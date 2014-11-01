@@ -1,0 +1,1798 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- This is currently a documentation-only software list, but is hooked up in exelv.c -->
+<softwarelist name="exl100_cass" description="Exelvision EXL 100 cassettes">
+	<software name="10000">
+		<description>10.000</description>
+		<year>198?</year>
+		<publisher>Minipuce</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="10702">
+				<rom name="10.000 (198x)(minipuce)(fr).k7" size="10702" crc="15c5239c" sha1="eede37b9eb7b4ca74f7e97a686a21d3234bcd961" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1000born">
+		<description>1000 Bornes</description>
+		<year>1985</year>
+		<publisher>Free Game Blot</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="15684">
+				<rom name="1000 bornes (1985)(free game blot)(fr)[b].k7" size="15684" crc="51198d3b" sha1="7cbefe80101b048f258dd8cccc238dc7b31e7114" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demimot">
+		<description>A Demi-Mot</description>
+		<year>198?</year>
+		<publisher>Cedic - Nathan</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="28347">
+				<rom name="a demi-mot (198x)(cedic, nathan)(fr).k7" size="28347" crc="a10e1f3c" sha1="4711847fbb45225126d1ac0196e8c12418ab6e72" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airball">
+		<description>Air-Ball</description>
+		<year>198?</year>
+		<publisher>Edition PUSSY</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="6540">
+				<rom name="air-ball (198x)(edition pussy)(fr).k7" size="6540" crc="920300b1" sha1="eeaabe61deec8836e93cb0635df224e88d0135b7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amigamus">
+		<description>Amiga Music System</description>
+		<year>19??</year>
+		<publisher>Edition PUSSY</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="4709">
+				<rom name="amiga music system (19xx)(edition pussy)(fr).k7" size="4709" crc="ed94d033" sha1="cb9146081e983d4731a20cb50f4bfa7a62d6d600" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anaconda">
+		<description>Anaconda</description>
+		<year>198?</year>
+		<publisher>Minipuce</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="25962">
+				<rom name="anaconda (198x)(minipuce)(fr).k7" size="25962" crc="c3c5e863" sha1="1493e08c2501c1a1910ba78048777a23b3c73cb0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="analyse">
+		<description>Analyse</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="1429">
+				<rom name="analyse (19xx)(-)(fr).k7" size="1429" crc="3a8c89c7" sha1="daa589dbb74e13388fab270399d0d842907d3f20" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="angles">
+		<description>Angles (Prototype)</description>
+		<year>1985</year>
+		<publisher>EH Services</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="56010">
+				<rom name="angles (1985)(eh services)(fr)(beta)[unreleased].k7" size="56010" crc="2801afad" sha1="79a5243dceed677703e13df620b304c62b22ba7b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anglesin">
+		<description>Angles + Invasion de Fautes (Prototype)</description>
+		<year>1985</year>
+		<publisher>EH Services</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="45656">
+				<rom name="angles + invasion de fautes (1985)(eh services)(fr)(beta)[unreleased].k7" size="45656" crc="510eeac5" sha1="20f97d1a0184e78392076dbbce6a0352d0e55bfe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anim640">
+		<description>Animation 640x250</description>
+		<year>2010</year>
+		<publisher>Daniel</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="64383">
+				<rom name="animation 640x250 (2010-01-01)(daniel).k7" size="64383" crc="4561ae6f" sha1="97171448ee26d2f989f5b354876ff86c00f7a4e0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="animauxa" cloneof="animaux">
+		<description>Animaux et la Ferme, Les - Tome I (2 Sides, Bad)</description>
+		<year>1985</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+		<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="16222">
+				<rom name="animaux et la ferme, les - tome i (1985)(exelvision)(fr)(side a)[b][req 64kb].k7" size="16222" crc="58c31b86" sha1="acd5e1a040d11162f65a1e78732080c49da71496" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="exl100_cass">
+		<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="16921">
+				<rom name="animaux et la ferme, les - tome i (1985)(exelvision)(fr)(side b)[b][req 64kb].k7" size="16921" crc="db81a0c5" sha1="fcb5be0081170ccb7d1fa64df190a095baa5a62b" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="animaux">
+		<description>Animaux et la Ferme, Les - Tome I (Bad)</description>
+		<year>1985</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="33148">
+				<rom name="animaux et la ferme, les - tome i (1985)(exelvision)(fr)[b][req 64kb].k7" size="33148" crc="ba9ffb1d" sha1="c7b0567890068194a233e4d6333722c1a8f7a968" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ati42">
+		<description>ATI 42</description>
+		<year>1985</year>
+		<publisher>Minipuce</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+		<feature name="part_id" value="Tape 1"/>
+			<dataarea name="cass" size="14696">
+				<rom name="ati 42 (1985-07)(minipuce)(fr)[req 64kb].k7" size="14696" crc="76aff8ce" sha1="2b2a10c52dc4b8cb3c6570f343ce5f08db0b4864" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="exl100_cass">
+		<feature name="part_id" value="Tape 1, Alt"/>
+			<dataarea name="cass" size="14694">
+				<rom name="ati 42 (1985-07)(minipuce)(fr)[a][req 64kb].k7" size="14694" crc="94fbc720" sha1="0363706c6af8edc61a4b2896d9d85955cc31063a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barman">
+		<description>Barman</description>
+		<year>198?</year>
+		<publisher>Minipuce</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="6003">
+				<rom name="barman (198x)(minipuce)(fr).k7" size="6003" crc="7cb1f6d6" sha1="32c3e5add21cda56d2958ff46e282ea09721016f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bitmap">
+		<description>Bitmap 640x250</description>
+		<year>2010</year>
+		<publisher>Daniel</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="32199">
+				<rom name="bitmap 640x250 (2010-01-01)(daniel).k7" size="32199" crc="5973334e" sha1="4299d871779de2234df1ab14a8332cdf71204b4b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bobodemo">
+		<description>Bobo Demo</description>
+		<year>19??</year>
+		<publisher>Edition PUSSY</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="6859">
+				<rom name="bobo demo (19xx)(edition pussy)(fr).k7" size="6859" crc="95fb0e49" sha1="d58ffe214c6b5a4876cc2f2e8194eb8655e733bd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombardi">
+		<description>Bombardier</description>
+		<year>198?</year>
+		<publisher>Minipuce</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="5935">
+				<rom name="bombardier (198x)(minipuce)(fr).k7" size="5935" crc="7e807fda" sha1="a2f8be5e4662c69ba8b9225b092e54347abe6cc3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bdash">
+		<description>Boulderdash</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="16469">
+				<rom name="boulderdash (198x)(-)(fr).k7" size="16469" crc="fc7bfdb0" sha1="c96b6c2fdc89081c2f5e903664e0cb5b8beb702e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bugsbust">
+		<description>Bugs Buster</description>
+		<year>1986</year>
+		<publisher>Free Game Blot</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="18046">
+				<rom name="bugs buster (1986)(free game blot)(fr)[req 64kb].k7" size="18046" crc="afc323c7" sha1="871418e2c4365290c926f4de1b14a559d70db5cd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carcrash">
+		<description>Car Crash (v1.8)</description>
+		<year>1986</year>
+		<publisher>Initiel</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+		<feature name="part_id" value="Tape 1"/>
+			<dataarea name="cass" size="16625">
+				<rom name="car crash v1.8 (1986-02)(initiel)(fr).k7" size="16625" crc="bc556f1d" sha1="42c3ef7f698c887b5c94ec620711d5a517728119" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="exl100_cass">
+		<feature name="part_id" value="Tape 1, Alt"/>
+			<dataarea name="cass" size="16627">
+				<rom name="car crash v1.8 (1986-02)(initiel)(fr)[a].k7" size="16627" crc="c7af41a9" sha1="23c4120704f838990c23a277456a9b2540db786e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="casino">
+		<description>Casino la Boule</description>
+		<year>19??</year>
+		<publisher>Minipuce</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="3479">
+				<rom name="casino la boule (19xx)(minipuce)(fr).k7" size="3479" crc="34496d00" sha1="b5f1558efc8e3531ff27ac3a1631cdf660f38676" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cassibri">
+		<description>Casse Briques Puissance 5</description>
+		<year>198?</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="16922">
+				<rom name="casse briques puissance 5 (198x)(exelvision)(fr)[b].k7" size="16922" crc="59ea6e44" sha1="855dada5acf93e70fe17586286a1f6637cb6054b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="civilwar">
+		<description>Civil War</description>
+		<year>198?</year>
+		<publisher>Exelement Votre</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="19915">
+				<rom name="civil war (198x)(exelement votre)(fr).k7" size="19915" crc="bb094291" sha1="d3583d3073bcd51648f011113efb9f90f29056a4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="compter">
+		<description>Compter</description>
+		<year>198?</year>
+		<publisher>Cedic - Nathan</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="30796">
+				<rom name="compter (198x)(cedic, nathan)(fr).k7" size="30796" crc="9b0eafa6" sha1="af9f05127d5de23ee4ee83fe680becc76266d6e7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conjugas">
+		<description>Conjugaison</description>
+		<year>198?</year>
+		<publisher>Cedic - Nathan</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="84116">
+				<rom name="conjugaison (198x)(cedic, nathan)(fr).k7" size="84116" crc="ddba9165" sha1="e46478532f2b9a4fe89532fd4a9b7611e0aff8e2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="corpshum">
+		<description>Le Corps Humain</description>
+		<year>1985</year>
+		<publisher>Infogrames</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="22954">
+				<rom name="corps humain, le (1985)(infogrames)(fr).k7" size="22954" crc="b2a1cb86" sha1="e60a609b79e1d05c7068e3fe024fbfe56dd6eab1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crackdem">
+		<description>Crack Demo</description>
+		<year>199?</year>
+		<publisher>Edition PUSSY</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="3535">
+				<rom name="crack demo (199x)(edition pussy)(fr)(en).k7" size="3535" crc="c4eb85c3" sha1="3be00704c01710e4d3629099b7ec191a048afa44" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crayon">
+		<description>Crayon Magique</description>
+		<year>198?</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="6278">
+				<rom name="crayon magique (198x)(exelvision)(fr).k7" size="6278" crc="1f8bf3ac" sha1="000cddbbeea9c4251510f3b04c9f2eeef5dc30bc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="creaphix">
+		<description>Creaphix</description>
+		<year>1985</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+		<feature name="part_id" value="Tape 1"/>
+			<dataarea name="cass" size="8163">
+				<rom name="creaphix (1985-07)(exelvision)(fr).k7" size="8163" crc="f66e913d" sha1="5d9c2d4a2ce97a98c8635f6a993e8dbaff09dd03" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="exl100_cass">
+		<feature name="part_id" value="Tape 1, Hacked by Edition PUSSY"/>
+			<dataarea name="cass" size="7151">
+				<rom name="creaphix (1985-07)(exelvision)(fr)[h edition pussy].k7" size="7151" crc="7a1713cb" sha1="bd7e420f6275a4fc734c39ee43be08aec595cf66" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crocodil">
+		<description>Crocodiles</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="1029">
+				<rom name="crocodiles (19xx)(-)(fr).k7" size="1029" crc="911eb13d" sha1="32095b6b0cca3990183c67263f73805b8aaf3e00" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="culture">
+		<description>La Culture par le Metro</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="5316">
+				<rom name="culture par le metro, la (19xx)(-)(fr).k7" size="5316" crc="77a9ea68" sha1="9c1d5383cd5b513bf70af2c87c97d376af95226b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dates">
+		<description>Dates</description>
+		<year>198?</year>
+		<publisher>Minipuce</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="3163">
+				<rom name="dates (198x)(minipuce)(fr).k7" size="3163" crc="f9ee617a" sha1="048de82e216fffa0f8f45005efee226d27b2f1cd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="decouv2">
+		<description>Decouverte - Tome II</description>
+		<year>198?</year>
+		<publisher>Minipuce</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="23119">
+				<rom name="decouverte - tome ii (198x)(minipuce)(fr).k7" size="23119" crc="6d945231" sha1="53c319dc2ee084e7099fec2a6f01c8c9b25bc78e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dessin">
+		<description>Dessin</description>
+		<year>19??</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="6488">
+				<rom name="dessin (19xx)(exelvision)(fr)[req 64kb].k7" size="6488" crc="fa4adde1" sha1="a108fe6d5139dbda68b65b219c58802579eff075" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="direct">
+		<description>Direct</description>
+		<year>198?</year>
+		<publisher>Edition PUSSY</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="7287">
+				<rom name="direct (198x)(edition pussy)(fr).k7" size="7287" crc="efbcc8fb" sha1="74a4b8b2282792de15406253e797bc086ab53517" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkong">
+		<description>Donkey Kong</description>
+		<year>1990</year>
+		<publisher>Edition PUSSY</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="6793">
+				<rom name="donkey kong (1990)(edition pussy)(fr).k7" size="6793" crc="0e134f1d" sha1="4afd41fa786bcc9d01cb499f549a84cecd58c6af" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dynamite">
+		<description>Dynamite-Ball</description>
+		<year>198?</year>
+		<publisher>Edition PUSSY</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="4268">
+				<rom name="dynamite-ball (198x)(edition pussy)(fr).k7" size="4268" crc="62d65538" sha1="927469a4461621e995dba3eb1ab78daf11e234b7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dynamite2" cloneof="dynamite">
+		<description>Dynamite-Ball (v2)</description>
+		<year>198?</year>
+		<publisher>Edition PUSSY</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="5274">
+				<rom name="dynamite-ball v2 (198x)(edition pussy)(fr).k7" size="5274" crc="f2e0b1d5" sha1="2b5a19e94950217b465e298b75e5ab6a7e837944" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="echecsda">
+		<description>Echecs-Dames</description>
+		<year>1988</year>
+		<publisher>Edition PUSSY</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="7181">
+				<rom name="echecs-dames (1988)(edition pussy)(fr).k7" size="7181" crc="89bd828a" sha1="bedfaebea9392cbc98736542666cff585e23c4de" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="editexte">
+		<description>Editeur de Texte</description>
+		<year>1985</year>
+		<publisher>Paul Picard</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="3736">
+				<rom name="editeur de texte (1985-07)(picard, paul)(fr).k7" size="3736" crc="de3f67ef" sha1="f506d621c745135e3f42d7e26e4ff4a46b46b91a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exelfich">
+		<description>Exel Fichiers</description>
+		<year>1984</year>
+		<publisher>Electron Software</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="12311">
+				<rom name="exel fichiers (1984)(electron software)(fr).k7" size="12311" crc="d7194490" sha1="cb7e734cd1b58f1a54205f3f8d1cfe0b39f2c991" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exeljack">
+		<description>Exel Jack</description>
+		<year>198?</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="13986">
+				<rom name="exel jack (198x)(exelvision)(fr).k7" size="13986" crc="f59a199a" sha1="47a6251bafd0aec080a5ccfd66e670f03c323a5e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exelpokr">
+		<description>Exel Poker</description>
+		<year>1984</year>
+		<publisher>Electron Software</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="13312">
+				<rom name="exel poker (1984)(electron software)(fr).k7" size="13312" crc="d978c510" sha1="7c6430f0aec8a5967862987752b3d73b14b10ebd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="faites1">
+		<description>Faites Parler Votre EXL100 - Volume 1 (v1.1)</description>
+		<year>198?</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="14439">
+				<rom name="faites parler votre exl100 - volume 1 v1.1 (198x)(exelvision)(fr).k7" size="14439" crc="87a128a0" sha1="4d9a167fd075ffff0e1ba869ca9ca0bcef9b3db2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="faites2">
+		<description>Faites Parler Votre EXL100 - Volume 2 (v1.1)</description>
+		<year>198?</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="10062">
+				<rom name="faites parler votre exl100 - volume 2 v1.1 (198x)(exelvision)(fr).k7" size="10062" crc="6759a1fc" sha1="1c8a7a9907abd5c6fb21c93401948a9a33421617" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fixel">
+		<description>Fixel</description>
+		<year>198?</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+		<feature name="part_id" value="Tape 1"/>
+			<dataarea name="cass" size="9222">
+				<rom name="fixel (198x)(exelvision)(fr).k7" size="9222" crc="e359af4a" sha1="159c201c46b3eb865fe1e88591bc32c1b83be80c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="exl100_cass">
+		<feature name="part_id" value="Tape 1, Alt"/>
+			<dataarea name="cass" size="9222">
+				<rom name="fixel (198x)(exelvision)(fr)[a].k7" size="9222" crc="615a88de" sha1="bbd79863d68b346fc1fe42f1f8101cefd8fad267" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fixtab">
+		<description>Fixtab</description>
+		<year>1985</year>
+		<publisher>Initiel</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="19147">
+				<rom name="fixtab (1985)(initiel)(fr).k7" size="19147" crc="9e9b2714" sha1="82d38887b7c78b2ce1003a0e9b455838a90b8e53" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fleuves">
+		<description>Fleuves Mers Ocean</description>
+		<year>198?</year>
+		<publisher>Minipuce</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+		<feature name="part_id" value="Intro"/>
+			<dataarea name="cass" size="10908">
+				<rom name="fleuves mers ocean (198x)(minipuce)(fr)(file 1 of 3)[intro].k7" size="10908" crc="c42c04ac" sha1="7acd938210372f59f806501d365ef825a959951f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="exl100_cass">
+		<feature name="part_id" value="Boot"/>
+			<dataarea name="cass" size="19567">
+				<rom name="fleuves mers ocean (198x)(minipuce)(fr)(file 2 of 3)[boot].k7" size="19567" crc="89e1861b" sha1="90fc8d5730d93ff4e70a921325dce63ddfd1fc43" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="exl100_cass">
+		<feature name="part_id" value="Data"/>
+			<dataarea name="cass" size="3552">
+				<rom name="fleuves mers ocean (198x)(minipuce)(fr)(file 3 of 3)[data].k7" size="3552" crc="e2c6b0cc" sha1="2ed7fb37855badedf861f18cd3f5284cd84c712d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="formule1">
+		<description>Formule 1</description>
+		<year>198?</year>
+		<publisher>Minipuce</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="7931">
+				<rom name="formule 1 (198x)(minipuce)(fr).k7" size="7931" crc="db08d13e" sha1="a848e43a2db17f9d48e263de4551b1b60d8f17a5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frises">
+		<description>Frises</description>
+		<year>198?</year>
+		<publisher>Cedic - Nathan</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="19176">
+				<rom name="frises (198x)(cedic, nathan)(fr).k7" size="19176" crc="41c00f52" sha1="6daa4f1d6811d70ce238b27ea3cec095fdb45763" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="espagnol">
+		<description>Generateur de Caracteres en Espagnol</description>
+		<year>198?</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+		<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="18066">
+				<rom name="generateur de caracteres en espagnol (198x)(exelvision)(fr)(side a).k7" size="18066" crc="3b45e034" sha1="826fc1afc8b8e3975c3acdbcd792d6a3ced4570b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="exl100_cass">
+		<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="18066">
+				<rom name="generateur de caracteres en espagnol (198x)(exelvision)(fr)(side b).k7" size="18066" crc="5c038236" sha1="a833fd02713d4ac15adc3d1c4350ea7ccba17f2f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geomega">
+		<description>Geomega le Monde</description>
+		<year>198?</year>
+		<publisher>Minipuce</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="21157">
+				<rom name="geomega le monde (198x)(minipuce)(fr).k7" size="21157" crc="ced99c55" sha1="b5d8b9829393ab56bebfc13487812b4674246f85" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graffiti">
+		<description>Graffitis</description>
+		<year>198?</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="4120">
+				<rom name="graffitis (198x)(exelvision)(fr).k7" size="4120" crc="75b32da9" sha1="06471ed3a98bec3099b94bcae30ea4bad43aff48" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hamburge">
+		<description>Hamburgers</description>
+		<year>1987</year>
+		<publisher>Edition PUSSY</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="5855">
+				<rom name="hamburgers (1987)(edition pussy)(fr).k7" size="5855" crc="da57eb12" sha1="c801375c6f8ca2f94e173c4b9c25f28ff3bd6092" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="histogra">
+		<description>Histogramme</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="3755">
+				<rom name="histogramme (19xx)(-)(fr).k7" size="3755" crc="9cc19b47" sha1="e9ae47d896d5414e56f596c18d2b7033a52cc077" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="horloge">
+		<description>Horloge</description>
+		<year>1984</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="1486">
+				<rom name="horloge (1984-12-04)(exelvision)(fr).k7" size="1486" crc="dcc94617" sha1="6df1edf55f16f9f6415fde341cc3769cd0e554af" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="initbas1">
+		<description>Initiation a l'EXELBASIC - Volume 1 (v1.0)</description>
+		<year>1985</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+		<feature name="part_id" value="Tape 1"/>
+			<dataarea name="cass" size="20928">
+				<rom name="initiation a l'exelbasic - volume 1 v1.0 (1985-07)(exelvision)(fr).k7" size="20928" crc="9e924951" sha1="23281175647249fe38834925833dfe4ad0e47873" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="exl100_cass">
+		<feature name="part_id" value="Tape 1, Alt"/>
+			<dataarea name="cass" size="20928">
+				<rom name="initiation a l'exelbasic - volume 1 v1.0 (1985-07)(exelvision)(fr)[a].k7" size="20928" crc="f0515212" sha1="c4ad077fa1716b77eec6a00cb772d97113b4e96f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="initbas2">
+		<description>Initiation a l'EXELBASIC - Volume 2 (v1.1)</description>
+		<year>1985</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="18853">
+				<rom name="initiation a l'exelbasic - volume 2 v1.1 (1985-08)(exelvision)(fr).k7" size="18853" crc="8f3708fb" sha1="1ee22b59be565b4e8089aab611ca8dae07d67b2e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="initbas3">
+		<description>Initiation a l'EXELBASIC - Volume 3 (v1.1)</description>
+		<year>1985</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="20396">
+				<rom name="initiation a l'exelbasic - volume 3 v1.1 (1985-08)(exelvision)(fr).k7" size="20396" crc="ebb86fe4" sha1="2f0acc4ceaa14c95b54cb13174e2464174837b54" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="initbas4">
+		<description>Initiation a l'EXELBASIC - Volume 4 (v1.1)</description>
+		<year>1985</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="23732">
+				<rom name="initiation a l'exelbasic - volume 4 v1.1 (1985-08)(exelvision)(fr).k7" size="23732" crc="0e0e55f5" sha1="8dc4e78d4732ed214997119bc01d305bfc7c4d8c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inibas1">
+		<description>Initiation au Basic 1</description>
+		<year>1985</year>
+		<publisher>Infogrames</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="13366">
+				<rom name="initiation au basic 1 (1985)(infogrames)(fr).k7" size="13366" crc="47f9b640" sha1="ddb487593a86bf77462df19bcfbad83dac6b4411" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inibas2">
+		<description>Initiation au Basic 2</description>
+		<year>1985</year>
+		<publisher>Infogrames</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="11459">
+				<rom name="initiation au basic 2 (1985)(infogrames)(fr).k7" size="11459" crc="5784eca7" sha1="1f2de97b4ba27c2ff195f4b61aa29796fdabe531" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inibas3">
+		<description>Initiation au Basic 3</description>
+		<year>1985</year>
+		<publisher>Infogrames</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="13772">
+				<rom name="initiation au basic 3 (1985)(infogrames)(fr).k7" size="13772" crc="256447bd" sha1="fbed3a4c2f15d16507f42a736dd23db6b3f5a090" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inibas4">
+		<description>Initiation au Basic 4</description>
+		<year>1985</year>
+		<publisher>Infogrames</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="5194">
+				<rom name="initiation au basic 4 (1985)(infogrames)(fr).k7" size="5194" crc="7d4a5b46" sha1="f3322f8958e8c5af3517edc3777a26b02b8e7766" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="invfaut">
+		<description>Invasion de Fautes (Prototype)</description>
+		<year>1985</year>
+		<publisher>EH Services</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="9658">
+				<rom name="invasion de fautes (1985-11)(eh services)(fr)(beta)[unreleased].k7" size="9658" crc="6f48044b" sha1="7d2a5e795b32a4deb1d5342b669b42e6e57f585e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kart">
+		<description>Kart</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="1300">
+				<rom name="kart (19xx)(-)(fr).k7" size="1300" crc="935a7053" sha1="a92efc6949797f4f363e71b7277d6b14da8eaa31" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keysbal3">
+		<description>Keys-Ball III</description>
+		<year>198?</year>
+		<publisher>Edition PUSSY</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+		<feature name="part_id" value="Tape 1"/>
+			<dataarea name="cass" size="16156">
+				<rom name="keys-ball iii (198x)(edition pussy)(fr).k7" size="16156" crc="af8ac17c" sha1="739ea02b5f7469d1aa5bf43f7dab885d33e11252" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="exl100_cass">
+		<feature name="part_id" value="Tape 1, Alt"/>
+			<dataarea name="cass" size="16156">
+				<rom name="keys-ball iii (198x)(edition pussy)(fr)[a].k7" size="16156" crc="c9868208" sha1="91f7caea04092bb464e76472a9b65f7a5ca01614" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keysbalp">
+		<description>Keys-Ball PRO</description>
+		<year>198?</year>
+		<publisher>Edition PUSSY</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="16850">
+				<rom name="keys-ball pro (198x)(edition pussy)(fr).k7" size="16850" crc="4bd7404c" sha1="5329cb4247e0c7d110118db4d5f80c7ae5cac5e1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kungfu">
+		<description>Kung-Fu</description>
+		<year>198?</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+		<feature name="part_id" value="Tape 1"/>
+			<dataarea name="cass" size="26160">
+				<rom name="kung-fu (198x)(exelvision)(fr).k7" size="26160" crc="3f2225e8" sha1="8fcf3064b94a5dc184cdb358805aad729b211c72" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="exl100_cass">
+		<feature name="part_id" value="Tape 1, Alt"/>
+			<dataarea name="cass" size="26162">
+				<rom name="kung-fu (198x)(exelvision)(fr)[a].k7" size="26162" crc="cf8ddbb4" sha1="ba3d84947417d89c0bc845f292a1aec2a95fa59a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="exl100_cass">
+		<feature name="part_id" value="Tape 1, Alt 2"/>
+			<dataarea name="cass" size="26160">
+				<rom name="kung-fu (198x)(exelvision)(fr)[a2].k7" size="26160" crc="47ff2e1b" sha1="3170af8b70eac201bd42d012ce532f54acbd87e7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="labyrint">
+		<description>A Labyrinthe in the Pyramide</description>
+		<year>1988</year>
+		<publisher>Edition PUSSY</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="14088">
+				<rom name="labyrinthe in the pyramide, a (1988)(edition pussy)(fr).k7" size="14088" crc="d74e6755" sha1="b6932d99ad39db47b02e4beca64504779046aea0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mnemolog">
+		<description>Lecture Rapide Mnemologik</description>
+		<year>198?</year>
+		<publisher>Minipuce</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="12326">
+				<rom name="lecture rapide mnemologik (198x)(minipuce)(fr).k7" size="12326" crc="9da215c6" sha1="995fc8f66144e946b5f18a793d3be778f2576ea1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="logiform">
+		<description>Logiformes</description>
+		<year>19??</year>
+		<publisher>Squirelle</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="19909">
+				<rom name="logiformes (19xx)(squirelle)(fr).k7" size="19909" crc="855e7e43" sha1="35c662025ef1d9c3fa8be7e2606b92b6c833bbf2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="logiphra">
+		<description>Logiphrases</description>
+		<year>19??</year>
+		<publisher>Squirelle</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="21559">
+				<rom name="logiphrases (19xx)(squirelle)(fr).k7" size="21559" crc="6517c50e" sha1="de612aaefb86f3ed6611eba04822506647927c9c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loto">
+		<description>Loto</description>
+		<year>198?</year>
+		<publisher>Edition PUSSY</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="2611">
+				<rom name="loto (198x)(edition pussy)(fr).k7" size="2611" crc="586fead1" sha1="df887df2a17b262999f8e6368cebee64167d408e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="myams">
+		<description>M'yams (Hacked by Edition PUSSY)</description>
+		<year>198?</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="17520">
+				<rom name="m'yams (198x)(exelvision)(fr)[h edition pussy].k7" size="17520" crc="750e448b" sha1="d5841a78aec872007827525bb9bed624f8bcceb5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mario">
+		<description>Mario's Cement Factory</description>
+		<year>1987</year>
+		<publisher>Exelement Votre</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="29112">
+				<rom name="mario's cement factory (1987)(exelement votre)(fr).k7" size="29112" crc="60059c17" sha1="43cb046f7f6bcf31ffec7c02a7851c8b7e6b4a67" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matrix">
+		<description>Matrix</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="1472">
+				<rom name="matrix (19xx)(-)(fr).k7" size="1472" crc="18c0524f" sha1="a05efb8e2bd13ea0cf13ef52a6fe26e574576476" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazeball">
+		<description>Maze-Ball</description>
+		<year>1990</year>
+		<publisher>Edition PUSSY</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+		<feature name="part_id" value="Tape 1"/>
+			<dataarea name="cass" size="8332">
+				<rom name="maze-ball (1990)(edition pussy)(fr).k7" size="8332" crc="6fea26d6" sha1="a706cb2b4bea0b97f8be21cfd0890ea5fe68ed2a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="exl100_cass">
+		<feature name="part_id" value="Tape 1, Alt"/>
+			<dataarea name="cass" size="8332">
+				<rom name="maze-ball (1990)(edition pussy)(fr)[a].k7" size="8332" crc="fa560e8a" sha1="974e27e4650f01eacb5137a2fe17449d413c2174" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="memoire">
+		<description>Memoire</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="3400">
+				<rom name="memoire (198x)(-)(fr).k7" size="3400" crc="32e9767a" sha1="d9367e4fa87f01fad746bce82fbf5c2c2da9b5f5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="memot">
+		<description>Memot</description>
+		<year>1985</year>
+		<publisher>EH Services</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="43329">
+				<rom name="memot (1985)(eh services)(fr).k7" size="43329" crc="93f374fa" sha1="c65769077f0beedd4e5c72709a25c866f1eb87e2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msgdefil">
+		<description>Message Defilant</description>
+		<year>198?</year>
+		<publisher>Minipuce</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="1602">
+				<rom name="message defilant (198x)(minipuce)(fr).k7" size="1602" crc="2a4b173f" sha1="d35ebd4e97abb687bde935b6f63dcf2edf30b0ef" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mesgolf">
+		<description>Mesure du Golf</description>
+		<year>198?</year>
+		<publisher>Cedic - Nathan</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="27103">
+				<rom name="mesure du golf (198x)(cedic, nathan)(fr).k7" size="27103" crc="4d4788d2" sha1="cc8e24ba82b19c4632436f561d52e282d955a154" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mestemps">
+		<description>Mesure du Temps</description>
+		<year>198?</year>
+		<publisher>Cedic - Nathan</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="19861">
+				<rom name="mesure du temps (198x)(cedic, nathan)(fr).k7" size="19861" crc="fc2f4bf6" sha1="ed2f717c5fa4d690331800bf92d0f053b029909f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meurtre">
+		<description>Meurtre - A Grande Vitesse</description>
+		<year>1985</year>
+		<publisher>Cobra Soft - Minipuce</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="60228">
+				<rom name="meurtre - a grande vitesse (1985-12-21)(cobra soft - minipuce)(fr).k7" size="60228" crc="cd537a90" sha1="a5a4d3433212dab312aee4c81e0c4e8f75f2d09d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midway">
+		<description>Midway</description>
+		<year>198?</year>
+		<publisher>Minipuce</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="12875">
+				<rom name="midway (198x)(minipuce)(fr).k7" size="12875" crc="fa7fd3d0" sha1="b804461285d7b979cc62aa52cec94d4eb068b53a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="millebor"> <!-- same as 1000born? -->
+		<description>Mille Bornes</description>
+		<year>1985</year>
+		<publisher>Free Game Blot</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="18398">
+				<rom name="mille bornes (1985)(free game blot)(fr).k7" size="18398" crc="7858bbc4" sha1="76eb51b028e8dfcf5e3a926daa53b80cd0e321bf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="millepat">
+		<description>Mille-pattes (Exelvision)</description>
+		<year>1985</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="11652">
+				<rom name="mille-pattes (1985-07)(exelvision)(fr).k7" size="11652" crc="2aec3aa9" sha1="59a0392ec9483426cfcaaaf66a0b5102e280246d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="millpat2">
+		<description>Mille-Pattes (Christophe Laboureau)</description>
+		<year>19??</year>
+		<publisher>Christophe Laboureau</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="21129">
+				<rom name="mille-pattes (19xx)(laboureau, christophe)(fr).k7" size="21129" crc="c32e1343" sha1="f2cfb82944c8dd62c2b0ce64091d7602601e72cd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moinsaut">
+		<description>Moins Autant Plus</description>
+		<year>198?</year>
+		<publisher>Cedic - Nathan</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="25352">
+				<rom name="moins autant plus (198x)(cedic, nathan)(fr).k7" size="25352" crc="e504b5bc" sha1="48953e33cba768fcc8895f64d47aa69ec788fc90" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mondrian">
+		<description>Mondrian</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="1127">
+				<rom name="mondrian (19xx)(-)(fr).k7" size="1127" crc="6855b55c" sha1="ecc65ebcc038256126fed54d8825cbad68aaa325" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monopoli">
+		<description>Monopolic</description>
+		<year>198?</year>
+		<publisher>Free Game Blot</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="29656">
+				<rom name="monopolic (198x)(free game blot)(fr).k7" size="29656" crc="8e281c1c" sha1="5dfa4168f5e80ff486c1b9a02ec16842eda3087d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monstre">
+		<description>Le Monstre du Lac Noir</description>
+		<year>1988</year>
+		<publisher>Edition PUSSY</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="24686">
+				<rom name="monstre du lac noir, le (1988)(edition pussy)(fr).k7" size="24686" crc="c115de1d" sha1="7b6222620a97762edae33481535d9177f3ffabcf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musicdem">
+		<description>Music Demo</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="2283">
+				<rom name="music demo (19xx)(-).k7" size="2283" crc="e50cf965" sha1="394aded95aa287b0f6f4d394ff342a23baa063a1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musical">
+		<description>Musical</description>
+		<year>198?</year>
+		<publisher>Paralleles</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+		<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="19707">
+				<rom name="musical (198x)(paralleles)(fr)(side a).k7" size="19707" crc="f1c988db" sha1="4bc28a934746894027dec95463b86ae8040a2fcf" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="exl100_cass">
+		<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="19707">
+				<rom name="musical (198x)(paralleles)(fr)(side b).k7" size="19707" crc="3c08ec80" sha1="89c8981d321c36bee9063d7492022d392f27f8a2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musique1">
+		<description>Musique 1</description>
+		<year>1985</year>
+		<publisher>Techni-musique</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="25143">
+				<rom name="musique 1 (1985)(techni-musique)(fr).k7" size="25143" crc="83c2a82d" sha1="da00630d694e6b72858f6540bed2b4e1a217632e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musique2">
+		<description>Musique 2</description>
+		<year>1985</year>
+		<publisher>Techni-musique</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="16582">
+				<rom name="musique 2 (1985)(techni-musique)(fr).k7" size="16582" crc="1dbeac33" sha1="5af41b0f34a583c94d0e161f528929bf26992ab2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nathlect">
+		<description>Nathan Lecture (Prototype)</description>
+		<year>198?</year>
+		<publisher>EH Services</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="23035">
+				<rom name="nathan lecture (198x)(eh services)(fr)(beta)[unreleased].k7" size="23035" crc="c623533c" sha1="338c661eae6af6101050faede823ff271cccfe55" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nimbus">
+		<description>Nimbus (Hacked by Edition PUSSY)</description>
+		<year>1985</year>
+		<publisher>Micro Scoop</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+		<feature name="part_id" value="Tape 1"/>
+			<dataarea name="cass" size="25093">
+				<rom name="nimbus (1985)(micro scoop)(fr)[h edition pussy].k7" size="25093" crc="ba41c0f8" sha1="cbd522195577bb7b71c30cd5e4a1aebd774296f3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="exl100_cass">
+		<feature name="part_id" value="Tape 1, Alt"/>
+			<dataarea name="cass" size="25091">
+				<rom name="nimbus (1985)(micro scoop)(fr)[h edition pussy][a].k7" size="25091" crc="a1fb3d87" sha1="0ce6001f0e69261e961a0aba80e20f8356757bdd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nombmyst">
+		<description>Le Nombre Mysterieux (Prototype)</description>
+		<year>198?</year>
+		<publisher>EH Services</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+		<feature name="part_id" value="Tape 1"/>
+			<dataarea name="cass" size="65079">
+				<rom name="nombre mysterieux, le (198x)(eh services)(fr)(beta)[unreleased].k7" size="65079" crc="e829c5d9" sha1="fb7859d472f0b85d4e8cc363459769471851cdfa" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="exl100_cass">
+		<feature name="part_id" value="Tape 1, Alt"/>
+			<dataarea name="cass" size="24777">
+				<rom name="nombre mysterieux, le (198x)(eh services)(fr)(beta)[a][unreleased].k7" size="24777" crc="c271f121" sha1="de743c27c9793336b7c707525b08e93b4399badb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="operal">
+		<description>Operal</description>
+		<year>198?</year>
+		<publisher>Paralleles</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="26466">
+				<rom name="operal (198x)(paralleles)(fr)[req 64kb].k7" size="26466" crc="fe329146" sha1="2298d95213dcc578ef10e9b16f58d0d7c0d3a8ed" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacific">
+		<description>Pacific</description>
+		<year>1988</year>
+		<publisher>Edition PUSSY</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="10429">
+				<rom name="pacific (1988)(edition pussy)(fr).k7" size="10429" crc="9dd7fe01" sha1="9d63e46ae0c69215d4fba83587b3be43a5724823" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="parsec">
+		<description>Parsec</description>
+		<year>1989</year>
+		<publisher>Edition PUSSY</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+		<feature name="part_id" value="Tape 1"/>
+			<dataarea name="cass" size="7235">
+				<rom name="parsec (1989)(edition pussy)(fr).k7" size="7235" crc="d6547ff0" sha1="99fddb5fc52e0358fc8cf343d38fe750b86e5b50" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="exl100_cass">
+		<feature name="part_id" value="Tape 1, Alt"/>
+			<dataarea name="cass" size="7235">
+				<rom name="parsec (1989)(edition pussy)(fr)[a].k7" size="7235" crc="f2f4a47c" sha1="2123a45fd87a97b8280ca4c75c84bcbe6d534dac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pascalba">
+		<description>Pascal Base (v1)</description>
+		<year>1985</year>
+		<publisher>Free Game Blot</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="34675">
+				<rom name="pascal base v1 (1985)(free game blot)(fr).k7" size="34675" crc="b30d4dd1" sha1="69e61e3308048c0e1c6578f31eb2146dc73c66e2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pedagogi">
+		<description>Pedagogiciel (v1.00)</description>
+		<year>1985</year>
+		<publisher>JLF Letierce</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+		<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="14473">
+				<rom name="pedagogiciel v1.00 (1985-03-25)(jlf letierce)(fr)(side a).k7" size="14473" crc="31219325" sha1="f7db063be21102081d4027dc8f95a9e88cef2058" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="exl100_cass">
+		<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="6153">
+				<rom name="pedagogiciel v1.00 (1985-03-25)(jlf letierce)(fr)(side b).k7" size="6153" crc="565cca78" sha1="96f8f938b67f379772787f12851f7e1834d277bc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="petanque">
+		<description>Petanque</description>
+		<year>198?</year>
+		<publisher>Minipuce</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="4930">
+				<rom name="petanque (198x)(minipuce)(fr)[b gfx].k7" size="4930" crc="3d26e083" sha1="a67adb4b4c8ac47562bd776326939390571cc10f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="petitpen">
+		<description>Le Petit Pendu Junior</description>
+		<year>198?</year>
+		<publisher>Edition PUSSY</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="4890">
+				<rom name="petit pendu junior, le (198x)(edition pussy)(fr).k7" size="4890" crc="38e194e5" sha1="a003d5f48d2a75907dfca98a4d1e033c0b2eebcd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phrase1" cloneof="phrase">
+		<description>La Phrase et ses Constituants (Prototype, v1)</description>
+		<year>198?</year>
+		<publisher>EH Services</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="13334">
+				<rom name="phrase et ses constituants, la (198x)(eh services)(fr)(beta)[unreleased][v1].k7" size="13334" crc="17c0be34" sha1="678faf5630deebe7c0eaf39fcd2d3f1ff7174d3a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phrase2" cloneof="phrase">
+		<description>La Phrase et ses Constituants (Prototype, v2)</description>
+		<year>198?</year>
+		<publisher>EH Services</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="30624">
+				<rom name="phrase et ses constituants, la (198x)(eh services)(fr)(beta)[unreleased][v2].k7" size="30624" crc="c88c9af1" sha1="d998fea78579f3f81814f65c17fea8a190cef22b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phrase3" cloneof="phrase">
+		<description>La Phrase et ses Constituants (Prototype, v3)</description>
+		<year>198?</year>
+		<publisher>EH Services</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="81357">
+				<rom name="phrase et ses constituants, la (198x)(eh services)(fr)(beta)[unreleased][v3].k7" size="81357" crc="d39d141d" sha1="067d3ca136082da3584da1441f9ce89a45edb305" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phrase">
+		<description>La Phrase et ses Constituants (Prototype, v4)</description>
+		<year>198?</year>
+		<publisher>EH Services</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="106659">
+				<rom name="phrase et ses constituants, la (198x)(eh services)(fr)(beta)[unreleased][v4].k7" size="106659" crc="7d6e1c49" sha1="20e9f78818e7109bda0330165fd5ffa9e54303f9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prodsurf">
+		<description>Produits et Surfaces</description>
+		<year>198?</year>
+		<publisher>Cedic - Nathan</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="24175">
+				<rom name="produits et surfaces (198x)(cedic, nathan)(fr).k7" size="24175" crc="be58e8fa" sha1="72a1ecccb0f68f6d3f6cdd360689c8de3d4a6042" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reflex">
+		<description>Programe de Reflexion</description>
+		<year>198?</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="5115">
+				<rom name="programe de reflexion (198x)(exelvision)(fr).k7" size="5115" crc="a6a0c363" sha1="ead7c8dd8e53f90139bd2fb9f017a27d216c4e7a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reperes">
+		<description>Reperes (Prototype)</description>
+		<year>198?</year>
+		<publisher>EH Services</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="11274">
+				<rom name="reperes (198x)(eh services)(fr)(beta)[unreleased].k7" size="11274" crc="c41c8f80" sha1="23d1dae627ba94f7658b0299dc7bc312f6aab833" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robix">
+		<description>Robix</description>
+		<year>198?</year>
+		<publisher>Lacral Software</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="29416">
+				<rom name="robix (198x)(lacral software)(fr).k7" size="29416" crc="4496da39" sha1="6f88c4faa52a6ba90c046305dbbc9a9ef504a3d7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="roboman">
+		<description>Roboman</description>
+		<year>198?</year>
+		<publisher>Fabrice Jouanot</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="18486">
+				<rom name="roboman (1987)(jouanot, fabrice)(fr).k7" size="18486" crc="268f93dd" sha1="1c638d787d8440ee6a8f33fb0d83e86d7dd3994f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shownote">
+		<description>Show-Note</description>
+		<year>19??</year>
+		<publisher>Edition PUSSY</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="12810">
+				<rom name="show-note (19xx)(edition pussy)(fr).k7" size="12810" crc="1cef08a6" sha1="0bd4d5ae94bfc8f3ee4321f07a46e280a1021be0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slidshowa" cloneof="slidshow">
+		<description>Slideshow Cassette (2010-01-01)</description>
+		<year>2010</year>
+		<publisher>Fabrice</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="77314">
+				<rom name="slideshow cassette (2010-01-01)(fabrice).k7" size="77314" crc="a8ba53a9" sha1="0da6fe509180ed34cab876cb5c6091dd00cbba26" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slidshow">
+		<description>Slideshow Cassette (2010-01-26)</description>
+		<year>2010</year>
+		<publisher>Fabrice</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="109521">
+				<rom name="slideshow cassette (2010-01-26)(fabrice).k7" size="109521" crc="30c04497" sha1="0d2e2e5daba2fc647705c0e9c6ae9cec294223f2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sommgame">
+		<description>Sommaire-Games</description>
+		<year>1988</year>
+		<publisher>Edition PUSSY</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="5344">
+				<rom name="sommaire-games (1988)(edition pussy)(fr).k7" size="5344" crc="cca06866" sha1="82ccc7a653cfdf87f6c8f4ca94c23715d685e3a0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacelab">
+		<description>Space Lab</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="4210">
+				<rom name="space lab (19xx)(-).k7" size="4210" crc="491ee6a2" sha1="300debdfd2de9b8e92d1f1335fb6e0a5889df4d1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacerun">
+		<description>Space Runner</description>
+		<year>1988</year>
+		<publisher>Edition PUSSY</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="7339">
+				<rom name="space runner (1988)(edition pussy)(fr).k7" size="7339" crc="f857821a" sha1="a9e21c403174c378bf77b72b31f7d134d8744b33" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprite">
+		<description>Sprite</description>
+		<year>198?</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="16924">
+				<rom name="sprite (198x)(exelvision)(fr)[b].k7" size="16924" crc="8dbf5285" sha1="ee52ef3b3c660e0572b403866a79fa449e0a2b50" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="startrek">
+		<description>Startrek</description>
+		<year>198?</year>
+		<publisher>Exelement Votre</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="20442">
+				<rom name="startrek (198x)(exelement votre)(fr).k7" size="20442" crc="6e893a0c" sha1="1add82b000adb20a3a575117a750a2beef2468a8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superli4">
+		<description>Super Line 4</description>
+		<year>198?</year>
+		<publisher>Edition PUSSY</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="4150">
+				<rom name="super line 4 (198x)(edition pussy)(fr).k7" size="4150" crc="49b7ec51" sha1="21327d86ddf1a4f38a0b33c31688c3701ed4e4a1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superbad">
+		<description>Superbad</description>
+		<year>1985</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="10605">
+				<rom name="superbad (1985)(exelvision)(fr).k7" size="10605" crc="99982061" sha1="a3347ab4524f6879416c35fba5b2a9f52644af32" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="symetrie">
+		<description>Symetries Translations</description>
+		<year>198?</year>
+		<publisher>Cedic - Nathan</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="19500">
+				<rom name="symetries translations (198x)(cedic, nathan)(fr).k7" size="19500" crc="300522ac" sha1="3b89d5dbe4efb560a26cd2fb933b79162a7a5448" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tarot">
+		<description>Tarot</description>
+		<year>1985</year>
+		<publisher>Exelement Votre</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="28337">
+				<rom name="tarot (1985-12-10)(exelement votre)(fr).k7" size="28337" crc="db3377c2" sha1="fda768bb3aefccc8389fb25ae34058feaca9b025" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="themeast">
+		<description>Theme Astral</description>
+		<year>19??</year>
+		<publisher>Minipuce</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="7531">
+				<rom name="theme astral (19xx)(minipuce)(fr).k7" size="7531" crc="19bdcadf" sha1="b8f34f7366f5c4c3d8219048bebe2ff11c0d764e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3rdworld">
+		<description>Third World War</description>
+		<year>1984</year>
+		<publisher>Free Game Blot</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="13781">
+				<rom name="third world war (1984)(free game blot)(fr).k7" size="13781" crc="87e25c3b" sha1="614fe8187610f0259d958dcb36b43cdec7fb78b3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="threerow">
+		<description>Three-in-a-Row</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="6057">
+				<rom name="three-in-a-row (198x)(-)(fr).k7" size="6057" crc="65cb1f3c" sha1="4b02837c11d57848110e7f39489d1ecc70097265" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tirecroi">
+		<description>Tire Croise</description>
+		<year>198?</year>
+		<publisher>Edition PUSSY</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="2494">
+				<rom name="tire croise (198x)(edition pussy)(fr).k7" size="2494" crc="66c5bc84" sha1="2cf4d31efc8460a79714fcdf7b6931ec50d81781" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toupie">
+		<description>Toupie</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="808">
+				<rom name="toupie (19xx)(-)(fr).k7" size="808" crc="74a2f780" sha1="2b1f51f56a814a1888370223b55ecd7fcb2f12d2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toureuro">
+		<description>Tour d'Europe</description>
+		<year>1985</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="19083">
+				<rom name="tour d'europe (1985)(exelvision)(fr).k7" size="19083" crc="a513e36d" sha1="5fe3dbff86a2d6018b393d075d1dff57f9068791" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trackba5">
+		<description>Track-Ball 5</description>
+		<year>1990</year>
+		<publisher>Edition PUSSY</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="6436">
+				<rom name="track-ball 5 (1990)(edition pussy)(fr).k7" size="6436" crc="45954019" sha1="fd9be5328414753271ff1006531231b576e88752" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trainlec">
+		<description>Le Train de la Lecture (Prototype)</description>
+		<year>198?</year>
+		<publisher>EH Services</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="72394">
+				<rom name="train de la lecture, le (198x)(eh services)(fr)(beta)[unreleased].k7" size="72394" crc="ab25550b" sha1="3177f0a80dbdbbb7404e7bc7789327cf10e50bf9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="affairor">
+		<description>Une Affaire en Or (Hacked by Edition PUSSY)</description>
+		<year>198?</year>
+		<publisher>Free Game Blot</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="24802">
+				<rom name="une affaire en or (198x)(free game blot)(fr)[h edition pussy].k7" size="24802" crc="3609996b" sha1="c2b69073d6f0b74d74ba9adc8756772acb0bcc11" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vampire">
+		<description>Vampire</description>
+		<year>198?</year>
+		<publisher>Edition PUSSY</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="10563">
+				<rom name="vampire (198x)(edition pussy)(fr).k7" size="10563" crc="1f093c7b" sha1="510da90a7b678a14fba0fbfc5c77303762778a28" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vegax4">
+		<description>Vega X4</description>
+		<year>1986</year>
+		<publisher>Minipuce</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="26197">
+				<rom name="vega x4 (1986)(minipuce)(fr).k7" size="26197" crc="293d5349" sha1="a5123b4c069e070d9a2b84281fd3241a4a943310" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="verlan">
+		<description>Verlan</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="exl100_cass">
+			<dataarea name="cass" size="2445">
+				<rom name="verlan (198x)(-).k7" size="2445" crc="7700d414" sha1="3448692c172c4b78f3e4ee4fd586b9dd3bfb563e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

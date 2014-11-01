@@ -589,6 +589,7 @@ static MACHINE_CONFIG_START( pmd85, pmd85_state )
 	MCFG_CASSETTE_FORMATS(pmd85_cassette_formats)
 	MCFG_CASSETTE_CREATE_OPTS(&pmd85_cassette_options)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("pmd85_cass")
 
 	/* uart */
 	MCFG_DEVICE_ADD("uart", I8251, 0)
@@ -597,6 +598,10 @@ static MACHINE_CONFIG_START( pmd85, pmd85_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
+	
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("cass_list","pmd85_cass")
+	MCFG_SOFTWARE_LIST_ADD("flop_list","pmd85_flop")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pmd851, pmd85 )

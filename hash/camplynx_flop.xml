@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- This is currently a documentation-only software list, but is hooked up in camplynx.c -->
+<softwarelist name="camplynx_flop" description="Camputers Lynx floppies">
+	<software name="cpm"> <!--128k-->
+		<description>CP/M (v2.2)</description>
+		<year>198?</year>
+		<publisher>Digital Research</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop1" size="204800">
+				<rom name="cpm v2.2.ldf" size="204800" crc="3d51fb62" sha1="ac75b3f0dbd3ea942eb22c4b8a25a180127e2d99" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jmutils"> <!--96k-128k-->
+		<description>Lynx JM Utilities Disk (v1.0)</description>
+		<year>1989</year>
+		<publisher>John Koushappas</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop1" size="204800">
+				<rom name="lynx jm utilities disk v1.0.ldf" size="204800" crc="5d0e836f" sha1="4f2504228685c51970be9e41f5884e28c1c84935" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="revival1">
+		<description>Lynx Revival Group - Volume 1</description>
+		<year>1988</year>
+		<publisher>John Koushappas</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop1" size="819200">
+				<rom name="lynx revival group - volume 1.ldf" size="819200" crc="afa4e118" sha1="ca5e74ddd7a66c1812ce946b6376dfa95f424f4c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

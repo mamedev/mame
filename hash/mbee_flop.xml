@@ -1,0 +1,173 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="mbee_flop" description="Applied Technology MicroBee floppies">
+	<software name="advgames">
+		<description>Adventure Games 1</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="860416">
+				<rom name="adventure games 1 (19xx)(-)[ds84].dsk" size="860416" crc="22e6d9e8" sha1="246b08f596dbea8558b07fd9a60eda84cadb2574" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alanadv3">
+		<description>Alan's Adventures Disk 3</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="860416">
+				<rom name="alan's adventure's disk 3 (19xx)(-)[ds84].dsk" size="860416" crc="de6bc2d5" sha1="79e6dd46a34f0ca84fe73cc9c1123d09eeeb2966" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alanadv4">
+		<description>Alan's Adventures Disk 4</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="860416">
+				<rom name="alan's adventure's disk 4 (19xx)(-)[ds84].dsk" size="860416" crc="245196c7" sha1="50e2800cf388428e6a2c16fe256dd7af84884bb3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alanadv2">
+		<description>Alan's Adventures Disk 2</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="860416">
+				<rom name="alan's adventures disk 2 (19xx)(-)[ds84].dsk" size="860416" crc="61a615ab" sha1="f58f38f22c4e3ee6c34f71e4af0dc05fcdce40ea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arcade1">
+		<description>Arcade Games 1</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="860416">
+				<rom name="arcade games 1 (19xx)(-)[ds84].dsk" size="860416" crc="91307b52" sha1="d15d711b4e88854c2cd9f2fa65c80093680f3117" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arcadev1">
+		<description>Arcade Games Vol. 1</description>
+		<year>198?</year>
+		<publisher>HoneySoft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="arcade games vol. 1 (19xx)(honeysoft).dsk" size="215296" crc="42097929" sha1="c0f1aee814c306d334015bd0c0c654125c009b42" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arcadev3">
+		<description>Arcade Games Vol. 3</description>
+		<year>198?</year>
+		<publisher>HoneySoft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="arcade games vol. 3 (19xx)(honeysoft).dsk" size="215296" crc="f96ad0c0" sha1="df1b86ed5923dced86a4e8f17a7f39c42289e700" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chicken">
+		<description>ChickenMan's Games Demo Disc</description>
+		<year>198?</year>
+		<publisher>ChickenMan</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="860416">
+				<rom name="chickenman's games demo disc (19xx)(chickenman)[ds80].dsk" size="860416" crc="e9c8dad6" sha1="1e1ef6c6da29202bc0b714ab69555e5f90e562bb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="coloursa">
+		<description>Colour Sampler 1</description>
+		<year>198?</year>
+		<publisher>HoneySoft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="colour sampler 1 (19xx)(honeysoft).dsk" size="215296" crc="fdf20f2b" sha1="fcc742c3756a3b3c698ccce80a1957e853710f4e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cunnrun">
+		<description>Cunning Running</description>
+		<year>1984</year>
+		<publisher>Jacaranda Wiley</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="430336">
+				<rom name="cunning running (1984)(jacaranda wiley)[ss80].dsk" size="430336" crc="b6e2dd4c" sha1="e3d79fa64774c49daa57cb3ed74bf2eb365574ea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mbeecpm">
+		<description>MicroBee 128 CPM v2.20</description>
+		<year>1982</year>
+		<publisher>MicroBee</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="microbee 128 cpm v2.20 (1982)(microbee).img" size="409600" crc="c19d1e51" sha1="288f76fd981a1fb7de8a1cdc73f8d3c0e1428d6b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mbeecpma" cloneof="mbeecpm">
+		<description>MicroBee 128 CPM v2.20 (Alt)</description>
+		<year>1982</year>
+		<publisher>MicroBee</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="microbee 128 cpm v2.20 (1982)(microbee)[a].img" size="409600" crc="686524f2" sha1="f8d057d166cb16bd7c2a0300e125b62ca2c7523a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mbeeadv3">
+		<description>Microbee Adventures Vol. 3</description>
+		<year>198?</year>
+		<publisher>HoneySoft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="215296">
+				<rom name="microbee adventures vol. 3 (19xx)(honeysoft).dsk" size="215296" crc="ba56e0be" sha1="3302a6156c003ad34deb5aabe1414ff5a2545170" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gammaos">
+		<description>MicroBee Gamma OS v1.1 Boot &amp; Demo Disk (Proto)</description>
+		<year>1986</year>
+		<publisher>MicroBee</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="819200">
+				<rom name="microbee gamma os v1.1 boot &amp; demo disk (1986)(microbee)(au)(proto).img" size="819200" crc="d0f22e46" sha1="c223e53243dcdf759a33201ff9bbfdef2be688d0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

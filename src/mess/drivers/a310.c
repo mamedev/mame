@@ -407,6 +407,10 @@ static MACHINE_CONFIG_START( a310, a310_state )
 
 	MCFG_SOUND_ADD("dac7", DAC, 0)
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
+		
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "archimedes")
+
 MACHINE_CONFIG_END
 
 ROM_START(a310)

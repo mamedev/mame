@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="primo_flop" description="Microkey Primo floppies">
+	<software name="cdosa64">
+		<description>CDOS Bootdisk (Primo A64)</description>
+		<year>1985</year>
+		<publisher>BME-KSZK</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="cdos bootdisk (1985)(bme-kszk)(primo a64).d64" size="174848" crc="6b773251" sha1="ff52850825eb0bb401254fe4478bc51d3748322d" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cdosb64">
+		<description>CDOS Bootdisk (Primo B64)</description>
+		<year>1985</year>
+		<publisher>BME-KSZK</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="cdos bootdisk (1985)(bme-kszk)(primo b64).d64" size="174848" crc="9733897f" sha1="b7423e7c3884cef1808fb7539da3b8f1f08ce5ef" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

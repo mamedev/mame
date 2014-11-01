@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!-- this is only a skeleton!-->
+
+<softwarelist name="oric_cass" description="Tangerine Oric cassettes">
+	<software name="007">
+		<description>007 - Dangereusement Votre (Fra)</description>
+		<year>19??</year>
+		<publisher>Severn Software</publisher>
+
+		<part name="cass1" interface="oric_cass">
+			<dataarea name="cass" size="28630">
+				<rom name="007 - dangereusement votre (19xx)(severn software).tap" size="28630" crc="693b1888" sha1="e2b86ae997cbf944b5cd2c0d715d78875efa3f19" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

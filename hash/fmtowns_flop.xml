@@ -1,0 +1,935 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="fmtowns_flop" description="Fujitsu FM-Towns disk images">
+	<software name="columns">
+		<description>Columns</description>
+		<year>1990</year>
+		<publisher>Telenet</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="columns (1990)(telenet)(jp).bin" size="1261568" crc="4ad9c624" sha1="8fc4fc56767c94864e8aceb2ae77a23cf5781e74" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dps">
+		<description>D.P.S.</description>
+		<year>1989</year>
+		<publisher>Alice Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="d.p.s. (1989)(alice soft)(jp)(disk 1 of 2).d88" size="1281968" crc="b16eb3e1" sha1="e9a816ca4b2794dd4409b84ee9d57564b7b90930" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="d.p.s. (1989)(alice soft)(jp)(disk 2 of 2).d88" size="1281968" crc="024dca54" sha1="2142c09dc6c70831321c9e7716539abc3e6100ef" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dpssg">
+		<description>D.P.S. SG</description>
+		<year>1990</year>
+		<publisher>Alice Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1 (System)"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="d.p.s. sg (1990)(alice soft)(jp)(disk 1 of 4)(system).d88" size="1281968" crc="f7149880" sha1="87f6c935cc95d25601d85b4bde5b39c21bcc4882" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2 (Kateikyoushi Ha Suteki Na Oshigoto)"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="d.p.s. sg (1990)(alice soft)(jp)(disk 2 of 4)(kateikyoushi ha suteki na oshigoto).d88" size="1281968" crc="0abfe4c7" sha1="1d0928f58322b815b190b2f99fe8f8e95be2535a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 3 (Fahnen Fliegen)"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="d.p.s. sg (1990)(alice soft)(jp)(disk 3 of 4)(fahnen fliegen).d88" size="1281968" crc="af5e100b" sha1="3d3c0ccbfd6b5a6bc6693da4c5e6090bd0c58c2e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 4 (Nobunaga No Inbou)"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="d.p.s. sg (1990)(alice soft)(jp)(disk 4 of 4)(nobunaga no inbou).d88" size="1281968" crc="24976e45" sha1="2b20cdb4c120b979670f6e0a2ee05fca6e2c6e59" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dpssg3">
+		<description>D.P.S. SG Set 3</description>
+		<year>1991</year>
+		<publisher>Alice Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1 (System)"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="d.p.s. sg set 3 (1991)(alice soft)(jp)(disk 1 of 4)(system).d88" size="1281968" crc="f8e1e57f" sha1="dbc1cc4947596950230b4516ca74549271e2589c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2 (Sotsugyou)"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="d.p.s. sg set 3 (1991)(alice soft)(jp)(disk 2 of 4)(sotsugyou).d88" size="1281968" crc="8e95b219" sha1="43f1b21d22706456c755d3e6d445897b9c5b04c3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 3 (Rabbit P4P)"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="d.p.s. sg set 3 (1991)(alice soft)(jp)(disk 3 of 4)(rabbit p4p).d88" size="1281968" crc="b6436653" sha1="8d5258f1f67014d02d5a640d2326205d4001595a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 4 (Shinkonsan Monogatari)"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="d.p.s. sg set 3 (1991)(alice soft)(jp)(disk 4 of 4)(shinkonsan monogatari).d88" size="1281968" crc="d9118228" sha1="f1a67de4fa364b2e3af2a2aac1bae2daee66885b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dalk">
+		<description>Dalk</description>
+		<year>1993</year>
+		<publisher>Alice Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1281968">
+				<rom name="dalk (1993)(alice soft)(jp).d88" size="1281968" crc="e9669a77" sha1="85b3f039e818a583341b9a787857b13c7d6c518d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dinosaur">
+		<description>Dinosaur</description>
+		<year>1991</year>
+		<publisher>Falcom</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="dinosaur (1991)(falcom)(jp)(disk 1 of 3).bin" size="1261568" crc="2f652873" sha1="190dc1a07c1b4ac1ccc96295e8b178c15eaf89b1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="dinosaur (1991)(falcom)(jp)(disk 2 of 3).bin" size="1261568" crc="e230629d" sha1="a2d0f382a49bb8b9c71d0cd23c7ec9f7b13f823b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="dinosaur (1991)(falcom)(jp)(disk 3 of 3).bin" size="1261568" crc="6a449cdc" sha1="792c40cd43ab723b4832995e55ef1367a6e462ae" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drstop">
+		<description>Dr.STOP!</description>
+		<year>1990</year>
+		<publisher>Alice Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="dr.stop! (1990)(alice soft)(jp)(disk 1 of 2).d88" size="1281968" crc="dd95d3eb" sha1="b8cecd88071da5a9b45900fc3e78033dd399dbd4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="dr.stop! (1990)(alice soft)(jp)(disk 2 of 2).d88" size="1281968" crc="f09a8d6a" sha1="92d9e3f82fc86ad96ea250e7bd95105dd669f5d4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hhl1">
+		<description>Houma Hunter Lime Vol.1</description>
+		<year>1994</year>
+		<publisher>Silence</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.1 (1994)(silence)(jp)(disk 1 of 2).bin" size="1261568" crc="bcacfc71" sha1="ff4f4cd0846d0fdab5d60d163d8d4a91b06ca8cb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.1 (1994)(silence)(jp)(disk 2 of 2).bin" size="1261568" crc="d29bb913" sha1="27ed3acf34e5eecb6295386db3a111ce3acf0e53" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hhl10">
+		<description>Houma Hunter Lime Vol.10</description>
+		<year>1994</year>
+		<publisher>Silence</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.10 (1994)(silence)(jp)(disk 1 of 3).bin" size="1261568" crc="be436f73" sha1="2d9f8a0b90d59c48a25ac3c18cf753e87aae22ce" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.10 (1994)(silence)(jp)(disk 2 of 3).bin" size="1261568" crc="e9cf9de2" sha1="6c1dcc4d40b9d9f55f9953eeb36d0375d00e2ccd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.10 (1994)(silence)(jp)(disk 3 of 3).bin" size="1261568" crc="d675e169" sha1="44bc603ba6293bda6fcdcf4afcd526cd21f7adc7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hhl11">
+		<description>Houma Hunter Lime Vol.11</description>
+		<year>1994</year>
+		<publisher>Silence</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.11 (1994)(silence)(jp)(disk 1 of 3).bin" size="1261568" crc="11c06a95" sha1="97a260b2d26215518d180a2ac6959f6032049909" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.11 (1994)(silence)(jp)(disk 2 of 3).bin" size="1261568" crc="9a339a06" sha1="04ddab9becb7d337d58123f1db41f61ce370a1e8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.11 (1994)(silence)(jp)(disk 3 of 3).bin" size="1261568" crc="94f78df9" sha1="6a318d7b3766b7cc97dbcd53208a4fe17bdc2951" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hhl12">
+		<description>Houma Hunter Lime Vol.12</description>
+		<year>1994</year>
+		<publisher>Silence</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.12 (1994)(silence)(jp)(disk 1 of 4).bin" size="1261568" crc="1e8f5e4e" sha1="13a081f80bd8d18dd1454c5ffeffb0430382e82d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.12 (1994)(silence)(jp)(disk 2 of 4).bin" size="1261568" crc="c2c125e6" sha1="62ea776500763d4ca79c76a0ad5c7f7d39e51660" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.12 (1994)(silence)(jp)(disk 3 of 4).bin" size="1261568" crc="8e85a5ad" sha1="7e11e491786fef1ef71e0d29f2539003f40053c7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.12 (1994)(silence)(jp)(disk 4 of 4).bin" size="1261568" crc="21a00337" sha1="fa8b7dc24933fe52cf3bfe0e3bccdcb92d6a56e1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hhl2">
+		<description>Houma Hunter Lime Vol.2</description>
+		<year>1994</year>
+		<publisher>Silence</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.2 (1994)(silence)(jp)(disk 1 of 2).bin" size="1261568" crc="fde9b8e5" sha1="08274b1e0912d7a03194279a814be4421ab79e75" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.2 (1994)(silence)(jp)(disk 2 of 2).bin" size="1261568" crc="17c31391" sha1="d2584da1ac2e01e30256f5341f35e21513130cc1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hhl3">
+		<description>Houma Hunter Lime Vol.3</description>
+		<year>1994</year>
+		<publisher>Silence</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.3 (1994)(silence)(jp)(disk 1 of 2).bin" size="1261568" crc="ab3d77d0" sha1="14ca7e31131d411408e4c532ae0a9c77d28160f8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.3 (1994)(silence)(jp)(disk 2 of 2).bin" size="1261568" crc="10b66445" sha1="447ff2266a281c7352bf0439e7fe16e49e6fb254" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hhl4">
+		<description>Houma Hunter Lime Vol.4</description>
+		<year>1994</year>
+		<publisher>Silence</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.4 (1994)(silence)(jp)(disk 1 of 2).bin" size="1261568" crc="cd83229e" sha1="3a52b0cee6a15de47c322157997cb7176abdee98" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.4 (1994)(silence)(jp)(disk 2 of 2).bin" size="1261568" crc="2a56cba4" sha1="3a81e2ac38d8b610f64f90b7f93c01da5ca80f46" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hhl5">
+		<description>Houma Hunter Lime Vol.5</description>
+		<year>1994</year>
+		<publisher>Silence</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.5 (1994)(silence)(jp)(disk 1 of 2).bin" size="1261568" crc="87c29800" sha1="3872d0b64d9973c78cd482d6bfdd489002b483d6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.5 (1994)(silence)(jp)(disk 2 of 2).bin" size="1261568" crc="2064f50f" sha1="14bee84e524ac603c94bcca791dafe3cb2c3719e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hhl6">
+		<description>Houma Hunter Lime Vol.6</description>
+		<year>1994</year>
+		<publisher>Silence</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.6 (1994)(silence)(jp)(disk 1 of 2).bin" size="1261568" crc="8bfd3e9b" sha1="aa626bb3356839cf7071ce8d8d8cc09c9951b220" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.6 (1994)(silence)(jp)(disk 2 of 2).bin" size="1261568" crc="9c669e28" sha1="a917938337a10b5ab73418ecc1bcddd55cd87d04" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hhl7">
+		<description>Houma Hunter Lime Vol.7</description>
+		<year>1994</year>
+		<publisher>Silence</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.7 (1994)(silence)(jp)(disk 1 of 3).bin" size="1261568" crc="ed76de63" sha1="af2d6bcd4373245bfd7a66ac0f4c7c61a5942f9d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.7 (1994)(silence)(jp)(disk 2 of 3).bin" size="1261568" crc="cd174cc7" sha1="a866fb6c898f2488113232c9d179aeb2545d504d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.7 (1994)(silence)(jp)(disk 3 of 3).bin" size="1261568" crc="076aa899" sha1="2a4e91e20ea87657edc18ff61d6274b8aa056e54" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hhl8">
+		<description>Houma Hunter Lime Vol.8</description>
+		<year>1994</year>
+		<publisher>Silence</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.8 (1994)(silence)(jp)(disk 1 of 3).bin" size="1261568" crc="f8954bcb" sha1="796336813e695c6073e334c2fc7aae7f1fa6fe6a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.8 (1994)(silence)(jp)(disk 2 of 3).bin" size="1261568" crc="550bbff0" sha1="636b8d763757e43f0225765ae05a3ded263f20cd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.8 (1994)(silence)(jp)(disk 3 of 3).bin" size="1261568" crc="d17cdd8c" sha1="e6c7542dcaa407d3e4e507702fe1a068f79e5b0b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hhl9">
+		<description>Houma Hunter Lime Vol.9</description>
+		<year>1994</year>
+		<publisher>Silence</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.9 (1994)(silence)(jp)(disk 1 of 3).bin" size="1261568" crc="92e7dd6c" sha1="815405e0a58ee2105e86472281757ca4b5826f3d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.9 (1994)(silence)(jp)(disk 2 of 3).bin" size="1261568" crc="a0bf31d3" sha1="24ec5c3103080a7191c5027d16533944c33d6cce" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="houma hunter lime vol.9 (1994)(silence)(jp)(disk 3 of 3).bin" size="1261568" crc="65c7c667" sha1="45269774f1f6cb977262f57d03bf3c20d3b71024" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="irium">
+		<description>Irium</description>
+		<year>1993</year>
+		<publisher>Orange House</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="irium (1993)(orange house)(jp)(disk 1 of 5).bin" size="1261568" crc="7d6b858f" sha1="1670641115935a85164a58f58cdeb2b4514652a2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="irium (1993)(orange house)(jp)(disk 2 of 5).bin" size="1261568" crc="0d11cb39" sha1="0ef37fb4abd4cd473ba6518d3dfce40aaefeba05" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="irium (1993)(orange house)(jp)(disk 3 of 5).bin" size="1261568" crc="193a7e6d" sha1="895d7c1ff30b64612ac18aedb3b1d67f79738322" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="irium (1993)(orange house)(jp)(disk 4 of 5).bin" size="1261568" crc="c7032ea8" sha1="35c8158074c8024dd65217727161c6f920f9ef06" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="irium (1993)(orange house)(jp)(disk 5 of 5).bin" size="1261568" crc="7485ce43" sha1="c16a5acf65b732676496b9fd89e337609283cb12" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dosboot" cloneof="msdos">
+		<description>MS-DOS (v6.2L10, Boot disk?)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="microsoft ms-dos v6.2 l10 (1993)(microsoft)(jp).bin" size="1261568" crc="16a72ad3" sha1="995b709506811697eceddcbd1812ca809d7230e8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos31" cloneof="msdos">
+		<description>MS-DOS (v3.1L24)</description>
+		<year>1992</year>
+		<publisher>Fujitsu</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="ms-dos v3.1l24 (1992)(fujitsu)(jp)(disk 1 of 2).bin" size="1261568" crc="c9a3378f" sha1="2c423f85ceea732b41cc195b065ada9e1f09b67c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="ms-dos v3.1l24 (1992)(fujitsu)(jp)(disk 2 of 2).bin" size="1261568" crc="c6f4c86c" sha1="86e64a6744e2c7d1d5d4e3159ebd1885c691b33b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos">
+		<description>MS-DOS (v6.2L10)</description>
+		<year>1994</year>
+		<publisher>Fujitsu</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="ms-dos v6.2l10 (1994)(fujitsu)(jp)(disk 1 of 5).bin" size="1261568" crc="e7eec864" sha1="22a98bcb36566487a0253657de1a00e44e459b6a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="ms-dos v6.2l10 (1994)(fujitsu)(jp)(disk 2 of 5).bin" size="1261568" crc="189b0d6f" sha1="b8a04dbda831a7bacf782135510b6fc70faa01f3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="ms-dos v6.2l10 (1994)(fujitsu)(jp)(disk 3 of 5).bin" size="1261568" crc="eb9fdbb1" sha1="5afa97f3061ab3394c6a38b0b8d233113dbd3d06" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="ms-dos v6.2l10 (1994)(fujitsu)(jp)(disk 4 of 5).bin" size="1261568" crc="80be3828" sha1="61a484f0cd085da7f6911e98e39295730d202055" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="ms-dos v6.2l10 (1994)(fujitsu)(jp)(disk 5 of 5).bin" size="1261568" crc="4016cf1a" sha1="870f7b747c3612c8f915da4f32fd86d8868d9d38" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musicpro">
+		<description>Music Pro-Towns</description>
+		<year>1989</year>
+		<publisher>Musical Plan</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="music pro-towns (1989)(musical plan)(jp).bin" size="1261568" crc="f5f61d98" sha1="2abb5e9042d8aae0480b551568ac2f8053126209" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="premium2">
+		<description>Premium 2</description>
+		<year>1994</year>
+		<publisher>Silky</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="premium 2 (1994)(silky)(jp)(disk 1 of 4).bin" size="1261568" crc="1fef893a" sha1="907617847040a74ef6d92a33e9430e46d500076e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="premium 2 (1994)(silky)(jp)(disk 2 of 4).bin" size="1261568" crc="5d645e54" sha1="dd9c4c649d273b7dd0730806837bdc3c953d3272" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="premium 2 (1994)(silky)(jp)(disk 3 of 4).bin" size="1261568" crc="26d67acd" sha1="70289de0b14909480769216904707116cafbcbcb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="premium 2 (1994)(silky)(jp)(disk 4 of 4).bin" size="1261568" crc="5723ce84" sha1="5948e0ba82688fe321be6b49402722768996c63e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rance">
+		<description>Rance - Hikari o Motomete</description>
+		<year>1989</year>
+		<publisher>Alice Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="rance - hikari o motomete (1989)(alice soft)(jp)(disk 1 of 4).d88" size="1281968" crc="5ae96d5d" sha1="a22f6b137230c9a476d0505b05391fccd7658ed5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="rance - hikari o motomete (1989)(alice soft)(jp)(disk 2 of 4).d88" size="1281968" crc="beaf81e5" sha1="63e034a212a751c55d5e451e8ec77a565585cb5e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="rance - hikari o motomete (1989)(alice soft)(jp)(disk 3 of 4).d88" size="1281968" crc="b82589fa" sha1="0509d39fabe7ecb49eec96d0b9f61f754cf43895" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="rance - hikari o motomete (1989)(alice soft)(jp)(disk 4 of 4).d88" size="1281968" crc="a47d486c" sha1="640f75605a3bd3a36a3dae795ba9ab3a79124516" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rance2">
+		<description>Rance 2 - Hangyaku No Shoujotachi (Missing Disks)</description>
+		<year>1990</year>
+		<publisher>Alice Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="disk1.d88" offset="0" status="nodump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="rance 2 - hangyaku no shoujotachi (1990)(alice soft)(jp)(disk 2 of 6).d88" size="1281968" crc="03523a2a" sha1="d10d5a5f7fbc9515b98a114b6bef783bc5336b20" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="disk3.d88" offset="0" status="nodump"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="disk4.d88" offset="0" status="nodump"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="disk5.d88" offset="0" status="nodump"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 6"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="rance 2 - hangyaku no shoujotachi (1990)(alice soft)(jp)(disk 6 of 6).d88" size="1281968" crc="1b162c76" sha1="bc490576196b3b095ca9dc8ef6218577cf659402" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reira">
+		<description>Reira</description>
+		<year>1994</year>
+		<publisher>Silkys</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="reira (1994)(silkys)(jp)(disk 1 of 6).bin" size="1261568" crc="d82d5732" sha1="ac51e1ee6be9afa79f984a9ddcd5109347d31c35" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="reira (1994)(silkys)(jp)(disk 2 of 6).bin" size="1261568" crc="3d66ddc6" sha1="05d1d20dd5c535dfe653e6afd23e0e256c3639ec" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="reira (1994)(silkys)(jp)(disk 3 of 6).bin" size="1261568" crc="03fa528c" sha1="635043a3490b03ee0ef06d901e774ae46f14963c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="reira (1994)(silkys)(jp)(disk 4 of 6).bin" size="1261568" crc="d26f5aef" sha1="9d59989831b58ed6098b517b29f45514932c8580" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="reira (1994)(silkys)(jp)(disk 5 of 6).bin" size="1261568" crc="9008a977" sha1="32cf426ce9f15489c92dd1effc58da5380ea6f16" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 6"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="reira (1994)(silkys)(jp)(disk 6 of 6).bin" size="1261568" crc="fa05a62c" sha1="1990124f647a164b18380b1686094ef29ee100e2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soreyuke">
+		<description>Soreyuke Nanpa-kun</description>
+		<year>1991</year>
+		<publisher>Virgin House</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="soreyuke nanpa kun (1991)(virgin house)(jp)(disk 1 of 3).bin" size="1261568" crc="26d312fd" sha1="aaccaf41db22c44da1f637b11110d8dbf3f7c9cc" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="soreyuke nanpa kun (1991)(virgin house)(jp)(disk 2 of 3).bin" size="1261568" crc="36f63243" sha1="a55c8075fc0430a5288224c36b0719fe33ce329e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="soreyuke nanpa kun (1991)(virgin house)(jp)(disk 3 of 3).bin" size="1261568" crc="c60eb344" sha1="c88788f4156f88d80e368ee12dc486e32544ce52" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superdps">
+		<description>Super D.P.S.</description>
+		<year>1992</year>
+		<publisher>Alice Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1 (System)"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="super d.p.s. (1992)(alice soft)(jp)(disk 1 of 6)(system).d88" size="1281968" crc="715999f3" sha1="561292589dce62766b35ac3dde51bfee09bab9e9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2 (Maria To Kanpan A)"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="super d.p.s. (1992)(alice soft)(jp)(disk 2 of 6)(maria to kanpan a).d88" size="1281968" crc="6d8d6d47" sha1="fc83a321d0ef855f942a78006ecf022f3e760592" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 3 (Ureshi Tanoshi Kaizoku Kagyou A)"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="super d.p.s. (1992)(alice soft)(jp)(disk 3 of 6)(ureshi tanoshi kaizoku kagyou a).d88" size="1281968" crc="a2506043" sha1="3d62845da2d87d7a039e02254aacf13809dab63b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 4 (Ureshi Tanoshi Kaizoku Kagyou B)"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="super d.p.s. (1992)(alice soft)(jp)(disk 4 of 6)(ureshi tanoshi kaizoku kagyou b).d88" size="1281968" crc="2fa5f23d" sha1="9384ea2fa570a85d128f99cdfea3eb2312f4c5b5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 5 (Toono No Mori A)"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="super d.p.s. (1992)(alice soft)(jp)(disk 5 of 6)(toono no mori a).d88" size="1281968" crc="29eea4b4" sha1="7ac90f50ae9e2aec962d01e9b88dcd92ce0f97d6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 6 (Toono No Mori B)"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="super d.p.s. (1992)(alice soft)(jp)(disk 6 of 6)(toono no mori b).d88" size="1281968" crc="5a67c687" sha1="3531f972f953404a4f8326f6d3b83f5a44b87aaf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toushint">
+		<description>Toushin Toshi</description>
+		<year>1991</year>
+		<publisher>Alice Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="toushin toshi (1991)(alice soft)(jp)(disk 1 of 7).d88" size="1281968" crc="a79c303c" sha1="386eda9a90c8463cb6966c6fb9b1cc812d1717ef" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="toushin toshi (1991)(alice soft)(jp)(disk 2 of 7).d88" size="1281968" crc="d9db76d2" sha1="09839a92581cc43e9d7ed33d9a51d3714e904b69" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="toushin toshi (1991)(alice soft)(jp)(disk 3 of 7).d88" size="1281968" crc="e4337ee8" sha1="6bc9b891bce7d17ccf713a95f413133fb407f993" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="toushin toshi (1991)(alice soft)(jp)(disk 4 of 7).d88" size="1281968" crc="5370f84f" sha1="ec5e332fe1f9033088ed0fd364e49731f3f7a4ed" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="toushin toshi (1991)(alice soft)(jp)(disk 5 of 7).d88" size="1281968" crc="e810b949" sha1="b279b2ad9b164c49390f253cac23c7088dcdc2c5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 6"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="toushin toshi (1991)(alice soft)(jp)(disk 6 of 7).d88" size="1281968" crc="106df787" sha1="bc0dabdc51c57a68b916bd3d34212c21aad63ca6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 7"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="toushin toshi (1991)(alice soft)(jp)(disk 7 of 7).d88" size="1281968" crc="2dccc332" sha1="4529faea8af480b03db8ea6ca70e07de348e3423" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="townssysb" cloneof="townssys">
+		<description>Towns System Software (v1.1L30)</description>
+		<year>1992</year>
+		<publisher>Fujitsu</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1281968">
+				<rom name="towns system software v1.1l30 (1992)(fujitsu)(jp).d88" size="1281968" crc="f4f0b2a3" sha1="901e3b0d935622b68780dc4ed54ba5da536ca58e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="townssys">
+		<description>Towns System Software (v2.1L51)</description>
+		<year>1995</year>
+		<publisher>Fujitsu</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1281968">
+				<rom name="towns system software v2.1l51 (1995)(fujitsu)(jp).d88" size="1281968" crc="d89c8db8" sha1="110e4cacc1010a2d30b88fc6b46c400c13747c22" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="townssysa" cloneof="townssys">
+		<description>Towns System Software (v2.1L51, Alt)</description>
+		<year>1995</year>
+		<publisher>Fujitsu</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="towns system software v2.1l51 (1995)(fujitsu)(jp).bin" size="1261568" crc="0fc9176c" sha1="7d96f648912102b69e1a0329aeebf386a78ece75" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wangels">
+		<description>Wrestle Angels</description>
+		<year>1993</year>
+		<publisher>Great</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="wrestle angels (1993)(great)(jp)(disk 1 of 4).d88" size="1281968" crc="2eff0978" sha1="9a66065918b39bdc8244eaf160018052ae419af9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="wrestle angels (1993)(great)(jp)(disk 2 of 4).d88" size="1281968" crc="0a17a44d" sha1="0efab10c02ac1fe8f0a06e008f94ab496559a35f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="wrestle angels (1993)(great)(jp)(disk 3 of 4).d88" size="1281968" crc="f478ac72" sha1="783500708baa61deaf2d59d15dd4178d84be5455" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="wrestle angels (1993)(great)(jp)(disk 4 of 4).d88" size="1281968" crc="285dccf7" sha1="4c6f74911f41f1c6da77c7f70e60c1559b5881a2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wangels2">
+		<description>Wrestle Angels 2</description>
+		<year>1993</year>
+		<publisher>Great</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="wrestle angels 2 (1993)(great)(jp)(disk 1 of 5).d88" size="1281968" crc="7e90b44a" sha1="2bfb96feb2eae4509273b894d454ddd8eb9c9a9b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="wrestle angels 2 (1993)(great)(jp)(disk 2 of 5).d88" size="1281968" crc="793555b5" sha1="5e0af756b21bb1409f994d10ac18207cdca8bd52" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="wrestle angels 2 (1993)(great)(jp)(disk 3 of 5).d88" size="1281968" crc="58a1f43a" sha1="498caa7f89761cc9fc08daa81870436c2f1784e8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="wrestle angels 2 (1993)(great)(jp)(disk 4 of 5).d88" size="1281968" crc="c27e7c9c" sha1="0b5e1cb3158ea6a6df7f3f91c603a1f84dd93d01" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="wrestle angels 2 (1993)(great)(jp)(disk 5 of 5).d88" size="1281968" crc="f759a718" sha1="f1aeb16a043a9968f0a412753c6135f5b7b31487" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tgdisk">
+		<description>ZZZ-UNK-TG_DISK</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="zzz-unk-tg_diska (19xx)(-).d88" size="1281968" crc="71c63492" sha1="a15ea8630860714057449ef54610c579b266e631" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="zzz-unk-tg_diskb (19xx)(-).d88" size="1281968" crc="1e979e38" sha1="af87c5b6d6c16fa58dead6635d1b09ed35f4dc57" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="zzz-unk-tg_diskc (19xx)(-).d88" size="1281968" crc="b3d7fdd8" sha1="e504fad750cc9ccb57dd09f8a2882ee58a775045" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

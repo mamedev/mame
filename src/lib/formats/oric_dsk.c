@@ -87,8 +87,8 @@ bool oric_dsk_format::load(io_generic *io, UINT32 form_factor, floppy_image *ima
 					if(t[i+3] == 0xfe) {
 						copy = 7;
 						sector_size = 128 << (t[i+7] & 3);
-						logerror("%02x %x - %02x %02x %02x %02x\n",
-									track, side, t[i+4], t[i+5], t[i+6], t[i+7]);
+					//	logerror("%02x %x - %02x %02x %02x %02x\n",
+					//			 track, side, t[i+4], t[i+5], t[i+6], t[i+7]);
 					} else if(t[i+3] == 0xfb)
 						copy = sector_size+3;
 					else

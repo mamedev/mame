@@ -545,6 +545,8 @@ static MACHINE_CONFIG_START( cgenie_common, cgenie_state )
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(cgenie_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
+	MCFG_CASSETTE_INTERFACE("cgenie_cass")
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "cgenie_cass")
 
 	MCFG_DEVICE_ADD("wd179x", FD1793, 0) // TODO confirm type
 	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS

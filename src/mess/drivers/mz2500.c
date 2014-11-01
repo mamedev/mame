@@ -1197,7 +1197,6 @@ WRITE8_MEMBER(mz2500_state::mz2500_fdc_w)
 	}
 }
 
-#if 0
 static LEGACY_FLOPPY_OPTIONS_START( mz2500 )
 	LEGACY_FLOPPY_OPTION( img2d, "2d", "2D disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
@@ -1206,12 +1205,11 @@ static LEGACY_FLOPPY_OPTIONS_START( mz2500 )
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([1]))
 LEGACY_FLOPPY_OPTIONS_END
-#endif
 
 static const floppy_interface mz2500_floppy_interface =
 {
 	FLOPPY_STANDARD_3_5_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
+	LEGACY_FLOPPY_OPTIONS_NAME(mz2500),
 	"floppy_3_5"
 };
 

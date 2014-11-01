@@ -790,7 +790,7 @@ static const floppy_interface mz2000_floppy_interface =
 {
 	FLOPPY_STANDARD_3_5_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL
+	"floppy_3_5"
 };
 
 static MACHINE_CONFIG_START( mz2000, mz2000_state )

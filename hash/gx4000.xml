@@ -289,6 +289,17 @@
 		</part>
 	</software>
 
+	<software name="arnold">
+		<description>Arnold Juke Box</description>
+		<year>199?</year>
+		<publisher>Amstrad</publisher>
+
+		<part name="cart" interface="gx4000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="arnold.bin" size="32768" crc="b4e09db5" sha1="546f5987f77dcc28e449233981a2593f09c36ed8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 <!-- CPC+ System Carts -->
 	<software name="sysuk">

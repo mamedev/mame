@@ -123,7 +123,6 @@
 
 
 #include "includes/mbee.h"
-#include "formats/dsk_dsk.h"
 #include "formats/mbee_dsk.h"
 #include "formats/mbee_cas.h"
 
@@ -608,45 +607,9 @@ GFXDECODE_END
 static GFXDECODE_START( mbeeppc )
 	GFXDECODE_ENTRY( "gfx", 0x0000, mbee_charlayout, 0, 8 )
 GFXDECODE_END
-#if 0
-static LEGACY_FLOPPY_OPTIONS_START(mbee)
-	LEGACY_FLOPPY_OPTION(ss80, "ss80", "SS80 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([80])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION(ds40, "ds40", "DS40 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([40])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION(ds80, "ds80", "DS80 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([21]))
-	LEGACY_FLOPPY_OPTION(ds84, "ds82,ds84", "DS84 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface mbee_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(mbee),
-	NULL
-};
-#endif
 
 FLOPPY_FORMATS_MEMBER( mbee_state::floppy_formats )
-	FLOPPY_MBEE_FORMAT,
-	FLOPPY_DSK_FORMAT
+	FLOPPY_MBEE_FORMAT
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( mbee_floppies )
@@ -809,6 +772,7 @@ static MACHINE_CONFIG_DERIVED( mbee56, mbeeic )
 	MCFG_WD2793x_ADD("fdc", XTAL_4MHz / 4) // divided by 2 externally, then divided by 2 internally (/ENMF pin not emulated)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbee_floppies, "35dd", mbee_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbee_floppies, "35dd", mbee_state::floppy_formats)
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "mbee_flop")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbee64, mbee56 )

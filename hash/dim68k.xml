@@ -7,78 +7,131 @@ CP/M-68K Release 1.03: Disk: 2 (maybe others)
 CP/M-68K Release 1.04: Disks: All (maybe others)
 -->
 
-<softwarelist name="dim68k" description="Dimension 68000 Disks">
+<softwarelist name="dim68k" description="Dimension 68000 floppies">
 
-	<software name="cpm121">
-		<description>CP/M-68K Release 1.21</description>
-		<!-- Serial Number: 1015-1004-000548-->
-		<!-- Build Date: June 29, 1984 -->
+	<!-- System Disks -->
+
+	<software name="cpm68k"> <!-- verified from labels -->
+		<description>CP/M-68K (Release 1.24)</description>
 		<year>1984</year>
 		<publisher>Micro Craft Corporation</publisher>
+		<info name="serial" value="1015-1004-0004016"/>
+		<info name="build_date" value="September 27, 1984"/>
 
 		<part name="flop1" interface="floppy_5_25">
-		<!-- Disk Content: User Master -->
-			<dataarea name="flop" size="369826">
-				<rom name="system.imd" size="369826" crc="18fe0e83" sha1="b389159e47c8fccc6674d3cb0e35d716f04d267e" offset="0x0000" />
+		<feature name="part_id" value="System Disk #1 (User Master)"/>
+			<dataarea name="flop" size="365718">
+				<rom name="user_master_1_24.imd" size="365718" crc="302a26f0" sha1="e480f90206fc24b9d74681633a90f4d575c380ca" offset="0" />
 			</dataarea>
 		</part>
-
 		<part name="flop2" interface="floppy_5_25">
-		<!-- Disk Content: utilities -->
-			<dataarea name="flop" size="384645">
-				<rom name="utilities.imd" size="384645" crc="175e10da" sha1="47f3151805556a4fd0c9e33329dc2db1d3b28725" offset="0x0000" />
+		<feature name="part_id" value="System Disk #2 (Utilities)"/>
+			<dataarea name="flop" size="343743">
+				<rom name="utilities_1_24.imd" size="343743" crc="c3bbf1f0" sha1="332771861b8a27deb307f2a758ce741406c3da36" offset="0" />
 			</dataarea>
 		</part>
-
 		<part name="flop3" interface="floppy_5_25">
-		<!-- Disk Content: Assembler -->
-			<dataarea name="flop" size="381579">
-				<rom name="assembler.imd" size="381579" crc="05926cfa" sha1="feaa2f0a9833aae96882d8b880dcd4cc8bbf871c" offset="0x0000" />
+		<feature name="part_id" value="System Disk #3 (Assembler)"/>
+			<dataarea name="flop" size="381558">
+				<rom name="assembler_1_24.imd" size="381558" crc="d0a9ced3" sha1="11ba67ffa495eb81b76eab72cfff30e77a604d00" offset="0" />
 			</dataarea>
 		</part>
-
 		<part name="flop4" interface="floppy_5_25">
-		<!-- Disk Content: C Language/Linker -->
-			<dataarea name="flop" size="302891">
-				<rom name="clanguage.imd" size="302891" crc="2e6505af" sha1="8f2296b3e852600aa77d96bd5b66f8ca52e2a24e" offset="0x0000" />
+		<feature name="part_id" value="System Disk #4 (C Language/Linker)"/>
+			<dataarea name="flop" size="318713">
+				<rom name="c_language_linker_1_24.imd" size="318713" crc="a0d6748d" sha1="080adfd1f435895bac511231e654beeb59e7657d" offset="0" />
 			</dataarea>
 		</part>
-
 		<part name="flop5" interface="floppy_5_25">
-		<!-- Disk Content: Apple ][+, Kaypro II, Z80, and IBM emulators  -->
+		<feature name="part_id" value="Emulation Disk"/>
+			<dataarea name="flop" size="395324">
+				<rom name="emulation_disk_1_24.imd" size="395324" crc="60264ee0" sha1="fcd206f5670d5289b618ee03fb0bcad937306f15" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm68k_121" cloneof="cpm68k"> <!-- verified from labels? -->
+		<description>CP/M-68K (Release 1.21)</description>
+		<year>1984</year>
+		<publisher>Micro Craft Corporation</publisher>
+		<info name="serial" value="1015-1004-000548"/>
+		<info name="build_date" value="June 29, 1984"/>
+
+		<part name="flop1" interface="floppy_5_25">
+		<feature name="part_id" value="System Disk #1 (User Master)"/>
+			<dataarea name="flop" size="369826">
+				<rom name="user_master_1_21.imd" size="369826" crc="18fe0e83" sha1="b389159e47c8fccc6674d3cb0e35d716f04d267e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+		<feature name="part_id" value="System Disk #2 (Utilities)"/>
+			<dataarea name="flop" size="384645">
+				<rom name="utilities_1_21.imd" size="384645" crc="175e10da" sha1="47f3151805556a4fd0c9e33329dc2db1d3b28725" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+		<feature name="part_id" value="System Disk #3 (Assembler)"/>
+			<dataarea name="flop" size="381579">
+				<rom name="assembler_1_21.imd" size="381579" crc="05926cfa" sha1="feaa2f0a9833aae96882d8b880dcd4cc8bbf871c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+		<feature name="part_id" value="System Disk #4 (C Language/Linker)"/>
+			<dataarea name="flop" size="302891">
+				<rom name="c_language_linker_1_21.imd" size="302891" crc="2e6505af" sha1="8f2296b3e852600aa77d96bd5b66f8ca52e2a24e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+		<feature name="part_id" value="Emulation Disk"/>
 			<dataarea name="flop" size="398409">
-				<rom name="emulator.imd" size="398409" crc="0f8cfc5b" sha1="5a3653bbf8f34ddf1b85565b069716ef30ede195" offset="0x0000" />
+				<rom name="emulation_disk_1_21.imd" size="398409" crc="0f8cfc5b" sha1="5a3653bbf8f34ddf1b85565b069716ef30ede195" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cpm102">
-		<description>CP/M-68K Release 1.02</description>
-		<!-- Serial Number: 1509-1004-654321 -->
+	<software name="cpm68k_104" cloneof="cpm68k">
+		<description>CP/M-68K (Release 1.04)</description>
 		<year>1984</year>
 		<publisher>Micro Craft Corporation</publisher>
+		<info name="build_date" value="March 30, 1984"/>
 
 		<part name="flop1" interface="floppy_5_25">
-		<!-- Disk Content: Utilities -->
-			<dataarea name="flop" size="366224">
-				<rom name="utilities.imd" size="366224" crc="1e96fc5b" sha1="21f36070f0d0bf566e9f6cbebccd4c1d95992a5f" offset="0x0000" />
+		<feature name="part_id" value="Emulation Disk"/>
+			<dataarea name="flop" size="405556">
+				<rom name="emulation_disk_1_04.imd" size="405556" crc="fb78d788" sha1="1c3f77dad9645ff7401c9ff9b4d9254c99eafadb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cpm103">
-		<description>CP/M-68K Release 1.03</description>
+	<software name="cpm68k_103" cloneof="cpm68k">
+		<description>CP/M-68K (Release 1.03)</description>
 		<year>1984</year>
 		<publisher>Micro Craft Corporation</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
-		<!-- Disk Content: System -->
+		<feature name="part_id" value="System Disk #1 (CP/M-68K)"/>
 			<dataarea name="flop" size="399441">
-				<rom name="system.imd" size="399441" crc="f7298f44" sha1="524828e55e006c90360f2aa6a43f1b567eb14118" offset="0x0000" />
+				<rom name="system_1_03.imd" size="399441" crc="f7298f44" sha1="524828e55e006c90360f2aa6a43f1b567eb14118" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
+	<software name="cpm68k_102" cloneof="cpm68k">
+		<description>CP/M-68K (Release 1.02)</description>
+		<year>1984</year>
+		<publisher>Micro Craft Corporation</publisher>
+		<info name="serial" value="1509-1004-654321"/> <!-- unverified? -->
+
+		<part name="flop1" interface="floppy_5_25">
+		<feature name="part_id" value="System Disk #2 (Utilities)"/>
+			<dataarea name="flop" size="366224">
+				<rom name="utilities_1_02.imd" size="366224" crc="1e96fc5b" sha1="21f36070f0d0bf566e9f6cbebccd4c1d95992a5f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Misc. Disks -->
+	
 	<software name="ibmcopy">
 		<description>IBM Program Copy for CP/M-68K</description>
 		<year>198?</year>
@@ -86,35 +139,19 @@ CP/M-68K Release 1.04: Disks: All (maybe others)
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="378492">
-				<rom name="copy.imd" size="378492" crc="69f08641" sha1="2354199c84944c9111e293a0c1d1781727bc4af5" offset="0x0000" />
+				<rom name="ibm_program_copy.imd" size="378492" crc="69f08641" sha1="2354199c84944c9111e293a0c1d1781727bc4af5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="ibmemu">
 		<description>IBM Emulator</description>
-		<!-- Serial Number: 1015-1004-000000-->
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="269117">
-				<rom name="emulator.imd" size="269117" crc="aa0f964e" sha1="c70553e904bf9671aab03900ef881b25c1be9ad8" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cpm104">
-		<description>CP/M-68K Release 1.04</description>
-		<!-- Serial Number: 1015-1004-000000-->
-		<!-- Hardware needed: 8086 Emulation Card, Z80 Emulator Card, APPLE Emulator Card -->
-		<!-- Last Revised 03/30/84 -->
-		<year>1984</year>
-		<publisher>Micro Craft Corporation</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="405556">
-				<rom name="emulator.imd" size="405556" crc="fb78d788" sha1="1c3f77dad9645ff7401c9ff9b4d9254c99eafadb" offset="0x0000" />
+				<rom name="ibm_emulator.imd" size="269117" crc="aa0f964e" sha1="c70553e904bf9671aab03900ef881b25c1be9ad8" offset="0" />
 			</dataarea>
 		</part>
 	</software>

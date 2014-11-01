@@ -273,6 +273,7 @@ static MACHINE_CONFIG_START( primoa32, primo_state )
 
 	/* floppy from serial bus */
 	MCFG_CBM_IEC_ADD(NULL)
+	MCFG_SOFTWARE_LIST_ADD("flop_list","primo_flop")
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_plain_slot, NULL)

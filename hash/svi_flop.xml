@@ -2,16 +2,27 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 Info Taken from here: http://www.samdal.com/svsoftware.htm
+					: http://www.tosecdev.org/forum/errors-contributions/spectravideo-svi-318-and-svi-328-(tosec)-549/
 
 These disks is not dumped:
 Wordstar
 dBase II
 CP/M-80 2.22 Single Sided Disk
-
+Spectra ORD (198x)(Ronex?)(sv)
+Spectra REG (198x)(Ronex?)(sv)
+Spectra KALK (198x)(Ronex?)(sv)
+ASMEDIT (198x)(sv)
+Asynkront TTY-V52 kommunikationsprogram (198x)(sv)
+Källkodsmonitor (198x)(sv)
+PLIST (198x)
+Jet Alf II (198x)
+Spectra ORD (198x)(Ronex?)(sv)
+Spectra KALK (198x)(Ronex?)(sv)
+Rädda disketten (198x)(sv)
 
 -->
 
-<softwarelist name="svi318_flop" description="Spectravision SVI-318 disk images">
+<softwarelist name="svi_flop" description="Spectravision SVI-318 &amp; SVI-328 disk images">
 
 	<software name="cpm224dd">
 		<description>CP/M-80 version 2.24</description>
@@ -24,13 +35,11 @@ CP/M-80 2.22 Single Sided Disk
 				<rom name="cpm224dd.imd" size="197368" crc="a99b6ecc" sha1="2326ad4de147638194645df82ea9e803cea4eb79" offset="0x0000" />
 			</dataarea>
 		</part>
-
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="145870">
 				<rom name="cpm224sd.imd" size="145870" crc="96bb2a7b" sha1="9cc4d5501abb83c586ede91161750b8718394b9a" offset="0x0000" />
 			</dataarea>
 		</part>
-
 	</software>
 
 </softwarelist>

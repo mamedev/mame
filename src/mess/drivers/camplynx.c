@@ -465,6 +465,10 @@ static MACHINE_CONFIG_START( lynx48k, camplynx_state )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(camplynx_state, lynx48k_update_row)
+	
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("cass_list","camplynx_cass")
+	MCFG_SOFTWARE_LIST_ADD("flop_list","camplynx_flop")	
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( lynx128k, camplynx_state )

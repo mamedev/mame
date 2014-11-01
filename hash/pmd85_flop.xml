@@ -1,0 +1,150 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- This is currently a documentation-only software list, but is hooked up in pmd85.c -->
+<softwarelist name="pmd85_flop" description="Tesla PMD-85 floppies">
+	<software name="lemmings">
+		<description>game-lemmings</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="game-lemmings.p32" size="368640" crc="c92ced51" sha1="4fa501c15b15b23c602306e7d9d3cc494e61f21a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="game4004">
+		<description>games-4004-482</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="games-4004-482.p32" size="368640" crc="28b31bd2" sha1="35400e85ad0d2425ec5fca6d4dbd446798d82926" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gameslib">
+		<description>games-libor-lasota</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="games-libor-lasota.p32" size="368640" crc="80a32960" sha1="f360c72209105e22bc4b996d093eb75968eb9ce3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamesoth">
+		<description>games-other</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="games-other.p32" size="368640" crc="0f52cfc5" sha1="a7ad3eadf35c33238ccfd91edff15a54ac09565c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamesrmc"> <!-- for Consul 2717 -->
+		<description>games-rm-team-consul</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="512512">
+				<rom name="games-rm-team-consul.dz8" size="512512" crc="7af90f7a" sha1="b842cfa92856a9f8d66783b1ac843264d8f02600" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamesrm">
+		<description>games-rm-team</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="games-rm-team.p32" size="368640" crc="ba09dc1a" sha1="9f17ce5ffd7e3489184b05a3d7277444b0882ed7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamesvbg">
+		<description>games-vbg</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="games-vbg.p32" size="368640" crc="14eec65d" sha1="ce8ee3ee29942f0338a2e49ed5d947d1630627f3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mikros">
+		<description>mikros</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="mikros.p32" size="368640" crc="921f987a" sha1="cbbed3e1e41f62bb9de62461814eb4bd1d476f75" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mikros32">
+		<description>mikros32k</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="mikros32k.p32" size="368640" crc="b44b3c0e" sha1="60e65c5069b02795bc1408f1e0919ad80b6a674e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mikros48">
+		<description>mikros48k</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="mikros48k.p32" size="368640" crc="7edfc705" sha1="efa65a05c6b3ee98a0015bc1949387a93bf6e774" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pmddos">
+		<description>pmddos</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="pmddos.p32" size="368640" crc="be89b3b5" sha1="a2980ec477102f57f0daa88dc7c5a5af3b852d0b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sysgen">
+		<description>sysgen</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="sysgen.p32" size="368640" crc="193b1296" sha1="8f0a6c2ad2997c9a9af6f7ccfdad309d71a39926" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

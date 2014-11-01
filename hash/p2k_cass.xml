@@ -1,0 +1,209 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="p2k_cass" description="Philips P2000 cassettes">
+	<software name="3ddool2">
+		<description>3D Doolhof 2 (Ned)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="p2k_cass">
+			<dataarea name="cass" size="11520">
+				<rom name="3d doolhof 2 (19xx)(-)(nl).cas" size="11520" crc="f3edc8b1" sha1="edc1f115be71029e91c0b617be8f35df1f921b81" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brickwal">
+		<description>Brick-Wall (Ned, v3.0)</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="p2k_cass">
+			<dataarea name="cass" size="17920">
+				<rom name="brick-wall v3.0 (1982)(-)(nl).cas" size="17920" crc="b3d7ff52" sha1="ac0907cd223bd434262cfedb39a2b94ce4557820" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="componis">
+		<description>Componist (Ned)</description>
+		<year>1984</year>
+		<publisher>A. Dobber</publisher>
+
+		<part name="cass1" interface="p2k_cass">
+			<dataarea name="cass" size="12800">
+				<rom name="componist (1984)(a. dobber)(nl).cas" size="12800" crc="aadd88b3" sha1="72ba868d38b822e011b5145c95f0509529fa275e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elevator">
+		<description>Elevator Humpie (Ned)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="p2k_cass">
+			<dataarea name="cass" size="7680">
+				<rom name="elevator humpie (19xx)(-)(nl).cas" size="7680" crc="dd95644d" sha1="3dc8257bff5513b66e6b6566c7f8343817927d37" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="errsoft">
+		<description>Ghost Hunter &amp; Racen (v2.0) (Ned)</description>
+		<year>198?</year>
+		<publisher>Errorsoft</publisher>
+
+		<part name="cass1" interface="p2k_cass">
+			<dataarea name="cass" size="25600">
+				<rom name="ghost hunter (19xx)(errorsoft)(nl) &amp; racen v2.0 (19xx)(errorsoft)(nl).cas" size="25600" crc="4ddf2e30" sha1="c6421914a709ebc7a5ab920e76b1c076b35c3f89" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kleuren">
+		<description>Kleurendemonstratie (v3.9, Bad?)</description>
+		<year>1983</year>
+		<publisher>Klaas H.J. Roberts</publisher>
+
+		<part name="cass1" interface="p2k_cass">
+			<dataarea name="cass" size="15360">
+				<rom name="kleurendemonstratie v3.9 (1983)(klaas h.j. roberts)[b].cas" size="15360" crc="45dd7e0f" sha1="f75ea81dd6c355c4ed0fd7a1b32374a5f2c00661" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lazybug">
+		<description>Lazy Bug (Ned, v6.0, Bad?)</description>
+		<year>1985</year>
+		<publisher>Double Brain</publisher>
+
+		<part name="cass1" interface="p2k_cass">
+			<dataarea name="cass" size="12800">
+				<rom name="lazy bug v6.0 (1985)(double brain)(nl)[b].cas" size="12800" crc="8f322af1" sha1="d7b06d8c870098197efe1de079b30f16b03070a4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="machoman">
+		<description>Macho Man (v2.1, Bad?)</description>
+		<year>1986</year>
+		<publisher>J. Nieuwenhuizen</publisher>
+
+		<part name="cass1" interface="p2k_cass">
+			<dataarea name="cass" size="11520">
+				<rom name="macho man v2.1 (1986)(j. nieuwenhuizen)[b].cas" size="11520" crc="1b2646fe" sha1="373430fa7e0a08dcd3483681c22d3c57c78bebe6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mkong">
+		<description>Monkey Kong - Deel II (Ned, v1.0)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="p2k_cass">
+			<dataarea name="cass" size="11520">
+				<rom name="monkey kong v1.0 deel ii (19xx)(-)(nl).cas" size="11520" crc="9a919e58" sha1="b7ae2607d6399d8fbb487dd61c7b382c10c2d1c6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snakey">
+		<description>Snakeygame</description>
+		<year>198?</year>
+		<publisher>NOS - Thomas Hofmeister</publisher>
+
+		<part name="cass1" interface="p2k_cass">
+			<dataarea name="cass" size="7680">
+				<rom name="snakeygame (19xx)(nos - thomas hofmeister).cas" size="7680" crc="3288dca2" sha1="2f6f0c55cb4dbd9f5dcb4ec8af41c8b3db0aaff8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spaceatk">
+		<description>Space Attack (Ned)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="p2k_cass">
+			<dataarea name="cass" size="14080">
+				<rom name="space attack (19xx)(-)(nl).cas" size="14080" crc="39a8b855" sha1="2064084fb9dbc8afbee53f311bede4b252c3bd82" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacef2">
+		<description>Space Fight II - Fraxxon (v1.0)</description>
+		<year>1985</year>
+		<publisher>LBK Production</publisher>
+
+		<part name="cass1" interface="p2k_cass">
+			<dataarea name="cass" size="30720">
+				<rom name="space fight ii - fraxxon v1.0 (1985)(lbk production).cas" size="30720" crc="e5e974bf" sha1="63f4478fa2b79a38a631b65559a3da36e4ce363f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacef">
+		<description>Space Fight (Ned, v3.0, Bad?)</description>
+		<year>1984</year>
+		<publisher>L.B. Kruijswijk</publisher>
+
+		<part name="cass1" interface="p2k_cass">
+			<dataarea name="cass" size="14080">
+				<rom name="space fight v3.0 (1984)(l.b. kruijswijk)(nl)[b].cas" size="14080" crc="59091f51" sha1="7cf241b9debe8cae556a6412eee729fe3b846a4f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacem">
+		<description>Space Mission (Ned)</description>
+		<year>1984</year>
+		<publisher>P. v. H.</publisher>
+
+		<part name="cass1" interface="p2k_cass">
+			<dataarea name="cass" size="23040">
+				<rom name="space mission (1984)(p. v. h.)(nl).cas" size="23040" crc="64907d33" sha1="5cb916c47f058efa221e3f8f2cfd3c91509a6015" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spellpal">
+		<description>Speelpaleis (Ned)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="p2k_cass">
+			<dataarea name="cass" size="15360">
+				<rom name="speelpaleis (19xx)(-)(nl).cas" size="15360" crc="b46b537e" sha1="366abaaa4089d5603d63ea56ca89b01e7031c3e6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="startrek">
+		<description>Startrek (Ned)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="p2k_cass">
+			<dataarea name="cass" size="17920">
+				<rom name="startrek (19xx)(-)(nl).cas" size="17920" crc="8480161f" sha1="7caf5c6f3d4dd3afdf2bb300b3253bc7a8b87351" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vlucht">
+		<description>Vlucht Simulator (Ned, Bad?)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="p2k_cass">
+			<dataarea name="cass" size="38400">
+				<rom name="vlucht simulator (19xx)(-)(nl)[b].cas" size="38400" crc="74958e0a" sha1="9d1e83998549356ddc6dc2fcbc767462c82da833" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

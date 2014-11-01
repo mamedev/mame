@@ -715,7 +715,7 @@ MACHINE_CONFIG_START( spectrum_common, spectrum_state )
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_LOAD(spectrum_state, spectrum_cart)
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","spectrum")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","spectrum_cart")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( spectrum, spectrum_common )

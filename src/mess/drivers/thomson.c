@@ -588,7 +588,7 @@ static const floppy_interface thomson_floppy_interface =
 {
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(thomson),
-	NULL
+	"floppy_5_25"
 };
 
 
@@ -631,6 +631,7 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(to7_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("to_cass")
 
 /* timer */
 	MCFG_DEVICE_ADD("mc6846", MC6846, 0)
@@ -662,6 +663,7 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)
 	MCFG_DEVICE_CONFIG(thomson_floppy_interface)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(thomson_state, fdc_index_3_w))
+	MCFG_SOFTWARE_LIST_ADD("flop_list","to_flop")
 
 /* network */
 	MCFG_DEVICE_ADD( "mc6854", MC6854, 0 )
@@ -715,11 +717,11 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 
 
 /* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "to7_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "to_cart")
 	MCFG_GENERIC_EXTENSIONS("m7,rom")
 	MCFG_GENERIC_LOAD(thomson_state, to7_cartridge)
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","to7_cart")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","to_cart")
 
 /* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -905,14 +907,6 @@ static MACHINE_CONFIG_DERIVED( to770, to7 )
 	MCFG_DEVICE_MODIFY("mc6846")
 	MCFG_MC6846_OUT_PORT_CB(WRITE8(thomson_state, to770_timer_port_out))
 
-	MCFG_DEVICE_REMOVE("cartslot")
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "to770_cart")
-	MCFG_GENERIC_EXTENSIONS("m7,rom")
-	MCFG_GENERIC_LOAD(thomson_state, to7_cartridge)
-
-	MCFG_DEVICE_REMOVE("cart_list")
-	MCFG_SOFTWARE_LIST_ADD("cart_list","to770_cart")
-
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
@@ -1090,6 +1084,7 @@ static MACHINE_CONFIG_DERIVED( mo5, to7 )
 
 	MCFG_CASSETTE_MODIFY( "cassette" )
 	MCFG_CASSETTE_FORMATS(mo5_cassette_formats)
+	MCFG_CASSETTE_INTERFACE("mo_cass")
 
 	MCFG_DEVICE_REMOVE( "mc6846" )
 
@@ -1106,12 +1101,13 @@ static MACHINE_CONFIG_DERIVED( mo5, to7 )
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_irq_1)) /* WARNING: differs from TO7 ! */
 
 	MCFG_DEVICE_REMOVE("cartslot")
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "mo5_cart")
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "mo_cart")
 	MCFG_GENERIC_EXTENSIONS("m5,rom")
 	MCFG_GENERIC_LOAD(thomson_state, mo5_cartridge)
 
 	MCFG_DEVICE_REMOVE("cart_list")
-	MCFG_SOFTWARE_LIST_ADD("cart_list","mo5_cart")
+	MCFG_DEVICE_REMOVE("flop_list")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","mo_cart")
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -2160,6 +2156,7 @@ static MACHINE_CONFIG_DERIVED( mo6, to7 )
 
 	MCFG_CASSETTE_MODIFY( "cassette" )
 	MCFG_CASSETTE_FORMATS(mo5_cassette_formats)
+	MCFG_CASSETTE_INTERFACE("mo_cass")
 
 	MCFG_DEVICE_REMOVE( "mc6846" )
 
@@ -2189,6 +2186,10 @@ static MACHINE_CONFIG_DERIVED( mo6, to7 )
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
+	
+	MCFG_DEVICE_REMOVE("cart_list")
+	MCFG_DEVICE_REMOVE("flop_list")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","mo_cart")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pro128, mo6 )
@@ -2402,6 +2403,10 @@ static MACHINE_CONFIG_DERIVED( mo5nr, to7 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP ( mo5nr)
 
+	MCFG_CASSETTE_MODIFY( "cassette" )
+	MCFG_CASSETTE_FORMATS(mo5_cassette_formats)
+	MCFG_CASSETTE_INTERFACE("mo_cass")
+
 	MCFG_DEVICE_REMOVE( "mc6846" )
 
 	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
@@ -2431,6 +2436,10 @@ static MACHINE_CONFIG_DERIVED( mo5nr, to7 )
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
+	
+	MCFG_DEVICE_REMOVE("cart_list")
+	MCFG_DEVICE_REMOVE("flop_list")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","mo_cart")
 MACHINE_CONFIG_END
 
 COMP ( 1986, mo5nr, 0, 0, mo5nr, mo5nr, driver_device, 0, "Thomson", "MO5 NR", 0 )

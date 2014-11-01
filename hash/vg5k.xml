@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<softwarelist name="vg5k" description="Philips VG-5000 cassette">
+<softwarelist name="vg5k" description="Philips VG-5000 cassettes">
+
+	<!-- Commercial software -->
+
 	<software name="abeille">
 		<description>L'Abeille - Spina the Bee</description>
 		<year>1984</year>
@@ -481,7 +484,7 @@
 		</part>
 	</software>
 
-	<software name="sa">
+	<software name="salutart">
 		<description>Salut l'Artiste</description>
 		<year>1985</year>
 		<publisher>Nice Ideas</publisher>
@@ -580,4 +583,367 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- Unofficial/PD software -->
+
+	<software name="ef9345">
+		<description>Affichage des Polices EF9345</description>
+		<year>2006</year>
+		<publisher>Daniel Coulom</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="1549">
+				<rom name="affichage des polices ef9345 (2006-04-11)(daniel coulom).k7" size="1549" crc="abfaec17" sha1="5db06eeb6d75e1ae2c6a4a93ddebd4496e526093" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alunisag">
+		<description>Alunissage</description>
+		<year>1985</year>
+		<publisher>Carl Hervier</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="2044">
+				<rom name="alunissage (1985)(carl hervier).k7" size="2044" crc="dea9620a" sha1="81954ebb23b0aa8595c9bd6d3ea0ea2cb793a8e5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anafact1">
+		<description>Analyse de Factuer 1er</description>
+		<year>1985</year>
+		<publisher>Carl Hervier</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="477">
+				<rom name="analyse de factuer 1er (1985)(carl hervier).k7" size="477" crc="e3251df5" sha1="c293265010feef3cfc15f0b62d3024759eb9848f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blitz">
+		<description>Blitz</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="1573">
+				<rom name="blitz (198x)(-).k7" size="1573" crc="9025aa23" sha1="0eaefe400754a32a97fd1a1a8a41e7357f8c27d0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="compilat">
+		<description>Compilation</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="82649">
+				<rom name="compilation (19xx)(-)[21 games].k7" size="82649" crc="5218beff" sha1="519205c58b380a30787dab5c92b49cd5176a6fc6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="currentc">
+		<description>Current Continu</description>
+		<year>1985</year>
+		<publisher>Carl Hervier</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="667">
+				<rom name="current continu (1985)(carl hervier).k7" size="667" crc="a35e2b78" sha1="c50705ff60ba8c0abad6c0874177b9db6bbade58" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dca">
+		<description>DCA</description>
+		<year>1986</year>
+		<publisher>Carl Hervier</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="4192">
+				<rom name="dca (1986)(carl hervier).k7" size="4192" crc="4f85237a" sha1="66618b61224c9785ba75c1cf84b07216b4e6f9df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demo27">
+		<description>Demo 27 Couleurs</description>
+		<year>2005</year>
+		<publisher>Daniel Coulom</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="1623">
+				<rom name="demo 27 couleurs (2005-12-10)(daniel coulom).k7" size="1623" crc="e34757ed" sha1="a254a16e9bffd34ec8ac1b208373d8842d472fda" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demo380">
+		<description>Demo 3 Mode 80 Colonnes</description>
+		<year>2005</year>
+		<publisher>Daniel Coulom</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="1382">
+				<rom name="demo 3 mode 80 colonnes (2005-12)(daniel coulom).k7" size="1382" crc="427d0fab" sha1="d552617e865ba0b608e256fbd2a285d81374cacb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demo480">
+		<description>Demo 4 Mode 80 Colonnes</description>
+		<year>2005</year>
+		<publisher>Daniel Coulom</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="1975">
+				<rom name="demo 4 mode 80 colonnes (2005-12)(daniel coulom).k7" size="1975" crc="2c3f7345" sha1="0087c0be41f6b6659ad4739190aaf4db2a471cde" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demo580">
+		<description>Demo 5 Mode 80 Colonnes</description>
+		<year>2005</year>
+		<publisher>Daniel Coulom</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="3622">
+				<rom name="demo 5 mode 80 colonnes (2005-12)(daniel coulom).k7" size="3622" crc="ced6c4dd" sha1="c1e924cc17e5bc4db14329eccb5da725d40cf200" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demo80">
+		<description>Demo Mode 80 Colonnes</description>
+		<year>2005</year>
+		<publisher>Daniel Coulom</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="1159">
+				<rom name="demo mode 80 colonnes (2005-11-30)(daniel coulom).k7" size="1159" crc="d2447498" sha1="df4ee19aed049c616e3b4d3431bc9515622dc5ca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="formbrut">
+		<description>Formule Brute</description>
+		<year>1985</year>
+		<publisher>Carl Hervier</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="936">
+				<rom name="formule brute (1985)(carl hervier).k7" size="936" crc="f3fe5e46" sha1="240a883f9636538a40e36bd3119b1d394a385ad6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jeudames">
+		<description>Jeu de Dames</description>
+		<year>1985</year>
+		<publisher>Carl Hervier</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="1393">
+				<rom name="jeu de dames (1985)(carl hervier).k7" size="1393" crc="2e12fd04" sha1="8650d203437a4cbd175d5ae9eb466899630cf306" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="memory">
+		<description>Memory</description>
+		<year>1985</year>
+		<publisher>Carl Hervier</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="2029">
+				<rom name="memory (1985)(carl hervier).k7" size="2029" crc="9bfd8dc3" sha1="0228184035cee94f44102f71aaabc08a6cbf9c6a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meteo36">
+		<description>Meteo 36</description>
+		<year>1985</year>
+		<publisher>Carl Hervier</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="7791">
+				<rom name="meteo 36 (1985)(carl hervier).k7" size="7791" crc="7438786c" sha1="8ddd3323cd13449cb8adc8724a53c153a49ed6e8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="penalty">
+		<description>Penalty</description>
+		<year>1985</year>
+		<publisher>Carl Hervier</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="2458">
+				<rom name="penalty (1985)(carl hervier).k7" size="2458" crc="1ad3f84f" sha1="f63e43a8463ecac82559a873f815c5124db3ea9a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phfaible">
+		<description>PH Faible</description>
+		<year>1985</year>
+		<publisher>Carl Hervier</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="1938">
+				<rom name="ph faible (1985)(carl hervier).k7" size="1938" crc="289a4f9a" sha1="ce9a60d6453fbd836bc9e71f96ab020079515d72" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="resol3em">
+		<description>Resolution d'Equation du 3eme Degres</description>
+		<year>1985</year>
+		<publisher>Carl Hervier</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="867">
+				<rom name="resolution d'equation du 3eme degres (1985)(carl hervier).k7" size="867" crc="136dd0f8" sha1="558f23de79d39e59cf9a06d9be58d6978c0b1810" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="resolsui">
+		<description>Resolution de Suite</description>
+		<year>1985</year>
+		<publisher>Carl Hervier</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="647">
+				<rom name="resolution de suite (1985)(carl hervier).k7" size="647" crc="042fcbb0" sha1="5da4113bd4e629e2ff234628e98822b923b972a0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="resol2eq">
+		<description>Resolution de Systeme de 2 equations</description>
+		<year>1985</year>
+		<publisher>Carl Hervier</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="2747">
+				<rom name="resolution de systeme de 2 equations (1985)(carl hervier).k7" size="2747" crc="60175a5a" sha1="81b15908478a543d70a14fef80b02e3e62da7b49" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="salutarth" cloneof="salutart"> <!-- read-write routines hacked to work in dcvg5k -->
+		<description>Salut l'Artiste (Hack)</description>
+		<year>1985</year>
+		<publisher>Nice Ideas</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="15464">
+				<rom name="salut l'artiste (1985)(nice ideas)[h][read-write routines hacked to work in dcvg5k].k7" size="15464" crc="ad1b3e50" sha1="ee115d2e6a9065eec2aea5edac75112c01168648" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="salutd1"> <!-- saved from the main program -->
+		<description>Salut l'Artiste - Dessin 1</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="6052">
+				<rom name="salut l'artiste - dessin 1 (198x)(-)[saved from the main program].k7" size="6052" crc="6864fd10" sha1="0cd1aa34234ed62b75d2e94d73e12ccb106cb2dd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="salutd2"> <!-- saved from the main program -->
+		<description>Salut l'Artiste - Dessin 2</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="6052">
+				<rom name="salut l'artiste - dessin 2 (198x)(-)[saved from the main program].k7" size="6052" crc="f9b55912" sha1="cd7da48d482a879bde92c37458b23e67ca6a9921" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spaceinv">
+		<description>Space Invaders</description>
+		<year>1985</year>
+		<publisher>Carl Hervier</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="2493">
+				<rom name="space invaders (1985)(carl hervier).k7" size="2493" crc="d94a5204" sha1="f749b39ddbd2663c46a5cc23ff74184ade44ecbb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="squash">
+		<description>Squash</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="1351">
+				<rom name="squash (198x)(-).k7" size="1351" crc="e059ba4c" sha1="30698d4a617f459cb8454fda992efb3e06da85dd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stricker">
+		<description>Stricker</description>
+		<year>1985</year>
+		<publisher>Carl Hervier</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="1690">
+				<rom name="stricker (1985)(carl hervier).k7" size="1690" crc="fa13eb3a" sha1="0daeee9ab7fa097c7f73b4da90fef4b851032590" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="submarin">
+		<description>Submarine</description>
+		<year>1985</year>
+		<publisher>Carl Hervier</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="5429">
+				<rom name="submarine (1985)(carl hervier).k7" size="5429" crc="8dfe50ad" sha1="b8245c86db44c9ee76840f4b161ecc0cb04d8fc1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="test80">
+		<description>Test Mode 80 Colonnes</description>
+		<year>2005</year>
+		<publisher>Daniel Coulom</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="521">
+				<rom name="test mode 80 colonnes (2005-11-29)(daniel coulom).k7" size="521" crc="26c2d28b" sha1="739d671d4b90ab60f703d76311b5ef067de2c8aa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="testjoy">
+		<description>Test Pour Joystick</description>
+		<year>2005</year>
+		<publisher>Carl Hervier</publisher>
+
+		<part name="cass1" interface="vg5k_cass">
+			<dataarea name="cass" size="761">
+				<rom name="test pour joystick (2005)(carl hervier).k7" size="761" crc="1c436962" sha1="58feffbcbde5c001dffe00a909cb17780c0ed786" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
