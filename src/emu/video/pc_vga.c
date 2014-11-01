@@ -198,6 +198,27 @@ mach8_device::mach8_device(const machine_config &mconfig, const char *tag, devic
 {
 }
 
+// zero everything, keep vtbls
+void vga_device::zero()
+{
+	memset(&vga.svga_intf, 0, sizeof(vga.svga_intf));
+	vga.memory.resize(0);
+	memset(vga.pens, 0, sizeof(vga.pens));
+	vga.miscellaneous_output = 0;
+	vga.feature_control = 0;
+	memset(&vga.sequencer, 0, sizeof(vga.sequencer));
+	memset(&vga.crtc, 0, sizeof(vga.crtc));
+	memset(&vga.gc, 0, sizeof(vga.gc));
+	memset(&vga.attribute, 0, sizeof(vga.attribute));
+	memset(&vga.dac, 0, sizeof(vga.dac));
+	memset(&vga.oak, 0, sizeof(vga.oak));
+}
+
+void svga_device::zero()
+{
+	vga_device::zero();
+	memset(&svga, 0, sizeof(svga));
+}
 
 /* VBLANK callback, start address definitely updates AT vblank, not before. */
 TIMER_CALLBACK_MEMBER(vga_device::vblank_timer_cb)
@@ -208,8 +229,7 @@ TIMER_CALLBACK_MEMBER(vga_device::vblank_timer_cb)
 
 void vga_device::device_start()
 {
-	// FIXME: this kills the vga.memory vptr
-	memset(&vga, 0, sizeof(vga));
+	zero();
 
 	int i;
 	for (i = 0; i < 0x100; i++)
