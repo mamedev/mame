@@ -21,7 +21,7 @@ CCOMFLAGS += -Wno-inline-new-delete
 # caused by src/mess/drivers/x07.c, src/osd/sdl/window.c, src/emu/sound/disc_mth.inc
 CCOMFLAGS += -Wno-absolute-value
 # these were disabled because of bugs in older clang versions
-CCOMFLAGS += -Wformat-security
+CCOMFLAGS += -Wformat-security -Wconstant-logical-operand
 # these show up when compiling as c++11
 CCOMFLAGS += -Wno-deprecated-register -Wno-reserved-user-defined-literal -Wno-c++11-narrowing
 # TODO: add proper detection of XCode 6.0.1
