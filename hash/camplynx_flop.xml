@@ -3,8 +3,8 @@
 
 <!-- This is currently a documentation-only software list, but is hooked up in camplynx.c -->
 <softwarelist name="camplynx_flop" description="Camputers Lynx floppies">
-	<software name="cpm"> <!--128k-->
-		<description>CP/M (v2.2)</description>
+	<software name="cpm">
+		<description>CP/M (v2.2, 128K)</description>
 		<year>198?</year>
 		<publisher>Digital Research</publisher>
 
@@ -15,8 +15,8 @@
 		</part>
 	</software>
 
-	<software name="jmutils"> <!--96k-128k-->
-		<description>Lynx JM Utilities Disk (v1.0)</description>
+	<software name="jmutils">
+		<description>Lynx JM Utilities Disk (v1.0, 96K-128K)</description>
 		<year>1989</year>
 		<publisher>John Koushappas</publisher>
 
@@ -35,6 +35,403 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop1" size="819200">
 				<rom name="lynx revival group - volume 1.ldf" size="819200" crc="afa4e118" sha1="ca5e74ddd7a66c1812ce946b6376dfa95f424f4c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="bttlship">
+		<description>Battleships (128K)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="battleships_128k.ldf" size="204800" crc="24a45d78" sha1="2f404f1558224bde58d45b608b555f03b3c5b5b2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="compiler">
+		<description>C - Compiler</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="c_compiler.ldf" size="204800" crc="713219b6" sha1="288c290556450f7b7890cf34f45ff87420263c3b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="calcstar">
+		<description>Calc Star</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="calcstar.ldf" size="204800" crc="c377a29f" sha1="67e1fa310be14a6f2d1fab5ee222957392b8155f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cobol">
+		<description>COBOL (BIOS 1.15)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="cobol.ldf" size="204800" crc="ae52373b" sha1="517ad01752ebbf5daff336e983c8655974c00889" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commterm">
+		<description>Comm. &amp; Term.</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="comm.ldf" size="204800" crc="c9a30f26" sha1="0d1fae3658a02e3faa396844fada75f4d55fc4c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmdoc">
+		<description>CP/M Doc</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="cpm_doc.ldf" size="204800" crc="1d1daef6" sha1="2b1e2ee37d9d2b54718b0a2c5642a1c2ea043b3a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmprobe">
+		<description>CPMProbe</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="cpmprobe.ldf" size="204800" crc="ef609f7d" sha1="8c80d0757ee4753db75bf8d9b12ffb574afbff8b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm102">
+		<description>CP/M Systemdisk (BIOS 1.02)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="cpmsys.ldf" size="204800" crc="2de23d92" sha1="291a54398bb3293806638d40983964795ad32be8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmmisc">
+		<description>CP/M Misc. Programs</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="cpmsys1.ldf" size="204800" crc="f3e317f6" sha1="18354e7bb301e19c7c05a93f0bbccac876284240" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="datastar">
+		<description>Data Star</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="datastar.ldf" size="204800" crc="2f441808" sha1="f0be82174b81b211c88a9e92dae39d671e74d50c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbase2">
+		<description>DBase II</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="dbase_ii.ldf" size="204800" crc="2c25de17" sha1="fc994d49d18584eac3615c2d668c445714d6b613" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="disassem">
+		<description>Disassembler</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="disassem.ldf" size="204800" crc="7241cb1e" sha1="e6f8a98a1e2f7b8c0271c3393902abc7df16ffc9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dltawing">
+		<description>DeltaWing (96K)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="dw_96.ldf" size="204800" crc="e05b6fb2" sha1="251938a76385b1bcd650dd36bc8deff4f48483a2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ebasic">
+		<description>E-BASIC (BIOS 1.15)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="e-basic.ldf" size="204800" crc="c7967923" sha1="ca6cd9761a317f0257dcd30e883029e10d3d8038" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="forth">
+		<description>FORTH</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="forth.ldf" size="204800" crc="82188b28" sha1="94888b4309c1c68ce8a35bfa192ac27e5cc57a7d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fortran">
+		<description>Fortran</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="fortran.ldf" size="204800" crc="a84aee63" sha1="9be154edef6d105e4bbfbaf886f70fa9b8c7c11d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fortrana" cloneof="fortran">
+		<description>Fortran (Alt)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="fortran (1).ldf" size="204800" crc="d3f002da" sha1="da6e4cd1e22ad9c5066cc893d08784ed44779dfb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gomoku">
+		<description>Gomoku (96K)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="gomoku_96k.ldf" size="204800" crc="0f12b5a6" sha1="d9527a4993af39184fcfe030508e254f770e6105" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hangman">
+		<description>Hangman (96K)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="hangman_96.ldf" size="204800" crc="5173734e" sha1="3d9933dfa2f49b7405d9277d3b2ee8ac23c3b302" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="intro128">
+		<description>Intro 128</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="intro128.ldf" size="204800" crc="5ea7b40c" sha1="d5254105b48eccb7e1b4246abdd02ff02e8a28bf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="logiches">
+		<description>LogiChess (v2.2, 96K)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="logichess.ldf" size="204800" crc="5aa9eba3" sha1="a40b96b05184a8af1d50228cdb6982ed56cf0751" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mbasic">
+		<description>M-BASIC</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="basic1.ldf" size="204800" crc="c24bc250" sha1="185c3615994654f5d295d3f6e7789288a209e625" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mbasica" cloneof="mbasic">
+		<description>M-BASIC (Alt)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="m-basic.ldf" size="204800" crc="4f828c7e" sha1="2b14686bd1b289d1286718a1c3509d477ab81ab5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mnstmine">
+		<description>MonsterMine (96K)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="monstermine_96.ldf" size="204800" crc="8087bd7e" sha1="a13569e2311e08d85f84f49ffd8024e61beec170" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="peachclc">
+		<description>Peach Calc</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="peachcalc.ldf" size="204800" crc="518fb821" sha1="75b9301c9434dd3f126f2d4a78e6f0d0707acc02" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rprtstar">
+		<description>Report Star</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="reportstar.ldf" size="204800" crc="8d434038" sha1="de2f4b59e8e9086bc71fa6fdb13e2bd741b3d53a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="roader">
+		<description>Roader (96K)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="roader_96.ldf" size="204800" crc="bfb99f3f" sha1="74fea2157ce6689b6385f77b78496fdf37797d76" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slotmach">
+		<description>SlotMachine (96K)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="slotmachine_96.ldf" size="204800" crc="cece4d3b" sha1="1aac120dece466ac1ff1709030ad55dbbd6d890f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprches">
+		<description>SuperChess (96K)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="superchess_96.ldf" size="204800" crc="e548a5d1" sha1="1bd13ae155729d056652611a2af0c1fee7283159" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tisland">
+		<description>Treasure-Island (96K)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="treasure-island_96.ldf" size="204800" crc="a9a13b77" sha1="273aa31b244bec18104bd23c92e94d9b3a3a2f99" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tpascal">
+		<description>Turbo Pascal</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="turbo_pascal.ldf" size="204800" crc="ffac51fe" sha1="4312b6f2e0665a00746fc60eb53b98c828f0d8ba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordmstr">
+		<description>Word Master</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="wordmaster.ldf" size="204800" crc="5fa87e3b" sha1="6503e9844ab751f0ba1b67b2485945caec057f43" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordstar">
+		<description>Word Star</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="wordstar.ldf" size="204800" crc="32485264" sha1="430188f77229f4faac88283a63431488dda29c10" offset="0" />
 			</dataarea>
 		</part>
 	</software>
