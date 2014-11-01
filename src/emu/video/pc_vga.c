@@ -208,6 +208,7 @@ TIMER_CALLBACK_MEMBER(vga_device::vblank_timer_cb)
 
 void vga_device::device_start()
 {
+	// FIXME: this kills the vga.memory vptr
 	memset(&vga, 0, sizeof(vga));
 
 	int i;
