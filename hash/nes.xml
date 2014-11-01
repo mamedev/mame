@@ -45857,6 +45857,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="ghostbstjp" cloneof="ghostbst">
+		<description>Ghostbusters (Jpn, Prototype)</description>
+		<year>1986</year>
+		<publisher>Tokuma Shoten</publisher>
+		<info name="alt_title" value="ゴーストバスターズ"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cnrom" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="chr" size="32768">
+				<rom name="ghostbusters (prototype).chr" size="32768" crc="b7e28707" sha1="ca3d601f1f8f3171c5d46777673159c9c79243c3" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="ghostbusters (prototype).prg" size="32768" crc="56bd6db9" sha1="c7989b51c2a361c84c1d6829dc79006fef94537b" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="goalj" cloneof="goal2">
 		<description>Goal!! (Jpn)</description>
 		<year>1992</year>

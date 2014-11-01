@@ -45,8 +45,7 @@ s3virgedx_rev1_vga_device::s3virgedx_rev1_vga_device(const machine_config &mconf
 
 void s3virge_vga_device::device_start()
 {
-	memset(&vga, 0, sizeof(vga));
-	memset(&svga, 0, sizeof(svga));
+	zero();
 
 	int x;
 	int i;

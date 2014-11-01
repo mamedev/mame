@@ -693,6 +693,7 @@ void nes_cart_slot_device::call_load_ines()
 		logerror("-- PRG 0x%x (%d x 16k chunks)\n", prg_size, prg_size / 0x4000);
 		logerror("-- VROM 0x%x (%d x 8k chunks)\n", vrom_size, vrom_size / 0x2000);
 		logerror("-- VRAM 0x%x (%d x 8k chunks)\n", vram_size, vram_size / 0x2000);
+		logerror("-- Mirroring %s\n", BIT(header[6], 0) ? "Vertical" : "Horizontal");
 		if (battery_size)
 			logerror("-- Battery found\n");
 		if (m_cart->get_trainer())
