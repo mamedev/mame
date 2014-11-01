@@ -1686,17 +1686,17 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 		}
 		if (operand32 != 0)  // if 32-bit
 		{
-			if(REG32(ESP) < 8)
+			if(i386_limit_check(SS, REG32(ESP) - 8))
 			{
-				logerror("CALL: Stack has no room for return address.\n");
+				logerror("CALL (%08x): Stack has no room for return address.\n",m_pc);
 				FAULT(FAULT_SS,0)  // #SS(0)
 			}
 		}
 		else
 		{
-			if(REG16(SP) < 4)
+			if(i386_limit_check(SS, (REG16(SP) - 4) & 0xffff))
 			{
-				logerror("CALL: Stack has no room for return address.\n");
+				logerror("CALL (%08x): Stack has no room for return address.\n",m_pc);
 				FAULT(FAULT_SS,0)  // #SS(0)
 			}
 		}
@@ -1944,7 +1944,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 					/* same privilege */
 					if (operand32 != 0)  // if 32-bit
 					{
-						if(REG32(ESP) < 8)
+						if(i386_limit_check(SS, REG32(ESP) - 8))
 						{
 							logerror("CALL: Stack has no room for return address.\n");
 							FAULT(FAULT_SS,0) // #SS(0)
@@ -1954,7 +1954,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 					}
 					else
 					{
-						if(REG16(SP) < 4)
+						if(i386_limit_check(SS, (REG16(SP) - 4) & 0xffff))
 						{
 							logerror("CALL: Stack has no room for return address.\n");
 							FAULT(FAULT_SS,0) // #SS(0)
