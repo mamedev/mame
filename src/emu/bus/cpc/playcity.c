@@ -126,7 +126,7 @@ void cpc_playcity_device::update_ymz_clock()
 {
 	// Bit of a hack job here, since there is no way currently to connect the CTC channel output directly to the YMZ clocks.
 	UINT8 rate = m_ctc->get_channel_constant(0);
-	UINT64 clk = XTAL_4MHz;
+	UINT32 clk = XTAL_4MHz;
 
 	switch(rate)
 	{
@@ -151,6 +151,6 @@ void cpc_playcity_device::update_ymz_clock()
 	clk = clk / 2;  // YMZ294 has an internal /2 divider (not handled in AY core?)
 	m_ymz1->ay_set_clock(clk);
 	m_ymz2->ay_set_clock(clk);
-	popmessage("YMZ clocks set to %" I64FMT "Hz",clk);
+	popmessage("YMZ clocks set to %d Hz",clk);
 }
 
