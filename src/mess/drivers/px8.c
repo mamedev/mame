@@ -801,6 +801,9 @@ static MACHINE_CONFIG_START( px8, px8_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
+	
+	// software
+	MCFG_SOFTWARE_LIST_ADD("epson_cpm_list", "epson_cpm")
 MACHINE_CONFIG_END
 
 /***************************************************************************

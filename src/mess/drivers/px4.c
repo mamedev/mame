@@ -1440,6 +1440,7 @@ static MACHINE_CONFIG_START( px4, px4_state )
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "px4_cart")
+	MCFG_SOFTWARE_LIST_ADD("epson_cpm_list", "epson_cpm")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( px4p, px4 )

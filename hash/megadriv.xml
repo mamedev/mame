@@ -14,7 +14,6 @@
     FERRARI GRAND PRIX CHALLENGE        PAL     we have Rev A, Rev 0 needed (does it exist?)
     FIFA SOCCER                 JAPAN
     FIRE SHARK                  PAL     dump check
-    GAIN GROUND                 PAL     revision order check
     GALAXY FORCE II             ALL     we have Rev B, Rev 0 and Rev A needed (does it exist?)
     INTERNATIONAL SUPERSTAR SOCCER      BRAZIL
     JEWEL MASTER                USA/PAL     we have Rev A, Rev 0 needed (does it match Japanese release?)
@@ -10357,16 +10356,14 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="arrow1" cloneof="arrow">
-		<description>Arrow Flash (World, Alt)</description>
+<!-- This dump was originally tagged as Alt, but it matched Jeckidy's proto dump (cart with label ARROW FLASH #625A) -->
+	<software name="arrowp" cloneof="arrow">
+		<description>Arrow Flash (USA, Prototype)</description>
 		<year>1990</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="G-4039 (JPN)"/>
-		<info name="release" value="19901020 (JPN)"/>
-		<info name="alt_title" value="アローフラッシュ"/>
+		<publisher>Renovation</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
-				<rom name="arrow flash (world) (alt).bin" size="524288" crc="4d89e66b" sha1="916524d2b403a633108cf457eec13b4df7384d95" offset="0x000000"/>
+				<rom name="arrowflash.a04c.bin" size="524288" crc="4d89e66b" sha1="916524d2b403a633108cf457eec13b4df7384d95" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15372,16 +15369,14 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="gground1a" cloneof="gground">
-		<description>Gain Ground (World, Alt)</description>
+<!-- This dump was originally tagged as Alt, but it matched Jeckidy's proto dump (cart with label GAIN GROUND #DFE7) -->
+	<software name="gground1p" cloneof="gground">
+		<description>Gain Ground (USA, Prototype)</description>
 		<year>1991</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="G-4036 (JPN)"/>
-		<info name="release" value="19910103 (JPN)"/>
-		<info name="alt_title" value="ゲイングランド"/>
+		<publisher>Renovation</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
-				<rom name="gain ground (world) (alt).bin" size="524288" crc="83e7b8ae" sha1="3cc501086f794ac663aad14d5c5a75b648041151" offset="0x000000"/>
+				<rom name="gainground.a760.bin" size="524288" crc="83e7b8ae" sha1="3cc501086f794ac663aad14d5c5a75b648041151" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20783,6 +20778,20 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="pcottonp" cloneof="pcotton">
+		<description>Panorama Cotton (Jpn, Prototype 19931127)</description>
+		<year>1993</year>
+		<publisher>Sunsoft</publisher>
+		<info name="serial" value="T-15103"/>
+		<info name="release" value="19940812"/>
+		<info name="alt_title" value="パノラマコットン"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="flying.bin" size="4194304" crc="54d82f86" sha1="aa7d052268ef439a3e289379003d7e7d6fc356f2" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="paperboyj" cloneof="paperboy">
 		<description>Paperboy (Jpn)</description>
 		<year>1992</year>
@@ -22538,6 +22547,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="rocket knight adventures (usa).bin" size="1048576" crc="a6efec47" sha1="49634bb09c38fa03549577f977e6afb6cebaac48" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rocketup" cloneof="rocket">
+		<description>Rocket Knight Adventures (USA, Prototype 19930615)</description>
+		<year>1993</year>
+		<publisher>Konami</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="rocketknightadventcdfb.bin" size="1048576" crc="9cbee37b" sha1="9e2335dc00f95754a2cdce1f6bc7142e467d173d" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>

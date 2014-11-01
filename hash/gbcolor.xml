@@ -10286,7 +10286,7 @@ List of unconfirmed retail cartridge roms
 			<feature name="slot" value="rom_mbc5" />
 			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
-				<rom name="hello kitty no magical museum (japan).bin" size="1048576" crc="5174584f" sha1="f274c780fc3bf4f95b5c17afd0ec73824bedee5c" offset="000000" />
+				<rom name="hello kitty no magical museum (japan).bin" size="1048576" crc="f6768930" sha1="462e5120831c2298bb5138bf25b4c8c72b372407" offset="000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>

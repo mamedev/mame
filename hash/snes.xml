@@ -428,33 +428,6 @@ Beyond that last category are the roms waiting to be classified.
         </part>
     </software>
 
-    <software name="ggoemon3rb" cloneof="ggoemon3">
-        <description>Ganbare Goemon 3 - Shishi Juurokubee no Karakuri Manjigatame (Jpn, Rev. B)</description>
-        <year>1994</year>
-        <publisher>Konami</publisher>
-        <info name="serial" value="SHVC-2U" />
-        <info name="release" value="19941216" />
-        <info name="alt_title" value="がんばれゴエモン3 獅子重禄兵衛のからくり卍固め" />
-        <sharedfeat name="compatibility" value="NTSC"/>
-        <part name="cart" interface="snes_cart">
-            <feature name="pcb" value="SHVC-1A3M-30" />
-            <feature name="u1" value="U1 MASK ROM(N)" />
-            <feature name="u2" value="U2 64K SRAM" />
-            <feature name="u3" value="U3 MAD-1" />
-            <feature name="u4" value="U4 CIC" />
-            <feature name="lockout" value="" />
-            <feature name="battery" value="BATT CR2032" />
-            <feature name="cart_revision" value="B" />
-            <feature name="cart_model" value="SHVC-006" />
-            <feature name="cart_back_label" value="920214" />
-            <dataarea name="rom" size="2097152">
-                <rom name="shvc-2u-2.u1" size="2097152" crc="af984bc1" offset="0x000000" />
-            </dataarea>
-            <dataarea name="nvram" size="8192">
-            </dataarea>
-        </part>
-    </software>
-
     <software name="shinkoukra" cloneof="shinkouk">
         <description>Shinchou Kouki (Jpn, Rev. A)</description>
         <year>1993</year>
@@ -15249,7 +15222,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="powyak2a" cloneof="powyak2">
+	<software name="powyak2b" cloneof="powyak2">
 		<description>Jikkyou Powerful Pro Yakyuu 2 (Jpn)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
@@ -17348,7 +17321,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="mjtaika2">
+	<software name="mjtaika2a" cloneof="mjtaika2">
 		<description>Mahjong Taikai II (Jpn)</description>
 		<year>1994</year>
 		<publisher>Koei</publisher>
@@ -26411,7 +26384,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="supermjtc" cloneof="supermjt">
+	<software name="supermjtd" cloneof="supermjt">
 		<description>Super Mahjong Taikai (Jpn)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
@@ -26437,7 +26410,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="supermjtb" cloneof="supermjt">
+	<software name="supermjtc" cloneof="supermjt">
 		<description>Super Mahjong Taikai (Jpn, Rev. A)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
@@ -32492,7 +32465,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="powyak2">
+	<software name="powyak2a" cloneof="powyak2">
 		<!-- single cartridge source: Yakushi~Kabuto -->
 		<description>Jikkyou Powerful Pro Yakyuu 2 (Jpn, Rev. A)</description>
 		<year>1995</year>
@@ -33158,7 +33131,7 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="supermjt">
+	<software name="supermjta" cloneof="supermjt">
 		<!-- single cartridge source: Yakushi~Kabuto -->
 		<description>Super Mahjong Taikai (Jpn, Rev. D)</description>
 		<year>1992</year>
@@ -40045,7 +40018,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="ggoemon3">
+	<software name="ggoemon3a" cloneof="ggoemon3">
 		<description>Ganbare Goemon 3 - Shishi Juurokubee no Karakuri Manjigatame (Jpn)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
@@ -40057,6 +40030,33 @@ List of unclassified roms
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
 				<rom name="ganbare goemon 3 - shishi juurokubee no karakuri manjigatame (japan).sfc" size="2097152" crc="7e5929e8" sha1="24832a8a054a83bbca241f8daf8b39ed2932996f" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ggoemon3">
+		<description>Ganbare Goemon 3 - Shishi Juurokubee no Karakuri Manjigatame (Jpn, Rev. B)</description>
+		<year>1994</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="SHVC-2U" />
+		<info name="release" value="19941216" />
+		<info name="alt_title" value="がんばれゴエモン3 獅子重禄兵衛のからくり卍固め" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-30" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="lockout" value="" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_revision" value="B" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shvc-2u-2.u1" size="2097152" crc="af984bc1" sha1="2732b810694880f9a388657ffb4cfb79d7d3ea7c" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -43051,6 +43051,24 @@ List of unclassified roms
 			<feature name="slot" value="lorom_sa1" />
 			<dataarea name="rom" size="3145728">
 				<rom name="jikkyou oshaberi parodius (japan).sfc" size="3145728" crc="177937ab" sha1="5d0bf1a3dd8a2ae65eb79adb8eb4a4e3c34e01a3" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="powyak2">
+		<description>Jikkyou Powerful Pro Yakyuu 2 (Jpn, Rev. B)</description>
+		<year>1995</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="SHVC-AP2J-JPN" />
+		<info name="release" value="19950224" />
+		<info name="alt_title" value="実況パワフルプロ野球2" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2621440">
+				<rom name="pawafurupuroyakyu.29b03.sfc" size="2097152" crc="855e3deb" sha1="508b86da019645e787a87ead558b7f8c24864f68" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -46106,6 +46124,21 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="magdrop2bh" cloneof="magdrop2">
+		<description>Magical Drop 2 (Jpn, Bunka Housou Special Version)</description>
+		<year>1996</year>
+		<publisher>Data East</publisher>
+		<info name="serial" value="SHVC-AOQJ-JPN" />
+		<info name="release" value="19960920" />
+		<info name="alt_title" value="マジカルドロップ2" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="magicaldrop2bunka.b9ee.sfc" size="2097152" crc="569a1cec" sha1="2602129615be0b06e9e4e431ab7f987a41c87b2b" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="magpopn">
 		<description>Magical Pop'n (Jpn)</description>
 		<year>1995</year>
@@ -46261,6 +46294,23 @@ List of unclassified roms
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mahjong sengoku monogatari (japan).sfc" size="1048576" crc="2e89db51" sha1="5d7dbecba63a9795e79d3da1365866278a9e7b49" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mjtaika2">
+		<description>Mahjong Taikai II (Jpn, Rev. A)</description>
+		<year>1994</year>
+		<publisher>Koei</publisher>
+		<info name="serial" value="SHVC-AIQJ-JPN" />
+		<info name="release" value="19940930" />
+		<info name="alt_title" value="麻雀大会II" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mahjongtaikai2.758b.sfc" size="1048576" crc="5695cc12" sha1="0249fda5aa715a45fef50be25d521fdfcb61e9be" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -50625,6 +50675,18 @@ List of unclassified roms
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="pink panther (japan).sfc" size="1048576" crc="0d1b3812" sha1="39436d24074f9ccc9874c25489aa93e36efc1de4" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pinkie">
+		<description>Pinkie (USA, Prototype)</description>
+		<year>1995</year>
+		<publisher>Data Design</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="pink2.sfc" size="1048576" crc="91c9d645" sha1="74e2204c1a1c03fb4db322130b9d03e1350b5b58" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -57256,7 +57318,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="supermjta" cloneof="supermjt">
+	<software name="supermjtb" cloneof="supermjt">
 		<description>Super Mahjong Taikai (Jpn, Rev. C)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
@@ -57267,6 +57329,23 @@ List of unclassified roms
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
 				<rom name="super mahjong taikai (japan) (rev 3).sfc" size="524288" crc="91a6d452" sha1="09f93386c093ed5800042a12db929c1b9eb848a8" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supermjt">
+		<description>Super Mahjong Taikai (Jpn, Rev. E)</description>
+		<year>1992</year>
+		<publisher>Koei</publisher>
+		<info name="serial" value="SHVC-IQ" />
+		<info name="release" value="19920912" />
+		<info name="alt_title" value="スーパー麻雀大会" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="supermahjongtaikai.a6f9.sfc" size="524288" crc="732740ec" sha1="e2d0e493d8b9cfba98338a80de942f45968d1f25" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
