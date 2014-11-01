@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="gamate" description="Bit Corp Gamate cartridges">
+
+	<software name="cubeup">
+		<description>Cube Up</description>
+		<year>19??</year>
+		<publisher>Bit Corp</publisher>
+		<part name="cart" interface="gamate_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="cube up.bin" size="16384" crc="2a911e57" sha1="9d3b28887b6f375600bff29f8f233087b9152a60" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+
+</softwarelist>
