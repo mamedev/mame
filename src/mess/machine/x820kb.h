@@ -73,7 +73,6 @@ private:
 	required_ioport m_y6;
 	required_ioport m_y7;
 	required_ioport m_y8;
-	required_ioport m_yd;
 	required_ioport m_yf;
 
 	devcb_write_line   m_kbstb_cb;
