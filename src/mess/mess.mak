@@ -1829,7 +1829,7 @@ $(MESSOBJ)/wavemate.a:          \
 	$(MESS_DRIVERS)/jupiter.o   \
 
 $(MESSOBJ)/xerox.a:             \
-	$(MESS_DRIVERS)/xerox820.o  \
+	$(MESS_DRIVERS)/xerox820.o $(MESS_MACHINE)/x820kb.o \
 	$(MESS_DRIVERS)/bigbord2.o  \
 	$(MESS_DRIVERS)/alto2.o     \
 

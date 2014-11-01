@@ -74,6 +74,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( trg2 );
 	DECLARE_WRITE_LINE_MEMBER( trg3 );
 
+	UINT16 get_channel_constant(UINT8 channel) { return m_channel[channel].m_tconst; }
+
 protected:
 	// device-level overrides
 	virtual void device_start();

@@ -39,9 +39,6 @@
 
 
 #include "includes/xerox820.h"
-#include "bus/rs232/rs232.h"
-
-#define KEYBOARD_TAG "keyboard"
 
 /* Read/Write Handlers */
 
@@ -320,7 +317,7 @@ READ8_MEMBER( xerox820_state::kbpio_pb_r )
 
 	*/
 
-	return m_keydata;
+	return m_kb->read() ^ 0xff;
 };
 
 WRITE8_MEMBER( xerox820ii_state::rdpio_pb_w )
@@ -407,15 +404,6 @@ WRITE_LINE_MEMBER( xerox820_state::fr_w )
 	m_sio->txca_w(state);
 }
 
-WRITE8_MEMBER( xerox820_state::kbd_w )
-{
-	m_keydata = ~data;
-
-	/* strobe in keyboard data */
-	m_kbpio->strobe_b(0);
-	m_kbpio->strobe_b(1);
-}
-
 /* Video */
 
 UINT32 xerox820_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -470,7 +458,6 @@ UINT32 xerox820_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 void xerox820_state::machine_start()
 {
 	// state saving
-	save_item(NAME(m_keydata));
 	save_item(NAME(m_scroll));
 	save_item(NAME(m_ncset2));
 	save_item(NAME(m_vatt));
@@ -627,8 +614,8 @@ static MACHINE_CONFIG_START( xerox820, xerox820_state )
 	MCFG_COM8116_FR_HANDLER(WRITELINE(xerox820_state, fr_w))
 	MCFG_COM8116_FT_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(xerox820_state, kbd_w))
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, XEROX_820_KEYBOARD, 0)
+	MCFG_XEROX_820_KEYBOARD_KBSTB_CALLBACK(DEVWRITELINE(Z80PIO_KB_TAG, z80pio_device, strobe_b))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -714,8 +701,8 @@ static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
 	MCFG_COM8116_FR_HANDLER(WRITELINE(xerox820_state, fr_w))
 	MCFG_COM8116_FT_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(xerox820_state, kbd_w))
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, XEROX_820_KEYBOARD, 0)
+	MCFG_XEROX_820_KEYBOARD_KBSTB_CALLBACK(DEVWRITELINE(Z80PIO_KB_TAG, z80pio_device, strobe_b))
 
 	// SASI bus
 	MCFG_DEVICE_ADD(SASIBUS_TAG, SCSI_PORT, 0)
@@ -785,9 +772,6 @@ ROM_START( x820 )
 
 	ROM_REGION( 0x800, "chargen", 0 )
 	ROM_LOAD( "x820.u92", 0x0000, 0x0800, CRC(b823fa98) SHA1(ad0ea346aa257a53ad5701f4201896a2b3a0f928) )
-
-	ROM_REGION( 0x800, "keyboard", 0 )
-	ROM_LOAD( "keyboard", 0x0000, 0x0800, NO_DUMP )
 ROM_END
 
 ROM_START( x820ii )
@@ -824,9 +808,6 @@ ROM_START( x820ii )
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "x820ii.u57", 0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9) )
 	ROM_LOAD( "x820ii.u58", 0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3) )
-
-	ROM_REGION( 0x400, "keyboard", 0 )
-	ROM_LOAD( "820iikey.bin", 0x000, 0x400, CRC(8ea3b39b) SHA1(3f05959f54a558b273567b1b4f0c7cdf46d8d9bf) ) // ASCII keyboard, QZERTY layout (Italian)
 ROM_END
 
 ROM_START( x168 )
@@ -849,9 +830,6 @@ ROM_START( x168 )
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "x820ii.u57", 0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9) )
 	ROM_LOAD( "x820ii.u58", 0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3) )
-
-	ROM_REGION( 0x400, "keyboard", 0 )
-	ROM_LOAD( "820iikey.bin", 0x000, 0x400, CRC(8ea3b39b) SHA1(3f05959f54a558b273567b1b4f0c7cdf46d8d9bf) ) // ASCII keyboard, QZERTY layout (Italian)
 ROM_END
 
 ROM_START( mk83 )
@@ -865,9 +843,9 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                         FULLNAME        FLAGS */
-COMP( 1980, bigboard,   0,          0,      bigboard,   xerox820, driver_device,   0,      "Digital Research Computers",   "Big Board",     GAME_IMPERFECT_KEYBOARD )
-COMP( 1981, x820,       bigboard,   0,      xerox820,   xerox820, driver_device,   0,      "Xerox",                        "Xerox 820",     GAME_IMPERFECT_KEYBOARD | GAME_NO_SOUND_HW )
-COMP( 1982, mk82,       bigboard,   0,      bigboard,   xerox820, driver_device,   0,      "Scomar",                       "MK-82",         GAME_IMPERFECT_KEYBOARD )
-COMP( 1983, x820ii,     0,          0,      xerox820ii, xerox820, driver_device,   0,      "Xerox",                        "Xerox 820-II",  GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD )
-COMP( 1983, x168,       x820ii,     0,      xerox168,   xerox820, driver_device,   0,      "Xerox",                        "Xerox 16/8",    GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD )
-COMP( 1983, mk83,       x820ii,     0,      mk83,       xerox820, driver_device,   0,      "Scomar",                       "MK-83",         GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD | GAME_NO_SOUND_HW )
+COMP( 1980, bigboard,   0,          0,      bigboard,   xerox820, driver_device,   0,      "Digital Research Computers",   "Big Board",     0 )
+COMP( 1981, x820,       bigboard,   0,      xerox820,   xerox820, driver_device,   0,      "Xerox",                        "Xerox 820",     GAME_NO_SOUND_HW )
+COMP( 1982, mk82,       bigboard,   0,      bigboard,   xerox820, driver_device,   0,      "Scomar",                       "MK-82",         0 )
+COMP( 1983, x820ii,     0,          0,      xerox820ii, xerox820, driver_device,   0,      "Xerox",                        "Xerox 820-II",  GAME_NOT_WORKING )
+COMP( 1983, x168,       x820ii,     0,      xerox168,   xerox820, driver_device,   0,      "Xerox",                        "Xerox 16/8",    GAME_NOT_WORKING )
+COMP( 1983, mk83,       x820ii,     0,      mk83,       xerox820, driver_device,   0,      "Scomar",                       "MK-83",         GAME_NOT_WORKING | GAME_NO_SOUND_HW )
