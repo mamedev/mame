@@ -11,36 +11,6 @@
 
 /*
 
-    Sector format
-    -------------
-
-    Header sync
-    Sector header (header ID, track ID, sector ID, and checksum)
-    Gap 1
-    Data Sync
-    Data field (data sync, data ID, data bytes, and checksum)
-    Gap 2
-
-    Track format
-    ------------
-
-    ZONE        LOWER HEAD  UPPER HEAD  SECTORS     ROTATIONAL
-    NUMBER      TRACKS      TRACKS      PER TRACK   PERIOD (MS)
-
-    0           0-3         unused      19          237.9
-    1           4-15        0-7         18          224.5
-    2           16-26       8-18        17          212.2
-    3           27-37       19-29       16          199.9
-    4           38-48       30-40       15          187.6
-    5           49-59       41-51       14          175.3
-    6           60-70       52-62       13          163.0
-    7           71-79       63-74       12          149.6
-    8           unused      75-79       11          144.0
-
-*/
-
-/*
-
     TODO:
 
     - floppy 8048
@@ -837,6 +807,10 @@ static SLOT_INTERFACE_START( victor9k_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
+FLOPPY_FORMATS_MEMBER( victor9k_state::floppy_formats )
+	FLOPPY_VICTOR_9000_FORMAT
+FLOPPY_FORMATS_END
+
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -972,8 +946,8 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(victor9k_state, erase_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor9k_state, via6_irq_w))
 
-	MCFG_FLOPPY_DRIVE_ADD(I8048_TAG":0", victor9k_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(I8048_TAG":1", victor9k_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(I8048_TAG":0", victor9k_floppies, "525qd", victor9k_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(I8048_TAG":1", victor9k_floppies, "525qd", victor9k_state::floppy_formats)
 
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, rxa_w))

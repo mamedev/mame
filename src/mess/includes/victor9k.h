@@ -17,6 +17,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "cpu/mcs48/mcs48.h"
+#include "formats/victor9k_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "bus/centronics/ctronics.h"
@@ -163,6 +164,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( ssda_irq_w );
 	MC6845_UPDATE_ROW( crtc_update_row );
+
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	void ready0_cb(floppy_image_device *, int device);
 	int load0_cb(floppy_image_device *device);
