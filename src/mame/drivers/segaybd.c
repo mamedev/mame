@@ -396,6 +396,20 @@ void segaybd_state::device_timer(emu_timer &timer, device_timer_id id, int param
 //      switches we need to fix
 
 //-------------------------------------------------
+//  gforce2_output_cb1 - output #1 handler for
+//  Galaxy Force
+//-------------------------------------------------
+
+void segaybd_state::gforce2_output_cb1(UINT16 data)
+{
+	logerror("gforce2_output_cb1: '%02X'\n", data & 0xFF);
+	//bits 4, 5, and 7 seem to be used to multiplex the PORTC signals
+	//The exact mapping of these signals is yet not perfectly understood.
+	//You can observe how this value changes when switching pages in the
+	//service mode motor test menu
+}
+
+//-------------------------------------------------
 //  gforce2_output_cb2 - output #2 handler for
 //  Galaxy Force
 //-------------------------------------------------
@@ -873,8 +887,8 @@ static INPUT_PORTS_START( gforce2 )
 
 	PORT_MODIFY("PORTC")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Floor Switch")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Beam Sensor 2 / Down Limit")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Beam Sensor 1 / Up Limit")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Beam Sensor 2 / Down Limit") //The meaning of these portbits seems to be selected
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Beam Sensor 1 / Up Limit")   // by the output value written to gforce2_output_cb1
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Left CCW Limit")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Right CW Limit")
 
@@ -2524,6 +2538,7 @@ DRIVER_INIT_MEMBER(segaybd_state,generic)
 DRIVER_INIT_MEMBER(segaybd_state,gforce2)
 {
 	DRIVER_INIT_CALL(generic);
+	m_output_cb1 = output_delegate(FUNC(segaybd_state::gforce2_output_cb1), this);
 	m_output_cb2 = output_delegate(FUNC(segaybd_state::gforce2_output_cb2), this);
 }
 
