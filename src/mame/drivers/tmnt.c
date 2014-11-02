@@ -2894,13 +2894,12 @@ ROM_START( tmhta )
 	ROM_LOAD( "963a25.d5",      0x00000, 0x80000, CRC(fca078c7) SHA1(3e1124d72c9db4cb11d8de6c44b7aeca967f44e1) )
 ROM_END
 
-
 ROM_START( tmhtb ) // the code is closest to tmntua near the start, and the data is closest to all the UK sets, especially tmhta, so I'm guessing it's a UK revision of the tmntua codebase
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 2*128k and 2*64k for 68000 code */
-	ROM_LOAD16_BYTE( "unk3.i17",   0x00000, 0x20000, CRC(537eb047) SHA1(97e6dbc486c7d057355db7fcbdc0a2c2cad2c653) )
+	ROM_LOAD16_BYTE( "unk3.i17",   0x00000, 0x20000, CRC(537eb047) SHA1(97e6dbc486c7d057355db7fcbdc0a2c2cad2c653) ) /* unknown 963 xxx Konami code for this set */
 	ROM_LOAD16_BYTE( "unk4.k17",   0x00001, 0x20000, CRC(5afae564) SHA1(8d5fbf9530ad8d095c12b7e0f8c499c1436c4d47) )
-	ROM_LOAD16_BYTE( "unk2.j15",   0x40000, 0x10000, CRC(ee34de05) SHA1(507d7fb178dbbe87dd373a81ad3f350ee2f7d923))
-	ROM_LOAD16_BYTE( "unk1.k15",   0x40001, 0x10000, NO_DUMP )
+	ROM_LOAD16_BYTE( "unk2.j15",   0x40000, 0x10000, CRC(ee34de05) SHA1(507d7fb178dbbe87dd373a81ad3f350ee2f7d923) )
+	ROM_LOAD16_BYTE( "unk5.k15",   0x40001, 0x10000, CRC(5ef58d4e) SHA1(5df71c61a90c3e9d28ec3b8055d7ee97bc283e01) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "963e20.g13",      0x00000, 0x08000, CRC(1692a6d6) SHA1(68c3419012b2863e91a7d7e479fce5ceabb10b88) )
@@ -2928,7 +2927,6 @@ ROM_START( tmhtb ) // the code is closest to tmntua near the start, and the data
 	ROM_REGION( 0x80000, "title", 0 )   /* 512k for the title music sample */
 	ROM_LOAD( "963a25.d5",      0x00000, 0x80000, CRC(fca078c7) SHA1(3e1124d72c9db4cb11d8de6c44b7aeca967f44e1) )
 ROM_END
-
 
 ROM_START( tmntj )
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 2*128k and 2*64k for 68000 code */
@@ -4102,7 +4100,7 @@ GAME( 1989, tmntu,       tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,    
 GAME( 1989, tmntua,      tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (US 4 Players, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1989, tmht,        tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 4 Players, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1989, tmhta,       tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 4 Players, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1989, tmhtb,       tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK?, unknown revision)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // incomplete dump
+GAME( 1989, tmhtb,       tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 4 Players, set 3)", GAME_SUPPORTS_SAVE )
 GAME( 1990, tmntj,       tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (Japan 4 Players)", GAME_SUPPORTS_SAVE )
 GAME( 1989, tmht2p,      tmnt,     tmnt,     tmnt2p,    tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 2 Players, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1989, tmht2pa,     tmnt,     tmnt,     tmnt2p,    tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 2 Players, set 2)", GAME_SUPPORTS_SAVE )
