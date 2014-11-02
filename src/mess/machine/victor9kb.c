@@ -28,7 +28,6 @@
 const device_type VICTOR9K_KEYBOARD = &device_creator<victor9k_keyboard_device>;
 
 
-
 //-------------------------------------------------
 //  ROM( victor9k_keyboard )
 //-------------------------------------------------
@@ -237,28 +236,28 @@ ioport_constructor victor9k_keyboard_device::device_input_ports() const
 //  victor9k_keyboard_device - constructor
 //-------------------------------------------------
 
-victor9k_keyboard_device::victor9k_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, VICTOR9K_KEYBOARD, "Victor 9000 Keyboard", tag, owner, clock, "victor9kb", __FILE__),
-		m_maincpu(*this, I8021_TAG),
-		m_y0(*this, "Y0"),
-		m_y1(*this, "Y1"),
-		m_y2(*this, "Y2"),
-		m_y3(*this, "Y3"),
-		m_y4(*this, "Y4"),
-		m_y5(*this, "Y5"),
-		m_y6(*this, "Y6"),
-		m_y7(*this, "Y7"),
-		m_y8(*this, "Y8"),
-		m_y9(*this, "Y9"),
-		m_ya(*this, "YA"),
-		m_yb(*this, "YB"),
-		m_yc(*this, "YC"),
-		m_kbrdy_handler(*this),
-		m_kbdata_handler(*this),
-		m_y(0),
-		m_kbrdy(1),
-		m_kbdata(1),
-		m_kback(1)
+victor9k_keyboard_device::victor9k_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, VICTOR9K_KEYBOARD, "Victor 9000 Keyboard", tag, owner, clock, "victor9kb", __FILE__),
+	m_maincpu(*this, I8021_TAG),
+	m_y0(*this, "Y0"),
+	m_y1(*this, "Y1"),
+	m_y2(*this, "Y2"),
+	m_y3(*this, "Y3"),
+	m_y4(*this, "Y4"),
+	m_y5(*this, "Y5"),
+	m_y6(*this, "Y6"),
+	m_y7(*this, "Y7"),
+	m_y8(*this, "Y8"),
+	m_y9(*this, "Y9"),
+	m_ya(*this, "YA"),
+	m_yb(*this, "YB"),
+	m_yc(*this, "YC"),
+	m_kbrdy_handler(*this),
+	m_kbdata_handler(*this),
+	m_y(0),
+	m_kbrdy(1),
+	m_kbdata(1),
+	m_kback(1)
 {
 }
 
@@ -291,32 +290,13 @@ void victor9k_keyboard_device::device_reset()
 
 
 //-------------------------------------------------
-//  kbrdy_r -
-//-------------------------------------------------
-
-READ_LINE_MEMBER( victor9k_keyboard_device::kbrdy_r )
-{
-	return m_kbrdy;
-}
-
-
-//-------------------------------------------------
 //  kback_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( victor9k_keyboard_device::kback_w )
 {
+	//logerror("KBACK %u\n", state);
 	m_kback = state;
-}
-
-
-//-------------------------------------------------
-//  kbdata_r -
-//-------------------------------------------------
-
-READ_LINE_MEMBER( victor9k_keyboard_device::kbdata_r )
-{
-	return m_kbdata;
 }
 
 
@@ -360,7 +340,7 @@ WRITE8_MEMBER( victor9k_keyboard_device::kb_p1_w )
 		m_y = data & 0x0f;
 	}
 
-	logerror("P1 %02x\n", data);
+	//logerror("P1 %02x\n", data);
 }
 
 
@@ -374,14 +354,14 @@ WRITE8_MEMBER( victor9k_keyboard_device::kb_p2_w )
 
 	    bit     description
 
-	    P20     keylatch enable ?
-	    P21
-	    P22     key available ?
-	    P23     data ?
+	    P20     ?
+	    P21 	KBRDY
+	    P22     ?
+	    P23     KBDATA
 
 	*/
 
-	int kbrdy = BIT(data, 2);
+	int kbrdy = BIT(data, 1);
 
 	if (m_kbrdy != kbrdy)
 	{
@@ -397,7 +377,7 @@ WRITE8_MEMBER( victor9k_keyboard_device::kb_p2_w )
 		m_kbdata_handler(m_kbdata);
 	}
 
-	logerror("P2 %01x\n", data & 0x0f);
+	//logerror("P2 %02x\n", data);
 }
 
 
@@ -407,7 +387,5 @@ WRITE8_MEMBER( victor9k_keyboard_device::kb_p2_w )
 
 READ8_MEMBER( victor9k_keyboard_device::kb_t1_r )
 {
-	logerror("read T1 %u\n", m_kback);
-
 	return m_kback;
 }

@@ -770,6 +770,7 @@ WRITE_LINE_MEMBER( victor9k_state::via6_irq_w )
 
 WRITE_LINE_MEMBER( victor9k_state::kbrdy_w )
 {
+	//logerror("KBRDY %u\n", state);
 	m_via2->write_cb1(state);
 
 	m_pic->ir6_w(state ? CLEAR_LINE : ASSERT_LINE);
@@ -777,6 +778,7 @@ WRITE_LINE_MEMBER( victor9k_state::kbrdy_w )
 
 WRITE_LINE_MEMBER( victor9k_state::kbdata_w )
 {
+	//logerror("KBDATA %u\n", state);
 	m_via2->write_cb2(state);
 	m_via2->write_pa6(state);
 }
