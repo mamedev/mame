@@ -2,36 +2,32 @@
 // copyright-holders:Sandro Ronco
 #pragma once
 
-#ifndef __DMV_K806_H__
-#define __DMV_K806_H__
+#ifndef __DMV_K803_H__
+#define __DMV_K803_H__
 
 #include "emu.h"
 #include "dmvbus.h"
-#include "cpu/mcs48/mcs48.h"
-
+#include "machine/mm58167.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> dmv_k806_device
+// ======================> dmv_k803_device
 
-class dmv_k806_device :
+class dmv_k803_device :
 		public device_t,
 		public device_dmvslot_interface
 {
 public:
 	// construction/destruction
-	dmv_k806_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dmv_k803_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
 	virtual ioport_constructor device_input_ports() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	DECLARE_READ8_MEMBER(portt1_r);
-	DECLARE_READ8_MEMBER(port1_r);
-	DECLARE_WRITE8_MEMBER(port2_w);
+	DECLARE_WRITE_LINE_MEMBER(rtc_irq_w);
 
 protected:
 	// device-level overrides
@@ -41,14 +37,18 @@ protected:
 	virtual void io_read(address_space &space, int ifsel, offs_t offset, UINT8 &data);
 	virtual void io_write(address_space &space, int ifsel, offs_t offset, UINT8 data);
 
+	void update_int();
+
 private:
-	required_device<upi41_cpu_device> m_mcu;
-	required_ioport m_jumpers;
+	required_device<mm58167_device> m_rtc;
+	required_ioport m_dsw;
 	dmvcart_slot_device * m_bus;
+	UINT8   m_latch;
+	int     m_rtc_int;
 };
 
 
 // device type definition
-extern const device_type DMV_K806;
+extern const device_type DMV_K803;
 
-#endif  /* __DMV_K806_H__ */
+#endif  /* __DMV_K803_H__ */
