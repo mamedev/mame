@@ -2822,4 +2822,72 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="kingqst4">
+		<!-- Dumped via Kryoflux, shows as good and unmodified -->
+		<description>King's Quest IV: The Perils of Rosella (Version #2.2, 3.5")</description>
+		<year>1988</year>
+		<publisher>Sierra</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 of 3" />
+			<dataarea name="flop" size="737280">
+				<rom name="disk1_35.img" size="737280" crc="afc8464c" sha1="a8a40b48be021b070378834d2ceb428f32f9b883" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 of 3" />
+			<dataarea name="flop" size="737280">
+				<rom name="disk2_35.img" size="737280" crc="022c3c12" sha1="89a4b0a4145257ae4d4270d4546dcf238c6b8b1d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 of 3" />
+			<dataarea name="flop" size="737280">
+				<rom name="disk3_35.img" size="737280" crc="c2230f34" sha1="28173b45a4b605fa99234b3567bf49e606bae78f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingqst4m" cloneof="kingqst4">
+		<!-- Dumped via Kryoflux, shows as good and unmodified -->
+		<description>King's Quest IV: The Perils of Rosella (Version #2.2, 5.25")</description>
+		<year>1988</year>
+		<publisher>Sierra</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 of 6" />
+			<dataarea name="flop" size="368640">
+				<rom name="disk1_525.img" size="368640" crc="d183e114" sha1="1569458b0588a1667ca99ef0a5206102742a34b5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 of 6" />
+			<dataarea name="flop" size="368640">
+				<rom name="disk2_525.img" size="368640" crc="a22e8248" sha1="cf6b5e0bd7847d0021ccc992cc7fd10b5d01a754" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 of 6" />
+			<dataarea name="flop" size="368640">
+				<rom name="disk3_525.img" size="368640" crc="43943dd4" sha1="375a2d158563a1148bd17b8c383d984ae43ea209" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 of 6" />
+			<dataarea name="flop" size="368640">
+				<rom name="disk4_525.img" size="368640" crc="e39c62f4" sha1="8f579c93d72b1d362d94ba2fb493ebad77b4fafd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5 of 6" />
+			<dataarea name="flop" size="368640">
+				<rom name="disk5_525.img" size="368640" crc="3d1517b0" sha1="8e5b3ff93b858e11e808776f440546da1858f20c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6 of 6" />
+			<dataarea name="flop" size="368640">
+				<rom name="disk6_525.img" size="368640" crc="3852ba12" sha1="09767b94985c3ef81547bca74964d6bff95faf00" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
