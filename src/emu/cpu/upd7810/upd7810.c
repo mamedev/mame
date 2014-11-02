@@ -1616,6 +1616,7 @@ void upd7810_device::base_device_start()
 	save_item(NAME(m_ovcf));
 	save_item(NAME(m_ovcs));
 	save_item(NAME(m_edges));
+	save_item(NAME(m_nmi));
 	save_item(NAME(m_int1));
 	save_item(NAME(m_int2));
 
@@ -1797,6 +1798,7 @@ void upd7810_device::device_reset()
 	m_co1 = 0;
 	m_irr = 0;
 	m_itf = 0;
+	m_nmi = 0;
 	m_int1 = 0;
 	m_int2 = 0;
 
@@ -1970,22 +1972,31 @@ void upd7801_device::execute_set_input(int irqline, int state)
 
 void upd7810_device::execute_set_input(int irqline, int state)
 {
-	if (state != CLEAR_LINE)
-	{
-		if (irqline == INPUT_LINE_NMI)
-		{
-			/* no nested NMIs ? */
-//          if (0 == (IRR & INTNMI))
+	switch (irqline) {
+	case INPUT_LINE_NMI:
+		/* NMI is falling edge sensitive */
+		if ( m_nmi == ASSERT_LINE && state == CLEAR_LINE )
 			IRR |= INTNMI;
-		}
-		else
-		if (irqline == UPD7810_INTF1)
+
+		m_nmi = state;
+		break;
+	case UPD7810_INTF1:
+		/* INT1 is rising edge sensitive */
+		if ( m_int1 == CLEAR_LINE && state == ASSERT_LINE )
 			IRR |= INTF1;
-		else
-		if ( irqline == UPD7810_INTF2 && ( MKL & 0x20 ) )
+
+		m_int1 = state;
+		break;
+	case UPD7810_INTF2:
+		/* INT2 is falling edge sensitive */
+		if ( m_int2 == ASSERT_LINE && state == CLEAR_LINE )
 			IRR |= INTF2;
-		else
-			logerror("upd7810_set_irq_line invalid irq line #%d\n", irqline);
+
+		m_int2 = state;
+		break;
+	default:
+		logerror("upd7810_set_irq_line invalid irq line #%d\n", irqline);
+		break;
 	}
 	/* resetting interrupt requests is done with the SKIT/SKNIT opcodes only! */
 }
