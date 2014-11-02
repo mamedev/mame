@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
+<!-- TODO: update to latest TOSEC (2014-10-31) -->
+
 <softwarelist name="jupace_cass" description="Jupiter Cantab Jupiter Ace cassettes">
 	<software name="3dmaze">
 		<description>3D Maze</description>
