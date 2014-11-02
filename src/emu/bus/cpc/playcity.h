@@ -3,9 +3,9 @@
 
 	I/O ports:
 	* F880 - Z80CTC channel 0 (input is system clock (4MHz), output to YMZ294 clock)
-	* F881 - Z80CTC channel 1 (input from CRTC CURSOR, output to NMI)
+	* F881 - Z80CTC channel 1 (input from CRTC CURSOR, output to /NMI)
 	* F882 - Z80CTC channel 2 (input is system clock (4MHz), output to channel 3 input)
-	* F883 - Z80CTC channel 3 (input is channel 2 output, output to IRQ)
+	* F883 - Z80CTC channel 3 (input is channel 2 output)
 	* F884 - YMZ294 #1 (right) data
 	* F888 - YMZ294 #2 (left) data
 	* F984 - YMZ294 #1 (right) register select
@@ -39,8 +39,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ymz2_data_w);
 	DECLARE_READ8_MEMBER(ymz1_data_r);
 	DECLARE_READ8_MEMBER(ymz2_data_r);
-	DECLARE_WRITE_LINE_MEMBER(ctc_zc1_cb) { if(state) {m_slot->nmi_w(1); m_slot->nmi_w(0); } }
-	DECLARE_WRITE_LINE_MEMBER(ctc_zc2_cb) { m_slot->irq_w(state); }
+	DECLARE_WRITE_LINE_MEMBER(ctc_zc1_cb) { if(state) { m_slot->nmi_w(1); m_slot->nmi_w(0); } printf("NMI %i",state); }
+	DECLARE_WRITE_LINE_MEMBER(ctc_intr_cb) { m_slot->irq_w(state); }
 
 protected:
 	// device-level overrides

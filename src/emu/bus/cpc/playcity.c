@@ -3,6 +3,10 @@
 
    Z80 CTC
    2x YMZ294 (clocks provided by CTC)
+
+   TODO:
+   IRQs aren't working currently, the Z80CTC core requires the daisy chain setup to acknowledge IRQs properly, and that can't be used in a slot device currently.
+   Add CRTC Cursor signal support to the expansion bus, this should get NMIs working consistently.
 */
 
 #include "playcity.h"
@@ -18,13 +22,14 @@ const device_type CPC_PLAYCITY = &device_creator<cpc_playcity_device>;
 static MACHINE_CONFIG_FRAGMENT( cpc_playcity )
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_4MHz)
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(cpc_playcity_device,ctc_zc1_cb))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(cpc_playcity_device,ctc_zc2_cb))
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("ctc",z80ctc_device,trg3))
+	MCFG_Z80CTC_INTR_CB(WRITELINE(cpc_playcity_device,ctc_intr_cb))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 	MCFG_SOUND_ADD("ymz_1",YMZ294,XTAL_4MHz)  // when timer is not set, operates at 4MHz (interally divided by 2, so equivalent to the ST)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 	MCFG_SOUND_ADD("ymz_2",YMZ294,XTAL_4MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 
 	// pass-through
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
@@ -89,7 +94,8 @@ READ8_MEMBER(cpc_playcity_device::ctc_r)
 WRITE8_MEMBER(cpc_playcity_device::ctc_w)
 {
 	m_ctc->write(space,offset,data);
-	update_ymz_clock();
+	if(offset == 0)
+		update_ymz_clock();
 }
 
 WRITE8_MEMBER(cpc_playcity_device::ymz1_address_w)
