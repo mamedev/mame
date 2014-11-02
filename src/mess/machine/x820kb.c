@@ -11,6 +11,31 @@
 
 /*
 
+PCB Layout
+----------
+
+Maxi-Switch Co.
+630107-02
+
+|-----------------------------------------------------------------------|
+|                                                       |--CN1--| CN2   |
+|            8748   6MHz                 74154   *                      |
+|                                                                       |
+|-----------------------------------------------------------------------|
+
+Notes:
+    All IC's shown.
+
+    8048        - NEC D8748D
+    74154       - 4-line to 16-line decoder/multiplexer
+    *           - unpopulated 8-pin chip
+    CN1         - 2x16 PCB header
+    CN2         - unpopulated RJ-45? connector
+
+*/
+
+/*
+
 	TODO:
 
 	- repeat
@@ -63,7 +88,7 @@ const rom_entry *xerox_820_keyboard_t::device_rom_region() const
 
 static ADDRESS_MAP_START( xerox_820_keyboard_io, AS_IO, 8, xerox_820_keyboard_t )
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(kb_p1_r, kb_p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(kb_p2_r)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(kb_p2_r) AM_WRITENOP
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(kb_t0_r)
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T1) AM_READ(kb_t1_r)
 	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_WRITE(kb_bus_w)
@@ -75,11 +100,8 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( xerox_820_keyboard )
-	MCFG_CPU_ADD(I8748_TAG, I8048, 4608000) // ???
+	MCFG_CPU_ADD(I8748_TAG, I8048, XTAL_6MHz)
 	MCFG_CPU_IO_MAP(xerox_820_keyboard_io)
-
-	MCFG_DEVICE_ADD("int_clk", CLOCK, 16) // ???
-	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE(I8748_TAG, MCS48_INPUT_IRQ))
 MACHINE_CONFIG_END
 
 
@@ -261,6 +283,11 @@ void xerox_820_keyboard_t::device_reset()
 	m_kbstb_cb.resolve_safe();
 }
 
+void xerox_820_keyboard_t::device_reset_after_children()
+{
+	m_maincpu->set_input_line(MCS48_INPUT_IRQ, ASSERT_LINE);
+}
+
 
 //-------------------------------------------------
 //  kb_p1_r -
@@ -331,7 +358,15 @@ READ8_MEMBER( xerox_820_keyboard_t::kb_p2_r )
 
 READ8_MEMBER( xerox_820_keyboard_t::kb_t0_r )
 {
-	return 1; // ???
+	UINT8 data = 1;
+
+	switch (m_p1 & 0x0f)
+	{
+		case 0xd: data = 1; break; // ??? if 0, return key data | 0x80
+		case 0xe: data = 1; break; // ??? if 0, set r6=1
+	}
+
+	return data;
 }
 
 
@@ -341,7 +376,7 @@ READ8_MEMBER( xerox_820_keyboard_t::kb_t0_r )
 
 READ8_MEMBER( xerox_820_keyboard_t::kb_t1_r )
 {
-	return 1; // ???
+	return 1; // ??? if 0, toggle P17
 }
 
 
