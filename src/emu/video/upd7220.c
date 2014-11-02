@@ -1571,6 +1571,7 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 	UINT16 len;
 	int im, wd, area;
 	int y = 0, tsy = 0, bsy = 0;
+	bool mixed = ((m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_MIXED);
 
 	for (area = 0; area < 4; area++)
 	{
@@ -1592,7 +1593,7 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 				addr = ((sad << 1) & 0x3ffff) + (y * (m_pitch << (im ? 0 : 1)));
 
 				if (!m_display_cb.isnull())
-					draw_graphics_line(bitmap, addr, y + (bsy / m_lr), wd);
+					draw_graphics_line(bitmap, addr, y + (bsy / (mixed ? 1 : m_lr)), wd);
 			}
 		}
 		else
