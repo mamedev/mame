@@ -709,6 +709,14 @@ void upd7810_device::upd7810_take_irq()
 		return;
 
 	/* check the interrupts in priority sequence */
+	if (IRR & INTNMI)
+	{
+		/* Nonmaskable interrupt */
+		irqline = INPUT_LINE_NMI;
+		vector = 0x0004;
+		IRR &= ~INTNMI;
+	}
+	else
 	if ((IRR & INTFT0)  && 0 == (MKL & 0x02))
 	{
 		vector = 0x0008;
@@ -1968,18 +1976,7 @@ void upd7810_device::execute_set_input(int irqline, int state)
 		{
 			/* no nested NMIs ? */
 //          if (0 == (IRR & INTNMI))
-			{
-				IRR |= INTNMI;
-				SP--;
-				WM( SP, PSW );
-				SP--;
-				WM( SP, PCH );
-				SP--;
-				WM( SP, PCL );
-				IFF = 0;
-				PSW &= ~(SK|L0|L1);
-				PC = 0x0004;
-			}
+			IRR |= INTNMI;
 		}
 		else
 		if (irqline == UPD7810_INTF1)
