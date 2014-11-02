@@ -3,7 +3,6 @@
 <!--
     UNDUMPED / TO BE REDUMPED LIST
 
-    2IN1 (COSMIC SPACEHEAD FANTASTIC DIZZY) PAL
     ADVANCED DAISENRYAKU            JAPAN       we have Rev A, Rev 0 needed (does it exist?)
     CAPTAIN PLANET              ASIA
     DAVIS CUP TENNIS                JAPAN
@@ -107,6 +106,25 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 <!-- Fully documented: confirmed dumps + PCB pics -->
 
+
+	<!-- Game is switched on reset -->
+	<software name="2fdizcsp">
+		<description>2 in 1 - Fantastic Dizzy &amp; Cosmic Spacehead (Euro)</description>
+		<year>1994</year>
+		<publisher>Codemasters</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_cm2in1"/>
+			<feature name="pcb" value="SR16V7-2"/>
+			<feature name="u1" value="COSMIC SPACEHEAD MD MDCS E4F7"/>   <!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u2" value="FANTASTIC DIZZY MD MDFD BB07"/>    <!-- location not really marked on PCB, using u2 for consistency -->
+			<feature name="left" value="GD74HC00"/>
+			<feature name="right" value="GD74HC74"/>
+			<dataarea name="rom" width="16" endianness="big" size="2621440">
+                <rom name="cosmic spacehead md mdcs e4f7.u1" size="1048576" crc="cb89e605" sha1="b5bc4a786639d1b8ae6de76f40dbe907b3f0b642" offset="0x000000"/>
+                <rom name="fantastic dizzy md mdfd bb07.u2" size="524288" crc="46447e7a" sha1="b320174d3b43f30b477818a27b4da30462a52003" offset="0x200000"/>
+			</dataarea>
+		</part>
+	</software>
 
 <!-- Both Euro and USA confirmed -->
 	<software name="688atsub">
