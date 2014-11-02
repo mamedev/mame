@@ -595,7 +595,7 @@ static MACHINE_CONFIG_START( psion_2lines, psion_state )
 	MCFG_PSION_DATAPACK_ADD("pack2")
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("pack_list", "psion")
+	MCFG_SOFTWARE_LIST_ADD("pack_list", "psion2")
 MACHINE_CONFIG_END
 
 /* basic configuration for 4 lines display */
@@ -624,6 +624,10 @@ static MACHINE_CONFIG_DERIVED_CLASS( psion1, psion_2lines, psion1_state )
 	MCFG_DEVICE_MODIFY("hd44780")
 	MCFG_HD44780_LCD_SIZE(1, 16)
 	MCFG_HD44780_PIXEL_UPDATE_CB(psion1_state::psion1_pixel_update)
+
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_REMOVE("pack_list")
+	MCFG_SOFTWARE_LIST_ADD("pack_list", "psion1")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( psioncm, psion_2lines )
@@ -696,6 +700,8 @@ ROM_START( psionla )
 	ROMX_LOAD( "34-lag.rom",   0x8000, 0x8000,  CRC(13a92c4b) SHA1(dab8bd6a41a5fd509c5ad4b0b0ab80d14f2c421a), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "v36", "LA v3.6")
 	ROMX_LOAD( "36-la.rom",    0x8000, 0x8000,  CRC(7442c7f6) SHA1(94f15bd06bd750be70fa4a4ab588237c5a703f65), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(3, "v30", "LA v3.0")
+	ROMX_LOAD( "30-lahp.rom",    0x8000, 0x8000,  CRC(50192528) SHA1(c556d53f70bf5ecae756b2ebfc6d954912316bbe), ROM_BIOS(4))
 ROM_END
 
 ROM_START( psionp200 )
