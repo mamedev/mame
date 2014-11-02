@@ -1513,13 +1513,14 @@ static MACHINE_CONFIG_START( x07, x07_state )
 	MCFG_GENERIC_LOAD(x07_state, x07_card)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(x07_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("x07_cass")
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("card_list", "x07_card")
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "x07_cass")
 MACHINE_CONFIG_END
 
 /* ROM definition */
