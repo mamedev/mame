@@ -47,9 +47,9 @@ static ADDRESS_MAP_START( victor9k_mem, AS_PROGRAM, 8, victor9k_state )
 	AM_RANGE(0xe8040, 0xe804f) AM_DEVREADWRITE(M6522_2_TAG, via6522_device, read, write)
 	AM_RANGE(0xe8060, 0xe8061) AM_DEVREADWRITE(MC6852_TAG, mc6852_device, read, write)
 	AM_RANGE(0xe8080, 0xe808f) AM_DEVREADWRITE(M6522_3_TAG, via6522_device, read, write)
-	AM_RANGE(0xe80a0, 0xe80af) AM_DEVREADWRITE(M6522_4_TAG, via6522_device, read, write)
-	AM_RANGE(0xe80c0, 0xe80cf) AM_DEVREADWRITE(M6522_6_TAG, via6522_device, read, write)
-	AM_RANGE(0xe80e0, 0xe80ef) AM_DEVREADWRITE(M6522_5_TAG, via6522_device, read, write)
+	AM_RANGE(0xe80a0, 0xe80af) AM_DEVREADWRITE(FDC_TAG, victor_9000_fdc_t, cs5_r, cs5_w)
+	AM_RANGE(0xe80c0, 0xe80cf) AM_DEVREADWRITE(FDC_TAG, victor_9000_fdc_t, cs6_r, cs6_w)
+	AM_RANGE(0xe80e0, 0xe80ef) AM_DEVREADWRITE(FDC_TAG, victor_9000_fdc_t, cs7_r, cs7_w)
 	AM_RANGE(0xf0000, 0xf0fff) AM_MIRROR(0x1000) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION(I8088_TAG, 0)
 ADDRESS_MAP_END
@@ -160,7 +160,7 @@ WRITE_LINE_MEMBER( victor9k_state::ssda_irq_w )
 {
 	m_ssda_irq = state;
 
-	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_via4_irq || m_via5_irq || m_via6_irq);
+	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_fdc_irq);
 }
 
 
@@ -232,7 +232,7 @@ WRITE_LINE_MEMBER( victor9k_state::via1_irq_w )
 {
 	m_via1_irq = state;
 
-	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_via4_irq || m_via5_irq || m_via6_irq);
+	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_fdc_irq);
 }
 
 WRITE8_MEMBER( victor9k_state::via2_pa_w )
@@ -299,7 +299,7 @@ WRITE_LINE_MEMBER( victor9k_state::via2_irq_w )
 {
 	m_via2_irq = state;
 
-	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_via4_irq || m_via5_irq || m_via6_irq);
+	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_fdc_irq);
 }
 
 
@@ -339,238 +339,7 @@ WRITE_LINE_MEMBER( victor9k_state::via3_irq_w )
 {
 	m_via3_irq = state;
 
-	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_via4_irq || m_via5_irq || m_via6_irq);
-}
-
-
-WRITE8_MEMBER( victor9k_state::via4_pa_w )
-{
-	/*
-
-	    bit     description
-
-	    PA0     L0MS0
-	    PA1     L0MS1
-	    PA2     L0MS2
-	    PA3     L0MS3
-	    PA4     ST0A
-	    PA5     ST0B
-	    PA6     ST0C
-	    PA7     ST0D
-
-	*/
-
-	m_fdc->l0ms_w(data & 0x0f);
-	m_fdc->st0_w(data >> 4);
-}
-
-WRITE8_MEMBER( victor9k_state::via4_pb_w )
-{
-	/*
-
-	    bit     description
-
-	    PB0     L1MS0
-	    PB1     L1MS1
-	    PB2     L1MS2
-	    PB3     L1MS3
-	    PB4     ST1A
-	    PB5     ST1B
-	    PB6     ST1C
-	    PB7     ST1D
-
-	*/
-
-	m_fdc->l1ms_w(data & 0x0f);
-	m_fdc->st1_w(data >> 4);
-}
-
-WRITE_LINE_MEMBER( victor9k_state::mode_w )
-{
-}
-
-WRITE_LINE_MEMBER( victor9k_state::via4_irq_w )
-{
-	m_via4_irq = state;
-
-	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_via4_irq || m_via5_irq || m_via6_irq);
-}
-
-
-/*
-
-    bit     description
-
-    PA0     E0
-    PA1     E1
-    PA2     I1
-    PA3     E2
-    PA4     E4
-    PA5     E5
-    PA6     I7
-    PA7     E6
-
-*/
-
-WRITE8_MEMBER( victor9k_state::via5_pb_w )
-{
-	/*
-
-	    bit     description
-
-	    PB0     WD0
-	    PB1     WD1
-	    PB2     WD2
-	    PB3     WD3
-	    PB4     WD4
-	    PB5     WD5
-	    PB6     WD6
-	    PB7     WD7
-
-	*/
-}
-
-WRITE_LINE_MEMBER( victor9k_state::via5_irq_w )
-{
-	m_via5_irq = state;
-
-	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_via4_irq || m_via5_irq || m_via6_irq);
-}
-
-
-READ8_MEMBER( victor9k_state::via6_pa_r )
-{
-	/*
-
-	    bit     description
-
-	    PA0
-	    PA1     _TRK0D0
-	    PA2
-	    PA3     _TRK0D1
-	    PA4
-	    PA5
-	    PA6     WPS
-	    PA7     _SYNC
-
-	*/
-
-	UINT8 data = 0;
-
-	// track 0 drive A sense
-	data |= m_fdc->trk0d0_r() << 1;
-
-	// track 0 drive B sense
-	data |= m_fdc->trk0d1_r() << 3;
-
-	// write protect sense
-	data |= m_fdc->wps_r() << 6;
-
-	// disk sync detect
-	data |= m_fdc->sync_r() << 7;
-
-	return data;
-}
-
-WRITE8_MEMBER( victor9k_state::via6_pa_w )
-{
-	/*
-
-	    bit     description
-
-	    PA0     LED0A
-	    PA1
-	    PA2     LED1A
-	    PA3
-	    PA4     SIDE SELECT
-	    PA5     DRIVE SELECT
-	    PA6
-	    PA7
-
-	*/
-
-	// LED, drive A
-	m_fdc->led0a_w(BIT(data, 0));
-
-	// LED, drive B
-	m_fdc->led1a_w(BIT(data, 2));
-
-	// dual side select
-	m_fdc->side_select_w(BIT(data, 4));
-
-	// select drive A/B
-	m_fdc->drive_select_w(BIT(data, 5));
-}
-
-READ8_MEMBER( victor9k_state::via6_pb_r )
-{
-	/*
-
-	    bit     description
-
-	    PB0     RDY0
-	    PB1     RDY1
-	    PB2
-	    PB3     _DS1
-	    PB4     _DS0
-	    PB5     SINGLE/_DOUBLE SIDED
-	    PB6
-	    PB7
-
-	*/
-
-	UINT8 data = 0;
-
-	// motor speed status, drive A
-	data |= m_fdc->rdy0_r();
-
-	// motor speed status, drive B
-	data |= m_fdc->rdy1_r() << 1;
-
-	// door B sense
-	data |= m_fdc->ds1_r() << 3;
-
-	// door A sense
-	data |= m_fdc->ds0_r() << 4;
-
-	// single/double sided
-	data |= m_fdc->single_double_sided_r() << 5;
-
-	return data;
-}
-
-WRITE8_MEMBER( victor9k_state::via6_pb_w )
-{
-	/*
-
-	    bit     description
-
-	    PB0
-	    PB1
-	    PB2     _SCRESET
-	    PB3
-	    PB4
-	    PB5
-	    PB6     STP0
-	    PB7     STP1
-
-	*/
-
-	// motor speed controller reset
-	m_fdc->screset_w(BIT(data, 2));
-
-	// stepper enable A
-	m_fdc->stp0_w(BIT(data, 6));
-
-	// stepper enable B
-	m_fdc->stp1_w(BIT(data, 7));
-}
-
-WRITE_LINE_MEMBER( victor9k_state::via6_irq_w )
-{
-	m_via6_irq = state;
-
-	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_via4_irq || m_via5_irq || m_via6_irq);
+	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_fdc_irq);
 }
 
 
@@ -594,6 +363,14 @@ WRITE_LINE_MEMBER( victor9k_state::kbdata_w )
 }
 
 
+WRITE_LINE_MEMBER( victor9k_state::fdc_irq_w )
+{
+	m_fdc_irq = state;
+
+	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_fdc_irq);
+}
+
+
 //**************************************************************************
 //  MACHINE INITIALIZATION
 //**************************************************************************
@@ -610,9 +387,7 @@ void victor9k_state::machine_start()
 	save_item(NAME(m_via1_irq));
 	save_item(NAME(m_via2_irq));
 	save_item(NAME(m_via3_irq));
-	save_item(NAME(m_via4_irq));
-	save_item(NAME(m_via5_irq));
-	save_item(NAME(m_via6_irq));
+	save_item(NAME(m_fdc_irq));
 	save_item(NAME(m_ssda_irq));
 
 	// memory banking
@@ -707,24 +482,6 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(victor9k_state, via3_pb_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor9k_state, via3_irq_w))
 
-	MCFG_DEVICE_ADD(M6522_4_TAG, VIA6522, XTAL_30MHz/30)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(victor9k_state, via4_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(victor9k_state, via4_pb_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(victor9k_state, mode_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor9k_state, via4_irq_w))
-
-	MCFG_DEVICE_ADD(M6522_5_TAG, VIA6522, XTAL_30MHz/30)
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor9k_state, via5_irq_w))
-
-	MCFG_DEVICE_ADD(M6522_6_TAG, VIA6522, XTAL_30MHz/30)
-	MCFG_VIA6522_READPA_HANDLER(READ8(victor9k_state, via6_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(victor9k_state, via6_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(victor9k_state, via6_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(victor9k_state, via6_pb_w))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(FDC_TAG, victor_9000_fdc_t, drw_w))
-	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE(FDC_TAG, victor_9000_fdc_t, erase_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor9k_state, via6_irq_w))
-
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, rxa_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, dcda_w))
@@ -744,12 +501,7 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_VICTOR9K_KBDATA_HANDLER(WRITELINE(victor9k_state, kbdata_w))
 
 	MCFG_DEVICE_ADD(FDC_TAG, VICTOR_9000_FDC, 0)
-	MCFG_VICTOR_9000_FDC_DS0_CB(DEVWRITELINE(M6522_4_TAG, via6522_device, write_ca1))
-	MCFG_VICTOR_9000_FDC_DS1_CB(DEVWRITELINE(M6522_4_TAG, via6522_device, write_cb1))
-	MCFG_VICTOR_9000_FDC_RDY0_CB(DEVWRITELINE(M6522_5_TAG, via6522_device, write_ca2))
-	MCFG_VICTOR_9000_FDC_RDY1_CB(DEVWRITELINE(M6522_5_TAG, via6522_device, write_cb2))
-	MCFG_VICTOR_9000_FDC_BRDY_CB(DEVWRITELINE(M6522_5_TAG, via6522_device, write_ca1))
-	MCFG_VICTOR_9000_FDC_GCRERR_CB(DEVWRITELINE(M6522_6_TAG, via6522_device, write_ca1))
+	MCFG_VICTOR_9000_FDC_IRQ_CB(WRITELINE(victor9k_state, fdc_irq_w))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

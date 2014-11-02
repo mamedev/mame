@@ -18,6 +18,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "formats/victor9k_dsk.h"
 #include "imagedev/floppy.h"
+#include "machine/6522via.h"
 
 
 
@@ -25,23 +26,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_VICTOR_9000_FDC_DS0_CB(_write) \
-	devcb = &victor_9000_fdc_t::set_ds0_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_VICTOR_9000_FDC_DS1_CB(_write) \
-	devcb = &victor_9000_fdc_t::set_ds1_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_VICTOR_9000_FDC_RDY0_CB(_write) \
-	devcb = &victor_9000_fdc_t::set_rdy0_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_VICTOR_9000_FDC_RDY1_CB(_write) \
-	devcb = &victor_9000_fdc_t::set_rdy1_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_VICTOR_9000_FDC_BRDY_CB(_write) \
-	devcb = &victor_9000_fdc_t::set_brdy_wr_callback(*device, DEVCB_##_write);
-
-#define MCFG_VICTOR_9000_FDC_GCRERR_CB(_write) \
-	devcb = &victor_9000_fdc_t::set_gcrerr_wr_callback(*device, DEVCB_##_write);
+#define MCFG_VICTOR_9000_FDC_IRQ_CB(_write) \
+	devcb = &victor_9000_fdc_t::set_irq_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -57,37 +43,14 @@ public:
 	// construction/destruction
 	victor_9000_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb_base &set_ds0_wr_callback(device_t &device, _Object object) { return downcast<victor_9000_fdc_t &>(device).m_ds0_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_ds1_wr_callback(device_t &device, _Object object) { return downcast<victor_9000_fdc_t &>(device).m_ds1_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_rdy0_wr_callback(device_t &device, _Object object) { return downcast<victor_9000_fdc_t &>(device).m_rdy0_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_rdy1_wr_callback(device_t &device, _Object object) { return downcast<victor_9000_fdc_t &>(device).m_rdy1_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_brdy_wr_callback(device_t &device, _Object object) { return downcast<victor_9000_fdc_t &>(device).m_brdy_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_gcrerr_wr_callback(device_t &device, _Object object) { return downcast<victor_9000_fdc_t &>(device).m_gcrerr_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<victor_9000_fdc_t &>(device).m_irq_cb.set_callback(object); }
 
-	void set_floppy(floppy_image_device *floppy0, floppy_image_device *floppy1);
-
-	void l0ms_w(UINT8 data) { m_lms = (m_lms & 0xf0) | (data & 0x0f); }
-	void l1ms_w(UINT8 data) { m_lms = (data << 4) | (m_lms & 0x0f); }
-	void st0_w(UINT8 data) { m_st0 = data; }
-	void st1_w(UINT8 data) { m_st1 = data; }
-	DECLARE_WRITE_LINE_MEMBER( side_select_w ) { m_side = state; }
-	DECLARE_WRITE_LINE_MEMBER( drive_select_w ) { m_drive = state; }
-	DECLARE_WRITE_LINE_MEMBER( stp0_w ) { m_stp0 = state; }
-	DECLARE_WRITE_LINE_MEMBER( stp1_w ) { m_stp1 = state; }
-	DECLARE_WRITE_LINE_MEMBER( drw_w ) { }
-	DECLARE_WRITE_LINE_MEMBER( erase_w ) { }
-	DECLARE_READ_LINE_MEMBER( trk0d0_r ) { return m_floppy0->trk00_r(); }
-	DECLARE_READ_LINE_MEMBER( trk0d1_r ) { return m_floppy1->trk00_r(); }
-	DECLARE_READ_LINE_MEMBER( wps_r ) { return m_drive ? m_floppy1->wpt_r() : m_floppy0->wpt_r(); }
-	DECLARE_READ_LINE_MEMBER( sync_r ) { return 1; }
-	DECLARE_WRITE_LINE_MEMBER( led0a_w ) { output_set_led_value(LED_A, state); }
-	DECLARE_WRITE_LINE_MEMBER( led1a_w ) { output_set_led_value(LED_B, state); }
-	DECLARE_READ_LINE_MEMBER( rdy0_r ) { return m_rdy0; }
-	DECLARE_READ_LINE_MEMBER( rdy1_r ) { return m_rdy1; }
-	DECLARE_READ_LINE_MEMBER( ds0_r ) { return m_ds0; }
-	DECLARE_READ_LINE_MEMBER( ds1_r ) { return m_ds1; }
-	DECLARE_READ_LINE_MEMBER( single_double_sided_r ) { return m_drive ? m_floppy1->twosid_r() : m_floppy0->twosid_r(); }
-	DECLARE_WRITE_LINE_MEMBER( screset_w ) { if (!state) m_maincpu->reset(); }
+	DECLARE_READ8_MEMBER( cs5_r ) { return m_via4->read(space, offset); }
+	DECLARE_WRITE8_MEMBER( cs5_w ) { return m_via4->write(space, offset, data); }
+	DECLARE_READ8_MEMBER( cs6_r ) { return m_via6->read(space, offset); }
+	DECLARE_WRITE8_MEMBER( cs6_w ) { return m_via6->write(space, offset, data); }
+	DECLARE_READ8_MEMBER( cs7_r ) { return m_via5->read(space, offset); }
+	DECLARE_WRITE8_MEMBER( cs7_w ) { return m_via5->write(space, offset, data); }
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
@@ -97,6 +60,22 @@ public:
 	DECLARE_READ8_MEMBER( tach0_r );
 	DECLARE_READ8_MEMBER( tach1_r );
 	DECLARE_WRITE8_MEMBER( da_w );
+
+	DECLARE_WRITE8_MEMBER( via4_pa_w );
+	DECLARE_WRITE8_MEMBER( via4_pb_w );
+	DECLARE_WRITE_LINE_MEMBER( mode_w );
+	DECLARE_WRITE_LINE_MEMBER( via4_irq_w );
+
+	DECLARE_WRITE8_MEMBER( via5_pb_w );
+	DECLARE_WRITE_LINE_MEMBER( via5_irq_w );
+
+	DECLARE_READ8_MEMBER( via6_pa_r );
+	DECLARE_READ8_MEMBER( via6_pb_r );
+	DECLARE_WRITE8_MEMBER( via6_pa_w );
+	DECLARE_WRITE8_MEMBER( via6_pb_w );
+	DECLARE_WRITE_LINE_MEMBER( drw_w );
+	DECLARE_WRITE_LINE_MEMBER( erase_w );
+	DECLARE_WRITE_LINE_MEMBER( via6_irq_w );
 
 protected:
 	// device-level overrides
@@ -115,14 +94,12 @@ private:
 		LED_B
 	};
 
-	devcb_write_line m_ds0_cb;
-	devcb_write_line m_ds1_cb;
-	devcb_write_line m_rdy0_cb;
-	devcb_write_line m_rdy1_cb;
-	devcb_write_line m_brdy_cb;
-	devcb_write_line m_gcrerr_cb;
+	devcb_write_line m_irq_cb;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<via6522_device> m_via4;
+	required_device<via6522_device> m_via5;
+	required_device<via6522_device> m_via6;
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;
 	required_memory_region m_gcr_rom;
@@ -156,6 +133,10 @@ private:
 	int m_brdy;
 	int m_sync;
 	int m_gcrerr;
+
+	int m_via4_irq;
+	int m_via5_irq;
+	int m_via6_irq;
 };
 
 

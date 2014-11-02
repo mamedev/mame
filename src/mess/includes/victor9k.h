@@ -41,9 +41,6 @@
 #define M6522_1_TAG     "m6522_1"
 #define M6522_2_TAG     "m6522_2"
 #define M6522_3_TAG     "14l"
-#define M6522_4_TAG     "1f"
-#define M6522_5_TAG     "1k"
-#define M6522_6_TAG     "1h"
 #define DAC0808_0_TAG   "5b"
 #define DAC0808_1_TAG   "5c"
 #define CENTRONICS_TAG  "centronics"
@@ -66,9 +63,6 @@ public:
 		m_via1(*this, M6522_1_TAG),
 		m_via2(*this, M6522_2_TAG),
 		m_via3(*this, M6522_3_TAG),
-		m_via4(*this, M6522_4_TAG),
-		m_via5(*this, M6522_5_TAG),
-		m_via6(*this, M6522_6_TAG),
 		m_cvsd(*this, HC55516_TAG),
 		m_crtc(*this, HD46505S_TAG),
 		m_ram(*this, RAM_TAG),
@@ -83,9 +77,7 @@ public:
 		m_via1_irq(CLEAR_LINE),
 		m_via2_irq(CLEAR_LINE),
 		m_via3_irq(CLEAR_LINE),
-		m_via4_irq(CLEAR_LINE),
-		m_via5_irq(CLEAR_LINE),
-		m_via6_irq(CLEAR_LINE),
+		m_fdc_irq(CLEAR_LINE),
 		m_ssda_irq(CLEAR_LINE)
 	{ }
 
@@ -97,9 +89,6 @@ public:
 	required_device<via6522_device> m_via1;
 	required_device<via6522_device> m_via2;
 	required_device<via6522_device> m_via3;
-	required_device<via6522_device> m_via4;
-	required_device<via6522_device> m_via5;
-	required_device<via6522_device> m_via6;
 	required_device<hc55516_device> m_cvsd;
 	required_device<mc6845_device> m_crtc;
 	required_device<ram_device> m_ram;
@@ -128,24 +117,14 @@ public:
 	DECLARE_WRITE8_MEMBER( via3_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( via3_irq_w );
 
-	DECLARE_WRITE8_MEMBER( via4_pa_w );
-	DECLARE_WRITE8_MEMBER( via4_pb_w );
-	DECLARE_WRITE_LINE_MEMBER( mode_w );
-	DECLARE_WRITE_LINE_MEMBER( via4_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
 
-	DECLARE_WRITE8_MEMBER( via5_pb_w );
-	DECLARE_WRITE_LINE_MEMBER( via5_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( ssda_irq_w );
 
-	DECLARE_READ8_MEMBER( via6_pa_r );
-	DECLARE_READ8_MEMBER( via6_pb_r );
-	DECLARE_WRITE8_MEMBER( via6_pa_w );
-	DECLARE_WRITE8_MEMBER( via6_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( kbrdy_w );
 	DECLARE_WRITE_LINE_MEMBER( kbdata_w );
 	DECLARE_WRITE_LINE_MEMBER( vert_w );
-	DECLARE_WRITE_LINE_MEMBER( via6_irq_w );
 
-	DECLARE_WRITE_LINE_MEMBER( ssda_irq_w );
 	MC6845_UPDATE_ROW( crtc_update_row );
 
 	/* video state */
@@ -156,9 +135,7 @@ public:
 	int m_via1_irq;
 	int m_via2_irq;
 	int m_via3_irq;
-	int m_via4_irq;
-	int m_via5_irq;
-	int m_via6_irq;
+	int m_fdc_irq;
 	int m_ssda_irq;
 
 	DECLARE_WRITE_LINE_MEMBER(mux_serial_b_w);

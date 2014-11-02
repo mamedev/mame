@@ -28,6 +28,9 @@
 #define LOG 0
 
 #define I8048_TAG       "5d"
+#define M6522_4_TAG     "1f"
+#define M6522_5_TAG     "1k"
+#define M6522_6_TAG     "1h"
 
 
 
@@ -82,14 +85,14 @@ void victor_9000_fdc_t::ready0_cb(floppy_image_device *device, int state)
 {
 	m_rdy0 = state;
 
-	m_rdy0_cb(state);
+	m_via5->write_ca2(m_rdy0);
 }
 
 int victor_9000_fdc_t::load0_cb(floppy_image_device *device)
 {
 	m_ds0 = 0;
 
-	m_ds0_cb(0);
+	m_via4->write_ca1(m_ds0);
 
 	return IMAGE_INIT_PASS;
 }
@@ -98,21 +101,21 @@ void victor_9000_fdc_t::unload0_cb(floppy_image_device *device)
 {
 	m_ds0 = 1;
 
-	m_ds0_cb(1);
+	m_via4->write_ca1(m_ds0);
 }
 
 void victor_9000_fdc_t::ready1_cb(floppy_image_device *device, int state)
 {
 	m_rdy1 = state;
 
-	m_rdy1_cb(state);
+	m_via5->write_cb2(m_rdy1);
 }
 
 int victor_9000_fdc_t::load1_cb(floppy_image_device *device)
 {
 	m_ds1 = 0;
 
-	m_ds1_cb(0);
+	m_via4->write_cb1(m_ds1);
 
 	return IMAGE_INIT_PASS;
 }
@@ -121,7 +124,7 @@ void victor_9000_fdc_t::unload1_cb(floppy_image_device *device)
 {
 	m_ds1 = 1;
 
-	m_ds1_cb(1);
+	m_via4->write_cb1(m_ds1);
 }
 
 static SLOT_INTERFACE_START( victor9k_floppies )
@@ -140,6 +143,24 @@ FLOPPY_FORMATS_END
 static MACHINE_CONFIG_FRAGMENT( victor_9000_fdc )
 	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_30MHz/6)
 	MCFG_CPU_IO_MAP(floppy_io)
+
+	MCFG_DEVICE_ADD(M6522_4_TAG, VIA6522, XTAL_30MHz/30)
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(victor_9000_fdc_t, via4_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(victor_9000_fdc_t, via4_pb_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(victor_9000_fdc_t, mode_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor_9000_fdc_t, via4_irq_w))
+
+	MCFG_DEVICE_ADD(M6522_5_TAG, VIA6522, XTAL_30MHz/30)
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor_9000_fdc_t, via5_irq_w))
+
+	MCFG_DEVICE_ADD(M6522_6_TAG, VIA6522, XTAL_30MHz/30)
+	MCFG_VIA6522_READPA_HANDLER(READ8(victor_9000_fdc_t, via6_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(victor_9000_fdc_t, via6_pb_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(victor_9000_fdc_t, via6_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(victor_9000_fdc_t, via6_pb_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(victor_9000_fdc_t, drw_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(victor_9000_fdc_t, erase_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor_9000_fdc_t, via6_irq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(I8048_TAG":0", victor9k_floppies, "525qd", victor_9000_fdc_t::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(I8048_TAG":1", victor9k_floppies, "525qd", victor_9000_fdc_t::floppy_formats)
@@ -168,13 +189,11 @@ machine_config_constructor victor_9000_fdc_t::device_mconfig_additions() const
 
 victor_9000_fdc_t::victor_9000_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, VICTOR_9000_FDC, "Victor 9000 FDC", tag, owner, clock, "victor9k_fdc", __FILE__),
-	m_ds0_cb(*this),
-	m_ds1_cb(*this),
-	m_rdy0_cb(*this),
-	m_rdy1_cb(*this),
-	m_brdy_cb(*this),
-	m_gcrerr_cb(*this),
+	m_irq_cb(*this),
 	m_maincpu(*this, I8048_TAG),
+	m_via4(*this, M6522_4_TAG),
+	m_via5(*this, M6522_5_TAG),
+	m_via6(*this, M6522_6_TAG),
 	m_floppy0(*this, I8048_TAG":0:525qd"),
 	m_floppy1(*this, I8048_TAG":1:525qd"),
 	m_gcr_rom(*this, "gcr"),
@@ -198,7 +217,10 @@ victor_9000_fdc_t::victor_9000_fdc_t(const machine_config &mconfig, const char *
 	m_side(0),
 	m_brdy(1),
 	m_sync(1),
-	m_gcrerr(0)
+	m_gcrerr(0),
+	m_via4_irq(CLEAR_LINE),
+	m_via5_irq(CLEAR_LINE),
+	m_via6_irq(CLEAR_LINE)
 {
 }
 
@@ -231,6 +253,9 @@ void victor_9000_fdc_t::device_start()
 	save_item(NAME(m_brdy));
 	save_item(NAME(m_sync));
 	save_item(NAME(m_gcrerr));
+	save_item(NAME(m_via4_irq));
+	save_item(NAME(m_via5_irq));
+	save_item(NAME(m_via6_irq));
 }
 
 
@@ -241,12 +266,7 @@ void victor_9000_fdc_t::device_start()
 void victor_9000_fdc_t::device_reset()
 {
 	// resolve callbacks
-	m_ds0_cb.resolve_safe();
-	m_ds1_cb.resolve_safe();
-	m_rdy0_cb.resolve_safe();
-	m_rdy1_cb.resolve_safe();
-	m_brdy_cb.resolve_safe();
-	m_gcrerr_cb.resolve_safe();
+	m_irq_cb.resolve_safe();
 
 	// set floppy callbacks
 	m_floppy0->setup_ready_cb(floppy_image_device::ready_cb(FUNC(victor_9000_fdc_t::ready0_cb), this));
@@ -397,4 +417,243 @@ READ8_MEMBER( victor_9000_fdc_t::tach1_r )
 WRITE8_MEMBER( victor_9000_fdc_t::da_w )
 {
 	m_da = data;
+}
+
+WRITE8_MEMBER( victor_9000_fdc_t::via4_pa_w )
+{
+	/*
+
+	    bit     description
+
+	    PA0     L0MS0
+	    PA1     L0MS1
+	    PA2     L0MS2
+	    PA3     L0MS3
+	    PA4     ST0A
+	    PA5     ST0B
+	    PA6     ST0C
+	    PA7     ST0D
+
+	*/
+
+	m_lms = (m_lms & 0xf0) | (data & 0x0f);
+	m_st0 = data >> 4;
+}
+
+WRITE8_MEMBER( victor_9000_fdc_t::via4_pb_w )
+{
+	/*
+
+	    bit     description
+
+	    PB0     L1MS0
+	    PB1     L1MS1
+	    PB2     L1MS2
+	    PB3     L1MS3
+	    PB4     ST1A
+	    PB5     ST1B
+	    PB6     ST1C
+	    PB7     ST1D
+
+	*/
+
+	m_lms = (data << 4) | (m_lms & 0x0f);
+	m_st1 = data >> 4;
+}
+
+WRITE_LINE_MEMBER( victor_9000_fdc_t::mode_w )
+{
+}
+
+WRITE_LINE_MEMBER( victor_9000_fdc_t::via4_irq_w )
+{
+	m_via4_irq = state;
+
+	m_irq_cb(m_via4_irq || m_via5_irq || m_via6_irq);
+}
+
+
+/*
+
+    bit     description
+
+    PA0     E0
+    PA1     E1
+    PA2     I1
+    PA3     E2
+    PA4     E4
+    PA5     E5
+    PA6     I7
+    PA7     E6
+
+*/
+
+WRITE8_MEMBER( victor_9000_fdc_t::via5_pb_w )
+{
+	/*
+
+	    bit     description
+
+	    PB0     WD0
+	    PB1     WD1
+	    PB2     WD2
+	    PB3     WD3
+	    PB4     WD4
+	    PB5     WD5
+	    PB6     WD6
+	    PB7     WD7
+
+	*/
+}
+
+WRITE_LINE_MEMBER( victor_9000_fdc_t::via5_irq_w )
+{
+	m_via5_irq = state;
+
+	m_irq_cb(m_via4_irq || m_via5_irq || m_via6_irq);
+}
+
+
+READ8_MEMBER( victor_9000_fdc_t::via6_pa_r )
+{
+	/*
+
+	    bit     description
+
+	    PA0
+	    PA1     _TRK0D0
+	    PA2
+	    PA3     _TRK0D1
+	    PA4
+	    PA5
+	    PA6     WPS
+	    PA7     _SYNC
+
+	*/
+
+	UINT8 data = 0;
+
+	// track 0 drive A sense
+	data |= m_floppy0->trk00_r() << 1;
+
+	// track 0 drive B sense
+	data |= m_floppy1->trk00_r() << 3;
+
+	// write protect sense
+	data |= (m_drive ? m_floppy1->wpt_r() : m_floppy0->wpt_r()) << 6;
+
+	// disk sync detect
+	data |= m_sync << 7;
+
+	return data;
+}
+
+WRITE8_MEMBER( victor_9000_fdc_t::via6_pa_w )
+{
+	/*
+
+	    bit     description
+
+	    PA0     LED0A
+	    PA1
+	    PA2     LED1A
+	    PA3
+	    PA4     SIDE SELECT
+	    PA5     DRIVE SELECT
+	    PA6
+	    PA7
+
+	*/
+
+	// LED, drive A
+	output_set_led_value(LED_A, BIT(data, 0));
+
+	// LED, drive B
+	output_set_led_value(LED_B, BIT(data, 2));
+
+	// dual side select
+	m_side = BIT(data, 4);
+
+	// select drive A/B
+	m_drive = BIT(data, 5);
+}
+
+READ8_MEMBER( victor_9000_fdc_t::via6_pb_r )
+{
+	/*
+
+	    bit     description
+
+	    PB0     RDY0
+	    PB1     RDY1
+	    PB2
+	    PB3     _DS1
+	    PB4     _DS0
+	    PB5     SINGLE/_DOUBLE SIDED
+	    PB6
+	    PB7
+
+	*/
+
+	UINT8 data = 0;
+
+	// motor speed status, drive A
+	data |= m_rdy0;
+
+	// motor speed status, drive B
+	data |= m_rdy1 << 1;
+
+	// door B sense
+	data |= m_ds1 << 3;
+
+	// door A sense
+	data |= m_ds0 << 4;
+
+	// single/double sided
+	data |= (m_drive ? m_floppy1->twosid_r() : m_floppy0->twosid_r()) << 5;
+
+	return data;
+}
+
+WRITE8_MEMBER( victor_9000_fdc_t::via6_pb_w )
+{
+	/*
+
+	    bit     description
+
+	    PB0
+	    PB1
+	    PB2     _SCRESET
+	    PB3
+	    PB4
+	    PB5
+	    PB6     STP0
+	    PB7     STP1
+
+	*/
+
+	// motor speed controller reset
+	if (!BIT(data, 2))
+		m_maincpu->reset();
+
+	// stepper enable A
+	m_stp0 = BIT(data, 6);
+
+	// stepper enable B
+	m_stp1 = BIT(data, 7);
+}
+
+WRITE_LINE_MEMBER( victor_9000_fdc_t::drw_w )
+{
+}
+
+WRITE_LINE_MEMBER( victor_9000_fdc_t::erase_w )
+{
+}
+
+WRITE_LINE_MEMBER( victor_9000_fdc_t::via6_irq_w )
+{
+	m_via6_irq = state;
+
+	m_irq_cb(m_via4_irq || m_via5_irq || m_via6_irq);
 }
