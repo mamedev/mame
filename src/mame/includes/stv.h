@@ -9,6 +9,8 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "machine/315-5881_crypt.h"
+
 #define MAX_FILTERS (24)
 #define MAX_BLOCKS  (200)
 #define MAX_DIR_SIZE    (256*1024)
@@ -33,7 +35,8 @@ public:
 			m_cart3(*this, "stv_slot3"),
 			m_cart4(*this, "stv_slot4"),
 			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette")
+			m_palette(*this, "palette"),
+			m_cryptdevice(*this, "315_5881")
 	{
 	}
 
@@ -166,6 +169,9 @@ public:
 	optional_device<generic_slot_device> m_cart4;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
+
 
 	bitmap_rgb32 m_tmpbitmap;
 	DECLARE_VIDEO_START(stv_vdp2);

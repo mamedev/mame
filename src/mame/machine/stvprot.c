@@ -572,6 +572,8 @@ UINT32 ffreveng_prot_read_callback( address_space &space, int protaddr, UINT32 k
 *
 *************************************/
 
+// the naomi hookup of 315-5881 reads 16-bits at a time, here we seem to read 32? 
+
 READ32_MEMBER( stv_state::common_prot_r )
 {
 	UINT32 *ROM = (UINT32 *)space.machine().root_device().memregion("abus")->base();
@@ -616,10 +618,18 @@ WRITE32_MEMBER ( stv_state::common_prot_w )
 	else if(offset == 2)
 	{
 		COMBINE_DATA(&m_abus_prot_addr);
+
+		m_cryptdevice->set_addr_low(m_abus_prot_addr >> 16);
+		m_cryptdevice->set_addr_high(m_abus_prot_addr&0xffff);
+
 	}
 	else if(offset == 3)
 	{
 		COMBINE_DATA(&m_abus_protkey);
+
+		m_cryptdevice->set_subkey(m_abus_protkey);
+
+
 		int a_bus_vector;
 		a_bus_vector = m_abus_prot_addr >> 16;
 		a_bus_vector|= (m_abus_prot_addr & 0xffff) << 16;
