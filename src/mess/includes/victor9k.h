@@ -16,7 +16,6 @@
 
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
-#include "cpu/mcs48/mcs48.h"
 #include "formats/victor9k_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/ram.h"
@@ -28,11 +27,11 @@
 #include "machine/pic8259.h"
 #include "machine/z80dart.h"
 #include "machine/victor9kb.h"
+#include "machine/victor9k_fdc.h"
 #include "sound/hc55516.h"
 #include "video/mc6845.h"
 
 #define I8088_TAG       "8l"
-#define I8048_TAG       "5d"
 #define I8253_TAG       "13h"
 #define I8259A_TAG      "7l"
 #define UPD7201_TAG     "16e"
@@ -52,53 +51,45 @@
 #define RS232_B_TAG     "rs232b"
 #define SCREEN_TAG      "screen"
 #define VICTOR9K_KEYBOARD_TAG   "victor9kb"
+#define FDC_TAG			"fdc"
 
 class victor9k_state : public driver_device
 {
 public:
-	victor9k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, I8088_TAG),
-			m_fdc_cpu(*this, I8048_TAG),
-			m_ieee488(*this, IEEE488_TAG),
-			m_pic(*this, I8259A_TAG),
-			m_upd7201(*this, UPD7201_TAG),
-			m_ssda(*this, MC6852_TAG),
-			m_via1(*this, M6522_1_TAG),
-			m_via2(*this, M6522_2_TAG),
-			m_via3(*this, M6522_3_TAG),
-			m_via4(*this, M6522_4_TAG),
-			m_via5(*this, M6522_5_TAG),
-			m_via6(*this, M6522_6_TAG),
-			m_cvsd(*this, HC55516_TAG),
-			m_crtc(*this, HD46505S_TAG),
-			m_ram(*this, RAM_TAG),
-			m_floppy0(*this, I8048_TAG":0:525qd"),
-			m_floppy1(*this, I8048_TAG":1:525qd"),
-			m_kb(*this, VICTOR9K_KEYBOARD_TAG),
-			m_rs232a(*this, RS232_A_TAG),
-			m_rs232b(*this, RS232_B_TAG),
-			m_video_ram(*this, "video_ram"),
-			m_da(0),
-			m_da0(0),
-			m_da1(0),
-			m_sel0(0),
-			m_sel1(0),
-			m_tach0(0),
-			m_tach1(0),
-			m_rdy0(0),
-			m_rdy1(0),
-			m_ds0(1),
-			m_ds1(1),
-			m_lms(0),
-			m_brdy(1),
-			m_sync(1),
-			m_gcrerr(0),
-			m_palette(*this, "palette")
+	victor9k_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, I8088_TAG),
+		m_ieee488(*this, IEEE488_TAG),
+		m_pic(*this, I8259A_TAG),
+		m_upd7201(*this, UPD7201_TAG),
+		m_ssda(*this, MC6852_TAG),
+		m_via1(*this, M6522_1_TAG),
+		m_via2(*this, M6522_2_TAG),
+		m_via3(*this, M6522_3_TAG),
+		m_via4(*this, M6522_4_TAG),
+		m_via5(*this, M6522_5_TAG),
+		m_via6(*this, M6522_6_TAG),
+		m_cvsd(*this, HC55516_TAG),
+		m_crtc(*this, HD46505S_TAG),
+		m_ram(*this, RAM_TAG),
+		m_kb(*this, VICTOR9K_KEYBOARD_TAG),
+		m_fdc(*this, FDC_TAG),
+		m_rs232a(*this, RS232_A_TAG),
+		m_rs232b(*this, RS232_B_TAG),
+		m_palette(*this, "palette"),
+		m_video_ram(*this, "video_ram"),
+		m_brt(0),
+		m_cont(0),
+		m_via1_irq(CLEAR_LINE),
+		m_via2_irq(CLEAR_LINE),
+		m_via3_irq(CLEAR_LINE),
+		m_via4_irq(CLEAR_LINE),
+		m_via5_irq(CLEAR_LINE),
+		m_via6_irq(CLEAR_LINE),
+		m_ssda_irq(CLEAR_LINE)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_fdc_cpu;
 	required_device<ieee488_device> m_ieee488;
 	required_device<pic8259_device> m_pic;
 	required_device<upd7201_device> m_upd7201;
@@ -112,20 +103,14 @@ public:
 	required_device<hc55516_device> m_cvsd;
 	required_device<mc6845_device> m_crtc;
 	required_device<ram_device> m_ram;
-	required_device<floppy_image_device> m_floppy0;
-	required_device<floppy_image_device> m_floppy1;
 	required_device<victor9k_keyboard_device> m_kb;
+	required_device<victor_9000_fdc_t> m_fdc;
 	required_device<rs232_port_device> m_rs232a;
 	required_device<rs232_port_device> m_rs232b;
+	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT8> m_video_ram;
 
 	virtual void machine_start();
-
-	DECLARE_READ8_MEMBER( floppy_p1_r );
-	DECLARE_READ8_MEMBER( floppy_p2_r );
-	DECLARE_WRITE8_MEMBER( floppy_p2_w );
-	DECLARE_READ8_MEMBER( tach0_r );
-	DECLARE_READ8_MEMBER( tach1_r );
-	DECLARE_WRITE8_MEMBER( da_w );
 
 	DECLARE_WRITE8_MEMBER( via1_pa_w );
 	DECLARE_WRITE_LINE_MEMBER( write_nfrd );
@@ -155,8 +140,6 @@ public:
 	DECLARE_READ8_MEMBER( via6_pb_r );
 	DECLARE_WRITE8_MEMBER( via6_pa_w );
 	DECLARE_WRITE8_MEMBER( via6_pb_w );
-	DECLARE_WRITE_LINE_MEMBER( drw_w );
-	DECLARE_WRITE_LINE_MEMBER( erase_w );
 	DECLARE_WRITE_LINE_MEMBER( kbrdy_w );
 	DECLARE_WRITE_LINE_MEMBER( kbdata_w );
 	DECLARE_WRITE_LINE_MEMBER( vert_w );
@@ -165,23 +148,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ssda_irq_w );
 	MC6845_UPDATE_ROW( crtc_update_row );
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
-
-	void ready0_cb(floppy_image_device *, int device);
-	int load0_cb(floppy_image_device *device);
-	void unload0_cb(floppy_image_device *device);
-	void ready1_cb(floppy_image_device *, int device);
-	int load1_cb(floppy_image_device *device);
-	void unload1_cb(floppy_image_device *device);
-
-	enum
-	{
-		LED_A = 0,
-		LED_B
-	};
-
 	/* video state */
-	required_shared_ptr<UINT8> m_video_ram;
 	int m_brt;
 	int m_cont;
 
@@ -194,30 +161,8 @@ public:
 	int m_via6_irq;
 	int m_ssda_irq;
 
-	/* floppy state */
-	UINT8 m_da;
-	UINT8 m_da0;
-	UINT8 m_da1;
-	int m_sel0;
-	int m_sel1;
-	int m_tach0;
-	int m_tach1;
-	int m_rdy0;
-	int m_rdy1;
-	int m_ds0;
-	int m_ds1;
-	UINT8 m_lms;                         /* motor speed */
-	int m_st[2];                        /* stepper phase */
-	int m_stp[2];                        /* stepper enable */
-	int m_drive;                        /* selected drive */
-	int m_side;                         /* selected side */
-	int m_brdy;
-	int m_sync;
-	int m_gcrerr;
-
 	DECLARE_WRITE_LINE_MEMBER(mux_serial_b_w);
 	DECLARE_WRITE_LINE_MEMBER(mux_serial_a_w);
-	required_device<palette_device> m_palette;
 };
 
 #endif

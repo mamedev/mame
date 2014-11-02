@@ -959,7 +959,7 @@ $(MESSOBJ)/act.a:               \
 	$(MESS_DRIVERS)/apricotf.o  \
 	$(MESS_DRIVERS)/apricotp.o  \
 	$(MESS_MACHINE)/apricotkb.o \
-	$(MESS_DRIVERS)/victor9k.o $(MESS_MACHINE)/victor9kb.o \
+	$(MESS_DRIVERS)/victor9k.o $(MESS_MACHINE)/victor9kb.o $(MESS_MACHINE)/victor9k_fdc.o \
 
 $(MESSOBJ)/adc.a:               \
 	$(MESS_DRIVERS)/super6.o    \
