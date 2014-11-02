@@ -1,20 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- 
-	Cassettes that load with CHAIN cannot auto-start correctly.
-	Mount the BASIC-I cart first, then the cassette to load + run them.
-	
-	Other tapes should auto-load and run.
--->
-
 <softwarelist name="m5_cass" description="Sord M5 cassettes">
 	<software name="barricad">
 		<description>Barricade</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load with CHAIN"/>
-	<!--<sharedfeat name="requirement" value="m5_cart:basici"/>-->
+		<sharedfeat name="requirement" value="m5_cart:basici"/>
 
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="3840">
@@ -28,7 +21,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load with CHAIN"/>
-	<!--<sharedfeat name="requirement" value="m5_cart:basici"/>-->
+		<sharedfeat name="requirement" value="m5_cart:basici"/>
 
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="3386">
@@ -41,6 +34,8 @@
 		<description>Baseball</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load with TAPE"/>
+		<sharedfeat name="requirement" value="m5_cart:basici"/>
 
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="11221">
@@ -54,7 +49,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load with CHAIN"/>
-	<!--<sharedfeat name="requirement" value="m5_cart:basici"/>-->
+		<sharedfeat name="requirement" value="m5_cart:basici"/>
 
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="19071">
@@ -68,7 +63,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load with CHAIN"/>
-	<!--<sharedfeat name="requirement" value="m5_cart:basici"/>-->
+		<sharedfeat name="requirement" value="m5_cart:basici"/>
 
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="16980">
@@ -82,7 +77,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load with CHAIN"/>
-	<!--<sharedfeat name="requirement" value="m5_cart:basici"/>-->
+		<sharedfeat name="requirement" value="m5_cart:basici"/>
 
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="3767">
@@ -95,6 +90,8 @@
 		<description>Graphic Designer</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load with TAPE"/>
+		<sharedfeat name="requirement" value="m5_cart:basici"/>
 
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="3417">
@@ -108,7 +105,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load with CHAIN"/>
-	<!--<sharedfeat name="requirement" value="m5_cart:basici"/>-->
+		<sharedfeat name="requirement" value="m5_cart:basici"/>
 
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="8537">
@@ -118,11 +115,11 @@
 	</software>
 
 	<software name="lastday">
-		<description>Last Day of the Earth</description>
+		<description>The Last Day of the Earth</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load with CHAIN"/>
-	<!--<sharedfeat name="requirement" value="m5_cart:basici"/>-->
+		<sharedfeat name="requirement" value="m5_cart:basici"/>
 
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="19184">
@@ -136,7 +133,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load with CHAIN"/>
-	<!--<sharedfeat name="requirement" value="m5_cart:basici"/>-->
+		<sharedfeat name="requirement" value="m5_cart:basici"/>
 
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="4744">
@@ -150,7 +147,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load with CHAIN"/>
-	<!--<sharedfeat name="requirement" value="m5_cart:basici"/>-->
+		<sharedfeat name="requirement" value="m5_cart:basici"/>
 
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="3423">
@@ -164,7 +161,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load with CHAIN"/>
-	<!--<sharedfeat name="requirement" value="m5_cart:basici"/>-->
+		<sharedfeat name="requirement" value="m5_cart:basici"/>
 
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="3244">
@@ -178,7 +175,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load with CHAIN"/>
-	<!--<sharedfeat name="requirement" value="m5_cart:basici"/>-->
+		<sharedfeat name="requirement" value="m5_cart:basici"/>
 
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="3628">
@@ -192,7 +189,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load with CHAIN"/>
-	<!--<sharedfeat name="requirement" value="m5_cart:basici"/>-->
+		<sharedfeat name="requirement" value="m5_cart:basici"/>
 
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="5207">
@@ -206,7 +203,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load with CHAIN"/>
-	<!--<sharedfeat name="requirement" value="m5_cart:basici"/>-->
+		<sharedfeat name="requirement" value="m5_cart:basici"/>
 
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="3213">
@@ -220,7 +217,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load with CHAIN"/>
-	<!--<sharedfeat name="requirement" value="m5_cart:basici"/>-->	
+		<sharedfeat name="requirement" value="m5_cart:basici"/>		
 
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="3278">
@@ -234,7 +231,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load with CHAIN"/>
-	<!--<sharedfeat name="requirement" value="m5_cart:basici"/>-->
+		<sharedfeat name="requirement" value="m5_cart:basici"/>
 
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="3568">
@@ -248,7 +245,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load with CHAIN"/>
-	<!--<sharedfeat name="requirement" value="m5_cart:basici"/>-->
+		<sharedfeat name="requirement" value="m5_cart:basici"/>
 
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="4108">
@@ -261,6 +258,8 @@
 		<description>TV Adjust</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load with TAPE"/>
+		<sharedfeat name="requirement" value="m5_cart:basici"/>
 
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="1345">
@@ -273,6 +272,8 @@
 		<description>Zac Banic</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load with TAPE"/>
+		<sharedfeat name="requirement" value="m5_cart:basici"/>
 
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="4746">

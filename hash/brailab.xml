@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- This is currently a documentation-only software list, but is hooked up in homelab.c -->
 <softwarelist name="brailab" description="BraiLab cassettes">
 	<software name="autotele">
 		<description>Automata beszelo telefonkonyv</description>

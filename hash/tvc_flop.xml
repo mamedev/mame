@@ -40,6 +40,103 @@
 		</part>
 	</software>
 
+	<software name="vtbridzsa" cloneof="vtbridzs">
+		<description>VT Bridzs (Alt)</description>
+		<year>198?</year>
+		<publisher>Videoton</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="vtbridzsv2.dsk" size="368640" crc="2fe325c5" sha1="458441b9d46193fce6f546423630cafb23cd80b6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="walltris">
+		<description>Walltris</description>
+		<year>198?</year>
+		<publisher>STV</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="walltris.dsk" size="368640" crc="76ce49dc" sha1="52b8a7028e21fdde51cf28c87ad180047a58ea42" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="war2200d">
+		<description>War in 2200 Demo</description>
+		<year>198?</year>
+		<publisher>TVCM</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="war2200demo.dsk" size="368640" crc="0eb7ede9" sha1="7b2a0e013c7fd7adf62814816385c765f54515bf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="war2100">
+		<description>War in 2100</description>
+		<year>198?</year>
+		<publisher>TVCM</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="warin2100.dsk" size="368640" crc="ef086158" sha1="cc55ef0ddb4a663903afaaae24a63ac04315894f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wimbledo">
+		<description>Wimbledon</description>
+		<year>198?</year>
+		<publisher>Software in LUX</publisher>
+
+		<info name="usage" value="Load file wimbledo.cas"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="wimbledon.dsk" size="368640" crc="d1311da4" sha1="a3c681bd8a871c1d2127c2397628951aca7d6671" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wimbledoa" cloneof="wimbledo">
+		<description>Wimbledon (Alt)</description>
+		<year>198?</year>
+		<publisher>Software in LUX</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="wimblev2.dsk" size="368640" crc="5ef42a61" sha1="21c753ba0de135caf9b7854ee7c2235d27fd017d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wst">
+		<description>World Soccer Trainer</description>
+		<year>1994</year>
+		<publisher>STV</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="wst.dsk" size="368640" crc="6bb8a4f3" sha1="4c2cfb572206573758fa158c98883a330d81c610" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yogi">
+		<description>Yogi</description>
+		<year>198?</year>
+		<publisher>Agilar</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="yogi.dsk" size="368640" crc="4656e157" sha1="6db97baf0e9c820deb6b7192db1db62d9eec2a9b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="labdatvc">
 		<description>5 Labdajatek</description>
 		<year>1987</year>
@@ -10324,30 +10421,6 @@
 		</part>
 	</software>
 
-	<software name="vtbridzs">
-		<description>VT Bridzs</description>
-		<year>198?</year>
-		<publisher>Videoton</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="vtbridzsv1.dsk" size="368640" crc="0a234ab2" sha1="2c0e075098098418a14ac1d686692b3e2e389828" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="vtbridzsa" cloneof="vtbridzs">
-		<description>VT Bridzs (Alt)</description>
-		<year>198?</year>
-		<publisher>Videoton</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="vtbridzsv2.dsk" size="368640" crc="2fe325c5" sha1="458441b9d46193fce6f546423630cafb23cd80b6" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="vtbridzsb" cloneof="vtbridzs">
 		<description>VT Bridzs (Alt 2)</description>
 		<year>198?</year>
@@ -10360,75 +10433,14 @@
 		</part>
 	</software>
 
-	<software name="walltris">
-		<description>Walltris</description>
+	<software name="vtbridzs">
+		<description>VT Bridzs</description>
 		<year>198?</year>
-		<publisher>STV</publisher>
+		<publisher>Videoton</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="walltris.dsk" size="368640" crc="76ce49dc" sha1="52b8a7028e21fdde51cf28c87ad180047a58ea42" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="war2200d">
-		<description>War in 2200 Demo</description>
-		<year>198?</year>
-		<publisher>TVCM</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="war2200demo.dsk" size="368640" crc="0eb7ede9" sha1="7b2a0e013c7fd7adf62814816385c765f54515bf" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="war2100">
-		<description>War in 2100</description>
-		<year>198?</year>
-		<publisher>TVCM</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="warin2100.dsk" size="368640" crc="ef086158" sha1="cc55ef0ddb4a663903afaaae24a63ac04315894f" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wimbledo">
-		<description>Wimbledon</description>
-		<year>198?</year>
-		<publisher>Software in LUX</publisher>
-
-		<info name="usage" value="Load file wimbledo.cas"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="wimbledon.dsk" size="368640" crc="d1311da4" sha1="a3c681bd8a871c1d2127c2397628951aca7d6671" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wimbledoa" cloneof="wimbledo">
-		<description>Wimbledon (Alt)</description>
-		<year>198?</year>
-		<publisher>Software in LUX</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="wimblev2.dsk" size="368640" crc="5ef42a61" sha1="21c753ba0de135caf9b7854ee7c2235d27fd017d" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wst">
-		<description>World Soccer Trainer</description>
-		<year>1994</year>
-		<publisher>STV</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="wst.dsk" size="368640" crc="6bb8a4f3" sha1="4c2cfb572206573758fa158c98883a330d81c610" offset="0" />
+				<rom name="vtbridzsv1.dsk" size="368640" crc="0a234ab2" sha1="2c0e075098098418a14ac1d686692b3e2e389828" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -10453,18 +10465,6 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="xstore.dsk" size="368640" crc="676e5961" sha1="64b26b0f2c75172a931f3d67daf64f0eb9ebecbb" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="yogi">
-		<description>Yogi</description>
-		<year>198?</year>
-		<publisher>Agilar</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="yogi.dsk" size="368640" crc="4656e157" sha1="6db97baf0e9c820deb6b7192db1db62d9eec2a9b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
