@@ -118,7 +118,7 @@ WRITE16_MEMBER( segaybd_state::analog_w )
 //-------------------------------------------------
 
 IOPORT_ARRAY_MEMBER( segaybd_state::digital_ports )
-{ "P1", "GENERAL", "PORTC", "PORTD", "PORTE", "DSW", "COINAGE", "PORTH" };
+{ "P1", "GENERAL", "LIMITSW", "PORTD", "PORTE", "DSW", "COINAGE", "PORTH" };
 
 READ16_MEMBER( segaybd_state::io_chip_r )
 {
@@ -403,7 +403,7 @@ void segaybd_state::device_timer(emu_timer &timer, device_timer_id id, int param
 void segaybd_state::gforce2_output_cb1(UINT16 data)
 {
 	logerror("gforce2_output_cb1: '%02X'\n", data & 0xFF);
-	//bits 4, 5, and 7 seem to be used to multiplex the PORTC signals
+	//bits 4, 5, and 7 seem to be used to multiplex the "LIMITSW" port signals
 	//The exact mapping of these signals is yet not perfectly understood.
 	//You can observe how this value changes when switching pages in the
 	//service mode motor test menu
@@ -846,7 +846,7 @@ static INPUT_PORTS_START( yboard_generic )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START("PORTC")
+	PORT_START("LIMITSW")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PORTD")
@@ -885,7 +885,7 @@ static INPUT_PORTS_START( gforce2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Shoot")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Missile")
 
-	PORT_MODIFY("PORTC")
+	PORT_MODIFY("LIMITSW")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Floor Switch")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Beam Sensor 2 / Down Limit") //The meaning of these portbits seems to be selected
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Beam Sensor 1 / Up Limit")   // by the output value written to gforce2_output_cb1
@@ -933,6 +933,12 @@ static INPUT_PORTS_START( gloc )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("After Burner")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Vulcan")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Missile")
+
+	PORT_MODIFY("LIMITSW")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Right Upper Limit Switch")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Right Lower Limit Switch")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Left Upper Limit Switch")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Left Lower Limit Switch")
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SWB:1,2")
