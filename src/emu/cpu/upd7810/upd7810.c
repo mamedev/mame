@@ -1987,10 +1987,6 @@ void upd7810_device::execute_set_input(int irqline, int state)
 		else
 		if ( irqline == UPD7810_INTF2 && ( MKL & 0x20 ) )
 			IRR |= INTF2;
-		// gamemaster hack
-		else
-		if (irqline == UPD7810_INTFE1)
-			IRR |= INTFE1;
 		else
 			logerror("upd7810_set_irq_line invalid irq line #%d\n", irqline);
 	}
