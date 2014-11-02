@@ -69,8 +69,8 @@ void xerox820ii_state::bankswitch(int bank)
 	if (bank)
 	{
 		/* ROM */
-		program.install_rom(0x0000, 0x17ff, m_rom->base());
-		program.unmap_readwrite(0x1800, 0x2fff);
+		program.install_rom(0x0000, 0x1fff, m_rom->base());
+		program.unmap_readwrite(0x2000, 0x2fff);
 		program.install_ram(0x3000, 0x3fff, m_video_ram);
 		program.unmap_readwrite(0x4000, 0xbfff);
 	}
