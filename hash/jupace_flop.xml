@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
+<!-- This is currently a documentation-only software list, but is hooked up in ace.c -->
 <softwarelist name="jupace_flop" description="Jupiter Cantab Jupiter Ace floppies">
 	<software name="demotape">
 		<description>Ace Demonstration Tape</description>

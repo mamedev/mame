@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
+<!-- This is currently a documentation-only software list, but is hooked up in p2000t.c -->
 <softwarelist name="p2k_cass" description="Philips P2000 cassettes">
 	<software name="3ddool2">
 		<description>3D Doolhof 2 (Ned)</description>

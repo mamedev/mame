@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<!-- this is only a skeleton!-->
 
+<!-- this is only a skeleton list for now!-->
 <softwarelist name="oric_cass" description="Tangerine Oric cassettes">
 	<software name="007">
 		<description>007 - Dangereusement Votre (Fra)</description>
