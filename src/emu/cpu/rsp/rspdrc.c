@@ -6318,13 +6318,15 @@ inline void rsp_device::ccfunc_rsp_vrcpl_simd()
 
 	UINT16 urec;
 	SIMD_EXTRACT16(m_xv[VS2REG], urec, EL);
-	INT32 rec = (urec | m_reciprocal_high);
-
+	INT32 rec = (INT16)urec;
 	INT32 datainput = rec;
 
-	if (rec < 0)
+	if (m_dp_allowed)
 	{
-		if (m_dp_allowed)
+		rec = (rec & 0x0000ffff) | m_reciprocal_high;
+		datainput = rec;
+
+		if (rec < 0)
 		{
 			if (rec < -32768)
 			{
@@ -6335,12 +6337,13 @@ inline void rsp_device::ccfunc_rsp_vrcpl_simd()
 				datainput = -datainput;
 			}
 		}
-		else
-		{
-			datainput = -datainput;
-		}
 	}
+	else if (datainput < 0)
+	{
+		datainput = -datainput;
 
+		shifter = 0x10;
+	}
 
 	if (datainput)
 	{
@@ -6353,25 +6356,12 @@ inline void rsp_device::ccfunc_rsp_vrcpl_simd()
 			}
 		}
 	}
-	else
-	{
-		if (m_dp_allowed)
-		{
-			shifter = 0;
-		}
-		else
-		{
-			shifter = 0x10;
-		}
-	}
 
 	INT32 address = ((datainput << shifter) & 0x7fc00000) >> 22;
 	INT32 fetchval = rsp_divtable[address];
 	INT32 temp = (0x40000000 | (fetchval << 14)) >> ((~shifter) & 0x1f);
-	if (rec < 0)
-	{
-		temp = ~temp;
-	}
+	temp ^= rec >> 31;
+
 	if (!rec)
 	{
 		temp = 0x7fffffff;
@@ -6408,12 +6398,15 @@ inline void rsp_device::ccfunc_rsp_vrcpl_scalar()
 	int op = m_rsp_state->arg0;
 
 	INT32 shifter = 0;
-	INT32 rec = ((UINT16)(VREG_S(VS2REG, EL & 7)) | m_reciprocal_high);
+	INT32 rec = (INT16)VREG_S(VS2REG, EL & 7);
 	INT32 datainput = rec;
 
-	if (rec < 0)
+	if (m_dp_allowed)
 	{
-		if (m_dp_allowed)
+		rec = (rec & 0x0000ffff) | m_reciprocal_high;
+		datainput = rec;
+
+		if (rec < 0)
 		{
 			if (rec < -32768)
 			{
@@ -6424,12 +6417,13 @@ inline void rsp_device::ccfunc_rsp_vrcpl_scalar()
 				datainput = -datainput;
 			}
 		}
-		else
-		{
-			datainput = -datainput;
-		}
 	}
+	else if (datainput < 0)
+	{
+		datainput = -datainput;
 
+		shifter = 0x10;
+	}
 
 	if (datainput)
 	{
@@ -6442,25 +6436,11 @@ inline void rsp_device::ccfunc_rsp_vrcpl_scalar()
 			}
 		}
 	}
-	else
-	{
-		if (m_dp_allowed)
-		{
-			shifter = 0;
-		}
-		else
-		{
-			shifter = 0x10;
-		}
-	}
 
-	INT32 address = ((datainput << shifter) & 0x7fc00000) >> 22;
-	INT32 fetchval = rsp_divtable[address];
+	UINT32 address = (datainput << shifter) >> 22;
+	INT32 fetchval = rsp_divtable[address & 0x1ff];
 	INT32 temp = (0x40000000 | (fetchval << 14)) >> ((~shifter) & 0x1f);
-	if (rec < 0)
-	{
-		temp = ~temp;
-	}
+	temp ^= rec >> 31;
 	if (!rec)
 	{
 		temp = 0x7fffffff;
@@ -6745,12 +6725,15 @@ inline void rsp_device::ccfunc_rsp_vrsql_simd()
 	INT32 shifter = 0;
 	UINT16 val;
 	SIMD_EXTRACT16(m_xv[VS2REG], val, EL);
-	INT32 rec = m_reciprocal_high | val;
+	INT32 rec = (INT16)val;
 	INT32 datainput = rec;
 
-	if (rec < 0)
+	if (m_dp_allowed)
 	{
-		if (m_dp_allowed)
+		rec = (rec & 0x0000ffff) | m_reciprocal_high;
+		datainput = rec;
+
+		if (rec < 0)
 		{
 			if (rec < -32768)
 			{
@@ -6761,10 +6744,12 @@ inline void rsp_device::ccfunc_rsp_vrsql_simd()
 				datainput = -datainput;
 			}
 		}
-		else
-		{
-			datainput = -datainput;
-		}
+	}
+	else if (datainput < 0)
+	{
+		datainput = -datainput;
+
+		shifter = 0x10;
 	}
 
 	if (datainput)
@@ -6778,27 +6763,14 @@ inline void rsp_device::ccfunc_rsp_vrsql_simd()
 			}
 		}
 	}
-	else
-	{
-		if (m_dp_allowed)
-		{
-			shifter = 0;
-		}
-		else
-		{
-			shifter = 0x10;
-		}
-	}
 
 	INT32 address = ((datainput << shifter) & 0x7fc00000) >> 22;
 	address = ((address | 0x200) & 0x3fe) | (shifter & 1);
 
 	INT32 fetchval = rsp_divtable[address];
 	INT32 temp = (0x40000000 | (fetchval << 14)) >> (((~shifter) & 0x1f) >> 1);
-	if (rec < 0)
-	{
-		temp = ~temp;
-	}
+	temp ^= rec >> 31;
+
 	if (!rec)
 	{
 		temp = 0x7fffffff;
@@ -6829,12 +6801,15 @@ inline void rsp_device::ccfunc_rsp_vrsql_scalar()
 	int op = m_rsp_state->arg0;
 
 	INT32 shifter = 0;
-	INT32 rec = m_reciprocal_high | (UINT16)VREG_S(VS2REG, EL & 7);
+	INT32 rec = (INT16)VREG_S(VS2REG, EL & 7);
 	INT32 datainput = rec;
 
-	if (rec < 0)
+	if (m_dp_allowed)
 	{
-		if (m_dp_allowed)
+		rec = (rec & 0x0000ffff) | m_reciprocal_high;
+		datainput = rec;
+
+		if (rec < 0)
 		{
 			if (rec < -32768)
 			{
@@ -6845,10 +6820,12 @@ inline void rsp_device::ccfunc_rsp_vrsql_scalar()
 				datainput = -datainput;
 			}
 		}
-		else
-		{
-			datainput = -datainput;
-		}
+	}
+	else if (datainput < 0)
+	{
+		datainput = -datainput;
+
+		shifter = 0x10;
 	}
 
 	if (datainput)
@@ -6862,27 +6839,14 @@ inline void rsp_device::ccfunc_rsp_vrsql_scalar()
 			}
 		}
 	}
-	else
-	{
-		if (m_dp_allowed)
-		{
-			shifter = 0;
-		}
-		else
-		{
-			shifter = 0x10;
-		}
-	}
 
 	INT32 address = ((datainput << shifter) & 0x7fc00000) >> 22;
 	address = ((address | 0x200) & 0x3fe) | (shifter & 1);
 
 	INT32 fetchval = rsp_divtable[address];
 	INT32 temp = (0x40000000 | (fetchval << 14)) >> (((~shifter) & 0x1f) >> 1);
-	if (rec < 0)
-	{
-		temp = ~temp;
-	}
+	temp ^= rec >> 31;
+
 	if (!rec)
 	{
 		temp = 0x7fffffff;
