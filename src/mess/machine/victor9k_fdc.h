@@ -29,6 +29,12 @@
 #define MCFG_VICTOR_9000_FDC_IRQ_CB(_write) \
 	devcb = &victor_9000_fdc_t::set_irq_wr_callback(*device, DEVCB_##_write);
 
+#define MCFG_VICTOR_9000_FDC_SYN_CB(_write) \
+	devcb = &victor_9000_fdc_t::set_syn_wr_callback(*device, DEVCB_##_write);
+
+#define MCFG_VICTOR_9000_FDC_LBRDY_CB(_write) \
+	devcb = &victor_9000_fdc_t::set_lbrdy_wr_callback(*device, DEVCB_##_write);
+
 
 
 //**************************************************************************
@@ -44,13 +50,15 @@ public:
 	victor_9000_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<victor_9000_fdc_t &>(device).m_irq_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_syn_wr_callback(device_t &device, _Object object) { return downcast<victor_9000_fdc_t &>(device).m_syn_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_lbrdy_wr_callback(device_t &device, _Object object) { return downcast<victor_9000_fdc_t &>(device).m_lbrdy_cb.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( cs5_r ) { return m_via4->read(space, offset); }
-	DECLARE_WRITE8_MEMBER( cs5_w ) { return m_via4->write(space, offset, data); }
+	DECLARE_WRITE8_MEMBER( cs5_w ) { m_via4->write(space, offset, data); }
 	DECLARE_READ8_MEMBER( cs6_r ) { return m_via6->read(space, offset); }
-	DECLARE_WRITE8_MEMBER( cs6_w ) { return m_via6->write(space, offset, data); }
-	DECLARE_READ8_MEMBER( cs7_r ) { return m_via5->read(space, offset); }
-	DECLARE_WRITE8_MEMBER( cs7_w ) { return m_via5->write(space, offset, data); }
+	DECLARE_WRITE8_MEMBER( cs6_w ) { m_via6->write(space, offset, data); }
+	DECLARE_READ8_MEMBER( cs7_r );
+	DECLARE_WRITE8_MEMBER( cs7_w );
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
@@ -63,7 +71,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER( via4_pa_w );
 	DECLARE_WRITE8_MEMBER( via4_pb_w );
-	DECLARE_WRITE_LINE_MEMBER( mode_w );
+	DECLARE_WRITE_LINE_MEMBER( wrsync_w );
 	DECLARE_WRITE_LINE_MEMBER( via4_irq_w );
 
 	DECLARE_READ8_MEMBER( via5_pa_r );
@@ -91,11 +99,59 @@ protected:
 private:
 	enum
 	{
+		TM_GEN,
+		TM_TACH0,
+		TM_TACH1
+	};
+
+	enum
+	{
 		LED_A = 0,
 		LED_B
 	};
 
+	enum {
+		IDLE,
+		RUNNING,
+		RUNNING_SYNCPOINT
+	};
+
+	struct live_info {
+		attotime tm;
+		int state, next_state;
+
+		int drive;
+		int side;
+		int drw;
+
+		// common
+		offs_t i;
+		UINT8 e;
+
+		// read
+		attotime edge;
+		UINT16 shift_reg;
+		int bit_counter;
+		int brdy;
+		int lbrdy;
+		int sync;
+		int gcr_err;
+
+		// write
+		UINT16 shift_reg_write;
+		attotime write_start_time;
+		attotime write_buffer[32];
+		int write_position;
+		UINT8 wd;
+		int wrsync;
+		int syn;
+		int gcr_data;
+		int erase;
+	};
+
 	devcb_write_line m_irq_cb;
+	devcb_write_line m_syn_cb;
+	devcb_write_line m_lbrdy_cb;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via4;
@@ -104,6 +160,9 @@ private:
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;
 	required_memory_region m_gcr_rom;
+
+	void update_stepper_motor(floppy_image_device *floppy, int stp, int old_st, int st);
+	void update_spindle_motor();
 
 	void ready0_cb(floppy_image_device *, int device);
 	int load0_cb(floppy_image_device *device);
@@ -116,6 +175,8 @@ private:
 	UINT8 m_da;
 	UINT8 m_da0;
 	UINT8 m_da1;
+	int m_mtr0;
+	int m_mtr1;
 	int m_sel0;
 	int m_sel1;
 	int m_tach0;
@@ -124,20 +185,44 @@ private:
 	int m_rdy1;
 	int m_ds0;
 	int m_ds1;
-	UINT8 m_lms;                         /* motor speed */
-	int m_st0;                        /* stepper phase */
-	int m_st1;                        /* stepper phase */
-	int m_stp0;                        /* stepper enable */
-	int m_stp1;                        /* stepper enable */
-	int m_drive;                        /* selected drive */
-	int m_side;                         /* selected side */
-	int m_brdy;
-	int m_sync;
-	int m_gcrerr;
+	UINT8 m_l0ms;
+	UINT8 m_l1ms;
+	int m_st0;
+	int m_st1;
+	int m_stp0;
+	int m_stp1;
+	int m_drive;
+	int m_side;
+	int m_drw;
+	int m_erase;
+	UINT8 m_wd;
+	int m_wrsync;
 
 	int m_via4_irq;
 	int m_via5_irq;
 	int m_via6_irq;
+	int m_syn;
+	int m_lbrdy;
+
+	attotime m_period;
+
+	live_info cur_live, checkpoint_live;
+	emu_timer *t_gen, *t_tach0, *t_tach1;
+
+	floppy_image_device* get_floppy();
+	void live_start();
+	void checkpoint();
+	void rollback();
+	bool write_next_bit(bool bit, const attotime &limit);
+	void start_writing(const attotime &tm);
+	void commit(const attotime &tm);
+	void stop_writing(const attotime &tm);
+	void live_delay(int state);
+	void live_sync();
+	void live_abort();
+	void live_run(const attotime &limit = attotime::never);
+	void get_next_edge(const attotime &when);
+	int get_next_bit(attotime &tm, const attotime &limit);
 };
 
 
