@@ -21,6 +21,7 @@
 #include "sound/speaker.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "coreutil.h"
 #include "px4.lh"
 
 
@@ -70,6 +71,7 @@ public:
 	m_swr(0),
 	m_one_sec_int_enabled(true), m_alarm_int_enabled(true), m_key_int_enabled(true),
 	m_key_status(0), m_interrupt_status(0),
+	m_time(), m_clock_state(0),
 	m_ear_last_state(0),
 	m_sio_pin(0), m_serial_rx(0), m_rs232_dcd(0), m_rs232_cts(0),
 	m_centronics_busy(0), m_centronics_perror(0)
@@ -229,6 +231,9 @@ private:
 
 	UINT8 m_key_status;
 	UINT8 m_interrupt_status;
+
+	system_time m_time;
+	int m_clock_state;
 
 	// external cassette/barcode reader
 	int m_ear_last_state;
@@ -553,6 +558,26 @@ READ8_MEMBER( px4_state::sior_r )
 	if (0)
 		logerror("%s: sior_r 0x%02x\n", machine().describe_context(), m_sior);
 
+	// reading clock?
+	if (m_clock_state > 0)
+	{
+		switch (m_clock_state++)
+		{
+		case 1: m_sior = (dec_2_bcd(m_time.local_time.year) >> 4) & 0xf; break;
+		case 2: m_sior = dec_2_bcd(m_time.local_time.year) & 0xf; break;
+		case 3:	m_sior = dec_2_bcd(m_time.local_time.month + 1); break;
+		case 4: m_sior = dec_2_bcd(m_time.local_time.mday); break;
+		case 5: m_sior = dec_2_bcd(m_time.local_time.hour); break;
+		case 6: m_sior = dec_2_bcd(m_time.local_time.minute); break;
+		case 7: m_sior = dec_2_bcd(m_time.local_time.second); break;
+		case 8: m_sior = dec_2_bcd(m_time.local_time.weekday); break;
+		}
+
+		// done?
+		if (m_clock_state == 9)
+			m_clock_state = 0;
+	}
+
 	return m_sior;
 }
 
@@ -562,122 +587,163 @@ WRITE8_MEMBER( px4_state::sior_w )
 	if (0)
 		logerror("%s: sior_w (0x%02x)\n", machine().describe_context(), data);
 
-	m_sior = data;
-
-	switch (data)
+	// writing clock?
+	if (m_clock_state > 0)
 	{
-	case 0x01:
+		struct tm *t = localtime(&m_time.time);
 
-		if (VERBOSE)
-			logerror("7508 cmd: Power OFF\n");
-
-		break;
-
-	case 0x02:
-
-		if (VERBOSE)
-			logerror("7508 cmd: Read Status\n");
-
-		if (m_interrupt_status != 0)
+		switch (m_clock_state++)
 		{
+		case 1:
+			{
+				int year = dec_2_bcd(m_time.local_time.year);
+				year = (year & 0xff0f) | ((data & 0xf) << 4);
+				t->tm_year = bcd_2_dec(year) - 1900;
+			}
+			break;
+		case 2:
+			{
+				int year = dec_2_bcd(m_time.local_time.year);
+				year = (year & 0xfff0) | (data & 0xf);
+				t->tm_year = bcd_2_dec(year) - 1900;
+			}
+			break;
+		case 3: t->tm_mon = bcd_2_dec(data & 0x7f) - 1; break;
+		case 4: t->tm_mday = bcd_2_dec(data & 0x7f); break;
+		case 5: t->tm_hour = bcd_2_dec(data & 0x7f); break;
+		case 6: t->tm_min = bcd_2_dec(data & 0x7f); break;
+		case 7: t->tm_sec = bcd_2_dec(data & 0x7f); break;
+		case 8: t->tm_wday = bcd_2_dec(data & 0x7f); break;
+		}
+
+		// update
+		m_time.set(mktime(t));
+
+		// done?
+		if (m_clock_state == 9)
+			m_clock_state = 0;
+	}
+	else
+	{
+		m_sior = data;
+
+		switch (data)
+		{
+		case 0x01:
 			if (VERBOSE)
-				logerror("> 7508 has interrupts pending: 0x%02x\n", m_interrupt_status);
+				logerror("7508 cmd: Power OFF\n");
 
-			// signal the interrupt(s)
-			m_sior = 0xc1 | m_interrupt_status;
-			m_interrupt_status = 0x00;
-		}
-		else if (m_key_status != 0xff)
-		{
-			m_sior = m_key_status;
-			m_key_status = 0xff;
-		}
-		else
-		{
-			// nothing happened
+			break;
+
+		case 0x02:
+			if (VERBOSE)
+				logerror("7508 cmd: Read Status\n");
+
+			if (m_interrupt_status != 0)
+			{
+				if (VERBOSE)
+					logerror("> 7508 has interrupts pending: 0x%02x\n", m_interrupt_status);
+
+				// signal the interrupt(s)
+				m_sior = 0xc1 | m_interrupt_status;
+				m_interrupt_status = 0x00;
+			}
+			else if (m_key_status != 0xff)
+			{
+				m_sior = m_key_status;
+				m_key_status = 0xff;
+			}
+			else
+			{
+				// nothing happened
+				m_sior = 0xbf;
+			}
+
+			break;
+
+		case 0x03: if (VERBOSE) logerror("7508 cmd: KB Reset\n"); break;
+		case 0x04: if (VERBOSE) logerror("7508 cmd: KB Repeat Timer 1 Set\n"); break;
+		case 0x14: if (VERBOSE) logerror("7508 cmd: KB Repeat Timer 2 Set\n"); break;
+		case 0x24: if (VERBOSE) logerror("7508 cmd: KB Repeat Timer 1 Read\n"); break;
+		case 0x34: if (VERBOSE) logerror("7508 cmd: KB Repeat Timer 2 Read\n"); break;
+		case 0x05: if (VERBOSE) logerror("7508 cmd: KB Repeat OFF\n"); break;
+		case 0x15: if (VERBOSE) logerror("7508 cmd: KB Repeat ON\n"); break;
+
+		case 0x06:
+			if (VERBOSE)
+				logerror("7508 cmd: KB Interrupt OFF\n");
+
+			m_key_int_enabled = false;
+			break;
+
+		case 0x16:
+			if (VERBOSE)
+				logerror("7508 cmd: KB Interrupt ON\n");
+
+			m_key_int_enabled = true;
+			break;
+
+		case 0x07:
+			if (VERBOSE)
+				logerror("7508 cmd: Clock Read\n");
+
+			m_clock_state = 1;
+			break;
+
+		case 0x17:
+			if (VERBOSE)
+				logerror("7508 cmd: Clock Write\n");
+
+			m_clock_state = 1;
+			break;
+
+		case 0x08:
+			if (VERBOSE)
+				logerror("7508 cmd: Power Switch Read\n");
+
+			// indicate that the power switch is in the "ON" position
+			m_sior = 0x01;
+			break;
+
+		case 0x09: if (VERBOSE) logerror("7508 cmd: Alarm Read\n"); break;
+		case 0x19: if (VERBOSE) logerror("7508 cmd: Alarm Set\n"); break;
+		case 0x29: if (VERBOSE) logerror("7508 cmd: Alarm OFF\n"); break;
+		case 0x39: if (VERBOSE) logerror("7508 cmd: Alarm ON\n"); break;
+
+		case 0x0a:
+			if (VERBOSE)
+				logerror("7508 cmd: DIP Switch Read\n");
+			m_sior = ioport("dips")->read();
+			break;
+
+		case 0x0b: if (VERBOSE) logerror("7508 cmd: Stop Key Interrupt disable\n"); break;
+		case 0x1b: if (VERBOSE) logerror("7508 cmd: Stop Key Interrupt enable\n"); break;
+		case 0x0c: if (VERBOSE) logerror("7508 cmd: 7 chr. Buffer\n"); break;
+		case 0x1c: if (VERBOSE) logerror("7508 cmd: 1 chr. Buffer\n"); break;
+
+		case 0x0d:
+			if (VERBOSE)
+				logerror("7508 cmd: 1 sec. Interrupt OFF\n");
+
+			m_one_sec_int_enabled = false;
+			break;
+
+		case 0x1d:
+			if (VERBOSE)
+				logerror("7508 cmd: 1 sec. Interrupt ON\n");
+
+			m_one_sec_int_enabled = true;
+			break;
+
+		case 0x0e:
+			if (VERBOSE)
+				logerror("7508 cmd: KB Clear\n");
+
 			m_sior = 0xbf;
+			break;
+
+		case 0x0f: if (VERBOSE) logerror("7508 cmd: System Reset\n"); break;
 		}
-
-		break;
-
-	case 0x03: if (VERBOSE) logerror("7508 cmd: KB Reset\n"); break;
-	case 0x04: if (VERBOSE) logerror("7508 cmd: KB Repeat Timer 1 Set\n"); break;
-	case 0x14: if (VERBOSE) logerror("7508 cmd: KB Repeat Timer 2 Set\n"); break;
-	case 0x24: if (VERBOSE) logerror("7508 cmd: KB Repeat Timer 1 Read\n"); break;
-	case 0x34: if (VERBOSE) logerror("7508 cmd: KB Repeat Timer 2 Read\n"); break;
-	case 0x05: if (VERBOSE) logerror("7508 cmd: KB Repeat OFF\n"); break;
-	case 0x15: if (VERBOSE) logerror("7508 cmd: KB Repeat ON\n"); break;
-
-	case 0x06:
-
-		if (VERBOSE)
-			logerror("7508 cmd: KB Interrupt OFF\n");
-
-		m_key_int_enabled = false;
-		break;
-
-	case 0x16:
-
-		if (VERBOSE)
-			logerror("7508 cmd: KB Interrupt ON\n");
-
-		m_key_int_enabled = true;
-		break;
-
-	case 0x07: if (VERBOSE) logerror("7508 cmd: Clock Read\n"); break;
-	case 0x17: if (VERBOSE) logerror("7508 cmd: Clock Write\n"); break;
-
-	case 0x08:
-
-		if (VERBOSE)
-			logerror("7508 cmd: Power Switch Read\n");
-
-		// indicate that the power switch is in the "ON" position
-		m_sior = 0x01;
-		break;
-
-	case 0x09: if (VERBOSE) logerror("7508 cmd: Alarm Read\n"); break;
-	case 0x19: if (VERBOSE) logerror("7508 cmd: Alarm Set\n"); break;
-	case 0x29: if (VERBOSE) logerror("7508 cmd: Alarm OFF\n"); break;
-	case 0x39: if (VERBOSE) logerror("7508 cmd: Alarm ON\n"); break;
-
-	case 0x0a:
-
-		if (VERBOSE)
-			logerror("7508 cmd: DIP Switch Read\n");
-		m_sior = ioport("dips")->read();
-		break;
-
-	case 0x0b: if (VERBOSE) logerror("7508 cmd: Stop Key Interrupt disable\n"); break;
-	case 0x1b: if (VERBOSE) logerror("7508 cmd: Stop Key Interrupt enable\n"); break;
-	case 0x0c: if (VERBOSE) logerror("7508 cmd: 7 chr. Buffer\n"); break;
-	case 0x1c: if (VERBOSE) logerror("7508 cmd: 1 chr. Buffer\n"); break;
-
-	case 0x0d:
-
-		if (VERBOSE)
-			logerror("7508 cmd: 1 sec. Interrupt OFF\n");
-
-		m_one_sec_int_enabled = false;
-		break;
-
-	case 0x1d:
-
-		if (VERBOSE)
-			logerror("7508 cmd: 1 sec. Interrupt ON\n");
-
-		m_one_sec_int_enabled = true;
-		break;
-
-	case 0x0e:
-
-		if (VERBOSE)
-			logerror("7508 cmd: KB Clear\n");
-
-		m_sior = 0xbf;
-		break;
-
-	case 0x0f: if (VERBOSE) logerror("7508 cmd: System Reset\n"); break;
 	}
 }
 
@@ -1000,6 +1066,9 @@ TIMER_DEVICE_CALLBACK_MEMBER( px4_state::upd7508_1sec_callback )
 		m_isr |= INT0_7508;
 		gapnit_interrupt();
 	}
+
+	// update clock
+	m_time.set(m_time.time + 1);
 }
 
 INPUT_CHANGED_MEMBER( px4_state::key_callback )
@@ -1163,6 +1232,9 @@ void px4_state::machine_start()
 	m_caps2_rom = memregion(region_tag.cpy(m_caps2->tag()).cat(GENERIC_ROM_REGION_TAG));
 
 	m_nvram->set_base(m_ram->pointer(), 0x10000);
+
+	// initialize clock
+	machine().base_datetime(m_time);
 }
 
 void px4_state::machine_reset()
