@@ -127,6 +127,7 @@ something wrong in the disk geometry reported by calchase.chd (20,255,63) since 
 #include "video/pc_vga.h"
 #include "sound/dac.h"
 #include "machine/pcshare.h"
+#include "machine/ds128x.h"
 #include "bus/isa/trident.h"
 
 
@@ -660,6 +661,11 @@ static MACHINE_CONFIG_START( calchase, calchase_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_trident_vga )
+
+	MCFG_DEVICE_REMOVE("rtc")
+	MCFG_DS12885_ADD("rtc")
+	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir0_w))
+	MCFG_MC146818_CENTURY_INDEX(0x32)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")

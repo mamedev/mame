@@ -52,7 +52,7 @@ esq8img_format::esq8img_format()
 
 const char *esq8img_format::name() const
 {
-	return "img";
+	return "esq8";
 }
 
 const char *esq8img_format::description() const

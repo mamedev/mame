@@ -20,7 +20,8 @@ ROM_START( dmv_k806 )
 ROM_END
 
 static ADDRESS_MAP_START( k806_io, AS_IO, 8, dmv_k806_device )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(port1_r, port1_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(port1_r)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(port2_w)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(portt1_r)
 ADDRESS_MAP_END
 
@@ -75,6 +76,7 @@ dmv_k806_device::dmv_k806_device(const machine_config &mconfig, const char *tag,
 
 void dmv_k806_device::device_start()
 {
+	m_bus = static_cast<dmvcart_slot_device*>(owner());
 }
 
 //-------------------------------------------------
@@ -129,6 +131,15 @@ void dmv_k806_device::io_write(address_space &space, int ifsel, offs_t offset, U
 
 READ8_MEMBER( dmv_k806_device::port1_r )
 {
+	// ---- ---x   Left button
+	// ---- --x-   Middle button
+	// ---- -x--   Right button
+	// ---- x---   XA / Y1
+	// ---x ----   XB / Y2
+	// --x- ----   YA / X2
+	// -x-- ----   YB / X1
+	// x--- ----   not used
+
 	// TODO
 	return 0xff;
 }
@@ -138,7 +149,7 @@ READ8_MEMBER( dmv_k806_device::portt1_r )
 	return BIT(m_jumpers->read(), 7) ? 0 : 1;
 }
 
-WRITE8_MEMBER( dmv_k806_device::port1_w )
+WRITE8_MEMBER( dmv_k806_device::port2_w )
 {
-	// TODO
+	m_bus->m_out_int_cb((data & 1) ? CLEAR_LINE : ASSERT_LINE);
 };

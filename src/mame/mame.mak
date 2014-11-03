@@ -578,6 +578,7 @@ MACHINES += FDC37C665GT
 #BUSES += ADAMNET
 #BUSES += APF
 #BUSES += ARCADIA
+#BUSES += ASTROCADE
 #BUSES += BML3
 #BUSES += BW2
 #BUSES += C64
@@ -621,6 +622,7 @@ BUSES += NEOGEO
 #BUSES += PC_KBD
 #BUSES += PET
 #BUSES += PLUS4
+#BUSES += PSX_CONTROLLER
 #BUSES += QL
 BUSES += RS232
 #BUSES += S100
@@ -631,6 +633,7 @@ BUSES += SCSI
 #BUSES += SMS_CTRL
 #BUSES += SMS_EXP
 #BUSES += SNES
+#BUSES += SPC1000
 #BUSES += TI99PEB
 #BUSES += TVC
 #BUSES += VBOY
@@ -1707,6 +1710,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/naomi.o $(MACHINE)/dc.o $(VIDEO)/powervr2.o $(MACHINE)/naomi.o \
 	$(MACHINE)/naomig1.o $(MACHINE)/naomibd.o $(MACHINE)/naomirom.o $(MACHINE)/naomigd.o \
 	$(MACHINE)/naomicrypt.o $(MACHINE)/naomim1.o $(MACHINE)/naomim2.o $(MACHINE)/naomim4.o \
+	$(MACHINE)/315-5881_crypt.o \
 	$(MACHINE)/awboard.o \
 	$(MACHINE)/mie.o $(MACHINE)/maple-dc.o $(MACHINE)/mapledev.o $(MACHINE)/dc-ctrl.o $(MACHINE)/jvs13551.o \
 	$(DRIVERS)/triforce.o \

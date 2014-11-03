@@ -3966,6 +3966,48 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="samnmax">
+		<!-- Dumped via Kryoflux, track 0 shows as modified on all disks -->
+		<description>Sam &amp; Max Hit the Road</description>
+		<year>1993</year>
+		<publisher>LucasArts</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1.img" size="1474560" crc="918a2aee" sha1="9293235f0efbbe19e9bb7c979911a2371e61f773" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2.img" size="1474560" crc="59f7507a" sha1="e43bfd7cb3f120566845a9efe489f6c59d57d384" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk3.img" size="1474560" crc="05541aff" sha1="03497aae8e443aada4c9234a6dd19563b8235450" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk4.img" size="1474560" crc="2174d87c" sha1="407eeb5293c9e02b38b1c8c314a8b23ae8a24fc9" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk5.img" size="1474560" crc="cfd03ddc" sha1="c7ce4de481715bd03f1ecca31af4ce1ceaa2be66" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk6.img" size="1474560" crc="af792c0f" sha1="1df1e0b4ff74b5b4aa9b3c416da99880f58826cd" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk7.img" size="737280" crc="077b9c18" sha1="8d299cd5fe2ed0dd93253d383c12e3fa889a4b39" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sserv2">
 		<!-- Dumped via Kryoflux, shows as good and unmodified -->
 		<description>Silent Service II (Version 457.01)</description>

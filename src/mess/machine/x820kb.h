@@ -16,7 +16,6 @@
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
-#include "machine/clock.h"
 
 
 
@@ -61,6 +60,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_reset_after_children();
 
 private:
 	required_device<cpu_device> m_maincpu;

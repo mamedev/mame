@@ -97,7 +97,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
-	void bankswitch(int bank);
+	virtual void bankswitch(int bank);
 	void update_nmi();
 
 	/* video state */

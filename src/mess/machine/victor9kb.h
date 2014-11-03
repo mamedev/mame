@@ -51,9 +51,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
 
-	DECLARE_READ_LINE_MEMBER( kbrdy_r );
 	DECLARE_WRITE_LINE_MEMBER( kback_w );
-	DECLARE_READ_LINE_MEMBER( kbdata_r );
 
 	// not really public
 	DECLARE_READ8_MEMBER( kb_p1_r );

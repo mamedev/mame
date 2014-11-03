@@ -1,5 +1,5 @@
 /*
- * Nec PC-6001 cassette format handling
+ * NEC PC-6001 cassette format handling
  */
 
 #ifndef PC6001_CAS_H_

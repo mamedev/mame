@@ -215,6 +215,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/tzx_cas.o     \
 	$(LIBOBJ)/formats/uef_cas.o     \
 	$(LIBOBJ)/formats/upd765_dsk.o  \
+	$(LIBOBJ)/formats/victor9k_dsk.o\
 	$(LIBOBJ)/formats/vg5k_cas.o    \
 	$(LIBOBJ)/formats/vt_cas.o      \
 	$(LIBOBJ)/formats/vt_dsk.o      \

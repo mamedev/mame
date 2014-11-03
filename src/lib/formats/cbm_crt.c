@@ -4,12 +4,42 @@
 
     cbm_crt.c
 
-    Commodore C64 cartridge images
+    Commodore C64 cartridge images in .CRT format
+
+    This format was introduced in the CCS64 emulator by Per Hakan
+    Sundell.
+
+    Header info based on the VICE manual chapter 15.11, which in turn
+    is based on CRT.txt rev 1.14 compiled by Peter Schepers, with
+    additional contributions by Per Hakan Sundell, Markus Brenner,
+    and Marco Van Den Heuvel.
+    Relevant links:
+        http://vice-emu.sourceforge.net/vice_15.html#SEC300
+        http://ist.uwaterloo.ca/~schepers/formats/CRT.TXT (version 1.13, outdated)
+
+    Header Contents (bytes $0000-003F):
+    Bytes $0000-000F - 16-byte cartridge signature "C64 CARTRIDGE" (padded with spaces)
+          $0010-0013 - File header length
+          $0014-0015 - Cartridge version (high/low, presently 01.00)
+          $0016-0017 - Cartridge hardware type ($0000, high/low), see below
+          $0018      - Cartridge port EXROM line status (0 = inactive, 1 = active)
+          $0019      - Cartridge port GAME line status (0 = inactive, 1 = active)
+          $001A-001F - Reserved for future use
+          $0020-003F - 32-byte cartridge name (uppercase, padded with null characters)
+
+    CHIP Packet Contents (starting from $0040; there can be multiple CHIP packets
+    in a single CRT file):
+    Bytes $0040-0043 - Contained ROM signature "CHIP"
+          $0044-0047 - Total packet length (ROM image size and header combined) (high/low format)
+          $0048-0049 - Chip type (0 = ROM, 1 = RAM (no ROM data), 2 = Flash ROM)
+          $004A-004B - Bank number
+          $004C-004D - Starting load address (high/low format)
+          $004E-004F - ROM image size in bytes (high/low format, typically $2000 or $4000)
+          $0050-xxxx - ROM data
 
 *********************************************************************/
 
 #include "cbm_crt.h"
-
 
 
 //**************************************************************************
@@ -22,62 +52,62 @@
 // slot names for the C64 cartridge types
 static const char * CRT_C64_SLOT_NAMES[_CRT_C64_COUNT] =
 {
-	"standard",
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED,
-	"simons_basic",
-	"ocean",
-	UNSUPPORTED,
-	"fun_play",
-	"super_games",
-	UNSUPPORTED,
-	"epyxfastload",
-	"westermann",
-	"rex",
-	UNSUPPORTED,
-	"magic_formel",
-	"system3",
-	"warp_speed",
-	"dinamic",
-	"zaxxon",
-	"magic_desk",
-	UNSUPPORTED,
-	"comal80",
-	"struct_basic",
-	"ross",
-	"ep64",
-	"ep7x8",
-	"dela_ep256",
-	"rex_ep256",
-	"mikroasm",
-	UNSUPPORTED,
-	UNSUPPORTED,
-	"stardos",
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED,
-	"ieee488",
-	UNSUPPORTED,
-	UNSUPPORTED,
-	"exos",
-	UNSUPPORTED,
-	UNSUPPORTED,
-	UNSUPPORTED,
-	"super_explode",
-	UNSUPPORTED,
-	UNSUPPORTED,
-	"mach5",
-	UNSUPPORTED,
-	"pagefox",
-	UNSUPPORTED,
-	"silverrock"
+	"standard",         //  0 - Normal cartridge
+	UNSUPPORTED,        //  1 - Action Replay
+	UNSUPPORTED,        //  2 - KCS Power Cartridge
+	"final3",           //  3 - Final Cartridge III
+	"simons_basic",     //  4 - Simons' BASIC
+	"ocean",            //  5 - Ocean type 1
+	UNSUPPORTED,        //  6 - Expert Cartridge
+	"fun_play",         //  7 - Fun Play, Power Play
+	"super_games",      //  8 - Super Games
+	UNSUPPORTED,        //  9 - Atomic Power
+	"epyxfastload",     // 10 - Epyx Fastload
+	"westermann",       // 11 - Westermann Learning
+	"rex",              // 12 - Rex Utility
+	"final",            // 13 - Final Cartridge I
+	"magic_formel",     // 14 - Magic Formel
+	"system3",          // 15 - C64 Game System, System 3
+	"warp_speed",       // 16 - Warp Speed
+	"dinamic",          // 17 - Dinamic
+	"zaxxon",           // 18 - Zaxxon, Super Zaxxon (SEGA)
+	"magic_desk",       // 19 - Magic Desk, Domark, HES Australia
+	UNSUPPORTED,        // 20 - Super Snapshot V5
+	"comal80",          // 21 - Comal-80
+	"struct_basic",     // 22 - Structured BASIC
+	"ross",             // 23 - Ross
+	"ep64",             // 24 - Dela EP64
+	"ep7x8",            // 25 - Dela EP7x8
+	"dela_ep256",       // 26 - Dela EP256
+	"rex_ep256",        // 27 - Rex EP256
+	"mikroasm",         // 28 - Mikro Assembler
+	UNSUPPORTED,        // 29 - Final Cartridge Plus
+	UNSUPPORTED,        // 30 - Action Replay 4
+	"stardos",          // 31 - Stardos
+	"easyflash",        // 32 - EasyFlash
+	UNSUPPORTED,        // 33 - EasyFlash Xbank
+	UNSUPPORTED,        // 34 - Capture
+	UNSUPPORTED,        // 35 - Action Replay 3
+	UNSUPPORTED,        // 36 - Retro Replay
+	UNSUPPORTED,        // 37 - MMC64
+	UNSUPPORTED,        // 38 - MMC Replay
+	"ide64",            // 39 - IDE64
+	UNSUPPORTED,        // 40 - Super Snapshot V4
+	"ieee488",          // 41 - IEEE-488
+	UNSUPPORTED,        // 42 - Game Killer
+	"prophet64",        // 43 - Prophet64
+	"exos",             // 44 - EXOS
+	UNSUPPORTED,        // 45 - Freeze Frame
+	UNSUPPORTED,        // 46 - Freeze Machine
+	UNSUPPORTED,        // 47 - Snapshot64
+	"super_explode",    // 48 - Super Explode V5.0
+	"magic_voice",      // 49 - Magic Voice
+	UNSUPPORTED,        // 50 - Action Replay 2
+	"mach5",            // 51 - MACH 5
+	UNSUPPORTED,        // 52 - Diashow-Maker
+	"pagefox",          // 53 - Pagefox
+	UNSUPPORTED,        // 54 - ?
+	"silverrock"        // 55 - Silverrock
 };
 
 

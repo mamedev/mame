@@ -2764,9 +2764,17 @@ int mips3_device::generate_cop1(drcuml_block *block, compiler_state *compiler, c
 
 				case 0x07:
 					if (IS_SINGLE(op))  /* NEG.S - MIPS I */
+					{
 						UML_FSNEG(block, FPR32(FDREG), FPR32(FSREG));               // fsneg   <fdreg>,<fsreg>
+						UML_CMP(block, FPR32(FSREG), 0);                            // cmp     <fsreg>,0.0
+						UML_MOVc(block, COND_E, FPR32(FDREG), 0x80000000);          // mov     <fdreg>,-0.0,e
+					}
 					else                /* NEG.D - MIPS I */
+					{
 						UML_FDNEG(block, FPR64(FDREG), FPR64(FSREG));               // fdneg   <fdreg>,<fsreg>
+						UML_CMP(block, FPR64(FSREG), 0);                            // cmp     <fsreg>,0.0
+						UML_DMOVc(block, COND_E, FPR64(FDREG), 0x8000000000000000L);// dmov    <fdreg>,-0.0,e
+					}
 					return TRUE;
 
 				case 0x08:
@@ -2774,6 +2782,7 @@ int mips3_device::generate_cop1(drcuml_block *block, compiler_state *compiler, c
 						UML_FSTOINT(block, FPR64(FDREG), FPR32(FSREG), SIZE_QWORD, ROUND_ROUND);// fstoint <fdreg>,<fsreg>,qword,round
 					else                /* ROUND.L.D - MIPS III */
 						UML_FDTOINT(block, FPR64(FDREG), FPR64(FSREG), SIZE_QWORD, ROUND_ROUND);// fdtoint <fdreg>,<fsreg>,qword,round
+					UML_DSEXT(block, FPR64(FDREG), FPR64(FDREG), SIZE_DWORD);
 					return TRUE;
 
 				case 0x09:
@@ -2781,6 +2790,7 @@ int mips3_device::generate_cop1(drcuml_block *block, compiler_state *compiler, c
 						UML_FSTOINT(block, FPR64(FDREG), FPR32(FSREG), SIZE_QWORD, ROUND_TRUNC);// fstoint <fdreg>,<fsreg>,qword,trunc
 					else                /* TRUNC.L.D - MIPS III */
 						UML_FDTOINT(block, FPR64(FDREG), FPR64(FSREG), SIZE_QWORD, ROUND_TRUNC);// fdtoint <fdreg>,<fsreg>,qword,trunc
+					UML_DSEXT(block, FPR64(FDREG), FPR64(FDREG), SIZE_DWORD);
 					return TRUE;
 
 				case 0x0a:
@@ -2788,6 +2798,7 @@ int mips3_device::generate_cop1(drcuml_block *block, compiler_state *compiler, c
 						UML_FSTOINT(block, FPR64(FDREG), FPR32(FSREG), SIZE_QWORD, ROUND_CEIL);// fstoint <fdreg>,<fsreg>,qword,ceil
 					else                /* CEIL.L.D - MIPS III */
 						UML_FDTOINT(block, FPR64(FDREG), FPR64(FSREG), SIZE_QWORD, ROUND_CEIL);// fdtoint <fdreg>,<fsreg>,qword,ceil
+					UML_DSEXT(block, FPR64(FDREG), FPR64(FDREG), SIZE_DWORD);
 					return TRUE;
 
 				case 0x0b:
@@ -2795,6 +2806,7 @@ int mips3_device::generate_cop1(drcuml_block *block, compiler_state *compiler, c
 						UML_FSTOINT(block, FPR64(FDREG), FPR32(FSREG), SIZE_QWORD, ROUND_FLOOR);// fstoint <fdreg>,<fsreg>,qword,floor
 					else                /* FLOOR.L.D - MIPS III */
 						UML_FDTOINT(block, FPR64(FDREG), FPR64(FSREG), SIZE_QWORD, ROUND_FLOOR);// fdtoint <fdreg>,<fsreg>,qword,floor
+					UML_DSEXT(block, FPR64(FDREG), FPR64(FDREG), SIZE_DWORD);
 					return TRUE;
 
 				case 0x0c:

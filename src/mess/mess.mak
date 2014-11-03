@@ -901,6 +901,7 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_MACHINE)/naomim2.o   \
 	$(MAME_MACHINE)/naomim4.o   \
 	$(MAME_MACHINE)/naomirom.o  \
+	$(MAME_MACHINE)/315-5881_crypt.o  \
 	$(MAME_VIDEO)/powervr2.o    \
 	$(MAME_DRIVERS)/neogeo.o    \
 	$(MAME_MACHINE)/neoboot.o   \
@@ -959,7 +960,7 @@ $(MESSOBJ)/act.a:               \
 	$(MESS_DRIVERS)/apricotf.o  \
 	$(MESS_DRIVERS)/apricotp.o  \
 	$(MESS_MACHINE)/apricotkb.o \
-	$(MESS_DRIVERS)/victor9k.o $(MESS_MACHINE)/victor9kb.o \
+	$(MESS_DRIVERS)/victor9k.o $(MESS_MACHINE)/victor9kb.o $(MESS_MACHINE)/victor9k_fdc.o \
 
 $(MESSOBJ)/adc.a:               \
 	$(MESS_DRIVERS)/super6.o    \

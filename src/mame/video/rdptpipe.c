@@ -595,6 +595,21 @@ void N64TexturePipeT::LOD1Cycle(INT32* sss, INT32* sst, INT32 s, INT32 t, INT32 
 	userdata->m_precomp_s = nexts;
 	userdata->m_precomp_t = nextt;
 
+	INT32 lodclamp = (((*sst & 0x60000) > 0) | ((nextt & 0x60000) > 0)) || (((*sss & 0x60000) > 0) | ((nexts & 0x60000) > 0));
+
+	INT32 horstep = SIGN17(nexts & 0x1ffff) - SIGN17(*sss & 0x1ffff);
+	INT32 vertstep = SIGN17(nextt & 0x1ffff) - SIGN17(*sst & 0x1ffff);
+	if (horstep & 0x20000)
+	{
+		horstep = ~horstep & 0x1ffff;
+	}
+	if (vertstep & 0x20000)
+	{
+		vertstep = ~vertstep & 0x1ffff;
+	}
+
+	INT32 lod = (horstep >= vertstep) ? horstep : vertstep;
+
 	int tempanded;
 	if (*sss & 0x40000)
 	{
@@ -644,6 +659,38 @@ void N64TexturePipeT::LOD1Cycle(INT32* sss, INT32* sst, INT32 s, INT32 t, INT32 
 		{
 			*sst &= 0xffff;
 		}
+	}
+
+	if ((lod & 0x4000) || lodclamp)
+	{
+		lod = 0x7fff;
+	}
+	else if (lod < object.MiscState.MinLevel)
+	{
+		lod = object.MiscState.MinLevel;
+	}
+
+	bool magnify = (lod < 32);
+	INT32 l_tile = m_rdp->GetLog2((lod >> 5) & 0xff);
+	bool distant = ((lod & 0x6000) || (l_tile >= object.MiscState.MaxLevel));
+
+	userdata->LODFraction = ((lod << 3) >> l_tile) & 0xff;
+
+	if(!object.OtherModes.sharpen_tex_en && !object.OtherModes.detail_tex_en)
+	{
+		if (distant)
+		{
+			userdata->LODFraction = 0xff;
+		}
+		else if (magnify)
+		{
+			userdata->LODFraction = 0;
+		}
+	}
+
+	if(object.OtherModes.sharpen_tex_en && magnify)
+	{
+		userdata->LODFraction |= 0x100;
 	}
 }
 
@@ -761,7 +808,7 @@ void N64TexturePipeT::LOD2Cycle(INT32* sss, INT32* sst, INT32 s, INT32 t, INT32 
 
 	if(object.OtherModes.sharpen_tex_en && magnify)
 	{
-		userdata->LODFraction = userdata->LODFraction | 0x100;
+		userdata->LODFraction |= 0x100;
 	}
 
 	if (object.OtherModes.tex_lod_en)

@@ -55,6 +55,7 @@ public:
 	DECLARE_DRIVER_INIT(generic_5874);
 	DECLARE_DRIVER_INIT(wwally);
 	DECLARE_DRIVER_INIT(generic_5987);
+	DECLARE_DRIVER_INIT(hamaway);
 
 	// memory mapping
 	void memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 index);
@@ -63,6 +64,7 @@ public:
 
 	// read/write handlers
 	DECLARE_WRITE16_MEMBER( rom_5987_bank_w );
+	DECLARE_WRITE16_MEMBER( rom_837_7525_bank_w );
 	DECLARE_READ16_MEMBER( io_chip_r );
 	DECLARE_WRITE16_MEMBER( io_chip_w );
 	DECLARE_READ16_MEMBER( misc_io_r );
@@ -90,6 +92,8 @@ public:
 
 	DECLARE_WRITE16_MEMBER( sega_tileram_0_w ) { m_segaic16vid->segaic16_tileram_0_w(space,offset,data,mem_mask); };
 	DECLARE_WRITE16_MEMBER( sega_textram_0_w ) { m_segaic16vid->segaic16_textram_0_w(space,offset,data,mem_mask); };
+	
+	DECLARE_WRITE_LINE_MEMBER(ym3438_irq_handler);
 
 protected:
 	// timer IDs
@@ -104,7 +108,9 @@ protected:
 		ROM_BOARD_INVALID,
 		ROM_BOARD_171_SHADOW,   // 171-???? -- used by shadow dancer
 		ROM_BOARD_171_5874,     // 171-5874
-		ROM_BOARD_171_5987      // 171-5987
+		ROM_BOARD_171_5987,     // 171-5987
+		ROM_BOARD_837_7525      // Hammer Away proto
+
 	};
 
 	// device overrides
