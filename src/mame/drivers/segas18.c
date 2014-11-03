@@ -91,7 +91,8 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 ind
 												mapper.map_as_rom(0x00000,0x100000, 0xf00000, "rom1base",0x100000, write16_delegate(FUNC(segas18_state::rom_5987_bank_w), this));
 											break;
 				case ROM_BOARD_837_7525:    mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom1base", 0x80000, write16_delegate(FUNC(segas18_state::rom_837_7525_bank_w), this));
-											break;
+				break;
+
 				default:                    assert(false);
 			}
 			break;
@@ -760,9 +761,7 @@ static INPUT_PORTS_START( astorm )
 	PORT_DIPSETTING(    0x00, "1" )
 	//"SW2:7" unused
 	//"SW2:8" unused
-
 INPUT_PORTS_END
-
 
 static INPUT_PORTS_START( astorm2p )
 	PORT_INCLUDE( system18_generic )
@@ -788,7 +787,6 @@ static INPUT_PORTS_START( astorm2p )
 	PORT_DIPSETTING(    0x00, "1" )
 	//"SW2:7" unused
 	//"SW2:8" unused
-
 INPUT_PORTS_END
 
 
@@ -907,7 +905,6 @@ static INPUT_PORTS_START( ddcrew )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-
 static INPUT_PORTS_START( ddcrew2p )
 	PORT_INCLUDE( system18_generic )
 
@@ -934,7 +931,6 @@ static INPUT_PORTS_START( ddcrew2p )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ddcrew3p )
@@ -953,8 +949,8 @@ static INPUT_PORTS_START( ddcrew3p )
 	PORT_MODIFY("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
-
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( desertbr )
 	PORT_INCLUDE( system18_generic )
@@ -1001,6 +997,31 @@ static INPUT_PORTS_START( desertbr )
 	PORT_DIPSETTING(    0x80, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( hamaway )
+	PORT_INCLUDE( system18_generic )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )	PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x08, "1" )
+	PORT_DIPSETTING(    0x04, "2" )
+	PORT_DIPSETTING(    0x0c, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	//"SW2:5" is unknown - Not listed in the service mode
+	//"SW2:6" is unknown - Not listed in the service mode
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "2 Credits to Start" )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -1212,38 +1233,6 @@ static INPUT_PORTS_START( wwally )
 
 	PORT_START("TRACKY3")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_PLAYER(3)
-INPUT_PORTS_END
-
-
-
-static INPUT_PORTS_START( hamaway )
-	PORT_INCLUDE( system18_generic )
-
-	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -1943,6 +1932,45 @@ ROM_END
 /**************************************************************************************************************************
  **************************************************************************************************************************
  **************************************************************************************************************************
+    Hammer Away, Sega System 18 (prototype / unreleased)
+    CPU: M68000
+    ROM Board: 837-7525
+
+    Japanese text on the mission screens, but no "For use in Japan..." warning. There are screen shots of a version without
+    the Japanese text on mission screens and an alternate title screen, so a "World" proto might exist.
+*/
+ROM_START( hamaway )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "4.bin",  0x000000, 0x40000, CRC(cc0981e1) SHA1(63528bd36f27e62fdf40715101e6d05b73e48f16) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "6.bin",  0x000001, 0x40000, CRC(e8599ee6) SHA1(3e32b025403aecbaecfcdd0325e4acd676e99c4e) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "5.bin",  0x080000, 0x40000, CRC(fdb247fd) SHA1(ee9db799fb5de27f81904f8ef792203415b6d4a6) )
+	ROM_LOAD16_BYTE( "7.bin",  0x080001, 0x40000, CRC(63711470) SHA1(6c4be3a0cf0f897c34ef0b3bf549f52b185bb915) )
+
+	ROM_REGION( 0x180000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "c10.bin",  0x000000, 0x40000, CRC(c55cb5cf) SHA1(396179632b29ac5f8b7f8f3c91d7cf834e548bdf) )
+	ROM_LOAD( "1.bin",    0x040000, 0x40000, CRC(33be003f) SHA1(134fa6b3347c306d9e30882dfcf24632b49f85ea) )
+	ROM_LOAD( "c11.bin",  0x080000, 0x40000, CRC(37787915) SHA1(c8d251be6c41de3aed2da6da70aa87071b70b1f6) )
+	ROM_LOAD( "2.bin",    0x0c0000, 0x40000, CRC(60ca5c9f) SHA1(6358ea00125a5e3f55acf73aeb9c36b1db6e711e) )
+	ROM_LOAD( "c12.bin",  0x100000, 0x40000, CRC(f12f1cf3) SHA1(45e883029c58e617a2a20ac1ab5c5f598c95f4bd) )
+	ROM_LOAD( "3.bin",    0x140000, 0x40000, CRC(520aa7ae) SHA1(9584206aedd8be5ce9dca0ed370f8fe77aabaf76) )
+
+	ROM_REGION16_BE( 0x200000, "sprites", ROMREGION_ERASEFF ) // sprites
+	ROM_LOAD16_BYTE( "c17.bin", 0x000001, 0x40000, CRC(aa28d7aa) SHA1(3dd5d95b05e408c023f9bd77753c37080714239d) )
+	ROM_LOAD16_BYTE( "10.bin",  0x000000, 0x40000, CRC(c4c95161) SHA1(2e313a4ca9506f53a2062b4a8e5ba7b381ba93ae) )
+	ROM_LOAD16_BYTE( "c18.bin", 0x080001, 0x40000, CRC(0f8fe8bb) SHA1(e6f68442b8d4def29b106458496a47344f70d511) )
+	ROM_LOAD16_BYTE( "11.bin",  0x080000, 0x40000, CRC(2b5eacbc) SHA1(ba3690501588b9c88a31022b44bc3c82b44ae26b) )
+	ROM_LOAD16_BYTE( "c19.bin", 0x100001, 0x40000, CRC(3c616caa) SHA1(d48a6239b7a52ac13971f7513a65a17af492bfdf) ) // 11xxxxxxxxxxxxxxxx = 0xFF
+ 	ROM_LOAD16_BYTE( "12.bin",  0x100000, 0x40000, CRC(c7bbd579) SHA1(ab87bfdad66ea241cb23c9bbfea05f5a1574d6c9) ) // 1ST AND 2ND HALF IDENTICAL (but ok, because pairing ROM has no data in the 2nd half anyway)
+
+	ROM_REGION( 0x210000, "soundcpu", ROMREGION_ERASEFF ) // sound CPU
+	ROM_LOAD( "c16.bin", 0x010000, 0x40000, CRC(913cc18c) SHA1(4bf4ec14937586c3ae77fcad57dcb21f6433ef81) )
+	ROM_LOAD( "c15.bin", 0x090000, 0x40000, CRC(b53694fc) SHA1(0e42be2730abce1b52ea94a9fe61cbd1c9a0ccae) )
+ROM_END
+
+
+/**************************************************************************************************************************
+ **************************************************************************************************************************
+ **************************************************************************************************************************
     Laser Ghost, Sega System 18
     CPU: FD1094 (317-0166)
     ROM Board: 171-5873B
@@ -2333,40 +2361,6 @@ ROM_START( wwallyja )
 	ROM_LOAD( "mpr-14722.c4",   0x190000, 0x80000, CRC(1bd081f8) SHA1(e5b0b5d8334486f813d7c430bb7fce3f69605a21) )
 ROM_END
 
-/**************************************************************************************************************************
-    Hammer Away, Sega System 18
-    CPU: M68000
-    ROM Board: 837-7525
-*/
-
-ROM_START( hamaway )
-	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_BYTE( "4.bin",  0x000000, 0x40000, CRC(cc0981e1) SHA1(63528bd36f27e62fdf40715101e6d05b73e48f16) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
-	ROM_LOAD16_BYTE( "6.bin",  0x000001, 0x40000, CRC(e8599ee6) SHA1(3e32b025403aecbaecfcdd0325e4acd676e99c4e) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
-	ROM_LOAD16_BYTE( "5.bin",  0x080000, 0x40000, CRC(fdb247fd) SHA1(ee9db799fb5de27f81904f8ef792203415b6d4a6) )
-	ROM_LOAD16_BYTE( "7.bin",  0x080001, 0x40000, CRC(63711470) SHA1(6c4be3a0cf0f897c34ef0b3bf549f52b185bb915) )
-
-	ROM_REGION( 0x180000, "gfx1", 0 ) // tiles
-	ROM_LOAD( "c10.bin",  0x000000, 0x40000, CRC(c55cb5cf) SHA1(396179632b29ac5f8b7f8f3c91d7cf834e548bdf) )
-	ROM_LOAD( "1.bin",    0x040000, 0x40000, CRC(33be003f) SHA1(134fa6b3347c306d9e30882dfcf24632b49f85ea) )
-	ROM_LOAD( "c11.bin",  0x080000, 0x40000, CRC(37787915) SHA1(c8d251be6c41de3aed2da6da70aa87071b70b1f6) )
-	ROM_LOAD( "2.bin",    0x0c0000, 0x40000, CRC(60ca5c9f) SHA1(6358ea00125a5e3f55acf73aeb9c36b1db6e711e) )
-	ROM_LOAD( "c12.bin",  0x100000, 0x40000, CRC(f12f1cf3) SHA1(45e883029c58e617a2a20ac1ab5c5f598c95f4bd) )
-	ROM_LOAD( "3.bin",    0x140000, 0x40000, CRC(520aa7ae) SHA1(9584206aedd8be5ce9dca0ed370f8fe77aabaf76) )
-
-	ROM_REGION16_BE( 0x200000, "sprites", ROMREGION_ERASEFF ) // sprites
-	ROM_LOAD16_BYTE( "c17.bin", 0x000001, 0x40000, CRC(aa28d7aa) SHA1(3dd5d95b05e408c023f9bd77753c37080714239d) )
-	ROM_LOAD16_BYTE( "10.bin",  0x000000, 0x40000, CRC(c4c95161) SHA1(2e313a4ca9506f53a2062b4a8e5ba7b381ba93ae) )
-	ROM_LOAD16_BYTE( "c18.bin", 0x080001, 0x40000, CRC(0f8fe8bb) SHA1(e6f68442b8d4def29b106458496a47344f70d511) )
-	ROM_LOAD16_BYTE( "11.bin",  0x080000, 0x40000, CRC(2b5eacbc) SHA1(ba3690501588b9c88a31022b44bc3c82b44ae26b) )
-	ROM_LOAD16_BYTE( "c19.bin", 0x100001, 0x40000, CRC(3c616caa) SHA1(d48a6239b7a52ac13971f7513a65a17af492bfdf) ) // 11xxxxxxxxxxxxxxxx = 0xFF
- 	ROM_LOAD16_BYTE( "12.bin",  0x100000, 0x40000, CRC(c7bbd579) SHA1(ab87bfdad66ea241cb23c9bbfea05f5a1574d6c9) ) // 1ST AND 2ND HALF IDENTICAL (but ok, because pairing ROM has no data in the 2nd half anyway)
-
-	ROM_REGION( 0x210000, "soundcpu", ROMREGION_ERASEFF ) // sound CPU
-	ROM_LOAD( "c16.bin", 0x010000, 0x40000, CRC(913cc18c) SHA1(4bf4ec14937586c3ae77fcad57dcb21f6433ef81) )
-	ROM_LOAD( "c15.bin", 0x090000, 0x40000, CRC(b53694fc) SHA1(0e42be2730abce1b52ea94a9fe61cbd1c9a0ccae) )
-ROM_END
-
 
 /*************************************
  *
@@ -2423,38 +2417,37 @@ DRIVER_INIT_MEMBER(segas18_state,wwally)
 }
 
 
-
 /*************************************
  *
  *  Game driver(s)
  *
  *************************************/
 
-//    YEAR, NAME,      PARENT,   MACHINE,              INPUT,    INIT,                       MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1990, astorm,    0,        system18_fd1094,      astorm2p, segas18_state,generic_5874, ROT0,   "Sega", "Alien Storm (World, 2 Players, FD1094 317-0154)", 0 )
-GAME( 1990, astorm3,   astorm,   system18_fd1094,      astorm,   segas18_state,generic_5874, ROT0,   "Sega", "Alien Storm (World, 3 Players, FD1094 317-0148)", 0 )
-GAME( 1990, astormu,   astorm,   system18_fd1094,      astorm,   segas18_state,generic_5874, ROT0,   "Sega", "Alien Storm (US, 3 Players, FD1094 317-0147)", 0 )
-GAME( 1990, astormj,   astorm,   system18_fd1094,      astorm2p, segas18_state,generic_5874, ROT0,   "Sega", "Alien Storm (Japan, 2 Players, FD1094 317-0146)", 0 )
-GAME( 1989, bloxeed,   0,        system18_fd1094,      bloxeed,  segas18_state,generic_5874, ROT0,   "Sega", "Bloxeed (Japan, FD1094 317-0139)", 0 )
-GAME( 1991, cltchitr,  0,        system18_fd1094,      cltchitr, segas18_state,generic_5987, ROT0,   "Sega", "Clutch Hitter (US, FD1094 317-0176)", 0 )
-GAME( 1991, cltchitrj, cltchitr, system18_fd1094,      cltchitr, segas18_state,generic_5987, ROT0,   "Sega", "Clutch Hitter (Japan, FD1094 317-0175)", 0 )
-GAME( 1992, desertbr,  0,        system18_fd1094,      desertbr, segas18_state,generic_5987, ROT270, "Sega", "Desert Breaker (World, FD1094 317-0196)", 0 )
-GAME( 1992, desertbrj, desertbr, system18_fd1094,      desertbr, segas18_state,generic_5987, ROT270, "Sega", "Desert Breaker (Japan, FD1094 317-0194)", 0 )
-GAME( 1991, ddcrew,    0,        system18_fd1094,      ddcrew3p, segas18_state,ddcrew,       ROT0,   "Sega", "D. D. Crew (World, 3 Players, FD1094 317-0190)", 0 )
-GAME( 1991, ddcrewu,   ddcrew,   system18_fd1094,      ddcrew,   segas18_state,ddcrew,       ROT0,   "Sega", "D. D. Crew (US, 4 Players, FD1094 317-0186)", 0 )
-GAME( 1991, ddcrew2,   ddcrew,   system18_fd1094,      ddcrew2p, segas18_state,ddcrew,       ROT0,   "Sega", "D. D. Crew (World, 2 Players, FD1094 317-0184)", 0 )
-GAME( 1991, ddcrew1,   ddcrew,   system18_fd1094,      ddcrew,   segas18_state,ddcrew,       ROT0,   "Sega", "D. D. Crew (World, 4 Players, FD1094 317-0187)", 0 )
-GAME( 1991, ddcrewj,   ddcrew,   system18_fd1094,      ddcrew,   segas18_state,ddcrew,       ROT0,   "Sega", "D. D. Crew (Japan, 4 Players, FD1094 317-0185)", 0 )
-GAME( 1991, ddcrewj2,  ddcrew,   system18_fd1094,      ddcrew2p, segas18_state,ddcrew,       ROT0,   "Sega", "D. D. Crew (Japan, 2 Players, FD1094 317-0182)", 0 )
-GAME( 1990, lghost,    0,        system18_fd1094,      lghost,   segas18_state,lghost,       ROT0,   "Sega", "Laser Ghost (World, FD1094 317-0166)", 0 )
-GAME( 1990, lghostu,   lghost,   system18_fd1094,      lghost,   segas18_state,lghost,       ROT0,   "Sega", "Laser Ghost (US, FD1094 317-0165)", 0 )
-GAME( 1990, mwalk,     0,        system18_fd1094_i8751,mwalk,    segas18_state,generic_5874, ROT0,   "Sega", "Michael Jackson's Moonwalker (World, FD1094/8751 317-0159)", 0 )
-GAME( 1990, mwalku,    mwalk,    system18_fd1094_i8751,mwalka,   segas18_state,generic_5874, ROT0,   "Sega", "Michael Jackson's Moonwalker (US, FD1094/8751 317-0158)", 0 )
-GAME( 1990, mwalkj,    mwalk,    system18_fd1094_i8751,mwalk,    segas18_state,generic_5874, ROT0,   "Sega", "Michael Jackson's Moonwalker (Japan, FD1094/8751 317-0157)", 0 )
-GAME( 1989, pontoon,   0,        system18_fd1094,      shdancer, segas18_state,generic_5874, ROT0,   "Sega", "Pontoon (FD1094 317-0153)", GAME_NOT_WORKING ) // satellite/networked gambling game?
-GAME( 1989, shdancer,  0,        system18,             shdancer, segas18_state,generic_shad, ROT0,   "Sega", "Shadow Dancer (World)", 0 )
-GAME( 1989, shdancerj, shdancer, system18,             shdancer, segas18_state,generic_shad, ROT0,   "Sega", "Shadow Dancer (Japan)", 0 )
-GAME( 1989, shdancer1, shdancer, system18,             shdancer, segas18_state,generic_shad, ROT0,   "Sega", "Shadow Dancer (US)", 0 )
-GAME( 1992, wwallyj,   0,        system18_fd1094,      wwally,   segas18_state,wwally,       ROT0,   "Sega", "Wally wo Sagase! (rev B, Japan, FD1094 317-0197B)", 0) // the roms do contain an english logo so maybe there is a world / us set too
-GAME( 1992, wwallyja,  wwallyj,  system18_fd1094,      wwally,   segas18_state,wwally,       ROT0,   "Sega", "Wally wo Sagase! (rev A, Japan, FD1094 317-0197A)", 0 )
-GAME( 1991, hamaway,   0,        system18,             hamaway,  segas18_state,hamaway,      ROT90,  "Sega / Santos", "Hammer Away (prototype)", 0 )
+//    YEAR, NAME,      PARENT,   MACHINE,              INPUT,                   INIT,         MONITOR, COMPANY,        FULLNAME,                                        FLAGS
+GAME( 1990, astorm,    0,        system18_fd1094,      astorm2p, segas18_state, generic_5874, ROT0,   "Sega",          "Alien Storm (World, 2 Players, FD1094 317-0154)", 0 )
+GAME( 1990, astorm3,   astorm,   system18_fd1094,      astorm,   segas18_state, generic_5874, ROT0,   "Sega",          "Alien Storm (World, 3 Players, FD1094 317-0148)", 0 )
+GAME( 1990, astormu,   astorm,   system18_fd1094,      astorm,   segas18_state, generic_5874, ROT0,   "Sega",          "Alien Storm (US, 3 Players, FD1094 317-0147)", 0 )
+GAME( 1990, astormj,   astorm,   system18_fd1094,      astorm2p, segas18_state, generic_5874, ROT0,   "Sega",          "Alien Storm (Japan, 2 Players, FD1094 317-0146)", 0 )
+GAME( 1989, bloxeed,   0,        system18_fd1094,      bloxeed,  segas18_state, generic_5874, ROT0,   "Sega",          "Bloxeed (Japan, FD1094 317-0139)", 0 )
+GAME( 1991, cltchitr,  0,        system18_fd1094,      cltchitr, segas18_state, generic_5987, ROT0,   "Sega",          "Clutch Hitter (US, FD1094 317-0176)", 0 )
+GAME( 1991, cltchitrj, cltchitr, system18_fd1094,      cltchitr, segas18_state, generic_5987, ROT0,   "Sega",          "Clutch Hitter (Japan, FD1094 317-0175)", 0 )
+GAME( 1992, desertbr,  0,        system18_fd1094,      desertbr, segas18_state, generic_5987, ROT270, "Sega",          "Desert Breaker (World, FD1094 317-0196)", 0 )
+GAME( 1992, desertbrj, desertbr, system18_fd1094,      desertbr, segas18_state, generic_5987, ROT270, "Sega",          "Desert Breaker (Japan, FD1094 317-0194)", 0 )
+GAME( 1991, ddcrew,    0,        system18_fd1094,      ddcrew3p, segas18_state, ddcrew,       ROT0,   "Sega",          "D. D. Crew (World, 3 Players, FD1094 317-0190)", 0 )
+GAME( 1991, ddcrewu,   ddcrew,   system18_fd1094,      ddcrew,   segas18_state, ddcrew,       ROT0,   "Sega",          "D. D. Crew (US, 4 Players, FD1094 317-0186)", 0 )
+GAME( 1991, ddcrew2,   ddcrew,   system18_fd1094,      ddcrew2p, segas18_state, ddcrew,       ROT0,   "Sega",          "D. D. Crew (World, 2 Players, FD1094 317-0184)", 0 )
+GAME( 1991, ddcrew1,   ddcrew,   system18_fd1094,      ddcrew,   segas18_state, ddcrew,       ROT0,   "Sega",          "D. D. Crew (World, 4 Players, FD1094 317-0187)", 0 )
+GAME( 1991, ddcrewj,   ddcrew,   system18_fd1094,      ddcrew,   segas18_state, ddcrew,       ROT0,   "Sega",          "D. D. Crew (Japan, 4 Players, FD1094 317-0185)", 0 )
+GAME( 1991, ddcrewj2,  ddcrew,   system18_fd1094,      ddcrew2p, segas18_state, ddcrew,       ROT0,   "Sega",          "D. D. Crew (Japan, 2 Players, FD1094 317-0182)", 0 )
+GAME( 1991, hamaway,   0,        system18,             hamaway,  segas18_state, hamaway,      ROT90,  "Sega / Santos", "Hammer Away (Japan, prototype)", 0 )
+GAME( 1990, lghost,    0,        system18_fd1094,      lghost,   segas18_state, lghost,       ROT0,   "Sega",          "Laser Ghost (World, FD1094 317-0166)", 0 )
+GAME( 1990, lghostu,   lghost,   system18_fd1094,      lghost,   segas18_state, lghost,       ROT0,   "Sega",          "Laser Ghost (US, FD1094 317-0165)", 0 )
+GAME( 1990, mwalk,     0,        system18_fd1094_i8751,mwalk,    segas18_state, generic_5874, ROT0,   "Sega",          "Michael Jackson's Moonwalker (World, FD1094/8751 317-0159)", 0 )
+GAME( 1990, mwalku,    mwalk,    system18_fd1094_i8751,mwalka,   segas18_state, generic_5874, ROT0,   "Sega",          "Michael Jackson's Moonwalker (US, FD1094/8751 317-0158)", 0 )
+GAME( 1990, mwalkj,    mwalk,    system18_fd1094_i8751,mwalk,    segas18_state, generic_5874, ROT0,   "Sega",          "Michael Jackson's Moonwalker (Japan, FD1094/8751 317-0157)", 0 )
+GAME( 1989, pontoon,   0,        system18_fd1094,      shdancer, segas18_state, generic_5874, ROT0,   "Sega",          "Pontoon (FD1094 317-0153)", GAME_NOT_WORKING ) // satellite/networked gambling game?
+GAME( 1989, shdancer,  0,        system18,             shdancer, segas18_state, generic_shad, ROT0,   "Sega",          "Shadow Dancer (World)", 0 )
+GAME( 1989, shdancerj, shdancer, system18,             shdancer, segas18_state, generic_shad, ROT0,   "Sega",          "Shadow Dancer (Japan)", 0 )
+GAME( 1989, shdancer1, shdancer, system18,             shdancer, segas18_state, generic_shad, ROT0,   "Sega",          "Shadow Dancer (US)", 0 )
+GAME( 1992, wwallyj,   0,        system18_fd1094,      wwally,   segas18_state, wwally,       ROT0,   "Sega",          "Wally wo Sagase! (rev B, Japan, FD1094 317-0197B)", 0) // the roms do contain an english logo so maybe there is a world / us set too
+GAME( 1992, wwallyja,  wwallyj,  system18_fd1094,      wwally,   segas18_state, wwally,       ROT0,   "Sega",          "Wally wo Sagase! (rev A, Japan, FD1094 317-0197A)", 0 )
