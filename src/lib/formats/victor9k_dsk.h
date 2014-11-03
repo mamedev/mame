@@ -38,8 +38,8 @@ protected:
 	static const format formats[];
 
 	static const UINT32 cell_size[];
-	static const int sectors_per_track[];
-	static const int speed_zone[];
+	static const int sectors_per_track[2][80];
+	static const int speed_zone[2][80];
 };
 
 extern const floppy_format_type FLOPPY_VICTOR_9000_FORMAT;

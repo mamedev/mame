@@ -17,7 +17,6 @@
 	- spindle speed
 	- stepper
     - read PLL
-    - TACH0/1
     - write logic
 
 */
@@ -109,6 +108,11 @@ void victor_9000_fdc_t::unload0_cb(floppy_image_device *device)
 	m_via4->write_ca1(m_ds0);
 }
 
+void victor_9000_fdc_t::index0_cb(floppy_image_device *device, int state)
+{
+	m_tach0 = state;
+}
+
 void victor_9000_fdc_t::ready1_cb(floppy_image_device *device, int state)
 {
 	m_rdy1 = state;
@@ -132,8 +136,14 @@ void victor_9000_fdc_t::unload1_cb(floppy_image_device *device)
 	m_via4->write_cb1(m_ds1);
 }
 
+void victor_9000_fdc_t::index1_cb(floppy_image_device *device, int state)
+{
+	m_tach1 = state;
+}
+
 static SLOT_INTERFACE_START( victor9k_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
+	SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD ) // Tandon TM100-3 with custom electronics
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD ) // Tandon TM100-4 with custom electronics
 SLOT_INTERFACE_END
 
 FLOPPY_FORMATS_MEMBER( victor_9000_fdc_t::floppy_formats )
@@ -246,9 +256,7 @@ victor_9000_fdc_t::victor_9000_fdc_t(const machine_config &mconfig, const char *
 void victor_9000_fdc_t::device_start()
 {
 	// allocate timer
-	t_gen = timer_alloc(TM_GEN);
-	t_tach0 = timer_alloc(TM_TACH0);
-	t_tach1 = timer_alloc(TM_TACH1);
+	t_gen = timer_alloc(0);
 
 	// state saving
 	save_item(NAME(m_da));
@@ -302,9 +310,11 @@ void victor_9000_fdc_t::device_reset()
 	m_floppy0->setup_ready_cb(floppy_image_device::ready_cb(FUNC(victor_9000_fdc_t::ready0_cb), this));
 	m_floppy0->setup_load_cb(floppy_image_device::load_cb(FUNC(victor_9000_fdc_t::load0_cb), this));
 	m_floppy0->setup_unload_cb(floppy_image_device::unload_cb(FUNC(victor_9000_fdc_t::unload0_cb), this));
+	m_floppy0->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(victor_9000_fdc_t::index0_cb), this));
 	m_floppy1->setup_ready_cb(floppy_image_device::ready_cb(FUNC(victor_9000_fdc_t::ready1_cb), this));
 	m_floppy1->setup_load_cb(floppy_image_device::load_cb(FUNC(victor_9000_fdc_t::load1_cb), this));
 	m_floppy1->setup_unload_cb(floppy_image_device::unload_cb(FUNC(victor_9000_fdc_t::unload1_cb), this));
+	m_floppy1->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(victor_9000_fdc_t::index1_cb), this));
 }
 
 
@@ -314,20 +324,8 @@ void victor_9000_fdc_t::device_reset()
 
 void victor_9000_fdc_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	switch (id)
-	{
-	case TM_GEN:
-		live_sync();
-		live_run();
-
-	case TM_TACH0:
-		// TODO
-		break;
-
-	case TM_TACH1:
-		// TODO
-		break;
-	}
+	live_sync();
+	live_run();
 }
 
 
@@ -482,12 +480,10 @@ void victor_9000_fdc_t::update_spindle_motor()
 	if (m_sel0) m_da0 = m_da;
 	m_floppy0->mon_w(m_mtr0);
 	m_floppy0->set_rpm(300); // TODO
-	t_tach0->adjust(attotime::never); // TODO
 
 	if (m_sel1) m_da1 = m_da;
 	m_floppy1->mon_w(m_mtr1);
 	m_floppy1->set_rpm(300); // TODO
-	t_tach1->adjust(attotime::never); // TODO
 }
 
 

@@ -99,13 +99,6 @@ protected:
 private:
 	enum
 	{
-		TM_GEN,
-		TM_TACH0,
-		TM_TACH1
-	};
-
-	enum
-	{
 		LED_A = 0,
 		LED_B
 	};
@@ -167,9 +160,11 @@ private:
 	void ready0_cb(floppy_image_device *, int device);
 	int load0_cb(floppy_image_device *device);
 	void unload0_cb(floppy_image_device *device);
+	void index0_cb(floppy_image_device *device, int state);
 	void ready1_cb(floppy_image_device *, int device);
 	int load1_cb(floppy_image_device *device);
 	void unload1_cb(floppy_image_device *device);
+	void index1_cb(floppy_image_device *device, int state);
 
 	/* floppy state */
 	UINT8 m_da;
@@ -207,7 +202,7 @@ private:
 	attotime m_period;
 
 	live_info cur_live, checkpoint_live;
-	emu_timer *t_gen, *t_tach0, *t_tach1;
+	emu_timer *t_gen;
 
 	floppy_image_device* get_floppy();
 	void live_start();
