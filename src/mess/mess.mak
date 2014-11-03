@@ -901,6 +901,7 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_MACHINE)/naomim2.o   \
 	$(MAME_MACHINE)/naomim4.o   \
 	$(MAME_MACHINE)/naomirom.o  \
+	$(MAME_MACHINE)/315-5881_crypt.o  \
 	$(MAME_VIDEO)/powervr2.o    \
 	$(MAME_DRIVERS)/neogeo.o    \
 	$(MAME_MACHINE)/neoboot.o   \
