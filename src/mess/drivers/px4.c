@@ -52,6 +52,7 @@ public:
 	device_serial_interface(mconfig, *this),
 	m_z80(*this, "maincpu"),
 	m_ram(*this, RAM_TAG),
+	m_nvram(*this, "nvram"),
 	m_centronics(*this, "centronics"),
 	m_ext_cas(*this, "extcas"),
 	m_ext_cas_timer(*this, "extcas_timer"),
@@ -182,6 +183,7 @@ private:
 	// internal devices
 	required_device<cpu_device> m_z80;
 	required_device<ram_device> m_ram;
+	required_device<nvram_device> m_nvram;
 	required_device<centronics_device> m_centronics;
 	required_device<cassette_image_device> m_ext_cas;
 	required_device<timer_device> m_ext_cas_timer;
@@ -1159,6 +1161,8 @@ void px4_state::machine_start()
 	astring region_tag;
 	m_caps1_rom = memregion(region_tag.cpy(m_caps1->tag()).cat(GENERIC_ROM_REGION_TAG));
 	m_caps2_rom = memregion(region_tag.cpy(m_caps2->tag()).cat(GENERIC_ROM_REGION_TAG));
+
+	m_nvram->set_base(m_ram->pointer(), 0x10000);
 }
 
 void px4_state::machine_reset()
@@ -1427,6 +1431,7 @@ static MACHINE_CONFIG_START( px4, px4_state )
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64k")
+	MCFG_NVRAM_ADD_NO_FILL("nvram")
 
 	// centronics printer
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
