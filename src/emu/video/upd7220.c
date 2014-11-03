@@ -371,17 +371,20 @@ inline void upd7220_device::update_blank_timer(int state)
 
 inline void upd7220_device::recompute_parameters()
 {
-	int horiz_mult;
+	int horiz_mult = 16, vert_mult = 1;
 	/* TODO: assume that the pitch also controls number of horizontal pixels in a single cell */
 	// horiz_mult = 4 if both mixed and interlace?
-	if(((m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_MIXED) ||
-				((m_mode & UPD7220_MODE_INTERLACE_MASK) == UPD7220_MODE_INTERLACE_ON))
+	if((m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_MIXED)
 		horiz_mult = 8;
-	else
-		horiz_mult = 16;
+	else if((m_mode & UPD7220_MODE_INTERLACE_MASK) == UPD7220_MODE_INTERLACE_ON)
+	{
+		// in interlaced mode every line contains both fields
+		horiz_mult = 8;
+		vert_mult = 2;
+	}
 
 	int horiz_pix_total = (m_hs + m_hbp + m_hfp + m_aw) * horiz_mult;
-	int vert_pix_total = m_vs + m_vbp + m_al + m_vfp;
+	int vert_pix_total = (m_vs + m_vbp + m_al + m_vfp) * vert_mult;
 
 	//printf("%d %d %d %d\n",m_hs,m_hbp,m_aw,m_hfp);
 	//printf("%d %d\n",m_aw * 8,m_pitch * 8);
@@ -396,7 +399,7 @@ inline void upd7220_device::recompute_parameters()
 	visarea.min_x = 0; //(m_hs + m_hbp) * 8;
 	visarea.min_y = 0; //m_vs + m_vbp;
 	visarea.max_x = m_aw * horiz_mult - 1;//horiz_pix_total - (m_hfp * 8) - 1;
-	visarea.max_y = m_al - 1;//vert_pix_total - m_vfp - 1;
+	visarea.max_y = m_al * vert_mult - 1;//vert_pix_total - m_vfp - 1;
 
 	LOG(("uPD7220 '%s' Screen: %u x %u @ %f Hz\n", tag(), horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh)));
 	LOG(("Visible Area: (%u, %u) - (%u, %u)\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y));
@@ -798,31 +801,47 @@ void upd7220_device::draw_pixel(int x, int y, int xi, UINT16 tile_data)
 
 void upd7220_device::draw_line(int x, int y)
 {
-	int line_size,i;
-	const int line_x_dir[8] = { 0, 1, 1, 0, 0,-1,-1, 0};
-	const int line_y_dir[8] = { 1, 0, 0,-1,-1, 0, 0, 1};
-	const int line_x_step[8] = { 1, 0, 0, 1,-1, 0, 0,-1 };
-	const int line_y_step[8] = { 0, 1,-1, 0, 0,-1, 1, 0 };
+	int xi, yi;
+	int d = (m_figs.m_d & 0x2000) ? (INT16)(m_figs.m_d | 0xe000) : m_figs.m_d;
+	int d2 = (m_figs.m_d2 & 0x2000) ? (INT16)(m_figs.m_d2 | 0xe000) : m_figs.m_d2;
 	UINT16 pattern = (m_ra[8]) | (m_ra[9]<<8);
-	int line_step = 0;
+	const int dot_dir[4] = {1, -1, -1, 1};
 
 	LOG(("uPD7220 line check: %d %d %02x %08x %d %d %d\n",x,y,m_figs.m_dir,m_ead,m_figs.m_d1,m_figs.m_dc,m_bitmap_mod));
 
-	line_size = m_figs.m_dc;
-
-	for(i = 0;i<line_size;i++)
+	for(yi = xi = 0; yi <= m_figs.m_dc; yi++)
 	{
-		line_step = (m_figs.m_d1 * i);
-		line_step/= m_figs.m_dc;
-		++line_step >>= 1;
-		draw_pixel(x + (line_step*line_x_step[m_figs.m_dir]),y + (line_step*line_y_step[m_figs.m_dir]),i,pattern);
-		x += line_x_dir[m_figs.m_dir];
-		y += line_y_dir[m_figs.m_dir];
+		switch(m_figs.m_dir & 3)
+		{
+			case 1:
+			case 2:
+				draw_pixel(yi * dot_dir[((m_figs.m_dir >> 1) + 3) & 3] + x, xi * dot_dir[m_figs.m_dir >> 1] + y, yi, pattern);
+				break;
+			default:
+				draw_pixel(xi * dot_dir[((m_figs.m_dir >> 1) + 3) & 3] + x, yi * dot_dir[m_figs.m_dir >> 1] + y, yi, pattern);
+				break;
+		}
+		if(d > 0)
+		{
+			xi++;
+			d += d2;
+		}
+		else
+			d += m_figs.m_d1;
 	}
 
-	/* TODO: check me*/
-	x += (line_step*line_x_step[m_figs.m_dir]);
-	y += (line_step*line_y_step[m_figs.m_dir]);
+	switch(m_figs.m_dir & 3)
+	{
+		case 1:
+		case 2:
+			x += yi * dot_dir[((m_figs.m_dir >> 1) + 3) & 3];
+			y += xi * dot_dir[m_figs.m_dir >> 1];
+			break;
+		default:
+			x += xi * dot_dir[((m_figs.m_dir >> 1) + 3) & 3];
+			y += yi * dot_dir[m_figs.m_dir >> 1];
+			break;
+	}
 
 	m_ead = (x >> 4) + (y * (m_pitch >> m_figs.m_gd));
 	m_dad = x & 0x0f;
@@ -854,7 +873,7 @@ void upd7220_device::draw_arc(int x, int y)
 
 	LOG(("uPD7220 arc check: %d %d %02x %08x %d %d %d\n",x,y,m_figs.m_dir,m_ead,m_figs.m_dm,m_figs.m_dc,m_figs.m_d));
 
-	for(int i = 0; i < m_figs.m_dc; i++)
+	for(int i = 0; i <= m_figs.m_dc; i++)
 	{
 		if(i >= m_figs.m_dm)
 		{
@@ -882,10 +901,10 @@ void upd7220_device::draw_arc(int x, int y)
 	{
 		case 1:
 		case 2:
-			x += m_figs.m_dc * dot_dir[((m_figs.m_dir >> 1) + 3) & 3];
+			x += (m_figs.m_dc + 1) * dot_dir[((m_figs.m_dir >> 1) + 3) & 3];
 			break;
 		default:
-			y += m_figs.m_dc * dot_dir[m_figs.m_dir >> 1];
+			y += (m_figs.m_dc + 1) * dot_dir[m_figs.m_dir >> 1];
 			break;
 	}
 
@@ -1583,14 +1602,15 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 
 			if(area >= 3) // TODO: most likely to be correct, Quarth (PC-98xx) definitely draws with area 2. We might see an area 3 someday ...
 				break;
-
+			if(((m_mode & UPD7220_MODE_INTERLACE_MASK) == UPD7220_MODE_INTERLACE_ON))
+				len <<= 1;
 			for (y = 0; y < len; y++)
 			{
 				/* TODO: again correct?
 				         Quarth (PC-98xx) doesn't seem to use pitch here and it definitely wants bsy to be /2 to make scrolling to work.
 				         Xevious (PC-98xx) wants the pitch to be fixed at 80, and wants bsy to be /1
 				         Dragon Buster (PC-98xx) contradicts with Xevious with regards of the pitch tho ... */
-				addr = ((sad << 1) & 0x3ffff) + (y * (m_pitch << (im ? 0 : 1)));
+				addr = ((sad << 1) & 0x3ffff) + (y * (m_aw << (im ? 0 : 1)));
 
 				if (!m_display_cb.isnull())
 					draw_graphics_line(bitmap, addr, y + (bsy / (mixed ? 1 : m_lr)), wd);
