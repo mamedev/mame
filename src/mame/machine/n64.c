@@ -267,10 +267,6 @@ void n64_periphs::device_reset()
 		pif_ram[0x27] = 0x3f;
 		cic_type=6;
 	}
-	else
-	{
-		//printf("Unknown BootCode Checksum %08X%08X\n", (UINT32)(boot_checksum>>32),(UINT32)(boot_checksum));
-	}
 }
 
 // Memory Interface (MI)
@@ -312,13 +308,11 @@ READ32_MEMBER( n64_periphs::mi_reg_r )
 			break;
 	}
 
-	//printf("mi_reg_r %08x = %08x\n", offset * 4, ret); fflush(stdout);
 	return ret;
 }
 
 WRITE32_MEMBER( n64_periphs::mi_reg_w )
 {
-	//printf("mi_reg_w %08x %08x %08x\n", offset * 4, data, mem_mask); fflush(stdout);
 	switch (offset)
 	{
 		case 0x00/4:        // MI_INIT_MODE_REG
@@ -409,12 +403,10 @@ void n64_periphs::check_interrupts()
 {
 	if (mi_intr_mask & mi_interrupt)
 	{
-		//printf("Asserting IRQ, %02x : %02x\n", mi_intr_mask, mi_interrupt); fflush(stdout);
 		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	}
 	else
 	{
-		//printf("Deasserting IRQ, %02x : %02x\n", mi_intr_mask, mi_interrupt); fflush(stdout);
 		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 }
@@ -466,10 +458,9 @@ WRITE32_MEMBER( n64_periphs::is64_w )
 		case 0x0014/4:
 			for(i = 0x20; i < (0x20 + data); i++)
 			{
-				//printf( "%c", is64_buffer[i] );
 				if(is64_buffer[i] == 0x0a)
 				{
-					//printf( "%c", 0x0d );
+					printf( "%c", 0x0d );
 				}
 				is64_buffer[i] = 0;
 			}
@@ -511,7 +502,6 @@ WRITE32_MEMBER( n64_periphs::open_w )
 
 READ32_MEMBER( n64_periphs::rdram_reg_r )
 {
-	//printf("rdram_reg_r %08x = %08x\n", offset * 4, rdram_regs[offset]); fflush(stdout);
 	if(offset > 0x24/4)
 	{
 		logerror("rdram_reg_r: %08X, %08X at %08X\n", offset, mem_mask, maincpu->safe_pc());
@@ -522,7 +512,6 @@ READ32_MEMBER( n64_periphs::rdram_reg_r )
 
 WRITE32_MEMBER( n64_periphs::rdram_reg_w )
 {
-	//printf("rdram_reg_w %08x %08x %08x\n", offset * 4, data, mem_mask); fflush(stdout);
 	if(offset > 0x24/4)
 	{
 		logerror("rdram_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, maincpu->safe_pc());
@@ -542,7 +531,6 @@ void n64_periphs::sp_dma(int direction)
 		length = (length + 7) & ~7;
 	}
 
-	//printf("Length %08x Skip %08x Count %08x\n", length, sp_dma_skip, sp_dma_count); fflush(stdout);
 	if (sp_mem_addr & 0x3)
 	{
 		sp_mem_addr = sp_mem_addr & ~3;
@@ -554,8 +542,6 @@ void n64_periphs::sp_dma(int direction)
 
 	if ((sp_mem_addr & 0xfff) + (length) > 0x1000)
 	{
-		//printf("sp_dma: dma out of memory area: %08X, %08X, %08X\n", sp_mem_addr, sp_dram_addr, length);
-		//fatalerror("sp_dma: dma out of memory area: %08X, %08X\n", sp_mem_addr, length);
 		length = 0x1000 - (sp_mem_addr & 0xfff);
 	}
 
@@ -602,7 +588,6 @@ void n64_periphs::sp_dma(int direction)
 
 WRITE32_MEMBER(n64_periphs::sp_set_status)
 {
-	//printf("sp_set_status: %08x\n", data);
 	if (data & 0x1)
 	{
 		rspcpu->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -638,8 +623,6 @@ READ32_MEMBER(n64_periphs::sp_reg_r)
 			break;
 
 		case 0x10/4:        // SP_STATUS_REG
-			//machine().scheduler().synchronize();
-			//machine().scheduler().boost_interleave(attotime::from_msec(1), attotime::from_msec(m));
 			ret = rspcpu->state().state_int(RSP_SR);
 			break;
 
@@ -652,7 +635,6 @@ READ32_MEMBER(n64_periphs::sp_reg_r)
 			break;
 
 		case 0x1c/4:        // SP_SEMAPHORE_REG
-			//machine().scheduler().boost_interleave(attotime::from_usec(1), attotime::from_usec(1));
 			machine().device("maincpu")->execute().yield();
 			if( sp_semaphore )
 			{
@@ -660,7 +642,6 @@ READ32_MEMBER(n64_periphs::sp_reg_r)
 			}
 			else
 			{
-				//printf("Semaphore is now acquired, returning 0\n");
 				sp_semaphore = 1;
 				ret = 0;
 			}
@@ -718,15 +699,12 @@ READ32_MEMBER(n64_periphs::sp_reg_r)
 			break;
 	}
 
-	//printf("%08x sp_reg_r %08x = %08x\n", (UINT32)maincpu->state().state_int(MIPS3_PC), offset * 4, ret); fflush(stdout);
 	return ret;
 }
 
 
 WRITE32_MEMBER(n64_periphs::sp_reg_w )
 {
-	//printf("%08x sp_reg_w %08x %08x %08x\n", (UINT32)maincpu->state().state_int(MIPS3_PC), offset * 4, data, mem_mask); fflush(stdout);
-
 	if ((offset & 0x10000) == 0)
 	{
 		switch (offset & 0xffff)
@@ -758,43 +736,37 @@ WRITE32_MEMBER(n64_periphs::sp_reg_w )
 				UINT32 oldstatus = rspcpu->state().state_int(RSP_SR);
 				UINT32 newstatus = oldstatus;
 
-				// printf( "RSP_STATUS_REG Write; %08x\n", data );
 				if (data & 0x00000001)      // clear halt
 				{
 					rspcpu->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 					newstatus &= ~RSP_STATUS_HALT;
-					//printf("***SP HALT CLR***\n"); fflush(stdout);
+					machine().scheduler().abort_timeslice();
+					machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 				}
 				if (data & 0x00000002)      // set halt
 				{
 					rspcpu->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 					newstatus |= RSP_STATUS_HALT;
-					//printf("***SP HALT SET***\n"); fflush(stdout);
 				}
 				if (data & 0x00000004)
 				{
 					newstatus &= ~RSP_STATUS_BROKE;
-					//printf("***SP BROKE CLR***\n"); fflush(stdout);
 				}
 				if (data & 0x00000008)      // clear interrupt
 				{
-					//printf("***SP INT CLR***\n"); fflush(stdout);
 					clear_rcp_interrupt(SP_INTERRUPT);
 				}
 				if (data & 0x00000010)      // set interrupt
 				{
-					//printf("***SP INT SET***\n"); fflush(stdout);
 					signal_rcp_interrupt(SP_INTERRUPT);
 				}
 				if (data & 0x00000020)
 				{
 					newstatus &= ~RSP_STATUS_SSTEP;
-					//printf("***SP SSTEP CLR***\n"); fflush(stdout);
 				}
 				if (data & 0x00000040)
 				{
 					newstatus |= RSP_STATUS_SSTEP;  // set single step
-					//printf("***SP SSTEP SET***\n"); fflush(stdout);
 					if(!(oldstatus & (RSP_STATUS_BROKE | RSP_STATUS_HALT)))
 					{
 						rspcpu->state().set_state_int(RSP_STEPCNT, 1 );
@@ -804,100 +776,80 @@ WRITE32_MEMBER(n64_periphs::sp_reg_w )
 				if (data & 0x00000080)
 				{
 					newstatus &= ~RSP_STATUS_INTR_BREAK;    // clear interrupt on break
-					//printf("***SP INTRBRK CLR***\n"); fflush(stdout);
 				}
 				if (data & 0x00000100)
 				{
 					newstatus |= RSP_STATUS_INTR_BREAK;     // set interrupt on break
-					//printf("***SP INTRBRK SET***\n"); fflush(stdout);
 				}
 				if (data & 0x00000200)
 				{
 					newstatus &= ~RSP_STATUS_SIGNAL0;       // clear signal 0
-					//printf("***SP YIELD CLR***\n"); fflush(stdout);
 				}
 				if (data & 0x00000400)
 				{
 					newstatus |= RSP_STATUS_SIGNAL0;        // set signal 0
-					//printf("***SP YIELD SET***\n"); fflush(stdout);
 				}
 				if (data & 0x00000800)
 				{
 					newstatus &= ~RSP_STATUS_SIGNAL1;       // clear signal 1
-					//printf("***SP YIELDED CLR***\n"); fflush(stdout);
 				}
 				if (data & 0x00001000)
 				{
 					newstatus |= RSP_STATUS_SIGNAL1;        // set signal 1
-					//printf("***SP YIELDED SET***\n"); fflush(stdout);
 				}
 				if (data & 0x00002000)
 				{
 					newstatus &= ~RSP_STATUS_SIGNAL2 ;      // clear signal 2
-					//printf("***SP TASKDONE CLR***\n"); fflush(stdout);
 				}
 				if (data & 0x00004000)
 				{
 					newstatus |= RSP_STATUS_SIGNAL2;        // set signal 2
-					//printf("***SP TASKDONE SET***\n"); fflush(stdout);
 				}
 				if (data & 0x00008000)
 				{
 					newstatus &= ~RSP_STATUS_SIGNAL3;       // clear signal 3
-					//printf("***SP SIG3 CLR***\n"); fflush(stdout);
 				}
 				if (data & 0x00010000)
 				{
 					newstatus |= RSP_STATUS_SIGNAL3;        // set signal 3
-					//printf("***SP SIG3 SET***\n"); fflush(stdout);
 				}
 				if (data & 0x00020000)
 				{
 					newstatus &= ~RSP_STATUS_SIGNAL4;       // clear signal 4
-					//printf("***SP SIG4 CLR***\n"); fflush(stdout);
 				}
 				if (data & 0x00040000)
 				{
 					newstatus |= RSP_STATUS_SIGNAL4;        // set signal 4
-					//printf("***SP SIG4 SET***\n"); fflush(stdout);
 				}
 				if (data & 0x00080000)
 				{
 					newstatus &= ~RSP_STATUS_SIGNAL5;       // clear signal 5
-					//printf("***SP SIG5 CLR***\n"); fflush(stdout);
 				}
 				if (data & 0x00100000)
 				{
 					newstatus |= RSP_STATUS_SIGNAL5;        // set signal 5
-					//printf("***SP SIG5 SET***\n"); fflush(stdout);
 				}
 				if (data & 0x00200000)
 				{
 					newstatus &= ~RSP_STATUS_SIGNAL6;       // clear signal 6
-					//printf("***SP SIG6 CLR***\n"); fflush(stdout);
 				}
 				if (data & 0x00400000)
 				{
 					newstatus |= RSP_STATUS_SIGNAL6;        // set signal 6
-					//printf("***SP SIG6 SET***\n"); fflush(stdout);
 				}
 				if (data & 0x00800000)
 				{
 					newstatus &= ~RSP_STATUS_SIGNAL7;       // clear signal 7
-					//printf("***SP SIG7 CLR***\n"); fflush(stdout);
 				}
 				if (data & 0x01000000)
 				{
 					newstatus |= RSP_STATUS_SIGNAL7;        // set signal 7
-					//printf("***SP SIG7 SET***\n"); fflush(stdout);
 				}
 				rspcpu->state().set_state_int(RSP_SR, newstatus);
 				break;
 			}
 
 			case 0x1c/4:        // SP_SEMAPHORE_REG
-				//machine().scheduler().boost_interleave(attotime::from_usec(1), attotime::from_usec(1));
-				//printf("Semaphore is being released\n");
 				if(data == 0)
 				{
 					sp_semaphore = 0;
@@ -976,7 +928,6 @@ READ32_MEMBER( n64_periphs::dp_reg_r )
 			break;
 	}
 
-	//printf("%08x dp_reg_r %08x = %08x\n", (UINT32)space.machine().device("rsp")->state().state_int(RSP_PC), offset, ret); fflush(stdout);
 	return ret;
 }
 
@@ -984,7 +935,6 @@ WRITE32_MEMBER( n64_periphs::dp_reg_w )
 {
 	n64_state *state = space.machine().driver_data<n64_state>();
 
-	//printf("%08x dp_reg_w %08x %08x %08x\n", (UINT32)space.machine().device("rsp")->state().state_int(RSP_PC), offset, data, mem_mask); fflush(stdout);
 	switch (offset)
 	{
 		case 0x00/4:        // DP_START_REG
@@ -993,7 +943,6 @@ WRITE32_MEMBER( n64_periphs::dp_reg_w )
 			break;
 
 		case 0x04/4:        // DP_END_REG
-			//printf("dp_end_reg %08x\n", data);
 			state->m_rdp->SetEndReg(data);
 			g_profiler.start(PROFILER_USER1);
 			state->m_rdp->ProcessList();
@@ -1042,7 +991,7 @@ void n64_periphs::vi_recalculate_resolution()
 	int y_end = (vi_vstart & 0x000003ff) / 2;
 	int width = ((vi_xscale & 0x00000fff) * (x_end - x_start)) / 0x400;
 	int height = ((vi_yscale & 0x00000fff) * (y_end - y_start)) / 0x400;
-	//printf("%04x | %02x | ", vi_xscale >> 16, vi_burst & 0x000000ff);
+
 	rectangle visarea = m_screen->visible_area();
 	attoseconds_t period = m_screen->frame_period().attoseconds;
 
@@ -1070,7 +1019,6 @@ void n64_periphs::vi_recalculate_resolution()
 
 	visarea.max_x = width - 1;
 	visarea.max_y = height - 1;
-	//printf("Reconfig %d, %d (%d - %d), %08x, %08x, %08x, %08x, %08x\n", width, height, x_start, x_end, vi_width, vi_xscale, vi_hsync, vi_hstart, vi_burst);
 	m_screen->configure(width, 525, visarea, period);
 }
 
@@ -1140,13 +1088,11 @@ READ32_MEMBER( n64_periphs::vi_reg_r )
 			break;
 	}
 
-	//printf("vi_reg_r %08x = %08x\n", offset * 4, ret);
 	return ret;
 }
 
 WRITE32_MEMBER( n64_periphs::vi_reg_w )
 {
-	//printf("vi_reg_w %08x %08x %08x\n", offset * 4, data, mem_mask);
 	n64_state *state = machine().driver_data<n64_state>();
 
 	switch (offset)
@@ -1379,13 +1325,11 @@ READ32_MEMBER( n64_periphs::ai_reg_r )
 			break;
 	}
 
-	//printf("ai_reg_r %08x = %08x\n", offset * 4, ret);
 	return ret;
 }
 
 WRITE32_MEMBER( n64_periphs::ai_reg_w )
 {
-	//printf("ai_reg_w %08x %08x %08x\n", offset * 4, data, mem_mask);
 	switch (offset)
 	{
 		case 0x00/4:        // AI_DRAM_ADDR_REG
@@ -1408,7 +1352,6 @@ WRITE32_MEMBER( n64_periphs::ai_reg_w )
 		case 0x10/4:        // AI_DACRATE_REG
 			ai_dacrate = data & 0x3fff;
 			dmadac_set_frequency(&ai_dac[0], 2, (double)DACRATE_NTSC / (double)(ai_dacrate+1));
-			//printf( "frequency: %f\n", (double)DACRATE_NTSC / (double)(ai_dacrate+1) );
 			dmadac_enable(&ai_dac[0], 2, 1);
 			break;
 
@@ -1454,8 +1397,6 @@ void n64_periphs::pi_dma_tick()
 		cart16 = (UINT16*)machine().root_device().memregion("user2")->base();
 		cart_addr &= ((machine().root_device().memregion("user2")->bytes() >> 1) - 1);
 	}
-
-	//printf("%08x Cart, %08x Dram\n", cart_addr << 1, dram_addr << 1); fflush(stdout);
 
 	if(pi_dma_dir == 1)
 	{
@@ -1558,13 +1499,11 @@ READ32_MEMBER( n64_periphs::pi_reg_r )
 			break;
 	}
 
-	//printf("pi_reg_r %08x = %08x\n", offset * 4, ret);
 	return ret;
 }
 
 WRITE32_MEMBER( n64_periphs::pi_reg_w )
 {
-	//printf("pi_reg_w %08x %08x %08x\n", offset * 4, data, mem_mask); fflush(stdout);
 	switch (offset)
 	{
 		case 0x00/4:        // PI_DRAM_ADDR_REG
@@ -1586,7 +1525,6 @@ WRITE32_MEMBER( n64_periphs::pi_reg_w )
 			pi_status |= 1;
 
 			attotime dma_period = attotime::from_hz(93750000) * (int)((float)(pi_rd_len + 1) * 5.08f); // Measured as between 2.53 cycles per byte and 2.55 cycles per byte
-			//printf("want read dma in %d\n", (pi_rd_len + 1));
 			pi_dma_timer->adjust(dma_period);
 			//pi_dma_tick();
 			break;
@@ -1599,7 +1537,6 @@ WRITE32_MEMBER( n64_periphs::pi_reg_w )
 			pi_status |= 1;
 
 			attotime dma_period = attotime::from_hz(93750000) * (int)((float)(pi_wr_len + 1) * 5.08f); // Measured as between 2.53 cycles per byte and 2.55 cycles per byte
-			//printf("want write dma in %d\n", (pi_wr_len + 1));
 			pi_dma_timer->adjust(dma_period);
 
 			//pi_dma_tick();
@@ -1658,7 +1595,6 @@ WRITE32_MEMBER( n64_periphs::pi_reg_w )
 
 READ32_MEMBER( n64_periphs::ri_reg_r )
 {
-	//printf("ri_reg_r %08x = %08x\n", offset * 4, ri_regs[offset]);
 	if(offset > 0x1c/4)
 	{
 		logerror("ri_reg_r: %08X, %08X at %08X\n", offset, mem_mask, maincpu->safe_pc());
@@ -1669,7 +1605,6 @@ READ32_MEMBER( n64_periphs::ri_reg_r )
 
 WRITE32_MEMBER( n64_periphs::ri_reg_w )
 {
-	//printf("ri_reg_w %08x %08x %08x\n", offset * 4, data, mem_mask);
 	if(offset > 0x1c/4)
 	{
 		logerror("ri_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, maincpu->safe_pc());
@@ -1732,20 +1667,12 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 		case 0x00:      // Read status
 		case 0xff:      // Reset
 		{
-			if(command == 0)
-			{
-				//printf("Read status\n");
-			}
-			else
-			{
-				//printf("Reset\n");
-			}
 			switch (channel)
 			{
 				case 0:
 				case 1:
 				{
-					//printf("Read controller %d status\n", channel + 1);
+					// Read status
 					rdata[0] = 0x05;
 					rdata[1] = 0x00;
 					rdata[2] = 0x01;
@@ -1754,13 +1681,12 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 				case 2:
 				case 3:
 				{
-					//printf("Read controller %d status (NC)\n", channel + 1);
-					// not connected
+					// Read status (unconnected)
 					return 1;
 				}
 				case 4:
 				{
-					//printf("Read EEPROM status\n");
+					// Read EEPROM status
 					rdata[0] = 0x00;
 					rdata[1] = 0x80;
 					rdata[2] = 0x00;
@@ -1791,10 +1717,9 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 
 			switch (channel)
 			{
-				case 0: //p1 inputs
-				case 1: //p2 inputs
+				case 0: // P1 Inputs
+				case 1: // P2 Inputs
 				{
-					//printf("Read p%d inputs\n", channel + 1);
 					buttons = machine().root_device().ioport(portnames[(channel*3) + 0])->read();
 					x = machine().root_device().ioport(portnames[(channel*3) + 1])->read() - 128;
 					y = machine().root_device().ioport(portnames[(channel*3) + 2])->read() - 128;
@@ -1808,8 +1733,7 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 				case 2:
 				case 3:
 				{
-					//printf("Controller %d not connected\n", channel + 1);
-					// not connected
+					// P3/P4 Inputs (not connected)
 					return 1;
 				}
 			}
@@ -1823,8 +1747,6 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 
 			address = (sdata[1] << 8) | (sdata[2]);
 			address &= ~0x1f;
-
-			////printf("Read mempak at %04x\n", address);
 
 			if(address == 0x8000)
 			{
@@ -1854,11 +1776,7 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 			UINT32 address = (sdata[1] << 8) | (sdata[2]);
 			address &= ~0x1f;
 
-			////printf("Write mempak at %04x\n", address);
-			if (address >= 0x8000)
-			{
-			}
-			else
+			if (address < 0x8000)
 			{
 				for(int i = 3; i < slength; i++)
 				{
@@ -1885,8 +1803,6 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 
 			UINT16 block_offset = sdata[1] * 8;
 
-			//printf("Read EEPROM at %04x\n", block_offset);
-
 			for(int i=0; i < 8; i++)
 			{
 				rdata[i] = m_save_data.eeprom[block_offset+i];
@@ -1909,8 +1825,6 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 
 			UINT16 block_offset = sdata[1] * 8;
 
-			//printf("Write EEPROM at %04x\n", block_offset);
-
 			for(int i = 0; i < 8; i++)
 			{
 				m_save_data.eeprom[block_offset+i] = sdata[2+i];
@@ -1921,7 +1835,6 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 
 		case 0x06:      // Read RTC Status
 		{
-			//printf("Read RTC Status\n");
 			rdata[0] = 0x00;
 			rdata[1] = 0x10;
 			rdata[2] = 0x00;
@@ -1933,7 +1846,6 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 			switch(sdata[1])
 			{
 				case 0:
-					//printf("Read RTC Block Header\n");
 					rdata[0] = 0x00;
 					rdata[1] = 0x02;
 					rdata[8] = 0x00;
@@ -1954,7 +1866,6 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 					rdata[6] = convert_to_bcd(systime.local_time.year % 100); // Year
 					rdata[7] = convert_to_bcd(systime.local_time.year / 100); // Century
 					rdata[8] = 0x00;
-					//printf("Read RTC Time\n");
 					return 0;
 			}
 			return 1;
@@ -1982,16 +1893,13 @@ void n64_periphs::handle_pif()
 		while(cmd_ptr < 0x3f && !end)
 		{
 			INT8 bytes_to_send = (INT8)pif_cmd[cmd_ptr++];
-			//printf("bytes to send: 0x%02x\n", bytes_to_send);
 
 			if (bytes_to_send == -2)
 			{
 				end = 1;
-				//printf("end\n");
 			}
 			else if (bytes_to_send < 0)
 			{
-				//printf("do nothing\n");
 				// do nothing
 			}
 			else
@@ -2002,7 +1910,6 @@ void n64_periphs::handle_pif()
 					UINT8 send_buffer[0x40];
 
 					INT8 bytes_to_recv = pif_cmd[cmd_ptr++];
-					//printf("bytes to receive: 0x%02x\n", bytes_to_recv);
 
 					if (bytes_to_recv == -2)
 					{
@@ -2015,11 +1922,9 @@ void n64_periphs::handle_pif()
 					}
 
 					int res = pif_channel_handle_command(channel, bytes_to_send, send_buffer, bytes_to_recv, recv_buffer);
-					//printf("result: %d\n", res);
 
 					if (res == 0)
 					{
-						//printf("cmd_ptr (%d) + bytes_to_recv (%d) = %d\n", cmd_ptr, bytes_to_recv, cmd_ptr + bytes_to_recv);
 						if (cmd_ptr + bytes_to_recv > 0x3f)
 						{
 							fatalerror("cmd_ptr overflow\n");
@@ -2110,13 +2015,11 @@ READ32_MEMBER( n64_periphs::si_reg_r )
 			ret = si_status;
 	}
 
-	//printf("si_reg_r %08x = %08x\n", offset * 4, ret); fflush(stdout);
 	return ret;
 }
 
 WRITE32_MEMBER( n64_periphs::si_reg_w )
 {
-	//printf("si_reg_w %08x %08x %08x\n", offset * 4, data, mem_mask); fflush(stdout);
 	switch (offset)
 	{
 		case 0x00/4:        // SI_DRAM_ADDR_REG
@@ -2396,7 +2299,7 @@ void n64_state::n64_machine_stop()
 		return;
 
 	device_image_interface *image = dynamic_cast<device_image_interface *>(periphs->m_nvram_image);
-	//printf("Saving stuff\n");
+
 	UINT8 data[0x30800];
 	memcpy(data, n64_sram, 0x20000);
 	memcpy(data + 0x20000, periphs->m_save_data.eeprom, 0x800);
