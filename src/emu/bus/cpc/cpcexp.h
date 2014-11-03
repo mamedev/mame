@@ -78,6 +78,7 @@ public:
 
 	// reset
 	virtual void cpc_reset_w() { };
+	virtual WRITE_LINE_MEMBER( cursor_w ) { };
 
 	void set_rom_bank(UINT8 sel) { m_rom_sel = sel; }  // tell device the currently selected ROM
 	UINT8 get_rom_bank() { return m_rom_sel; }
@@ -108,6 +109,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( romdis_w );
 
 	void set_rom_bank(UINT8 sel) { if(m_card) m_card->set_rom_bank(sel); }  // tell device the currently selected ROM
+	DECLARE_WRITE_LINE_MEMBER( cursor_w ) { if(m_card) m_card->cursor_w(state); }  // pass on CRTC Cursor signal
 
 protected:
 	// device-level overrides

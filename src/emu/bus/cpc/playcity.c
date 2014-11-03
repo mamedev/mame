@@ -6,7 +6,6 @@
 
    TODO:
    IRQs aren't working currently, the Z80CTC core requires the daisy chain setup to acknowledge IRQs properly, and that can't be used in a slot device currently.
-   Add CRTC Cursor signal support to the expansion bus, this should get NMIs working consistently.
 */
 
 #include "playcity.h"

@@ -39,8 +39,10 @@ public:
 	DECLARE_WRITE8_MEMBER(ymz2_data_w);
 	DECLARE_READ8_MEMBER(ymz1_data_r);
 	DECLARE_READ8_MEMBER(ymz2_data_r);
-	DECLARE_WRITE_LINE_MEMBER(ctc_zc1_cb) { if(state) { m_slot->nmi_w(1); m_slot->nmi_w(0); } printf("NMI %i",state); }
+	DECLARE_WRITE_LINE_MEMBER(ctc_zc1_cb) { if(state) { m_slot->nmi_w(1); m_slot->nmi_w(0); } }
 	DECLARE_WRITE_LINE_MEMBER(ctc_intr_cb) { m_slot->irq_w(state); }
+
+	virtual WRITE_LINE_MEMBER(cursor_w) { m_ctc->trg1(state); }
 
 protected:
 	// device-level overrides
