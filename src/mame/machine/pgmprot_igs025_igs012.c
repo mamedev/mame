@@ -202,3 +202,20 @@ DRIVER_INIT_MEMBER(pgm_012_025_state,drgw2j)
 	mem16[0x130366 / 2] = 0x4e93;
 	mem16[0x1303f6 / 2] = 0x4e93;
 }
+
+DRIVER_INIT_MEMBER(pgm_012_025_state,drgw2hk)
+{
+	// todo, fix for this set
+	drgw2_common_init();
+
+	int region = 0x01;
+	m_igs025->m_kb_region = region;
+	m_igs025->m_kb_game_id = region | (region << 8) | (region << 16) | (region << 24);
+
+#if 0
+	UINT16 *mem16 = (UINT16 *)memregion("maincpu")->base();
+	mem16[0x1302c0 / 2] = 0x4e93;
+	mem16[0x130366 / 2] = 0x4e93;
+	mem16[0x1303f6 / 2] = 0x4e93;
+#endif
+}
