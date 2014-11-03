@@ -1438,8 +1438,7 @@ void tx1_state::buggyboy_draw_char(UINT8 *bitmap, bool wide)
 ***************************************************************************/
 
 void tx1_state::buggyboy_get_roadpix(int screen, int ls161, UINT8 rva0_6, UINT8 sld, UINT32 *_rorev,
-									UINT8 *rc0, UINT8 *rc1, UINT8 *rc2, UINT8 *rc3,
-									const UINT8 *rom, const UINT8 *prom0, const UINT8 *prom1, const UINT8 *prom2)
+									UINT8 *rc0, UINT8 *rc1, UINT8 *rc2, UINT8 *rc3)
 {
 	/* Counter Q10-7 are added to 384 */
 	UINT16 ls283_159 = (ls161 & 0x780) + 128 + (256 * screen);
@@ -1448,6 +1447,12 @@ void tx1_state::buggyboy_get_roadpix(int screen, int ls161, UINT8 rva0_6, UINT8 
 	UINT32 rom_en = !(ls283_159 & 0x400) && !(ls283_159_co ^ (ls161 & 0x800));
 	UINT8 d0 = 0;
 	UINT8 d1 = 0;
+
+	/* ROM/PROM lookup tables */
+	const UINT8 *rom   = memregion("road")->base();
+	const UINT8 *prom0 = rom + 0x4000;
+	const UINT8 *prom1 = rom + 0x4200;
+	const UINT8 *prom2 = rom + 0x4400;
 
 	/* Latch road reverse bit */
 	*_rorev = !( (rom_en && rom_flip) || (!rom_en && (ls161 & 0x4000)) );
@@ -1539,11 +1544,7 @@ void tx1_state::buggyboy_draw_road(UINT8 *bitmap)
 
 	/* ROM/PROM lookup tables */
 	const UINT8 *rcols = (UINT8*)(memregion("proms")->base() + 0x1500);
-	const UINT8 *rom   = memregion("road")->base();
-	const UINT8 *prom0 = rom + 0x4000;
-	const UINT8 *prom1 = rom + 0x4200;
-	const UINT8 *prom2 = rom + 0x4400;
-	const UINT8 *vprom = rom + 0x4600;
+	const UINT8 *vprom   = memregion("road")->base() + 0x4600;
 
 	/* Extract constant values */
 	tcmd     = ((vregs.scol & 0xc000) >> 12) | ((vregs.scol & 0x00c0) >> 6);
@@ -1667,9 +1668,9 @@ void tx1_state::buggyboy_draw_road(UINT8 *bitmap)
 		/* Have we crossed a road gfx strip boundary? */
 		if (ls161 & 7)
 		{
-			buggyboy_get_roadpix(0, ls161, rva0_6, sld, &_rorevls, &rc0[0], &rc1[0], &rc2[0], &rc3[0], rom, prom0, prom1, prom2);
-			buggyboy_get_roadpix(1, ls161, rva0_6, sld, &_rorevcs, &rc0[1], &rc1[1], &rc2[1], &rc3[1], rom, prom0, prom1, prom2);
-			buggyboy_get_roadpix(2, ls161, rva0_6, sld, &_rorevrs, &rc0[2], &rc1[2], &rc2[2], &rc3[2], rom, prom0, prom1, prom2);
+			buggyboy_get_roadpix(0, ls161, rva0_6, sld, &_rorevls, &rc0[0], &rc1[0], &rc2[0], &rc3[0]);
+			buggyboy_get_roadpix(1, ls161, rva0_6, sld, &_rorevcs, &rc0[1], &rc1[1], &rc2[1], &rc3[1]);
+			buggyboy_get_roadpix(2, ls161, rva0_6, sld, &_rorevrs, &rc0[2], &rc1[2], &rc2[2], &rc3[2]);
 		}
 
 		/* We can evaluate some of the pixel logic outside of the x-loop */
@@ -1749,9 +1750,9 @@ void tx1_state::buggyboy_draw_road(UINT8 *bitmap)
 			/* Load in a new road gfx strip? */
 			if (!(ls161 & 7))
 			{
-				buggyboy_get_roadpix(0, ls161, rva0_6, sld, &_rorevls, &rc0[0], &rc1[0], &rc2[0], &rc3[0], rom, prom0, prom1, prom2);
-				buggyboy_get_roadpix(1, ls161, rva0_6, sld, &_rorevcs, &rc0[1], &rc1[1], &rc2[1], &rc3[1], rom, prom0, prom1, prom2);
-				buggyboy_get_roadpix(2, ls161, rva0_6, sld, &_rorevrs, &rc0[2], &rc1[2], &rc2[2], &rc3[2], rom, prom0, prom1, prom2);
+				buggyboy_get_roadpix(0, ls161, rva0_6, sld, &_rorevls, &rc0[0], &rc1[0], &rc2[0], &rc3[0]);
+				buggyboy_get_roadpix(1, ls161, rva0_6, sld, &_rorevcs, &rc0[1], &rc1[1], &rc2[1], &rc3[1]);
+				buggyboy_get_roadpix(2, ls161, rva0_6, sld, &_rorevrs, &rc0[2], &rc1[2], &rc2[2], &rc3[2]);
 			}
 
 			/* Road camber/banking */
@@ -2170,11 +2171,7 @@ void tx1_state::buggybjr_draw_road(UINT8 *bitmap)
 
 	/* ROM/PROM lookup tables */
 	const UINT8 *rcols = (UINT8*)(memregion("proms")->base() + 0x1500);
-	const UINT8 *rom   = memregion("road")->base();
-	const UINT8 *prom0 = rom + 0x4000;
-	const UINT8 *prom1 = rom + 0x4200;
-	const UINT8 *prom2 = rom + 0x4400;
-	const UINT8 *vprom = rom + 0x4600;
+	const UINT8 *vprom = memregion("road")->base() + 0x4600;
 
 	/* Extract constant values */
 	tcmd     = ((vregs.scol & 0xc000) >> 12) | ((vregs.scol & 0x00c0) >> 6);
@@ -2296,7 +2293,7 @@ void tx1_state::buggybjr_draw_road(UINT8 *bitmap)
 
 		/* Have we crossed a road gfx strip boundary? */
 		if (ls161 & 7)
-			buggyboy_get_roadpix(1, ls161, rva0_6, sld, &_rorevcs, &rc0, &rc1, &rc2, &rc3, rom, prom0, prom1, prom2);
+			buggyboy_get_roadpix(1, ls161, rva0_6, sld, &_rorevcs, &rc0, &rc1, &rc2, &rc3);
 
 		for (x = 0; x < 256; ++x)
 		{
@@ -2331,7 +2328,7 @@ void tx1_state::buggybjr_draw_road(UINT8 *bitmap)
 
 			/* Load in a new road gfx strip? */
 			if (!(ls161 & 7))
-				buggyboy_get_roadpix(1, ls161, rva0_6, sld, &_rorevcs, &rc0, &rc1, &rc2, &rc3, rom, prom0, prom1, prom2);
+				buggyboy_get_roadpix(1, ls161, rva0_6, sld, &_rorevcs, &rc0, &rc1, &rc2, &rc3);
 
 			/* Road camber */
 			if (vregs.bank_mode == 0)
