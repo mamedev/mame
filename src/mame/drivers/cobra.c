@@ -313,7 +313,7 @@
 
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
-#include "machine/pci.h"
+#include "machine/lpci.h"
 #include "machine/ataintf.h"
 #include "machine/idehd.h"
 #include "machine/jvshost.h"

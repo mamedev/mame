@@ -1,81 +1,152 @@
-/***************************************************************************
-
-    machine/pci.h
-
-    PCI bus
-
-***************************************************************************/
-
 #ifndef PCI_H
 #define PCI_H
 
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
+#include "emu.h"
 
-typedef UINT32 (*pci_read_func)(device_t *pcibus, device_t *device, int function, int reg, UINT32 mem_mask);
-typedef void (*pci_write_func)(device_t *pcibus, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask);
+#define MCFG_PCI_ROOT_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, PCI_ROOT, 0)
 
-// ======================> pci_bus_legacy_device
+#define MCFG_PCI_DEVICE_ADD(_tag, _type, _main_id, _revision, _pclass, _subdevice_id) \
+	MCFG_DEVICE_ADD(_tag, _type, 0) \
+	downcast<pci_device *>(device)->set_ids(_main_id, _revision, _pclass, _subdevice_id);
 
-class pci_bus_legacy_device :  public device_t
-{
+#define MCFG_AGP_DEVICE_ADD(_tag, _type, _main_id, _revision, _subdevice_id) \
+	MCFG_PCI_DEVICE_ADD(_tag, _type, _main_id, _revision, 0x030000, _subdevice_id)
+
+#define MCFG_PCI_HOST_ADD(_tag, _type, _main_id, _revision, _subdevice_id) \
+	MCFG_PCI_DEVICE_ADD(_tag, _type, _main_id, _revision, 0x060000, _subdevice_id)
+
+#define MCFG_PCI_BRIDGE_ADD(_tag, _main_id, _revision) \
+	MCFG_PCI_DEVICE_ADD(_tag, PCI_BRIDGE, _main_id, _revision, 0x060400, 0x00000000)
+
+#define MCFG_AGP_BRIDGE_ADD(_tag, _type, _main_id, _revision) \
+	MCFG_PCI_DEVICE_ADD(_tag, _type, _main_id, _revision, 0x060400, 0x00000000)
+
+class pci_device : public device_t {
 public:
-	// construction/destruction
-	pci_bus_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pci_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	DECLARE_READ32_MEMBER( read );
-	DECLARE_WRITE32_MEMBER( write );
+	void set_ids(UINT32 main_id, UINT8 revision, UINT32 pclass, UINT32 subdevice_id);
 
-	DECLARE_READ64_MEMBER( read_64be );
-	DECLARE_WRITE64_MEMBER( write_64be );
+	virtual void reset_all_mappings();
+	virtual void map_device(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
+							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space);
+	virtual void map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
+						   UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space);
 
-	void set_busnum(int busnum) { m_busnum = busnum; }
-	void set_father(const char *father) { m_father = father; }
-	void set_device(int num, const char *tag, pci_read_func read_func, pci_write_func write_func) {
-		m_devtag[num] = tag; m_read_callback[num] = read_func; m_write_callback[num] = write_func; }
+	void map_config(UINT8 device, address_space *config_space);
 
-	pci_bus_legacy_device *pci_search_bustree(int busnum, int devicenum, pci_bus_legacy_device *pcibus);
-	void add_sibling(pci_bus_legacy_device *sibling, int busnum);
+	virtual DECLARE_ADDRESS_MAP(config_map, 32);
 
 protected:
-	// device-level overrides
+	enum {
+		M_MEM = 0,
+		M_IO  = 1,
+		M_64D = 2,
+		M_64A = 4,
+		M_PREF = 8
+	};
+
+	UINT32 main_id, subdevice_id;
+	UINT32 pclass;
+	UINT8 revision;
+
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_post_load();
 
-private:
-	UINT8               m_busnum;
-	const char *        m_devtag[32];
-	pci_read_func       m_read_callback[32];
-	pci_write_func      m_write_callback[32];
-	const char *        m_father;
-	device_t *          m_device[32];
-	pci_bus_legacy_device * m_siblings[8];
-	UINT8               m_siblings_busnum[8];
-	int                 m_siblings_count;
+	static void scan_sub_devices(pci_device **devices, dynamic_array<pci_device *> &all, dynamic_array<pci_device *> &bridges, device_t *root);
 
-	offs_t              m_address;
-	INT8                m_devicenum; // device number we are addressing
-	INT8                m_busnumber; // pci bus number we are addressing
-	pci_bus_legacy_device * m_busnumaddr; // pci bus we are addressing
+	void add_map(UINT64 size, int flags, address_map_delegate &map);
+	template <typename T> void add_map(UINT64 size, int flags, void (T::*map)(address_map &map, device_t &device), const char *name) {
+		address_map_delegate delegate(map, name, static_cast<T *>(this));
+		add_map(size, flags, delegate);
+	}
 };
 
-// device type definition
-extern const device_type PCI_BUS_LEGACY;
+class agp_device : public pci_device {
+public:
+	agp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
+protected:
+	virtual void device_start();
+	virtual void device_reset();
+};
 
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
+class pci_bridge_device : public pci_device, public device_memory_interface {
+public:
+	pci_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pci_bridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-#define MCFG_PCI_BUS_LEGACY_ADD(_tag, _busnum) \
-	MCFG_DEVICE_ADD(_tag, PCI_BUS_LEGACY, 0) \
-	downcast<pci_bus_legacy_device *>(device)->set_busnum(_busnum);
-#define MCFG_PCI_BUS_LEGACY_DEVICE(_devnum, _devtag, _configread, _configwrite) \
-	downcast<pci_bus_legacy_device *>(device)->set_device(_devnum, _devtag,_configread,_configwrite);
-#define MCFG_PCI_BUS_LEGACY_SIBLING(_father_tag) \
-	downcast<pci_bus_legacy_device *>(device)->set_father(_father_tag);
+	virtual void map_device(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
+							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space);
+	virtual void reset_all_mappings();
 
+protected:
+	pci_device *sub_devices[32*8];
+	dynamic_array<pci_device *> all_devices;
+	dynamic_array<pci_device *> all_bridges;
 
-#endif /* PCI_H */
+	virtual void device_start();
+	virtual void device_reset();
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const;
+
+	virtual device_t *bus_root();
+	virtual void regenerate_config_mapping();
+
+private:
+	address_space_config configure_space_config;
+};
+
+class agp_bridge_device : public pci_bridge_device {
+public:
+	agp_bridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+
+protected:
+	virtual void device_start();
+	virtual void device_reset();
+};
+
+class pci_host_device : public pci_bridge_device {
+public:
+	DECLARE_ADDRESS_MAP(io_configuration_access_map, 32);
+
+	pci_host_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+
+protected:
+	address_space *memory_space, *io_space;
+
+	UINT64 memory_window_start, memory_window_end, memory_offset;
+	UINT64 io_window_start, io_window_end, io_offset;
+
+	virtual void device_start();
+	virtual void device_reset();
+
+	virtual device_t *bus_root();
+
+	UINT32 config_address;
+
+	DECLARE_READ32_MEMBER(config_address_r);
+	DECLARE_WRITE32_MEMBER(config_address_w);
+	DECLARE_READ32_MEMBER(config_data_r);
+	DECLARE_WRITE32_MEMBER(config_data_w);
+
+	UINT32 config_read(UINT8 bus, UINT8 device, UINT16 reg, UINT32 mem_mask);
+	void config_write(UINT8 bus, UINT8 device, UINT16 reg, UINT32 data, UINT32 mem_mask);
+
+	void regenerate_mapping();
+	virtual void regenerate_config_mapping();
+};
+
+class pci_root_device : public device_t {
+public:
+	pci_root_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual void device_start();
+	virtual void device_reset();
+};
+
+extern const device_type PCI_ROOT;
+extern const device_type PCI_BRIDGE;
+
+#endif

@@ -1221,11 +1221,27 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/machine/lpci.h,MACHINES += LPCI
+#-------------------------------------------------
+
+ifneq ($(filter LPCI,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/lpci.o
+endif
+
+#-------------------------------------------------
+#
 #@src/emu/machine/pci.h,MACHINES += PCI
 #-------------------------------------------------
 
 ifneq ($(filter PCI,$(MACHINES)),)
 MACHINEOBJS += $(MACHINEOBJ)/pci.o
+MACHINEOBJS += $(MACHINEOBJ)/pci-usb.o
+MACHINEOBJS += $(MACHINEOBJ)/pci-sata.o
+MACHINEOBJS += $(MACHINEOBJ)/pci-apic.o
+MACHINEOBJS += $(MACHINEOBJ)/pci-smbus.o
+MACHINEOBJS += $(MACHINEOBJ)/i82541.o
+MACHINEOBJS += $(MACHINEOBJ)/i82875p.o
+MACHINEOBJS += $(MACHINEOBJ)/i6300esb.o
 endif
 
 #-------------------------------------------------

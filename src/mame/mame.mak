@@ -271,6 +271,8 @@ SOUNDS += T6721A
 SOUNDS += MOS7360
 #SOUNDS += ESQPUMP
 #SOUNDS += VRC6
+SOUNDS += SB0400
+SOUNDS += AC97
 
 #-------------------------------------------------
 # specify available video cores
@@ -290,6 +292,7 @@ VIDEOS += DM9368
 #VIDEOS += EF9340_1
 #VIDEOS += EF9345
 #VIDEOS += GF4500
+VIDEOS += GF6800GT
 VIDEOS += EPIC12
 VIDEOS += FIXFREQ
 VIDEOS += H63484
@@ -436,6 +439,7 @@ MACHINES += LDV1000
 MACHINES += LDVP931
 #MACHINES += LH5810
 MACHINES += LINFLASH
+MACHINES += LPCI
 #MACHINES += LSI53C810
 #MACHINES += M68307
 #MACHINES += M68340
@@ -607,6 +611,7 @@ BUSES += GENERIC
 BUSES += ISA
 #BUSES += ISBX
 #BUSES += KC
+#BUSES += LPCI
 #BUSES += MACPDS
 #BUSES += MIDI
 #BUSES += MEGADRIVE
@@ -617,7 +622,6 @@ BUSES += NEOGEO
 #BUSES += O2
 #BUSES += ORICEXT
 #BUSES += PCE
-#BUSES += PCI
 #BUSES += PC_JOY
 #BUSES += PC_KBD
 #BUSES += PET
@@ -1697,7 +1701,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/hikaru.o \
 	$(DRIVERS)/hshavoc.o \
 	$(DRIVERS)/kopunch.o $(VIDEO)/kopunch.o \
-	$(DRIVERS)/lindbergh.o \
+	$(DRIVERS)/lindbergh.o $(MACHINE)/segabb.o \
 	$(MACHINE)/megadriv.o \
 	$(DRIVERS)/megadrvb.o \
 	$(DRIVERS)/megaplay.o \

@@ -13,7 +13,7 @@
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "machine/pci.h"
+#include "machine/lpci.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
 #include "video/pc_vga.h"

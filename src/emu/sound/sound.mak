@@ -70,6 +70,17 @@ $(SOUNDOBJ)/discrete.o: $(SOUNDSRC)/discrete.c \
 
 
 #-------------------------------------------------
+# AC97
+#@src/emu/sound/pic-ac97.h,SOUNDS += AC97
+#-------------------------------------------------
+
+ifneq ($(filter AC97,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/pci-ac97.o
+endif
+
+
+
+#-------------------------------------------------
 # Apple custom sound chips
 #@src/emu/sound/asc.h,SOUNDS += ASC
 #@src/emu/sound/awacs.h,SOUNDS += AWACS
@@ -123,12 +134,31 @@ endif
 
 
 #-------------------------------------------------
+#-------------------------------------------------
+# AC97
+#@src/emu/sound/pic-ac97.h,SOUNDS += AC97
+#-------------------------------------------------
+
+ifneq ($(filter AC97,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/pci-ac97.o
+endif
 # CEM 3394 analog synthesizer chip
 #@src/emu/sound/cem3394.h,SOUNDS += CEM3394
 #-------------------------------------------------
 
 ifneq ($(filter CEM3394,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/cem3394.o
+endif
+
+
+
+#-------------------------------------------------
+# Creative Labs SB0400 Audigy2 Value
+#@src/emu/sound/sb0400.h,SOUNDS += AC97
+#-------------------------------------------------
+
+ifneq ($(filter SB0400,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/sb0400.o
 endif
 
 

@@ -40,7 +40,7 @@ MX29F1610MC 16M FlashROM (x7)
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "machine/pci.h"
+#include "machine/lpci.h"
 #include "machine/pcshare.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"

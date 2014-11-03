@@ -26,7 +26,7 @@ processor speed is 533MHz <- likely to be a Celeron or a Pentium III class CPU -
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "machine/pci.h"
+#include "machine/lpci.h"
 #include "machine/pcshare.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
