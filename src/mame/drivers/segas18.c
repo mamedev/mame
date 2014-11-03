@@ -73,6 +73,7 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 ind
 			switch (m_romboard)
 			{
 				case ROM_BOARD_171_SHADOW:  break;  // ???
+				case ROM_BOARD_837_7525:
 				case ROM_BOARD_171_5874:
 				case ROM_BOARD_171_5987:    mapper.map_as_handler(0x00000, 0x00010, 0xfffff0, read16_delegate(FUNC(segas18_state::genesis_vdp_r), this), write16_delegate(FUNC(segas18_state::genesis_vdp_w), this)); break;
 				default:                    assert(false);
@@ -89,6 +90,8 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 ind
 											else
 												mapper.map_as_rom(0x00000,0x100000, 0xf00000, "rom1base",0x100000, write16_delegate(FUNC(segas18_state::rom_5987_bank_w), this));
 											break;
+				case ROM_BOARD_837_7525:    mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom1base", 0x80000, write16_delegate(FUNC(segas18_state::rom_837_7525_bank_w), this));
+
 				default:                    assert(false);
 			}
 			break;
@@ -98,6 +101,7 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 ind
 			{
 				case ROM_BOARD_171_SHADOW:
 				case ROM_BOARD_171_5874:    mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom0base", 0x00000, write16_delegate()); break;
+				case ROM_BOARD_837_7525:
 				case ROM_BOARD_171_5987:    if (romsize <= 0x100000)
 												mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom0base", 0x00000, write16_delegate());
 											else
@@ -390,6 +394,33 @@ WRITE16_MEMBER( segas18_state::rom_5987_bank_w )
 	}
 }
 
+WRITE16_MEMBER( segas18_state::rom_837_7525_bank_w )
+{
+	if (!ACCESSING_BITS_0_7)
+		return;
+
+	offset &= 0xf;
+	data &= 0xff;
+
+	// tile banking
+	if (offset < 8)
+	{
+	//	int maxbanks = m_gfxdecode->gfx(0)->elements() / 1024;
+		data &= 0x9f;
+
+		if (data & 0x80) data += 0x20;
+		data &= 0x3f;
+
+		m_segaic16vid->segaic16_tilemap_set_bank(0, offset, data);
+	}
+
+	// sprite banking
+	else
+	{
+		//printf("%02x %02x\n", offset, data);
+		// not needed?
+	}
+}
 
 
 /*************************************
@@ -1185,6 +1216,37 @@ INPUT_PORTS_END
 
 
 
+static INPUT_PORTS_START( hamaway )
+	PORT_INCLUDE( system18_generic )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 /*************************************
  *
  *  Graphics definitions
@@ -1227,6 +1289,15 @@ WRITE_LINE_MEMBER(segas18_state::vdp_lv4irqline_callback_s18)
  *  Machine driver
  *
  *************************************/
+
+WRITE_LINE_MEMBER(segas18_state::ym3438_irq_handler)
+{
+	if (state)
+		m_soundcpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE );
+	else
+		m_soundcpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE );
+}
+
 
 static MACHINE_CONFIG_START( system18, segas18_state )
 
@@ -1276,6 +1347,7 @@ static MACHINE_CONFIG_START( system18, segas18_state )
 
 	MCFG_SOUND_ADD("ym1", YM3438, 8000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_YM2612_IRQ_HANDLER(WRITELINE(segas18_state, ym3438_irq_handler))
 
 	MCFG_SOUND_ADD("ym2", YM3438, 8000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
@@ -2261,6 +2333,39 @@ ROM_START( wwallyja )
 	ROM_LOAD( "mpr-14722.c4",   0x190000, 0x80000, CRC(1bd081f8) SHA1(e5b0b5d8334486f813d7c430bb7fce3f69605a21) )
 ROM_END
 
+/**************************************************************************************************************************
+    Hammer Away, Sega System 18
+    CPU: M68000
+    ROM Board: 837-7525
+*/
+
+ROM_START( hamaway )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "4.bin",  0x000000, 0x40000, CRC(cc0981e1) SHA1(63528bd36f27e62fdf40715101e6d05b73e48f16) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "6.bin",  0x000001, 0x40000, CRC(e8599ee6) SHA1(3e32b025403aecbaecfcdd0325e4acd676e99c4e) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "5.bin",  0x080000, 0x40000, CRC(fdb247fd) SHA1(ee9db799fb5de27f81904f8ef792203415b6d4a6) )
+	ROM_LOAD16_BYTE( "7.bin",  0x080001, 0x40000, CRC(63711470) SHA1(6c4be3a0cf0f897c34ef0b3bf549f52b185bb915) )
+
+	ROM_REGION( 0x180000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "c10.bin",  0x000000, 0x40000, CRC(c55cb5cf) SHA1(396179632b29ac5f8b7f8f3c91d7cf834e548bdf) )
+	ROM_LOAD( "1.bin",    0x040000, 0x40000, CRC(33be003f) SHA1(134fa6b3347c306d9e30882dfcf24632b49f85ea) )
+	ROM_LOAD( "c11.bin",  0x080000, 0x40000, CRC(37787915) SHA1(c8d251be6c41de3aed2da6da70aa87071b70b1f6) )
+	ROM_LOAD( "2.bin",    0x0c0000, 0x40000, CRC(60ca5c9f) SHA1(6358ea00125a5e3f55acf73aeb9c36b1db6e711e) )
+	ROM_LOAD( "c12.bin",  0x100000, 0x40000, CRC(f12f1cf3) SHA1(45e883029c58e617a2a20ac1ab5c5f598c95f4bd) )
+	ROM_LOAD( "3.bin",    0x140000, 0x40000, CRC(520aa7ae) SHA1(9584206aedd8be5ce9dca0ed370f8fe77aabaf76) )
+
+	ROM_REGION16_BE( 0x200000, "sprites", ROMREGION_ERASEFF ) // sprites
+	ROM_LOAD16_BYTE( "c17.bin", 0x000001, 0x40000, CRC(aa28d7aa) SHA1(3dd5d95b05e408c023f9bd77753c37080714239d) )
+	ROM_LOAD16_BYTE( "10.bin",  0x000000, 0x40000, CRC(c4c95161) SHA1(2e313a4ca9506f53a2062b4a8e5ba7b381ba93ae) )
+	ROM_LOAD16_BYTE( "c18.bin", 0x080001, 0x40000, CRC(0f8fe8bb) SHA1(e6f68442b8d4def29b106458496a47344f70d511) )
+	ROM_LOAD16_BYTE( "11.bin",  0x080000, 0x40000, CRC(2b5eacbc) SHA1(ba3690501588b9c88a31022b44bc3c82b44ae26b) )
+	ROM_LOAD16_BYTE( "c19.bin", 0x100001, 0x40000, CRC(3c616caa) SHA1(d48a6239b7a52ac13971f7513a65a17af492bfdf) ) // 11xxxxxxxxxxxxxxxx = 0xFF
+ 	ROM_LOAD16_BYTE( "12.bin",  0x100000, 0x40000, CRC(c7bbd579) SHA1(ab87bfdad66ea241cb23c9bbfea05f5a1574d6c9) ) // 1ST AND 2ND HALF IDENTICAL (but ok, because pairing ROM has no data in the 2nd half anyway)
+
+	ROM_REGION( 0x210000, "soundcpu", ROMREGION_ERASEFF ) // sound CPU
+	ROM_LOAD( "c16.bin", 0x010000, 0x40000, CRC(913cc18c) SHA1(4bf4ec14937586c3ae77fcad57dcb21f6433ef81) )
+	ROM_LOAD( "c15.bin", 0x090000, 0x40000, CRC(b53694fc) SHA1(0e42be2730abce1b52ea94a9fe61cbd1c9a0ccae) )
+ROM_END
 
 
 /*************************************
@@ -2284,6 +2389,10 @@ DRIVER_INIT_MEMBER(segas18_state,generic_5987)
 	init_generic(ROM_BOARD_171_5987);
 }
 
+DRIVER_INIT_MEMBER(segas18_state,hamaway)
+{
+	init_generic(ROM_BOARD_837_7525);
+}
 
 
 /*************************************
@@ -2348,3 +2457,4 @@ GAME( 1989, shdancerj, shdancer, system18,             shdancer, segas18_state,g
 GAME( 1989, shdancer1, shdancer, system18,             shdancer, segas18_state,generic_shad, ROT0,   "Sega", "Shadow Dancer (US)", 0 )
 GAME( 1992, wwallyj,   0,        system18_fd1094,      wwally,   segas18_state,wwally,       ROT0,   "Sega", "Wally wo Sagase! (rev B, Japan, FD1094 317-0197B)", 0) // the roms do contain an english logo so maybe there is a world / us set too
 GAME( 1992, wwallyja,  wwallyj,  system18_fd1094,      wwally,   segas18_state,wwally,       ROT0,   "Sega", "Wally wo Sagase! (rev A, Japan, FD1094 317-0197A)", 0 )
+GAME( 1991, hamaway,   0,        system18,             hamaway,  segas18_state,hamaway,      ROT90,  "Sega / Santos", "Hammer Away (prototype)", 0 )
