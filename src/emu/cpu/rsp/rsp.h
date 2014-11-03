@@ -325,6 +325,7 @@ public:
 	void ccfunc_mtc2_scalar();
 	void ccfunc_ctc2_scalar();
 #endif
+	void ccfunc_rsp_vrsq_scalar();
 #if USE_SIMD && SIMUL_SIMD
 	void ccfunc_backup_regs();
 	void ccfunc_restore_regs();

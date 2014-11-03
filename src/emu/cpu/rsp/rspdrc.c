@@ -6592,6 +6592,136 @@ static void cfunc_rsp_vmov_scalar(void *param)
 }
 #endif
 
+// VRSQ
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | ?FFFF | DDDDD | 110100 |
+// ------------------------------------------------------
+//
+// Calculates reciprocal square-root
+
+inline void rsp_device::ccfunc_rsp_vrsq_scalar()
+{
+	int op = m_rsp_state->arg0;
+
+	INT32 shifter = 0;
+	INT32 rec = (INT16)VREG_S(VS2REG, EL & 7);
+	INT32 datainput = (rec < 0) ? (-rec) : (rec);
+
+	if (rec < 0)
+	{
+		if (rec < -32768)
+		{
+			datainput = ~datainput;
+		}
+		else
+		{
+			datainput = -datainput;
+		}
+	}
+
+	if (datainput)
+	{
+		for (int i = 0; i < 32; i++)
+		{
+			if (datainput & (1 << ((~i) & 0x1f)))
+			{
+				shifter = i;
+				break;
+			}
+		}
+	}
+	else
+	{
+		shifter = 0;
+	}
+
+	INT32 address = ((datainput << shifter) & 0x7fc00000) >> 22;
+	address = ((address | 0x200) & 0x3fe) | (shifter & 1);
+
+	INT32 fetchval = rsp_divtable[address];
+	INT32 temp = (0x40000000 | (fetchval << 14)) >> (((~shifter) & 0x1f) >> 1);
+	if (rec < 0)
+	{
+		temp = ~temp;
+	}
+	if (!rec)
+	{
+		temp = 0x7fffffff;
+	}
+	else if (rec == 0xffff8000)
+	{
+		temp = 0xffff0000;
+	}
+	rec = temp;
+
+	if (rec < 0)
+	{
+		if (m_dp_allowed)
+		{
+			if (rec < -32768)
+			{
+				datainput = ~datainput;
+			}
+			else
+			{
+				datainput = -datainput;
+			}
+		}
+		else
+		{
+			datainput = -datainput;
+		}
+	}
+
+	if (datainput)
+	{
+		for (int i = 0; i < 32; i++)
+		{
+			if (datainput & (1 << ((~i) & 0x1f)))
+			{
+				shifter = i;
+				break;
+			}
+		}
+	}
+	else
+	{
+		shifter = 0;
+	}
+
+	address = ((datainput << shifter) & 0x7fc00000) >> 22;
+	address = ((address | 0x200) & 0x3fe) | (shifter & 1);
+
+	fetchval = rsp_divtable[address];
+	temp = (0x40000000 | (fetchval << 14)) >> (((~shifter) & 0x1f) >> 1);
+	if (rec < 0)
+	{
+		temp = ~temp;
+	}
+	if (!rec)
+	{
+		temp = 0x7fff;
+	}
+	else if (rec == 0xffff8000)
+	{
+		temp = 0x0000;
+	}
+	rec = temp;
+
+	W_VREG_S(VDREG, VS1REG & 7) = (UINT16)rec;
+	for (int i = 0; i < 8; i++)
+	{
+		SET_ACCUM_L(VREG_S(VS2REG, VEC_EL_2(EL, i)), i);
+	}
+}
+
+static void cfunc_rsp_vrsq_scalar(void *param)
+{
+	((rsp_device *)param)->ccfunc_rsp_vrsq_scalar();
+}
+
 #if USE_SIMD
 // VRSQL
 //
@@ -7835,6 +7965,11 @@ int rsp_device::generate_vector_opcode(drcuml_block *block, compiler_state *comp
 #endif
 			return TRUE;
 
+		case 0x34:		/* VRSQ */
+			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);	      // mov     [arg0],desc->opptr.l
+			UML_CALLC_block, cfunc_rsp_vrsq_scalar, this);
+			return TRUE;
+
 		case 0x35:      /* VRSQL */
 			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vrsql_simd, this);
@@ -7855,6 +7990,10 @@ int rsp_device::generate_vector_opcode(drcuml_block *block, compiler_state *comp
 			UML_CALLC(block, cfunc_restore_regs, this);
 			UML_CALLC(block, cfunc_verify_regs, this);
 #endif
+			return TRUE;
+
+		case 0x37:		/* VNOP */
+		case 0x3F:		/* VNULL */
 			return TRUE;
 
 		default:
@@ -8057,6 +8196,11 @@ int rsp_device::generate_vector_opcode(drcuml_block *block, compiler_state *comp
 			UML_CALLC(block, cfunc_rsp_vmov_scalar, this);
 			return TRUE;
 
+		case 0x34:		/* VRSQ */
+			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);	      // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vrsq_scalar, this);
+			return TRUE;
+
 		case 0x35:      /* VRSQL */
 			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vrsql_scalar, this);
@@ -8065,6 +8209,10 @@ int rsp_device::generate_vector_opcode(drcuml_block *block, compiler_state *comp
 		case 0x36:      /* VRSQH */
 			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vrsqh_scalar, this);
+			return TRUE;
+
+		case 0x37:		/* VNOP */
+		case 0x3F:		/* VNULL */
 			return TRUE;
 
 		default:
