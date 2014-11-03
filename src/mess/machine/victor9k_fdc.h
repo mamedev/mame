@@ -66,6 +66,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( mode_w );
 	DECLARE_WRITE_LINE_MEMBER( via4_irq_w );
 
+	DECLARE_READ8_MEMBER( via5_pa_r );
 	DECLARE_WRITE8_MEMBER( via5_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( via5_irq_w );
 

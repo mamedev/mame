@@ -375,10 +375,6 @@ WRITE_LINE_MEMBER( victor9k_state::fdc_irq_w )
 //  MACHINE INITIALIZATION
 //**************************************************************************
 
-//-------------------------------------------------
-//  MACHINE_START( victor9k )
-//-------------------------------------------------
-
 void victor9k_state::machine_start()
 {
 	// state saving
@@ -395,6 +391,17 @@ void victor9k_state::machine_start()
 	program.install_ram(0x00000, m_ram->size() - 1, m_ram->pointer());
 }
 
+void victor9k_state::machine_reset()
+{
+	m_maincpu->reset();
+	m_upd7201->reset();
+	m_ssda->reset();
+	m_via1->reset();
+	m_via2->reset();
+	m_via3->reset();
+	m_crtc->reset();
+	m_fdc->reset();
+}
 
 
 //**************************************************************************

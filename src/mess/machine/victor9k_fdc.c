@@ -152,6 +152,8 @@ static MACHINE_CONFIG_FRAGMENT( victor_9000_fdc )
 
 	MCFG_DEVICE_ADD(M6522_5_TAG, VIA6522, XTAL_30MHz/30)
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor_9000_fdc_t, via5_irq_w))
+	MCFG_VIA6522_READPA_HANDLER(READ8(victor_9000_fdc_t, via5_pa_r))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(victor_9000_fdc_t, via5_pb_w))
 
 	MCFG_DEVICE_ADD(M6522_6_TAG, VIA6522, XTAL_30MHz/30)
 	MCFG_VIA6522_READPA_HANDLER(READ8(victor_9000_fdc_t, via6_pa_r))
@@ -267,6 +269,11 @@ void victor_9000_fdc_t::device_reset()
 {
 	// resolve callbacks
 	m_irq_cb.resolve_safe();
+
+	// reset devices
+	m_via4->reset();
+	m_via5->reset();
+	m_via6->reset();
 
 	// set floppy callbacks
 	m_floppy0->setup_ready_cb(floppy_image_device::ready_cb(FUNC(victor_9000_fdc_t::ready0_cb), this));
@@ -473,20 +480,25 @@ WRITE_LINE_MEMBER( victor_9000_fdc_t::via4_irq_w )
 }
 
 
-/*
+READ8_MEMBER( victor_9000_fdc_t::via5_pa_r )
+{
+	/*
 
-    bit     description
+	    bit     description
 
-    PA0     E0
-    PA1     E1
-    PA2     I1
-    PA3     E2
-    PA4     E4
-    PA5     E5
-    PA6     I7
-    PA7     E6
+	    PA0     E0
+	    PA1     E1
+	    PA2     I1
+	    PA3     E2
+	    PA4     E4
+	    PA5     E5
+	    PA6     I7
+	    PA7     E6
 
-*/
+	*/
+
+	return 0;
+}
 
 WRITE8_MEMBER( victor_9000_fdc_t::via5_pb_w )
 {

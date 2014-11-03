@@ -100,6 +100,7 @@ public:
 	required_shared_ptr<UINT8> m_video_ram;
 
 	virtual void machine_start();
+	virtual void machine_reset();
 
 	DECLARE_WRITE8_MEMBER( via1_pa_w );
 	DECLARE_WRITE_LINE_MEMBER( write_nfrd );
