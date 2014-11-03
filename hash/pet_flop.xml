@@ -711,4 +711,211 @@
 		</part>
 	</software>
 
+	<!-- misc files from TOSEC -->
+
+	<software name="basicsrc">
+		<description>PET BASIC Source Files Disk 01</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="pet basic source files disk 01 (19xx)(-).d64" size="174848" crc="27bd0f3d" sha1="eccb6a18a4ad8df964f1471d9f5a41524fd8aeed" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games1">
+		<description>PET Games 1</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="pet games 1 (19xx)(-).d64" size="174848" crc="52ffea48" sha1="f5a0b3b22340a195bef9a2aaa66f43b5c5454f01" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games2">
+		<description>PET Games 2</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="pet games 2 (19xx)(-).d64" size="174848" crc="e64ed20f" sha1="37ee4f75367ced01426e142da35248309fa591a8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games3">
+		<description>PET Games 3</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="pet games 3 (19xx)(-).d64" size="174848" crc="7ac24ec8" sha1="e07f0fcf2529b80e6d402b7a4ee254bb089f91a8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games01">
+		<description>PET Games Disk 01</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="pet games disk 01 (19xx)(-).d64" size="174848" crc="73c3aaa0" sha1="9de30ebdb3e23df20d4f785130fd879696fd71d7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games02">
+		<description>PET Games Disk 02</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="pet games disk 02 (19xx)(-).d64" size="174848" crc="5c5d5106" sha1="42532d62fff68bd4aca0000847d07909b9687c3f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games03">
+		<description>PET Games Disk 03</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="pet games disk 03 (19xx)(-).d64" size="174848" crc="d4829562" sha1="911dbefd9bc763405172689056dbec603960cc4f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games04">
+		<description>PET Games Disk 04</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="pet games disk 04 (19xx)(-).d64" size="174848" crc="8689b1c8" sha1="a4c10db6937a609e15f30d448b08f2130663250a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games05">
+		<description>PET Games Disk 05</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="pet games disk 05 (19xx)(-).d64" size="174848" crc="76c00d9d" sha1="e6d4bc42e617c55e5494432610a0047ba847877b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games06">
+		<description>PET Games Disk 06</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="pet games disk 06 (19xx)(-).d64" size="174848" crc="19c798be" sha1="1a9d1ac081267ba9347e9acf5949d7d10dfc5ead" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games07">
+		<description>PET Games Disk 07</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="pet games disk 07 (19xx)(-).d64" size="174848" crc="dccc6181" sha1="f5fd88e96a52223851ad81360d3d0416fd346f83" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games08">
+		<description>PET Games Disk 08</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="pet games disk 08 (19xx)(-).d64" size="174848" crc="811336ec" sha1="8fffd1fe275a6a458d863d1b5fdaff9a370cd277" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games09">
+		<description>PET Games Disk 09</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="pet games disk 09 (19xx)(-).d64" size="174848" crc="7d7f3e7f" sha1="042c1f2f2bb5a0216e6d6f9871e8099749e43c32" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games10">
+		<description>PET Games Disk 10</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="pet games disk 10 (19xx)(-).d64" size="174848" crc="24e29212" sha1="92e4b1e5550bec0a347e85af26bec06e7a427fc9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games11">
+		<description>PET Games Disk 11</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="pet games disk 11 (19xx)(-).d64" size="174848" crc="9de91aa8" sha1="70b67d9fc19d9ee3f76b1b9a76e314b842c30b5e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games12">
+		<description>PET Games Disk 12</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="pet games disk 12 (19xx)(-).d64" size="174848" crc="53e4f0ae" sha1="cb4dbed029dcd65867d0c052853b0772b441c662" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="petutils">
+		<description>PET Utilities Disk 01</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires 40 Column PET"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="pet utilities disk 01 (19xx)(-)[40 column pets].d64" size="174848" crc="63a79af4" sha1="4d982b22444e8293b29852617a3630e55b5b03e3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

@@ -107,12 +107,12 @@
 	<software name="gomokuna">
 		<description>Gomoku Narabe</description>
 		<year>198?</year>
-		<publisher>Renju</publisher>
+		<publisher>&lt;doujin&gt;</publisher>
 		<info name="alt_title" value="五目並べ"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
-				<rom name="disk.d88" size="697008" crc="8047e60c" sha1="37b70478bf8d87ee7660cf4c85b781fb7c67065a" offset="0" />
+				<rom name="gomokuna.d88" size="697008" crc="8047e60c" sha1="37b70478bf8d87ee7660cf4c85b781fb7c67065a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -160,7 +160,7 @@
 		</part>
 	</software>
 
-	<software name="laydock">
+	<software name="laydock" supported="no"> <!-- fails loading -->
 		<description>LayDock</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -187,7 +187,7 @@
 	<software name="mappy">
 		<description>Mappy</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="692928">
@@ -198,8 +198,8 @@
 
 	<software name="marchen">
 		<description>Märchen Veil I</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1985</year>
+		<publisher>システムサコム (System Sacom)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="805728">
@@ -208,8 +208,8 @@
 		</part>
 	</software>
 
-	<software name="moonchld">
-		<description>Moonchild</description>
+	<software name="moonchld" supported="partial"> <!-- is this missing a user disk? -->
+		<description>Moon Child</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -220,7 +220,7 @@
 		</part>
 	</software>
 
-	<software name="murdclub">
+	<software name="murdclub" supported="partial"> <!-- graphics issues -->
 		<description>Murder Club</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -251,7 +251,7 @@
 		</part>
 	</software>
 
-	<software name="mugen2">
+	<software name="mugen2" supported="no"> <!-- "loading error" -->
 		<description>Mugen no Shinzou II</description>
 		<year>198?</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
@@ -272,8 +272,8 @@
 
 	<software name="nobo">
 		<description>Nobo</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1985</year>
+		<publisher>&lt;doujin&gt;</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="70592">
@@ -334,24 +334,12 @@
 
 	<software name="relics">
 		<description>Relics</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>ボーステック (Bothtec)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="692928">
 				<rom name="relics.d88" size="692928" crc="620e4bf2" sha1="ae6d5bca35724b9f7d918449850d9f2c7cc61d5b" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="soundgal">
-		<description>Sound Gal Music Editor (v1.0A)</description>
-		<year>1986</year>
-		<publisher>EA-Z Communication</publisher>
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="544560">
-				<rom name="sound gal.d88" size="544560" crc="b97b4d57" sha1="d1463b3cf1a5bd769a7cd68d1b3f748c4014984a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -383,7 +371,7 @@
 	<software name="xevious">
 		<description>Xevious</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -413,7 +401,7 @@
 
 	<!-- Demo disks &amp; Diskmag disks -->
 
-	<software name="kaleidos">
+	<software name="kaleidos" supported="partial"> <!-- missing user disk! -->
 		<description>Kaleidoscope Demo</description>
 		<year>198?</year>
 		<publisher>Hot-B</publisher>
@@ -437,22 +425,23 @@
 		</part>
 	</software>
 
-	<software name="mzdemo1">
-		<description>Super MZ Demo 1</description>
+	<software name="mzdemo">
+		<description>Super MZ Demo</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sharp?</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
-				<rom name="super mz demo 1.d88" size="697008" crc="b49cfe1b" sha1="9dd7e37712799b93c8d93f9185cc05272e0e868b" offset="0" />
+				<rom name="super mz demo.d88" size="697008" crc="b49cfe1b" sha1="9dd7e37712799b93c8d93f9185cc05272e0e868b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="dustbx01">
-		<description>Dust Box Vol. 1 - '90/4</description>
-		<year>19??</year>
+		<description>Dust Box Vol. 1 - April 1990</description>
+		<year>1990</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Set Interlace DIP switch to On"/>		
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -462,9 +451,10 @@
 	</software>
 
 	<software name="dustbx02">
-		<description>Dust Box Vol. 2</description>
-		<year>19??</year>
+		<description>Dust Box Vol. 2 - June 1990</description>
+		<year>1990</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Set Interlace DIP switch to On"/>		
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -474,9 +464,10 @@
 	</software>
 
 	<software name="dustbx03">
-		<description>Dust Box Vol. 3</description>
-		<year>19??</year>
+		<description>Dust Box Vol. 3 - September 1990</description>
+		<year>1990</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Set Interlace DIP switch to On"/>		
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -485,10 +476,11 @@
 		</part>
 	</software>
 
-	<software name="dustbx91" supported="no">
+	<software name="dustbx91">
 		<description>Dust Box '91 Special</description>
-		<year>19??</year>
+		<year>1991</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Set Interlace DIP switch to On"/>		
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -498,9 +490,10 @@
 	</software>
 
 	<software name="dustbx04">
-		<description>Dust Box Vol. 4</description>
-		<year>19??</year>
+		<description>Dust Box Vol. 4 - November 1990</description>
+		<year>1990</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Set Interlace DIP switch to On"/>		
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -511,8 +504,9 @@
 
 	<software name="dustbx05">
 		<description>Dust Box Vol. 5</description>
-		<year>19??</year>
+		<year>1991</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Set Interlace DIP switch to On"/>		
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -523,8 +517,9 @@
 
 	<software name="dustbx06">
 		<description>Dust Box Vol. 6</description>
-		<year>19??</year>
+		<year>1991</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Set Interlace DIP switch to On"/>		
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -535,8 +530,9 @@
 
 	<software name="dustbx07">
 		<description>Dust Box Vol. 7</description>
-		<year>19??</year>
+		<year>1992</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Set Interlace DIP switch to On"/>		
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -547,8 +543,9 @@
 
 	<software name="dustbx08">
 		<description>Dust Box Vol. 8</description>
-		<year>19??</year>
+		<year>1992</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Set Interlace DIP switch to On"/>		
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -559,8 +556,9 @@
 
 	<software name="dustbx09">
 		<description>Dust Box Vol. 9</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Set Interlace DIP switch to On"/>		
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -571,8 +569,9 @@
 
 	<software name="dustbx10">
 		<description>Dust Box Vol. 10</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Set Interlace DIP switch to On"/>		
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="784048">
@@ -583,8 +582,9 @@
 
 	<software name="dustbx11">
 		<description>Dust Box Vol. 11</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Set Interlace DIP switch to On"/>		
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="784048">
@@ -595,8 +595,9 @@
 
 	<software name="dustbx12">
 		<description>Dust Box Vol. 12</description>
-		<year>19??</year>
+		<year>1994</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Set Interlace DIP switch to On"/>		
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -607,8 +608,9 @@
 
 	<software name="dustbx13">
 		<description>Dust Box Vol. 13</description>
-		<year>19??</year>
+		<year>1994</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Set Interlace DIP switch to On"/>		
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -619,9 +621,10 @@
 
 	<software name="dustbx14">
 		<description>Dust Box Vol. 14</description>
-		<year>19??</year>
+		<year>1994</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="Set Interlace DIP switch to On"/>
+		
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
 				<rom name="dust box vol 14.d88" size="697008" crc="6b897344" sha1="6f8b0ed388cce5a4d8ad24c16f37441a1c70b308" offset="0" />
@@ -631,9 +634,10 @@
 
 	<software name="dustbx15">
 		<description>Dust Box Vol. 15</description>
-		<year>19??</year>
+		<year>1995</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<info name="usage" value="Set Interlace DIP switch to On"/>
+		
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
 				<rom name="dust box vol 15.d88" size="697008" crc="4719c224" sha1="b93215672858018d4cc8b9e5af6a3fe92f0cb705" offset="0" />
@@ -642,9 +646,10 @@
 	</software>
 
 	<software name="dustbx16">
-		<description>Dust Box Vol. 16</description>
-		<year>19??</year>
+		<description>Dust Box Vol. 16 - October 1996</description>
+		<year>1996</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Set Interlace DIP switch to On"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -663,7 +668,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
-				<rom name="basic-m25 v1(6z002).d88" size="697008" crc="f0f84164" sha1="6f4f57195299b4ba329fd4bb9eb733c8f791adf0" offset="0" />
+				<rom name="6z002 v1.0a.d88" size="697008" crc="f0f84164" sha1="6f4f57195299b4ba329fd4bb9eb733c8f791adf0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -675,15 +680,28 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
-				<rom name="basic-m25 v2(6z002).d88" size="697008" crc="2e585759" sha1="c8ea6bb291be68d7b0186cd2117c7fe01dd21f55" offset="0" />
+				<rom name="6z002.d88" size="697008" crc="2e585759" sha1="c8ea6bb291be68d7b0186cd2117c7fe01dd21f55" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
+	<software name="brown" supported="no"> <!-- "system ID error" -->
+		<description>Brown</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="usage" value="Requires a BASIC Master disk in Drive 1"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697009">
+				<rom name="brown.d88" size="697009" crc="2457a9c9" sha1="ffb094354f44c691d2dc41cd93f7007ab33484c0" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+
 	<software name="fenix">
 		<description>Fenix Shell (v0.2)</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;doujin&gt;</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -694,8 +712,8 @@
 
 	<software name="multplan">
 		<description>Multiplan v1.07</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986?</year>
+		<publisher>Microsoft?</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="759808">
@@ -704,10 +722,23 @@
 		</part>
 	</software>
 
-	<software name="pcpm">
-		<description>Personal CP/M (V1.0A)</description>
+	<software name="mz1e30">
+		<description>MZ-1E30 HDD Utilities</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sharp</publisher>
+		<info name="usage" value="Requires a BASIC Master disk in Drive 1"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="mz-1e30.d88" size="697008" crc="0cc720f5" sha1="fc1c27fabb53046dd273ebdd8db832e4700cdb30" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="pcpm">
+		<description>Personal CP/M v1.0A</description>
+		<year>198?</year>
+		<publisher>Sharp</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -716,26 +747,64 @@
 		</part>
 	</software>
 
-	<software name="telephona" cloneof="telephon">
-		<description>Telephone Soft (6Z006) V1.1A</description>
-		<year>198?</year>
+	<software name="smallmac">
+		<description>Small-Mac (v1.2, Rev 29)</description>
+		<year>1985?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires a CP/M Master disk in Drive 1"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
-				<rom name="telephone soft 1.d88" size="697008" crc="24c0ff6f" sha1="1adb1028c59ec3961dfafeb4ed8cf472c7add918" offset="0" />
+				<rom name="smallmac.d88" size="697008" crc="84c9309d" sha1="c06d7bc6691bbdac574433665b15596888bddc03" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soundgal">
+		<description>Sound Gal Music Editor (v1.0A)</description>
+		<year>1986</year>
+		<publisher>EA-Z Communication</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="544560">
+				<rom name="sound gal.d88" size="544560" crc="b97b4d57" sha1="d1463b3cf1a5bd769a7cd68d1b3f748c4014984a" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+	
+	<software name="telephona" cloneof="telephon">
+		<description>Telephone Soft (6Z006) v1.1A</description>
+		<year>198?</year>
+		<publisher>Sharp</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="6z006 v1.1a.d88" size="697008" crc="24c0ff6f" sha1="1adb1028c59ec3961dfafeb4ed8cf472c7add918" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="telephon">
-		<description>Telephone Soft (6Z006) V2.0B</description>
+		<description>Telephone Soft (6Z006) v2.0B</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sharp</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
-				<rom name="telephone soft 2.d88" size="697008" crc="27b5a0ff" sha1="c5959050e319627882744f2de2aa9acfb6626aed" offset="0" />
+				<rom name="6z006.d88" size="697008" crc="27b5a0ff" sha1="c5959050e319627882744f2de2aa9acfb6626aed" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="turbopas">
+		<description>TURBO Pascal System v3.01a</description>
+		<year>1985?</year>
+		<publisher>Borland</publisher>
+		<info name="usage" value="Requires a CP/M Master disk in Drive 1"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="turbopas.d88" size="697008" crc="32e63f6d" sha1="c491a548db9bc7aee66c56069c99453b598f1300" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -771,79 +840,32 @@
 		</part>
 	</software>
 
-<!-- Misc. dumps (non master disks) -->
+<!-- the below seem to be related to the dustbox series... -->
 
-	<software name="unk1">
-		<description>Unknown Disk 1 (SMALLC)</description>
+	<software name="sb02">
+		<description>Unknown Disk 1 (SB02)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="697008">
-				<rom name="unk1.d88" size="697008" crc="84c9309d" sha1="c06d7bc6691bbdac574433665b15596888bddc03" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="unk2">
-		<description>Unknown Disk 2 (MZ-1E30)</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="697008">
-				<rom name="unk2.d88" size="697008" crc="0cc720f5" sha1="fc1c27fabb53046dd273ebdd8db832e4700cdb30" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="unk3">
-		<description>Unknown Disk 3 (SB02)</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires a BASIC Master disk in Drive 1"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="784048">
-				<rom name="unk3.d88" size="784048" crc="bafe3fd2" sha1="02b2ae5e964cb0a130f70962e913b2de3603dbec" offset="0" />
+				<rom name="sb02.d88" size="784048" crc="bafe3fd2" sha1="02b2ae5e964cb0a130f70962e913b2de3603dbec" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="unk4">
-		<description>Unknown Disk 4 (SB03)</description>
+	<software name="sb03">
+		<description>Unknown Disk 2 (SB03)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires a BASIC Master disk in Drive 1"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
-				<rom name="unk4.d88" size="697008" crc="d6d1de04" sha1="b72f0b17fdf52bd8d08a09a719dab668e11a2bee" offset="0" />
+				<rom name="sb03.d88" size="697008" crc="d6d1de04" sha1="b72f0b17fdf52bd8d08a09a719dab668e11a2bee" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="unk5">
-		<description>Unknown Disk 5 (??)</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="697008">
-				<rom name="unk5.d88" size="697008" crc="32e63f6d" sha1="c491a548db9bc7aee66c56069c99453b598f1300" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="unk6">
-		<description>Unknown Disk 6 (Brown)</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="697009">
-				<rom name="unk6.d88" size="697009" crc="2457a9c9" sha1="ffb094354f44c691d2dc41cd93f7007ab33484c0" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 
 </softwarelist>

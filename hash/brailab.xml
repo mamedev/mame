@@ -1,0 +1,198 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- This is currently a documentation-only software list, but is hooked up in homelab.c -->
+<softwarelist name="brailab" description="BraiLab cassettes">
+	<software name="autotele">
+		<description>Automata beszelo telefonkonyv</description>
+		<year>198?</year>
+		<publisher>Dr. Szel Lajos</publisher>
+
+		<part name="cass1" interface="brailab_cass">
+			<dataarea name="cass" size="3612">
+				<rom name="automata beszelo telefonkonyv (198x)(dr. szel lajos)(hu).htp" size="3612" crc="9bf49f4c" sha1="7ef317450ad1da193030cfee231b8f07be1cc233" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="automors">
+		<description>Automata Morze leado</description>
+		<year>1986</year>
+		<publisher>Dr. Szel Lajos</publisher>
+
+		<part name="cass1" interface="brailab_cass">
+			<dataarea name="cass" size="3044">
+				<rom name="automata morze leado (1986-06-10)(dr. szel lajos)(hu).htp" size="3044" crc="bd2e0a75" sha1="9700e62d519ff7c9ae10ee84650eefb8ff1e4f9a" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basic1"> <!-- pw - gepida -->
+		<description>Basic I.</description>
+		<year>1990</year>
+		<publisher>Vakoda Software</publisher>
+		
+		<part name="cass1" interface="brailab_cass">
+			<dataarea name="cass" size="5840">
+				<rom name="basic i. (1990)(vakoda software)(hu)[pw - gepida].htp" size="5840" crc="3cdfc683" sha1="164765b6ad00f99c920a389227a0ddb7a59a17ac" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basic4"> <!-- pw - bunko' -->
+		<description>Basic IV.</description>
+		<year>1990</year>
+		<publisher>Vakoda Software</publisher>
+
+		<part name="cass1" interface="brailab_cass">
+			<dataarea name="cass" size="7432">
+				<rom name="basic iv. (1990)(vakoda software)(hu)[pw - bunko'].htp" size="7432" crc="f86fdbab" sha1="ae19ca5028ab691f40162523092d694e397f6b43" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basic5"> <!-- pw - patka'ny -->
+		<description>Basic V.</description>
+		<year>1990</year>
+		<publisher>Vakoda Software</publisher>
+
+		<part name="cass1" interface="brailab_cass">
+			<dataarea name="cass" size="8838">
+				<rom name="basic v. (1990)(vakoda software)(hu)[pw - patka'ny].htp" size="8838" crc="ee8ac05f" sha1="ed7ac813c99dea6e90f523e76afd1712a92e9d60" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beszsakk">
+		<description>Beszelo Sakk</description>
+		<year>1987</year>
+		<publisher>Ecsedi Csaba</publisher>
+
+		<part name="cass1" interface="brailab_cass">
+			<dataarea name="cass" size="17727">
+				<rom name="beszelo sakk (1987-12-30)(ecsedi csaba)(hu).htp" size="17727" crc="199be814" sha1="aa84fa6e1fe63b7c94210a39f57fdd457d159d9e" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="overlay">
+		<description>BraiLab Overlay</description>
+		<year>1990</year>
+		<publisher>Varga Erno</publisher>
+
+		<part name="cass1" interface="brailab_cass">
+			<dataarea name="cass" size="2931">
+				<rom name="brailab overlay (1990)(varga erno).htp" size="2931" crc="dd1aae91" sha1="7600aa8bc7b8ac1d940e0fc849747a5c0f42e9ca" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fajlnevb">
+		<description>Fajlnevbemondo</description>
+		<year>198?</year>
+		<publisher></publisher>
+
+		<part name="cass1" interface="brailab_cass">
+			<dataarea name="cass" size="576">
+				<rom name="fajlnevbemondo (198x)(-).htp" size="576" crc="3a5b572e" sha1="55df4ca41d9c0b9dc4c53a18a678cecf88de16e9" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ketvando">
+		<description>A Ket vandorlo lovag</description>
+		<year>198?</year>
+		<publisher>Csapo Endre</publisher>
+
+		<part name="cass1" interface="brailab_cass">
+			<dataarea name="cass" size="5737">
+				<rom name="ket vandorlo lovag, a (198x)(csapo endre)(hu).htp" size="5737" crc="5f3c21f0" sha1="ee2fd14910631e5944b7e6c9dca3357954ad07fc" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="memteszt">
+		<description>Memoria teszt</description>
+		<year>198?</year>
+		<publisher>Vakoda Software</publisher>
+
+		<part name="cass1" interface="brailab_cass">
+			<dataarea name="cass" size="5897">
+				<rom name="memoria teszt (198x)(vakoda software)(hu).htp" size="5897" crc="4d092d67" sha1="a12549497aa6dc520984d3facf96fb077bd075bd" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ralli">
+		<description>Ralli</description>
+		<year>1988</year>
+		<publisher>Lukacs Sandor</publisher>
+
+		<part name="cass1" interface="brailab_cass">
+			<dataarea name="cass" size="19027">
+				<rom name="ralli (1988)(lukacs sandor)(hu).htp" size="19027" crc="fdcbccf1" sha1="c4cdb61844beb6f12fa2cb992a86d4fc64e2b089" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rulett">
+		<description>Rulett</description>
+		<year>198?</year>
+		<publisher></publisher>
+
+		<part name="cass1" interface="brailab_cass">
+			<dataarea name="cass" size="7557">
+				<rom name="rulett (198x)(-)(hu).htp" size="7557" crc="69bb232e" sha1="bc33c0dfbcea50f03656d670c591f92eb6a68540" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="szovegol">
+		<description>Szovegolvaso!</description>
+		<year>1990</year>
+		<publisher>Varga Erno</publisher>
+
+		<part name="cass1" interface="brailab_cass">
+			<dataarea name="cass" size="3660">
+				<rom name="szovegolvaso! (1990-08-26)(varga erno)(hu).htp" size="3660" crc="6a9c131c" sha1="b9c4e2d46d594a16162ce395ffa7cd516e9d912c" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="szovegsz">
+		<description>Szovegszerkeszto keresovel, taroloval</description>
+		<year>1986</year>
+		<publisher>Dr. Szel Lajos</publisher>
+
+		<part name="cass1" interface="brailab_cass">
+			<dataarea name="cass" size="12370">
+				<rom name="szovegszerkeszto keresovel, taroloval (1986-12-16)(dr. szel lajos)(hu).htp" size="12370" crc="9bc21a73" sha1="a72b2ea2639e055bac9fa9cdae66be650a028fdb" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tivoli">
+		<description>Tivoli</description>
+		<year>198?</year>
+		<publisher></publisher>
+
+		<part name="cass1" interface="brailab_cass">
+			<dataarea name="cass" size="4505">
+				<rom name="tivoli (198x)(-)(hu).htp" size="4505" crc="54370451" sha1="31a7ec2fc5569f613b42dc53bfc374d124d273dd" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vadaszpi">
+		<description>Vadaszpilota</description>
+		<year>1989</year>
+		<publisher>Vakoda Software</publisher>
+
+		<part name="cass1" interface="brailab_cass">
+			<dataarea name="cass" size="3272">
+				<rom name="vadaszpilota (1989)(vakoda software)(hu).htp" size="3272" crc="06d752c2" sha1="880f604c11080b688b127ce26f8928981cead189" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -13654,7 +13654,7 @@ kept for now until finding out what those bytes affect...
 	<software name="cheese" supported="partial">
 		<description>Cheese (Jpn)</description>
 		<year>1984</year>
-		<publisher>Nihon ELectronics</publisher>
+		<publisher>Nihon Electronics</publisher>
 		<part name="cart" interface="msx_cart">
 			<feature name="mapper" value="NOMAPPER" />
 			<dataarea name="rom" size="16384">

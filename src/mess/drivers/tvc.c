@@ -799,7 +799,7 @@ static MACHINE_CONFIG_START( tvc, tvc_state )
 
 	/* expansion interface */
 	MCFG_DEVICE_ADD("exp1", TVCEXP_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(tvc_exp , NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(tvc_exp , "hbf", false)
 	MCFG_TVCEXP_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
 	MCFG_TVCEXP_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_DEVICE_ADD("exp2", TVCEXP_SLOT, 0)
@@ -826,6 +826,8 @@ static MACHINE_CONFIG_START( tvc, tvc_state )
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "tvc_cart")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "tvc_flop")
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "tvc_cass")
 MACHINE_CONFIG_END
 
 /* ROM definition */

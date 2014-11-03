@@ -1,0 +1,828 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="turbor_flop" description="MSX TurboR floppies">
+	<software name="2021snoo">
+		<description>2021 Snooky (Jpn)</description>
+		<year>1991</year>
+		<publisher>Studio Hawk</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="2021 snooky (1991)(studio hawk)(jp).dsk" size="737280" crc="3d3e50b0" sha1="96d493fabe69aa8322e68e0b0c5344c464325cf9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blade">
+		<description>Blade</description>
+		<year>1997</year>
+		<publisher>GW's Workshop</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="blade (1997)(gw's workshop)[b].dsk" size="737280" crc="3dab74d6" sha1="8c0b7b32ec22840ce1dabd38863e1876232d3b9d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="earth">
+		<description>Earth</description>
+		<year>1996</year>
+		<publisher>GW's Workshop</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="earth (1996)(gw's workshop).dsk" size="737280" crc="82acc22b" sha1="eabdccc0f7c0a640013a4618d9c20aa458e1e0c5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="earthatt">
+		<description>Earth Attack</description>
+		<year>19??</year>
+		<publisher>GW's Workshop</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="earth attack (19xx)(gw's workshop)[b].dsk" size="737280" crc="b6cd052d" sha1="3ad636e6726be67f395b80d170566065c5d80868" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fnano2">
+		<description>F-Nano 2 - 3D Car Action (Jpn, Demo)</description>
+		<year>1994</year>
+		<publisher>XRay</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="f-nano 2 - 3d car action (demo) (1994)(xray)(jp).dsk" size="737280" crc="65f9baa0" sha1="2ffd8e05317a1f5f296635da654b51739d392b6a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fishing">
+		<description>Fishing (v1.0)</description>
+		<year>1996</year>
+		<publisher>GW's Workshop</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="fishing v1.0 (1996-02-26)(gw's workshop).dsk" size="737280" crc="09c578bb" sha1="b532cc47c08ea406efe3e551e0db2023f4d11154" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="fishing v1.0 (1996-02-26)(gw's workshop)[a].dsk" size="737280" crc="85e05982" sha1="5575d703d7e8290c1c8e434492efc340ba0b0558" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diefrag2">
+		<description>Die Frage II (Jpn)</description>
+		<year>199?</year>
+		<publisher>Studio Sequence</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="frage ii, die (199x)(studio sequence)(jp)[b].dsk" size="737280" crc="6d749b83" sha1="3da39ec846c109fbd74476efa3f9a349a85081b0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fray">
+		<description>Fray - In Magical Adventure (Jpn)</description>
+		<year>1990</year>
+		<publisher>Micro Cabin</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Opening Disk 0"/>
+			<dataarea name="flop" size="737280">
+				<rom name="fray - in magical adventure (1990)(micro cabin)(jp)(disk 1 of 5)(opening disk 0).dsk" size="737280" crc="f26fdaeb" sha1="fd3c5f8793bfbec1851c89cfc32366618c6f482d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Opening Disk 0, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="fray - in magical adventure (1990)(micro cabin)(jp)(disk 1 of 5)(opening disk 0)[a].dsk" size="737280" crc="ee1ddd5d" sha1="858f9861f5015fd2e04f5a9fa4de971bfe7b5ec4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Opening Disk 0, Alt 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="fray - in magical adventure (1990)(micro cabin)(jp)(disk 1 of 5)(opening disk 0)[a2].dsk" size="737280" crc="fe161465" sha1="9abd04cfb508567ab4d19e4a0a82fa00f6348286" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+		<feature name="part_id" value="Opening Disk 0, Alt 3"/>
+			<dataarea name="flop" size="737280">
+				<rom name="fray - in magical adventure (1990)(micro cabin)(jp)(disk 1 of 5)(opening disk 0)[b].dsk" size="737280" crc="47fbfe46" sha1="ce2ce7c68560e490539482c8b52177403bcffd31" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+		<feature name="part_id" value="Opening Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="fray - in magical adventure (1990)(micro cabin)(jp)(disk 2 of 5)(opening disk 1).dsk" size="737280" crc="c33d5ac3" sha1="0b145459326c62254522bf77f063b069d086aa29" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+		<feature name="part_id" value="Opening Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="fray - in magical adventure (1990)(micro cabin)(jp)(disk 2 of 5)(opening disk 1)[a].dsk" size="737280" crc="df4f5d75" sha1="4508096f7a4d5bf1c9e94df62def933ef1f6630f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+		<feature name="part_id" value="Opening Disk 1, Alt 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="fray - in magical adventure (1990)(micro cabin)(jp)(disk 2 of 5)(opening disk 1)[b].dsk" size="737280" crc="76a97e6e" sha1="f5d4dacceb3bf0b2150239f3c641d82ec733063e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+		<feature name="part_id" value="Opening Disk 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="fray - in magical adventure (1990)(micro cabin)(jp)(disk 3 of 5)(opening disk 2).dsk" size="737280" crc="b770ee14" sha1="80701f4a86a151778c4fc81f56e9088d7b880651" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+		<feature name="part_id" value="Opening Disk 2, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="fray - in magical adventure (1990)(micro cabin)(jp)(disk 3 of 5)(opening disk 2)[a].dsk" size="737280" crc="f2d4c059" sha1="ad26d223992b9c7713d2df7bd44b8a1cb09b9209" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+		<feature name="part_id" value="Game Disk 0"/>
+			<dataarea name="flop" size="737280">
+				<rom name="fray - in magical adventure (1990)(micro cabin)(jp)(disk 4 of 5)(game disk 0).dsk" size="737280" crc="8c6d9bed" sha1="0bddc86900b934cb381ce3aac8d9f8614ca49ede" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+		<feature name="part_id" value="Game Disk 0, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="fray - in magical adventure (1990)(micro cabin)(jp)(disk 4 of 5)(game disk 0)[a].dsk" size="737280" crc="99dcaab5" sha1="bf2f9b963c8045dca79921c3c08cea9a4a31f129" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+		<feature name="part_id" value="Game Disk 0, Alt 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="fray - in magical adventure (1990)(micro cabin)(jp)(disk 4 of 5)(game disk 0)[a2].dsk" size="737280" crc="4a96b160" sha1="f28e35348dceb9bef0d6e21674bf01d67fd9501b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+		<feature name="part_id" value="Game Disk 0, Alt 3"/>
+			<dataarea name="flop" size="737280">
+				<rom name="fray - in magical adventure (1990)(micro cabin)(jp)(disk 4 of 5)(game disk 0)[b].dsk" size="737280" crc="39f9bf40" sha1="bf09f4a119bba97e26b2a55e4d6c83c1a8dbfbad" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_3_5">
+		<feature name="part_id" value="Game Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="fray - in magical adventure (1990)(micro cabin)(jp)(disk 5 of 5)(game disk 1).dsk" size="737280" crc="d631a475" sha1="c1c35bedb620181846a407d6900db741f751e50f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop15" interface="floppy_3_5">
+		<feature name="part_id" value="Game Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="fray - in magical adventure (1990)(micro cabin)(jp)(disk 5 of 5)(game disk 1)[a].dsk" size="737280" crc="db96855a" sha1="9fce9c2fb9f684ed2478deacf02a1388975230e5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop16" interface="floppy_3_5">
+		<feature name="part_id" value="Game Disk 1, Alt 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="fray - in magical adventure (1990)(micro cabin)(jp)(disk 5 of 5)(game disk 1)[b].dsk" size="737280" crc="63a580d8" sha1="f8c52bf8405e08e5bb58623b691417f34b4e521c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gfx9000">
+		<description>GFX9000 Tool Disk (Ned)</description>
+		<year>1996</year>
+		<publisher>Fony</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="gfx9000 tool disk (1996)(fony)(nl).dsk" size="737280" crc="2c3eec2d" sha1="4c8ca5101426eb080ec41464928c6973f6415ace" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gunfesta">
+		<description>Gun Shot vs Festa Again (Jpn)</description>
+		<year>2001</year>
+		<publisher>Rabbit Soft Worker's</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="gun shot vs festa again (2001)(rabbit soft worker's)(jp).dsk" size="737280" crc="6375481b" sha1="56ac03a3fc5dcdb2cf07f1110284d87f7be061cb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="illucity">
+		<description>Illusion City (Jpn)</description>
+		<year>1991</year>
+		<publisher>Micro Cabin</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Game Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="illusion city (1991)(micro cabin)(jp)(disk 01 of 13)(game disk 1).dsk" size="737280" crc="6c09d054" sha1="94258658039f76d22bc79ec02b7b78e9b4a7ac13" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Game Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="illusion city (1991)(micro cabin)(jp)(disk 01 of 13)(game disk 1)[a].dsk" size="737280" crc="ada84ec2" sha1="f1cebd02bb01238b1d346838b162858ad1356d5b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Game Disk 1, Alt 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="illusion city (1991)(micro cabin)(disk 01 of 13)(game disk 1).dsk" size="737280" crc="5d4538bb" sha1="9e9946536f3cb6d90e2433ff19376cb9f9818290" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+		<feature name="part_id" value="Game Disk 1, Alt 3"/>
+			<dataarea name="flop" size="737280">
+				<rom name="illusion city (1991)(micro cabin)(jp)(disk 01 of 13)(game disk 1)[b].dsk" size="737280" crc="f1664f9b" sha1="6b9966cfc56e91c7a9ca66e99b73d7aebc496b54" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+		<feature name="part_id" value="Game Disk 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="illusion city (1991)(micro cabin)(jp)(disk 02 of 13)(game disk 2).dsk" size="737280" crc="69872539" sha1="4535b5a13a86537e363566bd2a864cbf17bcd2e7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+		<feature name="part_id" value="Game Disk 2, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="illusion city (1991)(micro cabin)(disk 02 of 13)(game disk 2).dsk" size="737280" crc="e37721f4" sha1="62ad6222dc4e0f47c6a4609ebf618fc2233288cc" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+		<feature name="part_id" value="Game Disk 3"/>
+			<dataarea name="flop" size="737280">
+				<rom name="illusion city (1991)(micro cabin)(jp)(disk 03 of 13)(game disk 3).dsk" size="737280" crc="494a0db3" sha1="ac94c9f5e735c935a5ed4ff47c9689e5e07ac266" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+		<feature name="part_id" value="Game Disk 4"/>
+			<dataarea name="flop" size="737280">
+				<rom name="illusion city (1991)(micro cabin)(jp)(disk 04 of 13)(game disk 4).dsk" size="737280" crc="9d31fe9f" sha1="da08fd8c79ebb28a01232734bf607f576f7987cf" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+		<feature name="part_id" value="Game Disk 5"/>
+			<dataarea name="flop" size="737280">
+				<rom name="illusion city (1991)(micro cabin)(jp)(disk 05 of 13)(game disk 5).dsk" size="737280" crc="d8a0e0c8" sha1="5472f519f06212562d72f5be229b74a4599f13c2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+		<feature name="part_id" value="Game Disk 6"/>
+			<dataarea name="flop" size="737280">
+				<rom name="illusion city (1991)(micro cabin)(jp)(disk 06 of 13)(game disk 6).dsk" size="737280" crc="5b89b23d" sha1="1141f0b05250ffde6cbd02a29041c4c520008267" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+		<feature name="part_id" value="Game Disk 7"/>
+			<dataarea name="flop" size="737280">
+				<rom name="illusion city (1991)(micro cabin)(jp)(disk 07 of 13)(game disk 7).dsk" size="737280" crc="98a4a1ac" sha1="fdad8341a81d1310f00e07057b61ea4ef31cdf06" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+		<feature name="part_id" value="Game Disk 8"/>
+			<dataarea name="flop" size="737280">
+				<rom name="illusion city (1991)(micro cabin)(jp)(disk 08 of 13)(game disk 8).dsk" size="737280" crc="11998da3" sha1="efa7b70351f0302e112cb9b0ef49dc033c967e3d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+		<feature name="part_id" value="Data Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="illusion city (1991)(micro cabin)(jp)(disk 10 of 13)(data disk 1).dsk" size="737280" crc="e5e892e0" sha1="ae943fd7643183366096341403ac387e60897719" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_3_5">
+		<feature name="part_id" value="Data Disk 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="illusion city (1991)(micro cabin)(jp)(disk 11 of 13)(data disk 2).dsk" size="737280" crc="18783533" sha1="68754c6308fcb1988e72677cef277325326bf22f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop15" interface="floppy_3_5">
+		<feature name="part_id" value="Data Disk 3"/>
+			<dataarea name="flop" size="737280">
+				<rom name="illusion city (1991)(micro cabin)(jp)(disk 12 of 13)(data disk 3).dsk" size="737280" crc="76cf5357" sha1="50b47657f4b911cf244d3992960e7cd8d76c7725" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop16" interface="floppy_3_5">
+		<feature name="part_id" value="Data Disk 4"/>
+			<dataarea name="flop" size="737280">
+				<rom name="illusion city (1991)(micro cabin)(jp)(disk 13 of 13)(data disk 4).dsk" size="737280" crc="79a28c00" sha1="99446c15d42241594bb2dab71a5db188d3f9a213" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moonligh">
+		<description>Moonlight Saga (Jpn)</description>
+		<year>1996</year>
+		<publisher>Maple Yard</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="moonlight saga (1996)(maple yard)(jp).dsk" size="737280" crc="5adff71b" sha1="c6e339c992562800ded94b29cd910cfe7d656cea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxview">
+		<description>MSX View</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="msx view (19xx)(-)[b].dsk" size="737280" crc="9305eb4e" sha1="bc5333ee88cf26419c64074e45ab7b64c8866c22" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxwin2k">
+		<description>MSX Windows 2000 (Fixed by Valerio]</description>
+		<year>2000</year>
+		<publisher>CyberSoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="msx windows 2000 (2000)(cybersoft)[f valerio][mouse].dsk" size="737280" crc="b39c8f5f" sha1="9de6b5c6c73bf418c798bb5ee9be56ebdda54b73" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxwn2ki">
+		<description>MSX Windows 2000 Installer (Fixed by Valerio)</description>
+		<year>2000</year>
+		<publisher>CyberSoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="msx windows 2000 installer (2000)(cybersoft)[f valerio][mouse].dsk" size="737280" crc="0d8890af" sha1="5763786c369cd6f77682f6dd616d883fc319d88f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxwin98">
+		<description>MSX Windows 98 (v1.1e, Fixed by Valerio)</description>
+		<year>1998</year>
+		<publisher>CyberSoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="msx windows 98 v1.1e (1989)(cybersoft)[f valerio][mouse][needs msx-dos 2].dsk" size="737280" crc="6c6ccd77" sha1="957c3c0189a1074aca18ae12e8283e0f109dd655" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxwn98i">
+		<description>MSX Windows 98 v1.1e Installer</description>
+		<year>1998</year>
+		<publisher>CyberSoft</publisher>
+		
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="msx windows 98 v1.1e installer (1989)(cybersoft)[mouse][needs msx-dos 2].dsk" size="368640" crc="256fe779" sha1="d890c64cc33476bd2730183c83fab43701e88652" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxdoshe">
+		<description>MSX-DOS Help (Ita, v2.20)</description>
+		<year>1994</year>
+		<publisher>Miri Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="msx-dos help v2.20 (1994)(miri software)(it).dsk" size="737280" crc="59b4b5b2" sha1="5a7822d0969f30b711dd0a3dfeb416e2d70d0817" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="msx-dos help v2.20 (1994)(miri software)(it)[a].dsk" size="737280" crc="74aa3cdd" sha1="7045228f7df7f049263397d06dd332868e3da271" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="multiplx">
+		<description>Multi-Plex (Jpn)</description>
+		<year>1993</year>
+		<publisher>MIWA</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="multi-plex (1993)(miwa)(jp).dsk" size="737280" crc="126399dc" sha1="a6f75f120c89c22dce27a63f73209d96ccacb92a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="multi-plex (1993)(miwa)(jp)[a].dsk" size="737280" crc="d116b2f7" sha1="8cd400d46b8af6a0f557eda0903ad916898b91cc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="myunote">
+		<description>Myu Note (Jpn)</description>
+		<year>1992</year>
+		<publisher>Bit2</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="myu note (1992)(bit2)(jp)(disk 1 of 2).dsk" size="737280" crc="e2d5772b" sha1="420fdd3980c4f18f46055ec457cf236348625a18" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="myu note (1992)(bit2)(jp)(disk 2 of 2).dsk" size="737280" crc="e3eda999" sha1="cf41b87c1390684fc31c2d6634756592d616073b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="myusios">
+		<description>Myu Sios (Jpn)</description>
+		<year>1991</year>
+		<publisher>Bit2</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="myu sios (1991)(bit2)(jp)(disk 1 of 3).dsk" size="737280" crc="2cf78feb" sha1="f80b22f2f1f8263cceb782738558767286dd89a1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="myu sios (1991)(bit2)(jp)(disk 2 of 3).dsk" size="737280" crc="0ffa249d" sha1="b7107c665a502c815e0d55e4165a17bd98420385" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="737280">
+				<rom name="myu sios (1991)(bit2)(jp)(disk 3 of 3).dsk" size="737280" crc="74010ac2" sha1="2e1b83373aadd455f093907b0700623b462cbe68" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="paradrea">
+		<description>PaRaDream (Jpn)</description>
+		<year>1992</year>
+		<publisher>RAC House</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="paradream (1992)(rac house)(jp).dsk" size="737280" crc="81f23eae" sha1="1dd663e5b38ce0206f09a8c6a226f9e6562e341a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="paradream (1992)(rac house)(jp)[a].dsk" size="737280" crc="cb11589a" sha1="eea7efb3a3f3df9a8985a24bc9838d3ef90b78e7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="paradream (1992)(rac house)(jp)[a2].dsk" size="737280" crc="7cafcc2c" sha1="7182f010517a9d7f54f2ade133c8f3b7f77b8f3e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt 3"/>
+			<dataarea name="flop" size="737280">
+				<rom name="paradream (1992)(rac house)(jp)[b].dsk" size="737280" crc="523c10aa" sha1="80d3db313a0787a5a9d4d061ac5d32f2b64a3f7e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcmplay">
+		<description>The PCM Player</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="pcm player, the (19xx)(-)[b].dsk" size="737280" crc="ebea7699" sha1="65c9c181fe8c78c3dec77ad4166fd70b3f448268" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ranman12">
+		<description>Ranma Nibunnoichi 1-2 (Jpn)</description>
+		<year>1992</year>
+		<publisher>Bothtec</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="ranma nibunnoichi 1-2 (1992)(bothtec)(jp)(disk 1 of 8).dsk" size="737280" crc="6074f52f" sha1="13ef524c86124a628e6169edcf81e2ede3140bc0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="ranma nibunnoichi 1-2 (1992)(bothtec)(jp)(disk 1 of 8)[a].dsk" size="737280" crc="9068b80b" sha1="846d114dfdcf6d33997937e03aefb5cfb782e75b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="ranma nibunnoichi 1-2 (1992)(bothtec)(jp)(disk 1 of 8)[a2].dsk" size="737280" crc="bbd17c43" sha1="50f5d422b5eb45f5e8b340e1030bf65cb91e1a8e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt 3"/>
+			<dataarea name="flop" size="737280">
+				<rom name="ranma nibunnoichi 1-2 (1992)(bothtec)(jp)(disk 1 of 8)[a3].dsk" size="737280" crc="39cf454c" sha1="c627a49182ccf80e231525cb1a3a53e460fc024b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt 4"/>
+			<dataarea name="flop" size="737280">
+				<rom name="ranma nibunnoichi 1-2 (1992)(bothtec)(jp)(disk 1 of 8)[b].dsk" size="737280" crc="6f8ce94b" sha1="fee621f0426ae26c35cc87b29d770d7056c352e0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt 5"/>
+			<dataarea name="flop" size="737280">
+				<rom name="ranma nibunnoichi 1-2 (1992)(bothtec)(jp)(disk 1 of 8)[b2].dsk" size="737280" crc="36375928" sha1="b2e154c59fd828ef935d5e4c5e016c2a8fc9cb24" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="ranma nibunnoichi 1-2 (1992)(bothtec)(jp)(disk 2 of 8).dsk" size="737280" crc="fbb7805b" sha1="a9e6bfd80298626086e3a81d054b37142db08b52" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="737280">
+				<rom name="ranma nibunnoichi 1-2 (1992)(bothtec)(jp)(disk 3 of 8).dsk" size="737280" crc="26295e10" sha1="7dcfedaafde8cf0b286d80b0f2a930dba15a362c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="737280">
+				<rom name="ranma nibunnoichi 1-2 (1992)(bothtec)(jp)(disk 4 of 8).dsk" size="737280" crc="4cb5d6f4" sha1="c0750209ce9b36dd76091ed353d762a9f5380adb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="737280">
+				<rom name="ranma nibunnoichi 1-2 (1992)(bothtec)(jp)(disk 5 of 8).dsk" size="737280" crc="9d9fd03d" sha1="7f92d37b3cb31689a3fa54c374c84366e302afb3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 6"/>
+			<dataarea name="flop" size="737280">
+				<rom name="ranma nibunnoichi 1-2 (1992)(bothtec)(jp)(disk 6 of 8).dsk" size="737280" crc="c90a316e" sha1="27dfae858e543a443521dc3b9a8f70028e0cd033" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 6, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="ranma nibunnoichi 1-2 (1992)(bothtec)(jp)(disk 6 of 8)[a].dsk" size="737280" crc="b313ebd6" sha1="99d9e9580372e9eccdc69a20e6b349a90e1c1005" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 7"/>
+			<dataarea name="flop" size="737280">
+				<rom name="ranma nibunnoichi 1-2 (1992)(bothtec)(jp)(disk 7 of 8).dsk" size="737280" crc="77b007ec" sha1="0f64b6b2a1eefb0597793ccb82a247945a19b5ca" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 8"/>
+			<dataarea name="flop" size="737280">
+				<rom name="ranma nibunnoichi 1-2 (1992)(bothtec)(jp)(disk 8 of 8).dsk" size="737280" crc="ea153962" sha1="6ea5f0a2b89f223220ee8003b83a2f537fd63ee3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop15" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 8, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="ranma nibunnoichi 1-2 (1992)(bothtec)(jp)(disk 8 of 8)[a].dsk" size="737280" crc="825b91a9" sha1="9dd478f437147726ba585c1a6446c0150f2de9a2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop16" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 8, Alt 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="ranma nibunnoichi 1-2 (1992)(bothtec)(jp)(disk 8 of 8)[a2].dsk" size="737280" crc="742f421d" sha1="34acc7e52b700557071447345f3f7419a972ddae" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stg">
+		<description>S.T.G.</description>
+		<year>1996</year>
+		<publisher>Y. Tomohara</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="s.t.g. (1996)(y. tomohara).dsk" size="368640" crc="1bf3a50c" sha1="1bfbac72446c059d4838a0b117c5cd5db0a85e21" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stgspec">
+		<description>S.T.G. Special - Do Don Taku</description>
+		<year>1998</year>
+		<publisher>Y. Tomohara</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="s.t.g. special - do don taku (1998)(y. tomohara).dsk" size="737280" crc="82309e65" sha1="a885df863a6f04441881ac907510ab80d139c357" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seeddrag">
+		<description>Seed of Dragon (Jpn)</description>
+		<year>1990</year>
+		<publisher>Riverhill Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Game Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="seed of dragon (1990)(riverhill soft)(jp)(disk 1 of 3)(game disk 1).dsk" size="737280" crc="6375eeb9" sha1="7a329629bc7667761751f092e8d2dc350f9eba76" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Game Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="seed of dragon (1990)(riverhill soft)(jp)(disk 1 of 3)(game disk 1)[a].dsk" size="737280" crc="a5f1a706" sha1="0df21b3debfc5bc83eed276ddeed0acf7f62ab30" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Game Disk 1, Alt 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="seed of dragon (1990)(riverhill soft)(jp)(disk 1 of 3)(game disk 1)[a2].dsk" size="737280" crc="08fd8f1b" sha1="5803057e6c75a5841dc4f273e7d26b73f83a74f9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+		<feature name="part_id" value="Game Disk 1, Alt 3"/>
+			<dataarea name="flop" size="737280">
+				<rom name="seed of dragon (1990)(riverhill soft)(jp)(disk 1 of 3)(game disk 1)[b].dsk" size="737280" crc="b6529b25" sha1="137f61f7437b62f643c46d6e8e2193ebd58d8d8a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+		<feature name="part_id" value="Game Disk 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="seed of dragon (1990)(riverhill soft)(jp)(disk 2 of 3)(game disk 2).dsk" size="737280" crc="dd1fd600" sha1="16bece552fd1af10c2cf467d1c89e7d2869ded35" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+		<feature name="part_id" value="Game Disk 2, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="seed of dragon (1990)(riverhill soft)(jp)(disk 2 of 3)(game disk 2)[a].dsk" size="737280" crc="86ea43d0" sha1="cf11190db1c36aa9b79c534b131f7258729e0e99" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+		<feature name="part_id" value="Game Disk 3"/>
+			<dataarea name="flop" size="737280">
+				<rom name="seed of dragon (1990)(riverhill soft)(jp)(disk 3 of 3)(game disk 3).dsk" size="737280" crc="3ac7bc91" sha1="f376d8875548a7910317ab7a34cd2be823101385" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+		<feature name="part_id" value="Game Disk 3, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="seed of dragon (1990)(riverhill soft)(jp)(disk 3 of 3)(game disk 3)[a].dsk" size="737280" crc="d0ef7a8e" sha1="a41729e7ae2e5223374603cadc08f551ae8e40e6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flywind">
+		<description>Shoot That Flying Windows!</description>
+		<year>1997</year>
+		<publisher>Nyyrikki</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="shoot that flying windows! (1997)(nyyrikki)[mouse].dsk" size="737280" crc="1c8f1d96" sha1="d69c803efb9558314489ab04a25ec84a2901f49f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="shoot that flying windows! (1997)(nyyrikki)[a][mouse].dsk" size="737280" crc="07a4a7ef" sha1="14e93cedcdd35e42c46d8d2c7b0b153012507bdb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sweet">
+		<description>Sweet (Jpn)</description>
+		<year>1994</year>
+		<publisher>Kazuyuki Suzuki</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="sweet (1994)(kazuyuki suzuki)(jp)[old t800].dsk" size="737280" crc="3cf9612c" sha1="8d46a336944128a9f925498647a3d163f7796acd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swissdmo">
+		<description>The Swiss Demo</description>
+		<year>1992</year>
+		<publisher>MJ-CHJ &amp; AT Productions</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="swiss demo, the (1992)(mj-chj &amp; at productions)[b].dsk" size="737280" crc="e37aa5b6" sha1="1235ccc142d7fcfefacb489cf375ac1001b7aacd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="telebas1">
+		<description>Telebasic - Issue 01 (Spa)</description>
+		<year>1993</year>
+		<publisher>Traposoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="telebasic - issue 01 (1993)(traposoft)(es).dsk" size="737280" crc="9c11fde1" sha1="d0691a07805dea89eb3be54bbcf37303df49e192" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turboost">
+		<description>Turbo Booster (Jpn)</description>
+		<year>1990</year>
+		<publisher>Team Toy Boys</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="turbo booster (1990)(team toy boys)(jp)[b].dsk" size="737280" crc="f7233416" sha1="78763684ef466ef84773f9f3c3102deaf2cc61cb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xsccomp">
+		<description>XSC Compression Program (Ned)</description>
+		<year>1995</year>
+		<publisher>XelaSoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="xsc compression program (1995)(xelasoft)(nl)[needs msx-dos 2].dsk" size="737280" crc="9f9cd398" sha1="09970aa6ee691f3f0b33cdd54d9a4e341fa6fbca" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="xsc compression program (1995)(xelasoft)(nl)[a][needs msx-dos 2].dsk" size="737280" crc="12eee5d2" sha1="7c70cde2d0b0a5fe952b11bd878d46290dab9231" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zoneterr">
+		<description>Zone Terra (Ned)</description>
+		<year>1994</year>
+		<publisher>Quadrivium</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="zone terra (1994)(quadrivium)(nl).dsk" size="737280" crc="5d7c7d25" sha1="cd631425a0fb7e7cf043c8f69281fd8255ce2c4f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zoneterrd" cloneof="zoneterr">
+		<description>Zone Terra (Ned, Demo)</description>
+		<year>1994</year>
+		<publisher>Quadrivium</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="zone terra (demo) (1994)(quadrivium)(nl).dsk" size="737280" crc="ed4ac074" sha1="a36dec1e71df540c4e87ee7f38660900f3a05efd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="zone terra (demo) (1994)(quadrivium)(nl)[b].dsk" size="737280" crc="1e1bedb5" sha1="78a2990afdc5b60f6e3ee04c3a4b82b2e35d43da" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="zone terra (demo) (1994)(quadrivium)(nl)[b2].dsk" size="737280" crc="f0271d7c" sha1="1a3355499ebf63ea5ec6581cd4a3535887b8c813" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

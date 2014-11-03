@@ -3,73 +3,15 @@
 <softwarelist name="msx1_flop" description="MSX1 disk images">
 
 <!--
-   Things listed here should have a requirement of BASIC 1.0 + Disk Basic 1.0 (ie a Standard MSX1 type system with FDD)
-   I've noticed some 'MSX1' floppy images in TOSEC seem to require a higher BASIC version?
+   Some 'MSX1' floppy images in TOSEC seem to require a higher BASIC version?
    Some also require more RAM? the driver currently isn't very flexible.
 
    This for now is just a skeleton list for quick testing.
 
-   To use the floppy drive the disk basic ROM must be mounted, example use case.
-   msx -cart1 diskbas -flop1 ohshit
+   To use the floppy disks a floppy interface (fsfd1, fsfd1a, etc.) must be loaded in one of the cartslots, 
+   or you can use a driver with a built-in floppy drive.
 
 -->
-
-	<software name="jsw2">
-		<description>Jet Set Willy II (trained)</description>
-		<year>1986</year>
-		<publisher>bootleg</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="jet set willy ii - the final frontier (1985)(software projects)(gb)[t].dsk" size="737280" crc="af505b0c" sha1="80c9d7d113acbda75f92d10bec1b8f3322e62176" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="laserfig">
-		<description>Laserfight!</description>
-		<year>1989</year>
-		<publisher>Login Soft</publisher>
-		<info name="developer" value="Shinobu Yagawa" />
-		<info name="usage" value="Hold CTRL at boot until the beep." />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="laserfight! (1989)(login soft)(jp).dsk" size="737280" crc="4811c8b6" sha1="b4cad1e07a2b0e54bae8d96e2f99cda7d3d01f29" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ohmummy">
-		<description>Oh Mummy!!</description>
-		<year>1984</year>
-		<publisher>Longman Software</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="oh mummy!! (1984)(longman software)(gb).dsk" size="737280" crc="9cf775cc" sha1="cd7db0faf25ae33699b1708a19a874e3662e158a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ohshit">
-		<description>Oh Shit!</description>
-		<year>1986</year>
-		<publisher>Aackosoft</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="oh shit! (1986)(aackosoft)(nl).dsk" size="737280" crc="735ebc21" sha1="7de3f69a8a5136e0dd25214d36b1194a6506b377" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ohno" cloneof="ohshit">
-		<description>Oh No!</description>
-		<year>1986</year>
-		<publisher>Eaglesoft</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="oh no! (1986)(eaglesoft)(nl)[aka oh shit!].dsk" size="737280" crc="aee65f34" sha1="5c2cd6dd8192a8c29fc0e272181272cb26cc2af6" offset="0" />
-			</dataarea>
-		</part>
-	</software>
 
 <!--
 System software
@@ -81,6 +23,7 @@ The following floppies came with the machines.
 		<description>National CF-3300</description>
 		<year>1985</year>
 		<publisher>National</publisher>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="368640">
 				<rom name="3300dsk.dsk" size="368640" crc="7aee6273" sha1="f41a08339ba6d0788309aaf7c1d6f978f0f18665" offset="0" />
@@ -92,19 +35,4067 @@ The following floppies came with the machines.
 		<description>Spectravideo SVI-738</description>
 		<year>1985</year>
 		<publisher>Spectravideo</publisher>
-		<part name="cpm1" interface="floppy_3_5">
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="CP/M Disk 1"/>
 			<dataarea name="flop" size="368640">
 				<rom name="738cpm1.dsk" size="368640" crc="02b05c62" sha1="6c14dae92677e5a3693ba51472cb6373f265774a" offset="0" />
 			</dataarea>
 		</part>
-		<part name="cpm2" interface="floppy_3_5">
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="CP/M Disk 2"/>
 			<dataarea name="flop" size="368640">
 				<rom name="738cpm2.dsk" size="368640" crc="46f95d1b" sha1="de98bcc4e84293d2f3139741ae995a1413f9e11d" offset="0" />
 			</dataarea>
 		</part>
-		<part name="msxdos" interface="floppy_3_5">
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="MSX-DOS"/>
 			<dataarea name="flop" size="368640">
 				<rom name="738msxdos.dsk" size="368640" crc="0430d57f" sha1="221faaf9fcbed0ecf82cb0f6b1965a384f952c8d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Non-TOSEC stuff -->
+
+	<software name="laserfig">
+		<description>Laserfight! (Jpn)</description>
+		<year>1989</year>
+		<publisher>Login Soft</publisher>
+		<info name="developer" value="Shinobu Yagawa" />
+		<info name="usage" value="Hold CTRL at boot until the beep." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="laserfight! (1989)(login soft)(jp).dsk" size="737280" crc="4811c8b6" sha1="b4cad1e07a2b0e54bae8d96e2f99cda7d3d01f29" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- TOSEC disks -->
+
+	<software name="007view">
+		<description>007 - A View to a Kill (Euro)</description>
+		<year>1986</year>
+		<publisher>Domark</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="007 - a view to a kill (1986)(domark)(gb).dsk" size="737280" crc="5212709d" sha1="8a68b31ac5999bc06afd1e0c3640d2e4122497e7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="007agent">
+		<description>007 - Agente Especial (Spa)</description>
+		<year>1985</year>
+		<publisher>Monser</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="007 - agente especial (1985)(monser)(es).dsk" size="737280" crc="23475bcf" sha1="2ceac4902c00525693034397618b7886ed9741b0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="007licen">
+		<description>007 - Licence to Kill (Euro)</description>
+		<year>1989</year>
+		<publisher>Domark</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="007 - licence to kill (1989)(domark)(gb).dsk" size="737280" crc="449bab0f" sha1="e752308c3d2bcbb987daa92a3fb454bc5d1f475c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="007livin">
+		<description>007 - The Living Daylights (Euro, Trained +2)</description>
+		<year>1987</year>
+		<publisher>Domark</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="007 - the living daylights (1987)(domark)(gb)[t +2].dsk" size="737280" crc="d0435225" sha1="40c79680da0639085fbc5106566e987e80463dba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="10yard">
+		<description>10 Yard Fight (Jpn)</description>
+		<year>1986</year>
+		<publisher>Irem</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="10 yard fight (1986)(irem)(jp).dsk" size="737280" crc="e89b608d" sha1="1af4a46b49f707fc898bbf6f6326442a39f9d885" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="10thfram">
+		<description>10th Frame (Euro)</description>
+		<year>1986</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="10th frame (1986)(us gold)(gb).dsk" size="737280" crc="4fb87b3e" sha1="77990265142595969eb41bede7045804d4db1863" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="10th frame (1986)(us gold)(gb)[a].dsk" size="737280" crc="f0cea3de" sha1="cde226d996691c33a2f8439ebcd056fc6fc4b657" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="180">
+		<description>180 (Euro)</description>
+		<year>1987</year>
+		<publisher>Mastertronic Added Dimension</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="180 (1987)(mastertronic added dimension).dsk" size="737280" crc="a9f6571e" sha1="7dc126a5eca63863022bc7a9c9ce86e5b4d72343" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1942">
+		<description>1942 (Jpn)</description>
+		<year>1986</year>
+		<publisher>ASCII</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="1942 (1986)(ascii)(jp).dsk" size="737280" crc="e8c84954" sha1="fba6ef9488031c0d4253fb30c9a832c10a85da3f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dgolf">
+		<description>3D Golf Simulation - High Speed Edition (Jpn)</description>
+		<year>1984</year>
+		<publisher>T&amp;E Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="3d golf simulation - high speed edition (1984)(t&amp;e soft)(jp).dsk" size="737280" crc="55ab246f" sha1="f36ee552db4784d6adf4842113b1edc3b4f93121" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dknock">
+		<description>3D Knockout! (Euro)</description>
+		<year>1985</year>
+		<publisher>Alligata Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="3d knockout! (1985)(alligata software)(gb).dsk" size="737280" crc="b9b4e2f5" sha1="5ecaf2f72eb4b7bde2bccd64b1442365cd3aeb79" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dpool">
+		<description>3D Pool - Maltese Joe's Pool Challenge (Euro)</description>
+		<year>1989</year>
+		<publisher>Firebird Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="3d pool. maltese joe's pool challenge (1989)(firebird software)(gb).dsk" size="737280" crc="a55caf09" sha1="40e2a8902aca64248be15a9cef57d9a31c2549c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dwater">
+		<description>3D Water Driver (Jpn)</description>
+		<year>1984</year>
+		<publisher>Apollo Technica</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="3d water driver (1984)(apollo technica)(jp).dsk" size="737280" crc="630d1c65" sha1="a01dcef169bee8cce4ae2b7c6df5d9689bd4b23a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="offroad">
+		<description>4x4 Off-Road Racing (Euro)</description>
+		<year>1988</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="4x4 off-road racing (1988)(us gold)(gb).dsk" size="737280" crc="51dbc827" sha1="a8099b59a3d7a328df5f4cf49d72fc5c1ff6e9d0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="4x4 off-road racing (1988)(us gold)(gb)[a].dsk" size="737280" crc="139003df" sha1="9c597ec0a80efd25eb3a4e802f842f04e238b1d9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="50dicas">
+		<description>50 dicas para o MSX (Bra)</description>
+		<year>198?</year>
+		<publisher>Universoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="50 dicas para o msx (19xx)(universoft)(br).dsk" size="368640" crc="a50616de" sha1="60a94bacc468dedac41fef2a15a10fc9a844df77" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="666">
+		<description>666 - Uma Aventura Macabra (Bra?, v2.02)</description>
+		<year>2003</year>
+		<publisher>Christian Hofsetz</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="666 - uma aventura macabra v2.02 (2003)(christian hofsetz)(en-pt).dsk" size="737280" crc="c07652c7" sha1="4d52cc035f4f9bfafa3b44f78c20894d7af8149e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="7card">
+		<description>7 Card Stud (Euro)</description>
+		<year>1986</year>
+		<publisher>Martech Games</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="7 card stud (1986)(martech games)(gb).dsk" size="737280" crc="e60c0c15" sha1="5cab68637e5e09ad59332642d819ead658b93abc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="737sim">
+		<description>737 Flight Simulator (Spa)</description>
+		<year>198?</year>
+		<publisher>Scorpio Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="737 flight simulator (19xx)(scorpio software)(es).dsk" size="737280" crc="92ab8891" sha1="a0452aa138f8cf6f50dc03df3425198998478415" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="747400b">
+		<description>747 400b Flight Simulator (Euro)</description>
+		<year>1988</year>
+		<publisher>Eurosoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="747 400b flight simulator (1988)(eurosoft)(nl).dsk" size="737280" crc="bbe930e4" sha1="d14a8ed6005877538e6f3744241a8c7daa707737" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="8192">
+		<description>8192</description>
+		<year>1990</year>
+		<publisher>Nagi-P Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="8192 (1990)(nagi-p soft).dsk" size="737280" crc="305fc0a9" sha1="822de4bae6f56a1c6875552647e066a2514bf248" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="98attack">
+		<description>98 Attackers</description>
+		<year>1990</year>
+		<publisher>Satico</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="98 attackers (1990)(satico)(jp).dsk" size="737280" crc="ce06ff2a" sha1="739463fcd1a5542f191c5b80b3011f215a3643c8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ateam">
+		<description>The A-Team (Spa)</description>
+		<year>1988</year>
+		<publisher>Zafiro Software Division</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="a-team, the (1988)(zafiro software division)(es).dsk" size="737280" crc="d748460e" sha1="15454df5d4602f77c35bd5f72973b501e6b53be1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="a-team, the (1988)(zafiro software division)(es)[a].dsk" size="737280" crc="28861280" sha1="c4e5784bd7798183a620f67f8135559d7e20cb5f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ae">
+		<description>A.E. (Jpn)</description>
+		<year>1983</year>
+		<publisher>Toshiba-EMI</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="a.e. (1983)(toshiba-emi)(jp).dsk" size="737280" crc="d4b7940c" sha1="4537d9a420a3d48deb828f90ee92a58c8a2a3b00" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aackodp">
+		<description>Aacko Draw &amp; Paint (Euro)</description>
+		<year>1985</year>
+		<publisher>Aackosoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="aacko draw &amp; paint (1985)(aackosoft)(nl).dsk" size="737280" crc="9d4408f7" sha1="6fd03e0515710d317be008d73104005a3905933e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aardrijk">
+		<description>Aardrijkskunde (Ned)</description>
+		<year>1987</year>
+		<publisher>Aackosoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="aardrijkskunde (1987)(aackosoft)(nl).dsk" size="737280" crc="8483414e" sha1="bc35a60a95f719ed8b0f99ad0ed271659a45f4ac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aatnos">
+		<description>Aatnos Demo</description>
+		<year>1997</year>
+		<publisher>Lieves!Tuore</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="aatnos demo (1997)(lieves!tuore).dsk" size="368640" crc="7237d7f5" sha1="c5f56f61f4a375a8cd0d59c6b4547d17e5e57a08" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abadis">
+		<description>La Abadia del Crimen (Spa)</description>
+		<year>1988</year>
+		<publisher>Opera Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="368640">
+				<rom name="abadia del crimen, la (1988)(opera soft)(es).dsk" size="368640" crc="9480eeef" sha1="2831f16bbd62d0a51d7644fc3c337171ee261450" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="abadia del crimen, la (1988)(opera soft)(es)[a].dsk" size="737280" crc="c1dff80f" sha1="5be83dc972537d2d43d4f98eb7dcc2c55ba3ad11" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="abadia del crimen, la (1988)(opera soft)(es)[a2].dsk" size="737280" crc="2806818d" sha1="3199bc44c210dc8888c88155b9df46d924e7c99c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt 3"/>
+			<dataarea name="flop" size="368640">
+				<rom name="abadia del crimen, la (1988)(opera soft)(es)[a3].dsk" size="368640" crc="ae61cb2e" sha1="086f2af5b4cb1cfb0e1c3ba3d69b9f0abdf5200d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abejasab">
+		<description>La Abeja Sabia (Spa)</description>
+		<year>1986</year>
+		<publisher>Anaya Multimedia</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="abeja sabia, la (1986)(anaya multimedia)(es).dsk" size="737280" crc="40ba52e6" sha1="095849e26f4ba5d41e628f109c17b78eb3510613" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abracada">
+		<description>Abracadabra (Spa)</description>
+		<year>1988</year>
+		<publisher>Proein Soft Line</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="abracadabra (1988)(proein soft line)(es).dsk" size="737280" crc="d53e0066" sha1="f5996f427d76f33e83f4a3c39978a7ee9b39af52" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Hacked by MSX Games bOX"/>
+			<dataarea name="flop" size="368640">
+				<rom name="abracadabra (1988)(proein soft line)(es)[h msx games box].dsk" size="368640" crc="c90dfd9a" sha1="aefd113dc2ffafc809192a998a1786955b8c7d5c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abusimb">
+		<description>Abu Simbel Profanation (Spa)</description>
+		<year>1986</year>
+		<publisher>Dinamic Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="abu simbel profanation (1986)(dinamic software)(es).dsk" size="737280" crc="f862e95c" sha1="3d767bfc3509d7ad32324c89fd13c48f774b4a97" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="abu simbel profanation (1986)(dinamic software)(es)[a].dsk" size="737280" crc="1199e7c6" sha1="73bb15161d25366ca0b8c970656045c2bd899f42" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aceoface">
+		<description>Ace of Aces (Euro)</description>
+		<year>1986</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="ace of aces (1986)(us gold)(gb).dsk" size="737280" crc="2761a392" sha1="406d73e0e8a2217e6fa58f6896e7169a02b89c40" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="acrobata">
+		<description>Acrobatas (Bra)</description>
+		<year>1987</year>
+		<publisher>Nemesis Informatica</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="acrobatas (1987)(nemesis informatica)(br).dsk" size="737280" crc="a124ca47" sha1="2e64ee9d9fd9336a1ab22f90dbdbdc91e9ef7199" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="actman">
+		<description>Actman (Jpn)</description>
+		<year>1984</year>
+		<publisher>ASCII</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="actman (1984)(ascii)(jp).dsk" size="737280" crc="ebb79685" sha1="aac3deef61c6538e24bc49c2b7a20f7ae06d9df9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="addictab">
+		<description>Addictaball (Euro)</description>
+		<year>1988</year>
+		<publisher>Alligata Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="addictaball (1988)(alligata software)(gb).dsk" size="737280" crc="cefe7064" sha1="e4df1f2cad224ae315ca7cfd08003efd6059adb6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adel">
+		<description>Adel (Spa)</description>
+		<year>1986</year>
+		<publisher>Mind Games Espana</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="adel (1986)(mind games espana)(es).dsk" size="737280" crc="13604ebe" sha1="5d846557c17ab1e9c9c25c529e5d579d1b03c8ed" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Hacked by CEZ"/>
+			<dataarea name="flop" size="737280">
+				<rom name="adel (1986)(mind games espana)(es)[h cez].dsk" size="737280" crc="49f2d892" sha1="29c299c5bcba6bf1245c155c3195bdeafea328d5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adonis">
+		<description>Adonis (Jpn)</description>
+		<year>1988</year>
+		<publisher>MSX Magazine</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="adonis (1988)(msx magazine)(jp).dsk" size="737280" crc="7083f19b" sha1="6fafb6f796f8f7fdcfce821df05f93934fdd9438" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advenchu">
+		<description>Adven'chuta! (Jpn)</description>
+		<year>1983</year>
+		<publisher>MIA</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="adven'chuta! (1983)(mia)(jp).dsk" size="737280" crc="05c18396" sha1="2e7f5acbdb27fdf147feec4002627bc4d0e512e2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aekrus">
+		<description>Aekrus Demo</description>
+		<year>1987</year>
+		<publisher>Lieves!Tuore</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="aekrus demo (1997)(lieves!tuore).dsk" size="368640" crc="334d7db2" sha1="af32acb972b831bfcd8770ac85fe91ad99ebcf9f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="afrtrail">
+		<description>African Trail Simulator (Spa)</description>
+		<year>1990</year>
+		<publisher>Positive</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="african trail simulator (1990)(positive)(es).dsk" size="737280" crc="fe08e61a" sha1="20e8ed8c86c46f8b17bfb6d91a90ea6b49f846b8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="african trail simulator (1990)(positive)(es)[a].dsk" size="737280" crc="4b2c5a11" sha1="3a3ab8762e2038e95bad89164590070338205d8e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="afterwar">
+		<description>After the War (Spa)</description>
+		<year>1989</year>
+		<publisher>Dinamic Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="368640">
+				<rom name="after the war (1989)(dinamic software)(es).dsk" size="368640" crc="499707ee" sha1="117efd7663cc4fbd6119556547df867802dd9a37" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="after the war (1989)(dinamic software)(es)[a].dsk" size="737280" crc="1925976c" sha1="5dada0db2d25fd6a9a11f714dbe83c303a91d483" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="after the war (1989)(dinamic software)(es)[a2].dsk" size="737280" crc="aee29011" sha1="c8a40486d6a85e25dababe65ea17a00e35f71756" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Cracked by King Soft"/>
+			<dataarea name="flop" size="737280">
+				<rom name="after the war (1989)(dinamic software)(es)[cr king soft].dsk" size="737280" crc="b96a8e3e" sha1="d3cb46162d2035199481f15c032607ebb385cf8a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aburner">
+		<description>Afterburner(Euro)</description>
+		<year>1988</year>
+		<publisher>Activision</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="afterburner (1988)(activision)(us).dsk" size="737280" crc="1939d4ad" sha1="d45c443f7ac64b13522b53b97b68ef1b6e712a29" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="afterburner (1988)(activision)(us)[a].dsk" size="737280" crc="5472743a" sha1="0992cf4fbe491d9f92517b5ff538d42754e922a7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="afteroid">
+		<description>Afteroids (Spa)</description>
+		<year>1988</year>
+		<publisher>Zigurat Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="afteroids (1988)(zigurat software)(es).dsk" size="737280" crc="5f7e0a28" sha1="652c0028935b59e1ccd26a90ad51a11f4ee30113" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="afteroids (1988)(zigurat software)(es)[a].dsk" size="737280" crc="2fc1c8c4" sha1="28fc994a26c27fe20394cae45b7acfc5aaac21a2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="agendape">
+		<description>Agenda Perpetua (Spa)</description>
+		<year>1986</year>
+		<publisher>Philips</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="agenda perpetua (1986)(philips)(es).dsk" size="737280" crc="c14c5b1a" sha1="72d2e2c7d26bb57f1d0c767d65bda0bba305df33" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aguiafo">
+		<description>Aguia de Fogo (Bra)</description>
+		<year>1986</year>
+		<publisher>Ayrton</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="aguia de fogo (1986)(ayrton)(br).dsk" size="737280" crc="8a0a9dd9" sha1="32f2dda1aaf27c63af6e06dab452c72c4e3d86ab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airfox">
+		<description>Air Fox</description>
+		<year>198?</year>
+		<publisher>Game Buster</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="air fox (19xx)(game buster).dsk" size="737280" crc="1d726be7" sha1="588603037b3345e18b6fde358162cb3694fca7ef" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atraffic">
+		<description>Air Traffic Control (Fra)</description>
+		<year>1986</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="air traffic control (1986)(-)(fr).dsk" size="737280" crc="85b47020" sha1="4a1fe57452bd42733c43f8308affa0cf4e4b4826" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="akernaak">
+		<description>Akernaak (Bra)</description>
+		<year>1987</year>
+		<publisher>Max Tecnologic</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="akernaak (1987)(max tecnologic)(br).dsk" size="737280" crc="795b00b1" sha1="62348600b7c562f4568b63d80f56c31bfda88c5c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alcatraz">
+		<description>Alcatraz - A Fuga Impossivel (Bra)</description>
+		<year>1986</year>
+		<publisher>Editora Aleph</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="alcatraz - a fuga impossivel (1986)(editora aleph)(br).dsk" size="737280" crc="f585726d" sha1="3993912d84b476139635c1d644a4f20e16ba3933" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="368640">
+				<rom name="alcatraz - a fuga impossivel (1986)(editora aleph)(br)[a].dsk" size="368640" crc="a5bef66d" sha1="bf224c9c1c7ca19b15faad9e50a795fc899635dd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Hacked by MSX Files"/>
+			<dataarea name="flop" size="737280">
+				<rom name="alcatraz - a fuga impossivel (1986)(editora aleph)(br)[h msx files].dsk" size="737280" crc="66b010ff" sha1="594e7800dfa859ea2570ae530d8ea2b05e507007" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alcatrz3">
+		<description>Alcatraz 3 - A Fuga Continua (Bra)</description>
+		<year>1990</year>
+		<publisher>Hyper Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="alcatraz 3 - a fuga continua (1990)(hyper soft)(br).dsk" size="737280" crc="b9e7d99f" sha1="652d98cbe7ff06073db88614861ff5acbda99ec9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alcazar">
+		<description>Alcazar - The Forgotten Fortress (Euro)</description>
+		<year>1985</year>
+		<publisher>Activision</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="alcazar - the forgotten fortress (1985)(activision)(us).dsk" size="737280" crc="40fa2312" sha1="16af448dd4571be2b14befc0ec30ba10ffe67c12" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alehop">
+		<description>Ale Hop! (Spa)</description>
+		<year>1988</year>
+		<publisher>Topo Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="ale hop! (1988)(topo soft)(es).dsk" size="737280" crc="03955c76" sha1="9d2175fee15ed92e4d82bc94d04036f1f60208ca" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="ale hop! (1988)(topo soft)(es)[a].dsk" size="737280" crc="679384b6" sha1="2857616a03d58b4e55020644d54df7adc74fcf3e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alfamat">
+		<description>Alfamat (Spa)</description>
+		<year>1985</year>
+		<publisher>Anaya Multimedia</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="alfamat (1985)(anaya multimedia)(es).dsk" size="737280" crc="613db4da" sha1="aaa5d6fcddedb12cbc9c2388bcd581bff75b1883" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alibaba">
+		<description>Alibaba and 40 Thieves</description>
+		<year>1984</year>
+		<publisher>ICM</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="alibaba and 40 thieves (1984)(icm).dsk" size="737280" crc="956f6e1d" sha1="7be0eff85cdab0b01b942ef90bffd7587161d2be" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alien8">
+		<description>Alien 8 (Euro)</description>
+		<year>1985</year>
+		<publisher>Ultimate Play The Game</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="alien 8 (1985)(ultimate play the game)(gb).dsk" size="737280" crc="8f902c11" sha1="4113b1cc4230b10c3a44501c4a05bd3d2bc23024" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asyndrom">
+		<description>Alien Syndrome (Spa)</description>
+		<year>1988</year>
+		<publisher>Dro Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="368640">
+				<rom name="alien syndrome (1988)(dro soft)(es).dsk" size="368640" crc="9b96a1ed" sha1="c85e84e137563dcad727b431ff8561d04d9c7566" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Bad?"/>
+			<dataarea name="flop" size="737280">
+				<rom name="alien syndrome (1988)(dro soft)(es)[b].dsk" size="737280" crc="1e918a22" sha1="c40bfdfcb854ae1afe175bf6ae46835f2500b4cc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aliens">
+		<description>Aliens (Euro)</description>
+		<year>1987</year>
+		<publisher>Mr. Micro</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="aliens (1987)(mr. micro)(gb).dsk" size="737280" crc="5c42b612" sha1="03c465a271f2b83a67a1a086df9b318856f1ab8e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aliensj"> <!-- needs 256k -->
+		<description>Aliens - Alien 2 (Jpn)</description>
+		<year>1987</year>
+		<publisher>Square</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="aliens. alien 2 (1987)(square)(jp)[needs 256k].dsk" size="737280" crc="7f4793cb" sha1="20972ea6c2a6d0e01f3738891eaf0e4c2cdb18e4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="aliens. alien 2 (1987)(square)(jp)[a][needs 256k].dsk" size="737280" crc="2795c76d" sha1="fcb5efed56e0b79f5d62928ec3c0788cfee336ed" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="aliens. alien 2 (1987)(square)(jp)[a2][needs 256k].dsk" size="737280" crc="18458fb3" sha1="f14c1deadbfb128cb20299f2e7b303047d43c91d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alblastr">
+		<description>Alpha Blaster (Euro)</description>
+		<year>1984</year>
+		<publisher>Aackosoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="alpha blaster (1984)(aackosoft)(nl).dsk" size="737280" crc="d0e43dc6" sha1="f4b24a0be4972dd5821fe3db5c71d5f55151962d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aroid">
+		<description>Alpha Roid (Jpn)</description>
+		<year>1986</year>
+		<publisher>Pony Canyon</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="alpha roid (1986)(pony canyon)(jp).dsk" size="737280" crc="503d6d7a" sha1="27ba39e14644d421633ad6d815f82b7c403f56c5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alphasqu">
+		<description>Alpha Squadron (Jpn)</description>
+		<year>1985</year>
+		<publisher>Sony</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="alpha squadron (1985)(sony)(jp).dsk" size="737280" crc="534f453c" sha1="ab558d4799fc6d6576c174f759374d7701dbbda3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alpine">
+		<description>Alpine Ski (Euro)</description>
+		<year>1987</year>
+		<publisher>Methodic Solutions</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="alpine ski (1987)(methodic solutions)(nl).dsk" size="737280" crc="b198fb54" sha1="372918cc166bd7685eb6cf3e2933621e3bbeba51" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amaurote">
+		<description>Amaurote (Euro)</description>
+		<year>1987</year>
+		<publisher>Mastertronic Added Dimension</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="amaurote (1987)(mastertronic added dimension).dsk" size="737280" crc="8e614bce" sha1="321b65720ffc0b31eec3da11fff345666110c2b2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amazonia">
+		<description>Amazonia (Bra)</description>
+		<year>1989</year>
+		<publisher>ProKit</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="amazonia (1989)(prokit)(br).dsk" size="737280" crc="df1d36e4" sha1="39cd2a77824615417c9bd25e472b54912877fa72" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="184320">
+				<rom name="amazonia (1989)(prokit)(br)[a].dsk" size="184320" crc="b5d87d1a" sha1="f2ac9ea9d873a8ffa14fc3d36ca8c74fdd1d3030" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amtruck">
+		<description>American Truck (Jpn)</description>
+		<year>1986</year>
+		<publisher>Nihon Telenet</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="american truck (1986)(telenet japan)(jp).dsk" size="737280" crc="986aa8ff" sha1="cc06734a0f535896bb2a7489b4f5a3f64b1fe891" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amida">
+		<description>Amida (Jpn)</description>
+		<year>1983</year>
+		<publisher>Victor - JVC</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="amida (1983)(pony canyon)(jp).dsk" size="737280" crc="f9a2f768" sha1="5c3376ead0fa7541ff5e92ddb887ad3422a50196" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amomundo">
+		<description>Amo del Mundo (Spa)</description>
+		<year>1990</year>
+		<publisher>Positive</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="amo del mundo (1990)(positive)(es).dsk" size="737280" crc="bb24dca7" sha1="9638ad154e3cf71b50cb805ec46283a7fab57302" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="amo del mundo (1990)(positive)(es)[a].dsk" size="737280" crc="6466cfe5" sha1="70815fe989acdce1292ad917351b58ed4b45036b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amotopuf">
+		<description>Amoto's Puf (Spa)</description>
+		<year>1988</year>
+		<publisher>SPE</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="amoto's puf (1988)(spe)(es).dsk" size="737280" crc="88dd742b" sha1="f312651b1ce27065d05ca03a8eb461afe75644a4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Cracked by Fun Soft"/>
+			<dataarea name="flop" size="737280">
+				<rom name="amoto's puf (1988)(spe)(es)[cr fun soft].dsk" size="737280" crc="f80ce2e5" sha1="ec2eebf7da07bbec6f3e1ca0652fa1a968320a1a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anaza">
+		<description>Anaza - Kaleidoscope Special (Jpn)</description>
+		<year>1987</year>
+		<publisher>Hot-B</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="anaza. kaleidoscope special (1987)(hot-b)(jp).dsk" size="737280" crc="33c1cbf2" sha1="32f7201accfa4c122c5a7a9a24d78ca58c078b5e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anp500cc">
+		<description>Angel Nieto Pole 500cc (Spa)</description>
+		<year>1990</year>
+		<publisher>Opera Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="angel nieto pole 500cc (1990)(opera soft)(es).dsk" size="737280" crc="a9e4ac47" sha1="ec05707870ccac99b1d52ac5c776b7e332dd02d7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="angel nieto pole 500cc (1990)(opera soft)(es)[a].dsk" size="737280" crc="7638f1f4" sha1="e24dfee21968222729f4ded70e5ec706d15e338c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="angelo">
+		<description>Angelo (Jpn)</description>
+		<year>1984</year>
+		<publisher>ASCII</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="angelo (1984)(ascii)(jp).dsk" size="737280" crc="ad8bba77" sha1="db37be3979a3c3746d2a1679669e489a3f47e17b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anglebal">
+		<description>Angleball (Euro)</description>
+		<year>1987</year>
+		<publisher>Mastertronic Added Dimension</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="angleball (1987)(mastertronic added dimension).dsk" size="737280" crc="5de3690a" sha1="afb4e21b7aea325e395b290395e7b5a156316090" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="angra1">
+		<description>Angra I (Bra)</description>
+		<year>1989</year>
+		<publisher>ProKit</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="angra i (1989)(prokit)(br).dsk" size="737280" crc="c5c8604e" sha1="e706d0f1a3a60d5a004d042aed5eb99558820f80" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="animalnd">
+		<description>Animal Land Murder Case (Jpn)</description>
+		<year>1987</year>
+		<publisher>Enix</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Cracked by SMA"/>
+			<dataarea name="flop" size="737280">
+				<rom name="animal land murder case (1987)(enix)(jp)[cr sma][needs 256k].dsk" size="737280" crc="702d3a21" sha1="677df7613fb6685da0f194d165af411f712c08fd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Cracked by SMA, Bad?"/>
+			<dataarea name="flop" size="737280">
+				<rom name="animal land murder case (1987)(enix)(jp)[cr sma][b][needs 256k].dsk" size="737280" crc="849f33e3" sha1="a4a68ee68ee95a34cb7c924135db13428abf4307" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="antarct">
+		<description>Antarctic Adventure - European Version (Euro, Cracked by El Halcon Pirata)</description>
+		<year>1984</year>
+		<publisher>Konami</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="antarctic adventure - european version (1984)(konami)(jp)[cr el halcon pirata].dsk" size="737280" crc="df1311a6" sha1="4fcebdaa98dbc571ad90644aeb5a580cfdd6f904" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="antares">
+		<description>Antares (Spa)</description>
+		<year>1987</year>
+		<publisher>Dro Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="antares (1987)(dro soft)(es).dsk" size="737280" crc="a3beef55" sha1="19162f777c791f824cf4ea85d087a35410c5ac22" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="antares (1987)(dro soft)(es)[a].dsk" size="737280" crc="80f98ef2" sha1="0a90f14fb181d3100aee873a83838205a83ab450" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anty">
+		<description>Anty (Jpn)</description>
+		<year>1984</year>
+		<publisher>Bothtec</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="anty (1984)(bothtec)(jp).dsk" size="737280" crc="223850c6" sha1="f2fe98e25dca38067f43b184a4c11d226f426f62" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apeman">
+		<description>The Apeman Strikes Again (Euro)</description>
+		<year>1986</year>
+		<publisher>Eaglesoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="apeman strikes again, the (1986)(eaglesoft)(nl).dsk" size="737280" crc="acb1efb9" sha1="54990a2328925e988b9840cb9ec733786956767c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aplicati">
+		<description>Aplicativos Pack (Bra)</description>
+		<year>198?</year>
+		<publisher>MSX Dragon's Club</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="aplicativos pack (19xx)(msx dragon's club)(br).dsk" size="737280" crc="a6f7295e" sha1="676a64430224467caaa30ef21244bfc77b535b53" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apringl2">
+		<description>Aprendiendo ingles 2 - Bernard goes to Mars (Spa)</description>
+		<year>1985</year>
+		<publisher>Sony Spain</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="aprendiendo ingles 2. bernard goes to mars (1985)(sony spain)(es)(en).dsk" size="737280" crc="22aaecc5" sha1="3482d982e7cd768fa5b2019a25e631dbd649014e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aquasos">
+		<description>Aquapolis SOS (Jpn, Cracked by Sammi)</description>
+		<year>1983</year>
+		<publisher>General</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="aquapolis sos (1983)(general)(jp)[cr sammi].dsk" size="737280" crc="ba01c4aa" sha1="41298291a4358fde9a72dcea286c3f637fbd1129" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aquarela">
+		<description>Aquarela (Bra)</description>
+		<year>1989</year>
+		<publisher>Paulisoft Informatica</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="aquarela (1989)(paulisoft informatica)(br)(disk 1 of 2).dsk" size="737280" crc="7f7f355c" sha1="d98ee7a902f49e22b7928104b80f87c9f9dc351a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="368640">
+				<rom name="aquarela (1989)(paulisoft informatica)(br)(disk 2 of 2).dsk" size="368640" crc="14c4fa32" sha1="997f80faf20ebeecf7d9bf12f499e33ea8fec0b9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aramo">
+		<description>Aramo (Jpn)</description>
+		<year>1986</year>
+		<publisher>Xain</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="aramo (1986)(xain)(jp).dsk" size="737280" crc="c39d3d6d" sha1="3cffa2e60ad3850f0512974175ce9dabfa1cf50b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arctfox">
+		<description>Arctic Fox (Spa)</description>
+		<year>1989</year>
+		<publisher>Dro Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="arctic fox (1989)(dro soft)(es).dsk" size="737280" crc="65c59243" sha1="16b21d3660aa5e7f390301651678b69897c6ecbf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arkunarc">
+		<description>Ark (v0.2) &amp; UnArc (v1.6)</description>
+		<year>1987</year>
+		<publisher>Brian E. Moore - Robert A. Freed</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="ark v0.2 - unarc v1.6 (1987)(brian e. moore - robert a. freed).dsk" size="737280" crc="11c5ffd1" sha1="d3cb42adef437fcecd92e396e646a99e1a27de40" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arkanoid">
+		<description>Arkanoid (Jpn)</description>
+		<year>1986</year>
+		<publisher>Taito</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="arkanoid (1986)(taito)(jp).dsk" size="737280" crc="30e78661" sha1="cec8263c1af307ab367d47336d930d1e4ef7140f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arkreven">
+		<description>Arkanoid Revenge (Bra)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="arkanoid revenge (19xx)(-)(br).dsk" size="737280" crc="1731fa3d" sha1="48c7ec698756804b269d53b821129845ad810337" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arkos1">
+		<description>Arkos I (Spa)</description>
+		<year>1988</year>
+		<publisher>Zigurat Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="arkos i (1988)(zigurat software)(es).dsk" size="737280" crc="a8259bce" sha1="bc5f91b4409b6891fb92659f1de2e5aa1be2fdd3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arkos123">
+		<description>Arkos I + II + III (Spa, Trained)</description>
+		<year>1988</year>
+		<publisher>Zigurat Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="arkos i + ii + iii (1988)(zigurat software)(es)[t].dsk" size="737280" crc="1fa81c23" sha1="ed0463f6f888ca165ae62518b5b38da5599e6710" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arkos2">
+		<description>Arkos II (Spa, Trained)</description>
+		<year>1988</year>
+		<publisher>Zigurat Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="arkos ii (1988)(zigurat software)(es)[t].dsk" size="737280" crc="c9dc95f7" sha1="98b7bc16044704633b89617823166caec52580ea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="armadac">
+		<description>La Armada Contrataca (Spa)</description>
+		<year>1987</year>
+		<publisher>Editorial Cometa</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="armada contrataca, la (1987)(editorial cometa)(es).dsk" size="737280" crc="85dfd331" sha1="994cd1b8fde98f7e5833486f23b0c6aa3ec55222" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="armymove">
+		<description>Army Moves (Spa)</description>
+		<year>1987</year>
+		<publisher>Dinamic Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Trained"/>
+			<dataarea name="flop" size="737280">
+				<rom name="army moves (1987)(dinamic software)(es)[t].dsk" size="737280" crc="a372ab4a" sha1="236b407ea09258e3924b0ab031974a0a6cd154e3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Hacked by MSX Games bOX, Trained"/>
+			<dataarea name="flop" size="368640">
+				<rom name="army moves (1987)(dinamic software)(es)[h msx games box][t].dsk" size="368640" crc="287c24bd" sha1="8d388b00f01ae60853444c9d9cf0b3d0e2ee9a03" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arquim21">
+		<description>Arquimedes XXI (Spa)</description>
+		<year>1986</year>
+		<publisher>Dinamic Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="arquimedes xxi (1986)(dinamic software)(es).dsk" size="737280" crc="8f626320" sha1="5d3c5ddac68e24ab893e27f3e5a3a60d008488b2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="arquimedes xxi (1986)(dinamic software)(es)[a].dsk" size="737280" crc="d4f0a907" sha1="63290e5dc6956a4818812356035e44156d4e7657" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="albatros">
+		<description>Albatross (Jpn)</description>
+		<year>1986</year>
+		<publisher>Nihon Telenet</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="arubatoros. albatross (1986)(telenet japan)(jp).dsk" size="737280" crc="1b810be0" sha1="816572b0eaae4053f87e53064327b23752f47464" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aspargp">
+		<description>Aspar GP Master (Spa)</description>
+		<year>1988</year>
+		<publisher>Dinamic Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="aspar gp master (1988)(dinamic software)(es).dsk" size="737280" crc="4f615039" sha1="14785c7cc89bfd3c05b49db6a34dd9c2df6c0932" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Hacked by MSX Games bOX"/>
+			<dataarea name="flop" size="368640">
+				<rom name="aspar gp master (1988)(dinamic software)(es)[h msx games box].dsk" size="368640" crc="9c06aefa" sha1="b1d168d75632ea46074cb46a386f6e69a67e3c6b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asblastr">
+		<description>Astro Blaster (Euro)</description>
+		<year>1988</year>
+		<publisher>Eurosoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="astro blaster (1988)(eurosoft)(nl).dsk" size="737280" crc="b0fa7831" sha1="789ca057a3a9f2c4dd9db874fc2de33e936c3ad3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Cracked by Crazy Boss"/>
+			<dataarea name="flop" size="368640">
+				<rom name="astro blaster (1988)(eurosoft)(nl)[cr crazy boss].dsk" size="368640" crc="5951ddd5" sha1="9b19fe4a2b6b25583e5d4842791aa8bd8d5109cd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astromar">
+		<description>Astro Marine Corps (Spa)</description>
+		<year>1989</year>
+		<publisher>Dinamic Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="astro marine corps (1989)(dinamic software)(es).dsk" size="737280" crc="273b526f" sha1="ef74e4458d0cf4059de327f1bdf429825c6b3785" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Hacked by CEZ"/>
+			<dataarea name="flop" size="737280">
+				<rom name="astro marine corps (1989)(dinamic software)(es)[h cez].dsk" size="737280" crc="0068fbc2" sha1="fbeb1427500ce26751e9014ce5c045f7200d5ff2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aplumber">
+		<description>Astro Plumber (Euro)</description>
+		<year>1986</year>
+		<publisher>Blue Ribbon Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="astro plumber (1986)(blue ribbon software)(gb).dsk" size="737280" crc="010b6a1a" sha1="82f6d53f41fadd7ab54d59b857b594da47105fc7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arocks">
+		<description>Astro Rocks (Euro)</description>
+		<year>1984</year>
+		<publisher>Kuma Computers</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="astro rocks (1984)(kuma computers)(gb).dsk" size="737280" crc="e8eb5d89" sha1="1489df55ace582e3110dda6055be2413b7eba12c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astrowul">
+		<description>The Astrowulards (Spa)</description>
+		<year>1987</year>
+		<publisher>J.F. Molano</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="astrowulards, the (1987)(j.f. molano)(es).dsk" size="737280" crc="9cc479a1" sha1="7c8d4353da76ad97ec9cb82381ebb2b89fc202e5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="astrowulards, the (1987)(j.f. molano)(es)[a].dsk" size="737280" crc="642c470f" sha1="600810207b4038583baa90722b8f3422cc465493" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="athlball">
+		<description>Athletic Ball (Jpn)</description>
+		<year>1984</year>
+		<publisher>ASCII</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="athletic ball. ghost flipper (1984)(ascii)(jp).dsk" size="737280" crc="96553d81" sha1="1e0cda3607bf5216febf2e57af9e4b2ebc545574" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="athlland">
+		<description>Athletic Land (Jpn)</description>
+		<year>1984</year>
+		<publisher>Konami</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="athletic land (1984)(konami)(jp).dsk" size="737280" crc="7ef14bb2" sha1="735677f1dbd33490df8d62960691c842e861dc2d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atomadri">
+		<description>Atom en Madriguera Peligrosa (Spa)</description>
+		<year>1985</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="atom en madriguera peligrosa (1985)(-)(es).dsk" size="737280" crc="8db4b178" sha1="83e1c47dd594fd171804fb429b543ae4e227b913" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="attack4">
+		<description>Attack 4 Women Volleyball (Jpn, Portuguese Translation by DisProsoft)</description>
+		<year>1986</year>
+		<publisher>Pax Softonica</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="attack 4 women volleyball (1986)(pax softonica)(jp)[tr pt disprosoft].dsk" size="737280" crc="4abe2fe1" sha1="3fd20b109c6fedb93d6123f08224dd89de598380" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="attackm2">
+		<description>Attack Mosquito II (Jpn)</description>
+		<year>1986</year>
+		<publisher>S. Ogawa</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="attack mosquito ii (1986)(s.ogawa).dsk" size="368640" crc="7ef8e11f" sha1="0a991127bb21c83fb6caca9a95e35583ada18be6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="attackmo">
+		<description>Attack of Mosquiton</description>
+		<year>1986</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="attack of mosquiton (1986)(-).dsk" size="737280" crc="112ea0d7" sha1="0a133241445cedea894cac82a9a22e149e7e8378" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="killerto">
+		<description>Attack of the Killer Tomatoes (Euro)</description>
+		<year>1986</year>
+		<publisher>Global Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="attack of the killer tomatoes (1986)(global software)(gb).dsk" size="737280" crc="61a53222" sha1="d0832135692bdab65cf111a6cd1fe416729987c8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="attack of the killer tomatoes (1986)(global software)(gb)[a].dsk" size="737280" crc="0ae6b73b" sha1="cf4c54b00f2ceba19dd34de40b92c3f75abecfda" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="attacked">
+		<description>Attacked (Euro)</description>
+		<year>198?</year>
+		<publisher>Tynesoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="attacked (19xx)(tynesoft)(gb).dsk" size="737280" crc="c9ed326b" sha1="89cb1d5f2ca20716d5b97dad3aeb422f8c446bf9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="attilio">
+		<description>Attilio Tubicini (Ita)</description>
+		<year>1988</year>
+		<publisher>MSX Hit Parade</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="attilio tubicini (1988)(msx hit parade)(it).dsk" size="737280" crc="56eb0df4" sha1="ebea64cf0a40d786f757556d931edae8a0d716cb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="attilio tubicini (1988)(msx hit parade)(it)[a].dsk" size="737280" crc="fc619859" sha1="33aad24556cca43d1746656acab814963baeedeb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aufmonty">
+		<description>Auf Wiedersehen Monty (Euro)</description>
+		<year>1987</year>
+		<publisher>Gremlin Graphics Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="auf wiedersehen monty (1987)(gremlin graphics software)(gb).dsk" size="737280" crc="bd71c844" sha1="8aa7205246f485396234acbdaa20d7442d7b3b7e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="auf wiedersehen monty (1987)(gremlin graphics software)(gb)[a].dsk" size="737280" crc="d925c398" sha1="36d95977b86d8dd91ad27fae57c0f4768e8887ed" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="avpaulis">
+		<description>Av. Paulista </description>
+		<year>1989</year>
+		<publisher>Jose Oliveira</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="av. paulista (1989)(jose oliveira)(br).dsk" size="737280" crc="49d47714" sha1="22468aab26ff3df76767350fe6d29f3e8366feca" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="av. paulista (1989)(jose oliveira)(br)[a].dsk" size="737280" crc="b80187b5" sha1="300a47c2e59ada61e339165bce02a35a8e975d91" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="avenger">
+		<description>Avenger (Euro)</description>
+		<year>1986</year>
+		<publisher>Gremlin Graphics Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="avenger (1986)(gremlin graphics software)(gb).dsk" size="737280" crc="f5e308b9" sha1="056720d74db73cef5a133b0c87b08ac499646641" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="avensanq">
+		<description>Aventura em San Quentin (Bra)</description>
+		<year>1987</year>
+		<publisher>Ricardo Costa</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="aventura em san quentin (1987)(ricardo costa)(br).dsk" size="737280" crc="dbf196de" sha1="e6e8c1cccb79cb07b2428582e85cd86b5794ee26" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aventesp">
+		<description>La Aventura Espacial (Spa)</description>
+		<year>1990</year>
+		<publisher>Aventuras AD</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="368640">
+				<rom name="aventura espacial, la (1990)(aventuras ad)(es).dsk" size="368640" crc="9e151c2f" sha1="0b4a914705b7897d92d4e41dec5cbc9bfc145897" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="aventura espacial, la (1990)(aventuras ad)(es)[a].dsk" size="737280" crc="37a03e81" sha1="3d1376a168a3632d3824f49e38cb85249d747193" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Hacked by CEZ"/>
+			<dataarea name="flop" size="737280">
+				<rom name="aventura espacial, la (1990)(aventuras ad)(es)[h cez].dsk" size="737280" crc="cbf5bc6f" sha1="eb320353565713b334d17e5293349e0e62a21140" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aventori">
+		<description>La Aventura Original (Spa)</description>
+		<year>1989</year>
+		<publisher>Aventuras AD</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="aventura original, la (1989)(aventuras ad)(es).dsk" size="737280" crc="7e4ff06a" sha1="af3d60a211179cadf9c5b8e4cb74557d52c89f64" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="aventura original, la (1989)(aventuras ad)(es)[a].dsk" size="737280" crc="1e51db48" sha1="3d911024cfa8adbe4b49473888170f0be3b18935" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="averno">
+		<description>Averno (Spa)</description>
+		<year>1989</year>
+		<publisher>Proein Soft Line</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="averno (1989)(proein soft line)(es).dsk" size="737280" crc="d15976f1" sha1="0227e4a4aa7b5e58df537beffc62e09cc2a04d5f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="averno (1989)(proein soft line)(es)[a].dsk" size="737280" crc="0e8cb026" sha1="22271c85e80bded528ef6588b138566ad0bf7114" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bc">
+		<description>B.C.'s Quest for Tires (Jpn)</description>
+		<year>1985</year>
+		<publisher>Toshiba-EMI</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="b.c.'s quest for tires (1985)(toshiba-emi)(jp).dsk" size="737280" crc="a25d21ae" sha1="7da07b12986b6e6aade7395e5d39c27f14cb0b42" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bc2">
+		<description>B.C.'s Quest for Tires II - Grog's Revenge (Euro)</description>
+		<year>1985</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="b.c.'s quest for tires ii - grog's revenge (1985)(us gold)(gb).dsk" size="737280" crc="22a4269c" sha1="110ba2598f5f62e507736c8b7542feec7e970be9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="b.c.'s quest for tires ii - grog's revenge (1985)(us gold)(gb)[tr it].dsk" size="737280" crc="5046142c" sha1="33635ba75b29da4081ff90b90b78ffef2e1200b8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bc2k" cloneof="bc2">
+		<description>B.C.'s Quest for Tires II - Grog's Revenge (Kor)</description>
+		<year>1986</year>
+		<publisher>Topia</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="b.c.'s quest for tires ii - grog's revenge (1986)(topia)(kr).dsk" size="737280" crc="5acf9870" sha1="d18d2d883ac5caf1780c24af6ab59a52854404ed" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bttf">
+		<description>Back to the Future (Jpn)</description>
+		<year>1985</year>
+		<publisher>Pony Canyon</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="back to the future (1985)(pony canyon)(jp).dsk" size="737280" crc="979149cd" sha1="76dc8c2c3e524036355196e541a251b7de98452c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Bad?"/>
+			<dataarea name="flop" size="737280">
+				<rom name="back to the future (1985)(pony canyon)(jp)[b].dsk" size="737280" crc="52d15be4" sha1="4f5e4c8561c558cd80be70465d0882a2e3eba2c2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="backgamm">
+		<description>Backgammon (Euro)</description>
+		<year>1984</year>
+		<publisher>Electric Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="backgammon (1984)(electric software)(gb).dsk" size="737280" crc="37a2a66a" sha1="9e55674ddeb3721a3b08aefbb448f75398eb95f2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="backgamj">
+		<description>Backgammon (Jpn)</description>
+		<year>1985</year>
+		<publisher>Sony</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="backgammon (1985)(sony)(jp).dsk" size="737280" crc="a140fd7e" sha1="0f44393decaabfc4074c1411a975ffb23d6a3597" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="balance">
+		<description>Balance (Jpn)</description>
+		<year>1984</year>
+		<publisher>HAL Kenkyuujo</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="balance (1984)(hal laboratory)(jp).dsk" size="737280" crc="c632ceca" sha1="51e401e2c0915db4b92240ad6be92547250b1338" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ball5">
+		<description>Ball 5 (Jpn)</description>
+		<year>198?</year>
+		<publisher>Nyan</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="ball 5 (19xx)(nyan)(jp).dsk" size="737280" crc="de8ff54c" sha1="655711d6cb713a74eba957708a838dd36a56e2d9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ballouts">
+		<description>Ball Out Special (Jpn)</description>
+		<year>1989</year>
+		<publisher>MSX Magazine</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="ball out special (1989)(msx magazine)(jp).dsk" size="737280" crc="d8180b4d" sha1="68bdbf70022fe3c056fcd0e35425f8a759ae261a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ballblaz">
+		<description>Ballblazer (Jpn)</description>
+		<year>1988</year>
+		<publisher>Pony Canyon</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="ballblazer (1988)(pony canyon)(jp).dsk" size="737280" crc="2cc28fb6" sha1="7a2c0d9dc1d2ae3ddaf822a5b546b31379d3a612" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="368640">
+				<rom name="ballblazer (1988)(pony canyon)(jp)[a].dsk" size="368640" crc="878bf130" sha1="b4770649d0183667a1946b48ed4f4bc2d4fe14ea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="balloonp">
+		<description>Balloon Punch</description>
+		<year>1989</year>
+		<publisher>Satico</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="balloon punch (1989)(satico)(jp).dsk" size="737280" crc="15f45ab4" sha1="e1bdba9ebdddd8d52e312d9fb710c7b7a8d42bf8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ballyhoo">
+		<description>Ballyhoo (Euro)</description>
+		<year>1986</year>
+		<publisher>Infocom</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="ballyhoo (1986)(infocom)(us).dsk" size="737280" crc="710abdfc" sha1="fd49a77b9b2720f0b2cbe576e61f0783cdde5ee4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="banana">
+		<description>Banana (Jpn)</description>
+		<year>1984</year>
+		<publisher>ASCII</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="banana (1984)(ascii)(jp).dsk" size="737280" crc="ef17be2b" sha1="4004f0ef24b2bc6b1d65c43becbb2752a515b295" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bananaw">
+		<description>Banana Worm (Euro?)</description>
+		<year>1986</year>
+		<publisher>Irgendwen</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="banana worm (1986)(irgendwen).dsk" size="737280" crc="c369683a" sha1="6479c7ab54be8ea3baa6d048eb1c377812a80538" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bankpan">
+		<description>Bank Panic (Jpn)</description>
+		<year>1985</year>
+		<publisher>Pony Canyon</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bank panic (1985)(pony canyon)(jp).dsk" size="737280" crc="27ca3d9d" sha1="498522d2008ef36e5b165e32c0c3f5a574c56855" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswriter">
+		<description>Bank Street Writer (Jpn)</description>
+		<year>1983</year>
+		<publisher>Toshiba-EMI</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bank street writer (1983)(toshiba-emi)(jp).dsk" size="737280" crc="752adfdf" sha1="fbbb44360685b342848b800e3578f6cb3764c55a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="banzai">
+		<description>Banzai</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="banzai (19xx)(-).dsk" size="737280" crc="3755c68a" sha1="d1201efdfbdfee743b5c1725dd8ee8958a036ce0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="banzai2">
+		<description>Banzai 2</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="banzai 2 (19xx)(-).dsk" size="737280" crc="d949e69d" sha1="2cb6b5c4510670bd99f63dc77205f929f7eda532" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brbarianp" cloneof="brbarian">
+		<description>Barbarian (Euro, Portuguese Translation)</description>
+		<year>1988</year>
+		<publisher>Mastertronic</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="barbarian (1988)(mastertronic)(gb)(br).dsk" size="737280" crc="12a7028f" sha1="111732721ce2c2abadf5aed9b55b142673052eaa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brbarian">
+		<description>Barbarian (Euro, Trained)</description>
+		<year>1988</year>
+		<publisher>Mastertronic</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="barbarian (1988)(mastertronic)(gb)[t].dsk" size="737280" crc="b2f10a1b" sha1="b88290855345e94515bbd3bbf43ee49b0a381047" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brbaria2">
+		<description>Barbarian II - The Dungeon of Drax (Spa, Cracked by Damian Roman)</description>
+		<year>1988</year>
+		<publisher>Erbe Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="barbarian ii - the dungeon of drax (1988)(erbe software)(es)[cr damian roman].dsk" size="737280" crc="957da801" sha1="af99a663afea2e8e816bf1b5ec26ab5e3d8e976b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bstormer">
+		<description>Barn Stormer (Euro, Cracked by Magicracks)</description>
+		<year>1985</year>
+		<publisher>Electric Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="barn stormer (1985)(electric software)(gb)[cr magicracks].dsk" size="737280" crc="a073ae1c" sha1="911fc983c214efbf72ac679c0c01a1b72a7b56a1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barnabas">
+		<description>Barnabasket (Spa)</description>
+		<year>1989</year>
+		<publisher>Barnajocs</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="barnabasket (1989)(barnajocs)(es).dsk" size="737280" crc="a6197ae6" sha1="1239fbfac435a0f912244332b935b5c020cedfe4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baskonam">
+		<description>Basic Konami Games Loader (v1.1)</description>
+		<year>1998</year>
+		<publisher>Possi</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="basic konami games loader v1.1 (1998)(possi).dsk" size="737280" crc="a1ca096c" sha1="1f1d6a27edbc6e7dbe60b50259858ad88ba39bcf" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Includes 2 Games"/>
+			<dataarea name="flop" size="737280">
+				<rom name="basic konami games loader v1.1 + two games (1998)(possi).dsk" size="737280" crc="583570fb" sha1="c1d712da0bd29aca41461356d452fa5054b48430" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batman">
+		<description>Batman</description>
+		<year>1986</year>
+		<publisher>Ocean Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="batman (1986)(ocean software)(gb).dsk" size="737280" crc="50833604" sha1="a7c0d35ab8232f160f8fb5f5a92f7fd3df636208" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batmanm">
+		<description>Batman - The Movie (Euro)</description>
+		<year>1989</year>
+		<publisher>Ocean Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Cracked by Damian Roman"/>
+			<dataarea name="flop" size="737280">
+				<rom name="batman - the movie (1989)(ocean software)(gb)[cr damian roman].dsk" size="737280" crc="e9279dd2" sha1="f79198e9d2ca59b360c341070d7ac75f92948085" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Cracked by Damian Roman, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="batman - the movie (1989)(ocean software)(gb)[cr damian roman][a].dsk" size="737280" crc="78154f82" sha1="91e853b42acd70b694f7ac88db98f156f0af5b33" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="battenta">
+		<description>Batten Tanuki no Daibouken (Jpn)</description>
+		<year>1986</year>
+		<publisher>Tecno Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="batten tanuki no daibouken. raccoon dog (1986)(tecno soft).dsk" size="737280" crc="635e415b" sha1="349bba7156db9e884bba949191b2d4b0c090721b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bchopper">
+		<description>Battle Chopper (Euro)</description>
+		<year>1985</year>
+		<publisher>Methodic Solutions</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="battle chopper (1985)(methodic solutions)(nl).dsk" size="737280" crc="af98b557" sha1="10aea1840ae835437f862924359936044af5a3c5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="battlex">
+		<description>Battle Cross (Jpn)</description>
+		<year>1984</year>
+		<publisher>Sony</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="battle cross (1984)(sony)(jp).dsk" size="737280" crc="357d6fa1" sha1="1df2e979c273d37c3584ea46ae72553b7c735d1d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midway">
+		<description>The Battle for Midway (Euro)</description>
+		<year>1985</year>
+		<publisher>PSS</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="battle for midway, the (1985)(pss)(gb).dsk" size="737280" crc="96995603" sha1="8809297e69cf3a9b0fbd805cce8a365f7a6f7c1a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="battle for midway, the (1985)(pss)(gb)[a].dsk" size="737280" crc="2c16affc" sha1="3e139f3bc09116e372a5e348003eeecfa1498305" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clapton2">
+		<description>Battle Ship Clapton II (Jpn)</description>
+		<year>1984</year>
+		<publisher>T&amp;E Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="battle ship clapton ii (1984)(t&amp;e soft)(jp).dsk" size="737280" crc="15444c10" sha1="ff49f71d11bd2e6844860bcbd52fa7ec09a933ba" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Cracked by Predator"/>
+			<dataarea name="flop" size="737280">
+				<rom name="battle ship clapton ii (1984)(t&amp;e soft)(jp)[cr predator].dsk" size="737280" crc="a7a4fffe" sha1="9af62554fd3027261bab7f16c6f4a4b3cf2c1d40" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tako">
+		<description>Beach Story of Tako</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="beach story of tako (19xx)(-).dsk" size="737280" crc="0e2b3b77" sha1="6e1bdd1b19c6a9e440f7aa6b726317153a649e3a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beachead">
+		<description>Beach-Head (Euro)</description>
+		<year>1985</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="beach-head (1985)(us gold)(gb).dsk" size="737280" crc="4bb09fab" sha1="c4f663d810fa6b4b70b46931d8eb68e5cff35a7f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beamridr">
+		<description>Beamrider (Euro)</description>
+		<year>1984</year>
+		<publisher>Activision</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="beamrider (1984)(activision)(us).dsk" size="737280" crc="45cdf95f" sha1="0f21bb62b0db8f61332d28cc2496c3fb31872da0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bgeorge">
+		<description>Bear George</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bear george (19xx)(-).dsk" size="737280" crc="fed1984f" sha1="291e7eadb3ae5ba237df1c7aef1e92a2f28892a1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bflower">
+		<description>Bee &amp; Flower</description>
+		<year>1983</year>
+		<publisher>Think Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bee &amp; flower (1983)(think soft).dsk" size="737280" crc="1850c313" sha1="f6ce52d693b3896c4acb27c46381b77db0b13de9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bernard">
+		<description>Bernard in the City (Spa)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bernard in the city (19xx)(-)(es).dsk" size="737280" crc="d36ad505" sha1="cb6d2508691146a668cdbf07894909f70dc1abbd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bestial">
+		<description>Bestial Warrior (Spa)</description>
+		<year>1989</year>
+		<publisher>Dinamic Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="bestial warrior (1989)(dinamic software)(es).dsk" size="737280" crc="2d5ccf7c" sha1="904221f84b9c9a566a0554632d0240cc265507f7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="368640">
+				<rom name="bestial warrior (1989)(dinamic software)(es)[a].dsk" size="368640" crc="c03c1534" sha1="589597a909dd4133c5791f045ebf02131b74ec9d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Trained"/>
+			<dataarea name="flop" size="737280">
+				<rom name="bestial warrior (1989)(dinamic software)(es)[t].dsk" size="737280" crc="074ef1f0" sha1="ceafd12c755f80ddc8686da59f9217f951c2c06f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bgmmusic">
+		<description>BGM Music Player</description>
+		<year>1995</year>
+		<publisher>Nacho &amp; Miguel Cabrera</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bgm music player (1995)(nacho &amp; miguel cabrera).dsk" size="737280" crc="24eb0bff" sha1="16805b520bd17d95e23d74d7d1a331564b55fd30" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bilot">
+		<description>Bilot (Bra)</description>
+		<year>198?</year>
+		<publisher>MSX Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bilot (19xx)(msx soft)(br).dsk" size="737280" crc="b3832063" sha1="ddc79a24c4d40baee6ad7b7a51bad705c8ef5956" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="binary">
+		<description>Binary Land (Euro)</description>
+		<year>1984</year>
+		<publisher>Kuma Computers</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="binary land (1984)(kuma computers)(gb).dsk" size="737280" crc="9c22a3ff" sha1="d077f308cfca2fb20a62ecf60620fc5409ba163d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bingo">
+		<description>Bingo (Spa?)</description>
+		<year>1985</year>
+		<publisher>Spectravideo</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bingo (1985)(spectravideo)(es-gb).dsk" size="737280" crc="ca9c5cd5" sha1="8a06b2d5124db0ecf9d1ab7530d5d916cc51bb4f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elbingo">
+		<description>El Bingo (Spa)</description>
+		<year>1985</year>
+		<publisher>Sony</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bingo, el (1985)(sony)(es).dsk" size="737280" crc="26169b40" sha1="f3de7ec46bb9abdcd7c9c3446c57a8dff90846dd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="biologia">
+		<description>Biologia - Principios Inmediatos (Spa)</description>
+		<year>1985</year>
+		<publisher>Microgesa</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="biologia - principios inmediatos (1985)(microgesa)(es).dsk" size="737280" crc="2f0f7e6e" sha1="499067c4f79101b9bac3de2b62a334a16c545de8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bioritmo">
+		<description>Biorritmos (Spa)</description>
+		<year>1987</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="biorritmos (1987)(-)(es).dsk" size="737280" crc="e2849796" sha1="21bf837a27bda5e9bda338a383e0001a4c9142b1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bkpdisco">
+		<description>BKP Disco (Bra)</description>
+		<year>198?</year>
+		<publisher>Enigma Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="184320">
+				<rom name="bkp disco (19xx)(enigma software)(br).dsk" size="184320" crc="6d2e1a90" sha1="83ed8f6ae6310a6d348c6443e409eb40282ca32e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bjack">
+		<description>Black Jack (Spa)</description>
+		<year>1984</year>
+		<publisher>Sony</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="black jack (1984)(sony)(es).dsk" size="737280" crc="db7835e8" sha1="46785e8216f1b6681182565201c600f95719d755" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="black jack (1984)(sony)(es)[a].dsk" size="737280" crc="a671a9b3" sha1="07fdc24156f008b5f0f13be803f60fc9786e7791" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blkonyx">
+		<description>The Black Onyx (Jpn)</description>
+		<year>1985</year>
+		<publisher>ASCII</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="black onyx, the (1985)(ascii)(jp)(jp).dsk" size="737280" crc="3438f8b6" sha1="e1758f98d1a89e36bee6654bd8c1774a123ef391" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="black onyx, the (1985)(ascii)(jp)[a].dsk" size="737280" crc="ac1495b3" sha1="5508fc5c758567f5ccf427ab7327137f2faec4ad" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blkbeard">
+		<description>Blackbeard (Spa)</description>
+		<year>1988</year>
+		<publisher>Topo Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="blackbeard (1988)(topo soft)(es).dsk" size="737280" crc="ecc3726f" sha1="3995bdb3c3c7c43e5a709101b7546b6a33e260d6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="blackbeard (1988)(topo soft)(es)[a].dsk" size="737280" crc="142cf31a" sha1="08178e83361367334d66047eeab8c4c19111841f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blagger">
+		<description>Blagger (Euro)</description>
+		<year>1984</year>
+		<publisher>Alligata Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="blagger (1984)(alligata software)(gb).dsk" size="737280" crc="c99d3f87" sha1="5b05e941ecd4c24c944dad301061d44d9c039c86" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blstroid">
+		<description>Blasteroids (Euro)</description>
+		<year>1987</year>
+		<publisher>Image Works</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="blasteroids (1987)(image works)(gb).dsk" size="737280" crc="19c96e75" sha1="66a535ae6e7364a5577b99f5668592cba6aefa4d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blockhol">
+		<description>Block Hole (Kor)</description>
+		<year>1990</year>
+		<publisher>Zemina</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="block hole (1990)(zemina)(kr).dsk" size="737280" crc="209fedbb" sha1="878b00d0e2a4dba97ccbf7e97775c25cf67ea6f1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="368640">
+				<rom name="block hole (1990)(zemina)(kr)[a].dsk" size="368640" crc="a80451fd" sha1="e4e25c90434d09fd11fbdb15876fd41deba8c1bc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blockade">
+		<description>Blockade Runner (Jpn)</description>
+		<year>1984</year>
+		<publisher>Toshiba-EMI</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="blockade runner (1984)(toshiba-emi)(jp).dsk" size="737280" crc="30942fce" sha1="562d785ef48fe74efdfbe61b76119338acba7c04" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bloody">
+		<description>Bloody (Spa)</description>
+		<year>1987</year>
+		<publisher>P.J. Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="bloody (1987)(p.j. software)(es).dsk" size="737280" crc="bd055d33" sha1="9114b80df67aade1f468f1c9e96840dfe4a1c0ab" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="bloody (1987)(p.j. software)(es)[a].dsk" size="737280" crc="b0edf44b" sha1="e0187c62e37819d9adbed95d46578fe12cce8b5c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blowup">
+		<description>Blow Up (Euro)</description>
+		<year>1988</year>
+		<publisher>Eurosoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="blow up (1988)(eurosoft)(nl).dsk" size="737280" crc="4e08bd31" sha1="d4d4e24e0e4e03ae69efc62c344e4b58fa659674" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="368640">
+				<rom name="blow up (1988)(eurosoft)(nl)[a].dsk" size="368640" crc="e2319cab" sha1="4ff46f12ba83d862036c5294dbc9eb5d7d4c36c6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Cracked by Crazy Boss"/>
+			<dataarea name="flop" size="737280">
+				<rom name="blow up (1988)(eurosoft)(nl)[cr crazy boss].dsk" size="737280" crc="ac22f0d5" sha1="0063c50f16ffc26a4e29af0e37df48650515526d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bluepink">
+		<description>Blue &amp; Pink (Ned)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="blue &amp; pink (19xx)(-)(nl).dsk" size="737280" crc="a1fe1efb" sha1="1fcf3edbf166adeaa5ae812d9a6efb462fe7783b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bmxreked">
+		<description>BMX Rekencross (Ned)</description>
+		<year>1985</year>
+		<publisher>Philips</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bmx rekencross (1985)(philips)(nl).dsk" size="737280" crc="bb0055ea" sha1="c36c70f91b7aa8bd72ff9b6b3b70e28eabd68f70" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bmxsim">
+		<description>BMX Simulator (Euro)</description>
+		<year>1987</year>
+		<publisher>Codemasters</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="bmx simulator (1987)(codemasters)(gb).dsk" size="737280" crc="610b4b10" sha1="f10f52fc3a169f74bc658e01e83330961494e4e2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="bmx simulator (1987)(codemasters)(gb)[a].dsk" size="737280" crc="3f635c4c" sha1="5d5a296eab4c5d9065dcc3a13b860b773cabb5d5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boardelo">
+		<description>Boardelo (Euro)</description>
+		<year>1985</year>
+		<publisher>Bubble Bus Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="boardelo (1995)(bubble bus)(gb).dsk" size="737280" crc="63ac9faa" sha1="1a441adf1066108d695544a1ba92663d97d418fd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boggy84">
+		<description>Boggy '84 (Jpn)</description>
+		<year>1984</year>
+		<publisher>Nihon Columbia</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="boggy '84 (1984)(nippon columbia - colpax - universal).dsk" size="737280" crc="46f6380c" sha1="2eb385313094135821e162c93d1827e0a5260654" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boing">
+		<description>Boing Boing (Spa)</description>
+		<year>1985</year>
+		<publisher>Idealogic</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="boing boing (1985)(idealogic)(es).dsk" size="737280" crc="426736aa" sha1="129df2d4dff43938b6b33b20bdd08e180e70f3e3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Hacked by MSX Games bOX"/>
+			<dataarea name="flop" size="368640">
+				<rom name="boing boing (1985)(idealogic)(es)[h msx games box].dsk" size="368640" crc="9c78bab8" sha1="519b54a055499553e9296415ecdfc054eabacefa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bokosuka">
+		<description>Bokosuka Wars (Jpn, Hacked)</description>
+		<year>1984</year>
+		<publisher>ASCII</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bokosuka (1984)(ascii)(jp).dsk" size="737280" crc="c4f3eb40" sha1="305bafeab01896ee3f12827fe79bb7f58bf0440b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bologna">
+		<description>Bologna &amp; Milano (Bra)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bologna &amp; milano (19xx)(-)(br).dsk" size="737280" crc="f8181734" sha1="c294643ecaa27e99a181fd02b6b51b4843592390" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombjack">
+		<description>Bomb Jack</description>
+		<year>1984</year>
+		<publisher>MSX Files</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bomb jack (2004)(msx files).dsk" size="737280" crc="38971e78" sha1="e24c594066cf1f7240689feb634c55d5f7c403c3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombermk">
+		<description>Bomber Man (Kor?)</description>
+		<year>1986</year>
+		<publisher>Korea Soft Bank</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bomber man (1986)(korea soft bank).dsk" size="737280" crc="e7d742b8" sha1="238130199f94e761f1a0557e6a34e6f93cdb75ec" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bomber3d">
+		<description>Bomber Man 3D (Jpn)</description>
+		<year>1984</year>
+		<publisher>Hudson Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="bomber man 3d (1984)(hudson soft)(jp).dsk" size="737280" crc="af3b6498" sha1="4a7cec1917ac674b27a28e290fcfc088e75c7bbe" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Italian Translation"/>
+			<dataarea name="flop" size="737280">
+				<rom name="bomber man 3d (1984)(hudson soft)(jp)[tr it].dsk" size="737280" crc="9e544424" sha1="819e898394f1609c45c7fb1b8936af085d4af7c6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombersp">
+		<description>Bomber Man Special (Jpn)</description>
+		<year>1986</year>
+		<publisher>Hudson Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bomber man special (1986)(hudson soft)(jp).dsk" size="737280" crc="95ad2b98" sha1="b72b5921687c261e61fccd4a45b88ffe3072388f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ericflot">
+		<description>Eric and the Floaters (Euro)</description>
+		<year>1985</year>
+		<publisher>Kuma Computers</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bomber man. eric and the floaters (1985)(kuma computers)(gb).dsk" size="737280" crc="747ba62d" sha1="1eb6e46d62ff2def66b2d3a6caef02c58409b336" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bomulus">
+		<description>Bomulus &amp; the Lost Crown (Fin)</description>
+		<year>1986</year>
+		<publisher>Teknopiste</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bomulus &amp; the lost crown (1986)(teknopiste)(fi).dsk" size="737280" crc="acd1c880" sha1="99d087d54a1384a473fce0b1a275c96b5b005c5f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boogaboo">
+		<description>Booga-Boo (Euro)</description>
+		<year>1986</year>
+		<publisher>Quicksilva</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="booga-boo. the flea (1986)(quicksilva)(gb).dsk" size="737280" crc="316a9e0d" sha1="4122bfc16d7d5694e37e749cdc3e9bab14eefe78" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="booga-boo. the flea (1986)(quicksilva)(gb)[a].dsk" size="737280" crc="1a554c79" sha1="afd0e67b6e8787da838c20965fef13c625701b91" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boogwoog">
+		<description>Boogie Woogi Jungle (Jpn)</description>
+		<year>1985</year>
+		<publisher>Ample Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="boogie woogi jungle (1985)(ample software)(jp).dsk" size="737280" crc="2043e752" sha1="59fa8cb86cb71cef2fd324125eb09a8dedd324c1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boom">
+		<description>Boom! (Euro)</description>
+		<year>1986</year>
+		<publisher>Aackosoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="boom! (1986)(aackosoft)(nl).dsk" size="737280" crc="27e79483" sha1="c2367f4c1b5a5af8c6ca6c68008477bf1268644a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boomrang">
+		<description>Boomerang (Jpn)</description>
+		<year>1984</year>
+		<publisher>ASCII</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="boomerang (1984)(ascii)(jp).dsk" size="737280" crc="1e8cc576" sha1="9ad6f6c1ba8c3254b02f11304f837fa5fae86c37" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="booty">
+		<description>Booty (Euro)</description>
+		<year>1988</year>
+		<publisher>Eurosoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="booty (1988)(eurosoft)(nl).dsk" size="737280" crc="78cef13f" sha1="5cab1cbee756e656349791b968956b0485a4c280" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bop">
+		<description>Bop! (Euro)</description>
+		<year>1986</year>
+		<publisher>Bug-Byte Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bop! (1986)(bug-byte software)(gb).dsk" size="737280" crc="05ab63a6" sha1="4f32214d3b744d31421466042fad4a45cbea6654" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bosconia">
+		<description>Bosconian (Jpn)</description>
+		<year>1984</year>
+		<publisher>Namcot</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bosconian (1984)(namcot)(jp).dsk" size="737280" crc="5a9f9f01" sha1="b413773576726ec6be72c9874f4eb28e149a7e92" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boukenro">
+		<description>Bouken Roman - Dota (Jpn)</description>
+		<year>1986</year>
+		<publisher>System Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bouken roman - dota (1986)(system soft)(jp).dsk" size="737280" crc="1101ac56" sha1="06765a7c03d9b7deb68471ab095dc3477caf929e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bdash">
+		<description>Boulder Dash (Euro)</description>
+		<year>1985</year>
+		<publisher>Databyte</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="boulder dash (1985)(databyte)(gb).dsk" size="737280" crc="a3c81ef6" sha1="5842006a827a97377a49470679ab22af28d8b5b3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bdash2">
+		<description>Boulder Dash II - Rockford's Riot (Euro)</description>
+		<year>1986</year>
+		<publisher>Databyte</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="boulder dash ii - rockford's riot (1986)(databyte)(gb).dsk" size="737280" crc="f8ad6e11" sha1="1921916142c26cbfc171501dbf31fdbb7797dc05" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bounce">
+		<description>Bounce (Euro)</description>
+		<year>1987</year>
+		<publisher>Methodic Solutions</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bounce (1987)(methodic solutions)(nl).dsk" size="737280" crc="b2f73204" sha1="53e5b763ab965c08184a0892c2c68f521005b51e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bblock">
+		<description>Bouncing Block (Spa)</description>
+		<year>1988</year>
+		<publisher>Idealogic</publisher>
+		<info name="alt_title" value="Igloo"/>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="bouncing block (1988)(idealogic)(es)[aka igloo].dsk" size="737280" crc="f45dde47" sha1="6c7a38ffc8f26a8608f2c206914504ed370fa881" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="bouncing block (1988)(idealogic)(es)[a][aka igloo].dsk" size="737280" crc="ce19aa74" sha1="d9852a8eb5e21fc78d92af3507309fa2421230c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bounder">
+		<description>Bounder (Euro)</description>
+		<year>1987</year>
+		<publisher>Gremlin Graphics Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bounder (1987)(gremlin graphics software)(gb).dsk" size="737280" crc="0d4e7bdc" sha1="4173965d3a2bfcc74095493aa36bdf6cfce66a67" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bousou">
+		<description>Bousou Tokkyuu SOS - Stop the Express (Jpn)</description>
+		<year>1985</year>
+		<publisher>Hudson Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="bousou tokkyuu sos. stop the express (1985)(hudson soft)(jp).dsk" size="737280" crc="ae5aabf1" sha1="328d18c7813808da40a26000653a94fc674c7a83" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="bousou tokkyuu sos. stop the express (1985)(hudson soft)(jp)[cr eg].dsk" size="737280" crc="c2663369" sha1="aecacab9c5210e5083dac4842167a061638c4abc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boxing">
+		<description>Boxing (Jpn)</description>
+		<year>1985</year>
+		<publisher>Konami</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="boxing (1985)(konami)(jp).dsk" size="737280" crc="1393d6aa" sha1="a43f7bb029af8bfe36bfcd23383163a5cfb9314d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breakfre">
+		<description>Break Free</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="break free (19xx)(-).dsk" size="737280" crc="34ad7f00" sha1="bd0b5a720512d5e02c774bcefb458c21c5614ebc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breakin">
+		<description>Break In (Euro)</description>
+		<year>1987</year>
+		<publisher>Eaglesoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="break in (1987)(eaglesoft)(nl).dsk" size="737280" crc="537df240" sha1="2ee3d703a217c65a99db9840a4dabaec63845ea8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breakoun">
+		<description>Break Out (Ned)</description>
+		<year>1985</year>
+		<publisher>Volker Becker</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="break out (1985)(volker becker)(nl).dsk" size="737280" crc="2317e7dc" sha1="f05edc22a481b83bef8b6ee292e242bfd2a66768" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breakouf">
+		<description>Break Out (Fra)</description>
+		<year>1986</year>
+		<publisher>Manfredi</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="break out (1986)(manfredi)(fr).dsk" size="737280" crc="1941acfb" sha1="22f4dc45ae7745b15220490a0b3caaebd2f64585" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breakous">
+		<description>Break Out (Spa?)</description>
+		<year>1987</year>
+		<publisher>Revista</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="break out (1987)(revista).dsk" size="737280" crc="fabb352f" sha1="1c5b5c9bbcb07754fd8f652abf6836dd78d48a8f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+<!-- are the three above sets the same game?-->
+	<software name="breakout"> <!-- needs 64k in slot 2 -->
+		<description>Break Out! (Jpn)</description>
+		<year>1985</year>
+		<publisher>Toshiba-EMI</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="break out! (1985)(toshiba-emi)(jp)[needs 64k in slot 2].dsk" size="737280" crc="b1ecbc2c" sha1="39e51e10acd010ef69b55b4bfe7f95247efc215c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breakman">
+		<description>Break-Man (Ned)</description>
+		<year>1985</year>
+		<publisher>MSX Computer Magazine</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="break-man (1985)(msx computer magazine)(nl).dsk" size="737280" crc="19efb305" sha1="3cad877057df8ab0500a340390375a4fb3d5a2ab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breaker">
+		<description>Breaker Breaker (Euro)</description>
+		<year>1988</year>
+		<publisher>Eurosoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="breaker breaker (1988)(eurosoft)(nl).dsk" size="737280" crc="d4405935" sha1="76b74ab00cc59bd2eb9d8e5bb908d0e52a340267" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bjacksc">
+		<description>Brian Jacks Superstar Challenge (Euro)</description>
+		<year>1985</year>
+		<publisher>Martech Games</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="brian jacks superstar challenge (1985)(martech games)(gb).dsk" size="737280" crc="859a40f9" sha1="4e6d23750d888cbbbec63ba0414920f45943631c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brickbrk">
+		<description>Brick Breaker (Spa)</description>
+		<year>1987</year>
+		<publisher>Dro Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="brick breaker (1987)(dro soft)(es).dsk" size="737280" crc="5290469c" sha1="1abab19c1222a7ac31d78773828f8624a54bfdde" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Hacked by CEZ"/>
+			<dataarea name="flop" size="737280">
+				<rom name="brick breaker (1987)(dro soft)(es)[h cez].dsk" size="737280" crc="87cc7984" sha1="ec139c02b96b038b8a70bd99897f1ca37a4e7d9b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bridge">
+		<description>Bridge (Fra)</description>
+		<year>1985</year>
+		<publisher>Nice Ideas</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bridge (1985)(nice ideas)(fr).dsk" size="737280" crc="e5732b98" sha1="7fe436c6e660fd1500cd2dfa14f9661d38c18597" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brisca">
+		<description>Brisca (Spa)</description>
+		<year>198?</year>
+		<publisher>Stars</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="brisca (19xx)(stars)(es).dsk" size="737280" crc="89b7db3e" sha1="1b2fdbe24a2d6e84781a6b2ee0316daa3f014e02" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="brisca (19xx)(stars)(es)[a].dsk" size="737280" crc="c9705283" sha1="04c3e766f469a614ff5bff96902478efb7469ffe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bronx">
+		<description>Bronx (Spa)</description>
+		<year>1989</year>
+		<publisher>Animagic</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Cracked by Damian Roman"/>
+			<dataarea name="flop" size="737280">
+				<rom name="bronx (1989)(animagic)(es)[cr damian roman].dsk" size="737280" crc="b6561a58" sha1="9b7f476b80fbf8e86fc0c07aa04be308dbbd80db" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Cracked by Damian Roman, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="bronx (1989)(animagic)(es)[cr damian roman][a].dsk" size="737280" crc="673ce5b3" sha1="4c3bdef58b33aec727ae711dacea2bc34a44b637" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brother">
+		<description>Brother Adventure - Mario Bros (Kor)</description>
+		<year>1987</year>
+		<publisher>Zemina</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="brother adventure. mario bros (1987)(zemina)(kr).dsk" size="737280" crc="4aa3ea51" sha1="57c892bfaceee1a3c20739b76164773a21887e31" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brucelee">
+		<description>Bruce Lee (Jpn)</description>
+		<year>1985</year>
+		<publisher>Comptiq</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bruce lee (1985)(comptiq)(jp).dsk" size="737280" crc="9df3bcb2" sha1="e56db52b8061ab9203799b51cdcc1ba6208ad531" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bubbler">
+		<description>Bubbler (Euro)</description>
+		<year>1987</year>
+		<publisher>Ultimate Play The Game</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bubbler (1987)(ultimate play the game)(gb).dsk" size="737280" crc="6145622f" sha1="d759a8b3c8a8f99a94019f18229985cd31e6c431" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bucaneer">
+		<description>Buccaneer Strip Girl (Bra)</description>
+		<year>198?</year>
+		<publisher>Iran Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="buccaneer strip girl (19xx)(iran soft)(br).dsk" size="737280" crc="3b5166f1" sha1="1ddac6fd8c01b97da41933f44829df65c0eb8113" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="buckrogr">
+		<description>Buck Rogers - Planet of Zoom (Jpn)</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="buck rogers - planet of zoom (1983)(sega)(jp).dsk" size="737280" crc="a9da08a9" sha1="748b0928b6d156f721bb1f5c9bc42eedfdcb5e77" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bugbustr">
+		<description>Bugbuster</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bugbuster (19xx)(-).dsk" size="737280" crc="0b0f0184" sha1="2dbd5d40656cc7f423f35aa029fbbffe8c116629" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bugrangr">
+		<description>Buggy Ranger (Spa)</description>
+		<year>1990</year>
+		<publisher>Dinamic Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="buggy ranger (1990)(dinamic software)(es).dsk" size="737280" crc="edc6a9d2" sha1="37649515af008c29312348015f7ed00d55500ecc" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="buggy ranger (1990)(dinamic software)(es)[a].dsk" size="737280" crc="1008eea8" sha1="4f911387002942684af592050419f53034e42af3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bumpy">
+		<description>Bumpy (Fra, Cracked by Drack Soft)</description>
+		<year>1989</year>
+		<publisher>Loriciels</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bumpy (1989)(loriciels)(fr)[cr drack soft].dsk" size="737280" crc="e44f36c4" sha1="bd534ab6c533b2345bb168443f71d7bde8ea0cfa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bumpys">
+		<description>Bumpy (Spa)</description>
+		<year>198?</year>
+		<publisher>Grupo de Trabajo Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bumpy (19xx)(grupo de trabajo software)(es).dsk" size="737280" crc="e97fecef" sha1="d592be09fffe0133c811f226e83c2693d16fe953" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="buran">
+		<description>Buran (Spa)</description>
+		<year>1990</year>
+		<publisher>OMK Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="buran (1990)(omk software)(es).dsk" size="737280" crc="998ee113" sha1="0005708885e0826e82100c07fce16c979966edc3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="burgkill">
+		<description>Burgerkill (Euro)</description>
+		<year>1988</year>
+		<publisher>Eurosoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="burgerkill (1988)(eurosoft)(nl)[aka mac attack].dsk" size="737280" crc="cd87fd55" sha1="1cd27cbba9e69abe245a1e63e46280f456349f8b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="368640">
+				<rom name="burgerkill (1988)(eurosoft)(nl)[a][aka mac attack].dsk" size="368640" crc="db399184" sha1="1cf4790afe97416cfb4d3ec818de7fb8c5928f42" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="burumart">
+		<description>Buru to Marty Kikiippatsu. Inspecteur Z (Jpn)</description>
+		<year>1986</year>
+		<publisher>HAL Kenkyuujo</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="buru to marty kikiippatsu. inspecteur z (1986)(hal laboratory)(jp).dsk" size="737280" crc="b158b391" sha1="84f7a10c2cf0dd6f05e3c331f6a20fe60d0faad4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="buscpala">
+		<description>Buscando las Palabras (Spa)</description>
+		<year>1987</year>
+		<publisher>Editorial Cometa</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="buscando las palabras (1987)(editorial cometa)(es).dsk" size="737280" crc="cccc84a7" sha1="e30c0b745146412e49d71c1c021a289890d1b1ee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bustbloc">
+		<description>Buster Block (Euro)</description>
+		<year>1985</year>
+		<publisher>Kuma Computers</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="buster block (1985)(kuma computers)(gb).dsk" size="737280" crc="00f419e2" sha1="f59ada93c5010940a86300cb7580dfddf70ddee2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprdoor">
+		<description>Super Doors (Jpn, Tape Hack?)</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="busy rainy day. super doors (1983)(hudson soft)(jp)[super doors][side b of tape].dsk" size="737280" crc="41c5c649" sha1="ae47df0f446309dd60337ecb2a7fcc6941299e5e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="butampan">
+		<description>Butam Pants (Jpn)</description>
+		<year>1983</year>
+		<publisher>HAL Kenkyuujo</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="butamaru pants. pig mock (1983)(hal laboratory)(jp).dsk" size="737280" crc="68cc087f" sha1="f120eb3453d7328181708774b425891c2073a24b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="buzzoff">
+		<description>Buzz Off! (Euro)</description>
+		<year>1984</year>
+		<publisher>Electric Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="buzz off! (1984)(electric software)(gb).dsk" size="737280" crc="2b547aca" sha1="b557b30dae3ef1dc36e87b04f2a1cf2b26cb683a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bytebust">
+		<description>Bytebusters (Euro)</description>
+		<year>1984</year>
+		<publisher>Aackosoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="bytebusters (1984)(aackosoft)(nl).dsk" size="737280" crc="f4b44d4c" sha1="ededcb72afc06b9a16b4c4adf481c5f751eed77c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cso">
+		<description>C_So! (Jpn)</description>
+		<year>1985</year>
+		<publisher>Pony Canyon</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="c so! (1985)(pony canyon)(jp).dsk" size="737280" crc="5608cce4" sha1="480208cca4b8867d6a7466d27a0fa177efed7997" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpk">
+		<description>Cabbage Patch Kids (Jpn)</description>
+		<year>1984</year>
+		<publisher>Konami</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="cabbage patch kids (1984)(konami)(jp).dsk" size="737280" crc="8fdff3d2" sha1="691efa58cc8cc10f68746ece5b393dc69f8ca3d6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="calgames">
+		<description>California Games (Euro)</description>
+		<year>1987</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="california games (1987)(us gold)(gb).dsk" size="737280" crc="85d4ffe7" sha1="6cd232b36222f131a22a1c6c20778e2d9488f14b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="california games (1987)(us gold)(gb)[a].dsk" size="737280" crc="62b3da99" sha1="b46171c47d7d10dbc32a732efaae4c94d5ade2ac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="camelot">
+		<description>Camelot Warriors (Spa)</description>
+		<year>1986</year>
+		<publisher>Dinamic Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="camelot warriors (1986)(dinamic software)(es).dsk" size="737280" crc="30368fc4" sha1="ad7602d8d60e3561ef0545e0136f37e88d16ef7e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Hacked by MSX Games bOX"/>
+			<dataarea name="flop" size="368640">
+				<rom name="camelot warriors (1986)(dinamic software)(es)[h msx games box].dsk" size="368640" crc="bec9728f" sha1="fc29b163328da7f8c270226aafc1834d2571ca3f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="campmina">
+		<description>Campo Minado (Bra)</description>
+		<year>1991</year>
+		<publisher>Renato de Mello</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="campo minado (1991)(renato de mello)(br).dsk" size="737280" crc="1ba4b9d7" sha1="1c48ad6b54e6f2a0b0798084ada536c596ba8747" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="canworms">
+		<description>Can of Worms (Euro)</description>
+		<year>1986</year>
+		<publisher>LiveWire Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="can of worms (1986)(livewire software)(gb).dsk" size="368640" crc="c1da76de" sha1="0a14b3f2fdcef25cf19c3b8897f7630c4d6c0548" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="candoon">
+		<description>Candoo Ninja (Jpn)</description>
+		<year>1983</year>
+		<publisher>ASCII</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="candoo ninja (1983)(ascii)(jp).dsk" size="737280" crc="59f9c156" sha1="acc6fe3ccc8f2a3027520dd901c48dd0506e85c8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cannonb">
+		<description>Cannon Ball (Jpn)</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="cannon ball (1983)(hudson soft)(jp).dsk" size="737280" crc="9be2382f" sha1="0c22a1c7373ea9b93cfe415bc33621f1957e8a8b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cannonf">
+		<description>Cannon Fighter (Jpn)</description>
+		<year>1984</year>
+		<publisher>Policy</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="cannon fighter (1984)(policy)(jp).dsk" size="737280" crc="8091560e" sha1="09cd7dd65d4f597fa486fd390be6429b33e5531f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sevilla">
+		<description>Capitan Sevilla (Spa)</description>
+		<year>1988</year>
+		<publisher>Dinamic Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="capitan sevilla (1988)(dinamic software)(es).dsk" size="737280" crc="a6a9c79a" sha1="472f1f7c792776e4292e6a73982e9d1d5a67b87a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="capitan sevilla (1988)(dinamic software)(es)[a].dsk" size="737280" crc="9d15daa3" sha1="aa1ada28c267469cc451cadb0cdb97c294a4ea9d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trueno">
+		<description>Capitan Trueno (Spa)</description>
+		<year>1989</year>
+		<publisher>Dinamic Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="368640">
+				<rom name="capitan trueno (1989)(dinamic software)(es).dsk" size="368640" crc="5f78f383" sha1="f48545629ee40b65afbc9f9dfcddebf5a2444e61" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="capitan trueno (1989)(dinamic software)(es)[a].dsk" size="737280" crc="6ced96a5" sha1="1fc53b80dc2d1c240bba4760ccaa86cda9806cf7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Trained"/>
+			<dataarea name="flop" size="737280">
+				<rom name="capitan trueno (1989)(dinamic software)(es)[t].dsk" size="737280" crc="706d8175" sha1="b15578af88cba80952d3945f4ec8797f3415a7ee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="caple">
+		<description>Caple</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="caple (19xx)(-).dsk" size="737280" crc="33e9c955" sha1="96f465b12ef0a45b8f1ce9986b631759b5b7c757" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="captchef">
+		<description>Captain Chef (Jpn)</description>
+		<year>1984</year>
+		<publisher>Nihon Columbia</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="captain chef (1984)(nippon columbia - colpax - universal).dsk" size="737280" crc="43d5ef89" sha1="66fe62369215f582b3006d65538831852f4b3417" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ccosmo">
+		<description>Captain Cosmo (Jpn)</description>
+		<year>1984</year>
+		<publisher>ASCII</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="captain cosmo (1984)(ascii)(jp).dsk" size="737280" crc="b47cc759" sha1="02edd0a9dcca97580b4ded364defb390a86f4b4b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="capmonga">
+		<description>Capture os Mongas (Bra)</description>
+		<year>198?</year>
+		<publisher>Editora McGraw-Hill</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="capture os mongas (19xx)(editora mcgraw-hill)(br).dsk" size="737280" crc="1060dd25" sha1="8f9206a37f5e03b27001dd9fe27afcd2c88da379" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="368640">
+				<rom name="capture os mongas (19xx)(editora mcgraw-hill)(br)[a].dsk" size="368640" crc="ae45bb63" sha1="12aef32cad905d99d8213469e4b886e90c0bfbc4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carfight">
+		<description>Car Fighter (Jpn)</description>
+		<year>1985</year>
+		<publisher>Casio</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="car fighter (1985)(casio)(jp).dsk" size="737280" crc="ee929fe1" sha1="f9d0db8c0311b28e35d6da03665252f4e8bd0b41" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carjambo">
+		<description>Car Jamboree (Jpn)</description>
+		<year>1984</year>
+		<publisher>Sony</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="car jamboree (1984)(sony)(jp).dsk" size="737280" crc="03ceabd8" sha1="fe87555878b54a46c7a84834c91b290a41d991c0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carrace">
+		<description>Car Race (Jpn)</description>
+		<year>1983</year>
+		<publisher>Ample Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="car race (1983)(ample software)(jp).dsk" size="737280" crc="e80b049c" sha1="629203cded2841bc992d6b51e28936d7b49f65ed" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carlos">
+		<description>Carlos Sainz (Spa)</description>
+		<year>1990</year>
+		<publisher>Zigurat Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="carlos sainz (1990)(zigurat software)(es).dsk" size="737280" crc="ba95f585" sha1="682f48d97ae901e433225d5cda61fae28744ce16" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="carlos sainz (1990)(zigurat software)(es)[a].dsk" size="737280" crc="188af2f2" sha1="bbbd7aa49f69b16eade278e0c152826c3ce242eb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="carlos sainz (1990)(zigurat software)(es)[a2].dsk" size="737280" crc="5c368b85" sha1="31e9cbc43c28196203db1eab69920c2132831a38" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carry">
+		<description>Carry</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="carry (19xx)(-).dsk" size="737280" crc="5e32fe24" sha1="362b5b066353cc7783bb0b50cc3efe93dba7ca02" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cartoon">
+		<description>Cartoon (Bra)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="cartoon (19xx)(-)(br).dsk" size="737280" crc="176eab76" sha1="8d2aec9c6c152039cff731ee47446861db84d879" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="casanova">
+		<description>Casanova (Spa)</description>
+		<year>1989</year>
+		<publisher>Iber Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="casanova (1989)(iber soft)(es).dsk" size="737280" crc="2a08e029" sha1="8e33cff3cee1f56db046279373ec3166858d70bd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="casanova (1989)(iber soft)(es)[cr knight software].dsk" size="737280" crc="7fcff347" sha1="8034b2ef9797fef73426524af5605691812130ee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrldopnk">
+		<description>Casio World Open (Kor)</description>
+		<year>1985</year>
+		<publisher>Boram Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="casio world open (1985)(casio)(jp)[cr boram soft].dsk" size="737280" crc="313aea93" sha1="ee544e73bec05e193a56c1e931d233463819e77b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="castelon">
+		<description>Castelo Negro (Bra)</description>
+		<year>1987</year>
+		<publisher>P.I.S.C.</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="castelo negro (1987)(p.i.s.c.)(br).dsk" size="737280" crc="2352ab80" sha1="f52593365cefeb61fa23d3ff5556bf34c6b83faf" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="castelo negro (1987)(p.i.s.c.)(br)[a].dsk" size="737280" crc="401a088b" sha1="380f678304f56a2e0fa6ffcc39d63034b8bb99bb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="castelo negro (1987)(p.i.s.c.)(br)[a2].dsk" size="737280" crc="439333d3" sha1="c19b00f2fc4355d7d9cbe18288e9affac11ff16f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="castgod">
+		<description>El Castillo de Godless (Spa)</description>
+		<year>1985</year>
+		<publisher>Idealogic</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="castillo de godless, el (1985)(idealogic)(es).dsk" size="737280" crc="4dadef92" sha1="15d435ee6209562cc705876c411809545e0dfaf0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="castcomb">
+		<description>Castle Combat (Euro)</description>
+		<year>1985</year>
+		<publisher>Spectravideo</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="castle combat (1985)(spectravideo)(gb).dsk" size="737280" crc="47e6a853" sha1="fb83e1d31750c3ba9a59453980c003cf01151b26" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="castlex">
+		<description>Castle Excellent (Jpn, Trained by Damian Roman)</description>
+		<year>1986</year>
+		<publisher>ASCII</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="castle excellent (1989)(ascii)(jp)[t damian roman].dsk" size="737280" crc="26c838b4" sha1="7a03b20aa305f9661a3e915f400654b616488d28" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="castle">
+		<description>The Castle (Jpn)</description>
+		<year>1985</year>
+		<publisher>ASCII</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="castle, the (1986)(ascii)(jp).dsk" size="737280" crc="669d7697" sha1="99ffcbf3e31edcbfab4c8c728c742a402d7252da" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="catwolf">
+		<description>Cat &amp; Wolf</description>
+		<year>198?</year>
+		<publisher>Drack Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="cat &amp; wolf (19xx)(drack soft).dsk" size="737280" crc="2f8e1431" sha1="4de1b80fd0d6bc9e6d2f2532e6aa2fd52581cb8f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="catchgrl">
+		<description>Catch That Girl</description>
+		<year>198?</year>
+		<publisher>WB-Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="catch that girl (19xx)(wb-soft).dsk" size="737280" crc="1223bfc3" sha1="d37d67549f344c8f9411ffdb86e2f0caf353a87f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="catchmou">
+		<description>Catch the Mouse Puzzle</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="catch the mouse puzzle (19xx)(-).dsk" size="737280" crc="280d6be8" sha1="3bad73885ec47cdb34531933aa91c31aa560b443" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavdeath">
+		<description>Cavern of Death (Spa)</description>
+		<year>1987</year>
+		<publisher>Dro Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="cavern of death (1987)(dro soft)(es).dsk" size="737280" crc="0dc959a6" sha1="22b0f82031e5e5ffc7694af719d3a6dc80ca1002" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Hacked by CEZ"/>
+			<dataarea name="flop" size="737280">
+				<rom name="cavern of death (1987)(dro soft)(es)[h cez].dsk" size="737280" crc="cc9c8018" sha1="4469fd09570050a4d99f3c3eb360dc854c586620" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="celula">
+		<description>La Celula (Spa)</description>
+		<year>1987</year>
+		<publisher>Microgesa</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="celula, la (1987)(microgesa)(es).dsk" size="737280" crc="1fc91197" sha1="a734954f010317a26feb9dc366e661321f34c0dc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cerebral">
+		<description>Cerebral (Spa)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="cerebral (19xx)(-)(es).dsk" size="737280" crc="748c8bb9" sha1="c8ac60913a338ec2299d3059667c623f44765c8d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cetus">
+		<description>Cetus (Euro)</description>
+		<year>1986</year>
+		<publisher>Tynesoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="cetus (1986)(tynesoft)(gb).dsk" size="737280" crc="6fdd844c" sha1="c3154342b09b4be6f46963b9fabc676eaf6705aa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chackpop">
+		<description>Chack 'n Pop (Jpn)</description>
+		<year>1984</year>
+		<publisher>Taito</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="chack 'n pop (1984)(taito)(jp).dsk" size="737280" crc="9733b027" sha1="8fcd9e39d7fdc6d1eb5d8942ee35cee6e06aaa35" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="champ">
+		<description>Champ (Euro)</description>
+		<year>1984</year>
+		<publisher>PSS</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="champ (1984)(pss)(gb).dsk" size="737280" crc="ae8b5aff" sha1="aca88410d5efb92cfdfad47828fc8c763c597ea7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="champbox">
+		<description>Champion Boxing (Jpn)</description>
+		<year>1985</year>
+		<publisher>Pony Canyon</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="champion boxing (1985)(pony canyon)(jp).dsk" size="737280" crc="e9b38f07" sha1="8d26d1c08b8f9190d361f58009512c8d758b4078" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="champice">
+		<description>Champion Ice Hockey (Jpn, Cracked by Nemesis)</description>
+		<year>1986</year>
+		<publisher>Pony Canyon</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="champion ice hockey (1986)(pony canyon)(jp)[cr nemesis].dsk" size="737280" crc="8d67680d" sha1="94516411a809788ed6ebdb6c0dcb65f64931080c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="champken">
+		<description>Champion Kendou (Jpn)</description>
+		<year>1986</year>
+		<publisher>Pony Canyon</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="champion kendo (1986)(pony canyon)(jp).dsk" size="737280" crc="ef840033" sha1="1a997aaccdfcc16b62a5b65d82d061a564d5e0dc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="champpwr">
+		<description>Champion Pro Wrestling (Jpn)</description>
+		<year>1985</year>
+		<publisher>Pony Canyon</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="champion pro wrestling (1985)(pony canyon)(jp).dsk" size="737280" crc="43869995" sha1="96f238ebc3f8cfb33b8aee696edfed41b8f97ebf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="champscr">
+		<description>Champion Soccer (Jpn)</description>
+		<year>1985</year>
+		<publisher>Pony Canyon</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="champion soccer (1985)(pony canyon)(jp).dsk" size="737280" crc="52264e46" sha1="cf7010948aa006740566a2ebbfda252792f110c1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="champion">
+		<description>Champions (Jpn)</description>
+		<year>1984</year>
+		<publisher>Pony</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="champions grand national (1984)(pony canyon)(jp).dsk" size="737280" crc="132edb78" sha1="f9e88e61268f52d7ee5f5a82131dbe3a2597bf96" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cloderun">
+		<description>Championship Lode Runner (Jpn)</description>
+		<year>1985</year>
+		<publisher>Sony</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="championship lode runner (1985)(sony)(jp).dsk" size="737280" crc="7ff74c3c" sha1="23a5a38ad1d33f68d4e8925ccc4bf81faf776d1b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chasehq">
+		<description>Chase H.Q. (Euro)</description>
+		<year>1988</year>
+		<publisher>Ocean Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="chase h.q. (1988)(ocean software)(gb).dsk" size="737280" crc="06d2f91a" sha1="4fb3456069d8c2e785273f6e41226147feb23abb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Cracked by Forca Informatica"/>
+			<dataarea name="flop" size="368640">
+				<rom name="chase h.q. (1988)(ocean software)(gb)[cr forca informatica].dsk" size="368640" crc="928c476f" sha1="2bc5868fb035125ded174e38e4aed340b4769fed" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tantan">
+		<description>Checkers in Tan Tan Tanuki (Jpn)</description>
+		<year>1985</year>
+		<publisher>Pony Canyon</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="checkers in tan tan (1985)(pony canyon)(jp).dsk" size="737280" crc="864963d3" sha1="d57438d16ffdc500c4493d9c505b6974afbf4535" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="checkmat"> <!-- needs 64k in slot 2 -->
+		<description>Checkmate! First Moves in Chess (Jpn)</description>
+		<year>1985</year>
+		<publisher>Toshiba</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="checkmate! first moves in chess (1985)(toshiba-emi)(jp)[needs 64k in slot 2].dsk" size="737280" crc="7edc36c9" sha1="1eda39a2de8057b4bc82ebe58c7295860162ccba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cheese">
+		<description>Cheese (Jpn)</description>
+		<year>1984</year>
+		<publisher>Nihon Electronics</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="cheese (1984)(nipon electronics)(jp)[mouse].dsk" size="737280" crc="a3ab0257" sha1="62c1411d0abb506d58a05ceec2ed8f4d78a50bd0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chemie">
+		<description>Chemie (Ned)</description>
+		<year>1987</year>
+		<publisher>Gemaakt</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="chemie (1987)(gemaakt)(nl).dsk" size="737280" crc="f7f7153d" sha1="38f191e305cc566ec2990144519ff8cbc0641006" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chessgam">
+		<description>The Chess Game (Euro)</description>
+		<year>1985</year>
+		<publisher>Eaglesoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="chess game, the (1985)(eaglesoft)(nl).dsk" size="737280" crc="ecf773e1" sha1="188c7ef7f25d74f3caf299b0fcd8092233736577" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="chess game, the (1985)(eaglesoft)(nl)[a].dsk" size="737280" crc="dd5f241f" sha1="8063fdff350fdb5284d9277d702eeca1ed4456c6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chessmas">
+		<description>Chess Master (Euro?)</description>
+		<year>1985</year>
+		<publisher>Philips</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="chess master (1985)(philips).dsk" size="737280" crc="948acce5" sha1="f182953ef9be53b60cd5e5dd7bff542b7134985c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chesspla">
+		<description>Chess Player (Euro)</description>
+		<year>1988</year>
+		<publisher>Eurosoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="chess player (1988)(eurosoft)(nl).dsk" size="737280" crc="e7369009" sha1="d1f07ce039ece76baacf74cf01f74ff51d7f38a4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmastr2k">
+		<description>The Chessmaster 2000 (Spa)</description>
+		<year>1990</year>
+		<publisher>Dro Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="chessmaster 2000, the (1990)(dro soft)(es).dsk" size="737280" crc="fd85aba0" sha1="cb1764e5cbd1d73cb18fc1134194fc3db1027050" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chicago">
+		<description>Chicago 30's (Spa)</description>
+		<year>1988</year>
+		<publisher>Topo Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="737280">
+				<rom name="chicago 30's (1988)(topo soft)(es).dsk" size="737280" crc="41d6269a" sha1="21091b023b7b779c4e6a738405662ece926a0d52" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="737280">
+				<rom name="chicago 30's (1988)(topo soft)(es)[a].dsk" size="737280" crc="45d01cc4" sha1="0df5976a3cb87eb2501dfce11c18eb6210684d25" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt 2"/>
+			<dataarea name="flop" size="737280">
+				<rom name="chicago 30's (1988)(topo soft)(es)[a2].dsk" size="737280" crc="d7b3f6e8" sha1="d3f84235c8543a354a4efd8ad19b1d8bad6d7d9a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jsw2">
+		<description>Jet Set Willy II (Euro, Trained)</description>
+		<year>1986</year>
+		<publisher>Software Projects</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="jet set willy ii - the final frontier (1985)(software projects)(gb)[t].dsk" size="737280" crc="af505b0c" sha1="80c9d7d113acbda75f92d10bec1b8f3322e62176" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ohmummy">
+		<description>Oh Mummy!! (Euro)</description>
+		<year>1984</year>
+		<publisher>Longman Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="oh mummy!! (1984)(longman software)(gb).dsk" size="737280" crc="9cf775cc" sha1="cd7db0faf25ae33699b1708a19a874e3662e158a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ohshit">
+		<description>Oh Shit! (Euro)</description>
+		<year>1986</year>
+		<publisher>Aackosoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="oh shit! (1986)(aackosoft)(nl).dsk" size="737280" crc="735ebc21" sha1="7de3f69a8a5136e0dd25214d36b1194a6506b377" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ohno" cloneof="ohshit">
+		<description>Oh No! (Euro)</description>
+		<year>1986</year>
+		<publisher>Eaglesoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="oh no! (1986)(eaglesoft)(nl)[aka oh shit!].dsk" size="737280" crc="aee65f34" sha1="5c2cd6dd8192a8c29fc0e272181272cb26cc2af6" offset="0" />
 			</dataarea>
 		</part>
 	</software>

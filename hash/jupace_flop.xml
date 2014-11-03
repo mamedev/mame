@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- This is currently a documentation-only software list, but is hooked up in ace.c -->
+<softwarelist name="jupace_flop" description="Jupiter Cantab Jupiter Ace floppies">
+	<software name="demotape">
+		<description>Ace Demonstration Tape</description>
+		<year>1983</year>
+		<publisher>Jupiter Cantab</publisher>
+
+		<part name="cass1" interface="floppy_5_25">
+			<dataarea name="cass" size="819200">
+				<rom name="ace demonstration tape (1983)(jupiter cantab)(gb)[3k].dsk" size="819200" crc="da0e95f1" sha1="63647c6d480a7530c50cd60954dd2c796caabd30" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

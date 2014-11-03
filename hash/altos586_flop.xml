@@ -1,0 +1,224 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+NOTE: This list is here only to document available dumps and it's not used (yet) by MESS!
+-->
+<softwarelist name="altos586_flop" description="Altos 186, 586 &amp; 986 floppies">
+	<software name="aoutc">
+		<description>A.Out C Compiler (v2.4S0)</description>
+		<year>1983</year>
+		<publisher>Altos Computer Systems</publisher>
+		<info name="serial" value="XEN-01262"/>
+		
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358529">
+				<rom name="a.out c compiler v2.4s0 (1983)(altos computer systems)(586-986)(serial no. xen-01262).imd" size="358529" crc="2a99e04d" sha1="fce35ffff9488de0561a33df4e24ff307cc94ee5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adx">
+		<description>ADX (v1.3S0, Serial No. 05569)</description>
+		<year>1983</year>
+		<publisher>Altos Computer Systems</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="210698">
+				<rom name="adx v1.3s0 (1983)(altos computer systems)(586-986)(serial no. 05569).imd" size="210698" crc="379d32b3" sha1="35ea3affd9c4680c8008f0baa110f9f93d4e4a74" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adx1" cloneof="adx">
+		<description>ADX (v1.3S0, Serial No. 10887)</description>
+		<year>1983</year>
+		<publisher>Altos Computer Systems</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="210748">
+				<rom name="adx v1.3s0 (1983)(altos computer systems)(586-986)(serial no. 10887).imd" size="210748" crc="431aeb7c" sha1="7f89863ed884ae5a85a2149ec79b362ba0b9e104" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adx2" cloneof="adx">
+		<description>ADX (v1.3S0, Serial No. 13532)</description>
+		<year>1983</year>
+		<publisher>Altos Computer Systems</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="210748">
+				<rom name="adx v1.3s0 (1983)(altos computer systems)(586-986)(serial no. 13532).imd" size="210748" crc="28f98617" sha1="88513d0c0fbe6886521a97ef4f6c86cdab49e2ef" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="586dms">
+		<description>Altos 586 Database Management System</description>
+		<year>1983</year>
+		<publisher>UNIFY</publisher>
+		<info name="serial" value="3.1-062684"/>
+
+		<part name="flop1" interface="floppy_5_25">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="695237">
+				<rom name="altos 586 database management system (1983)(unify)(586)(disk 1 of 5)(serial no. 3.1-062684).imd" size="695237" crc="e11af77f" sha1="ed46036f690951eb76744739d6543553590a5d55" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="683484">
+				<rom name="altos 586 database management system (1983)(unify)(586)(disk 2 of 5)(serial no. 3.1-062684).imd" size="683484" crc="6d1e212e" sha1="47feabe5fb41282230f3ede16d7bd2ff4649f871" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+		<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="669176">
+				<rom name="altos 586 database management system (1983)(unify)(586)(disk 3 of 5)(serial no. 3.1-062684).imd" size="669176" crc="dba28758" sha1="b0a616d0bf0257ef4860d7e592ca964d444ebbe7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+		<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="625741">
+				<rom name="altos 586 database management system (1983)(unify)(586)(disk 4 of 5)(serial no. 3.1-062684).imd" size="625741" crc="47be9f01" sha1="d07cdbf4e57d0156042f8590a15d248d507d8df4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+		<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="473463">
+				<rom name="altos 586 database management system (1983)(unify)(586)(disk 5 of 5)(serial no. 3.1-062684).imd" size="473463" crc="c61a6315" sha1="3685112a3ca3b7999747a2ca809c2ee88dc2bde7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fortran">
+		<description>Fortran 77 (v1.2B0)</description>
+		<year>198?</year>
+		<publisher></publisher>
+		<info name="serial" value="XEN-00201"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="313365">
+				<rom name="fortran 77 v1.2b0 (198x)(-)(586)(serial no. xen-00201).imd" size="313365" crc="5b4e5ea1" sha1="adcfc56902419398fca5a0781cb97a140267a214" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbms">
+		<description>Informix DBMS (v3.11B)</description>
+		<year>198?</year>
+		<publisher></publisher>
+		<info name="serial" value="010959"/>
+
+		<part name="flop1" interface="floppy_5_25">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="735979">
+				<rom name="informix dbms v3.11b (198x)(-)(586)(disk 1 of 2)(serial no. 010959).imd" size="735979" crc="99f2586a" sha1="f87978ed3f8b8989c0f49ff73bcd81a59acbedad" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="299067">
+				<rom name="informix dbms v3.11b (198x)(-)(586)(disk 2 of 2)(serial no. 010959).imd" size="299067" crc="acbd1de9" sha1="ff9f9eef5f4d35bda27b8fb12e36ce8f06b4d1c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="l2cobol">
+		<description>Level-II COBOL (v2.02S0)</description>
+		<year>1984</year>
+		<publisher>Santa Cruz Operation</publisher>
+		<info name="serial" value="068"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="389101">
+				<rom name="level-ii cobol v2.02s0 (1984)(santa cruz operation)(186-586-986)(serial no. 068).imd" size="389101" crc="4bade92f" sha1="7f41f0e1e25baf4590b5bccc429605f65e7ff74c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mpm">
+		<description>MP/M-86 (v2.1)</description>
+		<year>198?</year>
+		<publisher>Digital Research</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="507499">
+				<rom name="mp-m-86 v2.1 (198x)(digital research)(586).imd" size="507499" crc="1dc22209" sha1="edf7fb121aac55ed31073ab8d97be47bd6c7fd9d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xoutc">
+		<description>X.Out C Compiler (1984 version)</description>
+		<year>1984</year>
+		<publisher>Control Data</publisher>
+		<info name="serial" value="15202196 + 15202197"/>
+
+		<part name="flop1" interface="floppy_5_25">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="717068">
+				<rom name="x.out c compiler (1984)(control data)(586)(disk 1 of 2)(part no. 15202196).imd" size="717068" crc="f3df086d" sha1="1f6fab361c8fca1ff14a3f5aabbc9040036259f5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="584719">
+				<rom name="x.out c compiler (1984)(control data)(586)(disk 2 of 2)(part no. 15202197).imd" size="584719" crc="70711e82" sha1="47623ba27ecd6a4d5a099e4318137c251a50a2a4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xoutc2">
+		<description>X.Out C Compiler 2 (v3.0BS1)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value="X03-201"/>
+
+		<part name="flop1" interface="floppy_5_25">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="710938">
+				<rom name="x.out c compiler 2 v3.0bs1 (198x)(-)(586)(disk 1 of 2)(serial no. x03-201).imd" size="710938" crc="b54df53b" sha1="d40aeb4a7c7b60c80bd64fb2bbc1dd8e4f240bda" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="604138">
+				<rom name="x.out c compiler 2 v3.0bs1 (198x)(-)(586)(disk 2 of 2)(serial no. x03-201).imd" size="604138" crc="ef412cda" sha1="c32083607afc347a276e1c1bcc353576557f5aeb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xoutc1" cloneof="xoutc">
+		<description>X.Out C Compiler (v1.0aS0)</description>
+		<year>1983</year>
+		<publisher>Altos Computer Systems</publisher>
+		<info name="serial" value="XEN-01262"/>
+
+		<part name="flop1" interface="floppy_5_25">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="733093">
+				<rom name="x.out c compiler v1.0as0 (1983)(altos computer systems)(586-986)(disk 1 of 2)(serial no. xen-01262).imd" size="733093" crc="61cac538" sha1="b855e547f70943902ac796a7c459b256f3a408ba" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+		<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="103030">
+				<rom name="x.out c compiler v1.0as0 (1983)(altos computer systems)(586-986)(disk 2 of 2)(serial no. xen-01262).imd" size="103030" crc="26346ab7" sha1="fdbb521122914437453fb49bd264c4b03298aa82" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xenix">
+		<description>Xenix Boot Disk (586)</description>
+		<year>1983</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="541219">
+				<rom name="xenix boot disk (1983)(microsoft)(586).imd" size="541219" crc="c65e699d" sha1="a91d4ca1315f6a0849bcc24975db306e7e571d16" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

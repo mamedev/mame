@@ -7,7 +7,7 @@
   7 unreleased prototypes are included in this collection.
 
 -->
-<softwarelist name="spectrum" description="Sinclair ZX Spectrum cartridges">
+<softwarelist name="spectrum_cart" description="Sinclair ZX Spectrum cartridges">
 
 	<software name="backgamm">
 		<description>Backgammon</description>

@@ -539,6 +539,8 @@ static MACHINE_CONFIG_START( exl100, exelv_state )
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "exl100_cart")
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "exl100_cass")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "exl100_flop")
 MACHINE_CONFIG_END
 
 

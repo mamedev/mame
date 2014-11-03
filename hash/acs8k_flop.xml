@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+NOTE: This list is here only to document available dumps and it's not used (yet) by MESS!
+-->
+<softwarelist name="acs8k_flop" description="Altos ACS-8000 floppies">
+
+	<software name="a8cpmdma" cloneof="alts8cpm">
+		<description>"CP/M v2.20 (DMA Support)"</description>
+		<year>198?</year>
+		<publisher>Altos Computer Systems</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="190284">
+				<rom name="a8cpmdma.td0" size="190284" crc="aa5d0a8e" sha1="67d5d08ee873d77719774ef5309bcb11945ef9b6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="a8diadma" cloneof="alts8dia">
+		<description>"Altos Diagnostic v1.10 (DMA Support)"</description>
+		<year>198?</year>
+		<publisher>Altos Computer Systems</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="88237">
+				<rom name="a8diadma.td0" size="88237" crc="6d1663c2" sha1="865b87fbde7b5e1b656a96bc141d593273175fa0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alts8cpm">
+		<description>"CP/M v2.21 (Non-DMA)"</description>
+		<year>198?</year>
+		<publisher>Altos Computer Systems</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="165124">
+				<rom name="25-1489.td0" size="165124" crc="aa086940" sha1="2ba67f44bd0dd01a6a5569e6e9c309ff73325346" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alts8dia">
+		<description>"Altos Diagnostic v1.11 (Non-DMA)"</description>
+		<year>198?</year>
+		<publisher>Altos Computer Systems</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="43028">
+				<rom name="adx-2596.td0" size="43028" crc="eccf1efa" sha1="189f8ecdc3c9c81325f96674451e20254091485e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

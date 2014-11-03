@@ -1,0 +1,1290 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- This is currently a documentation-only software list, but is hooked up in camplynx.c -->
+<softwarelist name="camplynx_cass" description="Camputers Lynx cassettes">
+	<software name="128gfx">
+		<description>128 Graphics Demo</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="10034">
+				<rom name="128 graphics demo (19xx)(-)(128k).tap" size="10034" crc="2dbd7bb2" sha1="bfbf996e8151f9c57762b943fcd57babd3256778" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dcity">
+		<description>3D City (Bad?)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="2770">
+				<rom name="3d city (19xx)(-)(48k-96k-128k)[b].tap" size="2770" crc="8d80114f" sha1="b60e79479959410f9f93424793a06a6aedb5af07" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dmonst">
+		<description>3D Monster Craze</description>
+		<year>1983</year>
+		<publisher>Camsoft</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="13207">
+				<rom name="3d monster craze (1983)(camsoft)(gb).tap" size="13207" crc="74a6f23f" sha1="2ae09a2af1277c36dd6bc11456ac5f937e7b24c1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dsecan">
+		<description>3D Secan</description>
+		<year>1985</year>
+		<publisher>Death Todd</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="2608">
+				<rom name="3d secan (1985)(death todd)(48k-96k-128k).tap" size="2608" crc="ca3109bd" sha1="5726809b9977e4e29d457d164dac17e980151f25" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dsect">
+		<description>3D Section</description>
+		<year>1985</year>
+		<publisher>Death Todd</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="2613">
+				<rom name="3d section (1985)(death todd)(48k-96k-128k).tap" size="2613" crc="6ab8074c" sha1="05144ab34ac040feec134a94b12b45ef916b36e1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="6845p">
+		<description>6845p</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="2463">
+				<rom name="6845p (19xx)(-)(48k-96k-128k).tap" size="2463" crc="04478c7c" sha1="c9190a5fb63b51eb08edd061fbb162b991355d4b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="labproc">
+		<description>Aide - Lab-Proc (Fra)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="696">
+				<rom name="aide - lab-proc (19xx)(-)(fr).tap" size="696" crc="038c72b3" sha1="f88eff89560a5b8dd59fb4081569b5ee37410aa0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airraid">
+		<description>Air Raid</description>
+		<year>1984</year>
+		<publisher>Camputers</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="3372">
+				<rom name="air raid (1984)(camputers)(gb).tap" size="3372" crc="d440153d" sha1="6cd966f284c0385b518185c43a4d781e80010e21" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="assemble">
+		<description>Assembler (junk files)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="49">
+				<rom name="assembler (19xx)(-)[b].tap" size="49" crc="199ec88f" sha1="892eae060df01cbfffd380d275cf13032c2a6d90" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="camplynx_cass">
+			<dataarea name="cass" size="6832">
+				<rom name="assembler (19xx)(-)[b2].tap" size="6832" crc="519e593c" sha1="56968befe3334cf427783e025913d89a9ed9f231" offset="0" />
+			</dataarea>
+		</part>
+	</software>\
+
+	<software name="backgamm">
+		<description>Backgammon</description>
+		<year>1983</year>
+		<publisher>Camsoft</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="4234">
+				<rom name="backgammon (1983)(camsoft)(gb).tap" size="4234" crc="0fb3520d" sha1="020a5b1f5044fda1f163f5c44c08439779b234be" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batbrick">
+		<description>Battlebrick</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="2933">
+				<rom name="battlebrick (19xx)(-).tap" size="2933" crc="85b051f8" sha1="a323f0a22c13cb2c0989aa33d4729b2810e5d6c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="centiped">
+		<description>Centipede</description>
+		<year>198?</year>
+		<publisher>Play It!</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="11157">
+				<rom name="centipede (19xx)(play it!).tap" size="11157" crc="8c3b3109" sha1="d4f9081e89ddf4d0ba7b1734aef4fbf494ca31ec" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chargen">
+		<description>Character Generator Game</description>
+		<year>1984</year>
+		<publisher>Camputers</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="4817">
+				<rom name="character generator game (1984)(camputers)(gb).tap" size="4817" crc="56dda80a" sha1="886a5fa9dd8b693edfe47dd4b26f68ad4cd81b8f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="colosadv">
+		<description>Colossal Adventure</description>
+		<year>1983</year>
+		<publisher>Level 9 Computing</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+		<feature name="part_id" value="Welcome"/>
+			<dataarea name="cass" size="769">
+				<rom name="colossal adventure (1983)(level 9 computing)(tape 1 of 5)(48k)[welcome].tap" size="769" crc="0ef57869" sha1="36f33540ab496c49ec1ca6f268d796b12d421e06" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="camplynx_cass">
+		<feature name="part_id" value="Binary Loader"/>
+			<dataarea name="cass" size="2582">
+				<rom name="colossal adventure (1983)(level 9 computing)(tape 2 of 5)(48k)[binary loader].tap" size="2582" crc="60dc6eab" sha1="e18835857c18120b0cacbed32022b0916c5fe725" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="camplynx_cass">
+		<feature name="part_id" value="Adventure Data 1"/>
+			<dataarea name="cass" size="8208">
+				<rom name="colossal adventure (1983)(level 9 computing)(tape 3 of 5)(48k)[adventure data].tap" size="8208" crc="cf1fa558" sha1="d90fae7175e2935c5959488372239e6cee2f63ab" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass4" interface="camplynx_cass">
+		<feature name="part_id" value="Adventure Data 2"/>
+			<dataarea name="cass" size="8208">
+				<rom name="colossal adventure (1983)(level 9 computing)(tape 4 of 5)(48k)[adventure data].tap" size="8208" crc="3022d77c" sha1="18f5a5a3226510f51c8f9e56b890e8e0e60e6010" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass5" interface="camplynx_cass">
+		<feature name="part_id" value="Adventure Data 3"/>
+			<dataarea name="cass" size="10256">
+				<rom name="colossal adventure (1983)(level 9 computing)(tape 5 of 5)(48k)[adventure data].tap" size="10256" crc="954e7a24" sha1="e4e64e1b64081ba1dffcd8f046a71eec4f52a735" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="compass">
+		<description>Compass (v1.1)</description>
+		<year>1983</year>
+		<publisher>Level 9 Computing</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+		<feature name="part_id" value="Tape 1"/>
+			<dataarea name="cass" size="17394">
+				<rom name="compass v1.1 (1983)(level 9 computing).tap" size="17394" crc="692aaeb6" sha1="6a124363368d5a54c27b96af71a7e5751db96763" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="camplynx_cass">
+		<feature name="part_id" value="Tape 1, Bad?"/>
+			<dataarea name="cass" size="7988">
+				<rom name="compass v1.1 (1983)(level 9 computing)[b].tap" size="7988" crc="a8cc6768" sha1="17ac7fae5b14372d8705e03233e89731bf8be9af" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="camplynx_cass">
+		<feature name="part_id" value="Tape 1, Bad 2?"/>
+			<dataarea name="cass" size="8708">
+				<rom name="compass v1.1 (1983)(level 9 computing)[b2].tap" size="8708" crc="39b30c83" sha1="21a0ca5e7e077fa15daa83a68efc07a3098c2cad" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copys">
+		<description>Copys (96K-128K)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+		<feature name="part_id" value="Tape 1"/>
+			<dataarea name="cass" size="225">
+				<rom name="copys (19xx)(-)(96k-128k).tap" size="225" crc="13cb04b3" sha1="a040c7df1f4f7fd475a5f1d52b38e9727262e4f0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="camplynx_cass">
+		<feature name="part_id" value="Tape 1, Alt"/>
+			<dataarea name="cass" size="225">
+				<rom name="copys (19xx)(-)(96k-128k)[a].tap" size="225" crc="a6b87535" sha1="97fb23ad3e116036515830468fe96d593e4610dc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dambustrf" cloneof="dambustr">
+		<description>Dam Busters (Fra)</description>
+		<year>1983</year>
+		<publisher>Camsoft</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="8674">
+				<rom name="dam busters (1983)(camsoft)(96k)(gb)(fr).tap" size="8674" crc="659e1a61" sha1="9810d865afe5069eefc0ec730e6b3439cb61eb31" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dambustr">
+		<description>Dam Busters</description>
+		<year>1983</year>
+		<publisher>Camsoft</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="11341">
+				<rom name="dam busters (1983)(camsoft)(gb).tap" size="11341" crc="8ef98e47" sha1="be6cd7e270ab6efbef7aea6a5e6813c7e14b5fad" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deathbal">
+		<description>Deathball</description>
+		<year>1983</year>
+		<publisher>A. Miller</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="2566">
+				<rom name="deathball (1983)(miller, a.)(gb).tap" size="2566" crc="b9dd7f8f" sha1="c2643d49295dfad8772c12cd9ec647ca2d48f022" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demo3">
+		<description>Demo 3</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="209">
+				<rom name="demo 3 (19xx)(-).tap" size="209" crc="2c225e17" sha1="87b15eebe713768399f4bddaa59241e8830a3f96" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demo4">
+		<description>Demo 4</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="169">
+				<rom name="demo 4 (19xx)(-).tap" size="169" crc="2cc4e36a" sha1="4edaec395ac49594e9513589d5090cbfbcf51a4a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diggrman">
+		<description>Diggerman</description>
+		<year>198?</year>
+		<publisher>Gem Software</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="10727">
+				<rom name="diggerman (19xx)(gem software)(gb).tap" size="10727" crc="e61f9a18" sha1="2f19a3fbdd4a4f71dd44fafbb8b398a0daf8a568" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="disasm">
+		<description>Disassembler (Fra)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="11169">
+				<rom name="disassembler (19xx)(-)(48k-96k-128k)(fr).tap" size="11169" crc="b5e015e5" sha1="381db2c8104f436cce2cd3d721d7a51a1de7f015" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dump">
+		<description>Dump</description>
+		<year>1985</year>
+		<publisher>Death Todd</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="145">
+				<rom name="dump (1985)(death todd).tap" size="145" crc="7a9d99c1" sha1="06cb1dae6c4c8974cd89cb619e37d74f0a5948d3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dungadv">
+		<description>Dungeon Adventure</description>
+		<year>1983</year>
+		<publisher>Level 9 Computing</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+		<feature name="part_id" value="Welcome"/>
+			<dataarea name="cass" size="767">
+				<rom name="dungeon adventure (1983)(level 9 computing)(tape 1 of 5)[welcome].tap" size="767" crc="0f4d574b" sha1="540c66a8a4c0212dc3592119904b8e64ec8d9d05" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="camplynx_cass">
+		<feature name="part_id" value="Binary Loader"/>
+			<dataarea name="cass" size="2581">
+				<rom name="dungeon adventure (1983)(level 9 computing)(tape 2 of 5)[binary loader].tap" size="2581" crc="22d8f568" sha1="4c9d35d8c9bd9f376d47d7f6644aed88ff1d2eba" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="camplynx_cass">
+		<feature name="part_id" value="Adventure Data 1"/>
+			<dataarea name="cass" size="8210">
+				<rom name="dungeon adventure (1983)(level 9 computing)(tape 3 of 5)[adventure data].tap" size="8210" crc="a7488311" sha1="4a4841751fdedc4c3697b811219c8a2845acce8a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass4" interface="camplynx_cass">
+		<feature name="part_id" value="Adventure Data 2"/>
+			<dataarea name="cass" size="8210">
+				<rom name="dungeon adventure (1983)(level 9 computing)(tape 4 of 5)[adventure data].tap" size="8210" crc="057b768b" sha1="e5ab1188821d057183f49ca7c31d806e3019381f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass5" interface="camplynx_cass">
+		<feature name="part_id" value="Adventure Data 3"/>
+			<dataarea name="cass" size="10258">
+				<rom name="dungeon adventure (1983)(level 9 computing)(tape 5 of 5)[adventure data].tap" size="10258" crc="0ad62532" sha1="c01558e0cf645c9f5af3539dba2ddb55816b6025" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="enlarge">
+		<description>Enlarge</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+		<feature name="part_id" value="Tape 1"/>
+			<dataarea name="cass" size="1737">
+				<rom name="enlarge (19xx)(-)(48k-96k-128k).tap" size="1737" crc="98f7c983" sha1="4ae9ca410a048b00b0f6b8a91dc8f13a5d88dd5a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="camplynx_cass">
+		<feature name="part_id" value="Tape 1, Alt"/>
+			<dataarea name="cass" size="1737">
+				<rom name="enlarge (19xx)(-)(48k-96k-128k)[a].tap" size="1737" crc="1335cfae" sha1="5cafaee09b85fa89303c730095dc93d16d361ffd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="floyds">
+		<description>Floyds Bank</description>
+		<year>1983</year>
+		<publisher>Romik Software</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="5678">
+				<rom name="floyds bank (1983)(romik software)(gb).tap" size="5678" crc="2ffee1b6" sha1="040ac7f888b0e7ea20edee77dd18931944ca0f32" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="forest">
+		<description>The Forest (96K)</description>
+		<year>1983</year>
+		<publisher>Lynx User</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="1481">
+				<rom name="forest, the (1983-10)(lynx user)(96k).tap" size="1481" crc="783076d0" sha1="8888e9c5a374f56b8b8df4539084043d2726d3c6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gempack4">
+		<description>Gempack 4</description>
+		<year>1983</year>
+		<publisher>Gem Software</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="13432">
+				<rom name="gempack 4 (1983)(gem software)(gb).tap" size="13432" crc="e2c905c1" sha1="6d9ef67a3a9b210acf855b91ec76673c0c5d4b0d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="genbasic">
+		<description>Generateur Basic (Fra)</description>
+		<year>1984</year>
+		<publisher>C. Aussage</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="8122">
+				<rom name="generateur basic (1984)(aussage, c.)(fr).tap" size="8122" crc="9771442d" sha1="61e139f13220b7a84280eec87b8b939925902e33" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gencarac">
+		<description>Generateur de Caracteres (Fra, 96K)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="5852">
+				<rom name="generateur de caracteres (19xx)(-)(96k)(fr).tap" size="5852" crc="9b8a7bc7" sha1="b106e2329355fde5c997fd4888b724aa2c50caf1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gobblesp">
+		<description>Gobble de Spook</description>
+		<year>1983</year>
+		<publisher>Camsoft</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="13330">
+				<rom name="gobble de spook (1983)(camsoft)(gb).tap" size="13330" crc="61f2c69e" sha1="ec898433c427b65c4dbc50d466015539bd2ab9d0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gridtrap">
+		<description>Gridtrap (Fra)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="4708">
+				<rom name="gridtrap (19xx)(-)(fr).tap" size="4708" crc="7630c93b" sha1="ffce3d936325b9eec7143d27a2919361e2cd96ea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hyperbol">
+		<description>Hyperbolic Functions (Bad?)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="428">
+				<rom name="hyperbolic functions (19xx)(-)[b].tap" size="428" crc="c4348ef7" sha1="058640e8d73d6a124611e81f1bc71a24ddd4ac93" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inteltab">
+		<description>Inteltab (Fra, 96K-128K)</description>
+		<year>1984</year>
+		<publisher>A. Sauget</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="6911">
+				<rom name="inteltab (1984)(sauget, a.)(96k-128k)(fr).tap" size="6911" crc="7ec90030" sha1="a37b5879bae00445fee1ec5d1af8e49ddf4aeffd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jik">
+		<description>JIK</description>
+		<year>1985</year>
+		<publisher>Death Todd</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="2608">
+				<rom name="jik (1985)(death todd)(48k-96k-128k).tap" size="2608" crc="04fba5cb" sha1="81599bbe924ea0c3db49b253443ee18b8c26d4d1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="labyrint">
+		<description>Labyrinthe (Fra)</description>
+		<year>198?</year>
+		<publisher>Quazar Computing</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="10468">
+				<rom name="labyrinthe (19xx)(quazar computing)(48k-96k-128k)(gb)(fr).tap" size="10468" crc="a09b34b3" sha1="5a714839f5198905a1e17c3fbaea697ca51ed236" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="liontext">
+		<description>Lion Text</description>
+		<year>198?</year>
+		<publisher>Lion-Soft</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="2846">
+				<rom name="lion text (19xx)(lion-soft).tap" size="2846" crc="23be2816" sha1="939369286d34eff7d361126fa5a47776572f0661" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="logiches">
+		<description>Logichess (v2.2, 96K)</description>
+		<year>1983</year>
+		<publisher>Kaare Danielsen - Hartvig Ekner</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="20499">
+				<rom name="logichess v2.2 (1983)(danielsen, kaare - ekner, hartvig)(96k).tap" size="20499" crc="245189a3" sha1="52732eba9853cafc0b01b30e88e05417bad959e6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basicdoc">
+		<description>Lynx Basic Demonstration</description>
+		<year>1984</year>
+		<publisher>Camputers</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+		<feature name="part_id" value="Tape 1"/>
+			<dataarea name="cass" size="2508">
+				<rom name="lynx basic demonstration (1984)(camputers)(gb)(tape 1 of 2).tap" size="2508" crc="47c858b8" sha1="ea44275f2d88c6e1baea062d6ddd5f545fa1a67c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="camplynx_cass">
+		<feature name="part_id" value="Tape 2"/>
+			<dataarea name="cass" size="3259">
+				<rom name="lynx basic demonstration (1984)(camputers)(gb)(tape 2 of 2).tap" size="3259" crc="286027fa" sha1="38586ace9415d87384c2cba38ca8b4e268d9bacc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lynxcomp">
+		<description>Lynx Composer (96K, Bad?)</description>
+		<year>1983</year>
+		<publisher>Mike Kennedy</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="12499">
+				<rom name="lynx composer (1983)(kennedy, mike)(96k)[b glitched graphics].tap" size="12499" crc="b2be8783" sha1="53bfe9a4ee9190d2d13d8d70f96dffc26ed9e5fa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lynxdisa">
+		<description>Lynx Disassembler (Fra, v1.1)</description>
+		<year>198?</year>
+		<publisher>Camputers</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="7006">
+				<rom name="lynx disassembler v1.1 (19xx)(camputers)(48k-96k-128k)(gb)(fr).tap" size="7006" crc="10210468" sha1="2c9840f86b94b29951496aa886b0b7dcb588ab7f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hangman">
+		<description>Lynx Hangman</description>
+		<year>1983</year>
+		<publisher>Steven B. French</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="10404">
+				<rom name="lynx hangman (1983)(french, steven b.).tap" size="10404" crc="a9a2b29e" sha1="d45679e2e3039a93b656d4e2fce5dcd38047d6db" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="invaders">
+		<description>Lynx Invaders</description>
+		<year>1983</year>
+		<publisher>Camsoft</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="12309">
+				<rom name="lynx invaders (1983)(camsoft)(gb).tap" size="12309" crc="67675416" sha1="a9c838fd829e1e8193226239e1011d3921fbe5ca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lynxtrot">
+		<description>Lynx-Trot (LC-FIG815)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="191">
+				<rom name="lynx-trot (19xx)(-)(48k-96k-128k)[lc-fig815].tap" size="191" crc="0f5c8d4c" sha1="81a595c4f018876572f0b382243f2d6b0eb9caf7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lynxtrota" cloneof="lynxtrot">
+		<description>Lynx-Trot (LC-FIG816)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="363">
+				<rom name="lynx-trot (19xx)(-)(48k-96k-128k)[lc-fig816].tap" size="363" crc="a06122c0" sha1="2a46b1325fb8ce6e3e0a4be8211bbb26b401b5bb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lynxtrotb" cloneof="lynxtrot">
+		<description>Lynx-Trot (LC-FIG106, Bad?)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="367">
+				<rom name="lynx-trot (19xx)(-)[b][lc-fig106].tap" size="367" crc="42d971c4" sha1="aa61c076c6c40cf1423151fed355b84662d3afd5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mastmind">
+		<description>Mastermind (Fra, 96K)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="7463">
+				<rom name="mastermind (19xx)(-)(96k)(fr).tap" size="7463" crc="50e9e709" sha1="3bc4dced36c29ac4d8ce704641820f1f33cf3ae3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maths">
+		<description>Maths (Fra)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="12894">
+				<rom name="maths (19xx)(-)(fr).tap" size="12894" crc="df607c2c" sha1="7c24edb4272d604a59ef50e815a2b7de456b158d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazeman">
+		<description>Mazeman</description>
+		<year>1983</year>
+		<publisher>Abersoft</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="14029">
+				<rom name="mazeman (1983)(abersoft)(gb).tap" size="14029" crc="3a3c2ae9" sha1="e38303070fb0c742706c554987eed0d2efb02331" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minedout">
+		<description>Mined Out</description>
+		<year>1983</year>
+		<publisher>Camsoft</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="11670">
+				<rom name="mined out (1983)(camsoft)(gb).tap" size="11670" crc="9cdb19a4" sha1="77c67414814b9e91c17baa78b9b27f294e8c386f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moder80">
+		<description>MODER-80 (v1.0)</description>
+		<year>1983</year>
+		<publisher>Seven Stars Publishing</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="4885">
+				<rom name="moder-80 v1.0 (1983)(seven stars publishing)(gb).tap" size="4885" crc="feaf8eda" sha1="756b67f57c2e8aeddded0ed6929ad83f70d59cae" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moonfallf" cloneof="moonfall">
+		<description>Moonfall (Fra)</description>
+		<year>1983</year>
+		<publisher>Camsoft</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="12711">
+				<rom name="moonfall (1983)(camsoft)(gb)(fr).tap" size="12711" crc="c9e5fd7a" sha1="c9022eefebffb977c4c49f6cd7b8c26ec0a4cd11" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moonfall">
+		<description>Moonfall</description>
+		<year>1983</year>
+		<publisher>Camsoft</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="12373">
+				<rom name="moonfall (1983)(camsoft)(gb).tap" size="12373" crc="fbe9a9b5" sha1="ce57d9a6e06e84f5ad85c7e9e717831ca620d723" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moonfdoc">
+		<description>Moonfall (Instructions Only)</description>
+		<year>1983</year>
+		<publisher>Camsoft</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="4117">
+				<rom name="moonfall (1983)(camsoft)(gb)[instructions only].tap" size="4117" crc="4421b7d4" sha1="7c56809364ce78f2adfcf1ec31bd74071f77337e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="muncher">
+		<description>Muncher</description>
+		<year>1983</year>
+		<publisher>Robert Gordon</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="7052">
+				<rom name="muncher (1983-06-09)(gordon, robert).tap" size="7052" crc="592bea63" sha1="139e00f632e7f19e8f037064e4e50177282c7b8d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musicmas">
+		<description>Music Master</description>
+		<year>198?</year>
+		<publisher>Camsoft</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="6873">
+				<rom name="music master (19xx)(camsoft)(gb).tap" size="6873" crc="915eef36" sha1="d70711a0ec2671d4a4bf69a68adfc121adf531bb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="numerons">
+		<description>Numerons (Fra, 96K)</description>
+		<year>1983</year>
+		<publisher>Camsoft</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="16254">
+				<rom name="numerons (1983)(camsoft)(96k)(gb)(fr).tap" size="16254" crc="6059385c" sha1="50b282b881ae1f4740d9c211d9bfddb8a99c10ee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="numeronsa" cloneof="numerons">
+		<description>Numerons (Fra, Split)</description>
+		<year>1983</year>
+		<publisher>Camsoft</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+		<feature name="part_id" value="Intro"/>
+			<dataarea name="cass" size="3636">
+				<rom name="numerons (1983)(camsoft)(gb)(fr)[b freezes after loading].tap" size="3636" crc="df965305" sha1="5a9dcd7b23542a265d5236883f8cb29bbaf24c45" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="camplynx_cass">
+		<feature name="part_id" value="Game"/>
+			<dataarea name="cass" size="12872">
+				<rom name="numerons (1983)(camsoft)(gb)(fr).tap" size="12872" crc="261b9b5a" sha1="ee26c65da0983445842f857794dedae0f0b74acb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asterix">
+		<description>L'Odysee d'Asterix (Fra, 96K)</description>
+		<year>198?</year>
+		<publisher>La Bibliotheque de Cintre</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="27551">
+				<rom name="odysee d'asterix, l' (19xx)(la bibliotheque de cintre)(96k)(fr).tap" size="27551" crc="b3493726" sha1="147d2e1a12bc049e0c06c3fd7c419d09e9cafb56" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ohmummy">
+		<description>Oh Mummy!!</description>
+		<year>1983</year>
+		<publisher>Gem Software</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="11797">
+				<rom name="oh mummy!! (1983)(gem software)(gb).tap" size="11797" crc="149a049c" sha1="d774888a294e19b5981a64f20997cb5540f468ac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="panik">
+		<description>Panik (96K, Cracked by T.A.G, Bad?)</description>
+		<year>198?</year>
+		<publisher>M.D. Judd</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+		<feature name="part_id" value="Tape 1"/>
+			<dataarea name="cass" size="14275">
+				<rom name="panik (19xx)(judd, m.d.)(96k)(tape 1 of 2)[cr t.a.g.][b].tap" size="14275" crc="fa1875a0" sha1="25cb22452c9099051526fc245bc7db7451168d9d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="camplynx_cass">
+		<feature name="part_id" value="Tape 2"/>
+			<dataarea name="cass" size="1511">
+				<rom name="panik (19xx)(judd, m.d.)(96k)(tape 2 of 2)[cr t.a.g.][b].tap" size="1511" crc="a8efb6d9" sha1="c6e0b6af733b563a7d33f6705f6e50dfccb66ef0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="paniklod">
+		<description>Panik (Loader Only?)</description>
+		<year>198?</year>
+		<publisher>M.D. Judd</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="202">
+				<rom name="panik (19xx)(judd, m.d.)[b].tap" size="202" crc="55b8db07" sha1="af08e596371ad77e71a2bb55170829c5716ff3db" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pattern">
+		<description>Pattern Box Demo</description>
+		<year>1984</year>
+		<publisher>Camputers</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="1222">
+				<rom name="pattern box demo (1984)(camputers)(48k-96k-128k)(gb).tap" size="1222" crc="0f8bde7e" sha1="a4208b0bc317b9d41a4de9f98d274d674753ecd0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pengo">
+		<description>Pengo</description>
+		<year>1984</year>
+		<publisher>Play It!</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="10385">
+				<rom name="pengo (1984)(play it!).tap" size="10385" crc="f37d0240" sha1="41a2e0d36e6b3226a6c946e4d10e96c8e207ce6f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="playcard">
+		<description>Play Your Cards Right (96K)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="7190">
+				<rom name="play your cards right (19xx)(-)(96k).tap" size="7190" crc="26acf9f9" sha1="c29063bdacf73f4c33b6bd98fad39ec87772f72e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pontoon">
+		<description>Pontoon</description>
+		<year>1983</year>
+		<publisher>Gem Software</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="12196">
+				<rom name="pontoon (1983)(gem software)(48k-96k-128k)(gb).tap" size="12196" crc="9a427f0a" sha1="be2b02f2661801bf0fa60cf4e57a35034cc814c2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pblaster">
+		<description>Power Blaster</description>
+		<year>1983</year>
+		<publisher>Camsoft</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="6250">
+				<rom name="power blaster (1983)(camsoft)(gb).tap" size="6250" crc="6ea2af42" sha1="6d3eeda1cf23e331867056b0e052210740a3c18e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prelude">
+		<description>Prelude from Bach's The Well-Tempered Clavier</description>
+		<year>1984</year>
+		<publisher>Camputers</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="4136">
+				<rom name="prelude from bach's the well-tempered clavier (1984)(camputers)(48k-96k-128k)(gb).tap" size="4136" crc="d6660199" sha1="4f4436d1b69b602945408d5fa9466d0161e06199" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chopina" cloneof="chopin">
+		<description>Programme Chopin (Fra, 96K-128K)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="8517">
+				<rom name="programme chopin (19xx)(-)(96k-128k)(fr).tap" size="8517" crc="3792de11" sha1="8c9bf4650b74419ff383bf810bf2f1beb9eaca28" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chopin">
+		<description>Programme Chopin (Fra)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="7637">
+				<rom name="programme chopin (19xx)(-)(fr).tap" size="7637" crc="30a13c1a" sha1="b26a0e90bab080769799e97ceffc4e5c30641f5c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quest">
+		<description>Quest (Bad?)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="29202">
+				<rom name="quest (19xx)(-)[b].tap" size="29202" crc="88510cf9" sha1="1b0b88dd0b7b073aa3cd70cc20c586ccb7ad995c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="racer">
+		<description>Racer</description>
+		<year>1983</year>
+		<publisher>Camsoft</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="7800">
+				<rom name="racer (1983)(camsoft)(gb).tap" size="7800" crc="672c6933" sha1="954c0db280aaddd4f2baacc92bdf110c61db8886" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reversia" cloneof="reversi">
+		<description>Reversi (Split)</description>
+		<year>1983</year>
+		<publisher>C. Hunt</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+		<feature name="part_id" value="Loader"/>
+			<dataarea name="cass" size="2919">
+				<rom name="reversi (1983)(hunt, c.)(tape 1 of 2)[loader].tap" size="2919" crc="73806992" sha1="16273efef85a36f54e72f03f7dfa639504aea76d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="camplynx_cass">
+		<feature name="part_id" value="Game"/>
+			<dataarea name="cass" size="12012">
+				<rom name="reversi (1983)(hunt, c.)(tape 2 of 2)[game].tap" size="12012" crc="239f2a37" sha1="9ea841b39e7400003ac181ea26969c8a3280624f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reversi">
+		<description>Reversi</description>
+		<year>1983</year>
+		<publisher>C. Hunt</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="12449">
+				<rom name="reversi (1983)(hunt, c.).tap" size="12449" crc="9ad5756d" sha1="198af58b11e218f4442eb6a4310f7acb2f79c4f3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rismoon">
+		<description>Rising Moon</description>
+		<year>1983</year>
+		<publisher>Lynx User</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="352">
+				<rom name="rising moon (1983-06)(lynx user).tap" size="352" crc="214ac196" sha1="e47645fa95fb799e5eec26ebebf8cc3da096bed7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rocketm">
+		<description>Rocketman - A Pair of Number Games for Kids</description>
+		<year>1983</year>
+		<publisher>Bamby Software</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="11446">
+				<rom name="rocketman - a pair of number games for kids (1983)(bamby software).tap" size="11446" crc="c8c27fff" sha1="4fffd01529cf5498052c7efdc9a758f442b2216d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scrablyn">
+		<description>Scrablynx (Fra, 96K)</description>
+		<year>1985</year>
+		<publisher>Alain Sauget</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="16794">
+				<rom name="scrablynx (1985)(sauget, alain)(96k)(fr).tap" size="16794" crc="4da9bfee" sha1="e5369ee30ee14a1d589f880538a9456375ecc95e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scrdump1">
+		<description>Screen Dump 1</description>
+		<year>1983</year>
+		<publisher>Lynx User</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="646">
+				<rom name="screen dump 1 (1983-10)(lynx user)(48k-96k-128k).tap" size="646" crc="a1db7e86" sha1="13ebfd6e970811b4745f62db9b7d8ed8e2b821ce" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scrdump2">
+		<description>Screen Dump 2</description>
+		<year>1983</year>
+		<publisher>Lynx User</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="709">
+				<rom name="screen dump 2 (1983-10)(lynx user)(48k-96k-128k).tap" size="709" crc="853586e4" sha1="4902c88e85dadd755376ab15b1630fd579356169" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simdisc">
+		<description>SimDisc</description>
+		<year>198?</year>
+		<publisher>Death Todd</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+		<feature name="part_id" value="Tape 1"/>
+			<dataarea name="cass" size="177">
+				<rom name="simdisc (19xx)(death todd).tap" size="177" crc="2ca2dcfb" sha1="98341078204bda28aed68d042d0e25ec6aa662a5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="camplynx_cass">
+		<feature name="part_id" value="Tape 1, Alt"/>
+			<dataarea name="cass" size="177">
+				<rom name="simdisc (19xx)(death todd)[a].tap" size="177" crc="a67833bf" sha1="86bc7262158e52994a2b208aca1f6e263a5a0cb3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="camplynx_cass">
+		<feature name="part_id" value="Tape 1, Bad?"/>
+			<dataarea name="cass" size="223">
+				<rom name="simdisc (19xx)(death todd)[b].tap" size="223" crc="a84a9709" sha1="adaeaaba255a1066c50b4ec7533697addaf4fab6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sketch">
+		<description>Sketch Pad</description>
+		<year>1984</year>
+		<publisher>Camputers</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="1761">
+				<rom name="sketch pad (1984)(camputers)(48k-96k-128k)(gb).tap" size="1761" crc="6d1b2d88" sha1="90fa54fb236ea68f4b567dc16a9921a6eaf59244" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snake">
+		<description>Snake</description>
+		<year>1983</year>
+		<publisher>C. Hunt</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+		<feature name="part_id" value="Tape 1"/>
+			<dataarea name="cass" size="9506">
+				<rom name="snake (1983)(hunt, c.).tap" size="9506" crc="7f2b70d9" sha1="a25886242d67b58975b90cce7162f17d9aca0e65" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="camplynx_cass">
+		<feature name="part_id" value="Tape 1, Alt"/>
+			<dataarea name="cass" size="9506">
+				<rom name="snake (1983)(hunt, c.)[a].tap" size="9506" crc="c2024f42" sha1="de1211fc36ba92af03bcf30c8f0b1788196116a9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacetrk">
+		<description>Space Trek</description>
+		<year>1983</year>
+		<publisher>Quazar Computing</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="10916">
+				<rom name="space trek (1983)(quazar computing)(gb).tap" size="10916" crc="df3a6d2e" sha1="ae9f137d1ee7aa071a58ccb803847be5c280d9f3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spellbnd">
+		<description>Spellbound</description>
+		<year>1983</year>
+		<publisher>G. Smith</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="12999">
+				<rom name="spellbound (1983)(smith, g.).tap" size="12999" crc="68225b1d" sha1="6243e1786386e82fca7f6a6d6f637252c270b950" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starover">
+		<description>Star Rover</description>
+		<year>1983</year>
+		<publisher>Lynx User</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="2689">
+				<rom name="star rover (1983-06)(lynx user)(48k-96k-128k).tap" size="2689" crc="fac5cdae" sha1="86d204e11c5672b0a06ab02a9b65063bc7709141" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="test">
+		<description>Test (Fra)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="13037">
+				<rom name="test (19xx)(-)(fr).tap" size="13037" crc="7baee77f" sha1="fc22af0ee79c9e499bbc3110cd7a8a6f04ff4497" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tisland">
+		<description>Treasure Island</description>
+		<year>1983</year>
+		<publisher>Neil Higgins</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+		<feature name="part_id" value="Loader"/>
+			<dataarea name="cass" size="11248">
+				<rom name="treasure island (1983)(higgins, neil)(tape 1 of 2)[loader].tap" size="11248" crc="6ce40c63" sha1="53aeb73084e00de96e593a03388e9e1aec8f3ba5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="camplynx_cass">
+		<feature name="part_id" value="Game"/>
+			<dataarea name="cass" size="13587">
+				<rom name="treasure island (1983)(higgins, neil)(tape 2 of 2)[game].tap" size="13587" crc="31a341de" sha1="2e1e5534757beb10127afa2c1f7a5d2085793a88" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="triangle">
+		<description>Triangles (96K-128K)</description>
+		<year>1983</year>
+		<publisher>Lynx User</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="291">
+				<rom name="triangles (1983-10)(lynx user)(96k-128k).tap" size="291" crc="3c7e06dc" sha1="0158bad153b09801c9be9b28e61aa252257b5c93" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tronbloc">
+		<description>Tron Blocker (Fra, 96K)</description>
+		<year>198?</year>
+		<publisher>Stephen Sawyer</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="3816">
+				<rom name="tron blocker (198x)(sawyer, stephen)(96k)(gb)(fr).tap" size="3816" crc="494d8a23" sha1="c4975cb0f894f6254437126604cdfbea5e2c3b7a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="twinkle">
+		<description>Twinkle</description>
+		<year>1983</year>
+		<publisher>Gem Software</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="13001">
+				<rom name="twinkle (1983)(gem software).tap" size="13001" crc="d00c2581" sha1="c44ffc5bd05f2a4426b23beac5fbf351654e2d86" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="userdef">
+		<description>User-Defined Characters</description>
+		<year>1984</year>
+		<publisher>Camputers</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+		<feature name="part_id" value="Tape 1"/>
+			<dataarea name="cass" size="4575">
+				<rom name="user-defined characters (1984)(camputers)(gb).tap" size="4575" crc="d322c19e" sha1="0073e194a37c134fec56cd97b18b6b059be13f0b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="camplynx_cass">
+		<feature name="part_id" value="Tape 1, Bad?"/>
+			<dataarea name="cass" size="4574">
+				<rom name="user-defined characters (1984)(camputers)(gb)[b].tap" size="4574" crc="cf0c5187" sha1="63c1a40eb6fd6cee8e957b470d3f7ca06bb9ccea" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wormf" cloneof="worm">
+		<description>The Worm (Fra, 96K)</description>
+		<year>1983</year>
+		<publisher>Quazar Computing</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="12562">
+				<rom name="worm, the (1983)(quazar computing)(96k)(gb)(fr).tap" size="12562" crc="8e495571" sha1="e71c500b5ad3ff314b74bedbd269e7d58f5fa5d5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="worm">
+		<description>The Worm (Euro)</description>
+		<year>1983</year>
+		<publisher>Quazar Computing</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="11946">
+				<rom name="worm, the (1983)(quazar computing)(gb).tap" size="11946" crc="77149d21" sha1="e959e9bc1ae5bfa3f9cab4519cba8aa58669a5e9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zombie">
+		<description>Zombie Panic (Fra)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="camplynx_cass">
+			<dataarea name="cass" size="5066">
+				<rom name="zombie panic (19xx)(-)(fr).tap" size="5066" crc="6b1371f1" sha1="c086ca01c748b7b7582b10b284603d27cab018d7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

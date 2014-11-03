@@ -46,6 +46,18 @@
 		</part>
 	</software>
 
+	<software name="alieninva" cloneof="alieninv">
+		<description>alien_invasion_v1.4 (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162879">
+				<rom name="alien_invasion_v1.4 (alt).ccvf" size="162879" crc="ba6ecb8c" sha1="7f5f24fafcc50c380f42f86fb502683259edfc40" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="altronic">
 		<description>alltronics</description>
 		<year>19??</year>
@@ -186,6 +198,24 @@
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="asteroida" cloneof="asteroid">
+		<description>asteroids (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162935">
+				<rom name="asteroids (alt).ccvf" size="162935" crc="b51497b3" sha1="4944301634059ba51b35b2b9f6c021967c5fee26" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="162886">
+				<rom name="asteriods_source.ccvf" size="162886" crc="14af4de7" sha1="43a76ffda8b4e2f5513c8cd9ac6390ab15854280" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="ay8910">
 		<description>ay-3-8910_programs</description>
@@ -260,6 +290,18 @@
 		</part>
 	</software>
 
+	<software name="basiclesa" cloneof="basicles">
+		<description>basic_lessons (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162981">
+				<rom name="basic_lessons (alt).ccvf" size="162981" crc="a7062afc" sha1="d404c9f526a78f0d91c214f64bc05be8f35ea952" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="basicutl">
 		<description>basic_utilities</description>
 		<year>19??</year>
@@ -278,6 +320,18 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163637">
 				<rom name="battleship.ccvf" size="163637" crc="94ca6a2b" sha1="92e4b8303ec4acd3113d35c6e04639892af8ab23" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bttlshipa" cloneof="bttlship">
+		<description>battleship (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162916">
+				<rom name="battleship (alt).ccvf" size="162916" crc="e0b169cc" sha1="265ccb3f19ebe1e35da1cda7f5c5ba3106df8313" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -326,6 +380,18 @@
 		</part>
 	</software>
 
+	<software name="blanka" cloneof="blank">
+		<description>blank (alt)</description>
+		<year>19??</year>
+		<publisher></publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162818">
+				<rom name="blank (alt).ccvf" size="162818" crc="eac5f303" sha1="bd75191f6b4f9f6b75941851346860012f9fb486" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="brdsofts">
 		<description>board_softwares</description>
 		<year>19??</year>
@@ -355,6 +421,18 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162925">
 				<rom name="bounce_ball.ccvf" size="162925" crc="a329db86" sha1="7c1a4dea7182b0aa4d9df0ace6c53c5aec697d3c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cardsmil">
+		<description>cards_miller</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162898">
+				<rom name="cards_miller.ccvf" size="162898" crc="0e543b56" sha1="9e6f78c40737c771152c82fae27f2802efdd9273" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1026,6 +1104,18 @@
 		</part>
 	</software>
 
+	<software name="colossca">
+		<description>colossal_cave_epps</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162865">
+				<rom name="colossal_cave_epps.ccvf" size="162865" crc="3e7b98b3" sha1="109fcf8b94b866cb34f32e5aa46d6c3bb1946bbf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="commpgms">
 		<description>comm_pgms-sidea</description>
 		<year>19??</year>
@@ -1089,6 +1179,18 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162875">
 				<rom name="comtronics_sw.ccvf" size="162875" crc="d25cc3a1" sha1="eaa14502e527db92055a7fe9f9dfbf06c9f2f111" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cooltool">
+		<description>cooltools</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163041">
+				<rom name="cooltools.ccvf" size="163041" crc="cffc2cb4" sha1="79fff8725c3d7e277ae31cb54c55ce243aaecec8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1176,6 +1278,18 @@
 		</part>
 	</software>
 
+	<software name="draw2a" cloneof="draw2">
+		<description>draw2 (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162909">
+				<rom name="draw2 (alt).ccvf" size="162909" crc="ccd58029" sha1="7480bfb7fd0ed5991738cdca81a8450f40f88167" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="drivlist">
 		<description>driver_lister</description>
 		<year>19??</year>
@@ -1205,6 +1319,18 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163637">
 				<rom name="epps_trek.ccvf" size="163637" crc="0dad1114" sha1="4f4496c14c65d7b46640cecbdfefa8116de44b78" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="treka" cloneof="trek">
+		<description>trek (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162842">
+				<rom name="epps_trek (alt).ccvf" size="162842" crc="600fb885" sha1="1fdeaeb61f3fb1c08e803cdeb02f36c392713c7c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1364,6 +1490,30 @@
 		</part>
 	</software>
 
+	<software name="galaxiana" cloneof="galaxian">
+		<description>galaxian (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163112">
+				<rom name="galaxian (alt).ccvf" size="163112" crc="47fffa68" sha1="0bee0f0b3fda9733be42bed86769b90cb2c4748f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ghostcr">
+		<description>ghost_crunchers</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162874">
+				<rom name="ghost_crunchers.ccvf" size="162874" crc="126abdf4" sha1="80bc317041591391193c2c734030bd41c150ee12" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="softwre">
 		<description>softwares</description>
 		<year>19??</year>
@@ -1510,6 +1660,18 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163637">
 				<rom name="invaders_epps.ccvf" size="163637" crc="ecee8918" sha1="7d348f37ebbd18a5cf74bfd277fd8221bac5e1bb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="invadersa" cloneof="invaders">
+		<description>invaders_epps (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162840">
+				<rom name="invaders_epps (alt).ccvf" size="162840" crc="59e49cd6" sha1="13aeffa4015cb5cb0bfcd959ab8f7c5b606a27b6" offset="0" />
 			</dataarea>
 		</part>
 	</software>

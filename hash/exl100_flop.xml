@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- This is currently a documentation-only software list, but is hooked up in exelv.c -->
+<softwarelist name="exl100_flop" description="Exelvision EXL 100 floppies">
+	<software name="exelpntd">
+		<description>Demonstration Exelpaint (Fra)</description>
+		<year>1985</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="571834">
+				<rom name="demonstration exelpaint (1985)(exelvision)(fr).td0" size="571834" crc="e00a1b19" sha1="aba1bafdf6c92089a7fe3c7a8b0953b2cfca3d8c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exeldos11" cloneof="exeldos">
+		<description>ExelDOS (Fra, v1.1)</description>
+		<year>1985</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="69798">
+				<rom name="exeldos v1.1 (1985)(exelvision)(fr).td0" size="69798" crc="5c50eea2" sha1="c6fa76580d455647acf96b5045c1879f368ca102" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exeldos12" cloneof="exeldos">
+		<description>ExelDOS (Fra, v1.2)</description>
+		<year>1985</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="44303">
+				<rom name="exeldos v1.2 (1985)(exelvision)(fr).td0" size="44303" crc="58073293" sha1="0f63cd094bb0fd9619d6b707125761363559cead" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exeldos13" cloneof="exeldos">
+		<description>ExelDOS (Fra, v1.3)</description>
+		<year>1986</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="151375">
+				<rom name="exeldos v1.3 (1986)(exelvision)(fr).td0" size="151375" crc="a5370457" sha1="9b74b1cac382749ec9c94a09881825439fd58acf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exeldos">
+		<description>ExelDOS (Fra, v1.4)</description>
+		<year>1986</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="655360">
+				<rom name="exeldos v1.4 (1986)(exelvision)(fr).fd" size="655360" crc="c5ac08c4" sha1="88b968cd7bebd0a90cce0042fc072dbcd470e6c3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disk 1, Alt"/>
+			<dataarea name="flop" size="94183">
+				<rom name="exeldos v1.4 (1986)(exelvision)(fr).td0" size="94183" crc="e543a0bf" sha1="4abb0b6151c86c38aca78c178f577f62c82788df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jeux">
+		<description>Jeux (Fra)</description>
+		<year>198?</year>
+		<publisher>Exelvision</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="655360">
+				<rom name="jeux (198x)(exelvision)(fr).fd" size="655360" crc="9c7fdb39" sha1="a303a1166716cd8f785e18ba2710b409ac435c0c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slideshw">
+		<description>Slideshow</description>
+		<year>2009</year>
+		<publisher>6502man</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="655360">
+				<rom name="slideshow (2009-05-28)(6502man).fd" size="655360" crc="51033993" sha1="56a5e83c32f363f247140c90a8458cd943e7dbe7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

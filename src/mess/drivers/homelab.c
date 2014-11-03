@@ -824,6 +824,7 @@ static MACHINE_CONFIG_START( brailab4, homelab_state )
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", 18)
+	MCFG_SOFTWARE_LIST_ADD("cass_list","brailab_cass")
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(homelab_state,brailab4)
