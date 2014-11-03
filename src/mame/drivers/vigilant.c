@@ -606,7 +606,46 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
+
+
 ROM_START( vigilant )
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for bankswitching */
+	ROM_LOAD( "vg_a-8h-e.ic55",  0x00000, 0x10000, CRC(64735989) SHA1(0d1330eacbbe54fd98b3d6f81e770462a3a2372d) ) // 1ST AND 2ND HALF IDENTICAL (correct)
+	ROM_LOAD( "vg_a-8l-a.ic57",  0x10000, 0x10000, CRC(690d812f) SHA1(60d6513f8b27411018cdca1b25f94bc281476ae7) )
+	/* 0x20000-0x2ffff empty */
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* 64k for sound */
+	ROM_LOAD( "vg_a-5j-.ic37",  0x00000, 0x10000, CRC(10582b2d) SHA1(6e7e5f07c49b347b427572efeb180c89f49bf2c7) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "vg_b-4f-.ic33",  0x00000, 0x10000, CRC(01579d20) SHA1(e58d8ca0ea0ac9d77225bf55faa499d1565924f9) )
+	ROM_LOAD( "vg_b-4j-.ic34",  0x10000, 0x10000, CRC(4f5872f0) SHA1(6af21ba1c94097eecce30585983b4b07528c8635) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 ) // confirmed original board uses 4 roms
+	ROM_LOAD( "vg_b-6l-.ic61",  0x00000, 0x10000, CRC(fbe9552d) SHA1(3c7c218f13c0a94bb624745d81d63db9423777ea) )
+	ROM_CONTINUE(0x20000,0x10000)
+	ROM_LOAD( "vg_b-6k-.ic60",  0x10000, 0x10000, CRC(ae09d5c0) SHA1(9da5b824b148c1e1478e3f4b44ba4348376ed7d5) )
+	ROM_CONTINUE(0x30000,0x10000)
+	ROM_LOAD( "vg_b-6p-.ic63",  0x40000, 0x10000, CRC(afb77461) SHA1(18707768a4768b579c94092a260e286d3214b977) )
+	ROM_CONTINUE(0x60000,0x10000)
+	ROM_LOAD( "vg_b-6n-.ic62",  0x50000, 0x10000, CRC(5065cd35) SHA1(9a03c5af024fcae6b3371bb04be3e811ecc390d7) )
+	ROM_CONTINUE(0x70000,0x10000)
+
+	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_LOAD( "vg_b-1d-.ic1",  0x00000, 0x10000, CRC(81b1ee5c) SHA1(2014165ec71f089fecb5a3e60b939cc0f565d7f1) )
+	ROM_LOAD( "vg_b-1f-.ic2",  0x10000, 0x10000, CRC(d0d33673) SHA1(39761d97a71deaf7f17233d5bd5a55dbb1e6b30e) )
+	ROM_LOAD( "vg_b-1h-.ic3",  0x20000, 0x10000, CRC(aae81695) SHA1(ca8e136eca3543b27f3a61b105d4a280711cd6ea) )
+
+	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
+	ROM_LOAD( "vg_a-4d-.ic26",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
+
+	ROM_REGION( 0x0600, "plds", 0 ) /* All are pal16l8 - protected */
+	ROM_LOAD( "vg_b-8r.ic90", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )
+	ROM_LOAD( "vg_b-4m.ic38", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )
+	ROM_LOAD( "vg_b-1b.ic1", 0x0400, 0x0117, CRC(922e5167) SHA1(08efdfdfeb35f3f73b6fd3d5c0c2a386dea5f617) )
+ROM_END
+
+ROM_START( vigilantb )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for bankswitching */
 	ROM_LOAD( "g07_c03.bin",  0x00000, 0x08000, CRC(9dcca081) SHA1(6d086b70e6bf1fbafa746ef5c82334645f199be9) )
 	ROM_LOAD( "j07_c04.bin",  0x10000, 0x10000, CRC(e0159105) SHA1(da6d74ec075863c67c0ce21b07a54029d138f688) )
@@ -619,7 +658,7 @@ ROM_START( vigilant )
 	ROM_LOAD( "f05_c08.bin",  0x00000, 0x10000, CRC(01579d20) SHA1(e58d8ca0ea0ac9d77225bf55faa499d1565924f9) )
 	ROM_LOAD( "h05_c09.bin",  0x10000, 0x10000, CRC(4f5872f0) SHA1(6af21ba1c94097eecce30585983b4b07528c8635) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_REGION( 0x80000, "gfx2", 0 ) // 8 roms is a bootleg configuration?
 	ROM_LOAD( "n07_c12.bin",  0x00000, 0x10000, CRC(10af8eb2) SHA1(664b178b248babc43a9af0fe140fe57bc7367762) )
 	ROM_LOAD( "k07_c10.bin",  0x10000, 0x10000, CRC(9576f304) SHA1(0ec2a7d3d82208e2a9a4ef9ab2824e6fe26ebbe5) )
 	ROM_LOAD( "o07_c13.bin",  0x20000, 0x10000, CRC(b1d9d4dc) SHA1(1aacf6b0ff8d102880d3dce3b55cd1488edb90cf) )
@@ -658,7 +697,7 @@ ROM_START( vigilant1 )
 	ROM_LOAD( "f05_c08.bin",  0x00000, 0x10000, CRC(01579d20) SHA1(e58d8ca0ea0ac9d77225bf55faa499d1565924f9) )
 	ROM_LOAD( "h05_c09.bin",  0x10000, 0x10000, CRC(4f5872f0) SHA1(6af21ba1c94097eecce30585983b4b07528c8635) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_REGION( 0x80000, "gfx2", 0 ) // 8 roms is a bootleg configuration?
 	ROM_LOAD( "n07_c12.bin",  0x00000, 0x10000, CRC(10af8eb2) SHA1(664b178b248babc43a9af0fe140fe57bc7367762) )
 	ROM_LOAD( "k07_c10.bin",  0x10000, 0x10000, CRC(9576f304) SHA1(0ec2a7d3d82208e2a9a4ef9ab2824e6fe26ebbe5) )
 	ROM_LOAD( "o07_c13.bin",  0x20000, 0x10000, CRC(b1d9d4dc) SHA1(1aacf6b0ff8d102880d3dce3b55cd1488edb90cf) )
@@ -696,7 +735,7 @@ ROM_START( vigilantu )
 	ROM_LOAD( "f05_c08.bin",  0x00000, 0x10000, CRC(01579d20) SHA1(e58d8ca0ea0ac9d77225bf55faa499d1565924f9) )
 	ROM_LOAD( "h05_c09.bin",  0x10000, 0x10000, CRC(4f5872f0) SHA1(6af21ba1c94097eecce30585983b4b07528c8635) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_REGION( 0x80000, "gfx2", 0 ) // 8 roms is a bootleg configuration?
 	ROM_LOAD( "n07_c12.bin",  0x00000, 0x10000, CRC(10af8eb2) SHA1(664b178b248babc43a9af0fe140fe57bc7367762) )
 	ROM_LOAD( "k07_c10.bin",  0x10000, 0x10000, CRC(9576f304) SHA1(0ec2a7d3d82208e2a9a4ef9ab2824e6fe26ebbe5) )
 	ROM_LOAD( "o07_c13.bin",  0x20000, 0x10000, CRC(b1d9d4dc) SHA1(1aacf6b0ff8d102880d3dce3b55cd1488edb90cf) )
@@ -733,7 +772,7 @@ ROM_START( vigilantu2 )
 	ROM_LOAD( "f05_c08.bin",  0x00000, 0x10000, CRC(01579d20) SHA1(e58d8ca0ea0ac9d77225bf55faa499d1565924f9) )
 	ROM_LOAD( "h05_c09.bin",  0x10000, 0x10000, CRC(4f5872f0) SHA1(6af21ba1c94097eecce30585983b4b07528c8635) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_REGION( 0x80000, "gfx2", 0 ) // 8 roms is a bootleg configuration?
 	ROM_LOAD( "n07_c12.bin",  0x00000, 0x10000, CRC(10af8eb2) SHA1(664b178b248babc43a9af0fe140fe57bc7367762) )
 	ROM_LOAD( "k07_c10.bin",  0x10000, 0x10000, CRC(9576f304) SHA1(0ec2a7d3d82208e2a9a4ef9ab2824e6fe26ebbe5) )
 	ROM_LOAD( "o07_c13.bin",  0x20000, 0x10000, CRC(b1d9d4dc) SHA1(1aacf6b0ff8d102880d3dce3b55cd1488edb90cf) )
@@ -759,40 +798,43 @@ ROM_END
 
 ROM_START( vigilantj )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for bankswitching */
-	ROM_LOAD( "vg_a-8h.rom",  0x00000, 0x08000, CRC(ba848713) SHA1(b357cbf404fb1874d555797ed9fb37f946cc4340) )
-	ROM_LOAD( "vg_a-8l.rom",  0x10000, 0x10000, CRC(3b12b1d8) SHA1(2f9207f8d8ec41ea1b8f5bf3c69a97d1d09f6c3f) )
+	ROM_LOAD( "vg_a-8h-d.ic55",  0x00000, 0x10000, CRC(6480bd03) SHA1(f238811b9618ac6be441fcce211e769678b54a05) ) // 1ST AND 2ND HALF IDENTICAL (correct)
+	ROM_LOAD( "vg_a-8l-d.ic57",  0x10000, 0x10000, CRC(3b12b1d8) SHA1(2f9207f8d8ec41ea1b8f5bf3c69a97d1d09f6c3f) )
 	/* 0x20000-0x2ffff empty */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* 64k for sound */
-	ROM_LOAD( "g05_c02.bin",  0x00000, 0x10000, CRC(10582b2d) SHA1(6e7e5f07c49b347b427572efeb180c89f49bf2c7) )
+	ROM_LOAD( "vg_a-5j-.ic37",  0x00000, 0x10000, CRC(10582b2d) SHA1(6e7e5f07c49b347b427572efeb180c89f49bf2c7) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "f05_c08.bin",  0x00000, 0x10000, CRC(01579d20) SHA1(e58d8ca0ea0ac9d77225bf55faa499d1565924f9) )
-	ROM_LOAD( "h05_c09.bin",  0x10000, 0x10000, CRC(4f5872f0) SHA1(6af21ba1c94097eecce30585983b4b07528c8635) )
+	ROM_LOAD( "vg_b-4f-.ic33",  0x00000, 0x10000, CRC(01579d20) SHA1(e58d8ca0ea0ac9d77225bf55faa499d1565924f9) )
+	ROM_LOAD( "vg_b-4j-.ic34",  0x10000, 0x10000, CRC(4f5872f0) SHA1(6af21ba1c94097eecce30585983b4b07528c8635) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "n07_c12.bin",  0x00000, 0x10000, CRC(10af8eb2) SHA1(664b178b248babc43a9af0fe140fe57bc7367762) )
-	ROM_LOAD( "k07_c10.bin",  0x10000, 0x10000, CRC(9576f304) SHA1(0ec2a7d3d82208e2a9a4ef9ab2824e6fe26ebbe5) )
-	ROM_LOAD( "o07_c13.bin",  0x20000, 0x10000, CRC(b1d9d4dc) SHA1(1aacf6b0ff8d102880d3dce3b55cd1488edb90cf) )
-	ROM_LOAD( "l07_c11.bin",  0x30000, 0x10000, CRC(4598be4a) SHA1(6b68ec94bdee0e58133a8d3891054ef44a8ff0e5) )
-	ROM_LOAD( "t07_c16.bin",  0x40000, 0x10000, CRC(f5425e42) SHA1(c401263b6a266d3e9cd23133f1d823fb4b095e3d) )
-	ROM_LOAD( "p07_c14.bin",  0x50000, 0x10000, CRC(cb50a17c) SHA1(eb15704f715b6475ae7096f8d82f1b20f8277c71) )
-	ROM_LOAD( "v07_c17.bin",  0x60000, 0x10000, CRC(959ba3c7) SHA1(dcd2a885ae7b61210cbd55a38ccbe91c73d071b0) )
-	ROM_LOAD( "s07_c15.bin",  0x70000, 0x10000, CRC(7f2e91c5) SHA1(27dcc9b696834897c36c0b7a1c6202d93f41ad8d) )
+	ROM_REGION( 0x80000, "gfx2", 0 ) // confirmed original board uses 4 roms
+	ROM_LOAD( "vg_b-6l-.ic61",  0x00000, 0x10000, CRC(fbe9552d) SHA1(3c7c218f13c0a94bb624745d81d63db9423777ea) )
+	ROM_CONTINUE(0x20000,0x10000)
+	ROM_LOAD( "vg_b-6k-.ic60",  0x10000, 0x10000, CRC(ae09d5c0) SHA1(9da5b824b148c1e1478e3f4b44ba4348376ed7d5) )
+	ROM_CONTINUE(0x30000,0x10000)
+	ROM_LOAD( "vg_b-6p-.ic63",  0x40000, 0x10000, CRC(afb77461) SHA1(18707768a4768b579c94092a260e286d3214b977) )
+	ROM_CONTINUE(0x60000,0x10000)
+	ROM_LOAD( "vg_b-6n-.ic62",  0x50000, 0x10000, CRC(5065cd35) SHA1(9a03c5af024fcae6b3371bb04be3e811ecc390d7) )
+	ROM_CONTINUE(0x70000,0x10000)
 
-	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "d01_c05.bin",  0x00000, 0x10000, CRC(81b1ee5c) SHA1(2014165ec71f089fecb5a3e60b939cc0f565d7f1) )
-	ROM_LOAD( "e01_c06.bin",  0x10000, 0x10000, CRC(d0d33673) SHA1(39761d97a71deaf7f17233d5bd5a55dbb1e6b30e) )
-	ROM_LOAD( "f01_c07.bin",  0x20000, 0x10000, CRC(aae81695) SHA1(ca8e136eca3543b27f3a61b105d4a280711cd6ea) )
+	ROM_REGION( 0x40000, "gfx3", 0 )  // this should be 2x 23C1000 on Japan sets
+	ROM_LOAD( "vg_b-1d-.ic1",  0x00000, 0x10000, CRC(81b1ee5c) SHA1(2014165ec71f089fecb5a3e60b939cc0f565d7f1) )
+	ROM_LOAD( "vg_b-1f-.ic2",  0x10000, 0x10000, CRC(d0d33673) SHA1(39761d97a71deaf7f17233d5bd5a55dbb1e6b30e) )
+	ROM_LOAD( "vg_b-1h-.ic3",  0x20000, 0x10000, CRC(aae81695) SHA1(ca8e136eca3543b27f3a61b105d4a280711cd6ea) )
 
 	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
-	ROM_LOAD( "d04_c01.bin",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
+	ROM_LOAD( "vg_a-4d-.ic26",  0x00000, 0x10000, CRC(9b85101d) SHA1(6b8a0f33b9b66bb968f7b61e49d19a6afad8db95) )
 
-	ROM_REGION( 0x0600, "plds", 0 ) /* All are pal16l8 */
+	ROM_REGION( 0x0600, "plds", 0 ) /* All are pal16l8 - protected */
 	ROM_LOAD( "vg_b-8r.ic90", 0x0000, 0x0117, CRC(df368a7a) SHA1(597d85d1f90b7ee0188f2d849792ee02ff2ea48b) )
 	ROM_LOAD( "vg_b-4m.ic38", 0x0200, 0x0117, CRC(dbca4204) SHA1(d8e190f2dc4d6285f22be331d01ed402520d2017) )
 	ROM_LOAD( "vg_b-1b.ic1", 0x0400, 0x0117, CRC(922e5167) SHA1(08efdfdfeb35f3f73b6fd3d5c0c2a386dea5f617) )
 ROM_END
+
+
+
 
 ROM_START( kikcubic )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for bankswitching */
@@ -926,12 +968,15 @@ ROM_START( buccanrsa )
 	ROM_LOAD( "prom2.u99",  0x0300, 0x0100, CRC(e0aa8869) SHA1(ac8bdfeba69420ba56ec561bf3d0f1229d02cea2) )
 ROM_END
 
-GAME( 1988, vigilant, 0,        vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (World, set 1)", GAME_NO_COCKTAIL )
-GAME( 1988, vigilant1,vigilant, vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (World, set 2)", GAME_NO_COCKTAIL )
-GAME( 1988, vigilantu,vigilant, vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East USA license)", "Vigilante (US)", GAME_NO_COCKTAIL )
-GAME( 1988, vigilantu2,vigilant,vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East USA license)", "Vigilante (US) - Rev. G", GAME_NO_COCKTAIL )
-GAME( 1988, vigilantj,vigilant, vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (Japan)", GAME_NO_COCKTAIL )
-GAME( 1988, kikcubic, 0,        kikcubic, kikcubic, driver_device, 0, ROT0, "Irem", "Meikyu Jima (Japan)", GAME_NO_COCKTAIL )   /* English title is Kickle Cubicle */
-GAME( 1988, kikcubicb,kikcubic, kikcubic, kikcubic, driver_device, 0, ROT0, "bootleg", "Kickle Cubele", GAME_NO_COCKTAIL )
-GAME( 1989, buccanrs, 0,        buccanrs, buccanrs, driver_device, 0, ROT0, "Duintronic", "Buccaneers (set 1)", GAME_NO_COCKTAIL )
-GAME( 1989, buccanrsa,buccanrs, buccanrs, buccanra, driver_device, 0, ROT0, "Duintronic", "Buccaneers (set 2)", GAME_NO_COCKTAIL )
+GAME( 1988, vigilant,  0,        vigilant, vigilant, driver_device, 0, ROT0, "Irem",                         "Vigilante (World, Rev E)", GAME_NO_COCKTAIL )
+GAME( 1988, vigilantb, vigilant, vigilant, vigilant, driver_device, 0, ROT0, "Irem",                         "Vigilante (World, Rev ?)", GAME_NO_COCKTAIL )
+GAME( 1988, vigilant1, vigilant, vigilant, vigilant, driver_device, 0, ROT0, "Irem",                         "Vigilante (World, Rev C)", GAME_NO_COCKTAIL )
+GAME( 1988, vigilantu, vigilant, vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East USA license)", "Vigilante (US)", GAME_NO_COCKTAIL )
+GAME( 1988, vigilantu2,vigilant, vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East USA license)", "Vigilante (US, Rev. G)", GAME_NO_COCKTAIL )
+GAME( 1988, vigilantj, vigilant, vigilant, vigilant, driver_device, 0, ROT0, "Irem",                         "Vigilante (Japan, Rev. D)", GAME_NO_COCKTAIL )
+
+GAME( 1988, kikcubic,  0,        kikcubic, kikcubic, driver_device, 0, ROT0, "Irem",                         "Meikyu Jima (Japan)", GAME_NO_COCKTAIL )   /* English title is Kickle Cubicle */
+GAME( 1988, kikcubicb, kikcubic, kikcubic, kikcubic, driver_device, 0, ROT0, "bootleg",                      "Kickle Cubele", GAME_NO_COCKTAIL )
+
+GAME( 1989, buccanrs,  0,        buccanrs, buccanrs, driver_device, 0, ROT0, "Duintronic",                   "Buccaneers (set 1)", GAME_NO_COCKTAIL )
+GAME( 1989, buccanrsa, buccanrs, buccanrs, buccanra, driver_device, 0, ROT0, "Duintronic",                   "Buccaneers (set 2)", GAME_NO_COCKTAIL )
