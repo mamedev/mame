@@ -7361,6 +7361,30 @@ void rsp_device::generate_sequence_instruction(drcuml_block *block, compiler_sta
 }
 
 /*------------------------------------------------------------------
+    generate_branch
+------------------------------------------------------------------*/
+
+void rsp_device::generate_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+{
+	compiler_state compiler_temp = *compiler;
+
+	/* update the cycles and jump through the hash table to the target */
+	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
+	{
+		generate_update_cycles(block, &compiler_temp, desc->targetpc, TRUE);	// <subtract cycles>
+		if (desc->flags & OPFLAG_INTRABLOCK_BRANCH)
+			UML_JMP(block, desc->targetpc | 0x80000000);						// jmp     desc->targetpc
+		else
+			UML_HASHJMP(block, 0, desc->targetpc, *m_nocode);					// hashjmp <mode>,desc->targetpc,nocode
+	}
+	else
+	{
+		generate_update_cycles(block, &compiler_temp, mem(&m_rsp_state->jmpdest), TRUE);	// <subtract cycles>
+		UML_HASHJMP(block, 0, mem(&m_rsp_state->jmpdest), *m_nocode);						// hashjmp <mode>,<rsreg>,nocode
+	}
+}
+
+/*------------------------------------------------------------------
     generate_delay_slot_and_branch
 ------------------------------------------------------------------*/
 
@@ -7386,23 +7410,7 @@ void rsp_device::generate_delay_slot_and_branch(drcuml_block *block, compiler_st
 	assert(desc->delay.first() != NULL);
 	generate_sequence_instruction(block, &compiler_temp, desc->delay.first());     // <next instruction>
 
-	/* update the cycles and jump through the hash table to the target */
-	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
-	{
-		generate_update_cycles(block, &compiler_temp, desc->targetpc, TRUE);   // <subtract cycles>
-		if (desc->flags & OPFLAG_INTRABLOCK_BRANCH)
-			UML_JMP(block, desc->targetpc | 0x80000000);                            // jmp     desc->targetpc
-		else
-			UML_HASHJMP(block, 0, desc->targetpc, *m_nocode);
-																					// hashjmp <mode>,desc->targetpc,nocode
-	}
-	else
-	{
-		generate_update_cycles(block, &compiler_temp, mem(&m_rsp_state->jmpdest), TRUE);
-																					// <subtract cycles>
-		UML_HASHJMP(block, 0, mem(&m_rsp_state->jmpdest), *m_nocode);
-																					// hashjmp <mode>,<rsreg>,nocode
-	}
+	generate_branch(block, compiler, desc);
 
 	/* update the label */
 	compiler->labelnum = compiler_temp.labelnum;
@@ -8421,6 +8429,9 @@ int rsp_device::generate_special(drcuml_block *block, compiler_state *compiler, 
 			UML_MOV(block, mem(&m_rsp_state->arg0), 3);                   // mov     [arg0],3
 			UML_CALLC(block, cfunc_sp_set_status_cb, this);                      // callc   cfunc_sp_set_status_cb
 			UML_MOV(block, mem(&m_rsp_state->icount), 0);                       // mov icount, #0
+			UML_MOV(block, mem(&m_rsp_state->jmpdest), mem(&desc->targetpc));
+
+			generate_branch(block, compiler, desc);
 
 			UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);
 			return TRUE;

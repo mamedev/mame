@@ -541,6 +541,7 @@ private:
 	void generate_checksum_block(drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
 	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void generate_delay_slot_and_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT8 linkreg);
+	void generate_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	int generate_vector_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	int generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	int generate_special(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);

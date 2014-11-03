@@ -207,8 +207,8 @@ bool rsp_frontend::describe_special(UINT32 op, opcode_desc &desc)
 			return true;
 
 		case 0x0d:  // BREAK
-			desc.flags |= OPFLAG_END_SEQUENCE;
-			desc.targetpc = BRANCH_TARGET_DYNAMIC;
+			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			desc.targetpc = (op >> 5) & 0x000fffff;
 			return true;
 	}
 
