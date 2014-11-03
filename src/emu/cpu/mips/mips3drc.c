@@ -2764,9 +2764,17 @@ int mips3_device::generate_cop1(drcuml_block *block, compiler_state *compiler, c
 
 				case 0x07:
 					if (IS_SINGLE(op))  /* NEG.S - MIPS I */
+					{
 						UML_FSNEG(block, FPR32(FDREG), FPR32(FSREG));               // fsneg   <fdreg>,<fsreg>
+						UML_CMP(block, FPR32(FSREG), 0);                            // cmp     <fsreg>,0.0
+						UML_MOVc(block, COND_E, FPR32(FDREG), 0x80000000);          // mov     <fdreg>,-0.0,e
+					}
 					else                /* NEG.D - MIPS I */
+					{
 						UML_FDNEG(block, FPR64(FDREG), FPR64(FSREG));               // fdneg   <fdreg>,<fsreg>
+						UML_CMP(block, FPR64(FSREG), 0);                            // cmp     <fsreg>,0.0
+						UML_DMOVc(block, COND_E, FPR64(FDREG), 0x8000000000000000L);// dmov    <fdreg>,-0.0,e
+					}
 					return TRUE;
 
 				case 0x08:
