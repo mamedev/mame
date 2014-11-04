@@ -274,6 +274,7 @@ void drcuml_state::log_printf(const char *format, ...)
 		va_start(va, format);
 		vfprintf(m_umllog, format, va);
 		va_end(va);
+		fflush(m_umllog);
 	}
 }
 

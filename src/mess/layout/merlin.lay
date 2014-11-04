@@ -370,98 +370,98 @@
 
 		<!-- LEDs and number buttons -->
 
-		<bezel name="led_0" element="led">
+		<bezel name="lamp0" element="led">
 			<bounds x="100" y="20" width="20" height="10" />
 		</bezel>
-		<bezel element="0" inputtag="O0" inputmask="0x01">
+		<bezel element="0" inputtag="O.0" inputmask="0x01">
 			<bounds x="100" y="32" width="20" height="10" />
 		</bezel>
 
-		<bezel name="led_1" element="led">
+		<bezel name="lamp1" element="led">
 			<bounds x="50" y="50" width="20" height="10" />
 		</bezel>
-		<bezel element="1" inputtag="O0" inputmask="0x02">
+		<bezel element="1" inputtag="O.0" inputmask="0x02">
 			<bounds x="50" y="62" width="20" height="10" />
 		</bezel>
 
-		<bezel name="led_2" element="led">
+		<bezel name="lamp2" element="led">
 			<bounds x="100" y="50" width="20" height="10" />
 		</bezel>
-		<bezel element="2" inputtag="O0" inputmask="0x08">
+		<bezel element="2" inputtag="O.0" inputmask="0x08">
 			<bounds x="100" y="62" width="20" height="10" />
 		</bezel>
 
-		<bezel name="led_3" element="led">
+		<bezel name="lamp3" element="led">
 			<bounds x="150" y="50" width="20" height="10" />
 		</bezel>
-		<bezel element="3" inputtag="O0" inputmask="0x04">
+		<bezel element="3" inputtag="O.0" inputmask="0x04">
 			<bounds x="150" y="62" width="20" height="10" />
 		</bezel>
 
 
-		<bezel name="led_4" element="led">
+		<bezel name="lamp4" element="led">
 			<bounds x="50" y="80" width="20" height="10" />
 		</bezel>
-		<bezel element="4" inputtag="O1" inputmask="0x01">
+		<bezel element="4" inputtag="O.1" inputmask="0x01">
 			<bounds x="50" y="92" width="20" height="10" />
 		</bezel>
 
-		<bezel name="led_5" element="led">
+		<bezel name="lamp5" element="led">
 			<bounds x="100" y="80" width="20" height="10" />
 		</bezel>
-		<bezel element="5" inputtag="O1" inputmask="0x02">
+		<bezel element="5" inputtag="O.1" inputmask="0x02">
 			<bounds x="100" y="92" width="20" height="10" />
 		</bezel>
 
-		<bezel name="led_6" element="led">
+		<bezel name="lamp6" element="led">
 			<bounds x="150" y="80" width="20" height="10" />
 		</bezel>
-		<bezel element="6" inputtag="O1" inputmask="0x08">
+		<bezel element="6" inputtag="O.1" inputmask="0x08">
 			<bounds x="150" y="92" width="20" height="10" />
 		</bezel>
 
 
-		<bezel name="led_7" element="led">
+		<bezel name="lamp7" element="led">
 			<bounds x="50" y="110" width="20" height="10" />
 		</bezel>
-		<bezel element="7" inputtag="O1" inputmask="0x04">
+		<bezel element="7" inputtag="O.1" inputmask="0x04">
 			<bounds x="50" y="122" width="20" height="10" />
 		</bezel>
-		<bezel name="led_8" element="led">
+		<bezel name="lamp8" element="led">
 			<bounds x="100" y="110" width="20" height="10" />
 		</bezel>
-		<bezel element="8" inputtag="O2" inputmask="0x01">
+		<bezel element="8" inputtag="O.2" inputmask="0x01">
 			<bounds x="100" y="122" width="20" height="10" />
 		</bezel>
-		<bezel name="led_9" element="led">
+		<bezel name="lamp9" element="led">
 			<bounds x="150" y="110" width="20" height="10" />
 		</bezel>
-		<bezel element="9" inputtag="O2" inputmask="0x02">
+		<bezel element="9" inputtag="O.2" inputmask="0x02">
 			<bounds x="150" y="122" width="20" height="10" />
 		</bezel>
 
 
-		<bezel name="led_10" element="led">
+		<bezel name="lamp10" element="led">
 			<bounds x="100" y="140" width="20" height="10" />
 		</bezel>
-		<bezel element="10" inputtag="O2" inputmask="0x08">
+		<bezel element="10" inputtag="O.2" inputmask="0x08">
 			<bounds x="100" y="152" width="20" height="10" />
 		</bezel>
 
 
 		<!-- Other buttons -->
 
-		<bezel element="new_game" inputtag="O3" inputmask="0x08">
+		<bezel element="new_game" inputtag="O.3" inputmask="0x08">
 			<bounds x="75" y="170" width="30" height="30" />
 		</bezel>
-		<bezel element="same_game" inputtag="O2" inputmask="0x04">
+		<bezel element="same_game" inputtag="O.2" inputmask="0x04">
 			<bounds x="125" y="170" width="30" height="30" />
 		</bezel>
 
-		<bezel element="hit_me" inputtag="O3" inputmask="0x04">
+		<bezel element="hit_me" inputtag="O.3" inputmask="0x04">
 			<bounds x="75" y="210" width="30" height="30" />
 		</bezel>
-		<bezel element="comp_turn" inputtag="O3" inputmask="0x02">
+		<bezel element="comp_turn" inputtag="O.3" inputmask="0x02">
 			<bounds x="125" y="210" width="30" height="30" />
 		</bezel>
 	</view>

@@ -8541,7 +8541,7 @@ int rsp_device::generate_special(drcuml_block *block, compiler_state *compiler, 
 			UML_MOV(block, mem(&m_rsp_state->arg0), 3);                   // mov     [arg0],3
 			UML_CALLC(block, cfunc_sp_set_status_cb, this);                      // callc   cfunc_sp_set_status_cb
 			UML_MOV(block, mem(&m_rsp_state->icount), 0);                       // mov icount, #0
-			UML_MOV(block, mem(&m_rsp_state->jmpdest), mem(&desc->targetpc));
+			UML_MOV(block, mem(&m_rsp_state->jmpdest), desc->targetpc);
 
 			generate_branch(block, compiler, desc);
 

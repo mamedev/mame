@@ -36,6 +36,8 @@
 	7           71-79       63-74       12          149.6        401
 	8           unused      75-79       11          144.0        417
 
+	Interleave factor 3
+
 */
 
 #include "emu.h"
@@ -60,14 +62,121 @@ const char *victor9k_format::extensions() const
 	return "img";
 }
 
+int victor9k_format::find_size(io_generic *io, UINT32 form_factor)
+{
+	UINT64 size = io_generic_size(io);
+	for(int i=0; formats[i].sector_count; i++) {
+		const format &f = formats[i];
+		if(size == (UINT32) f.sector_count*f.sector_base_size*f.head_count)
+			return i;
+	}
+	return -1;
+}
+
 int victor9k_format::identify(io_generic *io, UINT32 form_factor)
 {
+	int type = find_size(io, form_factor);
+
+	if (type != -1)
+		return 50;
+
 	return 0;
+}
+
+floppy_image_format_t::desc_e* victor9k_format::get_sector_desc(const format &f, int &current_size, int sector_count, UINT8 id1, UINT8 id2, int gap_2)
+{
+	static floppy_image_format_t::desc_e desc[] = {
+		/* 00 */ { SECTOR_LOOP_START, 0, -1 },
+		/* 01 */ {   RAWBYTE, 0xff, 5 },
+		/* 02 */ {   GCR5, 0x08, 1 },
+		/* 03 */ {   CRC, 1 },
+		/* 04 */ {   CRC_CBM_START, 1 },
+		/* 05 */ {     SECTOR_ID_GCR5 },
+		/* 06 */ {     TRACK_ID_DOS2_GCR5 },
+		/* 07 */ {     GCR5, id2, 1 },
+		/* 08 */ {     GCR5, id1, 1 },
+		/* 09 */ {   CRC_END, 1 },
+		/* 10 */ {   GCR5, 0x0f, 2 },
+		/* 11 */ {   RAWBYTE, 0x55, f.gap_1 },
+		/* 12 */ {   RAWBYTE, 0xff, 5 },
+		/* 13 */ {   GCR5, 0x07, 1 },
+		/* 14 */ {   CRC_CBM_START, 2 },
+		/* 15 */ {     SECTOR_DATA_GCR5, -1 },
+		/* 16 */ {   CRC_END, 2 },
+		/* 17 */ {   CRC, 2 },
+		/* 18 */ {   GCR5, 0x00, 2 },
+		/* 19 */ {   RAWBYTE, 0x55, gap_2 },
+		/* 20 */ { SECTOR_LOOP_END },
+		/* 21 */ { RAWBYTE, 0x55, 0 },
+		/* 22 */ { RAWBITS, 0x5555, 0 },
+		/* 23 */ { END }
+	};
+
+	current_size = 40 + (1+1+4+2)*10 + (f.gap_1)*8 + 40 + (1+f.sector_base_size+1+2)*10 + gap_2*8;
+
+	current_size *= sector_count;
+	return desc;
+}
+
+void victor9k_format::build_sector_description(const format &f, UINT8 *sectdata, offs_t sect_offs, desc_s *sectors, int sector_count) const
+{
+	for (int i = 0; i < sector_count; i++) {
+		sectors[i].data = sectdata + sect_offs;
+		sectors[i].size = f.sector_base_size;
+		sectors[i].sector_id = i;
+
+		sect_offs += sectors[i].size;
+	}
 }
 
 bool victor9k_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
-	return false;
+	int type = find_size(io, form_factor);
+	if(type == -1)
+		return false;
+
+	const format &f = formats[type];
+
+	UINT64 size = io_generic_size(io);
+	dynamic_buffer img;
+	img.resize(size);
+
+	io_generic_read(io, img, 0, size);
+
+	int track_offset = 0;
+
+	UINT8 id1 = 0xde, id2 = 0xad; // TODO
+
+	for (int head = 0; head < f.head_count; head++) {
+		for (int track = 0; track < f.track_count; track++) {
+			int current_size = 0;
+			int total_size = 200000000./cell_size[speed_zone[head][track]];
+			int sector_count = sectors_per_track[head][track];
+			int track_size = sector_count*f.sector_base_size;
+
+			floppy_image_format_t::desc_e *desc = get_sector_desc(f, current_size, sector_count, id1, id2, f.gap_2);
+
+			int remaining_size = total_size - current_size;
+			if(remaining_size < 0)
+				throw emu_fatalerror("victor9k_format: Incorrect track layout, max_size=%d, current_size=%d", total_size, current_size);
+
+			// Fixup the end gap
+			desc[21].p2 = remaining_size / 8;
+			desc[22].p2 = remaining_size & 7;
+			desc[22].p1 >>= remaining_size & 0x01;
+
+			desc_s sectors[40];
+
+			build_sector_description(f, img, track_offset, sectors, sector_count);
+			generate_track(desc, track, head, sectors, sector_count, total_size, image);
+
+			track_offset += track_size;
+		}
+	}
+
+	image->set_variant(f.variant);
+
+	return true;
 }
 
 bool victor9k_format::supports_save() const
@@ -77,10 +186,10 @@ bool victor9k_format::supports_save() const
 
 const victor9k_format::format victor9k_format::formats[] = {
 	{ //
-		floppy_image::FF_525, floppy_image::SSDD, 80, 1, 512
+		floppy_image::FF_525, floppy_image::SSDD, 1224, 80, 1, 512, 9, 8
 	},
 	{ //
-		floppy_image::FF_525, floppy_image::DSDD, 80, 2, 512
+		floppy_image::FF_525, floppy_image::DSDD, 2448, 80, 2, 512, 9, 8
 	},
 	{}
 };

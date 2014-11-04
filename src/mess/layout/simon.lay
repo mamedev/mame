@@ -49,7 +49,7 @@
 		</disk>
 		<disk state="1">
 			<color red="0.8" green="0.25" blue="0.1" />
-			<bounds x="0.30" y="0.30" width="0.4" height="0.4" />
+			<bounds x="0.28" y="0.28" width="0.44" height="0.44" />
 		</disk>
 	</element>
 	<element name="button_y" defstate="0">
@@ -60,7 +60,7 @@
 		</disk>
 		<disk state="1">
 			<color red="0.8" green="0.78" blue="0.1" />
-			<bounds x="0.30" y="0.30" width="0.4" height="0.4" />
+			<bounds x="0.28" y="0.28" width="0.44" height="0.44" />
 		</disk>
 	</element>
 
