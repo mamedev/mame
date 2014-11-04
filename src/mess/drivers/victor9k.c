@@ -38,18 +38,19 @@
 
 static ADDRESS_MAP_START( victor9k_mem, AS_PROGRAM, 8, victor9k_state )
 //  AM_RANGE(0x00000, 0xdffff) AM_RAM
+	AM_RANGE(0x20000, 0xdffff) AM_NOP
 	AM_RANGE(0xe0000, 0xe0001) AM_DEVREADWRITE(I8259A_TAG, pic8259_device, read, write)
 	AM_RANGE(0xe0020, 0xe0023) AM_DEVREADWRITE(I8253_TAG, pit8253_device, read, write)
 	AM_RANGE(0xe0040, 0xe0043) AM_DEVREADWRITE(UPD7201_TAG, upd7201_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0xe8000, 0xe8000) AM_DEVREADWRITE(HD46505S_TAG, mc6845_device, status_r, address_w)
-	AM_RANGE(0xe8001, 0xe8001) AM_DEVREADWRITE(HD46505S_TAG, mc6845_device, register_r, register_w)
-	AM_RANGE(0xe8020, 0xe802f) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
-	AM_RANGE(0xe8040, 0xe804f) AM_DEVREADWRITE(M6522_2_TAG, via6522_device, read, write)
-	AM_RANGE(0xe8060, 0xe8061) AM_DEVREADWRITE(MC6852_TAG, mc6852_device, read, write)
-	AM_RANGE(0xe8080, 0xe808f) AM_DEVREADWRITE(M6522_3_TAG, via6522_device, read, write)
-	AM_RANGE(0xe80a0, 0xe80af) AM_DEVREADWRITE(FDC_TAG, victor_9000_fdc_t, cs5_r, cs5_w)
-	AM_RANGE(0xe80c0, 0xe80cf) AM_DEVREADWRITE(FDC_TAG, victor_9000_fdc_t, cs6_r, cs6_w)
-	AM_RANGE(0xe80e0, 0xe80ef) AM_DEVREADWRITE(FDC_TAG, victor_9000_fdc_t, cs7_r, cs7_w)
+	AM_RANGE(0xe8000, 0xe8000) AM_MIRROR(0x7f00) AM_DEVREADWRITE(HD46505S_TAG, mc6845_device, status_r, address_w)
+	AM_RANGE(0xe8001, 0xe8001) AM_MIRROR(0x7f00) AM_DEVREADWRITE(HD46505S_TAG, mc6845_device, register_r, register_w)
+	AM_RANGE(0xe8020, 0xe802f) AM_MIRROR(0x7f00) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
+	AM_RANGE(0xe8040, 0xe804f) AM_MIRROR(0x7f00) AM_DEVREADWRITE(M6522_2_TAG, via6522_device, read, write)
+	AM_RANGE(0xe8060, 0xe8061) AM_MIRROR(0x7f00) AM_DEVREADWRITE(MC6852_TAG, mc6852_device, read, write)
+	AM_RANGE(0xe8080, 0xe808f) AM_MIRROR(0x7f00) AM_DEVREADWRITE(M6522_3_TAG, via6522_device, read, write)
+	AM_RANGE(0xe80a0, 0xe80af) AM_MIRROR(0x7f00) AM_DEVREADWRITE(FDC_TAG, victor_9000_fdc_t, cs5_r, cs5_w)
+	AM_RANGE(0xe80c0, 0xe80cf) AM_MIRROR(0x7f00) AM_DEVREADWRITE(FDC_TAG, victor_9000_fdc_t, cs6_r, cs6_w)
+	AM_RANGE(0xe80e0, 0xe80ef) AM_MIRROR(0x7f00) AM_DEVREADWRITE(FDC_TAG, victor_9000_fdc_t, cs7_r, cs7_w)
 	AM_RANGE(0xf0000, 0xf0fff) AM_MIRROR(0x1000) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION(I8088_TAG, 0)
 ADDRESS_MAP_END

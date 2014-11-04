@@ -99,6 +99,13 @@ protected:
 private:
 	enum
 	{
+		TM_GEN,
+		TM_TACH0,
+		TM_TACH1
+	};
+
+	enum
+	{
 		LED_A = 0,
 		LED_B
 	};
@@ -154,34 +161,34 @@ private:
 	required_device<via6522_device> m_via6;
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;
+	required_memory_region m_rom;
 	required_memory_region m_gcr_rom;
 
 	void update_stepper_motor(floppy_image_device *floppy, int stp, int old_st, int st);
-	void update_spindle_motor();
+	void update_spindle_motor(floppy_image_device *floppy, emu_timer *t_tach, bool start, bool stop, bool sel, UINT8 &da);
 
-	void ready0_cb(floppy_image_device *, int device);
 	int load0_cb(floppy_image_device *device);
 	void unload0_cb(floppy_image_device *device);
-	void index0_cb(floppy_image_device *device, int state);
-	void ready1_cb(floppy_image_device *, int device);
+
 	int load1_cb(floppy_image_device *device);
 	void unload1_cb(floppy_image_device *device);
-	void index1_cb(floppy_image_device *device, int state);
+
+	UINT8 m_p2;
 
 	/* floppy state */
 	UINT8 m_da;
 	UINT8 m_da0;
 	UINT8 m_da1;
-	int m_mtr0;
-	int m_mtr1;
+	int m_start0;
+	int m_stop0;
+	int m_start1;
+	int m_stop1;
 	int m_sel0;
 	int m_sel1;
 	int m_tach0;
 	int m_tach1;
 	int m_rdy0;
 	int m_rdy1;
-	int m_ds0;
-	int m_ds1;
 	UINT8 m_l0ms;
 	UINT8 m_l1ms;
 	int m_st0;
@@ -204,7 +211,7 @@ private:
 	attotime m_period;
 
 	live_info cur_live, checkpoint_live;
-	emu_timer *t_gen;
+	emu_timer *t_gen, *t_tach0, *t_tach1;
 
 	floppy_image_device* get_floppy();
 	void live_start();
