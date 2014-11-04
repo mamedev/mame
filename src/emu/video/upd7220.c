@@ -397,9 +397,9 @@ inline void upd7220_device::recompute_parameters()
 	rectangle visarea;
 
 	visarea.min_x = 0; //(m_hs + m_hbp) * 8;
-	visarea.min_y = 0; //m_vs + m_vbp;
+	visarea.min_y = m_vbp; //m_vs + m_vbp;
 	visarea.max_x = m_aw * horiz_mult - 1;//horiz_pix_total - (m_hfp * 8) - 1;
-	visarea.max_y = m_al * vert_mult - 1;//vert_pix_total - m_vfp - 1;
+	visarea.max_y = m_al * vert_mult + m_vbp - 1;//vert_pix_total - m_vfp - 1;
 
 	LOG(("uPD7220 '%s' Screen: %u x %u @ %f Hz\n", tag(), horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh)));
 	LOG(("Visible Area: (%u, %u) - (%u, %u)\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y));
@@ -1554,7 +1554,7 @@ void upd7220_device::update_text(bitmap_rgb32 &bitmap, const rectangle &cliprect
 			addr = sad + (y * m_pitch);
 
 			if (!m_draw_text_cb.isnull())
-				m_draw_text_cb(bitmap, addr, (y * m_lr), wd, m_pitch, m_lr, m_dc, m_ead);
+				m_draw_text_cb(bitmap, addr, (y * m_lr) + m_vbp, wd, m_pitch, m_lr, m_dc, m_ead);
 		}
 
 		sy = y + 1;
@@ -1572,7 +1572,7 @@ void upd7220_device::draw_graphics_line(bitmap_rgb32 &bitmap, UINT32 addr, int y
 
 	for (sx = 0; sx < 80; sx++)
 	{
-		if((sx << 3) < m_aw * 16 && y < m_al)
+		if((sx << 3) < m_aw * 16 && y < (m_al + m_vbp))
 			m_display_cb(bitmap, y, sx << 3, addr);
 
 		addr+= wd + 1;
@@ -1613,7 +1613,7 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 				addr = ((sad << 1) & 0x3ffff) + (y * (m_pitch << (im ? 0 : 1)));
 
 				if (!m_display_cb.isnull())
-					draw_graphics_line(bitmap, addr, y + (bsy / (mixed ? 1 : m_lr)), wd);
+					draw_graphics_line(bitmap, addr, y + ((bsy + m_vbp) / (mixed ? 1 : m_lr)), wd);
 			}
 		}
 		else
@@ -1627,7 +1627,7 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 					addr = (sad & 0x3ffff) + ((y / m_lr) * m_pitch);
 
 					if (!m_draw_text_cb.isnull())
-						m_draw_text_cb(bitmap, addr, y + tsy, wd, m_pitch, m_lr, m_dc, m_ead);
+						m_draw_text_cb(bitmap, addr, y + tsy + m_vbp, wd, m_pitch, m_lr, m_dc, m_ead);
 				}
 			}
 		}
