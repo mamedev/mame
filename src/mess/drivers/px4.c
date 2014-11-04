@@ -1240,7 +1240,7 @@ void px4_state::machine_start()
 
 void px4_state::machine_reset()
 {
-	m_artsr = ART_TXRDY | ART_TXEMPTY;
+	m_artsr = ART_TXRDY | ART_TXEMPTY | (!m_rs232->dsr_r() << 7);
 	receive_register_reset();
 	transmit_register_reset();
 }
@@ -1561,7 +1561,10 @@ MACHINE_CONFIG_END
 
 ROM_START( px4 )
 	ROM_REGION(0x8000, "os", 0)
-	ROM_LOAD("m25122aa_po_px4.10c", 0x0000, 0x8000, CRC(62d60dc6) SHA1(3d32ec79a317de7c84c378302e95f48d56505502))
+	ROM_SYSTEM_BIOS(0, "default",  "PX-4 OS ROM")
+	ROMX_LOAD("m25122aa_po_px4.10c", 0x0000, 0x8000, CRC(62d60dc6) SHA1(3d32ec79a317de7c84c378302e95f48d56505502), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "ramtest",  "PX-4/PX-8 DRAM Test Ver. 1.0")
+	ROMX_LOAD("ramtest.10c", 0x0000, 0x8000, CRC(f8aced5f) SHA1(a5a2f398e602aa349c3636d6659dd0c7eaba07fb), ROM_BIOS(2))
 
 	ROM_REGION(0x1000, "slave", 0)
 	ROM_LOAD("upd7508.bin", 0x0000, 0x1000, NO_DUMP)
@@ -1569,7 +1572,10 @@ ROM_END
 
 ROM_START( px4p )
 	ROM_REGION(0x8000, "os", 0)
-	ROM_LOAD("b0_pxa.10c", 0x0000, 0x8000, CRC(d74b9ef5) SHA1(baceee076c12f5a16f7a26000e9bc395d021c455))
+	ROM_SYSTEM_BIOS(0, "default",  "PX-4+ OS ROM")
+	ROMX_LOAD("b0_pxa.10c", 0x0000, 0x8000, CRC(d74b9ef5) SHA1(baceee076c12f5a16f7a26000e9bc395d021c455), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "ramtest",  "PX-4/PX-8 DRAM Test Ver. 1.0")
+	ROMX_LOAD("ramtest.10c", 0x0000, 0x8000, CRC(f8aced5f) SHA1(a5a2f398e602aa349c3636d6659dd0c7eaba07fb), ROM_BIOS(2))
 
 	ROM_REGION(0x1000, "slave", 0)
 	ROM_LOAD("upd7508.bin", 0x0000, 0x1000, NO_DUMP)
