@@ -65,7 +65,7 @@ void sega_315_5881_crypt_device::device_reset()
 	buffer_bit = 0;
 }
 
-void sega_315_5881_crypt_device::do_decrypt(UINT8 *&base)
+UINT16 sega_315_5881_crypt_device::do_decrypt(UINT8 *&base)
 {
 	if(!enc_ready)
 		enc_start();
@@ -80,6 +80,8 @@ void sega_315_5881_crypt_device::do_decrypt(UINT8 *&base)
 		base = buffer + buffer_pos;
 		buffer_pos += 2;
 	}
+
+	return (base[0] << 8) | base[1];
 }
 
 void sega_315_5881_crypt_device::set_addr_low(UINT16 data)
