@@ -1352,6 +1352,7 @@ $(MESSOBJ)/matsushi.a:          \
 
 $(MESSOBJ)/mb.a:                \
 	$(MESS_DRIVERS)/microvsn.o  \
+	$(MESS_DRIVERS)/simon.o     \
 
 $(MESSOBJ)/mchester.a:          \
 	$(MESS_DRIVERS)/ssem.o      \
@@ -2123,6 +2124,7 @@ $(MESS_DRIVERS)/sc2.o:      $(MESS_LAYOUT)/sc2.lh
 $(MESS_DRIVERS)/sdk85.o:    $(MESS_LAYOUT)/sdk85.lh
 $(MESS_DRIVERS)/sdk86.o:    $(MESS_LAYOUT)/sdk86.lh
 $(MESS_DRIVERS)/selz80.o:   $(MESS_LAYOUT)/selz80.lh
+$(MESS_DRIVERS)/simon.o:    $(MESS_LAYOUT)/simon.lh
 $(MESS_DRIVERS)/sitcom.o:   $(MESS_LAYOUT)/sitcom.lh
 $(MESS_DRIVERS)/slc1.o:     $(MESS_LAYOUT)/slc1.lh
 $(MESS_DRIVERS)/sms.o:      $(MESS_LAYOUT)/sms1.lh

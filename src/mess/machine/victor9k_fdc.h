@@ -125,9 +125,12 @@ private:
 		attotime edge;
 		UINT16 shift_reg;
 		int bit_counter;
+		int sync_bit_counter;
+		int sync_byte_counter;
 		int brdy;
 		int lbrdy;
 		int sync;
+		int syn;
 		int gcr_err;
 
 		// write
@@ -137,7 +140,6 @@ private:
 		int write_position;
 		UINT8 wd;
 		int wrsync;
-		int syn;
 		int gcr_data;
 		int erase;
 	};

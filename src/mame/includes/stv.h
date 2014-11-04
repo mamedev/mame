@@ -35,8 +35,7 @@ public:
 			m_cart3(*this, "stv_slot3"),
 			m_cart4(*this, "stv_slot4"),
 			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette"),
-			m_cryptdevice(*this, "315_5881")
+			m_palette(*this, "palette")
 	{
 	}
 
@@ -170,7 +169,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
 
 
 	bitmap_rgb32 m_tmpbitmap;
@@ -700,7 +698,8 @@ public:
 	stv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: saturn_state(mconfig, type, tag),
 		m_adsp(*this, "adsp"),
-		m_adsp_pram(*this, "adsp_pram")
+		m_adsp_pram(*this, "adsp_pram"),
+		m_cryptdevice(*this, "315_5881")
 	{
 	}
 
@@ -835,6 +834,9 @@ public:
 	DECLARE_WRITE32_MEMBER( decathlt_prot2_w );
 	void write_prot_data(UINT32 data, UINT32 mem_mask, int offset, int which);
 	void install_decathlt_protection();
+
+	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
+	UINT16 crypt_read_callback(UINT32 addr);
 };
 
 

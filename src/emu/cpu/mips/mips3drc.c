@@ -1387,7 +1387,7 @@ int mips3_device::generate_opcode(drcuml_block *block, compiler_state *compiler,
 
 		case 0x0f:  /* LUI - MIPS I */
 			if (RTREG != 0)
-				UML_DMOV(block, R64(RTREG), SIMMVAL << 16);                 // dmov    <rtreg>,SIMMVAL << 16
+				UML_DMOV(block, R64(RTREG), UIMMVAL << 16);                 // dmov    <rtreg>,UIMMVAL << 16
 			return TRUE;
 
 		case 0x08:  /* ADDI - MIPS I */

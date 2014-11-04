@@ -887,6 +887,8 @@ void victor_9000_fdc_t::live_start()
 	cur_live.shift_reg = 0;
 	cur_live.shift_reg_write = 0;
 	cur_live.bit_counter = 0;
+	cur_live.sync_bit_counter = 0;
+	cur_live.sync_byte_counter = 0;
 
 	cur_live.drive = m_drive;
 	cur_live.side = m_side;
@@ -1007,6 +1009,7 @@ void victor_9000_fdc_t::live_abort()
 	cur_live.brdy = 1;
 	cur_live.lbrdy = 1;
 	cur_live.sync = 1;
+	cur_live.syn = 1;
 	cur_live.gcr_err = 1;
 }
 
@@ -1045,17 +1048,35 @@ void victor_9000_fdc_t::live_run(const attotime &limit)
 				}
 			}
 
+			// sync counter
+			if (sync) {
+				cur_live.sync_bit_counter = 0;
+				cur_live.sync_byte_counter = 10;
+			} else if (!cur_live.sync) {
+				cur_live.sync_bit_counter++;
+				if (cur_live.sync_bit_counter == 10) {
+					cur_live.sync_bit_counter = 0;
+					cur_live.sync_byte_counter++;
+					if (cur_live.sync_byte_counter == 16) {
+						cur_live.sync_byte_counter = 0;
+					}
+				}
+			}
+
+			// syn
+			int syn = !(cur_live.sync_byte_counter == 15);
+
 			// GCR decoder
 			if (cur_live.drw) {
 				cur_live.i = cur_live.drw << 10 | cur_live.shift_reg;
 			} else {
-				cur_live.i = 0x300 | ((cur_live.wd & 0xf0) << 1) | cur_live.wrsync << 4 | (cur_live.wd & 0x0f);
+				cur_live.i = cur_live.drw << 10 | ((cur_live.wd & 0xf0) << 1) | cur_live.wrsync << 4 | (cur_live.wd & 0x0f);
 			}
 
 			cur_live.e = m_gcr_rom->base()[cur_live.i];
 
 			// byte ready
-			int brdy = cur_live.bit_counter == 9;
+			int brdy = !(cur_live.bit_counter == 9);
 
 			// GCR error
 			int gcr_err = !(brdy || BIT(cur_live.e, 3));
@@ -1070,6 +1091,12 @@ void victor_9000_fdc_t::live_run(const attotime &limit)
 			if (sync != cur_live.sync) {
 				if (LOG) logerror("%s SYNC %u\n", cur_live.tm.as_string(),sync);
 				cur_live.sync = sync;
+				syncpoint = true;
+			}
+
+			if (syn != cur_live.syn) {
+				if (LOG) logerror("%s SYN %u\n", cur_live.tm.as_string(),syn);
+				cur_live.syn = syn;
 				syncpoint = true;
 			}
 
@@ -1093,6 +1120,7 @@ void victor_9000_fdc_t::live_run(const attotime &limit)
 
 		case RUNNING_SYNCPOINT: {
 			m_lbrdy_cb(cur_live.lbrdy);
+			m_syn_cb(cur_live.syn);
 
 			cur_live.state = RUNNING;
 			checkpoint();

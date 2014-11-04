@@ -19,7 +19,7 @@ public:
 	sega_315_5881_crypt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	
 
-	void do_decrypt(UINT8 *&base);
+	UINT16 do_decrypt(UINT8 *&base);
 	void set_addr_low(UINT16 data);
 	void set_addr_high(UINT16 data);
 	void set_subkey(UINT16 data);

@@ -87,7 +87,7 @@ const victor9k_format::format victor9k_format::formats[] = {
 
 const UINT32 victor9k_format::cell_size[] =
 {
-	0
+	1789, 1896, 2009, 2130, 2272, 2428, 2613, 2847, 2961
 };
 
 const int victor9k_format::sectors_per_track[2][80] =
