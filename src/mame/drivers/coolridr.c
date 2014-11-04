@@ -18,17 +18,20 @@
     - i8237 purpose is unknown (missing ROM for comms?).
     - verify zooming etc. our current algorithm is a bit ugly for text
 
-
+    Also known to exist on this hardware is Aqua Stage (Coin pusher):
+     833-12000 AQUA STAGE
+      Program roms EPR-18279 through EPR-18282
+      12 MASK roms (MPR numbers unknown)
+      SUB CPU program rom EPR-18278
 =======================================================================================================
 
 Cool Riders
 Sega 1994
 
-This game runs on SYSTEM-H1 hardware. Only one known game exists on this
-PCB and this is it. The hardware seems overly complex for a 2D bike
-racing game? The design of the PCB is very similar to vanilla Model 2
-(i.e. Daytona etc). However instead of fully custom-badged chips,
-many of the custom chips are off-the-shelf Hitachi/Toshiba gate-arrays.
+This game runs on SYSTEM-H1 hardware. The hardware seems overly complex for a
+2D bike racing game? The design of the PCB is very similar to vanilla Model 2
+(i.e. Daytona etc). However instead of fully custom-badged chips, many of the
+custom chips are off-the-shelf Hitachi/Toshiba gate-arrays.
 
 
 PCB Layouts
