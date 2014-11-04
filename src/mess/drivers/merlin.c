@@ -13,6 +13,7 @@
 
   TODO:
   - accurate rc osc
+  - accurate speaker levels (tone pitch sounds good though)
   - is the rom dump good?
 
 ***************************************************************************/
@@ -23,8 +24,9 @@
 
 #include "merlin.lh"
 
-// master clock is a single stage RC oscillator: R=?, C=?
-#define MERLIN_RC_CLOCK (500000)
+// master clock is a single stage RC oscillator: R=27K, C=100pf
+// this is an approximation compared with recordings
+#define MERLIN_RC_CLOCK (355000)
 
 
 class merlin_state : public driver_device
@@ -37,17 +39,18 @@ public:
 		m_speaker(*this, "speaker")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_ioport_array<4> m_button_matrix;
-	required_device<speaker_sound_device> m_speaker;
-
-	UINT16 m_o;
-
 	DECLARE_READ8_MEMBER(read_k);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_WRITE16_MEMBER(write_r);
 
 	virtual void machine_start();
+
+protected:
+	required_device<cpu_device> m_maincpu;
+	required_ioport_array<4> m_button_matrix;
+	required_device<speaker_sound_device> m_speaker;
+
+	UINT16 m_o;
 };
 
 
@@ -94,15 +97,17 @@ READ8_MEMBER(merlin_state::read_k)
 
 WRITE16_MEMBER(merlin_state::write_o)
 {
-	// O0-O3: input mux
-	m_o = data;
-
 	/* The speaker is connected to O4 through O6.  The 3 outputs are paralleled for
 	increased current driving capability.  They are passed thru a 220 ohm resistor
 	and then to the speaker, which has the other side grounded.  The software then
 	toggles these lines to make sounds and noises. (There is no audio generator
 	other than toggling it with a software delay between to make tones). */
-	m_speaker->level_w(m_o & 0x70);
+	static const int count[8] = { 0, 1, 1, 2, 1, 2, 2, 3 };
+	m_speaker->level_w(count[data >> 4 & 7]);
+
+	// O0-O3: input mux
+	// O7: N/C
+	m_o = data;
 }
 
 WRITE16_MEMBER(merlin_state::write_r)
@@ -177,6 +182,8 @@ static const UINT16 merlin_output_pla[0x20] =
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
+static const INT16 speaker_levels[] = { 0, 32767, 0, 32767 }; // unknown too, due to output_pla being unknown
+
 
 static MACHINE_CONFIG_START( merlin, merlin_state )
 
@@ -194,6 +201,7 @@ static MACHINE_CONFIG_START( merlin, merlin_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SPEAKER_LEVELS(4, speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
