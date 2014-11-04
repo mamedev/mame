@@ -4686,7 +4686,7 @@ inline void rsp_device::ccfunc_rsp_vaddc_scalar()
 		INT32 s2 = (UINT32)(UINT16)w2;
 		INT32 r = s1 + s2;
 
-		vres[i] = (INT16)r;
+		vres[i] = (INT16)(r);
 		SET_ACCUM_L((INT16)r, i);
 
 		if (r & 0xffff0000)
@@ -4754,7 +4754,6 @@ inline void rsp_device::ccfunc_rsp_vsubc_scalar()
 {
 	int op = m_rsp_state->arg0;
 
-
 	CLEAR_ZERO_FLAGS();
 	CLEAR_CARRY_FLAGS();
 
@@ -4788,6 +4787,67 @@ static void cfunc_rsp_vsubc_scalar(void *param)
 	((rsp_device *)param)->ccfunc_rsp_vsubc_scalar();
 }
 #endif
+
+// VADDB
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 010110 |
+// ------------------------------------------------------
+//
+// Adds two vector registers bytewise with rounding
+inline void rsp_device::ccfunc_rsp_vaddb_scalar()
+{
+	const int op = m_rsp_state->arg0;
+	const int round = (EL == 0) ? 0 : (1 << (EL - 1));
+
+	INT16 vres[8];
+	for (int i = 0; i < 8; i++)
+	{
+		UINT16 w1, w2;
+		SCALAR_GET_VS1(w1, i);
+		SCALAR_GET_VS2(w2, i);
+
+		UINT8 hb1 = w1 >> 8;
+		UINT8 lb1 = w1 & 0xff;
+		UINT8 hb2 = w2 >> 8;
+		UINT8 lb2 = w2 & 0xff;
+
+		UINT16 hs = hb1 + hb2 + round;
+		UINT16 ls = lb1 + lb2 + round;
+
+		SET_ACCUM_L((hs << 8) | ls, i);
+
+		hs >>= EL;
+		if (hs > 255)
+		{
+			hs = 255;
+		}
+		else if (hs < 0)
+		{
+			hs = 0;
+		}
+
+		ls >>= EL;
+		if (ls > 255)
+		{
+			ls = 255;
+		}
+		else if (ls < 0)
+		{
+			ls = 0;
+		}
+
+		vres[i] = 0; // VD writeback disabled on production hardware
+		// vres[i] = (hs << 8) | ls;
+	}
+	WRITEBACK_RESULT();
+}
+
+static void cfunc_rsp_vaddb_scalar(void *param)
+{
+	((rsp_device *)param)->ccfunc_rsp_vaddb_scalar();
+}
 
 #if USE_SIMD
 // VSAW
@@ -7720,6 +7780,26 @@ int rsp_device::generate_vector_opcode(drcuml_block *block, compiler_state *comp
 #endif
 			return TRUE;
 
+		case 0x16:      /* VADDB */
+			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vaddb_scalar, this);
+			return TRUE;
+
+		case 0x17:      /* VSUBB (reserved, functionally identical to VADDB) */
+			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vaddb_scalar, this);
+			return TRUE;
+
+		case 0x18:      /* VACCB (reserved, functionally identical to VADDB) */
+			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vaddb_scalar, this);
+			return TRUE;
+
+		case 0x19:      /* VSUCB (reserved, functionally identical to VADDB) */
+			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vaddb_scalar, this);
+			return TRUE;
+
 		case 0x1d:      /* VSAW */
 			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vsaw_simd, this);
@@ -8063,6 +8143,26 @@ int rsp_device::generate_vector_opcode(drcuml_block *block, compiler_state *comp
 		case 0x15:      /* VSUBC */
 			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vsubc_scalar, this);
+			return TRUE;
+
+		case 0x16:      /* VADDB */
+			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vaddb_scalar, this);
+			return TRUE;
+
+		case 0x17:      /* VSUBB (reserved, functionally identical to VADDB) */
+			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vaddb_scalar, this);
+			return TRUE;
+
+		case 0x18:      /* VACCB (reserved, functionally identical to VADDB) */
+			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vaddb_scalar, this);
+			return TRUE;
+
+		case 0x19:      /* VSUCB (reserved, functionally identical to VADDB) */
+			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vaddb_scalar, this);
 			return TRUE;
 
 		case 0x1d:      /* VSAW */
