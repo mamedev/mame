@@ -72,6 +72,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#ifdef __OS2__
+#include <sys/time.h>  // struct timeval
+#endif
 #include <signal.h>
 
 #ifdef _WIN32
@@ -120,7 +123,11 @@ typedef SOCKET sock_t;
 #include <sys/socket.h>
 #include <sys/select.h>
 #define closesocket(x) close(x)
+#ifdef __OS2__
+typedef int socklen_t;
+#else
 #define __cdecl
+#endif
 #define INVALID_SOCKET (-1)
 #define to64(x) strtoll(x, NULL, 10)
 typedef int sock_t;
@@ -1170,7 +1177,9 @@ typedef HANDLE process_id_t;
 #include <dlfcn.h>
 #include <inttypes.h>
 #include <pwd.h>
+#ifndef __OS2__
 #define O_BINARY 0
+#endif
 #define INT64_FMT PRId64
 typedef struct stat file_stat_t;
 typedef pid_t process_id_t;
@@ -5149,6 +5158,28 @@ static void *mmap(void *addr, int64_t len, int prot, int flags, int fd,
 	return p;
 }
 #define munmap(x, y)  UnmapViewOfFile(x)
+#define MAP_FAILED NULL
+#define MAP_PRIVATE 0
+#define PROT_READ 0
+#elif defined(__OS2__)
+static void *mmap(void *addr, int64_t len, int prot, int flags, int fd,
+					int offset) {
+	void *p;
+	off_t curpos;
+
+	p = malloc(len);
+	if (!p)
+	    return NULL;
+
+	curpos = lseek(fd, 0, SEEK_CUR);
+	lseek(fd, offset, SEEK_SET);
+	read(fd, p, len);
+	lseek(fd, curpos, SEEK_SET);
+
+	return p;
+}
+
+#define munmap(x, y)  free(x)
 #define MAP_FAILED NULL
 #define MAP_PRIVATE 0
 #define PROT_READ 0
