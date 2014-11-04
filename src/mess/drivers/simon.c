@@ -8,10 +8,15 @@
   * TMS1000 (has internal ROM), SN75494 lamp driver
   
   Newer revisions have a smaller 16-pin MB4850 chip instead of the TMS1000.
-  It has been decapped, but we couldn't yet find the internal ROM.
+  This one has been decapped too, but we couldn't yet find the internal ROM.
+  
+  Other games assumed to be on similar hardware:
+  - Pocket Simon
+  - Super Simon
   
 
   TODO:
+  - accurate rc osc
   - where's the skill switch?
 
 ***************************************************************************/
@@ -21,6 +26,10 @@
 #include "sound/speaker.h"
 
 #include "simon.lh"
+
+// master clock is a single stage RC oscillator: R=?, C=?
+// this is an approximation compared with old recordings
+#define SIMON_RC_CLOCK (330000)
 
 
 class simon_state : public driver_device
@@ -37,7 +46,6 @@ public:
 	required_ioport_array<3> m_button_matrix;
 	required_device<speaker_sound_device> m_speaker;
 
-	UINT16 m_o;
 	UINT16 m_r;
 
 	DECLARE_READ8_MEMBER(read_k);
@@ -45,7 +53,6 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 
 	virtual void machine_start();
-	virtual void machine_reset();
 };
 
 
@@ -57,14 +64,14 @@ public:
 
 READ8_MEMBER(simon_state::read_k)
 {
-	UINT8 ret = 0;
+	UINT8 k = 0;
 	
 	// read selected button rows
 	for (int i = 0; i < 3; i++)
 		if (m_r & (1 << i))
-			ret |= m_button_matrix[i]->read();
+			k |= m_button_matrix[i]->read();
 
-	return ret;
+	return k;
 }
 
 WRITE16_MEMBER(simon_state::write_r)
@@ -85,7 +92,6 @@ WRITE16_MEMBER(simon_state::write_r)
 WRITE16_MEMBER(simon_state::write_o)
 {
 	// N/C
-	m_o = data;
 }
 
 
@@ -125,16 +131,9 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-void simon_state::machine_reset()
-{
-}
-
 void simon_state::machine_start()
 {
-	m_o = 0;
 	m_r = 0;
-	
-	save_item(NAME(m_o));
 	save_item(NAME(m_r));
 }
 
@@ -152,7 +151,7 @@ static const UINT16 simon_output_pla[0x20] =
 static MACHINE_CONFIG_START( simon, simon_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", TMS1000, 330000 ) // RC osc, approximation compared with recordings
+	MCFG_CPU_ADD( "maincpu", TMS1000, SIMON_RC_CLOCK )
 	MCFG_TMS1XXX_OUTPUT_PLA(simon_output_pla)
 	MCFG_TMS1XXX_READ_K(READ8(simon_state, read_k))
 	MCFG_TMS1XXX_WRITE_O(WRITE16(simon_state, write_o))
@@ -172,7 +171,7 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Game drivers
+  Game driver(s)
 
 ***************************************************************************/
 
