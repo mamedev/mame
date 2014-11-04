@@ -24,7 +24,7 @@
     <software name="arcs">
         <description>Archivers</description>
         <year>?????</year>
-        <publisher>n/a</publisher>
+        <publisher>&lt;unofficial&gt;</publisher>
         <part name="flop1" interface="floppy_5_25">
             <feature name="part_id" value="Archivers" />
             <dataarea name="flop" size="348848">
@@ -36,7 +36,7 @@
     <software name="editor">
         <description>VDE 2.66</description>
         <year>?????</year>
-        <publisher>n/a</publisher>
+        <publisher>&lt;unofficial&gt;</publisher>
         <part name="flop1" interface="floppy_5_25">
             <feature name="part_id" value="VDE 2.66" />
             <dataarea name="flop" size="348848">
@@ -48,7 +48,7 @@
     <software name="extrauti">
         <description>Extra Utilities</description>
         <year>?????</year>
-        <publisher>n/a</publisher>
+        <publisher>&lt;unofficial&gt;</publisher>
         <part name="flop1" interface="floppy_5_25">
             <feature name="part_id" value="Extra Utilities" />
             <dataarea name="flop" size="348848">
@@ -60,7 +60,7 @@
     <software name="modems">
         <description>Modem Sample &amp; M80 &amp; L80</description>
         <year>?????</year>
-        <publisher>n/a</publisher>
+        <publisher>&lt;unofficial&gt;</publisher>
         <part name="flop1" interface="floppy_5_25">
             <feature name="part_id" value="Modem Sample &amp; M80 &amp; L80" />
             <dataarea name="flop" size="348848">
@@ -72,7 +72,7 @@
     <software name="promprog">
         <description>PROM Progs</description>
         <year>?????</year>
-        <publisher>n/a</publisher>
+        <publisher>&lt;unofficial&gt;</publisher>
         <part name="flop1" interface="floppy_5_25">
             <feature name="part_id" value="PROM Progs" />
             <dataarea name="flop" size="348848">
@@ -84,7 +84,7 @@
     <software name="px4util1">
         <description>PX-4 Utils</description>
         <year>?????</year>
-        <publisher>n/a</publisher>
+        <publisher>&lt;unofficial&gt;</publisher>
         <part name="flop1" interface="floppy_5_25">
             <feature name="part_id" value="PX-4 Utils" />
             <dataarea name="flop" size="348848">
@@ -96,7 +96,7 @@
     <software name="px4util2">
         <description>PX-4 Utility Disk</description>
         <year>?????</year>
-        <publisher>n/a</publisher>
+        <publisher>&lt;unofficial&gt;</publisher>
         <part name="flop1" interface="floppy_5_25">
             <feature name="part_id" value="PX-4 Utility Disk" />
             <dataarea name="flop" size="348848">
@@ -108,7 +108,7 @@
     <software name="px4util3">
         <description>PX-4 Utility Disk 2</description>
         <year>?????</year>
-        <publisher>n/a</publisher>
+        <publisher>&lt;unofficial&gt;</publisher>
         <part name="flop1" interface="floppy_5_25">
             <feature name="part_id" value="PX-4 Utility Disk 2" />
             <dataarea name="flop" size="348848">
@@ -120,7 +120,7 @@
     <software name="px4wand">
         <description>PX-4 Wanderer</description>
         <year>?????</year>
-        <publisher>n/a</publisher>
+        <publisher>&lt;unofficial&gt;</publisher>
         <part name="flop1" interface="floppy_5_25">
             <feature name="part_id" value="PX-4 Wanderer" />
             <dataarea name="flop" size="348848">
@@ -132,7 +132,7 @@
     <software name="px8epstf">
         <description>PX-8 EPS (TF-20 bootdisk)</description>
         <year>?????</year>
-        <publisher>n/a</publisher>
+        <publisher>&lt;unofficial&gt;</publisher>
         <part name="flop1" interface="floppy_5_25">
             <feature name="part_id" value="PX-8 EPS (TF-20 bootdisk)" />
             <dataarea name="flop" size="348848">
@@ -144,7 +144,7 @@
     <software name="px8games">
         <description>PX-8 Games</description>
         <year>?????</year>
-        <publisher>n/a</publisher>
+        <publisher>&lt;unofficial&gt;</publisher>
         <part name="flop1" interface="floppy_5_25">
             <feature name="part_id" value="PX-8 Games" />
             <dataarea name="flop" size="348848">
@@ -156,7 +156,7 @@
     <software name="scratch">
         <description>Scratch</description>
         <year>?????</year>
-        <publisher>n/a</publisher>
+        <publisher>&lt;unofficial&gt;</publisher>
         <part name="flop1" interface="floppy_5_25">
             <feature name="part_id" value="Scratch" />
             <dataarea name="flop" size="348848">
