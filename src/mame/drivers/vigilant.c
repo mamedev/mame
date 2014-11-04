@@ -966,8 +966,8 @@ ROM_END
 GAME( 1988, vigilant,  0,        vigilant, vigilant, driver_device, 0, ROT0, "Irem",                         "Vigilante (World, Rev E)", GAME_NO_COCKTAIL )
 GAME( 1988, vigilant1, vigilant, vigilant, vigilant, driver_device, 0, ROT0, "Irem",                         "Vigilante (World, Rev C)", GAME_NO_COCKTAIL )
 GAME( 1988, vigilantu, vigilant, vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East USA license)", "Vigilante (US)", GAME_NO_COCKTAIL )
-GAME( 1988, vigilantu2,vigilant, vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East USA license)", "Vigilante (US, Rev. G)", GAME_NO_COCKTAIL )
-GAME( 1988, vigilantj, vigilant, vigilant, vigilant, driver_device, 0, ROT0, "Irem",                         "Vigilante (Japan, Rev. D)", GAME_NO_COCKTAIL )
+GAME( 1988, vigilantu2,vigilant, vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East USA license)", "Vigilante (US, Rev G)", GAME_NO_COCKTAIL )
+GAME( 1988, vigilantj, vigilant, vigilant, vigilant, driver_device, 0, ROT0, "Irem",                         "Vigilante (Japan, Rev D)", GAME_NO_COCKTAIL )
 GAME( 1988, vigilantb, vigilant, vigilant, vigilant, driver_device, 0, ROT0, "bootleg",                      "Vigilante (bootleg)", GAME_NO_COCKTAIL )
 
 GAME( 1988, kikcubic,  0,        kikcubic, kikcubic, driver_device, 0, ROT0, "Irem",                         "Meikyu Jima (Japan)", GAME_NO_COCKTAIL )   /* English title is Kickle Cubicle */
