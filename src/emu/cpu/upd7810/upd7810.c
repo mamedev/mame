@@ -567,8 +567,8 @@ UINT8 upd7810_device::RP(offs_t port)
 			data = (data & ~0x02) | (m_rxd & 1 ? 0x02 : 0x00);
 		if (m_mcc & 0x04)   /* PC2 = SCK input/output */
 			data = (data & ~0x04) | (m_sck & 1 ? 0x04 : 0x00);
-		if (m_mcc & 0x08)   /* PC3 = TI input */
-			data = (data & ~0x08) | (m_ti & 1 ? 0x08 : 0x00);
+		if (m_mcc & 0x08)   /* PC3 = TI/INT2 input */
+			data = (data & ~0x08) | (m_int2 & 1 ? 0x08 : 0x00);
 		if (m_mcc & 0x10)   /* PC4 = TO output */
 			data = (data & ~0x10) | (m_to & 1 ? 0x10 : 0x00);
 		if (m_mcc & 0x20)   /* PC5 = CI input */
@@ -648,8 +648,8 @@ void upd7810_device::WP(offs_t port, UINT8 data)
 			data = (data & ~0x02) | (m_rxd & 1 ? 0x02 : 0x00);
 		if (m_mcc & 0x04)   /* PC2 = SCK input/output */
 			data = (data & ~0x04) | (m_sck & 1 ? 0x04 : 0x00);
-		if (m_mcc & 0x08)   /* PC3 = TI input */
-			data = (data & ~0x08) | (m_ti & 1 ? 0x08 : 0x00);
+		if (m_mcc & 0x08)   /* PC3 = TI/INT2 input */
+			data = (data & ~0x08) | (m_int2 & 1 ? 0x08 : 0x00);
 		if (m_mcc & 0x10)   /* PC4 = TO output */
 			data = (data & ~0x10) | (m_to & 1 ? 0x10 : 0x00);
 		if (m_mcc & 0x20)   /* PC5 = CI input */
