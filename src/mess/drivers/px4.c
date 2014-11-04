@@ -590,7 +590,7 @@ WRITE8_MEMBER( px4_state::sior_w )
 	// writing clock?
 	if (m_clock_state > 0)
 	{
-		struct tm *t = localtime(&m_time.time);
+		struct tm *t = localtime((const long int *)&m_time.time);
 
 		switch (m_clock_state++)
 		{
