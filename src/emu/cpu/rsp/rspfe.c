@@ -83,7 +83,7 @@ bool rsp_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 				desc.regin[0] |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
 				desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
 			}
-			desc.targetpc = ((desc.pc + 4 + (SIMMVAL << 2)) & 0x00000fff) | 0x1000;
+			desc.targetpc = ((desc.pc + 4 + SIMMVAL * 4) & 0x00000fff) | 0x1000;
 			desc.delayslots = 1;
 			desc.skipslots = (opswitch & 0x10) ? 1 : 0;
 			return true;
@@ -97,7 +97,7 @@ bool rsp_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 				desc.regin[0] |= REGFLAG_R(RSREG);
 				desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
 			}
-			desc.targetpc = ((desc.pc + 4 + (SIMMVAL << 2)) & 0x00000fff) | 0x1000;
+			desc.targetpc = ((desc.pc + 4 + SIMMVAL * 4) & 0x00000fff) | 0x1000;
 			desc.delayslots = 1;
 			desc.skipslots = (opswitch & 0x10) ? 1 : 0;
 			return true;
@@ -234,7 +234,7 @@ bool rsp_frontend::describe_regimm(UINT32 op, opcode_desc &desc)
 				desc.regin[0] |= REGFLAG_R(RSREG);
 				desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
 			}
-			desc.targetpc = ((desc.pc + 4 + (SIMMVAL << 2)) & 0x00000fff) | 0x1000;
+			desc.targetpc = ((desc.pc + 4 + SIMMVAL * 4) & 0x00000fff) | 0x1000;
 			desc.delayslots = 1;
 			desc.skipslots = (RTREG & 0x02) ? 1 : 0;
 			return true;
@@ -249,7 +249,7 @@ bool rsp_frontend::describe_regimm(UINT32 op, opcode_desc &desc)
 				desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
 			}
 			desc.regout[0] |= REGFLAG_R(31);
-			desc.targetpc = ((desc.pc + 4 + (SIMMVAL << 2)) & 0x00000fff) | 0x1000;
+			desc.targetpc = ((desc.pc + 4 + SIMMVAL * 4) & 0x00000fff) | 0x1000;
 			desc.delayslots = 1;
 			desc.skipslots = (RTREG & 0x02) ? 1 : 0;
 			return true;

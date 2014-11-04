@@ -106,7 +106,7 @@ bool mips3_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 				desc.regin[0] |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
 				desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
 			}
-			desc.targetpc = desc.pc + 4 + (SIMMVAL << 2);
+			desc.targetpc = desc.pc + 4 + SIMMVAL * 4;
 			desc.delayslots = 1;
 			desc.skipslots = (opswitch & 0x10) ? 1 : 0;
 			return true;
@@ -122,7 +122,7 @@ bool mips3_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 				desc.regin[0] |= REGFLAG_R(RSREG);
 				desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
 			}
-			desc.targetpc = desc.pc + 4 + (SIMMVAL << 2);
+			desc.targetpc = desc.pc + 4 + SIMMVAL * 4;
 			desc.delayslots = 1;
 			desc.skipslots = (opswitch & 0x10) ? 1 : 0;
 			return true;
@@ -396,7 +396,7 @@ bool mips3_frontend::describe_regimm(UINT32 op, opcode_desc &desc)
 				desc.regin[0] |= REGFLAG_R(RSREG);
 				desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
 			}
-			desc.targetpc = desc.pc + 4 + (SIMMVAL << 2);
+			desc.targetpc = desc.pc + 4 + SIMMVAL * 4;
 			desc.delayslots = 1;
 			desc.skipslots = (RTREG & 0x02) ? 1 : 0;
 			return true;
@@ -423,7 +423,7 @@ bool mips3_frontend::describe_regimm(UINT32 op, opcode_desc &desc)
 				desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
 			}
 			desc.regout[0] |= REGFLAG_R(31);
-			desc.targetpc = desc.pc + 4 + (SIMMVAL << 2);
+			desc.targetpc = desc.pc + 4 + SIMMVAL * 4;
 			desc.delayslots = 1;
 			desc.skipslots = (RTREG & 0x02) ? 1 : 0;
 			return true;
@@ -508,7 +508,7 @@ bool mips3_frontend::describe_cop0(UINT32 op, opcode_desc &desc)
 				case 0x00:  // BCzF
 				case 0x01:  // BCzT
 					desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
-					desc.targetpc = desc.pc + 4 + (SIMMVAL << 2);
+					desc.targetpc = desc.pc + 4 + SIMMVAL * 4;
 					desc.delayslots = 1;
 					return true;
 			}
@@ -580,7 +580,7 @@ bool mips3_frontend::describe_cop1(UINT32 op, opcode_desc &desc)
 				case 0x03:  // BCzTL
 					desc.regin[2] |= REGFLAG_FCC;
 					desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
-					desc.targetpc = desc.pc + 4 + (SIMMVAL << 2);
+					desc.targetpc = desc.pc + 4 + SIMMVAL * 4;
 					desc.delayslots = 1;
 					desc.skipslots = (RTREG & 0x02) ? 1 : 0;
 					return true;
@@ -730,7 +730,7 @@ bool mips3_frontend::describe_cop2(UINT32 op, opcode_desc &desc)
 				case 0x00:  // BCzF
 				case 0x01:  // BCzT
 					desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
-					desc.targetpc = desc.pc + 4 + (SIMMVAL << 2);
+					desc.targetpc = desc.pc + 4 + SIMMVAL * 4;
 					desc.delayslots = 1;
 					return true;
 			}
