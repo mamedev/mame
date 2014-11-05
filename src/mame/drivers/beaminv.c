@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    Tekunon Kougyou Beam Invader hardware
+    Tekunon Kougyou(Teknon Kogyo) Beam Invader hardware
 
     driver by Zsolt Vasvari
 
