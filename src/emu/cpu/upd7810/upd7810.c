@@ -420,6 +420,8 @@ const device_type UPD78C06 = &device_creator<upd78c06_device>;
 upd7810_device::upd7810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, UPD7810, "uPD7810", tag, owner, clock, "upd7810", __FILE__)
 	, m_to_func(*this)
+	, m_co0_func(*this)
+	, m_co1_func(*this)
 	, m_txd_func(*this)
 	, m_rxd_func(*this)
 	, m_an0_func(*this)
@@ -446,6 +448,8 @@ upd7810_device::upd7810_device(const machine_config &mconfig, const char *tag, d
 upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_to_func(*this)
+	, m_co0_func(*this)
+	, m_co1_func(*this)
 	, m_txd_func(*this)
 	, m_rxd_func(*this)
 	, m_an0_func(*this)
@@ -860,35 +864,43 @@ void upd7801_device::upd7810_take_irq()
 
 void upd7810_device::upd7810_write_EOM()
 {
-	if (EOM & 0x01) /* output LV0 content ? */
+	if (EOM & 0x01) /* output LV0 content */
 	{
 		switch (EOM & 0x0e)
 		{
 		case 0x02:  /* toggle CO0 */
-			CO0 = (CO0 >> 1) | ((CO0 ^ 2) & 2);
+			CO0 ^= 1;
 			break;
 		case 0x04:  /* reset CO0 */
 			CO0 = 0;
+			EOM &= 0xfb; /* LRE0 is reset t0 0 */
 			break;
 		case 0x08:  /* set CO0 */
 			CO0 = 1;
+			EOM &= 0xf7; /* LRE1 is reset t0 0 */
 			break;
 		}
+		EOM &= 0xfe; /* LO0 is reset t0 0 */
+		m_co0_func(CO0);
 	}
-	if (EOM & 0x10) /* output LV0 content ? */
+	if (EOM & 0x10) /* output LV1 content */
 	{
 		switch (EOM & 0xe0)
 		{
 		case 0x20:  /* toggle CO1 */
-			CO1 = (CO1 >> 1) | ((CO1 ^ 2) & 2);
+			CO1 ^= 1;
 			break;
 		case 0x40:  /* reset CO1 */
 			CO1 = 0;
+			EOM &= 0xbf; /* LRE2 is reset t0 0 */
 			break;
 		case 0x80:  /* set CO1 */
 			CO1 = 1;
+			EOM &= 0x7f; /* LRE3 is reset t0 0 */
 			break;
 		}
+		EOM &= 0xef; /* LO1 is reset t0 0 */
+		m_co1_func(CO1);
 	}
 }
 
@@ -1319,17 +1331,10 @@ void upd7810_device::handle_timers(int cycles)
 			    ((0x20 == (ETMM & 0x30)) && (ETM0 == ECNT)) || /* set CO0 if ECNT == ETM0 or at falling CI input */
 			    ((0x30 == (ETMM & 0x30)) && (ETM0 == ECNT || ETM1 == ECNT))) /* latch CO0 if ECNT == ETM0 or ECNT == ETM1 */
 			{
-				switch (EOM & 0x0e)
-				{
-				case 0x02:  /* toggle CO0 */
-					CO0 = (CO0 >> 1) | ((CO0 ^ 2) & 2);
-					break;
-				case 0x04:  /* reset CO0 */
-					CO0 = 0;
-					break;
-				case 0x08:  /* set CO0 */
-					CO0 = 1;
-					break;
+				if (EOM & 0x02) {
+					/* toggle CO0 */
+					CO0 ^= 1;
+					m_co0_func(CO0);
 				}
 			}
 			/* Conditions When ECNT Causes a CO1 Output Change */
@@ -1338,17 +1343,10 @@ void upd7810_device::handle_timers(int cycles)
 			    ((0x80 == (ETMM & 0xc0)) && (ETM1 == ECNT)) || /* set CO1 if ECNT == ETM1 or at falling CI input */
 			    ((0xc0 == (ETMM & 0xc0)) && (ETM0 == ECNT || ETM1 == ECNT))) /* latch CO1 if ECNT == ETM0 or ECNT == ETM1 */
 			{
-				switch (EOM & 0xe0)
-				{
-				case 0x20:  /* toggle CO1 */
-					CO1 = (CO1 >> 1) | ((CO1 ^ 2) & 2);
-					break;
-				case 0x40:  /* reset CO1 */
-					CO1 = 0;
-					break;
-				case 0x80:  /* set CO1 */
-					CO1 = 1;
-					break;
+				if (EOM & 0x20) {
+					/* toggle CO1 */
+					CO1 ^= 1;
+					m_co1_func(CO1);
 				}
 			}
 			/* How and When ECNT is Cleared */
@@ -1543,6 +1541,8 @@ void upd7810_device::base_device_start()
 	m_io = &space(AS_IO);
 
 	m_to_func.resolve_safe();
+	m_co0_func.resolve_safe();
+	m_co1_func.resolve_safe();
 	m_txd_func.resolve_safe();
 	m_rxd_func.resolve_safe(0);
 	m_an0_func.resolve_safe(0);
@@ -1677,8 +1677,8 @@ void upd7810_device::device_start()
 	state_add( UPD7810_TI,   "TI",   m_ti).formatstr("%3u");
 	state_add( UPD7810_TO,   "TO",   m_to).formatstr("%3u");
 	state_add( UPD7810_CI,   "CI",   m_ci).formatstr("%3u");
-	state_add( UPD7810_CO0,  "CO0",  m_co0).mask(0x01).formatstr("%1X");
-	state_add( UPD7810_CO1,  "CO1",  m_co1).mask(0x01).formatstr("%1X");
+	state_add( UPD7810_CO0,  "CO0",  m_co0).formatstr("%3u");
+	state_add( UPD7810_CO1,  "CO1",  m_co1).formatstr("%3u");
 
 	state_add( STATE_GENPC, "GENPC", m_pc.w.l ).formatstr("%04X").noshow();
 	state_add( STATE_GENPCBASE, "GENPCBASE", m_ppc.w.l ).formatstr("%04X").noshow();
