@@ -23,8 +23,6 @@ public:
 		UINT8 track_count;
 		UINT8 head_count;
 		UINT16 sector_base_size;
-		UINT8 gap_1;
-		UINT8 gap_2;
 	};
 
 	victor9k_format();
@@ -35,17 +33,20 @@ public:
 
 	int find_size(io_generic *io, UINT32 form_factor);
 	virtual int identify(io_generic *io, UINT32 form_factor);
-	floppy_image_format_t::desc_e* get_sector_desc(const format &f, int &current_size, int sector_count, UINT8 id1, UINT8 id2, int gap_2);
+	floppy_image_format_t::desc_e* get_sector_desc(const format &f, int &current_size, int sector_count);
 	void build_sector_description(const format &f, UINT8 *sectdata, offs_t sect_offs, desc_s *sectors, int sector_count) const;
 	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image);
 	virtual bool supports_save() const;
 
+	static int get_rpm(int head, int track);
+
 protected:
 	static const format formats[];
 
-	static const UINT32 cell_size[];
+	static const UINT32 cell_size[9];
 	static const int sectors_per_track[2][80];
 	static const int speed_zone[2][80];
+	static const int rpm[9];
 };
 
 extern const floppy_format_type FLOPPY_VICTOR_9000_FORMAT;

@@ -307,12 +307,14 @@ protected:
 		RAW,                    //!< One 16 bits word in p1 to be written raw, msb first, repeated p2 times
 		RAWBYTE,                //!< One 8 bit byte in p1 to be written raw, msb first, repeated p2 times
 		RAWBITS,                //!< A value of p2 bits in p1 to be copied as-is, msb first
+		SYNC_GCR5,              //!< gcr5 sync byte
 		TRACK_ID,               //!< Track id byte, mfm-encoded
 		TRACK_ID_FM,            //!< Track id byte, fm-encoded
 		TRACK_ID_DOS2_GCR5,     //!< Track id byte, gcr5-encoded
 		TRACK_ID_DOS25_GCR5,    //!< Track id byte, gcr5-encoded
 		TRACK_ID_GCR6,          //!< Track id low 6 bits, gcr6-encoded
 		TRACK_ID_8N1,           //!< Track id byte, 8N1-encoded
+		TRACK_ID_VICTOR_GCR5,   //!< Track id byte, gcr5-encoded
 		HEAD_ID,                //!< Head id byte, mfm-encoded
 		HEAD_ID_FM,             //!< Head id byte, fm-encoded
 		HEAD_ID_SWAP,           //!< Head id byte swapped (0->1, 1->0), mfm-encoded
@@ -346,6 +348,8 @@ protected:
 		CRC_CBM_START,          //!< Start a CBM checksum calculation (xor of original data values, gcr5-encoded), p1 = crc id
 		CRC_MACHEAD_START,      //!< Start of the mac gcr6 sector header checksum calculation (xor of pre-encode 6-bits values, gcr6-encoded)
 		CRC_FCS_START,          //!< Start a Compucolor File Control System checksum calculation, p1 = crc id
+		CRC_VICTOR_HDR_START,	//!< Start a Victor 9000 checksum calculation, p1 = crc id
+		CRC_VICTOR_DATA_START,	//!< Start a Victor 9000 checksum calculation, p1 = crc id
 		CRC_END,                //!< End the checksum, p1 = crc id
 		CRC,                    //!< Write a checksum in the apporpriate format, p1 = crc id
 
@@ -565,7 +569,7 @@ protected:
 	UINT8 sbyte_mfm_r(const UINT8 *bitstream, int &pos, int track_size);
 
 private:
-	enum { CRC_NONE, CRC_AMIGA, CRC_CBM, CRC_CCITT, CRC_CCITT_FM, CRC_MACHEAD, CRC_FCS };
+	enum { CRC_NONE, CRC_AMIGA, CRC_CBM, CRC_CCITT, CRC_CCITT_FM, CRC_MACHEAD, CRC_FCS, CRC_VICTOR_HDR, CRC_VICTOR_DATA };
 	enum { MAX_CRC_COUNT = 64 };
 
 	//! Holds data used internally for generating CRCs.
@@ -587,6 +591,8 @@ private:
 	void fixup_crc_ccitt_fm(UINT32 *buffer, const gen_crc_info *crc);
 	void fixup_crc_machead(UINT32 *buffer, const gen_crc_info *crc);
 	void fixup_crc_fcs(UINT32 *buffer, const gen_crc_info *crc);
+	void fixup_crc_victor_header(UINT32 *buffer, const gen_crc_info *crc);
+	void fixup_crc_victor_data(UINT32 *buffer, const gen_crc_info *crc);
 	void fixup_crcs(UINT32 *buffer, gen_crc_info *crcs);
 	void collect_crcs(const desc_e *desc, gen_crc_info *crcs);
 

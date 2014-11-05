@@ -13,8 +13,8 @@
 
     TODO:
 
-	- floppy format
-	- spindle speed
+	- disk error 8 (sync missing?)
+	- 8048 spindle speed control
     - read PLL
     - write logic
 
@@ -29,6 +29,8 @@
 //**************************************************************************
 
 #define LOG 1
+#define LOG_VIA 1
+#define LOG_SCP 0
 
 #define I8048_TAG       "5d"
 #define M6522_4_TAG     "1f"
@@ -182,7 +184,6 @@ victor_9000_fdc_t::victor_9000_fdc_t(const machine_config &mconfig, const char *
 	m_via6(*this, M6522_6_TAG),
 	m_floppy0(*this, I8048_TAG":0:525qd"),
 	m_floppy1(*this, I8048_TAG":1:525qd"),
-	m_rom(*this, I8048_TAG),
 	m_gcr_rom(*this, "gcr"),
 	m_da(0),
 	m_da0(0),
@@ -209,7 +210,8 @@ victor_9000_fdc_t::victor_9000_fdc_t(const machine_config &mconfig, const char *
 	m_via5_irq(CLEAR_LINE),
 	m_via6_irq(CLEAR_LINE),
 	m_syn(0),
-	m_lbrdy(1)
+	m_lbrdy(1),
+	m_period(attotime::from_nsec(21300))
 {
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
@@ -303,11 +305,11 @@ void victor_9000_fdc_t::device_timer(emu_timer &timer, device_timer_id id, int p
 		break;
 
 	case TM_TACH0:
-		m_tach0 = 1;
+		// TODO
 		break;
 
 	case TM_TACH1:
-		m_tach1 = 1;
+		// TODO
 		break;
 	}
 }
@@ -391,10 +393,13 @@ WRITE8_MEMBER( victor_9000_fdc_t::floppy_p2_w )
 	int sel1 = BIT(data, 4);
 	if (m_sel1 != sel1) sync = true;
 
-	m_rdy0 = BIT(data, 6);
-	m_rdy1 = BIT(data, 7);
+	//m_rdy0 = BIT(data, 6);
+	//m_via5->write_ca2(m_rdy0);
 
-	if (LOG) logerror("%s %s START0/STOP0/SEL0/RDY0 %u/%u/%u/%u START1/STOP1/SEL1/RDY1 %u/%u/%u/%u\n", machine().time().as_string(), machine().describe_context(), start0, stop0, sel0, m_rdy0, start1, stop1, sel1, m_rdy1);
+	//m_rdy1 = BIT(data, 7);
+	//m_via5->write_cb2(m_rdy1);
+
+	if (LOG_SCP) logerror("%s %s START0/STOP0/SEL0/RDY0 %u/%u/%u/%u START1/STOP1/SEL1/RDY1 %u/%u/%u/%u\n", machine().time().as_string(), machine().describe_context(), start0, stop0, sel0, m_rdy0, start1, stop1, sel1, m_rdy1);
 
 	if (sync)
 	{
@@ -403,12 +408,12 @@ WRITE8_MEMBER( victor_9000_fdc_t::floppy_p2_w )
 		m_start0 = start0;
 		m_stop0 = stop0;
 		m_sel0 = sel0;
-		update_spindle_motor(m_floppy0, t_tach0, m_start0, m_stop0, m_sel0, m_da0);
+		//update_spindle_motor(m_floppy0, t_tach0, m_start0, m_stop0, m_sel0, m_da0);
 
 		m_start1 = start1;
 		m_stop1 = stop1;
 		m_sel1 = sel1;
-		update_spindle_motor(m_floppy1, t_tach1, m_start1, m_stop1, m_sel1, m_da1);
+		//update_spindle_motor(m_floppy1, t_tach1, m_start1, m_stop1, m_sel1, m_da1);
 
 		checkpoint();
 
@@ -431,11 +436,7 @@ WRITE8_MEMBER( victor_9000_fdc_t::floppy_p2_w )
 
 READ8_MEMBER( victor_9000_fdc_t::tach0_r )
 {
-	int tach0 = m_tach0;
-
-	m_tach0 = 0;
-
-	return tach0;
+	return m_tach0;
 }
 
 
@@ -445,11 +446,7 @@ READ8_MEMBER( victor_9000_fdc_t::tach0_r )
 
 READ8_MEMBER( victor_9000_fdc_t::tach1_r )
 {
-	int tach1 = m_tach1;
-
-	m_tach1 = 0;
-
-	return tach1;
+	return m_tach1;
 }
 
 
@@ -483,20 +480,17 @@ void victor_9000_fdc_t::update_stepper_motor(floppy_image_device *floppy, int st
 
 void victor_9000_fdc_t::update_spindle_motor(floppy_image_device *floppy, emu_timer *t_tach, bool start, bool stop, bool sel, UINT8 &da)
 {
-	if (!start && !stop && floppy->mon_r()) {
-		if (LOG) logerror("%s: motor start\n", floppy->tag());
+	if (start && !stop && floppy->mon_r()) {
+		if (LOG_SCP) logerror("%s: motor start\n", floppy->tag());
 		floppy->mon_w(0);
 	} else if (stop && !floppy->mon_r()) {
-		if (LOG) logerror("%s: motor stop\n", floppy->tag());
+		if (LOG_SCP) logerror("%s: motor stop\n", floppy->tag());
 		floppy->mon_w(1);
 	}
 
 	if (sel) {
 		da = m_da;
 	}
-
-	floppy->set_rpm(300); // TODO
-	t_tach->adjust(attotime::from_hz(5)); // TODO
 }
 
 
@@ -506,11 +500,12 @@ void victor_9000_fdc_t::update_spindle_motor(floppy_image_device *floppy, emu_ti
 
 WRITE8_MEMBER( victor_9000_fdc_t::da_w )
 {
+	if (LOG_SCP) logerror("%s %s DA %02x\n", machine().time().as_string(), machine().describe_context(), data);
+
 	if (m_da != data)
 	{
 		live_sync();
 		m_da = data;
-		if (LOG) logerror("%s %s DA %02x\n", machine().time().as_string(), machine().describe_context(), data);
 		update_spindle_motor(m_floppy0, t_tach0, m_start0, m_stop0, m_sel0, m_da0);
 		update_spindle_motor(m_floppy1, t_tach1, m_start1, m_stop1, m_sel1, m_da1);
 		checkpoint();
@@ -537,14 +532,22 @@ WRITE8_MEMBER( victor_9000_fdc_t::via4_pa_w )
 
 	m_l0ms = data & 0x0f;
 
+	{ // HACK to bypass SCP
+		m_floppy0->mon_w((m_l0ms == 0xf) ? 1 : 0);
+		m_floppy0->set_rpm(victor9k_format::get_rpm(m_side, m_floppy0->get_cyl()));
+		m_rdy0 = (m_l0ms == 0xf) ? 0 : 1;
+		m_via5->write_ca2(m_rdy0);
+	}
+
 	UINT8 st0 = data >> 4;
+
+	if (LOG_VIA) logerror("%s %s L0MS %01x ST0 %01x\n", machine().time().as_string(), machine().describe_context(), m_l0ms, st0);
 
 	if (m_st0 != st0)
 	{
 		live_sync();
 		update_stepper_motor(m_floppy0, m_stp0, st0, m_st0);
 		m_st0 = st0;
-		if (LOG) logerror("%s %s L0MS %01x ST0 %01x\n", machine().time().as_string(), machine().describe_context(), m_l0ms, st0);
 		checkpoint();
 		live_run();
 	}
@@ -569,14 +572,22 @@ WRITE8_MEMBER( victor_9000_fdc_t::via4_pb_w )
 
 	m_l1ms = data & 0x0f;
 
+	{ // HACK to bypass SCP
+		m_floppy1->mon_w((m_l1ms == 0xf) ? 1 : 0);
+		m_floppy1->set_rpm(victor9k_format::get_rpm(m_side, m_floppy1->get_cyl()));
+		m_rdy1 = (m_l1ms == 0xf) ? 0 : 1;
+		m_via5->write_cb2(m_rdy1);
+	}
+
 	UINT8 st1 = data >> 4;
+
+	if (LOG_VIA) logerror("%s %s L1MS %01x ST1 %01x\n", machine().time().as_string(), machine().describe_context(), m_l1ms, st1);
 
 	if (m_st1 != st1)
 	{
 		live_sync();
 		update_stepper_motor(m_floppy1, m_stp1, st1, m_st1);
 		m_st1 = st1;
-		if (LOG) logerror("%s %s L1MS %01x ST1 %01x\n", machine().time().as_string(), machine().describe_context(), m_l1ms, st1);
 		checkpoint();
 		live_run();
 	}
@@ -590,6 +601,7 @@ WRITE_LINE_MEMBER( victor_9000_fdc_t::wrsync_w )
 		m_wrsync = state;
 		cur_live.wrsync = state;
 		checkpoint();
+		if (LOG_VIA) logerror("%s %s ERASE %u\n", machine().time().as_string(), machine().describe_context(), state);
 		live_run();
 	}
 }
@@ -645,7 +657,7 @@ WRITE8_MEMBER( victor_9000_fdc_t::via5_pb_w )
 	{
 		live_sync();
 		m_wd = cur_live.wd = data;
-		if (LOG) logerror("%s %s WD %02x\n", machine().time().as_string(), machine().describe_context(), data);
+		if (LOG_VIA) logerror("%s %s WD %02x\n", machine().time().as_string(), machine().describe_context(), data);
 		checkpoint();
 		live_run();
 	}
@@ -676,7 +688,7 @@ READ8_MEMBER( victor_9000_fdc_t::via6_pa_r )
 
 	*/
 
-	if (LOG) logerror("%s %s TRK0D0 %u TRK0D1 %u\n", machine().time().as_string(), machine().describe_context(), m_floppy0->trk00_r(),m_floppy1->trk00_r());
+	if (LOG_VIA) logerror("%s %s TRK0D0 %u TRK0D1 %u SYNC %u\n", machine().time().as_string(), machine().describe_context(), m_floppy0->trk00_r(), m_floppy1->trk00_r(), checkpoint_live.sync);
 
 	UINT8 data = 0;
 
@@ -740,7 +752,7 @@ WRITE8_MEMBER( victor_9000_fdc_t::via6_pa_w )
 		m_drive = drive;
 		cur_live.drive = drive;
 
-		if (LOG) logerror("%s %s SIDE %u DRIVE %u\n", machine().time().as_string(), machine().describe_context(), side, drive);
+		if (LOG_VIA) logerror("%s %s SIDE %u DRIVE %u\n", machine().time().as_string(), machine().describe_context(), side, drive);
 
 		checkpoint();
 		live_run();
@@ -825,7 +837,7 @@ WRITE8_MEMBER( victor_9000_fdc_t::via6_pb_w )
 		m_stp1 = stp1;
 		update_stepper_motor(m_floppy1, m_stp1, m_st1, m_st1);
 
-		if (LOG) logerror("%s %s STP0 %u STP1 %u\n", machine().time().as_string(), machine().describe_context(), stp0, stp1);
+		if (LOG_VIA) logerror("%s %s STP0 %u STP1 %u\n", machine().time().as_string(), machine().describe_context(), stp0, stp1);
 
 		checkpoint();
 		live_run();
@@ -839,7 +851,7 @@ WRITE_LINE_MEMBER( victor_9000_fdc_t::drw_w )
 		live_sync();
 		m_drw = cur_live.drw = state;
 		checkpoint();
-		if (LOG) logerror("%s %s DRW %u\n", machine().time().as_string(), machine().describe_context(), state);
+		if (LOG_VIA) logerror("%s %s DRW %u\n", machine().time().as_string(), machine().describe_context(), state);
 		if (state) {
 			stop_writing(machine().time());
 		} else {
@@ -856,7 +868,7 @@ WRITE_LINE_MEMBER( victor_9000_fdc_t::erase_w )
 		live_sync();
 		m_erase = cur_live.erase = state;
 		checkpoint();
-		if (LOG) logerror("%s %s ERASE %u\n", machine().time().as_string(), machine().describe_context(), state);
+		if (LOG_VIA) logerror("%s %s ERASE %u\n", machine().time().as_string(), machine().describe_context(), state);
 		live_run();
 	}
 }
@@ -874,7 +886,7 @@ READ8_MEMBER( victor_9000_fdc_t::cs7_r )
 	{
 		live_sync();
 		cur_live.lbrdy = 1;
-		if (LOG) logerror("%s %s LBRDY 1\n", machine().time().as_string(), machine().describe_context());
+		if (LOG_VIA) logerror("%s %s LBRDY 1\n", machine().time().as_string(), machine().describe_context());
 		m_lbrdy_cb(1);
 		checkpoint();
 		live_run();
@@ -889,7 +901,7 @@ WRITE8_MEMBER( victor_9000_fdc_t::cs7_w )
 	{
 		live_sync();
 		cur_live.lbrdy = 1;
-		if (LOG) logerror("%s %s LBRDY 1\n", machine().time().as_string(), machine().describe_context());
+		if (LOG_VIA) logerror("%s %s LBRDY 1\n", machine().time().as_string(), machine().describe_context());
 		m_lbrdy_cb(1);
 		checkpoint();
 		live_run();
@@ -1157,10 +1169,20 @@ void victor_9000_fdc_t::live_run(const attotime &limit)
 
 void victor_9000_fdc_t::get_next_edge(const attotime &when)
 {
-	// TODO
+	floppy_image_device *floppy = get_floppy();
+
+	cur_live.edge = floppy ? floppy->get_next_transition(when) : attotime::never;
 }
 
 int victor_9000_fdc_t::get_next_bit(attotime &tm, const attotime &limit)
 {
-	return -1; // TODO
+	attotime next = tm + m_period;
+
+	int bit = (cur_live.edge.is_never() || cur_live.edge >= next) ? 0 : 1;
+
+	if (bit) {
+		get_next_edge(next);
+	}
+
+	return bit;
 }
