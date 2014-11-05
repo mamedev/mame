@@ -5,7 +5,7 @@
   Milton Bradley Simon
   
   Revision A hardware:
-  * TMS1000 (has internal ROM), SN75494 lamp driver
+  * TMS1000 (has internal ROM), DS75494 lamp driver
   
   Newer revisions have a smaller 16-pin MB4850 chip instead of the TMS1000.
   This one has been decapped too, but we couldn't yet find the internal ROM.
@@ -13,11 +13,6 @@
   Other games assumed to be on similar hardware:
   - Pocket Simon
   - Super Simon
-  
-
-  TODO:
-  - accurate rc osc
-  - where's the skill switch?
 
 ***************************************************************************/
 
@@ -27,9 +22,9 @@
 
 #include "simon.lh"
 
-// master clock is a single stage RC oscillator: R=?, C=?
-// this is an approximation compared with old recordings
-#define SIMON_RC_CLOCK (330000)
+// master clock is a single stage RC oscillator: R=33K, C=100pf,
+// according to the TMS 1000 series data manual this is around 350kHz
+#define SIMON_RC_CLOCK (350000)
 
 
 class simon_state : public driver_device
@@ -38,12 +33,12 @@ public:
 	simon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_button_matrix(*this, "R"),
+		m_button_matrix(*this, "IN"),
 		m_speaker(*this, "speaker")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_ioport_array<3> m_button_matrix;
+	required_ioport_array<4> m_button_matrix;
 	required_device<speaker_sound_device> m_speaker;
 
 	UINT16 m_r;
@@ -67,23 +62,30 @@ READ8_MEMBER(simon_state::read_k)
 	UINT8 k = 0;
 	
 	// read selected button rows
-	for (int i = 0; i < 3; i++)
-		if (m_r & (1 << i))
+	for (int i = 0; i < 4; i++)
+	{
+		static int r[4] = { 0, 1, 2, 9 };
+		if (m_r & (1 << r[i]))
 			k |= m_button_matrix[i]->read();
+	}
 
 	return k;
 }
 
 WRITE16_MEMBER(simon_state::write_r)
 {
-	// R4-R7: lamps, through 75494 IC
+	// R4-R8 go through an 75494 IC first:
+	// R4 -> 75494 IN6 -> green lamp
+	// R5 -> 75494 IN3 -> red lamp
+	// R6 -> 75494 IN5 -> yellow lamp
+	// R7 -> 75494 IN2 -> blue lamp
 	for (int i = 0; i < 4; i++)
 		output_set_lamp_value(i, data >> (4 + i) & 1);
 	
-	// R8: speaker
+	// R8 -> 75494 IN0 -> speaker
 	m_speaker->level_w(data >> 8 & 1);
 
-	// R0-R2: input mux
+	// R0,R1,R2,R9: input mux
 	// R3: GND
 	// other bits: N/C
 	m_r = data;
@@ -103,24 +105,31 @@ WRITE16_MEMBER(simon_state::write_o)
 ***************************************************************************/
 
 static INPUT_PORTS_START( simon )
-	PORT_START("R.0")
+	PORT_START("IN.0")
 	PORT_CONFNAME( 0x07, 0x02, "Game Select")
 	PORT_CONFSETTING(    0x02, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
 	PORT_CONFSETTING(    0x04, "3" )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("R.1")
+	PORT_START("IN.1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Green Button")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Red Button")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Yellow Button")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Blue Button")
 
-	PORT_START("R.2")
+	PORT_START("IN.2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Start")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Last")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Longest")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3")
+	PORT_CONFNAME( 0x0f, 0x01, "Skill Level")
+	PORT_CONFSETTING(    0x02, "1" )
+	PORT_CONFSETTING(    0x04, "2" )
+	PORT_CONFSETTING(    0x08, "3" )
+	PORT_CONFSETTING(    0x01, "4" )
 INPUT_PORTS_END
 
 
@@ -177,7 +186,7 @@ MACHINE_CONFIG_END
 
 ROM_START( simon )
 	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "simon.bin", 0x0000, 0x0400, CRC(9961719d) SHA1(35dddb018a8a2b31f377ab49c1f0cb76951b81c0) )
+	ROM_LOAD( "tms1000.u1", 0x0000, 0x0400, CRC(9961719d) SHA1(35dddb018a8a2b31f377ab49c1f0cb76951b81c0) )
 ROM_END
 
 

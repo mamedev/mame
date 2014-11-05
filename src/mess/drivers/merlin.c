@@ -12,7 +12,6 @@
 
 
   TODO:
-  - accurate rc osc
   - accurate speaker levels (tone pitch sounds good though)
   - is the rom dump good?
 
@@ -24,9 +23,9 @@
 
 #include "merlin.lh"
 
-// master clock is a single stage RC oscillator: R=27K, C=100pf
-// this is an approximation compared with recordings
-#define MERLIN_RC_CLOCK (355000)
+// master clock is a single stage RC oscillator: R=33K, C=100pf,
+// according to the TMS 1000 series data manual this is around 350kHz
+#define MERLIN_RC_CLOCK (350000)
 
 
 class merlin_state : public driver_device
