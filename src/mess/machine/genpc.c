@@ -572,7 +572,7 @@ void ibm5160_mb_device::device_reset()
 	m_u73_q2 = 0;
 	m_out1 = 2; // initial state of pit output is undefined
 	m_pc_spkrdata = 0;
-	m_pit_out2 = 0;
+	m_pit_out2 = 1;
 	m_dma_channel = -1;
 	m_cur_eop = false;
 	memset(m_dma_offset,0,sizeof(m_dma_offset));

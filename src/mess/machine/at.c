@@ -300,7 +300,7 @@ MACHINE_START_MEMBER(at_state,at)
 MACHINE_RESET_MEMBER(at_state,at)
 {
 	m_at_spkrdata = 0;
-	m_pit_out2 = 0;
+	m_pit_out2 = 1;
 	m_dma_channel = -1;
 	m_cur_eop = false;
 }

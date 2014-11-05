@@ -685,7 +685,7 @@ void pcxt_state::machine_reset()
 	m_lastvalue = -1;
 
 	m_pc_spkrdata = 0;
-	m_pit_out2 = 0;
+	m_pit_out2 = 1;
 	m_wss2_data = 0;
 	m_speaker->level_w(0);
 }
