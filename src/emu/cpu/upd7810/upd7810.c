@@ -1313,22 +1313,6 @@ void upd7810_device::handle_timers(int cycles)
 				IRR |= INTFE0;
 			if (ETM1 == ECNT)
 				IRR |= INTFE1;
-			/* How and When ECNT is Cleared */
-			switch (ETMM & 0x0c)
-			{
-			case 0x00:              /* clear ECNT */
-				break;
-			case 0x04:              /* free running */
-				if (0 == ECNT)
-					ITF |= INTOV;   /* set overflow flag if counter wrapped */
-				break;
-			case 0x08:              /* reset at falling edge of CI or TO */
-				break;
-			case 0x0c:              /* reset if ECNT == ETM1 */
-				if (ETM1 == ECNT)
-					ECNT = 0;
-				break;
-			}
 			/* Conditions When ECNT Causes a CO0 Output Change */
 			if (((0x00 == (ETMM & 0x30)) && (ETM0 == ECNT)) || /* set CO0 if ECNT == ETM0 */
 			 /* ((0x10 == (ETMM & 0x30)) prohibited */
@@ -1366,6 +1350,22 @@ void upd7810_device::handle_timers(int cycles)
 					CO1 = 1;
 					break;
 				}
+			}
+			/* How and When ECNT is Cleared */
+			switch (ETMM & 0x0c)
+			{
+			case 0x00:              /* clear ECNT */
+				break;
+			case 0x04:              /* free running */
+				if (0 == ECNT)
+					ITF |= INTOV;   /* set overflow flag if counter wrapped */
+				break;
+			case 0x08:              /* reset at falling edge of CI or TO */
+				break;
+			case 0x0c:              /* reset if ECNT == ETM1 */
+				if (ETM1 == ECNT)
+					ECNT = 0;
+				break;
 			}
 		}
 	}
