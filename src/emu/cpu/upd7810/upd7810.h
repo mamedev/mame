@@ -294,8 +294,9 @@ protected:
 	UINT8   m_co1;
 	UINT16  m_irr;    /* interrupt request register */
 	UINT16  m_itf;    /* interrupt test flag register */
-	int     m_int1;   /* keep track of current int1 state. Needed for 7801 irq checking. */
-	int     m_int2;   /* keep track to current int2 state. Needed for 7801 irq checking. */
+	int     m_nmi;    /* keep track of current nmi state. Needed for 7810 irq checking. */
+	int     m_int1;   /* keep track of current int1 state. Needed for irq checking. */
+	int     m_int2;   /* keep track to current int2 state. Needed for irq checking. */
 
 	/* internal helper variables */
 	UINT16  m_txs;    /* transmitter shift register */

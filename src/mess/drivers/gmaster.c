@@ -28,7 +28,6 @@ public:
 	DECLARE_WRITE8_MEMBER(gmaster_port_w);
 	DECLARE_DRIVER_INIT(gmaster) { memset(&m_video, 0, sizeof(m_video)); memset(m_ram, 0, sizeof(m_ram)); }
 	UINT32 screen_update_gmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(gmaster_interrupt);
 
 private:
 	virtual void machine_start();
@@ -278,16 +277,10 @@ void gmaster_state::machine_start()
 }
 
 
-INTERRUPT_GEN_MEMBER(gmaster_state::gmaster_interrupt)
-{
-	m_maincpu->set_input_line(UPD7810_INTFE1, ASSERT_LINE);
-}
-
 static MACHINE_CONFIG_START( gmaster, gmaster_state )
 	MCFG_CPU_ADD("maincpu", UPD7810, XTAL_12MHz/2/*?*/)  // upd78c11 in the unit
 	MCFG_CPU_PROGRAM_MAP(gmaster_mem)
 	MCFG_CPU_IO_MAP( gmaster_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gmaster_state,  gmaster_interrupt)
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)

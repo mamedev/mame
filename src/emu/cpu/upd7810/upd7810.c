@@ -567,8 +567,8 @@ UINT8 upd7810_device::RP(offs_t port)
 			data = (data & ~0x02) | (m_rxd & 1 ? 0x02 : 0x00);
 		if (m_mcc & 0x04)   /* PC2 = SCK input/output */
 			data = (data & ~0x04) | (m_sck & 1 ? 0x04 : 0x00);
-		if (m_mcc & 0x08)   /* PC3 = TI input */
-			data = (data & ~0x08) | (m_ti & 1 ? 0x08 : 0x00);
+		if (m_mcc & 0x08)   /* PC3 = TI/INT2 input */
+			data = (data & ~0x08) | (m_int2 & 1 ? 0x08 : 0x00);
 		if (m_mcc & 0x10)   /* PC4 = TO output */
 			data = (data & ~0x10) | (m_to & 1 ? 0x10 : 0x00);
 		if (m_mcc & 0x20)   /* PC5 = CI input */
@@ -648,8 +648,8 @@ void upd7810_device::WP(offs_t port, UINT8 data)
 			data = (data & ~0x02) | (m_rxd & 1 ? 0x02 : 0x00);
 		if (m_mcc & 0x04)   /* PC2 = SCK input/output */
 			data = (data & ~0x04) | (m_sck & 1 ? 0x04 : 0x00);
-		if (m_mcc & 0x08)   /* PC3 = TI input */
-			data = (data & ~0x08) | (m_ti & 1 ? 0x08 : 0x00);
+		if (m_mcc & 0x08)   /* PC3 = TI/INT2 input */
+			data = (data & ~0x08) | (m_int2 & 1 ? 0x08 : 0x00);
 		if (m_mcc & 0x10)   /* PC4 = TO output */
 			data = (data & ~0x10) | (m_to & 1 ? 0x10 : 0x00);
 		if (m_mcc & 0x20)   /* PC5 = CI input */
@@ -709,6 +709,14 @@ void upd7810_device::upd7810_take_irq()
 		return;
 
 	/* check the interrupts in priority sequence */
+	if (IRR & INTNMI)
+	{
+		/* Nonmaskable interrupt */
+		irqline = INPUT_LINE_NMI;
+		vector = 0x0004;
+		IRR &= ~INTNMI;
+	}
+	else
 	if ((IRR & INTFT0)  && 0 == (MKL & 0x02))
 	{
 		vector = 0x0008;
@@ -1608,6 +1616,7 @@ void upd7810_device::base_device_start()
 	save_item(NAME(m_ovcf));
 	save_item(NAME(m_ovcs));
 	save_item(NAME(m_edges));
+	save_item(NAME(m_nmi));
 	save_item(NAME(m_int1));
 	save_item(NAME(m_int2));
 
@@ -1789,6 +1798,7 @@ void upd7810_device::device_reset()
 	m_co1 = 0;
 	m_irr = 0;
 	m_itf = 0;
+	m_nmi = 0;
 	m_int1 = 0;
 	m_int2 = 0;
 
@@ -1962,37 +1972,31 @@ void upd7801_device::execute_set_input(int irqline, int state)
 
 void upd7810_device::execute_set_input(int irqline, int state)
 {
-	if (state != CLEAR_LINE)
-	{
-		if (irqline == INPUT_LINE_NMI)
-		{
-			/* no nested NMIs ? */
-//          if (0 == (IRR & INTNMI))
-			{
-				IRR |= INTNMI;
-				SP--;
-				WM( SP, PSW );
-				SP--;
-				WM( SP, PCH );
-				SP--;
-				WM( SP, PCL );
-				IFF = 0;
-				PSW &= ~(SK|L0|L1);
-				PC = 0x0004;
-			}
-		}
-		else
-		if (irqline == UPD7810_INTF1)
+	switch (irqline) {
+	case INPUT_LINE_NMI:
+		/* NMI is falling edge sensitive */
+		if ( m_nmi == ASSERT_LINE && state == CLEAR_LINE )
+			IRR |= INTNMI;
+
+		m_nmi = state;
+		break;
+	case UPD7810_INTF1:
+		/* INT1 is rising edge sensitive */
+		if ( m_int1 == CLEAR_LINE && state == ASSERT_LINE )
 			IRR |= INTF1;
-		else
-		if ( irqline == UPD7810_INTF2 && ( MKL & 0x20 ) )
+
+		m_int1 = state;
+		break;
+	case UPD7810_INTF2:
+		/* INT2 is falling edge sensitive */
+		if ( m_int2 == ASSERT_LINE && state == CLEAR_LINE )
 			IRR |= INTF2;
-		// gamemaster hack
-		else
-		if (irqline == UPD7810_INTFE1)
-			IRR |= INTFE1;
-		else
-			logerror("upd7810_set_irq_line invalid irq line #%d\n", irqline);
+
+		m_int2 = state;
+		break;
+	default:
+		logerror("upd7810_set_irq_line invalid irq line #%d\n", irqline);
+		break;
 	}
 	/* resetting interrupt requests is done with the SKIT/SKNIT opcodes only! */
 }
