@@ -123,7 +123,6 @@ unknown cycle: CME, SSE, SSS
 #include "debugger.h"
 #include "tms0980.h"
 
-#define LOG                 0
 
 
 const device_type TMS0980 = &device_creator<tms0980_cpu_device>;
@@ -236,20 +235,11 @@ const device_type TMS1300 = &device_creator<tms1300_cpu_device>;
 #define I_YNEC      ( MICRO_MASK | M_YTP | M_CKN | M_NE )
 
 
-static const UINT8 tms0980_c2_value[4] =
-{
-	0x00, 0x02, 0x01, 0x03
-};
-static const UINT8 tms0980_c3_value[8] =
-{
-	0x00, 0x04, 0x02, 0x06, 0x01, 0x05, 0x03, 0x07
-};
-static const UINT8 tms0980_c4_value[16] =
-{
-	0x00, 0x08, 0x04, 0x0C, 0x02, 0x0A, 0x06, 0x0E, 0x01, 0x09, 0x05, 0x0D, 0x03, 0x0B, 0x07, 0x0F
-};
+static const UINT8 tms0980_c2_value[4] = { 0, 2, 1, 3 };
+static const UINT8 tms0980_c3_value[8] = { 0, 4, 2, 6, 1, 5, 3, 7 };
+static const UINT8 tms0980_c4_value[16] = { 0x0, 0x8, 0x4, 0xC, 0x2, 0xA, 0x6, 0xE, 0x1, 0x9, 0x5, 0xD, 0x3, 0xB, 0x7, 0xF };
 static const UINT8 tms0980_bit_value[4] = { 1, 4, 2, 8 };
-static const UINT8 tms0980_nbit_value[4] = { 0x0E, 0x0B, 0x0D, 0x07 };
+static const UINT8 tms0980_nbit_value[4] = { 0xE, 0xB, 0xD, 0x7 };
 
 
 static const UINT32 tms0980_decode[512] =
@@ -329,7 +319,8 @@ static const UINT32 tms0980_decode[512] =
 };
 
 
-static const UINT32 tms1000_default_decode[256] = {
+static const UINT32 tms1000_default_decode[256] =
+{
 	/* 0x00 */
 	F_COMX, I_A8AAC, I_YNEA, I_TAM, I_TAMZA, I_A10AAC, I_A6AAC, I_DAN,
 	I_TKA, I_KNEZ, F_TDO, F_CLO, F_RSTR, F_SETR, I_IA, F_RETN,
@@ -371,7 +362,8 @@ static const UINT32 tms1000_default_decode[256] = {
 };
 
 
-static const UINT32 tms1100_default_decode[256] = {
+static const UINT32 tms1100_default_decode[256] =
+{
 	/* 0x00 */
 	I_MNEA, I_ALEM, I_YNEA, I_XMA, I_DYN, I_IYC, I_AMAAC, I_DMAN,
 	I_TKA, F_COMX, F_TDO, F_COMC, F_RSTR, F_SETR, I_KNEZ, F_RETN,
@@ -504,8 +496,8 @@ void tms1xxx_cpu_device::device_start()
 
 void tms1xxx_cpu_device::device_reset()
 {
-	m_pa = 0x0F;
-	m_pb = 0x0F;
+	m_pa = 0xF;
+	m_pb = 0xF;
 	m_pc = 0;
 	m_dam = 0;
 	m_ca = 0;
@@ -620,7 +612,8 @@ location{1:0} =  ( pc{5:4} == 00 && pc{0} == 0 ) => 11
                  ( pc{5:4} == 11 && pc{0} == 1 ) => 10
 
 */
-static const UINT8 tms1000_next_pc[64] = {
+static const UINT8 tms1000_next_pc[64] =
+{
 	0x01, 0x03, 0x05, 0x07, 0x09, 0x0B, 0x0D, 0x0F, 0x11, 0x13, 0x15, 0x17, 0x19, 0x1B, 0x1D, 0x1F,
 	0x20, 0x22, 0x24, 0x26, 0x28, 0x2A, 0x2C, 0x2E, 0x30, 0x32, 0x34, 0x36, 0x38, 0x3A, 0x3C, 0x3F,
 	0x00, 0x02, 0x04, 0x06, 0x08, 0x0A, 0x0C, 0x0E, 0x10, 0x12, 0x14, 0x16, 0x18, 0x1A, 0x1C, 0x1E,
@@ -711,7 +704,6 @@ void tms1xxx_cpu_device::execute_run()
 {
 	do
 	{
-//      debugger_instruction_hook( this, ( ( m_pa << m_pc_size ) | m_pc ) << 1 );
 		m_icount--;
 		switch( m_subcycle )
 		{
@@ -811,12 +803,10 @@ void tms1xxx_cpu_device::execute_run()
 				}
 				if ( m_decode & M_STO )
 				{
-//printf("write ram %02x data %01x\n", m_ram_address, m_a );
 					m_data->write_byte( m_ram_address, m_a );
 				}
 				if ( m_decode & M_CKM )
 				{
-//printf("write ram %02x data %01x\n", m_ram_address, m_cki_bus );
 					m_data->write_byte( m_ram_address, m_cki_bus );
 				}
 			}
@@ -824,12 +814,10 @@ void tms1xxx_cpu_device::execute_run()
 			{
 				if ( m_decode & F_SBIT )
 				{
-//printf("write ram %02x data %01x\n", m_ram_address, m_ram_data | tms0980_bit_value[ m_opcode & 0x03 ] );
 					m_data->write_byte( m_ram_address, m_ram_data | tms0980_bit_value[ m_opcode & 0x03 ] );
 				}
 				if ( m_decode & F_RBIT )
 				{
-//printf("write ram %02x data %01x\n", m_ram_address, m_ram_data & tms0980_nbit_value[ m_opcode & 0x03 ] );
 					m_data->write_byte( m_ram_address, m_ram_data & tms0980_nbit_value[ m_opcode & 0x03 ] );
 				}
 				if ( m_decode & F_SETR )
@@ -850,10 +838,6 @@ void tms1xxx_cpu_device::execute_run()
 					{
 						logerror("unknown output pla mapping for status latch = %d and a = %X\n", m_status_latch, m_a);
 					}
-//if ( ( c_output_pla[ ( m_status_latch << 4 ) | m_a ] & 0xFF00 ) == 0xFF00 )
-//printf("****** o output m_status_latch = %X, m_a = %X\n", m_status_latch, m_a);
-//else
-//printf("o output m_status_latch = %X, m_a = %X\n", m_status_latch, m_a);
 
 					m_write_o( 0, m_o & m_o_mask, 0xffff );
 				}
@@ -951,8 +935,6 @@ void tms1xxx_cpu_device::execute_run()
 				m_opcode = m_program->read_byte( m_rom_address );
 			}
 			next_pc();
-			if (LOG)
-				logerror( "tms0980: read opcode %04x from %04x. Set pc to %04x\n", m_opcode, m_rom_address, m_pc );
 
 			/* ram address */
 			m_ram_address = ( m_x << 4 ) | m_y;

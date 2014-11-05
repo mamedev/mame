@@ -1,0 +1,149 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="sol20_cass" description="PTC SOL-20 cassettes">
+	<software name="2progs" supported="no">
+		<description>2 Programs in 1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="25383">
+				<rom name="2 programs in 1 (19xx)(-).svt" size="25383" crc="d2e097e3" sha1="52eb5e4036201c8bcb7eea656cd1d4b42d80d58b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="metron" supported="no">
+		<description>Metron Computerware</description>
+		<year>1977</year>
+		<publisher>Tiny C Associates</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="30719">
+				<rom name="metron computerware (1977)(tiny c associates).svt" size="30719" crc="6140c147" sha1="294487f58ec607decb69900b169a6b03208a61b4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pilot" supported="no">
+		<description>Pilot</description>
+		<year>19??</year>
+		<publisher>Processor Techonolgy</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="51064">
+				<rom name="pilot (19xx)(processor techonolgy).svt" size="51064" crc="e192a999" sha1="628b8e364f22a1a38b6f5487a2dcd518182ec5de" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="proteus1" supported="no">
+		<description>Proteus Cassete #1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="77646">
+				<rom name="proteus cassete #1 (19xx)(-).svt" size="77646" crc="f40fd39a" sha1="fe0b70607dd556ba8dc5ffca7d087b68778cdbcf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="proteus2" supported="no">
+		<description>Proteus Cassete #2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="95354">
+				<rom name="proteus cassete #2 (19xx)(-).svt" size="95354" crc="2b480f7b" sha1="06376865d8a0ce671c4a647c39f4ad2c4cef952d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="proteus3" supported="no">
+		<description>Proteus Cassete #3</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="57116">
+				<rom name="proteus cassete #3 (19xx)(-).svt" size="57116" crc="b2ee57f0" sha1="561f205f37affbaeba6ef7060f36044f268bf133" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="proteus7" supported="no">
+		<description>Proteus Cassete #7</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="178406">
+				<rom name="proteus cassete #7 (19xx)(-).svt" size="178406" crc="da305795" sha1="e9ce5023d288f52c303beb480e2a63531661ff90" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="proteus8" supported="no">
+		<description>Proteus Cassete #8</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="79094">
+				<rom name="proteus cassete #8 (19xx)(-).svt" size="79094" crc="d338d05a" sha1="8264f731acc676243e54d149d29b6cb13e691fa1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="solprint" supported="no">
+		<description>Sol Printer</description>
+		<year>19??</year>
+		<publisher>Processor Techonolgy</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="56307">
+				<rom name="sol printer (19xx)(processor techonolgy).svt" size="56307" crc="46a4e367" sha1="8e5f0226dde3ea450077a945f9bf12c3c5b7ede3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacegam" supported="no">
+		<description>Spaces Games</description>
+		<year>19??</year>
+		<publisher>Creative Computing Software</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="47421">
+				<rom name="spaces games (19xx)(creative computing software).svt" size="47421" crc="4f1b8108" sha1="fc6cd419b45b7c1f88a16dba0df12d901edc5753" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strategy" supported="no">
+		<description>Strategy Games</description>
+		<year>19??</year>
+		<publisher>Creative Computing Software</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="67400">
+				<rom name="strategy games (19xx)(creative computing software).svt" size="67400" crc="54d95385" sha1="54c8ca1542d9ec7cd711866bae3ceb3645735508" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strategya" cloneof="strategy" supported="no">
+		<description>Strategy Games (Alt)</description>
+		<year>19??</year>
+		<publisher>Creative Computing Software</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="67359">
+				<rom name="strategy games (19xx)(creative computing software)[a].svt" size="67359" crc="3f7a6908" sha1="230a8e72996f625959c77cd8350a9f7de087db80" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

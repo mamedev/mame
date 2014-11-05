@@ -1,289 +1,291 @@
-/***************************************************************************
+#include "pci.h"
 
-    machine/pci.c
+const device_type PCI_ROOT   = &device_creator<pci_root_device>;
+const device_type PCI_BRIDGE = &device_creator<pci_bridge_device>;
 
-    PCI bus
+DEVICE_ADDRESS_MAP_START(config_map, 32, pci_device)
+ADDRESS_MAP_END
 
-    The PCI bus is a 32-bit bus introduced by Intel, so it is little endian
-
-    Control word:
-        bit 31:         Enable bit
-        bits 30-24:     Reserved
-        bits 23-16:     PCI bus number
-        bits 15-11:     PCI device number
-        bits 10- 8:     PCI function number
-        bits  7- 0:     Offset address
-
-    Standard PCI registers:
-        0x00    2   Vendor ID
-        0x02    2   Device ID
-        0x04    2   PCI Command
-        0x06    2   PCI Status
-        0x08    1   Revision ID
-        0x09    1   Programming Interface
-        0x0A    1   Subclass Code
-        0x0B    1   Class Code
-
-    Class Code/Subclass Code/Programming Interface
-        0x00XXXX    Pre-PCI 2.0 devices
-        0x000000        Non-VGA device
-        0x000101        VGA device
-        0x01XXXX    Storage Controller
-        0x010000        SCSI
-        0x0101XX        IDE
-        0x0102XX        Floppy
-        0x0103XX        IPI
-        0x0104XX        RAID
-        0x0180XX        Other
-        0x02XXXX    Network Card
-        0x020000        Ethernet
-        0x020100        Tokenring
-        0x020200        FDDI
-        0x020300        ATM
-        0x028000        Other
-        0x03XXXX    Display Controller
-        0x030000        VGA
-        0x030001        8514 Compatible
-        0x030100        XGA
-        0x038000        Other
-        0x04XXXX    Multimedia
-        0x040000        Video
-        0x040100        Audio
-        0x048000        Other
-        0x05XXXX    Memory Controller
-        0x050000        RAM
-        0x050100        Flash
-        0x058000        Other
-        0x06XXXX    Bridge
-        0x060000        Host/PCI
-        0x060100        PCI/ISA
-        0x060200        PCI/EISA
-        0x060300        PCI/Micro Channel
-        0x060400        PCI/PCI
-        0x060500        PCI/PCMCIA
-        0x060600        PCI/NuBus
-        0x060700        PCI/CardBus
-        0x068000        Other
-
-    Information on PCI vendors can be found at http://www.pcidatabase.com/
-
-***************************************************************************/
-
-#include "emu.h"
-#include "machine/pci.h"
-
-#define LOG_PCI 0
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-const device_type PCI_BUS_LEGACY = &device_creator<pci_bus_legacy_device>;
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  pci_bus_legacy_device - constructor
-//-------------------------------------------------
-pci_bus_legacy_device::pci_bus_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, PCI_BUS_LEGACY, "PCI Bus Legacy", tag, owner, clock, "pci_bus_legacy", __FILE__),
-		m_father(NULL)
+pci_device::pci_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
-	for (int i = 0; i < ARRAY_LENGTH(m_devtag); i++) {
-		m_devtag[i]= NULL;
-		m_read_callback[i] = NULL;
-		m_write_callback[i] = NULL;
+	main_id = 0xffffffff;
+	revision = 0x00;
+	pclass = 0xffffff;
+	subdevice_id = 0xffffffff;
+}
+
+void pci_device::set_ids(UINT32 _main_id, UINT8 _revision, UINT32 _pclass, UINT32 _subdevice_id)
+{
+	main_id = _main_id;
+	revision = _revision;
+	pclass = _pclass;
+	subdevice_id = _subdevice_id;
+}
+
+void pci_device::device_start()
+{
+}
+
+void pci_device::device_reset()
+{
+}
+
+void pci_device::scan_sub_devices(pci_device **devices, dynamic_array<pci_device *> &all, dynamic_array<pci_device *> &bridges, device_t *root)
+{
+}
+
+void pci_device::reset_all_mappings()
+{
+}
+
+void pci_device::map_device(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
+							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space)
+{
+	map_extra(memory_window_start, memory_window_end, memory_offset, memory_space,
+			  io_window_start, io_window_end, io_offset, io_space);
+}
+
+void pci_device::map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
+						   UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space)
+{
+}
+
+void pci_device::map_config(UINT8 device, address_space *config_space)
+{
+	config_space->install_device(device << 12, (device << 12) | 0xfff, *this, &pci_device::config_map);
+}
+
+void pci_device::add_map(UINT64 size, int flags, address_map_delegate &map)
+{
+	logerror("Device %s (%s) has 0x%llx bytes of %s named %s\n", tag(), name(), size, flags & M_IO ? "io" : "memory", map.name());
+}
+
+agp_device::agp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: pci_device(mconfig, type, name, tag, owner, clock, shortname, source)
+{
+}
+
+void agp_device::device_start()
+{
+	pci_device::device_start();
+}
+
+void agp_device::device_reset()
+{
+	pci_device::device_reset();
+}
+
+
+
+pci_bridge_device::pci_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: pci_device(mconfig, PCI_BRIDGE, "PCI-PCI Bridge", tag, owner, clock, "pci_bridge", __FILE__),
+	  device_memory_interface(mconfig, *this),
+	  configure_space_config("configuration_space", ENDIANNESS_LITTLE, 32, 20)
+{
+}
+
+pci_bridge_device::pci_bridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: pci_device(mconfig, type, name, tag, owner, clock, shortname, source),
+	  device_memory_interface(mconfig, *this),
+	  configure_space_config("configuration_space", ENDIANNESS_LITTLE, 32, 20)
+{
+}
+
+const address_space_config *pci_bridge_device::memory_space_config(address_spacenum spacenum) const
+{
+	return spacenum == AS_PROGRAM ? &configure_space_config : NULL;
+}
+
+device_t *pci_bridge_device::bus_root()
+{
+	return this;
+}
+
+void pci_bridge_device::device_start()
+{
+	pci_device::device_start();
+
+	for(int i=0; i<32*8; i++)
+		sub_devices[i] = NULL;
+
+	for(device_t *d = bus_root()->first_subdevice(); d != NULL; d = d->next()) {
+		if(d == this)
+			continue;
+		const char *t = d->tag();
+		int l = strlen(t);
+		if(l <= 4 || t[l-5] != ':' || t[l-2] != '.')
+			continue;
+		int id = strtol(t+l-4, 0, 16);
+		int fct = t[l-1] - '0';
+		sub_devices[(id << 3) | fct] = downcast<pci_device *>(d);
 	}
-	m_siblings_count = 0;
+	for(int i=0; i<32*8; i++)
+		if(sub_devices[i]) {
+			all_devices.append(sub_devices[i]);
+			pci_bridge_device *bridge = dynamic_cast<pci_bridge_device *>(sub_devices[i]);
+			if(bridge)
+				all_bridges.append(bridge);
+		}
 }
 
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-READ32_MEMBER( pci_bus_legacy_device::read )
+void pci_bridge_device::device_reset()
 {
-	UINT32 result = 0xffffffff;
-	int function, reg;
+	pci_device::device_reset();
+	regenerate_config_mapping();
+}
 
-	offset %= 2;
-
-	switch (offset)
-	{
-		case 0:
-			result = m_address;
-			break;
-
-		case 1:
-			if (m_devicenum != -1)
-			{
-				pci_read_func read = m_busnumaddr->m_read_callback[m_devicenum];
-				if (read != NULL)
-				{
-					function = (m_address >> 8) & 0x07;
-					reg = (m_address >> 0) & 0xfc;
-					result = (*read)(m_busnumaddr, m_busnumaddr->m_device[m_devicenum], function, reg, mem_mask);
-				}
-			}
-			break;
-	}
-
-	if (LOG_PCI)
-		logerror("read('%s'): offset=%d result=0x%08X\n", tag(), offset, result);
-
-	return result;
+void pci_bridge_device::reset_all_mappings()
+{
+	for(int i=0; i != all_devices.count(); i++)
+		all_devices[i]->reset_all_mappings();
 }
 
 
-
-pci_bus_legacy_device *pci_bus_legacy_device::pci_search_bustree(int busnum, int devicenum, pci_bus_legacy_device *pcibus)
+void pci_bridge_device::map_device(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
+								   UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space)
 {
-	int a;
-	pci_bus_legacy_device *ret;
+	for(int i = all_devices.count()-1; i>=0; i--)
+		all_devices[i]->map_device(memory_window_start, memory_window_end, memory_offset, memory_space,
+								   io_window_start, io_window_end, io_offset, io_space);
 
-	if (pcibus->m_busnum == busnum)
-	{
-		return pcibus;
-	}
-	for (a = 0; a < pcibus->m_siblings_count; a++)
-	{
-		ret = pci_search_bustree(busnum, devicenum, pcibus->m_siblings[a]);
-		if (ret != NULL)
-			return ret;
-	}
-	return NULL;
+	map_extra(memory_window_start, memory_window_end, memory_offset, memory_space,
+			  io_window_start, io_window_end, io_offset, io_space);
 }
 
 
-
-WRITE32_MEMBER( pci_bus_legacy_device::write )
+void pci_bridge_device::regenerate_config_mapping()
 {
-	offset %= 2;
+	address_space *config_space = &space(AS_PROGRAM);
+	config_space->unmap_readwrite(0x00000, 0xfffff);
+	for(int i=0; i<32*8; i++)
+		if(sub_devices[i])
+			sub_devices[i]->map_config(i, config_space);
+}
 
-	if (LOG_PCI)
-		logerror("write('%s'): offset=%d data=0x%08X\n", tag(), offset, data);
 
-	switch (offset)
-	{
-		case 0:
-			m_address = data;
+agp_bridge_device::agp_bridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: pci_bridge_device(mconfig, type, name, tag, owner, clock, shortname, source)
+{
+}
 
-			/* lookup current device */
-			if (m_address & 0x80000000)
-			{
-				int busnum = (m_address >> 16) & 0xff;
-				int devicenum = (m_address >> 11) & 0x1f;
-				m_busnumaddr = pci_search_bustree(busnum, devicenum, this);
-				if (m_busnumaddr != NULL)
-				{
-					m_busnumber = busnum;
-					m_devicenum = devicenum;
-				}
-				else
-					m_devicenum = -1;
-				if (LOG_PCI)
-					logerror("  bus:%d device:%d\n", busnum, devicenum);
-			}
-			break;
+void agp_bridge_device::device_start()
+{
+	pci_bridge_device::device_start();
+}
 
-		case 1:
-			if (m_devicenum != -1)
-			{
-				pci_write_func write = m_busnumaddr->m_write_callback[m_devicenum];
-				if (write != NULL)
-				{
-					int function = (m_address >> 8) & 0x07;
-					int reg = (m_address >> 0) & 0xfc;
-					(*write)(m_busnumaddr, m_busnumaddr->m_device[m_devicenum], function, reg, data, mem_mask);
-				}
-				if (LOG_PCI)
-					logerror("  function:%d register:%d\n", (m_address >> 8) & 0x07, (m_address >> 0) & 0xfc);
-			}
-			break;
-	}
+void agp_bridge_device::device_reset()
+{
+	pci_bridge_device::device_reset();
 }
 
 
 
-READ64_MEMBER(pci_bus_legacy_device::read_64be)
+DEVICE_ADDRESS_MAP_START(io_configuration_access_map, 32, pci_host_device)
+	AM_RANGE(0xcf8, 0xcfb) AM_READWRITE(config_address_r, config_address_w)
+	AM_RANGE(0xcfc, 0xcff) AM_READWRITE(config_data_r,    config_data_w)
+ADDRESS_MAP_END
+
+
+pci_host_device::pci_host_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: pci_bridge_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
-	UINT64 result = 0;
-	mem_mask = FLIPENDIAN_INT64(mem_mask);
-	if (ACCESSING_BITS_0_31)
-		result |= (UINT64)read(space, offset * 2 + 0, mem_mask >> 0) << 0;
-	if (ACCESSING_BITS_32_63)
-		result |= (UINT64)read(space, offset * 2 + 1, mem_mask >> 32) << 32;
-	return FLIPENDIAN_INT64(result);
 }
 
-WRITE64_MEMBER(pci_bus_legacy_device::write_64be)
+device_t *pci_host_device::bus_root()
 {
-	data = FLIPENDIAN_INT64(data);
-	mem_mask = FLIPENDIAN_INT64(mem_mask);
-	if (ACCESSING_BITS_0_31)
-		write(space, offset * 2 + 0, data >> 0, mem_mask >> 0);
-	if (ACCESSING_BITS_32_63)
-		write(space, offset * 2 + 1, data >> 32, mem_mask >> 32);
+	return owner();
+}
+
+void pci_host_device::device_start()
+{
+	pci_bridge_device::device_start();
+
+	memory_window_start = memory_window_end = memory_offset = 0;
+	io_window_start = io_window_end = io_offset = 0;
+}
+
+void pci_host_device::device_reset()
+{
+	pci_bridge_device::device_reset();
+	for(int i=0; i != all_devices.count(); i++)
+		all_devices[i]->reset_all_mappings();
+	regenerate_mapping();
+
+	config_address = 0;
+}
+
+void pci_host_device::regenerate_mapping()
+{
+	memory_space->unmap_readwrite(memory_window_start, memory_window_end);
+	io_space->unmap_readwrite(io_window_start, io_window_end);
+
+	map_device(memory_window_start, memory_window_end, memory_offset, memory_space,
+			   io_window_start, io_window_end, io_offset, io_space);
+}
+
+void pci_host_device::regenerate_config_mapping()
+{
+	pci_bridge_device::regenerate_config_mapping();
+	map_config(0, &space(AS_PROGRAM));
+}
+
+READ32_MEMBER(pci_host_device::config_address_r)
+{
+	return config_address;
+}
+
+WRITE32_MEMBER(pci_host_device::config_address_w)
+{
+	COMBINE_DATA(&config_address);
+}
+
+READ32_MEMBER(pci_host_device::config_data_r)
+{
+	return config_address & 0x80000000 ? config_read((config_address >> 16) & 0xff, (config_address >> 8) & 0xff, config_address & 0xfc, mem_mask) : 0xffffffff;
+}
+
+WRITE32_MEMBER(pci_host_device::config_data_w)
+{
+	if(config_address & 0x80000000)
+		config_write((config_address >> 16) & 0xff, (config_address >> 8) & 0xff, config_address & 0xfc, data, mem_mask);
+}
+
+UINT32 pci_host_device::config_read(UINT8 bus, UINT8 device, UINT16 reg, UINT32 mem_mask)
+{
+	UINT32 data = 0xffffffff;
+	if(!bus) {
+		if(sub_devices[device]) {
+			data = space(AS_PROGRAM).read_dword((device << 12) | reg, mem_mask);
+			logerror("config_read %02x:%02x.%x:%02x %08x @ %08x\n", bus, device >> 3, device & 7, reg, data, mem_mask);
+		}
+	} else
+		abort();
+	
+	return data;
+}
+
+void pci_host_device::config_write(UINT8 bus, UINT8 device, UINT16 reg, UINT32 data, UINT32 mem_mask)
+{
+	if(!bus) {
+		if(sub_devices[device]) {
+			space(AS_PROGRAM).write_dword((device << 12) | reg, data, mem_mask);
+			logerror("config_write %02x:%02x.%x:%02x %08x @ %08x\n", bus, device >> 3, device & 7, reg, data, mem_mask);
+		}
+	} else
+		abort();
 }
 
 
-void pci_bus_legacy_device::add_sibling(pci_bus_legacy_device *sibling, int busnum)
+pci_root_device::pci_root_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, PCI_ROOT,"PCI virtual root", tag, owner, clock, "pci_root", __FILE__)
 {
-	m_siblings[m_siblings_count] = sibling;
-	m_siblings_busnum[m_siblings_count] = busnum;
-	m_siblings_count++;
 }
 
-
-//-------------------------------------------------
-//  device_post_load - handle updating after a
-//  restore
-//-------------------------------------------------
-
-void pci_bus_legacy_device::device_post_load()
+void pci_root_device::device_start()
 {
-	if (m_devicenum != -1)
-	{
-		m_busnumaddr = pci_search_bustree(m_busnumber, m_devicenum, this);
-	}
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void pci_bus_legacy_device::device_start()
+void pci_root_device::device_reset()
 {
-	/* store a pointer back to the device */
-	m_devicenum = -1;
-
-	/* find all our devices */
-	for (int i = 0; i < ARRAY_LENGTH(m_devtag); i++)
-		if (m_devtag[i] != NULL)
-			m_device[i] = machine().device(m_devtag[i]);
-
-	if (m_father != NULL) {
-		pci_bus_legacy_device *father = machine().device<pci_bus_legacy_device>(m_father);
-		if (father)
-			father->add_sibling(this, m_busnum);
-	}
-
-	/* register pci states */
-	save_item(NAME(m_address));
-	save_item(NAME(m_devicenum));
-	save_item(NAME(m_busnum));
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void pci_bus_legacy_device::device_reset()
-{
-	/* reset the drive state */
-	m_devicenum = -1;
-	m_address = 0;
 }
