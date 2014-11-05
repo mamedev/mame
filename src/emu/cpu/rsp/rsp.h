@@ -299,6 +299,7 @@ public:
 	void ccfunc_rsp_vabs_scalar();
 	void ccfunc_rsp_vaddc_scalar();
 	void ccfunc_rsp_vsubc_scalar();
+	void ccfunc_rsp_vaddb_scalar();
 	void ccfunc_rsp_vsaw_scalar();
 	void ccfunc_rsp_vlt_scalar();
 	void ccfunc_rsp_veq_scalar();
