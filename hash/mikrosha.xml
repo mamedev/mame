@@ -16,9 +16,9 @@
 	</software>
 
 	<software name="alambush">
-		<description>ALAMBUSH</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Alien Ambush</description>
+		<year>1990</year>
+		<publisher>Sedov E. A.</publisher>
 		<part name="cass" interface="mikrosha_cass">
 			<dataarea name="cass" size="5604">
 				<rom name="alambush.rkm" size="5604" crc="4b247561" sha1="5f6130c571bb4877b27c1e4c37a17db680e8b2ab" offset="0" />
@@ -27,9 +27,9 @@
 	</software>
 
 	<software name="ball">
-		<description>BALL</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>The Ball Game</description>
+		<year>1990</year>
+		<publisher>Sandy Pat Corp.</publisher>
 		<part name="cass" interface="mikrosha_cass">
 			<dataarea name="cass" size="2620">
 				<rom name="ball.rkm" size="2620" crc="ff43291b" sha1="f7fbdae6169c08a4140d685d0d504cc84be82375" offset="0" />
@@ -38,9 +38,9 @@
 	</software>
 
 	<software name="barmen">
-		<description>BARMEN</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Barmen (v1.5)</description>
+		<year>1988</year>
+		<publisher>ALG</publisher>
 		<part name="cass" interface="mikrosha_cass">
 			<dataarea name="cass" size="4102">
 				<rom name="barmen.rkm" size="4102" crc="01a1e046" sha1="f129df0395d261edf50c4c79a8d3375249a935ef" offset="0" />
@@ -49,9 +49,9 @@
 	</software>
 
 	<software name="bomber">
-		<description>BOMBER</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Bomber Aircraft</description>
+		<year>1990</year>
+		<publisher>Jup Corp</publisher>
 		<part name="cass" interface="mikrosha_cass">
 			<dataarea name="cass" size="4627">
 				<rom name="bomber.rkm" size="4627" crc="8ba227ef" sha1="a15ad12ec2981b53607f4ae755acecbb69939b3c" offset="0" />
@@ -59,10 +59,10 @@
 		</part>
 	</software>
 
-	<software name="boulder">
-		<description>BOULDER</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="bdash">
+		<description>Boulder Dash (v2)</description>
+		<year>1989</year>
+		<publisher>Clever Hands Software</publisher>
 		<part name="cass" interface="mikrosha_cass">
 			<dataarea name="cass" size="15367">
 				<rom name="boulder.rkm" size="15367" crc="2da99b60" sha1="2620046d21618cf22607827c19334ba000902c27" offset="0" />
@@ -71,7 +71,7 @@
 	</software>
 
 	<software name="chess">
-		<description>CHESS</description>
+		<description>Chess</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="mikrosha_cass">
@@ -81,10 +81,10 @@
 		</part>
 	</software>
 
-	<software name="circus">
-		<description>CIRCUS</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="cirk">
+		<description>Cirk (v1.2)</description>
+		<year>1986</year>
+		<publisher>Popov S.N.</publisher>
 		<part name="cass" interface="mikrosha_cass">
 			<dataarea name="cass" size="7655">
 				<rom name="circus.rkm" size="7655" crc="bd44cf25" sha1="2cc3472632e962b0e32637a4eea9090b5307eba9" offset="0" />
@@ -93,9 +93,9 @@
 	</software>
 
 	<software name="crossfir">
-		<description>CROSSFIR</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Cross Fire (v004)</description>
+		<year>1988</year>
+		<publisher>Zyryanov A.V.</publisher>
 		<part name="cass" interface="mikrosha_cass">
 			<dataarea name="cass" size="11127">
 				<rom name="crossfir.rkm" size="11127" crc="0e204a60" sha1="f41be5612ea4648ce51a2495fa2c2b20c4e910fb" offset="0" />
@@ -566,9 +566,9 @@
 	</software>
 
 	<software name="xonmicr">
-		<description>XONMICR</description>
+		<description>Xonix (Micron)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Micron</publisher>
 		<part name="cass" interface="mikrosha_cass">
 			<dataarea name="cass" size="2822">
 				<rom name="xonmicr.rkm" size="2822" crc="a2658748" sha1="561ac9989c2b8605719d0b340a513fb5a691d7dd" offset="0" />
@@ -576,10 +576,10 @@
 		</part>
 	</software>
 
-	<software name="zstation">
-		<description>ZSTATION</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="zstanciy">
+		<description>Z-Stanciya</description>
+		<year>1987</year>
+		<publisher>SNP</publisher>
 		<part name="cass" interface="mikrosha_cass">
 			<dataarea name="cass" size="1895">
 				<rom name="zstation.rkm" size="1895" crc="d496dea7" sha1="4aabce2dc4349a82c1ba59be8705f2f8cac77401" offset="0" />
@@ -591,7 +591,7 @@
 <!-- System -->
 
 	<software name="basic">
-		<description>BASIC</description>
+		<description>Mikrosha BASIC</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="mikrosha_cass">
@@ -602,7 +602,7 @@
 	</software>
 
 	<software name="disasm">
-		<description>DISASM</description>
+		<description>Disassembler Mikron</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="mikrosha_cass">

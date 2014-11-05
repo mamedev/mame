@@ -5,11 +5,11 @@
 
 	<software name="asteroid">
 		<description>Asteroidi</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>GAC Software</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="1298">
-				<rom name="asteroidi.gtp" size="1298" crc="70aa80a3" sha1="1bc96cdf7602bbb24b02f5f9cb9aac709f3a7080" offset="0x0000" />
+				<rom name="asteroidi.gtp" size="1298" crc="70aa80a3" sha1="1bc96cdf7602bbb24b02f5f9cb9aac709f3a7080" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -20,40 +20,40 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="1017">
-				<rom name="biljar.gtp" size="1017" crc="469ba6a2" sha1="b93a3a968e3fe004958f61d6fcf63268be01517d" offset="0x0000" />
+				<rom name="biljar.gtp" size="1017" crc="469ba6a2" sha1="b93a3a968e3fe004958f61d6fcf63268be01517d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="biorita1">
-		<description>Bioritam1</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="bioritam">
+		<description>Bioritam</description>
+		<year>1984</year>
+		<publisher>Galaxy Computer</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="2996">
-				<rom name="bioritam1.gtp" size="2996" crc="86d9274a" sha1="b71ef12740d0cb10d8ae0b5eb30d6f3fd1f7fb86" offset="0x0000" />
+				<rom name="bioritam1.gtp" size="2996" crc="86d9274a" sha1="b71ef12740d0cb10d8ae0b5eb30d6f3fd1f7fb86" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="biorita2">
-		<description>Bioritam2</description>
+		<description>Bioritam (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="1366">
-				<rom name="bioritam2.gtp" size="1366" crc="997e491e" sha1="b61d390bc33e2568526af5a2116ec87d7ac7e505" offset="0x0000" />
+				<rom name="bioritam2.gtp" size="1366" crc="997e491e" sha1="b61d390bc33e2568526af5a2116ec87d7ac7e505" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="bladall">
-		<description>BladeAlley</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="bladeall">
+		<description>Blade Alley</description>
+		<year>1985</year>
+		<publisher>Jasmin Halilovic</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="1879">
-				<rom name="bladealley.gtp" size="1879" crc="723da222" sha1="b8d7978a67595ef1107919771cbe7b9919ad2fe5" offset="0x0000" />
+				<rom name="bladealley.gtp" size="1879" crc="723da222" sha1="b8d7978a67595ef1107919771cbe7b9919ad2fe5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -61,21 +61,21 @@
 	<software name="bombard">
 		<description>Bombarder</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Nenad Balint</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="1880">
-				<rom name="bombarder.gtp" size="1880" crc="7d584b08" sha1="a0629636f015381f8d4132af8d95577fdef12ed7" offset="0x0000" />
+				<rom name="bombarder.gtp" size="1880" crc="7d584b08" sha1="a0629636f015381f8d4132af8d95577fdef12ed7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="charfire">
-		<description>ChariotsOfFire</description>
+		<description>Chariots of Fire</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Dragan Yujkov</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="290">
-				<rom name="chariotsoffire.gtp" size="290" crc="33e9fad9" sha1="7e80787f2314c6dad333856b2a1683ddcffafdf4" offset="0x0000" />
+				<rom name="chariotsoffire.gtp" size="290" crc="33e9fad9" sha1="7e80787f2314c6dad333856b2a1683ddcffafdf4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -86,29 +86,29 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="411">
-				<rom name="comets.gtp" size="411" crc="8ccc82a6" sha1="e283c077c660182ffba71f1f5300f893eaf13915" offset="0x0000" />
+				<rom name="comets.gtp" size="411" crc="8ccc82a6" sha1="e283c077c660182ffba71f1f5300f893eaf13915" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="dijamant">
-		<description>DijamantskiRudnik</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Dijamantski Rudnik</description>
+		<year>1985</year>
+		<publisher>Nenad Balint</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="2754">
-				<rom name="dijamantskirudnik.gtp" size="2754" crc="d7c5a9ba" sha1="f1669e88644fe4fca1387b00f617aff80162028e" offset="0x0000" />
+				<rom name="dijamantskirudnik.gtp" size="2754" crc="d7c5a9ba" sha1="f1669e88644fe4fca1387b00f617aff80162028e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="dijamanta" cloneof="dijamant">
-		<description>DijamantskiRudnik_ALT</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Dijamantski Rudnik (Alt Format)</description>
+		<year>1985</year>
+		<publisher>Nenad Balint</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="8244">
-				<rom name="dr.gal" size="8244" crc="c73c2187" sha1="9e2fe7856657df1db846f54f008e7e8a823aa8ac" offset="0x0000" />
+				<rom name="dr.gal" size="8244" crc="c73c2187" sha1="9e2fe7856657df1db846f54f008e7e8a823aa8ac" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -119,171 +119,171 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="2913">
-				<rom name="egemond.gtp" size="2913" crc="7c85c513" sha1="ca001178ba823a3a7258147473723321f424c535" offset="0x0000" />
+				<rom name="egemond.gtp" size="2913" crc="7c85c513" sha1="ca001178ba823a3a7258147473723321f424c535" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="evolucia">
 		<description>Evolucija</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>Dejan Ristanovic</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="1063">
-				<rom name="evolucija.gtp" size="1063" crc="c3a8c0f1" sha1="b195af2a260db880166aae754054d1a89a34f73f" offset="0x0000" />
+				<rom name="evolucija.gtp" size="1063" crc="c3a8c0f1" sha1="b195af2a260db880166aae754054d1a89a34f73f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="f1">
-		<description>Formula1</description>
+		<description>Formula 1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="1194">
-				<rom name="formula1.gtp" size="1194" crc="3efb14c1" sha1="8a48a4bf98c59ae2ed373f6c2db30dfb1cbf14be" offset="0x0000" />
+				<rom name="formula1.gtp" size="1194" crc="3efb14c1" sha1="8a48a4bf98c59ae2ed373f6c2db30dfb1cbf14be" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="four">
 		<description>Four</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>Dragan Yujkov</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="2631">
-				<rom name="four.gtp" size="2631" crc="9ee92e36" sha1="9c7b83ba138e77bc258d3e495146e8971779b4d2" offset="0x0000" />
+				<rom name="four.gtp" size="2631" crc="9ee92e36" sha1="9c7b83ba138e77bc258d3e495146e8971779b4d2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="galakrat">
-		<description>GalaktickiRat</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Galakticki Rat</description>
+		<year>1985</year>
+		<publisher>Antonic Voja</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="2238">
-				<rom name="galaktickirat.gtp" size="2238" crc="e7a5260e" sha1="510c411b524b80b621655f4038581811818dc7d2" offset="0x0000" />
+				<rom name="galaktickirat.gtp" size="2238" crc="e7a5260e" sha1="510c411b524b80b621655f4038581811818dc7d2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="hhorace">
-		<description>HungryHorace</description>
+		<description>Hungry Horace</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="797">
-				<rom name="hungryhorace.gtp" size="797" crc="f3c15d57" sha1="e1217926da7560e9a6a6582df3bbe22ca59e2ed1" offset="0x0000" />
+				<rom name="hungryhorace.gtp" size="797" crc="f3c15d57" sha1="e1217926da7560e9a6a6582df3bbe22ca59e2ed1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="igradisk">
-		<description>IgraDiskova</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Igra Diskova</description>
+		<year>1985</year>
+		<publisher>Yojislav Mihailovic</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="1768">
-				<rom name="igradiskova.gtp" size="1768" crc="7e37f44d" sha1="c60e55ff82287c7f0d610c1f403de7f75f206054" offset="0x0000" />
+				<rom name="igradiskova.gtp" size="1768" crc="7e37f44d" sha1="c60e55ff82287c7f0d610c1f403de7f75f206054" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="spiridon">
-		<description>InspektorSpiridon</description>
+		<description>Inspektor Spiridon</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="4112">
-				<rom name="inspektorspiridon.gtp" size="4112" crc="15a1ef41" sha1="0f173c16aec2abde535fdb88438a8408c1c114ec" offset="0x0000" />
+				<rom name="inspektorspiridon.gtp" size="4112" crc="15a1ef41" sha1="0f173c16aec2abde535fdb88438a8408c1c114ec" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="galaxy_cass">
 			<dataarea name="cass" size="2255">
-				<rom name="inspektorspiridonupustvo.gtp" size="2255" crc="01056c67" sha1="d658f2a5b749f20bdb0bd31b33e2a7a95cf3d378" offset="0x0000" />
+				<rom name="inspektorspiridonupustvo.gtp" size="2255" crc="01056c67" sha1="d658f2a5b749f20bdb0bd31b33e2a7a95cf3d378" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="galaxy_cass">
 			<dataarea name="cass" size="549">
-				<rom name="inspektorspiridonvaranje.gtp" size="549" crc="3c780376" sha1="5bd7015082a350dda324ca8d497e5cbd0d73a289" offset="0x0000" />
+				<rom name="inspektorspiridonvaranje.gtp" size="549" crc="3c780376" sha1="5bd7015082a350dda324ca8d497e5cbd0d73a289" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="jumpjack">
-		<description>JumpingJack</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Jumping Jack</description>
+		<year>1985</year>
+		<publisher>Antonic Voja</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="1891">
-				<rom name="jumpingjack.gtp" size="1891" crc="4b158c1d" sha1="fb6019ac9fbefd87ffcba592178b6568607680b0" offset="0x0000" />
+				<rom name="jumpingjack.gtp" size="1891" crc="4b158c1d" sha1="fb6019ac9fbefd87ffcba592178b6568607680b0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="lightcyc">
-		<description>LightCycles</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Light Cycles</description>
+		<year>1985</year>
+		<publisher>Bojan Stanojevic</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="1245">
-				<rom name="lightcycles.gtp" size="1245" crc="838cf2e2" sha1="6da589007fbf3688f63da88ced241907e8bee774" offset="0x0000" />
+				<rom name="lightcycles.gtp" size="1245" crc="838cf2e2" sha1="6da589007fbf3688f63da88ced241907e8bee774" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="lightcy2">
-		<description>LightCycles2</description>
+		<description>Light Cycles (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="1550">
-				<rom name="lightcycles2.gtp" size="1550" crc="f271a8a9" sha1="00dc59dfa6dd6a33edbbedc18f6300e445f170a0" offset="0x0000" />
+				<rom name="lightcycles2.gtp" size="1550" crc="f271a8a9" sha1="00dc59dfa6dd6a33edbbedc18f6300e445f170a0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="lightshw">
-		<description>LightShow</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Light Show</description>
+		<year>1987</year>
+		<publisher>Dragan Vujkov</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="3001">
-				<rom name="lightshow.gtp" size="3001" crc="27ae9809" sha1="d8a95e689dd8c84b71cf375c5f57010e8a9ae4b4" offset="0x0000" />
+				<rom name="lightshow.gtp" size="3001" crc="27ae9809" sha1="d8a95e689dd8c84b71cf375c5f57010e8a9ae4b4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="mminer">
-		<description>ManicMiner</description>
+		<description>Manic Miner</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="4378">
-				<rom name="manicminer.gtp" size="4378" crc="2ab18f85" sha1="ad12006ccc3bc5c8e27c60eaeac83164ab1b86eb" offset="0x0000" />
+				<rom name="manicminer.gtp" size="4378" crc="2ab18f85" sha1="ad12006ccc3bc5c8e27c60eaeac83164ab1b86eb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="mastrmnd">
 		<description>Mastermajnd</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>Dejan Ristanovic</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="2077">
-				<rom name="mastermajnd.gtp" size="2077" crc="6daf8f56" sha1="fe6f3f6fbbc75cded96d3217c7f4475f81bb3065" offset="0x0000" />
+				<rom name="mastermajnd.gtp" size="2077" crc="6daf8f56" sha1="fe6f3f6fbbc75cded96d3217c7f4475f81bb3065" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="mastrmn2">
-		<description>Mastermind2</description>
+		<description>Mastermind</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="1035">
-				<rom name="mastermind2.gtp" size="1035" crc="f27a7818" sha1="b8b93ce87792bd48e59e11e583838e2a8eea937d" offset="0x0000" />
+				<rom name="mastermind2.gtp" size="1035" crc="f27a7818" sha1="b8b93ce87792bd48e59e11e583838e2a8eea937d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -294,7 +294,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="2530">
-				<rom name="maze.gtp" size="2530" crc="9a2eb6e9" sha1="89fc487ef0f8e505525e98396ecc5a16a70379d5" offset="0x0000" />
+				<rom name="maze.gtp" size="2530" crc="9a2eb6e9" sha1="89fc487ef0f8e505525e98396ecc5a16a70379d5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -305,7 +305,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="2357">
-				<rom name="memorija.gtp" size="2357" crc="c5db1192" sha1="8d1c475f1b18f5b9e05583bfdafda1c2e45378c3" offset="0x0000" />
+				<rom name="memorija.gtp" size="2357" crc="c5db1192" sha1="8d1c475f1b18f5b9e05583bfdafda1c2e45378c3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -313,21 +313,21 @@
 	<software name="monitor">
 		<description>Monitor</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Antonic Voja</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="2073">
-				<rom name="monitor.gtp" size="2073" crc="f22eceb3" sha1="c9830a9d419681b9f345b44b091c0d82d4239a08" offset="0x0000" />
+				<rom name="monitor.gtp" size="2073" crc="f22eceb3" sha1="c9830a9d419681b9f345b44b091c0d82d4239a08" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="nightpil">
-		<description>NightPilot</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Night Pilot</description>
+		<year>1985</year>
+		<publisher>Dragutin Vukotic</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="4854">
-				<rom name="nightpilot.gtp" size="4854" crc="97f02860" sha1="44c4cec4abb012e81dfdc4255f4c42b82e9ff167" offset="0x0000" />
+				<rom name="nightpilot.gtp" size="4854" crc="97f02860" sha1="44c4cec4abb012e81dfdc4255f4c42b82e9ff167" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -335,65 +335,65 @@
 	<software name="oscil">
 		<description>Oscilacije</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Dragan Vujkov</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="504">
-				<rom name="oscilacije.gtp" size="504" crc="83392fb3" sha1="bce729ee54a326ee7db9c9dd7dd33145b0cc64db" offset="0x0000" />
+				<rom name="oscilacije.gtp" size="504" crc="83392fb3" sha1="bce729ee54a326ee7db9c9dd7dd33145b0cc64db" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="pacmanp">
-		<description>PacManPlus</description>
+		<description>Pac Man (Plus)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Josip Perusanec</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="12572">
-				<rom name="pacmanplus.gtp" size="12572" crc="cbb8af07" sha1="e3f048454c4a9d62835f80256fdfebbfaef5561b" offset="0x0000" />
+				<rom name="pacmanplus.gtp" size="12572" crc="cbb8af07" sha1="e3f048454c4a9d62835f80256fdfebbfaef5561b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="pamtilic">
 		<description>Pamtilice</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1985</year>
+		<publisher>Peca Milosavljevic</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="3076">
-				<rom name="pamtilice.gtp" size="3076" crc="1ae4d73f" sha1="60332bc1ac30abe9f737a8524fcb581003fd7077" offset="0x0000" />
+				<rom name="pamtilice.gtp" size="3076" crc="1ae4d73f" sha1="60332bc1ac30abe9f737a8524fcb581003fd7077" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="poker">
 		<description>Poker</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1985</year>
+		<publisher>Nenad Balint</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="4424">
-				<rom name="poker.gtp" size="4424" crc="ff4d5af3" sha1="59258c130121ac718ca8f256f293ef2e4e9742df" offset="0x0000" />
+				<rom name="poker.gtp" size="4424" crc="ff4d5af3" sha1="59258c130121ac718ca8f256f293ef2e4e9742df" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="pozivniz">
-		<description>PozivniZnak</description>
+		<description>Pozivni Znak</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Dragan Vujkov</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="414">
-				<rom name="pozivniznak.gtp" size="414" crc="2d7273a3" sha1="694c770409781f96b422a5b55f9222700fa08531" offset="0x0000" />
+				<rom name="pozivniznak.gtp" size="414" crc="2d7273a3" sha1="694c770409781f96b422a5b55f9222700fa08531" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="raindrop">
-		<description>RainDrops</description>
+		<description>Rain Drops</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="573">
-				<rom name="raindrops.gtp" size="573" crc="02642e02" sha1="d9880a1cb0180c8203cc71fab09687a808244d9a" offset="0x0000" />
+				<rom name="raindrops.gtp" size="573" crc="02642e02" sha1="d9880a1cb0180c8203cc71fab09687a808244d9a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -404,7 +404,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="1892">
-				<rom name="scater.gtp" size="1892" crc="bd4be810" sha1="59d027a4111b15fd30b9290e87a2edb438e1614f" offset="0x0000" />
+				<rom name="scater.gtp" size="1892" crc="bd4be810" sha1="59d027a4111b15fd30b9290e87a2edb438e1614f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -412,186 +412,186 @@
 	<software name="sintesaj">
 		<description>Sintesajzer</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Dragan Vujkov</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="901">
-				<rom name="sintesajzer.gtp" size="901" crc="f747478d" sha1="51b9f20f154f5631fbee88c6df906c95f8929de6" offset="0x0000" />
+				<rom name="sintesajzer.gtp" size="901" crc="f747478d" sha1="51b9f20f154f5631fbee88c6df906c95f8929de6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="slalom2">
-		<description>Slalom2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Slalom II</description>
+		<year>1985</year>
+		<publisher>Zeljko Gerovac</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="1328">
-				<rom name="slalom2.gtp" size="1328" crc="722f26ed" sha1="d9b87941fd19606d53b72cb319c4d3dc7e6880d6" offset="0x0000" />
+				<rom name="slalom2.gtp" size="1328" crc="722f26ed" sha1="d9b87941fd19606d53b72cb319c4d3dc7e6880d6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="snake">
-		<description>Snake</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Snake (Nenad Balint)</description>
+		<year>1984</year>
+		<publisher>Nenad Balint</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="3173">
-				<rom name="snake.gtp" size="3173" crc="ae7e097b" sha1="8b90a3ba49711ea7bd6fc7058a71c0699fc49cb1" offset="0x0000" />
+				<rom name="snake.gtp" size="3173" crc="ae7e097b" sha1="8b90a3ba49711ea7bd6fc7058a71c0699fc49cb1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="snake2">
-		<description>Snake2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="snakedv">
+		<description>Snake (Dragan Vujkov)</description>
+		<year>1987</year>
+		<publisher>Dragan Vujkov</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="1686">
-				<rom name="snake2.gtp" size="1686" crc="18127599" sha1="c37d5cf13704b374b3c76d4ac7b80787dfb88dc8" offset="0x0000" />
+				<rom name="snake2.gtp" size="1686" crc="18127599" sha1="c37d5cf13704b374b3c76d4ac7b80787dfb88dc8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="squash">
 		<description>Squash</description>
-		<year>19??</year>
+		<year>1986</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="1504">
-				<rom name="squash.gtp" size="1504" crc="ad4657df" sha1="b5a781c1a97086a3ae2da08f1ed975253a4a035b" offset="0x0000" />
+				<rom name="squash.gtp" size="1504" crc="ad4657df" sha1="b5a781c1a97086a3ae2da08f1ed975253a4a035b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="squasha" cloneof="squash">
-		<description>Squash_ALT</description>
+		<description>Squash (Alt Format)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="8244">
-				<rom name="squash.gal" size="8244" crc="a54b6d45" sha1="140530381ea8964bd32cecd13659f7131fcdb709" offset="0x0000" />
+				<rom name="squash.gal" size="8244" crc="a54b6d45" sha1="140530381ea8964bd32cecd13659f7131fcdb709" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="scruiser">
-		<description>SuperCruiser</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Super Cruiser</description>
+		<year>1985</year>
+		<publisher>Jasmin Halilovic</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="2569">
-				<rom name="supercruiser.gtp" size="2569" crc="b9faec35" sha1="a68d01975952c117e9620cfcdeb9ca7350964c54" offset="0x0000" />
+				<rom name="supercruiser.gtp" size="2569" crc="b9faec35" sha1="a68d01975952c117e9620cfcdeb9ca7350964c54" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="scruisera" cloneof="scruiser">
-		<description>SuperCruiser_ALT</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Super Cruiser (Alt Format)</description>
+		<year>1985</year>
+		<publisher>Jasmin Halilovic</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="8244">
-				<rom name="sc.gal" size="8244" crc="8ae78ffb" sha1="7e4217afd4d725dd14af55bf7d0796dd51cc868d" offset="0x0000" />
+				<rom name="sc.gal" size="8244" crc="8ae78ffb" sha1="7e4217afd4d725dd14af55bf7d0796dd51cc868d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="supersah">
-		<description>SuperSah</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Super-Sah</description>
+		<year>1984</year>
+		<publisher>Page Software</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="5773">
-				<rom name="supersah.gtp" size="5773" crc="9d24e956" sha1="8bb4898a2e5a538ab6f896b0f0d9f796d9e366d5" offset="0x0000" />
+				<rom name="supersah.gtp" size="5773" crc="9d24e956" sha1="8bb4898a2e5a538ab6f896b0f0d9f796d9e366d5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="strgovac">
-		<description>SvemirskiTrgovac</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Svemirski Trgovac</description>
+		<year>198?</year>
+		<publisher>Ilija Vitanov</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="2982">
-				<rom name="svemirskitrgovac.gtp" size="2982" crc="a01a1594" sha1="7cca6dc667a29de5f53b105287dc889869aad383" offset="0x0000" />
+				<rom name="svemirskitrgovac.gtp" size="2982" crc="a01a1594" sha1="7cca6dc667a29de5f53b105287dc889869aad383" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="svetleci">
-		<description>SvetleciBicikliPlus</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Svetleci Bicikli (Plus)</description>
+		<year>1986</year>
+		<publisher>Nenad Balint</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="2583">
-				<rom name="svetlecibicikliplus.gtp" size="2583" crc="2d4000fe" sha1="de2b47c73c3a324a223147e41c327a52c372875e" offset="0x0000" />
+				<rom name="svetlecibicikliplus.gtp" size="2583" crc="2d4000fe" sha1="de2b47c73c3a324a223147e41c327a52c372875e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="tenis">
 		<description>Tenis</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1985</year>
+		<publisher>Nenad Balint</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="2389">
-				<rom name="tenis.gtp" size="2389" crc="6f158ac7" sha1="3dd52ce8f6dbc1d5114c4a63ed5c40666e79c40f" offset="0x0000" />
+				<rom name="tenis.gtp" size="2389" crc="6f158ac7" sha1="3dd52ce8f6dbc1d5114c4a63ed5c40666e79c40f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="tenis3">
-		<description>Tenis3</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Tenis 3</description>
+		<year>1986</year>
+		<publisher>Dragan Yujkov</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="1874">
-				<rom name="tenis3.gtp" size="1874" crc="bc263558" sha1="2bdfcc96e8e4844cc9edae7670710f72d7bf3e1f" offset="0x0000" />
+				<rom name="tenis3.gtp" size="1874" crc="bc263558" sha1="2bdfcc96e8e4844cc9edae7670710f72d7bf3e1f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="tetris">
 		<description>Tetris</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1988</year>
+		<publisher>Dragoljub Obradovic</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="2709">
-				<rom name="tetrisplus.gtp" size="2709" crc="5a6a819b" sha1="7a60930d6269b3ac9898ce0dc2bada8e5626f270" offset="0x0000" />
+				<rom name="tetrisplus.gtp" size="2709" crc="5a6a819b" sha1="7a60930d6269b3ac9898ce0dc2bada8e5626f270" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="tetrisp">
-		<description>TetrisPlus</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Tetris (Plus)</description>
+		<year>1988</year>
+		<publisher>Dragoljub Obradovic</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="2706">
-				<rom name="tetrisplusq.gtp" size="2706" crc="64015b12" sha1="1d062b4abd1bfdc977568378a61f2bbdf65e2602" offset="0x0000" />
+				<rom name="tetrisplusq.gtp" size="2706" crc="64015b12" sha1="1d062b4abd1bfdc977568378a61f2bbdf65e2602" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="tetrisa" cloneof="tetris">
-		<description>Tetris_ALT</description>
+		<description>Tetris (Alt Format)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="8244">
-				<rom name="tetris.gal" size="8244" crc="12bc9373" sha1="008d85b379861416c38e3300477a3772959344a1" offset="0x0000" />
+				<rom name="tetris.gal" size="8244" crc="12bc9373" sha1="008d85b379861416c38e3300477a3772959344a1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="wall">
 		<description>Wall</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>Dragan Vujkov</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="1328">
-				<rom name="wall.gtp" size="1328" crc="602db525" sha1="fe31a2455376427436e2638e3452633a2a0f2c9a" offset="0x0000" />
+				<rom name="wall.gtp" size="1328" crc="602db525" sha1="fe31a2455376427436e2638e3452633a2a0f2c9a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -602,51 +602,51 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="2863">
-				<rom name="wonderer.gtp" size="2863" crc="0e7310b7" sha1="e7dd10af2970ada6ca4d7c3eaaa0b3c3b9b929e9" offset="0x0000" />
+				<rom name="wonderer.gtp" size="2863" crc="0e7310b7" sha1="e7dd10af2970ada6ca4d7c3eaaa0b3c3b9b929e9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="wonder2">
-		<description>Wonderer2</description>
+		<description>Wonderer 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="1866">
-				<rom name="wonderer2.gtp" size="1866" crc="cd4ae466" sha1="1e5f8e9be2be400ceed8d547d41f3cfe3d9eb072" offset="0x0000" />
+				<rom name="wonderer2.gtp" size="1866" crc="cd4ae466" sha1="1e5f8e9be2be400ceed8d547d41f3cfe3d9eb072" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="zamak">
 		<description>Zamak</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>Antonic Voja</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="3015">
-				<rom name="zamak.gtp" size="3015" crc="7d0cc0c9" sha1="e10d2cf3be1a79febc062ade3f8d5c3713bd43ca" offset="0x0000" />
+				<rom name="zamak.gtp" size="3015" crc="7d0cc0c9" sha1="e10d2cf3be1a79febc062ade3f8d5c3713bd43ca" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="zid">
 		<description>Zid</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>GAC Software</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="2142">
-				<rom name="zid.gtp" size="2142" crc="2302a824" sha1="19b34c1ad8ce33e638e297d68221fffc6c8e9e56" offset="0x0000" />
+				<rom name="zid.gtp" size="2142" crc="2302a824" sha1="19b34c1ad8ce33e638e297d68221fffc6c8e9e56" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="ziul">
 		<description>Ziul</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>Dejan Ristanovic</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="6673">
-				<rom name="ziul.gtp" size="6673" crc="f8322dad" sha1="d2988be278dc7328257841789042976799cf39ef" offset="0x0000" />
+				<rom name="ziul.gtp" size="6673" crc="f8322dad" sha1="d2988be278dc7328257841789042976799cf39ef" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -657,20 +657,75 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="1584">
-				<rom name="zvezdice.gtp" size="1584" crc="d45e9a5b" sha1="63cf1089407873e2eb4a43703985e41f6b0623f7" offset="0x0000" />
+				<rom name="zvezdice.gtp" size="1584" crc="d45e9a5b" sha1="63cf1089407873e2eb4a43703985e41f6b0623f7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="zvjezdan">
-		<description>ZvjezdaneStaze</description>
-		<year>19??</year>
+		<description>Zvjezdane Staze</description>
+		<year>1985</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="4950">
-				<rom name="zvjezdanestaze.gtp" size="4950" crc="40fcf0b0" sha1="c44d72cead914b31d5f7f26eebb2f3dc9acea498" offset="0x0000" />
+				<rom name="zvjezdanestaze.gtp" size="4950" crc="40fcf0b0" sha1="c44d72cead914b31d5f7f26eebb2f3dc9acea498" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="fire">
+		<description>Fire</description>
+		<year>2007</year>
+		<publisher>Tomaz Solc</publisher>
+		<part name="cass1" interface="galaxy_cass">
+			<dataarea name="cass" size="772">
+				<rom name="fire (2007-06-27)(solc, tomaz).gtp" size="772" crc="4c5758a9" sha1="4d9072f6fa5180e70d7ad4b05555678daf61d4ea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hardware">
+		<description>Hardware</description>
+		<year>2007</year>
+		<publisher>Tomaz Solc</publisher>
+		<part name="cass1" interface="galaxy_cass">
+			<dataarea name="cass" size="670">
+				<rom name="hardware (2007-09-22)(solc, tomaz).gtp" size="670" crc="daf12925" sha1="46c9e4a8039a6e4a8e9a2c7715c05fb65da05f5a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="highres">
+		<description>Highres</description>
+		<year>2009</year>
+		<publisher>Tomaz Solc</publisher>
+		<part name="cass1" interface="galaxy_cass">
+			<dataarea name="cass" size="2838">
+				<rom name="highres (2009-01-22)(solc, tomaz).gtp" size="2838" crc="663aaef2" sha1="bf60334e341682683bb658a5a5fa9dc00011dfbf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="particle">
+		<description>Particle</description>
+		<year>2007</year>
+		<publisher>Tomaz Solc</publisher>
+		<part name="cass1" interface="galaxy_cass">
+			<dataarea name="cass" size="631">
+				<rom name="particle (2007-07-12)(solc, tomaz).gtp" size="631" crc="7f9a2b90" sha1="025169e080857de663f41d3a809325c544fb9de7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stars">
+		<description>Stars</description>
+		<year>2007</year>
+		<publisher>Tomaz Solc</publisher>
+		<part name="cass1" interface="galaxy_cass">
+			<dataarea name="cass" size="573">
+				<rom name="stars (2007-07-12)(solc, tomaz).gtp" size="573" crc="6329e68d" sha1="3c6657ae167ce5ff1076458530da75dc3228e739" offset="0" />
+ 			</dataarea>
+ 		</part>
+ 	</software>
 
 </softwarelist>

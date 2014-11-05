@@ -4,7 +4,7 @@
 
 
 	<software name="basic80">
-		<description>BASIC80</description>
+		<description>Mikro/80 BASIC</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="ut88_cass">
@@ -15,7 +15,7 @@
 	</software>
 
 	<software name="chscom">
-		<description>CH$COM</description>
+		<description>Changer (v1.1) (CP/M)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="ut88_cass">
@@ -26,7 +26,7 @@
 	</software>
 
 	<software name="cpm35">
-		<description>CPM35</description>
+		<description>CP/M (v2.2, 35K)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="ut88_cass">
@@ -36,8 +36,8 @@
 		</part>
 	</software>
 
-	<software name="cpm64">
-		<description>CPM64</description>
+	<software name="cpm256">
+		<description>CP/M (v2.2, 256K)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="ut88_cass">
@@ -48,7 +48,7 @@
 	</software>
 
 	<software name="tetris">
-		<description>TETRIS</description>
+		<description>Tetris</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="ut88_cass">

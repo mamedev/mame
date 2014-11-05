@@ -6,109 +6,109 @@
 	<software name="adresar">
 		<description>Adresar</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Ei Racunari</publisher>
 		<part name="cass1" interface="pecom_cass">
 			<dataarea name="cass" size="6382680">
-				<rom name="adresar.wav" size="6382680" crc="e0032321" sha1="f6c9d19941175561c942c803aedc87d5c2dd1903" offset="0x0000" />
+				<rom name="adresar.wav" size="6382680" crc="e0032321" sha1="f6c9d19941175561c942c803aedc87d5c2dd1903" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="bioritam">
 		<description>Bioritam</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1985</year>
+		<publisher>Ei Racunari</publisher>
 		<part name="cass1" interface="pecom_cass">
 			<dataarea name="cass" size="5094680">
-				<rom name="bioritam.wav" size="5094680" crc="9fead1c7" sha1="7ed80372fdd57cc68997acc3a7eb1e1628236dfe" offset="0x0000" />
+				<rom name="bioritam.wav" size="5094680" crc="9fead1c7" sha1="7ed80372fdd57cc68997acc3a7eb1e1628236dfe" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="lavirint">
 		<description>Lavirint</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1987</year>
+		<publisher>Ei Racunari</publisher>
 		<part name="cass1" interface="pecom_cass">
 			<dataarea name="cass" size="13222360">
-				<rom name="lavirint.wav" size="13222360" crc="9f0aa1b4" sha1="854e9bbe45e42e09c7e57b561b311a98ff078661" offset="0x0000" />
+				<rom name="lavirint.wav" size="13222360" crc="9f0aa1b4" sha1="854e9bbe45e42e09c7e57b561b311a98ff078661" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="lopovbnk">
-		<description>LopovIBankar</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Lopov i Bankar</description>
+		<year>1985</year>
+		<publisher>Ei Racunari</publisher>
 		<part name="cass1" interface="pecom_cass">
 			<dataarea name="cass" size="7996248">
-				<rom name="lopov i bankar.wav" size="7996248" crc="e02b73bc" sha1="6b817af8638a94aa7f7c395467237adf3e226d12" offset="0x0000" />
+				<rom name="lopov i bankar.wav" size="7996248" crc="e02b73bc" sha1="6b817af8638a94aa7f7c395467237adf3e226d12" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="osvajaci">
-		<description>OsvajaciSvemira</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Osvajaci Svemira</description>
+		<year>1985</year>
+		<publisher>Ei Racunari</publisher>
 		<part name="cass1" interface="pecom_cass">
 			<dataarea name="cass" size="19538520">
-				<rom name="osvajaci svemira.wav" size="19538520" crc="a9000525" sha1="6758cac948d3fd1400e4f90dd9c1d281dfd42d0e" offset="0x0000" />
+				<rom name="osvajaci svemira.wav" size="19538520" crc="a9000525" sha1="6758cac948d3fd1400e4f90dd9c1d281dfd42d0e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="pecomrat">
-		<description>PecomRatuje</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Pecom Ratuje</description>
+		<year>1985</year>
+		<publisher>Ei Racunari</publisher>
 		<part name="cass1" interface="pecom_cass">
 			<dataarea name="cass" size="7595800">
-				<rom name="pecom ratuje.wav" size="7595800" crc="9837c657" sha1="d481df682df097de3e9b87f28d0be47939e87098" offset="0x0000" />
+				<rom name="pecom ratuje.wav" size="7595800" crc="9837c657" sha1="d481df682df097de3e9b87f28d0be47939e87098" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="kompozit">
-		<description>SamSvojKompozitor</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Sam Svoj Kompozitor</description>
+		<year>1987</year>
+		<publisher>Ei Racunari</publisher>
 		<part name="cass1" interface="pecom_cass">
 			<dataarea name="cass" size="3567832">
-				<rom name="sam svoj kompozitor.wav" size="3567832" crc="16a53a50" sha1="6ae2a28f0dfb8c6909240b28051c70149257847b" offset="0x0000" />
+				<rom name="sam svoj kompozitor.wav" size="3567832" crc="16a53a50" sha1="6ae2a28f0dfb8c6909240b28051c70149257847b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="sljive">
 		<description>Sljive</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>Ei Racunari</publisher>
 		<part name="cass1" interface="pecom_cass">
 			<dataarea name="cass" size="7898072">
-				<rom name="shljive.wav" size="7898072" crc="1c5d5a07" sha1="d63a217571ee0e5216708380844f028875533c4b" offset="0x0000" />
+				<rom name="shljive.wav" size="7898072" crc="1c5d5a07" sha1="d63a217571ee0e5216708380844f028875533c4b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="suviajnc">
-		<description>SuviAjnc</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Suvi Ajnc</description>
+		<year>1986</year>
+		<publisher>Ei Racunari</publisher>
 		<part name="cass1" interface="pecom_cass">
 			<dataarea name="cass" size="11266136">
-				<rom name="suvi ajnc.wav" size="11266136" crc="c922dc59" sha1="8679f34599d6929ce969d3ff16c007358924bd80" offset="0x0000" />
+				<rom name="suvi ajnc.wav" size="11266136" crc="c922dc59" sha1="8679f34599d6929ce969d3ff16c007358924bd80" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="trkakonj">
-		<description>TrkaKonja</description>
+		<description>Trka Konja</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="pecom_cass">
 			<dataarea name="cass" size="6658904">
-				<rom name="trka konja.wav" size="6658904" crc="f388087b" sha1="5dfc064b154a06409e2f57832318097756384ba3" offset="0x0000" />
+				<rom name="trka konja.wav" size="6658904" crc="f388087b" sha1="5dfc064b154a06409e2f57832318097756384ba3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
