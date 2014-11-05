@@ -490,6 +490,19 @@ UINT32 twin16_state::screen_update_twin16(screen_device &screen, bitmap_ind16 &b
       0     1    VRAM1
       1     0    Object
       1     1    Fix
+
+    Final Round uses a PROM (not dumped) instead of the PAL
+    and some discrete logic to combine some of the inputs.
+    Inputs to the PROM are:
+
+    A0 = V1C0 | V1C1 | V1C2 | V1C3
+    A1 = V2C0 | V2C1 | V2C2 | V2C3
+    A2 = OCO0 | OCO1 | OCO2 | OCO3
+    A3 = FIX0 | FIX1 | FIX2 | FIX3
+    A4 = ~(OCD0 & OCD1 & OCD2 & OCD3)
+    A5 = V2C6
+    A6 = PRI0
+    A7 = PRI1
 */
 	screen.priority().fill(0, cliprect);
 
