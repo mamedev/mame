@@ -76,7 +76,7 @@ WRITE8_MEMBER(mc1502_state::mc1502_ppi_portb_w)
 //  DBG_LOG(2,"mc1502_ppi_portb_w",("( %02X )\n", data));
 	m_ppi_portb = data;
 	m_pit8253->write_gate2(BIT(data, 0));
-//  mc1502_speaker_set_spkrdata(BIT(data, 1));
+	mc1502_speaker_set_spkrdata(BIT(data, 1));
 	m_centronics->write_strobe(BIT(data, 2));
 	m_centronics->write_autofd(BIT(data, 3));
 	m_centronics->write_init(BIT(data, 4));
@@ -163,8 +163,14 @@ WRITE_LINE_MEMBER(mc1502_state::mc1502_pit8253_out1_changed)
 WRITE_LINE_MEMBER(mc1502_state::mc1502_pit8253_out2_changed)
 {
 	m_pit_out2 = state;
-//  mc1502_speaker_set_input( state );
+	m_speaker->level_w(m_spkrdata & m_pit_out2);
 	m_cassette->output(state ? 1 : -1);
+}
+
+WRITE_LINE_MEMBER(mc1502_state::mc1502_speaker_set_spkrdata)
+{
+	m_spkrdata = state ? 1 : 0;
+	m_speaker->level_w(m_spkrdata & m_pit_out2);
 }
 
 DRIVER_INIT_MEMBER( mc1502_state, mc1502 )
@@ -197,6 +203,12 @@ MACHINE_START_MEMBER( mc1502_state, mc1502 )
 MACHINE_RESET_MEMBER( mc1502_state, mc1502 )
 {
 	DBG_LOG(0,"init",("machine_reset()\n"));
+
+	m_spkrdata = 0;
+	m_pit_out2 = 1;
+	m_ppi_portb = 0;
+	m_ppi_portc = 0;
+	m_speaker->level_w(0);
 }
 
 /*
