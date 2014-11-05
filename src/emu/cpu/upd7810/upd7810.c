@@ -1349,9 +1349,9 @@ void upd7810_device::handle_timers(int cycles)
 				}
 			}
 			/* Conditions When ECNT Causes a CO1 Output Change */
-			if (((0x00 == (ETMM & 0xc0)) && (ETM0 == ECNT)) || /* set CO1 if ECNT == ETM0 */
+			if (((0x00 == (ETMM & 0xc0)) && (ETM1 == ECNT)) || /* set CO1 if ECNT == ETM1 */
 			 /* ((0x40 == (ETMM & 0xc0)) prohibited */
-			    ((0x80 == (ETMM & 0xc0)) && (ETM0 == ECNT)) || /* set CO1 if ECNT == ETM0 or at falling CI input */
+			    ((0x80 == (ETMM & 0xc0)) && (ETM1 == ECNT)) || /* set CO1 if ECNT == ETM1 or at falling CI input */
 			    ((0xc0 == (ETMM & 0xc0)) && (ETM0 == ECNT || ETM1 == ECNT))) /* latch CO1 if ECNT == ETM0 or ECNT == ETM1 */
 			{
 				switch (EOM & 0xe0)
