@@ -1566,13 +1566,13 @@ void upd7220_device::update_text(bitmap_rgb32 &bitmap, const rectangle &cliprect
 //  draw_graphics_line -
 //-------------------------------------------------
 
-void upd7220_device::draw_graphics_line(bitmap_rgb32 &bitmap, UINT32 addr, int y, int wd)
+void upd7220_device::draw_graphics_line(bitmap_rgb32 &bitmap, UINT32 addr, int y, int wd, int pitch)
 {
-	int sx;
+	int sx, al = bitmap.cliprect().height();
 
-	for (sx = 0; sx < 80; sx++)
+	for (sx = 0; sx < pitch; sx++)
 	{
-		if((sx << 3) < m_aw * 16 && y < (m_al + m_vbp))
+		if((sx << 3) < m_aw * 16 && y < al)
 			m_display_cb(bitmap, y, sx << 3, addr);
 
 		addr+= wd + 1;
@@ -1591,6 +1591,7 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 	int im, wd, area;
 	int y = 0, tsy = 0, bsy = 0;
 	bool mixed = ((m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_MIXED);
+	UINT8 interlace = ((m_mode & UPD7220_MODE_INTERLACE_MASK) == UPD7220_MODE_INTERLACE_ON) ? 0 : 1;
 
 	for (area = 0; area < 4; area++)
 	{
@@ -1602,8 +1603,10 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 
 			if(area >= 3) // TODO: most likely to be correct, Quarth (PC-98xx) definitely draws with area 2. We might see an area 3 someday ...
 				break;
-			if(((m_mode & UPD7220_MODE_INTERLACE_MASK) == UPD7220_MODE_INTERLACE_ON))
+
+			if(!interlace)
 				len <<= 1;
+
 			for (y = 0; y < len; y++)
 			{
 				/* TODO: again correct?
@@ -1613,7 +1616,7 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 				addr = ((sad << 1) & 0x3ffff) + (y * (m_pitch << (im ? 0 : 1)));
 
 				if (!m_display_cb.isnull())
-					draw_graphics_line(bitmap, addr, y + ((bsy + m_vbp) / (mixed ? 1 : m_lr)), wd);
+					draw_graphics_line(bitmap, addr, y + ((bsy + m_vbp) / (mixed ? 1 : m_lr)), wd, (m_pitch << interlace));
 			}
 		}
 		else

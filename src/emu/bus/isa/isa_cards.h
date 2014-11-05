@@ -25,6 +25,7 @@
 #include "svga_s3.h"
 #include "svga_tseng.h"
 #include "svga_trident.h"
+#include "num9rev.h"
 
 // storage
 #include "fdc.h"
