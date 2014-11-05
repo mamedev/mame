@@ -210,8 +210,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( rockrage )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   64, 32 )  /* colors 00..31, but using 2 lookup tables */
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 32,  1 )  /* colors 32..63 */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 32 )  /* colors 00..31, using 2 lookup tables */
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 512, 16 )  /* colors 32..47, using lookup table */
 GFXDECODE_END
 
 /***************************************************************************
@@ -227,7 +227,6 @@ void rockrage_state::machine_start()
 	m_rombank->configure_entries(0, 8, &ROM[0x10000], 0x2000);
 
 	save_item(NAME(m_vreg));
-	save_item(NAME(m_layer_colorbase));
 }
 
 void rockrage_state::machine_reset()
@@ -268,7 +267,7 @@ static MACHINE_CONFIG_START( rockrage, rockrage_state )
 	MCFG_K007420_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rockrage)
-	MCFG_PALETTE_ADD("palette", 64 + 2*16*16)
+	MCFG_PALETTE_ADD("palette", 16*16*3)
 	MCFG_PALETTE_INDIRECT_ENTRIES(64)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_LITTLE)
@@ -310,10 +309,10 @@ ROM_START( rockrage )
 	ROM_LOAD( "620l10.8g",  0x020000, 0x20000, CRC(06d108e0) SHA1(cae8c5f2fc4e84bc7adbf27f71a18a74968c4296) ) /* One "K" & one "L" code version??? */
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "620k09.11g", 0x00000, 0x00100, CRC(9f0e0608) SHA1(c95bdb370e4a91f27afbd5ff3b39b2e0ad87da73) )    /* layer 0 lookup table */
+	ROM_LOAD( "620k07.13g", 0x00000, 0x00100, CRC(b6135ee0) SHA1(248a978987cff86c2bbad10ef332f63a6abd5bee) )    /* layer 0 lookup table */
 	ROM_LOAD( "620k08.12g", 0x00100, 0x00100, CRC(b499800c) SHA1(46fa4e071ebceed12027de109be1e16dde5e846e) )    /* layer 1 lookup table */
-	ROM_LOAD( "620k07.13g", 0x00200, 0x00100, CRC(b6135ee0) SHA1(248a978987cff86c2bbad10ef332f63a6abd5bee) )    /* sprite lookup table, but its not used */
-															/* because it's always 0 1 2 ... f */
+	ROM_LOAD( "620k09.11g", 0x00200, 0x00100, CRC(9f0e0608) SHA1(c95bdb370e4a91f27afbd5ff3b39b2e0ad87da73) )    /* sprite lookup table */
+
 	ROM_REGION( 0x08000, "vlm", 0 ) /* VLM3050 data */
 	ROM_LOAD( "620k04.6e", 0x00000, 0x08000, CRC(8be969f3) SHA1(9856b4c13fac77b645aed67a08cb4965b4966492) )
 ROM_END
@@ -339,10 +338,10 @@ ROM_START( rockragea )
 	ROM_LOAD( "620g10b.8f", 0x030000, 0x10000, CRC(1618854a) SHA1(0afb34a9ed97f13c1910acd7767cb8546ea7e6cd) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "620k09.11g", 0x00000, 0x00100, CRC(9f0e0608) SHA1(c95bdb370e4a91f27afbd5ff3b39b2e0ad87da73) )    /* layer 0 lookup table */
+	ROM_LOAD( "620k07.13g", 0x00000, 0x00100, CRC(b6135ee0) SHA1(248a978987cff86c2bbad10ef332f63a6abd5bee) )    /* layer 0 lookup table */
 	ROM_LOAD( "620k08.12g", 0x00100, 0x00100, CRC(b499800c) SHA1(46fa4e071ebceed12027de109be1e16dde5e846e) )    /* layer 1 lookup table */
-	ROM_LOAD( "620k07.13g", 0x00200, 0x00100, CRC(b6135ee0) SHA1(248a978987cff86c2bbad10ef332f63a6abd5bee) )    /* sprite lookup table, but its not used */
-															/* because it's always 0 1 2 ... f */
+	ROM_LOAD( "620k09.11g", 0x00200, 0x00100, CRC(9f0e0608) SHA1(c95bdb370e4a91f27afbd5ff3b39b2e0ad87da73) )    /* sprite lookup table */
+
 	ROM_REGION( 0x08000, "vlm", 0 ) /* VLM3050 data */
 	ROM_LOAD( "620k04.6e", 0x00000, 0x08000, CRC(8be969f3) SHA1(9856b4c13fac77b645aed67a08cb4965b4966492) ) /* Same rom but labeled as ver "G" */
 ROM_END
@@ -364,10 +363,10 @@ ROM_START( rockragej )
 	ROM_LOAD( "620k10.8g",  0x020000, 0x20000, CRC(0d1a95ab) SHA1(be565424f17af31dcd07004c6be03bbb00aef514) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "620k09.11g", 0x00000, 0x00100, CRC(9f0e0608) SHA1(c95bdb370e4a91f27afbd5ff3b39b2e0ad87da73) )    /* layer 0 lookup table */
+	ROM_LOAD( "620k07.13g", 0x00000, 0x00100, CRC(b6135ee0) SHA1(248a978987cff86c2bbad10ef332f63a6abd5bee) )    /* layer 0 lookup table */
 	ROM_LOAD( "620k08.12g", 0x00100, 0x00100, CRC(b499800c) SHA1(46fa4e071ebceed12027de109be1e16dde5e846e) )    /* layer 1 lookup table */
-	ROM_LOAD( "620k07.13g", 0x00200, 0x00100, CRC(b6135ee0) SHA1(248a978987cff86c2bbad10ef332f63a6abd5bee) )    /* sprite lookup table, but its not used */
-															/* because it's always 0 1 2 ... f */
+	ROM_LOAD( "620k09.11g", 0x00200, 0x00100, CRC(9f0e0608) SHA1(c95bdb370e4a91f27afbd5ff3b39b2e0ad87da73) )    /* sprite lookup table */
+
 	ROM_REGION( 0x08000, "vlm", 0 ) /* VLM3050 data */
 	ROM_LOAD( "620k04.6e", 0x00000, 0x08000, CRC(8be969f3) SHA1(9856b4c13fac77b645aed67a08cb4965b4966492) )
 ROM_END

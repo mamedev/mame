@@ -4,22 +4,13 @@
 PALETTE_INIT_MEMBER(rockrage_state, rockrage)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	int i;
 
-	/* sprites */
-	for (i = 0x20; i < 0x40; i++)
-		palette.set_pen_indirect(i, i);
-
-	/* characters */
-	for (i = 0x40; i < 0x140; i++)
+	for (int i = 0; i < 256*3; i++)
 	{
-		UINT8 ctabentry;
-
-		ctabentry = (color_prom[(i - 0x40) + 0x000] & 0x0f) | 0x00;
-		palette.set_pen_indirect(i + 0x000, ctabentry);
-
-		ctabentry = (color_prom[(i - 0x40) + 0x100] & 0x0f) | 0x10;
-		palette.set_pen_indirect(i + 0x100, ctabentry);
+		// layer0 uses colors 0x00-0x0f; layer1 uses 0x10-0x1f; sprites use 0x20-0x2f
+		UINT8 colorbase = (i / 256) * 16;
+		UINT8 ctabentry = (color_prom[i] & 0x0f) | colorbase;
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
@@ -50,7 +41,7 @@ K007420_CALLBACK_MEMBER(rockrage_state::rockrage_sprite_callback)
 {
 	*code |= ((*color & 0x40) << 2) | ((*color & 0x80) << 1) * ((m_vreg & 0x03) << 1);
 	*code = (*code << 2) | ((*color & 0x30) >> 4);
-	*color = 0;
+	*color = 0 + (*color & 0x0f);
 }
 
 
