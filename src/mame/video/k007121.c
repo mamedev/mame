@@ -7,10 +7,12 @@ It manages sprites and two 32x32 tilemaps. The tilemaps can be joined to form
 a single 64x32 one, or one of them can be moved to the side of screen, giving
 a high score display suitable for vertical games.
 The chip also generates clock and interrupt signals suitable for a 6809.
-It uses 0x2000 bytes of RAM for the tilemaps and sprites, and an additional
-0x100 bytes, maybe for scroll RAM and line buffers. The maximum addressable
+It uses 0x2000 bytes of static RAM for the tilemaps and sprite lists, and two
+64kx4bit DRAMs, presumably as a double frame buffer. The maximum addressable
 ROM is 0x80000 bytes (addressed 16 bits at a time). Tile and sprite data both
-come from the same ROM space.
+come from the same ROM space. Like the 005885, external circuitry can cause
+tiles and sprites to be fetched from different ROMs (used by Haunted Castle).
+
 Two 256x4 lookup PROMs are also used to increase the color combinations.
 All tilemap / sprite priority handling is done internally and the chip exports
 7 bits of color code, composed of 2 bits of palette bank, 1 bit indicating tile
@@ -27,8 +29,9 @@ inputs:
 outputs:
 - address lines for tilemap RAM (AX0-AX12)
 - data lines for tilemap RAM (VO0-VO7)
-- address lines for the small RAM (FA0-FA7)
-- data lines for the small RAM (FD0-FD7)
+- address lines for the DRAMs (FA0-FA7)
+- control lines for the DRAMs (NWR0, NWR1, NRAS, NCAS, NOE)
+- data lines for the DRAMs (FD0-FD7)
 - address lines for the gfx ROMs (R0-R17)
 - address lines for the tile lookup PROMs (VCF0-VCF3, VCB0-VCB3)
 - address lines for the sprite lookup PROMs (OCB0-OCB3, OCF0-OCF3)
