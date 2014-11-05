@@ -385,5 +385,5 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1979, beaminv,  0,       beaminv, beaminv, driver_device,  0, ROT270, "Tekunon Kougyou",   "Beam Invader",  GAME_NO_SOUND | GAME_SUPPORTS_SAVE, layout_beaminv )
+GAMEL( 1979, beaminv,  0,       beaminv, beaminv,  driver_device, 0, ROT270, "Teknon Kogyo", "Beam Invader", GAME_NO_SOUND | GAME_SUPPORTS_SAVE, layout_beaminv )
 GAMEL( 1979, pacominv, beaminv, beaminv, pacominv, driver_device, 0, ROT270, "Pacom Corporation", "Pacom Invader", GAME_NO_SOUND | GAME_SUPPORTS_SAVE, layout_beaminv )
