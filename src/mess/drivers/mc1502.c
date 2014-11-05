@@ -336,21 +336,61 @@ static MACHINE_CONFIG_DERIVED( pk88, mc1502 )
 MACHINE_CONFIG_END
 
 
+/*
+        Apparently there was a hardware revision with built-in floppy
+        controller mapped to alternate set of ports; v531 and v533
+        support this revision. v533 is possibly not an original BIOS, it
+        supports autoboot which none of others do. v521h is a version
+        with support for 3rd party hard disk controller (not emulated).
+        v51 is designed for a different keyboard layout (JCUKEN, not
+        QWERTY).
+*/
 ROM_START( mc1502 )
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 
 	ROM_DEFAULT_BIOS("v52")
-	ROM_SYSTEM_BIOS(0, "v50", "v5.0")
+	ROM_SYSTEM_BIOS(0, "v50", "v5.0 10/05/89")
 	ROMX_LOAD( "monitor_5_0.rom",  0xfc000, 0x4000, CRC(9e97c6a0) SHA1(16a304e8de69ec4d8b92acda6bf28454c361a24f),ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(1, "v52", "v5.2")
+	ROM_SYSTEM_BIOS(1, "v52", "v5.2 22/03/91")
 	ROMX_LOAD( "monitor_5_2.rom",  0xfc000, 0x4000, CRC(0e65491e) SHA1(8a4d556473b5e0e59b05fab77c79c29f4d562412),ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(2, "v531", "v5.31")
-	ROMX_LOAD( "monitor_5_31.rom", 0xfc000, 0x4000, CRC(a48295d5) SHA1(6f38977c22f9cc6c2bc6f6e53edc4048ca6b6721),ROM_BIOS(3))
-	ROM_SYSTEM_BIOS(3, "v533", "v5.33")
-	ROMX_LOAD( "0_(cbc0).bin", 0xfc000, 0x2000, CRC(9a55bc4f) SHA1(81da44eec2e52cf04b1fc7053502270f51270590),ROM_BIOS(4))
-	ROMX_LOAD( "1_(dfe2).bin", 0xfe000, 0x2000, CRC(8dec077a) SHA1(d6f6d7cc2183abc77fbd9cd59132de5766f7c458),ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(2, "v521", "v5.21 12/10/92")
+	ROMX_LOAD( "monitor_5_21.rom", 0xfc000, 0x4000, CRC(28c8f653) SHA1(04b0b09e0b86d9648a83352cc1590eb8963833e0),ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(3, "v531", "v5.31 12/10/92")
+	ROMX_LOAD( "monitor_5_31.rom", 0xfc000, 0x4000, CRC(a48295d5) SHA1(6f38977c22f9cc6c2bc6f6e53edc4048ca6b6721),ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(4, "v533", "v5.33 01/08/93")
+	ROMX_LOAD( "0_(cbc0).bin", 0xfc000, 0x2000, CRC(9a55bc4f) SHA1(81da44eec2e52cf04b1fc7053502270f51270590),ROM_BIOS(5))
+	ROMX_LOAD( "1_(dfe2).bin", 0xfe000, 0x2000, CRC(8dec077a) SHA1(d6f6d7cc2183abc77fbd9cd59132de5766f7c458),ROM_BIOS(5))
+
+	// 5.21 + 3rd party HDC support. fails checksum test so marked BAD_DUMP.
+	ROM_SYSTEM_BIOS(5, "v521h", "v5.21h 22/09/93")
+	ROMX_LOAD( "mshbios0.pgm", 0xfc000, 0x2000, BAD_DUMP CRC(be447261) SHA1(b93c597c17dfa4b678f72c20a3f7119b73e6ba1c),ROM_BIOS(6))
+	ROMX_LOAD( "mshbios1.pgm", 0xfe000, 0x2000, BAD_DUMP CRC(89e2eaf2) SHA1(37d6b225b5e35574fdac81219589407d925225be),ROM_BIOS(6))
+
+	// 5.3
+	ROM_SYSTEM_BIOS(6, "v53", "v5.3 10/11/91")
+	ROMX_LOAD( "1502~3b0.pgm", 0xfc000, 0x2000, CRC(dc148763) SHA1(7a5e66438007b2de328ac680614f9c4ff60f6a75),ROM_BIOS(7))
+	ROMX_LOAD( "1502~3b1.pgm", 0xfe000, 0x2000, CRC(17fc2af2) SHA1(a060d7b7302dfa639025f025106b50412cf26953),ROM_BIOS(7))
+	// 5.1 -- JCUKEN keyboard
+	ROM_SYSTEM_BIOS(7, "v51", "v5.1 10/12/90")
+	ROMX_LOAD( "ms1502b0.pgm", 0xfc000, 0x2000, CRC(92fcc29a) SHA1(930a4cffcd6ec6110dd9a18bd389b78f0ccb110a),ROM_BIOS(8))
+	ROMX_LOAD( "ms1502b1.pgm", 0xfe000, 0x2000, CRC(fe355a58) SHA1(b4ef7775045c6f2095e2b487fe19824986a4892c),ROM_BIOS(8))
+	// 5.31
+	ROM_SYSTEM_BIOS(8, "v531_92", "v5.31 12/10/92")
+	ROMX_LOAD( "ms531b0.pgm", 0xfc000, 0x2000, CRC(d97157d1) SHA1(cb1a1e0e2d9a0fcc78f9b09bfb4814d408ee4fae),ROM_BIOS(9))
+	ROMX_LOAD( "ms531b1.pgm", 0xfe000, 0x2000, CRC(b1368e1a) SHA1(286496d25dc0ac2d8fe1802caffc6c37b236d105),ROM_BIOS(9))
+	// 5.2
+	ROM_SYSTEM_BIOS(9, "v52_91", "v5.2 10/11/91")
+	ROMX_LOAD( "msv5~2b0.pgm", 0xfc000, 0x2000, CRC(f7f370e9) SHA1(e069a35005581a02856853b57dd511ab8e10054b),ROM_BIOS(10))
+	ROMX_LOAD( "msv5~2b1.pgm", 0xfe000, 0x2000, CRC(d50e1c43) SHA1(22724dec0052ee9e52f44f5914f2f5f3fae14612),ROM_BIOS(10))
+
+	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)
+	ROM_LOAD( "symgen.rom", 0x0000, 0x2000, CRC(b2747a52) SHA1(6766d275467672436e91ac2997ac6b77700eba1e))
 ROM_END
 
+/*
+        Predecessor of MC1502, same keyboard attachment but
+        different video subsystem (not emulated).
+*/
 ROM_START( pk88 )
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 
@@ -370,4 +410,4 @@ ROM_END
 
 /*     YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT       INIT                COMPANY       FULLNAME */
 COMP ( 1989,    mc1502,     ibm5150,    0,      mc1502,     mc1502,     mc1502_state, mc1502,   "NPO Microprocessor", "Elektronika MC-1502", 0)
-COMP ( 1990,    pk88,       ibm5150,    0,      pk88,       mc1502,     mc1502_state, mc1502,   "NPO Microprocessor", "Elektronika PK-88", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP ( 1988,    pk88,       ibm5150,    0,      pk88,       mc1502,     mc1502_state, mc1502,   "NPO Microprocessor", "Elektronika PK-88", GAME_NOT_WORKING | GAME_NO_SOUND)
