@@ -208,20 +208,20 @@ WRITE16_MEMBER( atarisy2_state::paletteram_w )
 READ16_MEMBER( atarisy2_state::slapstic_r )
 {
 	int result = m_slapstic_base[offset];
-	slapstic_tweak(space, offset);
+	m_slapstic->slapstic_tweak(space, offset);
 
 	/* an extra tweak for the next opcode fetch */
-	m_videobank = slapstic_tweak(space, 0x1234) * 0x1000;
+	m_videobank = m_slapstic->slapstic_tweak(space, 0x1234) * 0x1000;
 	return result;
 }
 
 
 WRITE16_MEMBER( atarisy2_state::slapstic_w )
 {
-	slapstic_tweak(space, offset);
+	m_slapstic->slapstic_tweak(space, offset);
 
 	/* an extra tweak for the next opcode fetch */
-	m_videobank = slapstic_tweak(space, 0x1234) * 0x1000;
+	m_videobank = m_slapstic->slapstic_tweak(space, 0x1234) * 0x1000;
 }
 
 

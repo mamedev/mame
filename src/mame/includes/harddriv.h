@@ -59,7 +59,9 @@ public:
 			m_ds3xdsp_internal_timer(*this, "ds3xdsp_timer"),
 			m_dac(*this, "dac"),
 			m_duart(*this, "duartn68681"),
-			m_asic65(*this, "asic65") {}
+			m_asic65(*this, "asic65"),
+			m_slapstic_device(*this, "slapstic")
+			{}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms34010_device> m_gsp;
@@ -469,4 +471,6 @@ public:
 
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_driver);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_multisync);
+
+	optional_device<atari_slapstic_device> m_slapstic_device;
 };

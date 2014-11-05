@@ -126,7 +126,6 @@
 
 
 #include "emu.h"
-#include "includes/slapstic.h"
 #include "includes/atarisy2.h"
 #include "sound/tms5220.h"
 #include "sound/2151intf.h"
@@ -222,7 +221,7 @@ MACHINE_START_MEMBER(atarisy2_state,atarisy2)
 MACHINE_RESET_MEMBER(atarisy2_state,atarisy2)
 {
 	atarigen_state::machine_reset();
-	slapstic_reset();
+	m_slapstic->slapstic_reset();
 	scanline_timer_reset(*m_screen, 64);
 
 	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(atarisy2_state::atarisy2_direct_handler), this));
@@ -1207,6 +1206,8 @@ static MACHINE_CONFIG_START( atarisy2, atarisy2_state )
 	MCFG_CPU_ADD("audiocpu", M6502, SOUND_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, (double)MASTER_CLOCK/2/16/16/16/10)
+
+	MCFG_SLAPSTIC_ADD("slapstic")
 
 	MCFG_MACHINE_START_OVERRIDE(atarisy2_state,atarisy2)
 	MCFG_MACHINE_RESET_OVERRIDE(atarisy2_state,atarisy2)
@@ -3143,7 +3144,7 @@ DRIVER_INIT_MEMBER(atarisy2_state,paperboy)
 	int i;
 	UINT8 *cpu1 = memregion("maincpu")->base();
 
-	slapstic_init(machine(), 105);
+	m_slapstic->slapstic_init(machine(), 105);
 
 	/* expand the 16k program ROMs into full 64k chunks */
 	for (i = 0x10000; i < 0x90000; i += 0x20000)
@@ -3164,7 +3165,7 @@ DRIVER_INIT_MEMBER(atarisy2_state,720)
 	/* without the default EEPROM, 720 hangs at startup due to communication
 	   issues with the sound CPU; temporarily increasing the sound CPU frequency
 	   to ~2.2MHz "fixes" the problem */
-	slapstic_init(machine(), 107);
+	m_slapstic->slapstic_init(machine(), 107);
 
 	m_pedal_count = -1;
 	m_has_tms5220 = 1;
@@ -3177,7 +3178,7 @@ DRIVER_INIT_MEMBER(atarisy2_state,ssprint)
 	int i;
 	UINT8 *cpu1 = memregion("maincpu")->base();
 
-	slapstic_init(machine(), 108);
+	m_slapstic->slapstic_init(machine(), 108);
 
 	/* expand the 32k program ROMs into full 64k chunks */
 	for (i = 0x10000; i < 0x90000; i += 0x20000)
@@ -3193,7 +3194,7 @@ DRIVER_INIT_MEMBER(atarisy2_state,csprint)
 	int i;
 	UINT8 *cpu1 = memregion("maincpu")->base();
 
-	slapstic_init(machine(), 109);
+	m_slapstic->slapstic_init(machine(), 109);
 
 	/* expand the 32k program ROMs into full 64k chunks */
 	for (i = 0x10000; i < 0x90000; i += 0x20000)
@@ -3206,7 +3207,7 @@ DRIVER_INIT_MEMBER(atarisy2_state,csprint)
 
 DRIVER_INIT_MEMBER(atarisy2_state,apb)
 {
-	slapstic_init(machine(), 110);
+	m_slapstic->slapstic_init(machine(), 110);
 
 	m_pedal_count = 2;
 	m_has_tms5220 = 1;

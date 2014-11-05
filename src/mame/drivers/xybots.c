@@ -184,6 +184,8 @@ static MACHINE_CONFIG_START( xybots, xybots_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
 
+	MCFG_SLAPSTIC_ADD("slapstic")
+
 	MCFG_MACHINE_RESET_OVERRIDE(xybots_state,xybots)
 
 	MCFG_ATARI_EEPROM_2804_ADD("eeprom")

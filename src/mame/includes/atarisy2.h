@@ -10,6 +10,7 @@
 #include "video/atarimo.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/t11/t11.h"
+#include "slapstic.h"
 
 class atarisy2_state : public atarigen_state
 {
@@ -25,7 +26,9 @@ public:
 			m_alpha_tilemap(*this, "alpha"),
 			m_rombank1(*this, "rombank1"),
 			m_rombank2(*this, "rombank2"),
-			m_generic_paletteram_16(*this, "paletteram") { }
+			m_generic_paletteram_16(*this, "paletteram"),
+			m_slapstic(*this, "slapstic")
+			{ }
 
 	required_device<t11_device> m_maincpu;
 	required_device<m6502_device> m_audiocpu;
@@ -50,6 +53,7 @@ public:
 	required_shared_ptr<UINT16> m_rombank1;
 	required_shared_ptr<UINT16> m_rombank2;
 	required_shared_ptr<UINT16> m_generic_paletteram_16;
+	required_device<atari_slapstic_device> m_slapstic;
 
 	UINT8           m_sound_reset_state;
 

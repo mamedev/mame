@@ -209,7 +209,7 @@ A046491
 Notes:
       68000 clock input - 8.000MHz [16/2]
 
-
+	  
 DSK
 A047724-01
 |-----------------------------------------------|
@@ -1231,6 +1231,9 @@ static MACHINE_CONFIG_START( driver_nomsp, harddriv_state )
 	MCFG_CPU_PROGRAM_MAP(driver_68k_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
 	MCFG_CPU_PERIODIC_INT_DRIVER(harddriv_state, hd68k_irq_gen,  (double)HARDDRIV_MASTER_CLOCK/16/16/16/16/2)
+
+	MCFG_SLAPSTIC_ADD("slapstic")
+	MCFG_SLAPSTIC_68K_ACCESS(1)
 
 	MCFG_CPU_ADD("gsp", TMS34010, HARDDRIV_GSP_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(driver_gsp_map)
@@ -4403,7 +4406,7 @@ DRIVER_INIT_MEMBER(harddriv_state,racedriv)
 	init_driver_sound();
 
 	/* set up the slapstic */
-	slapstic_init(machine(), 117);
+	m_slapstic_device->slapstic_init(machine(), 117);
 	m_m68k_slapstic_base = m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16_delegate(FUNC(harddriv_state::rd68k_slapstic_r), this), write16_delegate(FUNC(harddriv_state::rd68k_slapstic_w), this));
 
 	/* synchronization */
@@ -4424,7 +4427,7 @@ void harddriv_state::racedrivc_init_common(offs_t gsp_protection)
 	init_driver_sound();
 
 	/* set up the slapstic */
-	slapstic_init(machine(), 117);
+	m_slapstic_device->slapstic_init(machine(), 117);
 	m_m68k_slapstic_base = m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16_delegate(FUNC(harddriv_state::rd68k_slapstic_r), this), write16_delegate(FUNC(harddriv_state::rd68k_slapstic_w), this));
 
 	/* synchronization */
@@ -4523,7 +4526,7 @@ DRIVER_INIT_MEMBER(harddriv_state,strtdriv)
 	init_dsk();
 
 	/* set up the slapstic */
-	slapstic_init(machine(), 117);
+	m_slapstic_device->slapstic_init(machine(), 117);
 	m_m68k_slapstic_base = m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16_delegate(FUNC(harddriv_state::rd68k_slapstic_r), this), write16_delegate(FUNC(harddriv_state::rd68k_slapstic_w), this));
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa80000, 0xafffff, read16_delegate(FUNC(harddriv_state::hda68k_port1_r), this));

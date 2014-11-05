@@ -17,6 +17,7 @@
 #include "video/atarimo.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/okim6295.h"
+#include "includes/slapstic.h"
 
 
 /***************************************************************************
@@ -431,6 +432,7 @@ public:
 	optional_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	optional_shared_ptr<UINT16> m_generic_paletteram_16;
+	optional_device<atari_slapstic_device> m_slapstic_device;
 };
 
 

@@ -49,7 +49,6 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "includes/slapstic.h"
 #include "includes/atetris.h"
 #include "sound/sn76496.h"
 #include "sound/pokey.h"
@@ -115,8 +114,8 @@ void atetris_state::machine_start()
 void atetris_state::machine_reset()
 {
 	/* reset the slapstic */
-	slapstic_reset();
-	m_current_bank = slapstic_bank() & 1;
+	m_slapstic_device->slapstic_reset();
+	m_current_bank = m_slapstic_device->slapstic_bank() & 1;
 	reset_bank();
 
 	/* start interrupts going (32V clocked by 16V) */
@@ -134,7 +133,7 @@ void atetris_state::machine_reset()
 READ8_MEMBER(atetris_state::atetris_slapstic_r)
 {
 	int result = m_slapstic_base[0x2000 + offset];
-	int new_bank = slapstic_tweak(space, offset) & 1;
+	int new_bank = m_slapstic_device->slapstic_tweak(space, offset) & 1;
 
 	/* update for the new bank */
 	if (new_bank != m_current_bank)
@@ -308,6 +307,8 @@ static MACHINE_CONFIG_START( atetris, atetris_state )
 	MCFG_CPU_ADD("maincpu", M6502,MASTER_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
+	MCFG_SLAPSTIC_ADD("slapstic")
+
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
@@ -456,7 +457,7 @@ DRIVER_INIT_MEMBER(atetris_state,atetris)
 {
 	UINT8 *rgn = memregion("maincpu")->base();
 
-	slapstic_init(machine(), 101);
+	m_slapstic_device->slapstic_init(machine(), 101);
 	m_slapstic_source = &rgn[0x10000];
 	m_slapstic_base = &rgn[0x04000];
 }

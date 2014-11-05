@@ -180,108 +180,68 @@
 
 *************************************************************************/
 
-#include "emu.h"
-#include "cpu/m6800/m6800.h"
+
 #include "includes/slapstic.h"
-#include "cpu/m68000/m68000.h"
 
 
-/*************************************
- *
- *  Debugging
- *
- *************************************/
+extern const device_type SLAPSTIC = &device_creator<atari_slapstic_device>;
 
-#define LOG_SLAPSTIC    (0)
-
-
-
-/*************************************
- *
- *  Structure of slapstic params
- *
- *************************************/
-
-struct mask_value
+atari_slapstic_device::atari_slapstic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, SLAPSTIC, "Atari Slapstic", tag, owner, clock, "slapstic", __FILE__),
+	state(0),
+	current_bank(0),
+	access_68k(-1),
+	alt_bank(0),
+	bit_bank(0),
+	add_bank(0),
+	bit_xor(0)
 {
-	int mask, value;
-};
+	slapstic.bankstart = 0;
+	slapstic.bank[0] = slapstic.bank[1] = slapstic.bank[2] = slapstic.bank[3] = 0;
+	slapstic.alt1.mask = 0;
+	slapstic.alt1.value = 0;
+	slapstic.alt2.mask = 0;
+	slapstic.alt2.value = 0;
+	slapstic.alt3.mask = 0;
+	slapstic.alt3.value = 0;
+	slapstic.alt4.mask = 0;
+	slapstic.alt4.value = 0;
+	slapstic.altshift = 0;
+	slapstic.bit1.mask = 0;
+	slapstic.bit1.value = 0;
+	slapstic.bit2c0.mask = 0;
+	slapstic.bit2c0.value = 0;
+	slapstic.bit2s0.mask = 0;
+	slapstic.bit2s0.value = 0;
+	slapstic.bit2c1.mask = 0;
+	slapstic.bit2c1.value = 0;
+	slapstic.bit2s1.mask = 0;
+	slapstic.bit2s1.value = 0;
+	slapstic.bit3.mask = 0;
+	slapstic.bit3.value = 0;
+	slapstic.add1.mask = 0;
+	slapstic.add1.value = 0;
+	slapstic.add2.mask = 0;
+	slapstic.add2.value = 0;
+	slapstic.addplus1.mask = 0;
+	slapstic.addplus1.value = 0;
+	slapstic.addplus2.mask = 0;
+	slapstic.addplus2.value = 0;
+	slapstic.add3.mask = 0;
+	slapstic.add3.value = 0;
+}
 
 
-struct slapstic_data
+
+void atari_slapstic_device::device_start()
 {
-	int bankstart;
-	int bank[4];
 
-	struct mask_value alt1;
-	struct mask_value alt2;
-	struct mask_value alt3;
-	struct mask_value alt4;
-	int altshift;
+}
 
-	struct mask_value bit1;
-	struct mask_value bit2c0;
-	struct mask_value bit2s0;
-	struct mask_value bit2c1;
-	struct mask_value bit2s1;
-	struct mask_value bit3;
-
-	struct mask_value add1;
-	struct mask_value add2;
-	struct mask_value addplus1;
-	struct mask_value addplus2;
-	struct mask_value add3;
-};
-
-
-
-/*************************************
- *
- *  Shorthand
- *
- *************************************/
-
-#define UNKNOWN 0xffff
-#define NO_BITWISE          \
-	{ UNKNOWN,UNKNOWN },    \
-	{ UNKNOWN,UNKNOWN },    \
-	{ UNKNOWN,UNKNOWN },    \
-	{ UNKNOWN,UNKNOWN },    \
-	{ UNKNOWN,UNKNOWN },    \
-	{ UNKNOWN,UNKNOWN }
-#define NO_ADDITIVE         \
-	{ UNKNOWN,UNKNOWN },    \
-	{ UNKNOWN,UNKNOWN },    \
-	{ UNKNOWN,UNKNOWN },    \
-	{ UNKNOWN,UNKNOWN },    \
-	{ UNKNOWN,UNKNOWN }
-
-#define MATCHES_MASK_VALUE(val, maskval)    (((val) & (maskval).mask) == (maskval).value)
-
-
-
-/*************************************
- *
- *  Constants
- *
- *************************************/
-
-enum
+void atari_slapstic_device::device_reset()
 {
-	DISABLED,
-	ENABLED,
-	ALTERNATE1,
-	ALTERNATE2,
-	ALTERNATE3,
-	BITWISE1,
-	BITWISE2,
-	BITWISE3,
-	ADDITIVE1,
-	ADDITIVE2,
-	ADDITIVE3
-};
 
-
+}
 
 /*************************************
  *
@@ -779,27 +739,6 @@ static const struct slapstic_data *const slapstic_table[] =
 
 
 
-/*************************************
- *
- *  Statics
- *
- *************************************/
-
-static UINT8 state;
-static UINT8 current_bank;
-static UINT8 access_68k;
-
-static UINT8 alt_bank;
-static UINT8 bit_bank;
-static UINT8 add_bank;
-static UINT8 bit_xor;
-
-static struct slapstic_data slapstic;
-
-
-static void slapstic_log(running_machine &machine, offs_t offset);
-static FILE *slapsticlog;
-
 
 /*************************************
  *
@@ -807,9 +746,13 @@ static FILE *slapsticlog;
  *
  *************************************/
 
-void slapstic_init(running_machine &machine, int chip)
+void atari_slapstic_device::slapstic_init(running_machine &machine, int chip)
 {
-	device_type cputype = machine.device("maincpu")->type();
+	if (access_68k == -1)
+	{
+		device_type cputype = machine.device(":maincpu")->type();
+		access_68k = (cputype == M68000 || cputype == M68010);
+	}
 
 	/* only a small number of chips are known to exist */
 	if (chip < 101 || chip > 118)
@@ -824,7 +767,6 @@ void slapstic_init(running_machine &machine, int chip)
 	slapstic_reset();
 
 	/* see if we're 68k or 6502/6809 based */
-	access_68k = (cputype == M68000 || cputype == M68010);
 
 	/* save state */
 	state_save_register_item(machine, "slapstic", NULL, 0, state);
@@ -836,7 +778,7 @@ void slapstic_init(running_machine &machine, int chip)
 }
 
 
-void slapstic_reset(void)
+void atari_slapstic_device::slapstic_reset(void)
 {
 	/* reset the chip */
 	state = DISABLED;
@@ -853,7 +795,7 @@ void slapstic_reset(void)
  *
  *************************************/
 
-int slapstic_bank(void)
+int atari_slapstic_device::slapstic_bank(void)
 {
 	return current_bank;
 }
@@ -866,7 +808,7 @@ int slapstic_bank(void)
  *
  *************************************/
 
-static int alt2_kludge(address_space &space, offs_t offset)
+int atari_slapstic_device::alt2_kludge(address_space &space, offs_t offset)
 {
 	/* Of the 3 alternate addresses, only the middle one needs to actually hit
 	   in the slapstic region; the first and third ones can be anywhere in the
@@ -913,7 +855,7 @@ static int alt2_kludge(address_space &space, offs_t offset)
  *
  *************************************/
 
-int slapstic_tweak(address_space &space, offs_t offset)
+int atari_slapstic_device::slapstic_tweak(address_space &space, offs_t offset)
 {
 	/* reset is universal */
 	if (offset == 0x0000)
@@ -1137,7 +1079,7 @@ int slapstic_tweak(address_space &space, offs_t offset)
  *
  *************************************/
 
-static void slapstic_log(running_machine &machine, offs_t offset)
+void atari_slapstic_device::slapstic_log(running_machine &machine, offs_t offset)
 {
 	static attotime last_time;
 

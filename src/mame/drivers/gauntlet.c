@@ -499,6 +499,8 @@ static MACHINE_CONFIG_START( gauntlet, gauntlet_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
 
+	MCFG_SLAPSTIC_ADD("slapstic")
+
 	MCFG_CPU_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 

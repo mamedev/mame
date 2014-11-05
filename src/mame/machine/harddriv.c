@@ -51,7 +51,7 @@ MACHINE_RESET_MEMBER(harddriv_state,harddriv)
 {
 	/* generic reset */
 	atarigen_state::machine_reset();
-	slapstic_reset();
+	m_slapstic_device->slapstic_reset();
 
 	/* halt several of the DSPs to start */
 	if (m_adsp != NULL) m_adsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -1671,13 +1671,13 @@ WRITE16_MEMBER( harddriv_state::hddspcom_control_w )
 
 WRITE16_MEMBER( harddriv_state::rd68k_slapstic_w )
 {
-	slapstic_tweak(space, offset & 0x3fff);
+	m_slapstic_device->slapstic_tweak(space, offset & 0x3fff);
 }
 
 
 READ16_MEMBER( harddriv_state::rd68k_slapstic_r )
 {
-	int bank = slapstic_tweak(space, offset & 0x3fff) * 0x4000;
+	int bank = m_slapstic_device->slapstic_tweak(space, offset & 0x3fff) * 0x4000;
 	return m_m68k_slapstic_base[bank + (offset & 0x3fff)];
 }
 

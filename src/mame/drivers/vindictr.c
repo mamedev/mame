@@ -184,6 +184,8 @@ static MACHINE_CONFIG_START( vindictr, vindictr_state )
 	MCFG_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
+	MCFG_SLAPSTIC_ADD("slapstic") // where is this hooked up here?
+
 	MCFG_MACHINE_RESET_OVERRIDE(vindictr_state,vindictr)
 
 	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
