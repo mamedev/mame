@@ -8,7 +8,8 @@
   * TMS1000 (has internal ROM), DS75494 lamp driver
   
   Newer revisions have a smaller 16-pin MB4850 chip instead of the TMS1000.
-  This one has been decapped too, but we couldn't yet find the internal ROM.
+  This one has been decapped too, but we couldn't find an internal ROM.
+  It is possibly a cost-reduced custom ASIC specifically for Simon.
   
   Other games assumed to be on similar hardware:
   - Pocket Simon

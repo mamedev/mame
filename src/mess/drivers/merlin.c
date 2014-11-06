@@ -3,7 +3,18 @@
   Parker Bros Merlin handheld computer game
   * TMS1100NLL MP3404A-N2 (has internal ROM)
   
-  Other games assumed to be on similar hardware:
+  To start a game, press NEW GAME, followed by a number:
+  1: Tic-Tac-Toe
+  2: Music Machine
+  3: Echo
+  4: Blackjack 13
+  5: Magic Square
+  6: Mindbender
+  
+  Refer to the official manual for more information on the games.
+  
+  
+  Other handhelds assumed to be on similar hardware:
   - Dr. Smith - by Tomy, released in Japan (basically a white version of Merlin,
     let's assume for now that the ROM contents is identical)
   - Master Merlin
