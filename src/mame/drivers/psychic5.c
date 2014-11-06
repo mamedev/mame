@@ -407,8 +407,8 @@ WRITE8_MEMBER(psychic5_state::bombsa_flipscreen_w)
 
 static ADDRESS_MAP_START( psychic5_main_map, AS_PROGRAM, 8, psychic5_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(psychic5_paged_ram_r, psychic5_paged_ram_w)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
+	AM_RANGE(0xc000, 0xdfff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xf001, 0xf001) AM_READNOP AM_WRITE(psychic5_coin_counter_w)
@@ -420,6 +420,28 @@ static ADDRESS_MAP_START( psychic5_main_map, AS_PROGRAM, 8, psychic5_state )
 	AM_RANGE(0xf200, 0xf7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( psychic5_vrambank_map, AS_PROGRAM, 8, psychic5_state )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
+	AM_RANGE(0x1000, 0x1fff) AM_RAM
+
+	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("P1")
+	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("P2")
+	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("DSW1")
+	AM_RANGE(0x2004, 0x2004) AM_READ_PORT("DSW2")
+
+	AM_RANGE(0x2308, 0x230c) AM_RAM AM_SHARE("bg_control")
+
+	AM_RANGE(0x2400, 0x25ff) AM_RAM_WRITE(sprite_col_w) AM_SHARE("palette_ram_sp")
+	AM_RANGE(0x2800, 0x29ff) AM_RAM_WRITE(bg_col_w) AM_SHARE("palette_ram_bg")
+	AM_RANGE(0x2a00, 0x2bff) AM_RAM_WRITE(tx_col_w) AM_SHARE("palette_ram_tx")
+
+	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
+
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( psychic5_sound_map, AS_PROGRAM, 8, psychic5_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -436,7 +458,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bombsa_main_map, AS_PROGRAM, 8, psychic5_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 
 	/* ports look like the other games */
@@ -450,7 +472,7 @@ static ADDRESS_MAP_START( bombsa_main_map, AS_PROGRAM, 8, psychic5_state )
 	AM_RANGE(0xd200, 0xd7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(psychic5_paged_ram_r, bombsa_paged_ram_w)
+	AM_RANGE(0xe000, 0xffff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bombsa_sound_map, AS_PROGRAM, 8, psychic5_state )
@@ -464,6 +486,24 @@ static ADDRESS_MAP_START( bombsa_soundport_map, AS_IO, 8, psychic5_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( bombsa_vrambank_map, AS_PROGRAM, 8, psychic5_state )
+	AM_RANGE(0x0000, 0x1fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
+
+	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("P1")
+	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("P2")
+	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("DSW1")
+	AM_RANGE(0x2004, 0x2004) AM_READ_PORT("DSW2")
+
+	AM_RANGE(0x2308, 0x230c) AM_RAM AM_SHARE("bg_control")
+
+	AM_RANGE(0x3000, 0x31ff) AM_RAM_WRITE(sprite_col_w) AM_SHARE("palette_ram_sp")
+	AM_RANGE(0x3200, 0x33ff) AM_RAM_WRITE(bg_col_w) AM_SHARE("palette_ram_bg")
+	AM_RANGE(0x3400, 0x35ff) AM_RAM_WRITE(tx_col_w) AM_SHARE("palette_ram_tx")
+
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
 ADDRESS_MAP_END
 
 
@@ -655,6 +695,13 @@ static MACHINE_CONFIG_START( psychic5, psychic5_state )
 	MCFG_CPU_PROGRAM_MAP(psychic5_main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", psychic5_state, psychic5_scanline, "screen", 0, 1)
 
+	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(psychic5_vrambank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(14)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_5MHz)
 	MCFG_CPU_PROGRAM_MAP(psychic5_sound_map)
 	MCFG_CPU_IO_MAP(psychic5_soundport_map)
@@ -700,6 +747,13 @@ static MACHINE_CONFIG_START( bombsa, psychic5_state )
 	MCFG_CPU_PROGRAM_MAP(bombsa_main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", psychic5_state, psychic5_scanline, "screen", 0, 1)
 
+	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(bombsa_vrambank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(14)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_5MHz )
 	MCFG_CPU_PROGRAM_MAP(bombsa_sound_map)
 	MCFG_CPU_IO_MAP(bombsa_soundport_map)
@@ -718,7 +772,7 @@ static MACHINE_CONFIG_START( bombsa, psychic5_state )
 	MCFG_PALETTE_ADD("palette", 768)
 
 	MCFG_VIDEO_START_OVERRIDE(psychic5_state,bombsa)
-	MCFG_VIDEO_RESET_OVERRIDE(psychic5_state,bombsa)
+	MCFG_VIDEO_RESET_OVERRIDE(psychic5_state,psychic5)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

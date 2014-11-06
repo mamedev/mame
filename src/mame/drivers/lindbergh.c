@@ -221,12 +221,20 @@ Sega 2005
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "machine/pcshare.h"
-#include "machine/pckeybrd.h"
-#include "video/pc_vga.h"
 #include "machine/pci.h"
+#include "machine/i82875p.h"
+#include "machine/i6300esb.h"
+#include "machine/pci-usb.h"
+#include "machine/pci-apic.h"
+#include "machine/pci-sata.h"
+#include "machine/pci-smbus.h"
+#include "machine/i82541.h"
+#include "machine/segabb.h"
+#include "sound/pci-ac97.h"
+#include "sound/sb0400.h"
+#include "video/gf6800gt.h"
 
-class lindbergh_state : public pcat_base_state
+class lindbergh_state : public driver_device
 {
 public:
 	lindbergh_state(const machine_config &mconfig, device_type type, const char *tag);
@@ -235,24 +243,26 @@ public:
 	virtual void machine_reset();
 };
 
+#if 0
 static ADDRESS_MAP_START(lindbergh_map, AS_PROGRAM, 32, lindbergh_state)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
-	AM_RANGE(0x000c0000, 0x000cffff) AM_ROM AM_REGION("vid_bios", 0)
+									 //	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
+									 //	AM_RANGE(0x000c0000, 0x000cffff) AM_ROM AM_REGION("vid_bios", 0)
 //  0xd0000 - 0xdffff tested, wants 0x414d ("AM") in there
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROM AM_REGION("mb_bios", 0xf0000)
-	AM_RANGE(0xfd000000, 0xfd3fffff) AM_ROM AM_REGION("jvs_bios", 0)    /* Hack to see the data */
+//	AM_RANGE(0xfd000000, 0xfd3fffff) AM_ROM AM_REGION("jvs_bios", 0)    /* Hack to see the data */
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("mb_bios", 0)     /* System BIOS */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(lindbergh_io, AS_IO, 32, lindbergh_state)
-	AM_IMPORT_FROM(pcat32_io_common)
+//	AM_IMPORT_FROM(pcat32_io_common)
 
-	AM_RANGE(0x00e8, 0x00ef) AM_NOP
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
+//	AM_RANGE(0x00e8, 0x00ef) AM_NOP
+//	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
 ADDRESS_MAP_END
+#endif
 
-lindbergh_state::lindbergh_state(const machine_config &mconfig, device_type type, const char *tag) : pcat_base_state(mconfig, type, tag)
+lindbergh_state::lindbergh_state(const machine_config &mconfig, device_type type, const char *tag) : driver_device(mconfig, type, tag)
 {
 }
 
@@ -267,18 +277,37 @@ void lindbergh_state::machine_reset()
 static MACHINE_CONFIG_START(lindbergh, lindbergh_state)
 //  MCFG_CPU_ADD("maincpu", PENTIUM, 2800000000U) /* Actually Celeron D at 2,8 GHz */
 	MCFG_CPU_ADD("maincpu", PENTIUM4, 28000000U*5) /* Actually Celeron D at 2,8 GHz */
-	MCFG_CPU_PROGRAM_MAP(lindbergh_map)
-	MCFG_CPU_IO_MAP(lindbergh_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+//	MCFG_CPU_PROGRAM_MAP(lindbergh_map)
+//	MCFG_CPU_IO_MAP(lindbergh_io)
+//	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
-	MCFG_FRAGMENT_ADD( pcat_common )
-	MCFG_FRAGMENT_ADD( pcvideo_vga )
+//	MCFG_FRAGMENT_ADD( pcat_common )
+//	MCFG_FRAGMENT_ADD( pcvideo_vga )
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
+//	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
+
+	MCFG_PCI_ROOT_ADD(                ":pci")
+	MCFG_I82875P_HOST_ADD(            ":pci:00.0",                        0x103382c0, ":maincpu", 512*1024*1024)
+	MCFG_I82875P_AGP_ADD(             ":pci:01.0")
+	MCFG_GEFORCE_6800GT_ADD(          ":pci:01.0:00.0",                   0x10de0204)
+	MCFG_PCI_BRIDGE_ADD(              ":pci:1c.0",      0x808625ae, 0x02)
+	MCFG_I82541PI_ADD(                ":pci:1c.0:00.0",                   0x103382c0)
+	MCFG_USB_UHCI_ADD(                ":pci:1d.0",      0x808625a9, 0x02, 0x103382c0)
+	MCFG_USB_UHCI_ADD(                ":pci:1d.1",      0x808625aa, 0x02, 0x103382c0)
+	MCFG_I6300ESB_WATCHDOG_ADD(       ":pci:1d.4",                        0x103382c0)
+	MCFG_APIC_ADD(                    ":pci:1d.5",      0x808625ac, 0x02, 0x103382c0)
+	MCFG_USB_EHCI_ADD(                ":pci:1d.7",      0x808625ad, 0x02, 0x103382c0)
+	MCFG_PCI_BRIDGE_ADD(              ":pci:1e.0",      0x8086244e, 0x0a)
+	MCFG_SB0400_ADD(                  ":pci:1e.0:02.0",                   0x11021101)
+	MCFG_SEGA_LINDBERGH_BASEBOARD_ADD(":pci:1e.0:03.0")
+	MCFG_I6300ESB_LPC_ADD(            ":pci:1f.0")
+	MCFG_SATA_ADD(                    ":pci:1f.2",      0x808625a3, 0x02, 0x103382c0)
+	MCFG_SMBUS_ADD(                   ":pci:1f.3",      0x808625a4, 0x02, 0x103382c0)
+	MCFG_AC97_ADD(                    ":pci:1f.5",      0x808625a6, 0x02, 0x103382c0)
 MACHINE_CONFIG_END
 
 ROM_START(lindbios)
-	ROM_REGION32_LE(0x100000, "mb_bios", 0) // location 3j7
+	ROM_REGION32_LE(0x100000, ":pci:1f.0", 0) // PC bios, location 3j7
 	ROM_SYSTEM_BIOS(0, "bios0", "6.0.0010 alternate version")
 	ROMX_LOAD("6.0.0010a.bin", 0x00000, 0x100000, CRC(10dd9b76) SHA1(1fdf1f921bc395846a7c3180fbdbc4ca287a9670), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "bios1", "6.0.0009")
@@ -287,11 +316,11 @@ ROM_START(lindbios)
 	ROMX_LOAD("6.0.0010.bin", 0x00000, 0x100000, CRC(ea2bf888) SHA1(c9c5b6f0d4f4f36620939b15dd2f128a74347e37), ROM_BIOS(3) )
 
 
-	ROM_REGION(0x400000, "jvs_bios", 0)
+	ROM_REGION(0x400000, ":pci:1e.0:03.0", 0) // Baseboard MPC firmware
 	ROM_LOAD("fpr-24370b.ic6", 0x000000, 0x400000, CRC(c3b021a4) SHA1(1b6938a50fe0e4ae813864649eb103838c399ac0))
 
-	ROM_REGION(0x10000, "vid_bios", 0)
+	ROM_REGION32_LE(0x10000, ":pci:01.0:00.0", 0) // Geforce bios extension (custom or standard?)
 	ROM_LOAD("vid_bios.u504", 0x00000, 0x10000, CRC(f78d14d7) SHA1(f129787e487984edd23bf344f2e9500c85052275))
 ROM_END
 
-GAME(1999, lindbios, 0, lindbergh, at_keyboard, driver_device, 0, ROT0, "Sega Lindbergh", "Sega Lindbergh Bios", GAME_IS_SKELETON)
+GAME(1999, lindbios, 0, lindbergh, 0, driver_device, 0, ROT0, "Sega Lindbergh", "Sega Lindbergh Bios", GAME_IS_SKELETON)

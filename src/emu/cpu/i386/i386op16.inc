@@ -1746,8 +1746,12 @@ void i386_device::i386_popf()              // Opcode 0x9d
 
 void i386_device::i386_push_ax()           // Opcode 0x50
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
-	if(i386_limit_check(SS,offset-2) == 0)
+	UINT32 offset;
+	if(STACK_32BIT)
+		offset = REG32(ESP) - 2;
+	else
+		offset = (REG16(SP) - 2) & 0xffff;
+	if(i386_limit_check(SS,offset) == 0)
 		PUSH16(REG16(AX) );
 	else
 		FAULT(FAULT_SS,0)
@@ -1756,8 +1760,12 @@ void i386_device::i386_push_ax()           // Opcode 0x50
 
 void i386_device::i386_push_cx()           // Opcode 0x51
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
-	if(i386_limit_check(SS,offset-2) == 0)
+	UINT32 offset;
+	if(STACK_32BIT)
+		offset = REG32(ESP) - 2;
+	else
+		offset = (REG16(SP) - 2) & 0xffff;
+	if(i386_limit_check(SS,offset) == 0)
 		PUSH16(REG16(CX) );
 	else
 		FAULT(FAULT_SS,0)
@@ -1766,8 +1774,12 @@ void i386_device::i386_push_cx()           // Opcode 0x51
 
 void i386_device::i386_push_dx()           // Opcode 0x52
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
-	if(i386_limit_check(SS,offset-2) == 0)
+	UINT32 offset;
+	if(STACK_32BIT)
+		offset = REG32(ESP) - 2;
+	else
+		offset = (REG16(SP) - 2) & 0xffff;
+	if(i386_limit_check(SS,offset) == 0)
 		PUSH16(REG16(DX) );
 	else
 		FAULT(FAULT_SS,0)
@@ -1776,8 +1788,12 @@ void i386_device::i386_push_dx()           // Opcode 0x52
 
 void i386_device::i386_push_bx()           // Opcode 0x53
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
-	if(i386_limit_check(SS,offset-2) == 0)
+	UINT32 offset;
+	if(STACK_32BIT)
+		offset = REG32(ESP) - 2;
+	else
+		offset = (REG16(SP) - 2) & 0xffff;
+	if(i386_limit_check(SS,offset) == 0)
 		PUSH16(REG16(BX) );
 	else
 		FAULT(FAULT_SS,0)
@@ -1786,8 +1802,12 @@ void i386_device::i386_push_bx()           // Opcode 0x53
 
 void i386_device::i386_push_sp()           // Opcode 0x54
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
-	if(i386_limit_check(SS,offset-2) == 0)
+	UINT32 offset;
+	if(STACK_32BIT)
+		offset = REG32(ESP) - 2;
+	else
+		offset = (REG16(SP) - 2) & 0xffff;
+	if(i386_limit_check(SS,offset) == 0)
 		PUSH16(REG16(SP) );
 	else
 		FAULT(FAULT_SS,0)
@@ -1796,8 +1816,12 @@ void i386_device::i386_push_sp()           // Opcode 0x54
 
 void i386_device::i386_push_bp()           // Opcode 0x55
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
-	if(i386_limit_check(SS,offset-2) == 0)
+	UINT32 offset;
+	if(STACK_32BIT)
+		offset = REG32(ESP) - 2;
+	else
+		offset = (REG16(SP) - 2) & 0xffff;
+	if(i386_limit_check(SS,offset) == 0)
 		PUSH16(REG16(BP) );
 	else
 		FAULT(FAULT_SS,0)
@@ -1806,8 +1830,12 @@ void i386_device::i386_push_bp()           // Opcode 0x55
 
 void i386_device::i386_push_si()           // Opcode 0x56
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
-	if(i386_limit_check(SS,offset-2) == 0)
+	UINT32 offset;
+	if(STACK_32BIT)
+		offset = REG32(ESP) - 2;
+	else
+		offset = (REG16(SP) - 2) & 0xffff;
+	if(i386_limit_check(SS,offset) == 0)
 		PUSH16(REG16(SI) );
 	else
 		FAULT(FAULT_SS,0)
@@ -1816,8 +1844,12 @@ void i386_device::i386_push_si()           // Opcode 0x56
 
 void i386_device::i386_push_di()           // Opcode 0x57
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
-	if(i386_limit_check(SS,offset-2) == 0)
+	UINT32 offset;
+	if(STACK_32BIT)
+		offset = REG32(ESP) - 2;
+	else
+		offset = (REG16(SP) - 2) & 0xffff;
+	if(i386_limit_check(SS,offset) == 0)
 		PUSH16(REG16(DI) );
 	else
 		FAULT(FAULT_SS,0)
@@ -1826,8 +1858,12 @@ void i386_device::i386_push_di()           // Opcode 0x57
 
 void i386_device::i386_push_cs16()         // Opcode 0x0e
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
-	if(i386_limit_check(SS,offset-2) == 0)
+	UINT32 offset;
+	if(STACK_32BIT)
+		offset = REG32(ESP) - 2;
+	else
+		offset = (REG16(SP) - 2) & 0xffff;
+	if(i386_limit_check(SS,offset) == 0)
 		PUSH16(m_sreg[CS].selector );
 	else
 		FAULT(FAULT_SS,0)
@@ -1836,8 +1872,12 @@ void i386_device::i386_push_cs16()         // Opcode 0x0e
 
 void i386_device::i386_push_ds16()         // Opcode 0x1e
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
-	if(i386_limit_check(SS,offset-2) == 0)
+	UINT32 offset;
+	if(STACK_32BIT)
+		offset = REG32(ESP) - 2;
+	else
+		offset = (REG16(SP) - 2) & 0xffff;
+	if(i386_limit_check(SS,offset) == 0)
 		PUSH16(m_sreg[DS].selector );
 	else
 		FAULT(FAULT_SS,0)
@@ -1846,8 +1886,12 @@ void i386_device::i386_push_ds16()         // Opcode 0x1e
 
 void i386_device::i386_push_es16()         // Opcode 0x06
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
-	if(i386_limit_check(SS,offset-2) == 0)
+	UINT32 offset;
+	if(STACK_32BIT)
+		offset = REG32(ESP) - 2;
+	else
+		offset = (REG16(SP) - 2) & 0xffff;
+	if(i386_limit_check(SS,offset) == 0)
 		PUSH16(m_sreg[ES].selector );
 	else
 		FAULT(FAULT_SS,0)
@@ -1856,8 +1900,12 @@ void i386_device::i386_push_es16()         // Opcode 0x06
 
 void i386_device::i386_push_fs16()         // Opcode 0x0f a0
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
-	if(i386_limit_check(SS,offset-2) == 0)
+	UINT32 offset;
+	if(STACK_32BIT)
+		offset = REG32(ESP) - 2;
+	else
+		offset = (REG16(SP) - 2) & 0xffff;
+	if(i386_limit_check(SS,offset) == 0)
 		PUSH16(m_sreg[FS].selector );
 	else
 		FAULT(FAULT_SS,0)
@@ -1866,8 +1914,12 @@ void i386_device::i386_push_fs16()         // Opcode 0x0f a0
 
 void i386_device::i386_push_gs16()         // Opcode 0x0f a8
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
-	if(i386_limit_check(SS,offset-2) == 0)
+	UINT32 offset;
+	if(STACK_32BIT)
+		offset = REG32(ESP) - 2;
+	else
+		offset = (REG16(SP) - 2) & 0xffff;
+	if(i386_limit_check(SS,offset) == 0)
 		PUSH16(m_sreg[GS].selector );
 	else
 		FAULT(FAULT_SS,0)
@@ -1876,8 +1928,12 @@ void i386_device::i386_push_gs16()         // Opcode 0x0f a8
 
 void i386_device::i386_push_ss16()         // Opcode 0x16
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
-	if(i386_limit_check(SS,offset-2) == 0)
+	UINT32 offset;
+	if(STACK_32BIT)
+		offset = REG32(ESP) - 2;
+	else
+		offset = (REG16(SP) - 2) & 0xffff;
+	if(i386_limit_check(SS,offset) == 0)
 		PUSH16(m_sreg[SS].selector );
 	else
 		FAULT(FAULT_SS,0)
@@ -1887,8 +1943,12 @@ void i386_device::i386_push_ss16()         // Opcode 0x16
 void i386_device::i386_push_i16()          // Opcode 0x68
 {
 	UINT16 value = FETCH16();
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
-	if(i386_limit_check(SS,offset-2) == 0)
+	UINT32 offset;
+	if(STACK_32BIT)
+		offset = REG32(ESP) - 2;
+	else
+		offset = (REG16(SP) - 2) & 0xffff;
+	if(i386_limit_check(SS,offset) == 0)
 		PUSH16(value);
 	else
 		FAULT(FAULT_SS,0)
@@ -1898,8 +1958,12 @@ void i386_device::i386_push_i16()          // Opcode 0x68
 void i386_device::i386_pusha()             // Opcode 0x60
 {
 	UINT16 temp = REG16(SP);
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
-	if(i386_limit_check(SS,offset-16) == 0)
+	UINT32 offset;
+	if(STACK_32BIT)
+		offset = REG32(ESP) - 16;
+	else
+		offset = (REG16(SP) - 16) & 0xffff;
+	if(i386_limit_check(SS,offset) == 0)
 	{
 		PUSH16(REG16(AX) );
 		PUSH16(REG16(CX) );
@@ -1917,8 +1981,12 @@ void i386_device::i386_pusha()             // Opcode 0x60
 
 void i386_device::i386_pushf()             // Opcode 0x9c
 {
-	UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
-	if(i386_limit_check(SS,offset-2) == 0)
+	UINT32 offset;
+	if(STACK_32BIT)
+		offset = REG32(ESP) - 2;
+	else
+		offset = (REG16(SP) - 2) & 0xffff;
+	if(i386_limit_check(SS,offset) == 0)
 		PUSH16(get_flags() & 0xffff );
 	else
 		FAULT(FAULT_SS,0)
@@ -3133,9 +3201,14 @@ void i386_device::i386_group0F00_16()          // Opcode 0x0f 00
 				memset(&seg, 0, sizeof(seg));
 				seg.selector = m_task.segment;
 				i386_load_protected_mode_segment(&seg,NULL);
+
+				UINT32 addr = ((seg.selector & 4) ? m_ldtr.base : m_gdtr.base) + (seg.selector & ~7) + 5;
+				i386_translate_address(TRANSLATE_READ, &addr, NULL);
+				m_program->write_byte(addr, (seg.flags & 0xff) | 2);
+
 				m_task.limit = seg.limit;
 				m_task.base = seg.base;
-				m_task.flags = seg.flags;
+				m_task.flags = seg.flags | 2;
 			}
 			else
 			{

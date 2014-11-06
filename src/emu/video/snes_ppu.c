@@ -214,50 +214,9 @@ void snes_ppu_device::device_start()
 {
 	m_openbus_cb.resolve_safe(0);
 
-#if SNES_LAYER_DEBUG
-	memset(&m_debug_options, 0, sizeof(m_debug_options));
-#endif
-
 	m_vram = auto_alloc_array(machine(), UINT8, SNES_VRAM_SIZE);
 	m_cgram = auto_alloc_array(machine(), UINT16, SNES_CGRAM_SIZE/2);
 	m_oam_ram = auto_alloc_array(machine(), UINT16, SNES_OAM_SIZE/2);
-
-	/* Inititialize registers/variables */
-	m_update_windows = 1;
-	m_beam.latch_vert = 0;
-	m_beam.latch_horz = 0;
-	m_beam.current_vert = 0;
-	m_beam.current_horz = 0;
-	m_beam.last_visible_line = 225; /* TODO: PAL setting */
-	m_mode = 0;
-	m_ppu1_version = 1;  // 5C77 chip version number, read by STAT77, only '1' is known
-	m_ppu2_version = 3;  // 5C78 chip version number, read by STAT78, only '2' & '3' encountered so far.
-
-	m_cgram_address = 0;
-	m_read_ophct = 0;
-	m_read_opvct = 0;
-
-	PPU_REG(VMAIN) = 0x80;
-	// what about other regs?
-
-	/* Inititialize mosaic table */
-	for (int j = 0; j < 16; j++)
-	{
-		for (int i = 0; i < 4096; i++)
-			m_mosaic_table[j][i] = (i / (j + 1)) * (j + 1);
-	}
-
-	/* Init VRAM */
-	memset(m_vram, 0, SNES_VRAM_SIZE);
-
-	/* Init Palette RAM */
-	memset((UINT8 *)m_cgram, 0, SNES_CGRAM_SIZE);
-
-	/* Init oam RAM */
-	memset((UINT8 *)m_oam_ram, 0xff, SNES_OAM_SIZE);
-
-	m_stat78 = 0;
-	memset(m_regs, 0x00, sizeof(m_regs));
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -400,7 +359,113 @@ void snes_ppu_device::device_start()
 	save_pointer(NAME(m_oam_ram), SNES_OAM_SIZE/2);
 }
 
+void snes_ppu_device::device_reset()
+{
+	
+#if SNES_LAYER_DEBUG
+	memset(&m_debug_options, 0, sizeof(m_debug_options));
+#endif
+	
+	/* Inititialize registers/variables */
+	m_update_windows = 1;
+	m_beam.latch_vert = 0;
+	m_beam.latch_horz = 0;
+	m_beam.current_vert = 0;
+	m_beam.current_horz = 0;
+	m_beam.last_visible_line = 225; /* TODO: PAL setting */
+	m_mode = 0;
+	m_ppu1_version = 1;  // 5C77 chip version number, read by STAT77, only '1' is known
+	m_ppu2_version = 3;  // 5C78 chip version number, read by STAT78, only '2' & '3' encountered so far.
+	
+	m_cgram_address = 0;
+	m_read_ophct = 0;
+	m_read_opvct = 0;
 
+	m_vmadd = 0;
+	
+	PPU_REG(VMAIN) = 0x80;
+	// what about other regs?
+	
+	/* Inititialize mosaic table */
+	for (int j = 0; j < 16; j++)
+	{
+		for (int i = 0; i < 4096; i++)
+			m_mosaic_table[j][i] = (i / (j + 1)) * (j + 1);
+	}
+	
+	/* Init VRAM */
+	memset(m_vram, 0, SNES_VRAM_SIZE);
+	
+	/* Init Palette RAM */
+	memset((UINT8 *)m_cgram, 0, SNES_CGRAM_SIZE);
+	
+	/* Init oam RAM */
+	memset((UINT8 *)m_oam_ram, 0xff, SNES_OAM_SIZE);
+	
+	m_stat78 = 0;
+
+	// other initializations to 0
+	memset(m_regs, 0, sizeof(m_regs));
+	memset(m_oam_itemlist, 0, sizeof(m_oam_itemlist));
+	memset(&m_oam, 0, sizeof(m_oam));
+	memset(&m_mode7, 0, sizeof(m_mode7));
+
+	for (int i = 0; i < 2; i++)
+	{
+		m_scanlines[i].enable = 0;
+		m_scanlines[i].clip = 0;
+		memset(m_scanlines[i].buffer, 0, SNES_SCR_WIDTH);
+		memset(m_scanlines[i].priority, 0, SNES_SCR_WIDTH);
+		memset(m_scanlines[i].layer, 0, SNES_SCR_WIDTH);
+		memset(m_scanlines[i].blend_exception, 0, SNES_SCR_WIDTH);
+	}
+	
+	for (int i = 0; i < 6; i++)
+	{
+		m_layer[i].window1_enabled = 0;
+		m_layer[i].window1_invert = 0;
+		m_layer[i].window2_enabled = 0;
+		m_layer[i].window2_invert = 0;
+		m_layer[i].wlog_mask = 0;
+		m_layer[i].color_math = 0;
+		m_layer[i].charmap = 0;
+		m_layer[i].tilemap = 0;
+		m_layer[i].tilemap_size = 0;
+		m_layer[i].tile_size = 0;
+		m_layer[i].mosaic_enabled = 0;
+		m_layer[i].main_window_enabled = 0;
+		m_layer[i].sub_window_enabled = 0;
+		m_layer[i].main_bg_enabled = 0;
+		m_layer[i].sub_bg_enabled = 0;
+		m_layer[i].hoffs = 0;
+		m_layer[i].voffs = 0;
+		
+		memset(m_clipmasks[i], 0, SNES_SCR_WIDTH);
+	}
+	
+	for (int i = 0; i < ARRAY_LENGTH(m_oam_spritelist); i++)
+	{
+		m_oam_spritelist[i].tile = 0;
+		m_oam_spritelist[i].x = 0;
+		m_oam_spritelist[i].y = 0;
+		m_oam_spritelist[i].size = 0;
+		m_oam_spritelist[i].vflip = 0;
+		m_oam_spritelist[i].hflip = 0;
+		m_oam_spritelist[i].priority_bits = 0;
+		m_oam_spritelist[i].pal = 0;
+		m_oam_spritelist[i].height = 0;
+		m_oam_spritelist[i].width = 0;
+	}
+	
+	for (int i = 0; i < ARRAY_LENGTH(m_oam_tilelist); i++)
+	{
+		m_oam_tilelist[i].x = 0;
+		m_oam_tilelist[i].priority = 0;
+		m_oam_tilelist[i].pal = 0;
+		m_oam_tilelist[i].tileaddr = 0;
+		m_oam_tilelist[i].hflip = 0;
+	}
+}
 
 /*****************************************
  * get_bgcolor()

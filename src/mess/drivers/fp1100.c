@@ -674,7 +674,7 @@ static MACHINE_CONFIG_START( fp1100, fp1100_state )
 	MCFG_MC6845_UPDATE_ROW_CB(fp1100_state, fp1100_update_row)
 
 	/* Printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
+	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fp1100_state, centronics_busy_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 

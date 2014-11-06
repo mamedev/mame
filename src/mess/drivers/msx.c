@@ -517,7 +517,6 @@ PCB Layouts missing
 
 
 #include "includes/msx.h"
-#include "bus/centronics/covox.h"
 #include "formats/dsk_dsk.h"
 #include "formats/dmk_dsk.h"
 #include "machine/msx_matsushita.h"
@@ -1351,8 +1350,7 @@ static MACHINE_CONFIG_START( msx, msx_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
-	MCFG_SLOT_OPTION_ADD( "covox", CENTRONICS_COVOX )
+	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit1))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
@@ -1440,8 +1438,7 @@ static MACHINE_CONFIG_START( msx2, msx_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
-	MCFG_SLOT_OPTION_ADD( "covox", CENTRONICS_COVOX )
+	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit1))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
@@ -1505,8 +1502,7 @@ static MACHINE_CONFIG_START( msx2p, msx_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
-	MCFG_SLOT_OPTION_ADD( "covox", CENTRONICS_COVOX )
+	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit1))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")

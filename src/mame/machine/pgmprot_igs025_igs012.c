@@ -202,3 +202,18 @@ DRIVER_INIT_MEMBER(pgm_012_025_state,drgw2j)
 	mem16[0x130366 / 2] = 0x4e93;
 	mem16[0x1303f6 / 2] = 0x4e93;
 }
+
+DRIVER_INIT_MEMBER(pgm_012_025_state,drgw2hk)
+{
+	drgw2_common_init();
+
+	// todo, correct protection sequence for this region?
+	int region = 0x01;
+	m_igs025->m_kb_region = region;
+	m_igs025->m_kb_game_id = region | (region << 8) | (region << 16) | (region << 24);
+
+	UINT16 *mem16 = (UINT16 *)memregion("maincpu")->base();
+	mem16[0x12f520 / 2] = 0x4e93;
+	mem16[0x12f5c6 / 2] = 0x4e93;
+	mem16[0x12f656 / 2] = 0x4e93;
+}

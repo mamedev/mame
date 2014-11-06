@@ -864,7 +864,7 @@ static MACHINE_CONFIG_START( hx20, hx20_state )
 	MCFG_RAM_EXTRA_OPTIONS("32K")
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "hx20_flop")
+	MCFG_SOFTWARE_LIST_ADD("epson_cpm_list", "epson_cpm")
 MACHINE_CONFIG_END
 
 

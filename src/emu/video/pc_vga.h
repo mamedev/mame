@@ -26,7 +26,7 @@ public:
 	vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-
+	virtual void zero();
 	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual READ8_MEMBER(port_03b0_r);
@@ -205,6 +205,7 @@ public:
 	// construction/destruction
 	svga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
+	virtual void zero();
 	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 protected:
 	void svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect);

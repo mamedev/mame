@@ -595,7 +595,7 @@ static MACHINE_CONFIG_START( m5, m5_state )
 	// CK0 = EXINT, CK1 = GND, CK2 = TCK, CK3 = VDP INT
 	// ZC2 = EXCLK
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "printer")
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(m5_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
@@ -603,6 +603,7 @@ static MACHINE_CONFIG_START( m5, m5_state )
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(sordm5_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	MCFG_CASSETTE_INTERFACE("m5_cass")
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(m5_state, ppi_pa_r))
@@ -621,7 +622,8 @@ static MACHINE_CONFIG_START( m5, m5_state )
 	//MCFG_GENERIC_MANDATORY
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "m5")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "m5_cart")
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "m5_cass")
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

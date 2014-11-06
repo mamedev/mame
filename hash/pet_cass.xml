@@ -77,7 +77,7 @@
 		<publisher>Avalon Hill</publisher>
 		<part name="cass" interface="cbm_cass">
 			<dataarea name="cass" size="10001002">
-				<rom name="Bomber Attack (1982)(avalon hill).wav" size="10001002" crc="4ff57e9c" sha1="b795a4d8c2f7891088ee6cf7147d785948d7b887" offset="0" />
+				<rom name="bomber attack (1982)(avalon hill).wav" size="10001002" crc="4ff57e9c" sha1="b795a4d8c2f7891088ee6cf7147d785948d7b887" offset="0" />
 			</dataarea>
 		</part>
 	</software>

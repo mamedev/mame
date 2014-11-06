@@ -1021,6 +1021,9 @@ static MACHINE_CONFIG_START( stv, stv_state )
 	MCFG_SOUND_ADD("cdda", CDDA, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
+	MCFG_SET_READ_CALLBACK(stv_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
 /*

@@ -297,6 +297,7 @@ intvoice      // Mattel Intellivision + IntelliVoice expansion - 1982
 
 // Milton Bradley
 microvsn  // MicroVision - 1979
+simon
 
 // Entex
 advision  // Adventurevision
@@ -331,6 +332,9 @@ wscolor   // Bandai WonderSwan Color Handheld
 
 // EPOCH
 gamepock  // Epoch Game Pocket Computer
+
+// Bit Corp
+gamate   // Bit Corp Gamate
 
 // KOEI
 pasogo  // KOEI PasoGo
@@ -2474,6 +2478,7 @@ itt3030
 vax785
 ms0515
 ie15
+dvk_ksm
 asmapro
 asma2k
 altos5

@@ -8,6 +8,8 @@
 
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
+#include "includes/slapstic.h"
+
 
 class atarigx2_state : public atarigen_state
 {
@@ -19,7 +21,8 @@ public:
 			m_protection_base(*this, "protection_base"),
 			m_playfield_tilemap(*this, "playfield"),
 			m_alpha_tilemap(*this, "alpha"),
-			m_rle(*this, "rle") { }
+			m_rle(*this, "rle")
+			{ }
 
 	UINT16          m_playfield_base;
 

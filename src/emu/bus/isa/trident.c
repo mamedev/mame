@@ -155,8 +155,7 @@ void trident_vga_device::WRITEPIXEL(INT16 x,INT16 y, UINT32 data)
 
 void trident_vga_device::device_start()
 {
-	memset(&vga, 0, sizeof(vga));
-	memset(&svga, 0, sizeof(svga));
+	zero();
 
 	int i;
 	for (i = 0; i < 0x100; i++)

@@ -425,6 +425,7 @@ MACHINES += LDV1000
 MACHINES += LDVP931
 MACHINES += LH5810
 MACHINES += LINFLASH
+#MACHINES += LPCI
 MACHINES += LSI53C810
 MACHINES += M68307
 MACHINES += M68340
@@ -478,7 +479,6 @@ MACHINES += PC_FDC
 MACHINES += PC_LPT
 MACHINES += PCCARD
 MACHINES += PCF8593
-#MACHINES += PCI
 MACHINES += PCKEYBRD
 MACHINES += PIC8259
 MACHINES += PIT8253
@@ -599,6 +599,7 @@ BUSES += IQ151
 BUSES += ISA
 BUSES += ISBX
 BUSES += KC
+BUSES += LPCI
 BUSES += MACPDS
 BUSES += MIDI
 BUSES += MEGADRIVE
@@ -609,7 +610,6 @@ BUSES += NUBUS
 BUSES += O2
 BUSES += ORICEXT
 BUSES += PCE
-BUSES += PCI
 BUSES += PC_JOY
 BUSES += PC_KBD
 BUSES += PET
@@ -901,6 +901,7 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_MACHINE)/naomim2.o   \
 	$(MAME_MACHINE)/naomim4.o   \
 	$(MAME_MACHINE)/naomirom.o  \
+	$(MAME_MACHINE)/315-5881_crypt.o  \
 	$(MAME_VIDEO)/powervr2.o    \
 	$(MAME_DRIVERS)/neogeo.o    \
 	$(MAME_MACHINE)/neoboot.o   \
@@ -959,7 +960,7 @@ $(MESSOBJ)/act.a:               \
 	$(MESS_DRIVERS)/apricotf.o  \
 	$(MESS_DRIVERS)/apricotp.o  \
 	$(MESS_MACHINE)/apricotkb.o \
-	$(MESS_DRIVERS)/victor9k.o $(MESS_MACHINE)/victor9kb.o \
+	$(MESS_DRIVERS)/victor9k.o $(MESS_MACHINE)/victor9kb.o $(MESS_MACHINE)/victor9k_fdc.o \
 
 $(MESSOBJ)/adc.a:               \
 	$(MESS_DRIVERS)/super6.o    \
@@ -1029,7 +1030,7 @@ $(MESSOBJ)/bally.a:             \
 $(MESSOBJ)/bandai.a:            \
 	$(MESS_DRIVERS)/sv8000.o    \
 	$(MESS_DRIVERS)/rx78.o      \
-	$(MESS_DRIVERS)/wswan.o $(MESS_AUDIO)/wswan_snd.o $(MESS_MACHINE)/wswan.o $(MESS_VIDEO)/wswan.o \
+	$(MESS_DRIVERS)/wswan.o $(MESS_AUDIO)/wswan_snd.o $(MESS_MACHINE)/wswan.o $(MESS_VIDEO)/wswan_video.o \
 
 $(MESSOBJ)/be.a:                \
 	$(MESS_DRIVERS)/bebox.o $(MESS_MACHINE)/bebox.o \
@@ -1179,6 +1180,7 @@ $(MESSOBJ)/einis.a:             \
 
 $(MESSOBJ)/elektrka.a:          \
 	$(MESS_DRIVERS)/bk.o $(MESS_MACHINE)/bk.o $(MESS_VIDEO)/bk.o \
+	$(MESS_DRIVERS)/dvk_ksm.o $(MESS_MACHINE)/ms7004.o \
 	$(MESS_DRIVERS)/mk85.o      \
 	$(MESS_DRIVERS)/mk90.o      \
 
@@ -1351,6 +1353,7 @@ $(MESSOBJ)/matsushi.a:          \
 
 $(MESSOBJ)/mb.a:                \
 	$(MESS_DRIVERS)/microvsn.o  \
+	$(MESS_DRIVERS)/simon.o     \
 
 $(MESSOBJ)/mchester.a:          \
 	$(MESS_DRIVERS)/ssem.o      \
@@ -1829,7 +1832,7 @@ $(MESSOBJ)/wavemate.a:          \
 	$(MESS_DRIVERS)/jupiter.o   \
 
 $(MESSOBJ)/xerox.a:             \
-	$(MESS_DRIVERS)/xerox820.o  \
+	$(MESS_DRIVERS)/xerox820.o $(MESS_MACHINE)/x820kb.o \
 	$(MESS_DRIVERS)/bigbord2.o  \
 	$(MESS_DRIVERS)/alto2.o     \
 
@@ -1896,6 +1899,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/fc100.o     \
 	$(MESS_DRIVERS)/fk1.o       \
 	$(MESS_DRIVERS)/ft68m.o     \
+	$(MESS_DRIVERS)/gamate.o    \
 	$(MESS_DRIVERS)/gameking.o  \
 	$(MESS_DRIVERS)/gimix.o     \
 	$(MESS_DRIVERS)/grfd2301.o  \
@@ -2121,6 +2125,7 @@ $(MESS_DRIVERS)/sc2.o:      $(MESS_LAYOUT)/sc2.lh
 $(MESS_DRIVERS)/sdk85.o:    $(MESS_LAYOUT)/sdk85.lh
 $(MESS_DRIVERS)/sdk86.o:    $(MESS_LAYOUT)/sdk86.lh
 $(MESS_DRIVERS)/selz80.o:   $(MESS_LAYOUT)/selz80.lh
+$(MESS_DRIVERS)/simon.o:    $(MESS_LAYOUT)/simon.lh
 $(MESS_DRIVERS)/sitcom.o:   $(MESS_LAYOUT)/sitcom.lh
 $(MESS_DRIVERS)/slc1.o:     $(MESS_LAYOUT)/slc1.lh
 $(MESS_DRIVERS)/sms.o:      $(MESS_LAYOUT)/sms1.lh

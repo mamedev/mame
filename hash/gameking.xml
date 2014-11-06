@@ -5,7 +5,7 @@
 
 <softwarelist name="gameking" description="TimeTop GameKing cartridges">
 
-	<software name="2004">
+	<software name="2004" supported="no">
 		<description>2004</description>
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
@@ -16,7 +16,7 @@
 		</part>
 	</software>
 
-	<software name="alcarlo">
+	<software name="alcarlo" supported="no">
 		<description>Adventure Legend Carlo</description>
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
@@ -27,7 +27,7 @@
 		</part>
 	</software>
 
-	<software name="aries">
+	<software name="aries" supported="no">
 		<description>Aries</description>
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
@@ -38,7 +38,7 @@
 		</part>
 	</software>
 
-	<software name="dinoadv">
+	<software name="dinoadv" supported="no">
 		<description>Dino Adventure Legend</description>
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
@@ -49,7 +49,7 @@
 		</part>
 	</software>
 
-	<software name="duckman">
+	<software name="duckman" supported="no">
 		<description>Duck Man</description>
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
@@ -60,7 +60,7 @@
 		</part>
 	</software>
 
-	<software name="happybal">
+	<software name="happybal" supported="no">
 		<description>Happy Ball</description>
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
@@ -71,7 +71,7 @@
 		</part>
 	</software>
 
-	<software name="happykil">
+	<software name="happykil" supported="no">
 		<description>Happy Killer</description>
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
@@ -82,7 +82,7 @@
 		</part>
 	</software>
 
-	<software name="lanner">
+	<software name="lanner" supported="no">
 		<description>Lanneret</description>
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
@@ -93,7 +93,7 @@
 		</part>
 	</software>
 
-	<software name="penguin">
+	<software name="penguin" supported="no">
 		<description>Penguin</description>
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
@@ -104,7 +104,7 @@
 		</part>
 	</software>
 
-	<software name="popper">
+	<software name="popper" supported="no">
 		<description>Popper</description>
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
@@ -115,7 +115,7 @@
 		</part>
 	</software>
 
-	<software name="sthero">
+	<software name="sthero" supported="no">
 		<description>Street Hero</description>
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
@@ -126,7 +126,7 @@
 		</part>
 	</software>
 
-	<software name="smotor">
+	<software name="smotor" supported="no">
 		<description>Supermotor</description>
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
@@ -137,7 +137,7 @@
 		</part>
 	</software>
 
-	<software name="trojanl">
+	<software name="trojanl" supported="no">
 		<description>Trojan Legend</description>
 		<year>200?</year>
 		<publisher>TimeTop</publisher>

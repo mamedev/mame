@@ -203,7 +203,7 @@ void southbridge_device::device_start()
 void southbridge_device::device_reset()
 {
 	m_at_spkrdata = 0;
-	m_pit_out2 = 0;
+	m_pit_out2 = 1;
 	m_dma_channel = -1;
 	m_cur_eop = false;
 	m_nmi_enabled = 0;

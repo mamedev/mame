@@ -358,7 +358,7 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "machine/pci.h"
+#include "machine/lpci.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/idectrl.h"

@@ -10,11 +10,7 @@
 #include "video/jalblend.h"
 #include "includes/psychic5.h"
 
-#define BG_SCROLLX_LSB      0x308
-#define BG_SCROLLX_MSB      0x309
-#define BG_SCROLLY_LSB      0x30a
-#define BG_SCROLLY_MSB      0x30b
-#define BG_SCREEN_MODE      0x30c
+
 #define BG_PAL_INTENSITY_RG 0x1fe
 #define BG_PAL_INTENSITY_BU 0x1ff
 
@@ -23,12 +19,15 @@
   Palette color
 ***************************************************************************/
 
-void psychic5_state::psychic5_change_palette(int color, int offset)
+void psychic5_state::psychic5_change_palette(int offset, UINT8* palram, int palbase)
 {
-	UINT8 lo = m_ps5_palette_ram[offset & ~1];
-	UINT8 hi = m_ps5_palette_ram[offset | 1];
-	jal_blend_set(color, hi & 0x0f);
-	m_palette->set_pen_color(color, pal4bit(lo >> 4), pal4bit(lo), pal4bit(hi >> 4));
+	UINT8 lo = palram[(offset) & ~1];
+	UINT8 hi = palram[(offset) | 1];
+
+	int color = offset >> 1;
+
+	jal_blend_set(palbase + color, hi & 0x0f);
+	m_palette->set_pen_color(palbase + color, pal4bit(lo >> 4), pal4bit(lo), pal4bit(hi >> 4));
 }
 
 void psychic5_state::psychic5_change_bg_palette(int color, int lo_offs, int hi_offs)
@@ -44,8 +43,8 @@ void psychic5_state::psychic5_change_bg_palette(int color, int lo_offs, int hi_o
 
 	irgb = rgb_t(ir,ig,ib);
 
-	lo = m_ps5_palette_ram[lo_offs];
-	hi = m_ps5_palette_ram[hi_offs];
+	lo = m_ps5_palette_ram_bg[lo_offs];
+	hi = m_ps5_palette_ram_bg[hi_offs];
 
 	/* red,green,blue component */
 	r = pal4bit(lo >> 4);
@@ -53,7 +52,7 @@ void psychic5_state::psychic5_change_bg_palette(int color, int lo_offs, int hi_o
 	b = pal4bit(hi >> 4);
 
 	/* Grey background enable */
-	if (m_bg_status & 2)
+	if (m_bg_control[4] & 2)
 	{
 		UINT8 val = (r + g + b) / 3;        /* Grey */
 		/* Just leave plain grey */
@@ -73,12 +72,12 @@ void psychic5_state::psychic5_change_bg_palette(int color, int lo_offs, int hi_o
 void psychic5_state::set_background_palette_intensity()
 {
 	int i;
-	m_palette_intensity = m_ps5_palette_ram[BG_PAL_INTENSITY_BU] |
-						(m_ps5_palette_ram[BG_PAL_INTENSITY_RG]<<8);
+	m_palette_intensity = m_ps5_palette_ram_sp[BG_PAL_INTENSITY_BU] |
+						(m_ps5_palette_ram_sp[BG_PAL_INTENSITY_RG]<<8);
 
 	/* for all of the background palette */
 	for (i = 0; i < 0x100; i++)
-		psychic5_change_bg_palette(m_bg_palette_base+i,m_bg_palette_ram_base+i*2,m_bg_palette_ram_base+i*2+1);
+		psychic5_change_bg_palette(i+0x100,i*2,i*2+1);
 }
 
 
@@ -94,6 +93,7 @@ READ8_MEMBER(psychic5_state::psychic5_vram_page_select_r)
 WRITE8_MEMBER(psychic5_state::psychic5_vram_page_select_w)
 {
 	m_ps5_vram_page = data & 1;
+	m_vrambank->set_bank(data);
 }
 
 WRITE8_MEMBER(psychic5_state::psychic5_title_screen_w)
@@ -101,89 +101,40 @@ WRITE8_MEMBER(psychic5_state::psychic5_title_screen_w)
 	m_title_screen = data;
 }
 
-READ8_MEMBER(psychic5_state::psychic5_paged_ram_r)
-{
-	if (m_ps5_vram_page == 1)
-	{
-		switch (offset)
-		{
-			case 0x00: return ioport("SYSTEM")->read();
-			case 0x01: return ioport("P1")->read();
-			case 0x02: return ioport("P2")->read();
-			case 0x03: return ioport("DSW1")->read();
-			case 0x04: return ioport("DSW2")->read();
-		}
-	}
 
-	return m_ps5_pagedram[m_ps5_vram_page][offset];
+
+WRITE8_MEMBER(psychic5_state::sprite_col_w)
+{
+	m_ps5_palette_ram_sp[offset] = data;
+	psychic5_change_palette(offset,m_ps5_palette_ram_sp, 0x000);
 }
 
-WRITE8_MEMBER(psychic5_state::psychic5_paged_ram_w)
+WRITE8_MEMBER(psychic5_state::bg_col_w)
 {
-	m_ps5_pagedram[m_ps5_vram_page][offset] = data;
-
-	if (m_ps5_vram_page == 0)
-	{
-		if (offset <= 0xfff)
-			m_bg_tilemap->mark_tile_dirty(offset >> 1);
-	}
-	else
-	{
-		if (offset == BG_SCROLLX_LSB || offset == BG_SCROLLX_MSB)
-		{
-			UINT16 bg_scrollx = m_ps5_io_ram[BG_SCROLLX_LSB] | (m_ps5_io_ram[BG_SCROLLX_MSB] << 8);
-			m_bg_tilemap->set_scrollx(0, bg_scrollx);
-		}
-		else if (offset == BG_SCROLLY_LSB || offset == BG_SCROLLY_MSB)
-		{
-			UINT16 bg_scrolly = m_ps5_io_ram[BG_SCROLLY_LSB] | (m_ps5_io_ram[BG_SCROLLY_MSB] << 8);
-			m_bg_tilemap->set_scrolly(0, bg_scrolly);
-		}
-		else if (offset == BG_SCREEN_MODE)
-		{
-			m_bg_status = m_ps5_io_ram[BG_SCREEN_MODE];
-		}
-		else if (offset >= 0x400 && offset <= 0x5ff)    /* Sprite color */
-			psychic5_change_palette(((offset >> 1) & 0xff)+0x000,offset-0x400);
-		else if (offset >= 0x800 && offset <= 0x9ff)    /* BG color */
-			psychic5_change_palette(((offset >> 1) & 0xff)+0x100,offset-0x400);
-		else if (offset >= 0xa00 && offset <= 0xbff)    /* Text color */
-			psychic5_change_palette(((offset >> 1) & 0xff)+0x200,offset-0x400);
-		else if (offset >= 0x1000)
-			m_fg_tilemap->mark_tile_dirty((offset-0x1000) >> 1);
-	}
+	m_ps5_palette_ram_bg[offset] = data;
+	psychic5_change_palette(offset,m_ps5_palette_ram_bg, 0x100);
 }
 
-WRITE8_MEMBER(psychic5_state::bombsa_paged_ram_w)
+WRITE8_MEMBER(psychic5_state::tx_col_w)
 {
-	m_ps5_pagedram[m_ps5_vram_page][offset] = data;
-
-	if (m_ps5_vram_page == 0)
-	{
-		m_bg_tilemap->mark_tile_dirty(offset >> 1);
-	}
-	else
-	{
-		if (offset == BG_SCROLLX_LSB || offset == BG_SCROLLX_MSB)
-		{
-			UINT16 bg_scrollx = m_ps5_io_ram[BG_SCROLLX_LSB] | (m_ps5_io_ram[BG_SCROLLX_MSB] << 8);
-			m_bg_tilemap->set_scrollx(0, bg_scrollx);
-		}
-		else if (offset == BG_SCROLLY_LSB || offset == BG_SCROLLY_MSB)
-		{
-			UINT16 bg_scrolly = m_ps5_io_ram[BG_SCROLLY_LSB] | (m_ps5_io_ram[BG_SCROLLY_MSB] << 8);
-			m_bg_tilemap->set_scrolly(0, bg_scrolly);
-		}
-		else if (offset == BG_SCREEN_MODE)
-		{
-			m_bg_status = m_ps5_io_ram[BG_SCREEN_MODE];
-		}
-		else if (offset >= 0x0800 && offset <= 0x0fff)
-			m_fg_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
-		else if (offset >= 0x1000 && offset <= 0x15ff)
-			psychic5_change_palette((offset >> 1) & 0x3ff, offset-0x1000);
-	}
+	m_ps5_palette_ram_tx[offset] = data;
+	psychic5_change_palette(offset,m_ps5_palette_ram_tx, 0x200);
 }
+
+
+WRITE8_MEMBER(psychic5_state::fg_videoram_w)
+{
+	m_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset >> 1);
+}
+
+WRITE8_MEMBER( psychic5_state::bg_videoram_w )
+{	
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset >> 1);
+}
+
+
 
 WRITE8_MEMBER(psychic5_state::bombsa_unknown_w)
 {
@@ -224,69 +175,29 @@ TILE_GET_INFO_MEMBER(psychic5_state::get_fg_tile_info)
 
 VIDEO_START_MEMBER(psychic5_state,psychic5)
 {
-	/*                          info              offset             w   h  col  row */
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(psychic5_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(psychic5_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,  8,  8, 32, 32);
-
 	m_fg_tilemap->set_transparent_pen(15);
-
-	m_ps5_pagedram[0] = auto_alloc_array(machine(), UINT8, 0x2000);
-	m_ps5_pagedram[1] = auto_alloc_array(machine(), UINT8, 0x2000);
-
-	m_bg_videoram  = &m_ps5_pagedram[0][0x0000];
-	m_ps5_dummy_bg_ram      = &m_ps5_pagedram[0][0x1000];
-	m_ps5_io_ram            = &m_ps5_pagedram[1][0x0000];
-	m_ps5_palette_ram       = &m_ps5_pagedram[1][0x0400];
-	m_fg_videoram  = &m_ps5_pagedram[1][0x1000];
-
 	jal_blend_init(machine(), 1);
 
-	m_bg_palette_ram_base = 0x400;
-	m_bg_palette_base = 0x100;
 }
 
 VIDEO_START_MEMBER(psychic5_state,bombsa)
 {
-	/*                          info              offset             w   h   col  row */
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(psychic5_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 128, 32);
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(psychic5_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,  8,  8,  32, 32);
-
 	m_fg_tilemap->set_transparent_pen(15);
-
-	m_ps5_pagedram[0] = auto_alloc_array(machine(), UINT8, 0x2000);
-	m_ps5_pagedram[1] = auto_alloc_array(machine(), UINT8, 0x2000);
-
-	m_bg_videoram  = &m_ps5_pagedram[0][0x0000];
-	m_ps5_dummy_bg_ram      = &m_ps5_pagedram[0][0x1000];
-	m_ps5_io_ram            = &m_ps5_pagedram[1][0x0000];
-	m_fg_videoram  = &m_ps5_pagedram[1][0x0800];
-	m_ps5_palette_ram       = &m_ps5_pagedram[1][0x1000];
-
 	jal_blend_init(machine(), 0);
-
-	m_bg_palette_ram_base = 0x000;
-	m_bg_palette_base = 0x000;
 }
 
 VIDEO_RESET_MEMBER(psychic5_state,psychic5)
 {
 	m_bg_clip_mode = 0;
 	m_ps5_vram_page = 0;
-	m_bg_status = 0;
-	memset(m_ps5_pagedram[0],0,0x2000);
-	memset(m_ps5_pagedram[1],0,0x2000);
+	m_title_screen = 0;
 	m_palette_intensity = 0;
 }
 
-VIDEO_RESET_MEMBER(psychic5_state,bombsa)
-{
-	m_ps5_vram_page = 0;
-	m_bg_status = 0;
-	m_title_screen = 0;
-	memset(m_ps5_pagedram[0],0,0x2000);
-	memset(m_ps5_pagedram[1],0,0x2000);
-	m_palette_intensity = 0;
-}
 
 
 /***************************************************************************
@@ -406,8 +317,13 @@ void psychic5_state::draw_background(screen_device &screen, bitmap_rgb32 &bitmap
 
 UINT32 psychic5_state::screen_update_psychic5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	UINT16 bg_scrollx = m_bg_control[0] | (m_bg_control[1] << 8);
+	m_bg_tilemap->set_scrollx(0, bg_scrollx);
+	UINT16 bg_scrolly = m_bg_control[2] | (m_bg_control[3] << 8);
+	m_bg_tilemap->set_scrolly(0, bg_scrolly);
+
 	bitmap.fill(m_palette->black_pen(), cliprect);
-	if (m_bg_status & 1)    /* Backgound enable */
+	if (m_bg_control[4] & 1)    /* Backgound enable */
 		draw_background(screen, bitmap, cliprect);
 	if (!(m_title_screen & 1))
 		draw_sprites(bitmap, cliprect);
@@ -417,7 +333,13 @@ UINT32 psychic5_state::screen_update_psychic5(screen_device &screen, bitmap_rgb3
 
 UINT32 psychic5_state::screen_update_bombsa(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (m_bg_status & 1)    /* Backgound enable */
+	UINT16 bg_scrollx = m_bg_control[0] | (m_bg_control[1] << 8);
+	m_bg_tilemap->set_scrollx(0, bg_scrollx);
+	UINT16 bg_scrolly = m_bg_control[2] | (m_bg_control[3] << 8);
+	m_bg_tilemap->set_scrolly(0, bg_scrolly);
+	bitmap.fill(m_palette->black_pen(), cliprect);
+
+	if (m_bg_control[4] & 1)    /* Backgound enable */
 		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(m_palette->pen(0x0ff), cliprect);

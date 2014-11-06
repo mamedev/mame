@@ -3349,9 +3349,12 @@ MACHINE_START_MEMBER(pc9801_state,pc9801rs)
 	{
 		address_space& space = m_maincpu->space(AS_PROGRAM);
 		membank("wram")->set_base(m_ram->pointer());
-		space.install_read_bank(0x100000,  0x100000 + m_ram_size - 1, "ext_wram");
-		space.install_write_bank(0x100000,  0x100000 + m_ram_size - 1, "ext_wram");
-		membank("ext_wram")->set_base(m_ram->pointer() + 0xa0000);
+		if(m_ram_size)
+		{
+			space.install_read_bank(0x100000,  0x100000 + m_ram_size - 1, "ext_wram");
+			space.install_write_bank(0x100000,  0x100000 + m_ram_size - 1, "ext_wram");
+			membank("ext_wram")->set_base(m_ram->pointer() + 0xa0000);
+		}
 	}
 
 	m_ide_rom = memregion("ide")->base();

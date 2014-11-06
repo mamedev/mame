@@ -441,6 +441,7 @@ ckongalc        // bootleg (Alca)
 bigkong         // bootleg
 monkeyd         // bootleg
 dking           // Crazy Kong Bootleg
+ckongdks		// Spanish Crazy Kong bootleg
 ckongpt2        // (c) 1981 Falcon
 ckongpt2a       // (c) 1981 Falcon
 ckongpt2j       // (c) 1981 Falcon
@@ -1475,6 +1476,7 @@ claybust        // (c) 1978 Model Racing
 gunchamp        // (c) 1980 Model Racing
 gunchamps       // (c) 1980 Model Racing (sshot.c)
 spaceatt        // (c) 1978 Video Games GMBH
+galmonst		// (c) Laguna S.A.
 spaceat2        // (c) 1980 Zenitone-Microsec Ltd
 spacecom        // bootleg
 sinvzen         // Zenitone-Microsec Ltd
@@ -1796,6 +1798,7 @@ horizon         // (c) 1985
 youjyudn        // (c) 1986 (Japan)
 
 vigilant        // (c) 1988 (World)
+vigilantb		// (c) 1988 (World)
 vigilant1       // (c) 1988 (World)
 vigilantu       // (c) 1988 (US)
 vigilantu2      // (c) 1988 (US)
@@ -2520,6 +2523,7 @@ pbobble3        // 1996.?? E29 (c) 1996 Taito Corporation (World)
 pbobble3u       // 1996.11 E29 (c) 1996 Taito Corporation (US)
 pbobble3j       // 1996.11 E29 (c) 1996 Taito Corporation (Japan)
 arkretrn        // 1997.03 E36 (c) 1997 Taito Corporation (World)
+arkretrnu       // 1997.03 E36 (c) 1997 Taito Corporation (US)
 arkretrnj       // 1997.03 E36 (c) 1997 Taito Corporation (Japan)
 kirameki        // 1997.09 E44 (c) 1997 Taito Corporation (Japan)
 puchicar        // 1997.?? E46 (c) 1997 Taito Corporation (World)
@@ -2743,6 +2747,7 @@ batriderk       // (c) 1998 Raizing/8ing
 batriderja      // (c) 1998 Raizing/8ing
 batridert       // (c) 1998 Raizing/8ing
 bbakraid        // (c) 1999 8ing
+bbakraidc       // (c) 1999 8ing
 bbakraidj       // (c) 1999 8ing
 bbakraidja      // (c) 1999 8ing
 
@@ -2842,29 +2847,30 @@ korokoro        // (c) 1999 Takumi
 crusherm        // (c) 1999 Takumi
 tjumpman        // (c) 1999 Namco
 
-mushisam
-mushisama
-mushisamb
-espgal2
-ibara
-ibarablk
-ibarablka
-mushitam
-mushitama
-futari15
-futari15a
-futari10
-futaribl
-pinkswts
-pinkswtsa
-pinkswtsb
-pinkswtsx
-deathsml
-mmpork
-mmmbanc
-ddpdfk
-ddpdfk10
-dsmbl
+mushisam        // (c) 2004 Cave (AMI license) - 2004/10/12.MASTER VER.
+mushisama       // (c) 2004 Cave (AMI license) - 2004/10/12 MASTER VER.      
+mushisamb       // (c) 2004 Cave (AMI license) - 2004/10/12 MASTER VER
+espgal2         // (c) 2005 Cave (AMI license) - 2005/11/14 MASTER VER
+ibara           // (c) 2005 Cave (AMI license) - 2005/03/22 MASTER VER..
+ibarablk        // (c) 2005 Cave (AMI license) - 2006/02/06. MASTER VER.
+ibarablka       // (c) 2005 Cave (AMI license) - 2006/02/06 MASTER VER.
+mushitam        // (c) 2005 Cave (AMI license) - 2005/09/09.MASTER VER
+mushitama       // (c) 2005 Cave (AMI license) - 2005/09/09 MASTER VER
+futari15        // (c) 2006 Cave (AMI license) - 2006/12/8.MASTER VER. 1.54.
+futari15a       // (c) 2006 Cave (AMI license) - 2006/12/8 MASTER VER 1.54
+futari10        // (c) 2006 Cave (AMI license) - 2006/10/23 MASTER VER.
+futaribl        // (c) 2007 Cave (AMI license) - 2009/11/27 INTERNATIONAL BL
+futariblj       // (c) 2007 Cave (AMI license) - 2007/12/11 BLACK LABEL VER
+pinkswts        // (c) 2006 Cave (AMI license) - 2006/04/06 MASTER VER....
+pinkswtsa       // (c) 2006 Cave (AMI license) - 2006/04/06 MASTER VER...
+pinkswtsb       // (c) 2006 Cave (AMI license) - 2006/04/06 MASTER VER.
+pinkswtsx       // (c) 2006 Cave (AMI license) - 2006/xx/xx MASTER VER.
+deathsml        // (c) 2007 Cave (AMI license) - 2007/10/09 MASTER VER
+mmpork          // (c) 2007 Cave (AMI license) - 2007/ 4/17 MASTER VER.
+mmmbanc         // (c) 2007 Cave (AMI license) - 2007/06/05 MASTER VER.
+ddpdfk          // (c) 2008 Cave (AMI license) - 2008/06/23  MASTER VER 1.5
+ddpdfk10        // (c) 2008 Cave (AMI license) - 2008/05/16  MASTER VER
+dsmbl           // (c) 2008 Cave (AMI license) - 2008/10/06 MEGABLACK LABEL VER
 
 deathsm2
 
@@ -4684,6 +4690,7 @@ wwallyja        // 1992.06 Wally wo Sagase! (Japan, FD1094, decrypted)
 desertbr        // 1993.?? Desert Breaker (World, FD1094, decrypted)
 desertbrj       // 1992.10 Desert Breaker (Japan)
 pontoon
+hamaway
 
 // System18 Bootlegs
 astormbl        // BOOTLEG
@@ -5476,6 +5483,7 @@ vstrik3c        // 2001.04 Virtua Striker 3 (Rev C) (cartridge)
 wldrider        // 2001.05 Wild Riders
 clubkrte        // 2001.06 Club Kart: European Session
 clubkrtd        // 2001.06 Club Kart: European Session (Rev D)
+clubkrtc        // 2001.?? Club Kart: European Session (Rev C)
 beachspi        // 2001.07 Beach Spikers
 vf4cart         // 2001.08.02 Virtua Fighter 4 (cartridge)
 vf4             // 2001.08.02 Virtua Fighter 4 (GD-ROM)
@@ -5495,7 +5503,7 @@ initdv2jo       // 2002.12 Initial D Arcade Stage Ver. 2 (Japan)
 initdv2e        // 2002.12 Initial D Arcade Stage Ver. 2 (export)
 vf4evo          // 2002.12 Virtua Fighter 4 Evolution Ver.B
 clubk2k3        // 2003.?? Club Kart: European Session (2003)
-clubk2kf        // 2003.?? Club Kart: European Session (2003, not protected)
+clubk2kp        // 2003.?? Club Kart: European Session (2003, prototype)
 initdexpo       // 2002.?? Initial D Arcade Stage (Export)
 				// 2002.?? Sega Driving Simulator
 				// 2003.03 World Club Champion Football Serie A 2001-2002 Ver.2
@@ -7908,6 +7916,7 @@ ninjakd2        // UPL-????? (c) 1987
 ninjakd2a       // UPL-????? (c) 1987
 ninjakd2b       // UPL-????? (c) 1987
 rdaction        // UPL-87003?(c) 1987 + World Games license
+jt104			// hack?
 mnight          // UPL-????? (c) 1987 distributed by Kawakus
 arkarea         // UPL-87007 (c) 1988 (Arcade TV Game List - P.67, Right, 2 from top)
 robokid         // UPL-88013 (c) 1988
@@ -8299,7 +8308,8 @@ supdrapoa       // (c) 1983 + Jeutel license?
 supdrapob       // bootleg
 sbagman         // (c) 1984
 sbagmans        // (c) 1984 + Stern license
-botanic         // (c) 1985
+botanic         // (c) 1983
+botanicf		// (c) 1984
 squaitsa        // (c) 1985
 tankbust        // (c) 1985
 
@@ -9365,6 +9375,7 @@ magixb          // bootleg
 rocktris        // (c) 1994? Yun Sung
 magicbub        // (c) Yun Sung
 magicbuba       // (c) Yun Sung
+magicbubb       // (c) Yun Sung
 shocking        // (c) 1997 Yun Sung
 shockingk       // (c) 1997 Yun Sung
 bombkick        // (c) 1998 Yun Sung
@@ -9721,6 +9732,7 @@ drgw2           // (c) 1997 Dragon World 2
 dw2v100x        //
 drgw2c          //
 drgw2j          //
+drgw2hk			//
 drgw3           // (c) 1998 Dragon World 3
 drgw3105        //
 drgw3100        //
@@ -9821,8 +9833,10 @@ espgal          // (c) 2003 Espgaluda
 // IGS PGM2 Platform
 orleg2          // (c) 2007
 orleg2o         //
+orleg2oa		//
 kov2nl          // (c) 2008
 kov2nlo         //
+kov2nloa		//
 ddpdojh         //
 kov3            //
 
@@ -10968,7 +10982,9 @@ comg905d        // (c) 198? Cal Omega Inc.
 
 // IGT Player's Edge Plus
 peset001        // (c) 1987 IGT - International Game Technology
+peset004        // (c) 1987 IGT - International Game Technology
 peset038        // (c) 1987 IGT - International Game Technology
+peivc006        // (c) 1987 IGT - International Game Technology
 pepk1024        // (c) 1987 IGT - International Game Technology
 pepp0002        // (c) 1987 IGT - International Game Technology
 pepp0002a       // (c) 1987 IGT - International Game Technology
@@ -11112,7 +11128,9 @@ peip0115        // (c) 1987 IGT - International Game Technology
 peip0116        // (c) 1987 IGT - International Game Technology
 peip0118        // (c) 1987 IGT - International Game Technology
 peip0120        // (c) 1987 IGT - International Game Technology
+pemg0252        // (c) 1994 IGT - International Game Technology
 pebe0014        // (c) 1994 IGT - International Game Technology
+peke0017        // (c) 1994 IGT - International Game Technology
 peke1012        // (c) 1994 IGT - International Game Technology
 peke1013        // (c) 1994 IGT - International Game Technology
 peps0014        // (c) 1996 IGT - International Game Technology
@@ -20234,6 +20252,8 @@ m1cluedob2h //
 m1cluedob1  //
 m1cluedob1p //
 m1cluedob1h //
+m1cluedobi2 //
+m1cluedobi2p //
 m1cluedo4
 m1cluedo4p
 m1cluedo3
@@ -31790,6 +31810,7 @@ newufo_xmas
 ufomini
 ufo21
 ufo800
+westdrm
 
 // VLC Nevada
 nevada

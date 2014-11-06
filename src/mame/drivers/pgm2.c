@@ -278,6 +278,32 @@ ROM_START( orleg2o )
 	ROM_LOAD16_WORD_SWAP( "ig-a_sp.u2",              0x00000000, 0x1000000, CRC(8250688c) SHA1(d2488477afc528aeee96826065deba2bce4f0a7d) )
 ROM_END
 
+ROM_START( orleg2oa )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	ROM_LOAD( "xyj2_igs036.rom",         0x00000000, 0x0004000, NO_DUMP )
+
+	ROM_REGION( 0x800000, "user1", 0 )
+	ROM_LOAD( "orleg2_xyj2_v101cn.u7",  0x000000, 0x800000, CRC(45805b53) SHA1(f2a8399c821b75fadc53e914f6f318707e70787c) )
+
+	ROM_REGION( 0x200000, "tiles", ROMREGION_ERASEFF )
+	ROM_LOAD( "ig-a_text.u4",            0x00000000, 0x0200000, CRC(fa444c32) SHA1(31e5e3efa92d52bf9ab97a0ece51e3b77f52ce8a) )
+
+	ROM_REGION( 0x1000000, "bgtile", 0 )
+	ROM_LOAD32_WORD( "ig-a_bgl.u35",     0x00000000, 0x0800000, CRC(083a8315) SHA1(0dba25e132fbb12faa59ced648c27b881dc73478) )
+	ROM_LOAD32_WORD( "ig-a_bgh.u36",     0x00000002, 0x0800000, CRC(e197221d) SHA1(5574b1e3da4b202db725be906dd868edc2fd4634) )
+
+	ROM_REGION( 0x2000000, "spritesa", 0 ) // 1bpp sprite mask data
+	ROM_LOAD32_WORD( "ig-a_bml.u12",     0x00000000, 0x1000000, CRC(113a331c) SHA1(ee6b31bb2b052cc8799573de0d2f0a83f0ab4f6a) )
+	ROM_LOAD32_WORD( "ig-a_bmh.u16",     0x00000002, 0x1000000, CRC(fbf411c8) SHA1(5089b5cc9bbf6496ef1367c6255e63e9ab895117) )
+
+	ROM_REGION( 0x4000000, "spritesb", 0 ) // sprite colour data
+	ROM_LOAD32_WORD( "ig-a_cgl.u18",     0x00000000, 0x2000000, CRC(43501fa6) SHA1(58ccce6d393964b771fec3f5c583e3ede57482a3) )
+	ROM_LOAD32_WORD( "ig-a_cgh.u26",     0x00000002, 0x2000000, CRC(7051d020) SHA1(3d9b24c6fda4c9699bb9f00742e0888059b623e1) )
+
+	ROM_REGION( 0x1000000, "ymz770", ROMREGION_ERASEFF ) /* ymz770 */
+	ROM_LOAD16_WORD_SWAP( "ig-a_sp.u2",              0x00000000, 0x1000000, CRC(8250688c) SHA1(d2488477afc528aeee96826065deba2bce4f0a7d) )
+ROM_END
+
 ROM_START( kov2nl )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	ROM_LOAD( "gsyx_igs036.rom",         0x00000000, 0x0004000, NO_DUMP )
@@ -330,6 +356,31 @@ ROM_START( kov2nlo )
 	ROM_LOAD16_WORD_SWAP( "ig-a3_sp.u37",            0x00000000, 0x2000000, CRC(45cdf422) SHA1(8005d284bcee73cff37a147fcd1c3e9f039a7203) )
 ROM_END
 
+ROM_START( kov2nloa )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	ROM_LOAD( "gsyx_igs036.rom",         0x00000000, 0x0004000, NO_DUMP )
+
+	ROM_REGION( 0x800000, "user1", 0 )
+	ROM_LOAD( "kov2nl_gsyx_v300tw.u7",  0x000000, 0x800000, CRC(08da7552) SHA1(303b97d7694405474c8133a259303ccb49db48b1) )
+
+	ROM_REGION( 0x200000, "tiles", ROMREGION_ERASEFF )
+	ROM_LOAD( "ig-a3_text.u4",           0x00000000, 0x0200000, CRC(214530ff) SHA1(4231a02054b0345392a077042b95779fd45d6c22) )
+
+	ROM_REGION( 0x1000000, "bgtile", 0 )
+	ROM_LOAD32_WORD( "ig-a3_bgl.u35",    0x00000000, 0x0800000, CRC(2d46b1f6) SHA1(ea8c805eda6292e86a642e9633d8fee7054d10b1) )
+	ROM_LOAD32_WORD( "ig-a3_bgh.u36",    0x00000002, 0x0800000, CRC(df710c36) SHA1(f826c3f496c4f17b46d18af1d8e02cac7b7027ac) )
+
+	ROM_REGION( 0x2000000, "spritesa", 0 ) // 1bpp sprite mask data
+	ROM_LOAD32_WORD( "ig-a3_bml.u12",    0x00000000, 0x1000000, CRC(0bf63836) SHA1(b8e4f1951f8074b475b795bd7840c5a375b6f5ef) )
+	ROM_LOAD32_WORD( "ig-a3_bmh.u16",    0x00000002, 0x1000000, CRC(4a378542) SHA1(5d06a8a8796285a786ebb690c34610f923ef5570) )
+
+	ROM_REGION( 0x4000000, "spritesb", 0 ) // sprite colour data
+	ROM_LOAD32_WORD( "ig-a3_cgl.u18",    0x00000000, 0x2000000, CRC(8d923e1f) SHA1(14371cf385dd8857017d3111cd4710f4291b1ae2) )
+	ROM_LOAD32_WORD( "ig-a3_cgh.u26",    0x00000002, 0x2000000, CRC(5b6fbf3f) SHA1(d1f52e230b91ee6cde939d7c2b74da7fd6527e73) )
+
+	ROM_REGION( 0x2000000, "ymz770", ROMREGION_ERASEFF ) /* ymz770 */
+	ROM_LOAD16_WORD_SWAP( "ig-a3_sp.u37",            0x00000000, 0x2000000, CRC(45cdf422) SHA1(8005d284bcee73cff37a147fcd1c3e9f039a7203) )
+ROM_END
 
 ROM_START( ddpdojh )
 	ROM_REGION( 0x04000, "maincpu", 0 )
@@ -496,10 +547,12 @@ DRIVER_INIT_MEMBER(pgm2_state,kov3)
 /* PGM2 */
 GAME( 2007, orleg2,       0,         pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, China)", GAME_IS_SKELETON )
 GAME( 2007, orleg2o,      orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, China)", GAME_IS_SKELETON )
+GAME( 2007, orleg2oa,     orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, China)", GAME_IS_SKELETON )
 // should be earlier verisons too.
 
 GAME( 2008, kov2nl,       0,         pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V302, China)", GAME_IS_SKELETON )
 GAME( 2008, kov2nlo,      kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V301, China)", GAME_IS_SKELETON )
+GAME( 2008, kov2nloa,     kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V300, Taiwan)", GAME_IS_SKELETON )
 // should be earlier verisons too.
 
 GAME( 2010, ddpdojh,      0,    pgm2,    pgm2, pgm2_state,     ddpdojh,    ROT270, "IGS", "Dodonpachi Daioujou Tamashii (V201, China)", GAME_IS_SKELETON )

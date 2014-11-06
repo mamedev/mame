@@ -31,6 +31,7 @@
 		<year>1982</year>
 		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="3410"/>
+		<info name="alt_title" value="Advanced Dungeons &amp; Dragons - Cloudy Mountain"/>
 		<part name="cart" interface="intv_cart">
 			<feature name="slot" value="intv_rom" />
 			<dataarea name="5000" size="0x3000">
@@ -86,6 +87,20 @@
 			<feature name="slot" value="intv_rom" />
 			<dataarea name="5000" size="8192">
 				<rom name="astrosmash competition.50" size="8192" crc="d0f83698" sha1="fbb2df69cfda87976cf279be6ad028e00c47ce9d" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Originally AstroSmash was planned to be an Asteroid clone, titled Meteor. The code is still inside
+     the final AstroSmash cart, and this version makes the game selectable -->
+	<software name="astrosmsm" cloneof="astrosms">
+		<description>AstroSmash - Meteor (Hacked?)</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="8192">
+				<rom name="astrosmash - meteor (1981) (mattel).50" size="8192" crc="00be8bba" sha1="7da15a0b713cfc79e577650bd372b37cb3f6d7a4" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -502,6 +517,7 @@
 		</part>
 	</software>
 
+<!-- At title screen, press 4+7 in both keypads to start Deadly Dogs, a TRON Deadly Disks hack with BurgerTime gfx -->
 	<software name="digdug">
 		<description>Dig Dug</description>
 		<year>1987</year>
@@ -1823,6 +1839,18 @@
 		</part>
 	</software>
 
+	<software name="adventur" cloneof="add">
+		<description>Adventure (Prototype)</description>
+		<year>1982</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="16384">
+				<rom name="adventure (ad&amp;d - cloudy mountain) (1982) (mattel).50" size="16384" crc="11c3bcfa" sha1="009683f3a40adbdd97b7256d64614feff12469ae" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="advtron">
 		<description>Adventures of TRON (Unreleased)</description>
 		<year>1982</year>
@@ -1874,6 +1902,18 @@
 		</part>
 	</software>
 
+	<software name="crazycln">
+		<description>Crazy Clones (Unfinished)</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="0x2000">
+				<rom name="crazy clones.50" size="0x2000" crc="e1ee408f" sha1="9a45cd3b59ddb6c9e0fcff0cd4dc6f71afd6953d" offset="0x0000"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="choplift">
 		<description>Choplifter! (Prototype)</description>
 		<year>1983</year>
@@ -1900,6 +1940,18 @@
 			</dataarea>
 			<dataarea name="9000" size="0x4000">
 				<rom name="deep pockets - super pro pool and billiards.90" size="0x4000" crc="233c364d" sha1="e87a81345822f3417830f181169970c9aefaf9e3" offset="0x0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dfactorp" cloneof="dfactor">
+		<description>The Dreadnaught Factor (Prototype)</description>
+		<year>1982</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="16384">
+				<rom name="dreadnaught factor, the (prototype) (1983) (activision).50" size="16384" crc="bf4d0e9b" sha1="bede92706fbd137de5c24cff335f80e3447718fc" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2035,7 +2087,7 @@
 		</part>
 	</software>
 
-	<software name="league">
+	<software name="llight">
 		<description>League of Light (Prototype)</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
@@ -2043,6 +2095,30 @@
 			<feature name="slot" value="intv_rom" />
 			<dataarea name="5000" size="0x4000">
 				<rom name="league of light.50" size="0x4000" crc="b4287b95" sha1="ea729d124f02b87e3357ae62cce0f49242073141" offset="0x0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="llight1" cloneof="llight">
+		<description>League of Light (Prototype, Alt)</description>
+		<year>1983</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="16384">
+				<rom name="league of light (prototype) (1983) (activision) [a1][!].50" size="16384" crc="19360442" sha1="9c36d2fec6c1c2bc01bb3863997e267f74325e06" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="llight2" cloneof="llight" supported="no">
+		<description>League of Light (Prototype, Alt 2)</description>
+		<year>1983</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="16384">
+				<rom name="league of light (prototype) (1983) (activision) [a2].50" size="16384" crc="75ee64f6" sha1="43693f63b502029a15b93fc63be8e06cafa38085" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2071,6 +2147,42 @@
 			<feature name="slot" value="intv_rom" />
 			<dataarea name="5000" size="0x4000">
 				<rom name="masters of the universe ii.50" size="0x4000" crc="bab638f2" sha1="a7ab293fc906d18db415f647634be2f2bed1e93a" offset="0x0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minotaur" cloneof="addtot">
+		<description>Minotaur (Prototype)</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="16384">
+				<rom name="minotaur (1981) (mattel).50" size="16384" crc="bd731e3c" sha1="1cf301a48856cff7ac5e2162889fd0f3956d911c" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minotaur2" cloneof="addtot">
+		<description>Minotaur (Prototype, v2)</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="16384">
+				<rom name="minotaur v2 (1981) (mattel) [!].50" size="16384" crc="5a4ce519" sha1="3f6939a673f0ace5d02d7ebb5d9e44dfd4d80413" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minotaur11" cloneof="addtot" supported="no">
+		<description>Minotaur (Prototype, v1.1)</description>
+		<year>1981</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="16384">
+				<rom name="minotaur v1.1 (1981) (mattel) [!].50" size="16384" crc="6746607b" sha1="227d64182bc8adf46a17903c57c553353dd5e65a" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2144,6 +2256,18 @@
 		</part>
 	</software>
 
+	<software name="riveraidp" cloneof="riveraid">
+		<description>River Raid (Prototype)</description>
+		<year>1983?</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="16384">
+				<rom name="river raid v1 (prototype) (1982-83) (activision).50" size="16384" crc="95466ad3" sha1="2e148e09261ed89be0578abbb568b7225fc8621b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rrubble">
 		<description>Robot Rubble (Prototype)</description>
 		<year>1983</year>
@@ -2152,6 +2276,30 @@
 			<feature name="slot" value="intv_rom" />
 			<dataarea name="5000" size="0x4000">
 				<rom name="robot rubble.50" size="0x4000" crc="243b0812" sha1="d2d93bb89701906793a696b8b07a514fcff7428b" offset="0x0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rrubble2" cloneof="rrubble">
+		<description>Robot Rubble (Prototype, v2)</description>
+		<year>1983</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="8192">
+				<rom name="robot rubble v2 (prototype) (1983) (activision).50" size="8192" crc="a5e28783" sha1="7dfc58a14d57c7bd520007b2fb7e9173f3175752" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rrubble1" cloneof="rrubble">
+		<description>Robot Rubble (Prototype, v1)</description>
+		<year>1983</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="8192">
+				<rom name="robot rubble v1 (prototype) (1983) (activision).50" size="8192" crc="7473916d" sha1="99da0316641a7639ef4be71e5904b2399f36d4cb" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2239,6 +2387,18 @@
 			<feature name="slot" value="intv_rom" />
 			<dataarea name="5000" size="0x2000">
 				<rom name="takeover.50" size="0x2000" crc="1f584a69" sha1="47057bd3811689692ac9ef3deed7248e01a5f4f5" offset="0x0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thinicep" cloneof="thinice">
+		<description>Thin Ice (Prototype)</description>
+		<year>1983</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="intv_cart">
+			<feature name="slot" value="intv_rom" />
+			<dataarea name="5000" size="16384">
+				<rom name="thin ice (prototype) (1983) (intv corp) [!].50" size="16384" crc="d6495910" sha1="e038024463fc6b5577983621d861152602b281a6" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2393,10 +2553,10 @@
 		</part>
 	</software>
 
-	<software name="spacecnt">
+	<software name="spacecnt" cloneof="sspartan">
 		<description>Space Cunt</description>
-		<year>200?</year>
-		<publisher>IntelligentVision</publisher>
+		<year>1983</year>
+		<publisher>Mattel Electronics</publisher>
 		<info name="usage" value="Uses Intellivoice"/>
 		<part name="cart" interface="intv_cart">
 			<feature name="slot" value="intv_rom" />

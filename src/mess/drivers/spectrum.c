@@ -708,14 +708,14 @@ MACHINE_CONFIG_START( spectrum_common, spectrum_state )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 	MCFG_CASSETTE_INTERFACE("spectrum_cass")
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","spectrum_cass")
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "spectrum_cass")
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "spectrum_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_LOAD(spectrum_state, spectrum_cart)
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","spectrum")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "spectrum_cart")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( spectrum, spectrum_common )

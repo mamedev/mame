@@ -13,7 +13,6 @@
 #include "sound/wave.h"
 #include "machine/ay31015.h"
 #include "bus/centronics/ctronics.h"
-#include "bus/centronics/covox.h"
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"

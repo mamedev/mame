@@ -9,6 +9,8 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+#include "machine/315-5881_crypt.h"
+
 #define MAX_FILTERS (24)
 #define MAX_BLOCKS  (200)
 #define MAX_DIR_SIZE    (256*1024)
@@ -166,6 +168,8 @@ public:
 	optional_device<generic_slot_device> m_cart4;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+
 
 	bitmap_rgb32 m_tmpbitmap;
 	DECLARE_VIDEO_START(stv_vdp2);
@@ -694,7 +698,8 @@ public:
 	stv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: saturn_state(mconfig, type, tag),
 		m_adsp(*this, "adsp"),
-		m_adsp_pram(*this, "adsp_pram")
+		m_adsp_pram(*this, "adsp_pram"),
+		m_cryptdevice(*this, "315_5881")
 	{
 	}
 
@@ -829,6 +834,9 @@ public:
 	DECLARE_WRITE32_MEMBER( decathlt_prot2_w );
 	void write_prot_data(UINT32 data, UINT32 mem_mask, int offset, int which);
 	void install_decathlt_protection();
+
+	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
+	UINT16 crypt_read_callback(UINT32 addr);
 };
 
 

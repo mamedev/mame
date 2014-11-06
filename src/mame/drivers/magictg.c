@@ -118,7 +118,7 @@ Medium size chip with heat sink on it
 #include "cpu/adsp2100/adsp2100.h"
 #include "sound/dmadac.h"
 #include "video/voodoo.h"
-#include "machine/pci.h"
+#include "machine/lpci.h"
 
 
 /* TODO: Two 3Dfx Voodoo chipsets are used in SLI configuration */

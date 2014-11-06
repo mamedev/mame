@@ -35,14 +35,14 @@
 #include "wswan.lh"
 
 static ADDRESS_MAP_START (wswan_mem, AS_PROGRAM, 8, wswan_state)
-	AM_RANGE(0x00000, 0x03fff) AM_RAM       // 16kb RAM / 4 colour tiles
+	AM_RANGE(0x00000, 0x03fff) AM_DEVREADWRITE("vdp", wswan_video_device, vram_r, vram_w)       // 16kb RAM / 4 colour tiles
 	AM_RANGE(0x04000, 0x0ffff) AM_NOP       // nothing
 	//AM_RANGE(0x10000, 0xeffff)    // cart range, setup at machine_start
 	AM_RANGE(0xf0000, 0xfffff) AM_READ(bios_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START (wscolor_mem, AS_PROGRAM, 8, wswan_state)
-	AM_RANGE(0x00000, 0x0ffff) AM_RAM       // 16kb RAM / 4 colour tiles, 16 colour tiles + palettes
+	AM_RANGE(0x00000, 0x0ffff) AM_DEVREADWRITE("vdp", wswan_video_device, vram_r, vram_w)       // 16kb RAM / 4 colour tiles, 16 colour tiles + palettes
 	//AM_RANGE(0x10000, 0xeffff)    // cart range, setup at machine_start
 	AM_RANGE(0xf0000, 0xfffff) AM_READ(bios_r)
 ADDRESS_MAP_END
@@ -83,7 +83,7 @@ PALETTE_INIT_MEMBER(wswan_state, wswan)
 	}
 }
 
-PALETTE_INIT_MEMBER(wswan_state,wscolor)
+PALETTE_INIT_MEMBER(wswan_state, wscolor)
 {
 	for (int i = 0; i < 4096; i++)
 	{
@@ -95,9 +95,9 @@ PALETTE_INIT_MEMBER(wswan_state,wscolor)
 }
 
 static SLOT_INTERFACE_START(wswan_cart)
-	SLOT_INTERFACE_INTERNAL("ws_rom",         WS_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("ws_sram",        WS_ROM_SRAM)
-	SLOT_INTERFACE_INTERNAL("ws_eeprom",      WS_ROM_EEPROM)
+	SLOT_INTERFACE_INTERNAL("ws_rom",     WS_ROM_STD)
+	SLOT_INTERFACE_INTERNAL("ws_sram",    WS_ROM_SRAM)
+	SLOT_INTERFACE_INTERNAL("ws_eeprom",  WS_ROM_EEPROM)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( wswan, wswan_state )
@@ -106,11 +106,16 @@ static MACHINE_CONFIG_START( wswan, wswan_state )
 	MCFG_CPU_PROGRAM_MAP(wswan_mem)
 	MCFG_CPU_IO_MAP(wswan_io)
 
+	MCFG_DEVICE_ADD("vdp", WSWAN_VIDEO, 0)
+	MCFG_WSWAN_VIDEO_TYPE(VDP_TYPE_WSWAN)
+	MCFG_WSWAN_VIDEO_IRQ_CB(wswan_state, set_irq_line)
+	MCFG_WSWAN_VIDEO_DMASND_CB(wswan_state, dma_sound_cb)
+
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(75)
 	MCFG_SCREEN_VBLANK_TIME(0)
-	MCFG_SCREEN_UPDATE_DRIVER(wswan_state, screen_update)
-	MCFG_SCREEN_SIZE( WSWAN_X_PIXELS, WSWAN_Y_PIXELS )
+	MCFG_SCREEN_UPDATE_DEVICE("vdp", wswan_video_device, screen_update)
+	MCFG_SCREEN_SIZE(WSWAN_X_PIXELS, WSWAN_Y_PIXELS)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, WSWAN_X_PIXELS - 1, 0, WSWAN_Y_PIXELS - 1)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -141,11 +146,14 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( wscolor, wswan )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(wscolor_mem)
-	MCFG_MACHINE_START_OVERRIDE(wswan_state, wscolor )
+	MCFG_MACHINE_START_OVERRIDE(wswan_state, wscolor)
+
+	MCFG_DEVICE_MODIFY("vdp")
+	MCFG_WSWAN_VIDEO_TYPE(VDP_TYPE_WSC)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(4096)
-	MCFG_PALETTE_INIT_OWNER(wswan_state, wscolor )
+	MCFG_PALETTE_INIT_OWNER(wswan_state, wscolor)
 
 	/* software lists */
 	MCFG_DEVICE_REMOVE("cart_list")

@@ -4686,7 +4686,7 @@ inline void rsp_device::ccfunc_rsp_vaddc_scalar()
 		INT32 s2 = (UINT32)(UINT16)w2;
 		INT32 r = s1 + s2;
 
-		vres[i] = (INT16)r;
+		vres[i] = (INT16)(r);
 		SET_ACCUM_L((INT16)r, i);
 
 		if (r & 0xffff0000)
@@ -4754,7 +4754,6 @@ inline void rsp_device::ccfunc_rsp_vsubc_scalar()
 {
 	int op = m_rsp_state->arg0;
 
-
 	CLEAR_ZERO_FLAGS();
 	CLEAR_CARRY_FLAGS();
 
@@ -4788,6 +4787,67 @@ static void cfunc_rsp_vsubc_scalar(void *param)
 	((rsp_device *)param)->ccfunc_rsp_vsubc_scalar();
 }
 #endif
+
+// VADDB
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 010110 |
+// ------------------------------------------------------
+//
+// Adds two vector registers bytewise with rounding
+inline void rsp_device::ccfunc_rsp_vaddb_scalar()
+{
+	const int op = m_rsp_state->arg0;
+	const int round = (EL == 0) ? 0 : (1 << (EL - 1));
+
+	INT16 vres[8];
+	for (int i = 0; i < 8; i++)
+	{
+		UINT16 w1, w2;
+		SCALAR_GET_VS1(w1, i);
+		SCALAR_GET_VS2(w2, i);
+
+		UINT8 hb1 = w1 >> 8;
+		UINT8 lb1 = w1 & 0xff;
+		UINT8 hb2 = w2 >> 8;
+		UINT8 lb2 = w2 & 0xff;
+
+		UINT16 hs = hb1 + hb2 + round;
+		UINT16 ls = lb1 + lb2 + round;
+
+		SET_ACCUM_L((hs << 8) | ls, i);
+
+		hs >>= EL;
+		if (hs > 255)
+		{
+			hs = 255;
+		}
+		else if (hs < 0)
+		{
+			hs = 0;
+		}
+
+		ls >>= EL;
+		if (ls > 255)
+		{
+			ls = 255;
+		}
+		else if (ls < 0)
+		{
+			ls = 0;
+		}
+
+		vres[i] = 0; // VD writeback disabled on production hardware
+		// vres[i] = (hs << 8) | ls;
+	}
+	WRITEBACK_RESULT();
+}
+
+static void cfunc_rsp_vaddb_scalar(void *param)
+{
+	((rsp_device *)param)->ccfunc_rsp_vaddb_scalar();
+}
 
 #if USE_SIMD
 // VSAW
@@ -6318,13 +6378,15 @@ inline void rsp_device::ccfunc_rsp_vrcpl_simd()
 
 	UINT16 urec;
 	SIMD_EXTRACT16(m_xv[VS2REG], urec, EL);
-	INT32 rec = (urec | m_reciprocal_high);
-
+	INT32 rec = (INT16)urec;
 	INT32 datainput = rec;
 
-	if (rec < 0)
+	if (m_dp_allowed)
 	{
-		if (m_dp_allowed)
+		rec = (rec & 0x0000ffff) | m_reciprocal_high;
+		datainput = rec;
+
+		if (rec < 0)
 		{
 			if (rec < -32768)
 			{
@@ -6335,12 +6397,13 @@ inline void rsp_device::ccfunc_rsp_vrcpl_simd()
 				datainput = -datainput;
 			}
 		}
-		else
-		{
-			datainput = -datainput;
-		}
 	}
+	else if (datainput < 0)
+	{
+		datainput = -datainput;
 
+		shifter = 0x10;
+	}
 
 	if (datainput)
 	{
@@ -6353,25 +6416,12 @@ inline void rsp_device::ccfunc_rsp_vrcpl_simd()
 			}
 		}
 	}
-	else
-	{
-		if (m_dp_allowed)
-		{
-			shifter = 0;
-		}
-		else
-		{
-			shifter = 0x10;
-		}
-	}
 
 	INT32 address = ((datainput << shifter) & 0x7fc00000) >> 22;
 	INT32 fetchval = rsp_divtable[address];
 	INT32 temp = (0x40000000 | (fetchval << 14)) >> ((~shifter) & 0x1f);
-	if (rec < 0)
-	{
-		temp = ~temp;
-	}
+	temp ^= rec >> 31;
+
 	if (!rec)
 	{
 		temp = 0x7fffffff;
@@ -6408,12 +6458,15 @@ inline void rsp_device::ccfunc_rsp_vrcpl_scalar()
 	int op = m_rsp_state->arg0;
 
 	INT32 shifter = 0;
-	INT32 rec = ((UINT16)(VREG_S(VS2REG, EL & 7)) | m_reciprocal_high);
+	INT32 rec = (INT16)VREG_S(VS2REG, EL & 7);
 	INT32 datainput = rec;
 
-	if (rec < 0)
+	if (m_dp_allowed)
 	{
-		if (m_dp_allowed)
+		rec = (rec & 0x0000ffff) | m_reciprocal_high;
+		datainput = rec;
+
+		if (rec < 0)
 		{
 			if (rec < -32768)
 			{
@@ -6424,12 +6477,13 @@ inline void rsp_device::ccfunc_rsp_vrcpl_scalar()
 				datainput = -datainput;
 			}
 		}
-		else
-		{
-			datainput = -datainput;
-		}
 	}
+	else if (datainput < 0)
+	{
+		datainput = -datainput;
 
+		shifter = 0x10;
+	}
 
 	if (datainput)
 	{
@@ -6442,25 +6496,11 @@ inline void rsp_device::ccfunc_rsp_vrcpl_scalar()
 			}
 		}
 	}
-	else
-	{
-		if (m_dp_allowed)
-		{
-			shifter = 0;
-		}
-		else
-		{
-			shifter = 0x10;
-		}
-	}
 
-	INT32 address = ((datainput << shifter) & 0x7fc00000) >> 22;
-	INT32 fetchval = rsp_divtable[address];
+	UINT32 address = (datainput << shifter) >> 22;
+	INT32 fetchval = rsp_divtable[address & 0x1ff];
 	INT32 temp = (0x40000000 | (fetchval << 14)) >> ((~shifter) & 0x1f);
-	if (rec < 0)
-	{
-		temp = ~temp;
-	}
+	temp ^= rec >> 31;
 	if (!rec)
 	{
 		temp = 0x7fffffff;
@@ -6592,31 +6632,69 @@ static void cfunc_rsp_vmov_scalar(void *param)
 }
 #endif
 
-#if USE_SIMD
-// VRSQL
+// VRSQ
 //
 // 31       25  24     20      15      10      5        0
 // ------------------------------------------------------
-// | 010010 | 1 | EEEE | SSSSS | ?FFFF | DDDDD | 110101 |
+// | 010010 | 1 | EEEE | SSSSS | ?FFFF | DDDDD | 110100 |
 // ------------------------------------------------------
 //
-// Calculates reciprocal square-root low part
+// Calculates reciprocal square-root
 
-inline void rsp_device::ccfunc_rsp_vrsql_simd()
+inline void rsp_device::ccfunc_rsp_vrsq_scalar()
 {
 	int op = m_rsp_state->arg0;
 
-#if SIMUL_SIMD
-	m_old_reciprocal_res = m_reciprocal_res;
-	m_old_reciprocal_high = m_reciprocal_high;
-	m_old_dp_allowed = m_dp_allowed;
-#endif
-
 	INT32 shifter = 0;
-	UINT16 val;
-	SIMD_EXTRACT16(m_xv[VS2REG], val, EL);
-	INT32 rec = m_reciprocal_high | val;
-	INT32 datainput = rec;
+	INT32 rec = (INT16)VREG_S(VS2REG, EL & 7);
+	INT32 datainput = (rec < 0) ? (-rec) : (rec);
+
+	if (rec < 0)
+	{
+		if (rec < -32768)
+		{
+			datainput = ~datainput;
+		}
+		else
+		{
+			datainput = -datainput;
+		}
+	}
+
+	if (datainput)
+	{
+		for (int i = 0; i < 32; i++)
+		{
+			if (datainput & (1 << ((~i) & 0x1f)))
+			{
+				shifter = i;
+				break;
+			}
+		}
+	}
+	else
+	{
+		shifter = 0;
+	}
+
+	INT32 address = ((datainput << shifter) & 0x7fc00000) >> 22;
+	address = ((address | 0x200) & 0x3fe) | (shifter & 1);
+
+	INT32 fetchval = rsp_divtable[address];
+	INT32 temp = (0x40000000 | (fetchval << 14)) >> (((~shifter) & 0x1f) >> 1);
+	if (rec < 0)
+	{
+		temp = ~temp;
+	}
+	if (!rec)
+	{
+		temp = 0x7fffffff;
+	}
+	else if (rec == 0xffff8000)
+	{
+		temp = 0xffff0000;
+	}
+	rec = temp;
 
 	if (rec < 0)
 	{
@@ -6650,13 +6728,99 @@ inline void rsp_device::ccfunc_rsp_vrsql_simd()
 	}
 	else
 	{
-		if (m_dp_allowed)
+		shifter = 0;
+	}
+
+	address = ((datainput << shifter) & 0x7fc00000) >> 22;
+	address = ((address | 0x200) & 0x3fe) | (shifter & 1);
+
+	fetchval = rsp_divtable[address];
+	temp = (0x40000000 | (fetchval << 14)) >> (((~shifter) & 0x1f) >> 1);
+	if (rec < 0)
+	{
+		temp = ~temp;
+	}
+	if (!rec)
+	{
+		temp = 0x7fff;
+	}
+	else if (rec == 0xffff8000)
+	{
+		temp = 0x0000;
+	}
+	rec = temp;
+
+	W_VREG_S(VDREG, VS1REG & 7) = (UINT16)rec;
+	for (int i = 0; i < 8; i++)
+	{
+		SET_ACCUM_L(VREG_S(VS2REG, VEC_EL_2(EL, i)), i);
+	}
+}
+
+static void cfunc_rsp_vrsq_scalar(void *param)
+{
+	((rsp_device *)param)->ccfunc_rsp_vrsq_scalar();
+}
+
+#if USE_SIMD
+// VRSQL
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | ?FFFF | DDDDD | 110101 |
+// ------------------------------------------------------
+//
+// Calculates reciprocal square-root low part
+
+inline void rsp_device::ccfunc_rsp_vrsql_simd()
+{
+	int op = m_rsp_state->arg0;
+
+#if SIMUL_SIMD
+	m_old_reciprocal_res = m_reciprocal_res;
+	m_old_reciprocal_high = m_reciprocal_high;
+	m_old_dp_allowed = m_dp_allowed;
+#endif
+
+	INT32 shifter = 0;
+	UINT16 val;
+	SIMD_EXTRACT16(m_xv[VS2REG], val, EL);
+	INT32 rec = (INT16)val;
+	INT32 datainput = rec;
+
+	if (m_dp_allowed)
+	{
+		rec = (rec & 0x0000ffff) | m_reciprocal_high;
+		datainput = rec;
+
+		if (rec < 0)
 		{
-			shifter = 0;
+			if (rec < -32768)
+			{
+				datainput = ~datainput;
+			}
+			else
+			{
+				datainput = -datainput;
+			}
 		}
-		else
+	}
+	else if (datainput < 0)
+	{
+		datainput = -datainput;
+
+		shifter = 0x10;
+	}
+
+	if (datainput)
+	{
+		for (int i = 0; i < 32; i++)
 		{
-			shifter = 0x10;
+			if (datainput & (1 << ((~i) & 0x1f)))
+			{
+				shifter = i;
+				break;
+			}
 		}
 	}
 
@@ -6665,10 +6829,8 @@ inline void rsp_device::ccfunc_rsp_vrsql_simd()
 
 	INT32 fetchval = rsp_divtable[address];
 	INT32 temp = (0x40000000 | (fetchval << 14)) >> (((~shifter) & 0x1f) >> 1);
-	if (rec < 0)
-	{
-		temp = ~temp;
-	}
+	temp ^= rec >> 31;
+
 	if (!rec)
 	{
 		temp = 0x7fffffff;
@@ -6699,12 +6861,15 @@ inline void rsp_device::ccfunc_rsp_vrsql_scalar()
 	int op = m_rsp_state->arg0;
 
 	INT32 shifter = 0;
-	INT32 rec = m_reciprocal_high | (UINT16)VREG_S(VS2REG, EL & 7);
+	INT32 rec = (INT16)VREG_S(VS2REG, EL & 7);
 	INT32 datainput = rec;
 
-	if (rec < 0)
+	if (m_dp_allowed)
 	{
-		if (m_dp_allowed)
+		rec = (rec & 0x0000ffff) | m_reciprocal_high;
+		datainput = rec;
+
+		if (rec < 0)
 		{
 			if (rec < -32768)
 			{
@@ -6715,10 +6880,12 @@ inline void rsp_device::ccfunc_rsp_vrsql_scalar()
 				datainput = -datainput;
 			}
 		}
-		else
-		{
-			datainput = -datainput;
-		}
+	}
+	else if (datainput < 0)
+	{
+		datainput = -datainput;
+
+		shifter = 0x10;
 	}
 
 	if (datainput)
@@ -6732,27 +6899,14 @@ inline void rsp_device::ccfunc_rsp_vrsql_scalar()
 			}
 		}
 	}
-	else
-	{
-		if (m_dp_allowed)
-		{
-			shifter = 0;
-		}
-		else
-		{
-			shifter = 0x10;
-		}
-	}
 
 	INT32 address = ((datainput << shifter) & 0x7fc00000) >> 22;
 	address = ((address | 0x200) & 0x3fe) | (shifter & 1);
 
 	INT32 fetchval = rsp_divtable[address];
 	INT32 temp = (0x40000000 | (fetchval << 14)) >> (((~shifter) & 0x1f) >> 1);
-	if (rec < 0)
-	{
-		temp = ~temp;
-	}
+	temp ^= rec >> 31;
+
 	if (!rec)
 	{
 		temp = 0x7fffffff;
@@ -7361,6 +7515,30 @@ void rsp_device::generate_sequence_instruction(drcuml_block *block, compiler_sta
 }
 
 /*------------------------------------------------------------------
+    generate_branch
+------------------------------------------------------------------*/
+
+void rsp_device::generate_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+{
+	compiler_state compiler_temp = *compiler;
+
+	/* update the cycles and jump through the hash table to the target */
+	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
+	{
+		generate_update_cycles(block, &compiler_temp, desc->targetpc, TRUE);	// <subtract cycles>
+		if (desc->flags & OPFLAG_INTRABLOCK_BRANCH)
+			UML_JMP(block, desc->targetpc | 0x80000000);						// jmp     desc->targetpc
+		else
+			UML_HASHJMP(block, 0, desc->targetpc, *m_nocode);					// hashjmp <mode>,desc->targetpc,nocode
+	}
+	else
+	{
+		generate_update_cycles(block, &compiler_temp, mem(&m_rsp_state->jmpdest), TRUE);	// <subtract cycles>
+		UML_HASHJMP(block, 0, mem(&m_rsp_state->jmpdest), *m_nocode);						// hashjmp <mode>,<rsreg>,nocode
+	}
+}
+
+/*------------------------------------------------------------------
     generate_delay_slot_and_branch
 ------------------------------------------------------------------*/
 
@@ -7386,23 +7564,7 @@ void rsp_device::generate_delay_slot_and_branch(drcuml_block *block, compiler_st
 	assert(desc->delay.first() != NULL);
 	generate_sequence_instruction(block, &compiler_temp, desc->delay.first());     // <next instruction>
 
-	/* update the cycles and jump through the hash table to the target */
-	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
-	{
-		generate_update_cycles(block, &compiler_temp, desc->targetpc, TRUE);   // <subtract cycles>
-		if (desc->flags & OPFLAG_INTRABLOCK_BRANCH)
-			UML_JMP(block, desc->targetpc | 0x80000000);                            // jmp     desc->targetpc
-		else
-			UML_HASHJMP(block, 0, desc->targetpc, *m_nocode);
-																					// hashjmp <mode>,desc->targetpc,nocode
-	}
-	else
-	{
-		generate_update_cycles(block, &compiler_temp, mem(&m_rsp_state->jmpdest), TRUE);
-																					// <subtract cycles>
-		UML_HASHJMP(block, 0, mem(&m_rsp_state->jmpdest), *m_nocode);
-																					// hashjmp <mode>,<rsreg>,nocode
-	}
+	generate_branch(block, compiler, desc);
 
 	/* update the label */
 	compiler->labelnum = compiler_temp.labelnum;
@@ -7618,6 +7780,26 @@ int rsp_device::generate_vector_opcode(drcuml_block *block, compiler_state *comp
 #endif
 			return TRUE;
 
+		case 0x16:      /* VADDB */
+			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vaddb_scalar, this);
+			return TRUE;
+
+		case 0x17:      /* VSUBB (reserved, functionally identical to VADDB) */
+			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vaddb_scalar, this);
+			return TRUE;
+
+		case 0x18:      /* VACCB (reserved, functionally identical to VADDB) */
+			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vaddb_scalar, this);
+			return TRUE;
+
+		case 0x19:      /* VSUCB (reserved, functionally identical to VADDB) */
+			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vaddb_scalar, this);
+			return TRUE;
+
 		case 0x1d:      /* VSAW */
 			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vsaw_simd, this);
@@ -7827,6 +8009,11 @@ int rsp_device::generate_vector_opcode(drcuml_block *block, compiler_state *comp
 #endif
 			return TRUE;
 
+		case 0x34:		/* VRSQ */
+			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);	      // mov     [arg0],desc->opptr.l
+			UML_CALLC_block, cfunc_rsp_vrsq_scalar, this);
+			return TRUE;
+
 		case 0x35:      /* VRSQL */
 			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vrsql_simd, this);
@@ -7847,6 +8034,10 @@ int rsp_device::generate_vector_opcode(drcuml_block *block, compiler_state *comp
 			UML_CALLC(block, cfunc_restore_regs, this);
 			UML_CALLC(block, cfunc_verify_regs, this);
 #endif
+			return TRUE;
+
+		case 0x37:		/* VNOP */
+		case 0x3F:		/* VNULL */
 			return TRUE;
 
 		default:
@@ -7954,6 +8145,26 @@ int rsp_device::generate_vector_opcode(drcuml_block *block, compiler_state *comp
 			UML_CALLC(block, cfunc_rsp_vsubc_scalar, this);
 			return TRUE;
 
+		case 0x16:      /* VADDB */
+			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vaddb_scalar, this);
+			return TRUE;
+
+		case 0x17:      /* VSUBB (reserved, functionally identical to VADDB) */
+			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vaddb_scalar, this);
+			return TRUE;
+
+		case 0x18:      /* VACCB (reserved, functionally identical to VADDB) */
+			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vaddb_scalar, this);
+			return TRUE;
+
+		case 0x19:      /* VSUCB (reserved, functionally identical to VADDB) */
+			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vaddb_scalar, this);
+			return TRUE;
+
 		case 0x1d:      /* VSAW */
 			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vsaw_scalar, this);
@@ -8049,6 +8260,11 @@ int rsp_device::generate_vector_opcode(drcuml_block *block, compiler_state *comp
 			UML_CALLC(block, cfunc_rsp_vmov_scalar, this);
 			return TRUE;
 
+		case 0x34:		/* VRSQ */
+			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);	      // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vrsq_scalar, this);
+			return TRUE;
+
 		case 0x35:      /* VRSQL */
 			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vrsql_scalar, this);
@@ -8057,6 +8273,10 @@ int rsp_device::generate_vector_opcode(drcuml_block *block, compiler_state *comp
 		case 0x36:      /* VRSQH */
 			UML_MOV(block, mem(&m_rsp_state->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_rsp_vrsqh_scalar, this);
+			return TRUE;
+
+		case 0x37:		/* VNOP */
+		case 0x3F:		/* VNULL */
 			return TRUE;
 
 		default:
@@ -8421,6 +8641,9 @@ int rsp_device::generate_special(drcuml_block *block, compiler_state *compiler, 
 			UML_MOV(block, mem(&m_rsp_state->arg0), 3);                   // mov     [arg0],3
 			UML_CALLC(block, cfunc_sp_set_status_cb, this);                      // callc   cfunc_sp_set_status_cb
 			UML_MOV(block, mem(&m_rsp_state->icount), 0);                       // mov icount, #0
+			UML_MOV(block, mem(&m_rsp_state->jmpdest), desc->targetpc);
+
+			generate_branch(block, compiler, desc);
 
 			UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);
 			return TRUE;

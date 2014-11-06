@@ -169,17 +169,20 @@ protected:
 	virtual void handle_timers(int cycles);
 	virtual void upd7810_take_irq();
 
+	void upd7810_handle_timer0(int cycles, int clkdiv);
+	void upd7810_handle_timer1(int cycles, int clkdiv);
+
 	devcb_write_line  m_to_func;
 	devcb_write_line  m_txd_func;
 	devcb_read_line   m_rxd_func;
-	devcb_read_line   m_an0_func;
-	devcb_read_line   m_an1_func;
-	devcb_read_line   m_an2_func;
-	devcb_read_line   m_an3_func;
-	devcb_read_line   m_an4_func;
-	devcb_read_line   m_an5_func;
-	devcb_read_line   m_an6_func;
-	devcb_read_line   m_an7_func;
+	devcb_read8       m_an0_func;
+	devcb_read8       m_an1_func;
+	devcb_read8       m_an2_func;
+	devcb_read8       m_an3_func;
+	devcb_read8       m_an4_func;
+	devcb_read8       m_an5_func;
+	devcb_read8       m_an6_func;
+	devcb_read8       m_an7_func;
 
 	typedef void (upd7810_device::*opcode_func)();
 
@@ -291,8 +294,9 @@ protected:
 	UINT8   m_co1;
 	UINT16  m_irr;    /* interrupt request register */
 	UINT16  m_itf;    /* interrupt test flag register */
-	int     m_int1;   /* keep track of current int1 state. Needed for 7801 irq checking. */
-	int     m_int2;   /* keep track to current int2 state. Needed for 7801 irq checking. */
+	int     m_nmi;    /* keep track of current nmi state. Needed for 7810 irq checking. */
+	int     m_int1;   /* keep track of current int1 state. Needed for irq checking. */
+	int     m_int2;   /* keep track to current int2 state. Needed for irq checking. */
 
 	/* internal helper variables */
 	UINT16  m_txs;    /* transmitter shift register */
@@ -308,6 +312,8 @@ protected:
 	UINT8   m_edges;  /* rising/falling edge flag for serial I/O */
 	UINT16  m_adcnt;  /* A/D converter cycle count */
 	UINT8   m_adtot;  /* A/D converter total cycles per conversion */
+	UINT8   m_tmpcr;  /* temporary analog digital conversion register */
+	int     m_shdone; /* A/D converter sample and hold done */
 	int     m_adout;  /* currently selected A/D converter output register */
 	int     m_adin;   /* currently selected A/D converter input */
 	int     m_adrange;/* in scan mode, A/D converter range (AN0-AN3 or AN4-AN7) */

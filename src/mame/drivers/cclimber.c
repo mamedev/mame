@@ -1788,6 +1788,37 @@ ROM_START( dking )
 ROM_END
 
 
+ROM_START( ckongdks )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ck13.bin",      0x0800, 0x0800, CRC(f97ba8ae) SHA1(ae4a578ad77a8d3252f2f99a1afa6f38bc00471e) ) // 97.509766%
+	ROM_CONTINUE(              0x0000, 0x0800 )
+	ROM_LOAD( "ck09.bin",      0x1000, 0x1000, CRC(fe89dea4) SHA1(c39372ebe9950808ebc1ff7909c291496b206026) )
+	ROM_LOAD( "ck11.bin",      0x2000, 0x1000, CRC(b3947d06) SHA1(1c5e66e1f11313e11de760cda406c1fe237ce09a) ) // 99.975586%
+	ROM_LOAD( "ck12.bin",      0x3000, 0x1000, CRC(23d0657d) SHA1(dfebf3902186a3ab3b36c6d07bdbc832885347b4) ) // 95.214844%
+	ROM_LOAD( "ck10.bin",      0x4800, 0x0800, CRC(c27a13f1) SHA1(14f11976bc0e643829a4d4d2d5bb27971979be6f) ) // 94.921875%
+	ROM_CONTINUE(              0x4000, 0x0800 )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "ck06.bin",      0x0000, 0x1000, CRC(a8916dc8) SHA1(472520aae3837e6026f2a7577d3b2aff371a316c) )
+	ROM_LOAD( "ck05.bin",      0x1000, 0x1000, CRC(cd3b5dde) SHA1(2319a2be04d70989b01f4fc703756ba6e1c1f388) )
+	ROM_LOAD( "ck04.bin",      0x2000, 0x1000, CRC(b62a0367) SHA1(8c285cbc714d7e6589bd63b3cef7c841ed1c2a4e) )
+	ROM_LOAD( "ck03.bin",      0x3000, 0x1000, CRC(61122c5e) SHA1(978b6dbec35f3adc651fddf332db17625099a92e) )
+
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "ck02.bin",  0x0000, 0x0800, CRC(085b5f90) SHA1(cce771fbd76c2bc7749325d71c95810898e5b0d9) ) // 98.730469%
+	ROM_LOAD( "ck01.bin",  0x0800, 0x0800, CRC(16fd47e2) SHA1(43e5ea70e99482db90681e401a7e1e2d2d36b6f4) ) // 98.339844%
+
+	ROM_REGION( 0x0160, "proms", 0 ) // not dumped, assuming to be the same as dking
+	ROM_LOAD( "ck6v.bin",     0x0000, 0x0020, CRC(751c3325) SHA1(edce2bc883996c1d72dc6c1c9f62799b162d415a) ) // 82s123.1v
+	ROM_LOAD( "ck6u.bin",     0x0020, 0x0020, CRC(ab1940fa) SHA1(8d98e05cbaa6f55770c12e0a9a8ed9c73cc54423) ) // 82s123.1u
+	ROM_LOAD( "ck6t.bin",     0x0040, 0x0020, CRC(b4e827a5) SHA1(31a5a5ad54417a474d22bb16c473415d99a2b6f1) ) // 82s123.1t
+	ROM_LOAD( "82s129.5g",    0x0060, 0x0100, CRC(9e11550d) SHA1(b8cba8e16e10e23fba1f11551102ab77b680bdf0) ) // Decryption Table?
+
+	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_LOAD( "ck08.bin",    0x0000, 0x1000, CRC(31c0a7de) SHA1(ace23fde4cb3c336b8377c1a1e940607d545e8c3) ) // 97.241211%
+	ROM_LOAD( "ck07.bin",    0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
+ROM_END
+
 /* This set came from a 'Silver Land' board with Silver Land GFX roms, however, the program roms are nearly
    the same as River Patrol but appear to have an original ORCA copyright
 
@@ -2363,7 +2394,8 @@ GAME( 1980, cclimbroper, cclimber, cclimber, cclimber, driver_device,  0,       
 GAME( 1981, ckong,       0,        cclimber, ckong, driver_device,    0,        ROT270, "Kyoei / Falcon", "Crazy Kong", 0 ) // on a Falcon FCK-01 PCB, but doesn't display any Falcon copyright
 GAME( 1981, ckongalc,    ckong,    cclimber, ckong, driver_device,    0,        ROT270, "bootleg (Alca)", "Crazy Kong (Alca bootleg)", 0 )
 GAME( 1981, monkeyd,     ckong,    cclimber, ckong, driver_device,    0,        ROT270, "bootleg", "Monkey Donkey", 0 )
-GAME( 1981, dking,       ckong   , cclimber, ckong, cclimber_state,    dking,    ROT270, "bootleg", "Donkey King", 0 )
+GAME( 1981, dking,       ckong,    cclimber, ckong, cclimber_state,   dking,    ROT270, "bootleg", "Donkey King", 0 )
+GAME( 1981, ckongdks,    ckong,    cclimber, ckong, cclimber_state,   dking,    ROT270, "bootleg", "Donkey Kong (Spanish Crazy Kong bootleg)", 0 )
 
 /* these sets have correct colours, and also contain the graphics used for the extra attract screen in the BG roms, but it is unused
  - the Falcon logo in the text roms is still unused

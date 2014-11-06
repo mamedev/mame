@@ -193,8 +193,7 @@ public:
 
 	void buggyboy_draw_char(UINT8 *bitmap, bool wide);
 	void buggyboy_get_roadpix(int screen, int ls161, UINT8 rva0_6, UINT8 sld, UINT32 *_rorev,
-								UINT8 *rc0, UINT8 *rc1, UINT8 *rc2, UINT8 *rc3,
-								const UINT8 *rom, const UINT8 *prom0, const UINT8 *prom1, const UINT8 *prom2);
+								UINT8 *rc0, UINT8 *rc1, UINT8 *rc2, UINT8 *rc3);
 	void buggyboy_draw_road(UINT8 *bitmap);
 	void buggybjr_draw_road(UINT8 *bitmap);
 	void buggyboy_draw_objs(UINT8 *bitmap, bool wide);

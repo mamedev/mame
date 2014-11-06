@@ -299,6 +299,7 @@ public:
 	void ccfunc_rsp_vabs_scalar();
 	void ccfunc_rsp_vaddc_scalar();
 	void ccfunc_rsp_vsubc_scalar();
+	void ccfunc_rsp_vaddb_scalar();
 	void ccfunc_rsp_vsaw_scalar();
 	void ccfunc_rsp_vlt_scalar();
 	void ccfunc_rsp_veq_scalar();
@@ -325,6 +326,7 @@ public:
 	void ccfunc_mtc2_scalar();
 	void ccfunc_ctc2_scalar();
 #endif
+	void ccfunc_rsp_vrsq_scalar();
 #if USE_SIMD && SIMUL_SIMD
 	void ccfunc_backup_regs();
 	void ccfunc_restore_regs();
@@ -541,6 +543,7 @@ private:
 	void generate_checksum_block(drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
 	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void generate_delay_slot_and_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT8 linkreg);
+	void generate_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	int generate_vector_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	int generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	int generate_special(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);

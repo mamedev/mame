@@ -11,36 +11,6 @@
 
 /*
 
-    Sector format
-    -------------
-
-    Header sync
-    Sector header (header ID, track ID, sector ID, and checksum)
-    Gap 1
-    Data Sync
-    Data field (data sync, data ID, data bytes, and checksum)
-    Gap 2
-
-    Track format
-    ------------
-
-    ZONE        LOWER HEAD  UPPER HEAD  SECTORS     ROTATIONAL
-    NUMBER      TRACKS      TRACKS      PER TRACK   PERIOD (MS)
-
-    0           0-3         unused      19          237.9
-    1           4-15        0-7         18          224.5
-    2           16-26       8-18        17          212.2
-    3           27-37       19-29       16          199.9
-    4           38-48       30-40       15          187.6
-    5           49-59       41-51       14          175.3
-    6           60-70       52-62       13          163.0
-    7           71-79       63-74       12          149.6
-    8           unused      75-79       11          144.0
-
-*/
-
-/*
-
     TODO:
 
     - floppy 8048
@@ -59,144 +29,6 @@
 
 
 //**************************************************************************
-//  READ/WRITE HANDLERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  floppy_p1_r -
-//-------------------------------------------------
-
-READ8_MEMBER( victor9k_state::floppy_p1_r )
-{
-	/*
-
-	    bit     description
-
-	    0       L0MS0
-	    1       L0MS1
-	    2       L0MS2
-	    3       L0MS3
-	    4       L1MS0
-	    5       L1MS1
-	    6       L1MS2
-	    7       L1MS3
-
-	*/
-
-	return m_lms;
-}
-
-
-//-------------------------------------------------
-//  floppy_p2_r -
-//-------------------------------------------------
-
-READ8_MEMBER( victor9k_state::floppy_p2_r )
-{
-	/*
-
-	    bit     description
-
-	    0
-	    1
-	    2
-	    3
-	    4
-	    5
-	    6       RDY0
-	    7       RDY1
-
-	*/
-
-	UINT8 data = 0;
-
-	data |= m_rdy0 << 6;
-	data |= m_rdy1 << 7;
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  floppy_p2_w -
-//-------------------------------------------------
-
-WRITE8_MEMBER( victor9k_state::floppy_p2_w )
-{
-	/*
-
-	    bit     description
-
-	    0       START0
-	    1       STOP0
-	    2       START1
-	    3       STOP1
-	    4       SEL1
-	    5       SEL0
-	    6
-	    7
-
-	*/
-
-	if (BIT(data, 0)) m_floppy0->mon_w(0);
-	if (BIT(data, 1)) m_floppy0->mon_w(1);
-	if (BIT(data, 2)) m_floppy1->mon_w(0);
-	if (BIT(data, 3)) m_floppy1->mon_w(1);
-
-	int sel0 = BIT(data, 5);
-
-	if (m_sel0 && !sel0)
-	{
-		m_da0 = m_da;
-		//m_floppy0->set_rpm();
-	}
-
-	m_sel0 = sel0;
-
-	int sel1 = BIT(data, 4);
-
-	if (m_sel1 && !sel1)
-	{
-		m_da1 = m_da;
-		//m_floppy1->set_rpm();
-	}
-
-	m_sel1 = sel1;
-}
-
-
-//-------------------------------------------------
-//  tach0_r -
-//-------------------------------------------------
-
-READ8_MEMBER( victor9k_state::tach0_r )
-{
-	return m_tach0;
-}
-
-
-//-------------------------------------------------
-//  tach1_r -
-//-------------------------------------------------
-
-READ8_MEMBER( victor9k_state::tach1_r )
-{
-	return m_tach1;
-}
-
-
-//-------------------------------------------------
-//  da_w -
-//-------------------------------------------------
-
-WRITE8_MEMBER( victor9k_state::da_w )
-{
-	m_da = data;
-}
-
-
-
-//**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
 
@@ -206,33 +38,21 @@ WRITE8_MEMBER( victor9k_state::da_w )
 
 static ADDRESS_MAP_START( victor9k_mem, AS_PROGRAM, 8, victor9k_state )
 //  AM_RANGE(0x00000, 0xdffff) AM_RAM
+	AM_RANGE(0x20000, 0xdffff) AM_NOP
 	AM_RANGE(0xe0000, 0xe0001) AM_DEVREADWRITE(I8259A_TAG, pic8259_device, read, write)
 	AM_RANGE(0xe0020, 0xe0023) AM_DEVREADWRITE(I8253_TAG, pit8253_device, read, write)
 	AM_RANGE(0xe0040, 0xe0043) AM_DEVREADWRITE(UPD7201_TAG, upd7201_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0xe8000, 0xe8000) AM_DEVREADWRITE(HD46505S_TAG, mc6845_device, status_r, address_w)
-	AM_RANGE(0xe8001, 0xe8001) AM_DEVREADWRITE(HD46505S_TAG, mc6845_device, register_r, register_w)
-	AM_RANGE(0xe8020, 0xe802f) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
-	AM_RANGE(0xe8040, 0xe804f) AM_DEVREADWRITE(M6522_2_TAG, via6522_device, read, write)
-	AM_RANGE(0xe8060, 0xe8061) AM_DEVREADWRITE(MC6852_TAG, mc6852_device, read, write)
-	AM_RANGE(0xe8080, 0xe808f) AM_DEVREADWRITE(M6522_3_TAG, via6522_device, read, write)
-	AM_RANGE(0xe80a0, 0xe80af) AM_DEVREADWRITE(M6522_4_TAG, via6522_device, read, write)
-	AM_RANGE(0xe80c0, 0xe80cf) AM_DEVREADWRITE(M6522_6_TAG, via6522_device, read, write)
-	AM_RANGE(0xe80e0, 0xe80ef) AM_DEVREADWRITE(M6522_5_TAG, via6522_device, read, write)
+	AM_RANGE(0xe8000, 0xe8000) AM_MIRROR(0x7f00) AM_DEVREADWRITE(HD46505S_TAG, mc6845_device, status_r, address_w)
+	AM_RANGE(0xe8001, 0xe8001) AM_MIRROR(0x7f00) AM_DEVREADWRITE(HD46505S_TAG, mc6845_device, register_r, register_w)
+	AM_RANGE(0xe8020, 0xe802f) AM_MIRROR(0x7f00) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
+	AM_RANGE(0xe8040, 0xe804f) AM_MIRROR(0x7f00) AM_DEVREADWRITE(M6522_2_TAG, via6522_device, read, write)
+	AM_RANGE(0xe8060, 0xe8061) AM_MIRROR(0x7f00) AM_DEVREADWRITE(MC6852_TAG, mc6852_device, read, write)
+	AM_RANGE(0xe8080, 0xe808f) AM_MIRROR(0x7f00) AM_DEVREADWRITE(M6522_3_TAG, via6522_device, read, write)
+	AM_RANGE(0xe80a0, 0xe80af) AM_MIRROR(0x7f00) AM_DEVREADWRITE(FDC_TAG, victor_9000_fdc_t, cs5_r, cs5_w)
+	AM_RANGE(0xe80c0, 0xe80cf) AM_MIRROR(0x7f00) AM_DEVREADWRITE(FDC_TAG, victor_9000_fdc_t, cs6_r, cs6_w)
+	AM_RANGE(0xe80e0, 0xe80ef) AM_MIRROR(0x7f00) AM_DEVREADWRITE(FDC_TAG, victor_9000_fdc_t, cs7_r, cs7_w)
 	AM_RANGE(0xf0000, 0xf0fff) AM_MIRROR(0x1000) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION(I8088_TAG, 0)
-ADDRESS_MAP_END
-
-
-//-------------------------------------------------
-//  ADDRESS_MAP( floppy_io )
-//-------------------------------------------------
-
-static ADDRESS_MAP_START( floppy_io, AS_IO, 8, victor9k_state )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(floppy_p1_r) AM_WRITENOP
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(floppy_p2_r, floppy_p2_w)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(tach0_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(tach1_r)
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_WRITE(da_w)
 ADDRESS_MAP_END
 
 
@@ -341,7 +161,7 @@ WRITE_LINE_MEMBER( victor9k_state::ssda_irq_w )
 {
 	m_ssda_irq = state;
 
-	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_via4_irq || m_via5_irq || m_via6_irq);
+	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_fdc_irq);
 }
 
 
@@ -413,7 +233,7 @@ WRITE_LINE_MEMBER( victor9k_state::via1_irq_w )
 {
 	m_via1_irq = state;
 
-	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_via4_irq || m_via5_irq || m_via6_irq);
+	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_fdc_irq);
 }
 
 WRITE8_MEMBER( victor9k_state::via2_pa_w )
@@ -480,7 +300,7 @@ WRITE_LINE_MEMBER( victor9k_state::via2_irq_w )
 {
 	m_via2_irq = state;
 
-	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_via4_irq || m_via5_irq || m_via6_irq);
+	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_fdc_irq);
 }
 
 
@@ -520,247 +340,7 @@ WRITE_LINE_MEMBER( victor9k_state::via3_irq_w )
 {
 	m_via3_irq = state;
 
-	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_via4_irq || m_via5_irq || m_via6_irq);
-}
-
-
-WRITE8_MEMBER( victor9k_state::via4_pa_w )
-{
-	/*
-
-	    bit     description
-
-	    PA0     L0MS0
-	    PA1     L0MS1
-	    PA2     L0MS2
-	    PA3     L0MS3
-	    PA4     ST0A
-	    PA5     ST0B
-	    PA6     ST0C
-	    PA7     ST0D
-
-	*/
-
-	m_lms = (m_lms & 0xf0) | (data & 0x0f);
-	m_st[0] = data >> 4;
-}
-
-WRITE8_MEMBER( victor9k_state::via4_pb_w )
-{
-	/*
-
-	    bit     description
-
-	    PB0     L1MS0
-	    PB1     L1MS1
-	    PB2     L1MS2
-	    PB3     L1MS3
-	    PB4     ST1A
-	    PB5     ST1B
-	    PB6     ST1C
-	    PB7     ST1D
-
-	*/
-
-	m_lms = (data << 4) | (m_lms & 0x0f);
-	m_st[1] = data >> 4;
-}
-
-WRITE_LINE_MEMBER( victor9k_state::mode_w )
-{
-}
-
-WRITE_LINE_MEMBER( victor9k_state::via4_irq_w )
-{
-	m_via4_irq = state;
-
-	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_via4_irq || m_via5_irq || m_via6_irq);
-}
-
-
-/*
-
-    bit     description
-
-    PA0     E0
-    PA1     E1
-    PA2     I1
-    PA3     E2
-    PA4     E4
-    PA5     E5
-    PA6     I7
-    PA7     E6
-
-*/
-
-WRITE8_MEMBER( victor9k_state::via5_pb_w )
-{
-	/*
-
-	    bit     description
-
-	    PB0     WD0
-	    PB1     WD1
-	    PB2     WD2
-	    PB3     WD3
-	    PB4     WD4
-	    PB5     WD5
-	    PB6     WD6
-	    PB7     WD7
-
-	*/
-}
-
-WRITE_LINE_MEMBER( victor9k_state::via5_irq_w )
-{
-	m_via5_irq = state;
-
-	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_via4_irq || m_via5_irq || m_via6_irq);
-}
-
-
-READ8_MEMBER( victor9k_state::via6_pa_r )
-{
-	/*
-
-	    bit     description
-
-	    PA0
-	    PA1     _TRK0D0
-	    PA2
-	    PA3     _TRK0D1
-	    PA4
-	    PA5
-	    PA6     WPS
-	    PA7     _SYNC
-
-	*/
-
-	UINT8 data = 0;
-
-	// track 0 drive A sense
-	data |= m_floppy0->trk00_r() << 1;
-
-	// track 0 drive B sense
-	data |= m_floppy1->trk00_r() << 3;
-
-	// write protect sense
-	data |= (m_drive ? m_floppy1->wpt_r() : m_floppy0->wpt_r()) << 6;
-
-	// disk sync detect
-	data |= m_sync << 7;
-
-	return data;
-}
-
-WRITE8_MEMBER( victor9k_state::via6_pa_w )
-{
-	/*
-
-	    bit     description
-
-	    PA0     LED0A
-	    PA1
-	    PA2     LED1A
-	    PA3
-	    PA4     SIDE SELECT
-	    PA5     DRIVE SELECT
-	    PA6
-	    PA7
-
-	*/
-
-	// LED, drive A
-	output_set_led_value(LED_A, BIT(data, 0));
-
-	// LED, drive B
-	output_set_led_value(LED_B, BIT(data, 2));
-
-	// dual side select
-	m_side = BIT(data, 4);
-
-	// select drive A/B
-	m_drive = BIT(data, 5);
-}
-
-READ8_MEMBER( victor9k_state::via6_pb_r )
-{
-	/*
-
-	    bit     description
-
-	    PB0     RDY0
-	    PB1     RDY1
-	    PB2
-	    PB3     _DS1
-	    PB4     _DS0
-	    PB5     SINGLE/_DOUBLE SIDED
-	    PB6
-	    PB7
-
-	*/
-
-	UINT8 data = 0;
-
-	// motor speed status, drive A
-	data |= m_rdy0;
-
-	// motor speed status, drive B
-	data |= m_rdy1 << 1;
-
-	// door B sense
-	data |= m_ds1 << 3;
-
-	// door A sense
-	data |= m_ds0 << 4;
-
-	// single/double sided
-	data |= (m_drive ? m_floppy1->twosid_r() : m_floppy0->twosid_r()) << 5;
-
-	return data;
-}
-
-WRITE8_MEMBER( victor9k_state::via6_pb_w )
-{
-	/*
-
-	    bit     description
-
-	    PB0
-	    PB1
-	    PB2     _SCRESET
-	    PB3
-	    PB4
-	    PB5
-	    PB6     STP0
-	    PB7     STP1
-
-	*/
-
-	// motor speed controller reset
-	if (!BIT(data, 2))
-		m_fdc_cpu->reset();
-
-	// stepper enable A
-	m_stp[0] = BIT(data, 6);
-
-	// stepper enable B
-	m_stp[1] = BIT(data, 7);
-}
-
-WRITE_LINE_MEMBER( victor9k_state::drw_w )
-{
-}
-
-WRITE_LINE_MEMBER( victor9k_state::erase_w )
-{
-}
-
-WRITE_LINE_MEMBER( victor9k_state::via6_irq_w )
-{
-	m_via6_irq = state;
-
-	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_via4_irq || m_via5_irq || m_via6_irq);
+	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_fdc_irq);
 }
 
 
@@ -770,6 +350,7 @@ WRITE_LINE_MEMBER( victor9k_state::via6_irq_w )
 
 WRITE_LINE_MEMBER( victor9k_state::kbrdy_w )
 {
+	//logerror("KBRDY %u\n", state);
 	m_via2->write_cb1(state);
 
 	m_pic->ir6_w(state ? CLEAR_LINE : ASSERT_LINE);
@@ -777,91 +358,51 @@ WRITE_LINE_MEMBER( victor9k_state::kbrdy_w )
 
 WRITE_LINE_MEMBER( victor9k_state::kbdata_w )
 {
+	//logerror("KBDATA %u\n", state);
 	m_via2->write_cb2(state);
 	m_via2->write_pa6(state);
 }
 
-//-------------------------------------------------
-//  SLOT_INTERFACE( victor9k_floppies )
-//-------------------------------------------------
 
-void victor9k_state::ready0_cb(floppy_image_device *device, int state)
+WRITE_LINE_MEMBER( victor9k_state::fdc_irq_w )
 {
-	m_rdy0 = state;
+	m_fdc_irq = state;
 
-	m_via5->write_ca2(m_rdy0);
+	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_fdc_irq);
 }
-
-int victor9k_state::load0_cb(floppy_image_device *device)
-{
-	m_ds0 = 0;
-
-	m_via4->write_ca1(m_ds0);
-
-	return IMAGE_INIT_PASS;
-}
-
-void victor9k_state::unload0_cb(floppy_image_device *device)
-{
-	m_ds0 = 1;
-
-	m_via4->write_ca1(m_ds0);
-}
-
-void victor9k_state::ready1_cb(floppy_image_device *device, int state)
-{
-	m_rdy1 = state;
-
-	m_via5->write_cb2(m_rdy1);
-}
-
-int victor9k_state::load1_cb(floppy_image_device *device)
-{
-	m_ds1 = 0;
-
-	m_via4->write_cb1(m_ds1);
-
-	return IMAGE_INIT_PASS;
-}
-
-void victor9k_state::unload1_cb(floppy_image_device *device)
-{
-	m_ds1 = 1;
-
-	m_via4->write_cb1(m_ds1);
-}
-
-static SLOT_INTERFACE_START( victor9k_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
 
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
 //**************************************************************************
 
-//-------------------------------------------------
-//  MACHINE_START( victor9k )
-//-------------------------------------------------
-
 void victor9k_state::machine_start()
 {
-	// set floppy callbacks
-	m_floppy0->setup_ready_cb(floppy_image_device::ready_cb(FUNC(victor9k_state::ready0_cb), this));
-	m_floppy0->setup_load_cb(floppy_image_device::load_cb(FUNC(victor9k_state::load0_cb), this));
-	m_floppy0->setup_unload_cb(floppy_image_device::unload_cb(FUNC(victor9k_state::unload0_cb), this));
-	m_floppy1->setup_ready_cb(floppy_image_device::ready_cb(FUNC(victor9k_state::ready1_cb), this));
-	m_floppy1->setup_load_cb(floppy_image_device::load_cb(FUNC(victor9k_state::load1_cb), this));
-	m_floppy1->setup_unload_cb(floppy_image_device::unload_cb(FUNC(victor9k_state::unload1_cb), this));
+	// state saving
+	save_item(NAME(m_brt));
+	save_item(NAME(m_cont));
+	save_item(NAME(m_via1_irq));
+	save_item(NAME(m_via2_irq));
+	save_item(NAME(m_via3_irq));
+	save_item(NAME(m_fdc_irq));
+	save_item(NAME(m_ssda_irq));
 
 	// memory banking
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_ram(0x00000, m_ram->size() - 1, m_ram->pointer());
-
-	m_via5->write_ca1(m_brdy);
-	m_via6->write_ca1(m_gcrerr);
 }
 
+void victor9k_state::machine_reset()
+{
+	m_maincpu->reset();
+	m_upd7201->reset();
+	m_ssda->reset();
+	m_via1->reset();
+	m_via2->reset();
+	m_via3->reset();
+	m_crtc->reset();
+	m_fdc->reset();
+}
 
 
 //**************************************************************************
@@ -877,9 +418,6 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_CPU_ADD(I8088_TAG, I8088, XTAL_30MHz/6)
 	MCFG_CPU_PROGRAM_MAP(victor9k_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(I8259A_TAG, pic8259_device, inta_cb)
-
-	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_30MHz/6)
-	MCFG_CPU_IO_MAP(floppy_io)
 
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -952,27 +490,6 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(victor9k_state, via3_pb_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor9k_state, via3_irq_w))
 
-	MCFG_DEVICE_ADD(M6522_4_TAG, VIA6522, XTAL_30MHz/30)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(victor9k_state, via4_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(victor9k_state, via4_pb_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(victor9k_state, mode_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor9k_state, via4_irq_w))
-
-	MCFG_DEVICE_ADD(M6522_5_TAG, VIA6522, XTAL_30MHz/30)
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor9k_state, via5_irq_w))
-
-	MCFG_DEVICE_ADD(M6522_6_TAG, VIA6522, XTAL_30MHz/30)
-	MCFG_VIA6522_READPA_HANDLER(READ8(victor9k_state, via6_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(victor9k_state, via6_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(victor9k_state, via6_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(victor9k_state, via6_pb_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(victor9k_state, drw_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(victor9k_state, erase_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor9k_state, via6_irq_w))
-
-	MCFG_FLOPPY_DRIVE_ADD(I8048_TAG":0", victor9k_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(I8048_TAG":1", victor9k_floppies, "525qd", floppy_image_device::default_floppy_formats)
-
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, rxa_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, dcda_w))
@@ -990,6 +507,11 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_DEVICE_ADD(VICTOR9K_KEYBOARD_TAG, VICTOR9K_KEYBOARD, 0)
 	MCFG_VICTOR9K_KBRDY_HANDLER(WRITELINE(victor9k_state, kbrdy_w))
 	MCFG_VICTOR9K_KBDATA_HANDLER(WRITELINE(victor9k_state, kbdata_w))
+
+	MCFG_DEVICE_ADD(FDC_TAG, VICTOR_9000_FDC, 0)
+	MCFG_VICTOR_9000_FDC_IRQ_CB(WRITELINE(victor9k_state, fdc_irq_w))
+	MCFG_VICTOR_9000_FDC_SYN_CB(DEVWRITELINE(I8259A_TAG, pic8259_device, ir0_w)) MCFG_DEVCB_XOR(1)
+	MCFG_VICTOR_9000_FDC_LBRDY_CB(INPUTLINE(I8088_TAG, INPUT_LINE_TEST)) MCFG_DEVCB_XOR(1)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1019,12 +541,6 @@ ROM_START( victor9k )
 	ROM_SYSTEM_BIOS( 1, "univ", "Universal" )
 	ROMX_LOAD( "v9000 univ. fe f3f7 13db.7j", 0x0000, 0x1000, CRC(25c7a59f) SHA1(8784e9aa7eb9439f81e18b8e223c94714e033911), ROM_BIOS(2) )
 	ROMX_LOAD( "v9000 univ. ff f3f7 39fe.8j", 0x1000, 0x1000, CRC(496c7467) SHA1(eccf428f62ef94ab85f4a43ba59ae6a066244a66), ROM_BIOS(2) )
-
-	ROM_REGION( 0x400, I8048_TAG, 0)
-	ROM_LOAD( "36080.5d", 0x000, 0x400, CRC(9bf49f7d) SHA1(b3a11bb65105db66ae1985b6f482aab6ea1da38b) )
-
-	ROM_REGION( 0x800, "gcr", 0 )
-	ROM_LOAD( "100836-001.4k", 0x000, 0x800, CRC(adc601bd) SHA1(6eeff3d2063ae2d97452101aa61e27ef83a467e5) )
 ROM_END
 
 

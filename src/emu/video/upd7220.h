@@ -150,7 +150,7 @@ private:
 	void process_fifo();
 	void continue_command();
 	void update_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_graphics_line(bitmap_rgb32 &bitmap, UINT32 addr, int y, int wd);
+	void draw_graphics_line(bitmap_rgb32 &bitmap, UINT32 addr, int y, int wd, int pitch);
 	void update_graphics(bitmap_rgb32 &bitmap, const rectangle &cliprect, int force_bitmap);
 
 	upd7220_display_pixels_delegate     m_display_cb;

@@ -939,6 +939,74 @@
 		</part>
 	</software>
 
+	<software name="drdrawc"> <!-- CP/M-86 -->
+		<description>DR Draw (Color)</description>
+		<year>1983</year>
+		<publisher>Digital Research</publisher>
+		<info name="usage" value="Requires K208, K235 and K806" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="281212">
+				<rom name="86drdraw.td0" size="281212" crc="451350ce" sha1="3d710e12241850988c88ca8c16528da3cdbdc2fd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drdrawm"> <!-- CP/M-86 -->
+		<description>DR Draw (Monochrome)</description>
+		<year>1983</year>
+		<publisher>Digital Research</publisher>
+		<info name="usage" value="Requires CP/M-86" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="189140">
+				<rom name="86drmo-m.td0" size="189140" crc="61543ccf" sha1="b8e33a0076bd1568a40d403bb6b391e6c45f9569" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tgdemo"> <!-- CP/M-80 -->
+		<description>TUTBOGRAPH Demonstration Programs</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="259406">
+				<rom name="80tgraf.td0" size="259406" crc="d22d403f" sha1="8b1182f42faa68c1e5d879e79375683e48dd8bae" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm86qd"> <!-- CP/M-86 -->
+		<description>CP/M-86 1.1 with quad-density FDD support</description>
+		<year>1983</year>
+		<publisher>NCR Corporation</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="221628">
+				<rom name="586-4896.td0" size="221628" crc="383d54d3" sha1="be36d161f72c12bf6263f9577d609fd21b352c47" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gsx86tst"> <!-- CP/M-86 -->
+		<description>GSX-86 Test Suite</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="1128529">
+				<rom name="5-gsx86-test.mfi" size="1128529" crc="353821bc" sha1="ce977ea324ef6faf8245b4e1bcac84f2504f0c37" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdosqd"> <!-- MS-DOS -->
+		<description>MS-DOS v2.11 with quad-density FDD support</description>
+		<year>1983</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="611287">
+				<rom name="5_dos_96.mfi" size="611287" crc="c0f9d426" sha1="bccb7e04b320150435ee20e3d563dd163f6ab241" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dbase238"> <!-- CP/M-80 -->
 		<description>dBASE II v2.38</description>
 		<year>198?</year>
@@ -1043,7 +1111,7 @@
 		</part>
 	</software>
 
-	<software name="acad" supported="no"> <!-- MS-DOS --> <!-- graphic mode doesn't works -->
+	<software name="acad"> <!-- MS-DOS -->
 		<description>AutoCAD</description>
 		<year>1987</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1060,7 +1128,7 @@
 		</part>
 	</software>
 
-	<software name="acada" cloneof="acad" supported="no"> <!-- MS-DOS --> <!-- graphic mode doesn't works -->
+	<software name="acada" cloneof="acad"> <!-- MS-DOS -->
 		<description>AutoCAD (Alt 1)</description>
 		<year>1987</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1087,7 +1155,7 @@
 		</part>
 	</software>
 
-	<software name="acadb" cloneof="acad" supported="no"> <!-- MS-DOS --> <!-- graphic mode doesn't works -->
+	<software name="acadb" cloneof="acad"> <!-- MS-DOS -->
 		<description>AutoCAD (Alt 2)</description>
 		<year>1987</year>
 		<publisher>&lt;unknown&gt;</publisher>

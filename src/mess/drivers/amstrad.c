@@ -804,6 +804,7 @@ SLOT_INTERFACE_START(cpc_exp_cards)
 	SLOT_INTERFACE("amsrs232", CPC_RS232_AMS)
 	SLOT_INTERFACE("sf2", CPC_SYMBIFACE2)
 	SLOT_INTERFACE("amdrum", CPC_AMDRUM)
+	SLOT_INTERFACE("playcity", CPC_PLAYCITY)
 SLOT_INTERFACE_END
 
 SLOT_INTERFACE_START(cpcplus_exp_cards)
@@ -815,9 +816,10 @@ SLOT_INTERFACE_START(cpcplus_exp_cards)
 	SLOT_INTERFACE("amsrs232", CPC_RS232_AMS)
 	SLOT_INTERFACE("sf2", CPC_SYMBIFACE2)
 	SLOT_INTERFACE("amdrum", CPC_AMDRUM)
+	SLOT_INTERFACE("playcity", CPC_PLAYCITY)
 SLOT_INTERFACE_END
 
-SLOT_INTERFACE_START(amstrad_printers)
+SLOT_INTERFACE_START(amstrad_centronics_devices)
 	SLOT_INTERFACE("pl80", COMX_PL80)
 	SLOT_INTERFACE("ex800", EPSON_EX800)
 	SLOT_INTERFACE("lx800", EPSON_LX800)
@@ -862,6 +864,7 @@ static MACHINE_CONFIG_START( amstrad_nofdc, amstrad_state )
 	MCFG_MC6845_OUT_DE_CB(WRITELINE(amstrad_state, amstrad_de_changed))
 	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(amstrad_state, amstrad_hsync_changed))
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(amstrad_state, amstrad_vsync_changed))
+	MCFG_MC6845_OUT_CUR_CB(DEVWRITELINE("exp", cpc_expansion_slot_device, cursor_w))
 
 	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
 
@@ -874,7 +877,7 @@ static MACHINE_CONFIG_START( amstrad_nofdc, amstrad_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", amstrad_printers, "printer")
+	MCFG_CENTRONICS_ADD("centronics", amstrad_centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(amstrad_state, write_centronics_busy))
 
 	/* snapshot */
@@ -969,7 +972,7 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "printer")
+	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(amstrad_state, write_centronics_busy))
 
 	/* snapshot */

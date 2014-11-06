@@ -1,0 +1,180 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+
+<!-- define elements -->
+
+	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+	<element name="disk_black"><disk><color red="0.0" green="0.0" blue="0.0" /></disk></element>
+	<element name="disk_grey"><disk><color red="0.6" green="0.6" blue="0.6" /></disk></element>
+
+<!-- TODO: add these, maybe -->
+	<element name="text_game">
+		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
+		<text string="GAME">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+	<element name="text_skill">
+		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
+		<text string="SKILL LEVEL">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="text_last">
+		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
+		<text string="LAST">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+	<element name="text_start">
+		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
+		<text string="START">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+	<element name="text_long">
+		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
+		<text string="LONGEST">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="button_r" defstate="0">
+		<disk><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<disk state="0">
+			<color red="0.8" green="0.25" blue="0.1" />
+			<bounds x="0.2" y="0.2" width="0.6" height="0.6" />
+		</disk>
+		<disk state="1">
+			<color red="0.8" green="0.25" blue="0.1" />
+			<bounds x="0.28" y="0.28" width="0.44" height="0.44" />
+		</disk>
+	</element>
+	<element name="button_y" defstate="0">
+		<disk><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<disk state="0">
+			<color red="0.8" green="0.78" blue="0.1" />
+			<bounds x="0.2" y="0.2" width="0.6" height="0.6" />
+		</disk>
+		<disk state="1">
+			<color red="0.8" green="0.78" blue="0.1" />
+			<bounds x="0.28" y="0.28" width="0.44" height="0.44" />
+		</disk>
+	</element>
+
+	<element name="lamp_g" defstate="0">
+		<rect state="0"><color red="0.15" green="0.5" blue="0.1" /></rect>
+		<rect state="1"><color red="0.52" green="1.0" blue="0.4" /></rect>
+	</element>
+	<element name="lamp_r" defstate="0">
+		<rect state="0"><color red="0.5" green="0.15" blue="0.1" /></rect>
+		<rect state="1"><color red="1.0" green="0.4" blue="0.28" /></rect>
+	</element>
+	<element name="lamp_y" defstate="0">
+		<rect state="0"><color red="0.5" green="0.45" blue="0.1" /></rect>
+		<rect state="1"><color red="1.0" green="0.93" blue="0.4" /></rect>
+	</element>
+	<element name="lamp_b" defstate="0">
+		<rect state="0"><color red="0.1" green="0.15" blue="0.5" /></rect>
+		<rect state="1"><color red="0.3" green="0.42" blue="1.0" /></rect>
+	</element>
+
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" right="200" top="0" bottom="200" />
+		<bezel element="static_black">
+			<bounds left="0" right="200" top="0" bottom="200" />
+		</bezel>
+
+	<!-- big lamps -->
+
+		<bezel name="lamp0" element="lamp_g" inputtag="IN.1" inputmask="0x01" >
+			<bounds left="0" right="91" top="0" bottom="50" />
+		</bezel>
+		<bezel name="lamp0" element="lamp_g" inputtag="IN.1" inputmask="0x01" >
+			<bounds left="0" right="50" top="0" bottom="91" />
+		</bezel>
+		<bezel name="lamp0" element="lamp_g" inputtag="IN.1" inputmask="0x01" >
+			<bounds x="40" y="40" width="20" height="20" />
+		</bezel>
+
+		<bezel name="lamp1" element="lamp_r" inputtag="IN.1" inputmask="0x02" >
+			<bounds left="109" right="200" top="0" bottom="50" />
+		</bezel>
+		<bezel name="lamp1" element="lamp_r" inputtag="IN.1" inputmask="0x02" >
+			<bounds left="150" right="200" top="0" bottom="91" />
+		</bezel>
+		<bezel name="lamp1" element="lamp_r" inputtag="IN.1" inputmask="0x02" >
+			<bounds x="140" y="40" width="20" height="20" />
+		</bezel>
+
+		<bezel name="lamp2" element="lamp_y" inputtag="IN.1" inputmask="0x04" >
+			<bounds left="0" right="91" top="150" bottom="200" />
+		</bezel>
+		<bezel name="lamp2" element="lamp_y" inputtag="IN.1" inputmask="0x04" >
+			<bounds left="0" right="50" top="109" bottom="200" />
+		</bezel>
+		<bezel name="lamp2" element="lamp_y" inputtag="IN.1" inputmask="0x04" >
+			<bounds x="40" y="140" width="20" height="20" />
+		</bezel>
+
+		<bezel name="lamp3" element="lamp_b" inputtag="IN.1" inputmask="0x08" >
+			<bounds left="109" right="200" top="150" bottom="200" />
+		</bezel>
+		<bezel name="lamp3" element="lamp_b" inputtag="IN.1" inputmask="0x08" >
+			<bounds left="150" right="200" top="109" bottom="200" />
+		</bezel>
+		<bezel name="lamp3" element="lamp_b" inputtag="IN.1" inputmask="0x08" >
+			<bounds x="140" y="140" width="20" height="20" />
+		</bezel>
+
+
+		<bezel element="static_black">
+			<bounds x="0" y="90" width="200" height="20" />
+		</bezel>
+		<bezel element="static_black">
+			<bounds x="90" y="0" width="20" height="200" />
+		</bezel>
+		<bezel element="disk_black">
+			<bounds x="35" y="35" width="130" height="130" />
+		</bezel>
+
+		<bezel element="disk_grey">
+			<bounds x="50" y="50" width="100" height="100" />
+		</bezel>
+		<bezel element="static_black">
+			<bounds x="52" y="90" width="96" height="1" />
+		</bezel>
+
+
+	<!-- other controls -->
+
+		<bezel element="text_last">
+			<bounds x="65" y="110" width="20" height="4" />
+		</bezel>
+		<bezel element="button_y" inputtag="IN.2" inputmask="0x02">
+			<bounds x="71" y="115" width="8" height="8" />
+		</bezel>
+
+		<bezel element="text_start">
+			<bounds x="90" y="110" width="20" height="4" />
+		</bezel>
+		<bezel element="button_r" inputtag="IN.2" inputmask="0x01">
+			<bounds x="96" y="115" width="8" height="8" />
+		</bezel>
+
+		<bezel element="text_long">
+			<bounds x="115" y="110" width="20" height="4" />
+		</bezel>
+		<bezel element="button_y" inputtag="IN.2" inputmask="0x04">
+			<bounds x="121" y="115" width="8" height="8" />
+		</bezel>
+
+
+	</view>
+</mamelayout>

@@ -1,5 +1,5 @@
 /*
- * Nec PC-6001 cassette format handling
+ * NEC PC-6001 cassette format handling
  */
 
 #include "p6001_cas.h"

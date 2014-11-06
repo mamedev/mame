@@ -17,7 +17,7 @@ pc98fdi_format::pc98fdi_format()
 
 const char *pc98fdi_format::name() const
 {
-	return "pc98-fdi";
+	return "pc98_fdi";
 }
 
 const char *pc98fdi_format::description() const

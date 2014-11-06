@@ -31,7 +31,7 @@ public:
 
 	DECLARE_READ8_MEMBER(portt1_r);
 	DECLARE_READ8_MEMBER(port1_r);
-	DECLARE_WRITE8_MEMBER(port1_w);
+	DECLARE_WRITE8_MEMBER(port2_w);
 
 protected:
 	// device-level overrides
@@ -44,6 +44,7 @@ protected:
 private:
 	required_device<upi41_cpu_device> m_mcu;
 	required_ioport m_jumpers;
+	dmvcart_slot_device * m_bus;
 };
 
 

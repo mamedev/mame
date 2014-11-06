@@ -572,6 +572,8 @@ UINT32 ffreveng_prot_read_callback( address_space &space, int protaddr, UINT32 k
 *
 *************************************/
 
+// the naomi hookup of 315-5881 reads 16-bits at a time, here we seem to read 32? 
+
 READ32_MEMBER( stv_state::common_prot_r )
 {
 	UINT32 *ROM = (UINT32 *)space.machine().root_device().memregion("abus")->base();
@@ -588,6 +590,8 @@ READ32_MEMBER( stv_state::common_prot_r )
 
 			logerror("A-Bus control protection read at %06x with data = %08x Returning = %08x Would otherwise return = %08x\n",space.device().safe_pc(),m_abus_protkey, retdata, realret);
 
+			//UINT16 res = m_cryptdevice->do_decrypt(base);
+
 			m_ctrl_index += 4;
 			return retdata;
 
@@ -602,7 +606,11 @@ READ32_MEMBER( stv_state::common_prot_r )
 }
 
 
-
+UINT16 stv_state::crypt_read_callback(UINT32 addr)
+{
+	const UINT8 *base = m_cart_reg[0]->base() + 2*addr;
+	return base[1] | (base[0] << 8);
+}
 
 WRITE32_MEMBER ( stv_state::common_prot_w )
 {
@@ -616,10 +624,18 @@ WRITE32_MEMBER ( stv_state::common_prot_w )
 	else if(offset == 2)
 	{
 		COMBINE_DATA(&m_abus_prot_addr);
+
+		m_cryptdevice->set_addr_low(m_abus_prot_addr >> 16);
+		m_cryptdevice->set_addr_high(m_abus_prot_addr&0xffff);
+
 	}
 	else if(offset == 3)
 	{
 		COMBINE_DATA(&m_abus_protkey);
+
+		m_cryptdevice->set_subkey(m_abus_protkey>>16);
+
+
 		int a_bus_vector;
 		a_bus_vector = m_abus_prot_addr >> 16;
 		a_bus_vector|= (m_abus_prot_addr & 0xffff) << 16;
@@ -655,6 +671,7 @@ void stv_state::install_astrass_protection()
 {
 	install_common_protection();
 	m_prot_readback = astrass_prot_read_callback;
+//	m_cryptdevice->set_key(0x00000000);
 }
 
 void stv_state::install_ffreveng_protection()

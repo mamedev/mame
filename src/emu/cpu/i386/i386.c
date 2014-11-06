@@ -125,6 +125,16 @@ UINT32 i386_device::i386_load_protected_mode_segment(I386_SREG *seg, UINT64 *des
 	UINT32 base, limit;
 	int entry;
 
+	if(!seg->selector)
+	{
+		seg->flags = 0;
+		seg->base = 0;
+		seg->limit = 0;
+		seg->d = 0;
+		seg->valid = false;
+		return 0;
+	}
+
 	if ( seg->selector & 0x4 )
 	{
 		base = m_ldtr.base;
@@ -147,7 +157,7 @@ UINT32 i386_device::i386_load_protected_mode_segment(I386_SREG *seg, UINT64 *des
 	if (seg->flags & 0x8000)
 		seg->limit = (seg->limit << 12) | 0xfff;
 	seg->d = (seg->flags & 0x4000) ? 1 : 0;
-	seg->valid = (seg->selector & ~3)?(true):(false);
+	seg->valid = true;
 
 	if(desc)
 		*desc = ((UINT64)v2<<32)|v1;
@@ -212,7 +222,8 @@ void i386_device::i386_load_segment_descriptor(int segment )
 		if (!V8086_MODE)
 		{
 			i386_load_protected_mode_segment(&m_sreg[segment], NULL );
-			i386_set_descriptor_accessed(m_sreg[segment].selector);
+			if(m_sreg[segment].selector)
+				i386_set_descriptor_accessed(m_sreg[segment].selector);
 		}
 		else
 		{
@@ -751,6 +762,15 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 			{
 				logerror("IRQ (%08x): Software IRQ - gate DPL is less than CPL.\n",m_pc);
 				FAULT_EXP(FAULT_GP,entry+2)
+			}
+			if(V8086_MODE)
+			{
+				if((!m_IOP1 || !m_IOP2) && (m_opcode != 0xcc))
+				{
+					logerror("IRQ (%08x): Is in Virtual 8086 mode and IOPL != 3.\n",m_pc);
+					FAULT(FAULT_GP,0)
+				}
+
 			}
 		}
 
@@ -1666,17 +1686,17 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 		}
 		if (operand32 != 0)  // if 32-bit
 		{
-			if(REG32(ESP) < 8)
+			if(i386_limit_check(SS, REG32(ESP) - 8))
 			{
-				logerror("CALL: Stack has no room for return address.\n");
+				logerror("CALL (%08x): Stack has no room for return address.\n",m_pc);
 				FAULT(FAULT_SS,0)  // #SS(0)
 			}
 		}
 		else
 		{
-			if(REG16(SP) < 4)
+			if(i386_limit_check(SS, (REG16(SP) - 4) & 0xffff))
 			{
-				logerror("CALL: Stack has no room for return address.\n");
+				logerror("CALL (%08x): Stack has no room for return address.\n",m_pc);
 				FAULT(FAULT_SS,0)  // #SS(0)
 			}
 		}
@@ -1716,9 +1736,9 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 					logerror("CALL: TSS: TSS is busy.\n");
 					FAULT(FAULT_TS,selector & ~0x03) // #TS(selector)
 				}
-				if(desc.flags & 0x0080)
+				if((desc.flags & 0x0080) == 0)
 				{
-					logerror("CALL: TSS: Segment is not present.\n");
+					logerror("CALL: TSS: Segment %02x is not present.\n",selector);
 					FAULT(FAULT_NP,selector & ~0x03) // #NP(selector)
 				}
 				if(desc.flags & 0x08)
@@ -1924,7 +1944,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 					/* same privilege */
 					if (operand32 != 0)  // if 32-bit
 					{
-						if(REG32(ESP) < 8)
+						if(i386_limit_check(SS, REG32(ESP) - 8))
 						{
 							logerror("CALL: Stack has no room for return address.\n");
 							FAULT(FAULT_SS,0) // #SS(0)
@@ -1934,7 +1954,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 					}
 					else
 					{
-						if(REG16(SP) < 4)
+						if(i386_limit_check(SS, (REG16(SP) - 4) & 0xffff))
 						{
 							logerror("CALL: Stack has no room for return address.\n");
 							FAULT(FAULT_SS,0) // #SS(0)
@@ -1966,7 +1986,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 					logerror("CALL: Task Gate: Gate DPL is less than RPL.\n");
 					FAULT(FAULT_TS,selector & ~0x03) // #TS(selector)
 				}
-				if(gate.ar & 0x0080)
+				if((gate.ar & 0x0080) == 0)
 				{
 					logerror("CALL: Task Gate: Gate is not present.\n");
 					FAULT(FAULT_NP,selector & ~0x03) // #NP(selector)
@@ -1992,7 +2012,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 					logerror("CALL: Task Gate: TSS is busy.\n");
 					FAULT(FAULT_TS,gate.selector & ~0x03) // #TS(selector)
 				}
-				if(desc.flags & 0x0080)
+				if((desc.flags & 0x0080) == 0)
 				{
 					logerror("CALL: Task Gate: TSS is not present.\n");
 					FAULT(FAULT_NP,gate.selector & ~0x03) // #TS(selector)
@@ -3124,6 +3144,7 @@ void i386_device::i386_common_init(int tlbsize)
 	m_vtlb = vtlb_alloc(this, AS_PROGRAM, 0, tlbsize);
 	m_smi = false;
 	m_debugger_temp = 0;
+	m_lock = false;
 
 	zero_state();
 
@@ -3132,26 +3153,32 @@ void i386_device::i386_common_init(int tlbsize)
 	save_item(NAME(m_sreg[ES].base));
 	save_item(NAME(m_sreg[ES].limit));
 	save_item(NAME(m_sreg[ES].flags));
+	save_item(NAME(m_sreg[ES].d));
 	save_item(NAME(m_sreg[CS].selector));
 	save_item(NAME(m_sreg[CS].base));
 	save_item(NAME(m_sreg[CS].limit));
 	save_item(NAME(m_sreg[CS].flags));
+	save_item(NAME(m_sreg[CS].d));
 	save_item(NAME(m_sreg[SS].selector));
 	save_item(NAME(m_sreg[SS].base));
 	save_item(NAME(m_sreg[SS].limit));
 	save_item(NAME(m_sreg[SS].flags));
+	save_item(NAME(m_sreg[SS].d));
 	save_item(NAME(m_sreg[DS].selector));
 	save_item(NAME(m_sreg[DS].base));
 	save_item(NAME(m_sreg[DS].limit));
 	save_item(NAME(m_sreg[DS].flags));
+	save_item(NAME(m_sreg[DS].d));
 	save_item(NAME(m_sreg[FS].selector));
 	save_item(NAME(m_sreg[FS].base));
 	save_item(NAME(m_sreg[FS].limit));
 	save_item(NAME(m_sreg[FS].flags));
+	save_item(NAME(m_sreg[FS].d));
 	save_item(NAME(m_sreg[GS].selector));
 	save_item(NAME(m_sreg[GS].base));
 	save_item(NAME(m_sreg[GS].limit));
 	save_item(NAME(m_sreg[GS].flags));
+	save_item(NAME(m_sreg[GS].d));
 	save_item(NAME(m_eip));
 	save_item(NAME(m_prev_eip));
 	save_item(NAME(m_CF));
@@ -3545,7 +3572,6 @@ void i386_device::device_reset()
 	m_smi_latched = false;
 	m_nmi_masked = false;
 	m_nmi_latched = false;
-	m_lock = false;
 
 	m_a20_mask = ~0;
 
