@@ -13,7 +13,7 @@
 
     TODO:
 
-	- disk error 8 (sync missing?)
+	- disk error 2 (cannot find block header?)
 	- 8048 spindle speed control
     - read PLL
     - write logic
@@ -28,8 +28,8 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 1
-#define LOG_VIA 1
+#define LOG 0
+#define LOG_VIA 0
 #define LOG_SCP 0
 
 #define I8048_TAG       "5d"
@@ -211,7 +211,7 @@ victor_9000_fdc_t::victor_9000_fdc_t(const machine_config &mconfig, const char *
 	m_via6_irq(CLEAR_LINE),
 	m_syn(0),
 	m_lbrdy(1),
-	m_period(attotime::from_nsec(21300))
+	m_period(attotime::from_nsec(2130))
 {
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
@@ -1103,6 +1103,8 @@ void victor_9000_fdc_t::live_run(const attotime &limit)
 			// syn
 			int syn = !(cur_live.sync_byte_counter == 15);
 
+			if (LOG) logerror("%s bit %u sync %u bc %u sbc %u sBC %u syn %u\n",cur_live.tm.as_string(),bit,sync,cur_live.bit_counter,cur_live.sync_bit_counter,cur_live.sync_byte_counter,syn);
+
 			// GCR decoder
 			if (cur_live.drw) {
 				cur_live.i = cur_live.drw << 10 | cur_live.shift_reg;
@@ -1120,6 +1122,14 @@ void victor_9000_fdc_t::live_run(const attotime &limit)
 
 			if (brdy != cur_live.brdy) {
 				if (LOG) logerror("%s BRDY %u\n", cur_live.tm.as_string(),brdy);
+				if (LOG && !brdy)
+				{
+					UINT8 e = cur_live.e;
+					UINT8 i = cur_live.i;
+
+					UINT8 data = BIT(e, 6) << 7 | BIT(i, 7) << 6 | BIT(e, 5) << 5 | BIT(e, 4) << 4 | BIT(e, 2) << 3 | BIT(i, 1) << 2 | (e & 0x03);
+					logerror("%s BRDY %02x\n",cur_live.tm.as_string(),data);
+				}
 				cur_live.brdy = brdy;
 				if (!brdy) cur_live.lbrdy = 0;
 				syncpoint = true;
