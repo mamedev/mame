@@ -751,7 +751,6 @@ void atari_slapstic_device::slapstic_init(running_machine &machine, int chip)
 	if (access_68k == -1)
 	{
 		/* see if we're 68k or 6502/6809 based */
-		printf("oh\n");
 		device_type cputype = machine.device(":maincpu")->type();
 		access_68k = (cputype == M68000 || cputype == M68010);
 	}
