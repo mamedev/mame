@@ -161,7 +161,6 @@ private:
 	required_device<via6522_device> m_via6;
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;
-	required_memory_region m_rom;
 	required_memory_region m_gcr_rom;
 
 	void update_stepper_motor(floppy_image_device *floppy, int stp, int old_st, int st);

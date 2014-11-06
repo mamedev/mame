@@ -62,8 +62,8 @@ void starwars_state::machine_reset()
 		address_space &space = m_maincpu->space(AS_PROGRAM);
 
 		/* reset the slapstic */
-		slapstic_reset();
-		m_slapstic_current_bank = slapstic_bank();
+		m_slapstic_device->slapstic_reset();
+		m_slapstic_current_bank = m_slapstic_device->slapstic_bank();
 		memcpy(m_slapstic_base, &m_slapstic_source[m_slapstic_current_bank * 0x2000], 0x2000);
 
 		/* reset all the banks */
@@ -97,7 +97,7 @@ WRITE8_MEMBER(starwars_state::irq_ack_w)
 
 void starwars_state::esb_slapstic_tweak(address_space &space, offs_t offset)
 {
-	int new_bank = slapstic_tweak(space, offset);
+	int new_bank = m_slapstic_device->slapstic_tweak(space, offset);
 
 	/* update for the new bank */
 	if (new_bank != m_slapstic_current_bank)
@@ -331,6 +331,8 @@ static MACHINE_CONFIG_START( starwars, starwars_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(starwars_state, irq0_line_assert, CLOCK_3KHZ / 12)
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(CLOCK_3KHZ / 128))
 
+	MCFG_SLAPSTIC_ADD("slapstic")
+
 	MCFG_CPU_ADD("audiocpu", M6809, MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
@@ -524,7 +526,7 @@ DRIVER_INIT_MEMBER(starwars_state,esb)
 	UINT8 *rom = memregion("maincpu")->base();
 
 	/* init the slapstic */
-	slapstic_init(machine(), 101);
+	m_slapstic_device->slapstic_init(machine(), 101);
 	m_slapstic_source = &rom[0x14000];
 	m_slapstic_base = &rom[0x08000];
 

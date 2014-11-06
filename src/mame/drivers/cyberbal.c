@@ -389,6 +389,8 @@ static MACHINE_CONFIG_START( cyberbal, cyberbal_state )
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
+	MCFG_SLAPSTIC_ADD("slapstic")
+
 	MCFG_CPU_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, (double)ATARI_CLOCK_14MHz/4/4/16/16/14)

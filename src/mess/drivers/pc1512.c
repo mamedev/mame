@@ -1131,6 +1131,7 @@ void pc1512_state::machine_reset()
 	m_nmi_enable = 0;
 	m_toggle = 0;
 	m_kb_bits = 0;
+	m_pit2 = 1;
 
 	m_lpen = 0;
 	m_blink = 0;

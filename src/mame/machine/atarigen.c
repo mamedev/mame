@@ -16,7 +16,6 @@
 #include "sound/okim6295.h"
 #include "sound/pokey.h"
 #include "video/atarimo.h"
-#include "includes/slapstic.h"
 #include "atarigen.h"
 
 
@@ -975,7 +974,8 @@ atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, 
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_16(*this, "paletteram")
+		m_generic_paletteram_16(*this, "paletteram"),
+		m_slapstic_device(*this, ":slapstic")
 {
 }
 
@@ -1022,8 +1022,11 @@ void atarigen_state::machine_reset()
 	// reset the slapstic
 	if (m_slapstic_num != 0)
 	{
-		slapstic_reset();
-		slapstic_update_bank(slapstic_bank());
+		if (!m_slapstic_device)
+			fatalerror("Slapstic device is missing?\n");
+
+		m_slapstic_device->slapstic_reset();
+		slapstic_update_bank(m_slapstic_device->slapstic_bank());
 	}
 }
 
@@ -1192,7 +1195,10 @@ inline void atarigen_state::slapstic_update_bank(int bank)
 
 void atarigen_state::device_post_load()
 {
-	slapstic_update_bank(slapstic_bank());
+	if (!m_slapstic_device)
+		fatalerror("Slapstic device is missing?\n");
+
+	slapstic_update_bank(m_slapstic_device->slapstic_bank());
 }
 
 
@@ -1232,8 +1238,11 @@ void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t 
 	// if we have a chip, install it
 	if (chipnum != 0)
 	{
+		if (!m_slapstic_device)
+			fatalerror("Slapstic device is missing\n");
+
 		// initialize the slapstic
-		slapstic_init(machine(), chipnum);
+		m_slapstic_device->slapstic_init(machine(), chipnum);
 
 		// install the memory handlers
 		address_space &program = device.space(AS_PROGRAM);
@@ -1262,7 +1271,10 @@ void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t 
 
 WRITE16_MEMBER(atarigen_state::slapstic_w)
 {
-	slapstic_update_bank(slapstic_tweak(space, offset));
+	if (!m_slapstic_device)
+		fatalerror("Slapstic device is missing?\n");
+
+	slapstic_update_bank(m_slapstic_device->slapstic_tweak(space, offset));
 }
 
 
@@ -1273,11 +1285,14 @@ WRITE16_MEMBER(atarigen_state::slapstic_w)
 
 READ16_MEMBER(atarigen_state::slapstic_r)
 {
+	if (!m_slapstic_device)
+		fatalerror("Slapstic device is missing?\n");
+
 	// fetch the result from the current bank first
 	int result = m_slapstic[offset & 0xfff];
 
 	// then determine the new one
-	slapstic_update_bank(slapstic_tweak(space, offset));
+	slapstic_update_bank(m_slapstic_device->slapstic_tweak(space, offset));
 	return result;
 }
 

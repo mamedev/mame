@@ -1,468 +1,404 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
-	<element name="background">
-		<rect>
-			<bounds left="0" top="0" right="1" bottom="1" />
-			<color red="0.0" green="0.0" blue="0.0" />
-		</rect>
+
+
+<!-- define elements -->
+
+	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+	<element name="static_red"><rect><color red="0.8" green="0.14" blue="0.18" /></rect></element>
+	<element name="static_darkred"><rect><color red="0.64" green="0.10" blue="0.13" /></rect></element>
+
+	<!-- buttons are not pushbuttons, they are pressed very lightly -->
+
+	<element name="button" defstate="0">
+		<text state="0" string=" "><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="1" string=" "><color red="0.0" green="0.0" blue="0.0" /></text>
+		<disk state="1">
+			<bounds x="0.13" y="0.13" width="0.74" height="0.74"/>
+			<color red="0.33" green="0.33" blue="0.22" />
+		</disk>
 	</element>
 
 	<element name="led" defstate="0">
-		<rect state="0">
-			<color red="0.2" green="0" blue="0" />
-		</rect>
-		<rect state="1">
-			<color red="0.9" green="0" blue="0" />
-		</rect>
+		<text string=" "><color red="0.0" green="0.0" blue="0.0" /></text>
+		<disk>
+			<bounds x="0.30" y="0.30" width="0.40" height="0.40"/>
+			<color red="0.0" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="0">
+			<bounds x="0.36" y="0.36" width="0.28" height="0.28"/>
+			<color red="0.25" green="0.05" blue="0.04" />
+		</disk>
+		<disk state="1">
+			<bounds x="0.36" y="0.36" width="0.28" height="0.28"/>
+			<color red="1.0" green="0.2" blue="0.15" />
+		</disk>
 	</element>
 
-	<element name="0" defstate="0">
-		<rect>
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.1" green="0.1" blue="0.1" />
-		</rect>
-		<rect state="0">
-			<bounds x="0" y="0" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="0" state="0">
-			<bounds x="8" y="24" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
-		</text>
-		<rect state="1">
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="0" state="1">
-			<bounds x="10" y="26" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
-		</text>
-	</element>
 
-	<element name="1" defstate="0">
-		<rect>
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.1" green="0.1" blue="0.1" />
-		</rect>
-		<rect state="0">
-			<bounds x="0" y="0" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="1" state="0">
-			<bounds x="8" y="24" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
-		</text>
-		<rect state="1">
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="1" state="1">
-			<bounds x="10" y="26" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
+	<!-- number panels -->
+
+	<element name="panel_0">
+		<rect><color red="0.64" green="0.10" blue="0.13" /></rect>
+		<disk>
+			<bounds x="0.13" y="0.13" width="0.74" height="0.74"/>
+			<color red="0.68" green="0.675" blue="0.66" />
+		</disk>
+		<text string="0" align="2">
+			<bounds left="0.0" right="0.96" top="0.75" bottom="1.0"/>
+			<color red="0.71" green="0.22" blue="0.28" />
 		</text>
 	</element>
 
-	<element name="2" defstate="0">
-		<rect>
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.1" green="0.1" blue="0.1" />
-		</rect>
-		<rect state="0">
-			<bounds x="0" y="0" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="2" state="0">
-			<bounds x="8" y="24" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
-		</text>
-		<rect state="1">
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="2" state="1">
-			<bounds x="10" y="26" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
+	<element name="panel_1">
+		<rect><color red="0.64" green="0.10" blue="0.13" /></rect>
+		<disk>
+			<bounds x="0.13" y="0.13" width="0.74" height="0.74"/>
+			<color red="0.68" green="0.675" blue="0.66" />
+		</disk>
+		<text string="1" align="2">
+			<bounds left="0.0" right="0.96" top="0.75" bottom="1.0"/>
+			<color red="0.71" green="0.22" blue="0.28" />
 		</text>
 	</element>
 
-	<element name="3" defstate="0">
-		<rect>
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.1" green="0.1" blue="0.1" />
-		</rect>
-		<rect state="0">
-			<bounds x="0" y="0" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="3" state="0">
-			<bounds x="8" y="24" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
-		</text>
-		<rect state="1">
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="3" state="1">
-			<bounds x="10" y="26" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
+	<element name="panel_2">
+		<rect><color red="0.64" green="0.10" blue="0.13" /></rect>
+		<disk>
+			<bounds x="0.13" y="0.13" width="0.74" height="0.74"/>
+			<color red="0.68" green="0.675" blue="0.66" />
+		</disk>
+		<text string="2" align="2">
+			<bounds left="0.0" right="0.96" top="0.75" bottom="1.0"/>
+			<color red="0.71" green="0.22" blue="0.28" />
 		</text>
 	</element>
 
-	<element name="4" defstate="0">
-		<rect>
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.1" green="0.1" blue="0.1" />
-		</rect>
-		<rect state="0">
-			<bounds x="0" y="0" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="4" state="0">
-			<bounds x="8" y="24" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
-		</text>
-		<rect state="1">
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="4" state="1">
-			<bounds x="10" y="26" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
+	<element name="panel_3">
+		<rect><color red="0.64" green="0.10" blue="0.13" /></rect>
+		<disk>
+			<bounds x="0.13" y="0.13" width="0.74" height="0.74"/>
+			<color red="0.68" green="0.675" blue="0.66" />
+		</disk>
+		<text string="3" align="2">
+			<bounds left="0.0" right="0.96" top="0.75" bottom="1.0"/>
+			<color red="0.71" green="0.22" blue="0.28" />
 		</text>
 	</element>
 
-	<element name="5" defstate="0">
-		<rect>
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.1" green="0.1" blue="0.1" />
-		</rect>
-		<rect state="0">
-			<bounds x="0" y="0" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="5" state="0">
-			<bounds x="8" y="24" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
-		</text>
-		<rect state="1">
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="5" state="1">
-			<bounds x="10" y="26" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
+	<element name="panel_4">
+		<rect><color red="0.64" green="0.10" blue="0.13" /></rect>
+		<disk>
+			<bounds x="0.13" y="0.13" width="0.74" height="0.74"/>
+			<color red="0.68" green="0.675" blue="0.66" />
+		</disk>
+		<text string="4" align="2">
+			<bounds left="0.0" right="0.96" top="0.75" bottom="1.0"/>
+			<color red="0.71" green="0.22" blue="0.28" />
 		</text>
 	</element>
 
-	<element name="6" defstate="0">
-		<rect>
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.1" green="0.1" blue="0.1" />
-		</rect>
-		<rect state="0">
-			<bounds x="0" y="0" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="6" state="0">
-			<bounds x="8" y="24" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
-		</text>
-		<rect state="1">
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="6" state="1">
-			<bounds x="10" y="26" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
+	<element name="panel_5">
+		<rect><color red="0.64" green="0.10" blue="0.13" /></rect>
+		<disk>
+			<bounds x="0.13" y="0.13" width="0.74" height="0.74"/>
+			<color red="0.68" green="0.675" blue="0.66" />
+		</disk>
+		<text string="5" align="2">
+			<bounds left="0.0" right="0.96" top="0.75" bottom="1.0"/>
+			<color red="0.71" green="0.22" blue="0.28" />
 		</text>
 	</element>
 
-	<element name="7" defstate="0">
-		<rect>
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.1" green="0.1" blue="0.1" />
-		</rect>
-		<rect state="0">
-			<bounds x="0" y="0" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="7" state="0">
-			<bounds x="8" y="24" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
-		</text>
-		<rect state="1">
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="7" state="1">
-			<bounds x="10" y="26" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
+	<element name="panel_6">
+		<rect><color red="0.64" green="0.10" blue="0.13" /></rect>
+		<disk>
+			<bounds x="0.13" y="0.13" width="0.74" height="0.74"/>
+			<color red="0.68" green="0.675" blue="0.66" />
+		</disk>
+		<text string="6" align="2">
+			<bounds left="0.0" right="0.96" top="0.75" bottom="1.0"/>
+			<color red="0.71" green="0.22" blue="0.28" />
 		</text>
 	</element>
 
-	<element name="8" defstate="0">
-		<rect>
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.1" green="0.1" blue="0.1" />
-		</rect>
-		<rect state="0">
-			<bounds x="0" y="0" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="8" state="0">
-			<bounds x="8" y="24" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
-		</text>
-		<rect state="1">
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="8" state="1">
-			<bounds x="10" y="26" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
+	<element name="panel_7">
+		<rect><color red="0.64" green="0.10" blue="0.13" /></rect>
+		<disk>
+			<bounds x="0.13" y="0.13" width="0.74" height="0.74"/>
+			<color red="0.68" green="0.675" blue="0.66" />
+		</disk>
+		<text string="7" align="2">
+			<bounds left="0.0" right="0.96" top="0.75" bottom="1.0"/>
+			<color red="0.71" green="0.22" blue="0.28" />
 		</text>
 	</element>
 
-	<element name="9" defstate="0">
-		<rect>
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.1" green="0.1" blue="0.1" />
-		</rect>
-		<rect state="0">
-			<bounds x="0" y="0" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="9" state="0">
-			<bounds x="8" y="24" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
-		</text>
-		<rect state="1">
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="9" state="1">
-			<bounds x="10" y="26" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
+	<element name="panel_8">
+		<rect><color red="0.64" green="0.10" blue="0.13" /></rect>
+		<disk>
+			<bounds x="0.13" y="0.13" width="0.74" height="0.74"/>
+			<color red="0.68" green="0.675" blue="0.66" />
+		</disk>
+		<text string="8" align="2">
+			<bounds left="0.0" right="0.96" top="0.75" bottom="1.0"/>
+			<color red="0.71" green="0.22" blue="0.28" />
 		</text>
 	</element>
 
-	<element name="10" defstate="0">
-		<rect>
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.1" green="0.1" blue="0.1" />
-		</rect>
-		<rect state="0">
-			<bounds x="0" y="0" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="10" state="0">
-			<bounds x="8" y="24" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
-		</text>
-		<rect state="1">
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="10" state="1">
-			<bounds x="10" y="26" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
+	<element name="panel_9">
+		<rect><color red="0.64" green="0.10" blue="0.13" /></rect>
+		<disk>
+			<bounds x="0.13" y="0.13" width="0.74" height="0.74"/>
+			<color red="0.68" green="0.675" blue="0.66" />
+		</disk>
+		<text string="9" align="2">
+			<bounds left="0.0" right="0.96" top="0.75" bottom="1.0"/>
+			<color red="0.71" green="0.22" blue="0.28" />
 		</text>
 	</element>
 
-	<element name="new_game" defstate="0">
-		<rect>
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.1" green="0.1" blue="0.1" />
-		</rect>
-		<rect state="0">
-			<bounds x="0" y="0" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="NEW GAME" state="0">
-			<bounds x="8" y="24" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
-		</text>
-		<rect state="1">
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="NEW GAME" state="1">
-			<bounds x="10" y="26" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
+	<element name="panel_10">
+		<rect><color red="0.64" green="0.10" blue="0.13" /></rect>
+		<disk>
+			<bounds x="0.13" y="0.13" width="0.74" height="0.74"/>
+			<color red="0.68" green="0.675" blue="0.66" />
+		</disk>
+		<text string="10" align="2">
+			<bounds left="0.0" right="0.98" top="0.75" bottom="1.0"/>
+			<color red="0.71" green="0.22" blue="0.28" />
 		</text>
 	</element>
 
-	<element name="same_game" defstate="0">
-		<rect>
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.1" green="0.1" blue="0.1" />
-		</rect>
-		<rect state="0">
-			<bounds x="0" y="0" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="SAME GAME" state="0">
-			<bounds x="8" y="24" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
+
+	<!-- bottom panels -->
+
+	<element name="panel_newgame">
+		<rect><color red="0.68" green="0.675" blue="0.66" /></rect>
+		<text string="NEW">
+			<bounds x="0.0" y="0.25" width="1.0" height="0.24"/>
+			<color red="0.0" green="0.0" blue="0.0" />
 		</text>
-		<rect state="1">
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="SAME GAME" state="1">
-			<bounds x="10" y="26" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
+		<text string="GAME">
+			<bounds x="0.0" y="0.50" width="1.0" height="0.24"/>
+			<color red="0.0" green="0.0" blue="0.0" />
 		</text>
 	</element>
 
-	<element name="hit_me" defstate="0">
-		<rect>
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.1" green="0.1" blue="0.1" />
-		</rect>
-		<rect state="0">
-			<bounds x="0" y="0" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="HIT ME" state="0">
-			<bounds x="8" y="24" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
+	<element name="panel_samegame">
+		<rect><color red="0.68" green="0.675" blue="0.66" /></rect>
+		<text string="SAME">
+			<bounds x="0.0" y="0.25" width="1.0" height="0.24"/>
+			<color red="0.0" green="0.0" blue="0.0" />
 		</text>
-		<rect state="1">
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="HIT ME" state="1">
-			<bounds x="10" y="26" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
+		<text string="GAME">
+			<bounds x="0.0" y="0.50" width="1.0" height="0.24"/>
+			<color red="0.0" green="0.0" blue="0.0" />
 		</text>
 	</element>
 
-	<element name="comp_turn" defstate="0">
-		<rect>
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.1" green="0.1" blue="0.1" />
-		</rect>
-		<rect state="0">
-			<bounds x="0" y="0" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="COMP TURN" state="0">
-			<bounds x="8" y="24" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
+	<element name="panel_hitme">
+		<rect><color red="0.68" green="0.675" blue="0.66" /></rect>
+		<text string="HIT">
+			<bounds x="0.0" y="0.25" width="1.0" height="0.24"/>
+			<color red="0.0" green="0.0" blue="0.0" />
 		</text>
-		<rect state="1">
-			<bounds x="2" y="2" width="48" height="48"/>
-			<color red="0.25" green="0.25" blue="0.25" />
-		</rect>
-		<text string="COMP TURN" state="1">
-			<bounds x="10" y="26" width="40" height="20"/>
-			<color red="1.0" green="1.0" blue="1.0" />
+		<text string="ME">
+			<bounds x="0.0" y="0.50" width="1.0" height="0.24"/>
+			<color red="0.0" green="0.0" blue="0.0" />
 		</text>
 	</element>
 
-	<view name="Default Layout">
+	<element name="panel_compturn">
+		<rect><color red="0.68" green="0.675" blue="0.66" /></rect>
+		<text string="COMP">
+			<bounds x="0.0" y="0.25" width="1.0" height="0.24"/>
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="TURN">
+			<bounds x="0.0" y="0.50" width="1.0" height="0.24"/>
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
 
-		<!-- Black background -->
-		<bezel element="background">
-			<bounds left="0" top="0" right="200" bottom="250" />
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" right="88" top="0" bottom="216" />
+		<bezel element="static_black">
+			<bounds left="0" right="88" top="0" bottom="216" />
 		</bezel>
 
-		<!-- LEDs and number buttons -->
+	<!-- (don't care about the upper loudspeaker+logo part) -->
 
+		<bezel element="static_darkred">
+			<bounds x="10" y="4" width="68" height="160" />
+		</bezel>
+
+		<bezel element="static_red">
+			<bounds x="7" y="0" width="74" height="8" />
+		</bezel>
+		<bezel element="static_red">
+			<bounds x="4" y="14" width="80" height="128" />
+		</bezel>
+		<bezel element="static_red">
+			<bounds x="7" y="148" width="74" height="62" />
+		</bezel>
+
+
+	<!-- number panels -->
+
+		<bezel element="panel_0">
+			<bounds x="34" y="20" width="20" height="20" />
+		</bezel>
 		<bezel name="lamp0" element="led">
-			<bounds x="100" y="20" width="20" height="10" />
+			<bounds x="34" y="20" width="20" height="20" />
 		</bezel>
-		<bezel element="0" inputtag="O.0" inputmask="0x01">
-			<bounds x="100" y="32" width="20" height="10" />
+		<bezel element="button" inputtag="O.0" inputmask="0x01">
+			<bounds x="34" y="20" width="20" height="20" />
+			<color alpha="0.2" />
 		</bezel>
 
+		<bezel element="panel_1">
+			<bounds x="10" y="44" width="20" height="20" />
+		</bezel>
 		<bezel name="lamp1" element="led">
-			<bounds x="50" y="50" width="20" height="10" />
+			<bounds x="10" y="44" width="20" height="20" />
 		</bezel>
-		<bezel element="1" inputtag="O.0" inputmask="0x02">
-			<bounds x="50" y="62" width="20" height="10" />
+		<bezel element="button" inputtag="O.0" inputmask="0x02">
+			<bounds x="10" y="44" width="20" height="20" />
+			<color alpha="0.2" />
 		</bezel>
-
+		<bezel element="panel_2">
+			<bounds x="34" y="44" width="20" height="20" />
+		</bezel>
 		<bezel name="lamp2" element="led">
-			<bounds x="100" y="50" width="20" height="10" />
+			<bounds x="34" y="44" width="20" height="20" />
 		</bezel>
-		<bezel element="2" inputtag="O.0" inputmask="0x08">
-			<bounds x="100" y="62" width="20" height="10" />
+		<bezel element="button" inputtag="O.0" inputmask="0x08">
+			<bounds x="34" y="44" width="20" height="20" />
+			<color alpha="0.2" />
 		</bezel>
-
+		<bezel element="panel_3">
+			<bounds x="58" y="44" width="20" height="20" />
+		</bezel>
 		<bezel name="lamp3" element="led">
-			<bounds x="150" y="50" width="20" height="10" />
+			<bounds x="58" y="44" width="20" height="20" />
 		</bezel>
-		<bezel element="3" inputtag="O.0" inputmask="0x04">
-			<bounds x="150" y="62" width="20" height="10" />
+		<bezel element="button" inputtag="O.0" inputmask="0x04">
+			<bounds x="58" y="44" width="20" height="20" />
+			<color alpha="0.2" />
 		</bezel>
 
-
+		<bezel element="panel_4">
+			<bounds x="10" y="68" width="20" height="20" />
+		</bezel>
 		<bezel name="lamp4" element="led">
-			<bounds x="50" y="80" width="20" height="10" />
+			<bounds x="10" y="68" width="20" height="20" />
 		</bezel>
-		<bezel element="4" inputtag="O.1" inputmask="0x01">
-			<bounds x="50" y="92" width="20" height="10" />
+		<bezel element="button" inputtag="O.1" inputmask="0x01">
+			<bounds x="10" y="68" width="20" height="20" />
+			<color alpha="0.2" />
 		</bezel>
-
+		<bezel element="panel_5">
+			<bounds x="34" y="68" width="20" height="20" />
+		</bezel>
 		<bezel name="lamp5" element="led">
-			<bounds x="100" y="80" width="20" height="10" />
+			<bounds x="34" y="68" width="20" height="20" />
 		</bezel>
-		<bezel element="5" inputtag="O.1" inputmask="0x02">
-			<bounds x="100" y="92" width="20" height="10" />
+		<bezel element="button" inputtag="O.1" inputmask="0x02">
+			<bounds x="34" y="68" width="20" height="20" />
+			<color alpha="0.2" />
 		</bezel>
-
+		<bezel element="panel_6">
+			<bounds x="58" y="68" width="20" height="20" />
+		</bezel>
 		<bezel name="lamp6" element="led">
-			<bounds x="150" y="80" width="20" height="10" />
+			<bounds x="58" y="68" width="20" height="20" />
 		</bezel>
-		<bezel element="6" inputtag="O.1" inputmask="0x08">
-			<bounds x="150" y="92" width="20" height="10" />
+		<bezel element="button" inputtag="O.1" inputmask="0x08">
+			<bounds x="58" y="68" width="20" height="20" />
+			<color alpha="0.2" />
 		</bezel>
 
-
+		<bezel element="panel_7">
+			<bounds x="10" y="92" width="20" height="20" />
+		</bezel>
 		<bezel name="lamp7" element="led">
-			<bounds x="50" y="110" width="20" height="10" />
+			<bounds x="10" y="92" width="20" height="20" />
 		</bezel>
-		<bezel element="7" inputtag="O.1" inputmask="0x04">
-			<bounds x="50" y="122" width="20" height="10" />
+		<bezel element="button" inputtag="O.1" inputmask="0x04">
+			<bounds x="10" y="92" width="20" height="20" />
+			<color alpha="0.2" />
+		</bezel>
+		<bezel element="panel_8">
+			<bounds x="34" y="92" width="20" height="20" />
 		</bezel>
 		<bezel name="lamp8" element="led">
-			<bounds x="100" y="110" width="20" height="10" />
+			<bounds x="34" y="92" width="20" height="20" />
 		</bezel>
-		<bezel element="8" inputtag="O.2" inputmask="0x01">
-			<bounds x="100" y="122" width="20" height="10" />
+		<bezel element="button" inputtag="O.2" inputmask="0x01">
+			<bounds x="34" y="92" width="20" height="20" />
+			<color alpha="0.2" />
+		</bezel>
+		<bezel element="panel_9">
+			<bounds x="58" y="92" width="20" height="20" />
 		</bezel>
 		<bezel name="lamp9" element="led">
-			<bounds x="150" y="110" width="20" height="10" />
+			<bounds x="58" y="92" width="20" height="20" />
 		</bezel>
-		<bezel element="9" inputtag="O.2" inputmask="0x02">
-			<bounds x="150" y="122" width="20" height="10" />
+		<bezel element="button" inputtag="O.2" inputmask="0x02">
+			<bounds x="58" y="92" width="20" height="20" />
+			<color alpha="0.2" />
 		</bezel>
 
-
+		<bezel element="panel_10">
+			<bounds x="34" y="116" width="20" height="20" />
+		</bezel>
 		<bezel name="lamp10" element="led">
-			<bounds x="100" y="140" width="20" height="10" />
+			<bounds x="34" y="116" width="20" height="20" />
 		</bezel>
-		<bezel element="10" inputtag="O.2" inputmask="0x08">
-			<bounds x="100" y="152" width="20" height="10" />
-		</bezel>
-
-
-		<!-- Other buttons -->
-
-		<bezel element="new_game" inputtag="O.3" inputmask="0x08">
-			<bounds x="75" y="170" width="30" height="30" />
-		</bezel>
-		<bezel element="same_game" inputtag="O.2" inputmask="0x04">
-			<bounds x="125" y="170" width="30" height="30" />
+		<bezel element="button" inputtag="O.2" inputmask="0x08">
+			<bounds x="34" y="116" width="20" height="20" />
+			<color alpha="0.2" />
 		</bezel>
 
-		<bezel element="hit_me" inputtag="O.3" inputmask="0x04">
-			<bounds x="75" y="210" width="30" height="30" />
+
+	<!-- bottom panels -->
+
+		<bezel element="panel_newgame">
+			<bounds x="21" y="156" width="20" height="20" />
 		</bezel>
-		<bezel element="comp_turn" inputtag="O.3" inputmask="0x02">
-			<bounds x="125" y="210" width="30" height="30" />
+		<bezel element="button" inputtag="O.3" inputmask="0x08">
+			<bounds x="21" y="156" width="20" height="20" />
+			<color alpha="0.2" />
 		</bezel>
+
+		<bezel element="panel_samegame">
+			<bounds x="47" y="156" width="20" height="20" />
+		</bezel>
+		<bezel element="button" inputtag="O.2" inputmask="0x04">
+			<bounds x="47" y="156" width="20" height="20" />
+			<color alpha="0.2" />
+		</bezel>
+
+		<bezel element="panel_hitme">
+			<bounds x="21" y="182" width="20" height="20" />
+		</bezel>
+		<bezel element="button" inputtag="O.3" inputmask="0x04">
+			<bounds x="21" y="182" width="20" height="20" />
+			<color alpha="0.2" />
+		</bezel>
+
+		<bezel element="panel_compturn">
+			<bounds x="47" y="182" width="20" height="20" />
+		</bezel>
+		<bezel element="button" inputtag="O.3" inputmask="0x02">
+			<bounds x="47" y="182" width="20" height="20" />
+			<color alpha="0.2" />
+		</bezel>
+
 	</view>
 </mamelayout>

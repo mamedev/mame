@@ -37,6 +37,7 @@
 	8           unused      75-79       11          144.0        417
 
 	Interleave factor 3
+	cell 2.13 usec
 
 */
 
@@ -83,36 +84,33 @@ int victor9k_format::identify(io_generic *io, UINT32 form_factor)
 	return 0;
 }
 
-floppy_image_format_t::desc_e* victor9k_format::get_sector_desc(const format &f, int &current_size, int sector_count, UINT8 id1, UINT8 id2, int gap_2)
+floppy_image_format_t::desc_e* victor9k_format::get_sector_desc(const format &f, int &current_size, int sector_count)
 {
 	static floppy_image_format_t::desc_e desc[] = {
-		/* 00 */ { SECTOR_LOOP_START, 0, -1 },
-		/* 01 */ {   RAWBYTE, 0xff, 5 },
-		/* 02 */ {   GCR5, 0x08, 1 },
-		/* 03 */ {   CRC, 1 },
-		/* 04 */ {   CRC_CBM_START, 1 },
-		/* 05 */ {     SECTOR_ID_GCR5 },
-		/* 06 */ {     TRACK_ID_DOS2_GCR5 },
-		/* 07 */ {     GCR5, id2, 1 },
-		/* 08 */ {     GCR5, id1, 1 },
-		/* 09 */ {   CRC_END, 1 },
-		/* 10 */ {   GCR5, 0x0f, 2 },
-		/* 11 */ {   RAWBYTE, 0x55, f.gap_1 },
-		/* 12 */ {   RAWBYTE, 0xff, 5 },
-		/* 13 */ {   GCR5, 0x07, 1 },
-		/* 14 */ {   CRC_CBM_START, 2 },
-		/* 15 */ {     SECTOR_DATA_GCR5, -1 },
-		/* 16 */ {   CRC_END, 2 },
-		/* 17 */ {   CRC, 2 },
-		/* 18 */ {   GCR5, 0x00, 2 },
-		/* 19 */ {   RAWBYTE, 0x55, gap_2 },
-		/* 20 */ { SECTOR_LOOP_END },
-		/* 21 */ { RAWBYTE, 0x55, 0 },
-		/* 22 */ { RAWBITS, 0x5555, 0 },
-		/* 23 */ { END }
+		/* 00 */ { SECTOR_INTERLEAVE_SKEW, 0, 0},
+		/* 01 */ { SECTOR_LOOP_START, 0, -1 },
+		/* 02 */ {   SYNC_GCR5, 6 },
+		/* 03 */ {   GCR5, 0x07, 1 },
+		/* 04 */ {   CRC_VICTOR_HDR_START, 1 },
+		/* 05 */ {     TRACK_ID_VICTOR_GCR5 },
+		/* 06 */ {     SECTOR_ID_GCR5 },
+		/* 07 */ {   CRC_END, 1 },
+		/* 08 */ {   CRC, 1 },
+		/* 09 */ {   RAWBYTE, 0x55, 8 },
+		/* 10 */ {   SYNC_GCR5, 5 },
+		/* 11 */ {   GCR5, 0x08, 1 },
+		/* 12 */ {   CRC_VICTOR_DATA_START, 2 },
+		/* 13 */ {     SECTOR_DATA_GCR5, -1 },
+		/* 14 */ {   CRC_END, 2 },
+		/* 15 */ {   CRC, 2 },
+		/* 16 */ {   RAWBYTE, 0x55, 8 },
+		/* 17 */ { SECTOR_LOOP_END },
+		/* 18 */ { RAWBYTE, 0x55, 0 },
+		/* 19 */ { RAWBITS, 0x5555, 0 },
+		/* 20 */ { END }
 	};
 
-	current_size = 40 + (1+1+4+2)*10 + (f.gap_1)*8 + 40 + (1+f.sector_base_size+1+2)*10 + gap_2*8;
+	current_size = 60 + (1+1+1+1)*10 + 8*8 + 50 + (1+f.sector_base_size+2)*10 + 8*8;
 
 	current_size *= sector_count;
 	return desc;
@@ -145,8 +143,6 @@ bool victor9k_format::load(io_generic *io, UINT32 form_factor, floppy_image *ima
 
 	int track_offset = 0;
 
-	UINT8 id1 = 0xde, id2 = 0xad; // TODO
-
 	for (int head = 0; head < f.head_count; head++) {
 		for (int track = 0; track < f.track_count; track++) {
 			int current_size = 0;
@@ -154,16 +150,16 @@ bool victor9k_format::load(io_generic *io, UINT32 form_factor, floppy_image *ima
 			int sector_count = sectors_per_track[head][track];
 			int track_size = sector_count*f.sector_base_size;
 
-			floppy_image_format_t::desc_e *desc = get_sector_desc(f, current_size, sector_count, id1, id2, f.gap_2);
+			floppy_image_format_t::desc_e *desc = get_sector_desc(f, current_size, sector_count);
 
 			int remaining_size = total_size - current_size;
 			if(remaining_size < 0)
 				throw emu_fatalerror("victor9k_format: Incorrect track layout, max_size=%d, current_size=%d", total_size, current_size);
 
 			// Fixup the end gap
-			desc[21].p2 = remaining_size / 8;
-			desc[22].p2 = remaining_size & 7;
-			desc[22].p1 >>= remaining_size & 0x01;
+			desc[18].p2 = remaining_size / 8;
+			desc[19].p2 = remaining_size & 7;
+			desc[19].p1 >>= remaining_size & 0x01;
 
 			desc_s sectors[40];
 
@@ -184,17 +180,22 @@ bool victor9k_format::supports_save() const
 	return false;
 }
 
+int victor9k_format::get_rpm(int head, int track)
+{
+	return rpm[speed_zone[head][track]];
+}
+
 const victor9k_format::format victor9k_format::formats[] = {
 	{ //
-		floppy_image::FF_525, floppy_image::SSDD, 1224, 80, 1, 512, 9, 8
+		floppy_image::FF_525, floppy_image::SSDD, 1224, 80, 1, 512
 	},
 	{ //
-		floppy_image::FF_525, floppy_image::DSDD, 2448, 80, 2, 512, 9, 8
+		floppy_image::FF_525, floppy_image::DSDD, 2448, 80, 2, 512
 	},
 	{}
 };
 
-const UINT32 victor9k_format::cell_size[] =
+const UINT32 victor9k_format::cell_size[9] =
 {
 	1789, 1896, 2009, 2130, 2272, 2428, 2613, 2847, 2961
 };
@@ -245,6 +246,11 @@ const int victor9k_format::speed_zone[2][80] =
 		7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
 		8, 8, 8, 8, 8
 	}
+};
+
+const int victor9k_format::rpm[9] =
+{
+	252, 267, 283, 300, 320, 342, 368, 401, 417
 };
 
 const floppy_format_type FLOPPY_VICTOR_9000_FORMAT = &floppy_image_format_creator<victor9k_format>;

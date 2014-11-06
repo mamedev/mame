@@ -2658,6 +2658,8 @@ $(DRIVERS)/goldstar.o:  $(LAYOUT)/goldstar.lh \
 
 $(DRIVERS)/grchamp.o:   $(LAYOUT)/grchamp.lh
 
+$(DRIVERS)/harddriv.o:  $(LAYOUT)/racedrivpan.lh
+
 $(DRIVERS)/highvdeo.o:  $(LAYOUT)/fashion.lh
 
 $(DRIVERS)/hankin.o:    $(LAYOUT)/hankin.lh

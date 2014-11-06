@@ -58,7 +58,7 @@ void pci_device::map_config(UINT8 device, address_space *config_space)
 
 void pci_device::add_map(UINT64 size, int flags, address_map_delegate &map)
 {
-	logerror("Device %s (%s) has 0x%llx bytes of %s named %s\n", tag(), name(), size, flags & M_IO ? "io" : "memory", map.name());
+	logerror("Device %s (%s) has 0x%" I64FMT "x bytes of %s named %s\n", tag(), name(), size, flags & M_IO ? "io" : "memory", map.name());
 }
 
 agp_device::agp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
