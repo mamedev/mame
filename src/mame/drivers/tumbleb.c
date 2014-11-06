@@ -2026,7 +2026,6 @@ MACHINE_START_MEMBER(tumbleb_state,tumbleb)
 	save_item(NAME(m_music_is_playing));
 
 	save_item(NAME(m_control_0));
-	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_tilebank));
 }
 
@@ -2035,7 +2034,6 @@ MACHINE_RESET_MEMBER(tumbleb_state,tumbleb)
 	m_music_command = 0;
 	m_music_bank = 0;
 	m_music_is_playing = 0;
-	m_flipscreen = 0;
 	m_tilebank = 0;
 	memset(m_control_0, 0, sizeof(m_control_0));
 }

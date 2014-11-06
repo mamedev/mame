@@ -40,7 +40,6 @@ public:
 	tilemap_t   *m_pf2_tilemap;
 	tilemap_t   *m_pf2_alt_tilemap;
 	UINT16      m_control_0[8];
-	int         m_flipscreen;
 	UINT16      m_tilebank;
 
 	/* devices */
