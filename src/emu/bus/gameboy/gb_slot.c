@@ -557,7 +557,7 @@ int base_gb_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 
 	/* Check if we're dealing with the multigame variant of the MBC1 mapper */
 	if (type == GB_MBC_MBC1)
-	{	// bomberman collection korean
+	{	// bomberman collection korea
 		if (ROM[0x134] == 0x42 && ROM[0x135] == 0x4f && ROM[0x136] == 0x4d && ROM[0x137] == 0x53)
 			type = GB_MBC_MBC1_COL;
 //		if (ROM[0x13f] == 0x42 && ROM[0x140] == 0x32 && ROM[0x141] == 0x43 && ROM[0x142] == 0x4B)
