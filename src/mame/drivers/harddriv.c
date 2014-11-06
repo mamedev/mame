@@ -518,7 +518,7 @@ public:
 		: driver_device(mconfig, type, tag)
 	{ }
 
-
+	TIMER_DEVICE_CALLBACK_MEMBER(hack_timer);
 };
 
 
@@ -2084,17 +2084,30 @@ WRITE_LINE_MEMBER(racedriv_board_device_state::tx_a)
 }
 
 static MACHINE_CONFIG_START( racedriv_panorama_machine, harddriv_new_state )
-	MCFG_DEVICE_ADD("mainpcb", RACEDRIV_BOARD_DEVICE, 0) // if this is anything except the first screen the partial updates / rasters glitch, mame bug? something assuming primary_screen? other screens suffer from the same issue, not related to new code, you could reproduce it before just by adding a dummy screen
+	MCFG_DEVICE_ADD("mainpcb", RACEDRIV_BOARD_DEVICE, 0)
 	MCFG_DEVICE_ADD("leftpcb", RACEDRIVC_PANORAMA_SIDE_BOARD_DEVICE, 0)
 	MCFG_DEVICE_ADD("rightpcb", RACEDRIVC_PANORAMA_SIDE_BOARD_DEVICE, 0)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(100000))
+//	MCFG_QUANTUM_TIME(attotime::from_hz(100000))
 	MCFG_DEVICE_MODIFY("mainpcb:duartn68681")
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(racedriv_board_device_state,tx_a ))
 
-
-
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("hack_timer", harddriv_new_state, hack_timer, attotime::from_hz(60))	
+//	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 MACHINE_CONFIG_END
+
+// this is an ugly hack, otherwise MAME's core can't seem to handle partial updates if you have multiple screens with different update frequencies.
+// by forcing them to stay in sync using this ugly method everything works much better.
+TIMER_DEVICE_CALLBACK_MEMBER(harddriv_new_state::hack_timer)
+{
+	screen_device* middle = machine().device<screen_device>(":mainpcb:screen");
+	screen_device* left = machine().device<screen_device>(":leftpcb:screen");
+	screen_device* right = machine().device<screen_device>(":rightpcb:screen");
+
+	left->reset_origin(0, 0);
+	middle->reset_origin(0, 0);
+	right->reset_origin(0, 0);
+}
 
 /*************************************
  *
@@ -4153,27 +4166,6 @@ ROM_START( racedrivpan )
 	ROM_LOAD16_BYTE( "088-1016.bin", 0x0e0000, 0x010000, CRC(e83a9c99) SHA1(1d4093902133bb6da981f294e6947544c3564393) ) // == 136077-1016.200y
 	ROM_LOAD16_BYTE( "088-1015.bin", 0x0e0001, 0x010000, CRC(725806f3) SHA1(0fa4601465dc94f27c71db789ad625bbcd254169) ) // == 136077-4015.210y
 
-	// Multisync PCB (A046901) - Side Monitor
-	// these will boot with 'PROGRAM OK' and display an empty side view, if you use the 'compact' type board driver
-	//  there should be one board for each side.  (needs 137412-117 slapstic)
-	ROM_REGION( 0x200000, "mainpcb:sidecpu", 0 )        /* 2MB for 68000 code */
-	ROM_LOAD16_BYTE( "088-2002.bin", 0x000000, 0x010000, CRC(77724070) SHA1(5862f30f7e2ab9c0beb06cf5599bcb1ff97f3a47) )
-	ROM_LOAD16_BYTE( "088-2001.bin", 0x000001, 0x010000, CRC(16ab2fff) SHA1(bf6dcefc98e1fe27bef0ddacc265d8782c486c83) )
-	ROM_LOAD16_BYTE( "088-2004.bin", 0x020000, 0x010000, CRC(dccdb16b) SHA1(330cf39bcbdb9c73da48b4e947086a7988e37496) )
-	ROM_LOAD16_BYTE( "088-2003.bin", 0x020001, 0x010000, CRC(132ef986) SHA1(106f1a23ac200a868959181fa1c47419806e8366) )
-	ROM_LOAD16_BYTE( "088-2006.bin", 0x040000, 0x010000, CRC(de3a0c24) SHA1(1121b8a16ac11b2480f1c4336a5aa3271364f80e))
-	ROM_LOAD16_BYTE( "088-2005.bin", 0x040001, 0x010000, CRC(96ad705f) SHA1(cc0bc7fdd2a5f91a5929b889607dcf7ad015bb95) )
-	ROM_LOAD16_BYTE( "088-2008.bin", 0x060000, 0x010000, CRC(452d991c) SHA1(42dad0a93839a900c3571ce9e252e1c991a1da56) )
-	ROM_LOAD16_BYTE( "088-2007.bin", 0x060001, 0x010000, CRC(d6f526d3) SHA1(8406917c91c1d3690379cb0bca5809d1db27abec) )
-	ROM_LOAD16_BYTE( "088-2010.bin", 0x080000, 0x010000, CRC(775bca3d) SHA1(926b460faeb2aa46899432b3a9973381ffd7781d) )
-	ROM_LOAD16_BYTE( "088-2009.bin", 0x080001, 0x010000, CRC(6aedccc5) SHA1(9189881802969ecdde2fd41a20ff6ea0471ce2c0) )
-	ROM_LOAD16_BYTE( "088-2012.bin", 0x0a0000, 0x010000, CRC(bacf08c0) SHA1(2f7ddaf4ef350ee3e6ab886759d88c03aa94784b) )
-	ROM_LOAD16_BYTE( "088-2011.bin", 0x0a0001, 0x010000, CRC(1e0c2f71) SHA1(bcdd9089442934df78109df7c0dcf170873cf992) )
-	ROM_LOAD16_BYTE( "088-2014.bin", 0x0c0000, 0x010000, CRC(3512537c) SHA1(896975ef2685358bd98f7a9b45dda11e8bfa3a13) )
-	ROM_LOAD16_BYTE( "088-2013.bin", 0x0c0001, 0x010000, CRC(8d7c4e80) SHA1(eda8d02e51b18234fc0912eaca8171d75ae643c7) )
-	ROM_LOAD16_BYTE( "088-2016.bin", 0x0e0000, 0x010000, CRC(6a42b7e2) SHA1(2e0ff4b7e391106a976cb872f6311f6d35dca5b0) )
-	ROM_LOAD16_BYTE( "088-2015.bin", 0x0e0001, 0x010000, CRC(334e2a3b) SHA1(a19bfa7652845b9453c722091c773819ba248569) )
-
 	ROM_REGION( 0x60000, "mainpcb:user1", 0 )       /* 384k for object ROM */
 	ROM_LOAD16_BYTE( "088-1017.bin",  0x00000, 0x10000, CRC(d92251e8) SHA1(deeeec54c4a61c3adf62f6b1b910135559090ee5) )
 	ROM_LOAD16_BYTE( "088-1018.bin",  0x00001, 0x10000, CRC(11a0a8f5) SHA1(d4ccc83fc99331d741bc9b8027ef20d72e3ad71a) )
@@ -4211,7 +4203,7 @@ ROM_START( racedrivpan )
 	ROM_REGION( 0x800, "mainpcb:210e", 0 )
 	ROM_LOAD( "racedriv.210e",   0x000000, 0x000800, CRC(3d7c732e) SHA1(e7de81d4a54327514fdd339e93c888c63a344d2c) )
 	
-	/* Left PCB*/
+	/* Left PCB ( Multisync PCB (A046901) )*/
 	ROM_REGION( 0x200000, "leftpcb:maincpu", 0 )        /* 2MB for 68000 code */
 	ROM_LOAD16_BYTE( "088-2002.bin", 0x000000, 0x010000, CRC(77724070) SHA1(5862f30f7e2ab9c0beb06cf5599bcb1ff97f3a47) )
 	ROM_LOAD16_BYTE( "088-2001.bin", 0x000001, 0x010000, CRC(16ab2fff) SHA1(bf6dcefc98e1fe27bef0ddacc265d8782c486c83) )
@@ -4243,8 +4235,7 @@ ROM_START( racedrivpan )
 	ROM_REGION( 0x800, "leftpcb:210e", 0 )
 	ROM_LOAD( "leftpcb_210e",   0x000000, 0x000800, CRC(108ea834) SHA1(d7aec78287647dc52f92143cdb6d7765de0b4e39) )
 
-
-	/* Right PCB*/
+	/* Right PCB ( Multisync PCB (A046901) ) */
 	ROM_REGION( 0x200000, "rightpcb:maincpu", 0 )        /* 2MB for 68000 code */
 	ROM_LOAD16_BYTE( "088-2002.bin", 0x000000, 0x010000, CRC(77724070) SHA1(5862f30f7e2ab9c0beb06cf5599bcb1ff97f3a47) )
 	ROM_LOAD16_BYTE( "088-2001.bin", 0x000001, 0x010000, CRC(16ab2fff) SHA1(bf6dcefc98e1fe27bef0ddacc265d8782c486c83) )
@@ -5076,21 +5067,15 @@ void harddriv_state::init_racedrivc_panorama_side()
 	/* initialize the boards */
 	init_multisync(1);
 	init_adsp();
-//	init_dsk();
-//	init_driver_sound();
 
 	/* set up the slapstic */
 	m_slapstic_device->slapstic_init(machine(), 117);
 	m_m68k_slapstic_base = m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe0000, 0xfffff, read16_delegate(FUNC(harddriv_state::rd68k_slapstic_r), this), write16_delegate(FUNC(harddriv_state::rd68k_slapstic_w), this));
 
-	/* synchronization */
-//	m_rddsp32_sync[0] = m_dsp32->space(AS_PROGRAM).install_write_handler(0x613c00, 0x613c03, write32_delegate(FUNC(harddriv_state::rddsp32_sync0_w), this));
-//	m_rddsp32_sync[1] = m_dsp32->space(AS_PROGRAM).install_write_handler(0x613e00, 0x613e03, write32_delegate(FUNC(harddriv_state::rddsp32_sync1_w), this));
-
 	/* set up protection hacks */
 	m_gsp_protection = m_gsp->space(AS_PROGRAM).install_write_handler(gsp_protection, gsp_protection + 0x0f, write16_delegate(FUNC(harddriv_state::hdgsp_protection_w), this));
 
-	/* set up gsp speedup handler */
+	/* set up gsp speedup handler (todo, work these out) */
 //	m_gsp_speedup_addr[0] = m_gsp->space(AS_PROGRAM).install_write_handler(0xfff76f60, 0xfff76f6f, write16_delegate(FUNC(harddriv_state::rdgsp_speedup1_w), this));
 //	m_gsp->space(AS_PROGRAM).install_read_handler(0xfff76f60, 0xfff76f6f, read16_delegate(FUNC(harddriv_state::rdgsp_speedup1_r), this));
 //	m_gsp_speedup_pc = 0xfff43a00;
@@ -5303,7 +5288,7 @@ GAME( 1990, racedrivcg4, racedriv, racedrivc_machine, racedrivc, driver_device, 
 GAME( 1990, racedrivc2,  racedriv, racedrivc1_machine, racedrivc, driver_device, 0,ROT0, "Atari Games", "Race Drivin' (compact, rev 2)", 0 )
 GAME( 1990, racedrivc1,  racedriv, racedrivc1_machine, racedrivc, driver_device, 0,ROT0, "Atari Games", "Race Drivin' (compact, rev 1)", 0 )
 
-GAMEL( 1990, racedrivpan, racedriv, racedriv_panorama_machine, racedriv_pan, driver_device, 0, ROT0, "Atari Games", "Race Drivin' Panorama (prototype, rev 2.1)", GAME_NOT_WORKING, layout_racedrivpan )
+GAMEL( 1990, racedrivpan, racedriv, racedriv_panorama_machine, racedriv_pan, driver_device, 0, ROT0, "Atari Games", "Race Drivin' Panorama (prototype, rev 2.1)", GAME_NOT_WORKING, layout_racedrivpan ) // picking roadster crashes the side monitors?
 
 GAME( 1991, steeltal,  0,        steeltal_machine, steeltal, driver_device, 0, ROT0, "Atari Games", "Steel Talons (rev 2)", 0 )
 GAME( 1991, steeltalg, steeltal, steeltal_machine, steeltal, driver_device, 0, ROT0, "Atari Games", "Steel Talons (German, rev 2)", 0 )
