@@ -56,7 +56,7 @@
 #define MEM16_LIMIT 0x3fffff
 #define MEM32_LIMIT 0x1fffff
 
-#define RDP_RANGE_CHECK (0)
+#define RDP_RANGE_CHECK (1)
 
 #if RDP_RANGE_CHECK
 #define CHECK8(in) if(rdp_range_check((in))) { printf("Check8: Address %08x out of range!\n", (in)); fflush(stdout); fatalerror("Address %08x out of range!\n", (in)); }
