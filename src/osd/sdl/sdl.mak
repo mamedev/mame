@@ -83,10 +83,14 @@ SDL_FRAMEWORK_PATH = /Library/Frameworks/
 OSDSRC = $(SRC)/osd
 OSDOBJ = $(OBJ)/osd
 
-# default to SDL2 for non-OS/2 builds now
+# default to SDL2 for non-OS/2, non-Emscripten builds now
 ifndef SDL_LIBVER
 ifneq ($(TARGETOS),os2)
+ifneq ($(TARGETOS),emscripten)
 SDL_LIBVER = sdl2
+else
+SDL_LIBVER = sdl
+endif
 else
 SDL_LIBVER = sdl
 endif
@@ -258,6 +262,7 @@ NO_X11 = 1
 NO_USE_XINPUT = 1
 NO_USE_MIDI = 1
 NO_USE_QTDEBUG = 1
+DONT_USE_NETWORK = 1
 endif
 
 ifeq ($(TARGETOS),macosx)
@@ -779,6 +784,8 @@ ifneq ($(TARGETOS),win32)
 LIBS += -lpcap
 endif
 endif
+else
+OSDOBJS += $(SDLOBJ)/netdev.o
 endif
 
 #-------------------------------------------------
