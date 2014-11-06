@@ -13,7 +13,6 @@
 #include "cpu/dsp32/dsp32.h"
 #include "audio/atarijsa.h"
 #include "sound/dac.h"
-#include "machine/atarigen.h"
 #include "machine/mc68681.h"
 #include "machine/asic65.h"
 #include "machine/timekpr.h"
@@ -21,47 +20,29 @@
 #define HARDDRIV_MASTER_CLOCK   XTAL_32MHz
 #define HARDDRIV_GSP_CLOCK      XTAL_48MHz
 
-class harddriv_state : public atarigen_state
+extern const device_type HARDDRIV_DEVICE;
+extern const device_type HARDDRIV_BOARD_DEVICE;
+extern const device_type HARDDRIVC_BOARD_DEVICE;
+extern const device_type RACEDRIV_BOARD_DEVICE;
+extern const device_type RACEDRIVC_BOARD_DEVICE;
+extern const device_type RACEDRIVC1_BOARD_DEVICE;
+extern const device_type RACEDRIVB1_BOARD_DEVICE;
+extern const device_type RACEDRIVC_PANORAMA_SIDE_BOARD_DEVICE;
+extern const device_type STUNRUN_BOARD_DEVICE;
+extern const device_type STEELTAL_BOARD_DEVICE;
+extern const device_type STEELTAL1_BOARD_DEVICE;
+extern const device_type STEELTALP_BOARD_DEVICE;
+extern const device_type STRTDRIV_BOARD_DEVICE;
+extern const device_type HDRIVAIR_BOARD_DEVICE;
+extern const device_type HDRIVAIRP_BOARD_DEVICE;
+
+
+class harddriv_state :  public device_t
+ /* public device_video_interface */
 {
 public:
-	harddriv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_gsp(*this, "gsp"),
-			m_msp(*this, "msp"),
-			m_adsp(*this, "adsp"),
-			m_soundcpu(*this, "soundcpu"),
-			m_sounddsp(*this, "sounddsp"),
-			m_jsacpu(*this, "jsacpu"),
-			m_dsp32(*this, "dsp32"),
-			m_ds3sdsp(*this, "ds3sdsp"),
-			m_ds3xdsp(*this, "ds3xdsp"),
-			m_ds3dac1(*this, "ds3dac1"),
-			m_ds3dac2(*this, "ds3dac2"),
-			m_jsa(*this, "jsa"),
-			m_msp_ram(*this, "msp_ram"),
-			m_dsk_10c(*this, "dsk_10c"),
-			m_dsk_30c(*this, "dsk_30c"),
-			m_200e(*this, "200e"),
-			m_210e(*this, "210e"),
-			m_adsp_data_memory(*this, "adsp_data"),
-			m_adsp_pgm_memory(*this, "adsp_pgm_memory"),
-			m_ds3sdsp_data_memory(*this, "ds3sdsp_data"),
-			m_ds3sdsp_pgm_memory(*this, "ds3sdsp_pgm"),
-			m_ds3xdsp_pgm_memory(*this, "ds3xdsp_pgm"),
-			m_sounddsp_ram(*this, "sounddsp_ram"),
-			m_gsp_vram(*this, "gsp_vram", 16),
-			m_gsp_control_lo(*this, "gsp_control_lo"),
-			m_gsp_control_hi(*this, "gsp_control_hi"),
-			m_gsp_paletteram_lo(*this, "gsp_palram_lo"),
-			m_gsp_paletteram_hi(*this, "gsp_palram_hi"),
-			m_ds3sdsp_internal_timer(*this, "ds3sdsp_timer"),
-			m_ds3xdsp_internal_timer(*this, "ds3xdsp_timer"),
-			m_dac(*this, "dac"),
-			m_duart(*this, "duartn68681"),
-			m_asic65(*this, "asic65"),
-			m_slapstic_device(*this, "slapstic")
-			{}
+	harddriv_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms34010_device> m_gsp;
@@ -270,22 +251,30 @@ public:
 	void init_driver_sound();
 	void racedrivc_init_common(offs_t gsp_protection);
 	void steeltal_init_common(offs_t ds3_transfer_pc, int proto_sloop);
-	DECLARE_DRIVER_INIT(strtdriv);
-	DECLARE_DRIVER_INIT(harddrivc);
-	DECLARE_DRIVER_INIT(hdrivairp);
-	DECLARE_DRIVER_INIT(racedriv);
-	DECLARE_DRIVER_INIT(hdrivair);
-	DECLARE_DRIVER_INIT(steeltal1);
-	DECLARE_DRIVER_INIT(racedrivc);
-	DECLARE_DRIVER_INIT(steeltal);
-	DECLARE_DRIVER_INIT(racedrivc1);
-	DECLARE_DRIVER_INIT(racedrivb1);
-	DECLARE_DRIVER_INIT(harddriv);
-	DECLARE_DRIVER_INIT(steeltalp);
-	DECLARE_DRIVER_INIT(stunrun);
-	DECLARE_MACHINE_START(harddriv);
-	DECLARE_MACHINE_RESET(harddriv);
-	DECLARE_VIDEO_START(harddriv);
+
+	void init_strtdriv(void);
+	
+	void init_harddriv(void);
+	
+	void init_harddrivc(void);
+
+	void init_racedriv(void);
+	void init_racedrivb1(void);	
+
+	void init_racedrivc(void);
+	void init_racedrivc1(void);
+	
+	void init_hdrivair(void);
+	void init_hdrivairp(void);
+	
+	void init_steeltal(void);
+	void init_steeltal1(void);
+	void init_steeltalp(void);
+	
+	void init_stunrun(void);
+	void init_racedrivc_panorama_side();
+
+	void init_video();
 	INTERRUPT_GEN_MEMBER(hd68k_irq_gen);
 	TIMER_CALLBACK_MEMBER(deferred_adsp_bank_switch);
 	TIMER_CALLBACK_MEMBER(rddsp32_sync_cb);
@@ -312,6 +301,7 @@ public:
 	DECLARE_READ16_MEMBER( hd68k_msp_io_r );
 	DECLARE_WRITE16_MEMBER( hd68k_msp_io_w );
 
+	DECLARE_READ16_MEMBER( hd68k_a80000_r );
 	DECLARE_READ16_MEMBER( hd68k_port0_r );
 	DECLARE_READ16_MEMBER( hd68k_adc8_r );
 	DECLARE_READ16_MEMBER( hd68k_adc12_r );
@@ -471,6 +461,195 @@ public:
 
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_driver);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_multisync);
+	
+	UINT8               m_sound_int_state;
+	UINT8               m_video_int_state;
 
+	optional_device<palette_device> m_palette;
+	int get_hblank(screen_device &screen) const { return (screen.hpos() > (screen.width() * 9 / 10)); }
+	WRITE16_MEMBER( watchdog_reset16_w );
+	INTERRUPT_GEN_MEMBER(video_int_gen);
+	DECLARE_WRITE_LINE_MEMBER(sound_int_write_line);
 	optional_device<atari_slapstic_device> m_slapstic_device;
+protected:
+	//virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start();
+	virtual void device_reset();
 };
+
+/* Hard Drivin' */
+
+class harddriv_board_device_state :  public harddriv_state
+{
+public:
+	harddriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start();
+//	virtual void device_reset();	
+};
+
+/* Hard Drivin' Compact */
+
+class harddrivc_board_device_state :  public harddriv_state
+{
+public:
+	harddrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start();
+//	virtual void device_reset();	
+};
+
+/* Race Drivin' */
+
+class racedriv_board_device_state :  public harddriv_state
+{
+public:
+	racedriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	DECLARE_WRITE_LINE_MEMBER(tx_a);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start();
+//	virtual void device_reset();	
+};
+
+class racedrivb1_board_device_state :  public racedriv_board_device_state
+{
+public:
+	racedrivb1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+		racedriv_board_device_state(mconfig, tag, owner, clock)
+		{};
+
+protected:
+	virtual void device_start();
+};
+
+/* Race Drivin' Compact */
+
+class racedrivc_board_device_state :  public harddriv_state
+{
+public:
+	racedrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start();
+//	virtual void device_reset();	
+};
+
+class racedrivc1_board_device_state :  public racedrivc_board_device_state
+{
+public:
+	racedrivc1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+		racedrivc_board_device_state(mconfig, tag, owner, clock)
+		{};
+protected:
+	virtual void device_start();
+};
+
+class racedrivc_panorama_side_board_device_state :  public racedrivc_board_device_state
+{
+public:
+	racedrivc_panorama_side_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+		racedrivc_board_device_state(mconfig, tag, owner, clock)
+		{};
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start();
+};
+
+
+/* Stun Runner */
+
+class stunrun_board_device_state :  public harddriv_state
+{
+public:
+	stunrun_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start();
+//	virtual void device_reset();	
+};
+
+/* Steel Talons */
+
+class steeltal_board_device_state :  public harddriv_state
+{
+public:
+	steeltal_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start();
+//	virtual void device_reset();	
+};
+
+class steeltal1_board_device_state :  public steeltal_board_device_state
+{
+public:
+	steeltal1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+		steeltal_board_device_state(mconfig, tag, owner, clock)
+		{};
+
+protected:
+	virtual void device_start();
+};
+
+class steeltalp_board_device_state :  public steeltal_board_device_state
+{
+public:
+	steeltalp_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+		steeltal_board_device_state(mconfig, tag, owner, clock)
+		{};
+
+protected:
+	virtual void device_start();
+};
+
+
+
+/* Street Drivin' */
+
+class strtdriv_board_device_state :  public harddriv_state
+{
+public:
+	strtdriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start();
+//	virtual void device_reset();	
+};
+
+/* Hard Drivin' Airbourne */
+
+class hdrivair_board_device_state :  public harddriv_state
+{
+public:
+	hdrivair_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start();
+//	virtual void device_reset();	
+};
+
+class hdrivairp_board_device_state :  public hdrivair_board_device_state
+{
+public:
+	hdrivairp_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+		hdrivair_board_device_state(mconfig, tag, owner, clock)
+		{};
+		
+protected:
+	virtual void device_start();
+};
+
+
+
+

@@ -39,8 +39,8 @@ void harddriv_state::hdsnd_init()
 
 void harddriv_state::update_68k_interrupts()
 {
-	m_soundcpu->set_input_line(1, m_mainflag ? ASSERT_LINE : CLEAR_LINE);
-	m_soundcpu->set_input_line(3, m_irq68k   ? ASSERT_LINE : CLEAR_LINE);
+	if (m_soundcpu) m_soundcpu->set_input_line(1, m_mainflag ? ASSERT_LINE : CLEAR_LINE);
+	if (m_soundcpu) m_soundcpu->set_input_line(3, m_irq68k   ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -82,8 +82,8 @@ WRITE16_MEMBER(harddriv_state::hd68k_snd_data_w)
 
 WRITE16_MEMBER(harddriv_state::hd68k_snd_reset_w)
 {
-	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_soundcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	if (m_soundcpu) m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	if (m_soundcpu) m_soundcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	m_mainflag = m_soundflag = 0;
 	update_68k_interrupts();
 	logerror("%06X:Reset sound\n", space.device().safe_pcbase());
@@ -235,7 +235,7 @@ READ16_MEMBER(harddriv_state::hdsnd68k_320ports_r)
 
 WRITE16_MEMBER(harddriv_state::hdsnd68k_320ports_w)
 {
-	m_sounddsp->space(AS_IO).write_word((offset & 7) << 1, data);
+	if (m_sounddsp) m_sounddsp->space(AS_IO).write_word((offset & 7) << 1, data);
 }
 
 

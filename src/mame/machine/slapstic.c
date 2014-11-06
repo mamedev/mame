@@ -750,6 +750,8 @@ void atari_slapstic_device::slapstic_init(running_machine &machine, int chip)
 {
 	if (access_68k == -1)
 	{
+		/* see if we're 68k or 6502/6809 based */
+		printf("oh\n");
 		device_type cputype = machine.device(":maincpu")->type();
 		access_68k = (cputype == M68000 || cputype == M68010);
 	}
@@ -766,15 +768,14 @@ void atari_slapstic_device::slapstic_init(running_machine &machine, int chip)
 	/* reset the chip */
 	slapstic_reset();
 
-	/* see if we're 68k or 6502/6809 based */
 
 	/* save state */
-	state_save_register_item(machine, "slapstic", NULL, 0, state);
-	state_save_register_item(machine, "slapstic", NULL, 0, current_bank);
-	state_save_register_item(machine, "slapstic", NULL, 0, alt_bank);
-	state_save_register_item(machine, "slapstic", NULL, 0, bit_bank);
-	state_save_register_item(machine, "slapstic", NULL, 0, add_bank);
-	state_save_register_item(machine, "slapstic", NULL, 0, bit_xor);
+	save_item(NAME(state));
+	save_item(NAME(current_bank));
+	save_item(NAME(alt_bank));
+	save_item(NAME(bit_bank));
+	save_item(NAME(add_bank));
+	save_item(NAME(bit_xor));
 }
 
 

@@ -150,7 +150,7 @@ void asic65_device::device_reset()
 
 void asic65_device::reset_line(int state)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = subdevice("^maincpu")->memory().space(AS_PROGRAM);
 
 	/* rom-based means reset and clear states */
 	if (m_asic65_type == ASIC65_ROMBASED)

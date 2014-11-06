@@ -36,21 +36,24 @@
  *
  *************************************/
 
-MACHINE_START_MEMBER(harddriv_state,harddriv)
+void harddriv_state::device_start()
 {
-	atarigen_state::machine_start();
+	//atarigen_state::machine_start();
 
 	/* predetermine memory regions */
 	m_sim_memory = (UINT16 *)memregion("user1")->base();
 	m_sim_memory_size = memregion("user1")->bytes() / 2;
 	m_adsp_pgm_memory_word = (UINT16 *)(reinterpret_cast<UINT8 *>(m_adsp_pgm_memory.target()) + 1);
+
+	init_video();
+
 }
 
 
-MACHINE_RESET_MEMBER(harddriv_state,harddriv)
+void  harddriv_state::device_reset()
 {
 	/* generic reset */
-	atarigen_state::machine_reset();
+	//atarigen_state::machine_reset();
 	m_slapstic_device->slapstic_reset();
 
 	/* halt several of the DSPs to start */
@@ -196,6 +199,11 @@ WRITE16_MEMBER( harddriv_state::hd68k_msp_io_w )
  *
  *************************************/
 
+READ16_MEMBER( harddriv_state::hd68k_a80000_r )
+{
+	return ioport("a80000")->read_safe(0xffff);
+}
+
 READ16_MEMBER( harddriv_state::hd68k_port0_r )
 {
 	/* port is as follows:
@@ -213,8 +221,10 @@ READ16_MEMBER( harddriv_state::hd68k_port0_r )
 	        .....
 	    0x8000 = SW1 #1
 	*/
-	int temp = (ioport("SW1")->read() << 8) | ioport("IN0")->read();
-	if (get_hblank(*m_screen)) temp ^= 0x0002;
+	screen_device &scr = m_gsp->screen();
+	
+	int temp = (ioport("SW1")->read_safe(0xff) << 8) | ioport("IN0")->read_safe(0xff);
+	if (get_hblank(scr)) temp ^= 0x0002;
 	temp ^= 0x0018;     /* both EOCs always high for now */
 	return temp;
 }
@@ -222,7 +232,7 @@ READ16_MEMBER( harddriv_state::hd68k_port0_r )
 
 READ16_MEMBER( harddriv_state::hdc68k_port1_r )
 {
-	UINT16 result = ioport("a80000")->read();
+	UINT16 result = ioport("a80000")->read_safe(0xffff);
 	UINT16 diff = result ^ m_hdc68k_last_port1;
 
 	/* if a new shifter position is selected, use it */
@@ -250,7 +260,7 @@ READ16_MEMBER( harddriv_state::hdc68k_port1_r )
 
 READ16_MEMBER( harddriv_state::hda68k_port1_r )
 {
-	UINT16 result = ioport("a80000")->read();
+	UINT16 result = ioport("a80000")->read_safe(0xffff);
 
 	/* merge in the wheel edge latch bit */
 	if (m_hdc68k_wheel_edge)
@@ -263,7 +273,7 @@ READ16_MEMBER( harddriv_state::hda68k_port1_r )
 READ16_MEMBER( harddriv_state::hdc68k_wheel_r )
 {
 	/* grab the new wheel value and upconvert to 12 bits */
-	UINT16 new_wheel = ioport("12BADC0")->read() << 4;
+	UINT16 new_wheel = ioport("12BADC0")->read_safe(0xffff) << 4;
 
 	/* hack to display the wheel position */
 	if (space.machine().input().code_pressed(KEYCODE_LSHIFT))
@@ -317,14 +327,14 @@ WRITE16_MEMBER( harddriv_state::hd68k_adc_control_w )
 	if (m_adc_control & 0x08)
 	{
 		m_adc8_select = m_adc_control & 0x07;
-		m_adc8_data = ioport(adc8names[m_adc8_select])->read();
+		m_adc8_data = ioport(adc8names[m_adc8_select])->read_safe(0xffff);
 	}
 
 	/* handle a write to the 12-bit ADC address select */
 	if (m_adc_control & 0x40)
 	{
 		m_adc12_select = (m_adc_control >> 4) & 0x03;
-		m_adc12_data = space.machine().root_device().ioport(adc12names[m_adc12_select])->read() << 4;
+		m_adc12_data = ioport(adc12names[m_adc12_select])->read_safe(0xffff) << 4;
 	}
 
 	/* bit 7 selects which byte of the 12 bit data to read */
@@ -485,9 +495,11 @@ WRITE16_MEMBER( harddriv_state::hdgsp_io_w )
 		}
 	}
 
+	screen_device &scr = m_gsp->screen();
+
 	/* detect changes to HEBLNK and HSBLNK and force an update before they change */
 	if ((offset == REG_HEBLNK || offset == REG_HSBLNK) && data != m_gsp->io_register_r(space, offset, 0xffff))
-		m_screen->update_partial(m_screen->vpos() - 1);
+		scr.update_partial(scr.vpos() - 1);
 
 	m_gsp->io_register_w(space, offset, data, mem_mask);
 }
@@ -1502,11 +1514,11 @@ WRITE16_MEMBER( harddriv_state::hd68k_dsk_control_w )
 	switch (offset & 7)
 	{
 		case 0: /* DSPRESTN */
-			m_dsp32->set_input_line(INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
+			if (m_dsp32) m_dsp32->set_input_line(INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 1: /* DSPZN */
-			m_dsp32->set_input_line(INPUT_LINE_HALT, val ? CLEAR_LINE : ASSERT_LINE);
+			if (m_dsp32) m_dsp32->set_input_line(INPUT_LINE_HALT, val ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 2: /* ZW1 */
@@ -1570,7 +1582,7 @@ READ16_MEMBER( harddriv_state::hd68k_dsk_rom_r )
 WRITE16_MEMBER( harddriv_state::hd68k_dsk_dsp32_w )
 {
 	m_dsk_pio_access = TRUE;
-	m_dsp32->pio_w(offset, data);
+	if (m_dsp32) m_dsp32->pio_w(offset, data);
 	m_dsk_pio_access = FALSE;
 }
 
@@ -1579,7 +1591,9 @@ READ16_MEMBER( harddriv_state::hd68k_dsk_dsp32_r )
 {
 	UINT16 result;
 	m_dsk_pio_access = TRUE;
-	result = m_dsp32->pio_r(offset);
+	if (m_dsp32) result = m_dsp32->pio_r(offset);
+	else result = 0x00;
+
 	m_dsk_pio_access = FALSE;
 	return result;
 }
