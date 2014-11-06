@@ -572,6 +572,8 @@ void n64_rdp::SpanDrawFill(INT32 scanline, const extent_t &extent, const rdp_pol
 	{
 		if (x >= clipx1 && x < clipx2)
 		{
+			if (object.MiscState.FBSize < 2 || object.MiscState.FBSize > 4)
+				fatalerror("unsupported FBSize %d\n", object.MiscState.FBSize);
 			((this)->*(_Fill[object.MiscState.FBSize - 2]))(fb_index + x, object);
 		}
 
