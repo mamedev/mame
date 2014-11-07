@@ -4619,8 +4619,25 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ROM_END
 
 ROM_START( pemg0252 ) /* Normal board : Player's Choice Multi-Game MG0252 - Requires a Printer (not yet supported) */
+/*
+MG0252 has 4 poker games:
+  Deuces Wild
+  Jacks Better Bonus
+  Deuces / Joker Wild
+  Jacks or Better
+
+Requires a printer for ticket payout (no coins) made by Star Micronics Co. Ltd. (Piscataway, NJ)
+  40-column dot matrix
+  3.25" wide, 2-ply paper roll
+  One ply is the customer copy, the other is a carbon copy for auditing
+
+  Printer PCB consists of a SCN8039HCBN40  Signetics / Intel (8048 compatible Single-Chip 8-Bit Microcontroller, ROM-less version) MCU
+  8.00MHz OSC and the LP 86 (handwritten label) EPROM
+
+  Some Player's Choice machines contain and use a touchscreen for input
+*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "mg0252.u68",   0x00000, 0x10000, CRC(1d0ba4f1) SHA1(f906a11d171318a06fb0bb09783bd8e3b99f1ca9) ) /* Stalls with "PRINTER ERROR" */
+	ROM_LOAD( "mg0252_752-778.u68",   0x00000, 0x10000, CRC(1d0ba4f1) SHA1(f906a11d171318a06fb0bb09783bd8e3b99f1ca9) ) /* Stalls with "PRINTER ERROR" */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2076.u72",   0x00000, 0x8000, CRC(84634f0e) SHA1(8f1b9aaa92e861f00569053c1112c2fb7eb577e8) )
@@ -4630,6 +4647,9 @@ ROM_START( pemg0252 ) /* Normal board : Player's Choice Multi-Game MG0252 - Requ
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "cap1426.u50", 0x0000, 0x0100, CRC(6c7c3462) SHA1(b5481b548f4db460d27a4bfebb08188f36ca0c11) )
+
+	ROM_REGION( 0x1000, "printer", 0 ) /* ROM from the printer driver PCB */
+	ROM_LOAD( "lp_86.u9", 0x0000, 0x1000, CRC(cdd93c06) SHA1(96f0a6e231f355a0b82bb0e1e698edbd66ff3020) ) /* 2732 EPROM */
 ROM_END
 
 ROM_START( pebe0014 ) /* Normal board : Blackjack (BE0014) */
