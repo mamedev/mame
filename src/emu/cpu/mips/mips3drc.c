@@ -275,7 +275,7 @@ void mips3_device::code_compile_block(UINT8 mode, offs_t pc)
 
 	/* get a description of this sequence */
 	desclist = m_drcfe->describe_code(pc);
-	if (LOG_UML || LOG_NATIVE)
+	if (drcuml->logging() || LOG_NATIVE)
 		log_opcode_desc(drcuml, desclist, 0);
 
 	/* if we get an error back, flush the cache and try again */
@@ -294,7 +294,7 @@ void mips3_device::code_compile_block(UINT8 mode, offs_t pc)
 				UINT32 nextpc;
 
 				/* add a code log entry */
-				if (LOG_UML)
+				if (drcuml->logging())
 					block->append_comment("-------------------------");                     // comment
 
 				/* determine the last instruction in this sequence */
@@ -1070,7 +1070,7 @@ void mips3_device::generate_update_cycles(drcuml_block *block, compiler_state *c
 void mips3_device::generate_checksum_block(drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast)
 {
 	const opcode_desc *curdesc;
-	if (LOG_UML)
+	if (m_drcuml->logging())
 		block->append_comment("[Validation for %08X]", seqhead->pc);                // comment
 
 	/* loose verify or single instruction: just compare and fail */
@@ -1147,7 +1147,7 @@ void mips3_device::generate_sequence_instruction(drcuml_block *block, compiler_s
 	int hotnum;
 
 	/* add an entry for the log */
-	if (LOG_UML && !(desc->flags & OPFLAG_VIRTUAL_NOOP))
+	if (m_drcuml->logging() && !(desc->flags & OPFLAG_VIRTUAL_NOOP))
 		log_add_disasm_comment(block, desc->pc, desc->opptr.l[0]);
 
 	/* set the PC map variable */
@@ -3129,11 +3129,12 @@ int mips3_device::generate_cop1x(drcuml_block *block, compiler_state *compiler, 
 
 void mips3_device::log_add_disasm_comment(drcuml_block *block, UINT32 pc, UINT32 op)
 {
-#if (LOG_UML)
-	char buffer[100];
-	dasmmips3(buffer, pc, op);
-	block->append_comment("%08X: %s", pc, buffer);                                  // comment
-#endif
+	if (m_drcuml->logging())
+	{
+		char buffer[100];
+		dasmmips3(buffer, pc, op);
+		block->append_comment("%08X: %s", pc, buffer);                                  // comment
+	}
 }
 
 
@@ -3263,14 +3264,15 @@ void mips3_device::log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desc
 		char buffer[100];
 
 		/* disassemle the current instruction and output it to the log */
-#if (LOG_UML || LOG_NATIVE)
-		if (desclist->flags & OPFLAG_VIRTUAL_NOOP)
-			strcpy(buffer, "<virtual nop>");
+		if (drcuml->logging() || LOG_NATIVE)
+		{
+			if (desclist->flags & OPFLAG_VIRTUAL_NOOP)
+				strcpy(buffer, "<virtual nop>");
+			else
+				dasmmips3(buffer, desclist->pc, desclist->opptr.l[0]);
+		}
 		else
-			dasmmips3(buffer, desclist->pc, desclist->opptr.l[0]);
-#else
-		strcpy(buffer, "???");
-#endif
+			strcpy(buffer, "???");
 		drcuml->log_printf("%08X [%08X] t:%08X f:%s: %-30s", desclist->pc, desclist->physpc, desclist->targetpc, log_desc_flags_to_string(desclist->flags), buffer);
 
 		/* output register states */

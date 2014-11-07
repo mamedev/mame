@@ -121,14 +121,17 @@ drcbe_interface::~drcbe_interface()
 drcuml_state::drcuml_state(device_t &device, drc_cache &cache, UINT32 flags, int modes, int addrbits, int ignorebits)
 	: m_device(device),
 		m_cache(cache),
-		m_beintf((device.machine().options().drc_use_c()) ?
+		m_beintf(device.machine().options().drc_use_c() ?
 			*static_cast<drcbe_interface *>(auto_alloc(device.machine(), drcbe_c(*this, device, cache, flags, modes, addrbits, ignorebits))) :
 			*static_cast<drcbe_interface *>(auto_alloc(device.machine(), drcbe_native(*this, device, cache, flags, modes, addrbits, ignorebits)))),
 		m_umllog(NULL)
 {
 	// if we're to log, create the logfile
-	if (flags & DRCUML_OPTION_LOG_UML)
-		m_umllog = fopen("drcuml.asm", "w");
+	if (device.machine().options().drc_log_uml())
+	{
+		astring filename("drcuml_", m_device.shortname(), ".asm");
+		m_umllog = fopen(filename.cstr(), "w");
+	}
 }
 
 

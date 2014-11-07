@@ -22,7 +22,6 @@
 
 #define USE_SIMD        (0)
 #define SIMUL_SIMD      (0)
-#define RSP_LOG_UML     (0)
 #define RSP_LOG_NATIVE  (0)
 
 #if USE_SIMD

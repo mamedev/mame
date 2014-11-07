@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="dai_cass" description="DAI Personal Computer cassettes">
+	<software name="biorythm">
+		<description>BIORYTHME</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="dai_cass">
+			<dataarea name="cass" size="3417434">
+				<rom name="biorythme.wav" size="3417434" crc="e89fa182" sha1="0b10826f4ce86ca99749f78f7c4a7b8cf483b73e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dgraph">
+		<description>DEMOGRAPHBV</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="dai_cass">
+			<dataarea name="cass" size="9209948">
+				<rom name="demographbv.wav" size="9209948" crc="2d864a6a" sha1="bdd11f68ce56c71430d52aab195946b4276100d2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dessin">
+		<description>DESSIN</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="dai_cass">
+			<dataarea name="cass" size="4020808">
+				<rom name="dessin.wav" size="4020808" crc="75f37036" sha1="6080dd40e1e4a2cee8bbf7f1ca6c979ecffebbc5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lewiscar">
+		<description>LEWISCARROL</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="dai_cass">
+			<dataarea name="cass" size="5123796">
+				<rom name="lewiscarrol.wav" size="5123796" crc="8b853469" sha1="6ce37dcbbafd5226de51cceb58e3d952cf588c50" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="morpion">
+		<description>MORPION</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="dai_cass">
+			<dataarea name="cass" size="4866728">
+				<rom name="morpion.wav" size="4866728" crc="eef0df58" sha1="52273192a236eb2a3b5ab96949e672052128c414" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nautilus">
+		<description>NAUTILUS</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="dai_cass">
+			<dataarea name="cass" size="9359566">
+				<rom name="nautilus.wav" size="9359566" crc="c31d2ef8" sha1="311db74761013a80b6b323c0de081a8dedb17590" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="premier">
+		<description>PREMIER</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="dai_cass">
+			<dataarea name="cass" size="507438">
+				<rom name="premier.wav" size="507438" crc="7d3ab866" sha1="7c2e4024e6f3b7909e7b490ccb5eae871cac1cb9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="random">
+		<description>RANDOM</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="dai_cass">
+			<dataarea name="cass" size="449206">
+				<rom name="random.wav" size="449206" crc="1a8a5505" sha1="a5a20822292713f714f50f3c20d01d6c97bedb9f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

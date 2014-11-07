@@ -591,13 +591,17 @@ public:
 	DECLARE_READ8_MEMBER(pc9801_mouse_r);
 	DECLARE_WRITE8_MEMBER(pc9801_mouse_w);
 	DECLARE_WRITE8_MEMBER(pc9801rs_mouse_freq_w);
-	inline UINT8 m_pc9801rs_grcg_r(UINT32 offset,int vbank);
-	inline void m_pc9801rs_grcg_w(UINT32 offset,int vbank,UINT8 data);
+	inline UINT8 m_pc9801rs_grcg_r(UINT32 offset,int vbank,int vrambank);
+	inline UINT8 m_pc9801rs_grcg_r(UINT32 offset,int vbank) { return m_pc9801rs_grcg_r(offset, vbank, m_vram_bank); }
+	inline void m_pc9801rs_grcg_w(UINT32 offset,int vbank,int vrambank,UINT8 data);
+	inline void m_pc9801rs_grcg_w(UINT32 offset,int vbank,UINT8 data) { m_pc9801rs_grcg_w(offset, vbank, m_vram_bank, data); }
 	DECLARE_CUSTOM_INPUT_MEMBER(system_type_r);
 	DECLARE_READ8_MEMBER(pc9801ux_gvram_r);
 	DECLARE_WRITE8_MEMBER(pc9801ux_gvram_w);
 	DECLARE_READ8_MEMBER(pc9801ux_gvram0_r);
 	DECLARE_WRITE8_MEMBER(pc9801ux_gvram0_w);
+	DECLARE_READ8_MEMBER(upd7220_grcg_r);
+	DECLARE_WRITE8_MEMBER(upd7220_grcg_w);
 	UINT32 pc9801_286_a20(bool state);
 
 	DECLARE_READ8_MEMBER(ide_hack_r);
@@ -750,7 +754,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER( mouse_irq_cb );
 
 	void pc9801_fdc_2hd_update_ready(floppy_image_device *, int);
-	inline UINT32 m_calc_grcg_addr(int i,UINT32 offset);
+	inline UINT32 m_calc_grcg_addr(int i,UINT32 offset,int vrambank);
 
 	DECLARE_DRIVER_INIT(pc9801_kanji);
 	inline void set_dma_channel(int channel, int state);
@@ -1645,18 +1649,18 @@ WRITE8_MEMBER(pc9801_state::pc9801_gvram_w)
 	m_video_ram_2[offset+0x08000+m_vram_bank*0x20000] = data;
 }
 
-inline UINT32 pc9801_state::m_calc_grcg_addr(int i,UINT32 offset)
+inline UINT32 pc9801_state::m_calc_grcg_addr(int i,UINT32 offset,int vrambank)
 {
-	return (offset) + (((i+1)*0x8000) & 0x1ffff) + (m_vram_bank*0x20000);
+	return (offset) + (((i+1)*0x8000) & 0x1ffff) + (vrambank*0x20000);
 }
 
-inline UINT8 pc9801_state::m_pc9801rs_grcg_r(UINT32 offset,int vbank)
+inline UINT8 pc9801_state::m_pc9801rs_grcg_r(UINT32 offset,int vbank,int vrambank)
 {
-	UINT8 res;
+	UINT8 res = 0;
 
-	if((m_grcg.mode & 0x80) == 0 || (m_grcg.mode & 0x40))
-		res = m_video_ram_2[offset+vbank*0x8000+m_vram_bank*0x20000];
-	else
+	if(!(m_grcg.mode & 0x80))
+		res = m_video_ram_2[offset+vbank*0x8000+vrambank*0x20000];
+	else if(!(m_grcg.mode & 0x40))
 	{
 		int i;
 
@@ -1664,7 +1668,7 @@ inline UINT8 pc9801_state::m_pc9801rs_grcg_r(UINT32 offset,int vbank)
 		for(i=0;i<4;i++)
 		{
 			if((m_grcg.mode & (1 << i)) == 0)
-				res |= (m_video_ram_2[m_calc_grcg_addr(i,offset)] ^ m_grcg.tile[i]);
+				res |= (m_video_ram_2[m_calc_grcg_addr(i,offset,vrambank)] ^ m_grcg.tile[i]);
 		}
 
 		res ^= 0xff;
@@ -1673,10 +1677,10 @@ inline UINT8 pc9801_state::m_pc9801rs_grcg_r(UINT32 offset,int vbank)
 	return res;
 }
 
-inline void pc9801_state::m_pc9801rs_grcg_w(UINT32 offset,int vbank,UINT8 data)
+inline void pc9801_state::m_pc9801rs_grcg_w(UINT32 offset,int vbank,int vrambank,UINT8 data)
 {
 	if((m_grcg.mode & 0x80) == 0)
-		m_video_ram_2[offset+vbank*0x8000+m_vram_bank*0x20000] = data;
+		m_video_ram_2[offset+vbank*0x8000+vrambank*0x20000] = data;
 	else
 	{
 		int i;
@@ -1687,8 +1691,8 @@ inline void pc9801_state::m_pc9801rs_grcg_w(UINT32 offset,int vbank,UINT8 data)
 			{
 				if((m_grcg.mode & (1 << i)) == 0)
 				{
-					m_video_ram_2[m_calc_grcg_addr(i,offset)] &= ~data;
-					m_video_ram_2[m_calc_grcg_addr(i,offset)] |= m_grcg.tile[i] & data;
+					m_video_ram_2[m_calc_grcg_addr(i,offset,vrambank)] &= ~data;
+					m_video_ram_2[m_calc_grcg_addr(i,offset,vrambank)] |= m_grcg.tile[i] & data;
 				}
 			}
 		}
@@ -1698,13 +1702,22 @@ inline void pc9801_state::m_pc9801rs_grcg_w(UINT32 offset,int vbank,UINT8 data)
 			{
 				if((m_grcg.mode & (1 << i)) == 0)
 				{
-					m_video_ram_2[m_calc_grcg_addr(i,offset)] = m_grcg.tile[i];
+					m_video_ram_2[m_calc_grcg_addr(i,offset,vrambank)] = m_grcg.tile[i];
 				}
 			}
 		}
 	}
 }
 
+READ8_MEMBER(pc9801_state::upd7220_grcg_r)
+{
+	return m_pc9801rs_grcg_r(offset & 0x7fff, (offset >> 15) & 3, offset >> 17);
+}
+
+WRITE8_MEMBER(pc9801_state::upd7220_grcg_w)
+{
+	m_pc9801rs_grcg_w(offset & 0x7fff, (offset >> 15) & 3, offset >> 17, data);
+}
 
 READ8_MEMBER(pc9801_state::pc9801_mouse_r)
 {
@@ -2776,6 +2789,9 @@ static ADDRESS_MAP_START( upd7220_2_map, AS_0, 8, pc9801_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram_2")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( upd7220_grcg_2_map, AS_0, 8, pc9801_state )
+	AM_RANGE(0x00000, 0x3ffff) AM_READWRITE(upd7220_grcg_r, upd7220_grcg_w) AM_SHARE("video_ram_2")
+ADDRESS_MAP_END
 
 CUSTOM_INPUT_MEMBER(pc9801_state::system_type_r)
 {
@@ -3730,10 +3746,10 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_FRAGMENT_ADD(pc9801_keyboard)
 	MCFG_FRAGMENT_ADD(pc9801_mouse)
 	MCFG_FRAGMENT_ADD(pc9801_ide)
-	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, NULL, NULL)
+	MCFG_UPD4990A_ADD("upd1990a", XTAL_32_768kHz, NULL, NULL)
 	MCFG_DEVICE_ADD(UPD8251_TAG, I8251, 0)
 
-	MCFG_UPD765A_ADD("upd765_2hd", false, true)
+	MCFG_UPD765A_ADD("upd765_2hd", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pc9801_state, pc9801rs_fdc_irq))
 	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(pc9801_state, pc9801rs_fdc_drq))
 	//"upd765_2dd"
@@ -3761,7 +3777,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_UPD7220_VSYNC_CALLBACK(DEVWRITELINE("upd7220_btm", upd7220_device, ext_sync_w))
 
 	MCFG_DEVICE_ADD("upd7220_btm", UPD7220, 5000000/2)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_2_map)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_grcg_2_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(pc9801_state, hgdc_display_pixels)
 
 	MCFG_PALETTE_ADD("palette", 16+16)
@@ -3847,7 +3863,7 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_FRAGMENT_ADD(pc9801_keyboard)
 	MCFG_FRAGMENT_ADD(pc9801_mouse)
 	MCFG_FRAGMENT_ADD(pc9801_ide)
-	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, NULL, NULL)
+	MCFG_UPD4990A_ADD("upd1990a", XTAL_32_768kHz, NULL, NULL)
 	MCFG_DEVICE_ADD(UPD8251_TAG, I8251, 0)
 
 	MCFG_UPD765A_ADD("upd765_2hd", false, true)
@@ -3878,7 +3894,7 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_UPD7220_VSYNC_CALLBACK(DEVWRITELINE("upd7220_btm", upd7220_device, ext_sync_w))
 
 	MCFG_DEVICE_ADD("upd7220_btm", UPD7220, 5000000/2)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_2_map)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_grcg_2_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(pc9801_state, hgdc_display_pixels)
 
 	MCFG_PALETTE_ADD("palette", 16+16+256)

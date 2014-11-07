@@ -10,7 +10,7 @@ though. The table below shows the differences between the different models.
 
 Mode     | ROM       | RAM      | R pins | O pins | K pins | ids
 ---------+-----------+----------+--------+--------+--------|----------
-tms0970* | 1024 *  8 |  64 *  4 |        |        |        | tms0972
+tms0970  | 1024 *  8 |  64 *  4 |        |        |        | tms0972
 tms0920* |  511?*  9 |  40 *  5 |        |        |        | tmc0921
 tms0980  | 2048 *  9 |  64 *  9 |        |        |        | tmc0981
 tms1000  | 1024 *  8 |  64 *  4 |     11 |      8 |      4 | tms1001
@@ -127,6 +127,7 @@ unknown cycle: CME, SSE, SSS
 
 const device_type TMS0980 = &device_creator<tms0980_cpu_device>;
 const device_type TMS1000 = &device_creator<tms1000_cpu_device>;
+const device_type TMS0970 = &device_creator<tms0970_cpu_device>;
 const device_type TMS1070 = &device_creator<tms1070_cpu_device>;
 const device_type TMS1200 = &device_creator<tms1200_cpu_device>;
 const device_type TMS1270 = &device_creator<tms1270_cpu_device>;
@@ -636,7 +637,7 @@ static const UINT8 tms1000_next_pc[64] =
       nand322 means if pc = 0x3f, output MUST be true
       hence, nand325 is if pc = 0x7f, false. if pc = 0x3f, true. if pc&0x60 is zero OR pc&0x60 is 0x60, true. otherwise, false.
 
-      tms0980_nect_pc below implements an indentical function to this in a somewhat more elegant way.
+      tms0980_next_pc below implements an indentical function to this in a somewhat more elegant way.
 */
 void tms1xxx_cpu_device::next_pc()
 {
@@ -1056,6 +1057,11 @@ offs_t tms1000_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UIN
 	return CPU_DISASSEMBLE_NAME(tms1000)(this, buffer, pc, oprom, opram, options);
 }
 
+
+tms0970_cpu_device::tms0970_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms1000_cpu_device( mconfig, TMS0970, "TMS0970", tag, owner, clock, 0x00ff, 0x07ff, "tms0970", __FILE__)
+{
+}
 
 tms1070_cpu_device::tms1070_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms1000_cpu_device( mconfig, TMS1070, "TMS1070", tag, owner, clock, 0x00ff, 0x07ff, "tms1070", __FILE__)

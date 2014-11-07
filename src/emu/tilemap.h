@@ -443,8 +443,9 @@ struct tile_data
 	{
 		gfx_element *gfx = decoder->gfx(_gfxnum);
 		int code = rawcode % gfx->elements();
+		assert(rawcolor < gfx->colors()); // TEMPORARY ASSERT
 		pen_data = gfx->get_data(code);
-		palette_base = gfx->colorbase() + gfx->granularity() * rawcolor;
+		palette_base = gfx->colorbase() + gfx->granularity() * (rawcolor % gfx->colors());
 		flags = _flags;
 		gfxnum = _gfxnum;
 	}

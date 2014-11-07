@@ -50,6 +50,12 @@ enum
 #define MCFG_UPD7810_TO(_devcb) \
 	upd7810_device::set_to_func(*device, DEVCB_##_devcb);
 
+#define MCFG_UPD7810_CO0(_devcb) \
+	upd7810_device::set_co0_func(*device, DEVCB_##_devcb);
+
+#define MCFG_UPD7810_CO1(_devcb) \
+	upd7810_device::set_co1_func(*device, DEVCB_##_devcb);
+
 #define MCFG_UPD7810_TXD(_devcb) \
 	upd7810_device::set_txd_func(*device, DEVCB_##_devcb);
 
@@ -90,6 +96,8 @@ public:
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_to_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_to_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_co0_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_co0_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_co1_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_co1_func.set_callback(object); }
 	template<class _Object> static devcb_base &set_txd_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_txd_func.set_callback(object); }
 	template<class _Object> static devcb_base &set_rxd_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_rxd_func.set_callback(object); }
 	template<class _Object> static devcb_base &set_an0_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an0_func.set_callback(object); }
@@ -173,6 +181,8 @@ protected:
 	void upd7810_handle_timer1(int cycles, int clkdiv);
 
 	devcb_write_line  m_to_func;
+	devcb_write_line  m_co0_func;
+	devcb_write_line  m_co1_func;
 	devcb_write_line  m_txd_func;
 	devcb_read_line   m_rxd_func;
 	devcb_read8       m_an0_func;
