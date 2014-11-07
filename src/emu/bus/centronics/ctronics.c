@@ -119,6 +119,7 @@ device_centronics_peripheral_interface::~device_centronics_peripheral_interface(
 #include "comxpl80.h"
 #include "epson_ex800.h"
 #include "epson_lx800.h"
+#include "epson_lx810l.h"
 #include "printer.h"
 #include "covox.h"
 

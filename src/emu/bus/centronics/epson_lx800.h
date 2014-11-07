@@ -67,37 +67,9 @@ private:
 };
 
 
-// ======================> epson_lx810l_t
-
-class epson_lx810l_t :  public epson_lx800_t
-{
-public:
-	// construction/destruction
-	epson_lx810l_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-};
-
-
-// ======================> epson_ap2000_t
-
-class epson_ap2000_t :  public epson_lx800_t
-{
-public:
-	// construction/destruction
-	epson_ap2000_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-};
-
-
 
 // device type definition
 extern const device_type EPSON_LX800;
-extern const device_type EPSON_LX810L;
-extern const device_type EPSON_AP2000;
 
 
 

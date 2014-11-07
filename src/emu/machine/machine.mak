@@ -521,6 +521,15 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/machine/e05a30.h,MACHINES += E05A30
+#-------------------------------------------------
+
+ifneq ($(filter E05A30,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/e05a30.o
+endif
+
+#-------------------------------------------------
+#
 #@src/emu/machine/eeprom.h,MACHINES += EEPROMDEV
 #@src/emu/machine/eepromser.h,MACHINES += EEPROMDEV
 #@src/emu/machine/eeprompar.h,MACHINES += EEPROMDEV
