@@ -128,7 +128,10 @@ drcuml_state::drcuml_state(device_t &device, drc_cache &cache, UINT32 flags, int
 {
 	// if we're to log, create the logfile
 	if (device.machine().options().drc_log_uml())
-		m_umllog = fopen("drcuml.asm", "w");
+	{
+		astring filename("drcuml_", m_device.shortname(), ".asm");
+		m_umllog = fopen(filename.cstr(), "w");
+	}
 }
 
 
