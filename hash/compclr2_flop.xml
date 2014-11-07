@@ -1429,6 +1429,7 @@
 				<rom name="strings_fortran.ccvf" size="162830" crc="389c4c75" sha1="24b6a44cb71373c68c6cec52e61258e96e76e20f" offset="0"/>
 			</dataarea>
 		</part>
+	</software>
 
 
 	<software name="fortstra" clone="fortstr">
