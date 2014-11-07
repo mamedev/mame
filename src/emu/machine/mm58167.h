@@ -53,9 +53,13 @@ protected:
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second);
 	virtual bool rtc_feature_leap_year() { return true; }
 
+	void set_irq(int bit);
+	void update_rtc();
+
 private:
 	int m_regs[32];
 	int m_milliseconds;
+	bool m_comparator_state;
 
 	// timers
 	emu_timer *m_clock_timer;

@@ -177,6 +177,10 @@ void device_rtc_interface::advance_minutes()
 		m_register[RTC_HOUR] = 0;
 		advance_days();
 	}
+	else
+	{
+		clock_updated();
+	}
 }
 
 
