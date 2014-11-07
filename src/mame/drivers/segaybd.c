@@ -118,7 +118,7 @@ WRITE16_MEMBER( segaybd_state::analog_w )
 //-------------------------------------------------
 
 IOPORT_ARRAY_MEMBER( segaybd_state::digital_ports )
-{ "P1", "GENERAL", "PORTC", "PORTD", "PORTE", "DSW", "COINAGE", "PORTH" };
+{ "P1", "GENERAL", "LIMITSW", "PORTD", "PORTE", "DSW", "COINAGE", "PORTH" };
 
 READ16_MEMBER( segaybd_state::io_chip_r )
 {
@@ -394,6 +394,20 @@ void segaybd_state::device_timer(emu_timer &timer, device_timer_id id, int param
 //      section is frozen. bits x01, x04 and x10 when which == 0
 //      (IO chip 0), seem to have something to do with the sensor
 //      switches we need to fix
+
+//-------------------------------------------------
+//  gforce2_output_cb1 - output #1 handler for
+//  Galaxy Force
+//-------------------------------------------------
+
+void segaybd_state::gforce2_output_cb1(UINT16 data)
+{
+	logerror("gforce2_output_cb1: '%02X'\n", data & 0xFF);
+	//bits 4, 5, and 7 seem to be used to multiplex the "LIMITSW" port signals
+	//The exact mapping of these signals is yet not perfectly understood.
+	//You can observe how this value changes when switching pages in the
+	//service mode motor test menu
+}
 
 //-------------------------------------------------
 //  gforce2_output_cb2 - output #2 handler for
@@ -832,7 +846,7 @@ static INPUT_PORTS_START( yboard_generic )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START("PORTC")
+	PORT_START("LIMITSW")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PORTD")
@@ -870,6 +884,13 @@ static INPUT_PORTS_START( gforce2 )
 	PORT_MODIFY("GENERAL")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Shoot")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Missile")
+
+	PORT_MODIFY("LIMITSW")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Floor Switch")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Beam Sensor 2 / Down Limit") //The meaning of these portbits seems to be selected
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Beam Sensor 1 / Up Limit")   // by the output value written to gforce2_output_cb1
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Left CCW Limit")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Right CW Limit")
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWB:1")
@@ -912,6 +933,12 @@ static INPUT_PORTS_START( gloc )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("After Burner")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Vulcan")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Missile")
+
+	PORT_MODIFY("LIMITSW")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Right Upper Limit Switch")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Right Lower Limit Switch")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Left Upper Limit Switch")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Left Lower Limit Switch")
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SWB:1,2")
@@ -1040,6 +1067,12 @@ static INPUT_PORTS_START( pdrift )
 
 	PORT_MODIFY("GENERAL")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gear Shift") PORT_CODE(KEYCODE_SPACE) PORT_TOGGLE
+
+	PORT_MODIFY("LIMITSW")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Safety Sensor Left")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Safety Sensor Right")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Limit Switch Left")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Limit Switch Right")
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:1,2")
@@ -2517,6 +2550,7 @@ DRIVER_INIT_MEMBER(segaybd_state,generic)
 DRIVER_INIT_MEMBER(segaybd_state,gforce2)
 {
 	DRIVER_INIT_CALL(generic);
+	m_output_cb1 = output_delegate(FUNC(segaybd_state::gforce2_output_cb1), this);
 	m_output_cb2 = output_delegate(FUNC(segaybd_state::gforce2_output_cb2), this);
 }
 

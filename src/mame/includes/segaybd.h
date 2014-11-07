@@ -64,6 +64,7 @@ public:
 	DECLARE_READ8_MEMBER( link_portc0_r );
 
 	// game-specific output handlers
+	void gforce2_output_cb1(UINT16 data);
 	void gforce2_output_cb2(UINT16 data);
 	void gloc_output_cb1(UINT16 data);
 	void gloc_output_cb2(UINT16 data);
