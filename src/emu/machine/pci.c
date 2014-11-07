@@ -4,6 +4,17 @@ const device_type PCI_ROOT   = &device_creator<pci_root_device>;
 const device_type PCI_BRIDGE = &device_creator<pci_bridge_device>;
 
 DEVICE_ADDRESS_MAP_START(config_map, 32, pci_device)
+	AM_RANGE(0x00, 0x03) AM_READ16(vendor_r,          0x0000ffff)
+	AM_RANGE(0x00, 0x03) AM_READ16(device_r,          0xffff0000)
+
+	AM_RANGE(0x08, 0x0b) AM_READ  (class_rev_r)
+	AM_RANGE(0x0c, 0x0f) AM_READ8 (cache_line_size_r, 0x000000ff)
+	AM_RANGE(0x0c, 0x0f) AM_READ8 (latency_timer_r,   0x0000ff00)
+	AM_RANGE(0x0c, 0x0f) AM_READ8 (header_type_r,     0x00ff0000)
+	AM_RANGE(0x0c, 0x0f) AM_READ8 (bist_r,            0xff000000)
+
+	AM_RANGE(0x2c, 0x2f) AM_READ16(subvendor_r,          0x0000ffff)
+	AM_RANGE(0x2c, 0x2f) AM_READ16(subsystem_r,          0xffff0000)
 ADDRESS_MAP_END
 
 pci_device::pci_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
@@ -12,15 +23,15 @@ pci_device::pci_device(const machine_config &mconfig, device_type type, const ch
 	main_id = 0xffffffff;
 	revision = 0x00;
 	pclass = 0xffffff;
-	subdevice_id = 0xffffffff;
+	subsystem_id = 0xffffffff;
 }
 
-void pci_device::set_ids(UINT32 _main_id, UINT8 _revision, UINT32 _pclass, UINT32 _subdevice_id)
+void pci_device::set_ids(UINT32 _main_id, UINT8 _revision, UINT32 _pclass, UINT32 _subsystem_id)
 {
 	main_id = _main_id;
 	revision = _revision;
 	pclass = _pclass;
-	subdevice_id = _subdevice_id;
+	subsystem_id = _subsystem_id;
 }
 
 void pci_device::device_start()
@@ -29,6 +40,51 @@ void pci_device::device_start()
 
 void pci_device::device_reset()
 {
+}
+
+READ16_MEMBER(pci_device::vendor_r)
+{
+	return main_id >> 16;
+}
+
+READ16_MEMBER(pci_device::device_r)
+{
+	return main_id;
+}
+
+READ32_MEMBER(pci_device::class_rev_r)
+{
+	return (pclass << 8) | revision;
+}
+
+READ8_MEMBER(pci_device::cache_line_size_r)
+{
+	return 0x00;
+}
+
+READ8_MEMBER(pci_device::latency_timer_r)
+{
+	return 0x00;
+}
+
+READ8_MEMBER(pci_device::header_type_r)
+{
+	return 0x00;
+}
+
+READ8_MEMBER(pci_device::bist_r)
+{
+	return 0x00;
+}
+
+READ16_MEMBER(pci_device::subvendor_r)
+{
+	return subsystem_id >> 16;
+}
+
+READ16_MEMBER(pci_device::subsystem_r)
+{
+	return subsystem_id;
 }
 
 void pci_device::scan_sub_devices(pci_device **devices, dynamic_array<pci_device *> &all, dynamic_array<pci_device *> &bridges, device_t *root)
@@ -92,6 +148,11 @@ pci_bridge_device::pci_bridge_device(const machine_config &mconfig, device_type 
 {
 }
 
+READ8_MEMBER(pci_bridge_device::header_type_r)
+{
+	return 0x01;
+}
+
 const address_space_config *pci_bridge_device::memory_space_config(address_spacenum spacenum) const
 {
 	return spacenum == AS_PROGRAM ? &configure_space_config : NULL;
@@ -110,8 +171,6 @@ void pci_bridge_device::device_start()
 		sub_devices[i] = NULL;
 
 	for(device_t *d = bus_root()->first_subdevice(); d != NULL; d = d->next()) {
-		if(d == this)
-			continue;
 		const char *t = d->tag();
 		int l = strlen(t);
 		if(l <= 4 || t[l-5] != ':' || t[l-2] != '.')
@@ -123,9 +182,11 @@ void pci_bridge_device::device_start()
 	for(int i=0; i<32*8; i++)
 		if(sub_devices[i]) {
 			all_devices.append(sub_devices[i]);
-			pci_bridge_device *bridge = dynamic_cast<pci_bridge_device *>(sub_devices[i]);
-			if(bridge)
-				all_bridges.append(bridge);
+			if(sub_devices[i] != this) {
+				pci_bridge_device *bridge = dynamic_cast<pci_bridge_device *>(sub_devices[i]);
+				if(bridge)
+					all_bridges.append(bridge);
+			}
 		}
 }
 
@@ -138,7 +199,8 @@ void pci_bridge_device::device_reset()
 void pci_bridge_device::reset_all_mappings()
 {
 	for(int i=0; i != all_devices.count(); i++)
-		all_devices[i]->reset_all_mappings();
+		if(all_devices[i] != this)
+			all_devices[i]->reset_all_mappings();
 }
 
 
@@ -146,8 +208,9 @@ void pci_bridge_device::map_device(UINT64 memory_window_start, UINT64 memory_win
 								   UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space)
 {
 	for(int i = all_devices.count()-1; i>=0; i--)
-		all_devices[i]->map_device(memory_window_start, memory_window_end, memory_offset, memory_space,
-								   io_window_start, io_window_end, io_offset, io_space);
+		if(all_devices[i] != this)
+			all_devices[i]->map_device(memory_window_start, memory_window_end, memory_offset, memory_space,
+									   io_window_start, io_window_end, io_offset, io_space);
 
 	map_extra(memory_window_start, memory_window_end, memory_offset, memory_space,
 			  io_window_start, io_window_end, io_offset, io_space);
@@ -208,8 +271,7 @@ void pci_host_device::device_start()
 void pci_host_device::device_reset()
 {
 	pci_bridge_device::device_reset();
-	for(int i=0; i != all_devices.count(); i++)
-		all_devices[i]->reset_all_mappings();
+	reset_all_mappings();
 	regenerate_mapping();
 
 	config_address = 0;
@@ -217,17 +279,12 @@ void pci_host_device::device_reset()
 
 void pci_host_device::regenerate_mapping()
 {
+	logerror("Regenerating mapping\n");
 	memory_space->unmap_readwrite(memory_window_start, memory_window_end);
 	io_space->unmap_readwrite(io_window_start, io_window_end);
 
 	map_device(memory_window_start, memory_window_end, memory_offset, memory_space,
 			   io_window_start, io_window_end, io_offset, io_space);
-}
-
-void pci_host_device::regenerate_config_mapping()
-{
-	pci_bridge_device::regenerate_config_mapping();
-	map_config(0, &space(AS_PROGRAM));
 }
 
 READ32_MEMBER(pci_host_device::config_address_r)

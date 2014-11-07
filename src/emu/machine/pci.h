@@ -6,15 +6,15 @@
 #define MCFG_PCI_ROOT_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, PCI_ROOT, 0)
 
-#define MCFG_PCI_DEVICE_ADD(_tag, _type, _main_id, _revision, _pclass, _subdevice_id) \
+#define MCFG_PCI_DEVICE_ADD(_tag, _type, _main_id, _revision, _pclass, _subsystem_id) \
 	MCFG_DEVICE_ADD(_tag, _type, 0) \
-	downcast<pci_device *>(device)->set_ids(_main_id, _revision, _pclass, _subdevice_id);
+	downcast<pci_device *>(device)->set_ids(_main_id, _revision, _pclass, _subsystem_id);
 
-#define MCFG_AGP_DEVICE_ADD(_tag, _type, _main_id, _revision, _subdevice_id) \
-	MCFG_PCI_DEVICE_ADD(_tag, _type, _main_id, _revision, 0x030000, _subdevice_id)
+#define MCFG_AGP_DEVICE_ADD(_tag, _type, _main_id, _revision, _subsystem_id) \
+	MCFG_PCI_DEVICE_ADD(_tag, _type, _main_id, _revision, 0x030000, _subsystem_id)
 
-#define MCFG_PCI_HOST_ADD(_tag, _type, _main_id, _revision, _subdevice_id) \
-	MCFG_PCI_DEVICE_ADD(_tag, _type, _main_id, _revision, 0x060000, _subdevice_id)
+#define MCFG_PCI_HOST_ADD(_tag, _type, _main_id, _revision, _subsystem_id) \
+	MCFG_PCI_DEVICE_ADD(_tag, _type, _main_id, _revision, 0x060000, _subsystem_id)
 
 #define MCFG_PCI_BRIDGE_ADD(_tag, _main_id, _revision) \
 	MCFG_PCI_DEVICE_ADD(_tag, PCI_BRIDGE, _main_id, _revision, 0x060400, 0x00000000)
@@ -26,7 +26,7 @@ class pci_device : public device_t {
 public:
 	pci_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	void set_ids(UINT32 main_id, UINT8 revision, UINT32 pclass, UINT32 subdevice_id);
+	void set_ids(UINT32 main_id, UINT8 revision, UINT32 pclass, UINT32 subsystem_id);
 
 	virtual void reset_all_mappings();
 	virtual void map_device(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
@@ -38,6 +38,16 @@ public:
 
 	virtual DECLARE_ADDRESS_MAP(config_map, 32);
 
+	DECLARE_READ16_MEMBER(vendor_r);
+	DECLARE_READ16_MEMBER(device_r);
+	DECLARE_READ32_MEMBER(class_rev_r);
+	virtual DECLARE_READ8_MEMBER(cache_line_size_r);
+	virtual DECLARE_READ8_MEMBER(latency_timer_r);
+	virtual DECLARE_READ8_MEMBER(header_type_r);
+	virtual DECLARE_READ8_MEMBER(bist_r);
+	DECLARE_READ16_MEMBER(subvendor_r);
+	DECLARE_READ16_MEMBER(subsystem_r);
+
 protected:
 	enum {
 		M_MEM = 0,
@@ -47,7 +57,7 @@ protected:
 		M_PREF = 8
 	};
 
-	UINT32 main_id, subdevice_id;
+	UINT32 main_id, subsystem_id;
 	UINT32 pclass;
 	UINT8 revision;
 
@@ -80,6 +90,8 @@ public:
 	virtual void map_device(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
 							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space);
 	virtual void reset_all_mappings();
+
+	virtual DECLARE_READ8_MEMBER(header_type_r);
 
 protected:
 	pci_device *sub_devices[32*8];
@@ -134,7 +146,6 @@ protected:
 	void config_write(UINT8 bus, UINT8 device, UINT16 reg, UINT32 data, UINT32 mem_mask);
 
 	void regenerate_mapping();
-	virtual void regenerate_config_mapping();
 };
 
 class pci_root_device : public device_t {
