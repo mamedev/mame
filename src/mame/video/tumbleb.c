@@ -305,7 +305,6 @@ UINT32 tumbleb_state::screen_update_tumblepb(screen_device &screen, bitmap_ind16
 	int offs, offs2;
 
 	flip_screen_set(m_control_0[0] & 0x80);
-	machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	if (flip_screen())
 		offs = 1;
@@ -327,7 +326,6 @@ UINT32 tumbleb_state::screen_update_jumpkids(screen_device &screen, bitmap_ind16
 	int offs, offs2;
 
 	flip_screen_set(m_control_0[0] & 0x80);
-	machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	if (flip_screen())
 		offs = 1;
@@ -348,7 +346,6 @@ UINT32 tumbleb_state::screen_update_semicom(screen_device &screen, bitmap_ind16 
 	int offs, offs2;
 
 	flip_screen_set(m_control_0[0] & 0x80);
-	machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	if (flip_screen())
 		offs = 1;
@@ -384,7 +381,6 @@ UINT32 tumbleb_state::screen_update_bcstory(screen_device &screen, bitmap_ind16 
 	int offs, offs2;
 
 	flip_screen_set(m_control_0[0] & 0x80);
-	machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* not sure of this */
 	if (flip_screen())
@@ -407,7 +403,7 @@ UINT32 tumbleb_state::screen_update_semibase(screen_device &screen, bitmap_ind16
 	int offs, offs2;
 
 	flip_screen_set(m_control_0[0] & 0x80);
-	machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+
 	offs = -1;
 	offs2 = -2;
 
@@ -421,7 +417,7 @@ UINT32 tumbleb_state::screen_update_sdfight(screen_device &screen, bitmap_ind16 
 	int offs, offs2;
 
 	flip_screen_set(m_control_0[0] & 0x80);
-	machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+
 	offs = -1;
 	offs2 = -5; // foreground scroll..
 
@@ -436,7 +432,6 @@ UINT32 tumbleb_state::screen_update_fncywld(screen_device &screen, bitmap_ind16 
 	int offs, offs2;
 
 	flip_screen_set(m_control_0[0] & 0x80);
-	machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	if (flip_screen())
 		offs = 1;
@@ -458,7 +453,6 @@ UINT32 tumbleb_state::screen_update_pangpang(screen_device &screen, bitmap_ind16
 	int offs, offs2;
 
 	flip_screen_set(m_control_0[0] & 0x80);
-	machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	if (flip_screen())
 		offs = 1;
