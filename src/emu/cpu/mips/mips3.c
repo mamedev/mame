@@ -355,8 +355,6 @@ void mips3_device::device_start()
 
 	UINT32 flags = 0;
 	/* initialize the UML generator */
-	if (LOG_NATIVE)
-		flags |= DRCUML_OPTION_LOG_NATIVE;
 	m_drcuml = auto_alloc(machine(), drcuml_state(*this, m_cache, flags, 8, 32, 2));
 
 	/* add symbols for our stuff */

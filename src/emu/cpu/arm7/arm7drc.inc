@@ -41,8 +41,6 @@
     DEBUGGING
 ***************************************************************************/
 
-#define LOG_NATIVE                      (0)
-
 #define SINGLE_INSTRUCTION_MODE         (0)
 
 /***************************************************************************
@@ -153,8 +151,6 @@ void arm7_cpu_device::arm7_drc_init()
 	m_impstate.cache = cache;
 
 	/* initialize the UML generator */
-	if (LOG_NATIVE)
-		flags |= DRCUML_OPTION_LOG_NATIVE;
 	m_impstate.drcuml = new drcuml_state(*this, *cache, flags, 1, 32, 1);
 
 	/* add symbols for our stuff */
@@ -352,7 +348,7 @@ void arm7_cpu_device::code_compile_block(UINT8 mode, offs_t pc)
 	/* get a description of this sequence */
 	// TODO FIXME
 	const opcode_desc *desclist = NULL; //m_impstate.drcfe->describe_code(pc); // TODO
-//  if (drcuml->logging() || LOG_NATIVE)
+//  if (drcuml->logging() || drcuml->logging_native())
 //      log_opcode_desc(drcuml, desclist, 0);
 
 	/* if we get an error back, flush the cache and try again */

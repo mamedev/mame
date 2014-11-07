@@ -652,8 +652,11 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, U
 		s_opcode_table[s_opcode_table_source[opnum].opcode] = s_opcode_table_source[opnum].func;
 
 	// create the log
-	if (flags & DRCUML_OPTION_LOG_NATIVE)
-		m_log = x86log_create_context("drcbex64.asm");
+	if (device.machine().options().drc_log_native())
+	{
+		astring filename("drcbex64_", device.shortname(), ".asm");
+		m_log = x86log_create_context(filename.cstr());
+	}
 }
 
 
