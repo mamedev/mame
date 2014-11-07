@@ -3,7 +3,7 @@
 <softwarelist name="compclr2_flop" description="Compucolor II Disk Images">
 
 	<software name="asndware">
-		<description>action_soundware</description>
+		<description>Action Soundware</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -14,7 +14,7 @@
 	</software>
 
 	<software name="agilis">
-		<description>agilis</description>
+		<description>Agilis</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -25,7 +25,7 @@
 	</software>
 
 	<software name="airraid">
-		<description>airraid</description>
+		<description>Air Raid</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -36,7 +36,7 @@
 	</software>
 
 	<software name="alieninv">
-		<description>alien_invasion_v1.4</description>
+		<description>Alien Invasion (v1.4)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -46,8 +46,19 @@
 		</part>
 	</software>
 
+	<software name="alieninva" cloneof="alieninv">
+		<description>Alien Invasion (v1.4, Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162879">
+				<rom name="alien_invasion_v1.4 (alt).ccvf" size="162879" crc="ba6ecb8c" sha1="7f5f24fafcc50c380f42f86fb502683259edfc40" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="altronic">
-		<description>alltronics</description>
+		<description>Alltronics</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -57,19 +68,8 @@
 		</part>
 	</software>
 
-	<software name="analiz">
-		<description>analiz_watals</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162871">
-				<rom name="analiz_watals.ccvf" size="162871" crc="91bb3632" sha1="61472691a68688b3a9281385327a7d07e77c9d3b" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="arcdsoft">
-		<description>arcade_softwares</description>
+	<software name="arcadegm">
+		<description>Arcade Games</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -80,7 +80,7 @@
 	</software>
 
 	<software name="asmutlma">
-		<description>asm_utilities_macros</description>
+		<description>ASM Utilities - Macros</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -91,7 +91,7 @@
 	</software>
 
 	<software name="asmutil3">
-		<description>asm_utility_3</description>
+		<description>ASM Utilities - 3</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -102,7 +102,7 @@
 	</software>
 
 	<software name="asmutil4">
-		<description>asm_utility_4-sidea</description>
+		<description>ASM Utilities - 4</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -119,7 +119,7 @@
 	</software>
 
 	<software name="asmutilr">
-		<description>asm_utility_routines-sidea</description>
+		<description>ASM Utilities - Routines</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -135,8 +135,8 @@
 		</part>
 	</software>
 
-	<software name="asmtut">
-		<description>asmtut_disk1</description>
+	<software name="asmtutor">
+		<description>ASM Tutorial</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -171,7 +171,7 @@
 	</software>
 
 	<software name="asteroid">
-		<description>asteroids</description>
+		<description>Asteroids</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -181,6 +181,25 @@
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
+			<info name="part_id" value="Source"/>
+			<dataarea name="flop" size="162886">
+				<rom name="asteriods_source.ccvf" size="162886" crc="14af4de7" sha1="43a76ffda8b4e2f5513c8cd9ac6390ab15854280" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="asteroida" cloneof="asteroid">
+		<description>Asteroids (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162935">
+				<rom name="asteroids (alt).ccvf" size="162935" crc="b51497b3" sha1="4944301634059ba51b35b2b9f6c021967c5fee26" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<info name="part_id" value="Source"/>
 			<dataarea name="flop" size="162886">
 				<rom name="asteriods_source.ccvf" size="162886" crc="14af4de7" sha1="43a76ffda8b4e2f5513c8cd9ac6390ab15854280" offset="0"/>
 			</dataarea>
@@ -188,7 +207,7 @@
 	</software>
 
 	<software name="ay8910">
-		<description>ay-3-8910_programs</description>
+		<description>AY-3-8910 Programs</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -199,7 +218,7 @@
 	</software>
 
 	<software name="backgamn">
-		<description>backgammon-sidea</description>
+		<description>Backgammon</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -209,6 +228,7 @@
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
+			<info name="part_id" value="Source"/>
 			<dataarea name="flop" size="162832">
 				<rom name="backgammon-sideb.ccvf" size="162832" crc="7f9aca0c" sha1="a6b588e075c17f5d1ff10675de88f3c51a4ca35e" offset="0"/>
 			</dataarea>
@@ -216,7 +236,7 @@
 	</software>
 
 	<software name="basiccmp">
-		<description>basic_compiler_v12.25</description>
+		<description>BASIC Compiler v12.25</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -227,7 +247,7 @@
 	</software>
 
 	<software name="basiclng">
-		<description>basic_language_1-5</description>
+		<description>BASIC Language</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -250,7 +270,7 @@
 	</software>
 
 	<software name="basicles">
-		<description>basic_lessons</description>
+		<description>BASIC Lessons</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -260,8 +280,19 @@
 		</part>
 	</software>
 
+	<software name="basiclesa" cloneof="basicles">
+		<description>BASIC Lessons (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162981">
+				<rom name="basic_lessons (alt).ccvf" size="162981" crc="a7062afc" sha1="d404c9f526a78f0d91c214f64bc05be8f35ea952" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="basicutl">
-		<description>basic_utilities</description>
+		<description>BASIC Utilities</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -271,8 +302,8 @@
 		</part>
 	</software>
 
-	<software name="bttlship">
-		<description>battleship</description>
+	<software name="bship">
+		<description>Battleship</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -282,8 +313,19 @@
 		</part>
 	</software>
 
+	<software name="bshipa" cloneof="bship">
+		<description>Battleship (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162916">
+				<rom name="battleship (alt).ccvf" size="162916" crc="e0b169cc" sha1="265ccb3f19ebe1e35da1cda7f5c5ba3106df8313" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bertsbar">
-		<description>berts_bar</description>
+		<description>Bert's Bar</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -293,19 +335,8 @@
 		</part>
 	</software>
 
-	<software name="bitmaps">
-		<description>bitmaps</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162818">
-				<rom name="bitmaps.ccvf" size="162818" crc="03f6ee7f" sha1="f6651f3b4c3d709124782bccb1dafd7fbf557c9c" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="blackjak">
-		<description>blackjack</description>
+		<description>Blackjack</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -316,7 +347,7 @@
 	</software>
 
 	<software name="blank">
-		<description>blank</description>
+		<description>Blank</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -326,8 +357,19 @@
 		</part>
 	</software>
 
-	<software name="brdsofts">
-		<description>board_softwares</description>
+	<software name="blanka" cloneof="blank">
+		<description>Blank (Alt)</description>
+		<year>19??</year>
+		<publisher></publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162818">
+				<rom name="blank (alt).ccvf" size="162818" crc="eac5f303" sha1="bd75191f6b4f9f6b75941851346860012f9fb486" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boardgam">
+		<description>Board Games</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -338,7 +380,7 @@
 	</software>
 
 	<software name="bondsec">
-		<description>bonds_and_securities</description>
+		<description>Bonds And Securities</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -348,8 +390,8 @@
 		</part>
 	</software>
 
-	<software name="bnceball">
-		<description>bounce_ball</description>
+	<software name="bounce">
+		<description>Bounce Ball</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -359,8 +401,19 @@
 		</part>
 	</software>
 
+	<software name="cards">
+		<description>Cards</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162898">
+				<rom name="cards_miller.ccvf" size="162898" crc="0e543b56" sha1="9e6f78c40737c771152c82fae27f2802efdd9273" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="catalg32">
-		<description>catalog_32</description>
+		<description>Catalog 32k</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -370,8 +423,19 @@
 		</part>
 	</software>
 
+	<software name="bitmaps">
+		<description>Character Bitmaps</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162818">
+				<rom name="bitmaps.ccvf" size="162818" crc="03f6ee7f" sha1="f6651f3b4c3d709124782bccb1dafd7fbf557c9c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ccug14b">
-		<description>ccug_14b</description>
+		<description>Canadian Compucolor Users Disk #14B</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -382,7 +446,7 @@
 	</software>
 
 	<software name="chess">
-		<description>chess</description>
+		<description>Chess</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -392,8 +456,8 @@
 		</part>
 	</software>
 
-	<software name="chip1">
-		<description>chip_1</description>
+	<software name="chip001">
+		<description>Chip #1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -403,8 +467,30 @@
 		</part>
 	</software>
 
-	<software name="chip10">
-		<description>chip_10</description>
+	<software name="chip008">
+		<description>Chip #8</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162826">
+				<rom name="chip_8.ccvf" size="162826" crc="182eaf6a" sha1="7a477a1a75775b7c08e732585e0f26ad50953104" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip009">
+		<description>Chip #9</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162813">
+				<rom name="chip_9.ccvf" size="162813" crc="30d385e1" sha1="10cd8fe780d47be6dfe52b9ea4ba822c97a6f69b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip010">
+		<description>Chip #10</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -414,8 +500,360 @@
 		</part>
 	</software>
 
+	<software name="chip012">
+		<description>Chip #12</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162814">
+				<rom name="chip_12.ccvf" size="162814" crc="c3c9e871" sha1="3d53ac91afadd5559caf31e01074cb105e0fdb80" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip013">
+		<description>Chip #13</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162814">
+				<rom name="chip_13.ccvf" size="162814" crc="c491f41b" sha1="16f580cd147c005e3dcfba24ca0dfcfd083c9062" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip015">
+		<description>Chip #15</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162814">
+				<rom name="chip_15.ccvf" size="162814" crc="bcf16deb" sha1="7708406e89784fbae752bef36fa2ee9ee93afe48" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip016">
+		<description>Chip #16</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162814">
+				<rom name="chip_16.ccvf" size="162814" crc="032861c7" sha1="201443c1c800b663fe9c8bd2868d1bc03b72e375" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip017">
+		<description>Chip #17</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162814">
+				<rom name="chip_17.ccvf" size="162814" crc="394e3cd5" sha1="def68b4512ea2bd7d6d011c7dcfd33fdf28a88b5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip021">
+		<description>Chip #21</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162814">
+				<rom name="chip_21.ccvf" size="162814" crc="a74d454f" sha1="64590210d9ac2d259ee2fe6c543236c000aa48fe" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip022">
+		<description>Chip #22</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162831">
+				<rom name="chip_22.ccvf" size="162831" crc="35011349" sha1="da2468909253f700c8b484b97519a3b8eb5b69a2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip023">
+		<description>Chip #23</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162814">
+				<rom name="chip_23.ccvf" size="162814" crc="ad8114a5" sha1="cce250643668e91973a69932f201b49252c4987e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip024">
+		<description>Chip #24</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162838">
+				<rom name="chip_24.ccvf" size="162838" crc="808fdfe0" sha1="878c29c89c92183f2339640578fd33b819440c36" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip025">
+		<description>Chip #25</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162833">
+				<rom name="chip_25.ccvf" size="162833" crc="f6816d84" sha1="6bb92135f050ef3822e488d88d4bd9f8f65a1580" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip027">
+		<description>Chip #27</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162832">
+				<rom name="chip_27.ccvf" size="162832" crc="9e510dd7" sha1="7709796198e1896d9b643cb51a5a90ffe969cf3c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip033">
+		<description>Chip #33</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162833">
+				<rom name="chip_33.ccvf" size="162833" crc="ae4c688d" sha1="504f34781b30a934f04a5cb08d0683e074a91568" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip036">
+		<description>Chip #36</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162836">
+				<rom name="chip_36.ccvf" size="162836" crc="0a0a381a" sha1="1f711835e99d0156302a7fe45f390d4611c5896f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip039">
+		<description>Chip #39</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162842">
+				<rom name="chip_39.ccvf" size="162842" crc="82485868" sha1="592db58c9c701034594dbe20bdbf9766e48291dd" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip046">
+		<description>Chip #46</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162852">
+				<rom name="chip_46.ccvf" size="162852" crc="10088bb0" sha1="c14f578a58d07eb1147b28953f42ba1d891a0c77" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip053">
+		<description>Chip #53</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162849">
+				<rom name="chip_53.ccvf" size="162849" crc="75130b74" sha1="b080fbc4271cf3d4512b9ba5f2b48a10c3534168" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip057">
+		<description>Chip #57</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162814">
+				<rom name="chip_57.ccvf" size="162814" crc="beae7ee3" sha1="4f8fb7503f9944bd509482e318aed4d2530e4675" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip061">
+		<description>Chip #61</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162839">
+				<rom name="chip_61.ccvf" size="162839" crc="07566ea3" sha1="7129b20b02478766892b32d94977dab22b2f9bbd" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip062">
+		<description>Chip #62</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162814">
+				<rom name="chip_62.ccvf" size="162814" crc="f27921ec" sha1="fc493d1cf1c53145a7a7ccbe21e723d84311021c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip063">
+		<description>Chip #63</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162835">
+				<rom name="chip_63.ccvf" size="162835" crc="12cceb87" sha1="9b01d926cf52ae00fc33082ccb5d3e811ebcc0bf" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip064">
+		<description>Chip #64</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162838">
+				<rom name="chip_64.ccvf" size="162838" crc="a9a140c7" sha1="19f4a3c7d26cd63bf2eac36864a2294973a43b27" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip075">
+		<description>Chip #75</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162836">
+				<rom name="chip_75.ccvf" size="162836" crc="55a6904c" sha1="7fd62d534a20511c88c79ae95c018b09e5a87f3c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip077">
+		<description>Chip #77</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162832">
+				<rom name="chip_77.ccvf" size="162832" crc="afe57afb" sha1="acbc5b1c5173f9dc08945349ed6f378e06554d1c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip078">
+		<description>Chip #78</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162814">
+				<rom name="chip_78.ccvf" size="162814" crc="018497ed" sha1="0520a271cd8cd7e45ccc2a29bc9c88c7c02e0fa6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip079">
+		<description>Chip #79</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162827">
+				<rom name="chip_79.ccvf" size="162827" crc="2bcdcfa7" sha1="af24a0c365994d37d27d40e5c9ba2852afe0550a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip081">
+		<description>Chip #81</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162814">
+				<rom name="chip_81.ccvf" size="162814" crc="a84a5f02" sha1="f8a3641d19c622a29dbda95a847374e428932e0d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip083">
+		<description>Chip #83</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162983">
+				<rom name="chip_83.ccvf" size="162983" crc="0c70bf13" sha1="53cd2ea25866d2445ed011a844bee85f97d0b525" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip084">
+		<description>Chip #84</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162913">
+				<rom name="chip_84.ccvf" size="162913" crc="20d865c4" sha1="77378e4cc39352d79de558b91b403bbbafc6201f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip085">
+		<description>Chip #85</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162814">
+				<rom name="chip_85.ccvf" size="162814" crc="23550551" sha1="ff6d9738e142da6ac22cbbce90151f80de029663" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip090">
+		<description>Chip #90</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162827">
+				<rom name="chip_90.ccvf" size="162827" crc="17311e29" sha1="845bb65a460d9a47f03d576f313505e2efc51739" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip091">
+		<description>Chip #91</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162853">
+				<rom name="chip_91.ccvf" size="162853" crc="d24c530d" sha1="fb2c0ae5c9c50c20ab639397fb1a9fabae0db47c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip092">
+		<description>Chip #92</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162814">
+				<rom name="chip_92.ccvf" size="162814" crc="013e8402" sha1="824cf53bc646762f723468fa45a0a4e6d0d7f119" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="chip106">
-		<description>chip_106</description>
+		<description>Chip #106</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -426,7 +864,7 @@
 	</software>
 
 	<software name="chip107">
-		<description>chip_107</description>
+		<description>Chip #107</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -437,7 +875,7 @@
 	</software>
 
 	<software name="chip108">
-		<description>chip_108</description>
+		<description>Chip #108</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -448,7 +886,7 @@
 	</software>
 
 	<software name="chip110">
-		<description>chip_110</description>
+		<description>Chip #110</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -459,7 +897,7 @@
 	</software>
 
 	<software name="chip114">
-		<description>chip_114</description>
+		<description>Chip #114</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -470,7 +908,7 @@
 	</software>
 
 	<software name="chip117">
-		<description>chip_117</description>
+		<description>Chip #117</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -481,7 +919,7 @@
 	</software>
 
 	<software name="chip119">
-		<description>chip_119</description>
+		<description>Chip #119</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -491,19 +929,8 @@
 		</part>
 	</software>
 
-	<software name="chip12">
-		<description>chip_12</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162814">
-				<rom name="chip_12.ccvf" size="162814" crc="c3c9e871" sha1="3d53ac91afadd5559caf31e01074cb105e0fdb80" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="chip120">
-		<description>chip_120</description>
+		<description>Chip #120</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -514,7 +941,7 @@
 	</software>
 
 	<software name="chip121">
-		<description>chip_121</description>
+		<description>Chip #121</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -524,8 +951,8 @@
 		</part>
 	</software>
 
-	<software name="chip_125">
-		<description>chip_125</description>
+	<software name="chip125">
+		<description>Chip #125</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -542,7 +969,7 @@
 	</software>
 
 	<software name="chip128">
-		<description>chip_128</description>
+		<description>Chip #128</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -553,7 +980,7 @@
 	</software>
 
 	<software name="chip129">
-		<description>chip_129</description>
+		<description>Chip #129</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -563,19 +990,8 @@
 		</part>
 	</software>
 
-	<software name="chip13">
-		<description>chip_13</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162814">
-				<rom name="chip_13.ccvf" size="162814" crc="c491f41b" sha1="16f580cd147c005e3dcfba24ca0dfcfd083c9062" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip_138">
-		<description>chip_138</description>
+	<software name="chip138">
+		<description>Chip #138</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -591,360 +1007,8 @@
 		</part>
 	</software>
 
-	<software name="chip15">
-		<description>chip_15</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162814">
-				<rom name="chip_15.ccvf" size="162814" crc="bcf16deb" sha1="7708406e89784fbae752bef36fa2ee9ee93afe48" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip16">
-		<description>chip_16</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162814">
-				<rom name="chip_16.ccvf" size="162814" crc="032861c7" sha1="201443c1c800b663fe9c8bd2868d1bc03b72e375" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip17">
-		<description>chip_17</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162814">
-				<rom name="chip_17.ccvf" size="162814" crc="394e3cd5" sha1="def68b4512ea2bd7d6d011c7dcfd33fdf28a88b5" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip21">
-		<description>chip_21</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162814">
-				<rom name="chip_21.ccvf" size="162814" crc="a74d454f" sha1="64590210d9ac2d259ee2fe6c543236c000aa48fe" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip22">
-		<description>chip_22</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162831">
-				<rom name="chip_22.ccvf" size="162831" crc="35011349" sha1="da2468909253f700c8b484b97519a3b8eb5b69a2" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip23">
-		<description>chip_23</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162814">
-				<rom name="chip_23.ccvf" size="162814" crc="ad8114a5" sha1="cce250643668e91973a69932f201b49252c4987e" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip24">
-		<description>chip_24</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162838">
-				<rom name="chip_24.ccvf" size="162838" crc="808fdfe0" sha1="878c29c89c92183f2339640578fd33b819440c36" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip25">
-		<description>chip_25</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162833">
-				<rom name="chip_25.ccvf" size="162833" crc="f6816d84" sha1="6bb92135f050ef3822e488d88d4bd9f8f65a1580" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip27">
-		<description>chip_27</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162832">
-				<rom name="chip_27.ccvf" size="162832" crc="9e510dd7" sha1="7709796198e1896d9b643cb51a5a90ffe969cf3c" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip33">
-		<description>chip_33</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162833">
-				<rom name="chip_33.ccvf" size="162833" crc="ae4c688d" sha1="504f34781b30a934f04a5cb08d0683e074a91568" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip36">
-		<description>chip_36</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162836">
-				<rom name="chip_36.ccvf" size="162836" crc="0a0a381a" sha1="1f711835e99d0156302a7fe45f390d4611c5896f" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip39">
-		<description>chip_39</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162842">
-				<rom name="chip_39.ccvf" size="162842" crc="82485868" sha1="592db58c9c701034594dbe20bdbf9766e48291dd" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip46">
-		<description>chip_46</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162852">
-				<rom name="chip_46.ccvf" size="162852" crc="10088bb0" sha1="c14f578a58d07eb1147b28953f42ba1d891a0c77" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip53">
-		<description>chip_53</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162849">
-				<rom name="chip_53.ccvf" size="162849" crc="75130b74" sha1="b080fbc4271cf3d4512b9ba5f2b48a10c3534168" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip57">
-		<description>chip_57</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162814">
-				<rom name="chip_57.ccvf" size="162814" crc="beae7ee3" sha1="4f8fb7503f9944bd509482e318aed4d2530e4675" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip61">
-		<description>chip_61</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162839">
-				<rom name="chip_61.ccvf" size="162839" crc="07566ea3" sha1="7129b20b02478766892b32d94977dab22b2f9bbd" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip62">
-		<description>chip_62</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162814">
-				<rom name="chip_62.ccvf" size="162814" crc="f27921ec" sha1="fc493d1cf1c53145a7a7ccbe21e723d84311021c" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip63">
-		<description>chip_63</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162835">
-				<rom name="chip_63.ccvf" size="162835" crc="12cceb87" sha1="9b01d926cf52ae00fc33082ccb5d3e811ebcc0bf" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip64">
-		<description>chip_64</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162838">
-				<rom name="chip_64.ccvf" size="162838" crc="a9a140c7" sha1="19f4a3c7d26cd63bf2eac36864a2294973a43b27" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip75">
-		<description>chip_75</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162836">
-				<rom name="chip_75.ccvf" size="162836" crc="55a6904c" sha1="7fd62d534a20511c88c79ae95c018b09e5a87f3c" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip77">
-		<description>chip_77</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162832">
-				<rom name="chip_77.ccvf" size="162832" crc="afe57afb" sha1="acbc5b1c5173f9dc08945349ed6f378e06554d1c" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip78">
-		<description>chip_78</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162814">
-				<rom name="chip_78.ccvf" size="162814" crc="018497ed" sha1="0520a271cd8cd7e45ccc2a29bc9c88c7c02e0fa6" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip79">
-		<description>chip_79</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162827">
-				<rom name="chip_79.ccvf" size="162827" crc="2bcdcfa7" sha1="af24a0c365994d37d27d40e5c9ba2852afe0550a" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip8">
-		<description>chip_8</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162826">
-				<rom name="chip_8.ccvf" size="162826" crc="182eaf6a" sha1="7a477a1a75775b7c08e732585e0f26ad50953104" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip81">
-		<description>chip_81</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162814">
-				<rom name="chip_81.ccvf" size="162814" crc="a84a5f02" sha1="f8a3641d19c622a29dbda95a847374e428932e0d" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip83">
-		<description>chip_83</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162983">
-				<rom name="chip_83.ccvf" size="162983" crc="0c70bf13" sha1="53cd2ea25866d2445ed011a844bee85f97d0b525" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip84">
-		<description>chip_84</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162913">
-				<rom name="chip_84.ccvf" size="162913" crc="20d865c4" sha1="77378e4cc39352d79de558b91b403bbbafc6201f" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip85">
-		<description>chip_85</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162814">
-				<rom name="chip_85.ccvf" size="162814" crc="23550551" sha1="ff6d9738e142da6ac22cbbce90151f80de029663" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip9">
-		<description>chip_9</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162813">
-				<rom name="chip_9.ccvf" size="162813" crc="30d385e1" sha1="10cd8fe780d47be6dfe52b9ea4ba822c97a6f69b" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip90">
-		<description>chip_90</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162827">
-				<rom name="chip_90.ccvf" size="162827" crc="17311e29" sha1="845bb65a460d9a47f03d576f313505e2efc51739" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip91">
-		<description>chip_91</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162853">
-				<rom name="chip_91.ccvf" size="162853" crc="d24c530d" sha1="fb2c0ae5c9c50c20ab639397fb1a9fabae0db47c" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chip92">
-		<description>chip_92</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162814">
-				<rom name="chip_92.ccvf" size="162814" crc="013e8402" sha1="824cf53bc646762f723468fa45a0a4e6d0d7f119" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="chomp">
-		<description>chomp</description>
+		<description>Chomp</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -955,7 +1019,7 @@
 	</software>
 
 	<software name="paddle">
-		<description>cm_0-4_paddle_softwares-original</description>
+		<description>Paddle Games (Original)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -966,7 +1030,7 @@
 	</software>
 
 	<software name="paddlea" cloneof="paddle">
-		<description>cm_0-4_paddle_softwares</description>
+		<description>Paddle Games</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -976,8 +1040,8 @@
 		</part>
 	</software>
 
-	<software name="clrgfx">
-		<description>color_graphics_1_suits</description>
+	<software name="colorgfx">
+		<description>Color Graphics</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -994,7 +1058,7 @@
 	</software>
 
 	<software name="colorcue">
-		<description>colorcue</description>
+		<description>ColorCue Demos</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1005,7 +1069,7 @@
 	</software>
 
 	<software name="clrgraph">
-		<description>colorgraph</description>
+		<description>ColorGraph v1.01</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1016,7 +1080,7 @@
 	</software>
 
 	<software name="colossal">
-		<description>colossal_adventure</description>
+		<description>Colossal Adventure</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1026,8 +1090,19 @@
 		</part>
 	</software>
 
-	<software name="commpgms">
-		<description>comm_pgms-sidea</description>
+	<software name="colcave">
+		<description>Colossal Cave</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162865">
+				<rom name="colossal_cave_epps.ccvf" size="162865" crc="3e7b98b3" sha1="109fcf8b94b866cb34f32e5aa46d6c3bb1946bbf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commpgm">
+		<description>Comm Programs</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1050,18 +1125,7 @@
 	</software>
 
 	<software name="compwrit">
-		<description>compuwriter_1</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162892">
-				<rom name="compuwriter_1.ccvf" size="162892" crc="a030f3ea" sha1="5e9c7ab51a334b0effa1f4ccf18520aac2d29957" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="compwrita" cloneof="compwrit">
-		<description>compuwriter_2</description>
+		<description>Comp-U-Writer (v3.51)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1071,8 +1135,19 @@
 		</part>
 	</software>
 
+	<software name="compwrita" cloneof="compwrit">
+		<description>Comp-U-Writer (v3.4 &amp; v3.5)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162892">
+				<rom name="compuwriter_1.ccvf" size="162892" crc="a030f3ea" sha1="5e9c7ab51a334b0effa1f4ccf18520aac2d29957" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="comtron">
-		<description>comtronics</description>
+		<description>Comtronics</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1083,7 +1158,7 @@
 	</software>
 
 	<software name="comtron2">
-		<description>comtronics_sw</description>
+		<description>Comtronics Software</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1093,8 +1168,19 @@
 		</part>
 	</software>
 
+	<software name="cooltool">
+		<description>Cool Tools</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163041">
+				<rom name="cooltools.ccvf" size="163041" crc="cffc2cb4" sha1="79fff8725c3d7e277ae31cb54c55ce243aaecec8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="demo">
-		<description>demonstration</description>
+		<description>Demonstration</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1105,7 +1191,7 @@
 	</software>
 
 	<software name="demos">
-		<description>demos</description>
+		<description>Demos</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1115,25 +1201,27 @@
 		</part>
 	</software>
 
-	<software name="disasmlp">
-		<description>disasm+mldp+sidea</description>
+	<software name="dasmmlpd">
+		<description>DISASM + MLPD</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
+			<info name="part_id" value="DISASM"/>
 			<dataarea name="flop" size="162853">
 				<rom name="disasm+mldp+sidea.ccvf" size="162853" crc="37e8ba02" sha1="de79e786fd29633a471de44aa700cf256cd6434b" offset="0"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
+			<info name="part_id" value="MLPD"/>
 			<dataarea name="flop" size="162853">
 				<rom name="disasm+mldp-sideb.ccvf" size="162853" crc="17628a85" sha1="90fdc00b6939cc54fc5095c6ee0e621a9767a539" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="disasm">
-		<description>disasm-sidea</description>
+	<software name="dasmsrc">
+		<description>DISASM Source</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1143,8 +1231,19 @@
 		</part>
 	</software>
 
-	<software name="disasmlr">
-		<description>disassembler</description>
+	<software name="mldpfix">
+		<description>MLPD (Autorepeat Key Fixed)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162819">
+				<rom name="mldp_fix.ccvf" size="162819" crc="0871bd9d" sha1="c315b88c56a5186e27835800479eb41e013321b5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="disasm">
+		<description>Disassembler</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1155,7 +1254,7 @@
 	</software>
 
 	<software name="dogfight">
-		<description>dogfight</description>
+		<description>Dogfight</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1166,7 +1265,7 @@
 	</software>
 
 	<software name="draw2">
-		<description>draw2</description>
+		<description>Draw 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1176,19 +1275,19 @@
 		</part>
 	</software>
 
-	<software name="drivlist">
-		<description>driver_lister</description>
+	<software name="draw2a" cloneof="draw2">
+		<description>Draw 2 (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162925">
-				<rom name="driver_lister.ccvf" size="162925" crc="504740f6" sha1="f38611fb908e9986407309d7fb5eec769169c9cd" offset="0"/>
+			<dataarea name="flop" size="162909">
+				<rom name="draw2 (alt).ccvf" size="162909" crc="ccd58029" sha1="7480bfb7fd0ed5991738cdca81a8450f40f88167" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="dukedom">
-		<description>dukedom</description>
+		<description>Dukedom</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1198,19 +1297,8 @@
 		</part>
 	</software>
 
-	<software name="trek">
-		<description>trek</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="163637">
-				<rom name="epps_trek.ccvf" size="163637" crc="0dad1114" sha1="4f4496c14c65d7b46640cecbdfefa8116de44b78" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="eprom">
-		<description>eprom_programmer</description>
+		<description>EPROM Programmer</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1221,7 +1309,7 @@
 	</software>
 
 	<software name="equity">
-		<description>equity</description>
+		<description>Equity</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1232,7 +1320,7 @@
 	</software>
 
 	<software name="execgrap">
-		<description>execugraph</description>
+		<description>Execugraph Trend-Spotter</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1242,6 +1330,7 @@
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
+			<info name="part_id" value="Instructions"/>
 			<dataarea name="flop" size="162874">
 				<rom name="execugraph_instructions.ccvf" size="162874" crc="0716e534" sha1="1ae67e4acec0175880698df9c792ea97eb6f7158" offset="0"/>
 			</dataarea>
@@ -1249,7 +1338,7 @@
 	</software>
 
 	<software name="fcsmods">
-		<description>fcs_mods</description>
+		<description>FCS MOD</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1259,8 +1348,8 @@
 		</part>
 	</software>
 
-	<software name="fms">
-		<description>file_maintenance_system-sidea</description>
+	<software name="fms3650">
+		<description>File Maintenance System 3650 (v11.82)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1277,7 +1366,7 @@
 	</software>
 
 	<software name="fftrek">
-		<description>final_frontier_startrek</description>
+		<description>The Final Frontier - Star Trek</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1288,7 +1377,7 @@
 	</software>
 
 	<software name="format">
-		<description>formatter</description>
+		<description>Formatter</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1298,19 +1387,8 @@
 		</part>
 	</software>
 
-	<software name="frthpscl">
-		<description>forth_pascal</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162853">
-				<rom name="forth_pascal.ccvf" size="162853" crc="0545b0be" sha1="536d0b034ca44d7657bb36d38fff62832e8e5717" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="fortran">
-		<description>fortran</description>
+		<description>FORTRAN</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1321,7 +1399,7 @@
 	</software>
 
 	<software name="fortran2">
-		<description>fortran2</description>
+		<description>FORTRAN 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1332,7 +1410,7 @@
 	</software>
 
 	<software name="fortrek">
-		<description>fortrek</description>
+		<description>FORTRAN Star Trek Source</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1342,8 +1420,30 @@
 		</part>
 	</software>
 
+	<software name="fortstr">
+		<description>FORTRAN Strings Source</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162830">
+				<rom name="strings_fortran.ccvf" size="162830" crc="389c4c75" sha1="24b6a44cb71373c68c6cec52e61258e96e76e20f" offset="0"/>
+			</dataarea>
+		</part>
+
+
+	<software name="fortstra" clone="fortstr">
+		<description>FORTRAN Strings Source (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162812">
+				<rom name="strings_fortran_2.ccvf" size="162812" crc="7a821888" sha1="816b654bd70b0d0fa1c4f31fa43b0b4c70beafb0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="forutil">
-		<description>forutil_1</description>
+		<description>FORTRAN Utilities Source</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1354,7 +1454,7 @@
 	</software>
 
 	<software name="galaxian">
-		<description>galaxian</description>
+		<description>Galaxian</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1364,8 +1464,30 @@
 		</part>
 	</software>
 
-	<software name="softwre">
-		<description>softwares</description>
+	<software name="galaxiana" cloneof="galaxian">
+		<description>Galaxian (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163112">
+				<rom name="galaxian (alt).ccvf" size="163112" crc="47fffa68" sha1="0bee0f0b3fda9733be42bed86769b90cb2c4748f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ghostcr">
+		<description>Ghost Crunchers</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162874">
+				<rom name="ghost_crunchers.ccvf" size="162874" crc="126abdf4" sha1="80bc317041591391193c2c734030bd41c150ee12" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basicgam">
+		<description>BASIC Games</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1375,8 +1497,8 @@
 		</part>
 	</software>
 
-	<software name="softwre2">
-		<description>softwares2</description>
+	<software name="basicgm2">
+		<description>BASIC Games #2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1386,8 +1508,8 @@
 		</part>
 	</software>
 
-	<software name="softwre3">
-		<description>softwares3</description>
+	<software name="basicgm3">
+		<description>BASIC Games #3</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1397,8 +1519,8 @@
 		</part>
 	</software>
 
-	<software name="softwre4">
-		<description>softwares4</description>
+	<software name="basicgm4">
+		<description>BASIC Games #4</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1409,7 +1531,7 @@
 	</software>
 
 	<software name="hangman">
-		<description>hangman</description>
+		<description>Hangman</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1420,7 +1542,7 @@
 	</software>
 
 	<software name="hwutil">
-		<description>hardware_utilities</description>
+		<description>Hardware Utilities</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1431,7 +1553,7 @@
 	</software>
 
 	<software name="homebdgt">
-		<description>home_budget_1</description>
+		<description>Home Budget</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1454,7 +1576,7 @@
 	</software>
 
 	<software name="homevid">
-		<description>home_video_library</description>
+		<description>Home Video Library</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1465,7 +1587,7 @@
 	</software>
 
 	<software name="ida">
-		<description>ida_v2.6-sideb</description>
+		<description>IDA (v2.6)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1482,7 +1604,7 @@
 	</software>
 
 	<software name="ifsoft">
-		<description>interface_software</description>
+		<description>Interface Software / Joystick Games</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1492,8 +1614,8 @@
 		</part>
 	</software>
 
-	<software name="intrsndw">
-		<description>intro_to_soundware</description>
+	<software name="intro2sw">
+		<description>Intro to Soundware</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1504,7 +1626,7 @@
 	</software>
 
 	<software name="invaders">
-		<description>invaders_epps</description>
+		<description>Invaders</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1514,8 +1636,19 @@
 		</part>
 	</software>
 
+	<software name="invadersa" cloneof="invaders">
+		<description>Invaders (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162840">
+				<rom name="invaders_epps (alt).ccvf" size="162840" crc="59e49cd6" sha1="13aeffa4015cb5cb0bfcd959ab8f7c5b606a27b6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="inventry">
-		<description>inventory</description>
+		<description>Inventory</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1526,7 +1659,7 @@
 	</software>
 
 	<software name="invoice">
-		<description>invoice_order</description>
+		<description>Invoice Order</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1537,7 +1670,7 @@
 	</software>
 
 	<software name="iscdemos">
-		<description>isc_demos</description>
+		<description>ISC Demos</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1548,7 +1681,7 @@
 	</software>
 
 	<software name="joystick">
-		<description>joystick-sidea</description>
+		<description>Joystick Games</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1565,7 +1698,7 @@
 	</software>
 
 	<software name="joysound">
-		<description>joystick_sound</description>
+		<description>Joystick Games with Sound</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1576,7 +1709,7 @@
 	</software>
 
 	<software name="lasergun">
-		<description>laser_gun_joystick</description>
+		<description>Laser Gun (Joystick)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1587,7 +1720,7 @@
 	</software>
 
 	<software name="lasergunk" cloneof="lasergun">
-		<description>laser_gun_keyboard</description>
+		<description>Laser Gun (Keyboard)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1598,7 +1731,7 @@
 	</software>
 
 	<software name="life">
-		<description>life</description>
+		<description>Life</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1608,8 +1741,8 @@
 		</part>
 	</software>
 
-	<software name="life2">
-		<description>life2</description>
+	<software name="lifea" cloneof="life">
+		<description>Life (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1620,7 +1753,7 @@
 	</software>
 
 	<software name="llander">
-		<description>lunar_lander</description>
+		<description>Lunar Lander</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1631,7 +1764,7 @@
 	</software>
 
 	<software name="maillist">
-		<description>mailing_list</description>
+		<description>Mailing List</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1642,7 +1775,7 @@
 	</software>
 
 	<software name="mazes1">
-		<description>mazes_1</description>
+		<description>Mazes #1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1653,7 +1786,7 @@
 	</software>
 
 	<software name="mazes2">
-		<description>mazes_2</description>
+		<description>Mazes #2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1664,7 +1797,7 @@
 	</software>
 
 	<software name="mixed">
-		<description>mixed</description>
+		<description>Mixed Programs</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1674,19 +1807,8 @@
 		</part>
 	</software>
 
-	<software name="mldpfix">
-		<description>mldp_fix</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162819">
-				<rom name="mldp_fix.ccvf" size="162819" crc="0871bd9d" sha1="c315b88c56a5186e27835800479eb41e013321b5" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="modutils">
-		<description>modified_utilities</description>
+		<description>Modified Utilities</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1697,7 +1819,7 @@
 	</software>
 
 	<software name="mpidemo">
-		<description>multi_peripheral_interface_demo</description>
+		<description>Multi Peripheral Interface Hardware Demo</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1707,8 +1829,140 @@
 		</part>
 	</software>
 
+	<software name="ncc0105">
+		<description>NCC #1 &amp; #5</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162828">
+				<rom name="ncc_1_5.ccvf" size="162828" crc="8a4bf1e5" sha1="98df027ed8be3a6819819e3a58d9898d5e8dde65" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ncc02">
+		<description>NCC #2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162814">
+				<rom name="ncc_2.ccvf" size="162814" crc="2c27c8da" sha1="9096fcf57bd867662ebfd4b1f26e8bc4746a4c9d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ncc03">
+		<description>NCC #3</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162812">
+				<rom name="ncc_3.ccvf" size="162812" crc="ac44b202" sha1="e28d41b478c43a762476c27f2a33fbaeace7e738" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ncc04">
+		<description>NCC #4</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162814">
+				<rom name="ncc_4.ccvf" size="162814" crc="91eaf631" sha1="b1e1c5745ab7e93b5e7c0710bd4af293fc4e1a7d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ncc0411">
+		<description>NCC #4 &amp; #11</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162816">
+				<rom name="ncc_4_11.ccvf" size="162816" crc="929d57ad" sha1="f5297ec772dc79b4c30889f4ceef908f327bb410" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ncc05">
+		<description>NCC #5</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162854">
+				<rom name="ncc_5.ccvf" size="162854" crc="e2161570" sha1="705bc3ff4440584a2156ffba14830e57a6fb593f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ncc06">
+		<description>NCC #6 (Original)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162814">
+				<rom name="ncc_6_real.ccvf" size="162814" crc="0ca51665" sha1="1eb0feb76f0f1eddef2c7b5c7c4d1dc666b1c0c8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ncc06a" cloneof="ncc06">
+		<description>NCC #6</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162825">
+				<rom name="ncc_6.ccvf" size="162825" crc="f92a4138" sha1="bab59538bdf06c707548ec766d5ed349a6e2a166" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ncc07">
+		<description>NCC #7</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162825">
+				<rom name="ncc_7.ccvf" size="162825" crc="ef5f1eb0" sha1="643221839c6f0d7ba02555b3af5c79bcd328833a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ncc08">
+		<description>NCC #8 (Original)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162827">
+				<rom name="ncc_8_real.ccvf" size="162827" crc="50f3440b" sha1="31a5be594999a4f64e5f6f98d906556459123b7e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ncc08a" cloneof="ncc08">
+		<description>NCC #8</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162830">
+				<rom name="ncc_8.ccvf" size="162830" crc="2c103b67" sha1="c15ca208f630abf4ee96df90f0dab28970f7d944" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ncc09">
+		<description>NCC #9</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162814">
+				<rom name="ncc_9.ccvf" size="162814" crc="4cdfb369" sha1="c5c05c4bd09b0c5d9338b6408a9c4693c3fbb228" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ncc10">
-		<description>ncc_10</description>
+		<description>NCC #10</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1719,7 +1973,7 @@
 	</software>
 
 	<software name="ncc12">
-		<description>ncc_12</description>
+		<description>NCC #12</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1730,7 +1984,7 @@
 	</software>
 
 	<software name="ncc13">
-		<description>ncc_13</description>
+		<description>NCC #13</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1741,7 +1995,7 @@
 	</software>
 
 	<software name="ncc14">
-		<description>ncc_14</description>
+		<description>NCC #14</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1752,7 +2006,7 @@
 	</software>
 
 	<software name="ncc15">
-		<description>ncc_15</description>
+		<description>NCC #15</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1763,7 +2017,7 @@
 	</software>
 
 	<software name="ncc16">
-		<description>ncc_16</description>
+		<description>NCC #16</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1774,7 +2028,7 @@
 	</software>
 
 	<software name="ncc17">
-		<description>ncc_17</description>
+		<description>NCC #17</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1785,7 +2039,7 @@
 	</software>
 
 	<software name="ncc18">
-		<description>ncc_18</description>
+		<description>NCC #18</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1795,30 +2049,8 @@
 		</part>
 	</software>
 
-	<software name="ncc1_5">
-		<description>ncc_1_5</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162828">
-				<rom name="ncc_1_5.ccvf" size="162828" crc="8a4bf1e5" sha1="98df027ed8be3a6819819e3a58d9898d5e8dde65" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ncc2">
-		<description>ncc_2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162814">
-				<rom name="ncc_2.ccvf" size="162814" crc="2c27c8da" sha1="9096fcf57bd867662ebfd4b1f26e8bc4746a4c9d" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="ncc21">
-		<description>ncc_21</description>
+		<description>NCC #21</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1829,7 +2061,7 @@
 	</software>
 
 	<software name="ncc22">
-		<description>ncc_22</description>
+		<description>NCC #22</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1840,7 +2072,7 @@
 	</software>
 
 	<software name="ncc23">
-		<description>ncc_23</description>
+		<description>NCC #23</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1850,118 +2082,8 @@
 		</part>
 	</software>
 
-	<software name="ncc3">
-		<description>ncc_3</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162812">
-				<rom name="ncc_3.ccvf" size="162812" crc="ac44b202" sha1="e28d41b478c43a762476c27f2a33fbaeace7e738" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ncc_4">
-		<description>ncc_4</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162814">
-				<rom name="ncc_4.ccvf" size="162814" crc="91eaf631" sha1="b1e1c5745ab7e93b5e7c0710bd4af293fc4e1a7d" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ncc4_11">
-		<description>ncc_4_11</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162816">
-				<rom name="ncc_4_11.ccvf" size="162816" crc="929d57ad" sha1="f5297ec772dc79b4c30889f4ceef908f327bb410" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ncc5">
-		<description>ncc_5</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162854">
-				<rom name="ncc_5.ccvf" size="162854" crc="e2161570" sha1="705bc3ff4440584a2156ffba14830e57a6fb593f" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ncc6a" cloneof="ncc6">
-		<description>ncc_6</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162825">
-				<rom name="ncc_6.ccvf" size="162825" crc="f92a4138" sha1="bab59538bdf06c707548ec766d5ed349a6e2a166" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ncc6">
-		<description>ncc_6_real</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162814">
-				<rom name="ncc_6_real.ccvf" size="162814" crc="0ca51665" sha1="1eb0feb76f0f1eddef2c7b5c7c4d1dc666b1c0c8" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ncc7">
-		<description>ncc_7</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162825">
-				<rom name="ncc_7.ccvf" size="162825" crc="ef5f1eb0" sha1="643221839c6f0d7ba02555b3af5c79bcd328833a" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ncc8a" cloneof="ncc8">
-		<description>ncc_8</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162830">
-				<rom name="ncc_8.ccvf" size="162830" crc="2c103b67" sha1="c15ca208f630abf4ee96df90f0dab28970f7d944" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ncc8">
-		<description>ncc_8_real</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162827">
-				<rom name="ncc_8_real.ccvf" size="162827" crc="50f3440b" sha1="31a5be594999a4f64e5f6f98d906556459123b7e" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ncc9">
-		<description>ncc_9</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162814">
-				<rom name="ncc_9.ccvf" size="162814" crc="4cdfb369" sha1="c5c05c4bd09b0c5d9338b6408a9c4693c3fbb228" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="ncccat1">
-		<description>ncc_catalog_1</description>
+		<description>NCC Catalog #1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1972,7 +2094,7 @@
 	</software>
 
 	<software name="nswug1">
-		<description>nsw_ug_1-sidea</description>
+		<description>New South Wales CCII Users Group Disk #1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1989,7 +2111,7 @@
 	</software>
 
 	<software name="othello">
-		<description>othello</description>
+		<description>Othello</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2000,7 +2122,7 @@
 	</software>
 
 	<software name="pacman">
-		<description>pacman</description>
+		<description>Pacman</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2011,7 +2133,7 @@
 	</software>
 
 	<software name="persfina">
-		<description>personal_finance_vol_1</description>
+		<description>Personal Finance Volume 1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2022,7 +2144,7 @@
 	</software>
 
 	<software name="pertplnr">
-		<description>pert_planner</description>
+		<description>PERT Planner</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2033,7 +2155,7 @@
 	</software>
 
 	<software name="printpkg">
-		<description>printer_pkg</description>
+		<description>Printer Package</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2041,22 +2163,38 @@
 				<rom name="printer_pkg.ccvf" size="162842" crc="d4998bf0" sha1="abc216b8f2b2907289c83d555dd13bbaff8cfa6f" offset="0"/>
 			</dataarea>
 		</part>
+	</software>
 
-		<part name="flop2" interface="floppy_5_25">
+	<software name="printpkgs" cloneof="printpkg">
+		<description>Printer Package Source</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162842">
 				<rom name="printer_pkg_src-sidea.ccvf" size="162842" crc="7d2436e8" sha1="9f1188fd7d707bd8dc04dca252ddda187b48ab05" offset="0"/>
 			</dataarea>
 		</part>
 
-		<part name="flop3" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="162842">
 				<rom name="printer_pkg_src-sideb.ccvf" size="162842" crc="78d69675" sha1="55bcd7c91bdc78cffdd475caa8f8e217cc92a304" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
+	<software name="printdrv">
+		<description>Printer Drivers</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162925">
+				<rom name="driver_lister.ccvf" size="162925" crc="504740f6" sha1="f38611fb908e9986407309d7fb5eec769169c9cd" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ratfor">
-		<description>ratfor</description>
+		<description>RATFOR</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2066,19 +2204,8 @@
 		</part>
 	</software>
 
-	<software name="samplera" cloneof="sampler">
-		<description>sampler-3.31.78</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="163561">
-				<rom name="sampler-3.31.78.ccvf" size="163561" crc="3df51056" sha1="954c5add7267f0c3d832422f8c93d770e0d9cd06" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sampler">
-		<description>sampler</description>
+		<description>Sampler (v1.23.80)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2088,8 +2215,19 @@
 		</part>
 	</software>
 
-	<software name="srgches1">
-		<description>sargon_chess_1</description>
+	<software name="samplera" cloneof="sampler">
+		<description>Sampler (v3.31.78)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163561">
+				<rom name="sampler-3.31.78.ccvf" size="163561" crc="3df51056" sha1="954c5add7267f0c3d832422f8c93d770e0d9cd06" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sargon">
+		<description>Sargon 1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2100,7 +2238,7 @@
 	</software>
 
 	<software name="scratch">
-		<description>scratch</description>
+		<description>Scratch</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2111,7 +2249,7 @@
 	</software>
 
 	<software name="selutils">
-		<description>selective_utilities</description>
+		<description>Selective Utilities</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2121,19 +2259,8 @@
 		</part>
 	</software>
 
-	<software name="sfsspa" cloneof="sfssp">
-		<description>sfssp_v1.3_nodata_docs</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162862">
-				<rom name="sfssp_v1.3_nodata_docs.ccvf" size="162862" crc="21d05c4f" sha1="dc35e4d1ad361b69a922cd7ab0d8e629b5c49f67" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sfssp">
-		<description>sfssp_v1.3_stock</description>
+		<description>SFSSP (v1.3)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2143,8 +2270,19 @@
 		</part>
 	</software>
 
+	<software name="sfsspa" cloneof="sfssp">
+		<description>SFSSP (v1.3, No Docs)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162862">
+				<rom name="sfssp_v1.3_nodata_docs.ccvf" size="162862" crc="21d05c4f" sha1="dc35e4d1ad361b69a922cd7ab0d8e629b5c49f67" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sharks">
-		<description>sharks</description>
+		<description>Sharks</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2154,8 +2292,8 @@
 		</part>
 	</software>
 
-	<software name="snakeldr">
-		<description>snakes_and_ladders</description>
+	<software name="snakelad">
+		<description>Snakes and Ladders</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2166,7 +2304,7 @@
 	</software>
 
 	<software name="solitair">
-		<description>solitaire</description>
+		<description>Solitaire</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2177,7 +2315,7 @@
 	</software>
 
 	<software name="slitepen">
-		<description>sound_light_pen</description>
+		<description>Sound Light Pen</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2188,7 +2326,7 @@
 	</software>
 
 	<software name="sndware2">
-		<description>soundware_ii</description>
+		<description>Soundware II</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2199,7 +2337,7 @@
 	</software>
 
 	<software name="source">
-		<description>source</description>
+		<description>Source</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2210,7 +2348,7 @@
 	</software>
 
 	<software name="source1">
-		<description>source_1</description>
+		<description>Source 1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2221,7 +2359,7 @@
 	</software>
 
 	<software name="source3">
-		<description>source_3</description>
+		<description>Source 3</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2232,7 +2370,7 @@
 	</software>
 
 	<software name="source4">
-		<description>source_4</description>
+		<description>Source 4</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2243,7 +2381,7 @@
 	</software>
 
 	<software name="stampprc">
-		<description>stamp_price_lists</description>
+		<description>Stamp Price Lists</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2254,7 +2392,7 @@
 	</software>
 
 	<software name="startrek">
-		<description>startrek</description>
+		<description>Star Trek</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2264,8 +2402,30 @@
 		</part>
 	</software>
 
+	<software name="strekge">
+		<description>Star Trek (Graham Epps, v30.8.80)</description>
+		<year>19??</year>
+		<publisher>Graham Epps</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163637">
+				<rom name="epps_trek.ccvf" size="163637" crc="0dad1114" sha1="4f4496c14c65d7b46640cecbdfefa8116de44b78" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strekgea" cloneof="strekge">
+		<description>Star Trek (Graham Epps, v30.8.80, Alt)</description>
+		<year>19??</year>
+		<publisher>Graham Epps</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162842">
+				<rom name="epps_trek (alt).ccvf" size="162842" crc="600fb885" sha1="1fdeaeb61f3fb1c08e803cdeb02f36c392713c7c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="stat1">
-		<description>statistics_1</description>
+		<description>Statistics I</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2276,7 +2436,7 @@
 	</software>
 
 	<software name="stat2">
-		<description>statistics_2</description>
+		<description>Statistics II</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2287,7 +2447,7 @@
 	</software>
 
 	<software name="stat3">
-		<description>statistics_3</description>
+		<description>Statistics III</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2297,25 +2457,8 @@
 		</part>
 	</software>
 
-	<software name="fortstr">
-		<description>strings_fortran</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="162830">
-				<rom name="strings_fortran.ccvf" size="162830" crc="389c4c75" sha1="24b6a44cb71373c68c6cec52e61258e96e76e20f" offset="0"/>
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="162812">
-				<rom name="strings_fortran_2.ccvf" size="162812" crc="7a821888" sha1="816b654bd70b0d0fa1c4f31fa43b0b4c70beafb0" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="supermon">
-		<description>super_monitor</description>
+		<description>Super Monitor</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2326,7 +2469,7 @@
 	</software>
 
 	<software name="swarms">
-		<description>swarms</description>
+		<description>Swarms</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2337,7 +2480,7 @@
 	</software>
 
 	<software name="tabltenn">
-		<description>table_tennis_for_two</description>
+		<description>Table Tennis for Two</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2348,7 +2491,7 @@
 	</software>
 
 	<software name="taylor">
-		<description>taylor-sidea</description>
+		<description>Taylor</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2365,7 +2508,7 @@
 	</software>
 
 	<software name="taylor1">
-		<description>taylor_1</description>
+		<description>Taylor #1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2376,7 +2519,7 @@
 	</software>
 
 	<software name="taylor2">
-		<description>taylor_2</description>
+		<description>Taylor #2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2387,7 +2530,7 @@
 	</software>
 
 	<software name="taylor3">
-		<description>taylor_3</description>
+		<description>Taylor #3</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2398,7 +2541,7 @@
 	</software>
 
 	<software name="taylor4">
-		<description>taylor_4</description>
+		<description>Taylor #4</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2409,7 +2552,7 @@
 	</software>
 
 	<software name="taylor5">
-		<description>taylor_5</description>
+		<description>Taylor #5</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2420,7 +2563,7 @@
 	</software>
 
 	<software name="taylor6">
-		<description>taylor_6</description>
+		<description>Taylor #6</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2431,7 +2574,7 @@
 	</software>
 
 	<software name="taylor7">
-		<description>taylor_7</description>
+		<description>Taylor #7</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2442,7 +2585,7 @@
 	</software>
 
 	<software name="taylor8">
-		<description>taylor_8</description>
+		<description>Taylor #8</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2453,7 +2596,7 @@
 	</software>
 
 	<software name="taylorv2">
-		<description>taylor_vol_2</description>
+		<description>Taylor Vol. #2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2464,7 +2607,7 @@
 	</software>
 
 	<software name="terminal">
-		<description>terminal</description>
+		<description>Terminal</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2474,8 +2617,8 @@
 		</part>
 	</software>
 
-	<software name="termem">
-		<description>terminal_em</description>
+	<software name="termemu">
+		<description>Terminal Emulator</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2486,7 +2629,7 @@
 	</software>
 
 	<software name="textedit">
-		<description>text_editor</description>
+		<description>Text Editor</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2497,7 +2640,7 @@
 	</software>
 
 	<software name="textfrmt">
-		<description>text_formatter</description>
+		<description>Text Formatter</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2508,7 +2651,7 @@
 	</software>
 
 	<software name="editor">
-		<description>the_editor_v2</description>
+		<description>The BASIC Editor (v2.A.82)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2519,7 +2662,7 @@
 	</software>
 
 	<software name="tinyc">
-		<description>tiny_c_v3.0</description>
+		<description>Tiny C v3.0</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2530,7 +2673,7 @@
 	</software>
 
 	<software name="tinypasc">
-		<description>tiny_pascal</description>
+		<description>Tiny Pascal</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2540,8 +2683,19 @@
 		</part>
 	</software>
 
+	<software name="tpforth">
+		<description>Tiny Pascal in FORTH</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162853">
+				<rom name="forth_pascal.ccvf" size="162853" crc="0545b0be" sha1="536d0b034ca44d7657bb36d38fff62832e8e5717" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="utility">
-		<description>utility</description>
+		<description>Utility</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2552,7 +2706,7 @@
 	</software>
 
 	<software name="utility2">
-		<description>utility_2</description>
+		<description>Utility 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2563,7 +2717,7 @@
 	</software>
 
 	<software name="utility3">
-		<description>utility_3</description>
+		<description>Utility 3</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2573,8 +2727,19 @@
 		</part>
 	</software>
 
+	<software name="watlanal">
+		<description>WATALS/ANALIZ</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162871">
+				<rom name="analiz_watals.ccvf" size="162871" crc="91bb3632" sha1="61472691a68688b3a9281385327a7d07e77c9d3b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wordking">
-		<description>word_king_v1.6</description>
+		<description>Word King (v1.6)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2585,7 +2750,7 @@
 	</software>
 
 	<software name="wordproc">
-		<description>word_processor_v2.1</description>
+		<description>Word Processor (v2.1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2596,7 +2761,7 @@
 	</software>
 
 	<software name="wordpzle">
-		<description>word_puzzle</description>
+		<description>Word Puzzle</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2607,7 +2772,7 @@
 	</software>
 
 	<software name="wordy">
-		<description>wordy_disk_1</description>
+		<description>Wordy</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2630,7 +2795,7 @@
 	</software>
 
 	<software name="zipcomp">
-		<description>zip_compiler</description>
+		<description>ZIP Compiler</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">

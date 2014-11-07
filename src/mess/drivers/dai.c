@@ -224,6 +224,7 @@ static MACHINE_CONFIG_START( dai, dai_state )
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("dai_cass")
 
 	/* tms5501 */
 	MCFG_DEVICE_ADD("tms5501", TMS5501, 2000000)
@@ -234,6 +235,9 @@ static MACHINE_CONFIG_START( dai, dai_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("48K")
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "dai_cass")
 MACHINE_CONFIG_END
 
 #define io_dai      io_NULL
