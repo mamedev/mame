@@ -41,7 +41,6 @@
     DEBUGGING
 ***************************************************************************/
 
-#define LOG_UML                         (0)
 #define LOG_NATIVE                      (0)
 
 #define SINGLE_INSTRUCTION_MODE         (0)
@@ -154,8 +153,6 @@ void arm7_cpu_device::arm7_drc_init()
 	m_impstate.cache = cache;
 
 	/* initialize the UML generator */
-	if (LOG_UML)
-		flags |= DRCUML_OPTION_LOG_UML;
 	if (LOG_NATIVE)
 		flags |= DRCUML_OPTION_LOG_NATIVE;
 	m_impstate.drcuml = new drcuml_state(*this, *cache, flags, 1, 32, 1);
@@ -355,7 +352,7 @@ void arm7_cpu_device::code_compile_block(UINT8 mode, offs_t pc)
 	/* get a description of this sequence */
 	// TODO FIXME
 	const opcode_desc *desclist = NULL; //m_impstate.drcfe->describe_code(pc); // TODO
-//  if (LOG_UML || LOG_NATIVE)
+//  if (drcuml->logging() || LOG_NATIVE)
 //      log_opcode_desc(drcuml, desclist, 0);
 
 	/* if we get an error back, flush the cache and try again */
@@ -374,7 +371,7 @@ void arm7_cpu_device::code_compile_block(UINT8 mode, offs_t pc)
 				UINT32 nextpc;
 
 				/* add a code log entry */
-				if (LOG_UML)
+				if (drcuml->logging())
 					block->append_comment("-------------------------");                     // comment
 
 				/* determine the last instruction in this sequence */
@@ -1209,7 +1206,7 @@ void arm7_cpu_device::generate_update_cycles(drcuml_block *block, compiler_state
 void arm7_cpu_device::generate_checksum_block(drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast)
 {
 	const opcode_desc *curdesc;
-	if (LOG_UML)
+	if (m_impstate.drcuml->logging())
 	{
 		block->append_comment("[Validation for %08X]", seqhead->pc);                // comment
 	}
@@ -1278,7 +1275,7 @@ void arm7_cpu_device::generate_sequence_instruction(drcuml_block *block, compile
 
 	/* add an entry for the log */
 	// TODO FIXME
-//  if (LOG_UML && !(desc->flags & OPFLAG_VIRTUAL_NOOP))
+//  if (m_impstate.drcuml->logging() && !(desc->flags & OPFLAG_VIRTUAL_NOOP))
 //      log_add_disasm_comment(block, desc->pc, desc->opptr.l[0]);
 
 	/* set the PC map variable */

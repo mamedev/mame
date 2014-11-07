@@ -18,7 +18,6 @@
     DEBUGGING
 ***************************************************************************/
 
-#define LOG_UML                         (0)
 #define LOG_NATIVE                      (0)
 
 #define DISABLE_FLAG_OPTIMIZATIONS      (0)
