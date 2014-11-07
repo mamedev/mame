@@ -62,6 +62,11 @@ WRITE16_MEMBER(twin16_state::zipram_w)
 		m_gfxdecode->gfx(1)->mark_dirty(offset / 16);
 }
 
+void twin16_state::twin16_postload()
+{
+	m_gfxdecode->gfx(1)->mark_all_dirty();
+}
+
 WRITE16_MEMBER(fround_state::gfx_bank_w)
 {
 	int changed = 0;
@@ -452,6 +457,9 @@ void twin16_state::video_start()
 	save_item(NAME(m_need_process_spriteram));
 	save_item(NAME(m_video_register));
 	save_item(NAME(m_sprite_busy));
+
+	if (!m_is_fround)
+		machine().save().register_postload(save_prepost_delegate(FUNC(twin16_state::twin16_postload), this));
 }
 
 void fround_state::video_start()
