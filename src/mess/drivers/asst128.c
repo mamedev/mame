@@ -78,6 +78,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(asst128_io, AS_IO, 16, asst128_state)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE8("pc_joy", pc_joy_device, joy_port_r, joy_port_w, 0xffff)
 	AM_RANGE(0x03f2, 0x03f3) AM_WRITE8(asst128_fdc_dor_w, 0xffff)
 	AM_RANGE(0x03f4, 0x03f5) AM_DEVICE8("fdc:upd765", upd765a_device, map, 0xffff)
 ADDRESS_MAP_END
@@ -118,6 +119,8 @@ static MACHINE_CONFIG_START( asst128, asst128_state )
 	MCFG_PC_FDC_INTRQ_CALLBACK(DEVWRITELINE("mb:pic8259", pic8259_device, ir6_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", asst128_floppies, "525ssqd", asst128_state::asst128_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", asst128_floppies, "525ssqd", asst128_state::asst128_formats)
+
+	MCFG_PC_JOY_ADD("pc_joy")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
