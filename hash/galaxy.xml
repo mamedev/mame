@@ -724,8 +724,8 @@
 		<part name="cass1" interface="galaxy_cass">
 			<dataarea name="cass" size="573">
 				<rom name="stars (2007-07-12)(solc, tomaz).gtp" size="573" crc="6329e68d" sha1="3c6657ae167ce5ff1076458530da75dc3228e739" offset="0" />
- 			</dataarea>
- 		</part>
- 	</software>
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>

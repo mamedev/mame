@@ -120,8 +120,8 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="left" value="GD74HC00"/>
 			<feature name="right" value="GD74HC74"/>
 			<dataarea name="rom" width="16" endianness="big" size="2621440">
-                <rom name="cosmic spacehead md mdcs e4f7.u1" size="1048576" crc="cb89e605" sha1="b5bc4a786639d1b8ae6de76f40dbe907b3f0b642" offset="0x000000"/>
-                <rom name="fantastic dizzy md mdfd bb07.u2" size="524288" crc="46447e7a" sha1="b320174d3b43f30b477818a27b4da30462a52003" offset="0x200000"/>
+				<rom name="cosmic spacehead md mdcs e4f7.u1" size="1048576" crc="cb89e605" sha1="b5bc4a786639d1b8ae6de76f40dbe907b3f0b642" offset="0x000000"/>
+				<rom name="fantastic dizzy md mdfd bb07.u2" size="524288" crc="46447e7a" sha1="b320174d3b43f30b477818a27b4da30462a52003" offset="0x200000"/>
 			</dataarea>
 		</part>
 	</software>
