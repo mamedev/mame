@@ -15,6 +15,8 @@
 
   TODO:
   - write_r doesn't look right, maybe something missing in cpu emulation
+  - correct output_pla
+  - layout
 
 ***************************************************************************/
 
@@ -38,6 +40,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<3> m_button_matrix;
 
+	UINT16 m_r;
 	UINT16 m_o;
 
 	DECLARE_READ8_MEMBER(read_k);
@@ -70,13 +73,15 @@ READ8_MEMBER(comp4_state::read_k)
 
 WRITE16_MEMBER(comp4_state::write_r)
 {
-	// LEDs?
+	// LEDs
+	m_r = data;
 }
 
 WRITE16_MEMBER(comp4_state::write_o)
 {
-	// O0-O2: input mux
-	// other bits: some LEDs?
+	// O0: LEDs (common)
+	// O1-O3: input mux
+	// other bits: N/C
 	m_o = data;
 }
 
@@ -118,7 +123,10 @@ INPUT_PORTS_END
 
 void comp4_state::machine_start()
 {
+	m_r = 0;
 	m_o = 0;
+
+	save_item(NAME(m_r));
 	save_item(NAME(m_o));
 }
 

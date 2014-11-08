@@ -85,6 +85,7 @@ void mm58167_device::device_reset()
 
 	m_regs[R_CTL_STATUS] = 0;   // not busy
 	m_regs[R_CTL_IRQSTATUS] = 0;
+	m_regs[R_CTL_IRQCONTROL] = 0;
 	m_milliseconds = 0;
 	m_comparator_state = false;
 }
