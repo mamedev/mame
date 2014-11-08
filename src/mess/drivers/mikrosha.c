@@ -21,17 +21,28 @@ class mikrosha_state : public radio86_state
 {
 public:
 	mikrosha_state(const machine_config &mconfig, device_type type, const char *tag)
-		: radio86_state(mconfig, type, tag) { }
+		: radio86_state(mconfig, type, tag),
+		m_cart(*this, "cartslot")
+		{ }
 	DECLARE_WRITE_LINE_MEMBER(mikrosha_pit_out2);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
+	DECLARE_MACHINE_RESET(mikrosha);
+
+protected:
+	required_device<generic_slot_device> m_cart;
 };
 
+MACHINE_RESET_MEMBER(mikrosha_state,mikrosha)
+{
+	if (m_cart->exists())
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x8000+m_cart->get_rom_size()-1, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+	radio86_state::machine_reset();
+}
 
 /* Address maps */
 static ADDRESS_MAP_START(mikrosha_mem, AS_PROGRAM, 8, mikrosha_state )
 	AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
 	AM_RANGE( 0x1000, 0x7fff ) AM_RAM // RAM
-	AM_RANGE( 0x8000, 0xbfff ) AM_READ(radio_cpu_state_r) // Not connected
 	AM_RANGE( 0xc000, 0xc003 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x07fc)
 	AM_RANGE( 0xc800, 0xc803 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write) AM_MIRROR(0x07fc)
 	AM_RANGE( 0xd000, 0xd001 ) AM_DEVREADWRITE("i8275", i8275_device, read, write) AM_MIRROR(0x07fe) // video
@@ -189,7 +200,7 @@ static MACHINE_CONFIG_START( mikrosha, mikrosha_state )
 	MCFG_CPU_PROGRAM_MAP(mikrosha_mem)
 	MCFG_CPU_IO_MAP(mikrosha_io)
 
-	MCFG_MACHINE_RESET_OVERRIDE(mikrosha_state, radio86 )
+	MCFG_MACHINE_RESET_OVERRIDE(mikrosha_state, mikrosha)
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(radio86_state, radio86_8255_portb_r2))
@@ -238,7 +249,11 @@ static MACHINE_CONFIG_START( mikrosha, mikrosha_state )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 	MCFG_CASSETTE_INTERFACE("mikrosha_cass")
 
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "mikrosha_cart")
+	MCFG_GENERIC_EXTENSIONS("bin,rom")
+
 	MCFG_SOFTWARE_LIST_ADD("cass_list","mikrosha")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","mikrosha_cart")
 MACHINE_CONFIG_END
 
 
