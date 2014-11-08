@@ -121,7 +121,7 @@ rsp_device::rsp_device(const machine_config &mconfig, const char *tag, device_t 
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32)
 	, m_cache(CACHE_SIZE + sizeof(internal_rsp_state))
 	, m_drcuml(NULL)
-//  , m_drcuml(*this, m_cache, ( RSP_LOG_NATIVE ? DRCUML_OPTION_LOG_NATIVE : 0 ), 8, 32, 2)
+//  , m_drcuml(*this, m_cache, 0, 8, 32, 2)
 	, m_drcfe(NULL)
 	, m_drcoptions(0)
 	, m_cache_dirty(TRUE)
@@ -432,10 +432,6 @@ void rsp_device::device_start()
 
 	/* initialize the UML generator */
 	UINT32 drc_flags = 0;
-	if (RSP_LOG_NATIVE)
-	{
-		drc_flags |= DRCUML_OPTION_LOG_NATIVE;
-	}
 	m_drcuml = auto_alloc(machine(), drcuml_state(*this, m_cache, drc_flags, 8, 32, 2));
 
 	/* add symbols for our stuff */

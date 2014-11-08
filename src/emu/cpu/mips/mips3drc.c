@@ -275,7 +275,7 @@ void mips3_device::code_compile_block(UINT8 mode, offs_t pc)
 
 	/* get a description of this sequence */
 	desclist = m_drcfe->describe_code(pc);
-	if (drcuml->logging() || LOG_NATIVE)
+	if (drcuml->logging() || drcuml->logging_native())
 		log_opcode_desc(drcuml, desclist, 0);
 
 	/* if we get an error back, flush the cache and try again */
@@ -3264,7 +3264,7 @@ void mips3_device::log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desc
 		char buffer[100];
 
 		/* disassemle the current instruction and output it to the log */
-		if (drcuml->logging() || LOG_NATIVE)
+		if (drcuml->logging() || drcuml->logging_native())
 		{
 			if (desclist->flags & OPFLAG_VIRTUAL_NOOP)
 				strcpy(buffer, "<virtual nop>");

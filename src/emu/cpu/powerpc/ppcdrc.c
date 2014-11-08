@@ -368,7 +368,7 @@ void ppc_device::code_compile_block(UINT8 mode, offs_t pc)
 
 	/* get a description of this sequence */
 	desclist = m_drcfe->describe_code(pc);
-	if (m_drcuml->logging() || LOG_NATIVE)
+	if (m_drcuml->logging() || m_drcuml->logging_native())
 		log_opcode_desc(m_drcuml, desclist, 0);
 
 	bool succeeded = false;
@@ -3895,7 +3895,7 @@ void ppc_device::log_opcode_desc(drcuml_state *drcuml, const opcode_desc *descli
 		char buffer[100];
 
 		/* disassemle the current instruction and output it to the log */
-		if (drcuml->logging() || LOG_NATIVE)
+		if (drcuml->logging() || drcuml->logging_native())
 		{
 			if (desclist->flags & OPFLAG_VIRTUAL_NOOP)
 				strcpy(buffer, "<virtual nop>");

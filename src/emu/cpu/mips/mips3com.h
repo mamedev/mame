@@ -22,8 +22,6 @@
 #define PRINTF_TLB              (0)
 #define USE_ABI_REG_NAMES       (1)
 
-#define LOG_NATIVE                      (0)
-
 #define DISABLE_FAST_REGISTERS          (0)
 #define SINGLE_INSTRUCTION_MODE         (0)
 

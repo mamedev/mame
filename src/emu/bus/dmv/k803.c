@@ -129,5 +129,5 @@ WRITE_LINE_MEMBER(dmv_k803_device::rtc_irq_w)
 void dmv_k803_device::update_int()
 {
 	bool state = ((m_latch & 0x80) && m_rtc_int);
-	m_bus->m_out_irq_cb(state ? ASSERT_LINE : CLEAR_LINE);
+	m_bus->m_out_int_cb(state ? ASSERT_LINE : CLEAR_LINE);
 }

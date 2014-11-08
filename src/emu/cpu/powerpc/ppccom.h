@@ -18,8 +18,6 @@
     DEBUGGING
 ***************************************************************************/
 
-#define LOG_NATIVE                      (0)
-
 #define DISABLE_FLAG_OPTIMIZATIONS      (0)
 #define DISABLE_FAST_REGISTERS          (0)
 #define SINGLE_INSTRUCTION_MODE         (0)

@@ -77,10 +77,6 @@ public:
 	INTERRUPT_GEN_MEMBER(CPUA_interrupt);
 	INTERRUPT_GEN_MEMBER(CPUB_interrupt);
 	TIMER_CALLBACK_MEMBER(sprite_tick);
-	int set_sprite_timer(  );
-	void spriteram_process(  );
-	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap );
-	int spriteram_process_enable(  );
 	DECLARE_WRITE8_MEMBER(volume_callback);
 protected:
 	virtual void machine_start();
@@ -88,6 +84,12 @@ protected:
 	virtual void video_start();
 
 	virtual void tile_get_info(tile_data &tileinfo, UINT16 data, int color_base);
+private:
+	int set_sprite_timer();
+	void spriteram_process();
+	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap );
+	int spriteram_process_enable();
+	void twin16_postload();
 };
 
 class fround_state : public twin16_state

@@ -1352,6 +1352,7 @@ $(MESSOBJ)/matsushi.a:          \
 	$(MESS_DRIVERS)/myb3k.o     \
 
 $(MESSOBJ)/mb.a:                \
+	$(MESS_DRIVERS)/comp4.o     \
 	$(MESS_DRIVERS)/microvsn.o  \
 	$(MESS_DRIVERS)/simon.o     \
 

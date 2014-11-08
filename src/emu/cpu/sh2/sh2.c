@@ -115,8 +115,6 @@
     DEBUGGING
 ***************************************************************************/
 
-#define LOG_NATIVE                  (0) // log native assembly
-
 #define DISABLE_FAST_REGISTERS              (0) // set to 1 to turn off usage of register caching
 #define SINGLE_INSTRUCTION_MODE             (0)
 
@@ -169,7 +167,7 @@ sh2_device::sh2_device(const machine_config &mconfig, const char *tag, device_t 
 	, m_cpu_type(CPU_TYPE_SH2)
 	, m_cache(CACHE_SIZE + sizeof(internal_sh2_state))
 	, m_drcuml(NULL)
-//  , m_drcuml(*this, m_cache, ( LOG_NATIVE ? DRCUML_OPTION_LOG_NATIVE : 0 ), 1, 32, 1)
+//  , m_drcuml(*this, m_cache, 0, 1, 32, 1)
 	, m_drcfe(NULL)
 	, m_drcoptions(0)
 	, m_sh2_state(NULL)
@@ -206,7 +204,7 @@ sh2_device::sh2_device(const machine_config &mconfig, device_type type, const ch
 	, m_cpu_type(cpu_type)
 	, m_cache(CACHE_SIZE + sizeof(internal_sh2_state))
 	, m_drcuml(NULL)
-//  , m_drcuml(*this, m_cache, ( LOG_NATIVE ? DRCUML_OPTION_LOG_NATIVE : 0 ), 1, 32, 1)
+//  , m_drcuml(*this, m_cache, 0, 1, 32, 1)
 	, m_drcfe(NULL)
 	, m_drcoptions(0)
 	, m_sh2_state(NULL)
@@ -2560,8 +2558,6 @@ void sh2_device::device_start()
 
 	/* initialize the UML generator */
 	UINT32 flags = 0;
-	if (LOG_NATIVE)
-		flags |= DRCUML_OPTION_LOG_NATIVE;
 	m_drcuml = auto_alloc(machine(), drcuml_state(*this, m_cache, flags, 1, 32, 1));
 
 	/* add symbols for our stuff */
