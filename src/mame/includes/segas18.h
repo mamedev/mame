@@ -11,6 +11,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "machine/segaic16.h"
+#include "machine/315_5296.h"
 #include "video/315_5313.h"
 #include "video/segaic16.h"
 #include "video/sega16sp.h"
@@ -29,21 +30,20 @@ public:
 			m_soundcpu(*this, "soundcpu"),
 			m_mcu(*this, "mcu"),
 			m_vdp(*this, "gen_vdp"),
+			m_io(*this, "io"),
 			m_nvram(*this, "nvram"),
 			m_sprites(*this, "sprites"),
 			m_segaic16vid(*this, "segaic16vid"),
+			m_gfxdecode(*this, "gfxdecode"),
 			m_workram(*this, "workram"),
 			m_romboard(ROM_BOARD_INVALID),
-			m_has_guns(false),
 			m_grayscale_enable(false),
 			m_vdp_enable(false),
 			m_vdp_mixing(0),
 			m_mcu_data(0),
 			m_lghost_value(0),
-			m_lghost_select(0),
-			m_gfxdecode(*this, "gfxdecode")
+			m_lghost_select(0)
 	{
-		memset(m_misc_io_data, 0, sizeof(m_misc_io_data));
 		memset(m_wwally_last_x, 0, sizeof(m_wwally_last_x));
 		memset(m_wwally_last_y, 0, sizeof(m_wwally_last_y));
 	}
@@ -63,26 +63,21 @@ public:
 	void mapper_sound_w(UINT8 data);
 
 	// read/write handlers
+	DECLARE_WRITE8_MEMBER( rom_5874_bank_w );
 	DECLARE_WRITE16_MEMBER( rom_5987_bank_w );
 	DECLARE_WRITE16_MEMBER( rom_837_7525_bank_w );
-	DECLARE_READ16_MEMBER( io_chip_r );
-	DECLARE_WRITE16_MEMBER( io_chip_w );
+	DECLARE_WRITE8_MEMBER( misc_outputs_w );
 	DECLARE_READ16_MEMBER( misc_io_r );
 	DECLARE_WRITE16_MEMBER( misc_io_w );
 	DECLARE_WRITE8_MEMBER( soundbank_w );
 	DECLARE_WRITE8_MEMBER( mcu_data_w );
 
-	DECLARE_READ16_MEMBER( genesis_vdp_r );
-	DECLARE_WRITE16_MEMBER( genesis_vdp_w );
-
-	DECLARE_WRITE_LINE_MEMBER(vdp_sndirqline_callback_s18);
-	DECLARE_WRITE_LINE_MEMBER(vdp_lv6irqline_callback_s18);
-	DECLARE_WRITE_LINE_MEMBER(vdp_lv4irqline_callback_s18);
-
+	DECLARE_WRITE_LINE_MEMBER(ym3438_irq_handler);
 
 	// custom I/O
 	DECLARE_READ16_MEMBER( ddcrew_custom_io_r );
 	DECLARE_READ16_MEMBER( lghost_custom_io_r );
+	DECLARE_WRITE8_MEMBER( lghost_gun_recoil_w );
 	DECLARE_WRITE16_MEMBER( lghost_custom_io_w );
 	DECLARE_READ16_MEMBER( wwally_custom_io_r );
 	DECLARE_WRITE16_MEMBER( wwally_custom_io_w );
@@ -90,11 +85,18 @@ public:
 	// video rendering
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE16_MEMBER( sega_tileram_0_w ) { m_segaic16vid->segaic16_tileram_0_w(space,offset,data,mem_mask); };
-	DECLARE_WRITE16_MEMBER( sega_textram_0_w ) { m_segaic16vid->segaic16_textram_0_w(space,offset,data,mem_mask); };
-	
-	DECLARE_WRITE_LINE_MEMBER(ym3438_irq_handler);
+	DECLARE_WRITE_LINE_MEMBER(vdp_sndirqline_callback_s18);
+	DECLARE_WRITE_LINE_MEMBER(vdp_lv6irqline_callback_s18);
+	DECLARE_WRITE_LINE_MEMBER(vdp_lv4irqline_callback_s18);
 
+	DECLARE_READ16_MEMBER( genesis_vdp_r ) { return m_vdp->vdp_r(space, offset, mem_mask); }
+	DECLARE_WRITE16_MEMBER( genesis_vdp_w ) { m_vdp->vdp_w(space, offset, data, mem_mask); }
+	DECLARE_WRITE16_MEMBER( sega_tileram_0_w ) { m_segaic16vid->segaic16_tileram_0_w(space, offset, data, mem_mask); }
+	DECLARE_WRITE16_MEMBER( sega_textram_0_w ) { m_segaic16vid->segaic16_textram_0_w(space, offset, data, mem_mask); }
+
+	DECLARE_WRITE_LINE_MEMBER(set_grayscale);
+	DECLARE_WRITE_LINE_MEMBER(set_vdp_enable);
+	
 protected:
 	// timer IDs
 	enum
@@ -110,7 +112,6 @@ protected:
 		ROM_BOARD_171_5874,     // 171-5874
 		ROM_BOARD_171_5987,     // 171-5987
 		ROM_BOARD_837_7525      // Hammer Away proto
-
 	};
 
 	// device overrides
@@ -120,8 +121,6 @@ protected:
 
 	// internal helpers
 	void init_generic(segas18_rom_board rom_board);
-	void set_grayscale(bool enable);
-	void set_vdp_enable(bool enable);
 	void set_vdp_mixing(UINT8 mixing);
 	void draw_vdp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 
@@ -131,9 +130,11 @@ protected:
 	required_device<z80_device> m_soundcpu;
 	optional_device<i8751_device> m_mcu;
 	required_device<sega315_5313_device> m_vdp;
+	required_device<sega_315_5296_device> m_io;
 	required_device<nvram_device> m_nvram;
 	required_device<sega_sys16b_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	// memory pointers
 	required_shared_ptr<UINT16> m_workram;
@@ -142,21 +143,17 @@ protected:
 	segas18_rom_board   m_romboard;
 	read16_delegate     m_custom_io_r;
 	write16_delegate    m_custom_io_w;
-	bool                m_has_guns;
 
 	// internal state
-	bool                m_grayscale_enable;
-	bool                m_vdp_enable;
+	int                 m_grayscale_enable;
+	int                 m_vdp_enable;
 	UINT8               m_vdp_mixing;
 	bitmap_ind16        m_temp_bitmap;
 	UINT8               m_mcu_data;
-	UINT8               m_misc_io_data[0x10];
 
 	// game-specific state
 	UINT8               m_wwally_last_x[3];
 	UINT8               m_wwally_last_y[3];
 	UINT8               m_lghost_value;
 	UINT8               m_lghost_select;
-
-	required_device<gfxdecode_device> m_gfxdecode;
 };

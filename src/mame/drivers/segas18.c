@@ -150,13 +150,12 @@ void segas18_state::init_generic(segas18_rom_board rom_board)
 	m_vdp->set_vdp_pal(FALSE);
 	m_vdp->set_framerate(60);
 	m_vdp->set_total_scanlines(262);
-	m_vdp->stop_timers();   // 315-5124 timers
+	m_vdp->stop_timers(); // 315-5124 timers
 
 	// save state
 	save_item(NAME(m_mcu_data));
 	save_item(NAME(m_lghost_value));
 	save_item(NAME(m_lghost_select));
-	save_item(NAME(m_misc_io_data));
 	save_item(NAME(m_wwally_last_x));
 	save_item(NAME(m_wwally_last_y));
 }
@@ -199,134 +198,44 @@ void segas18_state::machine_reset()
  *
  *************************************/
 
-READ16_MEMBER( segas18_state::io_chip_r )
+WRITE8_MEMBER( segas18_state::misc_outputs_w )
 {
-	static const char *const portnames[] = { "P1", "P2", "PORTC", "PORTD", "SERVICE", "COINAGE", "DSW", "PORTH" };
-	offset &= 0x1f/2;
-
-	switch (offset)
-	{
-		// I/O ports
-		case 0x00/2:
-		case 0x02/2:
-		case 0x04/2:
-		case 0x06/2:
-		case 0x08/2:
-		case 0x0a/2:
-		case 0x0c/2:
-		case 0x0e/2:
-			// if the port is configured as an output, return the last thing written
-			if (m_misc_io_data[0x1e/2] & (1 << offset))
-				return m_misc_io_data[offset];
-
-			// otherwise, return an input port
-			return ioport(portnames[offset])->read();
-
-		// 'SEGA' protection
-		case 0x10/2:
-			return 'S';
-		case 0x12/2:
-			return 'E';
-		case 0x14/2:
-			return 'G';
-		case 0x16/2:
-			return 'A';
-
-		// CNT register & mirror
-		case 0x18/2:
-		case 0x1c/2:
-			return m_misc_io_data[0x1c/2];
-
-		// port direction register & mirror
-		case 0x1a/2:
-		case 0x1e/2:
-			return m_misc_io_data[0x1e/2];
-	}
-	return 0xffff;
-}
-
-
-WRITE16_MEMBER( segas18_state::io_chip_w )
-{
-	// generic implementation
-	offset &= 0x1f/2;
-	UINT8 old = m_misc_io_data[offset];
-	m_misc_io_data[offset] = data;
-
-	switch (offset)
-	{
-		// I/O ports
-		case 0x00/2:
-		case 0x02/2:
-		case 0x04/2:
-		case 0x08/2:
-		case 0x0a/2:
-		case 0x0c/2:
-			if (m_has_guns)
-			{
-				// outputs for lghost only
-				output_set_value("P1_Gun_Recoil",(~data & 0x01));
-				output_set_value("P2_Gun_Recoil",(~data & 0x02)>>1);
-				output_set_value("P3_Gun_Recoil",(~data & 0x04)>>2);
-			}
-			break;
-
-		// miscellaneous output
-		case 0x06/2:
-			set_grayscale(~data & 0x40);
-			m_segaic16vid->segaic16_tilemap_set_flip(0, data & 0x20);
-			m_sprites->set_flip(data & 0x20);
-// These are correct according to cgfm's docs, but mwalker and ddcrew both
-// enable the lockout and never turn it off
-//            coin_lockout_w(machine(), 1, data & 0x08);
-//            coin_lockout_w(machine(), 0, data & 0x04);
-			coin_counter_w(machine(), 1, data & 0x02);
-			coin_counter_w(machine(), 0, data & 0x01);
-			break;
-
-		// tile banking
-		case 0x0e/2:
-			if (m_romboard == ROM_BOARD_171_5874 || m_romboard == ROM_BOARD_171_SHADOW)
-				for (int i = 0; i < 4; i++)
-				{
-					m_segaic16vid->segaic16_tilemap_set_bank(0, 0 + i, (data & 0xf) * 4 + i);
-					m_segaic16vid->segaic16_tilemap_set_bank(0, 4 + i, ((data >> 4) & 0xf) * 4 + i);
-				}
-			break;
-
-		// CNT register
-		case 0x1c/2:
-			m_segaic16vid->segaic16_set_display_enable(data & 2);
-			if ((old ^ data) & 4)
-				set_vdp_enable(data & 4);
-			break;
-	}
+	// miscellaneous output
+	set_grayscale(~data & 0x40);
+	m_segaic16vid->segaic16_tilemap_set_flip(0, data & 0x20);
+	m_sprites->set_flip(data & 0x20);
+	// These are correct according to cgfm's docs, but mwalker and ddcrew both
+	// enable the lockout and never turn it off
+	// coin_lockout_w(machine(), 1, data & 0x08);
+	// coin_lockout_w(machine(), 0, data & 0x04);
+	coin_counter_w(machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
 }
 
 
 READ16_MEMBER( segas18_state::misc_io_r )
 {
-	static const char *const portnames[] = { "SERVICE", "COINAGE" };
-
 	offset &= 0x1fff;
-
 	switch (offset & (0x3000/2))
 	{
 		// I/O chip
 		case 0x0000/2:
 		case 0x1000/2:
-			return io_chip_r(space, offset, mem_mask);
+			return m_io->read(space, offset) | (open_bus_r(space, 0, mem_mask) & 0xff00);
 
 		// video control latch
 		case 0x2000/2:
+		{
+			static const char *const portnames[] = { "SERVICE", "COINAGE" };
 			return ioport(portnames[offset & 1])->read();
+		}
 	}
+
 	if (!m_custom_io_r.isnull())
 		return m_custom_io_r(space, offset, mem_mask);
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", space.device().safe_pc(), offset * 2);
 	return open_bus_r(space, 0, mem_mask);
 }
-
 
 WRITE16_MEMBER( segas18_state::misc_io_w )
 {
@@ -338,7 +247,7 @@ WRITE16_MEMBER( segas18_state::misc_io_w )
 		case 0x1000/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				io_chip_w(space, offset, data, mem_mask);
+				m_io->write(space, offset, data);
 				return;
 			}
 			break;
@@ -352,6 +261,7 @@ WRITE16_MEMBER( segas18_state::misc_io_w )
 			}
 			break;
 	}
+
 	if (!m_custom_io_w.isnull())
 	{
 		m_custom_io_w(space, offset, data, mem_mask);
@@ -368,10 +278,24 @@ WRITE16_MEMBER( segas18_state::misc_io_w )
  *
  *************************************/
 
+WRITE8_MEMBER( segas18_state::rom_5874_bank_w )
+{
+	if (m_romboard == ROM_BOARD_171_5874 || m_romboard == ROM_BOARD_171_SHADOW)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			m_segaic16vid->segaic16_tilemap_set_bank(0, 0 + i, (data & 0xf) * 4 + i);
+			m_segaic16vid->segaic16_tilemap_set_bank(0, 4 + i, ((data >> 4) & 0xf) * 4 + i);
+		}
+	}
+}
+
+
 WRITE16_MEMBER( segas18_state::rom_5987_bank_w )
 {
 	if (!ACCESSING_BITS_0_7)
 		return;
+
 	offset &= 0xf;
 	data &= 0xff;
 
@@ -406,7 +330,6 @@ WRITE16_MEMBER( segas18_state::rom_837_7525_bank_w )
 	// tile banking
 	if (offset < 8)
 	{
-	//	int maxbanks = m_gfxdecode->gfx(0)->elements() / 1024;
 		data &= 0x9f;
 
 		if (data & 0x80) data += 0x20;
@@ -435,13 +358,13 @@ READ16_MEMBER( segas18_state::ddcrew_custom_io_r )
 	switch (offset)
 	{
 		case 0x3020/2:
-			return ioport("P3")->read();
+			return ioport("EXP3")->read();
 
 		case 0x3022/2:
-			return ioport("P4")->read();
+			return ioport("EXP4")->read();
 
 		case 0x3024/2:
-			return ioport("P34START")->read();
+			return ioport("EXSERVICE")->read();
 	}
 	return open_bus_r(space, 0, mem_mask);
 }
@@ -470,7 +393,6 @@ READ16_MEMBER( segas18_state::lghost_custom_io_r )
 	return open_bus_r(space, 0, mem_mask);
 }
 
-
 WRITE16_MEMBER( segas18_state::lghost_custom_io_w )
 {
 	switch (offset)
@@ -495,6 +417,14 @@ WRITE16_MEMBER( segas18_state::lghost_custom_io_w )
 			m_lghost_select = data & 1;
 			break;
 	}
+}
+
+
+WRITE8_MEMBER( segas18_state::lghost_gun_recoil_w )
+{
+	output_set_value("P1_Gun_Recoil", (~data & 0x01));
+	output_set_value("P2_Gun_Recoil", (~data & 0x02)>>1);
+	output_set_value("P3_Gun_Recoil", (~data & 0x04)>>2);
 }
 
 
@@ -573,22 +503,6 @@ WRITE8_MEMBER( segas18_state::mcu_data_w )
 {
 	m_mcu_data = data;
 	m_mcu->set_input_line(MCS51_INT1_LINE, HOLD_LINE);
-}
-
-/*************************************
- *
- *  VDP memory handlers
- *
- *************************************/
-
-READ16_MEMBER( segas18_state::genesis_vdp_r )
-{
-	return m_vdp->vdp_r(space, offset, mem_mask);
-}
-
-WRITE16_MEMBER( segas18_state::genesis_vdp_w )
-{
-	m_vdp->vdp_w(space, offset, data, mem_mask);
 }
 
 
@@ -681,10 +595,7 @@ static INPUT_PORTS_START( system18_generic )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 
-	PORT_START("PORTC")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("PORTD")
+	PORT_START("P3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SERVICE")
@@ -709,9 +620,6 @@ static INPUT_PORTS_START( system18_generic )
 	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW2:6" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW2:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
-
-	PORT_START("PORTH")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -725,7 +633,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( astorm )
 	PORT_INCLUDE( system18_generic )
 
-	PORT_MODIFY("PORTC")
+	PORT_MODIFY("P3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
@@ -877,7 +785,7 @@ static INPUT_PORTS_START( ddcrew )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START("P3")
+	PORT_START("EXP3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
@@ -887,7 +795,7 @@ static INPUT_PORTS_START( ddcrew )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
 
-	PORT_START("P4")
+	PORT_START("EXP4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
@@ -897,7 +805,7 @@ static INPUT_PORTS_START( ddcrew )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
 
-	PORT_START("P34START")
+	PORT_START("EXSERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START4 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) // individual mode
@@ -936,7 +844,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ddcrew3p )
 	PORT_INCLUDE( ddcrew2p )
 
-	PORT_MODIFY("PORTC")
+	PORT_MODIFY("P3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
@@ -955,7 +863,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( desertbr )
 	PORT_INCLUDE( system18_generic )
 
-	PORT_MODIFY("PORTC")
+	PORT_MODIFY("P3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
@@ -1101,7 +1009,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( mwalk )
 	PORT_INCLUDE( system18_generic )
 
-	PORT_MODIFY("PORTC")
+	PORT_MODIFY("P3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
@@ -1281,10 +1189,7 @@ WRITE_LINE_MEMBER(segas18_state::vdp_lv4irqline_callback_s18)
 
 WRITE_LINE_MEMBER(segas18_state::ym3438_irq_handler)
 {
-	if (state)
-		m_soundcpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE );
-	else
-		m_soundcpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE );
+	m_soundcpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1303,6 +1208,17 @@ static MACHINE_CONFIG_START( system18, segas18_state )
 
 	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segas18_state, memory_mapper, mapper_sound_r, mapper_sound_w)
 
+	MCFG_DEVICE_ADD("io", SEGA_315_5296, 16000000)
+	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1"))
+	MCFG_315_5296_IN_PORTB_CB(IOPORT("P2"))
+	MCFG_315_5296_IN_PORTC_CB(IOPORT("P3"))
+	MCFG_315_5296_OUT_PORTD_CB(WRITE8(segas18_state, misc_outputs_w))
+	MCFG_315_5296_IN_PORTE_CB(IOPORT("SERVICE"))
+	MCFG_315_5296_IN_PORTF_CB(IOPORT("COINAGE"))
+	MCFG_315_5296_IN_PORTG_CB(IOPORT("DSW"))
+	MCFG_315_5296_OUT_PORTH_CB(WRITE8(segas18_state, rom_5874_bank_w))
+	MCFG_315_5296_OUT_CNT1_CB(DEVWRITELINE("segaic16vid", segaic16_video_device, segaic16_set_display_enable))
+	MCFG_315_5296_OUT_CNT2_CB(WRITELINE(segas18_state, set_vdp_enable))
 
 	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, 0)
 	MCFG_SEGA315_5313_IS_PAL(false)
@@ -1315,10 +1231,9 @@ static MACHINE_CONFIG_START( system18, segas18_state )
 
 	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer", "gen_vdp", sega315_5313_device, megadriv_scanline_timer_callback_alt_timing, "screen", 0, 1)
 
-
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.23)    // verified on pcb
+	MCFG_SCREEN_REFRESH_RATE(57.23) // verified on pcb
 	MCFG_SCREEN_SIZE(342,262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(segas18_state, screen_update)
@@ -1347,12 +1262,24 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( system18_fd1094, system18 )
+
+	// basic machine hardware
 	MCFG_CPU_REPLACE("maincpu", FD1094, 10000000)
 	MCFG_CPU_PROGRAM_MAP(system18_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas18_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( lghost, system18_fd1094 )
+
+	// basic machine hardware
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_315_5296_OUT_PORTC_CB(WRITE8(segas18_state, lghost_gun_recoil_w))
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_DERIVED( system18_fd1094_i8751, system18_fd1094 )
+
+	// basic machine hardware
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_REMOVE()
 
@@ -2403,7 +2330,6 @@ DRIVER_INIT_MEMBER(segas18_state,ddcrew)
 
 DRIVER_INIT_MEMBER(segas18_state,lghost)
 {
-	m_has_guns = true;
 	init_generic_5987();
 	m_custom_io_r = read16_delegate(FUNC(segas18_state::lghost_custom_io_r), this);
 	m_custom_io_w = write16_delegate(FUNC(segas18_state::lghost_custom_io_w), this);
@@ -2440,8 +2366,8 @@ GAME( 1991, ddcrew1,   ddcrew,   system18_fd1094,      ddcrew,   segas18_state, 
 GAME( 1991, ddcrewj,   ddcrew,   system18_fd1094,      ddcrew,   segas18_state, ddcrew,       ROT0,   "Sega",          "D. D. Crew (Japan, 4 Players, FD1094 317-0185)", 0 )
 GAME( 1991, ddcrewj2,  ddcrew,   system18_fd1094,      ddcrew2p, segas18_state, ddcrew,       ROT0,   "Sega",          "D. D. Crew (Japan, 2 Players, FD1094 317-0182)", 0 )
 GAME( 1991, hamaway,   0,        system18,             hamaway,  segas18_state, hamaway,      ROT90,  "Sega / Santos", "Hammer Away (Japan, prototype)", 0 )
-GAME( 1990, lghost,    0,        system18_fd1094,      lghost,   segas18_state, lghost,       ROT0,   "Sega",          "Laser Ghost (World, FD1094 317-0166)", 0 )
-GAME( 1990, lghostu,   lghost,   system18_fd1094,      lghost,   segas18_state, lghost,       ROT0,   "Sega",          "Laser Ghost (US, FD1094 317-0165)", 0 )
+GAME( 1990, lghost,    0,        lghost,               lghost,   segas18_state, lghost,       ROT0,   "Sega",          "Laser Ghost (World, FD1094 317-0166)", 0 )
+GAME( 1990, lghostu,   lghost,   lghost,               lghost,   segas18_state, lghost,       ROT0,   "Sega",          "Laser Ghost (US, FD1094 317-0165)", 0 )
 GAME( 1990, mwalk,     0,        system18_fd1094_i8751,mwalk,    segas18_state, generic_5874, ROT0,   "Sega",          "Michael Jackson's Moonwalker (World, FD1094/8751 317-0159)", 0 )
 GAME( 1990, mwalku,    mwalk,    system18_fd1094_i8751,mwalka,   segas18_state, generic_5874, ROT0,   "Sega",          "Michael Jackson's Moonwalker (US, FD1094/8751 317-0158)", 0 )
 GAME( 1990, mwalkj,    mwalk,    system18_fd1094_i8751,mwalk,    segas18_state, generic_5874, ROT0,   "Sega",          "Michael Jackson's Moonwalker (Japan, FD1094/8751 317-0157)", 0 )
@@ -2449,5 +2375,5 @@ GAME( 1989, pontoon,   0,        system18_fd1094,      shdancer, segas18_state, 
 GAME( 1989, shdancer,  0,        system18,             shdancer, segas18_state, generic_shad, ROT0,   "Sega",          "Shadow Dancer (World)", 0 )
 GAME( 1989, shdancerj, shdancer, system18,             shdancer, segas18_state, generic_shad, ROT0,   "Sega",          "Shadow Dancer (Japan)", 0 )
 GAME( 1989, shdancer1, shdancer, system18,             shdancer, segas18_state, generic_shad, ROT0,   "Sega",          "Shadow Dancer (US)", 0 )
-GAME( 1992, wwallyj,   0,        system18_fd1094,      wwally,   segas18_state, wwally,       ROT0,   "Sega",          "Wally wo Sagase! (rev B, Japan, FD1094 317-0197B)", 0) // the roms do contain an english logo so maybe there is a world / us set too
+GAME( 1992, wwallyj,   0,        system18_fd1094,      wwally,   segas18_state, wwally,       ROT0,   "Sega",          "Wally wo Sagase! (rev B, Japan, FD1094 317-0197B)", 0 ) // the roms do contain an english logo so maybe there is a world / us set too
 GAME( 1992, wwallyja,  wwallyj,  system18_fd1094,      wwally,   segas18_state, wwally,       ROT0,   "Sega",          "Wally wo Sagase! (rev A, Japan, FD1094 317-0197A)", 0 )
