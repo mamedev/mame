@@ -3981,6 +3981,157 @@ ROM_START( mspacmanbcc )
 	ROM_LOAD( "82s129-2.c9",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) /* timing - not used */ // == 82s126.3m
 ROM_END
 
+/*
+
+
+  Double Command Pac-Man game.
+  ----------------------------
+
+  Manufactured by Miky SRL.
+
+  Double board system.
+  Silkscreened "G-GA-1" and "G-GB-2"
+
+  1x Z80. @ 6a
+
+  1x 27256 (program) @ 6f
+
+  4x 2716 (gfx) @ 5e, 5f, 5h, 5j
+
+  3x HM1-7611-5 PROMs @ 1m, 3m, 4a
+
+  1x Xtal (no marks) @ 7b
+  1x DIP switches bank @ 9d (2-3-5 ON, 1-4-6-7-8 OFF).
+
+  1x 2x22 edge connector (converted to JAMMA).
+  1x 2x18 edge connector.
+
+  1x sticker warning about use 4.75 V. max.
+
+
+  WIRES PATCH:
+
+  The program ROM is a 27256 (28-pins) inserted into a 24-pins socket @ location 6f.
+  Aligned at the base, the upper part is out of the socket. some other legs are out of the socket.
+
+  OUT LEGS:
+
+  01 (Vpp) --> Tied to +5V
+  02 (A12) --> Tied to Z80 pin 02 (A12).
+  20 (/E)  --> Tied to pin 06 of 74LS139 @ location 7m, and pin 12 of 74LS42P @ location 7n
+  22 (/G)
+  23 (A11) --> Tied to Z80 pin 01 (A11).
+  26 (A13) --> Tied to Z80 pin 03 (A13).
+  27 (A14) --> Tied to Z80 pin 05 (A15), and pin 13 of 74LS42P @ location 7n.
+  28 (Vcc) --> Tied to +5V
+
+
+  Data lines look straight...
+
+
+   Z80  | 27256
+  ------+-------
+   07 <---> 16
+   08 <---> 15
+   09 <---> 17
+   10 <---> 18
+   11 <---> 01/28 (+5V)
+   12 <---> 13
+   13 <---> 19
+   14 <---> 11
+   15 <---> 12
+
+
+  Because EPROM A14 goes to Z80 A15, and Z80 A14 isn't connected to anything,
+  the EPROM data should be offset as follows:
+
+
+  Z80 address | EPROM offset
+  ------------+-------------
+   0000-3FFF  |  0000-3FFF
+   4000-7FFF  |  0000-3FFF
+   8000-BFFF  |  4000-7FFF
+   C000-FFFF  |  4000-7FFF
+
+
+  That's how the data is arranged, but the EPROM only drives the bus when the
+  enable pin (/E) is asserted.
+
+
+
+  About the bipolar PROMs...
+
+  Harris Semiconductor
+  Search: HM1-7611-5
+  Fuse-Programmable PROM
+  Number of Words=256
+  Bits Per Word=4
+  t(a) Max. (s) Access Time=60n
+  Output Config=3-State
+  Number of Chip Selects=2
+  Program Voltage (V)=14
+  Nom. Supp (V)=5.0
+  Status=Discontinued
+  Package=DIP
+  Pins=16
+  Military=N
+  Technology=TTL
+
+  http://www.bg-electronics.de/datenblaetter/Schaltkreise/HM-7611.pdf
+
+
+
+  256*4 = 1024 bit 
+ 
+     +--\/--+ 
+  A6 |01  16| Vcc 
+  A5 |02  15| A7 
+  A4 |03  14| /CE2 
+  A3 |04  13| /CE1 
+  A0 |05  12| D0 
+  A1 |06  11| D1 
+  A2 |07  10| D2 
+  GND|08  09| D3 
+     +------+ 
+
+   NEC   Fujitsu Fairchild Intersil Mitsubishi 
+  ------ ------- --------- -------- ---------- 
+  uPB423 MB7052   93427    IM5623    M54700 
+         MB7114 
+ 
+  Signetics     MMI    TI       Harris  Raytheon  AMD   National Intel  OKI 
+  ------------ ------ -------- -------- -------- ------ -------- ----- --------
+  82S129       6301-1 TBP24S10 HM7611-5 29661    27S21  74S287   3621  MBL8521A 
+  82S129A      63S141 TBP34S10 HM7611A           27S21A
+  82S27                                                          27S11
+ 
+
+
+  Dumps and docs by Robbie.
+  Credits: Roberto Fresca, ytsejam
+
+*/
+
+ROM_START( clubpacm )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "prg.6f",  0x0000, 0x4000, CRC(9baa78a2) SHA1(0f153b047028e8a065fbedd2a67d6601a8a4e384) )
+	ROM_CONTINUE(0x8000,0x4000)
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "12.5e",   0x0000, 0x0800, CRC(93933d1d) SHA1(fa38d2cb87e872bb9a3158a4df98f38360dc85ec) )
+	ROM_LOAD( "14.5h",   0x0800, 0x0800, CRC(7409fbec) SHA1(f440f08ba026ae6172666e1bdc0894ce33bba420) )
+	ROM_LOAD( "13.5f",   0x1000, 0x0800, CRC(22b0188a) SHA1(a9ed9ca8b36a60081fd364abc9bc23963932cc0b) )
+	ROM_LOAD( "15.5j",   0x1800, 0x0800, CRC(50c7477d) SHA1(c04ec282a8cb528df5e38ad750d12ee71612695d) )
+
+	// proms have not been dumped
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "82s123.7f",    0x0000, 0x0020, BAD_DUMP CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
+	ROM_LOAD( "82s129.4a",    0x0020, 0x0100, BAD_DUMP CRC(63efb927) SHA1(5c144a613fc4960a1dfd7ead89e7fee258a63171) )
+
+	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
+	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, BAD_DUMP CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    /* timing - not used */
+ROM_END
 
 ROM_START( hangly )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -6704,6 +6855,7 @@ GAME( 1992, mspacmanblt,mspacman,woodpek, mspacman, driver_device, 0,        ROT
 GAME( 1991, mspacmanbcc,mspacman,woodpek, mspacman, driver_device, 0,        ROT90,  "bootleg (Tecnausa)", "Come-Cocos (Ms. Pac-Man) ('Made in Greece' Tecnausa bootleg)", GAME_SUPPORTS_SAVE ) // ^ same PCB, also dated 1991, distributed by Tecnausa
 GAME( 198?, pacmansp,   puckman, pacman,  pacmansp, driver_device, 0,        ROT90,  "bootleg",            "Puck Man (Spanish, 'Made in Greece' bootleg)", GAME_SUPPORTS_SAVE ) // probably a further conversion of the mspacmanbg bootleg, still has some MS Pacman code + extra features
 
+GAME( 1991, clubpacm,  0,       woodpek, mspacman, driver_device, 0,        ROT90,  "Miky SRL", "Club Pacman / Lambada (Argentina)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 
 GAME( 1985, jumpshot, 0,        pacman,   jumpshot, pacman_state,  jumpshot, ROT90,  "Bally Midway", "Jump Shot", GAME_SUPPORTS_SAVE )
 GAME( 1985, jumpshotp,jumpshot, pacman,   jumpshotp,pacman_state,  jumpshot, ROT90,  "Bally Midway", "Jump Shot Engineering Sample", GAME_SUPPORTS_SAVE )
