@@ -1983,6 +1983,9 @@ void n64_rdp::DrawTriangle(bool shade, bool texture, bool zbuffer, bool rect)
 	int dzdx_dz = (dzdx >> 16) & 0xffff;
 
 	extent_t Spans[2048];
+#ifdef MAME_DEBUG
+	memset(Spans, 0xcc, sizeof(Spans));
+#endif
 
 	SpanBase.m_span_drdy = drdy;
 	SpanBase.m_span_dgdy = dgdy;
