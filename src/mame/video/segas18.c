@@ -29,8 +29,8 @@
 void segas18_state::video_start()
 {
 	m_temp_bitmap.allocate(m_screen->width(), m_screen->height());
-	m_grayscale_enable = false;
-	m_vdp_enable = false;
+	m_grayscale_enable = 0;
+	m_vdp_enable = 0;
 	m_vdp_mixing = 0;
 
 	// initialize the tile/text layers
@@ -50,23 +50,23 @@ void segas18_state::video_start()
  *
  *************************************/
 
-void segas18_state::set_grayscale(bool enable)
+WRITE_LINE_MEMBER(segas18_state::set_grayscale)
 {
-	if (enable != m_grayscale_enable)
+	if (state != m_grayscale_enable)
 	{
 		m_screen->update_partial(m_screen->vpos());
-		m_grayscale_enable = enable;
+		m_grayscale_enable = state;
 //      osd_printf_debug("Grayscale = %02X\n", enable);
 	}
 }
 
 
-void segas18_state::set_vdp_enable(bool enable)
+WRITE_LINE_MEMBER(segas18_state::set_vdp_enable)
 {
-	if (enable != m_vdp_enable)
+	if (state != m_vdp_enable)
 	{
 		m_screen->update_partial(m_screen->vpos());
-		m_vdp_enable = enable;
+		m_vdp_enable = state;
 #if DEBUG_VDP
 		osd_printf_debug("VDP enable = %02X\n", enable);
 #endif
@@ -222,6 +222,7 @@ UINT32 segas18_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	// mix in sprites
 	bitmap_ind16 &sprites = m_sprites->bitmap();
 	for (const sparse_dirty_rect *rect = m_sprites->first_dirty_rect(cliprect); rect != NULL; rect = rect->next())
+	{
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
 			UINT16 *dest = &bitmap.pix(y);
@@ -248,6 +249,7 @@ UINT32 segas18_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				}
 			}
 		}
+	}
 
 #if DEBUG_VDP
 	if (m_vdp_enable && machine().input().code_pressed(KEYCODE_V))

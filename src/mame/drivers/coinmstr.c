@@ -1407,7 +1407,7 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( coinmstr )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 46*32 )
 GFXDECODE_END
 
 
