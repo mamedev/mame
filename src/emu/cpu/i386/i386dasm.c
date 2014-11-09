@@ -17,6 +17,7 @@ enum
 	PARAM_REG3264,      /* 32-bit or 64-bit register */
 	PARAM_REG2_32,      /* 32-bit register */
 	PARAM_MMX,          /* MMX register */
+	PARAM_MMX2,         /* MMX register in modrm */
 	PARAM_XMM,          /* XMM register */
 	PARAM_RM,           /* 16 or 32-bit memory or register */
 	PARAM_RM8,          /* 8-bit memory or register */
@@ -739,7 +740,7 @@ static const I386_OPCODE i386_opcode_table2[256] =
 		"cmpsd\0"
 		"cmpss",            MODRM|VAR_NAME4,PARAM_XMM,          PARAM_XMMM,         0               },
 	{"movnti",          MODRM,          PARAM_RM,           PARAM_REG,          0               },
-	{"pinsrw",          MODRM,          PARAM_MMX,          PARAM_MMXM,         PARAM_UI8       },
+	{"pinsrw",          MODRM,          PARAM_MMX,          PARAM_RM,           PARAM_UI8       },
 	{"pextrw",          MODRM,          PARAM_MMX,          PARAM_MMXM,         PARAM_UI8       },
 	{"shufps\0"
 		"shufpd\0"
@@ -1825,11 +1826,11 @@ static const I386_OPCODE group0F71_table[8] =
 {
 	{"???",             0,              0,                  0,                  0               },
 	{"???",             0,              0,                  0,                  0               },
-	{"psrlw",           0,              PARAM_MMX,          PARAM_UI8,          0               },
+	{"psrlw",           0,              PARAM_MMX2,         PARAM_UI8,          0               },
 	{"???",             0,              0,                  0,                  0               },
-	{"psraw",           0,              PARAM_MMX,          PARAM_UI8,          0               },
+	{"psraw",           0,              PARAM_MMX2,         PARAM_UI8,          0               },
 	{"???",             0,              0,                  0,                  0               },
-	{"psllw",           0,              PARAM_MMX,          PARAM_UI8,          0               },
+	{"psllw",           0,              PARAM_MMX2,         PARAM_UI8,          0               },
 	{"???",             0,              0,                  0,                  0               }
 };
 
@@ -1837,24 +1838,24 @@ static const I386_OPCODE group0F72_table[8] =
 {
 	{"???",             0,              0,                  0,                  0               },
 	{"???",             0,              0,                  0,                  0               },
-	{"psrld",           0,              PARAM_MMX,          PARAM_UI8,          0               },
-	{"psrldq",          0,              PARAM_MMX,          PARAM_UI8,          0               },
+	{"psrld",           0,              PARAM_MMX2,         PARAM_UI8,          0               },
 	{"???",             0,              0,                  0,                  0               },
+	{"psrad",           0,              PARAM_MMX2,         PARAM_UI8,          0               },
 	{"???",             0,              0,                  0,                  0               },
-	{"pslld",           0,              PARAM_MMX,          PARAM_UI8,          0               },
-	{"pslldq",          0,              PARAM_MMX,          PARAM_UI8,          0               },
+	{"pslld",           0,              PARAM_MMX2,         PARAM_UI8,          0               },
+	{"???",             0,              0,                  0,                  0               }
 };
 
 static const I386_OPCODE group0F73_table[8] =
 {
 	{"???",             0,              0,                  0,                  0               },
 	{"???",             0,              0,                  0,                  0               },
-	{"psrlq",           0,              PARAM_MMX,          PARAM_UI8,          0               },
+	{"psrlq",           0,              PARAM_MMX2,         PARAM_UI8,          0               },
+	{"psrldq",          0,              PARAM_MMX2,         PARAM_UI8,          0               },
 	{"???",             0,              0,                  0,                  0               },
-	{"psraq",           0,              PARAM_MMX,          PARAM_UI8,          0               },
 	{"???",             0,              0,                  0,                  0               },
-	{"psllq",           0,              PARAM_MMX,          PARAM_UI8,          0               },
-	{"???",             0,              0,                  0,                  0               }
+	{"psllq",           0,              PARAM_MMX2,         PARAM_UI8,          0               },
+	{"pslldq",          0,              PARAM_MMX2,         PARAM_UI8,          0               },
 };
 
 static const I386_OPCODE group0FAE_table[8] =
@@ -2214,6 +2215,13 @@ static char* handle_param(char* s, UINT32 param)
 				s += sprintf( s, "xmm%d", MODRM_REG1 | regex );
 			else
 				s += sprintf( s, "mm%d", MODRM_REG1 | regex );
+			break;
+
+		case PARAM_MMX2:
+			if (pre0f == 0x66 || pre0f == 0xf2 || pre0f == 0xf3)
+				s += sprintf( s, "xmm%d", MODRM_REG2 | regex );
+			else
+				s += sprintf( s, "mm%d", MODRM_REG2 | regex );
 			break;
 
 		case PARAM_XMM:
