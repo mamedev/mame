@@ -7419,7 +7419,6 @@ void rsp_device::generate_checksum_block(drcuml_block *block, compiler_state *co
 			if (seqhead->delay.first() != NULL && seqhead->physpc != seqhead->delay.first()->physpc)
 			{
 				base = m_direct->read_decrypted_ptr(seqhead->delay.first()->physpc | 0x1000);
-				assert(base != NULL);
 				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);                 // load    i1,base,dword
 				UML_ADD(block, I0, I0, I1);                     // add     i0,i0,i1
 
@@ -7442,7 +7441,6 @@ void rsp_device::generate_checksum_block(drcuml_block *block, compiler_state *co
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
 				base = m_direct->read_decrypted_ptr(curdesc->physpc | 0x1000);
-				assert(base != NULL);
 				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);                     // load    i1,base,dword
 				UML_ADD(block, I0, I0, I1);                         // add     i0,i0,i1
 				sum += curdesc->opptr.l[0];
@@ -7450,7 +7448,6 @@ void rsp_device::generate_checksum_block(drcuml_block *block, compiler_state *co
 				if (curdesc->delay.first() != NULL && (curdesc == seqlast || (curdesc->next() != NULL && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
 				{
 					base = m_direct->read_decrypted_ptr(curdesc->delay.first()->physpc | 0x1000);
-					assert(base != NULL);
 					UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);                 // load    i1,base,dword
 					UML_ADD(block, I0, I0, I1);                     // add     i0,i0,i1
 
