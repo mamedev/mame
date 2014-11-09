@@ -1269,10 +1269,60 @@ void i386_device::mmx_group_0f73()  // Opcode 0f 73
 		switch ( (modm & 0x38) >> 3 )
 		{
 			case 2: // psrlq
-				MMX(modm & 7).q=MMX(modm & 7).q >> imm8;
+				if (m_xmm_operand_size)
+				{
+					XMM(modm & 7).q[0] = imm8 > 63 ? 0 : XMM(modm & 7).q[0] >> imm8;
+					XMM(modm & 7).q[1] = imm8 > 63 ? 0 : XMM(modm & 7).q[1] >> imm8;
+				}
+				else
+					MMX(modm & 7).q = imm8 > 63 ? 0 : MMX(modm & 7).q >> imm8;
+				break;
+			case 3: // psrldq
+				if (imm8 >= 16)
+				{
+					XMM(modm & 7).q[0] = 0;
+					XMM(modm & 7).q[1] = 0;
+				}
+				else if(imm8 >= 8)
+				{
+					imm8 = (imm8 & 7) << 3;
+					XMM(modm & 7).q[0] = XMM(modm & 7).q[1] >> imm8;
+					XMM(modm & 7).q[1] = 0;
+				}
+				else if(imm8)
+				{
+					imm8 = imm8 << 3;
+					XMM(modm & 7).q[1] = (XMM(modm & 7).q[0] << (64 - imm8)) | (XMM(modm & 7).q[1] >> imm8);
+					XMM(modm & 7).q[0] = XMM(modm & 7).q[0] >> imm8;
+				}
 				break;
 			case 6: // psllq
-				MMX(modm & 7).q=MMX(modm & 7).q << imm8;
+				if (m_xmm_operand_size)
+				{
+					XMM(modm & 7).q[0] = imm8 > 63 ? 0 : XMM(modm & 7).q[0] << imm8;
+					XMM(modm & 7).q[1] = imm8 > 63 ? 0 : XMM(modm & 7).q[1] << imm8;
+				}
+				else
+					MMX(modm & 7).q = imm8 > 63 ? 0 : MMX(modm & 7).q << imm8;
+				break;
+			case 7: // pslldq
+				if (imm8 >= 16)
+				{
+					XMM(modm & 7).q[0] = 0;
+					XMM(modm & 7).q[1] = 0;
+				}
+				else if(imm8 >= 8)
+				{
+					imm8 = (imm8 & 7) << 3;
+					XMM(modm & 7).q[1] = XMM(modm & 7).q[0] << imm8;
+					XMM(modm & 7).q[0] = 0;
+				}
+				else if(imm8)
+				{
+					imm8 = imm8 << 3;
+					XMM(modm & 7).q[0] = (XMM(modm & 7).q[1] << (64 - imm8)) | (XMM(modm & 7).q[0] >> imm8);
+					XMM(modm & 7).q[1] = XMM(modm & 7).q[1] << imm8;
+				}
 				break;
 			default:
 				report_invalid_modrm("mmx_group0f73", modm);
