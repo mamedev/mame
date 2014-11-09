@@ -3148,7 +3148,7 @@ void i386_device::i386_common_init(int tlbsize)
 
 	zero_state();
 
-	save_item(NAME( m_reg.d));
+	save_item(NAME(m_reg.d));
 	save_item(NAME(m_sreg[ES].selector));
 	save_item(NAME(m_sreg[ES].base));
 	save_item(NAME(m_sreg[ES].limit));
@@ -3190,9 +3190,9 @@ void i386_device::i386_common_init(int tlbsize)
 	save_item(NAME(m_AF));
 	save_item(NAME(m_IF));
 	save_item(NAME(m_TF));
-	save_item(NAME( m_cr));
-	save_item(NAME( m_dr));
-	save_item(NAME( m_tr));
+	save_item(NAME(m_cr));
+	save_item(NAME(m_dr));
+	save_item(NAME(m_tr));
 	save_item(NAME(m_idtr.base));
 	save_item(NAME(m_idtr.limit));
 	save_item(NAME(m_gdtr.base));
@@ -3512,6 +3512,7 @@ void i386_device::zero_state()
 	m_ext = 0;
 	m_halted = 0;
 	m_operand_size = 0;
+	m_xmm_operand_size = 0;
 	m_address_size = 0;
 	m_operand_prefix = 0;
 	m_address_prefix = 0;
@@ -3765,6 +3766,7 @@ void i386_device::execute_run()
 	{
 		i386_check_irq_line();
 		m_operand_size = m_sreg[CS].d;
+		m_xmm_operand_size = 0;
 		m_address_size = m_sreg[CS].d;
 		m_operand_prefix = 0;
 		m_address_prefix = 0;

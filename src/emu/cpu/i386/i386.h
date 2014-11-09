@@ -187,6 +187,7 @@ struct I386_CALL_GATE
 	int m_halted;
 
 	int m_operand_size;
+	int m_xmm_operand_size;
 	int m_address_size;
 	int m_operand_prefix;
 	int m_address_prefix;
@@ -331,6 +332,8 @@ struct I386_CALL_GATE
 	void pentium_msr_write(UINT32 offset, UINT64 data, UINT8 *valid_msr);
 	UINT64 p6_msr_read(UINT32 offset,UINT8 *valid_msr);
 	void p6_msr_write(UINT32 offset, UINT64 data, UINT8 *valid_msr);
+	UINT64 piv_msr_read(UINT32 offset,UINT8 *valid_msr);
+	void piv_msr_write(UINT32 offset, UINT64 data, UINT8 *valid_msr);
 	inline UINT64 MSR_READ(UINT32 offset,UINT8 *valid_msr);
 	inline void MSR_WRITE(UINT32 offset, UINT64 data, UINT8 *valid_msr);
 	UINT32 i386_load_protected_mode_segment(I386_SREG *seg, UINT64 *desc );

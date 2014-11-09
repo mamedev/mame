@@ -1328,6 +1328,31 @@ void i386_device::p6_msr_write(UINT32 offset, UINT64 data, UINT8 *valid_msr)
 	}
 }
 
+
+// PIV (Pentium 4+)
+UINT64 i386_device::piv_msr_read(UINT32 offset,UINT8 *valid_msr)
+{
+	switch(offset)
+	{
+	default:
+		logerror("RDMSR: unimplemented register called %08x at %08x\n",offset,m_pc-2);
+		*valid_msr = 1;
+		return 0;
+	}
+	return -1;
+}
+
+void i386_device::piv_msr_write(UINT32 offset, UINT64 data, UINT8 *valid_msr)
+{
+	switch(offset)
+	{
+	default:
+		logerror("WRMSR: unimplemented register called %08x (%08x%08x) at %08x\n",offset,(UINT32)(data >> 32),(UINT32)data,m_pc-2);
+		*valid_msr = 1;
+		break;
+	}
+}
+
 UINT64 i386_device::MSR_READ(UINT32 offset,UINT8 *valid_msr)
 {
 	UINT64 res;
@@ -1342,6 +1367,9 @@ UINT64 i386_device::MSR_READ(UINT32 offset,UINT8 *valid_msr)
 		break;
 	case 6:  // Pentium Pro, Pentium II, Pentium III
 		res = p6_msr_read(offset,valid_msr);
+		break;
+	case 15:  // Pentium 4+
+		res = piv_msr_read(offset,valid_msr);
 		break;
 	default:
 		res = 0;
@@ -1363,6 +1391,9 @@ void i386_device::MSR_WRITE(UINT32 offset, UINT64 data, UINT8 *valid_msr)
 		break;
 	case 6:  // Pentium Pro, Pentium II, Pentium III
 		p6_msr_write(offset,data,valid_msr);
+		break;
+	case 15:  // Pentium 4+
+		piv_msr_write(offset,data,valid_msr);
 		break;
 	}
 }
