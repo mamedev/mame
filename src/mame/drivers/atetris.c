@@ -343,6 +343,8 @@ static MACHINE_CONFIG_START( atetrisb2, atetris_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,BOOTLEG_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(atetrisb2_map)
+	
+	MCFG_SLAPSTIC_ADD("slapstic")
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
