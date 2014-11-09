@@ -134,6 +134,9 @@ READ8_MEMBER(beckerport_device::read)
 {
     unsigned char data = 0x5a;
 
+    if (m_pSocket == NULL)
+        return data;
+
     switch (offset)
     {
         case DWS_STATUS:
@@ -173,6 +176,9 @@ WRITE8_MEMBER(beckerport_device::write)
 {
     char d = (char)data;
     file_error filerr;
+
+    if (m_pSocket == NULL)
+        return;
 
     switch (offset)
     {
