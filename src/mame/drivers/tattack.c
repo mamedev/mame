@@ -176,7 +176,7 @@ static const gfx_layout charlayout =
 
 
 static GFXDECODE_START( tattack )
-	GFXDECODE_ENTRY( "gfx1", 0     , charlayout,  0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0     , charlayout,  0, 8 )
 GFXDECODE_END
 
 PALETTE_INIT_MEMBER(tattack_state, tattack)
