@@ -1183,7 +1183,7 @@ static const gfx_layout cupsocsb_tilelayout =
 
 static GFXDECODE_START( heatbrl_csb )
 	GFXDECODE_ENTRY( "gfx1", 0, cupsocsb_8x8_tilelayout,    48*16, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, cupsocsb_tilelayout,        0*16, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, cupsocsb_tilelayout,        0*16, 32 )
 	GFXDECODE_ENTRY( "gfx4", 0, cupsocsb_tilelayout,        32*16, 16 ) /* unused */
 	GFXDECODE_ENTRY( "gfx2", 0, cupsocsb_spritelayout,      0*16, 8*16 )
 	GFXDECODE_ENTRY( "gfx5", 0, cupsocsb_tilelayout,        32*16, 16 )

@@ -137,7 +137,7 @@ static const gfx_layout char16layout =
 };
 
 static GFXDECODE_START( sbugger )
-	GFXDECODE_ENTRY( "gfx1", 0, char16layout,   0, 1  )
+	GFXDECODE_ENTRY( "gfx1", 0, char16layout,   0, 256  )
 GFXDECODE_END
 
 
@@ -278,5 +278,5 @@ ROM_START( sbuggera )
 	ROM_LOAD( "spbugger.gfx", 0x0000, 0x1000, CRC(d3f345b5) SHA1(a5082ffc3043352e9b731af95770bdd62fb928bf) )
 ROM_END
 
-GAME( 1981, sbugger,  0,        sbugger,  sbugger, driver_device,  0, ROT270, "Game-A-Tron", "Space Bugger (set 1)", GAME_NOT_WORKING | GAME_IMPERFECT_COLORS )
-GAME( 1981, sbuggera, sbugger,  sbugger,  sbugger, driver_device,  0, ROT270, "Game-A-Tron", "Space Bugger (set 2)", GAME_IMPERFECT_COLORS )
+GAME( 1981, sbugger,  0,        sbugger,  sbugger, driver_device,  0, ROT270, "Game-A-Tron", "Space Bugger (set 1)", GAME_NOT_WORKING | GAME_WRONG_COLORS )
+GAME( 1981, sbuggera, sbugger,  sbugger,  sbugger, driver_device,  0, ROT270, "Game-A-Tron", "Space Bugger (set 2)", GAME_WRONG_COLORS )

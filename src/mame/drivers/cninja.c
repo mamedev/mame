@@ -770,7 +770,7 @@ GFXDECODE_END
 static GFXDECODE_START( mutantf )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 64 )    /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0, 64 )    /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,          0, 64 )    /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,          0, 80 )    /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,      0, 128 ) /* Sprites 16x16 */
 	GFXDECODE_ENTRY( "gfx5", 0, spritelayout,     0, 16 )   /* Sprites 16x16 */
 GFXDECODE_END

@@ -1139,11 +1139,11 @@ static const gfx_layout s2k_charlayout =
 ******************************/
 
 static GFXDECODE_START( ampoker2 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 128 )
 GFXDECODE_END
 
 static GFXDECODE_START( sigma2k )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, s2k_charlayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, s2k_charlayout, 0, 128 )
 GFXDECODE_END
 
 /*************************
