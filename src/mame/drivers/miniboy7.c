@@ -203,7 +203,7 @@ TILE_GET_INFO_MEMBER(miniboy7_state::get_bg_tile_info)
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index];
 	int bank = (attr & 0x02) >> 1;  /* bit 1 switch the gfx banks */
-	int color = (attr & 0x3c);  /* bits 2-3-4-5 for color? */
+	int color = (attr & 0x3c) >> 2;  /* bits 2-3-4-5 for color? */
 
 	if (bank == 1)  /* temporary hack to point to the 3rd gfx bank */
 		bank = 2;
@@ -367,7 +367,7 @@ static const gfx_layout tilelayout =
 	8, 8,
 	RGN_FRAC(1,3),
 	3,
-	{ 0, RGN_FRAC(1,3), RGN_FRAC(2,3) },    /* bitplanes are separated */
+	{ RGN_FRAC(2,3), RGN_FRAC(1,3), 0 },    /* bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
@@ -379,14 +379,14 @@ static const gfx_layout tilelayout =
 ****************************************/
 
 static GFXDECODE_START( miniboy7 )
-	GFXDECODE_ENTRY( "gfx1", 0x0800,    charlayout, 0, 16 ) /* text layer 1 */
-	GFXDECODE_ENTRY( "gfx1", 0x0000,    charlayout, 0, 16 ) /* text layer 2 */
+	GFXDECODE_ENTRY( "gfx1", 0x0800,    charlayout, 0, 128 ) /* text layer 1 */
+	GFXDECODE_ENTRY( "gfx1", 0x0000,    charlayout, 0, 128 ) /* text layer 2 */
 
 	/* 0x000 cards
 	   0x100 joker
 	   0x200 dices
 	   0x300 bigtxt */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0, 32 )
 
 GFXDECODE_END
 
@@ -477,7 +477,7 @@ ROM_START( miniboy7 )
 	ROM_LOAD( "mb7_cg2.d13",    0x2000, 0x2000, CRC(b3362650) SHA1(603907fd3a0049c0a3e1858c4329bf9fd58137f6) )  /* bitplane 2 */
 	ROM_LOAD( "mb7_cg3.d14",    0x4000, 0x2000, CRC(10c2bf71) SHA1(23a01625b0fc0b772054ee4bc026d2257df46a03) )  /* bitplane 3 */
 
-	ROM_REGION( 0x0200, "proms", 0 )    /* both bipolar PROMs are identical */
+	ROM_REGION( 0x0200, "proms", ROMREGION_INVERT )    /* both bipolar PROMs are identical */
 	ROM_LOAD( "j.e7",   0x0000, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) ) /* N82S129N BPROM simply labeled J */
 	ROM_LOAD( "j.f10",  0x0100, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) ) /* N82S129N BPROM simply labeled J */
 ROM_END
@@ -503,7 +503,7 @@ ROM_START( miniboy7a )
 	ROM_LOAD( "mb72.13d",   0x2000, 0x2000, CRC(b3362650) SHA1(603907fd3a0049c0a3e1858c4329bf9fd58137f6) )
 	ROM_LOAD( "mb73.14d",   0x4000, 0x2000, CRC(10c2bf71) SHA1(23a01625b0fc0b772054ee4bc026d2257df46a03) )
 
-	ROM_REGION( 0x0200, "proms", 0 )    /* both bipolar PROMs are identical */
+	ROM_REGION( 0x0200, "proms", ROMREGION_INVERT )    /* both bipolar PROMs are identical */
 	ROM_LOAD( "j.e7",   0x0000, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) ) /* N82S129N BPROM simply labeled J */
 	ROM_LOAD( "j.f10",  0x0100, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) ) /* N82S129N BPROM simply labeled J */
 ROM_END
@@ -525,7 +525,7 @@ ROM_START( miniboy7b ) /* "Might" be the same set as miniboy7a, all roms read co
 	ROM_LOAD( "mb7_2.13d",   0x2000, 0x2000, CRC(b3362650) SHA1(603907fd3a0049c0a3e1858c4329bf9fd58137f6) )
 	ROM_LOAD( "mb7_3.14d",   0x4000, 0x2000, CRC(10c2bf71) SHA1(23a01625b0fc0b772054ee4bc026d2257df46a03) )
 
-	ROM_REGION( 0x0200, "proms", 0 )    /* both bipolar PROMs are identical */
+	ROM_REGION( 0x0200, "proms", ROMREGION_INVERT )    /* both bipolar PROMs are identical */
 	ROM_LOAD( "j.e7",   0x0000, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) ) /* N82S129N BPROM simply labeled J */
 	ROM_LOAD( "j.f10",  0x0100, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) ) /* N82S129N BPROM simply labeled J */
 ROM_END
