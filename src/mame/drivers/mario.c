@@ -448,8 +448,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( mario )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,     0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 32 )
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 32 )
 GFXDECODE_END
 
 static const gfx_layout spritelayout_bl =
@@ -466,8 +466,8 @@ static const gfx_layout spritelayout_bl =
 };
 
 static GFXDECODE_START( mariobl )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_bl,     0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 32 )
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_bl, 0, 32 )
 GFXDECODE_END
 
 static const gfx_layout spritelayout_bl2 =
@@ -521,7 +521,7 @@ static MACHINE_CONFIG_START( mario_base, mario_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mario_state, screen_update_mario)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mario)
-	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(mario_state, mario)
 
 MACHINE_CONFIG_END
@@ -577,7 +577,7 @@ static MACHINE_CONFIG_START( mariobl, mario_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mario_state, screen_update_mariobl)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mariobl)
-	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(mario_state, mario)
 
 	/* sound hardware */

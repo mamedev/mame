@@ -10997,8 +10997,10 @@ pepp0014a       // (c) 1987 IGT - International Game Technology
 pepp0023        // (c) 1987 IGT - International Game Technology
 pepp0040        // (c) 1987 IGT - International Game Technology
 pepp0041        // (c) 1987 IGT - International Game Technology
+pepp0042        // (c) 1987 IGT - International Game Technology
 pepp0043        // (c) 1987 IGT - International Game Technology
 pepp0043a       // (c) 1987 IGT - International Game Technology
+pepp0043b       // (c) 1987 IGT - International Game Technology
 pepp0045        // (c) 1987 IGT - International Game Technology
 pepp0046        // (c) 1987 IGT - International Game Technology
 pepp0046a       // (c) 1987 IGT - International Game Technology
@@ -11014,6 +11016,7 @@ pepp0059        // (c) 1987 IGT - International Game Technology
 pepp0059a       // (c) 1987 IGT - International Game Technology
 pepp0060        // (c) 1987 IGT - International Game Technology
 pepp0060a       // (c) 1987 IGT - International Game Technology
+pepp0060b       // (c) 1987 IGT - International Game Technology
 pepp0063        // (c) 1987 IGT - International Game Technology
 pepp0064        // (c) 1987 IGT - International Game Technology
 pepp0065        // (c) 1987 IGT - International Game Technology
@@ -11071,6 +11074,7 @@ pepp0423        // (c) 1987 IGT - International Game Technology
 pepp0426        // (c) 1987 IGT - International Game Technology
 pepp0428        // (c) 1987 IGT - International Game Technology
 pepp0429        // (c) 1987 IGT - International Game Technology
+pepp0429a       // (c) 1987 IGT - International Game Technology
 pepp0431        // (c) 1987 IGT - International Game Technology
 pepp0434        // (c) 1987 IGT - International Game Technology
 pepp0447        // (c) 1987 IGT - International Game Technology

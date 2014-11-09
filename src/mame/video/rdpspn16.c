@@ -204,6 +204,9 @@ void n64_rdp::SpanDraw1Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 		dzpix = object.MiscState.PrimitiveDZ;
 		dzinc = 0;
 	}
+	
+	if (object.MiscState.FBSize < 2 || object.MiscState.FBSize > 4)
+		fatalerror("unsupported FBSize %d\n", object.MiscState.FBSize);
 
 	int blend_index = (object.OtherModes.alpha_cvg_select ? 2 : 0) | ((object.OtherModes.rgb_dither_sel < 3) ? 1 : 0);
 	int read_index = ((object.MiscState.FBSize - 2) << 1) | object.OtherModes.image_read_en;
