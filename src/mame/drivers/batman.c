@@ -181,7 +181,7 @@ static const gfx_layout pfmolayout =
 
 
 static GFXDECODE_START( batman )
-	GFXDECODE_ENTRY( "gfx3", 0, pfmolayout,  512, 16 )      /* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx3", 0, pfmolayout,  512, 32 )      /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,  256, 16 )      /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx1", 0, anlayout,      0, 64 )      /* characters 8x8 */
 GFXDECODE_END

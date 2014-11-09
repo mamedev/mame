@@ -556,8 +556,8 @@ static const gfx_layout splayout =
 
 
 static GFXDECODE_START( pipedrm )
-	GFXDECODE_ENTRY( "gfx1", 0, bglayout,    0, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0, bglayout,    0, 64 )
+	GFXDECODE_ENTRY( "gfx1", 0, bglayout,    0, 128 )
+	GFXDECODE_ENTRY( "gfx2", 0, bglayout,    0, 128 )
 	GFXDECODE_ENTRY( "gfx3", 0, splayout, 1024, 32 )
 GFXDECODE_END
 

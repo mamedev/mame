@@ -2149,6 +2149,7 @@ void k056832_device::create_gfx(const char *gfx_memory_region, int bpp, int big)
 	}
 
 	m_gfxdecode->gfx(gfx_index)->set_granularity(16); /* override */
+	m_gfxdecode->gfx(gfx_index)->set_colors(m_palette->entries() / 16);
 
 	m_gfx_memory_region = gfx_memory_region;
 	m_gfx_num = gfx_index;
