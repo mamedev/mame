@@ -1,3 +1,8 @@
+/*
+  Sega system24 hardware
+
+*/
+
 #ifndef __SEGAIC24_H
 #define __SEGAIC24_H
 
