@@ -91,6 +91,11 @@ void pci_device::scan_sub_devices(pci_device **devices, dynamic_array<pci_device
 {
 }
 
+void pci_device::set_remap_cb(mapper_cb _remap_cb)
+{
+	remap_cb = _remap_cb;
+}
+
 void pci_device::reset_all_mappings()
 {
 }
@@ -163,6 +168,14 @@ device_t *pci_bridge_device::bus_root()
 	return this;
 }
 
+void pci_bridge_device::set_remap_cb(mapper_cb _remap_cb)
+{
+	remap_cb = _remap_cb;
+	for(int i=0; i != all_devices.count(); i++)
+		if(all_devices[i] != this)
+			all_devices[i]->set_remap_cb(_remap_cb);
+}
+
 void pci_bridge_device::device_start()
 {
 	pci_device::device_start();
@@ -179,10 +192,15 @@ void pci_bridge_device::device_start()
 		int fct = t[l-1] - '0';
 		sub_devices[(id << 3) | fct] = downcast<pci_device *>(d);
 	}
+
+	mapper_cb cf_cb(FUNC(pci_bridge_device::regenerate_config_mapping), this);
+
 	for(int i=0; i<32*8; i++)
 		if(sub_devices[i]) {
 			all_devices.append(sub_devices[i]);
 			if(sub_devices[i] != this) {
+				sub_devices[i]->remap_config_cb = cf_cb;
+				sub_devices[i]->set_remap_cb(remap_cb);
 				pci_bridge_device *bridge = dynamic_cast<pci_bridge_device *>(sub_devices[i]);
 				if(bridge)
 					all_bridges.append(bridge);
@@ -262,10 +280,16 @@ device_t *pci_host_device::bus_root()
 
 void pci_host_device::device_start()
 {
+	remap_cb = mapper_cb(FUNC(pci_host_device::regenerate_mapping), this);
+
 	pci_bridge_device::device_start();
 
 	memory_window_start = memory_window_end = memory_offset = 0;
 	io_window_start = io_window_end = io_offset = 0;
+
+	for(int i=0; i != all_devices.count(); i++)
+		if(all_devices[i] != this)
+			all_devices[i]->reset_all_mappings();
 }
 
 void pci_host_device::device_reset()

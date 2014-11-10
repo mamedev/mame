@@ -71,7 +71,7 @@ void i6300esb_lpc_device::reset_all_mappings()
 	lpc_if_sound_range = 0x00;
 	fwh_dec_en1 = 0xff;
 	gen1_dec = 0x0000;
-	lpc_en = 0x2000;
+	lpc_en = 0x0000;
 	fwh_sel1 = 0x00112233;
 }
 
@@ -85,6 +85,7 @@ WRITE32_MEMBER(i6300esb_lpc_device::gpio_base_w)
 	COMBINE_DATA(&gpio_base);
 	gpio_base &= 0x0000ffc0;
 	logerror("%s: gpio_base = %08x\n", tag(), gpio_base);
+	remap_cb();
 }
 
 READ8_MEMBER  (i6300esb_lpc_device::gpio_cntl_r)
@@ -96,6 +97,7 @@ WRITE8_MEMBER (i6300esb_lpc_device::gpio_cntl_w)
 {
 	COMBINE_DATA(&gpio_cntl);
 	logerror("%s: gpio_cntl = %02x\n", tag(), gpio_cntl);
+	remap_cb();
 }
 
 READ8_MEMBER  (i6300esb_lpc_device::lpc_if_com_range_r)
@@ -107,6 +109,7 @@ WRITE8_MEMBER (i6300esb_lpc_device::lpc_if_com_range_w)
 {
 	COMBINE_DATA(&lpc_if_com_range);
 	logerror("%s: lpc_if_com_range  = %02x\n", tag(), lpc_if_com_range);
+	remap_cb();
 }
 
 READ8_MEMBER  (i6300esb_lpc_device::lpc_if_fdd_lpt_range_r)
@@ -118,6 +121,7 @@ WRITE8_MEMBER (i6300esb_lpc_device::lpc_if_fdd_lpt_range_w)
 {
 	COMBINE_DATA(&lpc_if_fdd_lpt_range);
 	logerror("%s: lpc_if_fdd_lpt_range  = %02x\n", tag(), lpc_if_fdd_lpt_range);
+	remap_cb();
 }
 
 READ8_MEMBER  (i6300esb_lpc_device::lpc_if_sound_range_r)
@@ -129,6 +133,7 @@ WRITE8_MEMBER (i6300esb_lpc_device::lpc_if_sound_range_w)
 {
 	COMBINE_DATA(&lpc_if_sound_range);
 	logerror("%s: lpc_if_sound_range  = %02x\n", tag(), lpc_if_sound_range);
+	remap_cb();
 }
 
 READ8_MEMBER  (i6300esb_lpc_device::fwh_dec_en1_r)
@@ -140,6 +145,7 @@ WRITE8_MEMBER (i6300esb_lpc_device::fwh_dec_en1_w)
 {
 	fwh_dec_en1 = data | 0x80;
 	logerror("%s: fwh_dec_en1  = %02x\n", tag(), fwh_dec_en1);
+	remap_cb();
 }
 
 READ16_MEMBER (i6300esb_lpc_device::gen1_dec_r)
@@ -151,6 +157,7 @@ WRITE16_MEMBER(i6300esb_lpc_device::gen1_dec_w)
 {
 	COMBINE_DATA(&gen1_dec);
 	logerror("%s: gen1_dec = %04x\n", tag(), gen1_dec);
+	remap_cb();
 }
 
 READ16_MEMBER (i6300esb_lpc_device::lpc_en_r)
@@ -162,6 +169,7 @@ WRITE16_MEMBER(i6300esb_lpc_device::lpc_en_w)
 {
 	COMBINE_DATA(&lpc_en);
 	logerror("%s: lpc_en = %04x\n", tag(), lpc_en);
+	remap_cb();
 }
 
 READ32_MEMBER (i6300esb_lpc_device::fwh_sel1_r)
@@ -173,6 +181,7 @@ WRITE32_MEMBER(i6300esb_lpc_device::fwh_sel1_w)
 {
 	COMBINE_DATA(&fwh_sel1);
 	logerror("%s: fwh_sel1 = %08x\n", tag(), fwh_sel1);
+	remap_cb();
 }
 
 READ32_MEMBER (i6300esb_lpc_device::unk_fc_r)
