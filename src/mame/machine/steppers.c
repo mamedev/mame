@@ -58,6 +58,7 @@ struct stepper
 				type;   /* reel type */
 	INT16   step_pos,   /* step position 0 - max_steps */
 			max_steps;  /* maximum step position */
+	INT32   abs_step_pos; /* absolute step position */
 
 	INT16 index_start,  /* start position of index (in half steps) */
 			index_end,  /* end position of index (in half steps) */
@@ -125,6 +126,7 @@ void stepper_config(running_machine &machine, int which, const stepper_interface
 	step[which].pattern     = 0;
 	step[which].old_pattern = 0;
 	step[which].step_pos    = 0;
+	step[which].abs_step_pos= 0;
 	step[which].phase = step[which].initphase;
 	step[which].old_phase = step[which].initphase;
 
@@ -161,6 +163,7 @@ void stepper_config(running_machine &machine, int which, const stepper_interface
 	state_save_register_item(machine, "stepper", NULL, which, step[which].pattern);
 	state_save_register_item(machine, "stepper", NULL, which, step[which].old_pattern);
 	state_save_register_item(machine, "stepper", NULL, which, step[which].step_pos);
+	state_save_register_item(machine, "stepper", NULL, which, step[which].abs_step_pos);
 	state_save_register_item(machine, "stepper", NULL, which, step[which].max_steps);
 	state_save_register_item(machine, "stepper", NULL, which, step[which].type);
 }
@@ -169,6 +172,12 @@ void stepper_config(running_machine &machine, int which, const stepper_interface
 int stepper_get_position(int which)
 {
 	return step[which].step_pos;
+}
+
+///////////////////////////////////////////////////////////////////////////
+int stepper_get_absolute_position(int which)
+{
+	return step[which].abs_step_pos;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -216,6 +225,7 @@ static void update_optic(int which)
 void stepper_reset_position(int which)
 {
 	step[which].step_pos    = 0x00;
+	step[which].abs_step_pos= 0x00;
 	step[which].pattern     = 0x00;
 	step[which].old_pattern = 0x00;
 	step[which].phase = step[which].initphase;
@@ -551,6 +561,7 @@ int stepper_update(int which, UINT8 pattern)
 
 	if (max!=0)
 	{
+		step[which].abs_step_pos += steps;
 		pos = (step[which].step_pos + steps + max) % max;
 	}
 	else
