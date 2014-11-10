@@ -1131,9 +1131,6 @@ static LONG WINAPI exception_filter(struct _EXCEPTION_POINTERS *info)
 	// flush stderr, so the data is actually written when output is being redirected
 	fflush(stderr);
 
-	// flush stderr, so the data is actually written when output is being redirected
-	fflush(stderr);
-
 	// exit
 	return EXCEPTION_CONTINUE_SEARCH;
 }
