@@ -972,6 +972,29 @@ ROM_START( avefenix )
 	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
 ROM_END
 
+ROM_START( avefenixrf )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "601-ic45.a1",    0x0000, 0x0800, CRC(b04260e9) SHA1(a275ba596e620b1e4dd73792cc9b11fbc55723cc) )
+	ROM_LOAD( "6002-ic46.a2",   0x0800, 0x0800, CRC(25a2e4bd) SHA1(a1188c4d1d059852b59ccfe16dd9a305d7b26299) )
+	ROM_LOAD( "0003-ic47.a3",   0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
+	ROM_LOAD( "6004-ic48.a4",   0x1800, 0x0800, CRC(4b7701b4) SHA1(2330802d4016450985f85937fd58e2a71e77c719) )
+	ROM_LOAD( "6005-ic49.a5",   0x2000, 0x0800, CRC(1ab92ef9) SHA1(ff5a263865895f8534f8535fbcb398af8512cbfe) )
+	ROM_LOAD( "0006-ic50.a6",   0x2800, 0x0800, CRC(ac5e9ec1) SHA1(0402e5241d99759d804291998efd43f37ce99917) )
+	ROM_LOAD( "6007-ic51.a7",   0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) )
+	ROM_LOAD( "f008-ic52.a8",   0x3800, 0x0800, CRC(3719fc84) SHA1(70691d55a86cdad21938a8af2a84ab9cfdc8d76a) )
+
+	ROM_REGION( 0x1000, "bgtiles", 0 )
+	ROM_LOAD( "0011-ic23.d3",      0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "0012-ic24.d4",      0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 )
+	ROM_LOAD( "0009-ic39.b3",   0x0000, 0x0800, CRC(bb0525ed) SHA1(86db1c7584fb3846bfd47535e1585eeb7fbbb1fe) )
+	ROM_LOAD( "0010-ic40.b4",   0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+ROM_END
 
 ROM_START( griffon )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1275,7 +1298,8 @@ GAME( 1980, griffon,  phoenix,  condor,   condor, phoenix_state,   condor,   ROT
 GAME( 1981, nextfase, phoenix,  phoenix,  nextfase, driver_device, 0,        ROT90, "bootleg (Petaco S.A.)", "Next Fase (bootleg of Phoenix)", GAME_SUPPORTS_SAVE )
 // as is this
 GAME( 1981, phoenixs, phoenix,  phoenix,  phoenix, driver_device,  0,        ROT90, "bootleg (Sonic)", "Phoenix (Spanish bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1980, avefenix, phoenix,  phoenix,  phoenix, driver_device,  0,        ROT90, "bootleg (Video Game)", "Ave Fenix (Spanish bootleg of Phoenix)", GAME_SUPPORTS_SAVE )
+GAME( 1980, avefenix, phoenix,  phoenix,  phoenix, driver_device,  0,        ROT90, "bootleg (Video Game)", "Ave Fenix (Electrogame, Spanish bootleg of Phoenix)", GAME_SUPPORTS_SAVE ) // Electrogame (Barcelona) made the dedicated cabinet and is likely the real manufacturer, ingame shows 'Video Game'
+GAME( 1980, avefenixrf,phoenix, phoenix,  phoenix, driver_device,  0,        ROT90, "bootleg (Recreativos Franco S.A.)", "Ave Fenix (Recreativos Franco, Spanish bootleg of Phoenix)", GAME_SUPPORTS_SAVE )
 
 GAME( 1981, pleiads,  0,        pleiads,  pleiads, driver_device,  0,        ROT90, "Tehkan", "Pleiads (Tehkan)", GAME_IMPERFECT_COLORS )
 GAME( 1981, pleiadsb2,pleiads,  pleiads,  pleiads, driver_device,  0,        ROT90, "bootleg (ESG)", "Pleiads (bootleg set 2)", GAME_SUPPORTS_SAVE )
