@@ -862,45 +862,63 @@ void upd7801_device::upd7810_take_irq()
 	}
 }
 
+void upd7810_device::upd7810_co0_output_change()
+{
+	/* Output LV0 Content to CO0 */
+	CO0 = LV0;
+
+	/* LV0 Level Inversion */
+	if (EOM & 0x02)
+		LV0 ^= 1;
+
+	m_co0_func(CO0);
+}
+void upd7810_device::upd7810_co1_output_change()
+{
+	/* Output LV1 Content to CO1 */
+	CO1 = LV1;
+
+	/* LV1 Level Inversion */
+	if (EOM & 0x20)
+		LV1 ^= 1;
+
+	m_co1_func(CO1);
+}
+
 void upd7810_device::upd7810_write_EOM()
 {
-	if (EOM & 0x01) /* output LV0 content */
+	switch (EOM & 0x0c)
 	{
-		switch (EOM & 0x0e)
-		{
-		case 0x02:  /* toggle CO0 */
-			CO0 ^= 1;
-			break;
-		case 0x04:  /* reset CO0 */
-			CO0 = 0;
-			EOM &= 0xfb; /* LRE0 is reset t0 0 */
-			break;
-		case 0x08:  /* set CO0 */
-			CO0 = 1;
-			EOM &= 0xf7; /* LRE1 is reset t0 0 */
-			break;
-		}
-		EOM &= 0xfe; /* LO0 is reset t0 0 */
-		m_co0_func(CO0);
+	case 0x04:  /* To Reset LV0 */
+		LV0 = 0;
+		EOM &= 0xfb; /* LRE0 is reset to 0 */
+		break;
+	case 0x08:  /* To Set LV0 */
+		LV0 = 1;
+		EOM &= 0xf7; /* LRE1 is reset to 0 */
+		break;
 	}
-	if (EOM & 0x10) /* output LV1 content */
+	/* Output LV0 Content */
+	if (EOM & 0x01) {
+		upd7810_co0_output_change();
+		EOM &= 0xfe; /* LO0 is reset to 0 */
+	}
+
+	switch (EOM & 0xc0)
 	{
-		switch (EOM & 0xe0)
-		{
-		case 0x20:  /* toggle CO1 */
-			CO1 ^= 1;
-			break;
-		case 0x40:  /* reset CO1 */
-			CO1 = 0;
-			EOM &= 0xbf; /* LRE2 is reset t0 0 */
-			break;
-		case 0x80:  /* set CO1 */
-			CO1 = 1;
-			EOM &= 0x7f; /* LRE3 is reset t0 0 */
-			break;
-		}
-		EOM &= 0xef; /* LO1 is reset t0 0 */
-		m_co1_func(CO1);
+	case 0x40:  /* To Reset LV1 */
+		LV1 = 0;
+		EOM &= 0xbf; /* LRE2 is reset to 0 */
+		break;
+	case 0x80:  /* To Set LV1 */
+		LV1 = 1;
+		EOM &= 0x7f; /* LRE3 is reset to 0 */
+		break;
+	}
+	/* Output LV1 Content */
+	if (EOM & 0x10) {
+		upd7810_co1_output_change();
+		EOM &= 0xef; /* LO1 is reset to 0 */
 	}
 }
 
@@ -1331,11 +1349,7 @@ void upd7810_device::handle_timers(int cycles)
 			    ((0x20 == (ETMM & 0x30)) && (ETM0 == ECNT)) || /* set CO0 if ECNT == ETM0 or at falling CI input */
 			    ((0x30 == (ETMM & 0x30)) && (ETM0 == ECNT || ETM1 == ECNT))) /* latch CO0 if ECNT == ETM0 or ECNT == ETM1 */
 			{
-				if (EOM & 0x02) {
-					/* toggle CO0 */
-					CO0 ^= 1;
-					m_co0_func(CO0);
-				}
+				upd7810_co0_output_change();
 			}
 			/* Conditions When ECNT Causes a CO1 Output Change */
 			if (((0x00 == (ETMM & 0xc0)) && (ETM1 == ECNT)) || /* set CO1 if ECNT == ETM1 */
@@ -1343,11 +1357,7 @@ void upd7810_device::handle_timers(int cycles)
 			    ((0x80 == (ETMM & 0xc0)) && (ETM1 == ECNT)) || /* set CO1 if ECNT == ETM1 or at falling CI input */
 			    ((0xc0 == (ETMM & 0xc0)) && (ETM0 == ECNT || ETM1 == ECNT))) /* latch CO1 if ECNT == ETM0 or ECNT == ETM1 */
 			{
-				if (EOM & 0x20) {
-					/* toggle CO1 */
-					CO1 ^= 1;
-					m_co1_func(CO1);
-				}
+				upd7810_co1_output_change();
 			}
 			/* How and When ECNT is Cleared */
 			switch (ETMM & 0x0c)
@@ -1607,6 +1617,8 @@ void upd7810_device::base_device_start()
 	save_item(NAME(m_ti));
 	save_item(NAME(m_to));
 	save_item(NAME(m_ci));
+	save_item(NAME(m_lv0));
+	save_item(NAME(m_lv1));
 	save_item(NAME(m_co0));
 	save_item(NAME(m_co1));
 	save_item(NAME(m_irr));
@@ -1677,6 +1689,8 @@ void upd7810_device::device_start()
 	state_add( UPD7810_TI,   "TI",   m_ti).formatstr("%3u");
 	state_add( UPD7810_TO,   "TO",   m_to).formatstr("%3u");
 	state_add( UPD7810_CI,   "CI",   m_ci).formatstr("%3u");
+	state_add( UPD7810_LV0,  "LV0",  m_lv0).formatstr("%3u");
+	state_add( UPD7810_LV1,  "LV1",  m_lv1).formatstr("%3u");
 	state_add( UPD7810_CO0,  "CO0",  m_co0).formatstr("%3u");
 	state_add( UPD7810_CO1,  "CO1",  m_co1).formatstr("%3u");
 
@@ -1794,6 +1808,8 @@ void upd7810_device::device_reset()
 	m_ti = 0;
 	m_to = 0;
 	m_ci = 0;
+	m_lv0 = 0;
+	m_lv1 = 0;
 	m_co0 = 0;
 	m_co1 = 0;
 	m_irr = 0;

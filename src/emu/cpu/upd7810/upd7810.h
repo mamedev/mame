@@ -24,7 +24,8 @@ enum
 	UPD7810_ANM, UPD7810_MKL, UPD7810_MKH, UPD7810_ZCM,
 	UPD7810_TXB, UPD7810_RXB, UPD7810_CR0, UPD7810_CR1, UPD7810_CR2, UPD7810_CR3,
 	UPD7810_AN0, UPD7810_AN1, UPD7810_AN2, UPD7810_AN3, UPD7810_AN4, UPD7810_AN5, UPD7810_AN6, UPD7810_AN7,
-	UPD7810_TXD, UPD7810_RXD, UPD7810_SCK, UPD7810_TI, UPD7810_TO, UPD7810_CI, UPD7810_CO0, UPD7810_CO1
+	UPD7810_TXD, UPD7810_RXD, UPD7810_SCK, UPD7810_TI, UPD7810_TO, UPD7810_CI, UPD7810_CO0, UPD7810_CO1,
+	UPD7810_LV0, UPD7810_LV1
 };
 
 /* port numbers for PA,PB,PC,PD and PF */
@@ -180,6 +181,9 @@ protected:
 	void upd7810_handle_timer0(int cycles, int clkdiv);
 	void upd7810_handle_timer1(int cycles, int clkdiv);
 
+	void upd7810_co0_output_change();
+	void upd7810_co1_output_change();
+
 	devcb_write_line  m_to_func;
 	devcb_write_line  m_co0_func;
 	devcb_write_line  m_co1_func;
@@ -300,6 +304,8 @@ protected:
 	UINT8   m_ti;
 	UINT8   m_to;
 	UINT8   m_ci;
+	UINT8   m_lv0;    /* level flip flop for co0 */
+	UINT8   m_lv1;    /* level flip flop for co1 */
 	UINT8   m_co0;
 	UINT8   m_co1;
 	UINT16  m_irr;    /* interrupt request register */
