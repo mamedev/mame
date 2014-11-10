@@ -27,8 +27,7 @@ public:
 		m_spriteram(*this,"spriteram"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_generic_paletteram_32(*this, "paletteram")
+		m_palette(*this, "palette")
 	{
 		m_coin_lockout = true;
 	}
@@ -40,14 +39,12 @@ public:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT32> m_generic_paletteram_32;
 
 	bool m_coin_lockout;
 	UINT16 m_coin_word;
 	struct tempsprite *m_spritelist;
 	UINT32 m_mem[2];
 
-	DECLARE_WRITE32_MEMBER(gunbustr_palette_w);
 	DECLARE_WRITE32_MEMBER(gunbustr_input_w);
 	DECLARE_WRITE32_MEMBER(motor_control_w);
 	DECLARE_READ32_MEMBER(gunbustr_gun_r);

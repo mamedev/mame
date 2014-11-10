@@ -69,18 +69,6 @@ INTERRUPT_GEN_MEMBER(gunbustr_state::gunbustr_interrupt)
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-WRITE32_MEMBER(gunbustr_state::gunbustr_palette_w)
-{
-	int a;
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
-
-	a = m_generic_paletteram_32[offset] >> 16;
-	m_palette->set_pen_color(offset*2,pal5bit(a >> 10),pal5bit(a >> 5),pal5bit(a >> 0));
-
-	a = m_generic_paletteram_32[offset] &0xffff;
-	m_palette->set_pen_color(offset*2+1,pal5bit(a >> 10),pal5bit(a >> 5),pal5bit(a >> 0));
-}
-
 CUSTOM_INPUT_MEMBER(gunbustr_state::coin_word_r)
 {
 	return m_coin_word;
@@ -168,7 +156,7 @@ static ADDRESS_MAP_START( gunbustr_map, AS_PROGRAM, 32, gunbustr_state )
 	AM_RANGE(0x500000, 0x500003) AM_READWRITE(gunbustr_gun_r, gunbustr_gun_w)                       /* gun coord read */
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, long_r, long_w)
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_long_r, ctrl_long_w)
-	AM_RANGE(0x900000, 0x901fff) AM_RAM_WRITE(gunbustr_palette_w) AM_SHARE("paletteram")            /* Palette ram */
+	AM_RANGE(0x900000, 0x901fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM                                                             /* network ram ?? */
 ADDRESS_MAP_END
 
@@ -275,8 +263,8 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( gunbustr )
-	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout,  0, 512 )
-	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,        0, 512 )
+	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout,  0, 256 )
+	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,        0, 256 )
 GFXDECODE_END
 
 
@@ -303,7 +291,8 @@ static MACHINE_CONFIG_START( gunbustr, gunbustr_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gunbustr)
-	MCFG_PALETTE_ADD("palette", 8192)
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
 	MCFG_TC0480SCP_GFX_REGION(1)
