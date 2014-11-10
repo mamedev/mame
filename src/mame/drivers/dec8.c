@@ -3569,27 +3569,17 @@ DRIVER_INIT_MEMBER(dec8_state,garyoret)
 DRIVER_INIT_MEMBER(dec8_state,ghostb)
 {
 	UINT8 *ROM = memregion("maincpu")->base();
-	UINT8 *RAM = memregion("proms")->base();
-
-	/* Blank out unused garbage in colour prom to avoid colour overflow */
-	memset(RAM + 0x20, 0, 0xe0);
 
 	membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL(dec8);
-	m_palette->update();
 }
 
 DRIVER_INIT_MEMBER(dec8_state,meikyuh)
 {
 	UINT8 *ROM = memregion("maincpu")->base();
-	UINT8 *RAM = memregion("proms")->base();
-
-	/* Blank out unused garbage in colour prom to avoid colour overflow */
-	memset(RAM + 0x20, 0, 0xe0);
 
 	membank("bank1")->configure_entries(0, 12, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL(dec8);
-	m_palette->update();
 }
 
 DRIVER_INIT_MEMBER(dec8_state,csilver)
