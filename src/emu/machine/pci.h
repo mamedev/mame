@@ -52,6 +52,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(bist_r);
 	DECLARE_READ16_MEMBER(subvendor_r);
 	DECLARE_READ16_MEMBER(subsystem_r);
+	virtual DECLARE_READ8_MEMBER(capptr_r);
 
 protected:
 	enum {
