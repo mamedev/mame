@@ -2080,7 +2080,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
 ROM_END
 
-ROM_START( pepp0060b ) /* Normal board : Standard Draw Poker (PP0060) - Cruise - Tournament Mode capable */
+ROM_START( pepp0060b ) /* Normal board : Standard Draw Poker (PP0060) - Cruise version - Tournament Mode capable */
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -8906,7 +8906,7 @@ GAMEL(1987, pepp0059,  pepp0002, peplus,  peplus_poker, peplus_state, peplus,   
 GAMEL(1987, pepp0059a, pepp0002, peplus,  peplus_poker, peplus_state, nonplus,  ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0059) Two Pair or Better (set 2)",    0, layout_pe_poker )
 GAMEL(1987, pepp0060,  pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0060) Standard Draw Poker (set 1)",   0, layout_pe_poker )
 GAMEL(1987, pepp0060a, pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0060) Standard Draw Poker (set 2)",   0, layout_pe_poker )
-GAMEL(1987, pepp0060b, pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0060) Standard Draw Poker (Cruise)",   0, layout_pe_poker )
+GAMEL(1987, pepp0060b, pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0060) Standard Draw Poker (Cruise)",  0, layout_pe_poker )
 GAMEL(1987, pepp0063,  pepp0002, peplus,  peplus_poker, peplus_state, nonplus,  ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0063) 10's or Better",                0, layout_pe_poker )
 GAMEL(1987, pepp0064,  pepp0053, peplus,  peplus_poker, peplus_state, nonplus,  ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0064) Joker Poker",                   0, layout_pe_poker )
 GAMEL(1987, pepp0065,  pepp0053, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0065) Joker Poker (Aces or Better)",  0, layout_pe_poker )
