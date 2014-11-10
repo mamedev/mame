@@ -5257,6 +5257,7 @@ ssf2mdb         // MegaDrive-based hack
 aladmdb         // MegaDrive-based hack
 mk3mdb          // MegaDrive-based hack
 srmdb           // MegaDrive-based hack
+sonic2mb		// MegaDrive-based hack
 
 // Sega Naomi-based (Dreamcast) systems
 naomi           // 1998.?? Naomi BIOS
