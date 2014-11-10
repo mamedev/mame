@@ -13,8 +13,10 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, pci_device)
 	AM_RANGE(0x0c, 0x0f) AM_READ8 (header_type_r,     0x00ff0000)
 	AM_RANGE(0x0c, 0x0f) AM_READ8 (bist_r,            0xff000000)
 
-	AM_RANGE(0x2c, 0x2f) AM_READ16(subvendor_r,          0x0000ffff)
-	AM_RANGE(0x2c, 0x2f) AM_READ16(subsystem_r,          0xffff0000)
+	AM_RANGE(0x2c, 0x2f) AM_READ16(subvendor_r,       0x0000ffff)
+	AM_RANGE(0x2c, 0x2f) AM_READ16(subsystem_r,       0xffff0000)
+
+	AM_RANGE(0x34, 0x37) AM_READ8 (capptr_r,          0x000000ff)
 ADDRESS_MAP_END
 
 pci_device::pci_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
@@ -85,6 +87,11 @@ READ16_MEMBER(pci_device::subvendor_r)
 READ16_MEMBER(pci_device::subsystem_r)
 {
 	return subsystem_id;
+}
+
+READ8_MEMBER(pci_device::capptr_r)
+{
+	return 0x00;
 }
 
 void pci_device::scan_sub_devices(pci_device **devices, dynamic_array<pci_device *> &all, dynamic_array<pci_device *> &bridges, device_t *root)

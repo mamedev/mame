@@ -23,6 +23,54 @@ public:
 	virtual void map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
 						   UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space);
 
+	virtual DECLARE_ADDRESS_MAP(config_map, 32);
+
+	virtual DECLARE_READ8_MEMBER(capptr_r);
+
+	DECLARE_READ8_MEMBER(  agpm_r);
+	DECLARE_WRITE8_MEMBER( agpm_w);
+	DECLARE_READ8_MEMBER(  gc_r);
+	DECLARE_READ8_MEMBER(  csabcont_r);
+	DECLARE_READ32_MEMBER( eap_r);
+	DECLARE_READ8_MEMBER(  derrsyn_r);
+	DECLARE_READ8_MEMBER(  des_r);
+	DECLARE_READ8_MEMBER(  fpllcont_r);
+	DECLARE_WRITE8_MEMBER( fpllcont_w);
+	DECLARE_READ8_MEMBER(  pam_r);
+	DECLARE_WRITE8_MEMBER( pam_w);
+	DECLARE_READ8_MEMBER(  smram_r);
+	DECLARE_WRITE8_MEMBER( smram_w);
+	DECLARE_READ8_MEMBER(  esmramc_r);
+	DECLARE_WRITE8_MEMBER( esmramc_w);
+	DECLARE_READ32_MEMBER( acapid_r);
+	DECLARE_READ32_MEMBER( agpstat_r);
+	DECLARE_READ32_MEMBER( agpcmd_r);
+	DECLARE_READ32_MEMBER( agpctrl_r);
+	DECLARE_WRITE32_MEMBER(agpctrl_w);
+	DECLARE_READ8_MEMBER(  apsize_r);
+	DECLARE_WRITE8_MEMBER( apsize_w);
+	DECLARE_READ32_MEMBER( attbase_r);
+	DECLARE_WRITE32_MEMBER(attbase_w);
+	DECLARE_READ8_MEMBER(  amtt_r);
+	DECLARE_WRITE8_MEMBER( amtt_w);
+	DECLARE_READ8_MEMBER(  lptt_r);
+	DECLARE_WRITE8_MEMBER( lptt_w);
+	DECLARE_READ16_MEMBER( toud_r);
+	DECLARE_WRITE16_MEMBER(toud_w);
+	DECLARE_READ16_MEMBER( mchcfg_r);
+	DECLARE_WRITE16_MEMBER(mchcfg_w);
+	DECLARE_READ16_MEMBER( errsts_r);
+	DECLARE_READ16_MEMBER( errcmd_r);
+	DECLARE_WRITE16_MEMBER(errcmd_w);
+	DECLARE_READ16_MEMBER( smicmd_r);
+	DECLARE_WRITE16_MEMBER(smicmd_w);
+	DECLARE_READ16_MEMBER( scicmd_r);
+	DECLARE_WRITE16_MEMBER(scicmd_w);
+	DECLARE_READ16_MEMBER( skpd_r);
+	DECLARE_WRITE16_MEMBER(skpd_w);
+	DECLARE_READ32_MEMBER( capreg1_r);
+	DECLARE_READ8_MEMBER(  capreg2_r);
+
 protected:
 	virtual void device_start();
 	virtual void device_reset();
@@ -34,6 +82,11 @@ private:
 	int ram_size;
 	cpu_device *cpu;
 	dynamic_array<UINT32> ram;
+
+	UINT8 agpm, fpllcont, pam[8], smram, esmramc;
+	UINT8 apsize, amtt, lptt;
+	UINT16 toud, mchcfg, errsts, errcmd, smicmd, scicmd, skpd;
+	UINT32 agpctrl, attbase;
 };
 
 class i82875p_agp_device : public agp_bridge_device {
