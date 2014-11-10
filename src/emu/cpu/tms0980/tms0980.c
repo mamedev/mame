@@ -12,7 +12,7 @@ Mode     | ROM       | RAM      | R pins | O pins | K pins | ids
 ---------+-----------+----------+--------+--------+--------|----------
 tms0970  | 1024 *  8 |  64 *  4 |        |        |        | tms0972
 tms0920* |  511?*  9 |  40 *  5 |        |        |        | tmc0921
-tms0980  | 2048 *  9 |  64 *  9?|        |        |        | tmc0981
+tms0980  | 2048 *  9 |  64 *  9 |        |        |        | tmc0981
 tms1000  | 1024 *  8 |  64 *  4 |     11 |      8 |      4 | tms1001
 tms1040* | 1024 *  8 |  64 *  4 |        |        |        | tms1043
 tms1070  | 1024 *  8 |  64 *  4 |     11 |      8 |      4 | tms1071
@@ -421,13 +421,19 @@ static ADDRESS_MAP_START(program_11bit_8, AS_PROGRAM, 8, tms1xxx_cpu_device)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(data_6bit, AS_DATA, 8, tms1xxx_cpu_device)
+static ADDRESS_MAP_START(data_64x4, AS_DATA, 8, tms1xxx_cpu_device)
 	AM_RANGE( 0x00, 0x3f ) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(data_7bit, AS_DATA, 8, tms1xxx_cpu_device)
+static ADDRESS_MAP_START(data_128x4, AS_DATA, 8, tms1xxx_cpu_device)
 	AM_RANGE( 0x00, 0x7f ) AM_RAM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START(data_64x9_as4, AS_DATA, 8, tms1xxx_cpu_device)
+	AM_RANGE( 0x00, 0x8f ) AM_RAM
+	AM_RANGE( 0x90, 0xff ) AM_NOP
 ADDRESS_MAP_END
 
 
@@ -625,7 +631,7 @@ static const UINT8 tms1000_next_pc[64] =
   or321 = OR of pc5 and pc6, i.e. output is true if ((pc&0x60) != 0)
   nand322 = NAND of pc0 through pc5 plus /pc6,
       i.e. output is true if (pc != 0x3f)
-  nand325 = nand pf nand323, or321 and nand322
+  nand325 = nand of nand323, or321 and nand322
       This one is complex:
       / or321 means if pc&0x60 is zero, output MUST be true
       \ nand323 means if (pc&0x60=0x60) && (pc&0x1f != 0x1f), output MUST be true
@@ -641,7 +647,7 @@ void tms1xxx_cpu_device::next_pc()
 		UINT8   xorval = ( m_pc & 0x3F ) == 0x3F ? 1 : 0;
 		UINT8   new_bit = ( ( m_pc ^ ( m_pc << 1 ) ) & 0x40 ) ? xorval : 1 - xorval;
 
-		m_pc = ( m_pc << 1 ) | new_bit;
+		m_pc = ((m_pc << 1) | new_bit) & ((1 << m_pc_size) - 1);
 	}
 	else
 	{
@@ -1020,7 +1026,7 @@ void tms1100_cpu_device::state_string_export(const device_state_entry &entry, as
 
 tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms1xxx_cpu_device( mconfig, TMS0980, "TMS0980", tag, owner, clock, tms0980_decode, 0x00ff, 0x07ff, 7, 9, 4
-						, 12, ADDRESS_MAP_NAME( program_11bit_9 ), 6, ADDRESS_MAP_NAME( data_6bit ), "tms0980", __FILE__)
+						, 12, ADDRESS_MAP_NAME( program_11bit_9 ), 8, ADDRESS_MAP_NAME( data_64x9_as4 ), "tms0980", __FILE__)
 {
 }
 
@@ -1034,14 +1040,14 @@ offs_t tms0980_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UIN
 
 tms1000_cpu_device::tms1000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms1xxx_cpu_device( mconfig, TMS1000, "TMS1000", tag, owner, clock, tms1000_default_decode, 0x00ff, 0x07ff, 6, 8, 2
-						, 10, ADDRESS_MAP_NAME( program_10bit_8 ), 6, ADDRESS_MAP_NAME( data_6bit ), "tms1000", __FILE__)
+						, 10, ADDRESS_MAP_NAME( program_10bit_8 ), 6, ADDRESS_MAP_NAME( data_64x4 ), "tms1000", __FILE__)
 {
 }
 
 
 tms1000_cpu_device::tms1000_cpu_device(const machine_config &mconfig, device_type type, const char*name, const char *tag, device_t *owner, UINT32 clock, UINT16 o_mask, UINT16 r_mask, const char *shortname, const char *source)
 	: tms1xxx_cpu_device( mconfig, type, name, tag, owner, clock, tms1000_default_decode, o_mask, r_mask, 6, 8, 2
-						, 10, ADDRESS_MAP_NAME( program_10bit_8 ), 6, ADDRESS_MAP_NAME( data_6bit ), shortname, source )
+						, 10, ADDRESS_MAP_NAME( program_10bit_8 ), 6, ADDRESS_MAP_NAME( data_64x4 ), shortname, source )
 {
 }
 
@@ -1078,14 +1084,14 @@ tms1270_cpu_device::tms1270_cpu_device(const machine_config &mconfig, const char
 
 tms1100_cpu_device::tms1100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms1xxx_cpu_device( mconfig, TMS1100, "TMS1100", tag, owner, clock, tms1100_default_decode, 0x00ff, 0x07ff, 6, 8, 3
-						, 11, ADDRESS_MAP_NAME( program_11bit_8 ), 7, ADDRESS_MAP_NAME( data_7bit ), "tms1100", __FILE__ )
+						, 11, ADDRESS_MAP_NAME( program_11bit_8 ), 7, ADDRESS_MAP_NAME( data_128x4 ), "tms1100", __FILE__ )
 {
 }
 
 
 tms1100_cpu_device::tms1100_cpu_device(const machine_config &mconfig, device_type type, const char*name, const char *tag, device_t *owner, UINT32 clock, UINT16 o_mask, UINT16 r_mask, const char *shortname, const char *source)
 	: tms1xxx_cpu_device( mconfig, type, name, tag, owner, clock, tms1100_default_decode, o_mask, r_mask, 6, 8, 3
-						, 11, ADDRESS_MAP_NAME( program_11bit_8 ), 7, ADDRESS_MAP_NAME( data_7bit ), shortname, source )
+						, 11, ADDRESS_MAP_NAME( program_11bit_8 ), 7, ADDRESS_MAP_NAME( data_128x4 ), shortname, source )
 {
 }
 
