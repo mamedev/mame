@@ -198,7 +198,7 @@ static const INT16 speaker_levels[] = { 0, 32767, 0, 32767 }; // unknown too, du
 static MACHINE_CONFIG_START( merlin, merlin_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", TMS1100, MERLIN_RC_CLOCK )
+	MCFG_CPU_ADD("maincpu", TMS1100, MERLIN_RC_CLOCK)
 	MCFG_TMS1XXX_OUTPUT_PLA(merlin_output_pla)
 	MCFG_TMS1XXX_READ_K(READ8( merlin_state, read_k))
 	MCFG_TMS1XXX_WRITE_O(WRITE16( merlin_state, write_o))

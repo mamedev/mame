@@ -1708,6 +1708,7 @@ $(MESSOBJ)/thomson.a:           \
 $(MESSOBJ)/ti.a:                \
 	$(MESS_DRIVERS)/avigo.o $(MESS_VIDEO)/avigo.o \
 	$(MESS_DRIVERS)/cc40.o      \
+	$(MESS_DRIVERS)/wizatron.o  \
 	$(MESS_DRIVERS)/evmbug.o    \
 	$(MESS_DRIVERS)/exelv.o     \
 	$(MESS_DRIVERS)/geneve.o    \

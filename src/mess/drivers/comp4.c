@@ -22,10 +22,9 @@
 
 #include "emu.h"
 #include "cpu/tms0980/tms0980.h"
-#include "sound/speaker.h"
 
 // master clock is cpu internal, the value below is an approximation
-#define COMP4_CLOCK (250000)
+#define MASTER_CLOCK (250000)
 
 
 class comp4_state : public driver_device
@@ -144,7 +143,7 @@ static const UINT16 comp4_output_pla[0x20] =
 static MACHINE_CONFIG_START( comp4, comp4_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS0970, COMP4_CLOCK)
+	MCFG_CPU_ADD("maincpu", TMS0970, MASTER_CLOCK)
 	MCFG_TMS1XXX_OUTPUT_PLA(comp4_output_pla)
 	MCFG_TMS1XXX_READ_K(READ8(comp4_state, read_k))
 	MCFG_TMS1XXX_WRITE_O(WRITE16(comp4_state, write_o))
@@ -164,7 +163,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( comp4 )
-	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "cp0904a", 0x0000, 0x0400, CRC(c502c8a1) SHA1(f82ff1a85c4849621d32344964d8b2233fc978d0) )
 ROM_END
 

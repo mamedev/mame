@@ -161,7 +161,7 @@ static const UINT16 simon_output_pla[0x20] =
 static MACHINE_CONFIG_START( simon, simon_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", TMS1000, SIMON_RC_CLOCK )
+	MCFG_CPU_ADD("maincpu", TMS1000, SIMON_RC_CLOCK)
 	MCFG_TMS1XXX_OUTPUT_PLA(simon_output_pla)
 	MCFG_TMS1XXX_READ_K(READ8(simon_state, read_k))
 	MCFG_TMS1XXX_WRITE_O(WRITE16(simon_state, write_o))
@@ -186,7 +186,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( simon )
-	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "tms1000.u1", 0x0000, 0x0400, CRC(9961719d) SHA1(35dddb018a8a2b31f377ab49c1f0cb76951b81c0) )
 ROM_END
 
