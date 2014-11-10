@@ -132,11 +132,8 @@ tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *ta
 	m_bgscrolly(0),
 	m_fgscrollx(0),
 	m_fgscrolly(0),
-	m_bg_col_mult(0),
 	m_bg_tilemask(0),
-	m_tx_col_mult(0),
 	m_gfxbank(0),
-	m_colbank(0),
 	m_bg0_colbank(0),
 	m_bg1_colbank(0),
 	m_tx_colbank(0),
@@ -257,26 +254,23 @@ void tc0100scn_device::device_start()
 
 	m_bg_tilemask = 0xffff;    /* Mjnquest has 0x7fff tilemask */
 
-	m_bg_col_mult = 1; /* multiplier for when bg gfx != 4bpp */
-	m_tx_col_mult = 1; /* multiplier needed when bg gfx is 6bpp */
-
-	if (m_gfxdecode->gfx(m_gfxnum)->granularity() == 2)    /* Yuyugogo, Yesnoj */
-		m_bg_col_mult = 8;
-
-	if (m_gfxdecode->gfx(m_gfxnum)->granularity() == 0x40) /* Undrfire */
-		m_tx_col_mult = 4;
-
-//logerror("TC0100SCN bg gfx granularity %04x: multiplier %04x\n", m_gfxdecode->gfx(m_gfxnum)->granularity(), m_tx_col_mult);
-
 	m_ram = auto_alloc_array_clear(machine(), UINT16, TC0100SCN_RAM_SIZE / 2);
 
 	set_layer_ptrs();
 
+	/* create the char set (gfx will then be updated dynamically from RAM) */
+	m_gfxdecode->set_gfx(m_txnum, global_alloc(gfx_element(m_palette, tc0100scn_charlayout, (UINT8 *)m_char_ram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), 256, 0)));
+
+	gfx_element *gfx = m_gfxdecode->gfx(m_gfxnum);
+	gfx_element *txt = m_gfxdecode->gfx(m_txnum);
+
+	if (gfx->granularity() == 2)    /* Yuyugogo, Yesnoj */
+		gfx->set_granularity(16);
+
+	txt->set_granularity(gfx->granularity());
+
 	set_colbanks(0, 0, 0);  /* standard values, only Wgp & multiscreen games change them */
 									/* we call this here, so that they can be modified at video_start*/
-
-	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_txnum, global_alloc(gfx_element(m_palette, tc0100scn_charlayout, (UINT8 *)m_char_ram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), 64, 0)));
 
 	save_pointer(NAME(m_ram), TC0100SCN_RAM_SIZE / 2);
 	save_item(NAME(m_ctrl));
@@ -292,7 +286,6 @@ void tc0100scn_device::device_start()
 void tc0100scn_device::device_reset()
 {
 	m_dblwidth = 0;
-	m_colbank = 0;
 	m_gfxbank = 0; /* Mjnquest uniquely banks tiles */
 
 	for (int i = 0; i < 8; i++)
@@ -304,11 +297,11 @@ void tc0100scn_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-void tc0100scn_device::common_get_bg0_tile_info( tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth )
+void tc0100scn_device::common_get_tile_info( tile_data &tileinfo, int tile_index, UINT16 *ram, int colbank )
 {
 	int code, attr;
 
-	if (!dblwidth)
+	if (!m_dblwidth)
 	{
 		/* Mahjong Quest (F2 system) inexplicably has a banking feature */
 		code = (ram[2 * tile_index + 1] & m_bg_tilemask) + (m_gfxbank << 15);
@@ -320,62 +313,30 @@ void tc0100scn_device::common_get_bg0_tile_info( tile_data &tileinfo, int tile_i
 		attr = ram[2 * tile_index];
 	}
 
-	SET_TILE_INFO_MEMBER(gfxnum,
+	SET_TILE_INFO_MEMBER(m_gfxnum,
 			code,
-			(((attr * m_bg_col_mult) + m_bg0_colbank) & 0xff) + colbank,
-			TILE_FLIPYX((attr & 0xc000) >> 14));
-}
-
-void tc0100scn_device::common_get_bg1_tile_info( tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth )
-{
-	int code, attr;
-
-	if (!dblwidth)
-	{
-		/* Mahjong Quest (F2 system) inexplicably has a banking feature */
-		code = (ram[2 * tile_index + 1] & m_bg_tilemask) + (m_gfxbank << 15);
-		attr = ram[2 * tile_index];
-	}
-	else
-	{
-		code = ram[2 * tile_index + 1] & m_bg_tilemask;
-		attr = ram[2 * tile_index];
-	}
-
-	SET_TILE_INFO_MEMBER(gfxnum,
-			code,
-			(((attr * m_bg_col_mult) + m_bg1_colbank) & 0xff) + colbank,
-			TILE_FLIPYX((attr & 0xc000) >> 14));
-}
-
-void tc0100scn_device::common_get_tx_tile_info( tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth )
-{
-	int attr = ram[tile_index];
-
-	SET_TILE_INFO_MEMBER(gfxnum,
-			attr & 0xff,
-			((((attr >> 6) & 0xfc) * m_tx_col_mult + (m_tx_colbank << 2)) & 0x3ff) + colbank * 4,
+			((attr + colbank) & 0xff),
 			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
 TILE_GET_INFO_MEMBER(tc0100scn_device::get_bg_tile_info)
 {
-	common_get_bg0_tile_info(tileinfo, tile_index, m_bg_ram, m_gfxnum, m_colbank, m_dblwidth);
+	common_get_tile_info(tileinfo, tile_index, m_bg_ram, m_bg0_colbank);
 }
 
 TILE_GET_INFO_MEMBER(tc0100scn_device::get_fg_tile_info)
 {
-	common_get_bg1_tile_info(tileinfo, tile_index, m_fg_ram, m_gfxnum, m_colbank, m_dblwidth);
+	common_get_tile_info(tileinfo, tile_index, m_fg_ram, m_bg1_colbank);
 }
 
 TILE_GET_INFO_MEMBER(tc0100scn_device::get_tx_tile_info)
 {
-	common_get_tx_tile_info(tileinfo, tile_index, m_tx_ram, m_txnum, m_colbank, m_dblwidth);
-}
+	int attr = m_tx_ram[tile_index];
 
-void tc0100scn_device::set_colbank( int col )
-{
-	m_colbank = col;
+	SET_TILE_INFO_MEMBER(m_txnum,
+			attr & 0x00ff,
+			((attr & 0x3f00) >> 8) + m_tx_colbank,
+			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
 void tc0100scn_device::set_colbanks( int bg0, int bg1, int tx )

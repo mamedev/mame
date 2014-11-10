@@ -1,15 +1,6 @@
 #include "emu.h"
 #include "includes/warriorb.h"
 
-/**********************************************************/
-
-void warriorb_state::video_start()
-{
-	/* Ensure palette from correct TC0110PCR used for each screen */
-	m_tc0100scn_1->set_colbanks(0x0, 0x100, 0x0);
-}
-
-
 /************************************************************
             SPRITE DRAW ROUTINE
 ************************************************************/

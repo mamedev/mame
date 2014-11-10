@@ -2792,17 +2792,27 @@ static const gfx_layout footchmpbl_tilelayout =
 	RGN_FRAC(1,4),
 	4,  /* 4 bits per pixel */
 	{ RGN_FRAC(0,4), RGN_FRAC(1,4),RGN_FRAC(2,4),RGN_FRAC(3,4) },
-	{ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16, 8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP16(0,1) },
+	{ STEP16(0,16) },
 	16*16   /* every sprite takes 128 consecutive bytes */
 };
 
+static const gfx_layout footchmpbl_charlayout =
+{
+	8,8,  /* 16*16 sprites */
+	256,  /* the ROMs are mostly empty */
+	4,  /* 4 bits per pixel */
+	{ RGN_FRAC(0,4), RGN_FRAC(1,4),RGN_FRAC(2,4),RGN_FRAC(3,4) },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	8*8   /* every sprite takes 128 consecutive bytes */
+};
 
 static GFXDECODE_START( footchmpbl )
 	GFXDECODE_ENTRY( "gfx2", 0, footchmpbl_tilelayout,  0, 256 )    /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx1", 0, footchmpbl_tilelayout,  0, 256 )    /* sprites & playfield */
-	GFXDECODE_ENTRY( "gfx3", 0, footchmpbl_tilelayout,  0, 256 )    // gets wiped out by the dynamic decode atm
-	GFXDECODE_ENTRY( "gfx3", 0, footchmpbl_tilelayout,  0, 256 )    // bootleg should clearly use this instead of the uploaded tiles
+	GFXDECODE_ENTRY( "gfx3", 0, footchmpbl_charlayout,  0, 256 )    // gets wiped out by the dynamic decode atm
+	GFXDECODE_ENTRY( "gfx3", 0, footchmpbl_charlayout,  0, 256 )    // bootleg should clearly use this instead of the uploaded tiles
 GFXDECODE_END
 
 
@@ -3417,7 +3427,7 @@ static MACHINE_CONFIG_DERIVED( metalb, taito_f2_tc0510nio )
 	MCFG_TC0480SCP_OFFSETS(0x32 + 3, -0x04)
 	MCFG_TC0480SCP_OFFSETS_TX(1, 0)
 	MCFG_TC0480SCP_OFFSETS_FLIP(-1, 0)
-	MCFG_TC0480SCP_COL_BASE(256)
+	MCFG_TC0480SCP_COL_BASE(4096)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 	MCFG_TC0480SCP_PALETTE("palette")
 

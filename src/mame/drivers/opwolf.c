@@ -666,13 +666,13 @@ static const gfx_layout tilelayout_b =
 };
 
 static GFXDECODE_START( opwolf )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* sprites */
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )   /* scr tiles */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 128 )   /* sprites */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 128 )   /* scr tiles */
 GFXDECODE_END
 
 static GFXDECODE_START( opwolfb )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_b,  0, 256 ) /* sprites */
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout_b,  0, 256 ) /* scr tiles */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_b,  0, 128 ) /* sprites */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout_b,  0, 128 ) /* scr tiles */
 GFXDECODE_END
 
 
@@ -704,7 +704,7 @@ static MACHINE_CONFIG_START( opwolf, opwolf_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", opwolf)
-	MCFG_PALETTE_ADD("palette", 8192)
+	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 	MCFG_DEVICE_ADD("pc080sn", PC080SN, 0)
@@ -770,7 +770,7 @@ static MACHINE_CONFIG_START( opwolfb, opwolf_state ) /* OSC clocks unknown for t
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", opwolfb)
-	MCFG_PALETTE_ADD("palette", 8192)
+	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 	MCFG_DEVICE_ADD("pc080sn", PC080SN, 0)

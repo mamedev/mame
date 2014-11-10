@@ -3,26 +3,22 @@
 
 /***************************************************************************/
 
-inline void darius_state::actual_get_fg_tile_info( tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum )
-{
-	UINT16 code = (ram[tile_index + 0x2000] & 0x7ff);
-	UINT16 attr = ram[tile_index];
-
-	SET_TILE_INFO_MEMBER(gfxnum,
-			code,
-			((attr & 0xff) << 2),
-			TILE_FLIPYX((attr & 0xc000) >> 14));
-}
-
 TILE_GET_INFO_MEMBER(darius_state::get_fg_tile_info)
 {
-	actual_get_fg_tile_info(tileinfo, tile_index, m_fg_ram, 2);
+	UINT16 code = (m_fg_ram[tile_index + 0x2000] & 0x7ff);
+	UINT16 attr = m_fg_ram[tile_index];
+
+	SET_TILE_INFO_MEMBER(2,
+			code,
+			(attr & 0x7f),
+			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
 /***************************************************************************/
 
 void darius_state::video_start()
 {
+	m_gfxdecode->gfx(2)->set_granularity(16);
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(darius_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
 
 	m_fg_tilemap->set_transparent_pen(0);

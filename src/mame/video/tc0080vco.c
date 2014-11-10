@@ -191,7 +191,7 @@ void tc0080vco_device::device_start()
 	m_scroll_ram    = m_ram + 0x20800 / 2;
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_txnum, global_alloc(gfx_element(m_palette, charlayout, (UINT8 *)m_char_ram, 0, 64, 0)));
+	m_gfxdecode->set_gfx(m_txnum, global_alloc(gfx_element(m_palette, charlayout, (UINT8 *)m_char_ram, 0, 1, 512)));
 
 	save_pointer(NAME(m_ram), TC0080VCO_RAM_SIZE / 2);
 	machine().save().register_postload(save_prepost_delegate(FUNC(tc0080vco_device::postload), this));
@@ -273,8 +273,8 @@ TILE_GET_INFO_MEMBER(tc0080vco_device::get_tx_tile_info)
 
 	SET_TILE_INFO_MEMBER(m_txnum,
 			tile,
-			0x40,
-			0);     /* 0x20<<1 as 3bpp */
+			0,
+			0);
 }
 
 

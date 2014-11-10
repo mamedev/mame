@@ -446,7 +446,7 @@ static const gfx_layout slapshot_charlayout =
 
 static GFXDECODE_START( slapshot )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tilelayout,  0, 256 ) /* sprite parts */
-	GFXDECODE_ENTRY( "gfx1", 0x0, slapshot_charlayout,  0, 256 )    /* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx1", 0x0, slapshot_charlayout, 4096, 256 )    /* sprites & playfield */
 GFXDECODE_END
 
 
@@ -514,7 +514,7 @@ static MACHINE_CONFIG_START( slapshot, slapshot_state )
 	MCFG_TC0480SCP_OFFSETS(30 + 3, 9)
 	MCFG_TC0480SCP_OFFSETS_TX(-1, -1)
 	MCFG_TC0480SCP_OFFSETS_FLIP(0, 2)
-	MCFG_TC0480SCP_COL_BASE(256)
+	MCFG_TC0480SCP_COL_BASE(4096)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 	MCFG_TC0480SCP_PALETTE("palette")
 
@@ -575,7 +575,7 @@ static MACHINE_CONFIG_START( opwolf3, slapshot_state )
 	MCFG_TC0480SCP_OFFSETS(30 + 3, 9)
 	MCFG_TC0480SCP_OFFSETS_TX(-1, -1)
 	MCFG_TC0480SCP_OFFSETS_FLIP(0, 2)
-	MCFG_TC0480SCP_COL_BASE(256)
+	MCFG_TC0480SCP_COL_BASE(4096)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 	MCFG_TC0480SCP_PALETTE("palette")
 

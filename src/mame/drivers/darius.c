@@ -676,9 +676,9 @@ static const gfx_layout char2layout =
 };
 
 static GFXDECODE_START( darius )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0, 256 )  /* sprites */
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 256 )  /* scr tiles */
-	GFXDECODE_ENTRY( "gfx3", 0, char2layout,  0, 256 )  /* top layer scr tiles */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0, 128 )  /* sprites */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 128 )  /* scr tiles */
+	GFXDECODE_ENTRY( "gfx3", 0, char2layout,  0, 128 )  /* top layer scr tiles */
 GFXDECODE_END
 
 
@@ -764,7 +764,7 @@ static MACHINE_CONFIG_START( darius, darius_state )
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", darius)
-	MCFG_PALETTE_ADD("palette", 4096*2)
+	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_DEFAULT_LAYOUT(layout_darius)
 

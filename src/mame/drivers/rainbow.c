@@ -646,7 +646,7 @@ static MACHINE_CONFIG_START( rbisland, rbisland_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rbisland)
-	MCFG_PALETTE_ADD("palette", 8192)
+	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_DEVICE_ADD("pc080sn", PC080SN, 0)
@@ -697,7 +697,7 @@ static MACHINE_CONFIG_START( jumping, rbisland_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jumping)
-	MCFG_PALETTE_ADD("palette", 8192)
+	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(rbisland_state,jumping)
