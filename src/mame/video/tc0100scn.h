@@ -39,10 +39,6 @@ public:
 	To change from the default (0,0,0) use after calling TC0100SCN_vh_start */
 	void set_colbanks(int bg0, int bg1, int tx);
 
-	/* Function to set separate color banks for each TC0100SCN.
-	To change from the default (0,0,0) use after calling TC0100SCN_vh_start */
-	void set_colbank(int colbank);
-
 	/* Function to set bg tilemask < 0xffff */
 	void set_bg_tilemask(int mask);
 
@@ -92,8 +88,8 @@ private:
 	/* We keep two tilemaps for each of the 3 actual tilemaps: one at standard width, one double */
 	tilemap_t      *m_tilemap[3][2];
 
-	int          m_bg_col_mult, m_bg_tilemask, m_tx_col_mult;
-	INT32        m_gfxbank, m_colbank;
+	int          m_bg_tilemask;
+	INT32        m_gfxbank;
 	INT32        m_bg0_colbank, m_bg1_colbank, m_tx_colbank;
 	int          m_dblwidth;
 
@@ -112,9 +108,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 
-	void common_get_bg0_tile_info(tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth);
-	void common_get_bg1_tile_info(tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth);
-	void common_get_tx_tile_info(tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth);
+	void common_get_tile_info(tile_data &tileinfo, int tile_index, UINT16 *ram, int colbank);
 
 	void tilemap_draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t* tmap, int flags, UINT32 priority);
 	void set_layer_ptrs();

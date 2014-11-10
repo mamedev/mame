@@ -376,7 +376,7 @@ static MACHINE_CONFIG_START( rastan, rastan_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rastan)
-	MCFG_PALETTE_ADD("palette", 8192)
+	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_DEVICE_ADD("pc080sn", PC080SN, 0)

@@ -282,7 +282,8 @@ void tc0480scp_device::device_start()
 	set_layer_ptrs();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_txnum, global_alloc(gfx_element(m_palette, tc0480scp_charlayout, (UINT8 *)m_char_ram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), 64, 0)));
+	m_gfxdecode->set_gfx(m_txnum, global_alloc(gfx_element(m_palette, tc0480scp_charlayout, (UINT8 *)m_char_ram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), 64, m_col_base)));
+	m_gfxdecode->gfx(m_gfxnum)->set_colorbase(m_col_base);
 
 	save_item(NAME(m_ram));
 	save_item(NAME(m_ctrl));
@@ -317,7 +318,7 @@ void tc0480scp_device::common_get_tc0480bg_tile_info( tile_data &tileinfo, int t
 	int attr = ram[2 * tile_index];
 	SET_TILE_INFO_MEMBER(gfxnum,
 			code,
-			(attr & 0xff) + m_col_base,
+			(attr & 0xff),
 			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
@@ -326,7 +327,7 @@ void tc0480scp_device::common_get_tc0480tx_tile_info( tile_data &tileinfo, int t
 	int attr = ram[tile_index];
 	SET_TILE_INFO_MEMBER(gfxnum,
 			attr & 0xff,
-			((attr & 0x3f00) >> 8) + m_col_base,
+			((attr & 0x3f00) >> 8),
 			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
@@ -654,10 +655,6 @@ void tc0480scp_device::tilemap_update()
 TODO
 ----
 
-Broken for any rotation except ROT0. ROT180 support could probably
-be added without too much difficulty: machine_flip is there as a
-place-holder for this purpose.
-
 Wouldn't work if y needs to be > 255 (i.e. if some game uses a
 bigger than usual vertical visible area). Refer to tc0080vco
 custom draw routine for an example of dealing with this.
@@ -709,7 +706,6 @@ void tc0480scp_device::bg01_draw( screen_device &screen, bitmap_ind16 &bitmap, c
 		int flip = m_pri_reg & 0x40;
 		int i, y, y_index, src_y_index, row_index;
 		int x_index, x_step;
-		int machine_flip = 0;   /* for  ROT 180 ? */
 
 		UINT16 screen_width = 512; //cliprect.width();
 		UINT16 min_y = cliprect.min_y;
@@ -736,10 +732,7 @@ void tc0480scp_device::bg01_draw( screen_device &screen, bitmap_ind16 &bitmap, c
 			y_index -= (m_y_offset - min_y) * zoomy;
 		}
 
-		if (!machine_flip)
-			y = min_y;
-		else
-			y = max_y;
+		y = min_y;
 
 		do
 		{
@@ -781,12 +774,9 @@ void tc0480scp_device::bg01_draw( screen_device &screen, bitmap_ind16 &bitmap, c
 			taitoic_drawscanline(bitmap, cliprect, 0, y, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? 0 : 1, ROT0, screen.priority(), priority);
 
 			y_index += zoomy;
-			if (!machine_flip)
-				y++;
-			else
-				y--;
+			y++;
 		}
-		while ((!machine_flip && y <= max_y) || (machine_flip && y >= min_y));
+		while (y <= max_y);
 
 	}
 }
@@ -797,10 +787,6 @@ void tc0480scp_device::bg01_draw( screen_device &screen, bitmap_ind16 &bitmap, c
 
 TODO
 ----
-
-Broken for any rotation except ROT0. ROT180 support could probably
-be added without too much difficulty: machine_flip is there as a
-place-holder for this purpose.
 
 Wouldn't work if y needs to be > 255 (i.e. if some game uses a
 bigger than usual vertical visible area). Refer to tc0080vco
@@ -844,7 +830,6 @@ void tc0480scp_device::bg23_draw(screen_device &screen, bitmap_ind16 &bitmap, co
 	UINT32 zoomx, zoomy;
 	UINT16 scanline[512];
 	int flipscreen = m_pri_reg & 0x40;
-	int machine_flip = 0;   /* for  ROT 180 ? */
 
 	UINT16 screen_width = 512; //cliprect.width();
 	UINT16 min_y = cliprect.min_y;
@@ -878,11 +863,7 @@ void tc0480scp_device::bg23_draw(screen_device &screen, bitmap_ind16 &bitmap, co
 		y_index -= (m_y_offset - min_y) * zoomy;
 	}
 
-
-	if (!machine_flip)
 		y = min_y;
-	else
-		y = max_y;
 
 	do
 	{
@@ -944,12 +925,9 @@ void tc0480scp_device::bg23_draw(screen_device &screen, bitmap_ind16 &bitmap, co
 		taitoic_drawscanline(bitmap, cliprect, 0, y, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? 0 : 1, ROT0, screen.priority(), priority);
 
 		y_index += zoomy;
-		if (!machine_flip)
-			y++;
-		else
-			y--;
+		y++;
 	}
-	while ((!machine_flip && y<=max_y) || (machine_flip && y>=min_y));
+	while (y<=max_y);
 }
 
 

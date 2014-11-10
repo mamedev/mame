@@ -124,7 +124,6 @@ public:
 	UINT32 screen_update_darius_middle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_darius_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void darius_postload();
-	inline void actual_get_fg_tile_info( tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int x_offs, int y_offs );
 	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs);
 	void parse_control(  )   /* assumes Z80 sandwiched between 68Ks */;

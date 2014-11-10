@@ -516,7 +516,7 @@ static const gfx_layout charlayout =
 
 static GFXDECODE_START( topspeed )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x8_layout,  0, 256 )    // Sprite parts
-	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,  0, 256 )         // Sprites & playfield
+	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,  0, 512 )         // Sprites & playfield
 	// Road Lines gfxdecodable ?
 GFXDECODE_END
 
