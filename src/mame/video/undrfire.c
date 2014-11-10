@@ -347,14 +347,14 @@ UINT32 undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind1
 {
 	address_space &space = machine().driver_data()->generic_space();
 	UINT8 layer[5];
-	UINT8 pivlayer[3];
+	UINT8 scclayer[3];
 	UINT16 priority;
 
 #ifdef MAME_DEBUG
 	if (machine().input().code_pressed_once (KEYCODE_X))
 	{
 		m_dislayer[5] ^= 1;
-		popmessage("piv text: %01x",m_dislayer[5]);
+		popmessage("scc text: %01x",m_dislayer[5]);
 	}
 	if (machine().input().code_pressed_once (KEYCODE_C))
 	{
@@ -398,22 +398,22 @@ UINT32 undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind1
 	layer[3] = (priority & 0x000f) >>  0;   /* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	pivlayer[0] = m_tc0100scn->bottomlayer();
-	pivlayer[1] = pivlayer[0] ^ 1;
-	pivlayer[2] = 2;
+	scclayer[0] = m_tc0100scn->bottomlayer();
+	scclayer[1] = scclayer[0] ^ 1;
+	scclayer[2] = 2;
 
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);   /* wrong color? */
 
 
-/* The "PIV" chip seems to be a renamed TC0100SCN. It has a
+/* The "SCC" chip seems to be a 6bpp TC0100SCN. It has a
    bottom layer usually full of bright garish colors that
    vaguely mimic the structure of the layers on top. Seems
    pointless - it's always hidden by other layers. Does it
    serve some blending pupose ? */
 
-	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, pivlayer[0], TILEMAP_DRAW_OPAQUE, 0);
-	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, pivlayer[1], 0, 0);
+	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, scclayer[0], TILEMAP_DRAW_OPAQUE, 0);
+	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, scclayer[1], 0, 0);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[0]]==0)
@@ -455,7 +455,7 @@ UINT32 undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind1
 #ifdef MAME_DEBUG
 	if (m_dislayer[5]==0)
 #endif
-	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, pivlayer[2], 0, 0); /* piv text layer */
+	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, scclayer[2], 0, 0); /* TC0620SCC text layer */
 
 	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[4], 0, 0);    /* TC0480SCP text layer */
 
@@ -488,14 +488,14 @@ UINT32 undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_ind1
 {
 	address_space &space = machine().driver_data()->generic_space();
 	UINT8 layer[5];
-	UINT8 pivlayer[3];
+	UINT8 scclayer[3];
 	UINT16 priority;
 
 #ifdef MAME_DEBUG
 	if (machine().input().code_pressed_once (KEYCODE_X))
 	{
 		m_dislayer[5] ^= 1;
-		popmessage("piv text: %01x",m_dislayer[5]);
+		popmessage("scc text: %01x",m_dislayer[5]);
 	}
 	if (machine().input().code_pressed_once (KEYCODE_C))
 	{
@@ -539,22 +539,22 @@ UINT32 undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_ind1
 	layer[3] = (priority & 0x000f) >>  0;   /* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	pivlayer[0] = m_tc0100scn->bottomlayer();
-	pivlayer[1] = pivlayer[0] ^ 1;
-	pivlayer[2] = 2;
+	scclayer[0] = m_tc0100scn->bottomlayer();
+	scclayer[1] = scclayer[0] ^ 1;
+	scclayer[2] = 2;
 
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);   /* wrong color? */
 
 
-/* The "PIV" chip seems to be a renamed TC0100SCN. It has a
+/* The "SCC" chip seems to be a 6bpp TC0100SCN. It has a
    bottom layer usually full of bright garish colors that
    vaguely mimic the structure of the layers on top. Seems
    pointless - it's always hidden by other layers. Does it
    serve some blending pupose ? */
 
-	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, pivlayer[0], TILEMAP_DRAW_OPAQUE, 0);
-	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, pivlayer[1], 0, 0);
+	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, scclayer[0], TILEMAP_DRAW_OPAQUE, 0);
+	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, scclayer[1], 0, 0);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[0]]==0)
@@ -596,7 +596,7 @@ UINT32 undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_ind1
 #ifdef MAME_DEBUG
 	if (m_dislayer[5]==0)
 #endif
-	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, pivlayer[2], 0, 0); /* piv text layer */
+	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, scclayer[2], 0, 0); /* TC0620SCC text layer */
 
 	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[4], 0, 0);    /* TC0480SCP text layer */
 
