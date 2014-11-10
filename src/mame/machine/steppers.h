@@ -59,5 +59,7 @@ int  stepper_update(int id, UINT8 pattern); /* update a motor */
 
 int  stepper_get_position(int id);          /* get current position in half steps */
 
+int  stepper_get_absolute_position(int id); /* get current absolute position in half steps */
+
 int  stepper_get_max(int id);               /* get maximum position in half steps */
 #endif
