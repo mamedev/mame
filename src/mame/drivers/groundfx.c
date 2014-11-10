@@ -48,8 +48,8 @@
 
     Ground Effects combines the sprite system used in Taito Z games with
     the TC0480SCP tilemap chip plus some features from the Taito F3 system.
-    It has an extra tilemap chip which is a dead ringer for the TC0100SCN
-    (check the inits), like Under Fire.
+    It has an extra TC0620SCC tilemap chip which is a 6bpp version of the
+    TC0100SCN (check the inits), like Under Fire.
 
     Ground Effects is effectively a 30Hz game - though the vblank interrupts
     still come in at 60Hz, the game uses a hardware frame counter to limit
@@ -190,7 +190,7 @@ static ADDRESS_MAP_START( groundfx_map, AS_PROGRAM, 32, groundfx_state )
 	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_SHARE("snd_shared")
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, long_r, long_w)      /* tilemaps */
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_long_r, ctrl_long_w)  // debugging
-	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, long_r, long_w)    /* piv tilemaps */
+	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, long_r, long_w)    /* 6bpp tilemaps */
 	AM_RANGE(0x920000, 0x92000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_long_r, ctrl_long_w)
 	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xb00000, 0xb003ff) AM_RAM                     // ?? single bytes, blending ??
@@ -279,7 +279,7 @@ static const gfx_layout charlayout =
 	128*8     /* every sprite takes 128 consecutive bytes */
 };
 
-static const gfx_layout pivlayout =
+static const gfx_layout scclayout =
 {
 	8,8,    /* 8*8 characters */
 	RGN_FRAC(1,2),
@@ -293,7 +293,7 @@ static const gfx_layout pivlayout =
 static GFXDECODE_START( groundfx )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout,  4096, 512 )
 	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,        0, 512 )
-	GFXDECODE_ENTRY( "gfx3", 0x0, pivlayout,         0, 512 )
+	GFXDECODE_ENTRY( "gfx3", 0x0, scclayout,         0, 512 )
 GFXDECODE_END
 
 
@@ -375,7 +375,7 @@ ROM_START( groundfx )
 	ROM_LOAD32_BYTE( "d51-07.51", 0x000003, 0x200000, CRC(24b2f97d) SHA1(6980e67b435d189ce897c0301e0411763410ab47) )
 
 	ROM_REGION( 0x400000, "gfx3", 0 )
-	ROM_LOAD16_BYTE( "d51-10.95", 0x000000, 0x100000, CRC(d5910604) SHA1(8efe13884cfdef208394ddfe19f43eb1b9f78ff3) )    /* PIV 8x8 tiles, 6bpp */
+	ROM_LOAD16_BYTE( "d51-10.95", 0x000000, 0x100000, CRC(d5910604) SHA1(8efe13884cfdef208394ddfe19f43eb1b9f78ff3) )    /* SCC 8x8 tiles, 6bpp */
 	ROM_LOAD16_BYTE( "d51-11.96", 0x000001, 0x100000, CRC(fee5f5c6) SHA1(1be88747f9c71c348dd61a8f0040007df3a3e6a6) )
 	ROM_LOAD       ( "d51-12.97", 0x300000, 0x100000, CRC(d630287b) SHA1(2fa09e1821b7280d193ca9a2a270759c3c3189d1) )
 	ROM_FILL       (              0x200000, 0x100000, 0 )
@@ -418,7 +418,7 @@ DRIVER_INIT_MEMBER(groundfx_state,groundfx)
 	/* Speedup handlers */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20b574, 0x20b577, read32_delegate(FUNC(groundfx_state::irq_speedup_r_groundfx),this));
 
-	/* make piv tile GFX format suitable for gfxdecode */
+	/* make SCC tile GFX format suitable for gfxdecode */
 	offset = size/2;
 	for (i = size/2+size/4; i<size; i++)
 	{

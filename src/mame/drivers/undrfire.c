@@ -7,12 +7,12 @@
 
     Board Info (Underfire):
 
-        TC0470LIN : ?
+        TC0470LIN : object line buffer?
         TC0480SCP : known tilemap chip
         TC0510NIO : known input chip
         TC0570SPC : must be the object chip (next to spritemap and OBJ roms)
-        TC0590PIV : Piv tilemaps
-        TC0620SCC : lightgun ??? pivot port ???
+        TC0590PIV : object related???
+        TC0620SCC : tilemap chip (6bpp version of TC0100SCN)
         TC0650FDA : palette ? (Slapshot and F3 games also have one)
 
     M43E0278A
@@ -46,9 +46,8 @@
 
     Under Fire combines the sprite system used in Taito Z games with
     the TC0480SCP tilemap chip plus some features from the Taito F3 system.
-    It has an extra tilemap chip which is a dead ringer for the TC0100SCN
-    (check the inits). Why did Taito give it a different name in this
-    incarnation?
+    It has an extra TC0620SCC tilemap chip which is a 6bpp version of the
+    TC0100SCN (check the inits).
 
 
     Game misbehaviours
@@ -452,7 +451,7 @@ static ADDRESS_MAP_START( undrfire_map, AS_PROGRAM, 32, undrfire_state )
 	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_SHARE("snd_shared")
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, long_r, long_w)        /* tilemaps */
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_long_r, ctrl_long_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, long_r, long_w)        /* piv tilemaps */
+	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, long_r, long_w)        /* 6bpp tilemaps */
 	AM_RANGE(0x920000, 0x92000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_long_r, ctrl_long_w)
 	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xb00000, 0xb003ff) AM_RAM                         /* single bytes, blending ??? */
@@ -471,7 +470,7 @@ static ADDRESS_MAP_START( cbombers_cpua_map, AS_PROGRAM, 32, undrfire_state )
 	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_SHARE("snd_shared")
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, long_r, long_w)        /* tilemaps */
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_long_r, ctrl_long_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, long_r, long_w)        /* piv tilemaps */
+	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, long_r, long_w)        /* 6bpp tilemaps */
 	AM_RANGE(0x920000, 0x92000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_long_r, ctrl_long_w)
 	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xb00000, 0xb0000f) AM_RAM /* ? */
@@ -639,7 +638,7 @@ static const gfx_layout charlayout =
 	128*8     /* every sprite takes 128 consecutive bytes */
 };
 
-static const gfx_layout pivlayout =
+static const gfx_layout scclayout =
 {
 	8,8,    /* 8*8 characters */
 	RGN_FRAC(1,2),
@@ -653,13 +652,13 @@ static const gfx_layout pivlayout =
 static GFXDECODE_START( undrfire )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout,  0, 512 )
 	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,        0, 512 )
-	GFXDECODE_ENTRY( "gfx3", 0x0, pivlayout,         0, 512 )
+	GFXDECODE_ENTRY( "gfx3", 0x0, scclayout,         0, 512 )
 GFXDECODE_END
 
 static GFXDECODE_START( cbombers )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout,  0, 512 )
 	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,        0x1000, 512 )
-	GFXDECODE_ENTRY( "gfx3", 0x0, pivlayout,         0, 512 )
+	GFXDECODE_ENTRY( "gfx3", 0x0, scclayout,         0, 512 )
 GFXDECODE_END
 
 /***********************************************************
@@ -1099,7 +1098,7 @@ DRIVER_INIT_MEMBER(undrfire_state,undrfire)
 	int size=memregion("gfx3")->bytes();
 	int data;
 
-	/* make piv tile GFX format suitable for gfxdecode */
+	/* make SCC tile GFX format suitable for gfxdecode */
 	offset = size/2;
 	for (i = size/2+size/4; i<size; i++)
 	{
@@ -1129,7 +1128,7 @@ DRIVER_INIT_MEMBER(undrfire_state,cbombers)
 	int data;
 
 
-	/* make piv tile GFX format suitable for gfxdecode */
+	/* make SCC tile GFX format suitable for gfxdecode */
 	offset = size/2;
 	for (i = size/2+size/4; i<size; i++)
 	{

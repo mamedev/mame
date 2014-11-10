@@ -197,7 +197,7 @@ UINT32 groundfx_state::screen_update_groundfx(screen_device &screen, bitmap_ind1
 {
 	address_space &space = machine().driver_data()->generic_space();
 	UINT8 layer[5];
-	UINT8 pivlayer[3];
+	UINT8 scclayer[3];
 	UINT16 priority;
 
 	m_tc0100scn->tilemap_update();
@@ -211,15 +211,15 @@ UINT32 groundfx_state::screen_update_groundfx(screen_device &screen, bitmap_ind1
 	layer[3] = (priority & 0x000f) >>  0;   /* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	pivlayer[0] = m_tc0100scn->bottomlayer();
-	pivlayer[1] = pivlayer[0]^1;
-	pivlayer[2] = 2;
+	scclayer[0] = m_tc0100scn->bottomlayer();
+	scclayer[1] = scclayer[0]^1;
+	scclayer[2] = 2;
 
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);   /* wrong color? */
 
-	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, pivlayer[0], TILEMAP_DRAW_OPAQUE, 0);
-	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, pivlayer[1], 0, 0);
+	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, scclayer[0], TILEMAP_DRAW_OPAQUE, 0);
+	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, scclayer[1], 0, 0);
 
 	/*  BIG HACK!
 
@@ -244,7 +244,7 @@ UINT32 groundfx_state::screen_update_groundfx(screen_device &screen, bitmap_ind1
 		m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
 		m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[3], 0, 8);
 
-		//m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, 0, pivlayer[2], 0, 0);
+		//m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, 0, scclayer[2], 0, 0);
 
 		if (m_tc0480scp->long_r(space, 0x20 / 4, 0xffffffff) != 0x240866) /* Stupid hack for start of race */
 			m_tc0480scp->tilemap_draw(screen, bitmap, m_hack_cliprect, layer[0], 0, 0);
@@ -257,7 +257,7 @@ UINT32 groundfx_state::screen_update_groundfx(screen_device &screen, bitmap_ind1
 		m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
 		m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[3], 0, 8);
 
-		m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, pivlayer[2], 0, 0);
+		m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, scclayer[2], 0, 0);
 
 		draw_sprites(screen, bitmap, cliprect, 0, 44, -574);
 	}
