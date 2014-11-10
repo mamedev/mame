@@ -89,6 +89,8 @@
 #define TI      m_ti
 #define TO      m_to
 #define CI      m_ci
+#define LV0     m_lv0
+#define LV1     m_lv1
 #define CO0     m_co0
 #define CO1     m_co1
 
