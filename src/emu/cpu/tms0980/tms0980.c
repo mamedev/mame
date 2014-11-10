@@ -12,7 +12,7 @@ Mode     | ROM       | RAM      | R pins | O pins | K pins | ids
 ---------+-----------+----------+--------+--------+--------|----------
 tms0970  | 1024 *  8 |  64 *  4 |        |        |        | tms0972
 tms0920* |  511?*  9 |  40 *  5 |        |        |        | tmc0921
-tms0980  | 2048 *  9 |  64 *  9 |        |        |        | tmc0981
+tms0980  | 2048 *  9 |  64 *  9?|        |        |        | tmc0981
 tms1000  | 1024 *  8 |  64 *  4 |     11 |      8 |      4 | tms1001
 tms1040* | 1024 *  8 |  64 *  4 |        |        |        | tms1043
 tms1070  | 1024 *  8 |  64 *  4 |     11 |      8 |      4 | tms1071
@@ -203,6 +203,7 @@ const device_type TMS1300 = &device_creator<tms1300_cpu_device>;
 #define I_DAN       ( MICRO_MASK | M_CKP | M_ATN | M_CIN | M_C8 | M_AUTA )
 #define I_DMAN      ( MICRO_MASK | M_MTP | M_15TN | M_C8 | M_AUTA )
 #define I_DMEA      ( MICRO_MASK | M_MTP | M_DMTP | M_SSS | M_AUTA )
+#define I_NDMEA     ( MICRO_MASK | M_MTN | M_NDMTP | M_SSS | M_AUTA )
 #define I_DNAA      ( MICRO_MASK | M_DMTP | M_NATN | M_SSS | M_AUTA )
 #define I_DYN       ( MICRO_MASK | M_YTP | M_15TN | M_C8 | M_AUTY )
 #define I_IA        ( MICRO_MASK | M_ATN | M_CIN | M_AUTA )
@@ -211,7 +212,6 @@ const device_type TMS1300 = &device_creator<tms1300_cpu_device>;
 #define I_KNEZ      ( MICRO_MASK | M_CKP | M_NE )
 #define I_MNEA      ( MICRO_MASK | M_MTP | M_ATN | M_NE )
 #define I_MNEZ      ( MICRO_MASK | M_MTP | M_NE )
-#define I_M_NDMEA   ( MICRO_MASK | M_MTN | M_NDTMP | M_SSS | M_AUTA )
 #define I_SAMAN     ( MICRO_MASK | M_MTP | M_NATN | M_CIN | M_C8 | M_AUTA )
 #define I_SETR      ( MICRO_MASK | M_YTP | M_15TN | M_AUTY | M_C8 )
 #define I_TAM       ( MICRO_MASK | M_STO )
@@ -248,7 +248,7 @@ static const UINT32 tms0980_decode[512] =
 	/* 0x000 */
 	F_COMX, I_ALEM, I_YNEA, I_XMA, I_DYN, I_IYC, I_CLA, I_DMAN,
 	I_TKA, I_MNEA, I_TKM, F_ILL, F_ILL, F_SETR, I_KNEZ, F_ILL,
-	I_DMEA, I_DNAA, I_CCLA, I_DMEA, F_ILL, I_AMAAC, F_ILL, F_ILL,
+	I_DMEA, I_DNAA, I_CCLA, I_NDMEA, F_ILL, I_AMAAC, F_ILL, F_ILL,
 	I_CTMDYN, I_XDA, F_ILL, F_ILL, F_ILL, F_ILL, F_ILL, F_ILL,
 	I_TBIT, I_TBIT, I_TBIT, I_TBIT, F_ILL, F_ILL, F_ILL, F_ILL,
 	I_TAY, I_TMA, I_TMY, I_TYA, I_TAMDYN, I_TAMIYC, I_TAMZA, I_TAM,
@@ -406,13 +406,8 @@ static const UINT32 tms1100_default_decode[256] =
 };
 
 
-static ADDRESS_MAP_START(tms0980_internal_rom, AS_PROGRAM, 16, tms1xxx_cpu_device)
-	AM_RANGE( 0x0000, 0x0FFF ) AM_ROM
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START(tms0980_internal_ram, AS_DATA, 8, tms1xxx_cpu_device)
-	AM_RANGE( 0x0000, 0x0FFF ) AM_RAM
+static ADDRESS_MAP_START(program_11bit_9, AS_PROGRAM, 16, tms1xxx_cpu_device)
+	AM_RANGE( 0x000, 0xfff ) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -637,7 +632,7 @@ static const UINT8 tms1000_next_pc[64] =
       nand322 means if pc = 0x3f, output MUST be true
       hence, nand325 is if pc = 0x7f, false. if pc = 0x3f, true. if pc&0x60 is zero OR pc&0x60 is 0x60, true. otherwise, false.
 
-      tms0980_next_pc below implements an indentical function to this in a somewhat more elegant way.
+      tms0980_next_pc below implements an identical function to this in a somewhat more elegant way.
 */
 void tms1xxx_cpu_device::next_pc()
 {
@@ -1025,7 +1020,7 @@ void tms1100_cpu_device::state_string_export(const device_state_entry &entry, as
 
 tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms1xxx_cpu_device( mconfig, TMS0980, "TMS0980", tag, owner, clock, tms0980_decode, 0x00ff, 0x07ff, 7, 9, 4
-						, 12, ADDRESS_MAP_NAME( tms0980_internal_rom ), 7, ADDRESS_MAP_NAME( tms0980_internal_ram ), "tms0980", __FILE__)
+						, 12, ADDRESS_MAP_NAME( program_11bit_9 ), 6, ADDRESS_MAP_NAME( data_6bit ), "tms0980", __FILE__)
 {
 }
 
@@ -1039,7 +1034,7 @@ offs_t tms0980_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UIN
 
 tms1000_cpu_device::tms1000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms1xxx_cpu_device( mconfig, TMS1000, "TMS1000", tag, owner, clock, tms1000_default_decode, 0x00ff, 0x07ff, 6, 8, 2
-						, 11, ADDRESS_MAP_NAME( program_11bit_8 ), 7, ADDRESS_MAP_NAME( data_7bit ), "tms1000", __FILE__)
+						, 10, ADDRESS_MAP_NAME( program_10bit_8 ), 6, ADDRESS_MAP_NAME( data_6bit ), "tms1000", __FILE__)
 {
 }
 
