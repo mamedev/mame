@@ -779,6 +779,8 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/emu/bus/isa/svga_cirrus.h",
 		MAME_DIR .. "src/emu/bus/isa/ega.c",
 		MAME_DIR .. "src/emu/bus/isa/ega.h",
+		MAME_DIR .. "src/emu/bus/isa/pgc.c",
+		MAME_DIR .. "src/emu/bus/isa/pgc.h",
 		MAME_DIR .. "src/emu/bus/isa/vga.c",
 		MAME_DIR .. "src/emu/bus/isa/vga.h",
 		MAME_DIR .. "src/emu/bus/isa/vga_ati.c",

@@ -18,6 +18,7 @@
 #include "cga.h"
 #include "aga.h"
 #include "ega.h"
+#include "pgc.h"
 #include "vga.h"
 #include "vga_ati.h"
 #include "svga_cirrus.h"
