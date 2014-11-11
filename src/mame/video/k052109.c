@@ -158,7 +158,7 @@ GFXDECODE_END
 
 
 k052109_device::k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K052109, "K052109 Sprite/Tilemap Generator", tag, owner, clock, "k052109", __FILE__),
+	: device_t(mconfig, K052109, "K052109 Tilemap Generator", tag, owner, clock, "k052109", __FILE__),
 	device_gfx_interface(mconfig, *this, gfxinfo),
 	m_ram(NULL),
 	m_videoram_F(NULL),
