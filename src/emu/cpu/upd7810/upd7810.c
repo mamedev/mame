@@ -1816,7 +1816,7 @@ void upd7810_device::device_reset()
 	m_itf = 0;
 	m_nmi = 0;
 	m_int1 = 0;
-	m_int2 = 0;
+	m_int2 = 1;	/* physical (inverted) INT2 line state */
 
 	m_txs = 0;
 	m_rxs = 0;
