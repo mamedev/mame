@@ -93,6 +93,15 @@ const device_type SONY_OA_D31V = &device_creator<sony_oa_d31v>;
 const device_type SONY_OA_D32W = &device_creator<sony_oa_d32w>;
 const device_type SONY_OA_D32V = &device_creator<sony_oa_d32v>;
 
+// teac 5.25" drives
+#if 0
+const device_type TEAC_FD_55A = &device_creator<teac_fd_55a>;
+const device_type TEAC_FD_55B = &device_creator<teac_fd_55b>;
+const device_type TEAC_FD_55E = &device_creator<teac_fd_55e>;
+#endif
+const device_type TEAC_FD_55F = &device_creator<teac_fd_55f>;
+const device_type TEAC_FD_55G = &device_creator<teac_fd_55g>;
+
 // ALPS 5.25" drives
 const device_type ALPS_3255190x = &device_creator<alps_3255190x>;
 
@@ -1762,6 +1771,81 @@ void sony_oa_d32v::handled_variants(UINT32 *variants, int &var_count) const
 	variants[var_count++] = floppy_image::SSDD;
 }
 
+//-------------------------------------------------
+//  teac fd-55f
+//
+//  track to track: 3 ms
+//  average: 94 ms
+//  setting time: 15 ms
+//  motor start time: 400 ms
+//
+//-------------------------------------------------
+
+teac_fd_55f::teac_fd_55f(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	floppy_image_device(mconfig, TEAC_FD_55F, "TEAC FD-55F FDD", tag, owner, clock, "teac_fd_55f", __FILE__)
+{
+}
+
+teac_fd_55f::~teac_fd_55f()
+{
+}
+
+void teac_fd_55f::setup_characteristics()
+{
+	form_factor = floppy_image::FF_525;
+	tracks = 80;
+	sides = 2;
+	set_rpm(300);
+}
+
+void teac_fd_55f::handled_variants(UINT32 *variants, int &var_count) const
+{
+	var_count = 0;
+	variants[var_count++] = floppy_image::SSSD;
+	variants[var_count++] = floppy_image::SSDD;
+	variants[var_count++] = floppy_image::SSQD;
+	variants[var_count++] = floppy_image::DSSD;
+	variants[var_count++] = floppy_image::DSDD;
+	variants[var_count++] = floppy_image::DSQD;
+}
+
+//-------------------------------------------------
+//  teac fd-55g
+//
+//  track to track: 3 ms
+//  average: 91 ms
+//  setting time: 15 ms
+//  motor start time: 400 ms
+//
+//-------------------------------------------------
+
+teac_fd_55g::teac_fd_55g(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	floppy_image_device(mconfig, TEAC_FD_55G, "TEAC FD-55G FDD", tag, owner, clock, "teac_fd_55g", __FILE__)
+{
+}
+
+teac_fd_55g::~teac_fd_55g()
+{
+}
+
+void teac_fd_55g::setup_characteristics()
+{
+	form_factor = floppy_image::FF_525;
+	tracks = 77;
+	sides = 2;
+	set_rpm(360);
+}
+
+void teac_fd_55g::handled_variants(UINT32 *variants, int &var_count) const
+{
+	var_count = 0;
+	variants[var_count++] = floppy_image::SSSD;
+	variants[var_count++] = floppy_image::SSDD;
+	variants[var_count++] = floppy_image::SSQD;
+	variants[var_count++] = floppy_image::DSDD;
+	variants[var_count++] = floppy_image::DSQD;
+	variants[var_count++] = floppy_image::DSHD;
+}
 
 //-------------------------------------------------
 //  ALPS 32551901 (black) / 32551902 (brown)
