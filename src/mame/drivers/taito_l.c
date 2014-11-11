@@ -1654,16 +1654,6 @@ INPUT_PORTS_END
 
 
 
-static const gfx_layout bg1_layout =
-{
-	8, 8,
-	RGN_FRAC(1,2),
-	4,
-	{ RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4, 0, 4 },
-	{ 3, 2, 1, 0, 8+3, 8+2, 8+1, 8+0 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	8*8*2
-};
 
 static const gfx_layout bg2_layout =
 {
@@ -1676,20 +1666,6 @@ static const gfx_layout bg2_layout =
 	8*8*4
 };
 
-#define O 8*8*2
-#define O2 2*O
-static const gfx_layout sp1_layout =
-{
-	16, 16,
-	RGN_FRAC(1,2),
-	4,
-	{ RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4, 0, 4 },
-	{ 3, 2, 1, 0, 8+3, 8+2, 8+1, 8+0, O+3, O+2, O+1, O+0, O+8+3, O+8+2, O+8+1, O+8+0 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16, O2+0*16, O2+1*16, O2+2*16, O2+3*16, O2+4*16, O2+5*16, O2+6*16, O2+7*16 },
-	8*8*2*4
-};
-#undef O
-#undef O2
 
 #define O 8*8*4
 #define O2 2*O
@@ -1717,13 +1693,9 @@ static const gfx_layout char_layout =
 	8*8*4
 };
 
-static GFXDECODE_START( 1 )
-	GFXDECODE_ENTRY( "gfx1", 0, bg1_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0, sp1_layout, 0, 16 )
-	GFXDECODE_ENTRY( NULL,           0, char_layout,  0, 16 )  // Ram-based
-GFXDECODE_END
 
-static GFXDECODE_START( 2 )
+
+static GFXDECODE_START( taito_l )
 	GFXDECODE_ENTRY( "gfx1", 0, bg2_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, sp2_layout, 0, 16 )
 	GFXDECODE_ENTRY( NULL,           0, char_layout,  0, 16 )  // Ram-based
@@ -1782,7 +1754,7 @@ static MACHINE_CONFIG_START( fhawk, taitol_state )
 	MCFG_SCREEN_VBLANK_DRIVER(taitol_state, screen_eof_taitol)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_l)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_VIDEO_START_OVERRIDE(taitol_state,taitol)
@@ -1883,7 +1855,7 @@ static MACHINE_CONFIG_START( kurikint, taitol_state )
 	MCFG_SCREEN_VBLANK_DRIVER(taitol_state, screen_eof_taitol)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_l)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_VIDEO_START_OVERRIDE(taitol_state,taitol)
@@ -1899,13 +1871,7 @@ static MACHINE_CONFIG_START( kurikint, taitol_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( kurikinta, kurikint )
 
-	/* basic machine hardware */
-
-	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", 1)
-MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( plotting, taitol_state )
@@ -1929,7 +1895,7 @@ static MACHINE_CONFIG_START( plotting, taitol_state )
 	MCFG_SCREEN_VBLANK_DRIVER(taitol_state, screen_eof_taitol)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_l)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_VIDEO_START_OVERRIDE(taitol_state,taitol)
@@ -2023,7 +1989,7 @@ static MACHINE_CONFIG_START( evilston, taitol_state )
 	MCFG_SCREEN_VBLANK_DRIVER(taitol_state, screen_eof_taitol)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_l)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_VIDEO_START_OVERRIDE(taitol_state,taitol)
@@ -2237,14 +2203,14 @@ ROM_START( kurikinta )
 	ROM_LOAD( "b42-07.ic22", 0x00000, 0x10000, CRC(0f2719c0) SHA1(f870335a75f236f0059522f9a577dee7ca3acb2f) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "kk_1-1l.rom", 0x00000, 0x20000, CRC(df1d4fcd) SHA1(300cad3636ea9648595c3f4bba3ca737f95f7354) )
-	ROM_LOAD( "kk_2-2l.rom", 0x20000, 0x20000, CRC(fca7f647) SHA1(0571e8fc2eda9f139e81d6d191368fb99764f797) )
-	ROM_LOAD( "kk_5-3l.rom", 0x40000, 0x20000, CRC(d080fde1) SHA1(e5011cdf35bf5d39f4786e6d60d2b35a79560dfa) )
-	ROM_LOAD( "kk_7-4l.rom", 0x60000, 0x20000, CRC(f5bf6829) SHA1(4c1b4c6f451ed823730762f67c2e716789cddb10) )
-	ROM_LOAD( "kk_3-1h.rom", 0x80000, 0x20000, CRC(71af848e) SHA1(1e4d050c9191a8645f324de84767662ed80165b6) )
-	ROM_LOAD( "kk_4-2h.rom", 0xa0000, 0x20000, CRC(cebb5bac) SHA1(6c1e3cdea353bd835b49b95af0bb718e2b46ecfe) )
-	ROM_LOAD( "kk_6-3h.rom", 0xc0000, 0x20000, CRC(322e3752) SHA1(7592b5dc7945c96f53aeb5c328c54c0dcba3809a) )
-	ROM_LOAD( "kk_8-4h.rom", 0xe0000, 0x20000, CRC(117bde99) SHA1(fe0f56b6c840e35870639c4de129443e14720a7b) )
+	ROM_LOAD16_BYTE( "kk_1-1l.rom", 0x00000, 0x20000, CRC(df1d4fcd) SHA1(300cad3636ea9648595c3f4bba3ca737f95f7354) )
+	ROM_LOAD16_BYTE( "kk_2-2l.rom", 0x40000, 0x20000, CRC(fca7f647) SHA1(0571e8fc2eda9f139e81d6d191368fb99764f797) )
+	ROM_LOAD16_BYTE( "kk_5-3l.rom", 0x80000, 0x20000, CRC(d080fde1) SHA1(e5011cdf35bf5d39f4786e6d60d2b35a79560dfa) )
+	ROM_LOAD16_BYTE( "kk_7-4l.rom", 0xc0000, 0x20000, CRC(f5bf6829) SHA1(4c1b4c6f451ed823730762f67c2e716789cddb10) )
+	ROM_LOAD16_BYTE( "kk_3-1h.rom", 0x00001, 0x20000, CRC(71af848e) SHA1(1e4d050c9191a8645f324de84767662ed80165b6) )
+	ROM_LOAD16_BYTE( "kk_4-2h.rom", 0x40001, 0x20000, CRC(cebb5bac) SHA1(6c1e3cdea353bd835b49b95af0bb718e2b46ecfe) )
+	ROM_LOAD16_BYTE( "kk_6-3h.rom", 0x80001, 0x20000, CRC(322e3752) SHA1(7592b5dc7945c96f53aeb5c328c54c0dcba3809a) )
+	ROM_LOAD16_BYTE( "kk_8-4h.rom", 0xc0001, 0x20000, CRC(117bde99) SHA1(fe0f56b6c840e35870639c4de129443e14720a7b) )
 ROM_END
 
 /************************************************************************
@@ -2300,8 +2266,8 @@ ROM_START( plotting ) /* Likely B96-10 or higher by Taito's rom numbering system
 	ROM_LOAD( "ic10",       0x00000, 0x10000, CRC(be240921) SHA1(f29f3a49b563f24aa6e3187ac4da1a8100cb02b5) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "b96-07.ic9", 0x00000, 0x10000, CRC(0713a387) SHA1(0fc1242ce02a56279fa1d5270c905bba7cdcd072) )
-	ROM_LOAD( "b96-08.ic8", 0x10000, 0x10000, CRC(55b8e294) SHA1(14405638f751adfadb022bf7a0123a3972d4a617) )
+	ROM_LOAD16_BYTE( "b96-07.ic9", 0x00000, 0x10000, CRC(0713a387) SHA1(0fc1242ce02a56279fa1d5270c905bba7cdcd072) )
+	ROM_LOAD16_BYTE( "b96-08.ic8", 0x00001, 0x10000, CRC(55b8e294) SHA1(14405638f751adfadb022bf7a0123a3972d4a617) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "gal16v8-b86-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )  /* derived, but verified  Pal Stamped B86-04 */
@@ -2313,8 +2279,8 @@ ROM_START( plottinga ) /* B96-09 or higher by Taito's rom numbering system, demo
 	ROM_LOAD( "plot01.ic10", 0x00000, 0x10000, CRC(5b30bc25) SHA1(df8839a90da9e5122d75b6faaf97f59499dbd316) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "b96-02.ic9", 0x00000, 0x10000, CRC(6e0bad2a) SHA1(73996688cd058a2f56f61ea60144b9c673919a58) )
-	ROM_LOAD( "b96-03.ic8", 0x10000, 0x10000, CRC(fb5f3ca4) SHA1(0c335acceea50133a6899f9e368cff5f61b55a96) )
+	ROM_LOAD16_BYTE( "b96-02.ic9", 0x00000, 0x10000, CRC(6e0bad2a) SHA1(73996688cd058a2f56f61ea60144b9c673919a58) )
+	ROM_LOAD16_BYTE( "b96-03.ic8", 0x00001, 0x10000, CRC(fb5f3ca4) SHA1(0c335acceea50133a6899f9e368cff5f61b55a96) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "gal16v8-b86-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )  /* derived, but verified  Pal Stamped B86-04 */
@@ -2325,8 +2291,8 @@ ROM_START( plottingb ) /* The first (earliest) "World" version by Taito's rom nu
 	ROM_LOAD( "b96-06.ic10",0x00000, 0x10000, CRC(f89a54b1) SHA1(19757b5fb61acdd6f5ae8e32a38ae54bfda0c522) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "b96-02.ic9", 0x00000, 0x10000, CRC(6e0bad2a) SHA1(73996688cd058a2f56f61ea60144b9c673919a58) )
-	ROM_LOAD( "b96-03.ic8", 0x10000, 0x10000, CRC(fb5f3ca4) SHA1(0c335acceea50133a6899f9e368cff5f61b55a96) )
+	ROM_LOAD16_BYTE( "b96-02.ic9", 0x00000, 0x10000, CRC(6e0bad2a) SHA1(73996688cd058a2f56f61ea60144b9c673919a58) )
+	ROM_LOAD16_BYTE( "b96-03.ic8", 0x00001, 0x10000, CRC(fb5f3ca4) SHA1(0c335acceea50133a6899f9e368cff5f61b55a96) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "gal16v8-b86-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )  /* derived, but verified  Pal Stamped B86-04 */
@@ -2337,8 +2303,8 @@ ROM_START( plottingu ) /* The demo mode is 2 players */
 	ROM_LOAD( "b96-05.ic10",0x00000, 0x10000, CRC(afb99d1f) SHA1(a5cabc182d4f1d5709e6835d8b0a481dd0f9a563) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "b96-02.ic9", 0x00000, 0x10000, CRC(6e0bad2a) SHA1(73996688cd058a2f56f61ea60144b9c673919a58) )
-	ROM_LOAD( "b96-03.ic8", 0x10000, 0x10000, CRC(fb5f3ca4) SHA1(0c335acceea50133a6899f9e368cff5f61b55a96) )
+	ROM_LOAD16_BYTE( "b96-02.ic9", 0x00000, 0x10000, CRC(6e0bad2a) SHA1(73996688cd058a2f56f61ea60144b9c673919a58) )
+	ROM_LOAD16_BYTE( "b96-03.ic8", 0x00001, 0x10000, CRC(fb5f3ca4) SHA1(0c335acceea50133a6899f9e368cff5f61b55a96) )
 
 	ROM_REGION( 0x0200, "plds", 0 ) // PAL16L8
 	ROM_LOAD( "b96-04.ic12", 0x0000, 0x0104, CRC(9390a782) SHA1(9e68948ed15d96c1998e5d5cd99b823676e555e7) )  /* Confirmed/Matches U.S. set */
@@ -2349,8 +2315,8 @@ ROM_START( flipull ) /* The demo mode is 1 player */
 	ROM_LOAD( "b96-01.ic10",0x00000, 0x10000, CRC(65993978) SHA1(d14dc70f1b5e72b96ccc3fab61d7740f627bfea2) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "b96-07.ic9", 0x00000, 0x10000, CRC(0713a387) SHA1(0fc1242ce02a56279fa1d5270c905bba7cdcd072) )
-	ROM_LOAD( "b96-08.ic8", 0x10000, 0x10000, CRC(55b8e294) SHA1(14405638f751adfadb022bf7a0123a3972d4a617) )
+	ROM_LOAD16_BYTE( "b96-07.ic9", 0x00000, 0x10000, CRC(0713a387) SHA1(0fc1242ce02a56279fa1d5270c905bba7cdcd072) )
+	ROM_LOAD16_BYTE( "b96-08.ic8", 0x00001, 0x10000, CRC(55b8e294) SHA1(14405638f751adfadb022bf7a0123a3972d4a617) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "gal16v8-b86-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )  /* derived, but verified  Pal Stamped B86-04 */
@@ -2364,8 +2330,8 @@ ROM_START( puzznic )
 	ROM_LOAD( "mc68705p3.ic4", 0x0000, 0x0800, CRC(085F68B4) SHA1(2DBC7E2C015220DC59EE1F1208540744E5B9B7CC) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "c20-07.ic10", 0x00000, 0x10000, CRC(be12749a) SHA1(c67d1a434486843a6776d89e905362b7db595d8d) )
-	ROM_LOAD( "c20-06.ic9",  0x10000, 0x10000, CRC(ac85a9c5) SHA1(2d72dae86a191ccdac9648980aca832fb9886544) )
+	ROM_LOAD16_BYTE( "c20-07.ic10", 0x00000, 0x10000, CRC(be12749a) SHA1(c67d1a434486843a6776d89e905362b7db595d8d) )
+	ROM_LOAD16_BYTE( "c20-06.ic9",  0x00001, 0x10000, CRC(ac85a9c5) SHA1(2d72dae86a191ccdac9648980aca832fb9886544) )
 
 	ROM_REGION( 0x0800, "pals", 0 )
 	ROM_LOAD( "mmipal20l8.ic3", 0x0000, 0x0800, NO_DUMP )
@@ -2379,8 +2345,8 @@ ROM_START( puzznicj )
 	ROM_LOAD( "mc68705p3.ic4", 0x0000, 0x0800, CRC(085F68B4) SHA1(2DBC7E2C015220DC59EE1F1208540744E5B9B7CC) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD( "c20-03.ic10",  0x00000, 0x20000, CRC(4264056c) SHA1(d2d8a170ae0f361093a5384935238605a59e5938) )
-	ROM_LOAD( "c20-02.ic9",   0x20000, 0x20000, CRC(3c115f8b) SHA1(8d518be01b7c4d6d993d5d9b62aab719a5c8baca) )
+	ROM_LOAD16_BYTE( "c20-03.ic10",  0x00000, 0x20000, CRC(4264056c) SHA1(d2d8a170ae0f361093a5384935238605a59e5938) )
+	ROM_LOAD16_BYTE( "c20-02.ic9",   0x00001, 0x20000, CRC(3c115f8b) SHA1(8d518be01b7c4d6d993d5d9b62aab719a5c8baca) )
 
 	ROM_REGION( 0x0200, "pals", 0 ) // PAL20L8
 	ROM_LOAD( "c20-05.ic3", 0x0000, 0x0144, CRC(f90e5594) SHA1(6181bb25b77028bb150c84bdc073f0457efd7eaa) ) // Confirmed/Matches Japan Set
@@ -2391,8 +2357,8 @@ ROM_START( puzznici ) /* bootleg */
 	ROM_LOAD( "1.ic11",  0x00000, 0x20000, CRC(4612f5e0) SHA1(dc07a365414666568537d31ef01b58f2362cadaf) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD( "u10.ic10",  0x00000, 0x20000, CRC(4264056c) SHA1(d2d8a170ae0f361093a5384935238605a59e5938) )
-	ROM_LOAD( "3.ic9",     0x20000, 0x20000, CRC(2bf5232a) SHA1(a8fc06bb8bae2ca6bd21e3a96c9ed38bb356d5d7) )
+	ROM_LOAD16_BYTE( "u10.ic10",  0x00000, 0x20000, CRC(4264056c) SHA1(d2d8a170ae0f361093a5384935238605a59e5938) )
+	ROM_LOAD16_BYTE( "3.ic9",     0x00001, 0x20000, CRC(2bf5232a) SHA1(a8fc06bb8bae2ca6bd21e3a96c9ed38bb356d5d7) )
 ROM_END
 
 /*
@@ -2420,14 +2386,14 @@ ROM_START( horshoes )
 	ROM_LOAD( "c47-03.ic6",  0x00000, 0x20000, CRC(37e15b20) SHA1(85baa0ee553e4c9fed38294ba8912f18f519e62f) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "c47-02.ic5",  0x00000, 0x10000, CRC(35f96526) SHA1(e7f9b33d82b050aff49f991aa12db436421caa5b) ) /* silkscreened CH0-L */
-	ROM_CONTINUE (           0x20000, 0x10000 )
-	ROM_LOAD( "c47-01.ic11", 0x10000, 0x10000, CRC(031c73d8) SHA1(deef972fbf226701f9a6469ae3934129dc52ce9c) ) /* silkscreened CH1-L */
-	ROM_CONTINUE (           0x30000, 0x10000 )
-	ROM_LOAD( "c47-04.ic4",  0x40000, 0x10000, CRC(aeac7121) SHA1(cf67688cde14d452da6d9cbd7a81593f4048ce77) ) /* silkscreened CH0-H */
+	ROM_LOAD16_BYTE( "c47-02.ic5",  0x00000, 0x10000, CRC(35f96526) SHA1(e7f9b33d82b050aff49f991aa12db436421caa5b) ) /* silkscreened CH0-L */
+	ROM_CONTINUE (           0x40000, 0x10000 )
+	ROM_LOAD16_BYTE( "c47-01.ic11", 0x20000, 0x10000, CRC(031c73d8) SHA1(deef972fbf226701f9a6469ae3934129dc52ce9c) ) /* silkscreened CH1-L */
 	ROM_CONTINUE (           0x60000, 0x10000 )
-	ROM_LOAD( "c47-05.ic10", 0x50000, 0x10000, CRC(b2a3dafe) SHA1(5ffd3e296272ef3f31432005c827f057aac79497) ) /* silkscreened CH1-H */
-	ROM_CONTINUE (           0x70000, 0x10000 )
+	ROM_LOAD16_BYTE( "c47-04.ic4",  0x00001, 0x10000, CRC(aeac7121) SHA1(cf67688cde14d452da6d9cbd7a81593f4048ce77) ) /* silkscreened CH0-H */
+	ROM_CONTINUE (           0x40001, 0x10000 )
+	ROM_LOAD16_BYTE( "c47-05.ic10", 0x20001, 0x10000, CRC(b2a3dafe) SHA1(5ffd3e296272ef3f31432005c827f057aac79497) ) /* silkscreened CH1-H */
+	ROM_CONTINUE (           0x60001, 0x10000 )
 
 	ROM_REGION( 0x0200, "plds", 0 ) // PAL20L8BCNS
 	ROM_LOAD( "c47-06.ic12", 0x0000, 0x0144, CRC(4342ca6c) SHA1(9c798a6f1508b03004b76577eb823f004df7298d) )
@@ -2439,8 +2405,8 @@ ROM_START( palamed )
 	ROM_LOAD( "c63.02", 0x00000, 0x20000, CRC(55a82bb2) SHA1(f157ad770351d4b8d8f8c061c4e330d6391fc624) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD( "c63.04", 0x00000, 0x20000, CRC(c7bbe460) SHA1(1c1f186d0b0b2e383f82c53ae93b975a75f50f9c) )
-	ROM_LOAD( "c63.03", 0x20000, 0x20000, CRC(fcd86e44) SHA1(bdd0750ed6e93cc49f09f4ccb05b0c4a44cb9c23) )
+	ROM_LOAD16_BYTE( "c63.04", 0x00000, 0x20000, CRC(c7bbe460) SHA1(1c1f186d0b0b2e383f82c53ae93b975a75f50f9c) )
+	ROM_LOAD16_BYTE( "c63.03", 0x00001, 0x20000, CRC(fcd86e44) SHA1(bdd0750ed6e93cc49f09f4ccb05b0c4a44cb9c23) )
 ROM_END
 
 ROM_START( cachat )
@@ -2448,10 +2414,10 @@ ROM_START( cachat )
 	ROM_LOAD( "cac6",  0x00000, 0x20000, CRC(8105cf5f) SHA1(e6dd22165436c247db887a04c3e69c9e2505bb33) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "cac9",  0x00000, 0x20000, CRC(bc462914) SHA1(3eede8940cabadf563acb63059bfc2d13253b29f) )
-	ROM_LOAD( "cac10", 0x20000, 0x20000, CRC(ecc64b31) SHA1(04ce97cdcdbdbd38602011f5ed27fe9182fb500a) )
-	ROM_LOAD( "cac7",  0x40000, 0x20000, CRC(7fb71578) SHA1(34cfa1383ea1f3cbf45eaf6b989a1248cdef1bb9) )
-	ROM_LOAD( "cac8",  0x60000, 0x20000, CRC(d2a63799) SHA1(71b024b239834ef068b7fc20cd49aae7853e0f7c) )
+	ROM_LOAD16_BYTE( "cac9",  0x00000, 0x20000, CRC(bc462914) SHA1(3eede8940cabadf563acb63059bfc2d13253b29f) )
+	ROM_LOAD16_BYTE( "cac10", 0x40000, 0x20000, CRC(ecc64b31) SHA1(04ce97cdcdbdbd38602011f5ed27fe9182fb500a) )
+	ROM_LOAD16_BYTE( "cac7",  0x00001, 0x20000, CRC(7fb71578) SHA1(34cfa1383ea1f3cbf45eaf6b989a1248cdef1bb9) )
+	ROM_LOAD16_BYTE( "cac8",  0x40001, 0x20000, CRC(d2a63799) SHA1(71b024b239834ef068b7fc20cd49aae7853e0f7c) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "pal20l8b-c63-01.14", 0x0000, 0x0144, CRC(14a7dd2a) SHA1(2a39ca6069bdac553d73c34db6f50f880559113c) )
@@ -2462,8 +2428,8 @@ ROM_START( tubeit ) /* Title changed. Year, copyright and manufacture removed */
 	ROM_LOAD( "t-i_02.6", 0x00000, 0x20000, CRC(54730669) SHA1(a44ebd31a8588a133a7552a39fa8d52ba1985e45) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "t-i_03.7", 0x40000, 0x40000, CRC(e1c3fed0) SHA1(cd68dbf61ed820f4aa50c630e7cb778aafb433c2) )
-	ROM_LOAD( "t-i_04.9", 0x00000, 0x40000, CRC(b4a6e31d) SHA1(e9abab8f19c78207f25a62104bcae1e391cbd2c0) )
+	ROM_LOAD16_BYTE( "t-i_03.7", 0x00001, 0x40000, CRC(e1c3fed0) SHA1(cd68dbf61ed820f4aa50c630e7cb778aafb433c2) )
+	ROM_LOAD16_BYTE( "t-i_04.9", 0x00000, 0x40000, CRC(b4a6e31d) SHA1(e9abab8f19c78207f25a62104bcae1e391cbd2c0) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "pal20l8b-c63-01.14", 0x0000, 0x0144, CRC(14a7dd2a) SHA1(2a39ca6069bdac553d73c34db6f50f880559113c) )
@@ -2474,10 +2440,10 @@ ROM_START( cubybop )
 	ROM_LOAD( "cb06.6", 0x00000, 0x40000, CRC(66b89a85) SHA1(2ba26d71fd1aa8e64584a5908a1d797666718d49) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "cb09.9",  0x00000, 0x40000, CRC(5f831e59) SHA1(db319a6c1058200274d687163b4df2f78a2bf879) )
-	ROM_LOAD( "cb10.10", 0x40000, 0x40000, CRC(430510fc) SHA1(95c0a0ebd0485a15090f302e5d2f4da8204baf7c) )
-	ROM_LOAD( "cb07.7",  0x80000, 0x40000, CRC(3582de99) SHA1(51620cc9044aef8e5ed0335b7d5d6d67a7857005) )
-	ROM_LOAD( "cb08.8",  0xc0000, 0x40000, CRC(09e18a51) SHA1(18db47d1d84f9be892bc796116c7ef7d0c1ee59f) )
+	ROM_LOAD16_BYTE( "cb09.9",  0x00000, 0x40000, CRC(5f831e59) SHA1(db319a6c1058200274d687163b4df2f78a2bf879) )
+	ROM_LOAD16_BYTE( "cb10.10", 0x80000, 0x40000, CRC(430510fc) SHA1(95c0a0ebd0485a15090f302e5d2f4da8204baf7c) )
+	ROM_LOAD16_BYTE( "cb07.7",  0x00001, 0x40000, CRC(3582de99) SHA1(51620cc9044aef8e5ed0335b7d5d6d67a7857005) )
+	ROM_LOAD16_BYTE( "cb08.8",  0x80001, 0x40000, CRC(09e18a51) SHA1(18db47d1d84f9be892bc796116c7ef7d0c1ee59f) )
 ROM_END
 
 ROM_START( plgirls )
@@ -2485,8 +2451,8 @@ ROM_START( plgirls )
 	ROM_LOAD( "pg03.ic6", 0x00000, 0x40000, CRC(6ca73092) SHA1(f5679f047a29b936046c0d3677489df553ad7b41) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "pg02.ic9", 0x00000, 0x40000, CRC(3cf05ca9) SHA1(502c45a5330dda1b2fbf7d3d0c9bc6e889ff07d8) )
-	ROM_LOAD( "pg01.ic7", 0x40000, 0x40000, CRC(79e41e74) SHA1(aa8efbeeee47f84e19b639821a89a7bcd67fe7a9) )
+	ROM_LOAD16_BYTE( "pg02.ic9", 0x00000, 0x40000, CRC(3cf05ca9) SHA1(502c45a5330dda1b2fbf7d3d0c9bc6e889ff07d8) )
+	ROM_LOAD16_BYTE( "pg01.ic7", 0x00001, 0x40000, CRC(79e41e74) SHA1(aa8efbeeee47f84e19b639821a89a7bcd67fe7a9) )
 ROM_END
 
 ROM_START( plgirls2 )
@@ -2494,9 +2460,21 @@ ROM_START( plgirls2 )
 	ROM_LOAD( "pg2_1j.ic6", 0x00000, 0x40000, CRC(f924197a) SHA1(ecaaefd1b3715ba60608e05d58be67e3c71f653a) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "cho-l.ic9",  0x00000, 0x80000, CRC(956384ec) SHA1(94a2b95f340e96bdccbeafd373f0dea90b8328dd) )
-	ROM_LOAD( "cho-h.ic7",  0x80000, 0x80000, CRC(992f99b1) SHA1(c79f1014d73654740f7823812f92376d65d6b15d) )
+	ROM_LOAD16_BYTE( "cho-l.ic9",  0x00000, 0x80000, CRC(956384ec) SHA1(94a2b95f340e96bdccbeafd373f0dea90b8328dd) )
+	ROM_LOAD16_BYTE( "cho-h.ic7",  0x00001, 0x80000, CRC(992f99b1) SHA1(c79f1014d73654740f7823812f92376d65d6b15d) )
 ROM_END
+
+ROM_START( plgirls2b )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "playgirls2b.d1", 0x00000, 0x40000, CRC(d58159fa) SHA1(541c6ca5f12c38b5a08f90048f52c31d27bb9233) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD32_BYTE( "playgirls2b.d8",   0x00003, 0x40000, CRC(22df48b5) SHA1(be51dbe55f84dd1b7c30da0e4d98c874b0803382) )
+	ROM_LOAD32_BYTE( "playgirls2b.d4",   0x00001, 0x40000, CRC(bc9e2192) SHA1(7bc7f46295166a84c849e9ea82428e653375d9d6) )
+	ROM_LOAD32_BYTE( "playgirls2b.b6",   0x00000, 0x40000, CRC(aac6c90b) SHA1(965cea2fb5f3aaabb4378fc24899af53de745ff3) )
+	ROM_LOAD32_BYTE( "playgirls2b.d3",   0x00002, 0x40000, CRC(75d82fab) SHA1(4eb9ee416944a36f016e7d353f79884915da2730) )
+ROM_END
+
 
 ROM_START( evilston )
 	ROM_REGION( 0x40000, "maincpu", 0 )
@@ -2553,10 +2531,10 @@ ROM_START( lagirl )
 	ROM_LOAD( "rom1",  0x00000, 0x40000, CRC(ba1acfdb) SHA1(ff1093c2d0887287ce451417bd373e00f2881ce7) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "rom2",   0x40001, 0x20000, CRC(4c739a30) SHA1(4426f51aac9bb39f5d1a7616d183ff6c76749dc2) )
-	ROM_LOAD16_BYTE( "rom3",   0x40000, 0x20000, CRC(4cf22a4b) SHA1(1c933ccbb6a5b8a6795385d7970db5f7138e572e) )
-	ROM_LOAD16_BYTE( "rom4",   0x00001, 0x20000, CRC(7dcd6696) SHA1(8f3b1fe669520142668af6dc2d04f13767048989) )
-	ROM_LOAD16_BYTE( "rom5",   0x00000, 0x20000, CRC(b1782816) SHA1(352663974886e1e4358e55b87c8bf0cdb979f177) )
+	ROM_LOAD32_BYTE( "rom2",   0x00003, 0x20000, CRC(4c739a30) SHA1(4426f51aac9bb39f5d1a7616d183ff6c76749dc2) )
+	ROM_LOAD32_BYTE( "rom3",   0x00001, 0x20000, CRC(4cf22a4b) SHA1(1c933ccbb6a5b8a6795385d7970db5f7138e572e) )
+	ROM_LOAD32_BYTE( "rom4",   0x00002, 0x20000, CRC(7dcd6696) SHA1(8f3b1fe669520142668af6dc2d04f13767048989) )
+	ROM_LOAD32_BYTE( "rom5",   0x00000, 0x20000, CRC(b1782816) SHA1(352663974886e1e4358e55b87c8bf0cdb979f177) )
 ROM_END
 
 
@@ -2588,31 +2566,43 @@ DRIVER_INIT_MEMBER(taitol_state,plottinga)
 GAME( 1988, raimais,   0,        raimais,   raimais,   driver_device, 0,         ROT0,   "Taito Corporation Japan", "Raimais (World)", 0 )
 GAME( 1988, raimaisj,  raimais,  raimais,   raimaisj,  driver_device, 0,         ROT0,   "Taito Corporation", "Raimais (Japan)", 0 )
 GAME( 1988, raimaisjo, raimais,  raimais,   raimaisj,  driver_device, 0,         ROT0,   "Taito Corporation", "Raimais (Japan, first revision)", 0 )
+
 GAME( 1988, fhawk,     0,        fhawk,     fhawk,     driver_device, 0,         ROT270, "Taito Corporation Japan", "Fighting Hawk (World)", 0 )
 GAME( 1988, fhawkj,    fhawk,    fhawk,     fhawkj,    driver_device, 0,         ROT270, "Taito Corporation", "Fighting Hawk (Japan)", 0 )
+
 GAME( 1989, champwr,   0,        champwr,   champwr,   driver_device, 0,         ROT0,   "Taito Corporation Japan", "Champion Wrestler (World)", GAME_IMPERFECT_SOUND )
 GAME( 1989, champwru,  champwr,  champwr,   champwru,  driver_device, 0,         ROT0,   "Taito America Corporation", "Champion Wrestler (US)", GAME_IMPERFECT_SOUND )
 GAME( 1989, champwrj,  champwr,  champwr,   champwrj,  driver_device, 0,         ROT0,   "Taito Corporation", "Champion Wrestler (Japan)", GAME_IMPERFECT_SOUND )
+
 GAME( 1988, kurikint,  0,        kurikint,  kurikint,  driver_device, 0,         ROT0,   "Taito Corporation Japan", "Kuri Kinton (World)", 0 )
 GAME( 1988, kurikintu, kurikint, kurikint,  kurikintj, driver_device, 0,         ROT0,   "Taito America Corporation", "Kuri Kinton (US)", 0 )
 GAME( 1988, kurikintj, kurikint, kurikint,  kurikintj, driver_device, 0,         ROT0,   "Taito Corporation", "Kuri Kinton (Japan)", 0 )
-GAME( 1988, kurikinta, kurikint, kurikinta, kurikinta, driver_device, 0,         ROT0,   "Taito Corporation Japan", "Kuri Kinton (World, prototype?)", 0 )
+GAME( 1988, kurikinta, kurikint, kurikint,  kurikinta, driver_device, 0,         ROT0,   "Taito Corporation Japan", "Kuri Kinton (World, prototype?)", 0 )
+
 GAME( 1989, plotting,  0,        plotting,  plotting,  driver_device, 0,         ROT0,   "Taito Corporation Japan", "Plotting (World set 1)", 0 )
 GAME( 1989, plottinga, plotting, plotting,  plotting,  taitol_state,  plottinga, ROT0,   "Taito Corporation Japan", "Plotting (World set 2, protected)", 0 )
 GAME( 1989, plottingb, plotting, plotting,  plotting,  driver_device, 0,         ROT0,   "Taito Corporation Japan", "Plotting (World set 3, earliest version)", 0 )
 GAME( 1989, plottingu, plotting, plotting,  plotting,  driver_device, 0,         ROT0,   "Taito America Corporation", "Plotting (US)", 0 )
 GAME( 1989, flipull,   plotting, plotting,  plotting,  driver_device, 0,         ROT0,   "Taito Corporation", "Flipull (Japan)", 0 )
+
 GAME( 1989, puzznic,   0,        puzznic,   puzznic,   driver_device, 0,         ROT0,   "Taito Corporation Japan", "Puzznic (World)", 0 )
 GAME( 1989, puzznicj,  puzznic,  puzznic,   puzznic,   driver_device, 0,         ROT0,   "Taito Corporation", "Puzznic (Japan)", 0 )
 GAME( 1989, puzznici,  puzznic,  puzznici,  puzznic,   driver_device, 0,         ROT0,   "bootleg", "Puzznic (Italian bootleg)", 0 )
+
 GAME( 1990, horshoes,  0,        horshoes,  horshoes,  driver_device, 0,         ROT270, "Taito America Corporation", "American Horseshoes (US)", 0 )
+
 GAME( 1990, palamed,   0,        palamed,   palamed,   driver_device, 0,         ROT0,   "Taito Corporation", "Palamedes (Japan)", 0 )
+
 GAME( 1993, cachat,    0,        cachat,    cachat,    driver_device, 0,         ROT0,   "Taito Corporation", "Cachat (Japan)", 0 )
-GAME( 1993, tubeit,    cachat,   cachat,    tubeit,    driver_device, 0,         ROT0,   "Taito Corporation", "Tube-It", 0 ) // No (c) message
+
+GAME( 1993, tubeit,    cachat,   cachat,    tubeit,    driver_device, 0,         ROT0,   "bootleg", "Tube-It", 0 ) // No (c) message
 
 GAME( 199?, cubybop,   0,        cachat,    cubybop,   driver_device, 0,         ROT0,   "Hot-B", "Cuby Bop (location test)", 0 ) // No (c) message, but Hot-B company logo in tile gfx
+
 GAME( 1992, plgirls,   0,        cachat,    plgirls,   driver_device, 0,         ROT270, "Hot-B", "Play Girls", 0 )
 GAME( 1992, lagirl,    plgirls,  cachat,    plgirls,   driver_device, 0,         ROT270, "bootleg", "LA Girl", 0 ) // bootleg hardware with changed title & backgrounds
-GAME( 1993, plgirls2,  0,        cachat,    plgirls2,  driver_device, 0,         ROT270, "Hot-B", "Play Girls 2", 0 )
 
-GAME( 1990, evilston,  0,        evilston,  evilston,  driver_device, 0,         ROT270, "Spacy Industrial, Ltd.", "Evil Stone", GAME_IMPERFECT_SOUND )
+GAME( 1993, plgirls2,  0,        cachat,    plgirls2,  driver_device, 0,         ROT270, "Hot-B", "Play Girls 2", 0 )
+GAME( 1993, plgirls2b, plgirls2, cachat,    plgirls2,  driver_device, 0,         ROT270, "bootleg", "Play Girls 2 (bootleg)", 0 ) // bootleg hardware (regular Z80 etc. instead of TC0090LVC, but acts the same)
+
+GAME( 1990, evilston,  0,        evilston,  evilston,  driver_device, 0,         ROT270, "Spacy Industrial, Ltd.", "Evil Stone", GAME_IMPERFECT_SOUND ) // not Taito PCB, just uses TC0090LVC
