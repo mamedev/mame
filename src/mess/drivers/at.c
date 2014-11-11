@@ -469,6 +469,11 @@ static MACHINE_CONFIG_DERIVED( ibm5170a, ibm5170 )
 	MCFG_CPU_CLOCK(XTAL_16MHz/2)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( ec1842, ibm5170 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(12000000)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( ec1849, ibm5170 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(12000000)
@@ -957,6 +962,17 @@ ROM_START( ibm5170 )
 	ROM_REGION( 0x2000, "proms", 0 )
 	ROM_LOAD("1501814.82s123an.u115", 0x0000, 0x0020, CRC(849C9217) SHA1(2955AE1705C3B59170F1373F99B3EA5C174C4544)) /* N82S123AN 8713 // SK-D 1501814 */
 	ROM_LOAD("55x8041.82s147an.u72", 0x0020, 0x0200, CRC(F2CC4FE6) SHA1(E285468516BD05083155A8A272583DEEF655315A)) /* S N82S147AN 8709 // V-C55X8041 */
+ROM_END
+
+ROM_START( ec1842 )
+	ROM_REGION16_LE(0x100000,"maincpu", 0)
+	ROM_LOAD16_BYTE( "4202004.bin", 0xfc001, 0x2000, CRC(33fb5382) SHA1(35eb62328324d93e7a06f2f9d1ad0002f83fc99b))
+	ROM_LOAD16_BYTE( "4202005.bin", 0xfc000, 0x2000, CRC(8e05c119) SHA1(9d81613b4fc305c14ae9fda0b1dd97a290715530))
+	ROM_LOAD16_BYTE( "4202006.bin", 0xf8001, 0x2000, CRC(6da537ef) SHA1(f79feb433dcf41f5cdef52b845e3550d5f0fb5c0))
+	ROM_LOAD16_BYTE( "4202007.bin", 0xf8000, 0x2000, CRC(d6ee0e95) SHA1(6fd4c42190e879501198fede70ae43bc420681d0))
+	// EGA ROM
+	ROM_LOAD16_BYTE( "4200009.bin", 0xc0000, 0x2000, CRC(9deeb39f) SHA1(255b859d3ea05891aa65a4a742ecaba744dfc923))
+	ROM_LOAD16_BYTE( "4200010.bin", 0xc0001, 0x2000, CRC(f2c38d93) SHA1(dcb3741d06089bf1a80cb766a6b94029ad698d73))
 ROM_END
 
 ROM_START( ec1849 )
@@ -1630,6 +1646,7 @@ COMP ( 1990, at486,    ibm5170, 0,       at486,     atvga, at_state,      atvga,
 COMP ( 1990, at586,    ibm5170, 0,       at586,     atvga, at586_state,   at586,  "<generic>",  "PC/AT 586 (PIIX4)", GAME_NOT_WORKING )
 COMP ( 1990, at586x3,  ibm5170, 0,       at586x3,   atvga, at586_state,   at586,  "<generic>",  "PC/AT 586 (PIIX3)", GAME_NOT_WORKING )
 COMP ( 1989, neat,     ibm5170, 0,       neat,      atvga, at_state,      atvga,  "<generic>",  "NEAT (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
+COMP ( 1989, ec1842,   ibm5150, 0,       ec1842,    atcga, at_state,      atcga,  "<unknown>",  "EC-1842", GAME_NOT_WORKING )
 COMP ( 1993, ec1849,   ibm5170, 0,       ec1849,    atcga, at_state,      atcga,  "<unknown>",  "EC-1849", GAME_NOT_WORKING )
 COMP ( 1993, megapc,   0,       0,       megapc,    0,     megapc_state,megapc,   "Amstrad plc", "MegaPC", GAME_NOT_WORKING )
 COMP ( 199?, megapcpl, megapc,  0,       megapcpl,  0,     megapc_state,megapcpl, "Amstrad plc", "MegaPC Plus", GAME_NOT_WORKING )
