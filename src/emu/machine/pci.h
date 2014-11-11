@@ -45,6 +45,9 @@ public:
 
 	DECLARE_READ16_MEMBER(vendor_r);
 	DECLARE_READ16_MEMBER(device_r);
+	DECLARE_READ16_MEMBER(command_r);
+	DECLARE_WRITE16_MEMBER(command_w);
+	DECLARE_READ16_MEMBER(status_r);
 	DECLARE_READ32_MEMBER(class_rev_r);
 	virtual DECLARE_READ8_MEMBER(cache_line_size_r);
 	virtual DECLARE_READ8_MEMBER(latency_timer_r);
@@ -66,6 +69,7 @@ protected:
 	UINT32 main_id, subsystem_id;
 	UINT32 pclass;
 	UINT8 revision;
+	UINT16 command, command_mask, status;
 
 	virtual void device_start();
 	virtual void device_reset();

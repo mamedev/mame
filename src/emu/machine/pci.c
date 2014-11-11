@@ -4,19 +4,21 @@ const device_type PCI_ROOT   = &device_creator<pci_root_device>;
 const device_type PCI_BRIDGE = &device_creator<pci_bridge_device>;
 
 DEVICE_ADDRESS_MAP_START(config_map, 32, pci_device)
-	AM_RANGE(0x00, 0x03) AM_READ16(vendor_r,          0x0000ffff)
-	AM_RANGE(0x00, 0x03) AM_READ16(device_r,          0xffff0000)
+	AM_RANGE(0x00, 0x03) AM_READ16     (vendor_r,                     0x0000ffff)
+	AM_RANGE(0x00, 0x03) AM_READ16     (device_r,                     0xffff0000)
+	AM_RANGE(0x04, 0x07) AM_READWRITE16(command_r,         command_w, 0x0000ffff)
+	AM_RANGE(0x04, 0x07) AM_READ16     (status_r,                     0xffff0000)
 
-	AM_RANGE(0x08, 0x0b) AM_READ  (class_rev_r)
-	AM_RANGE(0x0c, 0x0f) AM_READ8 (cache_line_size_r, 0x000000ff)
-	AM_RANGE(0x0c, 0x0f) AM_READ8 (latency_timer_r,   0x0000ff00)
-	AM_RANGE(0x0c, 0x0f) AM_READ8 (header_type_r,     0x00ff0000)
-	AM_RANGE(0x0c, 0x0f) AM_READ8 (bist_r,            0xff000000)
+	AM_RANGE(0x08, 0x0b) AM_READ       (class_rev_r)
+	AM_RANGE(0x0c, 0x0f) AM_READ8      (cache_line_size_r,            0x000000ff)
+	AM_RANGE(0x0c, 0x0f) AM_READ8      (latency_timer_r,              0x0000ff00)
+	AM_RANGE(0x0c, 0x0f) AM_READ8      (header_type_r,                0x00ff0000)
+	AM_RANGE(0x0c, 0x0f) AM_READ8      (bist_r,                       0xff000000)
 
-	AM_RANGE(0x2c, 0x2f) AM_READ16(subvendor_r,       0x0000ffff)
-	AM_RANGE(0x2c, 0x2f) AM_READ16(subsystem_r,       0xffff0000)
+	AM_RANGE(0x2c, 0x2f) AM_READ16     (subvendor_r,                  0x0000ffff)
+	AM_RANGE(0x2c, 0x2f) AM_READ16     (subsystem_r,                  0xffff0000)
 
-	AM_RANGE(0x34, 0x37) AM_READ8 (capptr_r,          0x000000ff)
+	AM_RANGE(0x34, 0x37) AM_READ8      (capptr_r,                     0x000000ff)
 ADDRESS_MAP_END
 
 pci_device::pci_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
@@ -38,6 +40,9 @@ void pci_device::set_ids(UINT32 _main_id, UINT8 _revision, UINT32 _pclass, UINT3
 
 void pci_device::device_start()
 {
+	command = 0x0080;
+	command_mask = 0x01bf;
+	status = 0x0000;
 }
 
 void pci_device::device_reset()
@@ -52,6 +57,23 @@ READ16_MEMBER(pci_device::vendor_r)
 READ16_MEMBER(pci_device::device_r)
 {
 	return main_id;
+}
+
+READ16_MEMBER(pci_device::command_r)
+{
+	return command;
+}
+
+WRITE16_MEMBER(pci_device::command_w)
+{
+	mem_mask &= command_mask;
+	COMBINE_DATA(&command);
+	logerror("%s: command = %04x\n", tag(), command);
+}
+
+READ16_MEMBER(pci_device::status_r)
+{
+	return status;
 }
 
 READ32_MEMBER(pci_device::class_rev_r)
