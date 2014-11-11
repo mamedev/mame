@@ -71,6 +71,7 @@ void i82875p_host_device::device_start()
 	io_window_start = 0;
 	io_window_end   = 0xffff;
 	io_offset       = 0;
+	status = 0x0010;
 
 	ram.resize(ram_size/4);
 
@@ -339,7 +340,7 @@ void i82875p_host_device::map_extra(UINT64 memory_window_start, UINT64 memory_wi
 	if(top > ram_size)
 		top = ram_size;
 
-	memory_space->install_ram          (0x00000000, 0x0007ffff, &ram[0x00000000/4]);
+	memory_space->install_ram          (0x00000000, 0x0009ffff, &ram[0x00000000/4]);
 
 	if(smram & 0x40)
 		memory_space->install_ram      (0x000a0000, 0x000bffff, &ram[0x000a0000/4]);

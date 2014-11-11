@@ -4,19 +4,21 @@ const device_type PCI_ROOT   = &device_creator<pci_root_device>;
 const device_type PCI_BRIDGE = &device_creator<pci_bridge_device>;
 
 DEVICE_ADDRESS_MAP_START(config_map, 32, pci_device)
-	AM_RANGE(0x00, 0x03) AM_READ16(vendor_r,          0x0000ffff)
-	AM_RANGE(0x00, 0x03) AM_READ16(device_r,          0xffff0000)
+	AM_RANGE(0x00, 0x03) AM_READ16     (vendor_r,                          0x0000ffff)
+	AM_RANGE(0x00, 0x03) AM_READ16     (device_r,                          0xffff0000)
+	AM_RANGE(0x04, 0x07) AM_READWRITE16(command_r,         command_w,      0x0000ffff)
+	AM_RANGE(0x04, 0x07) AM_READ16     (status_r,                          0xffff0000)
+	AM_RANGE(0x08, 0x0b) AM_READ       (class_rev_r)
+	AM_RANGE(0x0c, 0x0f) AM_READ8      (cache_line_size_r,                 0x000000ff)
+	AM_RANGE(0x0c, 0x0f) AM_READ8      (latency_timer_r,                   0x0000ff00)
+	AM_RANGE(0x0c, 0x0f) AM_READ8      (header_type_r,                     0x00ff0000)
+	AM_RANGE(0x0c, 0x0f) AM_READ8      (bist_r,                            0xff000000)
+	AM_RANGE(0x10, 0x27) AM_READWRITE  (address_base_r,    address_base_w)
 
-	AM_RANGE(0x08, 0x0b) AM_READ  (class_rev_r)
-	AM_RANGE(0x0c, 0x0f) AM_READ8 (cache_line_size_r, 0x000000ff)
-	AM_RANGE(0x0c, 0x0f) AM_READ8 (latency_timer_r,   0x0000ff00)
-	AM_RANGE(0x0c, 0x0f) AM_READ8 (header_type_r,     0x00ff0000)
-	AM_RANGE(0x0c, 0x0f) AM_READ8 (bist_r,            0xff000000)
+	AM_RANGE(0x2c, 0x2f) AM_READ16     (subvendor_r,                       0x0000ffff)
+	AM_RANGE(0x2c, 0x2f) AM_READ16     (subsystem_r,                       0xffff0000)
 
-	AM_RANGE(0x2c, 0x2f) AM_READ16(subvendor_r,       0x0000ffff)
-	AM_RANGE(0x2c, 0x2f) AM_READ16(subsystem_r,       0xffff0000)
-
-	AM_RANGE(0x34, 0x37) AM_READ8 (capptr_r,          0x000000ff)
+	AM_RANGE(0x34, 0x37) AM_READ8      (capptr_r,                          0x000000ff)
 ADDRESS_MAP_END
 
 pci_device::pci_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
@@ -38,10 +40,77 @@ void pci_device::set_ids(UINT32 _main_id, UINT8 _revision, UINT32 _pclass, UINT3
 
 void pci_device::device_start()
 {
+	command = 0x0080;
+	command_mask = 0x01bf;
+	status = 0x0000;
+
+	for(int i=0; i<6; i++) {
+		bank_infos[i].adr = 0;
+		bank_infos[i].size = 0;
+		bank_infos[i].flags = 0;
+		bank_reg_infos[i].bank = -1;
+		bank_reg_infos[i].hi = 0;
+	}
+
+	bank_count = 0;
+	bank_reg_count = 0;
 }
 
 void pci_device::device_reset()
 {
+}
+
+UINT32 pci_device::unmapped_r(offs_t offset, UINT32 mem_mask, int bank)
+{
+	logerror("%s: unmapped read from %08x & %08x (%s)\n", machine().describe_context(), offset*4, mem_mask, bank_infos[bank].map.name());
+	return 0;
+}
+
+void pci_device::unmapped_w(offs_t offset, UINT32 data, UINT32 mem_mask, int bank)
+{
+	logerror("%s: unmapped write to %08x = %08x & %08x (%s)\n", machine().describe_context(), offset*4, data, mem_mask, bank_infos[bank].map.name());
+}
+
+READ32_MEMBER(pci_device::unmapped0_r) { return unmapped_r(offset, mem_mask, 0); }
+WRITE32_MEMBER(pci_device::unmapped0_w) { return unmapped_w(offset, data, mem_mask, 0); }
+READ32_MEMBER(pci_device::unmapped1_r) { return unmapped_r(offset, mem_mask, 1); }
+WRITE32_MEMBER(pci_device::unmapped1_w) { return unmapped_w(offset, data, mem_mask, 1); }
+READ32_MEMBER(pci_device::unmapped2_r) { return unmapped_r(offset, mem_mask, 2); }
+WRITE32_MEMBER(pci_device::unmapped2_w) { return unmapped_w(offset, data, mem_mask, 2); }
+READ32_MEMBER(pci_device::unmapped3_r) { return unmapped_r(offset, mem_mask, 3); }
+WRITE32_MEMBER(pci_device::unmapped3_w) { return unmapped_w(offset, data, mem_mask, 3); }
+READ32_MEMBER(pci_device::unmapped4_r) { return unmapped_r(offset, mem_mask, 4); }
+WRITE32_MEMBER(pci_device::unmapped4_w) { return unmapped_w(offset, data, mem_mask, 4); }
+READ32_MEMBER(pci_device::unmapped5_r) { return unmapped_r(offset, mem_mask, 5); }
+WRITE32_MEMBER(pci_device::unmapped5_w) { return unmapped_w(offset, data, mem_mask, 5); }
+
+
+READ32_MEMBER(pci_device::address_base_r)
+{
+	if(bank_reg_infos[offset].bank == -1)
+		return 0;
+	int bid = bank_reg_infos[offset].bank;
+	if(bank_reg_infos[offset].hi)
+		return bank_infos[bid].adr >> 32;
+	int flags = bank_infos[bid].flags;
+	return bank_infos[bid].adr | (flags & M_IO ? 1 : 0) | (flags & M_64A ? 4 : 0) | (flags & M_PREF ? 8 : 0);
+}
+
+WRITE32_MEMBER(pci_device::address_base_w)
+{
+	if(bank_reg_infos[offset].bank == -1) {
+		logerror("%s: write to address base (%d, %08x) not linked to any bank\n", tag(), offset, data);
+		return;
+	}
+
+	int bid = bank_reg_infos[offset].bank;
+	if(bank_reg_infos[offset].hi)
+		bank_infos[bid].adr = (bank_infos[bid].adr & 0xffffffff) | (UINT64(data) << 32);
+	else {
+		data &= ~(bank_infos[bid].size - 1);
+		bank_infos[bid].adr = (bank_infos[bid].adr & U64(0xffffffff00000000)) | data;
+	}
+	remap_cb();
 }
 
 READ16_MEMBER(pci_device::vendor_r)
@@ -52,6 +121,23 @@ READ16_MEMBER(pci_device::vendor_r)
 READ16_MEMBER(pci_device::device_r)
 {
 	return main_id;
+}
+
+READ16_MEMBER(pci_device::command_r)
+{
+	return command;
+}
+
+WRITE16_MEMBER(pci_device::command_w)
+{
+	mem_mask &= command_mask;
+	COMBINE_DATA(&command);
+	logerror("%s: command = %04x\n", tag(), command);
+}
+
+READ16_MEMBER(pci_device::status_r)
+{
+	return status;
 }
 
 READ32_MEMBER(pci_device::class_rev_r)
@@ -110,6 +196,34 @@ void pci_device::reset_all_mappings()
 void pci_device::map_device(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
 							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space)
 {
+	for(int i=0; i<bank_count; i++) {
+		bank_info &bi = bank_infos[i];
+		if(!bi.adr)
+			continue;
+		if(UINT32(bi.adr) == UINT32(~(bi.size - 1)))
+			continue;
+
+		UINT64 start;
+		address_space *space;
+		if(bi.flags & M_IO) {
+			space = io_space;
+			start = bi.adr + io_offset;
+		} else {
+			space = memory_space;
+			start = bi.adr + memory_offset;
+		}
+		UINT64 end = start + bi.size-1;
+		switch(i) {
+		case 0: space->install_readwrite_handler(start, end, 0, 0, read32_delegate(FUNC(pci_device::unmapped0_r), this), write32_delegate(FUNC(pci_device::unmapped0_w), this)); break;
+		case 1: space->install_readwrite_handler(start, end, 0, 0, read32_delegate(FUNC(pci_device::unmapped1_r), this), write32_delegate(FUNC(pci_device::unmapped1_w), this)); break;
+		case 2: space->install_readwrite_handler(start, end, 0, 0, read32_delegate(FUNC(pci_device::unmapped2_r), this), write32_delegate(FUNC(pci_device::unmapped2_w), this)); break;
+		case 3: space->install_readwrite_handler(start, end, 0, 0, read32_delegate(FUNC(pci_device::unmapped3_r), this), write32_delegate(FUNC(pci_device::unmapped3_w), this)); break;
+		case 4: space->install_readwrite_handler(start, end, 0, 0, read32_delegate(FUNC(pci_device::unmapped4_r), this), write32_delegate(FUNC(pci_device::unmapped4_w), this)); break;
+		case 5: space->install_readwrite_handler(start, end, 0, 0, read32_delegate(FUNC(pci_device::unmapped5_r), this), write32_delegate(FUNC(pci_device::unmapped5_w), this)); break;
+		}
+		space->install_device_delegate(start, end, *this, bi.map);
+	}
+
 	map_extra(memory_window_start, memory_window_end, memory_offset, memory_space,
 			  io_window_start, io_window_end, io_offset, io_space);
 }
@@ -124,8 +238,36 @@ void pci_device::map_config(UINT8 device, address_space *config_space)
 	config_space->install_device(device << 12, (device << 12) | 0xfff, *this, &pci_device::config_map);
 }
 
+void pci_device::skip_map_regs(int count)
+{
+	bank_reg_count += count;
+	assert(bank_reg_count <= 6);
+}
+
 void pci_device::add_map(UINT64 size, int flags, address_map_delegate &map)
 {
+	assert(bank_count < 6);
+	int bid = bank_count++;
+	bank_infos[bid].map = map;
+	bank_infos[bid].adr = 0;
+	bank_infos[bid].size = size;
+	bank_infos[bid].flags = flags;
+
+	if(flags & M_64A) {
+		assert(bank_reg_count < 5);
+		int breg = bank_reg_count;
+		bank_reg_infos[breg].bank = bid;
+		bank_reg_infos[breg].hi = 0;
+		bank_reg_infos[breg+1].bank = bid;
+		bank_reg_infos[breg+1].hi = 1;
+		bank_reg_count += 2;
+	} else {
+		assert(bank_reg_count < 6);
+		int breg = bank_reg_count++;
+		bank_reg_infos[breg].bank = bid;
+		bank_reg_infos[breg].hi = 0;
+	}
+
 	logerror("Device %s (%s) has 0x%" I64FMT "x bytes of %s named %s\n", tag(), name(), size, flags & M_IO ? "io" : "memory", map.name());
 }
 

@@ -85,7 +85,7 @@ private:
 
 	UINT8 agpm, fpllcont, pam[8], smram, esmramc;
 	UINT8 apsize, amtt, lptt;
-	UINT16 toud, mchcfg, errsts, errcmd, smicmd, scicmd, skpd;
+	UINT16 toud, mchcfg, errcmd, smicmd, scicmd, skpd;
 	UINT32 agpctrl, attbase;
 };
 
