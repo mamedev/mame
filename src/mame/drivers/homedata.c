@@ -231,7 +231,7 @@ INTERRUPT_GEN_MEMBER(homedata_state::homedata_irq)
 
 INTERRUPT_GEN_MEMBER(homedata_state::upd7807_irq)
 {
-	device.execute().set_input_line(UPD7810_INTF1, HOLD_LINE);
+	generic_pulse_irq_line(device.execute(), UPD7810_INTF1, 1);
 }
 
 

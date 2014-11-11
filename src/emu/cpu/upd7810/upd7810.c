@@ -1991,7 +1991,7 @@ void upd7810_device::execute_set_input(int irqline, int state)
 	switch (irqline) {
 	case INPUT_LINE_NMI:
 		/* NMI is falling edge sensitive */
-		if ( m_nmi == ASSERT_LINE && state == CLEAR_LINE )
+		if ( m_nmi == CLEAR_LINE && state == ASSERT_LINE )
 			IRR |= INTNMI;
 
 		m_nmi = state;
@@ -2005,10 +2005,12 @@ void upd7810_device::execute_set_input(int irqline, int state)
 		break;
 	case UPD7810_INTF2:
 		/* INT2 is falling edge sensitive */
-		if ( m_int2 == ASSERT_LINE && state == CLEAR_LINE )
+		/* we store the physical state (inverse of the logical state) */
+		/* to keep the handling of port C consistent with the upd7801 */
+		if ( (!m_int2) == CLEAR_LINE && state == ASSERT_LINE )
 			IRR |= INTF2;
 
-		m_int2 = state;
+		m_int2 = !state;
 		break;
 	default:
 		logerror("upd7810_set_irq_line invalid irq line #%d\n", irqline);
