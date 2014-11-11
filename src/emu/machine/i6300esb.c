@@ -557,5 +557,44 @@ void i6300esb_lpc_device::map_extra(UINT64 memory_window_start, UINT64 memory_wi
 		logerror("%s: Warning: acpi range enabled at %04x-%04x\n", tag(), pmbase, pmbase+127);
 	if(gpio_cntl & 0x10)
 		logerror("%s: Warning: gpio range enabled at %04x-%04x\n", tag(), gpio_base, gpio_base+63);
+
+	UINT32 hpet = 0xfed00000 + ((gen_cntl & 0x00018000) >> 3);
+	logerror("%s: Warning: hpet at %08x-%08x\n", tag(), hpet, hpet+0x3ff);
+
+	if(lpc_en & 0x1000)
+		logerror("%s: Warning: superio at 2e-2f\n", tag());
+	if(lpc_en & 0x0800)
+		logerror("%s: Warning: mcu at 62/66\n", tag());
+	if(lpc_en & 0x0400)
+		logerror("%s: Warning: mcu at 60/64\n", tag());
+	if(lpc_en & 0x0200)
+		logerror("%s: Warning: gameport at 208-20f\n", tag());
+	if(lpc_en & 0x0100)
+		logerror("%s: Warning: gameport at 200-207\n", tag());
+
+	if(lpc_en & 0x0008) {
+		UINT16 fdc = lpc_if_fdd_lpt_range & 0x10 ? 0x370 : 0x3f0;
+		logerror("%s: Warning: floppy at %04x-%04x\n", tag(), fdc, fdc+7);
+	}
+
+	if(lpc_en & 0x0004) {
+		static const UINT16 lpt_pos[4] = { 0x378, 0x278, 0x3bc, 0x000 };
+		UINT16 lpt = lpt_pos[lpc_if_fdd_lpt_range & 3];
+		if(lpt)
+			logerror("%s: Warning: lpt at %04x-%04x %04x-%04x\n", tag(), lpt, lpt+7, lpt+0x400, lpt+0x407);
+	}
+
+	static const UINT16 com_pos[8] = { 0x3f8, 0x2f8, 0x220, 0x228, 0x238, 0x2e8, 0x338, 0x3e8 };
+
+	if(lpc_en & 0x0002) {
+		UINT16 comb = com_pos[(lpc_if_com_range >> 4) & 7];
+		logerror("%s: Warning: comb at %04x-%04x\n", tag(), comb, comb+7);
+	}
+
+	if(lpc_en & 0x0001) {
+		UINT16 coma = com_pos[lpc_if_com_range & 7];
+		logerror("%s: Warning: coma at %04x-%04x\n", tag(), coma, coma+7);
+	}
 }
+
 
