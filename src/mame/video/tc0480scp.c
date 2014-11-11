@@ -1,14 +1,27 @@
 /*
 Taito TC0480SCP
 ---------
-Tilemap generator, has four zoomable tilemaps with 16x16 tiles.
-It also has a front tilemap with 8x8 tiles which fetches gfx data
-from RAM.
+Tilemap generator. Manages four background tilemaps with 16x16 tiles fetched
+from ROM, and one foreground text tilemap with 8x8 tiles fetched from RAM.
+All four background tilemaps support zooming and rowscroll, and two of them
+additionally support per-row zooming and column scroll. The five tilemaps
+are mixed internally (the text tilemap is always on top, the order of the
+other four is selectable) and output as 16 bits of pixel data.
+The TC0480SCP uses 0x10000 bytes of RAM. It seems to be able to address
+up to 0x800000 bytes of ROM (0x10000 tiles) as it has 21 address lines and
+32 data lines, but no known game uses more than 0x400000 bytes.
 
-BG2 and 3 are "special" layers which have row zoom and source
-columnscroll. The selectable layer priority order is a function
-of the need to have the "special" layers in particular priority
-positions.
+Inputs and outputs (based on Gunbuster schematics):
+- CPU address bus (VA1-VA17)
+- CPU data bus (VD0-VD15)
+- CPU control lines (CS, UDS, LDS, R/W, DTACK)
+- RAM address bus (RA0-RA14)
+- RAM data bus (RAD0-RAD15)
+- RAM control lines (RWAH, RWAL, RAOE)
+- ROM address bus (CH0-CH20)
+- ROM data bus (RD0-RD31)
+- Pixel output (SD0-SD15)
+- Clocks and video sync (HSYNC, HBLANK, VSYNC, VBLANK)
 
 Standard memory layout (four 32x32 bg tilemaps, one 64x64 fg tilemap)
 

@@ -1,10 +1,32 @@
 /*
 Taito TC0100SCN
 ---------
-Tilemap generator. The front tilemap fetches gfx data from RAM,
-the others use ROMs as usual.
+Tilemap generator. Manages two background tilemaps with 8x8 tiles fetched
+from ROM, and one foreground text tilemap with tiles fetched from RAM.
+Both background layers support rowscroll and one of them additionally
+supports columnscroll. The three tilemaps are mixed internally (the text
+tilemap is always on top, the other two are selectable) and output as
+15 bits of pixel data.
+The TC0100SCN uses 0x10000 bytes of RAM, plus an optional 0x4000 bytes to
+allow wider tilemaps (mainly used by multiscreen games). It can address
+up to 0x200000 bytes of ROM (0x10000 tiles), 16 bits at a time.
 
-Standard memory layout (three 64x64 tilemaps with 8x8 tiles)
+Inputs and outputs (based on Operation Thunderbolt schematics):
+- CPU address bus (VA1-VA17)
+- CPU data bus (D0-D15)
+- CPU control lines (CS, UDS, LDS, R/W, DTACK)
+- RAM address bus (SA0-SA14)
+- RAM data bus (SD0-SD15)
+- RAM control lines (WEH, WEL, SCE0, SCE1)
+  (SCE0 is connected to CS of two 32Kx8 SRAMs. SCE1 is unconnected.
+   SCE1 is probably for the optional RAM, which isn't present on
+   Operation Thunderbolt)
+- ROM address bus (AD0-AD19)
+- ROM data bus (RD0-RD15)
+- Pixel output (SC0-SC14)
+- Clocks and video sync (HSYNC, HBLANK, VSYNC, VBLANK)
+
+Standard memory layout (three 64x64 tilemaps)
 
 0000-3fff BG0
 4000-5fff FG0
@@ -14,7 +36,7 @@ Standard memory layout (three 64x64 tilemaps with 8x8 tiles)
 c000-c3ff BG0 rowscroll (second half unused*)
 c400-c7ff BG1 rowscroll (second half unused*)
 c800-dfff unused (probably)
-e000-e0ff BG0 colscroll [see info below]
+e000-e0ff BG1 colscroll [see info below]
 e100-ffff unused (probably)
 
 Double width tilemaps memory layout (two 128x64 tilemaps, one 128x32 tilemap)
@@ -23,7 +45,7 @@ Double width tilemaps memory layout (two 128x64 tilemaps, one 128x32 tilemap)
 08000-0ffff BG1 (128x64)
 10000-103ff BG0 rowscroll (second half unused*)
 10400-107ff BG1 rowscroll (second half unused*)
-10800-108ff BG0 colscroll [evidenced by Warriorb inits from $1634]
+10800-108ff BG1 colscroll [evidenced by Warriorb inits from $1634]
 10900-10fff unused (probably)
 11000-11fff gfx data for FG0
 12000-13fff FG0 (128x32)
@@ -106,6 +128,13 @@ Towards end of first round in empty starfield area, about three big ship
 sprites cross the screen (scrolling down with the starfield). 16 starfield
 columns [rows, as the game is rotated] scroll across with the ship.
 $84fc0 and neighbouring routines poke col scroll area.
+
+TC0620SCC
+---------
+The TC0620SCC seems to be similar to the TC0100SCN except that the ROM tiles
+are 6bpp instead of 4bpp. It probably has a 24-bit bus to the ROMs instead
+of 16-bit, but nothing else is known about it (such as whether it supports
+the wide tilemap mode)
 
 */
 
