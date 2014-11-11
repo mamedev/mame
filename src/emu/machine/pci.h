@@ -43,6 +43,23 @@ public:
 
 	virtual DECLARE_ADDRESS_MAP(config_map, 32);
 
+	UINT32 unmapped_r(offs_t offset, UINT32 mem_mask, int bank);
+	void unmapped_w(offs_t offset, UINT32 data, UINT32 mem_mask, int bank);
+
+	READ32_MEMBER (unmapped0_r);
+	WRITE32_MEMBER(unmapped0_w);
+	READ32_MEMBER (unmapped1_r);
+	WRITE32_MEMBER(unmapped1_w);
+	READ32_MEMBER (unmapped2_r);
+	WRITE32_MEMBER(unmapped2_w);
+	READ32_MEMBER (unmapped3_r);
+	WRITE32_MEMBER(unmapped3_w);
+	READ32_MEMBER (unmapped4_r);
+	WRITE32_MEMBER(unmapped4_w);
+	READ32_MEMBER (unmapped5_r);
+	WRITE32_MEMBER(unmapped5_w);
+
+
 	DECLARE_READ16_MEMBER(vendor_r);
 	DECLARE_READ16_MEMBER(device_r);
 	DECLARE_READ16_MEMBER(command_r);
@@ -53,6 +70,8 @@ public:
 	virtual DECLARE_READ8_MEMBER(latency_timer_r);
 	virtual DECLARE_READ8_MEMBER(header_type_r);
 	virtual DECLARE_READ8_MEMBER(bist_r);
+	DECLARE_READ32_MEMBER(address_base_r);
+	DECLARE_WRITE32_MEMBER(address_base_w);
 	DECLARE_READ16_MEMBER(subvendor_r);
 	DECLARE_READ16_MEMBER(subsystem_r);
 	virtual DECLARE_READ8_MEMBER(capptr_r);
@@ -66,6 +85,21 @@ protected:
 		M_PREF = 8
 	};
 
+	struct bank_info {
+		address_map_delegate map;
+		UINT64 adr;
+		UINT32 size;
+		int flags;
+	};
+
+	struct bank_reg_info {
+		int bank, hi;
+	};
+
+	bank_info bank_infos[6];
+	int bank_count, bank_reg_count;
+	bank_reg_info bank_reg_infos[6];
+
 	UINT32 main_id, subsystem_id;
 	UINT32 pclass;
 	UINT8 revision;
@@ -76,6 +110,7 @@ protected:
 
 	static void scan_sub_devices(pci_device **devices, dynamic_array<pci_device *> &all, dynamic_array<pci_device *> &bridges, device_t *root);
 
+	void skip_map_regs(int count);
 	void add_map(UINT64 size, int flags, address_map_delegate &map);
 	template <typename T> void add_map(UINT64 size, int flags, void (T::*map)(address_map &map, device_t &device), const char *name) {
 		address_map_delegate delegate(map, name, static_cast<T *>(this));

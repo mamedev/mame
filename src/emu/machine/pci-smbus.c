@@ -13,6 +13,7 @@ smbus_device::smbus_device(const machine_config &mconfig, const char *tag, devic
 void smbus_device::device_start()
 {
 	pci_device::device_start();
+	skip_map_regs(4);
 	add_map(32, M_IO, FUNC(smbus_device::map));
 }
 
