@@ -770,6 +770,70 @@ ROM_START( firetrap )
 	ROM_LOAD( "firetrap.1a",  0x0200,  0x0100, CRC(d67f3514) SHA1(afadda6111fea663fe1373a81e184e51afc601df) ) // ?
 ROM_END
 
+ROM_START( firetrapa )
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 64k for banked ROMs */
+	ROM_LOAD( "di-02.4a",     0x00000, 0x8000, CRC(3d1e4bf7) SHA1(ee903b469619f49edb1727fb545c9a6085f50746) )
+	ROM_LOAD( "di-01.3a",     0x10000, 0x8000, CRC(9bbae38b) SHA1(dc1d3ed5da71bfb104fd54fc70c56833f31d281f) )
+	ROM_LOAD( "di-00-a.2a.bin",     0x18000, 0x8000, CRC(f39e2cf4) SHA1(ce77a65089937906d8a41076a3f29ad6f45fda9d) ) // this rom has data at 3FD7 where it seems to be blanked out in firetrap, as well as other changes
+
+	ROM_REGION( 0x18000, "audiocpu", 0 )    /* 64k for the sound CPU + 32k for banked ROMs */
+	ROM_LOAD( "di-17.10j",    0x08000, 0x8000, CRC(8605f6b9) SHA1(4fba88f34afd91d2cbc578b3b70f5399b8844390) )
+	ROM_LOAD( "di-18.12j",    0x10000, 0x8000, CRC(49508c93) SHA1(3812b0b1a33a1506d2896d2b676ed6aabb29dac0) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )  /* 8751 protection MCU */
+	ROM_LOAD( "di-12.16h",    0x00000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x02000, "gfx1", 0 )    /* characters */
+	ROM_LOAD( "di-03.17c",    0x00000, 0x2000, CRC(46721930) SHA1(a605fe993166e95c1602a35b548649ceae77bff2) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )    /* tiles */
+	ROM_LOAD( "di-06.3e",     0x00000, 0x2000, CRC(441d9154) SHA1(340804e82d4aba8e9fcdd08cce0cfecefd2f77a9) )
+	ROM_CONTINUE(             0x08000, 0x2000 )
+	ROM_CONTINUE(             0x02000, 0x2000 )
+	ROM_CONTINUE(             0x0a000, 0x2000 )
+	ROM_LOAD( "di-04.2e",     0x04000, 0x2000, CRC(8e6e7eec) SHA1(9cff147702620987346449e2f83ef9b2efef7798) )
+	ROM_CONTINUE(             0x0c000, 0x2000 )
+	ROM_CONTINUE(             0x06000, 0x2000 )
+	ROM_CONTINUE(             0x0e000, 0x2000 )
+	ROM_LOAD( "di-07.6e",     0x10000, 0x2000, CRC(ef0a7e23) SHA1(7c67ac27e6bde0f4943e8bed9898e730ae7ddd75) )
+	ROM_CONTINUE(             0x18000, 0x2000 )
+	ROM_CONTINUE(             0x12000, 0x2000 )
+	ROM_CONTINUE(             0x1a000, 0x2000 )
+	ROM_LOAD( "di-05.4e",     0x14000, 0x2000, CRC(ec080082) SHA1(3b034496bfa2aba9ed58ceba670d0364a9c2211d) )
+	ROM_CONTINUE(             0x1c000, 0x2000 )
+	ROM_CONTINUE(             0x16000, 0x2000 )
+	ROM_CONTINUE(             0x1e000, 0x2000 )
+
+	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_LOAD( "di-09.3j",     0x00000, 0x2000, CRC(d11e28e8) SHA1(3e91764f74d551e0984bac92daeab4e094e8dc13) )
+	ROM_CONTINUE(             0x08000, 0x2000 )
+	ROM_CONTINUE(             0x02000, 0x2000 )
+	ROM_CONTINUE(             0x0a000, 0x2000 )
+	ROM_LOAD( "di-08.2j",     0x04000, 0x2000, CRC(c32a21d8) SHA1(01898abf24aa40b13939afed96c990f430eb3bf1) )
+	ROM_CONTINUE(             0x0c000, 0x2000 )
+	ROM_CONTINUE(             0x06000, 0x2000 )
+	ROM_CONTINUE(             0x0e000, 0x2000 )
+	ROM_LOAD( "di-11.6j",     0x10000, 0x2000, CRC(6424d5c3) SHA1(9ad6cfe6effca795709f90839a338f2a9148128f) )
+	ROM_CONTINUE(             0x18000, 0x2000 )
+	ROM_CONTINUE(             0x12000, 0x2000 )
+	ROM_CONTINUE(             0x1a000, 0x2000 )
+	ROM_LOAD( "di-10.4j",     0x14000, 0x2000, CRC(9b89300a) SHA1(5575daa226188cb1ea7d7a23f4966252bfb748e0) )
+	ROM_CONTINUE(             0x1c000, 0x2000 )
+	ROM_CONTINUE(             0x16000, 0x2000 )
+	ROM_CONTINUE(             0x1e000, 0x2000 )
+
+	ROM_REGION( 0x20000, "gfx4", 0 )    /* sprites */
+	ROM_LOAD( "di-16.17h",    0x00000, 0x8000, CRC(0de055d7) SHA1(ef763237c317545520c659f438b572b11c342d5a) )
+	ROM_LOAD( "di-13.13h",    0x08000, 0x8000, CRC(869219da) SHA1(9ab2439d6d1c62fce24c4f78ac7887f34c86cd75) )
+	ROM_LOAD( "di-14.14h",    0x10000, 0x8000, CRC(6b65812e) SHA1(209e07b2fced6b033c6d5398a998374588a35f46) )
+	ROM_LOAD( "di-15.15h",    0x18000, 0x8000, CRC(3e27f77d) SHA1(9ceccb1f56a8d0e05f6dea45d102690a1370624e) )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "firetrap.3b",  0x0000,  0x0100, CRC(8bb45337) SHA1(deaf6ea53eb3955230db1fdcb870079758a0c996) ) /* palette red and green component */
+	ROM_LOAD( "firetrap.4b",  0x0100,  0x0100, CRC(d5abfc64) SHA1(6c808c1d6087804214dc29d35280f42382c40b18) ) /* palette blue component */
+	ROM_LOAD( "firetrap.1a",  0x0200,  0x0100, CRC(d67f3514) SHA1(afadda6111fea663fe1373a81e184e51afc601df) ) // ?
+ROM_END
+
 ROM_START( firetrapj )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 64k for banked ROMs */
 	ROM_LOAD( "fi-03.4a",     0x00000, 0x8000, CRC(20b2a4ff) SHA1(7c5de0789c5d3459063eb791f62d41c05ab474cc) )
@@ -898,6 +962,7 @@ ROM_END
 
 
 
-GAME( 1986, firetrap,   0,        firetrap,   firetrap, driver_device,   0, ROT90, "Wood Place Inc. (Data East USA license)", "Fire Trap (US)", GAME_SUPPORTS_SAVE )
+GAME( 1986, firetrap,   0,        firetrap,   firetrap, driver_device,   0, ROT90, "Wood Place Inc. (Data East USA license)", "Fire Trap (US, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, firetrapa,  firetrap, firetrap,   firetrap, driver_device,   0, ROT90, "Wood Place Inc. (Data East USA license)", "Fire Trap (US, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1986, firetrapj,  firetrap, firetrap,   firetrapj, driver_device,  0, ROT90, "Wood Place Inc.", "Fire Trap (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1986, firetrapbl, firetrap, firetrapbl, firetrapbl, driver_device, 0, ROT90, "bootleg", "Fire Trap (Japan bootleg)", GAME_SUPPORTS_SAVE )
