@@ -51,7 +51,7 @@ K052109_CB_MEMBER(tmnt_state::cuebrick_tile_callback)
 	if ((m_k052109->get_rmrd_line() == CLEAR_LINE) && (layer == 0))
 	{
 		*code |= ((*color & 0x01) << 8);
-		*color = m_layer_colorbase[layer]  + ((*color & 0x80) >> 5) + ((*color & 0x10) >> 1);
+		*color = m_layer_colorbase[layer]  + ((*color & 0x0e) >> 1);
 	}
 	else
 	{
