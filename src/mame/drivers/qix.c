@@ -1457,7 +1457,7 @@ GAMEL(1982, elecyoyo, 0,        mcu,      elecyoyo, driver_device, 0,        ROT
 GAMEL(1982, elecyoyo2,elecyoyo, mcu,      elecyoyo, driver_device, 0,        ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 2)", GAME_SUPPORTS_SAVE, layout_elecyoyo )
 GAME( 1982, kram,     0,        mcu,      kram,     driver_device, 0,        ROT0,   "Taito America Corporation", "Kram (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1982, kram2,    kram,     mcu,      kram,     driver_device, 0,        ROT0,   "Taito America Corporation", "Kram (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1982, kram3,    kram,     kram3,    kram,     qix_state,     kram3,    ROT0,   "Taito America Corporation", "Kram (encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1982, kram3,    kram,     kram3,    kram,     qix_state,     kram3,    ROT0,   "Taito America Corporation", "Kram (encrypted)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
 GAME( 1982, zookeep,  0,        zookeep,  zookeep,  qix_state,     zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1982, zookeep2, zookeep,  zookeep,  zookeep,  qix_state,     zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, zookeep3, zookeep,  zookeep,  zookeep,  qix_state,     zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 3)", GAME_SUPPORTS_SAVE )
