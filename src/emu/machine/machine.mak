@@ -1892,6 +1892,15 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/machine/steppers.h,MACHINES += STEPPERS
+#-------------------------------------------------
+
+ifneq ($(filter STEPPERS,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/steppers.o
+endif
+
+#-------------------------------------------------
+#
 #@src/emu/machine/corvushd.h,MACHINES += CORVUSHD
 #-------------------------------------------------
 ifneq ($(filter CORVUSHD,$(MACHINES)),)

@@ -564,6 +564,7 @@ MACHINES += FDC37C665GT
 #MACHINES += SMC92X4
 #MACHINES += TI99_HD
 #MACHINES += STRATA
+MACHINES += STEPPERS
 #MACHINES += CORVUSHD
 #MACHINES += WOZFDC
 #MACHINES += DIABLO_HD
@@ -954,7 +955,6 @@ $(MAMEOBJ)/barcrest.a: \
 	$(DRIVERS)/mpu5hw.o $(DRIVERS)/mpu5.o \
 	$(VIDEO)/awpvid.o \
 	$(MACHINE)/meters.o \
-	$(MACHINE)/steppers.o \
 
 $(MAMEOBJ)/bfm.a: \
 	$(DRIVERS)/bfcobra.o \
@@ -1289,7 +1289,6 @@ $(MAMEOBJ)/jpm.a: \
 	$(DRIVERS)/jpmsys7.o \
 	$(VIDEO)/awpvid.o \
 	$(MACHINE)/meters.o \
-	$(MACHINE)/steppers.o \
 
 $(MAMEOBJ)/kaneko.a: \
 	$(DRIVERS)/airbustr.o $(VIDEO)/airbustr.o \
