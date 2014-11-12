@@ -271,6 +271,19 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="bdash">
+		<description>Boulder Dash</description>
+		<year>1984</year>
+		<publisher>コンプティーク (Comptiq)</publisher>
+		<info name="alt_title" value="バルダーダッシュ"/>
+		<info name="release" value="198411xx"/>
+		<part name="cass1" interface="fm7_cass">
+			<dataarea name="cass" size="2343550">
+				<rom name="baldush.t77" size="2343550" crc="23287d88" sha1="cfdf3354867c55bc557c47df6929a23f00f4f791" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bushman">
 		<description>Happy Bushman</description>
 		<year>1983</year>
@@ -517,6 +530,19 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="doordmk2">
+		<description>Door Door mkII</description>
+		<year>1985</year>
+		<publisher>エニックス (Enix)</publisher>
+		<info name="serial" value="E-G138"/>
+		<info name="alt_title" value="ドアドアマークII"/>
+		<part name="cass1" interface="fm7_cass">
+			<dataarea name="cass" size="5236124">
+				<rom name="door door mkii (1985).t77" size="5236124" crc="688e59c4" sha1="22415c5b6618a87fbef5d3bc27b87706e2059e12" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dslayer">
 		<description>Dragon Slayer</description>
 		<year>1984</year>
@@ -552,6 +578,18 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="904832">
 				<rom name="egg.t77" size="904832" crc="aa938b89" sha1="50cb41c0b2def21bed19032b9c3f3f81d6f4a521" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="enterprs">
+		<description>Enterprise</description>
+		<year>1983</year>
+		<publisher>MIA</publisher>
+		<info name="alt_title" value="エンタープライズ"/>
+		<part name="cass1" interface="fm7_cass">
+			<dataarea name="cass" size="1368186">
+				<rom name="ent.t77" size="1368186" crc="4e89f220" sha1="9e65c2c23d23f6a37af7658c74c3bfdf2b144862" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -733,6 +771,19 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2345284">
 				<rom name="gbank.t77" size="2345284" crc="03aeaf4b" sha1="df1d1772f27235dbc526218658ca9766a6a7b8a6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gbanka" cloneof="gbank">
+		<description>Gutchan Bank (Alt)</description>
+		<year>1985</year>
+		<publisher>日本ソフトバンク (Nihon SoftBank)</publisher>
+		<info name="release" value="198506xx"/>
+		<info name="alt_title" value="ぐっちゃんバンク"/>
+		<part name="cass1" interface="fm7_cass">
+			<dataarea name="cass" size="2407350">
+				<rom name="gbank.t77" size="2407350" crc="b5b66db4" sha1="7498c5b8f25eb5aa3a8dfd2972d75f7af22dce1a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1363,6 +1414,18 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="ninjakuna" cloneof="ninjakun">
+		<description>Ninja-kun (Alt)</description>
+		<year>1986</year>
+		<publisher>日本デクスタ (Nihon Dexter)</publisher>
+		<info name="alt_title" value="忍者くん"/>
+		<part name="cass1" interface="fm7_cass">
+			<dataarea name="cass" size="2716494">
+				<rom name="ninjya.t77" size="2716494" crc="17bdb4f1" sha1="b5e30d4f39395d0e7d3f33a78d94fad993041ca4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nobunaga">
 		<description>Nobunaga no Yabou</description>
 		<year>1983</year>
@@ -1562,6 +1625,19 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2132424">
 				<rom name="punch.t77" size="2132424" crc="df66e659" sha1="37f81f05983f5d68ccfa56da82cb686ddec5a134" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pushpul2">
+		<description>Push Pull II</description>
+		<year>1985</year>
+		<publisher>Compac</publisher>
+		<info name="serial" value="CF-1190"/>
+		<info name="alt_title" value="プッシュプルII"/>
+		<part name="cass1" interface="fm7_cass">
+			<dataarea name="cass" size="1570538">
+				<rom name="push pull ii (1985)(compac).t77" size="1570538" crc="40cd4fcb" sha1="b3919c5b46d4d840b45650ddee1f16c722c1accd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
