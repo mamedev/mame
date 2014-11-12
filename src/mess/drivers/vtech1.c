@@ -223,8 +223,8 @@ WRITE8_MEMBER( vtech1_state::vtech1_latch_w )
 		m_mc6847->gm2_w(BIT(data, 1));
 	}
 
-	// bit 2, cassette out
-	m_cassette->output( BIT(data, 2) ? +1.0 : -1.0);
+	// bit 2, cassette out (actually bits 1 and 2 perform this function, so either can be used)
+	m_cassette->output( BIT(data, 2) ? -1.0 : +1.0);
 
 	// bit 3 and 4, vdc mode control lines
 	m_mc6847->ag_w(BIT(data, 3));
