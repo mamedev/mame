@@ -5609,6 +5609,7 @@ ROM_END
 // 0009     GAME( 2004, wangmido, wangmid,  chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune (Export) (GDX-0009)", GAME_NO_SOUND|GAME_NOT_WORKING )
 // 0009A    GAME( 2004, wangmida, wangmid,  chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune (Export) (Rev A) (GDX-0009A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 /* 0009B */ GAME( 2004, wangmid,  chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune (Export) (Rev B) (GDX-0009B)", GAME_NO_SOUND|GAME_NOT_WORKING )
+// 0010
 // 0011     GAME( 2004, outr2sp,  chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Out Run 2 SP (Japan) (GDX-0011)", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_SUPPORTS_SAVE )
 // 0012     GAME( 2004, ghostsqo, ghostsqu, chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Ghost Squad (GDX-0012)", GAME_NO_SOUND|GAME_NOT_WORKING )
 /* 0012A */ GAME( 2004, ghostsqu, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Ghost Squad (Rev A) (GDX-0012A)", GAME_NO_SOUND|GAME_NOT_WORKING )
@@ -5627,7 +5628,11 @@ ROM_END
 /* 0017F */ GAME( 2005, mj3,      chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 3 (Rev F) (GDX-0017F)", GAME_NO_SOUND|GAME_NOT_WORKING )
 // 0018     GAME( 2005, scg06nto, scg06nt,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Club Golf 2006 Next Tours (GDX-0018)", GAME_NO_SOUND|GAME_NOT_WORKING )
 /* 0018A */ GAME( 2005, scg06nt,  chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Club Golf 2006 Next Tours (Rev A) (GDX-0018A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+// 0019
+// 0020
 // 0021     GAME( 2005, mj3evo,   mj3ev,    chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 3 Evolution (GDX-0021)", GAME_NO_SOUND|GAME_NOT_WORKING )
 // 0021A    GAME( 2005, mj3ev,    chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 3 Evolution (Rev A) (GDX-0021A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-// 0024A    GAME( 2009, ccfboxo,  ccfboxa,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Chihiro Firmware Update For Compact Flash Box (GDX-0024)", GAME_NO_SOUND|GAME_NOT_WORKING )
+// 0022
+// 0023
+// 0024     GAME( 2009, ccfboxo,  ccfboxa,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Chihiro Firmware Update For Compact Flash Box (GDX-0024)", GAME_NO_SOUND|GAME_NOT_WORKING )
 /* 0024A */ GAME( 2009, ccfboxa,  chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Chihiro Firmware Update For Compact Flash Box (Rev A) (GDX-0024A)", GAME_NO_SOUND|GAME_NOT_WORKING )

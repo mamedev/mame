@@ -247,7 +247,7 @@ ROM Board (attached to CN3 of Media Board, ONLY for use with Namco ROM cart vers
 |---------------|
 Notes:
          * - These parts on other side of PCB
- FLASH.ICx - (except IC9) Samsung K9F1208U0B 512MBit (64Mx8) 3.0V NAND Flash ROM (TSOP48)
+ FLASH.ICx - (except IC9) Samsung K9F1208U0B 512Mbit (64Mx8) or Toshiba TC58DVG02A1FT00 1Gbit (128Mx8), both 3.0V NAND Flash ROM (TSOP48)
  FLASH.IC9 - Macronix 29LV400CTTC-70G 4MBit (512k x8 / 256k x16) 3V FLASH ROM (TSOP48)
       CN1S - Connector joining to Media Board (located under the PCB)
        CN2 - 10-pin JTAG Connector for reprogramming the FPGA (all JTAG connectors and required support parts are not populated)
@@ -923,6 +923,7 @@ ROM_END
 /* GDT-xxxx (Sega GD-ROM games) */
 /* 0001  */ GAME( 2002, vs2002j,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega / Amusement Vision",            "Virtua Striker 2002 (GDT-0001)", GAME_IS_SKELETON )
 /* 0002  */ GAME( 2002, vs2002ex, triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega / Amusement Vision",            "Virtua Striker 2002 (GDT-0002)", GAME_IS_SKELETON )
+// 0003
 // 0004     GAME( 2003, fzeroaxo, fzeroax,  triforcegd,    triforce, driver_device, 0, ROT0, "Sega / Amusement Vision / Nintendo", "F-Zero AX (GDT-0004)", GAME_IS_SKELETON )
 // 0004A    GAME( 2003, fzeroaxa, fzeroax,  triforcegd,    triforce, driver_device, 0, ROT0, "Sega / Amusement Vision / Nintendo", "F-Zero AX (Rev A) (GDT-0004A)", GAME_IS_SKELETON )
 // 0004B    GAME( 2003, fzeroaxb, fzeroax,  triforcegd,    triforce, driver_device, 0, ROT0, "Sega / Amusement Vision / Nintendo", "F-Zero AX (Rev B) (GDT-0004B)", GAME_IS_SKELETON )
@@ -934,6 +935,7 @@ ROM_END
 // 0005B    GAME( 2003, avalonsb, avalons,  triforcegd,    triforce, driver_device, 0, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon - The Wizard Master (server) (Rev B) (GDT-0005B)", GAME_IS_SKELETON )
 /* 0005C */ GAME( 2003, avalons,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon - The Wizard Master (server) (Rev C) (GDT-0005C)", GAME_IS_SKELETON )
 // 0006     GAME( 2003, avalonc,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon - The Wizard Master (client) (GDT-0006)", GAME_IS_SKELETON )
+// 0007
 // 0008     GAME( 2003, gekpury,  gekpurya, triforcegd,    triforce, driver_device, 0, ROT0, "Sega / Wow Entertainment",           "Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu (GDT-0008)", GAME_IS_SKELETON )
 // 0008A    GAME( 2003, gekpura,  gekpurya, triforcegd,    triforce, driver_device, 0, ROT0, "Sega / Wow Entertainment",           "Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu (Rev A) (GDT-0008A)", GAME_IS_SKELETON )
 // 0008B    GAME( 2003, gekpurb,  gekpurya, triforcegd,    triforce, driver_device, 0, ROT0, "Sega / Wow Entertainment",           "Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu (Rev B) (GDT-0008B)", GAME_IS_SKELETON )
@@ -944,17 +946,21 @@ ROM_END
 // 0010B    GAME( 2004, avalc13b, avalon13, triforcegd,    triforce, driver_device, 0, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon 1.3 - Chaotic Sabbat (client) (Rev B) (GDT-0010B)", GAME_IS_SKELETON )
 /* 0010C */ GAME( 2004, avalon13, triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon 1.3 - Chaotic Sabbat (client) (Rev C) (GDT-0010C)", GAME_IS_SKELETON )
 /* 0011  */ GAME( 2004, tfupdate, triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Triforce DIMM Updater (GDT-0011)", GAME_IS_SKELETON )
+// 0012
 // 0013     GAME( 2005, vs4jo,    vs4j,     triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Virtua Striker 4 (Japan) (GDT-0013)", GAME_IS_SKELETON )
 // 0013A    GAME( 2005, vs4ja,    vs4j,     triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Virtua Striker 4 (Japan) (Rev A) (GDT-0013A)", GAME_IS_SKELETON )
 // 0013B    GAME( 2005, vs4jb,    vs4j,     triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Virtua Striker 4 (Japan) (Rev B) (GDT-0013B)", GAME_IS_SKELETON )
 // 0013C    GAME( 2005, vs4jc,    vs4j,     triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Virtua Striker 4 (Japan) (Rev C) (GDT-0013C)", GAME_IS_SKELETON )
 // 0013D    GAME( 2005, vs4jd,    vs4j,     triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Virtua Striker 4 (Japan) (Rev D) (GDT-0013D)", GAME_IS_SKELETON )
 /* 0013E */ GAME( 2005, vs4j,     triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Virtua Striker 4 (Japan) (Rev E) (GDT-0013E)", GAME_IS_SKELETON )
+// 0014
 /* 0015  */ GAME( 2004, vs4,      triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Virtua Striker 4 (Export) (GDT-0015)", GAME_IS_SKELETON )
 // 0016     GAME( 2004, aval20s,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon 2.0 - Eutaxy and Commandment (server) (GDT-0016)", GAME_IS_SKELETON )
 // 0017     GAME( 2004, avalc20o, avalon20, triforcegd,    triforce, driver_device, 0, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon 2.0 - Eutaxy and Commandment (client) (GDT-0017)", GAME_IS_SKELETON )
 // 0017A    GAME( 2004, avalc20a, avalon20, triforcegd,    triforce, driver_device, 0, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon 2.0 - Eutaxy and Commandment (client) (Rev A) (GDT-0017A)", GAME_IS_SKELETON )
 /* 0017B */ GAME( 2004, avalon20, triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega / Hitmaker",                    "The Key Of Avalon 2.0 - Eutaxy and Commandment (client) (Rev B) (GDT-0017B)", GAME_IS_SKELETON )
+// 0018
+// 0019
 // 0020     GAME( 2006, vs42k6o,  vs42006,  triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Virtua Striker 4 Ver.2006 (Japan) (GDT-0020)", GAME_IS_SKELETON )
 // 0020A    GAME( 2006, vs42k6a,  vs42006,  triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Virtua Striker 4 Ver.2006 (Japan) (Rev A) (GDT-0020A)", GAME_IS_SKELETON )
 // 0020B    GAME( 2006, vs42k6b,  vs42006,  triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Virtua Striker 4 Ver.2006 (Japan) (Rev B) (GDT-0020B)", GAME_IS_SKELETON )
@@ -964,7 +970,7 @@ ROM_END
 // 0022     GAME( 2006, tcfboxo,  tcfboxa,  triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Triforce Firmware Update For Compact Flash Box (GDT-0022)", GAME_IS_SKELETON )
 // 0022A    GAME( 2006, tcfboxa,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Triforce Firmware Update For Compact Flash Box (Rev A) (GDT-0022A)", GAME_IS_SKELETON )
 
-// ROM games
-/* 14343 */ GAME( 2005, mkartagp, triforce, triforce_base, triforce, driver_device, 0, ROT0, "Namco / Nintendo",                   "Mario Kart Arcade GP (MKA2 Ver.B)", GAME_IS_SKELETON )
-/* 14343 */ GAME( 2007, mkartag2, triforce, triforce_base, triforce, driver_device, 0, ROT0, "Namco / Nintendo",                   "Mario Kart Arcade GP 2 (MK21 Ver.A)", GAME_IS_SKELETON )
-/* 14343 */ GAME( 2007, mkartag2a,mkartag2, triforce_base, triforce, driver_device, 0, ROT0, "Namco / Nintendo",                   "Mario Kart Arcade GP 2 (MK21 Ver.A, alt dump)", GAME_IS_SKELETON )
+// 837-xxxxx (Sega cart games)
+/* 14343-4T1  */ GAME( 2005, mkartagp, triforce, triforce_base, triforce, driver_device, 0, ROT0, "Namco / Nintendo", "Mario Kart Arcade GP (MKA2 Ver.B)", GAME_IS_SKELETON )
+/* 14343-R4S0 */ GAME( 2007, mkartag2, triforce, triforce_base, triforce, driver_device, 0, ROT0, "Namco / Nintendo", "Mario Kart Arcade GP 2 (MK21 Ver.A)", GAME_IS_SKELETON )
+/* 14343-R4S0 */ GAME( 2007, mkartag2a,mkartag2, triforce_base, triforce, driver_device, 0, ROT0, "Namco / Nintendo", "Mario Kart Arcade GP 2 (MK21 Ver.A, alt dump)", GAME_IS_SKELETON )
