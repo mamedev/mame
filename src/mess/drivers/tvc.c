@@ -826,6 +826,7 @@ static MACHINE_CONFIG_START( tvc, tvc_state )
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "tvc_cart")
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "tvc_cass")
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -178,7 +178,6 @@ static MACHINE_CONFIG_START( mikro80, mikro80_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mikro80)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
-
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -186,6 +185,9 @@ static MACHINE_CONFIG_START( mikro80, mikro80_state )
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(rk8_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
+	MCFG_CASSETTE_INTERFACE("mikro80_cass")
+
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "mikro80")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( radio99, mikro80 )
@@ -226,6 +228,8 @@ ROM_START( kristall2 )
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD( "kristall-2.fnt", 0x0000, 0x0800, CRC(9661c9f5) SHA1(830c38735dcb1c8a271fa0027f94b4e034848fc8))
 ROM_END
+
+
 /* Driver */
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY                  FULLNAME   FLAGS */
 COMP( 1983, mikro80,     0,      0, mikro80,    mikro80, mikro80_state, mikro80, "<unknown>", "Mikro-80",    0)

@@ -585,10 +585,14 @@ static MACHINE_CONFIG_START( pmd85, pmd85_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(pmd85_cassette_formats)
 	MCFG_CASSETTE_CREATE_OPTS(&pmd85_cassette_options)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("pmd85_cass")
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "pmd85_cass")
 
 	/* uart */
 	MCFG_DEVICE_ADD("uart", I8251, 0)
@@ -687,7 +691,7 @@ static MACHINE_CONFIG_DERIVED( mato, pmd85 )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(pmd85_state, mato_ppi_0_portc_w))
 
 	/* no uart */
-	MCFG_DEVICE_REMOVE( "uart" )
+	MCFG_DEVICE_REMOVE("uart")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( c2717, pmd851 )
