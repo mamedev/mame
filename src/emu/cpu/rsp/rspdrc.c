@@ -4823,20 +4823,20 @@ inline void rsp_device::ccfunc_rsp_vaddb_scalar()
 		{
 			hs = 255;
 		}
-		else if (hs < 0)
+		/*else if (hs < 0)
 		{
 			hs = 0;
-		}
+		}*/
 
 		ls >>= EL;
 		if (ls > 255)
 		{
 			ls = 255;
 		}
-		else if (ls < 0)
+		/*else if (ls < 0)
 		{
 			ls = 0;
-		}
+		}*/
 
 		vres[i] = 0; // VD writeback disabled on production hardware
 		// vres[i] = (hs << 8) | ls;
