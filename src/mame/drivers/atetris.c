@@ -8,7 +8,8 @@
         * Tetris
 
     Known bugs:
-        * none at this time
+        * the bootlegs don't actually have the slapstic. The additional
+		  hardware needs to be emulated.
 
 ****************************************************************************
 
@@ -130,7 +131,7 @@ void atetris_state::machine_reset()
  *
  *************************************/
 
-READ8_MEMBER(atetris_state::atetris_slapstic_r)
+READ8_MEMBER(atetris_state::slapstic_r)
 {
 	int result = m_slapstic_base[0x2000 + offset];
 	int new_bank = m_slapstic_device->slapstic_tweak(space, offset) & 1;
@@ -190,7 +191,7 @@ WRITE8_MEMBER(atetris_state::nvram_enable_w)
 /* full address map derived from schematics */
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, atetris_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(atetris_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0300) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x2400, 0x25ff) AM_MIRROR(0x0200) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
 	AM_RANGE(0x2800, 0x280f) AM_MIRROR(0x03e0) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
@@ -200,14 +201,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, atetris_state )
 	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x03ff) AM_WRITE(coincount_w)
 	AM_RANGE(0x4000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x7fff) AM_READ(atetris_slapstic_r)
+	AM_RANGE(0x6000, 0x7fff) AM_READ(slapstic_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( atetrisb2_map, AS_PROGRAM, 8, atetris_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(atetris_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x2000, 0x20ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x2400, 0x25ff) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
 	AM_RANGE(0x2802, 0x2802) AM_DEVWRITE("sn1", sn76496_device, write)
@@ -220,7 +221,27 @@ static ADDRESS_MAP_START( atetrisb2_map, AS_PROGRAM, 8, atetris_state )
 	AM_RANGE(0x3800, 0x3800) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(coincount_w)
 	AM_RANGE(0x4000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x7fff) AM_READ(atetris_slapstic_r)
+	AM_RANGE(0x6000, 0x7fff) AM_READ(slapstic_r)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( atetrisb3_map, AS_PROGRAM, 8, atetris_state )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x2000, 0x20ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x2400, 0x25ff) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
+	//AM_RANGE(0x2802, 0x2802) AM_DEVWRITE("sn1", sn76489_device, write)
+	//AM_RANGE(0x2804, 0x2804) AM_DEVWRITE("sn2", sn76489_device, write)
+	//AM_RANGE(0x2806, 0x2806) AM_DEVWRITE("sn3", sn76489_device, write)
+	AM_RANGE(0x2808, 0x2808) AM_READ_PORT("IN0")
+	AM_RANGE(0x2818, 0x2818) AM_READ_PORT("IN1")
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x3400, 0x3400) AM_WRITE(nvram_enable_w)
+	AM_RANGE(0x3800, 0x3800) AM_WRITE(irq_ack_w)
+	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(coincount_w)
+	AM_RANGE(0x4000, 0x5fff) AM_ROM
+	AM_RANGE(0x6000, 0x7fff) AM_READ(slapstic_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -321,7 +342,7 @@ static MACHINE_CONFIG_START( atetris, atetris_state )
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(atetris_state, screen_update_atetris)
+	MCFG_SCREEN_UPDATE_DRIVER(atetris_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 
@@ -358,7 +379,7 @@ static MACHINE_CONFIG_START( atetrisb2, atetris_state )
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(atetris_state, screen_update_atetris)
+	MCFG_SCREEN_UPDATE_DRIVER(atetris_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 
@@ -372,6 +393,24 @@ static MACHINE_CONFIG_START( atetrisb2, atetris_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("sn3", SN76496, BOOTLEG_CLOCK/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( atetrisb3, atetrisb2 )
+
+	MCFG_CPU_REPLACE("maincpu", M6502, MASTER_CLOCK/8)
+	MCFG_CPU_PROGRAM_MAP(atetrisb3_map)
+	
+	//8749 at 10 MHz instead of slapstic
+
+	MCFG_SOUND_REPLACE("sn1", SN76489, 4000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	
+	MCFG_SOUND_REPLACE("sn2", SN76489, 4000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	
+	MCFG_SOUND_REPLACE("sn3", SN76489, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -428,6 +467,50 @@ ROM_START( atetrisb2 )
 ROM_END
 
 
+/*
+Tetris (Korean bootleg of atetrisa set)
+
+PCB Layout
+----------
+
+RC-1108
+|---------------------------------------------------|
+|                                        14.31818MHz|
+| PAL                                               |
+|                                                   |
+|     P8749H   6116                                 |
+|J                                                  |
+|A          10MHz                     27512         |
+|M              PAL                                 |
+|M                                62256             |
+|A                                                  |
+|                27512                              |
+|                                              PAL  |
+|                                      PAL     PAL  |
+|76489 76489  4MHz                  82S123          |
+|76489              6502                            |
+|VOL MB3713    PAL                                  |
+|---------------------------------------------------|
+*/
+
+ROM_START( atetrisb3 )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "prg.bin",           0x10000, 0x8000, CRC(2bcab107) SHA1(3cfb8df8cd3782f3ff7f6b32ff15c461352061ee) )
+	ROM_CONTINUE(             0x08000, 0x8000 )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "gfx.bin",     0x0000, 0x10000, CRC(84a1939f) SHA1(d8577985fc8ed4e74f74c68b7c00c4855b7c3270) )
+	
+	// 8749 (10 MHz OSC) instead of the slapstic, needs to be hooked up.
+	ROM_REGION( 0x0800, "user1", 0 )
+	ROM_LOAD( "8749h.bin",    0x0000, 0x0800, CRC(a66a9c47) SHA1(fbebd755a5e826c7d94ebcafdff2f9a01c9fd1a5) )
+	
+	// currently unused
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.bin", 0x00000, 0x0020, CRC(79656af3) SHA1(bf55f100806520b291157c03999606367dd14ecc) )
+ROM_END
+
+
 ROM_START( atetrisc )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "tetcktl1.rom", 0x10000, 0x8000, CRC(9afd1f4a) SHA1(323d1576d92c905e8e95108b39cabf6fa0c10db6) )
@@ -472,9 +555,10 @@ DRIVER_INIT_MEMBER(atetris_state,atetris)
  *
  *************************************/
 
-GAME( 1988, atetris,  0,       atetris,  atetris, atetris_state,  atetris, ROT0,   "Atari Games", "Tetris (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1988, atetrisa, atetris, atetris,  atetris, atetris_state,  atetris, ROT0,   "Atari Games", "Tetris (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1988, atetrisb, atetris, atetris,  atetris, atetris_state,  atetris, ROT0,   "bootleg",     "Tetris (bootleg set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1988, atetrisb2,atetris, atetrisb2,atetris, atetris_state,  atetris, ROT0,   "bootleg",     "Tetris (bootleg set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1989, atetrisc, atetris, atetris,  atetrisc, atetris_state, atetris, ROT270, "Atari Games", "Tetris (cocktail set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1989, atetrisc2,atetris, atetris,  atetrisc, atetris_state, atetris, ROT270, "Atari Games", "Tetris (cocktail set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1988, atetris,  0,       atetris,   atetris, atetris_state,  atetris, ROT0,   "Atari Games", "Tetris (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1988, atetrisa, atetris, atetris,   atetris, atetris_state,  atetris, ROT0,   "Atari Games", "Tetris (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1988, atetrisb, atetris, atetris,   atetris, atetris_state,  atetris, ROT0,   "bootleg",     "Tetris (bootleg set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1988, atetrisb2,atetris, atetrisb2, atetris, atetris_state,  atetris, ROT0,   "bootleg",     "Tetris (bootleg set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1988, atetrisb3,atetris, atetrisb3, atetris, atetris_state,  atetris, ROT0,   "bootleg",     "Tetris (bootleg set 3)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1989, atetrisc, atetris, atetris,   atetrisc, atetris_state, atetris, ROT270, "Atari Games", "Tetris (cocktail set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, atetrisc2,atetris, atetris,   atetrisc, atetris_state, atetris, ROT270, "Atari Games", "Tetris (cocktail set 2)", GAME_SUPPORTS_SAVE )
