@@ -2210,6 +2210,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/aces1.o \
 	$(DRIVERS)/acesp.o \
 	$(DRIVERS)/adp.o \
+	$(DRIVERS)/alinvade.o \
 	$(DRIVERS)/amaticmg.o \
 	$(DRIVERS)/ampoker2.o $(VIDEO)/ampoker2.o \
 	$(DRIVERS)/amspdwy.o $(VIDEO)/amspdwy.o \
