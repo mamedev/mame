@@ -31,7 +31,7 @@ TILE_GET_INFO_MEMBER(atetris_state::get_tile_info)
  *
  *************************************/
 
-WRITE8_MEMBER(atetris_state::atetris_videoram_w)
+WRITE8_MEMBER(atetris_state::videoram_w)
 {
 	UINT8 *videoram = m_videoram;
 
@@ -60,7 +60,7 @@ void atetris_state::video_start()
  *
  *************************************/
 
-UINT32 atetris_state::screen_update_atetris(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 atetris_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;

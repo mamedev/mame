@@ -7207,6 +7207,7 @@ atetris         // 136066           (c) 1988
 atetrisa        // 136066           (c) 1988
 atetrisb        // (bootleg)
 atetrisb2       // (bootleg)
+atetrisb3       // (bootleg)
 // Escape from the Planet of Robot Monsters
 eprom           // 136069           (c) 1989
 eprom2          // 136069           (c) 1989
@@ -31849,3 +31850,6 @@ mgavegas133
 
 amusco     // 1987, Amusco.
 cocoloco   // 198?, Petaco S.A.
+
+alinvade
+

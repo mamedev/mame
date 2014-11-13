@@ -16,8 +16,7 @@
 #include "sound/dac.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-
-#include "rendlay.h"
+#include "machine/nvram.h"
 
 /* SM8521 register addresses */
 enum
@@ -217,8 +216,8 @@ public:
 		m_dac(*this, "dac"),
 		m_cart1(*this, "cartslot1"),
 		m_cart2(*this, "cartslot2"),
-		m_p_nvram(*this,"p_nvram"),
-		m_p_videoram(*this,"p_videoram"),
+		m_p_nvram(*this,"nvram"),
+		m_p_videoram(*this,"videoram"),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
 		m_bank3(*this, "bank3"),
@@ -228,8 +227,7 @@ public:
 		m_io_in0(*this, "IN0"),
 		m_io_in1(*this, "IN1"),
 		m_io_in2(*this, "IN2"),
-		m_io_styx(*this, "STYX"),
-		m_io_styy(*this, "STYY")
+		m_io_grid(*this, "GRID")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -251,8 +249,6 @@ public:
 	GAMECOM_DMA m_dma;
 	GAMECOM_TIMER m_timer[2];
 	gamecom_sound_t m_sound;
-	int m_stylus_x;
-	int m_stylus_y;
 	int m_scanline;
 	unsigned int m_base_address;
 	bitmap_ind16 m_bitmap;
@@ -288,8 +284,7 @@ protected:
 	required_ioport m_io_in0;
 	required_ioport m_io_in1;
 	required_ioport m_io_in2;
-	required_ioport m_io_styx;
-	required_ioport m_io_styy;
+	required_ioport_array<13> m_io_grid;
 };
 
 #endif /* GAMECOM_H_ */

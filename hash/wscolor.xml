@@ -1680,6 +1680,34 @@
 		</part>
 	</software>
 
+	<software name="wwitch" supported="no">
+		<!-- WSC only -->
+		<description>WonderWitch (w/FreyaOS 1.2.0)</description>
+		<year>2000</year>
+		<publisher>Qute</publisher>
+		<info name="release" value="20000718"/>
+		<info name="alt_title" value="ワンダーウィッチ"/>
+		<part name="cart" interface="wswan_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="wonderwitch [freyaos 1.2.0].bin" size="524288" crc="8e5e9633" sha1="d9dd280972ec45e56de98f3d425533dd49713caf" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wwitcha" cloneof="wwitch" supported="no">
+		<!-- WSC only -->
+		<description>WonderWitch (w/FreyaOS 1.1.5)</description>
+		<year>2000</year>
+		<publisher>Qute</publisher>
+		<info name="release" value="20000718"/>
+		<info name="alt_title" value="ワンダーウィッチ"/>
+		<part name="cart" interface="wswan_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="wonderwitch [freyaos 1.1.5].bin" size="524288" crc="45ba7287" sha1="905cca29fd6188b2c6237b1fb71e89d7b6a1f842" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="xcard">
 		<!-- WSC only -->
 		<description>X - Card of Fate</description>
