@@ -101,9 +101,19 @@ WRITE16_MEMBER(ngen_state::peripheral_w)
 {
 	switch(offset)
 	{
+	case 0x144:
+		if(mem_mask & 0x00ff)
+			m_crtc->address_w(space,0,data & 0xff);
+		break;
+	case 0x145:
+		if(mem_mask & 0x00ff)
+			m_crtc->register_w(space,0,data & 0xff);
+		break;
+	case 0x146:
+		if(mem_mask & 0x00ff)
+			m_pic->write(space,0,data & 0xff);
+		break;
 	case 0x147:
-		if(mem_mask & 0xff00)
-			m_pic->write(space,0,(data >> 8) & 0xff);
 		if(mem_mask & 0x00ff)
 			m_pic->write(space,1,data & 0xff);
 		break;
@@ -116,6 +126,14 @@ READ16_MEMBER(ngen_state::peripheral_r)
 	UINT16 ret = 0xff;
 	switch(offset)
 	{
+	case 0x144:
+		if(mem_mask & 0x00ff)
+			ret = m_crtc->status_r(space,0);
+		break;
+	case 0x145:
+		if(mem_mask & 0x00ff)
+			ret = m_crtc->register_r(space,0);
+		break;
 	case 0x146:
 		if(mem_mask & 0x00ff)
 			ret = m_pic->read(space,0);
@@ -200,15 +218,17 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	// video board
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(720,348)
+	MCFG_SCREEN_VISIBLE_AREA(0,719,0,347)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc",mc6845_device, screen_update)
 
-	MCFG_MC6845_ADD("crtc", MC6845, NULL, 19980000 / 16)  // divisor unknown
+	MCFG_MC6845_ADD("crtc", MC6845, NULL, 19980000 / 9)  // divisor unknown -- /9 gives 60Hz output, so likely correct
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(9)
 	MCFG_MC6845_UPDATE_ROW_CB(ngen_state, crtc_update_row)
+	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_DEVICE_ADD("videouart", I8251, 19980000 / 16)  // divisor unknown
+	MCFG_DEVICE_ADD("videouart", I8251, 19980000 / 9)  // divisor unknown
 
 MACHINE_CONFIG_END
 
