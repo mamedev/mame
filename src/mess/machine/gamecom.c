@@ -62,31 +62,17 @@ void gamecom_state::gamecom_set_mmu(UINT8 mmu, UINT8 data)
 
 void gamecom_state::handle_stylus_press( int column )
 {
-	static const UINT16 row_data[17] = { 0x3FE, 0x3FD, 0x3FB, 0x3F7, 0x3EF, 0x3DF, 0x3BF, 0x37F, 0x2FF, 0x1FF };
-
-	if ( column == 0 )
+	UINT16 data = m_io_grid[column]->read();
+	if (data)
 	{
-		if ( !BIT( m_io_in2->read(), 2) )
-		{
-			m_stylus_x = m_io_styx->read() >> 4;
-			m_stylus_y = m_io_styy->read() >> 4;
-		}
-		else
-		{
-			m_stylus_x = 16;
-			m_stylus_y = 16;
-		}
-	}
-
-	if ( m_stylus_x == column )
-	{
-		m_p_ram[SM8521_P0] = row_data[m_stylus_y];
-		m_p_ram[SM8521_P1] = ( m_p_ram[SM8521_P1] & 0xFC ) | ( ( row_data[m_stylus_y] >> 8 ) & 3 );
+		UINT16 stylus_y = data ^ 0x3ff;
+		m_p_ram[SM8521_P0] = stylus_y;
+		m_p_ram[SM8521_P1] = ( m_p_ram[SM8521_P1] & 0xFC ) | ( stylus_y >> 8 );
 	}
 	else
 	{
 		m_p_ram[SM8521_P0] = 0xFF;
-		m_p_ram[SM8521_P1] = ( m_p_ram[SM8521_P1] & 0xFC ) | 3;
+		m_p_ram[SM8521_P1] |= 3;
 	}
 }
 
