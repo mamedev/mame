@@ -4,7 +4,7 @@
   driver by Zsolt Vasvari
 
   TODO:
-  - remove protection hack
+  - remove protection hack (protection may be done by the 'H2' chip on the pcb)
 
 ***************************************************************************/
 
@@ -620,8 +620,6 @@ static GFXDECODE_START( imago )
 	GFXDECODE_ENTRY( "gfx4", 0,      imago_char_1bpp, 0x140,  1 )
 GFXDECODE_END
 
-#define CLOCK 18432000  /* The crystal is 18.432MHz */
-
 INTERRUPT_GEN_MEMBER(fastfred_state::vblank_irq)
 {
 	if(m_nmi_mask)
@@ -637,11 +635,11 @@ INTERRUPT_GEN_MEMBER(fastfred_state::sound_timer_irq)
 static MACHINE_CONFIG_START( fastfred, fastfred_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CLOCK/6)     /* 3.072 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12_432MHz/4)   /* 3.108 MHz; xtal from pcb pics, divider not verified */
 	MCFG_CPU_PROGRAM_MAP(fastfred_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", fastfred_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, CLOCK/12)  /* 1.536 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12_432MHz/8)  /* 1.554 MHz; xtal from pcb pics, divider not verified */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(fastfred_state, sound_timer_irq, 4*60)
 
@@ -664,10 +662,10 @@ static MACHINE_CONFIG_START( fastfred, fastfred_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay8910.1", AY8910, CLOCK/12)
+	MCFG_SOUND_ADD("ay8910.1", AY8910, XTAL_12_432MHz/8) /* 1.554 MHz; xtal from pcb pics, divider not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay8910.2", AY8910, CLOCK/12)
+	MCFG_SOUND_ADD("ay8910.2", AY8910, XTAL_12_432MHz/8) /* 1.554 MHz; xtal from pcb pics, divider not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
