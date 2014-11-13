@@ -317,7 +317,7 @@ Notes:
             have the ROM details over 2 lines, in this case 'SSFA' would be on the first line and '03B'
             on the second line. Each part of this label name is detailed below...
 
-            SSF -  The game title shortened to 3 characters, this game is 'Super Street Fighter 2'.
+            SSF -  The game title shortened to 3 characters, this game is 'Super Street Fighter II'.
 
             A   -  The region of the game, in this case 'Asia'. Known regions are...
                    J = Japan          E = ETC (World and Euro)
@@ -498,7 +498,7 @@ Notes:
       There is sufficient space next to the B-Board to enable this board to plug into the B-Board
       into CN7 and still be fully enclosed inside the housing. The housing has holes in it to allow
       the TX, RX and Register connectors to be accessed without opening the case.
-      This board is known to be used with "Super Street Fighter 2 : The Tournament Battle" and some
+      This board is known to be used with "Super Street Fighter II : The Tournament Battle" and some
       yellow rent boards also have this daughter board attached.
 
       SCN1    - Network Data IN
@@ -8822,9 +8822,9 @@ GAME( 1998, sfz3jr2,    sfa3,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   
 GAME( 1998, sfz3a,      sfa3,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Street Fighter Zero 3 (Asia 980904)", GAME_SUPPORTS_SAVE )
 GAME( 1998, sfz3ar1,    sfa3,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Street Fighter Zero 3 (Asia 980701)", GAME_SUPPORTS_SAVE )
 GAME( 1999, jyangoku,   0,        cps2, cps2_1p2b, cps_state, cps2,     ROT0,   "Capcom", "Jyangokushi: Haoh no Saihai (Japan 990527)", GAME_SUPPORTS_SAVE )
-GAME( 2004, hsf2,       0,        cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Hyper Street Fighter 2: The Anniversary Edition (USA 040202)", GAME_SUPPORTS_SAVE )
-GAME( 2004, hsf2a,      hsf2,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Hyper Street Fighter 2: The Anniversary Edition (Asia 040202)", GAME_SUPPORTS_SAVE )
-GAME( 2004, hsf2j,      hsf2,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Hyper Street Fighter 2: The Anniversary Edition (Japan 031222)", GAME_SUPPORTS_SAVE )
+GAME( 2004, hsf2,       0,        cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Hyper Street Fighter II: The Anniversary Edition (USA 040202)", GAME_SUPPORTS_SAVE )
+GAME( 2004, hsf2a,      hsf2,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Hyper Street Fighter II: The Anniversary Edition (Asia 040202)", GAME_SUPPORTS_SAVE )
+GAME( 2004, hsf2j,      hsf2,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Hyper Street Fighter II: The Anniversary Edition (Japan 031222)", GAME_SUPPORTS_SAVE )
 
 /* Games released on CPS-2 hardware by Takumi */
 
