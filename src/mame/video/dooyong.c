@@ -2,7 +2,7 @@
 #include "includes/dooyong.h"
 
 
-inline void dooyong_state::dooyong_scroll8_w(offs_t offset, UINT8 data, UINT8 *scroll, tilemap_t *map)
+inline void dooyong_state::scroll8_w(offs_t offset, UINT8 data, UINT8 *scroll, tilemap_t *map)
 {
 	UINT8 old = scroll[offset];
 	if (old != data)
@@ -46,52 +46,28 @@ inline void dooyong_state::dooyong_scroll8_w(offs_t offset, UINT8 data, UINT8 *s
 /* These handle writes to the tilemap scroll registers in 8-bit machines.
    There is one per tilemap, wrapping the above function that does the work. */
 
-WRITE8_MEMBER(dooyong_state::dooyong_bgscroll8_w)
+WRITE8_MEMBER(dooyong_z80_state::bgscroll_w)
 {
-	dooyong_scroll8_w(offset, data, m_bgscroll8, m_bg_tilemap);
+	scroll8_w(offset, data, m_bgscroll8, m_bg_tilemap);
 }
 
-WRITE8_MEMBER(dooyong_state::dooyong_bg2scroll8_w)
+WRITE8_MEMBER(dooyong_z80_state::bg2scroll_w)
 {
-	dooyong_scroll8_w(offset, data, m_bg2scroll8, m_bg2_tilemap);
+	scroll8_w(offset, data, m_bg2scroll8, m_bg2_tilemap);
 }
 
-WRITE8_MEMBER(dooyong_state::dooyong_fgscroll8_w)
+WRITE8_MEMBER(dooyong_z80_state::fgscroll_w)
 {
-	dooyong_scroll8_w(offset, data, m_fgscroll8, m_fg_tilemap);
+	scroll8_w(offset, data, m_fgscroll8, m_fg_tilemap);
 }
 
-WRITE8_MEMBER(dooyong_state::dooyong_fg2scroll8_w)
+WRITE8_MEMBER(dooyong_z80_state::fg2scroll_w)
 {
-	dooyong_scroll8_w(offset, data, m_fg2scroll8, m_fg2_tilemap);
-}
-
-
-/* These handle writes to the tilemap scroll registers in 16-bit machines.
-   This is just an 8-bit peripheral in a 16-bit machine. */
-
-WRITE16_MEMBER(dooyong_state::dooyong_bgscroll16_w)
-{
-	if (ACCESSING_BITS_0_7) dooyong_bgscroll8_w(space, offset, data & 0x00ff);
-}
-
-WRITE16_MEMBER(dooyong_state::dooyong_bg2scroll16_w)
-{
-	if (ACCESSING_BITS_0_7) dooyong_bg2scroll8_w(space, offset, data & 0x00ff);
-}
-
-WRITE16_MEMBER(dooyong_state::dooyong_fgscroll16_w)
-{
-	if (ACCESSING_BITS_0_7) dooyong_fgscroll8_w(space, offset, data & 0x00ff);
-}
-
-WRITE16_MEMBER(dooyong_state::dooyong_fg2scroll16_w)
-{
-	if (ACCESSING_BITS_0_7) dooyong_fg2scroll8_w(space, offset, data & 0x00ff);
+	scroll8_w(offset, data, m_fg2scroll8, m_fg2_tilemap);
 }
 
 
-WRITE8_MEMBER(dooyong_state::dooyong_txvideoram8_w)
+WRITE8_MEMBER(dooyong_z80_state::txvideoram_w)
 {
 	if (m_txvideoram[offset] != data)
 	{
@@ -106,7 +82,7 @@ WRITE8_MEMBER(dooyong_state::dooyong_txvideoram8_w)
 
 /* Control registers seem to be different on every game */
 
-WRITE8_MEMBER(dooyong_state::lastday_ctrl_w)
+WRITE8_MEMBER(dooyong_z80_ym2203_state::lastday_ctrl_w)
 {
 	/* bits 0 and 1 are coin counters */
 	coin_counter_w(machine(), 0, data & 0x01);
@@ -121,7 +97,7 @@ WRITE8_MEMBER(dooyong_state::lastday_ctrl_w)
 	flip_screen_set(data & 0x40);
 }
 
-WRITE8_MEMBER(dooyong_state::pollux_ctrl_w)
+WRITE8_MEMBER(dooyong_z80_ym2203_state::pollux_ctrl_w)
 {
 	/* bit 0 is flip screen */
 	flip_screen_set(data & 0x01);
@@ -136,7 +112,7 @@ WRITE8_MEMBER(dooyong_state::pollux_ctrl_w)
 	/* bit 4 is used but unknown */
 }
 
-WRITE8_MEMBER(dooyong_state::primella_ctrl_w)
+WRITE8_MEMBER(dooyong_z80_state::primella_ctrl_w)
 {
 	/* bits 0-2 select ROM bank */
 	membank("bank1")->set_entry(data & 0x07);
@@ -152,7 +128,7 @@ WRITE8_MEMBER(dooyong_state::primella_ctrl_w)
 //  logerror("%04x: bankswitch = %02x\n",space.device().safe_pc(),data&0xe0);
 }
 
-WRITE8_MEMBER(dooyong_state::paletteram_flytiger_w)
+WRITE8_MEMBER(dooyong_z80_state::paletteram_flytiger_w)
 {
 	if (m_flytiger_palette_bank)
 	{
@@ -163,7 +139,7 @@ WRITE8_MEMBER(dooyong_state::paletteram_flytiger_w)
 	}
 }
 
-WRITE8_MEMBER(dooyong_state::flytiger_ctrl_w)
+WRITE8_MEMBER(dooyong_z80_state::flytiger_ctrl_w)
 {
 	/* bit 0 is flip screen */
 	flip_screen_set(data & 0x01);
@@ -175,21 +151,6 @@ WRITE8_MEMBER(dooyong_state::flytiger_ctrl_w)
 
 	/* bit 4 changes tilemaps priority */
 	m_flytiger_pri = data & 0x10;
-}
-
-WRITE16_MEMBER(dooyong_state::rshark_ctrl_w)
-
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		/* bit 0 flips screen */
-		flip_screen_set(data & 0x0001);
-
-		/* bit 4 changes tilemaps priority */
-		m_rshark_pri = data & 0x0010;
-
-		/* bit 5 used but unknown */
-	}
 }
 
 
@@ -206,8 +167,8 @@ WRITE16_MEMBER(dooyong_state::rshark_ctrl_w)
 inline void dooyong_state::lastday_get_tile_info(tile_data &tileinfo, int tile_index,
 		const UINT8 *tilerom, UINT8 *scroll, int graphics)
 {
-	int offs = (tile_index + ((int)scroll[1] << 6)) * 2;
-	int attr = tilerom[offs];
+	int const offs = (tile_index + ((int)scroll[1] << 6)) * 2;
+	int const attr = tilerom[offs];
 	int code, color, flags;
 	if (scroll[6] & 0x20)
 	{   /* lastday/gulfstrm/pollux/flytiger */
@@ -221,7 +182,7 @@ inline void dooyong_state::lastday_get_tile_info(tile_data &tileinfo, int tile_i
 		   Y = y flip */
 		code = tilerom[offs + 1] | ((attr & 0x01) << 8) | ((attr & 0x80) << 2);
 		color = (attr & 0x78) >> 3;
-		flags = ((attr & 0x02) ? TILE_FLIPX : 0) | ((attr & 0x04) ? TILE_FLIPY : 0);
+		flags = TILE_FLIPYX((attr & 0x06) >> 1);
 	}
 	else
 	{
@@ -245,80 +206,33 @@ inline void dooyong_state::lastday_get_tile_info(tile_data &tileinfo, int tile_i
 
 		code = tilerom[offs + 1] | ((attr & codemask) << 8);
 		color = (attr & palmask) >> 2;
-		flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
+		flags = TILE_FLIPYX((attr & 0xC0) >> 6);
 	}
 
-	SET_TILE_INFO_MEMBER(graphics, code, color, flags);
+	tileinfo.set(graphics, code, color, flags);
 }
 
-inline void dooyong_state::rshark_get_tile_info(tile_data &tileinfo, int tile_index,
-		const UINT8 *tilerom1, const UINT8 *tilerom2, UINT8 *scroll, int graphics)
+TILE_GET_INFO_MEMBER(dooyong_z80_state::get_bg_tile_info)
 {
-		/* Tiles take two bytes in tile ROM 1:
-		                 MSB   LSB
-		   [offs + 0x00] YX?c cccc    (Y flip, X flip, bits 12-8 of gfx code)
-		   [offs + 0x01] cccc cccc    (bits 7-0 of gfx code)
-		   ? = unused/unknown
-		   c = gfx code
-		   X = x flip
-		   Y = y flip */
-	int offs = tile_index + ((int)scroll[1] << 9);
-	int attr = tilerom1[offs * 2];
-	int code = tilerom1[(offs * 2) + 1] | ((attr & 0x1f) << 8);
-	int color = tilerom2[offs] & 0x0f;
-	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
-
-	SET_TILE_INFO_MEMBER(graphics, code, color, flags);
+	lastday_get_tile_info(tileinfo, tile_index, m_bg_tilerom, m_bgscroll8, m_bg_gfx);
 }
 
-TILE_GET_INFO_MEMBER(dooyong_state::get_bg_tile_info)
+TILE_GET_INFO_MEMBER(dooyong_z80_state::get_bg2_tile_info)
 {
-	if (m_bg_tilerom2 != NULL)
-		rshark_get_tile_info(tileinfo, tile_index, m_bg_tilerom, m_bg_tilerom2, m_bgscroll8, m_bg_gfx);
-	else
-		lastday_get_tile_info(tileinfo, tile_index, m_bg_tilerom, m_bgscroll8, m_bg_gfx);
+	lastday_get_tile_info(tileinfo, tile_index, m_bg2_tilerom, m_bg2scroll8, m_bg2_gfx);
 }
 
-TILE_GET_INFO_MEMBER(dooyong_state::get_bg2_tile_info)
+TILE_GET_INFO_MEMBER(dooyong_z80_state::get_fg_tile_info)
 {
-	if (m_bg2_tilerom2 != NULL)
-		rshark_get_tile_info(tileinfo, tile_index, m_bg2_tilerom, m_bg2_tilerom2, m_bg2scroll8, m_bg2_gfx);
-	else
-		lastday_get_tile_info(tileinfo, tile_index, m_bg2_tilerom, m_bg2scroll8, m_bg2_gfx);
+	lastday_get_tile_info(tileinfo, tile_index, m_fg_tilerom, m_fgscroll8, m_fg_gfx);
 }
 
-TILE_GET_INFO_MEMBER(dooyong_state::get_fg_tile_info)
+TILE_GET_INFO_MEMBER(dooyong_z80_state::get_fg2_tile_info)
 {
-	if (m_fg_tilerom2 != NULL)
-		rshark_get_tile_info(tileinfo, tile_index, m_fg_tilerom, m_fg_tilerom2, m_fgscroll8, m_fg_gfx);
-	else
-		lastday_get_tile_info(tileinfo, tile_index, m_fg_tilerom, m_fgscroll8, m_fg_gfx);
+	lastday_get_tile_info(tileinfo, tile_index, m_fg2_tilerom, m_fg2scroll8, m_fg2_gfx);
 }
 
-TILE_GET_INFO_MEMBER(dooyong_state::get_fg2_tile_info)
-{
-	if (m_fg2_tilerom2 != NULL)
-		rshark_get_tile_info(tileinfo, tile_index, m_fg2_tilerom, m_fg2_tilerom2, m_fg2scroll8, m_fg2_gfx);
-	else
-		lastday_get_tile_info(tileinfo, tile_index, m_fg2_tilerom, m_fg2scroll8, m_fg2_gfx);
-}
-
-/* flytiger uses some palette banking technique or something maybe a trash protection */
-
-TILE_GET_INFO_MEMBER(dooyong_state::flytiger_get_fg_tile_info)
-{
-	const UINT8 *tilerom = m_fg_tilerom;
-
-	int offs = (tile_index + (m_fgscroll8[1] << 6)) * 2;
-	int attr = tilerom[offs];
-	int code = tilerom[offs + 1] | ((attr & 0x01) << 8) | ((attr & 0x80) << 2);
-	int color = (attr & 0x78) >> 3;
-	int flags = ((attr & 0x02) ? TILE_FLIPX : 0) | ((attr & 0x04) ? TILE_FLIPY : 0);
-
-	SET_TILE_INFO_MEMBER(m_fg_gfx, code, color, flags);
-}
-
-TILE_GET_INFO_MEMBER(dooyong_state::get_tx_tile_info)
+TILE_GET_INFO_MEMBER(dooyong_z80_state::get_tx_tile_info)
 {
 	/* Each tile takes two bytes of memory:
 	                 MSB   LSB
@@ -326,7 +240,7 @@ TILE_GET_INFO_MEMBER(dooyong_state::get_tx_tile_info)
 	   [offs + 0x01] CCCC cccc    (bits 3-0 of color code, bits 11-8 of gfx code)
 	   c = gfx code
 	   C = color code */
-	int offs, attr, code, color;
+	int offs, attr;
 	if (m_tx_tilemap_mode == 0)
 	{   /* lastday/gulfstrm/pollux/flytiger */
 		offs = tile_index;
@@ -337,14 +251,14 @@ TILE_GET_INFO_MEMBER(dooyong_state::get_tx_tile_info)
 		offs = tile_index * 2;
 		attr = m_txvideoram[offs + 1];
 	}
-	code = m_txvideoram[offs] | ((attr & 0x0f) << 8);
-	color = (attr & 0xf0) >> 4;
+	int const code = m_txvideoram[offs] | ((attr & 0x0f) << 8);
+	int const color = (attr & 0xf0) >> 4;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 }
 
 
-void dooyong_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pollux_extensions)
+void dooyong_z80_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pollux_extensions)
 {
 	/* Sprites take 32 bytes each in memory:
 	                 MSB   LSB
@@ -434,9 +348,398 @@ void dooyong_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 	}
 }
 
-void dooyong_state::rshark_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+
+UINT32 dooyong_z80_ym2203_state::screen_update_lastday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *buffered_spriteram16 = m_spriteram16->buffer();
+	bitmap.fill(m_palette->black_pen(), cliprect);
+	screen.priority().fill(0, cliprect);
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
+
+	if (!m_sprites_disabled)
+		draw_sprites(screen, bitmap, cliprect, 0);
+	return 0;
+}
+
+UINT32 dooyong_z80_ym2203_state::screen_update_gulfstrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_palette->black_pen(), cliprect);
+	screen.priority().fill(0, cliprect);
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
+
+	draw_sprites(screen, bitmap, cliprect, 1);
+	return 0;
+}
+
+UINT32 dooyong_z80_ym2203_state::screen_update_pollux(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_palette->black_pen(), cliprect);
+	screen.priority().fill(0, cliprect);
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
+
+	draw_sprites(screen, bitmap, cliprect, 2);
+	return 0;
+}
+
+UINT32 dooyong_z80_state::screen_update_flytiger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_palette->black_pen(), cliprect);
+	screen.priority().fill(0, cliprect);
+
+	if (m_flytiger_pri)
+	{
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
+	}
+	else
+	{
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
+	}
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
+
+	draw_sprites(screen, bitmap, cliprect, 4);
+	return 0;
+}
+
+
+UINT32 dooyong_z80_state::screen_update_bluehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_palette->black_pen(), cliprect);
+	screen.priority().fill(0, cliprect);
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
+	m_fg2_tilemap->draw(screen, bitmap, cliprect, 0, 4);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
+
+	draw_sprites(screen, bitmap, cliprect, 3);
+	return 0;
+}
+
+UINT32 dooyong_z80_state::screen_update_primella(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_palette->black_pen(), cliprect);
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	if (m_tx_pri) m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	if (!m_tx_pri) m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
+
+VIDEO_START_MEMBER(dooyong_z80_ym2203_state, lastday)
+{
+	/* Configure tilemap callbacks */
+	m_bg_tilerom = memregion("gfx5")->base();
+	m_fg_tilerom = memregion("gfx6")->base();
+	m_bg_gfx = 2;
+	m_fg_gfx = 3;
+	m_tx_tilemap_mode = 0;
+
+	/* Create tilemaps */
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_z80_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
+			32, 32, 32, 8);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_z80_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
+			32, 32, 32, 8);
+	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_z80_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
+			8, 8, 64, 32);
+
+	/* Configure tilemap transparency */
+	m_fg_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_transparent_pen(15);
+
+	/* Text layer is offset on this machine */
+	m_tx_tilemap->set_scrolly(0, 8);
+
+	memset(m_bgscroll8, 0, 0x10);
+	memset(m_bg2scroll8, 0, 0x10);
+	memset(m_fgscroll8, 0, 0x10);
+	memset(m_fg2scroll8, 0, 0x10);
+
+	/* Register for save/restore */
+	save_item(NAME(m_bgscroll8));
+	save_item(NAME(m_fgscroll8));
+	save_item(NAME(m_sprites_disabled));
+	save_item(NAME(m_interrupt_line_1));
+	save_item(NAME(m_interrupt_line_2));
+}
+
+VIDEO_START_MEMBER(dooyong_z80_ym2203_state, gulfstrm)
+{
+	/* Configure tilemap callbacks */
+	m_bg_tilerom = memregion("gfx5")->base();
+	m_fg_tilerom = memregion("gfx6")->base();
+	m_bg_gfx = 2;
+	m_fg_gfx = 3;
+	m_tx_tilemap_mode = 0;
+
+	/* Create tilemaps */
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_z80_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
+			32, 32, 32, 8);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_z80_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
+			32, 32, 32, 8);
+	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_z80_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
+			8, 8, 64, 32);
+
+	/* Configure tilemap transparency */
+	m_fg_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_transparent_pen(15);
+
+	/* Text layer is offset on this machine */
+	m_tx_tilemap->set_scrolly(0, 8);
+
+	memset(m_bgscroll8, 0, 0x10);
+	memset(m_bg2scroll8, 0, 0x10);
+	memset(m_fgscroll8, 0, 0x10);
+	memset(m_fg2scroll8, 0, 0x10);
+
+	/* Register for save/restore */
+	save_item(NAME(m_bgscroll8));
+	save_item(NAME(m_fgscroll8));
+	save_item(NAME(m_interrupt_line_1));
+	save_item(NAME(m_interrupt_line_2));
+}
+
+VIDEO_START_MEMBER(dooyong_z80_ym2203_state, pollux)
+{
+	/* Configure tilemap callbacks */
+	m_bg_tilerom = memregion("gfx5")->base();
+	m_fg_tilerom = memregion("gfx6")->base();
+	m_bg_gfx = 2;
+	m_fg_gfx = 3;
+	m_tx_tilemap_mode = 0;
+
+	/* Create tilemaps */
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_z80_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
+			32, 32, 32, 8);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_z80_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
+			32, 32, 32, 8);
+	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_z80_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
+			8, 8, 64, 32);
+
+	/* Configure tilemap transparency */
+	m_fg_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_transparent_pen(15);
+
+	memset(m_bgscroll8, 0, 0x10);
+	memset(m_bg2scroll8, 0, 0x10);
+	memset(m_fgscroll8, 0, 0x10);
+	memset(m_fg2scroll8, 0, 0x10);
+
+	/* Register for save/restore */
+	save_item(NAME(m_bgscroll8));
+	save_item(NAME(m_fgscroll8));
+	save_item(NAME(m_interrupt_line_1));
+	save_item(NAME(m_interrupt_line_2));
+}
+
+VIDEO_START_MEMBER(dooyong_z80_state,bluehawk)
+{
+	/* Configure tilemap callbacks */
+	m_bg_tilerom = memregion("gfx3")->base() + 0x78000;
+	m_fg_tilerom = memregion("gfx4")->base() + 0x78000;
+	m_fg2_tilerom = memregion("gfx5")->base() + 0x38000;
+	m_bg_gfx = 2;
+	m_fg_gfx = 3;
+	m_fg2_gfx = 4;
+	m_tx_tilemap_mode = 1;
+
+	/* Create tilemaps */
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_z80_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
+			32, 32, 32, 8);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_z80_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
+			32, 32, 32, 8);
+	m_fg2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_z80_state::get_fg2_tile_info),this), TILEMAP_SCAN_COLS,
+			32, 32, 32, 8);
+	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_z80_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
+			8, 8, 64, 32);
+
+	/* Configure tilemap transparency */
+	m_fg_tilemap->set_transparent_pen(15);
+	m_fg2_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_transparent_pen(15);
+
+	memset(m_bgscroll8, 0, 0x10);
+	memset(m_bg2scroll8, 0, 0x10);
+	memset(m_fgscroll8, 0, 0x10);
+	memset(m_fg2scroll8, 0, 0x10);
+
+	/* Register for save/restore */
+	save_item(NAME(m_bgscroll8));
+	save_item(NAME(m_fgscroll8));
+	save_item(NAME(m_fg2scroll8));
+}
+
+VIDEO_START_MEMBER(dooyong_z80_state,flytiger)
+{
+	/* Configure tilemap callbacks */
+	m_bg_tilerom = memregion("gfx3")->base() + 0x78000;
+	m_fg_tilerom = memregion("gfx4")->base() + 0x78000;
+	m_bg_gfx = 2;
+	m_fg_gfx = 3;
+	m_tx_tilemap_mode = 0;
+
+	/* Create tilemaps */
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_z80_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
+			32, 32, 32, 8);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_z80_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
+			32, 32, 32, 8);
+	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_z80_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
+			8, 8, 64, 32);
+
+	/* Configure tilemap transparency */
+	m_bg_tilemap->set_transparent_pen(15);
+	m_fg_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_transparent_pen(15);
+
+	memset(m_bgscroll8, 0, 0x10);
+	memset(m_bg2scroll8, 0, 0x10);
+	memset(m_fgscroll8, 0, 0x10);
+	memset(m_fg2scroll8, 0, 0x10);
+
+	/* Register for save/restore */
+	save_item(NAME(m_bgscroll8));
+	save_item(NAME(m_fgscroll8));
+	save_item(NAME(m_flytiger_pri));
+}
+
+VIDEO_START_MEMBER(dooyong_z80_state,primella)
+{
+	/* Configure tilemap callbacks */
+	m_bg_tilerom = memregion("gfx2")->base() + memregion("gfx2")->bytes() - 0x8000;
+	m_fg_tilerom = memregion("gfx3")->base() + memregion("gfx3")->bytes() - 0x8000;
+	m_bg_gfx = 1;
+	m_fg_gfx = 2;
+	m_tx_tilemap_mode = 1;
+
+	/* Create tilemaps */
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_z80_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
+			32, 32, 32, 8);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_z80_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
+			32, 32, 32, 8);
+	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_z80_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
+			8, 8, 64, 32);
+
+	/* Configure tilemap transparency */
+	m_fg_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_transparent_pen(15);
+
+	memset(m_bgscroll8, 0, 0x10);
+	memset(m_bg2scroll8, 0, 0x10);
+	memset(m_fgscroll8, 0, 0x10);
+	memset(m_fg2scroll8, 0, 0x10);
+
+	/* Register for save/restore */
+	save_item(NAME(m_bgscroll8));
+	save_item(NAME(m_fgscroll8));
+	save_item(NAME(m_tx_pri));
+}
+
+
+/* These handle writes to the tilemap scroll registers in 16-bit machines.
+   This is just an 8-bit peripheral in a 16-bit machine. */
+
+WRITE16_MEMBER(dooyong_68k_state::bgscroll_w)
+{
+	if (ACCESSING_BITS_0_7) scroll8_w(offset, data & 0x00ff, m_bgscroll8, m_bg_tilemap);
+}
+
+WRITE16_MEMBER(dooyong_68k_state::bg2scroll_w)
+{
+	if (ACCESSING_BITS_0_7) scroll8_w(offset, data & 0x00ff, m_bg2scroll8, m_bg2_tilemap);
+}
+
+WRITE16_MEMBER(dooyong_68k_state::fgscroll_w)
+{
+	if (ACCESSING_BITS_0_7) scroll8_w(offset, data & 0x00ff, m_fgscroll8, m_fg_tilemap);
+}
+
+WRITE16_MEMBER(dooyong_68k_state::fg2scroll_w)
+{
+	if (ACCESSING_BITS_0_7) scroll8_w(offset, data & 0x00ff, m_fg2scroll8, m_fg2_tilemap);
+}
+
+WRITE16_MEMBER(dooyong_68k_state::ctrl_w)
+
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		/* bit 0 flips screen */
+		flip_screen_set(data & 0x0001);
+
+		/* bit 4 changes tilemaps priority */
+		m_bg2_priority = data & 0x0010;
+
+		/* bit 5 used but unknown */
+	}
+}
+
+
+inline void dooyong_68k_state::rshark_get_tile_info(tile_data &tileinfo, int tile_index,
+		const UINT8 *tilerom1, const UINT8 *tilerom2, UINT8 *scroll, int graphics)
+{
+		/* Tiles take two bytes in tile ROM 1:
+		                 MSB   LSB
+		   [offs + 0x00] YX?c cccc    (Y flip, X flip, bits 12-8 of gfx code)
+		   [offs + 0x01] cccc cccc    (bits 7-0 of gfx code)
+		   ? = unused/unknown
+		   c = gfx code
+		   X = x flip
+		   Y = y flip */
+	int const offs = tile_index + ((int)scroll[1] << 9);
+	int const attr = tilerom1[offs * 2];
+	int const code = tilerom1[(offs * 2) + 1] | ((attr & 0x1f) << 8);
+	int const color = tilerom2[offs] & 0x0f;
+	int const flags = TILE_FLIPYX((attr & 0xC0) >> 6);
+
+	tileinfo.set(graphics, code, color, flags);
+}
+
+TILE_GET_INFO_MEMBER(dooyong_68k_state::get_bg_tile_info)
+{
+	if (m_bg_tilerom2 != NULL)
+		rshark_get_tile_info(tileinfo, tile_index, m_bg_tilerom, m_bg_tilerom2, m_bgscroll8, m_bg_gfx);
+	else
+		lastday_get_tile_info(tileinfo, tile_index, m_bg_tilerom, m_bgscroll8, m_bg_gfx);
+}
+
+TILE_GET_INFO_MEMBER(dooyong_68k_state::get_bg2_tile_info)
+{
+	if (m_bg2_tilerom2 != NULL)
+		rshark_get_tile_info(tileinfo, tile_index, m_bg2_tilerom, m_bg2_tilerom2, m_bg2scroll8, m_bg2_gfx);
+	else
+		lastday_get_tile_info(tileinfo, tile_index, m_bg2_tilerom, m_bg2scroll8, m_bg2_gfx);
+}
+
+TILE_GET_INFO_MEMBER(dooyong_68k_state::get_fg_tile_info)
+{
+	if (m_fg_tilerom2 != NULL)
+		rshark_get_tile_info(tileinfo, tile_index, m_fg_tilerom, m_fg_tilerom2, m_fgscroll8, m_fg_gfx);
+	else
+		lastday_get_tile_info(tileinfo, tile_index, m_fg_tilerom, m_fgscroll8, m_fg_gfx);
+}
+
+TILE_GET_INFO_MEMBER(dooyong_68k_state::get_fg2_tile_info)
+{
+	if (m_fg2_tilerom2 != NULL)
+		rshark_get_tile_info(tileinfo, tile_index, m_fg2_tilerom, m_fg2_tilerom2, m_fg2scroll8, m_fg2_gfx);
+	else
+		lastday_get_tile_info(tileinfo, tile_index, m_fg2_tilerom, m_fg2scroll8, m_fg2_gfx);
+}
+
+
+void dooyong_68k_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	UINT16 *buffered_spriteram = m_spriteram->buffer();
 
 	/* Sprites take 8 16-bit words each in memory:
 	              MSB             LSB
@@ -459,23 +762,23 @@ void dooyong_state::rshark_draw_sprites(screen_device &screen, bitmap_ind16 &bit
 
 	int offs;
 
-	for (offs = (m_spriteram16->bytes() / 2) - 8; offs >= 0; offs -= 8)
+	for (offs = (m_spriteram->bytes() / 2) - 8; offs >= 0; offs -= 8)
 	{
-		if (buffered_spriteram16[offs] & 0x0001)    /* enable */
+		if (buffered_spriteram[offs] & 0x0001)    /* enable */
 		{
 			int sx, sy, code, color, pri;
 			int flipx = 0, flipy = 0, width, height, x, y;
 
-			sx = buffered_spriteram16[offs+4] & 0x01ff;
-			sy = (INT16)buffered_spriteram16[offs+6] & 0x01ff;
+			sx = buffered_spriteram[offs+4] & 0x01ff;
+			sy = (INT16)buffered_spriteram[offs+6] & 0x01ff;
 			if (sy & 0x0100) sy |= ~(int)0x01ff;    // Correctly sign-extend 9-bit number
-			code = buffered_spriteram16[offs+3];
-			color = buffered_spriteram16[offs+7] & 0x000f;
+			code = buffered_spriteram[offs+3];
+			color = buffered_spriteram[offs+7] & 0x000f;
 			//TODO: This priority mechanism works for known games, but seems a bit strange.
 			//Are we missing something?  (The obvious spare palette bit isn't it.)
 			pri = (((color == 0x00) || (color == 0x0f)) ? 0xfc : 0xf0);
-			width = buffered_spriteram16[offs+1] & 0x000f;
-			height = (buffered_spriteram16[offs+1] & 0x00f0) >> 4;
+			width = buffered_spriteram[offs+1] & 0x000f;
+			height = (buffered_spriteram[offs+1] & 0x00f0) >> 4;
 
 			if (flip_screen())
 			{
@@ -505,342 +808,33 @@ void dooyong_state::rshark_draw_sprites(screen_device &screen, bitmap_ind16 &bit
 	}
 }
 
-
-UINT32 dooyong_state::screen_update_lastday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 dooyong_68k_state::screen_update_rshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
-
-	if (!m_sprites_disabled)
-		draw_sprites(screen, bitmap, cliprect, 0);
-	return 0;
-}
-
-UINT32 dooyong_state::screen_update_gulfstrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(m_palette->black_pen(), cliprect);
-	screen.priority().fill(0, cliprect);
-
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
-
-	draw_sprites(screen, bitmap, cliprect, 1);
-	return 0;
-}
-
-UINT32 dooyong_state::screen_update_pollux(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(m_palette->black_pen(), cliprect);
-	screen.priority().fill(0, cliprect);
-
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
-
-	draw_sprites(screen, bitmap, cliprect, 2);
-	return 0;
-}
-
-UINT32 dooyong_state::screen_update_flytiger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(m_palette->black_pen(), cliprect);
-	screen.priority().fill(0, cliprect);
-
-	if (m_flytiger_pri)
-	{
-		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
-		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
-	}
-	else
-	{
-		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
-		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
-	}
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
-
-	draw_sprites(screen, bitmap, cliprect, 4);
-	return 0;
-}
-
-
-UINT32 dooyong_state::screen_update_bluehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(m_palette->black_pen(), cliprect);
-	screen.priority().fill(0, cliprect);
-
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
-	m_fg2_tilemap->draw(screen, bitmap, cliprect, 0, 4);
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
-
-	draw_sprites(screen, bitmap, cliprect, 3);
-	return 0;
-}
-
-UINT32 dooyong_state::screen_update_primella(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(m_palette->black_pen(), cliprect);
-
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	if (m_tx_pri) m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	if (!m_tx_pri) m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	return 0;
-}
-
-UINT32 dooyong_state::screen_update_rshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(m_palette->black_pen(), cliprect);
-	screen.priority().fill(0, cliprect);
-
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
-	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, (m_rshark_pri ? 2 : 1));
+	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, (m_bg2_priority ? 2 : 1));
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
 	m_fg2_tilemap->draw(screen, bitmap, cliprect, 0, 2);
 
-	rshark_draw_sprites(screen, bitmap, cliprect);
+	draw_sprites(screen, bitmap, cliprect);
 	return 0;
 }
 
-UINT32 dooyong_state::screen_update_popbingo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 dooyong_68k_state::screen_update_popbingo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 1);
 
-	rshark_draw_sprites(screen, bitmap, cliprect);
+	draw_sprites(screen, bitmap, cliprect);
 	return 0;
 }
 
 
-VIDEO_START_MEMBER(dooyong_state,lastday)
-{
-	/* Configure tilemap callbacks */
-	m_bg_tilerom = memregion("gfx5")->base();
-	m_fg_tilerom = memregion("gfx6")->base();
-	m_bg_tilerom2 = NULL;
-	m_fg_tilerom2 = NULL;
-	m_bg_gfx = 2;
-	m_fg_gfx = 3;
-	m_tx_tilemap_mode = 0;
-
-	/* Create tilemaps */
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
-			32, 32, 32, 8);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
-			32, 32, 32, 8);
-	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
-			8, 8, 64, 32);
-
-	/* Configure tilemap transparency */
-	m_fg_tilemap->set_transparent_pen(15);
-	m_tx_tilemap->set_transparent_pen(15);
-
-	/* Text layer is offset on this machine */
-	m_tx_tilemap->set_scrolly(0, 8);
-
-	memset(m_bgscroll8, 0, 0x10);
-	memset(m_bg2scroll8, 0, 0x10);
-	memset(m_fgscroll8, 0, 0x10);
-	memset(m_fg2scroll8, 0, 0x10);
-
-	/* Register for save/restore */
-	save_item(NAME(m_bgscroll8));
-	save_item(NAME(m_fgscroll8));
-	save_item(NAME(m_sprites_disabled));
-	save_item(NAME(m_interrupt_line_1));
-	save_item(NAME(m_interrupt_line_2));
-}
-
-VIDEO_START_MEMBER(dooyong_state,gulfstrm)
-{
-	/* Configure tilemap callbacks */
-	m_bg_tilerom = memregion("gfx5")->base();
-	m_fg_tilerom = memregion("gfx6")->base();
-	m_bg_tilerom2 = NULL;
-	m_fg_tilerom2 = NULL;
-	m_bg_gfx = 2;
-	m_fg_gfx = 3;
-	m_tx_tilemap_mode = 0;
-
-	/* Create tilemaps */
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
-			32, 32, 32, 8);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
-			32, 32, 32, 8);
-	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
-			8, 8, 64, 32);
-
-	/* Configure tilemap transparency */
-	m_fg_tilemap->set_transparent_pen(15);
-	m_tx_tilemap->set_transparent_pen(15);
-
-	/* Text layer is offset on this machine */
-	m_tx_tilemap->set_scrolly(0, 8);
-
-	memset(m_bgscroll8, 0, 0x10);
-	memset(m_bg2scroll8, 0, 0x10);
-	memset(m_fgscroll8, 0, 0x10);
-	memset(m_fg2scroll8, 0, 0x10);
-
-	/* Register for save/restore */
-	save_item(NAME(m_bgscroll8));
-	save_item(NAME(m_fgscroll8));
-	save_item(NAME(m_interrupt_line_1));
-	save_item(NAME(m_interrupt_line_2));
-}
-
-VIDEO_START_MEMBER(dooyong_state,pollux)
-{
-	/* Configure tilemap callbacks */
-	m_bg_tilerom = memregion("gfx5")->base();
-	m_fg_tilerom = memregion("gfx6")->base();
-	m_bg_tilerom2 = NULL;
-	m_fg_tilerom2 = NULL;
-	m_bg_gfx = 2;
-	m_fg_gfx = 3;
-	m_tx_tilemap_mode = 0;
-
-	/* Create tilemaps */
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
-			32, 32, 32, 8);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
-			32, 32, 32, 8);
-	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
-			8, 8, 64, 32);
-
-	/* Configure tilemap transparency */
-	m_fg_tilemap->set_transparent_pen(15);
-	m_tx_tilemap->set_transparent_pen(15);
-
-	memset(m_bgscroll8, 0, 0x10);
-	memset(m_bg2scroll8, 0, 0x10);
-	memset(m_fgscroll8, 0, 0x10);
-	memset(m_fg2scroll8, 0, 0x10);
-
-	/* Register for save/restore */
-	save_item(NAME(m_bgscroll8));
-	save_item(NAME(m_fgscroll8));
-	save_item(NAME(m_interrupt_line_1));
-	save_item(NAME(m_interrupt_line_2));
-}
-
-VIDEO_START_MEMBER(dooyong_state,bluehawk)
-{
-	/* Configure tilemap callbacks */
-	m_bg_tilerom = memregion("gfx3")->base() + 0x78000;
-	m_fg_tilerom = memregion("gfx4")->base() + 0x78000;
-	m_fg2_tilerom = memregion("gfx5")->base() + 0x38000;
-	m_bg_tilerom2 = NULL;
-	m_fg_tilerom2 = NULL;
-	m_fg2_tilerom2 = NULL;
-	m_bg_gfx = 2;
-	m_fg_gfx = 3;
-	m_fg2_gfx = 4;
-	m_tx_tilemap_mode = 1;
-
-	/* Create tilemaps */
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
-			32, 32, 32, 8);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
-			32, 32, 32, 8);
-	m_fg2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_fg2_tile_info),this), TILEMAP_SCAN_COLS,
-			32, 32, 32, 8);
-	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
-			8, 8, 64, 32);
-
-	/* Configure tilemap transparency */
-	m_fg_tilemap->set_transparent_pen(15);
-	m_fg2_tilemap->set_transparent_pen(15);
-	m_tx_tilemap->set_transparent_pen(15);
-
-	memset(m_bgscroll8, 0, 0x10);
-	memset(m_bg2scroll8, 0, 0x10);
-	memset(m_fgscroll8, 0, 0x10);
-	memset(m_fg2scroll8, 0, 0x10);
-
-	/* Register for save/restore */
-	save_item(NAME(m_bgscroll8));
-	save_item(NAME(m_fgscroll8));
-	save_item(NAME(m_fg2scroll8));
-}
-
-VIDEO_START_MEMBER(dooyong_state,flytiger)
-{
-	/* Configure tilemap callbacks */
-	m_bg_tilerom = memregion("gfx3")->base() + 0x78000;
-	m_fg_tilerom = memregion("gfx4")->base() + 0x78000;
-	m_bg_tilerom2 = NULL;
-	m_fg_tilerom2 = NULL;
-	m_bg_gfx = 2;
-	m_fg_gfx = 3;
-	m_tx_tilemap_mode = 0;
-
-	/* Create tilemaps */
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
-			32, 32, 32, 8);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::flytiger_get_fg_tile_info),this), TILEMAP_SCAN_COLS,
-			32, 32, 32, 8);
-	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
-			8, 8, 64, 32);
-
-	/* Configure tilemap transparency */
-	m_bg_tilemap->set_transparent_pen(15);
-	m_fg_tilemap->set_transparent_pen(15);
-	m_tx_tilemap->set_transparent_pen(15);
-
-	memset(m_bgscroll8, 0, 0x10);
-	memset(m_bg2scroll8, 0, 0x10);
-	memset(m_fgscroll8, 0, 0x10);
-	memset(m_fg2scroll8, 0, 0x10);
-
-	/* Register for save/restore */
-	save_item(NAME(m_bgscroll8));
-	save_item(NAME(m_fgscroll8));
-	save_item(NAME(m_flytiger_pri));
-}
-
-VIDEO_START_MEMBER(dooyong_state,primella)
-{
-	/* Configure tilemap callbacks */
-	m_bg_tilerom = memregion("gfx2")->base() + memregion("gfx2")->bytes() - 0x8000;
-	m_fg_tilerom = memregion("gfx3")->base() + memregion("gfx3")->bytes() - 0x8000;
-	m_bg_tilerom2 = NULL;
-	m_fg_tilerom2 = NULL;
-	m_bg_gfx = 1;
-	m_fg_gfx = 2;
-	m_tx_tilemap_mode = 1;
-
-	/* Create tilemaps */
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
-			32, 32, 32, 8);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
-			32, 32, 32, 8);
-	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
-			8, 8, 64, 32);
-
-	/* Configure tilemap transparency */
-	m_fg_tilemap->set_transparent_pen(15);
-	m_tx_tilemap->set_transparent_pen(15);
-
-	memset(m_bgscroll8, 0, 0x10);
-	memset(m_bg2scroll8, 0, 0x10);
-	memset(m_fgscroll8, 0, 0x10);
-	memset(m_fg2scroll8, 0, 0x10);
-
-	/* Register for save/restore */
-	save_item(NAME(m_bgscroll8));
-	save_item(NAME(m_fgscroll8));
-	save_item(NAME(m_tx_pri));
-}
-
-VIDEO_START_MEMBER(dooyong_state,rshark)
+VIDEO_START_MEMBER(dooyong_68k_state, rshark)
 {
 	/* Configure tilemap callbacks */
 	m_bg_tilerom = memregion("gfx5")->base();
@@ -857,13 +851,13 @@ VIDEO_START_MEMBER(dooyong_state,rshark)
 	m_fg2_gfx = 1;
 
 	/* Create tilemaps */
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_68k_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
 			16, 16, 64, 32);
-	m_bg2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_bg2_tile_info),this), TILEMAP_SCAN_COLS,
+	m_bg2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_68k_state::get_bg2_tile_info),this), TILEMAP_SCAN_COLS,
 			16, 16, 64, 32);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_68k_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
 			16, 16, 64, 32);
-	m_fg2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_fg2_tile_info),this), TILEMAP_SCAN_COLS,
+	m_fg2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_68k_state::get_fg2_tile_info),this), TILEMAP_SCAN_COLS,
 			16, 16, 64, 32);
 
 	/* Configure tilemap transparency */
@@ -881,17 +875,18 @@ VIDEO_START_MEMBER(dooyong_state,rshark)
 	save_item(NAME(m_bg2scroll8));
 	save_item(NAME(m_fgscroll8));
 	save_item(NAME(m_fg2scroll8));
-	save_item(NAME(m_rshark_pri));
+	save_item(NAME(m_bg2_priority));
 }
 
-VIDEO_START_MEMBER(dooyong_state,popbingo)
+VIDEO_START_MEMBER(dooyong_68k_state, popbingo)
 {
 	/* Configure tilemap callbacks */
 	m_bg_tilerom = memregion("gfx2")->base();
+	m_bg_tilerom2 = NULL;
 	m_bg_gfx = 1;
 
 	/* Create tilemaps */
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_68k_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
 			32, 32, 32, 8);
 	m_bg2_tilemap = m_fg_tilemap = m_fg2_tilemap = NULL;    /* Stop scroll handler from crashing on these */
 
@@ -905,5 +900,5 @@ VIDEO_START_MEMBER(dooyong_state,popbingo)
 	save_item(NAME(m_bg2scroll8));  // Not used atm
 	save_item(NAME(m_fgscroll8));   // Not used atm
 	save_item(NAME(m_fg2scroll8));  // Not used atm
-	save_item(NAME(m_rshark_pri));
+	save_item(NAME(m_bg2_priority));
 }
