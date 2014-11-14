@@ -12,8 +12,8 @@
   It is possibly a cost-reduced custom ASIC specifically for Simon.
   
   Other games assumed to be on similar hardware:
-  - Pocket Simon
-  - Super Simon
+  - Pocket Simon, but there's a chance it only exists with MB4850 chip
+  - Super Simon (TMS1100)
 
 ***************************************************************************/
 
