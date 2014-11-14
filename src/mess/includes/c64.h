@@ -78,7 +78,7 @@ public:
 	UINT8 *m_charom;
 
 	required_device<m6510_device> m_maincpu;
-	required_device<pls100_device> m_pla;
+	required_device<pla_device> m_pla;
 	required_device<mos6566_device> m_vic;
 	required_device<mos6581_device> m_sid;
 	required_device<mos6526_device> m_cia1;
