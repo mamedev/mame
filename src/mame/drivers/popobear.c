@@ -89,6 +89,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_spr(*this, "spr"),
+		m_vram(*this, "vram"),
 		m_vregs(*this, "vregs"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
@@ -98,24 +99,18 @@ public:
 		tilemap_base[1] = 0xf4000;
 		tilemap_base[2] = 0xf8000;
 		tilemap_base[3] = 0xfc000;
-
-		tilemap_size[0] = 0x04000;
-		tilemap_size[1] = 0x04000;
-		tilemap_size[2] = 0x04000;
-		tilemap_size[3] = 0x04000;
 	}
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT16> m_spr;
+	required_shared_ptr<UINT16> m_vram;
 	required_shared_ptr<UINT16> m_vregs;
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	UINT16* m_vram;
-	UINT16* m_vram_rearranged;
+	dynamic_array<UINT16> m_vram_rearranged;
 
 	int tilemap_base[4];
-	int tilemap_size[4];
 
 	DECLARE_READ8_MEMBER(popo_620000_r);
 	DECLARE_WRITE8_MEMBER(popobear_irq_ack_w);
@@ -124,7 +119,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(popobear_irq);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
-	int m_gfx_index;
 	tilemap_t    *m_bg_tilemap[4];
 	TILE_GET_INFO_MEMBER(get_popobear_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_popobear_bg1_tile_info);
@@ -149,7 +143,7 @@ public:
 
 
 		COMBINE_DATA(&m_vram_rearranged[swapped_offset]);
-		m_gfxdecode->gfx(m_gfx_index)->mark_dirty((swapped_offset)/32);
+		m_gfxdecode->gfx(0)->mark_dirty((swapped_offset)/32);
 
 		// unfortunately tilemaps and tilegfx share the same ram so we're always dirty if we write to RAM
 		m_bg_tilemap[0]->mark_all_dirty();
@@ -158,7 +152,6 @@ public:
 		m_bg_tilemap[3]->mark_all_dirty();
 
 	}
-	DECLARE_READ16_MEMBER(popo_vram_r) { return m_vram[offset]; }
 
 };
 
@@ -166,7 +159,7 @@ public:
 static const gfx_layout popobear_char_layout =
 {
 	8,8,
-	0x4000,
+	RGN_FRAC(1,1),
 	8,
 	{ 0,1,2,3,4,5,6,7 },
 	{ STEP8(0, 8) },
@@ -174,6 +167,9 @@ static const gfx_layout popobear_char_layout =
 	8*64
 };
 
+GFXDECODE_START(popobear)
+	GFXDECODE_RAM( "vram", 0, popobear_char_layout, 0, 1 )
+GFXDECODE_END
 
 TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg0_tile_info)
 {
@@ -212,19 +208,9 @@ TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg3_tile_info)
 
 void popobear_state::video_start()
 {
-	/* find first empty slot to decode gfx */
-	for (m_gfx_index = 0; m_gfx_index < MAX_GFX_ELEMENTS; m_gfx_index++)
-		if (m_gfxdecode->gfx(m_gfx_index) == 0)
-			break;
+	m_vram_rearranged.resize(0x100000 / 2);
 
-	assert(m_gfx_index != MAX_GFX_ELEMENTS);
-
-	m_vram = auto_alloc_array_clear(machine(), UINT16, 0x100000/2);
-	m_vram_rearranged = auto_alloc_array_clear(machine(), UINT16, 0x100000/2);
-
-
-	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_gfx_index, global_alloc(gfx_element(m_palette, popobear_char_layout, (UINT8 *)m_vram_rearranged, NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries() / 16, 0)));
+	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<UINT8 *>(&m_vram_rearranged[0]));
 
 	m_bg_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(popobear_state::get_popobear_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 	m_bg_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(popobear_state::get_popobear_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
@@ -243,7 +229,6 @@ void popobear_state::video_start()
 
 void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
 	UINT8* vram = reinterpret_cast<UINT8 *>(m_spr.target());
 	int i;
 
@@ -264,16 +249,18 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 		/* 0x*29 = 32 x 32 */
 		for(i = 0x800-8;i >= 0; i-=8)
 		{
-			int y = vram[i+0x7f800+2]|(vram[i+0x7f800+3]<<8);
-			int x = vram[i+0x7f800+4]|(vram[i+0x7f800+5]<<8);
-			int spr_num = vram[i+0x7f800+6]|(vram[i+0x7f800+7]<<8);
-			int param = vram[i+0x7f800+0]|(vram[i+0x7f800+1]<<8);
+			UINT16 *sprdata = &m_spr[(0x7f800 + i) / 2];
 
+			int param = sprdata[0];
 			int pri = (param & 0x0f00)>>8;
 
 			// we do this because it's sprite<->sprite priority,
 			if (pri!=drawpri)
 				continue;
+
+			int y = sprdata[1];
+			int x = sprdata[2];
+			int spr_num = sprdata[3];
 
 			int width = 8 << ((param & 0x30)>>4);
 			int height = width; // sprites are always square?
@@ -327,7 +314,7 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 				for(int xi=0;xi<width;xi++)
 				{
-					UINT8 pix = (vram[spr_num^1] & 0xff);
+					UINT8 pix = vram[BYTE_XOR_BE(spr_num)];
 					int x_draw = (x_dir) ? x+((width-1) - xi) : x+xi;
 
 					if(cliprect.contains(x_draw, y_draw))
@@ -479,7 +466,7 @@ static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16, popobear_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM
 	AM_RANGE(0x280000, 0x2fffff) AM_RAM AM_SHARE("spr") // unknown boundaries, 0x2ff800 contains a sprite list, lower area = sprite gfx
-	AM_RANGE(0x300000, 0x3fffff) AM_READWRITE( popo_vram_r, popo_vram_w ) // tile definitions + tilemaps
+	AM_RANGE(0x300000, 0x3fffff) AM_RAM_WRITE( popo_vram_w ) AM_SHARE("vram") // tile definitions + tilemaps
 
 
 	/* Most if not all of these are vregs */
@@ -660,7 +647,7 @@ static MACHINE_CONFIG_START( popobear, popobear_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", popobear)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_42MHz/16)  // XTAL CORRECT, DIVISOR GUESSED
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
