@@ -4,6 +4,7 @@
  
  does it use any off-the shelf chips in addition to the 6502?
 
+ Driver by David Haywood and Mariusz Wojcieszek
 
 */
 
@@ -31,6 +32,7 @@ public:
 static ADDRESS_MAP_START( alinvade_map, AS_PROGRAM, 8, alinvade_state )
     AM_RANGE(0x0000, 0x01ff) AM_RAM
     AM_RANGE(0x0400, 0x0bff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x0c00, 0x0dff) AM_RAM
     AM_RANGE(0x2000, 0x2000) AM_WRITENOP //??
     AM_RANGE(0x4000, 0x4000) AM_READ_PORT("COIN")
     AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSW")
@@ -127,7 +129,7 @@ static MACHINE_CONFIG_START( alinvade, alinvade_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,2000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(alinvade_map)
-//	MCFG_CPU_VBLANK_INT_DRIVER("screen", alinvade_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", alinvade_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -157,4 +159,4 @@ ROM_START( alinvade )
 ROM_END
 
 
-GAME( 198?, alinvade,  0,    alinvade, alinvade, driver_device,  0, ROT90, "Forbes?", "Alien Invaders", GAME_NOT_WORKING )
+GAME( 198?, alinvade,  0,    alinvade, alinvade, driver_device,  0, ROT90, "Forbes?", "Alien Invaders", GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
