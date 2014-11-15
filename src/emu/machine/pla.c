@@ -39,7 +39,7 @@ void pla_device::device_start()
 {
 	assert(region() != NULL);
 	assert(m_terms < MAX_TERMS);
-	assert(m_inputs <= 32 && m_outputs <= 32);
+	assert(m_inputs < 32 && m_outputs <= 32);
 
 	if (m_input_mask == 0)
 		m_input_mask = ((UINT64)1 << m_inputs) - 1;
@@ -51,7 +51,7 @@ void pla_device::device_start()
 	// initialize cache
 	m_cache2_ptr = 0;
 	for (int i = 0; i < CACHE2_SIZE; i++)
-		m_cache2[i] = 0;
+		m_cache2[i] = 0x80000000;
 
 	m_cache_size = 0;
 	int csize = 1 << ((m_inputs > MAX_CACHE_BITS) ? MAX_CACHE_BITS : m_inputs);
