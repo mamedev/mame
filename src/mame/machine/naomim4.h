@@ -32,12 +32,12 @@ private:
 	static const UINT8 k_sboxes[4][16];
 
 	const char *key_tag;
-	UINT16 key, iv;
+	UINT16 subkey1, subkey2;
 	UINT16 *one_round;
 
 	UINT8 *buffer;
 	UINT32 rom_cur_address, buffer_actual_size;
-	UINT16 cur_iv;
+	UINT16 iv;
 	UINT8 counter;
 	bool encryption;
 	bool cfi_mode;
@@ -45,6 +45,7 @@ private:
 	void enc_init();
 	void enc_reset();
 	void enc_fill();
+	UINT16 decrypt_one_round(UINT16 word, UINT16 subkey);
 };
 
 extern const device_type NAOMI_M4_BOARD;
