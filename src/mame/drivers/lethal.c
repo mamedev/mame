@@ -109,8 +109,8 @@ Address          Dir Data     Name      Description
 ---------------- --- -------- --------- -----------------------
 000xxxxxxxxxxxxx R   xxxxxxxx PROM      program ROM (banked)
 001xxxxxxxxxxxxx R/W xxxxxxxx WRAM      work RAM
-010000--00xxxxxx   W xxxxxxxx VREG      056832 control
-010000--01--xxxx   W xxxxxxxx VSCG      056832 control
+010000--00xxxxxx   W xxxxxxxx VREG      054156 control
+010000--01--xxxx   W xxxxxxxx VSCG      054157 control
 010000--1000---- R/W -------- AFR       watchdog reset
 010000--1001----   W          SDON      sound enable?
 010000--1010                  CCLR      ?
@@ -121,7 +121,7 @@ Address          Dir Data     Name      Description
 010000--11-000--   W --x----- CRDB      /
 010000--11-001--   W -----xxx EEP       EEPROM DI, CS, CLK
 010000--11-001--   W ----x--- MUT       sound mute?
-010000--11-001--   W ---x---- CBNK      bank switch 4800-7FFF region between palette and 053245/056832
+010000--11-001--   W ---x---- CBNK      bank switch 4400-7FFF region between palette and 053245/054156
 010000--11-001--   W --x----- n.c.
 010000--11-001--   W xx------ SHD0/1    shadow control
 010000--11-010--   W -----xxx PCU1/XBA  palette bank (tilemap A)
@@ -138,11 +138,11 @@ Address          Dir Data     Name      Description
 010000--11-11011 R   -------x NCPU      ?
 010000--11-111--   W --xxxxxx BREG      ROM bank select
 010010--00------              n.c.
-010010--01---xxx R/W xxxxxxxx OREG      053244
+010010--01---xxx R/W xxxxxxxx OREG      053244/053245 control
 010010--10-xxxxx R/W xxxxxxxx HIP       054000
 010010--11       R/W xxxxxxxx PAR       sound communication
-010100xxxxxxxxxx R/W xxxxxxxx OBJ       053245
-011xxxxxxxxxxxxx R/W xxxxxxxx VRAM      056832
+010100xxxxxxxxxx R/W xxxxxxxx OBJ       053245 sprite RAM
+011xxxxxxxxxxxxx R/W xxxxxxxx VRAM      054156 video RAM
 1xxxxxxxxxxxxxxx R   xxxxxxxx PROM      program ROM
 
 
@@ -231,9 +231,12 @@ Notes:
 
 note:
 
-lethal enforcers has 2 sprite rendering chips working in parallel mixing
-data together to give 6bpp.. we cheat by using a custom function in
-konamiic.c and a fixed 6bpp decode.
+Lethal Enforcers has two sprite rendering chips working in parallel with their
+output mixed to give 6bpp, and two tilemap rendering chips working in parallel
+to give 8bpp. We currently cheat, using just one of each device but using
+alternate gfx layouts. Emulating it accurately will require separating the
+"front end" chips (053245, 054156) from the "back end" chips (053244, 054157)
+as only the latter are doubled.
 
 mirror not set up correctly
 
@@ -265,13 +268,13 @@ WRITE8_MEMBER(lethal_state::control2_w)
 	/* bit 1 is cs (active low) */
 	/* bit 2 is clock (active high) */
 	/* bit 3 is "MUT" on the schematics (audio mute?) */
-	/* bit 4 bankswitches the 4800-7fff region: 0 = registers, 1 = RAM ("CBNK" on schematics) */
+	/* bit 4 bankswitches the 4400-7fff region: 0 = registers, 1 = palette RAM ("CBNK" on schematics) */
 	/* bit 6 is "SHD0" (some kind of shadow control) */
 	/* bit 7 is "SHD1" (ditto) */
 
 	m_cur_control2 = data;
 
-	m_bank4800->set_bank((m_cur_control2 >> 4) & 1);
+	m_bank4000->set_bank(BIT(m_cur_control2, 4));
 
 	ioport("EEPROMOUT")->write(m_cur_control2, 0xff);
 }
@@ -300,12 +303,6 @@ READ8_MEMBER(lethal_state::sound_status_r)
 WRITE8_MEMBER(lethal_state::le_bankswitch_w)
 {
 	membank("bank1")->set_entry(data);
-}
-
-// use one more palette entry for the BG color
-WRITE8_MEMBER(lethal_state::le_bgcolor_w)
-{
-	m_palette->write(space, 0x3800 + offset, data);
 }
 
 READ8_MEMBER(lethal_state::guns_r)
@@ -356,23 +353,31 @@ static ADDRESS_MAP_START( le_main, AS_PROGRAM, 8, lethal_state )
 	AM_RANGE(0x40d9, 0x40d9) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x40db, 0x40db) AM_READ(gunsaux_r)     // top X bit of guns
 	AM_RANGE(0x40dc, 0x40dc) AM_WRITE(le_bankswitch_w)
-	AM_RANGE(0x47fe, 0x47ff) AM_WRITE(le_bgcolor_w)     // BG color
-	AM_RANGE(0x4800, 0x7fff) AM_DEVICE("bank4800", address_map_bank_device, amap8)
+	AM_RANGE(0x4000, 0x43ff) AM_UNMAP // first 0x400 bytes of palette RAM are inaccessible
+	AM_RANGE(0x4000, 0x7fff) AM_DEVICE("bank4000", address_map_bank_device, amap8)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x38000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bank4800_map, AS_PROGRAM, 8, lethal_state )
-	AM_RANGE(0x0040, 0x004f) AM_DEVREADWRITE("k053244", k05324x_device, k053244_r, k053244_w)
-	AM_RANGE(0x0080, 0x009f) AM_DEVREADWRITE("k054000", k054000_device, read, write)
-	AM_RANGE(0x00c6, 0x00c6) AM_WRITE(sound_cmd_w)
-	AM_RANGE(0x00c7, 0x00c7) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x00ca, 0x00ca) AM_READ(sound_status_r)
-	AM_RANGE(0x0800, 0x17ff) AM_MASK(0x07ff) AM_DEVREADWRITE("k053244", k05324x_device, k053245_r, k053245_w)
-	AM_RANGE(0x1800, 0x1fff) AM_DEVREADWRITE("k056832", k056832_device, ram_code_lo_r, ram_code_lo_w)
-	AM_RANGE(0x2000, 0x27ff) AM_DEVREADWRITE("k056832", k056832_device, ram_code_hi_r, ram_code_hi_w)
-	AM_RANGE(0x2800, 0x2fff) AM_DEVREADWRITE("k056832", k056832_device, ram_attr_lo_r, ram_attr_lo_w)
-	AM_RANGE(0x3000, 0x37ff) AM_DEVREADWRITE("k056832", k056832_device, ram_attr_hi_r, ram_attr_hi_w)
-	AM_RANGE(0x3800, 0x7001) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // 2 extra bytes for the BG color
+static ADDRESS_MAP_START( bank4000_map, AS_PROGRAM, 8, lethal_state )
+    // VRD = 0 or 1, CBNK = 0
+	AM_RANGE(0x0840, 0x084f) AM_MIRROR(0x8000) AM_DEVREADWRITE("k053244", k05324x_device, k053244_r, k053244_w)
+	AM_RANGE(0x0880, 0x089f) AM_MIRROR(0x8000) AM_DEVREADWRITE("k054000", k054000_device, read, write)
+	AM_RANGE(0x08c6, 0x08c6) AM_MIRROR(0x8000) AM_WRITE(sound_cmd_w)
+	AM_RANGE(0x08c7, 0x08c7) AM_MIRROR(0x8000) AM_WRITE(sound_irq_w)
+	AM_RANGE(0x08ca, 0x08ca) AM_MIRROR(0x8000) AM_READ(sound_status_r)
+	AM_RANGE(0x1000, 0x17ff) AM_MIRROR(0x8000) AM_DEVREADWRITE("k053244", k05324x_device, k053245_r, k053245_w)
+
+	// VRD = 0, CBNK = 0
+	AM_RANGE(0x2000, 0x27ff) AM_DEVREADWRITE("k056832", k056832_device, ram_code_lo_r, ram_code_lo_w)
+	AM_RANGE(0x2800, 0x2fff) AM_DEVREADWRITE("k056832", k056832_device, ram_code_hi_r, ram_code_hi_w)
+	AM_RANGE(0x3000, 0x37ff) AM_DEVREADWRITE("k056832", k056832_device, ram_attr_lo_r, ram_attr_lo_w)
+	AM_RANGE(0x3800, 0x3fff) AM_DEVREADWRITE("k056832", k056832_device, ram_attr_hi_r, ram_attr_hi_w)
+
+	// VRD = 1, CBNK = 0 or 1
+	AM_RANGE(0xa000, 0xbfff) AM_MIRROR(0x4000) AM_UNMAP // AM_DEVREAD("k056832", k056832_device, rom_byte_r)
+
+	// CBNK = 1; partially overlaid when VRD = 1
+	AM_RANGE(0x4000, 0x7fff) AM_MIRROR(0x8000) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( le_sound, AS_PROGRAM, 8, lethal_state )
@@ -467,8 +472,9 @@ void lethal_state::machine_start()
 	membank("bank1")->set_entry(0);
 
 	save_item(NAME(m_cur_control2));
-	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_layer_colorbase));
+	save_item(NAME(m_sprite_colorbase));
+	save_item(NAME(m_back_colorbase));
 }
 
 void lethal_state::machine_reset()
@@ -477,8 +483,9 @@ void lethal_state::machine_reset()
 		m_layer_colorbase[i] = 0;
 
 	m_sprite_colorbase = 0;
+	m_back_colorbase = 0;
 	m_cur_control2 = 0;
-	m_bank4800->set_bank(0);
+	m_bank4000->set_bank(0);
 }
 
 static MACHINE_CONFIG_START( lethalen, lethal_state )
@@ -491,12 +498,12 @@ static MACHINE_CONFIG_START( lethalen, lethal_state )
 	MCFG_CPU_ADD("soundcpu", Z80, MAIN_CLOCK/4)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(le_sound)
 
-	MCFG_DEVICE_ADD("bank4800", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank4800_map)
+	MCFG_DEVICE_ADD("bank4000", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(bank4000_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(15)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x3800)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
@@ -511,7 +518,7 @@ static MACHINE_CONFIG_START( lethalen, lethal_state )
 	MCFG_SCREEN_UPDATE_DRIVER(lethal_state, screen_update_lethalen)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 7168+1)
+	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

@@ -264,17 +264,15 @@ void goldngam_state::video_start()
 
 UINT32 goldngam_state::screen_update_goldngam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-
-	// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
-	UINT8 *tmp = reinterpret_cast<UINT8 *>(m_videoram.target());
 	int index = 0;
 
-	for(y = 0; y < 512; ++y)
+	for(int y = 0; y < 512; ++y)
 	{
-		for(x = 0; x < 384; ++x)
+		for(int x = 0; x < 384; x += 2)
 		{
-			bitmap.pix16(y, x) = tmp[index ^ 1]; /* swapped bytes in 16 bit word */
+			UINT16 word = m_videoram[index];
+			bitmap.pix16(y, x) = word >> 8;
+			bitmap.pix16(y, x+1) = word & 0xff;
 			++index;
 		}
 	}

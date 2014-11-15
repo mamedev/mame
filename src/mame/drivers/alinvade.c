@@ -2,14 +2,14 @@
 
  tiny bartop b&w Space Invaders type game with colour overlay
  
- does it use any off-the shelf chips in addition to the 6502?
+ Driver by David Haywood and Mariusz Wojcieszek
 
  TODO:
  - 16 bytes are protected in the c*** range. I'm guessing they used a PROM to protect a 
  simple sub-routine because just after that the program has a left-over located at 0xe000-0xe00f (yup, NOPs + a RTS)
  It's unknown at current stage what it really protects tho ...
  
-*/
+ */
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
@@ -54,7 +54,7 @@ WRITE8_MEMBER(alinvade_state::irqmask_w)
 static ADDRESS_MAP_START( alinvade_map, AS_PROGRAM, 8, alinvade_state )
     AM_RANGE(0x0000, 0x01ff) AM_RAM
     AM_RANGE(0x0400, 0x0bff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM
+	AM_RANGE(0x0c00, 0x0dff) AM_RAM
     AM_RANGE(0x2000, 0x2000) AM_WRITENOP //??
     AM_RANGE(0x4000, 0x4000) AM_READ_PORT("COIN")
     AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSW")
@@ -190,4 +190,4 @@ ROM_START( alinvade )
 ROM_END
 
 
-GAME( 198?, alinvade,  0,    alinvade, alinvade, driver_device,  0, ROT90, "Forbes?", "Alien Invaders", GAME_UNEMULATED_PROTECTION )
+GAME( 198?, alinvade,  0,    alinvade, alinvade, driver_device,  0, ROT90, "Forbes?", "Alien Invaders", GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )

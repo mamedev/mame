@@ -14,7 +14,7 @@ K05324X_CB_MEMBER(lethal_state::sprite_callback)
 {
 	int pri = (*color & 0xfff0);
 	*color = *color & 0x000f;
-	*color += 0x400 / 64; // colourbase?
+	*color += m_sprite_colorbase;
 
 	/* this isn't ideal.. shouldn't need to hardcode it? not 100% sure about it anyway*/
 	if (pri == 0x10)
@@ -65,11 +65,6 @@ void lethal_state::video_start()
 		m_k056832->set_layer_offs(2, 192, 0);
 		m_k056832->set_layer_offs(3, 194, 0);
 	}
-
-	m_layer_colorbase[0] = 0x00;
-	m_layer_colorbase[1] = 0x40;
-	m_layer_colorbase[2] = 0x80;
-	m_layer_colorbase[3] = 0xc0;
 }
 
 WRITE8_MEMBER(lethal_state::lethalen_palette_control)
@@ -77,28 +72,29 @@ WRITE8_MEMBER(lethal_state::lethalen_palette_control)
 	switch (offset)
 	{
 		case 0: // 40c8 - PCU1 from schematics
-			m_layer_colorbase[0] = ((data & 0x7) - 1) * 0x40;
-			m_layer_colorbase[1] = (((data >> 4) & 0x7) - 1) * 0x40;
+			m_layer_colorbase[0] = (data & 0x7) * 1024 / 16;
+			m_layer_colorbase[1] = ((data >> 4) & 0x7) * 1024 / 16;
 			m_k056832->mark_plane_dirty( 0);
 			m_k056832->mark_plane_dirty( 1);
 			break;
 
 		case 4: // 40cc - PCU2 from schematics
-			m_layer_colorbase[2] = ((data & 0x7) - 1) * 0x40;
-			m_layer_colorbase[3] = (((data >> 4) & 0x7) - 1) * 0x40;
+			m_layer_colorbase[2] = (data & 0x7) * 1024 / 16;
+			m_layer_colorbase[3] = ((data >> 4) & 0x7) * 1024 / 16;
 			m_k056832->mark_plane_dirty( 2);
 			m_k056832->mark_plane_dirty( 3);
 			break;
 
 		case 8: // 40d0 - PCU3 from schematics
-			m_sprite_colorbase = ((data & 0x7) - 1) * 0x40;
+			m_sprite_colorbase = (data & 0x7) * 1024 / 64;
+			m_back_colorbase = ((data >> 4) & 0x7) * 1024 + 1023;
 			break;
 	}
 }
 
 UINT32 lethal_state::screen_update_lethalen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(7168, cliprect);
+	bitmap.fill(m_back_colorbase, cliprect);
 	screen.priority().fill(0, cliprect);
 
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, 3, K056832_DRAW_FLAG_MIRROR, 1);

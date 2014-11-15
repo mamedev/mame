@@ -10,40 +10,40 @@
 			<bounds x="0" y="0" width="16" height="16" />
 		</backdrop>
 		<backdrop element="grid" inputtag="GRID.1" inputmask="0x01" >
-			<bounds x="16" y="16" width="16" height="16" />
+			<bounds x="16" y="0" width="16" height="16" />
 		</backdrop>
 		<backdrop element="grid" inputtag="GRID.2" inputmask="0x01" >
-			<bounds x="32" y="16" width="16" height="16" />
+			<bounds x="32" y="0" width="16" height="16" />
 		</backdrop>
 		<backdrop element="grid" inputtag="GRID.3" inputmask="0x01" >
-			<bounds x="48" y="16" width="16" height="16" />
+			<bounds x="48" y="0" width="16" height="16" />
 		</backdrop>
 		<backdrop element="grid" inputtag="GRID.4" inputmask="0x01" >
-			<bounds x="64" y="16" width="16" height="16" />
+			<bounds x="64" y="0" width="16" height="16" />
 		</backdrop>
 		<backdrop element="grid" inputtag="GRID.5" inputmask="0x01" >
-			<bounds x="80" y="16" width="16" height="16" />
+			<bounds x="80" y="0" width="16" height="16" />
 		</backdrop>
 		<backdrop element="grid" inputtag="GRID.6" inputmask="0x01" >
-			<bounds x="96" y="16" width="16" height="16" />
+			<bounds x="96" y="0" width="16" height="16" />
 		</backdrop>
 		<backdrop element="grid" inputtag="GRID.7" inputmask="0x01" >
-			<bounds x="112" y="16" width="16" height="16" />
+			<bounds x="112" y="0" width="16" height="16" />
 		</backdrop>
 		<backdrop element="grid" inputtag="GRID.8" inputmask="0x01" >
-			<bounds x="128" y="16" width="16" height="16" />
+			<bounds x="128" y="0" width="16" height="16" />
 		</backdrop>
 		<backdrop element="grid" inputtag="GRID.9" inputmask="0x01" >
-			<bounds x="144" y="16" width="16" height="16" />
+			<bounds x="144" y="0" width="16" height="16" />
 		</backdrop>
 		<backdrop element="grid" inputtag="GRID.10" inputmask="0x01" >
-			<bounds x="160" y="16" width="16" height="16" />
+			<bounds x="160" y="0" width="16" height="16" />
 		</backdrop>
 		<backdrop element="grid" inputtag="GRID.11" inputmask="0x01" >
-			<bounds x="176" y="16" width="16" height="16" />
+			<bounds x="176" y="0" width="16" height="16" />
 		</backdrop>
 		<backdrop element="grid" inputtag="GRID.12" inputmask="0x01" >
-			<bounds x="192" y="16" width="16" height="16" />
+			<bounds x="192" y="0" width="16" height="16" />
 		</backdrop>
 
 		<backdrop element="grid" inputtag="GRID.0" inputmask="0x02" >

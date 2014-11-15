@@ -183,7 +183,7 @@ static void process_field(jed_data *data, const UINT8 *cursrc, const UINT8 *srce
 
 		// end of file
 		case 'e':
-			printf("End of file\n");
+			if (LOG_PARSE) printf("End of file\n");
 			break;
 	}
 

@@ -5277,8 +5277,9 @@ alpilota        // 1999.03 Airline Pilots (Rev A)
 ggram2          // 1999.04 Giant Gram: All Japan Pro Wrestling 2
 				// 1999.05 Taisen Puzzle Kurutto Stone
 ringout         // 1999.06 Ring Out 4x4
-f355bios        // 1999.07 F355 Challenge (BIOS)
-f355            // 1999.07 F355 Challenge
+f355dlx         // 1999.07 F355 Challenge Deluxe (BIOS)
+f355bios        // 1999.08 F355 Challenge Twin (BIOS)
+f355            // 1999.07 F355 Challenge Deluxe
 f355twin        // 1999.07 F355 Challenge Twin
 shangril        // 1999.08 Dengen Tenshi Taisen Janshi Shangri-la
 tduno           // 1999.08 Touch de UNO! / Unou Nouryoku Check Machine
@@ -5322,7 +5323,7 @@ toukon4         // 2000.04 Shin Nihon Prowrestling Toukon Retsuden 4 Arcade Edit
 qmegamis        // 2000.05 Quiz Ah Megamisama
 derbyo2k        // 2000.06 Derby Owners Club 2000 Ver.2 (Rev A)
 starhrse        // 2000.?? Star Horse (big screens)
-starhrct        // 2000.?? Star Horse (server)
+starhrct        // 2000.12 Star Horse (server)
 starhrcl        // 2000.?? Star Horse (client)
 vonot           // 2000.06 Virtual-on Oratorio Tangram M.S.B.S. Ver.5.66 2000 Edition
 ggx             // 2000.07 Guilty Gear X
@@ -5356,7 +5357,6 @@ f355twn2        // 2001.01 F355 Challenge 2 Twin
 sfz3ugd         // 2001.02 Street Fighter ZERO3 Upper
 gundmgd         // 2001.03 Mobile Suit Gundam: Federation Vs. Zeon (GD-ROM)
 gundmct         // 2001.03 Mobile Suit Gundam: Federation Vs. Zeon (cartridge)
-starhrsp        // 2001.03 Star Horse Progress (Rev A)
 dygolf          // 2001.04.27 Dynamic Golf / Virtua Golf (Rev A)
 				// 2001.04 Shakatto Tambourine Motto Norinori Shinkyoku Tsuika
 shaktmsp        // 2001.04.04 Shakatto Tambourine 2K1 SPR
@@ -5385,7 +5385,6 @@ ikaruga         // 2001.12 Ikaruga
 lupinsho        // 2001.12 Lupin the Third: the Shooting
 drbyocwc        // 2001.?? Derby Owners Club World Edition (Rev. C)
 derbyocw        // 2001.?? Derby Owners Club World Edition (Rev. D)
-shootplm        // 2001.?? Shootout Pool Medal
 				// 2001.?? Star Horse 2001
 hopper          // 2002.?? SWP Hopper Board
 vathlete        // 2002.03 Virtua Athletics / Virtua Athlete
@@ -5402,7 +5401,7 @@ moeru           // 2002.12 Moeru Casinyo
 				// 2002.?? Pochinya
 quizqgd         // 2002.?? Quiz Keitai Q mode
 shootopl        // 2002.?? Shootout Pool
-shootpl         // 2002.?? Shootout Pool / Shootout Pool Prize (Rev A)
+shootpl         // 2003.?? Shootout Pool The Medal / Shootout Pool Prize (Rev A)
 mtkob2          // 2003.02 MushiKing The King Of Beetle
 				// 2003.03 Sega Network Taisen Mahjong MJ
 ggxxrl          // 2003.03 Guilty Gear XX # Reload (Rev A)
@@ -5413,6 +5412,7 @@ usagiym         // 2003.06 Usagi Yamashiro Mahjong Hen
 oinori          // 2003.08 Oinori-daimyoujin Matsuri
 psyvar2         // 2003.11 Psyvariar 2 - The Will To Fabricate
 puyofev         // 2003.11 Puyo Puyo Fever
+starhrsp        // 2003.12 Star Horse Progress (Rev A)
 puyofevp        // 2003.?? Puyo Puyo Fever (prototype)
 				// 2003.?? Dragon Treasure
 				// 2003.?? Rabbit 2
@@ -5420,6 +5420,7 @@ cfield          // 2004.06 Chaos Field
 tetkiwam        // 2004.06 Tetris Kiwamemichi (Arcade TV Game List - P.88, Right, 11 from bottom)
 trizeal         // 2004.09 Trizeal
 				// 2004.?? Dragon Treasure 2
+shootplm        // 2004.?? Shootout Pool The Medal Ver. B / Shootout Pool Prize Ver. B
 kick4csh        // 2004.?? Kick '4' Cash
 				// 2004.?? The Quiz Show
 				// 2005.03 Melty Blood Act Cadenza
