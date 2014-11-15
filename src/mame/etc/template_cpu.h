@@ -1,4 +1,4 @@
-// license: ?
+// license: BSD-3-Clause
 // copyright-holders: Angelo Salese
 /*****************************************************************************
  *
@@ -13,7 +13,7 @@
 
 enum
 {
-	#if 0
+	#if UNUSED
 	XXX_R0=1, XXX_R1, XXX_R2, XXX_R3,
 	XXX_R4, XXX_R5, XXX_R6, XXX_R7
 	#endif
