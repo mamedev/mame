@@ -37,7 +37,7 @@ pla_device::pla_device(const machine_config &mconfig, const char *tag, device_t 
 
 void pla_device::device_start()
 {
-	assert(*region() != NULL);
+	assert(region() != NULL);
 	assert(m_terms < MAX_TERMS);
 	assert(m_inputs <= 32 && m_outputs <= 32);
 
