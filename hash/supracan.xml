@@ -23,7 +23,7 @@
 		<info name="alt_title" value="邪惡之子" />
 		<part name="cart" interface="supracan_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom loadflag="load16_word_swap" name="sonevil.bin" size="2097152" crc="9f6119a7" sha1="67ae9e7f99e1c3054ea54d53dbbba7792ef45134" offset="0" />
+				<rom loadflag="load16_word_swap" name="16005.cu5" size="2097152" crc="9f6119a7" sha1="67ae9e7f99e1c3054ea54d53dbbba7792ef45134" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -62,7 +62,7 @@
 		<info name="alt_title" value="嘻遊記" />
 		<part name="cart" interface="supracan_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom loadflag="load16_word_swap" name="jttlaugh.bin" size="2097152" crc="cee25eea" sha1="fc82fc3a7d55571494cd62d8807160e22cf437bc" offset="0" />
+				<rom loadflag="load16_word_swap" name="16002.cu2" size="2097152" crc="cee25eea" sha1="fc82fc3a7d55571494cd62d8807160e22cf437bc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
