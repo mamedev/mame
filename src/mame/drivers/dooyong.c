@@ -235,13 +235,13 @@ static ADDRESS_MAP_START( rshark_map, AS_PROGRAM, 16, dooyong_68k_state )
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("DSW")
 	AM_RANGE(0x0c0004, 0x0c0005) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x0c0006, 0x0c0007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0c4000, 0x0c400f) AM_WRITE(bgscroll_w)
-	AM_RANGE(0x0c4010, 0x0c401f) AM_WRITE(bg2scroll_w)
+	AM_RANGE(0x0c4000, 0x0c400f) AM_WRITE8(bgscroll_w, 0x00ff)
+	AM_RANGE(0x0c4010, 0x0c401f) AM_WRITE8(bg2scroll_w, 0x00ff)
 	AM_RANGE(0x0c8000, 0x0c8fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0c0012, 0x0c0013) AM_WRITE(soundlatch_word_w)
 	AM_RANGE(0x0c0014, 0x0c0015) AM_WRITE(ctrl_w)    /* flip screen + unknown stuff */
-	AM_RANGE(0x0cc000, 0x0cc00f) AM_WRITE(fgscroll_w)
-	AM_RANGE(0x0cc010, 0x0cc01f) AM_WRITE(fg2scroll_w)
+	AM_RANGE(0x0cc000, 0x0cc00f) AM_WRITE8(fgscroll_w, 0x00ff)
+	AM_RANGE(0x0cc010, 0x0cc01f) AM_WRITE8(fg2scroll_w, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( superx_map, AS_PROGRAM, 16, dooyong_68k_state )
@@ -253,13 +253,13 @@ static ADDRESS_MAP_START( superx_map, AS_PROGRAM, 16, dooyong_68k_state )
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("DSW")
 	AM_RANGE(0x080004, 0x080005) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x080006, 0x080007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x084000, 0x08400f) AM_WRITE(bgscroll_w)
-	AM_RANGE(0x084010, 0x08401f) AM_WRITE(bg2scroll_w)
+	AM_RANGE(0x084000, 0x08400f) AM_WRITE8(bgscroll_w, 0x00ff)
+	AM_RANGE(0x084010, 0x08401f) AM_WRITE8(bg2scroll_w, 0x00ff)
 	AM_RANGE(0x088000, 0x088fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x080012, 0x080013) AM_WRITE(soundlatch_word_w)
 	AM_RANGE(0x080014, 0x080015) AM_WRITE(ctrl_w)    /* flip screen + unknown stuff */
-	AM_RANGE(0x08c000, 0x08c00f) AM_WRITE(fgscroll_w)
-	AM_RANGE(0x08c010, 0x08c01f) AM_WRITE(fg2scroll_w)
+	AM_RANGE(0x08c000, 0x08c00f) AM_WRITE8(fgscroll_w, 0x00ff)
+	AM_RANGE(0x08c010, 0x08c01f) AM_WRITE8(fg2scroll_w, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( popbingo_map, AS_PROGRAM, 16, dooyong_68k_state )
@@ -274,11 +274,11 @@ static ADDRESS_MAP_START( popbingo_map, AS_PROGRAM, 16, dooyong_68k_state )
 	AM_RANGE(0x0c0012, 0x0c0013) AM_WRITE(soundlatch_word_w)
 	AM_RANGE(0x0c0014, 0x0c0015) AM_WRITE(ctrl_w)
 	AM_RANGE(0x0c0018, 0x0c001b) AM_WRITENOP // ?
-	AM_RANGE(0x0c4000, 0x0c400f) AM_WRITE(bgscroll_w)
-	AM_RANGE(0x0c4010, 0x0c401f) AM_WRITE(bg2scroll_w) // not used atm
+	AM_RANGE(0x0c4000, 0x0c400f) AM_WRITE8(bgscroll_w, 0x00ff)
+	AM_RANGE(0x0c4010, 0x0c401f) AM_WRITE8(bg2scroll_w, 0x00ff) // not used atm
 	AM_RANGE(0x0c8000, 0x0c8fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x0cc000, 0x0cc00f) AM_WRITE(fgscroll_w) // not used atm
-	AM_RANGE(0x0cc010, 0x0cc01f) AM_WRITE(fg2scroll_w) // not used atm
+	AM_RANGE(0x0cc000, 0x0cc00f) AM_WRITE8(fgscroll_w, 0x00ff) // not used atm
+	AM_RANGE(0x0cc010, 0x0cc01f) AM_WRITE8(fg2scroll_w, 0x00ff) // not used atm
 	AM_RANGE(0x0dc000, 0x0dc01f) AM_RAM // registers of some kind?
 ADDRESS_MAP_END
 

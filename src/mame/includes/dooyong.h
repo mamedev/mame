@@ -11,7 +11,15 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	inline void lastday_get_tile_info(tile_data &tileinfo, int tile_index, const UINT8 *tilerom, UINT8 *scroll, int graphics);
+	DECLARE_WRITE8_MEMBER(bgscroll_w);
+	DECLARE_WRITE8_MEMBER(bg2scroll_w);
+	DECLARE_WRITE8_MEMBER(fgscroll_w);
+	DECLARE_WRITE8_MEMBER(fg2scroll_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg2_tile_info);
+	inline void get_tile_info(tile_data &tileinfo, int tile_index, UINT8 const *tilerom, UINT8 const *scroll, int graphics);
 	inline void scroll8_w(offs_t offset, UINT8 data, UINT8 *scroll, tilemap_t *map);
 
 	tilemap_t *m_bg_tilemap;
@@ -48,22 +56,22 @@ public:
 		m_spriteram(*this, "spriteram")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(bgscroll_w);
-	DECLARE_WRITE8_MEMBER(bg2scroll_w);
-	DECLARE_WRITE8_MEMBER(fgscroll_w);
-	DECLARE_WRITE8_MEMBER(fg2scroll_w);
+	enum
+	{
+		SPRITE_12BIT = 0x01,
+		SPRITE_HEIGHT = 0x02,
+		SPRITE_YSHIFT_BLUEHAWK = 0x04,
+		SPRITE_YSHIFT_FLYTIGER = 0x08
+	};
+
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(txvideoram_w);
 	DECLARE_WRITE8_MEMBER(primella_ctrl_w);
 	DECLARE_WRITE8_MEMBER(paletteram_flytiger_w);
 	DECLARE_WRITE8_MEMBER(flytiger_ctrl_w);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg2_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pollux_extensions);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, unsigned extensions = 0);
 	UINT32 screen_update_bluehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_flytiger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_primella(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -115,17 +123,13 @@ public:
 		m_spriteram(*this, "spriteram")
 	{ }
 
-	DECLARE_WRITE16_MEMBER(bgscroll_w);
-	DECLARE_WRITE16_MEMBER(bg2scroll_w);
-	DECLARE_WRITE16_MEMBER(fgscroll_w);
-	DECLARE_WRITE16_MEMBER(fg2scroll_w);
 	DECLARE_WRITE16_MEMBER(ctrl_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg2_tile_info);
-	inline void rshark_get_tile_info(tile_data &tileinfo, int tile_index, const UINT8 *tilerom1, const UINT8 *tilerom2, UINT8 *scroll, int graphics);
+	TILE_GET_INFO_MEMBER(rshark_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(rshark_get_bg2_tile_info);
+	TILE_GET_INFO_MEMBER(rshark_get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(rshark_get_fg2_tile_info);
+	inline void rshark_get_tile_info(tile_data &tileinfo, int tile_index, UINT8 const *tilerom1, UINT8 const *tilerom2, UINT8 const *scroll, int graphics);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_rshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_popbingo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
