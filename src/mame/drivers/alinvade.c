@@ -15,9 +15,14 @@ class alinvade_state : public driver_device
 public:
 	alinvade_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		 m_maincpu(*this, "maincpu"),
 	  	 m_videoram(*this, "videoram")
 	{ }
-
+	
+	UINT8 irqmask;
+	DECLARE_WRITE8_MEMBER(irqmask_w);
+	INTERRUPT_GEN_MEMBER(vblank_irq);
+	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_videoram;
 
 public:
@@ -26,11 +31,15 @@ public:
 	UINT32 screen_update_alinvade(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
-
+WRITE8_MEMBER(alinvade_state::irqmask_w)
+{
+		irqmask = data;
+}
 
 static ADDRESS_MAP_START( alinvade_map, AS_PROGRAM, 8, alinvade_state )
     AM_RANGE(0x0000, 0x01ff) AM_RAM
     AM_RANGE(0x0400, 0x0bff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM
     AM_RANGE(0x2000, 0x2000) AM_WRITENOP //??
     AM_RANGE(0x4000, 0x4000) AM_READ_PORT("COIN")
     AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSW")
@@ -43,7 +52,7 @@ static ADDRESS_MAP_START( alinvade_map, AS_PROGRAM, 8, alinvade_state )
     AM_RANGE(0xc400, 0xc7ff) AM_ROM
     AM_RANGE(0xc800, 0xcbff) AM_ROM
     AM_RANGE(0xe000, 0xe3ff) AM_ROM
-    AM_RANGE(0xe400, 0xe400) AM_WRITENOP //??
+    AM_RANGE(0xe400, 0xe400) AM_WRITE(irqmask_w) //??
     AM_RANGE(0xe800, 0xe800) AM_READNOP AM_WRITENOP //??
     AM_RANGE(0xec00, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -121,13 +130,21 @@ UINT32 alinvade_state::screen_update_alinvade(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
+INTERRUPT_GEN_MEMBER(alinvade_state::vblank_irq)
+{
+	if(irqmask & 1)
+		m_maincpu->set_input_line(0,HOLD_LINE);
+}
+
+
+
 
 static MACHINE_CONFIG_START( alinvade, alinvade_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,2000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(alinvade_map)
-//	MCFG_CPU_VBLANK_INT_DRIVER("screen", alinvade_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", alinvade_state,  vblank_irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
