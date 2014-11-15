@@ -211,37 +211,47 @@ class gamecom_state : public driver_device
 {
 public:
 	gamecom_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_dac(*this, "dac"),
-		m_cart1(*this, "cartslot1"),
-		m_cart2(*this, "cartslot2"),
-		m_p_nvram(*this,"nvram"),
-		m_p_videoram(*this,"videoram"),
-		m_bank1(*this, "bank1"),
-		m_bank2(*this, "bank2"),
-		m_bank3(*this, "bank3"),
-		m_bank4(*this, "bank4"),
-		m_region_maincpu(*this, "maincpu"),
-		m_region_kernel(*this, "kernel"),
-		m_io_in0(*this, "IN0"),
-		m_io_in1(*this, "IN1"),
-		m_io_in2(*this, "IN2"),
-		m_io_grid(*this, "GRID")
+		: driver_device(mconfig, type, tag)
+		, m_p_videoram(*this,"videoram")
+		, m_p_nvram(*this,"nvram")
+		, m_maincpu(*this, "maincpu")
+		, m_dac(*this, "dac")
+		, m_cart1(*this, "cartslot1")
+		, m_cart2(*this, "cartslot2")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+		, m_bank3(*this, "bank3")
+		, m_bank4(*this, "bank4")
+		, m_region_maincpu(*this, "maincpu")
+		, m_region_kernel(*this, "kernel")
+		, m_io_in0(*this, "IN0")
+		, m_io_in1(*this, "IN1")
+		, m_io_in2(*this, "IN2")
+		, m_io_grid(*this, "GRID")
 		{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
-	required_device<generic_slot_device> m_cart1;
-	required_device<generic_slot_device> m_cart2;
 	DECLARE_READ8_MEMBER( gamecom_internal_r );
 	DECLARE_READ8_MEMBER( gamecom_pio_r );
 	DECLARE_WRITE8_MEMBER( gamecom_internal_w );
 	DECLARE_WRITE8_MEMBER( gamecom_pio_w );
-	required_shared_ptr<UINT8> m_p_nvram;
+	DECLARE_DRIVER_INIT(gamecom);
+	DECLARE_PALETTE_INIT(gamecom);
+	INTERRUPT_GEN_MEMBER(gamecom_interrupt);
+	TIMER_CALLBACK_MEMBER(gamecom_clock_timer_callback);
+	TIMER_CALLBACK_MEMBER(gamecom_scanline);
+	DECLARE_WRITE8_MEMBER( gamecom_handle_dma );
+	DECLARE_WRITE8_MEMBER( gamecom_update_timers );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( gamecom_cart1 );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( gamecom_cart2 );
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+private:
 	UINT8 *m_p_ram;
-	required_shared_ptr<UINT8> m_p_videoram;
 	UINT8 *m_cart_ptr;
+	UINT8 m_lcdc_reg;
+	UINT8 m_lch_reg;
+	UINT8 m_lcv_reg;
+	UINT16 m_scanline;
+	UINT16 m_base_address;
 	memory_region *m_cart1_rom;
 	memory_region *m_cart2_rom;
 	emu_timer *m_clock_timer;
@@ -249,32 +259,20 @@ public:
 	GAMECOM_DMA m_dma;
 	GAMECOM_TIMER m_timer[2];
 	gamecom_sound_t m_sound;
-	int m_scanline;
-	unsigned int m_base_address;
 	bitmap_ind16 m_bitmap;
 	void gamecom_set_mmu(UINT8 mmu, UINT8 data);
 	void handle_stylus_press(int column);
-	UINT8 m_lcdc_reg;
-	UINT8 m_lch_reg;
-	UINT8 m_lcv_reg;
 	void recompute_lcd_params();
 	void handle_input_press(UINT16 mux_data);
-
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_DRIVER_INIT(gamecom);
+	int common_load(device_image_interface &image, generic_slot_device *slot);
 	virtual void machine_reset();
 	virtual void video_start();
-	DECLARE_PALETTE_INIT(gamecom);
-	INTERRUPT_GEN_MEMBER(gamecom_interrupt);
-	TIMER_CALLBACK_MEMBER(gamecom_clock_timer_callback);
-	TIMER_CALLBACK_MEMBER(gamecom_scanline);
-	DECLARE_WRITE8_MEMBER( gamecom_handle_dma );
-	DECLARE_WRITE8_MEMBER( gamecom_update_timers );
-	int common_load(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( gamecom_cart1 );
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( gamecom_cart2 );
-
-protected:
+	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<UINT8> m_p_nvram;
+	required_device<cpu_device> m_maincpu;
+	required_device<dac_device> m_dac;
+	required_device<generic_slot_device> m_cart1;
+	required_device<generic_slot_device> m_cart2;
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;

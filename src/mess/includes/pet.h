@@ -259,8 +259,8 @@ public:
 	required_memory_region m_editor_rom;
 	required_memory_region m_ue5_rom;
 	required_memory_region m_ue6_rom;
-	required_device<pls100_device> m_pla1;
-	required_device<pls100_device> m_pla2;
+	required_device<pla_device> m_pla1;
+	required_device<pla_device> m_pla2;
 
 	DECLARE_MACHINE_START( cbm8296 );
 	DECLARE_MACHINE_RESET( cbm8296 );

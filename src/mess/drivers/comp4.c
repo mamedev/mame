@@ -7,7 +7,7 @@
   
   This is a handheld Mastermind game; a code-breaking game where the player
   needs to find out the correct sequence of colours (numbers in our case).
-  It is known as Logic 5 in Europe, and as Pythaugoras in Japan.
+  It is known as Logic 5 in Europe, and as Pythaligoras in Japan.
   
   Press the R key to start, followed by a set of unique numbers and E.
   Refer to the official manual for more information.

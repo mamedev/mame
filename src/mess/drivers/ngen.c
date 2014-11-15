@@ -14,6 +14,7 @@
 #include "machine/am9517a.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
+#include "machine/z80dart.h"
 
 class ngen_state : public driver_device
 {
@@ -23,9 +24,12 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_crtc(*this,"crtc"),
 		m_viduart(*this,"videouart"),
+		m_iouart(*this,"iouart"),
 		m_dmac(*this,"dmac"),
 		m_pic(*this,"pic"),
-		m_pit(*this,"pit")
+		m_pit(*this,"pit"),
+		m_vram(*this,"vram"),
+		m_fontram(*this,"fontram")
 	{}
 
 	DECLARE_WRITE_LINE_MEMBER(pit_out0_w);
@@ -43,27 +47,34 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<i8251_device> m_viduart;
+	required_device<upd7201_device> m_iouart;
 	required_device<am9517a_device> m_dmac;
 	required_device<pic8259_device> m_pic;
 	required_device<pit8254_device> m_pit;
+	required_shared_ptr<UINT16> m_vram;
+	required_shared_ptr<UINT16> m_fontram;
 
 	UINT16 m_peripheral;
 	UINT16 m_upper;
 	UINT16 m_middle;
 	UINT16 m_port00;
+	UINT16 m_periph141;
 };
 
 WRITE_LINE_MEMBER(ngen_state::pit_out0_w)
 {
-	m_pic->ir0_w(state);
+	//m_pic->ir0_w(state);
+	logerror("80186 Timer 1 state %i\n",state);
 }
 
 WRITE_LINE_MEMBER(ngen_state::pit_out1_w)
 {
+	logerror("PIT Timer 1 state %i\n",state);
 }
 
 WRITE_LINE_MEMBER(ngen_state::pit_out2_w)
 {
+	logerror("PIT Timer 2 state %i\n",state);
 }
 
 WRITE16_MEMBER(ngen_state::cpu_peripheral_cb)
@@ -97,10 +108,15 @@ WRITE16_MEMBER(ngen_state::cpu_peripheral_cb)
 }
 
 // 80186 peripheral space
+// Largely guesswork at this stage
 WRITE16_MEMBER(ngen_state::peripheral_w)
 {
 	switch(offset)
 	{
+	case 0x141:
+		// bit 1 enables speaker?
+		COMBINE_DATA(&m_periph141);
+		break;
 	case 0x144:
 		if(mem_mask & 0x00ff)
 			m_crtc->address_w(space,0,data & 0xff);
@@ -111,21 +127,27 @@ WRITE16_MEMBER(ngen_state::peripheral_w)
 		break;
 	case 0x146:
 		if(mem_mask & 0x00ff)
-			m_pic->write(space,0,data & 0xff);
+			m_iouart->ba_cd_w(space,0,data & 0xff);
+		logerror("Video write offset 0x146 data %04x mask %04x\n",data,mem_mask);
 		break;
 	case 0x147:
 		if(mem_mask & 0x00ff)
-			m_pic->write(space,1,data & 0xff);
+			m_iouart->ba_cd_w(space,1,data & 0xff);
+		logerror("Video write offset 0x147 data %04x mask %04x\n",data,mem_mask);
 		break;
+	default:
+		logerror("(PC=%06x) Unknown 80186 peripheral write offset %04x data %04x mask %04x\n",m_maincpu->device_t::safe_pc(),offset,data,mem_mask);
 	}
-	logerror("Peripheral write offset %04x data %04x mask %04x\n",offset,data,mem_mask);
 }
 
 READ16_MEMBER(ngen_state::peripheral_r)
 {
-	UINT16 ret = 0xff;
+	UINT16 ret = 0xffff;
 	switch(offset)
 	{
+	case 0x141:
+		ret = m_periph141;
+		break;
 	case 0x144:
 		if(mem_mask & 0x00ff)
 			ret = m_crtc->status_r(space,0);
@@ -136,14 +158,17 @@ READ16_MEMBER(ngen_state::peripheral_r)
 		break;
 	case 0x146:
 		if(mem_mask & 0x00ff)
-			ret = m_pic->read(space,0);
+			ret = m_iouart->ba_cd_r(space,0);
 		break;
-	case 0x147:
+	case 0x147:  // definitely video related, likely UART sending data to the video board
 		if(mem_mask & 0x00ff)
-			ret = m_pic->read(space,1);
+			ret = m_iouart->ba_cd_r(space,1);
+		// expects bit 0 to be set (Video ready signal?)
+		ret |= 1;
 		break;
+	default:
+		logerror("(PC=%06x) Unknown 80186 peripheral read offset %04x mask %04x returning %04x\n",m_maincpu->device_t::safe_pc(),offset,mem_mask,ret);
 	}
-	logerror("Peripheral read offset %04x mask %04x\n",offset,mem_mask);
 	return ret;
 }
 
@@ -165,10 +190,25 @@ READ16_MEMBER(ngen_state::port00_r)
 
 MC6845_UPDATE_ROW( ngen_state::crtc_update_row )
 {
+	UINT16 addr = ma;
+
+	for(int x=0;x<bitmap.width();x+=9)
+	{
+		UINT8 ch = m_vram[addr++];
+		for(int z=0;z<9;z++)
+		{
+			if(BIT(m_fontram[ch*16+ra],8-z))
+				bitmap.pix32(y,x+z) = rgb_t(0,0xff,0);
+			else
+				bitmap.pix32(y,x+z) = rgb_t(0,0,0);
+		}
+	}
 }
 
 static ADDRESS_MAP_START( ngen_mem, AS_PROGRAM, 16, ngen_state )
-	AM_RANGE(0x00000, 0xfdfff) AM_RAM
+	AM_RANGE(0x00000, 0xf7fff) AM_RAM
+	AM_RANGE(0xf8000, 0xf9fff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0xfa000, 0xfbfff) AM_RAM AM_SHARE("fontram")
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("bios",0)
 ADDRESS_MAP_END
 
@@ -214,6 +254,9 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(ngen_state, pit_out2_w))
 
 	MCFG_DEVICE_ADD("dmac", AM9517A, XTAL_14_7456MHz / 3)  // NEC D8237A, divisor unknown
+
+	// I/O board
+	MCFG_UPD7201_ADD("iouart",XTAL_14_7456MHz / 3, 0,0,0,0) // no clock visible on I/O board, guessing for now
 
 	// video board
 	MCFG_SCREEN_ADD("screen", RASTER)

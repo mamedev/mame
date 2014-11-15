@@ -105,7 +105,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<m8502_device> m_subcpu;
 	required_device<mos8722_device> m_mmu;
-	required_device<mos8721_device> m_pla;
+	required_device<pla_device> m_pla;
 	required_device<mos8563_device> m_vdc;
 	required_device<mos6566_device> m_vic;
 	required_device<mos6581_device> m_sid;

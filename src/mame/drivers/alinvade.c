@@ -2,10 +2,14 @@
 
  tiny bartop b&w Space Invaders type game with colour overlay
  
- does it use any off-the shelf chips in addition to the 6502?
+ Driver by David Haywood and Mariusz Wojcieszek
 
-
-*/
+ TODO:
+ - 16 bytes are protected in the c*** range. I'm guessing they used a PROM to protect a 
+ simple sub-routine because just after that the program has a left-over located at 0xe000-0xe00f (yup, NOPs + a RTS)
+ It's unknown at current stage what it really protects tho ...
+ 
+ */
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
@@ -15,9 +19,16 @@ class alinvade_state : public driver_device
 public:
 	alinvade_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		 m_maincpu(*this, "maincpu"),
 	  	 m_videoram(*this, "videoram")
 	{ }
-
+	
+	UINT8 irqmask;
+	UINT8 irqff;
+	DECLARE_READ8_MEMBER(irqmask_r);
+	DECLARE_WRITE8_MEMBER(irqmask_w);
+	INTERRUPT_GEN_MEMBER(vblank_irq);
+	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_videoram;
 
 public:
@@ -26,23 +37,77 @@ public:
 	UINT32 screen_update_alinvade(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
+READ8_MEMBER(alinvade_state::irqmask_r)
+{
+	return 0; // TODO: might be anything
+}
 
+
+WRITE8_MEMBER(alinvade_state::irqmask_w)
+{
+	if((!(irqff & 1)) && (data & 1)) // f/f, active high? If the above actually returns 0xff this could be active low ...
+		irqmask^= 1;
+		
+	irqff = data;
+}
 
 static ADDRESS_MAP_START( alinvade_map, AS_PROGRAM, 8, alinvade_state )
-	AM_RANGE(0x0000, 0x01ff) AM_RAM	
-	AM_RANGE(0x0400, 0x0bff) AM_RAM	AM_SHARE("videoram")
-
-	AM_RANGE(0xe000, 0xe3ff) AM_ROM
-	AM_RANGE(0xe800, 0xebff) AM_RAM	
-	AM_RANGE(0xec00, 0xffff) AM_ROM
-
-
+    AM_RANGE(0x0000, 0x01ff) AM_RAM
+    AM_RANGE(0x0400, 0x0bff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x0c00, 0x0dff) AM_RAM
+    AM_RANGE(0x2000, 0x2000) AM_WRITENOP //??
+    AM_RANGE(0x4000, 0x4000) AM_READ_PORT("COIN")
+    AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSW")
+    AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0")
+    AM_RANGE(0x8001, 0x8001) AM_READ_PORT("IN1")
+    AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN2")
+    AM_RANGE(0x8003, 0x8003) AM_READ_PORT("IN3")
+    AM_RANGE(0x8004, 0x8004) AM_READ_PORT("IN4")
+    AM_RANGE(0xa000, 0xa000) AM_WRITENOP //??
+    AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0xff0) AM_ROM AM_REGION("proms",0)
+    AM_RANGE(0xe000, 0xe3ff) AM_ROM
+    AM_RANGE(0xe400, 0xe400) AM_WRITENOP //??
+    AM_RANGE(0xe800, 0xe800) AM_READWRITE(irqmask_r,irqmask_w) //??
+    AM_RANGE(0xec00, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( alinvade )
-INPUT_PORTS_END
+    PORT_START("COIN")
+    PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+    PORT_BIT(0xef, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+    PORT_START("IN0")
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+    PORT_BIT(0xdf, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+    PORT_START("IN1")
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
+    PORT_BIT(0xdf, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+    PORT_START("IN2")
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
+    PORT_BIT(0xdf, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+    PORT_START("IN3")
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_START1 )
+    PORT_BIT(0xdf, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+    PORT_START("IN4")
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_START2 )
+    PORT_BIT(0xdf, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+    PORT_START("DSW")
+    PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+    PORT_DIPSETTING(    0x00, "2" )
+    PORT_DIPSETTING(    0x01, "3" )
+    PORT_DIPSETTING(    0x02, "4" )
+    PORT_DIPSETTING(    0x03, "5" )
+    PORT_DIPNAME( 0x04, 0x00, DEF_STR ( Unknown ) )    // read, but not tested afterwards?
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+    PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
 
 
 void alinvade_state::machine_start()
@@ -51,6 +116,7 @@ void alinvade_state::machine_start()
 
 void alinvade_state::machine_reset()
 {
+	irqmask = 1;
 }
 
 UINT32 alinvade_state::screen_update_alinvade(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -79,13 +145,18 @@ UINT32 alinvade_state::screen_update_alinvade(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
+INTERRUPT_GEN_MEMBER(alinvade_state::vblank_irq)
+{
+	if(irqmask & 1)
+		m_maincpu->set_input_line(0,HOLD_LINE);
+}
 
 static MACHINE_CONFIG_START( alinvade, alinvade_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,2000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(alinvade_map)
-//	MCFG_CPU_VBLANK_INT_DRIVER("screen", alinvade_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", alinvade_state,  vblank_irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -95,6 +166,8 @@ static MACHINE_CONFIG_START( alinvade, alinvade_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 128-1)
 	MCFG_SCREEN_UPDATE_DRIVER(alinvade_state, screen_update_alinvade)
 
+	// TODO: MCFG_DEFAULT_LAYOUT for square pixels
+	
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 MACHINE_CONFIG_END
@@ -103,13 +176,18 @@ MACHINE_CONFIG_END
 
 ROM_START( alinvade )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // todo, check mapping
-	ROM_LOAD( "alien28.708", 0xe000, 0x0400, CRC(de376295) SHA1(e8eddbb1be1f8661c6b5b39c0d78a65bded65db2) )
-	ROM_LOAD( "alien29.708", 0xec00, 0x0400, CRC(20212977) SHA1(9d24a6b403d968267079fa6241545bd5a01afebb) )
-	ROM_LOAD( "alien30.708", 0xf000, 0x0400, CRC(734b691c) SHA1(9e562159061eecf4b1dee4ea0ee4752c901a54aa) )
-	ROM_LOAD( "alien31.708", 0xf400, 0x0400, CRC(5a70535c) SHA1(2827e7d4bffca78bd035da04481e1e972ee2da39) )
-	ROM_LOAD( "alien32.708", 0xf800, 0x0400, CRC(332dd234) SHA1(9974668344a2a351868a9e7757d1c3a497dc5621) )
-	ROM_LOAD( "alien33.708", 0xfc00, 0x0400, CRC(e0d57fc7) SHA1(7b8ddcb4a86811592d2d0bbc61b2f19e5caa9ccc) )
+    ROM_LOAD( "alien28.708", 0xe000, 0x0400, CRC(de376295) SHA1(e8eddbb1be1f8661c6b5b39c0d78a65bded65db2) )
+    ROM_LOAD( "alien29.708", 0xec00, 0x0400, CRC(20212977) SHA1(9d24a6b403d968267079fa6241545bd5a01afebb) )
+    ROM_LOAD( "alien30.708", 0xf000, 0x0400, CRC(734b691c) SHA1(9e562159061eecf4b1dee4ea0ee4752c901a54aa) )
+    ROM_LOAD( "alien31.708", 0xf400, 0x0400, CRC(5a70535c) SHA1(2827e7d4bffca78bd035da04481e1e972ee2da39) )
+    ROM_LOAD( "alien32.708", 0xf800, 0x0400, CRC(332dd234) SHA1(9974668344a2a351868a9e7757d1c3a497dc5621) )
+    ROM_LOAD( "alien33.708", 0xfc00, 0x0400, CRC(e0d57fc7) SHA1(7b8ddcb4a86811592d2d0bbc61b2f19e5caa9ccc) )
+
+	ROM_REGION( 0x20, "proms", 0 )
+	ROM_LOAD( "prom", 0, 0x20, NO_DUMP )
+	ROM_FILL( 0x00, 0x0f, 0xea )    
+	ROM_FILL( 0x0f, 0x01, 0x60 )    // rts for whole area, interrupt code jumps to various addresses here, check note on top.	
 ROM_END
 
 
-GAME( 198?, alinvade,  0,    alinvade, alinvade, driver_device,  0, ROT90, "Forbes?", "Alien Invaders", GAME_NOT_WORKING )
+GAME( 198?, alinvade,  0,    alinvade, alinvade, driver_device,  0, ROT90, "Forbes?", "Alien Invaders", GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )

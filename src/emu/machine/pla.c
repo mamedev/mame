@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    PLS100 16x48x8 Programmable Logic Array emulation
+    PLA (Programmable Logic Array) emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -10,43 +10,23 @@
 **********************************************************************/
 
 #include "pla.h"
+#include "jedparse.h"
+#include "plaparse.h"
 
 
-
-//**************************************************************************
-//  DEVICE TYPE DEFINITIONS
-//**************************************************************************
-
-const device_type PLS100 = &device_creator<pls100_device>;
-const device_type MOS8721 = &device_creator<mos8721_device>;
-
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
+const device_type PLA = &device_creator<pla_device>;
 
 //-------------------------------------------------
 //  pla_device - constructor
 //-------------------------------------------------
 
-pla_device::pla_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int inputs, int outputs, int terms, UINT32 input_mask, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_inputs(inputs),
-	m_outputs(outputs),
-	m_terms(terms),
-	m_input_mask(((UINT64)input_mask << 32) | input_mask)
-{
-}
-
-pls100_device::pls100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	pla_device(mconfig, PLS100, "PLS100", tag, owner, clock, 16, 8, 48, 0xffff, "pls100", __FILE__),
-	m_output(*this, "output")
-{
-}
-
-mos8721_device::mos8721_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	pla_device(mconfig, MOS8721, "MOS8721", tag, owner, clock, 27, 18, 379, 0x7ffffff, "mos8721", __FILE__) // TODO actual number of terms is unknown
+pla_device::pla_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, PLA, "PLA", tag, owner, clock, "pla", __FILE__),
+		m_format(PLA_FMT_JEDBIN),
+		m_inputs(0),
+		m_outputs(0),
+		m_terms(0),
+		m_input_mask(0)
 {
 }
 
@@ -57,30 +37,29 @@ mos8721_device::mos8721_device(const machine_config &mconfig, const char *tag, d
 
 void pla_device::device_start()
 {
-	assert(machine().root_device().memregion(tag()) != NULL);
+	assert(region() != NULL);
+	assert(m_terms < MAX_TERMS);
+	assert(m_inputs < 32 && m_outputs <= 32);
+
+	if (m_input_mask == 0)
+		m_input_mask = ((UINT64)1 << m_inputs) - 1;
+	m_input_mask = ((UINT64)m_input_mask << 32) | m_input_mask;
 
 	// parse fusemap
 	parse_fusemap();
 
-	// clear cache
-	for (int i = 0; i < CACHE_SIZE; i++)
-	{
-		m_cache[i] = 0;
-	}
+	// initialize cache
+	m_cache2_ptr = 0;
+	for (int i = 0; i < CACHE2_SIZE; i++)
+		m_cache2[i] = 0x80000000;
 
-	m_cache_ptr = 0;
-}
-
-void pls100_device::device_start()
-{
-	pla_device::device_start();
-
-	m_output.allocate(0x10000);
-
-	for (UINT32 input = 0; input < 0x10000; input++)
-	{
-		m_output[input] = pla_device::read(input);
-	}
+	m_cache_size = 0;
+	int csize = 1 << ((m_inputs > MAX_CACHE_BITS) ? MAX_CACHE_BITS : m_inputs);
+	m_cache.resize(csize);
+	for (int i = 0; i < csize; i++)
+		m_cache[i] = read(i);
+	
+	m_cache_size = csize;
 }
 
 
@@ -90,11 +69,25 @@ void pls100_device::device_start()
 
 void pla_device::parse_fusemap()
 {
-	memory_region *region = machine().root_device().memregion(tag());
 	jed_data jed;
-
-	jedbin_parse(region->base(), region->bytes(), &jed);
-
+	int result = JEDERR_NONE;
+	
+	// read pla file
+	switch (m_format)
+	{
+		case PLA_FMT_JEDBIN:
+			result = jedbin_parse(region()->base(), region()->bytes(), &jed);
+			break;
+		
+		case PLA_FMT_BERKELEY:
+			result = pla_parse(region()->base(), region()->bytes(), &jed);
+			break;
+	}
+	
+	if (result != JEDERR_NONE)
+		fatalerror("%s PLA parse error %d\n", tag(), result);
+	
+	// parse it
 	UINT32 fusenum = 0;
 
 	for (int p = 0; p < m_terms; p++)
@@ -143,14 +136,17 @@ void pla_device::parse_fusemap()
 UINT32 pla_device::read(UINT32 input)
 {
 	// try the cache first
-	for (int i = 0; i < CACHE_SIZE; ++i)
+	if (input < m_cache_size)
+		return m_cache[input];
+	
+	for (int i = 0; i < CACHE2_SIZE; ++i)
 	{
-		UINT64 cache_entry = m_cache[i];
+		UINT64 cache2_entry = m_cache2[i];
 
-		if ((UINT32)cache_entry == input)
+		if ((UINT32)cache2_entry == input)
 		{
-			// cache hit
-			return cache_entry >> 32;
+			// cache2 hit
+			return cache2_entry >> 32;
 		}
 	}
 
@@ -170,19 +166,9 @@ UINT32 pla_device::read(UINT32 input)
 
 	s ^= m_xor;
 
-	// store output in cache
-	m_cache[m_cache_ptr] = s | input;
-	++m_cache_ptr &= (CACHE_SIZE - 1);
+	// store output in cache2
+	m_cache2[m_cache2_ptr] = s | input;
+	++m_cache2_ptr &= (CACHE2_SIZE - 1);
 
 	return s >> 32;
-}
-
-
-//-------------------------------------------------
-//  read -
-//-------------------------------------------------
-
-UINT32 pls100_device::read(UINT32 input)
-{
-	return m_output[input];
 }

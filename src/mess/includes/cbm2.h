@@ -113,7 +113,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<pls100_device> m_pla1;
+	required_device<pla_device> m_pla1;
 	optional_device<mc6845_device> m_crtc;
 	optional_device<palette_device> m_palette;
 	required_device<mos6581_device> m_sid;
@@ -274,7 +274,7 @@ public:
 			m_vic_irq(CLEAR_LINE)
 	{ }
 
-	required_device<pls100_device> m_pla2;
+	required_device<pla_device> m_pla2;
 	required_device<mos6566_device> m_vic;
 	optional_shared_ptr<UINT8> m_color_ram;
 

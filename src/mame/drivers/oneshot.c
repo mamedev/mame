@@ -29,6 +29,7 @@ TO DO :
 
 NOTE: An eBay auction of the PCB shows "1996.9.16 PROMAT" on the JAMMA+ adapter for
       One Shot One Kill.  This information was used for the year & manufacturer.
+      Also listed in an Approved Game list on a HK government site as "Promet"
 
 */
 

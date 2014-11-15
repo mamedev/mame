@@ -18,7 +18,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_bank4800(*this, "bank4800"),
+		m_bank4000(*this, "bank4000"),
 		m_k056832(*this, "k056832"),
 		m_k053244(*this, "k053244"),
 		m_palette(*this, "palette") { }
@@ -26,6 +26,7 @@ public:
 	/* video-related */
 	int        m_layer_colorbase[4];
 	int        m_sprite_colorbase;
+	int        m_back_colorbase;
 
 	/* misc */
 	UINT8      m_cur_control2;
@@ -33,7 +34,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
-	required_device<address_map_bank_device> m_bank4800;
+	required_device<address_map_bank_device> m_bank4000;
 	required_device<k056832_device> m_k056832;
 	required_device<k05324x_device> m_k053244;
 	required_device<palette_device> m_palette;
@@ -43,7 +44,6 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_irq_w);
 	DECLARE_READ8_MEMBER(sound_status_r);
 	DECLARE_WRITE8_MEMBER(le_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(le_bgcolor_w);
 	DECLARE_READ8_MEMBER(guns_r);
 	DECLARE_READ8_MEMBER(gunsaux_r);
 	DECLARE_WRITE8_MEMBER(lethalen_palette_control);
