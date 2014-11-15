@@ -54,7 +54,23 @@ enum
 // macros for known (and used) devices
 
 // 82S100, 82S101, PLS100, PLS101
-// 16x48x8 PLA, 28-pin
+// 16x48x8 PLA, 28-pin:
+/*           _____   _____
+     FE   1 |*    \_/     | 28  Vcc
+     I7   2 |             | 27  I8
+     I6   3 |             | 26  I9
+     I5   4 |             | 25  I10
+     I4   5 |             | 24  I11
+     I3   6 |    82S100   | 23  I12
+     I2   7 |    82S101   | 22  I13
+     I1   8 |    PLS100   | 21  I14
+     I0   9 |    PLS101   | 20  I15
+     F7  10 |             | 19  _CE
+     F6  11 |             | 18  F0
+     F5  12 |             | 17  F1
+     F4  13 |             | 16  F2
+    GND  14 |_____________| 15  F3
+*/
 #define MCFG_PLS100_ADD(_tag) \
 	MCFG_PLA_ADD(_tag, 16, 8, 48)
 
