@@ -993,8 +993,9 @@ $(MESSOBJ)/apollo.a:            \
 
 $(MESSOBJ)/apple.a:             \
 	$(MESS_DRIVERS)/apple1.o $(MESS_MACHINE)/apple1.o $(MESS_VIDEO)/apple1.o \
-	$(MESS_DRIVERS)/apple2.o $(MESS_MACHINE)/apple2.o $(MESS_VIDEO)/apple2.o \
-		$(MESS_DRIVERS)/apple2gs.o $(MESS_MACHINE)/apple2gs.o $(MESS_VIDEO)/apple2gs.o \
+	$(MESS_DRIVERS)/apple2.o $(MESS_DRIVERS)/apple2e.o $(MESS_MACHINE)/apple2.o $(MESS_VIDEO)/apple2.o \
+	$(MESS_DRIVERS)/tk2000.o \
+	$(MESS_DRIVERS)/apple2gs.o $(MESS_MACHINE)/apple2gs.o $(MESS_VIDEO)/apple2gs.o \
 	$(MESS_DRIVERS)/apple3.o $(MESS_MACHINE)/apple3.o $(MESS_VIDEO)/apple3.o \
 	$(MESS_DRIVERS)/lisa.o $(MESS_MACHINE)/lisa.o \
 	$(MESS_DRIVERS)/mac.o $(MESS_AUDIO)/mac.o $(MESS_MACHINE)/egret.o $(MESS_MACHINE)/mac.o $(MESS_MACHINE)/macadb.o $(MESS_MACHINE)/macrtc.o $(MESS_MACHINE)/mackbd.o $(MESS_MACHINE)/swim.o $(MESS_VIDEO)/mac.o \
@@ -2018,9 +2019,10 @@ $(MESS_DRIVERS)/mac.o:      $(MESSSRC)/drivers/mac.c \
 $(MESS_MACHINE)/egret.o:    $(MESSSRC)/machine/egret.c\
 				$(MESSSRC)/machine/egret.h
 
-$(MESS_DRIVERS)/apple2.o:   $(MESSSRC)/includes/apple2.h
+$(MESS_DRIVERS)/apple2.o:   $(MESSSRC)/video/apple2.h
+$(MESS_DRIVERS)/apple2e.o:  $(MESSSRC)/video/apple2.h
 $(MESS_MACHINE)/apple2.o:   $(MESSSRC)/includes/apple2.h
-$(MESS_VIDEO)/apple2.o:     $(MESSSRC)/includes/apple2.h
+$(MESS_VIDEO)/apple2.o:     $(MESSSRC)/includes/apple2.h $(MESSSRC)/video/apple2.h
 $(MESS_DRIVERS)/apple2gs.o: $(MESSSRC)/includes/apple2.h $(MESSSRC)/includes/apple2gs.h
 $(MESS_MACHINE)/apple2gs.o: $(MESSSRC)/includes/apple2.h $(MESSSRC)/includes/apple2gs.h
 $(MESS_VIDEO)/apple2gs.o:   $(MESSSRC)/includes/apple2.h $(MESSSRC)/includes/apple2gs.h

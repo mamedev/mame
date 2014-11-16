@@ -1,205 +1,55 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /***************************************************************************
 
-Apple II
-
-This family of computers bank-switches everything up the wazoo.
-
-Remarkable features
--------------------
-
-Apple II (original model)
--------------------------
-
-RAM: 4/8/12/16/20/24/32/36/48 KB (according to the manual)
-
-ROM: 8 KB mapped to $E000-$FFFF
-Empty ROM sockets mapped at $D000-$D7FF (usually occupied by Programmer's
-Aid #1 chip) and $D800-$DFFF (usually empty, but a couple of 3rd party
-chips were produced)
-
-HI-RES Palette has only 4 colors: 0 - black, 1 - green, 2 - purple,
-3 - white
-
-Due to an hardware bug, green/purple artifacts are present in text mode
-too!
-
-No 80 columns
-No Open/Solid Apple keys
-No Up/Down arrows key
-
-Users often connected the SHIFT key to the paddle #2 button (mapped to
-$C063) in order to inform properly written software that characters were
-to be intended upper/lower case
-
-*** TODO: Should MESS emulate this via a dipswitch?
-
-Integer BASIC in ROM, AppleSoft must be loaded from disk or tape
-
-No AutoStart ROM: once the machine was switched on, the user had to manually
-perform the reset cycle pressing, guess what, RESET ;)
-
-Apple II+
----------
-
-RAM: 16/32/48 KB + extra 16 KB at $C000 if using Apple Language Card
-ROM: 12 KB mapped to $D000-$DFFF
-
-HI-RES Palette has four more entries: 4 - black (again), 5 - orange,
-6 - blue, 7 - white (again)
-
-No more artifact bug in text mode
-
-No 80 columns
-No Open/Solid Apple keys
-NO Up/Down arrows keys
-
-Users still did the SHIFT key mod
-
-AppleSoft BASIC in ROM
-
-AutoStart ROM - no more need to press RESET after switching the machine on
-
-Apple IIe
----------
-
-RAM: 64 KB + optional bank of 64 KB (see 80 columns card)
-ROM: 16 KB
-
-80 columns card: this card was available in two versions - one equipped
-with 1 KB of memory to provide the extra RAM for the display, the other
-equipped with full 64 KB of RAM - the 80 columns card is not included
-in the standard configuration and is available as add-on.
-
-Open/Solid Apple keys mapped to buttons 0 and 1 of the paddle #1
-Up/Down arrows keys
-Connector for an optional numeric keypad
-
-Apple begins manufacturing its machines with the SHIFT key mod
-
-Revision A motherboards cannot handle double-hires graphics, Revision B can
-
-*** TODO: Should MESS emulate this via a dipswitch?
-
-Apple IIe (enhanced)
---------------------
-
-The enhancement consists in bugfix of the ROM code, a 65c02 instead of the
-6502 and a change in the character generator ROM which now includes the
-so called "MouseText" characters (thus, no flashing characters in 80
-columns mode)
-
-Double hi-res mode is supported
-
-Apple IIe (Platinum)
---------------------
-
-Identical to IIe enhanced except for:
-
-The numerical keypad is integrated into the main keyboard (although the
-internal connector is still present)
-
-The CLEAR key on the keypad generates the same character of the ESC key,
-but some users did an hardware modification so that it generates CTRL-X
-
-*** TODO: Should MESS emulate this via a dipswitch?
-
-The 64 KB 80 columns card is built in
-
-Due to the SHIFT key mod, if the user press both SHIFT and the paddle
-button where the shift key was connected, a short circuit is caused
-and the power supply is shut down!
-
-Apple IIc
----------
-
-Same as IIe enhanced (Rev B) except for:
-
-There are no slots in hardware. The machine however sees (for compatibility
-reasons):
-
-Two Super Serial Cards in slots 1-2
-80 columns card (64 KB version) in slot 3
-Mouse in slot 4
-Easter Egg in slot 5 (!)
-Disk II in slot 6
-External 5.25 drive in slot 7
-
-MouseText characters
-
-No numerical keypad
-
-Switchables keyboard layouts (the user, via an external switch, can choose
-between two layouts, i.e. US and German, and in the USA QWERTY and Dvorak)
-
-*** TODO: Should MESS emulate this?
-
-Apple IIc (UniDisk 3.5)
------------------------
-
-Identical to IIc except for:
-
-ROM: 32 KB
-
-The disk firmware can handle up to four 3.5 disk drives or three 3.5 drives
-and a 5.25 drive
-
-Preliminary support (but not working and never completed) for AppleTalk
-network in slot 7
-
-Apple IIc (Original Memory Expansion)
--------------------------------------
-
-Identical to IIc except for:
-
-Support for Memory Expansion Board (mapped to slot 4)
-This card can provide up to 1 MB of RAM in increments of 256 KB
-The firmware in ROM sees the extra RAM as a RAMdisk
-
-Since the expansion is mapped to slot 4, mouse is now mapped to slot 7
-
-Apple IIc (Revised Memory Expansion)
-------------------------------------
-
-ROMSET NOT DUMPED
-
-Identical to IIc (OME) except for bugfixes
-
-Apple IIc Plus
---------------
-
-Identical to IIc (RME) except for:
-
-The 65c02 works at 4MHz
-
-The machine has an internal "Apple 3.5" drive (which is DIFFERENT from the
-UniDisk 3.5 drive!)
-
-The external drive port supports not only 5.25 drives but also UniDisk and
-Apple 3.5 drives, allowing via daisy-chaining any combination of UniDisk,
-Apple 3.5 and Apple 5.25 drives - up to three devices
-
-----------------------------------
-
-TK3000 keyboard matrix
-
-Data bus D0-D7 is X0-X7
-Address bus A0-A11 is Y0-Y11
-
-***************************************************************************/
-
-
+	apple2.c - Apple II/II Plus and clones
+
+    Next generation driver written in September/October 2014 by R. Belmont. 
+    Thanks to the original Apple II series driver's authors: Mike Balfour, Nathan Woods, and R. Belmont 
+    Special thanks to the Apple II Documentation Project/Antoine Vignau and Peter Ferrie. 
+ 
+II: original base model.  RAM sizes of 4, 8, 12, 16, 20, 24, 32, 36, and 48 KB possible. 
+    8K of ROM at $E000-$FFFF, empty sockets for $D000-$D7FF and $D800-$DFFF.
+    Programmer's Aid #1 was sold by Apple for $D000-$D7FF, some third-party ROMs
+    were also available.
+
+    Revision 0 (very rare) had only 4 hi-res colors (blue and orange were missing).
+    Revision 0 boards also did not include a color killer in text mode, making text
+    fringey on color TVs/monitors.
+
+    ROM contains original non-autostart Monitor and Integer BASIC; apparently
+    Autostart + Integer is also possible.
+ 
+II Plus: RAM options reduced to 16/32/48 KB. 
+    ROM expanded to 12KB from $D000-$FFFF containing Applesoft BASIC and
+    the Autostart Monitor.  Applesoft is a licensed version of Microsoft's
+    6502 BASIC as also found in Commodore and many other computers.
+ 
+ 
+    Users of both models often connected the SHIFT key to the paddle #2 button
+    (mapped to $C063) in order to inform properly written software that characters
+    were to be intended upper/lower case.
+ 
+    Both models commonly included a RAM "language card" in slot 0 which added 16K
+    of RAM which could be banked into the $D000-$FFFF space to replace the ROMs.
+    This allowed running Applesoft on a II and Integer BASIC on a II Plus.
+    A II Plus with this card installed is often called a "64K Apple II"; this is
+    the base configuration required to run ProDOS and some larger games.
+ 
+************************************************************************/ 
+ 
 #include "emu.h"
+#include "machine/bankdev.h"
+#include "machine/ram.h"
+#include "machine/kb3600.h"
+#include "sound/speaker.h"
 #include "imagedev/flopdrv.h"
 #include "imagedev/cassette.h"
 #include "formats/ap2_dsk.h"
-#include "formats/ap_dsk35.h"
-#include "includes/apple2.h"
-#include "cpu/z80/z80.h"
-#include "machine/sonydriv.h"
-#include "machine/appldriv.h"
+#include "cpu/m6502/m6502.h"
+#include "video/apple2.h"
 
 #include "bus/a2bus/a2bus.h"
-#include "bus/a2bus/a2lang.h"
 #include "bus/a2bus/a2diskii.h"
 #include "bus/a2bus/a2diskiing.h"
 #include "bus/a2bus/a2mockingboard.h"
@@ -227,9 +77,115 @@ Address bus A0-A11 is Y0-Y11
 #include "bus/a2bus/a2dx1.h"
 #include "bus/a2bus/timemasterho.h"
 #include "bus/a2bus/mouse.h"
-#include "bus/a2bus/a2estd80col.h"
-#include "bus/a2bus/a2eext80col.h"
-#include "bus/a2bus/a2eramworks3.h"
+#include "bus/a2bus/ramcard16k.h"
+#include "bus/a2bus/ramcard128k.h"
+
+#define A2_CPU_TAG "maincpu"
+#define A2_KBDC_TAG "ay3600"
+#define A2_BUS_TAG "a2bus"
+#define A2_SPEAKER_TAG "speaker"
+#define A2_CASSETTE_TAG "tape"
+#define A2_UPPERBANK_TAG "inhbank"
+#define A2_VIDEO_TAG "a2video"
+
+class napple2_state : public driver_device
+{
+public:
+	napple2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, A2_CPU_TAG),
+		m_ram(*this, RAM_TAG),
+		m_ay3600(*this, A2_KBDC_TAG),
+		m_video(*this, A2_VIDEO_TAG),
+		m_a2bus(*this, A2_BUS_TAG),
+		m_joy1x(*this, "joystick_1_x"),
+		m_joy1y(*this, "joystick_1_y"),
+		m_joy2x(*this, "joystick_2_x"),
+		m_joy2y(*this, "joystick_2_y"),
+		m_joybuttons(*this, "joystick_buttons"),
+		m_kbspecial(*this, "keyb_special"),
+		m_kbrepeat(*this, "keyb_repeat"),
+		m_resetdip(*this, "reset_dip"),
+		m_sysconfig(*this, "a2_config"),
+		m_speaker(*this, A2_SPEAKER_TAG),
+		m_cassette(*this, A2_CASSETTE_TAG),
+		m_upperbank(*this, A2_UPPERBANK_TAG)
+	{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
+	required_device<ay3600_device> m_ay3600;
+	required_device<a2_video_device> m_video;
+	required_device<a2bus_device> m_a2bus;
+	required_ioport m_joy1x, m_joy1y, m_joy2x, m_joy2y, m_joybuttons;
+	required_ioport m_kbspecial;
+	required_ioport m_kbrepeat;
+	optional_ioport m_resetdip;
+	required_ioport m_sysconfig;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<cassette_image_device> m_cassette;
+	required_device<address_map_bank_device> m_upperbank;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(ay3600_repeat);
+
+	virtual void machine_start();
+	virtual void machine_reset();
+
+	DECLARE_PALETTE_INIT(apple2);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	DECLARE_READ8_MEMBER(ram_r);
+	DECLARE_WRITE8_MEMBER(ram_w);
+	DECLARE_READ8_MEMBER(c000_r);
+	DECLARE_WRITE8_MEMBER(c000_w);
+	DECLARE_READ8_MEMBER(c080_r);
+	DECLARE_WRITE8_MEMBER(c080_w);
+	DECLARE_READ8_MEMBER(c100_r);
+	DECLARE_WRITE8_MEMBER(c100_w);
+	DECLARE_READ8_MEMBER(c800_r);
+	DECLARE_WRITE8_MEMBER(c800_w);
+	DECLARE_READ8_MEMBER(inh_r);
+	DECLARE_WRITE8_MEMBER(inh_w);
+	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
+	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
+	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
+	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
+	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
+	DECLARE_WRITE_LINE_MEMBER(ay3600_ako_w);
+
+private:
+	int m_speaker_state;
+	int m_cassette_state;
+
+	double m_joystick_x1_time;
+	double m_joystick_y1_time;
+	double m_joystick_x2_time;
+	double m_joystick_y2_time;
+
+	UINT16 m_lastchar, m_strobe;
+	UINT8 m_transchar;
+	bool m_anykeydown;
+
+	int m_inh_slot;
+	int m_cnxx_slot;
+
+	bool m_page2;
+	bool m_an0, m_an1, m_an2, m_an3;
+
+	UINT8 *m_ram_ptr;
+	int m_ram_size;
+
+	int m_inh_bank;
+
+	double m_x_calibration, m_y_calibration;
+
+	device_a2bus_card_interface *m_slotdevice[8];
+
+	void do_io(address_space &space, int offset);
+	UINT8 read_floatingbus();
+};
 
 /***************************************************************************
     PARAMETERS
@@ -238,53 +194,775 @@ Address bus A0-A11 is Y0-Y11
 #define JOYSTICK_DELTA          80
 #define JOYSTICK_SENSITIVITY    50
 #define JOYSTICK_AUTOCENTER     80
-#define PADDLE_DELTA            10
-#define PADDLE_SENSITIVITY      10
-#define PADDLE_AUTOCENTER       0
 
-WRITE_LINE_MEMBER(apple2_state::a2bus_irq_w)
+WRITE_LINE_MEMBER(napple2_state::a2bus_irq_w)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, state);
 }
 
-WRITE_LINE_MEMBER(apple2_state::a2bus_nmi_w)
+WRITE_LINE_MEMBER(napple2_state::a2bus_nmi_w)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
-WRITE_LINE_MEMBER(apple2_state::a2bus_inh_w)
+// This code makes a ton of assumptions because we can guarantee a pre-IIe machine!
+WRITE_LINE_MEMBER(napple2_state::a2bus_inh_w)
 {
-	m_inh_slot = state;
-	apple2_update_memory();
+	if (state == ASSERT_LINE)
+	{
+		// assume no cards are pulling /INH
+		m_inh_slot = -1;
+								   
+		// scan the slots to figure out which card(s) are INHibiting stuff
+		for (int i = 0; i <= 7; i++)
+		{
+			if (m_slotdevice[i])
+			{
+				// this driver only can inhibit from 0xd000-0xffff
+				if ((m_slotdevice[i]->inh_start() == 0xd000) &&
+					(m_slotdevice[i]->inh_end() == 0xffff))
+				{
+					if ((m_slotdevice[i]->inh_type() & INH_READ) == INH_READ)
+					{
+						if (m_inh_bank != 1)
+						{
+							m_upperbank->set_bank(1); 
+							m_inh_bank = 1;
+						}
+					}
+					else
+					{
+						if (m_inh_bank != 0)
+						{
+							m_upperbank->set_bank(0); 
+							m_inh_bank = 0;
+						}
+					}
+
+					m_inh_slot = i;
+					break;
+				}
+			}
+		}
+
+		// if no slots are inhibiting, make sure ROM is fully switched in
+		if ((m_inh_slot == -1) && (m_inh_bank != 0))
+		{
+			m_upperbank->set_bank(0); 
+			m_inh_bank = 0;
+		}
+	}
+}
+
+/***************************************************************************
+    START/RESET
+***************************************************************************/
+
+void napple2_state::machine_start()
+{
+	m_ram_ptr = m_ram->pointer();
+	m_ram_size = m_ram->size();
+	m_speaker_state = 0;
+	m_speaker->level_w(m_speaker_state);
+	m_cassette_state = 0;
+	m_cassette->output(-1.0f);
+	m_upperbank->set_bank(0);
+	m_inh_bank = 0;
+
+	// precalculate joystick time constants
+	m_x_calibration = attotime::from_usec(12).as_double();
+	m_y_calibration = attotime::from_usec(13).as_double();
+
+	// cache slot devices
+	for (int i = 0; i <= 7; i++)
+	{
+		m_slotdevice[i] = m_a2bus->get_a2bus_card(i);
+	}
+
+	// setup save states
+	save_item(NAME(m_speaker_state));
+	save_item(NAME(m_cassette_state));
+	save_item(NAME(m_joystick_x1_time));
+	save_item(NAME(m_joystick_y1_time));
+	save_item(NAME(m_joystick_x2_time));
+	save_item(NAME(m_joystick_y2_time));
+	save_item(NAME(m_lastchar));
+	save_item(NAME(m_strobe));
+	save_item(NAME(m_transchar));
+	save_item(NAME(m_inh_slot));
+	save_item(NAME(m_inh_bank));
+	save_item(NAME(m_cnxx_slot));
+	save_item(NAME(m_page2));
+	save_item(NAME(m_an0));
+	save_item(NAME(m_an1));
+	save_item(NAME(m_an2));
+	save_item(NAME(m_an3));
+	save_item(NAME(m_anykeydown));
+
+	// setup video pointers
+	m_video->m_ram_ptr = m_ram_ptr;
+	m_video->m_aux_ptr = m_ram_ptr;
+	m_video->m_char_ptr = memregion("gfx1")->base();
+	m_video->m_char_size = memregion("gfx1")->bytes();
+}
+
+void napple2_state::machine_reset()
+{
+	m_inh_slot = -1;
+	m_cnxx_slot = -1;
+	m_page2 = false;
+	m_an0 = m_an1 = m_an2 = m_an3 = false;
+	m_anykeydown = false;
+}
+
+/*************************************************************************** 
+    VIDEO
+***************************************************************************/
+
+TIMER_DEVICE_CALLBACK_MEMBER(napple2_state::apple2_interrupt)
+{
+	int scanline = param;
+
+	if((scanline % 8) == 0)
+		machine().first_screen()->update_partial(machine().first_screen()->vpos());
+
+	// update the video system's shadow copy of the system config at the end of the frame
+	if (scanline == 192)
+	{
+		m_video->m_sysconfig = m_sysconfig->read();
+
+		// check reset
+		if (m_resetdip)	// if reset DIP is present, use it
+		{
+			if (m_resetdip->read() & 1)
+			{		// CTRL-RESET
+				if ((m_kbspecial->read() & 0x88) == 0x88)
+				{
+					m_maincpu->reset();
+				}
+			}
+			else	// plain RESET
+			{
+				if (m_kbspecial->read() & 0x80)
+				{
+					m_maincpu->reset();
+				}
+			}
+		}
+		else	// no DIP, so always plain RESET
+		{
+			if (m_kbspecial->read() & 0x80)
+			{
+				m_maincpu->reset();
+			}
+		}
+	}
+}
+
+PALETTE_INIT_MEMBER(napple2_state, apple2)
+{
+	m_video->palette_init_apple2(palette);
+}
+
+UINT32 napple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// always update the flash timer here so it's smooth regardless of mode switches
+	m_video->m_flash = ((machine().time() * 4).seconds & 1) ? true : false;
+
+	if (m_video->m_graphics)
+	{
+		if (m_video->m_hires)
+		{
+			if (m_video->m_mix)
+			{
+				m_video->hgr_update(screen, bitmap, cliprect, 0, 159);
+				m_video->text_update_orig(screen, bitmap, cliprect, 160, 191);
+			}
+			else
+			{
+				m_video->hgr_update(screen, bitmap, cliprect, 0, 191);
+			}
+		}
+		else	// lo-res
+		{	
+			if (m_video->m_mix)
+			{
+				m_video->lores_update(screen, bitmap, cliprect, 0, 159);
+				m_video->text_update_orig(screen, bitmap, cliprect, 160, 191);
+			}
+			else
+			{
+				m_video->lores_update(screen, bitmap, cliprect, 0, 191);
+			}
+		}
+	}
+	else
+	{
+		m_video->text_update_orig(screen, bitmap, cliprect, 0, 191);
+	}
+
+	return 0;
+}
+
+/*************************************************************************** 
+    I/O
+***************************************************************************/
+// most softswitches don't care about read vs write, so handle them here
+void napple2_state::do_io(address_space &space, int offset)
+{
+	if(space.debugger_access())
+	{
+		return;
+	}
+
+	switch (offset)
+	{
+		case 0x20:
+			m_cassette_state ^= 1;
+			m_cassette->output(m_cassette_state ? 1.0f : -1.0f);
+			break;
+
+		case 0x30:
+			m_speaker_state ^= 1;
+			m_speaker->level_w(m_speaker_state);
+			break;
+
+		case 0x50:  // graphics mode
+			m_video->m_graphics = true; break;
+
+		case 0x51:  // text mode
+			m_video->m_graphics = false; break;
+
+		case 0x52:  // no mix
+			m_video->m_mix = false; break;
+
+		case 0x53:  // mixed mode
+			m_video->m_mix = true; break;
+
+		case 0x54:  // set page 1
+			m_page2 = false; 
+			m_video->m_page2 = false;
+			break;
+
+		case 0x55:  // set page 2
+			m_page2 = true; 
+			m_video->m_page2 = true;
+			break;
+
+		case 0x56: // select lo-res
+			m_video->m_hires = false; break;
+
+		case 0x57: // select hi-res
+			m_video->m_hires = true; break;
+
+		case 0x58: // AN0 off
+			m_an0 = false; break;
+
+		case 0x59: // AN0 on
+			m_an0 = true; break;
+
+		case 0x5a: // AN1 off
+			m_an1 = false; break;
+
+		case 0x5b: // AN1 on
+			m_an1 = true; break;
+
+		case 0x5c: // AN2 off
+			m_an2 = false; break;
+
+		case 0x5d: // AN2 on
+			m_an2 = true; break;
+
+		case 0x5e: // AN3 off
+			m_an3 = false; break;
+
+		case 0x5f: // AN3 on
+			m_an3 = true; break;
+
+		case 0x68:	// IIgs STATE register, which ProDOS touches
+			break;
+
+		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
+		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
+			m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_joy1x->read();
+			m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_joy1y->read();
+			m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_joy2x->read();
+			m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_joy2y->read();
+			break;
+	}
+}
+
+READ8_MEMBER(napple2_state::c000_r)
+{
+	switch (offset)
+	{
+		case 0x00:  // keyboard latch
+			return m_transchar | m_strobe;
+
+		case 0x10:  // reads any key down, clears strobe
+			{
+				UINT8 rv = m_transchar | m_anykeydown;
+				m_strobe = 0;
+				return rv;
+			}
+
+		case 0x60: // cassette in
+		case 0x68:
+			return m_cassette->input() > 0.0 ? 0x80 : 0;
+
+		case 0x61:	// button 0
+		case 0x69:
+			return (m_joybuttons->read() & 0x10) ? 0x80 : 0;
+
+		case 0x62:	// button 1
+		case 0x6a:
+			return (m_joybuttons->read() & 0x20) ? 0x80 : 0;
+
+		case 0x63:	// button 2
+		case 0x6b:
+			// check if SHIFT key mod configured
+			if (m_sysconfig->read() & 0x04)
+			{
+				return ((m_joybuttons->read() & 0x40) || (m_kbspecial->read() & 0x06)) ? 0x80 : 0;
+			}
+			return (m_joybuttons->read() & 0x40) ? 0x80 : 0;
+
+		case 0x64:	// joy 1 X axis
+		case 0x6c:
+			return (space.machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0;
+
+		case 0x65:	// joy 1 Y axis
+		case 0x6d:
+			return (space.machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0;
+
+		case 0x66: // joy 2 X axis
+		case 0x6e:
+			return (space.machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0;
+
+		case 0x67: // joy 2 Y axis
+		case 0x6f:
+			return (space.machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0;
+
+		default:
+			do_io(space, offset);
+			break;
+	}
+
+	return read_floatingbus();
+}
+
+WRITE8_MEMBER(napple2_state::c000_w)
+{
+	switch (offset)
+	{
+		case 0x10:  // clear keyboard latch
+			m_strobe = 0;
+			break;
+
+		default:
+			do_io(space, offset);
+			break;
+	}
+}
+
+READ8_MEMBER(napple2_state::c080_r)
+{
+	if(!space.debugger_access())
+	{
+		int slot;
+
+		offset &= 0x7F;
+		slot = offset / 0x10;
+
+		if (m_slotdevice[slot] != NULL)
+		{
+			return m_slotdevice[slot]->read_c0nx(space, offset % 0x10);
+		}
+	}
+
+	return read_floatingbus();
+}
+
+WRITE8_MEMBER(napple2_state::c080_w)
+{
+	int slot;
+
+	offset &= 0x7F;
+	slot = offset / 0x10;
+
+	if (m_slotdevice[slot] != NULL)
+	{
+		m_slotdevice[slot]->write_c0nx(space, offset % 0x10, data);
+	}
+}
+
+READ8_MEMBER(napple2_state::c100_r)
+{
+	int slotnum;
+
+	slotnum = ((offset>>8) & 0xf) + 1;
+
+	if (m_slotdevice[slotnum] != NULL)
+	{
+		if ((m_slotdevice[slotnum]->take_c800()) && (!space.debugger_access()))
+		{
+			m_cnxx_slot = slotnum;
+		}
+
+		return m_slotdevice[slotnum]->read_cnxx(space, offset&0xff);
+	}
+
+	return read_floatingbus();
+}
+
+WRITE8_MEMBER(napple2_state::c100_w)
+{
+	int slotnum;
+
+	slotnum = ((offset>>8) & 0xf) + 1;
+
+	if (m_slotdevice[slotnum] != NULL)
+	{
+		if ((m_slotdevice[slotnum]->take_c800()) && (!space.debugger_access()))
+		{
+			m_cnxx_slot = slotnum;
+		}
+
+		m_slotdevice[slotnum]->write_cnxx(space, offset&0xff, data);
+	}
+}
+
+READ8_MEMBER(napple2_state::c800_r)
+{
+	if (offset == 0x7ff)
+	{
+		m_cnxx_slot = -1;
+		return 0xff;
+	}
+
+	if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != NULL))
+	{
+		return m_slotdevice[m_cnxx_slot]->read_c800(space, offset&0xfff);
+	}
+
+	return read_floatingbus();
+}
+
+WRITE8_MEMBER(napple2_state::c800_w)
+{
+	if (offset == 0x7ff)
+	{
+		m_cnxx_slot = -1;
+		return;
+	}
+
+	if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != NULL))
+	{
+		m_slotdevice[m_cnxx_slot]->write_c800(space, offset&0xfff, data);
+	}
+}
+
+READ8_MEMBER(napple2_state::inh_r)
+{
+	if (m_inh_slot != -1)
+	{
+		return m_slotdevice[m_inh_slot]->read_inh_rom(space, offset + 0xd000); 
+	}
+
+	assert(0);	// hitting inh_r with invalid m_inh_slot should not be possible
+	return read_floatingbus();
+}
+
+WRITE8_MEMBER(napple2_state::inh_w)
+{
+	if (m_inh_slot != -1)
+	{
+		m_slotdevice[m_inh_slot]->write_inh_rom(space, offset + 0xd000, data);
+	}
+}
+
+// floating bus code from old machine/apple2: needs to be reworked based on real beam position to enable e.g. Bob Bishop's screen splitter
+UINT8 napple2_state::read_floatingbus()
+{
+	enum
+	{
+		// scanner types
+		kScannerNone = 0, kScannerApple2, kScannerApple2e,
+
+		// scanner constants
+		kHBurstClock      =    53, // clock when Color Burst starts
+		kHBurstClocks     =     4, // clocks per Color Burst duration
+		kHClock0State     =  0x18, // H[543210] = 011000
+		kHClocks          =    65, // clocks per horizontal scan (including HBL)
+		kHPEClock         =    40, // clock when HPE (horizontal preset enable) goes low
+		kHPresetClock     =    41, // clock when H state presets
+		kHSyncClock       =    49, // clock when HSync starts
+		kHSyncClocks      =     4, // clocks per HSync duration
+		kNTSCScanLines    =   262, // total scan lines including VBL (NTSC)
+		kNTSCVSyncLine    =   224, // line when VSync starts (NTSC)
+		kPALScanLines     =   312, // total scan lines including VBL (PAL)
+		kPALVSyncLine     =   264, // line when VSync starts (PAL)
+		kVLine0State      = 0x100, // V[543210CBA] = 100000000
+		kVPresetLine      =   256, // line when V state presets
+		kVSyncLines       =     4, // lines per VSync duration
+		kClocksPerVSync   = kHClocks * kNTSCScanLines // FIX: NTSC only?
+	};
+
+	// vars
+	//
+	int i, Hires, Mixed, Page2, _80Store, ScanLines, /* VSyncLine, ScanCycles,*/
+		h_clock, h_state, h_0, h_1, h_2, h_3, h_4, h_5,
+		v_line, v_state, v_A, v_B, v_C, v_0, v_1, v_2, v_3, v_4, /* v_5, */
+		_hires, addend0, addend1, addend2, sum, address;
+
+	// video scanner data
+	//
+	i = m_maincpu->total_cycles() % kClocksPerVSync; // cycles into this VSync
+
+	// machine state switches
+	//
+	Hires    = m_video->m_hires ? 1 : 0;
+	Mixed    = m_video->m_mix ? 1 : 0;
+	Page2    = m_page2 ? 1 : 0;
+	_80Store = 0;
+
+	// calculate video parameters according to display standard
+	//
+	ScanLines  = 1 ? kNTSCScanLines : kPALScanLines; // FIX: NTSC only?
+	// VSyncLine  = 1 ? kNTSCVSyncLine : kPALVSyncLine; // FIX: NTSC only?
+	// ScanCycles = ScanLines * kHClocks;
+
+	// calculate horizontal scanning state
+	//
+	h_clock = (i + kHPEClock) % kHClocks; // which horizontal scanning clock
+	h_state = kHClock0State + h_clock; // H state bits
+	if (h_clock >= kHPresetClock) // check for horizontal preset
+	{
+		h_state -= 1; // correct for state preset (two 0 states)
+	}
+	h_0 = (h_state >> 0) & 1; // get horizontal state bits
+	h_1 = (h_state >> 1) & 1;
+	h_2 = (h_state >> 2) & 1;
+	h_3 = (h_state >> 3) & 1;
+	h_4 = (h_state >> 4) & 1;
+	h_5 = (h_state >> 5) & 1;
+
+	// calculate vertical scanning state
+	//
+	v_line  = i / kHClocks; // which vertical scanning line
+	v_state = kVLine0State + v_line; // V state bits
+	if ((v_line >= kVPresetLine)) // check for previous vertical state preset
+	{
+		v_state -= ScanLines; // compensate for preset
+	}
+	v_A = (v_state >> 0) & 1; // get vertical state bits
+	v_B = (v_state >> 1) & 1;
+	v_C = (v_state >> 2) & 1;
+	v_0 = (v_state >> 3) & 1;
+	v_1 = (v_state >> 4) & 1;
+	v_2 = (v_state >> 5) & 1;
+	v_3 = (v_state >> 6) & 1;
+	v_4 = (v_state >> 7) & 1;
+	//v_5 = (v_state >> 8) & 1;
+
+	// calculate scanning memory address
+	//
+	_hires = Hires;
+	if (Hires && Mixed && (v_4 & v_2))
+	{
+		_hires = 0; // (address is in text memory)
+	}
+
+	addend0 = 0x68; // 1            1            0            1
+	addend1 =              (h_5 << 5) | (h_4 << 4) | (h_3 << 3);
+	addend2 = (v_4 << 6) | (v_3 << 5) | (v_4 << 4) | (v_3 << 3);
+	sum     = (addend0 + addend1 + addend2) & (0x0F << 3);
+
+	address = 0;
+	address |= h_0 << 0; // a0
+	address |= h_1 << 1; // a1
+	address |= h_2 << 2; // a2
+	address |= sum;      // a3 - aa6
+	address |= v_0 << 7; // a7
+	address |= v_1 << 8; // a8
+	address |= v_2 << 9; // a9
+	address |= ((_hires) ? v_A : (1 ^ (Page2 & (1 ^ _80Store)))) << 10; // a10
+	address |= ((_hires) ? v_B : (Page2 & (1 ^ _80Store))) << 11; // a11
+	if (_hires) // hires?
+	{
+		// Y: insert hires only address bits
+		//
+		address |= v_C << 12; // a12
+		address |= (1 ^ (Page2 & (1 ^ _80Store))) << 13; // a13
+		address |= (Page2 & (1 ^ _80Store)) << 14; // a14
+	}
+	else
+	{
+		// N: text, so no higher address bits unless Apple ][, not Apple //e
+		//
+		if ((1) && // Apple ][? // FIX: check for Apple ][? (FB is most useful in old games)
+			(kHPEClock <= h_clock) && // Y: HBL?
+			(h_clock <= (kHClocks - 1)))
+		{
+			address |= 1 << 12; // Y: a12 (add $1000 to address!)
+		}
+	}
+
+	return m_ram_ptr[address % m_ram_size]; // FIX: this seems to work, but is it right!?
 }
 
 /***************************************************************************
     ADDRESS MAP
 ***************************************************************************/
 
-static ADDRESS_MAP_START( apple2_map, AS_PROGRAM, 8, apple2_state )
-	/* nothing in the address map - everything is added dynamically */
+READ8_MEMBER(napple2_state::ram_r)
+{
+	if (offset < m_ram_size)
+	{
+		return m_ram_ptr[offset];
+	}
+
+	return 0xff;
+}
+
+WRITE8_MEMBER(napple2_state::ram_w)
+{
+	if (offset < m_ram_size)
+	{
+		m_ram_ptr[offset] = data;
+	}
+}
+
+static ADDRESS_MAP_START( apple2_map, AS_PROGRAM, 8, napple2_state )
+	AM_RANGE(0x0000, 0xbfff) AM_READWRITE(ram_r, ram_w)
+	AM_RANGE(0xc000, 0xc07f) AM_READWRITE(c000_r, c000_w)
+	AM_RANGE(0xc080, 0xc0ff) AM_READWRITE(c080_r, c080_w)
+	AM_RANGE(0xc100, 0xc7ff) AM_READWRITE(c100_r, c100_w)
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(c800_r, c800_w)
+	AM_RANGE(0xd000, 0xffff) AM_DEVICE(A2_UPPERBANK_TAG, address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-/*
-
-    LS259 at H12
-
-    A8  = D
-    A9  = A
-    A10 = B
-    A11 = C
-
-    374/259 outputs to 65C02 c000/c010 selected by Z80 WR OR Z80 IORQ? (schematic is not super legible)
-
-*/
-
-// RAM and ROM alternate in 8K blocks: ROM at 0/4/8/c, RAM at 2/6/a/e (RAM is only 1k and further mirrors inside those locations)
-static ADDRESS_MAP_START( tk3000_kbd_map, AS_PROGRAM, 8, apple2_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_MIRROR(0xc000) AM_REGION("kbdcpu", 0)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_MIRROR(0xcc00) AM_MASK(0x3ff)
+static ADDRESS_MAP_START( inhbank_map, AS_PROGRAM, 8, napple2_state )
+	AM_RANGE(0x0000, 0x2fff) AM_ROM AM_REGION("maincpu", 0x1000) AM_WRITE(inh_w)
+	AM_RANGE(0x3000, 0x5fff) AM_READWRITE(inh_r, inh_w)
 ADDRESS_MAP_END
 
+/***************************************************************************
+    KEYBOARD
+***************************************************************************/
+
+READ_LINE_MEMBER(napple2_state::ay3600_shift_r)
+{
+	// either shift key
+	if (m_kbspecial->read() & 0x06)
+	{
+		return ASSERT_LINE;
+	}
+
+	return CLEAR_LINE;
+}
+
+READ_LINE_MEMBER(napple2_state::ay3600_control_r)
+{
+	if (m_kbspecial->read() & 0x08)
+	{
+		return ASSERT_LINE;
+	}
+
+	return CLEAR_LINE;
+}
+
+static const UINT8 a2_key_remap[0x32][4] =
+{
+/*    norm shft ctrl both */
+	{ 0x33,0x23,0x33,0x23 },    /* 3 #     00     */
+	{ 0x34,0x24,0x34,0x24 },    /* 4 $     01     */
+	{ 0x35,0x25,0x35,0x25 },    /* 5 %     02     */
+	{ 0x36,'&', 0x35,'&'  },    /* 6 &     03     */
+	{ 0x37,0x27,0x37,0x27 },    /* 7 '     04     */
+	{ 0x38,0x28,0x38,0x28 },    /* 8 (     05     */
+	{ 0x39,0x29,0x39,0x29 },    /* 9 )     06     */
+	{ 0x30,0x30,0x30,0x30 },    /* 0       07     */
+	{ 0x3a,0x2a,0x3b,0x2a },    /* : *     08     */
+	{ 0x2d,0x3d,0x2d,0x3d },    /* - =     09     */
+	{ 0x51,0x51,0x11,0x11 },    /* q Q     0a     */
+	{ 0x57,0x57,0x17,0x17 },    /* w W     0b     */
+	{ 0x45,0x45,0x05,0x05 },    /* e E     0c     */
+	{ 0x52,0x52,0x12,0x12 },    /* r R     0d     */
+	{ 0x54,0x54,0x14,0x14 },    /* t T     0e     */
+	{ 0x59,0x59,0x19,0x19 },    /* y Y     0f     */
+	{ 0x55,0x55,0x15,0x15 },    /* u U     10     */
+	{ 0x49,0x49,0x09,0x09 },    /* i I     11     */
+	{ 0x4f,0x4f,0x0f,0x0f },    /* o O     12     */
+	{ 0x50,0x40,0x10,0x40 },    /* p P     13     */
+	{ 0x44,0x44,0x04,0x04 },    /* d D     14     */
+	{ 0x46,0x46,0x06,0x06 },    /* f F     15     */
+	{ 0x47,0x47,0x07,0x07 },    /* g G     16     */
+	{ 0x48,0x48,0x08,0x08 },    /* h H     17     */
+	{ 0x4a,0x4a,0x0a,0x0a },    /* j J     18     */
+	{ 0x4b,0x4b,0x0b,0x0b },    /* k K     19     */
+	{ 0x4c,0x4c,0x0c,0x0c },    /* l L     1a     */
+	{ ';' ,0x2b,';' ,0x2b },    /* ; +     1b     */
+	{ 0x08,0x08,0x08,0x08 },    /* Left    1c     */
+	{ 0x15,0x15,0x15,0x15 },    /* Right   1d     */
+	{ 0x5a,0x5a,0x1a,0x1a },    /* z Z     1e     */
+	{ 0x58,0x58,0x18,0x18 },    /* x X     1f     */
+	{ 0x43,0x43,0x03,0x03 },    /* c C     20     */
+	{ 0x56,0x56,0x16,0x16 },    /* v V     21     */
+	{ 0x42,0x42,0x02,0x02 },    /* b B     22     */
+	{ 0x4e,0x5e,0x0e,0x5e },    /* n N     23     */
+	{ 0x4d,0x4d,0x0d,0x0d },    /* m M     24     */
+	{ 0x2c,0x3c,0x2c,0x3c },    /* , <     25     */
+	{ 0x2e,0x3e,0x2e,0x3e },    /* . >     26     */
+	{ 0x2f,0x3f,0x2f,0x3f },    /* / ?     27     */
+	{ 0x53,0x53,0x13,0x13 },    /* s S     28     */
+	{ 0x32,0x22,0x32,0x00 },    /* 2 "     29     */
+	{ 0x31,0x21,0x31,0x31 },    /* 1 !     2a     */
+	{ 0x1b,0x1b,0x1b,0x1b },    /* Escape  2b     */
+	{ 0x41,0x41,0x01,0x01 },    /* a A     2c     */
+	{ 0x20,0x20,0x20,0x20 },    /* Space   2d     */
+	{ 0x00,0x00,0x00,0x00 },    /* 0x2e unused    */
+	{ 0x00,0x00,0x00,0x00 },    /* 0x2f unused    */
+	{ 0x00,0x00,0x00,0x00 },    /* 0x30 unused    */
+	{ 0x0d,0x0d,0x0d,0x0d },    /* Enter   31     */
+};
+
+WRITE_LINE_MEMBER(napple2_state::ay3600_data_ready_w)
+{
+	if (state == ASSERT_LINE)
+	{
+		int mod = 0;
+		m_lastchar = m_ay3600->b_r();
+
+		mod = (m_kbspecial->read() & 0x06) ? 0x01 : 0x00;
+		mod |= (m_kbspecial->read() & 0x08) ? 0x02 : 0x00;
+
+		m_transchar = a2_key_remap[m_lastchar&0x3f][mod];
+
+		if (m_transchar != 0)
+		{
+			m_strobe = 0x80;
+//			printf("new char = %04x (%02x)\n", m_lastchar&0x3f, m_transchar);
+		}
+	}
+}
+
+WRITE_LINE_MEMBER(napple2_state::ay3600_ako_w)
+{
+	m_anykeydown = (state == ASSERT_LINE) ? true : false;
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(napple2_state::ay3600_repeat)
+{
+	// is the key still down?
+	if (m_anykeydown)
+	{
+		if (m_kbrepeat->read() & 1)
+		{
+			m_strobe = 0x80;
+		}
+	}
+}
 
 /***************************************************************************
     INPUT PORTS
@@ -331,45 +1009,8 @@ static INPUT_PORTS_START( apple2_joystick )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1)  PORT_PLAYER(2)            PORT_CODE(JOYCODE_BUTTON1)
 INPUT_PORTS_END
 
-/*static INPUT_PORTS_START( apple2_paddle )
-    PORT_START("paddle_0")
-    PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_NAME("P1 Paddle 0")
-    PORT_SENSITIVITY(PADDLE_SENSITIVITY)
-    PORT_KEYDELTA(PADDLE_DELTA)
-    PORT_CENTERDELTA(PADDLE_AUTOCENTER)
-    PORT_MINMAX(0,0xff) PORT_PLAYER(1)
-    PORT_CODE_DEC(KEYCODE_4_PAD)    PORT_CODE_INC(KEYCODE_6_PAD)
-    PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH)    PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH)
-
-    PORT_START("paddle_1")
-    PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_NAME("P1 Paddle 1")
-    PORT_SENSITIVITY(PADDLE_SENSITIVITY)
-    PORT_KEYDELTA(PADDLE_DELTA)
-    PORT_CENTERDELTA(PADDLE_AUTOCENTER)
-    PORT_MINMAX(0,0xff) PORT_PLAYER(1)
-    PORT_CODE_DEC(KEYCODE_8_PAD)    PORT_CODE_INC(KEYCODE_2_PAD)
-    PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH)      PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)
-
-    PORT_START("paddle_2")
-    PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_NAME("P2 Paddle 0")
-    PORT_SENSITIVITY(PADDLE_SENSITIVITY)
-    PORT_KEYDELTA(PADDLE_DELTA)
-    PORT_CENTERDELTA(PADDLE_AUTOCENTER)
-    PORT_MINMAX(0,0xff) PORT_PLAYER(2)
-    PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH)    PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH)
-
-    PORT_START("paddle_3")
-    PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_NAME("P2 Paddle 1")
-    PORT_SENSITIVITY(PADDLE_SENSITIVITY)
-    PORT_KEYDELTA(PADDLE_DELTA)
-    PORT_CENTERDELTA(PADDLE_AUTOCENTER)
-    PORT_MINMAX(0,0xff) PORT_PLAYER(2)
-    PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH)      PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)
-INPUT_PORTS_END
-*/
 INPUT_PORTS_START( apple2_gameport )
 	PORT_INCLUDE( apple2_joystick )
-	//PORT_INCLUDE( apple2_paddle )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( apple2_sysconfig )
@@ -379,6 +1020,10 @@ INPUT_PORTS_START( apple2_sysconfig )
 	PORT_CONFSETTING(0x01, "B&W")
 	PORT_CONFSETTING(0x02, "Green")
 	PORT_CONFSETTING(0x03, "Amber")
+
+	PORT_CONFNAME(0x04, 0x04, "Shift key mod")	// default to installed
+	PORT_CONFSETTING(0x00, "Not present")
+	PORT_CONFSETTING(0x04, "Installed")
 INPUT_PORTS_END
 
 	/*
@@ -399,54 +1044,6 @@ INPUT_PORTS_END
 	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
 	*/
 
-	/*
-	  Apple IIe & IIc key matrix (from "Sams ComputerFacts: Apple IIe" and "Sams ComputerFacts: Apple IIc")
-
-	      | Y0  | Y1  | Y2  | Y3  | Y4  | Y5  | Y6  | Y7  | Y8  | Y9  |
-	      |     |     |     |     |     |     |     |     |     |     |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X0  | ESC |  1  |  2  |  3  |  4  |  6  |  5  |  7  |  8  |  9  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X1  | TAB |  Q  |  W  |  E  |  R  |  Y  |  T  |  U  |  I  |  O  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X2  |  A  |  D  |  S  |  H  |  F  |  G  |  J  |  K  | ;:  |  L  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X3  |  Z  |  X  |  C  |  V  |  B  |  M  |  N  | ,<  | .>  |  /? |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X4  |     |     |     |     |     |     | \|  | +=  |  0  | -_  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X5  |     |     |     |     |     |     | `~  |  P  | [{  | ]}  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X6  |     |     |     |     |     |     |RETRN| UP  | SPC | '"  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X7  |     |     |     |     |     |     | DEL |DOWN |LEFT |RIGHT|
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	*/
-
-	/*
-	  Apple IIe platinum key matrix
-
-	      | Y0  | Y1  | Y2  | Y3  | Y4  | Y5  | Y6  | Y7  | Y8  | Y9  |
-	      |     |     |     |     |     |     |     |     |     |     |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X0  | ESC |  1  |  2  |  3  |  4  |  6  |  5  |  7  |  8  |  9  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X1  | TAB |  Q  |  W  |  E  |  R  |  Y  |  T  |  U  |  I  |  O  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X2  |  A  |  D  |  S  |  H  |  F  |  G  |  J  |  K  | ;:  |  L  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X3  |  Z  |  X  |  C  |  V  |  B  |  M  |  N  | ,<  | .>  |  /? |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X4  | KP/ |     | KP0 | KP1 | KP2 | KP3 | \|  | +=  |  0  | -_  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X5  |     |KPEsc| KP4 | KP5 | KP6 | KP7 | `~  |  P  | [{  | ]}  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X6  | KP* |     | KP8 | KP9 | KP. | KP+ |RETRN| UP  | SPC | '"  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X7  |     |     |     | KP- |KPENT|     | DEL |DOWN |LEFT |RIGHT|
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	*/
-
 static INPUT_PORTS_START( apple2_common )
 	PORT_START("X0")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)  PORT_CHAR('3') PORT_CHAR('#')
@@ -456,9 +1053,9 @@ static INPUT_PORTS_START( apple2_common )
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)  PORT_CHAR('7') PORT_CHAR('\'')
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)  PORT_CHAR('8') PORT_CHAR('(')
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)  PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)      PORT_CHAR('0') PORT_CHAR(')')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR(':')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)  PORT_CHAR('-') PORT_CHAR('_')
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)  PORT_CHAR('0') 
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)  PORT_CHAR(':') PORT_CHAR('*')
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('-') PORT_CHAR('=')
 
 	PORT_START("X1")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)  PORT_CHAR('Q') PORT_CHAR('q')
@@ -470,7 +1067,7 @@ static INPUT_PORTS_START( apple2_common )
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)  PORT_CHAR('U') PORT_CHAR('u')
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)  PORT_CHAR('I') PORT_CHAR('i')
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)  PORT_CHAR('O') PORT_CHAR('o')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)  PORT_CHAR('P') PORT_CHAR('p')
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)  PORT_CHAR('P') PORT_CHAR('@')
 
 	PORT_START("X2")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)  PORT_CHAR('D') PORT_CHAR('d')
@@ -480,7 +1077,7 @@ static INPUT_PORTS_START( apple2_common )
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)  PORT_CHAR('J') PORT_CHAR('j')
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)  PORT_CHAR('K') PORT_CHAR('k')
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)  PORT_CHAR('L') PORT_CHAR('l')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('=') PORT_CHAR('+')
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)      PORT_CODE(KEYCODE_LEFT)
 	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)     PORT_CODE(KEYCODE_RIGHT)
 
@@ -489,8 +1086,8 @@ static INPUT_PORTS_START( apple2_common )
 	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)  PORT_CHAR('X') PORT_CHAR('x')
 	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)  PORT_CHAR('C') PORT_CHAR('c')
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)  PORT_CHAR('V') PORT_CHAR('v')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)          PORT_CHAR('B') PORT_CHAR('b')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)  PORT_CHAR('N') PORT_CHAR('n')
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)  PORT_CHAR('B') PORT_CHAR('b')
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)  PORT_CHAR('N') PORT_CHAR('^')
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)  PORT_CHAR('M') PORT_CHAR('m')
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)  PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)   PORT_CHAR('.') PORT_CHAR('>')
@@ -499,7 +1096,7 @@ static INPUT_PORTS_START( apple2_common )
 	PORT_START("X4")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)  PORT_CHAR('S') PORT_CHAR('s')
 	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)  PORT_CHAR('2') PORT_CHAR('\"')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)      PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)  PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc")      PORT_CODE(KEYCODE_ESC)      PORT_CHAR(27)
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)          PORT_CHAR('A') PORT_CHAR('a')
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)  PORT_CHAR(' ')
@@ -570,7 +1167,7 @@ static INPUT_PORTS_START( apple2 )
 	PORT_INCLUDE(apple2_common)
 
 	PORT_START("keyb_repeat")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("REPT")         PORT_CODE(KEYCODE_BACKSLASH)PORT_CHAR('\\')
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("REPT")         PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\')
 
 	/* other devices */
 	PORT_INCLUDE( apple2_gameport )
@@ -587,408 +1184,9 @@ static INPUT_PORTS_START( apple2p )
 	PORT_DIPSETTING( 0x00, "RESET" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( apple2e_common )
-	PORT_START("X0")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc")      PORT_CODE(KEYCODE_ESC)      PORT_CHAR(27)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)      PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)  PORT_CHAR('2') PORT_CHAR('\"')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)  PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)  PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)  PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)  PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)  PORT_CHAR('7') PORT_CHAR('\'')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)  PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)  PORT_CHAR('9') PORT_CHAR(')')
-
-	PORT_START("X1")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Tab")      PORT_CODE(KEYCODE_TAB)      PORT_CHAR(9)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)  PORT_CHAR('Q') PORT_CHAR('q')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)  PORT_CHAR('W') PORT_CHAR('w')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)  PORT_CHAR('E') PORT_CHAR('e')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)  PORT_CHAR('R') PORT_CHAR('r')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)  PORT_CHAR('Y') PORT_CHAR('y')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)  PORT_CHAR('T') PORT_CHAR('t')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)  PORT_CHAR('U') PORT_CHAR('u')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)  PORT_CHAR('I') PORT_CHAR('i')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)  PORT_CHAR('O') PORT_CHAR('o')
-
-	PORT_START("X2")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)          PORT_CHAR('A') PORT_CHAR('a')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)  PORT_CHAR('D') PORT_CHAR('d')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)  PORT_CHAR('S') PORT_CHAR('s')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)  PORT_CHAR('H') PORT_CHAR('h')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)  PORT_CHAR('F') PORT_CHAR('f')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)  PORT_CHAR('G') PORT_CHAR('g')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)  PORT_CHAR('J') PORT_CHAR('j')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)  PORT_CHAR('K') PORT_CHAR('k')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR(':')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)  PORT_CHAR('L') PORT_CHAR('l')
-
-	PORT_START("X3")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)  PORT_CHAR('Z') PORT_CHAR('z')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)  PORT_CHAR('X') PORT_CHAR('x')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)  PORT_CHAR('C') PORT_CHAR('c')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)  PORT_CHAR('V') PORT_CHAR('v')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)  PORT_CHAR('B') PORT_CHAR('b')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)  PORT_CHAR('N') PORT_CHAR('n')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)  PORT_CHAR('M') PORT_CHAR('m')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)  PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)   PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)  PORT_CHAR('/') PORT_CHAR('?')
-
-	PORT_START("X4")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR('\\') PORT_CHAR('|')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('=') PORT_CHAR('+')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)      PORT_CHAR('0') PORT_CHAR(')')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)  PORT_CHAR('-') PORT_CHAR('_')
-
-	PORT_START("X5")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('`') PORT_CHAR('~')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)  PORT_CHAR('P') PORT_CHAR('p')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
-
-	PORT_START("X6")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return")   PORT_CODE(KEYCODE_ENTER)    PORT_CHAR(13)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP)        PORT_CODE(KEYCODE_UP)
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)  PORT_CHAR(' ')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)  PORT_CHAR('\'') PORT_CHAR('\"')
-
-	PORT_START("X7")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Delete")   PORT_CODE(KEYCODE_BACKSPACE)PORT_CHAR(8)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN)      PORT_CODE(KEYCODE_DOWN)     PORT_CHAR(10)
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)      PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)     PORT_CODE(KEYCODE_RIGHT)
-
-	PORT_START("X8")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("keyb_special")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_NAME("Caps Lock")    PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")   PORT_CODE(KEYCODE_LSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift")  PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control")      PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Open Apple")   PORT_CODE(KEYCODE_LALT)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Apple")  PORT_CODE(KEYCODE_RALT)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
-
-	PORT_INCLUDE(apple2_sysconfig)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( apple2e )
-	PORT_INCLUDE( apple2e_common )
-	PORT_INCLUDE( apple2_gameport )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( apple2euk )
-	PORT_START("X0")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc")      PORT_CODE(KEYCODE_ESC)      PORT_CHAR(27)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)  PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)  PORT_CHAR('2') PORT_CHAR('\"')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)  PORT_CHAR('3') PORT_CHAR(0xa3)  // a3 is Unicode for the pound sign
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)  PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)  PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)  PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)  PORT_CHAR('7') PORT_CHAR('\'')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)  PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)  PORT_CHAR('9') PORT_CHAR(')')
-
-	PORT_START("X1")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Tab")      PORT_CODE(KEYCODE_TAB)      PORT_CHAR(9)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)  PORT_CHAR('Q') PORT_CHAR('q')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)  PORT_CHAR('W') PORT_CHAR('w')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)  PORT_CHAR('E') PORT_CHAR('e')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)  PORT_CHAR('R') PORT_CHAR('r')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)  PORT_CHAR('Y') PORT_CHAR('y')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)  PORT_CHAR('T') PORT_CHAR('t')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)  PORT_CHAR('U') PORT_CHAR('u')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)  PORT_CHAR('I') PORT_CHAR('i')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)  PORT_CHAR('O') PORT_CHAR('o')
-
-	PORT_START("X2")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)          PORT_CHAR('A') PORT_CHAR('a')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)  PORT_CHAR('D') PORT_CHAR('d')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)  PORT_CHAR('S') PORT_CHAR('s')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)  PORT_CHAR('H') PORT_CHAR('h')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)  PORT_CHAR('F') PORT_CHAR('f')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)  PORT_CHAR('G') PORT_CHAR('g')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)  PORT_CHAR('J') PORT_CHAR('j')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)  PORT_CHAR('K') PORT_CHAR('k')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR(':')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)  PORT_CHAR('L') PORT_CHAR('l')
-
-	PORT_START("X3")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)  PORT_CHAR('Z') PORT_CHAR('z')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)  PORT_CHAR('X') PORT_CHAR('x')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)  PORT_CHAR('C') PORT_CHAR('c')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)  PORT_CHAR('V') PORT_CHAR('v')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)  PORT_CHAR('B') PORT_CHAR('b')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)  PORT_CHAR('N') PORT_CHAR('n')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)  PORT_CHAR('M') PORT_CHAR('m')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)  PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)   PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)  PORT_CHAR('/') PORT_CHAR('?')
-
-	PORT_START("X4")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR('\\') PORT_CHAR('|')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('=') PORT_CHAR('+')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)      PORT_CHAR('0') PORT_CHAR(')')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)  PORT_CHAR('-') PORT_CHAR('_')
-
-	PORT_START("X5")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('`') PORT_CHAR('~')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)  PORT_CHAR('P') PORT_CHAR('p')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
-
-	PORT_START("X6")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return")   PORT_CODE(KEYCODE_ENTER)    PORT_CHAR(13)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP)        PORT_CODE(KEYCODE_UP)
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)  PORT_CHAR(' ')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)  PORT_CHAR('\'') PORT_CHAR('\"')
-
-	PORT_START("X7")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Delete")   PORT_CODE(KEYCODE_BACKSPACE)PORT_CHAR(8)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN)      PORT_CODE(KEYCODE_DOWN)     PORT_CHAR(10)
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)      PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)     PORT_CODE(KEYCODE_RIGHT)
-
-	PORT_START("X8")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("keyb_special")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_NAME("Caps Lock")    PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")   PORT_CODE(KEYCODE_LSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift")  PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control")      PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Open Apple")   PORT_CODE(KEYCODE_LALT)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Apple")  PORT_CODE(KEYCODE_RALT)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
-
-	PORT_INCLUDE( apple2_gameport )
-	PORT_INCLUDE(apple2_sysconfig)
-INPUT_PORTS_END
-
-INPUT_PORTS_START( apple2ep )
-	PORT_START("X0")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc")      PORT_CODE(KEYCODE_ESC)      PORT_CHAR(27)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)      PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)  PORT_CHAR('2') PORT_CHAR('\"')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)  PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)  PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)  PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)  PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)  PORT_CHAR('7') PORT_CHAR('\'')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)  PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)  PORT_CHAR('9') PORT_CHAR(')')
-
-	PORT_START("X1")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Tab")      PORT_CODE(KEYCODE_TAB)      PORT_CHAR(9)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)  PORT_CHAR('Q') PORT_CHAR('q')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)  PORT_CHAR('W') PORT_CHAR('w')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)  PORT_CHAR('E') PORT_CHAR('e')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)  PORT_CHAR('R') PORT_CHAR('r')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)  PORT_CHAR('Y') PORT_CHAR('y')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)  PORT_CHAR('T') PORT_CHAR('t')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)  PORT_CHAR('U') PORT_CHAR('u')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)  PORT_CHAR('I') PORT_CHAR('i')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)  PORT_CHAR('O') PORT_CHAR('o')
-
-	PORT_START("X2")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)          PORT_CHAR('A') PORT_CHAR('a')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)  PORT_CHAR('D') PORT_CHAR('d')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)  PORT_CHAR('S') PORT_CHAR('s')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)  PORT_CHAR('H') PORT_CHAR('h')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)  PORT_CHAR('F') PORT_CHAR('f')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)  PORT_CHAR('G') PORT_CHAR('g')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)  PORT_CHAR('J') PORT_CHAR('j')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)  PORT_CHAR('K') PORT_CHAR('k')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR(':')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)  PORT_CHAR('L') PORT_CHAR('l')
-
-	PORT_START("X3")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)  PORT_CHAR('Z') PORT_CHAR('z')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)  PORT_CHAR('X') PORT_CHAR('x')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)  PORT_CHAR('C') PORT_CHAR('c')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)  PORT_CHAR('V') PORT_CHAR('v')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)  PORT_CHAR('B') PORT_CHAR('b')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)  PORT_CHAR('N') PORT_CHAR('n')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)  PORT_CHAR('M') PORT_CHAR('m')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)  PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)   PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)  PORT_CHAR('/') PORT_CHAR('?')
-
-	PORT_START("X4")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD)   PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0_PAD)   PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD)   PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD)   PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD)   PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR('\\') PORT_CHAR('|')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('=') PORT_CHAR('+')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)      PORT_CHAR('0') PORT_CHAR(')')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)  PORT_CHAR('-') PORT_CHAR('_')
-
-	PORT_START("X5")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad Esc") PORT_CODE(KEYCODE_NUMLOCK)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD)   PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5_PAD)   PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD)   PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD)   PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('`') PORT_CHAR('~')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)  PORT_CHAR('P') PORT_CHAR('p')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
-
-	PORT_START("X6")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK)    PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD)       PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD)       PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)     PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)    PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return")   PORT_CODE(KEYCODE_ENTER)    PORT_CHAR(13)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP)        PORT_CODE(KEYCODE_UP)
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)  PORT_CHAR(' ')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)  PORT_CHAR('\'') PORT_CHAR('\"')
-
-	PORT_START("X7")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD)   PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD)   PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Delete")   PORT_CODE(KEYCODE_BACKSPACE)PORT_CHAR(8)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN)      PORT_CODE(KEYCODE_DOWN)     PORT_CHAR(10)
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)      PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)     PORT_CODE(KEYCODE_RIGHT)
-
-	PORT_START("X8")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("keyb_special")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_NAME("Caps Lock")    PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")   PORT_CODE(KEYCODE_LSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift")  PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control")      PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Open Apple")   PORT_CODE(KEYCODE_LALT)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Apple")  PORT_CODE(KEYCODE_RALT)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
-
-	PORT_INCLUDE( apple2_gameport )
-	PORT_INCLUDE(apple2_sysconfig)
-INPUT_PORTS_END
-
-/* according to Steve Nickolas (author of Dapple), our original palette would
- * have been more appropriate for an Apple IIgs.  So we've substituted in the
- * Robert Munafo palette instead, which is more accurate on 8-bit Apples
- */
-static const rgb_t apple2_palette[] =
-{
-	rgb_t::black,
-	rgb_t(0xE3, 0x1E, 0x60), /* Dark Red */
-	rgb_t(0x60, 0x4E, 0xBD), /* Dark Blue */
-	rgb_t(0xFF, 0x44, 0xFD), /* Purple */
-	rgb_t(0x00, 0xA3, 0x60), /* Dark Green */
-	rgb_t(0x9C, 0x9C, 0x9C), /* Dark Gray */
-	rgb_t(0x14, 0xCF, 0xFD), /* Medium Blue */
-	rgb_t(0xD0, 0xC3, 0xFF), /* Light Blue */
-	rgb_t(0x60, 0x72, 0x03), /* Brown */
-	rgb_t(0xFF, 0x6A, 0x3C), /* Orange */
-	rgb_t(0x9C, 0x9C, 0x9C), /* Light Grey */
-	rgb_t(0xFF, 0xA0, 0xD0), /* Pink */
-	rgb_t(0x14, 0xF5, 0x3C), /* Light Green */
-	rgb_t(0xD0, 0xDD, 0x8D), /* Yellow */
-	rgb_t(0x72, 0xFF, 0xD0), /* Aquamarine */
-	rgb_t(0xFF, 0xFF, 0xFF)  /* White */
-};
-
-/* Initialize the palette */
-PALETTE_INIT_MEMBER(apple2_state,apple2)
-{
-	palette.set_pen_colors(0, apple2_palette, ARRAY_LENGTH(apple2_palette));
-}
-
 static SLOT_INTERFACE_START(apple2_slot0_cards)
-	SLOT_INTERFACE("lang", A2BUS_LANG)      /* Apple II Language Card */
+	SLOT_INTERFACE("lang", A2BUS_RAMCARD16K)      /* Apple II RAM Language Card */
+	SLOT_INTERFACE("ssram", A2BUS_RAMCARD128K)	  /* Saturn Systems 128K extended language card */
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(apple2_cards)
@@ -1033,41 +1231,40 @@ static SLOT_INTERFACE_START(apple2_cards)
 //  SLOT_INTERFACE("magicmusician", A2BUS_MAGICMUSICIAN)    /* Magic Musician Card */
 SLOT_INTERFACE_END
 
-static SLOT_INTERFACE_START(apple2eaux_cards)
-	SLOT_INTERFACE("std80", A2EAUX_STD80COL) /* Apple IIe Standard 80 Column Card */
-	SLOT_INTERFACE("ext80", A2EAUX_EXT80COL) /* Apple IIe Extended 80 Column Card */
-	SLOT_INTERFACE("rw3", A2EAUX_RAMWORKS3)  /* Applied Engineering RamWorks III */
-SLOT_INTERFACE_END
-
-static MACHINE_CONFIG_START( apple2_common, apple2_state )
+static MACHINE_CONFIG_START( apple2_common, napple2_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1021800)     /* close to actual CPU frequency of 1.020484 MHz */
+	MCFG_CPU_ADD(A2_CPU_TAG, M6502, 1021800)     /* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_CPU_PROGRAM_MAP(apple2_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", apple2_state, apple2_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", napple2_state, apple2_interrupt, "screen", 0, 1)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START_OVERRIDE(apple2_state, apple2e )
+	MCFG_DEVICE_ADD(A2_VIDEO_TAG, APPLE2_VIDEO, XTAL_14_31818MHz)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(280*2, 192)
+	MCFG_SCREEN_SIZE(280*2, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, (280*2)-1,0,192-1)
-	MCFG_SCREEN_UPDATE_DRIVER(apple2_state, screen_update_apple2)
+	MCFG_SCREEN_UPDATE_DRIVER(napple2_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(apple2_palette))
-	MCFG_PALETTE_INIT_OWNER(apple2_state,apple2)
-
-	MCFG_VIDEO_START_OVERRIDE(apple2_state,apple2)
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(napple2_state, apple2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("a2speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD(A2_SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
+	/* /INH banking */
+	MCFG_DEVICE_ADD(A2_UPPERBANK_TAG, ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(inhbank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x3000)
+
 	/* keyboard controller */
-	MCFG_DEVICE_ADD("ay3600", AY3600, 0)
+	MCFG_DEVICE_ADD(A2_KBDC_TAG, AY3600, 0)
 	MCFG_AY3600_MATRIX_X0(IOPORT("X0"))
 	MCFG_AY3600_MATRIX_X1(IOPORT("X1"))
 	MCFG_AY3600_MATRIX_X2(IOPORT("X2"))
@@ -1077,269 +1274,57 @@ static MACHINE_CONFIG_START( apple2_common, apple2_state )
 	MCFG_AY3600_MATRIX_X6(IOPORT("X6"))
 	MCFG_AY3600_MATRIX_X7(IOPORT("X7"))
 	MCFG_AY3600_MATRIX_X8(IOPORT("X8"))
-	MCFG_AY3600_SHIFT_CB(READLINE(apple2_state, ay3600_shift_r))
-	MCFG_AY3600_CONTROL_CB(READLINE(apple2_state, ay3600_control_r))
-	MCFG_AY3600_DATA_READY_CB(WRITELINE(apple2_state, ay3600_data_ready_w))
+	MCFG_AY3600_SHIFT_CB(READLINE(napple2_state, ay3600_shift_r))
+	MCFG_AY3600_CONTROL_CB(READLINE(napple2_state, ay3600_control_r))
+	MCFG_AY3600_DATA_READY_CB(WRITELINE(napple2_state, ay3600_data_ready_w))
+	MCFG_AY3600_AKO_CB(WRITELINE(napple2_state, ay3600_ako_w)) 
+
+	/* repeat timer.  15 Hz from page 90 of "The Apple II Circuit Description */
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("repttmr", napple2_state, ay3600_repeat, attotime::from_hz(15))
 
 	/* slot devices */
-	MCFG_DEVICE_ADD("a2bus", A2BUS, 0)
-	MCFG_A2BUS_CPU("maincpu")
-	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(apple2_state, a2bus_irq_w))
-	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(apple2_state, a2bus_nmi_w))
-	MCFG_A2BUS_OUT_INH_CB(WRITELINE(apple2_state, a2bus_inh_w))
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl0", apple2_slot0_cards, "lang")
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl1", apple2_cards, NULL)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl2", apple2_cards, NULL)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl3", apple2_cards, NULL)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl4", apple2_cards, "mockingboard")
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl5", apple2_cards, NULL)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl6", apple2_cards, "diskii")
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl7", apple2_cards, NULL)
+	MCFG_DEVICE_ADD(A2_BUS_TAG, A2BUS, 0)
+	MCFG_A2BUS_CPU(A2_CPU_TAG)
+	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(napple2_state, a2bus_irq_w))
+	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(napple2_state, a2bus_nmi_w))
+	MCFG_A2BUS_OUT_INH_CB(WRITELINE(napple2_state, a2bus_inh_w))
+	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl0", apple2_slot0_cards, "lang")
+	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl1", apple2_cards, NULL)
+	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl2", apple2_cards, NULL)
+	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl3", apple2_cards, NULL)
+	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl4", apple2_cards, "mockingboard")
+	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl5", apple2_cards, NULL)
+	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl6", apple2_cards, "diskii")
+	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl7", apple2_cards, NULL)
 
 	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple2")
+
+	MCFG_CASSETTE_ADD(A2_CASSETTE_TAG)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2, apple2_common )
-	MCFG_MACHINE_START_OVERRIDE(apple2_state,apple2orig)
-
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_DEFAULT_SIZE("48K")
 	MCFG_RAM_EXTRA_OPTIONS("4K,8K,12K,16K,20K,24K,32K,36K,48K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
-	/* At the moment the RAM bank $C000-$FFFF is available only if you choose   */
-	/* default configuration: on real machine is present also in configurations */
-	/* with less memory, provided that the language card is installed           */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2p, apple2_common )
-	MCFG_MACHINE_START_OVERRIDE(apple2_state,apple2orig)
-	MCFG_VIDEO_START_OVERRIDE(apple2_state,apple2p)
-
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_DEFAULT_SIZE("48K")
 	MCFG_RAM_EXTRA_OPTIONS("16K,32K,48K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
-	/* At the moment the RAM bank $C000-$FFFF is available only if you choose   */
-	/* default configuration: on real machine is present also in configurations */
-	/* with less memory, provided that the language card is installed           */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( apple2e, apple2_common )
-	MCFG_MACHINE_START_OVERRIDE(apple2_state,apple2e)
-	MCFG_VIDEO_START_OVERRIDE(apple2_state,apple2e)
-	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("64K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
-
-	/* keyboard controller */
-	MCFG_DEVICE_MODIFY("ay3600")
-	MCFG_AY3600_DATA_READY_CB(WRITELINE(apple2_state, ay3600_iie_data_ready_w))
-
-	// IIe and later have no physical slot 0, the "language card" is built into the motherboard
-	MCFG_A2BUS_SLOT_REMOVE("sl0")
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl0", A2BUS_LANG, NULL)
-
-	MCFG_DEVICE_ADD(AUXSLOT_TAG, A2EAUXSLOT, 0)
-	MCFG_A2EAUXSLOT_CPU("maincpu")
-	MCFG_A2EAUXSLOT_OUT_IRQ_CB(WRITELINE(apple2_state, a2bus_irq_w))
-	MCFG_A2EAUXSLOT_OUT_NMI_CB(WRITELINE(apple2_state, a2bus_nmi_w))
-	MCFG_A2EAUXSLOT_SLOT_ADD(AUXSLOT_TAG, "aux", apple2eaux_cards, "ext80")   // default to an extended 80-column card
-
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( tk2000, apple2_common )
-	MCFG_MACHINE_START_OVERRIDE(apple2_state,tk2000)
-	MCFG_VIDEO_START_OVERRIDE(apple2_state,apple2c)
-	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
-
-	// TK2000 doesn't have slots, and it doesn't emulate a language card
-	// C05A maps RAM from C100-FFFF, C05B maps ROM
-	MCFG_A2BUS_SLOT_REMOVE("sl0")
-	MCFG_A2BUS_SLOT_REMOVE("sl1")
-	MCFG_A2BUS_SLOT_REMOVE("sl2")
-	MCFG_A2BUS_SLOT_REMOVE("sl3")
-	MCFG_A2BUS_SLOT_REMOVE("sl4")
-	MCFG_A2BUS_SLOT_REMOVE("sl5")
-	MCFG_A2BUS_SLOT_REMOVE("sl6")
-	MCFG_A2BUS_SLOT_REMOVE("sl7")
-
-	MCFG_SOFTWARE_LIST_REMOVE("flop525_list")
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( mprof3, apple2e )
-	MCFG_MACHINE_START_OVERRIDE(apple2_state,apple2c)
-	MCFG_VIDEO_START_OVERRIDE(apple2_state,apple2c)
-
-	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( apple2ee, apple2e )
-	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( tk3000, apple2e )
-	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
-
-	MCFG_CPU_ADD("subcpu", Z80, 1021800)    // schematics are illegible on where the clock comes from, but it *seems* to be the same as the 65C02 clock
-	MCFG_CPU_PROGRAM_MAP(tk3000_kbd_map)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( apple2ep, apple2e )
-	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( apple2c, apple2ee )
-	MCFG_MACHINE_START_OVERRIDE(apple2_state,apple2c)
-	MCFG_VIDEO_START_OVERRIDE(apple2_state,apple2c)
-
-	// IIc and friends have no cassette port
-	MCFG_DEVICE_REMOVE("cassette")
-
-	MCFG_A2BUS_SLOT_REMOVE("sl1")   // IIc has no slots, of course :)
-	MCFG_A2BUS_SLOT_REMOVE("sl2")
-	MCFG_A2BUS_SLOT_REMOVE("sl3")
-	MCFG_A2BUS_SLOT_REMOVE("sl4")
-	MCFG_A2BUS_SLOT_REMOVE("sl5")
-	MCFG_A2BUS_SLOT_REMOVE("sl6")
-	MCFG_A2BUS_SLOT_REMOVE("sl7")
-
-	MCFG_DEVICE_ADD(IIC_ACIA1_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_14_31818MHz / 8) // ~1.789 MHz
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_txd))
-
-	MCFG_DEVICE_ADD(IIC_ACIA2_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)   // matches SSC so modem software is compatible
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("modem", rs232_port_device, write_txd))
-
-	MCFG_RS232_PORT_ADD(PRINTER_PORT_TAG, default_rs232_devices, NULL)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(IIC_ACIA1_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(IIC_ACIA1_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(IIC_ACIA1_TAG, mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(IIC_ACIA1_TAG, mos6551_device, write_cts))
-
-	MCFG_RS232_PORT_ADD(MODEM_PORT_TAG, default_rs232_devices, NULL)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(IIC_ACIA2_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(IIC_ACIA2_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(IIC_ACIA2_TAG, mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(IIC_ACIA2_TAG, mos6551_device, write_cts))
-
-	// TODO: populate the IIc's other virtual slots with ONBOARD_ADD
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_DISKIING, NULL)
-
-	MCFG_A2EAUXSLOT_SLOT_REMOVE("aux")
-	MCFG_DEVICE_REMOVE(AUXSLOT_TAG)
-
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("128K")
-MACHINE_CONFIG_END
-
-const applefdc_interface a2cp_interface =
-{
-	sony_set_lines,         /* set_lines */
-	sony_set_enable_lines,  /* set_enable_lines */
-
-	sony_read_data,         /* read_data */
-	sony_write_data,    /* write_data */
-	sony_read_status    /* read_status */
-};
-
-static const floppy_interface apple2cp_floppy35_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(apple35_iigs),
-	"floppy_3_5"
-};
-
-static MACHINE_CONFIG_DERIVED( apple2cp, apple2c )
-	MCFG_MACHINE_START_OVERRIDE(apple2_state,apple2cp)
-
-	MCFG_A2BUS_SLOT_REMOVE("sl6")
-	MCFG_IWM_ADD(IICP_IWM_TAG, a2cp_interface)
-	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(apple2cp_floppy35_floppy_interface)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( apple2c_iwm, apple2c )
-
-	MCFG_A2BUS_SLOT_REMOVE("sl6")
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_IWM_FDC, NULL)
-MACHINE_CONFIG_END
-
-const applefdc_interface fdc_interface =
-{
-	apple525_set_lines,         /* set_lines */
-	apple525_set_enable_lines,  /* set_enable_lines */
-
-	apple525_read_data,         /* read_data */
-	apple525_write_data,    /* write_data */
-	apple525_read_status    /* read_status */
-};
-
-static const floppy_interface floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(apple2),
-	"floppy_5_25"
-};
-
-static MACHINE_CONFIG_DERIVED( laser128, apple2c )
-	MCFG_MACHINE_START_OVERRIDE(apple2_state,laser128)
-
-	MCFG_APPLEFDC_ADD(LASER128_UDC_TAG, fdc_interface)
-	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
-
-	MCFG_A2BUS_SLOT_REMOVE("sl6")
-
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl1", A2BUS_LASER128, NULL)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl2", A2BUS_LASER128, NULL)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl3", A2BUS_LASER128, NULL)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl4", A2BUS_LASER128, NULL)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl5", apple2_cards, NULL)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_LASER128, NULL)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl7", apple2_cards, NULL)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( laser128ex2, apple2c )
-	MCFG_MACHINE_START_OVERRIDE(apple2_state,laser128)
-
-	MCFG_APPLEFDC_ADD(LASER128_UDC_TAG, fdc_interface)
-	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
-
-	MCFG_A2BUS_SLOT_REMOVE("sl6")
-
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl1", A2BUS_LASER128, NULL)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl2", A2BUS_LASER128, NULL)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl3", A2BUS_LASER128, NULL)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl4", A2BUS_LASER128, NULL)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl5", A2BUS_LASER128, NULL)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_LASER128, NULL)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl7", A2BUS_LASER128, NULL)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( space84, apple2p )
-	MCFG_MACHINE_START_OVERRIDE(apple2_state,space84)
 MACHINE_CONFIG_END
 
 #if 0
 static MACHINE_CONFIG_DERIVED( laba2p, apple2p )
-	MCFG_MACHINE_START_OVERRIDE(apple2_state,laba2p)
+	MCFG_MACHINE_START_OVERRIDE(napple2_state,laba2p)
 
 	MCFG_A2BUS_SLOT_REMOVE("sl0")
 	MCFG_A2BUS_SLOT_REMOVE("sl3")
@@ -1364,30 +1349,17 @@ ROM_START(apple2) /* the classic, non-autoboot apple2 with integer basic in rom.
 	ROM_REGION(0x4000,"maincpu",0)
 	ROM_LOAD_OPTIONAL ( "341-0016-00.d0", 0x1000, 0x0800, CRC(4234e88a) SHA1(c9a81d704dc2f0c3416c20f9c4ab71fedda937ed)) /* 341-0016: Programmer's Aid #1 D0 */
 
-/* The area $D800-$DFFF in Apple II is reserved for 3rd party add-ons:
-   Maybe MESS should map this space to a CARTSLOT device?              */
-
 	ROM_LOAD ( "341-0001-00.e0", 0x2000, 0x0800, CRC(c0a4ad3b) SHA1(bf32195efcb34b694c893c2d342321ec3a24b98f)) /* Needs verification. From eBay: Label: S7925E // C48077 // 3410001-00 // (C)APPLE78 E0 */
 	ROM_LOAD ( "341-0002-00.e8", 0x2800, 0x0800, CRC(a99c2cf6) SHA1(9767d92d04fc65c626223f25564cca31f5248980)) /* Needs verification. From eBay: Label: S7916E // C48078 // 3410002-00 // (C)APPLE78 E8 */
 	ROM_LOAD ( "341-0003-00.f0", 0x3000, 0x0800, CRC(62230d38) SHA1(f268022da555e4c809ca1ae9e5d2f00b388ff61c)) /* Needs verification. From eBay: Label: S7908E // C48709 // 3410003 // CAPPLE78 F0 */
 	ROM_LOAD ( "341-0004-00.f8", 0x3800, 0x0800, CRC(020a86d0) SHA1(52a18bd578a4694420009cad7a7a5779a8c00226))
-	/* For the following bits, I'm not sure how to do this properly, since the P5 and P6 roms came in pairs and are in different address spaces...
-	Also the 3.5" 400k? disk control rom, 341-0438-a should probably be here as well, assuming it could be used with an apple2/2+/2e */
-	//ROMX_LOAD ( "341-0009.p5", 0x4500, 0x0100, CRC(d34eb2ff) SHA1(afd060e6f35faf3bb0146fa889fc787adf56330a), ROM_BIOS(1)) /* 341-0009: 13-sector disk drive, PROM P5 */
-	//ROMX_LOAD ( "341-0027-a.p5", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16), ROM_BIOS(2)) /* 341-0027-a: 16-sector disk drive (older version), PROM P5 */
-	//ROMX_LOAD ( "341-0127-a.p5a", 0x4500, 0x0100, NO_DUMP, ROM_BIOS(3)) /* 341-0127-A: 16-sector disk drive (later version) PROM P5; Label: 341-0127-A // (C) APPLE 81 P5A (see 'Apple Disk II Interface Card.jpg') (I have a suspicion this rom is the same as the 341-0027-a one)*/
-
-	//ROM_REGION(0x100,"wsmprom",0) /* prom 'p6' for the woz state machine on 650-X104- Disk II interface card */
-	//ROMX_LOAD ( "341-0010.rom", 0x0000, 0x0100, CRC(62e22620) SHA1(e3d6d1c30653572b49ecc2dc54ce073978411a04), ROM_BIOS(1)) /* 341-0010: 13-sector disk drive, PROM P6 */
-	//ROMX_LOAD ( "341-0028-a.rom", 0x0000, 0x0100, CRC(b72a2c70) SHA1(bc39fbd5b9a8d2287ac5d0a42e639fc4d3c2f9d4), ROM_BIOS(2)) /* 341-0028: 16-sector disk drive (older version), PROM P6 */
-	//ROMX_LOAD ( "341-0128-a.rom", 0x0000, 0x0100, NO_DUMP, ROM_BIOS(3)) /* 341-0128-A: 16-sector disk drive (later version), PROM P6 Label: 341-0128-A // (C) APPLE 81 P6A (see 'Apple Disk II Interface Card.jpg') (This rom MIGHT be the same as the 341-0028 one) */
 	ROM_END
 
 ROM_START(apple2p) /* the autoboot apple2+ with applesoft (microsoft-written) basic in rom; optional card with monitor and integer basic was possible but isn't yet supported */
 	ROM_REGION(0x0800,"gfx1",0)
 	ROM_LOAD ( "341-0036.chr", 0x0000, 0x0800, CRC(64f415c6) SHA1(f9d312f128c9557d9d6ac03bfad6c3ddf83e5659))
 
-	ROM_REGION(0x4000,"maincpu",0)
+	ROM_REGION(0x4000, "maincpu", ROMREGION_LE)
 	ROM_LOAD ( "341-0011.d0", 0x1000, 0x0800, CRC(6f05f949) SHA1(0287ebcef2c1ce11dc71be15a99d2d7e0e128b1e))
 	ROM_LOAD ( "341-0012.d8", 0x1800, 0x0800, CRC(1f08087c) SHA1(a75ce5aab6401355bf1ab01b04e4946a424879b5))
 	ROM_LOAD ( "341-0013.e0", 0x2000, 0x0800, CRC(2b8d9a89) SHA1(8d82a1da63224859bd619005fab62c4714b25dd7))
@@ -1421,6 +1393,58 @@ ROM_START(prav8m)
 	ROM_LOAD ( "pravetz8m.f8", 0x3800, 0x0800, CRC(5bab0a46) SHA1(f6c0817ce37d2e2c43f482c339acaede0a73359b))
 ROM_END
 
+/*
+    J-Plus ROM numbers confirmed by:
+    http://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Computers/Apple%20II/Apple%20II%20j-plus/Photos/Apple%20II%20j-plus%20-%20Motherboard.jpg
+*/
+
+ROM_START(apple2jp)
+	ROM_REGION(0x0800,"gfx1",0)
+	ROM_LOAD ( "a2jp.chr", 0x0000, 0x0800, CRC(487104b5) SHA1(0a382be58db5215c4a3de53b19a72fab660d5da2))
+
+	ROM_REGION(0x4000,"maincpu",0)
+	ROM_LOAD ( "341-0011.d0", 0x1000, 0x0800, BAD_DUMP CRC(6f05f949) SHA1(0287ebcef2c1ce11dc71be15a99d2d7e0e128b1e))
+	ROM_LOAD ( "341-0012.d8", 0x1800, 0x0800, BAD_DUMP CRC(1f08087c) SHA1(a75ce5aab6401355bf1ab01b04e4946a424879b5))
+	ROM_LOAD ( "341-0013.e0", 0x2000, 0x0800, BAD_DUMP CRC(2b8d9a89) SHA1(8d82a1da63224859bd619005fab62c4714b25dd7))
+	ROM_LOAD ( "341-0014.e8", 0x2800, 0x0800, BAD_DUMP CRC(5719871a) SHA1(37501be96d36d041667c15d63e0c1eff2f7dd4e9))
+	ROM_LOAD ( "341-0015.f0", 0x3000, 0x0800, BAD_DUMP CRC(9a04eecf) SHA1(e6bf91ed28464f42b807f798fc6422e5948bf581))
+	ROM_LOAD ( "341-0047.f8", 0x3800, 0x0800, CRC(6ea8379b) SHA1(00a75ae3b58e1917ad640249366f654608589cf4))
+ROM_END
+
+ROM_START(ace100)
+	ROM_REGION(0x0800,"gfx1",0)
+	ROM_LOAD ( "ace100.chr", 0x0000, 0x0800, BAD_DUMP CRC(64f415c6) SHA1(f9d312f128c9557d9d6ac03bfad6c3ddf83e5659)) // copy of a2.chr - real Ace chr is undumped
+
+	ROM_REGION(0x4000,"maincpu",0)
+	ROM_LOAD ( "ace100.rom", 0x1000, 0x3000, CRC(9d5ec94f) SHA1(8f2b3f2561788bebc7a805f620ec9e7ade973460))
+ROM_END
+
+ROM_START(space84)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD( "space 84 mobo chargen.bin", 0x0000, 0x2000, CRC(ceb98990) SHA1(8b2758da611bcfdd3d144edabc63ef1df2ca787b) )
+
+	ROM_REGION(0x4000,"maincpu",0)
+	ROM_LOAD ( "341-0011.d0",  0x1000, 0x0800, CRC(6f05f949) SHA1(0287ebcef2c1ce11dc71be15a99d2d7e0e128b1e))
+	ROM_LOAD ( "341-0012.d8",  0x1800, 0x0800, CRC(1f08087c) SHA1(a75ce5aab6401355bf1ab01b04e4946a424879b5))
+	ROM_LOAD ( "341-0013.e0",  0x2000, 0x0800, CRC(2b8d9a89) SHA1(8d82a1da63224859bd619005fab62c4714b25dd7))
+	ROM_LOAD ( "341-0014.e8",  0x2800, 0x0800, CRC(5719871a) SHA1(37501be96d36d041667c15d63e0c1eff2f7dd4e9))
+	ROM_LOAD( "space84_f.bin", 0x3000, 0x1000, CRC(4e741069) SHA1(ca1f16da9fb40e966ee4a899964cd6a7e140ab50))
+ROM_END
+
+ROM_START(am64)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD( "gm-2716.bin",  0x0000, 0x0800, CRC(863e657f) SHA1(cc954204c503bc545ec0d08862483aaad83805d5) )
+
+	ROM_REGION(0x4000,"maincpu",0)
+	ROM_LOAD( "am64-27128.bin", 0x0000, 0x4000, CRC(f25cdc7b) SHA1(235e72b77695938a9df8781f5bea3cbbbe1f4c76) )
+
+	ROM_REGION(0x2000, "spares", 0)
+	// parallel card ROM
+	ROM_LOAD( "ap-2716.bin",  0x0000, 0x0800, CRC(c6990f08) SHA1(e7daf63639234e46738a4d78a49287d11ccaf537) )
+	// i8048 keyboard MCU ROM
+	ROM_LOAD( "tk10.bin",     0x0800, 0x0800, CRC(a06c5b78) SHA1(27c5160b913e0f62120f384026d24b9f1acb6970) )
+ROM_END
+
 ROM_START( agat7 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v1", "Version 1" )
@@ -1450,260 +1474,6 @@ ROM_START( agat9 )
 	ROM_LOAD( "agathe9.fnt", 0x0000, 0x0800, CRC(8c55c984) SHA1(5a5a202000576b88b4ae2e180dd2d1b9b337b594))
 ROM_END
 
-/*
-    J-Plus ROM numbers confirmed by:
-    http://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Computers/Apple%20II/Apple%20II%20j-plus/Photos/Apple%20II%20j-plus%20-%20Motherboard.jpg
-*/
-
-ROM_START(apple2jp)
-	ROM_REGION(0x0800,"gfx1",0)
-	ROM_LOAD ( "a2jp.chr", 0x0000, 0x0800, CRC(487104b5) SHA1(0a382be58db5215c4a3de53b19a72fab660d5da2))
-
-	ROM_REGION(0x4000,"maincpu",0)
-	ROM_LOAD ( "341-0011.d0", 0x1000, 0x0800, BAD_DUMP CRC(6f05f949) SHA1(0287ebcef2c1ce11dc71be15a99d2d7e0e128b1e))
-	ROM_LOAD ( "341-0012.d8", 0x1800, 0x0800, BAD_DUMP CRC(1f08087c) SHA1(a75ce5aab6401355bf1ab01b04e4946a424879b5))
-	ROM_LOAD ( "341-0013.e0", 0x2000, 0x0800, BAD_DUMP CRC(2b8d9a89) SHA1(8d82a1da63224859bd619005fab62c4714b25dd7))
-	ROM_LOAD ( "341-0014.e8", 0x2800, 0x0800, BAD_DUMP CRC(5719871a) SHA1(37501be96d36d041667c15d63e0c1eff2f7dd4e9))
-	ROM_LOAD ( "341-0015.f0", 0x3000, 0x0800, BAD_DUMP CRC(9a04eecf) SHA1(e6bf91ed28464f42b807f798fc6422e5948bf581))
-	ROM_LOAD ( "341-0047.f8", 0x3800, 0x0800, CRC(6ea8379b) SHA1(00a75ae3b58e1917ad640249366f654608589cf4))
-ROM_END
-
-ROM_START(ace100)
-	ROM_REGION(0x0800,"gfx1",0)
-	ROM_LOAD ( "ace100.chr", 0x0000, 0x0800, BAD_DUMP CRC(64f415c6) SHA1(f9d312f128c9557d9d6ac03bfad6c3ddf83e5659)) // copy of a2.chr - real Ace chr is undumped
-
-	ROM_REGION(0x4000,"maincpu",0)
-	ROM_LOAD ( "ace100.rom", 0x1000, 0x3000, CRC(9d5ec94f) SHA1(8f2b3f2561788bebc7a805f620ec9e7ade973460))
-ROM_END
-
-ROM_START(apple2e)
-	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "342-0133-a.chr", 0x0000, 0x1000,CRC(b081df66) SHA1(7060de104046736529c1e8a687a0dd7b84f8c51b))
-	ROM_LOAD ( "342-0133-a.chr", 0x1000, 0x1000,CRC(b081df66) SHA1(7060de104046736529c1e8a687a0dd7b84f8c51b))
-
-	ROM_REGION(0x4000,"maincpu",0)
-	ROM_LOAD ( "342-0135-b.64", 0x0000, 0x2000, CRC(e248835e) SHA1(523838c19c79f481fa02df56856da1ec3816d16e))
-	ROM_LOAD ( "342-0134-a.64", 0x2000, 0x2000, CRC(fc3d59d8) SHA1(8895a4b703f2184b673078f411f4089889b61c54))
-
-	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
-	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // 1983 US-Dvorak
-ROM_END
-
-ROM_START(apple2euk)
-	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD( "341-0160-a.chr", 0x0000, 0x2000, CRC(9be77112) SHA1(48aafa9a72002c495bc1f3d28150630ff89ca47e) )
-
-	ROM_REGION(0x4000,"maincpu",0)
-	ROM_LOAD ( "342-0135-b.64", 0x0000, 0x2000, CRC(e248835e) SHA1(523838c19c79f481fa02df56856da1ec3816d16e))
-	ROM_LOAD ( "342-0134-a.64", 0x2000, 0x2000, CRC(fc3d59d8) SHA1(8895a4b703f2184b673078f411f4089889b61c54))
-
-	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
-	ROM_LOAD( "341-0150-a.e12", 0x000, 0x800, CRC(66ffacd7) SHA1(47bb9608be38ff75429a989b930a93b47099648e) )
-ROM_END
-
-ROM_START(mprof3)
-	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "mpf3.chr", 0x0000, 0x1000,CRC(2597bc19) SHA1(e114dcbb512ec24fb457248c1b53cbd78039ed20))
-	ROM_LOAD ( "mpf3.chr", 0x1000, 0x1000,CRC(2597bc19) SHA1(e114dcbb512ec24fb457248c1b53cbd78039ed20))
-
-	ROM_REGION(0x4000,"maincpu",0)
-	ROM_LOAD ( "mpf3-cd.rom", 0x0000, 0x2000, CRC(5b662e06) SHA1(aa0db775ca78986480829fcc10f00e57629e1a7c))
-	ROM_LOAD ( "mpf3-ef.rom", 0x2000, 0x2000, CRC(2c5e8b92) SHA1(befeb03e04b7c3ef36ef5829948a53880df85e92))
-
-	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
-	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // need to dump real mprof keyboard ROM
-ROM_END
-
-ROM_START(apple2ee)
-	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "342-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
-	ROM_LOAD ( "342-0265-a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
-
-	ROM_REGION(0x4000,"maincpu",0)
-	ROM_LOAD ( "342-0304-a.e10", 0x0000, 0x2000, CRC(443aa7c4) SHA1(3aecc56a26134df51e65e17f33ae80c1f1ac93e6)) /* PCB: "CD ROM // 342-0304", 2364 mask rom */
-	ROM_LOAD ( "342-0303-a.e8", 0x2000, 0x2000, CRC(95e10034) SHA1(afb09bb96038232dc757d40c0605623cae38088e)) /* PCB: "EF ROM // 342-0303", 2364 mask rom */
-
-	ROM_REGION( 0x800, "keyboard", 0 )
-	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
-ROM_END
-
-ROM_START(apple2eeuk)
-	ROM_REGION(0x2000, "gfx1", 0)
-	ROM_LOAD( "342-0273-a.chr", 0x0000, 0x2000, CRC(9157085a) SHA1(85479a509d6c8176949a5b20720567b7022aa631) )
-
-	ROM_REGION(0x4000,"maincpu",0)
-	ROM_LOAD ( "342-0304-a.e10", 0x0000, 0x2000, CRC(443aa7c4) SHA1(3aecc56a26134df51e65e17f33ae80c1f1ac93e6)) /* PCB: "CD ROM // 342-0304", 2364 mask rom */
-	ROM_LOAD ( "342-0303-a.e8", 0x2000, 0x2000, CRC(95e10034) SHA1(afb09bb96038232dc757d40c0605623cae38088e)) /* PCB: "EF ROM // 342-0303", 2364 mask rom */
-
-	ROM_REGION( 0x800, "keyboard", 0 )
-	ROM_LOAD( "341-0150-a.e12", 0x000, 0x800, CRC(66ffacd7) SHA1(47bb9608be38ff75429a989b930a93b47099648e) )
-ROM_END
-
-ROM_START(apple2ep)
-	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "342-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
-	ROM_LOAD ( "342-0265-a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
-
-	ROM_REGION(0x4000,"maincpu",0)
-	ROM_LOAD ("32-0349-b.128", 0x0000, 0x4000, CRC(1d70b193) SHA1(b8ea90abe135a0031065e01697c4a3a20d51198b)) /* should rom name be 342-0349-b? */
-
-	ROM_REGION( 0x800, "keyboard", 0 )
-	// chip printed markings say 342-0132-d, but internally text says "341-0132-d".  Go figure.
-	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
-ROM_END
-
-ROM_START(apple2c)
-	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
-	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
-
-	ROM_REGION(0x4000,"maincpu",0)
-	ROM_LOAD ( "a2c.128", 0x0000, 0x4000, CRC(f0edaa1b) SHA1(1a9b8aca5e32bb702ddb7791daddd60a89655729))
-
-	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
-	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // 1983 US-Dvorak
-ROM_END
-
-ROM_START(tk2000)
-	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
-	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
-
-	ROM_REGION(0x4000,"maincpu",0)
-	ROM_LOAD( "tk2000.rom",   0x000000, 0x004000, CRC(dfdbacc3) SHA1(bb37844c31616046630868a4399ee3d55d6df277) )
-
-	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
-	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // probably not this machine's actual ROM
-ROM_END
-
-// unlike the very unique TK2000, the TK3000 is a mostly stock enhanced IIe clone
-ROM_START(tk3000)
-	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD( "tk3000.f7",    0x000000, 0x002000, CRC(70157693) SHA1(a7922e2137f95271011042441d80466fba7bb828) )
-
-	ROM_REGION(0x4000,"maincpu",0)
-	ROM_LOAD( "tk3000.f4f6",  0x000000, 0x004000, CRC(5b1e8ab2) SHA1(f163e5753c18ff0e812a448e8da406f102600edf) )
-
-	ROM_REGION(0x2000, "kbdcpu", 0)
-	ROM_LOAD( "tk3000.e13",   0x000000, 0x002000, CRC(f9b860d3) SHA1(6a127f1458f43a00199d3dde94569b8928f05a53) )
-
-	ROM_REGION(0x800, "keyboard", ROMREGION_ERASE00)
-	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // probably not this machine's actual ROM
-ROM_END
-
-ROM_START(prav8c)
-	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "charrom.d20", 0x0000, 0x2000,CRC(935212cc) SHA1(934603a441c631bd841ea0d2ff39525474461e47))
-	ROM_REGION(0x4000,"maincpu",0)
-	ROM_LOAD ( "prom_cd.d46", 0x0000, 0x2000, CRC(195d0b48) SHA1(f8c4f3722159081f6950207f03bc85da30980c08))
-	ROM_LOAD ( "prom_ef.d41", 0x2000, 0x2000, CRC(ec6aa2f6) SHA1(64bce893ebf0e22cd8f22436b97ef1bfeddf692f))
-
-	// contains slot firmware for slots 1, 2, and 6 (6 is the usual Disk II f/w)
-	ROM_REGION(0x2000,"unknown",0)
-	ROM_LOAD ( "eprom.d38", 0x0000, 0x2000, CRC(c8d00b19) SHA1(13d156957ea68d0e7bc4be57cb1580c8b1399981))
-
-	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
-	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // we don't know what this machine used
-ROM_END
-
-ROM_START(apple2c0)
-	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
-	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
-
-	ROM_REGION(0x8000,"maincpu",0)
-	ROM_LOAD("3420033a.256", 0x0000, 0x8000, CRC(c8b979b3) SHA1(10767e96cc17bad0970afda3a4146564e6272ba1))
-
-	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
-	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // 1983 US-Dvorak
-ROM_END
-
-ROM_START(apple2c3)
-	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
-	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
-
-	ROM_REGION(0x8000,"maincpu",0)
-	ROM_LOAD("342-0445-a.256", 0x0000, 0x8000, CRC(bc5a79ff) SHA1(5338d9baa7ae202457b6500fde5883dbdc86e5d3))
-
-	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
-	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // 1983 US-Dvorak
-ROM_END
-
-ROM_START(apple2c4)
-	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
-	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
-
-	ROM_REGION(0x8000,"maincpu",0)
-	ROM_LOAD("3410445b.256", 0x0000, 0x8000, CRC(06f53328) SHA1(015061597c4cda7755aeb88b735994ffd2f235ca))
-
-	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
-	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // 1983 US-Dvorak
-ROM_END
-
-ROM_START(laser128)
-	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
-	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
-
-	ROM_REGION(0x8000,"maincpu",0)
-	ROM_LOAD("laser128.256", 0x0000, 0x8000, CRC(39E59ED3) SHA1(CBD2F45C923725BFD57F8548E65CC80B13BC18DA))
-
-	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
-	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // need to dump real laser rom
-ROM_END
-
-ROM_START(las128ex)
-	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
-	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
-
-	ROM_REGION(0x8000,"maincpu",0)
-	ROM_LOAD("las128ex.256", 0x0000, 0x8000, CRC(B67C8BA1) SHA1(8BD5F82A501B1CF9D988C7207DA81E514CA254B0))
-
-	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
-	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // need to dump real laser rom
-ROM_END
-
-ROM_START(las128e2)
-	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
-	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
-
-	ROM_REGION(0x8000,"maincpu",0)
-	ROM_LOAD( "laser 128ex2 rom version 6.1.bin", 0x000000, 0x008000, CRC(7f911c90) SHA1(125754c1bd777d4c510f5239b96178c6f2e3236b) )
-
-	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
-	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // need to dump real laser rom
-ROM_END
-
-#if 0
-ROM_START(las128e2)
-	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
-	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
-
-	ROM_REGION(0x8700,"maincpu",0)
-	ROM_LOAD( "laser 128ex2 v6.1 rom.bin", 0x000000, 0x008000, CRC(7f911c90) SHA1(125754c1bd777d4c510f5239b96178c6f2e3236b) )
-
-	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
-	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // need to dump real laser rom
-ROM_END
-#endif
-
-ROM_START(apple2cp)
-	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
-	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
-
-	ROM_REGION(0x8000,"maincpu",0)
-	ROM_LOAD("341-0625-a.256", 0x0000, 0x8000, CRC(0b996420) SHA1(1a27ae26966bbafd825d08ad1a24742d3e33557c))
-
-	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
-	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
-ROM_END
-
 ROM_START(ivelultr)
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD( "ultra.chr", 0x0000, 0x1000,CRC(fed62c85) SHA1(479fb3f38a3f7332cef2e8c4856871afe8dc6017))
@@ -1716,32 +1486,6 @@ ROM_START(ivelultr)
 
 	ROM_REGION(0x800, "kbmcu", 0)   // 6802 code for keyboard MCU (very unlike real Apples, will require some reverse-engineering)
 	ROM_LOAD( "ultra4.bin", 0x0000, 0x0800, CRC(3dce51ac) SHA1(676b6e775d5159049cae5b6143398ec7b2bf437a) )
-ROM_END
-
-ROM_START(space84)
-	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD( "space 84 mobo chargen.bin", 0x0000, 0x2000, CRC(ceb98990) SHA1(8b2758da611bcfdd3d144edabc63ef1df2ca787b) )
-
-	ROM_REGION(0x4000,"maincpu",0)
-	ROM_LOAD ( "341-0011.d0",  0x1000, 0x0800, CRC(6f05f949) SHA1(0287ebcef2c1ce11dc71be15a99d2d7e0e128b1e))
-	ROM_LOAD ( "341-0012.d8",  0x1800, 0x0800, CRC(1f08087c) SHA1(a75ce5aab6401355bf1ab01b04e4946a424879b5))
-	ROM_LOAD ( "341-0013.e0",  0x2000, 0x0800, CRC(2b8d9a89) SHA1(8d82a1da63224859bd619005fab62c4714b25dd7))
-	ROM_LOAD ( "341-0014.e8",  0x2800, 0x0800, CRC(5719871a) SHA1(37501be96d36d041667c15d63e0c1eff2f7dd4e9))
-	ROM_LOAD( "space84_f.bin", 0x3000, 0x1000, CRC(4e741069) SHA1(ca1f16da9fb40e966ee4a899964cd6a7e140ab50))
-ROM_END
-
-ROM_START(am64)
-	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD( "gm-2716.bin",  0x0000, 0x0800, CRC(863e657f) SHA1(cc954204c503bc545ec0d08862483aaad83805d5) )
-
-	ROM_REGION(0x4000,"maincpu",0)
-	ROM_LOAD( "am64-27128.bin", 0x0000, 0x4000, CRC(f25cdc7b) SHA1(235e72b77695938a9df8781f5bea3cbbbe1f4c76) )
-
-	ROM_REGION(0x2000, "spares", 0)
-	// parallel card ROM
-	ROM_LOAD( "ap-2716.bin",  0x0000, 0x0800, CRC(c6990f08) SHA1(e7daf63639234e46738a4d78a49287d11ccaf537) )
-	// i8048 keyboard MCU ROM
-	ROM_LOAD( "tk10.bin",     0x0800, 0x0800, CRC(a06c5b78) SHA1(27c5160b913e0f62120f384026d24b9f1acb6970) )
 ROM_END
 
 #if 0
@@ -1768,32 +1512,16 @@ ROM_END
 #endif
 
 /*    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     INIT      COMPANY            FULLNAME */
-COMP( 1977, apple2,   0,        0,        apple2,      apple2, driver_device,   0,        "Apple Computer",    "Apple ][", GAME_SUPPORTS_SAVE )
+COMP( 1977, apple2,   0,        0,        apple2,      apple2,  driver_device,   0,        "Apple Computer",    "Apple ][", GAME_SUPPORTS_SAVE )
 COMP( 1979, apple2p,  apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Apple Computer",    "Apple ][+", GAME_SUPPORTS_SAVE )
-COMP( 1982, prav82,   apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Pravetz",           "Pravetz 82", GAME_SUPPORTS_SAVE )
-COMP( 1985, prav8m,   apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Pravetz",           "Pravetz 8M", GAME_SUPPORTS_SAVE )
 COMP( 1980, apple2jp, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Apple Computer",    "Apple ][ J-Plus", GAME_SUPPORTS_SAVE )
-COMP( 1982, ace100,   apple2,   0,        apple2,      apple2e, driver_device,  0,        "Franklin Computer", "Franklin Ace 100", GAME_SUPPORTS_SAVE )
-COMP( 1983, apple2e,  0,        apple2,   apple2e,     apple2e, driver_device,  0,        "Apple Computer",    "Apple //e", GAME_SUPPORTS_SAVE )
-COMP( 1983, apple2euk,apple2e,  0,        apple2e,     apple2euk,driver_device, 0,        "Apple Computer",    "Apple //e (UK)", GAME_SUPPORTS_SAVE )
-COMP( 1983, mprof3,   apple2e,  0,        mprof3,      apple2e, driver_device,  0,        "Multitech",         "Microprofessor III", GAME_SUPPORTS_SAVE )
-COMP( 1985, apple2ee, apple2e,  0,        apple2ee,    apple2e, driver_device,  0,        "Apple Computer",    "Apple //e (enhanced)", GAME_SUPPORTS_SAVE )
-COMP( 1985, apple2eeuk,apple2e, 0,        apple2ee,    apple2euk, driver_device,0,        "Apple Computer",    "Apple //e (enhanced, UK)", GAME_SUPPORTS_SAVE )
-COMP( 1987, apple2ep, apple2e,  0,        apple2ep,    apple2ep, driver_device, 0,        "Apple Computer",    "Apple //e (Platinum)", GAME_SUPPORTS_SAVE )
-COMP( 1984, apple2c,  0,        apple2,   apple2c,     apple2e, driver_device,  0,        "Apple Computer",    "Apple //c" , GAME_SUPPORTS_SAVE )
-COMP( 1984, tk2000,   apple2c,  0,        tk2000,      apple2e, driver_device,  0,        "Microdigital",      "TK2000" , GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1986, tk3000,   apple2c,  0,        tk3000,      apple2e, driver_device,  0,        "Microdigital",      "TK3000//e" , GAME_SUPPORTS_SAVE )
-COMP( 1989, prav8c,   apple2c,  0,        apple2c,     apple2e, driver_device,  0,        "Pravetz",           "Pravetz 8C", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1987, laser128, apple2c,  0,        laser128,    apple2e, driver_device,  0,        "Video Technology",  "Laser 128 (version 4.2)", GAME_SUPPORTS_SAVE )
-COMP( 1988, las128ex, apple2c,  0,        laser128,    apple2e, driver_device,  0,        "Video Technology",  "Laser 128ex (version 4.5)", GAME_SUPPORTS_SAVE )
-COMP( 1988, las128e2, apple2c,  0,        laser128ex2, apple2e, driver_device,  0,        "Video Technology",  "Laser 128ex2 (version 6.1)", GAME_SUPPORTS_SAVE )
-COMP( 1985, apple2c0, apple2c,  0,        apple2c_iwm, apple2e, driver_device,  0,        "Apple Computer",    "Apple //c (UniDisk 3.5)", GAME_SUPPORTS_SAVE )
-COMP( 1986, apple2c3, apple2c,  0,        apple2c_iwm, apple2e, driver_device,  0,        "Apple Computer",    "Apple //c (Original Memory Expansion)", GAME_SUPPORTS_SAVE )
-COMP( 1986, apple2c4, apple2c,  0,        apple2c_iwm, apple2e, driver_device,  0,        "Apple Computer",    "Apple //c (rev 4)", GAME_SUPPORTS_SAVE )
-COMP( 1988, apple2cp, apple2c,  0,        apple2cp,    apple2e, driver_device,  0,        "Apple Computer",    "Apple //c Plus", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1984, ivelultr, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Ivasim",            "Ivel Ultra", GAME_SUPPORTS_SAVE )
+COMP( 1982, prav82,   apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Pravetz",           "Pravetz 82", GAME_SUPPORTS_SAVE )
+COMP( 1982, ace100,   apple2,   0,        apple2,      apple2p, driver_device,  0,        "Franklin Computer", "Franklin Ace 100", GAME_SUPPORTS_SAVE )
 COMP( 1983, agat7,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Agat",              "Agat-7", GAME_NOT_WORKING) // disk controller ROM JSRs to $FCA8 which is a delay on apple II, illegal instruction crash here :(
+// reverse font direction -\/
+COMP( 1984, ivelultr, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Ivasim",            "Ivel Ultra", GAME_SUPPORTS_SAVE )
 COMP( 1984, agat9,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Agat",              "Agat-9", GAME_NOT_WORKING)
+COMP( 1985, prav8m,   apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Pravetz",           "Pravetz 8M", GAME_SUPPORTS_SAVE )
 COMP( 1985, space84,  apple2,   0,        space84,     apple2p, driver_device,  0,        "ComputerTechnik/IBS",  "Space 84",   GAME_NOT_WORKING )
 COMP( 1985, am64,     apple2,   0,        space84,     apple2p, driver_device,  0,        "ASEM",              "AM 64", GAME_SUPPORTS_SAVE )
 //COMP( 19??, laba2p,   apple2,   0,        laba2p,      apple2p, driver_device,  0,        "<unknown>",         "Lab equipment Apple II Plus clone", GAME_SUPPORTS_SAVE )

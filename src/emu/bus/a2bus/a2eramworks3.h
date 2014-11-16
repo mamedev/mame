@@ -32,6 +32,7 @@ protected:
 	virtual UINT8 read_auxram(UINT16 offset);
 	virtual void write_auxram(UINT16 offset, UINT8 data);
 	virtual UINT8 *get_vram_ptr();
+	virtual UINT8 *get_auxbank_ptr();
 	virtual bool allow_dhr() { return true; }
 	virtual void write_c07x(address_space &space, UINT8 offset, UINT8 data);
 

@@ -74,10 +74,8 @@ void a2bus_swyft_device::device_reset()
 {
 	m_rombank = 0;
 
-	// take over the machine
-	apple2_state *state = machine().driver_data<apple2_state>();
-	raise_slot_inh();
-	state->m_maincpu->reset();
+	m_inh_state = INH_READ;	// read-enable the ROM
+	recalc_slot_inh();
 }
 
 UINT8 a2bus_swyft_device::read_c0nx(address_space &space, UINT8 offset)
@@ -86,17 +84,20 @@ UINT8 a2bus_swyft_device::read_c0nx(address_space &space, UINT8 offset)
 	{
 		case 0:
 			m_rombank = 0;
-			raise_slot_inh();
+			m_inh_state = INH_READ;
+			recalc_slot_inh();
 			break;
 
 		case 1:
 			m_rombank = 0;
-			lower_slot_inh();
+			m_inh_state = INH_NONE;
+			recalc_slot_inh();
 			break;
 
 		case 2:
 			m_rombank = 0x1000;
-			raise_slot_inh();
+			m_inh_state = INH_READ;
+			recalc_slot_inh();
 			break;
 	}
 
@@ -109,23 +110,28 @@ void a2bus_swyft_device::write_c0nx(address_space &space, UINT8 offset, UINT8 da
 	{
 		case 0:
 			m_rombank = 0;
-			raise_slot_inh();
+			m_inh_state = INH_READ;
+			recalc_slot_inh();
 			break;
 
 		case 1:
 			m_rombank = 0;
-			lower_slot_inh();
+			m_inh_state = INH_NONE;
+			recalc_slot_inh();
 			break;
 
 		case 2:
 			m_rombank = 0x1000;
-			raise_slot_inh();
+			m_inh_state = INH_READ;
+			recalc_slot_inh();
 			break;
 	}
 }
 
 UINT8 a2bus_swyft_device::read_inh_rom(address_space &space, UINT16 offset)
 {
+	offset -= 0xd000;
+
 	if (offset < 0x1000)    // banked area d000-dfff
 	{
 		return m_rom[offset + m_rombank];
@@ -135,3 +141,9 @@ UINT8 a2bus_swyft_device::read_inh_rom(address_space &space, UINT16 offset)
 		return m_rom[offset - 0x1000 + 0x2000];
 	}
 }
+
+int a2bus_swyft_device::inh_type()
+{
+	return m_inh_state;
+}
+

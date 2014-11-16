@@ -928,6 +928,7 @@ static void apple2_mem_Cx00(running_machine &machine, offs_t begin, offs_t end, 
 static void apple2_mem_C300(running_machine &machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	apple2_state *state = machine.driver_data<apple2_state>();
+
 	if (((state->m_flags & (VAR_INTCXROM|VAR_SLOTC3ROM)) != VAR_SLOTC3ROM) && !(state->m_flags_mask & VAR_SLOTC3ROM))
 	{
 		meminfo->read_mem       = (begin & 0x0FFF) | (state->m_flags & VAR_ROMSWITCH ? 0x4000 : 0x0000) | APPLE2_MEM_ROM;
@@ -982,7 +983,7 @@ static void apple2_mem_D000(running_machine &machine, offs_t begin, offs_t end, 
 {
 	apple2_state *state = machine.driver_data<apple2_state>();
 
-	if (state->m_inh_slot == INH_SLOT_INVALID)
+	if (state->m_inh_slot == -1)
 	{
 		if (state->m_flags & VAR_LCRAM)
 		{
@@ -1028,7 +1029,7 @@ static void apple2_mem_E000(running_machine &machine, offs_t begin, offs_t end, 
 {
 	apple2_state *state = machine.driver_data<apple2_state>();
 
-	if (state->m_inh_slot == INH_SLOT_INVALID)
+	if (state->m_inh_slot == -1)
 	{
 		if (state->m_flags & VAR_LCRAM)
 		{
@@ -1921,12 +1922,10 @@ READ8_MEMBER ( apple2_state::apple2_c05x_r )
 			if (offset == 0xa)  // RAM
 			{
 				apple2_setvar(VAR_TK2000RAM, ~0);
-				printf("TK2000: RAM (PC %x)\n", m_maincpu->pc());
 			}
 			else if (offset == 0xb) // ROM
 			{
 				apple2_setvar(0, ~VAR_TK2000RAM);
-				printf("TK2000: ROM (PC %x)\n", m_maincpu->pc());
 			}
 		}
 
@@ -2226,7 +2225,7 @@ const applefdc_interface apple2_fdc_interface =
 
 void apple2_state::apple2_init_common()
 {
-	m_inh_slot = INH_SLOT_INVALID;
+	m_inh_slot = -1;
 	m_flags = 0;
 	m_fdc_diskreg = 0;
 
