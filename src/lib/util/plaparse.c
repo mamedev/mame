@@ -4,7 +4,9 @@
 
     plaparse.h
 
-    Parser for Berkeley standard PLA files into raw fusemaps.
+    Simple parser for Berkeley standard PLA files into raw fusemaps.
+    It supports no more than one output matrix, and is limited to
+    keywords: i, o, p, phase, e
 
 ***************************************************************************/
 
@@ -31,9 +33,11 @@
 
 struct parse_info
 {
-	UINT32  inputs;
-	UINT32  outputs;
-	UINT32  terms;
+	UINT32  inputs;     /* number of input columns */
+	UINT32  outputs;    /* number of output columns */
+	UINT32  terms;      /* number of terms */
+	UINT32  xorval[JED_MAX_FUSES/64];   /* output polarity */
+	UINT32  xorptr;
 };
 
 
@@ -57,20 +61,22 @@ static int iscrlf(char c)
     character stream
 -------------------------------------------------*/
 
-static UINT32 suck_number(const UINT8 **psrc)
+static UINT32 suck_number(const UINT8 **cursrc, const UINT8 *srcend)
 {
-	const UINT8 *src = *psrc;
 	UINT32 value = 0;
+	(*cursrc)++;
+	
+	// find first digit
+	while (*cursrc < srcend && !iscrlf(**cursrc) && !isdigit(**cursrc))
+		(*cursrc)++;
 
 	// loop over and accumulate digits
-	while (isdigit(*src))
+	while (isdigit(**cursrc))
 	{
-		value = value * 10 + *src - '0';
-		src++;
+		value = value * 10 + (**cursrc) - '0';
+		(*cursrc)++;
 	}
 
-	// return a pointer to the string afterwards
-	*psrc = src;
 	return value;
 }
 
@@ -81,113 +87,178 @@ static UINT32 suck_number(const UINT8 **psrc)
 ***************************************************************************/
 
 /*-------------------------------------------------
+    process_terms - process input/output matrix
+-------------------------------------------------*/
+
+static bool process_terms(jed_data *data, const UINT8 **cursrc, const UINT8 *srcend, parse_info *pinfo)
+{
+	UINT32 curinput = 0;
+	UINT32 curoutput = 0;
+	bool outputs = false;
+
+	while (*cursrc < srcend && **cursrc != '.' && **cursrc != '#')
+	{
+		switch (**cursrc)
+		{
+			case '-':
+				if (!outputs)
+				{
+					curinput++;
+					jed_set_fuse(data, data->numfuses++, 1);
+					jed_set_fuse(data, data->numfuses++, 1);
+
+					if (LOG_PARSE) printf("11");
+				}
+				break;
+
+			case '~':
+				if (!outputs)
+				{
+					curinput++;
+					// this product term is inhibited
+					jed_set_fuse(data, data->numfuses++, 0);
+					jed_set_fuse(data, data->numfuses++, 0);
+
+					if (LOG_PARSE) printf("00");
+				}
+				break;
+
+			case '1':
+				if (outputs)
+				{
+					curoutput++;
+					jed_set_fuse(data, data->numfuses++, 0);
+
+					if (LOG_PARSE) printf("0");
+				}
+				else
+				{
+					curinput++;
+					jed_set_fuse(data, data->numfuses++, 1);
+					jed_set_fuse(data, data->numfuses++, 0);
+
+					if (LOG_PARSE) printf("10");
+				}
+				break;
+
+			case '0':
+				if (outputs)
+				{
+					curoutput++;
+					jed_set_fuse(data, data->numfuses++, 1);
+
+					if (LOG_PARSE) printf("1");
+				}
+				else
+				{
+					curinput++;
+					jed_set_fuse(data, data->numfuses++, 0);
+					jed_set_fuse(data, data->numfuses++, 1);
+
+					if (LOG_PARSE) printf("01");
+				}
+				break;
+
+			case ' ': case '\t':
+				if (curinput > 0)
+				{
+					outputs = true;
+					if (LOG_PARSE) printf(" ");
+				}
+				break;
+		
+			default:
+				break;
+		}
+
+		if (iscrlf(**cursrc) && outputs)
+		{
+			outputs = false;
+			if (LOG_PARSE) printf("\n");
+			
+			if (curinput != pinfo->inputs || curoutput != pinfo->outputs)
+				return false;
+
+			curinput = 0;
+			curoutput = 0;
+		}
+
+		(*cursrc)++;
+	}
+	
+	return true;
+}
+
+
+
+/*-------------------------------------------------
     process_field - process a single field
 -------------------------------------------------*/
 
-static void process_field(jed_data *data, const UINT8 *cursrc, const UINT8 *srcend, parse_info *pinfo)
+static bool process_field(jed_data *data, const UINT8 **cursrc, const UINT8 *srcend, parse_info *pinfo)
 {
-	cursrc++;
+	(*cursrc)++;
 
-	// switch off of the field type
-	switch (*cursrc)
+	switch (**cursrc)
 	{
 		// number of inputs
 		case 'i':
-			cursrc += 2;
-			pinfo->inputs = suck_number(&cursrc);
+			pinfo->inputs = suck_number(cursrc, srcend);
+			if (pinfo->inputs == 0 || pinfo->inputs >= (JED_MAX_FUSES/2))
+				return false;
+
 			if (LOG_PARSE) printf("Inputs: %u\n", pinfo->inputs);
 			break;
 
 		// number of outputs
 		case 'o':
-			cursrc += 2;
-			pinfo->outputs = suck_number(&cursrc);
+			pinfo->outputs = suck_number(cursrc, srcend);
+			if (pinfo->outputs == 0 || pinfo->outputs >= (JED_MAX_FUSES/2))
+				return false;
+
 			if (LOG_PARSE) printf("Outputs: %u\n", pinfo->outputs);
 			break;
 
-		// number of product terms
 		case 'p':
-		{
-			cursrc += 2;
-			pinfo->terms = suck_number(&cursrc);
-			if (LOG_PARSE) printf("Terms: %u\n", pinfo->terms);
-
-			UINT32 curfuse = 0;
-			bool outputs = false;
-
-			cursrc++;
-			while (cursrc < srcend && *cursrc != '.')
+			// output polarity (optional)
+			if ((*cursrc)[1] == 'h' && (*cursrc)[2] == 'a' && (*cursrc)[3] == 's' && (*cursrc)[4] == 'e')
 			{
-				switch (*cursrc)
+				if (LOG_PARSE) printf("Phase...\n");
+				while (*cursrc < srcend && !iscrlf(**cursrc) && pinfo->xorptr < (JED_MAX_FUSES/2))
 				{
-				case '-':
-					if (!outputs)
+					if (**cursrc == '0' || **cursrc == '1')
 					{
-						jed_set_fuse(data, curfuse++, 1);
-						jed_set_fuse(data, curfuse++, 1);
-
-						if (LOG_PARSE) printf("11");
+						// 0 is negative
+						if (**cursrc == '0')
+							pinfo->xorval[pinfo->xorptr/32] |= 1 << (pinfo->xorptr & 31);
+						pinfo->xorptr++;
 					}
-					break;
-
-				case '1':
-					if (outputs)
-					{
-						jed_set_fuse(data, curfuse++, 0);
-
-						if (LOG_PARSE) printf("0");
-					}
-					else
-					{
-						jed_set_fuse(data, curfuse++, 1);
-						jed_set_fuse(data, curfuse++, 0);
-
-						if (LOG_PARSE) printf("10");
-					}
-					break;
-
-				case '0':
-					if (outputs)
-					{
-						jed_set_fuse(data, curfuse++, 1);
-
-						if (LOG_PARSE) printf("1");
-					}
-					else
-					{
-						jed_set_fuse(data, curfuse++, 0);
-						jed_set_fuse(data, curfuse++, 1);
-
-						if (LOG_PARSE) printf("01");
-					}
-					break;
-
-				case ' ':
-					outputs = true;
-					if (LOG_PARSE) printf(" ");
-					break;
+					
+					(*cursrc)++;
 				}
-
-				if (iscrlf(*cursrc) && outputs)
-				{
-					outputs = false;
-					if (LOG_PARSE) printf("\n");
-				}
-
-				cursrc++;
 			}
+			
+			// or number of product terms (optional)
+			else
+			{
+				pinfo->terms = suck_number(cursrc, srcend);
+				if (pinfo->terms == 0 || pinfo->terms >= (JED_MAX_FUSES/2))
+					return false;
 
-			data->numfuses = curfuse;
+				if (LOG_PARSE) printf("Terms: %u\n", pinfo->terms);
+			}
 			break;
-		}
 
-		// end of file
+		// end of file (optional)
 		case 'e':
 			if (LOG_PARSE) printf("End of file\n");
 			break;
+		
+		default:
+			return false;
 	}
-
-	cursrc++;
+	
+	return true;
 }
 
 
@@ -201,34 +272,53 @@ int pla_parse(const void *data, size_t length, jed_data *result)
 {
 	const UINT8 *cursrc = (const UINT8 *)data;
 	const UINT8 *srcend = cursrc + length;
-	const UINT8 *scan;
+	
 	parse_info pinfo;
+	memset(&pinfo, 0, sizeof(pinfo));
 
 	result->numfuses = 0;
-	memset(result->fusemap, 0x00, sizeof(result->fusemap));
+	memset(result->fusemap, 0, sizeof(result->fusemap));
 
 	while (cursrc < srcend)
 	{
-		if (*cursrc == '#')
+		switch (*cursrc)
 		{
-			cursrc++;
-			while (cursrc < srcend && !iscrlf(*cursrc))
+			// comment line
+			case '#':
+				while (cursrc < srcend && !iscrlf(*cursrc))
+					cursrc++;
+				break;
+
+			// keyword
+			case '.':
+				if (!process_field(result, &cursrc, srcend, &pinfo))
+					return JEDERR_INVALID_DATA;
+				break;
+			
+			// terms
+			case '0': case '1': case '-': case '~':
+				if (!process_terms(result, &cursrc, srcend, &pinfo))
+					return JEDERR_INVALID_DATA;
+				break;
+			
+			default:
 				cursrc++;
+				break;
 		}
-		else if (*cursrc == '.')
+	}
+	
+	// write output polarity
+	if (pinfo.xorptr > 0)
+	{
+		if (LOG_PARSE) printf("Polarity: ");
+		
+		for (int i = 0; i < pinfo.outputs; i++)
 		{
-			scan = cursrc;
-			while (scan < srcend && !iscrlf(*scan))
-				scan++;
-			if (scan >= srcend)
-				return JEDERR_INVALID_DATA;
-
-			process_field(result, cursrc, srcend, &pinfo);
-
-			cursrc = scan + 1;
+			int bit = pinfo.xorval[i/32] >> (i & 31) & 1;
+			jed_set_fuse(result, result->numfuses++, bit);
+			if (LOG_PARSE) printf("%d", bit);
 		}
-
-		cursrc++;
+		if (LOG_PARSE) printf("\n");
 	}
 
 	return JEDERR_NONE;
