@@ -15,6 +15,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/z80dart.h"
+#include "bus/rs232/rs232.h"
 
 class ngen_state : public driver_device
 {
@@ -74,7 +75,10 @@ WRITE_LINE_MEMBER(ngen_state::pit_out1_w)
 
 WRITE_LINE_MEMBER(ngen_state::pit_out2_w)
 {
-	logerror("PIT Timer 2 state %i\n",state);
+	m_iouart->rxca_w(state);
+	m_iouart->rxcb_w(state);
+	m_iouart->txca_w(state);
+	m_iouart->txcb_w(state);
 }
 
 WRITE16_MEMBER(ngen_state::cpu_peripheral_cb)
@@ -113,6 +117,22 @@ WRITE16_MEMBER(ngen_state::peripheral_w)
 {
 	switch(offset)
 	{
+	case 0x110:
+		if(mem_mask & 0x00ff)
+			m_pit->write(space,0,data & 0x0ff);
+		break;
+	case 0x111:
+		if(mem_mask & 0x00ff)
+			m_pit->write(space,1,data & 0x0ff);
+		break;
+	case 0x112:
+		if(mem_mask & 0x00ff)
+			m_pit->write(space,2,data & 0x0ff);
+		break;
+	case 0x113:
+		if(mem_mask & 0x00ff)
+			m_pit->write(space,3,data & 0x0ff);
+		break;
 	case 0x141:
 		// bit 1 enables speaker?
 		COMBINE_DATA(&m_periph141);
@@ -126,14 +146,10 @@ WRITE16_MEMBER(ngen_state::peripheral_w)
 			m_crtc->register_w(space,0,data & 0xff);
 		break;
 	case 0x146:
-		if(mem_mask & 0x00ff)
-			m_iouart->ba_cd_w(space,0,data & 0xff);
 		logerror("Video write offset 0x146 data %04x mask %04x\n",data,mem_mask);
 		break;
 	case 0x147:
-		if(mem_mask & 0x00ff)
-			m_iouart->ba_cd_w(space,1,data & 0xff);
-		logerror("Video write offset 0x147 data %04x mask %04x\n",data,mem_mask);
+		//logerror("Video write offset 0x147 data %04x mask %04x\n",data,mem_mask);
 		break;
 	default:
 		logerror("(PC=%06x) Unknown 80186 peripheral write offset %04x data %04x mask %04x\n",m_maincpu->device_t::safe_pc(),offset,data,mem_mask);
@@ -145,6 +161,22 @@ READ16_MEMBER(ngen_state::peripheral_r)
 	UINT16 ret = 0xffff;
 	switch(offset)
 	{
+	case 0x110:
+		if(mem_mask & 0x00ff)
+			ret = m_pit->read(space,0);
+		break;
+	case 0x111:
+		if(mem_mask & 0x00ff)
+			ret = m_pit->read(space,1);
+		break;
+	case 0x112:
+		if(mem_mask & 0x00ff)
+			ret = m_pit->read(space,2);
+		break;
+	case 0x113:
+		if(mem_mask & 0x00ff)
+			ret = m_pit->read(space,3);
+		break;
 	case 0x141:
 		ret = m_periph141;
 		break;
@@ -246,17 +278,36 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	MCFG_PIC8259_ADD( "pic", INPUTLINE("maincpu", 0), VCC, NULL )
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
-	MCFG_PIT8253_CLK0(4772720/4)  // correct?
+	MCFG_PIT8253_CLK0(XTAL_14_7456MHz/8)  // correct?
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(ngen_state, pit_out0_w))
-	MCFG_PIT8253_CLK0(4772720/4)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(ngen_state, pit_out1_w))
-	MCFG_PIT8253_CLK0(4772720/4)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(ngen_state, pit_out2_w))
+	MCFG_PIT8253_CLK1(XTAL_14_7456MHz/8)
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(ngen_state, pit_out1_w))
+	MCFG_PIT8253_CLK2(XTAL_14_7456MHz/8)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(ngen_state, pit_out2_w))
 
 	MCFG_DEVICE_ADD("dmac", AM9517A, XTAL_14_7456MHz / 3)  // NEC D8237A, divisor unknown
 
 	// I/O board
-	MCFG_UPD7201_ADD("iouart",XTAL_14_7456MHz / 3, 0,0,0,0) // no clock visible on I/O board, guessing for now
+	MCFG_UPD7201_ADD("iouart",0, 0,0,0,0) // clocked by PIT channel 2?
+	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("rs232_a", default_rs232_devices, NULL)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("iouart", upd7201_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("iouart", upd7201_device, ctsa_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("iouart", upd7201_device, dcda_w))
+	MCFG_RS232_RI_HANDLER(DEVWRITELINE("iouart", upd7201_device, ria_w))
+
+	MCFG_RS232_PORT_ADD("rs232_b", default_rs232_devices, NULL)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("iouart", upd7201_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("iouart", upd7201_device, ctsb_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("iouart", upd7201_device, dcdb_w))
+	MCFG_RS232_RI_HANDLER(DEVWRITELINE("iouart", upd7201_device, rib_w))
+
 
 	// video board
 	MCFG_SCREEN_ADD("screen", RASTER)
