@@ -69,6 +69,8 @@ static UINT32 suck_number(const UINT8 **cursrc, const UINT8 *srcend)
 	// find first digit
 	while (*cursrc < srcend && !iscrlf(**cursrc) && !isdigit(**cursrc))
 		(*cursrc)++;
+	if (*cursrc >= srcend)
+		return 0;
 
 	// loop over and accumulate digits
 	while (isdigit(**cursrc))
@@ -160,7 +162,7 @@ static bool process_terms(jed_data *data, const UINT8 **cursrc, const UINT8 *src
 				break;
 
 			case ' ': case '\t':
-				if (curinput > 0)
+				if (curinput > 0 && !outputs)
 				{
 					outputs = true;
 					if (LOG_PARSE) printf(" ");
@@ -202,7 +204,7 @@ static bool process_field(jed_data *data, const UINT8 **cursrc, const UINT8 *src
 	switch (**cursrc)
 	{
 		// number of inputs
-		case 'i':
+		case 'i': case 'I':
 			pinfo->inputs = suck_number(cursrc, srcend);
 			if (pinfo->inputs == 0 || pinfo->inputs >= (JED_MAX_FUSES/2))
 				return false;
@@ -211,7 +213,7 @@ static bool process_field(jed_data *data, const UINT8 **cursrc, const UINT8 *src
 			break;
 
 		// number of outputs
-		case 'o':
+		case 'o': case 'O':
 			pinfo->outputs = suck_number(cursrc, srcend);
 			if (pinfo->outputs == 0 || pinfo->outputs >= (JED_MAX_FUSES/2))
 				return false;
@@ -219,9 +221,9 @@ static bool process_field(jed_data *data, const UINT8 **cursrc, const UINT8 *src
 			if (LOG_PARSE) printf("Outputs: %u\n", pinfo->outputs);
 			break;
 
-		case 'p':
+		case 'p': case 'P':
 			// output polarity (optional)
-			if ((*cursrc)[1] == 'h' && (*cursrc)[2] == 'a' && (*cursrc)[3] == 's' && (*cursrc)[4] == 'e')
+			if (tolower((*cursrc)[1]) == 'h' && tolower((*cursrc)[2]) == 'a' && tolower((*cursrc)[3]) == 's' && tolower((*cursrc)[4]) == 'e')
 			{
 				if (LOG_PARSE) printf("Phase...\n");
 				while (*cursrc < srcend && !iscrlf(**cursrc) && pinfo->xorptr < (JED_MAX_FUSES/2))
@@ -250,7 +252,7 @@ static bool process_field(jed_data *data, const UINT8 **cursrc, const UINT8 *src
 			break;
 
 		// end of file (optional)
-		case 'e':
+		case 'e': case 'E':
 			if (LOG_PARSE) printf("End of file\n");
 			break;
 		
