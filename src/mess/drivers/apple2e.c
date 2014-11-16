@@ -1891,8 +1891,6 @@ void apple2e_state::write_slot_rom(address_space &space, int slotbias, int offse
 
 UINT8 apple2e_state::read_int_rom(address_space &space, int slotbias, int offset)
 {
-	int slotnum = (slotbias & 0x700) >> 8;
-
 	if ((m_cnxx_slot == CNXX_UNCLAIMED) && (!space.debugger_access()))
 	{
 		m_cnxx_slot = CNXX_INTROM;
