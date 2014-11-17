@@ -52,8 +52,8 @@ private:
 	required_device<am9517a_device> m_dmac;
 	required_device<pic8259_device> m_pic;
 	required_device<pit8254_device> m_pit;
-	required_shared_ptr<UINT16> m_vram;
-	required_shared_ptr<UINT16> m_fontram;
+	optional_shared_ptr<UINT16> m_vram;
+	optional_shared_ptr<UINT16> m_fontram;
 
 	UINT16 m_peripheral;
 	UINT16 m_upper;
