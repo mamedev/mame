@@ -954,7 +954,7 @@ ROM_START( llander )
 	/* Vector ROM */
 	ROM_LOAD( "034599-01.r3",  0x4800, 0x0800, CRC(355a9371) SHA1(6ecb40169b797d9eb623bcb17872f745b1bf20fa) )
 	ROM_LOAD( "034598-01.np3", 0x5000, 0x0800, CRC(9c4ffa68) SHA1(eb4ffc289d254f699f821df3146aa2c6cd78597f) )
-	ROM_LOAD( "034597-01",     0x5800, 0x0800, CRC(503f992e) SHA1(3e88a110ced9ee1927b0ba760b8d92cbc93e645d) )
+	ROM_LOAD( "034597-01.m3",  0x5800, 0x0800, CRC(503f992e) SHA1(3e88a110ced9ee1927b0ba760b8d92cbc93e645d) ) /* built from original Atari source code */
 
 	/* DVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
@@ -970,7 +970,7 @@ ROM_START( llander1 )
 	/* Vector ROM */
 	ROM_LOAD( "034599-01.r3",  0x4800, 0x0800, CRC(355a9371) SHA1(6ecb40169b797d9eb623bcb17872f745b1bf20fa) )
 	ROM_LOAD( "034598-01.np3", 0x5000, 0x0800, CRC(9c4ffa68) SHA1(eb4ffc289d254f699f821df3146aa2c6cd78597f) )
-	ROM_LOAD( "034597-01",     0x5800, 0x0800, CRC(503f992e) SHA1(3e88a110ced9ee1927b0ba760b8d92cbc93e645d) )
+	ROM_LOAD( "034597-01.m3",  0x5800, 0x0800, CRC(503f992e) SHA1(3e88a110ced9ee1927b0ba760b8d92cbc93e645d) ) /* built from original Atari source code */
 
 	/* DVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
