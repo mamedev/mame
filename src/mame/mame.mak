@@ -2480,6 +2480,8 @@ $(DRIVERS)/aces1.o:     $(LAYOUT)/aces1.lh
 
 $(DRIVERS)/acefruit.o:  $(LAYOUT)/sidewndr.lh
 
+$(DRIVERS)/alinvade.o:  $(LAYOUT)/alinvade.lh
+
 $(DRIVERS)/allied.o:    $(LAYOUT)/allied.lh
 
 $(DRIVERS)/amaticmg.o:  $(LAYOUT)/suprstar.lh

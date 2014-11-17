@@ -8,6 +8,8 @@
 #include "includes/apple2.h"
 #include "machine/ram.h"
 
+#include "video/apple2.h"
+
 /***************************************************************************/
 
 
@@ -664,3 +666,801 @@ UINT32 apple2_state::screen_update_apple2(screen_device &screen, bitmap_ind16 &b
 	}
 	return 0;
 }
+
+/*
+	New implementation 
+*/
+
+const device_type APPLE2_VIDEO = &device_creator<a2_video_device>;
+
+//-------------------------------------------------
+//  a2_video_device - constructor
+//-------------------------------------------------
+
+a2_video_device::a2_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, APPLE2_VIDEO, "Apple II video", tag, owner, clock, "a2video", __FILE__)
+{
+}
+
+void a2_video_device::device_start()
+{
+	static const UINT8 hires_artifact_color_table[] =
+	{
+		BLACK,  PURPLE, GREEN,  WHITE,
+		BLACK,  BLUE,   ORANGE, WHITE
+	};
+	static const UINT8 dhires_artifact_color_table[] =
+	{
+		BLACK,      DKGREEN,    BROWN,  GREEN,
+		DKRED,      DKGRAY,     ORANGE, YELLOW,
+		DKBLUE,     BLUE,       GRAY,   AQUA,
+		PURPLE,     LTBLUE,     PINK,   WHITE
+	};
+
+	// generate hi-res artifact data
+	int i, j;
+	UINT16 c;
+
+	/* 2^3 dependent pixels * 2 color sets * 2 offsets */
+	m_hires_artifact_map = auto_alloc_array(machine(), UINT16, 8 * 2 * 2);
+
+	/* build hires artifact map */
+	for (i = 0; i < 8; i++)
+	{
+		for (j = 0; j < 2; j++)
+		{
+			if (i & 0x02)
+			{
+				if ((i & 0x05) != 0)
+					c = 3;
+				else
+					c = j ? 2 : 1;
+			}
+			else
+			{
+				if ((i & 0x05) == 0x05)
+					c = j ? 1 : 2;
+				else
+					c = 0;
+			}
+			m_hires_artifact_map[ 0 + j*8 + i] = hires_artifact_color_table[(c + 0) % 8];
+			m_hires_artifact_map[16 + j*8 + i] = hires_artifact_color_table[(c + 4) % 8];
+		}
+	}
+
+	/* 2^4 dependent pixels */
+	m_dhires_artifact_map = auto_alloc_array(machine(), UINT16, 16);
+
+	/* build double hires artifact map */
+	for (i = 0; i < 16; i++)
+	{
+		m_dhires_artifact_map[i] = dhires_artifact_color_table[i];
+	}
+
+	save_item(NAME(m_page2));
+	save_item(NAME(m_flash));
+	save_item(NAME(m_mix));
+	save_item(NAME(m_graphics));
+	save_item(NAME(m_hires));
+	save_item(NAME(m_dhires));
+	save_item(NAME(m_80col));
+	save_item(NAME(m_altcharset));
+}
+
+void a2_video_device::device_reset()
+{
+	m_page2 = false;
+	m_graphics = false;
+	m_hires = false;
+	m_80col = false;
+	m_altcharset = false;
+	m_dhires = false;
+	m_flash = false;
+	m_sysconfig = 0;
+}
+
+void a2_video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, UINT32 code,
+	const UINT8 *textgfx_data, UINT32 textgfx_datalen, int fg, int bg)
+{
+	int x, y, i;
+	const UINT8 *chardata;
+	UINT16 color;
+
+	if (!m_altcharset)
+	{
+		if ((code >= 0x40) && (code <= 0x7f))
+		{
+			code &= 0x3f;
+
+			if (m_flash)
+			{
+				i = fg;
+				fg = bg;
+				bg = i;
+			}
+		}
+	}
+	else
+	{
+		if ((code >= 0x60) && (code <= 0x7f))
+		{
+			code |= 0x80;	// map to lowercase normal
+			i = fg;			// and flip the color
+			fg = bg;
+			bg = i;
+		}
+	}
+
+	/* look up the character data */
+	chardata = &textgfx_data[(code * 8)];
+
+	for (y = 0; y < 8; y++)
+	{
+		for (x = 0; x < 7; x++)
+		{
+			color = (chardata[y] & (1 << x)) ? bg : fg;
+
+			for (i = 0; i < xscale; i++)
+			{
+				bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color;
+			}
+		}
+	}
+}
+
+void a2_video_device::plot_text_character_orig(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, UINT32 code,
+	const UINT8 *textgfx_data, UINT32 textgfx_datalen, int fg, int bg)
+{
+	int x, y, i;
+	const UINT8 *chardata;
+	UINT16 color;
+
+	if ((code >= 0x40) && (code <= 0x7f))
+	{
+		if (m_flash)
+		{
+			i = fg;
+			fg = bg;
+			bg = i;
+		}
+	}
+
+	/* look up the character data */
+	chardata = &textgfx_data[(code * 8)];
+
+	for (y = 0; y < 8; y++)
+	{
+		for (x = 0; x < 7; x++)
+		{
+			color = (chardata[y] & (1 << (6-x))) ? fg : bg;
+
+			for (i = 0; i < xscale; i++)
+			{
+				bitmap.pix16(ypos + y, xpos + (x * xscale) + i) = color;
+			}
+		}
+	}
+}
+
+void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
+{
+	int row, col, y, x;
+	UINT8 code;
+	UINT32 start_address = m_page2 ? 0x0800 : 0x0400;
+	UINT32 address;
+	int fg;
+
+	switch (m_sysconfig & 0x03)
+	{
+		case 0: fg = WHITE; break;
+		case 1: fg = WHITE; break;
+		case 2: fg = GREEN; break;
+		case 3: fg = ORANGE; break;
+	}
+
+	/* perform adjustments */
+	beginrow = MAX(beginrow, cliprect.min_y - (cliprect.min_y % 8));
+	endrow = MIN(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+
+	if (!(m_sysconfig & 0x03))
+	{
+		for (row = beginrow; row <= endrow; row += 8)
+		{
+			for (col = 0; col < 40; col++)
+			{
+				/* calculate adderss */
+				address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
+
+				/* perform the lookup */
+				code = m_ram_ptr[address];
+
+				/* and now draw */
+				for (y = 0; y < 4; y++)
+				{
+					for (x = 0; x < 14; x++)
+						bitmap.pix16(row + y, col * 14 + x) = (code >> 0) & 0x0F;
+				}
+				for (y = 4; y < 8; y++)
+				{
+					for (x = 0; x < 14; x++)
+						bitmap.pix16(row + y, col * 14 + x) = (code >> 4) & 0x0F;
+				}
+			}
+		}
+	}
+	else
+	{
+		for (row = beginrow; row <= endrow; row += 8)
+		{
+			for (col = 0; col < 40; col++)
+			{
+				UINT8 bits;
+
+				/* calculate adderss */
+				address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
+
+				/* perform the lookup */
+				code = m_ram_ptr[address];
+
+				bits = (code >> 0) & 0x0F;
+				/* and now draw */
+				for (y = 0; y < 4; y++)
+				{
+					for (x = 0; x < 14; x++)
+					{
+						bitmap.pix16(row + y, col * 14 + x) = bits & (1 << (x % 4)) ? fg : 0;
+					}
+				}
+
+				bits = (code >> 4) & 0x0F;
+				for (y = 4; y < 8; y++)
+				{
+					for (x = 0; x < 14; x++)
+						bitmap.pix16(row + y, col * 14 + x) = bits & (1 << (x % 4)) ? fg : 0;
+				}
+			}
+		}
+	}
+}
+
+void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
+{
+	int row, col, y;
+	UINT8 code, auxcode;
+	UINT32 start_address = m_page2 ? 0x0800 : 0x0400;
+	UINT32 address;
+	static const int aux_colors[16] = { 0, 2, 4, 6, 8, 0xa, 0xc, 0xe, 1, 3, 5, 7, 9, 0xb, 0xd, 0xf };
+	int fg;
+
+	switch (m_sysconfig & 0x03)
+	{
+		case 0: fg = WHITE; break;
+		case 1: fg = WHITE; break;
+		case 2: fg = GREEN; break;
+		case 3: fg = ORANGE; break;
+	}
+
+	/* perform adjustments */
+	beginrow = MAX(beginrow, cliprect.min_y - (cliprect.min_y % 8));
+	endrow = MIN(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+
+	if (!(m_sysconfig & 0x03))
+	{
+		for (row = beginrow; row <= endrow; row += 8)
+		{
+			for (col = 0; col < 40; col++)
+			{
+				/* calculate adderss */
+				address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
+
+				/* perform the lookup */
+				code = m_ram_ptr[address];
+				auxcode = m_aux_ptr[address];
+
+				/* and now draw */
+				for (y = 0; y < 4; y++)
+				{
+					UINT16 *vram = &bitmap.pix16(row + y, (col * 14));
+
+					*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
+					*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
+					*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
+					*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
+					*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
+					*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
+					*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
+					*vram++ = (code >> 0) & 0x0F;
+					*vram++ = (code >> 0) & 0x0F;
+					*vram++ = (code >> 0) & 0x0F;
+					*vram++ = (code >> 0) & 0x0F;
+					*vram++ = (code >> 0) & 0x0F;
+					*vram++ = (code >> 0) & 0x0F;
+					*vram++ = (code >> 0) & 0x0F;
+				}
+				for (y = 4; y < 8; y++)
+				{
+					UINT16 *vram = &bitmap.pix16(row + y, (col * 14));
+
+					*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
+					*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
+					*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
+					*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
+					*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
+					*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
+					*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
+					*vram++ = (code >> 4) & 0x0F;
+					*vram++ = (code >> 4) & 0x0F;
+					*vram++ = (code >> 4) & 0x0F;
+					*vram++ = (code >> 4) & 0x0F;
+					*vram++ = (code >> 4) & 0x0F;
+					*vram++ = (code >> 4) & 0x0F;
+					*vram++ = (code >> 4) & 0x0F;
+				}
+			}
+		}
+	}
+	else
+	{
+		for (row = beginrow; row <= endrow; row += 8)
+		{
+			for (col = 0; col < 40; col++)
+			{
+				UINT8 bits, abits;
+
+				/* calculate adderss */
+				address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
+
+				/* perform the lookup */
+				code = m_ram_ptr[address];
+				auxcode = m_aux_ptr[address];
+
+				bits = (code >> 0) & 0x0F;
+				abits = (auxcode >> 0) & 0x0F;
+
+				/* and now draw */
+				for (y = 0; y < 4; y++)
+				{
+					UINT16 *vram = &bitmap.pix16(row + y, (col * 14));
+
+					*vram++ = abits & (1 << 0) ? fg : 0; 
+					*vram++ = abits & (1 << 1) ? fg : 0; 
+					*vram++ = abits & (1 << 2) ? fg : 0; 
+					*vram++ = abits & (1 << 3) ? fg : 0; 
+					*vram++ = abits & (1 << 0) ? fg : 0; 
+					*vram++ = abits & (1 << 1) ? fg : 0; 
+					*vram++ = abits & (1 << 2) ? fg : 0; 
+					*vram++ = bits & (1 << 0) ? fg : 0; 
+					*vram++ = bits & (1 << 1) ? fg : 0; 
+					*vram++ = bits & (1 << 2) ? fg : 0; 
+					*vram++ = bits & (1 << 3) ? fg : 0; 
+					*vram++ = bits & (1 << 0) ? fg : 0; 
+					*vram++ = bits & (1 << 1) ? fg : 0; 
+					*vram++ = bits & (1 << 2) ? fg : 0; 
+				}
+
+				bits = (code >> 4) & 0x0F;
+				abits = (auxcode >> 4) & 0x0F;
+
+				for (y = 4; y < 8; y++)
+				{
+					UINT16 *vram = &bitmap.pix16(row + y, (col * 14));
+
+					*vram++ = abits & (1 << 0) ? fg : 0; 
+					*vram++ = abits & (1 << 1) ? fg : 0; 
+					*vram++ = abits & (1 << 2) ? fg : 0; 
+					*vram++ = abits & (1 << 3) ? fg : 0; 
+					*vram++ = abits & (1 << 0) ? fg : 0; 
+					*vram++ = abits & (1 << 1) ? fg : 0; 
+					*vram++ = abits & (1 << 2) ? fg : 0; 
+					*vram++ = bits & (1 << 0) ? fg : 0; 
+					*vram++ = bits & (1 << 1) ? fg : 0; 
+					*vram++ = bits & (1 << 2) ? fg : 0; 
+					*vram++ = bits & (1 << 3) ? fg : 0; 
+					*vram++ = bits & (1 << 0) ? fg : 0; 
+					*vram++ = bits & (1 << 1) ? fg : 0; 
+					*vram++ = bits & (1 << 2) ? fg : 0; 
+				}
+			}
+		}
+	}
+}
+
+void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
+{
+	int row, col;
+	UINT32 start_address;
+	UINT32 address;
+	UINT8 *aux_page = m_ram_ptr; 
+	int fg;
+	int bg = 0;
+
+	if (m_80col)
+	{
+		start_address = 0x400;
+		if (m_aux_ptr)
+		{
+			aux_page = m_aux_ptr; 
+		}
+	}
+	else
+	{
+		start_address = m_page2 ? 0x800 : 0x400; 
+	}
+
+	beginrow = MAX(beginrow, cliprect.min_y - (cliprect.min_y % 8));
+	endrow = MIN(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+
+	switch (m_sysconfig & 0x03)
+	{
+		case 0: fg = WHITE; break;
+		case 1: fg = WHITE; break;
+		case 2: fg = GREEN; break;
+		case 3: fg = ORANGE; break;
+	}
+
+	for (row = beginrow; row <= endrow; row += 8)
+	{
+		if (m_80col)
+		{
+			for (col = 0; col < 40; col++) 
+			{
+				/* calculate address */
+				address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
+
+				plot_text_character(bitmap, col * 14, row, 1, aux_page[address],
+					m_char_ptr, m_char_size, fg, bg);
+				plot_text_character(bitmap, col * 14 + 7, row, 1, m_ram_ptr[address],
+					m_char_ptr, m_char_size, fg, bg);
+			}
+		}
+		else
+		{
+			for (col = 0; col < 40; col++) 
+			{
+				/* calculate address */
+				address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
+				plot_text_character(bitmap, col * 14, row, 2, m_ram_ptr[address],
+					m_char_ptr, m_char_size, fg, bg);
+			}
+		}
+	}
+}
+
+void a2_video_device::text_update_orig(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
+{
+	int row, col;
+	UINT32 start_address = m_page2 ? 0x800 : 0x400;  
+	UINT32 address;
+	int fg;
+	int bg = 0;
+
+	beginrow = MAX(beginrow, cliprect.min_y - (cliprect.min_y % 8));
+	endrow = MIN(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+
+	switch (m_sysconfig & 0x03)
+	{
+		case 0: fg = WHITE; break;
+		case 1: fg = WHITE; break;
+		case 2: fg = GREEN; break;
+		case 3: fg = ORANGE; break;
+	}
+
+	for (row = beginrow; row <= endrow; row += 8)
+	{
+		for (col = 0; col < 40; col++) 
+		{
+			/* calculate address */
+			address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
+			plot_text_character_orig(bitmap, col * 14, row, 2, m_ram_ptr[address],
+				m_char_ptr, m_char_size, fg, bg);
+		}
+	}
+}
+
+void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
+{
+	const UINT8 *vram;
+	int row, col, b;
+	int offset;
+	UINT8 vram_row[42];
+	UINT16 v;
+	UINT16 *p;
+	UINT32 w;
+	UINT16 *artifact_map_ptr;
+	int mon_type = m_sysconfig & 0x03;
+
+	/* sanity checks */
+	if (beginrow < cliprect.min_y)
+		beginrow = cliprect.min_y;
+	if (endrow > cliprect.max_y)
+		endrow = cliprect.max_y;
+	if (endrow < beginrow)
+		return;
+
+	vram = &m_ram_ptr[(m_page2 ? 0x4000 : 0x2000)];
+
+	vram_row[0] = 0;
+	vram_row[41] = 0;
+
+	for (row = beginrow; row <= endrow; row++)
+	{
+		for (col = 0; col < 40; col++)
+		{
+			offset = ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col)) | ((row & 7) << 10);
+			vram_row[1+col] = vram[offset];
+		}
+
+		p = &bitmap.pix16(row);
+
+		for (col = 0; col < 40; col++)
+		{
+			w =     (((UINT32) vram_row[col+0] & 0x7f) <<  0)
+				|   (((UINT32) vram_row[col+1] & 0x7f) <<  7)
+				|   (((UINT32) vram_row[col+2] & 0x7f) << 14);
+
+			switch (mon_type)
+			{
+				case 0:
+					artifact_map_ptr = &m_hires_artifact_map[((vram_row[col+1] & 0x80) >> 7) * 16];
+					for (b = 0; b < 7; b++)
+					{
+						v = artifact_map_ptr[((w >> (b + 7-1)) & 0x07) | (((b ^ col) & 0x01) << 3)];
+						*(p++) = v;
+						*(p++) = v;
+					}
+					break;
+
+				case 1:
+					w >>= 7;
+					for (b = 0; b < 7; b++)
+					{
+						v = (w & 1);
+						w >>= 1;
+						*(p++) = v ? WHITE : BLACK;
+						*(p++) = v ? WHITE : BLACK;
+					}
+					break;
+
+				case 2:
+					w >>= 7;
+					for (b = 0; b < 7; b++)
+					{
+						v = (w & 1);
+						w >>= 1;
+						*(p++) = v ? GREEN : BLACK;
+						*(p++) = v ? GREEN : BLACK;
+					}
+					break;
+
+				case 3:
+					w >>= 7;
+					for (b = 0; b < 7; b++)
+					{
+						v = (w & 1);
+						w >>= 1;
+						*(p++) = v ? ORANGE : BLACK;
+						*(p++) = v ? ORANGE : BLACK;
+					}
+					break;
+			}
+		}
+	}
+}
+
+// similar to regular A2 except page 2 is at $A000
+void a2_video_device::hgr_update_tk2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
+{
+	const UINT8 *vram;
+	int row, col, b;
+	int offset;
+	UINT8 vram_row[42];
+	UINT16 v;
+	UINT16 *p;
+	UINT32 w;
+	UINT16 *artifact_map_ptr;
+	int mon_type = m_sysconfig & 0x03;
+
+	/* sanity checks */
+	if (beginrow < cliprect.min_y)
+		beginrow = cliprect.min_y;
+	if (endrow > cliprect.max_y)
+		endrow = cliprect.max_y;
+	if (endrow < beginrow)
+		return;
+
+	vram = &m_ram_ptr[(m_page2 ? 0xa000 : 0x2000)];
+
+	vram_row[0] = 0;
+	vram_row[41] = 0;
+
+	for (row = beginrow; row <= endrow; row++)
+	{
+		for (col = 0; col < 40; col++)
+		{
+			offset = ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col)) | ((row & 7) << 10);
+			vram_row[1+col] = vram[offset];
+		}
+
+		p = &bitmap.pix16(row);
+
+		for (col = 0; col < 40; col++)
+		{
+			w =     (((UINT32) vram_row[col+0] & 0x7f) <<  0)
+				|   (((UINT32) vram_row[col+1] & 0x7f) <<  7)
+				|   (((UINT32) vram_row[col+2] & 0x7f) << 14);
+
+			switch (mon_type)
+			{
+				case 0:
+					artifact_map_ptr = &m_hires_artifact_map[((vram_row[col+1] & 0x80) >> 7) * 16];
+					for (b = 0; b < 7; b++)
+					{
+						v = artifact_map_ptr[((w >> (b + 7-1)) & 0x07) | (((b ^ col) & 0x01) << 3)];
+						*(p++) = v;
+						*(p++) = v;
+					}
+					break;
+
+				case 1:
+					w >>= 7;
+					for (b = 0; b < 7; b++)
+					{
+						v = (w & 1);
+						w >>= 1;
+						*(p++) = v ? WHITE : BLACK;
+						*(p++) = v ? WHITE : BLACK;
+					}
+					break;
+
+				case 2:
+					w >>= 7;
+					for (b = 0; b < 7; b++)
+					{
+						v = (w & 1);
+						w >>= 1;
+						*(p++) = v ? GREEN : BLACK;
+						*(p++) = v ? GREEN : BLACK;
+					}
+					break;
+
+				case 3:
+					w >>= 7;
+					for (b = 0; b < 7; b++)
+					{
+						v = (w & 1);
+						w >>= 1;
+						*(p++) = v ? ORANGE : BLACK;
+						*(p++) = v ? ORANGE : BLACK;
+					}
+					break;
+			}
+		}
+	}
+}
+
+void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
+{
+	const UINT8 *vram, *vaux;
+	int row, col, b;
+	int offset;
+	UINT8 vram_row[82];
+	UINT16 v;
+	UINT16 *p;
+	UINT32 w;
+	int page = m_page2 ? 0x4000 : 0x2000;
+	int mon_type = m_sysconfig & 0x03;
+
+	/* sanity checks */
+	if (beginrow < cliprect.min_y)
+		beginrow = cliprect.min_y;
+	if (endrow > cliprect.max_y)
+		endrow = cliprect.max_y;
+	if (endrow < beginrow)
+		return;
+
+	vram = &m_ram_ptr[page];
+	if (m_aux_ptr)
+	{
+		vaux = m_aux_ptr; 
+	}
+	else
+	{
+		vaux = vram;
+	}
+	vaux += page;
+
+	vram_row[0] = 0;
+	vram_row[81] = 0;
+
+	for (row = beginrow; row <= endrow; row++)
+	{
+		for (col = 0; col < 40; col++)
+		{
+			offset = ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col)) | ((row & 7) << 10);
+			vram_row[1+(col*2)+0] = vaux[offset];
+			vram_row[1+(col*2)+1] = vram[offset];
+		}
+
+		p = &bitmap.pix16(row);
+
+		for (col = 0; col < 80; col++)
+		{
+			w =     (((UINT32) vram_row[col+0] & 0x7f) <<  0)
+				|   (((UINT32) vram_row[col+1] & 0x7f) <<  7)
+				|   (((UINT32) vram_row[col+2] & 0x7f) << 14);
+
+			switch (mon_type)
+			{
+				case 0:
+					for (b = 0; b < 7; b++)
+					{
+						v = m_dhires_artifact_map[((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (((2-(col*7+b))) & 0x03)) & 0x0F];
+						*(p++) = v;
+					}
+					break;
+
+				case 1:
+					w >>= 7;
+					for (b = 0; b < 7; b++)
+					{
+						v = (w & 1);
+						w >>= 1;
+						*(p++) = v ? WHITE : BLACK;
+					}
+					break;
+
+				case 2:
+					w >>= 7;
+					for (b = 0; b < 7; b++)
+					{
+						v = (w & 1);
+						w >>= 1;
+						*(p++) = v ? GREEN : BLACK;
+					}
+					break;
+
+				case 3:
+					w >>= 7;
+					for (b = 0; b < 7; b++)
+					{
+						v = (w & 1);
+						w >>= 1;
+						*(p++) = v ? ORANGE : BLACK;
+					}
+					break;
+			}
+		}
+	}
+}
+
+/* according to Steve Nickolas (author of Dapple), our original palette would
+ * have been more appropriate for an Apple IIgs.  So we've substituted in the
+ * Robert Munafo palette instead, which is more accurate on 8-bit Apples
+ */
+static const rgb_t apple2_palette[] =
+{
+	rgb_t::black,
+	rgb_t(0xE3, 0x1E, 0x60), /* Dark Red */
+	rgb_t(0x60, 0x4E, 0xBD), /* Dark Blue */
+	rgb_t(0xFF, 0x44, 0xFD), /* Purple */
+	rgb_t(0x00, 0xA3, 0x60), /* Dark Green */
+	rgb_t(0x9C, 0x9C, 0x9C), /* Dark Gray */
+	rgb_t(0x14, 0xCF, 0xFD), /* Medium Blue */
+	rgb_t(0xD0, 0xC3, 0xFF), /* Light Blue */
+	rgb_t(0x60, 0x72, 0x03), /* Brown */
+	rgb_t(0xFF, 0x6A, 0x3C), /* Orange */
+	rgb_t(0x9C, 0x9C, 0x9C), /* Light Grey */
+	rgb_t(0xFF, 0xA0, 0xD0), /* Pink */
+	rgb_t(0x14, 0xF5, 0x3C), /* Light Green */
+	rgb_t(0xD0, 0xDD, 0x8D), /* Yellow */
+	rgb_t(0x72, 0xFF, 0xD0), /* Aquamarine */
+	rgb_t(0xFF, 0xFF, 0xFF)  /* White */
+};
+
+/* Initialize the palette */
+PALETTE_INIT_MEMBER(a2_video_device, apple2)
+{
+	palette.set_pen_colors(0, apple2_palette, ARRAY_LENGTH(apple2_palette));
+}
+
+

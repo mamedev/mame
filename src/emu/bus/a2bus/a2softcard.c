@@ -81,6 +81,7 @@ void a2bus_softcard_device::device_start()
 void a2bus_softcard_device::device_reset()
 {
 	m_bEnabled = false;
+
 	m_6502space = NULL;
 	m_FirstZ80Boot = true;
 	m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -88,15 +89,13 @@ void a2bus_softcard_device::device_reset()
 
 void a2bus_softcard_device::write_cnxx(address_space &space, UINT8 offset, UINT8 data)
 {
-	apple2_state *state = machine().driver_data<apple2_state>();
-
 	if (!m_bEnabled)
 	{
 		// steal the 6502's address space
 		m_6502space = &space;
 
 		m_z80->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		state->m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		set_maincpu_halt(ASSERT_LINE);
 
 		if (m_FirstZ80Boot)
 		{
@@ -109,7 +108,7 @@ void a2bus_softcard_device::write_cnxx(address_space &space, UINT8 offset, UINT8
 	else
 	{
 		m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-		state->m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		set_maincpu_halt(CLEAR_LINE);
 		m_bEnabled = false;
 	}
 }

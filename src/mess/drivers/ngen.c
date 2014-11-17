@@ -15,6 +15,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/z80dart.h"
+#include "bus/rs232/rs232.h"
 
 class ngen_state : public driver_device
 {
@@ -40,6 +41,13 @@ public:
 	DECLARE_READ16_MEMBER(peripheral_r);
 	DECLARE_WRITE16_MEMBER(port00_w);
 	DECLARE_READ16_MEMBER(port00_r);
+	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
+	DECLARE_WRITE_LINE_MEMBER(dack0_w);
+	DECLARE_WRITE_LINE_MEMBER(dack1_w);
+	DECLARE_WRITE_LINE_MEMBER(dack2_w);
+	DECLARE_WRITE_LINE_MEMBER(dack3_w);
+	DECLARE_READ8_MEMBER(dma_read_byte);
+	DECLARE_WRITE8_MEMBER(dma_write_byte);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 protected:
@@ -51,14 +59,18 @@ private:
 	required_device<am9517a_device> m_dmac;
 	required_device<pic8259_device> m_pic;
 	required_device<pit8254_device> m_pit;
-	required_shared_ptr<UINT16> m_vram;
-	required_shared_ptr<UINT16> m_fontram;
+	optional_shared_ptr<UINT16> m_vram;
+	optional_shared_ptr<UINT16> m_fontram;
+
+	void set_dma_channel(int channel, int state);
 
 	UINT16 m_peripheral;
 	UINT16 m_upper;
 	UINT16 m_middle;
 	UINT16 m_port00;
 	UINT16 m_periph141;
+	UINT8 m_dma_offset[4];
+	INT8 m_dma_channel;
 };
 
 WRITE_LINE_MEMBER(ngen_state::pit_out0_w)
@@ -74,7 +86,10 @@ WRITE_LINE_MEMBER(ngen_state::pit_out1_w)
 
 WRITE_LINE_MEMBER(ngen_state::pit_out2_w)
 {
-	logerror("PIT Timer 2 state %i\n",state);
+	m_iouart->rxca_w(state);
+	m_iouart->rxcb_w(state);
+	m_iouart->txca_w(state);
+	m_iouart->txcb_w(state);
 }
 
 WRITE16_MEMBER(ngen_state::cpu_peripheral_cb)
@@ -113,6 +128,49 @@ WRITE16_MEMBER(ngen_state::peripheral_w)
 {
 	switch(offset)
 	{
+	case 0x00:
+	case 0x01:
+	case 0x02:
+	case 0x03:
+	case 0x04:
+	case 0x05:
+	case 0x06:
+	case 0x07:
+	case 0x08:
+	case 0x09:
+	case 0x0a:
+	case 0x0b:
+	case 0x0c:
+	case 0x0d:
+	case 0x0e:
+	case 0x0f:
+		if(mem_mask & 0x00ff)
+			m_dmac->write(space,offset,data & 0xff);
+		//logerror("(PC=%06x) DMA write offset %04x data %04x mask %04x\n",m_maincpu->device_t::safe_pc(),offset,data,mem_mask);
+		break;
+	case 0x80: // DMA page offset?
+	case 0x81:
+	case 0x82:
+	case 0x83:
+		if(mem_mask & 0x00ff)
+			m_dma_offset[offset-0x80] = data & 0xff;
+		break;
+	case 0x110:
+		if(mem_mask & 0x00ff)
+			m_pit->write(space,0,data & 0x0ff);
+		break;
+	case 0x111:
+		if(mem_mask & 0x00ff)
+			m_pit->write(space,1,data & 0x0ff);
+		break;
+	case 0x112:
+		if(mem_mask & 0x00ff)
+			m_pit->write(space,2,data & 0x0ff);
+		break;
+	case 0x113:
+		if(mem_mask & 0x00ff)
+			m_pit->write(space,3,data & 0x0ff);
+		break;
 	case 0x141:
 		// bit 1 enables speaker?
 		COMBINE_DATA(&m_periph141);
@@ -126,14 +184,13 @@ WRITE16_MEMBER(ngen_state::peripheral_w)
 			m_crtc->register_w(space,0,data & 0xff);
 		break;
 	case 0x146:
-		if(mem_mask & 0x00ff)
-			m_iouart->ba_cd_w(space,0,data & 0xff);
 		logerror("Video write offset 0x146 data %04x mask %04x\n",data,mem_mask);
 		break;
 	case 0x147:
-		if(mem_mask & 0x00ff)
-			m_iouart->ba_cd_w(space,1,data & 0xff);
-		logerror("Video write offset 0x147 data %04x mask %04x\n",data,mem_mask);
+		//logerror("Video write offset 0x147 data %04x mask %04x\n",data,mem_mask);
+		break;
+	case 0x1a0:  // serial?
+		logerror("(PC=%06x) Serial(?) 0x1a0 write offset %04x data %04x mask %04x\n",m_maincpu->device_t::safe_pc(),offset,data,mem_mask);
 		break;
 	default:
 		logerror("(PC=%06x) Unknown 80186 peripheral write offset %04x data %04x mask %04x\n",m_maincpu->device_t::safe_pc(),offset,data,mem_mask);
@@ -145,6 +202,49 @@ READ16_MEMBER(ngen_state::peripheral_r)
 	UINT16 ret = 0xffff;
 	switch(offset)
 	{
+	case 0x00:
+	case 0x01:
+	case 0x02:
+	case 0x03:
+	case 0x04:
+	case 0x05:
+	case 0x06:
+	case 0x07:
+	case 0x08:
+	case 0x09:
+	case 0x0a:
+	case 0x0b:
+	case 0x0c:
+	case 0x0d:
+	case 0x0e:
+	case 0x0f:
+		if(mem_mask & 0x00ff)
+			ret = m_dmac->read(space,offset);
+		logerror("(PC=%06x) DMA read offset %04x mask %04x returning %04x\n",m_maincpu->device_t::safe_pc(),offset,mem_mask,ret);
+		break;
+	case 0x80: // DMA page offset?
+	case 0x81:
+	case 0x82:
+	case 0x83:
+		if(mem_mask & 0x00ff)
+			ret = m_dma_offset[offset-0x80] & 0xff;
+		break;
+	case 0x110:
+		if(mem_mask & 0x00ff)
+			ret = m_pit->read(space,0);
+		break;
+	case 0x111:
+		if(mem_mask & 0x00ff)
+			ret = m_pit->read(space,1);
+		break;
+	case 0x112:
+		if(mem_mask & 0x00ff)
+			ret = m_pit->read(space,2);
+		break;
+	case 0x113:
+		if(mem_mask & 0x00ff)
+			ret = m_pit->read(space,3);
+		break;
 	case 0x141:
 		ret = m_periph141;
 		break;
@@ -157,14 +257,19 @@ READ16_MEMBER(ngen_state::peripheral_r)
 			ret = m_crtc->register_r(space,0);
 		break;
 	case 0x146:
-		if(mem_mask & 0x00ff)
-			ret = m_iouart->ba_cd_r(space,0);
 		break;
-	case 0x147:  // definitely video related, likely UART sending data to the video board
-		if(mem_mask & 0x00ff)
-			ret = m_iouart->ba_cd_r(space,1);
+	case 0x147:  // definitely video related, maybe UART sending data to the monitor?
 		// expects bit 0 to be set (Video ready signal?)
+		ret = 0;
 		ret |= 1;
+		break;
+	case 0x1a0:  // status?
+		ret = 0;
+		ret |= 0x02;  // end of DMA transfer?
+		break;
+	case 0x1b1:
+		ret = 0;
+		ret |= 0x02;  // also checked after DMA transfer ends
 		break;
 	default:
 		logerror("(PC=%06x) Unknown 80186 peripheral read offset %04x mask %04x returning %04x\n",m_maincpu->device_t::safe_pc(),offset,mem_mask,ret);
@@ -187,6 +292,51 @@ READ16_MEMBER(ngen_state::port00_r)
 {
 	return m_port00;
 }
+
+
+WRITE_LINE_MEMBER( ngen_state::dma_hrq_changed )
+{
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void ngen_state::set_dma_channel(int channel, int state)
+{
+	if(!state) 
+		m_dma_channel = channel;
+	else if(m_dma_channel == channel)
+		m_dma_channel = -1;
+}
+
+WRITE_LINE_MEMBER( ngen_state::dack0_w ) { set_dma_channel(0, state); }
+WRITE_LINE_MEMBER( ngen_state::dack1_w ) { set_dma_channel(1, state); }
+WRITE_LINE_MEMBER( ngen_state::dack2_w ) { set_dma_channel(2, state); }
+WRITE_LINE_MEMBER( ngen_state::dack3_w ) { set_dma_channel(3, state); }
+
+READ8_MEMBER(ngen_state::dma_read_byte)
+{
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
+	UINT8 result;
+	if(m_dma_channel == -1)
+		return 0xff;
+	offs_t page_offset = (((offs_t) m_dma_offset[m_dma_channel]) << 16) & 0xFF0000;
+
+	result = prog_space.read_byte(page_offset + offset);
+	popmessage("DMA byte address %06x read %02x\n",page_offset+offset,result);
+	return result;
+}
+
+
+WRITE8_MEMBER(ngen_state::dma_write_byte)
+{
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
+	if(m_dma_channel == -1)
+		return;
+	offs_t page_offset = (((offs_t) m_dma_offset[m_dma_channel]) << 16) & 0xFF0000;
+
+	prog_space.write_byte(page_offset + offset, data);
+	popmessage("DMA byte address %06x write %02x\n",page_offset+offset,data);
+}
+
 
 MC6845_UPDATE_ROW( ngen_state::crtc_update_row )
 {
@@ -246,17 +396,43 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	MCFG_PIC8259_ADD( "pic", INPUTLINE("maincpu", 0), VCC, NULL )
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
-	MCFG_PIT8253_CLK0(4772720/4)  // correct?
+	MCFG_PIT8253_CLK0(XTAL_14_7456MHz/8)  // correct?
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(ngen_state, pit_out0_w))
-	MCFG_PIT8253_CLK0(4772720/4)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(ngen_state, pit_out1_w))
-	MCFG_PIT8253_CLK0(4772720/4)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(ngen_state, pit_out2_w))
+	MCFG_PIT8253_CLK1(XTAL_14_7456MHz/8)
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(ngen_state, pit_out1_w))
+	MCFG_PIT8253_CLK2(XTAL_14_7456MHz/8)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(ngen_state, pit_out2_w))
 
 	MCFG_DEVICE_ADD("dmac", AM9517A, XTAL_14_7456MHz / 3)  // NEC D8237A, divisor unknown
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(ngen_state, dma_hrq_changed))
+	MCFG_I8237_IN_MEMR_CB(READ8(ngen_state, dma_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(ngen_state, dma_write_byte))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(ngen_state, dack0_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(ngen_state, dack1_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(ngen_state, dack2_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(ngen_state, dack3_w))
 
 	// I/O board
-	MCFG_UPD7201_ADD("iouart",XTAL_14_7456MHz / 3, 0,0,0,0) // no clock visible on I/O board, guessing for now
+	MCFG_UPD7201_ADD("iouart",0,0,0,0,0) // clocked by PIT channel 2?
+	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("rs232_a", default_rs232_devices, NULL)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("iouart", upd7201_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("iouart", upd7201_device, ctsa_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("iouart", upd7201_device, dcda_w))
+	MCFG_RS232_RI_HANDLER(DEVWRITELINE("iouart", upd7201_device, ria_w))
+
+	MCFG_RS232_PORT_ADD("rs232_b", default_rs232_devices, NULL)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("iouart", upd7201_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("iouart", upd7201_device, ctsb_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("iouart", upd7201_device, dcdb_w))
+	MCFG_RS232_RI_HANDLER(DEVWRITELINE("iouart", upd7201_device, rib_w))
+
 
 	// video board
 	MCFG_SCREEN_ADD("screen", RASTER)

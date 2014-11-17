@@ -16,17 +16,16 @@
 // phase is indeed a nibble-based linear combination.
 // With that block cipher, a stream cipher is constructed by feeding the output result of the 1st round
 // of a certain 16-bits block as a whitening value for the next block. The cart dependent data used by
-// the algorithm is comprised by a 16-bits "key" and a 16-bits IV (initialization vector) --though they
-// will be merged in a only 32-bits number in the code--. The hardware auto-reset the feed value
+// the algorithm is a 32-bits key stored in the PIC16C621A. The hardware auto-reset the feed value
 // to the cart-based IV every 16 blocks (32 bytes); that reset is not address-based, but index-based.
 
 const device_type NAOMI_M4_BOARD = &device_creator<naomi_m4_board>;
 
 const UINT8 naomi_m4_board::k_sboxes[4][16] = {
-	{13,14,1,11,7,9,10,0,15,6,4,5,8,2,12,3},
-	{12,3,14,6,7,15,2,13,1,4,11,0,9,10,8,5},
-	{6,12,0,10,1,5,14,9,7,2,15,13,4,11,3,8},
-	{9,12,8,7,10,4,0,15,1,11,14,2,13,5,6,3}
+	{9,8,2,11,1,14,5,15,12,6,0,3,7,13,10,4},
+	{2,10,0,15,14,1,11,3,7,12,13,8,4,9,5,6},
+	{4,11,3,8,7,2,15,13,1,5,14,9,6,12,0,10},
+	{1,13,8,2,0,5,6,14,4,11,15,10,12,3,7,9}
 };
 
 // from S29GL512N datasheet
@@ -67,8 +66,8 @@ void naomi_m4_board::device_start()
 	key = tempkey & 0xffff;
 #else
 	const UINT8 *key_data = memregion(key_tag)->base();
-	key = (key_data[2] << 8) | key_data[3];
-	iv = (key_data[0] << 8) | key_data[1];
+	subkey1 = (key_data[17] << 8) | key_data[16];
+	subkey2 = (key_data[19] << 8) | key_data[18];
 #endif
 	buffer = auto_alloc_array(machine(), UINT8, BUFFER_SIZE);
 	enc_init();
@@ -117,7 +116,7 @@ void naomi_m4_board::device_reset()
 	encryption = false;
 	cfi_mode = false;
 	counter = 0;
-	cur_iv = 0;
+	iv = 0;
 }
 
 void naomi_m4_board::board_setup_address(UINT32 address, bool is_dma)
@@ -176,8 +175,13 @@ void naomi_m4_board::board_advance(UINT32 size)
 void naomi_m4_board::enc_reset()
 {
 	buffer_actual_size = 0;
-	cur_iv = iv;
+	iv = 0;
 	counter = 0;
+}
+
+UINT16 naomi_m4_board::decrypt_one_round(UINT16 word, UINT16 subkey)
+{
+	return one_round[word ^ subkey] ^ subkey ;
 }
 
 void naomi_m4_board::enc_fill()
@@ -185,10 +189,10 @@ void naomi_m4_board::enc_fill()
 	const UINT8 *base = m_region->base() + rom_cur_address;
 	while(buffer_actual_size < BUFFER_SIZE) {
 		UINT16 enc = base[0] | (base[1] << 8);
-		UINT16 output_whitening = key ^ cur_iv;
-		cur_iv = one_round[enc ^ cur_iv];
-		UINT16 dec = one_round[key ^ cur_iv] ^ output_whitening;
-
+		UINT16 dec = iv;
+		iv = decrypt_one_round(enc ^ iv, subkey1);
+		dec ^= decrypt_one_round(iv, subkey2);
+		
 		buffer[buffer_actual_size++] = dec;
 		buffer[buffer_actual_size++] = dec >> 8;
 
@@ -198,7 +202,7 @@ void naomi_m4_board::enc_fill()
 		counter++;
 		if(counter == 16) {
 			counter = 0;
-			cur_iv = iv;
+			iv = 0;
 		}
 	}
 }

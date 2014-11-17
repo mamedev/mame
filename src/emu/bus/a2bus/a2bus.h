@@ -15,7 +15,14 @@
 
 #include "emu.h"
 
-#define INH_SLOT_INVALID    (255)
+// /INH special addresses
+#define INH_START_INVALID	0xffff;
+#define INH_END_INVALID		0x0000;
+
+// /INH types								
+#define INH_NONE			0x00
+#define	INH_READ			0x01
+#define INH_WRITE			0x02
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -97,7 +104,8 @@ public:
 
 	void set_irq_line(int state, int slot);
 	void set_nmi_line(int state, int slot);
-	void set_inh_slotnum(int slot);
+	void set_maincpu_halt(int state);
+	void recalc_inh(int slot);
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
@@ -112,7 +120,7 @@ protected:
 
 	devcb_write_line    m_out_irq_cb;
 	devcb_write_line    m_out_nmi_cb;
-	devcb_write_line    m_out_inh_cb;
+	devcb_write8		m_out_inh_cb;
 
 	device_a2bus_card_interface *m_device_list[8];
 	const char *m_cputag;
@@ -145,6 +153,9 @@ public:
 	virtual bool take_c800() { return true; }   // override and return false if your card doesn't take over the c800 space
 	virtual UINT8 read_inh_rom(address_space &space, UINT16 offset) { return 0; }
 	virtual void write_inh_rom(address_space &space, UINT16 offset, UINT8 data) { }
+	virtual UINT16 inh_start() { return INH_START_INVALID; }
+	virtual UINT16 inh_end() { return INH_END_INVALID; }
+	virtual int inh_type() { return INH_NONE; }
 
 	device_a2bus_card_interface *next() const { return m_next; }
 
@@ -157,8 +168,8 @@ public:
 	void lower_slot_irq() { m_a2bus->set_irq_line(CLEAR_LINE, m_slot); }
 	void raise_slot_nmi() { m_a2bus->set_nmi_line(ASSERT_LINE, m_slot); }
 	void lower_slot_nmi() { m_a2bus->set_nmi_line(CLEAR_LINE, m_slot); }
-	void raise_slot_inh() { m_a2bus->set_inh_slotnum(m_slot); }
-	void lower_slot_inh() { m_a2bus->set_inh_slotnum(INH_SLOT_INVALID); }
+	void recalc_slot_inh() { m_a2bus->recalc_inh(m_slot); }
+	void set_maincpu_halt(int state) { m_a2bus->set_maincpu_halt(state); }
 
 	// inline configuration
 	static void static_set_a2bus_tag(device_t &device, const char *tag, const char *slottag);

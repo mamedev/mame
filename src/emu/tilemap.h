@@ -36,7 +36,7 @@
 
             category (optional): specifies one of 16 categories for the
                 pixels in the tile; the category controls which tiles are
-                rendered during a tilemap_draw() call
+                rendered during a tilemap::draw() call
 
             group (optional): specifies one of 256 groups for pen mapping;
                 each pen in the tile is looked up in a table to determine
@@ -81,24 +81,26 @@
             all tiles rendered.
 
         Flagsmap = an 8bpp bitmap containing per-pixel flags,
-            specifically the category (specified in bits 0-3) and
-            the layer (specified in bits 4-6).
+            specifically the category (specified in bits 0-3) and the
+            layer (specified in bits 4-6).
 
 ****************************************************************************
 
     How to use a tilemap:
 
-    1. First create a new tilemap by calling tilemap_create(). The
-        parameters are as follows:
+    1. First create a new tilemap by calling tilemap_manager::create().
+        The parameters are as follows:
 
-        tile_get_info = pointer to a callback function which accepts a
-            memory index and in return fills in a tile_info structure
-            that describes the characteristics of a tile; this function
-            will be called whenever a dirty tile needs to be rendered
+        decoder = reference to your device_gfx_interface
 
-        mapper = pointer to a callback function which maps the logical
-            column and row to a memory index; several standard mappers
-            are provided, with tilemap_scan_rows being the most common
+        tile_get_info = callback function which accepts a memory index
+            and in return fills in a tile_data structure that describes
+            the characteristics of a tile; this function will be called
+            whenever a dirty tile needs to be rendered
+
+        mapper = callback function which maps the logical column and row
+            to a memory index; several standard mappers are provided,
+            with TILEMAP_SCAN_ROWS being the most common
 
         tilewidth = the width, in pixels, of each individual tile
 
@@ -112,39 +114,40 @@
         Common configuration tasks include:
 
             * marking one of the pens as transparent via
-                tilemap_set_transparent_pen()
+                tilemap_t::set_transparent_pen()
 
             * performing more complex pen-to-layer mapping via
-                tilemap_map_pen_to_layer() or
-                tilemap_map_pens_to_layer()
+                tilemap_t::map_pen_to_layer() or
+                tilemap_t::map_pens_to_layer()
 
             * configuring global scroll offsets via
-                tilemap_set_scrolldx() and tilemap_set_scrolldy()
+                tilemap_t::set_scrolldx() and tilemap_t::set_scrolldy()
 
-            * specifying a pointer that is passed to your tile_get_info
-                callback via tilemap_set_user_data()
+            * specifying a pointer that can be read back later (e.g. in
+                your tile_get_info callback) via
+                tilemap_t::set_user_data()
 
             * setting a global palette offset via
-                tilemap_set_palette_offset()
+                tilemap_t::set_palette_offset()
 
     3. In your memory write handlers for the tile memory, anytime tile
         data is modified, you need to mark the tile dirty so that it is
         re-rendered with the new data the next time the tilemap is drawn.
-        Use tilemap_mark_tile_dirty() and pass in the memory index.
+        Use tilemap_t::mark_tile_dirty() and pass in the memory index.
 
     4. In your handlers for scrolling, update the scroll values for the
-        tilemap via tilemap_set_scrollx() and tilemap_set_scrolly().
+        tilemap via tilemap_t::set_scrollx() and tilemap_t::set_scrolly().
 
     5. If any other major characteristics of the tilemap change (generally
         any global state that is used by the tile_get_info callback but
         which is not reported via other calls to the tilemap code), you
         should invalidate the entire tilemap. You can do this by calling
-        tilemap_mark_all_tiles_dirty().
+        tilemap_t::mark_all_dirty().
 
     6. In your VIDEO_UPDATE callback, render the tiles by calling
-        tilemap_draw() or tilemap_draw_roz(). If you need to do custom
-        rendering and want access to the raw pixels, call
-        tilemap_get_pixmap() to get a pointer to the updated bitmap_ind16
+        tilemap_t::draw() or tilemap_t::draw_roz(). If you need to do
+        custom rendering and want access to the raw pixels, call
+        tilemap_t::pixmap() to get a reference to the updated bitmap_ind16
         containing the tilemap graphics.
 
 ****************************************************************************
@@ -157,10 +160,11 @@
 
         tilemap_t *tmap;
         UINT16 *my_tmap_memory;
+        required_device<gfxdecode_device> gfxdecode;
 
-        TILE_GET_INFO( my_get_info )
+        TILE_GET_INFO_MEMBER( my_state::my_get_info )
         {
-            UINT8 tiledata = my_tmap_memory[tile_index];
+            UINT16 tiledata = my_tmap_memory[tile_index];
             UINT8 code = tiledata & 0xff;
             UINT8 color = (tiledata >> 8) & 0x1f;
             UINT8 flipx = (tiledata >> 13) & 1;
@@ -168,12 +172,12 @@
             UINT8 category = (tiledata >> 15) & 1;
 
             // set the common info for the tile
-            SET_TILE_INFO(
-                1,              // use m_gfxdecode->gfx(1) for tile graphics
+            tileinfo.set(
+                1,              // use gfxdecode->gfx(1) for tile graphics
                 code,           // the index of the graphics for this tile
                 color,          // the color to use for this tile
                 (flipx ? TILE_FLIPX : 0) |  // flags for this tile; also
-                (flipy ? TILE_FLIPY : 0);   // see the FLIP_YX macro
+                (flipy ? TILE_FLIPY : 0)    // see the FLIP_YX macro
             );
 
             // set the category of each tile based on the high bit; this
@@ -181,41 +185,43 @@
             tileinfo.category = category;
         }
 
-        VIDEO_START( mydriver )
+        VIDEO_START_MEMBER( my_state, my_driver )
         {
             // first create the tilemap
-            tmap = tilemap_create(machine,
-                    my_get_info,            // pointer to your get_info
-                    tilemap_scan_rows,      // standard row-major mapper
+            tmap = &machine().tilemap().create(
+                    gfxdecode,
+                    tilemap_get_info_delegate(FUNC(my_state::my_get_info), this),
+                    TILEMAP_SCAN_ROWS,      // standard row-major mapper
                     8,8,                    // 8x8 tiles
                     64,32);                 // 64 columns, 32 rows
 
             // then set the transparent pen; all other pens will default
             // to being part of layer 0
-            tilemap_set_transparent_pen(tmap, 0);
+            tmap.set_transparent_pen(0);
         }
 
-        SCREEN_UPDATE( mydriver )
+        UINT32 my_state::screen_update_mydriver(
+            screen_device &screen,
+            bitmap_ind16 &bitmap,
+            const rectangle &cliprect)
         {
             // draw the tilemap first, fully opaque since it needs to
             // erase all previous pixels
-            tilemap_draw(
+            tmap->draw(
+                screen,                 // destination screen
                 bitmap,                 // destination bitmap
                 cliprect,               // clipping rectangle
-                tmap,                   // tilemap to draw
-                TILEMAP_DRAW_OPAQUE,    // flags
-                0);                     // don't use priority_bitmap
+                TILEMAP_DRAW_OPAQUE);   // flags
 
             // next draw the sprites
             my_draw_sprites();
 
             // then draw the tiles which have priority over sprites
-            tilemap_draw(
+            tmap->draw(
+                screen,                 // destination screen
                 bitmap,                 // destination bitmap
                 cliprect,               // clipping rectangle
-                tmap,                   // tilemap to draw
-                TILEMAP_DRAW_CATEGORY(1),// flags: draw category 1
-                0);                     // don't use priority_bitmap
+                TILEMAP_DRAW_CATEGORY(1));// flags: draw category 1
 
             return 0;
         }
@@ -237,7 +243,7 @@
 
         TILEMAP_TRANSPARENT: This described a tilemap with a single
             transparent pen. To create the same effect, call
-            tilemap_set_transparent_pen() to specify which pen is
+            tilemap_t::set_transparent_pen() to specify which pen is
             transparent; all other pens will map to layer 0.
 
         TILEMAP_BITMASK: This type is no longer special; with the new
@@ -250,7 +256,7 @@
             also allowed for you to choose one of 4 mappings on a per-tile
             basis. All of this functionality is now expanded: you can
             specify one of 3 layers and can choose from one of 256 mappings
-            on a per-tile basis. You just call tilemap_set_transmask(),
+            on a per-tile basis. You just call tilemap_t::set_transmask(),
             which still exists but maps onto the new behavior. The "front"
             layer is now "layer 0" and the "back" layer is now "layer 1".
 
@@ -275,16 +281,16 @@
         TILEMAP_DRAW_LAYER0 is assumed.
 
     * If you want to render with alpha blending, you can call
-        tilemap_draw() with the TILEMAP_DRAW_ALPHA flag.
+        tilemap_t::draw() with the TILEMAP_DRAW_ALPHA flag.
 
     * To configure more complex pen-to-layer mapping, use the
-        tilemap_map_pens_to_layer() call. This call takes a group number
-        so that you can configure 1 of the 256 groups independently.
-        It also takes a pen and a mask; the mapping is updated for all
-        pens where ((pennum & mask) == pen). To set all the pens in a
-        group to the same value, pass a mask of 0. To set a single pen in
-        a group, pass a mask of ~0. The helper function
-        tilemap_map_pen_to_layer() does this for you.
+        tilemap_t::map_pens_to_layer() call. This call takes a group
+        number so that you can configure 1 of the 256 groups
+        independently. It also takes a pen and a mask; the mapping is
+        updated for all pens where ((pennum & mask) == pen). To set all
+        the pens in a group to the same value, pass a mask of 0. To set
+        a single pen in a group, pass a mask of ~0. The helper function
+        tilemap_t::map_pen_to_layer() does this for you.
 
 ***************************************************************************/
 
@@ -306,7 +312,7 @@
 #define TILEMAP_NUM_GROUPS              256
 
 
-// these flags control tilemap_draw() behavior
+// these flags control tilemap_t::draw() behavior
 const UINT32 TILEMAP_DRAW_CATEGORY_MASK = 0x0f;     // specify the category to draw
 const UINT32 TILEMAP_DRAW_LAYER0 = 0x10;            // draw layer 0
 const UINT32 TILEMAP_DRAW_LAYER1 = 0x20;            // draw layer 1
@@ -329,7 +335,7 @@ const UINT8 TILE_FORCE_LAYER0 = TILEMAP_PIXEL_LAYER0; // force all pixels to be 
 const UINT8 TILE_FORCE_LAYER1 = TILEMAP_PIXEL_LAYER1; // force all pixels to be layer 1 (no transparency)
 const UINT8 TILE_FORCE_LAYER2 = TILEMAP_PIXEL_LAYER2; // force all pixels to be layer 2 (no transparency)
 
-// tilemap global flags, used by tilemap_set_flip()
+// tilemap global flags, used by tilemap_t::set_flip()
 const UINT32 TILEMAP_FLIPX = TILE_FLIPX;            // draw the tilemap horizontally flipped
 const UINT32 TILEMAP_FLIPY = TILE_FLIPY;            // draw the tilemap vertically flipped
 
@@ -767,7 +773,7 @@ private:
 //  MACROS
 //**************************************************************************
 
-// macros to help form flags for tilemap_draw
+// macros to help form flags for tilemap_t::draw
 #define TILEMAP_DRAW_CATEGORY(x)        (x)     // specify category to draw
 #define TILEMAP_DRAW_ALPHA(x)           (TILEMAP_DRAW_ALPHA_FLAG | (rgb_t::clamp(x) << 24))
 

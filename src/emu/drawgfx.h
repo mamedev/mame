@@ -7,6 +7,109 @@
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
+**********************************************************************
+
+    How to use priority-masked drawing (formerly pdrawgfx):
+
+    There are two different standard ways to use the priority bitmap
+    and the priority-masked draw methods, depending on how many layers
+    of interest (tilemap or other layers that individual sprites can
+    be either "behind" or "in front of") your driver has.
+
+    In the more common scheme, which you can use when the number of
+    layers of interest is four or fewer, the priority bitmap contains
+    a bitmask indicating which layers are opaque at each location.
+    To use this scheme, draw your tilemap layers this way, in order
+    from back to front:
+
+        screen.priority().fill(0, cliprect);
+        m_tilemap1->draw(screen, bitmap, cliprect, tmap1flags, 1);
+        m_tilemap2->draw(screen, bitmap, cliprect, tmap2flags, 2);
+        m_tilemap3->draw(screen, bitmap, cliprect, tmap3flags, 4);
+        m_tilemap4->draw(screen, bitmap, cliprect, tmap4flags, 8);
+
+    Now, when drawing your sprites, the pmask parameter for each
+    sprite should be the bitwise OR of all the GFX_PMASK_n constants
+    corresponding to layers that the sprite should be masked by.
+    For example, to draw a sprite that appears over tilemap1, but
+    under opaque pixels of tilemap2, tilemap3, and tilemap4:
+
+        UINT32 pmask = GFX_PMASK_2 | GFX_PMASK_4 | GFX_PMASK_8;
+        gfx->prio_transpen(bitmap, cliprect,
+                code, color,
+                flipx, flipy,
+                sx, sy,
+                screen.priority(),
+                pmask,
+                trans_pen);
+
+    This scheme does not require priority to be transitive: it is
+    perfectly possible for a sprite to be "under" tilemap1 but "over"
+    tilemap4, even though tilemap1 itself is "under" tilemap4.
+
+    If you have more than four layers, you need to use a different
+    scheme, in which the priority bitmap contains the index of the
+    topmost opaque layer rather than a bitmask of all the opaque
+    layers. To use this scheme, draw your tilemaps this way, again
+    in order from back to front:
+
+        screen.priority().fill(0, cliprect);
+        m_tilemap1->draw(screen, bitmap, cliprect, tmap1flags, 1, 0);
+        m_tilemap2->draw(screen, bitmap, cliprect, tmap2flags, 2, 0);
+        m_tilemap3->draw(screen, bitmap, cliprect, tmap3flags, 3, 0);
+        m_tilemap4->draw(screen, bitmap, cliprect, tmap4flags, 4, 0);
+        m_tilemap5->draw(screen, bitmap, cliprect, tmap5flags, 5, 0);
+        m_tilemap6->draw(screen, bitmap, cliprect, tmap6flags, 6, 0);
+        m_tilemap7->draw(screen, bitmap, cliprect, tmap7flags, 7, 0);
+        m_tilemap8->draw(screen, bitmap, cliprect, tmap8flags, 8, 0);
+
+    Notice the additional 0 parameter to tilemap_t::draw(). This
+    parameter causes the new layer's priority code to replace that of
+    the underlying layer instead of being ORed with it (the parameter
+    is a mask to be ANDed with the previous contents of the priority
+    bitmap before the new code is ORed with it)
+
+    You need to use a different pmask for your sprites with this
+    scheme than with the previous scheme. The pmask should be set to
+    ((~1) << n), where n is the index of the highest priority layer
+    that the sprite should *not* be masked by. For example, to draw
+    a sprite over the first four tilemaps but under the higher
+    numbered ones:
+
+        UINT32 pmask = (~1) << 4;
+        gfx->prio_transpen(bitmap, cliprect,
+                code, color,
+                flipx, flipy,
+                sx, sy,
+                screen.priority(),
+                pmask,
+                trans_pen);
+
+    Unlike the other scheme, this one does require priority to be
+    transitive, because the priority bitmap only contains information
+    about the topmost opaque pixel.
+
+    These examples have used a different tilemap for each layer, but
+    the layers could just as easily be different tile categories or
+    pen layers from the same tilemap.
+
+    If you have a layer that is behind all sprites, draw it with
+    priority 0, and if you have a layer that is in front of all
+    sprites, just draw it after the sprites. The bitmask scheme
+    can handle up to 6 layers if you count "behind all sprites" and
+    "in front of all sprites".
+
+    An important thing to remember when using priority-masked drawing
+    is that the sprites are drawn from front to back. Sprite pixels
+    will not be drawn over already-drawn sprite pixels, even if the
+    previously-drawn pixel was masked by a background layer.
+    This reflects the fact that in most hardware, sprite-to-sprite
+    priority is unrelated to sprite-to-background priority. Your
+    sprites need to be pre-sorted by their sprite-to-sprite priority
+    (whether that be a field in the sprite attributes or simply their
+    order in sprite RAM) before drawing.
+
+
 *********************************************************************/
 
 #pragma once
@@ -30,6 +133,13 @@ enum
 	DRAWMODE_SHADOW
 };
 
+enum
+{
+	GFX_PMASK_1  = 0xaaaa,
+	GFX_PMASK_2  = 0xcccc,
+	GFX_PMASK_4  = 0xf0f0,
+	GFX_PMASK_8  = 0xff00
+};
 
 
 /***************************************************************************

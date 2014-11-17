@@ -241,9 +241,15 @@ void a2bus_device::set_nmi_line(int state, int slot)
 	}
 }
 
-void a2bus_device::set_inh_slotnum(int slot)
+void a2bus_device::set_maincpu_halt(int state)
 {
-	m_out_inh_cb(slot);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
+}
+
+void a2bus_device::recalc_inh(int slot)
+{
+	m_out_inh_cb(ASSERT_LINE);
+	m_out_inh_cb(CLEAR_LINE);
 }
 
 // interrupt request from a2bus card

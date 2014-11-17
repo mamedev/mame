@@ -913,6 +913,8 @@ BUSOBJS += $(BUSOBJ)/a2bus/timemasterho.o
 BUSOBJS += $(BUSOBJ)/a2bus/mouse.o
 BUSOBJS += $(BUSOBJ)/a2bus/corvfdc01.o
 BUSOBJS += $(BUSOBJ)/a2bus/corvfdc02.o
+BUSOBJS += $(BUSOBJ)/a2bus/ramcard16k.o
+BUSOBJS += $(BUSOBJ)/a2bus/ramcard128k.o
 endif
 
 #-------------------------------------------------

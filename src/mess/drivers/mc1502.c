@@ -254,7 +254,7 @@ static MACHINE_CONFIG_START( mc1502, mc1502_state )
 	MCFG_MACHINE_RESET_OVERRIDE( mc1502_state, mc1502 )
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_15MHz/12) /* heartbeat IRQ */
+	MCFG_PIT8253_CLK0(XTAL_16MHz/12) /* heartbeat IRQ */
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
 	MCFG_PIT8253_CLK1(XTAL_16MHz/12) /* serial port */
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(mc1502_state, mc1502_pit8253_out1_changed))
@@ -296,12 +296,11 @@ static MACHINE_CONFIG_START( mc1502, mc1502_state )
 	MCFG_ISA_OUT_IRQ5_CB(DEVWRITELINE("pic8259", pic8259_device, ir5_w))
 	MCFG_ISA_OUT_IRQ6_CB(DEVWRITELINE("pic8259", pic8259_device, ir6_w))
 	MCFG_ISA_OUT_IRQ7_CB(DEVWRITELINE("pic8259", pic8259_device, ir7_w))
+
+	MCFG_ISA8_SLOT_ADD("isa", "board0", mc1502_isa8_cards, "cga_mc1502", true)
 	MCFG_ISA8_SLOT_ADD("isa", "isa1", mc1502_isa8_cards, "fdc", false)
 	MCFG_ISA8_SLOT_ADD("isa", "isa2", mc1502_isa8_cards, "rom", false)
-	/* video hardware (only 1 chargen in ROM; CGA_FONT dip always 1 */
-	MCFG_ISA8_SLOT_ADD("isa", "isa3", mc1502_isa8_cards, "cga_mc1502", false)
 
-	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -323,7 +322,6 @@ static MACHINE_CONFIG_START( mc1502, mc1502_state )
 	MCFG_SOFTWARE_LIST_ADD("flop_list","mc1502_flop")
 //  MCFG_SOFTWARE_LIST_ADD("cass_list","mc1502_cass")
 
-	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("608K")                   /* 96 base + 512 on expansion card */
 	MCFG_RAM_EXTRA_OPTIONS("96K")

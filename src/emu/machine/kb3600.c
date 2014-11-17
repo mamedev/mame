@@ -147,10 +147,10 @@ void ay3600_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 			if (BIT(data, y))
 			{
+				ako = 1;
+
 				if (!(m_x_mask[x] & (1 << y)))
 				{
-					ako = 1;
-
 					m_x_mask[x] |= (1 << y);
 
 					if (m_b != b)
@@ -158,6 +158,12 @@ void ay3600_device::device_timer(emu_timer &timer, device_timer_id id, int param
 						m_b = b;
 
 						m_write_data_ready(1);
+
+						if (ako != m_ako)
+						{
+							m_write_ako(ako);
+							m_ako = ako;
+						}
 						return;
 					}
 				}

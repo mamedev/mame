@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "alinvade.lh"
 
 class alinvade_state : public driver_device
 {
@@ -190,4 +191,4 @@ ROM_START( alinvade )
 ROM_END
 
 
-GAME( 198?, alinvade,  0,    alinvade, alinvade, driver_device,  0, ROT90, "Forbes?", "Alien Invaders", GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )
+GAMEL( 198?, alinvade,  0,    alinvade, alinvade, driver_device,  0, ROT90, "Forbes?", "Alien Invaders", GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND, layout_alinvade )

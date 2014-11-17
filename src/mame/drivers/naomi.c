@@ -2661,7 +2661,7 @@ MACHINE_CONFIG_END
  */
 
 static MACHINE_CONFIG_DERIVED( naomim4, naomi_base )
-	MCFG_NAOMI_M4_BOARD_ADD("rom_board", ":rom_key", "naomibd_eeprom", ":boardid", WRITE8(dc_state, g1_irq))
+	MCFG_NAOMI_M4_BOARD_ADD("rom_board", ":pic_readout", "naomibd_eeprom", ":boardid", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 /*
@@ -5597,8 +5597,10 @@ ROM_START( mushik2e )
 	ROM_LOAD( "fpr-24333.ic8", 0x0000000, 0x4000000, CRC(a467b69c) SHA1(66a841b72ef1bb8cbabbfb1d14081b4dff14b1d3) )
 	ROM_LOAD( "fpr-24334.ic9", 0x4000000, 0x4000000, CRC(13d2d1dc) SHA1(6a47cfaddf006e6ff46837fac956fbcc20619d79) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "mushik2e-key.bin", 0, 4, CRC(b32a0633) SHA1(984c01e43cf359d8e8a0c6cb1a04c5dc3da47d39) )
+	// ROM_REGION( 4, "rom_key", 0 )
+	// ROM_LOAD( "mushik2e-key.bin", 0, 4, CRC(b32a0633) SHA1(984c01e43cf359d8e8a0c6cb1a04c5dc3da47d39) )
+	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
+	ROM_LOAD( "317-0437-com.ic3", 0, 20, NO_DUMP )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x02))
 ROM_END
@@ -5612,8 +5614,10 @@ ROM_START( mushi2ea )
 	ROM_LOAD( "epr-24357.ic7", 0x0000000, 0x0400000, CRC(a2236d58) SHA1(3746b9d3c0f7ecf6340619bb8bf01f170ac4efb7) ) // EPR mode, overwrite FPR data
 	ROM_LOAD( "fpr-24334.ic9", 0x4000000, 0x4000000, CRC(13d2d1dc) SHA1(6a47cfaddf006e6ff46837fac956fbcc20619d79) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "mushik2e-key.bin", 0, 4, CRC(b32a0633) SHA1(984c01e43cf359d8e8a0c6cb1a04c5dc3da47d39) )
+	// ROM_REGION( 4, "rom_key", 0 )
+	// ROM_LOAD( "mushik2e-key.bin", 0, 4, CRC(b32a0633) SHA1(984c01e43cf359d8e8a0c6cb1a04c5dc3da47d39) )
+	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
+	ROM_LOAD( "317-0437-com.ic3", 0, 20, NO_DUMP )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x82))
 ROM_END
@@ -5626,8 +5630,10 @@ ROM_START( zunou )
 	ROM_LOAD( "fpr-24338.ic8", 0x0000000, 0x4000000, CRC(1423c374) SHA1(e6a3f0eaccd13c161d07705bcd00f447f08fc186) )
 	ROM_LOAD( "fpr-24339.ic9", 0x4000000, 0x4000000, CRC(11883792) SHA1(1782db04f74394f981f887ab1a95d687eb2c0b35) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "zunou-key.bin", 0, 4, CRC(cbe35afb) SHA1(78877655800aae27661bf720e1c37d6c6f2e3d1c) )
+	// ROM_REGION( 4, "rom_key", 0 )
+	// ROM_LOAD( "zunou-key.bin", 0, 4, CRC(cbe35afb) SHA1(78877655800aae27661bf720e1c37d6c6f2e3d1c) )
+	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
+	ROM_LOAD( "317-0435-jpn.ic3", 0, 20, NO_DUMP )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x02))
 ROM_END
@@ -5642,8 +5648,8 @@ ROM_START( sl2007 )
 	ROM_LOAD( "fpr-24415.ic10", 0x8000000, 0x4000000, CRC(133c742c) SHA1(89f857a31731dc918afc72b6cb716f5c77cb9d6e) )
 	ROM_LOAD( "fpr-24416.ic11", 0xc000000, 0x4000000, CRC(562fb88e) SHA1(172678e3e27cfad7f7e6217c4653a4ba119bfbdf) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "sl2007-key.bin", 0, 4, CRC(d5d1e807) SHA1(8a0cc371729c622bb05c5d26b3e39ec31d29ace1) )
+	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
+	ROM_LOAD( "317-5129-jpn.ic3", 0, 20, CRC(b6191cea) SHA1(13e14ff013bf2728203641303141c016e82b10a3) )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x04))
 ROM_END
@@ -5658,8 +5664,8 @@ ROM_START( asndynmt )
 	ROM_LOAD( "fpr-24384.ic10", 0x8000000, 0x4000000, CRC(2e9116c4) SHA1(58903a33c4ce72a1f75aefcab94393fc2e8bd2d9) )
 	ROM_LOAD( "fpr-24385.ic11", 0xc000000, 0x4000000, CRC(2b79f45d) SHA1(db97d980bf1590df4b983a4b7786977687238ef5) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "asndynmt-key.bin", 0, 4, CRC(bf5396a9) SHA1(0b27fdc800143fb977cb2f1e937078d7a7006939) )
+	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
+	ROM_LOAD( "317-0495-com.ic3", 0, 20, CRC(675aca7b) SHA1(5127189e1f960abf9ed3f643158747d9abcaee1c) )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x04))
 ROM_END
@@ -5674,8 +5680,8 @@ ROM_START( illvelo )
 	ROM_LOAD( "fpr-24439.ic10", 0x8000000, 0x4000000, CRC(c02040f9) SHA1(27ad2cb45e8a516433917f060ca9798412bb95f7) )
 	// IC11 Populated, Empty
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "illvelo-key.bin", 0, 4, CRC(e164952f) SHA1(6c0dfe567640e1e843a5d7bf858a24c101dfcf95) )
+	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
+	ROM_LOAD( "317-5131-jpn.ic3", 0, 20, CRC(44ab8ca9) SHA1(c17b10041e70590547ed010dc16a4dd2510fcc80) )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x04))
 ROM_END
@@ -5690,8 +5696,8 @@ ROM_START( mamonoro )
 	ROM_LOAD( "ic10.bin", 0x8000000, 0x4000000, CRC(76fb945f) SHA1(448be0c3d9a7c3956dd51aca3c4d8d28f8cec227) )
 	// IC11 Populated, Empty
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "mamonoro-key.bin", 0x000000, 0x000004, CRC(264ca27a) SHA1(3b81b9794d86697f8eac7ea6945d992564ad6199) )
+	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
+	ROM_LOAD( "317-5132-jpn.ic3", 0, 20, CRC(f2089de5) SHA1(12af0681decb22bbfa4b3e01037c3503846f265a) )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x04))
 ROM_END
@@ -5708,8 +5714,8 @@ ROM_START( mbaa )
 	ROM_LOAD( "ic12.bin",     0x10000000, 0x4000000, CRC(b8a6bff2) SHA1(befbc2e917b3107f1c4bfb9169623282ff97bfb2) )
 	ROM_LOAD( "ic13.bin",     0x14000000, 0x4000000, CRC(4886329f) SHA1(6ccf6fb83cfdbef3f85f6c06e641c38ff434d605) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "mbaa-key.bin", 0x000000, 0x000004, CRC(f4ad909f) SHA1(27ba44592c2642b5862a24f68c755ad4115e6047) )
+	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
+	ROM_LOAD( "317-5133-jpn.ic3", 0, 20, CRC(3dc7d902) SHA1(bb70e80dff878bca3652088f3333079e0781f482) )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x06))
 ROM_END
@@ -5727,8 +5733,8 @@ ROM_START( mbaaa )
 	ROM_LOAD( "ic12.bin",     0x10000000, 0x4000000, CRC(b8a6bff2) SHA1(befbc2e917b3107f1c4bfb9169623282ff97bfb2) )
 	ROM_LOAD( "ic13.bin",     0x14000000, 0x4000000, CRC(4886329f) SHA1(6ccf6fb83cfdbef3f85f6c06e641c38ff434d605) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "mbaa-key.bin", 0x000000, 0x000004, CRC(f4ad909f) SHA1(27ba44592c2642b5862a24f68c755ad4115e6047) )
+	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
+	ROM_LOAD( "317-5133-jpn.ic3", 0, 20, CRC(3dc7d902) SHA1(bb70e80dff878bca3652088f3333079e0781f482) )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x86))
 ROM_END
@@ -5742,8 +5748,8 @@ ROM_START( radirgyn )
 	ROM_LOAD( "ic9.bin", 0x4000000, 0x4000000, CRC(16cf2e7a) SHA1(ff7c6540e4507f84e3128ba03be4826ba504678c) )
 	// IC10 and IC11 Populated, Empty
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "radirgyn-key.bin", 0x000000, 0x000004, CRC(c158cf3b) SHA1(c128646d7fee79fc10bf7bbaa23121f347df77f4) )
+	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
+	ROM_LOAD( "317-5138-jpn.ic3", 0, 20, CRC(babcc420) SHA1(653cdcfa388426f4ce03c76506046ec6fd070562) )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x04))
 ROM_END
@@ -5757,8 +5763,8 @@ ROM_START( ausfache )
 	ROM_LOAD( "ic9.bin",    0x4000000, 0x4000000, CRC(18c994d7) SHA1(159e1425b2fc645133814b0d26d93a90e9849b1a) )
 	// IC10 and IC11 Populated, Empty
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "ausfache-key.bin", 0, 4, CRC(93cdc793) SHA1(f0a0c321a3bdf8ca87cbd840a168a9057c08f16a) )
+	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
+	ROM_LOAD( "317-5130-jpn.ic3", 0, 20, CRC(3e0c010b) SHA1(b6da97d4ecb228e73fb9a5ada837d0d6699ab0f1) )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x04))
 ROM_END
@@ -5777,8 +5783,10 @@ ROM_START( manicpnc )
 	ROM_REGION( 0x200000, "ioboard", 0) // touch screen I/O board, program disassembles as little-endian SH-4
 	ROM_LOAD( "fpr24351.ic14", 0x000000, 0x200000, CRC(4d1b7b89) SHA1(965b8c6b5a2e7b3f1b1e2eac19c86000c3b66754) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "pokasuka-key.bin", 0, 4, CRC(f00bcd61) SHA1(b8315b851656c2e0b7853979988d1c44eab0886b) )
+	// ROM_REGION( 4, "rom_key", 0 )
+	// ROM_LOAD( "pokasuka-key.bin", 0, 4, CRC(f00bcd61) SHA1(b8315b851656c2e0b7853979988d1c44eab0886b) )
+	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
+	ROM_LOAD( "317-0461-com.ic3", 0, 20, NO_DUMP )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x05))
 ROM_END
@@ -5797,8 +5805,10 @@ ROM_START( pokasuka )
 	ROM_REGION( 0x200000, "ioboard", 0) // touch screen I/O board, program disassembles as little-endian SH-4
 	ROM_LOAD( "fpr24351.ic14", 0x000000, 0x200000, CRC(4d1b7b89) SHA1(965b8c6b5a2e7b3f1b1e2eac19c86000c3b66754) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "pokasuka-key.bin", 0, 4, CRC(f00bcd61) SHA1(b8315b851656c2e0b7853979988d1c44eab0886b) )
+	// ROM_REGION( 4, "rom_key", 0 )
+	// ROM_LOAD( "pokasuka-key.bin", 0, 4, CRC(f00bcd61) SHA1(b8315b851656c2e0b7853979988d1c44eab0886b) )
+	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
+	ROM_LOAD( "317-0461-com.ic3", 0, 20, NO_DUMP )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x05))
 ROM_END
@@ -5816,8 +5826,8 @@ ROM_START( rhytngk )
 	ROM_LOAD( "fpr-24425.ic10", 0x08000000, 0x4000000, CRC(6223ebac) SHA1(64c0ec61c108acbb557e7d3837f578deba832cb6) )
 	ROM_LOAD( "fpr-24426.ic11", 0x0c000000, 0x4000000, CRC(c78b0981) SHA1(f889acf9065566e11ff985a3b6c4824e364d57ae) )
 
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "rhytngk-key.bin", 0x000000, 0x000004, CRC(e2560d28) SHA1(46fb9b47a0df3035f92db2b0c63a6e4e0745ad29) )
+	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
+	ROM_LOAD( "317-0503-jpn.ic3", 0, 20, CRC(69fc3f47) SHA1(3a887c62e93fa264b307c954eb39a4fca1bdfad6) )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x04))
 ROM_END

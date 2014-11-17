@@ -16,7 +16,7 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(prehisle_state::prehisle_sound16_w)
+WRITE16_MEMBER(prehisle_state::soundcmd_w)
 {
 	soundlatch_byte_w(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -27,13 +27,13 @@ WRITE16_MEMBER(prehisle_state::prehisle_sound16_w)
 static ADDRESS_MAP_START( prehisle_map, AS_PROGRAM, 16, prehisle_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x070000, 0x073fff) AM_RAM
-	AM_RANGE(0x090000, 0x0907ff) AM_RAM_WRITE(prehisle_fg_videoram16_w) AM_SHARE("videoram")
+	AM_RANGE(0x090000, 0x0907ff) AM_RAM_WRITE(tx_vram_w) AM_SHARE("tx_vram")
 	AM_RANGE(0x0a0000, 0x0a07ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(prehisle_bg_videoram16_w) AM_SHARE("bg_videoram16")
+	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(fg_vram_w) AM_SHARE("fg_vram")
 	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x0e0000, 0x0e00ff) AM_READ(prehisle_control16_r)
-	AM_RANGE(0x0f0070, 0x0ff071) AM_WRITE(prehisle_sound16_w)
-	AM_RANGE(0x0f0000, 0x0ff0ff) AM_WRITE(prehisle_control16_w)
+	AM_RANGE(0x0e0000, 0x0e00ff) AM_READ(control_r)
+	AM_RANGE(0x0f0070, 0x0ff071) AM_WRITE(soundcmd_w)
+	AM_RANGE(0x0f0000, 0x0ff0ff) AM_WRITE(control_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -100,7 +100,7 @@ static INPUT_PORTS_START( prehisle )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Level_Select ) )     PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Level_Select ) ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:3")
@@ -126,7 +126,7 @@ static INPUT_PORTS_START( prehisle )
 	PORT_DIPSETTING(    0x03, DEF_STR( Standard ) )
 	PORT_DIPSETTING(    0x01, "Middle" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Difficult ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Game Mode" )         PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Game Mode" )             PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, "Demo Sounds Off" )
 	PORT_DIPSETTING(    0x0c, "Demo Sounds On" )
 	PORT_DIPSETTING(    0x00, "Freeze" )
@@ -136,7 +136,7 @@ static INPUT_PORTS_START( prehisle )
 	PORT_DIPSETTING(    0x20, "150K 300K" )
 	PORT_DIPSETTING(    0x10, "300K 500K" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
@@ -182,10 +182,10 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( prehisle )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 768, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 512, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, spritelayout, 256, 16 )
+	GFXDECODE_ENTRY( "chars",   0, charlayout,  0, 16 )
+	GFXDECODE_ENTRY( "bgtiles", 0, tilelayout, 768, 16 )
+	GFXDECODE_ENTRY( "fgtiles", 0, tilelayout, 512, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 256, 16 )
 GFXDECODE_END
 
 /******************************************************************************/
@@ -243,20 +243,20 @@ ROM_START( prehisle )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "gt1.1",  0x000000, 0x10000, CRC(80a4c093) SHA1(abe59e43259eb80b504bd5541f58cd0e5eb998ab) )
 
-	ROM_REGION( 0x008000, "gfx1", 0 )
+	ROM_REGION( 0x008000, "chars", 0 )
 	ROM_LOAD( "gt15.b15",   0x000000, 0x08000, CRC(ac652412) SHA1(916c04c3a8a7bfb961313ab73c0a27d7f5e48de1) )
 
-	ROM_REGION( 0x040000, "gfx2", 0 )
+	ROM_REGION( 0x040000, "bgtiles", 0 )
 	ROM_LOAD( "pi8914.b14", 0x000000, 0x40000, CRC(207d6187) SHA1(505dfd1424b894e7b898f91b89f021ddde433c48) )
 
-	ROM_REGION( 0x040000, "gfx3", 0 )
+	ROM_REGION( 0x040000, "fgtiles", 0 )
 	ROM_LOAD( "pi8916.h16", 0x000000, 0x40000, CRC(7cffe0f6) SHA1(aba08617964fc425418b098be5167021768bd47c) )
 
-	ROM_REGION( 0x0a0000, "gfx4", 0 )
+	ROM_REGION( 0x0a0000, "sprites", 0 )
 	ROM_LOAD( "pi8910.k14", 0x000000, 0x80000, CRC(5a101b0b) SHA1(9645ab1f8d058cf2c6c42ccb4ce92a9b5db10c51) )
 	ROM_LOAD( "gt5.5",      0x080000, 0x20000, CRC(3d3ab273) SHA1(b5706ada9eb2c22fcc0ac8ede2d2ee02ee853191) )
 
-	ROM_REGION( 0x10000, "gfx5", 0 )    /* background tilemaps */
+	ROM_REGION( 0x10000, "bgtilemap", 0 )    /* background tilemaps */
 	ROM_LOAD( "gt11.11",  0x000000, 0x10000, CRC(b4f0fcf0) SHA1(b81cc0b6e3e6f5616789bb3e77807dc0ef718a38) )
 
 	ROM_REGION( 0x20000, "upd", 0 ) /* ADPCM samples */
@@ -271,20 +271,20 @@ ROM_START( prehisleu )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "gt1.1",  0x000000, 0x10000, CRC(80a4c093) SHA1(abe59e43259eb80b504bd5541f58cd0e5eb998ab) )
 
-	ROM_REGION( 0x008000, "gfx1", 0 )
+	ROM_REGION( 0x008000, "chars", 0 )
 	ROM_LOAD( "gt15.b15",   0x000000, 0x08000, CRC(ac652412) SHA1(916c04c3a8a7bfb961313ab73c0a27d7f5e48de1) )
 
-	ROM_REGION( 0x040000, "gfx2", 0 )
+	ROM_REGION( 0x040000, "bgtiles", 0 )
 	ROM_LOAD( "pi8914.b14", 0x000000, 0x40000, CRC(207d6187) SHA1(505dfd1424b894e7b898f91b89f021ddde433c48) )
 
-	ROM_REGION( 0x040000, "gfx3", 0 )
+	ROM_REGION( 0x040000, "fgtiles", 0 )
 	ROM_LOAD( "pi8916.h16", 0x000000, 0x40000, CRC(7cffe0f6) SHA1(aba08617964fc425418b098be5167021768bd47c) )
 
-	ROM_REGION( 0x0a0000, "gfx4", 0 )
+	ROM_REGION( 0x0a0000, "sprites", 0 )
 	ROM_LOAD( "pi8910.k14", 0x000000, 0x80000, CRC(5a101b0b) SHA1(9645ab1f8d058cf2c6c42ccb4ce92a9b5db10c51) )
 	ROM_LOAD( "gt5.5",      0x080000, 0x20000, CRC(3d3ab273) SHA1(b5706ada9eb2c22fcc0ac8ede2d2ee02ee853191) )
 
-	ROM_REGION( 0x10000, "gfx5", 0 )    /* background tilemaps */
+	ROM_REGION( 0x10000, "bgtilemap", 0 )    /* background tilemaps */
 	ROM_LOAD( "gt11.11",  0x000000, 0x10000, CRC(b4f0fcf0) SHA1(b81cc0b6e3e6f5616789bb3e77807dc0ef718a38) )
 
 	ROM_REGION( 0x20000, "upd", 0 ) /* ADPCM samples */
@@ -299,20 +299,20 @@ ROM_START( prehislek )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "gt1.1",  0x000000, 0x10000, CRC(80a4c093) SHA1(abe59e43259eb80b504bd5541f58cd0e5eb998ab) )
 
-	ROM_REGION( 0x008000, "gfx1", 0 )
+	ROM_REGION( 0x008000, "chars", 0 )
 	ROM_LOAD( "gt15.b15",   0x000000, 0x08000, BAD_DUMP CRC(ac652412) SHA1(916c04c3a8a7bfb961313ab73c0a27d7f5e48de1) ) // not dumped, missing korean text
 
-	ROM_REGION( 0x040000, "gfx2", 0 )
+	ROM_REGION( 0x040000, "bgtiles", 0 )
 	ROM_LOAD( "pi8914.b14", 0x000000, 0x40000, CRC(207d6187) SHA1(505dfd1424b894e7b898f91b89f021ddde433c48) )
 
-	ROM_REGION( 0x040000, "gfx3", 0 )
+	ROM_REGION( 0x040000, "fgtiles", 0 )
 	ROM_LOAD( "pi8916.h16", 0x000000, 0x40000, CRC(7cffe0f6) SHA1(aba08617964fc425418b098be5167021768bd47c) )
 
-	ROM_REGION( 0x0a0000, "gfx4", 0 )
+	ROM_REGION( 0x0a0000, "sprites", 0 )
 	ROM_LOAD( "pi8910.k14", 0x000000, 0x80000, CRC(5a101b0b) SHA1(9645ab1f8d058cf2c6c42ccb4ce92a9b5db10c51) )
 	ROM_LOAD( "gt5.5",      0x080000, 0x20000, CRC(3d3ab273) SHA1(b5706ada9eb2c22fcc0ac8ede2d2ee02ee853191) )
 
-	ROM_REGION( 0x10000, "gfx5", 0 )    /* background tilemaps */
+	ROM_REGION( 0x10000, "bgtilemap", 0 )    /* background tilemaps */
 	ROM_LOAD( "gt11.11",  0x000000, 0x10000, CRC(b4f0fcf0) SHA1(b81cc0b6e3e6f5616789bb3e77807dc0ef718a38) )
 
 	ROM_REGION( 0x20000, "upd", 0 ) /* ADPCM samples */
@@ -327,20 +327,20 @@ ROM_START( gensitou )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "gt1.1",  0x000000, 0x10000, CRC(80a4c093) SHA1(abe59e43259eb80b504bd5541f58cd0e5eb998ab) )
 
-	ROM_REGION( 0x008000, "gfx1", 0 )
+	ROM_REGION( 0x008000, "chars", 0 )
 	ROM_LOAD( "gt15.b15",   0x000000, 0x08000, CRC(ac652412) SHA1(916c04c3a8a7bfb961313ab73c0a27d7f5e48de1) )
 
-	ROM_REGION( 0x040000, "gfx2", 0 )
+	ROM_REGION( 0x040000, "bgtiles", 0 )
 	ROM_LOAD( "pi8914.b14", 0x000000, 0x40000, CRC(207d6187) SHA1(505dfd1424b894e7b898f91b89f021ddde433c48) )
 
-	ROM_REGION( 0x040000, "gfx3", 0 )
+	ROM_REGION( 0x040000, "fgtiles", 0 )
 	ROM_LOAD( "pi8916.h16", 0x000000, 0x40000, CRC(7cffe0f6) SHA1(aba08617964fc425418b098be5167021768bd47c) )
 
-	ROM_REGION( 0x0a0000, "gfx4", 0 )
+	ROM_REGION( 0x0a0000, "sprites", 0 )
 	ROM_LOAD( "pi8910.k14", 0x000000, 0x80000, CRC(5a101b0b) SHA1(9645ab1f8d058cf2c6c42ccb4ce92a9b5db10c51) )
 	ROM_LOAD( "gt5.5",      0x080000, 0x20000, CRC(3d3ab273) SHA1(b5706ada9eb2c22fcc0ac8ede2d2ee02ee853191) )
 
-	ROM_REGION( 0x10000, "gfx5", 0 )    /* background tilemaps */
+	ROM_REGION( 0x10000, "bgtilemap", 0 )    /* background tilemaps */
 	ROM_LOAD( "gt11.11",  0x000000, 0x10000, CRC(b4f0fcf0) SHA1(b81cc0b6e3e6f5616789bb3e77807dc0ef718a38) )
 
 	ROM_REGION( 0x20000, "upd", 0 ) /* ADPCM samples */

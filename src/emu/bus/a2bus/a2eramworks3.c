@@ -69,6 +69,11 @@ UINT8 *a2eaux_ramworks3_device::get_vram_ptr()
 	return &m_ram[0];
 }
 
+UINT8 *a2eaux_ramworks3_device::get_auxbank_ptr()
+{
+	return &m_ram[m_bank];
+}
+
 /*
     These cards are split into 64k logical banks.
 
