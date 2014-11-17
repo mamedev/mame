@@ -476,6 +476,11 @@ READ8_MEMBER(apple2e_state::memexp_r)
 {
 	UINT8 retval = m_exp_regs[offset];
 
+	if (!m_exp_ram)
+	{
+		return 0xff;
+	}
+
 	if (offset == 3)
 	{
 		if (m_exp_liveptr <= m_exp_addrmask)
@@ -497,6 +502,11 @@ READ8_MEMBER(apple2e_state::memexp_r)
 
 WRITE8_MEMBER(apple2e_state::memexp_w)
 {
+	if (!m_exp_ram)
+	{
+		return;
+	}
+
 	switch (offset & 0xf)
 	{
 		case 0:
@@ -2277,6 +2287,26 @@ static ADDRESS_MAP_START( apple2c_memexp_map, AS_PROGRAM, 8, apple2e_state )
 	AM_RANGE(0xd000, 0xffff) AM_DEVICE(A2_UPPERBANK_TAG, address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( laser128_map, AS_PROGRAM, 8, apple2e_state )
+	AM_RANGE(0x0000, 0x01ff) AM_DEVICE(A2_0000_TAG, address_map_bank_device, amap8)
+	AM_RANGE(0x0200, 0x03ff) AM_DEVICE(A2_0200_TAG, address_map_bank_device, amap8)
+	AM_RANGE(0x0400, 0x07ff) AM_DEVICE(A2_0400_TAG, address_map_bank_device, amap8)
+	AM_RANGE(0x0800, 0x1fff) AM_DEVICE(A2_0800_TAG, address_map_bank_device, amap8)
+	AM_RANGE(0x2000, 0x3fff) AM_DEVICE(A2_2000_TAG, address_map_bank_device, amap8)
+	AM_RANGE(0x4000, 0xbfff) AM_DEVICE(A2_4000_TAG, address_map_bank_device, amap8)
+	AM_RANGE(0xc000, 0xc07f) AM_READWRITE(c000_r, c000_w)
+//	AM_RANGE(0xc098, 0xc09b) AM_DEVREADWRITE(IIC_ACIA1_TAG, mos6551_device, read, write)
+//	AM_RANGE(0xc0a8, 0xc0ab) AM_DEVREADWRITE(IIC_ACIA2_TAG, mos6551_device, read, write)
+	AM_RANGE(0xc0d0, 0xc0d3) AM_READWRITE(memexp_r, memexp_w)
+	AM_RANGE(0xc0e0, 0xc0ef) AM_DEVREADWRITE(LASER128_UDC_TAG, applefdc_base_device, read, write)
+	AM_RANGE(0xc080, 0xc0ff) AM_READWRITE(c080_r, c080_w)
+	AM_RANGE(0xc100, 0xc2ff) AM_DEVICE(A2_C100_TAG, address_map_bank_device, amap8)
+	AM_RANGE(0xc300, 0xc3ff) AM_DEVICE(A2_C300_TAG, address_map_bank_device, amap8)
+	AM_RANGE(0xc400, 0xc7ff) AM_DEVICE(A2_C400_TAG, address_map_bank_device, amap8)
+	AM_RANGE(0xc800, 0xcfff) AM_DEVICE(A2_C800_TAG, address_map_bank_device, amap8)
+	AM_RANGE(0xd000, 0xffff) AM_DEVICE(A2_UPPERBANK_TAG, address_map_bank_device, amap8)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( r0000bank_map, AS_PROGRAM, 8, apple2e_state )
 	AM_RANGE(0x0000, 0x01ff) AM_READWRITE(ram0000_r, ram0000_w)
 	AM_RANGE(0x0200, 0x03ff) AM_READWRITE(auxram0000_r, auxram0000_w) 
@@ -3299,6 +3329,9 @@ static const floppy_interface floppy_interface =
 };
 
 static MACHINE_CONFIG_DERIVED( laser128, apple2c )
+	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
+	MCFG_CPU_PROGRAM_MAP(laser128_map)
+
 	MCFG_APPLEFDC_ADD(LASER128_UDC_TAG, fdc_interface)
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 
@@ -3311,9 +3344,16 @@ static MACHINE_CONFIG_DERIVED( laser128, apple2c )
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl5", apple2_cards, NULL)
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_LASER128, NULL)
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl7", apple2_cards, NULL)
+
+	MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("128K")
+	MCFG_RAM_EXTRA_OPTIONS("128K, 384K, 640K, 896K, 1152K")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( laser128ex2, apple2c )
+	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
+	MCFG_CPU_PROGRAM_MAP(laser128_map)
+
 	MCFG_APPLEFDC_ADD(LASER128_UDC_TAG, fdc_interface)
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 
@@ -3326,6 +3366,10 @@ static MACHINE_CONFIG_DERIVED( laser128ex2, apple2c )
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl5", A2BUS_LASER128, NULL)
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_LASER128, NULL)
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl7", A2BUS_LASER128, NULL)
+
+	MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("128K")
+	MCFG_RAM_EXTRA_OPTIONS("128K, 384K, 640K, 896K, 1152K")
 MACHINE_CONFIG_END
 
 /***************************************************************************
