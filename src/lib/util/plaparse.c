@@ -61,22 +61,19 @@ static int iscrlf(char c)
     character stream
 -------------------------------------------------*/
 
-static UINT32 suck_number(const UINT8 **cursrc, const UINT8 *srcend)
+static UINT32 suck_number(const UINT8 **src, const UINT8 *srcend)
 {
 	UINT32 value = 0;
-	(*cursrc)++;
 	
 	// find first digit
-	while (*cursrc < srcend && !iscrlf(**cursrc) && !isdigit(**cursrc))
-		(*cursrc)++;
-	if (*cursrc >= srcend)
-		return 0;
+	while (*src < srcend && !iscrlf(**src) && !isdigit(**src))
+		(*src)++;
 
 	// loop over and accumulate digits
-	while (isdigit(**cursrc))
+	while (*src < srcend && isdigit(**src))
 	{
-		value = value * 10 + (**cursrc) - '0';
-		(*cursrc)++;
+		value = value * 10 + (**src) - '0';
+		(*src)++;
 	}
 
 	return value;
@@ -92,88 +89,89 @@ static UINT32 suck_number(const UINT8 **cursrc, const UINT8 *srcend)
     process_terms - process input/output matrix
 -------------------------------------------------*/
 
-static bool process_terms(jed_data *data, const UINT8 **cursrc, const UINT8 *srcend, parse_info *pinfo)
+static bool process_terms(jed_data *data, const UINT8 **src, const UINT8 *srcend, parse_info *pinfo)
 {
 	UINT32 curinput = 0;
 	UINT32 curoutput = 0;
 	bool outputs = false;
+	
+	// symbols for 0, 1, dont_care, no_meaning
+	// PLA format documentation also describes them as simply 0, 1, 2, 3
+	static const char symbols[] = { "01-~" };
 
-	while (*cursrc < srcend && **cursrc != '.' && **cursrc != '#')
+	while (*src < srcend && **src != '.' && **src != '#')
 	{
-		switch (**cursrc)
+		if (!outputs)
 		{
-			case '-':
-				if (!outputs)
-				{
-					curinput++;
-					jed_set_fuse(data, data->numfuses++, 1);
-					jed_set_fuse(data, data->numfuses++, 1);
-
-					if (LOG_PARSE) printf("11");
-				}
-				break;
-
-			case '~':
-				if (!outputs)
-				{
-					curinput++;
-					// this product term is inhibited
-					jed_set_fuse(data, data->numfuses++, 0);
-					jed_set_fuse(data, data->numfuses++, 0);
-
-					if (LOG_PARSE) printf("00");
-				}
-				break;
-
-			case '1':
-				if (outputs)
-				{
-					curoutput++;
-					jed_set_fuse(data, data->numfuses++, 0);
-
-					if (LOG_PARSE) printf("0");
-				}
-				else
-				{
-					curinput++;
-					jed_set_fuse(data, data->numfuses++, 1);
-					jed_set_fuse(data, data->numfuses++, 0);
-
-					if (LOG_PARSE) printf("10");
-				}
-				break;
-
-			case '0':
-				if (outputs)
-				{
-					curoutput++;
-					jed_set_fuse(data, data->numfuses++, 1);
-
-					if (LOG_PARSE) printf("1");
-				}
-				else
-				{
-					curinput++;
+			// and-matrix
+			if (strrchr(symbols, **src))
+				curinput++;
+			
+			switch (**src)
+			{
+				case '0':
 					jed_set_fuse(data, data->numfuses++, 0);
 					jed_set_fuse(data, data->numfuses++, 1);
 
 					if (LOG_PARSE) printf("01");
-				}
-				break;
+					break;
 
-			case ' ': case '\t':
-				if (curinput > 0 && !outputs)
-				{
-					outputs = true;
-					if (LOG_PARSE) printf(" ");
-				}
-				break;
+				case '1':
+					jed_set_fuse(data, data->numfuses++, 1);
+					jed_set_fuse(data, data->numfuses++, 0);
+
+					if (LOG_PARSE) printf("10");
+					break;
+
+				// anything goes
+				case '-':
+					jed_set_fuse(data, data->numfuses++, 1);
+					jed_set_fuse(data, data->numfuses++, 1);
+
+					if (LOG_PARSE) printf("11");
+					break;
+
+				// this product term is inhibited
+				case '~':
+					jed_set_fuse(data, data->numfuses++, 0);
+					jed_set_fuse(data, data->numfuses++, 0);
+
+					if (LOG_PARSE) printf("00");
+					break;
+
+				case ' ': case '\t':
+					if (curinput > 0)
+					{
+						outputs = true;
+						if (LOG_PARSE) printf(" ");
+					}
+					break;
 		
-			default:
-				break;
+				default:
+					break;
+			}
+		}
+		else
+		{
+			// or-matrix
+			if (strrchr(symbols, **src))
+			{
+				curoutput++;
+				if (**src == '1')
+				{
+					jed_set_fuse(data, data->numfuses++, 0);
+					if (LOG_PARSE) printf("0");
+				}
+				else
+				{
+					// write 1 for anything else
+					jed_set_fuse(data, data->numfuses++, 1);
+					if (LOG_PARSE) printf("1");
+				}
+			}
 		}
 
-		if (iscrlf(**cursrc) && outputs)
+		if (iscrlf(**src) && outputs)
 		{
 			outputs = false;
 			if (LOG_PARSE) printf("\n");
@@ -185,7 +183,7 @@ static bool process_terms(jed_data *data, const UINT8 **cursrc, const UINT8 *src
 			curoutput = 0;
 		}
 
-		(*cursrc)++;
+		(*src)++;
 	}
 	
 	return true;
@@ -197,15 +195,49 @@ static bool process_terms(jed_data *data, const UINT8 **cursrc, const UINT8 *src
     process_field - process a single field
 -------------------------------------------------*/
 
-static bool process_field(jed_data *data, const UINT8 **cursrc, const UINT8 *srcend, parse_info *pinfo)
+static bool process_field(jed_data *data, const UINT8 **src, const UINT8 *srcend, parse_info *pinfo)
 {
-	(*cursrc)++;
-
-	switch (**cursrc)
+	// valid keywords
+	static const char *const keywords[] = { "i", "o", "p", "phase", "e", "\0" };
+	enum
+	{
+		KW_INPUTS = 0,
+		KW_OUTPUTS,
+		KW_TERMS,
+		KW_PHASE,
+		KW_END,
+		
+		KW_INVALID
+	};
+	
+	// find keyword
+	char dest[0x10];
+	memset(dest, 0, ARRAY_LENGTH(dest));
+	const UINT8 *seek = *src;
+	int destptr = 0;
+	
+	while (seek < srcend && isalpha(*seek) && destptr < ARRAY_LENGTH(dest) - 1)
+	{
+		dest[destptr] = tolower(*seek);
+		seek++;
+		destptr++;
+	}
+	
+	UINT8 find = 0;
+	while (strlen(keywords[find]) && strcmp(dest, keywords[find]))
+		find++;
+	
+	if (find == KW_INVALID)
+		return false;
+	
+	(*src) += strlen(keywords[find]);
+	
+	// handle it
+	switch (find)
 	{
 		// number of inputs
-		case 'i': case 'I':
-			pinfo->inputs = suck_number(cursrc, srcend);
+		case KW_INPUTS:
+			pinfo->inputs = suck_number(src, srcend);
 			if (pinfo->inputs == 0 || pinfo->inputs >= (JED_MAX_FUSES/2))
 				return false;
 
@@ -213,51 +245,43 @@ static bool process_field(jed_data *data, const UINT8 **cursrc, const UINT8 *src
 			break;
 
 		// number of outputs
-		case 'o': case 'O':
-			pinfo->outputs = suck_number(cursrc, srcend);
+		case KW_OUTPUTS:
+			pinfo->outputs = suck_number(src, srcend);
 			if (pinfo->outputs == 0 || pinfo->outputs >= (JED_MAX_FUSES/2))
 				return false;
 
 			if (LOG_PARSE) printf("Outputs: %u\n", pinfo->outputs);
 			break;
 
-		case 'p': case 'P':
-			// output polarity (optional)
-			if (tolower((*cursrc)[1]) == 'h' && tolower((*cursrc)[2]) == 'a' && tolower((*cursrc)[3]) == 's' && tolower((*cursrc)[4]) == 'e')
-			{
-				if (LOG_PARSE) printf("Phase...\n");
-				while (*cursrc < srcend && !iscrlf(**cursrc) && pinfo->xorptr < (JED_MAX_FUSES/2))
-				{
-					if (**cursrc == '0' || **cursrc == '1')
-					{
-						// 0 is negative
-						if (**cursrc == '0')
-							pinfo->xorval[pinfo->xorptr/32] |= 1 << (pinfo->xorptr & 31);
-						pinfo->xorptr++;
-					}
-					
-					(*cursrc)++;
-				}
-			}
-			
-			// or number of product terms (optional)
-			else
-			{
-				pinfo->terms = suck_number(cursrc, srcend);
-				if (pinfo->terms == 0 || pinfo->terms >= (JED_MAX_FUSES/2))
-					return false;
+		// number of product terms (optional)
+		case KW_TERMS:
+			pinfo->terms = suck_number(src, srcend);
+			if (pinfo->terms == 0 || pinfo->terms >= (JED_MAX_FUSES/2))
+				return false;
 
-				if (LOG_PARSE) printf("Terms: %u\n", pinfo->terms);
+			if (LOG_PARSE) printf("Terms: %u\n", pinfo->terms);
+			break;
+		
+		// output polarity (optional)
+		case KW_PHASE:
+			if (LOG_PARSE) printf("Phase...\n");
+			while (*src < srcend && !iscrlf(**src) && pinfo->xorptr < (JED_MAX_FUSES/2))
+			{
+				if (**src == '0' || **src == '1')
+				{
+					// 0 is negative
+					if (**src == '0')
+						pinfo->xorval[pinfo->xorptr/32] |= 1 << (pinfo->xorptr & 31);
+					pinfo->xorptr++;
+				}
+				(*src)++;
 			}
 			break;
 
 		// end of file (optional)
-		case 'e': case 'E':
+		case KW_END:
 			if (LOG_PARSE) printf("End of file\n");
 			break;
-		
-		default:
-			return false;
 	}
 	
 	return true;
@@ -272,8 +296,8 @@ static bool process_field(jed_data *data, const UINT8 **cursrc, const UINT8 *src
 
 int pla_parse(const void *data, size_t length, jed_data *result)
 {
-	const UINT8 *cursrc = (const UINT8 *)data;
-	const UINT8 *srcend = cursrc + length;
+	const UINT8 *src = (const UINT8 *)data;
+	const UINT8 *srcend = src + length;
 	
 	parse_info pinfo;
 	memset(&pinfo, 0, sizeof(pinfo));
@@ -281,30 +305,31 @@ int pla_parse(const void *data, size_t length, jed_data *result)
 	result->numfuses = 0;
 	memset(result->fusemap, 0, sizeof(result->fusemap));
 
-	while (cursrc < srcend)
+	while (src < srcend)
 	{
-		switch (*cursrc)
+		switch (*src)
 		{
 			// comment line
 			case '#':
-				while (cursrc < srcend && !iscrlf(*cursrc))
-					cursrc++;
+				while (src < srcend && !iscrlf(*src))
+					src++;
 				break;
 
 			// keyword
 			case '.':
-				if (!process_field(result, &cursrc, srcend, &pinfo))
+				src++;
+				if (!process_field(result, &src, srcend, &pinfo))
 					return JEDERR_INVALID_DATA;
 				break;
 			
 			// terms
 			case '0': case '1': case '-': case '~':
-				if (!process_terms(result, &cursrc, srcend, &pinfo))
+				if (!process_terms(result, &src, srcend, &pinfo))
 					return JEDERR_INVALID_DATA;
 				break;
 			
 			default:
-				cursrc++;
+				src++;
 				break;
 		}
 	}
