@@ -4390,7 +4390,7 @@ inline void rsp_device::ccfunc_rsp_vmadh_scalar()
 
 		INT32 accum = (UINT32)(UINT16)ACCUM_M(i);
 		accum |= ((UINT32)((UINT16)ACCUM_H(i))) << 16;
-		accum += s1*s2;
+		accum += s1 * s2;
 
 		SET_ACCUM_H((UINT16)(accum >> 16), i);
 		SET_ACCUM_M((UINT16)accum, i);
@@ -4880,7 +4880,10 @@ inline void rsp_device::ccfunc_rsp_vsaw_simd()
 			m_xv[VDREG] = m_accum_l;
 			break;
 		}
-		default:    fatalerror("RSP: VSAW: el = %d\n", EL);
+		default:		// Unsupported, writes 0 to VD
+		{
+
+		}
 	}
 }
 
@@ -4899,30 +4902,30 @@ inline void rsp_device::ccfunc_rsp_vsaw_scalar()
 	switch (EL)
 	{
 		case 0x08:      // VSAWH
-		{
 			for (int i = 0; i < 8; i++)
 			{
 				W_VREG_S(VDREG, i) = ACCUM_H(i);
 			}
 			break;
-		}
 		case 0x09:      // VSAWM
-		{
 			for (int i = 0; i < 8; i++)
 			{
 				W_VREG_S(VDREG, i) = ACCUM_M(i);
 			}
 			break;
-		}
 		case 0x0a:      // VSAWL
-		{
 			for (int i = 0; i < 8; i++)
 			{
 				W_VREG_S(VDREG, i) = ACCUM_L(i);
 			}
 			break;
+		default:		// Unsupported
+		{
+			for (int i = 0; i < 8; i++)
+			{
+				W_VREG_S(VDREG, i) = 0;
+			}
 		}
-		default:    fatalerror("RSP: VSAW: el = %d\n", EL);
 	}
 }
 
@@ -5278,12 +5281,12 @@ inline void rsp_device::ccfunc_rsp_vcl_simd()
 					VEC_SET_ACCUM_L(s1, i);
 				}
 			}
-			else//VEC_ZERO_FLAG(i)==0
+			else
 			{
 				if (VEC_CLIP1_FLAG(i) != 0)
 				{
 					if (((UINT32)(UINT16)(s1) + (UINT32)(UINT16)(s2)) > 0x10000)
-					{//proper fix for Harvest Moon 64, r4
+					{
 						VEC_SET_ACCUM_L(s1, i);
 						VEC_CLEAR_COMPARE_FLAG(i);
 					}
@@ -5308,7 +5311,7 @@ inline void rsp_device::ccfunc_rsp_vcl_simd()
 				}
 			}
 		}
-		else//VEC_CARRY_FLAG(i)==0
+		else
 		{
 			if (VEC_ZERO_FLAG(i) != 0)
 			{
@@ -5375,12 +5378,12 @@ inline void rsp_device::ccfunc_rsp_vcl_scalar()
 					SET_ACCUM_L(s1, i);
 				}
 			}
-			else//ZERO_FLAG(i)==0
+			else
 			{
 				if (CLIP1_FLAG(i) != 0)
 				{
 					if (((UINT32)(UINT16)(s1) + (UINT32)(UINT16)(s2)) > 0x10000)
-					{//proper fix for Harvest Moon 64, r4
+					{
 						SET_ACCUM_L(s1, i);
 						CLEAR_COMPARE_FLAG(i);
 					}
@@ -5405,7 +5408,7 @@ inline void rsp_device::ccfunc_rsp_vcl_scalar()
 				}
 			}
 		}
-		else//CARRY_FLAG(i)==0
+		else
 		{
 			if (ZERO_FLAG(i) != 0)
 			{
@@ -6501,6 +6504,7 @@ inline void rsp_device::ccfunc_rsp_vrcpl_scalar()
 	INT32 fetchval = rsp_divtable[address & 0x1ff];
 	INT32 temp = (0x40000000 | (fetchval << 14)) >> ((~shifter) & 0x1f);
 	temp ^= rec >> 31;
+
 	if (!rec)
 	{
 		temp = 0x7fffffff;

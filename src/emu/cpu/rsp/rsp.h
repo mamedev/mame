@@ -133,9 +133,9 @@ union VECTOR_REG
 
 union ACCUMULATOR_REG
 {
-	INT64 q;
-	INT32 l[2];
-	INT16 w[4];
+	UINT64 q;
+	UINT32 l[2];
+	UINT16 w[4];
 };
 
 #define MCFG_RSP_DP_REG_R_CB(_devcb) \
