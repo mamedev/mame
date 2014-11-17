@@ -240,9 +240,7 @@ void gaelco_gae1_device::device_start()
 {
 	m_stream = stream_alloc(0, 2, 8000);
 
-	m_snd_data = (UINT8 *)machine().root_device().memregion(m_data_tag)->base();
-	if (m_snd_data == NULL)
-		m_snd_data = *region();
+	m_snd_data = owner()->memregion(m_data_tag)->base();
 
 	/* init volume table */
 	for (int vol = 0; vol < GAELCO_VOLUME_LEVELS; vol++){

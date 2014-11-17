@@ -85,10 +85,10 @@ const device_type X1_010 = &device_creator<x1_010_device>;
 x1_010_device::x1_010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, X1_010, "X1-010", tag, owner, clock, "x1_010", __FILE__),
 		device_sound_interface(mconfig, *this),
+		m_region(*this, DEVICE_SELF),
 		m_rate(0),
 		m_adr(0),
 		m_stream(NULL),
-		m_region(NULL),
 		m_sound_enable(0),
 		m_base_clock(0)
 {
@@ -106,7 +106,6 @@ void x1_010_device::device_start()
 {
 	int i;
 
-	m_region        = *region();
 	m_base_clock    = clock();
 	m_rate          = clock() / 1024;
 
@@ -193,7 +192,6 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	register INT8   *start, *end, data;
 	register UINT8  *env;
 	register UINT32 smp_offs, smp_step, env_offs, env_step, delta;
-	const UINT8 *snd1 = m_region;
 
 	// mixer buffer zero clear
 	memset( outputs[0], 0, samples*sizeof(*outputs[0]) );
@@ -207,8 +205,8 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			stream_sample_t *bufL = outputs[0];
 			stream_sample_t *bufR = outputs[1];
 			if( (reg->status&2) == 0 ) {                        // PCM sampling
-				start    = (INT8 *)(reg->start      *0x1000+snd1);
-				end      = (INT8 *)((0x100-reg->end)*0x1000+snd1);
+				start    = m_region + reg->start*0x1000;
+				end      = m_region + (0x100-reg->end)*0x1000;
 				volL     = ((reg->volume>>4)&0xf)*VOL_BASE;
 				volR     = ((reg->volume>>0)&0xf)*VOL_BASE;
 				smp_offs = m_smp_offset[ch];

@@ -1271,7 +1271,7 @@ static UINT64 expression_read_memory_region(running_machine &machine, const char
 		else if (address < region->bytes())
 		{
 			/* lowmask specified which address bits are within the databus width */
-			UINT32 lowmask = region->width() - 1;
+			UINT32 lowmask = region->bytewidth() - 1;
 			UINT8 *base = region->base() + (address & ~lowmask);
 
 			/* if we have a valid base, return the appropriate byte */
@@ -1453,7 +1453,7 @@ static void expression_write_memory_region(running_machine &machine, const char 
 		else if (address < region->bytes())
 		{
 			/* lowmask specified which address bits are within the databus width */
-			UINT32 lowmask = region->width() - 1;
+			UINT32 lowmask = region->bytewidth() - 1;
 			UINT8 *base = region->base() + (address & ~lowmask);
 
 			/* if we have a valid base, set the appropriate byte */

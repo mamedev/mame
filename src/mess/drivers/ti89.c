@@ -426,7 +426,6 @@ INPUT_PORTS_END
 
 void ti68k_state::machine_start()
 {
-	m_rom_base = (UINT16 *)(*memregion("flash"));
 	int i;
 
 	m_flash_mem = !((m_rom_base[0x32] & 0x0f) != 0);

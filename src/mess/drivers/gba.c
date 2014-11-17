@@ -1885,7 +1885,7 @@ WRITE32_MEMBER(gba_state::gba_oam_w)
 
 READ32_MEMBER(gba_state::gba_bios_r)
 {
-	UINT32 *rom = (UINT32 *)(*m_region_maincpu);
+	UINT32 *rom = m_region_maincpu;
 	if (m_bios_hack->read())
 	{
 		// partially patch out logo and checksum checks

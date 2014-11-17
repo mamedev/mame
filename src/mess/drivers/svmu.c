@@ -29,12 +29,14 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_flash(*this, "flash"),
-			m_speaker(*this, "speaker")
+			m_speaker(*this, "speaker"),
+			m_bios(*this, "bios")
 		{ }
 
 	required_device<lc8670_cpu_device> m_maincpu;
 	required_device<intelfsh8_device> m_flash;
 	required_device<speaker_sound_device> m_speaker;
+	required_region_ptr<UINT8> m_bios;
 
 	DECLARE_PALETTE_INIT(svmu);
 	virtual void machine_reset();
@@ -48,7 +50,6 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER( svmu );
 
 private:
-	UINT8 *     m_bios;
 	UINT8       m_page;
 };
 
@@ -145,7 +146,6 @@ INPUT_PORTS_END
 
 void svmu_state::machine_reset()
 {
-	m_bios = (UINT8*)(*memregion("bios"));
 	m_page = 0;
 }
 

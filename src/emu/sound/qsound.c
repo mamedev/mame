@@ -68,11 +68,10 @@ ROM_END
 qsound_device::qsound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, QSOUND, "Q-Sound", tag, owner, clock, "qsound", __FILE__),
 		device_sound_interface(mconfig, *this),
+		m_cpu(*this, "qsound"),
+		m_sample_rom(*this, DEVICE_SELF),
 		m_data(0),
-		m_stream(NULL),
-		m_sample_rom_length(0),
-		m_sample_rom(NULL),
-		m_cpu(NULL)
+		m_stream(NULL)
 {
 }
 
@@ -105,12 +104,6 @@ machine_config_constructor qsound_device::device_mconfig_additions() const
 
 void qsound_device::device_start()
 {
-	// find our CPU
-	m_cpu = subdevice<dsp16_device>("qsound");
-
-	m_sample_rom = (INT8*)*region();
-	m_sample_rom_length = region()->bytes();
-
 	m_stream = stream_alloc(0, 2, clock() / 166); // /166 clock divider?
 
 	// create pan table

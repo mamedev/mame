@@ -15,6 +15,7 @@
 #include "emu.h"
 #include "cpu/mc68hc11/mc68hc11.h"
 #include "machine/nvram.h"
+#include "machine/ram.h"
 #include "video/hd44780.h"
 #include "rendlay.h"
 
@@ -27,6 +28,7 @@ public:
 			m_lcdc0(*this, "ks0066_0"),
 			m_lcdc1(*this, "ks0066_1"),
 			m_nvram(*this, "nvram"),
+			m_ram(*this, RAM_TAG),
 			m_rambank(*this, "rambank"),
 			m_keyboard(*this, "COL"),
 			m_battery_status(*this, "BATTERY")
@@ -36,6 +38,7 @@ public:
 	required_device<hd44780_device> m_lcdc0;
 	required_device<hd44780_device> m_lcdc1;
 	required_device<nvram_device> m_nvram;
+	required_device<ram_device> m_ram;
 	required_memory_bank m_rambank;
 	required_ioport_array<16> m_keyboard;
 	required_ioport m_battery_status;
@@ -396,7 +399,7 @@ UINT32 alphasmart_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void alphasmart_state::machine_start()
 {
-	UINT8* ram = (UINT8*)(*memregion("mainram"));
+	UINT8* ram = m_ram->pointer();
 
 	m_rambank->configure_entries(0, 4, ram, 0x8000);
 	m_nvram->set_base(ram, 0x8000*4);
@@ -424,6 +427,9 @@ static MACHINE_CONFIG_START( alphasmart, alphasmart_state )
 	MCFG_KS0066_F05_ADD("ks0066_1")
 	MCFG_HD44780_LCD_SIZE(2, 40)
 
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("128K")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -449,8 +455,6 @@ MACHINE_CONFIG_END
 ROM_START( asmapro )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "alphasmartpro212.rom",  0x0000, 0x8000, CRC(896ddf1c) SHA1(c3c6a421c9ced92db97431d04b4a3f09a39de716) )   // Checksum 8D24 on label
-
-	ROM_REGION( 0x20000, "mainram", ROMREGION_ERASE )
 ROM_END
 
 ROM_START( asma2k )
@@ -467,8 +471,6 @@ ROM_START( asma2k )
 
 	ROM_REGION( 0x8000, "spellcheck", 0 )
 	ROM_LOAD( "spellcheck.bin",  0x0000, 0x8000, NO_DUMP )
-
-	ROM_REGION( 0x20000, "mainram", ROMREGION_ERASE )
 ROM_END
 
 

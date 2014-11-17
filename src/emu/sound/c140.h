@@ -108,7 +108,7 @@ private:
 	INT16 *m_mixer_buffer_right;
 
 	int m_baserate;
-	void *m_pRom;
+	INT8 *m_pRom;
 	UINT8 m_REG[0x200];
 
 	INT16 m_pcmtbl[8];        //2000.06.26 CAB

@@ -149,7 +149,7 @@ void y8950_device::device_start()
 	assert_always(m_chip != NULL, "Error creating Y8950 chip");
 
 	/* ADPCM ROM data */
-	y8950_set_delta_t_memory(m_chip, *region(), region()->bytes());
+	y8950_set_delta_t_memory(m_chip, region()->base(), region()->bytes());
 
 	m_stream = machine().sound().stream_alloc(*this,0,1,rate);
 	/* port and keyboard handler */

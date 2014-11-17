@@ -31,7 +31,7 @@ public:
 			m_ram(*this, "ram"){ }
 
 	required_device<cpu_device> m_maincpu;
-	required_memory_region m_maincpu_region;
+	required_region_ptr<UINT32> m_maincpu_region;
 	DECLARE_READ32_MEMBER(gp2x_lcdc_r);
 	DECLARE_WRITE32_MEMBER(gp2x_lcdc_w);
 	DECLARE_READ32_MEMBER(nand_r);
@@ -203,7 +203,7 @@ WRITE32_MEMBER( gp2x_state::gp2x_lcdc_w )
 
 READ32_MEMBER( gp2x_state::nand_r )
 {
-	UINT32 *ROM = (UINT32 *)(*m_maincpu_region);
+	UINT32 *ROM = m_maincpu_region;
 	UINT32 ret;
 
 	if (offset == 0)

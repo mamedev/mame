@@ -96,6 +96,7 @@ const device_type SP0256 = &device_creator<sp0256_device>;
 sp0256_device::sp0256_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 				: device_t(mconfig, SP0256, "SP0256", tag, owner, clock, "sp0256", __FILE__),
 					device_sound_interface(mconfig, *this),
+					m_rom(*this, DEVICE_SELF),
 					m_drq_cb(*this),
 					m_sby_cb(*this)
 {
@@ -139,7 +140,6 @@ void sp0256_device::device_start()
 	/* -------------------------------------------------------------------- */
 	/*  Setup the ROM.                                                      */
 	/* -------------------------------------------------------------------- */
-	m_rom = *region();
 	// the rom is not supposed to be reversed first; according to Joe Zbiciak.
 	// see http://forums.bannister.org/ubbthreads.php?ubb=showflat&Number=72385#Post72385
 	// TODO: because of this, check if the bitrev functions are even used anywhere else

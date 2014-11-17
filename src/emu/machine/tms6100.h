@@ -25,6 +25,7 @@ protected:
 	virtual void device_reset();
 private:
 	// internal state
+	required_region_ptr<UINT8> m_rom;
 	UINT32 m_address;
 	UINT32 m_address_latch;
 	UINT8  m_loadptr;
@@ -34,8 +35,6 @@ private:
 	UINT8  m_tms_clock;
 	UINT8  m_data;
 	UINT8  m_state;
-
-	const UINT8 *m_rom;
 
 };
 

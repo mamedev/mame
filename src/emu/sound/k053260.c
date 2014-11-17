@@ -92,7 +92,7 @@ k053260_device::k053260_device(const machine_config &mconfig, const char *tag, d
 void k053260_device::device_start()
 {
 	memory_region *ROM = (m_rgnoverride) ? owner()->memregion(m_rgnoverride) : region();
-	m_rom = *ROM;
+	m_rom = ROM->base();
 	m_rom_size = ROM->bytes();
 
 	m_stream = stream_alloc( 0, 2, clock() / CLOCKS_PER_SAMPLE );

@@ -77,12 +77,14 @@
 const device_type TMS6100 = &device_creator<tms6100_device>;
 
 tms6100_device::tms6100_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	m_rom(*this, DEVICE_SELF)
 {
 }
 
 tms6100_device::tms6100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TMS6100, "TMS6100", tag, owner, clock, "tms6100", __FILE__)
+	: device_t(mconfig, TMS6100, "TMS6100", tag, owner, clock, "tms6100", __FILE__),
+	m_rom(*this, DEVICE_SELF)
 {
 }
 
@@ -109,8 +111,6 @@ void tms6100_device::device_config_complete()
 
 void tms6100_device::device_start()
 {
-	m_rom = *region();
-
 	// save device variables
 	save_item(NAME(m_addr_bits));
 	save_item(NAME(m_address));

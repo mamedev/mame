@@ -581,7 +581,7 @@ void ymz280b_device::device_start()
 
 	/* initialize the rest of the structure */
 	m_master_clock = (double)clock() / 384.0;
-	m_mem_base = *region();
+	m_mem_base = region()->base();
 	m_mem_size = region()->bytes();
 	m_irq_handler.resolve();
 

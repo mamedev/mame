@@ -96,7 +96,7 @@ void memory_array::set(const address_space &space, void *base, UINT32 bytes, int
 
 void memory_array::set(const memory_share &share, int bpe)
 {
-	set(share.ptr(), share.bytes(), share.width(), share.endianness(), bpe);
+	set(share.ptr(), share.bytes(), share.bitwidth(), share.endianness(), bpe);
 }
 
 void memory_array::set(const memory_array &array)

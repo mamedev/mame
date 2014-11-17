@@ -115,9 +115,9 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 	// internal state
+	required_region_ptr<UINT8> m_rom;
 	devcb_write_line m_irq_cb;
 
-	UINT8 *m_rom;
 	INT16 m_ulaw[256];
 	UINT16 m_volume[4096];
 	static const int volume_bits = 15;

@@ -47,7 +47,7 @@ void tc8830f_device::device_start()
 	// create the stream
 	m_stream = stream_alloc(0, 1, clock() / 0x10);
 
-	m_mem_base = *region();
+	m_mem_base = region()->base();
 	m_mem_mask = region()->bytes() - 1;
 
 	// register for savestates

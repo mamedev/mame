@@ -149,7 +149,7 @@ void device_gfx_interface::decode_gfx(const gfx_decode_entry *gfxdecodeinfo)
 				assert(share != NULL);
 				region_length = 8 * share->bytes();
 				region_base = reinterpret_cast<UINT8 *>(share->ptr());
-				region_width = share->width() / 8;
+				region_width = share->bytewidth();
 				region_endianness = share->endianness();
 			}
 			else
@@ -158,7 +158,7 @@ void device_gfx_interface::decode_gfx(const gfx_decode_entry *gfxdecodeinfo)
 				assert(region != NULL);
 				region_length = 8 * region->bytes();
 				region_base = region->base();
-				region_width = region->width();
+				region_width = region->bytewidth();
 				region_endianness = region->endianness();
 			}
 		}

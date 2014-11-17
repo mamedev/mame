@@ -83,7 +83,7 @@ void nvram_device::nvram_default()
 	// region always wins
 	if (m_region != NULL)
 	{
-		memcpy(m_base, *m_region, m_length);
+		memcpy(m_base, m_region->base(), m_length);
 		return;
 	}
 

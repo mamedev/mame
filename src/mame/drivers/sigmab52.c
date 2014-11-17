@@ -546,8 +546,7 @@ INPUT_PORTS_END
 
 void sigmab52_state::machine_start()
 {
-	UINT8 *rom = (UINT8*)*memregion("maincpu");
-	m_bank1->configure_entries(0, 2, rom, 0x4000);
+	m_bank1->configure_entries(0, 2, memregion("maincpu")->base(), 0x4000);
 }
 
 void sigmab52_state::machine_reset()

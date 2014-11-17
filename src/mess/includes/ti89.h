@@ -18,6 +18,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_flash(*this, "flash"),
+			m_rom_base(*this, "flash"),
 			m_io_bit0(*this, "BIT0"),
 			m_io_bit1(*this, "BIT1"),
 			m_io_bit2(*this, "BIT2"),
@@ -30,6 +31,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<sharp_unk128mbit_device> m_flash;
+	required_region_ptr<UINT16> m_rom_base;
 	required_ioport m_io_bit0;
 	required_ioport m_io_bit1;
 	required_ioport m_io_bit2;
@@ -46,8 +48,6 @@ public:
 	UINT8 m_hw_version;
 	bool m_flash_mem;
 	UINT32 m_initial_pc;
-
-	UINT16 *m_rom_base;
 
 	// keyboard
 	UINT16 m_kb_mask;

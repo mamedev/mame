@@ -51,9 +51,6 @@
 #define TMS9901_TAG "tms9901"
 #define SGCPU_TAG "sgcpu"
 
-#define SAMSMEM_TAG "samsmem"
-#define PADMEM_TAG "padmem"
-
 #define VERBOSE 1
 #define LOG logerror
 
@@ -127,10 +124,10 @@ public:
 	UINT16  *m_rom6b;
 
 	// AMS RAM (1 Mib)
-	UINT16  *m_ram;
+	dynamic_array<UINT16> m_ram;
 
 	// Scratch pad ram (1 KiB)
-	UINT16  *m_scratchpad;
+	dynamic_array<UINT16> m_scratchpad;
 
 	// First joystick. 6 for TI-99/4A
 	int     m_firstjoy;
@@ -814,8 +811,8 @@ WRITE8_MEMBER( ti99_4p_state::external_operation )
 
 void ti99_4p_state::machine_start()
 {
-	m_ram = (UINT16*)(*memregion(SAMSMEM_TAG));
-	m_scratchpad = (UINT16*)(*memregion(PADMEM_TAG));
+	m_ram.resize(0x80000/2);
+	m_scratchpad.resize(0x400/2);
 
 	m_peribox->senila(CLEAR_LINE);
 	m_peribox->senilb(CLEAR_LINE);
@@ -824,7 +821,7 @@ void ti99_4p_state::machine_start()
 
 	m_ready_line = m_ready_line_dmux = ASSERT_LINE;
 
-	UINT16 *rom = (UINT16*)(*memregion("maincpu"));
+	UINT16 *rom = (UINT16*)(memregion("maincpu")->base());
 	m_rom0  = rom + 0x2000;
 	m_dsr   = rom + 0x6000;
 	m_rom6a = rom + 0x3000;
@@ -915,10 +912,6 @@ ROM_START(ti99_4p)
 	ROM_REGION16_BE(0x10000, "maincpu", 0)
 	ROM_LOAD16_BYTE("sgcpu_hb.bin", 0x0000, 0x8000, CRC(aa100730) SHA1(35e585b2dcd3f2a0005bebb15ede6c5b8c787366) ) /* system ROMs */
 	ROM_LOAD16_BYTE("sgcpu_lb.bin", 0x0001, 0x8000, CRC(2a5dc818) SHA1(dec141fe2eea0b930859cbe1ebd715ac29fa8ecb) ) /* system ROMs */
-	ROM_REGION16_BE(0x080000, SAMSMEM_TAG, 0)
-	ROM_FILL(0x000000, 0x080000, 0x0000)
-	ROM_REGION16_BE(0x0400, PADMEM_TAG, 0)
-	ROM_FILL(0x000000, 0x0400, 0x0000)
 ROM_END
 
 /*    YEAR  NAME      PARENT   COMPAT   MACHINE      INPUT    INIT      COMPANY     FULLNAME */

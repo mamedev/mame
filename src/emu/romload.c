@@ -536,7 +536,8 @@ static void region_post_process(romload_private *romdata, const char *rgntag, bo
 	if (region == NULL)
 		return;
 
-	LOG(("+ datawidth=%d little=%d\n", region->width(), region->endianness() == ENDIANNESS_LITTLE));
+	LOG(("+ datawidth=%dbit endian=%s\n", region->bitwidth(),
+		 region->endianness() == ENDIANNESS_LITTLE ? "little" : "big"));
 
 	/* if the region is inverted, do that now */
 	if (invert)
@@ -547,10 +548,10 @@ static void region_post_process(romload_private *romdata, const char *rgntag, bo
 	}
 
 	/* swap the endianness if we need to */
-	if (region->width() > 1 && region->endianness() != ENDIANNESS_NATIVE)
+	if (region->bytewidth() > 1 && region->endianness() != ENDIANNESS_NATIVE)
 	{
 		LOG(("+ Byte swapping region\n"));
-		int datawidth = region->width();
+		int datawidth = region->bytewidth();
 		for (i = 0, base = region->base(); i < region->bytes(); i += datawidth)
 		{
 			UINT8 temp[8];

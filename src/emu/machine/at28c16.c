@@ -125,15 +125,15 @@ void at28c16_device::nvram_default()
 			fatalerror( "at28c16 region '%s' wrong size (expected size = 0x%X)\n", tag(), AT28C16_DATA_BYTES );
 		}
 
-		if( m_region->width() != 1 )
+		if( m_region->bytewidth() != 1 )
 		{
 			fatalerror( "at28c16 region '%s' needs to be an 8-bit region\n", tag() );
 		}
 
+		UINT8 *default_data = m_region->base();
+
 		for( offs_t offs = 0; offs < AT28C16_DATA_BYTES; offs++ )
-		{
-			m_addrspace[ 0 ]->write_byte( offs, m_region->u8( offs ) );
-		}
+			m_addrspace[ 0 ]->write_byte( offs, default_data[offs] );
 	}
 }
 

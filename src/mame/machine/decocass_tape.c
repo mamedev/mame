@@ -91,7 +91,7 @@ void decocass_tape_device::device_start()
 	m_tape_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(decocass_tape_device::tape_clock_callback), this));
 	if (region() == NULL)
 		return;
-	UINT8 *regionbase = *region();
+	UINT8 *regionbase = region()->base();
 
 	/* scan for the first non-empty block in the image */
 	for (offs = region()->bytes() - 1; offs >= 0; offs--)
@@ -290,6 +290,7 @@ TIMER_CALLBACK_MEMBER( decocass_tape_device::tape_clock_callback )
 UINT8 decocass_tape_device::get_status_bits()
 {
 	UINT8 tape_bits = 0;
+	UINT8 *tape_data = region()->base();
 
 	/* bit 0x20 is the BOT/EOT signal, which is also set in the leader/trailer area */
 	if (m_region == REGION_LEADER || m_region == REGION_BOT || m_region == REGION_EOT || m_region == REGION_TRAILER)
@@ -320,7 +321,7 @@ UINT8 decocass_tape_device::get_status_bits()
 
 		/* data block bytes are data */
 		else if (m_bytenum >= BYTE_DATA_0 && m_bytenum <= BYTE_DATA_255)
-			byteval = static_cast<UINT8 *>(*region())[blocknum * 256 + (m_bytenum - BYTE_DATA_0)];
+			byteval = tape_data[blocknum * 256 + (m_bytenum - BYTE_DATA_0)];
 
 		/* CRC MSB */
 		else if (m_bytenum == BYTE_CRC16_MSB)

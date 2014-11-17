@@ -62,14 +62,14 @@ private:
 		UINT32 step_ptr;    // current offset counter
 	} m_channel[16];
 
+	required_device<dsp16_device> m_cpu;
+	required_region_ptr<INT8> m_sample_rom;
+
 	int m_pan_table[33];    // pan volume table
 	UINT16 m_data;          // register latch data
 	sound_stream *m_stream; // audio stream
-	UINT32 m_sample_rom_length;
-	INT8 *m_sample_rom;     // Q-Sound sample ROM
-	dsp16_device *m_cpu;
 
-	inline INT8 read_sample(UINT32 offset) { return m_sample_rom[offset % m_sample_rom_length]; }
+	inline INT8 read_sample(UINT32 offset) { return m_sample_rom[offset & m_sample_rom.mask()]; }
 	void write_data(UINT8 address, UINT16 data);
 };
 

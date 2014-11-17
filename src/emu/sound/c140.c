@@ -110,7 +110,7 @@ void c140_device::device_start()
 
 	m_stream = stream_alloc(0, 2, m_sample_rate);
 
-	m_pRom=*region();
+	m_pRom = (INT8 *)region()->base();
 
 	/* make decompress pcm table */     //2000.06.26 CAB
 	{
@@ -195,7 +195,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 			sz=ed-st;
 
 			/* Retrieve base pointer to the sample data */
-			pSampleData=(signed char*)((FPTR)m_pRom + find_sample(st, v->bank, i));
+			pSampleData = m_pRom + find_sample(st, v->bank, i);
 
 			/* Fetch back previous data pointers */
 			offset=v->ptoffset;
@@ -409,7 +409,7 @@ WRITE8_MEMBER( c140_device::c140_w )
 
 void c140_device::set_base(void *base)
 {
-	m_pRom = base;
+	m_pRom = (INT8 *)base;
 }
 
 

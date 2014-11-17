@@ -33,10 +33,10 @@ private:
 	// internal state
 
 	/* Variables only used here */
+	required_region_ptr<INT8> m_region;       // ROM
 	int m_rate;                               // Output sampling rate (Hz)
 	int m_adr;                                // address
 	sound_stream *  m_stream;                 // Stream handle
-	const UINT8 *m_region;                    // region name
 	int m_sound_enable;                       // sound output enable/disable
 	UINT8   m_reg[0x2000];                // X1-010 Register & wave form area
 	UINT8   m_HI_WORD_BUF[0x2000];            // X1-010 16bit access ram check avoidance work

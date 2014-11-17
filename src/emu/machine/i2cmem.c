@@ -186,15 +186,14 @@ void i2cmem_device::nvram_default()
 			fatalerror( "i2cmem region '%s' wrong size (expected size = 0x%X)\n", tag(), i2cmem_bytes );
 		}
 
-		if( m_region->width() != 1 )
+		if( m_region->bytewidth() != 1 )
 		{
 			fatalerror( "i2cmem region '%s' needs to be an 8-bit region\n", tag() );
 		}
 
+		UINT8 *default_data = m_region->base();
 		for( offs_t offs = 0; offs < i2cmem_bytes; offs++ )
-		{
-			m_addrspace[ 0 ]->write_byte( offs, m_region->u8( offs ) );
-		}
+			m_addrspace[ 0 ]->write_byte( offs, default_data[offs] );
 	}
 }
 

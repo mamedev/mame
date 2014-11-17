@@ -48,12 +48,13 @@ protected:
 
 private:
 	// internal state
+	required_region_ptr<UINT8> m_region_base;     /* pointer to the base of the region */
+
 	#define OKIM6376_VOICES     2
 	struct ADPCMVoice m_voice[OKIM6376_VOICES];
 	INT32 m_command[OKIM6376_VOICES];
 	INT32 m_latch;            /* Command data is held before transferring to either channel */
 	UINT8 m_stage[OKIM6376_VOICES];/* If a sample is playing, flag that we have a command staged */
-	UINT8 *m_region_base;     /* pointer to the base of the region */
 	sound_stream *m_stream;   /* which stream are we playing on? */
 	UINT32 m_master_clock;    /* master clock frequency */
 	UINT8 m_divisor;          /* can be 8,10,16, and is read out of ROM data */

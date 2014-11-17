@@ -109,7 +109,7 @@ WRITE8_MEMBER( gamate_state::audio_w )
 
 WRITE8_MEMBER( gamate_state::bios_w )
 {
-	UINT8 *memory = *memregion("main_cpu"); //memory_region (REGION_CPU1);
+	UINT8 *memory = memregion("maincpu")->base(); //memory_region (REGION_CPU1);
 
 	unsigned short stack=m_maincpu->sp();//cpu_get_reg(M6502_S)|0x100;
 	unsigned short address= memory[stack+1]|(memory[stack+2]<<8);
