@@ -848,7 +848,7 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	UINT8 code;
 	UINT32 start_address = m_page2 ? 0x0800 : 0x0400;
 	UINT32 address;
-	int fg;
+	int fg = 0;
 
 	switch (m_sysconfig & 0x03)
 	{
@@ -930,7 +930,7 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 	UINT32 start_address = m_page2 ? 0x0800 : 0x0400;
 	UINT32 address;
 	static const int aux_colors[16] = { 0, 2, 4, 6, 8, 0xa, 0xc, 0xe, 1, 3, 5, 7, 9, 0xb, 0xd, 0xf };
-	int fg;
+	int fg = 0;
 
 	switch (m_sysconfig & 0x03)
 	{
@@ -1071,7 +1071,7 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	UINT32 start_address;
 	UINT32 address;
 	UINT8 *aux_page = m_ram_ptr; 
-	int fg;
+	int fg = 0;
 	int bg = 0;
 
 	if (m_80col)
@@ -1131,7 +1131,7 @@ void a2_video_device::text_update_orig(screen_device &screen, bitmap_ind16 &bitm
 	int row, col;
 	UINT32 start_address = m_page2 ? 0x800 : 0x400;  
 	UINT32 address;
-	int fg;
+	int fg = 0;
 	int bg = 0;
 
 	beginrow = MAX(beginrow, cliprect.min_y - (cliprect.min_y % 8));

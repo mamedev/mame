@@ -6,14 +6,25 @@ Driver file to handle emulation of the Tiger Game.com by
   Wilbert Pol
 
 Todo:
-  everything
-  - Finish memory map, fill in details
-  - Finish input ports
-  - Finish palette code
-  - Finish machine driver struct
-  - Finish cartslot code
-  - Etc, etc, etc.
+- Fix cpu and system problems that prevent the games from working.
 
+Game Status:
+- The DAC sound partially works, sound from ports 1,2,3 not done
+- Inbuilt ROM and PDA functions all work
+- When starting a cart, the graphic of the cart going into the slot is corrupt
+- Due to an irritating message, the NVRAM is commented out in the machine config
+- Cart games all have severe video issues such as flickering and nonsense gfx
+- Lights Out works
+- Centipede works with bad flickering
+- Frogger works, but there are bugs on the 2nd row of cars (if you turn your
+  frog to the right it dies, and also one car goes in reverse), and not possible
+  to get the female frog.
+- Wheel of Fortune 1&2, playable although the spinner is corrupt
+- Jeopardy, playable with bad gfx
+- Quiz Wiz works, but the final score doesn't show
+- Tiger Web Link & Internet, they look ok, obviously aren't going to connect to anything
+- Williams Arcade Classics, Robotron works, the rest are no use.
+- The remaining carts are not functional to any useful degree.
 
 ***************************************************************************/
 
@@ -213,22 +224,13 @@ static INPUT_PORTS_START( gamecom )
 	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_OTHER)
 	INPUT_PORTS_END
 
-static const unsigned char palette_gamecom[] =
-{
-	0xDF, 0xFF, 0x8F,   /* White */
-	0x8F, 0xCF, 0x8F,   /* Gray 3 */
-	0x6F, 0x8F, 0x4F,   /* Gray 2 */
-	0x0F, 0x4F, 0x2F,   /* Gray 1 */
-	0x00, 0x00, 0x00,   /* Black */
-};
-
 PALETTE_INIT_MEMBER(gamecom_state, gamecom)
 {
-	int index;
-	for ( index = 0; index < 5; index++ )
-	{
-		palette.set_pen_color(4-index, palette_gamecom[index*3+0], palette_gamecom[index*3+1], palette_gamecom[index*3+2] );
-	}
+	palette.set_pen_color(0, 0x00, 0x00, 0x00 ); // Black
+	palette.set_pen_color(1, 0x0F, 0x4F, 0x2F ); // Gray 1
+	palette.set_pen_color(2, 0x6F, 0x8F, 0x4F ); // Gray 2
+	palette.set_pen_color(3, 0x8F, 0xCF, 0x8F ); // Grey 3
+	palette.set_pen_color(4, 0xDF, 0xFF, 0x8F ); // White
 }
 
 UINT32 gamecom_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
