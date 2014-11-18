@@ -1734,13 +1734,13 @@ void rsp_device::handle_vector_ops(UINT32 op)
 				{
 					if (ACCUM_H(i) != 0)
 					{
-						vres[i] = 0xffff;
+						vres[i] = 0xffffu;
 					}
 					else
 					{
 						if ((INT16)ACCUM_M(i) < 0)
 						{
-							vres[i] = 0xffff;
+							vres[i] = 0xffffu;
 						}
 						else
 						{
