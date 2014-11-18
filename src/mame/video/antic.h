@@ -359,7 +359,8 @@ struct VIDEO {
 };
 
 
-class antic_device :  public device_t
+class antic_device :  public device_t,
+								public device_video_interface
 {
 public:
 	// construction/destruction
