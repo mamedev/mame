@@ -308,8 +308,8 @@ void k054539_device::init_chip()
 	cur_ptr = 0;
 	memset(ram, 0, 0x4000);
 
-	memory_region *reg = (m_rgnoverride != NULL) ? machine().root_device().memregion(m_rgnoverride) : region();
-	rom = *reg;
+	memory_region *reg = (m_rgnoverride != NULL) ? owner()->memregion(m_rgnoverride) : region();
+	rom = reg->base();
 	rom_size = reg->bytes();
 	rom_mask = 0xffffffffU;
 	for(int i=0; i<32; i++)

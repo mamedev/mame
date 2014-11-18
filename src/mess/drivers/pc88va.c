@@ -193,7 +193,7 @@ void pc88va_state::video_start()
 
 void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *tvram = (UINT16 *)(*memregion("tvram"));
+	UINT16 *tvram = (UINT16 *)(memregion("tvram")->base());
 	int offs,i;
 
 	offs = m_tsp.spr_offset;
@@ -569,7 +569,7 @@ READ16_MEMBER(pc88va_state::sys_mem_r)
 			return 0xffff;
 		case 1: // TVRAM
 		{
-			UINT16 *tvram = (UINT16 *)(*memregion("tvram"));
+			UINT16 *tvram = (UINT16 *)(memregion("tvram")->base());
 
 			if(((offset*2) & 0x30000) == 0)
 				return tvram[offset];
@@ -578,14 +578,14 @@ READ16_MEMBER(pc88va_state::sys_mem_r)
 		}
 		case 4:
 		{
-			UINT16 *gvram = (UINT16 *)(*memregion("gvram"));
+			UINT16 *gvram = (UINT16 *)(memregion("gvram")->base());
 
 			return gvram[offset];
 		}
 		case 8: // kanji ROM
 		case 9:
 		{
-			UINT16 *knj_ram = (UINT16 *)(*memregion("kanji"));
+			UINT16 *knj_ram = (UINT16 *)(memregion("kanji")->base());
 			UINT32 knj_offset;
 
 			knj_offset = (offset + (((m_bank_reg & 0x100) >> 8)*0x20000));
@@ -600,7 +600,7 @@ READ16_MEMBER(pc88va_state::sys_mem_r)
 		case 0xc: // Dictionary ROM
 		case 0xd:
 		{
-			UINT16 *dic_rom = (UINT16 *)(*memregion("dictionary"));
+			UINT16 *dic_rom = (UINT16 *)(memregion("dictionary")->base());
 			UINT32 dic_offset;
 
 			dic_offset = (offset + (((m_bank_reg & 0x100) >> 8)*0x20000));
@@ -620,7 +620,7 @@ WRITE16_MEMBER(pc88va_state::sys_mem_w)
 			break;
 		case 1: // TVRAM
 		{
-			UINT16 *tvram = (UINT16 *)(*memregion("tvram"));
+			UINT16 *tvram = (UINT16 *)(memregion("tvram")->base());
 
 			if(((offset*2) & 0x30000) == 0)
 				COMBINE_DATA(&tvram[offset]);
@@ -628,7 +628,7 @@ WRITE16_MEMBER(pc88va_state::sys_mem_w)
 		break;
 		case 4: // TVRAM
 		{
-			UINT16 *gvram = (UINT16 *)(*memregion("gvram"));
+			UINT16 *gvram = (UINT16 *)(memregion("gvram")->base());
 
 			COMBINE_DATA(&gvram[offset]);
 		}
@@ -636,7 +636,7 @@ WRITE16_MEMBER(pc88va_state::sys_mem_w)
 		case 8: // kanji ROM, backup RAM at 0xb0000 - 0xb3fff
 		case 9:
 		{
-			UINT16 *knj_ram = (UINT16 *)(*memregion("kanji"));
+			UINT16 *knj_ram = (UINT16 *)(memregion("kanji")->base());
 			UINT32 knj_offset;
 
 			knj_offset = ((offset) + (((m_bank_reg & 0x100) >> 8)*0x20000));
@@ -1213,7 +1213,7 @@ WRITE16_MEMBER(pc88va_state::video_pri_w)
 
 READ8_MEMBER(pc88va_state::backupram_dsw_r)
 {
-	UINT16 *knj_ram = (UINT16 *)(*memregion("kanji"));
+	UINT16 *knj_ram = (UINT16 *)(memregion("kanji")->base());
 
 	if(offset == 0)
 		return knj_ram[(0x50000 + 0x1fc2) / 2] & 0xff;

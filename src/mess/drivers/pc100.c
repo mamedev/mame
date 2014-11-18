@@ -68,17 +68,24 @@ class pc100_state : public driver_device
 public:
 	pc100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_rtc(*this, "rtc"),
-		m_palram(*this, "palram"),
 		m_maincpu(*this, "maincpu"),
 		m_beeper(*this, "beeper"),
-		m_rtc_portc(0),
-		m_palette(*this, "palette")
+		m_rtc(*this, "rtc"),
+		m_palette(*this, "palette"),
+		m_palram(*this, "palram"),
+		m_kanji_rom(*this, "kanji"),
+		m_vram(*this, "vram"),
+		m_rtc_portc(0)
 	{
 	}
 
+	required_device<cpu_device> m_maincpu;
+	required_device<beep_device> m_beeper;
 	required_device<msm58321_device> m_rtc;
+	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT16> m_palram;
+	required_region_ptr<UINT16> m_kanji_rom;
+	required_region_ptr<UINT16> m_vram;
 
 	DECLARE_READ16_MEMBER(pc100_vram_r);
 	DECLARE_WRITE16_MEMBER(pc100_vram_w);
@@ -100,8 +107,6 @@ public:
 	DECLARE_WRITE8_MEMBER(rtc_porta_w);
 	DECLARE_READ8_MEMBER(rtc_portc_r);
 	DECLARE_WRITE8_MEMBER(rtc_portc_w);
-	UINT16 *m_kanji_rom;
-	UINT16 *m_vram;
 	UINT16 m_kanji_addr;
 	UINT8 m_timer_mode;
 
@@ -123,15 +128,13 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(pc100_100hz_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(pc100_50hz_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(pc100_10hz_irq);
-	required_device<cpu_device> m_maincpu;
-	required_device<beep_device> m_beeper;
+
 
 	WRITE_LINE_MEMBER(rtc_portc_0_w) { m_rtc_portc = (m_rtc_portc & ~(1 << 0)) | ((state & 1) << 0); }
 	WRITE_LINE_MEMBER(rtc_portc_1_w) { m_rtc_portc = (m_rtc_portc & ~(1 << 1)) | ((state & 1) << 1); }
 	WRITE_LINE_MEMBER(rtc_portc_2_w) { m_rtc_portc = (m_rtc_portc & ~(1 << 2)) | ((state & 1) << 2); }
 	WRITE_LINE_MEMBER(rtc_portc_3_w) { m_rtc_portc = (m_rtc_portc & ~(1 << 3)) | ((state & 1) << 3); }
 	UINT8 m_rtc_portc;
-	required_device<palette_device> m_palette;
 };
 
 void pc100_state::video_start()
@@ -410,8 +413,6 @@ WRITE8_MEMBER( pc100_state::crtc_bank_w )
 
 void pc100_state::machine_start()
 {
-	m_kanji_rom = (UINT16 *)(*memregion("kanji"));
-	m_vram = (UINT16 *)(*memregion("vram"));
 }
 
 void pc100_state::machine_reset()
@@ -523,13 +524,13 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( pc100 )
-	ROM_REGION( 0x8000, "ipl", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x8000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.rom", 0x0000, 0x8000, CRC(fd54a80e) SHA1(605a1b598e623ba2908a14a82454b9d32ea3c331))
 
-	ROM_REGION( 0x20000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x20000, "kanji", ROMREGION_ERASEFF )
 	ROM_LOAD( "kanji.rom", 0x0000, 0x20000, BAD_DUMP CRC(29298591) SHA1(d10174553ceea556fc53fc4e685d939524a4f64b))
 
-	ROM_REGION( 0x20000*4, "vram", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x20000*4, "vram", ROMREGION_ERASEFF )
 ROM_END
 
 /* Driver */

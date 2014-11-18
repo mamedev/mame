@@ -228,7 +228,7 @@ void timekeeper_device::device_start()
 	m_century = make_bcd( systime.local_time.year / 100 );
 	m_data.resize( m_size );
 
-	m_default_data = *region();
+	m_default_data = region()->base();
 	if (m_default_data)
 	{
 		assert( region()->bytes() == m_size );

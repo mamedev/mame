@@ -113,10 +113,10 @@ const device_type OKIM6376 = &device_creator<okim6376_device>;
 okim6376_device::okim6376_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, OKIM6376, "OKI6376", tag, owner, clock, "okim6376", __FILE__),
 		device_sound_interface(mconfig, *this),
+		m_region_base(*this, DEVICE_SELF),
 		//m_command[OKIM6376_VOICES],
 		m_latch(0),
 		//m_stage[OKIM6376_VOICES],
-		m_region_base(0),
 		m_stream(NULL),
 		m_master_clock(0),
 		m_divisor(0),
@@ -156,7 +156,6 @@ void okim6376_device::device_start()
 	m_stage[0] = 0;
 	m_stage[1] = 0;
 	m_latch = 0;
-	m_region_base = *region();
 	m_master_clock = clock();
 	m_divisor = divisor_table[0];
 	m_nar = 1;

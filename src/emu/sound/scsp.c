@@ -509,7 +509,7 @@ void scsp_device::init()
 		m_Master=0;
 	}
 
-	m_SCSPRAM = *region();
+	m_SCSPRAM = region()->base();
 	if (m_SCSPRAM)
 	{
 		m_SCSPRAM_LENGTH = region()->bytes();

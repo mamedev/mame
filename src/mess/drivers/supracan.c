@@ -120,6 +120,7 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_soundcpu(*this, "soundcpu"),
 			m_cart(*this, "cartslot"),
+			m_vram(*this, "vram"),
 			m_soundram(*this, "soundram"),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_palette(*this, "palette")
@@ -130,6 +131,10 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<generic_slot_device> m_cart;
+
+	required_shared_ptr<UINT16> m_vram;
+	required_shared_ptr<UINT8> m_soundram;
+
 	DECLARE_READ16_MEMBER(_68k_soundram_r);
 	DECLARE_WRITE16_MEMBER(_68k_soundram_w);
 	DECLARE_READ8_MEMBER(_6502_soundmem_r);
@@ -143,14 +148,12 @@ public:
 	DECLARE_WRITE16_MEMBER(sound_w);
 	DECLARE_READ16_MEMBER(video_r);
 	DECLARE_WRITE16_MEMBER(video_w);
-	DECLARE_READ16_MEMBER(vram_r);
 	DECLARE_WRITE16_MEMBER(vram_w);
 	DECLARE_WRITE16_MEMBER(paletteram_w);
 	acan_dma_regs_t m_acan_dma_regs;
 	acan_sprdma_regs_t m_acan_sprdma_regs;
 
 	UINT16 m_m6502_reset;
-	required_shared_ptr<UINT8> m_soundram;
 	UINT8 m_soundlatch;
 	UINT8 m_soundcpu_irq_src;
 	UINT8 m_sound_irq_enable_reg;
@@ -161,9 +164,8 @@ public:
 	emu_timer *m_hbl_timer;
 	emu_timer *m_line_on_timer;
 	emu_timer *m_line_off_timer;
-	UINT16 *m_vram;
-	UINT16 *m_vram_swapped;
-	UINT8 *m_vram_addr_swapped;
+
+	dynamic_buffer m_vram_addr_swapped;
 
 	UINT16 *m_pram;
 
@@ -428,9 +430,9 @@ void supracan_state::video_start()
 {
 	m_sprite_final_bitmap.allocate(1024, 1024, BITMAP_FORMAT_IND16);
 
-	m_vram = (UINT16*)(*memregion("ram_gfx"));
-	m_vram_swapped = (UINT16*)(*memregion("ram_gfx2"));
-	m_vram_addr_swapped = (UINT8*)(*memregion("ram_gfx3")); // hack for 1bpp layer at startup
+	m_vram_addr_swapped.resize(0x20000); // hack for 1bpp layer at startup
+	m_gfxdecode->gfx(4)->set_source(m_vram_addr_swapped);
+	m_gfxdecode->gfx(4)->set_xormask(0);
 
 	m_tilemap_sizes[0][0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tilemap_sizes[0][1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
@@ -1095,25 +1097,13 @@ void supracan_state::write_swapped_byte( int offset, UINT8 byte )
 	m_vram_addr_swapped[swapped_offset] = byte;
 }
 
-
-READ16_MEMBER( supracan_state::vram_r )
-{
-	return m_vram[offset];
-}
-
-
 WRITE16_MEMBER( supracan_state::vram_w )
 {
 	COMBINE_DATA(&m_vram[offset]);
 
-	// store a byteswapped vesrion for easier gfx-decode
-	data = m_vram[offset];
-	data = ((data & 0x00ff)<<8) | ((data & 0xff00)>>8);
-	m_vram_swapped[offset] = data;
-
 	// hack for 1bpp layer at startup
-	write_swapped_byte(offset*2+1, (data & 0xff00)>>8);
-	write_swapped_byte(offset*2, (data & 0x00ff));
+	write_swapped_byte(offset*2, (data & 0xff00)>>8);
+	write_swapped_byte(offset*2+1, (data & 0x00ff));
 
 	// mark tiles of each depth as dirty
 	m_gfxdecode->gfx(0)->mark_dirty((offset*2)/(64));
@@ -1137,7 +1127,7 @@ static ADDRESS_MAP_START( supracan_mem, AS_PROGRAM, 16, supracan_state )
 
 	AM_RANGE( 0xf00000, 0xf001ff ) AM_READWRITE(video_r, video_w)
 	AM_RANGE( 0xf00200, 0xf003ff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE( 0xf40000, 0xf5ffff ) AM_READWRITE(vram_r, vram_w)
+	AM_RANGE( 0xf40000, 0xf5ffff ) AM_RAM_WRITE(vram_w) AM_SHARE("vram")
 	AM_RANGE( 0xfc0000, 0xfdffff ) AM_MIRROR(0x30000) AM_RAM /* System work ram */
 ADDRESS_MAP_END
 
@@ -1863,11 +1853,11 @@ static const gfx_layout supracan_gfx1bpp_alt =
 
 
 static GFXDECODE_START( supracan )
-	GFXDECODE_ENTRY( "ram_gfx2",  0, supracan_gfx8bpp,   0, 1 )
-	GFXDECODE_ENTRY( "ram_gfx2",  0, supracan_gfx4bpp,   0, 0x10 )
-	GFXDECODE_ENTRY( "ram_gfx2",  0, supracan_gfx2bpp,   0, 0x40 )
-	GFXDECODE_ENTRY( "ram_gfx2",  0, supracan_gfx1bpp,   0, 0x80 )
-	GFXDECODE_ENTRY( "ram_gfx3",  0, supracan_gfx1bpp_alt,   0, 0x80 )
+	GFXDECODE_RAM( "vram",  0, supracan_gfx8bpp,   0, 1 )
+	GFXDECODE_RAM( "vram",  0, supracan_gfx4bpp,   0, 0x10 )
+	GFXDECODE_RAM( "vram",  0, supracan_gfx2bpp,   0, 0x40 )
+	GFXDECODE_RAM( "vram",  0, supracan_gfx1bpp,   0, 0x80 )
+	GFXDECODE_RAM( "vram",  0, supracan_gfx1bpp_alt,   0, 0x80 )
 GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(supracan_state::supracan_irq)
@@ -1931,9 +1921,6 @@ MACHINE_CONFIG_END
 
 
 ROM_START( supracan )
-	ROM_REGION( 0x20000, "ram_gfx", ROMREGION_ERASEFF )
-	ROM_REGION( 0x20000, "ram_gfx2", ROMREGION_ERASEFF )
-	ROM_REGION( 0x20000, "ram_gfx3", ROMREGION_ERASEFF )
 ROM_END
 
 

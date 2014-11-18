@@ -87,9 +87,9 @@ const rom_entry *hd44780_device::device_rom_region() const
 void hd44780_device::device_start()
 {
 	if (region())
-		m_cgrom = (UINT8*)(*region());
+		m_cgrom = region()->base();
 	else
-		m_cgrom = (UINT8*)(*memregion("cgrom"));
+		m_cgrom = memregion("cgrom")->base();
 
 	m_busy_timer = timer_alloc(TIMER_BUSY);
 	m_blink_timer = timer_alloc(TIMER_BLINKING);

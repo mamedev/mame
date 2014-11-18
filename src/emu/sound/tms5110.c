@@ -822,7 +822,7 @@ static const unsigned int example_word_TEN[619]={
 
 void tms5110_device::device_start()
 {
-	m_table = *region();
+	m_table = region()->base();
 
 	set_variant(TMS5110_IS_5110A);
 
@@ -1203,9 +1203,9 @@ void tmsprom_device::device_start()
 	m_pdc_cb.resolve_safe();
 	m_ctl_cb.resolve_safe();
 
-	m_rom = *region();
+	m_rom = region()->base();
 	assert_always(m_rom != NULL, "Error creating TMSPROM chip: No rom region found");
-	m_prom = machine().root_device().memregion(m_prom_region)->base();
+	m_prom = owner()->memregion(m_prom_region)->base();
 	assert_always(m_prom != NULL, "Error creating TMSPROM chip: No prom region found");
 
 	m_romclk_timer = timer_alloc(0);

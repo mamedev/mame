@@ -75,8 +75,7 @@ MACHINE_CONFIG_END
 
 ROM_START( stopthie )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	/* Taken from patent 4341385, might have made mistakes when creating this rom */
-	ROM_LOAD16_WORD( "stopthie.bin", 0x0000, 0x1000, BAD_DUMP CRC(63162ce9) SHA1(2ff88a139020c48869fcacc04b0786b27530a802) )
+	ROM_LOAD16_WORD( "stopthie.bin", 0x0000, 0x1000, CRC(03691115) SHA1(bdcd212aa50bb1c26cb2d0ee97e5cfc04841c108) )
 ROM_END
 
 /***************************************************************************

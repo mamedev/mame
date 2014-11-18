@@ -238,7 +238,7 @@ void upd7759_device::device_start()
 
 	/* compute the ROM base or allocate a timer */
 	m_romoffset = 0;
-	m_rom = m_rombase = *region();
+	m_rom = m_rombase = region()->base();
 	if (m_rombase == NULL)
 	{
 		assert(type() == UPD7759); // other chips do not support slave mode
@@ -313,7 +313,7 @@ void upd7756_device::device_start()
 
 	/* compute the ROM base or allocate a timer */
 	m_romoffset = 0;
-	m_rom = m_rombase = *region();
+	m_rom = m_rombase = region()->base();
 	if (m_rombase == NULL)
 	{
 		m_rommask = 0;

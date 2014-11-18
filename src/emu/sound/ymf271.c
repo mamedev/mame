@@ -1710,7 +1710,7 @@ void ymf271_device::device_start()
 	m_timA = timer_alloc(0);
 	m_timB = timer_alloc(1);
 
-	m_mem_base = *region();
+	m_mem_base = region()->base();
 	m_mem_size = region()->bytes();
 	m_irq_handler.resolve();
 

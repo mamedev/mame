@@ -48,10 +48,10 @@ void *finder_base::find_memregion(UINT8 width, size_t &length, bool required)
 		return NULL;
 
 	// check the width and warn if not correct
-	if (region->width() != width)
+	if (region->bytewidth() != width)
 	{
 		if (required)
-			osd_printf_warning("Region '%s' found but is width %d, not %d as requested\n", m_tag, region->width()*8, width*8);
+			osd_printf_warning("Region '%s' found but is width %d, not %d as requested\n", m_tag, region->bitwidth(), width*8);
 		return NULL;
 	}
 
@@ -73,10 +73,10 @@ void *finder_base::find_memshare(UINT8 width, size_t &bytes, bool required)
 		return NULL;
 
 	// check the width and warn if not correct
-	if (width != 0 && share->width() != width)
+	if (width != 0 && share->bitwidth() != width)
 	{
 		if (required)
-			osd_printf_warning("Shared ptr '%s' found but is width %d, not %d as requested\n", m_tag, share->width(), width);
+			osd_printf_warning("Shared ptr '%s' found but is width %d, not %d as requested\n", m_tag, share->bitwidth(), width);
 		return NULL;
 	}
 

@@ -374,7 +374,7 @@ void sgi_ip2_state::machine_reset()
 static ADDRESS_MAP_START(sgi_ip2_map, AS_PROGRAM, 32, sgi_ip2_state )
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x02100000, 0x0210ffff) AM_RAM AM_SHARE("bss") // ??? I don't understand the need for this...
-	AM_RANGE(0x30000000, 0x30017fff) AM_ROM AM_REGION("user1", 0)
+	AM_RANGE(0x30000000, 0x30017fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x30800000, 0x30800003) AM_READWRITE8(sgi_ip2_m_but_r,         sgi_ip2_m_but_w,        0xffffffff)
 	AM_RANGE(0x31000000, 0x31000003) AM_READWRITE16(sgi_ip2_m_quad_r,       sgi_ip2_m_quad_w,       0xffffffff)
 	AM_RANGE(0x31800000, 0x31800003) AM_READ16(sgi_ip2_swtch_r,                                     0xffffffff)
@@ -491,7 +491,7 @@ INPUT_PORTS_END
 
 DRIVER_INIT_MEMBER(sgi_ip2_state,sgi_ip2)
 {
-	UINT32 *src = (UINT32*)(*memregion("user1"));
+	UINT32 *src = (UINT32*)(memregion("maincpu")->base());
 	UINT32 *dst = m_mainram;
 	memcpy(dst, src, 8);
 
@@ -505,7 +505,7 @@ DRIVER_INIT_MEMBER(sgi_ip2_state,sgi_ip2)
 ***************************************************************************/
 
 ROM_START( sgi_ip2 )
-	ROM_REGION32_BE(0x18000, "user1", 0)
+	ROM_REGION32_BE(0x18000, "maincpu", 0)
 	ROM_LOAD( "sgi-ip2-u91.nolabel.od",    0x00000, 0x8000, CRC(32e1f6b5) SHA1(2bd928c3fe2e364b9a38189158e9bad0e5271a59) )
 	ROM_LOAD( "sgi-ip2-u92.nolabel.od",    0x08000, 0x8000, CRC(13dbfdb3) SHA1(3361fb62f7a8c429653700bccfc3e937f7508182) )
 	ROM_LOAD( "sgi-ip2-u93.ip2.2-008.od",  0x10000, 0x8000, CRC(bf967590) SHA1(1aac48e4f5531a25c5482f64de5cd3c7a9931f11) )

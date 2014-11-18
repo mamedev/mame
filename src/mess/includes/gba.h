@@ -268,7 +268,7 @@ public:
 	void draw_modes(int mode, int submode, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp);
 
 protected:
-	required_memory_region m_region_maincpu;
+	required_region_ptr<UINT32> m_region_maincpu;
 	required_ioport m_io_inputs;
 	required_ioport m_bios_hack;
 };

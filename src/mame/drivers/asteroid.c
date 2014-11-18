@@ -10,11 +10,6 @@
     Known bugs:
         * the ERROR message in Asteroids Deluxe self test is related to a pokey problem
 
-    Original bugs:
-        * Language ROMS for Lunar Lander are not dumped.  Attempting to use alternate
-          languages by changing through DIP menu will result in a game freeze, as the
-          original game would.
-
 Information from a Tech Tip:
 
 Asteroids Modification:
@@ -959,8 +954,7 @@ ROM_START( llander )
 	/* Vector ROM */
 	ROM_LOAD( "034599-01.r3",  0x4800, 0x0800, CRC(355a9371) SHA1(6ecb40169b797d9eb623bcb17872f745b1bf20fa) )
 	ROM_LOAD( "034598-01.np3", 0x5000, 0x0800, CRC(9c4ffa68) SHA1(eb4ffc289d254f699f821df3146aa2c6cd78597f) )
-	/* This _should_ be the rom for international versions.  Unfortunately, is it not currently available. */
-	ROM_LOAD( "034597-01.m3",  0x5800, 0x0800, NO_DUMP )
+	ROM_LOAD( "034597-01.m3",  0x5800, 0x0800, CRC(503f992e) SHA1(3e88a110ced9ee1927b0ba760b8d92cbc93e645d) ) /* built from original Atari source code */
 
 	/* DVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
@@ -976,8 +970,7 @@ ROM_START( llander1 )
 	/* Vector ROM */
 	ROM_LOAD( "034599-01.r3",  0x4800, 0x0800, CRC(355a9371) SHA1(6ecb40169b797d9eb623bcb17872f745b1bf20fa) )
 	ROM_LOAD( "034598-01.np3", 0x5000, 0x0800, CRC(9c4ffa68) SHA1(eb4ffc289d254f699f821df3146aa2c6cd78597f) )
-	/* This _should_ be the rom for international versions.  Unfortunately, is it not currently available. */
-	ROM_LOAD( "034597-01.m3",  0x5800, 0x0800, NO_DUMP )
+	ROM_LOAD( "034597-01.m3",  0x5800, 0x0800, CRC(503f992e) SHA1(3e88a110ced9ee1927b0ba760b8d92cbc93e645d) ) /* built from original Atari source code */
 
 	/* DVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )

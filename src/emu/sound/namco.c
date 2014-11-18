@@ -93,7 +93,7 @@ void namco_audio_device::device_start()
 	logerror("Namco: freq fractional bits = %d: internal freq = %d, output freq = %d\n", m_f_fracbits, m_namco_clock, m_sample_rate);
 
 	/* build the waveform table */
-	build_decoded_waveform(*region());
+	build_decoded_waveform(region()->base());
 
 	/* get stream channels */
 	if (m_stereo)

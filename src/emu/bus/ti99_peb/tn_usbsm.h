@@ -34,13 +34,10 @@ public:
 protected:
 	virtual void device_start(void);
 	virtual void device_reset(void);
-	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
 
 private:
-
-	smartmedia_image_device*    m_smartmedia;
 
 	int         m_feeprom_page;
 	int         m_sram_page;
@@ -54,9 +51,9 @@ private:
 
 	UINT16      m_input_latch;
 	UINT16      m_output_latch;
-	UINT16*     m_ram;
+	dynamic_array<UINT16> m_ram;
 
-	// Link to the FEEPROM containing the DSR (driver)
+	required_device<smartmedia_image_device> m_smartmedia;
 	required_device<strataflash_device> m_flash;
 };
 

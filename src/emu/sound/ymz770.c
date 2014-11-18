@@ -49,7 +49,7 @@ void ymz770_device::device_start()
 {
 	// create the stream
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, 16000);
-	m_rom_base = *region();
+	m_rom_base = region()->base();
 	m_rom_limit = region()->bytes() * 8;
 
 	for (int i = 0; i < 8; i++)

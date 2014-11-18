@@ -66,7 +66,7 @@ nile_device::nile_device(const machine_config &mconfig, const char *tag, device_
 
 void nile_device::device_start()
 {
-	m_sound_ram = *region();
+	m_sound_ram = region()->base();
 	m_stream = stream_alloc(0, 2, 44100);
 }
 

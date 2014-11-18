@@ -154,7 +154,7 @@ void ym2610_device::device_start()
 	/* stream system initialize */
 	m_stream = machine().sound().stream_alloc(*this,0,2,rate, stream_update_delegate(FUNC(ym2610_device::stream_generate),this));
 	/* setup adpcm buffers */
-	pcmbufa  = *region();
+	pcmbufa  = region()->base();
 	pcmsizea = region()->bytes();
 	name.printf("%s.deltat", tag());
 	pcmbufb  = (void *)(machine().root_device().memregion(name)->base());

@@ -51,7 +51,7 @@ void rp5h01_device::device_config_complete()
 
 void rp5h01_device::device_start()
 {
-	m_data = *region();
+	m_data = region()->base();
 	if (m_data == NULL)
 		m_data = initial_data;
 	else

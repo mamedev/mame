@@ -32,8 +32,8 @@ const device_type NAMCO_63701X = &device_creator<namco_63701x_device>;
 namco_63701x_device::namco_63701x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NAMCO_63701X, "Namco 63701X", tag, owner, clock, "namco_63701x", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_stream(NULL),
-		m_rom(NULL)
+		m_rom(*this, DEVICE_SELF),
+		m_stream(NULL)
 {
 }
 
@@ -44,7 +44,6 @@ namco_63701x_device::namco_63701x_device(const machine_config &mconfig, const ch
 
 void namco_63701x_device::device_start()
 {
-	m_rom = *region();
 	m_stream = stream_alloc(0, 2, clock()/1000);
 }
 

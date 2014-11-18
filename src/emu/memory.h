@@ -646,15 +646,18 @@ public:
 		: m_next(NULL),
 			m_ptr(ptr),
 			m_bytes(bytes),
-			m_width(width),
-			m_endianness(endianness) { }
+			m_endianness(endianness),
+			m_bitwidth(width),
+			m_bytewidth(width <= 8 ? 1 : width <= 16 ? 2 : width <= 32 ? 4 : 8)
+ { }
 
 	// getters
 	memory_share *next() const { return m_next; }
 	void *ptr() const { if (this == NULL) return NULL; return m_ptr; }
 	size_t bytes() const { return m_bytes; }
-	UINT8 width() const { return m_width; }
 	endianness_t endianness() const { return m_endianness; }
+	UINT8 bitwidth() const { return m_bitwidth; }
+	UINT8 bytewidth() const { return m_bytewidth; }
 
 	// setters
 	void set_ptr(void *ptr) { m_ptr = ptr; }
@@ -664,8 +667,10 @@ private:
 	memory_share *          m_next;                 // next share in the list
 	void *                  m_ptr;                  // pointer to the memory backing the region
 	size_t                  m_bytes;                // size of the shared region in bytes
-	UINT8                   m_width;                // width of the shared region
 	endianness_t            m_endianness;           // endianness of the memory
+	UINT8                   m_bitwidth;             // width of the shared region in bits
+	UINT8                   m_bytewidth;            // width in bytes, rounded up to a power of 2
+
 };
 
 
@@ -694,7 +699,8 @@ public:
 
 	// flag expansion
 	endianness_t endianness() const { return m_endianness; }
-	UINT8 width() const { return m_width; }
+	UINT8 bitwidth() const { return m_bitwidth; }
+	UINT8 bytewidth() const { return m_bytewidth; }
 
 	// data access
 	UINT8 &u8(offs_t offset = 0) { return m_buffer[offset]; }
@@ -702,25 +708,15 @@ public:
 	UINT32 &u32(offs_t offset = 0) { return reinterpret_cast<UINT32 *>(base())[offset]; }
 	UINT64 &u64(offs_t offset = 0) { return reinterpret_cast<UINT64 *>(base())[offset]; }
 
-	// allow passing a region for any common pointer
-	operator void *() { return (this != NULL) ? reinterpret_cast<void *>(base()) : NULL; }
-	operator INT8 *() { return (this != NULL) ? reinterpret_cast<INT8 *>(base()) : NULL; }
-	operator UINT8 *() { return (this != NULL) ? reinterpret_cast<UINT8 *>(base()) : NULL; }
-	operator INT16 *() { return (this != NULL) ? reinterpret_cast<INT16 *>(base()) : NULL; }
-	operator UINT16 *() { return (this != NULL) ? reinterpret_cast<UINT16 *>(base()) : NULL; }
-	operator INT32 *() { return (this != NULL) ? reinterpret_cast<INT32 *>(base()) : NULL; }
-	operator UINT32 *() { return (this != NULL) ? reinterpret_cast<UINT32 *>(base()) : NULL; }
-	operator INT64 *() { return (this != NULL) ? reinterpret_cast<INT64 *>(base()) : NULL; }
-	operator UINT64 *() { return (this != NULL) ? reinterpret_cast<UINT64 *>(base()) : NULL; }
-
 private:
 	// internal data
 	running_machine &       m_machine;
 	memory_region *         m_next;
 	astring                 m_name;
 	dynamic_buffer          m_buffer;
-	UINT8                   m_width;
 	endianness_t            m_endianness;
+	UINT8                   m_bitwidth;
+	UINT8                   m_bytewidth;
 };
 
 

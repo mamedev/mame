@@ -1163,7 +1163,7 @@ case 0x4E:  /* BMOV Rr,#b,BF/BF,Rr,#b - 6 cycles - Flags affected: --------/-Z-0
 	r2 = mem_readbyte( m_PC++ );
 	r1 = mem_readbyte( m_PC++ );
 	switch( r2 & 0xC0 ) {
-	case 0x00:
+	case 0x40:
 		res = mem_readbyte( r1 );
 		if ( m_PS1 & FLAG_B ) {
 			res = res | ( 1 << ( r2 & 0x07 ) );
@@ -1172,7 +1172,7 @@ case 0x4E:  /* BMOV Rr,#b,BF/BF,Rr,#b - 6 cycles - Flags affected: --------/-Z-0
 		}
 		mem_writebyte( r1, res & 0xFF );
 		break;
-	case 0x40:
+	case 0x00:
 		m_PS1 = m_PS1 & ( FLAG_C | FLAG_S | FLAG_D | FLAG_H | FLAG_I );
 		if ( mem_readbyte( r1 ) & ( 1 << ( r2 & 0x07 ) ) ) {
 			m_PS1 = m_PS1 | FLAG_B;

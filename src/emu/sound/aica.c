@@ -413,7 +413,7 @@ void aica_device::Init()
 
 	// get AICA RAM
 	{
-		m_AICARAM = *region();
+		m_AICARAM = region()->base();
 		if (m_AICARAM)
 		{
 			m_AICARAM += m_roffset;

@@ -428,7 +428,7 @@ void palette_device::device_start()
 		if (m_membits_supplied)
 		{
 			// forcing width only makes sense when narrower than the native bus width
-			assert_always(m_membits < share->width(), "Improper use of MCFG_PALETTE_MEMBITS");
+			assert_always(m_membits < share->bitwidth(), "Improper use of MCFG_PALETTE_MEMBITS");
 			m_paletteram.set_membits(m_membits);
 			if (share_ext != NULL)
 				m_paletteram_ext.set_membits(m_membits);

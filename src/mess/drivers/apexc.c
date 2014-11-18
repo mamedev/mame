@@ -117,12 +117,9 @@ bool apexc_cylinder_image_device::call_load()
 	fread( machine().root_device().memregion("maincpu")->base(), 0x1000);
 #ifdef LSB_FIRST
 	{   /* fix endianness */
-		UINT32 *RAM;
-		int i;
+		UINT32 *RAM = (UINT32 *)(machine().root_device().memregion("maincpu")->base());
 
-		RAM = (UINT32 *)(*machine().root_device().memregion("maincpu"));
-
-		for (i=0; i < 0x0400; i++)
+		for (int i=0; i < 0x0400; i++)
 			RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
 	}
 #endif
@@ -141,12 +138,9 @@ void apexc_cylinder_image_device::call_unload()
 		fseek(0, SEEK_SET);
 #ifdef LSB_FIRST
 		{   /* fix endianness */
-			UINT32 *RAM;
-			int i;
+			UINT32 *RAM = (UINT32 *)(machine().root_device().memregion("maincpu")->base());
 
-			RAM = (UINT32 *)(*machine().root_device().memregion("maincpu"));
-
-			for (i=0; i < /*0x2000*/0x0400; i++)
+			for (int i=0; i < /*0x2000*/0x0400; i++)
 				RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
 		}
 #endif

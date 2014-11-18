@@ -53,13 +53,12 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 private:
+	required_region_ptr<UINT8> m_rom;
 	UINT8* m_ram;
 	UINT8 m_low[16];
-	const UINT8* m_rom;
 	int m_bank;
 	int m_bankshift;
 	int m_bankmask;
-	int m_rgnmask;
 	sound_stream* m_stream;
 };
 

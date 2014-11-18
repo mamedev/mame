@@ -4131,8 +4131,9 @@ memory_region::memory_region(running_machine &machine, const char *name, UINT32 
 		m_next(NULL),
 		m_name(name),
 		m_buffer(length),
-		m_width(width),
-		m_endianness(endian)
+		m_endianness(endian),
+		m_bitwidth(width * 8),
+		m_bytewidth(width)
 {
 	assert(width == 1 || width == 2 || width == 4 || width == 8);
 }

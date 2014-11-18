@@ -48,6 +48,8 @@ protected:
 
 private:
 	// internal state
+	required_region_ptr<UINT8> m_rom;
+
 	UINT8           m_vol[KDAC_A_PCM_MAX][2]; /* volume for the left and right channel */
 	UINT32          m_addr[KDAC_A_PCM_MAX];
 	UINT32          m_start[KDAC_A_PCM_MAX];
@@ -56,7 +58,6 @@ private:
 	int             m_play[KDAC_A_PCM_MAX];
 
 	UINT8           m_wreg[0x10]; /* write data */
-	UINT8 *         m_pcmbuf[2];  /* Channel A & B pointers */
 
 	UINT32          m_pcmlimit;
 

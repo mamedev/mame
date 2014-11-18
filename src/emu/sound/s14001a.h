@@ -35,6 +35,7 @@ protected:
 
 private:
 	// internal state
+	required_region_ptr<UINT8> m_SpeechRom;
 	sound_stream * m_stream;
 
 	UINT8 m_WordInput; // value on word input bus
@@ -55,7 +56,6 @@ private:
 	UINT8 m_OldDelta; // 2-bit old delta value
 	UINT8 m_DACOutput; // 4-bit DAC Accumulator/output
 	UINT8 m_audioout; // filtered audio output
-	UINT8 *m_SpeechRom; // array to hold rom contents, mame will not need this, will use a pointer
 	INT16 m_filtervals[8];
 	UINT8 m_VSU1000_amp; // amplitude setting on VSU-1000 board
 

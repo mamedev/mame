@@ -256,6 +256,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cart(*this, "cartslot"),
+		m_rom(*this, "maincpu"),
 		m_vram(*this, "vram"),
 		m_mouse_gfx(*this, "mouse_gfx"),
 		m_cart_state(IQ128_NO_CART)
@@ -263,6 +264,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
+	required_region_ptr<UINT16> m_rom;
 	required_shared_ptr<UINT16> m_vram;
 	required_shared_ptr<UINT16> m_mouse_gfx;
 
@@ -420,7 +422,7 @@ WRITE16_MEMBER(geniusiq_state::gfx_base_w)
 
 WRITE16_MEMBER(geniusiq_state::gfx_idx_w)
 {
-	UINT16 *gfx = ((UINT16 *)(*memregion("maincpu"))) + ((m_gfx_base + (data & 0xff)*32)>>1);
+	UINT16 *gfx = m_rom + ((m_gfx_base + (data & 0xff)*32)>>1);
 
 	// first 16 bits are used to define the character size
 	UINT8 gfx_heigh = (gfx[0]>>0) & 0xff;

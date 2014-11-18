@@ -41,7 +41,6 @@
 
 #include "tn_usbsm.h"
 
-#define BUFFER_TAG "ram"
 #define STRATA_TAG "strata"
 
 enum
@@ -54,6 +53,7 @@ enum
 
 nouspikel_usb_smartmedia_device::nouspikel_usb_smartmedia_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : ti_expansion_card_device(mconfig, TI99_USBSM, "Nouspikel USB/Smartmedia card", tag, owner, clock, "ti99_usbsm", __FILE__),
+	m_smartmedia(*this, "smartmedia"),
 	m_flash(*this, STRATA_TAG)
 {
 }
@@ -273,9 +273,7 @@ WRITE8_MEMBER(nouspikel_usb_smartmedia_device::write)
 
 void nouspikel_usb_smartmedia_device::device_start()
 {
-	m_ram = (UINT16*)(*memregion(BUFFER_TAG));
-	/* auto_alloc_array(device->machine(), UINT16, 0x100000/2); */
-	m_smartmedia = subdevice<smartmedia_image_device>("smartmedia");
+	m_ram.resize(0x80000/2);
 }
 
 void nouspikel_usb_smartmedia_device::device_reset()
@@ -304,11 +302,6 @@ void nouspikel_usb_smartmedia_device::device_reset()
 	m_cru_base = ioport("CRUUSBSM")->read();
 }
 
-ROM_START( tn_usbsm )
-	ROM_REGION16_BE(0x80000, BUFFER_TAG, 0)  /* RAM buffer 512 KiB */
-	ROM_FILL(0x0000, 0x80000, 0x0000)
-ROM_END
-
 INPUT_PORTS_START( tn_usbsm )
 	PORT_START( "CRUUSBSM" )
 	PORT_DIPNAME( 0x1f00, 0x1600, "USB/Smartmedia CRU base" )
@@ -336,17 +329,12 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_FRAGMENT( tn_usbsm )
 	MCFG_DEVICE_ADD("smartmedia", SMARTMEDIA, 0)
-	MCFG_STRATAFLASH_ADD( "strata" )
+	MCFG_STRATAFLASH_ADD(STRATA_TAG)
 MACHINE_CONFIG_END
 
 machine_config_constructor nouspikel_usb_smartmedia_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( tn_usbsm );
-}
-
-const rom_entry *nouspikel_usb_smartmedia_device::device_rom_region() const
-{
-	return ROM_NAME( tn_usbsm );
 }
 
 ioport_constructor nouspikel_usb_smartmedia_device::device_input_ports() const

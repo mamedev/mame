@@ -20,13 +20,13 @@ const device_type ICS2115 = &device_creator<ics2115_device>;
 ics2115_device::ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ICS2115, "ICS2115", tag, owner, clock, "ics2115", __FILE__),
 		device_sound_interface(mconfig, *this),
+		m_rom(*this, DEVICE_SELF),
 		m_irq_cb(*this)
 {
 }
 
 void ics2115_device::device_start()
 {
-	m_rom = *region();
 	m_timer[0].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ics2115_device::timer_cb_0),this), this);
 	m_timer[1].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ics2115_device::timer_cb_1),this), this);
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, 33075);

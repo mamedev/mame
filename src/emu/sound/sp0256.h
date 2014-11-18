@@ -99,7 +99,7 @@ protected:
 private:
 	UINT32 getb(int len);
 	void micro();
-
+	required_region_ptr<UINT8> m_rom; /* 64K ROM.                                     */
 	sound_stream  *m_stream;          /* MAME core sound stream                       */
 	devcb_write_line m_drq_cb;       /* Data request callback                        */
 	devcb_write_line m_sby_cb;       /* Standby callback                             */
@@ -127,8 +127,6 @@ private:
 	UINT32         m_fifo_tail;       /* FIFO tail pointer (where data comes from).   */
 	UINT32         m_fifo_bitp;       /* FIFO bit-pointer (for partial decles).       */
 	UINT16         m_fifo[64];        /* The 64-decle FIFO.                           */
-
-	UINT8          *m_rom;            /* 64K ROM.                                     */
 
 	emu_timer *m_lrq_timer;
 };

@@ -71,6 +71,7 @@ const device_type ZSG2 = &device_creator<zsg2_device>;
 zsg2_device::zsg2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ZSG2, "ZSG-2", tag, owner, clock, "zsg2", __FILE__),
 		device_sound_interface(mconfig, *this),
+		m_mem_base(*this, DEVICE_SELF),
 		m_read_address(0),
 		m_ext_read_handler(*this)
 {
@@ -89,9 +90,7 @@ void zsg2_device::device_start()
 
 	m_stream = stream_alloc(0, 2, clock() / 192);
 
-	m_mem_base = *region();
-	m_mem_size = region()->bytes();
-	m_mem_blocks = m_mem_size / 4;
+	m_mem_blocks = m_mem_base.length();
 
 	m_mem_copy = auto_alloc_array_clear(machine(), UINT32, m_mem_blocks);
 	m_full_samples = auto_alloc_array_clear(machine(), INT16, m_mem_blocks * 4 + 4); // +4 is for empty block

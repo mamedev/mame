@@ -50,7 +50,7 @@ struct parse_info
     iscrlf - is a line feed character
 -------------------------------------------------*/
 
-static int iscrlf(char c)
+static bool iscrlf(char c)
 {
 	return (c == 13 || c == 10);
 }

@@ -51,6 +51,8 @@ private:
 	void es8712_state_save_register();
 
 private:
+	required_region_ptr<UINT8> m_rom;
+
 	UINT8 m_playing;          /* 1 if we're actively playing */
 
 	UINT32 m_base_offset;     /* pointer to the base memory location */
@@ -65,7 +67,6 @@ private:
 	UINT8  m_repeat;          /* Repeat current sample when 1 */
 
 	INT32 m_bank_offset;
-	UINT8 *m_region_base;     /* pointer to the base of the region */
 	sound_stream *m_stream;   /* which stream are we playing on? */
 };
 

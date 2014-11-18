@@ -148,6 +148,7 @@ const device_type K007232 = &device_creator<k007232_device>;
 k007232_device::k007232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K007232, "K007232 PCM Controller", tag, owner, clock, "k007232", __FILE__),
 		device_sound_interface(mconfig, *this),
+		m_rom(*this, DEVICE_SELF),
 		m_port_write_handler(*this)
 {
 }
@@ -159,8 +160,6 @@ k007232_device::k007232_device(const machine_config &mconfig, const char *tag, d
 void k007232_device::device_start()
 {
 	/* Set up the chips */
-	m_pcmbuf[0] = *region();
-	m_pcmbuf[1] = *region();
 	m_pcmlimit  = region()->bytes();
 
 	m_port_write_handler.resolve();
@@ -381,7 +380,7 @@ void k007232_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			addr = m_start[i] + ((m_addr[i]>>BASE_SHIFT)&0x000fffff);
 			while (old_addr <= addr)
 		{
-			if( (m_pcmbuf[i][old_addr] & 0x80) || old_addr >= m_pcmlimit )
+			if( (m_rom[old_addr] & 0x80) || old_addr >= m_pcmlimit )
 			{
 				/* end of sample */
 
@@ -413,7 +412,7 @@ void k007232_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 			m_addr[i] += m_step[i];
 
-			out = (m_pcmbuf[i][addr] & 0x7f) - 0x40;
+			out = (m_rom[addr] & 0x7f) - 0x40;
 
 			outputs[0][j] += out * volA;
 			outputs[1][j] += out * volB;
