@@ -8,8 +8,8 @@ static const int gamecom_timer_limit[8] = { 2, 1024, 2048, 4096, 8192, 16384, 32
 TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_clock_timer_callback)
 {
 	UINT8 * RAM = m_region_maincpu->base();
-	UINT8 val = ( ( RAM[SM8521_CLKT] & 0x3F ) + 1 ) & 0x3F;
-	RAM[SM8521_CLKT] = ( RAM[SM8521_CLKT] & 0xC0 ) | val;
+	UINT8 val = RAM[SM8521_CLKT] + 1;
+	RAM[SM8521_CLKT] = ( RAM[SM8521_CLKT] & 0xC0 ) | (val & 0x3f);
 	m_maincpu->set_input_line(sm8500_cpu_device::CK_INT, ASSERT_LINE );
 }
 
@@ -191,8 +191,9 @@ READ8_MEMBER( gamecom_state::gamecom_pio_r )
 
 READ8_MEMBER( gamecom_state::gamecom_internal_r )
 {
-	if(SM8521_LCV == offset + 0x20)
-		popmessage("Read from vblank bit, TODO");
+// ToDo: Read from vblank bit
+//	if(SM8521_LCV == offset + 0x20)
+//		popmessage("Read from vblank bit, TODO");
 
 	return m_p_ram[offset + 0x20];
 }
@@ -473,7 +474,8 @@ WRITE8_MEMBER( gamecom_state::gamecom_handle_dma )
 		m_dma.source_mask = 0x3FFF;
 		if (RAM[SM8521_DMBR] < 16)
 			m_dma.source_bank = m_region_kernel->base() + (RAM[SM8521_DMBR] << 14);
-		else if (m_cart_ptr)
+		else
+		if (m_cart_ptr)
 			m_dma.source_bank = m_cart_ptr + (RAM[SM8521_DMBR] << 14);
 
 		m_dma.dest_bank = &m_p_videoram[(RAM[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
