@@ -28,6 +28,8 @@ ADDRESS_MAP_END
 static MACHINE_CONFIG_FRAGMENT( dmv_k806 )
 	MCFG_CPU_ADD("mcu", I8741, XTAL_6MHz)
 	MCFG_CPU_IO_MAP(k806_io)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mouse_timer", dmv_k806_device, mouse_timer, attotime::from_hz(1000))
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( dmv_k806 )
@@ -46,6 +48,17 @@ static INPUT_PORTS_START( dmv_k806 )
 	PORT_DIPNAME( 0x380, 0x00, "K806 Mouse" )  PORT_DIPLOCATION("J:!8,J:!9,J:!10")
 	PORT_DIPSETTING( 0x000, "Hawley, Alps" )
 	PORT_DIPSETTING( 0x380, "Depraz" )
+
+	PORT_START("MOUSE")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Righ Mouse Button")    PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Middte Mouse Button")  PORT_CODE(MOUSECODE_BUTTON3)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Left Mouse Button")    PORT_CODE(MOUSECODE_BUTTON2)
+
+	PORT_START("MOUSEX")
+	PORT_BIT( 0xfff, 0x000, IPT_MOUSE_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(0)
+
+	PORT_START("MOUSEY")
+	PORT_BIT( 0xfff, 0x000, IPT_MOUSE_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(0)
 INPUT_PORTS_END
 
 //**************************************************************************
@@ -66,7 +79,10 @@ dmv_k806_device::dmv_k806_device(const machine_config &mconfig, const char *tag,
 		: device_t(mconfig, DMV_K806, "K806 mouse", tag, owner, clock, "dmv_k806", __FILE__),
 		device_dmvslot_interface( mconfig, *this ),
 		m_mcu(*this, "mcu"),
-		m_jumpers(*this, "JUMPERS")
+		m_jumpers(*this, "JUMPERS"),
+		m_mouse_buttons(*this, "MOUSE"),
+		m_mouse_x(*this, "MOUSEX"),
+		m_mouse_y(*this, "MOUSEY")
 {
 }
 
@@ -85,6 +101,11 @@ void dmv_k806_device::device_start()
 
 void dmv_k806_device::device_reset()
 {
+	m_mouse.phase = 0;
+	m_mouse.xa = m_mouse.xb = ASSERT_LINE;
+	m_mouse.ya = m_mouse.yb = ASSERT_LINE;
+	m_mouse.x = m_mouse.y = 0;
+	m_mouse.prev_x = m_mouse.prev_y = 0;
 }
 
 //-------------------------------------------------
@@ -126,7 +147,10 @@ void dmv_k806_device::io_write(address_space &space, int ifsel, offs_t offset, U
 {
 	UINT8 jumpers = m_jumpers->read();
 	if (BIT(jumpers, ifsel) && ((!BIT(offset, 3) && BIT(jumpers, 5)) || (BIT(offset, 3) && BIT(jumpers, 6))))
+	{
 		m_mcu->upi41_master_w(space, offset & 1, data);
+		m_bus->m_out_int_cb(CLEAR_LINE);
+	}
 }
 
 READ8_MEMBER( dmv_k806_device::port1_r )
@@ -140,8 +164,14 @@ READ8_MEMBER( dmv_k806_device::port1_r )
 	// -x-- ----   YB / X1
 	// x--- ----   not used
 
-	// TODO
-	return 0xff;
+	UINT8 data = m_mouse_buttons->read() & 0x07;
+
+	data |= (m_mouse.xa != CLEAR_LINE ? 0 : 0x08);
+	data |= (m_mouse.xb != CLEAR_LINE ? 0 : 0x10);
+	data |= (m_mouse.ya != CLEAR_LINE ? 0 : 0x20);
+	data |= (m_mouse.yb != CLEAR_LINE ? 0 : 0x40);
+
+	return data;
 }
 
 READ8_MEMBER( dmv_k806_device::portt1_r )
@@ -152,4 +182,62 @@ READ8_MEMBER( dmv_k806_device::portt1_r )
 WRITE8_MEMBER( dmv_k806_device::port2_w )
 {
 	m_bus->m_out_int_cb((data & 1) ? CLEAR_LINE : ASSERT_LINE);
-};
+}
+
+/*-------------------------------------------------------------------
+
+    Generate a sequence of pulses that have their phases shifted
+    by 90 degree for simulate the mouse movement.
+
+                 Right                          Left
+        -+   +---+   +---+   +---    ---+   +---+   +---+   +-
+     XA  |   |   |   |   |   |          |   |   |   |   |   |
+         +---+   +---+   +---+          +---+   +---+   +---+
+
+        ---+   +---+   +---+   +-    -+   +---+   +---+   +---
+     XB    |   |   |   |   |   |      |   |   |   |   |   |
+           +---+   +---+   +---+      +---+   +---+   +---+
+
+                 Down                            Up
+        -+   +---+   +---+   +---    ---+   +---+   +---+   +-
+     YA  |   |   |   |   |   |          |   |   |   |   |   |
+         +---+   +---+   +---+          +---+   +---+   +---+
+
+        ---+   +---+   +---+   +-    -+   +---+   +---+   +---
+     YB    |   |   |   |   |   |      |   |   |   |   |   |
+           +---+   +---+   +---+      +---+   +---+   +---+
+
+-------------------------------------------------------------------*/
+
+TIMER_DEVICE_CALLBACK_MEMBER(dmv_k806_device::mouse_timer)
+{
+	switch(m_mouse.phase)
+	{
+	case 0:
+		m_mouse.xa = m_mouse.x > m_mouse.prev_x ? CLEAR_LINE : ASSERT_LINE;
+		m_mouse.xb = m_mouse.x < m_mouse.prev_x ? CLEAR_LINE : ASSERT_LINE;
+		m_mouse.ya = m_mouse.y > m_mouse.prev_y ? CLEAR_LINE : ASSERT_LINE;
+		m_mouse.yb = m_mouse.y < m_mouse.prev_y ? CLEAR_LINE : ASSERT_LINE;
+		break;
+	case 1:
+		m_mouse.xa = m_mouse.xb = m_mouse.x != m_mouse.prev_x ? CLEAR_LINE : ASSERT_LINE;
+		m_mouse.ya = m_mouse.yb = m_mouse.y != m_mouse.prev_y ? CLEAR_LINE : ASSERT_LINE;
+		break;
+	case 2:
+		m_mouse.xa = m_mouse.x < m_mouse.prev_x ? CLEAR_LINE : ASSERT_LINE;
+		m_mouse.xb = m_mouse.x > m_mouse.prev_x ? CLEAR_LINE : ASSERT_LINE;
+		m_mouse.ya = m_mouse.y < m_mouse.prev_y ? CLEAR_LINE : ASSERT_LINE;
+		m_mouse.yb = m_mouse.y > m_mouse.prev_y ? CLEAR_LINE : ASSERT_LINE;
+		break;
+	case 3:
+		m_mouse.xa = m_mouse.xb = ASSERT_LINE;
+		m_mouse.ya = m_mouse.yb = ASSERT_LINE;
+		m_mouse.prev_x = m_mouse.x;
+		m_mouse.prev_y = m_mouse.y;
+		m_mouse.x = m_mouse_x->read();
+		m_mouse.y = m_mouse_y->read();
+		break;
+	}
+
+	m_mouse.phase = (m_mouse.phase + 1) & 3;
+}
