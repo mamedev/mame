@@ -410,6 +410,16 @@ and why some of the dumps below have weird size?
 		</part>
 	</software>
 
+	<software name="pitchase">
+		<description>Pit Chaser</description>
+		<year>1983</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="pitchaser.bin" size="8192" crc="cf71e13a" sha1="c843f817bb06faf78134b098acbebecc17b7c699" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
 
 
 
