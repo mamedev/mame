@@ -3,7 +3,7 @@
 U2 flash rom note
 
 Cave often programmed the u2 roms onto defective flash chips, programming around the bad blocks.
-As a result these are highly suseptible to failure, blocks around the known bad blocks appear to
+As a result these are highly susceptible to failure, blocks around the known bad blocks appear to
 decay at an alarming rate in some cases, and in others data has clearly been programmed over
 blocks that were already going bad. - this is why the same game often has different u2 roms
 in the different sets at the moment. - these will be reconstructed at some point.
@@ -122,7 +122,7 @@ Connectors:
 Misc:
    U27 (SUPERVISOR) MAX 690S 3.0V Microprocessor Supervisory Circuit.
    U10 (RTC & EEPROM) RTC 9701, Serial RTC Module with EEPROM 4 kbit (256x16 bit), controlled by Altera EPM7032 U13.
-   U12 (RS-232 TRANCEIVER) MAX 3244E RS-232 Tranceiver, only mounted when P5 is mounted.
+   U12 (RS-232 TRANSCEIVER) MAX 3244E RS-232 Transceiver, only mounted when P5 is mounted.
  D1-D6 (LED) Status LED's. D6 lights up at power on then shuts off, D2 indicates coinage.
 
 Note: * The Altera EPM7032 usually stamped / labeled with the Cave game ID number as listed above.
