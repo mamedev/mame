@@ -162,6 +162,7 @@ opcode_desc *drc_frontend::describe_one(offs_t curpc, const opcode_desc *prevdes
 	opcode_desc *desc = m_desc_allocator.alloc();
 	desc->m_next = NULL;
 	desc->branch = NULL;
+	desc->delay.reset();
 	desc->pc = curpc;
 	desc->physpc = curpc;
 	desc->targetpc = BRANCH_TARGET_DYNAMIC;
