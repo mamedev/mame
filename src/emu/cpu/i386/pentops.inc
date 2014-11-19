@@ -1292,8 +1292,8 @@ void i386_device::mmx_group_0f73()  // Opcode 0f 73
 				else if(imm8)
 				{
 					imm8 = imm8 << 3;
-					XMM(modm & 7).q[1] = (XMM(modm & 7).q[0] << (64 - imm8)) | (XMM(modm & 7).q[1] >> imm8);
-					XMM(modm & 7).q[0] = XMM(modm & 7).q[0] >> imm8;
+					XMM(modm & 7).q[0] = (XMM(modm & 7).q[1] << (64 - imm8)) | (XMM(modm & 7).q[0] >> imm8);
+					XMM(modm & 7).q[1] = XMM(modm & 7).q[0] >> imm8;
 				}
 				break;
 			case 6: // psllq
@@ -1320,8 +1320,8 @@ void i386_device::mmx_group_0f73()  // Opcode 0f 73
 				else if(imm8)
 				{
 					imm8 = imm8 << 3;
-					XMM(modm & 7).q[0] = (XMM(modm & 7).q[1] << (64 - imm8)) | (XMM(modm & 7).q[0] >> imm8);
-					XMM(modm & 7).q[1] = XMM(modm & 7).q[1] << imm8;
+					XMM(modm & 7).q[1] = (XMM(modm & 7).q[0] >> (64 - imm8)) | (XMM(modm & 7).q[1] << imm8);
+					XMM(modm & 7).q[0] = XMM(modm & 7).q[0] << imm8;
 				}
 				break;
 			default:
@@ -3570,12 +3570,18 @@ void i386_device::sse_pinsrw_r64_r16m16_i8() // Opcode 0f c4
 	if( modrm >= 0xc0 ) {
 		UINT8 imm8 = FETCH();
 		UINT16 v = LOAD_RM16(modrm);
-		MMX((modrm >> 3) & 0x7).w[imm8 & 3] = v;
+		if (m_xmm_operand_size)
+			XMM((modrm >> 3) & 0x7).w[imm8 & 7] = v;
+		else
+			MMX((modrm >> 3) & 0x7).w[imm8 & 3] = v;
 	} else {
 		UINT32 ea = GetEA(modrm, 0);
 		UINT8 imm8 = FETCH();
 		UINT16 v = READ16(ea);
-		MMX((modrm >> 3) & 0x7).w[imm8 & 3] = v;
+		if (m_xmm_operand_size)
+			XMM((modrm >> 3) & 0x7).w[imm8 & 7] = v;
+		else
+			MMX((modrm >> 3) & 0x7).w[imm8 & 3] = v;
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
@@ -3587,12 +3593,18 @@ void i386_device::sse_pinsrw_r64_r32m16_i8() // Opcode 0f c4
 	if( modrm >= 0xc0 ) {
 		UINT8 imm8 = FETCH();
 		UINT16 v = (UINT16)LOAD_RM32(modrm);
-		MMX((modrm >> 3) & 0x7).w[imm8 & 3] = v;
+		if (m_xmm_operand_size)
+			XMM((modrm >> 3) & 0x7).w[imm8 & 7] = v;
+		else
+			MMX((modrm >> 3) & 0x7).w[imm8 & 3] = v;
 	} else {
 		UINT32 ea = GetEA(modrm, 0);
 		UINT8 imm8 = FETCH();
 		UINT16 v = READ16(ea);
-		MMX((modrm >> 3) & 0x7).w[imm8 & 3] = v;
+		if (m_xmm_operand_size)
+			XMM((modrm >> 3) & 0x7).w[imm8 & 7] = v;
+		else
+			MMX((modrm >> 3) & 0x7).w[imm8 & 3] = v;
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
@@ -3603,7 +3615,10 @@ void i386_device::sse_pextrw_r16_r64_i8() // Opcode 0f c5
 	UINT8 modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		UINT8 imm8 = FETCH();
-		STORE_REG16(modrm, MMX(modrm & 0x7).w[imm8 & 3]);
+		if (m_xmm_operand_size)
+			STORE_REG16(modrm, XMM(modrm & 0x7).w[imm8 & 7]);
+		else
+			STORE_REG16(modrm, MMX(modrm & 0x7).w[imm8 & 3]);
 	} else {
 		//UINT8 imm8 = FETCH();
 		report_invalid_modrm("pextrw_r16_r64_i8", modrm);
@@ -3617,7 +3632,10 @@ void i386_device::sse_pextrw_r32_r64_i8() // Opcode 0f c5
 	UINT8 modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		UINT8 imm8 = FETCH();
-		STORE_REG32(modrm, MMX(modrm & 0x7).w[imm8 & 3]);
+		if (m_xmm_operand_size)
+			STORE_REG32(modrm, XMM(modrm & 0x7).w[imm8 & 7]);
+		else
+			STORE_REG32(modrm, MMX(modrm & 0x7).w[imm8 & 3]);
 	} else {
 		//UINT8 imm8 = FETCH();
 		report_invalid_modrm("pextrw_r32_r64_i8", modrm);
