@@ -167,8 +167,6 @@ static MACHINE_CONFIG_START( alinvade, alinvade_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 128-1)
 	MCFG_SCREEN_UPDATE_DRIVER(alinvade_state, screen_update_alinvade)
 
-	// TODO: MCFG_DEFAULT_LAYOUT for square pixels
-	
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 MACHINE_CONFIG_END
