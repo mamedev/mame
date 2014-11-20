@@ -464,6 +464,8 @@ harddriv_state::harddriv_state(const machine_config &mconfig, const char *tag, d
 			m_dac(*this, "dac"),
 			m_duart(*this, "duartn68681"),
 			m_asic65(*this, "asic65"),
+			m_sound_int_state(0),
+			m_video_int_state(0),
 			m_palette(*this, "palette"),
 			m_slapstic_device(*this, "slapstic")
 {

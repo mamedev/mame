@@ -33,6 +33,8 @@ public:
 	DECLARE_READ8_MEMBER(port1_r);
 	DECLARE_WRITE8_MEMBER(port2_w);
 
+	TIMER_DEVICE_CALLBACK_MEMBER(mouse_timer);
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -44,7 +46,23 @@ protected:
 private:
 	required_device<upi41_cpu_device> m_mcu;
 	required_ioport m_jumpers;
+	required_ioport m_mouse_buttons;
+	required_ioport m_mouse_x;
+	required_ioport m_mouse_y;
 	dmvcart_slot_device * m_bus;
+
+	struct
+	{
+		int phase;
+		int x;
+		int y;
+		int prev_x;
+		int prev_y;
+		int xa;
+		int xb;
+		int ya;
+		int yb;
+	} m_mouse;
 };
 
 

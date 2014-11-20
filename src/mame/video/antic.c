@@ -20,11 +20,12 @@
 const device_type ATARI_ANTIC = &device_creator<antic_device>;
 
 //-------------------------------------------------
-//  upd7220_device - constructor
+//  antic_device - constructor
 //-------------------------------------------------
 
 antic_device::antic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 				device_t(mconfig, ATARI_ANTIC, "Atari ANTIC", tag, owner, clock, "antic", __FILE__),
+				device_video_interface(mconfig, *this),
 				m_gtia_tag(NULL),
 				m_tv_artifacts(0),
 				m_render1(0),
@@ -59,7 +60,7 @@ void antic_device::device_start()
 	m_gtia = machine().device<gtia_device>(m_gtia_tag);
 	assert(m_gtia);
 
-	m_bitmap = auto_bitmap_ind16_alloc(machine(), machine().first_screen()->width(), machine().first_screen()->height());
+	m_bitmap = auto_bitmap_ind16_alloc(machine(), m_screen->width(), m_screen->height());
 
 	m_cclk_expand = auto_alloc_array_clear(machine(), UINT32, 21 * 256);
 
@@ -96,7 +97,7 @@ void antic_device::device_start()
 	LOG(("atari prio_init\n"));
 	prio_init();
 
-	for (int i = 0; i < machine().first_screen()->height(); i++)
+	for (int i = 0; i < m_screen->height(); i++)
 		m_video[i] = auto_alloc_clear(machine(), VIDEO);
 
 	/* save states */
@@ -1552,7 +1553,7 @@ void antic_device::linerefresh()
 	UINT16 *color_lookup = m_gtia->get_color_lookup();
 
 	/* increment the scanline */
-	if( ++m_scanline == machine().first_screen()->height() )
+	if( ++m_scanline == m_screen->height() )
 	{
 		/* and return to the top if the frame was complete */
 		m_scanline = 0;
@@ -1654,7 +1655,7 @@ void antic_device::linerefresh()
 
 
 #define ANTIC_TIME_FROM_CYCLES(cycles)  \
-(attotime)(machine().first_screen()->scan_period() * (cycles) / CYCLES_PER_LINE)
+(attotime)(m_screen->scan_period() * (cycles) / CYCLES_PER_LINE)
 
 void antic_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -1677,7 +1678,7 @@ void antic_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 int antic_device::cycle()
 {
-	return machine().first_screen()->hpos() * CYCLES_PER_LINE / machine().first_screen()->width();
+	return m_screen->hpos() * CYCLES_PER_LINE / m_screen->width();
 }
 
 TIMER_CALLBACK_MEMBER( antic_device::issue_dli )
@@ -1928,7 +1929,7 @@ void antic_device::scanline_dma(int param)
 							/* produce empty scanlines until vblank start */
 							m_modelines = VBL_START + 1 - m_scanline;
 							if( m_modelines < 0 )
-								m_modelines = machine().first_screen()->height() - m_scanline;
+								m_modelines = m_screen->height() - m_scanline;
 							LOG(("           JVB $%04x\n", m_dpage|m_doffs));
 						}
 						else
@@ -2081,7 +2082,7 @@ void antic_device::generic_interrupt(int button_count)
 		m_gtia->button_interrupt(button_count, machine().root_device().ioport("djoy_b")->read_safe(0));
 
 		/* do nothing new for the rest of the frame */
-		m_modelines = machine().first_screen()->height() - VBL_START;
+		m_modelines = m_screen->height() - VBL_START;
 		m_render1 = 0;
 		m_render2 = 0;
 		m_render3 = 0;

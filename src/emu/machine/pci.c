@@ -17,6 +17,7 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, pci_device)
 
 	AM_RANGE(0x2c, 0x2f) AM_READ16     (subvendor_r,                       0x0000ffff)
 	AM_RANGE(0x2c, 0x2f) AM_READ16     (subsystem_r,                       0xffff0000)
+	AM_RANGE(0x2c, 0x2f) AM_WRITENOP
 
 	AM_RANGE(0x34, 0x37) AM_READ8      (capptr_r,                          0x000000ff)
 ADDRESS_MAP_END

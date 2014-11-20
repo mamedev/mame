@@ -3338,6 +3338,21 @@ void i386_device::register_state_i386_x87()
 	state_add( X87_ST7,    "ST7", m_debugger_temp ).formatstr("%15s");
 }
 
+void i386_device::register_state_i386_x87_xmm()
+{
+	register_state_i386_x87();
+
+	state_add( SSE_XMM0, "XMM0", m_debugger_temp ).formatstr("%32s");
+	state_add( SSE_XMM1, "XMM1", m_debugger_temp ).formatstr("%32s");
+	state_add( SSE_XMM2, "XMM2", m_debugger_temp ).formatstr("%32s");
+	state_add( SSE_XMM3, "XMM3", m_debugger_temp ).formatstr("%32s");
+	state_add( SSE_XMM4, "XMM4", m_debugger_temp ).formatstr("%32s");
+	state_add( SSE_XMM5, "XMM5", m_debugger_temp ).formatstr("%32s");
+	state_add( SSE_XMM6, "XMM6", m_debugger_temp ).formatstr("%32s");
+	state_add( SSE_XMM7, "XMM7", m_debugger_temp ).formatstr("%32s");
+
+}
+
 void i386_device::state_import(const device_state_entry &entry)
 {
 	switch (entry.index())
@@ -3410,6 +3425,30 @@ void i386_device::state_string_export(const device_state_entry &entry, astring &
 			break;
 		case X87_ST7:
 			string.printf("%f", fx80_to_double(ST(7)));
+			break;
+		case SSE_XMM0:
+			string.printf("%08x%08x%08x%08x", XMM(0).d[3], XMM(0).d[2], XMM(0).d[1], XMM(0).d[0]);
+			break;
+		case SSE_XMM1:
+			string.printf("%08x%08x%08x%08x", XMM(1).d[3], XMM(1).d[2], XMM(1).d[1], XMM(1).d[0]);
+			break;
+		case SSE_XMM2:
+			string.printf("%08x%08x%08x%08x", XMM(2).d[3], XMM(2).d[2], XMM(2).d[1], XMM(2).d[0]);
+			break;
+		case SSE_XMM3:
+			string.printf("%08x%08x%08x%08x", XMM(3).d[3], XMM(3).d[2], XMM(3).d[1], XMM(3).d[0]);
+			break;
+		case SSE_XMM4:
+			string.printf("%08x%08x%08x%08x", XMM(4).d[3], XMM(4).d[2], XMM(4).d[1], XMM(4).d[0]);
+			break;
+		case SSE_XMM5:
+			string.printf("%08x%08x%08x%08x", XMM(5).d[3], XMM(5).d[2], XMM(5).d[1], XMM(5).d[0]);
+			break;
+		case SSE_XMM6:
+			string.printf("%08x%08x%08x%08x", XMM(6).d[3], XMM(6).d[2], XMM(6).d[1], XMM(6).d[0]);
+			break;
+		case SSE_XMM7:
+			string.printf("%08x%08x%08x%08x", XMM(7).d[3], XMM(7).d[2], XMM(7).d[1], XMM(7).d[0]);
 			break;
 	}
 }
@@ -4245,7 +4284,7 @@ void pentium3_device::device_start()
 {
 	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
 	i386_common_init(96);
-	register_state_i386_x87();
+	register_state_i386_x87_xmm();
 
 	build_x87_opcode_table();
 	build_opcode_table(OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_PPRO | OP_MMX | OP_SSE);
@@ -4314,7 +4353,7 @@ void pentium4_device::device_start()
 {
 	// 128 dtlb, 64 itlb
 	i386_common_init(196);
-	register_state_i386_x87();
+	register_state_i386_x87_xmm();
 
 	build_x87_opcode_table();
 	build_opcode_table(OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_PPRO | OP_MMX | OP_SSE | OP_SSE2);
