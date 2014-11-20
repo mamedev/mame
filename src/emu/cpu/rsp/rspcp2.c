@@ -844,46 +844,6 @@ void rsp_cop2::handle_swc2(UINT32 op)
     Vector Accumulator Helpers
 ***************************************************************************/
 
-inline UINT16 rsp_cop2::SATURATE_ACCUM1(int accum, UINT16 negative, UINT16 positive)
-{
-if ((INT16)ACCUM_H(accum) < 0)
-{
-if ((UINT16)(ACCUM_H(accum)) != 0xffff)
-{
-return negative;
-}
-else
-{
-if ((INT16)ACCUM_M(accum) >= 0)
-{
-return negative;
-}
-else
-{
-return ACCUM_M(accum);
-}
-}
-}
-else
-{
-if ((UINT16)(ACCUM_H(accum)) != 0)
-{
-return positive;
-}
-else
-{
-if ((INT16)ACCUM_M(accum) < 0)
-{
-return positive;
-}
-else
-{
-return ACCUM_M(accum);
-}
-}
-}
-}
-
 UINT16 rsp_cop2::SATURATE_ACCUM(int accum, int slice, UINT16 negative, UINT16 positive)
 {
 	if ((INT16)ACCUM_H(accum) < 0)
@@ -1174,7 +1134,6 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 			WRITEBACK_RESULT();
 			break;
 		}
-
 		case 0x09:      /* VMACU */
 		{
 			// 31       25  24     20      15      10      5        0
@@ -1274,7 +1233,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 				SET_ACCUM_M((UINT16)(r3), i);
 				SET_ACCUM_H(ACCUM_H(i) + (UINT16)(r3 >> 16), i);
 				if ((INT32)(r1) < 0)
-					SET_ACCUM_H(i, ACCUM_H(i) - 1);
+					SET_ACCUM_H(ACCUM_H(i) - 1, i);
 
 				m_vres[i] = SATURATE_ACCUM(i, 1, 0x8000, 0x7fff);
 			}
@@ -1339,7 +1298,7 @@ void rsp_cop2::handle_vector_ops(UINT32 op)
 				SET_ACCUM_H((UINT16)(accum >> 16), i);
 				SET_ACCUM_M((UINT16)accum, i);
 
-				m_vres[i] = SATURATE_ACCUM1(i, 0x8000, 0x7fff);
+				m_vres[i] = SATURATE_ACCUM(i, 1, 0x8000, 0x7fff);
 			}
 			WRITEBACK_RESULT();
 

@@ -146,6 +146,74 @@ offs_t rsp_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opro
 	return CPU_DISASSEMBLE_NAME( rsp )(this, buffer, pc, oprom, opram, options);
 }
 
+void rsp_device::rsp_add_imem(UINT32 *base)
+{
+	m_imem32 = base;
+	m_imem16 = (UINT16*)base;
+	m_imem8 = (UINT8*)base;
+}
+
+void rsp_device::rsp_add_dmem(UINT32 *base)
+{
+	m_dmem32 = base;
+	m_dmem16 = (UINT16*)base;
+	m_dmem8 = (UINT8*)base;
+}
+
+UINT8 rsp_device::DM_READ8(UINT32 address)
+{
+	UINT8 ret = m_dmem8[BYTE4_XOR_BE(address & 0xfff)];
+	//printf("R8:%08x=%02x\n", address, ret);
+	return ret;
+}
+
+UINT16 rsp_device::DM_READ16(UINT32 address)
+{
+	UINT16 ret;
+	address &= 0xfff;
+	ret = m_dmem8[BYTE4_XOR_BE(address)] << 8;
+	ret |= m_dmem8[BYTE4_XOR_BE(address + 1)];
+	//printf("R16:%08x=%04x\n", address, ret);
+	return ret;
+}
+
+UINT32 rsp_device::DM_READ32(UINT32 address)
+{
+	UINT32 ret;
+	address &= 0xfff;
+	ret = m_dmem8[BYTE4_XOR_BE(address)] << 24;
+	ret |= m_dmem8[BYTE4_XOR_BE(address + 1)] << 16;
+	ret |= m_dmem8[BYTE4_XOR_BE(address + 2)] << 8;
+	ret |= m_dmem8[BYTE4_XOR_BE(address + 3)];
+	//printf("R32:%08x=%08x\n", address, ret);
+	return ret;
+}
+
+void rsp_device::DM_WRITE8(UINT32 address, UINT8 data)
+{
+	address &= 0xfff;
+	m_dmem8[BYTE4_XOR_BE(address)] = data;
+	//printf("W8:%08x=%02x\n", address, data);
+}
+
+void rsp_device::DM_WRITE16(UINT32 address, UINT16 data)
+{
+	address &= 0xfff;
+	m_dmem8[BYTE4_XOR_BE(address)] = data >> 8;
+	m_dmem8[BYTE4_XOR_BE(address + 1)] = data & 0xff;
+	//printf("W16:%08x=%04x\n", address, data);
+}
+
+void rsp_device::DM_WRITE32(UINT32 address, UINT32 data)
+{
+	address &= 0xfff;
+	m_dmem8[BYTE4_XOR_BE(address)] = data >> 24;
+	m_dmem8[BYTE4_XOR_BE(address + 1)] = (data >> 16) & 0xff;
+	m_dmem8[BYTE4_XOR_BE(address + 2)] = (data >> 8) & 0xff;
+	m_dmem8[BYTE4_XOR_BE(address + 3)] = data & 0xff;
+	//printf("W32:%08x=%08x\n", address, data);
+}
+
 UINT8 rsp_device::READ8(UINT32 address)
 {
 	UINT8 ret;
