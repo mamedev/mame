@@ -9581,6 +9581,7 @@ cafebrk         // "528" Mahjong Cafe Break (C) 1999 Nakanihon / Dynax
 jongtei         // "532" Mahjong Jong-Tei (C) 1999 Dynax
 seljan2         // "557" 1996 Dynax / Face
 realbrk         // "600" Billiard Academy Real Break 1998 (Europe)
+realbrko		// "600" Billiard Academy Real Break 1998 (Europe)
 realbrkk        // "600" Billiard Academy Real Break 1998 (Korea)
 janshinp        // "700j" 1996 Dynax / Sigma
 dtoyoken        // "700d" 1996 Dynax / Sigma
