@@ -55,6 +55,8 @@ protected:
 	virtual void state_string_export(const int index, astring &string);
 
 public:
+	virtual ~rsp_cop2();
+
 	virtual void lbv() { }
 	virtual void lsv() { }
 	virtual void llv() { }

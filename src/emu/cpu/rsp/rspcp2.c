@@ -135,6 +135,10 @@ rsp_cop2::rsp_cop2(rsp_device &rsp, running_machine &machine)
 	memset(m_accum, 0, sizeof(m_accum));
 }
 
+rsp_cop2::~rsp_cop2()
+{
+}
+
 void rsp_cop2::init()
 {
 	CLEAR_CARRY_FLAGS();
