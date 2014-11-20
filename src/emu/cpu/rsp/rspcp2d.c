@@ -258,7 +258,7 @@ void rsp_cop2_drc::state_string_export(const int index, astring &string)
 //
 // Load 1 byte to vector byte index
 
-inline void rsp_cop2_drc::lbv()
+void rsp_cop2_drc::lbv()
 {
 	UINT32 op = m_op;
 
@@ -291,7 +291,7 @@ static void cfunc_lbv(void *param)
 //
 // Loads 2 bytes starting from vector byte index
 
-inline void rsp_cop2_drc::lsv()
+void rsp_cop2_drc::lsv()
 {
 	UINT32 op = m_op;
 	int dest = (op >> 16) & 0x1f;
@@ -327,7 +327,7 @@ static void cfunc_lsv(void *param)
 //
 // Loads 4 bytes starting from vector byte index
 
-inline void rsp_cop2_drc::llv()
+void rsp_cop2_drc::llv()
 {
 	UINT32 op = m_op;
 	UINT32 ea = 0;
@@ -366,7 +366,7 @@ static void cfunc_llv(void *param)
 //
 // Loads 8 bytes starting from vector byte index
 
-inline void rsp_cop2_drc::ldv()
+void rsp_cop2_drc::ldv()
 {
 	UINT32 op = m_op;
 	UINT32 ea = 0;
@@ -405,7 +405,7 @@ static void cfunc_ldv(void *param)
 //
 // Loads up to 16 bytes starting from vector byte index
 
-inline void rsp_cop2_drc::lqv()
+void rsp_cop2_drc::lqv()
 {
 	UINT32 op = m_op;
 	int dest = (op >> 16) & 0x1f;
@@ -443,7 +443,7 @@ static void cfunc_lqv(void *param)
 //
 // Stores up to 16 bytes starting from right side until 16-byte boundary
 
-inline void rsp_cop2_drc::lrv()
+void rsp_cop2_drc::lrv()
 {
 	UINT32 op = m_op;
 	int dest = (op >> 16) & 0x1f;
@@ -482,7 +482,7 @@ static void cfunc_lrv(void *param)
 //
 // Loads a byte as the upper 8 bits of each element
 
-inline void rsp_cop2_drc::lpv()
+void rsp_cop2_drc::lpv()
 {
 	UINT32 op = m_op;
 	int dest = (op >> 16) & 0x1f;
@@ -517,7 +517,7 @@ static void cfunc_lpv(void *param)
 //
 // Loads a byte as the bits 14-7 of each element
 
-inline void rsp_cop2_drc::luv()
+void rsp_cop2_drc::luv()
 {
 	UINT32 op = m_op;
 	int dest = (op >> 16) & 0x1f;
@@ -552,7 +552,7 @@ static void cfunc_luv(void *param)
 //
 // Loads a byte as the bits 14-7 of each element, with 2-byte stride
 
-inline void rsp_cop2_drc::lhv()
+void rsp_cop2_drc::lhv()
 {
 	UINT32 op = m_op;
 	int dest = (op >> 16) & 0x1f;
@@ -586,7 +586,7 @@ static void cfunc_lhv(void *param)
 //
 // Loads a byte as the bits 14-7 of upper or lower quad, with 4-byte stride
 
-inline void rsp_cop2_drc::lfv()
+void rsp_cop2_drc::lfv()
 {
 	UINT32 op = m_op;
 	int dest = (op >> 16) & 0x1f;
@@ -627,7 +627,7 @@ static void cfunc_lfv(void *param)
 // Loads the full 128-bit vector starting from vector byte index and wrapping to index 0
 // after byte index 15
 
-inline void rsp_cop2_drc::lwv()
+void rsp_cop2_drc::lwv()
 {
 	UINT32 op = m_op;
 	int dest = (op >> 16) & 0x1f;
@@ -664,7 +664,7 @@ static void cfunc_lwv(void *param)
 //
 // Loads one element to maximum of 8 vectors, while incrementing element index
 
-inline void rsp_cop2_drc::ltv()
+void rsp_cop2_drc::ltv()
 {
 	UINT32 op = m_op;
 	int dest = (op >> 16) & 0x1f;
@@ -791,7 +791,7 @@ int rsp_cop2_drc::generate_lwc2(drcuml_block *block, rsp_device::compiler_state 
 //
 // Stores 1 byte from vector byte index
 
-inline void rsp_cop2_drc::sbv()
+void rsp_cop2_drc::sbv()
 {
 	UINT32 op = m_op;
 	int dest = (op >> 16) & 0x1f;
@@ -822,7 +822,7 @@ static void cfunc_sbv(void *param)
 //
 // Stores 2 bytes starting from vector byte index
 
-inline void rsp_cop2_drc::ssv()
+void rsp_cop2_drc::ssv()
 {
 	UINT32 op = m_op;
 	int dest = (op >> 16) & 0x1f;
@@ -859,7 +859,7 @@ static void cfunc_ssv(void *param)
 //
 // Stores 4 bytes starting from vector byte index
 
-inline void rsp_cop2_drc::slv()
+void rsp_cop2_drc::slv()
 {
 	UINT32 op = m_op;
 	int dest = (op >> 16) & 0x1f;
@@ -896,7 +896,7 @@ static void cfunc_slv(void *param)
 //
 // Stores 8 bytes starting from vector byte index
 
-inline void rsp_cop2_drc::sdv()
+void rsp_cop2_drc::sdv()
 {
 	UINT32 op = m_op;
 	int dest = (op >> 16) & 0x1f;
@@ -932,7 +932,7 @@ static void cfunc_sdv(void *param)
 //
 // Stores up to 16 bytes starting from vector byte index until 16-byte boundary
 
-inline void rsp_cop2_drc::sqv()
+void rsp_cop2_drc::sqv()
 {
 	UINT32 op = m_op;
 	int dest = (op >> 16) & 0x1f;
@@ -968,7 +968,7 @@ static void cfunc_sqv(void *param)
 //
 // Stores up to 16 bytes starting from right side until 16-byte boundary
 
-inline void rsp_cop2_drc::srv()
+void rsp_cop2_drc::srv()
 {
 	UINT32 op = m_op;
 	int dest = (op >> 16) & 0x1f;
@@ -1008,7 +1008,7 @@ static void cfunc_srv(void *param)
 //
 // Stores upper 8 bits of each element
 
-inline void rsp_cop2_drc::spv()
+void rsp_cop2_drc::spv()
 {
 	UINT32 op = m_op;
 	int dest = (op >> 16) & 0x1f;
@@ -1051,7 +1051,7 @@ static void cfunc_spv(void *param)
 //
 // Stores bits 14-7 of each element
 
-inline void rsp_cop2_drc::suv()
+void rsp_cop2_drc::suv()
 {
 	UINT32 op = m_op;
 	int dest = (op >> 16) & 0x1f;
@@ -1094,7 +1094,7 @@ static void cfunc_suv(void *param)
 //
 // Stores bits 14-7 of each element, with 2-byte stride
 
-inline void rsp_cop2_drc::shv()
+void rsp_cop2_drc::shv()
 {
 	UINT32 op = m_op;
 	int dest = (op >> 16) & 0x1f;
@@ -1132,7 +1132,7 @@ static void cfunc_shv(void *param)
 //
 // Stores bits 14-7 of upper or lower quad, with 4-byte stride
 
-inline void rsp_cop2_drc::sfv()
+void rsp_cop2_drc::sfv()
 {
 	UINT32 op = m_op;
 	int dest = (op >> 16) & 0x1f;
@@ -1173,7 +1173,7 @@ static void cfunc_sfv(void *param)
 // Stores the full 128-bit vector starting from vector byte index and wrapping to index 0
 // after byte index 15
 
-inline void rsp_cop2_drc::swv()
+void rsp_cop2_drc::swv()
 {
 	UINT32 op = m_op;
 	int dest = (op >> 16) & 0x1f;
@@ -1212,7 +1212,7 @@ static void cfunc_swv(void *param)
 //
 // Stores one element from maximum of 8 vectors, while incrementing element index
 
-inline void rsp_cop2_drc::stv()
+void rsp_cop2_drc::stv()
 {
 	UINT32 op = m_op;
 	int dest = (op >> 16) & 0x1f;
@@ -1344,7 +1344,7 @@ int rsp_cop2_drc::generate_swc2(drcuml_block *block, rsp_device::compiler_state 
 //
 // Multiplies signed integer by signed integer * 2
 
-inline void rsp_cop2_drc::vmulf()
+void rsp_cop2_drc::vmulf()
 {
 	int op = m_op;
 
@@ -1391,7 +1391,7 @@ static void cfunc_vmulf(void *param)
 // ------------------------------------------------------
 //
 
-inline void rsp_cop2_drc::vmulu()
+void rsp_cop2_drc::vmulu()
 {
 	int op = m_op;
 
@@ -1443,7 +1443,7 @@ static void cfunc_vmulu(void *param)
 // The result is added into accumulator
 // The middle slice of accumulator is stored into destination element
 
-inline void rsp_cop2_drc::vmudl()
+void rsp_cop2_drc::vmudl()
 {
 	int op = m_op;
 
@@ -1483,7 +1483,7 @@ static void cfunc_vmudl(void *param)
 // The result is stored into accumulator
 // The middle slice of accumulator is stored into destination element
 
-inline void rsp_cop2_drc::vmudm()
+void rsp_cop2_drc::vmudm()
 {
 	int op = m_op;
 
@@ -1523,7 +1523,7 @@ static void cfunc_vmudm(void *param)
 // The result is stored into accumulator
 // The low slice of accumulator is stored into destination element
 
-inline void rsp_cop2_drc::vmudn()
+void rsp_cop2_drc::vmudn()
 {
 	int op = m_op;
 
@@ -1563,7 +1563,7 @@ static void cfunc_vmudn(void *param)
 // The result is stored into highest 32 bits of accumulator, the low slice is zero
 // The highest 32 bits of accumulator is saturated into destination element
 
-inline void rsp_cop2_drc::vmudh()
+void rsp_cop2_drc::vmudh()
 {
 	int op = m_op;
 
@@ -1602,7 +1602,7 @@ static void cfunc_vmudh(void *param)
 // ------------------------------------------------------
 //
 
-inline void rsp_cop2_drc::vmacf()
+void rsp_cop2_drc::vmacf()
 {
 	int op = m_op;
 
@@ -1646,7 +1646,7 @@ static void cfunc_vmacf(void *param)
 // ------------------------------------------------------
 //
 
-inline void rsp_cop2_drc::vmacu()
+void rsp_cop2_drc::vmacu()
 {
 	int op = m_op;
 
@@ -1709,7 +1709,7 @@ static void cfunc_vmacu(void *param)
 // Adds the higher 16 bits of the 32-bit result to accumulator
 // The low slice of accumulator is stored into destination element
 
-inline void rsp_cop2_drc::vmadl()
+void rsp_cop2_drc::vmadl()
 {
 	int op = m_op;
 
@@ -1743,7 +1743,7 @@ static void cfunc_vmadl(void *param)
 // VMADM
 //
 
-inline void rsp_cop2_drc::vmadm()
+void rsp_cop2_drc::vmadm()
 {
 	int op = m_op;
 
@@ -1781,7 +1781,7 @@ static void cfunc_vmadm(void *param)
 // VMADN
 //
 
-inline void rsp_cop2_drc::vmadn()
+void rsp_cop2_drc::vmadn()
 {
 	int op = m_op;
 
@@ -1826,7 +1826,7 @@ static void cfunc_vmadn(void *param)
 // The result is added into highest 32 bits of accumulator, the low slice is zero
 // The highest 32 bits of accumulator is saturated into destination element
 
-inline void rsp_cop2_drc::vmadh()
+void rsp_cop2_drc::vmadh()
 {
 	int op = m_op;
 
@@ -1864,7 +1864,7 @@ static void cfunc_vmadh(void *param)
 //
 // Adds two vector registers and carry flag, the result is saturated to 32767
 
-inline void rsp_cop2_drc::vadd()
+void rsp_cop2_drc::vadd()
 {
 	int op = m_op;
 
@@ -1904,7 +1904,7 @@ static void cfunc_vadd(void *param)
 // Subtracts two vector registers and carry flag, the result is saturated to -32768
 // TODO: check VS2REG == VDREG
 
-inline void rsp_cop2_drc::vsub()
+void rsp_cop2_drc::vsub()
 {
 	int op = m_op;
 
@@ -1944,7 +1944,7 @@ static void cfunc_vsub(void *param)
 //
 // Changes the sign of source register 2 if source register 1 is negative and stores the result to destination register
 
-inline void rsp_cop2_drc::vabs()
+void rsp_cop2_drc::vabs()
 {
 	int op = m_op;
 
@@ -1995,7 +1995,7 @@ static void cfunc_vabs(void *param)
 // Adds two vector registers, the carry out is stored into carry register
 // TODO: check VS2REG = VDREG
 
-inline void rsp_cop2_drc::vaddc()
+void rsp_cop2_drc::vaddc()
 {
 	int op = m_op;
 
@@ -2038,7 +2038,7 @@ static void cfunc_vaddc(void *param)
 // Subtracts two vector registers, the carry out is stored into carry register
 // TODO: check VS2REG = VDREG
 
-inline void rsp_cop2_drc::vsubc()
+void rsp_cop2_drc::vsubc()
 {
 	int op = m_op;
 
@@ -2084,7 +2084,7 @@ static void cfunc_vsubc(void *param)
 //
 // Adds two vector registers bytewise with rounding
 
-inline void rsp_cop2_drc::vaddb()
+void rsp_cop2_drc::vaddb()
 {
 	const int op = m_op;
 	const int round = (EL == 0) ? 0 : (1 << (EL - 1));
@@ -2138,7 +2138,7 @@ static void cfunc_vaddb(void *param)
 //
 // Stores high, middle or low slice of accumulator to destination vector
 
-inline void rsp_cop2_drc::vsaw()
+void rsp_cop2_drc::vsaw()
 {
 	int op = m_op;
 
@@ -2188,7 +2188,7 @@ static void cfunc_vsaw(void *param)
 // Sets compare flags if elements in VS1 are less than VS2
 // Moves the element in VS2 to destination vector
 
-inline void rsp_cop2_drc::vlt()
+void rsp_cop2_drc::vlt()
 {
 	int op = m_op;
 
@@ -2246,7 +2246,7 @@ static void cfunc_vlt(void *param)
 // Sets compare flags if elements in VS1 are equal with VS2
 // Moves the element in VS2 to destination vector
 
-inline void rsp_cop2_drc::veq()
+void rsp_cop2_drc::veq()
 {
 	int op = m_op;
 
@@ -2293,7 +2293,7 @@ static void cfunc_veq(void *param)
 // Sets compare flags if elements in VS1 are not equal with VS2
 // Moves the element in VS2 to destination vector
 
-inline void rsp_cop2_drc::vne()
+void rsp_cop2_drc::vne()
 {
 	int op = m_op;
 
@@ -2340,7 +2340,7 @@ static void cfunc_vne(void *param)
 // Sets compare flags if elements in VS1 are greater or equal with VS2
 // Moves the element in VS2 to destination vector
 
-inline void rsp_cop2_drc::vge()
+void rsp_cop2_drc::vge()
 {
 	int op = m_op;
 
@@ -2385,7 +2385,7 @@ static void cfunc_vge(void *param)
 //
 // Vector clip low
 
-inline void rsp_cop2_drc::vcl()
+void rsp_cop2_drc::vcl()
 {
 	int op = m_op;
 
@@ -2488,7 +2488,7 @@ static void cfunc_vcl(void *param)
 //
 // Vector clip high
 
-inline void rsp_cop2_drc::vch()
+void rsp_cop2_drc::vch()
 {
 	int op = m_op;
 
@@ -2575,7 +2575,7 @@ static void cfunc_vch(void *param)
 //
 // Vector clip reverse
 
-inline void rsp_cop2_drc::vcr()
+void rsp_cop2_drc::vcr()
 {
 	int op = m_op;
 
@@ -2644,7 +2644,7 @@ static void cfunc_vcr(void *param)
 //
 // Merges two vectors according to compare flags
 
-inline void rsp_cop2_drc::vmrg()
+void rsp_cop2_drc::vmrg()
 {
 	int op = m_op;
 
@@ -2682,7 +2682,7 @@ static void cfunc_vmrg(void *param)
 //
 // Bitwise AND of two vector registers
 
-inline void rsp_cop2_drc::vand()
+void rsp_cop2_drc::vand()
 {
 	int op = m_op;
 
@@ -2712,7 +2712,7 @@ static void cfunc_vand(void *param)
 //
 // Bitwise NOT AND of two vector registers
 
-inline void rsp_cop2_drc::vnand()
+void rsp_cop2_drc::vnand()
 {
 	int op = m_op;
 
@@ -2742,7 +2742,7 @@ static void cfunc_vnand(void *param)
 //
 // Bitwise OR of two vector registers
 
-inline void rsp_cop2_drc::vor()
+void rsp_cop2_drc::vor()
 {
 	int op = m_op;
 
@@ -2772,7 +2772,7 @@ static void cfunc_vor(void *param)
 //
 // Bitwise NOT OR of two vector registers
 
-inline void rsp_cop2_drc::vnor()
+void rsp_cop2_drc::vnor()
 {
 	int op = m_op;
 
@@ -2802,7 +2802,7 @@ static void cfunc_vnor(void *param)
 //
 // Bitwise XOR of two vector registers
 
-inline void rsp_cop2_drc::vxor()
+void rsp_cop2_drc::vxor()
 {
 	int op = m_op;
 
@@ -2832,7 +2832,7 @@ static void cfunc_vxor(void *param)
 //
 // Bitwise NOT XOR of two vector registers
 
-inline void rsp_cop2_drc::vnxor()
+void rsp_cop2_drc::vnxor()
 {
 	int op = m_op;
 
@@ -2862,7 +2862,7 @@ static void cfunc_vnxor(void *param)
 //
 // Calculates reciprocal
 
-inline void rsp_cop2_drc::vrcp()
+void rsp_cop2_drc::vrcp()
 {
 	int op = m_op;
 
@@ -2927,7 +2927,7 @@ static void cfunc_vrcp(void *param)
 //
 // Calculates reciprocal low part
 
-inline void rsp_cop2_drc::vrcpl()
+void rsp_cop2_drc::vrcpl()
 {
 	int op = m_op;
 
@@ -3012,7 +3012,7 @@ static void cfunc_vrcpl(void *param)
 //
 // Calculates reciprocal high part
 
-inline void rsp_cop2_drc::vrcph()
+void rsp_cop2_drc::vrcph()
 {
 	int op = m_op;
 
@@ -3042,7 +3042,7 @@ static void cfunc_vrcph(void *param)
 //
 // Moves element from vector to destination vector
 
-inline void rsp_cop2_drc::vmov()
+void rsp_cop2_drc::vmov()
 {
 	int op = m_op;
 
@@ -3068,7 +3068,7 @@ static void cfunc_vmov(void *param)
 //
 // Calculates reciprocal square-root
 
-inline void rsp_cop2_drc::vrsq()
+void rsp_cop2_drc::vrsq()
 {
 	int op = m_op;
 
@@ -3199,7 +3199,7 @@ static void cfunc_vrsq(void *param)
 //
 // Calculates reciprocal square-root low part
 
-inline void rsp_cop2_drc::vrsql()
+void rsp_cop2_drc::vrsql()
 {
 	int op = m_op;
 
@@ -3285,7 +3285,7 @@ static void cfunc_vrsql(void *param)
 //
 // Calculates reciprocal square-root high part
 
-inline void rsp_cop2_drc::vrsqh()
+void rsp_cop2_drc::vrsqh()
 {
 	int op = m_op;
 
@@ -3553,7 +3553,7 @@ int rsp_cop2_drc::generate_vector_opcode(drcuml_block *block, rsp_device::compil
     Vector Flag Reading/Writing
 ***************************************************************************/
 
-inline void rsp_cop2_drc::mfc2()
+void rsp_cop2_drc::mfc2()
 {
 	UINT32 op = m_op;
 	int el = (op >> 7) & 0xf;
@@ -3568,7 +3568,7 @@ static void cfunc_mfc2(void *param)
 	((rsp_cop2 *)param)->mfc2();
 }
 
-inline void rsp_cop2_drc::cfc2()
+void rsp_cop2_drc::cfc2()
 {
 	UINT32 op = m_op;
 	if (RTREG)
@@ -3633,7 +3633,7 @@ static void cfunc_cfc2(void *param)
 }
 
 
-inline void rsp_cop2_drc::mtc2()
+void rsp_cop2_drc::mtc2()
 {
 	UINT32 op = m_op;
 	int el = (op >> 7) & 0xf;
@@ -3647,7 +3647,7 @@ static void cfunc_mtc2(void *param)
 }
 
 
-inline void rsp_cop2_drc::ctc2()
+void rsp_cop2_drc::ctc2()
 {
 	UINT32 op = m_op;
 	switch(RDREG)
