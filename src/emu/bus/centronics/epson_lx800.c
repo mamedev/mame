@@ -15,19 +15,6 @@
       input buttons and switches.
     - CPU disassembly doesn't seem to indicate conditional JR or RET.
 
-
-    2014-06-10 Added LX810L, gets caught in a loop almost immediately.
-               IC list:
-               * uPD7810HG (cpu)
-               * E05A30 (gate array)
-               * 2064C (8k RAM)
-               * ER59256 (EEP-ROM - serial nvram)
-               * SLA7020M (step motor driver)
-               * uPC494C (pulse width modulation control)
-               May need to be split off to another driver.
-
-    2014-06-10 Added AP2000, gets caught in the same place as LX810L.
-
 **********************************************************************/
 
 #include "epson_lx800.h"
@@ -40,8 +27,6 @@
 //**************************************************************************
 
 const device_type EPSON_LX800 = &device_creator<epson_lx800_t>;
-const device_type EPSON_LX810L = &device_creator<epson_lx810l_t>;
-const device_type EPSON_AP2000 = &device_creator<epson_ap2000_t>;
 
 
 //-------------------------------------------------
@@ -55,52 +40,12 @@ ROM_END
 
 
 //-------------------------------------------------
-//  ROM( lx810l )
-//-------------------------------------------------
-
-ROM_START( lx810l )
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("lx810l.ic3c", 0x0000, 0x8000, CRC(a66454e1) SHA1(8e6f2f98abcbd8af6e34b9ba746edf0d18aef843) )
-ROM_END
-
-
-//-------------------------------------------------
-//  ROM( ap2000 )
-//-------------------------------------------------
-
-ROM_START( ap2000 )
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("ap2k.ic3c", 0x0000, 0x8000, CRC(ee7294b7) SHA1(219ffa6ff661ce95d5772c9fc1967093718f04e9) )
-ROM_END
-
-
-//-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
 const rom_entry *epson_lx800_t::device_rom_region() const
 {
 	return ROM_NAME( lx800 );
-}
-
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const rom_entry *epson_lx810l_t::device_rom_region() const
-{
-	return ROM_NAME( lx810l );
-}
-
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const rom_entry *epson_ap2000_t::device_rom_region() const
-{
-	return ROM_NAME( ap2000 );
 }
 
 
@@ -272,12 +217,6 @@ epson_lx800_t::epson_lx800_t(const machine_config &mconfig, device_type type, co
 	m_beep(*this, "beeper")
 {
 }
-
-epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: epson_lx800_t(mconfig, EPSON_LX810L, "Epson LX-810L", tag, owner, clock, "lx810l", __FILE__) { }
-
-epson_ap2000_t::epson_ap2000_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: epson_lx800_t(mconfig, EPSON_AP2000, "Epson ActionPrinter 2000", tag, owner, clock, "ap2000", __FILE__) { }
 
 
 //-------------------------------------------------
