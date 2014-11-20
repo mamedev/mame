@@ -83,7 +83,8 @@ ADDRESS_MAP_END
 
 
 i6300esb_lpc_device::i6300esb_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: pci_device(mconfig, I6300ESB_LPC, "i6300ESB southbridge ISA/LPC bridge", tag, owner, clock, "i6300esb_lpc", __FILE__)
+	: pci_device(mconfig, I6300ESB_LPC, "i6300ESB southbridge ISA/LPC bridge", tag, owner, clock, "i6300esb_lpc", __FILE__),
+	  acpi(*this, "acpi")
 {
 }
 
@@ -569,7 +570,8 @@ READ32_MEMBER (i6300esb_lpc_device::etr1_r)
 
 WRITE32_MEMBER(i6300esb_lpc_device::etr1_w)
 {
-	logerror("%s: etr1 = %08x\n", tag(), data);
+	COMBINE_DATA(&etr1);
+	logerror("%s: etr1 = %08x\n", tag(), etr1);
 }
 
 READ32_MEMBER (i6300esb_lpc_device::mfid_r)
@@ -684,7 +686,7 @@ void i6300esb_lpc_device::map_extra(UINT64 memory_window_start, UINT64 memory_wi
 	io_space->install_device(0, 0xffff, *this, &i6300esb_lpc_device::internal_io_map);
 
 	if(acpi_cntl & 0x10)
-		logerror("%s: Warning: acpi range enabled at %04x-%04x\n", tag(), pmbase, pmbase+127);
+		acpi->map_device(memory_window_start, memory_window_end, 0, memory_space, io_window_start, io_window_end, pmbase, io_space);
 	if(gpio_cntl & 0x10)
 		logerror("%s: Warning: gpio range enabled at %04x-%04x\n", tag(), gpio_base, gpio_base+63);
 
