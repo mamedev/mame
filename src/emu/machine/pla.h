@@ -127,8 +127,8 @@ private:
 
 	struct term
 	{
-		UINT64 m_and;
-		UINT64 m_or;
+		UINT64 and_mask;
+		UINT64 or_mask;
 	} m_term[MAX_TERMS];
 };
 
