@@ -233,6 +233,12 @@ Multiple paths can be specified by separating them with semicolons.
 The default is 'roms' (that is, a directory "roms" in the same directory
 as the MAME executable).
 .TP
+.B \-hashpath \fIpathname
+Specifies a list of paths within which to search for software hash files.
+Multiple paths can be specified by separating them with semicolons.
+The default is 'hash' (that is, a directory 'hash' in the same directory
+as the MAME executable).
+.TP
 .B \-samplepath, \-sp \fIpathname
 Specifies a list of paths within which to find sample files. Multiple
 paths can be specified by separating them with semicolons. The default
@@ -362,6 +368,23 @@ consistent, you should only record and playback with all configuration
 (.cfg), NVRAM (.nv), and memory card files deleted. The default is NULL
 (no recording).
 .TP
+.B \-mngwrite \fIfilename
+Writes each video frame to the given \fIfilename\fP in MNG format, producing
+an animation of the	game session. Note that \-mngwrite only writes video
+frames; it does not save any audio data. Use \-wavwrite for that, and
+reassemble the audio/video using offline tools. The default is NULL (no
+recording).
+.TP
+.B \-aviwrite \fIfilename
+Stream video and sound data to the given \fIfilename\fP in AVI format,
+producing an animation of the game session complete with sound. The
+default is NULL (no recording).
+.TP
+.B \-wavwrite \fIfilename
+Writes the final mixer output to the given \fIfilename\fP in WAV format,
+producing an audio recording of the	game session. The default is NULL
+(no recording).
+.TP
 .B \-snapname \fIstring
 Describes how MAME should name files for snapshots. \fIstring\fP
 provides a template that is used to generate a filename. Three
@@ -414,23 +437,6 @@ the current game. The default is '%g', which creates a separate folder
 for each game. Example: if you use
 .B mame robby \-statename foo/%g
 save states will be stored inside \fBsta/foo/robby/\fP. 
-.TP
-.B \-mngwrite \fIfilename
-Writes each video frame to the given \fIfilename\fP in MNG format, producing
-an animation of the	game session. Note that \-mngwrite only writes video
-frames; it does not save any audio data. Use \-wavwrite for that, and
-reassemble the audio/video using offline tools. The default is NULL (no
-recording).
-.TP
-.B \-aviwrite \fIfilename
-Stream video and sound data to the given \fIfilename\fP in AVI format,
-producing an animation of the game session complete with sound. The
-default is NULL (no recording).
-.TP
-.B \-wavwrite \fIfilename
-Writes the final mixer output to the given \fIfilename\fP in WAV format,
-producing an audio recording of the	game session. The default is NULL
-(no recording).
 .TP
 .B \-[no]burnin
 Tracks brightness of the screen during play and at the end of 
@@ -493,7 +499,7 @@ rate below that of the lowest screen refresh rate.
 Default is OFF (\-norefreshspeed).
 .\"
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-.\" SDL specific
+.\" OS specific
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .TP
 .B \-[no]multithreading, \-[no]mt
@@ -503,12 +509,16 @@ thread. The default is OFF (\-nomultithreading).
 .B \-numprocessors, \-np \fIvalue
 Set number of processors; this overrides the number the system reports.
 .TP
-.B \-[no]sdlvideofps
-Show SDL video performance. Default is OFF (\-nosdlvideofps).
-.TP
 .B \-bench \fIvalue
 Benchmark for the given number of emulated seconds;
 implies \-video none \-sound none \-nothrottle.
+.\"
+.\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+.\" SDL specific
+.\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+.TP
+.B \-[no]sdlvideofps
+Show SDL video performance. Default is OFF (\-nosdlvideofps).
 .\"
 .\" *******************************************************
 .SS Rotation options
@@ -607,11 +617,8 @@ toward white. The default is 1.0.
 This controls the brightness level when MAME is paused. The default
 value is 0.65.
 .TP
-.B \-minimum_width \fIvalue
-Minimum screen width. The default value is 320.
-.TP
-.B \-minimum_height \fIvalue
-Minimum screen eigth. The default value is 240.
+.B \-effect\fR [\fInone\fR|\fIfilename[.png]\fR]
+Name of a PNG file to use for visual effects, or 'none'. Default is 'none'.
 .\"
 .\" *******************************************************
 .SS Vector rendering options
@@ -679,9 +686,6 @@ The same applies for full\-screen. Default is ON (\-keepaspect).
 Allow non\-integer stretch factors. Video purists should stay far, far away
 from this option, while everyone else will be happy to know that it lets you
 fill the screen properly in full\-screen mode. Default is ON (\-unevenstretch).
-.TP
-.B \-effect\fR [\fInone\fR|\fIfilename[.png]\fR]
-Name of a PNG file to use for visual effects, or 'none'. Default is 'none'.
 .TP
 .B \-[no]centerh
 Center horizontally within the view area. Default is ON (\-centerh).
