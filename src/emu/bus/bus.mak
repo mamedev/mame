@@ -956,10 +956,12 @@ BUSOBJS += $(BUSOBJ)/centronics/covox.o
 BUSOBJS += $(BUSOBJ)/centronics/dsjoy.o
 BUSOBJS += $(BUSOBJ)/centronics/epson_ex800.o
 BUSOBJS += $(BUSOBJ)/centronics/epson_lx800.o
+BUSOBJS += $(BUSOBJ)/centronics/epson_lx810l.o
 BUSOBJS += $(BUSOBJ)/centronics/printer.o
 BUSOBJS += $(BUSOBJ)/centronics/digiblst.o
 $(BUSOBJ)/centronics/epson_ex800.o:    $(EMUOBJ)/layout/ex800.lh
 $(BUSOBJ)/centronics/epson_lx800.o:    $(EMUOBJ)/layout/lx800.lh
+$(BUSOBJ)/centronics/epson_lx810l.o:   $(EMUOBJ)/layout/lx800.lh
 endif
 
 #-------------------------------------------------

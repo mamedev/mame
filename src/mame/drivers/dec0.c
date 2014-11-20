@@ -1258,10 +1258,10 @@ WRITE_LINE_MEMBER(dec0_state::sound_irq2)
 
 /* TODO: These are raw guesses, only to get ~57,41 Hz */
 #define DEC0_PIXEL_CLOCK XTAL_20MHz/4
-#define DEC0_HTOTAL 256+74
+#define DEC0_HTOTAL 320
 #define DEC0_HBEND 0
 #define DEC0_HBSTART 256
-#define DEC0_VTOTAL 264
+#define DEC0_VTOTAL 272
 #define DEC0_VBEND 8
 #define DEC0_VBSTART 256-8
 
