@@ -6,10 +6,14 @@
 
  TODO:
  - 16 bytes are protected in the c*** range. I'm guessing they used a PROM to protect a
- simple sub-routine because just after that the program has a left-over located at 0xe000-0xe00f (yup, NOPs + a RTS)
- It's unknown at current stage what it really protects tho ...
- 
- Sound is entirely guesswork.
+   simple sub-routine because:
+   * It attempts to jsr from RAM to that area with a 0x10 byte offset (i.e. ROM copies a code snippet to RAM; when it executes 
+     it code executes jsr 0xc400 then self-modifies it to 0xc410, rinse and repeat ... up to 0xc7f0 and rolls back);
+   * After that the program has an amusing left-over located at 0xe000-0xe00f (yup, NOPs + a RTS), with the 
+     exact same number of times as above;
+   It's unknown at current stage what it really protects tho, game seems working for all I can see ... -AS
+
+ - Sound is entirely guesswork.
  
  */
 
