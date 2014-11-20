@@ -1892,10 +1892,16 @@ void i386_device::mmx_movd_r64_rm32() // Opcode 0f 6e
 	MMXPROLOG();
 	UINT8 modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		MMX((modrm >> 3) & 0x7).d[0]=LOAD_RM32(modrm);
+		if (m_xmm_operand_size)
+			XMM((modrm >> 3) & 0x7).d[0]=LOAD_RM32(modrm);
+		else
+			MMX((modrm >> 3) & 0x7).d[0]=LOAD_RM32(modrm);
 	} else {
 		UINT32 ea = GetEA(modrm, 0);
-		MMX((modrm >> 3) & 0x7).d[0]=READ32(ea);
+		if (m_xmm_operand_size)
+			XMM((modrm >> 3) & 0x7).d[0]=READ32(ea);
+		else
+			MMX((modrm >> 3) & 0x7).d[0]=READ32(ea);
 	}
 	MMX((modrm >> 3) & 0x7).d[1]=0;
 	CYCLES(1);     // TODO: correct cycle count
@@ -1906,10 +1912,17 @@ void i386_device::mmx_movq_r64_rm64() // Opcode 0f 6f
 	MMXPROLOG();
 	UINT8 modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		MMX((modrm >> 3) & 0x7).l=MMX(modrm & 0x7).l;
+		if (m_xmm_operand_size)
+			XMM((modrm >> 3) & 0x7).l[0]=XMM(modrm & 0x7).l[0];
+		else
+			MMX((modrm >> 3) & 0x7).l=MMX(modrm & 0x7).l;
 	} else {
 		UINT32 ea = GetEA(modrm, 0);
-		READMMX(ea, MMX((modrm >> 3) & 0x7));
+		if (m_xmm_operand_size)
+			READXMM_LO64(ea, XMM((modrm >> 3) & 0x7));
+		else
+			READMMX(ea, MMX((modrm >> 3) & 0x7));
+
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
@@ -1919,10 +1932,16 @@ void i386_device::mmx_movd_rm32_r64() // Opcode 0f 7e
 	MMXPROLOG();
 	UINT8 modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		STORE_RM32(modrm, MMX((modrm >> 3) & 0x7).d[0]);
+		if (m_xmm_operand_size)
+			STORE_RM32(modrm, XMM((modrm >> 3) & 0x7).d[0]);
+		else
+			STORE_RM32(modrm, MMX((modrm >> 3) & 0x7).d[0]);
 	} else {
 		UINT32 ea = GetEA(modrm, 0);
-		WRITE32(ea, MMX((modrm >> 3) & 0x7).d[0]);
+		if (m_xmm_operand_size)
+			WRITE32(ea, XMM((modrm >> 3) & 0x7).d[0]);
+		else
+			WRITE32(ea, MMX((modrm >> 3) & 0x7).d[0]);
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
@@ -1932,7 +1951,10 @@ void i386_device::mmx_movq_rm64_r64() // Opcode 0f 7f
 	MMXPROLOG();
 	UINT8 modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		MMX(modrm & 0x7)=MMX((modrm >> 3) & 0x7);
+		if (m_xmm_operand_size)
+			XMM(modrm & 0x7).l[0]=XMM((modrm >> 3) & 0x7).l[0];
+		else
+			MMX(modrm & 0x7)=MMX((modrm >> 3) & 0x7);
 	} else {
 		UINT32 ea = GetEA(modrm, 0);
 		WRITEMMX(ea, MMX((modrm >> 3) & 0x7));
