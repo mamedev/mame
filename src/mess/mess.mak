@@ -1715,10 +1715,10 @@ $(MESSOBJ)/thomson.a:           \
 $(MESSOBJ)/ti.a:                \
 	$(MESS_DRIVERS)/avigo.o $(MESS_VIDEO)/avigo.o \
 	$(MESS_DRIVERS)/cc40.o      \
-	$(MESS_DRIVERS)/wizatron.o  \
 	$(MESS_DRIVERS)/evmbug.o    \
 	$(MESS_DRIVERS)/exelv.o     \
 	$(MESS_DRIVERS)/geneve.o    \
+	$(MESS_DRIVERS)/ticalc1x.o  \
 	$(MESS_DRIVERS)/ti74.o      \
 	$(MESS_DRIVERS)/ti85.o $(MESS_MACHINE)/ti85.o $(MESS_VIDEO)/ti85.o \
 	$(MESS_DRIVERS)/ti89.o      \

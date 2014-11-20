@@ -2,6 +2,8 @@
 // copyright-holders:hap
 /***************************************************************************
 
+  Texas Instruments TMS1xxx/0970/0980 handheld calculators
+  
   Texas Instruments WIZ-A-TRON
   * TMC0907NL DP0907BS (die labeled 0970F-07B)
 
@@ -22,10 +24,10 @@
 #define MASTER_CLOCK (250000)
 
 
-class wizatron_state : public driver_device
+class ticalc1x_state : public driver_device
 {
 public:
-	wizatron_state(const machine_config &mconfig, device_type type, const char *tag)
+	ticalc1x_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_button_matrix(*this, "IN")
@@ -51,7 +53,7 @@ public:
 
 ***************************************************************************/
 
-READ8_MEMBER(wizatron_state::read_k)
+READ8_MEMBER(ticalc1x_state::read_k)
 {
 	UINT8 k = 0;
 
@@ -63,13 +65,13 @@ READ8_MEMBER(wizatron_state::read_k)
 	return k;
 }
 
-WRITE16_MEMBER(wizatron_state::write_r)
+WRITE16_MEMBER(ticalc1x_state::write_r)
 {
 	// R..: select digit
 	m_r = data;
 }
 
-WRITE16_MEMBER(wizatron_state::write_o)
+WRITE16_MEMBER(ticalc1x_state::write_o)
 {
 	// O0-O6: digit segments A-G
 	// O1-O4: input mux
@@ -118,7 +120,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-void wizatron_state::machine_start()
+void ticalc1x_state::machine_start()
 {
 	m_r = 0;
 	m_o = 0;
@@ -138,14 +140,14 @@ static const UINT16 wizatron_output_pla[0x20] =
 };
 
 
-static MACHINE_CONFIG_START( wizatron, wizatron_state )
+static MACHINE_CONFIG_START( wizatron, ticalc1x_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0970, MASTER_CLOCK)
 	MCFG_TMS1XXX_OUTPUT_PLA(wizatron_output_pla)
-	MCFG_TMS1XXX_READ_K(READ8(wizatron_state, read_k))
-	MCFG_TMS1XXX_WRITE_O(WRITE16(wizatron_state, write_o))
-	MCFG_TMS1XXX_WRITE_R(WRITE16(wizatron_state, write_r))
+	MCFG_TMS1XXX_READ_K(READ8(ticalc1x_state, read_k))
+	MCFG_TMS1XXX_WRITE_O(WRITE16(ticalc1x_state, write_o))
+	MCFG_TMS1XXX_WRITE_R(WRITE16(ticalc1x_state, write_r))
 
 	/* no video! */
 
