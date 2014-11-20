@@ -4,6 +4,7 @@
 #define I6300ESB_H
 
 #include "pci.h"
+#include "lpc-acpi.h"
 
 #define MCFG_I6300ESB_LPC_ADD(_tag) \
 	MCFG_PCI_DEVICE_ADD(_tag, I6300ESB_LPC, 0x808625a1, 0x02, 0x060100, 0x00000000)
@@ -27,6 +28,8 @@ protected:
 	virtual void device_reset();
 
 private:
+	required_device<lpc_acpi_device> acpi;
+
 	DECLARE_ADDRESS_MAP(internal_io_map, 32);
 
 	UINT32 pmbase, gpio_base, fwh_sel1, gen_cntl, etr1, rst_cnt2, gpi_rout;

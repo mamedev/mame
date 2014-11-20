@@ -2323,8 +2323,8 @@ void n64_state::machine_start()
 	rsp_device *rsp = machine().device<rsp_device>("rsp");
 	rsp->rspdrc_set_options(RSPDRC_STRICT_VERIFY);
 	rsp->rspdrc_flush_drc_cache();
-	rsp->rspdrc_add_dmem(rsp_dmem);
-	rsp->rspdrc_add_imem(rsp_imem);
+	rsp->rsp_add_dmem(rsp_dmem);
+	rsp->rsp_add_imem(rsp_imem);
 
 	/* add a hook for battery save */
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(n64_state::n64_machine_stop),this));

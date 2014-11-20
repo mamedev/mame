@@ -150,8 +150,8 @@ public:
 
 	void rspdrc_flush_drc_cache();
 	void rspdrc_set_options(UINT32 options);
-	void rspdrc_add_dmem(UINT32 *base);
-	void rspdrc_add_imem(UINT32 *base);
+	void rsp_add_dmem(UINT32 *base);
+	void rsp_add_imem(UINT32 *base);
 
 	void ccfunc_read8();
 	void ccfunc_read16();

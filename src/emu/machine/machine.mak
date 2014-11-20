@@ -1260,6 +1260,8 @@ MACHINEOBJS += $(MACHINEOBJ)/pci-smbus.o
 MACHINEOBJS += $(MACHINEOBJ)/i82541.o
 MACHINEOBJS += $(MACHINEOBJ)/i82875p.o
 MACHINEOBJS += $(MACHINEOBJ)/i6300esb.o
+MACHINEOBJS += $(MACHINEOBJ)/lpc.o
+MACHINEOBJS += $(MACHINEOBJ)/lpc-acpi.o
 endif
 
 #-------------------------------------------------
