@@ -449,5 +449,55 @@ ROM_START( atvtracka )
 	ROM_LOAD32_BYTE("k9f2808u0b.ic19", 0x0000003, 0x1080000, CRC(856c1e6a) SHA1(a6b2839120d61811c36cc6b4095de9cefceb394b) )
 ROM_END
 
+/*
+
+Smashing Drive
+Gaelco 2000
+
+PCB Layout
+----------
+
+REF 010131
+|----------------------------------------------|
+|                                              |
+|                              K4S643232C      |
+|        |------|SDRB.IC14                     |
+|        |SH4   |                              |-|
+|        |      |                              | |DB9
+|        |      |SDRA.IC15  SDRC.IC20  PRG.IC23|-|
+|        |------|             |----------|     |
+|                             |ALTERA    |     |
+|                             |FLEX0K50  |     |
+|        |------|  K4S643232C |EPF10K50  |     |
+|        |SH4   |  K4S643232C |EQC240-3  |     |
+|        |      |             |          |     |
+|        |      |             |          |     |
+|        |------|             |----------|     |
+|                                              |
+|         33MHz                 |--------|     |
+|                    K4S643232C |NEC     |     |
+|                    K4S643232C |POWERVR |     |
+|                               |250     |     |
+|                    K4S643232C |        |     |-|
+|                    K4S643232C |        |     | |DB9
+|                               |--------|     |-|
+|                                              |
+|  TL074C   TL074C                14.31818MHz  |
+|  TDA1543  TDA1543                            |
+|----------------------------------------------|
+
+*/
+
+ROM_START( smashdrv )
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("prg.ic23", 0x0000000, 0x0400000, CRC(5cc6d3ac) SHA1(0c8426774212d891796b59c95b8c70f64db5b67a) )
+	ROM_LOAD("sdra.ic15", 0x1000000, 0x1000000, CRC(cf702287) SHA1(84cd83c339831deff15fe5fcc353e0b596667500) )
+	ROM_LOAD("sdrb.ic14", 0x2000000, 0x1000000, CRC(39b76f0e) SHA1(529943b6075925e5f72c6e966796e04b2c33686c) )
+	ROM_LOAD("sdrc.ic20", 0x3000000, 0x1000000, CRC(c9021dd7) SHA1(1d08aab433614810af858a0fc5d7f03c7b782237) )
+ROM_END
+
 GAME( 2002, atvtrack,  0,          atvtrack,    atvtrack, driver_device,    0, ROT0, "Gaelco", "ATV Track (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2002, atvtracka, atvtrack,   atvtrack,    atvtrack, driver_device,    0, ROT0, "Gaelco", "ATV Track (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
+
+// not the same HW, but has dual SH4 at least
+GAME( 2000, smashdrv, 0,           atvtrack,    atvtrack, driver_device,    0, ROT0, "Gaelco", "Smashing Drive", GAME_NOT_WORKING | GAME_NO_SOUND )
