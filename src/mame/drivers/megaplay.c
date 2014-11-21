@@ -617,7 +617,7 @@ UINT32 mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 &b
 {
 	//printf("megplay vu\n");
 	screen_update_megadriv(screen, bitmap, cliprect);
-	m_vdp1->screen_update(screen, bitmap, cliprect);
+	//m_vdp1->screen_update(screen, bitmap, cliprect);
 
 	// i'm not sure if the overlay (256 pixels wide) is meant to be stretched over the 320 resolution genesis output, or centered.
 	// if it's meant to be stretched we'll have to multiply the entire outut x4 for the Genesis VDP and x5 for the SMS VDP to get a common 1280 pixel wide image
@@ -685,8 +685,6 @@ static MACHINE_CONFIG_START( megaplay, mplay_state )
 	MCFG_SEGA315_5246_SET_SCREEN("megadriv")
 	MCFG_SEGA315_5246_IS_PAL(false)
 	MCFG_SEGA315_5246_INT_CB(WRITELINE(mplay_state, bios_int_callback))
-	MCFG_SEGA315_5124_SET_MANUAL_MIX
-
 MACHINE_CONFIG_END
 
 
