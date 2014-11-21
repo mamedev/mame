@@ -928,6 +928,12 @@ handling that makes it easier to register simultaneous button presses,
 but has the disadvantage of making controls less responsive. The
 default is OFF (\-nosteadykey).
 .TP
+.B \-[no]ui_active
+Enable MESS user interface on top of emulated keyboard (if present).
+User interface may be toggled during execution by pressing the key
+defined with \-ui_modekey.
+Default is OFF (\-noui_active).
+.TP
 .B \-[no]offscreen_reload, \-[no]reload
 Controls whether or not MESS treats a second button input from a
 lightgun as a reload signal. In this case, MESS will report the gun's
@@ -1103,7 +1109,7 @@ to its built\-in UI font. On some platforms \fIfontname\fP can be a system
 font name instead of a BDF font file. The default is 'default' (use
 the OSD\-determined default font).
 .TP
-.B \-ramsize, \-ram
+.B \-ramsize, \-ram \fIvalue
 Size of RAM (if supported by driver).
 .TP
 .B \-[no]confirm_quit
