@@ -2,6 +2,7 @@ void retro_poll_mame_input();
 
 static int rtwi=320,rthe=240,topw=1600; // DEFAULT TEXW/TEXH/PITCH
 static float rtaspect=0;
+static float rtfps=60.0;
 static int max_width=0;
 static int max_height=0;
 
@@ -385,7 +386,7 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
    if (log_cb)
       log_cb(RETRO_LOG_INFO, "AV_INFO: aspect_ratio=%f\n",info->geometry.aspect_ratio);
 
-   info->timing.fps = 60;
+   info->timing.fps = rtfps;
    info->timing.sample_rate = 48000.0;
 
    if (log_cb)

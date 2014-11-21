@@ -86,6 +86,8 @@ void retro_osd_interface::init(running_machine &machine)
 	our_target->compute_visible_area(1000,1000,1,ROT0,width,height);
 	rtaspect=(float)width/(float)height;
 	
+	rtfps = ATTOSECONDS_TO_HZ(machine.first_screen()->refresh_attoseconds());
+	
 	if (log_cb)
 		log_cb(RETRO_LOG_DEBUG, "Screen width=%d height=%d, aspect=%d/%d=%f\n",rtwi,rthe,width,height,rtaspect);
 	
