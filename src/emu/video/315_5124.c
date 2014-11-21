@@ -160,6 +160,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, const ch
 	, m_int_cb(*this)
 	, m_pause_cb(*this)
 	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(sega315_5124))
+	, m_draws_bitmap(1)
 	, m_palette(*this, "palette")
 	, m_xscroll_hpos(X_SCROLL_HPOS_5124)
 {
@@ -177,6 +178,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 	, m_int_cb(*this)
 	, m_pause_cb(*this)
 	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(sega315_5124))
+	, m_draws_bitmap(1)
 	, m_palette(*this, "palette")
 	, m_xscroll_hpos(xscroll_hpos)
 {
@@ -1753,7 +1755,7 @@ void sega315_5378_device::cram_write(UINT8 data)
 
 UINT32 sega315_5124_device::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
-	copybitmap(bitmap, m_tmpbitmap, 0, 0, 0, 0, cliprect);
+	if (m_draws_bitmap) copybitmap(bitmap, m_tmpbitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
