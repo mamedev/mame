@@ -349,6 +349,7 @@ void rsp_device::unimplemented_opcode(UINT32 op)
 
 /*****************************************************************************/
 
+#if 0
 static const int vector_elements[16][8] =
 {
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },     // none
@@ -368,6 +369,7 @@ static const int vector_elements[16][8] =
 	{ 6, 6, 6, 6, 6, 6, 6, 6 },     // 6
 	{ 7, 7, 7, 7, 7, 7, 7, 7 },     // 7
 };
+#endif
 
 void rsp_device::resolve_cb()
 {
