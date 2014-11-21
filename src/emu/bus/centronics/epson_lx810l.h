@@ -17,7 +17,6 @@
 #include "machine/e05a30.h"
 #include "machine/eepromser.h"
 #include "machine/steppers.h"
-#include "sound/beep.h"
 #include "sound/speaker.h"
 
 
