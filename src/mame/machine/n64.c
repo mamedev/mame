@@ -955,7 +955,7 @@ WRITE32_MEMBER( n64_periphs::dp_reg_w )
 			if (data & 0x00000001)  current_status &= ~DP_STATUS_XBUS_DMA;
 			if (data & 0x00000002)  current_status |= DP_STATUS_XBUS_DMA;
 			if (data & 0x00000004)  current_status &= ~DP_STATUS_FREEZE;
-			if (data & 0x00000008)  current_status |= DP_STATUS_FREEZE;
+			//if (data & 0x00000008)  current_status |= DP_STATUS_FREEZE; // Temp: Do nothing for now
 			if (data & 0x00000010)  current_status &= ~DP_STATUS_FLUSH;
 			if (data & 0x00000020)  current_status |= DP_STATUS_FLUSH;
 			if (data & 0x00000200)  dp_clock = 0;
