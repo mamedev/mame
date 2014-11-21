@@ -740,8 +740,6 @@ WRITE32_MEMBER(n64_periphs::sp_reg_w )
 				{
 					rspcpu->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 					newstatus &= ~RSP_STATUS_HALT;
-					machine().scheduler().abort_timeslice();
-					machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 				}
 				if (data & 0x00000002)      // set halt
 				{
