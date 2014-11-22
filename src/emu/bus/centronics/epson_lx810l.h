@@ -73,6 +73,22 @@ public:
 	DECLARE_WRITE8_MEMBER(cr_stepper);
 	DECLARE_WRITE_LINE_MEMBER(e05a30_ready);
 
+	/* Centronics stuff */
+	virtual DECLARE_WRITE_LINE_MEMBER( input_strobe ) { if (m_e05a30) m_e05a30->centronics_input_strobe(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data0 ) { if (m_e05a30) m_e05a30->centronics_input_data0(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data1 ) { if (m_e05a30) m_e05a30->centronics_input_data1(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data2 ) { if (m_e05a30) m_e05a30->centronics_input_data2(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data3 ) { if (m_e05a30) m_e05a30->centronics_input_data3(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data4 ) { if (m_e05a30) m_e05a30->centronics_input_data4(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data5 ) { if (m_e05a30) m_e05a30->centronics_input_data5(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data6 ) { if (m_e05a30) m_e05a30->centronics_input_data6(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data7 ) { if (m_e05a30) m_e05a30->centronics_input_data7(state); }
+	DECLARE_WRITE_LINE_MEMBER(e05a30_centronics_ack) { output_ack(state); }
+	DECLARE_WRITE_LINE_MEMBER(e05a30_centronics_busy) { output_busy(state); }
+	DECLARE_WRITE_LINE_MEMBER(e05a30_centronics_perror) { output_perror(state); }
+	DECLARE_WRITE_LINE_MEMBER(e05a30_centronics_fault) { output_fault(state); }
+	DECLARE_WRITE_LINE_MEMBER(e05a30_centronics_select) { output_select(state); }
+
 	/* Panel buttons */
 	DECLARE_INPUT_CHANGED_MEMBER(online_sw);
 
@@ -85,6 +101,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<e05a30_device> m_e05a30;
 
 	int m_93c06_clk;
 	int m_93c06_cs;

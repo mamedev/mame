@@ -13,7 +13,10 @@
  *   SLA7020M (step motor driver)
  *   uPC494C (pulse width modulation control)
  *
- * Devices boot and enter main input loop, but input is not yet implemented.
+ * Devices boot and enter main input loop. Data is received through the
+ * centronics bus and printed as expected. The actual paper output is
+ * still not implemented, though. Look at the output from the fire signal
+ * (epson_lx810l_t::co0_w()) to see what's actually being printed.
  *
  * It is possible to run the printers' self test with this procedure:
  * - Turn on device;
@@ -99,7 +102,7 @@ static ADDRESS_MAP_START( lx810l_mem, AS_PROGRAM, 8, epson_lx810l_t )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM /* 32k firmware */
 	AM_RANGE(0x8000, 0x9fff) AM_RAM /* 8k external RAM */
 	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(fakemem_r, fakemem_w) /* fake memory, write one, set all */
-	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x1ff0) AM_DEVREADWRITE("ic3b", e05a30_device, read, write)
+	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x1ff0) AM_DEVREADWRITE("e05a30", e05a30_device, read, write)
 	AM_RANGE(0xe000, 0xfeff) AM_NOP /* not used */
 	AM_RANGE(0xff00, 0xffff) AM_RAM /* internal CPU RAM */
 ADDRESS_MAP_END
@@ -144,11 +147,16 @@ static MACHINE_CONFIG_FRAGMENT( epson_lx810l )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* gate array */
-	MCFG_DEVICE_ADD("ic3b", E05A30, 0)
+	MCFG_DEVICE_ADD("e05a30", E05A30, 0)
 	MCFG_E05A30_PRINTHEAD_CALLBACK(WRITE16(epson_lx810l_t, printhead))
 	MCFG_E05A30_PF_STEPPER_CALLBACK(WRITE8(epson_lx810l_t, pf_stepper))
 	MCFG_E05A30_CR_STEPPER_CALLBACK(WRITE8(epson_lx810l_t, cr_stepper))
 	MCFG_E05A30_READY_CALLBACK(WRITELINE(epson_lx810l_t, e05a30_ready))
+	MCFG_E05A30_CENTRONICS_ACK_CALLBACK(WRITELINE(epson_lx810l_t, e05a30_centronics_ack))
+	MCFG_E05A30_CENTRONICS_BUSY_CALLBACK(WRITELINE(epson_lx810l_t, e05a30_centronics_busy))
+	MCFG_E05A30_CENTRONICS_PERROR_CALLBACK(WRITELINE(epson_lx810l_t, e05a30_centronics_perror))
+	MCFG_E05A30_CENTRONICS_FAULT_CALLBACK(WRITELINE(epson_lx810l_t, e05a30_centronics_fault))
+	MCFG_E05A30_CENTRONICS_SELECT_CALLBACK(WRITELINE(epson_lx810l_t, e05a30_centronics_select))
 
 	/* 256-bit eeprom */
 	MCFG_EEPROM_SERIAL_93C06_ADD("eeprom")
@@ -272,6 +280,7 @@ epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, const char *tag, d
 	m_maincpu(*this, "maincpu"),
 	m_eeprom(*this, "eeprom"),
 	m_speaker(*this, "speaker"),
+	m_e05a30(*this, "e05a30"),
 	m_93c06_clk(0),
 	m_93c06_cs(0),
 	m_printhead(0),
@@ -287,6 +296,7 @@ epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, device_type type, 
 	m_maincpu(*this, "maincpu"),
 	m_eeprom(*this, "eeprom"),
 	m_speaker(*this, "speaker"),
+	m_e05a30(*this, "e05a30"),
 	m_93c06_clk(0),
 	m_93c06_cs(0),
 	m_printhead(0),
