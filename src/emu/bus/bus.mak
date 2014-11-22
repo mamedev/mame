@@ -330,9 +330,11 @@ endif
 ifneq ($(filter DMV,$(BUSES)),)
 OBJDIRS += $(BUSOBJ)/dmv
 BUSOBJS += $(BUSOBJ)/dmv/dmvbus.o
+BUSOBJS += $(BUSOBJ)/dmv/k210.o
 BUSOBJS += $(BUSOBJ)/dmv/k220.o
 BUSOBJS += $(BUSOBJ)/dmv/k230.o
 BUSOBJS += $(BUSOBJ)/dmv/k233.o
+BUSOBJS += $(BUSOBJ)/dmv/k801.o
 BUSOBJS += $(BUSOBJ)/dmv/k803.o
 BUSOBJS += $(BUSOBJ)/dmv/k806.o
 BUSOBJS += $(BUSOBJ)/dmv/ram.o
