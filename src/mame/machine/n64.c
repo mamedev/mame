@@ -740,8 +740,6 @@ WRITE32_MEMBER(n64_periphs::sp_reg_w )
 				{
 					rspcpu->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 					newstatus &= ~RSP_STATUS_HALT;
-					machine().scheduler().abort_timeslice();
-					machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 				}
 				if (data & 0x00000002)      // set halt
 				{
@@ -955,7 +953,7 @@ WRITE32_MEMBER( n64_periphs::dp_reg_w )
 			if (data & 0x00000001)  current_status &= ~DP_STATUS_XBUS_DMA;
 			if (data & 0x00000002)  current_status |= DP_STATUS_XBUS_DMA;
 			if (data & 0x00000004)  current_status &= ~DP_STATUS_FREEZE;
-			if (data & 0x00000008)  current_status |= DP_STATUS_FREEZE;
+			//if (data & 0x00000008)  current_status |= DP_STATUS_FREEZE; // Temp: Do nothing for now
 			if (data & 0x00000010)  current_status &= ~DP_STATUS_FLUSH;
 			if (data & 0x00000020)  current_status |= DP_STATUS_FLUSH;
 			if (data & 0x00000200)  dp_clock = 0;

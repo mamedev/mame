@@ -90,7 +90,7 @@ public:
 	DECLARE_READ8_MEMBER(bios_6600_r);
 	DECLARE_WRITE8_MEMBER(bios_6600_w);
 	DECLARE_WRITE8_MEMBER(game_w);
-	DECLARE_READ8_MEMBER(vdp_count_r);
+	DECLARE_READ8_MEMBER(vdp1_count_r);
 	DECLARE_WRITE_LINE_MEMBER(bios_int_callback);
 
 	DECLARE_DRIVER_INIT(megaplay);
@@ -593,22 +593,23 @@ static ADDRESS_MAP_START( megaplay_bios_map, AS_PROGRAM, 8, mplay_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(mplay_state::vdp_count_r)
+
+READ8_MEMBER(mplay_state::vdp1_count_r)
 {
 	address_space &prg = m_bioscpu->space(AS_PROGRAM);
 	if (offset & 0x01)
-		return m_vdp->hcount_read(prg, offset);
+		return m_vdp1->hcount_read(prg, offset);
 	else
-		return m_vdp->vcount_read(prg, offset);
+		return m_vdp1->vcount_read(prg, offset);
 }
 
 static ADDRESS_MAP_START( megaplay_bios_io_map, AS_IO, 8, mplay_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("sn2", sn76496_device, write)
 
-	AM_RANGE(0x40, 0x41) AM_MIRROR(0x3e) AM_READ(vdp_count_r)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("gen_vdp", sega315_5124_device, vram_read, vram_write)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("gen_vdp", sega315_5124_device, register_read, register_write)
+	AM_RANGE(0x40, 0x41) AM_MIRROR(0x3e) AM_READ(vdp1_count_r)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("vdp1", sega315_5124_device, vram_read, vram_write)
+	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("vdp1", sega315_5124_device, register_read, register_write)
 ADDRESS_MAP_END
 
 
@@ -616,22 +617,30 @@ UINT32 mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 &b
 {
 	//printf("megplay vu\n");
 	screen_update_megadriv(screen, bitmap, cliprect);
-//  m_vdp->screen_update(screen, bitmap, cliprect);
+	//m_vdp1->screen_update(screen, bitmap, cliprect);
+
+	// i'm not sure if the overlay (256 pixels wide) is meant to be stretched over the 320 resolution genesis output, or centered.
+	// if it's meant to be stretched we'll have to multiply the entire outut x4 for the Genesis VDP and x5 for the SMS VDP to get a common 1280 pixel wide image
 
 	// overlay, only drawn for pixels != 0
 	for (int y = 0; y < 224; y++)
 	{
 		UINT32* lineptr = &bitmap.pix32(y);
-		UINT32* srcptr =  &m_vdp->get_bitmap().pix32(y + SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT);
+		UINT32* srcptr =  &m_vdp1->get_bitmap().pix32(y + SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT);
 
 		for (int x = 0; x < SEGA315_5124_WIDTH; x++)
 		{
 			UINT32 src = srcptr[x] & 0xffffff;
 
 			if (src)
-				lineptr[x] = src;
+			{
+				if (x>=16)
+					lineptr[x-16] = src;
+
+			}
 		}
 	}
+
 	return 0;
 }
 
@@ -671,8 +680,11 @@ static MACHINE_CONFIG_START( megaplay, mplay_state )
 		SEGA315_5124_HEIGHT_NTSC, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT + 224)
 	MCFG_SCREEN_UPDATE_DRIVER(mplay_state, screen_update_megplay)
 
-	MCFG_DEVICE_MODIFY("gen_vdp")
-	MCFG_SEGA315_5313_INT_CB(WRITELINE(mplay_state, bios_int_callback))
+	// Megaplay has an additional SMS VDP as an overlay
+	MCFG_DEVICE_ADD("vdp1", SEGA315_5246, 0)
+	MCFG_SEGA315_5246_SET_SCREEN("megadriv")
+	MCFG_SEGA315_5246_IS_PAL(false)
+	MCFG_SEGA315_5246_INT_CB(WRITELINE(mplay_state, bios_int_callback))
 MACHINE_CONFIG_END
 
 
