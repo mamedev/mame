@@ -1927,6 +1927,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/jade.o      \
 	$(MESS_DRIVERS)/jonos.o     \
 	$(MESS_DRIVERS)/konin.o     \
+	$(MESS_DRIVERS)/leapster.o  \
 	$(MESS_DRIVERS)/lft.o       \
 	$(MESS_DRIVERS)/lola8a.o    \
 	$(MESS_DRIVERS)/m79152pc.o  \

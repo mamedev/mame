@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="leapster" description="LeapFrog Leapster cartridges">
+
+	<software name="findnemo" supported="no">
+		<description>Findet Nemo (German)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-11495-a - findet nemo (german).bin" size="0x800000" crc="6a5e20ba" sha1="984638e1d9b869611de8900d8f5a6a760cd40539" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
