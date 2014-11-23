@@ -1228,7 +1228,7 @@
 	</software>
 
 	<software name="stakwin">
-		<description>Stakes Winner - GI Kanzen Seiha Heno Machi (Jpn)</description>
+		<description>Stakes Winner - GI Kanzen Seiha e no Machi (Jpn)</description>
 		<year>1996</year>
 		<publisher>Saurus</publisher>
 		<info name="alt_title" value="ステークスウィナーGI完全制覇への道" />
@@ -1236,7 +1236,7 @@
 		<info name="release" value="19960322" />
 		<part name="cdrom" interface="neocd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="stakes winner - gi kanzen seiha heno machi (1996)(saurus)(jp)[!]" sha1="e72ce998b2d91542df5ae05ac0714284b6926e5d"/>
+				<disk name="stakes winner - gi kanzen seiha e no machi (1996)(saurus)(jp)[!]" sha1="e72ce998b2d91542df5ae05ac0714284b6926e5d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1256,7 +1256,7 @@
 	</software>
 
 	<software name="ssideki">
-		<description>Super Sidekicks (USA) ~ Tokuten Oh (Jpn)</description>
+		<description>Super Sidekicks (USA) ~ Tokuten Ou (Jpn)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="得点王" />
@@ -1264,13 +1264,13 @@
 		<info name="release" value="19950331 (JPN)" />
 		<part name="cdrom" interface="neocd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="super sidekicks (1995)(snk)(jp-us)[!][tokuten oh]" sha1="9bda953cb1b5354cb19ec3f8d2792de6bd1fba1a"/>
+				<disk name="super sidekicks (1995)(snk)(jp-us)[!][tokuten ou]" sha1="9bda953cb1b5354cb19ec3f8d2792de6bd1fba1a"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="ssideki2">
-		<description>Super Sidekicks 2 (USA) ~ Tokuten Oh 2 (Jpn)</description>
+		<description>Super Sidekicks 2 (USA) ~ Tokuten Ou 2 (Jpn)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="得点王2" />
@@ -1278,13 +1278,13 @@
 		<info name="release" value="19940909 (JPN)" />
 		<part name="cdrom" interface="neocd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="super sidekicks 2 (1994)(snk)(jp-us)[!][tokuten oh 2]" sha1="ef2a5fee5502561d25922aad1656319de18c72a0"/>
+				<disk name="super sidekicks 2 (1994)(snk)(jp-us)[!][tokuten ou 2]" sha1="ef2a5fee5502561d25922aad1656319de18c72a0"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="ssideki3">
-		<description>Super Sidekicks 3 - The Next Glory (USA) ~ Tokuten Oh 3 - Eikoue No Chousen (Jpn)</description>
+		<description>Super Sidekicks 3 - The Next Glory (USA) ~ Tokuten Ou 3 - Eikou e no Chousen (Jpn)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="得点王3 栄光への挑戦" />
@@ -1292,7 +1292,7 @@
 		<info name="release" value="19950623 (JPN)" />
 		<part name="cdrom" interface="neocd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="super sidekicks 3 - the next glory (1995)(snk)(jp-us)[!][tokuten oh 3 - eikoue no chousen]" sha1="ac8e645615318789535513b5861d99d6e45b99f9"/>
+				<disk name="super sidekicks 3 - the next glory (1995)(snk)(jp-us)[!][tokuten ou 3 - eikou e no chousen]" sha1="ac8e645615318789535513b5861d99d6e45b99f9"/>
 			</diskarea>
 		</part>
 	</software>
