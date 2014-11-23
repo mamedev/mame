@@ -336,7 +336,8 @@ Puyo Puyo Da!                                   841-0006C    22206   20 (64Mb)  
 Ring Out 4x4                                    840-0004C    21779   10 (64Mb)   present     315-6213  317-0250-COM   requires 2 JVS boards
 Samba de Amigo (Rev B)                          840-0020C    22966B  16 (64Mb)   present     315-6213  317-0270-COM   will boot but requires special controller to play it
 Sega Marine Fishing                             840-0027C    22221   10 (64Mb)   ?           315-6213  not present    ROM 3&4 not present. Requires fishing controller
-Sega Strike Fighter (Rev A)                     840-0035C    23323A  20 (64Mb)   present     315-6213  317-0281-COM
+Sega Strike Fighter (Rev A, set 1)              840-0035C    23323A  20 (64Mb)   present     315-6213  317-0281-COM   have "Rev. A" label on case
+Sega Strike Fighter (Rev A, set 2)              840-0035C    23786A  20 (64Mb)   present     315-6213  317-0281-COM   have "Rev. A" label on PCB
 Sega Tetris                                     840-0018C    22909    6 (64Mb)   present     315-6213  317-0268-COM
 Slashout                                        840-0041C    23341   17 (64Mb)   ?           315-6213  317-0286-COM   joystick + 4 buttons
 Spawn In the Demon's Hand (Rev B)               841-0005C    22977B  10 (64Mb)   ?           315-6213  317-5051-COM   joystick + 4 buttons
@@ -4745,6 +4746,38 @@ ROM_START( sstrkfgt )
 	ROM_LOAD( "sstrkfgt-key.bin", 0, 4, CRC(1884e4ee) SHA1(14ec026ed32825252987fed350f19f6e2565aa4d) )
 ROM_END
 
+// EPR ROM have different number, possible updated/bugfixed re-release or STD/DLX version, difference with original set is unknown, have "Rev.A" label too
+ROM_START( sstrkfgta )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr-23786a.ic22", 0x0000000, 0x400000, CRC(c24e4a70) SHA1(29de804afd3fe835eb9d819a7c46cc3c566e97c9) )
+	ROM_LOAD( "mpr-23302.ic1",   0x0800000, 0x800000, CRC(3429321b) SHA1(6fc1be2ca71a690a2ceca9dc968183a1222177f7) )
+	ROM_LOAD( "mpr-23303.ic2",   0x1000000, 0x800000, CRC(f7b3ada2) SHA1(d2caea852241cb0d91243d84d1c5523dfddac721) )
+	ROM_LOAD( "mpr-23304.ic3",   0x1800000, 0x800000, CRC(3bf145e9) SHA1(a000e135ad640472418de418b92dbdb83dcf872b) )
+	ROM_LOAD( "mpr-23305.ic4",   0x2000000, 0x800000, CRC(924ee9fd) SHA1(dd56f8cd7e9dda87968abb810694bddeeb31db5c) )
+	ROM_LOAD( "mpr-23306.ic5",   0x2800000, 0x800000, CRC(4021e805) SHA1(75988ff8d710da6d90608cef87fc8b4408a617fb) )
+	ROM_LOAD( "mpr-23307.ic6",   0x3000000, 0x800000, CRC(090c1812) SHA1(e3e32d5c1f42191e188f91dbd4a753030894aa6f) )
+	ROM_LOAD( "mpr-23308.ic7",   0x3800000, 0x800000, CRC(f23d2198) SHA1(9775796a388ab903102126fb190867a0d192903e) )
+	ROM_LOAD( "mpr-23309.ic8",   0x4000000, 0x800000, CRC(0d6a7c9d) SHA1(0df846289d598efdf5605ca8e09758eb8b5878f9) )
+	ROM_LOAD( "mpr-23310.ic9",   0x4800000, 0x800000, CRC(f4ec4baa) SHA1(77e2ea1c5747ced4951286142bd429780f9d4115) )
+	ROM_LOAD( "mpr-23311.ic10",  0x5000000, 0x800000, CRC(a1467573) SHA1(cf38527b0e812ba90e7402aa53e4557ce756cf43) )
+	ROM_LOAD( "mpr-23312.ic11",  0x5800000, 0x800000, CRC(9b0ae703) SHA1(35f0e3cdbc206b91dad4a97feb3c533bc12a77f1) )
+	ROM_LOAD( "mpr-23313.ic12s", 0x6000000, 0x800000, CRC(d309fea9) SHA1(2ba2da81976126f0a79b066d855706d800279150) )
+	ROM_LOAD( "mpr-23314.ic13s", 0x6800000, 0x800000, CRC(0aeedeac) SHA1(5e5086a7a51a9576e786911a2c7f4b509d5bc2f4) )
+	ROM_LOAD( "mpr-23315.ic14s", 0x7000000, 0x800000, CRC(88f22650) SHA1(3425433d233b458ae73e30cc0c7d25fca2a9d589) )
+	ROM_LOAD( "mpr-23316.ic15s", 0x7800000, 0x800000, CRC(38ff3a9d) SHA1(56978183fe61fd2ad59ab2979cb61fbf2cde07e6) )
+	ROM_LOAD( "mpr-23317.ic16s", 0x8000000, 0x800000, CRC(d6d45776) SHA1(102963243f6e127d4c35d150eeb09aa99a3738d4) )
+	ROM_LOAD( "mpr-23318.ic17s", 0x8800000, 0x800000, CRC(5f33207e) SHA1(6eceb6bb9171da8634fcba9dd7409794447fe069) )
+	ROM_LOAD( "mpr-23319.ic18s", 0x9000000, 0x800000, CRC(ff42857a) SHA1(adbc025c4e02ad3b15ead9340aee494c16005ad5) )
+	ROM_LOAD( "mpr-23320.ic19s", 0x9800000, 0x800000, CRC(5ec75a45) SHA1(696e5d14678c794dec67246507bd580f7e5b5043) )
+	ROM_LOAD( "mpr-23321.ic20s", 0xa000000, 0x800000, CRC(018627d4) SHA1(2519f39ad046d14f602648fed39bc3719185b55e) )
+
+	ROM_REGION( 4, "rom_key", 0 )
+	ROM_LOAD( "sstrkfgt-key.bin", 0, 4, CRC(1884e4ee) SHA1(14ec026ed32825252987fed350f19f6e2565aa4d) )
+ROM_END
+
 
 /* Sega Tetris */
 ROM_START( sgtetris )
@@ -8908,7 +8941,8 @@ ROM_END
 /* 0027 */ GAME( 2000, smarinef, naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Sega Marine Fishing", GAME_FLAGS )
 /* 0028 */ GAME( 2000, vonot,    naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Virtual On Oratorio Tangram M.S.B.S. ver5.66 2000 Edition", GAME_FLAGS )
 /* 0030 */ GAME( 2000, qmegamis, naomi,    naomim1, naomi,   naomi_state, qmegamis,ROT0, "Sega", "Quiz Ah Megamisama (JPN, USA, EXP, KOR, AUS)", GAME_FLAGS )
-/* 0035 */ GAME( 2000, sstrkfgt, naomi,    naomim2, sstrkfgt,naomi_state, naomi,   ROT0, "Sega", "Sega Strike Fighter (Rev A)", GAME_FLAGS )
+/* 0035 */ GAME( 2000, sstrkfgt, naomi,    naomim2, sstrkfgt,naomi_state, naomi,   ROT0, "Sega", "Sega Strike Fighter (Rev A, set 1)", GAME_FLAGS )
+/* 0035 */ GAME( 2000, sstrkfgta,sstrkfgt, naomim2, sstrkfgt,naomi_state, naomi,   ROT0, "Sega", "Sega Strike Fighter (Rev A, set 2)", GAME_FLAGS )
 /* 0036 */ GAME( 2000, 18wheels, 18wheelr, naomim2, 18wheelr,naomi_state, naomi,   ROT0, "Sega", "18 Wheeler (standard)", GAME_FLAGS )
 /* 0037 */ GAME( 2000, 18wheelu, 18wheelr, naomim2, 18wheelr,naomi_state, naomi,   ROT0, "Sega", "18 Wheeler (upright)", GAME_FLAGS )
 /* 0039 */ GAME( 2000, gram2000, naomi,    naomim1, naomi,   naomi_state, gram2000,ROT0, "Sega", "Giant Gram 2000 (JPN, USA, EXP, KOR, AUS)", GAME_FLAGS )
