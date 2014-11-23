@@ -2391,6 +2391,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/potgoldu.o \
 	$(DRIVERS)/proconn.o \
 	$(DRIVERS)/psattack.o \
+	$(DRIVERS)/pse.o \
 	$(DRIVERS)/quizo.o \
 	$(DRIVERS)/quizpun2.o \
 	$(DRIVERS)/rbmk.o \
