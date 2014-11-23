@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
-  Usage instructions: if the game/program does not autoboot, ype DIR to list the disk content
+  Usage instructions: if the game/program does not autoboot, type DIR to list the disk content
   and look for CMD or COM files.
   To run CMD files (which are TF-FOS programs, type RUN "XXX", with XXX being the name of the
   CMD file (e.g. RUN "SPACE MOUSE").

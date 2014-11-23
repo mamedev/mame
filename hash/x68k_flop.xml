@@ -2104,7 +2104,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 	<software name="branmrkr">
 		<description>Branmarker</description>
 		<year>1991</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="ブランマーカー" />
 		<info name="release" value="19910712" />
 		<part name="flop1" interface="floppy_5_25">
@@ -2775,7 +2775,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 	<software name="collectd" supported="no">
 		<description>Collector D Bangai-hen</description>
 		<year>1993</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="コレクターD 番外編" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk" />
@@ -3021,10 +3021,10 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="dodoki1">
+	<software name="dodokid1">
 		<description>D.O. Doki Doki Disk Vol.1</description>
 		<year>1991</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="ディー・オー どきどきディスク Vol.1" />
 		<info name="release" value="199102xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -3034,10 +3034,10 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="dodoki2">
+	<software name="dodokid2">
 		<description>D.O. Doki Doki Disk Vol.2</description>
 		<year>1991</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="ディー・オー どきどきディスク Vol.2" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
@@ -3049,7 +3049,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 	<software name="dodokid3">
 		<description>D.O. Doki Doki Disk Vol.3</description>
 		<year>1992</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="ディー・オー どきどきディスク Vol.3" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
@@ -3061,7 +3061,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 	<software name="dodokid4">
 		<description>D.O. Doki Doki Disk Vol.4</description>
 		<year>1993</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="ディー・オー どきどきディスク Vol.4" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
@@ -3073,7 +3073,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 	<software name="dodokid5">
 		<description>D.O. Doki Doki Disk Vol.5</description>
 		<year>1993</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="ディー・オー どきどきディスク Vol.5" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
@@ -3798,7 +3798,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="dor">
 		<description>Dor</description>
 		<year>1992</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="ドア" />
 		<info name="release" value="19920318" />
 		<part name="flop1" interface="floppy_5_25">
@@ -3830,7 +3830,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="dor2">
 		<description>Dor Part 2</description>
 		<year>1992</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="ドアパート2" />
 		<info name="release" value="19920519" />
 		<part name="flop1" interface="floppy_5_25">
@@ -3862,7 +3862,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="dor3">
 		<description>Dor Part 3</description>
 		<year>1992</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="ドアパート3" />
 		<info name="release" value="19921127" />
 		<part name="flop1" interface="floppy_5_25">
@@ -3894,7 +3894,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="dorse93">
 		<description>Dor Special Edition '93</description>
 		<year>1993</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261824">
@@ -3960,7 +3960,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="dorsesak">
 		<description>Dor Special Edition Sakigake</description>
 		<year>1993</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="ドア スペシャルエディション 魁" />
 		<info name="release" value="19930521" />
 		<part name="flop1" interface="floppy_5_25">
@@ -4182,7 +4182,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	</software>
 
 	<software name="drgcityx">
-		<description>Dragon City X Sitei</description>
+		<description>Dragon City X Shitei</description>
 		<year>1991</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
 		<info name="alt_title" value="ドラゴンシティX指定" />
@@ -4846,7 +4846,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="exterlin">
 		<description>Exterlien</description>
 		<year>1990</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="エクスタリアン" />
 		<info name="release" value="19901207" />
 		<part name="flop1" interface="floppy_5_25">
@@ -6296,7 +6296,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="hoshisun">
 		<description>Hoshi no Suna Monogatari</description>
 		<year>1991</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="星の砂物語" />
 		<info name="release" value="19910305" />
 		<part name="flop1" interface="floppy_5_25">
@@ -6322,7 +6322,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="hoshisu2">
 		<description>Hoshi no Suna Monogatari 2</description>
 		<year>1992</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="星の砂物語2" />
 		<info name="release" value="19920626" />
 		<part name="flop1" interface="floppy_5_25">
@@ -6407,7 +6407,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="hhunt">
+	<software name="hhunt1">
 		<description>Houma Hunter Lime Dai-1-wa</description>
 		<year>1993</year>
 		<publisher>ブラザー工業 (Brother Industries)</publisher>
@@ -7192,7 +7192,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="kaerimic">
 		<description>Kaerimichi wa Kiken ga Ippai</description>
 		<year>1990</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="帰り道は危険がいっぱい" />
 		<info name="release" value="199009xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -8246,8 +8246,8 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="lodossen">
-		<description>Lodoss Tou Senki Fukuzinzuke</description>
+	<software name="lodossfk">
+		<description>Lodoss Tou Senki - Fukujinzuke</description>
 		<year>1991</year>
 		<publisher>ブラザー工業 (Brother Industries)</publisher>
 		<info name="alt_title" value="ロードス島戦記 福神漬" />
@@ -9276,7 +9276,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="msgundcl">
+	<software name="gundamco">
 		<description>Mobile Suit Gundam Classic Operation</description>
 		<year>1991</year>
 		<publisher>ブラザー工業 (Brother Industries)</publisher>
@@ -9331,7 +9331,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="moonligt">
 		<description>Moonlight Chan Rin Shan</description>
 		<year>1993</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="Mウーンライトちゃんリンしゃん" />
 		<info name="release" value="19930319" />
 		<part name="flop1" interface="floppy_5_25">
@@ -10118,7 +10118,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	</software>
 
 	<software name="ougonras">
-		<description>Ougon no Rashinban - Shouyoumaru San Francisco Kouro Satsujin Jiken</description>
+		<description>Toudou Ryunosuke Tantei Nikki - Ougon no Rashinban - Shouyoumaru San Francisco Kouro Satsujin Jiken</description>
 		<year>1991</year>
 		<publisher>リバーヒルソフト (Riverhill Software)</publisher>
 		<info name="alt_title" value="黄金の羅針盤 翔洋丸桑港航路殺人事件" />
@@ -11311,7 +11311,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	</software>
 
 	<software name="raygun">
-		<description>Ray Gun</description>
+		<description>Ray・Gun</description>
 		<year>1990</year>
 		<publisher>エルフ (Elf)</publisher>
 		<info name="alt_title" value="レイガン" />
@@ -11907,7 +11907,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="shangha2">
+	<software name="shangh2">
 		<description>Shanghai II</description>
 		<year>1989</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
@@ -11920,7 +11920,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="shangha2d" cloneof="shangha2">
+	<software name="shangh2d" cloneof="shangh2">
 		<description>Shanghai II (Demo)</description>
 		<year>1989</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
@@ -13398,7 +13398,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="tenkyuhs">
+	<software name="tenkyusp">
 		<description>Tenkyuuhai Special - Tougen no Utage</description>
 		<year>1990</year>
 		<publisher>ブラザー工業 (Brother Industries)</publisher>
@@ -13688,7 +13688,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="tokimecb">
 		<description>Tokimeki Cherry Box</description>
 		<year>1990</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="ときめきチェリーボックス" />
 		<info name="release" value="19900516" />
 		<part name="flop1" interface="floppy_5_25">
@@ -14973,7 +14973,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="yojuclub">
 		<description>Youjuu Club</description>
 		<year>1990</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="妖獣クラブ" />
 		<info name="release" value="19900702" />
 		<part name="flop1" interface="floppy_5_25">
@@ -14993,7 +14993,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="yojuclb2">
 		<description>Youjuu Club 2</description>
 		<year>1991</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="妖獣クラブ2" />
 		<info name="release" value="19910823" />
 		<part name="flop1" interface="floppy_5_25">
@@ -15019,7 +15019,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="yoju2048">
 		<description>Youjuu Senki AD 2048</description>
 		<year>1994</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="妖獣戦記 A.D.2048" />
 		<info name="release" value="19940422" />
 		<part name="flop1" interface="floppy_5_25">
@@ -17532,7 +17532,7 @@ a bootable disk out of that? -->
 		</part>
 	</software>
 
-	<software name="zstaff1">
+	<software name="zpro68kv1" cloneof="zpro68k">
 		<description>Z's Staff Pro-68K v1.00</description>
 		<year>1987</year>
 		<publisher>Zeit</publisher>
@@ -17562,8 +17562,8 @@ a bootable disk out of that? -->
 		</part>
 	</software>
 
-	<software name="zstaff2">
-		<description>Z's Staff Pro-68K v2.00 (1989)(Zeit)(Disk 1 of 4)(System)</description>
+	<software name="zpro68kv2" cloneof="zpro68k">
+		<description>Z's Staff Pro-68K v2.00</description>
 		<year>1989</year>
 		<publisher>Zeit</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -17592,7 +17592,7 @@ a bootable disk out of that? -->
 		</part>
 	</software>
 
-	<software name="zstaff3">
+	<software name="zpro68k">
 		<description>Z's Staff Pro-68K v3.0</description>
 		<year>1992</year>
 		<publisher>Zeit</publisher>
@@ -17640,7 +17640,7 @@ a bootable disk out of that? -->
 		</part>
 	</software>
 
-	<software name="zxvi">
+	<software name="zxvi68k">
 		<description>Z's Staff XVI-68K v0.50</description>
 		<year>1992</year>
 		<publisher>Zeit</publisher>

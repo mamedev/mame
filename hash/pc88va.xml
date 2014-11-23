@@ -439,7 +439,7 @@ PC88VA doujin games (mostly undumped)
 	<software name="shanghai" supported="no">
 		<description>Shanghai</description>
 		<year>1986</year>
-		<publisher>システムソフト (System Software)</publisher>
+		<publisher>システムソフト (System Soft)</publisher>
 		<info name="alt_title" value="上海" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1296112">

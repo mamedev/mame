@@ -12,7 +12,6 @@
 #include "mc1502_fdc.h"
 
 #include "cpu/i86/i86.h"
-#include "formats/dsk_dsk.h"
 #include "formats/pc_dsk.h"
 
 #define VERBOSE_DBG 0
@@ -35,8 +34,7 @@
 const device_type MC1502_FDC = &device_creator<mc1502_fdc_device>;
 
 FLOPPY_FORMATS_MEMBER( mc1502_fdc_device::floppy_formats )
-	FLOPPY_PC_FORMAT,
-	FLOPPY_DSK_FORMAT
+	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( mc1502_floppies )
