@@ -154,7 +154,6 @@ http://www.z88forever.org.uk/zxplus3e/
 
 /* +3 hardware */
 #include "machine/ram.h"
-#include "formats/dsk_dsk.h"
 
 
 /****************************************************************************************************/
@@ -365,10 +364,6 @@ static GFXDECODE_START( specpls3 )
 GFXDECODE_END
 
 
-FLOPPY_FORMATS_MEMBER( spectrum_state::floppy_formats )
-	FLOPPY_DSK_FORMAT
-FLOPPY_FORMATS_END
-
 static MACHINE_CONFIG_DERIVED( spectrum_plus3, spectrum_128 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(spectrum_plus3_io)
@@ -379,8 +374,8 @@ static MACHINE_CONFIG_DERIVED( spectrum_plus3, spectrum_128 )
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum_plus3 )
 
 	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", specpls3_floppies, "3ssdd", spectrum_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", specpls3_floppies, "3ssdd", spectrum_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "specpls3_flop")
 MACHINE_CONFIG_END

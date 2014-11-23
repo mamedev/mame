@@ -60,17 +60,12 @@
 #include "machine/z80pio.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "formats/dsk_dsk.h"
 #include "sound/ay8910.h"
 #include "rendlay.h"
 #include "includes/einstein.h"
 
 #define VERBOSE_KEYBOARD    0
 #define VERBOSE_DISK        0
-
-FLOPPY_FORMATS_MEMBER( einstein_state::floppy_formats )
-	FLOPPY_DSK_FORMAT
-FLOPPY_FORMATS_END
 
 /***************************************************************************
     80 COLUMN DEVICE
@@ -743,10 +738,10 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 
 	MCFG_WD1770x_ADD(IC_I042, XTAL_X002)
 
-	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":0", einstein_floppies, "525dd", einstein_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":1", einstein_floppies, "525dd", einstein_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":2", einstein_floppies, "525dd", einstein_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":3", einstein_floppies, "525dd", einstein_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":0", einstein_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":1", einstein_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":2", einstein_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":3", einstein_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","einstein")

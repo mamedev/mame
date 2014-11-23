@@ -115,6 +115,7 @@ const floppy_format_type floppy_image_device::default_floppy_formats[] = {
 	FLOPPY_MFM_FORMAT,
 	FLOPPY_TD0_FORMAT,
 	FLOPPY_CQM_FORMAT,
+	FLOPPY_DSK_FORMAT,
 	NULL
 };
 

@@ -12,7 +12,6 @@
 #include "p1_fdc.h"
 
 #include "cpu/i86/i86.h"
-#include "formats/dsk_dsk.h"
 #include "formats/pc_dsk.h"
 
 #define VERBOSE_DBG 0
@@ -35,8 +34,7 @@
 const device_type P1_FDC = &device_creator<p1_fdc_device>;
 
 FLOPPY_FORMATS_MEMBER( p1_fdc_device::floppy_formats )
-	FLOPPY_PC_FORMAT,
-	FLOPPY_DSK_FORMAT
+	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( poisk1_floppies )
