@@ -6407,7 +6407,7 @@
 
 	<software name="supsnap2" cloneof="snapshot" supported="no">
 		<description>Super Snapshot (v2.0)</description>
-		<year>198</year>
+		<year>198?</year>
 		<publisher>LMS Tech</publisher>
 
 		<part name="cart" interface="c64_cart">
