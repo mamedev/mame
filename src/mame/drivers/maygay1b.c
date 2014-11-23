@@ -550,10 +550,6 @@ static ADDRESS_MAP_START( m1_nec_memmap, AS_PROGRAM, 8, maygay1b_state )
 	AM_RANGE(0x240c, 0x240d) AM_READ(m1_firq_clr_r)
 
 	AM_RANGE(0x240e, 0x240f) AM_READ(m1_firq_nec_r)
-	
-	AM_RANGE(0x2412, 0x2412) AM_READ(m1_firq_trg_r) // firq, sample playback?
-
-	AM_RANGE(0x2420, 0x2421) AM_WRITE(latch_ch2_w ) // oki
 
 	AM_RANGE(0x2800, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("bank1")    /* 64k  paged ROM (4 pages)  */
@@ -660,6 +656,9 @@ MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
 	MCFG_DEFAULT_LAYOUT(layout_maygay1b)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_DERIVED( maygay_m1_no_oki, maygay_m1 )
+	MCFG_DEVICE_REMOVE("msm6376")
+MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( maygay_m1_nec, maygay_m1 )
 	MCFG_CPU_MODIFY("maincpu")

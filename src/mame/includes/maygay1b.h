@@ -116,4 +116,5 @@ public:
 
 MACHINE_CONFIG_EXTERN( maygay_m1 );
 MACHINE_CONFIG_EXTERN( maygay_m1_nec );
+MACHINE_CONFIG_EXTERN( maygay_m1_no_oki );
 MACHINE_CONFIG_EXTERN( maygay_m1_empire );
