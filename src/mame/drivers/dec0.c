@@ -44,8 +44,8 @@ ToDo:
 - Fighting Fantasy (bootleg) doesn't boot at all;
 - Hook up the 68705 in Midnight Resistance (bootleg) (it might not be used, leftover from the Fighting Fantasy bootleg on the same PCB?)
 - Get rid of ROM patches in Sly Spy and Hippodrome;
-- Accurate pixel clock parameters;
 - background pen in Birdie Try is presumably wrong.
+- Pixel clock frequency isn't verified;
 - Finally, get a proper decap of the MCUs used by Bad Dudes and Birdie Try;
 
 
