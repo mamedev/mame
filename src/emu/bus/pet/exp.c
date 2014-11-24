@@ -196,9 +196,12 @@ int pet_expansion_slot_device::phi2()
 
 // slot devices
 #include "64k.h"
+#include "hsg.h"
 #include "superpet.h"
 
 SLOT_INTERFACE_START( pet_expansion_cards )
 	SLOT_INTERFACE("64k", PET_64K)
+	SLOT_INTERFACE("hsga", CBM8000_HSG_A)
+	SLOT_INTERFACE("hsgb", CBM8000_HSG_B)
 	SLOT_INTERFACE("superpet", SUPERPET)
 SLOT_INTERFACE_END
