@@ -5339,7 +5339,8 @@ gram2000        // 2000.09 Giant Gram 2000
 crackndj        // 2000.10 Crackin' DJ
 deathcox        // 2000.10 Death Crimson OX
 cspike          // 2000.10 Gun Spike / Cannon Spike
-sstrkfgt        // 2000.10 Sega Strike Fighter (Rev A)
+sstrkfgt        // 2000.10 Sega Strike Fighter (Rev A, set 1)
+sstrkfgta       // 2000.10 Sega Strike Fighter (Rev A, set 2)
 confmiss        // 2000.10.11 Confidential Mission         // First GD-ROM game?
 ninjaslt1       // 2000.11 Ninja Assault (NJA1 Ver. A)
 ninjaslt2       // 2000.11 Ninja Assault (NJA2 Ver. A)
@@ -5510,7 +5511,7 @@ vf4evoa         // 2002.08 Virtua Fighter 4 Evolution
 initdv2jo       // 2002.12 Initial D Arcade Stage Ver. 2 (Japan)
 initdv2e        // 2002.12 Initial D Arcade Stage Ver. 2 (export)
 vf4evo          // 2002.12 Virtua Fighter 4 Evolution Ver.B
-clubk2k3        // 2003.?? Club Kart: European Session (2003)
+clubk2k3        // 2003.?? Club Kart: European Session (2003, Rev A)
 clubk2kp        // 2003.?? Club Kart: European Session (2003, prototype)
 initdexpo       // 2002.?? Initial D Arcade Stage (Export)
 				// 2002.?? Sega Driving Simulator
