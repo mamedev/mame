@@ -467,7 +467,8 @@ static const UINT16 showhand_default_eeprom[15] =   {0x0001,0x0007,0x000a,0x0003
 
 
 /*
-TODO: understand if later hardware uses different parameters (XTAL is almost surely NOT 20 MHz so ...).
+TODO: understand if later hardware uses different parameters (XTAL is almost surely NOT 20 MHz so ...). Also, weirdly enough, there's an unused
+6x PAL XTAL according to notes, but VSync = 58,85 Hz?
 */
 #define ASTROCORP_PIXEL_CLOCK XTAL_20MHz/2
 #define ASTROCORP_HTOTAL 651
