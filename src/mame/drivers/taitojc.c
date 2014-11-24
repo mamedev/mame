@@ -436,11 +436,12 @@ static const int dendego_pressure_table[0x100] =
 
 // VSync - 55.6795Hz
 // HSync - 24.639kHz / 24.690kHz (may be inaccurate)
-#define HTOTAL              (768)
+// TODO: why different HSyncs? 24 kHz assumes medium res monitor, so it can't be interlacing.
+#define HTOTAL              (812)
 #define HBEND               (0)
 #define HBSTART             (512)
 
-#define VTOTAL              (468)
+#define VTOTAL              (443)
 #define VBEND               (0)
 #define VBSTART             (400)
 

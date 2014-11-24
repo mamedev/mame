@@ -36,6 +36,10 @@
 #include <os2.h>
 #endif
 
+#ifdef SDLMAME_EMSCRIPTEN
+#include <emscripten.h>
+#endif
+
 #include "sdlinc.h"
 
 // MAME headers
@@ -306,6 +310,10 @@ int main(int argc, char *argv[])
 
 	#ifdef SDLMAME_OS2
 	MorphToPM();
+	#endif
+
+	#ifdef SDLMAME_EMSCRIPTEN
+	EM_ASM("SDL.defaults.copyOnLock = false; SDL.defaults.discardOnLock = true;");
 	#endif
 
 #if defined(SDLMAME_X11) && (SDL_MAJOR_VERSION == 1) && (SDL_MINOR_VERSION == 2)

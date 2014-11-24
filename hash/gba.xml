@@ -26742,7 +26742,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="piacarro">
-		<description>Pia Carrot he Youkoso!! 3.3 (Jpn)</description>
+		<description>Pia Carrot e Youkoso!! 3.3 (Jpn)</description>
 		<year>2004</year>
 		<publisher>NEC Interchannel</publisher>
 		<info name="serial" value="AGB-BP3J-JPN"/>
@@ -26751,7 +26751,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="pia carrot he youkoso!! 3.3 (japan).bin" size="8388608" crc="254e6f31" sha1="4bafbc7a57851ddd330620e9f448714ffa7acb3b" offset="000000" />
+				<rom name="pia carrot e youkoso!! 3.3 (japan).bin" size="8388608" crc="254e6f31" sha1="4bafbc7a57851ddd330620e9f448714ffa7acb3b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -28486,7 +28486,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="pukupkil">
-		<description>PukuPuku Tennen Kairanban - Youkoso! Illusion Land he (Jpn)</description>
+		<description>PukuPuku Tennen Kairanban - Youkoso! Illusion Land e (Jpn)</description>
 		<year>2004</year>
 		<publisher>Marvelous Interactive</publisher>
 		<info name="serial" value="AGB-B3PJ-JPN"/>
@@ -28495,7 +28495,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="pukupuku tennen kairanban - youkoso! illusion land he (japan).bin" size="8388608" crc="e98cf9c3" sha1="b2bd07bf70d3bbd05c031baa482e891f245ebad2" offset="000000" />
+				<rom name="pukupuku tennen kairanban - youkoso! illusion land e (japan).bin" size="8388608" crc="e98cf9c3" sha1="b2bd07bf70d3bbd05c031baa482e891f245ebad2" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
