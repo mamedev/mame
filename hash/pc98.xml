@@ -97,8 +97,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>N88 BASIC + compiler (for MS-DOS)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="dosbasic.fdi" size="1265664" crc="54506b2b" sha1="8cab6b817c8e130366a0ab0c9859b51043c74c26" offset="0" />
@@ -110,8 +108,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>MS-DOS 3.3</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
@@ -136,8 +132,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>MS-DOS 5.0</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
@@ -168,8 +162,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>MS-DOS 5.5</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
@@ -200,8 +192,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>MS-DOS 6.2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
@@ -256,8 +246,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>MS-DOS 6.2 Extended Set</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
@@ -306,8 +294,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>Windows 2.1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
@@ -727,8 +713,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>QuickBASIC v45</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Start Disk"/>
 			<dataarea name="flop" size="1265664">
@@ -753,8 +737,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>QuickC v20</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Setup Disk"/>
 			<dataarea name="flop" size="1265664">
@@ -829,8 +811,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>EO System 3.0</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
@@ -849,8 +829,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>EO System 3.0 (Alt Format)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1281968">
@@ -1105,7 +1083,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="一太郎 ver.4" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System 1"/>
 			<dataarea name="flop" size="1265664">
@@ -1266,8 +1243,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>Wizard98 v3</description>
 		<year>19??</year>
 		<publisher>ウエストサイド (WestSide)</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1350240">
 				<rom name="wizard98-v3 systemdisk.nfd" size="1350240" crc="4419e57c" sha1="ea69af5e51174ba545fe689b5d9597b9e3ea5a56" offset="0" />
@@ -1279,8 +1254,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>Wizard98 v3r8</description>
 		<year>19??</year>
 		<publisher>ウエストサイド (WestSide)</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="wizard98r8.fdi" size="1265664" crc="507a66ac" sha1="145056248f4cb6ce2522168f9122902eb93e4820" offset="0" />
@@ -1292,8 +1265,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>Wizard98 v3r5</description>
 		<year>19??</year>
 		<publisher>ウエストサイド (WestSide)</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="wizard98r5.fdi" size="1265664" crc="4c68b6fe" sha1="f245c0268a34211fa810cdc1d363627c5cc3b22d" offset="0" />
@@ -1305,8 +1276,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>Wizard98 v3r4</description>
 		<year>19??</year>
 		<publisher>ウエストサイド (WestSide)</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="wizard98r4.fdi" size="1265664" crc="65fe0008" sha1="87afd9e86014263ae013fcb7e072dbc298ef9d44" offset="0" />
@@ -1318,8 +1287,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>Wizard98 v3r3</description>
 		<year>19??</year>
 		<publisher>ウエストサイド (WestSide)</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="wizard98r3.fdi" size="1265664" crc="54775a20" sha1="46a2961e535c9b0b9c778271da2a8e1ec7cfc68f" offset="0" />
@@ -1699,8 +1666,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>Wizard98 All-Filers No.1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1284704">
 				<rom name="all-filers no1.nfd" size="1284704" crc="a150f80d" sha1="a78b4b62967e35a03272f170692ed5918ec557cb" offset="0" />
@@ -1712,8 +1677,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>Wizard98 All-Filers No.2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1313056">
 				<rom name="all-filers no2.nfd" size="1313056" crc="716c5dda" sha1="1bdbc4fd650e23979364eba2ab5f23d90b21873c" offset="0" />
@@ -1725,8 +1688,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>Wizard98 All-Filers No.9</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="all-filers no9.fdi" size="1265664" crc="fe1c8928" sha1="b2535891aed6f65585c0f5ec7afbbb7a0ca6c768" offset="0" />
@@ -1738,8 +1699,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>Wizard98 All-Filers No.12</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="all-filers no12.fdi" size="1265664" crc="6ec7cf2c" sha1="51b46f4d23de7cdba1579e7822fc122a4cc1493e" offset="0" />
@@ -1751,8 +1710,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>Wizard98 All-Filers No.13</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="all-filers no13.fdi" size="1265664" crc="804b8b1d" sha1="901fc12f26eefb850acb975372addbd3299ecd84" offset="0" />
@@ -1764,8 +1721,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>Wizard98 All-Filers No.14</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="all-filers no14.fdi" size="1265664" crc="2fcf38ee" sha1="b9ba4f2399b888b3c6d7722b297b0d91ac763602" offset="0" />
@@ -1777,8 +1732,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>Wizard98 All-Filers No.15</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="all-filers no15.fdi" size="1265664" crc="76d34331" sha1="7a549b16feaf87003b839b08e11429298e04a4e9" offset="0" />
@@ -1790,8 +1743,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>Wizard98 All-Filers No.16</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="all-filers no16.fdi" size="1265664" crc="667373e6" sha1="d0308a29c8367cfe4526b2f10b9981b32c60729f" offset="0" />
@@ -1803,8 +1754,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>Wizard98 All-Filers No.17</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="all-filers no17.fdi" size="1265664" crc="9a7ed485" sha1="0c83692bd5c9e0e5ecb14b1a7d42f2256cdda21e" offset="0" />
@@ -1816,8 +1765,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>Wizard98 All-Filers No.18</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="all-filers no18.fdi" size="1265664" crc="8aa56345" sha1="f18819012222a39918ac9034389fcfc75af9d5b4" offset="0" />
@@ -1829,8 +1776,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>Wizard98 Filers-Oden No.1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1307744">
 				<rom name="filer-oden no1.nfd" size="1307744" crc="54afe365" sha1="3d0fe8c05e20e506beb21a4ed8b569f18ae1ff35" offset="0" />
@@ -1842,8 +1787,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>Wizard98 Filers-Oden No.2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1307744">
 				<rom name="filer-oden no2.nfd" size="1307744" crc="f60d7bfd" sha1="67ec8c1bd9efa1116ac78678df6a70832504ea02" offset="0" />
@@ -1855,8 +1798,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>Wizard98 Filers-Oden No.3</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1307744">
 				<rom name="filer-oden no3.nfd" size="1307744" crc="5711ab27" sha1="47414ca7148ac4aa8570111f8820afb5a8cf2469" offset="0" />
@@ -3371,7 +3312,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<year>19??</year>
 		<publisher>兄弟堂 (KDD)</publisher>
 		<info name="alt_title" value="オール美少女アートグラフィックス Ｖｏｌ．１ Ｋ・Ｄ・Ｄ編" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_1.fdi" size="1265664" crc="3445a86e" sha1="d2eb59a46e43a6a0ffb1e58d2cb9cc2c9f7b6540" offset="0" />
@@ -3385,7 +3325,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<year>19??</year>
 		<publisher>兄弟堂 (KDD)</publisher>
 		<info name="alt_title" value="オール美少女アートグラフィックス Ｖｏｌ．２" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_2.fdi" size="1265664" crc="ee12585b" sha1="941abd888e3ce84c072a28f4cd73b15cb6c8945b" offset="0" />
@@ -3399,7 +3338,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<year>19??</year>
 		<publisher>兄弟堂 (KDD)</publisher>
 		<info name="alt_title" value="オール美少女アートグラフィックス Ｖｏｌ．３" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_3.fdi" size="1265664" crc="30ae9567" sha1="e46a1cd8fa82a99a497048001b2e6d0268c4a5d6" offset="0" />
@@ -4104,7 +4042,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 
 	<software name="arbeit">
 		<description>Arbeit - Futari no Omoi</description>
-		<year>19??</year>
+		<year>1995</year>
 		<publisher>アンジェ (Ange)</publisher>
 		<info name="alt_title" value="アルバイト ～二人の想い～" />
 		<info name="release" value="19950728" />
@@ -8465,7 +8403,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="クラシックロード３　パーフェクトガイド" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
 				<rom name="croad3guide.d88" size="1281968" crc="742abaca" sha1="68a8455b66e3582178e5b20ff3201dda8e002742" offset="0" />
@@ -9458,7 +9395,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<year>19??</year>
 		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="ディー・オー ベストキャラクターズ" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="dobest.fdi" size="1265664" crc="abe0263d" sha1="231132277c3ca6b748fba4abc665cc19811164fa" offset="0" />
@@ -19123,7 +19059,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<year>19??</year>
 		<publisher>アグミックス (Agumix)</publisher>
 		<info name="alt_title" value="イーリス亭小夜曲 Ｓｐｅｃｉａｌな オ・マ・ケ" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="iris-tei serenade - special na o-ma-ke.fdi" size="1265664" crc="397539d3" sha1="267380a538015388685ffba4f55a6c482a6fdf4a" offset="0" />
@@ -20111,7 +20046,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 
 	<software name="kakinoki">
 		<description>Kakinoki Shougi</description>
-		<year>19??</year>
+		<year>1994</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="柿木将棋" />
 		<info name="release" value="19940422" />
@@ -24441,7 +24376,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 
 	<software name="mephist">
 		<description>Mephist</description>
-		<year>19??</year>
+		<year>1989</year>
 		<publisher>ストライカー (Striker)</publisher>
 		<info name="alt_title" value="メフィスト" />
 		<info name="release" value="19890915" />
@@ -29826,7 +29761,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 
 	<software name="pridangr">
 		<description>Princess Danger</description>
-		<year>19??</year>
+		<year>1994</year>
 		<publisher>ジャニス (Janis)</publisher>
 		<info name="alt_title" value="ぷりんせすでんじゃあ" />
 		<info name="release" value="19940421" />
@@ -34974,7 +34909,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 
 	<software name="startrad">
 		<description>Star Trader</description>
-		<year>19??</year>
+		<year>1989</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="alt_title" value="スタートレーダー" />
 		<info name="release" value="19890526" />
@@ -35066,7 +35001,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	<software name="stratego">
 		<description>Stratego</description>
 		<year>1992</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
 		<info name="alt_title" value="ストラテゴ" />
 		<info name="release" value="19920319" />
 		<part name="flop1" interface="floppy_5_25">
@@ -40440,7 +40375,6 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<year>19??</year>
 		<publisher>メディックス (Medix)</publisher>
 		<info name="alt_title" value="ウイニングホース" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
 				<rom name="winhorse.d88" size="1281968" crc="ff1de12b" sha1="9dd53722db76b8d1c840a6455ef86cc9e49adb93" offset="0" />
@@ -42496,8 +42430,6 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<description>Z's Staff Kid98</description>
 		<year>19??</year>
 		<publisher>Zeit</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
@@ -43187,7 +43119,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 <!-- Last Armageddon expansion? -->
 	<software name="alienzuk" supported="no">
 		<description>Alien Zukan</description>
-		<year>19??</year>
+		<year>1988</year>
 		<publisher>ブレイングレイ (Brain Grey)</publisher>
 		<info name="alt_title" value="エイリアン図鑑" />
 		<info name="release" value="19881111" />
@@ -43491,9 +43423,9 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="cgtsuku" supported="no">
-		<description>CG Tsukuru 3D</description>
+		<description>CG Tsukuruu 3D</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="CGツクール３Ｄ" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk I"/>
@@ -46299,7 +46231,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 
 	<software name="mjouden" supported="no">
 		<description>Mahjong Ou Densetsu</description>
-		<year>19??</year>
+		<year>1992</year>
 		<publisher>日本物産 (Nihon Bussan)</publisher>
 		<info name="alt_title" value="麻雀王伝説" />
 		<info name="release" value="19920626" />
@@ -46663,7 +46595,6 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<year>1983</year>
 		<publisher>光栄 (Koei)</publisher>
 		<info name="alt_title" value="ナイトライフ" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1089808">
 				<rom name="nlife.nfd" size="1089808" crc="c04e9db9" sha1="31965b21465be90043eb8a868b92425a2aca263d" offset="0" />
@@ -58127,7 +58058,7 @@ SPACE EMPIRE
 	<software name="gamblave" supported="no">
 		<description>Gambling Avenue</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Shuwa System Trading</publisher>
 		<info name="alt_title" value="ぎゃんぶら一ずアベニュー" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
@@ -59320,8 +59251,6 @@ SPACE EMPIRE
 		<description>Volleyball 2 on 2</description>
 		<year>1994</year>
 		<publisher>&lt;unofficial&gt;</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1478656">
 				<rom name="volleyball 2 on 2 (1994)(tome).fdi" size="1478656" crc="5074cf73" sha1="cf573aab5fcd90dac93ea6d3751e6c0c4f449b47" offset="0" />
@@ -60060,7 +59989,6 @@ doujin?!?
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="alt_title" value="NYS &amp; Rapcat" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="fervent nereid.fdi" size="1265664" crc="531d9ca8" sha1="0dcb35f19399e34fe3e0888f37fdcc23ba57d6a5" offset="0" />
@@ -61312,7 +61240,6 @@ doujin?!?
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="Team Zero" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
 				<rom name="sentimental graphics vol 1 (team zero).fdi" size="1478656" crc="a75f1c51" sha1="3f399c1525f193e8a5e89b0d35e7e20c3f1cea41" offset="0" />
@@ -62306,8 +62233,6 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		<description>Maboroshi Kaitou Den</description>
 		<year>19??</year>
 		<publisher>コンパイル (Compile)</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="maboroshi kaitou den.fdi" size="1265664" crc="c255c90e" sha1="8729284a5ba93b763761504b33259b7649d65b54" offset="0" />
@@ -62319,8 +62244,6 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		<description>Madou Monogatari - Michikusa Ibun</description>
 		<year>19??</year>
 		<publisher>コンパイル (Compile)</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="madou monogatari - michikusa ibun (j).fdi" size="1265664" crc="51a3defc" sha1="d8daf80e8e02c159939734236efa166200d006e1" offset="0" />
@@ -62366,8 +62289,6 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		<description>Nazo Puyo (Ripped from DS7)</description>
 		<year>19??</year>
 		<publisher>コンパイル (Compile)</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="nazo puyo puyo ds 7 (j).fdi" size="1265664" crc="36083ab0" sha1="12c4f34388ce7c0343b324013fc5cf4c026be470" offset="0" />
@@ -62425,8 +62346,6 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		<description>Wandafurya Madou Rando</description>
 		<year>19??</year>
 		<publisher>コンパイル (Compile)</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="wandafurya madou rando (j).fdi" size="1265664" crc="c2c8e072" sha1="d1da14a1fda25dd16fc73d49440d18c39f4b9e77" offset="0" />
@@ -62444,7 +62363,6 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="聖剣と魔剣の伝説" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1281968">
@@ -62464,8 +62382,6 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		<description>Sengoku (?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1281968">
@@ -62496,8 +62412,6 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		<description>Mahjong Satokara (?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="disk_sys.fdi" size="1261568" crc="d184f9c4" sha1="82e3ee4ca75b6cf486c4a639c70e8ebd7bec7e6a" offset="0" />
@@ -62507,10 +62421,8 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 
 	<software name="joro2">
 		<description>Joro v2 (?)</description>
-		<year>199?</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<info name="author" value="T&amp;H Projects" />
-		<info name="release" value="" />
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="jorov21.fdi" size="1265664" crc="973c2459" sha1="1650606de9b246cfa24c8731d36c2204dac4e04f" offset="0" />
