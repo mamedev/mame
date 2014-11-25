@@ -47491,7 +47491,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="rinneten" suppotred="no">
+	<software name="rinneten" supported="no">
 		<description>Rinne Tensei Reversible Game Tanba</description>
 		<year>1988</year>
 		<publisher>マイクロネット (Micronet)</publisher>
