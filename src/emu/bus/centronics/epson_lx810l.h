@@ -96,6 +96,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -108,8 +109,14 @@ private:
 	UINT16 m_printhead;
 	int m_pf_pos_abs;
 	int m_cr_pos_abs;
-	int m_last_fire; /* HACK to get fire positions for motor in movement */
+	int m_real_cr_pos;
+	int m_real_cr_steps;
+	int m_real_cr_dir; /* 1 is going right, -1 is going left */
 	UINT8 m_fakemem;
+
+	enum {
+		TIMER_CR,
+	};
 };
 
 // ======================> epson_ap2000_t

@@ -286,7 +286,9 @@ epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, const char *tag, d
 	m_printhead(0),
 	m_pf_pos_abs(200),
 	m_cr_pos_abs(200),
-	m_last_fire(0)
+	m_real_cr_pos(200),
+	m_real_cr_steps(0),
+	m_real_cr_dir(0)
 {
 }
 
@@ -302,7 +304,9 @@ epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, device_type type, 
 	m_printhead(0),
 	m_pf_pos_abs(200),
 	m_cr_pos_abs(200),
-	m_last_fire(0)
+	m_real_cr_pos(200),
+	m_real_cr_steps(0),
+	m_real_cr_dir(0)
 {
 }
 
@@ -347,6 +351,29 @@ void epson_lx810l_t::device_start()
 void epson_lx810l_t::device_reset()
 {
 	m_speaker->level_w(0);
+}
+
+
+//-------------------------------------------------
+//  device_timer - device-specific timer
+//-------------------------------------------------
+
+void epson_lx810l_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id) {
+	case TIMER_CR:
+		/* The firmware issues two half-steps in sequence, one immediately
+		 * after the other. At full speed, the motor does two half-steps at
+		 * each 833 microseconds. A timer fires the printhead twice, with
+		 * the same period as each half-step (417 microseconds), but with
+		 * a 356 microseconds delay relative to the motor steps.
+		 */
+		m_real_cr_pos += param;
+		m_real_cr_steps--;
+		if (m_real_cr_steps)
+			timer_set(attotime::from_usec(400), TIMER_CR, m_real_cr_dir);
+		break;
+	}
 }
 
 
@@ -496,8 +523,22 @@ WRITE8_MEMBER( epson_lx810l_t::pf_stepper )
 
 WRITE8_MEMBER( epson_lx810l_t::cr_stepper )
 {
+	int m_cr_pos_abs_prev = m_cr_pos_abs;
+
 	stepper_update(1, data);
 	m_cr_pos_abs = 200 - stepper_get_absolute_position(1);
+
+	if (m_cr_pos_abs > m_cr_pos_abs_prev) {
+		/* going right */
+		m_real_cr_dir =  1;
+	} else {
+		/* going left */
+		m_real_cr_dir = -1;
+	}
+
+	if (!m_real_cr_steps)
+		timer_set(attotime::from_usec(400), TIMER_CR, m_real_cr_dir);
+	m_real_cr_steps++;
 
 	LX810LLOG("%s: %s(%02x); abs %d\n", machine().describe_context(), __func__, data, m_cr_pos_abs);
 }
@@ -518,25 +559,18 @@ WRITE_LINE_MEMBER( epson_lx810l_t::co0_w )
 
 	/* Printhead is being fired on !state. */
 	if (!state) {
-		int pos = m_cr_pos_abs;
-
-		/* HACK to get fire positions for motor in movement. The firmware
-		 * issues two half-steps one immediately after the other. A timer
-		 * fires the printhead twice. Supposedly, the first time the
-		 * printhead is fired, it is midway between one step and the other.
-		 * Ideally, the stepper motor interface should model the physics
-		 * of the motors. For the moment, we adjust pos to get the
-		 * intermediate position.
+		/* The firmware expects a 300 microseconds delay between the fire
+		 * signal and the impact of the printhead on the paper. This can be
+		 * verified by the timings of the steps and fire signals for the
+		 * same positions with different directions (left to right or right
+		 * to left). We don't simulate this delay since it is smaller than
+		 * the time it takes the printhead to travel one pixel (which would
+		 * be 417 microseconds), so it makes no difference to us.
+		 * It is interesting to note that the vertical alignment between
+		 * lines which are being printed in different directions is
+		 * noticeably off in the 20+ years old printer used for testing =).
 		 */
-
-		if      (m_cr_pos_abs > m_last_fire + 1)
-			pos--;
-		else if (m_cr_pos_abs < m_last_fire - 1)
-			pos++;
-
-		LX810LLOG("FIRE0 %d %d %04x\n", m_pf_pos_abs, pos, m_printhead);
-
-		m_last_fire = pos;
+		LX810LLOG("FIRE0 %d %d %04x\n", m_pf_pos_abs, m_real_cr_pos, m_printhead);
 	}
 }
 
