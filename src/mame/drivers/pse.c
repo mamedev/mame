@@ -4,6 +4,7 @@
 
  Game Name                  DATA 
  --------------------------------
+ Maneater (1975)            YES
  Knights in Armor (1976)    YES
  Desert Patrol (1977)       YES
  Game Tree (1978)           YES
@@ -114,8 +115,7 @@ ROM_START( dpatrol )
 
 	ROM_REGION( 0x0800, "roms", ROMREGION_ERASE00 )
 	ROM_LOAD( "bd1.d2", 0x0000, 0x0400, CRC(e4c8e4ab) SHA1(0b989ca9369139f212dcea1d1461998f20057db8)) // computer program game code. 6341-1 or 82S181 according to Desert Patrol schematics 
-	// the one below should be at e2 according to schematics?
-	ROM_LOAD( "bd1.f2", 0x0000, 0x0400, CRC(256b3320) SHA1(712573e3d9625a84c54bbe2e3edafb8879a14b2e)) // computer program game code. 6341-1 or 82S181 according to Desert Patrol schematics 
+	ROM_LOAD( "bd1.e2", 0x0000, 0x0400, CRC(256b3320) SHA1(712573e3d9625a84c54bbe2e3edafb8879a14b2e)) // computer program game code. 6341-1 or 82S181 according to Desert Patrol schematics 
 
 	ROM_LOAD( "bd2.l4", 0x0000, 0x0200, CRC(bc87c648) SHA1(c4709d155aa50cc87146abd152a11de618cfd64c)) // prom 1 contains aircraft target images and explosion image. pcb has 82S141; schematics show 6341-1 
 	ROM_LOAD( "bd2.l1", 0x0000, 0x0800, CRC(f1e8ba9e) SHA1(605db3fdbaff4ba13729371ad0c4fbab3889378e)) // prom 2 contains parachute and man, falling man. pcb has 82S141; schematics show 6341-1 
