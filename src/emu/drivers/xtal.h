@@ -47,6 +47,7 @@ enum
     ------------------    ------------  ------------------------------------------------------------ */
 	XTAL_32_768kHz      = 32768,        /* 32.768kHz, used to drive RTC chips */
 	XTAL_1MHz           = 1000000,      /* Used to drive OKI M6295 chips */
+	XTAL_1_2944MHz      = 1294400,      /* BBN BitGraph PSG */
 	XTAL_1_75MHz        = 1750000,      /* RCA CDP1861 */
 	XTAL_1_8432MHz      = 1843200,      /* Bondwell 12/14 */
 	XTAL_1_9968MHz      = 1996800,      /* NEC PC-98xx */
@@ -80,6 +81,7 @@ enum
 	XTAL_6MHz           = 6000000,      /* American Poker II */
 	XTAL_6_144MHz       = 6144000,      /* Used on Alpha Denshi early 80's games sound board and Casio FP-200 main CPU */
 	XTAL_6_5MHz         = 6500000,      /* Jupiter Ace */
+	XTAL_6_9MHz         = 6900000,      /* BBN BitGraph CPU */
 	XTAL_7MHz           = 7000000,      /* Jaleco Mega System PCBs */
 	XTAL_7_15909MHz     = 7159090,      /* Blood Bros (2x NTSC subcarrier) */
 	XTAL_7_3728MHz      = 7372800,
