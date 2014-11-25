@@ -14313,8 +14313,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1086448">
-			</dataarea>
 				<rom name="fkekkaib.d88" size="1086448" crc="dc17c384" sha1="63baa05e21bcac3400aa99d2fceba34aae58fc92" offset="0" />
+			</dataarea>
 		</part>
 	</software>
 
