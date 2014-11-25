@@ -115,22 +115,26 @@ public:
 	// construction/destruction
 	dmv_k235_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+protected:
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
 
-	void irq0_w(int state) { m_pic->ir0_w(state); }
-	void irq1_w(int state) { m_pic->ir1_w(state); }
-	void irq2_w(int state) { m_pic->ir2_w(state); }
-	void irq3_w(int state) { m_pic->ir3_w(state); }
-	void irq4_w(int state) { m_pic->ir4_w(state); }
-	void irq5_w(int state) { m_pic->ir5_w(state); }
-	void irq6_w(int state) { m_pic->ir6_w(state); }
-	void irq7_w(int state) { m_pic->ir7_w(state); }
+	void timint_w(int state)  { m_pic->ir0_w(state); }
+	void keyint_w(int state)  { m_pic->ir1_w(state); }
+	void busint_w(int state)  { m_pic->ir2_w(state); }
+	void flexint_w(int state) { m_pic->ir6_w(state); }
+	void irq2a_w(int state)   { if (!(m_dsw->read() & 0x02))  m_pic->ir5_w(state); }
+	void irq2_w(int state)    { if ( (m_dsw->read() & 0x02))  m_pic->ir5_w(state); }
+	void irq3_w(int state)    { m_pic->ir3_w(state); }
+	void irq4_w(int state)    { m_pic->ir4_w(state); }
+	void irq5_w(int state)    { if (!(m_dsw->read() & 0x01))  m_pic->ir7_w(state); }
+	void irq6_w(int state)    { if ( (m_dsw->read() & 0x01))  m_pic->ir7_w(state); }
 
 private:
 	required_device<pic8259_device> m_pic;
-
+	required_ioport m_dsw;
 };
 
 // device type definition
