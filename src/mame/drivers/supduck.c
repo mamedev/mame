@@ -52,6 +52,13 @@ public:
 	DECLARE_WRITE16_MEMBER(tx_videoram_w);
 	DECLARE_WRITE16_MEMBER(bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(fg_videoram_w);
+	DECLARE_WRITE16_MEMBER(supduck_scroll_w);
+
+	DECLARE_WRITE16_MEMBER(supduck_4000_w);
+	DECLARE_WRITE16_MEMBER(supduck_4002_w);
+
+	TILEMAP_MAPPER_MEMBER(tigeroad_tilemap_scan);
+
 
 protected:
 
@@ -68,12 +75,18 @@ protected:
 
 };
 
+TILEMAP_MAPPER_MEMBER(supduck_state::tigeroad_tilemap_scan)
+{
+	/* logical (col,row) -> memory offset */
+	return (num_rows - 1 - row) * num_cols + col;
+}
+
 void supduck_state::video_start()
 {
 	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 8, 256);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 8, 256);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(supduck_state::tigeroad_tilemap_scan),this), 32, 32, 8, 256);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(supduck_state::tigeroad_tilemap_scan),this), 32, 32, 8, 256);
 
 	m_tx_tilemap->set_transparent_pen(3);
 
@@ -124,17 +137,16 @@ TILE_GET_INFO_MEMBER(supduck_state::get_tx_tile_info) // same as tigeroad.c
 
 TILE_GET_INFO_MEMBER(supduck_state::get_bg_tile_info)
 {
-	int m_bgcharbank = 0;
+	UINT16 *videoram = m_bg_videoram;
+	int data = videoram[tile_index];
+	int code = data & 0xff;
+	if (data & 0x4000) code |= 0x100;
+	if (data & 0x8000) code |= 0x200;
 
-	UINT16 *tilerom = m_bg_videoram;
-	int data = tilerom[tile_index];
-	int attr = tilerom[tile_index + 1];
-	int code = data + ((attr & 0xc0) << 2) + (m_bgcharbank << 10);
-	int color = attr & 0x0f;
-	int flags = (attr & 0x20) ? TILE_FLIPX : 0;
+	int color = 0;
+	int flags = 0;
 
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
-	tileinfo.group = (attr & 0x10) ? 1 : 0;
 }
 
 TILE_GET_INFO_MEMBER(supduck_state::get_fg_tile_info)
@@ -143,7 +155,10 @@ TILE_GET_INFO_MEMBER(supduck_state::get_fg_tile_info)
 	UINT16 *videoram = m_fg_videoram;
 	int data = videoram[tile_index];
 
-	int code = data;
+	int code = data & 0xff;
+	if (data & 0x4000) code |= 0x100;
+	if (data & 0x8000) code |= 0x200;
+
 	int color = 0;
 	int flags = 0;
 
@@ -192,10 +207,47 @@ void supduck_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	}
 }
 
+WRITE16_MEMBER(supduck_state::supduck_4000_w)
+{
+
+}
+
+WRITE16_MEMBER(supduck_state::supduck_4002_w)
+{
+	data &= mem_mask;
+	// soundlatch
+//	printf("supduck_4002_w %04x\n", data);
+}
+
+WRITE16_MEMBER(supduck_state::supduck_scroll_w)
+{
+	data &= mem_mask;
+
+	switch (offset)
+	{
+	case 0:
+		m_bg_tilemap->set_scrollx(0, data);
+		printf("bg x scroll %04x\n", data);
+
+		break;
+	case 1:
+		m_bg_tilemap->set_scrolly(0, -data - 32 * 8);
+		printf("bg y scroll %04x\n", data);
+
+		break;
+	case 2:
+		m_fg_tilemap->set_scrollx(0, data);
+		break;
+	case 3:
+		m_fg_tilemap->set_scrolly(0, -data - 32 * 8);
+		break;
+	}
+}
+
 
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, supduck_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_WRITENOP
 	AM_RANGE(0xfe0000, 0xfe1fff) AM_RAM AM_SHARE("spriteram") 
 //	AM_RANGE(0xfe0000, 0xfe07ff) AM_RAM /* RAM? */
 //	AM_RANGE(0xfe0800, 0xfe0cff) AM_RAM AM_SHARE("spriteram")
@@ -203,9 +255,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, supduck_state )
 //	AM_RANGE(0xfe4000, 0xfe4001) AM_WRITE(bionicc_gfxctrl_w)    /* + coin counters */
 //	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("SYSTEM")
 //	AM_RANGE(0xfe4002, 0xfe4003) AM_READ(supduck_random_r)
-	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("P1_P2")
-	AM_RANGE(0xfe4002, 0xfe4003) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("P1_P2") AM_WRITE( supduck_4000_w )
+	AM_RANGE(0xfe4002, 0xfe4003) AM_READ_PORT("SYSTEM") AM_WRITE( supduck_4002_w )
 	AM_RANGE(0xfe4004, 0xfe4005) AM_READ_PORT("DSW")
+
+	AM_RANGE(0xfe8000, 0xfe8007) AM_WRITE(supduck_scroll_w)
+	AM_RANGE(0xfe800e, 0xfe800f) AM_WRITENOP // watchdog or irqack
+
+	
 //	AM_RANGE(0xfe8010, 0xfe8017) AM_WRITE(bionicc_scroll_w)
 //	AM_RANGE(0xfe801a, 0xfe801b) AM_WRITE(bionicc_mpu_trigger_w)    /* ??? not sure, but looks like it */
 	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(tx_videoram_w) AM_SHARE("txvideoram")
