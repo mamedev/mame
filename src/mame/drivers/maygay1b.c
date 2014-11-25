@@ -680,7 +680,7 @@ DRIVER_INIT_MEMBER(maygay1b_state,m1common)
 {
 	//Initialise paging for non-extended ROM space
 	UINT8 *rom = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 1, &rom[0x0e000], 0x10000);
+	membank("bank1")->configure_entries(0, 2, &rom[0x0e000], 0x10000);
 	membank("bank1")->set_entry(0);
 
 	// print out the rom id / header info to give us some hints
