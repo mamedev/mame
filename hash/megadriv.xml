@@ -3153,9 +3153,9 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Garry Kitchen's Super Battletank - War in the Gulf (USA)</description>
 		<year>1992</year>
 		<publisher>Absolute Entertainment</publisher>
+		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-15273 W95"/>
-		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="mpr-15273 w95.ic1" size="524288" crc="b0b5e3c9" sha1="4ce9aaaa9d3f98e1747af12ad488b6bdbde1afb4" offset="0x000000"/>
 			</dataarea>
