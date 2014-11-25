@@ -77,8 +77,10 @@ DEVICE_ADDRESS_MAP_START(internal_io_map, 32, i6300esb_lpc_device)
 		AM_RANGE(0x004c, 0x004f) AM_READWRITE8(siu_data_port_r,   siu_data_port_w,   0xff000000)
 	}
 
-	AM_RANGE(0x80, 0x83) AM_WRITE8(                  nop_w,       0x000000ff) // POST/non-existing, used for delays by the bios/os
-	AM_RANGE(0xec, 0xef) AM_WRITE8(                  nop_w,       0x0000ff00) // Non-existing, used for delays by the bios/os
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(    nmi_sc_r,          nmi_sc_w,          0x0000ff00)
+
+	AM_RANGE(0x0080, 0x0083) AM_WRITE8(                           nop_w,             0x000000ff) // POST/non-existing, used for delays by the bios/os
+	AM_RANGE(0x00ec, 0x00ef) AM_WRITE8(                           nop_w,             0x0000ff00) // Non-existing, used for delays by the bios/os
 ADDRESS_MAP_END
 
 
@@ -117,6 +119,7 @@ void i6300esb_lpc_device::device_reset()
 	mon_fwd_en = 0;
 	memset(mon_trp_rng, 0, sizeof(mon_trp_rng));
 	mon_trp_msk = 0;
+	nmi_sc = 0;
 }
 
 void i6300esb_lpc_device::reset_all_mappings()
@@ -634,6 +637,19 @@ WRITE8_MEMBER (i6300esb_lpc_device::siu_data_port_w)
 	}
 	logerror("%s: siu config write port %02x, %02x\n", tag(), siu_config_port, data);
 }
+
+READ8_MEMBER  (i6300esb_lpc_device::nmi_sc_r)
+{
+	nmi_sc ^= 0x10;
+	return nmi_sc;
+}
+
+WRITE8_MEMBER (i6300esb_lpc_device::nmi_sc_w)
+{
+	nmi_sc = data;
+	logerror("%s: nmi_sc = %02x\n", tag(), nmi_sc);
+}
+
 
 WRITE8_MEMBER (i6300esb_lpc_device::nop_w)
 {

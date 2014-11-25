@@ -38,7 +38,7 @@ private:
 	UINT8 pirq_rout[8];
 	UINT8 acpi_cntl, tco_cntl, gpio_cntl, serirq_cntl, d31_err_cfg, d31_err_sts, gen_sta, back_cntl, rtc_conf;
 	UINT8 lpc_if_com_range, lpc_if_fdd_lpt_range, lpc_if_sound_range, fwh_dec_en1, fwh_dec_en2, siu_config_port;
-	UINT8 gen_pmcon_3, apm_cnt, apm_sts, mon_fwd_en;
+	UINT8 gen_pmcon_3, apm_cnt, apm_sts, mon_fwd_en, nmi_sc;
 	int siu_config_state;
 
 	DECLARE_WRITE8_MEMBER (nop_w);
@@ -130,6 +130,8 @@ private:
 	DECLARE_WRITE8_MEMBER (siu_config_port_w);
 	DECLARE_READ8_MEMBER  (siu_data_port_r);        // 4f
 	DECLARE_WRITE8_MEMBER (siu_data_port_w);
+	DECLARE_READ8_MEMBER  (nmi_sc_r);               // 61
+	DECLARE_WRITE8_MEMBER (nmi_sc_w);
 
 	void map_bios(address_space *memory_space, UINT32 start, UINT32 end, int idsel);
 };
