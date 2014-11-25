@@ -1294,7 +1294,7 @@ static MACHINE_CONFIG_START( apple2_common, napple2_state )
 	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl3", apple2_cards, NULL)
 	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl4", apple2_cards, "mockingboard")
 	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl5", apple2_cards, NULL)
-	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl6", apple2_cards, "diskii")
+	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl6", apple2_cards, "diskiing")
 	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl7", apple2_cards, NULL)
 
 	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple2")
