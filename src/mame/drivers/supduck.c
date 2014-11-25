@@ -13,7 +13,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-
+#include "video/bufsprite.h"
 
 class supduck_state : public driver_device
 {
@@ -22,8 +22,10 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
+			m_spriteram(*this, "spriteram") ,
 			m_tx_videoram(*this, "txvideoram"),
-			m_gfxdecode(*this, "gfxdecode")
+			m_gfxdecode(*this, "gfxdecode"),
+			m_palette(*this, "palette")
 	{ }
 
 	// devices
@@ -31,9 +33,11 @@ public:
 	required_device<z80_device> m_audiocpu;
 
 	// shared pointers
+	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<UINT16> m_tx_videoram;
 
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	tilemap_t     *m_tx_tilemap;
 
@@ -49,16 +53,24 @@ protected:
 
 	virtual void video_start();
 
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 };
 
 void supduck_state::video_start()
 {
 	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tx_tilemap->set_transparent_pen(3);
+
 }
 
 UINT32 supduck_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(m_palette->black_pen(), cliprect);
+
+	draw_sprites(bitmap, cliprect, 0);
+	draw_sprites(bitmap, cliprect, 1); //draw priority sprites?
+
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -70,22 +82,65 @@ WRITE16_MEMBER(supduck_state::tx_videoram_w)
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(supduck_state::get_tx_tile_info)
+TILE_GET_INFO_MEMBER(supduck_state::get_tx_tile_info) // same as tigeroad.c
 {
-	int data = m_tx_videoram[tile_index];
-	
-	int tileno = data & 0xff;
-//	tileno |= (data & 0x7000) >> 4;
+	UINT16 *videoram = m_tx_videoram;
+	int data = videoram[tile_index];
+	int attr = data >> 8;
+	int code = (data & 0xff) + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5);
+	int color = attr & 0x0f;
+	int flags = (attr & 0x10) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
+
+void supduck_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
+{
+	UINT16 *source = &m_spriteram->buffer()[m_spriteram->bytes()/2] - 4;
+	UINT16 *finish = m_spriteram->buffer();
+
+	while (source >= finish)
+	{
+		int tile_number = source[0];
+
+		if (tile_number != 0xfff) {
+			int attr = source[1];
+			int sy = source[2] & 0x1ff;
+			int sx = source[3] & 0x1ff;
+
+			int flipx = attr & 0x02;
+			int flipy = attr & 0x01;
+			int color = (attr >> 2) & 0x0f;
+
+			if (sx > 0x100) sx -= 0x200;
+			if (sy > 0x100) sy -= 0x200;
+
+			if (flip_screen())
+			{
+				sx = 240 - sx;
+				sy = 240 - sy;
+				flipx = !flipx;
+				flipy = !flipy;
+			}
+
+
+				m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
+				tile_number,
+				color,
+				flipx, flipy,
+				sx, 240 - sy, 15);
+		}
+
+		source -= 4;
+	}
+}
 
 
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, supduck_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0xfe0000, 0xfe1fff) AM_RAM
+	AM_RANGE(0xfe0000, 0xfe1fff) AM_RAM AM_SHARE("spriteram") 
 //	AM_RANGE(0xfe0000, 0xfe07ff) AM_RAM /* RAM? */
 //	AM_RANGE(0xfe0800, 0xfe0cff) AM_RAM AM_SHARE("spriteram")
 //	AM_RANGE(0xfe0d00, 0xfe3fff) AM_RAM              /* RAM? */
@@ -265,8 +320,11 @@ static MACHINE_CONFIG_START( supduck, supduck_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_UPDATE_DRIVER(supduck_state, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
+
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supduck)
 
@@ -324,4 +382,4 @@ ROM_START( supduck )
 	ROM_LOAD( "1.su13",   0x00000, 0x80000, CRC(7fb1ed42) SHA1(77ec86a6454398e329066aa060e9b6a39085ce71) ) // banked sample data
 ROM_END
 
-GAME( 1993, supduck, 0, supduck, supduck, driver_device, 0, ROT0, "Comad", "Super Duck", GAME_NOT_WORKING )
+GAME( 1992, supduck, 0, supduck, supduck, driver_device, 0, ROT0, "Comad", "Super Duck", GAME_NOT_WORKING )
