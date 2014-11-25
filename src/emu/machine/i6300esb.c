@@ -86,7 +86,8 @@ ADDRESS_MAP_END
 
 i6300esb_lpc_device::i6300esb_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pci_device(mconfig, I6300ESB_LPC, "i6300ESB southbridge ISA/LPC bridge", tag, owner, clock, "i6300esb_lpc", __FILE__),
-	  acpi(*this, "acpi")
+	  acpi(*this, "acpi"),
+	  rtc (*this, "rtc")
 {
 }
 
@@ -104,7 +105,6 @@ void i6300esb_lpc_device::device_reset()
 	d31_err_cfg = 0x00;
 	d31_err_sts = 0x00;
 	pci_dma_cfg = 0x0000;
-	rtc_conf = 0x00;
 	func_dis = 0x0080;
 	etr1 = 0x00000000;
 	siu_config_port = 0;
@@ -140,6 +140,7 @@ void i6300esb_lpc_device::reset_all_mappings()
 	lpc_en = 0x0000;
 	fwh_sel1 = 0x00112233;
 	gen_cntl = 0x00000080;
+	rtc_conf = 0x00;
 }
 
 READ32_MEMBER (i6300esb_lpc_device::pmbase_r)
@@ -433,6 +434,7 @@ WRITE8_MEMBER (i6300esb_lpc_device::rtc_conf_w)
 {
 	rtc_conf = data;
 	logerror("%s: rtc_conf = %02x\n", tag(), rtc_conf);
+	remap_cb();
 }
 
 READ8_MEMBER  (i6300esb_lpc_device::lpc_if_com_range_r)
@@ -743,6 +745,10 @@ void i6300esb_lpc_device::map_extra(UINT64 memory_window_start, UINT64 memory_wi
 		UINT16 coma = com_pos[lpc_if_com_range & 7];
 		logerror("%s: Warning: coma at %04x-%04x\n", tag(), coma, coma+7);
 	}
+
+	rtc->map_device(memory_window_start, memory_window_end, 0, memory_space, io_window_start, io_window_end, 0, io_space);
+	if(rtc_conf & 4)
+		rtc->map_extdevice(memory_window_start, memory_window_end, 0, memory_space, io_window_start, io_window_end, 0, io_space);
 }
 
 
