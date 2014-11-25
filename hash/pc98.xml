@@ -19361,8 +19361,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<info name="alt_title" value="雀ＯＨ！クエスト" />
 		<info name="release" value="19920910" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
 			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1265664">
 				<rom name="joquest1.fdi" size="1265664" crc="38c42198" sha1="655304903923589d053655557a1ef7441ea7ddc8" offset="0" />
 			</dataarea>
 		</part>
@@ -27124,8 +27124,8 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<info name="alt_title" value="ヌーク あばかれた陰謀" />
 		<info name="release" value="19921113" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
 			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1265664">
 				<rom name="nooch_a.fdi" size="1265664" crc="6158fa40" sha1="9c38a0ed7023532312c73cef280c185a05c80732" offset="0" />
 			</dataarea>
 		</part>
@@ -27945,8 +27945,8 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<info name="alt_title" value="パラ・ダイス ～君は追い剥ぎを見たか？～" />
 		<info name="release" value="19911129" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
 			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1265664">
 				<rom name="paradice (aion)(disk 1 of 2).fdi" size="1265664" crc="c5146886" sha1="c8323412938fe8aa26b02646829355bb8e0d9009" offset="0" />
 			</dataarea>
 		</part>
@@ -30507,8 +30507,8 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<info name="alt_title" value="クエストフォーグローリィ" />
 		<info name="release" value="19910412" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1186816">
 			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1186816">
 				<rom name="disk 01.fdi" size="1186816" crc="695c079e" sha1="93195094944af1d88338c4a2ce82f9188a7f3898" offset="0" />
 			</dataarea>
 		</part>
@@ -40869,8 +40869,8 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<info name="alt_title" value="ワーズ・ワース スペシャルディスク" />
 		<info name="usage" value="Requires &quot;Words Worth&quot; to work" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
 			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1265664">
 				<rom name="ww_sp_a.fdi" size="1265664" crc="572c9c12" sha1="98fdfadc5bb2d246b4c9d15d4b6c87b117297de8" offset="0" />
 			</dataarea>
 		</part>
@@ -44121,8 +44121,8 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="1329680">
 			<feature name="part_id" value="Event Disk"/>
+			<dataarea name="flop" size="1329680">
 				<rom name="event.nfd" size="1329680" crc="c9319157" sha1="2daeff81931661af78006dee5298830e7d7fee3a" offset="0" />
 			</dataarea>
 		</part>
@@ -45191,8 +45191,8 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
 			<feature name="part_id" value="Opening"/>
+			<dataarea name="flop" size="1261568">
 				<rom name="joshua_o.hdm" size="1261568" crc="3d9089be" sha1="bfaa0ccbbdaa32598b77e6fdcb75e67ed3613f69" offset="0" />
 			</dataarea>
 		</part>
@@ -47050,7 +47050,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="ppdsk04" suppotred="no">
+	<software name="ppdsk04" supported="no">
 		<description>PP Disk No. 04</description>
 		<year>19??</year>
 		<publisher>メディアックス (Mediax)</publisher>
