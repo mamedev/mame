@@ -24,6 +24,8 @@ public:
 			m_audiocpu(*this, "audiocpu"),
 			m_spriteram(*this, "spriteram") ,
 			m_tx_videoram(*this, "txvideoram"),
+			m_bg_videoram(*this, "bgvideoram"),
+			m_fg_videoram(*this, "fgvideoram"),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_palette(*this, "palette")
 	{ }
@@ -35,15 +37,21 @@ public:
 	// shared pointers
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<UINT16> m_tx_videoram;
+	required_shared_ptr<UINT16> m_bg_videoram;
+	required_shared_ptr<UINT16> m_fg_videoram;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 	tilemap_t     *m_tx_tilemap;
+	tilemap_t     *m_bg_tilemap;
+	tilemap_t     *m_fg_tilemap;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE16_MEMBER(tx_videoram_w);
+	DECLARE_WRITE16_MEMBER(bg_videoram_w);
+	DECLARE_WRITE16_MEMBER(fg_videoram_w);
 
 protected:
 
@@ -55,11 +63,18 @@ protected:
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+
 };
 
 void supduck_state::video_start()
 {
 	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 8, 256);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 8, 256);
+
 	m_tx_tilemap->set_transparent_pen(3);
 
 }
@@ -82,6 +97,19 @@ WRITE16_MEMBER(supduck_state::tx_videoram_w)
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
+WRITE16_MEMBER(supduck_state::bg_videoram_w)
+{
+	COMBINE_DATA(&m_bg_videoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+WRITE16_MEMBER(supduck_state::fg_videoram_w)
+{
+	COMBINE_DATA(&m_fg_videoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+
 TILE_GET_INFO_MEMBER(supduck_state::get_tx_tile_info) // same as tigeroad.c
 {
 	UINT16 *videoram = m_tx_videoram;
@@ -92,6 +120,34 @@ TILE_GET_INFO_MEMBER(supduck_state::get_tx_tile_info) // same as tigeroad.c
 	int flags = (attr & 0x10) ? TILE_FLIPY : 0;
 
 	SET_TILE_INFO_MEMBER(0, code, color, flags);
+}
+
+TILE_GET_INFO_MEMBER(supduck_state::get_bg_tile_info)
+{
+	int m_bgcharbank = 0;
+
+	UINT16 *tilerom = m_bg_videoram;
+	int data = tilerom[tile_index];
+	int attr = tilerom[tile_index + 1];
+	int code = data + ((attr & 0xc0) << 2) + (m_bgcharbank << 10);
+	int color = attr & 0x0f;
+	int flags = (attr & 0x20) ? TILE_FLIPX : 0;
+
+	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	tileinfo.group = (attr & 0x10) ? 1 : 0;
+}
+
+TILE_GET_INFO_MEMBER(supduck_state::get_fg_tile_info)
+{
+
+	UINT16 *videoram = m_fg_videoram;
+	int data = videoram[tile_index];
+
+	int code = data;
+	int color = 0;
+	int flags = 0;
+
+	SET_TILE_INFO_MEMBER(2, code, color, flags);
 }
 
 
@@ -147,12 +203,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, supduck_state )
 //	AM_RANGE(0xfe4000, 0xfe4001) AM_WRITE(bionicc_gfxctrl_w)    /* + coin counters */
 //	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("SYSTEM")
 //	AM_RANGE(0xfe4002, 0xfe4003) AM_READ(supduck_random_r)
+	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("P1_P2")
+	AM_RANGE(0xfe4002, 0xfe4003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xfe4004, 0xfe4005) AM_READ_PORT("DSW")
 //	AM_RANGE(0xfe8010, 0xfe8017) AM_WRITE(bionicc_scroll_w)
 //	AM_RANGE(0xfe801a, 0xfe801b) AM_WRITE(bionicc_mpu_trigger_w)    /* ??? not sure, but looks like it */
 	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(tx_videoram_w) AM_SHARE("txvideoram")
-	AM_RANGE(0xff0000, 0xff3fff) AM_RAM // AM_RAM_WRITE(bionicc_fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0xff4000, 0xff7fff) AM_RAM // AM_RAM_WRITE(bionicc_bgvideoram_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0xff0000, 0xff3fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0xff4000, 0xff7fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bgvideoram")
 	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM /* working RAM */
 ADDRESS_MAP_END
@@ -164,6 +222,35 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( supduck )
+	PORT_START("P1_P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") /* not sure, probably wrong */
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN2 )
+
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
@@ -246,39 +333,34 @@ static const gfx_layout vramlayout_bionicc=
 	128   /* every character takes 128 consecutive bytes */
 };
 
-static const gfx_layout scroll2layout_bionicc=
+// same as the ROM tilemap layout from tigeroad
+static const gfx_layout tile_layout = 
 {
-	8,8,    /* 8*8 tiles */
-	RGN_FRAC(1,2),   /* 2048 tiles */
-	4,      /* 4 bits per pixel */
-	{ RGN_FRAC(1,2)+4,RGN_FRAC(1,2)+0,RGN_FRAC(0,2)+4,RGN_FRAC(0,2)+0 },
-	{ 0,1,2,3, 8,9,10,11 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	128   /* every tile takes 128 consecutive bytes */
+	32, 32,
+	RGN_FRAC(1, 2),
+	4,
+	{ RGN_FRAC(1, 2) + 4, RGN_FRAC(1, 2) + 0, 4, 0 },
+	{
+		0, 1, 2, 3, 8 + 0, 8 + 1, 8 + 2, 8 + 3,
+		64 * 8 + 0, 64 * 8 + 1, 64 * 8 + 2, 64 * 8 + 3, 64 * 8 + 8 + 0, 64 * 8 + 8 + 1, 64 * 8 + 8 + 2, 64 * 8 + 8 + 3,
+		2 * 64 * 8 + 0, 2 * 64 * 8 + 1, 2 * 64 * 8 + 2, 2 * 64 * 8 + 3, 2 * 64 * 8 + 8 + 0, 2 * 64 * 8 + 8 + 1, 2 * 64 * 8 + 8 + 2, 2 * 64 * 8 + 8 + 3,
+		3 * 64 * 8 + 0, 3 * 64 * 8 + 1, 3 * 64 * 8 + 2, 3 * 64 * 8 + 3, 3 * 64 * 8 + 8 + 0, 3 * 64 * 8 + 8 + 1, 3 * 64 * 8 + 8 + 2, 3 * 64 * 8 + 8 + 3,
+	},
+	{
+		0 * 16, 1 * 16, 2 * 16, 3 * 16, 4 * 16, 5 * 16, 6 * 16, 7 * 16,
+		8 * 16, 9 * 16, 10 * 16, 11 * 16, 12 * 16, 13 * 16, 14 * 16, 15 * 16,
+		16 * 16, 17 * 16, 18 * 16, 19 * 16, 20 * 16, 21 * 16, 22 * 16, 23 * 16,
+		24 * 16, 25 * 16, 26 * 16, 27 * 16, 28 * 16, 29 * 16, 30 * 16, 31 * 16
+	},
+	256 * 8
 };
 
-static const gfx_layout scroll1layout_bionicc=
-{
-	16,16,  /* 16*16 tiles */
-	RGN_FRAC(1,2),   /* 2048 tiles */
-	4,      /* 4 bits per pixel */
-	{ RGN_FRAC(1,2)+4,RGN_FRAC(1,2)+0,RGN_FRAC(0,2)+4,RGN_FRAC(0,2)+0 },
-	{
-		0,1,2,3, 8,9,10,11,
-		(8*4*8)+0,(8*4*8)+1,(8*4*8)+2,(8*4*8)+3,
-		(8*4*8)+8,(8*4*8)+9,(8*4*8)+10,(8*4*8)+11
-	},
-	{
-		0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-		8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16
-	},
-	512   /* each tile takes 512 consecutive bytes */
-};
+
 
 static GFXDECODE_START( supduck )
 	GFXDECODE_ENTRY( "gfx1", 0, vramlayout_bionicc,    768, 64 )    /* colors 768-1023 */
-	GFXDECODE_ENTRY( "gfx2", 0, scroll2layout_bionicc,   0,  4 )    /* colors   0-  63 */
-	GFXDECODE_ENTRY( "gfx3", 0, scroll1layout_bionicc, 256,  4 )    /* colors 256- 319 */
+	GFXDECODE_ENTRY( "gfx2", 0, tile_layout,   0,  4 )    /* colors   0-  63 */
+	GFXDECODE_ENTRY( "gfx3", 0, tile_layout, 256,  4 )    /* colors 256- 319 */
 	GFXDECODE_ENTRY( "gfx4", 0, spritelayout_bionicc,  512, 16 )    /* colors 512- 767 */
 GFXDECODE_END
 
@@ -317,7 +399,7 @@ static MACHINE_CONFIG_START( supduck, supduck_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_UPDATE_DRIVER(supduck_state, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
@@ -372,8 +454,8 @@ ROM_START( supduck )
 	ROM_REGION( 0x80000, "gfx4", 0 )
 	ROM_LOAD( "15.u1d",   0x00000, 0x20000, CRC(81bf1f27) SHA1(7a66630a2da85387904917d3c136880dffcb9649) )
 	ROM_LOAD( "16.u2d",   0x20000, 0x20000, CRC(9573d6ec) SHA1(9923be782bae47c49913d01554bcf3e5efb5395b) )
-	ROM_LOAD( "17.u1c",   0x40000, 0x20000, CRC(21ef14d4) SHA1(66e389aaa1186921a07da9a9a9eda88a1083ad42) )
-	ROM_LOAD( "18.u2c",   0x60000, 0x20000, CRC(33dd0674) SHA1(b95dfcc16d939bac77f338b8a8cada19328a1993) ) 
+	ROM_LOAD( "17.u1c",   0x60000, 0x20000, CRC(21ef14d4) SHA1(66e389aaa1186921a07da9a9a9eda88a1083ad42) )
+	ROM_LOAD( "18.u2c",   0x40000, 0x20000, CRC(33dd0674) SHA1(b95dfcc16d939bac77f338b8a8cada19328a1993) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "2.su12",   0x00000, 0x20000, CRC(745d42fb) SHA1(f9aee3ddbad3cc2f3a7002ee0d762eb041967e1e) ) // static sample data
