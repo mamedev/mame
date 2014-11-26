@@ -62,6 +62,7 @@ public:
 
 	TILEMAP_MAPPER_MEMBER(supduk_tilemap_scan);
 
+	DECLARE_WRITE8_MEMBER(okibank_w);
 
 protected:
 
@@ -257,8 +258,10 @@ WRITE16_MEMBER(supduck_state::supduck_paletteram_w)  // wrong
 WRITE16_MEMBER(supduck_state::supduck_4002_w)
 {
 	data &= mem_mask;
-	// soundlatch
-//	printf("supduck_4002_w %04x\n", data);
+
+	soundlatch_byte_w(space, 0, (data>>8));
+	m_audiocpu->set_input_line(0, HOLD_LINE);
+
 }
 
 WRITE16_MEMBER(supduck_state::supduck_scroll_w)
@@ -313,7 +316,22 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, supduck_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(okibank_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( oki_map, AS_0, 8, supduck_state )
+	AM_RANGE(0x00000, 0x1ffff) AM_ROM
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
+ADDRESS_MAP_END
+
+WRITE8_MEMBER(supduck_state::okibank_w)
+{
+	// bit 0x80 is written on startup?
+
+	membank("okibank")->set_entry(data&0x03);
+}
 
 
 static INPUT_PORTS_START( supduck )
@@ -325,7 +343,7 @@ static INPUT_PORTS_START( supduck )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
@@ -333,7 +351,7 @@ static INPUT_PORTS_START( supduck )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -463,6 +481,8 @@ GFXDECODE_END
 
 void supduck_state::machine_start()
 {
+	membank("okibank")->configure_entries(0, 4, memregion("okibank")->base(), 0x20000);
+	membank("okibank")->set_entry(0);
 }
 
 void supduck_state::machine_reset()
@@ -513,6 +533,8 @@ static MACHINE_CONFIG_START( supduck, supduck_state )
 
 	MCFG_OKIM6295_ADD("oki", 8000000/8, OKIM6295_PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+
 MACHINE_CONFIG_END
 
 
