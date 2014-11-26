@@ -7363,7 +7363,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 	</software>
 
 	<software name="casablan">
-		<description>Casablanca ni Ai wo - Satsujin-sha wa Jikuu wo Koete</description>
+		<description>Casablanca ni Ai o - Satsujin-sha wa Jikuu o Koete</description>
 		<year>1986</year>
 		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
 		<info name="alt_title" value="カサブランカに愛を 殺人者は時空を越えて" />
@@ -40066,7 +40066,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="watagolf">
-		<description>Watashi wo Golf ni Tsuretette</description>
+		<description>Watashi o Golf ni Tsuretette</description>
 		<year>1991</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
 		<info name="alt_title" value="私をゴルフに連れてって" />
@@ -41770,7 +41770,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="yaritai2">
-		<description>Yaritai Houdai 2 - Tourist wo Nerae!!</description>
+		<description>Yaritai Houdai 2 - Tourist o Nerae!!</description>
 		<year>1989</year>
 		<publisher>全流通 (Zenryutsu)</publisher>
 		<info name="alt_title" value="やりたい放題２ ツーリストを狙え！！" />
@@ -47237,7 +47237,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="rance" supported="no">
-		<description>Rance - Hikari wo Motomete</description>
+		<description>Rance - Hikari o Motomete</description>
 		<year>1989</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="alt_title" value="ランス 光をもとめて" />
@@ -50793,7 +50793,7 @@ SPACE EMPIRE
 	</software>
 
 	<software name="dennoga3" supported="no">
-		<description>Dennou Gakuen 3 - Cybernetic Hi-School III - Top wo Nerae!</description>
+		<description>Dennou Gakuen 3 - Cybernetic Hi-School III - Top o Nerae!</description>
 		<year>1990</year>
 		<publisher>ガイナックス (Gainax)</publisher>
 		<info name="alt_title" value="電脳学園３ トップをねらえ！" />
