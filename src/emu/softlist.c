@@ -196,7 +196,10 @@ software_info::software_info(software_list_device &list, const char *name, const
 		m_list(list),
 		m_supported(SOFTWARE_SUPPORTED_YES),
 		m_shortname(name),
-		m_parentname(parent)
+		m_longname(NULL),
+		m_parentname(parent),
+		m_year(NULL),
+		m_publisher(NULL)
 {
 	// ensure strings we are passed are in the string pool
 	assert(list.string_pool_contains(name));
