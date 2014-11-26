@@ -31,13 +31,13 @@ class astrocade_rom_256k_device : public astrocade_rom_device
 public:
 	// construction/destruction
 	astrocade_rom_256k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	virtual void device_start();
 	virtual void device_reset();
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
-	
+
 private:
 	UINT8 m_base_bank;
 };
@@ -49,13 +49,13 @@ class astrocade_rom_512k_device : public astrocade_rom_device
 public:
 	// construction/destruction
 	astrocade_rom_512k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
-	
+
 private:
 	UINT8 m_base_bank;
 };

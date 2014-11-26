@@ -297,7 +297,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	required_shared_ptr<UINT8> m_nvram;
 	required_shared_ptr<UINT8> m_1800_regs;
 	required_shared_ptr<UINT8> m_vregs;
@@ -305,7 +305,7 @@ public:
 	required_shared_ptr<UINT8> m_2c01_regs;
 	required_shared_ptr<UINT8> m_3000_regs;
 	required_shared_ptr<UINT8> m_3800_regs;
-	
+
 	bitmap_ind16 *m_temp_reel_bitmap;
 	tilemap_t *m_tilemap;
 	tilemap_t *m_reel_tilemap;
@@ -318,7 +318,7 @@ public:
 	UINT8 *m_reel3_ram;
 	UINT8 *m_reel4_ram;
 	UINT8* m_videoram;
-	
+
 	DECLARE_WRITE8_MEMBER(sfbonus_videoram_w);
 	DECLARE_WRITE8_MEMBER(sfbonus_bank_w);
 	DECLARE_READ8_MEMBER(sfbonus_2800_r);

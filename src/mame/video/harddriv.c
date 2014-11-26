@@ -410,9 +410,9 @@ static void display_speedups(void)
 TMS340X0_SCANLINE_IND16_CB_MEMBER(harddriv_state::scanline_driver)
 {
 	UINT8 *vram_base = &m_gsp_vram[(params->rowaddr << 12) & m_vram_mask];
-	
+
 	if (!vram_base) return;
-	
+
 	UINT16 *dest = &bitmap.pix16(scanline);
 	int coladdr = (params->yoffset << 9) + ((params->coladdr & 0xff) << 4) - 15 + (m_gfx_finescroll & 0x0f);
 	int x;
@@ -429,8 +429,8 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(harddriv_state::scanline_multisync)
 {
 	UINT8 *vram_base = &m_gsp_vram[(params->rowaddr << 11) & m_vram_mask];
 
-	if (!vram_base) return;	
-	
+	if (!vram_base) return;
+
 	UINT16 *dest = &bitmap.pix16(scanline);
 	int coladdr = (params->yoffset << 9) + ((params->coladdr & 0xff) << 3) - 7 + (m_gfx_finescroll & 0x07);
 	int x;

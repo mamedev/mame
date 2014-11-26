@@ -86,8 +86,8 @@ ADDRESS_MAP_END
 
 i6300esb_lpc_device::i6300esb_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pci_device(mconfig, I6300ESB_LPC, "i6300ESB southbridge ISA/LPC bridge", tag, owner, clock, "i6300esb_lpc", __FILE__),
-	  acpi(*this, "acpi"),
-	  rtc (*this, "rtc")
+		acpi(*this, "acpi"),
+		rtc (*this, "rtc")
 {
 }
 
@@ -661,7 +661,7 @@ void i6300esb_lpc_device::map_bios(address_space *memory_space, UINT32 start, UI
 {
 	// Ignore idsel, a16 inversion for now
 	UINT32 mask = m_region->bytes() - 1;
-	memory_space->install_rom(start, end, m_region->base() + (start & mask));	
+	memory_space->install_rom(start, end, m_region->base() + (start & mask));
 }
 
 void i6300esb_lpc_device::map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
@@ -750,5 +750,3 @@ void i6300esb_lpc_device::map_extra(UINT64 memory_window_start, UINT64 memory_wi
 	if(rtc_conf & 4)
 		rtc->map_extdevice(memory_window_start, memory_window_end, 0, memory_space, io_window_start, io_window_end, 0, io_space);
 }
-
-

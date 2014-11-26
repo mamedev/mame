@@ -34,7 +34,7 @@ private:
 
 	const char *key_tag;
 
-	
+
 	required_device<sega_315_5881_crypt_device> m_cryptdevice;
 };
 

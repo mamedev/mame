@@ -2207,7 +2207,7 @@ Ballonies (198x)
 	</software>
 
 	<!-- Joystick -->
-	
+
 	<software name="joysti01">
 		<description>Joystick 01</description>
 		<year>1985</year>
@@ -2339,9 +2339,9 @@ Ballonies (198x)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- MKOD -->
-	
+
 	<software name="mkod01">
 		<description>MKOD Collection 01</description>
 		<year>19??</year>
@@ -2569,7 +2569,7 @@ Ballonies (198x)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- BASIC Collections -->
 
 	<software name="basicc01">

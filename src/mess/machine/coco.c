@@ -681,11 +681,11 @@ void coco_state::update_sound(void)
 	/* determine the sound mux status */
 	soundmux_status_t status = soundmux_status();
 
-    /* the SC77526 DAC chip internally biases the AC-coupled sound inputs for Cassette and Cartridge at the midpoint of the 3.9v output range */
-    bool bCassSoundEnable = (status == (SOUNDMUX_ENABLE | SOUNDMUX_SEL1));
-    bool bCartSoundEnable = (status == (SOUNDMUX_ENABLE | SOUNDMUX_SEL2));
-    UINT8 cassette_sound = (bCassSoundEnable ? 0x40 : 0);
-    UINT8 cart_sound = (bCartSoundEnable ? 0x40 : 0);
+	/* the SC77526 DAC chip internally biases the AC-coupled sound inputs for Cassette and Cartridge at the midpoint of the 3.9v output range */
+	bool bCassSoundEnable = (status == (SOUNDMUX_ENABLE | SOUNDMUX_SEL1));
+	bool bCartSoundEnable = (status == (SOUNDMUX_ENABLE | SOUNDMUX_SEL2));
+	UINT8 cassette_sound = (bCassSoundEnable ? 0x40 : 0);
+	UINT8 cart_sound = (bCartSoundEnable ? 0x40 : 0);
 
 	/* determine the value to send to the DAC */
 	m_dac_output = (m_pia_1->a_output() & 0xFC) >> 2;
@@ -1161,10 +1161,10 @@ WRITE8_MEMBER( coco_state::ff60_write )
 
 READ8_MEMBER( coco_state::ff40_read )
 {
-    if (offset >= 1 && offset <= 2 && m_beckerportconfig->read_safe(0) == 1)
-    {
-        return m_beckerport->read(space, offset-1, mem_mask);
-    }
+	if (offset >= 1 && offset <= 2 && m_beckerportconfig->read_safe(0) == 1)
+	{
+		return m_beckerport->read(space, offset-1, mem_mask);
+	}
 
 	return m_cococart->read(space, offset, mem_mask);
 }
@@ -1177,10 +1177,10 @@ READ8_MEMBER( coco_state::ff40_read )
 
 WRITE8_MEMBER( coco_state::ff40_write )
 {
-    if (offset >= 1 && offset <= 2 && m_beckerportconfig->read_safe(0) == 1)
-    {
-        return m_beckerport->write(space, offset-1, data, mem_mask);
-    }
+	if (offset >= 1 && offset <= 2 && m_beckerportconfig->read_safe(0) == 1)
+	{
+		return m_beckerport->write(space, offset-1, data, mem_mask);
+	}
 
 	m_cococart->write(space, offset, data, mem_mask);
 }

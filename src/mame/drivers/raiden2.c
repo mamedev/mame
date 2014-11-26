@@ -1368,7 +1368,7 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-#if 1	
+#if 1
 	MCFG_SCREEN_REFRESH_RATE(55.47) /* verified on pcb */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(500) /* not accurate */)
 	MCFG_SCREEN_SIZE(44*8, 34*8)

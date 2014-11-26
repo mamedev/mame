@@ -668,7 +668,7 @@ UINT32 apple2_state::screen_update_apple2(screen_device &screen, bitmap_ind16 &b
 }
 
 /*
-	New implementation 
+    New implementation
 */
 
 const device_type APPLE2_VIDEO = &device_creator<a2_video_device>;
@@ -784,8 +784,8 @@ void a2_video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int yp
 	{
 		if ((code >= 0x60) && (code <= 0x7f))
 		{
-			code |= 0x80;	// map to lowercase normal
-			i = fg;			// and flip the color
+			code |= 0x80;   // map to lowercase normal
+			i = fg;         // and flip the color
 			fg = bg;
 			bg = i;
 		}
@@ -1022,20 +1022,20 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 				{
 					UINT16 *vram = &bitmap.pix16(row + y, (col * 14));
 
-					*vram++ = abits & (1 << 0) ? fg : 0; 
-					*vram++ = abits & (1 << 1) ? fg : 0; 
-					*vram++ = abits & (1 << 2) ? fg : 0; 
-					*vram++ = abits & (1 << 3) ? fg : 0; 
-					*vram++ = abits & (1 << 0) ? fg : 0; 
-					*vram++ = abits & (1 << 1) ? fg : 0; 
-					*vram++ = abits & (1 << 2) ? fg : 0; 
-					*vram++ = bits & (1 << 0) ? fg : 0; 
-					*vram++ = bits & (1 << 1) ? fg : 0; 
-					*vram++ = bits & (1 << 2) ? fg : 0; 
-					*vram++ = bits & (1 << 3) ? fg : 0; 
-					*vram++ = bits & (1 << 0) ? fg : 0; 
-					*vram++ = bits & (1 << 1) ? fg : 0; 
-					*vram++ = bits & (1 << 2) ? fg : 0; 
+					*vram++ = abits & (1 << 0) ? fg : 0;
+					*vram++ = abits & (1 << 1) ? fg : 0;
+					*vram++ = abits & (1 << 2) ? fg : 0;
+					*vram++ = abits & (1 << 3) ? fg : 0;
+					*vram++ = abits & (1 << 0) ? fg : 0;
+					*vram++ = abits & (1 << 1) ? fg : 0;
+					*vram++ = abits & (1 << 2) ? fg : 0;
+					*vram++ = bits & (1 << 0) ? fg : 0;
+					*vram++ = bits & (1 << 1) ? fg : 0;
+					*vram++ = bits & (1 << 2) ? fg : 0;
+					*vram++ = bits & (1 << 3) ? fg : 0;
+					*vram++ = bits & (1 << 0) ? fg : 0;
+					*vram++ = bits & (1 << 1) ? fg : 0;
+					*vram++ = bits & (1 << 2) ? fg : 0;
 				}
 
 				bits = (code >> 4) & 0x0F;
@@ -1045,20 +1045,20 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 				{
 					UINT16 *vram = &bitmap.pix16(row + y, (col * 14));
 
-					*vram++ = abits & (1 << 0) ? fg : 0; 
-					*vram++ = abits & (1 << 1) ? fg : 0; 
-					*vram++ = abits & (1 << 2) ? fg : 0; 
-					*vram++ = abits & (1 << 3) ? fg : 0; 
-					*vram++ = abits & (1 << 0) ? fg : 0; 
-					*vram++ = abits & (1 << 1) ? fg : 0; 
-					*vram++ = abits & (1 << 2) ? fg : 0; 
-					*vram++ = bits & (1 << 0) ? fg : 0; 
-					*vram++ = bits & (1 << 1) ? fg : 0; 
-					*vram++ = bits & (1 << 2) ? fg : 0; 
-					*vram++ = bits & (1 << 3) ? fg : 0; 
-					*vram++ = bits & (1 << 0) ? fg : 0; 
-					*vram++ = bits & (1 << 1) ? fg : 0; 
-					*vram++ = bits & (1 << 2) ? fg : 0; 
+					*vram++ = abits & (1 << 0) ? fg : 0;
+					*vram++ = abits & (1 << 1) ? fg : 0;
+					*vram++ = abits & (1 << 2) ? fg : 0;
+					*vram++ = abits & (1 << 3) ? fg : 0;
+					*vram++ = abits & (1 << 0) ? fg : 0;
+					*vram++ = abits & (1 << 1) ? fg : 0;
+					*vram++ = abits & (1 << 2) ? fg : 0;
+					*vram++ = bits & (1 << 0) ? fg : 0;
+					*vram++ = bits & (1 << 1) ? fg : 0;
+					*vram++ = bits & (1 << 2) ? fg : 0;
+					*vram++ = bits & (1 << 3) ? fg : 0;
+					*vram++ = bits & (1 << 0) ? fg : 0;
+					*vram++ = bits & (1 << 1) ? fg : 0;
+					*vram++ = bits & (1 << 2) ? fg : 0;
 				}
 			}
 		}
@@ -1070,7 +1070,7 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	int row, col;
 	UINT32 start_address;
 	UINT32 address;
-	UINT8 *aux_page = m_ram_ptr; 
+	UINT8 *aux_page = m_ram_ptr;
 	int fg = 0;
 	int bg = 0;
 
@@ -1079,12 +1079,12 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		start_address = 0x400;
 		if (m_aux_ptr)
 		{
-			aux_page = m_aux_ptr; 
+			aux_page = m_aux_ptr;
 		}
 	}
 	else
 	{
-		start_address = m_page2 ? 0x800 : 0x400; 
+		start_address = m_page2 ? 0x800 : 0x400;
 	}
 
 	beginrow = MAX(beginrow, cliprect.min_y - (cliprect.min_y % 8));
@@ -1102,7 +1102,7 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	{
 		if (m_80col)
 		{
-			for (col = 0; col < 40; col++) 
+			for (col = 0; col < 40; col++)
 			{
 				/* calculate address */
 				address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
@@ -1115,7 +1115,7 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		}
 		else
 		{
-			for (col = 0; col < 40; col++) 
+			for (col = 0; col < 40; col++)
 			{
 				/* calculate address */
 				address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
@@ -1129,7 +1129,7 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 void a2_video_device::text_update_orig(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
 	int row, col;
-	UINT32 start_address = m_page2 ? 0x800 : 0x400;  
+	UINT32 start_address = m_page2 ? 0x800 : 0x400;
 	UINT32 address;
 	int fg = 0;
 	int bg = 0;
@@ -1147,7 +1147,7 @@ void a2_video_device::text_update_orig(screen_device &screen, bitmap_ind16 &bitm
 
 	for (row = beginrow; row <= endrow; row += 8)
 	{
-		for (col = 0; col < 40; col++) 
+		for (col = 0; col < 40; col++)
 		{
 			/* calculate address */
 			address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
@@ -1361,7 +1361,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	vram = &m_ram_ptr[page];
 	if (m_aux_ptr)
 	{
-		vaux = m_aux_ptr; 
+		vaux = m_aux_ptr;
 	}
 	else
 	{
@@ -1462,5 +1462,3 @@ PALETTE_INIT_MEMBER(a2_video_device, apple2)
 {
 	palette.set_pen_colors(0, apple2_palette, ARRAY_LENGTH(apple2_palette));
 }
-
-

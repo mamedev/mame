@@ -85,7 +85,7 @@ WRITE16_MEMBER(twin16_state::CPUA_register_w)
 	{
 		int rising_edge = ~old & m_CPUA_register;
 		int falling_edge = old & ~m_CPUA_register;
-		
+
 		if (rising_edge & 0x08)
 			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 

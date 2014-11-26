@@ -1,9 +1,9 @@
 /**********************************************************************
 
  wswan.h
- 
+
  File to handle video emulation of the Bandai WonderSwan.
- 
+
  Anthony Kruize
  Wilbert Pol
 
@@ -74,7 +74,7 @@ protected:
 	void refresh_scanline();
 	void scanline_interrupt();
 	void common_save();
-	
+
 	bitmap_ind16 m_bitmap;
 	UINT8 m_layer_bg_enable;          /* Background layer on/off */
 	UINT8 m_layer_fg_enable;          /* Foreground layer on/off */

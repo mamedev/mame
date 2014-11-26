@@ -217,7 +217,7 @@ public:
 	static void set_bus_frequency(device_t &device, UINT32 bus_frequency) { downcast<ppc_device &>(device).c_bus_frequency = bus_frequency; }
 
 	void ppc_set_dcstore_callback(write32_delegate callback);
-	
+
 	void ppcdrc_set_options(UINT32 options);
 	void ppcdrc_add_fastram(offs_t start, offs_t end, UINT8 readonly, void *base);
 	void ppcdrc_add_hotspot(offs_t pc, UINT32 opcode, UINT32 cycles);

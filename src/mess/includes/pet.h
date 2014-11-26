@@ -236,7 +236,7 @@ public:
 class cbm8096_state : public pet80_state
 {
 public:
-	cbm8096_state(const machine_config &mconfig, device_type type, const char *tag)	:
+	cbm8096_state(const machine_config &mconfig, device_type type, const char *tag) :
 		pet80_state(mconfig, type, tag)
 	{ }
 };

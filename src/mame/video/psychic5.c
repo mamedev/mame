@@ -129,7 +129,7 @@ WRITE8_MEMBER(psychic5_state::fg_videoram_w)
 }
 
 WRITE8_MEMBER( psychic5_state::bg_videoram_w )
-{	
+{
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }

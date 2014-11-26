@@ -1,8 +1,8 @@
 /*
 
-	Convergent NGen series
+    Convergent NGen series
 
-	10-11-14 - Skeleton driver
+    10-11-14 - Skeleton driver
 
 */
 
@@ -115,7 +115,7 @@ WRITE16_MEMBER(ngen_state::cpu_peripheral_cb)
 			m_maincpu->device_t::memory().space(AS_IO).install_readwrite_handler(addr, addr + 0x3ff, read16_delegate(FUNC(ngen_state::peripheral_r), this), write16_delegate(FUNC(ngen_state::peripheral_w), this));
 			logerror("Mapped peripherals to I/O 0x%04x\n",addr);
 		}
-		break;	
+		break;
 	case 4:
 		m_middle = data;
 		break;
@@ -301,7 +301,7 @@ WRITE_LINE_MEMBER( ngen_state::dma_hrq_changed )
 
 void ngen_state::set_dma_channel(int channel, int state)
 {
-	if(!state) 
+	if(!state)
 		m_dma_channel = channel;
 	else if(m_dma_channel == channel)
 		m_dma_channel = -1;

@@ -4,88 +4,88 @@
 
     apple2e.c - Apple IIe/IIc/IIc Plus and clones
 
-    Next generation driver written in September/October 2014 by R. Belmont. 
-    Thanks to the original Apple II series driver's authors: Mike Balfour, Nathan Woods, and R. Belmont 
-    Special thanks to the Apple II Documentation Project/Antoine Vignau and Peter Ferrie. 
- 
- 
-    IIe: base of this driver.  64K RAM, slot 0 language card emulation without the double-read requirement, 
+    Next generation driver written in September/October 2014 by R. Belmont.
+    Thanks to the original Apple II series driver's authors: Mike Balfour, Nathan Woods, and R. Belmont
+    Special thanks to the Apple II Documentation Project/Antoine Vignau and Peter Ferrie.
+
+
+    IIe: base of this driver.  64K RAM, slot 0 language card emulation without the double-read requirement,
          lowercase and SHIFT key on button 2, Open and Solid Apple buttons on joy buttons 0 and 1,
          auxiliary slot, built-in 80 column support if extra RAM added.
- 
-		 Physical slot 0 was eliminated thanks to the built-in language card.
- 
-		 Most of the write-only softswitches gained readback locations, necessary to make interrupt-driven
-		 software possible.
- 
-		 Base 80-column card: 1K RAM, allows 80 columns and double-lo-res,
-		 no double-hi-res.
- 
-		 Extended 80-column card: 64K RAM (including a second language card),
-		 allows 80 columns, double-lo-res, and double-hi-res.
- 
-		 Revision A motherboards (very rare) don't support double-hi-res; it's unclear
-		 if double-lo-res works or not.  We emulate the much more common Rev B or later
-		 board.
- 
-	IIe enhanced: 65C02 CPU with more instructions, MouseText in the character generator. 
- 
-	IIe platinum: Like enhanced but with added numeric keypad and extended 80-column card 
-		 included in the box.  Keypad CLEAR generates ESC by default, one hardware mod
-		 made it generate CTRL-X instead.  (new keyboard encoder ROM?)
- 
-	NOTE: On real IIe and IIe enhanced h/w, pressing SHIFT and paddle button 2 will 
-	short out the power supply and cause a safety shutdown.  (We don't emulate 
-	this "feature", and it was relatively rare in real life as Apple joysticks only 
-	had buttons 0 and 1 normally). 
- 
-	IIc: IIe enhanced shrunken into a pizzabox with a Disk II compatible 
-		 half-height drive included in the case.
-	 
-	 No slots, but included functionality equivalent to the following slots
-	 on the motherboard:
+
+         Physical slot 0 was eliminated thanks to the built-in language card.
+
+         Most of the write-only softswitches gained readback locations, necessary to make interrupt-driven
+         software possible.
+
+         Base 80-column card: 1K RAM, allows 80 columns and double-lo-res,
+         no double-hi-res.
+
+         Extended 80-column card: 64K RAM (including a second language card),
+         allows 80 columns, double-lo-res, and double-hi-res.
+
+         Revision A motherboards (very rare) don't support double-hi-res; it's unclear
+         if double-lo-res works or not.  We emulate the much more common Rev B or later
+         board.
+
+    IIe enhanced: 65C02 CPU with more instructions, MouseText in the character generator.
+
+    IIe platinum: Like enhanced but with added numeric keypad and extended 80-column card
+         included in the box.  Keypad CLEAR generates ESC by default, one hardware mod
+         made it generate CTRL-X instead.  (new keyboard encoder ROM?)
+
+    NOTE: On real IIe and IIe enhanced h/w, pressing SHIFT and paddle button 2 will
+    short out the power supply and cause a safety shutdown.  (We don't emulate
+    this "feature", and it was relatively rare in real life as Apple joysticks only
+    had buttons 0 and 1 normally).
+
+    IIc: IIe enhanced shrunken into a pizzabox with a Disk II compatible
+         half-height drive included in the case.
+
+     No slots, but included functionality equivalent to the following slots
+     on the motherboard:
      - 2 Super Serial Cards (modem and printer ports)
      - extended 80 column card / 128K RAM
      - Disk II IWM controller
      - Apple II Mouse card (firmware entry points are compatible,
        but the hardware implementation omits the 68705 and is quite different!)
- 
+
      Has a 40/80 column switch and a QWERTY/DVORAK switch.
- 
-	IIc (UniDisk 3.5): IIc with ROM doubled to 32K and the ROMSWITCH register 
-		 added to page between the original 16K ROM and the new added 16K.  The
-		 extra firmware space was dedicated to implementing the Protocol Converter,
-		 later renamed "SmartPort", which communicates with "smart" packet devices
-		 over the IWM bus.
- 
-		 Partial AppleTalk code also exists in this ROM but it doesn't work and
-		 was not completed.
- 
-	IIc (Original Memory Expansion): 
-		 Removes AppleTalk and adds support for a memory expansion card with up
-		 to 1 MB; this is identical both in hardware and firmware to the "Slinky"
-		 memory expansion card for the Apple IIe (a2bus/a2memexp.c).
 
-	IIc (Revised Memory Expansion, Rev. 3):
-		Fixes several nasty bugs in the Original Memory Expansion version.  Not
-		currently dumped.
- 
-	IIc (Rev 4): 
-		Fixes memory size detection for memory cards with less than 1MB.  Fixes
-		several screen hole errors introduced in Rev 3, and fixes Terminal Mode
-		wherein the firmware can be put into a built-in terminal mode for simple
-		tests with a modem.
- 
-	IIc Plus:
-		Like IIc with memory expansion, but with licensed built-in Zip Chip which
-		runs the 65C02 at 4 MHz turbo speed with a small cache RAM.
+    IIc (UniDisk 3.5): IIc with ROM doubled to 32K and the ROMSWITCH register
+         added to page between the original 16K ROM and the new added 16K.  The
+         extra firmware space was dedicated to implementing the Protocol Converter,
+         later renamed "SmartPort", which communicates with "smart" packet devices
+         over the IWM bus.
 
-		The machine has an internal "Apple 3.5" drive plus a custom gate array 
-		which emulates the functionality of the UniDisk 3.5's on-board 65C02.  
-		This gets around the fact that 1 MHz isn't sufficient to handle direct 
-		Woz-style control of a double-density 3.5" drive. 
+         Partial AppleTalk code also exists in this ROM but it doesn't work and
+         was not completed.
 
-		External drive port allows IIgs-style daisy-chaining.
+    IIc (Original Memory Expansion):
+         Removes AppleTalk and adds support for a memory expansion card with up
+         to 1 MB; this is identical both in hardware and firmware to the "Slinky"
+         memory expansion card for the Apple IIe (a2bus/a2memexp.c).
+
+    IIc (Revised Memory Expansion, Rev. 3):
+        Fixes several nasty bugs in the Original Memory Expansion version.  Not
+        currently dumped.
+
+    IIc (Rev 4):
+        Fixes memory size detection for memory cards with less than 1MB.  Fixes
+        several screen hole errors introduced in Rev 3, and fixes Terminal Mode
+        wherein the firmware can be put into a built-in terminal mode for simple
+        tests with a modem.
+
+    IIc Plus:
+        Like IIc with memory expansion, but with licensed built-in Zip Chip which
+        runs the 65C02 at 4 MHz turbo speed with a small cache RAM.
+
+        The machine has an internal "Apple 3.5" drive plus a custom gate array
+        which emulates the functionality of the UniDisk 3.5's on-board 65C02.
+        This gets around the fact that 1 MHz isn't sufficient to handle direct
+        Woz-style control of a double-density 3.5" drive.
+
+        External drive port allows IIgs-style daisy-chaining.
 
 ----------------------------------
 
@@ -163,27 +163,27 @@ Address bus A0-A11 is Y0-Y11
 #define A2_AUXSLOT_TAG "auxbus"
 #define A2_VIDEO_TAG "a2video"
 
-#define A2_0000_TAG	"r00bank"
-#define A2_0200_TAG	"r02bank"
-#define A2_0400_TAG	"r04bank"
-#define A2_0800_TAG	"r08bank"
-#define A2_2000_TAG	"r20bank"
-#define A2_4000_TAG	"r40bank"
-#define A2_C100_TAG	"c1bank"
-#define A2_C300_TAG	"c3bank"
-#define A2_C400_TAG	"c4bank"
-#define A2_C800_TAG	"c8bank"
+#define A2_0000_TAG "r00bank"
+#define A2_0200_TAG "r02bank"
+#define A2_0400_TAG "r04bank"
+#define A2_0800_TAG "r08bank"
+#define A2_2000_TAG "r20bank"
+#define A2_4000_TAG "r40bank"
+#define A2_C100_TAG "c1bank"
+#define A2_C300_TAG "c3bank"
+#define A2_C400_TAG "c4bank"
+#define A2_C800_TAG "c8bank"
 #define A2_LCBANK_TAG "lcbank"
 
 #define MOUSE_BUTTON_TAG    "mse_button"
 #define MOUSE_XAXIS_TAG     "mse_x"
 #define MOUSE_YAXIS_TAG     "mse_y"
 
-#define CNXX_UNCLAIMED 	-1
-#define CNXX_INTROM 	-2
+#define CNXX_UNCLAIMED  -1
+#define CNXX_INTROM     -2
 
 #define IRQ_SLOT 0
-#define IRQ_VBL	 1
+#define IRQ_VBL  1
 #define IRQ_MOUSEXY 2
 
 class apple2e_state : public driver_device
@@ -430,7 +430,7 @@ WRITE_LINE_MEMBER(apple2e_state::a2bus_inh_w)
 	{
 		// assume no cards are pulling /INH
 		m_inh_slot = -1;
-								   
+
 		// scan the slots to figure out which card(s) are INHibiting stuff
 		for (int i = 0; i <= 7; i++)
 		{
@@ -444,7 +444,7 @@ WRITE_LINE_MEMBER(apple2e_state::a2bus_inh_w)
 					{
 						if (m_inh_bank != 1)
 						{
-							m_upperbank->set_bank(1); 
+							m_upperbank->set_bank(1);
 							m_inh_bank = 1;
 						}
 					}
@@ -452,7 +452,7 @@ WRITE_LINE_MEMBER(apple2e_state::a2bus_inh_w)
 					{
 						if (m_inh_bank != 0)
 						{
-							m_upperbank->set_bank(0); 
+							m_upperbank->set_bank(0);
 							m_inh_bank = 0;
 						}
 					}
@@ -466,7 +466,7 @@ WRITE_LINE_MEMBER(apple2e_state::a2bus_inh_w)
 		// if no slots are inhibiting, make sure ROM is fully switched in
 		if ((m_inh_slot == -1) && (m_inh_bank != 0))
 		{
-			m_upperbank->set_bank(0); 
+			m_upperbank->set_bank(0);
 			m_inh_bank = 0;
 		}
 	}
@@ -485,7 +485,7 @@ READ8_MEMBER(apple2e_state::memexp_r)
 	{
 		if (m_exp_liveptr <= m_exp_addrmask)
 		{
-			retval = m_exp_ram[m_exp_liveptr]; 
+			retval = m_exp_ram[m_exp_liveptr];
 		}
 		else
 		{
@@ -569,7 +569,7 @@ void apple2e_state::machine_start()
 	m_cassette_out = 0;
 	if (m_cassette)
 	{
-		m_cassette->output(-1.0f); 
+		m_cassette->output(-1.0f);
 	}
 	m_upperbank->set_bank(0);
 	m_lcbank->set_bank(0);
@@ -587,7 +587,7 @@ void apple2e_state::machine_start()
 		m_exp_addrmask = m_ram_size - (128*1024) - 1;
 		m_exp_ram = m_ram_ptr + (128*1024);
 	}
-	else	// no expansion
+	else    // no expansion
 	{
 		m_exp_addrmask = 0;
 		m_exp_ram = NULL;
@@ -612,13 +612,13 @@ void apple2e_state::machine_start()
 		m_aux_ptr = m_auxslotdevice->get_vram_ptr();
 		m_aux_bank_ptr = m_auxslotdevice->get_auxbank_ptr();
 	}
-	else	// IIc has 128K right on the motherboard
+	else    // IIc has 128K right on the motherboard
 	{
 		m_auxslotdevice = NULL;
 
 		if (m_ram_size >= (128*1024))
 		{
-			m_aux_ptr = &m_ram_ptr[0x10000]; 
+			m_aux_ptr = &m_ram_ptr[0x10000];
 			m_aux_bank_ptr = m_aux_ptr;
 		}
 	}
@@ -749,7 +749,7 @@ void apple2e_state::raise_irq(int irq)
 
 	if (m_irqmask)
 	{
-		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); 
+		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 	}
 }
 
@@ -760,11 +760,11 @@ void apple2e_state::lower_irq(int irq)
 
 	if (!m_irqmask)
 	{
-		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); 
+		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 	}
 }
 
-/*************************************************************************** 
+/***************************************************************************
     VIDEO
 ***************************************************************************/
 
@@ -779,7 +779,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 
 	if (m_isiic)
 	{
-		update_iic_mouse(); 
+		update_iic_mouse();
 	}
 
 	if (scanline == 192)
@@ -828,11 +828,11 @@ UINT32 apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			{
 				if (m_video->m_dhires)
 				{
-					m_video->dhgr_update(screen, bitmap, cliprect, 0, 159); 
+					m_video->dhgr_update(screen, bitmap, cliprect, 0, 159);
 				}
 				else
 				{
-					m_video->hgr_update(screen, bitmap, cliprect, 0, 159); 
+					m_video->hgr_update(screen, bitmap, cliprect, 0, 159);
 				}
 				m_video->text_update(screen, bitmap, cliprect, 160, 191);
 			}
@@ -848,8 +848,8 @@ UINT32 apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				}
 			}
 		}
-		else	// lo-res
-		{	
+		else    // lo-res
+		{
 			if (m_video->m_mix)
 			{
 				if (m_video->m_dhires)
@@ -867,11 +867,11 @@ UINT32 apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			{
 				if (m_video->m_dhires)
 				{
-					m_video->dlores_update(screen, bitmap, cliprect, 0, 191); 
+					m_video->dlores_update(screen, bitmap, cliprect, 0, 191);
 				}
 				else
 				{
-					m_video->lores_update(screen, bitmap, cliprect, 0, 191); 
+					m_video->lores_update(screen, bitmap, cliprect, 0, 191);
 				}
 			}
 		}
@@ -886,7 +886,7 @@ UINT32 apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-/*************************************************************************** 
+/***************************************************************************
     I/O
 ***************************************************************************/
 void apple2e_state::auxbank_update()
@@ -954,16 +954,16 @@ void apple2e_state::update_slotrom_banks()
 	m_c100bank->set_bank(cxswitch);
 	m_c400bank->set_bank(cxswitch);
 
-//	printf("intcxrom %d cnxx_slot %d isiic %d romswitch %d\n", m_intcxrom, m_cnxx_slot, m_isiic, m_romswitch);
+//  printf("intcxrom %d cnxx_slot %d isiic %d romswitch %d\n", m_intcxrom, m_cnxx_slot, m_isiic, m_romswitch);
 	if ((m_intcxrom) || (m_cnxx_slot < 0) || (m_isiic))
 	{
 		if (m_romswitch)
 		{
-			m_c800bank->set_bank(2); 
+			m_c800bank->set_bank(2);
 		}
 		else
 		{
-			m_c800bank->set_bank(1); 
+			m_c800bank->set_bank(1);
 		}
 	}
 	else
@@ -975,16 +975,16 @@ void apple2e_state::update_slotrom_banks()
 	{
 		if (m_romswitch)
 		{
-			m_c300bank->set_bank(2); 
+			m_c300bank->set_bank(2);
 		}
 		else
 		{
-			m_c300bank->set_bank(1); 
+			m_c300bank->set_bank(1);
 		}
 	}
 	else
 	{
-	    m_c300bank->set_bank(0);
+		m_c300bank->set_bank(0);
 	}
 }
 
@@ -1018,27 +1018,27 @@ void apple2e_state::lc_update(int offset)
 	{
 		if (m_lcram)
 		{
-			m_lcbank->set_bank(1); 
+			m_lcbank->set_bank(1);
 		}
 		else
 		{
 			if (m_romswitch)
 			{
-				m_lcbank->set_bank(2); 
+				m_lcbank->set_bank(2);
 			}
 			else
 			{
-				m_lcbank->set_bank(0); 
+				m_lcbank->set_bank(0);
 			}
 		}
 	}
 
 	#if 0
-	printf("LC: new state %c%c dxxx=%04x altzp=%d\n", 
-		   m_lcram ? 'R' : 'x',
-		   m_lcwriteenable ? 'W' : 'x', 
-		   m_lcram2 ? 0x1000 : 0x0000,
-		   m_altzp);
+	printf("LC: new state %c%c dxxx=%04x altzp=%d\n",
+			m_lcram ? 'R' : 'x',
+			m_lcwriteenable ? 'W' : 'x',
+			m_lcram2 ? 0x1000 : 0x0000,
+			m_altzp);
 	#endif
 }
 
@@ -1055,35 +1055,35 @@ void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
 		{
 			switch (offset)
 			{
-				case 0x58:	// DisXY
+				case 0x58:  // DisXY
 					m_xy = false; break;
 
-				case 0x59:	// EnbXY
+				case 0x59:  // EnbXY
 					m_xy = true; break;
 
-				case 0x5a:	// DisVBL
+				case 0x5a:  // DisVBL
 					m_vblmask = false; break;
 
-				case 0x5b:	// EnVBL
+				case 0x5b:  // EnVBL
 					m_vblmask = true; break;
 
-				case 0x5c:	// RisX0Edge
+				case 0x5c:  // RisX0Edge
 					m_x0edge = false; break;
 
-				case 0x5d:	// FalX0Edge
+				case 0x5d:  // FalX0Edge
 					m_x0edge = true; break;
 
-				case 0x5e:	// RisY0Edge
+				case 0x5e:  // RisY0Edge
 					if (!m_ioudis)
 					{
-						m_y0edge = false; 
+						m_y0edge = false;
 					}
 					break;
 
-				case 0x5f:	// FalY0Edge
+				case 0x5f:  // FalY0Edge
 					if (!m_ioudis)
 					{
-						m_y0edge = true; 
+						m_y0edge = true;
 					}
 					break;
 			}
@@ -1091,14 +1091,14 @@ void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
 
 		if (m_ioudis)
 		{
-			switch (offset) 
+			switch (offset)
 			{
-				case 0x5e:	// SETDHIRES
-					m_video->m_dhires = true; 
+				case 0x5e:  // SETDHIRES
+					m_video->m_dhires = true;
 					break;
 
-				case 0x5f:	// CLRDHIRES
-					m_video->m_dhires = false; 
+				case 0x5f:  // CLRDHIRES
+					m_video->m_dhires = false;
 					break;
 			}
 		}
@@ -1111,7 +1111,7 @@ void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
 		case 0x20:
 			if (m_cassette)
 			{
-				m_cassette_state ^= 1; 
+				m_cassette_state ^= 1;
 				m_cassette->output(m_cassette_state ? 1.0f : -1.0f);
 			}
 			break;
@@ -1127,11 +1127,11 @@ void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
 				{
 					if (m_romswitch)
 					{
-						m_lcbank->set_bank(2); 
+						m_lcbank->set_bank(2);
 					}
 					else
 					{
-						m_lcbank->set_bank(0); 
+						m_lcbank->set_bank(0);
 					}
 				}
 			}
@@ -1142,7 +1142,7 @@ void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
 			m_speaker->level_w(m_speaker_state);
 			break;
 
-		case 0x48:	// (IIc only) clear mouse X/Y interrupt flags
+		case 0x48:  // (IIc only) clear mouse X/Y interrupt flags
 			m_xirq = m_yirq = false;
 			lower_irq(IRQ_MOUSEXY);
 			break;
@@ -1160,24 +1160,24 @@ void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
 			m_video->m_mix = true; break;
 
 		case 0x54:  // set page 1
-			m_page2 = false; 
+			m_page2 = false;
 			m_video->m_page2 = false;
 			auxbank_update();
 			break;
 
 		case 0x55:  // set page 2
-			m_page2 = true; 
+			m_page2 = true;
 			m_video->m_page2 = true;
 			auxbank_update();
 			break;
 
 		case 0x56: // select lo-res
-			m_video->m_hires = false; 
+			m_video->m_hires = false;
 			auxbank_update();
 			break;
 
 		case 0x57: // select hi-res
-			m_video->m_hires = true; 
+			m_video->m_hires = true;
 			auxbank_update();
 			break;
 
@@ -1205,10 +1205,10 @@ void apple2e_state::do_io(address_space &space, int offset, bool is_iic)
 		case 0x5f: // AN3 on
 			m_an3 = true; break;
 
-		case 0x68:	// IIgs STATE register, which ProDOS touches
+		case 0x68:  // IIgs STATE register, which ProDOS touches
 			break;
 
-		// trigger joypad read 
+		// trigger joypad read
 		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
 			if (is_iic)
@@ -1238,22 +1238,22 @@ READ8_MEMBER(apple2e_state::c000_r)
 		case 0x00:  // keyboard latch
 			return m_transchar | m_strobe;
 
-		case 0x02:	// RAMRDOFF
+		case 0x02:  // RAMRDOFF
 			m_ramrd = false;
 			auxbank_update();
 			break;
 
-		case 0x03:	// RAMRDON
+		case 0x03:  // RAMRDON
 			m_ramrd = true;
 			auxbank_update();
 			break;
 
-		case 0x04:	// RAMWRTOFF
+		case 0x04:  // RAMWRTOFF
 			m_ramwrt = false;
 			auxbank_update();
 			break;
 
-		case 0x05:	// RAMWRTON
+		case 0x05:  // RAMWRTON
 			m_ramwrt = true;
 			auxbank_update();
 			break;
@@ -1265,76 +1265,76 @@ READ8_MEMBER(apple2e_state::c000_r)
 				return rv;
 			}
 
-		case 0x11:	// read LCRAM2 (LC Dxxx bank)
+		case 0x11:  // read LCRAM2 (LC Dxxx bank)
 			return m_lcram2 ? 0x80 : 0x00;
 
-		case 0x12:	// read LCRAM (is LC readable?)
+		case 0x12:  // read LCRAM (is LC readable?)
 			return m_lcram ? 0x80 : 0x00;
 
-		case 0x13:	// read RAMRD
+		case 0x13:  // read RAMRD
 			return m_ramrd ? 0x80 : 0x00;
 
-		case 0x14:	// read RAMWRT
+		case 0x14:  // read RAMWRT
 			return m_ramwrt ? 0x80 : 0x00;
 
-		case 0x15:	// read INTCXROM
+		case 0x15:  // read INTCXROM
 			return m_intcxrom ? 0x80 : 0x00;
 
-		case 0x16:	// read ALTZP
+		case 0x16:  // read ALTZP
 			return m_altzp ? 0x80 : 0x00;
 
-		case 0x17:	// read SLOTC3ROM
+		case 0x17:  // read SLOTC3ROM
 			return m_slotc3rom ? 0x80 : 0x00;
 
-		case 0x18:	// read 80STORE
+		case 0x18:  // read 80STORE
 			return m_80store ? 0x80 : 0x00;
 
-		case 0x19:	// read VBLBAR
+		case 0x19:  // read VBLBAR
 			return space.machine().first_screen()->vblank() ? 0x00 : 0x80;
 
-		case 0x1a:	// read TEXT
+		case 0x1a:  // read TEXT
 			return m_video->m_graphics ? 0x00 : 0x80;
 
-		case 0x1b:	// read MIXED
+		case 0x1b:  // read MIXED
 			return m_video->m_mix ? 0x80 : 0x00;
 
-		case 0x1c:	// read PAGE2
+		case 0x1c:  // read PAGE2
 			return m_page2 ? 0x80 : 0x00;
 
-		case 0x1d:	// read HIRES
+		case 0x1d:  // read HIRES
 			return m_video->m_hires ? 0x80 : 0x00;
 
-		case 0x1e:	// read ALTCHARSET
+		case 0x1e:  // read ALTCHARSET
 			return m_video->m_altcharset ? 0x80 : 0x00;
 
-		case 0x1f:	// read 80COL
+		case 0x1f:  // read 80COL
 			return m_video->m_80col ? 0x80 : 0x00;
 
 		case 0x60: // cassette in
 		case 0x68:
 			if (m_cassette)
 			{
-				return m_cassette->input() > 0.0 ? 0x80 : 0; 
+				return m_cassette->input() > 0.0 ? 0x80 : 0;
 			}
 			return 0;
 
-		case 0x61:	// button 0 or Open Apple
+		case 0x61:  // button 0 or Open Apple
 		case 0x69:
 			return ((m_joybuttons->read() & 0x10) || (m_kbspecial->read() & 0x10)) ? 0x80 : 0;
 
-		case 0x62:	// button 1 or Solid Apple
+		case 0x62:  // button 1 or Solid Apple
 		case 0x6a:
 			return ((m_joybuttons->read() & 0x20) || (m_kbspecial->read() & 0x20)) ? 0x80 : 0;
 
-		case 0x63:	// button 2 or SHIFT key
+		case 0x63:  // button 2 or SHIFT key
 		case 0x6b:
 			return ((m_joybuttons->read() & 0x40) || (m_kbspecial->read() & 0x06)) ? 0x80 : 0;
 
-		case 0x64:	// joy 1 X axis
+		case 0x64:  // joy 1 X axis
 		case 0x6c:
 			return (space.machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0;
 
-		case 0x65:	// joy 1 Y axis
+		case 0x65:  // joy 1 Y axis
 		case 0x6d:
 			return (space.machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0;
 
@@ -1346,10 +1346,10 @@ READ8_MEMBER(apple2e_state::c000_r)
 		case 0x6f:
 			return (space.machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0;
 
-		case 0x7e:	// read IOUDIS
+		case 0x7e:  // read IOUDIS
 			return m_ioudis ? 0x80 : 0x00;
 
-		case 0x7f:	// read DHIRES
+		case 0x7f:  // read DHIRES
 			return m_video->m_dhires ? 0x00 : 0x80;
 
 		default:
@@ -1366,79 +1366,79 @@ WRITE8_MEMBER(apple2e_state::c000_w)
 
 	switch (offset)
 	{
-		case 0x00:	// 80STOREOFF
+		case 0x00:  // 80STOREOFF
 			m_80store = false;
 			auxbank_update();
 			break;
 
-		case 0x01:	// 80STOREON
+		case 0x01:  // 80STOREON
 			m_80store = true;
 			auxbank_update();
 			break;
 
-		case 0x02:	// RAMRDOFF
+		case 0x02:  // RAMRDOFF
 			m_ramrd = false;
 			auxbank_update();
 			break;
 
-		case 0x03:	// RAMRDON
+		case 0x03:  // RAMRDON
 			m_ramrd = true;
 			auxbank_update();
 			break;
 
-		case 0x04:	// RAMWRTOFF
+		case 0x04:  // RAMWRTOFF
 			m_ramwrt = false;
 			auxbank_update();
 			break;
 
-		case 0x05:	// RAMWRTON
+		case 0x05:  // RAMWRTON
 			m_ramwrt = true;
 			auxbank_update();
 			break;
 
-		case 0x06:	// INTCXROMOFF
+		case 0x06:  // INTCXROMOFF
 			m_intcxrom = false;
 			update_slotrom_banks();
 			break;
 
-		case 0x07:	// INTCXROMON
+		case 0x07:  // INTCXROMON
 			m_intcxrom = true;
 			update_slotrom_banks();
 			break;
 
-		case 0x08:	// ALTZPOFF
+		case 0x08:  // ALTZPOFF
 			m_altzp = false;
 			auxbank_update();
 			break;
 
-		case 0x09:	// ALTZPON
+		case 0x09:  // ALTZPON
 			m_altzp = true;
 			auxbank_update();
 			break;
 
-		case 0x0a:	// SETINTC3ROM
+		case 0x0a:  // SETINTC3ROM
 			m_slotc3rom = false;
 			update_slotrom_banks();
 			break;
 
-		case 0x0b:	// SETSLOTC3ROM
+		case 0x0b:  // SETSLOTC3ROM
 			m_slotc3rom = true;
 			update_slotrom_banks();
 			break;
 
-		case 0x0c:	// 80COLOFF
+		case 0x0c:  // 80COLOFF
 			m_video->m_80col = false;
 			break;
 
-		case 0x0d:	// 80COLON
+		case 0x0d:  // 80COLON
 			m_video->m_80col = true;
 			break;
 
-		case 0x0e:	// ALTCHARSETOFF
+		case 0x0e:  // ALTCHARSETOFF
 			m_video->m_altcharset = false;
 			break;
 
-		case 0x0f:	// ALTCHARSETON
+		case 0x0f:  // ALTCHARSETON
 			m_video->m_altcharset = true;
 			break;
 
@@ -1446,10 +1446,10 @@ WRITE8_MEMBER(apple2e_state::c000_w)
 			m_strobe = 0;
 			break;
 
-		case 0x20:	// cassette output
+		case 0x20:  // cassette output
 			if (m_cassette)
 			{
-				m_cassette_out ^= 1; 
+				m_cassette_out ^= 1;
 				m_cassette->output(m_cassette_out ? 1.0f : -1.0f);
 			}
 			break;
@@ -1463,13 +1463,13 @@ WRITE8_MEMBER(apple2e_state::c000_w)
 				// card may have banked auxram; get a new bank pointer
 				m_aux_bank_ptr = m_auxslotdevice->get_auxbank_ptr();
 			}
-			do_io(space, offset, false);	// make sure it also side-effect resets the paddles as documented
+			do_io(space, offset, false);    // make sure it also side-effect resets the paddles as documented
 			break;
 
-		case 0x7e:	// SETIOUDIS
+		case 0x7e:  // SETIOUDIS
 			m_ioudis = true; break;
 
-		case 0x7f:	// CLRIOUDIS
+		case 0x7f:  // CLRIOUDIS
 			m_ioudis = false; break;
 
 		default:
@@ -1487,114 +1487,114 @@ READ8_MEMBER(apple2e_state::c000_iic_r)
 		case 0x00:  // keyboard latch
 			return m_transchar | m_strobe;
 
-		case 0x02:	// RAMRDOFF
+		case 0x02:  // RAMRDOFF
 			m_ramrd = false;
 			auxbank_update();
 			break;
 
-		case 0x03:	// RAMRDON
+		case 0x03:  // RAMRDON
 			m_ramrd = true;
 			auxbank_update();
 			break;
 
-		case 0x04:	// RAMWRTOFF
+		case 0x04:  // RAMWRTOFF
 			m_ramwrt = false;
 			auxbank_update();
 			break;
 
-		case 0x05:	// RAMWRTON
+		case 0x05:  // RAMWRTON
 			m_ramwrt = true;
 			auxbank_update();
 			break;
 
-		case 0x10:  // read any key down, reset keyboard strobe 
+		case 0x10:  // read any key down, reset keyboard strobe
 			{
 				UINT8 rv = m_transchar | m_anykeydown;
 				m_strobe = 0;
 				return rv;
 			}
 
-		case 0x11:	// read LCRAM2 (LC Dxxx bank)
+		case 0x11:  // read LCRAM2 (LC Dxxx bank)
 			return m_lcram2 ? 0x80 : 0x00;
-			break;		
+			break;
 
-		case 0x12:	// read LCRAM (is LC readable?)
+		case 0x12:  // read LCRAM (is LC readable?)
 			return m_lcram ? 0x80 : 0x00;
 			break;
 
-		case 0x13:	// read RAMRD
+		case 0x13:  // read RAMRD
 			return m_ramrd ? 0x80 : 0x00;
 
-		case 0x14:	// read RAMWRT
+		case 0x14:  // read RAMWRT
 			return m_ramwrt ? 0x80 : 0x00;
 
-		case 0x15:	// read & reset mouse X0 interrupt flag
+		case 0x15:  // read & reset mouse X0 interrupt flag
 			lower_irq(IRQ_MOUSEXY);
 			return m_xirq ? 0x80 : 0x00;
 
-		case 0x16:	// read ALTZP
+		case 0x16:  // read ALTZP
 			return m_altzp ? 0x80 : 0x00;
 
-		case 0x17:	// read & reset mouse Y0 interrupt flag
+		case 0x17:  // read & reset mouse Y0 interrupt flag
 			lower_irq(IRQ_MOUSEXY);
 			return m_yirq ? 0x80 : 0x00;
 
-		case 0x18:	// read 80STORE
+		case 0x18:  // read 80STORE
 			return m_80store ? 0x80 : 0x00;
 
-		case 0x19:	// read VBL
+		case 0x19:  // read VBL
 			return m_vbl ? 0x80 : 0x00;
 
-		case 0x1a:	// read TEXT
+		case 0x1a:  // read TEXT
 			return m_video->m_graphics ? 0x00 : 0x80;
 
-		case 0x1b:	// read MIXED
+		case 0x1b:  // read MIXED
 			return m_video->m_mix ? 0x80 : 0x00;
 
-		case 0x1c:	// read PAGE2
+		case 0x1c:  // read PAGE2
 			return m_page2 ? 0x80 : 0x00;
 
-		case 0x1d:	// read HIRES
+		case 0x1d:  // read HIRES
 			return m_video->m_hires ? 0x80 : 0x00;
 
-		case 0x1e:	// read ALTCHARSET
+		case 0x1e:  // read ALTCHARSET
 			return m_video->m_altcharset ? 0x80 : 0x00;
 
-		case 0x1f:	// read 80COL
+		case 0x1f:  // read 80COL
 			return m_video->m_80col ? 0x80 : 0x00;
 
-		case 0x40:	// read XYMask (IIc only)
+		case 0x40:  // read XYMask (IIc only)
 			return m_xy ? 0x80 : 0x00;
 
-		case 0x41:	// read VBL mask (IIc only)
+		case 0x41:  // read VBL mask (IIc only)
 			return m_vblmask ? 0x80 : 0x00;
 
-		case 0x42:	// read X0Edge (IIc only)
+		case 0x42:  // read X0Edge (IIc only)
 			return m_x0edge ? 0x80 : 0x00;
 
-		case 0x43:	// read Y0Edge (IIc only)
+		case 0x43:  // read Y0Edge (IIc only)
 			return m_y0edge ? 0x80 : 0x00;
 
 		case 0x60: // 40/80 column switch (IIc only)
 			return (m_sysconfig->read() & 0x04) ? 0x80 : 0;
 
-		case 0x61:	// button 0 or Open Apple or mouse button 1
+		case 0x61:  // button 0 or Open Apple or mouse button 1
 		case 0x69:
 			return ((m_joybuttons->read() & 0x10) || (m_kbspecial->read() & 0x10)) ? 0x80 : 0;
 
-		case 0x62:	// button 1 or Solid Apple
+		case 0x62:  // button 1 or Solid Apple
 		case 0x6a:
 			return ((m_joybuttons->read() & 0x20) || (m_kbspecial->read() & 0x20)) ? 0x80 : 0;
 
-		case 0x63:	// mouse button 2 (no other function on IIc)
+		case 0x63:  // mouse button 2 (no other function on IIc)
 		case 0x6b:
 			return m_mouseb->read() ? 0 : 0x80;
 
-		case 0x64:	// joy 1 X axis
+		case 0x64:  // joy 1 X axis
 		case 0x6c:
 			return (space.machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0;
 
-		case 0x65:	// joy 1 Y axis
+		case 0x65:  // joy 1 Y axis
 		case 0x6d:
 			return (space.machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0;
 
@@ -1606,12 +1606,12 @@ READ8_MEMBER(apple2e_state::c000_iic_r)
 		case 0x6f:
 			return m_y1 ? 0x80 : 0;
 
-		case 0x7e:	// read IOUDIS
+		case 0x7e:  // read IOUDIS
 			m_vbl = false;
 			lower_irq(IRQ_VBL);
 			return m_ioudis ? 0x80 : 0x00;
 
-		case 0x7f:	// read DHIRES
+		case 0x7f:  // read DHIRES
 			return m_video->m_dhires ? 0x00 : 0x80;
 
 		default:
@@ -1628,79 +1628,79 @@ WRITE8_MEMBER(apple2e_state::c000_iic_w)
 
 	switch (offset)
 	{
-		case 0x00:	// 80STOREOFF
+		case 0x00:  // 80STOREOFF
 			m_80store = false;
 			auxbank_update();
 			break;
 
-		case 0x01:	// 80STOREON
+		case 0x01:  // 80STOREON
 			m_80store = true;
 			auxbank_update();
 			break;
 
-		case 0x02:	// RAMRDOFF
+		case 0x02:  // RAMRDOFF
 			m_ramrd = false;
 			auxbank_update();
 			break;
 
-		case 0x03:	// RAMRDON
+		case 0x03:  // RAMRDON
 			m_ramrd = true;
 			auxbank_update();
 			break;
 
-		case 0x04:	// RAMWRTOFF
+		case 0x04:  // RAMWRTOFF
 			m_ramwrt = false;
 			auxbank_update();
 			break;
 
-		case 0x05:	// RAMWRTON
+		case 0x05:  // RAMWRTON
 			m_ramwrt = true;
 			auxbank_update();
 			break;
 
-		case 0x06:	// INTCXROMOFF
+		case 0x06:  // INTCXROMOFF
 			m_intcxrom = false;
 			update_slotrom_banks();
 			break;
 
-		case 0x07:	// INTCXROMON
+		case 0x07:  // INTCXROMON
 			m_intcxrom = true;
 			update_slotrom_banks();
 			break;
 
-		case 0x08:	// ALTZPOFF
+		case 0x08:  // ALTZPOFF
 			m_altzp = false;
 			auxbank_update();
 			break;
 
-		case 0x09:	// ALTZPON
+		case 0x09:  // ALTZPON
 			m_altzp = true;
 			auxbank_update();
 			break;
 
-		case 0x0a:	// SETINTC3ROM
+		case 0x0a:  // SETINTC3ROM
 			m_slotc3rom = false;
 			update_slotrom_banks();
 			break;
 
-		case 0x0b:	// SETSLOTC3ROM
+		case 0x0b:  // SETSLOTC3ROM
 			m_slotc3rom = true;
 			update_slotrom_banks();
 			break;
 
-		case 0x0c:	// 80COLOFF
+		case 0x0c:  // 80COLOFF
 			m_video->m_80col = false;
 			break;
 
-		case 0x0d:	// 80COLON
+		case 0x0d:  // 80COLON
 			m_video->m_80col = true;
 			break;
 
-		case 0x0e:	// ALTCHARSETOFF
+		case 0x0e:  // ALTCHARSETOFF
 			m_video->m_altcharset = false;
 			break;
 
-		case 0x0f:	// ALTCHARSETON
+		case 0x0f:  // ALTCHARSETON
 			m_video->m_altcharset = true;
 			break;
 
@@ -1714,12 +1714,12 @@ WRITE8_MEMBER(apple2e_state::c000_iic_w)
 			lower_irq(IRQ_VBL);
 			break;
 
-		case 0x7e:	// SETIOUDIS
-			m_ioudis = true; 
+		case 0x7e:  // SETIOUDIS
+			m_ioudis = true;
 			break;
 
-		case 0x7f:	// CLRIOUDIS
-			m_ioudis = false; 
+		case 0x7f:  // CLRIOUDIS
+			m_ioudis = false;
 			break;
 
 		default:
@@ -1835,7 +1835,7 @@ READ8_MEMBER(apple2e_state::c080_r)
 		}
 		else
 		{
-			if (m_slotdevice[slot] != NULL) 
+			if (m_slotdevice[slot] != NULL)
 			{
 				return m_slotdevice[slot]->read_c0nx(space, offset % 0x10);
 			}
@@ -1867,7 +1867,7 @@ WRITE8_MEMBER(apple2e_state::c080_w)
 
 UINT8 apple2e_state::read_slot_rom(address_space &space, int slotbias, int offset)
 {
-	int slotnum = ((offset>>8) & 0xf) + slotbias; 
+	int slotnum = ((offset>>8) & 0xf) + slotbias;
 
 	if (m_slotdevice[slotnum] != NULL)
 	{
@@ -1970,10 +1970,10 @@ READ8_MEMBER(apple2e_state::inh_r)
 {
 	if (m_inh_slot != -1)
 	{
-		return m_slotdevice[m_inh_slot]->read_inh_rom(space, offset + 0xd000); 
+		return m_slotdevice[m_inh_slot]->read_inh_rom(space, offset + 0xd000);
 	}
 
-	assert(0);	// hitting inh_r with invalid m_inh_slot should not be possible
+	assert(0);  // hitting inh_r with invalid m_inh_slot should not be possible
 	return read_floatingbus();
 }
 
@@ -1989,9 +1989,9 @@ READ8_MEMBER(apple2e_state::lc_r)
 {
 	if (m_altzp)
 	{
-		if (m_aux_bank_ptr) 
-		{ 
-			if (offset < 0x1000) 
+		if (m_aux_bank_ptr)
+		{
+			if (offset < 0x1000)
 			{
 				if (m_lcram2)
 				{
@@ -2004,15 +2004,15 @@ READ8_MEMBER(apple2e_state::lc_r)
 			}
 
 			return m_aux_bank_ptr[(offset & 0x1fff) + 0xe000];
-		} 
-		else 
-		{ 
-			return read_floatingbus(); 
+		}
+		else
+		{
+			return read_floatingbus();
 		}
 	}
 	else
 	{
-		if (offset < 0x1000) 
+		if (offset < 0x1000)
 		{
 			if (m_lcram2)
 			{
@@ -2038,8 +2038,8 @@ WRITE8_MEMBER(apple2e_state::lc_w)
 	if (m_altzp)
 	{
 		if (m_aux_bank_ptr)
-		{ 
-			if (offset < 0x1000) 
+		{
+			if (offset < 0x1000)
 			{
 				if (m_lcram2)
 				{
@@ -2057,7 +2057,7 @@ WRITE8_MEMBER(apple2e_state::lc_w)
 	}
 	else
 	{
-		if (offset < 0x1000) 
+		if (offset < 0x1000)
 		{
 			if (m_lcram2)
 			{
@@ -2295,8 +2295,8 @@ static ADDRESS_MAP_START( laser128_map, AS_PROGRAM, 8, apple2e_state )
 	AM_RANGE(0x2000, 0x3fff) AM_DEVICE(A2_2000_TAG, address_map_bank_device, amap8)
 	AM_RANGE(0x4000, 0xbfff) AM_DEVICE(A2_4000_TAG, address_map_bank_device, amap8)
 	AM_RANGE(0xc000, 0xc07f) AM_READWRITE(c000_r, c000_w)
-//	AM_RANGE(0xc098, 0xc09b) AM_DEVREADWRITE(IIC_ACIA1_TAG, mos6551_device, read, write)
-//	AM_RANGE(0xc0a8, 0xc0ab) AM_DEVREADWRITE(IIC_ACIA2_TAG, mos6551_device, read, write)
+//  AM_RANGE(0xc098, 0xc09b) AM_DEVREADWRITE(IIC_ACIA1_TAG, mos6551_device, read, write)
+//  AM_RANGE(0xc0a8, 0xc0ab) AM_DEVREADWRITE(IIC_ACIA2_TAG, mos6551_device, read, write)
 	AM_RANGE(0xc0d0, 0xc0d3) AM_READWRITE(memexp_r, memexp_w)
 	AM_RANGE(0xc0e0, 0xc0ef) AM_DEVREADWRITE(LASER128_UDC_TAG, applefdc_base_device, read, write)
 	AM_RANGE(0xc080, 0xc0ff) AM_READWRITE(c080_r, c080_w)
@@ -2309,20 +2309,20 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( r0000bank_map, AS_PROGRAM, 8, apple2e_state )
 	AM_RANGE(0x0000, 0x01ff) AM_READWRITE(ram0000_r, ram0000_w)
-	AM_RANGE(0x0200, 0x03ff) AM_READWRITE(auxram0000_r, auxram0000_w) 
+	AM_RANGE(0x0200, 0x03ff) AM_READWRITE(auxram0000_r, auxram0000_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( r0200bank_map, AS_PROGRAM, 8, apple2e_state )
-	AM_RANGE(0x0000, 0x01ff) AM_READWRITE(ram0200_r, ram0200_w)	// wr 0 rd 0
+	AM_RANGE(0x0000, 0x01ff) AM_READWRITE(ram0200_r, ram0200_w) // wr 0 rd 0
 	AM_RANGE(0x0200, 0x03ff) AM_READWRITE(auxram0200_r, ram0200_w) // wr 0 rd 1
 	AM_RANGE(0x0400, 0x05ff) AM_READWRITE(ram0200_r, auxram0200_w) // wr 1 rd 0
 	AM_RANGE(0x0600, 0x07ff) AM_READWRITE(auxram0200_r, auxram0200_w) // wr 1 rd 1
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( r0400bank_map, AS_PROGRAM, 8, apple2e_state )
-	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(ram0400_r, ram0400_w)	// wr 0 rd 0
-	AM_RANGE(0x0400, 0x07ff) AM_READWRITE(auxram0400_r, ram0400_w)	// wr 0 rd 1
-	AM_RANGE(0x0800, 0x0bff) AM_READWRITE(ram0400_r, auxram0400_w)	// wr 1 rd 0
+	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(ram0400_r, ram0400_w) // wr 0 rd 0
+	AM_RANGE(0x0400, 0x07ff) AM_READWRITE(auxram0400_r, ram0400_w)  // wr 0 rd 1
+	AM_RANGE(0x0800, 0x0bff) AM_READWRITE(ram0400_r, auxram0400_w)  // wr 1 rd 0
 	AM_RANGE(0x0c00, 0x0fff) AM_READWRITE(auxram0400_r, auxram0400_w) // wr 1 rd 1
 ADDRESS_MAP_END
 
@@ -2330,21 +2330,21 @@ static ADDRESS_MAP_START( r0800bank_map, AS_PROGRAM, 8, apple2e_state )
 	AM_RANGE(0x0000, 0x17ff) AM_READWRITE(ram0800_r, ram0800_w)
 	AM_RANGE(0x2000, 0x37ff) AM_READWRITE(auxram0800_r, ram0800_w)
 	AM_RANGE(0x4000, 0x57ff) AM_READWRITE(ram0800_r, auxram0800_w)
-	AM_RANGE(0x6000, 0x77ff) AM_READWRITE(auxram0800_r, auxram0800_w) 
+	AM_RANGE(0x6000, 0x77ff) AM_READWRITE(auxram0800_r, auxram0800_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( r2000bank_map, AS_PROGRAM, 8, apple2e_state )
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(ram2000_r, ram2000_w)
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(auxram2000_r, ram2000_w)
 	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(ram2000_r, auxram2000_w)
-	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(auxram2000_r, auxram2000_w) 
+	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(auxram2000_r, auxram2000_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( r4000bank_map, AS_PROGRAM, 8, apple2e_state )
 	AM_RANGE(0x00000, 0x07fff) AM_READWRITE(ram4000_r, ram4000_w)
 	AM_RANGE(0x08000, 0x0ffff) AM_READWRITE(auxram4000_r, ram4000_w)
 	AM_RANGE(0x10000, 0x17fff) AM_READWRITE(ram4000_r, auxram4000_w)
-	AM_RANGE(0x18000, 0x1ffff) AM_READWRITE(auxram4000_r, auxram4000_w) 
+	AM_RANGE(0x18000, 0x1ffff) AM_READWRITE(auxram4000_r, auxram4000_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c100bank_map, AS_PROGRAM, 8, apple2e_state )
@@ -2372,7 +2372,7 @@ static ADDRESS_MAP_START( c800bank_map, AS_PROGRAM, 8, apple2e_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( inhbank_map, AS_PROGRAM, 8, apple2e_state )
-	AM_RANGE(0x0000, 0x2fff) AM_DEVICE(A2_LCBANK_TAG, address_map_bank_device, amap8) 
+	AM_RANGE(0x0000, 0x2fff) AM_DEVICE(A2_LCBANK_TAG, address_map_bank_device, amap8)
 	AM_RANGE(0x3000, 0x5fff) AM_READWRITE(inh_r, inh_w)
 ADDRESS_MAP_END
 
@@ -2424,10 +2424,10 @@ WRITE_LINE_MEMBER(apple2e_state::ay3600_data_ready_w)
 		trans |= (m_kbspecial->read() & 0x01) ? 0x0000 : 0x0200;    // caps lock is bit 9 (active low)
 
 		if (m_isiic)
-		{ 
+		{
 			if (m_sysconfig->read() & 0x08)
 			{
-				trans += 0x400;	// go to DVORAK half of the ROM
+				trans += 0x400; // go to DVORAK half of the ROM
 			}
 		}
 
@@ -2459,7 +2459,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::ay3600_repeat)
 		}
 		else
 		{
-			m_strobe = 0x80; 
+			m_strobe = 0x80;
 		}
 	}
 }
@@ -3169,7 +3169,7 @@ static MACHINE_CONFIG_START( apple2e, apple2e_state )
 	MCFG_AY3600_SHIFT_CB(READLINE(apple2e_state, ay3600_shift_r))
 	MCFG_AY3600_CONTROL_CB(READLINE(apple2e_state, ay3600_control_r))
 	MCFG_AY3600_DATA_READY_CB(WRITELINE(apple2e_state, ay3600_data_ready_w))
-	MCFG_AY3600_AKO_CB(WRITELINE(apple2e_state, ay3600_ako_w)) 
+	MCFG_AY3600_AKO_CB(WRITELINE(apple2e_state, ay3600_ako_w))
 
 	/* repeat timer.  15 Hz from page 7-15 of "Understanding the Apple IIe" */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("repttmr", apple2e_state, ay3600_repeat, attotime::from_hz(15))
@@ -3215,8 +3215,8 @@ static MACHINE_CONFIG_DERIVED( tk3000, apple2e )
 	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_CPU_PROGRAM_MAP(apple2e_map)
 
-//	MCFG_CPU_ADD("subcpu", Z80, 1021800)    // schematics are illegible on where the clock comes from, but it *seems* to be the same as the 65C02 clock
-//	MCFG_CPU_PROGRAM_MAP(tk3000_kbd_map)
+//  MCFG_CPU_ADD("subcpu", Z80, 1021800)    // schematics are illegible on where the clock comes from, but it *seems* to be the same as the 65C02 clock
+//  MCFG_CPU_PROGRAM_MAP(tk3000_kbd_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2ep, apple2e )
@@ -3597,4 +3597,3 @@ COMP( 1985, apple2c0, apple2c,  0,        apple2c_iwm, apple2c, driver_device,  
 COMP( 1986, apple2c3, apple2c,  0,        apple2c_mem, apple2c, driver_device,  0,        "Apple Computer",    "Apple //c (Original Memory Expansion)", GAME_SUPPORTS_SAVE )
 COMP( 1986, apple2c4, apple2c,  0,        apple2c_mem, apple2c, driver_device,  0,        "Apple Computer",    "Apple //c (rev 4)", GAME_SUPPORTS_SAVE )
 COMP( 1988, apple2cp, apple2c,  0,        apple2cp,    apple2c, driver_device,  0,        "Apple Computer",    "Apple //c Plus", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-

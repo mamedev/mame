@@ -341,7 +341,7 @@ Sega Strike Fighter (Rev A, set 2)              840-0035C    23786A  20 (64Mb)  
 Sega Tetris                                     840-0018C    22909    6 (64Mb)   present     315-6213  317-0268-COM
 Slashout                                        840-0041C    23341   17 (64Mb)   ?           315-6213  317-0286-COM   joystick + 4 buttons
 Spawn In the Demon's Hand (Rev B)               841-0005C    22977B  10 (64Mb)   ?           315-6213  317-5051-COM   joystick + 4 buttons
-Super Major League '99                          840-0012C    22059   21 (64Mb)   ?           315-6213  ? 
+Super Major League '99                          840-0012C    22059   21 (64Mb)   ?           315-6213  ?
 The Typing of the Dead (Rev A)                  840-0026C    23021A  20 (64Mb)   present     315-6213  not present
 Touch de UNO! / Unou Nouryoku Check Machine     840-0008C    22073    4 (64Mb)   present     315-6213  317-0255-JPN   requires special JVS board with touch input and printer
 Toy Fighter / Waffupu                           840-0011C    22035   10 (64Mb)   present     315-6212  317-0257-COM   joystick + 3 buttons
@@ -7835,16 +7835,16 @@ ROM_START( kingrt66 )
 
 	ROM_REGION( 0xa800000, "rom_board", ROMREGION_ERASEFF)
 	ROM_LOAD( "epr-23819a.ic22", 0x0000000, 0x00400000, CRC(92f11b29) SHA1(b33f7eefb849754cfe194be1d48d770ed77ff69a) )
-	ROM_LOAD("mpr-23808.ic1",  0x00800000,	0x01000000, CRC(e911bc86) SHA1(0dc658851e20425b2e697e538bb4297a221f6ae8) )
-	ROM_LOAD("mpr-23809.ic2",  0x01800000,	0x01000000, CRC(2716aba0) SHA1(4c245874da244926bf9ac6636af4fa67e07a21e8) )
-	ROM_LOAD("mpr-23810.ic3",  0x02800000,	0x01000000, CRC(2226accb) SHA1(c4dc71e87c2ccd866f4180129181b7ced8caf22c) )
-	ROM_LOAD("mpr-23811.ic4",  0x03800000,	0x01000000, CRC(bbad4a93) SHA1(724c3376102b2dc79b852af1e90748b2e0023b82) )
-	ROM_LOAD("mpr-23812.ic5",  0x04800000,	0x01000000, CRC(7beabe22) SHA1(d3cd926fc768d480ff45f1e30024bb0e31bd7d2c) )
-	ROM_LOAD("mpr-23813.ic6",  0x05800000,	0x01000000, CRC(fe0b94ea) SHA1(0e46dff932036bec49c78a612bcfd27e07b516e8) )
-	ROM_LOAD("mpr-23814.ic7",  0x06800000,	0x01000000, CRC(0cdf7325) SHA1(41668f873b7842dac1bc85aa2b6bd6512edc9b64) )
-	ROM_LOAD("mpr-23815.ic8",  0x07800000,	0x01000000, CRC(ef327ab8) SHA1(9dfc564084a75b9c3935374347f1709d2e86e469) )
-	ROM_LOAD("mpr-23816.ic9",  0x08800000,	0x01000000, CRC(bbaf0765) SHA1(3b79a4eff504b2156bea8b86c6cdd8e41e7bf268) )
-	ROM_LOAD("mpr-23817.ic10", 0x09800000,	0x01000000, CRC(e179cfb6) SHA1(1120036238439f8ac1041150396e4b60e4a243bc) )
+	ROM_LOAD("mpr-23808.ic1",  0x00800000,  0x01000000, CRC(e911bc86) SHA1(0dc658851e20425b2e697e538bb4297a221f6ae8) )
+	ROM_LOAD("mpr-23809.ic2",  0x01800000,  0x01000000, CRC(2716aba0) SHA1(4c245874da244926bf9ac6636af4fa67e07a21e8) )
+	ROM_LOAD("mpr-23810.ic3",  0x02800000,  0x01000000, CRC(2226accb) SHA1(c4dc71e87c2ccd866f4180129181b7ced8caf22c) )
+	ROM_LOAD("mpr-23811.ic4",  0x03800000,  0x01000000, CRC(bbad4a93) SHA1(724c3376102b2dc79b852af1e90748b2e0023b82) )
+	ROM_LOAD("mpr-23812.ic5",  0x04800000,  0x01000000, CRC(7beabe22) SHA1(d3cd926fc768d480ff45f1e30024bb0e31bd7d2c) )
+	ROM_LOAD("mpr-23813.ic6",  0x05800000,  0x01000000, CRC(fe0b94ea) SHA1(0e46dff932036bec49c78a612bcfd27e07b516e8) )
+	ROM_LOAD("mpr-23814.ic7",  0x06800000,  0x01000000, CRC(0cdf7325) SHA1(41668f873b7842dac1bc85aa2b6bd6512edc9b64) )
+	ROM_LOAD("mpr-23815.ic8",  0x07800000,  0x01000000, CRC(ef327ab8) SHA1(9dfc564084a75b9c3935374347f1709d2e86e469) )
+	ROM_LOAD("mpr-23816.ic9",  0x08800000,  0x01000000, CRC(bbaf0765) SHA1(3b79a4eff504b2156bea8b86c6cdd8e41e7bf268) )
+	ROM_LOAD("mpr-23817.ic10", 0x09800000,  0x01000000, CRC(e179cfb6) SHA1(1120036238439f8ac1041150396e4b60e4a243bc) )
 
 	ROM_REGION( 4, "rom_key", ROMREGION_ERASE00 )
 ROM_END
@@ -8948,7 +8948,7 @@ ROM_END
 /* 0039 */ GAME( 2000, gram2000, naomi,    naomim1, naomi,   naomi_state, gram2000,ROT0, "Sega", "Giant Gram 2000 (JPN, USA, EXP, KOR, AUS)", GAME_FLAGS )
 /* 0040 */ GAME( 2000, wwfroyal, naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "WWF Royal Rumble (JPN, USA, EXP, KOR, AUS)", GAME_FLAGS )
 /* 0041 */ GAME( 2000, slasho,   naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Slashout (JPN, USA, EXP, KOR, AUS)", GAME_FLAGS )
-// 0042 Ferrari F355 Challenge 2 (twin) - identical to 834-????? listed above. 
+// 0042 Ferrari F355 Challenge 2 (twin) - identical to 834-????? listed above.
 /* 0043 */ GAME( 2000, crackndj, naomi,    naomim2, crackndj,naomi_state, naomi,   ROT0, "Sega", "Crackin' DJ", GAME_FLAGS )
 /* 0044 */ GAME( 2000, csmasho,  csmash,   naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Cosmic Smash (JPN, USA, EXP, KOR, AUS)", GAME_FLAGS )
 /* 0044 */ GAME( 2000, csmash,   naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Cosmic Smash (JPN, USA, EXP, KOR, AUS) (Rev A)", GAME_FLAGS )

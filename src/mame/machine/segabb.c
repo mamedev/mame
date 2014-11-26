@@ -21,7 +21,7 @@ void sega_lindbergh_baseboard_device::device_start()
 	pci_device::device_start();
 	add_map(   128*1024, M_MEM, FUNC(sega_lindbergh_baseboard_device::map1));
 	add_map(  1024*1024, M_MEM, FUNC(sega_lindbergh_baseboard_device::map2));
-	add_map(2*1024*1024, M_MEM, FUNC(sega_lindbergh_baseboard_device::map3));	
+	add_map(2*1024*1024, M_MEM, FUNC(sega_lindbergh_baseboard_device::map3));
 }
 
 void sega_lindbergh_baseboard_device::device_reset()

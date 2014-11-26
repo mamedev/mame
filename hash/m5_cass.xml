@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- 
-	Cassettes that load with CHAIN cannot auto-start correctly.
-	Mount the BASIC-I cart first, then the cassette to load + run them.
-	
-	Other tapes should auto-load and run.
+<!--
+    Cassettes that load with CHAIN cannot auto-start correctly.
+    Mount the BASIC-I cart first, then the cassette to load + run them.
+
+    Other tapes should auto-load and run.
 -->
 
 <softwarelist name="m5_cass" description="Sord M5 cassettes">
@@ -220,7 +220,7 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Mount together with &quot;BASIC-I&quot; and load with CHAIN"/>
-	<!--<sharedfeat name="requirement" value="m5_cart:basici"/>-->	
+	<!--<sharedfeat name="requirement" value="m5_cart:basici"/>-->
 
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="3278">

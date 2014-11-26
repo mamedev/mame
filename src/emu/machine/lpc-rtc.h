@@ -14,7 +14,7 @@ public:
 							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space);
 
 	virtual void map_extdevice(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-								  UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space);
+									UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space);
 
 	DECLARE_READ8_MEMBER(  index_r);
 	DECLARE_WRITE8_MEMBER( index_w);

@@ -359,7 +359,7 @@ static ADDRESS_MAP_START( le_main, AS_PROGRAM, 8, lethal_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bank4000_map, AS_PROGRAM, 8, lethal_state )
-    // VRD = 0 or 1, CBNK = 0
+	// VRD = 0 or 1, CBNK = 0
 	AM_RANGE(0x0840, 0x084f) AM_MIRROR(0x8000) AM_DEVREADWRITE("k053244", k05324x_device, k053244_r, k053244_w)
 	AM_RANGE(0x0880, 0x089f) AM_MIRROR(0x8000) AM_DEVREADWRITE("k054000", k054000_device, read, write)
 	AM_RANGE(0x08c6, 0x08c6) AM_MIRROR(0x8000) AM_WRITE(sound_cmd_w)

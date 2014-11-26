@@ -372,11 +372,11 @@ UINT32 dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_ind1
 
 READ32_MEMBER(dreamwld_state::dreamwld_protdata_r)
 {
-//	static int count = 0;
+//  static int count = 0;
 
 
-//	printf("protection read %04x\n", count);
-//	count++;
+//  printf("protection read %04x\n", count);
+//  count++;
 
 	UINT8 *protdata = memregion("user1")->base();
 	size_t protsize = memregion("user1")->bytes();

@@ -6,7 +6,7 @@
 
     Games supported:
         * Super Breakout
-		* Super Breakout (Canyon and Vertical Breakout, prototype) - built from original source code
+        * Super Breakout (Canyon and Vertical Breakout, prototype) - built from original source code
 
     Known issues:
         * none at this time

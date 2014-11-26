@@ -28,14 +28,14 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
     Helpful Defines
 ***************************************************************************/
 
-#define VDREG	((op >> 6) & 0x1f)
-#define VS1REG	((op >> 11) & 0x1f)
-#define VS2REG	((op >> 16) & 0x1f)
-#define EL		((op >> 21) & 0xf)
+#define VDREG   ((op >> 6) & 0x1f)
+#define VS1REG  ((op >> 11) & 0x1f)
+#define VS2REG  ((op >> 16) & 0x1f)
+#define EL      ((op >> 21) & 0xf)
 
-#define RSVAL	(m_rsp.m_rsp_state->r[RSREG])
-#define RTVAL	(m_rsp.m_rsp_state->r[RTREG])
-#define RDVAL	(m_rsp.m_rsp_state->r[RDREG])
+#define RSVAL   (m_rsp.m_rsp_state->r[RSREG])
+#define RTVAL   (m_rsp.m_rsp_state->r[RTREG])
+#define RDVAL   (m_rsp.m_rsp_state->r[RDREG])
 
 #define VREG_B(reg, offset)         m_v[(reg)].b[(offset)^1]
 #define W_VREG_S(reg, offset)       m_v[(reg)].s[(offset)]
@@ -60,16 +60,16 @@ static void cfunc_ctc2(void *param);
 #define ACCUM_M(x)           (UINT16)m_accum[x].w[2]
 #define ACCUM_L(x)           (UINT16)m_accum[x].w[1]
 #define ACCUM_LL(x)          (UINT16)m_accum[x].w[0]
-#define ACCUM(x)			 m_accum[x].q
+#define ACCUM(x)             m_accum[x].q
 
 #define SET_ACCUM_H(v, x)       m_accum[x].w[3] = v;
 #define SET_ACCUM_M(v, x)       m_accum[x].w[2] = v;
 #define SET_ACCUM_L(v, x)       m_accum[x].w[1] = v;
 #define SET_ACCUM_LL(v, x)      m_accum[x].w[0] = v;
-#define SET_ACCUM(v, x)			m_accum[x].q = v;
+#define SET_ACCUM(v, x)         m_accum[x].q = v;
 
-#define GET_VS1(out, i)			out = VREG_S(vs1reg, i)
-#define GET_VS2(out, i)			out = VREG_S(vs2reg, VEC_EL_2(el, i))
+#define GET_VS1(out, i)         out = VREG_S(vs1reg, i)
+#define GET_VS2(out, i)         out = VREG_S(vs2reg, VEC_EL_2(el, i))
 
 #define CARRY_FLAG(x)          (m_vflag[CARRY][x & 7] != 0 ? 0xffff : 0)
 #define COMPARE_FLAG(x)        (m_vflag[COMPARE][x & 7] != 0 ? 0xffff : 0)
@@ -96,10 +96,10 @@ static void cfunc_ctc2(void *param);
 #define CLEAR_CLIP2_FLAG(x)         { m_vflag[CLIP2][x & 7] = 0; }
 
 #define CACHE_VALUES() \
-	const int op = m_op;	\
-	const int vdreg = VDREG;	\
-	const int vs1reg = VS1REG;	\
-	const int vs2reg = VS2REG;	\
+	const int op = m_op;    \
+	const int vdreg = VDREG;    \
+	const int vs1reg = VS1REG;  \
+	const int vs2reg = VS2REG;  \
 	const int el = EL;
 
 #define WRITEBACK_RESULT() { \
@@ -2105,7 +2105,7 @@ void rsp_cop2_drc::vsaw()
 				W_VREG_S(vdreg, i) = ACCUM_L(i);
 			}
 			break;
-		default:		// Unsupported
+		default:        // Unsupported
 		{
 			for (int i = 0; i < 8; i++)
 			{
@@ -3465,8 +3465,8 @@ int rsp_cop2_drc::generate_vector_opcode(drcuml_block *block, rsp_device::compil
 			UML_CALLC(block, cfunc_vmov, this);
 			return TRUE;
 
-		case 0x34:		/* VRSQ */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);	      // mov     [arg0],desc->opptr.l
+		case 0x34:      /* VRSQ */
+			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);         // mov     [arg0],desc->opptr.l
 			UML_CALLC(block, cfunc_vrsq, this);
 			return TRUE;
 
@@ -3480,8 +3480,8 @@ int rsp_cop2_drc::generate_vector_opcode(drcuml_block *block, rsp_device::compil
 			UML_CALLC(block, cfunc_vrsqh, this);
 			return TRUE;
 
-		case 0x37:		/* VNOP */
-		case 0x3F:		/* VNULL */
+		case 0x37:      /* VNOP */
+		case 0x3F:      /* VNULL */
 			return TRUE;
 
 		default:
@@ -3708,27 +3708,27 @@ int rsp_cop2_drc::generate_cop2(drcuml_block *block, rsp_device::compiler_state 
 		case 0x00:  /* MFCz */
 			if (RTREG != 0)
 			{
-				UML_MOV(block, mem(&m_op), desc->opptr.l[0]);	// mov     [arg0],desc->opptr.l
-				UML_CALLC(block, cfunc_mfc2, this);				// callc   mfc2
+				UML_MOV(block, mem(&m_op), desc->opptr.l[0]);   // mov     [arg0],desc->opptr.l
+				UML_CALLC(block, cfunc_mfc2, this);             // callc   mfc2
 			}
 			return TRUE;
 
 		case 0x02:  /* CFCz */
 			if (RTREG != 0)
 			{
-				UML_MOV(block, mem(&m_op), desc->opptr.l[0]);	// mov     [arg0],desc->opptr.l
-				UML_CALLC(block, cfunc_cfc2, this);				// callc   cfc2
+				UML_MOV(block, mem(&m_op), desc->opptr.l[0]);   // mov     [arg0],desc->opptr.l
+				UML_CALLC(block, cfunc_cfc2, this);             // callc   cfc2
 			}
 			return TRUE;
 
 		case 0x04:  /* MTCz */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);	// mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_mtc2, this);				// callc   mtc2
+			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);   // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_mtc2, this);             // callc   mtc2
 			return TRUE;
 
 		case 0x06:  /* CTCz */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);	// mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_ctc2, this);				// callc   ctc2
+			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);   // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_ctc2, this);             // callc   ctc2
 			return TRUE;
 
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:

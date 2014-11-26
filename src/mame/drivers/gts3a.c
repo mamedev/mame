@@ -5,7 +5,7 @@
   PINBALL
   Gottlieb System 3
   Dot Matrix Display
-  
+
   You need to pick "Pixel Aspect (4:1)" video option in the tab menu.
 
 Status:
@@ -256,7 +256,7 @@ WRITE8_MEMBER( gts3a_state::u4b_w )
 	m_lampclk = clk_bit;
 
 
-//	printf("B=%s=%X ",machine().describe_context(),data&0xe0);
+//  printf("B=%s=%X ",machine().describe_context(),data&0xe0);
 }
 
 READ8_MEMBER( gts3a_state::u4a_r )

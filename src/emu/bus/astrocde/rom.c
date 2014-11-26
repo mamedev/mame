@@ -80,21 +80,20 @@ READ8_MEMBER(astrocade_rom_device::read_rom)
 
 READ8_MEMBER(astrocade_rom_256k_device::read_rom)
 {
-	if (offset < 0x1000)	// 0x2000-0x2fff
+	if (offset < 0x1000)    // 0x2000-0x2fff
 		return m_rom[offset + 0x1000 * 0x3f];
-	else if (offset < 0x1fc0)	// 0x3000-0x3fbf
+	else if (offset < 0x1fc0)   // 0x3000-0x3fbf
 		return m_rom[(offset & 0xfff) + (0x1000 * m_base_bank)];
-	else	// 0x3fc0-0x3fff
+	else    // 0x3fc0-0x3fff
 		return m_base_bank = offset & 0x3f;
 }
 
 READ8_MEMBER(astrocade_rom_512k_device::read_rom)
 {
-	if (offset < 0x1000)	// 0x2000-0x2fff
+	if (offset < 0x1000)    // 0x2000-0x2fff
 		return m_rom[offset + 0x1000 * 0x7f];
-	else if (offset < 0x1f80)	// 0x3000-0x3fbf
+	else if (offset < 0x1f80)   // 0x3000-0x3fbf
 		return m_rom[(offset & 0xfff) + (0x1000 * m_base_bank)];
-	else	// 0x3fc0-0x3fff
+	else    // 0x3fc0-0x3fff
 		return m_base_bank = offset & 0x7f;
 }
-

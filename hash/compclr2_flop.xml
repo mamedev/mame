@@ -187,7 +187,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="asteroida" cloneof="asteroid">
 		<description>Asteroids (Alt)</description>
 		<year>19??</year>

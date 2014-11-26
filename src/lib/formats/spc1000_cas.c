@@ -10,7 +10,7 @@ Tape formats:
 TAP: This is a series of 0x30 and 0x31 bytes, representing binary
      0 and 1. It includes the header and leaders.
 
-CAS: Files in this format consist of a 16 bytes header (SPC-1000.CASfmt ) 
+CAS: Files in this format consist of a 16 bytes header (SPC-1000.CASfmt )
      followed by cassette bits packed together (each byte of a .cas file
      are 8 bits, most significant bit first)
 
@@ -74,12 +74,12 @@ static int spc1000_handle_tap(INT16 *buffer, const UINT8 *bytes)
 static int spc1000_handle_cas(INT16 *buffer, const UINT8 *bytes)
 {
 	UINT32 sample_count = 0;
-	
+
 	/* data (skipping first 16 bytes, which is CAS header) */
 	for (UINT32 i = 0x10; i < spc1000_image_size; i++)
 		for (int j = 0; j < 8; j++)
 			sample_count += spc1000_output_bit(buffer, sample_count, (bytes[i] >> (7 - j)) & 1);
-	
+
 	return sample_count;
 }
 
@@ -112,7 +112,7 @@ static int spc1000_tap_calculate_size_in_samples(const UINT8 *bytes, int length)
 static int spc1000_cas_calculate_size_in_samples(const UINT8 *bytes, int length)
 {
 	spc1000_image_size = length;
-	
+
 	return spc1000_handle_cas(NULL, bytes);
 }
 

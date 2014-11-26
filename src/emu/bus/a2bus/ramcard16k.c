@@ -107,10 +107,10 @@ void a2bus_ramcard_device::do_io(int offset)
 	}
 
 	#if 0
-	printf("LC: new state %c%c dxxx=%04x\n", 
-		   (m_inh_state & INH_READ) ? 'R' : 'x',
-		   (m_inh_state & INH_WRITE) ? 'W' : 'x', 
-		   m_dxxx_bank);
+	printf("LC: new state %c%c dxxx=%04x\n",
+			(m_inh_state & INH_READ) ? 'R' : 'x',
+			(m_inh_state & INH_WRITE) ? 'W' : 'x',
+			m_dxxx_bank);
 	#endif
 }
 
@@ -137,7 +137,7 @@ void a2bus_ramcard_device::write_c0nx(address_space &space, UINT8 offset, UINT8 
 
 UINT8 a2bus_ramcard_device::read_inh_rom(address_space &space, UINT16 offset)
 {
-	assert(m_inh_state & INH_READ);	// this should never happen
+	assert(m_inh_state & INH_READ); // this should never happen
 
 	if (offset < 0xe000)
 	{
@@ -168,4 +168,3 @@ int a2bus_ramcard_device::inh_type()
 {
 	return m_inh_state;
 }
-

@@ -18,15 +18,15 @@
     F4 + 0..9 on numeric keypad = setup mode.  0 changes serial port speed,
     1..9 toggle one of mode bits:
 
-	1	XON/XOFF	0: Off  1: On
-	2	Character set	0: N0/N1  2: N2 
-	3	Auto LF		0: Off  1: On
-	4	Auto repeat	0: On  1: Off
-	5	Auto wraparound	0: On  1: Off
-	6	Interpret controls	0: Interpret  1: Display
-	7	Parity check	0: Off  1: On
-	8	Parity bits	0: None  1: Even
-	9	Stop bits
+    1   XON/XOFF    0: Off  1: On
+    2   Character set   0: N0/N1  2: N2
+    3   Auto LF     0: Off  1: On
+    4   Auto repeat 0: On  1: Off
+    5   Auto wraparound 0: On  1: Off
+    6   Interpret controls  0: Interpret  1: Display
+    7   Parity check    0: Off  1: On
+    8   Parity bits 0: None  1: Even
+    9   Stop bits
 
     N0/N1 charset has regular ASCII in C0 page and Cyrillic in C1 page,
     switching between them via SI/SO.   N2 charset has uppercase Cyrillic
@@ -39,9 +39,9 @@
     Terminfo description would be something like
 
 ksm|DVK KSM,
-	am, bw, dch1=\EP, ich1=\EQ,
-	acsc=hRiTjXkClJmFnNqUtEuPv\174wKxW.M\054Q\055S\053\136~_{@}Z0\177,
-	use=vt52,
+    am, bw, dch1=\EP, ich1=\EQ,
+    acsc=hRiTjXkClJmFnNqUtEuPv\174wKxW.M\054Q\055S\053\136~_{@}Z0\177,
+    use=vt52,
 
     To do:
     - make Caps Lock work
@@ -220,8 +220,8 @@ WRITE8_MEMBER(ksm_state::ksm_ppi_portc_w)
 
 WRITE_LINE_MEMBER(ksm_state::write_keyboard_clock)
 {
-//	KSM never sends data to keyboard
-//	m_i8251kbd->write_txc(state);
+//  KSM never sends data to keyboard
+//  m_i8251kbd->write_txc(state);
 	m_i8251kbd->write_rxc(state);
 }
 
@@ -284,7 +284,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ksm_state::scanline_callback)
 {
 	UINT16 y = m_screen->vpos();
 	UINT16 offset;
-	
+
 	DBG_LOG(2,"scanline_cb",
 		("addr %02x frame %" I64FMT "d x %.4d y %.3d row %.2d\n",
 		m_video.line, m_screen->frame_number(), m_screen->hpos(), y, y%11));
@@ -384,8 +384,8 @@ MACHINE_CONFIG_END
 
 
 /*
-	Assumes that SRAM is at 0x2000, which is where technical manual puts it.
-	Chargen has 1 missing pixel in 'G' character.
+    Assumes that SRAM is at 0x2000, which is where technical manual puts it.
+    Chargen has 1 missing pixel in 'G' character.
 */
 ROM_START( dvk_ksm )
 	ROM_REGION(0x1000, "maincpu", ROMREGION_ERASE00)
@@ -397,8 +397,8 @@ ROM_START( dvk_ksm )
 ROM_END
 
 /*
-	Assumes that SRAM is at 0x2100, otherwise identical.
-	Chargen has no missing pixels in 'G' character.
+    Assumes that SRAM is at 0x2100, otherwise identical.
+    Chargen has no missing pixels in 'G' character.
 */
 ROM_START( dvk_ksm01 )
 	ROM_REGION(0x1000, "maincpu", ROMREGION_ERASE00)

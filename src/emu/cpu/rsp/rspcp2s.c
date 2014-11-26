@@ -26,14 +26,14 @@ using namespace uml;
     Helpful Defines
 ***************************************************************************/
 
-#define VDREG	((op >> 6) & 0x1f)
-#define VS1REG	((op >> 11) & 0x1f)
-#define VS2REG	((op >> 16) & 0x1f)
-#define EL		((op >> 21) & 0xf)
+#define VDREG   ((op >> 6) & 0x1f)
+#define VS1REG  ((op >> 11) & 0x1f)
+#define VS2REG  ((op >> 16) & 0x1f)
+#define EL      ((op >> 21) & 0xf)
 
-#define RSVAL	(m_rsp.m_rsp_state->r[RSREG])
-#define RTVAL	(m_rsp.m_rsp_state->r[RTREG])
-#define RDVAL	(m_rsp.m_rsp_state->r[RDREG])
+#define RSVAL   (m_rsp.m_rsp_state->r[RSREG])
+#define RTVAL   (m_rsp.m_rsp_state->r[RTREG])
+#define RDVAL   (m_rsp.m_rsp_state->r[RDREG])
 
 #define EXTRACT16(reg, value, element) \
 	switch((element) & 7) \
@@ -2322,9 +2322,8 @@ inline void rsp_cop2_simd::vsaw()
 			m_xv[VDREG] = m_accum_l;
 			break;
 		}
-		default:		// Unsupported, writes 0 to VD
+		default:        // Unsupported, writes 0 to VD
 		{
-
 		}
 	}
 }
@@ -3602,27 +3601,27 @@ int rsp_cop2_simd::generate_cop2(drcuml_block *block, rsp_device::compiler_state
 		case 0x00:  /* MFCz */
 			if (RTREG != 0)
 			{
-				UML_MOV(block, mem(&m_op), desc->opptr.l[0]);	// mov     [arg0],desc->opptr.l
-				UML_CALLC(block, cfunc_mfc2, this);				// callc   mfc2
+				UML_MOV(block, mem(&m_op), desc->opptr.l[0]);   // mov     [arg0],desc->opptr.l
+				UML_CALLC(block, cfunc_mfc2, this);             // callc   mfc2
 			}
 			return TRUE;
 
 		case 0x02:  /* CFCz */
 			if (RTREG != 0)
 			{
-				UML_MOV(block, mem(&m_op), desc->opptr.l[0]);	// mov     [arg0],desc->opptr.l
-				UML_CALLC(block, cfunc_cfc2, this);				// callc   cfc2
+				UML_MOV(block, mem(&m_op), desc->opptr.l[0]);   // mov     [arg0],desc->opptr.l
+				UML_CALLC(block, cfunc_cfc2, this);             // callc   cfc2
 			}
 			return TRUE;
 
 		case 0x04:  /* MTCz */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);	// mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_mtc2, this);				// callc   mtc2
+			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);   // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_mtc2, this);             // callc   mtc2
 			return TRUE;
 
 		case 0x06:  /* CTCz */
-			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);	// mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_ctc2, this);				// callc   ctc2
+			UML_MOV(block, mem(&m_op), desc->opptr.l[0]);   // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_ctc2, this);             // callc   ctc2
 			return TRUE;
 
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:

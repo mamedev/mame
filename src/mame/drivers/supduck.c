@@ -177,7 +177,7 @@ TILE_GET_INFO_MEMBER(supduck_state::get_fore_tile_info)
 
 	int color = (data & 0x0f00)>>8;
 	int flags = (data & 0x2000) ? TILE_FLIPX : 0;
-	    flags |=(data & 0x1000) ? TILE_FLIPY : 0;
+		flags |=(data & 0x1000) ? TILE_FLIPY : 0;
 
 
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
@@ -185,7 +185,6 @@ TILE_GET_INFO_MEMBER(supduck_state::get_fore_tile_info)
 
 TILE_GET_INFO_MEMBER(supduck_state::get_back_tile_info)
 {
-
 	UINT16 *videoram = m_back_videoram;
 	int data = videoram[tile_index];
 
@@ -195,7 +194,7 @@ TILE_GET_INFO_MEMBER(supduck_state::get_back_tile_info)
 
 	int color = (data & 0x0f00)>>8;
 	int flags = (data & 0x2000) ? TILE_FLIPX : 0;
-	    flags |=(data & 0x1000) ? TILE_FLIPY : 0;
+		flags |=(data & 0x1000) ? TILE_FLIPY : 0;
 
 	SET_TILE_INFO_MEMBER(2, code, color, flags);
 }
@@ -244,7 +243,6 @@ void supduck_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 WRITE16_MEMBER(supduck_state::supduck_4000_w)
 {
-
 }
 
 WRITE16_MEMBER(supduck_state::supduck_paletteram_w)
@@ -298,7 +296,7 @@ WRITE16_MEMBER(supduck_state::supduck_scroll_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, supduck_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_WRITENOP
-	AM_RANGE(0xfe0000, 0xfe1fff) AM_RAM AM_SHARE("spriteram") 
+	AM_RANGE(0xfe0000, 0xfe1fff) AM_RAM AM_SHARE("spriteram")
 
 	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("P1_P2") AM_WRITE( supduck_4000_w )
 	AM_RANGE(0xfe4002, 0xfe4003) AM_READ_PORT("SYSTEM") AM_WRITE( supduck_4002_w )
@@ -306,7 +304,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, supduck_state )
 
 	AM_RANGE(0xfe8000, 0xfe8007) AM_WRITE(supduck_scroll_w)
 	AM_RANGE(0xfe800e, 0xfe800f) AM_WRITENOP // watchdog or irqack
-	
+
 	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(text_videoram_w) AM_SHARE("textvideoram")
 	AM_RANGE(0xff0000, 0xff3fff) AM_RAM_WRITE(back_videoram_w) AM_SHARE("backvideoram")
 	AM_RANGE(0xff4000, 0xff7fff) AM_RAM_WRITE(fore_videoram_w) AM_SHARE("forevideoram")
@@ -444,7 +442,7 @@ static const gfx_layout vramlayout_bionicc=
 };
 
 // same as the ROM tilemap layout from tigeroad
-static const gfx_layout tile_layout = 
+static const gfx_layout tile_layout =
 {
 	32, 32,
 	RGN_FRAC(1, 2),
@@ -512,7 +510,7 @@ static MACHINE_CONFIG_START( supduck, supduck_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supduck)
 
 	MCFG_PALETTE_ADD("palette", 0x800/2)
-//	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB) // can't use this, the RGB bits are the lowest bits with this format, for this game they're the highest bits
+//  MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB) // can't use this, the RGB bits are the lowest bits with this format, for this game they're the highest bits
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -562,7 +560,7 @@ ROM_START( supduck )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "2.su12",   0x00000, 0x20000, CRC(745d42fb) SHA1(f9aee3ddbad3cc2f3a7002ee0d762eb041967e1e) ) // static sample data
-	
+
 	ROM_REGION( 0x80000, "okibank", 0 )
 	ROM_LOAD( "1.su13",   0x00000, 0x80000, CRC(7fb1ed42) SHA1(77ec86a6454398e329066aa060e9b6a39085ce71) ) // banked sample data
 ROM_END

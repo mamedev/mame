@@ -2695,4 +2695,3 @@ GAME( 1988, kabukizj,  kabukiz,  kabukiz,  kabukizj, tnzs_state,    kabukiz,  RO
 
 GAME( 1989, insectx,   0,        insectx,  insectx,  tnzs_state,    insectx,  ROT0,   "Taito Corporation Japan", "Insector X (World)", 0 )
 GAME( 1989, insectxj,  insectx,  insectx,  insectxj, tnzs_state,    insectx,  ROT0,   "Taito Corporation",       "Insector X (Japan)", 0 )
-

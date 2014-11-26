@@ -269,7 +269,7 @@ protected:
 	direct_read_data *m_direct;
 
 private:
-	rsp_cop2	*m_cop2;
+	rsp_cop2    *m_cop2;
 
 	UINT32 *m_dmem32;
 	UINT16 *m_dmem16;

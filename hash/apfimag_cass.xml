@@ -3,7 +3,7 @@
 
 <softwarelist name="apfimag_cass" description="APF Imagination cassettes">
 
-<!-- To load a tape, just start APF Imagination with the BASIC cart inserted, and type CLOAD followed by <Return> 
+<!-- To load a tape, just start APF Imagination with the BASIC cart inserted, and type CLOAD followed by <Return>
 (by default mapped to your ']' key). Then start the tape from the Internal UI and press <Return>.
 
 If you don't press <Return>, the system won't read the tape (this is fairly unusual but it's the way the system works)

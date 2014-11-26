@@ -51,7 +51,7 @@ const rom_entry *omti5100_device::device_rom_region() const
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( omti5100_z8 )
-//	MCFG_CPU_ADD("z8", Z8681, XTAL_20MHz / 3 /* ??? */)
+//  MCFG_CPU_ADD("z8", Z8681, XTAL_20MHz / 3 /* ??? */)
 MACHINE_CONFIG_END
 
 machine_config_constructor omti5100_device::device_mconfig_additions() const
@@ -70,7 +70,7 @@ machine_config_constructor omti5100_device::device_mconfig_additions() const
 
 omti5100_device::omti5100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, OMTI5100, "OMTI 5100 SCSI/SASI Controller", tag, owner, clock, "omti5100", __FILE__),
-//	m_cpu(*this, "z8"),
+//  m_cpu(*this, "z8"),
 	m_bsy_w(*this),
 	m_cd_w(*this),
 	m_io_w(*this),

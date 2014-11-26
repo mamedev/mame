@@ -1009,11 +1009,11 @@ void cp1610_cpu_device::cp1610_besc(int dir)
  *  S Z C OV 1 000 s1e e p ppp ppp ppp ppp ppp
  *  - - - -  BEXT ADDR, eeee
  ***************************************************/
- void cp1610_cpu_device::cp1610_bext(int ext, int dir)
+	void cp1610_cpu_device::cp1610_bext(int ext, int dir)
 {
 	UINT16 offset = cp1610_readop(m_r[7]);
 	m_r[7]++;
-	
+
 	if (m_read_bext(ext))
 	{
 		m_r[7] += (offset ^ dir);

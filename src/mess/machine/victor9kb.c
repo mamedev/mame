@@ -355,7 +355,7 @@ WRITE8_MEMBER( victor9k_keyboard_device::kb_p2_w )
 	    bit     description
 
 	    P20     ?
-	    P21 	KBRDY
+	    P21     KBRDY
 	    P22     ?
 	    P23     KBDATA
 

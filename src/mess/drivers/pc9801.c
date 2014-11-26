@@ -17,7 +17,7 @@
     - rewrite using slot devices
     - some later SWs put "Invalid command byte 05" (Absolutely Mahjong on Epson logo)
     - investigate on POR bit
-	- test 2dd more
+    - test 2dd more
 
     TODO (PC-9801RS):
     - extra features;
@@ -607,8 +607,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pc9801rs_access_ctrl_w);
 	DECLARE_WRITE8_MEMBER(pc9801rs_nmi_w);
 	DECLARE_READ8_MEMBER(pc9801rs_midi_r);
-//	DECLARE_READ8_MEMBER(winram_r);
-//	DECLARE_WRITE8_MEMBER(winram_w);
+//  DECLARE_READ8_MEMBER(winram_r);
+//  DECLARE_WRITE8_MEMBER(winram_w);
 //  DECLARE_READ8_MEMBER(pc9801_ext_opna_r);
 //  DECLARE_WRITE8_MEMBER(pc9801_ext_opna_w);
 	DECLARE_READ8_MEMBER(pic_r);
@@ -2122,14 +2122,14 @@ WRITE8_MEMBER(pc9801_state::pc9821_ext2_video_ff_w)
 
 /*READ8_MEMBER(pc9801_state::winram_r)
 {
-	offset = (offset & 0x1ffff) | (m_pc9821_window_bank & 0xfe) * 0x10000;
-	return
+    offset = (offset & 0x1ffff) | (m_pc9821_window_bank & 0xfe) * 0x10000;
+    return
 }
 
 
 WRITE8_MEMBER(pc9801_state::winram_w)
 {
-	offset = (offset & 0x1ffff) | (m_pc9821_window_bank & 0xfe) * 0x10000;
+    offset = (offset & 0x1ffff) | (m_pc9821_window_bank & 0xfe) * 0x10000;
 }*/
 
 static ADDRESS_MAP_START( pc9821_map, AS_PROGRAM, 32, pc9801_state )
@@ -3222,7 +3222,7 @@ ROM_START( pc9801ux )
 	ROM_LOAD( "font_ux.rom",     0x000000, 0x046800, BAD_DUMP CRC(19a76eeb) SHA1(96a006e8515157a624599c2b53a581ae0dd560fd) )
 
 	LOAD_KANJI_ROMS
-//	LOAD_IDE_ROM
+//  LOAD_IDE_ROM
 ROM_END
 
 /*
@@ -3325,7 +3325,7 @@ ROM_START( pc9801vm )
 	ROM_LOAD( "font_vm.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
 
 	LOAD_KANJI_ROMS
-//	LOAD_IDE_ROM
+//  LOAD_IDE_ROM
 ROM_END
 
 /*

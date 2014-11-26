@@ -912,22 +912,22 @@ static INPUT_PORTS_START( hamaway )
 	PORT_INCLUDE( system18_generic )
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )	PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )    PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, "1" )
 	PORT_DIPSETTING(    0x04, "2" )
 	PORT_DIPSETTING(    0x0c, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
 	//"SW2:5" is unknown - Not listed in the service mode
 	//"SW2:6" is unknown - Not listed in the service mode
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "2 Credits to Start" )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x80, "2 Credits to Start" )    PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1887,7 +1887,7 @@ ROM_START( hamaway )
 	ROM_LOAD16_BYTE( "c18.bin", 0x080001, 0x40000, CRC(0f8fe8bb) SHA1(e6f68442b8d4def29b106458496a47344f70d511) )
 	ROM_LOAD16_BYTE( "11.bin",  0x080000, 0x40000, CRC(2b5eacbc) SHA1(ba3690501588b9c88a31022b44bc3c82b44ae26b) )
 	ROM_LOAD16_BYTE( "c19.bin", 0x100001, 0x40000, CRC(3c616caa) SHA1(d48a6239b7a52ac13971f7513a65a17af492bfdf) ) // 11xxxxxxxxxxxxxxxx = 0xFF
- 	ROM_LOAD16_BYTE( "12.bin",  0x100000, 0x40000, CRC(c7bbd579) SHA1(ab87bfdad66ea241cb23c9bbfea05f5a1574d6c9) ) // 1ST AND 2ND HALF IDENTICAL (but ok, because pairing ROM has no data in the 2nd half anyway)
+	ROM_LOAD16_BYTE( "12.bin",  0x100000, 0x40000, CRC(c7bbd579) SHA1(ab87bfdad66ea241cb23c9bbfea05f5a1574d6c9) ) // 1ST AND 2ND HALF IDENTICAL (but ok, because pairing ROM has no data in the 2nd half anyway)
 
 	ROM_REGION( 0x210000, "soundcpu", ROMREGION_ERASEFF ) // sound CPU
 	ROM_LOAD( "c16.bin", 0x010000, 0x40000, CRC(913cc18c) SHA1(4bf4ec14937586c3ae77fcad57dcb21f6433ef81) )

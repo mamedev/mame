@@ -226,11 +226,11 @@ void pci_device::map_device(UINT64 memory_window_start, UINT64 memory_window_end
 	}
 
 	map_extra(memory_window_start, memory_window_end, memory_offset, memory_space,
-			  io_window_start, io_window_end, io_offset, io_space);
+				io_window_start, io_window_end, io_offset, io_space);
 }
 
 void pci_device::map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-						   UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space)
+							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space)
 {
 }
 
@@ -291,15 +291,15 @@ void agp_device::device_reset()
 
 pci_bridge_device::pci_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pci_device(mconfig, PCI_BRIDGE, "PCI-PCI Bridge", tag, owner, clock, "pci_bridge", __FILE__),
-	  device_memory_interface(mconfig, *this),
-	  configure_space_config("configuration_space", ENDIANNESS_LITTLE, 32, 20)
+		device_memory_interface(mconfig, *this),
+		configure_space_config("configuration_space", ENDIANNESS_LITTLE, 32, 20)
 {
 }
 
 pci_bridge_device::pci_bridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: pci_device(mconfig, type, name, tag, owner, clock, shortname, source),
-	  device_memory_interface(mconfig, *this),
-	  configure_space_config("configuration_space", ENDIANNESS_LITTLE, 32, 20)
+		device_memory_interface(mconfig, *this),
+		configure_space_config("configuration_space", ENDIANNESS_LITTLE, 32, 20)
 {
 }
 
@@ -373,15 +373,15 @@ void pci_bridge_device::reset_all_mappings()
 
 
 void pci_bridge_device::map_device(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-								   UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space)
+									UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space)
 {
 	for(int i = all_devices.count()-1; i>=0; i--)
 		if(all_devices[i] != this)
 			all_devices[i]->map_device(memory_window_start, memory_window_end, memory_offset, memory_space,
-									   io_window_start, io_window_end, io_offset, io_space);
+										io_window_start, io_window_end, io_offset, io_space);
 
 	map_extra(memory_window_start, memory_window_end, memory_offset, memory_space,
-			  io_window_start, io_window_end, io_offset, io_space);
+				io_window_start, io_window_end, io_offset, io_space);
 }
 
 
@@ -458,7 +458,7 @@ void pci_host_device::regenerate_mapping()
 	io_space->unmap_readwrite(io_window_start, io_window_end);
 
 	map_device(memory_window_start, memory_window_end, memory_offset, memory_space,
-			   io_window_start, io_window_end, io_offset, io_space);
+				io_window_start, io_window_end, io_offset, io_space);
 }
 
 READ32_MEMBER(pci_host_device::config_address_r)
@@ -492,7 +492,7 @@ UINT32 pci_host_device::config_read(UINT8 bus, UINT8 device, UINT16 reg, UINT32 
 		}
 	} else
 		abort();
-	
+
 	return data;
 }
 

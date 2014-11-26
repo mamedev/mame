@@ -1860,7 +1860,7 @@ static MACHINE_CONFIG_START( rranger, suna8_state )
 	MCFG_CPU_IO_MAP(rranger_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna8_state,  irq0_line_hold)  /* IRQ & NMI ! */
 
-	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 8)	/* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 8)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rranger_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(suna8_state, irq0_line_hold, 4*60) /* NMI = retn */
 
@@ -1883,13 +1883,13 @@ static MACHINE_CONFIG_START( rranger, suna8_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ym1", YM2203, SUNA8_MASTER_CLOCK / 16)	/* verified on pcb */
+	MCFG_SOUND_ADD("ym1", YM2203, SUNA8_MASTER_CLOCK / 16)  /* verified on pcb */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(suna8_state, rranger_play_samples_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(suna8_state, suna8_samples_number_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 
-	MCFG_SOUND_ADD("ym2", YM2203, SUNA8_MASTER_CLOCK / 16)	/* verified on pcb */
+	MCFG_SOUND_ADD("ym2", YM2203, SUNA8_MASTER_CLOCK / 16)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 

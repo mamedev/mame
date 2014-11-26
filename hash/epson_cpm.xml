@@ -5,7 +5,7 @@
 
 <softwarelist name="epson_cpm" description="Epson CPM systems floppy disks">
 
-    <!-- This disk is used to boot the intelligent TF-20 floppy drive -->
+	<!-- This disk is used to boot the intelligent TF-20 floppy drive -->
 
 	<software name="tf20boot">
 		<description>TF-20 boot disk</description>
@@ -19,7 +19,7 @@
 		</part>
 	</software>
 
-    <!-- The following disks are part of the vfloppy distribution -->
+	<!-- The following disks are part of the vfloppy distribution -->
 
 	<software name="arcs">
 		<description>Archivers</description>

@@ -11,8 +11,8 @@
 #define TRI_PARAM_TEXTURE_ENABLE        0x8
 #define TRI_PARAM_ALPHA_TEST            0x10
 
-#define TRI_BUFFER_SIZE					35000
-#define TRI_ALPHA_BUFFER_SIZE			15000
+#define TRI_BUFFER_SIZE                 35000
+#define TRI_ALPHA_BUFFER_SIZE           15000
 
 struct model3_polydata
 {
@@ -412,11 +412,11 @@ WRITE64_MEMBER(model3_state::model3_tile_w)
 
     0xF1180000:         ?
     0xF1180004:         ?
-	0xF1180008:			?									lostwsga: writes 0x7f010000
-															lemans24, magtruck, von2, lamachin: writes 0xee000000
-															bass, vs2, harley, scud, skichamp, fvipers2, eca: writes 0xef000000
-															srally2, swtrilgy: writes 0x70010000
-															daytona2: writes 0x4f010000
+    0xF1180008:         ?                                   lostwsga: writes 0x7f010000
+                                                            lemans24, magtruck, von2, lamachin: writes 0xee000000
+                                                            bass, vs2, harley, scud, skichamp, fvipers2, eca: writes 0xef000000
+                                                            srally2, swtrilgy: writes 0x70010000
+                                                            daytona2: writes 0x4f010000
 
     0xF1180010:                                             VBL IRQ acknowledge
 
@@ -855,7 +855,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
             -------- -xxxxx-- -------- -------- Polygon transparency (0 = fully transparent)
             -------- -------x -------- -------- 1 = disable lighting
             -------- -------- xxxxx--- -------- Polygon luminosity
-			-------- -------- -----x-- -------- Texture enable
+            -------- -------- -----x-- -------- Texture enable
             -------- -------- ------xx x------- Texture format
             -------- -------- -------- -------x Alpha enable?
             -------- ------x- -------- -xxxxxx- ?
@@ -1033,7 +1033,7 @@ void model3_state::real3d_display_list_end()
 		int ti = m_viewport_tri_index[i];
 		int tia = m_viewport_tri_alpha_index[i];
 		if (i < 3)
-		{			
+		{
 			ticount = m_viewport_tri_index[i+1] - ti;
 			tiacount = m_viewport_tri_alpha_index[i+1] - tia;
 		}
@@ -1331,7 +1331,7 @@ m3_triangle *model3_state::push_triangle(bool alpha)
 			return NULL;
 			//fatalerror("push_triangle: tri buffer max exceeded");
 		}
-		
+
 		m_tri_buffer_ptr++;
 		return &m_tri_buffer[i];
 	}
@@ -1575,8 +1575,8 @@ void model3_state::draw_model(UINT32 addr)
 			}
 
 			for (i=2; i < num_vertices; i++)
-			{				
-				bool alpha = (header[6] & 0x1) || (header[6] & 0x80000000);		// put to alpha buffer if there's any transparency involved
+			{
+				bool alpha = (header[6] & 0x1) || (header[6] & 0x80000000);     // put to alpha buffer if there's any transparency involved
 				m3_triangle* tri = push_triangle(alpha);
 
 				// bail out if tri buffer is maxed out (happens during harley boot)
@@ -1859,7 +1859,7 @@ void model3_renderer::clear_zb()
 	cliprect.min_y = 0;
 	cliprect.max_x = 495;
 	cliprect.max_y = 383;
-	
+
 	float zvalue = 10000000000.0f;
 	m_zb->fill(*(int*)&zvalue, cliprect);
 }
@@ -1877,7 +1877,7 @@ void model3_renderer::draw_opaque_triangles(const m3_triangle* tris, int num_tri
 	cliprect.max_x = 495;
 	cliprect.max_y = 383;
 
-//	printf("draw opaque: %d\n", num_tris);
+//  printf("draw opaque: %d\n", num_tris);
 
 	vertex_t v[3];
 
@@ -1897,7 +1897,7 @@ void model3_renderer::draw_opaque_triangles(const m3_triangle* tris, int num_tri
 				v[i].p[3] = tri->v[i].v * 256.0f;
 				v[i].p[4] = tri->v[i].i;
 			}
-	
+
 			model3_polydata &extra = object_data_alloc();
 			extra.texture = tri->texture;
 			extra.transparency = tri->transparency;
@@ -1931,7 +1931,7 @@ void model3_renderer::draw_alpha_triangles(const m3_triangle* tris, int num_tris
 	cliprect.max_x = 495;
 	cliprect.max_y = 383;
 
-//	printf("draw alpha: %d\n", num_tris);
+//  printf("draw alpha: %d\n", num_tris);
 
 	vertex_t v[3];
 
@@ -1951,7 +1951,7 @@ void model3_renderer::draw_alpha_triangles(const m3_triangle* tris, int num_tris
 				v[i].p[3] = tri->v[i].v * 256.0f;
 				v[i].p[4] = tri->v[i].i;
 			}
-	
+
 			model3_polydata &extra = object_data_alloc();
 			extra.texture = tri->texture;
 			extra.transparency = tri->transparency;

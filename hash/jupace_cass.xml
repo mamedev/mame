@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- 
+<!--
 
-  TODO: 
-  * update to latest TOSEC (2014-10-31) 
+  TODO:
+  * update to latest TOSEC (2014-10-31)
   * add usage instructions
   * check which games work and which don't and fix the supported flag accordingly
 -->

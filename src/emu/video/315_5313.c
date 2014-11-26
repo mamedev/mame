@@ -2503,7 +2503,7 @@ void sega315_5313_device::render_videobuffer_to_screenbuffer(int scanline)
 {
 	UINT16 *lineptr;
 
-	
+
 
 	if (!m_use_alt_timing)
 	{

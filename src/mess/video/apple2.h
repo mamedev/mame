@@ -1,7 +1,7 @@
 /*********************************************************************
- 
-	video/apple2.h	- Video handling for 8-bit Apple IIs
- 
+
+    video/apple2.h  - Video handling for 8-bit Apple IIs
+
 *********************************************************************/
 
 #ifndef __A2_VIDEO__

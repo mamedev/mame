@@ -649,7 +649,7 @@ public:
 			m_endianness(endianness),
 			m_bitwidth(width),
 			m_bytewidth(width <= 8 ? 1 : width <= 16 ? 2 : width <= 32 ? 4 : 8)
- { }
+	{ }
 
 	// getters
 	memory_share *next() const { return m_next; }

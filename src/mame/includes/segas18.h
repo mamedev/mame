@@ -96,7 +96,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(set_grayscale);
 	DECLARE_WRITE_LINE_MEMBER(set_vdp_enable);
-	
+
 protected:
 	// timer IDs
 	enum

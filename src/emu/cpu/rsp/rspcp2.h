@@ -126,36 +126,36 @@ public:
 	virtual void mtc2();
 	virtual void ctc2();
 
-	virtual void	handle_cop2(UINT32 op);
+	virtual void    handle_cop2(UINT32 op);
 
-	void			log_instruction_execution();
-	virtual void	cfunc_unimplemented_opcode() { }
+	void            log_instruction_execution();
+	virtual void    cfunc_unimplemented_opcode() { }
 
 protected:
-	virtual int 	generate_vector_opcode(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc) { return TRUE; }
+	virtual int     generate_vector_opcode(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc) { return TRUE; }
 
-	UINT16 			SATURATE_ACCUM(int accum, int slice, UINT16 negative, UINT16 positive);
-	UINT16			SATURATE_ACCUM1(int accum, UINT16 negative, UINT16 positive);
+	UINT16          SATURATE_ACCUM(int accum, int slice, UINT16 negative, UINT16 positive);
+	UINT16          SATURATE_ACCUM1(int accum, UINT16 negative, UINT16 positive);
 
-	UINT32			m_op;
+	UINT32          m_op;
 
-	rsp_device&		m_rsp;
+	rsp_device&     m_rsp;
 	running_machine& m_machine;
-	UINT32			m_vres[8];			/* used for temporary vector results */
+	UINT32          m_vres[8];          /* used for temporary vector results */
 
-	VECTOR_REG		m_v[32];
+	VECTOR_REG      m_v[32];
 
-	ACCUMULATOR_REG	m_accum[8];
-	UINT16			m_vflag[6][8];
+	ACCUMULATOR_REG m_accum[8];
+	UINT16          m_vflag[6][8];
 
-	INT32			m_reciprocal_res;
-	UINT32			m_reciprocal_high;
-	INT32			m_dp_allowed;
+	INT32           m_reciprocal_res;
+	UINT32          m_reciprocal_high;
+	INT32           m_dp_allowed;
 
 private:
-	void			handle_lwc2(UINT32 op);
-	void			handle_swc2(UINT32 op);
-	void			handle_vector_ops(UINT32 op);
+	void            handle_lwc2(UINT32 op);
+	void            handle_swc2(UINT32 op);
+	void            handle_vector_ops(UINT32 op);
 };
 
 #endif /* __RSPCP2_H__ */

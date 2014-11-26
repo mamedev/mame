@@ -128,9 +128,9 @@ static ADDRESS_MAP_START( pcd_io, AS_IO, 16, pcd_state )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf840, 0xf841) AM_DEVREADWRITE8("pic1", pic8259_device, read, write, 0xff00)
 	AM_RANGE(0xf900, 0xf907) AM_DEVREADWRITE8("fdc", wd2793_t, read, write, 0x00ff)
-//	AM_RANGE(0xf940, 0xf941) // sasi controller here?
+//  AM_RANGE(0xf940, 0xf941) // sasi controller here?
 	AM_RANGE(0xf980, 0xf981) AM_READWRITE8(crt_data_r, crt_data_w, 0x00ff) AM_READ8(crt_status_r, 0xff00)
-//	AM_RANGE(0xfa00, 0xfa7f) // pcs4-n (peripheral chip select)
+//  AM_RANGE(0xfa00, 0xfa7f) // pcs4-n (peripheral chip select)
 ADDRESS_MAP_END
 
 

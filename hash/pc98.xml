@@ -5,7 +5,7 @@
 
   This software list collects disks from many different sources, including the 13GB pack with ~90 rar files floating around since 2011
   Origin for many of the disks is Japanese BBS and/or P2P, so it is hard to properly credits whoever dumped them
-  A huge credit goes however to Tokugawa Boards people (Ben, pete_j, Starscream the 2nd, delicious, Ashura, fa123, kobushi, Trickless, etc.) 
+  A huge credit goes however to Tokugawa Boards people (Ben, pete_j, Starscream the 2nd, delicious, Ashura, fa123, kobushi, Trickless, etc.)
   for sharing and dumping a lot of disks and for the researches on the disks
 
 -->
@@ -46740,7 +46740,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 			</dataarea>
 		</part>
 	</software>
- 
+
 	<software name="paradox" supported="no">
 		<description>Paradox</description>
 		<year>19??</year>
@@ -48823,7 +48823,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 
 
 
-<!-- 
+<!--
 
   Game Packs, hopefully to be replaced with real disk images of the single games eventually
 
@@ -56883,7 +56883,7 @@ SPACE EMPIRE
 
 
 
-<!-- 
+<!--
 
   Coverdisks
 
@@ -57841,7 +57841,7 @@ SPACE EMPIRE
 
 
 
-<!-- 
+<!--
 
   Game and Software Packs / Collections
 
@@ -58323,7 +58323,7 @@ SPACE EMPIRE
 	</software>
 
 
-<!-- 
+<!--
 
   Bio 100% Freeware software
 
@@ -58622,10 +58622,10 @@ SPACE EMPIRE
 	</software>
 
 
-<!-- 
+<!--
 
   VECTOR Freeware software
-  
+
   These were available for download at Vector's homepage
   The disk images below have been created by users to launch the games in emulators
 
@@ -62437,35 +62437,35 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 
 
 
-<!--	<software name="">
-		<description>lodoss tou senki - custom (turbo program?) / ロードス島戦記カスタム</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="custom_program.fdi" size="1265664" crc="b78832f3" sha1="853bbf51085570147777460b2481be3149c710e4" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="custom_scenario.fdi" size="1265664" crc="8e8ee17d" sha1="f8b900cfdf557af018634003a6382aa7c35faab6" offset="0" /> <!- - same as in lodoss? - ->
-			</dataarea>
-		</part>
-	</software>
+<!--    <software name="">
+        <description>lodoss tou senki - custom (turbo program?) / ロードス島戦記カスタム</description>
+        <year>19??</year>
+        <publisher>&lt;unknown&gt;</publisher>
+        <part name="flop1" interface="floppy_5_25">
+            <feature name="part_id" value="Disk A"/>
+            <dataarea name="flop" size="1265664">
+                <rom name="custom_program.fdi" size="1265664" crc="b78832f3" sha1="853bbf51085570147777460b2481be3149c710e4" offset="0" />
+            </dataarea>
+        </part>
+        <part name="flop2" interface="floppy_5_25">
+            <feature name="part_id" value="Disk A"/>
+            <dataarea name="flop" size="1265664">
+                <rom name="custom_scenario.fdi" size="1265664" crc="8e8ee17d" sha1="f8b900cfdf557af018634003a6382aa7c35faab6" offset="0" /> <!- - same as in lodoss? - ->
+            </dataarea>
+        </part>
+    </software>
 -->
 
-<!--	<software name="">
-		<description>morita shougi ii + hanyuu data / 森田将棋２＋ 羽生 データ</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1281968">
-				<rom name="morita2p.d88" size="1281968" crc="99effa5b" sha1="c7c4a60e71b7112d94b85eb4fe0d156fae2c0c35" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+<!--    <software name="">
+        <description>morita shougi ii + hanyuu data / 森田将棋２＋ 羽生 データ</description>
+        <year>19??</year>
+        <publisher>&lt;unknown&gt;</publisher>
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="1281968">
+                <rom name="morita2p.d88" size="1281968" crc="99effa5b" sha1="c7c4a60e71b7112d94b85eb4fe0d156fae2c0c35" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 -->
 
 

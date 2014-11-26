@@ -116,7 +116,7 @@ public:
 		dev.m_vco_voltage = volt;
 		dev.m_vco_cap = cap;
 		dev.m_vco_res = res;
-	}	
+	}
 	static void set_pitch_voltage(device_t &device, double volt) { downcast<sn76477_device &>(device).m_pitch_voltage = volt; }
 	static void set_slf_params(device_t &device, double cap, double res)
 	{
@@ -137,16 +137,16 @@ public:
 		dev.m_mixer_a = a;
 		dev.m_mixer_b = b;
 		dev.m_mixer_c = c;
-	}	
+	}
 	static void set_envelope_params(device_t &device, UINT32 env1, UINT32 env2)
 	{
 		sn76477_device &dev = downcast<sn76477_device &>(device);
 		dev.m_envelope_1 = env1;
 		dev.m_envelope_2 = env2;
-	}	
+	}
 	static void set_enable(device_t &device, UINT32 enable) { downcast<sn76477_device &>(device).m_enable = enable; }
-	
-	
+
+
 	/* these functions take 0 or 1 as a logic input */
 	WRITE_LINE_MEMBER( enable_w );      /* active LO, 0 = enabled, 1 = disabled */
 	WRITE_LINE_MEMBER( mixer_a_w );
@@ -257,7 +257,7 @@ private:
 	UINT32 m_mixer_c;
 	UINT32 m_envelope_1;
 	UINT32 m_envelope_2;
-	
+
 	/* others */
 	sound_stream *m_channel;              /* returned by stream_create() */
 	int m_our_sample_rate;                    /* from machine.sample_rate() */

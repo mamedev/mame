@@ -35,8 +35,8 @@ enum
 
 #define MCFG_CP1610_BEXT_CALLBACK(_read) \
 	downcast<cp1610_cpu_device *>(device)->set_bext_callback(DEVCB_##_read);
-	
-	
+
+
 class cp1610_cpu_device :  public cpu_device
 {
 public:
@@ -47,7 +47,7 @@ public:
 	{
 		m_read_bext.set_callback(rd);
 	}
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -87,7 +87,7 @@ private:
 	int     m_mask_interrupts;
 	address_space *m_program;
 	int m_icount;
-	
+
 	devcb_read8 m_read_bext;
 
 	void cp1610_illegal();

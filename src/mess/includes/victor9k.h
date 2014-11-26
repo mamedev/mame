@@ -48,7 +48,7 @@
 #define RS232_B_TAG     "rs232b"
 #define SCREEN_TAG      "screen"
 #define VICTOR9K_KEYBOARD_TAG   "victor9kb"
-#define FDC_TAG			"fdc"
+#define FDC_TAG         "fdc"
 
 class victor9k_state : public driver_device
 {

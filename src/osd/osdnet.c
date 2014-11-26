@@ -119,13 +119,12 @@ void osd_list_network_adapters(void)
 
 	printf("Available network adapters:\n");
 	const netdev_entry_t *entry = netdev_first();
-	while(entry) {	
-		printf("	%s\n", entry->description);
+	while(entry) {
+		printf("    %s\n", entry->description);
 		entry = entry->m_next;
 	}
-	
+
 	#else
 	printf("Network is not supported in this build\n");
 	#endif
 }
-

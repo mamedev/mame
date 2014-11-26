@@ -13,8 +13,8 @@
 
     TODO:
 
-	- disk error 2 (cannot find block header?)
-	- 8048 spindle speed control
+    - disk error 2 (cannot find block header?)
+    - 8048 spindle speed control
     - read PLL
     - write logic
 

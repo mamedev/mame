@@ -361,11 +361,10 @@ void snes_ppu_device::device_start()
 
 void snes_ppu_device::device_reset()
 {
-	
 #if SNES_LAYER_DEBUG
 	memset(&m_debug_options, 0, sizeof(m_debug_options));
 #endif
-	
+
 	/* Inititialize registers/variables */
 	m_update_windows = 1;
 	m_beam.latch_vert = 0;
@@ -376,32 +375,32 @@ void snes_ppu_device::device_reset()
 	m_mode = 0;
 	m_ppu1_version = 1;  // 5C77 chip version number, read by STAT77, only '1' is known
 	m_ppu2_version = 3;  // 5C78 chip version number, read by STAT78, only '2' & '3' encountered so far.
-	
+
 	m_cgram_address = 0;
 	m_read_ophct = 0;
 	m_read_opvct = 0;
 
 	m_vmadd = 0;
-	
+
 	PPU_REG(VMAIN) = 0x80;
 	// what about other regs?
-	
+
 	/* Inititialize mosaic table */
 	for (int j = 0; j < 16; j++)
 	{
 		for (int i = 0; i < 4096; i++)
 			m_mosaic_table[j][i] = (i / (j + 1)) * (j + 1);
 	}
-	
+
 	/* Init VRAM */
 	memset(m_vram, 0, SNES_VRAM_SIZE);
-	
+
 	/* Init Palette RAM */
 	memset((UINT8 *)m_cgram, 0, SNES_CGRAM_SIZE);
-	
+
 	/* Init oam RAM */
 	memset((UINT8 *)m_oam_ram, 0xff, SNES_OAM_SIZE);
-	
+
 	m_stat78 = 0;
 
 	// other initializations to 0
@@ -419,7 +418,7 @@ void snes_ppu_device::device_reset()
 		memset(m_scanlines[i].layer, 0, SNES_SCR_WIDTH);
 		memset(m_scanlines[i].blend_exception, 0, SNES_SCR_WIDTH);
 	}
-	
+
 	for (int i = 0; i < 6; i++)
 	{
 		m_layer[i].window1_enabled = 0;
@@ -439,10 +438,10 @@ void snes_ppu_device::device_reset()
 		m_layer[i].sub_bg_enabled = 0;
 		m_layer[i].hoffs = 0;
 		m_layer[i].voffs = 0;
-		
+
 		memset(m_clipmasks[i], 0, SNES_SCR_WIDTH);
 	}
-	
+
 	for (int i = 0; i < ARRAY_LENGTH(m_oam_spritelist); i++)
 	{
 		m_oam_spritelist[i].tile = 0;
@@ -456,7 +455,7 @@ void snes_ppu_device::device_reset()
 		m_oam_spritelist[i].height = 0;
 		m_oam_spritelist[i].width = 0;
 	}
-	
+
 	for (int i = 0; i < ARRAY_LENGTH(m_oam_tilelist); i++)
 	{
 		m_oam_tilelist[i].x = 0;

@@ -379,7 +379,7 @@ intel_28f016s5_device::intel_28f016s5_device(const machine_config &mconfig, cons
 
 fujitsu_29f160t_device::fujitsu_29f160t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, FUJITSU_29F160T, "Fujitsu 29F160 Flash", tag, owner, clock, FLASH_FUJITSU_29F160T, "fujitsu_29f160t", __FILE__) { }
-	
+
 fujitsu_29f016a_device::fujitsu_29f016a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, FUJITSU_29F016A, "Fujitsu 29F016A Flash", tag, owner, clock, FLASH_FUJITSU_29F016A, "fujitsu_29f016a", __FILE__) { }
 
@@ -400,10 +400,10 @@ amd_29f040_device::amd_29f040_device(const machine_config &mconfig, const char *
 
 amd_29f080_device::amd_29f080_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, AMD_29F080, "AMD 29F080 Flash", tag, owner, clock, FLASH_AMD_29F080, "amd_29f080", __FILE__) { }
-	
+
 amd_29f400t_device::amd_29f400t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, AMD_29F080, "AMD 29F400 Flash", tag, owner, clock, FLASH_AMD_29F400T, "amd_29f400t", __FILE__) { }
-	
+
 amd_29f800t_device::amd_29f800t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, AMD_29F080, "AMD 29F800 Flash", tag, owner, clock, FLASH_AMD_29F080, "amd_29f800t", __FILE__) { }
 

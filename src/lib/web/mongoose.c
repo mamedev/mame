@@ -5169,7 +5169,7 @@ static void *mmap(void *addr, int64_t len, int prot, int flags, int fd,
 
 	p = malloc(len);
 	if (!p)
-	    return NULL;
+		return NULL;
 
 	curpos = lseek(fd, 0, SEEK_CUR);
 	lseek(fd, offset, SEEK_SET);

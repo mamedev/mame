@@ -34,7 +34,7 @@ public:
 	virtual void device_start();
 
 	bool get_card_mounted() { return m_card_mounted; }
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read);
 	virtual DECLARE_WRITE8_MEMBER(write);

@@ -786,16 +786,16 @@ void rsp_device::generate_branch(drcuml_block *block, compiler_state *compiler, 
 	/* update the cycles and jump through the hash table to the target */
 	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
 	{
-		generate_update_cycles(block, &compiler_temp, desc->targetpc, TRUE);	// <subtract cycles>
+		generate_update_cycles(block, &compiler_temp, desc->targetpc, TRUE);    // <subtract cycles>
 		if (desc->flags & OPFLAG_INTRABLOCK_BRANCH)
-			UML_JMP(block, desc->targetpc | 0x80000000);						// jmp     desc->targetpc
+			UML_JMP(block, desc->targetpc | 0x80000000);                        // jmp     desc->targetpc
 		else
-			UML_HASHJMP(block, 0, desc->targetpc, *m_nocode);					// hashjmp <mode>,desc->targetpc,nocode
+			UML_HASHJMP(block, 0, desc->targetpc, *m_nocode);                   // hashjmp <mode>,desc->targetpc,nocode
 	}
 	else
 	{
-		generate_update_cycles(block, &compiler_temp, mem(&m_rsp_state->jmpdest), TRUE);	// <subtract cycles>
-		UML_HASHJMP(block, 0, mem(&m_rsp_state->jmpdest), *m_nocode);						// hashjmp <mode>,<rsreg>,nocode
+		generate_update_cycles(block, &compiler_temp, mem(&m_rsp_state->jmpdest), TRUE);    // <subtract cycles>
+		UML_HASHJMP(block, 0, mem(&m_rsp_state->jmpdest), *m_nocode);                       // hashjmp <mode>,<rsreg>,nocode
 	}
 }
 

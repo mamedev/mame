@@ -16,13 +16,13 @@
 #include "emu.h"
 
 // /INH special addresses
-#define INH_START_INVALID	0xffff;
-#define INH_END_INVALID		0x0000;
+#define INH_START_INVALID   0xffff;
+#define INH_END_INVALID     0x0000;
 
-// /INH types								
-#define INH_NONE			0x00
-#define	INH_READ			0x01
-#define INH_WRITE			0x02
+// /INH types
+#define INH_NONE            0x00
+#define INH_READ            0x01
+#define INH_WRITE           0x02
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -120,7 +120,7 @@ protected:
 
 	devcb_write_line    m_out_irq_cb;
 	devcb_write_line    m_out_nmi_cb;
-	devcb_write8		m_out_inh_cb;
+	devcb_write8        m_out_inh_cb;
 
 	device_a2bus_card_interface *m_device_list[8];
 	const char *m_cputag;
