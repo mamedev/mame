@@ -983,7 +983,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="atarischreiber.rom" size="16384" crc="de1c1d12" sha1="8c0f7be263e3c30bcf34adf3dddee15d62ac62cc" />
+				<rom name="atarischreiber.rom" size="16384" crc="de1c1d12" sha1="8c0f7be263e3c30bcf34adf3dddee15d62ac62cc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
