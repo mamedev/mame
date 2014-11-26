@@ -26,6 +26,7 @@ public:
 			m_text_videoram(*this, "textvideoram"),
 			m_fore_videoram(*this, "forevideoram"),
 			m_back_videoram(*this, "backvideoram"),
+			m_paletteram(*this, "paletteram"),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_palette(*this, "palette")
 	{ }
@@ -39,6 +40,7 @@ public:
 	required_shared_ptr<UINT16> m_text_videoram;
 	required_shared_ptr<UINT16> m_fore_videoram;
 	required_shared_ptr<UINT16> m_back_videoram;
+	required_shared_ptr<UINT16> m_paletteram;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -56,6 +58,7 @@ public:
 
 	DECLARE_WRITE16_MEMBER(supduck_4000_w);
 	DECLARE_WRITE16_MEMBER(supduck_4002_w);
+	DECLARE_WRITE16_MEMBER(supduck_paletteram_w);
 
 	TILEMAP_MAPPER_MEMBER(supduk_tilemap_scan);
 
@@ -161,7 +164,7 @@ TILE_GET_INFO_MEMBER(supduck_state::get_fore_tile_info)
 	if (data & 0x4000) code |= 0x100;
 	if (data & 0x8000) code |= 0x200;
 
-	int color = 0;
+	int color = (data & 0x0f00)>>8;
 	int flags = 0;
 
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
@@ -177,7 +180,7 @@ TILE_GET_INFO_MEMBER(supduck_state::get_back_tile_info)
 	if (data & 0x4000) code |= 0x100;
 	if (data & 0x8000) code |= 0x200;
 
-	int color = 0;
+	int color = (data & 0x0f00)>>8;
 	int flags = 0;
 
 	SET_TILE_INFO_MEMBER(2, code, color, flags);
@@ -228,6 +231,27 @@ void supduck_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 WRITE16_MEMBER(supduck_state::supduck_4000_w)
 {
 
+}
+
+WRITE16_MEMBER(supduck_state::supduck_paletteram_w)  // wrong
+{
+	int r, g, b;
+	data = COMBINE_DATA(&m_paletteram[offset]);
+
+	r = ((data >> 8) & 0x0f);
+	g = ((data >> 4 ) & 0x0f);
+	b = ((data >> 0 ) & 0x0f);
+
+	int bright = (data & 0x7000) >> 12;
+
+	bright += 1;
+
+	r = r * bright * 2;
+	g = g * bright * 2;
+	b = b * bright * 2;
+
+
+	m_palette->set_pen_color (offset, rgb_t(r, g, b));
 }
 
 WRITE16_MEMBER(supduck_state::supduck_4002_w)
@@ -282,7 +306,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, supduck_state )
 	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(text_videoram_w) AM_SHARE("textvideoram")
 	AM_RANGE(0xff0000, 0xff3fff) AM_RAM_WRITE(back_videoram_w) AM_SHARE("backvideoram")
 	AM_RANGE(0xff4000, 0xff7fff) AM_RAM_WRITE(fore_videoram_w) AM_SHARE("forevideoram")
-	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_WRITE(supduck_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM /* working RAM */
 ADDRESS_MAP_END
 
@@ -410,7 +434,7 @@ static const gfx_layout tile_layout =
 	32, 32,
 	RGN_FRAC(1, 2),
 	4,
-	{ RGN_FRAC(1, 2) + 4, RGN_FRAC(1, 2) + 0, 4, 0 },
+	{ RGN_FRAC(1,2)+4, RGN_FRAC(1,2)+0, 4, 0 },
 	{
 		0, 1, 2, 3, 8 + 0, 8 + 1, 8 + 2, 8 + 3,
 		64 * 8 + 0, 64 * 8 + 1, 64 * 8 + 2, 64 * 8 + 3, 64 * 8 + 8 + 0, 64 * 8 + 8 + 1, 64 * 8 + 8 + 2, 64 * 8 + 8 + 3,
@@ -430,8 +454,8 @@ static const gfx_layout tile_layout =
 
 static GFXDECODE_START( supduck )
 	GFXDECODE_ENTRY( "gfx1", 0, vramlayout_bionicc,    768, 64 )    /* colors 768-1023 */
-	GFXDECODE_ENTRY( "gfx2", 0, tile_layout,   0,  4 )    /* colors   0-  63 */
-	GFXDECODE_ENTRY( "gfx3", 0, tile_layout, 256,  4 )    /* colors 256- 319 */
+	GFXDECODE_ENTRY( "gfx2", 0, tile_layout,   0,  16 )    /* colors   0-  63 */
+	GFXDECODE_ENTRY( "gfx3", 0, tile_layout, 256,  16 )    /* colors 256- 319 */
 	GFXDECODE_ENTRY( "gfx4", 0, spritelayout_bionicc,  512, 16 )    /* colors 512- 767 */
 GFXDECODE_END
 
@@ -482,7 +506,7 @@ static MACHINE_CONFIG_START( supduck, supduck_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supduck)
 
 	MCFG_PALETTE_ADD("palette", 0x800/2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+//	MCFG_PALETTE_FORMAT(IIIIRRRRGGGGBBBB)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -523,10 +547,10 @@ ROM_START( supduck )
 	ROM_LOAD( "14.ul32",   0x60000, 0x20000, CRC(97a7310b) SHA1(76b82bfea64b59890c0ba2e1688b7321507a4da7) )
 
 	ROM_REGION( 0x80000, "gfx4", 0 )
-	ROM_LOAD( "15.u1d",   0x00000, 0x20000, CRC(81bf1f27) SHA1(7a66630a2da85387904917d3c136880dffcb9649) )
-	ROM_LOAD( "16.u2d",   0x20000, 0x20000, CRC(9573d6ec) SHA1(9923be782bae47c49913d01554bcf3e5efb5395b) )
-	ROM_LOAD( "17.u1c",   0x60000, 0x20000, CRC(21ef14d4) SHA1(66e389aaa1186921a07da9a9a9eda88a1083ad42) )
-	ROM_LOAD( "18.u2c",   0x40000, 0x20000, CRC(33dd0674) SHA1(b95dfcc16d939bac77f338b8a8cada19328a1993) )
+	ROM_LOAD( "15.u1d",   0x60000, 0x20000, CRC(81bf1f27) SHA1(7a66630a2da85387904917d3c136880dffcb9649) )
+	ROM_LOAD( "16.u2d",   0x40000, 0x20000, CRC(9573d6ec) SHA1(9923be782bae47c49913d01554bcf3e5efb5395b) )
+	ROM_LOAD( "17.u1c",   0x20000, 0x20000, CRC(21ef14d4) SHA1(66e389aaa1186921a07da9a9a9eda88a1083ad42) )
+	ROM_LOAD( "18.u2c",   0x00000, 0x20000, CRC(33dd0674) SHA1(b95dfcc16d939bac77f338b8a8cada19328a1993) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "2.su12",   0x00000, 0x20000, CRC(745d42fb) SHA1(f9aee3ddbad3cc2f3a7002ee0d762eb041967e1e) ) // static sample data
