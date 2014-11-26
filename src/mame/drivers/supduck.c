@@ -1,10 +1,20 @@
 /*********************************************************************************
 
-   Super Duck
+   Super Duck (c) 1992 Comad
 
    hardware appears to be roughly based off Bionic Commando, close to the
    Tiger Road / F1-Dream based Pushman / Bouncing Balls.
 
+
+PCB Clocks as measured:
+
+Crystal 1: 8mhz
+Crystal 2: 24mhz
+
+All clock timing comes from crystal 1
+ 68k - 8mhz
+ Z80 - 2mhz
+ OKI M6295 - 1mhz
 
 *********************************************************************************/
 
@@ -404,7 +414,6 @@ static INPUT_PORTS_START( supduck )
 INPUT_PORTS_END
 
 
-
 static const gfx_layout spritelayout_bionicc=
 {
 	16,16,  /* 16*16 sprites */
@@ -477,26 +486,15 @@ void supduck_state::machine_reset()
 {
 }
 
-/*
-
-Crystal 1: 8mhz
-Crystal 2: 24mhz
-
-Following all come from crystal 1
-68k - 8mhz
-Z80 - 2mhz
-OKI M6295 - 1mhz
-
-*/
 
 static MACHINE_CONFIG_START( supduck, supduck_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz) /* Verified on PCB */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", supduck_state,  irq2_line_hold) // 2 & 4?
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000/4)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/4) /* 2MHz - verified on PCB */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
@@ -519,7 +517,7 @@ static MACHINE_CONFIG_START( supduck, supduck_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 8000000/8, OKIM6295_PIN7_HIGH) // pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_8MHz/8, OKIM6295_PIN7_HIGH) // 1MHz - Verified on PCB, pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 
