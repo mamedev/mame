@@ -237,25 +237,21 @@ WRITE16_MEMBER(supduck_state::supduck_4000_w)
 
 }
 
-WRITE16_MEMBER(supduck_state::supduck_paletteram_w)  // wrong
+WRITE16_MEMBER(supduck_state::supduck_paletteram_w)
 {
 	int r, g, b;
 	data = COMBINE_DATA(&m_paletteram[offset]);
 
 	r = ((data >> 8) & 0x0f);
+	if (data & 0x4000) r |= 0x10;
+
 	g = ((data >> 4 ) & 0x0f);
+	if (data & 0x2000) g |= 0x10;
+
 	b = ((data >> 0 ) & 0x0f);
+	if (data & 0x1000) b |= 0x10;
 
-	int bright = (data & 0x7000) >> 12;
-
-	bright += 1;
-
-	r = r * bright * 2;
-	g = g * bright * 2;
-	b = b * bright * 2;
-
-
-	m_palette->set_pen_color (offset, rgb_t(r, g, b));
+	m_palette->set_pen_color (offset, rgb_t(r<<3, g<<3, b<<3));
 }
 
 WRITE16_MEMBER(supduck_state::supduck_4002_w)
@@ -275,23 +271,15 @@ WRITE16_MEMBER(supduck_state::supduck_scroll_w)
 	{
 	case 0:
 		m_back_tilemap->set_scrollx(0, data);
-//		printf("fore x scroll %04x\n", data);
-		
 		break;
 	case 1:
 		m_back_tilemap->set_scrolly(0, -data - 32 * 8);
-//		printf("fore y scroll %04x\n", data);
-
 		break;
 	case 2:
 		m_fore_tilemap->set_scrollx(0, data);
-//		printf("back x scroll %04x\n", data);
-
 		break;
 	case 3:
 		m_fore_tilemap->set_scrolly(0, -data - 32 * 8);
-//		printf("back y scroll %04x\n", data);
-
 		break;
 	}
 }
@@ -312,7 +300,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, supduck_state )
 	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(text_videoram_w) AM_SHARE("textvideoram")
 	AM_RANGE(0xff0000, 0xff3fff) AM_RAM_WRITE(back_videoram_w) AM_SHARE("backvideoram")
 	AM_RANGE(0xff4000, 0xff7fff) AM_RAM_WRITE(fore_videoram_w) AM_SHARE("forevideoram")
-	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_WRITE(supduck_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_WRITE(supduck_paletteram_w) AM_SHARE("paletteram") // AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM /* working RAM */
 ADDRESS_MAP_END
 
@@ -527,7 +515,7 @@ static MACHINE_CONFIG_START( supduck, supduck_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supduck)
 
 	MCFG_PALETTE_ADD("palette", 0x800/2)
-//	MCFG_PALETTE_FORMAT(IIIIRRRRGGGGBBBB)
+//	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB) // can't use this, the RGB bits are the lowest bits with this format, for this game they're the highest bits
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -582,4 +570,4 @@ ROM_START( supduck )
 	ROM_LOAD( "1.su13",   0x00000, 0x80000, CRC(7fb1ed42) SHA1(77ec86a6454398e329066aa060e9b6a39085ce71) ) // banked sample data
 ROM_END
 
-GAME( 1992, supduck, 0, supduck, supduck, driver_device, 0, ROT0, "Comad", "Super Duck", GAME_IMPERFECT_COLORS )
+GAME( 1992, supduck, 0, supduck, supduck, driver_device, 0, ROT0, "Comad", "Super Duck", 0 )
