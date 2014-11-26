@@ -170,10 +170,10 @@ void ie15_keyboard_device::device_reset()
 /*
 Y1  Y2  Y3  Y4  Y5  Y6  Y7  Y8  Y9  Y10 Y11 Y12 Y13 Y14 Y15 Y16 Y17 Y18 Y19 Y20 Y21 Y22 Y23 Y24
 --
-;+  1!  2"  3#  4$  5%  6&  7'  8(  9)  0   -=      7   8   9   ТАБ ГТ  СБР СТР СТС f1  f2  f3
-ЙJ  ЦC  УU  КK  ЕE  НN  ГG  Ш[  Щ]  ЗZ  ХH  :*      4   5   6   ПС  ВК  АР1 С1  АР2 f4  f5  f6
-ФF  ЫY  ВW  АA  ПP  РR  ОO  ЛL  ДD  ЖV  Э\  .>  ЗБ  1   2   3           ПРД ПРМ ПРС f7  f8  f9
-ЯQ  Ч^  СS  МM  ИI  ТT  ЬX  БB  Ю@  ,<  /?  _   SPC 0       ,                       fA  fB  fC
+;+  1!  2"  3#  4$  5%  6&  7'  8(  9)  0   -=      7   8   9   ?????? ????  ?????? ?????? ?????? f1  f2  f3
+??J  ??C  ??U  ??K  ??E  ??N  ??G  ??[  ??]  ??Z  ??H  :*      4   5   6   ????  ????  ????1 ??1  ????2 f4  f5  f6
+??F  ??Y  ??W  ??A  ??P  ??R  ??O  ??L  ??D  ??V  ??\  .>  ????  1   2   3           ?????? ?????? ?????? f7  f8  f9
+??Q  ??^  ??S  ??M  ??I  ??T  ??X  ??B  ??@  ,<  /?  _   SPC 0       ,                       fA  fB  fC
 
 rom:
 
@@ -310,7 +310,7 @@ static INPUT_PORTS_START( ie15_keyboard )
 
 	PORT_START("TERM_LINEC")
 	PORT_BIT(0x000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
-//	PORT_BIT(0x000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT)  PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+//  PORT_BIT(0x000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT)  PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SetUp") PORT_CODE(KEYCODE_RSHIFT) PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(RSHIFT))
 	PORT_BIT(0x000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SetUp") PORT_CODE(KEYCODE_PRTSCR) PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(PRTSCR))
 INPUT_PORTS_END

@@ -6,6 +6,7 @@
 
     Games supported:
         * Super Breakout
+        * Super Breakout (Canyon and Vertical Breakout, prototype) - built from original source code
 
     Known issues:
         * none at this time
@@ -465,7 +466,14 @@ static INPUT_PORTS_START( sbrkout )
 	PORT_CONFSETTING(    0x01, "Cavity" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sbrkoutc )
+	PORT_INCLUDE(sbrkout)
 
+	PORT_MODIFY("SELECT")        /* IN6 - fake port, used to set the game select dial */
+	PORT_CONFNAME( 0x03, 0x00, "Game Select" )
+	PORT_CONFSETTING(    0x00, "Canyon" )
+	PORT_CONFSETTING(    0x02, "Vertical" )
+INPUT_PORTS_END
 
 /*************************************
  *
@@ -590,6 +598,21 @@ ROM_START( sbrkout3 ) // rev 03; main cpu roms are on 1024x4bit (82s137 or equiv
 	ROM_LOAD( "006401.e2",    0x0100, 0x0020, CRC(857df8db) SHA1(06313d5bde03220b2bc313d18e50e4bb1d0cfbbb) )    /* memory mapper */
 ROM_END
 
+ROM_START( sbrkoutc )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "a33443.bin",   0x2800, 0x1800, CRC(bf418976) SHA1(d766e220a284a7b9caf876207e8191aff0497a03) )
+
+	ROM_REGION( 0x0400, "gfx1", 0 )
+	ROM_LOAD( "033280.p4",    0x0000, 0x0200, CRC(5a69ce85) SHA1(ad9078d12495c350738bdb0b1e1b6120d9e01f60) )
+	ROM_LOAD( "033281.r4",    0x0200, 0x0200, CRC(066bd624) SHA1(cfb86c7013a70b8375126b23a4e66df5f3b9186b) )
+
+	ROM_REGION( 0x0020, "gfx2", 0 )
+	ROM_LOAD( "033282.k6",    0x0000, 0x0020, CRC(6228736b) SHA1(bc176261dba11521df19d545ce604f8cc294287a) )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "006400.m2",    0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )    /* sync (not used) */
+	ROM_LOAD( "006401.e2",    0x0100, 0x0020, CRC(857df8db) SHA1(06313d5bde03220b2bc313d18e50e4bb1d0cfbbb) )    /* memory mapper */
+ROM_END
 
 
 /*************************************
@@ -598,5 +621,6 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1978, sbrkout, 0, sbrkout, sbrkout, driver_device, 0, ROT270, "Atari", "Super Breakout (rev 04)", GAME_SUPPORTS_SAVE, layout_sbrkout )
-GAMEL( 1978, sbrkout3, sbrkout, sbrkout, sbrkout, driver_device, 0, ROT270, "Atari", "Super Breakout (rev 03)", GAME_SUPPORTS_SAVE, layout_sbrkout )
+GAMEL( 1978, sbrkout, 0, sbrkout, sbrkout, driver_device, 0, ROT270,         "Atari", "Super Breakout (rev 04)", GAME_SUPPORTS_SAVE, layout_sbrkout )
+GAMEL( 1978, sbrkout3, sbrkout, sbrkout, sbrkout, driver_device, 0, ROT270,  "Atari", "Super Breakout (rev 03)", GAME_SUPPORTS_SAVE, layout_sbrkout )
+GAMEL( 1978, sbrkoutc, sbrkout, sbrkout, sbrkoutc, driver_device, 0, ROT270, "Atari", "Super Breakout (Canyon and Vertical Breakout, prototype)", GAME_SUPPORTS_SAVE, layout_sbrkout )

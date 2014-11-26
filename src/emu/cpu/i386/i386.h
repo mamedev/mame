@@ -271,6 +271,7 @@ struct I386_CALL_GATE
 
 	void register_state_i386();
 	void register_state_i386_x87();
+	void register_state_i386_x87_xmm();
 	inline UINT32 i386_translate(int segment, UINT32 ip, int rwn);
 	inline vtlb_entry get_permissions(UINT32 pte, int wp);
 	bool i386_translate_address(int intention, offs_t *address, vtlb_entry *entry);

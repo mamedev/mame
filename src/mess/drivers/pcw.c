@@ -103,8 +103,6 @@
 // pcw/pcw16 beeper
 #include "sound/beep.h"
 #include "machine/ram.h"
-#include "formats/pc_dsk.h"
-#include "formats/dsk_dsk.h"
 
 #include "pcw.lh"
 
@@ -1254,10 +1252,6 @@ static SLOT_INTERFACE_START( pcw_floppies )
 	SLOT_INTERFACE( "3dsdd", FLOPPY_3_DSDD )
 SLOT_INTERFACE_END
 
-FLOPPY_FORMATS_MEMBER( pcw_state::floppy_formats )
-	FLOPPY_DSK_FORMAT
-FLOPPY_FORMATS_END
-
 /* PCW8256, PCW8512, PCW9256 */
 static MACHINE_CONFIG_START( pcw, pcw_state )
 	/* basic machine hardware */
@@ -1295,8 +1289,8 @@ static MACHINE_CONFIG_START( pcw, pcw_state )
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pcw_state, pcw_fdc_interrupt))
 
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pcw_floppies, "3dsdd", pcw_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pcw_floppies, "3dsdd", pcw_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pcw_floppies, "3dsdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pcw_floppies, "3dsdd", floppy_image_device::default_floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pcw")
 

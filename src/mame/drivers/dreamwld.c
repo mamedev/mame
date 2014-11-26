@@ -372,11 +372,11 @@ UINT32 dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_ind1
 
 READ32_MEMBER(dreamwld_state::dreamwld_protdata_r)
 {
-	//static int count = 0;
+//  static int count = 0;
 
 
-	//printf("protection read %04x\n", count);
-	//count++;
+//  printf("protection read %04x\n", count);
+//  count++;
 
 	UINT8 *protdata = memregion("user1")->base();
 	size_t protsize = memregion("user1")->bytes();
@@ -411,7 +411,7 @@ WRITE32_MEMBER(dreamwld_state::dreamwld_6295_1_bank_w)
 
 
 static ADDRESS_MAP_START( baryon_map, AS_PROGRAM, 32, dreamwld_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM  AM_WRITENOP
+	AM_RANGE(0x000000, 0x1fffff) AM_ROM  AM_WRITENOP
 
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -727,6 +727,50 @@ ROM_START( dreamwld )
 	ROM_LOAD( "11.bin", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
 ROM_END
 
+
+ROM_START( cutefght )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD32_BYTE( "cf.5", 0x000000, 0x080000, CRC(c14fd5dc) SHA1(f332105f5f249d693e792e7115f9e6cffb6db19f) )
+	ROM_LOAD32_BYTE( "cf.6", 0x000001, 0x080000, CRC(47440088) SHA1(c45503c4b5f271b430263ca079edeaaeadf5d9f6) )
+	ROM_LOAD32_BYTE( "cf.3", 0x000002, 0x080000, CRC(e7e7a866) SHA1(a31751f4164a427de59f0c76c9a8cb34370d8183) )
+	ROM_LOAD32_BYTE( "cf.4", 0x000003, 0x080000, CRC(476a3bf5) SHA1(5be1c70bbf4fcfc534b7f20bfceaa8da2e961330) )
+
+	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
+
+	ROM_REGION( 0x1000, "user1", ROMREGION_ERASEFF ) /* Protection data  */ // not read yet
+	/* The MCU supplies this data.
+	  The 68k reads it through a port, taking the size and destination write address from the level 1
+	  and level 2 irq positions in the 68k vector table (there is code to check that they haven't been
+	  modified!)  It then decodes the data using the rom checksum previously calculated and puts it in
+	  ram.  The interrupt vectors point at the code placed in RAM. */
+	ROM_LOAD( "protdata.bin", 0x000, 0x701 , NO_DUMP )
+
+	ROM_REGION( 0x100000, "oki1", 0 ) /* OKI Samples - 1st chip */
+	ROM_LOAD( "cf.1", 0x000000, 0x80000, CRC(fa3b6890) SHA1(7534931c96d6fa05fee840a7ea07b87e2e2acc50) )
+	ROM_RELOAD(0x80000,0x80000) // for the banks
+
+	ROM_REGION( 0x100000, "oki2", 0 ) /* OKI Samples - 2nd chip */
+	ROM_LOAD( "cf.2", 0x000000, 0x80000, CRC(694ddaf9) SHA1(f9138e7e1d8f771c4e69c17f27fb2b70fbee076a) )
+	ROM_RELOAD(0x80000,0x80000) // for the banks
+
+	ROM_REGION( 0x800000, "gfx1", 0 ) /* Sprite Tiles - decoded */
+	ROM_LOAD16_WORD_SWAP( "cf.10",  0x000000, 0x200000, CRC(62bf1e6e) SHA1(fb4b0db313e26687f0ebc6a8505a02e5348776da) )
+	ROM_LOAD16_WORD_SWAP( "cf.11",  0x200000, 0x200000, CRC(796f23a7) SHA1(adaa4c8525de428599f4489ecc8e966fed0d514d) )
+	ROM_LOAD16_WORD_SWAP( "cf.13",  0x400000, 0x200000, CRC(24222b3c) SHA1(08163863890c01728db89b8f4447841ecb4f4f62) )
+	ROM_LOAD16_WORD_SWAP( "cf.14",  0x600000, 0x200000, CRC(385b69d7) SHA1(8e7cae5589e354bea0b77b061af1d0c81d796f7c) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* BG Tiles - decoded */
+	ROM_LOAD16_WORD_SWAP( "cf.12",0x000000, 0x200000, CRC(45d29c22) SHA1(df719a061dcd14fb4388fb45dfee2054e56a1299) )
+
+	ROM_REGION( 0x040000, "spritelut", 0 ) /* Sprite Code Lookup ... */
+	ROM_LOAD16_BYTE( "cf.7", 0x000000, 0x020000, CRC(39454102) SHA1(347e9242fd7e2092cfaacdce92691cf6024471ac) )
+	ROM_LOAD16_BYTE( "cf.8", 0x000001, 0x020000, CRC(fccb1b13) SHA1(fd4aec4a660f9913651fcc084e3f13eb0adbddd6) )
+
+	ROM_REGION( 0x10000, "unknown", 0 ) /* ???? - not decoded seems to be in blocks of 0x41 bytes.. */
+	ROM_LOAD( "cf.9", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
+ROM_END
+
 /*
 
 Rolling Crush
@@ -840,7 +884,7 @@ Baryon is a slightly different PCB, doesn't have a position for a 2nd OKI
 
 // replacment labels? no SemiCom logo
 ROM_START( baryon )
-	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD32_BYTE( "4.bin", 0x000000, 0x040000, CRC(59e0df20) SHA1(ff12f4adcf731f6984db7d0fbdd7fcc71ce66aa4) )
 	ROM_LOAD32_BYTE( "6.bin", 0x000001, 0x040000, CRC(abccbb3d) SHA1(01524f094543d872d775306024f51258a11e9240) )
 	ROM_LOAD32_BYTE( "3.bin", 0x000002, 0x040000, CRC(046d4231) SHA1(05056efe5fec7f43c400f05278de516b01be0fdf) )
@@ -873,7 +917,7 @@ ROM_END
 
 // this set had original SemiCom labels
 ROM_START( baryona )
-	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD32_BYTE( "rom_4_27c020.bin", 0x000000, 0x040000, CRC(6c1cdad0) SHA1(40c437507076ce52ec2240049d6b4bef180b104a) )
 	ROM_LOAD32_BYTE( "rom_5_27c020.bin", 0x000001, 0x040000, CRC(15917c9d) SHA1(6444be93e6a997070820e3c5a2e2e703e22883d9) )
 	ROM_LOAD32_BYTE( "rom_2_27c020.bin", 0x000002, 0x040000, CRC(42b14a6c) SHA1(37e772a673732ef16767c14ad77a4faaa06d675a) )
@@ -908,5 +952,7 @@ GAME( 1997, baryon,   0,      baryon,   baryon,   driver_device, 0, ROT270, "Sem
 GAME( 1997, baryona,  baryon, baryon,   baryon,   driver_device, 0, ROT270, "SemiCom",         "Baryon - Future Assault (set 2)", GAME_SUPPORTS_SAVE )
 
 GAME( 2000, dreamwld, 0, dreamwld, dreamwld, driver_device, 0, ROT0,   "SemiCom",         "Dream World", GAME_SUPPORTS_SAVE )
+
+GAME( 1998, cutefght, 0, dreamwld, dreamwld, driver_device, 0, ROT0,   "SemiCom",         "Cute Fighters", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING ) // needs protection data
 
 GAME( 1999, rolcrush, 0, baryon,   rolcrush, driver_device, 0, ROT0,   "Trust / SemiCom", "Rolling Crush (version 1.07.E - 1999/02/11)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // wrong linescroll

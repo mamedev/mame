@@ -1079,6 +1079,36 @@ ROM_START( realbrk )
 	ROM_LOAD( "mm60003.2e", 0x000000, 0x400000, CRC(39512459) SHA1(b5859a7d8f2f87d923e7f86f095cbffd31f9cbfa) )
 ROM_END
 
+ROM_START( realbrko )
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* TMP68301 Code */
+	ROM_LOAD16_BYTE( "52302.1r", 0x000000, 0x080000, CRC(76de5e26) SHA1(d05b48f024053198fb63b1c4e5454ecb8fe302a4) )
+	ROM_LOAD16_BYTE( "52301.2r", 0x000001, 0x080000, CRC(29e979df) SHA1(61b30b2f8f16bb92a3ec1cd7abd157930f1a3f29) )
+
+	// note, the numbering on all the roms is shifted by 1 due to the sample data being split across 2 roms
+	//  this is how the board is labeled, it is not a mistake.
+	ROM_REGION( 0x800000, "gfx1", 0 )   /* Backgrounds */
+	ROM_LOAD32_WORD( "52311.9b", 0x0000000, 0x400000, CRC(07dfd9f5) SHA1(8722a98adc33f56df1e3b194ce923bc987e15cbe) )
+	ROM_LOAD32_WORD( "52312.9a", 0x0000002, 0x400000, CRC(136a93a4) SHA1(b4bd46ba6c2b367aaf362f67d8be4757f1160864) )
+
+	ROM_REGION( 0x40000, "gfx2", 0 )    /* Text Layer */
+	ROM_LOAD16_BYTE( "52306.1a", 0x000000, 0x020000, CRC(56546fb4) SHA1(5e4dc1665ca96bf24b89d92c24f5ff8420cb465e) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "52305.1b", 0x000001, 0x020000, CRC(b22b0aac) SHA1(8c62e19071a4031d0dcad621cce0ba550702659b) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0xc00000, "gfx3", 0 )   /* Sprites (256 colors) */
+	ROM_LOAD32_WORD( "52307.9f",   0x0000000, 0x400000, CRC(5ff0f666) SHA1(e3f1d9dc84fbef73af37cefd90bdf87a35f59e0e) )
+	ROM_LOAD32_WORD( "52309.9d",   0x0000002, 0x400000, CRC(20817051) SHA1(4c9a443b5d6353ce67d5b1fe716f5ac20d194ef0) )
+	ROM_LOAD32_WORD( "52308.9e",   0x0800000, 0x200000, CRC(a1d40934) SHA1(59b85435b13c6617e79b8d995506e585b6c8bedd) )
+	ROM_LOAD32_WORD( "52310.9c",   0x0800002, 0x200000, CRC(58c03a6c) SHA1(ec7ae49bba6ffdba0f79f1e41e14945f6c3acb1d) )
+
+	ROM_REGION( 0x200000, "gfx4", 0 )   /* Sprites (16 colors) */
+	ROM_LOAD( "52313.14f", 0x000000, 0x200000, CRC(2b5ba1ec) SHA1(d548ef8c96b7b868c866dedb314f56583726564d) )
+
+	ROM_REGION( 0x400000, "ymz", 0 )    /* Samples */
+	ROM_LOAD( "52303.2e", 0x000000, 0x200000, CRC(8a8a7d42) SHA1(7108203cf5a6a1603bfcbc5bde40e71ac960fffc) )
+	ROM_LOAD( "52304.1e", 0x200000, 0x200000, CRC(c8c5ef57) SHA1(4f363b36191f9c647fa88f07286bf9d667005553) )
+ROM_END
+
+
 ROM_START( realbrkj )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* TMP68301 Code */
 	ROM_LOAD16_BYTE( "52302.1r", 0x000000, 0x080000, CRC(ab0379b0) SHA1(67af6670f2b37a7d4d6e03508f291f8ffe64d4cb) )
@@ -1244,8 +1274,12 @@ ROM_END
 #endif
 
 GAME( 1998, pkgnsh,   0,       pkgnsh,   pkgnsh, driver_device,   0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu (Japan)",      GAME_IMPERFECT_GRAPHICS )
+
 GAME( 1998, pkgnshdx, 0,       pkgnshdx, pkgnshdx, driver_device, 0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu DX (Japan)",   GAME_IMPERFECT_GRAPHICS )
+
 GAME( 1998, realbrk,  0,       realbrk,  realbrk, driver_device,  0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Europe)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, realbrko, realbrk, realbrk,  realbrk, driver_device,  0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Europe, older)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, realbrkj, realbrk, realbrk,  realbrk, driver_device,  0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Japan)",  GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, realbrkk, realbrk, realbrk,  realbrk, driver_device,  0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Korea)",  GAME_IMPERFECT_GRAPHICS )
+
 GAME( 2004, dai2kaku, 0,       dai2kaku, dai2kaku, driver_device, 0, ROT0, "SystemBit",         "Dai-Dai-Kakumei (Japan)",              GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

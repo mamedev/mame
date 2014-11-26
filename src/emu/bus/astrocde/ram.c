@@ -19,7 +19,7 @@
       mapped to the cartridge memory starting at $2000.  So it would be possible to
       load a cartridge program from tape into the expansion memory, then flip the range
       switch and run it as a cartridge.  This is useful for cartridge development.
-     
+
       Blue RAM -- available in 4K, 16K, and 32K.  These also use an INS8154 chip,
       (not yet implemented) which has an additional $80 bytes of RAM mapped
       immediately after the end of the expansion address space.  This memory
@@ -29,17 +29,17 @@
       past this range)
       16K:  $6000 to $9FFF
       32K:  $6000 to $DFFF
-     
+
       VIPER System 1 -- This is available in 16K only.  It also includes a keyboard (not implemented).
       16K:  $6000 to $9FFF
-     
+
       Lil' WHITE RAM -- This is available in 32K only.  Attempts to read and write
       to memory outside of its address range ($D000 to $FFFF) are mapped to the expansion
       memory $5000 to $7FFF.  The current implementation won't allow the shadow RAM area
       to be accessed when RAM protect is on, but there is no known software that will
       access the upper range of the expansion RAM when RAM protect is enabled.
       32K:  $5000 to $CFFF
-     
+
       R&L 64K RAM Board -- This is a highly configurable kit.  RAM can be installed in
       2K increments.  So, the entire 44K expansion memory can be filled.  It is also
       possible to override the rest of the memory map with RAM (not implemented).
@@ -48,7 +48,7 @@
       installing switches.  The ranges are $0000 to $0FFF (first 4K), $0000 to $3FFF (first 16K),
       and $0000 to $FFFF (all 64K).  The current implementation is for 44K expansion memory mapped from
       $5000 to $FFFF, with only a single write protect covering this entire range.
- 
+
  ***********************************************************************************************************/
 
 
@@ -209,5 +209,3 @@ WRITE8_MEMBER(astrocade_rl64ram_device::write)
 	if (!m_write_prot->read())
 		m_ram[offset] = data;
 }
-
-

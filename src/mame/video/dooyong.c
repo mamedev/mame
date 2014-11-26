@@ -185,7 +185,7 @@ inline void dooyong_state::get_tile_info(tile_data &tileinfo, int tile_index,
 		flags = TILE_FLIPYX((attr & 0x06) >> 1);
 	}
 	else
-	{	/* primella/popbingo */
+	{   /* primella/popbingo */
 		/* Tiles take two bytes in ROM:
 		                 MSB   LSB
 		   [offs + 0x00] YXCC CCcc    (Y flip, X flip, bits 3-0 of color code, bits 9-8 of gfx code)

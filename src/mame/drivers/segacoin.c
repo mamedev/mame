@@ -3,14 +3,14 @@
 /***************************************************************************
 
   Sega Z80 Coin Pusher hardware
-  
+
   1992 - Western Dream
   * 2 x Z80 (prg, sound), 3 x YM3438 (6ch), ..
   Hexagon shaped cab, with a toy train riding circles in the top compartment.
   6 players, each with a coin pusher, and a LED roulette on the back panel.
-  
+
   more...
-  
+
 
 TODO:
 - everything

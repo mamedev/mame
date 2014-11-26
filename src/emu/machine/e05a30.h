@@ -1,0 +1,71 @@
+/*
+ * E05A30 Gate Array (used in the Epson ActionPrinter 2000)
+ *
+ * Copyright: 2014 Ramiro Polla
+ * License: BSD-3-Clause
+ */
+
+#ifndef __E05A30_H__
+#define __E05A30_H__
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MCFG_E05A30_PRINTHEAD_CALLBACK(_write) \
+	devcb = &e05a30_device::set_printhead_wr_callback(*device, DEVCB_##_write);
+
+#define MCFG_E05A30_PF_STEPPER_CALLBACK(_write) \
+	devcb = &e05a30_device::set_pf_stepper_wr_callback(*device, DEVCB_##_write);
+
+#define MCFG_E05A30_CR_STEPPER_CALLBACK(_write) \
+	devcb = &e05a30_device::set_cr_stepper_wr_callback(*device, DEVCB_##_write);
+
+#define MCFG_E05A30_READY_CALLBACK(_write) \
+	devcb = &e05a30_device::set_ready_wr_callback(*device, DEVCB_##_write);
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+class e05a30_device : public device_t
+{
+public:
+	e05a30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~e05a30_device() {}
+
+	template<class _Object> static devcb_base &set_printhead_wr_callback(device_t &device, _Object object) { return downcast<e05a30_device &>(device).m_write_printhead.set_callback(object); }
+	template<class _Object> static devcb_base &set_pf_stepper_wr_callback(device_t &device, _Object object) { return downcast<e05a30_device &>(device).m_write_pf_stepper.set_callback(object); }
+	template<class _Object> static devcb_base &set_cr_stepper_wr_callback(device_t &device, _Object object) { return downcast<e05a30_device &>(device).m_write_cr_stepper.set_callback(object); }
+	template<class _Object> static devcb_base &set_ready_wr_callback(device_t &device, _Object object) { return downcast<e05a30_device &>(device).m_write_ready.set_callback(object); }
+
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( read );
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+private:
+	/* callbacks */
+	devcb_write16 m_write_printhead;
+	devcb_write8 m_write_pf_stepper;
+	devcb_write8 m_write_cr_stepper;
+	devcb_write_line m_write_ready;
+
+	void update_printhead(int pos, UINT8 data);
+	void update_pf_stepper(UINT8 data);
+	void update_cr_stepper(UINT8 data);
+
+	/* port 0x05 and 0x06 (9-bit) */
+	UINT16 m_printhead;
+	/* port 0x07 (4-bit) */
+	UINT8 m_pf_stepper;
+	/* port 0x08 (4-bit) */
+	UINT8 m_cr_stepper;
+};
+
+extern const device_type E05A30;
+
+#endif /* __E05A30_H__ */

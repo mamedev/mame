@@ -741,7 +741,7 @@ static const I386_OPCODE i386_opcode_table2[256] =
 		"cmpss",            MODRM|VAR_NAME4,PARAM_XMM,          PARAM_XMMM,         0               },
 	{"movnti",          MODRM,          PARAM_RM,           PARAM_REG,          0               },
 	{"pinsrw",          MODRM,          PARAM_MMX,          PARAM_RM,           PARAM_UI8       },
-	{"pextrw",          MODRM,          PARAM_MMX,          PARAM_MMXM,         PARAM_UI8       },
+	{"pextrw",          MODRM,          PARAM_MMX,          PARAM_RM,           PARAM_UI8       },
 	{"shufps\0"
 		"shufpd\0"
 		"???\0"

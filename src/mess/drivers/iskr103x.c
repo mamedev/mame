@@ -77,7 +77,7 @@ static MACHINE_CONFIG_START( iskr1030m, iskr103x_state )
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(iskr1030m)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", iskr103x_isa8_cards, "cga_iskr1030m", false)	// actually MDA?
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", iskr103x_isa8_cards, "cga_iskr1030m", false)   // actually MDA?
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", iskr103x_isa8_cards, "fdc_xt", false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", iskr103x_isa8_cards, NULL, false) // hdc is WIP
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", iskr103x_isa8_cards, NULL, false)

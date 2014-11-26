@@ -3,8 +3,8 @@
 #include "debugqtview.h"
 
 DebuggerView::DebuggerView(const debug_view_type& type,
-						   running_machine* machine,
-						   QWidget* parent) :
+							running_machine* machine,
+							QWidget* parent) :
 	QAbstractScrollArea(parent),
 	m_preferBottom(false),
 	m_view(NULL),
@@ -122,8 +122,8 @@ void DebuggerView::paintEvent(QPaintEvent* event)
 				if(textAttr & DCA_DISABLED)
 				{
 					fgColor.setRgb((fgColor.red()   + bgColor.red())   >> 1,
-								   (fgColor.green() + bgColor.green()) >> 1,
-								   (fgColor.blue()  + bgColor.blue())  >> 1);
+									(fgColor.green() + bgColor.green()) >> 1,
+									(fgColor.blue()  + bgColor.blue())  >> 1);
 				}
 				if(textAttr & DCA_COMMENT)
 				{
@@ -141,8 +141,8 @@ void DebuggerView::paintEvent(QPaintEvent* event)
 			// There is a touchy interplay between font height, drawing difference, visible position, etc
 			// Fonts don't get drawn "down and to the left" like boxes, so some wiggling is needed.
 			painter.drawText(x*fontWidth,
-							 (y*fontHeight + (fontHeight*0.80)),
-							 QString(m_view->viewdata()[viewDataOffset].byte));
+								(y*fontHeight + (fontHeight*0.80)),
+								QString(m_view->viewdata()[viewDataOffset].byte));
 			viewDataOffset++;
 		}
 	}
@@ -254,7 +254,7 @@ void DebuggerView::paintEvent(QPaintEvent* event)
 					break;
 				text.append(QChar(viewdata[viewDataOffset + width].byte));
 			}
-            
+
 			// Your characters are not guaranteed to take up the entire length x fontWidth x fontHeight, so fill before.
 			painter.fillRect(x*fontWidth, y*fontHeight, width*fontWidth, fontHeight, bgBrush);
 

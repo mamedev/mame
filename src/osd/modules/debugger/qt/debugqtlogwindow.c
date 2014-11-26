@@ -25,8 +25,8 @@ LogWindow::LogWindow(running_machine* machine, QWidget* parent) :
 
 	// The main log view
 	m_logView = new DebuggerView(DVT_LOG,
-								 m_machine,
-								 this);
+									m_machine,
+									this);
 
 	// Layout
 	QVBoxLayout* vLayout = new QVBoxLayout(mainWindowFrame);

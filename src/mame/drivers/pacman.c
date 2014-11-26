@@ -4081,30 +4081,30 @@ ROM_END
 
 
 
-  256*4 = 1024 bit 
- 
-     +--\/--+ 
-  A6 |01  16| Vcc 
-  A5 |02  15| A7 
-  A4 |03  14| /CE2 
-  A3 |04  13| /CE1 
-  A0 |05  12| D0 
-  A1 |06  11| D1 
-  A2 |07  10| D2 
-  GND|08  09| D3 
-     +------+ 
+  256*4 = 1024 bit
 
-   NEC   Fujitsu Fairchild Intersil Mitsubishi 
-  ------ ------- --------- -------- ---------- 
-  uPB423 MB7052   93427    IM5623    M54700 
-         MB7114 
- 
-  Signetics     MMI    TI       Harris  Raytheon  AMD   National Intel  OKI 
+     +--\/--+
+  A6 |01  16| Vcc
+  A5 |02  15| A7
+  A4 |03  14| /CE2
+  A3 |04  13| /CE1
+  A0 |05  12| D0
+  A1 |06  11| D1
+  A2 |07  10| D2
+  GND|08  09| D3
+     +------+
+
+   NEC   Fujitsu Fairchild Intersil Mitsubishi
+  ------ ------- --------- -------- ----------
+  uPB423 MB7052   93427    IM5623    M54700
+         MB7114
+
+  Signetics     MMI    TI       Harris  Raytheon  AMD   National Intel  OKI
   ------------ ------ -------- -------- -------- ------ -------- ----- --------
-  82S129       6301-1 TBP24S10 HM7611-5 29661    27S21  74S287   3621  MBL8521A 
+  82S129       6301-1 TBP24S10 HM7611-5 29661    27S21  74S287   3621  MBL8521A
   82S129A      63S141 TBP34S10 HM7611A           27S21A
   82S27                                                          27S11
- 
+
 
 
   Dumps and docs by Robbie.

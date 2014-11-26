@@ -21,7 +21,6 @@
 #include "emu.h"
 #include "includes/maygay1b.h"
 
-MACHINE_CONFIG_EXTERN( maygay_m1 );
 INPUT_PORTS_EXTERN( maygay_m1 );
 
 
@@ -40,7 +39,7 @@ INPUT_PORTS_EXTERN( maygay_m1 );
 
 ROM_START( m1blkhol )   ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "blackhole.bin", 0x0000, 0x010000, CRC(b0d92e24) SHA1(161a39efda1f7f1964d52f12c27bf7b8bc824e9e) ) ROM_END_M1A_MCU
 
-GAME( 199?, m1blkhol    ,0          ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Black Hole (Dutch) (Maygay) (M1A/B)",GAME_FLAGS )
+GAME( 199?, m1blkhol    ,0          ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Black Hole (Dutch) (Maygay) (M1A/B)",GAME_FLAGS )
 
 /*******************************************************************************************************************************************************************************************************
   (Casino) Bar-gain
@@ -94,7 +93,7 @@ GAME( 199?, m1criss     ,0          ,maygay_m1_nec,maygay_m1, maygay1b_state,m1n
 
 ROM_START( m1dmnhrt )   ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "diamond.bin", 0x0000, 0x010000, CRC(d63a92c2) SHA1(66fe356662c353b2cca3831f7b55d0aea740aace) )ROM_END_M1A_MCU
 
-GAME( 199?, m1dmnhrt    ,0          ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Diamond Hearts (Maygay) (M1A/B)",GAME_FLAGS )
+GAME( 199?, m1dmnhrt    ,0          ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Diamond Hearts (Maygay) (M1A/B)",GAME_FLAGS )
 
 /*******************************************************************************************************************************************************************************************************
   Alley Cat
@@ -103,7 +102,7 @@ GAME( 199?, m1dmnhrt    ,0          ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT
 
 ROM_START( m1alley )    ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa001029", 0x0000, 0x020000, CRC(d4c80f2c) SHA1(b7f3dcf025e18dc1ba7117f5129a64e2e01975a7) ) ROM_END_M1A_MCU
 
-GAME( 199?, m1alley     ,0          ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Alley Cat (Maygay) (M1A/B)",GAME_FLAGS )
+GAME( 199?, m1alley     ,0          ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Alley Cat (Maygay) (M1A/B)",GAME_FLAGS )
 
 /*******************************************************************************************************************************************************************************************************
   Big Deal
@@ -125,8 +124,8 @@ GAME( 2000, m1bigdel    ,0          ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT
 ROM_START( m1bluemx )   ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa3-515", 0x0000, 0x010000, CRC(62451006) SHA1(0a1dd40097b378d8dc561894dbf587de7d47846b) ) ROM_END_M1A_MCU
 ROM_START( m1bluemxp )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa3-516", 0x0000, 0x010000, CRC(d6fdced5) SHA1(ea1afc8982683c799195116d7160c7d230e1db52) ) ROM_END_M1A_MCU
 
-GAME( 1992, m1bluemx    ,0          ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Blue Max (Maygay) v2.1 (M1A/B)",GAME_FLAGS )
-GAME( 1992, m1bluemxp   ,m1bluemx   ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Blue Max (Maygay) v2.1 (Protocol) (M1A/B)",GAME_FLAGS )
+GAME( 1992, m1bluemx    ,0          ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Blue Max (Maygay) v2.1 (M1A/B)",GAME_FLAGS )
+GAME( 1992, m1bluemxp   ,m1bluemx   ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Blue Max (Maygay) v2.1 (Protocol) (M1A/B)",GAME_FLAGS )
 
 /*******************************************************************************************************************************************************************************************************
   Casino Club
@@ -137,9 +136,9 @@ ROM_START( m1casclb )   ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    
 ROM_START( m1casclbp )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sc1-171.bin", 0x0000, 0x010000, CRC(1d20f2cf) SHA1(f2c9e1aa0c2c8903e293ef5ab3cc4b3d14349e64) ) ROM_END_M1A_MCU //1.2P
 ROM_START( m1casclb1 )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sco-234.bin", 0x0000, 0x010000, CRC(27d11ba5) SHA1(f640a4902213997df0b612e8d1be48ac6d1e0569) ) ROM_END_M1A_MCU //1.1N
 
-GAME( 1990, m1casclb    ,0          ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Casino Club (Maygay) v1.2 (M1A/B)",GAME_FLAGS )
-GAME( 1990, m1casclbp   ,m1casclb   ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Casino Club (Maygay) v1.2 (Protocol) (M1A/B)",GAME_FLAGS )
-GAME( 1990, m1casclb1   ,m1casclb   ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Casino Club (Maygay) v1.1 (M1A/B)",GAME_FLAGS )
+GAME( 1990, m1casclb    ,0          ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Casino Club (Maygay) v1.2 (M1A/B)",GAME_FLAGS )
+GAME( 1990, m1casclbp   ,m1casclb   ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Casino Club (Maygay) v1.2 (Protocol) (M1A/B)",GAME_FLAGS )
+GAME( 1990, m1casclb1   ,m1casclb   ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Casino Club (Maygay) v1.1 (M1A/B)",GAME_FLAGS )
 
 /*******************************************************************************************************************************************************************************************************
   Casino Gambler Club
@@ -149,8 +148,8 @@ GAME( 1990, m1casclb1   ,m1casclb   ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT
 ROM_START( m1casgcl )   ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sc3-524.bin", 0x0000, 0x010000, CRC(efde86a3) SHA1(aae7ecedb2ffdcae5fcb422574f9376b6a333497) ) ROM_END_M1A_MCU //1.2
 ROM_START( m1casgclp )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sc3-525.bin", 0x0000, 0x010000, CRC(07361b45) SHA1(3caf71da665b6327e8337c5e8c39c110dbd4783e) ) ROM_END_M1A_MCU //1.2p
 
-GAME( 1990, m1casgcl    ,0          ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Casino Gambler Club (Maygay) v1.2 (M1A/B)",GAME_FLAGS )
-GAME( 1990, m1casgclp   ,m1casgcl   ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Casino Gambler Club (Maygay) v1.2 (Protocol) (M1A/B)",GAME_FLAGS )
+GAME( 1990, m1casgcl    ,0          ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Casino Gambler Club (Maygay) v1.2 (M1A/B)",GAME_FLAGS )
+GAME( 1990, m1casgclp   ,m1casgcl   ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Casino Gambler Club (Maygay) v1.2 (Protocol) (M1A/B)",GAME_FLAGS )
 
 /*******************************************************************************************************************************************************************************************************
   Bank Buster Club
@@ -161,9 +160,9 @@ ROM_START( m1bankbs )   ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )    
 ROM_START( m1bankbsp )  ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sc010018", 0x0000, 0x020000, CRC(e6da0dd0) SHA1(fbcbe10ec10dee18127c9851994870f6b1073849) ) ROM_END_M1A_MCU //2.9 P
 ROM_START( m1bankbso )  ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sc001011", 0x0000, 0x020000, CRC(621404a6) SHA1(f43a1f4719bbe636d41d37e190cbc2634f6e9229) ) ROM_END_M1A_MCU  //2.8
 
-GAME( 199?, m1bankbs    ,0          ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bank Buster Club (Maygay) v2.9 (M1A/B)",GAME_FLAGS )
-GAME( 199?, m1bankbsp   ,m1bankbs   ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bank Buster Club (Maygay) v2.9 (Protocol) (M1A/B)",GAME_FLAGS )
-GAME( 199?, m1bankbso   ,m1bankbs   ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bank Buster Club (Maygay) v2.8 (M1A/B)",GAME_FLAGS )
+GAME( 199?, m1bankbs    ,0          ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bank Buster Club (Maygay) v2.9 (M1A/B)",GAME_FLAGS )
+GAME( 199?, m1bankbsp   ,m1bankbs   ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bank Buster Club (Maygay) v2.9 (Protocol) (M1A/B)",GAME_FLAGS )
+GAME( 199?, m1bankbso   ,m1bankbs   ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bank Buster Club (Maygay) v2.8 (M1A/B)",GAME_FLAGS )
 
 /*******************************************************************************************************************************************************************************************************
   Chain Reaction
@@ -186,9 +185,9 @@ ROM_START( m1dm4ev )    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    
 ROM_START( m1dm4evp )   ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sc4-086", 0x0000, 0x010000, CRC(7eccadaa) SHA1(9d3d3f990960cf57eac033786826b046e15d594e) ) ROM_END_M1A_MCU //5.1 p
 ROM_START( m1dm4ev11 )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sc3-301", 0x0000, 0x010000, CRC(0a1a3906) SHA1(bb16251bdf4726799218bf252b47184d999f97dc) ) ROM_END_M1A_MCU //200 GBP
 
-GAME( 199?, m1dm4ev     ,0          ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Diamonds Are Forever Club (Maygay) v5.1 (M1A/B)",GAME_FLAGS )
-GAME( 199?, m1dm4evp    ,m1dm4ev    ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Diamonds Are Forever Club (Maygay) v5.1 (Protocol) n(M1A/B)",GAME_FLAGS )
-GAME( 199?, m1dm4ev11   ,m1dm4ev    ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Diamonds Are Forever Club (Maygay) v1.1 (M1A/B)",GAME_FLAGS )
+GAME( 199?, m1dm4ev     ,0          ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Diamonds Are Forever Club (Maygay) v5.1 (M1A/B)",GAME_FLAGS )
+GAME( 199?, m1dm4evp    ,m1dm4ev    ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Diamonds Are Forever Club (Maygay) v5.1 (Protocol) n(M1A/B)",GAME_FLAGS )
+GAME( 199?, m1dm4ev11   ,m1dm4ev    ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Diamonds Are Forever Club (Maygay) v1.1 (M1A/B)",GAME_FLAGS )
 
 /*******************************************************************************************************************************************************************************************************
   Casino Royale Club
@@ -199,9 +198,9 @@ ROM_START( m1casroy )   ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    
 ROM_START( m1casroyp )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sc3-070.bin", 0x0000, 0x010000, CRC(8c548d12) SHA1(e86a0fc40f02c85a6139e11cc7824a3d05ba7dca) ) ROM_END_M1A_MCU //1.2p
 ROM_START( m1casroy1 )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sc1-197.bin", 0x0000, 0x010000, CRC(6e227a4a) SHA1(5070e3fa0e77f3e6ffa0915949e6c10ff3287fbf) ) ROM_END_M1A_MCU //1.1
 
-GAME( 1990, m1casroy    ,0          ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Casino Royale Club (Maygay) v1.2 (M1A/B)",GAME_FLAGS )
-GAME( 1990, m1casroyp   ,m1casroy   ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Casino Royale Club (Maygay) v1.2 (Protocol) (M1A/B)",GAME_FLAGS )
-GAME( 1990, m1casroy1   ,m1casroy   ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Casino Royale Club (Maygay) v1.1 (M1A/B)",GAME_FLAGS )
+GAME( 1990, m1casroy    ,0          ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Casino Royale Club (Maygay) v1.2 (M1A/B)",GAME_FLAGS )
+GAME( 1990, m1casroyp   ,m1casroy   ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Casino Royale Club (Maygay) v1.2 (Protocol) (M1A/B)",GAME_FLAGS )
+GAME( 1990, m1casroy1   ,m1casroy   ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Casino Royale Club (Maygay) v1.1 (M1A/B)",GAME_FLAGS )
 
 /*******************************************************************************************************************************************************************************************************
   Bank Roll
@@ -260,16 +259,16 @@ ROM_START( m1bondi2po ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )    
 ROM_START( m1bondi1 )   ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa7-208", 0x0000, 0x020000, CRC(cfc28e07) SHA1(06b214882252c9436afb441773de84e4be5cf17d) ) ROM_END_M1A_MCU //1.1
 ROM_START( m1bondi1p )  ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa7-209", 0x0000, 0x020000, CRC(9f8370bb) SHA1(205e03689926311755c6cc2700bb63eb88202046) ) ROM_END_M1A_MCU //1.1p
 
-GAME( 1996, m1bondi     ,0          ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bondi Beach (Maygay) v1.1 (Newer) (M1A/B)",GAME_FLAGS )
-GAME( 1996, m1bondip    ,m1bondi    ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bondi Beach (Maygay) v1.1 (Newer) (Protocol) (M1A/B)",GAME_FLAGS )
-GAME( 1996, m1bondi4    ,m1bondi    ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bondi Beach (Maygay) v4.1 (M1A/B)",GAME_FLAGS )
-GAME( 1996, m1bondi4p   ,m1bondi    ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bondi Beach (Maygay) v4.1 (Protocol) (M1A/B)",GAME_FLAGS )
-GAME( 1996, m1bondi3    ,m1bondi    ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bondi Beach (Maygay) v3.1 (M1A/B)",GAME_FLAGS )
-GAME( 1996, m1bondi2    ,m1bondi    ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bondi Beach (Maygay) v2.1 (M1A/B)",GAME_FLAGS )
-GAME( 1996, m1bondi2p   ,m1bondi    ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bondi Beach (Maygay) v2.1 (Protocol) (M1A/B)",GAME_FLAGS )
-GAME( 1996, m1bondi2po  ,m1bondi    ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bondi Beach (Maygay) v2.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS )
-GAME( 1996, m1bondi1    ,m1bondi    ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bondi Beach (Maygay) v1.1 (M1A/B)",GAME_FLAGS )
-GAME( 1996, m1bondi1p   ,m1bondi    ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bondi Beach (Maygay) v1.1 (Protocol) (M1A/B)",GAME_FLAGS )
+GAME( 1996, m1bondi     ,0          ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bondi Beach (Maygay) v1.1 (Newer) (M1A/B)",GAME_FLAGS )
+GAME( 1996, m1bondip    ,m1bondi    ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bondi Beach (Maygay) v1.1 (Newer) (Protocol) (M1A/B)",GAME_FLAGS )
+GAME( 1996, m1bondi4    ,m1bondi    ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bondi Beach (Maygay) v4.1 (M1A/B)",GAME_FLAGS )
+GAME( 1996, m1bondi4p   ,m1bondi    ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bondi Beach (Maygay) v4.1 (Protocol) (M1A/B)",GAME_FLAGS )
+GAME( 1996, m1bondi3    ,m1bondi    ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bondi Beach (Maygay) v3.1 (M1A/B)",GAME_FLAGS )
+GAME( 1996, m1bondi2    ,m1bondi    ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bondi Beach (Maygay) v2.1 (M1A/B)",GAME_FLAGS )
+GAME( 1996, m1bondi2p   ,m1bondi    ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bondi Beach (Maygay) v2.1 (Protocol) (M1A/B)",GAME_FLAGS )
+GAME( 1996, m1bondi2po  ,m1bondi    ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bondi Beach (Maygay) v2.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS )
+GAME( 1996, m1bondi1    ,m1bondi    ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bondi Beach (Maygay) v1.1 (M1A/B)",GAME_FLAGS )
+GAME( 1996, m1bondi1p   ,m1bondi    ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bondi Beach (Maygay) v1.1 (Protocol) (M1A/B)",GAME_FLAGS )
 
 /*******************************************************************************************************************************************************************************************************
   Albert Square
@@ -455,10 +454,10 @@ ROM_START( m1clueshp )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    
 ROM_START( m1cluesho )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa4-492", 0x0000, 0x010000, CRC(824eafd8) SHA1(19beeb7238eddfed4917dc809a620b695d2d8098) ) ROM_END_M1A_MCU //nhj 1.2
 ROM_START( m1clueshop ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa4-493", 0x0000, 0x010000, CRC(6aa6323e) SHA1(fb45b027259cb703ac31230465a65f39e834c0f2) ) ROM_END_M1A_MCU //phj 1.2
 
-GAME( 1993, m1cluesh    ,0          ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Super Cluedo Showcase (Maygay) v1.2 (M1A/B)",GAME_FLAGS )
-GAME( 1993, m1clueshp   ,m1cluesh   ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Super Cluedo Showcase (Maygay) v1.2 (Protocol) (M1A/B)",GAME_FLAGS )
-GAME( 1993, m1cluesho   ,m1cluesh   ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Super Cluedo Showcase (Maygay) v1.2 (Older) (M1A/B)",GAME_FLAGS )
-GAME( 1993, m1clueshop  ,m1cluesh   ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Super Cluedo Showcase (Maygay) v1.2 (Older) (Protocol) (M1A/B)",GAME_FLAGS )
+GAME( 1993, m1cluesh    ,0          ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Super Cluedo Showcase (Maygay) v1.2 (M1A/B)",GAME_FLAGS )
+GAME( 1993, m1clueshp   ,m1cluesh   ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Super Cluedo Showcase (Maygay) v1.2 (Protocol) (M1A/B)",GAME_FLAGS )
+GAME( 1993, m1cluesho   ,m1cluesh   ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Super Cluedo Showcase (Maygay) v1.2 (Older) (M1A/B)",GAME_FLAGS )
+GAME( 1993, m1clueshop  ,m1cluesh   ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Super Cluedo Showcase (Maygay) v1.2 (Older) (Protocol) (M1A/B)",GAME_FLAGS )
 
 /*******************************************************************************************************************************************************************************************************
   Cluedo Club
@@ -554,8 +553,8 @@ GAME( 1993, m1coro21vp  ,m1coro     ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT
 ROM_START( m1corosh )   ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa4-342", 0x0000, 0x010000, CRC(47ac83cf) SHA1(d23e14a714121bb67c130aae4b85bdcf62a949b6) ) ROM_END_M1A_MCU
 ROM_START( m1coroshp )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa4-343", 0x0000, 0x010000, CRC(af441e29) SHA1(6631d5282f896c9a7fe1b2e41c19d58dfef4e644) ) ROM_END_M1A_MCU
 
-GAME( 1993, m1corosh    ,0          ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Coronation Street Showcase (Maygay) v1.1 (M1A/B)",GAME_FLAGS )
-GAME( 1993, m1coroshp   ,m1corosh   ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Coronation Street Showcase (Maygay) v1.1 (Protocol)(M1A/B)",GAME_FLAGS )
+GAME( 1993, m1corosh    ,0          ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Coronation Street Showcase (Maygay) v1.1 (M1A/B)",GAME_FLAGS )
+GAME( 1993, m1coroshp   ,m1corosh   ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Coronation Street Showcase (Maygay) v1.1 (Protocol)(M1A/B)",GAME_FLAGS )
 
 /*******************************************************************************************************************************************************************************************************
   Coronation Street Club

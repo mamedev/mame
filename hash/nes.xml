@@ -16376,8 +16376,8 @@
 		</part>
 	</software>
 
-	<software name="hokkaido">
-		<description>Hokkaidou Rensa Satsujin - Okhotsu ni Shoyu (Jpn)</description>
+	<software name="okhotsk">
+		<description>Hokkaidou Rensa Satsujin - Okhotsk ni Shoyu (Jpn)</description>
 		<year>1987</year>
 		<publisher>Login Soft</publisher>
 		<info name="serial" value="HSP-07"/>

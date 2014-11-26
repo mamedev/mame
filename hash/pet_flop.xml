@@ -711,4 +711,22 @@
 		</part>
 	</software>
 
+	<software name="hsgdemo">
+		<description>CBM 8000 High Speed Graphics Demos</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="hsg-demos-01.d64" size="174848" crc="203cf196" sha1="465cc52a3a1d26c2c33dbd24a83c77b5c4b407f0" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1066496">
+				<rom name="hsg-demos-02.d82" size="1066496" crc="769f91cb" sha1="d1b5b8724eb58cd37403ea36765c060c5c2d7e21" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

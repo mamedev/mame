@@ -209,7 +209,7 @@ void n64_rdp::SpanDraw1Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 		dzpix = object.MiscState.PrimitiveDZ;
 		dzinc = 0;
 	}
-	
+
 	if (object.MiscState.FBSize < 2 || object.MiscState.FBSize > 4)
 		fatalerror("unsupported FBSize %d\n", object.MiscState.FBSize);
 

@@ -222,7 +222,7 @@ READ16_MEMBER( harddriv_state::hd68k_port0_r )
 	    0x8000 = SW1 #1
 	*/
 	screen_device &scr = m_gsp->screen();
-	
+
 	int temp = (ioport("SW1")->read_safe(0xff) << 8) | ioport("IN0")->read_safe(0xff);
 	if (get_hblank(scr)) temp ^= 0x0002;
 	temp ^= 0x0018;     /* both EOCs always high for now */

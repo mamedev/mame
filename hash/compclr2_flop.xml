@@ -181,13 +181,13 @@
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<info name="part_id" value="Source"/>
+			<feature name="part_id" value="Source"/>
 			<dataarea name="flop" size="162886">
 				<rom name="asteriods_source.ccvf" size="162886" crc="14af4de7" sha1="43a76ffda8b4e2f5513c8cd9ac6390ab15854280" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="asteroida" cloneof="asteroid">
 		<description>Asteroids (Alt)</description>
 		<year>19??</year>
@@ -199,7 +199,7 @@
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<info name="part_id" value="Source"/>
+			<feature name="part_id" value="Source"/>
 			<dataarea name="flop" size="162886">
 				<rom name="asteriods_source.ccvf" size="162886" crc="14af4de7" sha1="43a76ffda8b4e2f5513c8cd9ac6390ab15854280" offset="0"/>
 			</dataarea>
@@ -228,7 +228,7 @@
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<info name="part_id" value="Source"/>
+			<feature name="part_id" value="Source"/>
 			<dataarea name="flop" size="162832">
 				<rom name="backgammon-sideb.ccvf" size="162832" crc="7f9aca0c" sha1="a6b588e075c17f5d1ff10675de88f3c51a4ca35e" offset="0"/>
 			</dataarea>
@@ -1206,14 +1206,14 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<info name="part_id" value="DISASM"/>
+			<feature name="part_id" value="DISASM"/>
 			<dataarea name="flop" size="162853">
 				<rom name="disasm+mldp+sidea.ccvf" size="162853" crc="37e8ba02" sha1="de79e786fd29633a471de44aa700cf256cd6434b" offset="0"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<info name="part_id" value="MLPD"/>
+			<feature name="part_id" value="MLPD"/>
 			<dataarea name="flop" size="162853">
 				<rom name="disasm+mldp-sideb.ccvf" size="162853" crc="17628a85" sha1="90fdc00b6939cc54fc5095c6ee0e621a9767a539" offset="0"/>
 			</dataarea>
@@ -1330,7 +1330,7 @@
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<info name="part_id" value="Instructions"/>
+			<feature name="part_id" value="Instructions"/>
 			<dataarea name="flop" size="162874">
 				<rom name="execugraph_instructions.ccvf" size="162874" crc="0716e534" sha1="1ae67e4acec0175880698df9c792ea97eb6f7158" offset="0"/>
 			</dataarea>
@@ -1432,7 +1432,7 @@
 	</software>
 
 
-	<software name="fortstra" clone="fortstr">
+	<software name="fortstra" cloneof="fortstr">
 		<description>FORTRAN Strings Source (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

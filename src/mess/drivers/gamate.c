@@ -67,7 +67,7 @@ WRITE8_MEMBER( gamate_state::video_w )
 	case 5: video.y=data;break;
 	case 7:
 	if (video.bitmap.write) {
-		if (video.x<ARRAY_LENGTH(video.bitmap.data[0][0]) /*&& video.y<ARRAY_LENGTH(video.bitmap.data[0])*/) 
+		if (video.x<ARRAY_LENGTH(video.bitmap.data[0][0]) /*&& video.y<ARRAY_LENGTH(video.bitmap.data[0])*/)
 		video.bitmap.data[video.bitmap.page2][video.y][video.x]=data;
 		else
 		logerror("%.6f %04x video bitmap x %x invalid\n",machine().time().as_double(), m_maincpu->pc(), video.x);

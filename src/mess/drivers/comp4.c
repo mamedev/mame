@@ -4,11 +4,11 @@
 
   Milton Bradley Comp IV
   * TMC0904NL CP0904A (die labeled 4A0970D-04A)
-  
+
   This is a handheld Mastermind game; a code-breaking game where the player
   needs to find out the correct sequence of colours (numbers in our case).
   It is known as Logic 5 in Europe, and as Pythaligoras in Japan.
-  
+
   Press the R key to start, followed by a set of unique numbers and E.
   Refer to the official manual for more information.
 
@@ -63,7 +63,7 @@ READ8_MEMBER(comp4_state::read_k)
 	for (int i = 0; i < 3; i++)
 		if (m_o & (1 << (i + 1)))
 			k |= m_button_matrix[i]->read();
-	
+
 	return k;
 }
 

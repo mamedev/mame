@@ -196,7 +196,10 @@ software_info::software_info(software_list_device &list, const char *name, const
 		m_list(list),
 		m_supported(SOFTWARE_SUPPORTED_YES),
 		m_shortname(name),
-		m_parentname(parent)
+		m_longname(NULL),
+		m_parentname(parent),
+		m_year(NULL),
+		m_publisher(NULL)
 {
 	// ensure strings we are passed are in the string pool
 	assert(list.string_pool_contains(name));
@@ -609,19 +612,18 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 {
 	enum { NAME_LEN_PARENT = 8, NAME_LEN_CLONE = 16 };
 
-	// first parse and output core errors if any
-	if (m_errors.len() > 0)
-	{
-		osd_printf_error("%s: Errors parsing software list:\n%s", filename(), errors_string());
-		release();
-		return;
-	}
-
 	softlist_map names;
 	softlist_map descriptions;
 	for (software_info *swinfo = first_software_info(); swinfo != NULL; swinfo = swinfo->next())
 	{
-		// First, check if the xml got corrupted:
+		// first parse and output core errors if any
+		if (m_errors.len() > 0)
+		{
+			osd_printf_error("%s: Errors parsing software list:\n%s", filename(), errors_string());
+			break;
+		}
+
+		// Now check if the xml data is valid:
 
 		// Did we lost any description?
 		if (swinfo->longname() == NULL)

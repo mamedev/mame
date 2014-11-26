@@ -100,7 +100,7 @@ public:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	
+
 	UINT8 debug_peek_output(offs_t offset) { return m_output_latch[offset & 7]; }
 
 protected:

@@ -233,7 +233,7 @@ WRITE8_MEMBER( dmv_k220_device::porta_w )
 
 	output_set_digit_value(0, bcd2hex[(data >> 4) & 0x0f]);
 	output_set_digit_value(1, bcd2hex[data & 0x0f]);
-};
+}
 
 
 WRITE8_MEMBER( dmv_k220_device::portc_w )
@@ -250,7 +250,7 @@ WRITE8_MEMBER( dmv_k220_device::portc_w )
 	m_pit->write_gate2(BIT(data, 3));
 
 	m_portc = data;
-};
+}
 
 
 WRITE_LINE_MEMBER( dmv_k220_device::write_out0 )

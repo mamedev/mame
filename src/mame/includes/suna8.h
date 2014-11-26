@@ -17,7 +17,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		
+
 		m_prot_opcode_toggle(0)
 		{ }
 
@@ -46,7 +46,7 @@ public:
 	UINT8 m_write_disable;
 	UINT8 m_prot_opcode_toggle;
 	UINT8* m_decrypt;
-	
+
 	enum GFXBANK_TYPE_T
 	{
 		GFXBANK_TYPE_SPARKMAN,

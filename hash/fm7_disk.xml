@@ -24,6 +24,18 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="abyss" supported="no">
+		<description>Abyss</description>
+		<year>1984</year>
+		<publisher>ハミングバード (HummingBird)</publisher>
+		<info name="alt_title" value="アビス"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="344448">
+				<rom name="abyss1a.d77" size="344448" crc="f391015d" sha1="2aa2f99d6c9bb33a2d95b4e22ccc8b3477abebfe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="albatros">
 		<description>Albatross</description>
 		<year>1986</year>
@@ -192,6 +204,18 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="cprowsp" supported="no">
+		<description>Champion ProWres Special</description>
+		<year>1986</year>
+		<publisher>マイクロネット (Micronet)</publisher>
+		<info name="alt_title" value="チャンピオンプロレススペシャル"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="349888">
+				<rom name="champion prowres special(198x)(micronet).d77" size="349888" crc="f5c6257b" sha1="ef65f592eb92667538d14c1ebedcea8e06fc5984" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="christin">
 		<description>Christine</description>
 		<year>1986</year>
@@ -259,6 +283,41 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="diskfm1.d77" size="348848" crc="3c531ef3" sha1="27275efd310fe5e848de32d911970805b94bb3b9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dna" supported="no">
+		<description>DNA</description>
+		<year>1987</year>
+		<publisher>HOT・B</publisher>
+		<info name="release" value="198704xx"/>
+		<info name="alt_title" value="フェアリーズレジデンス"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="dna_a.d77" size="348848" crc="0cab8e99" sha1="4410d9f023f82d631a06448093109aeb1c5f1d1c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="dna_b.d77" size="348848" crc="b1d80b08" sha1="1b3c54c1a678c8985f4cecc8023abba2b950c961" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="faires">
+		<description>Fairie's Residence</description>
+		<year>1985</year>
+		<publisher>チャンピオンソフト (Champion Soft)</publisher>
+		<info name="alt_title" value="フェアリーズレジデンス"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="falyrgs1.d77" size="348848" crc="bd6c5b4c" sha1="9f9df0f53928933b0cfe5902c015e3ddbfe9dd98" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="falyrgs2.d77" size="348848" crc="acfbc616" sha1="b6ef23d3d8629f1a589c452cc336cb48464ee51f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -570,6 +629,23 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="lovelyga">
+		<description>Lovely Gal</description>
+		<year>1987</year>
+		<publisher>チャンピオンソフト (Champion Soft)</publisher>
+		<info name="alt_title" value="ラブリーGAL"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="lvlygl_1.d77" size="348848" crc="bd6c5b4c" sha1="9f9df0f53928933b0cfe5902c015e3ddbfe9dd98" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="lvlygl_2.d77" size="348848" crc="acfbc616" sha1="b6ef23d3d8629f1a589c452cc336cb48464ee51f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lupin">
 		<description>Lupin the Third - Cagliostro no Shiro</description>
 		<year>1985</year>
@@ -589,6 +665,18 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="cagliostro no shiro (disk 2).d77" size="348848" crc="d7ab4e32" sha1="2ac7072e859613fb2ea21decd2f1545cce3edcc9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maboyume">
+		<description>Maboroshi Yume no Shiro</description>
+		<year>1987</year>
+		<publisher>チャンピオンソフト (Champion Soft)</publisher>
+		<info name="alt_title" value="幻夢の城"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="gnmusiro.d77" size="348848" crc="775398ca" sha1="6565127350148b010af072c6a4b8d4b91e897324" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -707,24 +795,19 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<!-- No sound on the FM-7, FM sound only?  -->
-	<software name="psychic">
-		<description>Psychic War - Cosmic Soldier 2</description>
-		<year>1988</year>
-		<publisher>KGD Software</publisher>
+	<software name="poplemon">
+		<description>Pop Lemon</description>
+		<year>1986</year>
+		<publisher>チャンピオンソフト (Champion Soft)</publisher>
+		<info name="alt_title" value="ポップレモン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="psychic_a.d77" size="348848" crc="c540a5d8" sha1="61fb045687cf3f320d6b21554f5d36da1c5e6cda" offset="000000" />
+				<rom name="poplmn_1.d77" size="348848" crc="888adc31" sha1="5450b0b7c05975d9e91845a4ccd10ad4fcad97ed" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="psychic_b.d77" size="348848" crc="f311eb81" sha1="d7afe05b1e1f37df3f951a274af6c57a88bf6d84" offset="000000" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="psychic_u.d77" size="348848" crc="8ca45d1e" sha1="a3a0be9f4be3db485b9a7400c3103f3ab0b31277" offset="000000" />
+				<rom name="poplmn_2.d77" size="348848" crc="15e63ce4" sha1="1242fbf6262ef28c06b578d1d99a7e02167c9a33" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -759,6 +842,28 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="473776">
 				<rom name="pquest_u.d77" size="473776" crc="1a8805ce" sha1="4da739407feeed927924a66fa4d589641cfd0b26" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No sound on the FM-7, FM sound only?  -->
+	<software name="psychic">
+		<description>Psychic War - Cosmic Soldier 2</description>
+		<year>1988</year>
+		<publisher>KGD Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="psychic_a.d77" size="348848" crc="c540a5d8" sha1="61fb045687cf3f320d6b21554f5d36da1c5e6cda" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="psychic_b.d77" size="348848" crc="f311eb81" sha1="d7afe05b1e1f37df3f951a274af6c57a88bf6d84" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="psychic_u.d77" size="348848" crc="8ca45d1e" sha1="a3a0be9f4be3db485b9a7400c3103f3ab0b31277" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1003,7 +1108,7 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="topplez">
+	<software name="topzip">
 		<description>Topple Zip</description>
 		<year>1987</year>
 		<publisher>ボーステック (Bothtec)</publisher>
@@ -1329,7 +1434,6 @@ Titles, serial #s, publishers and release dates taken from:
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="release" value="198611xx"/>
 		<info name="alt_title" value="ザナドゥ シナリオ2"/>
-		<info name="usage" value="Needs Xanadu to work"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
 				<rom name="xanadu2d.d77" size="415840" crc="6e5e8827" sha1="337e6f4e945d6790141f21a31035c9d8bff79838" offset="0" />
@@ -1343,6 +1447,30 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
 				<rom name="xanadu2u.d77" size="415840" crc="87d04b23" sha1="910aae50771313c859e692d2614eefecf54db859" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- The user disk from this set has been reported to make the set above working! Investigate! -->
+	<software name="xanadu2a" cloneof="xanadu2">
+		<description>Xanadu Scenario II - The Resurrection of Dragon (Alt)</description>
+		<year>1986</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<info name="release" value="198611xx"/>
+		<info name="alt_title" value="ザナドゥ シナリオ2"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="415840">
+				<rom name="xanadu2_d.d77" size="415840" crc="3d51a5b4" sha1="b9c1f1cfdfef29746232501819cd62c7cc871d3d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="415840">
+				<rom name="xanadu2_e.d77" size="415840" crc="195a5828" sha1="cc5147101ff775fc78809c3d15f9c7c7ee22c51f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="415840">
+				<rom name="xanadu2_u.d77" size="415840" crc="62c77386" sha1="49302da48b80605b0e1b216f80b46619df98bfca" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2104,6 +2232,153 @@ Game #014 for FM-7/77/AV.
 		</part>
 	</software>
 
+
+<!--
+Description of Gane Bank #1
+- GALAGA : run "GALAGA" .
+- FLappy : run "FLAPPY" .
+- Mario Bros Special : run "MARIO.S".
+- The Castle: run "CASTLE".
+Aboves may be correct.
+
+- GALXAN : run "GALAXAN". But this game was broken.
+-->
+	<software name="gmbnk001">
+		<description>GameBank 01</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="gamebank01.d77" size="348848" crc="74d82ecf" sha1="f974ff99ef08a16b398e308b6fbefa6fb54c0959" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Descriptions of Game Bank #3:
+Belows are (seem to) correct:
+- Luner city SOS : run "LUNERSOS".
+- Mappy          : run "MAPPY".
+- NOBO           : run "NOBO".
+- MACH-7         : run "MACH-7". some cource(s) seems to be broken.
+Belows were broken.
+- Flight simulator : run "FLIGHT".
+-->
+	<software name="gmbnk003">
+		<description>GameBank 03</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="gamebank03.d77" size="348848" crc="79f2658d" sha1="349c6b91d312ca1a2dcb79e1258634de7cbcbf59" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Descriptions of Game Bank #4:
+Belows are (seem to) correct:
+- Battle City : run "BATTLE".
+- Plazma Line : run "PLAZMA".
+- EGGY : run "EGGY".
+- KNITHER : run "KNITHER".
+- Chak'n Pop : run "CHAN.POP".
+-->
+	<software name="gmbnk004">
+		<description>GameBank 04</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="gamebank04.d77" size="348848" crc="307dcb59" sha1="9a6bbabd621ab57dd957ec3f1ef5b9a5f1ab4a17" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Description of Game Bank #5:
+Belows are seem to be correct:
+- Victorious Nine : run "VICTORY9"
+- TANK BATTLE "Sento Gokko": boot from URA DOS, then loadm"TANK",,r
+
+Belows are seem to be correct, but maybe broken yet:
+- The Emergency : run "EMERGENCY".
+- Blue Fox : loadm "BLUEFOX",,r.
+Another games are not correct.
+-->
+	<software name="gmbnk005">
+		<description>GameBank 05</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="gamebank05.d77" size="348848" crc="7df7059c" sha1="7ab2c19aff20ea2790853108ed9805de05cb8b84" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Descriptions of Game Bank #6:
+Belows are (seem to) correct:
+- Bokosuka Wars : run "BOKOSUKA".
+
+Other games are broken.
+-->
+	<software name="gmbnk006">
+		<description>GameBank 06</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="gamebank06.d77" size="348848" crc="3bebdae0" sha1="b0b5b112624e7d5c0f72b7d7d60a43cb9f23068b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Descriptions of Game Bank #7:
+Belows are correct:
+- Newtron : run "NEWTRON".
+- Star Dash: run "STARDASH"
+- F-15 Eagle : run "EAGLE".
+- Push Pull (1): loadm "PUSHPULL",,r.
+
+Below is incorrect:
+- Hover Attack: run"HOVER.B".
+
+Another files are not test yet.
+-->
+	<software name="gmbnk007">
+		<description>GameBank 07</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="gamebank07.d77" size="348848" crc="663e1eec" sha1="8a0758777efc1e13d90425a11534bd0153bf25c6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+GameBank20.d77.
+1.Golgo 13            :RUN "G13-D/B".
+2.DELPHIS (Alt)       :RUN "DELPHIS".
+3.Dragon Slayer (v2.0):RUN "DRAGON.M".
+4.Volguard (Alt)      :RUN "VOLGUARD".
+5.Volguard (Cheat)    :RUN "VOLCHEAT".
+6.Super File Copy     :LOADM"SFCOPYo",,r .
+-->
+	<software name="gmbnk020">
+		<description>GameBank 20</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="473776">
+				<rom name="gamebank20.d77" size="473776" crc="131def2d" sha1="7d334f641e70de8e4445cb749e2bfa90e16dd450" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!--
 URA DOS Disk00 for FM-7/77/AV
 OPERATION D                RUN "OPERATE"
@@ -2175,3 +2450,7 @@ Uootoy             RUN "UOOTOY"   Needs boot from F-BASIC 3.0.
 	</software>
 
 </softwarelist>
+
+
+
+

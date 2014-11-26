@@ -78,8 +78,8 @@ public:
 		m_machine(machine)
 	{
 		m_dasmView = new DebuggerView(DVT_DISASSEMBLY,
-									  m_machine,
-									  this);
+										m_machine,
+										this);
 
 		// Force a recompute of the disassembly region
 		downcast<debug_view_disasm*>(m_dasmView->view())->set_expression("curpc");
@@ -130,8 +130,8 @@ public:
 		m_machine(machine)
 	{
 		m_processorView = new DebuggerView(DVT_STATE,
-										   m_machine,
-										   this);
+											m_machine,
+											this);
 		m_processorView->setFocusPolicy(Qt::NoFocus);
 
 		QVBoxLayout* cvLayout = new QVBoxLayout(this);

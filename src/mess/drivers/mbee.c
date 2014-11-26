@@ -123,7 +123,6 @@
 
 
 #include "includes/mbee.h"
-#include "formats/dsk_dsk.h"
 #include "formats/mbee_dsk.h"
 #include "formats/mbee_cas.h"
 
@@ -645,8 +644,7 @@ static const floppy_interface mbee_floppy_interface =
 #endif
 
 FLOPPY_FORMATS_MEMBER( mbee_state::floppy_formats )
-	FLOPPY_MBEE_FORMAT,
-	FLOPPY_DSK_FORMAT
+	FLOPPY_MBEE_FORMAT
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( mbee_floppies )

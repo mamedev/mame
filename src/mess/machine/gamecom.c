@@ -192,8 +192,8 @@ READ8_MEMBER( gamecom_state::gamecom_pio_r )
 READ8_MEMBER( gamecom_state::gamecom_internal_r )
 {
 // ToDo: Read from vblank bit
-//	if(SM8521_LCV == offset + 0x20)
-//		popmessage("Read from vblank bit, TODO");
+//  if(SM8521_LCV == offset + 0x20)
+//      popmessage("Read from vblank bit, TODO");
 
 	return m_p_ram[offset + 0x20];
 }

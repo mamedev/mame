@@ -537,7 +537,7 @@ static void region_post_process(romload_private *romdata, const char *rgntag, bo
 		return;
 
 	LOG(("+ datawidth=%dbit endian=%s\n", region->bitwidth(),
-		 region->endianness() == ENDIANNESS_LITTLE ? "little" : "big"));
+			region->endianness() == ENDIANNESS_LITTLE ? "little" : "big"));
 
 	/* if the region is inverted, do that now */
 	if (invert)

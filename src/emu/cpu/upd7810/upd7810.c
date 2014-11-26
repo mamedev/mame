@@ -1345,17 +1345,17 @@ void upd7810_device::handle_timers(int cycles)
 				IRR |= INTFE1;
 			/* Conditions When ECNT Causes a CO0 Output Change */
 			if (((0x00 == (ETMM & 0x30)) && (ETM0 == ECNT)) || /* set CO0 if ECNT == ETM0 */
-			 /* ((0x10 == (ETMM & 0x30)) prohibited */
-			    ((0x20 == (ETMM & 0x30)) && (ETM0 == ECNT)) || /* set CO0 if ECNT == ETM0 or at falling CI input */
-			    ((0x30 == (ETMM & 0x30)) && (ETM0 == ECNT || ETM1 == ECNT))) /* latch CO0 if ECNT == ETM0 or ECNT == ETM1 */
+				/* ((0x10 == (ETMM & 0x30)) prohibited */
+				((0x20 == (ETMM & 0x30)) && (ETM0 == ECNT)) || /* set CO0 if ECNT == ETM0 or at falling CI input */
+				((0x30 == (ETMM & 0x30)) && (ETM0 == ECNT || ETM1 == ECNT))) /* latch CO0 if ECNT == ETM0 or ECNT == ETM1 */
 			{
 				upd7810_co0_output_change();
 			}
 			/* Conditions When ECNT Causes a CO1 Output Change */
 			if (((0x00 == (ETMM & 0xc0)) && (ETM1 == ECNT)) || /* set CO1 if ECNT == ETM1 */
-			 /* ((0x40 == (ETMM & 0xc0)) prohibited */
-			    ((0x80 == (ETMM & 0xc0)) && (ETM1 == ECNT)) || /* set CO1 if ECNT == ETM1 or at falling CI input */
-			    ((0xc0 == (ETMM & 0xc0)) && (ETM0 == ECNT || ETM1 == ECNT))) /* latch CO1 if ECNT == ETM0 or ECNT == ETM1 */
+				/* ((0x40 == (ETMM & 0xc0)) prohibited */
+				((0x80 == (ETMM & 0xc0)) && (ETM1 == ECNT)) || /* set CO1 if ECNT == ETM1 or at falling CI input */
+				((0xc0 == (ETMM & 0xc0)) && (ETM0 == ECNT || ETM1 == ECNT))) /* latch CO1 if ECNT == ETM0 or ECNT == ETM1 */
 			{
 				upd7810_co1_output_change();
 			}
@@ -1816,7 +1816,7 @@ void upd7810_device::device_reset()
 	m_itf = 0;
 	m_nmi = 0;
 	m_int1 = 0;
-	m_int2 = 1;	/* physical (inverted) INT2 line state */
+	m_int2 = 1; /* physical (inverted) INT2 line state */
 
 	m_txs = 0;
 	m_rxs = 0;

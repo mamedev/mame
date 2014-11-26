@@ -163,11 +163,11 @@ void sega315_5313_device::device_start()
 
 
 	if (!m_use_alt_timing)
-		m_render_bitmap = auto_bitmap_ind16_alloc(machine(), m_screen->width(), m_screen->height());
+		m_render_bitmap = auto_bitmap_ind16_alloc(machine(), 320, 512); // allocate maximum sizes we're going to use, it's safer.
 	else
-		m_render_line = auto_alloc_array(machine(), UINT16, m_screen->width());
+		m_render_line = auto_alloc_array(machine(), UINT16, 320);
 
-	m_render_line_raw = auto_alloc_array(machine(), UINT16, m_screen->width());
+	m_render_line_raw = auto_alloc_array(machine(), UINT16, 320);
 
 	// FIXME: are these all needed? I'm pretty sure some of these (most?) are just helpers which don't need to be saved,
 	// but better safe than sorry...
@@ -178,9 +178,9 @@ void sega315_5313_device::device_start()
 	save_pointer(NAME(m_palette_lookup_sprite), 0x40/2);
 	save_pointer(NAME(m_palette_lookup_shadow), 0x40/2);
 	save_pointer(NAME(m_palette_lookup_highlight), 0x40/2);
-	save_pointer(NAME(m_render_line_raw), m_screen->width()/2);
+	save_pointer(NAME(m_render_line_raw), 320/2);
 	if (m_use_alt_timing)
-		save_pointer(NAME(m_render_line), m_screen->width()/2);
+		save_pointer(NAME(m_render_line), 320/2);
 
 	m_irq6_on_timer = machine().scheduler().timer_alloc(FUNC(irq6_on_timer_callback), (void*)this);
 	m_irq4_on_timer = machine().scheduler().timer_alloc(FUNC(irq4_on_timer_callback), (void*)this);
@@ -2503,8 +2503,16 @@ void sega315_5313_device::render_videobuffer_to_screenbuffer(int scanline)
 {
 	UINT16 *lineptr;
 
+
+
 	if (!m_use_alt_timing)
+	{
+		if (scanline >= m_render_bitmap->height()) // safety, shouldn't happen now we allocate a fixed amount tho
+			return;
+
 		lineptr = &m_render_bitmap->pix16(scanline);
+
+	}
 	else
 		lineptr = m_render_line;
 

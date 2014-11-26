@@ -6080,8 +6080,8 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<software name="chikyuse">
-		<description>Chikyu Senshi Raiyeza</description>
+	<software name="raizer">
+		<description>Chikyuu Senshi Raizer</description>
 		<year>1985</year>
 		<publisher>エニックス (Enix)</publisher>
 		<!-- PC8801 -->
@@ -6094,8 +6094,8 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<software name="chikyusea" cloneof="chikyuse">
-		<description>Chikyusenshi Raiyeza (Alt)</description>
+	<software name="raizera" cloneof="raizer">
+		<description>Chikyuu Senshi Raizer (Alt)</description>
 		<year>1985</year>
 		<publisher>エニックス (Enix)</publisher>
 		<!-- PC8801 -->
@@ -8307,7 +8307,7 @@ ExtractDisk  [02]"DAIVA_B        " -> "daiva_02.d88"
 	</software>
 
 	<software name="dennosui">
-		<description>Denno Suikoden</description>
+		<description>Dennou Suikoden</description>
 		<year>1987</year>
 		<publisher>HOT・B</publisher>
 		<!-- PC8801mk2SR -->
@@ -9336,8 +9336,8 @@ ExtractDisk  [08]"下巻 ユーザー   " -> "aaa_08.d88"
 		</part>
 	</software>
 
-	<software name="dokishot">
-		<description>Doki Doki Shot Chance</description>
+	<software name="dokishut">
+		<description>Doki Doki Shutter Chance</description>
 		<year>1989</year>
 		<publisher>エルフ (Elf)</publisher>
 		<!-- PC8801mk2SR -->
@@ -9389,8 +9389,8 @@ ExtractDisk  [08]"下巻 ユーザー   " -> "aaa_08.d88"
 		</part>
 	</software>
 
-	<software name="dokishota" cloneof="dokishot">
-		<description>Doki Doki Shot Chance (Alt? Extra Disk?)</description>
+	<software name="dokishuta" cloneof="dokishut">
+		<description>Doki Doki Shutter Chance (Alt? Extra Disk?)</description>
 		<year>1989</year>
 		<publisher>エルフ (Elf)</publisher>
 		<!-- PC8801mk2SR -->
@@ -11464,8 +11464,8 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
-	<software name="fahratok">
-		<description>Fahra no Toki Kekkai</description>
+	<software name="faara">
+		<description>Faara no Toki Kekkai</description>
 		<year>1990</year>
 		<publisher>ハート電子 (Heart Denshi)</publisher>
 		<!-- PC8801mk2SR -->
@@ -11497,7 +11497,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 	</software>
 
 	<software name="faires">
-		<description>Fairies Residence</description>
+		<description>Fairie's Residence</description>
 		<year>1985</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
 		<!-- PC8801 -->
@@ -11522,7 +11522,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 	</software>
 
 	<software name="fairescl">
-		<description>Fairies Residence Special - Club Hen</description>
+		<description>Fairie's Residence Special - Club Hen</description>
 		<year>1986</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
 		<!-- PC8801 -->
@@ -11535,7 +11535,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 	</software>
 
 	<software name="fairessf">
-		<description>Fairies Residence Special - SF Hen</description>
+		<description>Fairie's Residence Special - SF Hen</description>
 		<year>1986</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
 		<!-- PC8801 -->
@@ -11547,8 +11547,8 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
-	<software name="faeriesr">
-		<description>Fairies Residence Special - SF Hen (Alt)</description>
+	<software name="fairessfa" cloneof="fairessf">
+		<description>Fairie's Residence Special - SF Hen (Alt)</description>
 		<year>1986</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
 		<!-- PC8801 -->
@@ -11561,7 +11561,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 	</software>
 
 	<software name="fairesgk">
-		<description>Fairies Residence Special - Gakuen Hen</description>
+		<description>Fairie's Residence Special - Gakuen Hen</description>
 		<year>1986</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
 		<!-- PC8801 -->
@@ -11573,8 +11573,8 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
-	<software name="fairess4">
-		<description>Fairies Residence Special 4 - Geinou-kai Hen - Super Mariko Sister</description>
+	<software name="fairesge">
+		<description>Fairie's Residence Special 4 - Geinou-kai Hen - Super Mariko Sister</description>
 		<year>1986</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
 		<!-- PC8801 -->
@@ -11717,7 +11717,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
-	<software name="fantasia">
+	<software name="fantsian">
 		<description>Fantasian</description>
 		<year>1985</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
@@ -18077,8 +18077,11 @@ ExtractDisk  [03]"ｼﾅﾘｵ          " -> "gundam tactical operation_03.d88"
 
 	<software name="kingbreda" cloneof="kingbred">
 		<description>King Breeder (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1991</year>
+		<publisher>アーテック (Artec)</publisher>
+		<!-- PC8801mk2SR -->
+		<info name="release" value="199102xx"/>
+		<info name="alt_title" value="キングブリーダー"/>
 		<!--combined image-->
 		<!--rom name="king breeder.d88" size="3001360" crc="3a4c0ee5" sha1="2557117014f74c7f2775a23abd1c8abe3f089343" offset="0" /-->
 
@@ -18158,7 +18161,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ          " -> "gundam tactical operation_03.d88"
 		</part>
 	</software>
 
-	<software name="kingsalm">
+	<software name="kingsal">
 		<description>The King Salmon</description>
 		<year>1987</year>
 		<publisher>HOT・B</publisher>
@@ -18357,7 +18360,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ          " -> "gundam tactical operation_03.d88"
 	</software>
 
 	<software name="noriko">
-		<description>Kobishojo Noriko - Part I</description>
+		<description>Kobishoujo Noriko - Part I</description>
 		<year>1988</year>
 		<publisher>システムハウスオウ (System House Oh!)</publisher>
 		<!-- PC8801mk2SR -->
@@ -18382,7 +18385,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ          " -> "gundam tactical operation_03.d88"
 	</software>
 
 	<software name="norikoa" cloneof="noriko">
-		<description>Kobishojo Noriko (Alt)</description>
+		<description>Kobishoujo Noriko - Part I (Alt)</description>
 		<year>1988</year>
 		<publisher>システムハウスオウ (System House Oh!)</publisher>
 		<!-- PC8801mk2SR -->
@@ -21722,10 +21725,11 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<software name="maxserie">
-		<description>Max Series 2 Sacchan no Daiboken</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="sacchan">
+		<description>Max Series 2 - Sacchan no Daiboken!!</description>
+		<year>1988?</year>
+		<publisher>アグミックス (Agumix)</publisher>
+		<info name="alt_title" value="サッちゃんの大冒険！！"/>
 		<!--combined image-->
 		<!--rom name="max series 2 sacchan no daiboken.d88" size="1046544" crc="d50dd1fc" sha1="7b2bfa161480240a5697f899af1cb83c3b28565d" offset="0" /-->
 
@@ -23067,7 +23071,7 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 	</software>
 
 	<software name="moritash">
-		<description>Morita Kazuro no Shougi</description>
+		<description>Morita Kazuo no Shougi</description>
 		<year>1985</year>
 		<publisher>エニックス (Enix)</publisher>
 		<!-- PC8801 -->
@@ -23081,7 +23085,7 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 	</software>
 
 	<software name="moritasha" cloneof="moritash">
-		<description>Morita Kazuro no Shougi (Alt)</description>
+		<description>Morita Kazuo no Shougi (Alt)</description>
 		<year>1985</year>
 		<publisher>エニックス (Enix)</publisher>
 		<!-- PC8801 -->
@@ -24424,7 +24428,7 @@ ExtractDisk  [02]"DISK_2          " -> "oji binbin monogatari(a)_02.d88"
 	</software>
 
 	<software name="okhotsk">
-		<description>Okhotsk ni Kiyu</description>
+		<description>Hokkaidou Rensa Satsujin - Okhotsk ni Shouyu!!</description>
 		<year>1984</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<!-- PC8801 -->
@@ -24449,7 +24453,7 @@ ExtractDisk  [02]"DISK_2          " -> "oji binbin monogatari(a)_02.d88"
 	</software>
 
 	<software name="okhotska" cloneof="okhotsk">
-		<description>Okhotsk ni Kiyu (Alt Disk 1)</description>
+		<description>Hokkaidou Rensa Satsujin - Okhotsk ni Shouyu!! (Alt Disk 1)</description>
 		<year>1984</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<!-- PC8801 -->
@@ -24474,7 +24478,7 @@ ExtractDisk  [02]"DISK_2          " -> "oji binbin monogatari(a)_02.d88"
 	</software>
 
 	<software name="okhotskb" cloneof="okhotsk">
-		<description>Okhotsk ni Shouyu (Alt 2?)</description>
+		<description>Hokkaidou Rensa Satsujin - Okhotsk ni Shouyu!! (Alt 2?)</description>
 		<year>1984</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<!-- PC8801 -->
@@ -27858,12 +27862,12 @@ ExtractDisk  [04]"シナリオ2   " -> "rogue alliance_04.d88"
 	</software>
 
 	<software name="rouge">
-		<description>Rouge - Shinku no Kuchibeni</description>
+		<description>Rouge</description>
 		<year>1990</year>
 		<publisher>バーディソフト (BirdieSoft)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19900613"/>
-		<info name="alt_title" value="ルージュ 真紅の口紅"/>
+		<info name="alt_title" value="ルージュ 真夏の口紅 ~ Rouge - Manatsu no Kuchibeni"/>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="415840">
@@ -30480,7 +30484,7 @@ ExtractDisk  [04]"disk 4          " -> "shiryo sensen 2_04.d88"
 	</software>
 
 	<software name="shomakyo">
-		<description>Shomakyo no Densetsu</description>
+		<description>Shoumakyou no Densetsu</description>
 		<year>1986</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<!-- PC8801 -->
@@ -33380,7 +33384,7 @@ ExtractDisk  [02]"DISK B          " -> "telenet music box (b)_02.d88"
 		</part>
 	</software>
 
-	<software name="tenkyuhs">
+	<software name="tenkyusp">
 		<description>Tenkyuuhai Special - Tougen no Utage</description>
 		<year>1990</year>
 		<publisher>タケル (Takeru)</publisher>
@@ -35366,7 +35370,7 @@ ExtractDisk  [02]"PROGRAM        " -> "transylvania_02.d88"
 		</part>
 	</software>
 
-	<software name="ultima">
+	<software name="ultima1">
 		<description>Ultima I - The First Age of Darkness</description>
 		<year>1988</year>
 		<publisher>ポニカ (Pony Canyon)</publisher>
@@ -35398,7 +35402,7 @@ ExtractDisk  [02]"PROGRAM        " -> "transylvania_02.d88"
 		</part>
 	</software>
 
-	<software name="ultimaa" cloneof="ultima">
+	<software name="ultima1a" cloneof="ultima1">
 		<description>Ultima I - The First Age of Darkness (Alt)</description>
 		<year>1988</year>
 		<publisher>ポニカ (Pony Canyon)</publisher>
@@ -37238,7 +37242,7 @@ ExtractDisk  [03]"Ulysses_Disk1   " -> "ulysses_v80_03.d88" (same as ulyssesa)
 	<software name="wizardr2">
 		<description>Wizardry 2 - The Knight of Diamonds</description>
 		<year>1987</year>
-		<publisher>アスキー (ASCII) / SIRTEC</publisher>
+		<publisher>アスキー (ASCII)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198702xx"/>
 		<info name="alt_title" value="ウィザードリィ2"/>
@@ -39200,7 +39204,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 	</software>
 
 	<software name="yorutens">
-		<description>Yoru no Tenshi-tachi - Shitetsu Ensen Satsujinjiken</description>
+		<description>Yoru no Tenshi-tachi - Shitetsu Ensen Satsujin Jiken</description>
 		<year>1989</year>
 		<publisher>クレスト (Crest)</publisher>
 		<!-- PC8801mk2SR -->
@@ -46785,23 +46789,6 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<software name="dbleagle">
-		<description>Double Eagle</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1281968">
-				<rom name="double eagle disk 1.d88" size="1281968" crc="ae3b84f4" sha1="b8db35c232c4f461b230cde578381378c67e69b5" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="1281968">
-				<rom name="double eagle disk 2.d88" size="1281968" crc="d401f56f" sha1="21dbcb5b4a601f831b7ca17c043d4d39159e9477" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="daivacal">
 		<description>Daiva Cali-Yuga no Mitsuteru</description>
 		<year>19??</year>
@@ -49680,7 +49667,7 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<software name="tokimek1">
+	<software name="tokisg1">
 		<description>Tokimeki Sports Gal</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -49702,7 +49689,7 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<software name="tokimek1a" cloneof="tokimek1">
+	<software name="tokisg1a" cloneof="tokisg1">
 		<description>Tokimeki Sports Gal 1 (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -49724,7 +49711,7 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<software name="tokimek2">
+	<software name="tokisg2">
 		<description>Tokimeki Sports Gal II</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -49746,7 +49733,7 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<software name="tokimek3">
+	<software name="tokisg3">
 		<description>Tokimeki Sports Gal III</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -55089,7 +55076,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 
 <!-- DISK MAGAZINES -->
 
-	<software name="wizrep21">
+	<software name="wrp87084">
 		<description>Wizard88 Report Vol 87.8-4</description>
 		<year>1987</year>
 		<publisher>Westside Softhouse</publisher>
@@ -55100,7 +55087,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 		</part>
 	</software>
 
-	<software name="wizrep20">
+	<software name="wrp87092">
 		<description>Wizard88 Report Vol 87.9-2</description>
 		<year>1987</year>
 		<publisher>Westside Softhouse</publisher>
@@ -55111,7 +55098,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 		</part>
 	</software>
 
-	<software name="wizrep19">
+	<software name="wrp87112">
 		<description>Wizard88 Report Vol 87.11-2</description>
 		<year>1987</year>
 		<publisher>Westside Softhouse</publisher>
@@ -55122,7 +55109,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 		</part>
 	</software>
 
-	<software name="wizrep18">
+	<software name="wrp88021">
 		<description>Wizard88 Report Vol 88.2-1</description>
 		<year>1988</year>
 		<publisher>Westside Softhouse</publisher>
@@ -55133,7 +55120,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 		</part>
 	</software>
 
-	<software name="wizrep17">
+	<software name="wrp88062">
 		<description>Wizard88 Report Vol 88.6-2</description>
 		<year>1988</year>
 		<publisher>Westside Softhouse</publisher>
@@ -55144,7 +55131,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 		</part>
 	</software>
 
-	<software name="wizrep16">
+	<software name="wrp88063">
 		<description>Wizard88 Report Vol 88.6-3</description>
 		<year>1988</year>
 		<publisher>Westside Softhouse</publisher>
@@ -55155,7 +55142,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 		</part>
 	</software>
 
-	<software name="wizrep15">
+	<software name="wrp88073">
 		<description>Wizard88 Report Vol 88.7-3</description>
 		<year>1988</year>
 		<publisher>Westside Softhouse</publisher>
@@ -55166,7 +55153,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 		</part>
 	</software>
 
-	<software name="wizrep14">
+	<software name="wrp88112">
 		<description>Wizard88 Report Vol 88.11-2</description>
 		<year>1988</year>
 		<publisher>Westside Softhouse</publisher>
@@ -55177,7 +55164,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 		</part>
 	</software>
 
-	<software name="wizrep13">
+	<software name="wrp88123">
 		<description>Wizard88 Report Vol 88.12-3</description>
 		<year>1988</year>
 		<publisher>Westside Softhouse</publisher>
@@ -55188,7 +55175,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 		</part>
 	</software>
 
-	<software name="wizrep12">
+	<software name="wrp89043">
 		<description>Wizard88 Report Vol 89.4-3</description>
 		<year>1989</year>
 		<publisher>Westside Softhouse</publisher>
@@ -55199,7 +55186,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 		</part>
 	</software>
 
-	<software name="wizrep11">
+	<software name="wrp89061">
 		<description>Wizard88 Report Vol 89.6-1</description>
 		<year>1989</year>
 		<publisher>Westside Softhouse</publisher>
@@ -55210,7 +55197,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 		</part>
 	</software>
 
-	<software name="wizrep10">
+	<software name="wrp89082">
 		<description>Wizard88 Report Vol 89.8-2</description>
 		<year>1989</year>
 		<publisher>Westside Softhouse</publisher>
@@ -55221,7 +55208,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 		</part>
 	</software>
 
-	<software name="wizrep09">
+	<software name="wrp89093">
 		<description>Wizard88 Report Vol 89.9-3</description>
 		<year>1989</year>
 		<publisher>Westside Softhouse</publisher>
@@ -55232,7 +55219,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 		</part>
 	</software>
 
-	<software name="wizrep08">
+	<software name="wrp90013">
 		<description>Wizard88 Report Vol 90.1-3</description>
 		<year>1990</year>
 		<publisher>Westside Softhouse</publisher>
@@ -55243,7 +55230,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 		</part>
 	</software>
 
-	<software name="wizrep08a" cloneof="wizrep08">
+	<software name="wrp90013a" cloneof="wrp90013">
 		<description>Wizard88 Report Vol 90.1-3 (Alt)</description>
 		<year>1990</year>
 		<publisher>Westside Softhouse</publisher>
@@ -55254,7 +55241,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 		</part>
 	</software>
 
-	<software name="wizrep07">
+	<software name="wrp90022">
 		<description>Wizard88 Report Vol 90.2-2</description>
 		<year>1990</year>
 		<publisher>Westside Softhouse</publisher>
@@ -55265,7 +55252,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 		</part>
 	</software>
 
-	<software name="wizrep06">
+	<software name="wrp90031">
 		<description>Wizard88 Report Vol 90.3-1</description>
 		<year>1990</year>
 		<publisher>Westside Softhouse</publisher>
@@ -55276,7 +55263,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 		</part>
 	</software>
 
-	<software name="wizrep05">
+	<software name="wrp90051">
 		<description>Wizard88 Report Vol 90.5-1</description>
 		<year>1990</year>
 		<publisher>Westside Softhouse</publisher>
@@ -55287,7 +55274,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 		</part>
 	</software>
 
-	<software name="wizrep04">
+	<software name="wrp90092">
 		<description>Wizard88 Report Vol 90.9-2</description>
 		<year>1990</year>
 		<publisher>Westside Softhouse</publisher>
@@ -55298,7 +55285,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 		</part>
 	</software>
 
-	<software name="wizrep03">
+	<software name="wrp90113">
 		<description>Wizard88 Report Vol 90.11-3</description>
 		<year>1990</year>
 		<publisher>Westside Softhouse</publisher>
@@ -55309,7 +55296,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 		</part>
 	</software>
 
-	<software name="wizrep03a" cloneof="wizrep03">
+	<software name="wrp90113a" cloneof="wrp90113">
 		<description>Wizard88 Report Vol 90.11-3 (Alt)</description>
 		<year>1990</year>
 		<publisher>Westside Softhouse</publisher>
@@ -55320,7 +55307,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 		</part>
 	</software>
 
-	<software name="wizrep02" supported="no">
+	<software name="wrp90114" supported="no">
 		<description>Wizard88 Report Vol 90.11-4</description>
 		<year>1990</year>
 		<publisher>Westside Softhouse</publisher>
@@ -55331,7 +55318,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 		</part>
 	</software>
 
-	<software name="wizrep01">
+	<software name="wrp91031">
 		<description>Wizard88 Report Vol 91.3-1</description>
 		<year>1991</year>
 		<publisher>Westside Softhouse</publisher>
@@ -55342,7 +55329,7 @@ ExtractDisk  [11]"MagicCopy3.7  " -> "magic copy 2 ver2.8-3.7_11.d88"   79b4c6af
 		</part>
 	</software>
 
-	<software name="wizrep01a" cloneof="wizrep01">
+	<software name="wrp91031a" cloneof="wrp91031">
 		<description>Wizard88 Report Vol 91.3-1 (Alt)</description>
 		<year>1991</year>
 		<publisher>Westside Softhouse</publisher>
@@ -57425,7 +57412,7 @@ ExtractDisk  [01]"system          " -> "z's staff kid88_01.d88"
 ExtractDisk  [02]"utility        " -> "z's staff kid88_02.d88"
 ExtractDisk  [03]"backup          " -> "z's staff kid88_03.d88"
 -->
-	<software name="zsstaffk">
+	<software name="zkid88">
 		<description>Z's Staff Kid88</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

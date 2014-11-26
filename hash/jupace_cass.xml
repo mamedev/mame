@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- 
+<!--
 
-  TODO: 
-  * update to latest TOSEC (2014-10-31) 
+  TODO:
+  * update to latest TOSEC (2014-10-31)
   * add usage instructions
   * check which games work and which don't and fix the supported flag accordingly
 -->
@@ -1582,7 +1582,7 @@
 		<part name="cass3" interface="jupace_cass"> <!-- not available in TAP format -->
 			<feature name="part_id" value="Tape 3 (Computer Weaving)"/>
 			<dataarea name="cass" size="887">
-				<rom name="triple pack (1984)(boldfield computing)(gb)(file 3 of 3)[computer weaving][3k].tap" offset="0x0000" status="nodump" />
+				<rom name="triple pack (1984)(boldfield computing)(gb)(file 3 of 3)[computer weaving][3k].tap" size="0" offset="0x0000" status="nodump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1703,7 +1703,7 @@
 		<part name="cass2" interface="jupace_cass">
 			<feature name="part_id" value="Tape 2 (Life)"/>
 			<dataarea name="cass" size="12855">
-				<rom name="valkyr + life (1985)(colinsoft)(file 2 of 2)[unreleased][life][16k].tap" offset="0x0000" status="nodump" />
+				<rom name="valkyr + life (1985)(colinsoft)(file 2 of 2)[unreleased][life][16k].tap" size="0" offset="0x0000" status="nodump" />
 			</dataarea>
 		</part>
 	</software>

@@ -2,18 +2,18 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-	tk2000.c - Microdigital TK2000
- 
+    tk2000.c - Microdigital TK2000
+
     Driver by R. Belmont
- 
+
     This system is only vaguely Apple II compatible.
     The keyboard works entirely differently, which is a big deal.
- 
+
     $C05A - banks RAM from c100-ffff
     $C05B - banks ROM from c100-ffff
- 
-************************************************************************/ 
- 
+
+************************************************************************/
+
 #include "emu.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
@@ -129,7 +129,7 @@ void tk2000_state::machine_reset()
 	m_strobe = 0;
 }
 
-/*************************************************************************** 
+/***************************************************************************
     VIDEO
 ***************************************************************************/
 
@@ -158,7 +158,7 @@ UINT32 tk2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-/*************************************************************************** 
+/***************************************************************************
     I/O
 ***************************************************************************/
 // most softswitches don't care about read vs write, so handle them here
@@ -181,27 +181,27 @@ void tk2000_state::do_io(address_space &space, int offset)
 			m_speaker->level_w(m_speaker_state);
 			break;
 
-		case 0x50:	// monochrome
+		case 0x50:  // monochrome
 			break;
 
-		case 0x51:	// color
+		case 0x51:  // color
 			break;
 
 		case 0x54:  // set page 1
-			m_page2 = false; 
+			m_page2 = false;
 			m_video->m_page2 = false;
 			break;
 
 		case 0x55:  // set page 2
-			m_page2 = true; 
+			m_page2 = true;
 			m_video->m_page2 = true;
 			break;
 
-		case 0x5a:	// ROM
+		case 0x5a:  // ROM
 			m_upperbank->set_bank(0);
 			break;
 
-		case 0x5b:	// RAM
+		case 0x5b:  // RAM
 			m_upperbank->set_bank(1);
 			break;
 
@@ -240,7 +240,7 @@ WRITE8_MEMBER(tk2000_state::c000_w)
 {
 	switch (offset)
 	{
-		case 0x00:	// write row mask for keyboard scan
+		case 0x00:  // write row mask for keyboard scan
 			switch (data)
 			{
 				case 0:
@@ -255,10 +255,10 @@ WRITE8_MEMBER(tk2000_state::c000_w)
 				case 0x40: m_strobe = m_row6->read(); break;
 				case 0x80: m_strobe = m_row7->read(); break;
 			}
-			break; 
+			break;
 
 		case 0x5f:
-			m_strobe = m_kbspecial->read(); 
+			m_strobe = m_kbspecial->read();
 			break;
 
 		default:
@@ -454,22 +454,22 @@ ADDRESS_MAP_END
     INPUT PORTS
 ***************************************************************************/
 
-/* 
-	TK2000 matrix: 
- 
-		  0  1 2 3 4 5 6 7
+/*
+    TK2000 matrix:
+
+          0  1 2 3 4 5 6 7
        0SHIF B V C X Z
-	   1     G F D S A
+       1     G F D S A
        2 SPC T R E W Q
-	   3 LFT 5 4 3 2 1
-	   4 RGT 6 7 8 9 0
-	   5 DWN Y U I O P
-	   6 UP  H J K L :
+       3 LFT 5 4 3 2 1
+       4 RGT 6 7 8 9 0
+       5 DWN Y U I O P
+       6 UP  H J K L :
        7 RTN N M , . ?
- 
+
        write row mask 1/2/4/8/10/20/40/80 to $C000
        read column at $C010
- 
+
        If $C05F is written, the Ctrl key is read in bit 0 of $C010 immediately afterwards.
 */
 static INPUT_PORTS_START( tk2000 )

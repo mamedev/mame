@@ -1078,10 +1078,10 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="proyakyu">
+	<software name="proyakfn">
 		<description>Pro Yakyuu Fan (Jpn)</description>
 		<year>1987</year>
-		<publisher>Telenet</publisher>
+		<publisher>Nihon Telenet</publisher>
 		<info name="alt_title" value="プロ野球FAN" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M016-03M" />
@@ -1223,7 +1223,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="sangoku2">
-		<description>Sangokushi 2 (Jpn)</description>
+		<description>Sangokushi II (Jpn)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="三国志II" />

@@ -36,10 +36,10 @@ Notes:
 
 /*
 
-	TODO:
+    TODO:
 
-	- repeat
-	- what are T0/T1/INT?
+    - repeat
+    - what are T0/T1/INT?
 
 */
 
@@ -307,16 +307,16 @@ WRITE8_MEMBER( xerox_820_keyboard_t::kb_p1_w )
 {
 	/*
 
-		bit 	description
+	    bit     description
 
-		0 		A0
-		1 		A1
-		2 		A2
-		3 		A3
-		4  	 	KBSTB
-		5
-		6
-		7		? (toggled if T1=0)
+	    0       A0
+	    1       A1
+	    2       A2
+	    3       A3
+	    4       KBSTB
+	    5
+	    6
+	    7       ? (toggled if T1=0)
 
 	*/
 

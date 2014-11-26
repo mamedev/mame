@@ -150,7 +150,6 @@ void naomi_m2_board::board_setup_address(UINT32 address, bool is_dma)
 
 void naomi_m2_board::board_get_buffer(UINT8 *&base, UINT32 &limit)
 {
-
 	if(rom_cur_address & 0x40000000) {
 		if(rom_cur_address == 0x4001fffe) {
 			m_cryptdevice->do_decrypt(base);
@@ -178,8 +177,6 @@ void naomi_m2_board::board_advance(UINT32 size)
 
 void naomi_m2_board::board_write(offs_t offset, UINT16 data)
 {
-
-
 	if(offset & 0x40000000) {
 		if((offset & 0x0f000000) == 0x02000000) {
 			offset &= RAM_SIZE-1;
@@ -188,7 +185,6 @@ void naomi_m2_board::board_write(offs_t offset, UINT16 data)
 			return;
 		}
 		switch(offset & 0x1fffffff) {
-
 		case 0x1fff8: m_cryptdevice->set_addr_low(data); return;
 		case 0x1fffa: m_cryptdevice->set_addr_high(data);  return;
 		case 0x1fffc: m_cryptdevice->set_subkey(data); return;
@@ -219,4 +215,3 @@ machine_config_constructor naomi_m2_board::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( naomim2 );
 }
-

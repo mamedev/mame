@@ -6348,7 +6348,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Pia Carrot e Youkoso!! We've Been Waiting for You (Japan)... -->
 	<software name="picarrot" supported="no">
-		<description>Pia Carrot he Youkoso!! - We've Been Waiting for You (Jpn)</description>
+		<description>Pia Carrot e Youkoso!! - We've Been Waiting for You (Jpn)</description>
 		<year>1998</year>
 		<publisher>KID</publisher>
 		<info name="serial" value="T-19719G"/>
@@ -16801,7 +16801,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Elf wo Karu Monotachi ~Hanafuda Hen~ (T-16606G)... -->
 	<software name="elfhana" supported="no">
-		<description>Elf wo Karu Monotachi - Hanafuda Hen (Jpn)</description>
+		<description>Elf wo Karu Mono-tachi - Hanafuda Hen (Jpn)</description>
 		<year>1997</year>
 		<publisher>Altron</publisher>
 		<info name="serial" value="T-16606G"/>
@@ -16810,7 +16810,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="elf wo karu monotachi ~hanafuda hen~ (t-16606g)" sha1="015ae3fe128353934aaa8be5b9a705c2a789bef9" />
+				<disk name="elf wo karu mono-tachi ~hanafuda hen~ (t-16606g)" sha1="015ae3fe128353934aaa8be5b9a705c2a789bef9" />
 			</diskarea>
 		</part>
 	</software>
@@ -19217,7 +19217,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Pia Carrot e Youkoso - We've Been Waiting For You (Shokai Genteiban) (T-19708G)... -->
 	<software name="picarrotsg" cloneof="picarrot" supported="no">
-		<description>Pia Carrot he Youkoso!! - We've Been Waiting For You (Jpn, Shokai Genteiban)</description>
+		<description>Pia Carrot e Youkoso!! - We've Been Waiting For You (Jpn, Shokai Genteiban)</description>
 		<year>1998</year>
 		<publisher>KID</publisher>
 		<info name="serial" value="T-19708G"/>
@@ -19234,7 +19234,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Pia Carrot e Youkoso!! 2 Disc 1 (T-20114G)... -->
 	<!-- Identifying Pia Carrot e Youkoso!! 2 Disc 2 (T-20114G)... -->
 	<software name="picarro2" supported="no">
-		<description>Pia Carrot he Youkoso!! 2 (Jpn)</description>
+		<description>Pia Carrot e Youkoso!! 2 (Jpn)</description>
 		<year>1998</year>
 		<publisher>NEC Interchannel</publisher>
 		<info name="serial" value="T-20114G"/>
@@ -23617,9 +23617,9 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Kidou Senkan Nadesico - Yappari Saigo ha (GS-9142)... -->
+	<!-- Identifying Kidou Senkan Nadesico - Yappari Saigo wa (GS-9142)... -->
 	<software name="ksnyap" supported="no">
-		<description>Kidou Senkan Nadesico - Yappari Saigo ha [Ai ga Katsu] ? (Jpn)</description>
+		<description>Kidou Senkan Nadesico - Yappari Saigo wa "Ai ga Katsu"? (Jpn)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9142"/>
@@ -23628,7 +23628,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kidou senkan nadesico - yappari saigo ha (gs-9142)" sha1="53b22b5b86bf53df81eae252c9c85a58e03455b1" />
+				<disk name="kidou senkan nadesico - yappari saigo wa (gs-9142)" sha1="53b22b5b86bf53df81eae252c9c85a58e03455b1" />
 			</diskarea>
 		</part>
 	</software>
@@ -24885,7 +24885,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Okedera Yasuhikono Sekaiwo Mezase Soccer Kids (J) (T-26001G)... -->
 	<software name="socrkids" supported="no">
-		<description>Okudera Yasuhiko no Sekai wo Mezase! Soccer Kids - Nyuumon-hen (Jpn)</description>
+		<description>Okudera Yasuhiko no Sekai o Mezase! Soccer Kids - Nyuumon-hen (Jpn)</description>
 		<year>1996</year>
 		<publisher>Fujitsu Parex</publisher>
 		<info name="serial" value="T-26001G"/>
@@ -26306,7 +26306,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying The Conveni - Ano Machi wo Dokusen Seyo (T-4310G)... -->
 	<software name="convenia" cloneof="conveni" supported="no">
-		<description>The Conveni! - Ano Machi wo Dokusen Seyo (Jpn, Alt)</description>
+		<description>The Conveni! - Ano Machi o Dokusen Seyo (Jpn, Alt)</description>
 		<year>1997</year>
 		<publisher>Human</publisher>
 		<info name="serial" value="T-4310G"/>
@@ -27140,7 +27140,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Mobile Suit Gundam Side Story 2 (T-13309G)... -->
 	<software name="gundg2gen" cloneof="gundg2" supported="no">
-		<description>Kidou Senshi Gundam Gaiden II - Ao wo Uketsugu Mono (Jpn, Genteiban)</description>
+		<description>Kidou Senshi Gundam Gaiden II - Ao o Uketsugu Mono (Jpn, Genteiban)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="T-13309G"/>
@@ -27786,7 +27786,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Elf wo Karu Monotachi v1.001 (1997)(Altron)(NTSC)(JP)(Disc 1 of 2)[!]... -->
 	<!-- Identifying Elf wo Karu Monotachi v1.001 (1997)(Altron)(NTSC)(JP)(Disc 2 of 2)[!][Omake]... -->
 	<software name="elf" supported="no">
-		<description>Elf wo Karu Monotachi (Jpn, v1.001)</description>
+		<description>Elf o Karu Mono-tachi (Jpn, v1.001)</description>
 		<year>1997</year>
 		<publisher>Altron</publisher>
 		<info name="serial" value="T-16605G"/>
@@ -27795,12 +27795,12 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="elf wo karu monotachi v1.001 (1997)(altron)(ntsc)(jp)(disc 1 of 2)[!]" sha1="233c4a4eefc7fae89d4fc559943e2b999ce5a0e1" />
+				<disk name="elf wo karu mono-tachi v1.001 (1997)(altron)(ntsc)(jp)(disc 1 of 2)[!]" sha1="233c4a4eefc7fae89d4fc559943e2b999ce5a0e1" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="elf wo karu monotachi v1.001 (1997)(altron)(ntsc)(jp)(disc 2 of 2)[!][omake]" sha1="ecd7363ee5977c41f9333672ff059d8f384c2b4d" />
+				<disk name="elf wo karu mono-tachi v1.001 (1997)(altron)(ntsc)(jp)(disc 2 of 2)[!][omake]" sha1="ecd7363ee5977c41f9333672ff059d8f384c2b4d" />
 			</diskarea>
 		</part>
 	</software>
@@ -27860,7 +27860,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Kidou Senshi Gundam Gaiden II - Ao wo Uketsugu Mono v1.000 (1996)(Bandai)(NTSC)(JP)[!]... -->
 	<software name="gundg2" supported="no">
-		<description>Kidou Senshi Gundam Gaiden II - Ao wo Uketsugu Mono (Jpn, v1.000)</description>
+		<description>Kidou Senshi Gundam Gaiden II - Ao o Uketsugu Mono (Jpn, v1.000)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="T-13309G"/>
@@ -27869,7 +27869,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kidou senshi gundam gaiden ii - ao wo uketsugu mono v1.000 (1996)(bandai)(ntsc)(jp)[!]" sha1="d50f4397ec6674eb2f67ee1d35d760a6dd5735e5" />
+				<disk name="kidou senshi gundam gaiden ii - ao o uketsugu mono v1.000 (1996)(bandai)(ntsc)(jp)[!]" sha1="d50f4397ec6674eb2f67ee1d35d760a6dd5735e5" />
 			</diskarea>
 		</part>
 	</software>
@@ -28585,7 +28585,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying elves2-cd1... -->
 	<software name="elf2" supported="no">
-		<description>Elf wo Karu Monotachi II (Jpn)</description>
+		<description>Elf o Karu Mono-tachi II (Jpn)</description>
 		<year>1998</year>
 		<publisher>Altron</publisher>
 		<info name="serial" value="T-16610G"/>

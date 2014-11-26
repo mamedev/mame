@@ -1255,14 +1255,14 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 	</software>
 
 	<software name="arcshu">
-		<description>Arcshu - Kagerou no Jidai wo Koete</description>
+		<description>Arcshu - Kagerou no Jidai o Koete</description>
 		<year>1990</year>
 		<publisher>ウルフチーム (Wolf Team)</publisher>
 		<info name="alt_title" value="あーくしゅ 陽炎の時代を越えて" />
 		<info name="release" value="19900327" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="aakushu youen no jidai wo koete (1990)(wolf team).dim" size="1261824" crc="31461ace" sha1="c40ebdb1777b1a3e189c4957c0c373854375fc49" offset="000000" />
+				<rom name="aakushu youen no jidai o koete (1990)(wolf team).dim" size="1261824" crc="31461ace" sha1="c40ebdb1777b1a3e189c4957c0c373854375fc49" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2104,7 +2104,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 	<software name="branmrkr">
 		<description>Branmarker</description>
 		<year>1991</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="ブランマーカー" />
 		<info name="release" value="19910712" />
 		<part name="flop1" interface="floppy_5_25">
@@ -2535,7 +2535,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 	</software>
 
 	<software name="casablan">
-		<description>Casablanca ni Ai wo - Satsujin-sha wa Jikuu wo Koete</description>
+		<description>Casablanca ni Ai o - Satsujin-sha wa Jikuu o Koete</description>
 		<year>1988</year>
 		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
 		<info name="alt_title" value="カサブランカに愛を -殺人者は時空を超えて-" />
@@ -2543,13 +2543,13 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 0" />
 			<dataarea name="flop" size="1261824">
-				<rom name="casablanca ni ai wo satsujinsha ha jikuu wo koete (19xx)(thinking rabbit)(disk 1 of 2)(disk 0).dim" size="1261824" crc="72d882ee" sha1="c3395e7c0aee6d4d15523c0e85a583333ec345a4" offset="000000" />
+				<rom name="casablanca ni ai o - satsujin-sha wa jikuu o koete (19xx)(thinking rabbit)(disk 1 of 2)(disk 0).dim" size="1261824" crc="72d882ee" sha1="c3395e7c0aee6d4d15523c0e85a583333ec345a4" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="casablanca ni ai wo satsujinsha ha jikuu wo koete (19xx)(thinking rabbit)(disk 2 of 2)(disk 1).dim" size="1261824" crc="e12135ef" sha1="94a7b9b27c711e51a521649b6c655ee394db89c3" offset="000000" />
+				<rom name="casablanca ni ai o - satsujin-sha wa jikuu o koete (19xx)(thinking rabbit)(disk 2 of 2)(disk 1).dim" size="1261824" crc="e12135ef" sha1="94a7b9b27c711e51a521649b6c655ee394db89c3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2775,7 +2775,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 	<software name="collectd" supported="no">
 		<description>Collector D Bangai-hen</description>
 		<year>1993</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="コレクターD 番外編" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk" />
@@ -3021,10 +3021,10 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="dodoki1">
+	<software name="dodokid1">
 		<description>D.O. Doki Doki Disk Vol.1</description>
 		<year>1991</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="ディー・オー どきどきディスク Vol.1" />
 		<info name="release" value="199102xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -3034,10 +3034,10 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<software name="dodoki2">
+	<software name="dodokid2">
 		<description>D.O. Doki Doki Disk Vol.2</description>
 		<year>1991</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="ディー・オー どきどきディスク Vol.2" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
@@ -3049,7 +3049,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 	<software name="dodokid3">
 		<description>D.O. Doki Doki Disk Vol.3</description>
 		<year>1992</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="ディー・オー どきどきディスク Vol.3" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
@@ -3061,7 +3061,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 	<software name="dodokid4">
 		<description>D.O. Doki Doki Disk Vol.4</description>
 		<year>1993</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="ディー・オー どきどきディスク Vol.4" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
@@ -3073,7 +3073,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 	<software name="dodokid5">
 		<description>D.O. Doki Doki Disk Vol.5</description>
 		<year>1993</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="ディー・オー どきどきディスク Vol.5" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
@@ -3798,7 +3798,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="dor">
 		<description>Dor</description>
 		<year>1992</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="ドア" />
 		<info name="release" value="19920318" />
 		<part name="flop1" interface="floppy_5_25">
@@ -3830,7 +3830,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="dor2">
 		<description>Dor Part 2</description>
 		<year>1992</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="ドアパート2" />
 		<info name="release" value="19920519" />
 		<part name="flop1" interface="floppy_5_25">
@@ -3862,7 +3862,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="dor3">
 		<description>Dor Part 3</description>
 		<year>1992</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="ドアパート3" />
 		<info name="release" value="19921127" />
 		<part name="flop1" interface="floppy_5_25">
@@ -3894,7 +3894,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="dorse93">
 		<description>Dor Special Edition '93</description>
 		<year>1993</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261824">
@@ -3960,7 +3960,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="dorsesak">
 		<description>Dor Special Edition Sakigake</description>
 		<year>1993</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="ドア スペシャルエディション 魁" />
 		<info name="release" value="19930521" />
 		<part name="flop1" interface="floppy_5_25">
@@ -4182,7 +4182,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	</software>
 
 	<software name="drgcityx">
-		<description>Dragon City X Sitei</description>
+		<description>Dragon City X Shitei</description>
 		<year>1991</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
 		<info name="alt_title" value="ドラゴンシティX指定" />
@@ -4574,7 +4574,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	</software>
 
 	<software name="eikan">
-		<description>Eikan ha Kimi ni Koukou Yakyuu Zenkoku Taikai</description>
+		<description>Eikan wa Kimi ni - Koukou Yakyuu Zenkoku Taikai</description>
 		<year>1990</year>
 		<publisher>アートディンク (Artdink)</publisher>
 		<info name="alt_title" value="栄冠は君に 高校野球全国大会" />
@@ -4582,19 +4582,19 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261824">
-				<rom name="eikan ha kimi ni koukou yakyuu zenkokutaikai (1990)(artdink)(disk 1 of 3)(system).dim" size="1261824" crc="3f7469db" sha1="c2604e1f0db247ecb379b6d3cab30542850ade23" offset="000000" />
+				<rom name="eikan wa kimi ni - koukou yakyuu zenkoku taikai (1990)(artdink)(disk 1 of 3)(system).dim" size="1261824" crc="3f7469db" sha1="c2604e1f0db247ecb379b6d3cab30542850ade23" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Game Disk" />
 			<dataarea name="flop" size="1261824">
-				<rom name="eikan ha kimi ni koukou yakyuu zenkokutaikai (1990)(artdink)(disk 2 of 3)(game).dim" size="1261824" crc="f4506ed7" sha1="9e5d2cbbc07bfb4046415703680447ef3d5f5797" offset="000000" />
+				<rom name="eikan wa kimi ni - koukou yakyuu zenkoku taikai (1990)(artdink)(disk 2 of 3)(game).dim" size="1261824" crc="f4506ed7" sha1="9e5d2cbbc07bfb4046415703680447ef3d5f5797" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Utility Disk" />
 			<dataarea name="flop" size="1261824">
-				<rom name="eikan ha kimi ni koukou yakyuu zenkokutaikai (1990)(artdink)(disk 3 of 3)(utility).dim" size="1261824" crc="955a5e42" sha1="2e37562ebd9df8d5384baf3228c61364de03d53b" offset="000000" />
+				<rom name="eikan wa kimi ni - koukou yakyuu zenkoku taikai (1990)(artdink)(disk 3 of 3)(utility).dim" size="1261824" crc="955a5e42" sha1="2e37562ebd9df8d5384baf3228c61364de03d53b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4846,7 +4846,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="exterlin">
 		<description>Exterlien</description>
 		<year>1990</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="エクスタリアン" />
 		<info name="release" value="19901207" />
 		<part name="flop1" interface="floppy_5_25">
@@ -6296,7 +6296,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="hoshisun">
 		<description>Hoshi no Suna Monogatari</description>
 		<year>1991</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="星の砂物語" />
 		<info name="release" value="19910305" />
 		<part name="flop1" interface="floppy_5_25">
@@ -6322,7 +6322,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="hoshisu2">
 		<description>Hoshi no Suna Monogatari 2</description>
 		<year>1992</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="星の砂物語2" />
 		<info name="release" value="19920626" />
 		<part name="flop1" interface="floppy_5_25">
@@ -6407,7 +6407,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="hhunt">
+	<software name="hhunt1">
 		<description>Houma Hunter Lime Dai-1-wa</description>
 		<year>1993</year>
 		<publisher>ブラザー工業 (Brother Industries)</publisher>
@@ -6670,19 +6670,19 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="imitation ha ai senai (1990)(great)(disk 1 of 3)(disk a).dim" size="1261824" crc="2f88d553" sha1="b73528aebb2bdf36da25a8309551511e8023d1be" offset="000000" />
+				<rom name="imitation wa aisenai (1990)(great)(disk 1 of 3)(disk a).dim" size="1261824" crc="2f88d553" sha1="b73528aebb2bdf36da25a8309551511e8023d1be" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="imitation ha ai senai (1990)(great)(disk 2 of 3)(disk b).dim" size="1261824" crc="c25b55cd" sha1="a0a1df5fa01f162b01dce932dd87fa5248f41e36" offset="000000" />
+				<rom name="imitation wa aisenai (1990)(great)(disk 2 of 3)(disk b).dim" size="1261824" crc="c25b55cd" sha1="a0a1df5fa01f162b01dce932dd87fa5248f41e36" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261824">
-				<rom name="imitation ha ai senai (1990)(great)(disk 3 of 3)(disk c).dim" size="1261824" crc="a6a0f8e0" sha1="4a65467d256a713898947eb310ecadbf942f92d9" offset="000000" />
+				<rom name="imitation wa aisenai (1990)(great)(disk 3 of 3)(disk c).dim" size="1261824" crc="a6a0f8e0" sha1="4a65467d256a713898947eb310ecadbf942f92d9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7192,31 +7192,31 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="kaerimic">
 		<description>Kaerimichi wa Kiken ga Ippai</description>
 		<year>1990</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="帰り道は危険がいっぱい" />
 		<info name="release" value="199009xx" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="kaerimichi ha kiken ga ippai (1990)(do)(disk 1 of 4)(disk a).dim" size="1261824" crc="594b4c2a" sha1="2adfab36676fda4729afe55d7e74db96971f9c7d" offset="000000" />
+				<rom name="kaerimichi wa kiken ga ippai (1990)(do)(disk 1 of 4)(disk a).dim" size="1261824" crc="594b4c2a" sha1="2adfab36676fda4729afe55d7e74db96971f9c7d" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="kaerimichi ha kiken ga ippai (1990)(do)(disk 2 of 4)(disk b).dim" size="1261824" crc="96c80dbb" sha1="0f4f697931677111d87e752961c0cf5dac2dda79" offset="000000" />
+				<rom name="kaerimichi wa kiken ga ippai (1990)(do)(disk 2 of 4)(disk b).dim" size="1261824" crc="96c80dbb" sha1="0f4f697931677111d87e752961c0cf5dac2dda79" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261824">
-				<rom name="kaerimichi ha kiken ga ippai (1990)(do)(disk 3 of 4)(disk c).dim" size="1261824" crc="c5d45f72" sha1="1065f4347e584dc7800fd9282a0a2d41782a1188" offset="000000" />
+				<rom name="kaerimichi wa kiken ga ippai (1990)(do)(disk 3 of 4)(disk c).dim" size="1261824" crc="c5d45f72" sha1="1065f4347e584dc7800fd9282a0a2d41782a1188" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1261824">
-				<rom name="kaerimichi ha kiken ga ippai (1990)(do)(disk 4 of 4)(disk d).dim" size="1261824" crc="5b432582" sha1="25cbde5ff0cf1c23236f3ddff0f0400415cc75e2" offset="000000" />
+				<rom name="kaerimichi wa kiken ga ippai (1990)(do)(disk 4 of 4)(disk d).dim" size="1261824" crc="5b432582" sha1="25cbde5ff0cf1c23236f3ddff0f0400415cc75e2" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7335,30 +7335,30 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		<description>Kibun wa Pastel Touch!!</description>
 		<year>1990</year>
 		<publisher>グレイト (Great)</publisher>
-		<info name="alt_title" value="気分はぱすてるたっち!! アブナイ学園編 ~ Kibun ha Pastel Touch!! Abunai Gakuen Hen" />
+		<info name="alt_title" value="気分はぱすてるたっち!! アブナイ学園編 ~ Kibun wa Pastel Touch!! Abunai Gakuen Hen" />
 		<info name="release" value="199001xx" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="kibun ha pastel touch (19xx)(great)(disk 1 of 4)(disk a).dim" size="1261824" crc="d39336af" sha1="b9d4fb5a61681f9b03c473948ef6cd44c28c1af2" offset="000000" />
+				<rom name="kibun wa pastel touch (19xx)(great)(disk 1 of 4)(disk a).dim" size="1261824" crc="d39336af" sha1="b9d4fb5a61681f9b03c473948ef6cd44c28c1af2" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="kibun ha pastel touch (19xx)(great)(disk 2 of 4)(disk b).dim" size="1261824" crc="daba36ff" sha1="cf0e8894bda7dfed366b2674aa3a7311406b15f3" offset="000000" />
+				<rom name="kibun wa pastel touch (19xx)(great)(disk 2 of 4)(disk b).dim" size="1261824" crc="daba36ff" sha1="cf0e8894bda7dfed366b2674aa3a7311406b15f3" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261824">
-				<rom name="kibun ha pastel touch (19xx)(great)(disk 3 of 4)(disk c).dim" size="1261824" crc="7af7fc27" sha1="7285b1d82da612fd267bf84af5141e7be788c068" offset="000000" />
+				<rom name="kibun wa pastel touch (19xx)(great)(disk 3 of 4)(disk c).dim" size="1261824" crc="7af7fc27" sha1="7285b1d82da612fd267bf84af5141e7be788c068" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1261824">
-				<rom name="kibun ha pastel touch (19xx)(great)(disk 4 of 4)(disk d).dim" size="1261824" crc="fc490363" sha1="07b5c19f14efc8c7e97bcf5494b303be2a45ba64" offset="000000" />
+				<rom name="kibun wa pastel touch (19xx)(great)(disk 4 of 4)(disk d).dim" size="1261824" crc="fc490363" sha1="07b5c19f14efc8c7e97bcf5494b303be2a45ba64" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7427,7 +7427,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	</software>
 
 	<software name="kimidake">
-		<description>Kimi Dake ni Ai wo...</description>
+		<description>Kimi Dake ni Ai o...</description>
 		<year>1991</year>
 		<publisher>GAMEテクノポリス (Game Technopolis)</publisher>
 		<info name="alt_title" value="キミだけに愛を・・・" />
@@ -7435,19 +7435,19 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="kimi dake ni ai wo (1991)(technopolis)(disk 1 of 3)(disk a).dim" size="1261824" crc="b5b0c847" sha1="1b79747f3d1973956a11e2f23897807a8cc87deb" offset="000000" />
+				<rom name="kimi dake ni ai o (1991)(technopolis)(disk 1 of 3)(disk a).dim" size="1261824" crc="b5b0c847" sha1="1b79747f3d1973956a11e2f23897807a8cc87deb" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="kimi dake ni ai wo (1991)(technopolis)(disk 2 of 3)(disk b).dim" size="1261824" crc="0adec927" sha1="be0d32dd4f70b601fe5082100e11ea9c0ae6e517" offset="000000" />
+				<rom name="kimi dake ni ai o (1991)(technopolis)(disk 2 of 3)(disk b).dim" size="1261824" crc="0adec927" sha1="be0d32dd4f70b601fe5082100e11ea9c0ae6e517" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261824">
-				<rom name="kimi dake ni ai wo (1991)(technopolis)(disk 3 of 3)(disk c).dim" size="1261824" crc="acfdc8b6" sha1="bdc7ea59af54e11e10996f485c67762460060fde" offset="000000" />
+				<rom name="kimi dake ni ai o (1991)(technopolis)(disk 3 of 3)(disk c).dim" size="1261824" crc="acfdc8b6" sha1="bdc7ea59af54e11e10996f485c67762460060fde" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8246,8 +8246,8 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="lodossen">
-		<description>Lodoss Tou Senki Fukuzinzuke</description>
+	<software name="lodossfk">
+		<description>Lodoss Tou Senki - Fukujinzuke</description>
 		<year>1991</year>
 		<publisher>ブラザー工業 (Brother Industries)</publisher>
 		<info name="alt_title" value="ロードス島戦記 福神漬" />
@@ -9276,7 +9276,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="msgundcl">
+	<software name="gundamco">
 		<description>Mobile Suit Gundam Classic Operation</description>
 		<year>1991</year>
 		<publisher>ブラザー工業 (Brother Industries)</publisher>
@@ -9331,7 +9331,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="moonligt">
 		<description>Moonlight Chan Rin Shan</description>
 		<year>1993</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="Mウーンライトちゃんリンしゃん" />
 		<info name="release" value="19930319" />
 		<part name="flop1" interface="floppy_5_25">
@@ -10118,7 +10118,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	</software>
 
 	<software name="ougonras">
-		<description>Ougon no Rashinban - Shouyoumaru San Francisco Kouro Satsujin Jiken</description>
+		<description>Toudou Ryunosuke Tantei Nikki - Ougon no Rashinban - Shouyoumaru San Francisco Kouro Satsujin Jiken</description>
 		<year>1991</year>
 		<publisher>リバーヒルソフト (Riverhill Software)</publisher>
 		<info name="alt_title" value="黄金の羅針盤 翔洋丸桑港航路殺人事件" />
@@ -10861,7 +10861,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		<info name="release" value="19891221" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="princess ha street girl (19xx)(zenryuutsuu).dim" size="1261824" crc="120584d7" sha1="dd2f6a87f531ed647e235c62708cb95194207275" offset="000000" />
+				<rom name="princess wa street girl (19xx)(zenryuutsuu).dim" size="1261824" crc="120584d7" sha1="dd2f6a87f531ed647e235c62708cb95194207275" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -11311,7 +11311,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	</software>
 
 	<software name="raygun">
-		<description>Ray Gun</description>
+		<description>Ray・Gun</description>
 		<year>1990</year>
 		<publisher>エルフ (Elf)</publisher>
 		<info name="alt_title" value="レイガン" />
@@ -11907,7 +11907,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="shangha2">
+	<software name="shangh2">
 		<description>Shanghai II</description>
 		<year>1989</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
@@ -11920,7 +11920,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="shangha2d" cloneof="shangha2">
+	<software name="shangh2d" cloneof="shangh2">
 		<description>Shanghai II (Demo)</description>
 		<year>1989</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
@@ -13398,7 +13398,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-	<software name="tenkyuhs">
+	<software name="tenkyusp">
 		<description>Tenkyuuhai Special - Tougen no Utage</description>
 		<year>1990</year>
 		<publisher>ブラザー工業 (Brother Industries)</publisher>
@@ -13540,7 +13540,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	</software>
 
 	<software name="tessera">
-		<description>Tessera - Kimi ha Yogoreta Tenshi ka Seinaru Majo ka!?</description>
+		<description>Tessera - Kimi wa Yogoreta Tenshi ka Seinaru Majo ka!?</description>
 		<year>1992</year>
 		<publisher>GAMEテクノポリス (Game Technopolis)</publisher>
 		<info name="alt_title" value="テセラ キミは汚れた天使か聖なる魔女か!?" />
@@ -13688,7 +13688,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="tokimecb">
 		<description>Tokimeki Cherry Box</description>
 		<year>1990</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="ときめきチェリーボックス" />
 		<info name="release" value="19900516" />
 		<part name="flop1" interface="floppy_5_25">
@@ -13706,51 +13706,51 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	</software>
 
 	<software name="tokyojs1">
-		<description>Tokyo Joshiko Seifuku wo Nuida Zukan Part 1</description>
+		<description>Tokyo Joshikou Seifuku o Nuida Zukan Part 1</description>
 		<year>1988</year>
 		<publisher>ニューシステムハウスオウ (New System House Oh!)</publisher>
 		<info name="alt_title" value="東京女子高制服を脱いだ図鑑 Part.1" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261824">
-				<rom name="toukyou joshikou seifuku wo meida zukan (19xx)(system house oh!)(disk 1 of 3)(system).dim" size="1261824" crc="75eb3759" sha1="807a7f4959e2e55f2285d8fd1397c10e1ac6019b" offset="000000" />
+				<rom name="toukyou joshikou seifuku o nuida zukan (19xx)(system house oh!)(disk 1 of 3)(system).dim" size="1261824" crc="75eb3759" sha1="807a7f4959e2e55f2285d8fd1397c10e1ac6019b" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="toukyou joshikou seifuku wo meida zukan (19xx)(system house oh!)(disk 2 of 3)(disk 1).dim" size="1261824" crc="18590d6e" sha1="4104752de9d8cdc04d30d8f1ecf0de9661223a1d" offset="000000" />
+				<rom name="toukyou joshikou seifuku o nuida zukan (19xx)(system house oh!)(disk 2 of 3)(disk 1).dim" size="1261824" crc="18590d6e" sha1="4104752de9d8cdc04d30d8f1ecf0de9661223a1d" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261824">
-				<rom name="toukyou joshikou seifuku wo meida zukan (19xx)(system house oh!)(disk 3 of 3)(disk 2).dim" size="1261824" crc="7a8994f3" sha1="a578c2c1cf11aa7d663cd8f4284d0cb30ff4bc16" offset="000000" />
+				<rom name="toukyou joshikou seifuku o nuida zukan (19xx)(system house oh!)(disk 3 of 3)(disk 2).dim" size="1261824" crc="7a8994f3" sha1="a578c2c1cf11aa7d663cd8f4284d0cb30ff4bc16" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="tokyojs2">
-		<description>Tokyo Joshiko Seifuku wo Nuida Zukan Part 2</description>
+		<description>Tokyo Joshikou Seifuku o Nuida Zukan Part 2</description>
 		<year>1988</year>
 		<publisher>ニューシステムハウスオウ (New System House Oh!)</publisher>
 		<info name="alt_title" value="東京女子高制服を脱いだ図鑑 Part.2" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261824">
-				<rom name="toukyou joshikou seifuku wo meida zukan 2 (19xx)(system house oh!)(disk 1 of 3)(system).dim" size="1261824" crc="ca258d85" sha1="768c124448338482682cd90c49e9a6e11f9f0bf9" offset="000000" />
+				<rom name="toukyou joshikou seifuku o nuida zukan 2 (19xx)(system house oh!)(disk 1 of 3)(system).dim" size="1261824" crc="ca258d85" sha1="768c124448338482682cd90c49e9a6e11f9f0bf9" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
-				<rom name="toukyou joshikou seifuku wo meida zukan 2 (19xx)(system house oh!)(disk 2 of 3)(disk 1).dim" size="1261824" crc="5e353cd3" sha1="b4d46aabbf36f944c6078a9eed6f9fec01ebf9f6" offset="000000" />
+				<rom name="toukyou joshikou seifuku o nuida zukan 2 (19xx)(system house oh!)(disk 2 of 3)(disk 1).dim" size="1261824" crc="5e353cd3" sha1="b4d46aabbf36f944c6078a9eed6f9fec01ebf9f6" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261824">
-				<rom name="toukyou joshikou seifuku wo meida zukan 2 (19xx)(system house oh!)(disk 3 of 3)(disk 2).dim" size="1261824" crc="4904d2d8" sha1="7d7f43333ff3730f8472c239f9ef15c2a4d3cddb" offset="000000" />
+				<rom name="toukyou joshikou seifuku o nuida zukan 2 (19xx)(system house oh!)(disk 3 of 3)(disk 2).dim" size="1261824" crc="4904d2d8" sha1="7d7f43333ff3730f8472c239f9ef15c2a4d3cddb" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -14931,7 +14931,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		<description>Yaritai Houdai 2</description>
 		<year>1989</year>
 		<publisher>全流通 (Zenryutsu)</publisher>
-		<info name="alt_title" value="やりたい放題2 ツーリストを狙え!! ~ Yaritai Houdai 2 Tourist wo Nerae!!" />
+		<info name="alt_title" value="やりたい放題2 ツーリストを狙え!! ~ Yaritai Houdai 2 - Tourist o Nerae!!" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="yaritai houdai 2 (19xx)(zenryuutsuu).dim" size="1261824" crc="6f762b9a" sha1="5020ce8beb2a3cca4f077b32b5df22dbf192e00e" offset="000000" />
@@ -14973,7 +14973,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="yojuclub">
 		<description>Youjuu Club</description>
 		<year>1990</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="妖獣クラブ" />
 		<info name="release" value="19900702" />
 		<part name="flop1" interface="floppy_5_25">
@@ -14993,7 +14993,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="yojuclb2">
 		<description>Youjuu Club 2</description>
 		<year>1991</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="妖獣クラブ2" />
 		<info name="release" value="19910823" />
 		<part name="flop1" interface="floppy_5_25">
@@ -15019,7 +15019,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	<software name="yoju2048">
 		<description>Youjuu Senki AD 2048</description>
 		<year>1994</year>
-		<publisher>D.O.</publisher>
+		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="妖獣戦記 A.D.2048" />
 		<info name="release" value="19940422" />
 		<part name="flop1" interface="floppy_5_25">
@@ -15321,7 +15321,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
-<!-- Other Scenario Disks are titled "Kateikyoushi ha Suteki na Oshigoto" and "Nobunaga no Inbou" but I'm not sure which is what -->
+<!-- Other Scenario Disks are titled "Kateikyoushi wa Suteki na Oshigoto" and "Nobunaga no Inbou" but I'm not sure which is what -->
 	<software name="dpssg" supported="no">
 		<description>D.P.S. SG - Dream Program System SG</description>
 		<year>1990</year>
@@ -15433,7 +15433,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	</software>
 
 	<software name="rance" supported="no">
-		<description>Rance - Hikari wo Motomete</description>
+		<description>Rance - Hikari o Motomete</description>
 		<year>1989</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
 		<info name="release" value="19891115"/>
@@ -15469,7 +15469,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 	</software>
 
 	<software name="rance2" supported="no">
-		<description>Rance 2 - Hangyaku no Shojo-tachi</description>
+		<description>Rance 2 - Hangyaku no Shoujo-tachi</description>
 		<year>1990</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
 		<info name="release" value="19900713"/>
@@ -17532,7 +17532,7 @@ a bootable disk out of that? -->
 		</part>
 	</software>
 
-	<software name="zstaff1">
+	<software name="zpro68kv1" cloneof="zpro68k">
 		<description>Z's Staff Pro-68K v1.00</description>
 		<year>1987</year>
 		<publisher>Zeit</publisher>
@@ -17562,8 +17562,8 @@ a bootable disk out of that? -->
 		</part>
 	</software>
 
-	<software name="zstaff2">
-		<description>Z's Staff Pro-68K v2.00 (1989)(Zeit)(Disk 1 of 4)(System)</description>
+	<software name="zpro68kv2" cloneof="zpro68k">
+		<description>Z's Staff Pro-68K v2.00</description>
 		<year>1989</year>
 		<publisher>Zeit</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -17592,7 +17592,7 @@ a bootable disk out of that? -->
 		</part>
 	</software>
 
-	<software name="zstaff3">
+	<software name="zpro68k">
 		<description>Z's Staff Pro-68K v3.0</description>
 		<year>1992</year>
 		<publisher>Zeit</publisher>
@@ -17640,7 +17640,7 @@ a bootable disk out of that? -->
 		</part>
 	</software>
 
-	<software name="zxvi">
+	<software name="zxvi68k">
 		<description>Z's Staff XVI-68K v0.50</description>
 		<year>1992</year>
 		<publisher>Zeit</publisher>
@@ -20536,13 +20536,13 @@ a contest among doujin programmers...  -->
 	</software>
 
 	<software name="barcelono" cloneof="barcelon">
-		<description>Barcelona Fighter 92 - Bangaihen Sekaiichi Ha Ore Da (v1.00)</description>
+		<description>Barcelona Fighter 92 - Bangaihen Sekaiichi wa Ore Da (v1.00)</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="LTT - Kuma" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="barcelona fighter 92 bangaihen sekaiichi ha ore da (1992)(ltt - kuma).dim" size="1261824" crc="6e14dc8f" sha1="d42afb7c6b8189ce50dd8d553b0d9a960d8194e7" offset="000000" />
+				<rom name="barcelona fighter 92 bangaihen sekaiichi wa ore da (1992)(ltt - kuma).dim" size="1261824" crc="6e14dc8f" sha1="d42afb7c6b8189ce50dd8d553b0d9a960d8194e7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -26145,14 +26145,15 @@ a contest among doujin programmers...  -->
 		</part>
 	</software>
 
-	<software name="phoneixq">
-		<description>Phoneix Quiz Slime King Wo Hari Sakase</description>
+	<software name="phoenixq">
+		<description>Phoenix Quiz ~Slime King o Haritaose~</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<info name="alt_title" value="PHOENIX QUIZ ～スライムキングをハリ倒せ～" />
 		<info name="developer" value="Phoenix" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="phoneix quiz slime king wo hari sakase (1990)(phoenix).dim" size="1261824" crc="deef5db7" sha1="dafa9da31f03e984a33520d10dd35f6152775d11" offset="000000" />
+				<rom name="phoenix quiz ~slime king o haritaose~ (1990)(phoenix).dim" size="1261824" crc="deef5db7" sha1="dafa9da31f03e984a33520d10dd35f6152775d11" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -27437,13 +27438,13 @@ a contest among doujin programmers...  -->
 	</software>
 
 	<software name="seifukuk">
-		<description>Seifuku Kako no Ibutsu Wo Matoishi Monotachi</description>
+		<description>Seifuku Kako no Ibutsu o Matoishi Mono-tachi</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Pussy Cat" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
-				<rom name="seifuku kako no ibutsu wo matoishi monotachi (1992)(pussy cat).dim" size="1261824" crc="7b4d2da0" sha1="4d9494714893d2259dd6e1716f398b0c0c7b4002" offset="000000" />
+				<rom name="seifuku kako no ibutsu o matoishi mono-tachi (1992)(pussy cat).dim" size="1261824" crc="7b4d2da0" sha1="4d9494714893d2259dd6e1716f398b0c0c7b4002" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

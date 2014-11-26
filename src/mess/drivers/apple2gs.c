@@ -143,7 +143,7 @@ PALETTE_INIT_MEMBER(apple2gs_state,apple2gs)
 {
 	int i;
 
-//	PALETTE_INIT_NAME(apple2)(palette);
+//  PALETTE_INIT_NAME(apple2)(palette);
 
 	for (i = 0; i < 16; i++)
 	{

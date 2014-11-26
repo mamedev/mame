@@ -33,7 +33,7 @@ public:
 		m_dac(*this, "dac"),
 		m_samples(*this, "samples"),
 		m_palette(*this, "palette"),
-		m_mainbank(*this, "mainbank")	
+		m_mainbank(*this, "mainbank")
 		{ }
 
 	/* video-related */

@@ -26,7 +26,8 @@ pla_device::pla_device(const machine_config &mconfig, const char *tag, device_t 
 		m_inputs(0),
 		m_outputs(0),
 		m_terms(0),
-		m_input_mask(0)
+		m_input_mask(0),
+		m_xor(0)
 {
 }
 
@@ -58,7 +59,7 @@ void pla_device::device_start()
 	m_cache.resize(csize);
 	for (int i = 0; i < csize; i++)
 		m_cache[i] = read(i);
-	
+
 	m_cache_size = csize;
 }
 
@@ -71,22 +72,31 @@ void pla_device::parse_fusemap()
 {
 	jed_data jed;
 	int result = JEDERR_NONE;
-	
+
 	// read pla file
 	switch (m_format)
 	{
 		case PLA_FMT_JEDBIN:
 			result = jedbin_parse(region()->base(), region()->bytes(), &jed);
 			break;
-		
+
 		case PLA_FMT_BERKELEY:
 			result = pla_parse(region()->base(), region()->bytes(), &jed);
 			break;
 	}
-	
+
 	if (result != JEDERR_NONE)
-		fatalerror("%s PLA parse error %d\n", tag(), result);
-	
+	{
+		for (int p = 0; p < m_terms; p++)
+		{
+			m_term[p].and_mask = 0;
+			m_term[p].or_mask = 0;
+		}
+
+		logerror("%s PLA parse error %d!\n", tag(), result);
+		return;
+	}
+
 	// parse it
 	UINT32 fusenum = 0;
 
@@ -95,26 +105,26 @@ void pla_device::parse_fusemap()
 		term *term = &m_term[p];
 
 		// AND mask
-		term->m_and = 0;
+		term->and_mask = 0;
 
 		for (int i = 0; i < m_inputs; i++)
 		{
 			// complement
-			term->m_and |= (UINT64)jed_get_fuse(&jed, fusenum++) << (i + 32);
+			term->and_mask |= (UINT64)jed_get_fuse(&jed, fusenum++) << (i + 32);
 
 			// true
-			term->m_and |= (UINT64)jed_get_fuse(&jed, fusenum++) << i;
+			term->and_mask |= (UINT64)jed_get_fuse(&jed, fusenum++) << i;
 		}
 
 		// OR mask
-		term->m_or = 0;
+		term->or_mask = 0;
 
 		for (int f = 0; f < m_outputs; f++)
 		{
-			term->m_or |= !jed_get_fuse(&jed, fusenum++) << f;
+			term->or_mask |= !jed_get_fuse(&jed, fusenum++) << f;
 		}
 
-		term->m_or <<= 32;
+		term->or_mask <<= 32;
 	}
 
 	// XOR mask
@@ -138,7 +148,7 @@ UINT32 pla_device::read(UINT32 input)
 	// try the cache first
 	if (input < m_cache_size)
 		return m_cache[input];
-	
+
 	for (int i = 0; i < CACHE2_SIZE; ++i)
 	{
 		UINT64 cache2_entry = m_cache2[i];
@@ -158,9 +168,9 @@ UINT32 pla_device::read(UINT32 input)
 	{
 		term* term = &m_term[i];
 
-		if ((term->m_and | inputs) == m_input_mask)
+		if ((term->and_mask | inputs) == m_input_mask)
 		{
-			s |= term->m_or;
+			s |= term->or_mask;
 		}
 	}
 

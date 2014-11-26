@@ -968,7 +968,7 @@ MC6845_UPDATE_ROW( isa8_ec1840_0002_device::crtc_update_row )
 {
 	if (m_update_row_type == -1)
 		return;
-	
+
 	switch (m_update_row_type)
 	{
 		case MDA_LOWRES_TEXT_INTEN:

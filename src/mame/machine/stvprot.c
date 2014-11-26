@@ -572,7 +572,7 @@ UINT32 ffreveng_prot_read_callback( address_space &space, int protaddr, UINT32 k
 *
 *************************************/
 
-// the naomi hookup of 315-5881 reads 16-bits at a time, here we seem to read 32? 
+// the naomi hookup of 315-5881 reads 16-bits at a time, here we seem to read 32?
 
 READ32_MEMBER( stv_state::common_prot_r )
 {
@@ -671,7 +671,7 @@ void stv_state::install_astrass_protection()
 {
 	install_common_protection();
 	m_prot_readback = astrass_prot_read_callback;
-//	m_cryptdevice->set_key(0x00000000);
+//  m_cryptdevice->set_key(0x00000000);
 }
 
 void stv_state::install_ffreveng_protection()

@@ -1,0 +1,145 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+
+|  PART-NO    |LAN| GAME TITLE                                                | CARTRIDGE-TYPE |
+================================================================================================
+| 500-10933-A |GER| Spongebob Schwammkopf hat alles im Griff                  | LEAPSTER       |
+| 500-10934-A |GER| Vorschule                                                 | LEAPSTER       |
+| 500-10935-A |GER| Grundschule 1                                             | LEAPSTER       |
+| 500-11078-A |GER| Lernen mit Leap                                           | LEAPSTER       |
+| 500-11493-A |GER| Mit Bruno Bleistift lernst du MALEN & SCHREIBEN           | LEAPSTER       |
+| 500-11494-A |GER| Grundschule 2 - Musik in Gefahr                           | LEAPSTER       |
+| 500-11495-A |GER| Findet Nemo                                               | LEAPSTER       |
+| 500-11496-A |GER| Zauberhaftes Lernen                                       | LEAPSTER       |
+| 500-11496-B |GER| Zauberhaftes Lernen                                       | LEAPSTER       |
+| 500-11497-A |GER| SPIDER-MAN - Schachmatt den Schildersaboteuren!           | LEAPSTER       |
+| 500-11603-A |GER| DEMO - Herbst 2004 II                                     | LEAPSTER       |
+| 500-11903-A |ENG| SPIDER-MAN - The Chase of The Sinister Speller            | LEAPSTER L-MAX |
+| 500-11972-A |GER| BATMAN - Multipliziere, dividiere und reagiere            | LEAPSTER       |
+| 500-12139-A |GER| Buchstabenraupe - Lernen im Arcade-Stil!                  | LEAPSTER       |
+| 500-12140-A |GER| Weltraum-Mathe - Lernen im Arcade-Stil!                   | LEAPSTER       |
+| 500-12141-A |GER| Zahlenjäger - Lernen im Arcade-Stil!                      | LEAPSTER       |
+| 500-12142-A |GER| Wörterjäger - Lernen im Arcade-Stil!                      | LEAPSTER       |
+| 500-12161-A |ENG| Dora the Explorer - Pinata Party - Arcade-Style Learning! | LEAPSTER       |
+| 500-12171-A |GER| Cars                                                      | LEAPSTER       |
+| 500-12293-A |ENG| Animal Genius                                             | LEAPSTER       |
+| 500-12466-A |ENG| Clifford - The Big Red Dog - Reading                      | LEAPSTER       |
+| 500-12562-B |GER| Dora - Retter der Wildnis                                 | LEAPSTER       |
+| 500-12654-A |ENG| Ratatouille                                               | LEAPSTER       |
+| 500-12711-A |ENG| BATMAN - Strength in numbers                              | LEAPSTER       |
+| 500-13272-A |ENG| Wall-E                                                    | LEAPSTER       |
+| 500-13441-A |GER| Wall-E                                                    | LEAPSTER       |
+| 500-13472-A |ENG| Star Wars - Jedi Reading                                  | LEAPSTER       |
+| 500-13629-A |ENG| nihao, kai-lan                                            | LEAPSTER       |
+|             |GER| Spongebob Schwammkopf - Zeitreise durch das Wurmloch      | LEAPSTER       |
+|             |ENG| Disney Princess                                           | LEAPSTER       |
+
+
+-->
+
+
+
+
+<softwarelist name="leapster" description="LeapFrog Leapster cartridges">
+
+	<software name="findnemo" supported="no">
+		<description>Findet Nemo (German)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-11495-a - findet nemo (german).bin" size="0x800000" crc="6a5e20ba" sha1="984638e1d9b869611de8900d8f5a6a760cd40539" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spongeb" supported="no">
+		<description>Spongebob Schwammkopf hat alles im Griff (German)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-10933-a - spongebob schwammkopf hat alles im griff (german).bin" size="0x800000" crc="d11e7c30" sha1="71a844d9f38f7bc915e716d3d5485f558e9bffe9" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdrman" supported="no">
+		<description>Spider-Man - Schachmatt den Schildersaboteuren! (German)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-11497-a - spider-man - schachmatt den schildersaboteuren! (german).bin" size="0x800000" crc="9dc2e5f6" sha1="089e6739142edaaa5c0e72ba7faf6f443e1ddc59" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cars" supported="no">
+		<description>Cars (German)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-12171-a - cars (german).bin" size="0x800000" crc="c7b62602" sha1="bbc2b70e588710b2096741046ae3e08095397ee9" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zahl" supported="no">
+		<description>Zahlenjäger - Lernen im Arcade-Stil! (German)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-12141-a - zahlenjager - lernen im arcade-stil! (german).bin" size="0x400000" crc="334ab5d0" sha1="00eb76e267bfaded25fdf8361e933dc4ec72d059" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demo" supported="no">
+		<description>Demo - Herbst 2004 II (German)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-11603-a - demo - herbst 2004 ii (german).bin" size="0x800000" crc="71062cd7" sha1="eaf0656d29f61d89b97c6d66e73a2fa7021a92e3" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lernleap" supported="no">
+		<description>Lernen mit Leap (German)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-11078-a - lernen mit leap (german)" size="0x800000" crc="e1f505e7" sha1="935eb17d3b6f9df2115a12445b3c8c977005481a" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="disprinz" supported="no">
+		<description>Disney Prinzessinnen - Zauberhaftes Lernen (German)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-11496-a - disney prinzessinnen - zauberhaftes lernen (german).bin" size="0x800000" crc="bb6d5375" sha1="743d07ee756b54e2c72bf94da56dd8d18c4cd106" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="worter" supported="no">
+		<description>Wörterjäger - Lernen im Arcade-Stil! (German)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-12142-a - worterjager - lernen im arcade-stil! (german).bin" size="0x400000" crc="a707de61" sha1="76689979f08d8c585576a138579fcfb147449db5" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

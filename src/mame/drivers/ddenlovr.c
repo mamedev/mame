@@ -4182,10 +4182,10 @@ ADDRESS_MAP_END
                            Hanafuda Hana Tengoku
 ***************************************************************************/
 
-static ADDRESS_MAP_START( yarunara_mem_map, AS_PROGRAM, 8, dynax_state )
+static ADDRESS_MAP_START( htengoku_mem_map, AS_PROGRAM, 8, ddenlovr_state )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
-	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
+	AM_RANGE( 0x6000, 0x6fff ) AM_RAM AM_SHARE("nvram")
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank1")
 	AM_RANGE( 0x8000, 0x81ff ) AM_WRITE(yarunara_palette_w) // Palette or RTC
 ADDRESS_MAP_END
@@ -4194,7 +4194,7 @@ static MACHINE_CONFIG_START( htengoku, ddenlovr_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,20000000 / 4)
-	MCFG_CPU_PROGRAM_MAP(yarunara_mem_map)
+	MCFG_CPU_PROGRAM_MAP(htengoku_mem_map)
 	MCFG_CPU_IO_MAP(htengoku_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddenlovr_state,  sprtmtch_vblank_interrupt)   /* IM 0 needs an opcode on the data bus */
 	MCFG_CPU_PERIODIC_INT_DRIVER(ddenlovr_state, yarunara_clock_interrupt,  60)    // RTC

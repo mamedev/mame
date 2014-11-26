@@ -148,7 +148,7 @@
 
 	<software name="smrtlogo">
 		<description>SmartLOGO</description>
-		<year>198</year>
+		<year>198?</year>
 		<publisher>Logo Computer Systems</publisher>
 
 		<part name="cass1" interface="adam_cass">

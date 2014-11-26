@@ -368,6 +368,9 @@ ROM_START( dragrace )
 	ROM_LOAD( "8517dr.h0", 0x200, 0x200, CRC(8b5bff1f) SHA1(fdcd719c66bff7c4b9f3d56d1e635259dd8add61) )
 	ROM_LOAD( "8516dr.l0", 0x400, 0x200, CRC(d1e74af1) SHA1(f55a3bfd7d152ac9af128697f55c9a0c417779f5) )
 	ROM_LOAD( "8518dr.n0", 0x600, 0x200, CRC(b1369028) SHA1(598a8779982d532c9f34345e793a79fcb29cac62) )
+
+	ROM_REGION( 0x100, "sync", 0 )  /* sync prom located at L8, it's a 82s129 */
+	ROM_LOAD( "l8.bin", 0x000, 0x100, CRC(3610b453) SHA1(9e33ee04f22a9174c29fafb8e71781fa330a7a08) )
 ROM_END
 
 

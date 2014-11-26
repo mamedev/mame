@@ -1982,10 +1982,10 @@ void dec8_state::machine_reset()
 
 /* TODO: These are raw guesses, only to get ~57,41 Hz, assume to be the same as dec0 */
 #define DEC8_PIXEL_CLOCK XTAL_20MHz/4
-#define DEC8_HTOTAL 256+74
+#define DEC8_HTOTAL 320
 #define DEC8_HBEND 0
 #define DEC8_HBSTART 256
-#define DEC8_VTOTAL 264
+#define DEC8_VTOTAL 272
 #define DEC8_VBEND 8
 #define DEC8_VBSTART 256-8
 

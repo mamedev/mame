@@ -330,9 +330,11 @@ endif
 ifneq ($(filter DMV,$(BUSES)),)
 OBJDIRS += $(BUSOBJ)/dmv
 BUSOBJS += $(BUSOBJ)/dmv/dmvbus.o
+BUSOBJS += $(BUSOBJ)/dmv/k210.o
 BUSOBJS += $(BUSOBJ)/dmv/k220.o
 BUSOBJS += $(BUSOBJ)/dmv/k230.o
 BUSOBJS += $(BUSOBJ)/dmv/k233.o
+BUSOBJS += $(BUSOBJ)/dmv/k801.o
 BUSOBJS += $(BUSOBJ)/dmv/k803.o
 BUSOBJS += $(BUSOBJ)/dmv/k806.o
 BUSOBJS += $(BUSOBJ)/dmv/ram.o
@@ -644,6 +646,7 @@ BUSOBJS += $(BUSOBJ)/pet/c2n.o
 BUSOBJS += $(BUSOBJ)/pet/diag264_lb_tape.o
 BUSOBJS += $(BUSOBJ)/pet/exp.o
 BUSOBJS += $(BUSOBJ)/pet/64k.o
+BUSOBJS += $(BUSOBJ)/pet/hsg.o
 BUSOBJS += $(BUSOBJ)/pet/superpet.o
 BUSOBJS += $(BUSOBJ)/pet/user.o
 BUSOBJS += $(BUSOBJ)/pet/diag.o
@@ -956,10 +959,12 @@ BUSOBJS += $(BUSOBJ)/centronics/covox.o
 BUSOBJS += $(BUSOBJ)/centronics/dsjoy.o
 BUSOBJS += $(BUSOBJ)/centronics/epson_ex800.o
 BUSOBJS += $(BUSOBJ)/centronics/epson_lx800.o
+BUSOBJS += $(BUSOBJ)/centronics/epson_lx810l.o
 BUSOBJS += $(BUSOBJ)/centronics/printer.o
 BUSOBJS += $(BUSOBJ)/centronics/digiblst.o
 $(BUSOBJ)/centronics/epson_ex800.o:    $(EMUOBJ)/layout/ex800.lh
 $(BUSOBJ)/centronics/epson_lx800.o:    $(EMUOBJ)/layout/lx800.lh
+$(BUSOBJ)/centronics/epson_lx810l.o:   $(EMUOBJ)/layout/lx800.lh
 endif
 
 #-------------------------------------------------

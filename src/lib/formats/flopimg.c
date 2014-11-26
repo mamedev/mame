@@ -1307,14 +1307,14 @@ void floppy_image_format_t::fixup_crcs(UINT32 *buffer, gen_crc_info *crcs)
 	for(int i=0; i != MAX_CRC_COUNT; i++)
 		if(crcs[i].write != -1) {
 			switch(crcs[i].type) {
-			case CRC_AMIGA:			fixup_crc_amiga(buffer, crcs+i); break;
-			case CRC_CBM:			fixup_crc_cbm(buffer, crcs+i); break;
-			case CRC_CCITT:			fixup_crc_ccitt(buffer, crcs+i); break;
-			case CRC_CCITT_FM:		fixup_crc_ccitt_fm(buffer, crcs+i); break;
-			case CRC_MACHEAD:		fixup_crc_machead(buffer, crcs+i); break;
-			case CRC_FCS:			fixup_crc_fcs(buffer, crcs+i); break;
-			case CRC_VICTOR_HDR:	fixup_crc_victor_header(buffer, crcs+i); break;
-			case CRC_VICTOR_DATA:	fixup_crc_victor_data(buffer, crcs+i); break;
+			case CRC_AMIGA:         fixup_crc_amiga(buffer, crcs+i); break;
+			case CRC_CBM:           fixup_crc_cbm(buffer, crcs+i); break;
+			case CRC_CCITT:         fixup_crc_ccitt(buffer, crcs+i); break;
+			case CRC_CCITT_FM:      fixup_crc_ccitt_fm(buffer, crcs+i); break;
+			case CRC_MACHEAD:       fixup_crc_machead(buffer, crcs+i); break;
+			case CRC_FCS:           fixup_crc_fcs(buffer, crcs+i); break;
+			case CRC_VICTOR_HDR:    fixup_crc_victor_header(buffer, crcs+i); break;
+			case CRC_VICTOR_DATA:   fixup_crc_victor_data(buffer, crcs+i); break;
 			}
 			if(crcs[i].fixup_mfm_clock) {
 				int offset = crcs[i].write + crc_cells_size(crcs[i].type);

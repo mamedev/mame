@@ -181,7 +181,7 @@ public:
 	TIMER_CALLBACK_MEMBER(ti85_timer_callback);
 	TIMER_CALLBACK_MEMBER(ti83_timer1_callback);
 	TIMER_CALLBACK_MEMBER(ti83_timer2_callback);
-	
+
 	//crystal timers
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	void ti83pse_count( UINT8 timer, UINT8 data);
@@ -207,8 +207,8 @@ public:
 	DECLARE_WRITE8_MEMBER( ti83pse_ctimer3_loop_w );
 	DECLARE_READ8_MEMBER( ti83pse_ctimer3_count_r );
 	DECLARE_WRITE8_MEMBER( ti83pse_ctimer3_count_w );
-	
-	
+
+
 	void update_ti85_memory ();
 	void update_ti83p_memory ();
 	void update_ti83pse_memory ();
@@ -218,9 +218,9 @@ public:
 	void ti86_setup_snapshot (UINT8 * data);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( ti8x );
 	DECLARE_DIRECT_UPDATE_MEMBER( ti83p_direct_update_handler );
-	
+
 	ti83pse_timer m_ctimer[3];
-	
+
 	//address_space &asic;
 };
 

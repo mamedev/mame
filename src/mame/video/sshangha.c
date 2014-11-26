@@ -36,7 +36,10 @@ UINT32 sshangha_state::screen_update_sshangha(screen_device &screen, bitmap_rgb3
 	if (m_spriteram2 != NULL)
 		m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2, 0x800, true);
 
-	machine().tilemap().set_flip_all(flip_screen_x() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	// flip screen
+	address_space &space = machine().driver_data()->generic_space();
+	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
+	flip_screen_set(BIT(flip, 7));
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 

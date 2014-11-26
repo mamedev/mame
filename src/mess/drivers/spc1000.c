@@ -391,7 +391,7 @@ void spc1000_state::machine_reset()
 
 READ8_MEMBER(spc1000_state::mc6847_videoram_r)
 {
-	if (offset == ~0) 
+	if (offset == ~0)
 		return 0xff;
 
 	// m_GMODE layout: CSS|NA|PS2|PS1|~A/G|GM0|GM1|NA
@@ -416,7 +416,7 @@ READ8_MEMBER( spc1000_state::porta_r )
 	data |= (m_cass->input() > 0.0038) ? 0x80 : 0;
 	data |= ((m_cass->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY) ? 0x00 : 0x40;
 	data &= ~(m_io_joy->read() & 0x3f);
-	
+
 	return data;
 }
 

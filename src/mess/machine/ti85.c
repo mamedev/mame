@@ -155,20 +155,18 @@ void ti85_state::update_ti83p_memory ()
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	m_membank1->set_bank(m_booting ? 0x1f : 0); //Always flash page 0, well allmost
-	
+
 	if (m_ti83p_port4 & 1)
 	{
-		
 		m_membank2->set_bank(m_ti8x_memory_page_1 & 0xfe);
 
-		m_membank3->set_bank(m_ti8x_memory_page_1); 
+		m_membank3->set_bank(m_ti8x_memory_page_1);
 
 		m_membank4->set_bank(m_ti8x_memory_page_2);
-	
+
 	}
 	else
 	{
-
 		m_membank2->set_bank(m_ti8x_memory_page_1);
 
 		m_membank3->set_bank(m_ti8x_memory_page_2);
@@ -181,23 +179,21 @@ void ti85_state::update_ti83p_memory ()
 void ti85_state::update_ti83pse_memory ()
 {
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
-	
+
 	m_membank1->set_bank(m_booting ? (m_model==TI84P ? 0x3f : 0x7f) : 0);
-	
+
 	if (m_ti83p_port4 & 1)
- 	{
-		
+	{
 		m_membank2->set_bank(m_ti8x_memory_page_1 & 0xfe);
-		
+
 		m_membank3->set_bank(m_ti8x_memory_page_1 | 1);
 
 		m_membank4->set_bank(m_ti8x_memory_page_2);
 
-		
+
 	}
 	else
 	{
-
 		m_membank2->set_bank(m_ti8x_memory_page_1);
 
 		m_membank3->set_bank(m_ti8x_memory_page_2);
@@ -277,12 +273,12 @@ DIRECT_UPDATE_MEMBER(ti85_state::ti83p_direct_update_handler)
 {
 	if (m_booting)
 	{
-        if (((m_ti83p_port4 & 1) && (address >= 0x4000 && address < 0xc000)) || (address >= 0x4000 && address < 0x8000))
-        {
-            m_booting = false;
+		if (((m_ti83p_port4 & 1) && (address >= 0x4000 && address < 0xc000)) || (address >= 0x4000 && address < 0x8000))
+		{
+			m_booting = false;
 			update_ti83p_memory();
 		}
-    }
+	}
 	return address;
 }
 
@@ -294,19 +290,19 @@ MACHINE_RESET_MEMBER(ti85_state,ti83p)
 	m_PCR = 0xc0;
 
 
-    m_ti8x_memory_page_1 = 0;
+	m_ti8x_memory_page_1 = 0;
 	m_ti8x_memory_page_2 = 0;
 	m_ti8x_memory_page_3 = 0;
 	m_ti83p_port4 = 1;
 	m_booting = true;
 	if (m_model == TI83P)
-    {
-        update_ti83p_memory();
-    }
-    else
-    {
-        update_ti83pse_memory();
-    }
+	{
+		update_ti83p_memory();
+	}
+	else
+	{
+		update_ti83pse_memory();
+	}
 }
 
 MACHINE_START_MEMBER(ti85_state,ti83p)
@@ -336,7 +332,7 @@ MACHINE_START_MEMBER(ti85_state,ti83p)
 
 	m_booting = true;
 
-    ti85_state::update_ti83p_memory();
+	ti85_state::update_ti83p_memory();
 
 
 	machine().scheduler().timer_pulse(attotime::from_hz(256), timer_expired_delegate(FUNC(ti85_state::ti83_timer1_callback),this));
@@ -345,7 +341,7 @@ MACHINE_START_MEMBER(ti85_state,ti83p)
 
 	/* save states and debugging */
 	save_item(NAME(m_timer_interrupt_status));
-    save_item(NAME(m_timer_interrupt_mask));
+	save_item(NAME(m_timer_interrupt_mask));
 	save_item(NAME(m_ti8x_memory_page_1));
 	save_item(NAME(m_ti8x_memory_page_2));
 	save_item(NAME(m_ti8x_memory_page_3));
@@ -400,21 +396,21 @@ void ti85_state::ti8xpse_init_common()
 
 MACHINE_START_MEMBER(ti85_state,ti83pse)
 {
-    m_model = TI84PSE;
+	m_model = TI84PSE;
 
-    ti8xpse_init_common();
+	ti8xpse_init_common();
 }
 
 MACHINE_START_MEMBER(ti85_state,ti84pse)
 {
-    m_model = TI83PSE;
+	m_model = TI83PSE;
 
-    ti8xpse_init_common();
+	ti8xpse_init_common();
 }
 
 MACHINE_START_MEMBER(ti85_state,ti84p)
 {
-    m_model = TI84P;
+	m_model = TI84P;
 
 	ti8xpse_init_common();
 }
@@ -572,7 +568,7 @@ READ8_MEMBER(ti85_state::ti83_port_0003_r )
 		data |= 0x08;
 
 	data |= m_timer_interrupt_status;
-	
+
 	return data;
 }
 
@@ -606,7 +602,7 @@ READ8_MEMBER(ti85_state::ti83p_port_0004_r )
 	data |= m_timer_interrupt_status;
 
 	data |= m_ctimer_interrupt_status;
-	
+
 	return data;
 }
 
@@ -758,7 +754,7 @@ WRITE8_MEMBER(ti85_state::ti83p_int_mask_w)
 	//m_LCD_mask = (data&0x08) >> 2;
 	m_ON_interrupt_mask = data & 0x01;
 	m_ON_interrupt_status &= m_ON_interrupt_mask;
-	
+
 	m_timer_interrupt_mask = data & 0x06;
 
 	m_timer_interrupt_status &= m_timer_interrupt_mask;
@@ -796,7 +792,6 @@ WRITE8_MEMBER(ti85_state::ti83pse_port_0005_w)
 
 WRITE8_MEMBER(ti85_state::ti83pse_port_0006_w)
 {
-
 	if ((m_model == TI84P) && (data < 0x80))
 	{
 		m_ti8x_memory_page_1 = data & 0x3f;
@@ -873,7 +868,7 @@ void ti85_state::ti83pse_count( UINT8 timer, UINT8 data)
 
 	if (m_ctimer[timer].setup)
 	{
-		switch (m_ctimer[timer].setup & 0x07) 
+		switch (m_ctimer[timer].setup & 0x07)
 		{
 		case 0x00:
 			m_ctimer[timer].divsor = 3.0;
@@ -914,7 +909,7 @@ void ti85_state::ti83pse_count( UINT8 timer, UINT8 data)
 			m_crystal_timer3->adjust(attotime::zero, 0, attotime::from_hz( 32768.0/m_ctimer[timer].divsor));
 			m_crystal_timer3->enable(true);
 			break;
-			
+
 		}
 	}
 }

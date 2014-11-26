@@ -104,7 +104,6 @@ Some bugs left :
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
 #include "formats/tzx_cas.h"
-#include "formats/dsk_dsk.h"
 
 #include "machine/ram.h"
 
@@ -902,15 +901,11 @@ static MACHINE_CONFIG_START( amstrad_nofdc, amstrad_state )
 	MCFG_RAM_EXTRA_OPTIONS("64K,320K,576K")
 MACHINE_CONFIG_END
 
-FLOPPY_FORMATS_MEMBER( amstrad_state::floppy_formats )
-	FLOPPY_DSK_FORMAT
-FLOPPY_FORMATS_END
-
 static MACHINE_CONFIG_DERIVED( amstrad, amstrad_nofdc )
 	MCFG_UPD765A_ADD("upd765", true, true)
 
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", amstrad_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "3ssdd", amstrad_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","cpc_flop")
 MACHINE_CONFIG_END
@@ -987,8 +982,8 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 
 	MCFG_FRAGMENT_ADD(cpcplus_cartslot)
 
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", amstrad_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "3ssdd", amstrad_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
 
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, NULL, false)

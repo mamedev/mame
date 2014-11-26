@@ -491,6 +491,39 @@ ROM_START( saurop )
 	ROM_LOAD( "sp0256-al2.bin",   0x1000, 0x0800, CRC(b504ac15) SHA1(e60fcb5fa16ff3f3b69d36c7a6e955744d3feafc) )
 ROM_END
 
+ROM_START( saurorr ) // all roms have original Tecfri stickers
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27256-2.bin",     0x00000, 0x8000, CRC(b0d80eab) SHA1(60cbe16d6c87d4681155814a5034b7e9d10bbd81) )
+	ROM_LOAD( "27256-1.bin",     0x08000, 0x8000, CRC(cbb5f06e) SHA1(f93c01006d308e0b6950d720b6fe4409728c79e2) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "sauro-3.bin",     0x00000, 0x8000, CRC(0d501e1b) SHA1(20a56ff30d4fa5d2f483a449703b49153839f6bc) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "sauro-6.bin",     0x00000, 0x8000, CRC(4b77cb0f) SHA1(7b9cb2dca561d81390106c1a5c0533dcecaf6f1a) )
+	ROM_LOAD( "sauro-7.bin",     0x08000, 0x8000, CRC(187da060) SHA1(1df156e58379bb39acade02aabab6ff1cb7cc288) )
+
+	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_LOAD( "sauro-4.bin",     0x00000, 0x8000, CRC(9b617cda) SHA1(ce26b84ad5ecd6185ae218520e9972645bbf09ad) )
+	ROM_LOAD( "27256-5.bin",     0x08000, 0x8000, CRC(9aabdbe5) SHA1(ef008e368024f9377a8d2bc5863b01c63bc8f55b) ) // contains the changed license logo
+
+	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_LOAD( "sauro-8.bin",     0x00000, 0x8000, CRC(e08b5d5e) SHA1(eaaeaa08b19c034ab2a2140f887edffca5f441b9) )
+	ROM_LOAD( "sauro-9.bin",     0x08000, 0x8000, CRC(7c707195) SHA1(0529f6808b0cec3e12ca51bee189841d21577786) )
+	ROM_LOAD( "sauro-10.bin",    0x10000, 0x8000, CRC(c93380d1) SHA1(fc9655cc94c2d2058f83eb341be7e7856a08194f) )
+	ROM_LOAD( "sauro-11.bin",    0x18000, 0x8000, CRC(f47982a8) SHA1(cbaeac272c015d9439f151cfb3449082f11a57a1) )
+
+	ROM_REGION( 0x0c00, "proms", 0 )
+	ROM_LOAD( "82s137-3.bin",    0x0000, 0x0400, CRC(d52c4cd0) SHA1(27d6126b46616c06b55d8018c97f6c3d7805ae9e) )  /* Red component */
+	ROM_LOAD( "82s137-2.bin",    0x0400, 0x0400, CRC(c3e96d5d) SHA1(3f6f21526a4357e4a9a9d56a6f4ef5911af2d120) )  /* Green component */
+	ROM_LOAD( "82s137-1.bin",    0x0800, 0x0400, CRC(bdfcf00c) SHA1(9faf4d7f8959b64faa535c9945eec59c774a3760) )  /* Blue component */
+
+	ROM_REGION( 0x10000, "speech", 0 )
+	/* SP0256 mask rom */
+	ROM_LOAD( "sp0256-al2.bin",   0x1000, 0x0800, CRC(b504ac15) SHA1(e60fcb5fa16ff3f3b69d36c7a6e955744d3feafc) )
+ROM_END
+
+
 ROM_START( trckydoc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "trckydoc.d9",  0x0000,  0x8000, CRC(c6242fc3) SHA1(c8a6f6abe8b51061a113ed75fead0479df68ec40) )
@@ -550,7 +583,9 @@ DRIVER_INIT_MEMBER(sauro_state,tecfri)
 	RAM[0xe000] = 1;
 }
 
-GAME( 1987, sauro,    0,        sauro,    tecfri, sauro_state,    tecfri, ROT0, "Tecfri", "Sauro", 0 )
-GAME( 1987, saurop,   sauro,    sauro,    tecfri, sauro_state,    tecfri, ROT0, "Tecfri (Philko license)", "Sauro (Philko license)", 0 )
+GAME( 1987, sauro,    0,        sauro,    tecfri, sauro_state,    tecfri, ROT0, "Tecfri",                                "Sauro", 0 )
+GAME( 1987, saurop,   sauro,    sauro,    tecfri, sauro_state,    tecfri, ROT0, "Tecfri (Philko license)",               "Sauro (Philko license)", 0 )
+GAME( 1987, saurorr,  sauro,    sauro,    tecfri, sauro_state,    tecfri, ROT0, "Tecfri (Recreativos Real S.A. license)","Sauro (Recreativos Real S.A. license)", 0 )
+
 GAME( 1987, trckydoc, 0,        trckydoc, tecfri, sauro_state,    tecfri, ROT0, "Tecfri", "Tricky Doc (set 1)", 0 )
 GAME( 1987, trckydoca,trckydoc, trckydoc, trckydoca, sauro_state, tecfri, ROT0, "Tecfri", "Tricky Doc (set 2)", 0 )

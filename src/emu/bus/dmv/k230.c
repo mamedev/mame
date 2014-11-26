@@ -78,6 +78,17 @@ static MACHINE_CONFIG_FRAGMENT( dmv_k235 )
 MACHINE_CONFIG_END
 
 
+static INPUT_PORTS_START( dmv_k235 )
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x00, "K235 INT7" )  PORT_DIPLOCATION("S:1")
+	PORT_DIPSETTING( 0x00, "Slot 5" )
+	PORT_DIPSETTING( 0x01, "Slot 6" )
+	PORT_DIPNAME( 0x02, 0x00, "K235 INT5" )  PORT_DIPLOCATION("S:2")
+	PORT_DIPSETTING( 0x00, "Slot 2a" )
+	PORT_DIPSETTING( 0x02, "Slot 2" )
+INPUT_PORTS_END
+
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -135,7 +146,8 @@ dmv_k234_device::dmv_k234_device(const machine_config &mconfig, const char *tag,
 
 dmv_k235_device::dmv_k235_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: dmv_k230_device(mconfig, DMV_K235, "K235 8088 with interrupt controller", tag, owner, clock, "dmv_k235", __FILE__),
-		m_pic(*this, "pic8259")
+		m_pic(*this, "pic8259"),
+		m_dsw(*this, "DSW")
 {
 }
 
@@ -214,6 +226,15 @@ const rom_entry *dmv_k234_device::device_rom_region() const
 const rom_entry *dmv_k235_device::device_rom_region() const
 {
 	return ROM_NAME( dmv_k235 );
+}
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor dmv_k235_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( dmv_k235 );
 }
 
 bool dmv_k230_device::av16bit()

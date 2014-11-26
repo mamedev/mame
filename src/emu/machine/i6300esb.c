@@ -39,6 +39,16 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, i6300esb_lpc_device)
 	AM_RANGE(0x88, 0x8b) AM_READWRITE8 (d31_err_cfg_r,          d31_err_cfg_w,          0x000000ff)
 	AM_RANGE(0x88, 0x8b) AM_READWRITE8 (d31_err_sts_r,          d31_err_sts_w,          0x00ff0000)
 	AM_RANGE(0x90, 0x93) AM_READWRITE16(pci_dma_cfg_r,          pci_dma_cfg_w,          0x0000ffff)
+	AM_RANGE(0xa0, 0xa3) AM_READWRITE16(gen_pmcon_1_r,          gen_pmcon_1_w,          0x0000ffff)
+	AM_RANGE(0xa0, 0xa3) AM_READWRITE16(gen_pmcon_2_r,          gen_pmcon_2_w,          0xffff0000)
+	AM_RANGE(0xa4, 0xa7) AM_READWRITE8 (gen_pmcon_3_r,          gen_pmcon_3_w,          0x000000ff)
+	AM_RANGE(0xac, 0xaf) AM_READWRITE  (rst_cnt2_r,             rst_cnt2_w)
+	AM_RANGE(0xb0, 0xb3) AM_READWRITE8 (apm_cnt_r,              apm_cnt_w,              0x00ff0000)
+	AM_RANGE(0xb0, 0xb3) AM_READWRITE8 (apm_sts_r,              apm_sts_w,              0xff000000)
+	AM_RANGE(0xb8, 0xbb) AM_READWRITE  (gpi_rout_r,             gpi_rout_w)
+	AM_RANGE(0xc0, 0xc3) AM_READWRITE8 (mon_fwd_en_r,           mon_fwd_en_w,           0x000000ff)
+	AM_RANGE(0xc4, 0xcb) AM_READWRITE16(mon_trp_rng_r,          mon_trp_rng_w,          0xffffffff)
+	AM_RANGE(0xcc, 0xcf) AM_READWRITE16(mon_trp_msk_r,          mon_trp_msk_w,          0x0000ffff)
 	AM_RANGE(0xd0, 0xd3) AM_READWRITE  (gen_cntl_r,             gen_cntl_w)
 	AM_RANGE(0xd4, 0xd7) AM_READWRITE8 (gen_sta_r,              gen_sta_w,              0x000000ff)
 	AM_RANGE(0xd4, 0xd7) AM_READWRITE8 (back_cntl_r,            back_cntl_w,            0x0000ff00)
@@ -67,13 +77,17 @@ DEVICE_ADDRESS_MAP_START(internal_io_map, 32, i6300esb_lpc_device)
 		AM_RANGE(0x004c, 0x004f) AM_READWRITE8(siu_data_port_r,   siu_data_port_w,   0xff000000)
 	}
 
-	AM_RANGE(0x80, 0x83) AM_WRITE8(                  nop_w,       0x000000ff) // POST/non-existing, used for delays by the bios/os
-	AM_RANGE(0xec, 0xef) AM_WRITE8(                  nop_w,       0x0000ff00) // Non-existing, used for delays by the bios/os
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(    nmi_sc_r,          nmi_sc_w,          0x0000ff00)
+
+	AM_RANGE(0x0080, 0x0083) AM_WRITE8(                           nop_w,             0x000000ff) // POST/non-existing, used for delays by the bios/os
+	AM_RANGE(0x00ec, 0x00ef) AM_WRITE8(                           nop_w,             0x0000ff00) // Non-existing, used for delays by the bios/os
 ADDRESS_MAP_END
 
 
 i6300esb_lpc_device::i6300esb_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: pci_device(mconfig, I6300ESB_LPC, "i6300ESB southbridge ISA/LPC bridge", tag, owner, clock, "i6300esb_lpc", __FILE__)
+	: pci_device(mconfig, I6300ESB_LPC, "i6300ESB southbridge ISA/LPC bridge", tag, owner, clock, "i6300esb_lpc", __FILE__),
+		acpi(*this, "acpi"),
+		rtc (*this, "rtc")
 {
 }
 
@@ -91,11 +105,21 @@ void i6300esb_lpc_device::device_reset()
 	d31_err_cfg = 0x00;
 	d31_err_sts = 0x00;
 	pci_dma_cfg = 0x0000;
-	rtc_conf = 0x00;
 	func_dis = 0x0080;
 	etr1 = 0x00000000;
 	siu_config_port = 0;
 	siu_config_state = 0;
+	gen_pmcon_1 = 0;
+	gen_pmcon_2 = 0;
+	gen_pmcon_3 = 0;
+	rst_cnt2 = 0;
+	apm_cnt = 0;
+	apm_sts = 0;
+	gpi_rout = 0;
+	mon_fwd_en = 0;
+	memset(mon_trp_rng, 0, sizeof(mon_trp_rng));
+	mon_trp_msk = 0;
+	nmi_sc = 0;
 }
 
 void i6300esb_lpc_device::reset_all_mappings()
@@ -116,6 +140,7 @@ void i6300esb_lpc_device::reset_all_mappings()
 	lpc_en = 0x0000;
 	fwh_sel1 = 0x00112233;
 	gen_cntl = 0x00000080;
+	rtc_conf = 0x00;
 }
 
 READ32_MEMBER (i6300esb_lpc_device::pmbase_r)
@@ -256,6 +281,116 @@ WRITE16_MEMBER(i6300esb_lpc_device::pci_dma_cfg_w)
 	logerror("%s: pci_dma_cfg = %04x\n", tag(), pci_dma_cfg);
 }
 
+READ16_MEMBER (i6300esb_lpc_device::gen_pmcon_1_r)
+{
+	return gen_pmcon_1;
+}
+
+WRITE16_MEMBER(i6300esb_lpc_device::gen_pmcon_1_w)
+{
+	COMBINE_DATA(&gen_pmcon_1);
+	logerror("%s: gen_pmcon_1 = %04x\n", tag(), gen_pmcon_1);
+}
+
+READ16_MEMBER (i6300esb_lpc_device::gen_pmcon_2_r)
+{
+	return gen_pmcon_2;
+}
+
+WRITE16_MEMBER(i6300esb_lpc_device::gen_pmcon_2_w)
+{
+	COMBINE_DATA(&gen_pmcon_2);
+	logerror("%s: gen_pmcon_2 = %04x\n", tag(), gen_pmcon_2);
+}
+
+READ8_MEMBER  (i6300esb_lpc_device::gen_pmcon_3_r)
+{
+	return gen_pmcon_3;
+}
+
+WRITE8_MEMBER (i6300esb_lpc_device::gen_pmcon_3_w)
+{
+	gen_pmcon_3 = data;
+	logerror("%s: gen_pmcon_3 = %02x\n", tag(), gen_pmcon_3);
+}
+
+READ32_MEMBER (i6300esb_lpc_device::rst_cnt2_r)
+{
+	return rst_cnt2;
+}
+
+WRITE32_MEMBER(i6300esb_lpc_device::rst_cnt2_w)
+{
+	COMBINE_DATA(&rst_cnt2);
+	logerror("%s: rst_cnt2 = %08x\n", tag(), rst_cnt2);
+}
+
+READ8_MEMBER  (i6300esb_lpc_device::apm_cnt_r)
+{
+	return apm_cnt;
+}
+
+WRITE8_MEMBER (i6300esb_lpc_device::apm_cnt_w)
+{
+	apm_cnt = data;
+	logerror("%s: apm_cnt = %02x\n", tag(), apm_cnt);
+}
+
+READ8_MEMBER  (i6300esb_lpc_device::apm_sts_r)
+{
+	return apm_sts;
+}
+
+WRITE8_MEMBER (i6300esb_lpc_device::apm_sts_w)
+{
+	apm_sts = data;
+	logerror("%s: apm_sts = %02x\n", tag(), apm_sts);
+}
+
+READ32_MEMBER (i6300esb_lpc_device::gpi_rout_r)
+{
+	return gpi_rout;
+}
+
+WRITE32_MEMBER(i6300esb_lpc_device::gpi_rout_w)
+{
+	COMBINE_DATA(&gpi_rout);
+	logerror("%s: gpi_rout = %08x\n", tag(), gpi_rout);
+}
+
+READ8_MEMBER  (i6300esb_lpc_device::mon_fwd_en_r)
+{
+	return mon_fwd_en;
+}
+
+WRITE8_MEMBER (i6300esb_lpc_device::mon_fwd_en_w)
+{
+	mon_fwd_en = data;
+	logerror("%s: mon_fwd_en = %02x\n", tag(), mon_fwd_en);
+}
+
+READ16_MEMBER (i6300esb_lpc_device::mon_trp_rng_r)
+{
+	return mon_trp_rng[offset];
+}
+
+WRITE16_MEMBER(i6300esb_lpc_device::mon_trp_rng_w)
+{
+	COMBINE_DATA(&mon_trp_rng[offset]);
+	logerror("%s: mon_trp_rng[%d] = %04x\n", tag(), 4+offset, mon_trp_rng[offset]);
+}
+
+READ16_MEMBER (i6300esb_lpc_device::mon_trp_msk_r)
+{
+	return mon_trp_msk;
+}
+
+WRITE16_MEMBER(i6300esb_lpc_device::mon_trp_msk_w)
+{
+	COMBINE_DATA(&mon_trp_msk);
+	logerror("%s: mon_trp_msk = %04x\n", tag(), mon_trp_msk);
+}
+
 READ32_MEMBER (i6300esb_lpc_device::gen_cntl_r)
 {
 	return gen_cntl;
@@ -299,6 +434,7 @@ WRITE8_MEMBER (i6300esb_lpc_device::rtc_conf_w)
 {
 	rtc_conf = data;
 	logerror("%s: rtc_conf = %02x\n", tag(), rtc_conf);
+	remap_cb();
 }
 
 READ8_MEMBER  (i6300esb_lpc_device::lpc_if_com_range_r)
@@ -439,7 +575,8 @@ READ32_MEMBER (i6300esb_lpc_device::etr1_r)
 
 WRITE32_MEMBER(i6300esb_lpc_device::etr1_w)
 {
-	logerror("%s: etr1 = %08x\n", tag(), data);
+	COMBINE_DATA(&etr1);
+	logerror("%s: etr1 = %08x\n", tag(), etr1);
 }
 
 READ32_MEMBER (i6300esb_lpc_device::mfid_r)
@@ -503,6 +640,19 @@ WRITE8_MEMBER (i6300esb_lpc_device::siu_data_port_w)
 	logerror("%s: siu config write port %02x, %02x\n", tag(), siu_config_port, data);
 }
 
+READ8_MEMBER  (i6300esb_lpc_device::nmi_sc_r)
+{
+	nmi_sc ^= 0x10;
+	return nmi_sc;
+}
+
+WRITE8_MEMBER (i6300esb_lpc_device::nmi_sc_w)
+{
+	nmi_sc = data;
+	logerror("%s: nmi_sc = %02x\n", tag(), nmi_sc);
+}
+
+
 WRITE8_MEMBER (i6300esb_lpc_device::nop_w)
 {
 }
@@ -511,7 +661,7 @@ void i6300esb_lpc_device::map_bios(address_space *memory_space, UINT32 start, UI
 {
 	// Ignore idsel, a16 inversion for now
 	UINT32 mask = m_region->bytes() - 1;
-	memory_space->install_rom(start, end, m_region->base() + (start & mask));	
+	memory_space->install_rom(start, end, m_region->base() + (start & mask));
 }
 
 void i6300esb_lpc_device::map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
@@ -554,7 +704,7 @@ void i6300esb_lpc_device::map_extra(UINT64 memory_window_start, UINT64 memory_wi
 	io_space->install_device(0, 0xffff, *this, &i6300esb_lpc_device::internal_io_map);
 
 	if(acpi_cntl & 0x10)
-		logerror("%s: Warning: acpi range enabled at %04x-%04x\n", tag(), pmbase, pmbase+127);
+		acpi->map_device(memory_window_start, memory_window_end, 0, memory_space, io_window_start, io_window_end, pmbase, io_space);
 	if(gpio_cntl & 0x10)
 		logerror("%s: Warning: gpio range enabled at %04x-%04x\n", tag(), gpio_base, gpio_base+63);
 
@@ -595,6 +745,8 @@ void i6300esb_lpc_device::map_extra(UINT64 memory_window_start, UINT64 memory_wi
 		UINT16 coma = com_pos[lpc_if_com_range & 7];
 		logerror("%s: Warning: coma at %04x-%04x\n", tag(), coma, coma+7);
 	}
+
+	rtc->map_device(memory_window_start, memory_window_end, 0, memory_space, io_window_start, io_window_end, 0, io_space);
+	if(rtc_conf & 4)
+		rtc->map_extdevice(memory_window_start, memory_window_end, 0, memory_space, io_window_start, io_window_end, 0, io_space);
 }
-
-

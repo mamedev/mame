@@ -16,6 +16,7 @@
 #include "formats/mfi_dsk.h"
 #include "formats/td0_dsk.h"
 #include "formats/cqm_dsk.h"
+#include "formats/dsk_dsk.h"
 #include "ui/imgcntrl.h"
 
 #define MCFG_FLOPPY_DRIVE_ADD(_tag, _slot_intf, _def_slot, _formats)  \
@@ -38,6 +39,7 @@
 		FLOPPY_MFM_FORMAT, \
 		FLOPPY_TD0_FORMAT, \
 		FLOPPY_CQM_FORMAT, \
+		FLOPPY_DSK_FORMAT, \
 		NULL };
 
 

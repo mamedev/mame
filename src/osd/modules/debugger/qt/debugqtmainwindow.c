@@ -27,8 +27,8 @@ MainWindow::MainWindow(running_machine* machine, QWidget* parent) :
 
 	// The log view
 	m_consoleView = new DebuggerView(DVT_CONSOLE,
-									 m_machine,
-									 mainWindowFrame);
+										m_machine,
+										mainWindowFrame);
 	m_consoleView->setFocusPolicy(Qt::NoFocus);
 	m_consoleView->setPreferBottom(true);
 
@@ -211,8 +211,8 @@ void MainWindow::toggleBreakpointAtCursor(bool changedTo)
 			// Find an existing breakpoint at this address
 			INT32 bpindex = -1;
 			for (device_debug::breakpoint* bp = cpuinfo->breakpoint_first();
-				 bp != NULL;
-				 bp = bp->next())
+					bp != NULL;
+					bp = bp->next())
 			{
 				if (address == bp->address())
 				{
@@ -287,8 +287,8 @@ void MainWindow::executeCommand(bool withClear)
 
 	// Send along the command
 	debug_console_execute_command(*m_machine,
-								  command.toLocal8Bit().data(),
-								  true);
+									command.toLocal8Bit().data(),
+									true);
 
 	// Add history & set the index to be the top of the stack
 	addToHistory(command);

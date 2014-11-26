@@ -39,7 +39,7 @@
 
 #define MCFG_FUJITSU_29F160T_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, FUJITSU_29F160T, 0)
-	
+
 #define MCFG_FUJITSU_29F016A_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, FUJITSU_29F016A, 0)
 
@@ -161,7 +161,7 @@ protected:
 	UINT8                   m_maker_id;
 	bool                    m_sector_is_4k;
 	bool                    m_sector_is_16k;
-	bool					m_top_boot_sector;
+	bool                    m_top_boot_sector;
 	UINT8                   m_page_size;
 
 	// internal state

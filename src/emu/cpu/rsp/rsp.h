@@ -16,16 +16,8 @@
 #ifndef __RSP_H__
 #define __RSP_H__
 
-
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
-
-#define USE_SIMD        (0)
-#define SIMUL_SIMD      (0)
-
-#if USE_SIMD
-#include <tmmintrin.h>
-#endif
 
 /***************************************************************************
     REGISTER ENUMERATION
@@ -87,10 +79,6 @@ enum
 #define RDREG           ((op >> 11) & 31)
 #define SHIFT           ((op >> 6) & 31)
 
-#define RSVAL           (m_rsp_state->r[RSREG])
-#define RTVAL           (m_rsp_state->r[RTREG])
-#define RDVAL           (m_rsp_state->r[RDREG])
-
 #define FRREG           ((op >> 21) & 31)
 #define FTREG           ((op >> 16) & 31)
 #define FSREG           ((op >> 11) & 31)
@@ -123,21 +111,6 @@ enum
 
 #define RSPDRC_STRICT_VERIFY    0x0001          /* verify all instructions */
 
-union VECTOR_REG
-{
-	UINT64 d[2];
-	UINT32 l[4];
-	INT16 s[8];
-	UINT8 b[16];
-};
-
-union ACCUMULATOR_REG
-{
-	UINT64 q;
-	UINT32 l[2];
-	UINT16 w[4];
-};
-
 #define MCFG_RSP_DP_REG_R_CB(_devcb) \
 	devcb = &rsp_device::static_set_dp_reg_r_callback(*device, DEVCB_##_devcb);
 
@@ -155,10 +128,14 @@ union ACCUMULATOR_REG
 
 
 class rsp_frontend;
+class rsp_cop2;
 
 class rsp_device : public cpu_device
 {
 	friend class rsp_frontend;
+	friend class rsp_cop2;
+	friend class rsp_cop2_drc;
+	friend class rsp_cop2_simd;
 
 public:
 	// construction/destruction
@@ -173,8 +150,8 @@ public:
 
 	void rspdrc_flush_drc_cache();
 	void rspdrc_set_options(UINT32 options);
-	void rspdrc_add_dmem(UINT32 *base);
-	void rspdrc_add_imem(UINT32 *base);
+	void rsp_add_dmem(UINT32 *base);
+	void rsp_add_imem(UINT32 *base);
 
 	void ccfunc_read8();
 	void ccfunc_read16();
@@ -187,149 +164,6 @@ public:
 	void ccfunc_unimplemented_opcode();
 	void ccfunc_sp_set_status_cb();
 	void ccfunc_unimplemented();
-#if USE_SIMD
-	void ccfunc_rsp_lbv_simd();
-	void ccfunc_rsp_lsv_simd();
-	void ccfunc_rsp_llv_simd();
-	void ccfunc_rsp_ldv_simd();
-	void ccfunc_rsp_lqv_simd();
-	void ccfunc_rsp_lrv_simd();
-	void ccfunc_rsp_lpv_simd();
-	void ccfunc_rsp_luv_simd();
-	void ccfunc_rsp_lhv_simd();
-	void ccfunc_rsp_lfv_simd();
-	void ccfunc_rsp_lwv_simd();
-	void ccfunc_rsp_ltv_simd();
-	void ccfunc_rsp_sbv_simd();
-	void ccfunc_rsp_ssv_simd();
-	void ccfunc_rsp_slv_simd();
-	void ccfunc_rsp_sdv_simd();
-	void ccfunc_rsp_sqv_simd();
-	void ccfunc_rsp_srv_simd();
-	void ccfunc_rsp_spv_simd();
-	void ccfunc_rsp_suv_simd();
-	void ccfunc_rsp_shv_simd();
-	void ccfunc_rsp_sfv_simd();
-	void ccfunc_rsp_swv_simd();
-	void ccfunc_rsp_stv_simd();
-	void ccfunc_rsp_vmulf_simd();
-	void ccfunc_rsp_vmulu_simd();
-	void ccfunc_rsp_vmudl_simd();
-	void ccfunc_rsp_vmudm_simd();
-	void ccfunc_rsp_vmudn_simd();
-	void ccfunc_rsp_vmudh_simd();
-	void ccfunc_rsp_vmacf_simd();
-	void ccfunc_rsp_vmacu_simd();
-	void ccfunc_rsp_vmadl_simd();
-	void ccfunc_rsp_vmadm_simd();
-	void ccfunc_rsp_vmadn_simd();
-	void ccfunc_rsp_vmadh_simd();
-	void ccfunc_rsp_vadd_simd();
-	void ccfunc_rsp_vsub_simd();
-	void ccfunc_rsp_vabs_simd();
-	void ccfunc_rsp_vaddc_simd();
-	void ccfunc_rsp_vsubc_simd();
-	void ccfunc_rsp_vsaw_simd();
-	void ccfunc_rsp_vlt_simd();
-	void ccfunc_rsp_veq_simd();
-	void ccfunc_rsp_vne_simd();
-	void ccfunc_rsp_vge_simd();
-	void ccfunc_rsp_vcl_simd();
-	void ccfunc_rsp_vch_simd();
-	void ccfunc_rsp_vcr_simd();
-	void ccfunc_rsp_vmrg_simd();
-	void ccfunc_rsp_vand_simd();
-	void ccfunc_rsp_vnand_simd();
-	void ccfunc_rsp_vor_simd();
-	void ccfunc_rsp_vnor_simd();
-	void ccfunc_rsp_vxor_simd();
-	void ccfunc_rsp_vnxor_simd();
-	void ccfunc_rsp_vrcp_simd();
-	void ccfunc_rsp_vrcpl_simd();
-	void ccfunc_rsp_vrcph_simd();
-	void ccfunc_rsp_vmov_simd();
-	void ccfunc_rsp_vrsql_simd();
-	void ccfunc_rsp_vrsqh_simd();
-	void ccfunc_mfc2_simd();
-	void ccfunc_cfc2_simd();
-	void ccfunc_mtc2_simd();
-	void ccfunc_ctc2_simd();
-#endif
-#if (!USE_SIMD || SIMUL_SIMD)
-	void ccfunc_rsp_lbv_scalar();
-	void ccfunc_rsp_lsv_scalar();
-	void ccfunc_rsp_llv_scalar();
-	void ccfunc_rsp_ldv_scalar();
-	void ccfunc_rsp_lqv_scalar();
-	void ccfunc_rsp_lrv_scalar();
-	void ccfunc_rsp_lpv_scalar();
-	void ccfunc_rsp_luv_scalar();
-	void ccfunc_rsp_lhv_scalar();
-	void ccfunc_rsp_lfv_scalar();
-	void ccfunc_rsp_lwv_scalar();
-	void ccfunc_rsp_ltv_scalar();
-	void ccfunc_rsp_sbv_scalar();
-	void ccfunc_rsp_ssv_scalar();
-	void ccfunc_rsp_slv_scalar();
-	void ccfunc_rsp_sdv_scalar();
-	void ccfunc_rsp_sqv_scalar();
-	void ccfunc_rsp_srv_scalar();
-	void ccfunc_rsp_spv_scalar();
-	void ccfunc_rsp_suv_scalar();
-	void ccfunc_rsp_shv_scalar();
-	void ccfunc_rsp_sfv_scalar();
-	void ccfunc_rsp_swv_scalar();
-	void ccfunc_rsp_stv_scalar();
-	void ccfunc_rsp_vmulf_scalar();
-	void ccfunc_rsp_vmulu_scalar();
-	void ccfunc_rsp_vmudl_scalar();
-	void ccfunc_rsp_vmudm_scalar();
-	void ccfunc_rsp_vmudn_scalar();
-	void ccfunc_rsp_vmudh_scalar();
-	void ccfunc_rsp_vmacf_scalar();
-	void ccfunc_rsp_vmacu_scalar();
-	void ccfunc_rsp_vmadl_scalar();
-	void ccfunc_rsp_vmadm_scalar();
-	void ccfunc_rsp_vmadn_scalar();
-	void ccfunc_rsp_vmadh_scalar();
-	void ccfunc_rsp_vadd_scalar();
-	void ccfunc_rsp_vsub_scalar();
-	void ccfunc_rsp_vabs_scalar();
-	void ccfunc_rsp_vaddc_scalar();
-	void ccfunc_rsp_vsubc_scalar();
-	void ccfunc_rsp_vaddb_scalar();
-	void ccfunc_rsp_vsaw_scalar();
-	void ccfunc_rsp_vlt_scalar();
-	void ccfunc_rsp_veq_scalar();
-	void ccfunc_rsp_vne_scalar();
-	void ccfunc_rsp_vge_scalar();
-	void ccfunc_rsp_vcl_scalar();
-	void ccfunc_rsp_vch_scalar();
-	void ccfunc_rsp_vcr_scalar();
-	void ccfunc_rsp_vmrg_scalar();
-	void ccfunc_rsp_vand_scalar();
-	void ccfunc_rsp_vnand_scalar();
-	void ccfunc_rsp_vor_scalar();
-	void ccfunc_rsp_vnor_scalar();
-	void ccfunc_rsp_vxor_scalar();
-	void ccfunc_rsp_vnxor_scalar();
-	void ccfunc_rsp_vrcp_scalar();
-	void ccfunc_rsp_vrcpl_scalar();
-	void ccfunc_rsp_vrcph_scalar();
-	void ccfunc_rsp_vmov_scalar();
-	void ccfunc_rsp_vrsql_scalar();
-	void ccfunc_rsp_vrsqh_scalar();
-	void ccfunc_mfc2_scalar();
-	void ccfunc_cfc2_scalar();
-	void ccfunc_mtc2_scalar();
-	void ccfunc_ctc2_scalar();
-#endif
-	void ccfunc_rsp_vrsq_scalar();
-#if USE_SIMD && SIMUL_SIMD
-	void ccfunc_backup_regs();
-	void ccfunc_restore_regs();
-	void ccfunc_verify_regs();
-#endif
 
 protected:
 	// device-level overrides
@@ -358,6 +192,17 @@ protected:
 	virtual UINT32 disasm_max_opcode_bytes() const { return 4; }
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
+	void unimplemented_opcode(UINT32 op);
+
+	/* internal compiler state */
+	struct compiler_state
+	{
+		UINT32              cycles;                   /* accumulated cycles */
+		UINT8               checkints;                /* need to check interrupts before next instruction */
+		UINT8               checksoftints;            /* need to check software interrupts before next instruction */
+		uml::code_label     labelnum;                 /* index for local labels */
+	};
+
 private:
 	address_space_config m_program_config;
 
@@ -369,17 +214,6 @@ private:
 		UINT8               readonly;                   /* TRUE if read-only */
 		void *              base;                       /* base in memory where the RAM lives */
 	};
-
-
-	/* internal compiler state */
-	struct compiler_state
-	{
-		UINT32              cycles;                   /* accumulated cycles */
-		UINT8               checkints;                /* need to check interrupts before next instruction */
-		UINT8               checksoftints;            /* need to check software interrupts before next instruction */
-		uml::code_label     labelnum;                 /* index for local labels */
-	};
-
 
 	/* core state */
 	drc_cache           m_cache;                      /* pointer to the DRC code cache */
@@ -395,7 +229,6 @@ private:
 	const char *        m_format;                     /* format string for print_debug */
 	UINT32              m_arg2;                       /* print_debug argument 3 */
 	UINT32              m_arg3;                       /* print_debug argument 4 */
-	UINT32              m_vres[8];                    /* used for temporary vector results */
 
 	/* register mappings */
 	uml::parameter   m_regmap[34];                 /* parameter to register mappings for all 32 integer registers */
@@ -425,48 +258,8 @@ private:
 
 	FILE *m_exec_output;
 
-	VECTOR_REG m_v[32];
-	UINT16 m_vflag[6][8];
-
-#if SIMUL_SIMD
-	UINT32 m_old_r[35];
-	UINT8 m_old_dmem[4096];
-
-	UINT32 m_scalar_r[35];
-	UINT8 m_scalar_dmem[4096];
-
-	INT32 m_old_reciprocal_res;
-	UINT32 m_old_reciprocal_high;
-	INT32 m_old_dp_allowed;
-
-	INT32 m_scalar_reciprocal_res;
-	UINT32 m_scalar_reciprocal_high;
-	INT32 m_scalar_dp_allowed;
-
-	INT32 m_simd_reciprocal_res;
-	UINT32 m_simd_reciprocal_high;
-	INT32 m_simd_dp_allowed;
-#endif
-
-#if USE_SIMD
-	// Mirror of v[] for now, to be used in parallel as
-	// more vector ops are transitioned over
-	__m128i m_xv[32];
-	__m128i m_xvflag[6];
-#endif
 	UINT32 m_sr;
 	UINT32 m_step_count;
-
-	ACCUMULATOR_REG m_accum[8];
-#if USE_SIMD
-	__m128i m_accum_h;
-	__m128i m_accum_m;
-	__m128i m_accum_l;
-	__m128i m_accum_ll;
-#endif
-	INT32 m_reciprocal_res;
-	UINT32 m_reciprocal_high;
-	INT32 m_dp_allowed;
 
 	UINT32 m_ppc;
 	UINT32 m_nextpc;
@@ -476,6 +269,8 @@ protected:
 	direct_read_data *m_direct;
 
 private:
+	rsp_cop2    *m_cop2;
+
 	UINT32 *m_dmem32;
 	UINT16 *m_dmem16;
 	UINT8 *m_dmem8;
@@ -501,24 +296,6 @@ private:
 	void WRITE32(UINT32 address, UINT32 data);
 	UINT32 get_cop0_reg(int reg);
 	void set_cop0_reg(int reg, UINT32 data);
-	void unimplemented_opcode(UINT32 op);
-	void handle_lwc2(UINT32 op);
-	void handle_swc2(UINT32 op);
-	UINT16 SATURATE_ACCUM(int accum, int slice, UINT16 negative, UINT16 positive);
-	UINT16 SATURATE_ACCUM1(int accum, UINT16 negative, UINT16 positive);
-	void handle_vector_ops(UINT32 op);
-#if USE_SIMD
-	UINT16 VEC_ACCUM_H(int x);
-	UINT16 VEC_ACCUM_M(int x);
-	UINT16 VEC_ACCUM_L(int x);
-	UINT16 VEC_ACCUM_LL(int x);
-	UINT16 VEC_CARRY_FLAG(const int x);
-	UINT16 VEC_COMPARE_FLAG(const int x);
-	UINT16 VEC_CLIP1_FLAG(const int x);
-	UINT16 VEC_ZERO_FLAG(const int x);
-	UINT16 VEC_CLIP2_FLAG(const int x);
-	UINT16 VEC_SATURATE_ACCUM(int accum, int slice, UINT16 negative, UINT16 positive);
-#endif
 	void load_fast_iregs(drcuml_block *block);
 	void save_fast_iregs(drcuml_block *block);
 	UINT8 DM_READ8(UINT32 address);
@@ -528,8 +305,6 @@ private:
 	void DM_WRITE16(UINT32 address, UINT16 data);
 	void DM_WRITE32(UINT32 address, UINT32 data);
 	void rspcom_init();
-	int generate_lwc2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	int generate_swc2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void execute_run_drc();
 	void code_flush_cache();
 	void code_compile_block(offs_t pc);

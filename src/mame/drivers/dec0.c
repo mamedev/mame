@@ -44,8 +44,8 @@ ToDo:
 - Fighting Fantasy (bootleg) doesn't boot at all;
 - Hook up the 68705 in Midnight Resistance (bootleg) (it might not be used, leftover from the Fighting Fantasy bootleg on the same PCB?)
 - Get rid of ROM patches in Sly Spy and Hippodrome;
-- Accurate pixel clock parameters;
 - background pen in Birdie Try is presumably wrong.
+- Pixel clock frequency isn't verified;
 - Finally, get a proper decap of the MCUs used by Bad Dudes and Birdie Try;
 
 
@@ -1256,12 +1256,13 @@ WRITE_LINE_MEMBER(dec0_state::sound_irq2)
 /******************************************************************************/
 
 
-/* TODO: These are raw guesses, only to get ~57,41 Hz */
+/* This is guesswork, in order to get ~57,41 Hz.
+ * If real Pixel Clock isn't 5 MHz then htotal/vtotal is different too ... */
 #define DEC0_PIXEL_CLOCK XTAL_20MHz/4
-#define DEC0_HTOTAL 256+74
+#define DEC0_HTOTAL 320
 #define DEC0_HBEND 0
 #define DEC0_HBSTART 256
-#define DEC0_VTOTAL 264
+#define DEC0_VTOTAL 272
 #define DEC0_VBEND 8
 #define DEC0_VBSTART 256-8
 

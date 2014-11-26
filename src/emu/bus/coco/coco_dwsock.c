@@ -24,8 +24,8 @@ const device_type COCO_DWSOCK = &device_creator<beckerport_device>;
 
 INPUT_PORTS_START( coco_drivewire )
 	PORT_START(DRIVEWIRE_PORT_TAG)
-	PORT_CONFNAME( 0xffff, 65504, "Drivewire Server TCP Port")            
-      PORT_CHANGED_MEMBER(DEVICE_SELF, beckerport_device, drivewire_port_changed, NULL )
+	PORT_CONFNAME( 0xffff, 65504, "Drivewire Server TCP Port")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, beckerport_device, drivewire_port_changed, NULL )
 	PORT_CONFSETTING(      65500, "65500" )
 	PORT_CONFSETTING(      65501, "65501" )
 	PORT_CONFSETTING(      65502, "65502" )
@@ -52,7 +52,7 @@ ioport_constructor beckerport_device::device_input_ports() const
 //-------------------------------------------------
 INPUT_CHANGED_MEMBER(beckerport_device::drivewire_port_changed)
 {
-    this->update_port();
+	this->update_port();
 }
 
 //**************************************************************************
@@ -64,18 +64,18 @@ INPUT_CHANGED_MEMBER(beckerport_device::drivewire_port_changed)
 //-------------------------------------------------
 
 beckerport_device::beckerport_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
- : device_t(mconfig, COCO_DWSOCK, "Virtual Becker Port", tag, owner, clock, "coco_dwsock", __FILE__),
-   m_dwconfigport(*this, DRIVEWIRE_PORT_TAG)
+	: device_t(mconfig, COCO_DWSOCK, "Virtual Becker Port", tag, owner, clock, "coco_dwsock", __FILE__),
+	m_dwconfigport(*this, DRIVEWIRE_PORT_TAG)
 {
-    m_pSocket = NULL;
-    m_head = 0;
-    m_rx_pending = 0;
+	m_pSocket = NULL;
+	m_head = 0;
+	m_rx_pending = 0;
 }
 
 beckerport_device::~beckerport_device()
 {
-    if (m_pSocket != NULL)
-        device_stop();
+	if (m_pSocket != NULL)
+		device_stop();
 }
 
 /*-------------------------------------------------
@@ -84,22 +84,22 @@ beckerport_device::~beckerport_device()
 
 void beckerport_device::device_start(void)
 {
-    char chAddress[64];
+	char chAddress[64];
 
-    /* format address string for opening the port */
-    snprintf(chAddress, sizeof(chAddress), "socket.%s:%d", m_hostname, m_dwtcpport);
+	/* format address string for opening the port */
+	snprintf(chAddress, sizeof(chAddress), "socket.%s:%d", m_hostname, m_dwtcpport);
 
-    fprintf(stderr, "Connecting to Drivewire server on %s:%d... ", m_hostname, m_dwtcpport);
+	fprintf(stderr, "Connecting to Drivewire server on %s:%d... ", m_hostname, m_dwtcpport);
 
-    UINT64 filesize; // unused
-    file_error filerr = osd_open(chAddress, 0, &m_pSocket, &filesize);
-    if (filerr != FILERR_NONE)
-    {
-        fprintf(stderr, "Error: osd_open returned error %i!\n", (int) filerr);
-        return;
-    }
+	UINT64 filesize; // unused
+	file_error filerr = osd_open(chAddress, 0, &m_pSocket, &filesize);
+	if (filerr != FILERR_NONE)
+	{
+		fprintf(stderr, "Error: osd_open returned error %i!\n", (int) filerr);
+		return;
+	}
 
-    fprintf(stderr, "Connected!\n");
+	fprintf(stderr, "Connected!\n");
 }
 
 /*-------------------------------------------------
@@ -108,12 +108,12 @@ void beckerport_device::device_start(void)
 
 void beckerport_device::device_stop(void)
 {
-    if (m_pSocket != NULL)
-    {
-        printf("Closing connection to Drivewire server\n");
-        osd_close(m_pSocket);
-        m_pSocket = NULL;
-    }
+	if (m_pSocket != NULL)
+	{
+		printf("Closing connection to Drivewire server\n");
+		osd_close(m_pSocket);
+		m_pSocket = NULL;
+	}
 }
 
 /*-------------------------------------------------
@@ -132,40 +132,40 @@ void beckerport_device::device_config_complete(void)
 
 READ8_MEMBER(beckerport_device::read)
 {
-    unsigned char data = 0x5a;
+	unsigned char data = 0x5a;
 
-    if (m_pSocket == NULL)
-        return data;
+	if (m_pSocket == NULL)
+		return data;
 
-    switch (offset)
-    {
-        case DWS_STATUS:
-            if (!m_rx_pending)
-            {
-                /* Try to read from dws */
-                file_error filerr = osd_read(m_pSocket, m_buf, 0, sizeof(m_buf), &m_rx_pending);
-                if (filerr != FILERR_NONE && filerr != FILERR_FAILURE)  // FILERR_FAILURE means no data available, so don't throw error message
-                    fprintf(stderr, "coco_dwsock.c: beckerport_device::read() socket read operation failed with file_error %i\n", filerr);
-                else
-                    m_head = 0;
-            }
-            //printf("beckerport_device: status read. %i bytes remaining.\n", m_rx_pending);
-            data = (m_rx_pending > 0) ? 2 : 0;
-            break;
-        case DWS_DATA:
-            if (!m_rx_pending) {
-                fprintf(stderr, "coco_dwsock.c: beckerport_device::read() buffer underrun\n");
-                break;
-            }
-            data = m_buf[m_head++];
-            m_rx_pending--;
-            //printf("beckerport_device: data read 1 byte (0x%02x).  %i bytes remaining.\n", data&0xff, m_rx_pending);
-            break;
-        default:
-            fprintf(stderr, "%s: read from bad offset %d\n", __FILE__, offset);
-    }
+	switch (offset)
+	{
+		case DWS_STATUS:
+			if (!m_rx_pending)
+			{
+				/* Try to read from dws */
+				file_error filerr = osd_read(m_pSocket, m_buf, 0, sizeof(m_buf), &m_rx_pending);
+				if (filerr != FILERR_NONE && filerr != FILERR_FAILURE)  // FILERR_FAILURE means no data available, so don't throw error message
+					fprintf(stderr, "coco_dwsock.c: beckerport_device::read() socket read operation failed with file_error %i\n", filerr);
+				else
+					m_head = 0;
+			}
+			//printf("beckerport_device: status read. %i bytes remaining.\n", m_rx_pending);
+			data = (m_rx_pending > 0) ? 2 : 0;
+			break;
+		case DWS_DATA:
+			if (!m_rx_pending) {
+				fprintf(stderr, "coco_dwsock.c: beckerport_device::read() buffer underrun\n");
+				break;
+			}
+			data = m_buf[m_head++];
+			m_rx_pending--;
+			//printf("beckerport_device: data read 1 byte (0x%02x).  %i bytes remaining.\n", data&0xff, m_rx_pending);
+			break;
+		default:
+			fprintf(stderr, "%s: read from bad offset %d\n", __FILE__, offset);
+	}
 
-    return (int)data;
+	return (int)data;
 }
 
 /*-------------------------------------------------
@@ -174,26 +174,26 @@ READ8_MEMBER(beckerport_device::read)
 
 WRITE8_MEMBER(beckerport_device::write)
 {
-    char d = (char)data;
-    file_error filerr;
+	char d = (char)data;
+	file_error filerr;
 
-    if (m_pSocket == NULL)
-        return;
+	if (m_pSocket == NULL)
+		return;
 
-    switch (offset)
-    {
-        case DWS_STATUS:
-            //printf("beckerport_write: error: write (0x%02x) to status register\n", d);
-            break;
-        case DWS_DATA:
-            filerr = osd_write(m_pSocket, &d, 0, 1, NULL);
-            if (filerr != FILERR_NONE)
-                fprintf(stderr, "coco_dwsock.c: beckerport_device::write() socket write operation failed with file_error %i\n", filerr);
-            //printf("beckerport_write: data write one byte (0x%02x)\n", d & 0xff);
-            break;
-        default:
-            fprintf(stderr, "%s: write to bad offset %d\n", __FILE__, offset);
-    }
+	switch (offset)
+	{
+		case DWS_STATUS:
+			//printf("beckerport_write: error: write (0x%02x) to status register\n", d);
+			break;
+		case DWS_DATA:
+			filerr = osd_write(m_pSocket, &d, 0, 1, NULL);
+			if (filerr != FILERR_NONE)
+				fprintf(stderr, "coco_dwsock.c: beckerport_device::write() socket write operation failed with file_error %i\n", filerr);
+			//printf("beckerport_write: data write one byte (0x%02x)\n", d & 0xff);
+			break;
+		default:
+			fprintf(stderr, "%s: write to bad offset %d\n", __FILE__, offset);
+	}
 }
 
 /*-------------------------------------------------
@@ -202,8 +202,7 @@ WRITE8_MEMBER(beckerport_device::write)
 
 void beckerport_device::update_port(void)
 {
-    device_stop();
-    m_dwtcpport = m_dwconfigport->read_safe(65504);
-    device_start();
+	device_stop();
+	m_dwtcpport = m_dwconfigport->read_safe(65504);
+	device_start();
 }
-

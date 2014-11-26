@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<!-- 
-	If you want to use these cassettes, you must remove the hbf floppy interface from the slot devices.
-	After doing so, mount the cassette and load with the "LOAD" command. In most cases the program will
-	auto-start.
+<!--
+    If you want to use these cassettes, you must remove the hbf floppy interface from the slot devices.
+    After doing so, mount the cassette and load with the "LOAD" command. In most cases the program will
+    auto-start.
 
-	NOTE: The multipart sets in TOSEC are from floppy-based games and cannot be loaded via cassette.
-	So, they are not listed here.
+    NOTE: The multipart sets in TOSEC are from floppy-based games and cannot be loaded via cassette.
+    So, they are not listed here.
 -->
 <softwarelist name="tvc_cass" description="Videoton TVC cassettes">
 	<software name="advgame">
@@ -1388,7 +1388,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="labirnt1">
 		<description>Labirintus (Zoltán Gugi)</description>
 		<year>198?</year>
