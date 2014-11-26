@@ -23,9 +23,9 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
 			m_spriteram(*this, "spriteram") ,
-			m_tx_videoram(*this, "txvideoram"),
-			m_bg_videoram(*this, "bgvideoram"),
-			m_fg_videoram(*this, "fgvideoram"),
+			m_text_videoram(*this, "textvideoram"),
+			m_fore_videoram(*this, "forevideoram"),
+			m_back_videoram(*this, "backvideoram"),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_palette(*this, "palette")
 	{ }
@@ -36,28 +36,28 @@ public:
 
 	// shared pointers
 	required_device<buffered_spriteram16_device> m_spriteram;
-	required_shared_ptr<UINT16> m_tx_videoram;
-	required_shared_ptr<UINT16> m_bg_videoram;
-	required_shared_ptr<UINT16> m_fg_videoram;
+	required_shared_ptr<UINT16> m_text_videoram;
+	required_shared_ptr<UINT16> m_fore_videoram;
+	required_shared_ptr<UINT16> m_back_videoram;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	tilemap_t     *m_tx_tilemap;
-	tilemap_t     *m_bg_tilemap;
-	tilemap_t     *m_fg_tilemap;
+	tilemap_t     *m_text_tilemap;
+	tilemap_t     *m_fore_tilemap;
+	tilemap_t     *m_back_tilemap;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE16_MEMBER(tx_videoram_w);
-	DECLARE_WRITE16_MEMBER(bg_videoram_w);
-	DECLARE_WRITE16_MEMBER(fg_videoram_w);
+	DECLARE_WRITE16_MEMBER(text_videoram_w);
+	DECLARE_WRITE16_MEMBER(fore_videoram_w);
+	DECLARE_WRITE16_MEMBER(back_videoram_w);
 	DECLARE_WRITE16_MEMBER(supduck_scroll_w);
 
 	DECLARE_WRITE16_MEMBER(supduck_4000_w);
 	DECLARE_WRITE16_MEMBER(supduck_4002_w);
 
-	TILEMAP_MAPPER_MEMBER(tigeroad_tilemap_scan);
+	TILEMAP_MAPPER_MEMBER(supduk_tilemap_scan);
 
 
 protected:
@@ -69,26 +69,40 @@ protected:
 	virtual void video_start();
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
-	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_text_tile_info);
+	TILE_GET_INFO_MEMBER(get_fore_tile_info);
+	TILE_GET_INFO_MEMBER(get_back_tile_info);
 
 };
 
-TILEMAP_MAPPER_MEMBER(supduck_state::tigeroad_tilemap_scan)
+
+
+TILEMAP_MAPPER_MEMBER(supduck_state::supduk_tilemap_scan)
 {
-	/* logical (col,row) -> memory offset */
-	return (num_rows - 1 - row) * num_cols + col;
+	// where does each page start?
+	int pagesize = 0x8 * 0x8;
+
+	int offset = ((col & ~0x7) / 0x8) * (pagesize);
+	offset += ((row^0x3f) & 0x7)*0x8;
+	offset += col & 0x7;
+
+	offset &= 0x3ff;
+
+	offset += (((row^0x3f) & ~0x7) / 0x8) * 0x400;
+
+
+	return offset;
 }
 
 void supduck_state::video_start()
 {
-	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_text_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(supduck_state::tigeroad_tilemap_scan),this), 32, 32, 8, 256);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(supduck_state::tigeroad_tilemap_scan),this), 32, 32, 8, 256);
+	m_fore_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_fore_tile_info),this), tilemap_mapper_delegate(FUNC(supduck_state::supduk_tilemap_scan),this), 32, 32, 128,64);
+	m_back_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_back_tile_info),this), tilemap_mapper_delegate(FUNC(supduck_state::supduk_tilemap_scan),this), 32, 32, 128,64);
 
-	m_tx_tilemap->set_transparent_pen(3);
+	m_text_tilemap->set_transparent_pen(0x3);
+	m_fore_tilemap->set_transparent_pen(0xf);
 
 }
 
@@ -96,36 +110,40 @@ UINT32 supduck_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
+	m_back_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fore_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+
 	draw_sprites(bitmap, cliprect, 0);
 	draw_sprites(bitmap, cliprect, 1); //draw priority sprites?
 
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_text_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 
-WRITE16_MEMBER(supduck_state::tx_videoram_w)
+WRITE16_MEMBER(supduck_state::text_videoram_w)
 {
-	COMBINE_DATA(&m_tx_videoram[offset]);
-	m_tx_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_text_videoram[offset]);
+	m_text_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(supduck_state::bg_videoram_w)
+WRITE16_MEMBER(supduck_state::fore_videoram_w)
 {
-	COMBINE_DATA(&m_bg_videoram[offset]);
-	m_bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_fore_videoram[offset]);
+	m_fore_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(supduck_state::fg_videoram_w)
+WRITE16_MEMBER(supduck_state::back_videoram_w)
 {
-	COMBINE_DATA(&m_fg_videoram[offset]);
-	m_fg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_back_videoram[offset]);
+	m_back_tilemap->mark_tile_dirty(offset);
 }
 
 
-TILE_GET_INFO_MEMBER(supduck_state::get_tx_tile_info) // same as tigeroad.c
+TILE_GET_INFO_MEMBER(supduck_state::get_text_tile_info) // same as tigeroad.c
 {
-	UINT16 *videoram = m_tx_videoram;
+	UINT16 *videoram = m_text_videoram;
 	int data = videoram[tile_index];
 	int attr = data >> 8;
 	int code = (data & 0xff) + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5);
@@ -135,9 +153,9 @@ TILE_GET_INFO_MEMBER(supduck_state::get_tx_tile_info) // same as tigeroad.c
 	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(supduck_state::get_bg_tile_info)
+TILE_GET_INFO_MEMBER(supduck_state::get_fore_tile_info)
 {
-	UINT16 *videoram = m_bg_videoram;
+	UINT16 *videoram = m_fore_videoram;
 	int data = videoram[tile_index];
 	int code = data & 0xff;
 	if (data & 0x4000) code |= 0x100;
@@ -149,10 +167,10 @@ TILE_GET_INFO_MEMBER(supduck_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(supduck_state::get_fg_tile_info)
+TILE_GET_INFO_MEMBER(supduck_state::get_back_tile_info)
 {
 
-	UINT16 *videoram = m_fg_videoram;
+	UINT16 *videoram = m_back_videoram;
 	int data = videoram[tile_index];
 
 	int code = data & 0xff;
@@ -226,20 +244,24 @@ WRITE16_MEMBER(supduck_state::supduck_scroll_w)
 	switch (offset)
 	{
 	case 0:
-		m_bg_tilemap->set_scrollx(0, data);
-		printf("bg x scroll %04x\n", data);
-
+		m_back_tilemap->set_scrollx(0, data);
+//		printf("fore x scroll %04x\n", data);
+		
 		break;
 	case 1:
-		m_bg_tilemap->set_scrolly(0, -data - 32 * 8);
-		printf("bg y scroll %04x\n", data);
+		m_back_tilemap->set_scrolly(0, -data - 32 * 8);
+//		printf("fore y scroll %04x\n", data);
 
 		break;
 	case 2:
-		m_fg_tilemap->set_scrollx(0, data);
+		m_fore_tilemap->set_scrollx(0, data);
+//		printf("back x scroll %04x\n", data);
+
 		break;
 	case 3:
-		m_fg_tilemap->set_scrolly(0, -data - 32 * 8);
+		m_fore_tilemap->set_scrolly(0, -data - 32 * 8);
+//		printf("back y scroll %04x\n", data);
+
 		break;
 	}
 }
@@ -249,25 +271,17 @@ WRITE16_MEMBER(supduck_state::supduck_scroll_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, supduck_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_WRITENOP
 	AM_RANGE(0xfe0000, 0xfe1fff) AM_RAM AM_SHARE("spriteram") 
-//	AM_RANGE(0xfe0000, 0xfe07ff) AM_RAM /* RAM? */
-//	AM_RANGE(0xfe0800, 0xfe0cff) AM_RAM AM_SHARE("spriteram")
-//	AM_RANGE(0xfe0d00, 0xfe3fff) AM_RAM              /* RAM? */
-//	AM_RANGE(0xfe4000, 0xfe4001) AM_WRITE(bionicc_gfxctrl_w)    /* + coin counters */
-//	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("SYSTEM")
-//	AM_RANGE(0xfe4002, 0xfe4003) AM_READ(supduck_random_r)
+
 	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("P1_P2") AM_WRITE( supduck_4000_w )
 	AM_RANGE(0xfe4002, 0xfe4003) AM_READ_PORT("SYSTEM") AM_WRITE( supduck_4002_w )
 	AM_RANGE(0xfe4004, 0xfe4005) AM_READ_PORT("DSW")
 
 	AM_RANGE(0xfe8000, 0xfe8007) AM_WRITE(supduck_scroll_w)
 	AM_RANGE(0xfe800e, 0xfe800f) AM_WRITENOP // watchdog or irqack
-
 	
-//	AM_RANGE(0xfe8010, 0xfe8017) AM_WRITE(bionicc_scroll_w)
-//	AM_RANGE(0xfe801a, 0xfe801b) AM_WRITE(bionicc_mpu_trigger_w)    /* ??? not sure, but looks like it */
-	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(tx_videoram_w) AM_SHARE("txvideoram")
-	AM_RANGE(0xff0000, 0xff3fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0xff4000, 0xff7fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(text_videoram_w) AM_SHARE("textvideoram")
+	AM_RANGE(0xff0000, 0xff3fff) AM_RAM_WRITE(back_videoram_w) AM_SHARE("backvideoram")
+	AM_RANGE(0xff4000, 0xff7fff) AM_RAM_WRITE(fore_videoram_w) AM_SHARE("forevideoram")
 	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM /* working RAM */
 ADDRESS_MAP_END
@@ -459,7 +473,7 @@ static MACHINE_CONFIG_START( supduck, supduck_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_UPDATE_DRIVER(supduck_state, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
