@@ -166,7 +166,9 @@ TILE_GET_INFO_MEMBER(supduck_state::get_fore_tile_info)
 	if (data & 0x8000) code |= 0x200;
 
 	int color = (data & 0x0f00)>>8;
-	int flags = 0;
+	int flags = (data & 0x2000) ? TILE_FLIPX : 0;
+	    flags |=(data & 0x1000) ? TILE_FLIPY : 0;
+
 
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
@@ -182,7 +184,8 @@ TILE_GET_INFO_MEMBER(supduck_state::get_back_tile_info)
 	if (data & 0x8000) code |= 0x200;
 
 	int color = (data & 0x0f00)>>8;
-	int flags = 0;
+	int flags = (data & 0x2000) ? TILE_FLIPX : 0;
+	    flags |=(data & 0x1000) ? TILE_FLIPY : 0;
 
 	SET_TILE_INFO_MEMBER(2, code, color, flags);
 }
