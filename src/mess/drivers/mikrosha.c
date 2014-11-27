@@ -252,8 +252,8 @@ static MACHINE_CONFIG_START( mikrosha, mikrosha_state )
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "mikrosha_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","mikrosha")
-	MCFG_SOFTWARE_LIST_ADD("cart_list","mikrosha_cart")
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "mikrosha_cass")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "mikrosha_cart")
 MACHINE_CONFIG_END
 
 
