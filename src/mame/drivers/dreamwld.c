@@ -160,7 +160,7 @@ void dreamwld_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		xsize = (source[0] & 0x00000e00) >> 9;
 		ysize = (source[0] & 0x0e000000) >> 25;
 
-		tileno = (source[1] & 0x0000ffff) >>0;
+		tileno = (source[1] & 0x0001ffff) >>0;
 		colour = (source[1] & 0x3f000000) >>24;
 		xflip  = (source[1] & 0x40000000);
 		yflip  = (source[1] & 0x80000000);
@@ -372,15 +372,14 @@ UINT32 dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_ind1
 
 READ32_MEMBER(dreamwld_state::dreamwld_protdata_r)
 {
-//  static int count = 0;
-
-
-//  printf("protection read %04x\n", count);
-//  count++;
+//	static int count = 0;
 
 	UINT8 *protdata = memregion("user1")->base();
 	size_t protsize = memregion("user1")->bytes();
 	UINT8 dat = protdata[(m_protindex++) % protsize];
+
+//	printf("protection read %04x %02x\n", count, dat);
+//	count++;
 
 	// real hw returns 00 after end of data, I haven't checked if it's possible to overflow the read counter
 	// and read out the internal rom.
@@ -388,23 +387,28 @@ READ32_MEMBER(dreamwld_state::dreamwld_protdata_r)
 	return dat << 24;
 }
 
+static ADDRESS_MAP_START( oki1_map, AS_0, 8, dreamwld_state )
+	AM_RANGE(0x00000, 0x2ffff) AM_ROM
+	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("oki1bank")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( oki2_map, AS_0, 8, dreamwld_state )
+	AM_RANGE(0x00000, 0x2ffff) AM_ROM
+	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("oki2bank")
+ADDRESS_MAP_END
 
 WRITE32_MEMBER(dreamwld_state::dreamwld_6295_0_bank_w)
 {
-	UINT8 *sound = memregion("oki1")->base();
-
 	if (ACCESSING_BITS_0_7)
-		memcpy(sound + 0x30000, sound + 0xb0000 + 0x10000 * (data&0x3), 0x10000);
+		membank("oki1bank")->set_entry(data&3);
 	else
 		logerror("OKI0: unk bank write %x mem_mask %8x\n", data, mem_mask);
 }
 
 WRITE32_MEMBER(dreamwld_state::dreamwld_6295_1_bank_w)
 {
-	UINT8 *sound = memregion("oki2")->base();
-
 	if (ACCESSING_BITS_0_7)
-		memcpy(sound + 0x30000, sound + 0xb0000 + 0x10000 * (data&0x3), 0x10000);
+		membank("oki2bank")->set_entry(data&3);
 	else
 		logerror("OKI1: unk bank write %x mem_mask %8x\n", data, mem_mask);
 }
@@ -570,6 +574,82 @@ static INPUT_PORTS_START( rolcrush )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( cutefght )
+	PORT_START("INPUTS")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0000fffc, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2)
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2)
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(2)
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1)
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)
+	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
+
+	PORT_START("c00004")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_SERVICE_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW1:8" )
+INPUT_PORTS_END
+
+
 static const gfx_layout layout_16x16x4 =
 {
 	16,16,
@@ -591,6 +671,18 @@ GFXDECODE_END
 
 void dreamwld_state::machine_start()
 {
+	if (subdevice("oki1"))
+	{
+		membank("oki1bank")->configure_entries(0, 4, memregion("oki1")->base()+0x30000, 0x10000);
+		membank("oki1bank")->set_entry(0);
+	}
+
+	if (subdevice("oki2"))
+	{
+		membank("oki2bank")->configure_entries(0, 4, memregion("oki2")->base()+0x30000, 0x10000);
+		membank("oki2bank")->set_entry(0);
+	}
+
 	save_item(NAME(m_protindex));
 	save_item(NAME(m_tilebank));
 	save_item(NAME(m_tilebankold));
@@ -633,6 +725,8 @@ static MACHINE_CONFIG_START( baryon, dreamwld_state )
 	MCFG_OKIM6295_ADD("oki1", XTAL_32MHz/32, OKIM6295_PIN7_LOW) /* 1MHz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki1_map)
+
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dreamwld, baryon )
@@ -645,6 +739,8 @@ static MACHINE_CONFIG_DERIVED( dreamwld, baryon )
 	MCFG_OKIM6295_ADD("oki2", XTAL_32MHz/32, OKIM6295_PIN7_LOW) /* 1MHz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki2_map)
+
 MACHINE_CONFIG_END
 
 
@@ -705,13 +801,11 @@ ROM_START( dreamwld )
 	  ram.  The interrupt vectors point at the code placed in RAM. */
 	ROM_LOAD( "protdata.bin", 0x000, 0x6c9 ,  CRC(f284b2fd) SHA1(9e8096c8aa8a288683f002311b38787b120748d1) ) /* extracted */
 
-	ROM_REGION( 0x100000, "oki1", 0 ) /* OKI Samples - 1st chip */
+	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples - 1st chip */
 	ROM_LOAD( "5.bin", 0x000000, 0x80000, CRC(9689570a) SHA1(4414233da8f46214ca7e9022df70953922a63aa4) )
-	ROM_RELOAD(0x80000,0x80000) // for the banks
 
-	ROM_REGION( 0x100000, "oki2", 0 ) /* OKI Samples - 2nd chip */
+	ROM_REGION( 0x80000, "oki2", 0 ) /* OKI Samples - 2nd chip */
 	ROM_LOAD( "6.bin", 0x000000, 0x80000, CRC(c8b91f30) SHA1(706004ca56d0a74bc7a3dfd73a21cdc09eb90f05) )
-	ROM_RELOAD(0x80000,0x80000) // for the banks
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprite Tiles - decoded */
 	ROM_LOAD16_WORD_SWAP( "9.bin", 0x000000, 0x200000, CRC(fa84e3af) SHA1(5978737d348fd382f4ec004d29870656c864d137) )
@@ -738,21 +832,14 @@ ROM_START( cutefght )
 	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
 	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
 
-	ROM_REGION( 0x1000, "user1", ROMREGION_ERASEFF ) /* Protection data  */ // not read yet
-	/* The MCU supplies this data.
-	  The 68k reads it through a port, taking the size and destination write address from the level 1
-	  and level 2 irq positions in the 68k vector table (there is code to check that they haven't been
-	  modified!)  It then decodes the data using the rom checksum previously calculated and puts it in
-	  ram.  The interrupt vectors point at the code placed in RAM. */
-	ROM_LOAD( "protdata.bin", 0x000, 0x701 , NO_DUMP )
+	ROM_REGION( 0x1000, "user1", ROMREGION_ERASEFF ) /* Protection data  */
+	ROM_LOAD( "protdata.bin", 0x000, 0x701 , CRC(764c3c0e) SHA1(ae044d016850b730b2d97ccb7845b6b438c1e074) )
 
-	ROM_REGION( 0x100000, "oki1", 0 ) /* OKI Samples - 1st chip */
-	ROM_LOAD( "cf.1", 0x000000, 0x80000, CRC(fa3b6890) SHA1(7534931c96d6fa05fee840a7ea07b87e2e2acc50) )
-	ROM_RELOAD(0x80000,0x80000) // for the banks
-
-	ROM_REGION( 0x100000, "oki2", 0 ) /* OKI Samples - 2nd chip */
+	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples - 1st chip */
 	ROM_LOAD( "cf.2", 0x000000, 0x80000, CRC(694ddaf9) SHA1(f9138e7e1d8f771c4e69c17f27fb2b70fbee076a) )
-	ROM_RELOAD(0x80000,0x80000) // for the banks
+
+	ROM_REGION( 0x80000, "oki2", 0 ) /* OKI Samples - 2nd chip */
+	ROM_LOAD( "cf.1", 0x000000, 0x80000, CRC(fa3b6890) SHA1(7534931c96d6fa05fee840a7ea07b87e2e2acc50) )
 
 	ROM_REGION( 0x800000, "gfx1", 0 ) /* Sprite Tiles - decoded */
 	ROM_LOAD16_WORD_SWAP( "cf.10",  0x000000, 0x200000, CRC(62bf1e6e) SHA1(fb4b0db313e26687f0ebc6a8505a02e5348776da) )
@@ -826,11 +913,10 @@ ROM_START( rolcrush )
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 ) /* Protection data  */
 	ROM_LOAD( "protdata.bin", 0x000, 0x745, CRC(06b8a880) SHA1(b7d4bf26d34cb544825270c2c474bbd4c81a6c9e) ) /* extracted */
 
-	ROM_REGION( 0x100000, "oki1", 0 ) /* OKI Samples - 1st chip*/
+	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples - 1st chip*/
 	ROM_LOAD( "mx27c4000_5.bin", 0x000000, 0x80000, CRC(7afa6adb) SHA1(d4049e1068a5f7abf0e14d0b9fbbbc6dfb5d0170) )
-	ROM_RELOAD(0x80000,0x80000) // for the banks
 
-	ROM_REGION( 0x100000, "oki2", ROMREGION_ERASE00 ) /* OKI Samples - 2nd chip (neither OKI or rom is present, empty sockets) */
+	ROM_REGION( 0x80000, "oki2", ROMREGION_ERASE00 ) /* OKI Samples - 2nd chip (neither OKI or rom is present, empty sockets) */
 	/* not populared */
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprite Tiles - decoded */
@@ -896,9 +982,8 @@ ROM_START( baryon )
 	ROM_REGION( 0x6bd, "user1", 0 ) /* Protection data  */
 	ROM_LOAD( "protdata.bin", 0x000, 0x6bd, CRC(117f32a8) SHA1(837bea09d3e59ab9e13bd1103b1fc988edb361c0) ) /* extracted */
 
-	ROM_REGION( 0x100000, "oki1", 0 ) /* OKI Samples */
+	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples */
 	ROM_LOAD( "1.bin", 0x000000, 0x80000, CRC(e0349074) SHA1(f3d53d96dff586a0ad1632f52e5559cdce5ed0d8) )
-	ROM_RELOAD(0x80000,0x80000) // for the banks
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprite Tiles - decoded */
 	ROM_LOAD16_WORD_SWAP( "9.bin",  0x000000, 0x200000, CRC(28bf828f) SHA1(271390cc4f4015a3b69976f0d0527947f13c971b) )
@@ -929,9 +1014,8 @@ ROM_START( baryona )
 	ROM_REGION( 0x6bd, "user1", 0 ) /* Protection data - from baryon set, assumed to be the same */
 	ROM_LOAD( "protdata.bin", 0x000, 0x6bd, CRC(117f32a8) SHA1(837bea09d3e59ab9e13bd1103b1fc988edb361c0) ) /* extracted */
 
-	ROM_REGION( 0x100000, "oki1", 0 ) /* OKI Samples */
+	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples */
 	ROM_LOAD( "rom_1_27c040.bin", 0x000000, 0x80000, CRC(e0349074) SHA1(f3d53d96dff586a0ad1632f52e5559cdce5ed0d8) )
-	ROM_RELOAD(0x80000,0x80000) // for the banks
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprite Tiles - decoded */
 	ROM_LOAD16_WORD_SWAP( "rom_10_27c160.bin", 0x000000, 0x200000, CRC(28bf828f) SHA1(271390cc4f4015a3b69976f0d0527947f13c971b) )
@@ -948,11 +1032,13 @@ ROM_START( baryona )
 	ROM_LOAD( "rom_9_27c512.bin", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
 ROM_END
 
+
+
 GAME( 1997, baryon,   0,      baryon,   baryon,   driver_device, 0, ROT270, "SemiCom",         "Baryon - Future Assault (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1997, baryona,  baryon, baryon,   baryon,   driver_device, 0, ROT270, "SemiCom",         "Baryon - Future Assault (set 2)", GAME_SUPPORTS_SAVE )
 
 GAME( 2000, dreamwld, 0, dreamwld, dreamwld, driver_device, 0, ROT0,   "SemiCom",         "Dream World", GAME_SUPPORTS_SAVE )
 
-GAME( 1998, cutefght, 0, dreamwld, dreamwld, driver_device, 0, ROT0,   "SemiCom",         "Cute Fighters", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING ) // needs protection data
+GAME( 1998, cutefght, 0, dreamwld, cutefght, driver_device, 0, ROT0,   "SemiCom",         "Cute Fighter", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // wrong linescroll?
 
 GAME( 1999, rolcrush, 0, baryon,   rolcrush, driver_device, 0, ROT0,   "Trust / SemiCom", "Rolling Crush (version 1.07.E - 1999/02/11)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // wrong linescroll
