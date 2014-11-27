@@ -698,8 +698,8 @@ V.Smile Smartbooks
 
 -->
 
-	<software name="aladdin">
-		<description>Aladdin - Aladdins Welt der Wunder (GE) </description>
+	<software name="aladdin" supported="no">
+		<description>Aladdin - Aladdins Welt der Wunder (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -709,8 +709,8 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
-	<software name="ariel">
-		<description>Arielle Die Meerjungfrau - Arielles aufregendes Abenteuer (GE) </description>
+	<software name="ariel" supported="no">
+		<description>Arielle Die Meerjungfrau - Arielles aufregendes Abenteuer (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -720,8 +720,20 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
-	<software name="bobbuild">
-		<description>Bob der Baumeister - Bobs spannender Arbeitstag (GE) </description>
+<!-- loads if mapped as Batman TV -->
+	<software name="bobbday" supported="no">
+		<description>Bob the Builder - Bob's Busy Day (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92300.bin" size="8388608" crc="6aea957b" sha1="947008c882733a8284a000c9c4d379e2c213526e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bobbdayg" cloneof="bobbday" supported="no">
+		<description>Bob der Baumeister - Bobs spannender Arbeitstag (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -731,18 +743,19 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
-	<software name="cinderla">
-		<description>Cinderella - Lernen im Märchenland (Ger, Rev. 0)</description>
-		<year>200?</year>
+<!-- loads if mapped as Batman TV -->
+	<software name="cars" supported="no">
+		<description>Cars - Rev It Up in Radiator Springs (USA)</description>
+		<year>2006?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="092244.bin" size="8388608" crc="b08a50f3" sha1="a8e6b8b427115d01d35c27b41385ac5d430484c3" offset="0" />
+				<rom name="52-92660.bin" size="8388608" crc="ff65d967" sha1="27b229b6e308dfc0cea7e594c7b006f27961c05f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cinderla1" cloneof="cinderla">
+	<software name="cinderla" supported="no">
 		<description>Cinderella - Lernen im Märchenland (Ger, Rev. 1)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -753,8 +766,31 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
-	<software name="footschl">
-		<description>Fußball Schule (GE) </description>
+	<software name="cinderla1" cloneof="cinderla" supported="no">
+		<description>Cinderella - Lernen im Märchenland (Ger, Rev. 0)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="092244.bin" size="8388608" crc="b08a50f3" sha1="a8e6b8b427115d01d35c27b41385ac5d430484c3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- loads if mapped as Batman TV -->
+	<software name="dora" supported="no">
+		<description>Dora The Explorer - Dora's Fix-it Adventure (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92280.bin" size="8388608" crc="225c3133" sha1="97610c09834251d1960dbc67da18dad91e832dba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="footschl" supported="no">
+		<description>Fußball Schule (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -764,8 +800,19 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
-	<software name="fred">
-		<description>Freds Zahlen Rallye (GE) </description>
+	<software name="findnemo" supported="no">
+		<description>Finding Nemo - Nemo's Ocean Discoveries (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92420.bin" size="8388608" crc="e40e46dc" sha1="ac78178cff76ed264589113b73211b1f4cfe6dbf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fred" supported="no">
+		<description>Freds Zahlen Rallye (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -775,8 +822,8 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
-	<software name="manny">
-		<description>Meister Manny's Werkzeugkiste (GE) </description>
+	<software name="manny" supported="no">
+		<description>Meister Manny's Werkzeugkiste (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -786,8 +833,8 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
-	<software name="monstaln">
-		<description>Monsters vs Aliens (GE) </description>
+	<software name="monstaln" supported="no">
+		<description>Monsters vs Aliens (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -797,8 +844,8 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
-	<software name="oben">
-		<description>Oben (GE) </description>
+	<software name="oben" supported="no">
+		<description>Oben (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -808,8 +855,19 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
-	<software name="ratat">
-		<description>Ratatouille - Remys Neue Rezepte (GE) </description>
+	<software name="partyprk" supported="no">
+		<description>Partyland Park - A Carnival of Play and Learn Fun (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92920.bin" size="8388608" crc="bb8271ad" sha1="e59a8da24c08d596e1ef60b6cceb769bdb689ece" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ratat" supported="no">
+		<description>Ratatouille - Remys Neue Rezepte (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -819,8 +877,30 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
-	<software name="shrek">
-		<description>Shrek - Die Geschichte des Drache (GE) </description>
+	<software name="scoobydo" supported="no">
+		<description>Scooby-Doo! - Funland Frenzy (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92160.bin" size="8388608" crc="161ef602" sha1="d4020599c83a64b9f1f972b0b8ebc4c3fcc85970" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shrek3" supported="no">
+		<description>Shrek The Third - Arthur's School Day Adventure (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92860.bin" size="8388608" crc="eb84fc96" sha1="20ac2101fd0679e888f31ee38b1ba1358b0932a8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shrek" supported="no">
+		<description>Shrek - Die Geschichte des Drache (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -830,7 +910,18 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
-	<software name="spongeb">
+	<software name="spongeb" supported="no">
+		<description>Spongebob Squarepants - A Day in the Life of a Sponge (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92440.bin" size="8388608" crc="92afd10b" sha1="22ac256853201a5feaf86dc709ff05ad748d217c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spongebg" cloneof="spongeb" supported="no">
 		<description>Spongebob Schwammkopf - Der Tag des Schwamms (Ger, Rev. 1)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -841,8 +932,8 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
-	<software name="spongeb1" cloneof="spongeb">
-		<description>Spongebob Schwammkopf - Der Tag des Schwamms (GE) </description>
+	<software name="spongebg1" cloneof="spongeb" supported="no">
+		<description>Spongebob Schwammkopf - Der Tag des Schwamms (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -852,8 +943,8 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
-	<software name="superman">
-		<description>Superman - Der Superheld (GE) </description>
+	<software name="superman" supported="no">
+		<description>Superman - Der Superheld (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -863,8 +954,8 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
-	<software name="thomas">
-		<description>Thomas &amp; seine Freunde - Freunde halten zusammen (GE) </description>
+	<software name="thomas" supported="no">
+		<description>Thomas &amp; seine Freunde - Freunde halten zusammen (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -874,8 +965,8 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
-	<software name="toystor2">
-		<description>Toy Story 2 - Woodys Spannende Rettung (GE) </description>
+	<software name="toystor2" supported="no">
+		<description>Toy Story 2 - Woodys Spannende Rettung (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -885,8 +976,8 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
-	<software name="walle">
-		<description>Wall-E (GE) </description>
+	<software name="walle" supported="no">
+		<description>Wall-E (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -896,10 +987,10 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
-	<software name="pooh">
-		<description>Winnie Puhh - Die Honigjagd (GE) </description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="pooh" supported="no">
+		<description>Winnie Puhh - Die Honigjagd (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="092064.bin" size="8388608" crc="38a17e7e" sha1="434849ba8867d0bfb16b0fb5abfec86286390c07" offset="0" />
@@ -907,16 +998,32 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
-	<software name="zayzoo">
-		<description>Zayzoo's Lernall (Germany)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="zayzoo" supported="no">
+		<description>Zayzoo's Lernall (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="092364.bin" size="8388608" crc="93e9dcf3" sha1="5889e46806d1fa70ac92ec6b2158a339126a26d2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
+
+<!-- V.Smile Baby -->
+<!-- To be split into a separate list -->
+
+	<software name="mktierf" supported="no">
+		<description>Meine kleinen Tierfreunde (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="meine kleinen tierfreunde (german) (v.smile baby).bin" size="8388608" crc="7b48544b" sha1="a736ef1313762c493a366990406c3a7393457b6e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 
 </softwarelist>
 
