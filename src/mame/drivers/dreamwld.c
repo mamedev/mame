@@ -703,7 +703,6 @@ static MACHINE_CONFIG_START( baryon, dreamwld_state )
 	MCFG_CPU_PROGRAM_MAP(baryon_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dreamwld_state,  irq4_line_hold)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(57.793)
@@ -718,7 +717,6 @@ static MACHINE_CONFIG_START( baryon, dreamwld_state )
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dreamwld)
-
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -871,7 +869,7 @@ PCB Layout
 |3* 4*               SEMICOM8 SEMICOM11 SEMICOM14 |
 |-------------------------------------------------|
 
-Later version of the SemiCom's 68020 hardware added a second OKI sound chip and sample rom
+A later version of the SemiCom 68020 hardware added a second OKI sound chip and sample rom
 
 Main CPU 68EC020FG16           @ 16MHz
 AD-65 (OKI MSM6295 rebadged)   @ 1MHz
