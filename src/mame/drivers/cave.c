@@ -4624,7 +4624,7 @@ ROM_START( uopoko )
 	ROM_LOAD( "cave_cv-02_u49.u49", 0x000000, 0x400000, CRC(12fb11bb) SHA1(953df1b16b5c9a6c3eb2fdebec4669a879270e73) ) /* MASK ROM */
 
 	ROM_REGION( 0x200000, "ymz", 0 )    /* Samples */
-	ROM_LOAD( "came_cv-02_u4.u4", 0x000000, 0x200000, CRC(a2d0d755) SHA1(f8493ef7f367f3dc2a229ba785ac67bc5c2c54c0) ) /* MASK ROM */
+	ROM_LOAD( "cave_cv-02_u4.u4", 0x000000, 0x200000, CRC(a2d0d755) SHA1(f8493ef7f367f3dc2a229ba785ac67bc5c2c54c0) ) /* MASK ROM */
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "eeprom-uopoko.bin", 0x0000, 0x0080, CRC(f4a24b95) SHA1(4043f0ffed24e38b4f7dbe1a5a4a9e79bdde7dfd) )
@@ -4642,7 +4642,7 @@ ROM_START( uopokoj )
 	ROM_LOAD( "cave_cv-02_u49.u49", 0x000000, 0x400000, CRC(12fb11bb) SHA1(953df1b16b5c9a6c3eb2fdebec4669a879270e73) ) /* MASK ROM */
 
 	ROM_REGION( 0x200000, "ymz", 0 )    /* Samples */
-	ROM_LOAD( "came_cv-02_u4.u4", 0x000000, 0x200000, CRC(a2d0d755) SHA1(f8493ef7f367f3dc2a229ba785ac67bc5c2c54c0) ) /* MASK ROM */
+	ROM_LOAD( "cave_cv-02_u4.u4", 0x000000, 0x200000, CRC(a2d0d755) SHA1(f8493ef7f367f3dc2a229ba785ac67bc5c2c54c0) ) /* MASK ROM */
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "eeprom-uopoko.bin", 0x0000, 0x0080, CRC(f4a24b95) SHA1(4043f0ffed24e38b4f7dbe1a5a4a9e79bdde7dfd) )
