@@ -1,4 +1,15 @@
-/*  Semicom Baryon / Dream World hardware
+/*
+
+    SemiCom 68020 based hardware
+    Driver by David Haywood
+
+Baryon - Future Assault   (c) 1997 SemiCom
+Cute Fighter              (c) 1998 SemiCom
+Rolling Crush             (c) 1999 Trust / SemiCom
+Dream World               (c) 2000 SemiCom
+
+Note: There is a SemiCom game known as Lode Quest 1998(?). This game is very similar to Dream World.
+      It's not known if Lode Quest is a alternate title or a prequel of Dream World.
 
 Note: this hardware is a copy of Psikyo's 68020 based hardware,
       the Strikers 1945 bootleg has the same unknown rom!
@@ -601,52 +612,41 @@ static INPUT_PORTS_START( cutefght )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_SERVICE_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW1:8" )
+	PORT_DIPUNUSED_DIPLOC( 0x0001, IP_ACTIVE_LOW, "SW2:1" ) /* As listed in service mode, but tested */
+	PORT_DIPUNUSED_DIPLOC( 0x0002, IP_ACTIVE_LOW, "SW2:2" ) /* These might have some use, requires investigation of code */
+    PORT_DIPUNUSED_DIPLOC( 0x0004, IP_ACTIVE_LOW, "SW2:3" )
+    PORT_DIPUNUSED_DIPLOC( 0x0008, IP_ACTIVE_LOW, "SW2:4" )
+    PORT_DIPUNUSED_DIPLOC( 0x0010, IP_ACTIVE_LOW, "SW2:5" )
+    PORT_DIPNAME( 0x0060, 0x0060, "Ticket Payout" )         PORT_DIPLOCATION("SW2:6,7")
+    PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+    PORT_DIPSETTING(      0x0020, "Little" )
+    PORT_DIPSETTING(      0x0060, DEF_STR( Normal ) )
+    PORT_DIPSETTING(      0x0040, "Much" )
+    PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("SW2:8")
+    PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:1") /* Has no effect?? */
+    PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0e00, 0x0e00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:2,3,4")
+    PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
+    PORT_DIPSETTING(      0x0200, DEF_STR( 4C_1C ) )
+    PORT_DIPSETTING(      0x0400, DEF_STR( 3C_1C ) )
+    PORT_DIPSETTING(      0x0600, DEF_STR( 2C_1C ) )
+    PORT_DIPSETTING(      0x0e00, DEF_STR( 1C_1C ) )
+    PORT_DIPSETTING(      0x0a00, DEF_STR( 2C_3C ) )
+    PORT_DIPSETTING(      0x0c00, DEF_STR( 1C_2C ) )
+    PORT_DIPSETTING(      0x0800, DEF_STR( 1C_3C ) )
+    PORT_DIPNAME( 0x7000, 0x7000, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:5,6,7")
+    PORT_DIPSETTING(      0x2000, "Level 1" )
+    PORT_DIPSETTING(      0x1000, "Level 2" )
+    PORT_DIPSETTING(      0x0000, "Level 3" )
+    PORT_DIPSETTING(      0x7000, "Level 4" )
+    PORT_DIPSETTING(      0x6000, "Level 5" )
+    PORT_DIPSETTING(      0x5000, "Level 6" )
+    PORT_DIPSETTING(      0x4000, "Level 7" )
+    PORT_DIPSETTING(      0x3000, "Level 8" )
+    PORT_SERVICE_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW1:8" )
 INPUT_PORTS_END
 
 
@@ -746,6 +746,255 @@ MACHINE_CONFIG_END
 
 /*
 
+Baryon
+SemiCom, 1997
+
+PCB Layout
+----------
+
+|-------------------------------------------------|
+|           ROM1   62256   ACTEL            ROM2  |
+|VOL        M6295  62256   A1020B                 |
+|    PAL  PAL              32MHz                  |
+| 62256  62256                PAL                 |
+| ROM3 ROM4         68EC020   PAL    PAL          |
+| ROM5 ROM6                   PAL    PAL          |
+|J 62256 62256                PAL                 |
+|A                            PAL    27MHz        |
+|M                                 PAL            |
+|M                         ACTEL    M5M44260      |
+|A             6116        A1020B   M5M44260      |
+|              6116                               |
+|                          PAL                    |
+|              6264        PAL                    |
+| DSW1         6264                               |
+| DSW2  P87C52              ROM7                  |
+|                    ROM8   ROM9    27C160*       |
+|3* 4*               ROM10  ROM11   27C160*       |
+|-------------------------------------------------|
+
+The PCB used for Baryon is an earlier version with a single OKI sound chip
+
+* denotes unpopulated components
+  3 & 4 are 10 pin headers
+
+*/
+
+ROM_START( baryon ) // replacment labels? no SemiCom logo
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD32_BYTE( "4.bin", 0x000000, 0x040000, CRC(59e0df20) SHA1(ff12f4adcf731f6984db7d0fbdd7fcc71ce66aa4) )
+	ROM_LOAD32_BYTE( "6.bin", 0x000001, 0x040000, CRC(abccbb3d) SHA1(01524f094543d872d775306024f51258a11e9240) )
+	ROM_LOAD32_BYTE( "3.bin", 0x000002, 0x040000, CRC(046d4231) SHA1(05056efe5fec7f43c400f05278de516b01be0fdf) )
+	ROM_LOAD32_BYTE( "5.bin", 0x000003, 0x040000, CRC(63d5e7cb) SHA1(269bf5ffe10f2464f823c4d377921e19cfb8bc46) )
+
+	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
+
+	ROM_REGION( 0x6bd, "user1", 0 ) /* Protection data  */
+	ROM_LOAD( "protdata.bin", 0x000, 0x6bd, CRC(117f32a8) SHA1(837bea09d3e59ab9e13bd1103b1fc988edb361c0) ) /* extracted */
+
+	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples */
+	ROM_LOAD( "1.bin", 0x000000, 0x80000, CRC(e0349074) SHA1(f3d53d96dff586a0ad1632f52e5559cdce5ed0d8) )
+
+	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprite Tiles - decoded */
+	ROM_LOAD16_WORD_SWAP( "9.bin",  0x000000, 0x200000, CRC(28bf828f) SHA1(271390cc4f4015a3b69976f0d0527947f13c971b) )
+	ROM_LOAD16_WORD_SWAP( "11.bin", 0x200000, 0x200000, CRC(d0ff1bc6) SHA1(4aeb795222eedeeba770cf725122e989f97119b2) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* BG Tiles - decoded */
+	ROM_LOAD16_WORD_SWAP( "2.bin",0x000000, 0x200000, CRC(684012e6) SHA1(4cb60907184b67be130b8385e4336320c0f6e4a7) )
+
+	ROM_REGION( 0x040000, "spritelut", 0 ) /* Sprite Code Lookup ... */
+	ROM_LOAD16_BYTE( "8.bin", 0x000000, 0x020000, CRC(fdbb08b0) SHA1(4b3ac56c4c8370b1434fb6a481fce0d9c52313e0) )
+	ROM_LOAD16_BYTE( "10.bin",0x000001, 0x020000, CRC(c9d20480) SHA1(3f6170e8e08fb7508bd13c23f243ec6888a91f5e) )
+
+	ROM_REGION( 0x10000, "unknown", 0 )
+	ROM_LOAD( "7.bin", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
+ROM_END
+
+ROM_START( baryona ) // this set had original SemiCom labels
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD32_BYTE( "rom_4_27c020.bin", 0x000000, 0x040000, CRC(6c1cdad0) SHA1(40c437507076ce52ec2240049d6b4bef180b104a) )
+	ROM_LOAD32_BYTE( "rom_5_27c020.bin", 0x000001, 0x040000, CRC(15917c9d) SHA1(6444be93e6a997070820e3c5a2e2e703e22883d9) )
+	ROM_LOAD32_BYTE( "rom_2_27c020.bin", 0x000002, 0x040000, CRC(42b14a6c) SHA1(37e772a673732ef16767c14ad77a4faaa06d675a) )
+	ROM_LOAD32_BYTE( "rom_3_27c020.bin", 0x000003, 0x040000, CRC(0ae6d86e) SHA1(410ad161688ec8516fe5ac7160a4a228dbb01936) )
+
+	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
+
+	ROM_REGION( 0x6bd, "user1", 0 ) /* Protection data - from baryon set, assumed to be the same */
+	ROM_LOAD( "protdata.bin", 0x000, 0x6bd, CRC(117f32a8) SHA1(837bea09d3e59ab9e13bd1103b1fc988edb361c0) ) /* extracted */
+
+	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples */
+	ROM_LOAD( "rom_1_27c040.bin", 0x000000, 0x80000, CRC(e0349074) SHA1(f3d53d96dff586a0ad1632f52e5559cdce5ed0d8) )
+
+	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprite Tiles - decoded */
+	ROM_LOAD16_WORD_SWAP( "rom_10_27c160.bin", 0x000000, 0x200000, CRC(28bf828f) SHA1(271390cc4f4015a3b69976f0d0527947f13c971b) )
+	ROM_LOAD16_WORD_SWAP( "rom_11_27c160.bom", 0x200000, 0x200000, CRC(d0ff1bc6) SHA1(4aeb795222eedeeba770cf725122e989f97119b2) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* BG Tiles - decoded */
+	ROM_LOAD16_WORD_SWAP( "rom_8_27c160.bin",0x000000, 0x200000, CRC(684012e6) SHA1(4cb60907184b67be130b8385e4336320c0f6e4a7) )
+
+	ROM_REGION( 0x040000, "spritelut", 0 ) /* Sprite Code Lookup ... */
+	ROM_LOAD16_BYTE( "rom6", 0x000000, 0x020000, CRC(fdbb08b0) SHA1(4b3ac56c4c8370b1434fb6a481fce0d9c52313e0) )
+	ROM_LOAD16_BYTE( "rom7", 0x000001, 0x020000, CRC(c9d20480) SHA1(3f6170e8e08fb7508bd13c23f243ec6888a91f5e) )
+
+	ROM_REGION( 0x10000, "unknown", 0 )
+	ROM_LOAD( "rom_9_27c512.bin", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
+ROM_END
+
+/*
+
+Cute Fighter
+SemiCom, 1998
+
+PCB Layout
+----------
+
+|-------------------------------------------------|
+|    M6295  SEMICOM1 62256    ACTEL     SEMICOM12 |
+|VOL M6295  SEMICOM2 62256    A1020B              |
+|    PAL  PAL        32MHz                        |
+| 62256  62256              PAL                   |
+| SEMICOM3 SEMICOM5 68EC020 PAL    PAL            |
+| SEMICOM4 SEMICOM6         PAL    PAL            |
+|J 62256 62256              PAL                   |
+|A                          PAL    27MHz          |
+|M                                 PAL            |
+|M                         ACTEL    M5M44260      |
+|A             6116        A40MX04  M5M44260      |
+|              6116                               |
+|                          PAL                    |
+|              6264        PAL                    |
+| DSW1             6264                           |
+| DSW2   8752                  SEMICOM9           |
+|                    SEMICOM7 SEMICOM10 SEMICOM13 |
+|3* 4*               SEMICOM8 SEMICOM11 SEMICOM14 |
+|-------------------------------------------------|
+
+Later version of the SemiCom's 68020 hardware added a second OKI sound chip and sample rom
+
+Main CPU 68EC020FG16           @ 16MHz
+AD-65 (OKI MSM6295 rebadged)   @ 1MHz
+Atmel AT89C52 MCU (secured)    @ 16MHZ
+
+* 3 & 4 are 10 pin headers for unknown use. One might be used to drive the ticket dispenser
+
+*/
+
+ROM_START( cutefght )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD32_BYTE( "5_semicom", 0x000000, 0x080000, CRC(c14fd5dc) SHA1(f332105f5f249d693e792e7115f9e6cffb6db19f) )
+	ROM_LOAD32_BYTE( "6_semicom", 0x000001, 0x080000, CRC(47440088) SHA1(c45503c4b5f271b430263ca079edeaaeadf5d9f6) )
+	ROM_LOAD32_BYTE( "3_semicom", 0x000002, 0x080000, CRC(e7e7a866) SHA1(a31751f4164a427de59f0c76c9a8cb34370d8183) )
+	ROM_LOAD32_BYTE( "4_semicom", 0x000003, 0x080000, CRC(476a3bf5) SHA1(5be1c70bbf4fcfc534b7f20bfceaa8da2e961330) )
+
+	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
+
+	ROM_REGION( 0x1000, "user1", ROMREGION_ERASEFF ) /* Protection data  */
+	ROM_LOAD( "protdata.bin", 0x000, 0x701 , CRC(764c3c0e) SHA1(ae044d016850b730b2d97ccb7845b6b438c1e074) )
+
+	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples - 1st chip */
+	ROM_LOAD( "2_semicom", 0x000000, 0x80000, CRC(694ddaf9) SHA1(f9138e7e1d8f771c4e69c17f27fb2b70fbee076a) )
+
+	ROM_REGION( 0x80000, "oki2", 0 ) /* OKI Samples - 2nd chip */
+	ROM_LOAD( "1_semicom", 0x000000, 0x80000, CRC(fa3b6890) SHA1(7534931c96d6fa05fee840a7ea07b87e2e2acc50) )
+
+	ROM_REGION( 0x800000, "gfx1", 0 ) /* Sprite Tiles - decoded */
+	ROM_LOAD16_WORD_SWAP( "10_semicom",  0x000000, 0x200000, CRC(62bf1e6e) SHA1(fb4b0db313e26687f0ebc6a8505a02e5348776da) )
+	ROM_LOAD16_WORD_SWAP( "11_semicom",  0x200000, 0x200000, CRC(796f23a7) SHA1(adaa4c8525de428599f4489ecc8e966fed0d514d) )
+	ROM_LOAD16_WORD_SWAP( "13_semicom",  0x400000, 0x200000, CRC(24222b3c) SHA1(08163863890c01728db89b8f4447841ecb4f4f62) )
+	ROM_LOAD16_WORD_SWAP( "14_semicom",  0x600000, 0x200000, CRC(385b69d7) SHA1(8e7cae5589e354bea0b77b061af1d0c81d796f7c) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* BG Tiles - decoded */
+	ROM_LOAD16_WORD_SWAP( "12_semicom",0x000000, 0x200000, CRC(45d29c22) SHA1(df719a061dcd14fb4388fb45dfee2054e56a1299) )
+
+	ROM_REGION( 0x040000, "spritelut", 0 ) /* Sprite Code Lookup ... */
+	ROM_LOAD16_BYTE( "7_semicom", 0x000000, 0x020000, CRC(39454102) SHA1(347e9242fd7e2092cfaacdce92691cf6024471ac) )
+	ROM_LOAD16_BYTE( "8_semicom", 0x000001, 0x020000, CRC(fccb1b13) SHA1(fd4aec4a660f9913651fcc084e3f13eb0adbddd6) )
+
+	ROM_REGION( 0x10000, "unknown", 0 ) /* ???? - not decoded seems to be in blocks of 0x41 bytes.. */
+	ROM_LOAD( "9_semicom", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
+ROM_END
+
+/*
+
+Rolling Crush
+Trust / SemiCom, 1999
+
+PCB Layout
+----------
+
+|-------------------------------------------------|
+|    M6295* 27C40*  62256   ACTEL           ROM10 |
+|VOL M6295  ROM6    62256   A40MX04               |
+|    PAL  PAL       32MHz                         |
+| 62256  62256              PAL                   |
+| ROM2 ROM4       68EC020   PAL    PAL            |
+| ROM1 ROM3                 PAL    PAL            |
+|J 62256 62256              PAL                   |
+|A                          PAL    27MHz          |
+|M                                 PAL            |
+|M                         ACTEL    M5M44260      |
+|A             6116        A40MX04  M5M44260      |
+|              6116                               |
+|                          PAL                    |
+|              6264        PAL                    |
+| DSW2         6264                               |
+| DSW2   8752               ROM9                  |
+|                    ROM7   ROM8    27C160*       |
+|3* 4*               ROM6   27C160* 27C160*       |
+|-------------------------------------------------|
+
+Same PCB as Cute Fighter / Dream World PCB except one OKI M6295 and it's sample rom are unpopulated
+
+* denotes unpopulated components
+  3 & 4 are 10 pin headers
+
+Main CPU 68EC020FG16           @ 16MHz
+AD-65 (OKI MSM6295 rebadged)   @ 1MHz
+Atmel AT89C52 MCU (secured)    @ 16MHZ
+
+V-SYNC                         @57.793 Hz
+H-SYNC                         @15.19 - 15.27KHz (floating)
+
+*/
+
+ROM_START( rolcrush )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD32_BYTE( "mx27c2000_4.bin", 0x000000, 0x040000, CRC(c47f0540) SHA1(76712f41046e5852ad6be6dbf171cf34471e2409) )
+	ROM_LOAD32_BYTE( "mx27c2000_3.bin", 0x000001, 0x040000, CRC(7af59294) SHA1(f36b3d100e0d963bf51b7fbe8c4a0bdcf2180ba0) )
+	ROM_LOAD32_BYTE( "mx27c2000_2.bin", 0x000002, 0x040000, CRC(5eb24adb) SHA1(0329a02e18490bfe72ff34a64722d7316814720b) )
+	ROM_LOAD32_BYTE( "mx27c2000_1.bin", 0x000003, 0x040000, CRC(a37e15b2) SHA1(f0fc945a894d6ed58daf05390a17051d0f3cda20) )
+
+	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 ) /* Protection data  */
+	ROM_LOAD( "protdata.bin", 0x000, 0x745, CRC(06b8a880) SHA1(b7d4bf26d34cb544825270c2c474bbd4c81a6c9e) ) /* extracted */
+
+	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples - 1st chip*/
+	ROM_LOAD( "mx27c4000_5.bin", 0x000000, 0x80000, CRC(7afa6adb) SHA1(d4049e1068a5f7abf0e14d0b9fbbbc6dfb5d0170) )
+
+	ROM_REGION( 0x80000, "oki2", ROMREGION_ERASE00 ) /* OKI Samples - 2nd chip (neither OKI or rom is present, empty sockets) */
+	/* not populared */
+
+	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprite Tiles - decoded */
+	ROM_LOAD16_WORD_SWAP( "m27c160.8.bin", 0x000000, 0x200000, CRC(a509bc36) SHA1(aaa008e07e4b24ff9dbcee5925d6516d1662931c) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* BG Tiles - decoded */
+	ROM_LOAD16_WORD_SWAP( "m27c160.10.bin",0x000000, 0x200000, CRC(739b0cb0) SHA1(a7cc48502d84218586afa7276fa7ba759242f05e) )
+
+	ROM_REGION( 0x040000, "spritelut", 0 ) /* Sprite Code Lookup ... */
+	ROM_LOAD16_BYTE( "tms27c010_7.bin", 0x000000, 0x020000, CRC(4cb84384) SHA1(8dd02e2d9829c15cb19654779d2217a7d53d5971) )
+	ROM_LOAD16_BYTE( "tms27c010_6.bin", 0x000001, 0x020000, CRC(0c9d197a) SHA1(da057c8d08f41c4a5b9cb4f8f00de7e1461d98f0) )
+
+	ROM_REGION( 0x10000, "unknown", 0 ) /* ???? - not decoded seems to be in blocks of 0x41 bytes.. */
+	ROM_LOAD( "mx27c512.9.bin", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
+ROM_END
+
+/*
+
 Dream World
 SemiCom, 2000
 
@@ -767,13 +1016,14 @@ PCB Layout
 |              6116                               |
 |                          PAL                    |
 |              6264        PAL                    |
-|              6264                               |
-| DSW1                      ROM11                 |
-|        8752        ROM7   ROM9    27C160*       |
-| DSW2               ROM8   27C160* 27C160*       |
+| DSW1         6264                               |
+| DSW2   8752               ROM11                 |
+|                    ROM7   ROM9    27C160*       |
+|3* 4*               ROM8   27C160* 27C160*       |
 |-------------------------------------------------|
 
 * denotes unpopulated components
+  3 & 4 are 10 pin headers
 
 Notes:
       68020 @ 16.0MHz [32/2]
@@ -822,223 +1072,8 @@ ROM_START( dreamwld )
 ROM_END
 
 
-ROM_START( cutefght )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD32_BYTE( "cf.5", 0x000000, 0x080000, CRC(c14fd5dc) SHA1(f332105f5f249d693e792e7115f9e6cffb6db19f) )
-	ROM_LOAD32_BYTE( "cf.6", 0x000001, 0x080000, CRC(47440088) SHA1(c45503c4b5f271b430263ca079edeaaeadf5d9f6) )
-	ROM_LOAD32_BYTE( "cf.3", 0x000002, 0x080000, CRC(e7e7a866) SHA1(a31751f4164a427de59f0c76c9a8cb34370d8183) )
-	ROM_LOAD32_BYTE( "cf.4", 0x000003, 0x080000, CRC(476a3bf5) SHA1(5be1c70bbf4fcfc534b7f20bfceaa8da2e961330) )
-
-	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
-
-	ROM_REGION( 0x1000, "user1", ROMREGION_ERASEFF ) /* Protection data  */
-	ROM_LOAD( "protdata.bin", 0x000, 0x701 , CRC(764c3c0e) SHA1(ae044d016850b730b2d97ccb7845b6b438c1e074) )
-
-	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples - 1st chip */
-	ROM_LOAD( "cf.2", 0x000000, 0x80000, CRC(694ddaf9) SHA1(f9138e7e1d8f771c4e69c17f27fb2b70fbee076a) )
-
-	ROM_REGION( 0x80000, "oki2", 0 ) /* OKI Samples - 2nd chip */
-	ROM_LOAD( "cf.1", 0x000000, 0x80000, CRC(fa3b6890) SHA1(7534931c96d6fa05fee840a7ea07b87e2e2acc50) )
-
-	ROM_REGION( 0x800000, "gfx1", 0 ) /* Sprite Tiles - decoded */
-	ROM_LOAD16_WORD_SWAP( "cf.10",  0x000000, 0x200000, CRC(62bf1e6e) SHA1(fb4b0db313e26687f0ebc6a8505a02e5348776da) )
-	ROM_LOAD16_WORD_SWAP( "cf.11",  0x200000, 0x200000, CRC(796f23a7) SHA1(adaa4c8525de428599f4489ecc8e966fed0d514d) )
-	ROM_LOAD16_WORD_SWAP( "cf.13",  0x400000, 0x200000, CRC(24222b3c) SHA1(08163863890c01728db89b8f4447841ecb4f4f62) )
-	ROM_LOAD16_WORD_SWAP( "cf.14",  0x600000, 0x200000, CRC(385b69d7) SHA1(8e7cae5589e354bea0b77b061af1d0c81d796f7c) )
-
-	ROM_REGION( 0x200000, "gfx2", 0 ) /* BG Tiles - decoded */
-	ROM_LOAD16_WORD_SWAP( "cf.12",0x000000, 0x200000, CRC(45d29c22) SHA1(df719a061dcd14fb4388fb45dfee2054e56a1299) )
-
-	ROM_REGION( 0x040000, "spritelut", 0 ) /* Sprite Code Lookup ... */
-	ROM_LOAD16_BYTE( "cf.7", 0x000000, 0x020000, CRC(39454102) SHA1(347e9242fd7e2092cfaacdce92691cf6024471ac) )
-	ROM_LOAD16_BYTE( "cf.8", 0x000001, 0x020000, CRC(fccb1b13) SHA1(fd4aec4a660f9913651fcc084e3f13eb0adbddd6) )
-
-	ROM_REGION( 0x10000, "unknown", 0 ) /* ???? - not decoded seems to be in blocks of 0x41 bytes.. */
-	ROM_LOAD( "cf.9", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
-ROM_END
-
-/*
-
-Rolling Crush
-Trust / SemiCom, 1999
-
-PCB Layout
-----------
-
-|-------------------------------------------------|
-|    M6295* 27C40*  62256   ACTEL           ROM10 |
-|VOL M6295  ROM6    62256   A40MX04               |
-|    PAL  PAL       32MHz                         |
-| 62256  62256              PAL                   |
-| ROM2 ROM4       68EC020   PAL    PAL            |
-| ROM1 ROM3                 PAL    PAL            |
-|J 62256 62256              PAL                   |
-|A                          PAL    27MHz          |
-|M                                 PAL            |
-|M                         ACTEL    M5M44260      |
-|A             6116        A40MX04  M5M44260      |
-|              6116                               |
-|                          PAL                    |
-|              6264        PAL                    |
-|              6264                               |
-| DSW1                      ROM9                  |
-|        8752        ROM7   ROM8    27C160*       |
-| DSW2               ROM6   27C160* 27C160*       |
-|-------------------------------------------------|
-
-Same PCB as Dream World except one OKI M6295 and it's sample rom are unpopulated
-
-* denotes unpopulated components
-
-Main CPU 68EC020FG16           @ 16MHz
-AD-65 (OKI MSM6295 rebadged)   @ 1MHz
-Atmel AT89C52 MCU (secured)    @ 16MHZ
-
-V-SYNC                         @57.793 Hz
-H-SYNC                         @ (floating) 15.19 - 15.27KHz
-
-*/
-
-ROM_START( rolcrush )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD32_BYTE( "mx27c2000_4.bin", 0x000000, 0x040000, CRC(c47f0540) SHA1(76712f41046e5852ad6be6dbf171cf34471e2409) )
-	ROM_LOAD32_BYTE( "mx27c2000_3.bin", 0x000001, 0x040000, CRC(7af59294) SHA1(f36b3d100e0d963bf51b7fbe8c4a0bdcf2180ba0) )
-	ROM_LOAD32_BYTE( "mx27c2000_2.bin", 0x000002, 0x040000, CRC(5eb24adb) SHA1(0329a02e18490bfe72ff34a64722d7316814720b) )
-	ROM_LOAD32_BYTE( "mx27c2000_1.bin", 0x000003, 0x040000, CRC(a37e15b2) SHA1(f0fc945a894d6ed58daf05390a17051d0f3cda20) )
-
-	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
-
-	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 ) /* Protection data  */
-	ROM_LOAD( "protdata.bin", 0x000, 0x745, CRC(06b8a880) SHA1(b7d4bf26d34cb544825270c2c474bbd4c81a6c9e) ) /* extracted */
-
-	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples - 1st chip*/
-	ROM_LOAD( "mx27c4000_5.bin", 0x000000, 0x80000, CRC(7afa6adb) SHA1(d4049e1068a5f7abf0e14d0b9fbbbc6dfb5d0170) )
-
-	ROM_REGION( 0x80000, "oki2", ROMREGION_ERASE00 ) /* OKI Samples - 2nd chip (neither OKI or rom is present, empty sockets) */
-	/* not populared */
-
-	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprite Tiles - decoded */
-	ROM_LOAD16_WORD_SWAP( "m27c160.8.bin", 0x000000, 0x200000, CRC(a509bc36) SHA1(aaa008e07e4b24ff9dbcee5925d6516d1662931c) )
-
-	ROM_REGION( 0x200000, "gfx2", 0 ) /* BG Tiles - decoded */
-	ROM_LOAD16_WORD_SWAP( "m27c160.10.bin",0x000000, 0x200000, CRC(739b0cb0) SHA1(a7cc48502d84218586afa7276fa7ba759242f05e) )
-
-	ROM_REGION( 0x040000, "spritelut", 0 ) /* Sprite Code Lookup ... */
-	ROM_LOAD16_BYTE( "tms27c010_7.bin", 0x000000, 0x020000, CRC(4cb84384) SHA1(8dd02e2d9829c15cb19654779d2217a7d53d5971) )
-	ROM_LOAD16_BYTE( "tms27c010_6.bin", 0x000001, 0x020000, CRC(0c9d197a) SHA1(da057c8d08f41c4a5b9cb4f8f00de7e1461d98f0) )
-
-	ROM_REGION( 0x10000, "unknown", 0 ) /* ???? - not decoded seems to be in blocks of 0x41 bytes.. */
-	ROM_LOAD( "mx27c512.9.bin", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
-ROM_END
-
-/*
-
-Baryon
-SemiCom, 1997
-
-PCB Layout
-----------
-
-|-------------------------------------------------|
-|           ROM1   62256   ACTEL            ROM2  |
-|VOL        M6295  62256   A40MX04                |
-|    PAL  PAL              32MHz                  |
-| 62256  62256                PAL                 |
-| ROM3 ROM4         68EC020   PAL    PAL          |
-| ROM5 ROM6                   PAL    PAL          |
-|J 62256 62256                PAL                 |
-|A                            PAL    27MHz        |
-|M                                 PAL            |
-|M                         ACTEL    M5M44260      |
-|A             6116        A40MX04  M5M44260      |
-|              6116                               |
-|                          PAL                    |
-|              6264        PAL                    |
-|              6264                               |
-| DSW1                      ROM7                  |
-|       P87C52       ROM8   ROM9    27C160*       |
-| DSW2               ROM10  ROM11   27C160*       |
-|-------------------------------------------------|
-
-Baryon is a slightly different PCB, doesn't have a position for a 2nd OKI
-
-* denotes unpopulated components
-
-*/
-
-// replacment labels? no SemiCom logo
-ROM_START( baryon )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD32_BYTE( "4.bin", 0x000000, 0x040000, CRC(59e0df20) SHA1(ff12f4adcf731f6984db7d0fbdd7fcc71ce66aa4) )
-	ROM_LOAD32_BYTE( "6.bin", 0x000001, 0x040000, CRC(abccbb3d) SHA1(01524f094543d872d775306024f51258a11e9240) )
-	ROM_LOAD32_BYTE( "3.bin", 0x000002, 0x040000, CRC(046d4231) SHA1(05056efe5fec7f43c400f05278de516b01be0fdf) )
-	ROM_LOAD32_BYTE( "5.bin", 0x000003, 0x040000, CRC(63d5e7cb) SHA1(269bf5ffe10f2464f823c4d377921e19cfb8bc46) )
-
-	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
-
-	ROM_REGION( 0x6bd, "user1", 0 ) /* Protection data  */
-	ROM_LOAD( "protdata.bin", 0x000, 0x6bd, CRC(117f32a8) SHA1(837bea09d3e59ab9e13bd1103b1fc988edb361c0) ) /* extracted */
-
-	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples */
-	ROM_LOAD( "1.bin", 0x000000, 0x80000, CRC(e0349074) SHA1(f3d53d96dff586a0ad1632f52e5559cdce5ed0d8) )
-
-	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprite Tiles - decoded */
-	ROM_LOAD16_WORD_SWAP( "9.bin",  0x000000, 0x200000, CRC(28bf828f) SHA1(271390cc4f4015a3b69976f0d0527947f13c971b) )
-	ROM_LOAD16_WORD_SWAP( "11.bin", 0x200000, 0x200000, CRC(d0ff1bc6) SHA1(4aeb795222eedeeba770cf725122e989f97119b2) )
-
-	ROM_REGION( 0x200000, "gfx2", 0 ) /* BG Tiles - decoded */
-	ROM_LOAD16_WORD_SWAP( "2.bin",0x000000, 0x200000, CRC(684012e6) SHA1(4cb60907184b67be130b8385e4336320c0f6e4a7) )
-
-	ROM_REGION( 0x040000, "spritelut", 0 ) /* Sprite Code Lookup ... */
-	ROM_LOAD16_BYTE( "8.bin", 0x000000, 0x020000, CRC(fdbb08b0) SHA1(4b3ac56c4c8370b1434fb6a481fce0d9c52313e0) )
-	ROM_LOAD16_BYTE( "10.bin",0x000001, 0x020000, CRC(c9d20480) SHA1(3f6170e8e08fb7508bd13c23f243ec6888a91f5e) )
-
-	ROM_REGION( 0x10000, "unknown", 0 )
-	ROM_LOAD( "7.bin", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
-ROM_END
-
-// this set had original SemiCom labels
-ROM_START( baryona )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD32_BYTE( "rom_4_27c020.bin", 0x000000, 0x040000, CRC(6c1cdad0) SHA1(40c437507076ce52ec2240049d6b4bef180b104a) )
-	ROM_LOAD32_BYTE( "rom_5_27c020.bin", 0x000001, 0x040000, CRC(15917c9d) SHA1(6444be93e6a997070820e3c5a2e2e703e22883d9) )
-	ROM_LOAD32_BYTE( "rom_2_27c020.bin", 0x000002, 0x040000, CRC(42b14a6c) SHA1(37e772a673732ef16767c14ad77a4faaa06d675a) )
-	ROM_LOAD32_BYTE( "rom_3_27c020.bin", 0x000003, 0x040000, CRC(0ae6d86e) SHA1(410ad161688ec8516fe5ac7160a4a228dbb01936) )
-
-	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
-
-	ROM_REGION( 0x6bd, "user1", 0 ) /* Protection data - from baryon set, assumed to be the same */
-	ROM_LOAD( "protdata.bin", 0x000, 0x6bd, CRC(117f32a8) SHA1(837bea09d3e59ab9e13bd1103b1fc988edb361c0) ) /* extracted */
-
-	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples */
-	ROM_LOAD( "rom_1_27c040.bin", 0x000000, 0x80000, CRC(e0349074) SHA1(f3d53d96dff586a0ad1632f52e5559cdce5ed0d8) )
-
-	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprite Tiles - decoded */
-	ROM_LOAD16_WORD_SWAP( "rom_10_27c160.bin", 0x000000, 0x200000, CRC(28bf828f) SHA1(271390cc4f4015a3b69976f0d0527947f13c971b) )
-	ROM_LOAD16_WORD_SWAP( "rom_11_27c160.bom", 0x200000, 0x200000, CRC(d0ff1bc6) SHA1(4aeb795222eedeeba770cf725122e989f97119b2) )
-
-	ROM_REGION( 0x200000, "gfx2", 0 ) /* BG Tiles - decoded */
-	ROM_LOAD16_WORD_SWAP( "rom_8_27c160.bin",0x000000, 0x200000, CRC(684012e6) SHA1(4cb60907184b67be130b8385e4336320c0f6e4a7) )
-
-	ROM_REGION( 0x040000, "spritelut", 0 ) /* Sprite Code Lookup ... */
-	ROM_LOAD16_BYTE( "rom6", 0x000000, 0x020000, CRC(fdbb08b0) SHA1(4b3ac56c4c8370b1434fb6a481fce0d9c52313e0) )
-	ROM_LOAD16_BYTE( "rom7", 0x000001, 0x020000, CRC(c9d20480) SHA1(3f6170e8e08fb7508bd13c23f243ec6888a91f5e) )
-
-	ROM_REGION( 0x10000, "unknown", 0 )
-	ROM_LOAD( "rom_9_27c512.bin", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
-ROM_END
-
-
-
 GAME( 1997, baryon,   0,      baryon,   baryon,   driver_device, 0, ROT270, "SemiCom",         "Baryon - Future Assault (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1997, baryona,  baryon, baryon,   baryon,   driver_device, 0, ROT270, "SemiCom",         "Baryon - Future Assault (set 2)", GAME_SUPPORTS_SAVE )
-
-GAME( 2000, dreamwld, 0, dreamwld, dreamwld, driver_device, 0, ROT0,   "SemiCom",         "Dream World", GAME_SUPPORTS_SAVE )
-
-GAME( 1998, cutefght, 0, dreamwld, cutefght, driver_device, 0, ROT0,   "SemiCom",         "Cute Fighter", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // wrong linescroll?
-
-GAME( 1999, rolcrush, 0, baryon,   rolcrush, driver_device, 0, ROT0,   "Trust / SemiCom", "Rolling Crush (version 1.07.E - 1999/02/11)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // wrong linescroll
+GAME( 1998, cutefght, 0,      dreamwld, cutefght, driver_device, 0, ROT0,   "SemiCom",         "Cute Fighter", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // wrong linescroll?
+GAME( 1999, rolcrush, 0,      baryon,   rolcrush, driver_device, 0, ROT0,   "Trust / SemiCom", "Rolling Crush (version 1.07.E - 1999/02/11)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // wrong 
+GAME( 2000, dreamwld, 0,      dreamwld, dreamwld, driver_device, 0, ROT0,   "SemiCom",         "Dream World", GAME_SUPPORTS_SAVE )
