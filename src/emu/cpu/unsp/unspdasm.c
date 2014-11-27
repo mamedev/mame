@@ -53,7 +53,7 @@ static const char *alu[] =
 
 /*****************************************************************************/
 
-#define UNSP_DASM_OK ((2 * (OP2X ? 2 : 1)) | DASMFLAG_SUPPORTED)
+#define UNSP_DASM_OK ((OP2X ? 2 : 1) | DASMFLAG_SUPPORTED)
 
 CPU_DISASSEMBLE( unsp )
 {
@@ -68,7 +68,7 @@ CPU_DISASSEMBLE( unsp )
 
 	if(OP0 < 0xf && OPA == 0x7 && OP1 < 2)
 	{
-		print("%s %04x", jmp[OP0], OP1 ? (pc - OPIMM*2) : (pc + OPIMM*2));
+		print("%s %04x", jmp[OP0], OP1 ? (pc - OPIMM + 1) : (pc + OPIMM + 1));
 		return UNSP_DASM_OK;
 	}
 

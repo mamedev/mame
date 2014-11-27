@@ -16,7 +16,7 @@ const device_type UNSP = &device_creator<unsp_device>;
 
 unsp_device::unsp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, UNSP, "u'nSP", tag, owner, clock, "unsp", __FILE__)
-	, m_program_config("program", ENDIANNESS_BIG, 16, 23, 0)
+	, m_program_config("program", ENDIANNESS_BIG, 16, 23, -1)
 {
 }
 
@@ -100,19 +100,19 @@ offs_t unsp_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opr
 
 void unsp_device::unimplemented_opcode(UINT16 op)
 {
-	fatalerror("UNSP: unknown opcode %04x at %04x\n", op, UNSP_LPC << 1);
+	fatalerror("UNSP: unknown opcode %04x at %04x\n", op, UNSP_LPC);
 }
 
 /*****************************************************************************/
 
 UINT16 unsp_device::READ16(UINT32 address)
 {
-	return m_program->read_word(address << 1);
+	return m_program->read_word(address<<1);
 }
 
 void unsp_device::WRITE16(UINT32 address, UINT16 data)
 {
-	m_program->write_word(address << 1, data);
+	m_program->write_word(address<<1, data);
 }
 
 /*****************************************************************************/
@@ -152,11 +152,11 @@ void unsp_device::state_export(const device_state_entry &entry)
 	switch (entry.index())
 	{
 		case UNSP_PC:
-			m_debugger_temp = UNSP_LPC << 1;
+			m_debugger_temp = UNSP_LPC;
 			break;
 
 		case STATE_GENPC:
-			m_debugger_temp = UNSP_LPC << 1;
+			m_debugger_temp = UNSP_LPC;
 			break;
 	}
 }
@@ -166,8 +166,8 @@ void unsp_device::state_import(const device_state_entry &entry)
 	switch (entry.index())
 	{
 		case UNSP_PC:
-			UNSP_REG(PC) = (m_debugger_temp & 0x0001fffe) >> 1;
-			UNSP_REG(SR) = (UNSP_REG(SR) & 0xffc0) | ((m_debugger_temp & 0x007e0000) >> 17);
+			UNSP_REG(PC) = m_debugger_temp & 0x0000ffff;
+			UNSP_REG(SR) = (UNSP_REG(SR) & 0xffc0) | ((m_debugger_temp & 0x003f0000) >> 16);
 			break;
 	}
 }
@@ -230,8 +230,7 @@ void unsp_device::execute_run()
 
 	while (m_icount > 0)
 	{
-		debugger_instruction_hook(this, UNSP_LPC<<1);
-
+		debugger_instruction_hook(this, UNSP_LPC);
 		op = READ16(UNSP_LPC);
 
 		UNSP_REG(PC)++;
