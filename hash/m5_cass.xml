@@ -215,6 +215,58 @@
 		</part>
 	</software>
 
+	<software name="ssf" supported="no">
+		<description>Solar System Forces</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="太陽系艦隊"/>
+		<info name="usage" value="Mount together with &quot;BASIC-G&quot; and load with CHAIN"/>
+		<part name="cass1" interface="m5_cass">
+			<dataarea name="cass" size="17882692">
+				<rom name="solar system forces (19xx)(-)[req basic-g].wav" size="17882692" crc="07b4e0e1" sha1="c057b7d7b964ee3cef516a1f60692e431dce1616" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssfcm" supported="no">
+		<description>Solar System Forces - Commando Team</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="太陽系艦隊4 コマンドチーム"/>
+		<info name="usage" value="Mount together with &quot;BASIC-G&quot; and load with CHAIN"/>
+		<part name="cass1" interface="m5_cass">
+			<dataarea name="cass" size="7273520">
+				<rom name="solar system forces - commando team (19xx)(-)[req basic-g].wav" size="7273520" crc="fb402872" sha1="cb699eaf40c46a3fb61bdf4cd0faa902e8778abb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssfom" supported="no">
+		<description>Solar System Forces - Operation Maul</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="太陽系艦隊3 オペレーションモール"/>
+		<info name="usage" value="Mount together with &quot;BASIC-G&quot; and load with CHAIN"/>
+		<part name="cass1" interface="m5_cass">
+			<dataarea name="cass" size="7348024">
+				<rom name="solar system forces - operation maul (19xx)(-)[req basic-g].wav" size="7348024" crc="389b82e5" sha1="baee461d2fde0941eb0c7a5963c5340c32212d76" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssfvm" supported="no">
+		<description>Solar System Forces - Victory of Mars</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="太陽系艦隊2 火星軌道上の勝利"/>
+		<info name="usage" value="Mount together with &quot;BASIC-G&quot; and load with CHAIN"/>
+		<part name="cass1" interface="m5_cass">
+			<dataarea name="cass" size="7731210">
+				<rom name="solar system forces - victory of mars (19xx)(-)[req basic-g].wav" size="7731210" crc="c711f2bb" sha1="2a266117198bf9290d831941dba7e419e745ccce" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="solitair">
 		<description>Solitaire</description>
 		<year>19??</year>
