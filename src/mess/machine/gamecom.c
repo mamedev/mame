@@ -435,10 +435,10 @@ WRITE8_MEMBER( gamecom_state::gamecom_handle_dma )
 		return;
 	}
 
-	if ( m_dma.decrement_x || m_dma.decrement_y )
-	{
-		popmessage( "TODO: Decrement-x and decrement-y are not supported yet\n" );
-	}
+	//if ( m_dma.decrement_x || m_dma.decrement_y )
+	//{
+		//popmessage( "TODO: Decrement-x and decrement-y are not supported yet\n" );
+	//}
 
 	m_dma.width_x = RAM[SM8521_DMDX];
 	m_dma.width_x_count = 0;
@@ -574,7 +574,10 @@ WRITE8_MEMBER( gamecom_state::gamecom_handle_dma )
 		/* Advance a line */
 		m_dma.source_x_current = m_dma.source_x;
 		m_dma.dest_x_current = m_dma.dest_x;
-		m_dma.source_line += m_dma.source_width;
+		if ( m_dma.decrement_y )
+			m_dma.source_line -= m_dma.source_width;
+		else
+			m_dma.source_line += m_dma.source_width;
 		m_dma.source_current = m_dma.source_line;
 		m_dma.dest_line += m_dma.dest_width;
 		m_dma.dest_current = m_dma.dest_line;
