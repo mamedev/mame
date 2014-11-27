@@ -1,0 +1,514 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="mtx_cass" description="Memotech MTX cassettes">
+
+<!-- 
+TODO: find out why the driver does not recognize the program on the tapes...
+-->
+
+	<software name="3dtach" supported="no">
+		<description>3D Tachyon Fighter</description>
+		<year>1984</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="2021162">
+				<rom name="3d tachyon fighter (1984)(continental software).wav" size="2021162" crc="2589dbde" sha1="6a71529a04b6aa408e5129e22fe9a5424c38d1ee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dturbo" supported="no">
+		<description>3D Turbo</description>
+		<year>1984</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="1854157">
+				<rom name="3d turbo (1984)(continental software).wav" size="1854157" crc="4c284701" sha1="4e4ba0658bdf1e269d80905303f88b623d080276" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="agrovatr" supported="no">
+		<description>Agrovator</description>
+		<year>1985</year>
+		<publisher>Syntax Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="1689130">
+				<rom name="agrovator (1985)(syntax software).wav" size="1689130" crc="b559a805" sha1="c3d7418a20bc9df0120903d768c83c5ab3fe3465" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alice" supported="no">
+		<description>Alice in Wonderland</description>
+		<year>1983</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="2484522">
+				<rom name="alice in wonderland (1983)(continental software).wav" size="2484522" crc="bd85acc6" sha1="6301ccf3072b390cb44a4a85c71f063886f171b0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arcazion" supported="no">
+		<description>Arcazion</description>
+		<year>1985</year>
+		<publisher>Chris Sawyer</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="730152">
+				<rom name="arcazion (1985)(sawyer, chris).wav" size="730152" crc="e2b88cf7" sha1="2fdda7c67165288b44755e2014a402ce8762bafd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astropac" supported="no">
+		<description>Astro-Pac</description>
+		<year>1984</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="1150504">
+				<rom name="astro-pac (1984)(continental software).wav" size="1150504" crc="28723a4f" sha1="bd8489cb38d109aedc111b199c1c36e1f62acf7e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astromil" supported="no">
+		<description>Astromilon</description>
+		<year>1984</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="606506">
+				<rom name="astromilon (1984)(continental software).wav" size="606506" crc="02b07b74" sha1="6dc84b5fb7aafc569606d9a75cd2749c852903c0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="backgamm" supported="no">
+		<description>Backgammon</description>
+		<year>1983</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="1128490">
+				<rom name="backgammon (1983)(continental software).wav" size="1128490" crc="b1581a9c" sha1="ef9898fe868f51707fd9e7666b5aac9e7eb3b1ba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blobbo" supported="no">
+		<description>Blobbo</description>
+		<year>1984</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="1205546">
+				<rom name="blobbo (1984)(continental software).wav" size="1205546" crc="5e6be874" sha1="47d4fb8b3ad2861231812c1af094f3f4f23e52bf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cbridge2" supported="no">
+		<description>Contract Bridge II</description>
+		<year>1984</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="3367810">
+				<rom name="contract bridge ii (1984)(continental software).wav" size="3367810" crc="63e8a4a6" sha1="0b5ba910d170fa3e2aebb84ecec76973bc60d3bc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cbridge2a" cloneof="cbridge2" supported="no">
+		<description>Contract Bridge II (Alt)</description>
+		<year>1984</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="3367936">
+				<rom name="contract bridge ii (1984)(continental software)[a].wav" size="3367936" crc="c662669c" sha1="a98ad20cfad39e7b3ba0e9df8ab97e830ee4d286" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cosmraid" supported="no">
+		<description>Cosmic Raiders</description>
+		<year>1984</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="1326820">
+				<rom name="cosmic raiders (1984)(continental software).wav" size="1326820" crc="c4684ba3" sha1="35403fc613cd45dfb97fd8502f7647c39b49009d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goldmine" supported="no">
+		<description>Goldmine</description>
+		<year>1983</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="3377977">
+				<rom name="goldmine (1983)(continental software).wav" size="3377977" crc="263b14a8" sha1="8c19ebf881448003ae3389b8d8303eb54320a4c5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hawkwars" supported="no">
+		<description>Hawk Wars</description>
+		<year>1985</year>
+		<publisher>Syntax Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="986666">
+				<rom name="hawk wars (1985)(syntax software).wav" size="986666" crc="f38501a9" sha1="cbb349aa61c2caed142dcc0703d00ca375f73c3e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jumpjack" supported="no">
+		<description>Jumping Jack Flash</description>
+		<year>1985</year>
+		<publisher>Syntax Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="2800648">
+				<rom name="jumping jack flash (1985)(syntax software).wav" size="2800648" crc="c7203844" sha1="c6fb39c408588910af63ba5b9ee4d6a605dbbb38" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jumpjacka" cloneof="jumpjack" supported="no">
+		<description>Jumping Jack Flash (Alt)</description>
+		<year>1985</year>
+		<publisher>Syntax Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="2800510">
+				<rom name="jumping jack flash (1985)(syntax software)[a].wav" size="2800510" crc="55880d5b" sha1="51ecef974d417fa021f544e59476233325c56f44" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kilopede" supported="no">
+		<description>Kilopede</description>
+		<year>1983</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="689866">
+				<rom name="kilopede (1983)(continental software).wav" size="689866" crc="32e73f52" sha1="219bae458fe266c83e2c84f7af61bfa4acdd98ac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="knuckles" supported="no">
+		<description>Knuckles</description>
+		<year>1983</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="1766980">
+				<rom name="knuckles (1983)(continental software).wav" size="1766980" crc="fa8bb304" sha1="fc2feb8b769b0abb3b8d87662144616204d99f14" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="knucklesa" cloneof="knuckles" supported="no">
+		<description>Knuckles (Alt)</description>
+		<year>1983</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="1766967">
+				<rom name="knuckles (1983)(continental software)[a].wav" size="1766967" crc="677a1d0b" sha1="23f476930a247686e6907f6bde44d1fc15be311c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lildevil" supported="no">
+		<description>Little Devils</description>
+		<year>1985</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="794920">
+				<rom name="little devils (1985)(syntax software).wav" size="794920" crc="1dfe1f05" sha1="bb8120a162d5272653b48fe98f54de1a6a775c78" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="canavas" supported="no">
+		<description>Micro Canavas</description>
+		<year>2000</year>
+		<publisher>MTX ISFT</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="3058350">
+				<rom name="micro canavas (2000)(mtx isft).wav" size="3058350" crc="bee454e5" sha1="fc9c0b49befc0411ee1370f775a0859f7ac22983" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alphatro" supported="no">
+		<description>Mission Alphatron</description>
+		<year>1984</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="1410990">
+				<rom name="mission alphatron (1984)(continental software).wav" size="1410990" crc="3dfcb4ba" sha1="64e7d42156745ca2a3032c418f97163e89634d65" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alphatroa" cloneof="alphatro" supported="no">
+		<description>Mission Alphatron (Alt)</description>
+		<year>1984</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="1411127">
+				<rom name="mission alphatron (1984)(continental software)[a].wav" size="1411127" crc="d14f3525" sha1="858bf19bc6085f58a096670e936994eae34264eb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="misomega" supported="no">
+		<description>Mission Omega</description>
+		<year>1985</year>
+		<publisher>Chris Sawyer - Syntaxsoft</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="854826">
+				<rom name="mission omega (1985)(sawyer, chris - syntaxsoft).wav" size="854826" crc="da3fac2b" sha1="82096de278a94a1cdae6263de65d604582fbb15e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mtxchess" supported="no">
+		<description>MTX Chess</description>
+		<year>1983</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="2198847">
+				<rom name="mtx chess (1983)(continental software).wav" size="2198847" crc="5e96b81f" sha1="bb5c67af8bf49ed454c816abe19a583df83ebd01" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nemo" supported="no">
+		<description>Nemo</description>
+		<year>1983</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="1232168">
+				<rom name="nemo (1983)(continental software).wav" size="1232168" crc="e3e012b5" sha1="c59dd0343942d72bcff961e8868b721c825e0c3d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="obloids" supported="no">
+		<description>Obloids</description>
+		<year>1984</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="1241642">
+				<rom name="obloids (1984)(continental software).wav" size="1241642" crc="815729bf" sha1="769422894d41954dca5db3b5e2e411ee96c86884" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phaid" supported="no">
+		<description>Phaid</description>
+		<year>1983</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="1497466">
+				<rom name="phaid (1983)(continental software).wav" size="1497466" crc="db9d7c98" sha1="9d5630fc226d414c0f52d5924c13b229f5a18afc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phaida" cloneof="phaid" supported="no">
+		<description>Phaid (Alt)</description>
+		<year>1983</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="1508207">
+				<rom name="phaid (1983)(continental software)[a].wav" size="1508207" crc="b8299386" sha1="a1704dc34e26a7107f0b3dd94b56c0e234cd57b3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qogo" supported="no">
+		<description>Qogo</description>
+		<year>1984</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="802346">
+				<rom name="qogo (1984)(continental software).wav" size="802346" crc="877996a3" sha1="e5ef101c7656897df0495a5ae642f1cf487b9737" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quazzia" supported="no">
+		<description>Quazzia</description>
+		<year>1984</year>
+		<publisher>Megastar Games</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="2440746">
+				<rom name="quazzia (1984)(megastar games).wav" size="2440746" crc="0b834345" sha1="2495de02a7d8b9a330701149caef9ca7ed7b452b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reversi" supported="no">
+		<description>Reversi</description>
+		<year>1984</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="1782582">
+				<rom name="reversi (1984)(continental software).wav" size="1782582" crc="bd643977" sha1="5bf931f5c2252d0c3a5d6f5d13464988cc13dff1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reversia" cloneof="reversi" supported="no">
+		<description>Reversi (Alt)</description>
+		<year>1984</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="1782569">
+				<rom name="reversi (1984)(continental software)[a].wav" size="1782569" crc="e468f5e9" sha1="f7d82d67b8d94915739f185ccecc724f720b74c2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spaceinv" supported="no">
+		<description>Space Invasion</description>
+		<year>1998</year>
+		<publisher>John Dondzila</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="1750058">
+				<rom name="space invasion (1998)(dondzila, john).wav" size="1750058" crc="08e592c0" sha1="a63f4c788cc10db01e89cc8bb2e121382fada0c2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spaceinva" cloneof="spaceinv" supported="no">
+		<description>Space Invasion (Alt)</description>
+		<year>1998</year>
+		<publisher>John Dondzila</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="1750058">
+				<rom name="space invasion (1998)(dondzila, john)[a].wav" size="1750058" crc="3a8dab04" sha1="ca7908ee86f10a6d038d76efac82d5cd29e62d30" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starcmd" supported="no">
+		<description>Star Command</description>
+		<year>1984</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="1962026">
+				<rom name="star command (1984)(continental software).wav" size="1962026" crc="3ae902f0" sha1="4508c2bcf5dd4abcd148e6bc177c6f3f1c98f5ae" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sminefld" supported="no">
+		<description>Super Minefield</description>
+		<year>1984</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="1032746">
+				<rom name="super minefield (1984)(continental software).wav" size="1032746" crc="f5f47e24" sha1="496a4048d9effafb0bb3f8c739e30b017fc89e27" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="surfscan" supported="no">
+		<description>Surface Scanner</description>
+		<year>1984</year>
+		<publisher>Megastar Games</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="1788648">
+				<rom name="surface scanner (1984)(megastar games).wav" size="1788648" crc="a291ed23" sha1="f0136543a9fb07e8a6f1bff778111370c6fde71f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tapeworm" supported="no">
+		<description>Tapeworm</description>
+		<year>1984</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="754288">
+				<rom name="tapeworm (1984)(continental software).wav" size="754288" crc="d39cc8e2" sha1="05bffa9b020a8025f4c70c2389b7d753a777f261" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="targzone" supported="no">
+		<description>Target Zone</description>
+		<year>1985</year>
+		<publisher>Syntax Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="1386109">
+				<rom name="target zone (1985)(syntax software).wav" size="1386109" crc="0d7c47b4" sha1="e98e2ebca226366cdf10bb913063ca8f5aeaeb59" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toado" supported="no">
+		<description>Toado</description>
+		<year>1984</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="1225768">
+				<rom name="toado (1984)(continental software).wav" size="1225768" crc="d0186e4c" sha1="88ef2d83771806665379ea9295d373d8882d4f59" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vernon" supported="no">
+		<description>Vernon and the Vampires</description>
+		<year>1983</year>
+		<publisher>Syntax Software</publisher>
+
+		<part name="cass1" interface="mtx_cass">
+			<dataarea name="cass" size="1385723">
+				<rom name="vernon and the vampires (1983)(syntax software).wav" size="1385723" crc="533bdad4" sha1="4d046fcb6273f74b86385cc35477ba8ad13a31dd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
