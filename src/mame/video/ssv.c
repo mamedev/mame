@@ -385,25 +385,6 @@ WRITE16_MEMBER(ssv_state::ssv_scroll_w)
 //      printf("%04x %04x\n",data,offset*2);
 }
 
-WRITE16_MEMBER(ssv_state::paletteram16_xrgb_swap_word_w)
-{
-	int r, g, b;
-	UINT16 data0, data1;
-
-	COMBINE_DATA(m_paletteram + offset);
-
-	offset &= ~1;
-
-	data0 = m_paletteram[offset + 1];
-	data1 = m_paletteram[offset];
-
-	r = data0 & 0xff;
-	g = data1 >> 8;
-	b = data1 & 0xff;
-
-	m_palette->set_pen_color(offset>>1, rgb_t(r, g, b));
-}
-
 /***************************************************************************
 
 
