@@ -13,7 +13,7 @@
 .\" and updated by Andrew Burton <burtona@gol.com>, July 2003
 .\"
 .\"
-.TH MAME 6 2014-10-15 0.155 "MAME \- The Multiple Arcade Machine Emulator"
+.TH MAME 6 2014-11-19 0.156 "MAME \- The Multiple Arcade Machine Emulator"
 .\"
 .\"
 .\" NAME chapter
@@ -172,7 +172,9 @@ limit this list by specifying a specific softwarelistname (without .XML).
 .TP
 .B \-listmidi, \-mlist
 Create a list of list available MIDI I/O devices for use with emulation.
-
+.TP
+.B \-listnetwork, \-nlist
+List available network adapters.
 .\"
 .\" *******************************************************
 .SS Configuration options
@@ -214,8 +216,9 @@ vector games, you can create a vector.ini with the "effect none" line
 in it, and it will override whatever effect value you have in your
 mame.ini. The default is ON (\-readconfig).
 .TP
-.B \-writeconfig, \-wc
+.B \-[no]writeconfig, \-[no]wc
 Write configuration to \fI[driver]\fR.ini on exit.
+Default is OFF (\-nowriteconfig).
 .\"
 .\" *******************************************************
 .SS Search path options
@@ -228,6 +231,12 @@ consistent across releases.
 Specifies a list of paths within which to find ROM or hard disk images.
 Multiple paths can be specified by separating them with semicolons.
 The default is 'roms' (that is, a directory "roms" in the same directory
+as the MAME executable).
+.TP
+.B \-hashpath \fIpathname
+Specifies a list of paths within which to search for software hash files.
+Multiple paths can be specified by separating them with semicolons.
+The default is 'hash' (that is, a directory 'hash' in the same directory
 as the MAME executable).
 .TP
 .B \-samplepath, \-sp \fIpathname
@@ -359,6 +368,23 @@ consistent, you should only record and playback with all configuration
 (.cfg), NVRAM (.nv), and memory card files deleted. The default is NULL
 (no recording).
 .TP
+.B \-mngwrite \fIfilename
+Writes each video frame to the given \fIfilename\fP in MNG format, producing
+an animation of the	game session. Note that \-mngwrite only writes video
+frames; it does not save any audio data. Use \-wavwrite for that, and
+reassemble the audio/video using offline tools. The default is NULL (no
+recording).
+.TP
+.B \-aviwrite \fIfilename
+Stream video and sound data to the given \fIfilename\fP in AVI format,
+producing an animation of the game session complete with sound. The
+default is NULL (no recording).
+.TP
+.B \-wavwrite \fIfilename
+Writes the final mixer output to the given \fIfilename\fP in WAV format,
+producing an audio recording of the	game session. The default is NULL
+(no recording).
+.TP
 .B \-snapname \fIstring
 Describes how MAME should name files for snapshots. \fIstring\fP
 provides a template that is used to generate a filename. Three
@@ -397,6 +423,10 @@ specified by \fIviewname\fP. For example, \-snapview native will match the
 \fIviewname\fP can also be 'auto', which selects the first view with all
 screens present. The default value is 'internal'.
 .TP
+.B \-[no]snapbilinear
+Specify whether snapshot/movie should have bilinear filtering applied.
+Default is ON (\-snapbilinear).
+.TP
 .B \-statename \fIstring
 Describes how MAME should store save state files, relative to the
 state_directory path. \fIstring\fP provides a template that
@@ -407,23 +437,6 @@ the current game. The default is '%g', which creates a separate folder
 for each game. Example: if you use
 .B mame robby \-statename foo/%g
 save states will be stored inside \fBsta/foo/robby/\fP. 
-.TP
-.B \-mngwrite \fIfilename
-Writes each video frame to the given \fIfilename\fP in MNG format, producing
-an animation of the	game session. Note that \-mngwrite only writes video
-frames; it does not save any audio data. Use \-wavwrite for that, and
-reassemble the audio/video using offline tools. The default is NULL (no
-recording).
-.TP
-.B \-aviwrite \fIfilename
-Stream video and sound data to the given \fIfilename\fP in AVI format,
-producing an animation of the game session complete with sound. The
-default is NULL (no recording).
-.TP
-.B \-wavwrite \fIfilename
-Writes the final mixer output to the given \fIfilename\fP in WAV format,
-producing an audio recording of the	game session. The default is NULL
-(no recording).
 .TP
 .B \-[no]burnin
 Tracks brightness of the screen during play and at the end of 
@@ -476,31 +489,36 @@ game isn't taxing 100% of your CPU resources. This option can potentially
 cause hiccups in performance if other demanding programs are running.
 The default is ON (\-sleep).
 .TP
-.B \-speed
+.B \-speed \fIvalue
 Controls the speed of gameplay, relative to realtime; smaller numbers are
 slower. Default is 1.00.
 .TP
-.B \-refreshspeed, \-rs
+.B \-[no]refreshspeed, \-[no]rs
 Automatically adjusts the \fB\-speed\fR parameter to keep the effective refresh
 rate below that of the lowest screen refresh rate.
+Default is OFF (\-norefreshspeed).
+.\"
+.\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+.\" OS specific
+.\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+.TP
+.B \-[no]multithreading, \-[no]mt
+Enable multithreading; this enables rendering and blitting on a separate
+thread. The default is OFF (\-nomultithreading).
+.TP
+.B \-numprocessors, \-np \fIvalue
+Set number of processors; this overrides the number the system reports.
+.TP
+.B \-bench \fIvalue
+Benchmark for the given number of emulated seconds;
+implies \-video none \-sound none \-nothrottle.
 .\"
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .\" SDL specific
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .TP
-.B \-multithreading, \-mt
-Enable multithreading; this enables rendering and blitting on a separate
-thread. The default is OFF.
-.TP
-.B \-numprocessors, \-np
-Set number of processors; this overrides the number the system reports.
-.TP
-.B \-sdlvideofps
-Show SDL video performance.
-.TP
-.B \-bench
-Benchmark for the given number of emulated seconds;
-implies \-video none \-sound none \-nothrottle.
+.B \-[no]sdlvideofps
+Show SDL video performance. Default is OFF (\-nosdlvideofps).
 .\"
 .\" *******************************************************
 .SS Rotation options
@@ -516,8 +534,8 @@ arcade, turn this option OFF. The default is ON (\-rotate).
 .B \-[no]ror | \-[no]rol
 Rotate the game screen to the right (clockwise) or left (counter\-
 clockwise) relative to either its normal state (if \-rotate is specified)
-or its native state (if \-norotate is specified). The default for both of
-these options is OFF (\-noror \-norol).
+or its native state (if \-norotate is specified).
+Default for both is OFF (\-noror \-norol).
 .TP
 .B \-[no]autoror | \-[no]autorol
 These options are designed for use with pivoting screens that only
@@ -525,12 +543,13 @@ pivot in a single direction. If your screen only pivots clockwise,
 use \-autorol to ensure that the game will fill the screen either
 horizontally or vertically in one of the directions you can handle.
 If your screen only pivots counter\-clockwise, use \-autoror.
+Default for both is OFF (\-noautoror \-noautorol).
 .TP
 .B \-[no]flipx \-[no]flipy
 Flip (mirror) the game screen either horizontally (\-flipx) or
 vertically (\-flipy). The flips are applied after the \-rotate and
-\-ror/\-rol options are applied. The default for both of these options
-is OFF (\-noflipx \-noflipy).
+\-ror/\-rol options are applied.
+Default for both is OFF (\-noflipx \-noflipy).
 .\"
 .\" *******************************************************
 .SS Artwork options
@@ -598,11 +617,8 @@ toward white. The default is 1.0.
 This controls the brightness level when MAME is paused. The default
 value is 0.65.
 .TP
-.B \-minimum_width \fIvalue
-Minimum screen width. The default value is 320.
-.TP
-.B \-minimum_height \fIvalue
-Minimum screen eigth. The default value is 240.
+.B \-effect\fR [\fInone\fR|\fIfilename[.png]\fR]
+Name of a PNG file to use for visual effects, or 'none'. Default is 'none'.
 .\"
 .\" *******************************************************
 .SS Vector rendering options
@@ -612,7 +628,7 @@ Minimum screen eigth. The default value is 240.
 Enables antialiased line rendering for vector games. The default is ON
 (\-antialias).
 .TP
-.B \-beam \fIwidth
+.B \-beam \fIvalue
 Sets the width of the vectors. This is a scaling factor against the
 standard vector width. A value of 1.0 will keep the default vector line
 width. Smaller values will reduce the width, and larger values will
@@ -659,33 +675,31 @@ start MAME. If it is turned off, the window will start out at the
 smallest supported size. This option only has an effect when the 
 \-window option is used. The default is ON (\-maximize).
 .TP
-.B \-keepaspect, \-ka
+.B \-[no]keepaspect, \-[no]ka
 Forces the correct aspect ratio. This means when you're resizing the window
 in windowed mode the actual game image will resize in discrete steps to
 maintain the proper shape of the game graphics. If you turn this off you can
 resize the window to anything you like and get funny squishing and stretching.
 The same applies for full\-screen. Default is ON (\-keepaspect).
 .TP
-.B \-unevenstretch, \-ues
+.B \-[no]unevenstretch, \-[no]ues
 Allow non\-integer stretch factors. Video purists should stay far, far away
 from this option, while everyone else will be happy to know that it lets you
 fill the screen properly in full\-screen mode. Default is ON (\-unevenstretch).
 .TP
-.B \-effect
-Name of a PNG file to use for visual effects, or 'none'. Default is 'none'.
-.TP
-.B \-centerh
+.B \-[no]centerh
 Center horizontally within the view area. Default is ON (\-centerh).
 .TP
-.B \-centerv
+.B \-[no]centerv
 Center vertically within the view area. Default is ON (\-centerv).
 .TP
-.B \-waitvsync
+.B \-[no]waitvsync, \-[no]vs
 Enable waiting for the start of VBLANK before flipping screens;
-reduces tearing effects.
+reduces tearing effects. Default is OFF (\-nowaitvsync).
 .TP
-.B \-syncrefresh
+.B \-[no]syncrefresh, \-[no]srf
 Enable using the start of VBLANK for throttling instead of the game time.
+Default is OFF (\-nosyncrefresh).
 .\"
 .\" *******************************************************
 .SS Software video rendering subsystem options
@@ -697,7 +711,7 @@ Enable using the start of VBLANK for throttling instead of the game time.
 All the options in this group are available only with softare video 
 rendering subsystem, i.e \fB\-video soft\fR.
 .TP
-.B \-prescale
+.B \-prescale\fR [\fIvalue\fR]
 Scale screen rendering by this amount in software. Default is 1.
 .TP
 .B \-scalemode, \-sm \fR[\fInone\fR|\fIasync\fR|\fIyv12\fR|\fIyuy2\fR|\fIyv12x2\fR|\fIyuy2x2\fR]
@@ -727,30 +741,31 @@ Default is NONE.
 All the options in this group are available only with OpenGL video 
 rendering subsystem, i.e \fB\-video opengl\fR or \fB\-video opengl16\fR.
 .TP
-.B \-filter, \-glfilter, \-flt
+.B \-[no]filter, \-[no]glfilter, \-[no]flt
 Enable bilinear filtering on screen output. Default is ON (\-filter).
 .TP
-.B \-prescale
+.B \-prescale\fR [\fIvalue\fR]
 Scale screen rendering by this amount in software. Default is 1.
 .TP
-.B \-gl_forcepow2texture
-Force power of two textures. Default is NO.
+.B \-[no]gl_forcepow2texture
+Force power of two textures. Default is OFF (\-nogl_forcepow2texture).
 .TP
-.B \-gl_notexturerect
-Don't use OpenGL GL_ARB_texture_rectangle. Default is ON: turn off
-(set this to 0) if corruption occurs in OpenGL mode, at cost of some
-performance loss.
+.B \-[no]gl_notexturerect
+Don't use OpenGL GL_ARB_texture_rectangle. Turn off if
+corruption occurs in OpenGL mode, at cost of some performance
+loss. Default is ON (\-gl_notexturerect).
 .TP
-.B \-gl_vbo
+.B \-[no]gl_vbo
 Enable OpenGL VBO, if available, for a performance increase.
-Default is ON: turn off (set this to 0) if corruption occurs.
+Turn off if corruption occurs. Default is ON (\-gl_vbo).
 .TP
-.B \-gl_pbo
+.B \-[no]gl_pbo
 Enable OpenGL PBO, if available, for a performance increase.
-Default is ON: turn off (set this to 0) if corruption occurs.
+Turn off if corruption occurs. Default is ON (\-gl_pbo).
 .TP
-.B \-gl_glsl
+.B \-[no]gl_glsl
 Enable OpenGL GLSL, if available, for a performance increase.
+Default is OFF (\-nogl_glsl).
 .TP
 .B \-gl_glsl_filter \fIvalue
 Enable OpenGL GLSL filtering instead of FF filtering 0=plain, 1=bilinear.
@@ -805,10 +820,10 @@ Preferred view for the first|second|third|fourth screen.
 Affects full screen mode only. Chooses if MAME can try to change the screen
 resolution (color depth is normally left alone) when in full\-screen mode. If
 it's off, you always get your desktop resolution in full\-screen mode (which can
-be useful for LCDs).
+be useful for LCDs). Default is OFF (\-noswitchres).
 .TP
-.B \-useallheads
-Split full screen image across monitors.
+.B \-[no]useallheads
+Split full screen image across monitors. Default is OFF (\-nouseallheads).
 .\"
 .\" *******************************************************
 .SS Sound options
@@ -903,6 +918,10 @@ handling that makes it easier to register simultaneous button presses,
 but has the disadvantage of making controls less responsive. The
 default is OFF (\-nosteadykey).
 .TP
+.B \-[no]ui_active
+Enable MAME user interface on top of emulated keyboard (if present).
+Default is OFF (\-noui_active).
+.TP
 .B \-[no]offscreen_reload, \-[no]reload
 Controls whether or not MAME treats a second button input from a
 lightgun as a reload signal. In this case, MAME will report the gun's
@@ -930,18 +949,20 @@ the maximum range. This option expects a float in the range of 0.0 to
 1.0, where 0 is the center of the joystick and 1 is the outer limit.
 The default is 0.85.
 .TP
-.B \-natural, \-nat
+.B \-[no]natural, \-[no]nat
 Allows user to specify whether or not to use a natural keyboard.
 This allows you to start your game or system in a 'native' mode, depending
 on your region, allowing compatibility for non\-"QWERTY" style keyboards.
 The default is OFF (\-nonatural).
 .TP
-.B \-joystick_contradictory
+.B \-[no]joystick_contradictory, \-[no]joy_contradictory
 Enable contradictory direction digital joystick input at the same time.
+Default is OFF (\-nojoystick_contradictory).
 .TP
 .B \-coin_impulse \fItime
 Set coin impulse time. A negative value for \fItime\fR disables the impulse;
 set \fItime\fR to 0 to obey driver or give a positive value to set impulse time.
+.\"
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .\" SDL specific
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -949,9 +970,9 @@ set \fItime\fR to 0 to obey driver or give a positive value to set impulse time.
 .B \-uimodekey, \-umk
 Specifies the key used to toggle between full and partial UI mode.
 .TP
-.B \-keymap
+.B \-[no]keymap
 Enable keymap for non\-QWERTY keyboards. Used in conjunction with
-\fB\-keymap_file\fR.
+\fB\-keymap_file\fR. Default is OFF (\-nokeymap).
 .TP
 .B \-keymap_file \fIkeymap_file\fR
 Specifies the full path to the keymap file to be used. A few
@@ -964,8 +985,9 @@ in a different order on the next boot, MAME will still see the joystick
 as e.g. "Joystick 2". Use mame \-v to see which joysticks are recognized.
 Default is 'auto'.
 .TP
-.B \-sixaxis
+.B \-[no]sixaxis
 Use special handling for PS3 Sixaxis controllers.
+Default is OFF (\-nosixaxis).
 .TP
 .B \-lightgun_index[1\-8]
 Map lightgun to specific index in MAME.
@@ -1018,11 +1040,12 @@ is OFF (\-nolog).
 Displays internal diagnostic information. This information is very
 useful for debugging problems with your configuration. \fBIMPORTANT\fP: when
 reporting bugs, please run with mame \-verbose and include the resulting
-information. The default is off (\-noverbose).
+information. The default is OFF (\-noverbose).
 .TP
-.B \-update_in_pause
+.B \-[no]update_in_pause
 Enables updating the screen bitmap while the game is paused. This is
 useful for debuggin in some scenarios (and gets in the way in others).
+Default is OFF (\-noupdate_in_pause).
 .TP
 .B \-[no]debug, \-[no]d
 Activates the integrated debugger. By default, the debugger is entered 
@@ -1032,6 +1055,7 @@ immediately at startup. The default is OFF (\-nodebug).
 .B \-debugscript \fIfilename
 Specifies a file that contains a list of debugger commands to execute
 immediately upon startup. The default is NULL (no commands).
+.\"
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .\" SDL specific
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -1045,11 +1069,17 @@ Default is OFF (\-nooslog).
 .SS Misc options
 .\" *******************************************************
 .TP
-.B \-drc
-Enable DRC cpu core if available. Enabled by default.
+.B \-[no]drc
+Enable DRC cpu core if available. Default is ON (\-drc).
 .TP
-.B \-drc_use_c
-Force DRC use C backend.
+.B \-[no]drc_use_c
+Force DRC use C backend. Default is OFF (\-nodrc_use_c).
+.TP
+.B \-[no]drc_log_uml
+Write DRC UML disassembly log. Default is OFF (\-nodrc_log_uml).
+.TP
+.B \-[no]drc_log_native
+Write DRC native disassembly log. Default is OFF (\-no_drc_log_native).
 .TP
 .B \-bios \fIbiosname
 Specifies the specific BIOS to use with the current game, for game
@@ -1071,14 +1101,14 @@ to its built\-in UI font. On some platforms \fIfontname\fP can be a system
 font name instead of a BDF font file. The default is 'default' (use 
 the OSD\-determined default font).
 .TP
-.B \-ramsize, \-ram
+.B \-ramsize, \-ram \fIvalue
 Size of RAM (if supported by driver).
 .TP
-.B \-confirm_quit
-Display confirm quit screen on exit. Default is true.
+.B \-[no]confirm_quit
+Display confirm quit screen on exit. Default is ON (\-confirm_quit).
 .TP
-.B \-ui_mouse
-Display UI mouse cursor.
+.B \-[no]ui_mouse
+Display UI mouse cursor. Default is OFF (\-noui_mouse).
 .TP
 .B \-autoboot_command, \-ab \fIcommand
 Command string to execute after machine boot (in quotes "").  To issue
@@ -1087,15 +1117,15 @@ Using \fB\\n\fP will issue a create a new line, issuing what was
 typed prior as a command. Example:
 \fB\-autoboot_command "load """$""",8,1\\n"\fP.
 .TP
-.B \-autoboot_delay \fR[\fIseconds\fP]
+.B \-autoboot_delay \fR[\fIvalue\fP]
 Timer delay (in seconds) to trigger command execution on autoboot.
 Default is 2.
 .TP
 .B \-autoboot_script, \-script \fR[\fIfilename.lua\fP]
 File containing scripting to execute after machine boot.
 .TP
-.B \-http
-Enable local http server. Disabled by default.
+.B \-[no]http
+Enable local http server. Default is OFF (\-nohttp).
 .TP
 .B \-http_port \fIport
 Internal webserver listener port.
@@ -1103,13 +1133,13 @@ Internal webserver listener port.
 .B \-http_path \fIpath
 Path to web files. Default is /usr/share/games/mess/web.
 .TP
-.B \-console
-Enable emulator LUA console.
+.B \-[no]console
+Enable emulator LUA console. Default is OFF (\-noconsole).
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .\" SDL specific
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .TP
-.B \-watchdog
+.B \-watchdog \fIvalue
 Specifies a number of seconds after which MAME should automatically exit
 if it detects that the emulation has locked up.
 .\"
