@@ -852,15 +852,12 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(ssv_state::eaglshot_gfxrom_r)
 {
-	UINT8 *rom  =   m_region_gfx1->base();
-	size_t size =   m_region_gfx1->bytes();
-
 	offset = offset * 2 + m_gfxrom_select * 0x200000;
 
-	if (offset > size)
+	if (offset > m_gfx1_rom.length())
 		return 0xffff;
 
-	return rom[offset] + (rom[offset+1]<<8);
+	return m_gfx1_rom[offset] + (m_gfx1_rom[offset+1]<<8);
 }
 
 WRITE16_MEMBER(ssv_state::eaglshot_gfxrom_w)

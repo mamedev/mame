@@ -21,7 +21,7 @@ public:
 		m_gdfs_tmapscroll(*this, "gdfs_tmapscroll"),
 		m_gdfs_st0020(*this, "st0020_spr"),
 		m_input_sel(*this, "input_sel"),
-		m_region_gfx1(*this, "gfx1"),
+		m_gfx1_rom(*this, "gfx1"),
 		m_io_gunx1(*this, "GUNX1"),
 		m_io_guny1(*this, "GUNY1"),
 		m_io_gunx2(*this, "GUNX2"),
@@ -63,15 +63,12 @@ public:
 	UINT8 m_requested_int;
 	UINT16 m_irq_enable;
 
-	UINT16 *m_dsp_ram;
-
 	UINT16 *m_eaglshot_gfxram;
 
 	tilemap_t *m_gdfs_tmap;
 
 	int m_interrupt_ultrax;
 
-	int m_gdfs_gfxram_bank;
 	int m_gdfs_lightgun_select;
 
 	UINT16 m_sxyreact_serial;
@@ -167,7 +164,7 @@ public:
 	void init_st010();
 
 protected:
-	required_memory_region m_region_gfx1;
+	required_region_ptr<UINT8> m_gfx1_rom;
 	optional_ioport m_io_gunx1;
 	optional_ioport m_io_guny1;
 	optional_ioport m_io_gunx2;
