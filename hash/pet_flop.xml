@@ -713,8 +713,10 @@
 
 	<software name="hsgdemo">
 		<description>CBM 8000 High Speed Graphics Demos</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2012</year>
+		<publisher>Steve Gray</publisher>
+		<!-- These disks contain some programs typed in from the HSG manual,
+		     along with new programs that were written in 2012. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
