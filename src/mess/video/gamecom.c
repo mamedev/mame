@@ -7,8 +7,7 @@
 TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_scanline)
 	{
 	// draw line
-	if ( m_scanline == 0 )
-		m_base_address = ( m_p_ram[SM8521_LCDC] & 0x40 ) ? 0x2000 : 0x0000;
+	m_base_address = ( m_p_ram[SM8521_LCDC] & 0x40 ) ? 0x2000 : 0x0000;
 
 	if ( ~m_p_ram[SM8521_LCDC] & 0x80 )
 	{
