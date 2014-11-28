@@ -2,42 +2,42 @@
 // copyright-holders:Curt Coder
 /*********************************************************************
 
-	formats/victor9k_dsk.c
+    formats/victor9k_dsk.c
 
-	Victor 9000 sector disk image format
+    Victor 9000 sector disk image format
 
 *********************************************************************/
 
 /*
 
-	Sector format
-	-------------
+    Sector format
+    -------------
 
-	Header sync
-	Sector header (header ID, track ID, sector ID, and checksum)
-	Gap 1
-	Data Sync
-	Data field (data sync, data ID, data bytes, and checksum)
-	Gap 2
+    Header sync
+    Sector header (header ID, track ID, sector ID, and checksum)
+    Gap 1
+    Data Sync
+    Data field (data sync, data ID, data bytes, and checksum)
+    Gap 2
 
-	Track format
-	------------
+    Track format
+    ------------
 
-	ZONE        LOWER HEAD  UPPER HEAD  SECTORS     ROTATIONAL   RPM
-	NUMBER      TRACKS      TRACKS      PER TRACK   PERIOD (MS)
+    ZONE        LOWER HEAD  UPPER HEAD  SECTORS     ROTATIONAL   RPM
+    NUMBER      TRACKS      TRACKS      PER TRACK   PERIOD (MS)
 
-	0           0-3         unused      19          237.9        252
-	1           4-15        0-7         18          224.5        267
-	2           16-26       8-18        17          212.2        283
-	3           27-37       19-29       16          199.9        300
-	4           38-48       30-40       15          187.6        320
-	5           49-59       41-51       14          175.3        342
-	6           60-70       52-62       13          163.0        368
-	7           71-79       63-74       12          149.6        401
-	8           unused      75-79       11          144.0        417
+    0           0-3         unused      19          237.9        252
+    1           4-15        0-7         18          224.5        267
+    2           16-26       8-18        17          212.2        283
+    3           27-37       19-29       16          199.9        300
+    4           38-48       30-40       15          187.6        320
+    5           49-59       41-51       14          175.3        342
+    6           60-70       52-62       13          163.0        368
+    7           71-79       63-74       12          149.6        401
+    8           unused      75-79       11          144.0        417
 
-	Interleave factor 3
-	cell 2.13 usec
+    Interleave factor 3
+    cell 2.13 usec
 
 */
 

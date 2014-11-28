@@ -45,7 +45,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class px4_state : public driver_device,	public device_serial_interface
+class px4_state : public driver_device, public device_serial_interface
 {
 public:
 	px4_state(const machine_config &mconfig, device_type type, const char *tag) :
@@ -60,7 +60,7 @@ public:
 	m_speaker(*this, "speaker"),
 	m_sio(*this, "sio"),
 	m_rs232(*this, "rs232"),
-	m_caps1(*this, "capsule1"),	m_caps2(*this, "capsule2"),
+	m_caps1(*this, "capsule1"), m_caps2(*this, "capsule2"),
 	m_caps1_rom(NULL), m_caps2_rom(NULL),
 	m_ctrl1(0), m_icrb(0), m_bankr(0),
 	m_isr(0), m_ier(0), m_str(0), m_sior(0xbf),
@@ -565,7 +565,7 @@ READ8_MEMBER( px4_state::sior_r )
 		{
 		case 1: m_sior = (dec_2_bcd(m_time.local_time.year) >> 4) & 0xf; break;
 		case 2: m_sior = dec_2_bcd(m_time.local_time.year) & 0xf; break;
-		case 3:	m_sior = dec_2_bcd(m_time.local_time.month + 1); break;
+		case 3: m_sior = dec_2_bcd(m_time.local_time.month + 1); break;
 		case 4: m_sior = dec_2_bcd(m_time.local_time.mday); break;
 		case 5: m_sior = dec_2_bcd(m_time.local_time.hour); break;
 		case 6: m_sior = dec_2_bcd(m_time.local_time.minute); break;

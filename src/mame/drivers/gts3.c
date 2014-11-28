@@ -247,7 +247,7 @@ WRITE8_MEMBER( gts3_state::u4b_w )
 	m_lampclk = clk_bit;
 
 
-//	printf("B=%s=%X ",machine().describe_context(),data&0xe0);
+//  printf("B=%s=%X ",machine().describe_context(),data&0xe0);
 }
 
 READ8_MEMBER( gts3_state::u4a_r )

@@ -646,6 +646,7 @@ BUSOBJS += $(BUSOBJ)/pet/c2n.o
 BUSOBJS += $(BUSOBJ)/pet/diag264_lb_tape.o
 BUSOBJS += $(BUSOBJ)/pet/exp.o
 BUSOBJS += $(BUSOBJ)/pet/64k.o
+BUSOBJS += $(BUSOBJ)/pet/hsg.o
 BUSOBJS += $(BUSOBJ)/pet/superpet.o
 BUSOBJS += $(BUSOBJ)/pet/user.o
 BUSOBJS += $(BUSOBJ)/pet/diag.o

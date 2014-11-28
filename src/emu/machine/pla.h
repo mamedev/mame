@@ -99,7 +99,7 @@ public:
 	static void set_num_terms(device_t &device, UINT32 t) { downcast<pla_device &>(device).m_terms = t; }
 	static void set_inputmask(device_t &device, UINT32 mask) { downcast<pla_device &>(device).m_input_mask = mask; } // UINT32!
 	static void set_format(device_t &device, int format) { downcast<pla_device &>(device).m_format = format; }
-	
+
 	UINT32 inputs() { return m_inputs; }
 	UINT32 outputs() { return m_outputs; }
 
@@ -113,7 +113,7 @@ private:
 	void parse_fusemap();
 
 	int m_format;
-	
+
 	UINT32 m_inputs;
 	UINT32 m_outputs;
 	UINT32 m_terms;

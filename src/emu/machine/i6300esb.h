@@ -5,6 +5,7 @@
 
 #include "pci.h"
 #include "lpc-acpi.h"
+#include "lpc-rtc.h"
 
 #define MCFG_I6300ESB_LPC_ADD(_tag) \
 	MCFG_PCI_DEVICE_ADD(_tag, I6300ESB_LPC, 0x808625a1, 0x02, 0x060100, 0x00000000)
@@ -18,7 +19,7 @@ public:
 
 	virtual void reset_all_mappings();
 	virtual void map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-						   UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space);
+							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space);
 
 	virtual DECLARE_ADDRESS_MAP(config_map, 32);
 
@@ -29,6 +30,7 @@ protected:
 
 private:
 	required_device<lpc_acpi_device> acpi;
+	required_device<lpc_rtc_device> rtc;
 
 	DECLARE_ADDRESS_MAP(internal_io_map, 32);
 
@@ -38,7 +40,7 @@ private:
 	UINT8 pirq_rout[8];
 	UINT8 acpi_cntl, tco_cntl, gpio_cntl, serirq_cntl, d31_err_cfg, d31_err_sts, gen_sta, back_cntl, rtc_conf;
 	UINT8 lpc_if_com_range, lpc_if_fdd_lpt_range, lpc_if_sound_range, fwh_dec_en1, fwh_dec_en2, siu_config_port;
-	UINT8 gen_pmcon_3, apm_cnt, apm_sts, mon_fwd_en;
+	UINT8 gen_pmcon_3, apm_cnt, apm_sts, mon_fwd_en, nmi_sc;
 	int siu_config_state;
 
 	DECLARE_WRITE8_MEMBER (nop_w);
@@ -130,6 +132,8 @@ private:
 	DECLARE_WRITE8_MEMBER (siu_config_port_w);
 	DECLARE_READ8_MEMBER  (siu_data_port_r);        // 4f
 	DECLARE_WRITE8_MEMBER (siu_data_port_w);
+	DECLARE_READ8_MEMBER  (nmi_sc_r);               // 61
+	DECLARE_WRITE8_MEMBER (nmi_sc_w);
 
 	void map_bios(address_space *memory_space, UINT32 start, UINT32 end, int idsel);
 };

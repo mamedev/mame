@@ -167,7 +167,7 @@ WRITE8_MEMBER(maygay1b_state::m1_pia_portb_w)
 	int i;
 	for (i=0; i<8; i++)
 	{
-		if ( data & (1 << i) )      
+		if ( data & (1 << i) )
 		{
 			output_set_indexed_value("triac", i, data & (1 << i));
 		}
@@ -377,12 +377,12 @@ WRITE8_MEMBER(maygay1b_state::m1_latch_w)
 		break;
 		case 2: // Enable
 		{
-            if ( m_NMIENABLE == 0 && ( data & 1 ))
+			if ( m_NMIENABLE == 0 && ( data & 1 ))
 			{
 				m_NMIENABLE = (data & 1);
 				cpu0_nmi();
 			}
-			m_NMIENABLE = (data & 1);		
+			m_NMIENABLE = (data & 1);
 		}
 		break;
 		case 3: // RTS
@@ -495,7 +495,7 @@ READ8_MEMBER(maygay1b_state::m1_firq_nec_r)
 READ8_MEMBER(maygay1b_state::nec_reset_r)
 {
 	m_upd7759->reset_w(0);
-	m_upd7759->reset_w(1);	
+	m_upd7759->reset_w(1);
 	return 0xff;
 }
 
@@ -504,7 +504,7 @@ WRITE8_MEMBER(maygay1b_state::nec_bank0_w)
 	m_upd7759->set_bank_base(0x00000);
 	m_upd7759->port_w(space, 0, data);
 	m_upd7759->start_w(0);
-	m_upd7759->start_w(1);	
+	m_upd7759->start_w(1);
 }
 
 WRITE8_MEMBER(maygay1b_state::nec_bank1_w)
@@ -512,7 +512,7 @@ WRITE8_MEMBER(maygay1b_state::nec_bank1_w)
 	m_upd7759->set_bank_base(0x20000);
 	m_upd7759->port_w(space, 0, data);
 	m_upd7759->start_w(0);
-	m_upd7759->start_w(1);	
+	m_upd7759->start_w(1);
 }
 
 static ADDRESS_MAP_START( m1_nec_memmap, AS_PROGRAM, 8, maygay1b_state )
@@ -665,7 +665,7 @@ MACHINE_CONFIG_DERIVED( maygay_m1_nec, maygay_m1 )
 	MCFG_CPU_PROGRAM_MAP(m1_nec_memmap)
 
 	MCFG_DEVICE_REMOVE("msm6376")
-	
+
 	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
@@ -680,7 +680,7 @@ DRIVER_INIT_MEMBER(maygay1b_state,m1common)
 {
 	//Initialise paging for non-extended ROM space
 	UINT8 *rom = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 1, &rom[0x0e000], 0x10000);
+	membank("bank1")->configure_entries(0, 2, &rom[0x0e000], 0x10000);
 	membank("bank1")->set_entry(0);
 
 	// print out the rom id / header info to give us some hints

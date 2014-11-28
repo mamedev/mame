@@ -41,7 +41,7 @@
 
 
 
-  
+
 <softwarelist name="leapster" description="LeapFrog Leapster cartridges">
 
 	<software name="findnemo" supported="no">
@@ -65,7 +65,7 @@
 			</dataarea>
 		</part>
 	</software>
-  
+
 	<software name="spdrman" supported="no">
 		<description>Spider-Man - Schachmatt den Schildersaboteuren! (German)</description>
 		<year>2003</year>
@@ -98,7 +98,7 @@
 			</dataarea>
 		</part>
 	</software>
-  
+
 	<software name="demo" supported="no">
 		<description>Demo - Herbst 2004 II (German)</description>
 		<year>2003</year>
@@ -120,7 +120,7 @@
 			</dataarea>
 		</part>
 	</software>
-  
+
 	<software name="disprinz" supported="no">
 		<description>Disney Prinzessinnen - Zauberhaftes Lernen (German)</description>
 		<year>2003</year>

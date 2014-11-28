@@ -39,7 +39,7 @@
 #endif
 
 /*
- * Avoids a compiler warning in case this was already defined      
+ * Avoids a compiler warning in case this was already defined
  * (someone defined _WINSOCKAPI_ when including 'windows.h', in order
  * to prevent it from including 'winsock.h')
  */
@@ -67,7 +67,7 @@
 #endif
 
 #if defined(_MSC_VER) && (_MSC_VER < 1700)
-#define inline __inline 
+#define inline __inline
 #endif
 
 #ifdef __MINGW32__
@@ -90,6 +90,6 @@ typedef __int64    intptr_t;
 typedef _W64 int   intptr_t;
 #endif
 #define _INTPTR_T_DEFINED
-#endif 
+#endif
 
 #endif /*__MINGW32__*/

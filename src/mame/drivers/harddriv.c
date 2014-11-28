@@ -342,7 +342,7 @@ const device_type HARDDRIV_DEVICE = &device_creator<harddriv_state>;
 
 harddriv_state::harddriv_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HARDDRIV_DEVICE, "Hard Drivin' PCB Family", tag, owner, clock, "harddriv_pcb", __FILE__),
-/*	device_video_interface(mconfig, *this, false), */
+/*  device_video_interface(mconfig, *this, false), */
 			m_maincpu(*this, "maincpu"),
 			m_gsp(*this, "gsp"),
 			m_msp(*this, "msp"),
@@ -433,32 +433,32 @@ harddriv_state::harddriv_state(const machine_config &mconfig, const char *tag, d
 			m_ds3xdsp_sdata(0),
 			m_ds3xdsp_internal_timer(*this, "ds3xdsp_timer"),
 			m_adc_control(0),
-		    m_adc8_select(0),
-	        m_adc8_data(0),
-	        m_adc12_select(0),
-	        m_adc12_byte(0),
-	        m_adc12_data(0),
-	        m_hdc68k_last_wheel(0),
-	        m_hdc68k_last_port1(0),
-	        m_hdc68k_wheel_edge(0),
-	        m_hdc68k_shifter_state(0),
-	        m_st68k_sloop_bank(0),
-	        m_st68k_last_alt_sloop_offset(0),
-		    m_next_msp_sync(0),
+			m_adc8_select(0),
+			m_adc8_data(0),
+			m_adc12_select(0),
+			m_adc12_byte(0),
+			m_adc12_data(0),
+			m_hdc68k_last_wheel(0),
+			m_hdc68k_last_port1(0),
+			m_hdc68k_wheel_edge(0),
+			m_hdc68k_shifter_state(0),
+			m_st68k_sloop_bank(0),
+			m_st68k_last_alt_sloop_offset(0),
+			m_next_msp_sync(0),
 			m_soundflag(0),
-		    m_mainflag(0),
-	        m_sounddata(0),
-	        m_maindata(0),
-	        m_dacmute(0),
-	        m_cramen(0),
-	        m_irq68k(0),
-	        m_sound_rom_offs(0),
-	        m_rombase(0),
-	        m_romsize(0),
-	        m_last_bio_cycles(0),
-	        m_vram_mask(0),
-	        m_shiftreg_enable(0),
-	        m_gsp_shiftreg_source(0),
+			m_mainflag(0),
+			m_sounddata(0),
+			m_maindata(0),
+			m_dacmute(0),
+			m_cramen(0),
+			m_irq68k(0),
+			m_sound_rom_offs(0),
+			m_rombase(0),
+			m_romsize(0),
+			m_last_bio_cycles(0),
+			m_vram_mask(0),
+			m_shiftreg_enable(0),
+			m_gsp_shiftreg_source(0),
 			m_gfx_finescroll(0),
 			m_gfx_palettebank(0),
 			m_dac(*this, "dac"),
@@ -526,7 +526,6 @@ public:
 
 WRITE16_MEMBER( harddriv_state::watchdog_reset16_w )
 {
-
 }
 
 static ADDRESS_MAP_START( driver_68k_map, AS_PROGRAM, 16, harddriv_state )
@@ -876,7 +875,7 @@ static INPUT_PORTS_START( harddriv )
 
 	PORT_START("mainpcb:12BADC3")       /* b80000 - 12 bit ADC 3 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 INPUT_PORTS_END
 
 
@@ -964,7 +963,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( racedriv_pan )
 	PORT_INCLUDE( racedriv )
-	
+
 	PORT_START("leftpcb:IN0")       /* 600000 */
 	PORT_DIPNAME( 0x01, 0x01, "Diagnostic jumper (Left)" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -1509,7 +1508,7 @@ MACHINE_CONFIG_END
 /* Driver board with MSP (used by Hard Drivin' cockpit) */
 static MACHINE_CONFIG_FRAGMENT( driver_msp )
 
-	MCFG_FRAGMENT_ADD( driver_nomsp ) 
+	MCFG_FRAGMENT_ADD( driver_nomsp )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("msp", TMS34010, XTAL_50MHz)
@@ -1526,7 +1525,7 @@ MACHINE_CONFIG_END
 /* Multisync board without MSP (used by STUN Runner, Steel Talons, Race Drivin' compact) */
 static MACHINE_CONFIG_FRAGMENT( multisync_nomsp )
 
-	MCFG_FRAGMENT_ADD( driver_nomsp ) 
+	MCFG_FRAGMENT_ADD( driver_nomsp )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1547,7 +1546,7 @@ MACHINE_CONFIG_END
 /* Multisync board with MSP (used by Hard Drivin' compact) */
 static MACHINE_CONFIG_FRAGMENT( multisync_msp )
 
-	MCFG_FRAGMENT_ADD( multisync_nomsp ) 
+	MCFG_FRAGMENT_ADD( multisync_nomsp )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("msp", TMS34010, XTAL_50MHz)
@@ -1564,7 +1563,7 @@ MACHINE_CONFIG_END
 /* Multisync II board (used by Hard Drivin's Airborne) */
 static MACHINE_CONFIG_FRAGMENT( multisync2 )
 
-	MCFG_FRAGMENT_ADD( multisync_nomsp ) 
+	MCFG_FRAGMENT_ADD( multisync_nomsp )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1697,14 +1696,14 @@ MACHINE_CONFIG_END
  *************************************/
 
 static MACHINE_CONFIG_FRAGMENT( harddriv )
-	MCFG_FRAGMENT_ADD( driver_msp ) 
+	MCFG_FRAGMENT_ADD( driver_msp )
 	/* basic machine hardware */        /* original driver board with MSP */
 	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
 	MCFG_FRAGMENT_ADD( driversnd )      /* driver sound board */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( harddrivc )
-	MCFG_FRAGMENT_ADD( multisync_msp ) 
+	MCFG_FRAGMENT_ADD( multisync_msp )
 
 	/* basic machine hardware */        /* multisync board with MSP */
 	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
@@ -1712,7 +1711,7 @@ static MACHINE_CONFIG_FRAGMENT( harddrivc )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( racedriv )
-	MCFG_FRAGMENT_ADD( driver_nomsp ) 
+	MCFG_FRAGMENT_ADD( driver_nomsp )
 
 	/* basic machine hardware */        /* original driver board without MSP */
 	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
@@ -1722,7 +1721,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( racedrivc )
 
-	MCFG_FRAGMENT_ADD( multisync_nomsp ) 
+	MCFG_FRAGMENT_ADD( multisync_nomsp )
 
 	/* basic machine hardware */        /* multisync board without MSP */
 	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
@@ -1733,12 +1732,12 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( racedrivc_panorama_side )
 
-	MCFG_FRAGMENT_ADD( multisync_nomsp ) 
+	MCFG_FRAGMENT_ADD( multisync_nomsp )
 
 	/* basic machine hardware */        /* multisync board without MSP */
 	MCFG_FRAGMENT_ADD( adsp )           /* ADSP board */
-//	MCFG_FRAGMENT_ADD( dsk )            /* DSK board */
-//	MCFG_FRAGMENT_ADD( driversnd )      /* driver sound board */
+//  MCFG_FRAGMENT_ADD( dsk )            /* DSK board */
+//  MCFG_FRAGMENT_ADD( driversnd )      /* driver sound board */
 MACHINE_CONFIG_END
 
 WRITE_LINE_MEMBER(harddriv_state::sound_int_write_line)
@@ -1750,7 +1749,7 @@ WRITE_LINE_MEMBER(harddriv_state::sound_int_write_line)
 
 static MACHINE_CONFIG_FRAGMENT( stunrun )
 
-	MCFG_FRAGMENT_ADD( multisync_nomsp ) 
+	MCFG_FRAGMENT_ADD( multisync_nomsp )
 
 	/* basic machine hardware */        /* multisync board without MSP */
 	MCFG_CPU_MODIFY("gsp")
@@ -1770,7 +1769,7 @@ static MACHINE_CONFIG_FRAGMENT( stunrun )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( steeltal )
-	MCFG_FRAGMENT_ADD( multisync_msp ) 
+	MCFG_FRAGMENT_ADD( multisync_msp )
 
 	/* basic machine hardware */        /* multisync board with MSP */
 	MCFG_FRAGMENT_ADD( ds3 )            /* DS III board */
@@ -1793,7 +1792,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( strtdriv )
 
-	MCFG_FRAGMENT_ADD( multisync_nomsp ) 
+	MCFG_FRAGMENT_ADD( multisync_nomsp )
 
 	/* basic machine hardware */        /* multisync board */
 	MCFG_FRAGMENT_ADD( ds3 )            /* DS III board */
@@ -1805,7 +1804,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( hdrivair )
 
-	MCFG_FRAGMENT_ADD( multisync2 ) 
+	MCFG_FRAGMENT_ADD( multisync2 )
 
 	/* basic machine hardware */        /* multisync II board */
 	MCFG_FRAGMENT_ADD( ds3 )            /* DS IV board */
@@ -1833,7 +1832,7 @@ void harddriv_board_device_state::device_start()
 /* Compact */
 
 void harddrivc_board_device_state::device_start()
-{	
+{
 	init_harddrivc();
 	harddriv_state::device_start();
 }
@@ -2090,12 +2089,12 @@ static MACHINE_CONFIG_START( racedriv_panorama_machine, harddriv_new_state )
 	MCFG_DEVICE_ADD("leftpcb", RACEDRIVC_PANORAMA_SIDE_BOARD_DEVICE, 0)
 	MCFG_DEVICE_ADD("rightpcb", RACEDRIVC_PANORAMA_SIDE_BOARD_DEVICE, 0)
 
-//	MCFG_QUANTUM_TIME(attotime::from_hz(100000))
+//  MCFG_QUANTUM_TIME(attotime::from_hz(100000))
 	MCFG_DEVICE_MODIFY("mainpcb:duartn68681")
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(racedriv_board_device_state,tx_a ))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("hack_timer", harddriv_new_state, hack_timer, attotime::from_hz(60))	
-//	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("hack_timer", harddriv_new_state, hack_timer, attotime::from_hz(60))
+//  MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 MACHINE_CONFIG_END
 
 // this is an ugly hack, otherwise MAME's core can't seem to handle partial updates if you have multiple screens with different update frequencies.
@@ -2155,7 +2154,7 @@ ROM_START( harddriv )
 	ROM_LOAD( "harddriv.200e",   0x000000, 0x000800, CRC(aed020f7) SHA1(494fc2eb74b4924c07f18bef5e69efd5476deec2) )
 
 	ROM_REGION( 0x800, "mainpcb:210e", 0 )
-	ROM_LOAD( "harddriv.210e",   0x000000, 0x000800, CRC(4a91835b) SHA1(96f0087ba7e577748758a2fbe61225048862bb65) )	
+	ROM_LOAD( "harddriv.210e",   0x000000, 0x000800, CRC(4a91835b) SHA1(96f0087ba7e577748758a2fbe61225048862bb65) )
 ROM_END
 
 
@@ -4204,7 +4203,7 @@ ROM_START( racedrivpan )
 
 	ROM_REGION( 0x800, "mainpcb:210e", 0 )
 	ROM_LOAD( "racedriv.210e",   0x000000, 0x000800, CRC(3d7c732e) SHA1(e7de81d4a54327514fdd339e93c888c63a344d2c) )
-	
+
 	/* Left PCB ( Multisync PCB (A046901) )*/
 	ROM_REGION( 0x200000, "leftpcb:maincpu", 0 )        /* 2MB for 68000 code */
 	ROM_LOAD16_BYTE( "088-2002.bin", 0x000000, 0x010000, CRC(77724070) SHA1(5862f30f7e2ab9c0beb06cf5599bcb1ff97f3a47) )
@@ -4233,7 +4232,7 @@ ROM_START( racedrivpan )
 	ROM_LOAD16_BYTE( "088-1022.bin",  0x40001, 0x10000, CRC(4f1e1c5d) SHA1(3e72813129cae9e9bf084bfb1b747aa46b92591e) )
 
 	ROM_REGION( 0x800, "leftpcb:200e", 0 ) // set to display left monitor, controls not calibrated with valid values (don't think they need to be)
-	ROM_LOAD( "leftpcb_200e",   0x000000, 0x000800, CRC(a618d02e) SHA1(cc1068fe4f6ec9a26b6e8fdbe05f4364a64559c1) )	
+	ROM_LOAD( "leftpcb_200e",   0x000000, 0x000800, CRC(a618d02e) SHA1(cc1068fe4f6ec9a26b6e8fdbe05f4364a64559c1) )
 	ROM_REGION( 0x800, "leftpcb:210e", 0 )
 	ROM_LOAD( "leftpcb_210e",   0x000000, 0x000800, CRC(108ea834) SHA1(d7aec78287647dc52f92143cdb6d7765de0b4e39) )
 
@@ -4265,7 +4264,7 @@ ROM_START( racedrivpan )
 	ROM_LOAD16_BYTE( "088-1022.bin",  0x40001, 0x10000, CRC(4f1e1c5d) SHA1(3e72813129cae9e9bf084bfb1b747aa46b92591e) )
 
 	ROM_REGION( 0x800, "rightpcb:200e", 0 ) // set to display right monitor, controls not calibrated with valid values (don't think they need to be)
-	ROM_LOAD( "rightpcb_200e",   0x000000, 0x000800, CRC(6f1b7094) SHA1(6194a5b99aebe43f02c8d267290207b32c5bdbbd) )	
+	ROM_LOAD( "rightpcb_200e",   0x000000, 0x000800, CRC(6f1b7094) SHA1(6194a5b99aebe43f02c8d267290207b32c5bdbbd) )
 	ROM_REGION( 0x800, "rightpcb:210e", 0 )
 	ROM_LOAD( "rightpcb_210e",   0x000000, 0x000800, CRC(108ea834) SHA1(d7aec78287647dc52f92143cdb6d7765de0b4e39) )
 ROM_END
@@ -5078,9 +5077,9 @@ void harddriv_state::init_racedrivc_panorama_side()
 	m_gsp_protection = m_gsp->space(AS_PROGRAM).install_write_handler(gsp_protection, gsp_protection + 0x0f, write16_delegate(FUNC(harddriv_state::hdgsp_protection_w), this));
 
 	/* set up gsp speedup handler (todo, work these out) */
-//	m_gsp_speedup_addr[0] = m_gsp->space(AS_PROGRAM).install_write_handler(0xfff76f60, 0xfff76f6f, write16_delegate(FUNC(harddriv_state::rdgsp_speedup1_w), this));
-//	m_gsp->space(AS_PROGRAM).install_read_handler(0xfff76f60, 0xfff76f6f, read16_delegate(FUNC(harddriv_state::rdgsp_speedup1_r), this));
-//	m_gsp_speedup_pc = 0xfff43a00;
+//  m_gsp_speedup_addr[0] = m_gsp->space(AS_PROGRAM).install_write_handler(0xfff76f60, 0xfff76f6f, write16_delegate(FUNC(harddriv_state::rdgsp_speedup1_w), this));
+//  m_gsp->space(AS_PROGRAM).install_read_handler(0xfff76f60, 0xfff76f6f, read16_delegate(FUNC(harddriv_state::rdgsp_speedup1_r), this));
+//  m_gsp_speedup_pc = 0xfff43a00;
 
 	/* set up adsp speedup handlers */
 	m_adsp->space(AS_DATA).install_read_handler(0x1fff, 0x1fff, read16_delegate(FUNC(harddriv_state::hdadsp_speedup_r), this));
@@ -5301,5 +5300,3 @@ GAME( 1993, strtdriv, 0,        strtdriv_machine, strtdriv, driver_device, 0, RO
 
 GAME( 1993, hdrivair,  0,        hdrivair_machine, hdrivair, driver_device, 0, ROT0, "Atari Games", "Hard Drivin's Airborne (prototype)", GAME_IMPERFECT_SOUND )
 GAME( 1993, hdrivairp, hdrivair, hdrivairp_machine, hdrivair, driver_device, 0,ROT0, "Atari Games", "Hard Drivin's Airborne (prototype, early rev)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-
-

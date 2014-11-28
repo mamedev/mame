@@ -207,7 +207,7 @@ public:
 	required_shared_ptr<UINT16> m_tilemap1scroll;
 	required_shared_ptr<UINT16> m_tilemap2scroll;
 	required_shared_ptr<UINT16> m_roadram;
-	
+
 	tilemap_t *m_tilemap0_tilemap;
 	tilemap_t *m_tilemap1_tilemap;
 	tilemap_t *m_tilemap2_tilemap;

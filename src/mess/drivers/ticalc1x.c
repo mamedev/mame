@@ -3,7 +3,7 @@
 /***************************************************************************
 
   Texas Instruments TMS1xxx/0970/0980 handheld calculators
-  
+
   Texas Instruments WIZ-A-TRON
   * TMC0907NL DP0907BS (die labeled 0970F-07B)
 
@@ -61,7 +61,7 @@ READ8_MEMBER(ticalc1x_state::read_k)
 	for (int i = 0; i < 4; i++)
 		if (m_o & (1 << (i + 1)))
 			k |= m_button_matrix[i]->read();
-	
+
 	return k;
 }
 

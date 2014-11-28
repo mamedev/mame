@@ -1,16 +1,16 @@
 /***************************************************************************
- 
+
  wswan_video.c
- 
+
  File to handle video emulation of the Bandai WonderSwan VDP.
- 
+
  Anthony Kruize
  Wilbert Pol
- 
+
  TODO:
    - remove the redundant parts of m_regs
    - split the Color VDP from the Mono VDP?
- 
+
  ***************************************************************************/
 
 #include "wswan_video.h"
@@ -32,7 +32,7 @@ void wswan_video_device::common_save()
 	save_item(NAME(m_palette_port));
 	save_item(NAME(m_pal));
 	save_item(NAME(m_regs));
-	
+
 	save_item(NAME(m_layer_bg_enable));
 	save_item(NAME(m_layer_fg_enable));
 	save_item(NAME(m_sprites_enable));
@@ -79,10 +79,10 @@ void wswan_video_device::common_save()
 void wswan_video_device::device_start()
 {
 	machine().first_screen()->register_screen_bitmap(m_bitmap);
-	
+
 	m_timer = timer_alloc(TIMER_SCANLINE);
 	m_timer->adjust(attotime::from_ticks(256, 3072000), 0, attotime::from_ticks(256, 3072000));
-	
+
 	// bind callbacks
 	m_set_irq_cb.bind_relative_to(*owner());
 	m_snd_dma_cb.bind_relative_to(*owner());
@@ -166,7 +166,7 @@ void wswan_video_device::device_reset()
 	m_timer_vblank_mode = 0;
 	m_timer_vblank_reload = 0;
 	m_timer_vblank_count = 0;      /* Vertical blank timer counter value */
-	
+
 	memset(m_sprite_table_buffer, 0, sizeof(m_sprite_table_buffer));
 	memset(m_main_palette, 0, sizeof(m_main_palette));
 	memcpy(m_regs, vdp_regs_init, 256);
@@ -190,15 +190,15 @@ void wswan_video_device::device_timer(emu_timer &timer, device_timer_id id, int 
 
 void wswan_video_device::setup_palettes()
 {
-	if (m_color_mode) 
+	if (m_color_mode)
 	{
-		for (int i = 0; i < 16; i++) 
-			for (int j = 0; j < 16; j++) 
+		for (int i = 0; i < 16; i++)
+			for (int j = 0; j < 16; j++)
 				m_pal[i][j] = ((m_palette_vram[(i << 5) + j * 2 + 1] << 8) | m_palette_vram[(i << 5) + j * 2]) & 0x0fff;
-	} 
-	else 
+	}
+	else
 	{
-		for (int  i = 0; i < 16; i++) 
+		for (int  i = 0; i < 16; i++)
 		{
 			m_pal[i][0] = (m_palette_port[(i << 1)] >> 0) & 0x07;
 			m_pal[i][1] = (m_palette_port[(i << 1)] >> 4) & 0x07;
@@ -212,8 +212,8 @@ void wswan_video_device::draw_background()
 {
 	UINT16 map_addr = m_layer_bg_address + (((m_current_line + m_layer_bg_scroll_y) & 0xf8) << 3);
 	UINT8 start_column = (m_layer_bg_scroll_x >> 3);
-	
-	for (int column = 0; column < 29; column++) 
+
+	for (int column = 0; column < 29; column++)
 	{
 		UINT32 plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
 		int x_offset, tile_line, tile_address;
@@ -221,34 +221,34 @@ void wswan_video_device::draw_background()
 						| m_vram[map_addr + (((start_column + column) & 0x1f) << 1)];
 		int tile_number = tile_data & 0x01ff;
 		int tile_palette = (tile_data >> 9) & 0x0f;
-		
+
 		tile_line = (m_current_line + m_layer_bg_scroll_y) & 0x07;
 		if (tile_data & 0x8000) // vflip
 			tile_line = 7 - tile_line;
-		
-		if (m_colors_16) 
+
+		if (m_colors_16)
 		{
 			tile_address = ((tile_data & 0x2000) ? 0x8000 : 0x4000) + (tile_number * 32) + (tile_line << 2);
-			if (m_tile_packed) 
+			if (m_tile_packed)
 			{
 				plane0 = (m_vram[tile_address + 0] << 24) | (m_vram[tile_address + 1] << 16) | (m_vram[tile_address + 2] << 8) | m_vram[tile_address + 3];
-			} 
-			else 
+			}
+			else
 			{
 				plane0 = m_vram[tile_address + 0];
 				plane1 = m_vram[tile_address + 1] << 1;
 				plane2 = m_vram[tile_address + 2] << 2;
 				plane3 = m_vram[tile_address + 3] << 3;
 			}
-		} 
-		else 
+		}
+		else
 		{
 			tile_address = 0x2000 + (tile_number * 16) + (tile_line << 1);
-			if (m_tile_packed) 
+			if (m_tile_packed)
 			{
 				plane0 = (m_vram[tile_address + 0] << 8) | m_vram[tile_address + 1];
-			} 
-			else 
+			}
+			else
 			{
 				plane0 = m_vram[tile_address + 0];
 				plane1 = m_vram[tile_address + 1] << 1;
@@ -256,24 +256,24 @@ void wswan_video_device::draw_background()
 				plane3 = 0;
 			}
 		}
-		
-		for (int x = 0; x < 8; x++) 
+
+		for (int x = 0; x < 8; x++)
 		{
 			int col;
-			if (m_tile_packed) 
+			if (m_tile_packed)
 			{
-				if (m_colors_16) 
+				if (m_colors_16)
 				{
 					col = plane0 & 0x0f;
 					plane0 = plane0 >> 4;
-				} 
-				else 
+				}
+				else
 				{
 					col = plane0 & 0x03;
 					plane0 = plane0 >> 2;
 				}
-			} 
-			else 
+			}
+			else
 			{
 				col = (plane3 & 8) | (plane2 & 4) | (plane1 & 2) | (plane0 & 1);
 				plane3 = plane3 >> 1;
@@ -282,29 +282,29 @@ void wswan_video_device::draw_background()
 				plane0 = plane0 >> 1;
 			}
 
-			if (tile_data & 0x4000) 
+			if (tile_data & 0x4000)
 				x_offset = x + (column << 3) - (m_layer_bg_scroll_x & 0x07);
 			else
 				x_offset = 7 - x + (column << 3) - (m_layer_bg_scroll_x & 0x07);
 
-			if (x_offset >= 0 && x_offset < WSWAN_X_PIXELS) 
+			if (x_offset >= 0 && x_offset < WSWAN_X_PIXELS)
 			{
-				if (m_colors_16) 
+				if (m_colors_16)
 				{
-					if (col) 
+					if (col)
 					{
 						if (m_color_mode)
 							m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
-						else 
+						else
 						{
 							/* Hmmmm, what should we do here... Is this correct?? */
 							m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
 						}
 					}
-				} 
-				else 
+				}
+				else
 				{
-					if (col || !(tile_palette & 4)) 
+					if (col || !(tile_palette & 4))
 					{
 						if (m_color_mode)
 							m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
@@ -322,7 +322,7 @@ void wswan_video_device::draw_foreground_0()
 	UINT16 map_addr = m_layer_fg_address + (((m_current_line + m_layer_fg_scroll_y) & 0xf8) << 3);
 	UINT8 start_column = (m_layer_fg_scroll_x >> 3);
 
-	for (int column = 0; column < 29; column++) 
+	for (int column = 0; column < 29; column++)
 	{
 		UINT32 plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
 		int x_offset, tile_line, tile_address;
@@ -330,34 +330,34 @@ void wswan_video_device::draw_foreground_0()
 						| m_vram[map_addr + (((start_column + column) & 0x1f) << 1)];
 		int tile_number = tile_data & 0x01ff;
 		int tile_palette = (tile_data >> 9) & 0x0f;
-		
+
 		tile_line = (m_current_line + m_layer_fg_scroll_y) & 0x07;
 		if (tile_data & 0x8000) // vflip
 			tile_line = 7 - tile_line;
-		
-		if (m_colors_16) 
+
+		if (m_colors_16)
 		{
 			tile_address = ((tile_data & 0x2000) ? 0x8000 : 0x4000) + (tile_number * 32) + (tile_line << 2);
-			if (m_tile_packed) 
+			if (m_tile_packed)
 			{
 				plane0 = (m_vram[tile_address + 0] << 24) | (m_vram[tile_address + 1] << 16) | (m_vram[tile_address + 2] << 8) | m_vram[tile_address + 3];
-			} 
-			else 
+			}
+			else
 			{
 				plane0 = m_vram[tile_address + 0];
 				plane1 = m_vram[tile_address + 1] << 1;
 				plane2 = m_vram[tile_address + 2] << 2;
 				plane3 = m_vram[tile_address + 3] << 3;
 			}
-		} 
-		else 
+		}
+		else
 		{
 			tile_address = 0x2000 + (tile_number * 16) + (tile_line << 1);
-			if (m_tile_packed) 
+			if (m_tile_packed)
 			{
 				plane0 = (m_vram[tile_address + 0] << 8) | m_vram[tile_address + 1];
-			} 
-			else 
+			}
+			else
 			{
 				plane0 = m_vram[tile_address + 0];
 				plane1 = m_vram[tile_address + 1] << 1;
@@ -366,23 +366,23 @@ void wswan_video_device::draw_foreground_0()
 			}
 		}
 
-		for (int x = 0; x < 8; x++ ) 
+		for (int x = 0; x < 8; x++ )
 		{
 			int col;
-			if (m_tile_packed) 
+			if (m_tile_packed)
 			{
-				if (m_colors_16) 
+				if (m_colors_16)
 				{
 					col = plane0 & 0x0f;
 					plane0 = plane0 >> 4;
-				} 
-				else 
+				}
+				else
 				{
 					col = plane0 & 0x03;
 					plane0 = plane0 >> 2;
 				}
-			} 
-			else 
+			}
+			else
 			{
 				col = (plane3 & 8) | (plane2 & 4) | (plane1 & 2) | (plane0 & 1);
 				plane3 = plane3 >> 1;
@@ -391,16 +391,16 @@ void wswan_video_device::draw_foreground_0()
 				plane0 = plane0 >> 1;
 			}
 
-			if (tile_data & 0x4000) 
+			if (tile_data & 0x4000)
 				x_offset = x + (column << 3) - (m_layer_fg_scroll_x & 0x07);
 			else
 				x_offset = 7 - x + (column << 3) - (m_layer_fg_scroll_x & 0x07);
 
-			if (x_offset >= 0 && x_offset < WSWAN_X_PIXELS) 
+			if (x_offset >= 0 && x_offset < WSWAN_X_PIXELS)
 			{
-				if (m_colors_16) 
+				if (m_colors_16)
 				{
-					if (col) 
+					if (col)
 					{
 //                      if (m_color_mode) {
 						m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
@@ -409,10 +409,10 @@ void wswan_video_device::draw_foreground_0()
 //                          m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
 //                      }
 					}
-				} 
-				else 
+				}
+				else
 				{
-					if (col || !(tile_palette & 4)) 
+					if (col || !(tile_palette & 4))
 					{
 						if (m_color_mode)
 							m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
@@ -429,8 +429,8 @@ void wswan_video_device::draw_foreground_2()
 {
 	UINT16 map_addr = m_layer_fg_address + (((m_current_line + m_layer_fg_scroll_y) & 0xf8) << 3);
 	UINT8 start_column = (m_layer_fg_scroll_x >> 3);
-	
-	for (int column = 0; column < 29; column++) 
+
+	for (int column = 0; column < 29; column++)
 	{
 		UINT32 plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
 		int x_offset, tile_line, tile_address;
@@ -438,35 +438,35 @@ void wswan_video_device::draw_foreground_2()
 						| m_vram[map_addr + (((start_column + column) & 0x1f) << 1)];
 		int tile_number = tile_data & 0x01ff;
 		int tile_palette = (tile_data >> 9) & 0x0f;
-		
+
 		tile_line = (m_current_line + m_layer_fg_scroll_y) & 0x07;
 		if (tile_data & 0x8000) // vflip
 			tile_line = 7 - tile_line;
 
-		
-		if (m_colors_16) 
+
+		if (m_colors_16)
 		{
 			tile_address = ((tile_data & 0x2000) ? 0x8000 : 0x4000) + (tile_number * 32) + (tile_line << 2);
-			if (m_tile_packed) 
+			if (m_tile_packed)
 			{
 				plane0 = (m_vram[tile_address + 0] << 24) | (m_vram[tile_address + 1] << 16) | (m_vram[tile_address + 2] << 8) | m_vram[tile_address + 3];
-			} 
-			else 
+			}
+			else
 			{
 				plane0 = m_vram[tile_address + 0];
 				plane1 = m_vram[tile_address + 1] << 1;
 				plane2 = m_vram[tile_address + 2] << 2;
 				plane3 = m_vram[tile_address + 3] << 3;
 			}
-		} 
-		else 
+		}
+		else
 		{
 			tile_address = 0x2000 + (tile_number * 16) + (tile_line << 1);
-			if (m_tile_packed) 
+			if (m_tile_packed)
 			{
 				plane0 = (m_vram[tile_address + 0] << 8) | m_vram[tile_address + 1];
-			} 
-			else 
+			}
+			else
 			{
 				plane0 = m_vram[tile_address + 0];
 				plane1 = m_vram[tile_address + 1] << 1;
@@ -475,23 +475,23 @@ void wswan_video_device::draw_foreground_2()
 			}
 		}
 
-		for (int x = 0; x < 8; x++) 
+		for (int x = 0; x < 8; x++)
 		{
 			int col;
-			if (m_tile_packed) 
+			if (m_tile_packed)
 			{
-				if (m_colors_16) 
+				if (m_colors_16)
 				{
 					col = plane0 & 0x0f;
 					plane0 = plane0 >> 4;
-				} 
-				else 
+				}
+				else
 				{
 					col = plane0 & 0x03;
 					plane0 = plane0 >> 2;
 				}
-			} 
-			else 
+			}
+			else
 			{
 				col = (plane3 & 8) | (plane2 & 4) | (plane1 & 2) | (plane0 & 1);
 				plane3 = plane3 >> 1;
@@ -500,16 +500,16 @@ void wswan_video_device::draw_foreground_2()
 				plane0 = plane0 >> 1;
 			}
 
-			if (tile_data & 0x4000) 
+			if (tile_data & 0x4000)
 				x_offset = x + (column << 3) - (m_layer_fg_scroll_x & 0x07);
 			else
 				x_offset = 7 - x + (column << 3) - (m_layer_fg_scroll_x & 0x07);
 
-			if (x_offset >= 0 && x_offset >= m_window_fg_left && x_offset < m_window_fg_right && x_offset < WSWAN_X_PIXELS) 
+			if (x_offset >= 0 && x_offset >= m_window_fg_left && x_offset < m_window_fg_right && x_offset < WSWAN_X_PIXELS)
 			{
-				if (m_colors_16) 
+				if (m_colors_16)
 				{
-					if (col) 
+					if (col)
 					{
 						if (m_color_mode)
 							m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
@@ -517,10 +517,10 @@ void wswan_video_device::draw_foreground_2()
 							/* Hmmmm, what should we do here... Is this correct?? */
 							m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
 					}
-				} 
-				else 
+				}
+				else
 				{
-					if (col || !(tile_palette & 4)) 
+					if (col || !(tile_palette & 4))
 					{
 						if (m_color_mode)
 							m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
@@ -537,8 +537,8 @@ void wswan_video_device::draw_foreground_3()
 {
 	UINT16 map_addr = m_layer_fg_address + (((m_current_line + m_layer_fg_scroll_y) & 0xf8) << 3);
 	UINT8 start_column = (m_layer_fg_scroll_x >> 3);
-	
-	for (int column = 0; column < 29; column++) 
+
+	for (int column = 0; column < 29; column++)
 	{
 		UINT32 plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
 		int x_offset, tile_line, tile_address;
@@ -550,30 +550,30 @@ void wswan_video_device::draw_foreground_3()
 		tile_line = (m_current_line + m_layer_fg_scroll_y) & 0x07;
 		if (tile_data & 0x8000) // vflip
 			tile_line = 7 - tile_line;
-		
-		if (m_colors_16) 
+
+		if (m_colors_16)
 		{
 			tile_address = ((tile_data & 0x2000) ? 0x8000 : 0x4000) + (tile_number * 32) + (tile_line << 2);
-			if (m_tile_packed) 
+			if (m_tile_packed)
 			{
 				plane0 = (m_vram[tile_address + 0] << 24) | (m_vram[tile_address + 1] << 16) | (m_vram[tile_address + 2] << 8) | m_vram[tile_address + 3];
-			} 
-			else 
+			}
+			else
 			{
 				plane0 = m_vram[tile_address + 0];
 				plane1 = m_vram[tile_address + 1] << 1;
 				plane2 = m_vram[tile_address + 2] << 2;
 				plane3 = m_vram[tile_address + 3] << 3;
 			}
-		} 
-		else 
+		}
+		else
 		{
 			tile_address = 0x2000 + (tile_number * 16) + (tile_line << 1);
-			if (m_tile_packed) 
+			if (m_tile_packed)
 			{
 				plane0 = (m_vram[tile_address + 0] << 8) | m_vram[tile_address + 1];
-			} 
-			else 
+			}
+			else
 			{
 				plane0 = m_vram[tile_address + 0];
 				plane1 = m_vram[tile_address + 1] << 1;
@@ -582,23 +582,23 @@ void wswan_video_device::draw_foreground_3()
 			}
 		}
 
-		for (int x = 0; x < 8; x++) 
+		for (int x = 0; x < 8; x++)
 		{
 			int col;
-			if (m_tile_packed) 
+			if (m_tile_packed)
 			{
-				if (m_colors_16) 
+				if (m_colors_16)
 				{
 					col = plane0 & 0x0f;
 					plane0 = plane0 >> 4;
-				} 
-				else 
+				}
+				else
 				{
 					col = plane0 & 0x03;
 					plane0 = plane0 >> 2;
 				}
-			} 
-			else 
+			}
+			else
 			{
 				col = (plane3 & 8) | (plane2 & 4) | (plane1 & 2) | (plane0 & 1);
 				plane3 = plane3 >> 1;
@@ -607,16 +607,16 @@ void wswan_video_device::draw_foreground_3()
 				plane0 = plane0 >> 1;
 			}
 
-			if (tile_data & 0x4000) 
+			if (tile_data & 0x4000)
 				x_offset = x + (column << 3) - (m_layer_fg_scroll_x & 0x07);
 			else
 				x_offset = 7 - x + (column << 3) - (m_layer_fg_scroll_x & 0x07);
 
-			if ((x_offset >= 0 && x_offset < m_window_fg_left) || (x_offset >= m_window_fg_right && x_offset < WSWAN_X_PIXELS)) 
+			if ((x_offset >= 0 && x_offset < m_window_fg_left) || (x_offset >= m_window_fg_right && x_offset < WSWAN_X_PIXELS))
 			{
-				if (m_colors_16) 
+				if (m_colors_16)
 				{
-					if (col) 
+					if (col)
 					{
 						if (m_color_mode)
 							m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
@@ -624,10 +624,10 @@ void wswan_video_device::draw_foreground_3()
 							/* Hmmmm, what should we do here... Is this correct?? */
 							m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
 					}
-				} 
-				else 
+				}
+				else
 				{
-					if (col || !(tile_palette & 4)) 
+					if (col || !(tile_palette & 4))
 					{
 						if (m_color_mode)
 							m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
@@ -645,14 +645,14 @@ void wswan_video_device::handle_sprites(int mask)
 	if (m_sprite_count == 0)
 		return;
 
-	for (int i = m_sprite_first + m_sprite_count - 1; i >= m_sprite_first; i--) 
+	for (int i = m_sprite_first + m_sprite_count - 1; i >= m_sprite_first; i--)
 	{
 		UINT16 tile_data = (m_sprite_table_buffer[i * 4 + 1] << 8) | m_sprite_table_buffer[i * 4];
 		UINT8 y = m_sprite_table_buffer[ i * 4 + 2 ];
 		UINT8 x = m_sprite_table_buffer[ i * 4 + 3 ];
 		int tile_line = (m_current_line - y) & 0xff;
 
-		if ((tile_line >= 0) && (tile_line < 8) && ((tile_data & 0x2000) == mask)) 
+		if ((tile_line >= 0) && (tile_line < 8) && ((tile_data & 0x2000) == mask))
 		{
 			UINT32 plane0 = 0, plane1 = 0, plane2 = 0, plane3 = 0;
 			int x_offset, tile_address;
@@ -662,30 +662,30 @@ void wswan_video_device::handle_sprites(int mask)
 
 			if (tile_data & 0x8000)
 				tile_line = 7 - tile_line;
-			
-			if (m_colors_16) 
+
+			if (m_colors_16)
 			{
 				tile_address = 0x4000 + (tile_number * 32) + (tile_line << 2);
-				if (m_tile_packed) 
+				if (m_tile_packed)
 				{
 					plane0 = (m_vram[tile_address + 0] << 24) | (m_vram[tile_address + 1] << 16) | (m_vram[tile_address + 2] << 8) | m_vram[tile_address + 3];
-				} 
-				else 
+				}
+				else
 				{
 					plane0 = m_vram[tile_address + 0];
 					plane1 = m_vram[tile_address + 1] << 1;
 					plane2 = m_vram[tile_address + 2] << 2;
 					plane3 = m_vram[tile_address + 3] << 3;
 				}
-			} 
-			else 
+			}
+			else
 			{
 				tile_address = 0x2000 + (tile_number * 16) + (tile_line << 1);
-				if (m_tile_packed) 
+				if (m_tile_packed)
 				{
 					plane0 = (m_vram[tile_address + 0] << 8) | m_vram[tile_address + 1];
-				} 
-				else 
+				}
+				else
 				{
 					plane0 = m_vram[tile_address + 0];
 					plane1 = m_vram[tile_address + 1] << 1;
@@ -693,38 +693,38 @@ void wswan_video_device::handle_sprites(int mask)
 					plane3 = 0;
 				}
 			}
-			
-			if (m_window_sprites_enable) 
+
+			if (m_window_sprites_enable)
 			{
-				if (tile_data & 0x1000) 
+				if (tile_data & 0x1000)
 				{
 					if (m_current_line >= m_window_sprites_top && m_current_line <= m_window_sprites_bottom)
 						check_clip = 1;
-				} 
-				else 
+				}
+				else
 				{
 					if (m_current_line < m_window_sprites_top || m_current_line > m_window_sprites_bottom)
 						continue;
 				}
 			}
-			
-			for (int j = 0; j < 8; j++) 
+
+			for (int j = 0; j < 8; j++)
 			{
 				int col;
-				if (m_tile_packed) 
+				if (m_tile_packed)
 				{
-					if (m_colors_16) 
+					if (m_colors_16)
 					{
 						col = plane0 & 0x0f;
 						plane0 = plane0 >> 4;
-					} 
-					else 
+					}
+					else
 					{
 						col = plane0 & 0x03;
 						plane0 = plane0 >> 2;
 					}
-				} 
-				else 
+				}
+				else
 				{
 					col = (plane3 & 8) | (plane2 & 4) | (plane1 & 2) | (plane0 & 1);
 					plane3 = plane3 >> 1;
@@ -740,26 +740,26 @@ void wswan_video_device::handle_sprites(int mask)
 
 				x_offset = x_offset & 0xff;
 
-				if (m_window_sprites_enable) 
+				if (m_window_sprites_enable)
 				{
-					if (tile_data & 0x1000 && check_clip) 
+					if (tile_data & 0x1000 && check_clip)
 					{
 						if (x_offset >= m_window_sprites_left && x_offset <= m_window_sprites_right)
 							continue;
-					} 
-					else 
+					}
+					else
 					{
-						if (x_offset < m_window_sprites_left || x_offset > m_window_sprites_right) 
+						if (x_offset < m_window_sprites_left || x_offset > m_window_sprites_right)
 						{
 //                          continue;
 						}
 					}
 				}
-				if (x_offset >= 0 && x_offset < WSWAN_X_PIXELS) 
+				if (x_offset >= 0 && x_offset < WSWAN_X_PIXELS)
 				{
-					if (m_colors_16) 
+					if (m_colors_16)
 					{
-						if (col) 
+						if (col)
 						{
 							if (m_color_mode)
 								m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
@@ -767,10 +767,10 @@ void wswan_video_device::handle_sprites(int mask)
 								/* Hmmmm, what should we do here... Is this correct?? */
 								m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
 						}
-					} 
-					else 
+					}
+					else
 					{
-						if (col || !(tile_palette & 4)) 
+						if (col || !(tile_palette & 4))
 						{
 							if (m_color_mode)
 								m_bitmap.pix16(m_current_line, x_offset) = m_pal[tile_palette][col];
@@ -788,9 +788,9 @@ void wswan_video_device::handle_sprites(int mask)
 void wswan_video_device::refresh_scanline()
 {
 	setup_palettes();
-	
+
 	rectangle rec(0, WSWAN_X_PIXELS, m_current_line, m_current_line);
-	if (m_lcd_control) 
+	if (m_lcd_control)
 	{
 		/* Not sure if these background color checks and settings are correct */
 		if (m_color_mode && m_colors_16)
@@ -798,24 +798,24 @@ void wswan_video_device::refresh_scanline()
 		else
 			m_bitmap.fill(m_main_palette[m_bg_control & 0x07], rec);
 	}
-	else 
+	else
 	{
 		m_bitmap.fill(0, rec);
 		return;
 	}
-	
+
 	// Draw background layer
 	if (m_layer_bg_enable)
 		draw_background();
-	
+
 	// Draw sprites between background and foreground layers
 	if (m_sprites_enable)
 		handle_sprites(0);
-	
+
 	// Draw foreground layer, taking window settings into account
-	if (m_layer_fg_enable) 
+	if (m_layer_fg_enable)
 	{
-		switch (m_window_fg_mode) 
+		switch (m_window_fg_mode)
 		{
 			case 0: // FG inside & outside window area
 				draw_foreground_0();
@@ -835,7 +835,7 @@ void wswan_video_device::refresh_scanline()
 				break;
 		}
 	}
-	
+
 	// Draw sprites in front of foreground layer
 	if (m_sprites_enable)
 		handle_sprites(0x2000);
@@ -881,7 +881,7 @@ READ8_MEMBER(wswan_video_device::reg_r)
 			value = m_timer_vblank_count >> 8;
 			break;
 	}
-	
+
 	return value;
 }
 
@@ -900,7 +900,7 @@ WRITE8_MEMBER(wswan_video_device::reg_w)
 		m_palette_port[offset & 0x1f] = data;
 		return;
 	}
-		
+
 	switch (offset)
 	{
 		case 0x00:  // Display control
@@ -1140,7 +1140,7 @@ void wswan_video_device::scanline_interrupt()
 {
 	if (m_current_line < 144)
 		refresh_scanline();
-	
+
 	// Decrement 12kHz (HBlank) counter
 	if (m_timer_hblank_enable && m_timer_hblank_reload != 0)
 	{
@@ -1152,24 +1152,24 @@ void wswan_video_device::scanline_interrupt()
 				m_timer_hblank_count = m_timer_hblank_reload;
 			else
 				m_timer_hblank_reload = 0;
-			
+
 			logerror( "trigerring hbltmr interrupt\n" );
 			m_set_irq_cb(WSWAN_VIDEO_IFLAG_HBLTMR);
 		}
 	}
-	
+
 	// Handle Sound DMA
 	m_snd_dma_cb();
-	
+
 //  m_current_line = (m_current_line + 1) % 159;
-	
+
 	if (m_current_line == 144) // buffer sprite table
 	{
 		memcpy(m_sprite_table_buffer, &m_vram[m_sprite_table_address], 512);
 		m_sprite_first = m_sprite_first_latch; // always zero?
 		m_sprite_count = m_sprite_count_latch;
 	}
-	
+
 	if (m_current_line == 144)
 	{
 		m_set_irq_cb(WSWAN_VIDEO_IFLAG_VBL);
@@ -1184,18 +1184,18 @@ void wswan_video_device::scanline_interrupt()
 					m_timer_vblank_count = m_timer_vblank_reload;
 				else
 					m_timer_vblank_reload = 0;
-				
+
 				logerror("triggering vbltmr interrupt\n");
 				m_set_irq_cb(WSWAN_VIDEO_IFLAG_VBLTMR);
 			}
 		}
 	}
-	
+
 //  m_current_line = (m_current_line + 1) % 159;
-	
+
 	if (m_current_line == m_line_compare)
 		m_set_irq_cb(WSWAN_VIDEO_IFLAG_LCMP);
-	
+
 	m_current_line = (m_current_line + 1) % 159;
 }
 

@@ -422,8 +422,8 @@ void dmv_state::update_busint(int slot, int state)
 			break;
 		}
 
-	m_slot7a->irq2_w(new_state);
-	m_slot7->irq2_w(new_state);
+	m_slot7a->busint_w(new_state);
+	m_slot7->busint_w(new_state);
 	m_maincpu->set_input_line(0, new_state);
 }
 
@@ -433,9 +433,13 @@ void dmv_state::update_irqs(int slot, int state)
 
 	switch(slot)
 	{
+	case 0: // slot 2
+		m_slot7->irq2_w(state);
+		m_slot7a->irq2_w(state);
+		break;
 	case 1: // slot 2a
-		m_slot7->irq5_w(state);
-		m_slot7a->irq5_w(state);
+		m_slot7->irq2a_w(state);
+		m_slot7a->irq2a_w(state);
 		break;
 	case 2: // slot 3
 		m_slot7->irq3_w(state);
@@ -446,8 +450,12 @@ void dmv_state::update_irqs(int slot, int state)
 		m_slot7a->irq4_w(state);
 		break;
 	case 4: // slot 5
-		m_slot7->irq7_w(state);
-		m_slot7a->irq7_w(state);
+		m_slot7->irq5_w(state);
+		m_slot7a->irq5_w(state);
+		break;
+	case 5: // slot 6
+		m_slot7->irq6_w(state);
+		m_slot7a->irq6_w(state);
 		break;
 	}
 }
@@ -537,8 +545,8 @@ WRITE8_MEMBER(dmv_state::kb_mcu_port1_w)
 WRITE8_MEMBER(dmv_state::kb_mcu_port2_w)
 {
 	m_speaker->level_w(BIT(data, 0));
-	m_slot7a->irq1_w(BIT(data, 4));
-	m_slot7->irq1_w(BIT(data, 4));
+	m_slot7a->keyint_w(BIT(data, 4));
+	m_slot7->keyint_w(BIT(data, 4));
 }
 
 static ADDRESS_MAP_START( dmv_kb_ctrl_io, AS_IO, 8, dmv_state )
@@ -652,14 +660,14 @@ WRITE_LINE_MEMBER( dmv_state::pit_out0 )
 
 WRITE_LINE_MEMBER( dmv_state::timint_w )
 {
-	m_slot7a->irq0_w(state);
-	m_slot7->irq0_w(state);
+	m_slot7a->timint_w(state);
+	m_slot7->timint_w(state);
 }
 
 WRITE_LINE_MEMBER( dmv_state::fdc_irq )
 {
-	m_slot7a->irq6_w(state);
-	m_slot7->irq6_w(state);
+	m_slot7a->flexint_w(state);
+	m_slot7->flexint_w(state);
 
 	if (state)
 		m_fdc->tc_w(false);

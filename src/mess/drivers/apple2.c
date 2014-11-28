@@ -2,13 +2,13 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-	apple2.c - Apple II/II Plus and clones
+    apple2.c - Apple II/II Plus and clones
 
-    Next generation driver written in September/October 2014 by R. Belmont. 
-    Thanks to the original Apple II series driver's authors: Mike Balfour, Nathan Woods, and R. Belmont 
-    Special thanks to the Apple II Documentation Project/Antoine Vignau and Peter Ferrie. 
- 
-II: original base model.  RAM sizes of 4, 8, 12, 16, 20, 24, 32, 36, and 48 KB possible. 
+    Next generation driver written in September/October 2014 by R. Belmont.
+    Thanks to the original Apple II series driver's authors: Mike Balfour, Nathan Woods, and R. Belmont
+    Special thanks to the Apple II Documentation Project/Antoine Vignau and Peter Ferrie.
+
+II: original base model.  RAM sizes of 4, 8, 12, 16, 20, 24, 32, 36, and 48 KB possible.
     8K of ROM at $E000-$FFFF, empty sockets for $D000-$D7FF and $D800-$DFFF.
     Programmer's Aid #1 was sold by Apple for $D000-$D7FF, some third-party ROMs
     were also available.
@@ -19,25 +19,25 @@ II: original base model.  RAM sizes of 4, 8, 12, 16, 20, 24, 32, 36, and 48 KB p
 
     ROM contains original non-autostart Monitor and Integer BASIC; apparently
     Autostart + Integer is also possible.
- 
-II Plus: RAM options reduced to 16/32/48 KB. 
+
+II Plus: RAM options reduced to 16/32/48 KB.
     ROM expanded to 12KB from $D000-$FFFF containing Applesoft BASIC and
     the Autostart Monitor.  Applesoft is a licensed version of Microsoft's
     6502 BASIC as also found in Commodore and many other computers.
- 
- 
+
+
     Users of both models often connected the SHIFT key to the paddle #2 button
     (mapped to $C063) in order to inform properly written software that characters
     were to be intended upper/lower case.
- 
+
     Both models commonly included a RAM "language card" in slot 0 which added 16K
     of RAM which could be banked into the $D000-$FFFF space to replace the ROMs.
     This allowed running Applesoft on a II and Integer BASIC on a II Plus.
     A II Plus with this card installed is often called a "64K Apple II"; this is
     the base configuration required to run ProDOS and some larger games.
- 
-************************************************************************/ 
- 
+
+************************************************************************/
+
 #include "emu.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
@@ -212,7 +212,7 @@ WRITE_LINE_MEMBER(napple2_state::a2bus_inh_w)
 	{
 		// assume no cards are pulling /INH
 		m_inh_slot = -1;
-								   
+
 		// scan the slots to figure out which card(s) are INHibiting stuff
 		for (int i = 0; i <= 7; i++)
 		{
@@ -226,7 +226,7 @@ WRITE_LINE_MEMBER(napple2_state::a2bus_inh_w)
 					{
 						if (m_inh_bank != 1)
 						{
-							m_upperbank->set_bank(1); 
+							m_upperbank->set_bank(1);
 							m_inh_bank = 1;
 						}
 					}
@@ -234,7 +234,7 @@ WRITE_LINE_MEMBER(napple2_state::a2bus_inh_w)
 					{
 						if (m_inh_bank != 0)
 						{
-							m_upperbank->set_bank(0); 
+							m_upperbank->set_bank(0);
 							m_inh_bank = 0;
 						}
 					}
@@ -248,7 +248,7 @@ WRITE_LINE_MEMBER(napple2_state::a2bus_inh_w)
 		// if no slots are inhibiting, make sure ROM is fully switched in
 		if ((m_inh_slot == -1) && (m_inh_bank != 0))
 		{
-			m_upperbank->set_bank(0); 
+			m_upperbank->set_bank(0);
 			m_inh_bank = 0;
 		}
 	}
@@ -315,7 +315,7 @@ void napple2_state::machine_reset()
 	m_anykeydown = false;
 }
 
-/*************************************************************************** 
+/***************************************************************************
     VIDEO
 ***************************************************************************/
 
@@ -332,16 +332,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(napple2_state::apple2_interrupt)
 		m_video->m_sysconfig = m_sysconfig->read();
 
 		// check reset
-		if (m_resetdip)	// if reset DIP is present, use it
+		if (m_resetdip) // if reset DIP is present, use it
 		{
 			if (m_resetdip->read() & 1)
-			{		// CTRL-RESET
+			{       // CTRL-RESET
 				if ((m_kbspecial->read() & 0x88) == 0x88)
 				{
 					m_maincpu->reset();
 				}
 			}
-			else	// plain RESET
+			else    // plain RESET
 			{
 				if (m_kbspecial->read() & 0x80)
 				{
@@ -349,7 +349,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(napple2_state::apple2_interrupt)
 				}
 			}
 		}
-		else	// no DIP, so always plain RESET
+		else    // no DIP, so always plain RESET
 		{
 			if (m_kbspecial->read() & 0x80)
 			{
@@ -383,8 +383,8 @@ UINT32 napple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				m_video->hgr_update(screen, bitmap, cliprect, 0, 191);
 			}
 		}
-		else	// lo-res
-		{	
+		else    // lo-res
+		{
 			if (m_video->m_mix)
 			{
 				m_video->lores_update(screen, bitmap, cliprect, 0, 159);
@@ -404,7 +404,7 @@ UINT32 napple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-/*************************************************************************** 
+/***************************************************************************
     I/O
 ***************************************************************************/
 // most softswitches don't care about read vs write, so handle them here
@@ -440,12 +440,12 @@ void napple2_state::do_io(address_space &space, int offset)
 			m_video->m_mix = true; break;
 
 		case 0x54:  // set page 1
-			m_page2 = false; 
+			m_page2 = false;
 			m_video->m_page2 = false;
 			break;
 
 		case 0x55:  // set page 2
-			m_page2 = true; 
+			m_page2 = true;
 			m_video->m_page2 = true;
 			break;
 
@@ -479,7 +479,7 @@ void napple2_state::do_io(address_space &space, int offset)
 		case 0x5f: // AN3 on
 			m_an3 = true; break;
 
-		case 0x68:	// IIgs STATE register, which ProDOS touches
+		case 0x68:  // IIgs STATE register, which ProDOS touches
 			break;
 
 		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
@@ -510,15 +510,15 @@ READ8_MEMBER(napple2_state::c000_r)
 		case 0x68:
 			return m_cassette->input() > 0.0 ? 0x80 : 0;
 
-		case 0x61:	// button 0
+		case 0x61:  // button 0
 		case 0x69:
 			return (m_joybuttons->read() & 0x10) ? 0x80 : 0;
 
-		case 0x62:	// button 1
+		case 0x62:  // button 1
 		case 0x6a:
 			return (m_joybuttons->read() & 0x20) ? 0x80 : 0;
 
-		case 0x63:	// button 2
+		case 0x63:  // button 2
 		case 0x6b:
 			// check if SHIFT key mod configured
 			if (m_sysconfig->read() & 0x04)
@@ -527,11 +527,11 @@ READ8_MEMBER(napple2_state::c000_r)
 			}
 			return (m_joybuttons->read() & 0x40) ? 0x80 : 0;
 
-		case 0x64:	// joy 1 X axis
+		case 0x64:  // joy 1 X axis
 		case 0x6c:
 			return (space.machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0;
 
-		case 0x65:	// joy 1 Y axis
+		case 0x65:  // joy 1 Y axis
 		case 0x6d:
 			return (space.machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0;
 
@@ -666,10 +666,10 @@ READ8_MEMBER(napple2_state::inh_r)
 {
 	if (m_inh_slot != -1)
 	{
-		return m_slotdevice[m_inh_slot]->read_inh_rom(space, offset + 0xd000); 
+		return m_slotdevice[m_inh_slot]->read_inh_rom(space, offset + 0xd000);
 	}
 
-	assert(0);	// hitting inh_r with invalid m_inh_slot should not be possible
+	assert(0);  // hitting inh_r with invalid m_inh_slot should not be possible
 	return read_floatingbus();
 }
 
@@ -942,7 +942,7 @@ WRITE_LINE_MEMBER(napple2_state::ay3600_data_ready_w)
 		if (m_transchar != 0)
 		{
 			m_strobe = 0x80;
-//			printf("new char = %04x (%02x)\n", m_lastchar&0x3f, m_transchar);
+//          printf("new char = %04x (%02x)\n", m_lastchar&0x3f, m_transchar);
 		}
 	}
 }
@@ -1021,7 +1021,7 @@ INPUT_PORTS_START( apple2_sysconfig )
 	PORT_CONFSETTING(0x02, "Green")
 	PORT_CONFSETTING(0x03, "Amber")
 
-	PORT_CONFNAME(0x04, 0x04, "Shift key mod")	// default to installed
+	PORT_CONFNAME(0x04, 0x04, "Shift key mod")  // default to installed
 	PORT_CONFSETTING(0x00, "Not present")
 	PORT_CONFSETTING(0x04, "Installed")
 INPUT_PORTS_END
@@ -1053,7 +1053,7 @@ static INPUT_PORTS_START( apple2_common )
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)  PORT_CHAR('7') PORT_CHAR('\'')
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)  PORT_CHAR('8') PORT_CHAR('(')
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)  PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)  PORT_CHAR('0') 
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)  PORT_CHAR('0')
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)  PORT_CHAR(':') PORT_CHAR('*')
 	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('-') PORT_CHAR('=')
 
@@ -1186,7 +1186,7 @@ INPUT_PORTS_END
 
 static SLOT_INTERFACE_START(apple2_slot0_cards)
 	SLOT_INTERFACE("lang", A2BUS_RAMCARD16K)      /* Apple II RAM Language Card */
-	SLOT_INTERFACE("ssram", A2BUS_RAMCARD128K)	  /* Saturn Systems 128K extended language card */
+	SLOT_INTERFACE("ssram", A2BUS_RAMCARD128K)    /* Saturn Systems 128K extended language card */
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(apple2_cards)
@@ -1277,7 +1277,7 @@ static MACHINE_CONFIG_START( apple2_common, napple2_state )
 	MCFG_AY3600_SHIFT_CB(READLINE(napple2_state, ay3600_shift_r))
 	MCFG_AY3600_CONTROL_CB(READLINE(napple2_state, ay3600_control_r))
 	MCFG_AY3600_DATA_READY_CB(WRITELINE(napple2_state, ay3600_data_ready_w))
-	MCFG_AY3600_AKO_CB(WRITELINE(napple2_state, ay3600_ako_w)) 
+	MCFG_AY3600_AKO_CB(WRITELINE(napple2_state, ay3600_ako_w))
 
 	/* repeat timer.  15 Hz from page 90 of "The Apple II Circuit Description */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("repttmr", napple2_state, ay3600_repeat, attotime::from_hz(15))
@@ -1294,7 +1294,7 @@ static MACHINE_CONFIG_START( apple2_common, napple2_state )
 	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl3", apple2_cards, NULL)
 	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl4", apple2_cards, "mockingboard")
 	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl5", apple2_cards, NULL)
-	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl6", apple2_cards, "diskii")
+	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl6", apple2_cards, "diskiing")
 	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl7", apple2_cards, NULL)
 
 	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple2")

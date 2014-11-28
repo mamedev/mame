@@ -67,7 +67,7 @@ public:
 	optional_shared_ptr<UINT16> m_k053936_0_linectrl_16;
 	optional_shared_ptr<UINT32> m_konamigx_type3_psac2_bank;
 	optional_shared_ptr<UINT32> m_generic_paletteram_32;
-	
+
 	optional_ioport m_an0, m_an1, m_light0_x, m_light0_y, m_light1_x, m_light1_y, m_eepromout;
 
 	DECLARE_WRITE32_MEMBER(esc_w);
@@ -167,16 +167,16 @@ public:
 	void fantjour_dma_install();
 
 	void konamigx_mixer_primode(int mode);
-	
+
 	typedef void (konamigx_state::*esc_cb)(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4);
-	
+
 	void tkmmpzdm_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4);
 	void dragoonj_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4);
 	void sal2_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4);
 	void sexyparo_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4);
 	void tbyahhoo_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4);
 	void daiskiss_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4);
-	
+
 	inline int K053247GX_combine_c18(int attrib);
 	inline int K055555GX_decode_objcolor(int c18);
 	inline int K055555GX_decode_inpri(int c18);
@@ -193,17 +193,17 @@ public:
 	int m_gx_cfgport;
 	int m_suspension_active, m_resume_trigger;
 	int m_last_prot_op, m_last_prot_clk;
-		
+
 	UINT8 m_esc_program[4096];
 	esc_cb m_esc_cb;
-	
+
 	UINT16 m_prot_data[0x20];
-	
+
 	UINT16 *m_gx_spriteram;
-	
+
 	// mirrored K054338 settings
 	int *m_K054338_shdRGB;
-	
+
 	// 1st-Tier GX/MW Variables
 	// frequently used registers
 	int m_k053247_vrcbk[4];
@@ -213,8 +213,8 @@ public:
 	int m_vinmix, m_vmixon, m_osinmix, m_osmixon;
 	UINT8  m_gx_wrport1_0, m_gx_wrport1_1;
 	UINT16 m_gx_wrport2;
-	
-	// 2nd-Tier GX/MW Graphics Variables 
+
+	// 2nd-Tier GX/MW Graphics Variables
 	UINT8 *m_gx_objzbuf, *m_gx_shdzbuf;
 	int m_layer_colorbase[4];
 	INT32 m_gx_tilebanks[8], m_gx_oldbanks[8];
@@ -229,27 +229,27 @@ public:
 	int m_konamigx_palformat;
 	bitmap_rgb32 *m_dualscreen_left_tempbitmap;
 	bitmap_rgb32 *m_dualscreen_right_tempbitmap;
-	
+
 	/* On Type-1 the K053936 output is rendered to these temporary bitmaps as raw data
-    the 'voxel' effect to give the pixels height is a post-process operation on the
-    output of the K053936 (this can clearly be seen in videos as large chunks of
-    scenary flicker when in the distance due to single pixels in the K053936 output
-    becoming visible / invisible due to drawing precision.
+	the 'voxel' effect to give the pixels height is a post-process operation on the
+	output of the K053936 (this can clearly be seen in videos as large chunks of
+	scenary flicker when in the distance due to single pixels in the K053936 output
+	becoming visible / invisible due to drawing precision.
 
-    -- however, progress on this has stalled as our K053936 doesn't seem to give
-       the right output for post processing, I suspect the game is using some
-       unsupported flipping modes (probably due to the way it's hooked up to the
-       rest of the chips) which is causing entirely the wrong output.
+	-- however, progress on this has stalled as our K053936 doesn't seem to give
+	   the right output for post processing, I suspect the game is using some
+	   unsupported flipping modes (probably due to the way it's hooked up to the
+	   rest of the chips) which is causing entirely the wrong output.
 
-    -- furthermore video\k053936.c contains an implementation of
-       the K053936_zoom_draw named K053936GP_zoom_draw that's only used in konamigx ...
+	-- furthermore video\k053936.c contains an implementation of
+	   the K053936_zoom_draw named K053936GP_zoom_draw that's only used in konamigx ...
 
 
-    */
+	*/
 	bitmap_ind16 *m_gxtype1_roz_dstbitmap;
 	bitmap_ind16 *m_gxtype1_roz_dstbitmap2;
 	rectangle m_gxtype1_roz_dstbitmapclip;
-	
+
 	int m_konamigx_type3_psac2_actual_bank;
 	//int m_konamigx_type3_psac2_actual_last_bank = 0;
 };

@@ -1,4 +1,4 @@
-/* 
+/*
    PlayCity expansion device
 
    Z80 CTC
@@ -158,4 +158,3 @@ void cpc_playcity_device::update_ymz_clock()
 	m_ymz2->ay_set_clock(clk);
 	popmessage("YMZ clocks set to %d Hz",clk);
 }
-

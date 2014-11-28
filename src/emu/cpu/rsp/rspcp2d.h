@@ -104,7 +104,7 @@ public:
 	virtual void ctc2();
 
 private:
-	virtual int 	generate_vector_opcode(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc);
+	virtual int     generate_vector_opcode(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc);
 };
 
 #endif /* __RSPCP2D_H__ */

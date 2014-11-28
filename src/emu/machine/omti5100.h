@@ -88,7 +88,7 @@ protected:
 	virtual void device_reset();
 
 private:
-//	required_device<z8681_device> m_cpu;
+//  required_device<z8681_device> m_cpu;
 
 	devcb_write_line m_bsy_w;
 	devcb_write_line m_cd_w;

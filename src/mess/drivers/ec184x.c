@@ -232,7 +232,7 @@ static MACHINE_CONFIG_START( ec1840, ec184x_state )
 	MCFG_DEVICE_INPUT_DEFAULTS(ec1840)
 
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", ec184x_isa8_cards, "ec1840.0002", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", ec184x_isa8_cards, "ec1841.0003", false)	// actually ec1840.0003 -- w/o mouse port
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", ec184x_isa8_cards, "ec1841.0003", false)   // actually ec1840.0003 -- w/o mouse port
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", ec184x_isa8_cards, NULL, false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", ec184x_isa8_cards, NULL, false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", ec184x_isa8_cards, NULL, false)
@@ -258,8 +258,8 @@ static MACHINE_CONFIG_START( ec1841, ec184x_state )
 	MCFG_EC1841_MOTHERBOARD_ADD("mb", "maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(ec1841)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", ec184x_isa8_cards, "ec1841.0002", false)	// cga
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", ec184x_isa8_cards, "ec1841.0003", false)	// fdc + mouse port
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", ec184x_isa8_cards, "ec1841.0002", false)   // cga
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", ec184x_isa8_cards, "ec1841.0003", false)   // fdc + mouse port
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", ec184x_isa8_cards, "hdc", false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", ec184x_isa8_cards, NULL, false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", ec184x_isa8_cards, NULL, false)

@@ -23,33 +23,33 @@
 class beckerport_device : public device_t
 {
 public:
-    beckerport_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-    virtual ~beckerport_device();
+	beckerport_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~beckerport_device();
 
-    // optional information overrides
-    virtual ioport_constructor device_input_ports() const;
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const;
 
-    virtual void device_start(void);
-    virtual void device_stop(void);
-    virtual void device_config_complete(void);
+	virtual void device_start(void);
+	virtual void device_stop(void);
+	virtual void device_config_complete(void);
 
-    void    update_port(void);
+	void    update_port(void);
 
-    // driver update handlers
-    DECLARE_INPUT_CHANGED_MEMBER(drivewire_port_changed);
+	// driver update handlers
+	DECLARE_INPUT_CHANGED_MEMBER(drivewire_port_changed);
 
-    virtual DECLARE_READ8_MEMBER(read);
-    virtual DECLARE_WRITE8_MEMBER(write);
+	virtual DECLARE_READ8_MEMBER(read);
+	virtual DECLARE_WRITE8_MEMBER(write);
 
-    // types
-    enum dwsock_ports {
-	    DWS_STATUS,
-	    DWS_DATA
-    };
+	// types
+	enum dwsock_ports {
+		DWS_STATUS,
+		DWS_DATA
+	};
 
 private:
-    /* IP hostname */
-    const char *            m_hostname;
+	/* IP hostname */
+	const char *            m_hostname;
 
 	/* IP port */
 	required_ioport         m_dwconfigport;
@@ -69,4 +69,3 @@ extern const device_type COCO_DWSOCK;
 typedef device_type_iterator<&device_creator<beckerport_device>, beckerport_device> beckerport_device_iterator;
 
 #endif /* _DWSOCK_H_ */
-

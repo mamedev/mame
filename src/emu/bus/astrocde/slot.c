@@ -207,7 +207,7 @@ void astrocade_cart_slot_device::get_default_card_software(astring &result)
 		const char *slot_string = "rom";
 		UINT32 size = core_fsize(m_file);
 		int type = ASTROCADE_STD;
-		
+
 		if (size == 0x40000)
 			type = ASTROCADE_256K;
 		if (size == 0x80000)
@@ -236,4 +236,3 @@ READ8_MEMBER(astrocade_cart_slot_device::read_rom)
 	else
 		return 0xff;
 }
-

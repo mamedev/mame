@@ -1,15 +1,15 @@
-/* 
+/*
    PlayCity expansion device
 
-	I/O ports:
-	* F880 - Z80CTC channel 0 (input is system clock (4MHz), output to YMZ294 clock)
-	* F881 - Z80CTC channel 1 (input from CRTC CURSOR, output to /NMI)
-	* F882 - Z80CTC channel 2 (input is system clock (4MHz), output to channel 3 input)
-	* F883 - Z80CTC channel 3 (input is channel 2 output)
-	* F884 - YMZ294 #1 (right) data
-	* F888 - YMZ294 #2 (left) data
-	* F984 - YMZ294 #1 (right) register select
-	* F988 - YMZ294 #2 (left) register select
+    I/O ports:
+    * F880 - Z80CTC channel 0 (input is system clock (4MHz), output to YMZ294 clock)
+    * F881 - Z80CTC channel 1 (input from CRTC CURSOR, output to /NMI)
+    * F882 - Z80CTC channel 2 (input is system clock (4MHz), output to channel 3 input)
+    * F883 - Z80CTC channel 3 (input is channel 2 output)
+    * F884 - YMZ294 #1 (right) data
+    * F888 - YMZ294 #2 (left) data
+    * F984 - YMZ294 #1 (right) register select
+    * F988 - YMZ294 #2 (left) register select
 */
 
 #ifndef CPC_PLAYCITY_H_
@@ -64,4 +64,3 @@ extern const device_type CPC_PLAYCITY;
 
 
 #endif /* CPC_PLAYCITY_H_ */
-

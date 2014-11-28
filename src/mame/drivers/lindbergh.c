@@ -246,19 +246,19 @@ public:
 #if 0
 static ADDRESS_MAP_START(lindbergh_map, AS_PROGRAM, 32, lindbergh_state)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-									 //	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
-									 //	AM_RANGE(0x000c0000, 0x000cffff) AM_ROM AM_REGION("vid_bios", 0)
+										//  AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
+										//  AM_RANGE(0x000c0000, 0x000cffff) AM_ROM AM_REGION("vid_bios", 0)
 //  0xd0000 - 0xdffff tested, wants 0x414d ("AM") in there
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROM AM_REGION("mb_bios", 0xf0000)
-//	AM_RANGE(0xfd000000, 0xfd3fffff) AM_ROM AM_REGION("jvs_bios", 0)    /* Hack to see the data */
+//  AM_RANGE(0xfd000000, 0xfd3fffff) AM_ROM AM_REGION("jvs_bios", 0)    /* Hack to see the data */
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("mb_bios", 0)     /* System BIOS */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(lindbergh_io, AS_IO, 32, lindbergh_state)
-//	AM_IMPORT_FROM(pcat32_io_common)
+//  AM_IMPORT_FROM(pcat32_io_common)
 
-//	AM_RANGE(0x00e8, 0x00ef) AM_NOP
-//	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
+//  AM_RANGE(0x00e8, 0x00ef) AM_NOP
+//  AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
 ADDRESS_MAP_END
 #endif
 
@@ -277,14 +277,14 @@ void lindbergh_state::machine_reset()
 static MACHINE_CONFIG_START(lindbergh, lindbergh_state)
 //  MCFG_CPU_ADD("maincpu", PENTIUM, 2800000000U) /* Actually Celeron D at 2,8 GHz */
 	MCFG_CPU_ADD("maincpu", PENTIUM4, 28000000U*5) /* Actually Celeron D at 2,8 GHz */
-//	MCFG_CPU_PROGRAM_MAP(lindbergh_map)
-//	MCFG_CPU_IO_MAP(lindbergh_io)
-//	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+//  MCFG_CPU_PROGRAM_MAP(lindbergh_map)
+//  MCFG_CPU_IO_MAP(lindbergh_io)
+//  MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
-//	MCFG_FRAGMENT_ADD( pcat_common )
-//	MCFG_FRAGMENT_ADD( pcvideo_vga )
+//  MCFG_FRAGMENT_ADD( pcat_common )
+//  MCFG_FRAGMENT_ADD( pcvideo_vga )
 
-//	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
+//  MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 
 	MCFG_PCI_ROOT_ADD(                ":pci")
 	MCFG_I82875P_HOST_ADD(            ":pci:00.0",                        0x103382c0, ":maincpu", 512*1024*1024)
@@ -302,6 +302,7 @@ static MACHINE_CONFIG_START(lindbergh, lindbergh_state)
 	MCFG_SEGA_LINDBERGH_BASEBOARD_ADD(":pci:1e.0:03.0")
 	MCFG_I6300ESB_LPC_ADD(            ":pci:1f.0")
 	MCFG_LPC_ACPI_ADD(                ":pci:1f.0:acpi")
+	MCFG_LPC_RTC_ADD(                 ":pci:1f.0:rtc")
 	MCFG_SATA_ADD(                    ":pci:1f.2",      0x808625a3, 0x02, 0x103382c0)
 	MCFG_SMBUS_ADD(                   ":pci:1f.3",      0x808625a4, 0x02, 0x103382c0)
 	MCFG_AC97_ADD(                    ":pci:1f.5",      0x808625a6, 0x02, 0x103382c0)

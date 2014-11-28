@@ -34,18 +34,18 @@ WRITE8_MEMBER(spc1000_fdd_exp_device::i8255_c_w)
 READ8_MEMBER( spc1000_fdd_exp_device::tc_r )
 {
 	logerror("%s: tc_r\n", space.machine().describe_context());
-	
+
 	// toggle tc on read
 	m_fdc->tc_w(true);
 	m_timer_tc->adjust(attotime::zero);
-	
+
 	return 0xff;
 }
 
 WRITE8_MEMBER( spc1000_fdd_exp_device::control_w )
 {
 	logerror("%s: control_w(%02x)\n", space.machine().describe_context(), data);
-	
+
 	// bit 0, motor on signal
 	if (m_fd0)
 		m_fd0->mon_w(!BIT(data, 0));
@@ -150,7 +150,7 @@ void spc1000_fdd_exp_device::device_start()
 {
 	m_timer_tc = timer_alloc(TIMER_TC);
 	m_timer_tc->adjust(attotime::never);
-	
+
 	m_fd0 = subdevice<floppy_connector>("upd765:0")->get_device();
 	m_fd1 = subdevice<floppy_connector>("upd765:1")->get_device();
 }

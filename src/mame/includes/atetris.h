@@ -23,17 +23,17 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	optional_device<atari_slapstic_device> m_slapstic_device;
-	
+
 	required_shared_ptr<UINT8>  m_nvram;
 	required_shared_ptr<UINT8> m_videoram;
-	
+
 	UINT8 *m_slapstic_source;
 	UINT8 *m_slapstic_base;
 	UINT8 m_current_bank;
 	UINT8 m_nvram_write_enable;
 	emu_timer *m_interrupt_timer;
 	tilemap_t *m_bg_tilemap;
-	
+
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
 	DECLARE_READ8_MEMBER(slapstic_r);
 	DECLARE_WRITE8_MEMBER(coincount_w);

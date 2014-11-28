@@ -30,7 +30,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write);
 
 	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
-	
+
 private:
 	// internal state
 	required_device<tms9928a_device>   m_vdp;

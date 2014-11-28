@@ -6174,14 +6174,14 @@ ROM_START( tturf )
 	ROM_LOAD16_BYTE( "epr-12326.a5",  0x00001, 0x20000, CRC(f998862b) SHA1(69902ab0162eb42e1d6a9792651a5d41cb77477d) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
-	ROM_LOAD( "opr-12268.a14", 0x00000, 0x10000, CRC(e0dac07f) SHA1(c7f6de42eb93a8f34afdc300628735b5f40a34c2) )	// ROMS are Toshiba TMM24512AF one time programmable roms
-	ROM_LOAD( "opr-12269.a15", 0x10000, 0x10000, CRC(457a8790) SHA1(b701e1a1745cefb31083c8a3daa3b23181f89576) )	// Some ROM boards might have standard EPR numbers with
-	ROM_LOAD( "opr-12270.a16", 0x20000, 0x10000, CRC(69fc025b) SHA1(20be1242de27f1b997d43890051cc5d5ac8a127a) )	//  standard EPROM chips instead
+	ROM_LOAD( "opr-12268.a14", 0x00000, 0x10000, CRC(e0dac07f) SHA1(c7f6de42eb93a8f34afdc300628735b5f40a34c2) ) // ROMS are Toshiba TMM24512AF one time programmable roms
+	ROM_LOAD( "opr-12269.a15", 0x10000, 0x10000, CRC(457a8790) SHA1(b701e1a1745cefb31083c8a3daa3b23181f89576) ) // Some ROM boards might have standard EPR numbers with
+	ROM_LOAD( "opr-12270.a16", 0x20000, 0x10000, CRC(69fc025b) SHA1(20be1242de27f1b997d43890051cc5d5ac8a127a) ) //  standard EPROM chips instead
 
 	ROM_REGION16_BE( 0x100000, "sprites", 0 ) // sprites
-	ROM_LOAD16_BYTE( "opr-12279.b1", 0x00001, 0x10000, CRC(7a169fb1) SHA1(1ec6da0d2cfcf727e61f61c847fd8b975b64f944) )	// ROMS are Toshiba TMM24512AF one time programmable roms
-	ROM_LOAD16_BYTE( "opr-12283.b5", 0x00000, 0x10000, CRC(ae0fa085) SHA1(ae9af92d4dd0c8a0f064d24e647522b588fbd7f7) )	// Some ROM boards might have standard EPR numbers with
-	ROM_LOAD16_BYTE( "opr-12278.b2", 0x40001, 0x10000, CRC(961d06b7) SHA1(b1a9dea63785bfa2c0e7b931387b91dfcd27d79b) )	//  standard EPROM chips instead
+	ROM_LOAD16_BYTE( "opr-12279.b1", 0x00001, 0x10000, CRC(7a169fb1) SHA1(1ec6da0d2cfcf727e61f61c847fd8b975b64f944) )   // ROMS are Toshiba TMM24512AF one time programmable roms
+	ROM_LOAD16_BYTE( "opr-12283.b5", 0x00000, 0x10000, CRC(ae0fa085) SHA1(ae9af92d4dd0c8a0f064d24e647522b588fbd7f7) )   // Some ROM boards might have standard EPR numbers with
+	ROM_LOAD16_BYTE( "opr-12278.b2", 0x40001, 0x10000, CRC(961d06b7) SHA1(b1a9dea63785bfa2c0e7b931387b91dfcd27d79b) )   //  standard EPROM chips instead
 	ROM_LOAD16_BYTE( "opr-12282.b6", 0x40000, 0x10000, CRC(e8671ee1) SHA1(a3732938c370f1936d867aae9c3d1e9bbfb57ede) )
 	ROM_LOAD16_BYTE( "opr-12277.b3", 0x80001, 0x10000, CRC(f16b6ba2) SHA1(00cc04c7b5aad82d51d2d252e1e57bcdc5e2c9e3) )
 	ROM_LOAD16_BYTE( "opr-12281.b7", 0x80000, 0x10000, CRC(1ef1077f) SHA1(8ce6fd7d32a20b93b3f91aaa43fe22720da7236f) )
@@ -6917,7 +6917,7 @@ GAME( 1987, timescan,   0,        system16b,           timescan, segas16b_state,
 
 GAME( 1994, toryumon,   0,        system16b_5797,      toryumon, segas16b_state,generic_5797,       ROT0,   "Sega", "Toryumon", 0 )
 
-GAME( 1989, tturf,      0,        system16b_i8751,     tturf,    segas16b_state,tturf_5704,         ROT0,   "Sega / Sunsoft", "Tough Turf (set 2, Japan, 8751 317-0104)", 0 ) 
+GAME( 1989, tturf,      0,        system16b_i8751,     tturf,    segas16b_state,tturf_5704,         ROT0,   "Sega / Sunsoft", "Tough Turf (set 2, Japan, 8751 317-0104)", 0 )
 GAME( 1989, tturfu,     tturf,    system16b_i8751,     tturf,    segas16b_state,generic_5358,       ROT0,   "Sega / Sunsoft", "Tough Turf (set 1, US, 8751 317-0099)", 0)
 
 GAME( 1988, wb3,        0,        system16b_i8751,     wb3,      segas16b_state,wb3_5704,           ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 6, World, System 16B, 8751 317-0098)", 0 )

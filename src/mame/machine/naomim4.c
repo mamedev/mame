@@ -192,7 +192,7 @@ void naomi_m4_board::enc_fill()
 		UINT16 dec = iv;
 		iv = decrypt_one_round(enc ^ iv, subkey1);
 		dec ^= decrypt_one_round(iv, subkey2);
-		
+
 		buffer[buffer_actual_size++] = dec;
 		buffer[buffer_actual_size++] = dec >> 8;
 

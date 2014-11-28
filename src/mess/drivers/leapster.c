@@ -1,33 +1,33 @@
-/* 
+/*
     LeapFrog - Leapster
 
-	educational system from 2003, software is all developed in MXFlash
+    educational system from 2003, software is all developed in MXFlash
 
-	hwspecs
+    hwspecs
 
-	
+
     CPU:
-	  Custom ASIC (ARCTangent 5.1 CPU @ 96MHz)
+      Custom ASIC (ARCTangent 5.1 CPU @ 96MHz)
 
-    Memory: 
-	  Leapster: 2MB onboard RAM, 256 bytes NVRAM.
-	  Leapster2: 16MB RAM, 128kbytes NVRAM
+    Memory:
+      Leapster: 2MB onboard RAM, 256 bytes NVRAM.
+      Leapster2: 16MB RAM, 128kbytes NVRAM
 
     Media type:
-	  Cartridges of 4-16MB with between 2 and 512kb NVRAM
-    
-	Graphics:
-	  4Mb ATI chip.
+      Cartridges of 4-16MB with between 2 and 512kb NVRAM
+
+    Graphics:
+      4Mb ATI chip.
 
     Audio:
-	  Custom
+      Custom
 
     Screen:
-	  160x160 CSTN with touchscreen.
+      160x160 CSTN with touchscreen.
 
-    
-	The Leapster 2 also has 
-		USB 1.1 (client only) + full-sized SD slot.
+
+    The Leapster 2 also has
+        USB 1.1 (client only) + full-sized SD slot.
 
 */
 
@@ -81,7 +81,7 @@ PCB - Handheld-Console:
                |                             |
   +------------|                             |------------+
   |            | C A R T R I D G E - S L O T |            |
-  |            |                             |            | 
+  |            |                             |            |
   |            +-----------------------------+            |
   |                                                       |
   |ASY 310-10069    +-------------------+                 |
@@ -160,7 +160,7 @@ B1: 24L002B
   (GND)<- A2-|     |-SCL
          VSS-|     |-SDA
              +-----+
-          
+
 
 
 
@@ -194,11 +194,11 @@ PCB - LEAPSTER-TV:
           |          | C A R T R I D G E - S L O T |          |
           |          +-----------------------------+          |
            \                                                 /
-            +-----------------------------------------------+  
+            +-----------------------------------------------+
 
-     
-      
-     
+
+
+
 
 
 
@@ -292,7 +292,7 @@ ROM_END
 
 ROM_START(leapstertv)
 	ROM_REGION(0x200000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD( "am29pl160cb-90sf.bin", 0x00000, 0x200000, CRC(dc281f1f) SHA1(17588de54ab3bb82801bd5062f3e6aa687412178) )
+	ROM_LOAD( "am29pl160cb-90sf.bin", 0x00000, 0x200000, BAD_DUMP CRC(dc281f1f) SHA1(17588de54ab3bb82801bd5062f3e6aa687412178) )
 ROM_END
 
 

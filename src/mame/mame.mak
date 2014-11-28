@@ -987,6 +987,7 @@ $(MAMEOBJ)/capcom.a: \
 	$(DRIVERS)/1943.o $(VIDEO)/1943.o \
 	$(DRIVERS)/alien.o \
 	$(DRIVERS)/bionicc.o $(VIDEO)/bionicc.o \
+	$(DRIVERS)/supduck.o \
 	$(DRIVERS)/blktiger.o $(VIDEO)/blktiger.o \
 	$(DRIVERS)/cbasebal.o $(VIDEO)/cbasebal.o \
 	$(DRIVERS)/commando.o $(VIDEO)/commando.o \

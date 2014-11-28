@@ -3862,6 +3862,17 @@
 		</part>
 	</software>
 
+	<software name="sdmilhao">
+		<description>Show do Milhão (Bra, Prototype)</description>
+		<year>2003</year>
+		<publisher>Tec Toy</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="milhao.bin" size="131072" crc="58423688" sha1="06e4bb261d44dffad882043305f59816a0be6f47" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="miracle">
 		<description>Miracle Warriors - Seal of the Dark Lord (Euro, USA, Bra)</description>
 		<year>1987</year>

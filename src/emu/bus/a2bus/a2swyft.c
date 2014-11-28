@@ -74,7 +74,7 @@ void a2bus_swyft_device::device_reset()
 {
 	m_rombank = 0;
 
-	m_inh_state = INH_READ;	// read-enable the ROM
+	m_inh_state = INH_READ; // read-enable the ROM
 	recalc_slot_inh();
 }
 
@@ -146,4 +146,3 @@ int a2bus_swyft_device::inh_type()
 {
 	return m_inh_state;
 }
-

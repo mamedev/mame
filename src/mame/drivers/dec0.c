@@ -1256,7 +1256,7 @@ WRITE_LINE_MEMBER(dec0_state::sound_irq2)
 /******************************************************************************/
 
 
-/* This is guesswork, in order to get ~57,41 Hz. 
+/* This is guesswork, in order to get ~57,41 Hz.
  * If real Pixel Clock isn't 5 MHz then htotal/vtotal is different too ... */
 #define DEC0_PIXEL_CLOCK XTAL_20MHz/4
 #define DEC0_HTOTAL 320

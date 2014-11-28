@@ -8,7 +8,7 @@
   1st gen
     * ?
   - # UFO Catcher (1985)
-  
+
   2nd gen:
     * ?
   - # UFO Catcher DX (1987)
@@ -21,7 +21,7 @@
   - UFO Catcher Mini (1991) (1P)
   - # UFO Catcher Sega Sonic (1991)
   - # School Kids (1993)
-  
+
   4th gen - EX brd
     * Z80, 2 Sega 315-5296(I/O), 315-5338A, YM3438, NEC uPD71054C, optional NEC uPD7759C
   - # Dream Palace (1992)
@@ -32,7 +32,7 @@
   - UFO Catcher 800 (1998) (1P)
   - # Baby UFO (1998)
   - # Prize Sensor (1998)
-  
+
   More games were released after 2000, assumed to be on more modern hardware.
 
   TODO:
@@ -57,7 +57,7 @@
 
 /* simulation parameters */
 // x/y/z cabinet dimensions per player (motor range)
-#define CABINET_WIDTH	400
+#define CABINET_WIDTH   400
 #define CABINET_DEPTH   400
 #define CABINET_HEIGHT  300
 
@@ -85,7 +85,7 @@ public:
 	required_device<sega_315_5296_device> m_io1;
 	required_device<sega_315_5296_device> m_io2;
 	optional_device<upd7759_device> m_upd;
-	
+
 	struct Player
 	{
 		struct Motor
@@ -96,9 +96,9 @@ public:
 			float speed;
 		} motor[4];
 	} m_player[2];
-	
+
 	UINT8 m_stepper;
-	
+
 	void motor_tick(int p, int m);
 
 	DECLARE_WRITE_LINE_MEMBER(pit_out0);
@@ -121,7 +121,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ex_ufo800_lamps_w);
 	DECLARE_READ8_MEMBER(ex_upd_busy_r);
 	DECLARE_WRITE8_MEMBER(ex_upd_start_w);
-	
+
 	virtual void machine_reset();
 	virtual void machine_start();
 	TIMER_DEVICE_CALLBACK_MEMBER(simulate_xyz);
@@ -135,10 +135,10 @@ void ufo_state::motor_tick(int p, int m)
 	float delta = m_player[p].motor[m].speed;
 	if (m_player[p].motor[m].direction)
 		delta = -delta;
-	
+
 	if (m_player[p].motor[m].running)
 		m_player[p].motor[m].position += delta;
-	
+
 	if (m_player[p].motor[m].position < 0)
 		m_player[p].motor[m].position = 0;
 	if (m_player[p].motor[m].position > 1)
@@ -163,7 +163,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ufo_state::update_info)
 	for (int p = 0; p < 2; p++)
 		for (int m = 0; m < 4; m++)
 			output_set_indexed_value("counter", p*4 + m, (UINT8)(m_player[p].motor[m].position * 100));
-	
+
 #if 0
 	char msg1[0x100] = {0};
 	char msg2[0x100] = {0};
@@ -226,7 +226,7 @@ READ8_MEMBER(ufo_state::crane_limits_r)
 	// d6: crane open sensor (reflective sticker on the stepper motor rotation disc)
 	if (m_player[p].motor[3].position >= 0.97)
 		ret ^= 0x40;
-	
+
 	// d7: prize sensor (mirror?)
 	ret |= (ioport(p ? "IN2" : "IN1")->read() & 0x80);
 
@@ -249,23 +249,23 @@ WRITE8_MEMBER(ufo_state::stepper_w)
 		// d0-d3: p1, d4-d7: p2
 		UINT8 cur = data >> (p*4) & 0xf;
 		UINT8 prev = m_stepper >> (p*4) & 0xf;
-		
+
 		for (int i = 0; i < 4; i++)
 		{
 			if (sequence[i] == prev && sequence[(i+1) & 3] == cur)
 			{
 				m_player[p].motor[3].running = 1;
 				motor_tick(p, 3);
-				
+
 				// change direction after each quarter rotate
 				if (m_player[p].motor[3].position <= 0 || m_player[p].motor[3].position >= 1)
 					m_player[p].motor[3].direction ^= 1;
-				
+
 				break;
 			}
 		}
 	}
-	
+
 	m_stepper = data;
 }
 
@@ -281,7 +281,7 @@ WRITE8_MEMBER(ufo_state::cp_digits_w)
 {
 	static const UINT8 lut_7448[0x10] =
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
-	
+
 	// d0-d3: cpanel digit
 	// other bits: ?
 	output_set_digit_value(offset & 1, lut_7448[data & 0xf]);
@@ -290,7 +290,7 @@ WRITE8_MEMBER(ufo_state::cp_digits_w)
 WRITE8_MEMBER(ufo_state::crane_xyz_w)
 {
 	int p = offset & 1;
-	
+
 	// d0: x/z axis (0:x, 1:z + halt x/y)
 	// d1: x/z direction
 	// d2: y direction
@@ -315,7 +315,7 @@ WRITE8_MEMBER(ufo_state::ufo_lamps_w)
 	// 10 = red,   green
 	output_set_lamp_value(10, data & 3);
 	output_set_lamp_value(11, data >> 2 & 3);
-	
+
 	// d4,d5: ?
 	// d6,d7: coincounters
 	coin_counter_w(machine(), 0, data & 0x40); // 100 Y
@@ -346,7 +346,7 @@ READ8_MEMBER(ufo_state::ex_crane_limits_r)
 		ret ^= (m_player[p].motor[m].position >= 1) << shift;
 		ret ^= (m_player[p].motor[m].position <= 0) << (shift+1);
 	}
-	
+
 	return ret;
 }
 
@@ -354,17 +354,17 @@ READ8_MEMBER(ufo_state::ex_crane_open_r)
 {
 	// d0-d3: p1, d4-d7: p2
 	UINT8 ret = 0xff;
-	
+
 	for (int p = 0; p < 2; p++)
 	{
 		// d0: crane open sensor
 		if (m_player[p].motor[3].position >= 0.97)
 			ret ^= (1 << (p*4));
-		
+
 		// d1: coincounter is plugged in (ufo800 gives error 14 otherwise)
 		// d2,d3: ?
 	}
-	
+
 	return ret;
 }
 
@@ -382,7 +382,7 @@ WRITE8_MEMBER(ufo_state::ex_cp_lamps_w)
 	// d0,d1,d4,d5: p1/p2 button lamps
 	for (int i = 0; i < 4; i++)
 		output_set_lamp_value(i, ~data >> ((i&1) + (i&2) * 2) & 1);
-	
+
 	// d2,d3,d6,d7: p1/p2 coincounters
 	for (int i = 0; i < 4; i++)
 		coin_counter_w(machine(), i, data >> (2 + (i&1) + (i&2) * 2) & 1);
@@ -391,7 +391,7 @@ WRITE8_MEMBER(ufo_state::ex_cp_lamps_w)
 WRITE8_MEMBER(ufo_state::ex_crane_xyz_w)
 {
 	int p = offset & 1;
-	
+
 	// more straightforward setup than on UFO board hardware
 	// d0: move left
 	// d1: move right
@@ -464,13 +464,13 @@ static ADDRESS_MAP_START( ex_ufo21_portmap, AS_IO, 8, ufo_state )
 	AM_RANGE(0x60, 0x60) AM_WRITE(ex_upd_start_w) AM_READNOP
 	AM_RANGE(0x61, 0x61) AM_READ(ex_upd_busy_r)
 	AM_RANGE(0x64, 0x65) AM_WRITE(ex_ufo21_lamps_w) AM_READNOP
-//	AM_RANGE(0x68, 0x68) AM_WRITENOP // ?
+//  AM_RANGE(0x68, 0x68) AM_WRITENOP // ?
 	AM_IMPORT_FROM( ufo_portmap )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ex_ufo800_portmap, AS_IO, 8, ufo_state )
-//	AM_RANGE(0x60, 0x67) AM_NOP // unused?
-//	AM_RANGE(0x68, 0x68) AM_WRITENOP // ?
+//  AM_RANGE(0x60, 0x67) AM_NOP // unused?
+//  AM_RANGE(0x68, 0x68) AM_WRITENOP // ?
 	AM_IMPORT_FROM( ufo_portmap )
 ADDRESS_MAP_END
 
@@ -723,7 +723,7 @@ void ufo_state::machine_start()
 	// init/zerofill/register for savestates
 	static const float motor_speeds[4] =
 		{ 1.0f/CABINET_WIDTH, 1.0f/CABINET_DEPTH, 1.0f/CABINET_HEIGHT, 1.0f/CRANE_SIZE };
-	
+
 	for (int m = 0; m < 4; m++)
 	{
 		for (int p = 0; p < 2; p++)
@@ -742,7 +742,7 @@ void ufo_state::machine_start()
 		save_item(NAME(m_player[1].motor[m].direction), m);
 		save_item(NAME(m_player[1].motor[m].position), m);
 	}
-	
+
 	m_stepper = 0;
 	save_item(NAME(m_stepper));
 }
@@ -761,7 +761,7 @@ static MACHINE_CONFIG_START( newufo, ufo_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("motor_timer", ufo_state, simulate_xyz, attotime::from_hz(MOTOR_SPEED))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("update_timer", ufo_state, update_info, attotime::from_hz(60))
-	
+
 	MCFG_DEVICE_ADD("io1", SEGA_315_5296, XTAL_16MHz)
 	// all ports set to input
 	MCFG_315_5296_IN_PORTA_CB(READ8(ufo_state, crane_limits_r))

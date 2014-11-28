@@ -40,7 +40,7 @@ lpc_acpi_device::lpc_acpi_device(const machine_config &mconfig, const char *tag,
 }
 
 void lpc_acpi_device::map_device(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-								 UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space)
+									UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space)
 {
 	io_space->install_device(io_offset, io_window_end, *this, &lpc_acpi_device::map);
 }

@@ -9,7 +9,7 @@
 
     Known bugs:
         * the bootlegs don't actually have the slapstic. The additional
-		  hardware needs to be emulated.
+          hardware needs to be emulated.
 
 ****************************************************************************
 
@@ -364,7 +364,7 @@ static MACHINE_CONFIG_START( atetrisb2, atetris_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,BOOTLEG_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(atetrisb2_map)
-	
+
 	MCFG_SLAPSTIC_ADD("slapstic")
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -401,15 +401,15 @@ static MACHINE_CONFIG_DERIVED( atetrisb3, atetrisb2 )
 
 	MCFG_CPU_REPLACE("maincpu", M6502, MASTER_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(atetrisb3_map)
-	
+
 	//8749 at 10 MHz instead of slapstic
 
 	MCFG_SOUND_REPLACE("sn1", SN76489, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	
+
 	MCFG_SOUND_REPLACE("sn2", SN76489, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	
+
 	MCFG_SOUND_REPLACE("sn3", SN76489, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -500,11 +500,11 @@ ROM_START( atetrisb3 )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "gfx.bin",     0x0000, 0x10000, CRC(84a1939f) SHA1(d8577985fc8ed4e74f74c68b7c00c4855b7c3270) )
-	
+
 	// 8749 (10 MHz OSC) instead of the slapstic, needs to be hooked up.
 	ROM_REGION( 0x0800, "user1", 0 )
 	ROM_LOAD( "8749h.bin",    0x0000, 0x0800, CRC(a66a9c47) SHA1(fbebd755a5e826c7d94ebcafdff2f9a01c9fd1a5) )
-	
+
 	// currently unused
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "82s123.bin", 0x00000, 0x0020, CRC(79656af3) SHA1(bf55f100806520b291157c03999606367dd14ecc) )

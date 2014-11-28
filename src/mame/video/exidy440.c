@@ -381,7 +381,7 @@ void exidy440_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
  *
  *************************************/
 
-void exidy440_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,	int scroll_offset, int check_collision)
+void exidy440_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,  int scroll_offset, int check_collision)
 {
 	/* draw any dirty scanlines from the VRAM directly */
 	int sy = scroll_offset + cliprect.min_y;

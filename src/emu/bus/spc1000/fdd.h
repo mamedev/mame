@@ -36,7 +36,7 @@ public:
 	DECLARE_WRITE8_MEMBER(i8255_b_w);
 	DECLARE_READ8_MEMBER(i8255_c_r);
 	DECLARE_WRITE8_MEMBER(i8255_c_w);
-	
+
 private:
 	// internal state
 	required_device<z80_device> m_cpu;
@@ -47,11 +47,11 @@ private:
 	floppy_image_device *m_fd1;
 
 	emu_timer *m_timer_tc;
-	
+
 	UINT8 m_i8255_0_pc;
 	UINT8 m_i8255_1_pc;
 	UINT8 m_i8255_portb;
-	
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	static const device_timer_id TIMER_TC = 0;
 };

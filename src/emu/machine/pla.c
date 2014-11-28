@@ -59,7 +59,7 @@ void pla_device::device_start()
 	m_cache.resize(csize);
 	for (int i = 0; i < csize; i++)
 		m_cache[i] = read(i);
-	
+
 	m_cache_size = csize;
 }
 
@@ -72,19 +72,19 @@ void pla_device::parse_fusemap()
 {
 	jed_data jed;
 	int result = JEDERR_NONE;
-	
+
 	// read pla file
 	switch (m_format)
 	{
 		case PLA_FMT_JEDBIN:
 			result = jedbin_parse(region()->base(), region()->bytes(), &jed);
 			break;
-		
+
 		case PLA_FMT_BERKELEY:
 			result = pla_parse(region()->base(), region()->bytes(), &jed);
 			break;
 	}
-	
+
 	if (result != JEDERR_NONE)
 	{
 		for (int p = 0; p < m_terms; p++)
@@ -92,11 +92,11 @@ void pla_device::parse_fusemap()
 			m_term[p].and_mask = 0;
 			m_term[p].or_mask = 0;
 		}
-		
+
 		logerror("%s PLA parse error %d!\n", tag(), result);
 		return;
 	}
-	
+
 	// parse it
 	UINT32 fusenum = 0;
 
@@ -148,7 +148,7 @@ UINT32 pla_device::read(UINT32 input)
 	// try the cache first
 	if (input < m_cache_size)
 		return m_cache[input];
-	
+
 	for (int i = 0; i < CACHE2_SIZE; ++i)
 	{
 		UINT64 cache2_entry = m_cache2[i];

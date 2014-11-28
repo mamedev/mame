@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="altos5" description="Altos Series 5 floppies">
+
+	<software name="altdiag">
+		<description>Altos Diag. Exec. v3.0</description>
+		<year>198?</year>
+		<publisher>Digital Research</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="134797">
+				<rom name="adx5-00367.td0" size="134797" crc="3f92f689" sha1="af0182e7b305fd3a9142e7463f2b4a12a33371a2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm220so" supported="no">
+		<description>CP/M v2.20SO</description>
+		<year>198?</year>
+		<publisher>Digital Research</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="82277">
+				<rom name="25-3709.td0" size="82277" crc="29f2dbf5" sha1="52bc049028ecd646cf7b27c1593ddc3a271377e6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mpm210so" supported="no">
+		<description>MP-M v2.10SO rev.B</description>
+		<year>1982</year>
+		<publisher>Digital Research</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="500437">
+				<rom name="25-1941.td0" size="500437" crc="269cb851" sha1="2c5e448bee307e61d3565a63544d00be50da3c77" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

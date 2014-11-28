@@ -38,7 +38,7 @@ extern const device_type HDRIVAIRP_BOARD_DEVICE;
 
 
 class harddriv_state :  public device_t
- /* public device_video_interface */
+	/* public device_video_interface */
 {
 public:
 	harddriv_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -253,24 +253,24 @@ public:
 	void steeltal_init_common(offs_t ds3_transfer_pc, int proto_sloop);
 
 	void init_strtdriv(void);
-	
+
 	void init_harddriv(void);
-	
+
 	void init_harddrivc(void);
 
 	void init_racedriv(void);
-	void init_racedrivb1(void);	
+	void init_racedrivb1(void);
 
 	void init_racedrivc(void);
 	void init_racedrivc1(void);
-	
+
 	void init_hdrivair(void);
 	void init_hdrivairp(void);
-	
+
 	void init_steeltal(void);
 	void init_steeltal1(void);
 	void init_steeltalp(void);
-	
+
 	void init_stunrun(void);
 	void init_racedrivc_panorama_side();
 
@@ -461,7 +461,7 @@ public:
 
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_driver);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_multisync);
-	
+
 	UINT8               m_sound_int_state;
 	UINT8               m_video_int_state;
 
@@ -487,7 +487,7 @@ public:
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_start();
-//	virtual void device_reset();	
+//  virtual void device_reset();
 };
 
 /* Hard Drivin' Compact */
@@ -500,7 +500,7 @@ public:
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_start();
-//	virtual void device_reset();	
+//  virtual void device_reset();
 };
 
 /* Race Drivin' */
@@ -514,7 +514,7 @@ public:
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_start();
-//	virtual void device_reset();	
+//  virtual void device_reset();
 };
 
 class racedrivb1_board_device_state :  public racedriv_board_device_state
@@ -538,7 +538,7 @@ public:
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_start();
-//	virtual void device_reset();	
+//  virtual void device_reset();
 };
 
 class racedrivc1_board_device_state :  public racedrivc_board_device_state
@@ -573,7 +573,7 @@ public:
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_start();
-//	virtual void device_reset();	
+//  virtual void device_reset();
 };
 
 /* Steel Talons */
@@ -586,7 +586,7 @@ public:
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_start();
-//	virtual void device_reset();	
+//  virtual void device_reset();
 };
 
 class steeltal1_board_device_state :  public steeltal_board_device_state
@@ -623,7 +623,7 @@ public:
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_start();
-//	virtual void device_reset();	
+//  virtual void device_reset();
 };
 
 /* Hard Drivin' Airbourne */
@@ -636,7 +636,7 @@ public:
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_start();
-//	virtual void device_reset();	
+//  virtual void device_reset();
 };
 
 class hdrivairp_board_device_state :  public hdrivair_board_device_state
@@ -645,11 +645,7 @@ public:
 	hdrivairp_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		hdrivair_board_device_state(mconfig, tag, owner, clock)
 		{};
-		
+
 protected:
 	virtual void device_start();
 };
-
-
-
-

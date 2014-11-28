@@ -71,4 +71,3 @@ UINT8 *a2eaux_ext80col_device::get_auxbank_ptr()
 {
 	return &m_ram[0];
 }
-

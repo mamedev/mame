@@ -201,8 +201,8 @@ public:
 class pet2001b_state : public pet_state
 {
 public:
-	pet2001b_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pet_state(mconfig, type, tag)
+	pet2001b_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pet_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_READ8_MEMBER( pia1_pb_r );
@@ -212,8 +212,8 @@ public:
 class pet80_state : public pet2001b_state
 {
 public:
-	pet80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pet2001b_state(mconfig, type, tag)
+	pet80_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pet2001b_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_MACHINE_START( pet80 );
@@ -236,8 +236,8 @@ public:
 class cbm8096_state : public pet80_state
 {
 public:
-	cbm8096_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pet80_state(mconfig, type, tag)
+	cbm8096_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pet80_state(mconfig, type, tag)
 	{ }
 };
 
@@ -245,14 +245,14 @@ public:
 class cbm8296_state : public pet80_state
 {
 public:
-	cbm8296_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pet80_state(mconfig, type, tag),
-			m_basic_rom(*this, "basic"),
-			m_editor_rom(*this, "editor"),
-			m_ue5_rom(*this, "ue5hack"),
-			m_ue6_rom(*this, "ue6hack"),
-			m_pla1(*this, PLA1_TAG),
-			m_pla2(*this, PLA2_TAG)
+	cbm8296_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pet80_state(mconfig, type, tag),
+		m_basic_rom(*this, "basic"),
+		m_editor_rom(*this, "editor"),
+		m_ue5_rom(*this, "ue5_eprom"),
+		m_ue6_rom(*this, "ue6_eprom"),
+		m_pla1(*this, PLA1_TAG),
+		m_pla2(*this, PLA2_TAG)
 	{ }
 
 	required_memory_region m_basic_rom;
@@ -268,6 +268,10 @@ public:
 	void read_pla1(offs_t offset, int phi2, int brw, int noscreen, int noio, int ramsela, int ramsel9, int ramon, int norom,
 		int &cswff, int &cs9, int &csa, int &csio, int &cse, int &cskb, int &fa12, int &casena1);
 	void read_pla2(offs_t offset, int phi2, int brw, int casena1, int &endra, int &noscreen, int &casena2, int &fa15);
+
+	void read_pla1_eprom(offs_t offset, int phi2, int brw, int noscreen, int noio, int ramsela, int ramsel9, int ramon, int norom,
+		int &cswff, int &cs9, int &csa, int &csio, int &cse, int &cskb, int &fa12, int &casena1);
+	void read_pla2_eprom(offs_t offset, int phi2, int brw, int casena1, int &endra, int &noscreen, int &casena2, int &fa15);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

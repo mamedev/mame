@@ -348,8 +348,8 @@ protected:
 		CRC_CBM_START,          //!< Start a CBM checksum calculation (xor of original data values, gcr5-encoded), p1 = crc id
 		CRC_MACHEAD_START,      //!< Start of the mac gcr6 sector header checksum calculation (xor of pre-encode 6-bits values, gcr6-encoded)
 		CRC_FCS_START,          //!< Start a Compucolor File Control System checksum calculation, p1 = crc id
-		CRC_VICTOR_HDR_START,	//!< Start a Victor 9000 checksum calculation, p1 = crc id
-		CRC_VICTOR_DATA_START,	//!< Start a Victor 9000 checksum calculation, p1 = crc id
+		CRC_VICTOR_HDR_START,   //!< Start a Victor 9000 checksum calculation, p1 = crc id
+		CRC_VICTOR_DATA_START,  //!< Start a Victor 9000 checksum calculation, p1 = crc id
 		CRC_END,                //!< End the checksum, p1 = crc id
 		CRC,                    //!< Write a checksum in the apporpriate format, p1 = crc id
 

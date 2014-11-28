@@ -142,7 +142,7 @@ Super PE+
    XnnnnnnP Poker Data. Contains poker game + paytable percentages
              Data roms will not work with every Program rom. Incompatible combos report: Incompatible Data EPROM
              X000055P is a good example, it works with 19 XP000xxx Program roms. Others may be as few as 2.
-  XMPnnnnn  Multi-Poker Programs. Different options for each set, but all use the same XMnnnnnP data 
+  XMPnnnnn  Multi-Poker Programs. Different options for each set, but all use the same XMnnnnnP data
              XMP00002 through XMP00006 & XMP00024 Use the XM000xxP Multi-Poker Data
              XMP00014, XMP00017 & XMP00030 Use the WING Board add-on and use the XnnnnnnP Poker Data (Not all are compatible!)
              XMP00013, XMP00022 & XMP00026 Use the WING Board add-on & CG2346 + CAPX2346 for Spanish paytables
@@ -226,7 +226,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	required_shared_ptr<UINT8> m_cmos_ram;
 	required_shared_ptr<UINT8> m_program_ram;
 	required_shared_ptr<UINT8> m_s3000_ram;
@@ -237,7 +237,7 @@ public:
 	required_shared_ptr<UINT8> m_sd000_ram;
 	required_shared_ptr<UINT8> m_sf000_ram;
 	required_shared_ptr<UINT8> m_io_port;
-	
+
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_wingboard;
 	UINT8 m_doorcycle;
@@ -265,7 +265,7 @@ public:
 	UINT8 m_bv_data_bit;
 	UINT8 m_bv_loop_count;
 	UINT16 id023_data;
-	
+
 	DECLARE_WRITE8_MEMBER(peplus_bgcolor_w);
 	DECLARE_WRITE8_MEMBER(peplus_crtc_display_w);
 	DECLARE_WRITE8_MEMBER(peplus_duart_w);

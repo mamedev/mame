@@ -170,13 +170,13 @@ TI-83PlusSE ports:
     2: ?
     3: ON status, LCD power
     4: Interrupt status
-	5: Memory page 3
+    5: Memory page 3
     6: Memory page 1
     7: Memory page 2
     10: Controll port for the display controller
     11: Data port for the display controller
-	15: Asic Version
-		
+    15: Asic Version
+
 TI-85 ports:
     0: Video buffer offset (write only)
     1: Keypad
@@ -296,7 +296,7 @@ static ADDRESS_MAP_START( ti83pse_io, AS_IO, 8, ti85_state )
 	AM_RANGE(0x0015, 0x0015) AM_READ(ti83pse_port_0015_r)
 	AM_RANGE(0x0020, 0x0020) AM_READWRITE(ti83pse_port_0020_r, ti83pse_port_0020_w )
 	AM_RANGE(0x0021, 0x0021) AM_READWRITE(ti83pse_port_0021_r, ti83pse_port_0021_w )
-	
+
 	AM_RANGE(0x0030, 0x0030) AM_READWRITE(ti83pse_ctimer1_setup_r, ti83pse_ctimer1_setup_w )
 	AM_RANGE(0x0031, 0x0031) AM_READWRITE(ti83pse_ctimer1_loop_r, ti83pse_ctimer1_loop_w )
 	AM_RANGE(0x0032, 0x0032) AM_READWRITE(ti83pse_ctimer1_count_r, ti83pse_ctimer1_count_w )
@@ -306,7 +306,7 @@ static ADDRESS_MAP_START( ti83pse_io, AS_IO, 8, ti85_state )
 	AM_RANGE(0x0036, 0x0036) AM_READWRITE(ti83pse_ctimer3_setup_r, ti83pse_ctimer3_setup_w )
 	AM_RANGE(0x0037, 0x0037) AM_READWRITE(ti83pse_ctimer3_loop_r, ti83pse_ctimer3_loop_w )
 	AM_RANGE(0x0038, 0x0038) AM_READWRITE(ti83pse_ctimer3_count_r, ti83pse_ctimer3_count_w )
-	
+
 	AM_RANGE(0x0055, 0x0055) AM_READ(ti84pse_port_0055_r)
 	AM_RANGE(0x0056, 0x0056) AM_READ(ti84pse_port_0056_r)
 ADDRESS_MAP_END
@@ -713,7 +713,7 @@ static MACHINE_CONFIG_DERIVED( ti83p, ti81 )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	
+
 	MCFG_AMD_29F400T_ADD("flash")
 
 	//MCFG_TI83PSERIAL_ADD( "tiserial" )
@@ -721,18 +721,18 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ti83pse, ti83p )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( 15000000) 
+	MCFG_CPU_CLOCK( 15000000)
 	MCFG_CPU_IO_MAP(ti83pse_io)
-	
+
 	MCFG_DEVICE_MODIFY("membank1")
 	MCFG_DEVICE_PROGRAM_MAP(ti83pse_banked_mem)
 
 	MCFG_DEVICE_MODIFY("membank2")
 	MCFG_DEVICE_PROGRAM_MAP(ti83pse_banked_mem)
-	
+
 	MCFG_DEVICE_MODIFY("membank3")
 	MCFG_DEVICE_PROGRAM_MAP(ti83pse_banked_mem)
-	
+
 	MCFG_DEVICE_MODIFY("membank4")
 	MCFG_DEVICE_PROGRAM_MAP(ti83pse_banked_mem)
 
@@ -743,7 +743,7 @@ static MACHINE_CONFIG_DERIVED( ti83pse, ti83p )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ti84p, ti83pse )
-    MCFG_DEVICE_MODIFY("membank1")
+	MCFG_DEVICE_MODIFY("membank1")
 	MCFG_DEVICE_PROGRAM_MAP(ti84p_banked_mem)
 
 	MCFG_DEVICE_MODIFY("membank2")
@@ -756,7 +756,7 @@ static MACHINE_CONFIG_DERIVED( ti84p, ti83pse )
 	MCFG_DEVICE_PROGRAM_MAP(ti84p_banked_mem)
 
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti84p )
-    MCFG_DEVICE_REPLACE("flash", AMD_29F800T , 0)
+	MCFG_DEVICE_REPLACE("flash", AMD_29F800T , 0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ti84pse, ti83pse )
@@ -909,10 +909,10 @@ ROM_START (ti84pse)
 ROM_END
 
 ROM_START (ti84p)
-    ROM_REGION (0x100000, "flash",0)
-    ROM_DEFAULT_BIOS("b100v255mp")
-    ROM_SYSTEM_BIOS( 0, "b100v255mp", "Boot 1.00 OS V 2.55MP" )
-    ROMX_LOAD( "ti84pb100v255mp.bin", 0x00000, 0x100000, CRC(4AF31251) SHA1(8F67269346644B87E7CD0F353F5F4030E787CF57), ROM_BIOS(1) )
+	ROM_REGION (0x100000, "flash",0)
+	ROM_DEFAULT_BIOS("b100v255mp")
+	ROM_SYSTEM_BIOS( 0, "b100v255mp", "Boot 1.00 OS V 2.55MP" )
+	ROMX_LOAD( "ti84pb100v255mp.bin", 0x00000, 0x100000, CRC(4AF31251) SHA1(8F67269346644B87E7CD0F353F5F4030E787CF57), ROM_BIOS(1) )
 ROM_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT   COMPANY                 FULLNAME                        FLAGS */

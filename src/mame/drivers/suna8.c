@@ -1860,13 +1860,13 @@ static MACHINE_CONFIG_START( rranger, suna8_state )
 	MCFG_CPU_IO_MAP(rranger_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna8_state,  irq0_line_hold)  /* IRQ & NMI ! */
 
-	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)                   /* ? */
+	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 8)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rranger_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(suna8_state, irq0_line_hold, 4*60) /* NMI = retn */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(59.1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
@@ -1883,13 +1883,13 @@ static MACHINE_CONFIG_START( rranger, suna8_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ym1", YM2203, SUNA8_MASTER_CLOCK / 6)
+	MCFG_SOUND_ADD("ym1", YM2203, SUNA8_MASTER_CLOCK / 16)  /* verified on pcb */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(suna8_state, rranger_play_samples_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(suna8_state, suna8_samples_number_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 
-	MCFG_SOUND_ADD("ym2", YM2203, SUNA8_MASTER_CLOCK / 6)
+	MCFG_SOUND_ADD("ym2", YM2203, SUNA8_MASTER_CLOCK / 16)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 

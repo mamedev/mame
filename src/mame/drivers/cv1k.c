@@ -847,7 +847,6 @@ DRIVER_INIT_MEMBER(cv1k_state,espgal2)
 
 READ64_MEMBER( cv1k_state::mushitam_speedup_r )
 {
-
 	if (m_maincpu->pc()==  0xc04a0da)  m_maincpu->spin_until_time( attotime::from_usec(10)); // mushitam / mushitama
 	return m_ram[0x0022f0/8];
 }

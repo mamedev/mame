@@ -4,4 +4,3 @@ lpc_device::lpc_device(const machine_config &mconfig, device_type type, const ch
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
-

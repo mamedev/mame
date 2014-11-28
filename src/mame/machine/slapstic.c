@@ -235,12 +235,10 @@ atari_slapstic_device::atari_slapstic_device(const machine_config &mconfig, cons
 
 void atari_slapstic_device::device_start()
 {
-
 }
 
 void atari_slapstic_device::device_reset()
 {
-
 }
 
 /*************************************

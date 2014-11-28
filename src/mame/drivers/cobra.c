@@ -634,7 +634,7 @@ public:
 	DECLARE_READ64_MEMBER(main_mpc106_r);
 	DECLARE_WRITE64_MEMBER(main_mpc106_w);
 	DECLARE_WRITE32_MEMBER(main_cpu_dc_store);
-	
+
 	DECLARE_READ32_MEMBER(sub_comram_r);
 	DECLARE_WRITE32_MEMBER(sub_comram_w);
 	DECLARE_READ32_MEMBER(sub_sound_r);
@@ -665,7 +665,7 @@ public:
 	DECLARE_READ64_MEMBER(gfx_fifo_r);
 	DECLARE_WRITE64_MEMBER(gfx_buf_w);
 	DECLARE_WRITE32_MEMBER(gfx_cpu_dc_store);
-	
+
 	DECLARE_WRITE8_MEMBER(sub_jvs_w);
 
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);

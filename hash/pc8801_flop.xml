@@ -11464,8 +11464,8 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
-	<software name="fahratok">
-		<description>Fahra no Toki Kekkai</description>
+	<software name="faara">
+		<description>Faara no Toki Kekkai</description>
 		<year>1990</year>
 		<publisher>ハート電子 (Heart Denshi)</publisher>
 		<!-- PC8801mk2SR -->
@@ -11497,7 +11497,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 	</software>
 
 	<software name="faires">
-		<description>Fairies Residence</description>
+		<description>Fairie's Residence</description>
 		<year>1985</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
 		<!-- PC8801 -->
@@ -11522,7 +11522,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 	</software>
 
 	<software name="fairescl">
-		<description>Fairies Residence Special - Club Hen</description>
+		<description>Fairie's Residence Special - Club Hen</description>
 		<year>1986</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
 		<!-- PC8801 -->
@@ -11535,7 +11535,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 	</software>
 
 	<software name="fairessf">
-		<description>Fairies Residence Special - SF Hen</description>
+		<description>Fairie's Residence Special - SF Hen</description>
 		<year>1986</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
 		<!-- PC8801 -->
@@ -11547,8 +11547,8 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
-	<software name="faeriesr">
-		<description>Fairies Residence Special - SF Hen (Alt)</description>
+	<software name="fairessfa" cloneof="fairessf">
+		<description>Fairie's Residence Special - SF Hen (Alt)</description>
 		<year>1986</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
 		<!-- PC8801 -->
@@ -11561,7 +11561,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 	</software>
 
 	<software name="fairesgk">
-		<description>Fairies Residence Special - Gakuen Hen</description>
+		<description>Fairie's Residence Special - Gakuen Hen</description>
 		<year>1986</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
 		<!-- PC8801 -->
@@ -11573,8 +11573,8 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
-	<software name="fairess4">
-		<description>Fairies Residence Special 4 - Geinou-kai Hen - Super Mariko Sister</description>
+	<software name="fairesge">
+		<description>Fairie's Residence Special 4 - Geinou-kai Hen - Super Mariko Sister</description>
 		<year>1986</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
 		<!-- PC8801 -->

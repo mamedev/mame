@@ -111,47 +111,47 @@ public:
 #endif
 
 private:
-	virtual int 	generate_vector_opcode(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc);
+	virtual int     generate_vector_opcode(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc);
 
-	UINT16			ACCUM_H(int x);
-	UINT16			ACCUM_M(int x);
-	UINT16			ACCUM_L(int x);
-	UINT16			ACCUM_LL(int x);
-	UINT16			CARRY_FLAG(const int x);
-	UINT16			COMPARE_FLAG(const int x);
-	UINT16			CLIP1_FLAG(const int x);
-	UINT16			ZERO_FLAG(const int x);
-	UINT16			CLIP2_FLAG(const int x);
-	UINT16			SATURATE_ACCUM(int accum, int slice, UINT16 negative, UINT16 positive);
+	UINT16          ACCUM_H(int x);
+	UINT16          ACCUM_M(int x);
+	UINT16          ACCUM_L(int x);
+	UINT16          ACCUM_LL(int x);
+	UINT16          CARRY_FLAG(const int x);
+	UINT16          COMPARE_FLAG(const int x);
+	UINT16          CLIP1_FLAG(const int x);
+	UINT16          ZERO_FLAG(const int x);
+	UINT16          CLIP2_FLAG(const int x);
+	UINT16          SATURATE_ACCUM(int accum, int slice, UINT16 negative, UINT16 positive);
 
-	__m128i			m_accum_h;
-	__m128i			m_accum_m;
-	__m128i			m_accum_l;
-	__m128i			m_accum_ll;
+	__m128i         m_accum_h;
+	__m128i         m_accum_m;
+	__m128i         m_accum_l;
+	__m128i         m_accum_ll;
 
 	// Mirror of v[] for now, to be used in parallel as
 	// more vector ops are transitioned over
-	__m128i			m_xv[32];
-	__m128i			m_xvflag[6];
+	__m128i         m_xv[32];
+	__m128i         m_xvflag[6];
 
 #if SIMUL_SIMD
-	UINT32			m_old_r[35];
-	UINT8			m_old_dmem[4096];
+	UINT32          m_old_r[35];
+	UINT8           m_old_dmem[4096];
 
-	UINT32			m_scalar_r[35];
-	UINT8			m_scalar_dmem[4096];
+	UINT32          m_scalar_r[35];
+	UINT8           m_scalar_dmem[4096];
 
-	INT32			m_old_reciprocal_res;
-	UINT32			m_old_reciprocal_high;
-	INT32			m_old_dp_allowed;
+	INT32           m_old_reciprocal_res;
+	UINT32          m_old_reciprocal_high;
+	INT32           m_old_dp_allowed;
 
-	INT32			m_scalar_reciprocal_res;
-	UINT32			m_scalar_reciprocal_high;
-	INT32			m_scalar_dp_allowed;
+	INT32           m_scalar_reciprocal_res;
+	UINT32          m_scalar_reciprocal_high;
+	INT32           m_scalar_dp_allowed;
 
-	INT32			m_simd_reciprocal_res;
-	UINT32			m_simd_reciprocal_high;
-	INT32			m_simd_dp_allowed;
+	INT32           m_simd_reciprocal_res;
+	UINT32          m_simd_reciprocal_high;
+	INT32           m_simd_dp_allowed;
 #endif
 };
 

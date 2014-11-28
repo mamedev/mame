@@ -64,7 +64,7 @@ static bool iscrlf(char c)
 static UINT32 suck_number(const UINT8 **src, const UINT8 *srcend)
 {
 	UINT32 value = 0;
-	
+
 	// find first digit
 	while (*src < srcend && !iscrlf(**src) && !isdigit(**src))
 		(*src)++;
@@ -94,7 +94,7 @@ static bool process_terms(jed_data *data, const UINT8 **src, const UINT8 *srcend
 	UINT32 curinput = 0;
 	UINT32 curoutput = 0;
 	bool outputs = false;
-	
+
 	// symbols for 0, 1, dont_care, no_meaning
 	// PLA format documentation also describes them as simply 0, 1, 2, 3
 	static const char symbols[] = { "01-~" };
@@ -106,7 +106,7 @@ static bool process_terms(jed_data *data, const UINT8 **src, const UINT8 *srcend
 			// and-matrix
 			if (strrchr(symbols, **src))
 				curinput++;
-			
+
 			switch (**src)
 			{
 				case '0':
@@ -146,7 +146,7 @@ static bool process_terms(jed_data *data, const UINT8 **src, const UINT8 *srcend
 						if (LOG_PARSE) printf(" ");
 					}
 					break;
-		
+
 				default:
 					break;
 			}
@@ -175,7 +175,7 @@ static bool process_terms(jed_data *data, const UINT8 **src, const UINT8 *srcend
 		{
 			outputs = false;
 			if (LOG_PARSE) printf("\n");
-			
+
 			if (curinput != pinfo->inputs || curoutput != pinfo->outputs)
 				return false;
 
@@ -185,7 +185,7 @@ static bool process_terms(jed_data *data, const UINT8 **src, const UINT8 *srcend
 
 		(*src)++;
 	}
-	
+
 	return true;
 }
 
@@ -206,32 +206,32 @@ static bool process_field(jed_data *data, const UINT8 **src, const UINT8 *srcend
 		KW_TERMS,
 		KW_PHASE,
 		KW_END,
-		
+
 		KW_INVALID
 	};
-	
+
 	// find keyword
 	char dest[0x10];
 	memset(dest, 0, ARRAY_LENGTH(dest));
 	const UINT8 *seek = *src;
 	int destptr = 0;
-	
+
 	while (seek < srcend && isalpha(*seek) && destptr < ARRAY_LENGTH(dest) - 1)
 	{
 		dest[destptr] = tolower(*seek);
 		seek++;
 		destptr++;
 	}
-	
+
 	UINT8 find = 0;
 	while (strlen(keywords[find]) && strcmp(dest, keywords[find]))
 		find++;
-	
+
 	if (find == KW_INVALID)
 		return false;
-	
+
 	(*src) += strlen(keywords[find]);
-	
+
 	// handle it
 	switch (find)
 	{
@@ -261,7 +261,7 @@ static bool process_field(jed_data *data, const UINT8 **src, const UINT8 *srcend
 
 			if (LOG_PARSE) printf("Terms: %u\n", pinfo->terms);
 			break;
-		
+
 		// output polarity (optional)
 		case KW_PHASE:
 			if (LOG_PARSE) printf("Phase...\n");
@@ -283,7 +283,7 @@ static bool process_field(jed_data *data, const UINT8 **src, const UINT8 *srcend
 			if (LOG_PARSE) printf("End of file\n");
 			break;
 	}
-	
+
 	return true;
 }
 
@@ -298,7 +298,7 @@ int pla_parse(const void *data, size_t length, jed_data *result)
 {
 	const UINT8 *src = (const UINT8 *)data;
 	const UINT8 *srcend = src + length;
-	
+
 	parse_info pinfo;
 	memset(&pinfo, 0, sizeof(pinfo));
 
@@ -321,24 +321,24 @@ int pla_parse(const void *data, size_t length, jed_data *result)
 				if (!process_field(result, &src, srcend, &pinfo))
 					return JEDERR_INVALID_DATA;
 				break;
-			
+
 			// terms
 			case '0': case '1': case '-': case '~':
 				if (!process_terms(result, &src, srcend, &pinfo))
 					return JEDERR_INVALID_DATA;
 				break;
-			
+
 			default:
 				src++;
 				break;
 		}
 	}
-	
+
 	// write output polarity
 	if (pinfo.xorptr > 0)
 	{
 		if (LOG_PARSE) printf("Polarity: ");
-		
+
 		for (int i = 0; i < pinfo.outputs; i++)
 		{
 			int bit = pinfo.xorval[i/32] >> (i & 31) & 1;

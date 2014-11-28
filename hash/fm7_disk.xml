@@ -2232,6 +2232,133 @@ Game #014 for FM-7/77/AV.
 		</part>
 	</software>
 
+
+<!--
+Description of Gane Bank #1
+- GALAGA : run "GALAGA" .
+- FLappy : run "FLAPPY" .
+- Mario Bros Special : run "MARIO.S".
+- The Castle: run "CASTLE".
+Aboves may be correct.
+
+- GALXAN : run "GALAXAN". But this game was broken.
+-->
+	<software name="gmbnk001">
+		<description>GameBank 01</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="gamebank01.d77" size="348848" crc="74d82ecf" sha1="f974ff99ef08a16b398e308b6fbefa6fb54c0959" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Descriptions of Game Bank #3:
+Belows are (seem to) correct:
+- Luner city SOS : run "LUNERSOS".
+- Mappy          : run "MAPPY".
+- NOBO           : run "NOBO".
+- MACH-7         : run "MACH-7". some cource(s) seems to be broken.
+Belows were broken.
+- Flight simulator : run "FLIGHT".
+-->
+	<software name="gmbnk003">
+		<description>GameBank 03</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="gamebank03.d77" size="348848" crc="79f2658d" sha1="349c6b91d312ca1a2dcb79e1258634de7cbcbf59" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Descriptions of Game Bank #4:
+Belows are (seem to) correct:
+- Battle City : run "BATTLE".
+- Plazma Line : run "PLAZMA".
+- EGGY : run "EGGY".
+- KNITHER : run "KNITHER".
+- Chak'n Pop : run "CHAN.POP".
+-->
+	<software name="gmbnk004">
+		<description>GameBank 04</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="gamebank04.d77" size="348848" crc="307dcb59" sha1="9a6bbabd621ab57dd957ec3f1ef5b9a5f1ab4a17" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Description of Game Bank #5:
+Belows are seem to be correct:
+- Victorious Nine : run "VICTORY9"
+- TANK BATTLE "Sento Gokko": boot from URA DOS, then loadm"TANK",,r
+
+Belows are seem to be correct, but maybe broken yet:
+- The Emergency : run "EMERGENCY".
+- Blue Fox : loadm "BLUEFOX",,r.
+Another games are not correct.
+-->
+	<software name="gmbnk005">
+		<description>GameBank 05</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="gamebank05.d77" size="348848" crc="7df7059c" sha1="7ab2c19aff20ea2790853108ed9805de05cb8b84" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Descriptions of Game Bank #6:
+Belows are (seem to) correct:
+- Bokosuka Wars : run "BOKOSUKA".
+
+Other games are broken.
+-->
+	<software name="gmbnk006">
+		<description>GameBank 06</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="gamebank06.d77" size="348848" crc="3bebdae0" sha1="b0b5b112624e7d5c0f72b7d7d60a43cb9f23068b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Descriptions of Game Bank #7:
+Belows are correct:
+- Newtron : run "NEWTRON".
+- Star Dash: run "STARDASH"
+- F-15 Eagle : run "EAGLE".
+- Push Pull (1): loadm "PUSHPULL",,r.
+
+Below is incorrect:
+- Hover Attack: run"HOVER.B".
+
+Another files are not test yet.
+-->
+	<software name="gmbnk007">
+		<description>GameBank 07</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="gamebank07.d77" size="348848" crc="663e1eec" sha1="8a0758777efc1e13d90425a11534bd0153bf25c6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!--
 GameBank20.d77.
 1.Golgo 13            :RUN "G13-D/B".
@@ -2241,7 +2368,7 @@ GameBank20.d77.
 5.Volguard (Cheat)    :RUN "VOLCHEAT".
 6.Super File Copy     :LOADM"SFCOPYo",,r .
 -->
-	<software name="game020">
+	<software name="gmbnk020">
 		<description>GameBank 20</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

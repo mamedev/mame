@@ -1,20 +1,20 @@
 /*
 
  tiny bartop b&w Space Invaders type game with colour overlay
- 
+
  Driver by David Haywood and Mariusz Wojcieszek
 
  TODO:
  - 16 bytes are protected in the c*** range. I'm guessing they used a PROM to protect a
    simple sub-routine because:
-   * It attempts to jsr from RAM to that area with a 0x10 byte offset (i.e. ROM copies a code snippet to RAM; when it executes 
+   * It attempts to jsr from RAM to that area with a 0x10 byte offset (i.e. ROM copies a code snippet to RAM; when it executes
      it code executes jsr 0xc400 then self-modifies it to 0xc410, rinse and repeat ... up to 0xc7f0 and rolls back);
-   * After that the program has an amusing left-over located at 0xe000-0xe00f (yup, NOPs + a RTS), with the 
+   * After that the program has an amusing left-over located at 0xe000-0xe00f (yup, NOPs + a RTS), with the
      exact same number of times as above;
    It's unknown at current stage what it really protects tho, game seems working for all I can see ... -AS
 
  - Sound is entirely guesswork.
- 
+
  */
 
 #include "emu.h"
@@ -28,10 +28,10 @@ public:
 	alinvade_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-	  	, m_videoram(*this, "videoram")
+		, m_videoram(*this, "videoram")
 		, m_discrete(*this, "discrete")
 	{ }
-	
+
 	DECLARE_READ8_MEMBER(irqmask_r);
 	DECLARE_WRITE8_MEMBER(irqmask_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
@@ -90,7 +90,7 @@ WRITE8_MEMBER(alinvade_state::irqmask_w)
 {
 	if((!(irqff & 1)) && (data & 1)) // f/f, active high? If the above actually returns 0xff this could be active low ...
 		irqmask^= 1;
-		
+
 	irqff = data;
 }
 

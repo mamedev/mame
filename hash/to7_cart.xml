@@ -28,7 +28,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="6809langb" cloneof="6809lang">
 		<description>6809 Language Module (v1.0)</description>
 		<year>1984</year>
@@ -52,7 +52,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="airbus">
 		<description>Airbus</description>
 		<year>1984</year>
@@ -64,7 +64,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="atomium">
 		<description>Atomium</description>
 		<year>1982</year>
@@ -76,7 +76,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="basic">
 		<description>BASIC (v1.0)</description>
 		<year>1982</year>
@@ -88,7 +88,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="blitz">
 		<description>Blitz!</description>
 		<year>1984</year>
@@ -104,15 +104,15 @@
 	<software name="budgfami">
 		<description>Budget Familial</description>
 		<year>1982</year>
-		<publisher>Answare</publisher>	
-	
+		<publisher>Answare</publisher>
+
 		<part name="cart" interface="to7_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="bf.7001.bin" size="16384" crc="193a8b14" sha1="82d3f56cd9c27ee80decf722a9e107761b42851e" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="caractr2">
 		<description>Caractor II</description>
 		<year>1984</year>
@@ -124,7 +124,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="caractor">
 		<description>Caractor</description>
 		<year>1983</year>
@@ -136,7 +136,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="choplift">
 		<description>Choplifter</description>
 		<year>1985</year>
@@ -160,7 +160,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="clrpaint">
 		<description>Colorpaint</description>
 		<year>1985</year>
@@ -184,7 +184,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="controle">
 		<description>Controle Aerien</description>
 		<year>1984</year>
@@ -196,7 +196,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="crypto">
 		<description>Crypto</description>
 		<year>1982</year>
@@ -245,7 +245,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="gemini">
 		<description>Gemini</description>
 		<year>1982</year>
@@ -256,8 +256,8 @@
 				<rom name="gemini (1982)(vifi-nathan)(fr).bin" size="4096" crc="c20c1d82" sha1="92ee16ef7d14b241e8df390b0e6192810a8eda40" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="gerfiche">
 		<description>Gerez vos Fiches</description>
 		<year>1984</year>
@@ -280,8 +280,8 @@
 				<rom name="gerez vos fiches (answare) (inconnus) (1984) (memo7).bin" size="16384" crc="f3ad6a2c" sha1="396427d6fcf22a69c5de6a4873e20a5b3b7062f9" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="gerteque">
 		<description>Gerez Votre Bibliotheque-Discotheque-Videotheque</description>
 		<year>1983</year>
@@ -292,8 +292,8 @@
 				<rom name="gerez votre bibliotheque-discotheque-videotheque (1983)(answare)(fr).bin" size="8192" crc="cb6f0f85" sha1="56ce86e414a7debdadac4a416bad4c70d289be95" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="chiflett">
 		<description>Les Chiffres et les Lettres</description>
 		<year>1984</year>
@@ -305,7 +305,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="logicod">
 		<description>Logicod</description>
 		<year>1982</year>
@@ -317,7 +317,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="logo">
 		<description>LOGO (v1.0)</description>
 		<year>1984</year>
@@ -353,7 +353,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="lsegedl">
 		<description>LSEG-EDL (v3.51)</description>
 		<year>1985</year>
@@ -401,7 +401,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="melodia">
 		<description>Melodia</description>
 		<year>1982</year>
@@ -450,7 +450,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pictor">
 		<description>Pictor</description>
 		<year>1983</year>
@@ -464,17 +464,17 @@
 	</software>
 
 <!--
-	<software name="polyphon">
-		<description>Polyphonia</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+    <software name="polyphon">
+        <description>Polyphonia</description>
+        <year>19??</year>
+        <publisher>&lt;unknown&gt;</publisher>
 
-		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="polyphonia.bin" size="16384" crc="a38e60e0" sha1="a69569db7ca416159fc7e1921a60b38d40da8c8d" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cart" interface="to7_cart">
+            <dataarea name="rom" size="16384">
+                <rom name="polyphonia.bin" size="16384" crc="a38e60e0" sha1="a69569db7ca416159fc7e1921a60b38d40da8c8d" offset="0x0000" />
+            </dataarea>
+        </part>
+    </software>
 -->
 
 	<software name="praxitel">
@@ -488,7 +488,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="prolog">
 		<description>Prolog (v1.0)</description>
 		<year>1986</year>
@@ -500,7 +500,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="quest">
 		<description>Quest</description>
 		<year>1983</year>
@@ -512,7 +512,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="scriptor">
 		<description>Scriptor</description>
 		<year>1984</year>
@@ -560,7 +560,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="threshld">
 		<description>Threshold</description>
 		<year>1984</year>

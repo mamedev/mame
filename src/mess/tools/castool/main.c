@@ -104,7 +104,7 @@ const struct SupportedCassetteFormats formats[] = {
 	{"sol20", sol20_cassette_formats           ,"PTC SOL-20"},
 	{"sorcerer", sorcerer_cassette_formats     ,"Exidy Sorcerer"},
 	{"sordm5", sordm5_cassette_formats         ,"Sord M5"},
-	{"spc1000", spc1000_cassette_formats       ,"Samsung SPC-1000"},	
+	{"spc1000", spc1000_cassette_formats       ,"Samsung SPC-1000"},
 	{"svi", svi_cassette_formats               ,"Spectravideo SVI-318 & SVI-328"},
 	{"to7", to7_cassette_formats               ,"Thomson TO-series"},
 	{"trs80l2", trs80l2_cassette_formats       ,"TRS-80 Level 2"},
@@ -120,7 +120,7 @@ const struct SupportedCassetteFormats formats[] = {
 	{"zx81_p", zx81_p_format                   ,"Sinclair ZX81"},
 
 
-	
+
 	{NULL,NULL,NULL}
 };
 

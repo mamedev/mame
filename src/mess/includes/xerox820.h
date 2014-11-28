@@ -36,7 +36,7 @@
 #define SASIBUS_TAG     "sasi"
 #define RS232_A_TAG     "rs232a"
 #define RS232_B_TAG     "rs232b"
-#define KEYBOARD_TAG	"kb"
+#define KEYBOARD_TAG    "kb"
 
 #define XEROX820_VIDEORAM_SIZE  0x1000
 #define XEROX820_VIDEORAM_MASK  0x0fff

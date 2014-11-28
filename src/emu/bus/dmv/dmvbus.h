@@ -35,14 +35,16 @@ public:
 	virtual bool av16bit() { return false; }
 	virtual void hold_w(int state) { }
 	virtual void switch16_w(int state) { }
-	virtual void irq0_w(int state) { }
-	virtual void irq1_w(int state) { }
+	virtual void timint_w(int state) { }
+	virtual void keyint_w(int state) { }
+	virtual void busint_w(int state) { }
+	virtual void flexint_w(int state) { }
 	virtual void irq2_w(int state) { }
+	virtual void irq2a_w(int state) { }
 	virtual void irq3_w(int state) { }
 	virtual void irq4_w(int state) { }
 	virtual void irq5_w(int state) { }
 	virtual void irq6_w(int state) { }
-	virtual void irq7_w(int state) { }
 };
 
 
@@ -74,14 +76,16 @@ public:
 	virtual void io_write(address_space &space, int ifsel, offs_t offset, UINT8 data);
 	virtual void hold_w(int state);
 	virtual void switch16_w(int state);
-	virtual void irq0_w(int state);
-	virtual void irq1_w(int state);
+	virtual void timint_w(int state);
+	virtual void keyint_w(int state);
+	virtual void busint_w(int state);
+	virtual void flexint_w(int state);
 	virtual void irq2_w(int state);
+	virtual void irq2a_w(int state);
 	virtual void irq3_w(int state);
 	virtual void irq4_w(int state);
 	virtual void irq5_w(int state);
 	virtual void irq6_w(int state);
-	virtual void irq7_w(int state);
 	virtual bool av16bit();
 
 	// internal state

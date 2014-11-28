@@ -27,14 +27,14 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
     Helpful Defines
 ***************************************************************************/
 
-#define VDREG	((op >> 6) & 0x1f)
-#define VS1REG	((op >> 11) & 0x1f)
-#define VS2REG	((op >> 16) & 0x1f)
-#define EL		((op >> 21) & 0xf)
+#define VDREG   ((op >> 6) & 0x1f)
+#define VS1REG  ((op >> 11) & 0x1f)
+#define VS2REG  ((op >> 16) & 0x1f)
+#define EL      ((op >> 21) & 0xf)
 
-#define RSVAL	(m_rsp.m_rsp_state->r[RSREG])
-#define RTVAL	(m_rsp.m_rsp_state->r[RTREG])
-#define RDVAL	(m_rsp.m_rsp_state->r[RDREG])
+#define RSVAL   (m_rsp.m_rsp_state->r[RSREG])
+#define RTVAL   (m_rsp.m_rsp_state->r[RTREG])
+#define RDVAL   (m_rsp.m_rsp_state->r[RDREG])
 
 #define VREG_B(reg, offset)     m_v[(reg)].b[(offset)^1]
 #define VREG_S(reg, offset)     m_v[(reg)].s[(offset)]
@@ -56,11 +56,11 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 #define ZERO        3
 #define CLIP2       4
 
-#define ACCUM(x)        	m_accum[x].q
-#define ACCUM_H(x)			(UINT16)m_accum[x].w[3]
-#define ACCUM_M(x)			(UINT16)m_accum[x].w[2]
-#define ACCUM_L(x)			(UINT16)m_accum[x].w[1]
-#define ACCUM_LL(x)			(UINT16)m_accum[x].w[0]
+#define ACCUM(x)            m_accum[x].q
+#define ACCUM_H(x)          (UINT16)m_accum[x].w[3]
+#define ACCUM_M(x)          (UINT16)m_accum[x].w[2]
+#define ACCUM_L(x)          (UINT16)m_accum[x].w[1]
+#define ACCUM_LL(x)         (UINT16)m_accum[x].w[0]
 
 #define SET_ACCUM_H(v, x)       m_accum[x].w[3] = v;
 #define SET_ACCUM_M(v, x)       m_accum[x].w[2] = v;
@@ -123,9 +123,9 @@ static const int vector_elements_2[16][8] =
 };
 
 rsp_cop2::rsp_cop2(rsp_device &rsp, running_machine &machine)
-    : m_rsp(rsp)
-    , m_machine(machine)
-    , m_reciprocal_res(0)
+	: m_rsp(rsp)
+	, m_machine(machine)
+	, m_reciprocal_res(0)
 	, m_reciprocal_high(0)
 	, m_dp_allowed(0)
 {
