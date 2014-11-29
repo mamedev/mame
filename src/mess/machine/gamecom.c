@@ -7,9 +7,8 @@ static const int gamecom_timer_limit[8] = { 2, 1024, 2048, 4096, 8192, 16384, 32
 
 TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_clock_timer_callback)
 {
-	UINT8 * RAM = m_region_maincpu->base();
-	UINT8 val = RAM[SM8521_CLKT] + 1;
-	RAM[SM8521_CLKT] = ( RAM[SM8521_CLKT] & 0xC0 ) | (val & 0x3f);
+	UINT8 val = m_p_ram[SM8521_CLKT] + 1;
+	m_p_ram[SM8521_CLKT] = ( m_p_ram[SM8521_CLKT] & 0xC0 ) | (val & 0x3f);
 	m_maincpu->set_input_line(sm8500_cpu_device::CK_INT, ASSERT_LINE );
 }
 
@@ -417,14 +416,9 @@ WRITE8_MEMBER( gamecom_state::gamecom_internal_w )
 
 /* The manual is not conclusive as to which bit of the DMVP register (offset 0x3D) determines
    which page for source or destination is used */
-/* For now the increment/decrement-x and increment/decrement-y parts are NOT supported.
-   Their usage is also not explained properly in the manuals. Guess we'll have to wait
-   for them to show up in some rom images...
- */
 WRITE8_MEMBER( gamecom_state::gamecom_handle_dma )
 {
-	UINT8 * RAM = m_region_maincpu->base();
-	UINT8 dmc = RAM[SM8521_DMC];
+	UINT8 dmc = m_p_ram[SM8521_DMC];
 	m_dma.overwrite_mode = dmc & 0x01;
 	m_dma.transfer_mode = dmc & 0x06;
 	m_dma.decrement_x = dmc & 0x08;
@@ -435,60 +429,55 @@ WRITE8_MEMBER( gamecom_state::gamecom_handle_dma )
 		return;
 	}
 
-	//if ( m_dma.decrement_x || m_dma.decrement_y )
-	//{
-		//popmessage( "TODO: Decrement-x and decrement-y are not supported yet\n" );
-	//}
-
-	m_dma.width_x = RAM[SM8521_DMDX];
+	m_dma.width_x = m_p_ram[SM8521_DMDX];
 	m_dma.width_x_count = 0;
-	m_dma.width_y = RAM[SM8521_DMDY];
+	m_dma.width_y = m_p_ram[SM8521_DMDY];
 	m_dma.width_y_count = 0;
-	m_dma.source_x = RAM[SM8521_DMX1];
+	m_dma.source_x = m_p_ram[SM8521_DMX1];
 	m_dma.source_x_current = m_dma.source_x;
-	m_dma.source_y = RAM[SM8521_DMY1];
-	m_dma.source_width = ( RAM[SM8521_LCH] & 0x20 ) ? 50 : 40;
-	m_dma.dest_x = RAM[SM8521_DMX2];
+	m_dma.source_y = m_p_ram[SM8521_DMY1];
+	m_dma.source_width = ( m_p_ram[SM8521_LCH] & 0x20 ) ? 50 : 40;
+	m_dma.dest_x = m_p_ram[SM8521_DMX2];
 	m_dma.dest_x_current = m_dma.dest_x;
-	m_dma.dest_y = RAM[SM8521_DMY2];
-	m_dma.dest_width = ( RAM[SM8521_LCH] & 0x20 ) ? 50 : 40;
-	m_dma.palette[0] = RAM[SM8521_DMPL] & 0x03;
-	m_dma.palette[1] = ( RAM[SM8521_DMPL] >> 2 ) & 3;
-	m_dma.palette[2] = ( RAM[SM8521_DMPL] >> 4 ) & 3;
-	m_dma.palette[3] = RAM[SM8521_DMPL] >> 6;
+	m_dma.dest_y = m_p_ram[SM8521_DMY2];
+	m_dma.dest_width = ( m_p_ram[SM8521_LCH] & 0x20 ) ? 50 : 40;
+	m_dma.palette[0] = m_p_ram[SM8521_DMPL] & 0x03;
+	m_dma.palette[1] = ( m_p_ram[SM8521_DMPL] >> 2 ) & 3;
+	m_dma.palette[2] = ( m_p_ram[SM8521_DMPL] >> 4 ) & 3;
+	m_dma.palette[3] = m_p_ram[SM8521_DMPL] >> 6;
 	m_dma.source_mask = 0x1FFF;
 	m_dma.dest_mask = 0x1FFF;
-//  logerror("DMA: width %Xx%X, source (%X,%X), dest (%X,%X), transfer_mode %X, banks %X \n", m_dma.width_x, m_dma.width_y, m_dma.source_x, m_dma.source_y, m_dma.dest_x, m_dma.dest_y, m_dma.transfer_mode, RAM[SM8521_DMVP] );
+//  logerror("DMA: width %Xx%X, source (%X,%X), dest (%X,%X), transfer_mode %X, banks %X \n", m_dma.width_x, m_dma.width_y, m_dma.source_x, m_dma.source_y, m_dma.dest_x, m_dma.dest_y, m_dma.transfer_mode, m_p_ram[SM8521_DMVP] );
 //  logerror( "   Palette: %d, %d, %d, %d\n", m_dma.palette[0], m_dma.palette[1], m_dma.palette[2], m_dma.palette[3] );
 	switch( m_dma.transfer_mode )
 	{
 	case 0x00:
 		/* VRAM->VRAM */
-		m_dma.source_bank = &m_p_videoram[(RAM[SM8521_DMVP] & 0x01) ? 0x2000 : 0x0000];
-		m_dma.dest_bank = &m_p_videoram[(RAM[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
+		m_dma.source_bank = &m_p_videoram[(m_p_ram[SM8521_DMVP] & 0x01) ? 0x2000 : 0x0000];
+		m_dma.dest_bank = &m_p_videoram[(m_p_ram[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
 		break;
 	case 0x02:
 		/* ROM->VRAM */
-//      logerror( "DMA DMBR = %X\n", RAM[SM8521_DMBR] );
+//      logerror( "DMA DMBR = %X\n", m_p_ram[SM8521_DMBR] );
 		m_dma.source_width = 64;
 		m_dma.source_mask = 0x3FFF;
-		if (RAM[SM8521_DMBR] < 16)
-			m_dma.source_bank = m_region_kernel->base() + (RAM[SM8521_DMBR] << 14);
+		if (m_p_ram[SM8521_DMBR] < 16)
+			m_dma.source_bank = m_region_kernel->base() + (m_p_ram[SM8521_DMBR] << 14);
 		else
 		if (m_cart_ptr)
-			m_dma.source_bank = m_cart_ptr + (RAM[SM8521_DMBR] << 14);
+			m_dma.source_bank = m_cart_ptr + (m_p_ram[SM8521_DMBR] << 14);
 
-		m_dma.dest_bank = &m_p_videoram[(RAM[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
+		m_dma.dest_bank = &m_p_videoram[(m_p_ram[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
 		break;
 	case 0x04:
 		/* Extend RAM->VRAM */
 		m_dma.source_width = 64;
 		m_dma.source_bank = &m_p_nvram[0x0000];
-		m_dma.dest_bank = &m_p_videoram[(RAM[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
+		m_dma.dest_bank = &m_p_videoram[(m_p_ram[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
 		break;
 	case 0x06:
 		/* VRAM->Extend RAM */
-		m_dma.source_bank = &m_p_videoram[(RAM[SM8521_DMVP] & 0x01) ? 0x2000 : 0x0000];
+		m_dma.source_bank = &m_p_videoram[(m_p_ram[SM8521_DMVP] & 0x01) ? 0x2000 : 0x0000];
 		m_dma.dest_width = 64;
 		m_dma.dest_bank = &m_p_nvram[0x0000];
 		break;
@@ -507,50 +496,22 @@ WRITE8_MEMBER( gamecom_state::gamecom_handle_dma )
 	{
 		for( x_count = 0; x_count <= m_dma.width_x; x_count++ )
 		{
-			int source_pixel = 0;
-			int dest_pixel = 0;
-			int src_addr = m_dma.source_current & m_dma.source_mask;
-			int dest_addr = m_dma.dest_current & m_dma.dest_mask;
+			UINT16 src_addr = m_dma.source_current & m_dma.source_mask;
+			UINT16 dest_addr = m_dma.dest_current & m_dma.dest_mask;
+			UINT8 dest_adj = (3 - (m_dma.dest_x_current & 3)) << 1;
+			UINT8 src_adj = (3 - (m_dma.source_x_current & 3)) << 1;
+			
 			/* handle DMA for 1 pixel */
-			/* Read pixel data */
-			switch ( m_dma.source_x_current & 0x03 )
-			{
-			case 0x00: source_pixel = m_dma.source_bank[src_addr] >> 6; break;
-			case 0x01: source_pixel = ( m_dma.source_bank[src_addr] >> 4 ) & 3; break;
-			case 0x02: source_pixel = ( m_dma.source_bank[src_addr] >> 2 ) & 3; break;
-			case 0x03: source_pixel = m_dma.source_bank[src_addr] & 3;      break;
-			}
+			// Get new pixel
+			UINT8 source_pixel = (m_dma.source_bank[src_addr] >> src_adj) & 3;
 
-			if ( !m_dma.overwrite_mode && source_pixel == 0 )
+			// If overwrite mode, write new pixel
+			if ( m_dma.overwrite_mode || source_pixel)
 			{
-				switch ( m_dma.dest_x_current & 0x03 )
-				{
-				case 0x00: dest_pixel = m_dma.dest_bank[dest_addr] >> 6; break;
-				case 0x01: dest_pixel = ( m_dma.dest_bank[dest_addr] >> 4 ) & 3; break;
-				case 0x02: dest_pixel = ( m_dma.dest_bank[dest_addr] >> 2 ) & 3; break;
-				case 0x03: dest_pixel = m_dma.dest_bank[dest_addr] & 3;      break;
-				}
-				source_pixel = dest_pixel;
-			}
-
-			/* Translate pixel data using DMA palette. */
-			/* Not sure if this should be done before the compound stuff - WP */
-			source_pixel = m_dma.palette[ source_pixel ];
-			/* Write pixel data */
-			switch( m_dma.dest_x_current & 0x03 )
-			{
-			case 0x00:
-				m_dma.dest_bank[dest_addr] = ( m_dma.dest_bank[dest_addr] & 0x3F ) | ( source_pixel << 6 );
-				break;
-			case 0x01:
-				m_dma.dest_bank[dest_addr] = ( m_dma.dest_bank[dest_addr] & 0xCF ) | ( source_pixel << 4 );
-				break;
-			case 0x02:
-				m_dma.dest_bank[dest_addr] = ( m_dma.dest_bank[dest_addr] & 0xF3 ) | ( source_pixel << 2 );
-				break;
-			case 0x03:
-				m_dma.dest_bank[dest_addr] = ( m_dma.dest_bank[dest_addr] & 0xFC ) | source_pixel;
-				break;
+				// Get 4 pixels and remove the one about to be replaced
+				UINT8 other_pixels = m_dma.dest_bank[dest_addr] & ~(3 << dest_adj);
+				// Get palette of new pixel and place into the hole
+				m_dma.dest_bank[dest_addr] = other_pixels | (m_dma.palette[ source_pixel ] << dest_adj);
 			}
 
 			/* Advance a pixel */
@@ -588,17 +549,16 @@ WRITE8_MEMBER( gamecom_state::gamecom_handle_dma )
 
 WRITE8_MEMBER( gamecom_state::gamecom_update_timers )
 {
-	UINT8 * RAM = m_region_maincpu->base();
 	if ( m_timer[0].enabled )
 	{
 		m_timer[0].state_count += data;
 		while ( m_timer[0].state_count >= m_timer[0].state_limit )
 		{
 			m_timer[0].state_count -= m_timer[0].state_limit;
-			RAM[SM8521_TM0D]++;
-			if ( RAM[SM8521_TM0D] >= m_timer[0].check_value )
+			m_p_ram[SM8521_TM0D]++;
+			if ( m_p_ram[SM8521_TM0D] >= m_timer[0].check_value )
 			{
-				RAM[SM8521_TM0D] = 0;
+				m_p_ram[SM8521_TM0D] = 0;
 				m_maincpu->set_input_line(sm8500_cpu_device::TIM0_INT, ASSERT_LINE );
 			}
 		}
@@ -609,10 +569,10 @@ WRITE8_MEMBER( gamecom_state::gamecom_update_timers )
 		while ( m_timer[1].state_count >= m_timer[1].state_limit )
 		{
 			m_timer[1].state_count -= m_timer[1].state_limit;
-			RAM[SM8521_TM1D]++;
-			if ( RAM[SM8521_TM1D] >= m_timer[1].check_value )
+			m_p_ram[SM8521_TM1D]++;
+			if ( m_p_ram[SM8521_TM1D] >= m_timer[1].check_value )
 			{
-				RAM[SM8521_TM1D] = 0;
+				m_p_ram[SM8521_TM1D] = 0;
 				m_maincpu->set_input_line(sm8500_cpu_device::TIM1_INT, ASSERT_LINE );
 			}
 		}

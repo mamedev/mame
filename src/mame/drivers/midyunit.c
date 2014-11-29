@@ -2563,7 +2563,7 @@ ROM_START( mkyawdim2 )
 	ROM_LOAD ( "yawdim.u167", 0x00000, 0x10000, CRC(16da7efb) SHA1(ac1db81a55aca36136b94977a91a1fc778b7b164) )
 
 	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM */
-		// Half size as other yawdim set
+		// Half size as mkyawdim set
 	ROM_LOAD( "yawdim.u159",  0x00000, 0x20000, CRC(95b120af) SHA1(41b6fb384e5048926b87959a2c58d96b95698aba) )
 	ROM_CONTINUE(       0x40000, 0x20000 )
 	ROM_LOAD( "mw-15.u160",  0x20000, 0x20000, CRC(6e68e0b0) SHA1(edb7aa6507452ffa5ce7097e3b1855a69542971c) )
@@ -2584,6 +2584,39 @@ ROM_START( mkyawdim2 )
 
 	ROM_LOAD ( "c-1.bin",  0x400000, 0x100000, CRC(de27c4c3) SHA1(a7760d239749c7463808adec72795f9785f553ec) )
 	ROM_LOAD ( "c-2.bin",  0x500000, 0x100000, CRC(d99203f3) SHA1(46ea21cbedfd42838562594b9bdc5d80360b7e5e) )
+ROM_END
+
+
+ROM_START( mkyawdim3 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound CPU */
+	ROM_LOAD (  "15.bin", 0x00000, 0x10000, CRC(b58d229e) SHA1(3ed14ef650dfa7f9d460611b19e9233a022cbea6) )
+
+	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM */
+	ROM_LOAD( "13.bin",  0x00000, 0x20000, CRC(921c613d) SHA1(be62b87f195b6347112ab13cc14514d4c88a8b86) ) // Half size as mkyawdim2 set and a quarter of mkyawdim
+	ROM_LOAD( "14.bin",  0x20000, 0x20000, CRC(6e68e0b0) SHA1(edb7aa6507452ffa5ce7097e3b1855a69542971c) )
+	ROM_CONTINUE(       0x60000, 0x20000 )
+	ROM_CONTINUE(       0xa0000, 0x20000 )
+	ROM_CONTINUE(       0xe0000, 0x20000 )
+
+	ROM_REGION16_LE( 0x100000, "user1", 0 ) /* 34010 code */
+	ROM_LOAD16_BYTE( "p1.bin",  0x00000, 0x80000, CRC(2337a0f9) SHA1(d25743e5bb7b4a60f181783d17f217aa0a64536a) ) // differs from other Yawdim sets
+	ROM_LOAD16_BYTE( "p2.bin",  0x00001, 0x80000, CRC(7a37dc5c) SHA1(c4fc6933d8b990c5c56c65282b1f72b90b5d5435) )
+
+	ROM_REGION( 0x800000, "gfx1", 0 )
+	ROM_LOAD ( "12.bin",  0x000000, 0x80000, CRC(d17096c4) SHA1(01ef390a372c9d94adf138f9543ebb88b89f4c38) )
+	ROM_LOAD ( "8.bin",  0x080000, 0x80000, CRC(993bc2e4) SHA1(7791edbec2b4b8971a3e790346dd7564ecf16d5c) )
+	ROM_LOAD ( "10.bin",  0x100000, 0x80000, CRC(6fb91ede) SHA1(a3735b49f93b08c44fbc97e2b5aad394628fbe90) )
+	ROM_LOAD ( "3.bin",  0x180000, 0x80000, CRC(ed1ff88a) SHA1(6b090b658ee6148af953bd0c9216f37162b6460f) )
+
+	ROM_LOAD (  "6.bin",  0x200000, 0x80000, CRC(a002a155) SHA1(3cf7909e92bcd428063596fc5b9953e0000d6eca) )
+	ROM_LOAD (  "1.bin",  0x280000, 0x80000, CRC(dcee8492) SHA1(a912b74d3b26ebd1b1613cc631080f83ececeaf8) )
+	ROM_LOAD (  "11.bin",  0x300000, 0x80000, CRC(de88caef) SHA1(a7927b504dc56ca5c9048373977fe5743b0a3f0b) )
+	ROM_LOAD (  "2.bin",  0x380000, 0x80000, CRC(37eb01b4) SHA1(06092460bd137e08d0f8df8560942ed877d40e09) )
+
+	ROM_LOAD ( "4.bin",  0x400000, 0x80000, CRC(45acaf21) SHA1(5edd36c55f4e5d3c74fb85171728ec0a58284b12) )
+	ROM_LOAD ( "7.bin",  0x480000, 0x80000, CRC(2a6c10a0) SHA1(cc90923c44f2961b945a0fd0f85ecc2ba04af2cb) )
+	ROM_LOAD ( "9.bin",  0x500000, 0x80000, CRC(23308979) SHA1(0b36788624a1cf0d3f4c895be5ba967b8dfcf85e) )
+	ROM_LOAD ( "5.bin",  0x580000, 0x80000, CRC(cafc47bb) SHA1(8610af6e52f7089ff4acd850c53ab8b4119e4445) )
 ROM_END
 
 
@@ -2840,6 +2873,7 @@ GAME( 1992, mknifty,  mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state, 
 GAME( 1992, mknifty666, mk,     yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyturbo, ROT0, "hack",     "Mortal Kombat (Nifty Kombo 666, hack)", GAME_SUPPORTS_SAVE )
 GAME( 1992, mkyawdim, mk,       mkyawdim,                mkyawdim, midyunit_state, mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1992, mkyawdim2,mk,       mkyawdim,                mkyawdim, midyunit_state, mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 2)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
+GAME( 1992, mkyawdim3, mk,       mkyawdim,                mkyawdim, midyunit_state, mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 3)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND) //some sound effects aren't reproduced
 
 GAME( 1992, totcarn,  0,        yunit_adpcm_6bit_fast,   totcarn, midyunit_state,  totcarn,  ROT0, "Midway",   "Total Carnage (rev LA1 03/10/92)", GAME_SUPPORTS_SAVE )
 GAME( 1992, totcarnp, totcarn,  yunit_adpcm_6bit_fast,   totcarn, midyunit_state,  totcarn,  ROT0, "Midway",   "Total Carnage (prototype, rev 1.0 01/25/92)", GAME_SUPPORTS_SAVE )

@@ -242,6 +242,18 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
+<!-- is this a boot disk from some game?!? -->
+	<software name="msdos211">
+		<description>MS-DOS 2.11 Boot</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1281968">
+				<rom name="ms-dos v2.11 boot.d88" size="1281968" crc="f55b72dc" sha1="a6443b20f6aeba4e4f052dd8a2539e6cc46a63c8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="msdos62e">
 		<description>MS-DOS 6.2 Extended Set</description>
 		<year>19??</year>
@@ -2593,6 +2605,20 @@ only have some part of Windows file and a Video driver(CLGD?).
 		-->
 	</software>
 
+<!-- is this hacked as well? if so it shall be removed -->
+	<software name="advlanda" cloneof="advland">
+		<description>Adventureland (Alt)</description>
+		<year>1984</year>
+		<publisher>スタークラフト (Starcraft)</publisher>
+		<info name="alt_title" value="アドベンチャーランド" />
+		<info name="release" value="198407xx" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1086448">
+				<rom name="adventureland.d88" size="1086448" crc="dfe46669" sha1="ee0e6fae3553f8b60d515ba5c0bfdbe56cb7df16" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- There should be also a CD version, released in Jan 1996 -->
 	<software name="aegeank">
 		<description>Aegean Kai no Shizuku (16 Shoku Ban)</description>
@@ -4873,6 +4899,26 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
+	<software name="balpowera" cloneof="balpower">
+		<description>Balance of Power - Geopolitics in the Nuclear Age (Alt Disk 1)</description>
+		<year>1988</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<info name="alt_title" value="バランス オブ パワー" />
+		<info name="release" value="198810xx" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="balance of power (1985)(ascii)(disk 1 of 2).d88" size="1281968" crc="8d141809" sha1="7169df114bc0524aa75f56a7a3eacaa218e1f941" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="balance of power (1985)(ascii)(disk 2 of 2).d88" size="1281968" crc="7f6dcb98" sha1="978463a9149c4b277d184ae44968ea12fe50f205" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="balanpln">
 		<description>Balance of the Planet</description>
 		<year>1992</year>
@@ -5981,6 +6027,26 @@ only have some part of Windows file and a Video driver(CLGD?).
 			<feature name="part_id" value="Disk U?"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_u.fdi" size="1265664" crc="7b711899" sha1="1bf3669b66b2f1d7f83090906fd27c4f0286fe69" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blackpol" supported="no">
+		<description>The Blade of Blackpoole</description>
+		<year>1984</year>
+		<publisher>スタークラフト (Starcraft)</publisher>
+		<info name="alt_title" value="ブラックプールの剣" />
+		<info name="release" value="198401xx" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="344496">
+				<rom name="disk a.d88" size="344496" crc="21eca713" sha1="2d11670eb8cb269bc7777a7237eb44b48263f691" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="348848">
+				<rom name="disk b.d88" size="348848" crc="05529277" sha1="409083c4b4bad399d64d931f2f835ef47a858837" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -8586,6 +8652,19 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
 				<rom name="columnns.d88" size="1281968" crc="88e507f9" sha1="9f97a12584f12ab02723add9c0134a5b247e2cd5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="columnsa" cloneof="columns">
+		<description>Columns - Taisen Mode-tsuki (Alt)</description>
+		<year>1991</year>
+		<publisher>システムソフト (SystemSoft)</publisher>
+		<info name="alt_title" value="コラムス 対戦モード付き" />
+		<info name="release" value="19910726" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1281968">
+				<rom name="columns (1991)(system soft).d88" size="1281968" crc="f9f64013" sha1="5cef58509ef3eb7479f6e9f5badca73d54ed0769" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -13163,6 +13242,19 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
+	<software name="dngmstera" cloneof="dngmster">
+		<description>Dungeon Master (Alt Format)</description>
+		<year>1990</year>
+		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
+		<info name="alt_title" value="ダンジョンマスター" />
+		<info name="release" value="19900209" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1281968">
+				<rom name="dungeon master (ftl).d88" size="1281968" crc="5ef9226b" sha1="cd0730df8f501d03dc337a15a6619ba4405de216" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dngmstr2">
 		<description>Dungeon Master II - Skullkeep</description>
 		<year>1993</year>
@@ -15735,6 +15827,18 @@ only have some part of Windows file and a Video driver(CLGD?).
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="gaogao_omake.fdi" size="1265664" crc="99d2ef11" sha1="93fa75747b7db74e49fc82d1867015b2174c0d1e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gaplus">
+		<description>Gaplus</description>
+		<year>1985</year>
+		<publisher>キャリーラボ (Carry Lab)</publisher>
+		<info name="alt_title" value="ギャプラス" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="696736">
+				<rom name="gaplus (1985)(carry lab)(disk 1 of 1).d88" size="696736" crc="72b57bcf" sha1="1f1121c06d0bb25c4b2d8052eb026d75046e4f86" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -18453,6 +18557,19 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
 				<rom name="loderun.d88" size="1281968" crc="7c3e3f7e" sha1="3df6f8d37240b2af4ac01da2d6d7efd6c61c9bdf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hldruna" cloneof="hldrun">
+		<description>Hozonban Lode Runner (Alt)</description>
+		<year>1989</year>
+		<publisher>システムソフト (SystemSoft)</publisher>
+		<info name="alt_title" value="保存版ロードランナー" />
+		<info name="release" value="198907xx" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1086448">
+				<rom name="lode runner.d88" size="1086448" crc="e5f804b6" sha1="d2b6241fbc6f15f1fba791ae6d6260653a6140af" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -31603,6 +31720,33 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
+<!-- Notice that disk 2 and 3 coincide with the ones above when converted to FDI! -->
+	<software name="rxanadua" cloneof="rxanadu">
+		<description>Revival Xanadu (Alt Format)</description>
+		<year>1995</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<info name="alt_title" value="リバイバル ザナドゥ" />
+		<info name="release" value="19950428" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="xanadu revival (1995)(falcom)(disk 1 of 3)(disk a).d88" size="1281968" crc="48369edc" sha1="ac5d6a9cea6821b92c5bfa43bc2b7e36fda5af4b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="xanadu revival (1995)(falcom)(disk 2 of 3)(disk b).d88" size="1281968" crc="5fdef8f8" sha1="52342d865f2f47afa11c07a9d9b71febe76328f1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="xanadu revival (1995)(falcom)(disk 3 of 3)(disk c).d88" size="1281968" crc="1992956a" sha1="bf50b0411713c1717c10338b2b3f1a7b8b52f1b0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rxanadue" cloneof="rxanadu">
 		<description>Revival Xanadu - Easy Mode</description>
 		<year>1995?</year>
@@ -44493,8 +44637,8 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="gaplus" supported="no">
-		<description>Gaplus</description>
+	<software name="gaplusa" cloneof="gaplus" supported="no">
+		<description>Gaplus (Alt Format)</description>
 		<year>1985</year>
 		<publisher>キャリーラボ (Carry Lab)</publisher>
 		<info name="alt_title" value="ギャプラス" />
@@ -61614,6 +61758,18 @@ doujin?!?
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="uno.fdi" size="1265664" crc="1415bdcd" sha1="716dc623d724e9127f05748de0c5da31beb5edfd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unoa" cloneof="uno">
+		<description>UNO (Alt Format)</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="author" value="I.G.I. Limited" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1281968">
+				<rom name="uno (1981)(igi)(jp).d88" size="1281968" crc="29f7b2d2" sha1="225173162b57cc72045ad7b105f1b93858a67470" offset="0" />
 			</dataarea>
 		</part>
 	</software>

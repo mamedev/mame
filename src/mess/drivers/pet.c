@@ -2517,6 +2517,40 @@ ROM_START( cbm8296gd )
 ROM_END
 
 
+//-------------------------------------------------
+//  ROM( cbm8296dgv_de )
+//-------------------------------------------------
+
+ROM_START( cbm8296dgv_de ) // SER.NO.WG 8947
+	ROM_REGION( 0x2000, M6502_TAG, 0 )
+	ROM_LOAD( "i/o gv.ue9", 0x1000, 0x1000, CRC(7adf50a0) SHA1(4f7abc5286e51f34cde98238410274715e766b31) ) // I/O MASTER (C)1982 J.PFEIFER
+
+	ROM_REGION( 0x4000, "basic", 0 )
+	ROM_LOAD( "324746-01.ue7", 0x0000, 0x4000, CRC(03a25bb4) SHA1(e3e1431969bf317c885e47f3790e0bcbdf61fe77) )
+
+	ROM_REGION( 0x1000, "editor", 0 )
+	ROM_LOAD( "ue8gv.ue8", 0x0000, 0x1000, CRC(8ad1fca9) SHA1(3c939092e51549696754c308b2a09f47c5d4d277) )
+
+	ROM_REGION( 0x1000, "charom", 0 )
+	ROM_LOAD( "ua3gv.uc5", 0x000, 0x1000, CRC(d8035dc4) SHA1(cdf520a7dabf1b18aed15455b1dbefac15ff91f3) )
+
+	ROM_REGION( 0x20, "prom", 0 )
+	ROM_LOAD( "74s288.uc2", 0x00, 0x20, CRC(06030665) SHA1(19dc91ca49ecc20e66c646ba480d2c3bc70a62e6) )
+
+	ROM_REGION( 0x10000, "ue5_eprom", 0 )
+	ROM_LOAD( "ue5.bin", 0x00000, 0x10000, CRC(f70b7b37) SHA1(fe0fbb0fa71775f3780134aa11dac5b761526148) )
+
+	ROM_REGION( 0x10000, "ue6_eprom", 0 )
+	ROM_LOAD( "ue6.bin", 0x00000, 0x10000, CRC(36952256) SHA1(e94d3e744a6aaff553bf260f25da0286436265d1) )
+
+	ROM_REGION( 0xf5, PLA1_TAG, 0 )
+	ROM_LOAD( "324744-01.ue6", 0x00, 0xf5, NO_DUMP ) // 8700-009
+
+	ROM_REGION( 0xf5, PLA2_TAG, 0 )
+	ROM_LOAD( "324745-01.ue5", 0x00, 0xf5, NO_DUMP ) // 8700-008
+ROM_END
+
+
 
 //**************************************************************************
 //  SYSTEM DRIVERS
@@ -2556,3 +2590,4 @@ COMP( 1984, cbm8296ed,  cbm8296,    0,      cbm8296d,   petb,       driver_devic
 COMP( 1984, cbm8296d,   cbm8296,    0,      cbm8296d,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296-D",                   GAME_SUPPORTS_SAVE )
 COMP( 1984, cbm8296d_de,cbm8296,    0,      cbm8296d,   petb_de,    driver_device,  0,  "Commodore Business Machines",  "CBM 8296-D (Germany)",         GAME_SUPPORTS_SAVE )
 COMP( 1984, cbm8296gd,  cbm8296,    0,      cbm8296d,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296GD",                   GAME_SUPPORTS_SAVE )
+COMP( 1984, cbm8296dgv_de,cbm8296,    0,      cbm8296d,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296-D GV? (Germany)",        GAME_SUPPORTS_SAVE )

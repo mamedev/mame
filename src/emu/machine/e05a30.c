@@ -28,6 +28,11 @@ e05a30_device::e05a30_device(const machine_config &mconfig, const char *tag, dev
 	m_write_pf_stepper(*this),
 	m_write_cr_stepper(*this),
 	m_write_ready(*this),
+	m_write_centronics_ack(*this),
+	m_write_centronics_busy(*this),
+	m_write_centronics_perror(*this),
+	m_write_centronics_fault(*this),
+	m_write_centronics_select(*this),
 	m_printhead(0),
 	m_pf_stepper(0),
 	m_cr_stepper(0)
@@ -45,6 +50,11 @@ void e05a30_device::device_start()
 	m_write_pf_stepper.resolve_safe();
 	m_write_cr_stepper.resolve_safe();
 	m_write_ready.resolve_safe();
+	m_write_centronics_ack.resolve_safe();
+	m_write_centronics_busy.resolve_safe();
+	m_write_centronics_perror.resolve_safe();
+	m_write_centronics_fault.resolve_safe();
+	m_write_centronics_select.resolve_safe();
 
 	/* register for state saving */
 	save_item(NAME(m_printhead));
@@ -61,6 +71,15 @@ void e05a30_device::device_reset()
 	m_printhead  = 0x00;
 	m_pf_stepper = 0x00;
 	m_cr_stepper = 0x00;
+
+	/* centronics init */
+	m_centronics_nack = FALSE;
+	m_centronics_busy = FALSE;
+	m_write_centronics_ack   (!m_centronics_nack);
+	m_write_centronics_busy  ( m_centronics_busy);
+	m_write_centronics_perror(FALSE);
+	m_write_centronics_fault (TRUE);
+	m_write_centronics_select(TRUE);
 
 	m_write_ready(1);
 }
@@ -126,6 +145,25 @@ void e05a30_device::update_cr_stepper(UINT8 data)
 
 
 /***************************************************************************
+    Centronics
+***************************************************************************/
+
+WRITE_LINE_MEMBER( e05a30_device::centronics_input_strobe )
+{
+	if (m_centronics_strobe == TRUE && state == FALSE && !m_centronics_busy) {
+
+		m_centronics_data_latch   = m_centronics_data;
+
+		m_centronics_data_latched = TRUE;
+		m_centronics_busy         = TRUE;
+		m_write_centronics_busy(m_centronics_busy);
+	}
+
+	m_centronics_strobe = state;
+}
+
+
+/***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
 
@@ -134,6 +172,19 @@ WRITE8_MEMBER( e05a30_device::write )
 	LOG("%s: e05a30_w([0xC0%02x]): %02x\n", space.machine().describe_context(), offset, data);
 
 	switch (offset) {
+	case 0x04:
+		m_centronics_nack = BIT(data,5);
+		m_centronics_busy = BIT(data,0);
+		/* The ActionPrinter 2000 firmware might overwrite the busy signal at
+		 * address 20AB if the host depends only on the busy signal and
+		 * doesn't wait for the ack pulse. To avoid skipping input data, we
+		 * assume the busy signal cannot be reset while the data hasn't been
+		 * read. */
+		if (m_centronics_data_latched)
+			m_centronics_busy = TRUE;
+		m_write_centronics_ack (!m_centronics_nack);
+		m_write_centronics_busy( m_centronics_busy);
+		break;
 	/* printhead */
 	case 0x05: update_printhead(0, data); break;
 	case 0x06: update_printhead(1, data); break;
@@ -151,6 +202,17 @@ READ8_MEMBER( e05a30_device::read )
 	LOG("%s: e05a30_r([0xC0%02x]): ", space.machine().describe_context(), offset);
 
 	switch (offset) {
+	case 0x02:
+		result = m_centronics_data_latched << 7;
+		break;
+	case 0x03:
+		result = m_centronics_data_latch;
+		m_centronics_data_latched = FALSE;
+		break;
+	case 0x04:
+		result |= m_centronics_busy << 0;
+		result |= m_centronics_nack << 5;
+		break;
 	/* paper feed stepper motor */
 	case 0x07: result = m_pf_stepper; break;
 	/* carriage return stepper motor */

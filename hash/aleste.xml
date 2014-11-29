@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="aleste" description="Patisonic Aleste 520EX floppies">
+
+	<software name="dos_dev" supported="no">
+		<description>MSX-DOS + Developer Tools</description>
+		<year>1993</year>
+		<publisher>Microsoft - Patisonic</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="alestedos-dev.dsk" size="737280" crc="7b2b64a9" sha1="2307eb72478a01a461e231d2dcae28249145c38f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magplay" supported="no">
+		<description>Magic Sound Tracker Player</description>
+		<year>1993</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="magplayer.dsk" size="737280" crc="3fbebfe8" sha1="f9abaec938c0be7ed1bf3851f0a35a358df35fd3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxgames" supported="no">
+		<description>MSX Games</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737296">
+				<rom name="msx games.dsk" size="737296" crc="99aff243" sha1="eb2c036f716005409a43b4ae849b50fb5859b6ba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
