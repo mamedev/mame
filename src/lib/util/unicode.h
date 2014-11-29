@@ -53,7 +53,7 @@
 #define UTF8_CAPITAL_DELTA      "\xce\x94"          /* Greek capital letter delta */
 
 #define UTF8_MACRON             "\xc2\xaf"          /* macron symbol */
-#define UTF8_NONSPACE_MACRON    "\xcc\x84"          /* nonspace macron, use before another char */
+#define UTF8_NONSPACE_MACRON    "\xcc\x84"          /* nonspace macron, use after another char */
 
 #define a_RING                  "\xc3\xa5"          /* small a with a ring */
 #define a_UMLAUT                "\xc3\xa4"          /* small a with an umlaut */
