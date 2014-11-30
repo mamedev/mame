@@ -2405,7 +2405,7 @@
 		</part>
 	</software>
 
-	<software name="dambust">
+	<software name="dambustr">
 		<description>The Dam Busters</description>
 		<year>1984</year>
 		<publisher>Coleco / CBS</publisher>
@@ -2420,7 +2420,7 @@
 		</part>
 	</software>
 
-	<software name="dambustc" cloneof="dambust">
+	<software name="dambustrc" cloneof="dambustr">
 		<!-- Dam Busters, The (1984)(Coleco).bin -->
 		<description>The Dam Busters (Can)</description>
 		<year>1984</year>

@@ -158,6 +158,54 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
+	<software name="msdos50a">
+		<description>MS-DOS 5.0A</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk 1"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="ms-dos 5.0a (system disk 1).fdi" size="1265664" crc="8bead8ac" sha1="9666387eb4ee79bc085c7a444ac5a953fa2f56ea" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk 2"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="ms-dos 5.0a (system disk 2).fdi" size="1265664" crc="ece32e11" sha1="b2e460f07f2d546466ee5abc3ffb96b5301fe55e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk 3"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="ms-dos 5.0a (system disk 3).fdi" size="1265664" crc="57c8238a" sha1="90b88485f8ed7e2eebbae5019a115f6ce9c087a3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 1"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="ms-dos 5.0a (data disk 1).fdi" size="1265664" crc="7119e7f9" sha1="a1e39b4c70d211587db8b1acaa131e5b07c4605d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 2"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="ms-dos 5.0a (data disk 2).fdi" size="1265664" crc="7b75a24a" sha1="5a77f1392508feee000491d697379e094dc7a13b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 3"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="ms-dos 5.0a (data disk 3).fdi" size="1265664" crc="b415bc91" sha1="39275f26e1167b98915e002df58783f2dfd19bdd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 4"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="ms-dos 5.0a (data disk 4).fdi" size="1265664" crc="61dec302" sha1="9c9beb216ae55ac9f606d92dded842abb7203c19" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="msdos55">
 		<description>MS-DOS 5.5</description>
 		<year>19??</year>
@@ -298,6 +346,36 @@ only have some part of Windows file and a Video driver(CLGD?).
 			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="edos5_4.fdi" size="1265664" crc="7a9da5ff" sha1="2d4439e2bfc56eb8301d82f255d907eccffb9a48" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="emsdos50a" cloneof="emsdos50">
+		<description>Epson MS-DOS 5.0 (Alt)</description>
+		<year>19??</year>
+		<publisher>EPSON / Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="ms-dos_5.0_epson_system.fdi" size="1265664" crc="e951c463" sha1="2fa12693244a5b657cc1907a8edba55e3d59cbcc" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Utility 1"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="ms-dos_5.0_epson_utility 01.fdi" size="1265664" crc="3f609504" sha1="06f0595691e22f31562f9b8ffec2add4e0aa2c1a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Utility 2"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="ms-dos_5.0_epson_utility 02.fdi" size="1265664" crc="58d0a2fd" sha1="3146f6f6782ebdaff660574325d28ad50e9c5e6b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Jisho"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="ms-dos_5.0_epson_jisho.fdi" size="1265664" crc="582c5f50" sha1="e27506c10e8150b0ff4583f0857a9c54a11223f5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -12346,6 +12424,19 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
+	<software name="doordoor">
+		<description>Door Door</description>
+		<year>1984</year>
+		<publisher>エニックス (Enix)</publisher>
+		<info name="alt_title" value="ドアドア" />
+		<info name="release" value="" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="697008">
+				<rom name="door door (j).d88" size="697008" crc="ed48e06e" sha1="20d4758150bf663ec6c26502912af9882f15254f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dorse93">
 		<description>DOR Special Edition '93</description>
 		<year>1993</year>
@@ -12964,6 +13055,32 @@ only have some part of Windows file and a Video driver(CLGD?).
 			<feature name="part_id" value="Disk E"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="dragonpe.d88" size="1281968" crc="2a09ced1" sha1="bca945c540b645807b8802a2913a19b6ceda6d06" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dslayed">
+		<description>Dragon Slayer - The Legend of Heroes - Eiyuu Densetsu</description>
+		<year>1990</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<info name="alt_title" value="ドラゴンスレイヤー英雄伝説" />
+		<info name="release" value="19900420" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program Disk"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="ed1 program.d88" size="1281968" crc="ed4cff2c" sha1="938394f9248dcefe17cbbc15435604da02f5fa89" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Event Disk"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="ed1 event.d88" size="1281968" crc="04e47e7b" sha1="9fd992b5c525ccedea6a802ac1b7a9e4e73ec09e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Scenario Disk"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="ed1 scenario.d88" size="1281968" crc="65c3b687" sha1="2d33646d51e733575394725bdc17d3b49fd8488a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -14670,6 +14787,38 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
+	<software name="5elemen2">
+		<description>Fifth Element II - Hikari to Yami no Ouji</description>
+		<year>1993</year>
+		<publisher>遊演体 (You-en-tai)</publisher>
+		<info name="alt_title" value="フィフス・エレメント２ 光と闇の王子" />
+		<info name="release" value="19931218" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="system.fdi" size="1265664" crc="f014dd25" sha1="470793f8b518cca838997dc6ea2d063e48e8ff9e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 1"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="data 01.fdi" size="1265664" crc="946d41f3" sha1="11a564c1083baa18daafc2a40bfbe790a833c47b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 2"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="data 02.fdi" size="1265664" crc="996e2491" sha1="e97461a687e9f222ea4f3770444f102dfb93c739" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 3"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="data 03.fdi" size="1265664" crc="7436b7ed" sha1="59bcec9dac89f30c60c2714a3c535def0d6017f8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="filsnown">
 		<description>Filsnown - Hikari to Toki</description>
 		<year>1995</year>
@@ -15722,6 +15871,32 @@ only have some part of Windows file and a Video driver(CLGD?).
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1086448">
 				<rom name="galaxy_b.d88" size="1086448" crc="02a7a30c" sha1="b518e26ede687964654d8c9c747ee80aefcb1b84" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galfstrm">
+		<description>Galf Streem</description>
+		<year>1989</year>
+		<publisher>ザインソフト (Xain Soft)</publisher>
+		<info name="alt_title" value="ガルフストリーム" />
+		<info name="release" value="198905xx" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1086448">
+				<rom name="galf_a.d88" size="1086448" crc="45b3580d" sha1="7861d56394abc181c930e7046f29a63394dfb909" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1086448">
+				<rom name="galf_b.d88" size="1086448" crc="4f283c8b" sha1="3681b7a9afc1cfafe5005c0a83e2dd6126cf119e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1086448">
+				<rom name="galf_c.d88" size="1086448" crc="020351eb" sha1="12c03e80d2e45c18b7cd59c32d6e5eba649c42ce" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -17579,6 +17754,44 @@ only have some part of Windows file and a Video driver(CLGD?).
 			<feature name="part_id" value="Data Disk"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="data.fdi" size="1265664" crc="e345f778" sha1="740f371081521a501d449ec1704b1f7ec3401345" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hanachir">
+		<description>Hana to Chiruran</description>
+		<year>1993</year>
+		<publisher>ドット企画 (Dott Plan)</publisher>
+		<info name="alt_title" value="華と散るらん" />
+		<info name="release" value="19931105" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="hana to chiruran (1993)(dott plan)(1 of 5) system.fdi" size="1265664" crc="0d1c97ae" sha1="3f6e0e69c6c64d9e0499123984c94fea67d1ccf2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 1"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="hana to chiruran (1993)(dott plan)(2 of 5) data_1.fdi" size="1265664" crc="fd66f87a" sha1="aa3c32e096bf45e2b4be5c0b249be136b78b2cdb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 2"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="hana to chiruran (1993)(dott plan)(3 of 5) data_2.fdi" size="1265664" crc="9f1b6ffd" sha1="4ccbc8e088e76636645b62360c0b12bed695ff05" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 3"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="hana to chiruran (1993)(dott plan)(4 of 5) data_3.fdi" size="1265664" crc="ad38ec43" sha1="797e64821811337190f4458f1a43e59aa8955222" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 4"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="hana to chiruran (1993)(dott plan)(5 of 5) data_4.fdi" size="1265664" crc="a42112b4" sha1="e86f110d80176c747485b5687daaad323218443b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -25306,6 +25519,25 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
+	<software name="mink02">
+		<description>Mink no Omochabako Vol. 02 - Pero Pero Candy SP Disk</description>
+		<year>19??</year>
+		<publisher>ミンク (Mink)</publisher>
+		<info name="alt_title" value="ミンクのおもちゃ箱 Ｖｏｌ．０２ ［ぺろぺろＣＡＮＤＹ ＳＰディスク］" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_a.fdi" size="1265664" crc="0dc5da19" sha1="67c18ea2e20fedd0c86bf69b070e598811ad865c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_b.fdi" size="1265664" crc="6805c9ef" sha1="365541ed5e1ad64df6a798dc26248c08fe32346c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mirage">
 		<description>Mirage</description>
 		<year>1992</year>
@@ -26108,6 +26340,32 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="valis.fdi" size="1265664" crc="44ef2a49" sha1="30b676c5d85f10f781eff1ffb7ccea1b9309e46c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="valis2">
+		<description>Mugen Senshi Valis II</description>
+		<year>1989</year>
+		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<info name="alt_title" value="夢幻戦士ヴァリス２" />
+		<info name="release" value="19890805" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="mugen senshi valis 2 (1986)(nihon telenet)(disc 1 of 3)(disk a).fdi" size="1265664" crc="ceb883b9" sha1="36f06cfdf9b43184a58521c0ec57777eb890c2ab" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="mugen senshi valis 2 (1986)(nihon telenet)(disc 2 of 3)(disk b).fdi" size="1265664" crc="38cbab2a" sha1="4eff9c916e7f939b68b01da673350200aff430ba" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="mugen senshi valis 2 (1986)(nihon telenet)(disc 3 of 3)(disk c).fdi" size="1265664" crc="bf57cbfc" sha1="550606a177b52ef6e5c3480a0ee975fc4eedfddf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -29872,6 +30130,26 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="prince_of_persia_b.fdi" size="1261568" crc="e15f8465" sha1="1b1c2ca4933c30897ea75d98194d5b92be769f17" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ppersiab" cloneof="ppersia">
+		<description>Prince of Persia (Alt 2)</description>
+		<year>1990</year>
+		<publisher>ブロダーバンドジャパン (Brøderbund Japan)</publisher>
+		<info name="alt_title" value="プリンス オブ ペルシャ" />
+		<info name="release" value="19900720" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="prince of persia 1 (j) a.fdi" size="1265664" crc="f4a6e55c" sha1="80206acb259baec91288b9da89aed24a7f140a48" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="prince of persia 1 (j) b.fdi" size="1265664" crc="59a4014b" sha1="1f05c0b284d884a675db1a4892f18d1a9395355f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -34933,6 +35211,38 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
+	<software name="scruisr2">
+		<description>Star Cruiser II - The Odysseus Project</description>
+		<year>1993</year>
+		<publisher>アルシスソフト (Arsys Software)</publisher>
+		<info name="alt_title" value="スタークルーザー２ －ザ・オデュッセウス・プロジェクト－" />
+		<info name="release" value="19930618" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="disk 01.fdi" size="1265664" crc="bb6ee00f" sha1="8cf785fc71ddb0bd790d77cd179936f6fc4e3ee2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="disk 02.fdi" size="1265664" crc="9b894ebb" sha1="d27799c71f15f896aed96d23cc934f4598314fe0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="disk 03.fdi" size="1265664" crc="e0581a2e" sha1="57dc2e2d4154a8cdc70f3ce2d90d65b3a6aba8bb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Music Disk?"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="music disk.fdi" size="1265664" crc="6a051177" sha1="9daacc3ac31922a27149ab5bf0065125438c23b9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="stargld2">
 		<description>Starglider 2</description>
 		<year>1991</year>
@@ -39128,6 +39438,18 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
+	<software name="ulifefrc">
+		<description>Ulife Force</description>
+		<year>199?</year>
+		<publisher>Gold Cats</publisher>
+		<info name="alt_title" value="ウライフフォース" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1281968">
+				<rom name="ulife force (19xx)(gold cats).d88" size="1281968" crc="80ff5d60" sha1="e95d0329c1fb30d9e409958869d1fa416622af24" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ultima1">
 		<description>Ultima I - The First Age of Darkness</description>
 		<year>1988</year>
@@ -42716,6 +43038,32 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
+	<software name="zan2">
+		<description>Zan II - Kagerou no Jidai</description>
+		<year>1991</year>
+		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<info name="alt_title" value="斬２ 陽炎の時代" />
+		<info name="release" value="19910920" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="zan21.d88" size="1281968" crc="1bfea1e1" sha1="fa01705d5bea722f6459fa3191048dd5b13cfc37" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="zan22.d88" size="1281968" crc="ba37c15b" sha1="71c91d62c1c7c4cf647495a1b47bd09bc8f13e87" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="zan23.d88" size="1281968" crc="632c7424" sha1="524cd76dfc1506d48c1fa8df0664682bcd117643" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zan3">
 		<description>Zan III - Tenun Ware ni Ari</description>
 		<year>1993</year>
@@ -44252,8 +44600,8 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="dslayed" supported="no">
-		<description>Dragon Slayer - The Legend of Heroes - Eiyuu Densetsu</description>
+	<software name="dslayeda" cloneof="dslayed" supported="no">
+		<description>Dragon Slayer - The Legend of Heroes - Eiyuu Densetsu (Alt Format)</description>
 		<year>1990</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="alt_title" value="ドラゴンスレイヤー英雄伝説" />
@@ -46695,8 +47043,8 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="valis2" supported="no">
-		<description>Mugen Senshi Valis II</description>
+	<software name="valis2a" cloneof="valis2" supported="no">
+		<description>Mugen Senshi Valis II (Alt Format)</description>
 		<year>1989</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="alt_title" value="夢幻戦士ヴァリス２" />
@@ -48900,8 +49248,8 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="zan2" supported="no">
-		<description>Zan II - Kagerou no Jidai</description>
+	<software name="zan2a" cloneof="zan2" supported="no">
+		<description>Zan II - Kagerou no Jidai (Alt Format)</description>
 		<year>1991</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="alt_title" value="斬２ 陽炎の時代" />
@@ -58688,6 +59036,17 @@ SPACE EMPIRE
 		</part>
 	</software>
 
+	<software name="markadiaa" cloneof="markadia">
+		<description>Markadia (Alt)</description>
+		<year>1993</year>
+		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="markadia (1993)(bio 100%).fdi" size="1261568" crc="19eed65c" sha1="a0c454be33961f80e0710e8b4b3ec17f44815b11" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="metysnow">
 		<description>Metys's SnowWars</description>
 		<year>1992</year>
@@ -62135,20 +62494,6 @@ doujin?!?
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="boot.fdi" size="1265664" crc="b21286a3" sha1="f12f2f2192e9fb1af20e1641734d6bcea4a603fc" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- this should contain 3 disks. it was accompanied by an HDI image -->
-	<software name="scruisr2" supported="no">
-		<description>Star Cruiser II - The Odysseus Project (Incomplete)</description>
-		<year>1993</year>
-		<publisher>アルシスソフト (Arsys Software)</publisher>
-		<info name="alt_title" value="スタークルーザー２ －ザ・オデュッセウス・プロジェクト－" />
-		<info name="release" value="19930618" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1478656">
-				<rom name="boot.fdi" size="1478656" crc="6369803c" sha1="92b3b4883d2b06e8f58b76170bb9878b39781edd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
