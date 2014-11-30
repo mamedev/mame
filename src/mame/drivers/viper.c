@@ -93,7 +93,8 @@ MB81G163222-80 - Fujitsu MB81G163222-80 256k x 32-bit x 2 banks Synchronous Grap
                 DIN pins 2, 3 & 4. Pin 1 NC, Pin 2 GND, Pin 3 DATA, Pin 4 NC, Pin 5 NC. If the dongle is
                 required and plugged in it overrides the DS2430 on the main board. Without the (on-board)
                 DS2430 the PCB will complain after the CF check with HARDWARE ERROR. If the DS2430 is not
-                correct for the game the error given is RTC BAD even if the RTC is correct. Most games don't require                 a dongle and use the factory DS2430 on the main board.
+                correct for the game the error given is RTC BAD even if the RTC is correct. Most games don't require
+                a dongle and use the factory DS2430 on the main board.
          CN12 - 4 pin connector (possibly stereo audio output?)
          CN13 - Power connector for plug-in daughterboard
     CN15/CN16 - Multi-pin IDC connectors for plug-in daughterboard (see detail below)
@@ -101,7 +102,8 @@ MB81G163222-80 - Fujitsu MB81G163222-80 256k x 32-bit x 2 banks Synchronous Grap
                 software resides on the CF card. Games use 32M, 64M and 128M CF cards. In many cases a different
                 CF card version of the same game can be swapped and the existing RTC works but sometimes the RTC data
                 needs to be re-initialised to factory defaults by entering test mode. Sometimes the game will not boot
-                and gives error RTC BAD meaning the RTC is not compatible with the version or the dongle is required.                 See DS2430 above for more info.
+                and gives error RTC BAD meaning the RTC is not compatible with the version or the dongle is required.
+                See DS2430 above for more info.
        28-WAY - Edge connector used for connecting special controls such as guns etc.
        DIP(4) - 4-position DIP switch. Switch 1 skips the CF check for a faster boot-up. The others appear unused?
 
@@ -182,7 +184,8 @@ MB81G163222-80 - Fujitsu MB81G163222-80 256k x 32-bit x 2 banks Synchronous Grap
       CN2/CN3 - Video output connector to external monitors
       CN4/CN5 - Multi-pin IDC connectors joining to main board CN15/CN16
 
-An additional control PCB is used for Mocap Golf for the golf club sensor. It contains a ROMless MCU, an EPROM and some other components. It will be documented at a later date.
+An additional control PCB is used for Mocap Golf for the golf club sensor. It contains a ROMless MCU, an EPROM and 
+some other components. It will be documented at a later date.
 
 */
 

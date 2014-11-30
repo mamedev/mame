@@ -5725,8 +5725,10 @@ READ16_MEMBER ( saturn_state::saturn_vdp2_regs_r )
 			m_vdp2_regs[offset] = (STV_VDP2_VRAMSZ << 15) |
 											((0 << 0) & 0xf); // VDP2 version
 
-			if(!space.debugger_access())
-				printf("Warning: VDP2 version read\n");
+			/* Games basically r/w the entire VDP2 register area when this is tripped. (example: Silhouette Mirage) 
+			   Disable log for the time being. */
+			//if(!space.debugger_access())
+			//	printf("Warning: VDP2 version read\n");
 			break;
 		}
 
