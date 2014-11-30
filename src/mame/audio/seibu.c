@@ -320,16 +320,6 @@ WRITE16_MEMBER( seibu_sound_device::main_word_w )
 	}
 }
 
-READ8_MEMBER( seibu_sound_device::main_v30_r )
-{
-	return main_word_r(space,offset/2,0xffff) >> (8 * (offset & 1));
-}
-
-WRITE8_MEMBER( seibu_sound_device::main_v30_w )
-{
-	main_word_w(space,offset/2,data << (8 * (offset & 1)),0x00ff << (8 * (offset & 1)));
-}
-
 WRITE16_MEMBER( seibu_sound_device::main_mustb_w )
 {
 	if (ACCESSING_BITS_0_7)
