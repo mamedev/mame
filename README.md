@@ -17,11 +17,15 @@ How to compile?
 
 If you're on a *nix system, it could be as easy as typing
 
-```make```
+```
+make
+```
 
 for a MAME build, or
 
-```make TARGET=mess```
+```
+make TARGET=mess
+```
 
 for a MESS build (provided you have all the [prerequisites](http://forums.bannister.org/ubbthreads.php?ubb=showflat&Number=35138)).
 
