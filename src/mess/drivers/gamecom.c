@@ -11,19 +11,18 @@ Todo:
 Game Status:
 - The DAC sound partially works, sound from ports 1,2,3 not done
 - Inbuilt ROM and PDA functions all work
-- When starting a cart, the graphic of the cart going into the slot is corrupt
+- On the screen where the cart goes into the slot there is video flicker
 - Due to an irritating message, the NVRAM is commented out in the machine config
-- Cart games all have severe video issues such as flickering and nonsense gfx
+- Most of the cart games have severe video issues such as flickering and nonsense gfx
 - Lights Out works
-- Centipede works with bad flickering
-- Frogger works, but there are bugs on the 2nd row of cars (if you turn your
-  frog to the right it dies, and also one car goes in reverse), and not possible
-  to get the female frog.
-- Wheel of Fortune 1&2, playable although the spinner is corrupt
+- Centipede works
+- Wheel of Fortune 1 & 2 are working.
+- Frogger works, but it is difficult to capture the female frog or the insect.
+- Quiz Wiz works, but the end-of-round score doesn't show
 - Jeopardy, playable with bad gfx
-- Quiz Wiz works, but the final score doesn't show
 - Tiger Web Link & Internet, they look ok, obviously aren't going to connect to anything
 - Williams Arcade Classics, Robotron works, the rest are no use.
+- Monopoly is starting to show promise. It's playable but the video is terrible.
 - The remaining carts are not functional to any useful degree.
 
 ***************************************************************************/

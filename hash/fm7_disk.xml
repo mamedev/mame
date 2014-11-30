@@ -2243,7 +2243,7 @@ Aboves may be correct.
 
 - GALXAN : run "GALAXAN". But this game was broken.
 -->
-	<software name="gmbnk001">
+	<software name="gambnk01">
 		<description>GameBank 01</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2264,13 +2264,35 @@ Belows are (seem to) correct:
 Belows were broken.
 - Flight simulator : run "FLIGHT".
 -->
-	<software name="gmbnk003">
+	<software name="gambnk03">
 		<description>GameBank 03</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="gamebank03.d77" size="348848" crc="79f2658d" sha1="349c6b91d312ca1a2dcb79e1258634de7cbcbf59" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Description of Gane Bank #2
+- DELPHIS   : run "DELPHIS" .
+- RALLY X   : run "RALLY-X" .
+- TARTAROS  : run "TARTAROS" .
+- DIGDUG    : run "DIG DUG" .
+- Sonic Boom: run "SONIC".
+- Wall and Wall : run "WALL".
+
+Aboves may be correct.
+-->
+	<software name="gambnk02">
+		<description>GameBank 02</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="gamebank02.d77" size="348848" crc="357d7fd5" sha1="d81a0ac1aa40538ea48a1f200bcdec90a47d1fe8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2284,7 +2306,7 @@ Belows are (seem to) correct:
 - KNITHER : run "KNITHER".
 - Chak'n Pop : run "CHAN.POP".
 -->
-	<software name="gmbnk004">
+	<software name="gambnk04">
 		<description>GameBank 04</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2306,7 +2328,7 @@ Belows are seem to be correct, but maybe broken yet:
 - Blue Fox : loadm "BLUEFOX",,r.
 Another games are not correct.
 -->
-	<software name="gmbnk005">
+	<software name="gambnk05">
 		<description>GameBank 05</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2324,7 +2346,7 @@ Belows are (seem to) correct:
 
 Other games are broken.
 -->
-	<software name="gmbnk006">
+	<software name="gambnk06">
 		<description>GameBank 06</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2348,7 +2370,7 @@ Below is incorrect:
 
 Another files are not test yet.
 -->
-	<software name="gmbnk007">
+	<software name="gambnk07">
 		<description>GameBank 07</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

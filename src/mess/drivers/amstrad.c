@@ -1069,6 +1069,10 @@ static MACHINE_CONFIG_DERIVED( aleste, amstrad )
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", aleste_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", aleste_floppies, "525hd", floppy_image_device::default_floppy_formats)
 
+	MCFG_DEVICE_REMOVE("flop_list")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "aleste")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cpc_list", "cpc_flop")
+
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
