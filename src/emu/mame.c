@@ -55,7 +55,7 @@
 
             - calls config_load_settings() [config.c] to load the configuration file
             - calls nvram_load [machine/generic.c] to load NVRAM
-            - calls ui_display_startup_screens() [ui.c] to display the the startup screens
+            - calls ui_display_startup_screens() [ui.c] to display the startup screens
             - begins resource tracking (level 2)
             - calls soft_reset() [mame.c] to reset all systems
 

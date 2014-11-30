@@ -135,7 +135,7 @@ struct bpf_stat
 						///< from the beginning of the current capture. This value includes the packets
 						///< lost by the driver.
 	UINT bs_drop;       ///< number of packets that the driver lost from the beginning of a capture.
-						///< Basically, a packet is lost when the the buffer of the driver is full.
+						///< Basically, a packet is lost when the buffer of the driver is full.
 						///< In this situation the packet cannot be stored and the driver rejects it.
 	UINT ps_ifdrop;     ///< drops by interface. XXX not yet supported
 	UINT bs_capt;       ///< number of packets that pass the filter, find place in the kernel buffer and

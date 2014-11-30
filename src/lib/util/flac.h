@@ -79,7 +79,7 @@ private:
 	UINT32                  m_block_size;           // block size
 
 	// header stripping
-	bool                    m_strip_metadata;       // strip the the metadata?
+	bool                    m_strip_metadata;       // strip the metadata?
 	UINT32                  m_ignore_bytes;         // how many bytes to ignore when writing
 	bool                    m_found_audio;          // have we hit the audio yet?
 };

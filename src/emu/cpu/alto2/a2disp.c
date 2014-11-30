@@ -154,7 +154,7 @@ static const prom_load_t pl_displ_a63 =
 /**
  * @brief PROM a66 is a 256x4 bit (type 3601)
  * <PRE>
- * Address lines are driven by H[1] to H[128] of the the horz. line counters.
+ * Address lines are driven by H[1] to H[128] of the horz. line counters.
  * PROM is enabled when H[256] and H[512] are both 0.
  *
  * Q1 is VSYNC for the odd field (with H1024=0)

@@ -514,16 +514,16 @@ bool debug_comment_load(running_machine &machine);
 /* return the physical address corresponding to the given logical address */
 int debug_cpu_translate(address_space &space, int intention, offs_t *address);
 
-/* return a byte from the the specified memory space */
+/* return a byte from the specified memory space */
 UINT8 debug_read_byte(address_space &space, offs_t address, int apply_translation);
 
-/* return a word from the the specified memory space */
+/* return a word from the specified memory space */
 UINT16 debug_read_word(address_space &space, offs_t address, int apply_translation);
 
-/* return a dword from the the specified memory space */
+/* return a dword from the specified memory space */
 UINT32 debug_read_dword(address_space &space, offs_t address, int apply_translation);
 
-/* return a qword from the the specified memory space */
+/* return a qword from the specified memory space */
 UINT64 debug_read_qword(address_space &space, offs_t address, int apply_translation);
 
 /* return 1,2,4 or 8 bytes from the specified memory space */

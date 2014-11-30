@@ -237,8 +237,8 @@ static const help_item static_help_list[] =
 		"\n"
 		"  cheatinit [<address>,<length>[,<cpu>]] -- initialize the cheat search to the selected memory area\n"
 		"  cheatrange <address>,<length> -- add to the cheat search the selected memory area\n"
-		"  cheatnext <condition>[,<comparisonvalue>] -- continue cheat search comparing with the the last value\n"
-		"  cheatnextf <condition>[,<comparisonvalue>] -- continue cheat search comparing with the the first value\n"
+		"  cheatnext <condition>[,<comparisonvalue>] -- continue cheat search comparing with the last value\n"
+		"  cheatnextf <condition>[,<comparisonvalue>] -- continue cheat search comparing with the first value\n"
 		"  cheatlist [<filename>] -- show the list of cheat search matches or save them to <filename>\n"
 		"  cheatundo -- undo the last cheat search (state only)\n"
 	},

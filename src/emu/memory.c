@@ -2868,7 +2868,7 @@ void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t 
 		}
 		while (base_address != end_address + 1);
 
-		// Efficient method to go the the next range start given a mirroring mask
+		// Efficient method to go to the next range start given a mirroring mask
 		base_mirror = (base_mirror + 1 + ~bytemirror) & bytemirror;
 	}
 	while (base_mirror);

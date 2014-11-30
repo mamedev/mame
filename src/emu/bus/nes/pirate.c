@@ -666,8 +666,8 @@ WRITE8_MEMBER(nes_magseries_device::write_h)
 
  In MESS: Supported.
 
- Notes: Metal Force and Buzz & Waldog only use the the first
- 4 regs and no mirroring. Janggun ui Adeul uses all features
+ Notes: Metal Force and Buzz & Waldog only use the first 4
+ regs and no mirroring. Janggun ui Adeul uses all features
 
  -------------------------------------------------*/
 

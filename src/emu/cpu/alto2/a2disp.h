@@ -274,7 +274,7 @@ enum {
  * @brief vertical blank and synch PROM
  *
  * PROM a66 is a 256x4 bit (type 3601), containing the vertical blank + synch.
- * Address lines are driven by H[1] to H[128] of the the horz. line counters.
+ * Address lines are driven by H[1] to H[128] of the horz. line counters.
  * The PROM is enabled whenever H[256] and H[512] are both 0.
  */
 UINT8* m_disp_a66;
