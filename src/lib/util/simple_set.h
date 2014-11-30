@@ -150,7 +150,7 @@ public:
 					merge(left, parentNode);
 					merge(right, parentNode);
 
-					// Now we're the the root
+					// Now we're the root
 					m_root = parentNode;
 				}
 				else

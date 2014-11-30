@@ -665,7 +665,7 @@ FLAC_API FLAC__bool FLAC__metadata_simple_iterator_delete_block(FLAC__Metadata_S
  *
  * - Create a new chain using FLAC__metadata_chain_new().  A chain is a
  *   linked list of FLAC metadata blocks.
- * - Read all metadata into the the chain from a FLAC file using
+ * - Read all metadata into the chain from a FLAC file using
  *   FLAC__metadata_chain_read() or FLAC__metadata_chain_read_ogg() and
  *   check the status.
  * - Optionally, consolidate the padding using
@@ -1690,7 +1690,7 @@ FLAC_API FLAC__bool FLAC__metadata_object_vorbiscomment_append_comment(FLAC__Str
  *  For convenience, a trailing NUL is added to the entry if it doesn't have
  *  one already.
  *
- *  Depending on the the value of \a all, either all or just the first comment
+ *  Depending on the value of \a all, either all or just the first comment
  *  whose field name(s) match the given entry's name will be replaced by the
  *  given entry.  If no comments match, \a entry will simply be appended.
  *

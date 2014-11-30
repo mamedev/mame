@@ -237,7 +237,7 @@ void timer_device::device_reset()
 			if (m_screen == NULL)
 				fatalerror("timer '%s': unable to find screen '%s'\n", tag(), m_screen_tag);
 
-			// set the timer to to fire immediately
+			// set the timer to fire immediately
 			m_first_time = true;
 			m_timer->adjust(attotime::zero, m_param);
 			break;

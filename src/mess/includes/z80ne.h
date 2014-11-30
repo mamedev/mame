@@ -45,7 +45,7 @@ struct cass_data_t {
 	struct {
 		int length;     /* time cassette level is at output.level */
 		int level;      /* cassette level */
-		int bit;        /* bit to to output */
+		int bit;        /* bit to output */
 	} output;
 	z80netape_speed speed;          /* 300 - 600 - 1200 */
 	int wave_filter;

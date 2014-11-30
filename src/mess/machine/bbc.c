@@ -377,7 +377,7 @@ WRITE8_MEMBER(bbc_state::bbcm_ACCCON_write)
 
 	/* ACCCON_TST controls paging of rom reads in the 0xFC00-0xFEFF reigon */
 	/* if 0 the I/O is paged for both reads and writes */
-	/* if 1 the the ROM is paged in for reads but writes still go to I/O   */
+	/* if 1 the ROM is paged in for reads but writes still go to I/O */
 	if (m_ACCCON_TST)
 	{
 		m_bank8->set_base(m_region_os->base() + 0x3c00);

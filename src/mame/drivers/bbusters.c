@@ -191,7 +191,7 @@ foreground and not behind the moving elevator layer.
 
 2. Oddly enough, the emulation completely misses the huge zombie that jumps
 out during the attract demo right before the text story text comes in.
-When you hear the the high pitch "zing" sound, there should be a zombie nearly
+When you hear the high pitch "zing" sound, there should be a zombie nearly
 the entire size of the screen.
 
 

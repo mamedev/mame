@@ -2696,7 +2696,7 @@ Beyond that last category are the roms waiting to be classified.
 <!--
     <software name="smkartupa" cloneof="smkart">
         <!- - Van Halen - ->
-        <!- - Notes: this earlier prototype has a lot more memory the the final release - ->
+        <!- - Notes: this earlier prototype has a lot more memory than the final release - ->
         <description>Super Mario Kart (USA, Prototype)</description>
         <year>1992</year>
         <publisher>Nintendo</publisher>

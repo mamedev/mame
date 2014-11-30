@@ -421,7 +421,7 @@ WRITE8_MEMBER(segag80r_state::spaceod_back_port_w)
 
 WRITE8_MEMBER(segag80r_state::monsterb_videoram_w)
 {
-	/* accesses to the the area $f040-$f07f go to background palette if */
+	/* accesses to the area $f040-$f07f go to background palette if */
 	/* the palette access enable bit is set */
 	if ((offset & 0x1fc0) == 0x1040 && (m_video_control & 0x40))
 	{
@@ -491,7 +491,7 @@ WRITE8_MEMBER(segag80r_state::monsterb_back_port_w)
 
 WRITE8_MEMBER(segag80r_state::pignewt_videoram_w)
 {
-	/* accesses to the the area $f040-$f07f go to background palette if */
+	/* accesses to the area $f040-$f07f go to background palette if */
 	/* the palette access enable bit is set */
 	if ((offset & 0x1fc0) == 0x1040 && (m_video_control & 0x02))
 	{
@@ -574,7 +574,7 @@ WRITE8_MEMBER(segag80r_state::pignewt_back_port_w)
 
 WRITE8_MEMBER(segag80r_state::sindbadm_videoram_w)
 {
-	/* accesses to the the area $f000-$f03f go to background palette if */
+	/* accesses to the area $f000-$f03f go to background palette if */
 	/* the palette access enable bit is set */
 	if ((offset & 0x1fc0) == 0x1000 && (m_video_control & 0x02))
 	{

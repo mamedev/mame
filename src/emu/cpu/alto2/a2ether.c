@@ -560,7 +560,7 @@ void alto2_cpu_device::tx_packet(void* ptr, INT32 arg)
 		PUT_ETH_WLF(m_eth.status, 0);
 		m_eth.tx_timer->adjust(attotime::from_usec(5.44), -1);
 	} else {
-		// transmit teh next word after 5.44us
+		// transmit the next word after 5.44us
 		m_eth.tx_timer->adjust(attotime::from_usec(5.44), arg + 1);
 	}
 	eth_wakeup();

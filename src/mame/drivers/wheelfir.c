@@ -13,7 +13,7 @@ TODO:
 - various gfx size/pos glitches (gaps, extra rows of pixels here and there)
 - real gfx zoom, based on the zoom params, not lookup table
 - apply double buffering (sometimes gfx is displayed at y+256 every other frame (extra bits are currently masked out))
-- fix road/sky (extra bits in teh scroll reg. are there two bitmap buffers? )
+- fix road/sky (extra bits in the scroll reg. are there two bitmap buffers? )
 - bitmap layer clearing
 - fix wrong coords of sprites rendered into the bitmap layer (intro car)
 - is toggle_bit really a vblank  bit ? or somethign else (blitter status ?)

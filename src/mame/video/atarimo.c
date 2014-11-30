@@ -660,7 +660,7 @@ bool atari_motion_objects_device::dual_sprite_parameter::set(const atari_motion_
 	if (!m_upper.set(input.data_upper))
 		return false;
 
-	// determine teh upper shift amount
+	// determine the upper shift amount
 	UINT16 temp = m_lower.mask();
 	m_uppershift = 0;
 	while (temp != 0)

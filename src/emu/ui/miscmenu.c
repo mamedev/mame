@@ -1653,7 +1653,7 @@ void ui_menu_sliders::custom_render(void *selectedref, float top, float bottom, 
 		percentage = (float)(curval - curslider->minval) / (float)(curslider->maxval - curslider->minval);
 		default_percentage = (float)(curslider->defval - curslider->minval) / (float)(curslider->maxval - curslider->minval);
 
-		/* assemble the the text */
+		/* assemble the text */
 		tempstring.ins(0, " ").ins(0, curslider->description);
 
 		/* move us to the bottom of the screen, and expand to full width */

@@ -56,7 +56,7 @@ Tile encoding 4 bytes/tile (banks of 2000 bytes):
 
 Communication with these ics go through 4 memory zones:
   1000/2000 bytes: access to the currently selected ram bank
-       2000 bytes: readonly access the the currently select tile
+       2000 bytes: readonly access to the currently selected tile
                    rom bank for rom checksumming
          40 bytes: writeonly access to the first register bank
           8 bytes: writeonly access to the second register bank

@@ -2214,8 +2214,8 @@ http://uk.youtube.com/watch?v=Y-KvbKtqzaQ
 
 Rom 21 is full of 0's... i cleaned and re-dumped
 it numerous times, but i just got 0's everytime.
-It contains some of the the graphics for enemies
-on the opening stage at the very least.
+It contains some of the graphics for enemies on
+the opening stage at the very least.
 
 enjoy..
 

@@ -25,7 +25,7 @@
 /* Note on a tapes leader-BOT-data-EOT-trailer format:
  * A cassette has a transparent piece of tape on both ends,
  * leader and trailer. And data tapes also have BOT and EOT
- * holes, shortly before the the leader and trailer.
+ * holes, shortly before the leader and trailer.
  * The holes and clear tape are detected using a photo-resitor.
  * When rewinding, the BOT/EOT signal will show a short
  * pulse and if rewind continues a constant high signal later.

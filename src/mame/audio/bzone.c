@@ -339,7 +339,7 @@ static DISCRETE_SOUND_START(bzone)
 		5.0 * RES_VOLTAGE_DIVIDER(BZ_R7, BZ_R6),            /* INP0 */
 		5.0 * RES_VOLTAGE_DIVIDER(BZ_R7, RES_2_PARALLEL(CD4066_R_ON + BZ_R5, BZ_R6)))   /* INP1 */
 	/* R5, R6, R7 all affect the following circuit charge discharge rates */
-	/* they are not emulated as their effect is less the the 5% component tolerance */
+	/* they are not emulated as their effect is less than the 5% component tolerance */
 	DISCRETE_RCDISC3(NODE_62,                               /* IC K5, pin 7 */
 		1, NODE_61, BZ_R8, BZ_R9, BZ_C13, -0.5)
 
