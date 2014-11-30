@@ -479,12 +479,15 @@ ADDRESS_MAP_END
 
 /***************************************************************************
     Seibu ADPCM device
+    (MSM5205 with interface to sample ROM provided by YM3931)
+
+    FIXME: hook up an actual MSM5205 in place of this custom implementation
 ***************************************************************************/
 
 const device_type SEIBU_ADPCM = &device_creator<seibu_adpcm_device>;
 
 seibu_adpcm_device::seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SEIBU_ADPCM, "Seibu ADPCM", tag, owner, clock, "seibu_adpcm", __FILE__),
+	: device_t(mconfig, SEIBU_ADPCM, "Seibu ADPCM (MSM5205)", tag, owner, clock, "seibu_adpcm", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(NULL),
 		m_current(0),

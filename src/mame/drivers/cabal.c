@@ -9,9 +9,6 @@ driver by Carlos A. Lozano Baides
 The original uses 2xYM3931 for sound
 The bootleg uses YM2151 + 2xZ80 used as ADPCM players
 
-Coin inputs are handled by the sound CPU, so they don't work with sound
-disabled. Use the service switch instead.
-
 
 MEMORY MAP
 0x00000 - 0x3ffff   ROM
