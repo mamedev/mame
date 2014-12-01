@@ -1391,7 +1391,7 @@ void i860_cpu_device::insn_pstd (UINT32 insn)
 	if (auto_inc)
 		set_iregval (isrc2, eff);
 
-	/* Update the the pixel mask depending on the pixel size.  Shift PM
+	/* Update the pixel mask depending on the pixel size.  Shift PM
 	   right by 8/2^ps bits.  */
 	if (ps == 0)
 		pm = (pm >> 8) & 0x00;

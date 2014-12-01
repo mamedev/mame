@@ -571,7 +571,7 @@ void upd775x_device::advance_state()
 			m_state = STATE_DUMMY2;
 			break;
 
-		/* Second dummy state: ignore any data here and issue a request for the the sixth byte */
+		/* Second dummy state: ignore any data here and issue a request for the sixth byte */
 		/* The expected response will be the first block header */
 		case STATE_DUMMY2:
 			m_offset++;

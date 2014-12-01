@@ -949,6 +949,8 @@ MACHINE_CONFIG_FRAGMENT( common )
 	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa5", apollo_isa_cards, NULL, false)
 	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa6", apollo_isa_cards, NULL, false)
 	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa7", apollo_isa_cards, NULL, false)
+
+	MCFG_SOFTWARE_LIST_ADD("ctape_list", "apollo_ctape")
 MACHINE_CONFIG_END
 
 // for machines with the keyboard and a graphics head

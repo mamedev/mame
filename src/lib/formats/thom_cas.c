@@ -20,7 +20,7 @@
    raw wave. It saves some time & memory but disables the ability to "hear" the
    cassette.
    This does not affect raw wave files.
-   Also, we do not do this for k5 files because the the corresponding wave
+   Also, we do not do this for k5 files because the corresponding wave
    files are more compact anyway. */
 /* It must be set accordingly in machine/thomson.c */
 

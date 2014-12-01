@@ -63,7 +63,7 @@
     that changes at every address. To prevent that double use, the CPU fetches
     the 8-bit key from a different place when decrypting words 0-3, but this only
     happens after wrapping around at least once; when decrypting the first four
-    words of memory, which correspond the the initial SP and initial PC vectors,
+    words of memory, which correspond to the initial SP and initial PC vectors,
     the 8-bit key is taken from bytes 0-3 of RAM. Instead, when fetching the
     vectors, the global key is handled differently, to prevent double use of
     those bytes. But this special handling of the global key doesn't apply to

@@ -673,6 +673,30 @@ ROM_START(intvecs) // the intv1 exec rom should be two roms: RO-3-9502-011.U5 an
 	ROM_LOAD( "sp0256-012.bin",   0x1000, 0x0800, CRC(0de7579d) SHA1(618563e512ff5665183664f52270fa9606c9d289) )
 ROM_END
 
+/*
+Intellivision Keyboard Component - Prototype
+-------------------------------------------------------------
+
+GI    9333B-0104         0104.U20  4Kx8  Mask ROM, 6502 code
+Intel 2732 "CPU 2D"     CPU2D.U21  4Kx8  EPROM, 6502 code
+
+TI    8S030N  1149-0360  0360.U58  32x8  Timing prom?
+TI    8S030N  1149-0370  0370.U74  32x8  Timing prom?
+ 
+GI    RO-3-9502-024       024.U60  2Kx10 Mask ROM+Addr Decoder, CP1600 code
+GI    9316B-4D72         4D72.U62  2Kx8  Mask ROM, CP1600 code (upper)
+GI    9316B-4D71         4D71.U63  2Kx8  Mask ROM, CP1600 code (lower)
+GI    9316B-4C52         4C52.U34  2Kx8  Mask ROM, Alphanumerics
+
+Main board also includes:
+
+    2  2114 DRAMS        1Kx4  Character memory
+    10 MM5290J DRAMS    16Kx10 CP1600 memory?     
+    1  6502
+    1  Mystery 40-pin chip (under heat sink)
+       (actually a SMC CRT5027 aka TI TMS9927 CRT controller)
+*/
+
 ROM_START(intvkbd) // the intv1 exec rom should be two roms: RO-3-9502-011.U5 and RO-3-9504-021.U6
 	ROM_REGION(0x10000<<1,"maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD( "exec.bin", 0x1000<<1, 0x2000, CRC(cbce86f7) SHA1(5a65b922b562cb1f57dab51b73151283f0e20c7a))
@@ -688,6 +712,10 @@ ROM_START(intvkbd) // the intv1 exec rom should be two roms: RO-3-9502-011.U5 an
 
 	ROM_REGION(0x00800,"gfx1",0)
 	ROM_LOAD( "4c52.u34",  0x0000, 0x0800, CRC(cbeb2e96) SHA1(f0e17adcd278fb376c9f90833c7fbbb60193dbe3))
+
+	ROM_REGION(0x0100,"proms",0)
+	ROM_LOAD( "0360.u58", 0x00, 0x20, CRC(1295528a) SHA1(b35e598891f1185e02cbacb4811d2334357abd79))
+	ROM_LOAD( "0370.u74", 0x20, 0x20, CRC(19da5096) SHA1(76af50e4fd29649fc4837120c245321a8fc84cd3))	
 ROM_END
 
 DRIVER_INIT_MEMBER(intv_state,intv)

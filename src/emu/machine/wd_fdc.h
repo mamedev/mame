@@ -238,7 +238,7 @@ private:
 	//  Live states change continually depending on the disk contents
 	//  until the next externally discernable event is found.  They
 	//  are checkpointing, run until an event is found, then they wait
-	//  for it.  When an event eventually happen the the changes are
+	//  for it.  When an event eventually happens, the changes are
 	//  either committed or replayed until the sync event time.
 	//
 	//  The transition to IDLE is only done on a synced event.  Some

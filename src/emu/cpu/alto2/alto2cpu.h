@@ -536,7 +536,7 @@ private:
 	 * \brief current micro instruction's register selection
 	 * The emulator F2s ACSOURCE and ACDEST modify this.
 	 * Note: The S registers are addressed by the original RSEL[0-4],
-	 * even when the the emulator modifies this.
+	 * even when the emulator modifies this.
 	 */
 	UINT8 m_rsel;
 	UINT8 m_d_rsel;                                 //!< decoded RSEL[0-4]

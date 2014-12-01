@@ -1059,7 +1059,7 @@ void alto2_cpu_device::f1_late_load_kstat()
 	/* KSTAT[14-15] are just taken from BUS[14-15] */
 	PUT_KSTAT_COMPLETION(m_dsk.kstat, GET_KSTAT_COMPLETION(m_bus));
 
-	/* May set the the CKSUM flip-flop 44b
+	/* May set the CKSUM flip-flop 44b
 	 * JK flip-flop 44b (KSTAT<- clocked)
 	 * CLK  SYSCLKA'
 	 * J    !BUS[13]

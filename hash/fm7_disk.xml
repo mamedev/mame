@@ -1666,6 +1666,18 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="teamabm">
+		<description>Team AB Music Disk No.1 ~We Love Dreams Music~</description>
+		<year>1992?</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Team AB" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="ab7md1.d77" size="348848" crc="d0b393ca" sha1="51897c3c7a13824e5c699dafbc4b5c5bb67814e2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 
 <!-- Misc -->
 
@@ -2234,7 +2246,7 @@ Game #014 for FM-7/77/AV.
 
 
 <!--
-Description of Gane Bank #1
+Description of Game Bank #1
 - GALAGA : run "GALAGA" .
 - FLappy : run "FLAPPY" .
 - Mario Bros Special : run "MARIO.S".
@@ -2276,7 +2288,7 @@ Belows were broken.
 	</software>
 
 <!--
-Description of Gane Bank #2
+Description of Game Bank #2
 - DELPHIS   : run "DELPHIS" .
 - RALLY X   : run "RALLY-X" .
 - TARTAROS  : run "TARTAROS" .

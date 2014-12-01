@@ -44,9 +44,7 @@ public:
 	~seibu_sound_device() {}
 
 	DECLARE_READ16_MEMBER( main_word_r );
-	DECLARE_READ8_MEMBER( main_v30_r );
 	DECLARE_WRITE16_MEMBER( main_word_w );
-	DECLARE_WRITE8_MEMBER( main_v30_w );
 
 	DECLARE_WRITE16_MEMBER( main_mustb_w );
 

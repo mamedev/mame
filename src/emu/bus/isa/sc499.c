@@ -318,7 +318,8 @@ sc499_device::sc499_device(const machine_config &mconfig, const char *tag, devic
 	: device_t(mconfig, SC499, "Archive SC-499", tag, owner, clock, "sc499", __FILE__),
 	device_isa8_card_interface(mconfig, *this),
 	m_iobase(*this, "IO_BASE"),
-	m_irqdrq(*this, "IRQ_DRQ")
+	m_irqdrq(*this, "IRQ_DRQ"),
+	m_image(*this, SC499_CTAPE_TAG)
 {
 }
 
@@ -342,16 +343,13 @@ void sc499_device::device_start()
 
 	m_installed = false;
 
-	device_t *ctape_device = subdevice(SC499_CTAPE_TAG);
-	m_image = dynamic_cast<device_image_interface *> (ctape_device);
-
 	if (m_image->image_core_file() == NULL)
 	{
 		LOG2(("start sc499: no cartridge tape"));
 	}
 	else
 	{
-		LOG2(("start sc499: cartridge tape image is %s",m_image->filename()));
+		LOG2(("start sc499: cartridge tape image is %s", m_image->filename()));
 	}
 
 	m_ctape_block_buffer.resize(SC499_CTAPE_BLOCK_SIZE);
@@ -465,11 +463,11 @@ void sc499_device::check_tape()
 			tape_status_set(SC499_ST0_WP);
 		}
 
-		if (m_image_length != m_image->length())
+		if (m_image_length != m_image->tapelen())
 		{
 			// tape has changed, get new size
-			m_image_length = m_image->length();
-			m_ctape_block_count = (UINT32)((m_image_length+SC499_CTAPE_BLOCK_SIZE-1) / SC499_CTAPE_BLOCK_SIZE);
+			m_image_length = m_image->tapelen();
+			m_ctape_block_count = (UINT32)((m_image_length + SC499_CTAPE_BLOCK_SIZE - 1) / SC499_CTAPE_BLOCK_SIZE);
 		}
 
 		LOG1(("check_tape: tape image is %s with %d blocks", m_image->filename(), m_ctape_block_count));
@@ -1167,16 +1165,19 @@ void sc499_device::log_block(const char *text)
 
 void sc499_device::read_block()
 {
+	UINT8 *tape;
+
 	if (m_tape_pos == 0)
 	{
 		// check if tape has been replaced or removed
 		check_tape();
 	}
 
-	m_image->fseek((UINT64) m_tape_pos * SC499_CTAPE_BLOCK_SIZE, SEEK_SET);
+	tape = m_image->read_block(m_tape_pos);
 
-	if (m_image->image_feof())
+	if (tape == NULL)
 	{
+		// either there is no tape or m_tape_pos goes beyond end-of-tape
 		m_status &= ~SC499_STAT_EXC;
 		m_status &= ~SC499_STAT_DIR;
 		m_status &= ~SC499_STAT_DON;
@@ -1185,7 +1186,7 @@ void sc499_device::read_block()
 	}
 	else
 	{
-		m_image->fread(m_ctape_block_buffer, SC499_CTAPE_BLOCK_SIZE);
+		memcpy(m_ctape_block_buffer, tape, SC499_CTAPE_BLOCK_SIZE);
 
 		//  if (verbose > 1 || m_tape_pos % 100 == 0)
 		{
@@ -1236,8 +1237,7 @@ void sc499_device::write_block()
 		check_tape();
 	}
 
-	m_image->fseek((UINT64) m_tape_pos * SC499_CTAPE_BLOCK_SIZE, SEEK_SET);
-	m_image->fwrite(m_ctape_block_buffer, SC499_CTAPE_BLOCK_SIZE);
+	m_image->write_block(m_tape_pos, m_ctape_block_buffer);
 	m_ctape_block_count = m_tape_pos;
 	m_ctape_block_index = 0;
 	m_tape_pos++;
@@ -1268,38 +1268,13 @@ int sc499_device::block_is_filemark()
 void sc499_device::block_set_filemark()
 {
 	static const UINT8 fm_pattern[] = {0xDE, 0xAF, 0xFA, 0xED};
-	int i;
-
-	for (i = 0; i < SC499_CTAPE_BLOCK_SIZE; i += 4)
+	for (int i = 0; i < SC499_CTAPE_BLOCK_SIZE; i += 4)
 	{
 		memcpy(m_ctape_block_buffer + i, fm_pattern, 4);
 	}
 }
 
 //##########################################################################
-class sc499_ctape_image_device :    public device_t,
-									public device_image_interface
-{
-public:
-	// construction/destruction
-	sc499_ctape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// image-level overrides
-	virtual iodevice_t image_type() const { return IO_MAGTAPE; }
-
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 1; }
-	virtual bool is_creatable() const { return 1; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return NULL; }
-	virtual const char *file_extensions() const { return "act"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
-protected:
-	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start() { };
-};
 
 const device_type SC499_CTAPE = &device_creator<sc499_ctape_image_device>;
 
@@ -1313,3 +1288,46 @@ void sc499_ctape_image_device::device_config_complete()
 {
 	update_names(SC499_CTAPE, "ctape", "ct");
 };
+
+
+UINT8 *sc499_ctape_image_device::read_block(int block_num)
+{
+	// access beyond end of tape cart
+	if (m_ctape_data.bytes() <= (block_num + 1) * SC499_CTAPE_BLOCK_SIZE)
+		return NULL;
+	else
+		return m_ctape_data + (block_num * SC499_CTAPE_BLOCK_SIZE);
+}
+
+void sc499_ctape_image_device::write_block(int block_num, UINT8 *ptr)
+{
+	if (!(m_ctape_data.bytes() <= (block_num + 1) * SC499_CTAPE_BLOCK_SIZE))
+		memcpy(m_ctape_data + (block_num * SC499_CTAPE_BLOCK_SIZE), ptr, SC499_CTAPE_BLOCK_SIZE);
+}
+
+bool sc499_ctape_image_device::call_load()
+{
+	if (software_entry() == NULL)
+	{
+		m_ctape_data.resize(length());
+		fread(m_ctape_data, length());
+	}
+	else
+	{
+		m_ctape_data.resize(get_software_region_length("ctape"));
+		memcpy(m_ctape_data, get_software_region("ctape"), get_software_region_length("ctape"));
+	}
+
+	return IMAGE_INIT_PASS;
+}
+
+void sc499_ctape_image_device::call_unload()
+{
+	m_ctape_data.resize(0);
+	// TODO: add save tape on exit?
+	//if (software_entry() == NULL)
+	//{
+	//    fseek(0, SEEK_SET);
+	//    fwrite(m_ctape_data, m_ctape_data.size);
+	//}
+}
