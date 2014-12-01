@@ -24,6 +24,7 @@ All clock timing comes from crystal 1
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "video/bufsprite.h"
+#include "video/tigeroad_spr.h"
 
 class supduck_state : public driver_device
 {
@@ -37,7 +38,8 @@ public:
 			m_fore_videoram(*this, "forevideoram"),
 			m_back_videoram(*this, "backvideoram"),
 			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette")
+			m_palette(*this, "palette"),
+			m_spritegen(*this, "spritegen")
 	{ }
 
 	// devices
@@ -52,6 +54,7 @@ public:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<tigeroad_spr_device> m_spritegen;
 
 	tilemap_t     *m_text_tilemap;
 	tilemap_t     *m_fore_tilemap;
@@ -79,7 +82,6 @@ protected:
 
 	virtual void video_start();
 
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
@@ -124,9 +126,7 @@ UINT32 supduck_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	m_back_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fore_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-
-	draw_sprites(bitmap, cliprect, 0);
-	draw_sprites(bitmap, cliprect, 1); //draw priority sprites?
+	m_spritegen->draw_sprites(bitmap, cliprect, m_gfxdecode, 3, m_spriteram->buffer(), m_spriteram->bytes(), flip_screen(), 1 );
 
 	m_text_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -197,46 +197,6 @@ TILE_GET_INFO_MEMBER(supduck_state::get_back_tile_info)
 }
 
 
-void supduck_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
-{
-	UINT16 *source = &m_spriteram->buffer()[m_spriteram->bytes()/2] - 4;
-	UINT16 *finish = m_spriteram->buffer();
-
-	while (source >= finish)
-	{
-		int tile_number = source[0];
-
-		if (tile_number != 0xfff) {
-			int attr = source[1];
-			int sy = source[2] & 0x1ff;
-			int sx = source[3] & 0x1ff;
-
-			int flipx = attr & 0x02;
-			int flipy = attr & 0x01;
-			int color = (attr >> 2) & 0x0f;
-
-			if (sx > 0x100) sx -= 0x200;
-			if (sy > 0x100) sy -= 0x200;
-
-			if (flip_screen())
-			{
-				sx = 240 - sx;
-				sy = 240 - sy;
-				flipx = !flipx;
-				flipy = !flipy;
-			}
-
-
-				m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
-				tile_number,
-				color,
-				flipx, flipy,
-				sx, 240 - sy, 15);
-		}
-
-		source -= 4;
-	}
-}
 
 WRITE16_MEMBER(supduck_state::supduck_4000_w)
 {
@@ -489,6 +449,8 @@ static MACHINE_CONFIG_START( supduck, supduck_state )
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supduck)
+
+	MCFG_DEVICE_ADD("spritegen", TIGEROAD_SPRITE, 0)
 
 	MCFG_PALETTE_ADD("palette", 0x800/2)
 	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit4)

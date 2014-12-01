@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "video/bufsprite.h"
+#include "video/tigeroad_spr.h"
 
 class bionicc_state : public driver_device
 {
@@ -18,7 +19,9 @@ public:
 		m_paletteram(*this, "paletteram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_spritegen(*this, "spritegen")	
+	{ }
 
 	/* memory pointers */
 	required_device<buffered_spriteram16_device> m_spriteram;
@@ -55,8 +58,8 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_bionicc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(bionicc_scanline);
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<tigeroad_spr_device> m_spritegen;
 };
