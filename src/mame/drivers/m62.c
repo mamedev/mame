@@ -2152,12 +2152,6 @@ DRIVER_INIT_MEMBER(m62_state,ldrun4)
 
 DRIVER_INIT_MEMBER(m62_state,kidniki)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
-
-	/* in Kid Niki, bank 0 has code falling from 7fff to 8000, */
-	/* so I have to copy it there because bank switching wouldn't catch it */
-	memcpy(ROM + 0x08000, ROM + 0x10000, 0x2000);
-
 	/* configure memory banks */
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x2000);
 }
