@@ -54,7 +54,6 @@ static const struct game_keys keys_table[] =
 	{ "samba",           0x000a8b5d }, // 840-0020    1999
 	{ "sambap",          0x000a8b5d }, // 840-0020    1999
 	{ "virnbao",         0x00068b58 }, // 840-0021    2000
-	{ "tduno2",          0x2f6f0f8d }, // 840-0022    2000
 	{ "18wheelr",        0x0007cf54 }, // 840-0023    2000
 	{ "marstv",          0x000b8ef5 }, // 840-0025    1999
 	{ "vonot",           0x00010715 }, // 840-0028    2000
@@ -89,6 +88,7 @@ static const struct game_keys keys_table[] =
 	{ "zerogu2",         0x0007c010 }, // 841-0020    2001
 	{ "hmgeo",           0x00038510 }, // HMG016007   2001
 // M1
+	{ "tduno2",          0x2f6f0f8d }, // 840-0022    2000
 	{ "qmegamis",        0x96489bcd }, // 840-0030    2000
 	{ "gram2000",        0x3f5c807f }, // 840-0039    2000
 	{ "vtenis2c",        0x43472d2d }, // 840-0084    2001
@@ -99,13 +99,6 @@ static const struct game_keys keys_table[] =
 	{ "kick4csh",        0xc9570882 }, // 840-0140    2004
 	{ "mtkob2",          0x3892fb3a }, // 840-0150    2003
 	{ "mvsc2",           0x7c6e8bc1 }, // 841-0007-02 2000
-// M4
-	{ "pokasuka",        0x4792bcde }, // 840-0170    2007
-	{ "asndynmt",        0x00008784 }, // 840-0175    2007
-	{ "sl2007",          0x88c274c7 }, // 841-0057    2007
-	{ "ausfache",        0x092b6007 }, // 841-0058    2008
-	{ "illvelo",         0xf3a5982c }, // 841-0059    2008
-	{ "mbaa",            0xab0f2aba }, // 841-0061    2008
 	{ NULL, 0 }    // end of table
 };
 
