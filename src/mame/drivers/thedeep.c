@@ -87,9 +87,7 @@ WRITE8_MEMBER(thedeep_state::thedeep_protection_w)
 			m_rombank = new_rombank;
 			rom = memregion("maincpu")->base();
 			membank("bank1")->set_base(rom + 0x10000 + m_rombank * 0x4000);
-			/* there's code which falls through from the fixed ROM to bank #1, I have to */
-			/* copy it there otherwise the CPU bank switching support will not catch it. */
-			memcpy(rom + 0x08000, rom + 0x10000 + m_rombank * 0x4000, 0x4000);
+
 		}
 		break;
 
@@ -197,9 +195,6 @@ void thedeep_state::thedeep_maincpu_bankswitch(UINT8 bank_trig)
 	m_rombank = new_rombank;
 	rom = memregion("maincpu")->base();
 	membank("bank1")->set_base(rom + 0x10000 + m_rombank * 0x4000);
-	/* there's code which falls through from the fixed ROM to bank #1, I have to */
-	/* copy it there otherwise the CPU bank switching support will not catch it. */
-	memcpy(rom + 0x08000, rom + 0x10000 + m_rombank * 0x4000, 0x4000);
 
 }
 
