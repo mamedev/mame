@@ -24,6 +24,54 @@ The familiar PIC is still present on the back of the system and likely decrypts 
 On this red box the CPU is a Celeron D at 2.8GHz. RAM is 512M DDR PC3200
 The box has Sega number 845-0001D-02
 
+Lindbergh Game List
+-------------------
+                                               Security
+Game                                           Dongle Sticker    PIC Number      DVD Code
+------------------------------------------------------------------------------------------
+ 2 Spicy                                       253-5508-0491     317-0491-COM    DVP-0027A
+ After Burner Climax (EXPORT)                  253-5508-0440A   ^317-0440-COM    DVP-0009
+ Ami-Gyo                                       ?                 ?               ?
+ Answer X Answer                               ?                 ?               ?
+ Answer X Answer 1.1                           ?                 ?               ?
+ Answer X Answer DX                            ?                 ?               ?
+ Answer X Answer Premium                       ?                 ?               ?
+ Club Majesty Extend                           ?                 ?               ?
+ Club Majesty Formal                           ?                 ?               ?
+ Derby Owners Club 2008: Feel the Rush         ?                 ?               DVP-0047A
+ Derby Owners Club 2008: Feel the Rush V2.0    ?                 ?               ?
+ Ghost Squad Evolution                         ?                 ?               ?
+ Harley Davidson: King of the Road             ?                 ?               ?
+ Hummer Extreme                                ?                 ?               ?
+ Initial D Arcade Stage 4                      ?                 ?               DVP-0019
+ Initial D Arcade Stage 4 (rev B)              253-5508-0486E    317-0486-COM    DVP-0030B
+*Initial D Arcade Stage 4 (rev C)              253-5508-0486E    317-0486-COM    DVP-0030C
+*Initial D Arcade Stage 4 (rev D)              253-5508-0486E    317-0486-COM    DVP-0030D
+ Initial D Arcade Stage 5                      ?                 ?               ?
+ Let's Go Jungle (EXPORT)                      253-5508-0442     317-0442-COM    DVP-0011
+ MJ4                                           ?                 ?               ?
+ Outrun 2 Special Tours (EXPORT)               253-5508-0452     317-0452-COM    ?
+ Primeval Hunt                                 ?                 ?               DVP-0048A
+ R-Tuned: Ultimate Street Racing               ?                 ?               DVP-0060
+*Rambo (EXPORT)                                253-5508-0540    ^317-0540-COM    DVP-0069
+*Sega Race TV (EXPORT)                         253-5508-0504    ^317-0504-COM    DVP-0044
+*The House Of The Dead 4 (EXPORT)              253-5508-0427    ^317-0427-COM    DVP-0003A
+ The House Of The Dead EX (JAPAN)              253-5508-0550    ^317-0550-JPN    ?
+ The House Of the Dead 4 Special               ?                 ?               ?
+ Virtua Fighter 5 (EXPORT)                     253-5508-0438     317-0438-COM    ?
+ Virtua Tennis 3 (Power Smash 3) (EXPORT)      253-5508-0434    ^317-0434-COM    DVP-0005A
+*Virtua Tennis 3 (JAPAN)                       253-5508-0506     317-0506-JPN    DVP-0005C
+*VBIOS Update                                  ?                 ?               DVP-0021B
+ WCC Football Intercontinental Clubs 2006-2007 ?                 ?               ?
+ WCC Football Intercontinental Clubs 2007-2008 ?                 ?               ?
+ WCC Football Intercontinental Clubs 2008-2009 ?                 ?               ?
+ WCC Football Intercontinental Clubs 2009-2010 ?                 ?               ?
+
+* denotes these DVDs are archived. 
+^ denotes these PICs are archived. 
+This list is not necessarily correct or complete.
+Corrections and additions to the above are welcome.
+
 
 Mainboard
 ---------
