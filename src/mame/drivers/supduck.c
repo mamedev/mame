@@ -36,7 +36,6 @@ public:
 			m_text_videoram(*this, "textvideoram"),
 			m_fore_videoram(*this, "forevideoram"),
 			m_back_videoram(*this, "backvideoram"),
-			m_paletteram(*this, "paletteram"),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_palette(*this, "palette")
 	{ }
@@ -50,7 +49,6 @@ public:
 	required_shared_ptr<UINT16> m_text_videoram;
 	required_shared_ptr<UINT16> m_fore_videoram;
 	required_shared_ptr<UINT16> m_back_videoram;
-	required_shared_ptr<UINT16> m_paletteram;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -68,7 +66,6 @@ public:
 
 	DECLARE_WRITE16_MEMBER(supduck_4000_w);
 	DECLARE_WRITE16_MEMBER(supduck_4002_w);
-	DECLARE_WRITE16_MEMBER(supduck_paletteram_w);
 
 	TILEMAP_MAPPER_MEMBER(supduk_tilemap_scan);
 
@@ -245,22 +242,6 @@ WRITE16_MEMBER(supduck_state::supduck_4000_w)
 {
 }
 
-WRITE16_MEMBER(supduck_state::supduck_paletteram_w)
-{
-	int r, g, b;
-	data = COMBINE_DATA(&m_paletteram[offset]);
-
-	r = ((data >> 8) & 0x0f);
-	if (data & 0x4000) r |= 0x10;
-
-	g = ((data >> 4 ) & 0x0f);
-	if (data & 0x2000) g |= 0x10;
-
-	b = ((data >> 0 ) & 0x0f);
-	if (data & 0x1000) b |= 0x10;
-
-	m_palette->set_pen_color (offset, rgb_t(r<<3, g<<3, b<<3));
-}
 
 WRITE16_MEMBER(supduck_state::supduck_4002_w)
 {
@@ -308,7 +289,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, supduck_state )
 	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(text_videoram_w) AM_SHARE("textvideoram")
 	AM_RANGE(0xff0000, 0xff3fff) AM_RAM_WRITE(back_videoram_w) AM_SHARE("backvideoram")
 	AM_RANGE(0xff4000, 0xff7fff) AM_RAM_WRITE(fore_videoram_w) AM_SHARE("forevideoram")
-	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_WRITE(supduck_paletteram_w) AM_SHARE("paletteram") // AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM /* working RAM */
 ADDRESS_MAP_END
 
@@ -510,7 +491,7 @@ static MACHINE_CONFIG_START( supduck, supduck_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supduck)
 
 	MCFG_PALETTE_ADD("palette", 0x800/2)
-//  MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB) // can't use this, the RGB bits are the lowest bits with this format, for this game they're the highest bits
+	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit4)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
