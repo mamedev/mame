@@ -3,14 +3,14 @@
 /***************************************************************************
 
   Milton Bradley Simon
-
+  
   Revision A hardware:
   * TMS1000 (has internal ROM), DS75494 lamp driver
-
+  
   Newer revisions have a smaller 16-pin MB4850 chip instead of the TMS1000.
   This one has been decapped too, but we couldn't find an internal ROM.
   It is possibly a cost-reduced custom ASIC specifically for Simon.
-
+  
   Other games assumed to be on similar hardware:
   - Pocket Simon, but there's a chance it only exists with MB4850 chip
   - Super Simon (TMS1100)
@@ -61,11 +61,11 @@ public:
 READ8_MEMBER(simon_state::read_k)
 {
 	UINT8 k = 0;
-
+	
 	// read selected button rows
 	for (int i = 0; i < 4; i++)
 	{
-		static int r[4] = { 0, 1, 2, 9 };
+		const int r[4] = { 0, 1, 2, 9 };
 		if (m_r & (1 << r[i]))
 			k |= m_button_matrix[i]->read();
 	}
@@ -82,7 +82,7 @@ WRITE16_MEMBER(simon_state::write_r)
 	// R7 -> 75494 IN2 -> blue lamp
 	for (int i = 0; i < 4; i++)
 		output_set_lamp_value(i, data >> (4 + i) & 1);
-
+	
 	// R8 -> 75494 IN0 -> speaker
 	m_speaker->level_w(data >> 8 & 1);
 
@@ -106,26 +106,26 @@ WRITE16_MEMBER(simon_state::write_o)
 ***************************************************************************/
 
 static INPUT_PORTS_START( simon )
-	PORT_START("IN.0")
+	PORT_START("IN.0") // R0
 	PORT_CONFNAME( 0x07, 0x02, "Game Select")
 	PORT_CONFSETTING(    0x02, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
 	PORT_CONFSETTING(    0x04, "3" )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN.1")
+	PORT_START("IN.1") // R1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Green Button")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Red Button")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Yellow Button")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Blue Button")
 
-	PORT_START("IN.2")
+	PORT_START("IN.2") // R2
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Start")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Last")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Longest")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN.3")
+	PORT_START("IN.3") // R9
 	PORT_CONFNAME( 0x0f, 0x01, "Skill Level")
 	PORT_CONFSETTING(    0x02, "1" )
 	PORT_CONFSETTING(    0x04, "2" )
@@ -148,24 +148,13 @@ void simon_state::machine_start()
 }
 
 
-static const UINT16 simon_output_pla[0x20] =
-{
-	/* The output PLA just maps 1 2 4 8 and SL to O0-O4 */
-	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-	0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
-};
-
-
 static MACHINE_CONFIG_START( simon, simon_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1000, SIMON_RC_CLOCK)
-	MCFG_TMS1XXX_OUTPUT_PLA(simon_output_pla)
-	MCFG_TMS1XXX_READ_K(READ8(simon_state, read_k))
-	MCFG_TMS1XXX_WRITE_O(WRITE16(simon_state, write_o))
-	MCFG_TMS1XXX_WRITE_R(WRITE16(simon_state, write_r))
+	MCFG_TMS1XXX_READ_K_CB(READ8(simon_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(simon_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(simon_state, write_r))
 
 	MCFG_DEFAULT_LAYOUT(layout_simon)
 
@@ -188,6 +177,11 @@ MACHINE_CONFIG_END
 ROM_START( simon )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "tms1000.u1", 0x0000, 0x0400, CRC(9961719d) SHA1(35dddb018a8a2b31f377ab49c1f0cb76951b81c0) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_simon_mpla.pla", 0, 867, CRC(52f7c1f1) SHA1(dbc2634dcb98eac173ad0209df487cad413d08a5) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_simon_opla.pla", 0, 365, CRC(2943c71b) SHA1(bd5bb55c57e7ba27e49c645937ec1d4e67506601) )
 ROM_END
 
 

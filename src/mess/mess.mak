@@ -2074,6 +2074,7 @@ $(MAME_DRIVERS)/cdi.o:      $(MAME_LAYOUT)/cdi.lh
 $(MESS_DRIVERS)/chessmst.o: $(MESS_LAYOUT)/chessmst.lh
 $(MESS_DRIVERS)/chesstrv.o: $(MESS_LAYOUT)/chesstrv.lh \
 							$(MESS_LAYOUT)/borisdpl.lh
+$(MESS_DRIVERS)/comp4.o:    $(MESS_LAYOUT)/comp4.lh
 $(MESS_DRIVERS)/cp1.o:      $(MESS_LAYOUT)/cp1.lh
 $(MESS_DRIVERS)/cvicny.o:   $(MESS_LAYOUT)/cvicny.lh
 $(MESS_DRIVERS)/coco3.o:    $(MESS_LAYOUT)/coco3.lh
@@ -2154,6 +2155,10 @@ $(MESS_DRIVERS)/tec1.o:     $(MESS_LAYOUT)/tec1.lh
 $(MESS_DRIVERS)/tecnbras.o: $(MESS_LAYOUT)/tecnbras.lh
 $(MESS_DRIVERS)/ti74.o:     $(MESS_LAYOUT)/ti74.lh \
 							$(MESS_LAYOUT)/ti95.lh
+$(MESS_DRIVERS)/ticalc1x.o: $(MESS_LAYOUT)/ti1270.lh \
+							$(MESS_LAYOUT)/ti30.lh \
+							$(MESS_LAYOUT)/tisr16.lh \
+							$(MESS_LAYOUT)/wizatron.lh
 $(MESS_DRIVERS)/tk80.o:     $(MESS_LAYOUT)/tk80.lh
 $(MESS_DRIVERS)/tm990189.o: $(MESS_LAYOUT)/tm990189.lh \
 							$(MESS_LAYOUT)/tm990189v.lh
