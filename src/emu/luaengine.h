@@ -84,6 +84,8 @@ private:
 	static int l_emu_hook_output(lua_State *L);
 	static int l_emu_exit(lua_State *L);
 	static int l_emu_start(lua_State *L);
+	static int l_emu_pause(lua_State *L);
+	static int l_emu_unpause(lua_State *L);
 
 	void resume(void *L, INT32 param);
 	void report_errors(int status);

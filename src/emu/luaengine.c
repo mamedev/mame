@@ -217,6 +217,22 @@ int lua_engine::l_emu_romname(lua_State *L)
 }
 
 //-------------------------------------------------
+//  emu_pause/emu_unpause - pause/unpause game
+//-------------------------------------------------
+
+int lua_engine::l_emu_pause(lua_State *L)
+{
+	luaThis->machine().pause();
+	return 0;
+}
+
+int lua_engine::l_emu_unpause(lua_State *L)
+{
+	luaThis->machine().resume();
+	return 0;
+}
+
+//-------------------------------------------------
 //  emu_keypost - post keys to natural keyboard
 //-------------------------------------------------
 
@@ -514,6 +530,8 @@ void lua_engine::initialize()
 			.addCFunction ("after",       l_emu_after )
 			.addCFunction ("exit",        l_emu_exit )
 			.addCFunction ("start",       l_emu_start )
+			.addCFunction ("pause",       l_emu_pause )
+			.addCFunction ("unpause",     l_emu_unpause )
 			.beginClass <machine_manager> ("manager")
 				.addFunction ("machine", &machine_manager::machine)
 				.addFunction ("options", &machine_manager::options)
