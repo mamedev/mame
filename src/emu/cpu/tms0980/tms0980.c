@@ -48,6 +48,12 @@ cycle #5
     - Execute:
         1. Execute BRANCH/CALL/RETN part #1
 
+*/
+
+#include "tms0980.h"
+#include "debugger.h"
+
+/*
 
 The MCU cores contains a set of fixed instructions and a set of
 instructions created using microinstructions. A subset of the
@@ -58,10 +64,55 @@ cycle #0: 15TN, ATN, CIN, CKN, CKP, DMTP, MTN, MTP, NATN, NDMTP, YTP
 cycle #2: C8(?), CKM, NE(?), STO
 cycle #3,#4: AUTA, AUTY
 
+unknown cycle: CME, SSE, SSS
+
 */
 
-#include "tms0980.h"
-#include "debugger.h"
+/* Microinstructions */
+#define M_15TN              0x00000001 /* 15 to -ALU */
+#define M_ATN               0x00000002 /* ACC to -ALU */
+#define M_AUTA              0x00000004 /* ALU to ACC */
+#define M_AUTY              0x00000008 /* ALU to Y */
+#define M_C8                0x00000010 /* CARRY8 to STATUS */
+#define M_CIN               0x00000020 /* Carry In to ALU */
+#define M_CKM               0x00000040 /* CKB to MEM */
+#define M_CKN               0x00000080 /* CKB to -ALU */
+#define M_CKP               0x00000100 /* CKB to +ALU */
+#define M_CME               0x00000200 /* Conditional Memory Enable */
+#define M_DMTP              0x00000400 /* DAM to +ALU */
+#define M_MTN               0x00000800 /* MEM to -ALU */
+#define M_MTP               0x00001000 /* MEM to +ALU */
+#define M_NATN              0x00002000 /* ~ACC to -ALU */
+#define M_NDMTP             0x00004000 /* ~DAM to +ALU */
+#define M_NE                0x00008000 /* COMP to STATUS */
+#define M_SSE               0x00010000 /* Special Status Enable */
+#define M_SSS               0x00020000 /* Special Status Sample */
+#define M_STO               0x00040000 /* ACC to MEM */
+#define M_STSL              0x00080000 /* STATUS to Status Latch */
+#define M_YTP               0x00100000 /* Y to +ALU */
+
+/* Standard/fixed instructions - these are documented more in their specific handlers below */
+#define F_BR                0x00000001
+#define F_CALL              0x00000002
+#define F_CLO               0x00000004
+#define F_COMC              0x00000008
+#define F_COMX              0x00000010
+#define F_COMX8             0x00000020
+#define F_LDP               0x00000040
+#define F_LDX               0x00000080
+#define F_OFF               0x00000100
+#define F_RBIT              0x00000200
+#define F_REAC              0x00000400
+#define F_RETN              0x00000800
+#define F_RSTR              0x00001000
+#define F_SAL               0x00002000
+#define F_SBIT              0x00004000
+#define F_SBL               0x00008000
+#define F_SEAC              0x00010000
+#define F_SETR              0x00020000
+#define F_TDO               0x00040000
+#define F_XDA               0x00080000
+
 
 // supported types:
 // note: dice information assumes the orientation is pictured with RAM at the bottom-left
@@ -286,53 +337,6 @@ void tms0980_cpu_device::state_string_export(const device_state_entry &entry, as
 			break;
 	}
 }
-
-
-
-/* Standard/fixed instructions */
-#define F_BR                0x00000001
-#define F_CALL              0x00000002
-#define F_CLO               0x00000004
-#define F_COMC              0x00000008
-#define F_COMX              0x00000010
-#define F_COMX8             0x00000020
-#define F_LDP               0x00000040
-#define F_LDX               0x00000080
-#define F_OFF               0x00000100
-#define F_RBIT              0x00000200
-#define F_REAC              0x00000400
-#define F_RETN              0x00000800
-#define F_RSTR              0x00001000
-#define F_SAL               0x00002000
-#define F_SBIT              0x00004000
-#define F_SBL               0x00008000
-#define F_SEAC              0x00010000
-#define F_SETR              0x00020000
-#define F_TDO               0x00040000
-#define F_XDA               0x00080000
-
-/* Microinstructions */
-#define M_15TN              0x00000001
-#define M_ATN               0x00000002
-#define M_AUTA              0x00000004
-#define M_AUTY              0x00000008
-#define M_C8                0x00000010
-#define M_CIN               0x00000020
-#define M_CKM               0x00000040
-#define M_CKN               0x00000080
-#define M_CKP               0x00000100
-#define M_CME               0x00000200
-#define M_DMTP              0x00000400
-#define M_MTN               0x00000800
-#define M_MTP               0x00001000
-#define M_NATN              0x00002000
-#define M_NDMTP             0x00004000
-#define M_NE                0x00008000
-#define M_SSE               0x00010000
-#define M_SSS               0x00020000
-#define M_STO               0x00040000
-#define M_STSL              0x00080000
-#define M_YTP               0x00100000
 
 
 
