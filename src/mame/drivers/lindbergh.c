@@ -31,6 +31,7 @@ Game                                           Dongle Sticker    PIC Number     
 ------------------------------------------------------------------------------------------
  2 Spicy                                       253-5508-0491     317-0491-COM    DVP-0027A
  After Burner Climax (EXPORT)                  253-5508-0440A   ^317-0440-COM    DVP-0009
+ After Burner Climax CE                        ?                 ?               DVP-0031A
  Ami-Gyo                                       ?                 ?               ?
  Answer X Answer                               ?                 ?               ?
  Answer X Answer 1.1                           ?                 ?               ?
@@ -44,24 +45,37 @@ Game                                           Dongle Sticker    PIC Number     
  Harley Davidson: King of the Road             ?                 ?               ?
  Hummer Extreme                                ?                 ?               ?
  Initial D Arcade Stage 4                      ?                 ?               DVP-0019
- Initial D Arcade Stage 4 (rev B)              253-5508-0486E    317-0486-COM    DVP-0030B
-*Initial D Arcade Stage 4 (rev C)              253-5508-0486E    317-0486-COM    DVP-0030C
-*Initial D Arcade Stage 4 (rev D)              253-5508-0486E    317-0486-COM    DVP-0030D
+ Initial D Arcade Stage 4 (rev A)              ?                 ?               DVP-0019A
+ Initial D Arcade Stage 4 (rev B)              ?                 ?               DVP-0019B
+ Initial D Arcade Stage 4 (rev D)              ?                 ?               DVP-0019D
+ Initial D Arcade Stage 4 (rev G)              ?                 ?               DVP-0019G
+ Initial D4                                    ?                 ?               DVP-0030
+ Initial D4 (rev B)                            253-5508-0486E    317-0486-COM    DVP-0030B
+*Initial D4 (rev C)                            253-5508-0486E    317-0486-COM    DVP-0030C
+*Initial D4 (rev D)                            253-5508-0486E    317-0486-COM    DVP-0030D
  Initial D Arcade Stage 5                      ?                 ?               ?
  Let's Go Jungle (EXPORT)                      253-5508-0442     317-0442-COM    DVP-0011
  MJ4                                           ?                 ?               ?
- Outrun 2 Special Tours (EXPORT)               253-5508-0452     317-0452-COM    ?
+ OutRun 2 Special Tours (EXPORT)               253-5508-0452     317-0452-COM    ?
+ OutRun 2 SP SDX                               ?                 ?               DVP-0015A
  Primeval Hunt                                 ?                 ?               DVP-0048A
  R-Tuned: Ultimate Street Racing               ?                 ?               DVP-0060
 *Rambo (EXPORT)                                253-5508-0540    ^317-0540-COM    DVP-0069
-*Sega Race TV (EXPORT)                         253-5508-0504    ^317-0504-COM    DVP-0044
+ SEGA Network Taisen Mahjong MJ4 (rev A)       ?                 ?               DVP-0049A
+ SEGA Network Taisen Mahjong MJ4 (rev F)       ?                 ?               DVP-0049F
+ SEGA Network Taisen Mahjong MJ4 (rev G)       ?                 ?               DVP-0049G
+*SEGA-Race TV (EXPORT)                         253-5508-0504    ^317-0504-COM    DVP-0044
+ StarHorse 2: Fifth Expansion (rev D)          ?                 ?               DVP-0082D
+ StarHorse 2: Fifth Expansion (rev E)          ?                 ?               DVP-0082E
 *The House Of The Dead 4 (EXPORT)              253-5508-0427    ^317-0427-COM    DVP-0003A
  The House Of The Dead EX (JAPAN)              253-5508-0550    ^317-0550-JPN    ?
  The House Of the Dead 4 Special               ?                 ?               ?
- Virtua Fighter 5 (EXPORT)                     253-5508-0438     317-0438-COM    ?
+*VBIOS Update                                  ?                 ?               DVP-0021B
+ VBIOS Update [For VTF]                        ?                 ?               DVP-0023A
+ Virtua Fighter 5 (EXPORT)                     253-5508-0438     317-0438-COM    DVP-0008E
+ Virtua Tennis 3 (Power Smash 3)               ?                 ?               DVP-0005
  Virtua Tennis 3 (Power Smash 3) (EXPORT)      253-5508-0434    ^317-0434-COM    DVP-0005A
 *Virtua Tennis 3 (JAPAN)                       253-5508-0506     317-0506-JPN    DVP-0005C
-*VBIOS Update                                  ?                 ?               DVP-0021B
  WCC Football Intercontinental Clubs 2006-2007 ?                 ?               ?
  WCC Football Intercontinental Clubs 2007-2008 ?                 ?               ?
  WCC Football Intercontinental Clubs 2008-2009 ?                 ?               ?
