@@ -14,7 +14,6 @@ public:
 		m_bg15(*this, "bg15"),
 		m_ram(*this, "ram"),
 		m_ram2(*this, "ram2"),
-		m_rombank(*this, "rombank"),
 		m_maincpu(*this,"maincpu"),
 		m_subcpu(*this,"sub"),
 		m_kaneko_spr(*this, "kan_spr"),
@@ -36,7 +35,6 @@ public:
 	required_shared_ptr<UINT16> m_ram2;
 	UINT16 m_old_mcu_nmi1;
 	UINT16 m_old_mcu_nmi2;
-	required_shared_ptr<UINT16> m_rombank;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -47,11 +45,12 @@ public:
 	DECLARE_WRITE8_MEMBER(galpani2_mcu_nmi1_w);
 	DECLARE_WRITE8_MEMBER(galpani2_mcu_nmi2_w);
 	DECLARE_WRITE8_MEMBER(galpani2_coin_lockout_w);
-	DECLARE_READ16_MEMBER(galpani2_bankedrom_r);
 	DECLARE_READ16_MEMBER(galpani2_eeprom_r);
 	DECLARE_WRITE16_MEMBER(galpani2_eeprom_w);
 	DECLARE_WRITE8_MEMBER(galpani2_oki1_bank_w);
 	DECLARE_WRITE8_MEMBER(galpani2_oki2_bank_w);
+	DECLARE_WRITE16_MEMBER(subdatabank_select_w);
+	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(galpani2);
