@@ -441,17 +441,17 @@ void tms1xxx_cpu_device::device_start()
 	save_item(NAME(m_subcycle));
 
 	// register state for debugger
-	state_add(TMS0980_PC,     "PC",     m_pc    ).callimport().callexport().formatstr("%02X");
-	state_add(TMS0980_SR,     "SR",     m_sr    ).callimport().callexport().formatstr("%01X");
-	state_add(TMS0980_PA,     "PA",     m_pa    ).callimport().callexport().formatstr("%01X");
-	state_add(TMS0980_PB,     "PB",     m_pb    ).callimport().callexport().formatstr("%01X");
-	state_add(TMS0980_A,      "A",      m_a     ).callimport().callexport().formatstr("%01X");
-	state_add(TMS0980_X,      "X",      m_x     ).callimport().callexport().formatstr("%01X");
-	state_add(TMS0980_Y,      "Y",      m_y     ).callimport().callexport().formatstr("%01X");
-	state_add(TMS0980_STATUS, "STATUS", m_status).callimport().callexport().formatstr("%01X");
+	state_add(TMS0980_PC,     "PC",     m_pc    ).formatstr("%02X");
+	state_add(TMS0980_SR,     "SR",     m_sr    ).formatstr("%01X");
+	state_add(TMS0980_PA,     "PA",     m_pa    ).formatstr("%01X");
+	state_add(TMS0980_PB,     "PB",     m_pb    ).formatstr("%01X");
+	state_add(TMS0980_A,      "A",      m_a     ).formatstr("%01X");
+	state_add(TMS0980_X,      "X",      m_x     ).formatstr("%01X");
+	state_add(TMS0980_Y,      "Y",      m_y     ).formatstr("%01X");
+	state_add(TMS0980_STATUS, "STATUS", m_status).formatstr("%01X");
 
-	state_add(STATE_GENPC, "curpc", m_pc).callimport().callexport().formatstr("%8s").noshow();
-	state_add(STATE_GENFLAGS, "GENFLAGS", m_sr).callimport().callexport().formatstr("%8s").noshow();
+	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%8s").noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_sr).formatstr("%8s").noshow();
 
 	m_icountptr = &m_icount;
 }
