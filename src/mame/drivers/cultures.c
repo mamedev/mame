@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
+#include "machine/bankdev.h"
 
 #define MCLK 16000000
 
@@ -28,9 +29,10 @@ public:
 		m_bg2_regs_y(*this, "bg2_regs_y"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_vrambank(*this, "vrambank")
+		{ }
 
-	UINT8     m_paletteram[0x4000];
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_bg0_videoram;
 	required_shared_ptr<UINT8> m_bg0_regs_x;
@@ -44,11 +46,9 @@ public:
 	tilemap_t  *m_bg0_tilemap;
 	tilemap_t  *m_bg1_tilemap;
 	tilemap_t  *m_bg2_tilemap;
-	int      m_video_bank;
 	int      m_irq_enable;
 	int      m_bg1_bank;
 	int      m_bg2_bank;
-	int      m_old_bank;
 	DECLARE_WRITE8_MEMBER(cpu_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(bg0_videoram_w);
 	DECLARE_WRITE8_MEMBER(misc_w);
@@ -64,6 +64,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<address_map_bank_device> m_vrambank;
 };
 
 
@@ -138,45 +139,19 @@ UINT32 cultures_state::screen_update_cultures(screen_device &screen, bitmap_ind1
 WRITE8_MEMBER(cultures_state::cpu_bankswitch_w)
 {
 	membank("bank1")->set_entry(data & 0x0f);
-	m_video_bank = ~data & 0x20;
+	m_vrambank->set_bank((data & 0x20)>>5);
 }
+
 
 WRITE8_MEMBER(cultures_state::bg0_videoram_w)
 {
-	if (m_video_bank == 0)
-	{
-		int r, g, b, datax;
-		m_paletteram[offset] = data;
-		offset >>= 1;
-		datax = m_paletteram[offset * 2] + 256 * m_paletteram[offset * 2 + 1];
-
-		r = ((datax >> 7) & 0x1e) | ((datax & 0x4000) ? 0x1 : 0);
-		g = ((datax >> 3) & 0x1e) | ((datax & 0x2000) ? 0x1 : 0);
-		b = ((datax << 1) & 0x1e) | ((datax & 0x1000) ? 0x1 : 0);
-
-		m_palette->set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
-	}
-	else
-	{
-		m_bg0_videoram[offset] = data;
-		m_bg0_tilemap->mark_tile_dirty(offset >> 1);
-	}
+	m_bg0_videoram[offset] = data;
+	m_bg0_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 WRITE8_MEMBER(cultures_state::misc_w)
 {
-	int new_bank = data & 0xf;
-
-	if (m_old_bank != new_bank)
-	{
-		// oki banking
-		UINT8 *src = memregion("oki")->base() + 0x40000 + 0x20000 * new_bank;
-		UINT8 *dst = memregion("oki")->base() + 0x20000;
-		memcpy(dst, src, 0x20000);
-
-		m_old_bank = new_bank;
-	}
-
+	membank("okibank")->set_entry(data&0x0f);
 	m_irq_enable = data & 0x80;
 }
 
@@ -196,10 +171,21 @@ WRITE8_MEMBER(cultures_state::bg_bank_w)
 	coin_counter_w(machine(), 0, data & 0x10);
 }
 
+
+static ADDRESS_MAP_START( oki_map, AS_0, 8, cultures_state )
+	AM_RANGE(0x00000, 0x1ffff) AM_ROM
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( vrambank_map, AS_PROGRAM, 8, cultures_state )
+	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(bg0_videoram_w) AM_SHARE("bg0_videoram")	
+	AM_RANGE(0x4000, 0x6fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( cultures_map, AS_PROGRAM, 8, cultures_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE(bg0_videoram_w) AM_SHARE("bg0_videoram")
+	AM_RANGE(0x8000, 0xbfff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -380,10 +366,9 @@ void cultures_state::machine_start()
 	UINT8 *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 16, &ROM[0x0000], 0x4000);
+	membank("okibank")->configure_entries(0, 0x200000 / 0x20000, memregion("oki")->base(), 0x20000);
+	membank("okibank")->set_entry(0);
 
-	save_item(NAME(m_paletteram));
-	save_item(NAME(m_old_bank));
-	save_item(NAME(m_video_bank));
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_bg1_bank));
 	save_item(NAME(m_bg2_bank));
@@ -391,12 +376,14 @@ void cultures_state::machine_start()
 
 void cultures_state::machine_reset()
 {
-	m_old_bank = -1;
-	m_video_bank = 0;
+	membank("okibank")->set_entry(0);
+	m_vrambank->set_bank(1);
 	m_irq_enable = 0;
 	m_bg1_bank = 0;
 	m_bg2_bank = 0;
 }
+
+
 
 static MACHINE_CONFIG_START( cultures, cultures_state )
 
@@ -405,6 +392,13 @@ static MACHINE_CONFIG_START( cultures, cultures_state )
 	MCFG_CPU_PROGRAM_MAP(cultures_map)
 	MCFG_CPU_IO_MAP(cultures_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cultures_state,  cultures_interrupt)
+
+	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(vrambank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(15)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 
 	/* video hardware */
@@ -417,14 +411,17 @@ static MACHINE_CONFIG_START( cultures, cultures_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", culture)
-	MCFG_PALETTE_ADD("palette", 0x2000)
-
+	MCFG_PALETTE_ADD("palette", 0x3000/2)
+	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit0)
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_LITTLE)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", (MCLK/1024)*132, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", MCLK/8, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+
 MACHINE_CONFIG_END
 
 /*
@@ -485,9 +482,8 @@ ROM_START( cultures )
 	ROM_LOAD( "bg1t.u67",     0x200000, 0x100000, CRC(d2e594ee) SHA1(a84b5ab62dec1867d433ccaeb1381e7593958cf0) )
 	/* 0x300000 - 0x3fffff empty */
 
-	ROM_REGION( 0x240000, "oki", 0 )
-	ROM_LOAD( "pcm.u87",      0x040000, 0x200000, CRC(84206475) SHA1(d1423bd5c7425e121fb4e7845cf57801e9afa7b3) )
-	ROM_RELOAD(               0x000000, 0x020000 )
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "pcm.u87",      0x000000, 0x200000, CRC(84206475) SHA1(d1423bd5c7425e121fb4e7845cf57801e9afa7b3) )
 ROM_END
 
 
