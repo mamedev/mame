@@ -184,7 +184,7 @@
 #define SET_INPUT_FULL()            (m_latch_control &= ~LCTRL_INPUT_EMPTY)
 
 
-/* These are the some of the control register, we dont use them all */
+/* These are some of the control registers. We don't use them all */
 enum
 {
 	IDMA_CONTROL_REG = 0,   /* 3fe0 */

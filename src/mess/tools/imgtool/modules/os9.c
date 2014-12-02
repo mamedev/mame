@@ -673,7 +673,7 @@ static imgtoolerr_t os9_diskimage_open(imgtool_image *image, imgtool_stream *str
 		return IMGTOOLERR_OUTOFMEMORY;
 	memset(info->allocation_bitmap, 0, info->allocation_bitmap_bytes);
 
-	/* sectors per track and track size dont jive? */
+	/* sectors per track and track size don't jive? */
 	if (info->sectors_per_track != track_size_in_sectors)
 		return IMGTOOLERR_CORRUPTIMAGE;
 

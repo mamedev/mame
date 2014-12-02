@@ -20,7 +20,7 @@
     it is perfectly possible to generate other sounds with different rom code and data.
 
     Most upd17XXX devices are typically 4bit NEC MCUs, however based on information
-    in in "Electronic Speech Synthesis" by Geoff Bristow (ISBN 0-07-007912-9, pages 148-152)
+    in "Electronic Speech Synthesis" by Geoff Bristow (ISBN 0-07-007912-9, pages 148-152)
     the upd1770/1771 is not one of these 4-bit ones.
 
     The uPD1770/uPD1771 SSM is a 16-bit-wide rom/ram mcu with 8kb (4kw) of rom code,
@@ -138,7 +138,7 @@
     pin  6 is tied to the   PC3 pin of the upD7801 CPU
     pin 26 is tied to the  INT1 pin of the upD7801 (CPU pin 12),
 
-    1,2,3,28,27 dont generate any digital signals
+    1,2,3,28,27 don't generate any digital signals
     6 seems to be lowered 2.5 ms before an audio write
     7  is always low.
     12 is always high
@@ -404,7 +404,7 @@ WRITE8_MEMBER( upd1771c_device::write )
 				m_t_timbre = (m_packet[1] & 0xe0) >> 5;
 				m_t_offset = (m_packet[1] & 0x1f);
 				m_t_period = m_packet[2];
-				//smaller periods dont all equal to 0x20
+				//smaller periods don't all equal to 0x20
 				if (m_t_period < 0x20)
 					m_t_period = 0x20;
 

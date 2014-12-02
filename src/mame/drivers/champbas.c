@@ -320,7 +320,7 @@ static ADDRESS_MAP_START( exctsccr_main_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(champbas_gfxbank_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(champbas_flipscreen_w)
 	AM_RANGE(0xa006, 0xa006) AM_WRITE(champbas_mcu_halt_w)
-	AM_RANGE(0xa007, 0xa007) AM_WRITENOP /* This is also MCU control, but i dont need it */
+	AM_RANGE(0xa007, 0xa007) AM_WRITENOP /* This is also MCU control, but I don't need it */
 
 	AM_RANGE(0xa040, 0xa06f) AM_WRITEONLY AM_SHARE("spriteram") /* Sprite pos */
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(soundlatch_byte_w)

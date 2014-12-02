@@ -523,7 +523,7 @@ WRITE16_MEMBER(gaelco3d_state::tms_comm_w)
  *
  *************************************/
 
-/* These are the some of the control register, we dont use them all */
+/* These are some of the control registers. We don't use them all */
 enum
 {
 	S1_AUTOBUF_REG = 15,
@@ -663,7 +663,7 @@ WRITE32_MEMBER(gaelco3d_state::adsp_tx_callback)
 			/* get the base value, since we need to keep it around for wrapping */
 			source -= m_adsp_incs;
 
-			/* make it go back one so we dont lose the first sample */
+			/* make it go back one so we don't lose the first sample */
 			m_adsp->set_state_int(ADSP2100_I0 + m_adsp_ireg, source);
 
 			/* save it as it is now */
