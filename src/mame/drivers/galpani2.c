@@ -513,7 +513,7 @@ static INPUT_PORTS_START( galpani2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-//  PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_LOW )
+ 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SERVICE2  ) // this button is used in gp2se as an alt way to bring up the service menu, booting with it held down breaks the game tho!
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_TILT     )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
