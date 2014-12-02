@@ -41,7 +41,7 @@ REF. 020419
 Notes:
       SH4       - Hitachi HD6417750S SH4 CPU (BGA)
       K4S643232 - Samsung K4S643232E-TC70 64M x 32-bit SDRAM (TSSOP86)
-      GFX       - Unknown BGA graphics chip (heatsinked)
+      GFX       - NEC PowerVR Neon 250
       FLASH.IC* - Samsung K9F2808U0B 128MBit (16M + 512k Spare x 8-bit) FlashROM (TSOP48)
       EPF10K50  - Altera Flex EPF10K50EQC240-3 FPGA (QFP240)
       EPC1PC8   - Altera EPC1PC8 FPGA Configuration Device (DIP8)
@@ -101,8 +101,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu") { }
 
-	DECLARE_READ64_MEMBER(area1_r);
-	DECLARE_WRITE64_MEMBER(area1_w);
+	DECLARE_READ64_MEMBER(control_r);
+	DECLARE_WRITE64_MEMBER(control_w);
 	DECLARE_READ64_MEMBER(area2_r);
 	DECLARE_WRITE64_MEMBER(area2_w);
 	DECLARE_READ64_MEMBER(area3_r);
@@ -124,6 +124,8 @@ public:
 
 	required_device<sh4_device> m_maincpu;
 	required_device<sh4_device> m_subcpu;
+protected:
+	bool m_slaverun;
 };
 
 
@@ -167,7 +169,7 @@ inline UINT32 atvtrack_state::decode64_32(offs_t offset64, UINT64 data, UINT64 m
 	return 0;
 }
 
-READ64_MEMBER(atvtrack_state::area1_r)
+READ64_MEMBER(atvtrack_state::control_r)
 {
 	UINT32 addr;
 
@@ -180,7 +182,7 @@ READ64_MEMBER(atvtrack_state::area1_r)
 	return -1;
 }
 
-WRITE64_MEMBER(atvtrack_state::area1_w)
+WRITE64_MEMBER(atvtrack_state::control_w)
 {
 	UINT32 addr, dat; //, old;
 
@@ -189,9 +191,10 @@ WRITE64_MEMBER(atvtrack_state::area1_w)
 //  old = m_area1_data[addr];
 	m_area1_data[addr] = dat;
 	if (addr == (0x00020000-0x00020000)/4) {
-		if (data & 4) {
+		if ((data & 4) && m_slaverun)
 			m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-		}
+		else
+			m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 	logerror("Write %08x at %08x ",dat, 0x20000+addr*4+0);
 	logbinary(dat);
@@ -340,6 +343,10 @@ WRITE64_MEMBER(atvtrack_state::ioport_w)
 #endif
 
 	if (offset == SH4_IOPORT_16/8) {
+		if ((data & 0xf000) == 0x7000) {
+			if (data & 0x0100)
+				m_slaverun = true;
+		}
 		logerror("SH4 16bit i/o port write ");
 		logbinary((UINT32)data,15,0);
 		logerror("\n");
@@ -407,14 +414,15 @@ void smashdrv_state::machine_start()
 
 void smashdrv_state::machine_reset()
 {
-
+	m_slaverun = false;
+	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 // ATV Track
 
 static ADDRESS_MAP_START( atvtrack_main_map, AS_PROGRAM, 64, atvtrack_state )
 	AM_RANGE(0x00000000, 0x000003ff) AM_RAM AM_SHARE("sharedmem")
-	AM_RANGE(0x00020000, 0x00020007) AM_READWRITE(area1_r, area1_w) // control registers
+	AM_RANGE(0x00020000, 0x00020007) AM_READWRITE(control_r, control_w) // control registers
 //	AM_RANGE(0x00020040, 0x0002007f) // audio DAC buffer
 	AM_RANGE(0x14000000, 0x14000007) AM_READWRITE(area2_r, area2_w) // data
 	AM_RANGE(0x14100000, 0x14100007) AM_READWRITE(area3_r, area3_w) // command
@@ -432,12 +440,15 @@ static ADDRESS_MAP_START( smashdrv_main_map, AS_PROGRAM, 64, smashdrv_state )
 	AM_RANGE(0x00000000, 0x03ffffff) AM_ROM
 	AM_RANGE(0x0c000000, 0x0c7fffff) AM_RAM
 	AM_RANGE(0x10000000, 0x100003ff) AM_RAM AM_SHARE("sharedmem")
+	AM_RANGE(0x10000400, 0x10000407) AM_READWRITE(control_r, control_w) // control registers
+
 // 0x10000400 - 0x1000043F control registers
 // 0x10000440 - 0x1000047F Audio DAC buffer
 	AM_RANGE(0x14000000, 0x143fffff) AM_ROM AM_REGION("data", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( smashdrv_main_port, AS_IO, 64, smashdrv_state )
+	AM_RANGE(0x00, 0x1f) AM_READWRITE(ioport_r, ioport_w)
 ADDRESS_MAP_END
 
 // Sub CPU (same for both games)
@@ -446,6 +457,7 @@ static ADDRESS_MAP_START( atvtrack_sub_map, AS_PROGRAM, 64, atvtrack_state )
 	AM_RANGE(0x00000000, 0x000003ff) AM_RAM AM_SHARE("sharedmem")
 	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM
 // 0x14000000 - 0x1400xxxx GPU registers
+	AM_RANGE(0x18000000, 0x19ffffff) AM_RAM
 // 0x18000000 - 0x19FFFFFF GPU RAM (32MB)
 ADDRESS_MAP_END
 
@@ -582,5 +594,5 @@ ROM_END
 GAME( 2002, atvtrack,  0,          atvtrack,    atvtrack, driver_device,    0, ROT0, "Gaelco", "ATV Track (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2002, atvtracka, atvtrack,   atvtrack,    atvtrack, driver_device,    0, ROT0, "Gaelco", "ATV Track (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
-// not the same HW, but has dual SH4 at least
+// almost identical PCB, FlashROM mapping and master registers addresses different
 GAME( 2000, smashdrv, 0,           smashdrv,    atvtrack, driver_device,    0, ROT0, "Gaelco", "Smashing Drive", GAME_NOT_WORKING | GAME_NO_SOUND )
