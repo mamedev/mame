@@ -751,478 +751,478 @@
 
 	<!-- Type-in BASIC programs -->
 
-	<!-- 
-    These programs were downloaded as .bas files, converted to .bin and then converted to .wav, thanks to the tools by Ensjo at 
-    http://mc-1000.wikispaces.com/file/view/aplicativos-cassete-mc1000.zip/267884614/aplicativos-cassete-mc1000.zip (Requires Java) 
-    -->
+	<!--
+	These programs were downloaded as .bas files, converted to .bin and then converted to .wav, thanks to the tools by Ensjo at
+	http://mc-1000.wikispaces.com/file/view/aplicativos-cassete-mc1000.zip/267884614/aplicativos-cassete-mc1000.zip (Requires Java)
+	-->
 
 <!--
-	<software name="amazing">
-		<description>Amazing</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="amazing">
+        <description>Amazing</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="302892">
-				<rom name="amazing 2.wav" size="302892" crc="93239a52" sha1="ae135b159cb8246d8617097d3a239959ff9cb929" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="mc1000_cass">
-			<dataarea name="cass" size="325164">
-				<rom name="amazing 3.wav" size="325164" crc="53bb3ffd" sha1="6066742b1e36f05887c3de7c0cdba3715e56d50c" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass3" interface="mc1000_cass">
-			<dataarea name="cass" size="232668">
-				<rom name="amazing.wav" size="232668" crc="9dec1422" sha1="33e5386fe8ef60cf5501b1891a30b36651761c6c" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="302892">
+                <rom name="amazing 2.wav" size="302892" crc="93239a52" sha1="ae135b159cb8246d8617097d3a239959ff9cb929" offset="0" />
+            </dataarea>
+        </part>
+        <part name="cass2" interface="mc1000_cass">
+            <dataarea name="cass" size="325164">
+                <rom name="amazing 3.wav" size="325164" crc="53bb3ffd" sha1="6066742b1e36f05887c3de7c0cdba3715e56d50c" offset="0" />
+            </dataarea>
+        </part>
+        <part name="cass3" interface="mc1000_cass">
+            <dataarea name="cass" size="232668">
+                <rom name="amazing.wav" size="232668" crc="9dec1422" sha1="33e5386fe8ef60cf5501b1891a30b36651761c6c" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="arquivo">
-		<description>Mostra Nome de Arquivo</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="arquivo">
+        <description>Mostra Nome de Arquivo</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="68844">
-				<rom name="mostra nome de arquivo.wav" size="68844" crc="1dbd1e56" sha1="394f0e1f93b777329eae3c79314d352a84c84815" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="68844">
+                <rom name="mostra nome de arquivo.wav" size="68844" crc="1dbd1e56" sha1="394f0e1f93b777329eae3c79314d352a84c84815" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="aventura">
-		<description>Aventura</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="aventura">
+        <description>Aventura</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="702764">
-				<rom name="aventura.wav" size="702764" crc="82a6263b" sha1="834d9511e22f5c34244923108366201e82b89179" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="702764">
+                <rom name="aventura.wav" size="702764" crc="82a6263b" sha1="834d9511e22f5c34244923108366201e82b89179" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="awari">
-		<description>Awari</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="awari">
+        <description>Awari</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="216444">
-				<rom name="awari.wav" size="216444" crc="4e695eeb" sha1="daf34c61a385a6044f52d3b3a0fead5bc25786b6" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="216444">
+                <rom name="awari.wav" size="216444" crc="4e695eeb" sha1="daf34c61a385a6044f52d3b3a0fead5bc25786b6" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="boneco">
-		<description>Boneco Animado SG6</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="boneco">
+        <description>Boneco Animado SG6</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="266668">
-				<rom name="boneco animado sg6.wav" size="266668" crc="066c1f17" sha1="d4ef4e152f892e8566c7a789dc591d9451e5bb73" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="266668">
+                <rom name="boneco animado sg6.wav" size="266668" crc="066c1f17" sha1="d4ef4e152f892e8566c7a789dc591d9451e5bb73" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="capaesp">
-		<description>Capa e Espada</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="capaesp">
+        <description>Capa e Espada</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="1224700">
-				<rom name="capa e espada alt.wav" size="1224700" crc="1b4ee35e" sha1="1d02c0bb984d83a14c170655c7c704e52bf5824a" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="mc1000_cass">
-			<dataarea name="cass" size="1224028">
-				<rom name="capa e espada.wav" size="1224028" crc="6dfde138" sha1="6a6395381cf29111a5143a5bae5e517d8150277e" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="1224700">
+                <rom name="capa e espada alt.wav" size="1224700" crc="1b4ee35e" sha1="1d02c0bb984d83a14c170655c7c704e52bf5824a" offset="0" />
+            </dataarea>
+        </part>
+        <part name="cass2" interface="mc1000_cass">
+            <dataarea name="cass" size="1224028">
+                <rom name="capa e espada.wav" size="1224028" crc="6dfde138" sha1="6a6395381cf29111a5143a5bae5e517d8150277e" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="circulos">
-		<description>Circulos</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="circulos">
+        <description>Circulos</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="176812">
-				<rom name="circulos.wav" size="176812" crc="402caaea" sha1="614201ff32f80c91bf433243bc046eee78e190bf" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="176812">
+                <rom name="circulos.wav" size="176812" crc="402caaea" sha1="614201ff32f80c91bf433243bc046eee78e190bf" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="comecome">
-		<description>Come Come</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="comecome">
+        <description>Come Come</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="290236">
-				<rom name="come come.wav" size="290236" crc="2aff8ec3" sha1="622bb22f427cf583064e943d02fe9a8a57d61d87" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="290236">
+                <rom name="come come.wav" size="290236" crc="2aff8ec3" sha1="622bb22f427cf583064e943d02fe9a8a57d61d87" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="damas">
-		<description>Damas</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="damas">
+        <description>Damas</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="333484">
-				<rom name="damas.wav" size="333484" crc="323edc1f" sha1="ad04c3568d598879f63e4a45a89270812bdcafe6" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="333484">
+                <rom name="damas.wav" size="333484" crc="323edc1f" sha1="ad04c3568d598879f63e4a45a89270812bdcafe6" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="drawprnt">
-		<description>Draw Print</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="drawprnt">
+        <description>Draw Print</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="412892">
-				<rom name="draw print.wav" size="412892" crc="2e8b4101" sha1="0693a63c7a65a864c15dd899f3d4a4dfd31606f0" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="412892">
+                <rom name="draw print.wav" size="412892" crc="2e8b4101" sha1="0693a63c7a65a864c15dd899f3d4a4dfd31606f0" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="enginead">
-		<description>Engine para Adventures</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="enginead">
+        <description>Engine para Adventures</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="757388">
-				<rom name="engine para adventures 2.wav" size="757388" crc="84577d7e" sha1="e34884828bd8902ae63c1d8b407035db25b102a5" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="mc1000_cass">
-			<dataarea name="cass" size="615356">
-				<rom name="engine para adventures.wav" size="615356" crc="2b6aaeba" sha1="aec9b2ab7e82dd5884a352e20a04741640819ad1" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="757388">
+                <rom name="engine para adventures 2.wav" size="757388" crc="84577d7e" sha1="e34884828bd8902ae63c1d8b407035db25b102a5" offset="0" />
+            </dataarea>
+        </part>
+        <part name="cass2" interface="mc1000_cass">
+            <dataarea name="cass" size="615356">
+                <rom name="engine para adventures.wav" size="615356" crc="2b6aaeba" sha1="aec9b2ab7e82dd5884a352e20a04741640819ad1" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="explosao">
-		<description>Explosao</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="explosao">
+        <description>Explosao</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="549964">
-				<rom name="explosao.wav" size="549964" crc="d231d3af" sha1="a3cce871efa9f8762257ac7ea47c71311f25920f" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="549964">
+                <rom name="explosao.wav" size="549964" crc="d231d3af" sha1="a3cce871efa9f8762257ac7ea47c71311f25920f" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="grafic3d">
-		<description>Graficos em 3D</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="grafic3d">
+        <description>Graficos em 3D</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="161212">
-				<rom name="graficos em 3d 2.wav" size="161212" crc="2b66d72c" sha1="ae267b2e917c3aeaf2b509df396071a6391c03d7" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="mc1000_cass">
-			<dataarea name="cass" size="312092">
-				<rom name="graficos em 3d 3.wav" size="312092" crc="25eeda66" sha1="66515ed2845ecbc2a2bfdc92ed2b014127d10424" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass3" interface="mc1000_cass">
-			<dataarea name="cass" size="108092">
-				<rom name="graficos em 3d.wav" size="108092" crc="2afb2dd1" sha1="b7712378f87b0aa442511f909cdf394fe3171c6a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="161212">
+                <rom name="graficos em 3d 2.wav" size="161212" crc="2b66d72c" sha1="ae267b2e917c3aeaf2b509df396071a6391c03d7" offset="0" />
+            </dataarea>
+        </part>
+        <part name="cass2" interface="mc1000_cass">
+            <dataarea name="cass" size="312092">
+                <rom name="graficos em 3d 3.wav" size="312092" crc="25eeda66" sha1="66515ed2845ecbc2a2bfdc92ed2b014127d10424" offset="0" />
+            </dataarea>
+        </part>
+        <part name="cass3" interface="mc1000_cass">
+            <dataarea name="cass" size="108092">
+                <rom name="graficos em 3d.wav" size="108092" crc="2afb2dd1" sha1="b7712378f87b0aa442511f909cdf394fe3171c6a" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="hamurabi">
-		<description>Hamurabi</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="hamurabi">
+        <description>Hamurabi</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="482092">
-				<rom name="hamurabi.wav" size="482092" crc="4d894a09" sha1="fc9bb4eb7cab0c544e623a7a1731910b824b8107" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="482092">
+                <rom name="hamurabi.wav" size="482092" crc="4d894a09" sha1="fc9bb4eb7cab0c544e623a7a1731910b824b8107" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="hanoisol">
-		<description>Hanoi Solucao Circular</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="hanoisol">
+        <description>Hanoi Solucao Circular</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="216236">
-				<rom name="hanoi solucao circular.wav" size="216236" crc="14e1964f" sha1="f9676f8403faa2d8ba5c8aba657f9893e23d22ed" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="216236">
+                <rom name="hanoi solucao circular.wav" size="216236" crc="14e1964f" sha1="f9676f8403faa2d8ba5c8aba657f9893e23d22ed" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="hgrpri64">
-		<description>HGR Print 64</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="hgrpri64">
+        <description>HGR Print 64</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="276140">
-				<rom name="hgr print 64 2.wav" size="276140" crc="dc88eb54" sha1="bbbfaf25c591b1097132d1451b2960bd23374983" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="mc1000_cass">
-			<dataarea name="cass" size="301228">
-				<rom name="hgr print 64.wav" size="301228" crc="e4eaf422" sha1="37438b2e26dec14809e020162bbc623b8977cdf5" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="276140">
+                <rom name="hgr print 64 2.wav" size="276140" crc="dc88eb54" sha1="bbbfaf25c591b1097132d1451b2960bd23374983" offset="0" />
+            </dataarea>
+        </part>
+        <part name="cass2" interface="mc1000_cass">
+            <dataarea name="cass" size="301228">
+                <rom name="hgr print 64.wav" size="301228" crc="e4eaf422" sha1="37438b2e26dec14809e020162bbc623b8977cdf5" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="hgrprint">
-		<description>HGR Print</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="hgrprint">
+        <description>HGR Print</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="368780">
-				<rom name="hgr print 10.wav" size="368780" crc="5bd47cbc" sha1="1066ee0728d9c0573852c67fec7c519e5f5906d6" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="mc1000_cass">
-			<dataarea name="cass" size="391708">
-				<rom name="hgr print 11.wav" size="391708" crc="14453cfa" sha1="a8a3dfab558861f6a4cb49d7c423aaed1d323a4d" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass3" interface="mc1000_cass">
-			<dataarea name="cass" size="426332">
-				<rom name="hgr print 12.wav" size="426332" crc="6119473b" sha1="81ec218a8500f6bfe51b06292ec0ba5051d39678" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass4" interface="mc1000_cass">
-			<dataarea name="cass" size="366204">
-				<rom name="hgr print 2.wav" size="366204" crc="506c5a8d" sha1="a039a343bf749a234f86e53beae26533389f7c3f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass5" interface="mc1000_cass">
-			<dataarea name="cass" size="358684">
-				<rom name="hgr print 3.wav" size="358684" crc="d584a3b7" sha1="1baebe754cb88b4f9e349dafbf6d4ad38e517922" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass6" interface="mc1000_cass">
-			<dataarea name="cass" size="418188">
-				<rom name="hgr print 4.wav" size="418188" crc="22d7d41e" sha1="9b981838a90f845cc466d1d83278e425e410b818" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass7" interface="mc1000_cass">
-			<dataarea name="cass" size="393452">
-				<rom name="hgr print 5.wav" size="393452" crc="7eda4a84" sha1="8376c9cfec9fb4c7d33ef3fe3ed729bbce675ac1" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass8" interface="mc1000_cass">
-			<dataarea name="cass" size="406012">
-				<rom name="hgr print 6.wav" size="406012" crc="a60b49c8" sha1="7f832fd22e5c4fef05e84fabfd3992e52964d1d3" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass9" interface="mc1000_cass">
-			<dataarea name="cass" size="424300">
-				<rom name="hgr print 7.wav" size="424300" crc="9d6d5111" sha1="57e4f2ec6a5d3ff109e163185beb0b3065f1faf9" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass10" interface="mc1000_cass">
-			<dataarea name="cass" size="417916">
-				<rom name="hgr print 8.wav" size="417916" crc="05ef09f7" sha1="2971eb0416a492be700bf5e405708e20a8e74a6f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass11" interface="mc1000_cass">
-			<dataarea name="cass" size="392460">
-				<rom name="hgr print 9.wav" size="392460" crc="0b6224d7" sha1="7dfeca391984c9472da335a465313ab99a864735" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass12" interface="mc1000_cass">
-			<dataarea name="cass" size="380460">
-				<rom name="hgr print.wav" size="380460" crc="721f3a06" sha1="188669d5b1b193b5dd594bd6f91e638eba961547" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="368780">
+                <rom name="hgr print 10.wav" size="368780" crc="5bd47cbc" sha1="1066ee0728d9c0573852c67fec7c519e5f5906d6" offset="0" />
+            </dataarea>
+        </part>
+        <part name="cass2" interface="mc1000_cass">
+            <dataarea name="cass" size="391708">
+                <rom name="hgr print 11.wav" size="391708" crc="14453cfa" sha1="a8a3dfab558861f6a4cb49d7c423aaed1d323a4d" offset="0" />
+            </dataarea>
+        </part>
+        <part name="cass3" interface="mc1000_cass">
+            <dataarea name="cass" size="426332">
+                <rom name="hgr print 12.wav" size="426332" crc="6119473b" sha1="81ec218a8500f6bfe51b06292ec0ba5051d39678" offset="0" />
+            </dataarea>
+        </part>
+        <part name="cass4" interface="mc1000_cass">
+            <dataarea name="cass" size="366204">
+                <rom name="hgr print 2.wav" size="366204" crc="506c5a8d" sha1="a039a343bf749a234f86e53beae26533389f7c3f" offset="0" />
+            </dataarea>
+        </part>
+        <part name="cass5" interface="mc1000_cass">
+            <dataarea name="cass" size="358684">
+                <rom name="hgr print 3.wav" size="358684" crc="d584a3b7" sha1="1baebe754cb88b4f9e349dafbf6d4ad38e517922" offset="0" />
+            </dataarea>
+        </part>
+        <part name="cass6" interface="mc1000_cass">
+            <dataarea name="cass" size="418188">
+                <rom name="hgr print 4.wav" size="418188" crc="22d7d41e" sha1="9b981838a90f845cc466d1d83278e425e410b818" offset="0" />
+            </dataarea>
+        </part>
+        <part name="cass7" interface="mc1000_cass">
+            <dataarea name="cass" size="393452">
+                <rom name="hgr print 5.wav" size="393452" crc="7eda4a84" sha1="8376c9cfec9fb4c7d33ef3fe3ed729bbce675ac1" offset="0" />
+            </dataarea>
+        </part>
+        <part name="cass8" interface="mc1000_cass">
+            <dataarea name="cass" size="406012">
+                <rom name="hgr print 6.wav" size="406012" crc="a60b49c8" sha1="7f832fd22e5c4fef05e84fabfd3992e52964d1d3" offset="0" />
+            </dataarea>
+        </part>
+        <part name="cass9" interface="mc1000_cass">
+            <dataarea name="cass" size="424300">
+                <rom name="hgr print 7.wav" size="424300" crc="9d6d5111" sha1="57e4f2ec6a5d3ff109e163185beb0b3065f1faf9" offset="0" />
+            </dataarea>
+        </part>
+        <part name="cass10" interface="mc1000_cass">
+            <dataarea name="cass" size="417916">
+                <rom name="hgr print 8.wav" size="417916" crc="05ef09f7" sha1="2971eb0416a492be700bf5e405708e20a8e74a6f" offset="0" />
+            </dataarea>
+        </part>
+        <part name="cass11" interface="mc1000_cass">
+            <dataarea name="cass" size="392460">
+                <rom name="hgr print 9.wav" size="392460" crc="0b6224d7" sha1="7dfeca391984c9472da335a465313ab99a864735" offset="0" />
+            </dataarea>
+        </part>
+        <part name="cass12" interface="mc1000_cass">
+            <dataarea name="cass" size="380460">
+                <rom name="hgr print.wav" size="380460" crc="721f3a06" sha1="188669d5b1b193b5dd594bd6f91e638eba961547" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="jogcobra">
-		<description>Jogo da Cobra</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="jogcobra">
+        <description>Jogo da Cobra</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="275756">
-				<rom name="jogo da cobra.wav" size="275756" crc="cdbbfeb4" sha1="1a46b99a0ca5ab2b7bd59c84b08938bd7da035ff" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="275756">
+                <rom name="jogo da cobra.wav" size="275756" crc="cdbbfeb4" sha1="1a46b99a0ca5ab2b7bd59c84b08938bd7da035ff" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="jogovida">
-		<description>Jogo da Vida de Conway</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="jogovida">
+        <description>Jogo da Vida de Conway</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="49100">
-				<rom name="jogo da vida de conway 2.wav" size="49100" crc="58489ad6" sha1="515653094e106ccb7ca72a7a89b97da3e355813d" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="mc1000_cass">
-			<dataarea name="cass" size="56028">
-				<rom name="jogo da vida de conway 3.wav" size="56028" crc="6f45555d" sha1="be12200bf6cab01cdbe8115eefce2742d5b32662" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass3" interface="mc1000_cass">
-			<dataarea name="cass" size="190460">
-				<rom name="jogo da vida de conway.wav" size="190460" crc="6c37aec8" sha1="8ab0749201923cb549ad6d791620c71125ae301a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="49100">
+                <rom name="jogo da vida de conway 2.wav" size="49100" crc="58489ad6" sha1="515653094e106ccb7ca72a7a89b97da3e355813d" offset="0" />
+            </dataarea>
+        </part>
+        <part name="cass2" interface="mc1000_cass">
+            <dataarea name="cass" size="56028">
+                <rom name="jogo da vida de conway 3.wav" size="56028" crc="6f45555d" sha1="be12200bf6cab01cdbe8115eefce2742d5b32662" offset="0" />
+            </dataarea>
+        </part>
+        <part name="cass3" interface="mc1000_cass">
+            <dataarea name="cass" size="190460">
+                <rom name="jogo da vida de conway.wav" size="190460" crc="6c37aec8" sha1="8ab0749201923cb549ad6d791620c71125ae301a" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="labirint">
-		<description>Labirinto</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="labirint">
+        <description>Labirinto</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="811724">
-				<rom name="labirinto.wav" size="811724" crc="3faf8ebe" sha1="4c2fe02873ca1ecaf152d54aea9dd15c969f8022" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="811724">
+                <rom name="labirinto.wav" size="811724" crc="3faf8ebe" sha1="4c2fe02873ca1ecaf152d54aea9dd15c969f8022" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="mazemake">
-		<description>Maze Maker</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="mazemake">
+        <description>Maze Maker</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="292716">
-				<rom name="maze maker.wav" size="292716" crc="ac56c8e7" sha1="71a437a3a6018a247bd239187b70e0e39542dd1d" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="292716">
+                <rom name="maze maker.wav" size="292716" crc="ac56c8e7" sha1="71a437a3a6018a247bd239187b70e0e39542dd1d" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="minaouro">
-		<description>Mina de Ouro</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="minaouro">
+        <description>Mina de Ouro</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="492668">
-				<rom name="mina de ouro.wav" size="492668" crc="606a0c7b" sha1="2f7ba270900ce9fe54ad2a3b94352bf2e2954b18" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="492668">
+                <rom name="mina de ouro.wav" size="492668" crc="606a0c7b" sha1="2f7ba270900ce9fe54ad2a3b94352bf2e2954b18" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="modosvid">
-		<description>Modos de Video</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="modosvid">
+        <description>Modos de Video</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="227132">
-				<rom name="modos de video.wav" size="227132" crc="5e349ed7" sha1="729b1d6e236e06c643d746c943252b703c044304" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="227132">
+                <rom name="modos de video.wav" size="227132" crc="5e349ed7" sha1="729b1d6e236e06c643d746c943252b703c044304" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="simulvoo">
-		<description>Simulador de Voo</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="simulvoo">
+        <description>Simulador de Voo</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="1003836">
-				<rom name="simulador de voo.wav" size="1003836" crc="7de71c8f" sha1="d740c569144151a34f9facf3ef141990d433ece8" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="1003836">
+                <rom name="simulador de voo.wav" size="1003836" crc="7de71c8f" sha1="d740c569144151a34f9facf3ef141990d433ece8" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="startrek">
-		<description>Star Trek</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="startrek">
+        <description>Star Trek</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="832572">
-				<rom name="star trek 1.wav" size="832572" crc="d233a4f9" sha1="76279157ef2923ca415b7143f624a16e00cfdc98" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="mc1000_cass">
-			<dataarea name="cass" size="690828">
-				<rom name="star trek 2.wav" size="690828" crc="1efb2f5d" sha1="22b3f1d4c1443908421cacf11fac9314a94c4725" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="832572">
+                <rom name="star trek 1.wav" size="832572" crc="d233a4f9" sha1="76279157ef2923ca415b7143f624a16e00cfdc98" offset="0" />
+            </dataarea>
+        </part>
+        <part name="cass2" interface="mc1000_cass">
+            <dataarea name="cass" size="690828">
+                <rom name="star trek 2.wav" size="690828" crc="1efb2f5d" sha1="22b3f1d4c1443908421cacf11fac9314a94c4725" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="stevejob">
-		<description>Foto de Steve Jobs</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="stevejob">
+        <description>Foto de Steve Jobs</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="901884">
-				<rom name="foto de steve jobs.wav" size="901884" crc="5a4f54bf" sha1="a4ba646755008f2929f6530aeb5420b38ad730c7" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="901884">
+                <rom name="foto de steve jobs.wav" size="901884" crc="5a4f54bf" sha1="a4ba646755008f2929f6530aeb5420b38ad730c7" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="testacol">
-		<description>Testa Color Artifacting</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="testacol">
+        <description>Testa Color Artifacting</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="161868">
-				<rom name="testa color artifacting 2.wav" size="161868" crc="954256c2" sha1="3e65461e6d33e84d112326591f5d2476867be02f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="mc1000_cass">
-			<dataarea name="cass" size="141484">
-				<rom name="testa color artifacting 3.wav" size="141484" crc="0ff96798" sha1="d10405573601ce67de539f414a6dae026ee3b378" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass3" interface="mc1000_cass">
-			<dataarea name="cass" size="165628">
-				<rom name="testa color artifacting.wav" size="165628" crc="43f00cff" sha1="0c12c5ff98d230b46753b5aba896a050e10654a3" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="161868">
+                <rom name="testa color artifacting 2.wav" size="161868" crc="954256c2" sha1="3e65461e6d33e84d112326591f5d2476867be02f" offset="0" />
+            </dataarea>
+        </part>
+        <part name="cass2" interface="mc1000_cass">
+            <dataarea name="cass" size="141484">
+                <rom name="testa color artifacting 3.wav" size="141484" crc="0ff96798" sha1="d10405573601ce67de539f414a6dae026ee3b378" offset="0" />
+            </dataarea>
+        </part>
+        <part name="cass3" interface="mc1000_cass">
+            <dataarea name="cass" size="165628">
+                <rom name="testa color artifacting.wav" size="165628" crc="43f00cff" sha1="0c12c5ff98d230b46753b5aba896a050e10654a3" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="travess">
-		<description>Travessia</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="travess">
+        <description>Travessia</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="407916">
-				<rom name="travessia.wav" size="407916" crc="7bb5efde" sha1="fedb7691219b277461f4869917ddf357346adbb5" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="407916">
+                <rom name="travessia.wav" size="407916" crc="7bb5efde" sha1="fedb7691219b277461f4869917ddf357346adbb5" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="viscass">
-		<description>Visualiza Cassete</description>
-		<year>19??</year>
-		<publisher>&lt;type-in&gt;</publisher>
+    <software name="viscass">
+        <description>Visualiza Cassete</description>
+        <year>19??</year>
+        <publisher>&lt;type-in&gt;</publisher>
 
-		<part name="cass1" interface="mc1000_cass">
-			<dataarea name="cass" size="52108">
-				<rom name="visualiza cassete 2.wav" size="52108" crc="6030ad9a" sha1="04c1eca0be9cdb80437d09b9ce11758681acca4c" offset="0" />
-			</dataarea>
-		</part>
-		<part name="cass2" interface="mc1000_cass">
-			<dataarea name="cass" size="61516">
-				<rom name="visualiza cassete.wav" size="61516" crc="97d7e459" sha1="7b386f40f1e90e508fd56c7eb6f8aa8ed58c1e22" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+        <part name="cass1" interface="mc1000_cass">
+            <dataarea name="cass" size="52108">
+                <rom name="visualiza cassete 2.wav" size="52108" crc="6030ad9a" sha1="04c1eca0be9cdb80437d09b9ce11758681acca4c" offset="0" />
+            </dataarea>
+        </part>
+        <part name="cass2" interface="mc1000_cass">
+            <dataarea name="cass" size="61516">
+                <rom name="visualiza cassete.wav" size="61516" crc="97d7e459" sha1="7b386f40f1e90e508fd56c7eb6f8aa8ed58c1e22" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 -->
 </softwarelist>

@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- 
+<!--
 
-Most of these can be run in BASIC by using LOAD"*" 
+Most of these can be run in BASIC by using LOAD"*"
 If the program doesn't automatically start, start it with RUN
 
 -->
@@ -10070,510 +10070,510 @@ If the program doesn't automatically start, start it with RUN
 
 
 <!--
-	<software name="blankdsk">
-		<description>Blank Disk (TV-DOS v1.2)</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="realtiv.dsk" size="368640" crc="ef5198e5" sha1="63c25cbee70f667c0403ba85829391c07c201a2c" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-
-	<software name="astrobla" cloneof="astrobl">
-		<description>Astro Blaster (Alt)</description>
-		<year>1991</year>
-		<publisher>STV</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="astro.dsk" size="737280" crc="9b43b63d" sha1="ce632f216055d8ecffd99e23f4c91481c5e0bd12" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bobb" cloneof="bob">
-		<description>Bob (Alt 2)</description>
-		<year>198?</year>
-		<publisher>Mamut Soft</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="bobv1.dsk" size="368640" crc="a3eb8cd9" sha1="640cfe393b40f88c44ab781c91f87b725b50f5a7" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bobc" cloneof="bob">
-		<description>Bob (Alt 3)</description>
-		<year>198?</year>
-		<publisher>Mamut Soft</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="bobv2_.dsk" size="368640" crc="cadf10cd" sha1="32f6215e9ab16a6f272820311f88ac7cbdcae052" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bombazoa" cloneof="bombazo">
-		<description>Az Utolso Bombazo (Alt)</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="bombazo.dsk" size="737280" crc="297f8e3a" sha1="16ea50b5e7fb1f68d0c6b1c910ad08b7cf894023" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="break">
-		<description>Break</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="break.dsk" size="368640" crc="ec0765bc" sha1="4cd47552c883751528a8b0674ee23c56c07a2f05" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="centipeda" cloneof="centiped">
-		<description>Centipede (Alt)</description>
-		<year>198?</year>
-		<publisher>STV</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="cent.dsk" size="737280" crc="1dd2c577" sha1="06595792be54bbbad9b220134ddf10435bac8f2a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="crackeda" cloneof="cracked">
-		<description>Crack Ed (Alt)</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="crak.dsk" size="368640" crc="eb6a363f" sha1="743b726d8430b1c55f2003f5ad24133377eff9ec" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cyrus2a" cloneof="cyrus2">
-		<description>Cyrus 2 (Alt)</description>
-		<year>1985</year>
-		<publisher>Intelligent Chess Software</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="cyrus2 [a].dsk" size="737280" crc="5f1de574" sha1="069641cdd004acfe0071ffe43f7679b63e50ccec" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dobgepa" cloneof="dobgep">
-		<description>Dobgép (Alt)</description>
-		<year>198?</year>
-		<publisher>STV</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="dob.dsk" size="737280" crc="5b5d0bc5" sha1="2c9d3d349ef97c21c64c3a5fbe7e99f29e8035f1" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="hamburg">
-		<description>Hamburger</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="hamburger.dsk" size="368640" crc="fe540e2c" sha1="4520e085c21e0b4c3dfe6aa92b269b4b9e73c982" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="invazioa" cloneof="invazio">
-		<description>Invázió (Alt)</description>
-		<year>198?</year>
-		<publisher>STV</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="inv.dsk" size="737280" crc="16169e62" sha1="9ee2c1890ac273ee49da023c41cd1d8ff7a8608d" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="iq">
-		<description>Hasznalati Utasitas</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="iq.dsk" size="737280" crc="46ce5ec6" sha1="887d95912347a39052a3ac98f5f5e655732b7ccd" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="jancsia" cloneof="jancsi">
-		<description>Jancsi a Várban (Alt)</description>
-		<year>1986</year>
-		<publisher>STV</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="jancs.dsk" size="737280" crc="fd406d9b" sha1="4136b8925bfb87485f4a882eb50744f0b10f9d70" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kardhalaa" cloneof="kardhala">
-		<description>Kardhalak és Kincsek (Alt)</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="kardhal.dsk" size="737280" crc="31743be0" sha1="f44e32caf176055e254b9540591eda496c4ff0d1" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="katalogu">
-		<description>Katalogus Program</description>
-		<year>1986</year>
-		<publisher>Kronosz</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="katalogus.dsk" size="368640" crc="a3d08af1" sha1="68336f5e904aada1f0bf93dcd30ee284dff65206" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="keljfelja" cloneof="keljfelj">
-		<description>Keljfeljancsi (Alt)</description>
-		<year>198?</year>
-		<publisher>STV</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="keljfel.dsk" size="737280" crc="6e09e8c5" sha1="f5a043f2eddd88d7207bdd862887d3c3a9af66c3" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kismozdoa" cloneof="kismozdo">
-		<description>Kismozdony (Alt)</description>
-		<year>198?</year>
-		<publisher>STV</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="kismozony.dsk" size="737280" crc="0af2cc13" sha1="de13c7326810609fc81046333c689919f8ea3c2b" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="labirinta" cloneof="labirint">
-		<description>Labirintus (Alt)</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="labiv2.dsk" size="368640" crc="7b90a57c" sha1="2f0ba8595584141e2ea7dacd0b1f758ff27b5743" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="linaa" cloneof="lina">
-		<description>Lina (Alt)</description>
-		<year>198?</year>
-		<publisher>STV</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="lina [a].dsk" size="737280" crc="dbe61e9a" sha1="50fda0f33be072c40d2050efc6e4f3531971f9d5" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="masolo">
-		<description>Másoló</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="masolo.dsk" size="368640" crc="33b27e3e" sha1="7e542be169d5a6de3cd5dcdf4f50f65fc48ce055" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="newintro">
-		<description>Newintro</description>
-		<year>198?</year>
-		<publisher>C.S. Software</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="newintro.dsk" size="368640" crc="bde3cf32" sha1="994fe451f537f42686367984e3ef449ecbf18263" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ordogmota" cloneof="ordogmot">
-		<description>Ördögmotor (Alt)</description>
-		<year>1990</year>
-		<publisher>STV</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="ordogmotor [a].dsk" size="737280" crc="8bfa6cbf" sha1="e6758720567aa72cd2afc8be5b413c2015ab1fcf" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="oszkara" cloneof="oszkar">
-		<description>Oszkár a Lovag (Alt)</description>
-		<year>198?</year>
-		<publisher>STV</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="oszkar.dsk" size="737280" crc="62d1c2b2" sha1="76ea86b6661a35c2de1e202154599c2b613df32b" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="panika" cloneof="panik">
-		<description>Pánik (Alt)</description>
-		<year>1991</year>
-		<publisher>STV</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="panik [a].dsk" size="737280" crc="ac5ac41b" sha1="ec78040a45ab5419478f0a9ad159bb74dcdf9b10" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="parbajb" cloneof="parbaj">
-		<description>Párbaj (Alt 2)</description>
-		<year>1991</year>
-		<publisher>STV</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="parbaj [a].dsk" size="737280" crc="296e157b" sha1="c3b71a97597257253057c4c41e9cc97c7741e93e" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="peepshowa" cloneof="peepshow">
-		<description>Peep Show (Alt)</description>
-		<year>1984</year>
-		<publisher>STV</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="peepshow.dsk" size="737280" crc="c3628300" sha1="01b45844089b16341ab1bc8964208f6304f97222" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="poseidona" cloneof="poseidon">
-		<description>Poseidon Kincse (Alt)</description>
-		<year>1989</year>
-		<publisher>Novotrade</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="poseidonkincse.dsk" size="368640" crc="2acff3a1" sha1="cc3af65157cd00645c8f2f45dbec17dcdd13ca71" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="raceaceb" cloneof="raceace">
-		<description>Race Ace (Alt 2)</description>
-		<year>1990</year>
-		<publisher>Zsolt Szigeti</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="race_ace.dsk" size="368640" crc="af7378e5" sha1="553a0bc4909afd55b59eca95d4a5b1a998590dd5" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rohammcr" cloneof="rohamm">
-		<description>Rohamm (Cracked)</description>
-		<year>1989</year>
-		<publisher>GATO Bt.</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="rohammcracked.dsk" size="368640" crc="5c1b9675" sha1="338864ac3231d73af5a24def9c676c08d49e1b19" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sajtvajob" cloneof="sajtvajo">
-		<description>Sajtvájó (Alt 2)</description>
-		<year>1991</year>
-		<publisher>STV</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="sajtvajo [a].dsk" size="737280" crc="1e73fb64" sha1="83f0953be53663c8cc3881a06a124a5186ac0dcf" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="satirozab" cloneof="satiroza">
-		<description>Satírozás (Alt 2)</description>
-		<year>1991</year>
-		<publisher>STV</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="satirozas.dsk" size="737280" crc="23fa33d8" sha1="d3048a2e17254270c2a8ccd28a65a6e936e81539" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sinuscr">
-		<description>Sinuscr</description>
-		<year>198?</year>
-		<publisher>Peter Rakos</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="sinusscr.dsk" size="368640" crc="bb893ca8" sha1="17dc0c5eb70b4718654718cae1be2acd38a1dff7" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="spacesapb" cloneof="spacesap">
-		<description>Space Sapper (Alt 2)</description>
-		<year>1987</year>
-		<publisher>Novotrade</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="spacesapperv2.dsk" size="368640" crc="2c0c2b0e" sha1="e9294e4a1b82cc6bc60ced8a27081442ed3e4c62" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="teszt">
-		<description>Teszt</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="teszt.dsk" size="737280" crc="31fbc7bb" sha1="cf9521931f5aa45459a64ab8258c4dddd5f9d788" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="turbojaca" cloneof="turbojac">
-		<description>Turbo Jack (Alt)</description>
-		<year>1991</year>
-		<publisher>STV</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="turbojack [a].dsk" size="737280" crc="2ea588e9" sha1="acbc0f2d1907406f2a44489124c3a3fe30e851bf" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ufoa">
-		<description>UFO (Alt)</description>
-		<year>1985</year>
-		<publisher>STV</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="ufo [a].dsk" size="737280" crc="941110b4" sha1="453504556562f0ccd00089dcf2c86d67004df053" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="upmleme1">
-		<description>UPM Lemez 1</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="upmlemez1.dsk" size="737280" crc="d3698df2" sha1="1b944fff0b41007fc6c482ba28407fb851e3ec16" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="upmleme2">
-		<description>UPM Lemez 2</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="upmlemez2.dsk" size="737280" crc="1f51ce73" sha1="3de8a6e44bbd34e0abacd0fcdfb76b6965cc5b5a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="upmleme3">
-		<description>UPM Lemez 3</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="upmlemez3.dsk" size="737280" crc="c8966ad8" sha1="a38ac0cd6eec559cbf4f306f64dd8e4c7cab9c57" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="vidzenea" cloneof="vidzene">
-		<description>Videoton Zene (Alt)</description>
-		<year>198?</year>
-		<publisher>JozsiSoft</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="vidizev2.dsk" size="368640" crc="7ef1328a" sha1="99b708e16a8c49b63661a4b44afa30fecb0079dc" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="viliabana" cloneof="viliaban">
-		<description>Vili a Bányász (Alt)</description>
-		<year>1991</year>
-		<publisher>STV</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="vili.dsk" size="737280" crc="90b96888" sha1="0a38c2d1704f5cdfdc5f2cb7c60f7035caaa28b4" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="blankdsk">
+        <description>Blank Disk (TV-DOS v1.2)</description>
+        <year>198?</year>
+        <publisher>&lt;unknown&gt;</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="368640">
+                <rom name="realtiv.dsk" size="368640" crc="ef5198e5" sha1="63c25cbee70f667c0403ba85829391c07c201a2c" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+
+    <software name="astrobla" cloneof="astrobl">
+        <description>Astro Blaster (Alt)</description>
+        <year>1991</year>
+        <publisher>STV</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="368640">
+                <rom name="astro.dsk" size="737280" crc="9b43b63d" sha1="ce632f216055d8ecffd99e23f4c91481c5e0bd12" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="bobb" cloneof="bob">
+        <description>Bob (Alt 2)</description>
+        <year>198?</year>
+        <publisher>Mamut Soft</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="368640">
+                <rom name="bobv1.dsk" size="368640" crc="a3eb8cd9" sha1="640cfe393b40f88c44ab781c91f87b725b50f5a7" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="bobc" cloneof="bob">
+        <description>Bob (Alt 3)</description>
+        <year>198?</year>
+        <publisher>Mamut Soft</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="368640">
+                <rom name="bobv2_.dsk" size="368640" crc="cadf10cd" sha1="32f6215e9ab16a6f272820311f88ac7cbdcae052" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="bombazoa" cloneof="bombazo">
+        <description>Az Utolso Bombazo (Alt)</description>
+        <year>198?</year>
+        <publisher>&lt;unknown&gt;</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="737280">
+                <rom name="bombazo.dsk" size="737280" crc="297f8e3a" sha1="16ea50b5e7fb1f68d0c6b1c910ad08b7cf894023" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="break">
+        <description>Break</description>
+        <year>198?</year>
+        <publisher>&lt;unknown&gt;</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="368640">
+                <rom name="break.dsk" size="368640" crc="ec0765bc" sha1="4cd47552c883751528a8b0674ee23c56c07a2f05" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="centipeda" cloneof="centiped">
+        <description>Centipede (Alt)</description>
+        <year>198?</year>
+        <publisher>STV</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="737280">
+                <rom name="cent.dsk" size="737280" crc="1dd2c577" sha1="06595792be54bbbad9b220134ddf10435bac8f2a" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="crackeda" cloneof="cracked">
+        <description>Crack Ed (Alt)</description>
+        <year>198?</year>
+        <publisher>&lt;unknown&gt;</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="368640">
+                <rom name="crak.dsk" size="368640" crc="eb6a363f" sha1="743b726d8430b1c55f2003f5ad24133377eff9ec" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="cyrus2a" cloneof="cyrus2">
+        <description>Cyrus 2 (Alt)</description>
+        <year>1985</year>
+        <publisher>Intelligent Chess Software</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="737280">
+                <rom name="cyrus2 [a].dsk" size="737280" crc="5f1de574" sha1="069641cdd004acfe0071ffe43f7679b63e50ccec" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="dobgepa" cloneof="dobgep">
+        <description>Dobgép (Alt)</description>
+        <year>198?</year>
+        <publisher>STV</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="737280">
+                <rom name="dob.dsk" size="737280" crc="5b5d0bc5" sha1="2c9d3d349ef97c21c64c3a5fbe7e99f29e8035f1" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="hamburg">
+        <description>Hamburger</description>
+        <year>198?</year>
+        <publisher>&lt;unknown&gt;</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="368640">
+                <rom name="hamburger.dsk" size="368640" crc="fe540e2c" sha1="4520e085c21e0b4c3dfe6aa92b269b4b9e73c982" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="invazioa" cloneof="invazio">
+        <description>Invázió (Alt)</description>
+        <year>198?</year>
+        <publisher>STV</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="737280">
+                <rom name="inv.dsk" size="737280" crc="16169e62" sha1="9ee2c1890ac273ee49da023c41cd1d8ff7a8608d" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="iq">
+        <description>Hasznalati Utasitas</description>
+        <year>198?</year>
+        <publisher>&lt;unknown&gt;</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="737280">
+                <rom name="iq.dsk" size="737280" crc="46ce5ec6" sha1="887d95912347a39052a3ac98f5f5e655732b7ccd" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="jancsia" cloneof="jancsi">
+        <description>Jancsi a Várban (Alt)</description>
+        <year>1986</year>
+        <publisher>STV</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="737280">
+                <rom name="jancs.dsk" size="737280" crc="fd406d9b" sha1="4136b8925bfb87485f4a882eb50744f0b10f9d70" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="kardhalaa" cloneof="kardhala">
+        <description>Kardhalak és Kincsek (Alt)</description>
+        <year>198?</year>
+        <publisher>&lt;unknown&gt;</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="737280">
+                <rom name="kardhal.dsk" size="737280" crc="31743be0" sha1="f44e32caf176055e254b9540591eda496c4ff0d1" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="katalogu">
+        <description>Katalogus Program</description>
+        <year>1986</year>
+        <publisher>Kronosz</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="368640">
+                <rom name="katalogus.dsk" size="368640" crc="a3d08af1" sha1="68336f5e904aada1f0bf93dcd30ee284dff65206" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="keljfelja" cloneof="keljfelj">
+        <description>Keljfeljancsi (Alt)</description>
+        <year>198?</year>
+        <publisher>STV</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="737280">
+                <rom name="keljfel.dsk" size="737280" crc="6e09e8c5" sha1="f5a043f2eddd88d7207bdd862887d3c3a9af66c3" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="kismozdoa" cloneof="kismozdo">
+        <description>Kismozdony (Alt)</description>
+        <year>198?</year>
+        <publisher>STV</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="737280">
+                <rom name="kismozony.dsk" size="737280" crc="0af2cc13" sha1="de13c7326810609fc81046333c689919f8ea3c2b" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="labirinta" cloneof="labirint">
+        <description>Labirintus (Alt)</description>
+        <year>198?</year>
+        <publisher>&lt;unknown&gt;</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="368640">
+                <rom name="labiv2.dsk" size="368640" crc="7b90a57c" sha1="2f0ba8595584141e2ea7dacd0b1f758ff27b5743" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="linaa" cloneof="lina">
+        <description>Lina (Alt)</description>
+        <year>198?</year>
+        <publisher>STV</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="737280">
+                <rom name="lina [a].dsk" size="737280" crc="dbe61e9a" sha1="50fda0f33be072c40d2050efc6e4f3531971f9d5" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="masolo">
+        <description>Másoló</description>
+        <year>198?</year>
+        <publisher>&lt;unknown&gt;</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="368640">
+                <rom name="masolo.dsk" size="368640" crc="33b27e3e" sha1="7e542be169d5a6de3cd5dcdf4f50f65fc48ce055" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="newintro">
+        <description>Newintro</description>
+        <year>198?</year>
+        <publisher>C.S. Software</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="368640">
+                <rom name="newintro.dsk" size="368640" crc="bde3cf32" sha1="994fe451f537f42686367984e3ef449ecbf18263" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="ordogmota" cloneof="ordogmot">
+        <description>Ördögmotor (Alt)</description>
+        <year>1990</year>
+        <publisher>STV</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="737280">
+                <rom name="ordogmotor [a].dsk" size="737280" crc="8bfa6cbf" sha1="e6758720567aa72cd2afc8be5b413c2015ab1fcf" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="oszkara" cloneof="oszkar">
+        <description>Oszkár a Lovag (Alt)</description>
+        <year>198?</year>
+        <publisher>STV</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="737280">
+                <rom name="oszkar.dsk" size="737280" crc="62d1c2b2" sha1="76ea86b6661a35c2de1e202154599c2b613df32b" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="panika" cloneof="panik">
+        <description>Pánik (Alt)</description>
+        <year>1991</year>
+        <publisher>STV</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="737280">
+                <rom name="panik [a].dsk" size="737280" crc="ac5ac41b" sha1="ec78040a45ab5419478f0a9ad159bb74dcdf9b10" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="parbajb" cloneof="parbaj">
+        <description>Párbaj (Alt 2)</description>
+        <year>1991</year>
+        <publisher>STV</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="737280">
+                <rom name="parbaj [a].dsk" size="737280" crc="296e157b" sha1="c3b71a97597257253057c4c41e9cc97c7741e93e" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="peepshowa" cloneof="peepshow">
+        <description>Peep Show (Alt)</description>
+        <year>1984</year>
+        <publisher>STV</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="737280">
+                <rom name="peepshow.dsk" size="737280" crc="c3628300" sha1="01b45844089b16341ab1bc8964208f6304f97222" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="poseidona" cloneof="poseidon">
+        <description>Poseidon Kincse (Alt)</description>
+        <year>1989</year>
+        <publisher>Novotrade</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="368640">
+                <rom name="poseidonkincse.dsk" size="368640" crc="2acff3a1" sha1="cc3af65157cd00645c8f2f45dbec17dcdd13ca71" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="raceaceb" cloneof="raceace">
+        <description>Race Ace (Alt 2)</description>
+        <year>1990</year>
+        <publisher>Zsolt Szigeti</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="368640">
+                <rom name="race_ace.dsk" size="368640" crc="af7378e5" sha1="553a0bc4909afd55b59eca95d4a5b1a998590dd5" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="rohammcr" cloneof="rohamm">
+        <description>Rohamm (Cracked)</description>
+        <year>1989</year>
+        <publisher>GATO Bt.</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="368640">
+                <rom name="rohammcracked.dsk" size="368640" crc="5c1b9675" sha1="338864ac3231d73af5a24def9c676c08d49e1b19" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="sajtvajob" cloneof="sajtvajo">
+        <description>Sajtvájó (Alt 2)</description>
+        <year>1991</year>
+        <publisher>STV</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="737280">
+                <rom name="sajtvajo [a].dsk" size="737280" crc="1e73fb64" sha1="83f0953be53663c8cc3881a06a124a5186ac0dcf" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="satirozab" cloneof="satiroza">
+        <description>Satírozás (Alt 2)</description>
+        <year>1991</year>
+        <publisher>STV</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="737280">
+                <rom name="satirozas.dsk" size="737280" crc="23fa33d8" sha1="d3048a2e17254270c2a8ccd28a65a6e936e81539" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="sinuscr">
+        <description>Sinuscr</description>
+        <year>198?</year>
+        <publisher>Peter Rakos</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="368640">
+                <rom name="sinusscr.dsk" size="368640" crc="bb893ca8" sha1="17dc0c5eb70b4718654718cae1be2acd38a1dff7" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="spacesapb" cloneof="spacesap">
+        <description>Space Sapper (Alt 2)</description>
+        <year>1987</year>
+        <publisher>Novotrade</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="368640">
+                <rom name="spacesapperv2.dsk" size="368640" crc="2c0c2b0e" sha1="e9294e4a1b82cc6bc60ced8a27081442ed3e4c62" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="teszt">
+        <description>Teszt</description>
+        <year>198?</year>
+        <publisher>&lt;unknown&gt;</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="737280">
+                <rom name="teszt.dsk" size="737280" crc="31fbc7bb" sha1="cf9521931f5aa45459a64ab8258c4dddd5f9d788" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="turbojaca" cloneof="turbojac">
+        <description>Turbo Jack (Alt)</description>
+        <year>1991</year>
+        <publisher>STV</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="737280">
+                <rom name="turbojack [a].dsk" size="737280" crc="2ea588e9" sha1="acbc0f2d1907406f2a44489124c3a3fe30e851bf" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="ufoa">
+        <description>UFO (Alt)</description>
+        <year>1985</year>
+        <publisher>STV</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="737280">
+                <rom name="ufo [a].dsk" size="737280" crc="941110b4" sha1="453504556562f0ccd00089dcf2c86d67004df053" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="upmleme1">
+        <description>UPM Lemez 1</description>
+        <year>198?</year>
+        <publisher>&lt;unknown&gt;</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="737280">
+                <rom name="upmlemez1.dsk" size="737280" crc="d3698df2" sha1="1b944fff0b41007fc6c482ba28407fb851e3ec16" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="upmleme2">
+        <description>UPM Lemez 2</description>
+        <year>198?</year>
+        <publisher>&lt;unknown&gt;</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="737280">
+                <rom name="upmlemez2.dsk" size="737280" crc="1f51ce73" sha1="3de8a6e44bbd34e0abacd0fcdfb76b6965cc5b5a" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="upmleme3">
+        <description>UPM Lemez 3</description>
+        <year>198?</year>
+        <publisher>&lt;unknown&gt;</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="737280">
+                <rom name="upmlemez3.dsk" size="737280" crc="c8966ad8" sha1="a38ac0cd6eec559cbf4f306f64dd8e4c7cab9c57" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="vidzenea" cloneof="vidzene">
+        <description>Videoton Zene (Alt)</description>
+        <year>198?</year>
+        <publisher>JozsiSoft</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="368640">
+                <rom name="vidizev2.dsk" size="368640" crc="7ef1328a" sha1="99b708e16a8c49b63661a4b44afa30fecb0079dc" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+
+    <software name="viliabana" cloneof="viliaban">
+        <description>Vili a Bányász (Alt)</description>
+        <year>1991</year>
+        <publisher>STV</publisher>
+
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="737280">
+                <rom name="vili.dsk" size="737280" crc="90b96888" sha1="0a38c2d1704f5cdfdc5f2cb7c60f7035caaa28b4" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
 -->
 </softwarelist>

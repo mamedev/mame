@@ -1118,7 +1118,7 @@ A few comments on these:
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- boot ok -->
 	<software name="akagawaj" supported="no">
 		<description>Akagawa Jirou - Yasoukyoku 2 (Japan)</description>
@@ -10756,7 +10756,7 @@ A few comments on these:
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="soundqub" supported="no">
 		<description>S.Q. - Sound Qube (Japan)</description>
 		<year>1998</year>
@@ -10897,7 +10897,7 @@ A few comments on these:
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="sangokou" supported="no">
 		<description>Sangokushi Koumeiden (Japan)</description>
 		<year>1997</year>
@@ -11155,7 +11155,7 @@ A few comments on these:
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<software name="seikende" supported="no">
 		<description>Seiken Densetsu - Legend of Mana (Demo) (Japan)</description>
 		<year>1999</year>
@@ -12120,17 +12120,17 @@ A few comments on these:
 
 	<!-- to dump!
 	<software name="sc2k_01" supported="no">
-		<description>Simple Characters 2000 Series Vol.01 - Kidou Senshi Gundam - The Gunjin Shougi (Japan)</description>
-		<year>2001</year>
-		<publisher>Bandai</publisher>
-		<info name="alt_title" value="SIMPLEキャラクター2000シリーズ Vol.01 機動戦士ガンダム THE 軍人将棋"/>
-		<info name="serial" value="SLPS-03309" />
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="psx_cdrom">
-	  		<diskarea name="cdrom">
-	    		<disk name="simple characters 2000 series vol.01 - kidou senshi gundam (japan) [slps-03309]" sha1=""/>
-	  		</diskarea>
-		</part>
+	    <description>Simple Characters 2000 Series Vol.01 - Kidou Senshi Gundam - The Gunjin Shougi (Japan)</description>
+	    <year>2001</year>
+	    <publisher>Bandai</publisher>
+	    <info name="alt_title" value="SIMPLEキャラクター2000シリーズ Vol.01 機動戦士ガンダム THE 軍人将棋"/>
+	    <info name="serial" value="SLPS-03309" />
+	    <sharedfeat name="compatibility" value="NTSC-J"/>
+	    <part name="cdrom" interface="psx_cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="simple characters 2000 series vol.01 - kidou senshi gundam (japan) [slps-03309]" sha1=""/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -12217,20 +12217,20 @@ A few comments on these:
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- to dump!
 	<software name="sc2k_08" supported="no">
-		<description>Simple Characters 2000 Series Vol.08 - Gatchaman the Shooting (Japan)</description>
-		<year>2002</year>
-		<publisher>Bandai</publisher>
-		<info name="alt_title" value="SIMPLEキャラクター2000シリーズ Vol.08 ガッチャマン THE シューティング"/>
-		<info name="serial" value="SLPS-03444" />
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="psx_cdrom">
-	  		<diskarea name="cdrom">
-	    		<disk name="simple characters 2000 series vol.08 - gatchaman the shooting (japan) [slps-03444]" sha1=""/>
-	  		</diskarea>
-		</part>
+	    <description>Simple Characters 2000 Series Vol.08 - Gatchaman the Shooting (Japan)</description>
+	    <year>2002</year>
+	    <publisher>Bandai</publisher>
+	    <info name="alt_title" value="SIMPLEキャラクター2000シリーズ Vol.08 ガッチャマン THE シューティング"/>
+	    <info name="serial" value="SLPS-03444" />
+	    <sharedfeat name="compatibility" value="NTSC-J"/>
+	    <part name="cdrom" interface="psx_cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="simple characters 2000 series vol.08 - gatchaman the shooting (japan) [slps-03444]" sha1=""/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -12261,20 +12261,20 @@ A few comments on these:
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- to dump!
 	<software name="sc2k_11" supported="no">
-		<description>Simple Characters 2000 Series Vol.11 - Meitantei Conan - The Board (Japan)</description>
-		<year>2002</year>
-		<publisher>Bandai&#47;D3</publisher>
-		<info name="alt_title" value="SIMPLEキャラクター2000シリーズ Vol.11 名探偵コナン THE ボードゲーム"/>
-		<info name="serial" value="SLPS-03458" />
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="psx_cdrom">
-	  		<diskarea name="cdrom">
-	    		<disk name="simple characters 2000 series vol.11 - meitantei conan - the board (japan) [slps-03458]" sha1=""/>
-	  		</diskarea>
-		</part>
+	    <description>Simple Characters 2000 Series Vol.11 - Meitantei Conan - The Board (Japan)</description>
+	    <year>2002</year>
+	    <publisher>Bandai&#47;D3</publisher>
+	    <info name="alt_title" value="SIMPLEキャラクター2000シリーズ Vol.11 名探偵コナン THE ボードゲーム"/>
+	    <info name="serial" value="SLPS-03458" />
+	    <sharedfeat name="compatibility" value="NTSC-J"/>
+	    <part name="cdrom" interface="psx_cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="simple characters 2000 series vol.11 - meitantei conan - the board (japan) [slps-03458]" sha1=""/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -12350,17 +12350,17 @@ A few comments on these:
 
 	<!-- to dump!
 	<software name="sc2k_17" supported="no">
-		<description>Simple Characters 2000 Series vol.17 - Sentou Mecha Xabungle - The Racing Game (Japan)</description>
-		<year>2003</year>
-		<publisher>Bandai&#47;D3</publisher>
-		<info name="alt_title" value="SIMPLEキャラクター2000シリーズ Vol.17 戦闘メカ ザブングル THE アクション"/>
-		<info name="serial" value="SLPS-03547" />
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="psx_cdrom">
-	  		<diskarea name="cdrom">
-	    		<disk name="simple characters 2000 series vol.17 - sentou mecha xabungle - rhe racing game (japan) [slps-03547]" sha1=""/>
-	  		</diskarea>
-		</part>
+	    <description>Simple Characters 2000 Series vol.17 - Sentou Mecha Xabungle - The Racing Game (Japan)</description>
+	    <year>2003</year>
+	    <publisher>Bandai&#47;D3</publisher>
+	    <info name="alt_title" value="SIMPLEキャラクター2000シリーズ Vol.17 戦闘メカ ザブングル THE アクション"/>
+	    <info name="serial" value="SLPS-03547" />
+	    <sharedfeat name="compatibility" value="NTSC-J"/>
+	    <part name="cdrom" interface="psx_cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="simple characters 2000 series vol.17 - sentou mecha xabungle - rhe racing game (japan) [slps-03547]" sha1=""/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -14203,7 +14203,7 @@ A few comments on these:
 
 	<!-- boot ok -->
 	<software name="worldlea" supported="no">
-		<description>World League Soccer - Challenge Nippon! (	Family Price 1500) (Japan)</description>
+		<description>World League Soccer - Challenge Nippon! (  Family Price 1500) (Japan)</description>
 		<year>2000</year>
 		<publisher>Coconuts Japan</publisher>
 		<info name="alt_title" value="ワールドリーグサッカー"/>
