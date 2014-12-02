@@ -329,7 +329,7 @@ Then for each sector:
 - FM-encoded sector data followed by two bytes of crc
 - A number of FM-encoded 0xff (usually 48, very variable)
 
-The the track is finished with a stream of '1' cells.
+The track is finished with a stream of '1' cells.
 
 The 125KHz pulse trains are used to lock the PLL to the signal
 correctly.  The specific 16-cells streams allow to distinguish between

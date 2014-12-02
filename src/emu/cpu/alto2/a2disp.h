@@ -76,8 +76,8 @@
 #define ALTO2_DISPLAY_HEIGHT 808                                                    //!< number of visible scanlines per frame; 808 really, but there are some empty lines?
 #define ALTO2_DISPLAY_WIDTH 606                                                     //!< visible width of the display; 38 x 16 bit words - 2 pixels
 #define ALTO2_DISPLAY_VISIBLE_WORDS ((ALTO2_DISPLAY_WIDTH+15)/16)                   //!< visible words per scanline
-#define ALTO2_DISPLAY_BITCLOCK 20160000ll                                           //!< display bit clock in in Hertz (20.16MHz)
-#define ALTO2_DISPLAY_BITTIME(n) (U64(1000000000000)*(n)/ALTO2_DISPLAY_BITCLOCK)    //!< display bit time in in pico seconds (~= 49.6031ns)
+#define ALTO2_DISPLAY_BITCLOCK 20160000ll                                           //!< display bit clock in Hertz (20.16MHz)
+#define ALTO2_DISPLAY_BITTIME(n) (U64(1000000000000)*(n)/ALTO2_DISPLAY_BITCLOCK)    //!< display bit time in pico seconds (~= 49.6031ns)
 #define ALTO2_DISPLAY_SCANLINE_TIME ALTO2_DISPLAY_BITTIME(ALTO2_DISPLAY_TOTAL_WIDTH)//!< time for a scanline in pico seconds (768 * 49.6031ns ~= 38095.1808ns)
 #define ALTO2_DISPLAY_VISIBLE_TIME ALTO2_DISPLAY_BITTIME(ALTO2_DISPLAY_WIDTH)       //!< time of the visible part of a scanline in pico seconds (606 * 49.6031ns ~= 30059.4786ns)
 #define ALTO2_DISPLAY_WORD_TIME ALTO2_DISPLAY_BITTIME(16)                           //!< time for a word in pico seconds (16 pixels * 49.6031ns ~= 793.6496ns)

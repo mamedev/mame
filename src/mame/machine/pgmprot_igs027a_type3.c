@@ -498,8 +498,8 @@ void pgm_arm_type3_state::pgm_create_dummy_internal_arm_region_theglad(int is_sv
 	temp16[(base) /2] = 0xff1e; base += 2;
 	temp16[(base) /2] = 0xe12f; base += 2;
 
-	// the non-EO area starts in the middle of a function that seems similar to those  at 000037E4 / 000037D4 in killbldp.. by setting this up we allow the intro to run
-	// it sets '0x10000038' to a value ot 1
+	// the non-EO area starts in the middle of a function that seems similar to those at 000037E4 / 000037D4 in killbldp. by setting this up we allow the intro to run
+	// it sets '0x10000038' to a value of 1
 	base = 0x184;
 	temp16[(base) /2] = 0x105c; base += 2;
 	temp16[(base) /2] = 0xE59F; base += 2;

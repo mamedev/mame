@@ -45,8 +45,8 @@
 
     How to play...
 
-    This Roulette allow up to 6 players. To start the machine, turn the Operator Key
-    (the the Operator Key light will turn green). Whilest this key is turned ON, you
+    This Roulette allows up to 6 players. To start the machine, turn the Operator Key
+    (the Operator Key light will turn green). Whilst this key is turned ON, you
     can insert credits, play, and payout. Once the key is turned OFF (red light), you
     can play, but credits can't be entered/taken.
 

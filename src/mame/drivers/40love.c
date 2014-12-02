@@ -28,7 +28,7 @@ Game number              : A30
 Vintage                  : 1984
 Game serial/model number : M4300006B ?
 
-I dont have the wiring harness for this board, so dont know if it works.
+I don't have the wiring harness for this board, so don't know if it works.
 One GFX ROM is bad though.
 See A30-26.u23\A30-26.txt for details about the bad ROM.
 To summarise:

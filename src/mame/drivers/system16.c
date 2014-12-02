@@ -35,7 +35,7 @@
      - Tetris
      - E-Swat
 
-    These appear to be a variation no the encrypted / protected bootlegs, but without the encryption
+    These appear to be a variation on the encrypted / protected bootlegs, but without the encryption
     or protection
 
     - Golden Axe (set 2)
@@ -566,7 +566,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::s16bl_bgscrollx_w)
 	int scroll = data & 0x1ff;
 
 	scroll+= 0x200;
-	scroll+= 1; // so that the background fo the select screen is properly aligned
+	scroll+= 1; // so that the background of the select screen is properly aligned
 	m_bg_scrollx = -scroll;
 }
 

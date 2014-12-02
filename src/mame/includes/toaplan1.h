@@ -27,7 +27,7 @@ public:
 
 	optional_shared_ptr<UINT8> m_sharedram;
 
-	int m_coin_count; /* coin count increments on startup ? , so dont count it */
+	int m_coin_count; /* coin count increments on startup ? , so don't count it */
 	int m_intenable;
 
 	/* Demon world */
