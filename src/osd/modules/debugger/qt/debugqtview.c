@@ -152,7 +152,7 @@ void DebuggerView::paintEvent(QPaintEvent* event)
 {
 	// Tell the MAME debug view how much real estate is available
 	QFontMetrics actualFont = fontMetrics();
-	const int fontWidth = MAX(1, actualFont.width('_'));
+	const double fontWidth = actualFont.width(QString(100, '_')) / 100.;
 	const int fontHeight = MAX(1, actualFont.height());
 	m_view->set_visible_size(debug_view_xy(width()/fontWidth, height()/fontHeight));
 
@@ -344,7 +344,7 @@ void DebuggerView::mousePressEvent(QMouseEvent* event)
 	if (event->button() == Qt::LeftButton)
 	{
 		QFontMetrics actualFont = fontMetrics();
-		const int fontWidth = MAX(1, actualFont.width('_'));
+		const double fontWidth = actualFont.width(QString(100, '_')) / 100.;
 		const int fontHeight = MAX(1, actualFont.height());
 
 		debug_view_xy topLeft = m_view->visible_position();
