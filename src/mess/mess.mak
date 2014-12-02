@@ -730,6 +730,7 @@ DRVLIBS += \
 	$(MESSOBJ)/intv.a \
 	$(MESSOBJ)/isc.a \
 	$(MESSOBJ)/kaypro.a \
+	$(MESSOBJ)/kenner.a \
 	$(MESSOBJ)/koei.a \
 	$(MESSOBJ)/kyocera.a \
 	$(MESSOBJ)/luxor.a \
@@ -1329,6 +1330,9 @@ $(MESSOBJ)/isc.a:               \
 $(MESSOBJ)/kaypro.a:            \
 	$(MESS_DRIVERS)/kaypro.o $(MESS_MACHINE)/kaypro.o $(MESS_MACHINE)/kay_kbd.o $(MESS_VIDEO)/kaypro.o \
 
+$(MESSOBJ)/kenner.a:            \
+	$(MESS_DRIVERS)/starwbc.o   \
+
 $(MESSOBJ)/koei.a:              \
 	$(MESS_DRIVERS)/pasogo.o    \
 
@@ -1472,6 +1476,7 @@ $(MESSOBJ)/palm.a:              \
 	$(MESS_DRIVERS)/palmz22.o   \
 
 $(MESSOBJ)/parker.a:            \
+	$(MESS_DRIVERS)/cnsector.o  \
 	$(MESS_DRIVERS)/merlin.o    \
 	$(MESS_DRIVERS)/stopthie.o  \
 
@@ -2074,6 +2079,7 @@ $(MAME_DRIVERS)/cdi.o:      $(MAME_LAYOUT)/cdi.lh
 $(MESS_DRIVERS)/chessmst.o: $(MESS_LAYOUT)/chessmst.lh
 $(MESS_DRIVERS)/chesstrv.o: $(MESS_LAYOUT)/chesstrv.lh \
 							$(MESS_LAYOUT)/borisdpl.lh
+$(MESS_DRIVERS)/cnsector.o: $(MESS_LAYOUT)/cnsector.lh
 $(MESS_DRIVERS)/comp4.o:    $(MESS_LAYOUT)/comp4.lh
 $(MESS_DRIVERS)/cp1.o:      $(MESS_LAYOUT)/cp1.lh
 $(MESS_DRIVERS)/cvicny.o:   $(MESS_LAYOUT)/cvicny.lh
@@ -2144,6 +2150,7 @@ $(MESS_DRIVERS)/simon.o:    $(MESS_LAYOUT)/simon.lh
 $(MESS_DRIVERS)/sitcom.o:   $(MESS_LAYOUT)/sitcom.lh
 $(MESS_DRIVERS)/slc1.o:     $(MESS_LAYOUT)/slc1.lh
 $(MESS_DRIVERS)/sms.o:      $(MESS_LAYOUT)/sms1.lh
+$(MESS_DRIVERS)/starwbc.o:  $(MESS_LAYOUT)/starwbc.lh
 $(MESS_DRIVERS)/stopthie.o: $(MESS_LAYOUT)/stopthie.lh
 $(MESS_DRIVERS)/super80.o:  $(MESS_LAYOUT)/super80.lh
 $(MESS_DRIVERS)/supercon.o: $(MESS_LAYOUT)/supercon.lh
