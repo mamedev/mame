@@ -45,12 +45,10 @@ WRITE8_MEMBER(mjkjidai_state::mjkjidai_videoram_w)
 
 WRITE8_MEMBER(mjkjidai_state::mjkjidai_ctrl_w)
 {
-	UINT8 *rom = memregion("maincpu")->base();
-
 //  logerror("%04x: port c0 = %02x\n",space.device().safe_pc(),data);
 
 	/* bit 0 = NMI enable */
-	m_nmi_mask = data & 1;
+	m_nmi_enable = data & 1;
 
 	/* bit 1 = flip screen */
 	flip_screen_set(data & 0x02);
@@ -62,15 +60,7 @@ WRITE8_MEMBER(mjkjidai_state::mjkjidai_ctrl_w)
 	coin_counter_w(machine(), 0,data & 0x20);
 
 	/* bits 6-7 select ROM bank */
-	if (data & 0xc0)
-	{
-		membank("bank1")->set_base(rom + 0x10000-0x4000 + ((data & 0xc0) << 8));
-	}
-	else
-	{
-		/* there is code flowing from 7fff to this bank so they have to be contiguous in memory */
-		membank("bank1")->set_base(rom + 0x08000);
-	}
+	membank("bank1")->set_entry(data >> 6);
 }
 
 
@@ -83,9 +73,9 @@ WRITE8_MEMBER(mjkjidai_state::mjkjidai_ctrl_w)
 
 void mjkjidai_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram1;
-	UINT8 *spriteram_2 = m_spriteram2;
-	UINT8 *spriteram_3 = m_spriteram3;
+	UINT8 *spriteram = &m_videoram[0];
+	UINT8 *spriteram_2 = &m_videoram[0x800];
+	UINT8 *spriteram_3 = &m_videoram[0x1000];
 	int offs;
 
 	for (offs = 0x20-2;offs >= 0;offs -= 2)
