@@ -398,6 +398,20 @@ void debug_view_manager::free_view(debug_view &view)
 
 
 //-------------------------------------------------
+//  update_all_except - force all views to refresh
+//  except one
+//-------------------------------------------------
+
+void debug_view_manager::update_all_except(debug_view_type type)
+{
+	// loop over each view and force an update
+	for (debug_view *view = m_viewlist; view != NULL; view = view->next())
+		if (type == DVT_NONE || type != view->type())
+			view->force_update();
+}
+
+
+//-------------------------------------------------
 //  update_all - force all views to refresh
 //-------------------------------------------------
 

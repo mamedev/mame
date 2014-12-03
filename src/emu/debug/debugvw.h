@@ -240,6 +240,7 @@ public:
 
 	// update helpers
 	void update_all(debug_view_type type = DVT_NONE);
+	void update_all_except(debug_view_type type = DVT_NONE);
 	void flush_osd_updates();
 
 private:
