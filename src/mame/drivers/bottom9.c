@@ -367,7 +367,7 @@ ROM_START( bottom9 )
 	ROM_LOAD32_BYTE( "891e09d", 0x40002, 0x10000, CRC(4e1335e6) SHA1(b892ab40a41978a89658ea2e7aabe9b073430b5d) )
 	ROM_LOAD32_BYTE( "891e09b", 0x40003, 0x10000, CRC(b6f914fb) SHA1(e95f3e899c2ead15ef8a529dbc67e8f4a0f88bdd) )
 
-	ROM_REGION( 0x100000, "k051960", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x100000, "k051960", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD32_BYTE( "891e06e", 0x00000, 0x10000, CRC(0b04db1c) SHA1(0beae7bb8da49379915c0253ce03091eb71a58b5) )    /* sprites */
 	ROM_LOAD32_BYTE( "891e06a", 0x00001, 0x10000, CRC(5ee37327) SHA1(f63ddaf63af06ea5421b0361315940582ef57922) )
 	ROM_LOAD32_BYTE( "891e05e", 0x00002, 0x10000, CRC(b356e729) SHA1(2cda591415b0f139fdb1f80c349d432bb0579d8e) )
@@ -424,7 +424,7 @@ ROM_START( bottom9n )
 	ROM_LOAD32_BYTE( "891e09d", 0x40002, 0x10000, CRC(4e1335e6) SHA1(b892ab40a41978a89658ea2e7aabe9b073430b5d) )
 	ROM_LOAD32_BYTE( "891e09b", 0x40003, 0x10000, CRC(b6f914fb) SHA1(e95f3e899c2ead15ef8a529dbc67e8f4a0f88bdd) )
 
-	ROM_REGION( 0x100000, "k051960", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x100000, "k051960", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD32_BYTE( "891e06e", 0x00000, 0x10000, CRC(0b04db1c) SHA1(0beae7bb8da49379915c0253ce03091eb71a58b5) )    /* sprites */
 	ROM_LOAD32_BYTE( "891e06a", 0x00001, 0x10000, CRC(5ee37327) SHA1(f63ddaf63af06ea5421b0361315940582ef57922) )
 	ROM_LOAD32_BYTE( "891e05e", 0x80002, 0x10000, CRC(b356e729) SHA1(2cda591415b0f139fdb1f80c349d432bb0579d8e) )

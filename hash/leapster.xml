@@ -117,7 +117,7 @@
 		<publisher>LeapFrog</publisher>
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="0x800000">
-				<rom name="500-11078-a - lernen mit leap (german)" size="0x800000" crc="e1f505e7" sha1="935eb17d3b6f9df2115a12445b3c8c977005481a" offset="0x00000" />
+				<rom name="500-11078-a - lernen mit leap (german).bin" size="0x800000" crc="e1f505e7" sha1="935eb17d3b6f9df2115a12445b3c8c977005481a" offset="0x00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -143,4 +143,38 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="dora" supported="no">
+		<description>Dora - Retter der Wildnis (German)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-12562-b - dora - retter der wildnis (german).bin" size="0x800000" crc="242907d4" sha1="262ee3e208fff0fc362bc879416cbdf31bf38304" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vorschul" supported="no">
+		<description>Vorschule (German)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-10934-a - vorschule (german).bin" size="0x800000" crc="4c5e775e" sha1="87819e1a95f0d435fc94697423fcfca13f463a34" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="weltmath" supported="no">
+		<description>Weltraum-Mathe - Lernen im Arcade-Stil! (German)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-12140-a - weltraum-mathe - lernen im arcade-stil! (german).bin" size="0x400000" crc="75164c8e" sha1="6bebaef0d3b6f8a1a4b2bb957a00a0cce4ed65a2" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

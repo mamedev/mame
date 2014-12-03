@@ -1054,7 +1054,7 @@ DRIVER_INIT_MEMBER(crystal_state,evosocc)
 
 The PIC uses a software UART bit banged on a single output pin of the main CPU:
 the data port is bit 0x20000000 on the PIO register, the same register where the EEPROM control lines are. The serial data is transmitted at 8 data bits, even parity, 1 stop bit. It's probably
-tricky to get it working properly because it doesn't rely on a clock signal, and so, the pic and main cpu must run in in parallel, and the bit lengths must match. The pic bit delay routine is just a loop.
+tricky to get it working properly because it doesn't rely on a clock signal, and so, the pic and main cpu must run in parallel, and the bit lengths must match. The pic bit delay routine is just a loop.
 also it seems that bit 0x40000000 is the PIC reset.
 
 */

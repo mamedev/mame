@@ -1,51 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
 <softwarelist name="osborne1" description="Osborne-1 floppies">
 
-	<software name="osmosis" supported="no"><!-- boot error -->
-		<description>Osmosis CP/M Disk Emulation System v1.0</description>
-		<year>1983</year>
-		<publisher>Osmosis Computer</publisher>
-		<info name="release" value="198303??"/>
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="disk_serial" value="1690" />
-			<feature name="disk_label" value="Osmosis CP/M Disk Emulation System for the Osborne 1 Microcomputer" />
-			<dataarea name="flop" size="3154">
-				<rom name="osmo-emu.td0" size="3154" crc="5040c443" sha1="49fc78621b7a9356ebe9ed88fe8ceb1dd9befdbf" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dddist" supported="no"><!-- boot error -->
-		<description>Double Density Distribution v1.4</description>
+	<software name="amcall">
+		<description>AMCALL (v2.06)</description>
 		<year>1982</year>
-		<publisher>Osmosis Computer</publisher>
-		<info name="release" value="198210??"/>
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="disk_serial" value="2121" />
-			<feature name="disk_label" value="Double Density Distribution" />
-			<dataarea name="flop" size="834">
-				<rom name="osmos-dd.td0" size="834" crc="8b47a452" sha1="1a4746512678b498dce28f28f96396ba31043ccc" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rt60a" supported="no"><!-- boot error -->
-		<description>RT-60A Real Time Clock Software v2.7</description><!-- for the RT-60A Real Time Clock, rom dump needed -->
-		<year>19??</year>
-		<publisher>JG Communications</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="disk_label" value="RT-60A Software" />
-			<dataarea name="flop" size="13793">
-				<rom name="rt-60a.td0" size="13793" crc="241b2497" sha1="1385701061152202db14550f1aad6cd4b190286f" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="amcall" supported="no">
-		<description>Auto MicroCALL Communications Program</description>
-		<year>1982</year>
-		<publisher>MicroCALL SERVICES</publisher>
+		<publisher>MicroCALL Services</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="40392">
 				<rom name="os1mcal.td0" size="40392" crc="ee61a8e9" sha1="1ad5d000e1865ebf7118cbd2fbeee581b3ad226f" offset="0" />
@@ -53,10 +14,11 @@
 		</part>
 	</software>
 
-	<software name="amcalla" cloneof="amcall" supported="no"><!-- boot error -->
-		<description>AMCALL v2.06 (Alt)</description>
+	<software name="amcalla" cloneof="amcall">
+		<description>AMCALL (v2.06, Alt)</description>
 		<year>1982</year>
 		<publisher>MicroCALL Services</publisher>
+		<info name="usage" value="Requires CP/M disk in drive A"/>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="disk_serial" value="1113" />
 			<feature name="part_number" value="2B50002-00" />
@@ -79,10 +41,11 @@
 		</part>
 	</software>
 
-	<software name="mileston" supported="no"><!-- boot error -->
-		<description>Milestone v1.09</description>
+	<software name="mileston">
+		<description>Milestone (Rev 1.09)</description>
 		<year>1981</year>
 		<publisher>Organic Software</publisher>
+		<info name="usage" value="Requires CP/M disk in drive A"/>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="disk_serial" value="302997" />
 			<feature name="part_number" value="2G011501-00" />
@@ -99,10 +62,11 @@
 		</part>
 	</software>
 
-	<software name="interrog" supported="no"><!-- boot error -->
+	<software name="interrog">
 		<description>Interrogator</description>
 		<year>1984</year>
 		<publisher>Dysan</publisher>
+		<info name="usage" value="Requires CP/M disk in drive A"/>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="disk_label" value="Drive Diagnostic Program" />
 			<dataarea name="flop" size="35037">
@@ -111,10 +75,11 @@
 		</part>
 	</software>
 
-	<software name="microlnk" supported="no"><!-- boot error -->
-		<description>The Micro Link</description>
+	<software name="microlnk">
+		<description>The Micro Link (v2.3)</description>
 		<year>1981</year>
 		<publisher>Wordcraft</publisher>
+		<info name="usage" value="Requires CP/M disk in drive A"/>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="disk_serial" value="000835" />
 			<dataarea name="flop" size="6835">
@@ -123,8 +88,8 @@
 		</part>
 	</software>
 
-	<software name="diag" supported="no"><!-- Bdos Err on A: Select -->
-		<description>Diagnostics?</description>
+	<software name="sysconf">
+		<description>Osborne-1 System Confidence Test (v2.04)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -134,8 +99,20 @@
 		</part>
 	</software>
 
-	<software name="sysconf" supported="no"><!-- cpm plus formatted? -->
-		<description>Osborne-1 System Confidence Test v2.00</description>
+	<software name="sysconfa" cloneof="sysconf">
+		<description>Osborne-1 System Confidence Test (v2.04, Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires CP/M disk in drive A"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="46760">
+				<rom name="os1dias.td0" size="46760" crc="04b4bec8" sha1="d764df88e9f18ca67823f41797bd536e2d4cc606" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sysconfb" cloneof="sysconf" supported="no"> <!-- cpm plus formatted? -->
+		<description>Osborne-1 System Confidence Test (v2.00)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -145,8 +122,8 @@
 		</part>
 	</software>
 
-	<software name="cpm">
-		<description>CP/M for Osborne I v2.20</description>
+	<software name="actcpm">
+		<description>60K CP/M vers 2.20 for Osborne </description>
 		<year>19??</year>
 		<publisher>Australian Computer &amp; Telecommunications</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -156,8 +133,8 @@
 		</part>
 	</software>
 
-	<software name="basic" supported="no">
-		<description>Osborne 1 BASIC</description>
+	<software name="basic80">
+		<description>BASIC-80 (Rev. 5.21)</description>
 		<year>1981</year>
 		<publisher>Microsoft</publisher>
 		<info name="release" value="19810529"/>
@@ -168,12 +145,11 @@
 		</part>
 	</software>
 
-	<software name="dbase2" supported="no">
-		<description>dBase II</description>
+	<software name="dbase2">
+		<description>dBase II (v2.3)</description>
 		<year>1982</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="release" value="19820106"/>
-		<info name="version" value="2.3" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="56706">
 				<rom name="os1dbase.td0" size="56706" crc="1266f67c" sha1="641c271af3681a00e7a2750e20d7fabcaa5adb9f" offset="0" />
@@ -181,20 +157,9 @@
 		</part>
 	</software>
 
-	<software name="conftest" supported="no">
-		<description>Osbourne 1 System Confidence Test</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="46760">
-				<rom name="os1dias.td0" size="46760" crc="04b4bec8" sha1="d764df88e9f18ca67823f41797bd536e2d4cc606" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mdm740" supported="no">
+	<software name="mdm740">
 		<description>MDM740 modem program</description>
-		<year>1985</year>
+		<year>1984</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="programmer" value="Irvin M. Hoff"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -204,21 +169,10 @@
 		</part>
 	</software>
 
-	<software name="sysdisku" cloneof="sysdisk" supported="no">
-		<description>Osborne 1 System Disk (upgrade rom?)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="57670">
-				<rom name="os1sysd.td0" size="57670" crc="8b67b9cc" sha1="ab49f0ed731e197940b46bf79c6536a9f622d3bb" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sysdisk" supported="no">
-		<description>Osborne 1 System Disk</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="cpm22">
+		<description>60k CP/M v2.2</description>
+		<year>1981</year>
+		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="49640">
 				<rom name="os1syss.td0" size="49640" crc="47fcb5a7" sha1="287c56f0083303768eea526c98a098b04f0749be" offset="0" />
@@ -226,7 +180,18 @@
 		</part>
 	</software>
 
-	<software name="utils" supported="no">
+	<software name="cpm22a" cloneof="cpm22">
+		<description>60k CP/M v2.2 (Alt)</description>
+		<year>1981</year>
+		<publisher>Digital Research</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="57670">
+				<rom name="os1sysd.td0" size="57670" crc="8b67b9cc" sha1="ab49f0ed731e197940b46bf79c6536a9f622d3bb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="utils">
 		<description>Utilities</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -237,10 +202,11 @@
 		</part>
 	</software>
 
-	<software name="xutils" supported="no">
-		<description>Extended Utilities</description><!-- Bdos Err on A: Select -->
+	<software name="xutils">
+		<description>Extended Utilities</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires CP/M disk in drive A"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="35382">
 				<rom name="os1xutls.td0" size="35382" crc="630d7091" sha1="a8bc164cf8cb4f5fba49422ac10447ecacbb60dd" offset="0" />
@@ -248,8 +214,8 @@
 		</part>
 	</software>
 
-	<software name="wordstar" supported="no">
-		<description>Wordstar</description>
+	<software name="wordstar">
+		<description>Wordstar (rel. 2.26)</description>
 		<year>1981</year>
 		<publisher>Micropro International</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -259,7 +225,7 @@
 		</part>
 	</software>
 
-	<software name="blank" supported="no">
+	<software name="blank">
 		<description>Osborne 1 blank disk</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -269,4 +235,49 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- how are these used? maybe they are bad dumps? -->
+
+	<software name="osmosis" supported="no">
+		<description>Osmosis CP/M Disk Emulation System (v1.0)</description>
+		<year>1983</year>
+		<publisher>Osmosis Computer</publisher>
+		<info name="release" value="198303??"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="disk_serial" value="1690" />
+			<feature name="disk_label" value="Osmosis CP/M Disk Emulation System for the Osborne 1 Microcomputer" />
+			<dataarea name="flop" size="3154">
+				<rom name="osmo-emu.td0" size="3154" crc="5040c443" sha1="49fc78621b7a9356ebe9ed88fe8ceb1dd9befdbf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dddist" supported="no">
+		<description>Double Density Distribution (v1.4)</description>
+		<year>1982</year>
+		<publisher>Osmosis Computer</publisher>
+		<info name="release" value="198210??"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="disk_serial" value="2121" />
+			<feature name="disk_label" value="Double Density Distribution" />
+			<dataarea name="flop" size="834">
+				<rom name="osmos-dd.td0" size="834" crc="8b47a452" sha1="1a4746512678b498dce28f28f96396ba31043ccc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rt60a" supported="no">
+		<description>RT-60A Real Time Clock Software (v2.7)</description>   <!-- for the RT-60A Real Time Clock, rom dump needed -->
+		<year>19??</year>
+		<publisher>JG Communications</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="disk_label" value="RT-60A Software" />
+			<dataarea name="flop" size="13793">
+				<rom name="rt-60a.td0" size="13793" crc="241b2497" sha1="1385701061152202db14550f1aad6cd4b190286f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

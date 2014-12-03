@@ -435,9 +435,10 @@
 				<rom loadflag="load16_word_swap" name="006-p1.p1" offset="0x000000" size="0x080000" crc="d4aaf597" sha1="34d35b71adb5bd06f4f1b50ffd9c58ab9c440a84" />
 				<!-- MB834200 -->
 			</dataarea>
-			<dataarea name="mcu" size="0x1000">
+			<dataarea name="mcu" size="0x2000">
 				<!-- Hitachi HD6301V1 MCU -->
-				<!-- <rom name="hd6301v1p.com", 0x0000, 0x1000, NO_DUMP /> -->
+				<rom offset="0x000000" size="0x02000" name="rhcom.bin" crc="e5cd6306" sha1="f6bbb8ae562804d67e137290c765c3589fa334c0" />
+        <!-- dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally) -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="006-s1.s1" crc="eb5189f0" sha1="0239c342ea62e73140a2306052f226226461a478" />
@@ -487,9 +488,10 @@
 				<rom loadflag="load16_word_swap" name="006-pg1.p1" offset="0x000000" size="0x080000" status="baddump" crc="52445646" sha1="647bb31f2f68453c1366cb6e2e867e37d1df7a54" />
 				<!-- Chip label p1h does not exist, renamed temporarly to pg1, marked BAD_DUMP. This needs to be verified. -->
 			</dataarea>
-			<dataarea name="mcu" size="0x1000">
+			<dataarea name="mcu" size="0x2000">
 				<!-- Hitachi HD6301V1 MCU -->
-				<!-- <rom name="hd6301v1p.com", 0x0000, 0x1000, NO_DUMP /> -->
+				<rom offset="0x000000" size="0x02000" name="rhcom.bin" crc="e5cd6306" sha1="f6bbb8ae562804d67e137290c765c3589fa334c0" />
+        <!-- dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally) -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="006-s1.s1" crc="eb5189f0" sha1="0239c342ea62e73140a2306052f226226461a478" />
@@ -3566,7 +3568,7 @@
 				<!-- VIC940800 -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
-				<rom offset="0x000000" size="0x020000" name="060-s1.s1" crc="7f012104" sha1="f366dcc3923655dff16ec08a40d5fce22a84257d" />
+				<rom offset="0x000000" size="0x020000" name="060-s1.s1" crc="d62a72e9" sha1="a23e4c4fd4ec11a7467ce41227c418b4dd1ef649" />
 				<!-- VIC930100 -->
 			</dataarea>
 			<dataarea name="audiocpu" size="0x020000">
@@ -3604,11 +3606,11 @@
 				<rom loadflag="load16_word_swap" name="060-p1.p1" offset="0x000000" size="0x100000" crc="2a104b50" sha1="3eb663d3df7074e1cdf4c0e450a35c9cf55d8979" />
 				<!-- VIC940800 -->
 				<!-- the rom below acts as a patch to the program rom in the cart, replacing the first 512kb -->
-				<rom loadflag="load16_word_swap" name="060-epr.sp2"  offset="0x000000" size="0x080000" status="baddump" crc="3032041b" sha1="4b8ed2e6f74579ea35a53e06ccac42d6905b0f51" />
-				<!-- P is on eprom, correct chip label unknown -->
+				<rom loadflag="load16_word_swap" name="1.sp2"  offset="0x000000" size="0x080000" crc="3032041b" sha1="4b8ed2e6f74579ea35a53e06ccac42d6905b0f51" />
+				<!-- P is on eprom, has a Viccom logo at the top of the label with a circled '1' in the center -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
-				<rom offset="0x000000" size="0x020000" name="060-s1.s1" crc="7f012104" sha1="f366dcc3923655dff16ec08a40d5fce22a84257d" />
+				<rom offset="0x000000" size="0x020000" name="060-s1.s1" crc="d62a72e9" sha1="a23e4c4fd4ec11a7467ce41227c418b4dd1ef649" />
 				<!-- VIC930100 -->
 			</dataarea>
 			<dataarea name="audiocpu" size="0x020000">

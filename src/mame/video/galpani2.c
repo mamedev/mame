@@ -55,47 +55,6 @@ WRITE16_MEMBER( galpani2_bg8_regs_0_w ) { galpani2_bg8_regs_w(space, offset, dat
 WRITE16_MEMBER( galpani2_bg8_regs_1_w ) { galpani2_bg8_regs_w(space, offset, data, mem_mask, 1); }
 #endif
 
-inline void galpani2_state::galpani2_bg8_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _n_)
-{
-	int x,y,pen;
-	UINT16 newword = COMBINE_DATA(&m_bg8[_n_][offset]);
-	pen =   newword & 0xff;
-	x   =   (offset % 512); /* 512 x 256 */
-	y   =   (offset / 512);
-	m_bg8_bitmap[_n_]->pix16(y, x) = 0x4000 + pen;
-}
-
-WRITE16_MEMBER( galpani2_state::galpani2_bg8_0_w ) { galpani2_bg8_w(offset, data, mem_mask, 0); }
-WRITE16_MEMBER( galpani2_state::galpani2_bg8_1_w ) { galpani2_bg8_w(offset, data, mem_mask, 1); }
-
-inline void galpani2_state::galpani2_palette_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _n_)
-{
-	UINT16 newword = COMBINE_DATA(&m_palette_val[_n_][offset]);
-	m_palette->set_pen_color( offset + 0x4000 + _n_ * 0x100, pal5bit(newword >> 5), pal5bit(newword >> 10), pal5bit(newword >> 0) );
-}
-
-WRITE16_MEMBER( galpani2_state::galpani2_palette_0_w ) { galpani2_palette_w(offset, data, mem_mask, 0); }
-WRITE16_MEMBER( galpani2_state::galpani2_palette_1_w ) { galpani2_palette_w(offset, data, mem_mask, 1); }
-
-
-/***************************************************************************
-
-
-                            xRGB  Background Layer
-
-
-***************************************************************************/
-
-/* 8 horizontal pages of 256x256 pixels? */
-WRITE16_MEMBER( galpani2_state::galpani2_bg15_w )
-{
-	UINT16 newword = COMBINE_DATA(&m_bg15[offset]);
-
-	int x = (offset % 256) + (offset / (256*256)) * 256 ;
-	int y = (offset / 256) % 256;
-
-	m_bg15_bitmap->pix16(y, x) = 0x4200 + (newword & 0x7fff);
-}
 
 
 /***************************************************************************
@@ -113,14 +72,11 @@ PALETTE_INIT_MEMBER(galpani2_state, galpani2)
 
 	/* initialize 555 RGB lookup */
 	for (i = 0; i < 0x8000; i++)
-		palette.set_pen_color(0x4200+i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
+		palette.set_pen_color(i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
 }
 
 void galpani2_state::video_start()
 {
-	m_bg15_bitmap  = auto_bitmap_ind16_alloc(machine(), 256*8, 256);
-	m_bg8_bitmap[0] = auto_bitmap_ind16_alloc(machine(), 512, 256);
-	m_bg8_bitmap[1] = auto_bitmap_ind16_alloc(machine(), 512, 256);
 }
 
 
@@ -132,11 +88,53 @@ void galpani2_state::video_start()
 
 ***************************************************************************/
 
-UINT32 galpani2_state::screen_update_galpani2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+// based on videos these 8-bit layers actually get *blended* against the RGB555 layer
+// it should be noted that in the layer at 0x500000 the upper 8 bits are set too, this could be related
+void galpani2_state::copybg8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer)
+{
+	int x = - ( *m_bg8_scrollx[layer] + 0x200 - 0x0f5 );
+	int y = - ( *m_bg8_scrolly[layer] + 0x200 - 0x1be );
+	UINT16* ram = m_bg8[layer];
+
+	const pen_t *clut = &m_bg8palette->pen(0);
+	for (int xx = 0; xx < 320; xx++)
+	{
+		for (int yy = 0; yy < 240; yy++)
+		{
+			UINT16 pen = ram[(((y + yy) & 0xff) * 512) + ((x + xx) & 0x1ff)];
+			if (pen) bitmap.pix32(yy, xx) = clut[pen & 0xff];
+		}
+	}
+}
+
+// this seems to be 256x256 pages (arranged as 1024*256), but the game resolution is 320x240
+// https://www.youtube.com/watch?v=2b2SLFtC0uA is a video of the galpanic2j set, and shows the RGB pattern at
+// startup covering all screen lines - is the hardware mixing bitmaps of different resolutions or is there a
+// line select somewhere?  I should find the gal images and find what resolution they're stored at too.
+// (or is this just wrong format / layout due to protection?)
+void galpani2_state::copybg15(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	UINT16* ram = m_bg15 + 0x40000/2;
+	
+	//int x = 0;
+	//int y = 0;
+
+	const pen_t *clut = &m_bg15palette->pen(0);
+	for (int xx = 0; xx < 320; xx++)
+	{
+		for (int yy = 0; yy < 240; yy++)
+		{
+			UINT16 pen = ram[(xx * 0x800) + yy];
+			bitmap.pix32(yy, xx) = clut[pen & 0x7fff];
+		}
+	}
+}
+
+UINT32 galpani2_state::screen_update_galpani2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 
-#ifdef MAME_DEBUG
+#if 1 // MAME_DEBUG
 if (machine().input().code_pressed(KEYCODE_Z))
 {
 	int msk = 0;
@@ -151,39 +149,15 @@ if (machine().input().code_pressed(KEYCODE_Z))
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0, cliprect);
 
-	if (layers_ctrl & 0x1)
-	{
-		int x = 0;
-		int y = 0;
-		copyscrollbitmap_trans(bitmap, *m_bg15_bitmap,
-								1, &x, 1, &y,
-								cliprect,0x4200 + 0);
-	}
-
 /*  test mode:
     304000:0040 0000 0100 0000-0000 0000 0000 0000      (Sprite regs)
     304010:16C0 0200 16C0 0200-16C0 0200 16C0 0200
     16c0/40 = 5b        200/40 = 8
     scrollx = f5, on screen x should be 0 (f5+5b = 150) */
 
-	if (layers_ctrl & 0x2)
-	{
-		int x = - ( *m_bg8_scrollx[0] + 0x200 - 0x0f5 );
-		int y = - ( *m_bg8_scrolly[0] + 0x200 - 0x1be );
-		copyscrollbitmap_trans(bitmap, *m_bg8_bitmap[0],
-								1, &x, 1, &y,
-								cliprect,0x4000 + 0);
-	}
-
-	if (layers_ctrl & 0x4)
-	{
-		int x = - ( *m_bg8_scrollx[1] + 0x200 - 0x0f5 );
-		int y = - ( *m_bg8_scrolly[1] + 0x200 - 0x1be );
-		copyscrollbitmap_trans(bitmap, *m_bg8_bitmap[1],
-								1, &x, 1, &y,
-								cliprect,0x4000 + 0);
-	}
-
+	if (layers_ctrl & 0x1) copybg15(screen, bitmap, cliprect);
+	if (layers_ctrl & 0x2) copybg8(screen, bitmap, cliprect, 0);
+	if (layers_ctrl & 0x4) copybg8(screen, bitmap, cliprect, 1);
 	if (layers_ctrl & 0x8) m_kaneko_spr->kaneko16_render_sprites(bitmap, cliprect, screen.priority(), m_spriteram, m_spriteram.bytes());
 	return 0;
 }

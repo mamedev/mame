@@ -207,6 +207,7 @@ PCB - LEAPSTER-TV:
 #include "emu.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "cpu/arc/arc.h"
 
 
 class leapster_state : public driver_device
@@ -263,11 +264,16 @@ void leapster_state::machine_reset()
 {
 }
 
-
+static ADDRESS_MAP_START( leapster_map, AS_PROGRAM, 32, leapster_state )
+	AM_RANGE(0x000000, 0x1fffff) AM_ROM
+ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( leapster, leapster_state )
 	/* basic machine hardware */
 	// CPU is ArcTangent A5
+	MCFG_CPU_ADD("maincpu", ARC, 96000000/10)
+	MCFG_CPU_PROGRAM_MAP(leapster_map)
+
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -287,12 +293,12 @@ MACHINE_CONFIG_END
 
 ROM_START(leapster)
 	ROM_REGION(0x200000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD( "155-10072-a.bin", 0x00000, 0x200000, CRC(af05e5a0) SHA1(d4468d060543ba7e44785041093bc98bcd9afa07) )
+	ROM_LOAD16_WORD_SWAP( "155-10072-a.bin", 0x00000, 0x200000, CRC(af05e5a0) SHA1(d4468d060543ba7e44785041093bc98bcd9afa07) )
 ROM_END
 
 ROM_START(leapstertv)
 	ROM_REGION(0x200000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD( "am29pl160cb-90sf.bin", 0x00000, 0x200000, BAD_DUMP CRC(dc281f1f) SHA1(17588de54ab3bb82801bd5062f3e6aa687412178) )
+	ROM_LOAD16_WORD_SWAP( "am29pl160cb-90sf.bin", 0x00000, 0x200000, BAD_DUMP CRC(dc281f1f) SHA1(17588de54ab3bb82801bd5062f3e6aa687412178) )
 ROM_END
 
 

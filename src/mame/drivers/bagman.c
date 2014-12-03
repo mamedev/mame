@@ -281,7 +281,7 @@ static INPUT_PORTS_START( botanici )
 
 	PORT_MODIFY("P2") // only seems to have 2 coin slots
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // this must be ACTIVE_HIGH or the game fails after you complete a level, protection?
 
 	PORT_MODIFY("DSW") // dipswitches are a bit messy on this set
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:3")

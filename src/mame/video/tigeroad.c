@@ -66,46 +66,7 @@ WRITE16_MEMBER(tigeroad_state::tigeroad_scroll_w)
 	}
 }
 
-void tigeroad_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
-{
-	UINT16 *source = &m_spriteram->buffer()[m_spriteram->bytes()/2] - 4;
-	UINT16 *finish = m_spriteram->buffer();
 
-	while (source >= finish)
-	{
-		int tile_number = source[0];
-
-		if (tile_number != 0xfff) {
-			int attr = source[1];
-			int sy = source[2] & 0x1ff;
-			int sx = source[3] & 0x1ff;
-
-			int flipx = attr & 0x02;
-			int flipy = attr & 0x01;
-			int color = (attr >> 2) & 0x0f;
-
-			if (sx > 0x100) sx -= 0x200;
-			if (sy > 0x100) sy -= 0x200;
-
-			if (flip_screen())
-			{
-				sx = 240 - sx;
-				sy = 240 - sy;
-				flipx = !flipx;
-				flipy = !flipy;
-			}
-
-
-				m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
-				tile_number,
-				color,
-				flipx, flipy,
-				sx, 240 - sy, 15);
-		}
-
-		source -= 4;
-	}
-}
 
 TILE_GET_INFO_MEMBER(tigeroad_state::get_bg_tile_info)
 {
@@ -156,9 +117,9 @@ void tigeroad_state::video_start()
 UINT32 tigeroad_state::screen_update_tigeroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	draw_sprites(bitmap, cliprect, 0);
+	m_spritegen->draw_sprites(bitmap, cliprect, m_gfxdecode, 2, m_spriteram->buffer(), m_spriteram->bytes(), flip_screen(), 1 );
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
-	//draw_sprites(bitmap, cliprect, 1); draw priority sprites?
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
 	return 0;
 }
+

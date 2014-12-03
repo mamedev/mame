@@ -248,7 +248,7 @@ void bosco_state::draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 				x = (m_star_seed_tab[star_cntr].x + m_stars_scrollx) % 256;
 				y = (m_star_seed_tab[star_cntr].y + m_stars_scrolly) % 256;
 
-				/* dont draw the stars that are off the screen */
+				/* don't draw the stars that are off the screen */
 				if ( x < 224 )
 				{
 					if (flip) x += 64;

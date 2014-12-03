@@ -185,43 +185,7 @@ WRITE16_MEMBER(bionicc_state::bionicc_gfxctrl_w)
 
 ***************************************************************************/
 
-void bionicc_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
-{
-	UINT16 *buffered_spriteram = m_spriteram->buffer();
-	int offs;
-	gfx_element *gfx = m_gfxdecode->gfx(3);
 
-	for (offs = (m_spriteram->bytes() - 8) / 2; offs >= 0; offs -= 4)
-	{
-		int tile_number = buffered_spriteram[offs] & 0x7ff;
-		if( tile_number != 0x7ff )
-		{
-			int attr = buffered_spriteram[offs + 1];
-			int color = (attr & 0x3c) >> 2;
-			int flipx = attr & 0x02;
-			int flipy = 0;
-			int sx = (INT16)buffered_spriteram[offs + 3];   /* signed */
-			int sy = (INT16)buffered_spriteram[offs + 2];   /* signed */
-
-			if (sy > 512 - 16)
-				sy -= 512;
-
-			if (flip_screen())
-			{
-				sx = 240 - sx;
-				sy = 240 - sy;
-				flipx = !flipx;
-				flipy = !flipy;
-			}
-
-			gfx->transpen(bitmap,cliprect,
-				tile_number,
-				color,
-				flipx,flipy,
-				sx,sy,15);
-		}
-	}
-}
 
 UINT32 bionicc_state::screen_update_bionicc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -229,7 +193,7 @@ UINT32 bionicc_state::screen_update_bionicc(screen_device &screen, bitmap_ind16 
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 1 | TILEMAP_DRAW_LAYER1, 0);   /* nothing in FRONT */
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER1, 0);
-	draw_sprites(bitmap, cliprect);
+	m_spritegen->draw_sprites(bitmap, cliprect, m_gfxdecode, 3, m_spriteram->buffer(), m_spriteram->bytes(), flip_screen(), 0 );
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER0, 0);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

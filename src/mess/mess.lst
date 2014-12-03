@@ -1063,26 +1063,31 @@ avigo_es     // 1997 Avigo (Spanish)
 avigo_it     // 1997 Avigo (Italian)
 
 // Texas Instruments Calculators
+tisr16    // 1974 SR-16
+ti1270
+ti30      // 1976 TI-30
+tiprog
+tibusan1
+wizatron
 ti73      // 1990 TI-73
 ti74      // 1985 TI-74
 ti95      // 1986 TI-95
 ti81      // 1990 TI-81 (Z80 2 MHz)
-ti81v2  // 1990 TI-81 (Z80 2 MHz)
+ti81v2    // 1990 TI-81 (Z80 2 MHz)
 ti85      // 1992 TI-85 (Z80 6 MHz)
 ti82      // 1993 TI-82 (Z80 6 MHz)
 ti83      // 1996 TI-83 (Z80 6 MHz)
 ti86      // 1997 TI-86 (Z80 6 MHz)
-ti83p    // 1999 TI-83 Plus (Z80 6 MHz)
+ti83p     // 1999 TI-83 Plus (Z80 6 MHz)
 ti83pse   // 2001 TI-83 Plus Silver Edition
-ti84p  // 2004 TI-84 Plus
+ti84p     // 2004 TI-84 Plus
 ti84pse   // 2004 TI-84 Plus Silver Edition
 //ti84cse // 2013 TI-84 Plus C Silver Edition (color screen)
 ti89      // 1998 TI-89
 ti92      // 1995 TI-92
-ti92p    // 1999 TI-92 Plus
+ti92p     // 1999 TI-92 Plus
 v200      // 2002 Voyage 200 PLT
-ti89t    // 2004 TI-89 Titanium
-wizatron
+ti89t     // 2004 TI-89 Titanium
 evmbug
 
 // Exelvision (founded by former TI employees)
@@ -2231,6 +2236,8 @@ swyft
 mmd1
 mmd2
 mpf1p
+cnsector
+starwbc
 stopthie
 amico2k
 jtc
