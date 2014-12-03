@@ -127,7 +127,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ticalc1x_state::leds_decay_tick)
 
 ***************************************************************************/
 
-// TMS1000 - SR-16
+// SR-16: TMS1000 MCU labeled TMS1001NL. die labeled 1001A
 
 void ticalc1x_state::tisr16_leds_update()
 {
@@ -174,7 +174,7 @@ WRITE16_MEMBER(ticalc1x_state::tisr16_write_o)
 }
 
 
-// TMS0970 - TI-1270
+// TI-1270: TMS0970 MCU labeled TMC0974NL ZA0355, DP0974A. die labeled 0970D-74A
 
 READ8_MEMBER(ticalc1x_state::ti1270_read_k)
 {
@@ -205,7 +205,7 @@ WRITE16_MEMBER(ticalc1x_state::ti1270_write_o)
 }
 
 
-// TMS0970 - WIZ-A-TRON (educational toy)
+// WIZ-A-TRON (educational toy): TMS0970 MCU labeled TMC0907NL ZA0379, DP0907BS. die labeled 0970F-07B
 
 READ8_MEMBER(ticalc1x_state::wizatron_read_k)
 {
@@ -244,7 +244,9 @@ WRITE16_MEMBER(ticalc1x_state::wizatron_write_o)
 }
 
 
-// TMS0980 - TI-30, TI Programmer, TI Business Analyst-I
+// TI-30: TMS0980 MCU labeled TMC0981NL. die labeled 0980B-81F
+// TI Programmer: TMS0980 MCU labeled ZA0675NL, JP0983AT. die labeled 0980B-83
+// TI Business Analyst-I: TMS0980 MCU labeled TMC0982NL. die labeled 0980B-82F
 
 READ8_MEMBER(ticalc1x_state::ti30_read_k)
 {
