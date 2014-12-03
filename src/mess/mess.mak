@@ -1952,7 +1952,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/mx2178.o    \
 	$(MESS_DRIVERS)/mycom.o     \
 	$(MESS_DRIVERS)/myvision.o  \
-	$(MESS_DRIVERS)/ngen.o      \
+	$(MESS_DRIVERS)/ngen.o  $(MESS_MACHINE)/ngen_kb.o \
 	$(MESS_DRIVERS)/octopus.o   \
 	$(MESS_DRIVERS)/onyx.o      \
 	$(MESS_DRIVERS)/okean240.o  \
