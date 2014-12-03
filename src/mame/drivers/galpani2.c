@@ -71,7 +71,9 @@ Notes:
 	  PISCES - NEC uPD78324 series MCU with 32k internal rom. Clock 13.500MHz [27/2] on pins 51 & 52
 	   VSync - 59.1856Hz
 	   HSync - 15.625kHz
-
+	   
+	   (TODO: VTOTAL = 264, HTOTAL = 432, pixel clock 27 MHz / 4)
+	   
 ***************************************************************************/
 
 #include "emu.h"
