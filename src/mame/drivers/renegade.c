@@ -108,11 +108,13 @@ $8000 - $ffff   ROM
 #include "includes/renegade.h"
 
 
-/***************************************************************************
-
-    ADPCM sound
-
-***************************************************************************/
+/**************************************************************************/
+/*  ADPCM sound
+**
+**  Inferred from the 6809 code and analogy with ddragon
+**  NMI at end of sample is not needed in order for
+**  playback to work, but seems to be what the code expects
+*/
 
 WRITE8_MEMBER(renegade_state::adpcm_start_w)
 {
@@ -122,7 +124,21 @@ WRITE8_MEMBER(renegade_state::adpcm_start_w)
 
 WRITE8_MEMBER(renegade_state::adpcm_addr_w)
 {
-	m_adpcm_pos = (data - 0x2c) * 0x2000 * 2;
+	// table at $CB52 in audiocpu program:
+	// 38 38 39 3A 3B 34 35 36 37 2C 2D 2E 2F
+	//
+	// bits 2-4 are active-low chip select; bit 5 is always set
+	// (chip select for an unpopulated fourth ROM?)
+	switch (data & 0x1c)
+	{
+		case 0x18: m_adpcm_pos = 0 * 0x8000 * 2; break;		// 110 -> ic33
+		case 0x14: m_adpcm_pos = 1 * 0x8000 * 2; break;		// 101 -> ic32
+		case 0x0c: m_adpcm_pos = 2 * 0x8000 * 2; break;		// 011 -> ic31
+		default: m_adpcm_pos = m_adpcm_end = 0; return;	// doesn't happen
+	}
+	// bits 0-1 are a13-a14
+	m_adpcm_pos |= (data & 0x03) * 0x2000 * 2;
+	// a0-a12 are driven by a binary counter; playback ends when it rolls over
 	m_adpcm_end = m_adpcm_pos + 0x2000 * 2;
 }
 
@@ -156,7 +172,7 @@ WRITE8_MEMBER(renegade_state::sound_w)
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
-/********************************************************************************************/
+/**************************************************************************/
 /*  MCU Simulation
 **
 **  Renegade and Nekketsu Kouha Kunio Kun MCU behaviors are identical,
@@ -891,10 +907,10 @@ ROM_START( renegade )
 	ROM_LOAD( "ng-5.bin",     0x50000, 0x8000, CRC(a8ee3720) SHA1(df3d40015b16fa7a9bf05f0ed5741c22f7f152c7) )
 	ROM_LOAD( "nm-5.bin",     0x58000, 0x8000, CRC(c100258e) SHA1(0e2124e642b9742a9a0045f460974025048bc2dd) )
 
-	ROM_REGION( 0x20000, "adpcm", 0 )
-	ROM_LOAD( "n5-5.ic31",    0x00000, 0x8000, CRC(7ee43a3c) SHA1(36b14b886096177cdd0bd0c99cbcfcc362b2bc30) )
-	ROM_LOAD( "n4-5.ic32",    0x10000, 0x8000, CRC(6557564c) SHA1(b3142be9d48eacb43786079a7ae012010f6afabb) )
-	ROM_LOAD( "n3-5.ic33",    0x18000, 0x8000, CRC(78fd6190) SHA1(995df0e88f5c34946e0634b50bda8c1cc621afaa) )
+	ROM_REGION( 0x18000, "adpcm", 0 )
+	ROM_LOAD( "n3-5.ic33",    0x00000, 0x8000, CRC(78fd6190) SHA1(995df0e88f5c34946e0634b50bda8c1cc621afaa) )
+	ROM_LOAD( "n4-5.ic32",    0x08000, 0x8000, CRC(6557564c) SHA1(b3142be9d48eacb43786079a7ae012010f6afabb) )
+	ROM_LOAD( "n5-5.ic31",    0x10000, 0x8000, CRC(7ee43a3c) SHA1(36b14b886096177cdd0bd0c99cbcfcc362b2bc30) )
 ROM_END
 
 ROM_START( kuniokun )
@@ -933,10 +949,10 @@ ROM_START( kuniokun )
 	ROM_LOAD( "ta18-21.bin",  0x50000, 0x8000, CRC(c95e009b) SHA1(d45a247d4ebf8587a2cd30c83444cc7bd17a3534) )
 	ROM_LOAD( "ta18-15.bin",  0x58000, 0x8000, CRC(a5d61d01) SHA1(9bf1f0b8296667db31ff1c34e28c8eda3ce9f7c3) )
 
-	ROM_REGION( 0x20000, "adpcm", 0 )
-	ROM_LOAD( "ta18-07.bin",  0x00000, 0x8000, CRC(02e3f3ed) SHA1(ab09b3af2c4ab9a36eb1273bcc7c788350048554) )
-	ROM_LOAD( "ta18-08.bin",  0x10000, 0x8000, CRC(c9312613) SHA1(fbbdf7c56c34cbee42984e41fcf2a21da2b87a31) )
-	ROM_LOAD( "ta18-09.bin",  0x18000, 0x8000, CRC(07ed4705) SHA1(6fd4b78ca846fa602504f06f3105b2da03bcd00c) )
+	ROM_REGION( 0x18000, "adpcm", 0 )
+	ROM_LOAD( "ta18-09.bin",  0x00000, 0x8000, CRC(07ed4705) SHA1(6fd4b78ca846fa602504f06f3105b2da03bcd00c) )
+	ROM_LOAD( "ta18-08.bin",  0x08000, 0x8000, CRC(c9312613) SHA1(fbbdf7c56c34cbee42984e41fcf2a21da2b87a31) )
+	ROM_LOAD( "ta18-07.bin",  0x10000, 0x8000, CRC(02e3f3ed) SHA1(ab09b3af2c4ab9a36eb1273bcc7c788350048554) )
 ROM_END
 
 ROM_START( kuniokunb )
@@ -972,10 +988,10 @@ ROM_START( kuniokunb )
 	ROM_LOAD( "ta18-21.bin",  0x50000, 0x8000, CRC(c95e009b) SHA1(d45a247d4ebf8587a2cd30c83444cc7bd17a3534) )
 	ROM_LOAD( "ta18-15.bin",  0x58000, 0x8000, CRC(a5d61d01) SHA1(9bf1f0b8296667db31ff1c34e28c8eda3ce9f7c3) )
 
-	ROM_REGION( 0x20000, "adpcm", 0 ) /* adpcm */
-	ROM_LOAD( "ta18-07.bin",  0x00000, 0x8000, CRC(02e3f3ed) SHA1(ab09b3af2c4ab9a36eb1273bcc7c788350048554) )
-	ROM_LOAD( "ta18-08.bin",  0x10000, 0x8000, CRC(c9312613) SHA1(fbbdf7c56c34cbee42984e41fcf2a21da2b87a31) )
-	ROM_LOAD( "ta18-09.bin",  0x18000, 0x8000, CRC(07ed4705) SHA1(6fd4b78ca846fa602504f06f3105b2da03bcd00c) )
+	ROM_REGION( 0x18000, "adpcm", 0 ) /* adpcm */
+	ROM_LOAD( "ta18-09.bin",  0x00000, 0x8000, CRC(07ed4705) SHA1(6fd4b78ca846fa602504f06f3105b2da03bcd00c) )
+	ROM_LOAD( "ta18-08.bin",  0x08000, 0x8000, CRC(c9312613) SHA1(fbbdf7c56c34cbee42984e41fcf2a21da2b87a31) )
+	ROM_LOAD( "ta18-07.bin",  0x10000, 0x8000, CRC(02e3f3ed) SHA1(ab09b3af2c4ab9a36eb1273bcc7c788350048554) )
 ROM_END
 
 
