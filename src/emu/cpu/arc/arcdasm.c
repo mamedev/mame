@@ -1,6 +1,6 @@
 /*********************************\
 
- ARCtangent (A4? A5?) disassembler
+ ARCtangent A4 disassembler
 
 \*********************************/
 
