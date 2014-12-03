@@ -79,6 +79,19 @@ endif
 
 $(CPUOBJ)/8x300/8x300.o:    $(CPUSRC)/8x300/8x300.c \
 							$(CPUSRC)/8x300/8x300.h
+#-------------------------------------------------
+# ARCangent A4
+#@src/emu/cpu/arc/arc.h,CPUS += ARC
+#-------------------------------------------------
+
+ifneq ($(filter ARC,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/arc
+CPUOBJS += $(CPUOBJ)/arc/arc.o
+DASMOBJS += $(CPUOBJ)/arc/arcdasm.o
+endif
+
+$(CPUOBJ)/arc/arc.o:  $(CPUSRC)/arc/arc.c \
+			$(CPUSRC)/arc/arc.h
 
 #-------------------------------------------------
 # Acorn ARM series
