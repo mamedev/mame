@@ -29,7 +29,7 @@ Lindbergh Game List
                                                Security
 Game                                           Dongle Sticker    PIC Number      DVD Code
 ------------------------------------------------------------------------------------------
- 2 Spicy                                       253-5508-0491     317-0491-COM    DVP-0027A
+*2 Spicy                                       253-5508-0491     317-0491-COM    DVP-0027A
  After Burner Climax (EXPORT)                  253-5508-0440A   ^317-0440-COM    DVP-0009
  After Burner Climax CE                        ?                 ?               DVP-0031A
  Ami-Gyo                                       ?                 ?               ?
@@ -41,7 +41,7 @@ Game                                           Dongle Sticker    PIC Number     
  Club Majesty Formal                           ?                 ?               ?
  Derby Owners Club 2008: Feel the Rush         ?                 ?               DVP-0047A
  Derby Owners Club 2008: Feel the Rush V2.0    ?                 ?               ?
- Ghost Squad Evolution                         ?                 ?               ?
+*Ghost Squad Evolution                         ?                 ?               ?
  Harley Davidson: King of the Road             ?                 ?               ?
  Hummer Extreme                                ?                 ?               ?
  Initial D Arcade Stage 4                      ?                 ?               DVP-0019
@@ -58,7 +58,7 @@ Game                                           Dongle Sticker    PIC Number     
  MJ4                                           ?                 ?               ?
  OutRun 2 Special Tours (EXPORT)               253-5508-0452     317-0452-COM    ?
  OutRun 2 SP SDX                               ?                 ?               DVP-0015A
- Primeval Hunt                                 ?                 ?               DVP-0048A
+*Primeval Hunt                                 253-5508-0512     317-0512-COM    DVP-0048A
  R-Tuned: Ultimate Street Racing               ?                 ?               DVP-0060
 *Rambo (EXPORT)                                253-5508-0540    ^317-0540-COM    DVP-0069
  SEGA Network Taisen Mahjong MJ4 (rev A)       ?                 ?               DVP-0049A
@@ -148,7 +148,8 @@ Notes:
                  P/N: 0A30209 BA17730E6B
                  Serial: EETNGM0G
        CF SLOT - Accepts a compact flash card. The card is required to boot the system.
-                 Revision C and E have been seen. There may be other revisions out there.
+                 Revision C and E have been seen. StarHorse 2 has it's own special card.
+                 There may be other revisions out there.
                  Sticker: LINDBERGH
                           MDA-C0004A
                           REV. C
