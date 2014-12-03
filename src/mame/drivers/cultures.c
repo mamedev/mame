@@ -20,20 +20,33 @@ class cultures_state : public driver_device
 public:
 	cultures_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_vrambank(*this, "vrambank"),
+		m_prgbank(*this, "prgbank"),
+		m_okibank(*this, "okibank"),
+		m_bg1_rom(*this, "bg1"),
+		m_bg2_rom(*this, "bg2"),
 		m_bg0_videoram(*this, "bg0_videoram"),
 		m_bg0_regs_x(*this, "bg0_regs_x"),
 		m_bg0_regs_y(*this, "bg0_regs_y"),
 		m_bg1_regs_x(*this, "bg1_regs_x"),
 		m_bg1_regs_y(*this, "bg1_regs_y"),
 		m_bg2_regs_x(*this, "bg2_regs_x"),
-		m_bg2_regs_y(*this, "bg2_regs_y"),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_vrambank(*this, "vrambank")
+		m_bg2_regs_y(*this, "bg2_regs_y")
 		{ }
 
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<address_map_bank_device> m_vrambank;
+	required_memory_bank m_prgbank;
+	required_memory_bank m_okibank;
+
 	/* memory pointers */
+	required_region_ptr<UINT16> m_bg1_rom;
+	required_region_ptr<UINT16> m_bg2_rom;
+
 	required_shared_ptr<UINT8> m_bg0_videoram;
 	required_shared_ptr<UINT8> m_bg0_regs_x;
 	required_shared_ptr<UINT8> m_bg0_regs_y;
@@ -61,31 +74,25 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_cultures(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cultures_interrupt);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_device<address_map_bank_device> m_vrambank;
 };
 
 
 
 TILE_GET_INFO_MEMBER(cultures_state::get_bg1_tile_info)
 {
-	UINT8 *region = memregion("gfx3")->base() + 0x200000 + 0x80000 * m_bg1_bank;
-	int code = region[tile_index * 2] + (region[tile_index * 2 + 1] << 8);
-	SET_TILE_INFO_MEMBER(2, code, code >> 12, 0);
+	int const code = m_bg1_rom[0x200000/2 + m_bg1_bank * 0x80000/2 + tile_index];
+	SET_TILE_INFO_MEMBER(1, code, code >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(cultures_state::get_bg2_tile_info)
 {
-	UINT8 *region = memregion("gfx2")->base() + 0x200000 + 0x80000 * m_bg2_bank;
-	int code = region[tile_index * 2] + (region[tile_index * 2 + 1] << 8);
-	SET_TILE_INFO_MEMBER(1, code, code >> 12, 0);
+	int const code = m_bg2_rom[0x200000/2 + m_bg2_bank * 0x80000/2 + tile_index];
+	SET_TILE_INFO_MEMBER(2, code, code >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(cultures_state::get_bg0_tile_info)
 {
-	int code = m_bg0_videoram[tile_index * 2] + (m_bg0_videoram[tile_index * 2 + 1] << 8);
+	int const code = m_bg0_videoram[tile_index * 2] + (m_bg0_videoram[tile_index * 2 + 1] << 8);
 	SET_TILE_INFO_MEMBER(0, code, code >> 12, 0);
 }
 
@@ -98,13 +105,13 @@ void cultures_state::video_start()
 	m_bg1_tilemap->set_transparent_pen(0);
 	m_bg0_tilemap->set_transparent_pen(0);
 
-	m_bg0_tilemap->set_scrolldx(502, 10);
-	m_bg1_tilemap->set_scrolldx(502, 10);
-	m_bg2_tilemap->set_scrolldx(502, 10);
+	m_bg0_tilemap->set_scrolldx(502, -118);
+	m_bg1_tilemap->set_scrolldx(502, -118);
+	m_bg2_tilemap->set_scrolldx(502, -118);
 
-	m_bg0_tilemap->set_scrolldy(255, 0);
-	m_bg1_tilemap->set_scrolldy(255, 0);
-	m_bg2_tilemap->set_scrolldy(255, 0);
+	m_bg0_tilemap->set_scrolldy(255, -16);
+	m_bg1_tilemap->set_scrolldy(255, -16);
+	m_bg2_tilemap->set_scrolldy(255, -16);
 }
 
 UINT32 cultures_state::screen_update_cultures(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -138,7 +145,7 @@ UINT32 cultures_state::screen_update_cultures(screen_device &screen, bitmap_ind1
 
 WRITE8_MEMBER(cultures_state::cpu_bankswitch_w)
 {
-	membank("bank1")->set_entry(data & 0x0f);
+	m_prgbank->set_entry(data & 0x0f);
 	m_vrambank->set_bank((data & 0x20)>>5);
 }
 
@@ -151,7 +158,7 @@ WRITE8_MEMBER(cultures_state::bg0_videoram_w)
 
 WRITE8_MEMBER(cultures_state::misc_w)
 {
-	membank("okibank")->set_entry(data&0x0f);
+	m_okibank->set_entry(data&0x0f);
 	m_irq_enable = data & 0x80;
 }
 
@@ -184,7 +191,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cultures_map, AS_PROGRAM, 8, cultures_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("prgbank")
 	AM_RANGE(0x8000, 0xbfff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
@@ -350,9 +357,9 @@ static const gfx_layout gfxlayout =
 };
 
 static GFXDECODE_START( culture )
-	GFXDECODE_ENTRY("gfx1", 0, gfxlayout, 0x0000, 0x10 )
-	GFXDECODE_ENTRY("gfx2", 0, gfxlayout, 0x1000, 0x10 )
-	GFXDECODE_ENTRY("gfx3", 0, gfxlayout, 0x1000, 0x10 )
+	GFXDECODE_ENTRY("bg0", 0, gfxlayout, 0x0000, 16 )
+	GFXDECODE_ENTRY("bg1", 0, gfxlayout, 0x1000, 8 )
+	GFXDECODE_ENTRY("bg2", 0, gfxlayout, 0x1000, 8 )
 GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(cultures_state::cultures_interrupt)
@@ -363,11 +370,9 @@ INTERRUPT_GEN_MEMBER(cultures_state::cultures_interrupt)
 
 void cultures_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
-
-	membank("bank1")->configure_entries(0, 16, &ROM[0x0000], 0x4000);
-	membank("okibank")->configure_entries(0, 0x200000 / 0x20000, memregion("oki")->base(), 0x20000);
-	membank("okibank")->set_entry(0);
+	m_prgbank->configure_entries(0, 16, memregion("maincpu")->base(), 0x4000);
+	m_okibank->configure_entries(0, 0x200000 / 0x20000, memregion("oki")->base(), 0x20000);
+	m_okibank->set_entry(0);
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_bg1_bank));
@@ -376,7 +381,7 @@ void cultures_state::machine_start()
 
 void cultures_state::machine_reset()
 {
-	membank("okibank")->set_entry(0);
+	m_okibank->set_entry(0);
 	m_vrambank->set_bank(1);
 	m_irq_enable = 0;
 	m_bg1_bank = 0;
@@ -413,7 +418,6 @@ static MACHINE_CONFIG_START( cultures, cultures_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", culture)
 	MCFG_PALETTE_ADD("palette", 0x3000/2)
 	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit0)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_LITTLE)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -468,18 +472,19 @@ ROM_START( cultures )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "ma01.u12",     0x000000, 0x040000, CRC(f57417b3) SHA1(9a2a50222f54e5da9bc5c66863b8be16e33b171f) )
 
-	ROM_REGION( 0x300000, "gfx1", 0 )
+	ROM_REGION( 0x400000, "bg0", ROMREGION_ERASE00 )
 	ROM_LOAD( "bg0c.u45",     0x000000, 0x200000, CRC(ad2e1263) SHA1(b28a3d82aaa0421a7b4df837814147b109e7d1a5) )
 	ROM_LOAD( "bg0c2.u46",    0x200000, 0x100000, CRC(97c71c09) SHA1(ffbcee1d9cb39d0824f3aa652c3a24579113cf2e) )
-
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASE00 )
-	ROM_LOAD( "bg1c.u80",     0x000000, 0x200000, CRC(9ab99bd9) SHA1(bce41b6f5d83c8262ba8d37b2dfcd5d7a5e7ace7) )
-	ROM_LOAD( "bg2t.u79",     0x200000, 0x100000, CRC(0610a79f) SHA1(9fc6b2e5c573ed682b2f7fa462c8f42ff99da5ba) )
 	/* 0x300000 - 0x3fffff empty */
 
-	ROM_REGION( 0x400000, "gfx3", ROMREGION_ERASE00 )
+	ROM_REGION16_LE( 0x400000, "bg1", ROMREGION_ERASE00 )
 	ROM_LOAD( "bg2c.u68",     0x000000, 0x200000, CRC(fa598644) SHA1(532249e456c34f18a787d5a028df82f2170f604d) )
 	ROM_LOAD( "bg1t.u67",     0x200000, 0x100000, CRC(d2e594ee) SHA1(a84b5ab62dec1867d433ccaeb1381e7593958cf0) )
+	/* 0x300000 - 0x3fffff empty */
+
+	ROM_REGION16_LE( 0x400000, "bg2", ROMREGION_ERASE00 )
+	ROM_LOAD( "bg1c.u80",     0x000000, 0x200000, CRC(9ab99bd9) SHA1(bce41b6f5d83c8262ba8d37b2dfcd5d7a5e7ace7) )
+	ROM_LOAD( "bg2t.u79",     0x200000, 0x100000, CRC(0610a79f) SHA1(9fc6b2e5c573ed682b2f7fa462c8f42ff99da5ba) )
 	/* 0x300000 - 0x3fffff empty */
 
 	ROM_REGION( 0x200000, "oki", 0 )
