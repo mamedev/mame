@@ -108,101 +108,46 @@ $8000 - $ffff   ROM
 #include "includes/renegade.h"
 
 
-/********************************************************************************************/
+/***************************************************************************
 
-const device_type RENEGADE_ADPCM = &device_creator<renegade_adpcm_device>;
+    ADPCM sound
 
-renegade_adpcm_device::renegade_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, RENEGADE_ADPCM, "Renegade ADPCM Custom", tag, owner, clock, "renegade_adpcm", __FILE__),
-		device_sound_interface(mconfig, *this),
-		m_stream(NULL),
-		m_current(0),
-		m_end(0),
-		m_nibble(0),
-		m_playing(0),
-		m_base(NULL)
+***************************************************************************/
+
+WRITE8_MEMBER(renegade_state::adpcm_start_w)
 {
+	m_msm->reset_w(0);
+	m_adpcm_playing = true;
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void renegade_adpcm_device::device_config_complete()
+WRITE8_MEMBER(renegade_state::adpcm_addr_w)
 {
+	m_adpcm_pos = (data - 0x2c) * 0x2000 * 2;
+	m_adpcm_end = m_adpcm_pos + 0x2000 * 2;
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void renegade_adpcm_device::device_start()
+WRITE8_MEMBER(renegade_state::adpcm_stop_w)
 {
-	m_playing = 0;
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock());
-	m_base = machine().root_device().memregion("adpcm")->base();
-	m_adpcm.reset();
-
-	save_item(NAME(m_current));
-	save_item(NAME(m_end));
-	save_item(NAME(m_nibble));
-	save_item(NAME(m_playing));
+	m_msm->reset_w(1);
+	m_adpcm_playing = false;
 }
 
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void renegade_adpcm_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+WRITE_LINE_MEMBER(renegade_state::adpcm_int)
 {
-	stream_sample_t *dest = outputs[0];
+	if (!m_adpcm_playing) return;
 
-	while (m_playing && samples > 0)
+	if (m_adpcm_pos >= m_adpcm_end)
 	{
-		int val = (m_base[m_current] >> m_nibble) & 15;
-
-		m_nibble ^= 4;
-		if (m_nibble == 4)
-		{
-			m_current++;
-			if (m_current >= m_end)
-				m_playing = 0;
-		}
-
-		*dest++ = m_adpcm.clock(val) << 4;
-		samples--;
-	}
-	while (samples > 0)
-	{
-		*dest++ = 0;
-		samples--;
-	}
-}
-
-
-WRITE8_MEMBER(renegade_adpcm_device::play_w)
-{
-	int offs = (data - 0x2c) * 0x2000;
-	int len = 0x2000 * 2;
-
-	/* kludge to avoid reading past end of ROM */
-	if (offs + len > 0x20000)
-		len = 0x1000;
-
-	if (offs >= 0 && offs+len <= 0x20000)
-	{
-		m_stream->update();
-		m_adpcm.reset();
-
-		m_current = offs;
-		m_end = offs + len/2;
-		m_nibble = 4;
-		m_playing = 1;
+		m_msm->reset_w(1);
+		m_adpcm_playing = false;
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
-		logerror("out of range adpcm command: 0x%02x\n", data);
+	{
+		UINT8 const data = m_adpcmrom[m_adpcm_pos / 2];
+		m_msm->data_w(m_adpcm_pos & 1 ? data & 0xf : data >> 4);
+		m_adpcm_pos++;
+	}
 }
 
 WRITE8_MEMBER(renegade_state::sound_w)
@@ -230,21 +175,17 @@ static const UINT8 kuniokun_xor_table[0x2a] =
 	0x68, 0x60
 };
 
-void renegade_state::setbank()
-{
-	UINT8 *RAM = memregion("maincpu")->base();
-	membank("bank1")->set_base(&RAM[m_bank ? 0x10000 : 0x4000]);
-}
-
 void renegade_state::machine_start()
 {
+	m_rombank->configure_entries(0, 2, memregion("maincpu")->base(), 0x4000);
+
+	save_item(NAME(m_adpcm_pos));
+	save_item(NAME(m_adpcm_end));
+	save_item(NAME(m_adpcm_playing));
 	save_item(NAME(m_mcu_buffer));
 	save_item(NAME(m_mcu_input_size));
 	save_item(NAME(m_mcu_output_byte));
 	save_item(NAME(m_mcu_key));
-
-	save_item(NAME(m_bank));
-	machine().save().register_postload(save_prepost_delegate(FUNC(renegade_state::setbank), this));
 }
 
 DRIVER_INIT_MEMBER(renegade_state,renegade)
@@ -605,11 +546,7 @@ CUSTOM_INPUT_MEMBER(renegade_state::mcu_status_r)
 
 WRITE8_MEMBER(renegade_state::bankswitch_w)
 {
-	if ((data & 1) != m_bank)
-	{
-		m_bank = data & 1;
-		setbank();
-	}
+	m_rombank->set_entry(data & 1);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(renegade_state::renegade_interrupt)
@@ -632,30 +569,30 @@ WRITE8_MEMBER(renegade_state::renegade_coin_counter_w)
 
 static ADDRESS_MAP_START( renegade_map, AS_PROGRAM, 8, renegade_state )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(renegade_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(renegade_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x3000, 0x30ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x3100, 0x31ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0") AM_WRITE(renegade_scroll0_w)       /* Player#1 controls, P1,P2 start */
-	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1") AM_WRITE(renegade_scroll1_w)       /* Player#2 controls, coin triggers */
+	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0") AM_WRITE(scroll_lsb_w)       /* Player#1 controls, P1,P2 start */
+	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1") AM_WRITE(scroll_msb_w)       /* Player#2 controls, coin triggers */
 	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("DSW2") AM_WRITE(sound_w) /* DIP2  various IO ports */
 	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW1") AM_WRITE(renegade_flipscreen_w)   /* DIP1 */
 	AM_RANGE(0x3804, 0x3804) AM_READWRITE(mcu_r, mcu_w)
 	AM_RANGE(0x3805, 0x3805) AM_READWRITE(mcu_reset_r, bankswitch_w)
 	AM_RANGE(0x3806, 0x3806) AM_WRITENOP // ?? watchdog
 	AM_RANGE(0x3807, 0x3807) AM_WRITE(renegade_coin_counter_w)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("rombank")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( renegade_sound_map, AS_PROGRAM, 8, renegade_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x1800, 0x1800) AM_WRITENOP // this gets written the same values as 0x2000
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("adpcm", renegade_adpcm_device, play_w)
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(adpcm_start_w)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(adpcm_addr_w)
 	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE("ymsnd", ym3526_device, read, write)
-	AM_RANGE(0x3000, 0x3000) AM_WRITENOP /* adpcm related? stereo pan? */
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(adpcm_stop_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -866,8 +803,9 @@ GFXDECODE_END
 
 void renegade_state::machine_reset()
 {
-	m_bank = 0;
-	setbank();
+	m_rombank->set_entry(0);
+	m_msm->reset_w(1);
+	m_adpcm_playing = 0;
 }
 
 
@@ -905,7 +843,9 @@ static MACHINE_CONFIG_START( renegade, renegade_state )
 	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6809_device, firq_line))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("adpcm", RENEGADE_ADPCM, 8000)
+	MCFG_SOUND_ADD("msm", MSM5205, 12000000/32)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(renegade_state, adpcm_int))
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)  /* 8kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -916,10 +856,9 @@ MACHINE_CONFIG_END
 
 
 ROM_START( renegade )
-	ROM_REGION( 0x14000, "maincpu", 0 ) /* 64k for code + bank switched ROM */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for code + bank switched ROM */
+	ROM_LOAD( "na-5.ic52",     0x00000, 0x8000, CRC(de7e7df4) SHA1(7d26ac29e0b5858d9a0c0cdc86c864e464145260) )
 	ROM_LOAD( "nb-5.ic51",     0x08000, 0x8000, CRC(ba683ddf) SHA1(7516fac1c4fd14cbf43481e94c0c26c662c4cd28) )
-	ROM_LOAD( "na-5.ic52",     0x04000, 0x4000, CRC(de7e7df4) SHA1(7d26ac29e0b5858d9a0c0cdc86c864e464145260) )
-	ROM_CONTINUE(         0x10000, 0x4000 )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "n0-5.ic13",     0x8000, 0x8000, CRC(3587de3b) SHA1(f82e758254b21eb0c5a02469c72adb86d9577065) )
@@ -959,10 +898,9 @@ ROM_START( renegade )
 ROM_END
 
 ROM_START( kuniokun )
-	ROM_REGION( 0x14000, "maincpu", 0 ) /* 64k for code + bank switched ROM */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for code + bank switched ROM */
+	ROM_LOAD( "ta18-11.bin",  0x00000, 0x8000, CRC(f240f5cd) SHA1(ed6875e8ad2988e88389d4f63ff448d0823c195f) )
 	ROM_LOAD( "nb-01.bin",    0x08000, 0x8000, CRC(93fcfdf5) SHA1(51cdb9377544ae17895e427f21d150ce195ab8e7) ) // original
-	ROM_LOAD( "ta18-11.bin",  0x04000, 0x4000, CRC(f240f5cd) SHA1(ed6875e8ad2988e88389d4f63ff448d0823c195f) )
-	ROM_CONTINUE(         0x10000, 0x4000 )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "n0-5.bin",     0x8000, 0x8000, CRC(3587de3b) SHA1(f82e758254b21eb0c5a02469c72adb86d9577065) )
@@ -1002,10 +940,9 @@ ROM_START( kuniokun )
 ROM_END
 
 ROM_START( kuniokunb )
-	ROM_REGION( 0x14000, "maincpu", 0 ) /* 64k for code + bank switched ROM */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for code + bank switched ROM */
+	ROM_LOAD( "ta18-11.bin",  0x00000, 0x8000, CRC(f240f5cd) SHA1(ed6875e8ad2988e88389d4f63ff448d0823c195f) )
 	ROM_LOAD( "ta18-10.bin",  0x08000, 0x8000, CRC(a90cf44a) SHA1(6d63d9c29da7b8c5bc391e074b6b8fe6ae3892ae) ) // bootleg
-	ROM_LOAD( "ta18-11.bin",  0x04000, 0x4000, CRC(f240f5cd) SHA1(ed6875e8ad2988e88389d4f63ff448d0823c195f) )
-	ROM_CONTINUE(         0x10000, 0x4000 )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "n0-5.bin",     0x8000, 0x8000, CRC(3587de3b) SHA1(f82e758254b21eb0c5a02469c72adb86d9577065) )
