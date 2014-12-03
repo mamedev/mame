@@ -62,7 +62,7 @@ private:
 	UINT32 m_debugger_temp;
 
 	void unimplemented_opcode(UINT16 op);
-	inline UINT16 READ32(UINT32 address);
+	inline UINT32 READ32(UINT32 address);
 	inline void WRITE32(UINT32 address, UINT32 data);
 };
 

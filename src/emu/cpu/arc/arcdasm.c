@@ -175,13 +175,13 @@ static const char *regnames[0x40] =
 	/* 0x3f */ "sImm NF",
 };
 
-#define ARC_CONDITION ((op & 0x0000001f) >> 0 )
+#define ARC_CONDITION ((op & 0x0000001f) >> 0 ) // aka Q
 
 // used in jumps
 #define ARC_BRANCH_DELAY     ((op & 0x00000060) >> 5 ) // aka N
 #define ARC_BRANCH_ADDR      ((op & 0x07ffff80) >> 7 ) // aka L
 
-#define ARC_OPERATION ((op & 0xf8000000) >> 27) // aka Q
+#define ARC_OPERATION ((op & 0xf8000000) >> 27)
 
 #define ARC_REGOP_DEST      ((op & 0x07e00000) >> 21 ) // aka A
 #define ARC_REGOP_OP1       ((op & 0x001f8000) >> 15 ) // aka B

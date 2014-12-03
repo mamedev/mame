@@ -26,7 +26,7 @@ const device_type ARCA5 = &device_creator<arcompact_device>;
 
 arcompact_device::arcompact_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, ARCA5, "ARCtangent-A5", tag, owner, clock, "arca5", __FILE__)
-	, m_program_config("program", ENDIANNESS_BIG, 32, 24, 0) // some docs describe these as 'middle endian'?!
+	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0) // some docs describe these as 'middle endian'?!
 {
 }
 
@@ -49,7 +49,7 @@ void arcompact_device::unimplemented_opcode(UINT16 op)
 
 /*****************************************************************************/
 
-UINT16 arcompact_device::READ32(UINT32 address)
+UINT32 arcompact_device::READ32(UINT32 address)
 {
 	return m_program->read_dword(address << 2);
 }
@@ -58,6 +58,17 @@ void arcompact_device::WRITE32(UINT32 address, UINT32 data)
 {
 	m_program->write_dword(address << 2, data);
 }
+
+UINT16 arcompact_device::READ16(UINT32 address)
+{
+	return m_program->read_word(address << 1);
+}
+
+void arcompact_device::WRITE16(UINT32 address, UINT16 data)
+{
+	m_program->write_word(address << 1, data);
+}
+
 
 /*****************************************************************************/
 
@@ -80,11 +91,11 @@ void arcompact_device::state_export(const device_state_entry &entry)
 	switch (entry.index())
 	{
 		case 0:
-			m_debugger_temp = m_pc << 2;
+			m_debugger_temp = m_pc << 1;
 			break;
 
 		case STATE_GENPC:
-			m_debugger_temp = m_pc << 2;
+			m_debugger_temp = m_pc << 1;
 			break;
 	}
 }
@@ -94,7 +105,7 @@ void arcompact_device::state_import(const device_state_entry &entry)
 	switch (entry.index())
 	{
 		case 0:
-			m_pc = (m_debugger_temp & 0xfffffffc) >> 2;
+			m_pc = (m_debugger_temp & 0xfffffffe) >> 1;
 			break;
 	}
 }
@@ -122,6 +133,7 @@ void arcompact_device::execute_run()
 		debugger_instruction_hook(this, m_pc<<2);
 
 		//UINT32 op = READ32(m_pc);
+
 
 		m_pc++;
 
