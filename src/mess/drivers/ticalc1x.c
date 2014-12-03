@@ -632,6 +632,9 @@ void ticalc1x_state::machine_start()
 	m_r = 0;
 	m_o = 0;
 
+	save_item(NAME(m_leds_state));
+	save_item(NAME(m_leds_cache));
+	save_item(NAME(m_leds_decay));
 	save_item(NAME(m_r));
 	save_item(NAME(m_o));
 }
