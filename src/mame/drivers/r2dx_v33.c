@@ -490,7 +490,7 @@ static ADDRESS_MAP_START( nzeroteam_base_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
 	AM_RANGE(0x1f000, 0x1ffff) AM_RAM //_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
-	AM_RANGE(0x20000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x20000 )
+	AM_RANGE(0x20000, 0xfffff) AM_ROM AM_REGION("maincpu", 0x20000 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16, r2dx_v33_state )
@@ -846,10 +846,10 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,rdx_v33)
 	static const int spri[5] = { 0, 1, 2, 3, -1 };
 	cur_spri = spri;
 
-	membank("bank1")->configure_entries(0, 0x40, memregion("mainprg")->base(), 0x10000);
+	membank("bank1")->configure_entries(0, 0x40, memregion("maincpu")->base(), 0x10000);
 
-	membank("bank3")->configure_entry(0, memregion("mainprg")->base()+0x030000); // 0x30000 - 0xfffff bank for Raiden 2
-	membank("bank3")->configure_entry(1, memregion("mainprg")->base()+0x230000); // 0x30000 - 0xfffff bank for Raiden DX
+	membank("bank3")->configure_entry(0, memregion("maincpu")->base()+0x030000); // 0x30000 - 0xfffff bank for Raiden 2
+	membank("bank3")->configure_entry(1, memregion("maincpu")->base()+0x230000); // 0x30000 - 0xfffff bank for Raiden DX
 
 
 	raiden2_decrypt_sprites(machine());
@@ -958,7 +958,7 @@ Notes
 
 
 ROM_START( r2dx_v33 )
-	ROM_REGION( 0x400000, "mainprg", 0 ) /* v33 main cpu */
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* v33 main cpu */
 	ROM_LOAD("prg.223", 0x000000, 0x400000, CRC(b3dbcf98) SHA1(30d6ec2090531c8c579dff74c4898889902d7d87) )
 
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF ) /* v33 main cpu */
@@ -984,7 +984,7 @@ ROM_START( r2dx_v33 )
 ROM_END
 
 ROM_START( r2dx_v33_r2 )
-	ROM_REGION( 0x400000, "mainprg", 0 ) /* v33 main cpu */
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* v33 main cpu */
 	ROM_LOAD("prg.223", 0x000000, 0x400000, CRC(b3dbcf98) SHA1(30d6ec2090531c8c579dff74c4898889902d7d87) )
 
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF ) /* v33 main cpu */
@@ -1012,7 +1012,7 @@ ROM_END
 
 // uses dipswitches
 ROM_START( nzeroteam ) /* V33 SYSTEM TYPE_B hardware, uses SEI333 (AKA COPX-D3) for protection  */
-	ROM_REGION( 0x100000, "mainprg", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("prg1", 0x000000, 0x80000, CRC(3c7d9410) SHA1(25f2121b6c2be73f11263934266901ed5d64d2ee) )
 	ROM_LOAD16_BYTE("prg2", 0x000001, 0x80000, CRC(6cba032d) SHA1(bf5d488cd578fff09e62e3650efdee7658033e3f) )
 
@@ -1044,7 +1044,7 @@ ROM_END
 
 // uses a 93c46a eeprom
 ROM_START( zerotm2k ) /* V33 SYSTEM TYPE_C VER2 hardware, uses SEI333 (AKA COPX-D3) for protection  */
-	ROM_REGION( 0x100000, "mainprg", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD( "mt28f800b1.u0230", 0x000000, 0x100000, CRC(6ab49d8c) SHA1(d94ec9a46ff98a76c3372369246733268474de99) ) /* SMT rom, PCB silkscreened PRG01 */
 	/* PCB has unpopulated socket space for two 27C040 at u0224 silkscreened PRG0 & u0226 silkscreened PRG1) */
 
