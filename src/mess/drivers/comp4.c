@@ -5,7 +5,7 @@
   Milton Bradley Comp IV
   * TMC0904NL CP0904A (die labeled 4A0970D-04A)
   
-  This is a handheld Mastermind game; a code-breaking game where the player
+  This is small tabletop Mastermind game; a code-breaking game where the player
   needs to find out the correct sequence of colours (numbers in our case).
   It is known as Logic 5 in Europe, and as Pythaligoras in Japan.
   
