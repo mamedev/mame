@@ -69,10 +69,10 @@ ROM_START( stopthie )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD16_WORD( "stopthie.bin", 0x0000, 0x1000, CRC(03691115) SHA1(bdcd212aa50bb1c26cb2d0ee97e5cfc04841c108) )
 
-	ROM_REGION( 1246, "maincpu:ipla", 0 )
-	ROM_REGION( 1982, "maincpu:mpla", 0 )
-	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_REGION( 1246, "maincpu:ipla", ROMREGION_ERASE00 )
+	ROM_REGION( 1982, "maincpu:mpla", ROMREGION_ERASE00 )
+	ROM_REGION( 352, "maincpu:opla", ROMREGION_ERASE00 )
+	ROM_REGION( 157, "maincpu:spla", ROMREGION_ERASE00 )
 ROM_END
 
 /***************************************************************************
