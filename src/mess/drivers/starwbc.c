@@ -2,16 +2,23 @@
 // copyright-holders:hap
 /***************************************************************************
 
-  Kenner Star Wars: Electronic Battle Command Game
-  * TMS1100 MCU, marked MP3438A
+  Kenner Star Wars - Electronic Battle Command
+  * TMS1100 MCU, labeled MP3438A
+  
+  This is a small tabletop space-dogfighting game.
 
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/tms0980/tms0980.h"
+#include "sound/speaker.h"
 
 #include "starwbc.lh"
+
+
+// master clock is unknown, the value below is an approximation
+#define MASTER_CLOCK (350000)
 
 
 class starwbc_state : public driver_device
@@ -19,20 +26,103 @@ class starwbc_state : public driver_device
 public:
 	starwbc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_button_matrix(*this, "IN"),
+		m_speaker(*this, "speaker")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_ioport_array<11> m_button_matrix;
+	required_device<speaker_sound_device> m_speaker;
 
 	UINT16 m_r;
 	UINT16 m_o;
 
+	UINT16 m_leds_state[0x10];
+	UINT16 m_leds_cache[0x10];
+	UINT8 m_leds_decay[0x100];
+
 	DECLARE_READ8_MEMBER(read_k);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_WRITE16_MEMBER(write_r);
+	
+	TIMER_DEVICE_CALLBACK_MEMBER(leds_decay_tick);
+	void leds_update();
+	void prepare_and_update();
 
 	virtual void machine_start();
 };
+
+
+
+/***************************************************************************
+
+  LEDs
+
+***************************************************************************/
+
+// The device strobes the outputs very fast, it is unnoticeable to the user.
+// To prevent flickering here, we need to simulate a decay.
+
+// decay time, in steps of 10ms
+#define LEDS_DECAY_TIME 4
+
+void starwbc_state::leds_update()
+{
+	UINT16 active_state[0x10];
+	
+	for (int i = 0; i < 0x10; i++)
+	{
+		active_state[i] = 0;
+		
+		for (int j = 0; j < 0x10; j++)
+		{
+			int di = j << 4 | i;
+			
+			// turn on powered leds
+			if (m_leds_state[i] >> j & 1)
+				m_leds_decay[di] = LEDS_DECAY_TIME;
+			
+			// determine active state
+			int ds = (m_leds_decay[di] != 0) ? 1 : 0;
+			active_state[i] |= (ds << j);
+		}
+	}
+	
+	// on difference, send to output
+	for (int i = 0; i < 0x10; i++)
+		if (m_leds_cache[i] != active_state[i])
+		{
+			output_set_digit_value(i, active_state[i]);
+			
+			for (int j = 0; j < 8; j++)
+				output_set_lamp_value(i*10 + j, active_state[i] >> j & 1);
+		}
+	
+	memcpy(m_leds_cache, active_state, sizeof(m_leds_cache));
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(starwbc_state::leds_decay_tick)
+{
+	// slowly turn off unpowered leds
+	for (int i = 0; i < 0x100; i++)
+		if (!(m_leds_state[i & 0xf] >> (i>>4) & 1) && m_leds_decay[i])
+			m_leds_decay[i]--;
+	
+	leds_update();
+}
+
+void starwbc_state::prepare_and_update()
+{
+	UINT8 o = (m_o << 4 & 0xf0) | (m_o >> 4 & 0x0f);
+	const UINT8 mask[5] = { 0x30, 0xff, 0xff, 0x7f, 0x7f };
+	
+	// R0,R2,R4,R6,R8
+	for (int i = 0; i < 5; i++)
+		m_leds_state[i*2] = (m_r >> (i*2) & 1) ? (o & mask[i]) : 0;
+
+	leds_update();
+}
 
 
 
@@ -44,17 +134,36 @@ public:
 
 READ8_MEMBER(starwbc_state::read_k)
 {
-	return 0;
+	UINT8 k = 0;
+
+	// read selected button rows
+	for (int i = 0; i < 11; i++)
+		if (m_r >> i & 1)
+			k |= m_button_matrix[i]->read();
+
+	// const int r[5] = { 3, 5, 6, 7, 9 }; //nope
+	//printf("%04X ",m_r);
+	
+	return k;
 }
 
 WRITE16_MEMBER(starwbc_state::write_r)
 {
+	// R0,R2,R4: select lamp row
+	// R6,R8: select digit
+	// R3,R5-R7,R9: input mux
+	// R9: piezo speaker
+	m_speaker->level_w(data >> 9 & 1);
+	
 	m_r = data;
+	prepare_and_update();
 }
 
 WRITE16_MEMBER(starwbc_state::write_o)
 {
+	// O0-O7: leds state
 	m_o = data;
+	prepare_and_update();
 }
 
 
@@ -66,6 +175,71 @@ WRITE16_MEMBER(starwbc_state::write_o)
 ***************************************************************************/
 
 static INPUT_PORTS_START( starwbc )
+	PORT_START("IN.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)
+
+	PORT_START("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)
+
+	PORT_START("IN.2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)
+
+	PORT_START("IN.3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)
+
+	PORT_START("IN.4")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)
+
+	PORT_START("IN.5")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)
+
+	PORT_START("IN.6")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)
+
+	PORT_START("IN.7")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)
+
+	PORT_START("IN.8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)
+
+	PORT_START("IN.9")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)
+
+	PORT_START("IN.10")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD)
 INPUT_PORTS_END
 
 
@@ -78,9 +252,15 @@ INPUT_PORTS_END
 
 void starwbc_state::machine_start()
 {
+	memset(m_leds_state, 0, sizeof(m_leds_state));
+	memset(m_leds_cache, 0, sizeof(m_leds_cache));
+	memset(m_leds_decay, 0, sizeof(m_leds_decay));
 	m_r = 0;
 	m_o = 0;
 	
+	save_item(NAME(m_leds_state));
+	save_item(NAME(m_leds_cache));
+	save_item(NAME(m_leds_decay));
 	save_item(NAME(m_r));
 	save_item(NAME(m_o));
 }
@@ -89,17 +269,21 @@ void starwbc_state::machine_start()
 static MACHINE_CONFIG_START( starwbc, starwbc_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 400000)
+	MCFG_CPU_ADD("maincpu", TMS1100, MASTER_CLOCK)
 	MCFG_TMS1XXX_READ_K_CB(READ8(starwbc_state, read_k))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(starwbc_state, write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(starwbc_state, write_r))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("leds_decay", starwbc_state, leds_decay_tick, attotime::from_msec(10))
 	
 	MCFG_DEFAULT_LAYOUT(layout_starwbc)
 
 	/* no video! */
 
 	/* sound hardware */
-//	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -121,4 +305,4 @@ ROM_START( starwbc )
 ROM_END
 
 
-CONS( 1979, starwbc, 0, 0, starwbc, starwbc, driver_device, 0, "Kenner", "Star Wars: Electronic Battle Command Game", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
+CONS( 1979, starwbc, 0, 0, starwbc, starwbc, driver_device, 0, "Kenner", "Star Wars - Electronic Battle Command", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

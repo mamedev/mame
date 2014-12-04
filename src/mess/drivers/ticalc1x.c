@@ -150,7 +150,7 @@ READ8_MEMBER(ticalc1x_state::tisr16_read_k)
 
 	// read selected button rows
 	for (int i = 0; i < 11; i++)
-		if (m_r & (1 << i))
+		if (m_r >> i & 1)
 			k |= m_button_matrix[i]->read();
 
 	return k;
@@ -182,7 +182,7 @@ READ8_MEMBER(ticalc1x_state::ti1270_read_k)
 
 	// read selected button rows
 	for (int i = 0; i < 7; i++)
-		if (m_o & (1 << (i + 1)))
+		if (m_o >> (i+1) & 1)
 			k |= m_button_matrix[i]->read();
 
 	return k;
@@ -213,7 +213,7 @@ READ8_MEMBER(ticalc1x_state::wizatron_read_k)
 
 	// read selected button rows
 	for (int i = 0; i < 4; i++)
-		if (m_o & (1 << (i + 1)))
+		if (m_o >> (i+1) & 1)
 			k |= m_button_matrix[i]->read();
 
 	return k;
@@ -255,7 +255,7 @@ READ8_MEMBER(ticalc1x_state::ti30_read_k)
 
 	// read selected button rows
 	for (int i = 0; i < 8; i++)
-		if (m_o & (1 << i))
+		if (m_o >> i & 1)
 			k |= m_button_matrix[i]->read();
 
 	return k;

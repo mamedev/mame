@@ -1,8 +1,49 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
 
+<!-- define elements -->
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.25" blue="0.23" /></led7seg>
+	</element>
+
+	<element name="lamp" defstate="0">
+		<disk state="1"><color red="1.0" green="0.25" blue="0.23" /></disk>
+		<disk state="0"><color red="0.2" green="0.05" blue="0.04" /></disk>
+	</element>
+
+
+<!-- build screen -->
+
 	<view name="Internal Layout">
 		<bounds left="0" right="200" top="0" bottom="200" />
+
+		<bezel name="lamp20" element="lamp"><bounds x="0" y="0" width="5" height="5" /></bezel>
+		<bezel name="lamp21" element="lamp"><bounds x="10" y="0" width="5" height="5" /></bezel>
+		<bezel name="lamp22" element="lamp"><bounds x="20" y="0" width="5" height="5" /></bezel>
+		<bezel name="lamp23" element="lamp"><bounds x="30" y="0" width="5" height="5" /></bezel>
+
+		<bezel name="lamp24" element="lamp"><bounds x="0" y="10" width="5" height="5" /></bezel>
+		<bezel name="lamp25" element="lamp"><bounds x="10" y="10" width="5" height="5" /></bezel>
+		<bezel name="lamp26" element="lamp"><bounds x="20" y="10" width="5" height="5" /></bezel>
+		<bezel name="lamp27" element="lamp"><bounds x="30" y="10" width="5" height="5" /></bezel>
+
+		<bezel name="lamp40" element="lamp"><bounds x="0" y="20" width="5" height="5" /></bezel>
+		<bezel name="lamp41" element="lamp"><bounds x="10" y="20" width="5" height="5" /></bezel>
+		<bezel name="lamp42" element="lamp"><bounds x="20" y="20" width="5" height="5" /></bezel>
+		<bezel name="lamp43" element="lamp"><bounds x="30" y="20" width="5" height="5" /></bezel>
+
+		<bezel name="lamp44" element="lamp"><bounds x="0" y="30" width="5" height="5" /></bezel>
+		<bezel name="lamp45" element="lamp"><bounds x="10" y="30" width="5" height="5" /></bezel>
+		<bezel name="lamp46" element="lamp"><bounds x="20" y="30" width="5" height="5" /></bezel>
+		<bezel name="lamp47" element="lamp"><bounds x="30" y="30" width="5" height="5" /></bezel>
+
+		<bezel name="lamp5" element="lamp"><bounds x="50" y="10" width="5" height="5" /></bezel>
+		<bezel name="lamp4" element="lamp"><bounds x="50" y="30" width="5" height="5" /></bezel>
+
+		<bezel name="digit6" element="digit"><bounds x="50" y="50" width="10" height="15" /></bezel>
+		<bezel name="digit8" element="digit"><bounds x="60" y="50" width="10" height="15" /></bezel>
+
 
 	</view>
 </mamelayout>
