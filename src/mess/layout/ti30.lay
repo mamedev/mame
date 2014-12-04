@@ -8,34 +8,34 @@
 	</element>
 
 	<view name="Internal Layout">
-		<bounds left="0" right="135" top="0" bottom="15" />
+		<bounds left="0" right="90" top="0" bottom="15" />
 
 		<bezel name="digit0" element="digit">
 			<bounds x="0" y="0" width="10" height="15" />
 		</bezel>
 		<bezel name="digit1" element="digit">
-			<bounds x="15" y="0" width="10" height="15" />
+			<bounds x="10" y="0" width="10" height="15" />
 		</bezel>
 		<bezel name="digit2" element="digit">
-			<bounds x="30" y="0" width="10" height="15" />
+			<bounds x="20" y="0" width="10" height="15" />
 		</bezel>
 		<bezel name="digit3" element="digit">
-			<bounds x="45" y="0" width="10" height="15" />
+			<bounds x="30" y="0" width="10" height="15" />
 		</bezel>
 		<bezel name="digit4" element="digit">
-			<bounds x="60" y="0" width="10" height="15" />
+			<bounds x="40" y="0" width="10" height="15" />
 		</bezel>
 		<bezel name="digit5" element="digit">
-			<bounds x="75" y="0" width="10" height="15" />
+			<bounds x="50" y="0" width="10" height="15" />
 		</bezel>
 		<bezel name="digit6" element="digit">
-			<bounds x="90" y="0" width="10" height="15" />
+			<bounds x="60" y="0" width="10" height="15" />
 		</bezel>
 		<bezel name="digit7" element="digit">
-			<bounds x="105" y="0" width="10" height="15" />
+			<bounds x="70" y="0" width="10" height="15" />
 		</bezel>
 		<bezel name="digit8" element="digit">
-			<bounds x="120" y="0" width="10" height="15" />
+			<bounds x="80" y="0" width="10" height="15" />
 		</bezel>
 
 	</view>
