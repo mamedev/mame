@@ -40,7 +40,7 @@ void arc_device::unimplemented_opcode(UINT16 op)
 
 /*****************************************************************************/
 
-UINT16 arc_device::READ32(UINT32 address)
+UINT32 arc_device::READ32(UINT32 address)
 {
 	return m_program->read_dword(address << 2);
 }

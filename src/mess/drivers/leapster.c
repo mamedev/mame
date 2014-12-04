@@ -207,7 +207,7 @@ PCB - LEAPSTER-TV:
 #include "emu.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-#include "cpu/arc/arc.h"
+#include "cpu/arcompact/arcompact.h"
 
 
 class leapster_state : public driver_device
@@ -270,8 +270,8 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( leapster, leapster_state )
 	/* basic machine hardware */
-	// CPU is ArcTangent A5
-	MCFG_CPU_ADD("maincpu", ARC, 96000000/10)
+	// CPU is ArcTangent-A5 '5.1' (ARCompact core)
+	MCFG_CPU_ADD("maincpu", ARCA5, 96000000/10)
 	MCFG_CPU_PROGRAM_MAP(leapster_map)
 
 

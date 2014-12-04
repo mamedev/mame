@@ -1485,9 +1485,9 @@ void raiden2cop_device::LEGACY_execute_c480(address_space &space, int offset, UI
 */
 void raiden2cop_device::LEGACY_execute_d104(address_space &space, int offset, UINT16 data)
 {
-	UINT8 *ROM = space.machine().root_device().memregion("maincpu")->base();
-	UINT32 rom_addr = (m_cop_rom_addr_hi << 16 | m_cop_rom_addr_lo) & ~1;
-	UINT16 rom_data = (ROM[rom_addr + 0]) | (ROM[rom_addr + 1] << 8);
+	UINT16 *ROM = (UINT16 *)space.machine().root_device().memregion("maincpu")->base();
+	UINT32 rom_addr = (m_cop_rom_addr_hi << 16 | m_cop_rom_addr_lo);
+	UINT16 rom_data = ROM[rom_addr / 2];
 
 	/* writes to some unemulated COP registers, then puts the result in here, adding a parameter taken from ROM */
 	//space.write_word(cop_regs[0]+(0x44 + offset * 4), rom_data);

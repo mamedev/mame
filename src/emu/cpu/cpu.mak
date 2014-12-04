@@ -94,6 +94,20 @@ $(CPUOBJ)/arc/arc.o:  $(CPUSRC)/arc/arc.c \
 			$(CPUSRC)/arc/arc.h
 
 #-------------------------------------------------
+# ARcompact (ARCtangent-A5, ARC 600, ARC 700)
+#@src/emu/cpu/arc/arc.h,CPUS += ARCOMPACT
+#-------------------------------------------------
+
+ifneq ($(filter ARCOMPACT,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/arcompact
+CPUOBJS += $(CPUOBJ)/arcompact/arcompact.o
+DASMOBJS += $(CPUOBJ)/arcompact/arcompactdasm.o
+endif
+
+$(CPUOBJ)/arcompact/arcompact.o:  $(CPUSRC)/arcompact/arcompact.c \
+			$(CPUSRC)/arcompact/arcompact.h
+
+#-------------------------------------------------
 # Acorn ARM series
 #
 #@src/emu/cpu/arm/arm.h,CPUS += ARM

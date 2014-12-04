@@ -31,8 +31,7 @@ public:
 	
 	// image-level overrides
 	virtual bool call_load();
-//	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) { printf("%s\n", swname); return load_software(swlist, swname, start_entry); }
+	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
 	virtual void call_unload();
 	virtual iodevice_t image_type() const { return IO_MAGTAPE; }
 	

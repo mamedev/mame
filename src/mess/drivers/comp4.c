@@ -5,7 +5,7 @@
   Milton Bradley Comp IV
   * TMC0904NL CP0904A (die labeled 4A0970D-04A)
   
-  This is a handheld Mastermind game; a code-breaking game where the player
+  This is small tabletop Mastermind game; a code-breaking game where the player
   needs to find out the correct sequence of colours (numbers in our case).
   It is known as Logic 5 in Europe, and as Pythaligoras in Japan.
   
@@ -37,10 +37,10 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<3> m_button_matrix;
 
+	UINT16 m_o;
+
 	UINT16 m_leds_state;
 	UINT8 m_leds_decay[0x10];
-	UINT16 m_r;
-	UINT16 m_o;
 
 	DECLARE_READ8_MEMBER(read_k);
 	DECLARE_WRITE16_MEMBER(write_o);
@@ -116,9 +116,7 @@ WRITE16_MEMBER(comp4_state::write_r)
 	// R2    R7
 	// R1    R6
 	// R0    R5
-	m_r = data;
-	
-	m_leds_state = m_r;
+	m_leds_state = data;
 	leds_update();
 }
 
@@ -170,10 +168,10 @@ void comp4_state::machine_start()
 {
 	m_leds_state = 0;
 	memset(m_leds_decay, 0, sizeof(m_leds_decay));
-	m_r = 0;
 	m_o = 0;
 	
-	save_item(NAME(m_r));
+	save_item(NAME(m_leds_state));
+	save_item(NAME(m_leds_decay));
 	save_item(NAME(m_o));
 }
 

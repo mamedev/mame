@@ -98,7 +98,8 @@ static MACHINE_CONFIG_START( starwbc, starwbc_state )
 
 	/* no video! */
 
-	/* no sound! */
+	/* sound hardware */
+//	MCFG_SPEAKER_STANDARD_MONO("mono")
 MACHINE_CONFIG_END
 
 
@@ -120,4 +121,4 @@ ROM_START( starwbc )
 ROM_END
 
 
-CONS( 1979, starwbc, 0, 0, starwbc, starwbc, driver_device, 0, "Kenner", "Star Wars: Electronic Battle Command Game", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+CONS( 1979, starwbc, 0, 0, starwbc, starwbc, driver_device, 0, "Kenner", "Star Wars: Electronic Battle Command Game", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_NO_SOUND )

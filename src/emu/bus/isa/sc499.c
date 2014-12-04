@@ -16,6 +16,7 @@
  */
 
 #include "sc499.h"
+#include "formats/ioprocs.h"
 
 #define VERBOSE 0
 
@@ -1307,16 +1308,16 @@ void sc499_ctape_image_device::write_block(int block_num, UINT8 *ptr)
 
 bool sc499_ctape_image_device::call_load()
 {
-	if (software_entry() == NULL)
-	{
-		m_ctape_data.resize(length());
-		fread(m_ctape_data, length());
-	}
-	else
-	{
-		m_ctape_data.resize(get_software_region_length("ctape"));
-		memcpy(m_ctape_data, get_software_region("ctape"), get_software_region_length("ctape"));
-	}
+	UINT32 size;
+	io_generic io;
+	io.file = (device_image_interface *)this;
+	io.procs = &image_ioprocs;
+	io.filler = 0xff;
+
+	size = io_generic_size(&io);
+	m_ctape_data.resize(size);
+
+	io_generic_read(&io, m_ctape_data, 0, size);
 
 	return IMAGE_INIT_PASS;
 }
