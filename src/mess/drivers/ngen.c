@@ -9,6 +9,46 @@
 	level 3 - timer (from PIT, presumably channel 0? Patent says "channel 3")
 	level 4 - "interrupt detector" - keyboard, printer, RTC
 	level 7 - floppy/hard disk
+	
+    To get to "menu mode", press Space quickly after reset (might need good timing)
+    The bootstrap ROM version number is displayed, along with "B,D,L,M,P,T:"
+    You can press one of these keys for the following tests:
+    B: Bootstrap
+       Loads the system image file (from disk or master workstation)
+    D: Dump
+       RAM contents are dumped to a local disk drive or master workstation
+    L: Load
+       Loads the system image file, then enters the Panel Debugger.  Exiting the Panel
+       Debugger will continue execution of the system image
+    M: Memory Test
+       Continuously performs the Memory Test until the system is reset.
+    P: Panel Debugger
+       Enters the Panel Debugger
+    T: Type of Operating System
+       Gives an "OS:" prompt, at which you can enter the number of the system image to
+       load at the master workstation.
+       
+    Panel Debugger:
+    - Open/Modify RAM
+    Enter an address (seg:off) followed by a forward-slash, the contents of this word will
+    appear, you can enter a value to set it to, or just press Next (default: Enter) to leave
+    it as is.  It will then go on to the next word.  Pressing Return (scan code unknown 
+    currently) will return to the debugger prompt.
+    - Open/Modify Register
+    Enter the register only, and the contents will appear, you can leave it or alter it (you
+    must enter all digits (eg: 0A03 if you're modifying DX) then press Return.
+    - I/O to or from a port
+    Input: Address (segment is ignored, and not required) followed by I, a byte is read from 
+    the port defined by the offset, and the byte is displayed.
+    Output: Address followed by O, you are now prompted with an '='.  Enter the byte to send
+    to the port, and press Return.
+    - Set Haltpoint:
+    Enter an address (seg:off) followed by H.  Sets a haltpoint at the specified address.  Does
+    not work for ROM addresses.  Only one allowed at a time.  Haltpoint info is stored at
+    0000:01F0.  Uses a software interrupt (INT 7C), rather than INT 3.
+    
+    To start or continue from the current address, enter P.
+    To start from a specific address, enter the address (seg:off) followed by a G.
 */
 
 #include "emu.h"
@@ -303,7 +343,7 @@ READ16_MEMBER(ngen_state::peripheral_r)
 			ret = m_viduart->status_r(space,0);
 		break;
 	case 0x1a0:  // I/O control register?
-		ret = m_control;  // end of DMA transfer? (maybe a per-channel EOP?) Add a '| 0x40' to force a serial I/O failure, so that the keyboard can be tested
+		ret = m_control;  // end of DMA transfer? (maybe a per-channel EOP?) Bit 6 is set during a transfer?
 		break;
 	case 0x1b1:
 		ret = 0;
@@ -542,7 +582,7 @@ MACHINE_CONFIG_END
 
 ROM_START( ngen )
 	ROM_REGION( 0x2000, "bios", 0)
-	ROM_LOAD16_BYTE( "72-00414_80186_cpu.bin",  0x000000, 0x001000, CRC(e1387a03) SHA1(ddca4eba67fbf8b731a8009c14f6b40edcbc3279) )
+	ROM_LOAD16_BYTE( "72-00414_80186_cpu.bin",  0x000000, 0x001000, CRC(e1387a03) SHA1(ddca4eba67fbf8b731a8009c14f6b40edcbc3279) )  // bootstrap ROM v8.4
 	ROM_LOAD16_BYTE( "72-00415_80186_cpu.bin",  0x000001, 0x001000, CRC(a6dde7d9) SHA1(b4d15c1bce31460ab5b92ff43a68c15ac5485816) )
 ROM_END
 
