@@ -4,6 +4,8 @@
 
 
   - some history:
+    2014-12-01 Mike Saarna, Robert Tuccitto Implemented "colorburst kill" bit 
+	            of the MARIA CTRL register.
     2014-10-05 Mike Saarna, Robert Tuccitto Last Line DMA value corrected
                 to 6. GCC and Atari docs both show a difference between
                 Other Line and Last Line as +6 at the lowest part of the
@@ -316,6 +318,12 @@ void atari_maria_device::draw_scanline()
 				d = (pixel_cell & 0x1c) | ((pixel_cell << 1) & 0x02); // b4 b3 b2 b0 0
 				scanline[2 * i + 1] = m_maria_palette[d];
 				break;
+		}
+
+		if(m_color_kill) //remove color if there's no colorburst signal
+		{
+				scanline[2 * i] &= 0x0f;
+				scanline[2 * i + 1] &= 0x0f;
 		}
 	}
 
