@@ -33,7 +33,7 @@
 #include "pps4.h"
 
 
-#define VERBOSE 1       //!< set to 1 to log certain instruction conditions
+#define VERBOSE 0       //!< set to 1 to log certain instruction conditions
 
 #if VERBOSE
 #define LOG(x) logerror x
@@ -219,7 +219,7 @@ void pps4_device::iADCSK()
  * @brief pps4_device::iADI Add immediate
  * OPCODE     cycles  mnemonic
  * -----------------------------
- * 0110 xxxx  1 cyc   ADI #x
+ * 0110 xxxx  1 cyc   ADI x
  *
  * Symbolic equation
  * -----------------------------
@@ -248,7 +248,7 @@ void pps4_device::iADI()
  * @brief pps4_device::iDC Decimal correction
  * OPCODE     cycles  mnemonic
  * -----------------------------
- * 0110 0110  1 cyc   DC
+ * 0110 0101  1 cyc   DC
  *
  * Symbolic equation
  * -----------------------------
@@ -337,7 +337,7 @@ void pps4_device::iEOR()
  */
 void pps4_device::iCOMP()
 {
-    m_A = ~m_A & 15;
+    m_A = m_A ^ 15;
 }
 
 /**
@@ -395,7 +395,7 @@ void pps4_device::iSF1()
  * @brief pps4_device::iRF1 Reset flip-flop FF1
  * OPCODE     cycles  mnemonic
  * -----------------------------
- * 0010 0100  1 cyc   RF1
+ * 0010 0110  1 cyc   RF1
  *
  * Symbolic equation
  * -----------------------------
@@ -463,9 +463,9 @@ void pps4_device::iRF2()
  */
 void pps4_device::iLD()
 {
-    const UINT16 imm = ~m_I & 7;
+    const UINT16 i3c = ~m_I & 7;
     m_A = M();
-    m_B = m_B ^ (imm << 4);
+    m_B = m_B ^ (i3c << 4);
 }
 
 /**
@@ -486,11 +486,11 @@ void pps4_device::iLD()
  */
 void pps4_device::iEX()
 {
-    const UINT16 imm = ~m_I & 7;
+    const UINT16 i3c = ~m_I & 7;
     const UINT8 mem = M();
     W(m_A);
     m_A = mem;
-    m_B = m_B ^ (imm << 4);
+    m_B = m_B ^ (i3c << 4);
 }
 
 /**
@@ -515,18 +515,17 @@ void pps4_device::iEX()
  */
 void pps4_device::iEXD()
 {
-    const UINT8 imm = ~m_I & 7;
+    const UINT8 i3c = ~m_I & 7;
     const UINT8 mem = M();
     UINT8 bl = m_B & 15;
     W(m_A);
     m_A = mem;
-    m_B = m_B ^ (imm << 4);
+    m_B = m_B ^ (i3c << 4);
+    // if decrement BL wraps to 1111b
     if (0 == bl) {
-        // decrement BL wraps to 1111b
         bl = 15;
         m_Skip = 1;
     } else {
-        // decrement BL
         bl = bl - 1;
     }
     m_B = (m_B & ~15) | bl;
@@ -583,7 +582,7 @@ void pps4_device::iLAX()
  * @brief pps4_device::iLXA
  * OPCODE     cycles  mnemonic
  * -----------------------------
- * 0001 1011  1 cyc   LAX
+ * 0001 1011  1 cyc   LXA
  *
  * Symbolic equation
  * -----------------------------
@@ -637,7 +636,7 @@ void pps4_device::iLBMX()
  * @brief pps4_device::iLBUA
  * OPCODE     cycles  mnemonic
  * -----------------------------
- * 0001 0000  1 cyc   LBUA
+ * 0000 0100  1 cyc   LBUA
  *
  * Symbolic equation
  * -----------------------------
@@ -760,7 +759,7 @@ void pps4_device::iXS()
  */
 void pps4_device::iCYS()
 {
-    const UINT16 sa = (m_SA >> 4) | (m_A << 12);
+    const UINT16 sa = (m_SA >> 4) | (m_A << 8);
     m_A = m_SA & 15;
     m_SA = sa;
 }
@@ -841,12 +840,13 @@ void pps4_device::iLB()
  */
 void pps4_device::iLBL()
 {
+    const UINT8 i8 = ~ARG() & 255;
     // previous LB or LBL instruction?
     if (0xc0 == m_Ip || 0x00 == m_Ip) {
         LOG(("%s: skip prev:%02x op:%02x\n", __FUNCTION__, m_Ip, m_I));
         return;
     }
-    m_B = ~ARG() & 255;
+    m_B = i8;
 }
 
 /**
@@ -879,7 +879,7 @@ void pps4_device::iINCB()
  * @brief pps4_device::iDECB
  * OPCODE     cycles  mnemonic
  * -----------------------------
- * 0001 1111  1 cyc    DECq
+ * 0001 1111  1 cyc    DECB
  *
  * Symbolic equation
  * -----------------------------
@@ -905,7 +905,7 @@ void pps4_device::iDECB()
  * @brief pps4_device::iT Transfer
  * OPCODE     cycles  mnemonic
  * -----------------------------
- * 10xx xxxx  1 cyc    T *
+ * 10xx xxxx  1 cyc    T *xx
  *
  * Symbolic equation
  * -----------------------------
@@ -952,8 +952,7 @@ void pps4_device::iTM()
 {
     m_SB = m_SA;
     m_SA = m_P;
-    m_P = 3 << 6;
-    m_P = m_P | (m_I & 63);
+    m_P = (3 << 6) | (m_I & 63);
     m_I2 = ARG();
     m_P = (1 << 8) | m_I2;
 }
@@ -978,8 +977,7 @@ void pps4_device::iTM()
 void pps4_device::iTL()
 {
     m_I2 = ARG();
-    m_P = (m_I & 15) << 8;
-    m_P = m_P | m_I2;
+    m_P = ((m_I & 15) << 8) | m_I2;
 }
 
 /**
@@ -1040,7 +1038,7 @@ void pps4_device::iSKC()
  */
 void pps4_device::iSKZ()
 {
-    m_Skip = 0 == m_A ? 1 : 0;
+    m_Skip = (0 == m_A) ? 1 : 0;
 }
 
 /**
@@ -1059,9 +1057,9 @@ void pps4_device::iSKZ()
  */
 void pps4_device::iSKBI()
 {
-    const UINT8 imm = m_I & 15;
+    const UINT8 i4 = m_I & 15;
     const UINT8 bl = m_B & 15;
-    m_Skip = bl == imm ? 1 : 0;
+    m_Skip = bl == i4 ? 1 : 0;
 }
 
 /**
@@ -1098,7 +1096,7 @@ void pps4_device::iSKF2()
  * @brief pps4_device::iRTN Return
  * OPCODE     cycles  mnemonic
  * -----------------------------
- * 0000 0101  1 cyc    RET
+ * 0000 0101  1 cyc    RTN
  *
  * Symbolic equation
  * -----------------------------
@@ -1121,7 +1119,7 @@ void pps4_device::iRTN()
  * @brief pps4_device::iRTN Return
  * OPCODE     cycles  mnemonic
  * -----------------------------
- * 0000 0111  1 cyc    RETSK
+ * 0000 0111  1 cyc    RTNSK
  *
  * Symbolic equation
  * -----------------------------
@@ -1138,8 +1136,7 @@ void pps4_device::iRTNSK()
     m_SA ^= m_SB;
     m_SB ^= m_SA;
     m_SA ^= m_SB;
-    ROP();      // next opcode is ignored
-    m_I = 0;    // avoid LB/LBL or LDI skipping due to m_Ip
+    m_Skip = 1; // next opcode is ignored
 }
 
 /**
@@ -1166,10 +1163,10 @@ void pps4_device::iRTNSK()
  */
 void pps4_device::iIOL()
 {
-    const UINT8 a = ~m_A & 15;
+    const UINT8 ac = ~m_A & 15;
     m_I2 = ARG();
-    m_io->write_byte(m_I2, a);
-    LOG(("%s: port:%02x <- %x\n", __FUNCTION__, m_I2, a));
+    m_io->write_byte(m_I2, ac);
+    LOG(("%s: port:%02x <- %x\n", __FUNCTION__, m_I2, ac));
     m_A = ~m_io->read_byte(m_I2) & 15;
     LOG(("%s: port:%02x -> %x\n", __FUNCTION__, m_I2, m_A));
 }
@@ -1189,7 +1186,7 @@ void pps4_device::iIOL()
  */
 void pps4_device::iDIA()
 {
-    m_A = m_io->read_byte(PPS4_PORT_A);
+    m_A = m_io->read_byte(PPS4_PORT_A) & 15;
 }
 
 /**
@@ -1207,14 +1204,14 @@ void pps4_device::iDIA()
  */
 void pps4_device::iDIB()
 {
-    m_A = m_io->read_byte(PPS4_PORT_B);
+    m_A = m_io->read_byte(PPS4_PORT_B) & 15;
 }
 
 /**
- * @brief pps4_device::iDIA Discrete input group A
+ * @brief pps4_device::iDOA Discrete output
  * OPCODE     cycles  mnemonic
  * -----------------------------
- * 0010 1101  1 cyc    DOA
+ * 0001 1101  1 cyc    DOA
  *
  * Symbolic equation
  * -----------------------------
