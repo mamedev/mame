@@ -53,7 +53,7 @@ private:
 	//     62 = Long Immediate Data Indicator
 	//     63 = Short Immediate Data Indicator NOT Settings Flag
 	UINT32 m_pc;
-	UINT32 m_r[64];
+	//UINT32 m_r[64];
 
 
 	address_space *m_program;
