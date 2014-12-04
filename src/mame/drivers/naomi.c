@@ -259,7 +259,7 @@ Crackin' DJ part 2                            840-0068C  23674   20 (64Mb)   pre
 Ferrari F355 Challenge (twin, prototype)        no cart  22848P* 21 (64Mb)   present  315-6206  317-0267-COM  * flash-PCB have CRC 330B A417, the rest is the same as regular cart, not dumped but known to exist
 Ferrari F355 Challenge 2 (twin)                 no cart  23399   21 (64Mb)   present  315-6206  317-0287-COM  content is the same as regular 171-7919A cart
 House of the Dead 2 (prototype)                 no cart  A1E2    21 (64Mb)   present  315-6206  present       no label on IC42
-Inu No Osanpo / Dog Walking (Rev A)           840-0073C  22294A  16 (64Mb)   present  315-6206  317-0316-JPN  requires 837-13844 JVS IO with special jumpers settings enabling rotary
+Inu No Osanpo / Dog Walking (Rev A)           840-0073C  22294A  16 (64Mb)   present  315-6206  317-0316-JPN  requires 837-13844 JVS IO with DIPSW 1 ON
 Maze of the Kings The (prototype)               no cart  *       21 (64Mb)   present  315-6206  FRI           * flash-PCB, not dumped but known to exist
 Samba de Amigo (prototype)                      no cart  *       21 (64Mb)   present  315-6206  317-0270-COM  * instead of EPROM have tiny PCB with 2 flashroms on it
 Soul Surfer (Rev A)                           840-0095C  23838C  21 (64Mb)   present  315-6206  not present
@@ -335,7 +335,7 @@ Power Stone 2                                   841-0008C    23127    9 (64Mb)  
 Puyo Puyo Da!                                   841-0006C    22206   20 (64Mb)   ?           315-6213  ?
 Ring Out 4x4                                    840-0004C    21779   10 (64Mb)   present     315-6213  317-0250-COM   requires 2 JVS boards
 Samba de Amigo (Rev B)                          840-0020C    22966B  16 (64Mb)   present     315-6213  317-0270-COM   will boot but requires special controller to play it
-Sega Marine Fishing                             840-0027C    22221   10 (64Mb)   ?           315-6213  not present    ROM 3&4 not present. Requires fishing controller
+Sega Marine Fishing                             840-0027C    22221   10 (64Mb)   ?           315-6213  not present    ROM 3&4 not present. Requires 837-13844 JVS IO with all DIPSW Off and fishing controller
 Sega Strike Fighter (Rev A, set 1)              840-0035C    23323A  20 (64Mb)   present     315-6213  317-0281-COM   have "Rev. A" label on case
 Sega Strike Fighter (Rev A, set 2)              840-0035C    23786A  20 (64Mb)   present     315-6213  317-0281-COM   have "Rev. A" label on PCB
 Sega Tetris                                     840-0018C    22909    6 (64Mb)   present     315-6213  317-0268-COM
@@ -343,7 +343,7 @@ Slashout                                        840-0041C    23341   17 (64Mb)  
 Spawn In the Demon's Hand (Rev B)               841-0005C    22977B  10 (64Mb)   ?           315-6213  317-5051-COM   joystick + 4 buttons
 Super Major League '99                          840-0012C    22059   21 (64Mb)   ?           315-6213  ?
 The Typing of the Dead (Rev A)                  840-0026C    23021A  20 (64Mb)   present     315-6213  not present
-Touch de UNO! / Unou Nouryoku Check Machine     840-0008C    22073    4 (64Mb)   present     315-6213  317-0255-JPN   requires special JVS board with touch input and printer
+Touch de UNO! / Unou Nouryoku Check Machine     840-0008C    22073    4 (64Mb)   present     315-6213  317-0255-JPN   requires 837-13844 JVS IO with DIPSW 5 On, ELO AccuTouch-compatible touch screen controller and special printer.
 Toy Fighter / Waffupu                           840-0011C    22035   10 (64Mb)   present     315-6212  317-0257-COM   joystick + 3 buttons
 Virtua NBA                                      840-0021C-01 23073   21 (64Mb)   present     315-6213  not present
 Virtua NBA (original)                           840-0021C    22949   21 (64Mb)   present     315-6213  317-0271-COM
@@ -460,7 +460,7 @@ Shootout Pool                                  840-0098C    23844    4 (64Mb)   
 Shootout Pool Prize / The Medal (Rev A)        840-0128C    24065A   4 (64Mb)   present  317-0367-COM  requires Naomi-based hopper controller
 Shootout Pool Prize / The Medal Ver. B         840-0136C    24148    4 (64Mb)   present  317-0367-COM  requires Naomi-based or 837-14438 hopper controller
 SWP Hopper Board                               840-0130C    24083   20 (64Mb)   present  317-0339-COM  Maskroms are not really used, they are recycled from other games; there is an additional 837-14381 IO board
-Touch de UNO! 2                                840-0022C    23071    6 (64Mb)   present  317-0276-JPN  requires special JVS board with touch input and printer
+Touch de UNO! 2                                840-0022C    23071    6 (64Mb)   present  317-0276-JPN  requires 837-13844 JVS IO with DIPSW 5 On, ELO AccuTouch-compatible touch screen controller and special printer.
 Virtua Fighter 4 Evolution                     840-0106B    23934   20 (64Mb)   present  317-0339-COM
 Virtua Tennis 2 / Power Smash 2 (Rev A)        840-0084C    22327A  18 (64Mb)   present  317-0320-COM
 
@@ -888,7 +888,10 @@ Notes:
 |-----------------------------|
 Notes: (most info taken from poor quality pics/scans, better info is needed)
 
-             JVS I/O board 2. Has both digital and analogue inputs.
+             JVS I/O board 2. Supports digital and analogue inputs, rotary input,
+             touch screens (ELO AccuTouch-compatible) and printer output using
+             extended JVS commands. This features can be enabled or disabled
+             by switching DIPSW 1-5.
              This board is used with F355, Ghost Squad, and many
              others including network/satellite games.
 
@@ -909,7 +912,7 @@ Notes: (most info taken from poor quality pics/scans, better info is needed)
       IC7  - 27C512 EPROM with label 'EPR-22082' (DIP28)
              On plain 837-13844 (no -02) this is 'EPR-21868' (DIP28)
       IC8  - Sharp LH52256 32k x8 SRAM (SOP28)
-      IC10 - Something by NEC? (QFP44)
+      IC10 - NEC D71054GB programmable counter/timer (QFP44)
       OSC1 - 14.7456MHz
       OSC2 - 32MHz
       CNx  - 6 pin connector

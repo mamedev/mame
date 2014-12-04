@@ -357,4 +357,8 @@ READ8_MEMBER(mie_device::jvs_sense_r)
 
 void mie_device::maple_reset()
 {
+	// ignoring reset maple pattern is HUGE HACK
+	// current implementation works only because of in such case procedure of firmware upload by games will be skipped at all
+	// so in better case - inputs doesnt work if game uses very different firmware version than already uploaded by BIOS, in worst case - game hang/reboot
+	// TODO: figure out why game code doesn't wait long enough for internal firmware's RAM test completed in the case of proper reset
 }
