@@ -15,6 +15,7 @@ enum
     PPS4_SA,
     PPS4_SB,
     PPS4_B,
+    PPS4_Skip,
     PPS4_SAG,
     PPS4_I2,
     PPS4_Ip,
@@ -83,6 +84,7 @@ private:
     UINT16  m_P;        //!< program counter P(12:1)
     UINT16  m_SA;       //!< Shift register SA(12:1)
     UINT16  m_SB;       //!< Shift register SB(12:1)
+    UINT8   m_Skip;     //!< Skip next instruction
     UINT16  m_SAG;      //!< Special address generation mask
     UINT16  m_B;        //!< B register B(12:1) (BL, BM and BH)
     UINT8   m_C;        //!< Carry flip-flop
