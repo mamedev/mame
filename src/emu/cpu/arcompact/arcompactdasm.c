@@ -120,6 +120,20 @@ static const char *table01_01_0x[0x10] =
 	/* 0f */ "<BBIT1>"
 };
 
+static const char *table18[0x8] =
+{
+	/* 00 */ "LD_S (SP)",
+	/* 01 */ "LDB_S (SP)",
+	/* 02 */ "ST_S (SP)",
+	/* 03 */ "STB_S (SP)",
+	/* 04 */ "ADD_S (SP)",
+	/* 05 */ "ADD_S/SUB_S (SP)",
+	/* 06 */ "POP_S (SP)",
+	/* 07 */ "PUSH_S (SP)",
+
+};
+
+
 
 #define ARCOMPACT_OPERATION ((op & 0xf800) >> 11)
 
@@ -233,9 +247,25 @@ CPU_DISASSEMBLE(arcompact)
 		
 	}
 	else
-	{
+	{	
 		size = 2;
-		print("%s (%04x)", basic[instruction], op & ~0xf800 );
+
+		switch (instruction)
+		{
+			case 0x18:
+			{
+				// Stack Pointer Based Instructions (16-bit)
+				// 11000 bbb iii uuuuu
+				UINT8 subinstr = (op & 0x00e0) >> 5;
+				print("%s (%04x)", table18[subinstr], op & ~0xf8e0);
+				break;
+
+			}
+
+			default:
+				print("%s (%04x)", basic[instruction], op & ~0xf800);
+				break;
+		}
 	}
 
 
