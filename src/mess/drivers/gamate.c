@@ -1,5 +1,7 @@
 /******************************************************************************
  PeT mess@utanet.at 2007, 2014
+ Peter Wilhelmsen peter.wilhelmsen@gmail.com
+ Morten Shearman Kirkegaard morten+gamate@afdelingp.dk
 ******************************************************************************/
 
 #include "emu.h"
@@ -15,157 +17,170 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_cart(*this, "cartslot")
-//      , m_gfxdecode(*this, "gfxdecode")
+//		, m_gfxdecode(*this, "gfxdecode")
 		, m_io_joy(*this, "JOY")
-		,   m_palette(*this, "palette")
+		,	m_palette(*this, "palette")
+		, m_cart_rom(*this, "cart_rom")
+		, m_bios(*this, "bios")
 	{ }
 
 	DECLARE_PALETTE_INIT(gamate);
-	DECLARE_READ8_MEMBER(video_r);
-	DECLARE_READ8_MEMBER(pad_r);
-	DECLARE_WRITE8_MEMBER(video_w);
-	DECLARE_WRITE8_MEMBER(audio_w);
-	DECLARE_WRITE8_MEMBER(bios_w);
+	DECLARE_READ8_MEMBER(protection_r);
+	DECLARE_READ8_MEMBER(gamate_cart_protection_r);
+	DECLARE_WRITE8_MEMBER(gamate_cart_protection_w);
+	DECLARE_READ8_MEMBER(gamate_video_r);
+	DECLARE_READ8_MEMBER(gamate_pad_r);
+	DECLARE_WRITE8_MEMBER(gamate_video_w);
+	DECLARE_READ8_MEMBER(gamate_audio_r);
+	DECLARE_WRITE8_MEMBER(gamate_audio_w);
+	DECLARE_WRITE8_MEMBER(gamate_bios_w);
 	DECLARE_DRIVER_INIT(gamate);
 	UINT32 screen_update_gamate(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(gamate_interrupt);
+	TIMER_CALLBACK_MEMBER(gamate_timer);
+	TIMER_CALLBACK_MEMBER(gamate_timer2);
 
 private:
 	virtual void machine_start();
 
 	struct
 	{
-	UINT8 reg[8];
-	struct {
-		bool write; // else tilemap
-		bool page2; // else page1
-		UINT8 data[2][0x100][0x20];
-		} bitmap;
-	struct {
-		UINT8 data[32][32];
-	} tilemap;
-	UINT8 x, y;
+  	UINT8 reg[8];
+  	struct {
+    	bool write;
+    	bool page2; // else page1
+			UINT8 ypos, xpos/*tennis*/;
+    	UINT8 data[2][0x100][0x20];
+	  } bitmap;
+  	UINT8 x, y;
+		bool y_increment;
 	} video;
 
-//  UINT8 m_ports[5];
-//  UINT8 m_ram[0x4000];
+	struct {
+		int bit_shifter;
+		UINT8 cartridge_byte;
+		UINT16 address; // in reality something more like short local cartridge address offset
+		bool unprotected;
+		bool failed;
+	} card_protection;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
-//  required_device<gfxdecode_device> m_gfxdecode;
+//	required_device<gfxdecode_device> m_gfxdecode;
 	required_ioport m_io_joy;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT8> m_cart_rom;
+	required_shared_ptr<UINT8> m_bios;
+	emu_timer *timer1;
+	emu_timer *timer2;
 };
 
-WRITE8_MEMBER( gamate_state::video_w )
+WRITE8_MEMBER( gamate_state::gamate_cart_protection_w )
 {
-	if (m_maincpu->pc()<0xf000)
-	logerror("%.6f %04x video write %04x %02x\n", machine().time().as_double(), m_maincpu->pc(), offset,data);
-	video.reg[offset]=data;
 	switch (offset) {
-	case 1: video.bitmap.write=data&0x40;break; // probably y increment
-	case 4: video.bitmap.page2=data&0x80;video.x=data&0x7f;break;
-	case 5: video.y=data;break;
-	case 7:
-	if (video.bitmap.write) {
-		if (video.x<ARRAY_LENGTH(video.bitmap.data[0][0]) /*&& video.y<ARRAY_LENGTH(video.bitmap.data[0])*/)
-		video.bitmap.data[video.bitmap.page2][video.y][video.x]=data;
-		else
-		logerror("%.6f %04x video bitmap x %x invalid\n",machine().time().as_double(), m_maincpu->pc(), video.x);
-		video.y++;
-	} else {
-		if (video.x<ARRAY_LENGTH(video.tilemap.data[0]) && (video.y&0x1f)<ARRAY_LENGTH(video.tilemap.data))
-		video.tilemap.data[video.y&0x1f][video.x]=data;
-		else
-		logerror("%.6f %04x video tilemap %x %x invalid\n",machine().time().as_double(), m_maincpu->pc(), video.x, video.y);
-		video.x++;
-	}
+	case 0:
+		card_protection.failed= card_protection.failed || ((card_protection.cartridge_byte&0x80)!=0) != ((data&4)!=0);
+		card_protection.bit_shifter++;
+		if (card_protection.bit_shifter>=8) {
+			card_protection.cartridge_byte=m_cart_rom[card_protection.address++];
+			card_protection.bit_shifter=0;
+		}
+		break;
 	}
 }
+READ8_MEMBER( gamate_state::gamate_cart_protection_r )
+{
+	UINT8 ret=1;
+	switch (offset) {
+	case 0:
+		ret=(card_protection.cartridge_byte&0x80)?2:0;
+		card_protection.cartridge_byte<<=1;
+		card_protection.bit_shifter++;
+		if (card_protection.bit_shifter>=8) {
+			card_protection.bit_shifter=0;
+			card_protection.cartridge_byte=m_cart_rom[card_protection.address++];
+			card_protection.unprotected=true;
+			if (!card_protection.failed) {
+			} // now protection chip on cartridge activates cartridge chip select on cpu accesses
+		}
+		break;
+	}
+	return ret;
+}
 
-READ8_MEMBER( gamate_state::video_r )
+READ8_MEMBER( gamate_state::protection_r ) { return 1; }
+
+WRITE8_MEMBER( gamate_state::gamate_video_w )
+{
+  video.reg[offset]=data;
+  switch (offset) {
+  case 1: video.bitmap.write=data&0xc0; // more addressing mode
+		video.y_increment=data&0x40;
+		break;
+	case 2: video.bitmap.xpos=data;break; // at least 7 bits
+	case 3: video.bitmap.ypos=data;break; // at least 7 bits
+  case 4: video.bitmap.page2=data&0x80;video.x=data&0x7f;break;
+  case 5: video.y=data;break;
+  case 7:
+    if (video.bitmap.write) {
+      if (video.x<ARRAY_LENGTH(video.bitmap.data[0][0]) && video.y<ARRAY_LENGTH(video.bitmap.data[0]))
+        video.bitmap.data[video.bitmap.page2][video.y][video.x]=data;
+      else 
+        logerror("%.6f %04x video bitmap x %x invalid\n",machine().time().as_double(), m_maincpu->pc(), video.x);
+    } else {
+        video.bitmap.data[0][video.y][video.x&(ARRAY_LENGTH(video.bitmap.data[0][0])-1)]=data;
+    }    
+    if (video.y_increment) video.y++;
+		else video.x++;
+  }
+}
+
+READ8_MEMBER( gamate_state::gamate_video_r )
 {
 	if (offset!=6) return 0;
-	UINT8 data=0;
-	if (video.bitmap.write) {
-		if (video.x<ARRAY_LENGTH(video.bitmap.data[0][0]) /*&& video.y<ARRAY_LENGTH(video.bitmap.data[0])*/)
-		data=video.bitmap.data[video.bitmap.page2][video.y][video.x];
-		else
-		logerror("%.6f video bitmap x %x invalid\n",machine().time().as_double(),video.x);
-	} else {
-		if (video.x<ARRAY_LENGTH(video.tilemap.data[0]) && video.y<ARRAY_LENGTH(video.tilemap.data))
-		data=video.tilemap.data[video.y][video.x];
-		else
-		logerror("%.6f video tilemap %x %x invalid\n",machine().time().as_double(),video.x, video.y);
-	}
-	if (m_maincpu->pc()<0xf000)
-	logerror("%.6f video read %04x %02x\n",machine().time().as_double(),offset, data);
-	return data;
+  UINT8 data=0;
+  if (video.bitmap.write) {
+      if (video.x<ARRAY_LENGTH(video.bitmap.data[0][0]) && video.y<ARRAY_LENGTH(video.bitmap.data[0]))
+        data=video.bitmap.data[video.bitmap.page2][video.y][video.x];    
+      else 
+        logerror("%.6f video bitmap x %x invalid\n",machine().time().as_double(),video.x);
+  } else {
+    data=video.bitmap.data[0][video.y][video.x&(ARRAY_LENGTH(video.bitmap.data[0][0])-1)];
+  }
+  if (m_maincpu->pc()<0xf000) 
+    logerror("%.6f video read %04x %02x\n",machine().time().as_double(),offset, data);
+  return data;
 }
 
-WRITE8_MEMBER( gamate_state::audio_w )
+WRITE8_MEMBER( gamate_state::gamate_audio_w )
 {
-	//  logerror("%.6f audio write %04x %02x\n",timer_get_time(),offset,data);
+  logerror("%.6f %04x audio write %04x %02x\n",machine().time().as_double(),m_maincpu->pc(),offset,data);
 }
 
-WRITE8_MEMBER( gamate_state::bios_w )
+READ8_MEMBER( gamate_state::gamate_audio_r )
 {
-	UINT8 *memory = memregion("maincpu")->base(); //memory_region (REGION_CPU1);
-
-	unsigned short stack=m_maincpu->sp();//cpu_get_reg(M6502_S)|0x100;
-	unsigned short address= memory[stack+1]|(memory[stack+2]<<8);
-	switch (offset) {
-	case 0x12:
-	logerror("%.6f bios api %04x %04x string:%04x x:%02x y:%02x\n",
-				machine().time().as_double(), offset|0xf000, address,
-				memory[0]|(memory[1]<<8), 0, 0);//cpu_get_reg(M6502_X), cpu_get_reg(M6502_Y) );
-	break;
-	case 0x15:
-	logerror("%.6f bios api %04x %04x string:%04x x:%02x y:%02x\n",
-				machine().time().as_double(), offset|0xf000, address,
-				memory[0]|(memory[1]<<8), 0, 0); //cpu_get_reg(M6502_X), cpu_get_reg(M6502_Y) );
-	break;
-	case 0x18:
-	logerror("%.6f bios api %04x %04x string:%04x\n",machine().time().as_double(), offset|0xf000, address,
-				memory[0]|(memory[1]<<8) );
-	break;
-	case 0x1b:
-	logerror("%.6f bios api %04x %04x string:%04x\n",machine().time().as_double(), offset|0xf000, address,
-				memory[0]|(memory[1]<<8) );
-	break;
-	case 0x1e:
-	logerror("%.6f bios api %04x %04x string:%04x\n",machine().time().as_double(), offset|0xf000, address,
-				memory[0]|(memory[1]<<8) );
-	break;
-	case 0x2a: // cube up menu lighting
-	logerror("%.6f bios api %04x %04x 1c1d:%04x a:%02x x:%02x y:%02x\n",
-				machine().time().as_double(), offset|0xf000, address,
-				memory[0x1c]|(memory[0x1d]<<8),
-				0,0,0);//cpu_get_reg(M6502_A), cpu_get_reg(M6502_X), cpu_get_reg(M6502_Y) );
-	break;
-	default:
-	logerror("%.6f bios api %04x %04x\n",machine().time().as_double(), offset|0xf000, address);
-	}
+  logerror("%.6f %04x audio read %04x \n",machine().time().as_double(),m_maincpu->pc(),offset);
+	return 0;
 }
 
-READ8_MEMBER( gamate_state::pad_r )
+
+READ8_MEMBER( gamate_state::gamate_pad_r )
 {
-	UINT8 data=m_io_joy->read();//readinputport(0);
-	//  logerror("%.6f pad read %04x %02x\n",timer_get_time(),offset,data);
-	return data;
+  UINT8 data=m_io_joy->read();
+  return data;
 }
 
 static ADDRESS_MAP_START( gamate_mem, AS_PROGRAM, 8, gamate_state )
-//  AM_RANGE(0x4000, 0x7fff) AM_READWRITE(gmaster_io_r, gmaster_io_w)
+ 	AM_RANGE(0x0000, 0x03ff) AM_RAM
+  AM_RANGE(0x4000, 0x400d) AM_READWRITE(gamate_audio_r, gamate_audio_w)
+  AM_RANGE(0x4400, 0x4400) AM_READ(gamate_pad_r)
+  AM_RANGE(0x5000, 0x5007) AM_READWRITE(gamate_video_r, gamate_video_w)
+  AM_RANGE(0x5a00, 0x5a00) AM_READ(protection_r)
 
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x4000, 0x400d) AM_WRITE(audio_w)
-	AM_RANGE(0x4400, 0x4400) AM_READ(pad_r)
-//  AM_RANGE(0x5006, 0x5006) AM_READ(video_r)
-//  AM_RANGE(0x5000, 0x5007) AM_WRITE(video_w)
-	AM_RANGE(0x5000, 0x5007) AM_READWRITE(video_r, video_w)
-
-	AM_RANGE(0x6000, 0xdfff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_ROM
+  AM_RANGE(0x6000, 0xdfff) AM_ROM AM_SHARE("cart_rom")
+	AM_RANGE(0x6000, 0x6002) AM_READWRITE(gamate_cart_protection_r, gamate_cart_protection_w)
+//	AM_RANGE(0x6000, 0xdfff) AM_READWRITE(gamate_cart_r, gamate_cart_w)
+  AM_RANGE(0xf000, 0xffff) AM_ROM AM_SHARE("bios")
 ADDRESS_MAP_END
 
 
@@ -173,49 +188,45 @@ static INPUT_PORTS_START( gamate )
 	PORT_START("JOY")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) // left?
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) // rechts?
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("A")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("B")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START) PORT_NAME("start/pause")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("select")
 INPUT_PORTS_END
 
-#if 0
 static const struct gfx_layout gamate_charlayout =
 {
-		4,      /* width of object */
-		1,      /* height of object */
-		256,/* 256 characters */
-		2,      /* bits per pixel */
-		{ 0,1 }, /* no bitplanes */
-		/* x offsets */
-		{ 0,2,4,6 },
-		/* y offsets */
-		{ 0 },
-		8*1 /* size of 1 object in bits */
+        4,      /* width of object */
+        1,      /* height of object */
+        256,/* 256 characters */
+        2,      /* bits per pixel */
+        { 0,1 }, /* no bitplanes */
+        /* x offsets */
+        { 0,2,4,6 },
+        /* y offsets */
+        { 0 },
+        8*1 /* size of 1 object in bits */
 };
 
 static const unsigned short gamate_palette[4] =
 {
 	0,1,2,3
 };
-#endif
 
 /* palette in red, green, blue tribles */
 static const unsigned char gamate_colors[4][3] =
 {
-	{ 255,255,255 },
-	{ 0xa0, 0xa0, 0xa0 },
-	{ 0x60, 0x60, 0x60 },
-	{ 0, 0, 0 }
+  { 255,255,255 },
+  { 0xa0, 0xa0, 0xa0 },
+  { 0x60, 0x60, 0x60 },
+  { 0, 0, 0 }
 };
 
-#if 0
 static GFXDECODE_START( gamate_charlayout )
-		GFXDECODE_ENTRY( "gfx1", 0x0000, gamate_charlayout, 0, 0x100 )
+        GFXDECODE_ENTRY( "gfx1", 0x0000, gamate_charlayout, 0, 0x100 )
 GFXDECODE_END
-#endif
 
 PALETTE_INIT_MEMBER(gamate_state, gamate)
 {
@@ -245,79 +256,43 @@ static void BlitPlane(UINT16* line, UINT8 plane1, UINT8 plane2)
 
 UINT32 gamate_state::screen_update_gamate(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y, j;
-	for (y=0;y<160;y++) {
-	for (x=0, j=0;x<160;x+=8, j++) {
-//  for (y=0;y<256;y++) {
-//    for (x=0, j=0;x<256;x+=8, j++) {
-		UINT8 d1=video.bitmap.data[0][y][j];
-		UINT8 d2=video.bitmap.data[1][y][j];
-#if 0
-		UINT16 data=PLANES2_2_PACKED(d1, d2);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), (data>>8)&0xff,0,0,0, x, y);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), data&0xff,0,0,0, x+4, y);
-#else
+  int x, y, j;
+  for (y=0;y<160;y++) {
+    for (x=0, j=0;x<160;x+=8, j++) {
+//      UINT8 d1=video.bitmap.data[0][(y+video.bitmap.ypos)&0xff][j+video.bitmap.xpos/8];
+//      UINT8 d2=video.bitmap.data[1][(y+video.bitmap.ypos)&0xff][j+video.bitmap.xpos/8];
+      UINT8 d1=video.bitmap.data[0][(y+video.bitmap.ypos)%200][j]; // kill shot, tornade
+      UINT8 d2=video.bitmap.data[1][(y+video.bitmap.ypos)%200][j];
 			BlitPlane(&bitmap.pix16(y, x+4), d1, d2);
 			BlitPlane(&bitmap.pix16(y, x), d1>>4, d2>>4);
-#endif
-	}
-	}
-	for (y=0; y<32; y++) {
-	for (x=0; x<32; x++) {
-#if 0
-		UINT8 d=video.tilemap.data[y][x];
-		if (d) {
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0xff,0,0,0, 256+x*8, y*8);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0xff,0,0,0, 256+x*8, y*8+1);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0xff,0,0,0, 256+x*8, y*8+2);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0xff,0,0,0, 256+x*8, y*8+3);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0xff,0,0,0, 256+x*8, y*8+4);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0xff,0,0,0, 256+x*8, y*8+5);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0xff,0,0,0, 256+x*8, y*8+6);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0xff,0,0,0, 256+x*8, y*8+7);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0xff,0,0,0, 260+x*8, y*8);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0xff,0,0,0, 260+x*8, y*8+1);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0xff,0,0,0, 260+x*8, y*8+2);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0xff,0,0,0, 260+x*8, y*8+3);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0xff,0,0,0, 260+x*8, y*8+4);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0xff,0,0,0, 260+x*8, y*8+5);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0xff,0,0,0, 260+x*8, y*8+6);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0xff,0,0,0, 260+x*8, y*8+7);
-		} else {
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0,0,0,0, 256+x*8, y*8);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0,0,0,0, 256+x*8, y*8+1);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0,0,0,0, 256+x*8, y*8+2);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0,0,0,0, 256+x*8, y*8+3);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0,0,0,0, 256+x*8, y*8+4);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0,0,0,0, 256+x*8, y*8+5);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0,0,0,0, 256+x*8, y*8+6);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0,0,0,0, 256+x*8, y*8+7);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0,0,0,0, 260+x*8, y*8);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0,0,0,0, 260+x*8, y*8+1);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0,0,0,0, 260+x*8, y*8+2);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0,0,0,0, 260+x*8, y*8+3);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0,0,0,0, 260+x*8, y*8+4);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0,0,0,0, 260+x*8, y*8+5);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0,0,0,0, 260+x*8, y*8+6);
-		m_gfxdecode->gfx(0)->opaque(bitmap, bitmap.cliprect(), 0,0,0,0, 260+x*8, y*8+7);
-		}
-#endif
-	}
-	}
+    }
+  }
 	return 0;
 }
 
 DRIVER_INIT_MEMBER(gamate_state,gamate)
 {
 	memset(&video, 0, sizeof(video));/* memset(m_ram, 0, sizeof(m_ram));*/
-	UINT8 *gfx=memregion("gfx1")->base();   for (int i=0; i<256; i++) gfx[i]=i;
+	UINT8 *gfx=memregion("gfx1")->base();	for (int i=0; i<256; i++) gfx[i]=i;
+	timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamate_state::gamate_timer),this));
+	timer2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamate_state::gamate_timer2),this));
 }
 
 
 void gamate_state::machine_start()
 {
-	if (m_cart->exists())
+	if (m_cart->exists()) {
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0xdfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+//		m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x6000, READ8_DELEGATE(gamate_state, gamate_cart_protection_r));
+	}
+	m_bios[0xdf1]=0xea; m_bios[0xdf2]=0xea; // $47 protection readback
+	card_protection.address=0x6005-0x6001;
+	card_protection.bit_shifter=0;
+	card_protection.cartridge_byte=m_cart_rom[card_protection.address++];
+	card_protection.failed=false;
+	card_protection.unprotected=false;
+	timer2->enable(TRUE);
+	timer2->reset(m_maincpu->cycles_to_attotime(1000));
 #if 0
 	save_item(NAME(m_video.data));
 	save_item(NAME(m_video.index));
@@ -331,14 +306,24 @@ void gamate_state::machine_start()
 #endif
 }
 
+TIMER_CALLBACK_MEMBER(gamate_state::gamate_timer)
+{
+	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+	timer1->enable(FALSE);
+}
+
+TIMER_CALLBACK_MEMBER(gamate_state::gamate_timer2)
+{
+	m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+	timer1->enable(TRUE);
+	timer1->reset(m_maincpu->cycles_to_attotime(10/* cycles short enought to clear irq line early enough*/));
+	timer2->enable(TRUE);
+	timer2->reset(m_maincpu->cycles_to_attotime(40000));
+}
+
 
 INTERRUPT_GEN_MEMBER(gamate_state::gamate_interrupt)
 {
-//  m_maincpu->set_input_line(UPD7810_INTFE1, ASSERT_LINE);
-	static bool state=false;
-//  m_maincpu->set_input_line(M6502_IRQ_LINE, state?ASSERT_LINE: CLEAR_LINE);
-	state=!state;
-//  cpu_set_irq_line(0, M6502_INT_IRQ, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( gamate, gamate_state )
@@ -348,36 +333,37 @@ static MACHINE_CONFIG_START( gamate, gamate_state )
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)
-#if 0
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+#ifdef SHOW_TILEMAP
+	MCFG_SCREEN_SIZE(256, 152+256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 152+256-1)
 #else
-	MCFG_SCREEN_SIZE(160, 160)
-	MCFG_SCREEN_VISIBLE_AREA(0, 160-1, 0, 160-1)
+	MCFG_SCREEN_SIZE(160, 152)
+	MCFG_SCREEN_VISIBLE_AREA(0, 160-1, 0, 152-1)
 #endif
 	MCFG_SCREEN_UPDATE_DRIVER(gamate_state, screen_update_gamate)
 	MCFG_SCREEN_PALETTE("palette")
 
-//  MCFG_GFXDECODE_ADD("gfxdecode", "palette", gamate )
+//	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gamate )
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(gamate_colors))
-//  MCFG_PALETTE_INDIRECT_ENTRIES(4)
+//	MCFG_PALETTE_INDIRECT_ENTRIES(4)
 	MCFG_PALETTE_INIT_OWNER(gamate_state, gamate)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "gamate_cart")
 	MCFG_GENERIC_MANDATORY
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "gamate")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","gamate")
 MACHINE_CONFIG_END
 
 
 ROM_START(gamate)
 	ROM_REGION(0x10000,"maincpu", 0)
-	ROM_LOAD("gamate.bin", 0xf000, 0x1000, BAD_DUMP CRC(b8bf539b) SHA1(d00cb43b8a4cb0cc7fea06bee5f08490a71f5690) )
-//  ROM_LOAD("gamate.bin", 0xf000, 0x1000, CRC(b8bf539b) SHA1(d00cb43b8a4cb0cc7fea06bee5f08490a71f5690) )
-	ROM_REGION(0x100,"gfx1", ROMREGION_ERASEFF)
+	ROM_LOAD("gamate_bios_umc.bin", 0xf000, 0x1000, CRC(07090415) SHA1(ea449dc607601f9a68d855ad6ab53800d2e99297) )
+ ROM_REGION(0x100,"gfx1", ROMREGION_ERASEFF)
 ROM_END
 
 
 /*    YEAR  NAME      PARENT  COMPAT    MACHINE   INPUT    CLASS          INIT      COMPANY    FULLNAME */
-CONS( 19??, gamate,  0,      0,        gamate,  gamate, gamate_state, gamate, "Bit Corp", "Gamate", GAME_NOT_WORKING | GAME_NO_SOUND)
+CONS( 19??, gamate,  0,      0,        gamate,  gamate, gamate_state, gamate, "Bit Corp", "Gamate", GAME_NO_SOUND)
+
+
