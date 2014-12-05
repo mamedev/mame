@@ -303,8 +303,8 @@ void btime_state::draw_chars( bitmap_ind16 &bitmap, const rectangle &cliprect, U
 
 		if (flip_screen())
 		{
-			x = 31 + 16 - x;
-			y = 33 - y;
+			x = 31 - x;
+			y = 31 - y;
 		}
 
 		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
@@ -339,8 +339,8 @@ void btime_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 		if (flip_screen())
 		{
-			x = 240 + 128 - x;
-			y = 256 - y + sprite_y_adjust_flip_screen;
+			x = 240 - x;
+			y = 240 - y + sprite_y_adjust_flip_screen;
 
 			flipx = !flipx;
 			flipy = !flipy;
@@ -391,8 +391,8 @@ void btime_state::draw_background( bitmap_ind16 &bitmap, const rectangle &clipre
 
 			if (flip_screen())
 			{
-				x = 240 + 128 - x;
-				y = 256 - y;
+				x = 240 - x;
+				y = 240 - y;
 			}
 
 			m_gfxdecode->gfx(2)->opaque(bitmap,cliprect,
@@ -488,7 +488,7 @@ UINT32 btime_state::screen_update_bnj(screen_device &screen, bitmap_ind16 &bitma
 			if (flip_screen())
 			{
 				sx = 496 - sx;
-				sy = 256 - sy;
+				sy = 240 - sy;
 			}
 
 			m_gfxdecode->gfx(2)->opaque(*m_background_bitmap,m_background_bitmap->cliprect(),
@@ -534,7 +534,7 @@ UINT32 btime_state::screen_update_cookrace(screen_device &screen, bitmap_ind16 &
 		if (flip_screen())
 		{
 			sx = 31 - sx;
-			sy = 33 - sy;
+			sy = 31 - sy;
 		}
 
 		m_gfxdecode->gfx(2)->opaque(bitmap,cliprect,
