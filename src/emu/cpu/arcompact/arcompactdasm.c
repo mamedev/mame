@@ -133,7 +133,65 @@ static const char *table18[0x8] =
 
 };
 
+static const char *table0f[0x20] =
+{
+	/* 00 */ "SOPs", // Sub Operation (another table..) ( table0f_00 )
+	/* 01 */ "0x01 <illegal>",
+	/* 02 */ "SUB_S",
+	/* 03 */ "0x03 <illegal>",
+	/* 04 */ "AND_S",
+	/* 05 */ "OR_S",
+	/* 06 */ "BIC_S",
+	/* 07 */ "XOR_S",
+	/* 08 */ "0x08 <illegal>",
+	/* 09 */ "0x09 <illegal>",
+	/* 0a */ "0x0a <illegal>",
+	/* 0b */ "TST_S",
+	/* 0c */ "MUL64_S",
+	/* 0d */ "SEXB_S",
+	/* 0e */ "SEXW_S",
+	/* 0f */ "EXTB_S",
+	/* 10 */ "EXTW_S",
+	/* 11 */ "ABS_S",
+	/* 12 */ "NOT_S",
+	/* 13 */ "NEG_S",
+	/* 14 */ "ADD1_S",
+	/* 15 */ "ADD2_S>",
+	/* 16 */ "ADD3_S",
+	/* 17 */ "0x17 <illegal>",
+	/* 18 */ "ASL_S (multiple)",
+	/* 19 */ "LSR_S (multiple)",
+	/* 1a */ "ASR_S (multiple)",
+	/* 1b */ "ASL_S (single)",
+	/* 1c */ "LSR_S (single)",
+	/* 1d */ "ASR_S (single)",
+	/* 1e */ "TRAP (not a5?)",
+	/* 1f */ "BRK_S" // 0x7fff only?
+};
 
+static const char *table0f_00[0x8] =
+{
+	/* 00 */ "J_S",
+	/* 01 */ "J_S.D",
+	/* 02 */ "JL_S",
+	/* 03 */ "JL_S.D",
+	/* 04 */ "0x04 <illegal>",
+	/* 05 */ "0x05 <illegal>",
+	/* 06 */ "SUB_S.NE",
+	/* 07 */ "ZOPs", // Sub Operations (yet another table..) ( table0f_00_07 )
+};
+
+static const char *table0f_00_07[0x8] =
+{
+	/* 00 */ "NOP_S",
+	/* 01 */ "UNIMP_S", // unimplemented (not a5?)
+	/* 02 */ "0x02 <illegal>",
+	/* 03 */ "0x03 <illegal>",
+	/* 04 */ "JEQ_S [BLINK]",
+	/* 05 */ "JNE_S [BLINK]",
+	/* 06 */ "J_S [BLINK]",
+	/* 07 */ "J_S.D [BLINK]",
+};
 
 #define ARCOMPACT_OPERATION ((op & 0xf800) >> 11)
 
@@ -163,7 +221,7 @@ CPU_DISASSEMBLE(arcompact)
 					address |=        ((op & 0x0000000f) >> 0) << 20;
 					if (address & 0x800000) address = -(address&0x7fffff);	
 
-					print("B %08x (%08x)",  pc + (address *2) + 4, op & ~0xffffffcf );
+					print("B %08x (%08x)",  pc + (address *2) + 2, op & ~0xffffffcf );
 				}
 				else
 				{ // Branch Conditionally
@@ -174,7 +232,7 @@ CPU_DISASSEMBLE(arcompact)
 
 					UINT8 condition = op & 0x0000001f;
 
-					print("B(%s) %08x (%08x)", conditions[condition], pc + (address *2) + 4, op & ~0xffffffdf );
+					print("B(%s) %08x (%08x)", conditions[condition], pc + (address *2) + 2, op & ~0xffffffdf );
 
 				}
 
@@ -220,7 +278,7 @@ CPU_DISASSEMBLE(arcompact)
 						address |=        ((op & 0x0000000f) >> 0) << 20;
 						if (address & 0x800000) address = -(address&0x7fffff);	
 
-						print("BL %08x (%08x)",  pc + (address *2) + 4, op & ~0xffffffcf );
+						print("BL %08x (%08x)",  pc + (address *2) + 2, op & ~0xffffffcf );
 					}
 					else
 					{ // Branch and Link Conditionally
@@ -231,7 +289,7 @@ CPU_DISASSEMBLE(arcompact)
 
 						UINT8 condition = op & 0x0000001f;
 
-						print("BL(%s) %08x (%08x)", conditions[condition], pc + (address *2) + 4, op & ~0xffffffdf );
+						print("BL(%s) %08x (%08x)", conditions[condition], pc + (address *2) + 2, op & ~0xffffffdf );
 
 					}
 
@@ -252,6 +310,53 @@ CPU_DISASSEMBLE(arcompact)
 
 		switch (instruction)
 		{
+			case 0x0f:
+			{
+				// General Register Instructions (16-bit)
+				// 01111 bbb ccc iiiii
+				UINT8 subinstr = (op & 0x01f) >> 0;
+				//print("%s (%04x)", table0f[subinstr], op & ~0xf81f);
+
+#if 1			
+				switch (subinstr)
+				{
+	
+					default:
+						print("%s (%04x)", table0f[subinstr], op & ~0xf81f);
+						break;
+
+					case 0x00:
+					{
+						// General Operations w/ Register
+						// 01111 bbb iii 00000
+						UINT8 subinstr2 = (op & 0x00e0) >> 5;
+
+						switch (subinstr2)
+						{
+							default:
+								print("%s (%04x)", table0f_00[subinstr2], op & ~0xf8ff);
+								break;
+
+							case 0x7:
+							{
+								// General Operations w/o Register
+								// 01111 iii 111 00000
+								UINT8 subinstr3 = (op & 0x0700) >> 8;
+
+								print("%s (%04x)", table0f_00_07[subinstr3], op & ~0xffff);
+
+								break;
+							}
+						}
+					}
+				}
+#endif				
+			
+				break;
+
+			}
+
+
 			case 0x18:
 			{
 				// Stack Pointer Based Instructions (16-bit)
