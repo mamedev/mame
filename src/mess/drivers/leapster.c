@@ -248,7 +248,7 @@ DEVICE_IMAGE_LOAD_MEMBER( leapster_state, leapster_cart )
 {
 	UINT32 size = m_cart->common_get_size("rom");
 
-	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->rom_alloc(size, GENERIC_ROM32_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
 	return IMAGE_INIT_PASS;
@@ -258,6 +258,7 @@ void leapster_state::machine_start()
 {
 	astring region_tag;
 	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	membank("cartrom")->set_base(m_cart_rom->base());
 }
 
 void leapster_state::machine_reset()
@@ -265,7 +266,9 @@ void leapster_state::machine_reset()
 }
 
 static ADDRESS_MAP_START( leapster_map, AS_PROGRAM, 32, leapster_state )
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
+	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_MIRROR(0x40000000) // pointers in the bios region seem to be to the 40xxxxxx region, either we mirror there or something (real bios?) is acutally missing
+	AM_RANGE(0x80000000, 0x807fffff) AM_ROMBANK("cartrom") // game ROM pointers are all to the 80xxxxxx region, so I assume it maps here
+
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( leapster, leapster_state )
@@ -293,12 +296,12 @@ MACHINE_CONFIG_END
 
 ROM_START(leapster)
 	ROM_REGION(0x200000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD16_WORD_SWAP( "155-10072-a.bin", 0x00000, 0x200000, CRC(af05e5a0) SHA1(d4468d060543ba7e44785041093bc98bcd9afa07) )
+	ROM_LOAD( "155-10072-a.bin", 0x00000, 0x200000, CRC(af05e5a0) SHA1(d4468d060543ba7e44785041093bc98bcd9afa07) )
 ROM_END
 
 ROM_START(leapstertv)
 	ROM_REGION(0x200000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD16_WORD_SWAP( "am29pl160cb-90sf.bin", 0x00000, 0x200000, BAD_DUMP CRC(dc281f1f) SHA1(17588de54ab3bb82801bd5062f3e6aa687412178) )
+	ROM_LOAD( "am29pl160cb-90sf.bin", 0x00000, 0x200000, BAD_DUMP CRC(dc281f1f) SHA1(17588de54ab3bb82801bd5062f3e6aa687412178) )
 ROM_END
 
 
