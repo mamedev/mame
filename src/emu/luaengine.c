@@ -207,6 +207,32 @@ int lua_engine::l_emu_gamename(lua_State *L)
 }
 
 //-------------------------------------------------
+//  emu_romname - returns rom base name
+//-------------------------------------------------
+
+int lua_engine::l_emu_romname(lua_State *L)
+{
+	lua_pushstring(L, luaThis->machine().basename());
+	return 1;
+}
+
+//-------------------------------------------------
+//  emu_pause/emu_unpause - pause/unpause game
+//-------------------------------------------------
+
+int lua_engine::l_emu_pause(lua_State *L)
+{
+	luaThis->machine().pause();
+	return 0;
+}
+
+int lua_engine::l_emu_unpause(lua_State *L)
+{
+	luaThis->machine().resume();
+	return 0;
+}
+
+//-------------------------------------------------
 //  emu_keypost - post keys to natural keyboard
 //-------------------------------------------------
 
@@ -496,6 +522,7 @@ void lua_engine::initialize()
 	luabridge::getGlobalNamespace (m_lua_state)
 		.beginNamespace ("emu")
 			.addCFunction ("gamename",    l_emu_gamename )
+			.addCFunction ("romname",     l_emu_romname )
 			.addCFunction ("keypost",     l_emu_keypost )
 			.addCFunction ("hook_output", l_emu_hook_output )
 			.addCFunction ("time",        l_emu_time )
@@ -503,6 +530,8 @@ void lua_engine::initialize()
 			.addCFunction ("after",       l_emu_after )
 			.addCFunction ("exit",        l_emu_exit )
 			.addCFunction ("start",       l_emu_start )
+			.addCFunction ("pause",       l_emu_pause )
+			.addCFunction ("unpause",     l_emu_unpause )
 			.beginClass <machine_manager> ("manager")
 				.addFunction ("machine", &machine_manager::machine)
 				.addFunction ("options", &machine_manager::options)
