@@ -103,6 +103,9 @@ public:
 			// See if it's a leaf
 			if (currNode->isLeaf())
 			{
+				// Get the parent object
+				tree_node* parentNode = currNode->parent;
+
 				// If we're a leaf and we have no parent, then the tree will be emptied
 				if (!currNode->parent)
 				{
@@ -112,6 +115,12 @@ public:
 				// If it's a leaf node, simply remove it
 				removeNode(currNode);
 				global_free(currNode);
+
+				// Update the balance of the parent of
+				// currentNode after having disconnected
+				// it
+				if (parentNode)
+					parentNode->calcHeights();
 			}
 			else
 			{
@@ -129,8 +138,16 @@ public:
 					replaceNode = findMax(currNode->left);
 				}
 
+				tree_node* parentReplaceNode = replaceNode->parent;
+
 				// Disconnect the replacement node's branch
 				removeNode(replaceNode);
+
+				// Update the balance of the parent of
+				// replaceNode after having disconnected
+				// it
+				if (parentReplaceNode)
+					parentReplaceNode->calcHeights();
 
 				// Disconnect the current node
 				removeNode(currNode);
@@ -286,6 +303,8 @@ private:
 			if (retVal)
 			{
 				t->left->setParent(t);
+				t->calcHeights();
+
 				if(t->balanceFactor() < -1)
 				{
 					// See if it went left of the left
@@ -311,6 +330,7 @@ private:
 			if (retVal)
 			{
 				t->right->setParent(t);
+				t->calcHeights();
 
 				if (t->balanceFactor() > 1)
 				{
@@ -389,6 +409,7 @@ private:
 				if (retVal && !t->left->parent)
 				{
 					t->left->setParent(t);
+					t->calcHeights();
 				}
 			}
 			else if (t->element < b->element)
@@ -399,6 +420,7 @@ private:
 				if (retVal && !t->right->parent)
 				{
 					t->right->setParent(t);
+					t->calcHeights();
 				}
 
 				return retVal;
@@ -502,6 +524,9 @@ private:
 
 		k2 = k1;
 		k2->setParent(k2Parent);
+
+		k2->right->calcHeights();
+
 	}
 
 
@@ -520,6 +545,9 @@ private:
 
 		k1 = k2;
 		k1->setParent(k1Parent);
+
+		k1->left->calcHeights();
+
 	}
 
 
@@ -722,22 +750,6 @@ public:
 	{
 		// Set our new parent
 		parent = p;
-
-		// If we have a valid parent, set its height
-		if (parent)
-		{
-			// Set the parent's height to include this tree. If the parent
-			// already has a tree that is taller than the one we're attaching
-			// then the parent's height remains unchanged
-			int rightHeight = (parent->right ? parent->right->m_height : 0);
-			int leftHeight = (parent->left ? parent->left->m_height : 0);
-
-			// The height of the tallest branch + 1
-			parent->m_height = maxInt(rightHeight, leftHeight) + 1;
-
-			// Also set the balance factor
-			parent->m_balanceFactor = rightHeight - leftHeight;
-		}
 	}
 
 
@@ -746,13 +758,6 @@ public:
 	{
 		// Set our new left node
 		left = l;
-
-		// Set the height and balance factor
-		int rightHeight = (right ? right->m_height : 0);
-		int leftHeight = (left ? left->m_height : 0);
-
-		m_height = maxInt(rightHeight, leftHeight) + 1;
-		m_balanceFactor = (right ? right->m_height : 0) - (left ? left->m_height : 0);
 	}
 
 
@@ -761,13 +766,6 @@ public:
 	{
 		// Set our new right node
 		right = r;
-
-		// Set the height and balance factor
-		int rightHeight = (right ? right->m_height : 0);
-		int leftHeight = (left ? left->m_height : 0);
-
-		m_height = maxInt(rightHeight, leftHeight) + 1;
-		m_balanceFactor = (right ? right->m_height : 0) - (left ? left->m_height : 0);
 	}
 
 
@@ -799,10 +797,14 @@ private:
 	// Calculates all of the heights for this node and its ancestors -- O(log n).
 	void calcHeights()
 	{
-		// Calculate our own height -- O(1)
-		m_height = maxInt(left ? left->m_height : 0, right ? right->m_height : 0) + 1;
+		int rightHeight = (right ? right->m_height : 0);
+		int leftHeight = (left ? left->m_height : 0);
 
-		// And our parent's height (and recurse) -- O(log n)
+		// Calculate our own height and balance factor -- O(1)
+		m_height = maxInt(rightHeight, leftHeight) + 1;
+		m_balanceFactor = (rightHeight - leftHeight);
+
+		// And our parent's height and balance factor (and recurse) -- O(log n)
 		if (parent)
 		{
 			parent->calcHeights();
