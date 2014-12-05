@@ -517,8 +517,8 @@ void sc4_state::bfm_sc4_68307_porta_w(address_space &space, bool dedicated, UINT
 {
 	m_reel12_latch = data;
 
-	if ( stepper_update(0, data&0x0f   ) ) m_reel_changed |= 0x01;
-	if ( stepper_update(1, (data>>4))&0x0f ) m_reel_changed |= 0x02;
+	stepper_update(0, data&0x0f   );
+	stepper_update(1, (data>>4)&0x0f );
 
 	if ( stepper_optic_state(0) ) m_optic_pattern |=  0x01;
 	else                          m_optic_pattern &= ~0x01;
@@ -533,7 +533,7 @@ WRITE8_MEMBER( sc4_state::bfm_sc4_reel3_w )
 {
 	m_reel3_latch = data;
 
-	if ( stepper_update(2, data&0x0f ) ) m_reel_changed |= 0x04;
+	stepper_update(2, data&0x0f );
 
 	if ( stepper_optic_state(2) ) m_optic_pattern |=  0x04;
 	else                          m_optic_pattern &= ~0x04;
@@ -545,7 +545,7 @@ WRITE8_MEMBER( sc4_state::bfm_sc4_reel4_w )
 {
 	m_reel4_latch = data;
 
-	if ( stepper_update(3, data&0x0f ) ) m_reel_changed |= 0x08;
+	stepper_update(3, data&0x0f );
 
 	if ( stepper_optic_state(3) ) m_optic_pattern |=  0x08;
 	else                          m_optic_pattern &= ~0x08;
@@ -663,8 +663,8 @@ WRITE8_MEMBER(sc4_state::bfm_sc4_duart_output_w)
 //  logerror("bfm_sc4_duart_output_w\n");
 	m_reel56_latch = data;
 
-	if ( stepper_update(4, data&0x0f   ) ) m_reel_changed |= 0x10;
-	if ( stepper_update(5, (data>>4)&0x0f) ) m_reel_changed |= 0x20;
+	stepper_update(4, data&0x0f   );
+	stepper_update(5, (data>>4)&0x0f);
 
 	if ( stepper_optic_state(4) ) m_optic_pattern |=  0x10;
 	else                          m_optic_pattern &= ~0x10;

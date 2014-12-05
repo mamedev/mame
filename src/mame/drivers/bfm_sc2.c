@@ -204,7 +204,6 @@ public:
 	int m_data_to_uart1;
 	int m_data_to_uart2;
 	int m_is_timer_enabled;
-	int m_reel_changed;
 	int m_coin_inhibits;
 	int m_irq_timer_stat;
 	int m_expansion_latch;
@@ -547,8 +546,8 @@ WRITE8_MEMBER(bfm_sc2_state::reel12_w)
 {
 	m_reel12_latch = data;
 
-	if ( stepper_update(0, data&0x0f   ) ) m_reel_changed |= 0x01;
-	if ( stepper_update(1, (data>>4))&0x0f ) m_reel_changed |= 0x02;
+	stepper_update(0, data&0x0f   );
+	stepper_update(1, (data>>4)&0x0f );
 
 	if ( stepper_optic_state(0) ) m_optic_pattern |=  0x01;
 	else                          m_optic_pattern &= ~0x01;
@@ -563,8 +562,8 @@ WRITE8_MEMBER(bfm_sc2_state::reel34_w)
 {
 	m_reel34_latch = data;
 
-	if ( stepper_update(2, data&0x0f ) ) m_reel_changed |= 0x04;
-	if ( stepper_update(3, (data>>4)&0x0f) ) m_reel_changed |= 0x08;
+	stepper_update(2, data&0x0f );
+	stepper_update(3, (data>>4)&0x0f);
 
 	if ( stepper_optic_state(2) ) m_optic_pattern |=  0x04;
 	else                          m_optic_pattern &= ~0x04;
@@ -581,8 +580,8 @@ WRITE8_MEMBER(bfm_sc2_state::reel56_w)
 {
 	m_reel56_latch = data;
 
-	if ( stepper_update(4, data&0x0f   ) ) m_reel_changed |= 0x10;
-	if ( stepper_update(5, (data>>4)&0x0f) ) m_reel_changed |= 0x20;
+	stepper_update(4, data&0x0f   );
+	stepper_update(5, (data>>4)&0x0f);
 
 	if ( stepper_optic_state(4) ) m_optic_pattern |=  0x10;
 	else                          m_optic_pattern &= ~0x10;
@@ -1399,7 +1398,6 @@ void bfm_sc2_state::save_state()
 	save_item(NAME(m_data_to_uart1));
 	save_item(NAME(m_data_to_uart2));
 	save_item(NAME(m_is_timer_enabled));
-	save_item(NAME(m_reel_changed));
 	save_item(NAME(m_coin_inhibits));
 	save_item(NAME(m_irq_timer_stat));
 	save_item(NAME(m_expansion_latch));

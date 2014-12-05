@@ -123,7 +123,6 @@ public:
 	int m_acia_status;
 	int m_locked;
 	int m_is_timer_enabled;
-	int m_reel_changed;
 	int m_coin_inhibits;
 	int m_mux1_outputlatch;
 	int m_mux1_datalo;
@@ -252,8 +251,8 @@ WRITE8_MEMBER(bfm_sc1_state::reel12_w)
 	}
 	else
 	{
-		if ( stepper_update(0, (data>>4)&0x0f) ) m_reel_changed |= 0x01;
-		if ( stepper_update(1, data&0x0f   ) ) m_reel_changed |= 0x02;
+		stepper_update(0, (data>>4)&0x0f);
+		stepper_update(1, data&0x0f   );
 
 		if ( stepper_optic_state(0) ) m_optic_pattern |=  0x01;
 		else                          m_optic_pattern &= ~0x01;
@@ -274,8 +273,8 @@ WRITE8_MEMBER(bfm_sc1_state::reel34_w)
 	}
 	else
 	{
-		if ( stepper_update(2, (data>>4)&0x0f) ) m_reel_changed |= 0x04;
-		if ( stepper_update(3, data&0x0f   ) ) m_reel_changed |= 0x08;
+		stepper_update(2, (data>>4)&0x0f);
+		stepper_update(3, data&0x0f   );
 
 		if ( stepper_optic_state(2) ) m_optic_pattern |=  0x04;
 		else                          m_optic_pattern &= ~0x04;
@@ -290,8 +289,8 @@ WRITE8_MEMBER(bfm_sc1_state::reel34_w)
 
 WRITE8_MEMBER(bfm_sc1_state::reel56_w)
 {
-	if ( stepper_update(4, (data>>4)&0x0f) ) m_reel_changed |= 0x10;
-	if ( stepper_update(5, data&0x0f   ) ) m_reel_changed |= 0x20;
+	stepper_update(4, (data>>4)&0x0f);
+	stepper_update(5, data&0x0f   );
 
 	if ( stepper_optic_state(4) ) m_optic_pattern |=  0x10;
 	else                          m_optic_pattern &= ~0x10;

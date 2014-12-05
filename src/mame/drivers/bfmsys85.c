@@ -86,7 +86,6 @@ public:
 	int m_optic_pattern;
 	int m_locked;
 	int m_is_timer_enabled;
-	int m_reel_changed;
 	int m_coin_inhibits;
 	int m_mux_output_strobe;
 	int m_mux_input_strobe;
@@ -205,8 +204,8 @@ READ8_MEMBER(bfmsys85_state::irqlatch_r)
 
 WRITE8_MEMBER(bfmsys85_state::reel12_w)
 {
-	if ( stepper_update(0, (data>>4)&0x0f) ) m_reel_changed |= 0x01;
-	if ( stepper_update(1, data&0x0f   ) ) m_reel_changed |= 0x02;
+	stepper_update(0, (data>>4)&0x0f);
+	stepper_update(1, data&0x0f   );
 
 	if ( stepper_optic_state(0) ) m_optic_pattern |=  0x01;
 	else                          m_optic_pattern &= ~0x01;
@@ -220,8 +219,8 @@ WRITE8_MEMBER(bfmsys85_state::reel12_w)
 
 WRITE8_MEMBER(bfmsys85_state::reel34_w)
 {
-	if ( stepper_update(2, (data>>4)&0x0f) ) m_reel_changed |= 0x04;
-	if ( stepper_update(3, data&0x0f   ) ) m_reel_changed |= 0x08;
+	stepper_update(2, (data>>4)&0x0f);
+	stepper_update(3, data&0x0f   );
 
 	if ( stepper_optic_state(2) ) m_optic_pattern |=  0x04;
 	else                          m_optic_pattern &= ~0x04;

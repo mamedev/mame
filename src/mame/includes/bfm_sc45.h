@@ -125,7 +125,6 @@ public:
 
 
 	const stepper_interface **m_reel_setup;
-	int m_reel_changed;
 	int m_reels;
 	int m_reel12_latch;
 	int m_reel3_latch;
