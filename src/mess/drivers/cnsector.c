@@ -58,7 +58,7 @@ public:
 
 ***************************************************************************/
 
-// Devices with TMS09x0 strobe the outputs very fast, it is unnoticeable to the user.
+// The device strobes the outputs very fast, it is unnoticeable to the user.
 // To prevent flickering here, we need to simulate a decay.
 
 // decay time, in steps of 10ms
@@ -118,7 +118,7 @@ READ8_MEMBER(cnsector_state::read_k)
 
 	// read selected button rows
 	for (int i = 0; i < 5; i++)
-		if (m_o & (1 << i))
+		if (m_o >> i & 1)
 			k |= m_button_matrix[i]->read();
 	
 	return k;

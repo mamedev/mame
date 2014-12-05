@@ -78,7 +78,7 @@ READ8_MEMBER(merlin_state::read_k)
 	
 	// read selected button rows
 	for (int i = 0; i < 4; i++)
-		if (m_o & (1 << i))
+		if (m_o >> i & 1)
 			k |= m_button_matrix[i]->read();
 
 	return k;

@@ -259,7 +259,7 @@ Crackin' DJ part 2                            840-0068C  23674   20 (64Mb)   pre
 Ferrari F355 Challenge (twin, prototype)        no cart  22848P* 21 (64Mb)   present  315-6206  317-0267-COM  * flash-PCB have CRC 330B A417, the rest is the same as regular cart, not dumped but known to exist
 Ferrari F355 Challenge 2 (twin)                 no cart  23399   21 (64Mb)   present  315-6206  317-0287-COM  content is the same as regular 171-7919A cart
 House of the Dead 2 (prototype)                 no cart  A1E2    21 (64Mb)   present  315-6206  present       no label on IC42
-Inu No Osanpo / Dog Walking (Rev A)           840-0073C  22294A  16 (64Mb)   present  315-6206  317-0316-JPN  requires 837-13844 JVS IO with special jumpers settings enabling rotary
+Inu No Osanpo / Dog Walking (Rev A)           840-0073C  22294A  16 (64Mb)   present  315-6206  317-0316-JPN  requires 837-13844 JVS IO with DIPSW 1 ON
 Maze of the Kings The (prototype)               no cart  *       21 (64Mb)   present  315-6206  FRI           * flash-PCB, not dumped but known to exist
 Samba de Amigo (prototype)                      no cart  *       21 (64Mb)   present  315-6206  317-0270-COM  * instead of EPROM have tiny PCB with 2 flashroms on it
 Soul Surfer (Rev A)                           840-0095C  23838C  21 (64Mb)   present  315-6206  not present
@@ -335,7 +335,7 @@ Power Stone 2                                   841-0008C    23127    9 (64Mb)  
 Puyo Puyo Da!                                   841-0006C    22206   20 (64Mb)   ?           315-6213  ?
 Ring Out 4x4                                    840-0004C    21779   10 (64Mb)   present     315-6213  317-0250-COM   requires 2 JVS boards
 Samba de Amigo (Rev B)                          840-0020C    22966B  16 (64Mb)   present     315-6213  317-0270-COM   will boot but requires special controller to play it
-Sega Marine Fishing                             840-0027C    22221   10 (64Mb)   ?           315-6213  not present    ROM 3&4 not present. Requires fishing controller
+Sega Marine Fishing                             840-0027C    22221   10 (64Mb)   ?           315-6213  not present    ROM 3&4 not present. Requires 837-13844 JVS IO with all DIPSW Off and fishing controller
 Sega Strike Fighter (Rev A, set 1)              840-0035C    23323A  20 (64Mb)   present     315-6213  317-0281-COM   have "Rev. A" label on case
 Sega Strike Fighter (Rev A, set 2)              840-0035C    23786A  20 (64Mb)   present     315-6213  317-0281-COM   have "Rev. A" label on PCB
 Sega Tetris                                     840-0018C    22909    6 (64Mb)   present     315-6213  317-0268-COM
@@ -343,7 +343,7 @@ Slashout                                        840-0041C    23341   17 (64Mb)  
 Spawn In the Demon's Hand (Rev B)               841-0005C    22977B  10 (64Mb)   ?           315-6213  317-5051-COM   joystick + 4 buttons
 Super Major League '99                          840-0012C    22059   21 (64Mb)   ?           315-6213  ?
 The Typing of the Dead (Rev A)                  840-0026C    23021A  20 (64Mb)   present     315-6213  not present
-Touch de UNO! / Unou Nouryoku Check Machine     840-0008C    22073    4 (64Mb)   present     315-6213  317-0255-JPN   requires special JVS board with touch input and printer
+Touch de UNO! / Unou Nouryoku Check Machine     840-0008C    22073    4 (64Mb)   present     315-6213  317-0255-JPN   requires 837-13844 JVS IO with DIPSW 5 On, ELO AccuTouch-compatible touch screen controller and special printer.
 Toy Fighter / Waffupu                           840-0011C    22035   10 (64Mb)   present     315-6212  317-0257-COM   joystick + 3 buttons
 Virtua NBA                                      840-0021C-01 23073   21 (64Mb)   present     315-6213  not present
 Virtua NBA (original)                           840-0021C    22949   21 (64Mb)   present     315-6213  317-0271-COM
@@ -460,7 +460,7 @@ Shootout Pool                                  840-0098C    23844    4 (64Mb)   
 Shootout Pool Prize / The Medal (Rev A)        840-0128C    24065A   4 (64Mb)   present  317-0367-COM  requires Naomi-based hopper controller
 Shootout Pool Prize / The Medal Ver. B         840-0136C    24148    4 (64Mb)   present  317-0367-COM  requires Naomi-based or 837-14438 hopper controller
 SWP Hopper Board                               840-0130C    24083   20 (64Mb)   present  317-0339-COM  Maskroms are not really used, they are recycled from other games; there is an additional 837-14381 IO board
-Touch de UNO! 2                                840-0022C    23071    6 (64Mb)   present  317-0276-JPN  requires special JVS board with touch input and printer
+Touch de UNO! 2                                840-0022C    23071    6 (64Mb)   present  317-0276-JPN  requires 837-13844 JVS IO with DIPSW 5 On, ELO AccuTouch-compatible touch screen controller and special printer.
 Virtua Fighter 4 Evolution                     840-0106B    23934   20 (64Mb)   present  317-0339-COM
 Virtua Tennis 2 / Power Smash 2 (Rev A)        840-0084C    22327A  18 (64Mb)   present  317-0320-COM
 
@@ -888,7 +888,10 @@ Notes:
 |-----------------------------|
 Notes: (most info taken from poor quality pics/scans, better info is needed)
 
-             JVS I/O board 2. Has both digital and analogue inputs.
+             JVS I/O board 2. Supports digital and analogue inputs, rotary input,
+             touch screens (ELO AccuTouch-compatible) and printer output using
+             extended JVS commands. This features can be enabled or disabled
+             by switching DIPSW 1-5.
              This board is used with F355, Ghost Squad, and many
              others including network/satellite games.
 
@@ -909,7 +912,7 @@ Notes: (most info taken from poor quality pics/scans, better info is needed)
       IC7  - 27C512 EPROM with label 'EPR-22082' (DIP28)
              On plain 837-13844 (no -02) this is 'EPR-21868' (DIP28)
       IC8  - Sharp LH52256 32k x8 SRAM (SOP28)
-      IC10 - Something by NEC? (QFP44)
+      IC10 - NEC D71054GB programmable counter/timer (QFP44)
       OSC1 - 14.7456MHz
       OSC2 - 32MHz
       CNx  - 6 pin connector
@@ -5631,10 +5634,8 @@ ROM_START( mushik2e )
 	ROM_LOAD( "fpr-24333.ic8", 0x0000000, 0x4000000, CRC(a467b69c) SHA1(66a841b72ef1bb8cbabbfb1d14081b4dff14b1d3) )
 	ROM_LOAD( "fpr-24334.ic9", 0x4000000, 0x4000000, CRC(13d2d1dc) SHA1(6a47cfaddf006e6ff46837fac956fbcc20619d79) )
 
-	// ROM_REGION( 4, "rom_key", 0 )
-	// ROM_LOAD( "mushik2e-key.bin", 0, 4, CRC(b32a0633) SHA1(984c01e43cf359d8e8a0c6cb1a04c5dc3da47d39) )
-	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
-	ROM_LOAD( "317-0437-com.ic3", 0, 20, NO_DUMP )
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0437-com.ic3", 0, 0x800, BAD_DUMP CRC(b6e4f61a) SHA1(b5cae574170afa3889e01517f1c4429e207042b9) )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x02))
 ROM_END
@@ -5648,10 +5649,8 @@ ROM_START( mushi2ea )
 	ROM_LOAD( "epr-24357.ic7", 0x0000000, 0x0400000, CRC(a2236d58) SHA1(3746b9d3c0f7ecf6340619bb8bf01f170ac4efb7) ) // EPR mode, overwrite FPR data
 	ROM_LOAD( "fpr-24334.ic9", 0x4000000, 0x4000000, CRC(13d2d1dc) SHA1(6a47cfaddf006e6ff46837fac956fbcc20619d79) )
 
-	// ROM_REGION( 4, "rom_key", 0 )
-	// ROM_LOAD( "mushik2e-key.bin", 0, 4, CRC(b32a0633) SHA1(984c01e43cf359d8e8a0c6cb1a04c5dc3da47d39) )
-	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
-	ROM_LOAD( "317-0437-com.ic3", 0, 20, NO_DUMP )
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0437-com.ic3", 0, 0x800, BAD_DUMP CRC(b6e4f61a) SHA1(b5cae574170afa3889e01517f1c4429e207042b9) )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x82))
 ROM_END
@@ -5664,10 +5663,8 @@ ROM_START( zunou )
 	ROM_LOAD( "fpr-24338.ic8", 0x0000000, 0x4000000, CRC(1423c374) SHA1(e6a3f0eaccd13c161d07705bcd00f447f08fc186) )
 	ROM_LOAD( "fpr-24339.ic9", 0x4000000, 0x4000000, CRC(11883792) SHA1(1782db04f74394f981f887ab1a95d687eb2c0b35) )
 
-	// ROM_REGION( 4, "rom_key", 0 )
-	// ROM_LOAD( "zunou-key.bin", 0, 4, CRC(cbe35afb) SHA1(78877655800aae27661bf720e1c37d6c6f2e3d1c) )
-	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
-	ROM_LOAD( "317-0435-jpn.ic3", 0, 20, NO_DUMP )
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0435-jpn.ic3", 0, 0x800, BAD_DUMP CRC(b553d900) SHA1(ed1c3c2053f2c0e98cb5c4d99f93143a66c29e5c) )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x02))
 ROM_END
@@ -5682,8 +5679,8 @@ ROM_START( sl2007 )
 	ROM_LOAD( "fpr-24415.ic10", 0x8000000, 0x4000000, CRC(133c742c) SHA1(89f857a31731dc918afc72b6cb716f5c77cb9d6e) )
 	ROM_LOAD( "fpr-24416.ic11", 0xc000000, 0x4000000, CRC(562fb88e) SHA1(172678e3e27cfad7f7e6217c4653a4ba119bfbdf) )
 
-	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
-	ROM_LOAD( "317-5129-jpn.ic3", 0, 20, CRC(b6191cea) SHA1(13e14ff013bf2728203641303141c016e82b10a3) )
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-5129-jpn.ic3", 0, 0x800, CRC(432ba30f) SHA1(4935a16d1075430799269ac7ac990066d44d815b) )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x04))
 ROM_END
@@ -5698,8 +5695,8 @@ ROM_START( asndynmt )
 	ROM_LOAD( "fpr-24384.ic10", 0x8000000, 0x4000000, CRC(2e9116c4) SHA1(58903a33c4ce72a1f75aefcab94393fc2e8bd2d9) )
 	ROM_LOAD( "fpr-24385.ic11", 0xc000000, 0x4000000, CRC(2b79f45d) SHA1(db97d980bf1590df4b983a4b7786977687238ef5) )
 
-	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
-	ROM_LOAD( "317-0495-com.ic3", 0, 20, CRC(675aca7b) SHA1(5127189e1f960abf9ed3f643158747d9abcaee1c) )
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0495-com.ic3", 0, 0x800, CRC(c229a59b) SHA1(497dcc1e4e52eb044a8b709edbd00126cef212b1) )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x04))
 ROM_END
@@ -5714,8 +5711,8 @@ ROM_START( illvelo )
 	ROM_LOAD( "fpr-24439.ic10", 0x8000000, 0x4000000, CRC(c02040f9) SHA1(27ad2cb45e8a516433917f060ca9798412bb95f7) )
 	// IC11 Populated, Empty
 
-	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
-	ROM_LOAD( "317-5131-jpn.ic3", 0, 20, CRC(44ab8ca9) SHA1(c17b10041e70590547ed010dc16a4dd2510fcc80) )
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-5131-jpn.ic3", 0, 0x800, CRC(af4b38f2) SHA1(9b82f16a258854d7d618d60f9a610f7d47d67a78) )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x04))
 ROM_END
@@ -5730,8 +5727,8 @@ ROM_START( mamonoro )
 	ROM_LOAD( "ic10.bin", 0x8000000, 0x4000000, CRC(76fb945f) SHA1(448be0c3d9a7c3956dd51aca3c4d8d28f8cec227) )
 	// IC11 Populated, Empty
 
-	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
-	ROM_LOAD( "317-5132-jpn.ic3", 0, 20, CRC(f2089de5) SHA1(12af0681decb22bbfa4b3e01037c3503846f265a) )
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-5132-jpn.ic3", 0, 0x800, CRC(d56e70a1) SHA1(fda1a2989f0fa3b0edeb292cdd4537d9b86af6f2) )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x04))
 ROM_END
@@ -5748,8 +5745,8 @@ ROM_START( mbaa )
 	ROM_LOAD( "ic12.bin",     0x10000000, 0x4000000, CRC(b8a6bff2) SHA1(befbc2e917b3107f1c4bfb9169623282ff97bfb2) )
 	ROM_LOAD( "ic13.bin",     0x14000000, 0x4000000, CRC(4886329f) SHA1(6ccf6fb83cfdbef3f85f6c06e641c38ff434d605) )
 
-	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
-	ROM_LOAD( "317-5133-jpn.ic3", 0, 20, CRC(3dc7d902) SHA1(bb70e80dff878bca3652088f3333079e0781f482) )
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-5133-jpn.ic3", 0, 0x800, CRC(0f16d180) SHA1(9d4ae15aa54752cdbd8e279388b7f3ae20777172) )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x06))
 ROM_END
@@ -5767,8 +5764,8 @@ ROM_START( mbaaa )
 	ROM_LOAD( "ic12.bin",     0x10000000, 0x4000000, CRC(b8a6bff2) SHA1(befbc2e917b3107f1c4bfb9169623282ff97bfb2) )
 	ROM_LOAD( "ic13.bin",     0x14000000, 0x4000000, CRC(4886329f) SHA1(6ccf6fb83cfdbef3f85f6c06e641c38ff434d605) )
 
-	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
-	ROM_LOAD( "317-5133-jpn.ic3", 0, 20, CRC(3dc7d902) SHA1(bb70e80dff878bca3652088f3333079e0781f482) )
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-5133-jpn.ic3", 0, 0x800, CRC(0f16d180) SHA1(9d4ae15aa54752cdbd8e279388b7f3ae20777172) )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x86))
 ROM_END
@@ -5782,8 +5779,8 @@ ROM_START( radirgyn )
 	ROM_LOAD( "ic9.bin", 0x4000000, 0x4000000, CRC(16cf2e7a) SHA1(ff7c6540e4507f84e3128ba03be4826ba504678c) )
 	// IC10 and IC11 Populated, Empty
 
-	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
-	ROM_LOAD( "317-5138-jpn.ic3", 0, 20, CRC(babcc420) SHA1(653cdcfa388426f4ce03c76506046ec6fd070562) )
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-5138-jpn.ic3", 0, 0x800, CRC(93b7a03d) SHA1(7af7c8d436f61e57b9d5957431c6fc745442f74f) )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x04))
 ROM_END
@@ -5797,8 +5794,8 @@ ROM_START( ausfache )
 	ROM_LOAD( "ic9.bin",    0x4000000, 0x4000000, CRC(18c994d7) SHA1(159e1425b2fc645133814b0d26d93a90e9849b1a) )
 	// IC10 and IC11 Populated, Empty
 
-	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
-	ROM_LOAD( "317-5130-jpn.ic3", 0, 20, CRC(3e0c010b) SHA1(b6da97d4ecb228e73fb9a5ada837d0d6699ab0f1) )
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-05130-jpn.ic3", 0, 0x800, CRC(eccdcd59) SHA1(9f374e0b37f18591c92c38c83c9310f2db0abf9c) )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x04))
 ROM_END
@@ -5817,10 +5814,8 @@ ROM_START( manicpnc )
 	ROM_REGION( 0x200000, "ioboard", 0) // touch screen I/O board, program disassembles as little-endian SH-4
 	ROM_LOAD( "fpr24351.ic14", 0x000000, 0x200000, CRC(4d1b7b89) SHA1(965b8c6b5a2e7b3f1b1e2eac19c86000c3b66754) )
 
-	// ROM_REGION( 4, "rom_key", 0 )
-	// ROM_LOAD( "pokasuka-key.bin", 0, 4, CRC(f00bcd61) SHA1(b8315b851656c2e0b7853979988d1c44eab0886b) )
-	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
-	ROM_LOAD( "317-0461-com.ic3", 0, 20, NO_DUMP )
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0461-com.ic3", 0, 0x800, BAD_DUMP CRC(c9282cdd) SHA1(23933e489d763515428e2714cc6e7676df1d5323) )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x05))
 ROM_END
@@ -5839,10 +5834,8 @@ ROM_START( pokasuka )
 	ROM_REGION( 0x200000, "ioboard", 0) // touch screen I/O board, program disassembles as little-endian SH-4
 	ROM_LOAD( "fpr24351.ic14", 0x000000, 0x200000, CRC(4d1b7b89) SHA1(965b8c6b5a2e7b3f1b1e2eac19c86000c3b66754) )
 
-	// ROM_REGION( 4, "rom_key", 0 )
-	// ROM_LOAD( "pokasuka-key.bin", 0, 4, CRC(f00bcd61) SHA1(b8315b851656c2e0b7853979988d1c44eab0886b) )
-	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
-	ROM_LOAD( "317-0461-com.ic3", 0, 20, NO_DUMP )
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0461-com.ic3", 0, 0x800, BAD_DUMP CRC(c9282cdd) SHA1(23933e489d763515428e2714cc6e7676df1d5323) )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x05))
 ROM_END
@@ -5860,8 +5853,8 @@ ROM_START( rhytngk )
 	ROM_LOAD( "fpr-24425.ic10", 0x08000000, 0x4000000, CRC(6223ebac) SHA1(64c0ec61c108acbb557e7d3837f578deba832cb6) )
 	ROM_LOAD( "fpr-24426.ic11", 0x0c000000, 0x4000000, CRC(c78b0981) SHA1(f889acf9065566e11ff985a3b6c4824e364d57ae) )
 
-	ROM_REGION( 20, "pic_readout", 0 ) // data obtained using a custom PIC reader
-	ROM_LOAD( "317-0503-jpn.ic3", 0, 20, CRC(69fc3f47) SHA1(3a887c62e93fa264b307c954eb39a4fca1bdfad6) )
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0503-jpn.ic3", 0, 0x800, CRC(6eb0976b) SHA1(d5d0fc09a0c0e3a8f2703c450f05f5082317fbe4) )
 
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x04))
 ROM_END

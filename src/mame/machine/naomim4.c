@@ -60,15 +60,10 @@ void naomi_m4_board::device_start()
 {
 	naomi_board::device_start();
 
-#if USE_NAOMICRYPT
-	UINT32 tempkey = get_naomi_key(machine());
-	iv = (tempkey >> 16) &0xffff;
-	key = tempkey & 0xffff;
-#else
 	const UINT8 *key_data = memregion(key_tag)->base();
-	subkey1 = (key_data[17] << 8) | key_data[16];
-	subkey2 = (key_data[19] << 8) | key_data[18];
-#endif
+	subkey1 = (key_data[0x5e2] << 8) | key_data[0x5e0];
+	subkey2 = (key_data[0x5e6] << 8) | key_data[0x5e4];
+
 	buffer = auto_alloc_array(machine(), UINT8, BUFFER_SIZE);
 	enc_init();
 

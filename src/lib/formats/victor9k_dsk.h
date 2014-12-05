@@ -33,6 +33,7 @@ public:
 
 	int find_size(io_generic *io, UINT32 form_factor);
 	virtual int identify(io_generic *io, UINT32 form_factor);
+	void log_boot_sector(UINT8 *data);
 	floppy_image_format_t::desc_e* get_sector_desc(const format &f, int &current_size, int sector_count);
 	void build_sector_description(const format &f, UINT8 *sectdata, offs_t sect_offs, desc_s *sectors, int sector_count) const;
 	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image);

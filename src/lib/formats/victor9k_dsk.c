@@ -39,6 +39,62 @@
     Interleave factor 3
     cell 2.13 usec
 
+
+	Boot Disc Label Format
+	Track 0 Sector 0
+
+	Byte
+	Offset         Name                Description
+
+	0              System disc ID      literally, ff,00h for a system
+	                                   disc
+
+	2              Load address        paragraph   to   load   booted
+	                                   program at. If zero then  boot
+	                                   loads in high memory.
+
+	4              Length              paragraph count to load.
+
+	6              Entry offset        I.P.  value  for  transfer  of
+	                                   control.
+
+	8              Entry segment       C.S.  value  for  transfer  of
+	                                   control.
+
+	10             I.D.                disc identifier.
+
+	18             Part number         system identifier  - displayed
+	                                   by early versions of boot.
+
+	26             Sector size         byte count for sectors.
+
+	28             Data start          first   data  sector  on  disc
+	                                   (absolute sectors).
+
+	30             Boot start          first   absolute   sector   of
+	                                   program  for boot to  load  at
+	                                   'load  address'  for  'length'
+	                                   paragraphs.
+
+	32             Flags               indicators:
+	                                        bit  meaning
+	                                       15-12 interleave    factor
+	                                             (0-15)
+	                                         0   0=single sided
+	                                             1=double sided
+
+	34             Disc type           00 = CP/M
+	                                   01 = MS-DOS
+
+	35             Reserved
+
+	38             Speed table         information  for speed control
+	                                   proc.
+
+	56             Zone table          high track for each zone.
+
+	71             Sector/track        sectors  per  track  for  each
+	                                   zone.
 */
 
 #include "emu.h"
@@ -82,6 +138,71 @@ int victor9k_format::identify(io_generic *io, UINT32 form_factor)
 		return 50;
 
 	return 0;
+}
+
+void victor9k_format::log_boot_sector(UINT8 *data)
+{
+	// System disc ID
+	logerror("System disc: %s\n", ((data[0] == 0xff) && (data[1] == 0x00)) ? "yes" : "no");
+
+	// Load address
+	logerror("Load address: %04x\n", (data[1] << 8) | data[2]);
+
+	// Length
+	logerror("Length: %04x\n", (data[3] << 8) | data[4]);
+
+	// Entry offset
+	logerror("Entry offset: %04x\n", (data[5] << 8) | data[6]);
+
+	// Entry segment
+	logerror("Entry segment: %04x\n", (data[7] << 8) | data[8]);
+
+	// I.D.
+	//logerror("I.D.: %s\n", data[10]);
+
+	// Part number
+	//logerror("Part number: %s\n", data[18]);
+
+	// Sector size
+	logerror("Sector size: %04x\n", (data[25] << 8) | data[26]);
+
+	// Data start
+	logerror("Data start: %04x\n", (data[27] << 8) | data[28]);
+
+	// Boot start
+	logerror("Boot start: %04x\n", (data[29] << 8) | data[30]);
+
+	// Flags
+	logerror("%s sided\n", BIT(data[33], 0) ? "Double" : "Single");
+	logerror("Interleave factor: %u\n", data[32] >> 4);
+
+	// Disc type
+	switch (data[34]) {
+	case 0x00: logerror("Disc type: CP/M\n"); break;
+	case 0x01: logerror("Disc type: MS-DOS\n"); break;
+	default: logerror("Disc type: unknown\n"); break;
+	}
+
+	// Speed table
+	logerror("Speed table:  ");
+	for (int i = 38; i < 56; i++) {
+		logerror("%02x ", data[i]);
+	}
+	logerror("\n");
+
+	// Zone table
+	logerror("Zone table:            ");
+	for (int i = 56; i < 71; i++) {
+		logerror("%02x ", data[i]);
+	}
+	logerror("\n");
+
+	// Sector/track
+	logerror("Sector/track:          ");
+	for (int i = 71; i < 86; i++) {
+		logerror("%02x ", data[i]);
+	}
+	logerror("\n");
 }
 
 floppy_image_format_t::desc_e* victor9k_format::get_sector_desc(const format &f, int &current_size, int sector_count)
@@ -140,6 +261,8 @@ bool victor9k_format::load(io_generic *io, UINT32 form_factor, floppy_image *ima
 	img.resize(size);
 
 	io_generic_read(io, img, 0, size);
+
+	log_boot_sector(img);
 
 	int track_offset = 0;
 
@@ -207,8 +330,8 @@ const int victor9k_format::sectors_per_track[2][80] =
 		18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18,
 		17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17,
 		16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
-		15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-		14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
+		15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+		14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
 		13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13,
 		12, 12, 12, 12, 12, 12, 12, 12, 12
 	},

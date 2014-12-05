@@ -102,7 +102,7 @@ READ8_MEMBER(comp4_state::read_k)
 
 	// read selected button rows
 	for (int i = 0; i < 3; i++)
-		if (m_o & (1 << (i + 1)))
+		if (m_o >> (i+1) & 1)
 			k |= m_button_matrix[i]->read();
 	
 	return k;

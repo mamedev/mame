@@ -66,7 +66,7 @@ READ8_MEMBER(simon_state::read_k)
 	for (int i = 0; i < 4; i++)
 	{
 		const int r[4] = { 0, 1, 2, 9 };
-		if (m_r & (1 << r[i]))
+		if (m_r >> r[i] & 1)
 			k |= m_button_matrix[i]->read();
 	}
 
