@@ -20,6 +20,7 @@
 
 
 // master clock is unknown, the value below is an approximation
+// (patent says R=51K, C=47pf, but then it sounds too low pitched)
 #define MASTER_CLOCK (350000)
 
 
@@ -279,5 +280,16 @@ ROM_START( starwbc )
 	ROM_LOAD( "tms1100_starwbc_opla.pla", 0, 365, CRC(d358a76d) SHA1(06b60b207540e9b726439141acadea9aba718013) )
 ROM_END
 
+ROM_START( starwbcp )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "us4270755", 0x0000, 0x0800, BAD_DUMP CRC(112b7069) SHA1(11f39c69a543c128023ba11cc6228bacdfab04de) ) // from patent us4270755, may have errors
 
-CONS( 1979, starwbc, 0, 0, starwbc, starwbc, driver_device, 0, "Kenner", "Star Wars - Electronic Battle Command", GAME_SUPPORTS_SAVE )
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_starwbc_mpla.pla", 0, 867, CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_starwbc_opla.pla", 0, 365, CRC(d358a76d) SHA1(06b60b207540e9b726439141acadea9aba718013) )
+ROM_END
+
+
+CONS( 1979, starwbc,  0,       0, starwbc, starwbc, driver_device, 0, "Kenner", "Star Wars - Electronic Battle Command", GAME_SUPPORTS_SAVE )
+CONS( 1979, starwbcp, starwbc, 0, starwbc, starwbc, driver_device, 0, "Kenner", "Star Wars - Electronic Battle Command (prototype)", GAME_SUPPORTS_SAVE )
