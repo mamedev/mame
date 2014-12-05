@@ -282,7 +282,7 @@ ROM_END
 
 ROM_START( starwbcp )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "us4270755", 0x0000, 0x0800, BAD_DUMP CRC(112b7069) SHA1(11f39c69a543c128023ba11cc6228bacdfab04de) ) // from patent us4270755, may have errors
+	ROM_LOAD( "us4270755", 0x0000, 0x0800, BAD_DUMP CRC(fb3332f2) SHA1(a79ac81e239983cd699b7cfcc55f89b203b2c9ec) ) // from patent US4270755, may have errors
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_starwbc_mpla.pla", 0, 867, CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) )
