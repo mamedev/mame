@@ -9,8 +9,7 @@
   
   TODO:
   - ON/OFF button callbacks, and support OFF callback from the 0980
-  - CPU clocks are unknown
-
+  - MCU clocks are unknown
 
 ***************************************************************************/
 
@@ -136,7 +135,7 @@ void ticalc1x_state::tisr16_leds_update()
 		if (m_r >> i & 1)
 			m_leds_state[i] = m_o;
 	
-	// exponent sign
+	// exponent sign (not 100% sure this is correct)
 	m_leds_state[11] = (m_leds_state[0] | m_leds_state[1]) ? 0x40 : 0;
 
 	// send to output
@@ -250,7 +249,7 @@ WRITE16_MEMBER(ticalc1x_state::wizatron_write_o)
 
 READ8_MEMBER(ticalc1x_state::ti30_read_k)
 {
-	// the top row is always on
+	// the Vss row is always on
 	UINT8 k = m_button_matrix[8]->read();
 
 	// read selected button rows
