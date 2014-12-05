@@ -280,4 +280,4 @@ ROM_START( starwbc )
 ROM_END
 
 
-CONS( 1979, starwbc, 0, 0, starwbc, starwbc, driver_device, 0, "Kenner", "Star Wars - Electronic Battle Command", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+CONS( 1979, starwbc, 0, 0, starwbc, starwbc, driver_device, 0, "Kenner", "Star Wars - Electronic Battle Command", GAME_SUPPORTS_SAVE )
