@@ -30,6 +30,11 @@
     TODO:
 
 	- communication error with SCP after loading boot sector
+		- bp ff1a8
+		- patch ff1ab=c3
+	- data block checksum errors loading header track
+		- bp ff46a (ax = checksum read from disk, dx = calculated checksum)
+		- bit stream is offset by 1 bit at some point
     - 8048 spindle speed control
     - read PLL
     - write logic
@@ -1019,28 +1024,18 @@ WRITE_LINE_MEMBER( victor_9000_fdc_t::via6_irq_w )
 
 READ8_MEMBER( victor_9000_fdc_t::cs7_r )
 {
-	if (!checkpoint_live.lbrdy)
-	{
-		live_sync();
-		cur_live.lbrdy = 1;
-		cur_live.lbrdy_changed = true;
-		if (LOG_VIA) logerror("%s %s LBRDY 1 : %02x\n", machine().time().as_string(), machine().describe_context(), m_via5->read(space, offset));
-		live_delay(RUNNING_SYNCPOINT);
-	}
+	m_lbrdy_cb(1);
+
+	if (LOG_VIA) logerror("%s %s LBRDY 1 : %02x\n", machine().time().as_string(), machine().describe_context(), m_via5->read(space, offset));
 
 	return m_via5->read(space, offset);
 }
 
 WRITE8_MEMBER( victor_9000_fdc_t::cs7_w )
 {
-	if (!checkpoint_live.lbrdy)
-	{
-		live_sync();
-		cur_live.lbrdy = 1;
-		cur_live.lbrdy_changed = true;
-		if (LOG_VIA) logerror("%s %s LBRDY 1\n", machine().time().as_string(), machine().describe_context());
-		live_delay(RUNNING_SYNCPOINT);
-	}
+	m_lbrdy_cb(1);
+
+	if (LOG_VIA) logerror("%s %s LBRDY 1\n", machine().time().as_string(), machine().describe_context());
 
 	m_via5->write(space, offset, data);
 }
@@ -1179,7 +1174,6 @@ void victor_9000_fdc_t::live_abort()
 	cur_live.write_start_time = attotime::never;
 
 	cur_live.brdy = 1;
-	cur_live.lbrdy = 1;
 	cur_live.lbrdy_changed = true;
 	cur_live.sync = 1;
 	cur_live.syn = 1;
@@ -1249,7 +1243,8 @@ void victor_9000_fdc_t::live_run(const attotime &limit)
 
 			cur_live.e = m_gcr_rom->base()[cur_live.i];
 
-			if (LOG) logerror("%s bit %u sync %u bc %u sbc %u sBC %u syn %u i %03x e %02x\n",cur_live.tm.as_string(),bit,sync,cur_live.bit_counter,cur_live.sync_bit_counter,cur_live.sync_byte_counter,syn,cur_live.i,cur_live.e);
+			attotime next = cur_live.tm + m_period;
+			if (LOG) logerror("%s:%s:%s bit %u sync %u bc %u sbc %u sBC %u syn %u i %03x e %02x\n",cur_live.tm.as_string(),next.as_string(),cur_live.edge.as_string(),bit,sync,cur_live.bit_counter,cur_live.sync_bit_counter,cur_live.sync_byte_counter,syn,cur_live.i,cur_live.e);
 
 			// byte ready
 			int brdy = !(cur_live.bit_counter == 9);
@@ -1261,7 +1256,6 @@ void victor_9000_fdc_t::live_run(const attotime &limit)
 				if (LOG) logerror("%s BRDY %u\n", cur_live.tm.as_string(),brdy);
 				if (!brdy)
 				{
-					cur_live.lbrdy = 0;
 					cur_live.lbrdy_changed = true;
 					if (LOG_VIA) logerror("%s LBRDY 0 : %02x\n", cur_live.tm.as_string(), GCR_DECODE(cur_live.e, cur_live.i));
 				}
@@ -1302,7 +1296,7 @@ void victor_9000_fdc_t::live_run(const attotime &limit)
 
 		case RUNNING_SYNCPOINT: {
 			if (cur_live.lbrdy_changed) {
-				m_lbrdy_cb(cur_live.lbrdy);
+				m_lbrdy_cb(0);
 				cur_live.lbrdy_changed = false;
 			}
 

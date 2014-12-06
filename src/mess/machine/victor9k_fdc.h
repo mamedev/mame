@@ -140,7 +140,6 @@ private:
 		int sync_bit_counter;
 		int sync_byte_counter;
 		int brdy;
-		int lbrdy;
 		bool lbrdy_changed;
 		int sync;
 		int syn;
