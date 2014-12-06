@@ -307,6 +307,35 @@ int lua_engine::l_gui_draw_box(lua_State *L)
 }
 
 //-------------------------------------------------
+//  gui_draw_line - draw a line to HUD
+//  -> gui.draw_line(x1, y1, x2, y2, color)
+//-------------------------------------------------
+
+int lua_engine::l_gui_draw_line(lua_State *L)
+{
+	// ensure that we got 5 numerical parameters
+	luaL_argcheck(L, lua_isnumber(L, 1), 1, "x1 (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "y1 (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 3), 3, "x2 (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 4), 4, "y2 (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 5), 5, "color (integer) expected");
+
+	// retrieve all parameters
+	float x1, y1, x2, y2;
+	x1 = MIN(lua_tounsigned(L, 1) / static_cast<float>(luaThis->m_screen.width()) , 1.0f);
+	y1 = MIN(lua_tounsigned(L, 2) / static_cast<float>(luaThis->m_screen.height()), 1.0f);
+	x2 = MIN(lua_tounsigned(L, 3) / static_cast<float>(luaThis->m_screen.width()) , 1.0f);
+	y2 = MIN(lua_tounsigned(L, 4) / static_cast<float>(luaThis->m_screen.height()), 1.0f);
+	UINT32 color = lua_tounsigned(L, 5);
+
+	// draw the line
+	render_container &rc = luaThis->machine().first_screen()->container();
+	rc.add_line(x1, y1, x2, y2, UI_LINE_WIDTH, rgb_t(color), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+
+	return 0;
+}
+
+//-------------------------------------------------
 //  gui_draw_text - draw text to HUD
 //  -> gui.draw_text(int x, int y, string msg[, color="white", outline="black"])
 //-------------------------------------------------
@@ -663,6 +692,7 @@ void lua_engine::initialize()
 			.addCFunction ("screen_width",    l_gui_screen_width )
 			.addCFunction ("screen_height",   l_gui_screen_height )
 			.addCFunction ("draw_box",        l_gui_draw_box )
+			.addCFunction ("draw_line",       l_gui_draw_line )
 			.addCFunction ("draw_text",       l_gui_draw_text )
 		.endNamespace ();
 
