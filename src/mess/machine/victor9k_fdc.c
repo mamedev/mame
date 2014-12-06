@@ -53,8 +53,19 @@
 #define M6522_5_TAG     "1k"
 #define M6522_6_TAG     "1h"
 
+// this is exactly the same decode as used in the Commodore 4040/8050 series drives
 #define GCR_DECODE(_e, _i) \
     ((BIT(_e, 6) << 7) | (BIT(_i, 7) << 6) | (_e & 0x33) | (BIT(_e, 2) << 3) | (_i & 0x04))
+
+// Tandon TM-100 spindle @ 300RPM, measured TACH 12VAC 256Hz
+// TACH = RPM / 60 * SPINDLE RATIO * MOTOR POLES
+// 256 = 300 / 60 * 6.4 * 8
+#define SPINDLE_RATIO 	6.4
+#define MOTOR_POLES		8
+
+// TODO wrong values here! motor speed is controlled by an LM2917, with help from the spindle TACH and a DAC0808 whose value is set by the SCP 8048
+const int victor_9000_fdc_t::rpm[] = { 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 254, 255, 257, 259, 260, 262, 264, 266, 267, 269, 271, 273, 275, 276, 278, 280, 282, 284, 286, 288, 290, 291, 293, 295, 297, 299, 301, 303, 305, 307, 309, 311, 313, 315, 318, 320, 322, 324, 326, 328, 330, 333, 335, 337, 339, 342, 344, 346, 348, 351, 353, 355, 358, 360, 362, 365, 367, 370, 372, 375, 377, 380, 382, 385, 387, 390, 392, 395, 398, 400, 403, 406, 408, 411, 414, 416, 419, 422, 425, 428, 430, 433, 436, 439, 442, 445, 448, 451, 454, 457, 460, 463, 466, 469, 472, 475, 478, 482, 485, 488, 491, 494, 498, 501, 504, 508, 511, 514, 518, 521, 525, 528, 532, 535, 539, 542, 546, 550, 553, 557, 561, 564, 568, 572, 576, 579, 583, 587, 591, 595, 599, 603, 607, 611, 615, 619, 623, 627, 631, 636, 640, 644, 648, 653, 657, 661, 666, 670, 674, 679, 683, 688, 693, 697, 702, 706, 711, 716, 721, 725, 730, 735, 740, 745, 750, 755, 760, 765, 770, 775, 780, 785, 790, 796, 801, 806, 812, 817, 822, 828, 833, 839, 844, 850, 856, 861, 867, 873, 878, 884 };
+
 
 
 //**************************************************************************
@@ -92,7 +103,7 @@ const rom_entry *victor_9000_fdc_t::device_rom_region() const
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( floppy_io, AS_IO, 8, victor_9000_fdc_t )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(floppy_p1_r) AM_WRITENOP
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(floppy_p1_r, floppy_p1_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(floppy_p2_r, floppy_p2_w)
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(tach0_r)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(tach1_r)
@@ -106,6 +117,7 @@ ADDRESS_MAP_END
 
 int victor_9000_fdc_t::load0_cb(floppy_image_device *device)
 {
+	// DOOR OPEN 0
 	m_via4->write_ca1(0);
 
 	return IMAGE_INIT_PASS;
@@ -113,11 +125,13 @@ int victor_9000_fdc_t::load0_cb(floppy_image_device *device)
 
 void victor_9000_fdc_t::unload0_cb(floppy_image_device *device)
 {
+	// DOOR OPEN 0
 	m_via4->write_ca1(1);
 }
 
 int victor_9000_fdc_t::load1_cb(floppy_image_device *device)
 {
+	// DOOR OPEN 1
 	m_via4->write_cb1(0);
 
 	return IMAGE_INIT_PASS;
@@ -125,6 +139,7 @@ int victor_9000_fdc_t::load1_cb(floppy_image_device *device)
 
 void victor_9000_fdc_t::unload1_cb(floppy_image_device *device)
 {
+	// DOOR OPEN 1
 	m_via4->write_cb1(1);
 }
 
@@ -147,7 +162,9 @@ static MACHINE_CONFIG_FRAGMENT( victor_9000_fdc )
 	MCFG_CPU_IO_MAP(floppy_io)
 
 	MCFG_DEVICE_ADD(M6522_4_TAG, VIA6522, XTAL_30MHz/30)
+	MCFG_VIA6522_READPA_HANDLER(READ8(victor_9000_fdc_t, via4_pa_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(victor_9000_fdc_t, via4_pa_w))
+	MCFG_VIA6522_READPB_HANDLER(READ8(victor_9000_fdc_t, via4_pb_r))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(victor_9000_fdc_t, via4_pb_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(victor_9000_fdc_t, wrsync_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor_9000_fdc_t, via4_irq_w))
@@ -319,11 +336,13 @@ void victor_9000_fdc_t::device_timer(emu_timer &timer, device_timer_id id, int p
 		break;
 
 	case TM_TACH0:
-		// TODO
+		m_tach0 = !m_tach0;
+		if (LOG_SCP) logerror("TACH0 %u\n", m_tach0);
 		break;
 
 	case TM_TACH1:
-		// TODO
+		m_tach1 = !m_tach1;
+		if (LOG_SCP) logerror("TACH1 %u\n", m_tach1);
 		break;
 	}
 }
@@ -355,12 +374,58 @@ READ8_MEMBER( victor_9000_fdc_t::floppy_p1_r )
 
 
 //-------------------------------------------------
+//  floppy_p1_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( victor_9000_fdc_t::floppy_p1_w )
+{
+	/*
+
+	    bit     description
+
+	    0       L0MS0
+	    1       L0MS1
+	    2       L0MS2
+	    3       L0MS3
+	    4       L1MS0
+	    5       L1MS1
+	    6       L1MS2
+	    7       L1MS3
+
+	*/
+
+	m_l0ms = data & 0x0f;
+	m_l1ms = data >> 4;
+}
+
+
+//-------------------------------------------------
 //  floppy_p2_r -
 //-------------------------------------------------
 
 READ8_MEMBER( victor_9000_fdc_t::floppy_p2_r )
 {
-	return m_p2; // TODO needed because of ORL/ANL P2, should be in mcs48.c
+	/*
+
+	    bit     description
+
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5
+	    6       RDY0
+	    7       RDY1
+
+	*/
+
+	UINT8 data = m_p2 & 0x3f;
+
+	data |= m_rdy0 << 6;
+	data |= m_rdy1 << 7;
+
+	return data;
 }
 
 
@@ -407,11 +472,8 @@ WRITE8_MEMBER( victor_9000_fdc_t::floppy_p2_w )
 	int sel1 = BIT(data, 4);
 	if (m_sel1 != sel1) sync = true;
 
-	//m_rdy0 = BIT(data, 6);
-	//m_via5->write_ca2(m_rdy0);
-
-	//m_rdy1 = BIT(data, 7);
-	//m_via5->write_cb2(m_rdy1);
+	set_rdy0(BIT(data, 6));
+	set_rdy1(BIT(data, 7));
 
 	if (LOG_SCP) logerror("%s %s START0/STOP0/SEL0/RDY0 %u/%u/%u/%u START1/STOP1/SEL1/RDY1 %u/%u/%u/%u\n", machine().time().as_string(), machine().describe_context(), start0, stop0, sel0, m_rdy0, start1, stop1, sel1, m_rdy1);
 
@@ -500,11 +562,32 @@ void victor_9000_fdc_t::update_spindle_motor(floppy_image_device *floppy, emu_ti
 	} else if (stop && !floppy->mon_r()) {
 		if (LOG_SCP) logerror("%s: motor stop\n", floppy->tag());
 		floppy->mon_w(1);
+		t_tach->reset();
 	}
 
 	if (sel) {
 		da = m_da;
+		if (!floppy->mon_r()) {
+			float tach = rpm[da] / 60 * SPINDLE_RATIO * MOTOR_POLES;
+
+			if (LOG_SCP) logerror("%s: motor speed %u rpm / tach %0.1f hz (DA %02x)\n", floppy->tag(), rpm[da], tach, da);
+
+			t_tach->adjust(attotime::from_hz(tach*2), 0, attotime::from_hz(tach*2));
+			floppy->set_rpm(rpm[da]);
+		}
 	}
+}
+
+void victor_9000_fdc_t::set_rdy0(int state)
+{
+	//m_rdy0 = state;
+	//m_via5->write_ca2(m_rdy0);
+}
+
+void victor_9000_fdc_t::set_rdy1(int state)
+{
+	//m_rdy1 = state;
+	//m_via5->write_cb2(m_rdy1);
 }
 
 
@@ -525,6 +608,26 @@ WRITE8_MEMBER( victor_9000_fdc_t::da_w )
 		checkpoint();
 		live_run();
 	}
+}
+
+READ8_MEMBER( victor_9000_fdc_t::via4_pa_r )
+{
+	/*
+
+	    bit     description
+
+	    PA0     L0MS0
+	    PA1     L0MS1
+	    PA2     L0MS2
+	    PA3     L0MS3
+	    PA4
+	    PA5
+	    PA6
+	    PA7
+
+	*/
+
+	return m_l0ms;
 }
 
 WRITE8_MEMBER( victor_9000_fdc_t::via4_pa_w )
@@ -565,6 +668,26 @@ WRITE8_MEMBER( victor_9000_fdc_t::via4_pa_w )
 		checkpoint();
 		live_run();
 	}
+}
+
+READ8_MEMBER( victor_9000_fdc_t::via4_pb_r )
+{
+	/*
+
+	    bit     description
+
+	    PB0     L1MS0
+	    PB1     L1MS1
+	    PB2     L1MS2
+	    PB3     L1MS3
+	    PB4
+	    PB5
+	    PB6
+	    PB7
+
+	*/
+
+	return m_l1ms;
 }
 
 WRITE8_MEMBER( victor_9000_fdc_t::via4_pb_w )
@@ -615,7 +738,7 @@ WRITE_LINE_MEMBER( victor_9000_fdc_t::wrsync_w )
 		m_wrsync = state;
 		cur_live.wrsync = state;
 		checkpoint();
-		if (LOG_VIA) logerror("%s %s ERASE %u\n", machine().time().as_string(), machine().describe_context(), state);
+		if (LOG_VIA) logerror("%s %s WRSYNC %u\n", machine().time().as_string(), machine().describe_context(), state);
 		live_run();
 	}
 }
@@ -813,8 +936,8 @@ WRITE8_MEMBER( victor_9000_fdc_t::via6_pb_w )
 
 	    bit     description
 
-	    PB0
-	    PB1
+	    PB0     RDY0
+	    PB1     RDY1
 	    PB2     _SCRESET
 	    PB3
 	    PB4
@@ -823,6 +946,9 @@ WRITE8_MEMBER( victor_9000_fdc_t::via6_pb_w )
 	    PB7     STP1
 
 	*/
+
+	set_rdy0(BIT(data, 0));
+	set_rdy1(BIT(data, 1));
 
 	// motor speed controller reset
 	if (!BIT(data, 2))
