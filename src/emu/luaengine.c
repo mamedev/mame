@@ -540,6 +540,7 @@ void lua_engine::update_machine()
 
 void lua_engine::initialize()
 {
+	// "emu" namespace
 	luabridge::getGlobalNamespace (m_lua_state)
 		.beginNamespace ("emu")
 			.addCFunction ("app_name",    l_emu_app_name )
@@ -571,6 +572,11 @@ void lua_engine::initialize()
 				.addData ("year", &game_driver::year)
 				.addData ("manufacturer", &game_driver::manufacturer)
 			.endClass ()
+		.endNamespace ();
+
+	// "gui" namespace
+	luabridge::getGlobalNamespace (m_lua_state)
+		.beginNamespace ("gui")
 		.endNamespace ();
 
 	luabridge::push (m_lua_state, machine_manager::instance());
