@@ -35,6 +35,7 @@
 #ifndef __POLYNEW_H__
 #define __POLYNEW_H__
 
+#include <limits.h>
 
 //**************************************************************************
 //  DEBUGGING
