@@ -8,5 +8,9 @@
 
 ***************************************************************************/
 
+#define BARE_BUILD_VERSION "0.156"
+
+extern const char bare_build_version[];
 extern const char build_version[];
-const char build_version[] = "0.156 (" __DATE__")";
+const char bare_build_version[] = BARE_BUILD_VERSION;
+const char build_version[] = BARE_BUILD_VERSION " (" __DATE__")";
