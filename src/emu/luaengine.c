@@ -254,6 +254,26 @@ int lua_engine::l_emu_unpause(lua_State *L)
 }
 
 //-------------------------------------------------
+//  gui_screen_width - return current screen width in pixels
+//-------------------------------------------------
+
+int lua_engine::l_gui_screen_width(lua_State *L)
+{
+	lua_pushunsigned(L, luaThis->m_screen.width());
+	return 1;
+}
+
+//-------------------------------------------------
+//  gui_screen_height - return current screen height in pixels
+//-------------------------------------------------
+
+int lua_engine::l_gui_screen_height(lua_State *L)
+{
+	lua_pushunsigned(L, luaThis->m_screen.height());
+	return 1;
+}
+
+//-------------------------------------------------
 //  emu_keypost - post keys to natural keyboard
 //-------------------------------------------------
 
@@ -480,7 +500,7 @@ static void *serve_lua(void *param)
 //  lua_engine - constructor
 //-------------------------------------------------
 
-lua_engine::lua_engine()
+lua_engine::lua_engine() :  m_screen()
 {
 	m_machine = NULL;
 	luaThis = this;
@@ -530,6 +550,8 @@ void lua_engine::update_machine()
 			}
 			port = port->next();
 		}
+		// Register a screen-tracking bitmap
+		m_machine->first_screen()->register_screen_bitmap(m_screen);
 	}
 	lua_setglobal(m_lua_state, "ioport");
 }
@@ -577,6 +599,8 @@ void lua_engine::initialize()
 	// "gui" namespace
 	luabridge::getGlobalNamespace (m_lua_state)
 		.beginNamespace ("gui")
+			.addCFunction ("screen_width",    l_gui_screen_width )
+			.addCFunction ("screen_height",   l_gui_screen_height )
 		.endNamespace ();
 
 	luabridge::push (m_lua_state, machine_manager::instance());

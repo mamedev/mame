@@ -55,6 +55,7 @@ private:
 	// internal state
 	lua_State          *m_lua_state;
 	running_machine *   m_machine;
+	bitmap_argb32 m_screen;
 
 	hook hook_output_cb;
 	bool output_notifier_set;
@@ -75,6 +76,8 @@ private:
 	void emu_hook_output(lua_State *L);
 
 	static int l_ioport_write(lua_State *L);
+
+	// "emu" namespace
 	static int l_emu_after(lua_State *L);
 	static int l_emu_app_name(lua_State *L);
 	static int l_emu_app_version(lua_State *L);
@@ -88,6 +91,10 @@ private:
 	static int l_emu_start(lua_State *L);
 	static int l_emu_pause(lua_State *L);
 	static int l_emu_unpause(lua_State *L);
+
+	// "gui" namespace
+	static int l_gui_screen_width(lua_State *L);
+	static int l_gui_screen_height(lua_State *L);
 
 	void resume(void *L, INT32 param);
 	void report_errors(int status);
