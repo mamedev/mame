@@ -95,6 +95,7 @@ private:
 	// "gui" namespace
 	static int l_gui_screen_width(lua_State *L);
 	static int l_gui_screen_height(lua_State *L);
+	static int l_gui_draw_box(lua_State *L);
 
 	void resume(void *L, INT32 param);
 	void report_errors(int status);

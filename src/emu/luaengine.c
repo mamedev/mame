@@ -16,6 +16,7 @@
 #include "emuopts.h"
 #include "osdepend.h"
 #include "drivenum.h"
+#include "ui/ui.h"
 #include "web/mongoose.h"
 
 //**************************************************************************
@@ -271,6 +272,38 @@ int lua_engine::l_gui_screen_height(lua_State *L)
 {
 	lua_pushunsigned(L, luaThis->m_screen.height());
 	return 1;
+}
+
+//-------------------------------------------------
+//  gui_draw_box - draw a box to HUD
+//  -> gui.draw_box(x1, y1, x2, y2, fillcolor, outlinecolor)
+//-------------------------------------------------
+
+int lua_engine::l_gui_draw_box(lua_State *L)
+{
+	// ensure that we got 6 numerical parameters
+	luaL_argcheck(L, lua_isnumber(L, 1), 1, "x1 (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "y1 (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 3), 3, "x2 (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 4), 4, "y2 (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 5), 5, "fill color (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 6), 6, "outline color (integer) expected");
+
+	// retrieve all parameters
+	float x1, y1, x2, y2;
+	x1 = MIN(lua_tounsigned(L, 1) / static_cast<float>(luaThis->m_screen.width()) , 1.0f);
+	y1 = MIN(lua_tounsigned(L, 2) / static_cast<float>(luaThis->m_screen.height()), 1.0f);
+	x2 = MIN(lua_tounsigned(L, 3) / static_cast<float>(luaThis->m_screen.width()) , 1.0f);
+	y2 = MIN(lua_tounsigned(L, 4) / static_cast<float>(luaThis->m_screen.height()), 1.0f);
+	UINT32 bgcolor = lua_tounsigned(L, 5);
+	UINT32 fgcolor = lua_tounsigned(L, 6);
+
+	// draw the box
+	render_container &rc = luaThis->machine().first_screen()->container();
+	ui_manager &ui = luaThis->machine().ui();
+	ui.draw_outlined_box(&rc, x1, y1, x2, y2, fgcolor, bgcolor);
+
+	return 0;
 }
 
 //-------------------------------------------------
@@ -601,6 +634,7 @@ void lua_engine::initialize()
 		.beginNamespace ("gui")
 			.addCFunction ("screen_width",    l_gui_screen_width )
 			.addCFunction ("screen_height",   l_gui_screen_height )
+			.addCFunction ("draw_box",        l_gui_draw_box )
 		.endNamespace ();
 
 	luabridge::push (m_lua_state, machine_manager::instance());
