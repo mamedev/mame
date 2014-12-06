@@ -512,12 +512,12 @@ GAME(1979,  pinpool,    gts1,       gts1,   gts1, gts1_state,   gts1,   ROT0,   
 
 // sound card
 GAME(1979,  totem,      gts1s,      gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "Totem",                                GAME_IS_SKELETON_MECHANICAL)
-GAME(1979,  hulk,       gts1s,      gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "Incredible Hulk,The",                  GAME_IS_SKELETON_MECHANICAL)
-GAME(1979,  geniep,     gts1s,      gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "Genie (Pinball)",                              GAME_IS_SKELETON_MECHANICAL)
+GAME(1979,  hulk,       gts1s,      gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "The Incredible Hulk",                  GAME_IS_SKELETON_MECHANICAL)
+GAME(1979,  geniep,     gts1s,      gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "Genie (Pinball)",                      GAME_IS_SKELETON_MECHANICAL)
 GAME(1980,  buckrgrs,   gts1s,      gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "Buck Rogers",                          GAME_IS_SKELETON_MECHANICAL)
 GAME(1980,  torch,      gts1s,      gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "Torch",                                GAME_IS_SKELETON_MECHANICAL)
 GAME(1980,  roldisco,   gts1s,      gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "Roller Disco",                         GAME_IS_SKELETON_MECHANICAL)
 GAME(1980,  astannie,   gts1s,      gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "Asteroid Annie and the Aliens",        GAME_IS_SKELETON_MECHANICAL)
 
 // homebrew
-GAME(1986,  hexagone,   gts1s,      gts1,   gts1, gts1_state,   gts1,   ROT0,   "Christian Tabart (France)",        "L'Hexagone",       GAME_IS_SKELETON_MECHANICAL)
+GAME(1986,  hexagone,   gts1s,      gts1,   gts1, gts1_state,   gts1,   ROT0,   "Christian Tabart",        "L'Hexagone (France)",       GAME_IS_SKELETON_MECHANICAL)

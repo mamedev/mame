@@ -1407,9 +1407,9 @@ void layout_element::component::draw_led7seg(bitmap_argb32 &dest, const rectangl
 }
 
 
-//------------------------------------------------------
-//  draw_led8seg - draw a 8-segment fluorescent (Futaba)
-//------------------------------------------------------
+//-----------------------------------------------------------------
+//  draw_led8seg - draw a 8-segment fluorescent (Gottlieb System 1)
+//-----------------------------------------------------------------
 
 void layout_element::component::draw_led8seg(bitmap_argb32 &dest, const rectangle &bounds, int pattern)
 {
@@ -1453,8 +1453,8 @@ void layout_element::component::draw_led8seg(bitmap_argb32 &dest, const rectangl
 	draw_segment_vertical(tempbitmap, 0 + segwidth/3 - 8, bmheight/2 - segwidth/3 + 2, 2*bmwidth/3 - segwidth/2 - 4, segwidth + 8, backpen);
 	draw_segment_vertical(tempbitmap, 0 + segwidth/3, bmheight/2 - segwidth/3, 2*bmwidth/3 - segwidth/2 - 4, segwidth, (pattern & (1 << 7)) ? onpen : offpen);
 
-	draw_segment_vertical(tempbitmap, bmheight/2 + segwidth/3 - 2, bmheight - 2*segwidth/3 + 4, 2*bmwidth/3 - segwidth/2 - 4, segwidth + 8, backpen);
-	draw_segment_vertical(tempbitmap, bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, 2*bmwidth/3 - segwidth/2 - 4, segwidth, (pattern & (1 << 7)) ? onpen : offpen);
+	draw_segment_vertical(tempbitmap, bmheight/2 + segwidth/3 - 2, bmheight - segwidth/3 + 8, 2*bmwidth/3 - segwidth/2 - 4, segwidth + 8, backpen);
+	draw_segment_vertical(tempbitmap, bmheight/2 + segwidth/3, bmheight - segwidth/3, 2*bmwidth/3 - segwidth/2 - 4, segwidth, (pattern & (1 << 7)) ? onpen : offpen);
 
 	// apply skew
 	apply_skew(tempbitmap, 40);
@@ -1462,6 +1462,7 @@ void layout_element::component::draw_led8seg(bitmap_argb32 &dest, const rectangl
 	// resample to the target size
 	render_resample_argb_bitmap_hq(dest, tempbitmap, m_color);
 }
+
 
 //-------------------------------------------------
 //  draw_led14seg - draw a 14-segment LCD
