@@ -129,6 +129,7 @@ unknown cycle: CME, SSE, SSS
 const device_type TMS1000 = &device_creator<tms1000_cpu_device>; // 28-pin DIP, 11 R pins
 const device_type TMS1200 = &device_creator<tms1200_cpu_device>; // 40-pin DIP, 13 R pins
 const device_type TMS1070 = &device_creator<tms1070_cpu_device>; // same as tms1000, just supports higher voltage
+// TMS1270 has 10 O pins, how does that work?
 
 // TMS1100 is nearly the same as TMS1000, some different opcodes, and with double the RAM and ROM
 const device_type TMS1100 = &device_creator<tms1100_cpu_device>; // 28-pin DIP, 11 R pins
@@ -142,7 +143,6 @@ const device_type TMS1300 = &device_creator<tms1300_cpu_device>; // 40-pin DIP, 
 // - 16-term output PLA and segment PLA above the RAM
 const device_type TMS0980 = &device_creator<tms0980_cpu_device>; // 28-pin DIP, 9 R pins
 
-
 // TMS0970 is a stripped-down version of the TMS0980, itself acting more like a TMS1000
 // - 64x4bit RAM array at the bottom-left
 // - 1024x8bit ROM array at the bottom-right
@@ -150,7 +150,6 @@ const device_type TMS0980 = &device_creator<tms0980_cpu_device>; // 28-pin DIP, 
 // - 32-term microinstructions PLA between the RAM and ROM, supporting 15 microinstructions
 // - 16-term output PLA and segment PLA above the RAM
 const device_type TMS0970 = &device_creator<tms0970_cpu_device>; // 28-pin DIP, 11 R pins
-
 
 
 static ADDRESS_MAP_START(program_11bit_9, AS_PROGRAM, 16, tms1xxx_cpu_device)
@@ -307,33 +306,12 @@ offs_t tms0980_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UIN
 	return CPU_DISASSEMBLE_NAME(tms0980)(this, buffer, pc, oprom, opram, options);
 }
 
-
-void tms1000_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void tms1xxx_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
 {
 	switch (entry.index())
 	{
 		case STATE_GENPC:
-			string.printf("%03X", (m_pa << 6) | m_pc);
-			break;
-	}
-}
-
-void tms1100_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
-{
-	switch (entry.index())
-	{
-		case STATE_GENPC:
-			string.printf("%03X", (m_ca << 10) | (m_pa << 6) | m_pc);
-			break;
-	}
-}
-
-void tms0980_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
-{
-	switch (entry.index())
-	{
-		case STATE_GENPC:
-			string.printf("%03X", ((m_pa << 7) | m_pc) << 1);
+			string.printf("%03X", m_rom_address << ((m_byte_bits > 8) ? 1 : 0));
 			break;
 	}
 }
@@ -450,7 +428,7 @@ void tms1xxx_cpu_device::device_start()
 	state_add(TMS0980_Y,      "Y",      m_y     ).formatstr("%01X");
 	state_add(TMS0980_STATUS, "STATUS", m_status).formatstr("%01X");
 
-	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%8s").noshow();
+	state_add(STATE_GENPC, "curpc", m_rom_address).formatstr("%03X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_sr).formatstr("%8s").noshow();
 
 	m_icountptr = &m_icount;
