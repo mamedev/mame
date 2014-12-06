@@ -3,14 +3,17 @@
 /***************************************************************************
 
   Parker Brothers Stop Thief
-  * MP0905BNL TMS0980NLL MP6101B (die labeled 0980B-01A)
+  * TMS0980NLL MP6101B (die labeled 0980B-01A)
   
-  bla
+  Stop Thief is actually a board game, the electronic device emulated here
+  (called Electronic Crime Scanner) is an accessory. To start a game, press
+  the ON button. Otherwise, it is in test-mode where you can hear all sounds.
 
 
   TODO:
   - ON/OFF button callbacks
   - MCU clock is unknown
+  - stopthiep: unable to start a game (may be intentional?)
 
 ***************************************************************************/
 
@@ -21,7 +24,7 @@
 #include "stopthie.lh"
 
 // master clock is unknown, the value below is an approximation
-#define MASTER_CLOCK (350000)
+#define MASTER_CLOCK (425000)
 
 
 class stopthief_state : public driver_device
@@ -38,7 +41,6 @@ public:
 	required_ioport_array<3> m_button_matrix;
 	required_device<speaker_sound_device> m_speaker;
 
-	UINT16 m_r;
 	UINT16 m_o;
 
 	UINT16 m_leds_state[0x10];
@@ -136,22 +138,20 @@ READ8_MEMBER(stopthief_state::read_k)
 WRITE16_MEMBER(stopthief_state::write_r)
 {
 	// R0-R2: select digit
-	UINT8 o = BITSWAP8(m_o,3,5,0,6,7,2,1,4) & 0x7f;
-	for (int i = 0; i < 10; i++)
+	UINT8 o = BITSWAP8(m_o,3,5,2,1,4,0,6,7) & 0x7f;
+	for (int i = 0; i < 3; i++)
 		m_leds_state[i] = (data >> i & 1) ? o : 0;
 	
 	leds_update();
 	
-	// R3-..: sound
-
-
-	m_r = data;
+	// R3-R8: speaker on
+	m_speaker->level_w((data & 0x1f8 && m_o & 8) ? 1 : 0);
 }
 
 WRITE16_MEMBER(stopthief_state::write_o)
 {
 	// O0,O6: input mux
-	// O3: sound on
+	// O3: speaker out
 	// O0-O2,O4-O7: led segments A-G
 	m_o = data;
 }
@@ -210,13 +210,11 @@ void stopthief_state::machine_start()
 	memset(m_leds_state, 0, sizeof(m_leds_state));
 	memset(m_leds_cache, 0, sizeof(m_leds_cache));
 	memset(m_leds_decay, 0, sizeof(m_leds_decay));
-	m_r = 0;
 	m_o = 0;
 
 	save_item(NAME(m_leds_state));
 	save_item(NAME(m_leds_cache));
 	save_item(NAME(m_leds_decay));
-	save_item(NAME(m_r));
 	save_item(NAME(m_o));
 }
 
@@ -251,7 +249,7 @@ MACHINE_CONFIG_END
 
 ROM_START( stopthie )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "tms0980nll_mp6101b", 0x0000, 0x1000, CRC(5b4114af) SHA1(30a9b20dd5f0d57ed34c53e46f5adbf959d47828) )
+	ROM_LOAD( "tms0980nll_mp6101b", 0x0000, 0x1000, CRC(8bde5bb4) SHA1(8c318fcce67acc24c7ae361f575f28ec6f94665a) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
@@ -265,8 +263,7 @@ ROM_END
 
 ROM_START( stopthiep )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD16_WORD( "us4341385", 0x0000, 0x1000, CRC(03691115) SHA1(bdcd212aa50bb1c26cb2d0ee97e5cfc04841c108) ) // from patent US4341385, data should be correct (it included checksums)
-	// TODO: put in 0980 proper order
+	ROM_LOAD16_WORD( "us4341385", 0x0000, 0x1000, CRC(07aec38a) SHA1(0a3d0956495c0d6d9ea771feae6c14a473a800dc) ) // from patent US4341385, data should be correct (it included checksums)
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
@@ -279,5 +276,5 @@ ROM_START( stopthiep )
 ROM_END
 
 
-CONS( 1979, stopthie,  0,        0, stopthief, stopthief, driver_device, 0, "Parker Brothers", "Stop Thief (Electronic Crime Scanner)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1979, stopthie,  0,        0, stopthief, stopthief, driver_device, 0, "Parker Brothers", "Stop Thief (Electronic Crime Scanner)", GAME_SUPPORTS_SAVE )
 CONS( 1979, stopthiep, stopthie, 0, stopthief, stopthief, driver_device, 0, "Parker Brothers", "Stop Thief (Electronic Crime Scanner) (prototype)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )

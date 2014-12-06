@@ -234,7 +234,7 @@ MACHINE_CONFIG_END
 
 ROM_START( cnsector )
 	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "mp0905bnl_za0379", 0x0000, 0x0400, CRC(564fe1a0) SHA1(825840a73175eee12e9712c871799f00e3be2c53) )
+	ROM_LOAD( "mp0905bnl_za0379", 0x0000, 0x0400, CRC(201036e9) SHA1(b37fef86bb2bceaf0ac8bb3745b4702d17366914) )
 
 	ROM_REGION( 782, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0970_default_ipla.pla", 0, 782, CRC(e038fc44) SHA1(dfc280f6d0a5828d1bb14fcd59ac29caf2c2d981) )
