@@ -74,7 +74,7 @@ Game                                           Dongle Sticker    PIC Number     
  Club Majesty Formal                           ?                 ?               ?
  Derby Owners Club 2008: Feel the Rush         ?                 ?               DVP-0047A
  Derby Owners Club 2008: Feel the Rush V2.0    ?                 ?               ?
-*Ghost Squad Evolution                         ?                 ?               ?
+*Ghost Squad Evolution                         ?                 ?               DVP-0029A
  Harley Davidson: King of the Road             ?                 ?               ?
  Hummer Extreme                                ?                 ?               ?
  Initial D Arcade Stage 4                      ?                 ?               DVP-0019
@@ -339,25 +339,6 @@ public:
 	virtual void machine_reset();
 };
 
-#if 0
-static ADDRESS_MAP_START(lindbergh_map, AS_PROGRAM, 32, lindbergh_state)
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-										//  AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
-										//  AM_RANGE(0x000c0000, 0x000cffff) AM_ROM AM_REGION("vid_bios", 0)
-//  0xd0000 - 0xdffff tested, wants 0x414d ("AM") in there
-	AM_RANGE(0x000f0000, 0x000fffff) AM_ROM AM_REGION("mb_bios", 0xf0000)
-//  AM_RANGE(0xfd000000, 0xfd3fffff) AM_ROM AM_REGION("jvs_bios", 0)    /* Hack to see the data */
-	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("mb_bios", 0)     /* System BIOS */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(lindbergh_io, AS_IO, 32, lindbergh_state)
-//  AM_IMPORT_FROM(pcat32_io_common)
-
-//  AM_RANGE(0x00e8, 0x00ef) AM_NOP
-//  AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
-ADDRESS_MAP_END
-#endif
-
 lindbergh_state::lindbergh_state(const machine_config &mconfig, device_type type, const char *tag) : driver_device(mconfig, type, tag)
 {
 }
@@ -493,6 +474,22 @@ ROM_START(vtennis3)
 	DISK_IMAGE_READONLY("dvp-0005c", 0, SHA1(1fd689753c4b70dff0286cb7f623ee7fd439db62))
 ROM_END
 
+ROM_START(2spicy)
+	LINDBERGH_BIOS
+
+	ROM_REGION(0x2000, ":pic", 0) // PIC security 253-5508-0491 / 317-0491-COM
+	ROM_LOAD("317-0491-com.bin", 0, 0x2000, NO_DUMP)
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY("dvp-0027a", 0, SHA1(da1aacee9e32e813844f4d434981e69cc5c80682))
+ROM_END
+
+ROM_START(ghostsev)
+	LINDBERGH_BIOS
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY("dvp-0029a", 0, SHA1(256d9e8a6d61e1bcf65b17b8ed70fbc58796f7b1))
+ROM_END
 
 ROM_START(initiad4)
 	LINDBERGH_BIOS
@@ -534,6 +531,16 @@ ROM_START(hotdex)
 	DISK_IMAGE_READONLY("hotdex", 0, NO_DUMP)
 ROM_END
 
+ROM_START(primevah)
+	LINDBERGH_BIOS
+
+	ROM_REGION(0x2000, ":pic", 0) // PIC security 253-5508-0512 / 317-0512-COM
+	ROM_LOAD("317-0512-com.bin", 0, 0x2000, NO_DUMP)
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY("dvp-0048a", 0, SHA1(914aa23ece8aaf0f1942f77272b3a87d10f7a7db))
+ROM_END
+
 ROM_START(rambo)
 	LINDBERGH_BIOS
 
@@ -566,10 +573,13 @@ GAME(2006, letsgoju,  lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "L
 GAME(2006, outr2sdx,  lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Outrun 2 SP SDX",                          GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_NO_SOUND)
 GAME(2006, psmash3,   lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Power Smash 3 / Virtua Tennis 3 (Export)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_NO_SOUND)
 GAME(2006, vtennis3,  lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Virtua Tennis 3 (Japan)",                  GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_NO_SOUND)
+GAME(2007, 2spicy,    lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "2 Spicy",                                  GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_NO_SOUND)
+GAME(2007, ghostsev,  lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Ghost Squad Evolution",                    GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_NO_SOUND)
 GAME(2007, initiad4,  lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Initial D4 (Rev D)",                       GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_NO_SOUND)
 GAME(2007, initiad4c, initiad4, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Initial D4 (Rev C)",                       GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_NO_SOUND)
 GAME(2007, segartv,   lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Sega Race-TV (Export)",                    GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_NO_SOUND)
 GAME(2008, hotdex,    lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "House of the Dead EX (Japan)",             GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_NO_SOUND)
+GAME(2008, primevah,  lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Primeval Hunt",                            GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_NO_SOUND)
 GAME(2008, rambo,     lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Rambo (Export)",                           GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_NO_SOUND)
 GAME(2009, hummerxt,  lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "Hummer Extreme",                           GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_NO_SOUND)
 GAME(200?, lbvbiosu,  lindbios, lindbergh, 0, driver_device, 0, ROT0, "Sega", "VBios updater",                            GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_NO_SOUND)
