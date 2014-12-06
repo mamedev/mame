@@ -364,6 +364,21 @@ int lua_engine::l_gui_draw_text(lua_State *L)
 }
 
 //-------------------------------------------------
+//  gui_show_fps - display/hide fps counter
+//-------------------------------------------------
+
+int lua_engine::l_gui_show_fps(lua_State *L)
+{
+	luaL_argcheck(L, lua_isboolean(L, 1), 1, "enabled (bool) expected");
+	bool enabled = lua_toboolean(L, 1);
+	render_container &rc = luaThis->machine().first_screen()->container();
+	ui_manager &ui = luaThis->machine().ui();
+	ui.set_show_fps(enabled);
+	lua_pushboolean(L, ui.show_fps_counter());
+	return 1;
+}
+
+//-------------------------------------------------
 //  emu_keypost - post keys to natural keyboard
 //-------------------------------------------------
 
@@ -694,6 +709,7 @@ void lua_engine::initialize()
 			.addCFunction ("draw_box",        l_gui_draw_box )
 			.addCFunction ("draw_line",       l_gui_draw_line )
 			.addCFunction ("draw_text",       l_gui_draw_text )
+			.addCFunction ("show_fps",        l_gui_show_fps )
 		.endNamespace ();
 
 	luabridge::push (m_lua_state, machine_manager::instance());

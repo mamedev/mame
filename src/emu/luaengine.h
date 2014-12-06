@@ -98,6 +98,7 @@ private:
 	static int l_gui_draw_box(lua_State *L);
 	static int l_gui_draw_line(lua_State *L);
 	static int l_gui_draw_text(lua_State *L);
+	static int l_gui_show_fps(lua_State *L);
 
 	void resume(void *L, INT32 param);
 	void report_errors(int status);
