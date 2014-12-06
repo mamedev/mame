@@ -695,7 +695,9 @@ MACHINE_CONFIG_END
 ROM_START( microvsn )
 	ROM_REGION( 0x800, "maincpu1", ROMREGION_ERASE00 )
 	ROM_REGION( 0x800, "maincpu2", ROMREGION_ERASE00 )
-	ROM_REGION( 867, "maincpu2:mpla", ROMREGION_ERASE00 )
+	ROM_REGION( 867, "maincpu2:mpla", 0 )
+	ROM_LOAD( "tms1100_default_mpla.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) ) // verified for: pinball, blockbuster, bowling
+
 	ROM_REGION( 365, "maincpu2:opla", ROMREGION_ERASE00 )
 ROM_END
 
