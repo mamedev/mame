@@ -136,8 +136,10 @@ private:
 		int sync_byte_counter;
 		int brdy;
 		int lbrdy;
+		bool lbrdy_changed;
 		int sync;
 		int syn;
+		bool syn_changed;
 		int gcr_err;
 
 		// write
@@ -204,8 +206,6 @@ private:
 	int m_via4_irq;
 	int m_via5_irq;
 	int m_via6_irq;
-	int m_syn;
-	int m_lbrdy;
 
 	attotime m_period;
 

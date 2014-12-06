@@ -364,7 +364,7 @@ static INPUT_PORTS_START( vsnes_dual )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )            /* bit 1 of dsw goes here */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )            /* this bit masks irqs - dont change */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )            /* this bit masks irqs - don't change */
 
 	/* Right Side Controls */
 	PORT_START("IN2")
@@ -395,7 +395,7 @@ static INPUT_PORTS_START( vsnes_dual )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )            /* bit 1 of dsw goes here */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )            /* this bit masks irqs - dont change */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )            /* this bit masks irqs - don't change */
 
 	/* Both sides also have a DSW (#0 & #1) which are defined per game, below */
 INPUT_PORTS_END

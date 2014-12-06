@@ -655,9 +655,9 @@ static MACHINE_CONFIG_START( microvision, microvision_state )
 	MCFG_CPU_IO_MAP( microvision_8021_io )
 	MCFG_CPU_ADD("maincpu2", TMS1100, 500000)   // most games seem to be running at approximately this speed
 	MCFG_TMS1XXX_OUTPUT_PLA( microvision_output_pla_0 )
-	MCFG_TMS1XXX_READ_K( READ8( microvision_state, tms1100_read_k ) )
-	MCFG_TMS1XXX_WRITE_O( WRITE16( microvision_state, tms1100_write_o ) )
-	MCFG_TMS1XXX_WRITE_R( WRITE16( microvision_state, tms1100_write_r ) )
+	MCFG_TMS1XXX_READ_K_CB( READ8( microvision_state, tms1100_read_k ) )
+	MCFG_TMS1XXX_WRITE_O_CB( WRITE16( microvision_state, tms1100_write_o ) )
+	MCFG_TMS1XXX_WRITE_R_CB( WRITE16( microvision_state, tms1100_write_r ) )
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -695,6 +695,8 @@ MACHINE_CONFIG_END
 ROM_START( microvsn )
 	ROM_REGION( 0x800, "maincpu1", ROMREGION_ERASE00 )
 	ROM_REGION( 0x800, "maincpu2", ROMREGION_ERASE00 )
+	ROM_REGION( 867, "maincpu2:mpla", ROMREGION_ERASE00 )
+	ROM_REGION( 365, "maincpu2:opla", ROMREGION_ERASE00 )
 ROM_END
 
 

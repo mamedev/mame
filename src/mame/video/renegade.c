@@ -8,17 +8,16 @@
 #include "includes/renegade.h"
 
 
-WRITE8_MEMBER(renegade_state::renegade_videoram_w)
+WRITE8_MEMBER(renegade_state::bg_videoram_w)
 {
-	UINT8 *videoram = m_videoram;
-	videoram[offset] = data;
+	m_bg_videoram[offset] = data;
 	offset = offset % (64 * 16);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(renegade_state::renegade_videoram2_w)
+WRITE8_MEMBER(renegade_state::fg_videoram_w)
 {
-	m_videoram2[offset] = data;
+	m_fg_videoram[offset] = data;
 	offset = offset % (32 * 32);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
@@ -28,20 +27,19 @@ WRITE8_MEMBER(renegade_state::renegade_flipscreen_w)
 	flip_screen_set(~data & 0x01);
 }
 
-WRITE8_MEMBER(renegade_state::renegade_scroll0_w)
+WRITE8_MEMBER(renegade_state::scroll_lsb_w)
 {
 	m_scrollx = (m_scrollx & 0xff00) | data;
 }
 
-WRITE8_MEMBER(renegade_state::renegade_scroll1_w)
+WRITE8_MEMBER(renegade_state::scroll_msb_w)
 {
 	m_scrollx = (m_scrollx & 0xff) | (data << 8);
 }
 
 TILE_GET_INFO_MEMBER(renegade_state::get_bg_tilemap_info)
 {
-	UINT8 *videoram = m_videoram;
-	const UINT8 *source = &videoram[tile_index];
+	const UINT8 *source = &m_bg_videoram[tile_index];
 	UINT8 attributes = source[0x400]; /* CCC??BBB */
 	SET_TILE_INFO_MEMBER(1 + (attributes & 0x7),
 		source[0],
@@ -51,7 +49,7 @@ TILE_GET_INFO_MEMBER(renegade_state::get_bg_tilemap_info)
 
 TILE_GET_INFO_MEMBER(renegade_state::get_fg_tilemap_info)
 {
-	const UINT8 *source = &m_videoram2[tile_index];
+	const UINT8 *source = &m_fg_videoram[tile_index];
 	UINT8 attributes = source[0x400];
 	SET_TILE_INFO_MEMBER(0,
 		(attributes & 3) * 256 + source[0],

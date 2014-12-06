@@ -4,6 +4,51 @@
 
     10-11-14 - Skeleton driver
 
+	Interrupts based on patents:
+	level 1 - SIO
+	level 3 - timer (from PIT, presumably channel 0? Patent says "channel 3")
+	level 4 - "interrupt detector" - keyboard, printer, RTC
+	level 7 - floppy/hard disk
+	
+    To get to "menu mode", press Space quickly after reset (might need good timing)
+    The bootstrap ROM version number is displayed, along with "B,D,L,M,P,T:"
+    You can press one of these keys for the following tests:
+    B: Bootstrap
+       Loads the system image file (from disk or master workstation)
+    D: Dump
+       RAM contents are dumped to a local disk drive or master workstation
+    L: Load
+       Loads the system image file, then enters the Panel Debugger.  Exiting the Panel
+       Debugger will continue execution of the system image
+    M: Memory Test
+       Continuously performs the Memory Test until the system is reset.
+    P: Panel Debugger
+       Enters the Panel Debugger
+    T: Type of Operating System
+       Gives an "OS:" prompt, at which you can enter the number of the system image to
+       load at the master workstation.
+       
+    Panel Debugger:
+    - Open/Modify RAM
+    Enter an address (seg:off) followed by a forward-slash, the contents of this word will
+    appear, you can enter a value to set it to, or just press Next (default: Enter) to leave
+    it as is.  It will then go on to the next word.  Pressing Return (scan code unknown 
+    currently) will return to the debugger prompt.
+    - Open/Modify Register
+    Enter the register only, and the contents will appear, you can leave it or alter it (you
+    must enter all digits (eg: 0A03 if you're modifying DX) then press Return.
+    - I/O to or from a port
+    Input: Address (segment is ignored, and not required) followed by I, a byte is read from 
+    the port defined by the offset, and the byte is displayed.
+    Output: Address followed by O, you are now prompted with an '='.  Enter the byte to send
+    to the port, and press Return.
+    - Set Haltpoint:
+    Enter an address (seg:off) followed by H.  Sets a haltpoint at the specified address.  Does
+    not work for ROM addresses.  Only one allowed at a time.  Haltpoint info is stored at
+    0000:01F0.  Uses a software interrupt (INT 7C), rather than INT 3.
+    
+    To start or continue from the current address, enter P.
+    To start from a specific address, enter the address (seg:off) followed by a G.
 */
 
 #include "emu.h"
@@ -16,6 +61,8 @@
 #include "machine/pit8253.h"
 #include "machine/z80dart.h"
 #include "bus/rs232/rs232.h"
+#include "machine/ngen_kb.h"
+#include "machine/clock.h"
 
 class ngen_state : public driver_device
 {
@@ -36,21 +83,35 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pit_out0_w);
 	DECLARE_WRITE_LINE_MEMBER(pit_out1_w);
 	DECLARE_WRITE_LINE_MEMBER(pit_out2_w);
+	DECLARE_WRITE_LINE_MEMBER(cpu_timer_w);
+	DECLARE_WRITE_LINE_MEMBER(timer_clk_out);
 	DECLARE_WRITE16_MEMBER(cpu_peripheral_cb);
 	DECLARE_WRITE16_MEMBER(peripheral_w);
 	DECLARE_READ16_MEMBER(peripheral_r);
 	DECLARE_WRITE16_MEMBER(port00_w);
 	DECLARE_READ16_MEMBER(port00_r);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
+	DECLARE_WRITE_LINE_MEMBER(dma_eop_changed);
 	DECLARE_WRITE_LINE_MEMBER(dack0_w);
 	DECLARE_WRITE_LINE_MEMBER(dack1_w);
 	DECLARE_WRITE_LINE_MEMBER(dack2_w);
 	DECLARE_WRITE_LINE_MEMBER(dack3_w);
-	DECLARE_READ8_MEMBER(dma_read_byte);
-	DECLARE_WRITE8_MEMBER(dma_write_byte);
+	DECLARE_READ8_MEMBER(dma_read_word);
+	DECLARE_WRITE8_MEMBER(dma_write_word);
 	MC6845_UPDATE_ROW(crtc_update_row);
+	// TODO: sort out what devices use which channels
+	DECLARE_READ8_MEMBER( dma_0_dack_r ) { UINT16 ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
+	DECLARE_READ8_MEMBER( dma_1_dack_r ) { UINT16 ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
+	DECLARE_READ8_MEMBER( dma_2_dack_r ) { UINT16 ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
+	DECLARE_READ8_MEMBER( dma_3_dack_r ) { UINT16 ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
+	DECLARE_WRITE8_MEMBER( dma_0_dack_w ){ popmessage("IOW: data %02x",data); }
+	DECLARE_WRITE8_MEMBER( dma_1_dack_w ){  }
+	DECLARE_WRITE8_MEMBER( dma_2_dack_w ){  }
+	DECLARE_WRITE8_MEMBER( dma_3_dack_w ){  }
 
 protected:
+	virtual void machine_reset();
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
@@ -71,25 +132,39 @@ private:
 	UINT16 m_periph141;
 	UINT8 m_dma_offset[4];
 	INT8 m_dma_channel;
+	UINT16 m_dma_high_byte;
+	UINT16 m_control;
 };
 
 WRITE_LINE_MEMBER(ngen_state::pit_out0_w)
 {
-	//m_pic->ir0_w(state);
-	logerror("80186 Timer 1 state %i\n",state);
+	m_pic->ir3_w(state);  // Timer interrupt
+	popmessage("PIT Timer 0 state %i\n",state);
 }
 
 WRITE_LINE_MEMBER(ngen_state::pit_out1_w)
 {
-	logerror("PIT Timer 1 state %i\n",state);
+	popmessage("PIT Timer 1 state %i\n",state);
+	m_iouart->rxcb_w(state);
+	m_iouart->txcb_w(state);  // channels in the correct order?
 }
 
 WRITE_LINE_MEMBER(ngen_state::pit_out2_w)
 {
 	m_iouart->rxca_w(state);
-	m_iouart->rxcb_w(state);
 	m_iouart->txca_w(state);
-	m_iouart->txcb_w(state);
+	//logerror("PIT Timer 2 state %i\n",state);
+}
+
+WRITE_LINE_MEMBER(ngen_state::cpu_timer_w)
+{
+	logerror("80186 Timer 1 state %i\n",state);
+}
+
+WRITE_LINE_MEMBER(ngen_state::timer_clk_out)
+{
+	m_viduart->write_rxc(state);  // Keyboard UART Rx/Tx clocks
+	m_viduart->write_txc(state);
 }
 
 WRITE16_MEMBER(ngen_state::cpu_peripheral_cb)
@@ -184,10 +259,12 @@ WRITE16_MEMBER(ngen_state::peripheral_w)
 			m_crtc->register_w(space,0,data & 0xff);
 		break;
 	case 0x146:
-		logerror("Video write offset 0x146 data %04x mask %04x\n",data,mem_mask);
+		if(mem_mask & 0x00ff)
+			m_viduart->data_w(space,0,data & 0xff);
 		break;
 	case 0x147:
-		//logerror("Video write offset 0x147 data %04x mask %04x\n",data,mem_mask);
+		if(mem_mask & 0x00ff)
+			m_viduart->control_w(space,0,data & 0xff);
 		break;
 	case 0x1a0:  // serial?
 		logerror("(PC=%06x) Serial(?) 0x1a0 write offset %04x data %04x mask %04x\n",m_maincpu->device_t::safe_pc(),offset,data,mem_mask);
@@ -257,15 +334,16 @@ READ16_MEMBER(ngen_state::peripheral_r)
 			ret = m_crtc->register_r(space,0);
 		break;
 	case 0x146:
+		if(mem_mask & 0x00ff)
+			ret = m_viduart->data_r(space,0);
 		break;
-	case 0x147:  // definitely video related, maybe UART sending data to the monitor?
-		// expects bit 0 to be set (Video ready signal?)
-		ret = 0;
-		ret |= 1;
+	case 0x147:  // keyboard UART
+		// expects bit 0 to be set (UART transmit ready)
+		if(mem_mask & 0x00ff)
+			ret = m_viduart->status_r(space,0);
 		break;
-	case 0x1a0:  // status?
-		ret = 0;
-		ret |= 0x02;  // end of DMA transfer?
+	case 0x1a0:  // I/O control register?
+		ret = m_control;  // end of DMA transfer? (maybe a per-channel EOP?) Bit 6 is set during a transfer?
 		break;
 	case 0x1b1:
 		ret = 0;
@@ -299,6 +377,17 @@ WRITE_LINE_MEMBER( ngen_state::dma_hrq_changed )
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
+WRITE_LINE_MEMBER( ngen_state::dma_eop_changed )
+{
+	if(m_dma_channel == 0)
+	{
+		if(state)
+			m_control |= 0x02;
+		else
+			m_control &= ~0x02;
+	}
+}
+
 void ngen_state::set_dma_channel(int channel, int state)
 {
 	if(!state)
@@ -312,29 +401,30 @@ WRITE_LINE_MEMBER( ngen_state::dack1_w ) { set_dma_channel(1, state); }
 WRITE_LINE_MEMBER( ngen_state::dack2_w ) { set_dma_channel(2, state); }
 WRITE_LINE_MEMBER( ngen_state::dack3_w ) { set_dma_channel(3, state); }
 
-READ8_MEMBER(ngen_state::dma_read_byte)
+READ8_MEMBER(ngen_state::dma_read_word)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
-	UINT8 result;
+	UINT16 result;
 	if(m_dma_channel == -1)
 		return 0xff;
-	offs_t page_offset = (((offs_t) m_dma_offset[m_dma_channel]) << 16) & 0xFF0000;
+	offs_t page_offset = (((offs_t) m_dma_offset[m_dma_channel]) << 16) & 0xFE0000;
 
-	result = prog_space.read_byte(page_offset + offset);
-	popmessage("DMA byte address %06x read %02x\n",page_offset+offset,result);
-	return result;
+	result = prog_space.read_word(page_offset + (offset << 1));
+	m_dma_high_byte = result & 0xFF00;
+	popmessage("DMA byte address %06x read %04x\n",page_offset+(offset<<1),result);
+	return result & 0xff;
 }
 
 
-WRITE8_MEMBER(ngen_state::dma_write_byte)
+WRITE8_MEMBER(ngen_state::dma_write_word)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_dma_channel == -1)
 		return;
-	offs_t page_offset = (((offs_t) m_dma_offset[m_dma_channel]) << 16) & 0xFF0000;
+	offs_t page_offset = (((offs_t) m_dma_offset[m_dma_channel]) << 16) & 0xFE0000;
 
-	prog_space.write_byte(page_offset + offset, data);
-	popmessage("DMA byte address %06x write %02x\n",page_offset+offset,data);
+	prog_space.write_word(page_offset + (offset << 1), data);
+	popmessage("DMA byte address %06x write %04x\n",page_offset+(offset<<1), m_dma_high_byte | data);
 }
 
 
@@ -353,6 +443,13 @@ MC6845_UPDATE_ROW( ngen_state::crtc_update_row )
 				bitmap.pix32(y,x+z) = rgb_t(0,0,0);
 		}
 	}
+}
+
+void ngen_state::machine_reset()
+{
+	m_control = 0;
+	m_viduart->write_dsr(0);
+	m_viduart->write_cts(0);
 }
 
 static ADDRESS_MAP_START( ngen_mem, AS_PROGRAM, 16, ngen_state )
@@ -385,32 +482,45 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( ngen )
 INPUT_PORTS_END
 
+static SLOT_INTERFACE_START(keyboard)
+	SLOT_INTERFACE("ngen", NGEN_KEYBOARD)
+SLOT_INTERFACE_END
+
 static MACHINE_CONFIG_START( ngen, ngen_state )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(ngen_mem)
 	MCFG_CPU_IO_MAP(ngen_io)
 	MCFG_80186_CHIP_SELECT_CB(WRITE16(ngen_state, cpu_peripheral_cb))
-	MCFG_80186_TMROUT1_HANDLER(WRITELINE(ngen_state, pit_out0_w))
+	MCFG_80186_TMROUT1_HANDLER(WRITELINE(ngen_state, cpu_timer_w))
 
 	MCFG_PIC8259_ADD( "pic", INPUTLINE("maincpu", 0), VCC, NULL )
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
-	MCFG_PIT8253_CLK0(XTAL_14_7456MHz/8)  // correct?
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(ngen_state, pit_out0_w))
-	MCFG_PIT8253_CLK1(XTAL_14_7456MHz/8)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(ngen_state, pit_out1_w))
-	MCFG_PIT8253_CLK2(XTAL_14_7456MHz/8)
+	MCFG_PIT8253_CLK0(78120/4)  // 19.53kHz, /4 of the CPU timer output?
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(ngen_state, pit_out0_w))  // RS232 channel B baud rate
+	MCFG_PIT8253_CLK1(XTAL_14_7456MHz/12)  // correct? - based on patent
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(ngen_state, pit_out1_w))  // RS232 channel A baud rate
+	MCFG_PIT8253_CLK2(XTAL_14_7456MHz/12)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(ngen_state, pit_out2_w))
 
 	MCFG_DEVICE_ADD("dmac", AM9517A, XTAL_14_7456MHz / 3)  // NEC D8237A, divisor unknown
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(ngen_state, dma_hrq_changed))
-	MCFG_I8237_IN_MEMR_CB(READ8(ngen_state, dma_read_byte))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(ngen_state, dma_write_byte))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(ngen_state, dma_eop_changed))
+	MCFG_I8237_IN_MEMR_CB(READ8(ngen_state, dma_read_word))  // DMA is always 16-bit
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(ngen_state, dma_write_word))
 	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(ngen_state, dack0_w))
 	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(ngen_state, dack1_w))
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(ngen_state, dack2_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(ngen_state, dack3_w))
+	MCFG_I8237_IN_IOR_0_CB(READ8(ngen_state, dma_0_dack_r))
+	MCFG_I8237_IN_IOR_1_CB(READ8(ngen_state, dma_1_dack_r))
+	MCFG_I8237_IN_IOR_2_CB(READ8(ngen_state, dma_2_dack_r))
+	MCFG_I8237_IN_IOR_3_CB(READ8(ngen_state, dma_3_dack_r))
+	MCFG_I8237_OUT_IOW_0_CB(WRITE8(ngen_state, dma_0_dack_w))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(ngen_state, dma_1_dack_w))
+	MCFG_I8237_OUT_IOW_2_CB(WRITE8(ngen_state, dma_2_dack_w))
+	MCFG_I8237_OUT_IOW_3_CB(WRITE8(ngen_state, dma_3_dack_w))
 
 	// I/O board
 	MCFG_UPD7201_ADD("iouart",0,0,0,0,0) // clocked by PIT channel 2?
@@ -447,7 +557,15 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	MCFG_MC6845_UPDATE_ROW_CB(ngen_state, crtc_update_row)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_DEVICE_ADD("videouart", I8251, 19980000 / 9)  // divisor unknown
+	// keyboard UART (patent says i8251 is used for keyboard communications, it is located on the video board)
+	MCFG_DEVICE_ADD("videouart", I8251, 0)  // main clock unknown, Rx/Tx clocks are 19.53kHz
+	MCFG_I8251_TXEMPTY_HANDLER(DEVWRITELINE("pic",pic8259_device,ir4_w))
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("keyboard", rs232_port_device, write_txd))
+	MCFG_RS232_PORT_ADD("keyboard", keyboard, "ngen")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("videouart", i8251_device, write_rxd))
+	
+	MCFG_DEVICE_ADD("refresh_clock", CLOCK, 19200*16)  // should be 19530Hz
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(ngen_state,timer_clk_out))
 
 MACHINE_CONFIG_END
 
@@ -464,7 +582,7 @@ MACHINE_CONFIG_END
 
 ROM_START( ngen )
 	ROM_REGION( 0x2000, "bios", 0)
-	ROM_LOAD16_BYTE( "72-00414_80186_cpu.bin",  0x000000, 0x001000, CRC(e1387a03) SHA1(ddca4eba67fbf8b731a8009c14f6b40edcbc3279) )
+	ROM_LOAD16_BYTE( "72-00414_80186_cpu.bin",  0x000000, 0x001000, CRC(e1387a03) SHA1(ddca4eba67fbf8b731a8009c14f6b40edcbc3279) )  // bootstrap ROM v8.4
 	ROM_LOAD16_BYTE( "72-00415_80186_cpu.bin",  0x000001, 0x001000, CRC(a6dde7d9) SHA1(b4d15c1bce31460ab5b92ff43a68c15ac5485816) )
 ROM_END
 

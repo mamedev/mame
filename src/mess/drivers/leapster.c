@@ -207,6 +207,7 @@ PCB - LEAPSTER-TV:
 #include "emu.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "cpu/arcompact/arcompact.h"
 
 
 class leapster_state : public driver_device
@@ -247,7 +248,7 @@ DEVICE_IMAGE_LOAD_MEMBER( leapster_state, leapster_cart )
 {
 	UINT32 size = m_cart->common_get_size("rom");
 
-	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->rom_alloc(size, GENERIC_ROM32_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
 	return IMAGE_INIT_PASS;
@@ -257,17 +258,25 @@ void leapster_state::machine_start()
 {
 	astring region_tag;
 	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	membank("cartrom")->set_base(m_cart_rom->base());
 }
 
 void leapster_state::machine_reset()
 {
 }
 
+static ADDRESS_MAP_START( leapster_map, AS_PROGRAM, 32, leapster_state )
+	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_MIRROR(0x40000000) // pointers in the bios region seem to be to the 40xxxxxx region, either we mirror there or something (real bios?) is acutally missing
+	AM_RANGE(0x80000000, 0x807fffff) AM_ROMBANK("cartrom") // game ROM pointers are all to the 80xxxxxx region, so I assume it maps here
 
+ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( leapster, leapster_state )
 	/* basic machine hardware */
-	// CPU is ArcTangent A5
+	// CPU is ArcTangent-A5 '5.1' (ARCompact core)
+	MCFG_CPU_ADD("maincpu", ARCA5, 96000000/10)
+	MCFG_CPU_PROGRAM_MAP(leapster_map)
+
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

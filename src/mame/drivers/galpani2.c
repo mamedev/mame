@@ -71,7 +71,9 @@ Notes:
 	  PISCES - NEC uPD78324 series MCU with 32k internal rom. Clock 13.500MHz [27/2] on pins 51 & 52
 	   VSync - 59.1856Hz
 	   HSync - 15.625kHz
-
+	   
+	   (TODO: VTOTAL = 264, HTOTAL = 432, pixel clock 27 MHz / 4)
+	   
 ***************************************************************************/
 
 #include "emu.h"
@@ -120,6 +122,13 @@ WRITE16_MEMBER(galpani2_state::galpani2_eeprom_w)
 
 ***************************************************************************/
 
+void galpani2_state::machine_start()
+{
+	UINT8 *ROM = memregion("subdata")->base();
+	membank("subdatabank")->configure_entries(0, 0x2000000/0x0800000, ROM, 0x0800000);
+	membank("subdatabank")->set_entry(0);
+
+}
 
 void galpani2_state::machine_reset()
 {
@@ -337,21 +346,23 @@ static ADDRESS_MAP_START( galpani2_mem1, AS_PROGRAM, 16, galpani2_state )
 	AM_RANGE(0x300000, 0x301fff) AM_RAM                                             // ?
 	AM_RANGE(0x302000, 0x303fff) AM_RAM AM_SHARE("spriteram")   // Sprites
 	AM_RANGE(0x304000, 0x30401f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)
-	AM_RANGE(0x308000, 0x308001) AM_WRITENOP                                        // ? 0 at startup
-	AM_RANGE(0x30c000, 0x30c001) AM_WRITENOP                                        // ? hblank effect ?
-	AM_RANGE(0x310000, 0x3101ff) AM_RAM_WRITE(galpani2_palette_0_w) AM_SHARE("palette.0")    // ?
+//	AM_RANGE(0x308000, 0x308001) AM_WRITENOP                                        // ? 0 at startup
+//	AM_RANGE(0x30c000, 0x30c001) AM_WRITENOP                                        // ? hblank effect ?
+	AM_RANGE(0x310000, 0x3101ff) AM_RAM_DEVWRITE("bg8palette", palette_device, write) AM_SHARE("bg8palette")    // ?
 	AM_RANGE(0x314000, 0x314001) AM_WRITENOP                                        // ? flip backgrounds ?
 	AM_RANGE(0x318000, 0x318001) AM_READWRITE(galpani2_eeprom_r, galpani2_eeprom_w) // EEPROM
 	AM_RANGE(0x380000, 0x387fff) AM_RAM                                             // Palette?
 	AM_RANGE(0x388000, 0x38ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")   // Palette
-	AM_RANGE(0x390000, 0x3901ff) AM_WRITENOP                                        // ? at startup of service mode
+//	AM_RANGE(0x390000, 0x3901ff) AM_WRITENOP                                        // ? at startup of service mode
 
-	AM_RANGE(0x400000, 0x43ffff) AM_RAM_WRITE(galpani2_bg8_0_w) AM_SHARE("bg8.0")    // Background 0
+	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_SHARE("bg8.0")    // Background 0
 	AM_RANGE(0x440000, 0x440001) AM_RAM AM_SHARE("bg8_scrollx.0")           // Background 0 Scroll X
 	AM_RANGE(0x480000, 0x480001) AM_RAM AM_SHARE("bg8_scrolly.0")           // Background 0 Scroll Y
-	AM_RANGE(0x4c0000, 0x4c0001) AM_WRITENOP                                        // ? 0 at startup only
-	AM_RANGE(0x500000, 0x53ffff) AM_RAM_WRITE(galpani2_bg8_1_w) AM_SHARE("bg8.1")    // Background 1
+//	AM_RANGE(0x4c0000, 0x4c0001) AM_WRITENOP                                        // ? 0 at startup only
+	AM_RANGE(0x500000, 0x53ffff) AM_RAM AM_SHARE("bg8.1")    // Background 1
 	AM_RANGE(0x540000, 0x540001) AM_RAM AM_SHARE("bg8_scrollx.1")           // Background 1 Scroll X
+	AM_RANGE(0x580000, 0x580001) AM_RAM AM_SHARE("bg8_scrolly.1")           // Background 1 Scroll Y
+//	AM_RANGE(0x5c0000, 0x5c0001) AM_WRITENOP                                        // ? 0 at startup only
 
 	AM_RANGE(0x540572, 0x540573) AM_READNOP                                         // ? galpani2 at F0A4
 	AM_RANGE(0x54057a, 0x54057b) AM_READNOP                                         // ? galpani2 at F148
@@ -363,9 +374,7 @@ static ADDRESS_MAP_START( galpani2_mem1, AS_PROGRAM, 16, galpani2_state )
 	AM_RANGE(0x5405c2, 0x5405c3) AM_READNOP                                         // ? galpani2 at F0A4 and F148
 	AM_RANGE(0x5405ca, 0x5405cb) AM_READNOP                                         // ? galpani2 at F148
 
-	AM_RANGE(0x580000, 0x580001) AM_RAM AM_SHARE("bg8_scrolly.1")           // Background 1 Scroll Y
-	AM_RANGE(0x5c0000, 0x5c0001) AM_WRITENOP                                        // ? 0 at startup only
-	AM_RANGE(0x600000, 0x600001) AM_WRITENOP                                        // Watchdog
+	AM_RANGE(0x600000, 0x600001) AM_NOP                                        // Watchdog
 	AM_RANGE(0x640000, 0x640001) AM_WRITE8(galpani2_mcu_init_w, 0x00ff          )   // ? 0 before resetting and at startup, Reset mcu ?
 	AM_RANGE(0x680000, 0x680001) AM_WRITE8(galpani2_mcu_nmi1_w, 0x00ff)             // ? 0 -> 1 -> 0 (lev 5) / 0 -> $10 -> 0
 	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITE8(galpani2_coin_lockout_w, 0xff00      )   // Coin + Card Lockout
@@ -389,31 +398,28 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 
-READ16_MEMBER(galpani2_state::galpani2_bankedrom_r)
+WRITE16_MEMBER(galpani2_state::subdatabank_select_w)
 {
-	UINT16 *ROM = (UINT16 *) memregion( "user1" )->base();
-	size_t    len = memregion( "user1" )->bytes() / 2;
+	data &= mem_mask;
 
-	offset += (0x800000/2) * (*m_rombank & 0x0003);
-
-	if ( offset < len ) return ROM[offset];
-	else                return 0xffff; //floating bus for absent ROMs
+	if (data & 0xfffc) printf("subdatabank_select_w %04x\n", data);
+	membank("subdatabank")->set_entry(data&3);
 }
+
 
 static ADDRESS_MAP_START( galpani2_mem2, AS_PROGRAM, 16, galpani2_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                             // ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM AM_SHARE("ram2")                                        // Work RAM
-	AM_RANGE(0x400000, 0x4fffff) AM_RAM_WRITE(galpani2_bg15_w) AM_SHARE("bg15")  // bg15
-	AM_RANGE(0x500000, 0x5fffff) AM_RAM                                                             // bg15
-	AM_RANGE(0x600000, 0x600001) AM_NOP // ? 0 at startup only
-	AM_RANGE(0x640000, 0x640001) AM_WRITENOP                                // ? 0 at startup only
-	AM_RANGE(0x680000, 0x680001) AM_WRITENOP                                // ? 0 at startup only
-	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITENOP                                // ? 0 at startup only
-	AM_RANGE(0x700000, 0x700001) AM_WRITENOP                                // Watchdog
+	AM_RANGE(0x400000, 0x5fffff) AM_RAM AM_SHARE("bg15")  // bg15
+//	AM_RANGE(0x600000, 0x600001) AM_NOP // ? 0 at startup only
+//	AM_RANGE(0x640000, 0x640001) AM_WRITENOP                                // ? 0 at startup only
+//	AM_RANGE(0x680000, 0x680001) AM_WRITENOP                                // ? 0 at startup only
+//	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITENOP                                // ? 0 at startup only
+	AM_RANGE(0x700000, 0x700001) AM_NOP                                 // Watchdog
 //  AM_RANGE(0x740000, 0x740001) AM_WRITENOP                                // ? Reset mcu
 	AM_RANGE(0x780000, 0x780001) AM_WRITE8(galpani2_mcu_nmi2_w, 0x00ff)             // ? 0 -> 1 -> 0 (lev 5)
-	AM_RANGE(0x7c0000, 0x7c0001) AM_WRITEONLY AM_SHARE("rombank")   // Rom Bank
-	AM_RANGE(0x800000, 0xffffff) AM_READ(galpani2_bankedrom_r       )       // Banked ROM
+	AM_RANGE(0x7c0000, 0x7c0001) AM_WRITE(subdatabank_select_w)   // Rom Bank
+	AM_RANGE(0x800000, 0xffffff) AM_ROMBANK("subdatabank")
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -514,7 +520,7 @@ static INPUT_PORTS_START( galpani2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-//  PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_LOW )
+ 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SERVICE2  ) // this button is used in gp2se as an alt way to bring up the service menu, booting with it held down breaks the game tho!
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_TILT     )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
@@ -626,12 +632,17 @@ static MACHINE_CONFIG_START( galpani2, galpani2_state )
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(galpani2_state, screen_update_galpani2)
-	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galpani2)
-	MCFG_PALETTE_ADD("palette", 0x4000 + 0x200 + 0x8000)    // sprites, bg8, bg15
+	MCFG_PALETTE_ADD("palette", 0x4000)    // sprites
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
-	MCFG_PALETTE_INIT_OWNER(galpani2_state, galpani2)
+
+	MCFG_PALETTE_ADD("bg8palette", 0x200/2) // bg8
+	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+
+	MCFG_PALETTE_ADD("bgpalette", 32768) /* 32768 static colors for the bg */
+	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	MCFG_PALETTE_INIT_OWNER(galpani2_state,galpani2)
 
 	MCFG_DEVICE_ADD_KC002_SPRITES
 	kaneko16_sprite_device::set_offsets(*device, 0x10000 - 0x16c0 + 0xc00, 0);
@@ -731,7 +742,7 @@ ROM_START( galpani2 )
 	ROM_LOAD16_BYTE( "g002a2.u64-1", 0x000000, 0x020000, CRC(c0b94eaf) SHA1(4f3a65b238b31ee8d256b7025253f01eaf6e55d5) )
 	ROM_LOAD16_BYTE( "g003a2.u63-1", 0x000001, 0x020000, CRC(0d30725d) SHA1(d4614f9ffb930c4ea36cb3fbacffe63060e92402) )
 
-	ROM_REGION16_BE( 0x2000000, "user1", 0 )    /* Backgrounds (CPU2) */
+	ROM_REGION16_BE( 0x2000000, "subdata", ROMREGION_ERASEFF )    /* Backgrounds (CPU2) */
 	ROM_LOAD( "gp2-300a.052", 0x0000000, 0x100000, CRC(09ebedba) SHA1(3c06614633f0da03facb5199deac492b8ce07257) )
 	ROM_LOAD( "gp2-300b.053", 0x0100000, 0x100000, CRC(d7d12920) SHA1(4b6e01cc0ac5192758f4b3d26f102905b2b5e8ac) )
 	ROM_LOAD( "gp2-301.035", 0x0200000, 0x200000, CRC(e71e749d) SHA1(420c4c085e89d9641a84e34fa870df2bc02165b6) )
@@ -777,7 +788,7 @@ ROM_START( galpani2e )
 	ROM_LOAD16_BYTE( "g002a1-u125-1.bin", 0x000000, 0x020000, CRC(100e76b3) SHA1(24a259ee427cd7a6e487520a712dc7ef632dc5d6) )
 	ROM_LOAD16_BYTE( "g003a1-u126-1.bin", 0x000001, 0x020000, CRC(0efe7835) SHA1(c7eecacdf101c0515da504cc77512f27b61b2ab7) )
 
-	ROM_REGION16_BE( 0x2000000, "user1", 0 )    /* Backgrounds (CPU2) */
+	ROM_REGION16_BE( 0x2000000, "subdata", ROMREGION_ERASEFF )    /* Backgrounds (CPU2) */
 	ROM_LOAD( "gp2-300a.052", 0x0000000, 0x100000, CRC(09ebedba) SHA1(3c06614633f0da03facb5199deac492b8ce07257) )
 	ROM_LOAD( "gp2-300b.053", 0x0100000, 0x100000, CRC(d7d12920) SHA1(4b6e01cc0ac5192758f4b3d26f102905b2b5e8ac) )
 	ROM_LOAD( "gp2-301.035", 0x0200000, 0x200000, CRC(e71e749d) SHA1(420c4c085e89d9641a84e34fa870df2bc02165b6) )
@@ -824,7 +835,7 @@ ROM_START( galpani2i )
 	ROM_LOAD16_BYTE( "g002a2.u64-1", 0x000000, 0x020000, CRC(c0b94eaf) SHA1(4f3a65b238b31ee8d256b7025253f01eaf6e55d5) )
 	ROM_LOAD16_BYTE( "g003a2.u63-1", 0x000001, 0x020000, CRC(0d30725d) SHA1(d4614f9ffb930c4ea36cb3fbacffe63060e92402) )
 
-	ROM_REGION16_BE( 0x2000000, "user1", 0 )    /* Backgrounds (CPU2) */
+	ROM_REGION16_BE( 0x2000000, "subdata", ROMREGION_ERASEFF )    /* Backgrounds (CPU2) */
 	ROM_LOAD( "gp2-300a.052", 0x0000000, 0x100000, CRC(09ebedba) SHA1(3c06614633f0da03facb5199deac492b8ce07257) )
 	ROM_LOAD( "gp2-300b.053", 0x0100000, 0x100000, CRC(d7d12920) SHA1(4b6e01cc0ac5192758f4b3d26f102905b2b5e8ac) )
 	ROM_LOAD( "gp2-301.035", 0x0200000, 0x200000, CRC(e71e749d) SHA1(420c4c085e89d9641a84e34fa870df2bc02165b6) )
@@ -873,7 +884,7 @@ ROM_START( galpani2gs ) // basically the same as the Italy set but with differen
 	ROM_LOAD16_BYTE( "g003g1.u65-2", 0x000000, 0x020000, CRC(c0b94eaf) SHA1(4f3a65b238b31ee8d256b7025253f01eaf6e55d5) )
 	ROM_LOAD16_BYTE( "g002g1.u64-2", 0x000001, 0x020000, CRC(0d30725d) SHA1(d4614f9ffb930c4ea36cb3fbacffe63060e92402) )
 
-	ROM_REGION16_BE( 0x2000000, "user1", 0 )    /* Backgrounds (CPU2) */
+	ROM_REGION16_BE( 0x2000000, "subdata", ROMREGION_ERASEFF )    /* Backgrounds (CPU2) */
 	ROM_LOAD( "gp2-300a.052", 0x0000000, 0x100000, CRC(09ebedba) SHA1(3c06614633f0da03facb5199deac492b8ce07257) )
 	ROM_LOAD( "gp2-300b.053", 0x0100000, 0x100000, CRC(d7d12920) SHA1(4b6e01cc0ac5192758f4b3d26f102905b2b5e8ac) )
 	ROM_LOAD( "gp2-301.035", 0x0200000, 0x200000, CRC(e71e749d) SHA1(420c4c085e89d9641a84e34fa870df2bc02165b6) )
@@ -921,7 +932,7 @@ ROM_START( galpani2g )
 	ROM_LOAD16_BYTE( "g002t1.125", 0x000000, 0x020000, CRC(a3034e1c) SHA1(493e4be36f2aea0083d5d37e16486ed66dab952e) )
 	ROM_LOAD16_BYTE( "g003t1.126", 0x000001, 0x020000, CRC(20d3a2ad) SHA1(93450e5a23456c242ebf1a3560013a17c6b05354) )
 
-	ROM_REGION16_BE( 0x2000000, "user1", 0 )    /* Backgrounds (CPU2) */
+	ROM_REGION16_BE( 0x2000000, "subdata", ROMREGION_ERASEFF )    /* Backgrounds (CPU2) */
 	ROM_LOAD16_BYTE( "g300a0.u44-00", 0x0000000, 0x080000, CRC(50406294) SHA1(fc1165b7b31a44ab204cd5ac3e7b2733ed6b1534) )
 	ROM_LOAD16_BYTE( "g300a1.u41-00", 0x0000001, 0x080000, CRC(d26b7c4f) SHA1(b491170010977ba1e5111893937cc6bab0539e7d) )
 	ROM_LOAD16_BYTE( "g300b0.u45-00", 0x0100000, 0x080000, CRC(9637934c) SHA1(d3b39d9f44825bdf24d4aa39ca32035bc5af4905) )
@@ -973,7 +984,7 @@ ROM_START( galpani2e2 )
 	ROM_LOAD16_BYTE( "g002i1.125", 0x000000, 0x020000, CRC(a3034e1c) SHA1(493e4be36f2aea0083d5d37e16486ed66dab952e) )
 	ROM_LOAD16_BYTE( "g003i1.126", 0x000001, 0x020000, CRC(20d3a2ad) SHA1(93450e5a23456c242ebf1a3560013a17c6b05354) )
 
-	ROM_REGION16_BE( 0x2000000, "user1", 0 )    /* Backgrounds (CPU2) */
+	ROM_REGION16_BE( 0x2000000, "subdata", ROMREGION_ERASEFF )    /* Backgrounds (CPU2) */
 	ROM_LOAD16_BYTE( "g300a0.u44-00", 0x0000000, 0x080000, CRC(50406294) SHA1(fc1165b7b31a44ab204cd5ac3e7b2733ed6b1534) )
 	ROM_LOAD16_BYTE( "g300a1.u41-00", 0x0000001, 0x080000, CRC(d26b7c4f) SHA1(b491170010977ba1e5111893937cc6bab0539e7d) )
 	ROM_LOAD16_BYTE( "g300b0.u45-00", 0x0100000, 0x080000, CRC(9637934c) SHA1(d3b39d9f44825bdf24d4aa39ca32035bc5af4905) )
@@ -1025,7 +1036,7 @@ ROM_START( galpani2t )
 	ROM_LOAD16_BYTE( "g002t1.125", 0x000000, 0x020000, CRC(a3034e1c) SHA1(493e4be36f2aea0083d5d37e16486ed66dab952e) )
 	ROM_LOAD16_BYTE( "g003t1.126", 0x000001, 0x020000, CRC(20d3a2ad) SHA1(93450e5a23456c242ebf1a3560013a17c6b05354) )
 
-	ROM_REGION16_BE( 0x2000000, "user1", 0 )    /* Backgrounds (CPU2) */
+	ROM_REGION16_BE( 0x2000000, "subdata", ROMREGION_ERASEFF )    /* Backgrounds (CPU2) */
 	ROM_LOAD( "gp2-300a.052", 0x0000000, 0x100000, CRC(09ebedba) SHA1(3c06614633f0da03facb5199deac492b8ce07257) )
 	ROM_LOAD( "gp2-300b.053", 0x0100000, 0x100000, CRC(d7d12920) SHA1(4b6e01cc0ac5192758f4b3d26f102905b2b5e8ac) )
 	ROM_LOAD( "gp2-301.035", 0x0200000, 0x200000, CRC(e71e749d) SHA1(420c4c085e89d9641a84e34fa870df2bc02165b6) )
@@ -1090,7 +1101,7 @@ ROM_START( galpani2j )
 	ROM_LOAD16_BYTE( "g002j1.64",  0x000000, 0x020000, CRC(5e523829) SHA1(dad11e4a3348c988ff658609cf78a3fbee58064e) )
 	ROM_LOAD16_BYTE( "g003j1.63",  0x000001, 0x020000, CRC(2a0d5f89) SHA1(0a7031c4b8b7bc757da25250dbb5fa1004205aeb) )
 
-	ROM_REGION16_BE( 0x2000000, "user1", 0 )    /* Backgrounds (CPU2) */
+	ROM_REGION16_BE( 0x2000000, "subdata", ROMREGION_ERASEFF )    /* Backgrounds (CPU2) */
 	ROM_LOAD( "gp2-300j.175", 0x000000, 0x200000, CRC(3a0afc1d) SHA1(91fba9074cc3c28e919053f0ea07b28d88b2ce5f) )
 	ROM_LOAD( "gp2-301j.176", 0x200000, 0x200000, CRC(5b6d1709) SHA1(a7d35247fe71895f2b6169409aa0bdaef446804c) )
 	ROM_LOAD16_BYTE( "gp2-302a.177", 0x400000, 0x100000, CRC(311fa273) SHA1(c2adeac45be701f6f474841755fac4347d44f844) )
@@ -1121,7 +1132,7 @@ ROM_START( gp2se )
 	ROM_LOAD16_BYTE( "g002j4.u64",  0x000000, 0x020000, CRC(bcd4edd9) SHA1(17ae6fbf75d8e5333133737de926a36f5cd29661) )
 	ROM_LOAD16_BYTE( "g003j4.u63",  0x000001, 0x020000, CRC(2fbe0194) SHA1(52da771ba813b27ec1a996b237c14dab9b33db82) )
 
-	ROM_REGION16_BE( 0x2000000, "user1", 0 )    /* Backgrounds (CPU2) */
+	ROM_REGION16_BE( 0x2000000, "subdata", ROMREGION_ERASEFF )    /* Backgrounds (CPU2) */
 	ROM_LOAD( "gp2-300-j-0071.u175", 0x000000, 0x200000, CRC(3a0afc1d) SHA1(91fba9074cc3c28e919053f0ea07b28d88b2ce5f) )
 	ROM_LOAD( "gp2-301-j-0072.u176", 0x200000, 0x200000, CRC(5b6d1709) SHA1(a7d35247fe71895f2b6169409aa0bdaef446804c) )
 	ROM_LOAD16_BYTE( "gp2-302a-0057.u177", 0x400000, 0x100000, CRC(311fa273) SHA1(c2adeac45be701f6f474841755fac4347d44f844) )
@@ -1158,7 +1169,7 @@ ROM_START( gp2quiz )
 	ROM_LOAD16_BYTE( "g002e3.u64-3",  0x000000, 0x020000, CRC(5e523829) SHA1(dad11e4a3348c988ff658609cf78a3fbee58064e) )
 	ROM_LOAD16_BYTE( "g003e3.u63-3",  0x000001, 0x020000, CRC(2a0d5f89) SHA1(0a7031c4b8b7bc757da25250dbb5fa1004205aeb) )
 
-	ROM_REGION16_BE( 0x2000000, "user1", 0 )    /* Backgrounds (CPU2) */
+	ROM_REGION16_BE( 0x2000000, "subdata", ROMREGION_ERASEFF )    /* Backgrounds (CPU2) */
 	ROM_LOAD( "gp2-300-j-0071.u175", 0x000000, 0x200000, CRC(3a0afc1d) SHA1(91fba9074cc3c28e919053f0ea07b28d88b2ce5f) )
 	ROM_LOAD( "gp2-301-j-0072.u176", 0x200000, 0x200000, CRC(5b6d1709) SHA1(a7d35247fe71895f2b6169409aa0bdaef446804c) )
 	ROM_LOAD16_BYTE( "gp2-302a-0057.u177", 0x400000, 0x100000, CRC(311fa273) SHA1(c2adeac45be701f6f474841755fac4347d44f844) )

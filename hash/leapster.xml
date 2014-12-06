@@ -117,7 +117,7 @@
 		<publisher>LeapFrog</publisher>
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="0x800000">
-				<rom name="500-11078-a - lernen mit leap (german)" size="0x800000" crc="e1f505e7" sha1="935eb17d3b6f9df2115a12445b3c8c977005481a" offset="0x00000" />
+				<rom name="500-11078-a - lernen mit leap (german).bin" size="0x800000" crc="e1f505e7" sha1="935eb17d3b6f9df2115a12445b3c8c977005481a" offset="0x00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -143,4 +143,116 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="dora" supported="no">
+		<description>Dora - Retter der Wildnis (German)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-12562-b - dora - retter der wildnis (german).bin" size="0x800000" crc="242907d4" sha1="262ee3e208fff0fc362bc879416cbdf31bf38304" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vorschul" supported="no">
+		<description>Vorschule (German)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-10934-a - vorschule (german).bin" size="0x800000" crc="4c5e775e" sha1="87819e1a95f0d435fc94697423fcfca13f463a34" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="weltmath" supported="no">
+		<description>Weltraum-Mathe - Lernen im Arcade-Stil! (German)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-12140-a - weltraum-mathe - lernen im arcade-stil! (german).bin" size="0x400000" crc="75164c8e" sha1="6bebaef0d3b6f8a1a4b2bb957a00a0cce4ed65a2" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="jedimath" supported="no">
+		<description>Star Wars - Jedi Math (US)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-13306-a - star wars - jedi math (us).bin" size="0x800000" crc="27000674" sha1="a7e8e63ab74931ad9546aba20755714df572badb" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carssc" supported="no">
+		<description>Cars - Supercharged (US)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-12712-a - cars - supercharged (us).bin" size="0x800000" crc="beca3909" sha1="8cda80251d6e45427dba6acbae5dff306eb84d34" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clifread" supported="no">
+		<description>Clifford - The big red dog - Reading (US)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-12466-a - clifford - the big red dog - reading (us).bin" size="0x800000" crc="0134af49" sha1="29c3e2e9d56aeee09c752776bfd8c096e02b75c5" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+  <software name="digdino" supported="no">
+		<description>Digging for Dinosaurs (US)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-13681-a - digging for dinosaurs (us).bin" size="0x800000" crc="822ca3da" sha1="ff0ac7f5fded346553e1a4697b45c27fc04ee3fe" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="getpuzld" supported="no">
+		<description>Get Puzzled! (US)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-12692-a - get puzzled! (us).bin" size="0x800000" crc="05b608f0" sha1="04b3181f39e88b6cd47e39a7efb50fa14618ff2c" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hugenose" supported="no">
+		<description>Reading with Phonics - Mole's Huge Nose (US)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-10829-a - reading with phonics - mole's huge nose (us).bin" size="0x800000" crc="2c6e623e" sha1="c298181f00109b7f863fdb12b5bd462085c4ff4f" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="imagfrnd" supported="no">
+		<description>Foster's Home for Imaginary Friends (US)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-12715-a - foster's home for imaginary friends (us).bin" size="0x800000" crc="e62d1684" sha1="e43820efe9dbd8dddf6312493a7967c75a29431a" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

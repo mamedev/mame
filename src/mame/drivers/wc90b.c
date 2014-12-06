@@ -62,7 +62,7 @@ and encoded in a different way from the original machine. Even if
 sometimes it seems colors are not entirely correct, this is only due
 to the crappy artwork of the person that did the bootleg.
 
-Dip switches are not complete and they dont seem to differ from
+Dip switches are not complete and they don't seem to differ from
 the original machine.
 
 Last but not least, the set of ROMs i have for Euro League seem to have

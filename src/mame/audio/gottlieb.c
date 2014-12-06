@@ -1030,7 +1030,7 @@ void gottlieb_sound_r2_device::device_timer(emu_timer &timer, device_timer_id id
 			m_nmi_state = 1;
 			nmi_state_update();
 
-			// set a timer to turn it off again on hte next SOUND_CLOCK/16
+			// set a timer to turn it off again on the next SOUND_CLOCK/16
 			timer_set(attotime::from_hz(SOUND2_CLOCK/16), TID_NMI_CLEAR);
 
 			// adjust the NMI timer for the next time

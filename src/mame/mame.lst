@@ -5102,7 +5102,20 @@ ecap            // 1999.12 Emergency Call Ambulance - US proto or location test
 
 // Sega Lindbergh games
 lindbios
-
+hotd4
+vf5
+abclimax
+letsgoju
+outr2sdx
+psmash3
+vtennis3
+initiad4
+initiad4c
+segartv
+hotdex
+rambo
+hummerxt
+lbvbiosu
 
 // Deniam games
 // they run on Sega System 16 video hardware
@@ -6931,6 +6944,7 @@ quantump        // 136016           (c) 1982        // made by Gencomp
 bwidow          // 136017           (c) 1982
 starwars        // 136021           (c) 1983
 starwars1       // 136021           (c) 1983
+starwarso       // 136021           (c) 1983
 tomcatsw        // (proto)          (c) 1983
 mhavoc          // 136025           (c) 1983
 mhavoc2         // 136025           (c) 1983
@@ -10339,6 +10353,7 @@ thedeep         // (c) 1987 Wood Place
 rundeep         // (c) 1988 Cream (bootleg?)
 wallc           // (c) 1984 Midcoin
 wallca          // (c) 1984 Midcoin
+brkblast		// bootleg (Fadesa)
 sidampkr        //
 wink            // (c) 1985 Midcoin
 winka           // (c) 1985 Midcoin

@@ -50,10 +50,10 @@ MACHINE_RESET_MEMBER(relief_state,relief)
 {
 	atarigen_state::machine_reset();
 
-	m_oki->set_bank_base(0);
+	m_adpcm_bank = 0;
+	m_okibank->set_entry(m_adpcm_bank);
 	m_ym2413_volume = 15;
 	m_overall_volume = 127;
-	m_adpcm_bank_base = 0;
 }
 
 
@@ -85,12 +85,12 @@ WRITE16_MEMBER(relief_state::audio_control_w)
 	{
 		m_ym2413_volume = (data >> 1) & 15;
 		set_ym2413_volume((m_ym2413_volume * m_overall_volume * 100) / (127 * 15));
-		m_adpcm_bank_base = (0x040000 * ((data >> 6) & 3)) | (m_adpcm_bank_base & 0x100000);
+		m_adpcm_bank = ((data >> 6) & 3) | (m_adpcm_bank & 4);
 	}
 	if (ACCESSING_BITS_8_15)
-		m_adpcm_bank_base = (0x100000 * ((data >> 8) & 1)) | (m_adpcm_bank_base & 0x0c0000);
+		m_adpcm_bank = (((data >> 8) & 1)<<2) | (m_adpcm_bank & 3);
 
-	m_oki->set_bank_base(m_adpcm_bank_base);
+	m_okibank->set_entry(m_adpcm_bank);
 }
 
 
@@ -104,6 +104,10 @@ WRITE16_MEMBER(relief_state::audio_volume_w)
 	}
 }
 
+static ADDRESS_MAP_START( oki_map, AS_0, 8, relief_state )
+	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("okibank")
+	AM_RANGE(0x20000, 0x3ffff) AM_ROM 
+ADDRESS_MAP_END
 
 
 /*************************************
@@ -295,6 +299,7 @@ static MACHINE_CONFIG_START( relief, relief_state )
 
 	MCFG_OKIM6295_ADD("oki", ATARI_CLOCK_14MHz/4/3, OKIM6295_PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, ATARI_CLOCK_14MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -324,9 +329,9 @@ ROM_START( relief )
 	ROM_LOAD( "136093-0028a.10d",       0x180000, 0x80000, CRC(55fb9111) SHA1(a95508f0831842fa79ca2fc168cfadc8c6d3fbd4) )
 	ROM_LOAD16_BYTE( "136093-0029a.4d", 0x200001, 0x40000, CRC(e4593ff4) SHA1(7360ec7a65aabc90aa787dc30f39992e342495dd) )
 
-	ROM_REGION( 0x200000, "oki", 0 )    /* 2MB for ADPCM data */
-	ROM_LOAD( "136093-0030a.9b",  0x100000, 0x80000, CRC(f4c567f5) SHA1(7e8c1d54d918b0b41625eacbaf6dcb5bd99d1949) )
-	ROM_LOAD( "136093-0031a.10b", 0x180000, 0x80000, CRC(ba908d73) SHA1(a83afd86f4c39394cf624b728a87b8d8b6de1944) )
+	ROM_REGION( 0x100000, "oki", 0 )    /* 2MB for ADPCM data */
+	ROM_LOAD( "136093-0030a.9b",  0x000000, 0x80000, CRC(f4c567f5) SHA1(7e8c1d54d918b0b41625eacbaf6dcb5bd99d1949) )
+	ROM_LOAD( "136093-0031a.10b", 0x080000, 0x80000, CRC(ba908d73) SHA1(a83afd86f4c39394cf624b728a87b8d8b6de1944) )
 
 	ROM_REGION( 0x800, "eeprom:eeprom", 0 )
 	ROM_LOAD( "relief-eeprom.bin", 0x0000, 0x800, CRC(66069f60) SHA1(fac3797888f7ffe972f642aca44c6ca7d208c814) )
@@ -359,9 +364,9 @@ ROM_START( relief2 )
 	ROM_LOAD( "136093-0028a.10d",      0x180000, 0x80000, CRC(55fb9111) SHA1(a95508f0831842fa79ca2fc168cfadc8c6d3fbd4) )
 	ROM_LOAD16_BYTE( "136093-0029.4d", 0x200001, 0x40000, CRC(e4593ff4) SHA1(7360ec7a65aabc90aa787dc30f39992e342495dd) )
 
-	ROM_REGION( 0x200000, "oki", 0 )    /* 2MB for ADPCM data */
-	ROM_LOAD( "136093-0030a.9b",  0x100000, 0x80000, CRC(f4c567f5) SHA1(7e8c1d54d918b0b41625eacbaf6dcb5bd99d1949) )
-	ROM_LOAD( "136093-0031a.10b", 0x180000, 0x80000, CRC(ba908d73) SHA1(a83afd86f4c39394cf624b728a87b8d8b6de1944) )
+	ROM_REGION( 0x100000, "oki", 0 )    /* 2MB for ADPCM data */
+	ROM_LOAD( "136093-0030a.9b",  0x000000, 0x80000, CRC(f4c567f5) SHA1(7e8c1d54d918b0b41625eacbaf6dcb5bd99d1949) )
+	ROM_LOAD( "136093-0031a.10b", 0x080000, 0x80000, CRC(ba908d73) SHA1(a83afd86f4c39394cf624b728a87b8d8b6de1944) )
 
 	ROM_REGION( 0x800, "eeprom:eeprom", 0 )
 	ROM_LOAD( "relief2-eeprom.bin", 0x0000, 0x800, CRC(2131fc40) SHA1(72a9f5f6647fbc74e645b6639db2fdbfbe6456e2) )
@@ -393,9 +398,9 @@ ROM_START( relief3 )
 	ROM_LOAD( "136093-0028a.10d",      0x180000, 0x80000, CRC(55fb9111) SHA1(a95508f0831842fa79ca2fc168cfadc8c6d3fbd4) )
 	ROM_LOAD16_BYTE( "136093-0029.4d", 0x200001, 0x40000, CRC(e4593ff4) SHA1(7360ec7a65aabc90aa787dc30f39992e342495dd) )
 
-	ROM_REGION( 0x200000, "oki", 0 )    /* 2MB for ADPCM data */
-	ROM_LOAD( "136093-0030a.9b",  0x100000, 0x80000, CRC(f4c567f5) SHA1(7e8c1d54d918b0b41625eacbaf6dcb5bd99d1949) )
-	ROM_LOAD( "136093-0031a.10b", 0x180000, 0x80000, CRC(ba908d73) SHA1(a83afd86f4c39394cf624b728a87b8d8b6de1944) )
+	ROM_REGION( 0x100000, "oki", 0 )    /* 2MB for ADPCM data */
+	ROM_LOAD( "136093-0030a.9b",  0x000000, 0x80000, CRC(f4c567f5) SHA1(7e8c1d54d918b0b41625eacbaf6dcb5bd99d1949) )
+	ROM_LOAD( "136093-0031a.10b", 0x080000, 0x80000, CRC(ba908d73) SHA1(a83afd86f4c39394cf624b728a87b8d8b6de1944) )
 
 	ROM_REGION( 0x800, "eeprom:eeprom", 0 )
 	ROM_LOAD( "relief3-eeprom.bin", 0x0000, 0x800, CRC(2131fc40) SHA1(72a9f5f6647fbc74e645b6639db2fdbfbe6456e2) )
@@ -421,29 +426,12 @@ ROM_END
 
 DRIVER_INIT_MEMBER(relief_state,relief)
 {
-	UINT8 *sound_base = memregion("oki")->base();
-
-	/* expand the ADPCM data to avoid lots of memcpy's during gameplay */
-	/* the upper 128k is fixed, the lower 128k is bankswitched */
-	memcpy(&sound_base[0x000000], &sound_base[0x100000], 0x20000);
-	memcpy(&sound_base[0x040000], &sound_base[0x100000], 0x20000);
-	memcpy(&sound_base[0x080000], &sound_base[0x140000], 0x20000);
-	memcpy(&sound_base[0x0c0000], &sound_base[0x160000], 0x20000);
-	memcpy(&sound_base[0x100000], &sound_base[0x180000], 0x20000);
-	memcpy(&sound_base[0x140000], &sound_base[0x1a0000], 0x20000);
-	memcpy(&sound_base[0x180000], &sound_base[0x1c0000], 0x20000);
-	memcpy(&sound_base[0x1c0000], &sound_base[0x1e0000], 0x20000);
-
-	memcpy(&sound_base[0x020000], &sound_base[0x120000], 0x20000);
-	memcpy(&sound_base[0x060000], &sound_base[0x120000], 0x20000);
-	memcpy(&sound_base[0x0a0000], &sound_base[0x120000], 0x20000);
-	memcpy(&sound_base[0x0e0000], &sound_base[0x120000], 0x20000);
-	memcpy(&sound_base[0x160000], &sound_base[0x120000], 0x20000);
-	memcpy(&sound_base[0x1a0000], &sound_base[0x120000], 0x20000);
-	memcpy(&sound_base[0x1e0000], &sound_base[0x120000], 0x20000);
+	m_okibank->configure_entries(0, 8, memregion("oki")->base(), 0x20000);
+	m_okibank->set_entry(0);
 }
 
 
+		
 
 /*************************************
  *

@@ -132,6 +132,8 @@ CPUS += IE15
 CPUS += 8X300
 CPUS += ALTO2
 #CPUS += W65816
+CPUS += ARC
+CPUS += ARCOMPACT
 
 #-------------------------------------------------
 # specify available sound cores; some of these are
@@ -730,6 +732,7 @@ DRVLIBS += \
 	$(MESSOBJ)/intv.a \
 	$(MESSOBJ)/isc.a \
 	$(MESSOBJ)/kaypro.a \
+	$(MESSOBJ)/kenner.a \
 	$(MESSOBJ)/koei.a \
 	$(MESSOBJ)/kyocera.a \
 	$(MESSOBJ)/luxor.a \
@@ -1329,6 +1332,9 @@ $(MESSOBJ)/isc.a:               \
 $(MESSOBJ)/kaypro.a:            \
 	$(MESS_DRIVERS)/kaypro.o $(MESS_MACHINE)/kaypro.o $(MESS_MACHINE)/kay_kbd.o $(MESS_VIDEO)/kaypro.o \
 
+$(MESSOBJ)/kenner.a:            \
+	$(MESS_DRIVERS)/starwbc.o   \
+
 $(MESSOBJ)/koei.a:              \
 	$(MESS_DRIVERS)/pasogo.o    \
 
@@ -1472,6 +1478,7 @@ $(MESSOBJ)/palm.a:              \
 	$(MESS_DRIVERS)/palmz22.o   \
 
 $(MESSOBJ)/parker.a:            \
+	$(MESS_DRIVERS)/cnsector.o  \
 	$(MESS_DRIVERS)/merlin.o    \
 	$(MESS_DRIVERS)/stopthie.o  \
 
@@ -1946,7 +1953,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/mx2178.o    \
 	$(MESS_DRIVERS)/mycom.o     \
 	$(MESS_DRIVERS)/myvision.o  \
-	$(MESS_DRIVERS)/ngen.o      \
+	$(MESS_DRIVERS)/ngen.o  $(MESS_MACHINE)/ngen_kb.o \
 	$(MESS_DRIVERS)/octopus.o   \
 	$(MESS_DRIVERS)/onyx.o      \
 	$(MESS_DRIVERS)/okean240.o  \
@@ -2074,6 +2081,8 @@ $(MAME_DRIVERS)/cdi.o:      $(MAME_LAYOUT)/cdi.lh
 $(MESS_DRIVERS)/chessmst.o: $(MESS_LAYOUT)/chessmst.lh
 $(MESS_DRIVERS)/chesstrv.o: $(MESS_LAYOUT)/chesstrv.lh \
 							$(MESS_LAYOUT)/borisdpl.lh
+$(MESS_DRIVERS)/cnsector.o: $(MESS_LAYOUT)/cnsector.lh
+$(MESS_DRIVERS)/comp4.o:    $(MESS_LAYOUT)/comp4.lh
 $(MESS_DRIVERS)/cp1.o:      $(MESS_LAYOUT)/cp1.lh
 $(MESS_DRIVERS)/cvicny.o:   $(MESS_LAYOUT)/cvicny.lh
 $(MESS_DRIVERS)/coco3.o:    $(MESS_LAYOUT)/coco3.lh
@@ -2143,6 +2152,7 @@ $(MESS_DRIVERS)/simon.o:    $(MESS_LAYOUT)/simon.lh
 $(MESS_DRIVERS)/sitcom.o:   $(MESS_LAYOUT)/sitcom.lh
 $(MESS_DRIVERS)/slc1.o:     $(MESS_LAYOUT)/slc1.lh
 $(MESS_DRIVERS)/sms.o:      $(MESS_LAYOUT)/sms1.lh
+$(MESS_DRIVERS)/starwbc.o:  $(MESS_LAYOUT)/starwbc.lh
 $(MESS_DRIVERS)/stopthie.o: $(MESS_LAYOUT)/stopthie.lh
 $(MESS_DRIVERS)/super80.o:  $(MESS_LAYOUT)/super80.lh
 $(MESS_DRIVERS)/supercon.o: $(MESS_LAYOUT)/supercon.lh
@@ -2154,6 +2164,10 @@ $(MESS_DRIVERS)/tec1.o:     $(MESS_LAYOUT)/tec1.lh
 $(MESS_DRIVERS)/tecnbras.o: $(MESS_LAYOUT)/tecnbras.lh
 $(MESS_DRIVERS)/ti74.o:     $(MESS_LAYOUT)/ti74.lh \
 							$(MESS_LAYOUT)/ti95.lh
+$(MESS_DRIVERS)/ticalc1x.o: $(MESS_LAYOUT)/ti1270.lh \
+							$(MESS_LAYOUT)/ti30.lh \
+							$(MESS_LAYOUT)/tisr16.lh \
+							$(MESS_LAYOUT)/wizatron.lh
 $(MESS_DRIVERS)/tk80.o:     $(MESS_LAYOUT)/tk80.lh
 $(MESS_DRIVERS)/tm990189.o: $(MESS_LAYOUT)/tm990189.lh \
 							$(MESS_LAYOUT)/tm990189v.lh

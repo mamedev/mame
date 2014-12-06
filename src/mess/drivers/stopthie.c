@@ -1,82 +1,247 @@
+// license:BSD-3-Clause
+// copyright-holders:hap
+/***************************************************************************
+
+  Parker Brothers Stop Thief
+  * MP0905BNL TMS0980NLL MP6101B (die labeled 0980B-01A)
+  
+  bla
+
+
+  TODO:
+  - ON/OFF button callbacks
+  - MCU clock is unknown
+
+***************************************************************************/
+
 #include "emu.h"
 #include "cpu/tms0980/tms0980.h"
+#include "sound/speaker.h"
 
-/* Layout */
 #include "stopthie.lh"
 
+// master clock is unknown, the value below is an approximation
+#define MASTER_CLOCK (350000)
 
-class stopthie_state : public driver_device
+
+class stopthief_state : public driver_device
 {
 public:
-	stopthie_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+	stopthief_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_button_matrix(*this, "IN"),
+		m_speaker(*this, "speaker")
+	{ }
 
-	DECLARE_READ8_MEMBER(stopthie_read_k);
-	DECLARE_WRITE16_MEMBER(stopthie_write_o);
-	DECLARE_WRITE16_MEMBER(stopthie_write_r);
 	required_device<cpu_device> m_maincpu;
+	required_ioport_array<3> m_button_matrix;
+	required_device<speaker_sound_device> m_speaker;
+
+	UINT16 m_r;
+	UINT16 m_o;
+
+	UINT16 m_leds_state[0x10];
+	UINT16 m_leds_cache[0x10];
+	UINT8 m_leds_decay[0x100];
+
+	DECLARE_READ8_MEMBER(read_k);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_WRITE16_MEMBER(write_r);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(leds_decay_tick);
+	void leds_update();
+
+	virtual void machine_start();
 };
 
 
 
-#define LOG 1
+/***************************************************************************
 
-static INPUT_PORTS_START( stopthie )
+  LEDs
+
+***************************************************************************/
+
+// The device strobes the outputs very fast, it is unnoticeable to the user.
+// To prevent flickering here, we need to simulate a decay.
+
+// decay time, in steps of 10ms
+#define LEDS_DECAY_TIME 4
+
+void stopthief_state::leds_update()
+{
+	UINT16 active_state[0x10];
+	
+	for (int i = 0; i < 0x10; i++)
+	{
+		active_state[i] = 0;
+		
+		for (int j = 0; j < 0x10; j++)
+		{
+			int di = j << 4 | i;
+			
+			// turn on powered leds
+			if (m_leds_state[i] >> j & 1)
+				m_leds_decay[di] = LEDS_DECAY_TIME;
+			
+			// determine active state
+			int ds = (m_leds_decay[di] != 0) ? 1 : 0;
+			active_state[i] |= (ds << j);
+		}
+	}
+	
+	// on difference, send to output
+	for (int i = 0; i < 0x10; i++)
+		if (m_leds_cache[i] != active_state[i])
+			output_set_digit_value(i, active_state[i]);
+	
+	memcpy(m_leds_cache, active_state, sizeof(m_leds_cache));
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(stopthief_state::leds_decay_tick)
+{
+	// slowly turn off unpowered leds
+	for (int i = 0; i < 0x100; i++)
+		if (!(m_leds_state[i & 0xf] >> (i>>4) & 1) && m_leds_decay[i])
+			m_leds_decay[i]--;
+	
+	leds_update();
+}
+
+
+
+/***************************************************************************
+
+  I/O
+
+***************************************************************************/
+
+READ8_MEMBER(stopthief_state::read_k)
+{
+	// the Vss row is always on
+	UINT8 k = m_button_matrix[2]->read();
+
+	// read selected button rows
+	for (int i = 0; i < 2; i++)
+	{
+		const int ki[2] = { 0, 6 };
+		if (m_o >> ki[i] & 1)
+			k |= m_button_matrix[i]->read();
+	}
+
+	return k;
+}
+
+WRITE16_MEMBER(stopthief_state::write_r)
+{
+	// R0-R2: select digit
+	UINT8 o = BITSWAP8(m_o,3,5,0,6,7,2,1,4) & 0x7f;
+	for (int i = 0; i < 10; i++)
+		m_leds_state[i] = (data >> i & 1) ? o : 0;
+	
+	leds_update();
+	
+	// R3-..: sound
+
+
+	m_r = data;
+}
+
+WRITE16_MEMBER(stopthief_state::write_o)
+{
+	// O0,O6: input mux
+	// O3: sound on
+	// O0-O2,O4-O7: led segments A-G
+	m_o = data;
+}
+
+
+
+/***************************************************************************
+
+  Inputs
+
+***************************************************************************/
+
+/* physical button layout and labels is like this:
+
+    [1] [2] [OFF]
+    [3] [4] [ON]
+    [5] [6] [T, TIP]
+    [7] [8] [A, ARREST]
+    [9] [0] [C, CLUE]
+*/
+
+static INPUT_PORTS_START( stopthief )
+	PORT_START("IN.0") // O0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+
+	PORT_START("IN.1") // O6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+
+	// note: even though power buttons are on the matrix, they are not CPU-controlled
+	PORT_START("IN.2") // Vss!
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("On")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_NAME("Tip")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_NAME("Arrest")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_NAME("Clue")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off")
 INPUT_PORTS_END
 
 
-READ8_MEMBER(stopthie_state::stopthie_read_k)
+
+/***************************************************************************
+
+  Machine Config
+
+***************************************************************************/
+
+void stopthief_state::machine_start()
 {
-	UINT8 data = 0;
+	memset(m_leds_state, 0, sizeof(m_leds_state));
+	memset(m_leds_cache, 0, sizeof(m_leds_cache));
+	memset(m_leds_decay, 0, sizeof(m_leds_decay));
+	m_r = 0;
+	m_o = 0;
 
-	if (LOG)
-		logerror( "stopthie_read_k\n" );
-
-	return data;
+	save_item(NAME(m_leds_state));
+	save_item(NAME(m_leds_cache));
+	save_item(NAME(m_leds_decay));
+	save_item(NAME(m_r));
+	save_item(NAME(m_o));
 }
 
 
-WRITE16_MEMBER(stopthie_state::stopthie_write_o)
-{
-	if (LOG)
-		logerror( "stopthie_write_o: write %02x\n", data );
-}
-
-
-WRITE16_MEMBER(stopthie_state::stopthie_write_r)
-{
-	if (LOG)
-		logerror( "stopthie_write_r: write %04x\n", data );
-}
-
-
-static const UINT16 stopthie_output_pla[0x20] =
-{
-	/* O output PLA configuration currently unknown */
-	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-	0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
-};
-
-
-static MACHINE_CONFIG_START( stopthie, stopthie_state )
+static MACHINE_CONFIG_START( stopthief, stopthief_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", TMS0980, 500000 ) /* Clock is wrong */
-	MCFG_TMS1XXX_OUTPUT_PLA( stopthie_output_pla )
-	MCFG_TMS1XXX_READ_K( READ8( stopthie_state, stopthie_read_k ) )
-	MCFG_TMS1XXX_WRITE_O( WRITE16( stopthie_state, stopthie_write_o ) )
-	MCFG_TMS1XXX_WRITE_R( WRITE16( stopthie_state, stopthie_write_r ) )
+	MCFG_CPU_ADD("maincpu", TMS0980, MASTER_CLOCK)
+	MCFG_TMS1XXX_READ_K_CB(READ8(stopthief_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(stopthief_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(stopthief_state, write_r))
 
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("leds_decay", stopthief_state, leds_decay_tick, attotime::from_msec(10))
+	
 	MCFG_DEFAULT_LAYOUT(layout_stopthie)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-ROM_START( stopthie )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD16_WORD( "stopthie.bin", 0x0000, 0x1000, CRC(03691115) SHA1(bdcd212aa50bb1c26cb2d0ee97e5cfc04841c108) )
-ROM_END
+
 
 /***************************************************************************
 
@@ -84,5 +249,35 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY            FULLNAME      FLAGS */
-CONS( 1979, stopthie,   0,      0,      stopthie,   stopthie, driver_device,  0,      "Parker Brothers", "Stop Thief", GAME_NOT_WORKING | GAME_NO_SOUND)
+ROM_START( stopthie )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "tms0980nll_mp6101b", 0x0000, 0x1000, CRC(5b4114af) SHA1(30a9b20dd5f0d57ed34c53e46f5adbf959d47828) )
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 1982, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0980_default_mpla.pla", 0, 1982, CRC(3709014f) SHA1(d28ee59ded7f3b9dc3f0594a32a98391b6e9c961) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_stopthie_opla.pla", 0, 352, CRC(50337a48) SHA1(4a9ea62ed797a9ac5190eec3bb6ebebb7814628c) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_stopthie_spla.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
+ROM_END
+
+ROM_START( stopthiep )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD16_WORD( "us4341385", 0x0000, 0x1000, CRC(03691115) SHA1(bdcd212aa50bb1c26cb2d0ee97e5cfc04841c108) ) // from patent US4341385, data should be correct (it included checksums)
+	// TODO: put in 0980 proper order
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 1982, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0980_default_mpla.pla", 0, 1982, CRC(3709014f) SHA1(d28ee59ded7f3b9dc3f0594a32a98391b6e9c961) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_stopthie_opla.pla", 0, 352, CRC(50337a48) SHA1(4a9ea62ed797a9ac5190eec3bb6ebebb7814628c) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_stopthie_spla.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
+ROM_END
+
+
+CONS( 1979, stopthie,  0,        0, stopthief, stopthief, driver_device, 0, "Parker Brothers", "Stop Thief (Electronic Crime Scanner)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1979, stopthiep, stopthie, 0, stopthief, stopthief, driver_device, 0, "Parker Brothers", "Stop Thief (Electronic Crime Scanner) (prototype)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )

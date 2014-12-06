@@ -1,8 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol, hap
 /***************************************************************************
 
   Parker Bros Merlin handheld computer game
   * TMS1100NLL MP3404A-N2 (has internal ROM)
-
+  
   To start a game, press NEW GAME, followed by a number:
   1: Tic-Tac-Toe
   2: Music Machine
@@ -10,15 +12,15 @@
   4: Blackjack 13
   5: Magic Square
   6: Mindbender
-
+  
   Refer to the official manual for more information on the games.
-
-
+  
+  
   Other handhelds assumed to be on similar hardware:
   - Dr. Smith - by Tomy, released in Japan (basically a white version of Merlin,
     let's assume for now that the ROM contents is identical)
   - Master Merlin
-
+  
   Another sequel, called Split Second, looks like different hardware.
 
 
@@ -45,7 +47,7 @@ public:
 	merlin_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_button_matrix(*this, "O"),
+		m_button_matrix(*this, "IN"),
 		m_speaker(*this, "speaker")
 	{ }
 
@@ -70,36 +72,13 @@ protected:
 
 ***************************************************************************/
 
-/* The keypad is a 4*4 matrix, connected like so:
-
-       +----+  +----+  +----+  +----+
-O0 o---| R0 |--| R1 |--| R2 |--| R3 |
-       +----+  +----+  +----+  +----+
-          |       |       |       |
-       +----+  +----+  +----+  +----+
-O1 o---| R4 |--| R5 |--| R6 |--| R7 |
-       +----+  +----+  +----+  +----+
-          |       |       |       |
-       +----+  +----+  +----+  +----+
-O2 o---| R8 |--| R9 |--|R10 |--| SG |
-       +----+  +----+  +----+  +----+
-          |       |       |       |
-          |    +----+  +----+  +----+
-O3 o------+----| CT |--| NG |--| HM |
-          |    +----+  +----+  +----+
-          |       |       |       |
-          o       o       o       o
-         K1      K2      K8      K4
-
-SG = same game, CT = comp turn, NG = new game, HM = hit me */
-
 READ8_MEMBER(merlin_state::read_k)
 {
 	UINT8 k = 0;
-
+	
 	// read selected button rows
 	for (int i = 0; i < 4; i++)
-		if (m_o & (1 << i))
+		if (m_o >> i & 1)
 			k |= m_button_matrix[i]->read();
 
 	return k;
@@ -143,29 +122,29 @@ WRITE16_MEMBER(merlin_state::write_r)
 ***************************************************************************/
 
 static INPUT_PORTS_START( merlin )
-	PORT_START("O.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME("Button 0")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Button 1")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("Button 3")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Button 2")
+	PORT_START("IN.0") // O0
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME("Button 0")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Button 1")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("Button 3")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Button 2")
 
-	PORT_START("O.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Button 4")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Button 5")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Button 7")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Button 6")
+	PORT_START("IN.1") // O1
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Button 4")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Button 5")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON8) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Button 7")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Button 6")
 
-	PORT_START("O.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Button 8")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Button 9")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_S) PORT_NAME("Same Game")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Button 10")
+	PORT_START("IN.2") // O2
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON9) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Button 8")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Button 9")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_S) PORT_NAME("Same Game")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Button 10")
 
-	PORT_START("O.3")
+	PORT_START("IN.3") // O3
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_C) PORT_NAME("Comp Turn")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_H) PORT_NAME("Hit Me")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON13) PORT_CODE(KEYCODE_C) PORT_NAME("Comp Turn")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON15) PORT_CODE(KEYCODE_H) PORT_NAME("Hit Me")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON14) PORT_CODE(KEYCODE_N) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("New Game")
 INPUT_PORTS_END
 
 
@@ -200,9 +179,9 @@ static MACHINE_CONFIG_START( merlin, merlin_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1100, MERLIN_RC_CLOCK)
 	MCFG_TMS1XXX_OUTPUT_PLA(merlin_output_pla)
-	MCFG_TMS1XXX_READ_K(READ8( merlin_state, read_k))
-	MCFG_TMS1XXX_WRITE_O(WRITE16( merlin_state, write_o))
-	MCFG_TMS1XXX_WRITE_R(WRITE16( merlin_state, write_r))
+	MCFG_TMS1XXX_READ_K_CB(READ8( merlin_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16( merlin_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16( merlin_state, write_r))
 
 	MCFG_DEFAULT_LAYOUT(layout_merlin)
 
@@ -230,6 +209,11 @@ ROM_START( merlin )
 	// 0x5E to 0x1E to make 'Music Machine' working.
 	// The hashes below are from the manually changed dump
 	ROM_LOAD( "mp3404", 0x0000, 0x800, BAD_DUMP CRC(7515a75d) SHA1(76ca3605d3fde1df62f79b9bb1f534c2a2ae0229) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_default_mpla.pla", 0, 867, BAD_DUMP CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) ) // not verified
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_merlin_opla.pla", 0, 365, NO_DUMP )
 ROM_END
 
 

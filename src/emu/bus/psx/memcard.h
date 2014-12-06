@@ -63,7 +63,7 @@ public:
 	virtual void device_reset();
 	virtual void device_config_complete();
 
-	void clock_w(bool state) { if(m_clock && !m_sel && !state && !m_pad) do_card(); m_clock = state; }
+	void clock_w(bool state) { if(!m_clock && !m_sel && state && !m_pad) do_card(); m_clock = state; }
 	void sel_w(bool state);
 	bool rx_r() { return m_rx; }
 	bool ack_r() { return m_ack; }

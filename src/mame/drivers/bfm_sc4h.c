@@ -584,7 +584,7 @@ UINT16 sc4_state::bfm_sc4_68307_portb_r(address_space &space, bool dedicated, UI
 	else
 	{
 		// generating certain interrupts expects the bit 0x8000 to be set here
-		// but it's set ot dedicated i/o, not general purpose, source?
+		// but it's set to dedicated i/o, not general purpose, source?
 		return 0x8040;
 	}
 }

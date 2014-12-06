@@ -988,6 +988,7 @@ $(MAMEOBJ)/capcom.a: \
 	$(DRIVERS)/alien.o \
 	$(DRIVERS)/bionicc.o $(VIDEO)/bionicc.o \
 	$(DRIVERS)/supduck.o \
+	$(VIDEO)/tigeroad_spr.o \
 	$(DRIVERS)/blktiger.o $(VIDEO)/blktiger.o \
 	$(DRIVERS)/cbasebal.o $(VIDEO)/cbasebal.o \
 	$(DRIVERS)/commando.o $(VIDEO)/commando.o \
@@ -1694,7 +1695,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/bingoc.o \
 	$(DRIVERS)/blockade.o $(AUDIO)/blockade.o $(VIDEO)/blockade.o \
 	$(DRIVERS)/calorie.o \
-	$(DRIVERS)/chihiro.o \
+	$(DRIVERS)/chihiro.o $(VIDEO)/chihiro.o  \
 	$(DRIVERS)/coolridr.o \
 	$(DRIVERS)/deniam.o $(VIDEO)/deniam.o \
 	$(DRIVERS)/dotrikun.o \

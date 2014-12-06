@@ -5,6 +5,7 @@
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 #include "cpu/m6805/m6805.h"
+#include "video/tigeroad_spr.h"
 
 class tigeroad_state : public driver_device
 {
@@ -20,6 +21,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_mcu(*this, "mcu"),
+		m_spritegen(*this, "spritegen"),
 		m_has_coinlock(1)
 	{ }
 
@@ -43,7 +45,6 @@ public:
 	TILEMAP_MAPPER_MEMBER(tigeroad_tilemap_scan);
 	virtual void video_start();
 	UINT32 screen_update_tigeroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	void f1dream_protection_w(address_space &space);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
@@ -52,6 +53,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<cpu_device> m_mcu;
+	required_device<tigeroad_spr_device> m_spritegen;
 
 	UINT16     m_control[2];
 

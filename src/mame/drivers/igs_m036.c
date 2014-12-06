@@ -12,12 +12,12 @@ a IGS game use IGS036 chip
 IGS036 could be a upgraded version of IGS027A
 but with GFX processor integrated
 
-I dont know the CPU core (should ARM based due to fail test)
-the chip has internal rom build-in
-the the FLASH(u33, EV29LV160AB-90PCR) is external rom and encrypted
-if the external rom decrypted then we can
+I don't know the CPU core (should be ARM based due to fail test)
+the chip has internal rom built-in
+the FLASH(u33, EV29LV160AB-90PCR) is external rom and encrypted
+if the external rom is decrypted then we can
 try to trojan the internal rom
-here we offer several revision a same game to see
+here we offer several revisions of the same game to see
 if anyone could find any clue, these 4 revision can
 be programmed and running on a same PCB.
 ===================================================

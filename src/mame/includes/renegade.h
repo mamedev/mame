@@ -1,24 +1,38 @@
-#include "sound/okiadpcm.h"
+#include "sound/msm5205.h"
 
 #define MCU_BUFFER_MAX 6
-
-class renegade_adpcm_device;
 
 class renegade_state : public driver_device
 {
 public:
 	renegade_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_videoram2(*this, "videoram2"),
-		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this,"maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_mcu(*this, "mcu"),
+		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_rombank(*this, "rombank"),
+		m_adpcmrom(*this, "adpcm"),
+		m_fg_videoram(*this, "fg_videoram"),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_spriteram(*this, "spriteram") { }
 
-	UINT8 m_bank;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_mcu;
+	required_device<msm5205_device> m_msm;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_memory_bank m_rombank;
+	required_region_ptr<UINT8> m_adpcmrom;
+	required_shared_ptr<UINT8> m_fg_videoram;
+	required_shared_ptr<UINT8> m_bg_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+
+	UINT32 m_adpcm_pos;
+	UINT32 m_adpcm_end;
+	bool m_adpcm_playing;
+
 	int m_mcu_sim;
 	int m_from_main;
 	int m_from_mcu;
@@ -40,15 +54,10 @@ public:
 	int m_mcu_checksum;
 	const UINT8 *m_mcu_encrypt_table;
 	int m_mcu_encrypt_table_len;
-	int m_coin;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_videoram2;
 	INT32 m_scrollx;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-	required_shared_ptr<UINT8> m_spriteram;
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_READ8_MEMBER(mcu_reset_r);
 	DECLARE_WRITE8_MEMBER(mcu_w);
@@ -65,13 +74,17 @@ public:
 	DECLARE_READ8_MEMBER(renegade_68705_port_c_r);
 	DECLARE_WRITE8_MEMBER(renegade_68705_port_c_w);
 	DECLARE_WRITE8_MEMBER(renegade_68705_ddr_c_w);
-	DECLARE_WRITE8_MEMBER(renegade_videoram_w);
-	DECLARE_WRITE8_MEMBER(renegade_videoram2_w);
+	DECLARE_WRITE8_MEMBER(fg_videoram_w);
+	DECLARE_WRITE8_MEMBER(bg_videoram_w);
 	DECLARE_WRITE8_MEMBER(renegade_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(renegade_scroll0_w);
-	DECLARE_WRITE8_MEMBER(renegade_scroll1_w);
+	DECLARE_WRITE8_MEMBER(scroll_lsb_w);
+	DECLARE_WRITE8_MEMBER(scroll_msb_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(mcu_status_r);
-	DECLARE_WRITE8_MEMBER(adpcm_play_w);
+	DECLARE_WRITE8_MEMBER(adpcm_start_w);
+	DECLARE_WRITE8_MEMBER(adpcm_addr_w);
+	DECLARE_WRITE8_MEMBER(adpcm_stop_w);
+	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	
 	DECLARE_DRIVER_INIT(kuniokun);
 	DECLARE_DRIVER_INIT(kuniokunb);
 	DECLARE_DRIVER_INIT(renegade);
@@ -82,40 +95,5 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_renegade(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(renegade_interrupt);
-	void setbank();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_audiocpu;
-	optional_device<cpu_device> m_mcu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };
-
-class renegade_adpcm_device : public device_t,
-									public device_sound_interface
-{
-public:
-	renegade_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~renegade_adpcm_device() {}
-
-	DECLARE_WRITE8_MEMBER(play_w);
-
-protected:
-	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-
-private:
-	// internal state
-	oki_adpcm_state m_adpcm;
-	sound_stream *m_stream;
-	UINT32 m_current;
-	UINT32 m_end;
-	UINT8 m_nibble;
-	UINT8 m_playing;
-	UINT8 *m_base;
-};
-
-extern const device_type RENEGADE_ADPCM;

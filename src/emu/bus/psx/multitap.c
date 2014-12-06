@@ -79,9 +79,9 @@ void psx_multitap_device::set_tx_line(bool tx, int port)
 			dev = m_portd;
 			break;
 	}
-	dev->clock_w(1);
-	dev->tx_w(tx);
 	dev->clock_w(0);
+	dev->tx_w(tx);
+	dev->clock_w(1);
 }
 
 bool psx_multitap_device::get_rx_line(int port)

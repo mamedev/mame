@@ -620,8 +620,8 @@ ROM_START( ridhero ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "006-p1.p1", 0x000000, 0x080000, CRC(d4aaf597) SHA1(34d35b71adb5bd06f4f1b50ffd9c58ab9c440a84) ) /* MB834200 */
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* Hitachi HD6301V1 MCU */
-	ROM_LOAD( "hd6301v1p.com", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x2000, "mcu", 0 )    /* Hitachi HD6301V1 MCU */
+	ROM_LOAD( "rhcom.bin", 0x0000, 0x2000, CRC(e5cd6306) SHA1(f6bbb8ae562804d67e137290c765c3589fa334c0) ) // dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally)
 
 	NEO_SFIX_128K( "006-s1.s1", CRC(eb5189f0) SHA1(0239c342ea62e73140a2306052f226226461a478) ) /* TC531000 */
 
@@ -649,8 +649,8 @@ ROM_START( ridheroh )
 	ROM_LOAD16_WORD_SWAP( "006-pg1.p1", 0x000000, 0x080000, BAD_DUMP CRC(52445646) SHA1(647bb31f2f68453c1366cb6e2e867e37d1df7a54) )
 	/* Chip label p1h does not exist, renamed temporarly to pg1, marked BAD_DUMP. This needs to be verified. */
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* Hitachi HD6301V1 MCU */
-	ROM_LOAD( "hd6301v1p.com", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x2000, "mcu", 0 )    /* Hitachi HD6301V1 MCU */
+	ROM_LOAD( "rhcom.bin", 0x0000, 0x2000, CRC(e5cd6306) SHA1(f6bbb8ae562804d67e137290c765c3589fa334c0) ) // dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally)
 
 	NEO_SFIX_128K( "006-s1.s1", CRC(eb5189f0) SHA1(0239c342ea62e73140a2306052f226226461a478) ) /* TC531000 */
 
@@ -2539,7 +2539,7 @@ ROM_START( fightfev ) /* MVS ONLY RELEASE */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "060-p1.p1", 0x0000000, 0x100000, CRC(2a104b50) SHA1(3eb663d3df7074e1cdf4c0e450a35c9cf55d8979) ) /* VIC940800 */
 
-	NEO_SFIX_128K( "060-s1.s1", CRC(7f012104) SHA1(f366dcc3923655dff16ec08a40d5fce22a84257d) ) /* VIC930100 */
+	NEO_SFIX_128K( "060-s1.s1", CRC(d62a72e9) SHA1(a23e4c4fd4ec11a7467ce41227c418b4dd1ef649) ) /* VIC930100 */
 
 	NEO_BIOS_AUDIO_128K( "060-m1.m1", CRC(0b7c4e65) SHA1(999a1e784de18db3f1332b30bc425836ea6970be) ) /* VIC930100 */
 
@@ -2560,10 +2560,10 @@ ROM_START( fightfeva ) /* MVS ONLY RELEASE */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "060-p1.p1", 0x0000000, 0x100000, CRC(2a104b50) SHA1(3eb663d3df7074e1cdf4c0e450a35c9cf55d8979) ) /* VIC940800 */
 	/* the rom below acts as a patch to the program rom in the cart, replacing the first 512kb */
-	ROM_LOAD16_WORD_SWAP( "060-epr.sp2", 0x000000, 0x080000, BAD_DUMP CRC(3032041b) SHA1(4b8ed2e6f74579ea35a53e06ccac42d6905b0f51) )
-	/* P is on eprom, correct chip label unknown */
+	ROM_LOAD16_WORD_SWAP( "1.sp2", 0x000000, 0x080000, CRC(3032041b) SHA1(4b8ed2e6f74579ea35a53e06ccac42d6905b0f51) )
+	/* P is on eprom, has a Viccom logo at the top of the label with a circled '1' in the center */
 
-	NEO_SFIX_128K( "060-s1.s1", CRC(7f012104) SHA1(f366dcc3923655dff16ec08a40d5fce22a84257d) ) /* VIC930100 */
+	NEO_SFIX_128K( "060-s1.s1", CRC(d62a72e9) SHA1(a23e4c4fd4ec11a7467ce41227c418b4dd1ef649) ) /* VIC930100 */
 
 	NEO_BIOS_AUDIO_128K( "060-m1.m1", CRC(0b7c4e65) SHA1(999a1e784de18db3f1332b30bc425836ea6970be) ) /* VIC930100 */
 

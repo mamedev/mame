@@ -1119,6 +1119,21 @@ A few comments on these:
 		</part>
 	</software>
 
+	<!-- boot ok -->
+	<software name="akagawaj" supported="no">
+		<description>Akagawa Jirou - Yasoukyoku 2 (Japan)</description>
+		<year>2001</year>
+		<publisher>Victor</publisher>
+		<info name="alt_title" value="夜想曲2"/>
+		<info name="serial" value="SLPS-03213" />
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="akagawa jirou - yasoukyoku 2 (japan) [slps-03213]" sha1="2469c7c6d8d69835aae534b91c59b03aa4d2dd96"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="alabamaj" supported="no">
 		<description>Pop de Cute na Shinri Test - Alabama (Japan)</description>
 		<year>2000</year>
@@ -2797,7 +2812,7 @@ A few comments on these:
 	<software name="chikichi" supported="no">
 		<description>Chiki Chiki Machine Mou Race - Wacky Races (Japan)</description>
 		<year>2001</year>
-		<publisher>Hudson / Infogrames</publisher>
+		<publisher>Hudson&#47;Infogrames</publisher>
 		<info name="alt_title" value="ドタバタ爆笑レースゲーム チキチキマシン猛レース"/>
 		<info name="serial" value="SLPM-86845" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
@@ -8875,6 +8890,20 @@ A few comments on these:
 		</part>
 	</software>
 
+	<software name="nankuro" supported="no">
+		<description>Nankuro (SuperLite 1500 Series) (Japan)</description>
+		<year>1999</year>
+		<publisher>Success</publisher>
+		<info name="alt_title" value="SuperLite1500 EXTRAシリーズ Vol.2 ナンクロ"/>
+		<info name="serial" value="SLPS-02067" />
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="superlite 1500 extra series vol.02 - nankuro (japan) [slps-02067]" sha1="8f17ac2169a351af67437fd79cfd66a13e51062e"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- missing Disc 2? -->
 	<software name="natsuiro" supported="no">
 		<description>Natsuiro Kenjutsu Komachi (Limited Edition) (Japan) (Disc 1 Only)</description>
@@ -9478,8 +9507,9 @@ A few comments on these:
 
 	<software name="pacapaca" supported="no">
 		<description>Pacapaca Passion (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Produce!</publisher>
+		<info name="alt_title" value="パカパカパッション"/>
 		<info name="serial" value="SLPS-02122" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9491,8 +9521,9 @@ A few comments on these:
 
 	<software name="pacapac2" supported="no">
 		<description>Pacapaca Passion 2 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Produce!</publisher>
+		<info name="alt_title" value="パカパカパッション2"/>
 		<info name="serial" value="SLPS-02720" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9504,8 +9535,9 @@ A few comments on these:
 
 	<software name="pachipac" supported="no">
 		<description>Pachi Pachi Saga (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>TEN Institute</publisher>
+		<info name="alt_title" value="パチパチサーガ"/>
 		<info name="serial" value="SLPS-00288" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9516,9 +9548,10 @@ A few comments on these:
 	</software>
 
 	<software name="psao5" supported="no">
-		<description>Pachi-Slot Aruze Oukoku 5 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Pachi-Slot Aruze Oukoku 5 - Slotmachine Simulator (Japan)</description>
+		<year>2001</year>
+		<publisher>Aruze</publisher>
+		<info name="alt_title" value="パチスロ アルゼ王国5"/>
 		<info name="serial" value="SLPS-03280" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9530,8 +9563,9 @@ A few comments on these:
 
 	<software name="pstbk" supported="no">
 		<description>Pachi-Slot Teiou - Battle Knight &amp; Atlantis Doom (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Media</publisher>
+		<info name="alt_title" value="パチスロ帝王〜バトルナイト・アトランチスドーム〜"/>
 		<info name="serial" value="SLPS-03108" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9542,9 +9576,10 @@ A few comments on these:
 	</software>
 
 	<software name="pststwis" supported="no">
-		<description>Pachi-Slot Teiou - Shimauta-30 - Twiste - Nangoku Monogarari-30 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Pachi-Slot Teiou - Twist - Shimauta 30 - Nankoku Monogatari (Japan)</description>
+		<year>2002</year>
+		<publisher>Media</publisher>
+		<info name="alt_title" value="パチスロ帝王〜島唄－30・ツイスト・南国物語－30〜"/>
 		<info name="serial" value="SLPS-03442" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9555,9 +9590,10 @@ A few comments on these:
 	</software>
 
 	<software name="pst2" supported="no">
-		<description>Pachi-Slot Teiou 2 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Pachi-Slot Teiou 2 - Kagetsu - 2 Pair - Beaver X (Japan)</description>
+		<year>1999</year>
+		<publisher>Mecko</publisher>
+		<info name="alt_title" value="パチスロ帝王II 花月・ツーペア・マイマイ"/>
 		<info name="serial" value="SLPS-02217" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9568,9 +9604,10 @@ A few comments on these:
 	</software>
 
 	<software name="pst3" supported="no">
-		<description>Pachi-Slot Teiou 3 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Pachi-Slot Teiou 3 - Sea Master - Epsilon R - Wai Wai Pulsa (Japan)</description>
+		<year>1999</year>
+		<publisher>Media</publisher>
+		<info name="alt_title" value="パチスロ帝王3"/>
 		<info name="serial" value="SLPS-02413" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9581,9 +9618,10 @@ A few comments on these:
 	</software>
 
 	<software name="pst6" supported="no">
-		<description>Pachi-Slot Teiou 6 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description> Pachi-Slot Teiou 6 - Kung Fu Lady - BangBang - Prelude 2 (Japan)</description>
+		<year>2000</year>
+		<publisher>Media</publisher>
+		<info name="alt_title" value="パチスロ帝王6"/>
 		<info name="serial" value="SLPS-02657" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9595,8 +9633,9 @@ A few comments on these:
 
 	<software name="pst7" supported="no">
 		<description>Pachi-Slot Teiou 7 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Media</publisher>
+		<info name="alt_title" value="パチスロ帝王7 メーカー推奨マニュアル1 〜ビートザドラゴン2･ルパン三世･ホッドロッドクィーン〜"/>
 		<info name="serial" value="SLPS-02991" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9607,9 +9646,10 @@ A few comments on these:
 	</software>
 
 	<software name="pstmsm3" supported="no">
-		<description>Pachi-Slot Teiou Maker Suishou Manual 3 - I'm Angel - White 2 &amp; Blue 2 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description> Pachi-Slot Teiou - Maker Suishou Manual 3 - I'm Angel White 2 &amp; Blue 2 (Japan)</description>
+		<year>2001</year>
+		<publisher>Media</publisher>
+		<info name="alt_title" value="パチスロ帝王 メーカー推奨マニュアル3 アイムエンジェル〜ホワイト2&amp;ブルー2〜"/>
 		<info name="serial" value="SLPS-03130" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9620,9 +9660,10 @@ A few comments on these:
 	</software>
 
 	<software name="pstmsm5" supported="no">
-		<description>Pachi-Slot Teiou Maker Suishou Manual 5 - Race Queen 2 - Tomcat (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Pachi-Slot Teiou - Maker Suishou Manual 5 - Race Queen 2 - Tomcat (Japan)</description>
+		<year>2001</year>
+		<publisher>Media</publisher>
+		<info name="alt_title" value="パチスロ帝王 メーカー推奨マニュアル5 〜レースクイーン2･トムキャット〜"/>
 		<info name="serial" value="SLPS-03245" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9634,8 +9675,9 @@ A few comments on these:
 
 	<software name="pstmsm6" supported="no">
 		<description>Pachi-Slot Teiou Maker Suishou Manual 6 - Takarabune (Japan)</description>
-		<year>199?</year>
+		<year>2001</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="パチスロ帝王 メーカー推奨マニュアル6 宝船"/>
 		<info name="serial" value="SLPS-03329" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9646,9 +9688,10 @@ A few comments on these:
 	</software>
 
 	<software name="pstmsm7" supported="no">
-		<description>Pachi-Slot Teiou Maker Suishou Manual 7 - Trick Monster 2 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Pachi-Slot Teiou - Maker Suishou Manual 7 - Trick Monster 2 (Japan)</description>
+		<year>2002</year>
+		<publisher>Media</publisher>
+		<info name="alt_title" value="パチスロ帝王 メーカー推奨マニュアル7 トリックモンスター2"/>
 		<info name="serial" value="SLPS-03391" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9660,8 +9703,9 @@ A few comments on these:
 
 	<software name="pstmda" supported="no">
 		<description>Pachi-Slot Teiou Mini - Dr. A7 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Media</publisher>
+		<info name="alt_title" value="パチスロ帝王 Mini"/>
 		<info name="serial" value="SLPS-02114" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9673,8 +9717,9 @@ A few comments on these:
 
 	<software name="palmtown" supported="no">
 		<description>Palm Town (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>MyCom</publisher>
+		<info name="alt_title" value="ぱーむたうん"/>
 		<info name="serial" value="SLPS-01820" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9686,8 +9731,9 @@ A few comments on these:
 
 	<software name="panzerba" supported="no">
 		<description>Panzer Bandit (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Banpresto</publisher>
+		<info name="alt_title" value="パンツァーバンディット"/>
 		<info name="serial" value="SLPS-00899" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9699,8 +9745,9 @@ A few comments on these:
 
 	<software name="panzerfr" supported="no">
 		<description>Panzer Front bis. (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>Enterbrain</publisher>
+		<info name="alt_title" value="PANZER FRONT bis."/>
 		<info name="serial" value="SLPS-03111" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9712,8 +9759,9 @@ A few comments on these:
 
 	<software name="paranoia" supported="no">
 		<description>Paranoia Scape (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Mathilda</publisher>
+		<info name="alt_title" value="PARANOIA SCAPE"/>
 		<info name="serial" value="SLPS-01375" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9725,8 +9773,9 @@ A few comments on these:
 
 	<software name="parlorpr" supported="no">
 		<description>Parlor! Pro Jr. Collection (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Nihon Telenet</publisher>
+		<info name="alt_title" value="Parlor!PRO Jr. Collection"/>
 		<info name="serial" value="SLPS-02781" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9738,8 +9787,9 @@ A few comments on these:
 
 	<software name="parowars" supported="no">
 		<description>Paro Wars (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="パロウォーズ"/>
 		<info name="serial" value="SLPM-86016" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9751,8 +9801,9 @@ A few comments on these:
 
 	<software name="pdultram" supported="no">
 		<description>PD Ultraman Invader (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="PDウルトラマンインベーダー"/>
 		<info name="serial" value="SLPS-00195" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9763,9 +9814,10 @@ A few comments on these:
 	</software>
 
 	<software name="pepsiman" supported="no">
-		<description>Pepsiman The Running Hero (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Pepsiman (Japan)</description>
+		<year>1999</year>
+		<publisher>KID</publisher>
+		<info name="alt_title" value="ペプシマン"/>
 		<info name="serial" value="SLPS-01762" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9776,9 +9828,10 @@ A few comments on these:
 	</software>
 
 	<software name="perfectf" supported="no">
-		<description>Perfect Fishing - Iso Zuri (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Perfect Fishing - Rock Fishing (Japan)</description>
+		<year>2000</year>
+		<publisher>Seta</publisher>
+		<info name="alt_title" value="パーフェクトフィッシング(磯釣り)"/>
 		<info name="serial" value="SLPS-02410" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9788,25 +9841,12 @@ A few comments on these:
 		</part>
 	</software>
 
-	<!-- missing GFX -->
-	<software name="petitcar" supported="no">
-		<description>Petit Carat (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="serial" value="SLPS-01435" />
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="petit carat (japan) [slps-01435]" sha1="d5a4844ddc86dbc9ac5a3b783a93e5dbf0c1bace"/>
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- boot OK -->
-	<software name="picnicex" supported="no">
-		<description>Picnic! Excellent (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="pikinecx" supported="no">
+		<description>Pikinya! Excellent(Japan)</description>
+		<year>1998</year>
+		<publisher>ASCII</publisher>
+		<info name="alt_title" value="ピキーニャ エクセレンテ"/>
 		<info name="serial" value="SLPS-01345" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9819,8 +9859,9 @@ A few comments on these:
 	<!-- boot OK -->
 	<software name="pinballf" supported="no">
 		<description>Pinball Fantasies Deluxe (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>VAP (NTV)</publisher>
+		<info name="alt_title" value="Pinball Fantasies DELUXE"/>
 		<info name="serial" value="SLPS-00482" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9832,8 +9873,9 @@ A few comments on these:
 
 	<software name="pitfall3" supported="no">
 		<description>Pitfall 3D - Beyond the Jungle (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Victor</publisher>
+		<info name="alt_title" value="ピットフォール3D"/>
 		<info name="serial" value="SLPS-01669" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9845,8 +9887,9 @@ A few comments on these:
 
 	<software name="planetdo" supported="no">
 		<description>Planet Dob (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Hudson</publisher>
+		<info name="alt_title" value="PLANET DOB"/>
 		<info name="serial" value="SLPS-02111" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9857,9 +9900,10 @@ A few comments on these:
 	</software>
 
 	<software name="planetla" supported="no">
-		<description>Planet Laika - Kasei Mokushiroku (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Planet Laika (Japan)</description>
+		<year>1999</year>
+		<publisher>Enix</publisher>
+		<info name="alt_title" value="PLANET LAIKA 火星黙示録"/>
 		<info name="serial" value="SLPM-86264" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9870,9 +9914,10 @@ A few comments on these:
 	</software>
 
 	<software name="pocketdi" supported="no">
-		<description>Pocket Digimon World (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Pocket DigimonWorld (Japan)</description>
+		<year>2000</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="ポケットデジモンワールド"/>
 		<info name="serial" value="SLPS-02800" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9883,9 +9928,10 @@ A few comments on these:
 	</software>
 
 	<software name="pocketwb" supported="no">
-		<description>Pocket Digimon World - Wind Battle Disc (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Pocket DigimonWorld - Wind Battle Disc (Japan)</description>
+		<year>2000</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="ポケットデジモンワールド ウイングバトルディスク"/>
 		<info name="serial" value="SLPS-02992" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9896,9 +9942,10 @@ A few comments on these:
 	</software>
 
 	<software name="pocketwc" supported="no">
-		<description>Pocket Digimon World Cool &amp; Nature Battle (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Pocket DigimonWorld Cool &amp; Nature Battle Disc (Japan)</description>
+		<year>2001</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="ポケットデジモンワールド クール＆ネイチャー バトルディスク"/>
 		<info name="serial" value="SLPS-03146" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9910,8 +9957,9 @@ A few comments on these:
 
 	<software name="pocketfi" supported="no">
 		<description>Pocket Fighter (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Capcom</publisher>
+		<info name="alt_title" value="ポケットファイター"/>
 		<info name="serial" value="SLPS-01360" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9923,8 +9971,9 @@ A few comments on these:
 
 	<software name="pocketmu" supported="no">
 		<description>Pocket Muumuu (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Sony</publisher>
+		<info name="alt_title" value="ポケットムームー"/>
 		<info name="serial" value="SCPS-10076" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9935,9 +9984,10 @@ A few comments on these:
 	</software>
 
 	<software name="poitters" supported="no">
-		<description>Poitter's Point 2 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Poitter's Point 2 - Sodom no Inbou (Japan)</description>
+		<year>1998</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="ポイッターズポイント2"/>
 		<info name="serial" value="SLPM-86061" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9949,8 +9999,9 @@ A few comments on these:
 
 	<software name="policena" supported="no">
 		<description>Policenauts - Private Collection (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="ポリスノーツ プライベートコレクション"/>
 		<info name="serial" value="SLPS-00228" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9962,8 +10013,9 @@ A few comments on these:
 
 	<software name="popnmusi" supported="no">
 		<description>Pop'n Music - Disney Tunes (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="ポップンミュージックディズニーチューンズ"/>
 		<info name="serial" value="SLPM-86670" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9976,8 +10028,9 @@ A few comments on these:
 	<!-- boot OK -->
 	<software name="popnpopj" supported="no">
 		<description>Pop'n Pop (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Taito</publisher>
+		<info name="alt_title" value="ぽっぷんぽっぷ"/>
 		<info name="serial" value="SLPS-01636" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -9990,8 +10043,9 @@ A few comments on these:
 	<!-- black screen after logos -->
 	<software name="popntank" supported="no">
 		<description>Pop'n Tanks! (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Enix</publisher>
+		<info name="alt_title" value="POPN TANKS"/>
 		<info name="serial" value="SLPM-86146" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10003,8 +10057,9 @@ A few comments on these:
 
 	<software name="potestas" supported="no">
 		<description>Potestas (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Nexus</publisher>
+		<info name="alt_title" value="ポテスタス"/>
 		<info name="serial" value="SLPS-00324" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10016,8 +10071,9 @@ A few comments on these:
 
 	<software name="powersho" supported="no">
 		<description>Power Shovel ni Norou!! (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Taito</publisher>
+		<info name="alt_title" value="パワーショベルに乗ろう!!"/>
 		<info name="serial" value="SLPM-86629" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10029,8 +10085,9 @@ A few comments on these:
 
 	<software name="powersta" supported="no">
 		<description>Power Stakes (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Aques</publisher>
+		<info name="alt_title" value="パワーステークス"/>
 		<info name="serial" value="SLPM-86032" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10042,8 +10099,9 @@ A few comments on these:
 
 	<software name="powersg1" supported="no">
 		<description>Power Stakes Grade 1 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Aques</publisher>
+		<info name="alt_title" value="パワーステークス Grade1"/>
 		<info name="serial" value="SLPM-86050" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10055,8 +10113,9 @@ A few comments on these:
 
 	<software name="princess" supported="no">
 		<description>Princess Maker - Go! Go! Princess (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>NineLives</publisher>
+		<info name="alt_title" value="プリンセスメーカー GO!GO!プリンセス"/>
 		<info name="serial" value="SLPS-01505" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10068,8 +10127,9 @@ A few comments on these:
 
 	<software name="prismcou" supported="no">
 		<description>Prism Court (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>FPS</publisher>
+		<info name="alt_title" value="プリズムコート"/>
 		<info name="serial" value="SLPS-01226" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10081,8 +10141,9 @@ A few comments on these:
 
 	<software name="prisoner" supported="no">
 		<description>Prisoner (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Mainichi</publisher>
+		<info name="alt_title" value="PRISONER&#40;プリズナー&#41;"/>
 		<info name="serial" value="SLPS-02387" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10094,8 +10155,9 @@ A few comments on these:
 
 	<software name="promahpl" supported="no">
 		<description>Pro Mahjong Kiwame Plus (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Athena</publisher>
+		<info name="alt_title" value="プロ麻雀 極PLUS"/>
 		<info name="serial" value="SLPS-00402" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10107,8 +10169,9 @@ A few comments on these:
 
 	<software name="promahjo" supported="no">
 		<description>Pro Mahjong Kiwame Tengensenhen (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Athena</publisher>
+		<info name="alt_title" value="プロ麻雀 極 天元戦編"/>
 		<info name="serial" value="SLPS-02347" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10120,8 +10183,9 @@ A few comments on these:
 
 	<software name="prowrest" supported="no">
 		<description>Pro Wrestling Sengokuden - Hyper Tag Match (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>KSS</publisher>
+		<info name="alt_title" value="プロレス戦国伝 〜HYPER TAG MATCH〜"/>
 		<info name="serial" value="SLPS-01006" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10132,9 +10196,10 @@ A few comments on these:
 	</software>
 
 	<software name="prologic" supported="no">
-		<description>Pro-Logic Mah-Jong Hai-Shin (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Pro Logic Mahjong Hai-Shin (Japan)</description>
+		<year>1996</year>
+		<publisher>Aques</publisher>
+		<info name="alt_title" value="プロロジック麻雀 牌神"/>
 		<info name="serial" value="SLPM-86018" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10144,10 +10209,26 @@ A few comments on these:
 		</part>
 	</software>
 
+	<!-- missing GFX -->
+	<software name="puchicar" supported="no">
+		<description>Puchi Carat (Japan)</description>
+		<year>1998</year>
+		<publisher>Taito</publisher>
+		<info name="alt_title" value="プチカラット"/>
+		<info name="serial" value="SLPS-01435" />
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="petit carat (japan) [slps-01435]" sha1="d5a4844ddc86dbc9ac5a3b783a93e5dbf0c1bace"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="pukunpaj" supported="no">
-		<description>Pukunpa - Joshi Kousei no Houkago... (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Pukunpa Joshikousei No Houkago... (Japan)</description>
+		<year>1996</year>
+		<publisher>Athena</publisher>
+		<info name="alt_title" value="ぷくんパ 女子高生の放課後…"/>
 		<info name="serial" value="SLPS-00409" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10160,8 +10241,9 @@ A few comments on these:
 	<!-- boot OK -->
 	<software name="puyopubx" supported="no">
 		<description>Puyo Puyo Box (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Compile</publisher>
+		<info name="alt_title" value="ぷよぷよBOX"/>
 		<info name="serial" value="SLPS-03114" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10171,10 +10253,11 @@ A few comments on these:
 		</part>
 	</software>
 
-	<software name="puypuyoo" supported="no">
-		<description>Puyo Puyoon - Car-Kun to Issho (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="puyopuy4" supported="no">
+		<description>Puyo Puyo 4 - Car-Kun to Issho (Japan)</description>
+		<year>1999</year>
+		<publisher>Compile</publisher>
+		<info name="alt_title" value="ぷよぷよ〜ん カーくんといっしょ"/>
 		<info name="serial" value="SLPS-02412" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10186,9 +10269,10 @@ A few comments on these:
 
 	<!-- boot OK -->
 	<software name="puzzlear" supported="no">
-		<description>Puzzle Arena Toshinden (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Puzzle Arena To Shin Den (Japan)</description>
+		<year>1997</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="パズルアリーナ闘神伝"/>
 		<info name="serial" value="SLPS-00879" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10201,8 +10285,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="pbobl3dx" supported="no">
 		<description>Puzzle Bobble 3 DX (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Taito</publisher>
+		<info name="alt_title" value="パズルボブル3デラックス"/>
 		<info name="serial" value="SLPS-01065" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10215,8 +10300,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="pbobl4" supported="no">
 		<description>Puzzle Bobble 4 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Taito</publisher>
+		<info name="alt_title" value="パズルボブル4"/>
 		<info name="serial" value="SLPS-01492" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10228,9 +10314,10 @@ A few comments on these:
 
 	<!-- boot ok, must skip fmv before it begins or black screen -->
 	<software name="qix2000j" supported="no">
-		<description>Qix 2000 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Qix 2000 (Superlite 1500 Series) (Japan)</description>
+		<year>2000</year>
+		<publisher>Success</publisher>
+		<info name="alt_title" value="SuperLite1500シリーズ クイックス2000"/>
 		<info name="serial" value="SLPM-86659" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10242,8 +10329,9 @@ A few comments on these:
 
 	<software name="quantumg" supported="no">
 		<description>Quantum Gate I - Akumu no Joshou (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Gaga</publisher>
+		<info name="alt_title" value="QUANTUM GATE 〜悪夢の序章〜"/>
 		<info name="serial" value="SLPS-00399" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10255,8 +10343,9 @@ A few comments on these:
 
 	<software name="quizchar" supported="no">
 		<description>Quiz Charaokedon! Toei Tokusatsu Hero Part 2 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Banpresto</publisher>
+		<info name="alt_title" value="クイズキャラおけドン! 東映特撮ヒーローPART2"/>
 		<info name="serial" value="SLPS-02310" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10268,9 +10357,10 @@ A few comments on these:
 
 	<!-- boot ok -->
 	<software name="quizdara" supported="no">
-		<description>Quiz Darake no Jinsei Game - Un to Atama de Daifugou (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Quiz Darake No Jinsei Game (Japan)</description>
+		<year>1997</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="クイズだらけの人生ゲーム 運と頭で大富豪!?"/>
 		<info name="serial" value="SLPS-02282" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10282,9 +10372,10 @@ A few comments on these:
 
 	<!-- hang starting new game -->
 	<software name="quizmill" supported="no">
-		<description>Quiz Millionaire (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Quiz$Millionaire (Japan)</description>
+		<year>2001</year>
+		<publisher>Eidos</publisher>
+		<info name="alt_title" value="クイズ＄ミリオネア"/>
 		<info name="serial" value="SLPS-03364" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10297,8 +10388,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="quovadis" supported="no">
 		<description>Quo Vadis - Iberukatsu Seneki (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Glams</publisher>
+		<info name="alt_title" value="クオバディス 〜イベルカーツ戦役〜"/>
 		<info name="serial" value="SLPS-00733" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10310,9 +10402,10 @@ A few comments on these:
 
 	<!-- boot OK -->
 	<software name="racedriv" supported="no">
-		<description>Race Drivin' a Go! Go! (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Race Driving' A Go! Go! (Japan)</description>
+		<year>1996</year>
+		<publisher>Time Warner</publisher>
+		<info name="alt_title" value="RACE DRIVIN' a GO! GO!"/>
 		<info name="serial" value="SLPS-00167" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10325,8 +10418,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="rakugaki" supported="no">
 		<description>Rakugaki Showtime (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Enix</publisher>
+		<info name="alt_title" value="ラクガキショータイム"/>
 		<info name="serial" value="SLPM-86272" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10339,8 +10433,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="rallydea" supported="no">
 		<description>Rally de Africa (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Prism Arts</publisher>
+		<info name="alt_title" value="ラリー・デ・アフリカ"/>
 		<info name="serial" value="SLPS-01601" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10353,8 +10448,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="rallydee" supported="no">
 		<description>Rally de Europe (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Prism Arts</publisher>
+		<info name="alt_title" value="ラリー・デ・ヨーロッパ"/>
 		<info name="serial" value="SLPS-02679" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10366,9 +10462,10 @@ A few comments on these:
 
 	<!-- black screen after some movies -->
 	<software name="ramichan" supported="no">
-		<description>Ramichan no Odeo Surogoku - Keio Yugekitai Gaiden (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Rami-Chan No Ooeto Surogoku&#58; Keio Yugekitai Gaiden (Japan)</description>
+		<year>1998</year>
+		<publisher>Victor</publisher>
+		<info name="alt_title" value="蘭未ちゃんの大江戸すごろく"/>
 		<info name="serial" value="SLPS-01546" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10380,9 +10477,10 @@ A few comments on these:
 
 	<!-- boot ok -->
 	<software name="ranma12b" supported="no">
-		<description>Ranma 1-2 - Battle Renaissance (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Ranma 1&#47;2 Battle Renaissance (Japan)</description>
+		<year>1996</year>
+		<publisher>Shogakukan</publisher>
+		<info name="alt_title" value="らんま1&#47;2 バトルルネッサンス"/>
 		<info name="serial" value="SLPS-00522" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10395,8 +10493,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="raytrace" supported="no">
 		<description>Ray Tracers (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Taito</publisher>
+		<info name="alt_title" value="レイ・トレーサー"/>
 		<info name="serial" value="SLPS-00098" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10409,8 +10508,9 @@ A few comments on these:
 	<!-- hangs at company logo -->
 	<software name="raymanja" supported="no">
 		<description>Rayman (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Ubisoft</publisher>
+		<info name="alt_title" value="ユービーアイ ソフト&#40;株&#41;"/>
 		<info name="serial" value="SLPS-00026" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10423,8 +10523,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="readymai" supported="no">
 		<description>Ready Maid (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2002</year>
+		<publisher>Princess</publisher>
+		<info name="alt_title" value="れでぃめいど"/>
 		<info name="serial" value="SLPM-87157" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10437,8 +10538,9 @@ A few comments on these:
 	<!-- boot OK -->
 	<software name="rbffsdm" supported="no">
 		<description>Real Bout Garou Densetsu Special - Dominated Mind (Limited Edition) (Japan) (Disc 1)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>SNK</publisher>
+		<info name="alt_title" value="リアルバウト餓狼伝説スペシャル DOMINATED MIND 限定版"/>
 		<info name="serial" value="SLPM-86090, SLPM-86091" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
@@ -10456,8 +10558,9 @@ A few comments on these:
 	<!-- boot OK -->
 	<software name="realrobo" supported="no">
 		<description>Real Robots - Final Attack (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Banpresto</publisher>
+		<info name="alt_title" value="リアルロボッツ ファイナルアタック"/>
 		<info name="serial" value="SLPS-01125" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10470,8 +10573,9 @@ A few comments on these:
 	<!-- boot OK -->
 	<software name="reciproh" supported="no">
 		<description>Recipro Heat 5000 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Xing</publisher>
+		<info name="alt_title" value="レシプロヒート5000"/>
 		<info name="serial" value="SLPS-00744" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10484,8 +10588,9 @@ A few comments on these:
 	<!-- boot ok, needs gun -->
 	<software name="rsbhdemo" supported="no">
 		<description>Rescue Shot Bubibo &amp; BioHazard - Gun Survivor (Demo) (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>200?</year>
+		<publisher>SCEI</publisher>
+		<info name="alt_title" value="レスキューショットブービーぼー＆バイオハザードガンサバイバー ガンコン"/>
 		<info name="serial" value="SLPM-80522" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10498,8 +10603,9 @@ A few comments on these:
 	<!-- black screen, MESS crash -->
 	<software name="retzork" supported="no">
 		<description>Return to Zork (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="リターン・トゥ・ゾーク"/>
 		<info name="serial" value="SLPS-00192, SLPS-00193" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
@@ -10517,8 +10623,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="ridegear" supported="no">
 		<description>Ridegear Guybrave II (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Axela</publisher>
+		<info name="alt_title" value="雷弩機兵ガイブレイブII"/>
 		<info name="serial" value="SLPS-01643, SLPS-01644" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
@@ -10536,8 +10643,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="rikujoub" supported="no">
 		<description>Rikujou Boueitai Maochan (Deluxe Pack) (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2003</year>
+		<publisher>Marvelous</publisher>
+		<info name="alt_title" value="陸上防衛隊まおちゃん DXパック"/>
 		<info name="serial" value="SLPM-87198" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10550,8 +10658,9 @@ A few comments on these:
 	<!-- black screen after company logos -->
 	<software name="riotstar" supported="no">
 		<description>Riot Stars (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Hect</publisher>
+		<info name="alt_title" value="ライアット・スターズ"/>
 		<info name="serial" value="SLPS-00829" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10563,9 +10672,10 @@ A few comments on these:
 
 	<!-- company logos shown, broken into incorrect parts, then hang -->
 	<software name="riseofro" supported="no">
-		<description>Rise of Robots 2 - Resurection (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Rise of Robots 2 - Resurrection (Japan)</description>
+		<year>1996</year>
+		<publisher>Acclaim</publisher>
+		<info name="alt_title" value="ライズ オブ ザ ロボット 2"/>
 		<info name="serial" value="SLPS-00259" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10578,8 +10688,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="risingza" supported="no">
 		<description>Rising Zan - The Samurai Gunman (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>UEP</publisher>
+		<info name="alt_title" value="RISING ZAN"/>
 		<info name="serial" value="SLPS-01691" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10590,9 +10701,10 @@ A few comments on these:
 	</software>
 
 	<software name="robinllo" supported="no">
-		<description>Robin Lloyd no Bouken (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Robin Lloyd no Daibouken (Japan)</description>
+		<year>2000</year>
+		<publisher>Gust</publisher>
+		<info name="alt_title" value="ロビン・ロイドの冒険"/>
 		<info name="serial" value="SLPS-02501" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10603,22 +10715,24 @@ A few comments on these:
 	</software>
 
 	<software name="robotxro" supported="no">
-		<description>Robot X Robot (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="serial" value="SLPS-02231" />
+		<description>Robot-X-Robot (Japan)</description>
+		<year>1999</year>
+		<publisher>Nemesys</publisher>
+		<info name="alt_title" value="ロボット×ロボット"/>
+		<info name="serial" value="SLPS-02331" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="robot x robot (japan) [slps-02231]" sha1="fd0813351a8bbcf57cecb2e3f5481d88592140fe"/>
+				<disk name="robot x robot (japan) [slps-02331]" sha1="fd0813351a8bbcf57cecb2e3f5481d88592140fe"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="roommate" supported="no">
 		<description>Roommate - Inoue Ryoko (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Datam Polystar</publisher>
+		<info name="alt_title" value="ルームメイト〜井上涼子〜"/>
 		<info name="serial" value="SLPS-02140" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10631,8 +10745,9 @@ A few comments on these:
 	<!-- boot OK -->
 	<software name="runningh" supported="no">
 		<description>Running High (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>REX</publisher>
+		<info name="alt_title" value="ランニング・ハイ"/>
 		<info name="serial" value="SLPS-00751" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10642,10 +10757,25 @@ A few comments on these:
 		</part>
 	</software>
 
-	<software name="sakkyoku" supported="no">
-		<description>Sakkyoku Surundamon - Dance Remix-hen (Japan)</description>
-		<year>199?</year>
+	<software name="soundqub" supported="no">
+		<description>S.Q. - Sound Qube (Japan)</description>
+		<year>1998</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="S.Q. サウンドキューブ"/>
+		<info name="serial" value="SLPS-01309" />
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="sound qube (japan) [slps-01309]" sha1="54139ab64577aec717ca75daa26d87b67887a673"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sakkyoku" supported="no">
+		<description>Sakkyoku Surundamon - Dance Remix (Japan)</description>
+		<year>2000</year>
+		<publisher>Ving</publisher>
+		<info name="alt_title" value="作曲するんだもん ダンスリミックス編"/>
 		<info name="serial" value="SLPS-02808" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10657,8 +10787,9 @@ A few comments on these:
 
 	<software name="sakumash" supported="no">
 		<description>Sakuma-shiki Jinsei Game (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="さくま式人生ゲーム"/>
 		<info name="serial" value="SLPS-01740" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10670,8 +10801,9 @@ A few comments on these:
 
 	<software name="salaryma" supported="no">
 		<description>Salary Man Champ - Tatakau Salary Man (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>Success</publisher>
+		<info name="alt_title" value="サラリーマンチャンプ たたかうサラリーマン"/>
 		<info name="serial" value="SLPM-86820" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10682,9 +10814,10 @@ A few comments on these:
 	</software>
 
 	<software name="salarytg" supported="no">
-		<description>Salary Man Kintaro - The Game (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Salaryman Kintarou - The Game (Japan)</description>
+		<year>2000</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="サラリーマン金太郎 THE GAME"/>
 		<info name="serial" value="SLPS-02806" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10696,8 +10829,9 @@ A few comments on these:
 
 	<software name="salarysm" supported="no">
 		<description>Salary Man Settai Mahjong (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>Visit</publisher>
+		<info name="alt_title" value="サラリーマン接待麻雀"/>
 		<info name="serial" value="SLPS-03175" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10708,9 +10842,10 @@ A few comments on these:
 	</software>
 
 	<software name="samuraid" supported="no">
-		<description>Samurai Deeper Kyo (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Samurai Deeper Kyo (Limited Edition) (Japan)</description>
+		<year>2002</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="サムライディーパー キョウ"/>
 		<info name="serial" value="SLPS-03505" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10722,8 +10857,9 @@ A few comments on these:
 
 	<software name="samurais" supported="no">
 		<description>Samurai Spirits - Kenkaku Yubinan Pack (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>SNK</publisher>
+		<info name="alt_title" value="サムライスピリッツ 剣客指南パック"/>
 		<info name="serial" value="SLPS-00647" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10735,9 +10871,10 @@ A few comments on these:
 
 	<!-- odd gfx problems -->
 	<software name="samsho3" supported="no">
-		<description>Samurai Spirits - Zankurou Musouken (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Samurai Spirits - Zankurou Musouken (PlayStation the Best) (Japan)</description>
+		<year>1997</year>
+		<publisher>SNK</publisher>
+		<info name="alt_title" value="サムライスピリッツ 斬紅郎無双剣 PlayStation the Best"/>
 		<info name="serial" value="SLPS-91024" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10749,8 +10886,9 @@ A few comments on these:
 
 	<software name="sangokus" supported="no">
 		<description>Sangokushi Eiketsuden (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Koei</publisher>
+		<info name="alt_title" value="三國志英傑伝"/>
 		<info name="serial" value="SLPS-00309" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10760,10 +10898,25 @@ A few comments on these:
 		</part>
 	</software>
 
+	<software name="sangokou" supported="no">
+		<description>Sangokushi Koumeiden (Japan)</description>
+		<year>1997</year>
+		<publisher>Koei</publisher>
+		<info name="alt_title" value="三國志孔明伝"/>
+		<info name="serial" value="SLPS-00688" />
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="sangokushi koumeiden (japan) [slps-00688]" sha1="2719dea19adbb7f9adf3ed4325cc7254bd09c1d4"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="sangoku2" supported="no">
 		<description>Sangokushi II (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Koei</publisher>
+		<info name="alt_title" value="三國志II"/>
 		<info name="serial" value="SLPS-01596" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10775,8 +10928,9 @@ A few comments on these:
 
 	<software name="sangoku3" supported="no">
 		<description>Sangokushi III (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>Koei</publisher>
+		<info name="alt_title" value="三國志III"/>
 		<info name="serial" value="SLPM-86747" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10786,23 +10940,11 @@ A few comments on these:
 		</part>
 	</software>
 
-	<software name="sangokou" supported="no">
-		<description>Sangokushi Koumeiden (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="serial" value="SLPS-00688" />
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="sangokushi koumeiden (japan) [slps-00688]" sha1="2719dea19adbb7f9adf3ed4325cc7254bd09c1d4"/>
-			</diskarea>
-		</part>
-	</software>
-
 	<software name="sangokrt" supported="no">
 		<description>Sangokushi Returns (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Koei</publisher>
+		<info name="alt_title" value="三國志リターンズ"/>
 		<info name="serial" value="SLPS-00474" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10814,8 +10956,9 @@ A few comments on these:
 
 	<software name="sangoku5" supported="no">
 		<description>Sangokushi V (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Koei</publisher>
+		<info name="alt_title" value="三国志5繁体中文版"/>
 		<info name="serial" value="SCPS-45128" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10827,8 +10970,9 @@ A few comments on these:
 
 	<software name="sangoku6" supported="no">
 		<description>Sangokushi VI (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Koei</publisher>
+		<info name="alt_title" value="三國志VI"/>
 		<info name="serial" value="SLPM-86129" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10839,9 +10983,10 @@ A few comments on these:
 	</software>
 
 	<software name="sanyopac" supported="no">
-		<description>Sanyo Pachinko Paradise 2 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Sanyo Pachinko Paradise 2 - Umi Monogatari Special (Japan)</description>
+		<year>1999</year>
+		<publisher>Irem</publisher>
+		<info name="alt_title" value="三洋パチンコパラダイス2"/>
 		<info name="serial" value="SLPS-02389" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10853,8 +10998,9 @@ A few comments on these:
 
 	<software name="sarugety" supported="no">
 		<description>Saru! Get You! (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Sony</publisher>
+		<info name="alt_title" value="サルゲッチュ"/>
 		<info name="serial" value="SCPS-10091" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10866,8 +11012,9 @@ A few comments on these:
 
 	<software name="satellit" supported="no">
 		<description>Satelli TV (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Nippon Ichi</publisher>
+		<info name="alt_title" value="サテライTV"/>
 		<info name="serial" value="SLPS-01203" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10879,8 +11026,9 @@ A few comments on these:
 
 	<software name="satomino" supported="no">
 		<description>Satomi no Nazo (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Sound Technology Japan</publisher>
+		<info name="alt_title" value="里見の謎"/>
 		<info name="serial" value="SLPS-00613" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10891,9 +11039,10 @@ A few comments on these:
 	</software>
 
 	<software name="schrodin" supported="no">
-		<description>Schrodinger no Neko - Die Katze von Schrodinger (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Schr&#246;dinger no Neko - Die Katze von Schr&#246;dinger (Japan)</description>
+		<year>1997</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="シュレディンガーの猫"/>
 		<info name="serial" value="SLPS-00780" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10904,9 +11053,10 @@ A few comments on these:
 	</software>
 
 	<software name="sdgkvm" supported="no">
-		<description>SD Gundam Eiyuuden - Daikessen!! Knight vs. Musha (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>SD Gundam Eiyuuden Daikessen - Knight vs. Musha (Japan)</description>
+		<year>2001</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="SDガンダム英雄伝 大決戦!!騎士VS武者"/>
 		<info name="serial" value="SLPS-03145" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10917,9 +11067,10 @@ A few comments on these:
 	</software>
 
 	<software name="sdgggf" supported="no">
-		<description>SD Gundam G-Generation F (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>SD Gundam G Generation-F (Limited Edition)(Japan)</description>
+		<year>2000</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="SDガンダムG GENERATION－F(限定版)"/>
 		<info name="serial" value="SLPS-02900, SLPS-02901, SLPS-02902" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
@@ -10940,9 +11091,10 @@ A few comments on these:
 	</software>
 
 	<software name="sdgggfif" supported="no">
-		<description>SD Gundam G-Generation F if (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>SD Gundam G - Generation-F.I.F (Japan)</description>
+		<year>2001</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="SDガンダム GGENERATION－F.I.F"/>
 		<info name="serial" value="SLPS-03195" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10953,9 +11105,10 @@ A few comments on these:
 	</software>
 
 	<software name="sdggg0" supported="no">
-		<description>SD Gundam G-Generation Zero (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>SD Gundam G - Generation Zero (Japan)</description>
+		<year>1999</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="SDガンダム ジージェネレーション・ゼロ"/>
 		<info name="serial" value="SLPS-02200, SLPS-02201, SLPS-02202" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
@@ -10977,8 +11130,9 @@ A few comments on these:
 
 	<software name="seabassf" supported="no">
 		<description>Seabass Fishing 2 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Victor</publisher>
+		<info name="alt_title" value="シーバス・フィッシング2"/>
 		<info name="serial" value="SLPS-00992" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -10989,9 +11143,10 @@ A few comments on these:
 	</software>
 
 	<software name="seikaino" supported="no">
-		<description>Seikai no Monshou (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Seikai no Monshou (Crest of the Stars) (Japan)</description>
+		<year>2000</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="星界の紋章"/>
 		<info name="serial" value="SLPS-02323" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11001,10 +11156,25 @@ A few comments on these:
 		</part>
 	</software>
 
+	<software name="seikende" supported="no">
+		<description>Seiken Densetsu - Legend of Mana (Demo) (Japan)</description>
+		<year>1999</year>
+		<publisher>Squaresoft</publisher>
+		<info name="alt_title" value=""/>
+		<info name="serial" value="SCPS-45417" />
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="square's preview 5 (japan) (demo) [scps-45417]" sha1="2e84ab79573ce07bb78480a9d75d601e14d07895"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="seireish" supported="no">
-		<description>Seirei Shoukan - Princess of Darkness (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Seirishoukan - Princess of Darkness (Japan)</description>
+		<year>1998</year>
+		<publisher>Shoeisha</publisher>
+		<info name="alt_title" value="精霊召喚 〜プリンセス オブ ダークネス〜"/>
 		<info name="serial" value="SLPS-01271" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11016,8 +11186,9 @@ A few comments on these:
 
 	<software name="sengokum" supported="no">
 		<description>Sengoku Mugen (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>Banpresto</publisher>
+		<info name="alt_title" value="戦国夢幻"/>
 		<info name="serial" value="SLPS-03151" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11028,9 +11199,10 @@ A few comments on these:
 	</software>
 
 	<software name="senkaita" supported="no">
-		<description>Senkai Taisen - TV Animation Senkaiden Houshin Engi yori (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Senkai Taisen TV Animation Senkaiden Houshin Engi Yori (Japan)</description>
+		<year>2000</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="仙界大戦 〜TVアニメーション仙界伝封神演義より〜"/>
 		<info name="serial" value="SLPS-02736" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11041,9 +11213,10 @@ A few comments on these:
 	</software>
 
 	<software name="senryaku" supported="no">
-		<description>Senryaku Shidan - Tora! Tora! Tora! Rikusen-hen (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Senryaku Shidan - Tora! Tora! Tora! Rikusenhen (Japan)</description>
+		<year>2000</year>
+		<publisher>DaZZ</publisher>
+		<info name="alt_title" value="戦略師団 トラ!トラ!トラ! 陸戦編"/>
 		<info name="serial" value="SLPS-02631" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11055,8 +11228,9 @@ A few comments on these:
 
 	<software name="sentimen" supported="no">
 		<description>Sentimental Graffiti (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>NEC</publisher>
+		<info name="alt_title" value="センチメンタルグラフティ"/>
 		<info name="serial" value="SLPS-03184" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11067,9 +11241,10 @@ A few comments on these:
 	</software>
 
 	<software name="sentouko" supported="no">
-		<description>Sentou Kokka Kai Improved (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Sentou Kokka Kai - Improved (Japan)</description>
+		<year>1997</year>
+		<publisher>Sony</publisher>
+		<info name="alt_title" value="戦闘国家－改－ IMPROVED"/>
 		<info name="serial" value="SCPS-10034" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11081,8 +11256,9 @@ A few comments on these:
 
 	<software name="shachoue" supported="no">
 		<description>Shachou Eiyuuden - The Eagle Shooting Heroes (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Sony</publisher>
+		<info name="alt_title" value="射雕英雄传"/>
 		<info name="serial" value="SCPS-45510" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11093,9 +11269,10 @@ A few comments on these:
 	</software>
 
 	<software name="shibasu1" supported="no">
-		<description>Shibasu 1-2-3 Destiny! (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Shibas 1-2-3 Destiny! Unmei O Kaerusha! (Japan)</description>
+		<year>2000</year>
+		<publisher>Jaleco</publisher>
+		<info name="alt_title" value="シーバス 1－2－3"/>
 		<info name="serial" value="SLPS-01893" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11107,8 +11284,9 @@ A few comments on these:
 
 	<software name="shinmaso" supported="no">
 		<description>Shin Masoukishin - Panzer Warfare (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Banpresto</publisher>
+		<info name="alt_title" value="真・魔装機神"/>
 		<info name="serial" value="SLPS-02319" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11120,8 +11298,9 @@ A few comments on these:
 
 	<software name="shinmega" supported="no">
 		<description>Shin Megami Tensei (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>Atlus</publisher>
+		<info name="alt_title" value="真・女神転生"/>
 		<info name="serial" value="SLPS-03170" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11132,9 +11311,10 @@ A few comments on these:
 	</software>
 
 	<software name="shinsdse" supported="no">
-		<description>Shin SD Sengokuden Kidou Musha Taisen [Limited Edition] (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Shin SD Sengokuden - Kidou Musha Taisen (Limited Edition) (Japan)</description>
+		<year>1996</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="新SD戦国伝 機動武者大戦(限定版)"/>
 		<info name="serial" value="SLPS-00576" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11147,8 +11327,9 @@ A few comments on these:
 	<!-- boot OK -->
 	<software name="shinthem" supported="no">
 		<description>Shin Theme Park (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="alt_title" value="新テーマパーク"/>
 		<info name="serial" value="SLPS-00810" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11160,8 +11341,9 @@ A few comments on these:
 
 	<software name="shinriga" supported="no">
 		<description>Shinri Game, The (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Visit</publisher>
+		<info name="alt_title" value="ザ・心理ゲーム"/>
 		<info name="serial" value="SLPS-00169" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11172,9 +11354,10 @@ A few comments on these:
 	</software>
 
 	<software name="shinseid" supported="no">
-		<description>Shinseiden Megaseed Fukkatsu-hen (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Shinseiden Megaseed Fukkatsu-Hen (Japan)</description>
+		<year>1997</year>
+		<publisher>Banpresto</publisher>
+		<info name="alt_title" value="神聖伝メガシード 復活編"/>
 		<info name="serial" value="SLPS-00925" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11186,8 +11369,9 @@ A few comments on these:
 
 	<software name="shinsets" supported="no">
 		<description>Shinsetsu Samurai Spirits - Bushido Retsuden (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>SNK</publisher>
+		<info name="alt_title" value="真説サムライスピリッツ 武士道烈伝"/>
 		<info name="serial" value="SLPS-00814" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11198,9 +11382,10 @@ A few comments on these:
 	</software>
 
 	<software name="shiritsu" supported="no">
-		<description>Shiritsu Justice Gakuen (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Shiritsu Justice Gakuen - Legion of Heroes (Japan)</description>
+		<year>1998</year>
+		<publisher>Capcom</publisher>
+		<info name="alt_title" value="私立ジャスティス学園 〜 LEGION OF HEROES 〜"/>
 		<info name="serial" value="SLPS-01240, SLPS-01241" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
@@ -11217,8 +11402,9 @@ A few comments on these:
 
 	<software name="shirits2" supported="no">
 		<description>Shiritsu Justice Gakuen - Nekketsu Seishun Nikki 2 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Capcom</publisher>
+		<info name="alt_title" value="私立ジャスティス学園－熱血青春日記2－"/>
 		<info name="serial" value="SLPS-02120" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11230,8 +11416,9 @@ A few comments on these:
 
 	<software name="shoryusa" supported="no">
 		<description>Shoryu Sangokuengi (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Imageneer</publisher>
+		<info name="alt_title" value="昇龍三国演義"/>
 		<info name="serial" value="SLPS-00253" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11243,8 +11430,9 @@ A few comments on these:
 
 	<software name="shuranom" supported="no">
 		<description>Shura no Mon (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Kodansha</publisher>
+		<info name="alt_title" value="修羅の門"/>
 		<info name="serial" value="SLPS-01202" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11257,8 +11445,9 @@ A few comments on these:
 	<!-- boot OK -->
 	<software name="sidebysi" supported="no">
 		<description>Side by Side Special 2000 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Taito</publisher>
+		<info name="alt_title" value="サイドバイサイドスペシャル2000"/>
 		<info name="serial" value="SLPM-86344" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11269,9 +11458,10 @@ A few comments on these:
 	</software>
 
 	<software name="sidepock" supported="no">
-		<description>Side Pocket 3 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Side Pocket 3 - 3D Polygon Billiard Game (Japan)</description>
+		<year>1998</year>
+		<publisher>Data East</publisher>
+		<info name="alt_title" value="サイドポケット3"/>
 		<info name="serial" value="SLPS-01079" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11283,8 +11473,9 @@ A few comments on these:
 
 	<software name="sidewind" supported="no">
 		<description>Sidewinder (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Asmik</publisher>
+		<info name="alt_title" value="サイドワインダー"/>
 		<info name="serial" value="SLPS-00156" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11295,9 +11486,10 @@ A few comments on these:
 	</software>
 
 	<software name="silentmo" supported="no">
-		<description>Silent Mobius - Genei no Datenshi (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Silent M&#246;bius - Genei no Datenshi (Japan)</description>
+		<year>1998</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="サイレントメビウス 幻影の堕天使"/>
 		<info name="serial" value="SLPS-01803" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11309,8 +11501,9 @@ A few comments on these:
 
 	<software name="silhouet" supported="no">
 		<description>Silhouette Mirage - Reprogrammed Hope (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>ESP</publisher>
+		<info name="alt_title" value="シルエットミラージュ"/>
 		<info name="serial" value="SLPS-01449" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11322,8 +11515,9 @@ A few comments on these:
 
 	<software name="silhstor" supported="no">
 		<description>Silhouette Stories (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Kaneko</publisher>
+		<info name="alt_title" value="シルエット☆ストーリィズ"/>
 		<info name="serial" value="SLPS-00374" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11335,9 +11529,10 @@ A few comments on these:
 
 	<!-- black screen -->
 	<software name="s15j_01" supported="no">
-		<description>Simple 1500 Jitsuyou Series Vol.01 - Norikae Annai - 2000 Edition (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple 1500 Jitsuyou Series Vol.01 - Norikae Annai -2000 Edition- (Japan)</description>
+		<year>2000</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500実用シリーズ Vol.01 乗換案内〜2000年版〜"/>
 		<info name="serial" value="SLPS-02842" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11350,8 +11545,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="s15j_03" supported="no">
 		<description>Simple 1500 Jitsuyou Series Vol.03 - Seimei Handan (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500実用シリーズ Vol.03 THE 姓名判断"/>
 		<info name="serial" value="SLPS-02841" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11364,8 +11560,9 @@ A few comments on these:
 	<!-- black screen -->
 	<software name="s15j_04" supported="no">
 		<description>Simple 1500 Jitsuyou Series Vol.04 - Ryouri (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500実用シリーズ Vol.04 THE 料理〜定番料理レシピ集〜"/>
 		<info name="serial" value="SLPS-02839" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11378,8 +11575,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="s15j_05" supported="no">
 		<description>Simple 1500 Jitsuyou Series Vol.05 - Kusuri no Jiten - Pill Book 2001 Edition (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500実用シリーズ Vol.05 薬の事典〜ピルブック2001年版〜"/>
 		<info name="serial" value="SLPM-86706" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11392,8 +11590,9 @@ A few comments on these:
 	<!-- black screen -->
 	<software name="s15j_06" supported="no">
 		<description>Simple 1500 Jitsuyou Series Vol.06 - Cocktail no Recipe (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500実用シリーズ Vol.06 カクテルのレシピ"/>
 		<info name="serial" value="SLPM-86707" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11406,8 +11605,9 @@ A few comments on these:
 	<!-- black screen -->
 	<software name="s15j_07" supported="no">
 		<description>Simple 1500 Jitsuyou Series Vol.07 - Tanoshiku Manabu Unten Menkyo (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500実用シリーズ Vol.07 楽しく学ぶ運転免許"/>
 		<info name="serial" value="SLPM-86797" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11420,8 +11620,9 @@ A few comments on these:
 	<!-- MESS crash after company logos -->
 	<software name="s15j_08" supported="no">
 		<description>Simple 1500 Jitsuyou Series Vol.08 - 1-Jikan de Wakaru Kabushiki Toushi (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500実用シリーズ Vol.08 1時間でわかる株式投資"/>
 		<info name="serial" value="SLPM-86708" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11434,8 +11635,9 @@ A few comments on these:
 	<!-- black screen -->
 	<software name="s15j_09" supported="no">
 		<description>Simple 1500 Jitsuyou Series Vol.09 - Watashi Style no Aromatherapy (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500実用シリーズ Vol.09 わたしスタイルのアロマセラピー"/>
 		<info name="serial" value="SLPM-86843" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11448,8 +11650,9 @@ A few comments on these:
 	<!-- black screen -->
 	<software name="s15j_10" supported="no">
 		<description>Simple 1500 Jitsuyou Series Vol.10 - Tarot Uranai (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500実用シリーズ Vol.10 タロット占い"/>
 		<info name="serial" value="SLPM-86913" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11462,8 +11665,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="s15j_11" supported="no">
 		<description>Simple 1500 Jitsuyou Series Vol.11 - Katei de Dekiru Tsubo Shiatsu (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500実用シリーズ Vol.11 家庭でできるツボ指圧"/>
 		<info name="serial" value="SLPM-86968" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11476,8 +11680,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="s15j_12" supported="no">
 		<description>Simple 1500 Jitsuyou Series Vol.12 - Katei no Igaku (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500実用シリーズ Vol.12 家庭の医学"/>
 		<info name="serial" value="SLPM-86969" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11490,8 +11695,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="s15j_13" supported="no">
 		<description>Simple 1500 Jitsuyou Series Vol.13 - Shinri Game - Soreike X Kokoroji (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2002</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500実用シリーズ Vol.13 心理ゲーム 〜それいけ×ココロジー ココロのウソの摩訶不思議〜"/>
 		<info name="serial" value="SLPM-87016" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11506,6 +11712,7 @@ A few comments on these:
 		<description>Simple 1500 Jitsuyou Series Vol.14 - Kurashi no Manner (Japan)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="SIMPLE1500実用シリーズ Vol.14 暮らしのマナー 〜冠婚葬祭編〜"/>
 		<info name="serial" value="SLPM-87022" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11517,9 +11724,10 @@ A few comments on these:
 
 	<!-- boot ok -->
 	<software name="s15j_15" supported="no">
-		<description>Simple 1500 Jitsuyou Series Vol.15 - Inu no Kaikata (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple 1500 Jitsuyou Series Vol.15 - Inu no Kaikata - Sekai no Inu Catalog (Japan)</description>
+		<year>2002</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500実用シリーズ Vol.15 犬の飼い方 〜世界の犬カタログ〜"/>
 		<info name="serial" value="SLPM-87051" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11531,9 +11739,10 @@ A few comments on these:
 
 	<!-- boot ok -->
 	<software name="s15j_16" supported="no">
-		<description>Simple 1500 Jitsuyou Series Vol.16 - Neko no Kaikata (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple 1500 Jitsuyou Series Vol.16 - Neko no Kaikata - Sekai no Neko Catalo (Japan)</description>
+		<year>2002</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500実用シリーズ Vol.16 猫の飼い方 〜世界の猫カタログ〜"/>
 		<info name="serial" value="SLPM-87052" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11546,8 +11755,9 @@ A few comments on these:
 	<!-- black screen -->
 	<software name="s15j_17" supported="no">
 		<description>Simple 1500 Jitsuyou Series Vol.17 - Planetarium (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2002</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500実用シリーズ Vol.17 THE プラネタリウム"/>
 		<info name="serial" value="SLPM-87049" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11559,22 +11769,24 @@ A few comments on these:
 
 	<!-- black screen -->
 	<software name="s15j_18" supported="no">
-		<description>Simple 1500 Jitsuyou Series Vol.18 - Kanji Quiz - Kanji Kentei Ni Challenge (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="serial" value="SLPS-3186" />
+		<description>Simple 1500 Jitsuyou Series Vol.18 - Kanji Quiz - Kanji Keitei ni Challenge (Japan)</description>
+		<year>2002</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500実用シリーズ Vol.18 THE 漢字クイズ 〜漢字検定にチャレンジ〜"/>
+		<info name="serial" value="SLPM-87072" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="simple 1500 jitsuyou series vol.18 - kanji quiz - kanji kentei ni challenge (japan) [slps-3186]" sha1="a8ad5f5ac74436bf7ebbad9faa20f4f04d1320e4"/>
+				<disk name="simple 1500 jitsuyou series vol.18 - kanji quiz - kanji kentei ni challenge (japan) [slpm-87072]" sha1="a8ad5f5ac74436bf7ebbad9faa20f4f04d1320e4"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="s15_h01" supported="no">
-		<description>Simple 1500 Series Hello Kitty Vol.01 - Hello Kitty Bowling (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple 1500 Series - Hello Kitty vol.01 - Hello Kitty Bowling (Japan)</description>
+		<year>2001</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500シリーズ ハローキティ Vol.01 Hello Kitty ボウリング"/>
 		<info name="serial" value="SLPM-86866" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11586,8 +11798,9 @@ A few comments on these:
 
 	<software name="s15_h02" supported="no">
 		<description>Simple 1500 Series Hello Kitty Vol.02 - Hello Kitty Illust Puzzle (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500シリーズ ハローキティ Vol.02 Hello Kitty イラストパズル"/>
 		<info name="serial" value="SLPM-86867" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11598,9 +11811,10 @@ A few comments on these:
 	</software>
 
 	<software name="s15_h03" supported="no">
-		<description>Simple 1500 Series Hello Kitty Vol.03 - Hello Kitty Block Kuzushi (Japan)</description>
+		<description> Simple 1500 Series Hello Kitty vol.03 - Hello Kitty Block Kuzushi (Japan)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="SIMPLE1500シリーズ ハローキティ Vol.03 Hello Kitty ブロックくずし"/>
 		<info name="serial" value="SLPM-86911" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11611,9 +11825,10 @@ A few comments on these:
 	</software>
 
 	<software name="s15_h04" supported="no">
-		<description>Simple 1500 Series Hello Kitty Vol.04 - Trump (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple 1500 Series Hello Kitty Vol.04 - Hello Kitty Trump (Japan)</description>
+		<year>2001</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500シリーズ ハローキティ Vol.04 Hello Kitty トランプ"/>
 		<info name="serial" value="SLPM-86910" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11624,9 +11839,10 @@ A few comments on these:
 	</software>
 
 	<software name="s15_37" supported="no">
-		<description>Simple 1500 Series Vol.037 - The Illustration Puzzle &amp; Slide Puzzle (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple 1500 Series Vol.37 - The Illustration Puzzle &#38; Slide Puzzle (Japan)</description>
+		<year>2000</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500シリーズ Vol.37 THE イラストパズル＆スライドパズル"/>
 		<info name="serial" value="SLPS-02958" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11637,9 +11853,10 @@ A few comments on these:
 	</software>
 
 	<software name="s15_51" supported="no">
-		<description>Simple 1500 Series Vol.051 - The Jigsaw Puzzle (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple 1500 Series vol.51 - The Jigsaw Puzzle (Japan)</description>
+		<year>2000</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500シリーズ Vol.51 THE ジグソーパズル"/>
 		<info name="serial" value="SLPM-86700" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11650,9 +11867,10 @@ A few comments on these:
 	</software>
 
 	<software name="s15_63" supported="no">
-		<description>Simple 1500 Series Vol.063 - The Gun Shooting 2 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple 1500 Series vol.63 - The Gun Shooting 2 (Japan)</description>
+		<year>2001</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500シリーズ Vol.63 THE ガンシューティング2"/>
 		<info name="serial" value="SLPM-86816" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11663,9 +11881,10 @@ A few comments on these:
 	</software>
 
 	<software name="s15_67" supported="no">
-		<description>Simple 1500 Series Vol.067 - The Soccer - Dynamite Soccer 1500 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple 1500 Series vol.67 - The Soccer - Dynamite Soccer 1500 (Japan)</description>
+		<year>2001</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500シリーズ Vol.67 THE サッカー 〜ダイナマイトサッカー1500〜"/>
 		<info name="serial" value="SLPM-86864" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11676,9 +11895,10 @@ A few comments on these:
 	</software>
 
 	<software name="s15_71" supported="no">
-		<description>Simple 1500 Series Vol.071 - The Renai Simulation 2 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple 1500 Series vol.71 - The Renai Simulation 2 (Japan)</description>
+		<year>2001</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500シリーズ Vol.71 THE 恋愛シミュレーション2 〜ふれあい〜"/>
 		<info name="serial" value="SLPM-86870" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11689,9 +11909,10 @@ A few comments on these:
 	</software>
 
 	<software name="s15_72" supported="no">
-		<description>Simple 1500 Series Vol.072 - The Beach Volley (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple 1500 Series vol.72 - The Beach Volley (Japan)</description>
+		<year>2001</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500シリーズ Vol.72 THE ビーチバレー"/>
 		<info name="serial" value="SLPM-86871" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11702,9 +11923,10 @@ A few comments on these:
 	</software>
 
 	<software name="s15_73" supported="no">
-		<description>Simple 1500 Series Vol.073 - The Invader - Space Invaders 1500 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple 1500 Series vol.73 - The Invaders - Space Invaders 1500 (Japan)</description>
+		<year>2001</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500シリーズ Vol.73 THE インベーダー"/>
 		<info name="serial" value="SLPM-86900" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11715,9 +11937,10 @@ A few comments on these:
 	</software>
 
 	<software name="s15_76" supported="no">
-		<description>Simple 1500 Series Vol.076 - The Dodge Ball (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple 1500 Series vol.76 - The Dodgeball (Japan)</description>
+		<year>2001</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500シリーズ Vol.76 THE ドッヂボール"/>
 		<info name="serial" value="SLPM-86914" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11728,9 +11951,10 @@ A few comments on these:
 	</software>
 
 	<software name="s15_83" supported="no">
-		<description>Simple 1500 Series Vol.083 - The Wake Board - Burstrick Wake Boarding (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple 1500 Series vol.83 - The Wakeboard - BursTrick Wake Boarding!! (Japan)</description>
+		<year>2001</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500シリーズ Vol.83 THE ウェイクボード"/>
 		<info name="serial" value="SLPM-86998" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11741,9 +11965,10 @@ A few comments on these:
 	</software>
 
 	<software name="s15_85" supported="no">
-		<description>Simple 1500 Series Vol.085 - The Sengoku Bushou - Tenka Touitsu no Yabou (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple 1500 Series vol.85 - The Sengoku Bushou - Tenka Touitsu no Yabou (Japan)</description>
+		<year>2002</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500シリーズ Vol.85 THE 戦国武将 〜天下統一の野望〜"/>
 		<info name="serial" value="SLPM-87008" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11754,9 +11979,10 @@ A few comments on these:
 	</software>
 
 	<software name="s15_88" supported="no">
-		<description>Simple 1500 Series Vol.088 - The Gal Mahjong (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple 1500 Series vol.88 - The Gal Mahjong - Love Songs - Idol wa High Rate (Japan)</description>
+		<year>2002</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500シリーズ Vol.88 THE ギャル麻雀 〜LoveSongs アイドルはハイレ〜ト〜"/>
 		<info name="serial" value="SLPM-87023" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11767,9 +11993,10 @@ A few comments on these:
 	</software>
 
 	<software name="s15_89" supported="no">
-		<description>Simple 1500 Series Vol.089 - The Power Shovel Ni Norou!! (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple 1500 Series vol.89 - The Power Shovel - Power Shovel ni Norou! (Japan)</description>
+		<year>2002</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500シリーズ Vol.89 THE パワーショベル 〜パワーショベルに乗ろう!!〜"/>
 		<info name="serial" value="SLPM-87035" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11780,9 +12007,10 @@ A few comments on these:
 	</software>
 
 	<software name="s15_90" supported="no">
-		<description>Simple 1500 Series Vol.090 - The Sensha (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple 1500 Series vol.90 - The Sensha (Japan)</description>
+		<year>2002</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500シリーズ Vol.90 THE 戦車"/>
 		<info name="serial" value="SLPM-87044" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11793,9 +12021,10 @@ A few comments on these:
 	</software>
 
 	<software name="s15_93" supported="no">
-		<description>Simple 1500 Series Vol.093 - The Puzzle Bobble - Puzzle Bobble 4 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple 1500 Series Vol.93 - The Puzzle Bobble 4 (Japan)</description>
+		<year>2002</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500シリーズ Vol.93 THE パズルボブル 〜パズルボブル4〜"/>
 		<info name="serial" value="SLPM-87057" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11806,9 +12035,10 @@ A few comments on these:
 	</software>
 
 	<software name="s15_97" supported="no">
-		<description>Simple 1500 Series Vol.097 - The Squash (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple 1500 Series vol.97 - The Squash (Japan)</description>
+		<year>2002</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500シリーズ Vol.97 THE スカッシュ"/>
 		<info name="serial" value="SLPM-87088" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11819,9 +12049,10 @@ A few comments on these:
 	</software>
 
 	<software name="s15_99" supported="no">
-		<description>Simple 1500 Series Vol.099 - The Kendo (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple 1500 Series Vol.99 - The Kendo - Ken no Hanamichi (Japan)</description>
+		<year>2002</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500シリーズ Vol.99 THE 剣道 〜剣の花道〜"/>
 		<info name="serial" value="SLPM-87140" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11832,9 +12063,10 @@ A few comments on these:
 	</software>
 
 	<software name="s15_101" supported="no">
-		<description>Simple 1500 Series Vol.101 - The Sentou (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple 1500 series vol.101 - The Sentou (Japan)</description>
+		<year>2003</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500シリーズ Vol.101 THE 銭湯"/>
 		<info name="serial" value="SLPM-87142" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11845,9 +12077,10 @@ A few comments on these:
 	</software>
 
 	<software name="s15_102" supported="no">
-		<description>Simple 1500 Series Vol.102 - The Densha Untenshi - Densha de Go! Nagoya Tetsudo-hen (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple 1500 Series Vol.102 - The Densha Untensha - Densha de Go! - Nagoya Tetsudou-hen (Japan)</description>
+		<year>2002</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500シリーズ Vol.102 THE 電車運転手〜電車でGO!名古屋鉄道編〜"/>
 		<info name="serial" value="SLPM-87144" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11858,9 +12091,10 @@ A few comments on these:
 	</software>
 
 	<software name="s15_103" supported="no">
-		<description>Simple 1500 Series Vol.103 - The Ganso Densha Untenshi - Densha de Go! (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple 1500 Series Vol.103 - The Ganso Densha Utenshi - Densha De Go! (Japan)</description>
+		<year>2003</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500シリーズ Vol.103 THE 元祖電車運転士〜電車でGO!〜"/>
 		<info name="serial" value="SLPM-87212" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11871,9 +12105,10 @@ A few comments on these:
 	</software>
 
 	<software name="s15_104" supported="no">
-		<description>Simple 1500 Series Vol.104 - The Pink Panther (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple 1500 Series Vol.104 - The Pink Panther - Pinkadelic Pursuit (Japan)</description>
+		<year>2003</year>
+		<publisher>D3</publisher>
+		<info name="alt_title" value="SIMPLE1500シリーズ Vol.104 THE ピンクパンサー"/>
 		<info name="serial" value="SLPM-87215" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11883,10 +12118,27 @@ A few comments on these:
 		</part>
 	</software>
 
+	<!-- to dump!
+	<software name="sc2k_01" supported="no">
+	    <description>Simple Characters 2000 Series Vol.01 - Kidou Senshi Gundam - The Gunjin Shougi (Japan)</description>
+	    <year>2001</year>
+	    <publisher>Bandai</publisher>
+	    <info name="alt_title" value="SIMPLEキャラクター2000シリーズ Vol.01 機動戦士ガンダム THE 軍人将棋"/>
+	    <info name="serial" value="SLPS-03309" />
+	    <sharedfeat name="compatibility" value="NTSC-J"/>
+	    <part name="cdrom" interface="psx_cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="simple characters 2000 series vol.01 - kidou senshi gundam (japan) [slps-03309]" sha1=""/>
+	        </diskarea>
+	    </part>
+	</software>
+	-->
+
 	<software name="sc2k_02" supported="no">
 		<description>Simple Characters 2000 Series Vol.02 - Afro Ken - The Puzzle (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="SIMPLEキャラクター2000シリーズ Vol.02 アフロ犬 THE パズル"/>
 		<info name="serial" value="SLPS-03307" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11895,24 +12147,12 @@ A few comments on these:
 			</diskarea>
 		</part>
 	</software>
-	<!-- dupe
-	<software name="sc2k_02" supported="no">
-	<description>Simple Characters 2000 Series Vol.02 - Afroken - The Puzzle (Japan)</description>
-	<year>199?</year>
-	<publisher>&lt;unknown&gt;</publisher>
-	<info name="serial" value="SLPS-03307" />
-	<sharedfeat name="compatibility" value="NTSC-J"/>
-	<part name="cdrom" interface="psx_cdrom">
-	  <diskarea name="cdrom">
-	    <disk name="simple characters 2000 series vol.02 - afroken - the puzzle (japan) [slps-03307]" sha1="5b89aac27f6435972c512abe6b949d9bae591d19"/>
-	  </diskarea>
-	</part>
-	</software>
-	-->
+
 	<software name="sc2k_03" supported="no">
 		<description>Simple Characters 2000 Series Vol.03 - Kamen Rider - The Bike Race (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="SIMPLEキャラクター2000シリーズ Vol.03 仮面ライダー THE バイクレース"/>
 		<info name="serial" value="SLPS-03308" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11923,9 +12163,10 @@ A few comments on these:
 	</software>
 
 	<software name="sc2k_04" supported="no">
-		<description>Simple Characters 2000 Series Vol.04 - Jarin-Ko Chie - The Hanafuda (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple Characters 2000 Series Vol.04 - Jarinko Chie - The Hanafuda (Japan)</description>
+		<year>2001</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="SIMPLEキャラクター2000シリーズ Vol.04 じゃりン子チエ THE 花札"/>
 		<info name="serial" value="SLPS-03350" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11936,9 +12177,10 @@ A few comments on these:
 	</software>
 
 	<software name="sc2k_05" supported="no">
-		<description>Simple Characters 2000 Series Vol.05 - HighSchool Kimengumi - The Table Hockey (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple Characters 2000 Series vol.05 - Highschool Kimengumi - The Table Hockey (Japan)</description>
+		<year>2001</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="SIMPLEキャラクター2000シリーズ Vol.05 ハイスクール奇面組 THE テーブルホッケー"/>
 		<info name="serial" value="SLPS-03362" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11950,8 +12192,9 @@ A few comments on these:
 
 	<software name="sc2k_06" supported="no">
 		<description>Simple Characters 2000 Series Vol.06 - Dokonjou Gaeru - The Mahjong (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2002</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="SIMPLEキャラクター2000シリーズ Vol.06 ど根性ガエル THE 麻雀"/>
 		<info name="serial" value="SLPS-03363" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11962,9 +12205,10 @@ A few comments on these:
 	</software>
 
 	<software name="sc2k_07" supported="no">
-		<description>Simple Characters 2000 Series Vol.07 - Ikkyuusan - The Quiz (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple Characters 2000 Series vol.07 - Ikkyuu-san&#58; The Quiz (Japan)</description>
+		<year>2002</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="SIMPLEキャラクター2000シリーズ Vol.07 一休さん THE クイズ"/>
 		<info name="serial" value="SLPS-03418" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11974,10 +12218,27 @@ A few comments on these:
 		</part>
 	</software>
 
+	<!-- to dump!
+	<software name="sc2k_08" supported="no">
+	    <description>Simple Characters 2000 Series Vol.08 - Gatchaman the Shooting (Japan)</description>
+	    <year>2002</year>
+	    <publisher>Bandai</publisher>
+	    <info name="alt_title" value="SIMPLEキャラクター2000シリーズ Vol.08 ガッチャマン THE シューティング"/>
+	    <info name="serial" value="SLPS-03444" />
+	    <sharedfeat name="compatibility" value="NTSC-J"/>
+	    <part name="cdrom" interface="psx_cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="simple characters 2000 series vol.08 - gatchaman the shooting (japan) [slps-03444]" sha1=""/>
+	        </diskarea>
+	    </part>
+	</software>
+	-->
+
 	<software name="sc2k_09" supported="no">
 		<description>Simple Characters 2000 Series Vol.09 - Tsuri Kichi Sanpei - The Tsuri (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2002</year>
+		<publisher>Bandai&#47;D3</publisher>
+		<info name="alt_title" value="SIMPLEキャラクター2000シリーズ Vol.09 釣りキチ三平 THE 釣り"/>
 		<info name="serial" value="SLPS-03445" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -11988,9 +12249,10 @@ A few comments on these:
 	</software>
 
 	<software name="sc2k_10" supported="no">
-		<description>Simple Characters 2000 Series Vol.10 - Sakigake!! Otojo Juku - The Dodgeball (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple Characters 2000 Series Vol.10 - Sakigake!! Otojo Juku (Japan)</description>
+		<year>2002</year>
+		<publisher>Bandai&#47;D3</publisher>
+		<info name="alt_title" value="SIMPLEキャラクター2000シリーズ Vol.10 魁!!男塾 THE 怒馳暴流"/>
 		<info name="serial" value="SLPS-03457" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12000,10 +12262,27 @@ A few comments on these:
 		</part>
 	</software>
 
+	<!-- to dump!
+	<software name="sc2k_11" supported="no">
+	    <description>Simple Characters 2000 Series Vol.11 - Meitantei Conan - The Board (Japan)</description>
+	    <year>2002</year>
+	    <publisher>Bandai&#47;D3</publisher>
+	    <info name="alt_title" value="SIMPLEキャラクター2000シリーズ Vol.11 名探偵コナン THE ボードゲーム"/>
+	    <info name="serial" value="SLPS-03458" />
+	    <sharedfeat name="compatibility" value="NTSC-J"/>
+	    <part name="cdrom" interface="psx_cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="simple characters 2000 series vol.11 - meitantei conan - the board (japan) [slps-03458]" sha1=""/>
+	        </diskarea>
+	    </part>
+	</software>
+	-->
+
 	<software name="sc2k_12" supported="no">
 		<description>Simple Characters 2000 Series Vol.12 - Kidou Butouden G Gundam - The Battle (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2002</year>
+		<publisher>Bandai&#47;D3</publisher>
+		<info name="alt_title" value="SIMPLEキャラクター2000シリーズ VOL.12 機動武闘伝Gガンダム THE バトル"/>
 		<info name="serial" value="SLPS-03471" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12014,9 +12293,10 @@ A few comments on these:
 	</software>
 
 	<software name="sc2k_13" supported="no">
-		<description>Simple Characters 2000 Series Vol.13 - Shin Kidou Senki Gundam W - The Battle (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple Characters 2000 Series vol.13 - Kidou Senki Gundam W - The Battle (Japan)</description>
+		<year>2002</year>
+		<publisher>Bandai&#47;D3</publisher>
+		<info name="alt_title" value="SIMPLEキャラクター2000シリーズ VOL.13 新機動戦記ガンダムW THE バトル"/>
 		<info name="serial" value="SLPS-03472" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12027,9 +12307,10 @@ A few comments on these:
 	</software>
 
 	<software name="sc2k_14" supported="no">
-		<description>Simple Characters 2000 Series Vol.14 - Nantettantei Idol - The Jigsaw Puzzle (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple Characters 2000 Series Vol.14 - Nante Tantei Idol - The Jigsaw Puzzle (Japan)</description>
+		<year>2002</year>
+		<publisher>Bandai&#47;D3</publisher>
+		<info name="alt_title" value="SIMPLEキャラクター2000シリーズ Vol.14 なんてっ探偵アイドル THE ジグソーパズル"/>
 		<info name="serial" value="SLPS-03473" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12040,9 +12321,10 @@ A few comments on these:
 	</software>
 
 	<software name="sc2k_15" supported="no">
-		<description>Simple Characters 2000 Series Vol.15 - Cyborg 009 - The Block Kuzushi (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simple Characters 2000 Series vol.15 - The Block Kuzushi (Japan)</description>
+		<year>2002</year>
+		<publisher>Bandai&#47;D3</publisher>
+		<info name="alt_title" value="SIMPLEキャラクター2000シリーズ Vol.15 サイボーグ009 THE ブロックくずし"/>
 		<info name="serial" value="SLPS-03474" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12054,8 +12336,9 @@ A few comments on these:
 
 	<software name="sc2k_16" supported="no">
 		<description>Simple Characters 2000 Series Vol.16 - Ganba no Bouken - The Puzzle Action (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2003</year>
+		<publisher>Bandai&#47;D3</publisher>
+		<info name="alt_title" value="SIMPLEキャラクター2000シリーズ Vol.16 ガンバの冒険 THE パズルアクション"/>
 		<info name="serial" value="SLPS-03546" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12065,10 +12348,27 @@ A few comments on these:
 		</part>
 	</software>
 
+	<!-- to dump!
+	<software name="sc2k_17" supported="no">
+	    <description>Simple Characters 2000 Series vol.17 - Sentou Mecha Xabungle - The Racing Game (Japan)</description>
+	    <year>2003</year>
+	    <publisher>Bandai&#47;D3</publisher>
+	    <info name="alt_title" value="SIMPLEキャラクター2000シリーズ Vol.17 戦闘メカ ザブングル THE アクション"/>
+	    <info name="serial" value="SLPS-03547" />
+	    <sharedfeat name="compatibility" value="NTSC-J"/>
+	    <part name="cdrom" interface="psx_cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="simple characters 2000 series vol.17 - sentou mecha xabungle - rhe racing game (japan) [slps-03547]" sha1=""/>
+	        </diskarea>
+	    </part>
+	</software>
+	-->
+
 	<software name="simulati" supported="no">
-		<description>Simulation Zoo (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Simulation Zoo&#58; Sekaiichi no Doubutsuen o Tsukurou (Japan)</description>
+		<year>1996</year>
+		<publisher>SoftBank</publisher>
+		<info name="alt_title" value="シミュレーションズー"/>
 		<info name="serial" value="SLPS-00458" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12080,8 +12380,9 @@ A few comments on these:
 
 	<software name="sisterpr" supported="no">
 		<description>Sister Princess - Pure Stories (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>Media Works</publisher>
+		<info name="alt_title" value="シスター・プリンセス 〜ピュア・ストーリーズ〜 &#60;初回限定生産&#62;"/>
 		<info name="serial" value="SLPS-03360" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12093,8 +12394,9 @@ A few comments on these:
 
 	<software name="slaphapp" supported="no">
 		<description>Slap Happy Rhythm Busters (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>ASK</publisher>
+		<info name="alt_title" value="スラップ ハッピー リズム バスターズ"/>
 		<info name="serial" value="SLPS-02789" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12106,8 +12408,9 @@ A few comments on these:
 
 	<software name="snatcher" supported="no">
 		<description>Snatcher (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="スナッチャー"/>
 		<info name="serial" value="SLPS-00154" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12119,8 +12422,9 @@ A few comments on these:
 
 	<software name="snobowki" supported="no">
 		<description>Snobow Kids Plus (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>ASCII</publisher>
+		<info name="alt_title" value="スノボキッズプラス"/>
 		<info name="serial" value="SLPS-01823" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12132,8 +12436,9 @@ A few comments on these:
 
 	<software name="sonataja" supported="no">
 		<description>Sonata (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>T&#38;E</publisher>
+		<info name="alt_title" value="Sonata"/>
 		<info name="serial" value="SLPS-01843, SLPS-01844" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
@@ -12150,8 +12455,9 @@ A few comments on these:
 
 	<software name="sotsugyo" supported="no">
 		<description>Sotsugyou Crossworld (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Hearty Robin</publisher>
+		<info name="alt_title" value="卒業クロスワールド"/>
 		<info name="serial" value="SLPS-00273" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12163,8 +12469,9 @@ A few comments on these:
 
 	<software name="sougakut" supported="no">
 		<description>Sougaku Toshi - Osaka (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>King Records</publisher>
+		<info name="alt_title" value="奏(騒)楽都市 OSAKA"/>
 		<info name="serial" value="SLPS-01722, SLPS-01723" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
@@ -12181,8 +12488,9 @@ A few comments on these:
 
 	<software name="soukyugu" supported="no">
 		<description>Soukyu Gurentai - Oubushustugeki (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Data East</publisher>
+		<info name="alt_title" value="蒼穹紅蓮隊 黄武出撃"/>
 		<info name="serial" value="SLPS-01172" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12192,23 +12500,11 @@ A few comments on these:
 		</part>
 	</software>
 
-	<software name="soundqub" supported="no">
-		<description>Sound Qube (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="serial" value="SLPS-01309" />
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="sound qube (japan) [slps-01309]" sha1="54139ab64577aec717ca75daa26d87b67887a673"/>
-			</diskarea>
-		</part>
-	</software>
-
 	<software name="spaceinv" supported="no">
 		<description>Space Invaders X (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Taito</publisher>
+		<info name="alt_title" value="スペースインベーダーX(エックス)"/>
 		<info name="serial" value="SLPM-86419" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12220,8 +12516,9 @@ A few comments on these:
 
 	<software name="spectral" supported="no">
 		<description>Spectral Blade (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Idea Factory</publisher>
+		<info name="alt_title" value="スペクトラルブレイド"/>
 		<info name="serial" value="SLPS-02526" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12232,9 +12529,10 @@ A few comments on these:
 	</software>
 
 	<software name="speedkin" supported="no">
-		<description>Speed King - Neo Kobe 2045 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Speed King (Japan)</description>
+		<year>1996</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="スピードキング"/>
 		<info name="serial" value="SLPM-86013" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12246,8 +12544,9 @@ A few comments on these:
 
 	<software name="speedpow" supported="no">
 		<description>Speed Power Gunbike (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Sony</publisher>
+		<info name="alt_title" value="可変走攻 ガンバイク"/>
 		<info name="serial" value="SLPS-01066" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12259,8 +12558,9 @@ A few comments on these:
 
 	<software name="spiderma" supported="no">
 		<description>Spider-Man (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>Activision</publisher>
+		<info name="alt_title" value="SPIDER-MAN"/>
 		<info name="serial" value="SLPM-86739" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12270,23 +12570,10 @@ A few comments on these:
 		</part>
 	</software>
 
-	<software name="squaresp" supported="no">
-		<description>Square's Preview 5 (Japan) (Demo)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="serial" value="SCPS-45417" />
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="square's preview 5 (japan) (demo) [scps-45417]" sha1="2e84ab79573ce07bb78480a9d75d601e14d07895"/>
-			</diskarea>
-		</part>
-	</software>
-
 	<software name="squareso" supported="no">
 		<description>Squaresoft Memory Card Data CD (Japan)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Squaresoft</publisher>
 		<info name="serial" value="SLPM-80556" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12298,8 +12585,9 @@ A few comments on these:
 
 	<software name="stahlfed" supported="no">
 		<description>Stahlfeder (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Santos</publisher>
+		<info name="alt_title" value="シュタールフェーダー 〜鉄甲飛空団〜"/>
 		<info name="serial" value="SLPS-00162" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12311,8 +12599,9 @@ A few comments on these:
 
 	<software name="startlin" supported="no">
 		<description>Startling Odyssey 1 - Blue Evolution (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>RayForce</publisher>
+		<info name="alt_title" value="スタートリング・オデッセイ1 ブルーエヴォリューション"/>
 		<info name="serial" value="SLPS-02043" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12324,8 +12613,9 @@ A few comments on these:
 
 	<software name="streetfi" supported="no">
 		<description>Street Fighter Collection (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Capcom</publisher>
+		<info name="alt_title" value="ストリートファイターコレクション"/>
 		<info name="serial" value="SLPS-00800, SLPS-00801" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
@@ -12342,8 +12632,9 @@ A few comments on these:
 
 	<software name="suchiepa" supported="no">
 		<description>Suchie-Pai Adventure - Doki Doki Nightmare (Japan) (Disc 2 Only)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Jaleco</publisher>
+		<info name="alt_title" value="スーチーパイアドベンチャー"/>
 		<info name="serial" value="SLPS-01265" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12354,9 +12645,10 @@ A few comments on these:
 	</software>
 
 	<software name="suikoenb" supported="no">
-		<description>Suiko Enbu (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Suiko Enbu - Outlaws of the Lost Dynasty (Japan)</description>
+		<year>1996</year>
+		<publisher>Data East</publisher>
+		<info name="alt_title" value="水　滸　演　武"/>
 		<info name="serial" value="SLPS-00137" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12367,9 +12659,10 @@ A few comments on these:
 	</software>
 
 	<software name="sunsoft1" supported="no">
-		<description>Sunsoft Classics Vol.1 - Memorial Series (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Memorial Star Series Sunsoft Vol. 1 - Ikki &#38; Super Arabian (Japan)</description>
+		<year>2001</year>
+		<publisher>Sunsoft</publisher>
+		<info name="alt_title" value="メモリアル☆シリーズ サンソフト Vol.1"/>
 		<info name="serial" value="SLPS-03135" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12380,9 +12673,10 @@ A few comments on these:
 	</software>
 
 	<software name="sunsoft2" supported="no">
-		<description>Sunsoft Classics Vol.2 - Memorial Series (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Memorial Star Series Sunsoft Vol. 2 - Route 16 - Turbo &#38; Atlantis no Nazo (Japan)</description>
+		<year>2001</year>
+		<publisher>Sunsoft</publisher>
+		<info name="alt_title" value="メモリアル☆シリーズ サンソフトVOL.2"/>
 		<info name="serial" value="SLPS-03181" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12394,8 +12688,9 @@ A few comments on these:
 
 	<software name="sunsoft3" supported="no">
 		<description>Sunsoft Classics Vol.3 - Memorial Series (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>Sunsoft</publisher>
+		<info name="alt_title" value="メモリアル☆シリーズ サンソフトVOL.3"/>
 		<info name="serial" value="SLPS-03366" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12406,9 +12701,10 @@ A few comments on these:
 	</software>
 
 	<software name="sunsoft4" supported="no">
-		<description>Sunsoft Classics Vol.4 - Memorial Series (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Memorial Star Series Sunsoft Vol.4 - Chou wakusei senki metafight &#38; Lipple island (Japan)</description>
+		<year>2002</year>
+		<publisher>Sunsoft</publisher>
+		<info name="alt_title" value="メモリアル☆シリーズ サンソフト VOL.4"/>
 		<info name="serial" value="SLPS-03382" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12419,9 +12715,10 @@ A few comments on these:
 	</software>
 
 	<software name="sunsoft5" supported="no">
-		<description>Sunsoft Classics Vol.5 - Memorial Series (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Memorial Star Series Sunsoft Vol.5 - Raf World &#38; Hebereke (Japan)</description>
+		<year>2002</year>
+		<publisher>Sunsoft</publisher>
+		<info name="alt_title" value="メモリアル☆シリーズ サンソフト VOL.5"/>
 		<info name="serial" value="SLPS-03397" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12432,9 +12729,10 @@ A few comments on these:
 	</software>
 
 	<software name="sunsoft6" supported="no">
-		<description>Sunsoft Classics Vol.6 - Memorial Series (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Memorial Star Series Sunsoft Vol.6 - Battle Formula &#38; Gimmick! (Japan)</description>
+		<year>2002</year>
+		<publisher>Sunsoft</publisher>
+		<info name="alt_title" value="メモリアル☆シリーズ サンソフトVOL.6"/>
 		<info name="serial" value="SLPS-03486" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12446,8 +12744,9 @@ A few comments on these:
 
 	<software name="superadv" supported="no">
 		<description>Super Adventure RockMan (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Capcom</publisher>
+		<info name="alt_title" value="スーパーアドベンチャーロックマン"/>
 		<info name="serial" value="SLPS-01051, SLPS-01052, SLPS-01053" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
@@ -12469,8 +12768,9 @@ A few comments on these:
 
 	<software name="superfoo" supported="no">
 		<description>Super Football Champ (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Taito</publisher>
+		<info name="alt_title" value="SUPER FOOTBALL CHAMP"/>
 		<info name="serial" value="SLPS-00569" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12482,8 +12782,9 @@ A few comments on these:
 
 	<software name="superliv" supported="no">
 		<description>Super Live Stadium (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Aques</publisher>
+		<info name="alt_title" value="スーパーライブスタジアム"/>
 		<info name="serial" value="SLPM-86019" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12493,23 +12794,11 @@ A few comments on these:
 		</part>
 	</software>
 
-	<software name="superlit" supported="no">
-		<description>SuperLite 1500 Extra Series Vol.02 - Nankuro (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="serial" value="SLPS-02067" />
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="superlite 1500 extra series vol.02 - nankuro (japan) [slps-02067]" sha1="8f17ac2169a351af67437fd79cfd66a13e51062e"/>
-			</diskarea>
-		</part>
-	</software>
-
 	<software name="susumeka" supported="no">
-		<description>Susume! Kaizoku (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Susume! Kaizoku - Be Pirates! (Japan)</description>
+		<year>1998</year>
+		<publisher>ArtDink</publisher>
+		<info name="alt_title" value="進め! 海賊"/>
 		<info name="serial" value="SLPS-01737" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12520,9 +12809,10 @@ A few comments on these:
 	</software>
 
 	<software name="tkarahaj" supported="no">
-		<description>T kara Hajimaru Monogatari (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>T Kara Hajimaru Monogatari (Japan)</description>
+		<year>1998</year>
+		<publisher>Jaleco</publisher>
+		<info name="alt_title" value="Tから始まる物語"/>
 		<info name="serial" value="SLPS-01350" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12534,8 +12824,9 @@ A few comments on these:
 
 	<software name="tactical" supported="no">
 		<description>Tactical Armor Custom Gasaraki (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="Tactical Armor Custom ガサラキ"/>
 		<info name="serial" value="SLPS-02181" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12547,8 +12838,9 @@ A few comments on these:
 
 	<software name="tacticso" supported="no">
 		<description>Tactics Ogre - Let Us Cling Together (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Artdink</publisher>
+		<info name="alt_title" value="タクティクス・オウガ"/>
 		<info name="serial" value="SLPS-00767" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12560,8 +12852,9 @@ A few comments on these:
 
 	<software name="taihoshi" supported="no">
 		<description>Taiho Shichauzo! - You're Under Arrest (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>Pioneer</publisher>
+		<info name="alt_title" value="逮捕しちゃうぞ"/>
 		<info name="serial" value="SLPM-86782, SLPM-86783" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
@@ -12577,9 +12870,10 @@ A few comments on these:
 	</software>
 
 	<software name="talesoff" supported="no">
-		<description>Tales of Fandom Vol.1 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Tales of Fandom Vol.1 (Cless Version) (Japan)</description>
+		<year>2002</year>
+		<publisher>Namco</publisher>
+		<info name="alt_title" value="テイルズオブファンダム Vol.1(クレス・ルーティー・ファラバージョン)"/>
 		<info name="serial" value="SLPS-03375" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12592,7 +12886,7 @@ A few comments on these:
 	<software name="tamamayu" supported="no">
 		<description>Tamamayu Monogatari - Dennou Bijutsukan (Japan) (Demo)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Genki</publisher>
 		<info name="serial" value="SLPM-80325" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12604,8 +12898,9 @@ A few comments on these:
 
 	<software name="tanteiea" supported="no">
 		<description>Tantei Jinguuji Saburo - Early Collection (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Data East</publisher>
+		<info name="alt_title" value="探偵神宮寺三郎 Early Collection"/>
 		<info name="serial" value="SLPS-02157" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12616,9 +12911,10 @@ A few comments on these:
 	</software>
 
 	<software name="tanteimr" supported="no">
-		<description>Tantei Jinguuji Saburo - Mikan no Report (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Tantei Jinguuji Saburo - Mikan No Rupo (Popular Edition) (Japan)</description>
+		<year>2000</year>
+		<publisher>Data East</publisher>
+		<info name="alt_title" value="普及版1,500円シリーズ 探偵神宮寺三郎 未完のルポ 普及版"/>
 		<info name="serial" value="SLPS-03016" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12629,9 +12925,10 @@ A few comments on these:
 	</software>
 
 	<software name="tanteitk" supported="no">
-		<description>Tantei Jinguuji Saburo - Tomoshibi ga Kienu Ma ni (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Tantei Jinguji Saburo - Tomosibi Ga Kienumani (Japan)</description>
+		<year>1999</year>
+		<publisher>Data East</publisher>
+		<info name="alt_title" value="探偵 神宮寺三郎 灯火が消えぬ間に"/>
 		<info name="serial" value="SLPS-02427" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12642,9 +12939,10 @@ A few comments on these:
 	</software>
 
 	<software name="tanteiyo" supported="no">
-		<description>Tantei Jinguuji Saburo - Yume no Owari ni (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Tantei Jinguji Saburo - Yumeno Owarini (Japan)</description>
+		<year>1998</year>
+		<publisher>Data East</publisher>
+		<info name="alt_title" value="探偵 神宮寺三郎 夢の終わりに"/>
 		<info name="serial" value="SLPS-01356" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12656,8 +12954,9 @@ A few comments on these:
 
 	<software name="tatsunok" supported="no">
 		<description>Tatsunoko Fight (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="タツノコファイトt"/>
 		<info name="serial" value="SLPS-02939" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12668,9 +12967,10 @@ A few comments on these:
 	</software>
 
 	<software name="tenmadej" supported="no">
-		<description>Ten Made Jack (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Ten Made Jack &#47; Tenma de Jack - Odoroki Manenoki Daitoubou (Japan)</description>
+		<year>2000</year>
+		<publisher>Enix</publisher>
+		<info name="alt_title" value="天までジャック オドロキマメノキ大逃亡！！"/>
 		<info name="serial" value="SLPM-86368" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12682,8 +12982,9 @@ A few comments on these:
 
 	<software name="tenantwa" supported="no">
 		<description>Tenant Wars (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Kid</publisher>
+		<info name="alt_title" value="テナントウォーズ"/>
 		<info name="serial" value="SLPS-01243" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12695,8 +12996,9 @@ A few comments on these:
 
 	<software name="tenchimu" supported="no">
 		<description>Tenchi Muyou! Toukou Muyou - No Need for School (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Xing</publisher>
+		<info name="alt_title" value="天地無用！ 〜登校無用〜"/>
 		<info name="serial" value="SLPS-00451, SLPS-00452" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
@@ -12713,8 +13015,9 @@ A few comments on these:
 
 	<software name="tenchiwo" supported="no">
 		<description>Tenchi wo Kurau II - Sekiheki no Tatakai (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Capcom</publisher>
+		<info name="alt_title" value="天地を喰らうII"/>
 		<info name="serial" value="SLPS-00203" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12726,8 +13029,9 @@ A few comments on these:
 
 	<software name="tennisar" supported="no">
 		<description>Tennis Arena (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Ubi Soft</publisher>
+		<info name="alt_title" value="TENNIS ARENA"/>
 		<info name="serial" value="SLPS-01303" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12738,9 +13042,10 @@ A few comments on these:
 	</software>
 
 	<software name="tensenny" supported="no">
-		<description>Tensen-Nyannyan - Gekijou-ban (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Tensen Nyannyan Gekigyouban (Japan)</description>
+		<year>1998</year>
+		<publisher>Time Point</publisher>
+		<info name="alt_title" value="天仙娘々〜劇場版〜"/>
 		<info name="serial" value="SLPS-01278" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12752,8 +13057,9 @@ A few comments on these:
 
 	<software name="tenshino" supported="no">
 		<description>Tenshi no Shippo (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2003</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="天使のしっぽ"/>
 		<info name="serial" value="SLPS-03531" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12765,8 +13071,9 @@ A few comments on these:
 
 	<software name="tetrisxj" supported="no">
 		<description>Tetris X (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Bullet Proof</publisher>
+		<info name="alt_title" value="テトリス X"/>
 		<info name="serial" value="SLPS-00321" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12777,9 +13084,10 @@ A few comments on these:
 	</software>
 
 	<software name="tfxjapan" supported="no">
-		<description>TFX (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>TFX - Tactical Fighter Experiment (Japan)</description>
+		<year>1996</year>
+		<publisher>Imageneer &#47; Ocean</publisher>
+		<info name="alt_title" value="TFX"/>
 		<info name="serial" value="SLPS-00511" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12791,8 +13099,9 @@ A few comments on these:
 
 	<software name="thatsqtj" supported="no">
 		<description>That's QT (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Koei</publisher>
+		<info name="alt_title" value="ザッツキューティ"/>
 		<info name="serial" value="SLPM-86340" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12804,8 +13113,9 @@ A few comments on these:
 
 	<software name="themehos" supported="no">
 		<description>Theme Hospital (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="alt_title" value="テーマホスピタル"/>
 		<info name="serial" value="SLPS-01405" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12816,9 +13126,10 @@ A few comments on these:
 	</software>
 
 	<software name="thunderf" supported="no">
-		<description>Thunderforce V - Perfect System (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Thunder Force V - Perfect System (Japan)</description>
+		<year>1998</year>
+		<publisher>TechnoSoft</publisher>
+		<info name="alt_title" value="サンダー・フォースＶ　～パーフェクト・システム～"/>
 		<info name="serial" value="SLPS-01406" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12830,8 +13141,9 @@ A few comments on these:
 
 	<software name="timegaln" supported="no">
 		<description>Time Gal &amp; Ninja Hayate (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Taito</publisher>
+		<info name="alt_title" value="タイムギャル&#38;忍者ハヤテ"/>
 		<info name="serial" value="SLPS-00383, SLPS-00384" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
@@ -12848,8 +13160,9 @@ A few comments on these:
 
 	<software name="tinybull" supported="no">
 		<description>Tiny Bullets (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Sony</publisher>
+		<info name="alt_title" value="タイニーバレット"/>
 		<info name="serial" value="SCPS-10130" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12861,8 +13174,9 @@ A few comments on these:
 
 	<software name="toheartj" supported="no">
 		<description>To Heart (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Aqua Plus</publisher>
+		<info name="alt_title" value="トゥハート"/>
 		<info name="serial" value="SLPS-01919, SLPS-01920" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
@@ -12879,8 +13193,9 @@ A few comments on these:
 
 	<software name="toaplans" supported="no">
 		<description>Toaplan Shooting Battle 1 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Banpresto</publisher>
+		<info name="alt_title" value="東亜プラン シューティングバトル1"/>
 		<info name="serial" value="SLPS-00436" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12893,8 +13208,9 @@ A few comments on these:
 	<!-- OK, some problems with sky gfx -->
 	<software name="tocatour" supported="no">
 		<description>Toca Touring Car Championship (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Upstar</publisher>
+		<info name="alt_title" value="TOCA TOURINGCAR CHAMPION SHIP"/>
 		<info name="serial" value="SLPS-01410" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12907,8 +13223,9 @@ A few comments on these:
 	<!-- boot OK -->
 	<software name="tkpzldm" supported="no">
 		<description>Tokimeki Memorial - Taisen Puzzle-Dama (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="ときめきメモリアル対戦ぱずるだま"/>
 		<info name="serial" value="SLPM-86005" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12919,9 +13236,9 @@ A few comments on these:
 	</software>
 
 	<software name="tm2ev1" supported="no">
-		<description>Tokimeki Memorial 2 Emotional Voice System (Vol.1 - Kotoko-Miyuki-Kaedeko) (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Tokimeki Memorial 2 EVS Append Disc 1 (Kotoko-Miyuki-Kaedeko) (Japan)</description>
+		<year>2000</year>
+		<publisher>Aspect</publisher>
 		<info name="serial" value="SLPM-80527" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12932,9 +13249,9 @@ A few comments on these:
 	</software>
 
 	<software name="tm2ev2" supported="no">
-		<description>Tokimeki Memorial 2 Emotional Voice System (Vol.2 - Homura-Akane-Kaori) (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Tokimeki Memorial 2 EVS Append Disc 2 (Homura-Akane-Kaori) (Japan)</description>
+		<year>2000</year>
+		<publisher>Aspect</publisher>
 		<info name="serial" value="SLPM-80544" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12945,9 +13262,9 @@ A few comments on these:
 	</software>
 
 	<software name="tm2ev3" supported="no">
-		<description>Tokimeki Memorial 2 Emotional Voice System (Vol.3 - Miho-Mei-Sumire) (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Tokimeki Memorial 2 EVS Append Disc 3 (Miho-Mei-Sumire) (Japan)</description>
+		<year>2000</year>
+		<publisher>Enterbrain</publisher>
 		<info name="serial" value="SLPM-80550" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -12958,9 +13275,10 @@ A few comments on these:
 	</software>
 
 	<software name="tm2s1" supported="no">
-		<description>Tokimeki Memorial 2 Substories Vol.1 - Dancing Summer Vacation (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Tokimeki Memorial 2 Substories vol. 1 - Dancing Summer Vacation (Japan)</description>
+		<year>2000</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="ときめきメモリアル2 Substories 〜Dancing Summer Vacation〜"/>
 		<info name="serial" value="SLPM-86549, SLPM-86550" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
@@ -12977,8 +13295,9 @@ A few comments on these:
 
 	<software name="tm2s2" supported="no">
 		<description>Tokimeki Memorial 2 Substories Vol.2 - Leaping School Festival (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="ときめきメモリアル2 Substories 〜Leaping School Festival〜"/>
 		<info name="serial" value="SLPM-86775, SLPM-86776" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
@@ -12994,9 +13313,10 @@ A few comments on these:
 	</software>
 
 	<software name="tm2s3" supported="no">
-		<description>Tokimeki Memorial 2 SubStories Vol.3 - Memories Ringing on (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Tokimeki Memorial 2 SubStories Vol.3 - Memories Ringing On (Japan)</description>
+		<year>2001</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="ときめきメモリアル2 サブストーリーズ〜Memories Ringing On〜"/>
 		<info name="serial" value="SLPM-86881, SLPM-86882" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
@@ -13013,9 +13333,10 @@ A few comments on these:
 
 	<!-- boot ok -->
 	<software name="tmds1" supported="no">
-		<description>Tokimeki Memorial Drama Series Vol.1 - Nijiiro no Seishun (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Tokimeki Memorial Drama Series Vol.1 - Nijiiro No Seishun (Konami the Best) (Japan)</description>
+		<year>1999</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="タイトル:ときめきメモリアル　ドラマシリーズVol.1　虹色の青春（ベスト）"/>
 		<info name="serial" value="SLPM-86360" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13028,8 +13349,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="tokyomaj" supported="no">
 		<description>Tokyo Majin Gakuen Gehouchou (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2002</year>
+		<publisher>Asmik Ace</publisher>
+		<info name="alt_title" value="東京魔人学園外法帖"/>
 		<info name="serial" value="SLPS-03333, SLPS-03334, SLPS-03335" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
@@ -13052,8 +13374,9 @@ A few comments on these:
 	<!-- black screen -->
 	<software name="tomba" supported="no">
 		<description>Tomba! The Wild Adventures (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Whoopee Camp</publisher>
+		<info name="alt_title" value="トンバ！ ザ・ワイルドアドベンチャー"/>
 		<info name="serial" value="SLPS-02350" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13065,9 +13388,10 @@ A few comments on these:
 
 	<!-- boot ok -->
 	<software name="tomikato" supported="no">
-		<description>Tomikatown wo Tukurou! (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Tomica Town o Tsukurou! (Japan)</description>
+		<year>1999</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="トミカタウンをつくろう!"/>
 		<info name="serial" value="SLPS-01935" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13080,8 +13404,9 @@ A few comments on these:
 	<!-- hangs on now loading -->
 	<software name="topoloja" supported="no">
 		<description>ToPoLo (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Artdink</publisher>
+		<info name="alt_title" value="ToPoLo"/>
 		<info name="serial" value="SLPS-00620" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13094,8 +13419,9 @@ A few comments on these:
 	<!-- black screen after company logos -->
 	<software name="toshcard" supported="no">
 		<description>Toshinden Card Quest (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="闘神伝 カードクエスト"/>
 		<info name="serial" value="SLPS-01113" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13108,8 +13434,9 @@ A few comments on these:
 	<!-- black screen -->
 	<software name="tougemax" supported="no">
 		<description>Touge Max G (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Atlus</publisher>
+		<info name="alt_title" value="峠MAX G"/>
 		<info name="serial" value="SLPS-02361" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13122,8 +13449,9 @@ A few comments on these:
 	<!-- boot OK -->
 	<software name="toukiden" supported="no">
 		<description>Touki Denshou - Angel Eyes (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Tecmo</publisher>
+		<info name="alt_title" value="闘姫伝承 ANGEL EYES"/>
 		<info name="serial" value="SLPS-01168" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13136,8 +13464,9 @@ A few comments on these:
 	<!-- boot OK -->
 	<software name="toyotane" supported="no">
 		<description>Toyota Netz Racing (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Atlus</publisher>
+		<info name="alt_title" value="ソフト ネッツ・レーシング"/>
 		<info name="serial" value="SLPM-80429" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13150,8 +13479,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="toysdrea" supported="no">
 		<description>Toys Dream (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>KSS</publisher>
+		<info name="alt_title" value="トイズドリーム"/>
 		<info name="serial" value="SLPS-01704" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13164,13 +13494,14 @@ A few comments on these:
 	<!-- boot OK -->
 	<software name="tripuzzj" supported="no">
 		<description>Tripuzz (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="serial" value="SLPS-0911" />
+		<year>1997</year>
+		<publisher>Santos</publisher>
+		<info name="alt_title" value="トリパズ"/>
+		<info name="serial" value="SLPS-00911" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tripuzz (japan) [slps-0911]" sha1="ee7b2282597dde183796d7a1b50994565e047f4d"/>
+				<disk name="tripuzz (japan) [slps-00911]" sha1="ee7b2282597dde183796d7a1b50994565e047f4d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -13178,8 +13509,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="trumpshi" supported="no">
 		<description>Trump Shiyouyo! (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Bottom Up</publisher>
+		<info name="alt_title" value="トランプしようよ！"/>
 		<info name="serial" value="SLPS-01440" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13194,6 +13526,7 @@ A few comments on these:
 		<description>Tsun-tsun-gumi 2 - Moji Moji Bakkun (Japan)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value=""/>
 		<info name="serial" value="SLPS-01694" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13206,8 +13539,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="tsuntsu3" supported="no">
 		<description>Tsun-tsun-gumi 3 - Kanji Vader (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Kodansha</publisher>
+		<info name="alt_title" value="つんつん組3 〜もじもじぱっくん〜"/>
 		<info name="serial" value="SLPS-01839" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13220,8 +13554,9 @@ A few comments on these:
 	<!-- black screen -->
 	<software name="tsuribak" supported="no">
 		<description>Tsuri Baka Nisshi (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Shogakukan</publisher>
+		<info name="alt_title" value="釣りバカ日誌"/>
 		<info name="serial" value="SLPS-00440" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13234,8 +13569,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="tvanimat" supported="no">
 		<description>TV Animation X - Unmei no Tatakai (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2002</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="TVanimation X〜運命の選択〜"/>
 		<info name="serial" value="SLPS-03459" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13248,8 +13584,9 @@ A few comments on these:
 	<!-- black screen -->
 	<software name="twingodd" supported="no">
 		<description>Twin Goddesses (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>PolyGram</publisher>
+		<info name="alt_title" value="ツイン・ゴッデス"/>
 		<info name="serial" value="SLPS-00018" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13262,8 +13599,9 @@ A few comments on these:
 	<!-- black screen -->
 	<software name="twinbeet" supported="no">
 		<description>Twinbee Taisen Puzzle-Dama (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="ツインビー対戦ぱずるだま"/>
 		<info name="serial" value="SLPS-00015" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13276,8 +13614,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="twinbeer" supported="no">
 		<description>TwinBee-RPG (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="ツインビーRPG"/>
 		<info name="serial" value="SLPM-86077" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13289,9 +13628,10 @@ A few comments on these:
 
 	<!-- boot ok -->
 	<software name="twinssto" supported="no">
-		<description>Twins Story (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Twins Story - Kimi ni Tsutaetakute (Japan)</description>
+		<year>1999</year>
+		<publisher>Panther</publisher>
+		<info name="alt_title" value="ツインズストーリー きみにつたえたくて・・・"/>
 		<info name="serial" value="SLPS-02126" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13304,8 +13644,9 @@ A few comments on these:
 	<!-- boot OK -->
 	<software name="twotenka" supported="no">
 		<description>Two-Tenkaku (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Sony</publisher>
+		<info name="alt_title" value="通天閣"/>
 		<info name="serial" value="SLPS-00131" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13333,8 +13674,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="ufoadayi" supported="no">
 		<description>UFO - A Day in the Life (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>ASCII</publisher>
+		<info name="alt_title" value="UFO ～A day in the life～"/>
 		<info name="serial" value="SLPS-02032" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13347,8 +13689,9 @@ A few comments on these:
 	<!-- black screen, bad sounds -->
 	<software name="ugetsuki" supported="no">
 		<description>Ugetsu Kitan (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Tonkin House</publisher>
+		<info name="alt_title" value="雨月奇譚 〜うげつきたん〜"/>
 		<info name="serial" value="SLPS-00391" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13361,8 +13704,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="ukiukits" supported="no">
 		<description>Ukiuki Tsuri Tengoku - Uogami Densetsu wo Oe (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Teichiku</publisher>
+		<info name="alt_title" value="ウキウキ釣り天国〜魚神伝説を追え〜"/>
 		<info name="serial" value="SLPS-02579" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13375,8 +13719,9 @@ A few comments on these:
 	<!-- stuck on sony logo -->
 	<software name="ultimaun" supported="no">
 		<description>Ultima Underworld - The Stygian Abyss (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="alt_title" value="ウルティマ アンダーワールド"/>
 		<info name="serial" value="SLPS-00742" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13388,9 +13733,10 @@ A few comments on these:
 
 	<!-- boot ok -->
 	<software name="ultraman" supported="no">
-		<description>Ultraman Tiga &amp; Dyna Fighting Evolution - New Generations (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Ultraman Tiga &#38; Ultraman Dyna Fighting Evolution - New Generations (Japan)</description>
+		<year>1998</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="ウルトラマンティガ&#38;ダイナ 新たなる2つの光"/>
 		<info name="serial" value="SLPS-01455" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13403,8 +13749,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="ultramze" supported="no">
 		<description>Ultraman Zearth (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Tohoku Shinsha</publisher>
+		<info name="alt_title" value="ウルトラマンゼアス"/>
 		<info name="serial" value="SLPS-00652" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13416,9 +13763,10 @@ A few comments on these:
 
 	<!-- black screen after company logos -->
 	<software name="uminonus" supported="no">
-		<description>Umi no Nushi Tsuri (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Umi No Nushi Tsuri Takarajimi NI Mukatte (Japan)</description>
+		<year>1999</year>
+		<publisher>Pack-in-Soft</publisher>
+		<info name="alt_title" value="海のぬし釣り−宝島に向かって−"/>
 		<info name="serial" value="SLPS-02172" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13430,9 +13778,10 @@ A few comments on these:
 
 	<!-- black screen -->
 	<software name="umiharak" supported="no">
-		<description>Umihara Kawase Shun - Second Edition (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Umihara Kawase Shun - Second Edition (Maruan Series 1) (Japan)</description>
+		<year>2000</year>
+		<publisher>Xing</publisher>
+		<info name="alt_title" value="マル安シリーズ1 海腹川背・旬 〜セカンドエディション〜"/>
 		<info name="serial" value="SLPS-02549" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13445,8 +13794,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="ungrawal" supported="no">
 		<description>Ungra Walker (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2002</year>
+		<publisher>Success</publisher>
+		<info name="alt_title" value="アングラウォーカー"/>
 		<info name="serial" value="SLPM-87055" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13459,8 +13809,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="urawazam" supported="no">
 		<description>Urawaza Mahjong - Korette Tenhoutte Yatsukai (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>Spike</publisher>
+		<info name="alt_title" value="裏技麻雀〜これって天和ってやつかい〜"/>
 		<info name="serial" value="SLPS-02807" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13473,9 +13824,10 @@ A few comments on these:
 	<!-- boot OK -->
 	<software name="vtennis2" supported="no">
 		<description>V-Tennis 2 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="serial" value="SLPS 00469" />
+		<year>1996</year>
+		<publisher>Tonkin House</publisher>
+		<info name="alt_title" value="Vテニス2"/>
+		<info name="serial" value="SLPS-00469" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -13485,10 +13837,11 @@ A few comments on these:
 	</software>
 
 	<!-- boot ok, every other fmv frame broken -->
-	<software name="vampirek" supported="no">
-		<description>Vampire - Kyuuketsuki Densetsu (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="vampirky" supported="no">
+		<description>Vampir Kyuuketsuki Densetsu (Japan)</description>
+		<year>1999</year>
+		<publisher>Artdink</publisher>
+		<info name="alt_title" value="ヴァンピール 吸血鬼伝説"/>
 		<info name="serial" value="SLPS-01932" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13501,8 +13854,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="vehiclec" supported="no">
 		<description>Vehicle Cavalier (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Vanguard Works</publisher>
+		<info name="alt_title" value="ヴィーグル・キャヴァリアー"/>
 		<info name="serial" value="SLPS-00232" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13515,8 +13869,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="victorys" supported="no">
 		<description>Victory Spike (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Imagineer</publisher>
+		<info name="alt_title" value="ヴィクトリー・スパイク"/>
 		<info name="serial" value="SLPS-00372" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13528,9 +13883,10 @@ A few comments on these:
 
 	<!-- black screen after copyrights -->
 	<software name="victoryz" supported="no">
-		<description>Victory Zone (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Victory Zone - Real Pachinko Simulator (Japan)</description>
+		<year>1995</year>
+		<publisher>Sony</publisher>
+		<info name="alt_title" value="ヴィクトリーゾーン"/>
 		<info name="serial" value="SCPS-10002" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13543,8 +13899,9 @@ A few comments on these:
 	<!-- black screen after memory card message -->
 	<software name="virtualh" supported="no">
 		<description>Virtual Hiyru no Ken (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Culture Brain</publisher>
+		<info name="alt_title" value="バーチャル飛龍の拳"/>
 		<info name="serial" value="SLPS-00338" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13557,8 +13914,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="virtualk" supported="no">
 		<description>Virtual Kyotei '98 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Nihon Bussan</publisher>
+		<info name="alt_title" value="バーチャル競艇 '98"/>
 		<info name="serial" value="SLPS-01396" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13571,8 +13929,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="virtualp" supported="no">
 		<description>Virtual Pro Wrestling (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Asmik Ace</publisher>
+		<info name="alt_title" value="バーチャルプロレスリング"/>
 		<info name="serial" value="SLPS-00449" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13585,8 +13944,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="virus" supported="no">
 		<description>Virus - The Battle Field (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>PolyGram</publisher>
+		<info name="alt_title" value="病毒 - 战场"/>
 		<info name="serial" value="SLPS-02008" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13598,9 +13958,10 @@ A few comments on these:
 
 	<!-- boot ok -->
 	<software name="visionof" supported="no">
-		<description>Vision Of Escaflowne, The (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Vision Of Escaflowne, The (Limited Edition) (Japan)</description>
+		<year>1999</year>
+		<publisher>Bandai</publisher>
+		<info name="alt_title" value="天空のエスカフローネ限定版 Fortune BOX"/>
 		<info name="serial" value="SLPS-01014" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13613,8 +13974,9 @@ A few comments on these:
 	<!-- hangs loading afte initial fmv -->
 	<software name="volfossj" supported="no">
 		<description>Volfoss (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>Namco</publisher>
+		<info name="alt_title" value="ボルフォス"/>
 		<info name="serial" value="SLPS-03140" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13626,9 +13988,10 @@ A few comments on these:
 
 	<!-- boot ok -->
 	<software name="wagamama" supported="no">
-		<description>Wagamama Fairy Mirumo de Pon! (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Wagamama Fairy Mirumo de Pon! - Mirumo no Mahou Gakkou Monogatari (Japan)</description>
+		<year>2003</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="わがままフェアリーミルモでポン! ミルモの魔法学校ものがたり"/>
 		<info name="serial" value="SLPM-87220" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13641,8 +14004,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="wangantr" supported="no">
 		<description>Wangan Trial (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Pack-in-Soft</publisher>
+		<info name="alt_title" value="湾岸トライアル"/>
 		<info name="serial" value="SLPS-01213, SLPS-01214" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom1" interface="psx_cdrom">
@@ -13659,9 +14023,10 @@ A few comments on these:
 
 	<!-- boot ok -->
 	<software name="warerami" supported="no">
-		<description>Warera Mitsurin Tankentai!! (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Warera Mitsubayashi Tankentai!! (Japan)</description>
+		<year>2000</year>
+		<publisher>Victor</publisher>
+		<info name="alt_title" value="われら密林探検隊!!"/>
 		<info name="serial" value="SLPS-02658" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13673,9 +14038,10 @@ A few comments on these:
 
 	<!-- boot ok -->
 	<software name="watersum" supported="no">
-		<description>Water Summer (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Water Summer (Limited Edition) (Japan)</description>
+		<year>2002</year>
+		<publisher>Princess Soft</publisher>
+		<info name="alt_title" value="WATER SUMMER(初回限定版)"/>
 		<info name="serial" value="SLPM-87085" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13687,9 +14053,10 @@ A few comments on these:
 
 	<!-- boot ok -->
 	<software name="weddingp" supported="no">
-		<description>Wedding Peach - Doki Doki Oironaoshi Fashion Daisakuse (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Wedding Peach - Doki Doki Oiro-Naoshi Fashion Daisakusen (Japan)</description>
+		<year>1996</year>
+		<publisher>KSS</publisher>
+		<info name="alt_title" value="ウェディングピーチ ドキドキお色直し"/>
 		<info name="serial" value="SLPS-00368" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13702,13 +14069,14 @@ A few comments on these:
 	<!-- stuck on sony logo -->
 	<software name="welcomeh" supported="no">
 		<description>Welcome House</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="serial" value="Welcome Hous" />
+		<year>1996</year>
+		<publisher>Gust</publisher>
+		<info name="alt_title" value="ウエルカムハウス"/>
+		<info name="serial" value="SLPS-00190" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="welcome house" sha1="0aa66eca197e87d56c0cc30c45dbdb311883d3d9"/>
+				<disk name="welcome house (japan) [slps-00190]" sha1="0aa66eca197e87d56c0cc30c45dbdb311883d3d9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -13716,8 +14084,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="weltorve" supported="no">
 		<description>Weltorv Estleia (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Hudson</publisher>
+		<info name="alt_title" value="ウエルト オブ イストリア"/>
 		<info name="serial" value="SLPS-01887" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13730,8 +14099,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="whitedia" supported="no">
 		<description>White Diamond (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Escot</publisher>
+		<info name="alt_title" value="ホワイトダイアモンド"/>
 		<info name="serial" value="SLPS-02352" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13744,8 +14114,9 @@ A few comments on these:
 	<!-- hangs / gets stuck on loading screen playing bad sound -->
 	<software name="wingover" supported="no">
 		<description>Wing Over (Japan)</description>
-		<year>199?</year>
+		<year>1997</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ウイングオーバー"/>
 		<info name="serial" value="SLPS-00598" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13758,8 +14129,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="wizardsh" supported="no">
 		<description>Wizard's Harmony R (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Arc System Works</publisher>
+		<info name="alt_title" value="Wizard's Harmony R"/>
 		<info name="serial" value="SLPS-01716" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13772,8 +14144,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="wolffang" supported="no">
 		<description>Wolf Fang (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Xing</publisher>
+		<info name="alt_title" value="ウルフファング"/>
 		<info name="serial" value="SLPS-00254" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13786,8 +14159,9 @@ A few comments on these:
 	<!-- some games work -->
 	<software name="wonder3a" supported="no">
 		<description>Wonder 3 Arcade Gears (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Xing</publisher>
+		<info name="alt_title" value="ワンダー3"/>
 		<info name="serial" value="SLPS-00927" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13800,8 +14174,9 @@ A few comments on these:
 	<!-- crash MESS -->
 	<software name="wonderbc" supported="no">
 		<description>Wonder B-Cruise - Dogiborn Daisakusen (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Sunsoft</publisher>
+		<info name="alt_title" value="わんダービークルズ"/>
 		<info name="serial" value="SLPS-02322" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13814,8 +14189,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="wondertr" supported="no">
 		<description>Wonder Tracker (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Sony</publisher>
+		<info name="alt_title" value="ワンダートレック"/>
 		<info name="serial" value="SCPS-10072" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13827,9 +14203,10 @@ A few comments on these:
 
 	<!-- boot ok -->
 	<software name="worldlea" supported="no">
-		<description>World League Soccer - Challenge Nippon! (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>World League Soccer - Challenge Nippon! (  Family Price 1500) (Japan)</description>
+		<year>2000</year>
+		<publisher>Coconuts Japan</publisher>
+		<info name="alt_title" value="ワールドリーグサッカー"/>
 		<info name="serial" value="SLPS-02687" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13842,8 +14219,9 @@ A few comments on these:
 	<!-- black screen -->
 	<software name="worldnev" supported="no">
 		<description>World Neverland - Olerud Oukoku Monogatari (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>RiverhillSoft</publisher>
+		<info name="alt_title" value="World Neverland〜オルルド王国物語〜"/>
 		<info name="serial" value="SLPS-01037" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13856,8 +14234,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="worldpro" supported="no">
 		<description>World Pro Tennis '98 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>I.Magic</publisher>
+		<info name="alt_title" value="ワールドプロテニス98"/>
 		<info name="serial" value="SLPS-01379" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13870,8 +14249,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="wwfwrest" supported="no">
 		<description>WWF Wrestlemania - The Arcade Game (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Acclaim</publisher>
+		<info name="alt_title" value="レッスルマニア・ジ・アーケードゲーム"/>
 		<info name="serial" value="SLPS-00223" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13884,8 +14264,9 @@ A few comments on these:
 	<!-- boot OK -->
 	<software name="xracingj" supported="no">
 		<description>X-Racing (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Nichibutsu</publisher>
+		<info name="alt_title" value="X.RACING（エックスレーシング）"/>
 		<info name="serial" value="SLPS-01063" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13898,8 +14279,9 @@ A few comments on these:
 	<!-- boot ok, but invisible player sprite -->
 	<software name="x2noreli" supported="no">
 		<description>X2 - No Relief (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Capcom</publisher>
+		<info name="alt_title" value="X2"/>
 		<info name="serial" value="SLPS-00766" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13926,8 +14308,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="yakiniku" supported="no">
 		<description>Yakiniku Bugyou (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>Media</publisher>
+		<info name="alt_title" value="焼肉奉行"/>
 		<info name="serial" value="SLPS-03209" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13940,8 +14323,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="yakitori" supported="no">
 		<description>Yakitori Musume - Sugo Ude Hanjouki (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2002</year>
+		<publisher>Media</publisher>
+		<info name="alt_title" value="やきとり娘〜スゴ腕繁盛記〜"/>
 		<info name="serial" value="SLPS-03435" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13954,8 +14338,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="yamagaau" supported="no">
 		<description>Yamagata Digital Museum - Autumn (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Imagineer</publisher>
+		<info name="alt_title" value="デジタルミュージアム ヒロ・ヤマガタAutumn"/>
 		<info name="serial" value="SLPS-01662" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13968,8 +14353,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="yamagasp" supported="no">
 		<description>Yamagata Digital Museum - Spring (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Imagineer</publisher>
+		<info name="alt_title" value="デジタルミュージアム ヒロ・ヤマガタSpring"/>
 		<info name="serial" value="SLPS-01581" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13982,8 +14368,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="yamagasu" supported="no">
 		<description>Yamagata Digital Museum - Summer (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Imagineer</publisher>
+		<info name="alt_title" value="デジタルミュージアム ヒロ・ヤマガタSummer"/>
 		<info name="serial" value="SLPS-01661" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -13996,8 +14383,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="yamagawi" supported="no">
 		<description>Yamagata Digital Museum - Winter (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Imagineer</publisher>
+		<info name="alt_title" value="デジタルミュージアム ヒロ・ヤマガタWinter"/>
 		<info name="serial" value="SLPS-01663" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -14007,25 +14395,12 @@ A few comments on these:
 		</part>
 	</software>
 
-	<!-- boot ok -->
-	<software name="yasoukyo" supported="no">
-		<description>Yasoukyoku 2 (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="serial" value="SLPS-03213" />
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="yasoukyoku 2 (japan) [slps-03213]" sha1="2469c7c6d8d69835aae534b91c59b03aa4d2dd96"/>
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- black screen -->
 	<software name="yoshimot" supported="no">
 		<description>Yoshimoto Muchicco Daikessen (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Sony</publisher>
+		<info name="alt_title" value="ヨシモト ムチッ子大決戦"/>
 		<info name="serial" value="SLPS-02308" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -14037,9 +14412,10 @@ A few comments on these:
 
 	<!-- boot ok -->
 	<software name="youkaiha" supported="no">
-		<description>Youkai Hanaasobi (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Youkai Hana Asobi (Japan)</description>
+		<year>2001</year>
+		<publisher>Unbalance</publisher>
+		<info name="alt_title" value="妖怪花あそび"/>
 		<info name="serial" value="SLPM-86857" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -14052,8 +14428,9 @@ A few comments on these:
 	<!-- black screen -->
 	<software name="yugiohmo" supported="no">
 		<description>Yu-Gi-Oh! Monster Capsule Breed &amp; Battle (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="遊戯王 モンスターカプセル ブリード＆バトル"/>
 		<info name="serial" value="SLPM-86096" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -14066,8 +14443,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="yukinkob" supported="no">
 		<description>Yukinko Burning (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2002</year>
+		<publisher>Princess Soft</publisher>
+		<info name="alt_title" value="ゆきんこ ばあにんぐ"/>
 		<info name="serial" value="SLPM-87013" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -14080,8 +14458,9 @@ A few comments on these:
 	<!-- white screen after initial menus -->
 	<software name="yumenots" supported="no">
 		<description>Yume no Tsubasa (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2000</year>
+		<publisher>KID</publisher>
+		<info name="alt_title" value="夢のつばさ"/>
 		<info name="serial" value="SLPS-02954" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -14094,8 +14473,9 @@ A few comments on these:
 	<!-- black screen -->
 	<software name="yumeiroi" supported="no">
 		<description>Yume-Iroiro (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Feathered</publisher>
+		<info name="alt_title" value="夢☆色いろ"/>
 		<info name="serial" value="SLPS-01401" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -14107,14 +14487,15 @@ A few comments on these:
 
 	<!-- black screen -->
 	<software name="yuugenga" supported="no">
-		<description>Yuugen Gaisha Chikyuu Boueitai - Earth Defenders Corporation (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Yuugen Kaisha Chikyuu Boueitai - Guard of Earth Organization (Japan)</description>
+		<year>1999</year>
+		<publisher>Media Rings</publisher>
+		<info name="alt_title" value="有限会社 地球防衛隊"/>
 		<info name="serial" value="SLPS-02024" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="yuugen gaisha chikyuu boueitai - earth defenders corporation (japan) [slps-02024]" sha1="34f2ae1cd241e5bfe494ee3f1d8545e00d303010"/>
+				<disk name="yuugen kaisha chikyuu boueitai - guard of earth organization (japan) [slps-02024]" sha1="34f2ae1cd241e5bfe494ee3f1d8545e00d303010"/>
 			</diskarea>
 		</part>
 	</software>
@@ -14122,8 +14503,9 @@ A few comments on these:
 	<!-- boot ok, bad fmv every other frame -->
 	<software name="yuukyuun" supported="no">
 		<description>Yuukyuu no Eden - The Eternal Eden (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>ASCII</publisher>
+		<info name="alt_title" value="悠久のエデン"/>
 		<info name="serial" value="SLPS-01928" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -14150,8 +14532,9 @@ A few comments on these:
 	<!-- boot ok, hang on loading screen after first menu -->
 	<software name="yuuyamid" supported="no">
 		<description>Yuuyami Doori Tankentai (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Spike</publisher>
+		<info name="alt_title" value="夕闇通り探検隊"/>
 		<info name="serial" value="SLPS-02274" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -14164,8 +14547,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="zapsnowb" supported="no">
 		<description>Zap! Snowboarding Trix '98 (Japan)</description>
-		<year>199?</year>
+		<year>1997</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ZAP! SNOWBOADRING TRIX '98"/>
 		<info name="serial" value="SLPS-00909" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -14178,8 +14562,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="zeiramzo" supported="no">
 		<description>Zeiramzone (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Banpresto</publisher>
+		<info name="alt_title" value="ゼイラムゾーン"/>
 		<info name="serial" value="SLPS-00575" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -14192,8 +14577,9 @@ A few comments on these:
 	<!-- black screen after company logos -->
 	<software name="zeitgeis" supported="no">
 		<description>Zeitgeist (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Taito</publisher>
+		<info name="alt_title" value="ツァイトガイスト"/>
 		<info name="serial" value="SLPS-00034" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -14206,8 +14592,9 @@ A few comments on these:
 	<!-- boot ok -->
 	<software name="zennippo" supported="no">
 		<description>Zen-Nippon Joshi Pro Wrestling - Joou Densetsu Yume no Taikousen (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>TEN</publisher>
+		<info name="alt_title" value="全日本女子プロレス 女王伝説 夢の対抗戦"/>
 		<info name="serial" value="SLPS-01475" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -14219,9 +14606,10 @@ A few comments on these:
 
 	<!-- black screen -->
 	<software name="zennipok" supported="no">
-		<description>Zen-Nippon Pro-Wrestling - Ouja no Kon (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Zen-Nippon Pro Wrestling - Ouja no Kon (Japan)</description>
+		<year>1999</year>
+		<publisher>Human</publisher>
+		<info name="alt_title" value="全日本プロレス 王者の魂"/>
 		<info name="serial" value="SLPS-01849" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -14233,9 +14621,10 @@ A few comments on these:
 
 	<!-- boot OK -->
 	<software name="zero4cha" supported="no">
-		<description>Zero 4 Champ Doozy-J (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Zero4 Champ Doozy-J (Japan)</description>
+		<year>1997</year>
+		<publisher>Media Rings</publisher>
+		<info name="alt_title" value="ZERO4 CHAMP Doozy－J"/>
 		<info name="serial" value="SLPS-00755" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -14248,8 +14637,9 @@ A few comments on these:
 	<!-- boot OK -->
 	<software name="zigzagba" supported="no">
 		<description>Zig Zag Ball (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year>
+		<publisher>Upstar</publisher>
+		<info name="alt_title" value="ZIG ZAG BALL"/>
 		<info name="serial" value="SLPS-01483" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -14261,9 +14651,10 @@ A few comments on these:
 
 	<!-- boot OK -->
 	<software name="zipangut" supported="no">
-		<description>Zipangutou - Unmei wa Saikoro ga Kimeru! (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Zipangujima&#58; Unmei wa Saikoro ga Kimeru! (Japan)</description>
+		<year>1999</year>
+		<publisher>Human</publisher>
+		<info name="alt_title" value="じぱんぐ島 〜運命はサイコロが決める!?〜"/>
 		<info name="serial" value="SLPS-02260" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -14276,8 +14667,9 @@ A few comments on these:
 	<!-- black screen after logos -->
 	<software name="zoidsbat" supported="no">
 		<description>Zoids - Battle Card Game - Seihou Tairiku Senki (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2001</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="ゾイドバトルカードゲーム 西方大陸戦記"/>
 		<info name="serial" value="SLPS-03255" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -14289,9 +14681,10 @@ A few comments on these:
 
 	<!-- boot OK -->
 	<software name="zoidstei" supported="no">
-		<description>Zoids - Teikoku vs. Kyouwakoku - Meka Seitai no Idenshi (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Zoids - Zenebus VS Heric (Japan)</description>
+		<year>2000</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="メカ生体ゾイド"/>
 		<info name="serial" value="SLPS-02982" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -14303,9 +14696,10 @@ A few comments on these:
 
 	<!-- boot OK -->
 	<software name="zoids2" supported="no">
-		<description>Zoids 2 - Heric Kyouwakoku vs. Guylos Teikoku  (Japan)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Zoids 2 - Helic Republic VS Guylos Empire  (Japan)</description>
+		<year>2002</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="ZOIDS2 ヘリック共和国VSガイロス帝国"/>
 		<info name="serial" value="SLPS-03389" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">

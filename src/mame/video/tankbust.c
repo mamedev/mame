@@ -194,7 +194,7 @@ void tankbust_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		color = 0;
 
-		//0x02 - dont know (most of the time this bit is set in tank sprite and others but not all and not always)
+		//0x02 - don't know (most of the time this bit is set in tank sprite and others but not all and not always)
 		//0x04 - not used
 		//0x08 - not used
 		//0x10 - not used

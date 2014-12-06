@@ -930,7 +930,7 @@ ROM_END
 /******************************************************************************
 
 Gfx ROMs in pkunwar have an unusual layout, where a high address bit
-(which is no the top bit) separates parts of the same tile.
+(which is not the top bit) separates parts of the same tile.
 
 This all originates from Nova2001 apparently, which uses 0x2000 bytes ROMs for
 the graphics. When the number of tiles was increased, the same 0x2000 blocks

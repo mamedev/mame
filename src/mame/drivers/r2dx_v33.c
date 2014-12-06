@@ -434,8 +434,8 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
 	AM_RANGE(0x1f000, 0x1ffff) AM_RAM //_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
-	AM_RANGE(0x20000, 0x2ffff) AM_ROM AM_ROMBANK("bank1") AM_WRITENOP
-	AM_RANGE(0x30000, 0xfffff) AM_ROM AM_ROMBANK("bank3") AM_WRITENOP
+	AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK("bank1") AM_WRITENOP
+	AM_RANGE(0x30000, 0xfffff) AM_ROMBANK("bank3") AM_WRITENOP
 ADDRESS_MAP_END
 
 
@@ -490,7 +490,7 @@ static ADDRESS_MAP_START( nzeroteam_base_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
 	AM_RANGE(0x1f000, 0x1ffff) AM_RAM //_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
-	AM_RANGE(0x20000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x20000 )
+	AM_RANGE(0x20000, 0xfffff) AM_ROM AM_REGION("maincpu", 0x20000 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16, r2dx_v33_state )
@@ -846,10 +846,10 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,rdx_v33)
 	static const int spri[5] = { 0, 1, 2, 3, -1 };
 	cur_spri = spri;
 
-	membank("bank1")->configure_entries(0, 0x40, memregion("mainprg")->base(), 0x10000);
+	membank("bank1")->configure_entries(0, 0x40, memregion("maincpu")->base(), 0x10000);
 
-	membank("bank3")->configure_entry(0, memregion("mainprg")->base()+0x030000); // 0x30000 - 0xfffff bank for Raiden 2
-	membank("bank3")->configure_entry(1, memregion("mainprg")->base()+0x230000); // 0x30000 - 0xfffff bank for Raiden DX
+	membank("bank3")->configure_entry(0, memregion("maincpu")->base()+0x030000); // 0x30000 - 0xfffff bank for Raiden 2
+	membank("bank3")->configure_entry(1, memregion("maincpu")->base()+0x230000); // 0x30000 - 0xfffff bank for Raiden DX
 
 
 	raiden2_decrypt_sprites(machine());
@@ -958,10 +958,8 @@ Notes
 
 
 ROM_START( r2dx_v33 )
-	ROM_REGION( 0x400000, "mainprg", 0 ) /* v33 main cpu */
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* v33 main cpu */
 	ROM_LOAD("prg.223", 0x000000, 0x400000, CRC(b3dbcf98) SHA1(30d6ec2090531c8c579dff74c4898889902d7d87) )
-
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF ) /* v33 main cpu */
 
 	ROM_REGION( 0x040000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "fix.613", 0x000000, 0x040000, CRC(3da27e39) SHA1(3d446990bf36dd0a3f8fadb68b15bed54904c8b5) )
@@ -969,7 +967,7 @@ ROM_START( r2dx_v33 )
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
 	ROM_LOAD( "bg.612", 0x000000, 0x400000, CRC(162c61e9) SHA1(bd0a6a29804b84196ba6bf3402e9f30a25da9269) )
 
-	ROM_REGION( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
 	ROM_LOAD32_WORD( "obj1.724", 0x000000, 0x400000, CRC(7d218985) SHA1(777241a533defcbea3d7e735f309478d260bad52) )
 	ROM_LOAD32_WORD( "obj2.725", 0x000002, 0x400000, CRC(891b24d6) SHA1(74f89b47b1ba6b84ddd96d1fae92fddad0ace342) )
 
@@ -984,10 +982,8 @@ ROM_START( r2dx_v33 )
 ROM_END
 
 ROM_START( r2dx_v33_r2 )
-	ROM_REGION( 0x400000, "mainprg", 0 ) /* v33 main cpu */
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* v33 main cpu */
 	ROM_LOAD("prg.223", 0x000000, 0x400000, CRC(b3dbcf98) SHA1(30d6ec2090531c8c579dff74c4898889902d7d87) )
-
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF ) /* v33 main cpu */
 
 	ROM_REGION( 0x040000, "gfx1", 0 ) /* chars */
 	ROM_LOAD( "fix.613", 0x000000, 0x040000, CRC(3da27e39) SHA1(3d446990bf36dd0a3f8fadb68b15bed54904c8b5) )
@@ -995,7 +991,7 @@ ROM_START( r2dx_v33_r2 )
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
 	ROM_LOAD( "bg.612", 0x000000, 0x400000, CRC(162c61e9) SHA1(bd0a6a29804b84196ba6bf3402e9f30a25da9269) )
 
-	ROM_REGION( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
 	ROM_LOAD32_WORD( "obj1.724", 0x000000, 0x400000, CRC(7d218985) SHA1(777241a533defcbea3d7e735f309478d260bad52) )
 	ROM_LOAD32_WORD( "obj2.725", 0x000002, 0x400000, CRC(891b24d6) SHA1(74f89b47b1ba6b84ddd96d1fae92fddad0ace342) )
 
@@ -1012,11 +1008,9 @@ ROM_END
 
 // uses dipswitches
 ROM_START( nzeroteam ) /* V33 SYSTEM TYPE_B hardware, uses SEI333 (AKA COPX-D3) for protection  */
-	ROM_REGION( 0x100000, "mainprg", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("prg1", 0x000000, 0x80000, CRC(3c7d9410) SHA1(25f2121b6c2be73f11263934266901ed5d64d2ee) )
 	ROM_LOAD16_BYTE("prg2", 0x000001, 0x80000, CRC(6cba032d) SHA1(bf5d488cd578fff09e62e3650efdee7658033e3f) )
-
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF ) /* v33 main cpu */
 
 	ROM_REGION( 0x20000, "math", 0 ) /* SEI333 (AKA COPX-D3) data */
 	ROM_LOAD( "copx-d3.bin", 0x00000, 0x20000, CRC(fa2cf3ad) SHA1(13eee40704d3333874b6e3da9ee7d969c6dc662a) ) /* Not from this set, but same data as Zero Team 2000 & Raiden II New */
@@ -1034,7 +1028,7 @@ ROM_START( nzeroteam ) /* V33 SYSTEM TYPE_B hardware, uses SEI333 (AKA COPX-D3) 
 	ROM_LOAD( "back-1", 0x000000, 0x100000, CRC(8b7f9219) SHA1(3412b6f8a4fe245e521ddcf185a53f2f4520eb57) ) /* Same as "MUSHA BACK-1" of other Zero Team sets */
 	ROM_LOAD( "back-2", 0x100000, 0x080000, CRC(ce61c952) SHA1(52a843c8ba428b121fab933dd3b313b2894d80ac) ) /* Same as "MUSHA BACK-2" of other Zero Team sets */
 
-	ROM_REGION( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
 	ROM_LOAD32_WORD( "obj-1", 0x000000, 0x200000, CRC(45be8029) SHA1(adc164f9dede9a86b96a4d709e9cba7d2ad0e564) ) /* Same as "MUSHA OBJ-1" of other Zero Team sets */
 	ROM_LOAD32_WORD( "obj-2", 0x000002, 0x200000, CRC(cb61c19d) SHA1(151a2ce9c32f3321a974819e9b165dddc31c8153) ) /* Same as "MUSHA OBJ-2" of other Zero Team sets */
 
@@ -1044,11 +1038,9 @@ ROM_END
 
 // uses a 93c46a eeprom
 ROM_START( zerotm2k ) /* V33 SYSTEM TYPE_C VER2 hardware, uses SEI333 (AKA COPX-D3) for protection  */
-	ROM_REGION( 0x100000, "mainprg", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD( "mt28f800b1.u0230", 0x000000, 0x100000, CRC(6ab49d8c) SHA1(d94ec9a46ff98a76c3372369246733268474de99) ) /* SMT rom, PCB silkscreened PRG01 */
 	/* PCB has unpopulated socket space for two 27C040 at u0224 silkscreened PRG0 & u0226 silkscreened PRG1) */
-
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF ) /* v33 main cpu */
 
 	ROM_REGION( 0x20000, "math", 0 ) /* SEI333 (AKA COPX-D3) data */
 	ROM_LOAD( "mx27c1000mc.u0366", 0x00000, 0x20000, CRC(fa2cf3ad) SHA1(13eee40704d3333874b6e3da9ee7d969c6dc662a) ) /* PCB silkscreened 333ROM */
@@ -1067,7 +1059,7 @@ ROM_START( zerotm2k ) /* V33 SYSTEM TYPE_C VER2 hardware, uses SEI333 (AKA COPX-
 	ROM_LOAD( "mt28f400b1.u0619", 0x100000, 0x080000, CRC(266acee6) SHA1(2a9da66c313a7536c7fb393134b9df0bb122cb2b) ) /* SMT rom, PCB silkscreened BG3 */
 	/* PCB has an unpopulated socket rom space for a LH535A00D at u0615 for alt BG3 location */
 
-	ROM_REGION( 0x800000, "gfx3", 0 ) /* sprite gfx (NOT encrypted) */
+	ROM_REGION32_LE( 0x800000, "gfx3", 0 ) /* sprite gfx (NOT encrypted) */
 	ROM_LOAD32_WORD( "musha_obj-1a.u0729", 0x000000, 0x200000, CRC(9b2cf68c) SHA1(cd8cb277091bfa125fd0f68410de39f72f1c7047) ) /* PCB silkscreened OBJ1 */
 	ROM_LOAD32_WORD( "musha_obj-2a.u0730", 0x000002, 0x200000, CRC(fcabee05) SHA1(b2220c0311b3bd2fd44fb56fff7c27bed0816fe9) ) /* PCB silkscreened OBJ2 */
 	/* PCB has unpopulated rom space for two SMT roms at u0734 & u0736 for alt OBJ1 & OBJ2 locations) */

@@ -1466,7 +1466,7 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 			break;
 
 		case TRACK_ID_VICTOR_GCR5:
-			gcr5_w(buffer, offset, 10, 1 + track + (head * 0x80));
+			gcr5_w(buffer, offset, 10, track + (head * 0x80));
 			break;
 
 		case HEAD_ID:

@@ -714,6 +714,17 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
+	<software name="alphaprk" supported="no">
+		<description>Alphabet Park Adventure (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92000.bin" size="8388608" crc="69ef24ff" sha1="82b89bdc5e9050e4152866fc774d3996f9836d65" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ariel" supported="no">
 		<description>Arielle Die Meerjungfrau - Arielles aufregendes Abenteuer (Ger)</description>
 		<year>200?</year>
@@ -761,6 +772,17 @@ V.Smile Smartbooks
 	</software>
 
 	<software name="cinderla" supported="no">
+		<description>Cinderella - Cinderella's Magic Wishes (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92240.bin" size="8388608" crc="2723728c" sha1="32fd6a5b9718ccc7e10e64046d7ac320cfa47362" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cinderlag" cloneof="cinderla" supported="no">
 		<description>Cinderella - Lernen im Märchenland (Ger, Rev. 1)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -771,7 +793,7 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
-	<software name="cinderla1" cloneof="cinderla" supported="no">
+	<software name="cinderlag1" cloneof="cinderla" supported="no">
 		<description>Cinderella - Lernen im Märchenland (Ger, Rev. 0)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>

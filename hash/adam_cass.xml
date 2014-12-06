@@ -69,77 +69,77 @@
 		<publisher>Reedy Software</publisher>
 
 		<part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="addictus (1989) (reedy software).ddp" size="262144" crc="30584c67" sha1="7c6b6a44647e6fff3f1be207174cb30503f92e2b" offset="0" />
-	        </dataarea>
-	    </part>
+			<dataarea name="cass" size="262144">
+				<rom name="addictus (1989) (reedy software).ddp" size="262144" crc="30584c67" sha1="7c6b6a44647e6fff3f1be207174cb30503f92e2b" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="addrbook">
-	    <description>Address Book Filer with AutoDialer</description>
-	    <year>1984</year>
-	    <publisher>Coleco</publisher>
+		<description>Address Book Filer with AutoDialer</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="address book filer with autodialer (1984) (coleco).ddp" size="262144" crc="8fba1389" sha1="47b5737eafd9e778aba2a05c93f4551a4b3eb21a" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="address book filer with autodialer (1984) (coleco).ddp" size="262144" crc="8fba1389" sha1="47b5737eafd9e778aba2a05c93f4551a4b3eb21a" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="autoaid">
-	    <description>Auto-AID for SmartBASIC</description>
-	    <year>1984</year>
-	    <publisher>FutureVision</publisher>
+		<description>Auto-AID for SmartBASIC</description>
+		<year>1984</year>
+		<publisher>FutureVision</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="auto-aid for smartbasic v1.0 (1984) (futurevision).ddp" size="262144" crc="394284af" sha1="3c98d98665fe4e12265455419f460e97faf79c41" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="auto-aid for smartbasic v1.0 (1984) (futurevision).ddp" size="262144" crc="394284af" sha1="3c98d98665fe4e12265455419f460e97faf79c41" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="autobckp">
-	    <description>AutoBackup</description>
-	    <year>198?</year>
-	    <publisher>Walters Software Co.</publisher>
+		<description>AutoBackup</description>
+		<year>198?</year>
+		<publisher>Walters Software Co.</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <feature name="part_id" value="AutoSave" />
-	        <dataarea name="cass" size="262144">
-	            <rom name="autobackup - autosave (198x) (walters software co.).ddp" size="262144" crc="13f5f1ad" sha1="2a7c0fb50fbd1a9d64fb1d53b1354222b5f426f7" offset="0" />
-	        </dataarea>
-	    </part>
-	    <part name="cass2" interface="adam_cass">
-	        <feature name="part_id" value="AutoLoad" />
-	        <dataarea name="cass" size="262144">
-	            <rom name="autobackup - autoload (198x) (walters software co.).ddp" size="262144" crc="55b9ccf1" sha1="a1196b2c9a91042e1c549afbf3a0d40413dc24a9" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<feature name="part_id" value="AutoSave" />
+			<dataarea name="cass" size="262144">
+				<rom name="autobackup - autosave (198x) (walters software co.).ddp" size="262144" crc="13f5f1ad" sha1="2a7c0fb50fbd1a9d64fb1d53b1354222b5f426f7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="adam_cass">
+			<feature name="part_id" value="AutoLoad" />
+			<dataarea name="cass" size="262144">
+				<rom name="autobackup - autoload (198x) (walters software co.).ddp" size="262144" crc="55b9ccf1" sha1="a1196b2c9a91042e1c549afbf3a0d40413dc24a9" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="bestbrod">
-	    <description>The Best of Brøderbund</description>
-	    <year>1984</year>
-	    <publisher>Coleco</publisher>
+		<description>The Best of Brøderbund</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="best of broderbund, the (1984) (coleco).ddp" size="262144" crc="8a1d3ab5" sha1="a6646acea19a2d96cc262f478225f8216fdbb2fa" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="best of broderbund, the (1984) (coleco).ddp" size="262144" crc="8a1d3ab5" sha1="a6646acea19a2d96cc262f478225f8216fdbb2fa" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="bestbroda" cloneof="bestbrod">
-	    <description>The Best of Brøderbund (Alt)</description>
-	    <year>1984</year>
-	    <publisher>Coleco</publisher>
+		<description>The Best of Brøderbund (Alt)</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="best of broderbund, the (1984) (coleco) [a1].ddp" size="262144" crc="cc8d3dc4" sha1="dabbdc85d4cd22c98a864d337958d3e7b48ff120" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="best of broderbund, the (1984) (coleco) [a1].ddp" size="262144" crc="cc8d3dc4" sha1="dabbdc85d4cd22c98a864d337958d3e7b48ff120" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="bestea">
@@ -172,10 +172,10 @@
 		<publisher>Coleco</publisher>
 
 		<part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="super buck rogers - planet of zoom (1983) (coleco) [a1].ddp" size="262144" crc="69aa76a7" sha1="f394b00b027ea4459eaccb03d1bff4c3dc231cab" offset="0" />
-	        </dataarea>
-	    </part>
+			<dataarea name="cass" size="262144">
+				<rom name="super buck rogers - planet of zoom (1983) (coleco) [a1].ddp" size="262144" crc="69aa76a7" sha1="f394b00b027ea4459eaccb03d1bff4c3dc231cab" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="softadam">
@@ -191,39 +191,39 @@
 	</software>
 
 	<software name="cartcopy">
-	    <description>Coleco Game Cartridge Copy</description>
-	    <year>1984</year>
-	    <publisher>Coleco</publisher>
+		<description>Coleco Game Cartridge Copy</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="coleco game cartridge copy (1984) (coleco).ddp" size="262144" crc="cda050a1" sha1="2227328bf2f15eb8bf784e1fc331c1a8a3f2867b" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="coleco game cartridge copy (1984) (coleco).ddp" size="262144" crc="cda050a1" sha1="2227328bf2f15eb8bf784e1fc331c1a8a3f2867b" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="conlife">
-	    <description>Conway's Game of Life</description>
-	    <year>199?</year>
-	    <publisher>&lt;unknown&gt;</publisher>
+		<description>Conway's Game of Life</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="conway's game of life (199x) (unknown).ddp" size="262144" crc="f4286eaa" sha1="dc1c9dc5db9103240e7c68c17f222a216fb2e18e" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="conway's game of life (199x) (unknown).ddp" size="262144" crc="f4286eaa" sha1="dc1c9dc5db9103240e7c68c17f222a216fb2e18e" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="copyutil">
-	    <description>Copy Utilities (v2.0)</description>
-	    <year>19??</year>
-	    <publisher>&lt;unknown&gt;</publisher>
+		<description>Copy Utilities (v2.0)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="copy utilities v2.0.ddp" size="262144" crc="a36d2f6b" sha1="54546df91844998092eabe0348ad3d7a4b36123d" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="copy utilities v2.0.ddp" size="262144" crc="a36d2f6b" sha1="54546df91844998092eabe0348ad3d7a4b36123d" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="copycart">
@@ -255,11 +255,11 @@
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="super donkey kong junior (1984) (coleco).ddp" size="262144" crc="819ea0fc" sha1="edb51bdc1e3336906afe2ed65062eaccdb4742b4" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="super donkey kong junior (1984) (coleco).ddp" size="262144" crc="819ea0fc" sha1="edb51bdc1e3336906afe2ed65062eaccdb4742b4" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="dkongjrp14" cloneof="dkongjr">
@@ -279,83 +279,83 @@
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="super donkey kong junior - 5 screen (1984) (coleco) (prototype) (rev. 13).ddp" size="262144" crc="d1fb3bc9" sha1="794fb6a66b1bfc6bf9b056e4dcd887285cb61c32" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="super donkey kong junior - 5 screen (1984) (coleco) (prototype) (rev. 13).ddp" size="262144" crc="d1fb3bc9" sha1="794fb6a66b1bfc6bf9b056e4dcd887285cb61c32" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="dlair">
-	    <description>Dragon's Lair</description>
-	    <year>1984</year>
-	    <publisher>Coleco</publisher>
+		<description>Dragon's Lair</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="dragon's lair (1984) (coleco).ddp" size="262144" crc="690b2172" sha1="55624e0adbf35f2ad6e5cada6612f65a22b88ef1" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="dragon's lair (1984) (coleco).ddp" size="262144" crc="690b2172" sha1="55624e0adbf35f2ad6e5cada6612f65a22b88ef1" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="eosdisk">
-	    <description>E.O.S. Disk Manager</description>
-	    <year>1984</year>
-	    <publisher>Coleco</publisher>
+		<description>E.O.S. Disk Manager</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="e.o.s. disk manager (1984) (coleco).ddp" size="262144" crc="53fbaf72" sha1="a78466b931597543f4de77620031175173ad2bc0" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="e.o.s. disk manager (1984) (coleco).ddp" size="262144" crc="53fbaf72" sha1="a78466b931597543f4de77620031175173ad2bc0" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="xbasutil">
-	    <description>EBU - Extended BASIC Utilities v1.0</description>
-	    <year>198?</year>
-	    <publisher>Extended Software</publisher>
+		<description>EBU - Extended BASIC Utilities v1.0</description>
+		<year>198?</year>
+		<publisher>Extended Software</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="extended basic utilities (198x) (extended software).ddp" size="262144" crc="fd48e2c4" sha1="516b9ea4aa64a8269da1ff354774667806973795" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="extended basic utilities (198x) (extended software).ddp" size="262144" crc="fd48e2c4" sha1="516b9ea4aa64a8269da1ff354774667806973795" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="fla_alg">
-	    <description>Electronic Flashcard Maker - Algebra I</description>
-	    <year>198?</year>
+		<description>Electronic Flashcard Maker - Algebra I</description>
+		<year>198?</year>
 		<publisher>Coleco?</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="electronic flashcard maker - algebra i (198x) (unknown).ddp" size="262144" crc="0c21ac4a" sha1="6d074161a443a4ecb37b6dda4f5d00ffb916af09" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="electronic flashcard maker - algebra i (198x) (unknown).ddp" size="262144" crc="0c21ac4a" sha1="6d074161a443a4ecb37b6dda4f5d00ffb916af09" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="fla_his1">
-	    <description>Electronic Flashcard Maker - American History I</description>
-	    <year>198?</year>
+		<description>Electronic Flashcard Maker - American History I</description>
+		<year>198?</year>
 		<publisher>Coleco?</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="electronic flashcard maker - american history i (198x) (unknown).ddp" size="262144" crc="3f67783a" sha1="727f6b5e0fed746fc6bcbc10d226a19a01694140" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="electronic flashcard maker - american history i (198x) (unknown).ddp" size="262144" crc="3f67783a" sha1="727f6b5e0fed746fc6bcbc10d226a19a01694140" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="fla_his2">
-	    <description>Electronic Flashcard Maker - American History II</description>
-	    <year>198?</year>
+		<description>Electronic Flashcard Maker - American History II</description>
+		<year>198?</year>
 		<publisher>Coleco?</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="electronic flashcard maker - american history ii (198x) (unknown).ddp" size="262144" crc="d87b7811" sha1="f58a7657de63de5544c121247be1f0fecd06534b" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="electronic flashcard maker - american history ii (198x) (unknown).ddp" size="262144" crc="d87b7811" sha1="f58a7657de63de5544c121247be1f0fecd06534b" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="egp2">
@@ -395,39 +395,39 @@
 	</software>
 
 	<software name="famfeud">
-	    <description>Family Feud</description>
-	    <year>1984</year>
-	    <publisher>Coleco</publisher>
+		<description>Family Feud</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="family feud (1984) (coleco).ddp" size="262144" crc="ca1cc594" sha1="6f3a544007826610ef0c5db40804023736af0312" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="family feud (1984) (coleco).ddp" size="262144" crc="ca1cc594" sha1="6f3a544007826610ef0c5db40804023736af0312" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="fffback">
-	    <description>Flash Facts - Flashbacks</description>
-	    <year>1984</year>
-	    <publisher>Coleco</publisher>
+		<description>Flash Facts - Flashbacks</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="flash facts - flashbacks (1984) (coleco).ddp" size="262144" crc="3bce9ea3" sha1="aeb6850b90dd38539ab033d2f391305cec8da3ab" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="flash facts - flashbacks (1984) (coleco).ddp" size="262144" crc="3bce9ea3" sha1="aeb6850b90dd38539ab033d2f391305cec8da3ab" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="fffbacka" cloneof="fffback">
-	    <description>Flash Facts - Flashbacks (Alt)</description>
-	    <year>1984</year>
-	    <publisher>Coleco</publisher>
+		<description>Flash Facts - Flashbacks (Alt)</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="flash facts - flashbacks (1984) (coleco) [a1].ddp" size="262144" crc="97847c0f" sha1="62328cd04d99859e3e633d32391e477bf1733db6" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="flash facts - flashbacks (1984) (coleco) [a1].ddp" size="262144" crc="97847c0f" sha1="62328cd04d99859e3e633d32391e477bf1733db6" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="fftrivia">
@@ -455,51 +455,51 @@
 	</software>
 
 	<software name="godosd">
-	    <description>GoDOS (v1.2, Demo)</description>
-	    <year>1990</year>
-	    <publisher>Phoenix 2000</publisher>
+		<description>GoDOS (v1.2, Demo)</description>
+		<year>1990</year>
+		<publisher>Phoenix 2000</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="godos v1.2 demo (ddp #01) (1990) (phoenix 2000).ddp" size="262144" crc="205f65c0" sha1="09a69e6b6f209b3c46e2e8bf774ce7021e7e1be0" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="godos v1.2 demo (ddp #01) (1990) (phoenix 2000).ddp" size="262144" crc="205f65c0" sha1="09a69e6b6f209b3c46e2e8bf774ce7021e7e1be0" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="godosda" cloneof="godosd">
-	    <description>GoDOS (v1.2, Demo, Alt)</description>
-	    <year>1990</year>
-	    <publisher>Phoenix 2000</publisher>
+		<description>GoDOS (v1.2, Demo, Alt)</description>
+		<year>1990</year>
+		<publisher>Phoenix 2000</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="godos v1.2 demo (ddp #02) (1990) (phoenix 2000).ddp" size="262144" crc="99ed9b19" sha1="cdaf8032571708471d59ce3ddd4bd1f21ee84367" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="godos v1.2 demo (ddp #02) (1990) (phoenix 2000).ddp" size="262144" crc="99ed9b19" sha1="cdaf8032571708471d59ce3ddd4bd1f21ee84367" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="godosprg">
-	    <description>GoDOS BASIC Programs #01</description>
-	    <year>1990</year>
-	    <publisher>Joe Quinn</publisher>
+		<description>GoDOS BASIC Programs #01</description>
+		<year>1990</year>
+		<publisher>Joe Quinn</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="godos basic programs #01 (1990) (joe quinn).ddp" size="262144" crc="cc6ef8d6" sha1="0608b4a8e9555bed6e0c20cffda27df473ee7915" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="godos basic programs #01 (1990) (joe quinn).ddp" size="262144" crc="cc6ef8d6" sha1="0608b4a8e9555bed6e0c20cffda27df473ee7915" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="hackguid">
-	    <description>Hacker's Guide to ADAM</description>
-	    <year>1985</year>
-	    <publisher>Peter &amp; Ben Hinkle</publisher>
+		<description>Hacker's Guide to ADAM</description>
+		<year>1985</year>
+		<publisher>Peter &amp; Ben Hinkle</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="hacker's guide to adam (1985) (peter &amp; ben hinkle).ddp" size="262144" crc="fa9e0844" sha1="96bdecbc9fe060a8eb7247161029cfda6ca18139" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="hacker's guide to adam (1985) (peter &amp; ben hinkle).ddp" size="262144" crc="fa9e0844" sha1="96bdecbc9fe060a8eb7247161029cfda6ca18139" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="jeopardy">
@@ -527,51 +527,51 @@
 	</software>
 
 	<software name="labelwrk">
-	    <description>The Label Works</description>
-	    <year>198?</year>
-	    <publisher>Walters Software</publisher>
+		<description>The Label Works</description>
+		<year>198?</year>
+		<publisher>Walters Software</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="label works, the (198x) (walters software co.).ddp" size="262144" crc="eedbf0d0" sha1="2d0904aac4794d24dd24e6116f36f9b38d366fa1" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="label works, the (198x) (walters software co.).ddp" size="262144" crc="eedbf0d0" sha1="2d0904aac4794d24dd24e6116f36f9b38d366fa1" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="malhow1">
-	    <description>M.A.L. How To Vol. I - Install a Phone Outlet</description>
-	    <year>199?</year>
-	    <publisher>Maine ADAM Library</publisher>
+		<description>M.A.L. How To Vol. I - Install a Phone Outlet</description>
+		<year>199?</year>
+		<publisher>Maine ADAM Library</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="m.a.l. how to vol. i - install a phone outlet (199x) (maine adam library).ddp" size="262144" crc="017503bd" sha1="966e659b2e94cd7ff1d147e23a0d79ae80d0d76c" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="m.a.l. how to vol. i - install a phone outlet (199x) (maine adam library).ddp" size="262144" crc="017503bd" sha1="966e659b2e94cd7ff1d147e23a0d79ae80d0d76c" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="malhow2">
-	    <description>M.A.L. How To Vol. II - Build Your Own Computer Desk Hutch</description>
-	    <year>199?</year>
-	    <publisher>Maine ADAM Library</publisher>
+		<description>M.A.L. How To Vol. II - Build Your Own Computer Desk Hutch</description>
+		<year>199?</year>
+		<publisher>Maine ADAM Library</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="m.a.l. how to vol. ii - build your own computer desk hutch (199x) (maine adam library).ddp" size="262144" crc="b472434d" sha1="244985d48da47ee66da000c04c39a3c7a578703e" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="m.a.l. how to vol. ii - build your own computer desk hutch (199x) (maine adam library).ddp" size="262144" crc="b472434d" sha1="244985d48da47ee66da000c04c39a3c7a578703e" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="malhow5">
-	    <description>M.A.L. How To Vol. V - How to Build an Acoustic Printer Stand</description>
-	    <year>199?</year>
-	    <publisher>Maine ADAM Library</publisher>
+		<description>M.A.L. How To Vol. V - How to Build an Acoustic Printer Stand</description>
+		<year>199?</year>
+		<publisher>Maine ADAM Library</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="m.a.l. how to vol. v - how to build an acoustic printer stand (199x) (maine adam library).ddp" size="262144" crc="e22f74ad" sha1="a680c3b03a1f6f2661a09285ea61bd41ddac941c" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="m.a.l. how to vol. v - how to build an acoustic printer stand (199x) (maine adam library).ddp" size="262144" crc="e22f74ad" sha1="a680c3b03a1f6f2661a09285ea61bd41ddac941c" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="malcal93">
@@ -599,51 +599,51 @@
 	</software>
 
 	<software name="multibkp">
-	    <description>Multicart Backup</description>
-	    <year>198?</year>
-	    <publisher>&lt;unknown&gt;</publisher>
+		<description>Multicart Backup</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="multicart backup (198x) (unknown).ddp" size="262144" crc="f9f1ce7e" sha1="ec1fb7636de040860c01230b3a05426f896f91c6" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="multicart backup (198x) (unknown).ddp" size="262144" crc="f9f1ce7e" sha1="ec1fb7636de040860c01230b3a05426f896f91c6" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="recipefi">
-	    <description>Recipe Filer</description>
-	    <year>1984</year>
-	    <publisher>Coleco</publisher>
+		<description>Recipe Filer</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="recipe filer (1984) (coleco).ddp" size="262144" crc="a9c479bc" sha1="543c2f66103f598dfcbe2bf9e39af5266b778e6a" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="recipe filer (1984) (coleco).ddp" size="262144" crc="a9c479bc" sha1="543c2f66103f598dfcbe2bf9e39af5266b778e6a" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="scarry">
-	    <description>Richard Scarry's Best Electronic Wordbook Ever</description>
-	    <year>1984</year>
-	    <publisher>Coleco</publisher>
+		<description>Richard Scarry's Best Electronic Wordbook Ever</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="richard scarry's best electronic wordbook ever (1984) (coleco).ddp" size="262144" crc="dcba7f52" sha1="19274fc480154af210a85bb17d17fb0a8df52887" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="richard scarry's best electronic wordbook ever (1984) (coleco).ddp" size="262144" crc="dcba7f52" sha1="19274fc480154af210a85bb17d17fb0a8df52887" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="scarrya" cloneof="scarry">
-	    <description>Richard Scarry's Best Electronic Wordbook Ever (Alt)</description>
-	    <year>1984</year>
-	    <publisher>Coleco</publisher>
+		<description>Richard Scarry's Best Electronic Wordbook Ever (Alt)</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="richard scarry's best electronic wordbook ever (1984) (coleco) [a1].ddp" size="262144" crc="bf33f35b" sha1="5ed65eaafe8075b4f05876bb3158a8742a07817c" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="richard scarry's best electronic wordbook ever (1984) (coleco) [a1].ddp" size="262144" crc="bf33f35b" sha1="5ed65eaafe8075b4f05876bb3158a8742a07817c" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="smartfil">
@@ -671,51 +671,51 @@
 	</software>
 
 	<software name="smarttyp">
-	    <description>Smart Type (v1.1)</description>
-	    <year>1985</year>
-	    <publisher>Reedy Software</publisher>
+		<description>Smart Type (v1.1)</description>
+		<year>1985</year>
+		<publisher>Reedy Software</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="smarttype v1.1 (1985) (reedy software).ddp" size="262144" crc="ab1a4ffd" sha1="d14ec9688be8d37339a6d9338a242a108df5e46c" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="smarttype v1.1 (1985) (reedy software).ddp" size="262144" crc="ab1a4ffd" sha1="d14ec9688be8d37339a6d9338a242a108df5e46c" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="smartbas">
-	    <description>SmartBASIC (v1.0)</description>
-	    <year>1983</year>
-	    <publisher>Coleco</publisher>
+		<description>SmartBASIC (v1.0)</description>
+		<year>1983</year>
+		<publisher>Coleco</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="smartbasic v1.0 (1983) (coleco).ddp" size="262144" crc="aa52c12f" sha1="bce8367bde3ac49f27480cb5d6a21a657e44255b" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="smartbasic v1.0 (1983) (coleco).ddp" size="262144" crc="aa52c12f" sha1="bce8367bde3ac49f27480cb5d6a21a657e44255b" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="smartbasa" cloneof="smartbas">
-	    <description>SmartBASIC (v1.0, Alt)</description>
-	    <year>1983</year>
-	    <publisher>Coleco</publisher>
+		<description>SmartBASIC (v1.0, Alt)</description>
+		<year>1983</year>
+		<publisher>Coleco</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="smartbasic v1.0 (1983) (coleco) [a1].ddp" size="262144" crc="e27df400" sha1="280e5c07f0323f819c9a552445135bbfc8728d1c" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="smartbasic v1.0 (1983) (coleco) [a1].ddp" size="262144" crc="e27df400" sha1="280e5c07f0323f819c9a552445135bbfc8728d1c" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="smartbon">
-	    <description>SmartBASIC Bonanza</description>
-	    <year>1985</year>
-	    <publisher>Martin Consulting</publisher>
+		<description>SmartBASIC Bonanza</description>
+		<year>1985</year>
+		<publisher>Martin Consulting</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="smartbasic bonanza (1985) (martin consulting ltd.).ddp" size="262144" crc="5550b3d9" sha1="a4644160cae98e1d3ad4e1a8bf4b292a667fe583" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="smartbasic bonanza (1985) (martin consulting ltd.).ddp" size="262144" crc="5550b3d9" sha1="a4644160cae98e1d3ad4e1a8bf4b292a667fe583" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="smartlog">
@@ -731,39 +731,39 @@
 	</software>
 
 	<software name="smartspl">
-	    <description>SmartSPELLER</description>
-	    <year>198?</year>
-	    <publisher>Strategic Software Inc.</publisher>
+		<description>SmartSPELLER</description>
+		<year>198?</year>
+		<publisher>Strategic Software Inc.</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="smartspeller (198x) (strategic software inc.).ddp" size="262144" crc="45616de4" sha1="883a987c71cf6e148ecc5ec88d17e05a25ab407d" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="smartspeller (198x) (strategic software inc.).ddp" size="262144" crc="45616de4" sha1="883a987c71cf6e148ecc5ec88d17e05a25ab407d" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="smartwri">
-	    <description>SmartWRITER Elite</description>
-	    <year>199?</year>
-	    <publisher>Walters Software Co.</publisher>
+		<description>SmartWRITER Elite</description>
+		<year>199?</year>
+		<publisher>Walters Software Co.</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="smartwriter elite (199x) (walters software co.).ddp" size="262144" crc="0644a754" sha1="c76a1e20a08eeccbf017ca89a1bbe120f974db7f" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="smartwriter elite (199x) (walters software co.).ddp" size="262144" crc="0644a754" sha1="c76a1e20a08eeccbf017ca89a1bbe120f974db7f" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="stellar5">
-	    <description>Stellar 5</description>
-	    <year>1985</year>
-	    <publisher>Hanania Enterprises</publisher>
+		<description>Stellar 5</description>
+		<year>1985</year>
+		<publisher>Hanania Enterprises</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="stellar 5 (1985) (hanania enterprises).ddp" size="262144" crc="c54fbe05" sha1="9a3a553822c103c17af199ced00d8c6a97fa09ae" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="stellar 5 (1985) (hanania enterprises).ddp" size="262144" crc="c54fbe05" sha1="9a3a553822c103c17af199ced00d8c6a97fa09ae" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="subroc">
@@ -779,15 +779,15 @@
 	</software>
 
 	<software name="snowdrag">
-	    <description>Temple of the Snow Dragon</description>
-	    <year>1988</year>
-	    <publisher>Digital Adventures</publisher>
+		<description>Temple of the Snow Dragon</description>
+		<year>1988</year>
+		<publisher>Digital Adventures</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="temple of the snow dragon (1988) (digital adventures).ddp" size="262144" crc="1a7aaf37" sha1="57ddb806366c334d0f0a902a4b6c50b03db97e70" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="temple of the snow dragon (1988) (digital adventures).ddp" size="262144" crc="1a7aaf37" sha1="57ddb806366c334d0f0a902a4b6c50b03db97e70" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="troltale">
@@ -815,39 +815,39 @@
 	</software>
 
 	<software name="wackywrd">
-	    <description>Wacky Word Games</description>
-	    <year>1984</year>
-	    <publisher>Coleco</publisher>
+		<description>Wacky Word Games</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="wacky word games (1984) (coleco).ddp" size="262144" crc="262ff8c4" sha1="d035bb85856b7a8408f95f1d4fb3e7b5c511eac5" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="wacky word games (1984) (coleco).ddp" size="262144" crc="262ff8c4" sha1="d035bb85856b7a8408f95f1d4fb3e7b5c511eac5" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="wizpin">
-	    <description>Wizard's Pinball Arcade</description>
-	    <year>1987</year>
-	    <publisher>Wizard's Lair Software</publisher>
+		<description>Wizard's Pinball Arcade</description>
+		<year>1987</year>
+		<publisher>Wizard's Lair Software</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="wizard's pinball arcade (1987) (wizard's lair software).ddp" size="262144" crc="01017fc4" sha1="d0670fba4967ca63bb45d9c0818522bc20e3ef2d" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="wizard's pinball arcade (1987) (wizard's lair software).ddp" size="262144" crc="01017fc4" sha1="d0670fba4967ca63bb45d9c0818522bc20e3ef2d" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="zaxxon">
-	    <description>Zaxxon</description>
-	    <year>1984</year>
-	    <publisher>Coleco</publisher>
+		<description>Zaxxon</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="super zaxxon (1984) (coleco).ddp" size="262144" crc="f12489a7" sha1="7fb6e8204e745d481abaff53735f3ffffa5f65bc" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="super zaxxon (1984) (coleco).ddp" size="262144" crc="f12489a7" sha1="7fb6e8204e745d481abaff53735f3ffffa5f65bc" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 
@@ -892,15 +892,15 @@
 	</software>
 
 	<software name="ghaaug04">
-	    <description>gHAAUG #04 - SmartBASIC - Game Arc #4</description>
-	    <year>19??</year>
-	    <publisher>gHAAUG</publisher>
+		<description>gHAAUG #04 - SmartBASIC - Game Arc #4</description>
+		<year>19??</year>
+		<publisher>gHAAUG</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="ghaaug #04 - smartbasic - game arc #4.ddp" size="262144" crc="03c75aa4" sha1="9fd49907dd711d9d78b03ff1c1af72f5b66e8353" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="ghaaug #04 - smartbasic - game arc #4.ddp" size="262144" crc="03c75aa4" sha1="9fd49907dd711d9d78b03ff1c1af72f5b66e8353" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="undv2">
@@ -919,52 +919,52 @@
 
 	<!-- Related to NIAD and SmartBASIC: investigate! -->
 	<software name="basicpgm">
-	    <description>basicpgm</description>
-	    <year>19??</year>
-	    <publisher>&lt;unknown&gt;</publisher>
+		<description>basicpgm</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="basicpgm.ddp" size="262144" crc="50668433" sha1="1853f441cfe8cc9a679a0a8186364a735e9d2d9c" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="basicpgm.ddp" size="262144" crc="50668433" sha1="1853f441cfe8cc9a679a0a8186364a735e9d2d9c" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<!-- what is this? investigate! -->
 	<software name="smarttrx">
-	    <description>SmartTrix I - Data Doctor</description>
-	    <year>19??</year>
-	    <publisher>&lt;unknown&gt;</publisher>
+		<description>SmartTrix I - Data Doctor</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="smarttrix i - data doctor.ddp" size="262144" crc="e2e98c26" sha1="b49735b212c8277729eaff256437b5bce3b9685f" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="smarttrix i - data doctor.ddp" size="262144" crc="e2e98c26" sha1="b49735b212c8277729eaff256437b5bce3b9685f" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="blankddp">
-	    <description>Blank Digital Data Pack</description>
-	    <year>19??</year>
-	    <publisher>&lt;unknown&gt;</publisher>
+		<description>Blank Digital Data Pack</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="256k digital data pack.ddp" size="262144" crc="3fe56492" sha1="71b8e1122f2693eda166efc29f674d6bc01c3400" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="256k digital data pack.ddp" size="262144" crc="3fe56492" sha1="71b8e1122f2693eda166efc29f674d6bc01c3400" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="blankddpa" cloneof="blankddp">
-	    <description>Blank Digital Data Pack (Alt)</description>
-	    <year>19??</year>
-	    <publisher>&lt;unknown&gt;</publisher>
+		<description>Blank Digital Data Pack (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="256k digital data pack [a1].ddp" size="262144" crc="03781521" sha1="e1a73a5e7df3627c37d13e35ef2a58549d59353a" offset="0" />
-	        </dataarea>
-	    </part>
+		<part name="cass1" interface="adam_cass">
+			<dataarea name="cass" size="262144">
+				<rom name="256k digital data pack [a1].ddp" size="262144" crc="03781521" sha1="e1a73a5e7df3627c37d13e35ef2a58549d59353a" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 <!--

@@ -3,7 +3,7 @@
 
 <softwarelist name="coco_flop" description="Tandy Radio Shack Color Computer disk images">
 
-	<!-- coco3 only requires 512Kb, audio is a farty, run best with a a 6309? - coco3h driver) -->
+	<!-- coco3 only requires 512Kb, audio is a farty, run best with a 6309? - coco3h driver) -->
 	<!-- RUN"DONKEY" -->
 	<software name="dkong" supported ="partial">
 		<description>Donkey Kong (Sock Master's Donkey Kong Emulator for CoCo 3) (512Kb)</description>

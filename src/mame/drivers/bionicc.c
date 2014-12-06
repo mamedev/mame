@@ -366,8 +366,10 @@ static MACHINE_CONFIG_START( bionicc, bionicc_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bionicc)
-	MCFG_PALETTE_ADD("palette", 1024)
 
+	MCFG_DEVICE_ADD("spritegen", TIGEROAD_SPRITE, 0)
+
+	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
