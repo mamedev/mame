@@ -307,6 +307,34 @@ int lua_engine::l_gui_draw_box(lua_State *L)
 }
 
 //-------------------------------------------------
+//  gui_draw_text - draw text to HUD
+//  -> gui.draw_text(int x, int y, string msg[, color="white", outline="black"])
+//-------------------------------------------------
+
+int lua_engine::l_gui_draw_text(lua_State *L)
+{
+	// ensure that we got proper parameters
+	luaL_argcheck(L, lua_isnumber(L, 1), 1, "x (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "y (integer) expected");
+	luaL_argcheck(L, lua_isstring(L, 3), 3, "message (string) expected");
+
+	// retrieve all parameters
+	float x = MIN(lua_tounsigned(L, 1) / static_cast<float>(luaThis->m_screen.width()) , 1.0f);
+	float y = MIN(lua_tounsigned(L, 2) / static_cast<float>(luaThis->m_screen.height()), 1.0f);
+	const char *msg = luaL_checkstring(L,3);
+	// TODO: optional parameters
+
+	// draw the text
+	render_container &rc = luaThis->machine().first_screen()->container();
+	ui_manager &ui = luaThis->machine().ui();
+	ui.draw_text_full(&rc, msg, x, y , (1.0f - x),
+						JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR,
+						UI_TEXT_BG_COLOR, NULL, NULL);
+
+	return 0;
+}
+
+//-------------------------------------------------
 //  emu_keypost - post keys to natural keyboard
 //-------------------------------------------------
 
@@ -635,6 +663,7 @@ void lua_engine::initialize()
 			.addCFunction ("screen_width",    l_gui_screen_width )
 			.addCFunction ("screen_height",   l_gui_screen_height )
 			.addCFunction ("draw_box",        l_gui_draw_box )
+			.addCFunction ("draw_text",       l_gui_draw_text )
 		.endNamespace ();
 
 	luabridge::push (m_lua_state, machine_manager::instance());
