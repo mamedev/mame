@@ -460,6 +460,22 @@ int lua_engine::l_emu_hook_output(lua_State *L)
 	return 0;
 }
 
+//-------------------------------------------------
+//  emu_hook_frame - register callback to draw a HUD from LUA on top of each frame
+//  -> emu.hook_frame(function cb)
+//-------------------------------------------------
+
+int lua_engine::l_emu_hook_frame(lua_State *L)
+{
+	luaThis->emu_hook_frame(L);
+	return 0;
+}
+
+void lua_engine::emu_hook_frame(lua_State *L)
+{
+	luaL_argcheck(L, lua_isfunction(L, 1), 1, "callback function expected");
+	frame_hook_cb.set(L, 1);
+}
 
 void *lua_engine::checkparam(lua_State *L, int idx, const char *tname)
 {
@@ -676,6 +692,7 @@ void lua_engine::initialize()
 			.addCFunction ("romname",     l_emu_romname )
 			.addCFunction ("keypost",     l_emu_keypost )
 			.addCFunction ("hook_output", l_emu_hook_output )
+			.addCFunction ("hook_frame",  l_emu_hook_frame )
 			.addCFunction ("time",        l_emu_time )
 			.addCFunction ("wait",        l_emu_wait )
 			.addCFunction ("after",       l_emu_after )
@@ -719,6 +736,25 @@ void lua_engine::initialize()
 void lua_engine::start_console()
 {
 	mg_start_thread(::serve_lua, this);
+}
+
+//-------------------------------------------------
+//  frame_hook - called at each frame refresh, used to draw a HUD
+//-------------------------------------------------
+bool lua_engine::frame_hook()
+{
+	bool is_cb_hooked = false;
+	if (m_machine != NULL)
+	{
+		// invoke registered callback (if any)
+		is_cb_hooked = frame_hook_cb.active();
+		if (is_cb_hooked)
+		{
+			lua_State *L = frame_hook_cb.precall();
+			frame_hook_cb.call(this, L, 0);
+		}
+	}
+	return is_cb_hooked;
 }
 
 void lua_engine::periodic_check()
