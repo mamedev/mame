@@ -68,7 +68,7 @@ ToDo:
 
 #include "machine/genpin.h"
 #include "cpu/pps4/pps4.h"
-//#include "gts1.lh"
+#include "gts1.lh"
 
 #define VERBOSE    1
 
@@ -233,7 +233,7 @@ static MACHINE_CONFIG_START( gts1, gts1_state )
     //MCFG_NVRAM_ADD_0FILL("nvram")
 
     /* Video */
-    //MCFG_DEFAULT_LAYOUT(layout_gts1)
+    MCFG_DEFAULT_LAYOUT(layout_gts1)
 
     /* Sound */
     MCFG_FRAGMENT_ADD( genpin_audio )
