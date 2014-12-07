@@ -201,8 +201,8 @@ C1070 - Insect War
 
 	<software name="killshot" supported="no">
 		<description>Kill Shot</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1991</year>
+		<publisher>Bit Corp.</publisher>
 		<info name="serial" value="C1015" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -261,8 +261,8 @@ C1070 - Insect War
 
 	<software name="pipemani" supported="no">
 		<description>Pipemania</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1991</year>
+		<publisher>Bit Corp.</publisher>
 		<info name="serial" value="C1022" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
@@ -285,8 +285,8 @@ C1070 - Insect War
 
 	<software name="marauder" supported="no">
 		<description>Marauder</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1991</year>
+		<publisher>Bit Corp.</publisher>
 		<info name="serial" value="C1024" />
 		<part name="cart" interface="gamate_cart">
 			<dataarea name="rom" size="32768">
