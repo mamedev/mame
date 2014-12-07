@@ -418,9 +418,8 @@ CPU_DISASSEMBLE( pps4 )
 
     if (tok & t_I8c) {
         // 8 bit immediate offset into page
-        UINT16 arg = pc & ~0xff;
-        arg |= ~ARG(pc++) & 255;
-        dst += sprintf(dst, "%03x", arg);
+        UINT16 arg = ~ARG(pc++) & 255;
+        dst += sprintf(dst, "%02x", arg);
     }
 
     if (tok & t_OVER)  // TL or TML
