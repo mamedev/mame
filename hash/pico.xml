@@ -37,7 +37,6 @@ Published by Sega/Sega Toys (HPC-6*** serial codes)
 * おせわしましょ! あかちゃんピコ - Osewashimasho! Akachan Pico (Sega Toys - 20020701 - HPC-6109)
 * トミカ・ピコ レスキューパーキング きんきゅうしゅつどう! はたらくのりもの <初回･トミカ付属> - Tomica Pico Rescue Parking Kinkyuushutsudou! Hataraku Norimono ~Shokai-Tomica Fuzoku~ (Sega Toys - 200207xx - HPC-6114)
 * 学研 ピコで学習 1年生 - Gakken Pico de Gakushuu 1-nensei (Sega Toys - ???? - HPC-????)
-* ミニモニ。小学校へ行くんだぴょん! - Mini Moni. Shougakkou he Iku Ndapyon! (Sega Toys - 200303xx - HPC-6120)
 * ピーターパン ネバーランドへ いこう!<10th> - Peter Pan - Neverland e Ikou! ~10th Anniversary Edition~ (Sega Toys - 200306xx - HPC-6124) [reprint HPC-6047]
 * McDonald's マクドナルドであそぼ!<10th> - McDonald's - McDonald de Asobo! ~10th Anniversary Edition~ (Sega Toys - 200306xx - HPC-6125) [reprint HPC-6079]
 * ドラえもん のびたの まちなか ドキドキ たんけん!<10th> - Doraemon - Nobita no Machinaka Dokidoki Tanken! ~10th Anniversary Edition~ (Sega Toys - 200308xx - HPC-6126) [reprint HPC-6009]
@@ -62,14 +61,10 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * 黄金勇者ゴルドラン ひみつ大百科 - Ougon Yuusha Gorudoran Himitsu Daihyakka (Takara - 19950825 - T-103020)
 * 忍者戦隊カクレンジャー - Ninja Sentai Kakuranger (Bandai - ???? - T-133???)
 * 楽しく遊んで能力アップ!!たのしい幼稚園 - Tanoshi ku Asonde Nouryoku Appu!! Tanoshii Youchien (Bandai - 1994xxxx - T-133050)
-* クレヨンしんちゃんの おえかきノート - Crayon Shin-chan Oekaki Note (Bandai - ???? - T-133080)
 * 電磁戦隊メガレンジャー - Denji Sentai Megaranger (Bandai - 1997xxxx - T-133220)
 * それいけ!アンパンマンのみんなできょうそうアンパンマン! - Soreike! Anpanman no Minna de Kyousou Anpanman! (Bandai - 1996xxxx - T-133250)
-* 新ウルトラヒーロー - Shin Ultrahero (Bandai - 1998xxxx - T-133280)
-* うんてんトーマス デラックスセット - Unten Thomas Track Set (Bandai - 200004xx - T-133???)
 * ウルトラマンピコ ウルトラファイティングベース - Ultraman Pico Ultraman Fighting Best (Bandai - 200009xx - T-133???)
 * アンパンマンピコ わくわくパン工場 - Anpanman Pico Wakuwaku Pan Koujou (Bandai - 200106xx - T-133350)
-* 新ウルトラマンピコ ウルトラファイティングベース - Shin Ultraman Pico Ultraman Fighting Best (Bandai - 200110xx - T-133380)
 * おジャ魔女どれみ ドッカ～ン! - Ojamajo Doremi Dokka~n! (Bandai - 200205xx - T-133410)
 * それいけ!アンパンマンの メダリンピックワールド2 <Best Selection> - Soreike! Anpanman no Medarin Pikku World 2 Best Selection (Bandai - 20040713 - T-133460) [reprint T-133300]
 * 特捜戦隊デカレンジャー - Tokusou Sentai Dekaranger (Bandai - 200406xx - T-133470)
@@ -247,7 +242,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 			<feature name="pcb" value="171-6882A" />
 			<feature name="ic1" value="MPR-17789-H" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-17789-h.ic1" size="524288" crc="4e4c17bc" sha1="e07a568f90a5db13bae314bfd310488320122439" offset="0" loadflag="load16_word_swap" />
+				<rom name="mpr-17789-h.ic1" size="524288" crc="4e4c17bc" sha1="e07a568f90a5db13bae314bfd310488320122439" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -690,6 +685,22 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		</part>
 	</software>
 
+<!-- This was also released as dump from a prototype build, but development was complete apparently, since TeamEurope has confirmed it with a final cart -->
+	<software name="crayonon">
+		<description>Crayon Shin-chan Oekaki Note (Jpn)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133080"/>
+		<info name="alt_title" value="クレヨンしんちゃんの おえかきノート"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-17599-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17599-h.ic1" size="524288" crc="843c3af4" sha1="878733ffb5b0464f82f102f8500650bfe0b4add4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cuteyhon">
 		<description>Cutey Honey (Jpn)</description>
 		<year>1997</year>
@@ -720,6 +731,20 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 			<feature name="u4" value="74HC245D" />
 			<dataarea name="rom" size="2097152">
 				<rom name="epoxy block ic1.u1" size="2097152" crc="412f06fc" sha1="e53362675c66762c3046bc03d03c22cf2c745c01" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dorangkr">
+		<description>Ddoddo-rang Koko-rang (Kor)</description>
+		<year>1995</year>
+		<publisher>Samsung</publisher>
+		<info name="serial" value="T-102021-08 ~ PICO-9507S"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="??" />	<!-- non-Sega PCB, probably by Samsung -->
+			<feature name="ic1" value="PICO-9507S" />
+			<dataarea name="rom" size="524288">
+				<rom name="pico-9507s.ic1" size="524288" crc="042520ce" sha1="5dd748a1bdfc661d0b96f6a1d26babc6a0ae7f2d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1909,6 +1934,20 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+	<software name="jeulgeop">
+		<description>Jeulgeo-oon Pati-leul Yeolja! (Kor)</description>
+		<year>199?</year>
+		<publisher>Samsung?</publisher>
+		<info name="serial" value="837-11641"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-17862-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17862-h.ic1" size="524288" crc="311a471e" sha1="d89bcc9111e7a2fa2fb85b77ea6c79c622bbd440" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="moomin">
 		<description>Jidou Eiken Taiou Soft Moomin to Eigo Tanjoubi no Okurimono (Jpn)</description>
 		<year>1995</year>
@@ -2459,6 +2498,20 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+	<software name="mickybkk" cloneof="mickybk">
+		<description>Mikiwa Moheom-eul Ddeonayo (Kor, Rev. 1?)</description>
+		<year>199?</year>
+		<publisher>Samsung?</publisher>
+		<info name="serial" value="837-11665-2"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-17861A-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17861a-t.ic1" size="524288" crc="bb51f4ca" sha1="d3f635960540e8554eb99e58b319e6c4ac1ecec6" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mickofrd">
 		<description>Mickey to Ooki na Furudokei (Jpn, Rev. 2)</description>
 		<year>1995</year>
@@ -2615,6 +2668,22 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="ic1" value="EPOXY BLOCK U1" />
 			<dataarea name="rom" size="2097152">
 				<rom name="epoxy block u1.ic1" size="2097152" crc="9cedfac5" sha1="dea9772e3503180a844b4728e3ed8eeb0911a978" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minimosn">
+		<description>Mini Moni. Shougakkou he Iku Ndapyon! (Jpn)</description>
+		<year>2003</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6120" />
+		<info name="release" value="200303xx"/>
+		<info name="alt_title" value="ミニモニ。小学校へ行くんだぴょん!"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="EPOXY BLOCK U1" />
+			<dataarea name="rom" size="2097152">
+				<rom name="epoxy block ic1.ic1" size="2097152" crc="bfe1ceb5" sha1="b0f82f3b7ad188656a048dd24fff8b844ca6068c" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -3526,6 +3595,40 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+	<software name="shinuher">
+		<description>Shin Ultrahero (Jpn)</description>
+		<year>1998</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133280"/>
+		<info name="alt_title" value="新ウルトラヒーロー"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-21326-S" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-21326-s.ic1" size="524288" crc="92097565" sha1="db7648dd4b9c54f46b5248ee9c726848ae59998b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultrafgt">
+		<description>Shin Ultraman Pico Ultraman Fighting Best (Jpn)</description>
+		<year>2001</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133380"/>
+		<info name="release" value="200110xx"/>
+		<info name="alt_title" value="新ウルトラマンピコ ウルトラファイティングベース"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7967" />
+			<feature name="ic1" value="9K0-0048-MK-08" />
+			<feature name="ic2" value="HC32" />
+			<feature name="ic3" value="HC74" />
+			<feature name="ic4" value="HC125" />
+			<dataarea name="rom" size="1048576">
+				<rom name="9k0-0048-mk-08.ic1" size="1048576" crc="203dc701" sha1="4d2d17bddb03b4ab179f4db1ffa2482137b51a29" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ultraden">
 		<description>Shinseiki Ultraman Densetsu (Jpn)</description>
 		<year>2002</year>
@@ -4102,8 +4205,10 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="serial" value="T-133260"/>
 		<info name="alt_title" value="ウルトラマンダイナ"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-20688-S" />
 			<dataarea name="rom" size="524288">
-				<rom name="ultraman dyna d (j).bin" size="524288" crc="501e97d9" sha1="b1bec7fa1fca53205fc7fec2547c8da4da4928b2" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-20688-s.ic1" size="524288" crc="501e97d9" sha1="b1bec7fa1fca53205fc7fec2547c8da4da4928b2" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -4152,6 +4257,22 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+	<software name="thomasdx">
+		<description>Unten Thomas Deluxe Set (Jpn)</description>
+		<year>2000</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133320"/>
+		<info name="release" value="200004xx"/>
+		<info name="alt_title" value="うんてんトーマス デラックスセット"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="9K0-0020-MX" />
+			<dataarea name="rom" size="1048576">
+				<rom name="9k0-0020-mx.ic1" size="1048576" crc="cf027dda" sha1="0c4a456b14ec345784517ad8339fb9b9b341cf86" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="yasaclin">
 		<description>Yasashiku Oteate Pico Clinic! Kangofu-san Pico (Jpn)</description>
 		<year>2001</year>
@@ -4159,7 +4280,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="serial" value="HPC-6095"/>
 		<info name="alt_title" value="やさしくおてあて ピコクリニック! かんごふさんピコ"/>
 		<part name="cart" interface="pico_cart">
-			<feature name="pcb" value="171-7967" />     <!-- The PCB was not 100% readable here -->
+			<feature name="pcb" value="171-7967" />
 			<feature name="ic1" value="9K0-0042-RV" />
 			<feature name="ic2" value="HC32" />
 			<feature name="ic3" value="HC74" />
@@ -4182,6 +4303,20 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="ic2" value="315-6078" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-19549 j35.ic1" size="1048576" crc="39f38a22" sha1="df0f45c8b229e648347bc932225f185c0fe2465f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yosoolkp">
+		<description>Yosool Keure-paseu (Kor)</description>
+		<year>199?</year>
+		<publisher>Samsung?</publisher>
+		<info name="serial" value="837-11921"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18084-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-18084-t.ic1" size="524288" crc="6521ef2d" sha1="97d3d39b006579ceb62ee68ab02f8b44f0c76069" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -4406,7 +4541,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="crayonon">
+	<software name="crayononp1" cloneof="crayonon">
 		<description>Crayon Shin-chan Oekaki Note (Jpn, Prototype 1)</description>
 		<year>1995</year>
 		<publisher>Bandai</publisher>
@@ -4417,19 +4552,8 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="crayonona" cloneof="crayonon">
+	<software name="crayononp2" cloneof="crayonon">
 		<description>Crayon Shin-chan Oekaki Note (Jpn, Prototype 2)</description>
-		<year>1995</year>
-		<publisher>Bandai</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="crayon shinchan oekaki note (1995)(bandai)(jp)(beta)[a].bin" size="524288" crc="843c3af4" sha1="878733ffb5b0464f82f102f8500650bfe0b4add4" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="crayononb" cloneof="crayonon">
-		<description>Crayon Shin-chan Oekaki Note (Jpn, Prototype 3)</description>
 		<year>1995</year>
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="pico_cart">

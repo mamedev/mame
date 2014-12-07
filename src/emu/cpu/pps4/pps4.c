@@ -115,7 +115,7 @@ offs_t pps4_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opr
  */
 inline UINT8 pps4_device::ROP()
 {
-    m_Ip = m_I & 0xf0;      // set previous opcode mask
+    m_Ip = m_I;         // set previous opcode
     m_I = m_direct->read_decrypted_byte(m_P & 0xFFF);
     m_P = (m_P + 1) & 0xFFF;
     m_icount -= 1;
@@ -580,7 +580,7 @@ void pps4_device::iEXD()
 void pps4_device::iLDI()
 {
     // previous LDI instruction?
-    if (0x70 == m_Ip) {
+    if (0x70 == (m_Ip & 0xf0)) {
         LOG(("%s: skip prev:%02x op:%02x\n", __FUNCTION__, m_Ip, m_I));
         return;
     }
@@ -792,7 +792,7 @@ void pps4_device::iCYS()
 }
 
 /**
- * @brief pps4_device::iLB
+ * @brief pps4_device::iLB Load B indirect
  * OPCODE     cycles  mnemonic
  * -----------------------------
  * 1100 xxxx  2 cyc    LB x
@@ -827,7 +827,7 @@ void pps4_device::iCYS()
 void pps4_device::iLB()
 {
     // previous LB or LBL instruction?
-    if (0xc0 == m_Ip|| 0x00 == m_Ip) {
+    if (0xc0 == (m_Ip & 0xf0) || 0x00 == m_Ip) {
         LOG(("%s: skip prev:%02x op:%02x\n", __FUNCTION__, m_Ip, m_I));
         return;
     }
@@ -843,7 +843,7 @@ void pps4_device::iLB()
 }
 
 /**
- * @brief pps4_device::iLBL
+ * @brief pps4_device::iLBL Load B long
  * OPCODE     cycles  mnemonic
  * -----------------------------
  * 0000 0000  2 cyc    LBL
@@ -869,7 +869,7 @@ void pps4_device::iLBL()
 {
     const UINT8 i8 = ~ARG() & 255;
     // previous LB or LBL instruction?
-    if (0xc0 == m_Ip || 0x00 == m_Ip) {
+    if (0xc0 == (m_Ip & 0xf0) || 0x00 == m_Ip) {
         LOG(("%s: skip prev:%02x op:%02x\n", __FUNCTION__, m_Ip, m_I));
         return;
     }

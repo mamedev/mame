@@ -19,12 +19,6 @@
 #include "c2040fdc.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m6504.h"
-#include "imagedev/floppy.h"
-#include "formats/d64_dsk.h"
-#include "formats/g64_dsk.h"
-#include "formats/d67_dsk.h"
-#include "formats/d80_dsk.h"
-#include "formats/d82_dsk.h"
 #include "machine/6522via.h"
 #include "machine/6532riot.h"
 #include "machine/mos6530.h"
@@ -82,7 +76,6 @@ protected:
 	};
 
 	inline void update_ieee_signals();
-	inline void update_gcr_data();
 
 	required_device<m6502_device> m_maincpu;
 	required_device<m6504_device> m_fdccpu;

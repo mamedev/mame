@@ -771,6 +771,28 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
+	<software name="carsdk" cloneof="cars" supported="no">
+		<description>Biler - Ræs i kølerkildekøbing (Den)</description>
+		<year>2006?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92673.bin" size="8388608" crc="380d5655" sha1="fa70dcfd2793b5ba7bede3b365e245c8fde935d7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carssw" cloneof="cars" supported="no">
+		<description>Biler - Kör ikapp i kylarköping (Swe)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92674.bin" size="8388608" crc="69b535f2" sha1="7785e4e92a0edbb90fd0e0a4f2de3afafae5e957" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cinderla" supported="no">
 		<description>Cinderella - Cinderella's Magic Wishes (USA)</description>
 		<year>200?</year>
@@ -782,24 +804,46 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
+	<software name="cinderladk" cloneof="cinderla" supported="no">
+		<description>Cinderella - Askepots magiske ønsker (Den)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92253.bin" size="8388608" crc="81edbee0" sha1="cf4bca5a1f28049a40060eead7f10c940574107f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cinderlag" cloneof="cinderla" supported="no">
 		<description>Cinderella - Lernen im Märchenland (Ger, Rev. 1)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="092244-1.bin" size="8388608" crc="83b7e95c" sha1="8c29c4cc585b1c80c7294193a0dff5da76538752" offset="0" />
+				<rom name="52-92244-104.bin" size="8388608" crc="7dbe47a2" sha1="d74d24d1d87a456f11a98f822b8c59d155734cea" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="cinderlag1" cloneof="cinderla" supported="no">
-		<description>Cinderella - Lernen im Märchenland (Ger, Rev. 0)</description>
+		<description>Cinderella - Lernen im Märchenland (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="092244.bin" size="8388608" crc="b08a50f3" sha1="a8e6b8b427115d01d35c27b41385ac5d430484c3" offset="0" />
+				<rom name="52-92244.bin" size="8388608" crc="b08a50f3" sha1="a8e6b8b427115d01d35c27b41385ac5d430484c3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cinderlasw" cloneof="cinderla" supported="no">
+		<description>Cinderella - Askungens magiska önskningar (Swe)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92254.bin" size="8388608" crc="946472af" sha1="9009a81689be949f9a5fbf91a6a1d2398f7e8d90" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -860,6 +904,39 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
+	<software name="mickymag" supported="no">
+		<description>Musse Pigg - Musses magiska äventyr (Swe)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92094.bin" size="8388608" crc="9ec8d52f" sha1="0f6f6cc4a34aacfa4ad97a73f4c5ad04e7bcec40" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickeywh" supported="no">
+		<description>Micky Maus Wunderhaus (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92944.bin" size="8388608" crc="11695793" sha1="ea58234636d544dbf6d3f65508fcf5263355636f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickeychsw" cloneof="mickeywh" supported="no">
+		<description>Mickey Mouse - Clubhouse (Swe)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92954.bin" size="8388608" crc="6d8a99d2" sha1="f929e5c3a2aff21dcf38bbbb6441a95eed744256" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="monstaln" supported="no">
 		<description>Monsters vs Aliens (Ger)</description>
 		<year>200?</year>
@@ -867,6 +944,28 @@ V.Smile Smartbooks
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="090164.bin" size="8388608" crc="bf531c68" sha1="00c3a04282f3d1eb517fc6eb8c4af413bcb9587b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mypuppy" supported="no">
+		<description>Min hunvalp (Swe)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-90154.bin" size="8388608" crc="b1cf55cf" sha1="654b104e2ad8414a29db70bb9e07873b8eca8645" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="noddy" supported="no">
+		<description>Noddy - Detektiv für einen Tag (Ger, Rev. 1?)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92544-104.bin" size="8388608" crc="2402b5b4" sha1="98dd09522b3d897dd8db070e08e66fcaebb192a2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -915,6 +1014,28 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
+	<software name="scoobydodk" cloneof="scoobydo" supported="no">
+		<description>Scooby-Doo! - Sjov i forlystelsesparken (Den)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92173.bin" size="8388608" crc="d24dd55a" sha1="85850a6ec0215442f99d1554ee6af62773c93426" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scoobydosw" cloneof="scoobydo" supported="no">
+		<description>Scooby-Doo! - Tivoli-Tokerier (Swe)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92174.bin" size="8388608" crc="ecec53de" sha1="ad021dae6a8633b66172e3b0ef357b2dd52b021e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shrek3" supported="no">
 		<description>Shrek The Third - Arthur's School Day Adventure (USA)</description>
 		<year>200?</year>
@@ -927,12 +1048,12 @@ V.Smile Smartbooks
 	</software>
 
 	<software name="shrek" supported="no">
-		<description>Shrek - Die Geschichte des Drache (Ger)</description>
+		<description>Shrek - Die Geschichte des Drachen (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="092604.bin" size="8388608" crc="dc1ceca3" sha1="88349b556de43d78198aeb6289fa836f597f8a77" offset="0" />
+				<rom name="52-92604.bin" size="8388608" crc="0abbb98b" sha1="7b23e7a5a1f1b5f3a39427b563e06340268db272" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1025,6 +1146,39 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
+	<software name="poohdk" cloneof="pooh" supported="no">
+		<description>Peter Plys - Honningjagten (Den)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92073.bin" size="8388608" crc="f2cf8e50" sha1="9ef7e8a3f03c252970348f2eabc53010c1ee588b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohsw" cloneof="pooh" supported="no">
+		<description>Nalle Puh - Honungsjakten (Swe)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92074.bin" size="8388608" crc="70bde4da" sha1="788a8b471ef97106fbcaeb053cd6aa19c6ac299a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="techart" supported="no">
+		<description>V.Smile Tecknarstudio (Swe)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-67021.bin" size="8388608" crc="6b035705" sha1="3b89a19c202c55790f948a64cda22d60a8d1fc87" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zayzoo" supported="no">
 		<description>Zayzoo's Lernall (Ger)</description>
 		<year>200?</year>
@@ -1041,7 +1195,7 @@ V.Smile Smartbooks
 <!-- To be split into a separate list -->
 
 	<software name="mktierf" supported="no">
-		<description>Meine kleinen Tierfreunde (Ger)</description>
+		<description>Meine kleinen Tierfreunde (Ger) (V.Smile Baby)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -1051,6 +1205,19 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
+
+<!-- V.Smile Motion -->
+<!-- To be split into a separate list -->
+	<software name="cindervm" supported="no">
+		<description>Cinderella - Lernen im Märchenland (Ger) (V.Smile Motion)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-84604.bin" size="8388608" crc="0229cf3a" sha1="9c08e6370ecf08992924f067b64dd1950e3a2c6c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>
 

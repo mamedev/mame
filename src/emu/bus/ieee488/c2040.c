@@ -626,24 +626,24 @@ c2040_device::c2040_device(const machine_config &mconfig, device_type type, cons
 {
 }
 
-c2040_device::c2040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, C2040, "C2040", tag, owner, clock, "c2040", __FILE__),
-		device_ieee488_interface(mconfig, *this),
-		m_maincpu(*this, M6502_TAG),
-		m_fdccpu(*this, M6504_TAG),
-		m_riot0(*this, M6532_0_TAG),
-		m_riot1(*this, M6532_1_TAG),
-		m_miot(*this, M6530_TAG),
-		m_via(*this, M6522_TAG),
-		m_floppy0(*this, FDC_TAG":0:525ssqd"),
-		m_floppy1(*this, FDC_TAG":1:525ssqd"),
-		m_fdc(*this, FDC_TAG),
-		m_gcr(*this, "gcr"),
-		m_address(*this, "ADDRESS"),
-		m_rfdo(1),
-		m_daco(1),
-		m_atna(1),
-		m_miot_irq(CLEAR_LINE)
+c2040_device::c2040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, C2040, "C2040", tag, owner, clock, "c2040", __FILE__),
+	device_ieee488_interface(mconfig, *this),
+	m_maincpu(*this, M6502_TAG),
+	m_fdccpu(*this, M6504_TAG),
+	m_riot0(*this, M6532_0_TAG),
+	m_riot1(*this, M6532_1_TAG),
+	m_miot(*this, M6530_TAG),
+	m_via(*this, M6522_TAG),
+	m_floppy0(*this, FDC_TAG":0:525ssqd"),
+	m_floppy1(*this, FDC_TAG":1:525ssqd"),
+	m_fdc(*this, FDC_TAG),
+	m_gcr(*this, "gcr"),
+	m_address(*this, "ADDRESS"),
+	m_rfdo(1),
+	m_daco(1),
+	m_atna(1),
+	m_miot_irq(CLEAR_LINE)
 {
 }
 

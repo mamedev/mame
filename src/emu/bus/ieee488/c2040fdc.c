@@ -119,7 +119,7 @@ c2040_fdc_t::c2040_fdc_t(const machine_config &mconfig, const char *tag, device_
 }
 
 c8050_fdc_t::c8050_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	c2040_fdc_t(mconfig, C2040_FDC, "C2040 FDC", tag, owner, clock, "c2040fdc", __FILE__) { }
+	c2040_fdc_t(mconfig, C8050_FDC, "C8050 FDC", tag, owner, clock, "c8050fdc", __FILE__) { }
 
 
 
@@ -567,26 +567,6 @@ WRITE_LINE_MEMBER( c2040_fdc_t::mtr1_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c2040_fdc_t::odd_hd_w )
-{
-	if (m_odd_hd != state)
-	{
-		live_sync();
-		m_odd_hd = cur_live.odd_hd = state;
-		if (LOG) logerror("%s ODD HD %u\n", machine().time().as_string(), state);
-		m_floppy0->ss_w(!state);
-		if (m_floppy1) m_floppy1->ss_w(!state);
-		checkpoint();
-		live_run();
-	}
-}
-
-WRITE_LINE_MEMBER( c2040_fdc_t::pull_sync_w )
-{
-	// TODO
-	if (LOG) logerror("%s PULL SYNC %u\n", machine().time().as_string(), state);
-}
-
 void c2040_fdc_t::stp_w(floppy_image_device *floppy, int mtr, int &old_stp, int stp)
 {
 	if (mtr) return;
@@ -599,36 +579,6 @@ void c2040_fdc_t::stp_w(floppy_image_device *floppy, int mtr, int &old_stp, int 
 	case 1: if (stp == 2) tracks++; else if (stp == 0) tracks--; break;
 	case 2: if (stp == 3) tracks++; else if (stp == 1) tracks--; break;
 	case 3: if (stp == 0) tracks++; else if (stp == 2) tracks--; break;
-	}
-
-	if (tracks == -1)
-	{
-		floppy->dir_w(1);
-		floppy->stp_w(1);
-		floppy->stp_w(0);
-	}
-	else if (tracks == 1)
-	{
-		floppy->dir_w(0);
-		floppy->stp_w(1);
-		floppy->stp_w(0);
-	}
-
-	old_stp = stp;
-}
-
-void c8050_fdc_t::stp_w(floppy_image_device *floppy, int mtr, int &old_stp, int stp)
-{
-	if (mtr) return;
-
-	int tracks = 0;
-
-	switch (old_stp)
-	{
-	case 0: if (stp == 1) tracks++; else if (stp == 2) tracks--; break;
-	case 1: if (stp == 3) tracks++; else if (stp == 0) tracks--; break;
-	case 2: if (stp == 0) tracks++; else if (stp == 3) tracks--; break;
-	case 3: if (stp == 2) tracks++; else if (stp == 1) tracks--; break;
 	}
 
 	if (tracks == -1)
@@ -684,4 +634,153 @@ void c2040_fdc_t::set_floppy(floppy_image_device *floppy0, floppy_image_device *
 {
 	m_floppy0 = floppy0;
 	m_floppy1 = floppy1;
+}
+
+void c8050_fdc_t::live_start()
+{
+	cur_live.tm = machine().time();
+	cur_live.state = RUNNING;
+	cur_live.next_state = -1;
+
+	cur_live.shift_reg = 0;
+	cur_live.shift_reg_write = 0;
+	cur_live.cycle_counter = 0;
+	cur_live.cell_counter = 0;
+	cur_live.bit_counter = 0;
+	cur_live.ds = m_ds;
+	cur_live.drv_sel = m_drv_sel;
+	cur_live.mode_sel = m_mode_sel;
+	cur_live.rw_sel = m_rw_sel;
+	cur_live.pi = m_pi;
+
+	pll_reset(cur_live.tm, attotime::from_hz(0));
+	checkpoint_live = cur_live;
+	pll_save_checkpoint();
+
+	live_run();
+}
+
+void c8050_fdc_t::pll_reset(const attotime &when, const attotime clock)
+{
+	cur_pll.reset(when);
+	cur_pll.set_clock(clock);
+}
+
+void c8050_fdc_t::pll_save_checkpoint()
+{
+	checkpoint_pll = cur_pll;
+}
+
+void c8050_fdc_t::pll_retrieve_checkpoint()
+{
+	cur_pll = checkpoint_pll;
+}
+
+void c8050_fdc_t::checkpoint()
+{
+	checkpoint_live = cur_live;
+	pll_save_checkpoint();
+}
+
+void c8050_fdc_t::rollback()
+{
+	cur_live = checkpoint_live;
+	pll_retrieve_checkpoint();
+}
+
+void c8050_fdc_t::live_run(const attotime &limit)
+{
+	if(cur_live.state == IDLE || cur_live.next_state != -1)
+		return;
+
+	for(;;) {
+		switch(cur_live.state) {
+		case RUNNING: {
+			bool syncpoint = false;
+
+			if (cur_live.tm > limit)
+				return;
+
+			int bit = get_next_bit(cur_live.tm, limit);
+			if(bit < 0)
+				return;
+
+			if (syncpoint) {
+				commit(cur_live.tm);
+
+				cur_live.tm += m_period;
+				live_delay(RUNNING_SYNCPOINT);
+				return;
+			}
+
+			cur_live.tm += m_period;
+			break;
+		}
+
+		case RUNNING_SYNCPOINT: {
+			m_write_ready(cur_live.ready);
+			m_write_sync(cur_live.sync);
+			m_write_error(cur_live.error);
+
+			cur_live.state = RUNNING;
+			checkpoint();
+			break;
+		}
+		}
+	}
+}
+
+int c8050_fdc_t::get_next_bit(attotime &tm, const attotime &limit)
+{
+	return cur_pll.get_next_bit(tm, get_floppy(), limit);
+}
+
+void c8050_fdc_t::stp_w(floppy_image_device *floppy, int mtr, int &old_stp, int stp)
+{
+	if (mtr) return;
+
+	int tracks = 0;
+
+	switch (old_stp)
+	{
+	case 0: if (stp == 1) tracks++; else if (stp == 2) tracks--; break;
+	case 1: if (stp == 3) tracks++; else if (stp == 0) tracks--; break;
+	case 2: if (stp == 0) tracks++; else if (stp == 3) tracks--; break;
+	case 3: if (stp == 2) tracks++; else if (stp == 1) tracks--; break;
+	}
+
+	if (tracks == -1)
+	{
+		floppy->dir_w(1);
+		floppy->stp_w(1);
+		floppy->stp_w(0);
+	}
+	else if (tracks == 1)
+	{
+		floppy->dir_w(0);
+		floppy->stp_w(1);
+		floppy->stp_w(0);
+	}
+
+	old_stp = stp;
+}
+
+WRITE_LINE_MEMBER( c8050_fdc_t::odd_hd_w )
+{
+	if (m_odd_hd != state)
+	{
+		live_sync();
+		m_odd_hd = cur_live.odd_hd = state;
+		if (LOG) logerror("%s ODD HD %u\n", machine().time().as_string(), state);
+		m_floppy0->ss_w(!state);
+		if (m_floppy1) m_floppy1->ss_w(!state);
+		checkpoint();
+		live_run();
+	}
+}
+
+WRITE_LINE_MEMBER( c8050_fdc_t::pull_sync_w )
+{
+	// TODO
+	if (LOG) logerror("%s PULL SYNC %u\n", machine().time().as_string(), state);
 }
