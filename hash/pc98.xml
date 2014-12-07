@@ -2692,7 +2692,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<info name="release" value="198407xx" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1086448">
-				<rom name="adventureland.d88" size="1086448" crc="dfe46669" sha1="ee0e6fae3553f8b60d515ba5c0bfdbe56cb7df16" offset="0" />
+				<rom name="adventureland (a).d88" size="1086448" crc="dfe46669" sha1="ee0e6fae3553f8b60d515ba5c0bfdbe56cb7df16" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -8800,6 +8800,32 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
+	<software name="constgp">
+		<description>Constructors Grand Prix</description>
+		<year>1992</year>
+		<publisher>ソフトスタジオWING (Soft Studio Wing)</publisher>
+		<info name="alt_title" value="コンストラクターズグランプリ" />
+		<info name="release" value="199209xx" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_1.fdi" size="1265664" crc="3b45a8bc" sha1="f8e82747f5f74e9d3a52005dea758f6f7c592f7e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_2.fdi" size="1265664" crc="54df3337" sha1="b6c60da8a745bae7350711f35362c7b00965ab2f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_3.fdi" size="1265664" crc="f49df6d7" sha1="e2e54c54c6787d360c4697a270471d75417a31c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="continen">
 		<description>Continental</description>
 		<year>1992</year>
@@ -9256,6 +9282,19 @@ only have some part of Windows file and a Video driver(CLGD?).
 			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_4.fdi" size="1265664" crc="21d9ca31" sha1="8bf57cd64fd4ed6c661ba76da3be432297321a9e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Game was included on extra disk with purchase of Hanaou blank floppy disk pack. -->
+	<software name="cursecst">
+		<description>Curse of Castle</description>
+		<year>19??</year>
+		<publisher>エルフ (Elf)</publisher>
+		<info name="alt_title" value="カース・オブ・キャッスル" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="curse of castle.fdi" size="1265664" crc="fed51a1f" sha1="ec625b0fe63b142fedce88c5751739cba51e5cb2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -10170,6 +10209,27 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="daisenr4_tsuika.fdi" size="1265664" crc="320ecba3" sha1="6b1a64da6e5a708f6d21699d9b0a0eca4a7193c2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Editor for multiple Daisenryaku games (Super Daisenryaku, Campaign Daisenryaku, or Daisenryaku 3 '90) -->
+	<software name="daisnmed">
+		<description>Daisenryaku Multi-Editor</description>
+		<year>1992</year>
+		<publisher>システムソフト (SystemSoft)</publisher>
+		<info name="alt_title" value="大戦略 マルチエディタ" />
+		<info name="release" value="19920828" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="daisenryaku_multi-editor_1.fdi" size="1265664" crc="c2439c57" sha1="ff62538225333167a97e442201a1363b6e6314a1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="daisenryaku_multi-editor_2.fdi" size="1265664" crc="730c5d24" sha1="ee9a53d7b49b81e1b67a6caaa41a3324d0feafb8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -11243,6 +11303,38 @@ only have some part of Windows file and a Video driver(CLGD?).
 			<feature name="part_id" value="Scenario Disk 2"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="dinosaur_sc2.fdi" size="1265664" crc="c3e97b15" sha1="dac44ce76cf800a230ead7c690b017cbab4e5ee4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dios">
+		<description>Dios</description>
+		<year>1989</year>
+		<publisher>ザインソフト (Zain Soft)</publisher>
+		<info name="alt_title" value="ディオス" />
+		<info name="release" value="19891111" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1086448">
+				<rom name="dios (1989)(zainsoft) disk_a.d88" size="1086448" crc="7e5bfa62" sha1="1fc4c3c6e32f61c4920513680b76854f7db3af9b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1128880">
+				<rom name="dios (1989)(zainsoft) disk_b.d88" size="1128880" crc="1aaffc81" sha1="0e48cc65541104842e16681d754666f07fb73086" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1100592">
+				<rom name="dios (1989)(zainsoft) disk_c.d88" size="1100592" crc="1986b21c" sha1="61d5b96fdfd5a14d1214b36bff992c83eb5a6b79" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="1092704">
+				<rom name="dios (1989)(zainsoft) disk_d.d88" size="1092704" crc="8b7d9d45" sha1="0fa44d0a328b929551cc175a39798209128a023d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -18371,6 +18463,68 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
+	<software name="hercequa">
+		<description>Hercequary</description>
+		<year>1994</year>
+		<publisher>ジックス (ZyX)</publisher>
+		<info name="alt_title" value="ハースキュアリー" />
+		<info name="release" value="19940419" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="hercequary disk a.fdi" size="1265664" crc="0759d041" sha1="208bec369687c0c1019445e894355024c67e8346" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="hercequary disk b.fdi" size="1265664" crc="7655da0a" sha1="d6c9e46135cbb52ce8de28b6ca2a6de280229b93" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="hercequary disk c.fdi" size="1265664" crc="2598e2f6" sha1="995d666e01bb6bbce99bdf9e170640be5f980ff6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="hercequary disk d.fdi" size="1265664" crc="8a3dd580" sha1="070c6c2a78c44f089a7e91ad8a31836d8a6dc3c9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk E"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="hercequary disk e.fdi" size="1265664" crc="39ac5a09" sha1="d2ccffa4dc8671626d95abfbd7ab5d97b01b9ccb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk F"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="hercequary disk f.fdi" size="1265664" crc="3e01f5ba" sha1="ed6e3a379ac9e1806081d61d2894abd731b2ed3c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk G"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="hercequary disk g.fdi" size="1265664" crc="d35df10e" sha1="cafb3f9014dea5cb436ca874c6980d4cdaf13f30" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk H"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="hercequary disk h.fdi" size="1265664" crc="ad0bbbb3" sha1="8a50812152147392dc31b30c4f5d57f0870a9f90" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Disk I"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="hercequary disk i.fdi" size="1265664" crc="abb4b9d6" sha1="f3ab2535a2305ff57ca990b77a39c0d45b18dc21" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hideger">
 		<description>Hideger</description>
 		<year>1988</year>
@@ -19976,6 +20130,18 @@ only have some part of Windows file and a Video driver(CLGD?).
 			<feature name="part_id" value="Disk 5"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="jesus2_5.fdi" size="1265664" crc="85f10316" sha1="aac6671fad6b9e02ffa5bb8b186be970e2622d71" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jet">
+		<description>Jet - F-16/F-18 Combat Simulator</description>
+		<year>1989</year>
+		<publisher>サブロジック (SubLogic)</publisher>
+		<info name="release" value="198903xx" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="jet.2dd" size="737280" crc="cd8ead94" sha1="3979d0edde821d54fead26fc6164e2ea4037eecd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -25129,8 +25295,9 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="msfsim40">
-		<description>Microsoft Flight Simulator Version 4.0b</description>
+<!-- This should contain a single disk?!? -->
+	<software name="msfsim40a" cloneof="msfsim40">
+		<description>Microsoft Flight Simulator Version 4.0 (Alt?)</description>
 		<year>1992</year>
 		<publisher>マイクロソフト (Microsoft)</publisher>
 		<info name="alt_title" value="マイクロソフト フライトシミュレーター Ｖｅｒ４．０" />
@@ -25863,7 +26030,33 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="gundams1">
+	<software name="gundamdo">
+		<description>Mobile Suit Gundam - Desert Operation</description>
+		<year>1990</year>
+		<publisher>ファミリーソフト (Family Soft)</publisher>
+		<info name="alt_title" value="機動戦士ガンダム デザートオペレーション" />
+		<info name="release" value="19901215" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1086448">
+				<rom name="disk_a.d88" size="1086448" crc="4f26fecb" sha1="8e7c5b02b815631c942fcf47aa5995b0b2337bbc" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1086448">
+				<rom name="disk_b.d88" size="1086448" crc="a04d64ea" sha1="db582c0627247ed606c6f90cb9e8479f9aa7aec5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1086448">
+				<rom name="disk_c.d88" size="1086448" crc="afe90802" sha1="f63a788494b1342be52deb27c168a57ec1070d8d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gundamdos1" cloneof="gundamdo">
 		<description>Mobile Suit Gundam - Desert Operation Tsuika Scenario Shuu 1</description>
 		<year>1991</year>
 		<publisher>ファミリーソフト (Family Soft)</publisher>
@@ -46934,6 +47127,69 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
+	<software name="msfsim40" supported="no">
+		<description>Microsoft Flight Simulator Version 4.0</description>
+		<year>1992</year>
+		<publisher>マイクロソフト (Microsoft)</publisher>
+		<info name="alt_title" value="マイクロソフト フライトシミュレーター Ｖｅｒ４．０" />
+		<info name="release" value="19921030" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="msflightsim4.hdm" size="1261568" crc="519e0f9b" sha1="12853cacca922511b983cf5f36d7e7a6f86abb69" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msfsim40gc" cloneof="msfsim40" supported="no">
+		<description>Microsoft Flight Simulator Version 4.0 - Grand Canyon Scenery</description>
+		<year>19??</year>
+		<publisher>Mallard</publisher>
+		<info name="usage" value="Requires &quot;Flight Simulator Version 4.0&quot; to work" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="msflightsim4_grandcanyon.hdm" size="1261568" crc="61696fed" sha1="a4fca61960c265c96f6d7f4fe91f975b7f00c3ae" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msfsim40h" cloneof="msfsim40" supported="no">
+		<description>Microsoft Flight Simulator Version 4.0 - Hawaii Scenery</description>
+		<year>19??</year>
+		<publisher>Mallard</publisher>
+		<info name="alt_title" value="マイクロソフト フライトシュミレーター ハワイ・シーナリー" />
+		<info name="usage" value="Requires &quot;Flight Simulator Version 4.0&quot; to work" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="msflightsim4_hawaii.hdm" size="1228800" crc="5358de97" sha1="f3cd75dcdbdd1808f88a4f3da49b1d98e54f0de6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msfsim40j" cloneof="msfsim40" supported="no">
+		<description>Microsoft Flight Simulator Version 4.0 - Japan Scenery</description>
+		<year>19??</year>
+		<publisher>Mallard</publisher>
+		<info name="usage" value="Requires &quot;Flight Simulator Version 4.0&quot; to work" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="msflightsim4_japan.hdm" size="1261568" crc="ffd51199" sha1="24900db0de9c6ad1d2ba76ca58f2a7df15b34505" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msfsim40t" cloneof="msfsim40" supported="no">
+		<description>Microsoft Flight Simulator Version 4.0 - Tahiti Scenery</description>
+		<year>19??</year>
+		<publisher>Mallard</publisher>
+		<info name="alt_title" value="マイクロソフト フライトシュミレーター タヒチ・シーナリー" />
+		<info name="usage" value="Requires &quot;Flight Simulator Version 4.0&quot; to work" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="msflightsim4_tahiti.hdm" size="1261568" crc="98a722fe" sha1="c871a2cb79aab2f3cbec054e98565bd4f9039b5d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spacesim" supported="no">
 		<description>Microsoft Space Simulator - 42 Oku Kounen no Fantasy</description>
 		<year>1995</year>
@@ -59042,7 +59298,7 @@ SPACE EMPIRE
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
-				<rom name="markadia (1993)(bio 100%).fdi" size="1261568" crc="19eed65c" sha1="a0c454be33961f80e0710e8b4b3ec17f44815b11" offset="0" />
+				<rom name="markadia (1993)(bio 100%) [a].fdi" size="1261568" crc="19eed65c" sha1="a0c454be33961f80e0710e8b4b3ec17f44815b11" offset="0" />
 			</dataarea>
 		</part>
 	</software>
