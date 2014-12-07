@@ -729,6 +729,11 @@ void lua_engine::initialize()
 			.addCFunction ("show_fps",        l_gui_show_fps )
 		.endNamespace ();
 
+	// "cpu" namespace
+	luabridge::getGlobalNamespace (m_lua_state)
+		.beginNamespace ("cpu")
+	.endNamespace ();
+
 	luabridge::push (m_lua_state, machine_manager::instance());
 	lua_setglobal(m_lua_state, "manager");
 }
