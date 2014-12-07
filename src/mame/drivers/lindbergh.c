@@ -16,8 +16,8 @@ This is a "PC-based" arcade system. Different configurations have different colo
 The version documented here is the red box. The PC part of it is mostly just the CPU,
 Intel North/South-bridge chipset and AGP/PCI card slots etc. The main board is still
 a typically custom-made Sega arcade PCB using a custom nVIDIA GeForce video card.
-The main board also has a slot for a compact flash card. Primary storage media is DVD or HDD.
-Both CF and HDD are locked and unreadable on a regular PC.
+The main board also has a slot for a compact flash card. Primary storage media is HDD.
+Games are installed from a DVD. Both the CF and HDD are locked and unreadable on a regular PC.
 
 The familiar PIC is still present on the back of the system and likely decrypts the HDD and/or DVD.
 
@@ -28,7 +28,7 @@ The box has Sega number 845-0001D-02
 Security
 --------
 
-The security seems to work in multiple steps.  The information there
+The security seems to work in multiple steps.  The information here
 is a combination of our research and things found on the internet.
 
 - At boot, the bios unlocks the CF card through an IDE 0x82 command
@@ -222,11 +222,6 @@ Sticker 839-1275R
 DSW(8)    - OFF,OFF,OFF,ON,ON,OFF,OFF,ON
 DIP18.IC1 - DIP18 socket for protection PIC16F648A
 
-                        Sega Security
-            Game        ID Number      Dongle Sticker
-            -----------------------------------------
-            Too Spicy   317-0490-COM   253-5508-0491
-
 
 Video Card (plugged into AGP slot)
 ----------
@@ -293,7 +288,7 @@ Notes:
       EDS1232   - Elpida EDS1232AATA-75-E 128Mbit SDRAM (4M word x 32bit)
       D442012   - NEC D442012AGY-BB70 2Mbit CMOS Static RAM (128k-word x 16bit)
       ISP1106   - NXP Semiconductor ISP1106 Advanced Universal Serial Bus transceiver (SSOIC16)
-      RTL8201   - Realtek RTL8201 Single Chip Single Pport 10/100M Fast Ethernet IC (QFP48)
+      RTL8201   - Realtek RTL8201 Single Chip Single Port 10/100M Fast Ethernet IC (QFP48)
       mUSB      - Mini USB connector
 
 
