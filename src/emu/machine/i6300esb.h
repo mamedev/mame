@@ -6,6 +6,7 @@
 #include "pci.h"
 #include "lpc-acpi.h"
 #include "lpc-rtc.h"
+#include "lpc-pit.h"
 
 #define MCFG_I6300ESB_LPC_ADD(_tag) \
 	MCFG_PCI_DEVICE_ADD(_tag, I6300ESB_LPC, 0x808625a1, 0x02, 0x060100, 0x00000000)
@@ -31,6 +32,7 @@ protected:
 private:
 	required_device<lpc_acpi_device> acpi;
 	required_device<lpc_rtc_device> rtc;
+	required_device<lpc_pit_device> pit;
 
 	DECLARE_ADDRESS_MAP(internal_io_map, 32);
 
