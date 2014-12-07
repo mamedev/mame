@@ -677,6 +677,10 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 	else if (strcmp(compnode.name, "led7seg") == 0)
 		m_type = CTYPE_LED7SEG;
 
+	// led8seg nodes
+	else if (strcmp(compnode.name, "led8seg") == 0)
+		m_type = CTYPE_LED8SEG;
+
 	// led14seg nodes
 	else if (strcmp(compnode.name, "led14seg") == 0)
 		m_type = CTYPE_LED14SEG;
@@ -747,6 +751,10 @@ void layout_element::component::draw(running_machine &machine, bitmap_argb32 &de
 
 		case CTYPE_LED7SEG:
 			draw_led7seg(dest, bounds, state);
+			break;
+
+		case CTYPE_LED8SEG:
+			draw_led8seg(dest, bounds, state);
 			break;
 
 		case CTYPE_LED14SEG:
@@ -1393,6 +1401,63 @@ void layout_element::component::draw_led7seg(bitmap_argb32 &dest, const rectangl
 
 	// decimal point
 	draw_segment_decimal(tempbitmap, bmwidth + segwidth/2, bmheight - segwidth/2, segwidth, (pattern & (1 << 7)) ? onpen : offpen);
+
+	// resample to the target size
+	render_resample_argb_bitmap_hq(dest, tempbitmap, m_color);
+}
+
+
+//-----------------------------------------------------------------
+//  draw_led8seg - draw a 8-segment fluorescent (Gottlieb System 1)
+//-----------------------------------------------------------------
+
+void layout_element::component::draw_led8seg(bitmap_argb32 &dest, const rectangle &bounds, int pattern)
+{
+	const rgb_t onpen = rgb_t(0xff,0xff,0xff,0xff);
+	const rgb_t offpen = rgb_t(0xff,0x20,0x20,0x20);
+	const rgb_t backpen = rgb_t(0xff,0x00,0x00,0x00);
+
+	// sizes for computation
+	int bmwidth = 250;
+	int bmheight = 400;
+	int segwidth = 40;
+	int skewwidth = 40;
+
+	// allocate a temporary bitmap for drawing
+	bitmap_argb32 tempbitmap(bmwidth + skewwidth, bmheight);
+	tempbitmap.fill(backpen);
+
+	// top bar
+	draw_segment_horizontal(tempbitmap, 0 + 2*segwidth/3, bmwidth - 2*segwidth/3, 0 + segwidth/2, segwidth, (pattern & (1 << 0)) ? onpen : offpen);
+
+	// top-right bar
+	draw_segment_vertical(tempbitmap, 0 + 2*segwidth/3, bmheight/2 - segwidth/3, bmwidth - segwidth/2, segwidth, (pattern & (1 << 1)) ? onpen : offpen);
+
+	// bottom-right bar
+	draw_segment_vertical(tempbitmap, bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, bmwidth - segwidth/2, segwidth, (pattern & (1 << 2)) ? onpen : offpen);
+
+	// bottom bar
+	draw_segment_horizontal(tempbitmap, 0 + 2*segwidth/3, bmwidth - 2*segwidth/3, bmheight - segwidth/2, segwidth, (pattern & (1 << 3)) ? onpen : offpen);
+
+	// bottom-left bar
+	draw_segment_vertical(tempbitmap, bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, 0 + segwidth/2, segwidth, (pattern & (1 << 4)) ? onpen : offpen);
+
+	// top-left bar
+	draw_segment_vertical(tempbitmap, 0 + 2*segwidth/3, bmheight/2 - segwidth/3, 0 + segwidth/2, segwidth, (pattern & (1 << 5)) ? onpen : offpen);
+
+	// horizontal bars
+	draw_segment_horizontal(tempbitmap, 0 + 2*segwidth/3, 2*bmwidth/3 - 2*segwidth/3, bmheight/2, segwidth, (pattern & (1 << 6)) ? onpen : offpen);
+	draw_segment_horizontal(tempbitmap, 0 + 2*segwidth/3 + bmwidth/2, bmwidth - 2*segwidth/3, bmheight/2, segwidth, (pattern & (1 << 6)) ? onpen : offpen);
+
+	// vertical bars
+	draw_segment_vertical(tempbitmap, 0 + segwidth/3 - 8, bmheight/2 - segwidth/3 + 2, 2*bmwidth/3 - segwidth/2 - 4, segwidth + 8, backpen);
+	draw_segment_vertical(tempbitmap, 0 + segwidth/3, bmheight/2 - segwidth/3, 2*bmwidth/3 - segwidth/2 - 4, segwidth, (pattern & (1 << 7)) ? onpen : offpen);
+
+	draw_segment_vertical(tempbitmap, bmheight/2 + segwidth/3 - 2, bmheight - segwidth/3 + 8, 2*bmwidth/3 - segwidth/2 - 4, segwidth + 8, backpen);
+	draw_segment_vertical(tempbitmap, bmheight/2 + segwidth/3, bmheight - segwidth/3, 2*bmwidth/3 - segwidth/2 - 4, segwidth, (pattern & (1 << 7)) ? onpen : offpen);
+
+	// apply skew
+	apply_skew(tempbitmap, 40);
 
 	// resample to the target size
 	render_resample_argb_bitmap_hq(dest, tempbitmap, m_color);

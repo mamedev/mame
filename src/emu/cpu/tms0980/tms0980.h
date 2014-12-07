@@ -80,6 +80,8 @@ protected:
 	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
 	virtual UINT32 disasm_max_opcode_bytes() const { return 1; }
 
+	void state_string_export(const device_state_entry &entry, astring &string);
+
 	void next_pc();
 	void execute_fixed_opcode();
 	
@@ -193,7 +195,6 @@ protected:
 	virtual void device_reset();
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	void state_string_export(const device_state_entry &entry, astring &string);
 
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 };
@@ -221,8 +222,6 @@ public:
 protected:
 	// overrides
 	virtual void device_reset();
-
-	void state_string_export(const device_state_entry &entry, astring &string);
 
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 	
@@ -264,7 +263,6 @@ protected:
 	// overrides
 	virtual void device_reset();
 
-	void state_string_export(const device_state_entry &entry, astring &string);
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	virtual UINT32 disasm_min_opcode_bytes() const { return 2; }

@@ -13,6 +13,12 @@
 
     TODO:
 
+	- centronics
+	- expansion bus
+		- Z80 card
+		- Winchester DMA card (Xebec S1410 + Tandon TM502/TM603SE)
+		- RAM cards
+		- clock cards
     - floppy 8048
     - keyboard
     - hires graphics
@@ -20,7 +26,6 @@
     - brightness/contrast
     - MC6852
     - codec sound
-    - hard disk (Tandon TM502, TM603SE)
 
 */
 

@@ -65,8 +65,8 @@ READ8_MEMBER(simon_state::read_k)
 	// read selected button rows
 	for (int i = 0; i < 4; i++)
 	{
-		const int r[4] = { 0, 1, 2, 9 };
-		if (m_r >> r[i] & 1)
+		const int ki[4] = { 0, 1, 2, 9 };
+		if (m_r >> ki[i] & 1)
 			k |= m_button_matrix[i]->read();
 	}
 

@@ -2650,6 +2650,7 @@ $(DRIVERS)/goldnpkr.o:  $(LAYOUT)/goldnpkr.lh \
 			$(LAYOUT)/pmpoker.lh \
 			$(LAYOUT)/upndown.lh
 
+$(DRIVERS)/gts1.o:      $(LAYOUT)/gts1.lh
 $(DRIVERS)/gts3.o:      $(LAYOUT)/gts3.lh
 $(DRIVERS)/gts80.o:     $(LAYOUT)/gts80.lh
 $(DRIVERS)/gts80a.o:    $(LAYOUT)/gts80a.lh

@@ -10,6 +10,9 @@
   START TURN. Refer to the official manual for more information.
 
 
+  TODO:
+  - MCU clock is unknown
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -17,7 +20,6 @@
 #include "sound/speaker.h"
 
 #include "starwbc.lh"
-
 
 // master clock is unknown, the value below is an approximation
 // (patent says R=51K, C=47pf, but then it sounds too low pitched)
@@ -142,8 +144,8 @@ READ8_MEMBER(starwbc_state::read_k)
 	// read selected button rows
 	for (int i = 0; i < 5; i++)
 	{
-		const int r[5] = { 0, 1, 3, 5, 7 };
-		if (m_r >> r[i] & 1)
+		const int ki[5] = { 0, 1, 3, 5, 7 };
+		if (m_r >> ki[i] & 1)
 			k |= m_button_matrix[i]->read();
 	}
 

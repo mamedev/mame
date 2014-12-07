@@ -13,6 +13,9 @@
   Refer to the official manual for more information.
 
 
+  TODO:
+  - MCU clock is unknown
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -20,8 +23,7 @@
 
 #include "comp4.lh"
 
-
-// master clock is cpu internal, the value below is an approximation
+// master clock is unknown, the value below is an approximation
 #define MASTER_CLOCK (250000)
 
 

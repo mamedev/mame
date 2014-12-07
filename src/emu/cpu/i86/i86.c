@@ -178,7 +178,10 @@ void i8086_cpu_device::execute_run()
 			}
 		}
 
-		debugger_instruction_hook( this, pc() );
+		if (!m_seg_prefix)
+		{
+			debugger_instruction_hook( this, pc() );
+		}
 
 		UINT8 op = fetch_op();
 

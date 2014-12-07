@@ -123,13 +123,13 @@ WRITE8_MEMBER( gamate_state::gamate_video_w )
   case 5: video.y=data;break;
   case 7:
     if (video.bitmap.write) {
-      if (video.x<ARRAY_LENGTH(video.bitmap.data[0][0]) && video.y<ARRAY_LENGTH(video.bitmap.data[0]))
+      if (video.x<ARRAY_LENGTH(video.bitmap.data[0][0]) /*&& video.y<ARRAY_LENGTH(video.bitmap.data[0])*/)
         video.bitmap.data[video.bitmap.page2][video.y][video.x]=data;
-      else 
+      else
         logerror("%.6f %04x video bitmap x %x invalid\n",machine().time().as_double(), m_maincpu->pc(), video.x);
     } else {
         video.bitmap.data[0][video.y][video.x&(ARRAY_LENGTH(video.bitmap.data[0][0])-1)]=data;
-    }    
+    }
     if (video.y_increment) video.y++;
 		else video.x++;
   }
@@ -140,14 +140,14 @@ READ8_MEMBER( gamate_state::gamate_video_r )
 	if (offset!=6) return 0;
   UINT8 data=0;
   if (video.bitmap.write) {
-      if (video.x<ARRAY_LENGTH(video.bitmap.data[0][0]) && video.y<ARRAY_LENGTH(video.bitmap.data[0]))
-        data=video.bitmap.data[video.bitmap.page2][video.y][video.x];    
-      else 
+      if (video.x<ARRAY_LENGTH(video.bitmap.data[0][0]) /*&& video.y<ARRAY_LENGTH(video.bitmap.data[0])*/)
+        data=video.bitmap.data[video.bitmap.page2][video.y][video.x];
+      else
         logerror("%.6f video bitmap x %x invalid\n",machine().time().as_double(),video.x);
   } else {
     data=video.bitmap.data[0][video.y][video.x&(ARRAY_LENGTH(video.bitmap.data[0][0])-1)];
   }
-  if (m_maincpu->pc()<0xf000) 
+  if (m_maincpu->pc()<0xf000)
     logerror("%.6f video read %04x %02x\n",machine().time().as_double(),offset, data);
   return data;
 }
@@ -196,6 +196,7 @@ static INPUT_PORTS_START( gamate )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("select")
 INPUT_PORTS_END
 
+#ifdef UNUSED_CODE
 static const struct gfx_layout gamate_charlayout =
 {
         4,      /* width of object */
@@ -215,6 +216,11 @@ static const unsigned short gamate_palette[4] =
 	0,1,2,3
 };
 
+static GFXDECODE_START( gamate_charlayout )
+        GFXDECODE_ENTRY( "gfx1", 0x0000, gamate_charlayout, 0, 0x100 )
+GFXDECODE_END
+#endif
+
 /* palette in red, green, blue tribles */
 static const unsigned char gamate_colors[4][3] =
 {
@@ -223,10 +229,6 @@ static const unsigned char gamate_colors[4][3] =
   { 0x60, 0x60, 0x60 },
   { 0, 0, 0 }
 };
-
-static GFXDECODE_START( gamate_charlayout )
-        GFXDECODE_ENTRY( "gfx1", 0x0000, gamate_charlayout, 0, 0x100 )
-GFXDECODE_END
 
 PALETTE_INIT_MEMBER(gamate_state, gamate)
 {

@@ -63,13 +63,16 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	DECLARE_READ8_MEMBER( floppy_p1_r );
+	DECLARE_WRITE8_MEMBER( floppy_p1_w );
 	DECLARE_READ8_MEMBER( floppy_p2_r );
 	DECLARE_WRITE8_MEMBER( floppy_p2_w );
 	DECLARE_READ8_MEMBER( tach0_r );
 	DECLARE_READ8_MEMBER( tach1_r );
 	DECLARE_WRITE8_MEMBER( da_w );
 
+	DECLARE_READ8_MEMBER( via4_pa_r );
 	DECLARE_WRITE8_MEMBER( via4_pa_w );
+	DECLARE_READ8_MEMBER( via4_pb_r );
 	DECLARE_WRITE8_MEMBER( via4_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( wrsync_w );
 	DECLARE_WRITE_LINE_MEMBER( via4_irq_w );
@@ -97,6 +100,8 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 private:
+	static const int rpm[0x100];
+
 	enum
 	{
 		TM_GEN,
@@ -135,7 +140,6 @@ private:
 		int sync_bit_counter;
 		int sync_byte_counter;
 		int brdy;
-		int lbrdy;
 		bool lbrdy_changed;
 		int sync;
 		int syn;
@@ -167,6 +171,8 @@ private:
 
 	void update_stepper_motor(floppy_image_device *floppy, int stp, int old_st, int st);
 	void update_spindle_motor(floppy_image_device *floppy, emu_timer *t_tach, bool start, bool stop, bool sel, UINT8 &da);
+	void set_rdy0(int state);
+	void set_rdy1(int state);
 
 	int load0_cb(floppy_image_device *device);
 	void unload0_cb(floppy_image_device *device);

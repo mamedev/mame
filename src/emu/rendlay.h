@@ -87,6 +87,7 @@ private:
 			CTYPE_DISK,
 			CTYPE_TEXT,
 			CTYPE_LED7SEG,
+			CTYPE_LED8SEG,
 			CTYPE_LED14SEG,
 			CTYPE_LED16SEG,
 			CTYPE_LED14SEGSC,
@@ -109,6 +110,7 @@ private:
 		void load_bitmap();
 		void load_reel_bitmap(int number);
 		void draw_led7seg(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
+		void draw_led8seg(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
 		void draw_led14seg(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
 		void draw_led14segsc(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
 		void draw_led16seg(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
