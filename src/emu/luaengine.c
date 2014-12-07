@@ -379,6 +379,71 @@ int lua_engine::l_gui_show_fps(lua_State *L)
 }
 
 //-------------------------------------------------
+//  cpu_mem_read - read values from main memory
+//  -> cpu.mem_read(integer address, integer size, bool signed)
+//-------------------------------------------------
+
+int lua_engine::l_cpu_mem_read(lua_State *L)
+{
+	// check and retrieve parameters
+	luaL_argcheck(L, lua_isnumber(L, 1), 1, "address (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "size (8/16/32/64) expected");
+	luaL_argcheck(L, lua_isboolean(L, 3), 3, "signed (bool) expected");
+	offs_t addr = lua_tounsigned(L, 1);
+	UINT32 size = lua_tounsigned(L, 2);
+	bool signd = lua_toboolean(L, 3);
+
+	// read memory and push the value back to LUA
+	if ((size == 8) || (size == 16) || (size == 32) || (size == 64)) {
+		luaThis->mem_read(L, addr, size, signd);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+void lua_engine::mem_read(lua_State *L, offs_t address, UINT32 size, bool signd)
+{
+	address_space &sp = m_machine->firstcpu->space();
+	INT64 retv = 0;
+	switch(size) {
+		case 8:
+			retv = sp.read_byte(address);
+			break;
+		case 16:
+			if ((address & 1) == 0) {
+				retv = sp.read_word(address);
+			} else {
+				retv = sp.read_word_unaligned(address);
+			}
+			break;
+		case 32:
+			if ((address & 3) == 0) {
+				retv = sp.read_dword(address);
+			} else {
+				retv = sp.read_dword_unaligned(address);
+			}
+			break;
+		case 64:
+			if ((address & 7) == 0) {
+				retv = sp.read_qword(address);
+			} else {
+				retv = sp.read_qword_unaligned(address);
+			}
+			break;
+		default:
+			break;
+	}
+
+	// directly push the result back to LUA
+	if (signd) {
+		lua_pushnumber(L, retv);
+	} else {
+		lua_pushunsigned(L, retv);
+	}
+}
+
+//-------------------------------------------------
 //  emu_keypost - post keys to natural keyboard
 //-------------------------------------------------
 
@@ -732,6 +797,7 @@ void lua_engine::initialize()
 	// "cpu" namespace
 	luabridge::getGlobalNamespace (m_lua_state)
 		.beginNamespace ("cpu")
+			.addCFunction ("mem_read",        l_cpu_mem_read )
 	.endNamespace ();
 
 	luabridge::push (m_lua_state, machine_manager::instance());

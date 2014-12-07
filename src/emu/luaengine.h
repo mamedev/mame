@@ -70,6 +70,7 @@ private:
 	running_machine &machine() const { return *m_machine; }
 
 	void update_machine();
+	void mem_read(lua_State *L, offs_t addr, UINT32 size, bool signd);
 	void output_notifier(const char *outname, INT32 value);
 	static void s_output_notifier(const char *outname, INT32 value, void *param);
 
@@ -104,6 +105,9 @@ private:
 	static int l_gui_draw_line(lua_State *L);
 	static int l_gui_draw_text(lua_State *L);
 	static int l_gui_show_fps(lua_State *L);
+
+	// "cpu" namespace
+	static int l_cpu_mem_read(lua_State *L);
 
 	void resume(void *L, INT32 param);
 	void report_errors(int status);
