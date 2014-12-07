@@ -23,6 +23,9 @@
 	08      sync too long
 	99      not a system disc
 
+	11      Noise on sync
+	FF      No sync (bad or unformatted disk)
+
 */
 
 /*
@@ -32,11 +35,10 @@
 	- communication error with SCP after loading boot sector
 		- bp ff1a8
 		- patch ff1ab=c3
-	- data block checksum errors loading header track
-		- bp ff46a (ax = checksum read from disk, dx = calculated checksum)
-		- bit stream is offset by 1 bit at some point
+	- sync counter errors
+		- FF if sync byte counter loaded to 10
+		- 11 if sync byte counter loaded to 9
     - 8048 spindle speed control
-    - read PLL
     - write logic
 
 */
@@ -1064,21 +1066,39 @@ void victor_9000_fdc_t::live_start()
 	cur_live.wrsync = m_wrsync;
 	cur_live.erase = m_erase;
 
+	pll_reset(cur_live.tm, attotime::from_nsec(2130));
 	checkpoint_live = cur_live;
+	pll_save_checkpoint();
 
 	live_run();
 }
 
+void victor_9000_fdc_t::pll_reset(const attotime &when, const attotime clock)
+{
+	cur_pll.reset(when);
+	cur_pll.set_clock(clock);
+}
+
+void victor_9000_fdc_t::pll_save_checkpoint()
+{
+	checkpoint_pll = cur_pll;
+}
+
+void victor_9000_fdc_t::pll_retrieve_checkpoint()
+{
+	cur_pll = checkpoint_pll;
+}
+
 void victor_9000_fdc_t::checkpoint()
 {
-	get_next_edge(machine().time());
 	checkpoint_live = cur_live;
+	pll_save_checkpoint();
 }
 
 void victor_9000_fdc_t::rollback()
 {
 	cur_live = checkpoint_live;
-	get_next_edge(cur_live.tm);
+	pll_retrieve_checkpoint();
 }
 
 void victor_9000_fdc_t::start_writing(const attotime &tm)
@@ -1315,22 +1335,7 @@ void victor_9000_fdc_t::live_run(const attotime &limit)
 	}
 }
 
-void victor_9000_fdc_t::get_next_edge(const attotime &when)
-{
-	floppy_image_device *floppy = get_floppy();
-
-	cur_live.edge = floppy ? floppy->get_next_transition(when) : attotime::never;
-}
-
 int victor_9000_fdc_t::get_next_bit(attotime &tm, const attotime &limit)
 {
-	attotime next = tm + m_period;
-
-	int bit = (cur_live.edge.is_never() || cur_live.edge >= next) ? 0 : 1;
-
-	if (bit) {
-		get_next_edge(next);
-	}
-
-	return bit;
+	return cur_pll.get_next_bit(tm, get_floppy(), limit);
 }

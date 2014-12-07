@@ -19,6 +19,7 @@
 #include "formats/victor9k_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/6522via.h"
+#include "machine/fdc_pll.h"
 
 
 
@@ -216,10 +217,14 @@ private:
 	attotime m_period;
 
 	live_info cur_live, checkpoint_live;
+	fdc_pll_t cur_pll, checkpoint_pll;
 	emu_timer *t_gen, *t_tach0, *t_tach1;
 
 	floppy_image_device* get_floppy();
 	void live_start();
+	void pll_reset(const attotime &when, const attotime clock);
+	void pll_save_checkpoint();
+	void pll_retrieve_checkpoint();
 	void checkpoint();
 	void rollback();
 	bool write_next_bit(bool bit, const attotime &limit);
