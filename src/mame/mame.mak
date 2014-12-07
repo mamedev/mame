@@ -706,6 +706,7 @@ DRVLIBS += \
 	$(MAMEOBJ)/jpm.a \
 	$(MAMEOBJ)/kaneko.a \
 	$(MAMEOBJ)/konami.a \
+	$(MAMEOBJ)/matic.a \
 	$(MAMEOBJ)/maygay.a \
 	$(MAMEOBJ)/meadows.a \
 	$(MAMEOBJ)/merit.a \
@@ -1430,6 +1431,8 @@ $(MAMEOBJ)/konami.a: \
 	$(VIDEO)/k001005.o \
 	$(VIDEO)/k001604.o \
 
+$(MAMEOBJ)/matic.a: \
+	$(DRIVERS)/barata.o
 
 $(MAMEOBJ)/maygay.a: \
 	$(DRIVERS)/maygay1b.o \
@@ -2526,6 +2529,8 @@ $(DRIVERS)/atari_s2.o:  $(LAYOUT)/atari_s2.lh
 $(DRIVERS)/avalnche.o:  $(LAYOUT)/avalnche.lh
 
 $(DRIVERS)/balsente.o:  $(LAYOUT)/stocker.lh
+
+$(DRIVERS)/barata.o:   $(LAYOUT)/barata.lh
 
 $(DRIVERS)/beaminv.o:   $(LAYOUT)/beaminv.lh
 
