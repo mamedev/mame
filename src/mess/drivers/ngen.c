@@ -9,6 +9,12 @@
 	level 3 - timer (from PIT, presumably channel 0? Patent says "channel 3")
 	level 4 - "interrupt detector" - keyboard, printer, RTC
 	level 7 - floppy/hard disk
+
+	DMA channels:
+	channel 0 - communications (RS-232)
+	channel 1 - X-Bus expansion modules (except disk and graphics)
+	channel 2 - graphics?
+	channel 3 - hard disk
 	
     To get to "menu mode", press Space quickly after reset (might need good timing)
     The bootstrap ROM version number is displayed, along with "B,D,L,M,P,T:"
@@ -60,6 +66,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/z80dart.h"
+#include "machine/wd_fdc.h"
 #include "bus/rs232/rs232.h"
 #include "machine/ngen_kb.h"
 #include "machine/clock.h"
@@ -77,7 +84,9 @@ public:
 		m_pic(*this,"pic"),
 		m_pit(*this,"pit"),
 		m_vram(*this,"vram"),
-		m_fontram(*this,"fontram")
+		m_fontram(*this,"fontram"),
+		m_fdc(*this,"fdc"),
+		m_fd0(*this,"fdc:0")
 	{}
 
 	DECLARE_WRITE_LINE_MEMBER(pit_out0_w);
@@ -108,6 +117,8 @@ public:
 	DECLARE_WRITE8_MEMBER( dma_1_dack_w ){  }
 	DECLARE_WRITE8_MEMBER( dma_2_dack_w ){  }
 	DECLARE_WRITE8_MEMBER( dma_3_dack_w ){  }
+	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
 protected:
 	virtual void machine_reset();
@@ -122,6 +133,8 @@ private:
 	required_device<pit8254_device> m_pit;
 	optional_shared_ptr<UINT16> m_vram;
 	optional_shared_ptr<UINT16> m_fontram;
+	optional_device<wd2797_t> m_fdc;
+	optional_device<floppy_connector> m_fd0;
 
 	void set_dma_channel(int channel, int state);
 
@@ -355,22 +368,36 @@ READ16_MEMBER(ngen_state::peripheral_r)
 	return ret;
 }
 
-// A sequencial number is written to this port, and keeps on going until an NMI is triggered.
-// Maybe this is a RAM test of some kind, and this would be a bank switch register?
-// Even though the system supports 1MB at the most, which would fit in the CPU's whole address space...
+// X-bus module select
+// The bootstrap ROM creates a table at 0:FC9h, with a count, followed by the module IDs of each
+// expansion module.  The base I/O address for each module is 0x100*module number.
+// Module 0 is the main processor module, module 1 is the next module attached, and so on.
 WRITE16_MEMBER(ngen_state::port00_w)
 {
 	m_port00 = data;
-	if(data > 0)
-		m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
-	logerror("SYS: Port 0 write %04x\n",data);
+	logerror("SYS: X-Bus module select %04x\n",data);
 }
 
+// returns X-bus module ID (what is the low byte for?)
 READ16_MEMBER(ngen_state::port00_r)
 {
-	return m_port00;
+	if(m_port00 > 0)
+		m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+	if(m_port00 == 0)
+		return 0x4000;  // module ID of 0x40 = dual floppy disk module (need hardware manual to find other module IDs)
+	else
+		return 0x0080;  // invalid device?
 }
 
+WRITE_LINE_MEMBER(ngen_state::fdc_irq_w)
+{
+	m_pic->ir7_w(state);
+}
+
+WRITE_LINE_MEMBER(ngen_state::fdc_drq_w)
+{
+	// TODO
+}
 
 WRITE_LINE_MEMBER( ngen_state::dma_hrq_changed )
 {
@@ -456,11 +483,14 @@ static ADDRESS_MAP_START( ngen_mem, AS_PROGRAM, 16, ngen_state )
 	AM_RANGE(0x00000, 0xf7fff) AM_RAM
 	AM_RANGE(0xf8000, 0xf9fff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0xfa000, 0xfbfff) AM_RAM AM_SHARE("fontram")
+	AM_RANGE(0xfc000, 0xfcfff) AM_ROM AM_REGION("disk",0)
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("bios",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ngen_io, AS_IO, 16, ngen_state )
 	AM_RANGE(0x0000, 0x0001) AM_READWRITE(port00_r,port00_w)
+	AM_RANGE(0x0100, 0x0107) AM_DEVREADWRITE8("fdc",wd2797_t,read,write,0x00ff)  // a guess for now
+	// port 0x0108 is used also, maybe for motor control/side select?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ngen386_mem, AS_PROGRAM, 32, ngen_state )
@@ -484,6 +514,10 @@ INPUT_PORTS_END
 
 static SLOT_INTERFACE_START(keyboard)
 	SLOT_INTERFACE("ngen", NGEN_KEYBOARD)
+SLOT_INTERFACE_END
+
+static SLOT_INTERFACE_START( ngen_floppies )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( ngen, ngen_state )
@@ -543,6 +577,7 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("iouart", upd7201_device, dcdb_w))
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE("iouart", upd7201_device, rib_w))
 
+	// TODO: SCN2652 MPCC, used for RS-422 cluster communications?
 
 	// video board
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -567,6 +602,15 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	MCFG_DEVICE_ADD("refresh_clock", CLOCK, 19200*16)  // should be 19530Hz
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(ngen_state,timer_clk_out))
 
+	// floppy disk / hard disk module (WD2797 FDC, WD1010 HDC, plus an 8253 timer for each)
+	MCFG_WD2797x_ADD("fdc", XTAL_20MHz / 10)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(ngen_state,fdc_irq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(ngen_state,fdc_drq_w))
+	MCFG_DEVICE_ADD("fdc_timer", PIT8253, 0)
+	// TODO: WD1010 HDC (not implemented)
+	MCFG_DEVICE_ADD("hdc_timer", PIT8253, 0)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ngen_floppies, "525hd", floppy_image_device::default_floppy_formats)
+
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ngen386, ngen )
@@ -584,6 +628,12 @@ ROM_START( ngen )
 	ROM_REGION( 0x2000, "bios", 0)
 	ROM_LOAD16_BYTE( "72-00414_80186_cpu.bin",  0x000000, 0x001000, CRC(e1387a03) SHA1(ddca4eba67fbf8b731a8009c14f6b40edcbc3279) )  // bootstrap ROM v8.4
 	ROM_LOAD16_BYTE( "72-00415_80186_cpu.bin",  0x000001, 0x001000, CRC(a6dde7d9) SHA1(b4d15c1bce31460ab5b92ff43a68c15ac5485816) )
+	
+	ROM_REGION( 0x1000, "disk", 0)
+	ROM_LOAD( "72-00422_10mb_disk.bin", 0x000000, 0x001000,  CRC(f5b046b6) SHA1(b303c6f6aa40504016de9826879bc316e44389aa) )
+	
+	ROM_REGION( 0x20, "disk_prom", 0)
+	ROM_LOAD( "72-00422_10mb_disk_15d.bin", 0x000000, 0x000020,  CRC(121ee494) SHA1(9a8d3c336cc7378a71f9d48c99f88515eb236fbf) )
 ROM_END
 
 // not sure just how similar these systems are to the 80186 model, but are here at the moment to document the dumps
