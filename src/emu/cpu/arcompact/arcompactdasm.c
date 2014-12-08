@@ -27,6 +27,72 @@ static void ATTR_PRINTF(1,2) print(const char *fmt, ...)
 #define DASM_OPS_16 char *output, offs_t pc, UINT16 op, const UINT8* oprom
 #define DASM_OPS_32 char *output, offs_t pc, UINT32 op, const UINT8* oprom
 
+int arcompact_handle04_00_dasm(DASM_OPS_32);
+int arcompact_handle04_01_dasm(DASM_OPS_32);
+int arcompact_handle04_02_dasm(DASM_OPS_32);
+int arcompact_handle04_03_dasm(DASM_OPS_32);
+int arcompact_handle04_04_dasm(DASM_OPS_32);
+int arcompact_handle04_05_dasm(DASM_OPS_32);
+int arcompact_handle04_06_dasm(DASM_OPS_32);
+int arcompact_handle04_07_dasm(DASM_OPS_32);
+int arcompact_handle04_08_dasm(DASM_OPS_32);
+int arcompact_handle04_09_dasm(DASM_OPS_32);
+int arcompact_handle04_0a_dasm(DASM_OPS_32);
+int arcompact_handle04_0b_dasm(DASM_OPS_32);
+int arcompact_handle04_0c_dasm(DASM_OPS_32);
+int arcompact_handle04_0d_dasm(DASM_OPS_32);
+int arcompact_handle04_0e_dasm(DASM_OPS_32);
+int arcompact_handle04_0f_dasm(DASM_OPS_32);
+int arcompact_handle04_10_dasm(DASM_OPS_32);
+int arcompact_handle04_11_dasm(DASM_OPS_32);
+int arcompact_handle04_12_dasm(DASM_OPS_32);
+int arcompact_handle04_13_dasm(DASM_OPS_32);
+int arcompact_handle04_14_dasm(DASM_OPS_32);
+int arcompact_handle04_15_dasm(DASM_OPS_32);
+int arcompact_handle04_16_dasm(DASM_OPS_32);
+int arcompact_handle04_17_dasm(DASM_OPS_32);
+int arcompact_handle04_18_dasm(DASM_OPS_32);
+int arcompact_handle04_19_dasm(DASM_OPS_32);
+int arcompact_handle04_1a_dasm(DASM_OPS_32);
+int arcompact_handle04_1b_dasm(DASM_OPS_32);
+int arcompact_handle04_1c_dasm(DASM_OPS_32);
+int arcompact_handle04_1d_dasm(DASM_OPS_32);
+int arcompact_handle04_1e_dasm(DASM_OPS_32);
+int arcompact_handle04_1f_dasm(DASM_OPS_32);
+int arcompact_handle04_20_dasm(DASM_OPS_32);
+int arcompact_handle04_21_dasm(DASM_OPS_32);
+int arcompact_handle04_22_dasm(DASM_OPS_32);
+int arcompact_handle04_23_dasm(DASM_OPS_32);
+int arcompact_handle04_24_dasm(DASM_OPS_32);
+int arcompact_handle04_25_dasm(DASM_OPS_32);
+int arcompact_handle04_26_dasm(DASM_OPS_32);
+int arcompact_handle04_27_dasm(DASM_OPS_32);
+int arcompact_handle04_28_dasm(DASM_OPS_32);
+int arcompact_handle04_29_dasm(DASM_OPS_32);
+int arcompact_handle04_2a_dasm(DASM_OPS_32);
+int arcompact_handle04_2b_dasm(DASM_OPS_32);
+int arcompact_handle04_2c_dasm(DASM_OPS_32);
+int arcompact_handle04_2d_dasm(DASM_OPS_32);
+int arcompact_handle04_2e_dasm(DASM_OPS_32);
+int arcompact_handle04_2f_dasm(DASM_OPS_32);
+int arcompact_handle04_30_dasm(DASM_OPS_32);
+int arcompact_handle04_31_dasm(DASM_OPS_32);
+int arcompact_handle04_32_dasm(DASM_OPS_32);
+int arcompact_handle04_33_dasm(DASM_OPS_32);
+int arcompact_handle04_34_dasm(DASM_OPS_32);
+int arcompact_handle04_35_dasm(DASM_OPS_32);
+int arcompact_handle04_36_dasm(DASM_OPS_32);
+int arcompact_handle04_37_dasm(DASM_OPS_32);
+int arcompact_handle04_38_dasm(DASM_OPS_32);
+int arcompact_handle04_39_dasm(DASM_OPS_32);
+int arcompact_handle04_3a_dasm(DASM_OPS_32);
+int arcompact_handle04_3b_dasm(DASM_OPS_32);
+int arcompact_handle04_3c_dasm(DASM_OPS_32);
+int arcompact_handle04_3d_dasm(DASM_OPS_32);
+int arcompact_handle04_3e_dasm(DASM_OPS_32);
+int arcompact_handle04_3f_dasm(DASM_OPS_32);
+
+
 int arcompact_handle18_00_dasm(DASM_OPS_16);
 int arcompact_handle18_01_dasm(DASM_OPS_16);
 int arcompact_handle18_02_dasm(DASM_OPS_16);
@@ -325,21 +391,197 @@ int arcompact_handle01_dasm(DASM_OPS_32)
 
 int arcompact_handle02_dasm(DASM_OPS_32)
 {
+	// bitpos
+	// 11111 111 11111111 0 000 0 00 00 0 000000
+	// fedcb a98 76543210 f edc b a9 87 6 543210
+	// fields
+	// 00010 bbb ssssssss S BBB D aa ZZ X AAAAAA
+#if 0	
+	int A = (op & 0x0000003f >> 0);  op &= ~0x0000003f;
+	int X = (op & 0x00000040 >> 6);  op &= ~0x00000040;
+	int Z = (op & 0x00000180 >> 7);  op &= ~0x00000180;
+	int a = (op & 0x00000600 >> 9);  op &= ~0x00000600;
+	int D = (op & 0x00000800 >> 11); op &= ~0x00000800;
+	int B = (op & 0x00007000 >> 12); op &= ~0x00007000;
+	int S = (op & 0x00008000 >> 15); op &= ~0x00008000;
+	int s = (op & 0x00ff0000 >> 16); op &= ~0x00ff0000;
+	int b = (op & 0x07000000 >> 24); op &= ~0x07000000;
+#endif
+
 	print("LD r+o (%08x)", op );
 	return 4;
 }
 
 int arcompact_handle03_dasm(DASM_OPS_32)
 {
+	// bitpos
+	// 11111 111 11111111 0 000 000000 0 00 00 0
+	// fedcb a98 76543210 f edc ba9876 5 43 21 0
+	// fields
+	// 00011 bbb ssssssss S BBB CCCCCC D aa ZZ R
+
 	print("ST r+o (%08x)", op );
 	return 4;
 }
 
 int arcompact_handle04_dasm(DASM_OPS_32)
 {
-	print("op a,b,c (basecase) (%08x)", op );
-	return 4;
+	int size = 4;
+	// General Operations
+
+	// bitpos
+	// 11111 111 11 111111 0 000 000000 0 00000
+	// fedcb a98 76 543210 f edc ba9876 5 43210
+	//
+	// 00100 bbb 00 iiiiii F BBB CCCCCC A AAAAA   General Operations *UN*Conditional Register to Register
+	// 00100 bbb 01 iiiiii F BBB UUUUUU A AAAAA   General Operations *UN*Conditional Register (Unsigned 6-bit IMM)
+	// 00100 bbb 10 iiiiii F BBB ssssss S SSSSS   General Operations *UN*Conditional Register (Signed 12-bit IMM)
+	
+	// 00100 bbb 11 iiiiii F BBB CCCCCC 0 QQQQQ   General Operations Conditional Register 
+	// 00100 bbb 11 iiiiii F BBB UUUUUU 1 QQQQQ   General Operations Conditional Register (Unsigned 6-bit IMM) 
+	UINT8 subinstr = (op & 0x003f0000) >> 16;
+	op &= ~0x003f0000;
+
+	switch (subinstr)
+	{
+		case 0x00: size = arcompact_handle04_00_dasm(output, pc, op, oprom); break; // ADD
+		case 0x01: size = arcompact_handle04_01_dasm(output, pc, op, oprom); break; // ADC
+		case 0x02: size = arcompact_handle04_02_dasm(output, pc, op, oprom); break; // SUB
+		case 0x03: size = arcompact_handle04_03_dasm(output, pc, op, oprom); break; // SBC
+		case 0x04: size = arcompact_handle04_04_dasm(output, pc, op, oprom); break; // AND
+		case 0x05: size = arcompact_handle04_05_dasm(output, pc, op, oprom); break; // OR
+		case 0x06: size = arcompact_handle04_06_dasm(output, pc, op, oprom); break; // BIC
+		case 0x07: size = arcompact_handle04_07_dasm(output, pc, op, oprom); break; // XOR
+		case 0x08: size = arcompact_handle04_08_dasm(output, pc, op, oprom); break; // MAX
+		case 0x09: size = arcompact_handle04_09_dasm(output, pc, op, oprom); break; // MIN
+		case 0x0a: size = arcompact_handle04_0a_dasm(output, pc, op, oprom); break; // MOV
+		case 0x0b: size = arcompact_handle04_0b_dasm(output, pc, op, oprom); break; // TST
+		case 0x0c: size = arcompact_handle04_0c_dasm(output, pc, op, oprom); break; // CMP
+		case 0x0d: size = arcompact_handle04_0d_dasm(output, pc, op, oprom); break; // RCMP
+		case 0x0e: size = arcompact_handle04_0e_dasm(output, pc, op, oprom); break; // RSUB
+		case 0x0f: size = arcompact_handle04_0f_dasm(output, pc, op, oprom); break; // BSET
+		case 0x10: size = arcompact_handle04_10_dasm(output, pc, op, oprom); break; // BCLR
+		case 0x11: size = arcompact_handle04_11_dasm(output, pc, op, oprom); break; // BTST
+		case 0x12: size = arcompact_handle04_12_dasm(output, pc, op, oprom); break; // BXOR
+		case 0x13: size = arcompact_handle04_13_dasm(output, pc, op, oprom); break; // BMSK
+		case 0x14: size = arcompact_handle04_14_dasm(output, pc, op, oprom); break; // ADD1
+		case 0x15: size = arcompact_handle04_15_dasm(output, pc, op, oprom); break; // ADD2
+		case 0x16: size = arcompact_handle04_16_dasm(output, pc, op, oprom); break; // ADD3
+		case 0x17: size = arcompact_handle04_17_dasm(output, pc, op, oprom); break; // SUB1
+		case 0x18: size = arcompact_handle04_18_dasm(output, pc, op, oprom); break; // SUB2
+		case 0x19: size = arcompact_handle04_19_dasm(output, pc, op, oprom); break; // SUB3
+		case 0x1a: size = arcompact_handle04_1a_dasm(output, pc, op, oprom); break; // MPY *
+		case 0x1b: size = arcompact_handle04_1b_dasm(output, pc, op, oprom); break; // MPYH *
+		case 0x1c: size = arcompact_handle04_1c_dasm(output, pc, op, oprom); break; // MPYHU *
+		case 0x1d: size = arcompact_handle04_1d_dasm(output, pc, op, oprom); break; // MPYU *
+		case 0x1e: size = arcompact_handle04_1e_dasm(output, pc, op, oprom); break; // illegal
+		case 0x1f: size = arcompact_handle04_1f_dasm(output, pc, op, oprom); break; // illegal
+		case 0x20: size = arcompact_handle04_20_dasm(output, pc, op, oprom); break; // Jcc
+		case 0x21: size = arcompact_handle04_21_dasm(output, pc, op, oprom); break; // Jcc.D
+		case 0x22: size = arcompact_handle04_22_dasm(output, pc, op, oprom); break; // JLcc
+		case 0x23: size = arcompact_handle04_23_dasm(output, pc, op, oprom); break; // JLcc.D
+		case 0x24: size = arcompact_handle04_24_dasm(output, pc, op, oprom); break; // illegal
+		case 0x25: size = arcompact_handle04_25_dasm(output, pc, op, oprom); break; // illegal
+		case 0x26: size = arcompact_handle04_26_dasm(output, pc, op, oprom); break; // illegal
+		case 0x27: size = arcompact_handle04_27_dasm(output, pc, op, oprom); break; // illegal
+		case 0x28: size = arcompact_handle04_28_dasm(output, pc, op, oprom); break; // LPcc
+		case 0x29: size = arcompact_handle04_29_dasm(output, pc, op, oprom); break; // FLAG
+		case 0x2a: size = arcompact_handle04_2a_dasm(output, pc, op, oprom); break; // LR
+		case 0x2b: size = arcompact_handle04_2b_dasm(output, pc, op, oprom); break; // SR
+		case 0x2c: size = arcompact_handle04_2c_dasm(output, pc, op, oprom); break; // illegal
+		case 0x2d: size = arcompact_handle04_2d_dasm(output, pc, op, oprom); break; // illegal
+		case 0x2e: size = arcompact_handle04_2e_dasm(output, pc, op, oprom); break; // illegal
+		case 0x2f: size = arcompact_handle04_2f_dasm(output, pc, op, oprom); break; // Sub Opcode
+		case 0x30: size = arcompact_handle04_30_dasm(output, pc, op, oprom); break; // LD r-r
+		case 0x31: size = arcompact_handle04_31_dasm(output, pc, op, oprom); break; // LD r-r
+		case 0x32: size = arcompact_handle04_32_dasm(output, pc, op, oprom); break; // LD r-r
+		case 0x33: size = arcompact_handle04_33_dasm(output, pc, op, oprom); break; // LD r-r
+		case 0x34: size = arcompact_handle04_34_dasm(output, pc, op, oprom); break; // LD r-r
+		case 0x35: size = arcompact_handle04_35_dasm(output, pc, op, oprom); break; // LD r-r
+		case 0x36: size = arcompact_handle04_36_dasm(output, pc, op, oprom); break; // LD r-r
+		case 0x37: size = arcompact_handle04_37_dasm(output, pc, op, oprom); break; // LD r-r
+		case 0x38: size = arcompact_handle04_38_dasm(output, pc, op, oprom); break; // illegal
+		case 0x39: size = arcompact_handle04_39_dasm(output, pc, op, oprom); break; // illegal
+		case 0x3a: size = arcompact_handle04_3a_dasm(output, pc, op, oprom); break; // illegal
+		case 0x3b: size = arcompact_handle04_3b_dasm(output, pc, op, oprom); break; // illegal
+		case 0x3c: size = arcompact_handle04_3c_dasm(output, pc, op, oprom); break; // illegal
+		case 0x3d: size = arcompact_handle04_3d_dasm(output, pc, op, oprom); break; // illegal
+		case 0x3e: size = arcompact_handle04_3e_dasm(output, pc, op, oprom); break; // illegal
+		case 0x3f: size = arcompact_handle04_3f_dasm(output, pc, op, oprom); break; // illegal
+	}
+
+	return size;
 }
+
+int arcompact_handle04_00_dasm(DASM_OPS_32)  { print("ADD (%08x)", op); return 4;}
+int arcompact_handle04_01_dasm(DASM_OPS_32)  { print("ADC (%08x)", op); return 4;}
+int arcompact_handle04_02_dasm(DASM_OPS_32)  { print("SUB (%08x)", op); return 4;}
+int arcompact_handle04_03_dasm(DASM_OPS_32)  { print("SBC (%08x)", op); return 4;}
+int arcompact_handle04_04_dasm(DASM_OPS_32)  { print("AND (%08x)", op); return 4;}
+int arcompact_handle04_05_dasm(DASM_OPS_32)  { print("OR (%08x)", op); return 4;}
+int arcompact_handle04_06_dasm(DASM_OPS_32)  { print("BIC (%08x)", op); return 4;}
+int arcompact_handle04_07_dasm(DASM_OPS_32)  { print("XOR (%08x)", op); return 4;}
+int arcompact_handle04_08_dasm(DASM_OPS_32)  { print("MAX (%08x)", op); return 4;}
+int arcompact_handle04_09_dasm(DASM_OPS_32)  { print("MIN (%08x)", op); return 4;}
+int arcompact_handle04_0a_dasm(DASM_OPS_32)  { print("MOV (%08x)", op); return 4;}
+int arcompact_handle04_0b_dasm(DASM_OPS_32)  { print("TST (%08x)", op); return 4;}
+int arcompact_handle04_0c_dasm(DASM_OPS_32)  { print("CMP (%08x)", op); return 4;}
+int arcompact_handle04_0d_dasm(DASM_OPS_32)  { print("RCMP (%08x)", op); return 4;}
+int arcompact_handle04_0e_dasm(DASM_OPS_32)  { print("RSUB (%08x)", op); return 4;}
+int arcompact_handle04_0f_dasm(DASM_OPS_32)  { print("BSET (%08x)", op); return 4;}
+int arcompact_handle04_10_dasm(DASM_OPS_32)  { print("BCLR (%08x)", op); return 4;}
+int arcompact_handle04_11_dasm(DASM_OPS_32)  { print("BTST (%08x)", op); return 4;}
+int arcompact_handle04_12_dasm(DASM_OPS_32)  { print("BXOR (%08x)", op); return 4;}
+int arcompact_handle04_13_dasm(DASM_OPS_32)  { print("BMSK (%08x)", op); return 4;}
+int arcompact_handle04_14_dasm(DASM_OPS_32)  { print("ADD1 (%08x)", op); return 4;}
+int arcompact_handle04_15_dasm(DASM_OPS_32)  { print("ADD2 (%08x)", op); return 4;}
+int arcompact_handle04_16_dasm(DASM_OPS_32)  { print("ADD3 (%08x)", op); return 4;}
+int arcompact_handle04_17_dasm(DASM_OPS_32)  { print("SUB1 (%08x)", op); return 4;}
+int arcompact_handle04_18_dasm(DASM_OPS_32)  { print("SUB2 (%08x)", op); return 4;}
+int arcompact_handle04_19_dasm(DASM_OPS_32)  { print("SUB3 (%08x)", op); return 4;}
+int arcompact_handle04_1a_dasm(DASM_OPS_32)  { print("MPY (%08x)", op); return 4;} // *
+int arcompact_handle04_1b_dasm(DASM_OPS_32)  { print("MPYH (%08x)", op); return 4;} // *
+int arcompact_handle04_1c_dasm(DASM_OPS_32)  { print("MPYHU (%08x)", op); return 4;} // *
+int arcompact_handle04_1d_dasm(DASM_OPS_32)  { print("MPYU (%08x)", op); return 4;} // *
+int arcompact_handle04_1e_dasm(DASM_OPS_32)  { print("<illegal 0x04_1e> (%08x)", op); return 4;}
+int arcompact_handle04_1f_dasm(DASM_OPS_32)  { print("<illegal 0x04_1f> (%08x)", op); return 4;}
+int arcompact_handle04_20_dasm(DASM_OPS_32)  { print("Jcc (%08x)", op); return 4;}
+int arcompact_handle04_21_dasm(DASM_OPS_32)  { print("Jcc.D (%08x)", op); return 4;}
+int arcompact_handle04_22_dasm(DASM_OPS_32)  { print("JLcc (%08x)", op); return 4;}
+int arcompact_handle04_23_dasm(DASM_OPS_32)  { print("JLcc.D (%08x)", op); return 4;}
+int arcompact_handle04_24_dasm(DASM_OPS_32)  { print("<illegal 0x04_24> (%08x)", op); return 4;}
+int arcompact_handle04_25_dasm(DASM_OPS_32)  { print("<illegal 0x04_25> (%08x)", op); return 4;}
+int arcompact_handle04_26_dasm(DASM_OPS_32)  { print("<illegal 0x04_26> (%08x)", op); return 4;}
+int arcompact_handle04_27_dasm(DASM_OPS_32)  { print("<illegal 0x04_27> (%08x)", op); return 4;}
+int arcompact_handle04_28_dasm(DASM_OPS_32)  { print("LPcc (%08x)", op); return 4;}
+int arcompact_handle04_29_dasm(DASM_OPS_32)  { print("FLAG (%08x)", op); return 4;}
+int arcompact_handle04_2a_dasm(DASM_OPS_32)  { print("LR (%08x)", op); return 4;}
+int arcompact_handle04_2b_dasm(DASM_OPS_32)  { print("SR (%08x)", op); return 4;}
+int arcompact_handle04_2c_dasm(DASM_OPS_32)  { print("<illegal 0x04_2c> (%08x)", op); return 4;}
+int arcompact_handle04_2d_dasm(DASM_OPS_32)  { print("<illegal 0x04_2d> (%08x)", op); return 4;}
+int arcompact_handle04_2e_dasm(DASM_OPS_32)  { print("<illegal 0x04_2e> (%08x)", op); return 4;}
+int arcompact_handle04_2f_dasm(DASM_OPS_32)  { print("SOP (another subcode) (%08x)", op); return 4;}
+int arcompact_handle04_30_dasm(DASM_OPS_32)  { print("LD r-r (basecase 0x30) (%08x)", op); return 4;}
+int arcompact_handle04_31_dasm(DASM_OPS_32)  { print("LD r-r (basecase 0x31) (%08x)", op); return 4;}
+int arcompact_handle04_32_dasm(DASM_OPS_32)  { print("LD r-r (basecase 0x32) (%08x)", op); return 4;}
+int arcompact_handle04_33_dasm(DASM_OPS_32)  { print("LD r-r (basecase 0x33) (%08x)", op); return 4;}
+int arcompact_handle04_34_dasm(DASM_OPS_32)  { print("LD r-r (basecase 0x34) (%08x)", op); return 4;}
+int arcompact_handle04_35_dasm(DASM_OPS_32)  { print("LD r-r (basecase 0x35) (%08x)", op); return 4;}
+int arcompact_handle04_36_dasm(DASM_OPS_32)  { print("LD r-r (basecase 0x36) (%08x)", op); return 4;}
+int arcompact_handle04_37_dasm(DASM_OPS_32)  { print("LD r-r (basecase 0x37) (%08x)", op); return 4;}
+int arcompact_handle04_38_dasm(DASM_OPS_32)  { print("<illegal 0x04_38> (%08x)", op); return 4;}
+int arcompact_handle04_39_dasm(DASM_OPS_32)  { print("<illegal 0x04_39> (%08x)", op); return 4;}
+int arcompact_handle04_3a_dasm(DASM_OPS_32)  { print("<illegal 0x04_3a> (%08x)", op); return 4;}
+int arcompact_handle04_3b_dasm(DASM_OPS_32)  { print("<illegal 0x04_3b> (%08x)", op); return 4;}
+int arcompact_handle04_3c_dasm(DASM_OPS_32)  { print("<illegal 0x04_3c> (%08x)", op); return 4;}
+int arcompact_handle04_3d_dasm(DASM_OPS_32)  { print("<illegal 0x04_3d> (%08x)", op); return 4;}
+int arcompact_handle04_3e_dasm(DASM_OPS_32)  { print("<illegal 0x04_3e> (%08x)", op); return 4;}
+int arcompact_handle04_3f_dasm(DASM_OPS_32)  { print("<illegal 0x04_3f> (%08x)", op); return 4;}
+
+
+
+
+
 
 int arcompact_handle05_dasm(DASM_OPS_32)
 {
