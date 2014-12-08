@@ -22,7 +22,6 @@
     - floppy 8048
     - keyboard
     - hires graphics
-    - character attributes
     - brightness/contrast
     - MC6852
     - codec sound
@@ -108,13 +107,17 @@ MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 			UINT32 char_ram_addr = (BIT(ma, 12) << 16) | ((code & 0xff) << 5) | (ra << 1);
 			UINT16 data = program.read_word(char_ram_addr);
 
+			if (code & CODE_REVERSE_VIDEO) data ^= 0xffff;
+			if (code & CODE_NON_DISPLAY) data = 0;
+			if (sx == cursor_x) data = 0xffff;
+
 			for (int x = 0; x <= 10; x++)
 			{
-				int color = BIT(data, x);
+				int pixel = BIT(data, x);
+				int color = palette[pixel && de];
+				if (!(code & CODE_LOW_INTENSITY) && color) color = 2;
 
-				if (sx == cursor_x) color = 1;
-
-				bitmap.pix32(vbp + y, hbp + x + sx*10) = palette[color && de];
+				bitmap.pix32(vbp + y, hbp + x + sx*10) = color;
 			}
 
 			video_ram_addr += 2;
@@ -441,7 +444,7 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT("palette")
 
 	MCFG_MC6845_ADD(HD46505S_TAG, HD6845, SCREEN_TAG, 1000000) // HD6845 == HD46505S
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
