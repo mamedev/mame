@@ -682,7 +682,32 @@ int arcompact_handle04_1c_dasm(DASM_OPS_32)  { print("MPYHU (%08x)", op); return
 int arcompact_handle04_1d_dasm(DASM_OPS_32)  { print("MPYU (%08x)", op); return 4;} // *
 int arcompact_handle04_1e_dasm(DASM_OPS_32)  { print("<illegal 0x04_1e> (%08x)", op); return 4;}
 int arcompact_handle04_1f_dasm(DASM_OPS_32)  { print("<illegal 0x04_1f> (%08x)", op); return 4;}
-int arcompact_handle04_20_dasm(DASM_OPS_32)  { print("Jcc (%08x)", op); return 4;}
+
+#define GET_LIMM_32 \
+	limm = oprom[6] | (oprom[7] << 8); \
+	limm |= (oprom[4] << 16) | (oprom[5] << 24); \
+
+int arcompact_handle04_20_dasm(DASM_OPS_32)
+{
+	int C = (op & 0x00000fc0) >> 6;
+	op &= ~0x00000fc0;
+	
+	if (C == LIMM_REG)
+	{
+		UINT32 limm;
+		GET_LIMM_32;
+
+
+		print("Jcc %08x (%08x)", limm, op);
+	}
+	else
+	{
+		print("Jcc (%04x) (%08x)", C, op);
+	}
+
+	return 4;
+}
+
 int arcompact_handle04_21_dasm(DASM_OPS_32)  { print("Jcc.D (%08x)", op); return 4;}
 int arcompact_handle04_22_dasm(DASM_OPS_32)  { print("JLcc (%08x)", op); return 4;}
 int arcompact_handle04_23_dasm(DASM_OPS_32)  { print("JLcc.D (%08x)", op); return 4;}

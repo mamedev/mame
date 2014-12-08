@@ -307,20 +307,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(leapster_state,leapster)
 {
-	// the CPU is apparently Little Endian (or 'middle endian') but according to documentation definitely NOT 'Big Endian'
-	// a regular ROM order with sensible DASM function makes sense for the 16-bit code, but not for the 32-bit code?! (or initial PC isn't at 0 / there is missing code?)
 
-	// do PC = 460c0 to see some code
-
-#if 0
-	UINT16 *ROM = (UINT16*)memregion("maincpu")->base();
-	for (int i = 0; i < 0x200000 / 2; i += 2)
-	{
-		UINT16 temp = ROM[i];
-		ROM[i] = ROM[i + 1];;
-		ROM[i + 1] = temp;
-	}
-#endif
 }
 
 CONS(2003,  leapster,    0,         0,  leapster,    leapster, leapster_state, leapster,    "LeapFrog",   "Leapster (Germany)",    GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IS_SKELETON )
