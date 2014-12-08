@@ -1094,8 +1094,8 @@ int arcompact_handle0e_dasm(DASM_OPS_16)
 // this is as messed up as the rest of the 16-bit alignment in LE mode...
 
 #define GET_LIMM \
-	limm = oprom[6] | (oprom[7] << 8); \
-	limm |= (oprom[4] << 16) | (oprom[5] << 24); \
+	limm = oprom[4] | (oprom[5] << 8); \
+	limm |= (oprom[2] << 16) | (oprom[3] << 24); \
 
 
 int arcompact_handle0e_00_dasm(DASM_OPS_16)
@@ -1640,7 +1640,7 @@ CPU_DISASSEMBLE(arcompact)
 {
 	int size = 2;
 
-	UINT32 op = oprom[2] | (oprom[3] << 8);
+	UINT32 op = oprom[0] | (oprom[1] << 8);
 	output = buffer;
 
 	UINT8 instruction = ARCOMPACT_OPERATION;
@@ -1649,7 +1649,7 @@ CPU_DISASSEMBLE(arcompact)
 	{
 		size = 4;
 		op <<= 16;
-		op |= oprom[0] | (oprom[1] << 8);
+		op |= oprom[2] | (oprom[3] << 8);
 
 		op &= ~0xf8000000;
 

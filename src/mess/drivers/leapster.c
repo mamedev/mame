@@ -224,6 +224,7 @@ public:
 
 	UINT32 screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(leapster_cart);
+	DECLARE_DRIVER_INIT(leapster);
 
 protected:
 	required_device<generic_slot_device> m_cart;
@@ -304,6 +305,23 @@ ROM_START(leapstertv)
 	ROM_LOAD( "am29pl160cb-90sf.bin", 0x00000, 0x200000, BAD_DUMP CRC(dc281f1f) SHA1(17588de54ab3bb82801bd5062f3e6aa687412178) )
 ROM_END
 
+DRIVER_INIT_MEMBER(leapster_state,leapster)
+{
+	// the CPU is apparently Little Endian (or 'middle endian') but according to documentation definitely NOT 'Big Endian'
+	// a regular ROM order with sensible DASM function makes sense for the 16-bit code, but not for the 32-bit code?! (or initial PC isn't at 0 / there is missing code?)
 
-CONS(2003,  leapster,    0,         0,  leapster,    leapster, driver_device, 0,    "LeapFrog",   "Leapster (Germany)",    GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IS_SKELETON )
-CONS(2005,  leapstertv,  leapster,  0,  leapster,    leapster, driver_device, 0,    "LeapFrog",   "Leapster TV (Germany)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IS_SKELETON )
+	// do PC = 460c0 to see some code
+
+#if 0
+	UINT16 *ROM = (UINT16*)memregion("maincpu")->base();
+	for (int i = 0; i < 0x200000 / 2; i += 2)
+	{
+		UINT16 temp = ROM[i];
+		ROM[i] = ROM[i + 1];;
+		ROM[i + 1] = temp;
+	}
+#endif
+}
+
+CONS(2003,  leapster,    0,         0,  leapster,    leapster, leapster_state, leapster,    "LeapFrog",   "Leapster (Germany)",    GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IS_SKELETON )
+CONS(2005,  leapstertv,  leapster,  0,  leapster,    leapster, leapster_state, leapster,    "LeapFrog",   "Leapster TV (Germany)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IS_SKELETON )
