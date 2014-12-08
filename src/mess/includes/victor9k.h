@@ -71,6 +71,7 @@ public:
 		m_rs232a(*this, RS232_A_TAG),
 		m_rs232b(*this, RS232_B_TAG),
 		m_palette(*this, "palette"),
+		m_rom(*this, I8088_TAG),
 		m_video_ram(*this, "video_ram"),
 		m_brt(0),
 		m_cont(0),
@@ -97,6 +98,7 @@ public:
 	required_device<rs232_port_device> m_rs232a;
 	required_device<rs232_port_device> m_rs232b;
 	required_device<palette_device> m_palette;
+	required_memory_region m_rom;
 	required_shared_ptr<UINT8> m_video_ram;
 
 	virtual void machine_start();

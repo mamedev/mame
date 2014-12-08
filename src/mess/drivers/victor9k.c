@@ -395,6 +395,15 @@ void victor9k_state::machine_start()
 	// memory banking
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_ram(0x00000, m_ram->size() - 1, m_ram->pointer());
+
+	// patch out SCP self test
+	m_rom->base()[0x11ab] = 0xc3;
+
+	// patch out ROM checksum error
+	m_rom->base()[0x1d51] = 0x90;
+	m_rom->base()[0x1d52] = 0x90;
+	m_rom->base()[0x1d53] = 0x90;
+	m_rom->base()[0x1d54] = 0x90;
 }
 
 void victor9k_state::machine_reset()
