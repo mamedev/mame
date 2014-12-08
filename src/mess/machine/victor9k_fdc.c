@@ -1114,7 +1114,7 @@ int victor_9000_fdc_t::pll_get_next_bit(attotime &tm, floppy_image_device *flopp
 
 bool victor_9000_fdc_t::pll_write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, const attotime &limit)
 {
-	return cur_pll.write_next_bit(bit, tm, floppy, limit);
+	return cur_pll.write_next_bit_prev_cell(bit, tm, floppy, limit);
 }
 
 void victor_9000_fdc_t::checkpoint()
