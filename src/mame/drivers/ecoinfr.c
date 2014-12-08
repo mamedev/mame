@@ -53,10 +53,19 @@ class ecoinfr_state : public driver_device
 public:
 	ecoinfr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_reel0(*this, "reel0"),
+		m_reel1(*this, "reel1"),
+		m_reel2(*this, "reel2"),
+		m_reel3(*this, "reel3")
+		{ }
 
 	int irq_toggle;
 	int m_optic_pattern;
+	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
+	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
+	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
+	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
 
 	UINT8 port09_value;
 	UINT8 port10_value;
@@ -108,6 +117,10 @@ public:
 
 	DECLARE_MACHINE_START(ecoinfr);
 	required_device<cpu_device> m_maincpu;
+	required_device<stepper_device> m_reel0;
+	required_device<stepper_device> m_reel1;
+	required_device<stepper_device> m_reel2;
+	required_device<stepper_device> m_reel3;
 };
 
 
@@ -151,12 +164,9 @@ WRITE8_MEMBER(ecoinfr_state::ec_port00_out_w)
 		printf("ec_port0a_out_w (reel 1 port) unk bits used %02x\n", data);
 	}
 
-	stepper_update(0, data&0x0f);
+	m_reel0->update(data&0x0f);
 
-	if ( stepper_optic_state(0) ) m_optic_pattern |=  0x01;
-	else                          m_optic_pattern &= ~0x01;
-
-	awp_draw_reel(0);
+	awp_draw_reel(0, m_reel0);
 }
 
 WRITE8_MEMBER(ecoinfr_state::ec_port01_out_w)
@@ -166,12 +176,9 @@ WRITE8_MEMBER(ecoinfr_state::ec_port01_out_w)
 		printf("ec_port01_out_w (reel 2 port) unk bits used %02x\n", data);
 	}
 
-	stepper_update(1, data&0x0f);
+	m_reel1->update(data&0x0f);
 
-	if ( stepper_optic_state(1) ) m_optic_pattern |=  0x02;
-	else                          m_optic_pattern &= ~0x02;
-
-	awp_draw_reel(1);
+	awp_draw_reel(1, m_reel1);
 }
 
 WRITE8_MEMBER(ecoinfr_state::ec_port02_out_w)
@@ -181,12 +188,9 @@ WRITE8_MEMBER(ecoinfr_state::ec_port02_out_w)
 		printf("ec_port02_out_w (reel 3 port) unk bits used %02x\n", data);
 	}
 
-	stepper_update(2, data&0x0f);
+	m_reel2->update(data&0x0f);
 
-	if ( stepper_optic_state(2) ) m_optic_pattern |=  0x04;
-	else                          m_optic_pattern &= ~0x04;
-
-	awp_draw_reel(2);
+	awp_draw_reel(2, m_reel2);
 }
 
 
@@ -766,10 +770,10 @@ void ecoinfr_state::machine_reset()
 
 MACHINE_START_MEMBER(ecoinfr_state,ecoinfr)
 {
-	for ( int n = 0; n < 4; n++ )
-	{
-		stepper_config(machine(), n, &ecoin_interface_200step_reel);
-	}
+	m_reel0->configure(&ecoin_interface_200step_reel);
+	m_reel1->configure(&ecoin_interface_200step_reel);
+	m_reel2->configure(&ecoin_interface_200step_reel);
+	m_reel3->configure(&ecoin_interface_200step_reel);
 }
 
 static MACHINE_CONFIG_START( ecoinfr, ecoinfr_state )
@@ -784,6 +788,13 @@ static MACHINE_CONFIG_START( ecoinfr, ecoinfr_state )
 	MCFG_MACHINE_START_OVERRIDE(ecoinfr_state, ecoinfr )
 
 	MCFG_DEVICE_ADD(UPD8251_TAG, I8251, 0)
+
+	MCFG_DEVICE_ADD("reel0", STEPPER, 0)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinfr_state, reel0_optic_cb))
+	MCFG_DEVICE_ADD("reel1", STEPPER, 0)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinfr_state, reel1_optic_cb))
+	MCFG_DEVICE_ADD("reel2", STEPPER, 0)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinfr_state, reel2_optic_cb))
 MACHINE_CONFIG_END
 
 

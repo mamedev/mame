@@ -18,13 +18,13 @@
 
 static UINT16 reelpos[MAX_STEPPERS];
 
-void awp_draw_reel(int rno)
+void awp_draw_reel(int rno, stepper_device &reel)
 {
 	int x = rno + 1;
 	char rg[16];
 
 	sprintf(rg,"reel%d", x);
-	reelpos[rno] = stepper_get_position(rno);
+	reelpos[rno] = reel.get_position();
 	if (reelpos[rno] == output_get_value(rg))
 	{
 		// Not moved, no need to update.
@@ -34,11 +34,11 @@ void awp_draw_reel(int rno)
 		output_set_value(rg,(reelpos[rno]));
 
 		// if the reel isn't configured don't do this, otherwise you'll get DIV0
-		if (stepper_get_max(rno))
+		if (reel.get_max())
 		{
 			sprintf(rg,"sreel%d", x); // our new scrolling reels are called 'sreel'
 			// normalize the value
-			int sreelpos = (reelpos[rno] * 0x10000) / stepper_get_max(rno);
+			int sreelpos = (reelpos[rno] * 0x10000) / reel.get_max();
 
 			output_set_value(rg,sreelpos);
 		}

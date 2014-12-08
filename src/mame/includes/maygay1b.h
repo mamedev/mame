@@ -44,7 +44,13 @@ public:
 		m_s5_port(*this, "STROBE5"),
 		m_s6_port(*this, "STROBE6"),
 		m_s7_port(*this, "STROBE7"),
-		m_bank1(*this, "bank1")
+		m_bank1(*this, "bank1"),
+		m_reel0(*this, "reel0"),
+		m_reel1(*this, "reel1"),
+		m_reel2(*this, "reel2"),
+		m_reel3(*this, "reel3"),
+		m_reel4(*this, "reel4"),
+		m_reel5(*this, "reel5")
 	{}
 
 	required_device<cpu_device> m_maincpu;
@@ -63,6 +69,12 @@ public:
 	required_ioport m_s6_port;
 	required_ioport m_s7_port;
 	required_memory_bank m_bank1;
+	required_device<stepper_device> m_reel0;
+	required_device<stepper_device> m_reel1;
+	required_device<stepper_device> m_reel2;
+	required_device<stepper_device> m_reel3;
+	required_device<stepper_device> m_reel4;
+	required_device<stepper_device> m_reel5;
 
 	UINT8 m_lamppos;
 	int m_lamp_strobe;
@@ -79,6 +91,12 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER( maygay1b_nmitimer_callback );
 	UINT8 m_Lamps[256];
 	int m_optic_pattern;
+	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
+	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
+	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
+	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
+	DECLARE_WRITE_LINE_MEMBER(reel4_optic_cb) { if (state) m_optic_pattern |= 0x10; else m_optic_pattern &= ~0x10; }
+	DECLARE_WRITE_LINE_MEMBER(reel5_optic_cb) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(lamp_data_w);
 	DECLARE_WRITE8_MEMBER(lamp_data_2_w);
@@ -111,7 +129,6 @@ public:
 	virtual void machine_reset();
 	void cpu0_firq(int data);
 	void cpu0_nmi();
-	void m1_stepper_reset();
 };
 
 MACHINE_CONFIG_EXTERN( maygay_m1 );

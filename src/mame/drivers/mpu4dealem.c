@@ -171,8 +171,6 @@ MACHINE_RESET_MEMBER(mpu4dealem_state,dealem_vid)
 {
 	m_vfd->reset(); //for debug ports only
 
-	mpu4_stepper_reset();
-
 	m_lamp_strobe    = 0;
 	m_lamp_strobe2   = 0;
 	m_led_strobe     = 0;
