@@ -689,24 +689,31 @@ int arcompact_handle04_1f_dasm(DASM_OPS_32)  { print("<illegal 0x04_1f> (%08x)",
 
 int arcompact_handle04_20_dasm(DASM_OPS_32)
 {
+	// todo, other bits (in none long immediate mode at least)
+
+	int size = 4;
 	int C = (op & 0x00000fc0) >> 6;
+	UINT8 condition = op & 0x0000001f;
+
 	op &= ~0x00000fc0;
 	
 	if (C == LIMM_REG)
 	{
 		UINT32 limm;
 		GET_LIMM_32;
-
-
-		print("Jcc %08x (%08x)", limm, op);
+		size = 8;
+		
+		print("J(%s) %08x (%08x)", conditions[condition], limm, op);
 	}
 	else
 	{
-		print("Jcc (%04x) (%08x)", C, op);
+		print("J(%s) (r%d) (%08x)", conditions[condition], C, op);
 	}
 
-	return 4;
+	return size;
 }
+
+
 
 int arcompact_handle04_21_dasm(DASM_OPS_32)  { print("Jcc.D (%08x)", op); return 4;}
 int arcompact_handle04_22_dasm(DASM_OPS_32)  { print("JLcc (%08x)", op); return 4;}
