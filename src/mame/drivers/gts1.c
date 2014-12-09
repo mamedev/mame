@@ -266,6 +266,7 @@ static MACHINE_CONFIG_START( gts1, gts1_state )
     //MCFG_NVRAM_ADD_0FILL("nvram")
 
     /* General Purpose Display and Keyboard */
+    MCFG_DEVICE_ADD( "r10788", R10788, 0 )
     MCFG_R10788_UPDATE( WRITE8(gts1_state,gts1_display_w) )
 
     /* Video */
