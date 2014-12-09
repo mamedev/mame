@@ -25,7 +25,7 @@ READ8_MEMBER( super80_state::pio_port_b_r )
 	m_key_pressed = 3;
 
 	return data;
-};
+}
 
 /**************************** CASSETTE ROUTINES *****************************************************************/
 
