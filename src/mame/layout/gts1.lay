@@ -5,9 +5,9 @@
 <mamelayout version="2">
 
 	<element name="digit8_" defstate="0">
-		<led8seg>
+		<led8seg_gts1>
 			<color red="0.0" green="0.75" blue="1.0" />
-		</led8seg>
+		</led8seg_gts1>
 	</element>
 	<element name="digit7_" defstate="0">
 		<led7seg>
