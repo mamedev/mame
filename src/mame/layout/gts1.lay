@@ -47,7 +47,6 @@
 		<bezel name="digit8_5" element="digit8_">
 			<bounds left="135" top="45" right="155" bottom="84" />
 		</bezel>
-		<!-- Digits 6 and 7 are not used -->
 		<bezel name="digit8_8" element="digit8_">
 			<bounds left="170" top="45" right="190" bottom="84" />
 		</bezel>
@@ -66,7 +65,6 @@
 		<bezel name="digit8_13" element="digit8_">
 			<bounds left="295" top="45" right="315" bottom="84" />
 		</bezel>
-		<!-- Digits 14 and 15 are not used -->
 
 		<!-- Bottom Row -->
 		<bezel name="digit8_16" element="digit8_">
@@ -110,16 +108,16 @@
 
 		<!-- 4 digit display -->
 		<bezel name="digit7_6" element="digit7_">
-			<bounds left="111" top="155" right="131" bottom="194" />
+			<bounds left="121" top="155" right="136" bottom="189" />
 		</bezel>
 		<bezel name="digit7_7" element="digit7_">
-			<bounds left="135" top="155" right="155" bottom="194" />
+			<bounds left="140" top="155" right="155" bottom="189" />
 		</bezel>
 		<bezel name="digit7_14" element="digit7_">
-			<bounds left="170" top="155" right="190" bottom="194" />
+			<bounds left="170" top="155" right="185" bottom="189" />
 		</bezel>
 		<bezel name="digit7_15" element="digit7_">
-			<bounds left="194" top="155" right="214" bottom="194" />
+			<bounds left="189" top="155" right="204" bottom="189" />
 		</bezel>
 	</view>
 </mamelayout>
