@@ -78,20 +78,22 @@ unknown cycle: CME, SSE, SSS
 #define M_CKM               0x00000040 /* CKB to MEM */
 #define M_CKN               0x00000080 /* CKB to -ALU */
 #define M_CKP               0x00000100 /* CKB to +ALU */
-#define M_CME               0x00000200 /* Conditional Memory Enable */
-#define M_DMTP              0x00000400 /* DAM to +ALU */
-#define M_MTN               0x00000800 /* MEM to -ALU */
-#define M_MTP               0x00001000 /* MEM to +ALU */
-#define M_NATN              0x00002000 /* ~ACC to -ALU */
-#define M_NDMTP             0x00004000 /* ~DAM to +ALU */
-#define M_NE                0x00008000 /* COMP to STATUS */
-#define M_SSE               0x00010000 /* Special Status Enable */
-#define M_SSS               0x00020000 /* Special Status Sample */
-#define M_STO               0x00040000 /* ACC to MEM */
-#define M_STSL              0x00080000 /* STATUS to Status Latch */
-#define M_YTP               0x00100000 /* Y to +ALU */
+#define M_MTN               0x00000200 /* MEM to -ALU */
+#define M_MTP               0x00000400 /* MEM to +ALU */
+#define M_NATN              0x00000800 /* ~ACC to -ALU */
+#define M_NE                0x00001000 /* COMP to STATUS */
+#define M_STO               0x00002000 /* ACC to MEM */
+#define M_STSL              0x00004000 /* STATUS to Status Latch */
+#define M_YTP               0x00008000 /* Y to +ALU */
 
-#define M_RSTR              0x00200000 /* -> F_RSTR */
+#define M_CME               0x00010000 /* Conditional Memory Enable */
+#define M_DMTP              0x00020000 /* DAM to +ALU */
+#define M_NDMTP             0x00040000 /* ~DAM to +ALU */
+#define M_SSE               0x00080000 /* Special Status Enable */
+#define M_SSS               0x00100000 /* Special Status Sample */
+
+#define M_RSTR              0x00200000 /* -> line #36, F_RSTR (TMC02x0 custom) */
+#define M_UNK1              0x00400000 /* -> line #37, F_???? (TMC0270 custom) */
 
 /* Standard/fixed instructions - these are documented more in their specific handlers below */
 #define F_BR                0x00000001
@@ -102,17 +104,18 @@ unknown cycle: CME, SSE, SSS
 #define F_COMX8             0x00000020
 #define F_LDP               0x00000040
 #define F_LDX               0x00000080
-#define F_OFF               0x00000100
-#define F_RBIT              0x00000200
-#define F_REAC              0x00000400
-#define F_RETN              0x00000800
-#define F_RSTR              0x00001000
-#define F_SAL               0x00002000
-#define F_SBIT              0x00004000
-#define F_SBL               0x00008000
-#define F_SEAC              0x00010000
-#define F_SETR              0x00020000
-#define F_TDO               0x00040000
+#define F_RBIT              0x00000100
+#define F_RETN              0x00000200
+#define F_RSTR              0x00000400
+#define F_SBIT              0x00000800
+#define F_SETR              0x00001000
+#define F_TDO               0x00002000
+
+#define F_OFF               0x00004000
+#define F_REAC              0x00008000
+#define F_SAL               0x00010000
+#define F_SBL               0x00020000
+#define F_SEAC              0x00040000
 #define F_XDA               0x00080000
 
 
@@ -311,7 +314,7 @@ static MACHINE_CONFIG_FRAGMENT(tmc0270)
 	// main opcodes PLA, microinstructions PLA, output PLA
 	MCFG_PLA_ADD("ipla", 9, 22, 24)
 	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
-	MCFG_PLA_ADD("mpla", 6, 21, 64)
+	MCFG_PLA_ADD("mpla", 6, 22, 64)
 	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
 	MCFG_PLA_ADD("opla", 6, 16, 48)
 	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
@@ -508,6 +511,7 @@ void tms1xxx_cpu_device::device_reset()
 	// clear outputs
 	m_r = 0;
 	m_write_r(0, m_r & m_r_mask, 0xffff);
+	m_o_latch = 0;
 	write_o_output(0);
 	m_write_r(0, m_r & m_r_mask, 0xffff);
 }
@@ -617,11 +621,12 @@ UINT32 tms0980_cpu_device::decode_micro(UINT8 sel)
 	UINT32 mask = m_mpla->read(sel);
 	mask ^= 0x43fc3; // invert active-negative
 	
-	// note: M_RSTR is specific to TMC02x0, it redirects to F_RSTR
+	// M_RSTR is specific to TMC02x0, it redirects to F_RSTR
+	// M_UNK1 is specific to TMC0270, unknown yet
 	//                      _______  ______                                _____  _____  _____  _____  ______  _____  ______  _____                            _____
-	const UINT32 md[21] = { M_NDMTP, M_DMTP, M_AUTY, M_AUTA, M_CKM, M_SSE, M_CKP, M_YTP, M_MTP, M_ATN, M_NATN, M_MTN, M_15TN, M_CKN, M_NE, M_C8, M_SSS, M_CME, M_CIN, M_STO, M_RSTR };
+	const UINT32 md[22] = { M_NDMTP, M_DMTP, M_AUTY, M_AUTA, M_CKM, M_SSE, M_CKP, M_YTP, M_MTP, M_ATN, M_NATN, M_MTN, M_15TN, M_CKN, M_NE, M_C8, M_SSS, M_CME, M_CIN, M_STO, M_RSTR, M_UNK1 };
 	
-	for (int bit = 0; bit < 21 && bit < m_mpla->outputs(); bit++)
+	for (int bit = 0; bit < 22 && bit < m_mpla->outputs(); bit++)
 		if (mask & (1 << bit))
 			decode |= md[bit];
 	
@@ -722,6 +727,8 @@ void tmc0270_cpu_device::read_opcode()
 	// RSTR is on the mpla
 	if (m_micro & M_RSTR)
 		m_fixed |= F_RSTR;
+	
+	// TODO: M_UNK1
 }
 
 
