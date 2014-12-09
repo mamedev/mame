@@ -103,8 +103,13 @@ void ticalc1x_state::leds_update()
 	// on difference, send to output
 	for (int i = 0; i < 0x10; i++)
 		if (m_leds_cache[i] != active_state[i])
+		{
 			output_set_digit_value(i, active_state[i]);
-	
+			
+			for (int j = 0; j < 8; j++)
+				output_set_lamp_value(i*10 + j, active_state[i] >> j & 1);
+		}
+
 	memcpy(m_leds_cache, active_state, sizeof(m_leds_cache));
 }
 
@@ -221,12 +226,9 @@ READ8_MEMBER(ticalc1x_state::wizatron_read_k)
 WRITE16_MEMBER(ticalc1x_state::wizatron_write_r)
 {
 	// R0-R8: select digit (right-to-left)
+	// note: 3rd digit is custom(not 7seg), for math symbols
 	for (int i = 0; i < 9; i++)
 		m_leds_state[i] = (data >> i & 1) ? m_o : 0;
-	
-	// 3rd digit has more segments, for math symbols
-	// let's assume it's a 14-seg led
-	m_leds_state[6] = BITSWAP16(m_leds_state[6],15,14,2,1,6,4,3,0,5,5,11,10,9,13,12,8);
 	
 	// 6th digit only has A and G for =
 	m_leds_state[3] &= 0x41;
