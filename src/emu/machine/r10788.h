@@ -60,8 +60,10 @@ private:
     UINT8        m_kts;                 //!< transfer keyboard strobe value
     UINT8        m_kla;                 //!< display register A value
     UINT8        m_klb;                 //!< display register B value
-    UINT8        m_enable;              //!< display enable flags for A (1) and B (2)
+    UINT8        m_mask_a;              //!< display enable bits for A
+    UINT8        m_mask_b;              //!< display enable bits for B
     UINT8        m_ker;                 //!< keyboard error value
+    int          m_io_counter;          //!< current I/O register index
     int          m_scan_counter;        //!< current display scan
     devcb_write8 m_display;             //!< display updater
     emu_timer*   m_timer;               //!< timer running at clock / 18 / 36

@@ -216,6 +216,7 @@ DRIVER_INIT_MEMBER(gts1_state,gts1)
  */
 WRITE8_MEMBER(gts1_state::gts1_display_w)
 {
+    LOG(("%s: offset:%d data:%02x\n", __FUNCTION__, offset, data));
     output_set_digit_value(offset, data);
 }
 
