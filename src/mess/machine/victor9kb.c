@@ -9,6 +9,37 @@
 
 *********************************************************************/
 
+/*
+
+PCB Layout
+----------
+
+A65-02307-201D
+
+|-----------------------------------------------------------------------|
+|    22-008-03  22-050-3B     8021    74LS14                         CN1|
+|                            ?MHz                                       |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|-----------------------------------------------------------------------|
+
+Notes:
+    All IC's shown.
+
+    8021        - Intel 8021 "70-8021-130?"
+    22-008-03   - Exar Semiconductor XR22-008-03 keyboard matrix capacitive readout latch
+    22-050-3B   - Exar Semiconductor XR22-050-3B keyboard matrix row driver with 4 to 12 decoder/demultiplexer
+    CN1         - keyboard data connector
+
+*/
+
 #include "victor9kb.h"
 
 
