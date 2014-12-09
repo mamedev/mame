@@ -403,6 +403,31 @@ int arcompact_handle18_07_1d_dasm(DASM_OPS_16);
 int arcompact_handle18_07_1e_dasm(DASM_OPS_16);
 int arcompact_handle18_07_1f_dasm(DASM_OPS_16);
 
+int arcompact_handle19_00_dasm(DASM_OPS_16);
+int arcompact_handle19_01_dasm(DASM_OPS_16);
+int arcompact_handle19_02_dasm(DASM_OPS_16);
+int arcompact_handle19_03_dasm(DASM_OPS_16);
+
+int arcompact_handle1c_00_dasm(DASM_OPS_16);
+int arcompact_handle1c_01_dasm(DASM_OPS_16);
+
+int arcompact_handle1d_00_dasm(DASM_OPS_16);
+int arcompact_handle1d_01_dasm(DASM_OPS_16);
+
+int arcompact_handle1e_00_dasm(DASM_OPS_16);
+int arcompact_handle1e_01_dasm(DASM_OPS_16);
+int arcompact_handle1e_02_dasm(DASM_OPS_16);
+int arcompact_handle1e_03_dasm(DASM_OPS_16);
+
+int arcompact_handle1e_03_00_dasm(DASM_OPS_16);
+int arcompact_handle1e_03_01_dasm(DASM_OPS_16);
+int arcompact_handle1e_03_02_dasm(DASM_OPS_16);
+int arcompact_handle1e_03_03_dasm(DASM_OPS_16);
+int arcompact_handle1e_03_04_dasm(DASM_OPS_16);
+int arcompact_handle1e_03_05_dasm(DASM_OPS_16);
+int arcompact_handle1e_03_06_dasm(DASM_OPS_16);
+int arcompact_handle1e_03_07_dasm(DASM_OPS_16);
+
 
 
 // condition codes (basic ones are the same as arc 
@@ -2036,9 +2061,25 @@ int arcompact_handle18_07_1f_dasm(DASM_OPS_16)  { print("<illegal 0x18_07_1f> (%
 
 int arcompact_handle19_dasm(DASM_OPS_16)
 {
-	print("GP Instr (%04x)",  op);
-	return 2;
+	int size = 2;
+	UINT8 subinstr = (op & 0x0600) >> 9;
+	op &= ~0x0600;
+
+	switch (subinstr)
+	{
+		case 0x00: size = arcompact_handle19_00_dasm(DASM_PARAMS); break; // LD_S (GP)
+		case 0x01: size = arcompact_handle19_01_dasm(DASM_PARAMS); break; // LDB_S (GP)
+		case 0x02: size = arcompact_handle19_02_dasm(DASM_PARAMS); break; // LDW_S (GP)
+		case 0x03: size = arcompact_handle19_03_dasm(DASM_PARAMS); break; // ADD_S (GP)
+	}
+	return size;
 }
+
+int arcompact_handle19_00_dasm(DASM_OPS_16)  { print("LD_S r0 <- m[GP + s11].long (%04x)",  op); return 2;}
+int arcompact_handle19_01_dasm(DASM_OPS_16)  { print("LDB_S r0 <- m[GP + s9].byte (%04x)",  op); return 2;}
+int arcompact_handle19_02_dasm(DASM_OPS_16)  { print("LDW_S r0 <- m[GP + s10].word (%04x)",  op); return 2;}
+int arcompact_handle19_03_dasm(DASM_OPS_16)  { print("ADD_S r0 <- GP + s11 (%04x)",  op); return 2;}
+
 
 
 int arcompact_handle1a_dasm(DASM_OPS_16)
@@ -2055,21 +2096,93 @@ int arcompact_handle1b_dasm(DASM_OPS_16)
 
 int arcompact_handle1c_dasm(DASM_OPS_16)
 {
-	print("ADD_S/CMP_S (%04x)", op);
-	return 2;
+	int size = 2;
+	UINT8 subinstr = (op & 0x0080) >> 7;
+	op &= ~0x0080;
+
+	switch (subinstr)
+	{
+		case 0x00: size = arcompact_handle1c_00_dasm(DASM_PARAMS); break; // ADD_S
+		case 0x01: size = arcompact_handle1c_01_dasm(DASM_PARAMS); break; // CMP_S
+	}
+	return size;
 }
+
+int arcompact_handle1c_00_dasm(DASM_OPS_16)  { print("ADD_S b <- b + u7 (%04x)",  op); return 2;}
+int arcompact_handle1c_01_dasm(DASM_OPS_16)  { print("CMP_S b - u7 (%04x)",  op); return 2;}
+
 
 int arcompact_handle1d_dasm(DASM_OPS_16)
 {
-	print("BRcc_S (%04x)", op);
-	return 2;
+	int size = 2;
+	UINT8 subinstr = (op & 0x0080) >> 7;
+	op &= ~0x0080;
+
+	switch (subinstr)
+	{
+		case 0x00: size = arcompact_handle1d_00_dasm(DASM_PARAMS); break; // BREQ_S
+		case 0x01: size = arcompact_handle1d_01_dasm(DASM_PARAMS); break; // BRNE_S
+	}
+	return size;
 }
+
+int arcompact_handle1d_00_dasm(DASM_OPS_16)  { print("BREQ_S (%04x)",  op); return 2;}
+int arcompact_handle1d_01_dasm(DASM_OPS_16)  { print("BRNE_S (%04x)",  op); return 2;}
+
 
 int arcompact_handle1e_dasm(DASM_OPS_16)
 {
-	print("Bcc_S (%04x)", op);
-	return 2;
+	int size = 2;
+	UINT8 subinstr = (op & 0x0600) >> 9;
+	op &= ~0x0600;
+
+	switch (subinstr)
+	{
+		case 0x00: size = arcompact_handle1e_00_dasm(DASM_PARAMS); break; // B_S
+		case 0x01: size = arcompact_handle1e_01_dasm(DASM_PARAMS); break; // BEQ_S
+		case 0x02: size = arcompact_handle1e_02_dasm(DASM_PARAMS); break; // BNE_S
+		case 0x03: size = arcompact_handle1e_03_dasm(DASM_PARAMS); break; // Bcc_S
+	}
+	return size;
 }
+
+int arcompact_handle1e_00_dasm(DASM_OPS_16)  { print("B_S (%04x)",  op); return 2;}
+int arcompact_handle1e_01_dasm(DASM_OPS_16)  { print("BEQ_S (%04x)",  op); return 2;}
+int arcompact_handle1e_02_dasm(DASM_OPS_16)  { print("BNE_S (%04x)",  op); return 2;}
+
+
+int arcompact_handle1e_03_dasm(DASM_OPS_16)
+{
+	
+	int size = 2;
+	UINT8 subinstr2 = (op & 0x01c0) >> 6;
+	op &= ~0x01c0;
+
+	switch (subinstr2)
+	{
+		case 0x00: size = arcompact_handle1e_03_00_dasm(DASM_PARAMS); break; // BGT_S
+		case 0x01: size = arcompact_handle1e_03_01_dasm(DASM_PARAMS); break; // BGE_S 
+		case 0x02: size = arcompact_handle1e_03_02_dasm(DASM_PARAMS); break; // BLT_S
+		case 0x03: size = arcompact_handle1e_03_03_dasm(DASM_PARAMS); break; // BLE_S
+		case 0x04: size = arcompact_handle1e_03_04_dasm(DASM_PARAMS); break; // BHI_S
+		case 0x05: size = arcompact_handle1e_03_05_dasm(DASM_PARAMS); break; // BHS_S
+		case 0x06: size = arcompact_handle1e_03_06_dasm(DASM_PARAMS); break; // BLO_S
+		case 0x07: size = arcompact_handle1e_03_07_dasm(DASM_PARAMS); break; // BLS_S 
+	}
+	return size;
+
+}
+
+int arcompact_handle1e_03_00_dasm(DASM_OPS_16)  { print("BGT_S (%04x)",  op); return 2;}
+int arcompact_handle1e_03_01_dasm(DASM_OPS_16)  { print("BGE_S (%04x)",  op); return 2;}
+int arcompact_handle1e_03_02_dasm(DASM_OPS_16)  { print("BLT_S (%04x)",  op); return 2;}
+int arcompact_handle1e_03_03_dasm(DASM_OPS_16)  { print("BLE_S (%04x)",  op); return 2;}
+int arcompact_handle1e_03_04_dasm(DASM_OPS_16)  { print("BHI_S (%04x)",  op); return 2;}
+int arcompact_handle1e_03_05_dasm(DASM_OPS_16)  { print("BHS_S (%04x)",  op); return 2;}
+int arcompact_handle1e_03_06_dasm(DASM_OPS_16)  { print("BLO_S (%04x)",  op); return 2;}
+int arcompact_handle1e_03_07_dasm(DASM_OPS_16)  { print("BLS_S (%04x)",  op); return 2;}
+
+
 
 int arcompact_handle1f_dasm(DASM_OPS_16)
 {
