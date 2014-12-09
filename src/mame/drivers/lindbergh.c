@@ -323,7 +323,7 @@ Sega 2005
 #include "machine/segabb.h"
 #include "sound/pci-ac97.h"
 #include "sound/sb0400.h"
-#include "video/gf6800gt.h"
+#include "video/gf7600gs.h"
 
 class lindbergh_state : public driver_device
 {
@@ -352,7 +352,7 @@ static MACHINE_CONFIG_START(lindbergh, lindbergh_state)
 	MCFG_PCI_ROOT_ADD(                ":pci")
 	MCFG_I82875P_HOST_ADD(            ":pci:00.0",                        0x103382c0, ":maincpu", 512*1024*1024)
 	MCFG_I82875P_AGP_ADD(             ":pci:01.0")
-	MCFG_GEFORCE_6800GT_ADD(          ":pci:01.0:00.0",                   0x10de0204)
+	MCFG_GEFORCE_7600GS_ADD(          ":pci:01.0:00.0",                   0x10de02e1)
 	MCFG_PCI_BRIDGE_ADD(              ":pci:1c.0",      0x808625ae, 0x02)
 	MCFG_I82541PI_ADD(                ":pci:1c.0:00.0",                   0x103382c0)
 	MCFG_USB_UHCI_ADD(                ":pci:1d.0",      0x808625a9, 0x02, 0x103382c0)
