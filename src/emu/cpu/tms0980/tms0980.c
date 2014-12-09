@@ -397,6 +397,7 @@ void tms1xxx_cpu_device::device_start()
 	m_r = 0;
 	m_o = 0;
 	m_o_latch = 0;
+	m_o_latch_low = 0;
 	m_cki_bus = 0;
 	m_c4 = 0;
 	m_p = 0;
@@ -423,7 +424,7 @@ void tms1xxx_cpu_device::device_start()
 
 	m_a_prev = m_a;
 	m_r_prev = m_r;
-	m_o_prev = m_o;
+	m_o_latch_prev = m_o;
 
 	// register for savestates
 	save_item(NAME(m_pc));
@@ -439,6 +440,7 @@ void tms1xxx_cpu_device::device_start()
 	save_item(NAME(m_r));
 	save_item(NAME(m_o));
 	save_item(NAME(m_o_latch));
+	save_item(NAME(m_o_latch_low));
 	save_item(NAME(m_cki_bus));
 	save_item(NAME(m_c4));
 	save_item(NAME(m_p));
@@ -465,7 +467,7 @@ void tms1xxx_cpu_device::device_start()
 
 	save_item(NAME(m_a_prev));
 	save_item(NAME(m_r_prev));
-	save_item(NAME(m_o_prev));
+	save_item(NAME(m_o_latch_prev));
 
 	// register state for debugger
 	state_add(TMS0980_PC,     "PC",     m_pc    ).formatstr("%02X");
@@ -511,9 +513,11 @@ void tms1xxx_cpu_device::device_reset()
 	// clear outputs
 	m_r = 0;
 	m_write_r(0, m_r & m_r_mask, 0xffff);
+	m_o_latch_low = 0;
 	m_o_latch = 0;
 	write_o_output(0);
 	m_write_r(0, m_r & m_r_mask, 0xffff);
+	m_power_off(0);
 }
 
 
@@ -741,10 +745,6 @@ void tms1xxx_cpu_device::write_o_output(UINT8 data)
 {
 	// a hardcoded table is supported if the output pla is unknown
 	m_o = (c_output_pla == NULL) ? m_opla->read(data) : c_output_pla[data];
-	
-	if ((m_o & 0xff00) == 0xff00)
-		logerror("unknown output pla mapping for index %02X\n", data);
-	
 	m_write_o(0, m_o & m_o_mask, 0xffff);
 }
 
@@ -761,7 +761,7 @@ void tmc0270_cpu_device::dynamic_output()
 	
 	m_a_prev = m_a;
 	m_r_prev = m_r;
-	m_o_prev = m_o;
+	m_o_latch_prev = m_o_latch;
 }
 
 
@@ -965,8 +965,7 @@ void tms1xxx_cpu_device::op_xda()
 
 void tms1xxx_cpu_device::op_off()
 {
-	// OFF: request power off
-	logerror("%s: power-off request\n", tag());
+	// OFF: request auto power-off
 	m_power_off(1);
 }
 
@@ -1000,9 +999,9 @@ void tmc0270_cpu_device::op_tdo()
 {
 	// TDO: transfer data out
 	if (m_status)
-		m_o_latch = m_a;
+		m_o_latch_low = m_a;
 	else
-		m_o = m_o_latch | (m_a << 4 & 0x30);
+		m_o_latch = m_o_latch_low | (m_a << 4 & 0x30);
 	
 	// handled further in dynamic_output
 }

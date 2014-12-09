@@ -131,8 +131,9 @@ protected:
 	UINT16  m_r;
 	UINT16  m_r_prev;
 	UINT16  m_o;
-	UINT16  m_o_prev;
-	UINT16  m_o_latch;   // TMC0270 hold latch
+	UINT8   m_o_latch;   // TMC0270 hold latch
+	UINT8   m_o_latch_low;
+	UINT8   m_o_latch_prev;
 	UINT8   m_cki_bus;
 	UINT8   m_c4;
 	UINT8   m_p;         // 4-bit adder p(lus)-input
