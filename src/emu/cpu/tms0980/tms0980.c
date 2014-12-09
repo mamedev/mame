@@ -424,7 +424,7 @@ void tms1xxx_cpu_device::device_start()
 
 	m_a_prev = m_a;
 	m_r_prev = m_r;
-	m_o_latch_prev = m_o;
+	m_o_latch_prev = m_o_latch;
 
 	// register for savestates
 	save_item(NAME(m_pc));

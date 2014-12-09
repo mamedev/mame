@@ -9,10 +9,6 @@
   press BASIC/INTER/ADV and enter P#(number of players), then
   START TURN. Refer to the official manual for more information.
 
-
-  TODO:
-  - MCU clock is unknown
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -21,8 +17,8 @@
 
 #include "starwbc.lh"
 
-// master clock is unknown, the value below is an approximation
-// (patent says R=51K, C=47pf, but then it sounds too low pitched)
+// master clock is a single stage RC oscillator: R=51K, C=47pf,
+// according to the TMS 1000 series data manual this is around 350kHz
 #define MASTER_CLOCK (350000)
 
 
