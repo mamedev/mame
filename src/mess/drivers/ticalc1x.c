@@ -8,7 +8,6 @@
 
   
   TODO:
-  - ON/OFF button callbacks, and support OFF callback from the 0980
   - MCU clocks are unknown
 
 ***************************************************************************/
@@ -36,6 +35,7 @@ public:
 
 	UINT16 m_r;
 	UINT16 m_o;
+	bool m_power;
 
 	UINT16 m_leds_state[0x10];
 	UINT16 m_leds_cache[0x10];
@@ -58,9 +58,13 @@ public:
 	DECLARE_WRITE16_MEMBER(ti30_write_o);
 	DECLARE_WRITE16_MEMBER(ti30_write_r);
 
+	DECLARE_INPUT_CHANGED_MEMBER(power_button);
+	DECLARE_WRITE_LINE_MEMBER(auto_power_off);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(leds_decay_tick);
 	void leds_update();
 
+	virtual void machine_reset();
 	virtual void machine_start();
 };
 
@@ -95,7 +99,7 @@ void ticalc1x_state::leds_update()
 				m_leds_decay[di] = LEDS_DECAY_TIME;
 			
 			// determine active state
-			int ds = (m_leds_decay[di] != 0) ? 1 : 0;
+			int ds = (m_power && m_leds_decay[di] != 0) ? 1 : 0;
 			active_state[i] |= (ds << j);
 		}
 	}
@@ -290,6 +294,12 @@ WRITE16_MEMBER(ticalc1x_state::ti30_write_o)
 
 ***************************************************************************/
 
+INPUT_CHANGED_MEMBER(ticalc1x_state::power_button)
+{
+	m_power = (bool)(FPTR)param;
+	m_maincpu->set_input_line(INPUT_LINE_RESET, m_power ? CLEAR_LINE : ASSERT_LINE);
+}
+
 static INPUT_PORTS_START( tisr16 )
 	PORT_START("IN.0") // R0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -483,11 +493,11 @@ static INPUT_PORTS_START( ti30 )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.8") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("ON/C")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("ON/C") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, power_button, (void *)true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_NAME("1/x")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME(UTF8_SQUAREROOT"x")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x"UTF8_POW_2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("OFF")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("OFF") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, power_button, (void *)false)
 INPUT_PORTS_END
 
 
@@ -546,11 +556,11 @@ static INPUT_PORTS_START( tiprog )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.8") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_PGUP) PORT_NAME("C/ON")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_PGUP) PORT_NAME("C/ON") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, power_button, (void *)true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_NAME("DEC")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_NAME("OCT")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_NAME("HEX")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("OFF")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("OFF") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, power_button, (void *)false)
 INPUT_PORTS_END
 
 
@@ -610,11 +620,11 @@ static INPUT_PORTS_START( tibusan1 )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.8") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("ON/C")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("ON/C") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, power_button, (void *)true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("2nd")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x"UTF8_POW_2"  "UTF8_SQUAREROOT"x")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_NAME("ln(x)  e"UTF8_POW_X)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("OFF")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("OFF") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, power_button, (void *)false)
 INPUT_PORTS_END
 
 
@@ -625,19 +635,41 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
+WRITE_LINE_MEMBER(ticalc1x_state::auto_power_off)
+{
+	// TMS0980 auto power-off opcode
+	if (state)
+	{
+		m_power = false;
+		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	}
+}
+
+
+void ticalc1x_state::machine_reset()
+{
+	m_power = true;
+}
+
 void ticalc1x_state::machine_start()
 {
+	// zerofill
 	memset(m_leds_state, 0, sizeof(m_leds_state));
 	memset(m_leds_cache, 0, sizeof(m_leds_cache));
 	memset(m_leds_decay, 0, sizeof(m_leds_decay));
+
 	m_r = 0;
 	m_o = 0;
+	m_power = false;
 
+	// register for savestates
 	save_item(NAME(m_leds_state));
 	save_item(NAME(m_leds_cache));
 	save_item(NAME(m_leds_decay));
+
 	save_item(NAME(m_r));
 	save_item(NAME(m_o));
+	save_item(NAME(m_power));
 }
 
 
@@ -693,6 +725,7 @@ static MACHINE_CONFIG_DERIVED( ti30, t9base )
 	MCFG_TMS1XXX_READ_K_CB(READ8(ticalc1x_state, ti30_read_k))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, ti30_write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, ti30_write_r))
+	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(ticalc1x_state, auto_power_off))
 
 	MCFG_DEFAULT_LAYOUT(layout_ti30)
 MACHINE_CONFIG_END

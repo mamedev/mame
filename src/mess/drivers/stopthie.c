@@ -11,7 +11,6 @@
 
 
   TODO:
-  - ON/OFF button callbacks
   - MCU clock is unknown
   - stopthiep: unable to start a game (may be intentional?)
 
@@ -42,6 +41,7 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 
 	UINT16 m_o;
+	bool m_power;
 
 	UINT16 m_leds_state[0x10];
 	UINT16 m_leds_cache[0x10];
@@ -51,9 +51,13 @@ public:
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_WRITE16_MEMBER(write_r);
 
+	DECLARE_INPUT_CHANGED_MEMBER(power_button);
+	DECLARE_WRITE_LINE_MEMBER(auto_power_off);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(leds_decay_tick);
 	void leds_update();
 
+	virtual void machine_reset();
 	virtual void machine_start();
 };
 
@@ -88,7 +92,7 @@ void stopthief_state::leds_update()
 				m_leds_decay[di] = LEDS_DECAY_TIME;
 			
 			// determine active state
-			int ds = (m_leds_decay[di] != 0) ? 1 : 0;
+			int ds = (m_power && m_leds_decay[di] != 0) ? 1 : 0;
 			active_state[i] |= (ds << j);
 		}
 	}
@@ -164,6 +168,12 @@ WRITE16_MEMBER(stopthief_state::write_o)
 
 ***************************************************************************/
 
+INPUT_CHANGED_MEMBER(stopthief_state::power_button)
+{
+	m_power = (bool)(FPTR)param;
+	m_maincpu->set_input_line(INPUT_LINE_RESET, m_power ? CLEAR_LINE : ASSERT_LINE);
+}
+
 /* physical button layout and labels is like this:
 
     [1] [2] [OFF]
@@ -190,11 +200,11 @@ static INPUT_PORTS_START( stopthief )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.2") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("On")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, stopthief_state, power_button, (void *)true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_NAME("Tip")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_NAME("Arrest")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_NAME("Clue")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, stopthief_state, power_button, (void *)false)
 INPUT_PORTS_END
 
 
@@ -205,17 +215,39 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
+WRITE_LINE_MEMBER(stopthief_state::auto_power_off)
+{
+	// TMS0980 auto power-off opcode
+	if (state)
+	{
+		m_power = false;
+		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	}
+}
+
+
+void stopthief_state::machine_reset()
+{
+	m_power = true;
+}
+
 void stopthief_state::machine_start()
 {
+	// zerofill
 	memset(m_leds_state, 0, sizeof(m_leds_state));
 	memset(m_leds_cache, 0, sizeof(m_leds_cache));
 	memset(m_leds_decay, 0, sizeof(m_leds_decay));
-	m_o = 0;
 
+	m_o = 0;
+	m_power = false;
+
+	// register for savestates
 	save_item(NAME(m_leds_state));
 	save_item(NAME(m_leds_cache));
 	save_item(NAME(m_leds_decay));
+
 	save_item(NAME(m_o));
+	save_item(NAME(m_power));
 }
 
 
@@ -226,6 +258,7 @@ static MACHINE_CONFIG_START( stopthief, stopthief_state )
 	MCFG_TMS1XXX_READ_K_CB(READ8(stopthief_state, read_k))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(stopthief_state, write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(stopthief_state, write_r))
+	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(stopthief_state, auto_power_off))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("leds_decay", stopthief_state, leds_decay_tick, attotime::from_msec(10))
 	
