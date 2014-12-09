@@ -295,12 +295,29 @@ int arcompact_handle05_3e_dasm(DASM_OPS_32);
 int arcompact_handle05_3f_dasm(DASM_OPS_32);
 
 
+int arcompact_handle0c_00_dasm(DASM_OPS_16);
+int arcompact_handle0c_01_dasm(DASM_OPS_16);
+int arcompact_handle0c_02_dasm(DASM_OPS_16);
+int arcompact_handle0c_03_dasm(DASM_OPS_16);
 
+int arcompact_handle0d_00_dasm(DASM_OPS_16);
+int arcompact_handle0d_01_dasm(DASM_OPS_16);
+int arcompact_handle0d_02_dasm(DASM_OPS_16);
+int arcompact_handle0d_03_dasm(DASM_OPS_16);
 
 int arcompact_handle0e_00_dasm(DASM_OPS_16);
 int arcompact_handle0e_01_dasm(DASM_OPS_16);
 int arcompact_handle0e_02_dasm(DASM_OPS_16);
 int arcompact_handle0e_03_dasm(DASM_OPS_16);
+
+int arcompact_handle17_00_dasm(DASM_OPS_16);
+int arcompact_handle17_01_dasm(DASM_OPS_16);
+int arcompact_handle17_02_dasm(DASM_OPS_16);
+int arcompact_handle17_03_dasm(DASM_OPS_16);
+int arcompact_handle17_04_dasm(DASM_OPS_16);
+int arcompact_handle17_05_dasm(DASM_OPS_16);
+int arcompact_handle17_06_dasm(DASM_OPS_16);
+int arcompact_handle17_07_dasm(DASM_OPS_16);
 
 int arcompact_handle18_00_dasm(DASM_OPS_16);
 int arcompact_handle18_01_dasm(DASM_OPS_16);
@@ -1332,15 +1349,94 @@ int arcompact_handle0b_dasm(DASM_OPS_32)
 
 int arcompact_handle0c_dasm(DASM_OPS_16)
 {
-	print("Load/Add reg-reg (%04x)", op);
-	return 2;
+	int size = 2;
+	UINT8 subinstr = (op & 0x0018) >> 3;
+	op &= ~0x0018;
+
+	switch (subinstr)
+	{
+		case 0x00: size = arcompact_handle0c_00_dasm(DASM_PARAMS); break; // LD_S
+		case 0x01: size = arcompact_handle0c_01_dasm(DASM_PARAMS); break; // LDB_S
+		case 0x02: size = arcompact_handle0c_02_dasm(DASM_PARAMS); break; // LDW_S
+		case 0x03: size = arcompact_handle0c_03_dasm(DASM_PARAMS); break; // ADD_S
+	}
+	return size;
 }
+
+
+int arcompact_handle0c_00_dasm(DASM_OPS_16)
+{
+	int size = 2;
+	print("LD_S a <- m[b + c].long (%04x)", op);
+	return size;
+}
+
+int arcompact_handle0c_01_dasm(DASM_OPS_16)
+{
+	int size = 2;
+	print("LDB_S a <- m[b + c].byte (%04x)", op);
+	return size;
+}
+
+int arcompact_handle0c_02_dasm(DASM_OPS_16)
+{
+	int size = 2;
+	print("LDW_S a <- m[b + c].word (%04x)", op);
+	return size;
+}
+
+int arcompact_handle0c_03_dasm(DASM_OPS_16)
+{
+	int size = 2;
+	print("ADD_S a <- b + c (%04x)", op);
+	return size;
+}
+
 
 int arcompact_handle0d_dasm(DASM_OPS_16)
 {
-	print("Add/Sub/Shft imm (%04x)", op);
-	return 2;
+	int size = 2;
+	UINT8 subinstr = (op & 0x0018) >> 3;
+	op &= ~0x0018;
+
+	switch (subinstr)
+	{
+		case 0x00: size = arcompact_handle0d_00_dasm(DASM_PARAMS); break; // ADD_S
+		case 0x01: size = arcompact_handle0d_01_dasm(DASM_PARAMS); break; // SUB_S
+		case 0x02: size = arcompact_handle0d_02_dasm(DASM_PARAMS); break; // ASL_S
+		case 0x03: size = arcompact_handle0d_03_dasm(DASM_PARAMS); break; // ASR_S
+	}
+	return size;
 }
+
+int arcompact_handle0d_00_dasm(DASM_OPS_16)
+{
+	int size = 2;
+	print("ADD_S c <- b + u3 (%04x)", op);
+	return size;
+}
+
+int arcompact_handle0d_01_dasm(DASM_OPS_16)
+{
+	int size = 2;
+	print("SUB_S c <- b - u3 (%04x)", op);
+	return size;
+}
+
+int arcompact_handle0d_02_dasm(DASM_OPS_16)
+{
+	int size = 2;
+	print("ASL_S c <- b asl u3 (%04x)", op);
+	return size;
+}
+
+int arcompact_handle0d_03_dasm(DASM_OPS_16)
+{
+	int size = 2;
+	print("ASL_S c <- b asr u3 (%04x)", op);
+	return size;
+}
+
 
 int arcompact_handle0e_dasm(DASM_OPS_16)
 {
@@ -1357,6 +1453,8 @@ int arcompact_handle0e_dasm(DASM_OPS_16)
 	}
 	return size;
 }
+
+
 
 
 #define GROUP_0e_GET_h \
@@ -1543,8 +1641,79 @@ int arcompact_handle16_dasm(DASM_OPS_16)
 
 int arcompact_handle17_dasm(DASM_OPS_16)
 {
-	print("Shift/Sub/Bit (%04x)",  op);
-	return 2;
+	int size = 2;
+	UINT8 subinstr = (op & 0x00e0) >> 5;
+	op &= ~0x00e0;
+
+	switch (subinstr)
+	{
+		case 0x00: size = arcompact_handle17_00_dasm(DASM_PARAMS); break; // ASL_S 
+		case 0x01: size = arcompact_handle17_01_dasm(DASM_PARAMS); break; // LSR_S 
+		case 0x02: size = arcompact_handle17_02_dasm(DASM_PARAMS); break; // ASR_S
+		case 0x03: size = arcompact_handle17_03_dasm(DASM_PARAMS); break; // SUB_S 
+		case 0x04: size = arcompact_handle17_04_dasm(DASM_PARAMS); break; // BSET_S 
+		case 0x05: size = arcompact_handle17_05_dasm(DASM_PARAMS); break; // BCLR_S 
+		case 0x06: size = arcompact_handle17_06_dasm(DASM_PARAMS); break; // BMSK_S 
+		case 0x07: size = arcompact_handle17_07_dasm(DASM_PARAMS); break; // BTST_S
+	}
+
+	return size;
+}
+
+int arcompact_handle17_00_dasm(DASM_OPS_16)
+{
+	int size = 2;
+	print("ASL_S b <- b asl u5 (%04x)",  op);
+	return size;
+}
+
+int arcompact_handle17_01_dasm(DASM_OPS_16)
+{
+	int size = 2;
+	print("LSR_S b <- b lsr u5 (%04x)",  op);
+	return size;
+}
+
+int arcompact_handle17_02_dasm(DASM_OPS_16)
+{
+	int size = 2;
+	print("ASR_S b <- b asr u5 (%04x)",  op);
+	return size;
+}
+
+int arcompact_handle17_03_dasm(DASM_OPS_16)
+{
+	int size = 2;
+	print("SUB_S b <- b - u5 (%04x)",  op);
+	return size;
+}
+
+int arcompact_handle17_04_dasm(DASM_OPS_16)
+{
+	int size = 2;
+	print("BSET_S b <- b | (1 << u5) (%04x)",  op);
+	return size;
+}
+
+int arcompact_handle17_05_dasm(DASM_OPS_16)
+{
+	int size = 2;
+	print("BCLR_S b <- b & !(1 << u5) (%04x)",  op);
+	return size;
+}
+
+int arcompact_handle17_06_dasm(DASM_OPS_16)
+{
+	int size = 2;
+	print("BMSK_S (%04x)",  op);
+	return size;
+}
+
+int arcompact_handle17_07_dasm(DASM_OPS_16)
+{
+	int size = 2;
+	print("BTST_S (%04x)",  op);
+	return size;
 }
 
 int arcompact_handle18_dasm(DASM_OPS_16)
