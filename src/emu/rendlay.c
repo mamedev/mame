@@ -432,7 +432,7 @@ layout_element::layout_element(running_machine &machine, xml_data_node &elemnode
 		// determine the maximum state
 		if (newcomp.m_state > m_maxstate)
 			m_maxstate = newcomp.m_state;
-		if (newcomp.m_type == component::CTYPE_LED7SEG)
+		if (newcomp.m_type == component::CTYPE_LED7SEG || newcomp.m_type == component::CTYPE_LED8SEG)
 			m_maxstate = 255;
 		if (newcomp.m_type == component::CTYPE_LED14SEG)
 			m_maxstate = 16383;
