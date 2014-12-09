@@ -98,7 +98,6 @@ public:
 private:
     virtual void machine_reset();
     required_device<cpu_device> m_maincpu;
-    // required_device<r10788_device> m_gpkd; // FIXME: doesn't compile
     UINT8 m_io[256];
     UINT8 m_counter;
     UINT8 m_6351_addr;
@@ -258,14 +257,8 @@ WRITE8_MEMBER(gts1_state::gts1_display_w)
     LOG(("%s: offset:%d data:%02x\n", __FUNCTION__, offset, data));
     const UINT8 a = ttl7448_mod[(data >> 0) & 15];
     const UINT8 b = ttl7448_mod[(data >> 4) & 15];
-    if (offset < 6) {
-    	output_set_digit_value(offset, a);
-    	output_set_digit_value(offset + 10, b);
-    }
-    if (offset >= 8 && offset < 8 + 6) {
-    	output_set_digit_value(offset - 8 + 6, a);
-    	output_set_digit_value(offset - 8 + 10, b);
-    }
+    output_set_digit_value(offset, a);
+    output_set_digit_value(offset + 16, b);
 }
 
 READ8_MEMBER (gts1_state::gts1_io_r)

@@ -28,79 +28,83 @@
 		</backdrop>
 
 		<!-- Top Row -->
-		<bezel name="digit0_0" element="digit">
+		<bezel name="digit0" element="digit">
 			<bounds left="10" top="45" right="30" bottom="84" />
 		</bezel>
-		<bezel name="digit0_1" element="digit">
+		<bezel name="digit1" element="digit">
 			<bounds left="34" top="45" right="54" bottom="84" />
 		</bezel>
-		<bezel name="digit0_2" element="digit">
+		<bezel name="digit2" element="digit">
 			<bounds left="58" top="45" right="78" bottom="84" />
 		</bezel>
-		<bezel name="digit0_3" element="digit">
+		<bezel name="digit3" element="digit">
 			<bounds left="87" top="45" right="107" bottom="84" />
 		</bezel>
-		<bezel name="digit0_4" element="digit">
+		<bezel name="digit4" element="digit">
 			<bounds left="111" top="45" right="131" bottom="84" />
 		</bezel>
-		<bezel name="digit0_5" element="digit">
+		<bezel name="digit5" element="digit">
 			<bounds left="135" top="45" right="155" bottom="84" />
 		</bezel>
-		<bezel name="digit1_0" element="digit">
+		<!-- Digits 6 and 7 are not used -->
+		<bezel name="digit8" element="digit">
 			<bounds left="170" top="45" right="190" bottom="84" />
 		</bezel>
-		<bezel name="digit1_1" element="digit">
+		<bezel name="digit9" element="digit">
 			<bounds left="194" top="45" right="214" bottom="84" />
 		</bezel>
-		<bezel name="digit1_2" element="digit">
+		<bezel name="digit10" element="digit">
 			<bounds left="218" top="45" right="238" bottom="84" />
 		</bezel>
-		<bezel name="digit1_3" element="digit">
+		<bezel name="digit11" element="digit">
 			<bounds left="247" top="45" right="267" bottom="84" />
 		</bezel>
-		<bezel name="digit1_4" element="digit">
+		<bezel name="digit12" element="digit">
 			<bounds left="271" top="45" right="291" bottom="84" />
 		</bezel>
-		<bezel name="digit1_5" element="digit">
+		<bezel name="digit13" element="digit">
 			<bounds left="295" top="45" right="315" bottom="84" />
 		</bezel>
+		<!-- Digits 14 and 15 are not used -->
 
 		<!-- Bottom Row -->
-		<bezel name="digit2_0" element="digit">
+		<bezel name="digit16" element="digit">
 			<bounds left="10" top="100" right="30" bottom="139" />
 		</bezel>
-		<bezel name="digit2_1" element="digit">
+		<bezel name="digit17" element="digit">
 			<bounds left="34" top="100" right="54" bottom="139" />
 		</bezel>
-		<bezel name="digit2_2" element="digit">
+		<bezel name="digit18" element="digit">
 			<bounds left="58" top="100" right="78" bottom="139" />
 		</bezel>
-		<bezel name="digit2_3" element="digit">
+		<bezel name="digit19" element="digit">
 			<bounds left="87" top="100" right="107" bottom="139" />
 		</bezel>
-		<bezel name="digit2_4" element="digit">
+		<bezel name="digit20" element="digit">
 			<bounds left="111" top="100" right="131" bottom="139" />
 		</bezel>
-		<bezel name="digit2_5" element="digit">
+		<bezel name="digit21" element="digit">
 			<bounds left="135" top="100" right="155" bottom="139" />
 		</bezel>
-		<bezel name="digit3_0" element="digit">
+		<!-- Digits 22 and 23 are not used -->
+		<bezel name="digit24" element="digit">
 			<bounds left="170" top="100" right="190" bottom="139" />
 		</bezel>
-		<bezel name="digit3_1" element="digit">
+		<bezel name="digit25" element="digit">
 			<bounds left="194" top="100" right="214" bottom="139" />
 		</bezel>
-		<bezel name="digit3_2" element="digit">
+		<bezel name="digit26" element="digit">
 			<bounds left="218" top="100" right="238" bottom="139" />
 		</bezel>
-		<bezel name="digit3_3" element="digit">
+		<bezel name="digit27" element="digit">
 			<bounds left="247" top="100" right="267" bottom="139" />
 		</bezel>
-		<bezel name="digit3_4" element="digit">
+		<bezel name="digit28" element="digit">
 			<bounds left="271" top="100" right="291" bottom="139" />
 		</bezel>
-		<bezel name="digit3_5" element="digit">
+		<bezel name="digit29" element="digit">
 			<bounds left="295" top="100" right="315" bottom="139" />
 		</bezel>
+		<!-- Digits 30 and 31 are not used -->
 	</view>
 </mamelayout>
