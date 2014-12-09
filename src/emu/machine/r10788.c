@@ -76,11 +76,6 @@ void r10788_device::device_start()
     save_item(NAME(m_scan_counter));
 
     m_timer = timer_alloc(TIMER_DISPLAY);
-    /* Default clock is from CPU1 */
-    if (clock() == 0)
-    {
-        set_unscaled_clock(machine().firstcpu->clock());
-    }
     m_timer->adjust(clocks_to_attotime(36));
 }
 
