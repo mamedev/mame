@@ -216,8 +216,56 @@ DRIVER_INIT_MEMBER(gts1_state,gts1)
  */
 WRITE8_MEMBER(gts1_state::gts1_display_w)
 {
+    /*
+     * The 7448 is modified to be disabled through RI/RBO
+     * when the input is 0001, and in this case the extra
+     * output H is generated instead.
+     */
+#define _a (1 << 0)
+#define _b (1 << 1)
+#define _c (1 << 2)
+#define _d (1 << 3)
+#define _e (1 << 4)
+#define _f (1 << 5)
+#define _g (1 << 6)
+#define _h (1 << 7)
+    static const UINT8 ttl7448_mod[16] = {
+    /* 0 */  _a | _b | _c | _d | _e | _f,
+    /* 1 */  _h,
+    /* 2 */  _a | _b | _d | _e | _g,
+    /* 3 */  _a | _b | _c | _d | _g,
+    /* 4 */  _b | _c | _f | _g,
+    /* 5 */  _a | _c | _d | _f | _g,
+    /* 6 */  _a | _c | _d | _e | _f | _g,
+    /* 7 */  _a | _b | _c,
+    /* 8 */  _a | _b | _c | _d | _e | _f | _g,
+    /* 9 */  _a | _b | _c | _d | _f | _g,
+    /* a */  _d | _e | _g,
+    /* b */  _c | _d | _g,
+    /* c */  _b | _f | _g,
+    /* d */  _a | _d | _f | _g,
+    /* e */  _d | _e | _f | _g,
+    /* f */  0
+    };
+#undef _a
+#undef _b
+#undef _c
+#undef _d
+#undef _e
+#undef _f
+#undef _g
+#undef _h
     LOG(("%s: offset:%d data:%02x\n", __FUNCTION__, offset, data));
-    output_set_digit_value(offset, data);
+    const UINT8 a = ttl7448_mod[(data >> 0) & 15];
+    const UINT8 b = ttl7448_mod[(data >> 4) & 15];
+    if (offset < 6) {
+    	output_set_digit_value(offset, a);
+    	output_set_digit_value(offset + 10, b);
+    }
+    if (offset >= 8 && offset < 8 + 6) {
+    	output_set_digit_value(offset - 8 + 6, a);
+    	output_set_digit_value(offset - 8 + 10, b);
+    }
 }
 
 READ8_MEMBER (gts1_state::gts1_io_r)
