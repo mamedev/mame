@@ -13,12 +13,13 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, pci_device)
 	AM_RANGE(0x0c, 0x0f) AM_READ8      (latency_timer_r,                          0x0000ff00)
 	AM_RANGE(0x0c, 0x0f) AM_READ8      (header_type_r,                            0x00ff0000)
 	AM_RANGE(0x0c, 0x0f) AM_READ8      (bist_r,                                   0xff000000)
+	AM_RANGE(0x0c, 0x0f) AM_WRITENOP
 	AM_RANGE(0x10, 0x27) AM_READWRITE  (address_base_r,      address_base_w)
-
+	// Cardbus CIS pointer at 28
 	AM_RANGE(0x2c, 0x2f) AM_READ16     (subvendor_r,                              0x0000ffff)
 	AM_RANGE(0x2c, 0x2f) AM_READ16     (subsystem_r,                              0xffff0000)
 	AM_RANGE(0x2c, 0x2f) AM_WRITENOP
-
+	AM_RANGE(0x30, 0x33) AM_READWRITE  (expansion_base_r,    expansion_base_w)
 	AM_RANGE(0x34, 0x37) AM_READ8      (capptr_r,                                 0x000000ff)
 ADDRESS_MAP_END
 
@@ -88,6 +89,10 @@ void pci_device::device_start()
 
 	bank_count = 0;
 	bank_reg_count = 0;
+
+	expansion_rom = 0;
+	expansion_rom_size = 0;
+	expansion_rom_base = 0;
 }
 
 void pci_device::device_reset()
@@ -209,6 +214,24 @@ READ16_MEMBER(pci_device::subsystem_r)
 	return subsystem_id;
 }
 
+READ32_MEMBER(pci_device::expansion_base_r)
+{
+	return expansion_rom_base;
+}
+
+
+WRITE32_MEMBER(pci_device::expansion_base_w)
+{
+	COMBINE_DATA(&expansion_rom_base);
+	if(!expansion_rom_size)
+		expansion_rom_base = 0;
+	else {
+		// Trick to get an address resolution at expansion_rom_size with minimal granularity of 0x800, plus bit 1 set to keep the on/off information
+		expansion_rom_base &= 0xfffff801 & (1-expansion_rom_size);
+	}
+	remap_cb();
+}
+
 READ8_MEMBER(pci_device::capptr_r)
 {
 	return 0x00;
@@ -256,10 +279,20 @@ void pci_device::map_device(UINT64 memory_window_start, UINT64 memory_window_end
 		case 5: space->install_readwrite_handler(start, end, 0, 0, read32_delegate(FUNC(pci_device::unmapped5_r), this), write32_delegate(FUNC(pci_device::unmapped5_w), this)); break;
 		}
 		space->install_device_delegate(start, end, *this, bi.map);
+		logerror("%s: map %s at %0*x-%0*x\n", tag(), bi.map.name(), bi.flags & M_IO ? 4 : 8, UINT32(start), bi.flags & M_IO ? 4 : 8, UINT32(end));
 	}
 
 	map_extra(memory_window_start, memory_window_end, memory_offset, memory_space,
 				io_window_start, io_window_end, io_offset, io_space);
+
+	if(expansion_rom_base & 1) {
+		logerror("%s: map expansion rom at %08x-%08x\n", tag(), expansion_rom_base & ~1, (expansion_rom_base & ~1) + expansion_rom_size - 1);
+		UINT32 start = (expansion_rom_base & ~1) + memory_offset;
+		UINT32 end = start + expansion_rom_size - 1;
+		if(end > memory_window_end)
+			end = memory_window_end;
+		memory_space->install_rom(start, end, (void *)expansion_rom);
+	}
 }
 
 void pci_device::map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
@@ -303,6 +336,18 @@ void pci_device::add_map(UINT64 size, int flags, address_map_delegate &map)
 	}
 
 	logerror("Device %s (%s) has 0x%" I64FMT "x bytes of %s named %s\n", tag(), name(), size, flags & M_IO ? "io" : "memory", map.name());
+}
+
+void pci_device::add_rom(const UINT8 *rom, UINT32 size)
+{
+	expansion_rom = rom;
+	expansion_rom_size = size;
+	logerror("Device %s (%s) has 0x%x bytes of expansion rom\n", tag(), name(), size);
+}
+
+void pci_device::add_rom_from_region()
+{
+	add_rom(m_region->base(), m_region->bytes());
 }
 
 agp_device::agp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
@@ -660,17 +705,6 @@ READ16_MEMBER (pci_bridge_device::iolimitu_r)
 WRITE16_MEMBER(pci_bridge_device::iolimitu_w)
 {
 	logerror("%s: iolimitu_w %04x\n", tag(), data);
-}
-
-READ32_MEMBER (pci_bridge_device::expansion_base_r)
-{
-	logerror("%s: expansion_base_r\n", tag());
-	return 0xffffffff;
-}
-
-WRITE32_MEMBER(pci_bridge_device::expansion_base_w)
-{
-	logerror("%s: expansion_base_w %08x\n", tag(), data);
 }
 
 READ8_MEMBER  (pci_bridge_device::interrupt_line_r)

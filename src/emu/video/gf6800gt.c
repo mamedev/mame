@@ -22,6 +22,7 @@ void geforce_6800gt_device::device_start()
 	add_map( 16*1024*1024, M_MEM, FUNC(geforce_6800gt_device::map1));
 	add_map(256*1024*1024, M_MEM, FUNC(geforce_6800gt_device::map2));
 	add_map( 16*1024*1024, M_MEM, FUNC(geforce_6800gt_device::map3));
+	add_rom_from_region();
 }
 
 void geforce_6800gt_device::device_reset()

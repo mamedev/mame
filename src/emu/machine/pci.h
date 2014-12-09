@@ -74,6 +74,8 @@ public:
 	DECLARE_WRITE32_MEMBER(address_base_w);
 	DECLARE_READ16_MEMBER(subvendor_r);
 	DECLARE_READ16_MEMBER(subsystem_r);
+	DECLARE_READ32_MEMBER (expansion_base_r);
+	DECLARE_WRITE32_MEMBER(expansion_base_w);
 	virtual DECLARE_READ8_MEMBER(capptr_r);
 
 protected:
@@ -104,6 +106,9 @@ protected:
 	UINT32 pclass;
 	UINT8 revision;
 	UINT16 command, command_mask, status;
+	const UINT8 *expansion_rom;
+	UINT32 expansion_rom_size;
+	UINT32 expansion_rom_base;
 
 	virtual void device_start();
 	virtual void device_reset();
@@ -116,6 +121,9 @@ protected:
 		address_map_delegate delegate(map, name, static_cast<T *>(this));
 		add_map(size, flags, delegate);
 	}
+
+	void add_rom(const UINT8 *data, UINT32 size);
+	void add_rom_from_region();
 };
 
 class agp_device : public pci_device {
@@ -173,8 +181,6 @@ public:
 	DECLARE_WRITE16_MEMBER(iobaseu_w);
 	DECLARE_READ16_MEMBER (iolimitu_r);
 	DECLARE_WRITE16_MEMBER(iolimitu_w);
-	DECLARE_READ32_MEMBER (expansion_base_r);
-	DECLARE_WRITE32_MEMBER(expansion_base_w);
 	DECLARE_READ8_MEMBER  (interrupt_line_r);
 	DECLARE_WRITE8_MEMBER (interrupt_line_w);
 	DECLARE_READ8_MEMBER  (interrupt_pin_r);
