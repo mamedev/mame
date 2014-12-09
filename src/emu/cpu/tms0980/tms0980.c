@@ -91,6 +91,8 @@ unknown cycle: CME, SSE, SSS
 #define M_STSL              0x00080000 /* STATUS to Status Latch */
 #define M_YTP               0x00100000 /* Y to +ALU */
 
+#define M_RSTR              0x00200000 /* -> F_RSTR */
+
 /* Standard/fixed instructions - these are documented more in their specific handlers below */
 #define F_BR                0x00000001
 #define F_CALL              0x00000002
@@ -115,7 +117,7 @@ unknown cycle: CME, SSE, SSS
 
 
 // supported types:
-// note: dice information assumes the orientation is pictured with RAM at the bottom-left
+// note: dice information assumes the orientation is pictured with RAM at the bottom-left, except where noted
 
 // TMS1000
 // - 64x4bit RAM array at the bottom-left
@@ -127,8 +129,8 @@ unknown cycle: CME, SSE, SSS
 // - 20-term output PLA(opla) at the top-left
 // - the ALU is between the opla and mpla
 const device_type TMS1000 = &device_creator<tms1000_cpu_device>; // 28-pin DIP, 11 R pins
-const device_type TMS1200 = &device_creator<tms1200_cpu_device>; // 40-pin DIP, 13 R pins
 const device_type TMS1070 = &device_creator<tms1070_cpu_device>; // same as tms1000, just supports higher voltage
+const device_type TMS1200 = &device_creator<tms1200_cpu_device>; // 40-pin DIP, 13 R pins
 // TMS1270 has 10 O pins, how does that work?
 
 // TMS1100 is nearly the same as TMS1000, some different opcodes, and with double the RAM and ROM
@@ -140,16 +142,22 @@ const device_type TMS1300 = &device_creator<tms1300_cpu_device>; // 40-pin DIP, 
 // - 2048x9bit ROM array at the bottom-left
 // - main instructions PLA at the top half, to the right of the midline
 // - 64-term microinstructions PLA between the RAM and ROM, supporting 20 microinstructions
-// - 16-term output PLA and segment PLA above the RAM
-const device_type TMS0980 = &device_creator<tms0980_cpu_device>; // 28-pin DIP, 9 R pins
+// - 16-term output PLA and segment PLA above the RAM (rotate opla 90 degrees)
+const device_type TMS0980 = &device_creator<tms0980_cpu_device>; // 28-pin DIP, 9 R pins, 5 K pins
 
 // TMS0970 is a stripped-down version of the TMS0980, itself acting more like a TMS1000
-// - 64x4bit RAM array at the bottom-left
-// - 1024x8bit ROM array at the bottom-right
+// - RAM and ROM is exactly the same as TMS1000
 // - main instructions PLA at the top half, to the right of the midline
 // - 32-term microinstructions PLA between the RAM and ROM, supporting 15 microinstructions
-// - 16-term output PLA and segment PLA above the RAM
+// - 16-term output PLA and segment PLA above the RAM (rotate opla 90 degrees)
 const device_type TMS0970 = &device_creator<tms0970_cpu_device>; // 28-pin DIP, 11 R pins
+
+// TMC0270 on the other hand, is a TMS0980 with earrings and a new hat. The new changes look like a quick afterthought, almost hacky
+// - RAM, ROM, and main instructions PLA is exactly the same as TMS0980
+// - 64-term microinstructions PLA between the RAM and ROM, supporting 20 microinstructions plus optional separate lines for custom opcode handling
+// - 48-term output PLA above the RAM (rotate opla 90 degrees)
+const device_type TMC0270 = &device_creator<tmc0270_cpu_device>; // 40-pin DIP, 16 O pins, 8 R pins (the other R pins are internally hooked up to support more I/O)
+// TMC0260 is same? except opla is 32 instead of 48 terms
 
 
 static ADDRESS_MAP_START(program_11bit_9, AS_PROGRAM, 16, tms1xxx_cpu_device)
@@ -232,6 +240,17 @@ tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, const char
 {
 }
 
+tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 k_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
+	: tms0970_cpu_device(mconfig, type, name, tag, owner, clock, o_pins, r_pins, k_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data, shortname, source)
+{
+}
+
+
+tmc0270_cpu_device::tmc0270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms0980_cpu_device(mconfig, TMC0270, "TMC0270", tag, owner, clock, 16, 8, 4, 7, 9, 4, 12, ADDRESS_MAP_NAME(program_11bit_9), 8, ADDRESS_MAP_NAME(data_64x9_as4), "tmc0270", __FILE__)
+{
+}
+
 
 
 static MACHINE_CONFIG_FRAGMENT(tms1000)
@@ -284,6 +303,23 @@ MACHINE_CONFIG_END
 machine_config_constructor tms0980_cpu_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME(tms0980);
+}
+
+
+static MACHINE_CONFIG_FRAGMENT(tmc0270)
+
+	// main opcodes PLA, microinstructions PLA, output PLA
+	MCFG_PLA_ADD("ipla", 9, 22, 24)
+	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
+	MCFG_PLA_ADD("mpla", 6, 21, 64)
+	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
+	MCFG_PLA_ADD("opla", 6, 16, 48)
+	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
+MACHINE_CONFIG_END
+
+machine_config_constructor tmc0270_cpu_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME(tmc0270);
 }
 
 
@@ -357,6 +393,7 @@ void tms1xxx_cpu_device::device_start()
 	m_cs = 0;
 	m_r = 0;
 	m_o = 0;
+	m_o_latch = 0;
 	m_cki_bus = 0;
 	m_c4 = 0;
 	m_p = 0;
@@ -370,7 +407,7 @@ void tms1xxx_cpu_device::device_start()
 	m_clatch = 0;
 	m_add = 0;
 	m_bl = 0;
-
+	
 	m_ram_in = 0;
 	m_dam_in = 0;
 	m_ram_out = 0;
@@ -380,6 +417,10 @@ void tms1xxx_cpu_device::device_start()
 	m_fixed = 0;
 	m_micro = 0;
 	m_subcycle = 0;
+
+	m_a_prev = m_a;
+	m_r_prev = m_r;
+	m_o_prev = m_o;
 
 	// register for savestates
 	save_item(NAME(m_pc));
@@ -394,6 +435,7 @@ void tms1xxx_cpu_device::device_start()
 	save_item(NAME(m_cs));
 	save_item(NAME(m_r));
 	save_item(NAME(m_o));
+	save_item(NAME(m_o_latch));
 	save_item(NAME(m_cki_bus));
 	save_item(NAME(m_c4));
 	save_item(NAME(m_p));
@@ -417,6 +459,10 @@ void tms1xxx_cpu_device::device_start()
 	save_item(NAME(m_fixed));
 	save_item(NAME(m_micro));
 	save_item(NAME(m_subcycle));
+
+	save_item(NAME(m_a_prev));
+	save_item(NAME(m_r_prev));
+	save_item(NAME(m_o_prev));
 
 	// register state for debugger
 	state_add(TMS0980_PC,     "PC",     m_pc    ).formatstr("%02X");
@@ -570,11 +616,12 @@ UINT32 tms0980_cpu_device::decode_micro(UINT8 sel)
 	sel = BITSWAP8(sel,7,6,0,1,2,3,4,5); // lines are reversed
 	UINT32 mask = m_mpla->read(sel);
 	mask ^= 0x43fc3; // invert active-negative
-
-	//                      _______  ______                                _____  _____  _____  _____  ______  _____  ______  _____                            _____
-	const UINT32 md[20] = { M_NDMTP, M_DMTP, M_AUTY, M_AUTA, M_CKM, M_SSE, M_CKP, M_YTP, M_MTP, M_ATN, M_NATN, M_MTN, M_15TN, M_CKN, M_NE, M_C8, M_SSS, M_CME, M_CIN, M_STO };
 	
-	for (int bit = 0; bit < 20; bit++)
+	// note: M_RSTR is specific to TMC02x0, it redirects to F_RSTR
+	//                      _______  ______                                _____  _____  _____  _____  ______  _____  ______  _____                            _____
+	const UINT32 md[21] = { M_NDMTP, M_DMTP, M_AUTY, M_AUTA, M_CKM, M_SSE, M_CKP, M_YTP, M_MTP, M_ATN, M_NATN, M_MTN, M_15TN, M_CKN, M_NE, M_C8, M_SSS, M_CME, M_CIN, M_STO, M_RSTR };
+	
+	for (int bit = 0; bit < 21 && bit < m_mpla->outputs(); bit++)
 		if (mask & (1 << bit))
 			decode |= md[bit];
 	
@@ -619,7 +666,9 @@ void tms0980_cpu_device::device_reset()
 
 
 
-
+//-------------------------------------------------
+//  program counter/opcode decode
+//-------------------------------------------------
 
 void tms1xxx_cpu_device::next_pc()
 {
@@ -666,6 +715,20 @@ void tms0980_cpu_device::read_opcode()
 	next_pc();
 }
 
+void tmc0270_cpu_device::read_opcode()
+{
+	tms0980_cpu_device::read_opcode();
+	
+	// RSTR is on the mpla
+	if (m_micro & M_RSTR)
+		m_fixed |= F_RSTR;
+}
+
+
+
+//-------------------------------------------------
+//  i/o handling
+//-------------------------------------------------
 
 void tms1xxx_cpu_device::write_o_output(UINT8 data)
 {
@@ -684,12 +747,30 @@ void tms0970_cpu_device::write_o_output(UINT8 data)
 	m_write_o(0, m_o & m_o_mask, 0xffff);
 }
 
+
+void tmc0270_cpu_device::dynamic_output()
+{
+	// TODO..
+	
+	m_a_prev = m_a;
+	m_r_prev = m_r;
+	m_o_prev = m_o;
+}
+
+
 UINT8 tms1xxx_cpu_device::read_k_input()
 {
 	// K1,2,4,8,3 (KC test pin is not emulated)
 	UINT8 k = m_read_k(0, 0xff) & m_k_mask;
 	UINT8 k3 = (k & 0x10) ? 3: 0; // the K3 line that is on some chips, is simply K1|K2
 	return (k & 0xf) | k3;
+}
+
+UINT8 tmc0270_cpu_device::read_k_input()
+{
+	// TODO..
+	
+	return tms1xxx_cpu_device::read_k_input();
 }
 
 
@@ -746,7 +827,10 @@ void tms0980_cpu_device::set_cki_bus()
 }
 
 
-// fixed opcode set
+
+//-------------------------------------------------
+//  fixed opcode set
+//-------------------------------------------------
 
 // TMS1000/common:
 
@@ -841,7 +925,7 @@ void tms1xxx_cpu_device::op_comc()
 }
 
 
-// TMS09x0-specific
+// TMS0970-specific (and possibly child classes)
 void tms0970_cpu_device::op_setr()
 {
 	// SETR: set output register
@@ -858,7 +942,7 @@ void tms0970_cpu_device::op_tdo()
 }
 
 
-// TMS0980-specific
+// TMS0980-specific (and possibly child classes)
 void tms0980_cpu_device::op_comx()
 {
 	// COMX: complement X register, but not the MSB
@@ -904,37 +988,23 @@ void tms1xxx_cpu_device::op_sbl()
 }
 
 
-void tms1xxx_cpu_device::execute_fixed_opcode()
+// TMC0270-specific
+void tmc0270_cpu_device::op_tdo()
 {
-	switch (m_fixed)
-	{
-		case F_SBIT: op_sbit(); break;
-		case F_RBIT: op_rbit(); break;
-		case F_SETR: op_setr(); break;
-		case F_RSTR: op_rstr(); break;
-		case F_TDO:  op_tdo();  break;
-		case F_CLO:  op_clo();  break;
-		case F_LDX:  op_ldx();  break;
-		case F_COMX: op_comx(); break;
-		case F_COMX8:op_comx8();break;
-		case F_LDP:  op_ldp();  break;
-		case F_COMC: op_comc(); break;
-		case F_OFF:  op_off();  break;
-		case F_SEAC: op_seac(); break;
-		case F_REAC: op_reac(); break;
-		case F_SAL:  op_sal();  break;
-		case F_SBL:  op_sbl();  break;
-		case F_XDA:  op_xda();  break;
-		
-		default:
-			// BR, CALL, RETN are handled in execute_run
-			if (m_fixed & ~(F_BR | F_CALL | F_RETN))
-				fatalerror("%s unsupported fixed opcode %03X %04X!\n", tag(), m_opcode, m_fixed);
-			break;
-	}
+	// TDO: transfer data out
+	if (m_status)
+		m_o_latch = m_a;
+	else
+		m_o = m_o_latch | (m_a << 4 & 0x30);
+	
+	// handled further in dynamic_output
 }
 
 
+
+//-------------------------------------------------
+//  execute_run
+//-------------------------------------------------
 
 void tms1xxx_cpu_device::execute_run()
 {
@@ -995,6 +1065,7 @@ void tms1xxx_cpu_device::execute_run()
 
 			// execute: k input valid, read ram, clear alu inputs
 			set_cki_bus();
+			dynamic_output();
 			m_ram_in = m_data->read_byte(m_ram_address) & 0xf;
 			m_dam_in = m_data->read_byte(m_ram_address | (0x10 << (m_x_bits-1))) & 0xf;
 			m_ram_out = -1;
@@ -1056,8 +1127,24 @@ void tms1xxx_cpu_device::execute_run()
 			if (m_micro & M_STO || (m_micro & M_CME && m_eac == m_add))
 				m_ram_out = m_a;
 
-			// handle the fixed opcodes here
-			execute_fixed_opcode();
+			// handle the other fixed opcodes here
+			if (m_fixed & F_SBIT)  op_sbit();
+			if (m_fixed & F_RBIT)  op_rbit();
+			if (m_fixed & F_SETR)  op_setr();
+			if (m_fixed & F_RSTR)  op_rstr();
+			if (m_fixed & F_TDO)   op_tdo();
+			if (m_fixed & F_CLO)   op_clo();
+			if (m_fixed & F_LDX)   op_ldx();
+			if (m_fixed & F_COMX)  op_comx();
+			if (m_fixed & F_COMX8) op_comx8();
+			if (m_fixed & F_LDP)   op_ldp();
+			if (m_fixed & F_COMC)  op_comc();
+			if (m_fixed & F_OFF)   op_off();
+			if (m_fixed & F_SEAC)  op_seac();
+			if (m_fixed & F_REAC)  op_reac();
+			if (m_fixed & F_SAL)   op_sal();
+			if (m_fixed & F_SBL)   op_sbl();
+			if (m_fixed & F_XDA)   op_xda();
 
 			// execute: write ram
 			if (m_ram_out != -1)
