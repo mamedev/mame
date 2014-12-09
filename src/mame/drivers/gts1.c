@@ -67,6 +67,7 @@ ToDo:
 
 
 #include "machine/genpin.h"
+#include "machine/r10788.h"
 #include "cpu/pps4/pps4.h"
 #include "gts1.lh"
 
@@ -87,12 +88,19 @@ public:
     { }
 
     DECLARE_DRIVER_INIT(gts1);
+
+    DECLARE_WRITE8_MEMBER(gts1_display_w);
+    DECLARE_READ8_MEMBER (gts1_io_r);
+    DECLARE_WRITE8_MEMBER(gts1_io_w);
     DECLARE_READ8_MEMBER (gts1_pa_r);
     DECLARE_WRITE8_MEMBER(gts1_pa_w);
     DECLARE_WRITE8_MEMBER(gts1_pb_w);
 private:
     virtual void machine_reset();
     required_device<cpu_device> m_maincpu;
+    // required_device<r10788_device> m_gpkd; // FIXME: doesn't compile
+    UINT8 m_io[256];
+    UINT8 m_counter;
     UINT8 m_6351_addr;
 };
 
@@ -101,12 +109,14 @@ static ADDRESS_MAP_START( gts1_map, AS_PROGRAM, 8, gts1_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gts1_data, AS_DATA, 8, gts1_state )
-    AM_RANGE(0x0000, 0x0fff) AM_RAM // not correct
+    AM_RANGE(0x0000, 0x00ff) AM_RAM // not correct
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gts1_io, AS_IO, 8, gts1_state )
-    AM_RANGE(0x0000, 0x00ff) AM_RAM // connects to all the other chips
-    AM_RANGE(0x0100, 0x0100) AM_READ (gts1_pa_r) AM_WRITE(gts1_pa_w)
+    AM_RANGE(0x00d0, 0x00df) AM_DEVREADWRITE ( "r10788", r10788_device, io_r, io_w )
+    AM_RANGE(0x0000, 0x00ff) AM_READ ( gts1_io_r )   AM_WRITE( gts1_io_w ) // connects to all the other chips
+
+    AM_RANGE(0x0100, 0x0100) AM_READ ( gts1_pa_r ) AM_WRITE( gts1_pa_w )
     AM_RANGE(0x0101, 0x0101) AM_WRITE(gts1_pb_w)
 ADDRESS_MAP_END
 
@@ -199,6 +209,29 @@ DRIVER_INIT_MEMBER(gts1_state,gts1)
 {
 }
 
+/**
+ * @brief write a 8seg display value
+ * @param offset digit number 0 .. 19
+ * @param data 4-bit value to display
+ */
+WRITE8_MEMBER(gts1_state::gts1_display_w)
+{
+    output_set_digit_value(offset, data);
+}
+
+READ8_MEMBER (gts1_state::gts1_io_r)
+{
+    UINT8 data = m_io[offset] & 0x0f;
+    LOG(("%s: io[%02x] -> %x\n", __FUNCTION__, offset, data));
+    return data;
+}
+
+WRITE8_MEMBER(gts1_state::gts1_io_w)
+{
+    LOG(("%s: io[%02x] <- %x\n", __FUNCTION__, offset, data));
+    m_io[offset] = data;
+}
+
 READ8_MEMBER (gts1_state::gts1_pa_r)
 {
     // return ROM nibble
@@ -232,8 +265,11 @@ static MACHINE_CONFIG_START( gts1, gts1_state )
 
     //MCFG_NVRAM_ADD_0FILL("nvram")
 
+    /* General Purpose Display and Keyboard */
+    MCFG_R10788_UPDATE( WRITE8(gts1_state,gts1_display_w) )
+
     /* Video */
-    MCFG_DEFAULT_LAYOUT(layout_gts1)
+    MCFG_DEFAULT_LAYOUT( layout_gts1 )
 
     /* Sound */
     MCFG_FRAGMENT_ADD( genpin_audio )
