@@ -653,7 +653,7 @@ void c8050_fdc_t::live_start()
 	cur_live.rw_sel = m_rw_sel;
 	cur_live.pi = m_pi;
 
-	pll_reset(cur_live.tm, attotime::from_hz(0));
+	pll_reset(cur_live.tm, attotime::from_double(0));
 	checkpoint_live = cur_live;
 	pll_save_checkpoint();
 
