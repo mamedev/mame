@@ -31,6 +31,7 @@ public:
 	pci_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	void set_ids(UINT32 main_id, UINT8 revision, UINT32 pclass, UINT32 subsystem_id);
+	void set_multifunction_device(bool enable);
 
 	virtual void set_remap_cb(mapper_cb _remap_cb);
 	virtual void reset_all_mappings();
@@ -109,11 +110,10 @@ protected:
 	const UINT8 *expansion_rom;
 	UINT32 expansion_rom_size;
 	UINT32 expansion_rom_base;
+	bool is_multifunction_device;
 
 	virtual void device_start();
 	virtual void device_reset();
-
-	static void scan_sub_devices(pci_device **devices, dynamic_array<pci_device *> &all, dynamic_array<pci_device *> &bridges, device_t *root);
 
 	void skip_map_regs(int count);
 	void add_map(UINT64 size, int flags, address_map_delegate &map);

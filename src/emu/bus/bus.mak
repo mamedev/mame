@@ -403,6 +403,7 @@ BUSOBJS += $(BUSOBJ)/ieee488/c2031.o
 BUSOBJS += $(BUSOBJ)/ieee488/c2040.o
 BUSOBJS += $(BUSOBJ)/ieee488/c2040fdc.o
 BUSOBJS += $(BUSOBJ)/ieee488/c8050.o
+BUSOBJS += $(BUSOBJ)/ieee488/c8050fdc.o
 BUSOBJS += $(BUSOBJ)/ieee488/c8280.o
 BUSOBJS += $(BUSOBJ)/ieee488/d9060.o
 BUSOBJS += $(BUSOBJ)/ieee488/softbox.o

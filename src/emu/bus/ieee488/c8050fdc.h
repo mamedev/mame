@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Commodore 2040 floppy disk controller emulation
+    Commodore 8050 floppy disk controller emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -11,14 +11,14 @@
 
 #pragma once
 
-#ifndef __C2040_FLOPPY__
-#define __C2040_FLOPPY__
+#ifndef __C8050_FLOPPY__
+#define __C8050_FLOPPY__
 
 #include "emu.h"
-#include "formats/d64_dsk.h"
-#include "formats/d67_dsk.h"
-#include "formats/g64_dsk.h"
+#include "formats/d80_dsk.h"
+#include "formats/d82_dsk.h"
 #include "imagedev/floppy.h"
+#include "machine/fdc_pll.h"
 
 
 
@@ -26,14 +26,14 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_C2040_SYNC_CALLBACK(_write) \
-	devcb = &c2040_fdc_t::set_sync_wr_callback(*device, DEVCB_##_write);
+#define MCFG_C8050_SYNC_CALLBACK(_write) \
+	devcb = &c8050_fdc_t::set_sync_wr_callback(*device, DEVCB_##_write);
 
-#define MCFG_C2040_READY_CALLBACK(_write) \
-	devcb = &c2040_fdc_t::set_ready_wr_callback(*device, DEVCB_##_write);
+#define MCFG_C8050_READY_CALLBACK(_write) \
+	devcb = &c8050_fdc_t::set_ready_wr_callback(*device, DEVCB_##_write);
 
-#define MCFG_C2040_ERROR_CALLBACK(_write) \
-	devcb = &c2040_fdc_t::set_error_wr_callback(*device, DEVCB_##_write);
+#define MCFG_C8050_ERROR_CALLBACK(_write) \
+	devcb = &c8050_fdc_t::set_error_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -41,17 +41,17 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c2040_fdc_t
+// ======================> c8050_fdc_t
 
-class c2040_fdc_t :  public device_t
+class c8050_fdc_t :  public device_t
 {
 public:
 	// construction/destruction
-	c2040_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c8050_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb_base &set_sync_wr_callback(device_t &device, _Object object) { return downcast<c2040_fdc_t &>(device).m_write_sync.set_callback(object); }
-	template<class _Object> static devcb_base &set_ready_wr_callback(device_t &device, _Object object) { return downcast<c2040_fdc_t &>(device).m_write_ready.set_callback(object); }
-	template<class _Object> static devcb_base &set_error_wr_callback(device_t &device, _Object object) { return downcast<c2040_fdc_t &>(device).m_write_error.set_callback(object); }
+	template<class _Object> static devcb_base &set_sync_wr_callback(device_t &device, _Object object) { return downcast<c8050_fdc_t &>(device).m_write_sync.set_callback(object); }
+	template<class _Object> static devcb_base &set_ready_wr_callback(device_t &device, _Object object) { return downcast<c8050_fdc_t &>(device).m_write_ready.set_callback(object); }
+	template<class _Object> static devcb_base &set_error_wr_callback(device_t &device, _Object object) { return downcast<c8050_fdc_t &>(device).m_write_error.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -61,6 +61,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rw_sel_w );
 	DECLARE_WRITE_LINE_MEMBER( mtr0_w );
 	DECLARE_WRITE_LINE_MEMBER( mtr1_w );
+	DECLARE_WRITE_LINE_MEMBER( odd_hd_w );
+	DECLARE_WRITE_LINE_MEMBER( pull_sync_w );
 
 	DECLARE_READ_LINE_MEMBER( wps_r ) { return checkpoint_live.drv_sel ? m_floppy1->wpt_r() : m_floppy0->wpt_r(); }
 	DECLARE_READ_LINE_MEMBER( sync_r ) { return checkpoint_live.sync; }
@@ -110,9 +112,6 @@ protected:
 
 		UINT8 pi;
 		UINT16 shift_reg_write;
-		attotime write_start_time;
-		attotime write_buffer[32];
-		int write_position;
 	};
 
 	devcb_write_line m_write_sync;
@@ -138,6 +137,7 @@ protected:
 	attotime m_period;
 
 	live_info cur_live, checkpoint_live;
+	fdc_pll_t cur_pll, checkpoint_pll;
 	emu_timer *t_gen;
 
 	floppy_image_device* get_floppy();
@@ -145,21 +145,23 @@ protected:
 	void live_start();
 	void checkpoint();
 	void rollback();
-	bool write_next_bit(bool bit, const attotime &limit);
-	void start_writing(const attotime &tm);
-	void commit(const attotime &tm);
-	void stop_writing(const attotime &tm);
+	void pll_reset(const attotime &when, const attotime clock);
+	void pll_start_writing(const attotime &tm);
+	void pll_commit(floppy_image_device *floppy, const attotime &tm);
+	void pll_stop_writing(floppy_image_device *floppy, const attotime &tm);
+	int pll_get_next_bit(attotime &tm, floppy_image_device *floppy, const attotime &limit);
+	bool pll_write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, const attotime &limit);
+	void pll_save_checkpoint();
+	void pll_retrieve_checkpoint();
 	void live_delay(int state);
 	void live_sync();
 	void live_abort();
 	void live_run(const attotime &limit = attotime::never);
-	void get_next_edge(const attotime &when);
-	int get_next_bit(attotime &tm, const attotime &limit);
 };
 
 
 // device type definition
-extern const device_type C2040_FDC;
+extern const device_type C8050_FDC;
 
 
 

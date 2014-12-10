@@ -121,6 +121,7 @@ void i6300esb_lpc_device::device_reset()
 	memset(mon_trp_rng, 0, sizeof(mon_trp_rng));
 	mon_trp_msk = 0;
 	nmi_sc = 0;
+	gen_sta = 0x00;
 }
 
 void i6300esb_lpc_device::reset_all_mappings()
