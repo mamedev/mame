@@ -993,6 +993,7 @@ $(MESSOBJ)/amstrad.a:           \
 
 $(MESSOBJ)/apf.a:               \
 	$(MESS_DRIVERS)/apf.o       \
+	$(MESS_DRIVERS)/mathmagi.o  \
 
 $(MESSOBJ)/apollo.a:            \
 	$(MESS_DRIVERS)/apollo.o $(MESS_MACHINE)/apollo.o $(MESS_MACHINE)/apollo_dbg.o $(MESS_MACHINE)/apollo_kbd.o $(MESS_VIDEO)/apollo.o \
@@ -1000,7 +1001,7 @@ $(MESSOBJ)/apollo.a:            \
 $(MESSOBJ)/apple.a:             \
 	$(MESS_DRIVERS)/apple1.o $(MESS_MACHINE)/apple1.o $(MESS_VIDEO)/apple1.o \
 	$(MESS_DRIVERS)/apple2.o $(MESS_DRIVERS)/apple2e.o $(MESS_MACHINE)/apple2.o $(MESS_VIDEO)/apple2.o \
-	$(MESS_DRIVERS)/tk2000.o \
+	$(MESS_DRIVERS)/tk2000.o    \
 	$(MESS_DRIVERS)/apple2gs.o $(MESS_MACHINE)/apple2gs.o $(MESS_VIDEO)/apple2gs.o \
 	$(MESS_DRIVERS)/apple3.o $(MESS_MACHINE)/apple3.o $(MESS_VIDEO)/apple3.o \
 	$(MESS_DRIVERS)/lisa.o $(MESS_MACHINE)/lisa.o \
@@ -2114,6 +2115,7 @@ $(MESS_DRIVERS)/lc80.o:     $(MESS_LAYOUT)/lc80.lh
 $(MESS_DRIVERS)/llc.o:      $(MESS_LAYOUT)/llc1.lh
 $(MESS_DRIVERS)/lynx.o:     $(MESS_LAYOUT)/lynx.lh
 $(MESS_DRIVERS)/mac.o:      $(MESS_LAYOUT)/mac.lh
+$(MESS_DRIVERS)/mathmagi.o: $(MESS_LAYOUT)/mathmagi.lh
 $(MESS_MACHINE)/megacd.o:   $(MESS_LAYOUT)/megacd.lh
 $(MESS_DRIVERS)/mekd2.o:    $(MESS_LAYOUT)/mekd2.lh
 $(MESS_DRIVERS)/mephisto.o: $(MESS_LAYOUT)/mephisto.lh
