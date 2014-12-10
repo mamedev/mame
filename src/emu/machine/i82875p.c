@@ -240,7 +240,8 @@ READ16_MEMBER( i82875p_host_device::toud_r)
 WRITE16_MEMBER(i82875p_host_device::toud_w)
 {
 	COMBINE_DATA(&toud);
-	logerror("%s: toud = %08x\n", tag(), 512*toud);
+	toud &= ~7;
+	logerror("%s: toud = %08x\n", tag(), toud << 16);
 	remap_cb();
 }
 
