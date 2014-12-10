@@ -99,7 +99,6 @@ private:
     virtual void machine_reset();
     required_device<cpu_device> m_maincpu;
     UINT8 m_io[256];
-    UINT8 m_counter;
     UINT8 m_6351_addr;
 };
 
