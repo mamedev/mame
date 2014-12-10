@@ -75,7 +75,7 @@ const pc98_format::format pc98_format::formats[] = {
 	},
 	{   /* 2880K 3 1/2 inch extended density - gaps unverified */
 		floppy_image::FF_35,  floppy_image::DSED, floppy_image::MFM,
-			500, 36, 80, 2, 512, {}, 1, {}, 80, 50, 41, 80
+		500, 36, 80, 2, 512, {}, 1, {}, 80, 50, 41, 80
 	},
 	{
 		floppy_image::FF_525,  floppy_image::DSHD, floppy_image::MFM,
