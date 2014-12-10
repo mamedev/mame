@@ -211,7 +211,7 @@
 		</part>
 	</software>
 
-  <software name="digdino" supported="no">
+	<software name="digdino" supported="no">
 		<description>Digging for Dinosaurs (US)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
