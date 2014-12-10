@@ -682,6 +682,9 @@ void apple2e_state::machine_start()
 	save_item(NAME(m_exp_liveptr));
 	save_item(NAME(m_exp_bankhior));
 	save_item(NAME(m_exp_addrmask));
+	save_item(NAME(m_lcram));
+	save_item(NAME(m_lcram2));
+	save_item(NAME(m_lcwriteenable));
 }
 
 void apple2e_state::machine_reset()
@@ -826,7 +829,7 @@ UINT32 apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		{
 			if (m_video->m_mix)
 			{
-				if (m_video->m_dhires)
+				if ((m_video->m_dhires) && (m_video->m_80col))
 				{
 					m_video->dhgr_update(screen, bitmap, cliprect, 0, 159);
 				}
@@ -838,7 +841,7 @@ UINT32 apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			}
 			else
 			{
-				if (m_video->m_dhires)
+				if ((m_video->m_dhires) && (m_video->m_80col))
 				{
 					m_video->dhgr_update(screen, bitmap, cliprect, 0, 191);
 				}
@@ -852,7 +855,7 @@ UINT32 apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		{
 			if (m_video->m_mix)
 			{
-				if (m_video->m_dhires)
+				if ((m_video->m_dhires) && (m_video->m_80col))
 				{
 					m_video->dlores_update(screen, bitmap, cliprect, 0, 159);
 				}
@@ -865,7 +868,7 @@ UINT32 apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			}
 			else
 			{
-				if (m_video->m_dhires)
+				if ((m_video->m_dhires) && (m_video->m_80col))
 				{
 					m_video->dlores_update(screen, bitmap, cliprect, 0, 191);
 				}
