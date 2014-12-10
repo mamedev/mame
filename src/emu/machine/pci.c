@@ -63,6 +63,7 @@ pci_device::pci_device(const machine_config &mconfig, device_type type, const ch
 	revision = 0x00;
 	pclass = 0xffffff;
 	subsystem_id = 0xffffffff;
+	is_multifunction_device = false;
 }
 
 void pci_device::set_ids(UINT32 _main_id, UINT8 _revision, UINT32 _pclass, UINT32 _subsystem_id)
@@ -194,9 +195,14 @@ READ8_MEMBER(pci_device::latency_timer_r)
 	return 0x00;
 }
 
+void pci_device::set_multifunction_device(bool enable)
+{
+	is_multifunction_device = enable;
+}
+
 READ8_MEMBER(pci_device::header_type_r)
 {
-	return 0x00;
+	return is_multifunction_device ? 0x80 : 0x00;
 }
 
 READ8_MEMBER(pci_device::bist_r)
@@ -235,10 +241,6 @@ WRITE32_MEMBER(pci_device::expansion_base_w)
 READ8_MEMBER(pci_device::capptr_r)
 {
 	return 0x00;
-}
-
-void pci_device::scan_sub_devices(pci_device **devices, dynamic_array<pci_device *> &all, dynamic_array<pci_device *> &bridges, device_t *root)
-{
 }
 
 void pci_device::set_remap_cb(mapper_cb _remap_cb)
@@ -425,6 +427,9 @@ void pci_bridge_device::device_start()
 
 	for(int i=0; i<32*8; i++)
 		if(sub_devices[i]) {
+			if((i & 7) && sub_devices[i & ~7])
+				sub_devices[i & ~7]->set_multifunction_device(true);
+
 			all_devices.append(sub_devices[i]);
 			if(sub_devices[i] != this) {
 				sub_devices[i]->remap_config_cb = cf_cb;
