@@ -239,7 +239,7 @@ inline void operator--(_Type &value, int) { value = (_Type)((int)value - 1); }
 #define NATIVE_ENDIAN_VALUE_LE_BE(leval,beval)  ENDIAN_VALUE_LE_BE(ENDIANNESS_NATIVE, leval, beval)
 
 // endian-based value: first value is if 'endian' matches native, second is if 'endian' doesn't match native
-#define ENDIAN_VALUE_NE_NNE(endian,leval,beval) (((endian) == ENDIANNESS_NATIVE) ? (neval) : (nneval))
+#define ENDIAN_VALUE_NE_NNE(endian,neval,nneval) (((endian) == ENDIANNESS_NATIVE) ? (neval) : (nneval))
 
 
 // useful macros to deal with bit shuffling encryptions
