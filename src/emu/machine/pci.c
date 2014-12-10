@@ -449,6 +449,8 @@ void pci_bridge_device::device_reset()
 
 void pci_bridge_device::reset_all_mappings()
 {
+	pci_device::reset_all_mappings();
+
 	for(int i=0; i != all_devices.count(); i++)
 		if(all_devices[i] != this)
 			all_devices[i]->reset_all_mappings();
@@ -784,9 +786,7 @@ void pci_host_device::device_start()
 	memory_window_start = memory_window_end = memory_offset = 0;
 	io_window_start = io_window_end = io_offset = 0;
 
-	for(int i=0; i != all_devices.count(); i++)
-		if(all_devices[i] != this)
-			all_devices[i]->reset_all_mappings();
+	reset_all_mappings();
 }
 
 void pci_host_device::device_reset()
