@@ -16,7 +16,7 @@ G?A29    2001    Mocap Boxing
 G?A30    2002    Tsurugi
 GMA41    2001    Thrill Drive 2
 G?A45    2001    Boxing Mania
-GCB11    2001    Police 911 2 (USA) / Police 24/7 2 (World) / Keisatsukan Shinjuku 24ji 2 (Japan)
+G*B11    2001    Police 911 2 (USA) / Police 24/7 2 (World) / Keisatsukan Shinjuku 24ji 2 (Japan)
 G?B33    2001    Mocap Golf
 G?B41    2001    Jurassic Park 3
 G?B4x    2002    Xtrial Racing
@@ -79,9 +79,29 @@ MB81G163222-80 - Fujitsu MB81G163222-80 256k x 32-bit x 2 banks Synchronous Grap
       ADC0838 - National Semiconductor ADC0838 Serial I/O 8-Bit A/D Converters with Multiplexer Options (SOIC20 @ U13)
        DS2430 - Dallas DS2430 256-bits 1-Wire EEPROM. Has 256 bits x8 EEPROM (32 bytes), 64 bits x8 (8 bytes)
                 one-time programmable application register and unique factory-lasered and tested 64-bit
-                registration number (8-bit family code + 48-bit serial number + 8-bit CRC tester) (TO-92 @ U37)
-                It appears the DS2430 is not protected from reading but the unique silicon serial number isn't
-                included in the 40 byte dump.
+                registration number (8-bit family code + 48-bit serial number + 8-bit CRC) (TO-92 @ U37)
+                The OTP application register on the common DS2430 and the Police 911 2 DS2430 are not programmed 
+                (application register reads all 0xFF and the status register reads back 0xFF), so it's probably safe 
+                to assume they're not used on any of them.
+                It appears the DS2430 is not protected from reading and the unique silicon serial number is
+                included in the 40 byte dump. In the Police 911 2 NVRAM dump the serial number is located at both 0x002A and 0x1026
+                so that means it is tied to the DS2430. If the serial number in the NVRAM and DS2430 match then they are 
+                paired. The same serial number is likely present in the CF card image and a compare is done there too.
+                If they don't match the game requires an external DS2430 (i.e. dongle)
+                When the lasered ROM is read from the DS2430, it comes out from LSB to MSB (family code, LSB of 
+                S/N->MSB of S/N, CRC)
+                For Police 911 2 that is 0x14 0xB2 0xB7 0x4A 0x00 0x00 0x00 0x83
+                Family code=0x14
+                S/N=0x0000004AB7B2
+                CRC=0x83
+                In a DS2430 dump, the first 32 bytes is the EEPROM and the lasered ROM is 8 bytes and starts at 0x20h
+                For Police 911 2 that is....
+                00000000h CB 9B 56 EC A0 4C 87 53 51 46 28 E7 00 00 00 74
+                00000010h 30 A9 C7 76 B9 85 A3 43 87 53 50 42 1A E7 FA CF
+                00000020h 14 B2 B7 4A 00 00 00 83
+                It may be possible to hand craft a DS2430 for a dongle-protected version of a game simply by using
+                one of the existing DS2430 dumps and adjusting the serial number found in a dump of the NVRAM to pair them
+                or adjusting the serial number in the NVRAM to match the serial number found in one of the dumped DS2430s.
       M48T58Y - ST Microelectronics M48T58Y Timekeeper RAM (DIP28 @ U39). When this dies (after 10 year lifespan)
                 the game will complain with error RTC BAD then reset. The data inside the RTC can not be hand created
                 (yet) so to revive the PCB the correct RTC data must be re-programmed to a new RTC and replaced
@@ -2299,7 +2319,7 @@ ROM_END
 ROM_START(p9112) /* dongle-protected version */
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* plug-in male DIN5 dongle containing a DS2430 */
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* plug-in male DIN5 dongle containing a DS2430. The sticker on the dongle says 'GCB11-UA' */
 	ROM_LOAD("ds2430_p9112.u3", 0x00, 0x28, CRC(d745c6ee) SHA1(065C9D0DF1703B3BBB53A07F4923FDEE3B16F80E))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
@@ -2564,7 +2584,7 @@ GAME(2001, p911uc,    p911,      viper, viper, viper_state, vipercf,  ROT90,  "K
 GAME(2001, p911kc,    p911,      viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Police 911 (ver KAC)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, p911e,     p911,      viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Police 24/7 (ver EAA)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, p911j,     p911,      viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Keisatsukan Shinjuku 24ji (ver JAC)", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME(2001, p9112,     kviper,    viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Police 911 2 (ver UAD)", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME(2001, p9112,     kviper,    viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Police 911 2 (VER. UAA:B)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2003, popn9,     kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Pop'n Music 9 (ver JAB)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, sscopex,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Silent Scope EX (ver UAA)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, sogeki,    sscopex,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Sogeki (ver JAA)", GAME_NOT_WORKING|GAME_NO_SOUND)
