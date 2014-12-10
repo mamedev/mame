@@ -11,33 +11,35 @@
 
 /*
 
-PCB Layout
+Keyboard PCB Layout
 ----------
 
-A65-02307-201D
+Marking on PCB back: A65-02307-201D 007
 
-|-----------------------------------------------------------------------|
-|    22-008-03  22-050-3B     8021    74LS14                         CN1|
-|                            ?MHz                                       |
-|                                                                       |
-|                                                                       |
-|                                                                       |
-|                                                                       |
-|                                                                       |
-|                                                                       |
-|                                                                       |
-|                                                                       |
-|                                                                       |
-|-----------------------------------------------------------------------|
+|------------------------------------------------------------------------------------=
+| 22-908-03 22-950-3B .   XTAL 8021  74LS14     [804x]           [EPROM]  [???]   CN1=___
+|         X       X       X       X       X       X        X      X   X      X      X    |
+| X    X   X   X   X   X   X   X   X   X   X   X   X   X    X     X   X    X   X   X   X |
+| X     X   X   X   X   X   X   X   X   X   X   X   X   X    X    X   X    X   X   X   X |
+| X     X    X   X   X   X   X   X   X   X   X   X   X   X    X   X   X    X   X   X   X |
+| X    X   X  X   X   X   X   X   X   X   X   X   X       X       X   X    X   X   X   X |
+| X     X    marking             X                 X              X   X    X   X   X   X |
+|----------------------------------------------------------------------------------------|
+                                         
 
 Notes:
     All IC's shown.
+    XTAL        - 3.579545Mhz Crystal, marked "48-300-010" (front) and "3.579545Mhz" (back)
+    8021        - Intel 8021 MCU, marked: "iP8021 2137 // 8227 // 20-8021-139 // (C) INTEL 77"
+    22-908-03   - Exar Semiconductor XR22-008-03 keyboard matrix capacitive readout latch
+    22-950-3B   - Exar Semiconductor XR22-050-3B keyboard matrix row driver with 4 to 12 decoder/demultiplexer
+    CN1         - keyboard data connector (SIP, 7 pins, right angle)
 
-    8021        - Intel 8021 "70-8021-130?"
-    22-008-03   - Exar Semiconductor XR22-008-03 keyboard matrix capacitive readout latch
-    22-050-3B   - Exar Semiconductor XR22-050-3B keyboard matrix row driver with 4 to 12 decoder/demultiplexer
-    CN1         - keyboard data connector
-
+    [804x]      - unpopulated space for a 40 pin 804x or 803x MCU
+    [EPROM]     - unpopulated space for an EPROM, if a ROMless 803x MCU was used
+    [???]       - unpopulated space for an unknown NDIP10 IC or DIP-switch array
+    X           - capacitive sensor pad for one key
+    marking     - PCB trace marking: "KTC // A65-02307-007 // PCB 201 D"
 */
 
 #include "victor9kb.h"
