@@ -43,7 +43,7 @@ public:
 	//UINT8 m_pcg_internal_addr;
 	//UINT8 *m_char_rom;
 
-	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<UINT16> m_video_ram;
 	DECLARE_DRIVER_INIT(vt240);
 	virtual void machine_reset();
 	INTERRUPT_GEN_MEMBER(vt240_irq);
@@ -117,7 +117,7 @@ static ADDRESS_MAP_START(vt240_io, AS_IO, 8, vt240_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( upd7220_map, AS_0, 8, vt240_state)
+static ADDRESS_MAP_START( upd7220_map, AS_0, 16, vt240_state)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 

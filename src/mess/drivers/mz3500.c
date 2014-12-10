@@ -61,7 +61,7 @@ public:
 	required_device<upd7220_device> m_hgdc1;
 	required_device<upd7220_device> m_hgdc2;
 	required_device<upd765a_device> m_fdc;
-	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<UINT16> m_video_ram;
 	required_device<beep_device> m_beeper;
 	required_device<palette_device> m_palette;
 
@@ -174,8 +174,8 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( mz3500_state::hgdc_draw_text )
 
 	for( x = 0; x < pitch; x++ )
 	{
-		tile = (m_video_ram[((addr+x)*2) & 0x1fff] & 0xff);
-		attr = (m_video_ram[((addr+x)*2+1) & 0x3ffff] & 0x0f);
+		tile = (m_video_ram[(((addr+x)*2) & 0x1fff) >> 1] & 0xff);
+		attr = ((m_video_ram[(((addr+x)*2+1) & 0x3ffff) >> 1] >> 8) & 0x0f);
 
 		//if(hires)
 		//  tile <<= 1;
@@ -796,12 +796,12 @@ PALETTE_INIT_MEMBER(mz3500_state, mz3500)
 
 }
 
-static ADDRESS_MAP_START( upd7220_1_map, AS_0, 8, mz3500_state )
+static ADDRESS_MAP_START( upd7220_1_map, AS_0, 16, mz3500_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x00000, 0x00fff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( upd7220_2_map, AS_0, 8, mz3500_state )
+static ADDRESS_MAP_START( upd7220_2_map, AS_0, 16, mz3500_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM // AM_SHARE("video_ram_2")
 ADDRESS_MAP_END
 

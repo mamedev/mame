@@ -81,7 +81,7 @@ public:
 	required_memory_region m_rom;
 	required_memory_region m_mmu_rom;
 	required_memory_region m_char_rom;
-	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<UINT16> m_video_ram;
 
 	virtual void machine_start();
 	virtual void machine_reset();

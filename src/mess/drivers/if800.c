@@ -23,7 +23,7 @@ public:
 
 	required_device<upd7220_device> m_hgdc;
 
-	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<UINT16> m_video_ram;
 	virtual void machine_start();
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
@@ -38,9 +38,9 @@ UPD7220_DISPLAY_PIXELS_MEMBER( if800_state::hgdc_display_pixels )
 	int xi,gfx;
 	UINT8 pen;
 
-	gfx = m_video_ram[address];
+	gfx = m_video_ram[address >> 1];
 
-	for(xi=0;xi<8;xi++)
+	for(xi=0;xi<16;xi++)
 	{
 		pen = ((gfx >> xi) & 1) ? 1 : 0;
 
@@ -73,7 +73,7 @@ void if800_state::machine_reset()
 {
 }
 
-static ADDRESS_MAP_START( upd7220_map, AS_0, 8, if800_state )
+static ADDRESS_MAP_START( upd7220_map, AS_0, 16, if800_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 

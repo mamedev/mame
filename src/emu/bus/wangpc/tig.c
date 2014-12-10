@@ -83,7 +83,7 @@ const rom_entry *wangpc_tig_device::device_rom_region() const
 //  UPD7220_INTERFACE( hgdc0_intf )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( upd7220_0_map, AS_0, 8, wangpc_tig_device )
+static ADDRESS_MAP_START( upd7220_0_map, AS_0, 16, wangpc_tig_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_RAM // frame buffer
 	AM_RANGE(0x4000, 0x7fff) AM_RAM // font memory
@@ -98,7 +98,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( wangpc_tig_device::hgdc_draw_text )
 //  UPD7220_INTERFACE( hgdc1_intf )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( upd7220_1_map, AS_0, 8, wangpc_tig_device )
+static ADDRESS_MAP_START( upd7220_1_map, AS_0, 16, wangpc_tig_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0xffff) AM_RAM // graphics memory
 ADDRESS_MAP_END
