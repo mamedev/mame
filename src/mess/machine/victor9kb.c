@@ -177,14 +177,14 @@ INPUT_PORTS_START( victor9k_keyboard )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
 	PORT_START("Y6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I)
 
 	PORT_START("Y7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )
@@ -286,8 +286,8 @@ victor9k_keyboard_device::victor9k_keyboard_device(const machine_config &mconfig
 	m_kbrdy_handler(*this),
 	m_kbdata_handler(*this),
 	m_y(0),
-	m_kbrdy(1),
-	m_kbdata(1),
+	m_kbrdy(-1),
+	m_kbdata(-1),
 	m_kback(1)
 {
 }
@@ -371,7 +371,7 @@ WRITE8_MEMBER( victor9k_keyboard_device::kb_p1_w )
 		m_y = data & 0x0f;
 	}
 
-	//logerror("P1 %02x\n", data);
+	//logerror("%s P1 %02x\n", machine().describe_context(), data);
 }
 
 
@@ -408,7 +408,7 @@ WRITE8_MEMBER( victor9k_keyboard_device::kb_p2_w )
 		m_kbdata_handler(m_kbdata);
 	}
 
-	//logerror("P2 %02x\n", data);
+	//logerror("%s P2 %01x\n", machine().describe_context(), data&0x0f);
 }
 
 
