@@ -196,6 +196,11 @@ READ8_MEMBER( excali64_state::ppic_r )
 	return data;
 }
 
+WRITE8_MEMBER( excali64_state::ppic_w )
+{
+	m_cass->output(BIT(data, 7) ? -1.0 : +1.0);
+}
+
 READ8_MEMBER( excali64_state::port00_r )
 {
 	UINT8 data = 0xff;
@@ -218,20 +223,15 @@ d4 : vsync
 */
 READ8_MEMBER( excali64_state::port50_r )
 {
-	UINT8 data = m_sys_status & 7;
+	UINT8 data = m_sys_status & 0x2f;
 	data |= (UINT8)m_crtc_vs << 4;
-	data |= (UINT8)m_crtc_de << 3;
+	//data |= (UINT8)m_crtc_de << 3; this is a hardware mistake, recommended to disconnect
 	return data;
-}
-
-WRITE8_MEMBER( excali64_state::ppic_w )
-{
-	m_cass->output(BIT(data, 7) ? -1.0 : +1.0);
 }
 
 /*
 d0,1,2 : same as port50
-d7 : 2nd colour set
+d3 : 2nd colour set (schematic wrongly says d7)
 */
 WRITE8_MEMBER( excali64_state::port70_w )
 {
@@ -309,7 +309,7 @@ MC6845_UPDATE_ROW( excali64_state::update_row )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT8 chr,gfx,col,bg,fg;
 	UINT16 mem,x;
-	UINT8 col_base = BIT(m_sys_status, 7) ? 16 : 0;
+	UINT8 col_base = BIT(m_sys_status, 3) ? 16 : 0;
 	UINT32 *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
