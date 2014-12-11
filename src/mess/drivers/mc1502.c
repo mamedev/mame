@@ -51,8 +51,8 @@ TIMER_CALLBACK_MEMBER(mc1502_state::keyb_signal_callback)
 	key |= ioport("Y10")->read();
 	key |= ioport("Y11")->read();
 	key |= ioport("Y12")->read();
-//  DBG_LOG(1,"mc1502_k_s_c",("= %02X (%d) %s\n", key, m_kbd.pulsing,
-//          (key || m_kbd.pulsing) ? " will IRQ" : ""));
+//	DBG_LOG(1,"mc1502_k_s_c",("= %02X (%d) %s\n", key, m_kbd.pulsing,
+//	    (key || m_kbd.pulsing) ? " will IRQ" : ""));
 
 	/*
 	   If a key is pressed and we're not pulsing yet, start pulsing the IRQ1;
@@ -73,7 +73,7 @@ TIMER_CALLBACK_MEMBER(mc1502_state::keyb_signal_callback)
 
 WRITE8_MEMBER(mc1502_state::mc1502_ppi_portb_w)
 {
-//  DBG_LOG(2,"mc1502_ppi_portb_w",("( %02X )\n", data));
+//	DBG_LOG(2,"mc1502_ppi_portb_w",("( %02X )\n", data));
 	m_ppi_portb = data;
 	m_pit8253->write_gate2(BIT(data, 0));
 	mc1502_speaker_set_spkrdata(BIT(data, 1));
@@ -87,14 +87,14 @@ WRITE8_MEMBER(mc1502_state::mc1502_ppi_portb_w)
 // bit 3: i8251 SYNDET pin triggers NMI (default = 1 = no)
 WRITE8_MEMBER(mc1502_state::mc1502_ppi_portc_w)
 {
-//  DBG_LOG(2,"mc1502_ppi_portc_w",("( %02X )\n", data));
+//	DBG_LOG(2,"mc1502_ppi_portc_w",("( %02X )\n", data));
 	m_ppi_portc = data & 15;
 }
 
-//  0x80 -- serial RxD
-//  0x40 -- CASS IN, also loops back T2OUT (gated by CASWR)
-//  0x20 -- T2OUT
-//  0x10 -- SNDOUT
+// 0x80 -- serial RxD
+// 0x40 -- CASS IN, also loops back T2OUT (gated by CASWR)
+// 0x20 -- T2OUT
+// 0x10 -- SNDOUT
 READ8_MEMBER(mc1502_state::mc1502_ppi_portc_r)
 {
 	int data = 0xff;
@@ -104,8 +104,8 @@ READ8_MEMBER(mc1502_state::mc1502_ppi_portc_r)
 	data = ( data & ~0x20 ) | ( m_pit_out2 ? 0x20 : 0x00 );
 	data = ( data & ~0x10 ) | ( (BIT(m_ppi_portb, 1) && m_pit_out2) ? 0x10 : 0x00 );
 
-//  DBG_LOG(2,"mc1502_ppi_portc_r",("= %02X (tap_val %f t2out %d) at %s\n",
-//          data, tap_val, m_pit_out2, machine().describe_context()));
+//	DBG_LOG(2,"mc1502_ppi_portc_r",("= %02X (tap_val %f t2out %d) at %s\n",
+//	    data, tap_val, m_pit_out2, machine().describe_context()));
 	return data;
 }
 
@@ -126,7 +126,7 @@ READ8_MEMBER(mc1502_state::mc1502_kppi_porta_r)
 	if (m_kbd.mask & 0x0400) { key |= ioport("Y11")->read(); }
 	if (m_kbd.mask & 0x0800) { key |= ioport("Y12")->read(); }
 	key ^= 0xff;
-//  DBG_LOG(2,"mc1502_kppi_porta_r",("= %02X\n", key));
+//	DBG_LOG(2,"mc1502_kppi_porta_r",("= %02X\n", key));
 	return key;
 }
 
@@ -138,14 +138,14 @@ WRITE8_MEMBER(mc1502_state::mc1502_kppi_portb_w)
 		m_kbd.mask |= 1 << 11;
 	else
 		m_kbd.mask &= ~(1 << 11);
-//  DBG_LOG(2,"mc1502_kppi_portb_w",("( %02X -> %04X )\n", data, m_kbd.mask));
+//	DBG_LOG(2,"mc1502_kppi_portb_w",("( %02X -> %04X )\n", data, m_kbd.mask));
 }
 
 WRITE8_MEMBER(mc1502_state::mc1502_kppi_portc_w)
 {
 	m_kbd.mask &= ~(7 << 8);
 	m_kbd.mask |= ((data ^ 7) & 7) << 8;
-//  DBG_LOG(2,"mc1502_kppi_portc_w",("( %02X -> %04X )\n", data, m_kbd.mask));
+//	DBG_LOG(2,"mc1502_kppi_portc_w",("( %02X -> %04X )\n", data, m_kbd.mask));
 }
 
 WRITE_LINE_MEMBER(mc1502_state::mc1502_i8251_syndet)
@@ -219,7 +219,6 @@ static ADDRESS_MAP_START( mc1502_map, AS_PROGRAM, 8, mc1502_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x97fff) AM_RAM   /* 96K on mainboard + 512K on extension card */
 	AM_RANGE(0xc0000, 0xfbfff) AM_NOP
-//  AM_RANGE(0xe8000, 0xeffff) AM_ROM       /* BASIC */
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -232,7 +231,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mc1502_io, AS_IO, 8, mc1502_state )
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
-	AM_RANGE(0x0028, 0x0028) AM_DEVREADWRITE("upd8251", i8251_device, data_r, data_w)   // not working yet
+	AM_RANGE(0x0028, 0x0028) AM_DEVREADWRITE("upd8251", i8251_device, data_r, data_w)
 	AM_RANGE(0x0029, 0x0029) AM_DEVREADWRITE("upd8251", i8251_device, status_r, control_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255n1", i8255_device, read, write)
@@ -244,7 +243,6 @@ static INPUT_PORTS_START( mc1502 )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( mc1502, mc1502_state )
-	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_16MHz/3)
 	MCFG_CPU_PROGRAM_MAP(mc1502_map)
 	MCFG_CPU_IO_MAP(mc1502_io)
