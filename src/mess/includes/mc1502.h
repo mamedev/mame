@@ -77,15 +77,6 @@ public:
 
 private:
 	int m_pit_out2;
-
-/*
-    TIMER_CALLBACK_MEMBER(fdc_motor_callback);
-    static struct {
-        int         fdc_motor_on;
-        emu_timer   *fdc_motor_timer;
-    } m_motor;
-    const char *m_cputag;
-*/
 };
 
 #endif /* MC1502_H_ */
