@@ -16,8 +16,8 @@ Keyboard PCB Layout
 
 Marking on PCB back: A65-02307-201D 007
 
-|------------------------------------------------------------------------------------=
-| 22-908-03 22-950-3B .   XTAL 8021  74LS14     [804x]           [EPROM]  [???]   CN1=___
+|------------------------------------------------------------------------------------|
+| 22-908-03 22-950-3B     XTAL 8021  74LS14     [804x]           [EPROM]  [???] L CN1=___
 |         X       X       X       X       X       X        X      X   X      X      X    |
 | X    X   X   X   X   X   X   X   X   X   X   X   X   X    X     X   X    X   X   X   X |
 | X     X   X   X   X   X   X   X   X   X   X   X   X   X    X    X   X    X   X   X   X |
@@ -29,11 +29,13 @@ Marking on PCB back: A65-02307-201D 007
 
 Notes:
     All IC's shown.
-    XTAL        - 3.579545Mhz Crystal, marked "48-300-010" (front) and "3.579545Mhz" (back)
-    8021        - Intel 8021 MCU, marked: "iP8021 2137 // 8227 // 20-8021-139 // (C) INTEL 77"
-    22-908-03   - Exar Semiconductor XR22-008-03 keyboard matrix capacitive readout latch
-    22-950-3B   - Exar Semiconductor XR22-050-3B keyboard matrix row driver with 4 to 12 decoder/demultiplexer
-    CN1         - keyboard data connector (SIP, 7 pins, right angle)
+    XTAL        - 3.579545Mhz Crystal, marked "48-300-010" (front of xtal) and "3.579545Mhz" (back of xtal)
+    74LS14      - Z4 - 74LS14 Hex inverter with Schmitt-trigger inputs (0.8v hysteresis)
+    8021        - Z3 - Intel 8021 MCU, marked: "P8021 2137 // 8227 // 20-8021-139 // (C) INTEL 77"
+    22-908-03   - Z2 - Exar Semiconductor XR22-008-03 keyboard matrix capacitive readout latch
+    22-950-3B   - Z1 - Exar Semiconductor XR22-050-3B keyboard matrix row driver with 4 to 12 decoder/demultiplexer
+    CN1 or J1   - J1 - keyboard data connector (SIP, 7 pins, right angle)
+    L           - L1 & L2 - mil-spec 22uH 10% inductors (double wide silver band(mil spec), red(2) red(2) black(x1uH) silver(10%))
 
     [804x]      - unpopulated space for a 40 pin 804x or 803x MCU
     [EPROM]     - unpopulated space for an EPROM, if a ROMless 803x MCU was used
@@ -41,16 +43,141 @@ Notes:
     X           - capacitive sensor pad for one key
     marking     - PCB trace marking: "KTC // A65-02307-007 // PCB 201 D"
 
+74LS14 (Hex inverter with Schmitt-trigger inputs (0.8v hysteresis))
+------------------
+         __   __
+   1A 1 |* \_/  | 14 VCC
+  /1Y 2 |       | 13 6A
+   2A 3 |       | 12 /6Y
+  /2Y 4 |       | 11 5A
+   3A 5 | 74LS14| 10 /5Y
+  /3Y 6 |       | 9  4A
+  GND 7 |_______| 8  /4Y
+
+   
+P8021 Pinout
+------------------
+            _____   _____
+   P22   1 |*    \_/     | 28  VCC
+   P23   2 |             | 27  P21
+  PROG   3 |             | 26  P20
+   P00   4 |             | 25  P17
+   P01   5 |    P8021    | 24  P16
+   P02   6 |             | 23  P15
+   P03   7 |             | 22  P14
+   P04   8 |             | 21  P13
+   P05   9 |             | 20  P12
+   P06  10 |             | 19  P11
+   P07  11 |             | 18  P10
+   ALE  12 |             | 17  RESET
+    T1  13 |             | 16  XTAL 2
+   VSS  14 |_____________| 15  XTAL 1
+
+
+XR22-008-03 Pinout (AKA XR22-908-03)
+------------------
+            _____   _____
+    D0   1 |*    \_/     | 20  Vcc
+    D1   2 |             | 19  _CLR
+    D2   3 |             | 18  Q0
+    D3   4 |             | 17  Q1
+   HYS   5 |  22-008-03  | 16  Q2
+    D4   6 |             | 15  Q3
+    D5   7 |             | 14  Q4
+    D6   8 |             | 13  Q5
+    D7   9 |             | 12  Q6
+   GND  10 |_____________| 11  Q7
+
+
+XR22-050-3B Pinout (AKA XR22-950-3B)
+------------------
+            _____   _____
+    Y8   1 |*    \_/     | 20  Vcc
+    Y9   2 |             | 19  Y7
+   Y10   3 |             | 18  Y6
+   Y11   4 |             | 17  Y5
+  _STB   5 |  22-050-3B  | 16  Y4
+    A0   6 |             | 15  Y3
+    A1   7 |             | 14  Y2
+    A2   8 |             | 13  Y1
+    A3   9 |             | 12  Y0
+   GND  10 |_____________| 11  OE?
+
+i8021 to elsewhere connections
+------------------------------
+8021 pin - 22-xxx pin
+  P22  1 - 74LS14 pin 5 (3A)                            AND (804x chip pin 37, P26)
+  P23  2 - 74LS14 pin 11 (5A)                           AND (804x chip pin 38, P27)
+ PROG  3 -                                                  (804x chip pin 25, PROG)
+  P00  4 - N/C
+  P01  5 - N/C
+  P02  6 - N/C
+  P03  7 - N/C
+  P04  8 - N/C
+  P05  9 - N/C
+  P06 10 - N/C
+  P07 11 - N/C
+  ALE 12 - N/C
+   T1 13 - 74LS14 pin 2 (/1Y)                           AND (804x chip pin 39, T1)
+  VSS 14 - GND
+XTAL1 15 - XTAL
+XTAL2 16 - XTAL
+RESET 17 - 10uf capacitor - VCC
+  P10 18 - 22-908 pin 18 (Q0) AND 22-950 pin 6 (A0)     AND (804x chip pin 27, P10)
+  P11 19 - 22-908 pin 17 (Q1) AND 22-950 pin 7 (A1)     AND (804x chip pin 28, P11)
+  P12 20 - 22-908 pin 16 (Q2) AND 22-950 pin 8 (A2)     AND (804x chip pin 29, P12)
+  P13 21 - 22-908 pin 15 (Q3) AND 22-950 pin 9 (A3)     AND (804x chip pin 30, P13)
+  P14 22 - 22-908 pin 14 (Q4)                           AND (804x chip pin 31, P14)
+  P15 23 - 22-908 pin 13 (Q5)                           AND (804x chip pin 32, P15)
+  P16 24 - 22-908 pin 12 (Q6)                           AND (804x chip pin 33, P16)
+  P17 25 - 22-908 pin 11 (Q7)                           AND (804x chip pin 34, P17)
+  P20 26 - 22-908 pin 19 (/CLR) AND 22-950 pin 5 (/STB) AND (804x chip pin 35, P24)
+  P21 27 - 74LS14 pin 9 (4A)                            AND (804x chip pin 36, P25)
+  VCC 28 - VCC
+  
+74LS14 to elsewhere connections
+-------------------------------
+  1A  1 - 100 Ohm resistor - J1 pin 4
+ /1Y  2 - 8021 pin 13 (T1)
+  2A  3 - 74LS14 pin 8
+ /2Y  4 - 22uH 10% inductor 'L1' - J1 pin 5
+  3A  5 - 8021 pin 1 (P22)
+ /3Y  6 - many keyboard contact pads (!)
+ GND  7 - GND
+ /4Y  8 - 74LS14 pin 3
+  4A  9 - 8021 pin 27 (P21)
+ /5Y 10 - 74LS14 pin 13
+  5A 11 - 8021 pin 2 (P23)
+ /6Y 12 - 22uH 10% inductor 'L2' - J1 pin 6
+  6A 13 - 74LS14 pin 10
+ VCC 14 - VCC
+
+ 
+J1 (aka CN1) connections:
+-------------------------
+1 - VCC
+2 - GND
+3 - GND
+4 - 100 Ohm 5% resistor -> 74LS14 pin 1 -> inverted 74LS14 pin 2 -> inverted 8021 pin 13 (T1)
+5 - 22uH 10% inductor 'L1' <- 74LS14 pin 4 <- inverted 74LS14 pin 3 <- inverted 74LS14 pin 8 <- 74LS14 pin 9 <- 8021 pin 27 (P21)
+6 - 22uH 10% inductor 'L2' <- 74LS14 pin 12 <- inverted 74LS14 pin 13 <- inverted 74LS14 pin 10 <- 74LS14 pin 11 <- 8021 pin 2 (P23)
+7 - VCC
+
+Pins 5,and 6 also have a .0047uF capacitor to GND (forming some sort of LC filter)
+There is another .0047uF capacitor to ground from the connection between 74LS14 pin 1 and the 100 Ohm 5% resistor which connects to pin 4 (forming some sort of RC filter)
+
+ 
+22-950 pin 11 (OE?) - 68KOhm 5% resistor - 22-908 pin 5 (HYS)  
 
 Key Layout (USA Variant): (the S0x markings appear on the back of the PCB)
-|------------------------------------------------------------------------------------=
-| 22-908-03 22-950-3B .   XTAL 8021  74LS14     [804x]           [EPROM]  [???]   CN1=___
-|         01      02      03      04      05      06       07     08  09     10     11   | <- the leftmost X is S01
+|------------------------------------------------------------------------------------|
+| 22-908-03 22-950-3B     XTAL 8021  74LS14     [804x]           [EPROM]  [???] L CN1=___
+|         01      02      03      04      05      06       07     08  09     10     11   |
 | 12   13  14  15  16  17  18  19  20  21  22  23  24  25   26    27  28   29  30  31 32 |
 | 33    34  35  36  37  38  39  40  41  42  43  44  45  46   47   48  49   50  51  52 53 |
 | 54    55   56  57  58  59  60  61  62  63  64  65  66  67   68  69  70   71  72  73 74 |
 | 75   76  77 78  79  80  81  82  83  84  85  86  87      88      89  90   91  92  93 94 |
-| 95    96   marking             97                98             99 100  101 102 103 104| <- the rightmost X is S104
+| 95    96   marking             97                98             99 100  101 102 103 104|
 |----------------------------------------------------------------------------------------|
 
    key - Shifted(top)/Unshifted(bottom)/Alt(front) (if no slashes in description assume key has just one symbol on it)
