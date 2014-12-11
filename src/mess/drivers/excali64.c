@@ -3,6 +3,7 @@
 /***************************************************************************
 
 Excalibur 64 kit computer, designed and sold in Australia by BGR Computers.
+The official schematics have a LOT of errors and omissions.
 
 Skeleton driver created on 2014-12-09.
 
@@ -15,16 +16,15 @@ ToDo:
 - Some keys can be connected to more than one position in the matrix. Need to
   determine the correct positions.
 - The position of the "Line Insert" key is unknown.
-- PCGEN command not working.
 - Colours are approximate.
 - Disk controller
-- Banking
+- ROM banking
 - The schematic shows the audio counter connected to 2MHz, but this produces
   sounds that are too high. Connected to 1MHz for now.
 - Serial
 - Parallel / Centronics
 - Need software
-- Pasting can drop a character or two at the start of a line.
+- Pasting can sometimes drop a character.
 
 ****************************************************************************/
 
@@ -61,16 +61,16 @@ public:
 	DECLARE_READ8_MEMBER(port00_r);
 	DECLARE_READ8_MEMBER(port50_r);
 	DECLARE_WRITE8_MEMBER(port70_w);
-	DECLARE_WRITE8_MEMBER(video_w);
 	MC6845_UPDATE_ROW(update_row);
 	DECLARE_WRITE_LINE_MEMBER(crtc_de);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vs);
-
+	DECLARE_MACHINE_RESET(excali64);
 	required_device<palette_device> m_palette;
 	
 private:
 	const UINT8 *m_p_chargen;
 	UINT8 *m_p_videoram;
+	UINT8 *m_p_hiresram;
 	UINT8 m_sys_status;
 	UINT8 m_kbdrow;
 	bool m_crtc_vs;
@@ -82,9 +82,11 @@ private:
 };
 
 static ADDRESS_MAP_START(excali64_mem, AS_PROGRAM, 8, excali64_state)
-	AM_RANGE(0x0000, 0x1FFF) AM_ROM
-	AM_RANGE(0x2000, 0x3FFF) AM_ROM AM_WRITE(video_w)
-	AM_RANGE(0x4000, 0xFFFF) AM_RAM
+	AM_RANGE(0x0000, 0x1FFF) AM_READ_BANK("bankr1") AM_WRITE_BANK("bankw1")
+	AM_RANGE(0x2000, 0x2FFF) AM_READ_BANK("bankr2") AM_WRITE_BANK("bankw2")
+	AM_RANGE(0x3000, 0x3FFF) AM_READ_BANK("bankr3") AM_WRITE_BANK("bankw3")
+	AM_RANGE(0x4000, 0x4FFF) AM_READ_BANK("bankr4") AM_WRITE_BANK("bankw4")
+	AM_RANGE(0x5000, 0xFFFF) AM_RAM AM_REGION("rambank", 0x5000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(excali64_io, AS_IO, 8, excali64_state)
@@ -101,7 +103,7 @@ static ADDRESS_MAP_START(excali64_io, AS_IO, 8, excali64_state)
 ADDRESS_MAP_END
 
 
-/* Input ports */
+// Keyboard matrix is not included in schematics, so some guesswork
 static INPUT_PORTS_START( excali64 )
 	PORT_START("KEY.0")    /* line 0 */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R') PORT_CHAR(0x12)
@@ -218,30 +220,75 @@ READ8_MEMBER( excali64_state::port00_r )
 d0 : /rom ; screen
 d1 : ram on
 d2 : /low ; high res
-d3 : dispen
+d3 : 2nd colour set (previously, dispen, which is a mistake in hardware and schematic)
 d4 : vsync
+d5 : rombank
 */
 READ8_MEMBER( excali64_state::port50_r )
 {
 	UINT8 data = m_sys_status & 0x2f;
 	data |= (UINT8)m_crtc_vs << 4;
-	//data |= (UINT8)m_crtc_de << 3; this is a hardware mistake, recommended to disconnect
 	return data;
 }
 
 /*
-d0,1,2 : same as port50
-d3 : 2nd colour set (schematic wrongly says d7)
+d0,1,2,3,5 : same as port50
+(schematic wrongly says d7 used for 2nd colour set)
 */
 WRITE8_MEMBER( excali64_state::port70_w )
 {
 	m_sys_status = data;
 	m_crtc->set_unscaled_clock(BIT(data, 2) ? 2e6 : 1e6);
+	if BIT(data, 1)
+	{
+	// select 64k ram
+		membank("bankr1")->set_entry(0);
+		membank("bankr2")->set_entry(0);
+		membank("bankr3")->set_entry(0);
+		membank("bankr4")->set_entry(0);
+		membank("bankw1")->set_entry(0);
+		membank("bankw2")->set_entry(0);
+		membank("bankw3")->set_entry(0);
+		membank("bankw4")->set_entry(0);
+	}
+	else
+	if BIT(data, 0)
+	{
+	// select videoram and hiresram for writing, and ROM for reading
+		membank("bankr1")->set_entry(1);
+		membank("bankr2")->set_entry(1);
+		membank("bankr3")->set_entry(1);
+		membank("bankr4")->set_entry(0);
+		membank("bankw1")->set_entry(0);
+		membank("bankw2")->set_entry(2);
+		membank("bankw3")->set_entry(2);
+		membank("bankw4")->set_entry(2);
+	}
+	else
+	{
+	// as above, except 4000-4FFF is main ram
+		membank("bankr1")->set_entry(1);
+		membank("bankr2")->set_entry(1);
+		membank("bankr3")->set_entry(1);
+		membank("bankr4")->set_entry(0);
+		membank("bankw1")->set_entry(0);
+		membank("bankw2")->set_entry(2);
+		membank("bankw3")->set_entry(2);
+		membank("bankw4")->set_entry(0);
+	}
 }
 
-WRITE8_MEMBER( excali64_state::video_w )
+MACHINE_RESET_MEMBER( excali64_state, excali64 )
 {
-	m_p_videoram[offset] = data;
+	membank("bankr1")->set_entry(1); // read from ROM
+	membank("bankr2")->set_entry(1); // read from ROM
+	membank("bankr3")->set_entry(1); // read from ROM
+	membank("bankr4")->set_entry(0); // read from RAM
+	membank("bankw1")->set_entry(0); // write to RAM
+	membank("bankw2")->set_entry(2); // write to videoram
+	membank("bankw3")->set_entry(2); // write to hiresram
+	membank("bankw4")->set_entry(0); // write to RAM
+	m_maincpu->reset();
 }
 
 WRITE_LINE_MEMBER( excali64_state::crtc_de )
@@ -280,7 +327,31 @@ PALETTE_INIT_MEMBER( excali64_state, excali64 )
 	// do this here because driver_init hasn't run yet
 	m_p_videoram = memregion("videoram")->base();
 	m_p_chargen = memregion("chargen")->base();
+	m_p_hiresram = memregion("hiresram")->base();
+	UINT8 *main = memregion("roms")->base();
+	UINT8 *ram = memregion("rambank")->base();
 
+	// main ram (cp/m mode)
+	membank("bankr1")->configure_entry(0, &ram[0x0000]);
+	membank("bankr2")->configure_entry(0, &ram[0x2000]);
+	membank("bankr3")->configure_entry(0, &ram[0x3000]);
+	membank("bankr4")->configure_entry(0, &ram[0x4000]);//boot
+	membank("bankw1")->configure_entry(0, &ram[0x0000]);//boot
+	membank("bankw2")->configure_entry(0, &ram[0x2000]);
+	membank("bankw3")->configure_entry(0, &ram[0x3000]);
+	membank("bankw4")->configure_entry(0, &ram[0x4000]);//boot
+	// rom_1
+	membank("bankr1")->configure_entry(1, &main[0x0000]);//boot
+	// rom_2
+	membank("bankr2")->configure_entry(1, &main[0x4000]);//boot
+	membank("bankr3")->configure_entry(1, &main[0x5000]);//boot
+	// videoram
+	membank("bankw2")->configure_entry(2, &m_p_videoram[0x0000]);//boot
+	// hiresram
+	membank("bankw3")->configure_entry(2, &m_p_hiresram[0x0000]);//boot
+	membank("bankw4")->configure_entry(2, &m_p_hiresram[0x0000]);
+
+	// Set up foreground palettes
 	UINT8 r,g,b,i,code;
 	for (i = 0; i < 32; i++)
 	{
@@ -291,7 +362,6 @@ PALETTE_INIT_MEMBER( excali64_state, excali64 )
 		palette.set_pen_color(i, r, g, b);
 	}
 
-
 	// Background
 	palette.set_pen_color(32, 0x00, 0x00, 0x00);  //  0 Black
 	palette.set_pen_color(33, 0xff, 0x00, 0x00);  //  1 Red
@@ -301,7 +371,6 @@ PALETTE_INIT_MEMBER( excali64_state, excali64 )
 	palette.set_pen_color(37, 0xff, 0xff, 0x00);  //  5 Yellow
 	palette.set_pen_color(38, 0x00, 0xff, 0xff);  //  6 Cyan
 	palette.set_pen_color(39, 0xff, 0xff, 0xff);  //  7 White
-
 }
 
 MC6845_UPDATE_ROW( excali64_state::update_row )
@@ -321,7 +390,7 @@ MC6845_UPDATE_ROW( excali64_state::update_row )
 		bg = 32 + ((col >> 1) & 7);
 
 		if (BIT(col, 0) & BIT(chr, 7))
-			gfx = m_p_videoram[0x800 + (chr<<4) + ra]; // hires definition
+			gfx = m_p_hiresram[(chr<<4) | ra]; // hires definition
 		else
 			gfx = m_p_chargen[(chr<<4) | ra]; // normal character
 		
@@ -344,6 +413,8 @@ static MACHINE_CONFIG_START( excali64, excali64_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(excali64_mem)
 	MCFG_CPU_IO_MAP(excali64_io)
+
+	MCFG_MACHINE_RESET_OVERRIDE(excali64_state, excali64)
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	//MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
@@ -398,16 +469,18 @@ static MACHINE_CONFIG_START( excali64, excali64_state )
 
 /* ROM definition */
 ROM_START( excali64 )
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x6000, "roms", 0)
 	ROM_LOAD( "rom_1.ic17", 0x0000, 0x4000, CRC(e129a305) SHA1(e43ec7d040c2b2e548d22fd6bbc7df8b45a26e5a) )
-	ROM_LOAD( "rom_2.ic24", 0x2000, 0x2000, CRC(916d9f5a) SHA1(91c527cce963481b7bebf077e955ca89578bb553) )
+	ROM_LOAD( "rom_2.ic24", 0x4000, 0x2000, CRC(916d9f5a) SHA1(91c527cce963481b7bebf077e955ca89578bb553) )
 	// fix a bug that causes screen to be filled with 'p'
 	ROM_FILL(0x4ee, 1, 0)
 	ROM_FILL(0x4ef, 1, 8)
 	ROM_FILL(0x4f6, 1, 0)
 	ROM_FILL(0x4f7, 1, 8)
 
-	ROM_REGION(0x2000, "videoram", ROMREGION_ERASE00)
+	ROM_REGION(0x10000, "rambank", ROMREGION_ERASE00)
+	ROM_REGION(0x1000, "videoram", ROMREGION_ERASE00)
+	ROM_REGION(0x1000, "hiresram", ROMREGION_ERASE00)
 
 	ROM_REGION(0x1020, "chargen", 0)
 	ROM_LOAD( "genex_3.ic43", 0x0000, 0x1000, CRC(b91619a9) SHA1(2ced636cb7b94ba9d329868d7ecf79963cefe9d9) )
