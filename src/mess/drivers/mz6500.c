@@ -62,12 +62,15 @@ void mz6500_state::video_start()
 
 READ8_MEMBER( mz6500_state::mz6500_vram_r )
 {
-	return m_video_ram[offset];
+	return m_video_ram[offset >> 1] >> ((offset & 1) ? 8 : 0);
 }
 
 WRITE8_MEMBER( mz6500_state::mz6500_vram_w )
 {
-	m_video_ram[offset] = data;
+	int mask = (offset & 1) ? 8 : 0;
+	offset >>= 1;
+	m_video_ram[offset] &= 0xff00 >> mask;
+	m_video_ram[offset] |= data << mask;
 }
 
 static ADDRESS_MAP_START(mz6500_map, AS_PROGRAM, 16, mz6500_state)

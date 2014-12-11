@@ -3389,7 +3389,7 @@ MACHINE_CONFIG_END
 	ROM_IGNORE( 0x2000 ) \
 	ROM_IGNORE( 0x2000 ) \
 	ROM_IGNORE( 0x2000 ) \
-//	ROM_FILL( 0x0000, 0x2000, 0xcb )
+	ROM_FILL( 0x0000, 0x2000, 0xcb )
 
 // all of these are half size :/
 #define LOAD_KANJI_ROMS \

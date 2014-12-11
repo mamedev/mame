@@ -704,7 +704,7 @@ READ16_MEMBER( qx10_state::vram_r )
 	else if(m_vram_bank & 2) { bank = 1; } // G
 	else if(m_vram_bank & 4) { bank = 2; } // R
 
-	return m_video_ram[offset + (0x20000 * bank)] | (m_video_ram[offset + (0x20000 * bank) + 1] << 8);
+	return m_video_ram[offset + (0x20000 * bank)];
 }
 
 WRITE16_MEMBER( qx10_state::vram_w )
@@ -715,10 +715,7 @@ WRITE16_MEMBER( qx10_state::vram_w )
 	else if(m_vram_bank & 2) { bank = 1; } // G
 	else if(m_vram_bank & 4) { bank = 2; } // R
 
-	if(mem_mask & 0xff)
-		m_video_ram[offset + (0x20000 * bank)] = data;
-	if(mem_mask & 0xff00)
-		m_video_ram[offset + (0x20000 * bank) + 1] = data >> 8;
+	COMBINE_DATA(&m_video_ram[offset + (0x20000 * bank)]);
 }
 
 static ADDRESS_MAP_START( upd7220_map, AS_0, 16, qx10_state )
