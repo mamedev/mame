@@ -2,9 +2,9 @@
 // copyright-holders:etabeta
 /*********************************************************************
 
-    formats/pc98nfd_dsk.h
+    formats/nfd_dsk.h
 
-    PC98NFD disk images (info from: http://www.geocities.jp/t98next/dev.html )
+    PC98 NFD disk images (info from: http://www.geocities.jp/t98next/dev.html )
 
     Revision 0
     ==========
@@ -78,28 +78,28 @@
  *********************************************************************/
 
 #include "emu.h"
-#include "pc98nfd_dsk.h"
+#include "nfd_dsk.h"
 
-pc98nfd_format::pc98nfd_format()
+nfd_format::nfd_format()
 {
 }
 
-const char *pc98nfd_format::name() const
-{
-	return "pc98_nfd";
-}
-
-const char *pc98nfd_format::description() const
-{
-	return "PC98 NFD disk image";
-}
-
-const char *pc98nfd_format::extensions() const
+const char *nfd_format::name() const
 {
 	return "nfd";
 }
 
-int pc98nfd_format::identify(io_generic *io, UINT32 form_factor)
+const char *nfd_format::description() const
+{
+	return "NFD disk image";
+}
+
+const char *nfd_format::extensions() const
+{
+	return "nfd";
+}
+
+int nfd_format::identify(io_generic *io, UINT32 form_factor)
 {
 	UINT8 h[16];	
 	io_generic_read(io, h, 0, 16);
@@ -110,7 +110,7 @@ int pc98nfd_format::identify(io_generic *io, UINT32 form_factor)
 	return 0;
 }
 
-bool pc98nfd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+bool nfd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	UINT64 size = io_generic_size(io);
 	UINT8 h[0x120], hsec[0x10];	
@@ -273,9 +273,9 @@ bool pc98nfd_format::load(io_generic *io, UINT32 form_factor, floppy_image *imag
 	return true;
 }
 
-bool pc98nfd_format::supports_save() const
+bool nfd_format::supports_save() const
 {
 	return false;
 }
 
-const floppy_format_type FLOPPY_PC98NFD_FORMAT = &floppy_image_format_creator<pc98nfd_format>;
+const floppy_format_type FLOPPY_NFD_FORMAT = &floppy_image_format_creator<nfd_format>;

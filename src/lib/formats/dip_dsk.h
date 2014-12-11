@@ -1,21 +1,21 @@
 /*********************************************************************
 
-    formats/pc98fdd_dsk.h
+    formats/dip_dsk.h
 
-    PC98FDD disk images
+    PC98DIP disk images
 
 *********************************************************************/
 
-#ifndef PC98FDD_DSK_H
-#define PC98FDD_DSK_H
+#ifndef DIP_DSK_H
+#define DIP_DSK_H
 
 #include "flopimg.h"
 
 
-class pc98fdd_format : public floppy_image_format_t
+class dip_format : public floppy_image_format_t
 {
 public:
-	pc98fdd_format();
+	dip_format();
 
 	virtual int identify(io_generic *io, UINT32 form_factor);
 	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image);
@@ -26,6 +26,6 @@ public:
 	virtual bool supports_save() const;
 };
 
-extern const floppy_format_type FLOPPY_PC98FDD_FORMAT;
+extern const floppy_format_type FLOPPY_DIP_FORMAT;
 
-#endif /* PC98FDD_DSK_H */
+#endif /* DIP_DSK_H */

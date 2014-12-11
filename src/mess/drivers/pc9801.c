@@ -416,10 +416,10 @@ Keyboard TX commands:
 
 #include "formats/pc98_dsk.h"
 #include "formats/pc98fdi_dsk.h"
-#include "formats/pc98fdd_dsk.h"
-#include "formats/pc98dcp_dsk.h"
-#include "formats/pc98dip_dsk.h"
-#include "formats/pc98nfd_dsk.h"
+#include "formats/fdd_dsk.h"
+#include "formats/dcp_dsk.h"
+#include "formats/dip_dsk.h"
+#include "formats/nfd_dsk.h"
 
 #include "machine/pc9801_26.h"
 #include "machine/pc9801_86.h"
@@ -3100,10 +3100,10 @@ INTERRUPT_GEN_MEMBER(pc9801_state::pc9801_vrtc_irq)
 FLOPPY_FORMATS_MEMBER( pc9801_state::floppy_formats )
 	FLOPPY_PC98_FORMAT,
 	FLOPPY_PC98FDI_FORMAT,
-	FLOPPY_PC98FDD_FORMAT,
-	FLOPPY_PC98DCP_FORMAT,
-	FLOPPY_PC98DIP_FORMAT,
-	FLOPPY_PC98NFD_FORMAT
+	FLOPPY_FDD_FORMAT,
+	FLOPPY_DCP_FORMAT,
+	FLOPPY_DIP_FORMAT,
+	FLOPPY_NFD_FORMAT
 FLOPPY_FORMATS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER( pc9801_state::mouse_irq_cb )

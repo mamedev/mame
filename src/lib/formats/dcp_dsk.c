@@ -2,7 +2,7 @@
 // copyright-holders:etabeta
 /*********************************************************************
 
-    formats/pc98dcp_dsk.h
+    formats/dcp_dsk.h
 
     PC98 DCP & DCU disk images
 
@@ -21,28 +21,28 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "pc98dcp_dsk.h"
+#include "dcp_dsk.h"
 
-pc98dcp_format::pc98dcp_format()
+dcp_format::dcp_format()
 {
 }
 
-const char *pc98dcp_format::name() const
+const char *dcp_format::name() const
 {
-	return "pc98_dcx";
+	return "dcx";
 }
 
-const char *pc98dcp_format::description() const
+const char *dcp_format::description() const
 {
-	return "PC98 DCP/DCU disk image";
+	return "DCP/DCU disk image";
 }
 
-const char *pc98dcp_format::extensions() const
+const char *dcp_format::extensions() const
 {
 	return "dcp,dcu";
 }
 
-int pc98dcp_format::identify(io_generic *io, UINT32 form_factor)
+int dcp_format::identify(io_generic *io, UINT32 form_factor)
 {
 	UINT64 size = io_generic_size(io);
 	UINT8 h[0xa2];
@@ -111,7 +111,7 @@ int pc98dcp_format::identify(io_generic *io, UINT32 form_factor)
 	return 0;
 }
 
-bool pc98dcp_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+bool dcp_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	UINT8 h[0xa2];
 	int heads, tracks, spt, bps;
@@ -293,9 +293,9 @@ bool pc98dcp_format::load(io_generic *io, UINT32 form_factor, floppy_image *imag
 	return true;
 }
 
-bool pc98dcp_format::supports_save() const
+bool dcp_format::supports_save() const
 {
 	return false;
 }
 
-const floppy_format_type FLOPPY_PC98DCP_FORMAT = &floppy_image_format_creator<pc98dcp_format>;
+const floppy_format_type FLOPPY_DCP_FORMAT = &floppy_image_format_creator<dcp_format>;

@@ -138,8 +138,10 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/d81_dsk.o     \
 	$(LIBOBJ)/formats/d82_dsk.o     \
 	$(LIBOBJ)/formats/d88_dsk.o     \
+	$(LIBOBJ)/formats/dcp_dsk.o     \
 	$(LIBOBJ)/formats/dfi_dsk.o     \
 	$(LIBOBJ)/formats/dim_dsk.o     \
+	$(LIBOBJ)/formats/dip_dsk.o     \
 	$(LIBOBJ)/formats/dmk_dsk.o     \
 	$(LIBOBJ)/formats/dmv_dsk.o     \
 	$(LIBOBJ)/formats/dsk_dsk.o     \
@@ -148,6 +150,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/esq16_dsk.o   \
 	$(LIBOBJ)/formats/fc100_cas.o   \
 	$(LIBOBJ)/formats/fdi_dsk.o     \
+	$(LIBOBJ)/formats/fdd_dsk.o     \
 	$(LIBOBJ)/formats/flex_dsk.o    \
 	$(LIBOBJ)/formats/fm7_cas.o     \
 	$(LIBOBJ)/formats/fmsx_cas.o    \
@@ -175,6 +178,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/nanos_dsk.o   \
 	$(LIBOBJ)/formats/naslite_dsk.o \
 	$(LIBOBJ)/formats/nes_dsk.o     \
+	$(LIBOBJ)/formats/nfd_dsk.o     \
 	$(LIBOBJ)/formats/orao_cas.o    \
 	$(LIBOBJ)/formats/oric_dsk.o    \
 	$(LIBOBJ)/formats/oric_tap.o    \
@@ -183,10 +187,6 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/pc_dsk.o      \
 	$(LIBOBJ)/formats/pc98_dsk.o    \
 	$(LIBOBJ)/formats/pc98fdi_dsk.o \
-	$(LIBOBJ)/formats/pc98fdd_dsk.o \
-	$(LIBOBJ)/formats/pc98dcp_dsk.o \
-	$(LIBOBJ)/formats/pc98dip_dsk.o \
-	$(LIBOBJ)/formats/pc98nfd_dsk.o \
 	$(LIBOBJ)/formats/phc25_cas.o   \
 	$(LIBOBJ)/formats/pmd_cas.o     \
 	$(LIBOBJ)/formats/primoptp.o    \

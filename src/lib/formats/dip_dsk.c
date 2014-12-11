@@ -2,9 +2,9 @@
 // copyright-holders:etabeta
 /*********************************************************************
 
-    formats/pc98dip_dsk.h
+    formats/dip_dsk.h
 
-    PC98DIP disk images
+    PC98 DIP disk images
  
     0x100 header, followed by track data
 
@@ -15,28 +15,28 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "pc98dip_dsk.h"
+#include "dip_dsk.h"
 
-pc98dip_format::pc98dip_format()
+dip_format::dip_format()
 {
 }
 
-const char *pc98dip_format::name() const
-{
-	return "pc98_dip";
-}
-
-const char *pc98dip_format::description() const
-{
-	return "PC98 DIP disk image";
-}
-
-const char *pc98dip_format::extensions() const
+const char *dip_format::name() const
 {
 	return "dip";
 }
 
-int pc98dip_format::identify(io_generic *io, UINT32 form_factor)
+const char *dip_format::description() const
+{
+	return "DIP disk image";
+}
+
+const char *dip_format::extensions() const
+{
+	return "dip";
+}
+
+int dip_format::identify(io_generic *io, UINT32 form_factor)
 {
 	UINT64 size = io_generic_size(io);
 
@@ -46,7 +46,7 @@ int pc98dip_format::identify(io_generic *io, UINT32 form_factor)
 	return 0;
 }
 
-bool pc98dip_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+bool dip_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	int heads, tracks, spt, bps;
 
@@ -88,9 +88,9 @@ bool pc98dip_format::load(io_generic *io, UINT32 form_factor, floppy_image *imag
 	return true;
 }
 
-bool pc98dip_format::supports_save() const
+bool dip_format::supports_save() const
 {
 	return false;
 }
 
-const floppy_format_type FLOPPY_PC98DIP_FORMAT = &floppy_image_format_creator<pc98dip_format>;
+const floppy_format_type FLOPPY_DIP_FORMAT = &floppy_image_format_creator<dip_format>;

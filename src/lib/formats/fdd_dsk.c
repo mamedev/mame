@@ -2,9 +2,9 @@
 // copyright-holders:etabeta
 /*********************************************************************
 
-    formats/pc98fdd_dsk.h
+    formats/fdd_dsk.h
 
-    PC98FDD disk images
+    PC98 FDD disk images
  
     0xC3FC header, followed by track data
     Sector map starts at offset 0xDC, with 12bytes for each sector
@@ -32,28 +32,28 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "pc98fdd_dsk.h"
+#include "fdd_dsk.h"
 
-pc98fdd_format::pc98fdd_format()
+fdd_format::fdd_format()
 {
 }
 
-const char *pc98fdd_format::name() const
-{
-	return "pc98_fdd";
-}
-
-const char *pc98fdd_format::description() const
-{
-	return "PC98 FDD disk image";
-}
-
-const char *pc98fdd_format::extensions() const
+const char *fdd_format::name() const
 {
 	return "fdd";
 }
 
-int pc98fdd_format::identify(io_generic *io, UINT32 form_factor)
+const char *fdd_format::description() const
+{
+	return "FDD disk image";
+}
+
+const char *fdd_format::extensions() const
+{
+	return "fdd";
+}
+
+int fdd_format::identify(io_generic *io, UINT32 form_factor)
 {
 	UINT8 h[7];	
 	io_generic_read(io, h, 0, 7);
@@ -64,7 +64,7 @@ int pc98fdd_format::identify(io_generic *io, UINT32 form_factor)
 	return 0;
 }
 
-bool pc98fdd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+bool fdd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	UINT8 hsec[0x0c];	
 	
@@ -141,9 +141,9 @@ bool pc98fdd_format::load(io_generic *io, UINT32 form_factor, floppy_image *imag
 	return true;
 }
 
-bool pc98fdd_format::supports_save() const
+bool fdd_format::supports_save() const
 {
 	return false;
 }
 
-const floppy_format_type FLOPPY_PC98FDD_FORMAT = &floppy_image_format_creator<pc98fdd_format>;
+const floppy_format_type FLOPPY_FDD_FORMAT = &floppy_image_format_creator<fdd_format>;
