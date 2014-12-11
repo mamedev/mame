@@ -166,8 +166,28 @@ J1 (aka CN1) connections:
 Pins 5,and 6 also have a .0047uF capacitor to GND (forming some sort of LC filter)
 There is another .0047uF capacitor to ground from the connection between 74LS14 pin 1 and the 100 Ohm 5% resistor which connects to pin 4 (forming some sort of RC filter)
 
- 
-22-950 pin 11 (OE?) - 68KOhm 5% resistor - 22-908 pin 5 (HYS)  
+Exar Custom connections between each other:
+-------------------------------------------
+22-950 pin 11 (OE?) - 68KOhm 5% resistor - 22-908 pin 5 (HYS)
+
+Cable connecting J1/CN1 to the Victor:
+--------------------------------------
+RJ45 when looking at end of plug (not socket!)
+.||||||||.
+|87654321|
+|__----__|
+   |__|
+
+RJ45 pins   Wire Color   Connection
+1           White        J1 pin 1 (VCC)
+2           Yellow       J1 pin 2 (GND)
+3           Green        J1 pin 3 (GND)
+4           Orange       J1 pin 4 (?KBACK?)
+5           Blue         J1 pin 5 (?KBRDY?)
+6           Red          J1 pin 6 (?KBDATA?)
+7           Black        J1 pin 7 (VCC)
+8           shield/bare  Keyboard Frame Ground
+
 
 Key Layout (USA Variant): (the S0x markings appear on the back of the PCB)
 |------------------------------------------------------------------------------------|
