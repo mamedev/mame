@@ -427,7 +427,7 @@ READ8_MEMBER( c2040_fdc_t::read )
 
 	UINT8 data = (BIT(e, 6) << 7) | (BIT(i, 7) << 6) | (e & 0x33) | (BIT(e, 2) << 3) | (i & 0x04);
 
-	if (LOG) logerror("%s VIA reads data %02x (%03x)\n", machine().time().as_string(), data, checkpoint_live.shift_reg);
+	if (LOG) logerror("%s %s VIA reads data %02x (%03x)\n", machine().time().as_string(), machine().describe_context(), data, checkpoint_live.shift_reg);
 
 	return data;
 }
@@ -439,7 +439,7 @@ WRITE8_MEMBER( c2040_fdc_t::write )
 		live_sync();
 		m_pi = cur_live.pi = data;
 		checkpoint();
-		if (LOG) logerror("%s PI %02x\n", machine().time().as_string(), data);
+		if (LOG) logerror("%s %s PI %02x\n", machine().time().as_string(), machine().describe_context(), data);
 		live_run();
 	}
 }
@@ -451,7 +451,7 @@ WRITE_LINE_MEMBER( c2040_fdc_t::drv_sel_w )
 		live_sync();
 		m_drv_sel = cur_live.drv_sel = state;
 		checkpoint();
-		if (LOG) logerror("%s DRV SEL %u\n", machine().time().as_string(), state);
+		if (LOG) logerror("%s %s DRV SEL %u\n", machine().time().as_string(), machine().describe_context(), state);
 		live_run();
 	}
 }
@@ -463,7 +463,7 @@ WRITE_LINE_MEMBER( c2040_fdc_t::mode_sel_w )
 		live_sync();
 		m_mode_sel = cur_live.mode_sel = state;
 		checkpoint();
-		if (LOG) logerror("%s MODE SEL %u\n", machine().time().as_string(), state);
+		if (LOG) logerror("%s %s MODE SEL %u\n", machine().time().as_string(), machine().describe_context(), state);
 		live_run();
 	}
 }
@@ -475,7 +475,7 @@ WRITE_LINE_MEMBER( c2040_fdc_t::rw_sel_w )
 		live_sync();
 		m_rw_sel = cur_live.rw_sel = state;
 		checkpoint();
-		if (LOG) logerror("%s RW SEL %u\n", machine().time().as_string(), state);
+		if (LOG) logerror("%s %s RW SEL %u\n", machine().time().as_string(), machine().describe_context(), state);
 		if (m_rw_sel) {
 			stop_writing(machine().time());
 		} else {
@@ -491,7 +491,7 @@ WRITE_LINE_MEMBER( c2040_fdc_t::mtr0_w )
 	{
 		live_sync();
 		m_mtr0 = state;
-		if (LOG) logerror("%s MTR0 %u\n", machine().time().as_string(), state);
+		if (LOG) logerror("%s %s MTR0 %u\n", machine().time().as_string(), machine().describe_context(), state);
 		m_floppy0->mon_w(state);
 		checkpoint();
 
@@ -513,7 +513,7 @@ WRITE_LINE_MEMBER( c2040_fdc_t::mtr1_w )
 	{
 		live_sync();
 		m_mtr1 = state;
-		if (LOG) logerror("%s MTR1 %u\n", machine().time().as_string(), state);
+		if (LOG) logerror("%s %s MTR1 %u\n", machine().time().as_string(), machine().describe_context(), state);
 		if (m_floppy1) m_floppy1->mon_w(state);
 		checkpoint();
 
@@ -587,6 +587,7 @@ void c2040_fdc_t::ds_w(int ds)
 	{
 		live_sync();
 		m_ds = cur_live.ds = ds;
+		if (LOG) logerror("%s %s DS %u\n", machine().time().as_string(), machine().describe_context(), ds);
 		checkpoint();
 		live_run();
 	}

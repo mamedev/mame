@@ -65,7 +65,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pull_sync_w );
 
 	DECLARE_READ_LINE_MEMBER( wps_r ) { return checkpoint_live.drv_sel ? m_floppy1->wpt_r() : m_floppy0->wpt_r(); }
-	DECLARE_READ_LINE_MEMBER( sync_r ) { return checkpoint_live.sync; }
 
 	void stp0_w(int stp);
 	void stp1_w(int stp);
@@ -133,8 +132,6 @@ protected:
 	int m_rw_sel;
 	int m_odd_hd;
 	UINT8 m_pi;
-
-	attotime m_period;
 
 	live_info cur_live, checkpoint_live;
 	fdc_pll_t cur_pll, checkpoint_pll;
