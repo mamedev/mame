@@ -215,9 +215,7 @@ bool pc98nfd_format::load(io_generic *io, UINT32 form_factor, floppy_image *imag
 				curr_track_size += (128 << hsec[3]);
 				curr_num_sec++;
 			}
-			if (num_specials[track] > 0)
-			{
-			}
+
 			num_secs[track] = curr_num_sec;
 			track_sizes[track] = curr_track_size;
 		}

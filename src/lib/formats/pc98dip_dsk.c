@@ -63,7 +63,7 @@ bool pc98dip_format::load(io_generic *io, UINT32 form_factor, floppy_image *imag
 	for (ssize = 0; (128 << ssize) < bps; ssize++);
 	
 	desc_pc_sector sects[256];
-	UINT8 sect_data[bps * spt];
+	UINT8 sect_data[65536];
 	
 	for (int track = 0; track < tracks; track++)
 		for (int head = 0; head < heads; head++) 
