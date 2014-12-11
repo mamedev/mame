@@ -16,7 +16,7 @@ ToDo:
   determine the correct positions.
 - The position of the "Line Insert" key is unknown.
 - PCGEN command not working.
-- Colours are wrong (colour prom needs to be dumped)
+- Colours are approximate.
 - Disk controller
 - Banking
 - The schematic shows the audio counter connected to 2MHz, but this produces
@@ -25,7 +25,6 @@ ToDo:
 - Parallel / Centronics
 - Need software
 - Pasting can drop a character or two at the start of a line.
-- Clock change for crtc
 
 ****************************************************************************/
 
@@ -55,7 +54,6 @@ public:
 		, m_io_keyboard(*this, "KEY")
 	{ }
 
-	DECLARE_DRIVER_INIT(excali64);
 	DECLARE_PALETTE_INIT(excali64);
 	DECLARE_WRITE8_MEMBER(ppib_w);
 	DECLARE_READ8_MEMBER(ppic_r);
@@ -222,7 +220,7 @@ READ8_MEMBER( excali64_state::port50_r )
 {
 	UINT8 data = m_sys_status & 7;
 	data |= (UINT8)m_crtc_vs << 4;
-	data |= (UINT8)m_crtc_de << 5;
+	data |= (UINT8)m_crtc_de << 3;
 	return data;
 }
 
@@ -233,7 +231,7 @@ WRITE8_MEMBER( excali64_state::ppic_w )
 
 /*
 d0,1,2 : same as port50
-d3 : 2nd colour set
+d7 : 2nd colour set
 */
 WRITE8_MEMBER( excali64_state::port70_w )
 {
@@ -256,12 +254,6 @@ WRITE_LINE_MEMBER( excali64_state::crtc_vs )
 	m_crtc_vs = state;
 }
 
-DRIVER_INIT_MEMBER( excali64_state, excali64 )
-{
-	m_p_chargen = memregion("chargen")->base();
-	m_p_videoram = memregion("videoram")->base();
-}
-
 /* F4 Character Displayer */
 static const gfx_layout excali64_charlayout =
 {
@@ -280,43 +272,26 @@ static GFXDECODE_START( excali64 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, excali64_charlayout, 0, 1 )
 GFXDECODE_END
 
-// The colour names in the comments are what's needed, the current rgb values are mostly wrong
+// The prom, the schematic, and the manual all contradict each other,
+// so the colours can only be described as wild guesses. Further, the 38
+// colour-load resistors are missing labels and values.
 PALETTE_INIT_MEMBER( excali64_state, excali64 )
 {
-	// Colour Menu A
-	palette.set_pen_color(0, 0x00, 0x00, 0x00);   /*  0 Black     */
-	palette.set_pen_color(1, 0x7f, 0x00, 0x00);   /*  1 Dark Red      */
-	palette.set_pen_color(2, 0xff, 0x00, 0x00);   /*  2 Red       */
-	palette.set_pen_color(3, 0x00, 0x00, 0x00);   /*  3 Pink     */
-	palette.set_pen_color(4, 0xbf, 0xbf, 0xbf);   /*  4 Orange     */
-	palette.set_pen_color(5, 0x00, 0xff, 0xff);   /*  5 Brown     */
-	palette.set_pen_color(6, 0xff, 0xff, 0x00);   /*  6 Yellow        */
-	palette.set_pen_color(7, 0x7f, 0x7f, 0x00);   /*  7 Dark Green */
-	palette.set_pen_color(8, 0x00, 0x7f, 0x00);   /*  8 Green     */
-	palette.set_pen_color(9, 0x00, 0xff, 0x00);   /*  9 Bright Green  */
-	palette.set_pen_color(10, 0x00, 0x00, 0xff);  /* 10 Light Blue    */
-	palette.set_pen_color(11, 0x00, 0x00, 0x7f);  /* 11 Blue      */
-	palette.set_pen_color(12, 0xff, 0x00, 0xff);  /* 12 Magenta       */
-	palette.set_pen_color(13, 0x7f, 0x00, 0x7f);  /* 13 Purple        */
-	palette.set_pen_color(14, 0x80, 0x80, 0x80);  /* 14 Dark Grey      */
-	palette.set_pen_color(15, 0xff, 0xff, 0xff);  /* 15 White     */
-	// Colour Menu B
-	palette.set_pen_color(16, 0x00, 0x00, 0x00);  /*  0 Black     */
-	palette.set_pen_color(17, 0x7f, 0x00, 0x00);  /*  1 Dark Red  */
-	palette.set_pen_color(18, 0xff, 0x00, 0x00);  /*  2 Red       */
-	palette.set_pen_color(19, 0x80, 0x80, 0x80);  /*  3 Flesh     */
-	palette.set_pen_color(20, 0x00, 0x00, 0xff);  /*  4 Pink      */
-	palette.set_pen_color(21, 0xff, 0xff, 0x80);  /*  5 Yellow Brown */
-	palette.set_pen_color(22, 0x00, 0x00, 0x00);  /*  6 Dark Brown     */
-	palette.set_pen_color(23, 0x00, 0xff, 0x00);  /*  7 Dark Purple */
-	palette.set_pen_color(24, 0xff, 0x80, 0xff);  /*  8 Very Dark Green */
-	palette.set_pen_color(25, 0x00, 0xff, 0xff);  /*  9 Yellow Green */
-	palette.set_pen_color(26, 0xff, 0x40, 0x40);  /* 10 Grey Blue */
-	palette.set_pen_color(27, 0xff, 0x00, 0x00);  /* 11 Sky Blue */
-	palette.set_pen_color(28, 0x00, 0x80, 0x80);  /* 12 Very Pale Blue */
-	palette.set_pen_color(29, 0xff, 0x00, 0xff);  /* 13 Dark Grey */
-	palette.set_pen_color(30, 0x80, 0xff, 0x80);  /* 14 Light Grey */
-	palette.set_pen_color(31, 0xff, 0xff, 0xff);  /* 15 White     */
+	// do this here because driver_init hasn't run yet
+	m_p_videoram = memregion("videoram")->base();
+	m_p_chargen = memregion("chargen")->base();
+
+	UINT8 r,g,b,i,code;
+	for (i = 0; i < 32; i++)
+	{
+		code = m_p_chargen[0x1000+i];
+		r = (BIT(code, 0) ? 38 : 0) + (BIT(code, 1) ? 73 : 0) + (BIT(code, 2) ? 144 : 0);
+		b = (BIT(code, 3) ? 38 : 0) + (BIT(code, 4) ? 73 : 0) + (BIT(code, 5) ? 144 : 0);
+		g = (BIT(code, 6) ? 85 : 0) + (BIT(code, 7) ? 170 : 0);
+		palette.set_pen_color(i, r, g, b);
+	}
+
+
 	// Background
 	palette.set_pen_color(32, 0x00, 0x00, 0x00);  //  0 Black
 	palette.set_pen_color(33, 0xff, 0x00, 0x00);  //  1 Red
@@ -334,7 +309,7 @@ MC6845_UPDATE_ROW( excali64_state::update_row )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT8 chr,gfx,col,bg,fg;
 	UINT16 mem,x;
-	UINT8 col_base = BIT(m_sys_status, 3) ? 16 : 0;
+	UINT8 col_base = BIT(m_sys_status, 7) ? 16 : 0;
 	UINT32 *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
@@ -350,7 +325,7 @@ MC6845_UPDATE_ROW( excali64_state::update_row )
 		else
 			gfx = m_p_chargen[(chr<<4) | ra]; // normal character
 		
-		gfx ^= ((x == cursor_x) ? 0xff : 0);
+		gfx ^= (x == cursor_x) ? 0xff : 0;
 
 		/* Display a scanline of a character */
 		*p++ = palette[BIT(gfx, 0) ? fg : bg];
@@ -434,11 +409,12 @@ ROM_START( excali64 )
 
 	ROM_REGION(0x2000, "videoram", ROMREGION_ERASE00)
 
-	ROM_REGION(0x1000, "chargen", 0)
+	ROM_REGION(0x1020, "chargen", 0)
 	ROM_LOAD( "genex_3.ic43", 0x0000, 0x1000, CRC(b91619a9) SHA1(2ced636cb7b94ba9d329868d7ecf79963cefe9d9) )
+	ROM_LOAD( "hm7603.ic55",  0x1000, 0x0020, CRC(c74f47dc) SHA1(331ff3c913846191ddd97cacb80bd19438c1ff71) )
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     CLASS             INIT        COMPANY         FULLNAME        FLAGS */
-COMP( 1984, excali64, 0,      0,       excali64,  excali64, excali64_state, excali64,  "BGR Computers", "Excalibur 64", GAME_NOT_WORKING )
+/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     CLASS         INIT        COMPANY         FULLNAME        FLAGS */
+COMP( 1984, excali64, 0,      0,       excali64,  excali64, driver_device, 0,  "BGR Computers", "Excalibur 64", GAME_NOT_WORKING )
