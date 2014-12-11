@@ -105,7 +105,7 @@ private:
     required_device<cpu_device> m_maincpu;
     UINT8 m_io[256];
     UINT8 m_nvram_addr;
-    UINT8 m_6351_addr;
+    UINT16 m_6351_addr;
     UINT16 m_z30_out;
 };
 
@@ -424,12 +424,14 @@ READ8_MEMBER (gts1_state::gts1_lamp_apm_r)
 WRITE8_MEMBER(gts1_state::gts1_lamp_apm_w)
 {
     switch (offset) {
-        case 0: // DS0-DS4
+        case 0: // LD1-LD4 on jumper J5
             break;
-        case 1: // LD1-LD4 on jumper J5
-            break;
-        case 2: // Z30 1-of-16 decoder
+        case 1: // Z30 1-of-16 decoder
             m_z30_out = 1 << (data & 15);
+            break;
+        case 2: // O9: PGOL PROM A8, O10: PGOL PROM A9
+            m_6351_addr = (m_6351_addr & ~(3 << 8)) | ((data & 3) << 8);
+            // O11 and O12 are unused(?)
             break;
     }
 }
