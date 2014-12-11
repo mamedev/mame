@@ -183,6 +183,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/pc_dsk.o      \
 	$(LIBOBJ)/formats/pc98_dsk.o    \
 	$(LIBOBJ)/formats/pc98fdi_dsk.o \
+	$(LIBOBJ)/formats/pc98fdd_dsk.o \
 	$(LIBOBJ)/formats/pc98dcp_dsk.o \
 	$(LIBOBJ)/formats/pc98dip_dsk.o \
 	$(LIBOBJ)/formats/pc98nfd_dsk.o \

@@ -416,6 +416,7 @@ Keyboard TX commands:
 
 #include "formats/pc98_dsk.h"
 #include "formats/pc98fdi_dsk.h"
+#include "formats/pc98fdd_dsk.h"
 #include "formats/pc98dcp_dsk.h"
 #include "formats/pc98dip_dsk.h"
 #include "formats/pc98nfd_dsk.h"
@@ -3099,6 +3100,7 @@ INTERRUPT_GEN_MEMBER(pc9801_state::pc9801_vrtc_irq)
 FLOPPY_FORMATS_MEMBER( pc9801_state::floppy_formats )
 	FLOPPY_PC98_FORMAT,
 	FLOPPY_PC98FDI_FORMAT,
+	FLOPPY_PC98FDD_FORMAT,
 	FLOPPY_PC98DCP_FORMAT,
 	FLOPPY_PC98DIP_FORMAT,
 	FLOPPY_PC98NFD_FORMAT
