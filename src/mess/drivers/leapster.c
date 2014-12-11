@@ -215,6 +215,7 @@ class leapster_state : public driver_device
 public:
 	leapster_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_cart(*this, "cartslot")
 		{ }
 
@@ -227,6 +228,7 @@ public:
 	DECLARE_DRIVER_INIT(leapster);
 
 protected:
+	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 
 	memory_region *m_cart_rom;
@@ -259,7 +261,14 @@ void leapster_state::machine_start()
 {
 	astring region_tag;
 	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
-	membank("cartrom")->set_base(m_cart_rom->base());
+
+	if (m_cart_rom)
+	{
+		address_space &space = m_maincpu->space(AS_PROGRAM);
+
+		space.install_readwrite_bank(0x80000000, 0x807fffff, "cartrom");
+		membank("cartrom")->set_base(m_cart_rom->base());
+	}
 }
 
 void leapster_state::machine_reset()
@@ -268,8 +277,7 @@ void leapster_state::machine_reset()
 
 static ADDRESS_MAP_START( leapster_map, AS_PROGRAM, 32, leapster_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_MIRROR(0x40000000) // pointers in the bios region seem to be to the 40xxxxxx region, either we mirror there or something (real bios?) is acutally missing
-	AM_RANGE(0x80000000, 0x807fffff) AM_ROMBANK("cartrom") // game ROM pointers are all to the 80xxxxxx region, so I assume it maps here
-
+//	AM_RANGE(0x80000000, 0x807fffff) AM_ROMBANK("cartrom") // game ROM pointers are all to the 80xxxxxx region, so I assume it maps here - installed if a cart is present
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( leapster, leapster_state )
