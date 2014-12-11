@@ -94,7 +94,7 @@ public:
 	required_device<hc55516_device> m_cvsd;
 	required_device<mc6845_device> m_crtc;
 	required_device<ram_device> m_ram;
-	required_device<victor9k_keyboard_device> m_kb;
+	required_device<victor_9000_keyboard_t> m_kb;
 	required_device<victor_9000_fdc_t> m_fdc;
 	required_device<centronics_device> m_centronics;
 	required_device<rs232_port_device> m_rs232a;
