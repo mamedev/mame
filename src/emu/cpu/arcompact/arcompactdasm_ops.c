@@ -208,27 +208,161 @@ int arcompact_handle01_01_01_05_dasm(DASM_OPS_32)  { GET_01_01_01_BRANCH_ADDR;  
 int arcompact_handle01_01_01_0e_dasm(DASM_OPS_32)  { GET_01_01_01_BRANCH_ADDR;  print("BBIT0 (b & 1<<u6) == 0 (dst %08x) (%08x)", pc + (address * 2) + 4, op); return 4; }
 int arcompact_handle01_01_01_0f_dasm(DASM_OPS_32)  { GET_01_01_01_BRANCH_ADDR;  print("BBIT1 (b & 1<<u6) != 0 (dst %08x) (%08x)", pc + (address * 2) + 4, op); return 4; }
 
+#if 0
+//#define EXPLICIT_EXTENSIONS
+
+static const char *datasize[0x4] =
+{
+#ifdef EXPLICIT_EXTENSIONS
+	/* 00 */ ".L", // Dword (default) (can use no extension, using .L to be explicit)
+#else
+	/* 00 */ " ",// Dword (default)
+#endif
+	/* 01 */ ".B", // Byte
+	/* 02 */ ".W", // Word
+	/* 03 */ ".<illegal data size>"
+};
+
+static const char *dataextend[0x2] =
+{
+#ifdef EXPLICIT_EXTENSIONS
+	/* 00 */ ".ZX", // Zero Extend (can use no extension, using .ZX to be explicit)
+else
+	/* 00 */ " ", // Zero Extend
+#endif
+	/* 01 */ ".X" // Sign Extend
+};
+
+static const char *addressmode[0x4] =
+{
+#ifdef EXPLICIT_EXTENSIONS
+	/* 00 */ ".AN", // No Writeback (can use no extension, using .AN to be explicit)
+#else
+	/* 00 */ " ", // No Writeback
+#endif
+	/* 01 */ ".AW", // Writeback pre memory access
+	/* 02 */ ".AB", // Writeback post memory access
+	/* 03 */ ".AS"  // scaled
+};
+
+static const char *cachebit[0x2] =
+{
+#ifdef EXPLICIT_EXTENSIONS
+	/* 00 */ ".EN", // Data Cache Enabled (can use no extension, using .EN to be explicit)
+#else
+	/* 00 */ " ", // Data Cache Enabled
+#endif
+	/* 01 */ ".DI" // Direct to Memory (Cache Bypass)
+};
+
+static const char *regnames[0x40] =
+{
+	/* 00 */ "r0",
+	/* 01 */ "r1",
+	/* 02 */ "r2",
+	/* 03 */ "r3",
+	/* 04 */ "r4",
+	/* 05 */ "r5",
+	/* 06 */ "r6",
+	/* 07 */ "r7",
+	/* 08 */ "r8",
+	/* 09 */ "r9",
+	/* 0a */ "r10",
+	/* 0b */ "r11",
+	/* 0c */ "r12",
+	/* 0d */ "r13",
+	/* 0e */ "r14",
+	/* 0f */ "r15",
+
+	/* 10 */ "r16",
+	/* 11 */ "r17",
+	/* 12 */ "r18",
+	/* 13 */ "r19",
+	/* 14 */ "r20",
+	/* 15 */ "r21",
+	/* 16 */ "r22",
+	/* 17 */ "r23",
+	/* 18 */ "r24",
+	/* 19 */ "r25",
+	/* 1a */ "r26(GP)",
+	/* 1b */ "r27(FP)",
+	/* 1c */ "r28(SP)",
+	/* 1d */ "r29(ILINK1)",
+	/* 1e */ "r30(ILINK2)",
+	/* 1f */ "r31(BLINK)",
+
+	/* 20 */ "r32(ext)",
+	/* 21 */ "r33(ext)",
+	/* 22 */ "r34(ext)",
+	/* 23 */ "r35(ext)",
+	/* 24 */ "r36(ext)",
+	/* 25 */ "r37(ext)",
+	/* 26 */ "r38(ext)",
+	/* 27 */ "r39(ext)",
+	/* 28 */ "r40(ext)",
+	/* 29 */ "r41(ext)",
+	/* 2a */ "r42(ext)",
+	/* 2b */ "r43(ext)",
+	/* 2c */ "r44(ext)",
+	/* 2d */ "r45(ext)",
+	/* 2e */ "r46(ext)",
+	/* 2f */ "r47(ext)",
+
+	/* 30 */ "r48(ext)",
+	/* 31 */ "r49(ext)",
+	/* 32 */ "r50(ext)",
+	/* 33 */ "r51(ext)",
+	/* 34 */ "r52(ext)",
+	/* 35 */ "r53(ext)",
+	/* 36 */ "r54(ext)",
+	/* 37 */ "r55(ext)",
+	/* 38 */ "r56(ext)",
+	/* 39 */ "r57(ext)", // MLO  (result registers for optional multply functions)
+	/* 3a */ "r58(ext)", // MMID 
+	/* 3b */ "r59(ext)", // MHI 
+	/* 3c */ "r60(LP_COUNT)",
+	/* 3d */ "r61(reserved)",
+	/* 3e */ "r62(LIMM)", // use Long Immediate Data instead of register
+	/* 3f */ "r63(PCL)"
+};
+#endif
 
 int arcompact_handle02_dasm(DASM_OPS_32)
 {
 	// bitpos
-	// 11111 111 11111111 0 000 0 00 00 0 000000
-	// fedcb a98 76543210 f edc b a9 87 6 543210
+	// 1111 1111 1111 1111 0000 0000 0000 0000
+	// fedc ba98 7654 3210 fedc ba98 7654 3210
 	// fields
-	// 00010 bbb ssssssss S BBB D aa ZZ X AAAAAA
-#if 0	
-	int A = (op & 0x0000003f >> 0);  op &= ~0x0000003f;
-	int X = (op & 0x00000040 >> 6);  op &= ~0x00000040;
-	int Z = (op & 0x00000180 >> 7);  op &= ~0x00000180;
-	int a = (op & 0x00000600 >> 9);  op &= ~0x00000600;
-	int D = (op & 0x00000800 >> 11); op &= ~0x00000800;
-	int B = (op & 0x00007000 >> 12); op &= ~0x00007000;
-	int S = (op & 0x00008000 >> 15); op &= ~0x00008000;
-	int s = (op & 0x00ff0000 >> 16); op &= ~0x00ff0000;
-	int b = (op & 0x07000000 >> 24); op &= ~0x07000000;
+	// 0001 0bbb ssss ssss SBBB DaaZ ZXAA AAAA
+
+#if 0
+	int A = (op & 0x0000003f >> 0);  //op &= ~0x0000003f;
+	int X = (op & 0x00000040 >> 6);  //op &= ~0x00000040;
+	int Z = (op & 0x00000180 >> 7);  //op &= ~0x00000180;
+	int a = (op & 0x00000600 >> 9);  //op &= ~0x00000600;
+	int D = (op & 0x00000800 >> 11);// op &= ~0x00000800;
+	int B = (op & 0x00007000 >> 12);// op &= ~0x00007000;
+	int S = (op & 0x00008000 >> 15);// op &= ~0x00008000;
+	int s = (op & 0x00ff0000 >> 16);// op &= ~0x00ff0000;
+	int b = (op & 0x07000000 >> 24);// op &= ~0x07000000;
+
+	int breg = b | (B << 3);
+	int sdat = s | (S << 8); // todo - signed
 #endif
 
-	print("LD r+o (%08x)", op );
+
+	output  += sprintf( output, "LD");
+//	output  += sprintf( output, "%s", datasize[Z]);
+//	output  += sprintf( output, "%s", dataextend[X]);
+//	output  += sprintf( output, "%s", addressmode[a]);
+//	output  += sprintf( output, "%s", cachebit[D]);
+//	output  += sprintf( output, " ");
+//	output  += sprintf( output, "%s, ", regnames[A]);
+//	output  += sprintf( output, "[");
+//	output  += sprintf( output, "%s(%d %d), ", regnames[breg], B, b);
+//	output  += sprintf( output, "%d", sdat);
+//	output  += sprintf( output, "]");
+
 	return 4;
 }
 
