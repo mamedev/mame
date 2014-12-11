@@ -67,6 +67,7 @@ ToDo:
 
 
 #include "machine/genpin.h"
+#include "machine/r10696.h"
 #include "machine/r10788.h"
 #include "cpu/pps4/pps4.h"
 #include "gts1.lh"
@@ -92,6 +93,8 @@ public:
     DECLARE_WRITE8_MEMBER(gts1_display_w);
     DECLARE_READ8_MEMBER (gts1_io_r);
     DECLARE_WRITE8_MEMBER(gts1_io_w);
+    DECLARE_READ8_MEMBER (gts1_nvram_r);
+    DECLARE_WRITE8_MEMBER(gts1_nvram_w);
     DECLARE_READ8_MEMBER (gts1_pa_r);
     DECLARE_WRITE8_MEMBER(gts1_pa_w);
     DECLARE_WRITE8_MEMBER(gts1_pb_w);
@@ -99,6 +102,7 @@ private:
     virtual void machine_reset();
     required_device<cpu_device> m_maincpu;
     UINT8 m_io[256];
+    UINT8 m_nvram_addr;
     UINT8 m_6351_addr;
 };
 
@@ -111,7 +115,8 @@ static ADDRESS_MAP_START( gts1_data, AS_DATA, 8, gts1_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gts1_io, AS_IO, 8, gts1_state )
-    AM_RANGE(0x00d0, 0x00df) AM_DEVREADWRITE ( "r10788", r10788_device, io_r, io_w )
+    AM_RANGE(0x0060, 0x006f) AM_DEVREADWRITE ( "r10696", r10696_device, io_r, io_w ) // NVRAM io chip
+    AM_RANGE(0x00d0, 0x00df) AM_DEVREADWRITE ( "r10788", r10788_device, io_r, io_w ) // display chip
     AM_RANGE(0x0000, 0x00ff) AM_READ ( gts1_io_r )   AM_WRITE( gts1_io_w ) // connects to all the other chips
 
     AM_RANGE(0x0100, 0x0100) AM_READ ( gts1_pa_r ) AM_WRITE( gts1_pa_w )
@@ -200,6 +205,7 @@ INPUT_PORTS_END
 
 void gts1_state::machine_reset()
 {
+    m_nvram_addr = 0;
     m_6351_addr = 0;
 }
 
@@ -274,6 +280,39 @@ WRITE8_MEMBER(gts1_state::gts1_display_w)
 #undef _h
 }
 
+READ8_MEMBER (gts1_state::gts1_nvram_r)
+{
+    UINT8 data = 0x0f;
+    switch (offset)
+    {
+        case 0: // group A
+            // FIXME: Schematics says TO Z5
+            break;
+        case 1: // group B
+        case 2: // group C
+            // Schematics says: SPARES
+            break;
+    }
+    return data;
+}
+
+WRITE8_MEMBER(gts1_state::gts1_nvram_w)
+{
+    switch (offset)
+    {
+        case 0: // group A - address lines 3:0
+            m_nvram_addr = (m_nvram_addr & ~15) | (data & 15);
+            break;
+        case 1: // group B - address lines 7:4
+            m_nvram_addr = (m_nvram_addr & ~(15 << 4)) | ((data & 15) << 4);
+            break;
+        case 2: // group C - data bits 3:0 of NVRAM
+            // FIXME: schematics says write enable is U4-36 (O14)
+            LOG(("%s: nvram[%02x] <- %x\n", __FUNCTION__, m_nvram_addr, data & 15));
+            break;
+    }
+}
+
 READ8_MEMBER (gts1_state::gts1_io_r)
 {
     UINT8 data = m_io[offset] & 0x0f;
@@ -319,6 +358,11 @@ static MACHINE_CONFIG_START( gts1, gts1_state )
     MCFG_CPU_IO_MAP(gts1_io)
 
     //MCFG_NVRAM_ADD_0FILL("nvram")
+
+    /* General Purpose Input/Output */
+    MCFG_DEVICE_ADD( "r10696", R10696, 0 )
+    MCFG_R10696_IO( READ8 (gts1_state,gts1_nvram_r),
+                    WRITE8(gts1_state,gts1_nvram_w) )
 
     /* General Purpose Display and Keyboard */
     MCFG_DEVICE_ADD( "r10788", R10788, XTAL_3_579545MHz / 18 )  // divided in the circuit
