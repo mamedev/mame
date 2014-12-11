@@ -1263,7 +1263,7 @@ READ8_MEMBER(apple2e_state::c000_r)
 
 		case 0x10:  // read any key down, reset keyboard strobe
 			{
-				UINT8 rv = m_transchar | m_anykeydown;
+				UINT8 rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
 				m_strobe = 0;
 				return rv;
 			}
@@ -1512,7 +1512,7 @@ READ8_MEMBER(apple2e_state::c000_iic_r)
 
 		case 0x10:  // read any key down, reset keyboard strobe
 			{
-				UINT8 rv = m_transchar | m_anykeydown;
+				UINT8 rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
 				m_strobe = 0;
 				return rv;
 			}
