@@ -40,6 +40,134 @@ Notes:
     [???]       - unpopulated space for an unknown NDIP10 IC or DIP-switch array
     X           - capacitive sensor pad for one key
     marking     - PCB trace marking: "KTC // A65-02307-007 // PCB 201 D"
+
+
+Key Layout (USA Variant): (the S0x markings appear on the back of the PCB)
+|------------------------------------------------------------------------------------=
+| 22-908-03 22-950-3B .   XTAL 8021  74LS14     [804x]           [EPROM]  [???]   CN1=___
+|         01      02      03      04      05      06       07     08  09     10     11   | <- the leftmost X is S01
+| 12   13  14  15  16  17  18  19  20  21  22  23  24  25   26    27  28   29  30  31 32 |
+| 33    34  35  36  37  38  39  40  41  42  43  44  45  46   47   48  49   50  51  52 53 |
+| 54    55   56  57  58  59  60  61  62  63  64  65  66  67   68  69  70   71  72  73 74 |
+| 75   76  77 78  79  80  81  82  83  84  85  86  87      88      89  90   91  92  93 94 |
+| 95    96   marking             97                98             99 100  101 102 103 104| <- the rightmost X is S104
+|----------------------------------------------------------------------------------------|
+
+   key - Shifted(top)/Unshifted(bottom)/Alt(front) (if no slashes in description assume key has just one symbol on it)
+   S01 - [1]
+   S02 - [2]
+   S03 - [3]
+   S04 - [4]
+   S05 - [5]
+   S06 - [6]
+   S07 - [7]
+   S08 - [8]
+   S09 - UNUSED (under the [8] key, no metal contact on key)
+   S10 - [9]
+   S11 - [10]
+   
+   S12 - CLR/HOME
+   S13 - (Degree symbol U+00B0)/(+- symbol U+00B1)/(Pi symbol U+03C0)
+   S14 - !/1/|
+   S15 - @/2/<
+   S16 - #/3/>
+   S17 - $/4/(centered closed dot U+00B7)
+   S18 - %/5/(up arrow symbol U+2191)
+   S19 - (cent symbol U+00A2)/6/(logical not symbol U+00AC)
+   S20 - &/7/^
+   S21 - * /8/`
+   S22 - (/9/{
+   S23 - )/0/}
+   S24 - _/-/~
+   S25 - +/=/\
+   S26 - BACKSPACE
+   S27 - INS
+   S28 - DEL
+   S29 - MODE CALC/= (white keypad key)
+   S30 - % (white keypad key)
+   S31 - (division symbol U+00F7) (white keypad key)
+   S32 - (multiplication symbol U+00D7) (white keypad key)
+   
+   S33 - (up arrow, SCRL, down arrow)//VTAB
+   S34 - TAB//BACK
+   S35 - Q
+   S36 - W
+   S37 - E
+   S38 - R
+   S39 - T
+   S40 - Y
+   S41 - U
+   S42 - I
+   S43 - O
+   S44 - P
+   S45 - (1/4 symbol U+00BC)/(1/2 symbol U+00BD)
+   S46 - [/]
+   S47 - UNUSED (under the RETURN key, no metal contact on key)
+   S48 - ERASE/EOL
+   S49 - REQ/CAN
+   S50 - 7 (white keypad key)
+   S51 - 8 (white keypad key)
+   S52 - 9 (white keypad key)
+   S53 - - (white keypad key)
+   
+   S54 - (OFF,RVS,ON)//ESC
+   S55 - LOCK//CAPS LOCK
+   S56 - A
+   S57 - S
+   S58 - D
+   S59 - F
+   S60 - G
+   S61 - H
+   S62 - J
+   S63 - K
+   S64 - L
+   S65 - :/;
+   S66 - "/'
+   S67 - UNUSED (under the RETURN key, no metal contact on key)
+   S68 - RETURN
+   S69 - WORD/(left arrow U+2190)/(volume up U+1F508 plus U+25B4) (i.e. 'Previous Word')
+   S70 - WORD/(right arrow U+2192)/(volume down U+1F508 plus U+25BE) (i.e. 'Next Word')
+   S71 - 4 (white keypad key)
+   S72 - 5 (white keypad key)
+   S73 - 6 (white keypad key)
+   S74 - + (white keypad key)
+   
+   S75 - (OFF,UNDL,ON)
+   S76 - SHIFT (left shift)
+   S77 - UNUSED (under the left SHIFT key, no metal contact on key)
+   S78 - Z
+   S79 - X
+   S80 - C
+   S81 - V
+   S82 - B
+   S83 - N
+   S84 - M
+   S85 - ,/, (yes, both are comma)
+   S86 - ./. (yes, both are period/fullstop)
+   S87 - ?// (this is the actual / key)
+   S88 - SHIFT (right shift)
+   S89 - (up arrow U+2191)//(brightness up U+263C plus U+25B4)
+   S90 - (down arrow U+2193)//(brightness down U+263C plus U+25BE)
+   S91 - 1 (white keypad key)
+   S92 - 2 (white keypad key)
+   S93 - 3 (white keypad key)
+   S94 - ENTER (white keypad key)
+   
+   S95 - RPT
+   S96 - ALT
+   S97 - (spacebar)
+   S98 - PAUSE/CONT
+   S99 - (left arrow U+2190)//(contrast up U+25D0 plus U+25B4) (U+1F313 can be used in place of U+25D0)
+   S100 - (right arrow U+2192)//(contrast down U+25D0 plus U+25BE) ''
+   S101 - 0 (white keypad key)
+   S102 - 00 (white keypad key) ('double zero')
+   S103 - . (white keypad key)
+   S104 - UNUSED (under the ENTER (keypad) key, no metal contact on key)
+   
+   Note that the five unused key contacts:
+   S09, S47, S67, S77 and S104
+   may be used on international variants of the Victor 9000/Sirius 1 Keyboard.
+   
 */
 
 #include "victor9kb.h"
