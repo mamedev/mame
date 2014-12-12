@@ -267,7 +267,7 @@ protected:
 	UINT32  m_trap_entry;   // entry point to get trap address
 
 	UINT8   m_clock_scale_mask;
-	UINT8   m_clock_scale;
+	UINT8   m_clck_scale;
 	UINT8   m_clock_cycles_1;
 	UINT8   m_clock_cycles_2;
 	UINT8   m_clock_cycles_4;
