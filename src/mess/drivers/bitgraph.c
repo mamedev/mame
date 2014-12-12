@@ -396,12 +396,14 @@ WRITE8_MEMBER(bitgraph_state::ppu_write)
 	m_ppu[offset] = data;
 }
 
+#ifdef UNUSED_FUNCTION
 static ADDRESS_MAP_START(ppu_io, AS_IO, 8, bitgraph_state)
 //	AM_RANGE(0x00, 0x00) AM_READ(ppu_irq)
 //	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1)
 //	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(ppu_t0_r)
 	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("i8243", i8243_device, i8243_prog_w)
 ADDRESS_MAP_END
+#endif
 
 /*
 	p4	O: Centronics data 3..0
@@ -521,6 +523,7 @@ static MACHINE_CONFIG_FRAGMENT( bg_motherboard )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
+#ifdef UNUSED_FUNCTION
 static MACHINE_CONFIG_FRAGMENT( bg_ppu )
 	MCFG_CPU_ADD(PPU_TAG, I8035, XTAL_6_9MHz)
 	MCFG_CPU_IO_MAP(ppu_io)
@@ -537,6 +540,7 @@ static MACHINE_CONFIG_FRAGMENT( bg_ppu )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
+#endif
 
 static MACHINE_CONFIG_START( bitgrpha, bitgraph_state )
 	MCFG_CPU_ADD(M68K_TAG, M68000, XTAL_6_9MHz)
