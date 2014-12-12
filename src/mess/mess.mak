@@ -1890,6 +1890,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/beehive.o   \
 	$(MESS_DRIVERS)/binbug.o    \
 	$(MESS_DRIVERS)/besta.o     \
+	$(MESS_DRIVERS)/bitgraph.o  \
 	$(MESS_DRIVERS)/br8641.o    \
 	$(MESS_DRIVERS)/busicom.o $(MESS_VIDEO)/busicom.o \
 	$(MESS_DRIVERS)/chaos.o     \
@@ -2079,6 +2080,7 @@ $(MESS_DRIVERS)/avigo.o:    $(MESS_LAYOUT)/avigo.lh
 $(MESS_DRIVERS)/babbage.o:  $(MESS_LAYOUT)/babbage.lh
 $(MESS_DRIVERS)/bbc.o:      $(MESS_LAYOUT)/bbc.lh
 $(MESS_DRIVERS)/beta.o:     $(MESS_LAYOUT)/beta.lh
+$(MESS_DRIVERS)/bitgraph.o: $(MESS_LAYOUT)/bitgrpha.lh $(MESS_LAYOUT)/bitgrphb.lh
 $(MESS_DRIVERS)/bob85.o:    $(MESS_LAYOUT)/bob85.lh
 $(MESS_DRIVERS)/cc40.o:     $(MESS_LAYOUT)/cc40.lh
 $(MAME_DRIVERS)/cdi.o:      $(MAME_LAYOUT)/cdi.lh
