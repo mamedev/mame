@@ -70,7 +70,7 @@ bool fdd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	
 	// sector map
 	UINT8 num_secs[160];
-	UINT32 track_sizes[160];
+//	UINT32 track_sizes[160];
 	UINT8 tracks[160 * 26];
 	UINT8 heads[160 * 26];
 	UINT8 secs[160 * 26];
@@ -103,7 +103,7 @@ bool fdd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			curr_num_sec++;
 		}
 		num_secs[track] = curr_num_sec;
-		track_sizes[track] = curr_track_size;
+//		track_sizes[track] = curr_track_size;
 	}
 
 	int cell_count = form_factor == floppy_image::FF_35 ? 200000 : 166666;
