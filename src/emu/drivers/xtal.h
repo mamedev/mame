@@ -94,8 +94,8 @@ enum
 	XTAL_8_7MHz         = 8700000,      /* Tandberg TDV 2324 */
 	XTAL_8_867236MHz    = 8867236,      /* RCA CDP1869 PAL color clock (~2x PAL subcarrier) */
 	XTAL_8_867238MHz    = 8867238,      /* ETI-660 (~2x PAL subcarrier) */
-	XTAL_9_216MHz       = 9216000,      /* Conitec PROF-180X */
 	XTAL_8_945MHz       = 8945000,      /* Hit Me */
+	XTAL_9_216MHz       = 9216000,      /* Conitec PROF-180X */
 	XTAL_9_828MHz       = 9828000,      /* Universal PCBs */
 	XTAL_9_8304MHz      = 9830400,      /* Epson PX-8 */
 	XTAL_9_987MHz       = 9987000,      /* Crazy Balloon */
@@ -189,7 +189,7 @@ enum
 	XTAL_30_4761MHz     = 30476100,     /* Taito JC */
 	XTAL_30_8MHz        = 30800000,     /* 15IE-00-013 */
 	XTAL_32MHz          = 32000000,
-	XTAL_32_22MHz       = 32220000,     /* Typically used on 90's Data East PCBs */
+	XTAL_32_22MHz       = 32220000,     /* Typically used on 90's Data East PCBs (close to 9x NTSC subcarrier which is 32.215905Mhz*/
 	XTAL_32_5304MHz     = 32530400,     /* Seta 2 */
 	XTAL_33MHz          = 33000000,     /* Sega Model 3 video board */
 	XTAL_33_333MHz      = 33333000,     /* Sega Model 3 CPU board, Vegas */
@@ -209,7 +209,7 @@ enum
 	XTAL_48_66MHz       = 48660000,     /* Zaxxon */
 	XTAL_49_152MHz      = 49152000,     /* Used on some Namco PCBs, Baraduke h/w, System 21, Super System 22  */
 	XTAL_50MHz          = 50000000,     /* Williams/Midway T/W/V-unit system */
-	XTAL_50_113MHz      = 50113000,     /* Namco NA-1 */
+	XTAL_50_113MHz      = 50113000,     /* Namco NA-1 (14x NTSC subcarrier)*/
 	XTAL_52MHz          = 52000000,     /* Cojag */
 	XTAL_52_832MHz      = 52832000,     /* Wang PC TIG video controller */
 	XTAL_53_693175MHz   = 53693175,     /* PSX-based h/w, Sony ZN1-2-based (15x NTSC subcarrier) */
@@ -233,7 +233,7 @@ enum
 	XTAL_400kHz         = 400000,       /* OKI MSM5205 on Great Swordman h/w */
 	XTAL_455kHz         = 455000,       /* OKI MSM5205 on Gladiator h/w */
 	XTAL_512kHz         = 512000,       /* Toshiba TC8830F */
-	XTAL_640kHz         = 640000,       /* NEC UPD7759, Texas Instruments Speech Chips */
+	XTAL_640kHz         = 640000,       /* NEC UPD7759, Texas Instruments Speech Chips @ 8khz */
 	XTAL_1_056MHz       = 1056000       /* OKI M6295 on Trio The Punch h/w */
 };
 
