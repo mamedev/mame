@@ -344,7 +344,7 @@ int arcompact_handle02_dasm(DASM_OPS_32)
 	// fedc ba98 7654 3210 fedc ba98 7654 3210
 	// fields
 	// 0001 0bbb ssss ssss SBBB DaaZ ZXAA AAAA
-
+	int size = 4;
 
 	int A = (op & 0x0000003f) >> 0;  //op &= ~0x0000003f;
 	int X = (op & 0x00000040) >> 6;  //op &= ~0x00000040;
@@ -359,6 +359,13 @@ int arcompact_handle02_dasm(DASM_OPS_32)
 	int breg = b | (B << 3);
 	int sdat = s | (S << 8); // todo - signed
 
+	UINT32 limm = 0;
+	if (breg == LIMM_REG)
+	{
+		GET_LIMM_32;
+		size = 8;
+	}
+
 	output  += sprintf( output, "LD");
 	output  += sprintf( output, "%s", datasize[Z]);
 	output  += sprintf( output, "%s", dataextend[X]);
@@ -367,23 +374,59 @@ int arcompact_handle02_dasm(DASM_OPS_32)
 	output  += sprintf( output, " ");
 	output  += sprintf( output, "%s, ", regnames[A]);
 	output  += sprintf( output, "[");
-	output  += sprintf( output, "%s, ", regnames[breg]);
+	if (breg == LIMM_REG) output  += sprintf( output, "(%08x), ", limm);
+	else output  += sprintf( output, "%s, ", regnames[breg]);
 	output  += sprintf( output, "%d", sdat);
 	output  += sprintf( output, "]");
 
-	return 4;
+	return size;
 }
 
 int arcompact_handle03_dasm(DASM_OPS_32)
 {
+	int size = 4;
 	// bitpos
-	// 11111 111 11111111 0 000 000000 0 00 00 0
-	// fedcb a98 76543210 f edc ba9876 5 43 21 0
+	// 1111 1111 1111 1111 0000 0000 0000 0000
+	// fedc ba98 7654 3210 fedc ba98 7654 3210
 	// fields
-	// 00011 bbb ssssssss S BBB CCCCCC D aa ZZ R
+	// 0001 1bbb ssss ssss SBBB CCCC CCDa aZZR
+	int B = (op & 0x00007000) >> 12;// op &= ~0x00007000;
+	int S = (op & 0x00008000) >> 15;// op &= ~0x00008000;
+	int s = (op & 0x00ff0000) >> 16;// op &= ~0x00ff0000;
+	int b = (op & 0x07000000) >> 24;// op &= ~0x07000000;
 
-	print("ST r+o (%08x)", op );
-	return 4;
+	int breg = b | (B << 3);
+	int sdat = s | (S << 8); // todo - signed
+
+	int R = (op & 0x00000001) >> 0; op &= ~0x00000001;
+	int Z = (op & 0x00000006) >> 1; op &= ~0x00000006;
+	int a = (op & 0x00000018) >> 3; op &= ~0x00000018;
+	int D = (op & 0x00000020) >> 5; op &= ~0x00000020;
+	int C = (op & 0x00000fc0) >> 6; op &= ~0x00000fc0;
+	
+	UINT32 limm = 0;
+	if (breg == LIMM_REG)
+	{
+		GET_LIMM_32;
+		size = 8;
+	}
+
+
+	output  += sprintf( output, "ST");
+	output  += sprintf( output, "%s", datasize[Z]);
+	output  += sprintf( output, "%s", addressmode[a]);
+	output  += sprintf( output, "%s", cachebit[D]);
+	output  += sprintf( output, " ");
+
+	output  += sprintf( output, "%s, ", regnames[C]);
+	if (breg == LIMM_REG) output  += sprintf( output, "(%08x), ", limm);
+	else output  += sprintf( output, "%s, ", regnames[breg]);
+	output  += sprintf( output, "%d", sdat);
+
+	if (R) output  += sprintf( output, "(reserved bit set)");
+
+
+	return size;
 }
 
 
@@ -703,16 +746,47 @@ int arcompact_handle04_2f_3f_05_dasm(DASM_OPS_32)  { print("BRK (%08x)", op); re
 
 // 0010 0bbb aa11 0ZZX DBBB CCCC CCAA AAAA
 // note, bits  11 0ZZX are part of the sub-opcode # already - this is a special encoding
-int arcompact_handle04_30_dasm(DASM_OPS_32)  { print("LD r-r (basecase 0x30) (%08x)", op); return 4;}
+int arcompact_handle04_3x_helper_dasm(char *output, offs_t pc, UINT32 op, const UINT8* oprom, int dsize, int extend)
+{
+	int size = 4;
+	output += sprintf(output, "LD");
+	output += sprintf(output, "%s", datasize[dsize]);
+	output += sprintf(output, "%s", dataextend[extend]);
+
+	int mode = (op & 0x00c00000) >> 22; op &= ~0x00c00000;
+	int b = (op & 0x07000000) >> 24; op &= ~0x07000000;
+	int B = (op & 0x00007000) >> 12; op &= ~0x00007000;
+	int breg = b | (B << 3);
+	int D = (op & 0x00008000) >> 15;op &= ~0x00008000;
+	int C = (op & 0x00000fc0) >> 6; op &= ~0x00000fc0;
+	int A = (op & 0x0000003f) >> 0; op &= ~0x0000003f;
+
+	output += sprintf(output, "%s", addressmode[mode]);
+	output += sprintf(output, "%s", cachebit[D]);
+
+	output  += sprintf( output, "DST(%s)", regnames[A]);
+	output  += sprintf( output, "SRC1(%s)", regnames[breg]);
+	output  += sprintf( output, "SRC2(%s)", regnames[C]);
+
+	
+
+
+	return size;
+	
+
+
+}
+
+int arcompact_handle04_30_dasm(DASM_OPS_32)  { return arcompact_handle04_3x_helper_dasm(output,pc,op,oprom,0,0); }
 // ZZ value of 0x0 with X of 1 is illegal
-int arcompact_handle04_31_dasm(DASM_OPS_32)  { print("LD r-r (illegal 0x31) (%08x)", op); return 4;}
-int arcompact_handle04_32_dasm(DASM_OPS_32)  { print("LD r-r (basecase 0x32) (%08x)", op); return 4;}
-int arcompact_handle04_33_dasm(DASM_OPS_32)  { print("LD r-r (basecase 0x33) (%08x)", op); return 4;}
-int arcompact_handle04_34_dasm(DASM_OPS_32)  { print("LD r-r (basecase 0x34) (%08x)", op); return 4;}
-int arcompact_handle04_35_dasm(DASM_OPS_32)  { print("LD r-r (basecase 0x35) (%08x)", op); return 4;}
+int arcompact_handle04_31_dasm(DASM_OPS_32)  { return arcompact_handle04_3x_helper_dasm(output,pc,op,oprom,0,1); }
+int arcompact_handle04_32_dasm(DASM_OPS_32)  { return arcompact_handle04_3x_helper_dasm(output,pc,op,oprom,1,0); }
+int arcompact_handle04_33_dasm(DASM_OPS_32)  { return arcompact_handle04_3x_helper_dasm(output,pc,op,oprom,1,1); }
+int arcompact_handle04_34_dasm(DASM_OPS_32)  { return arcompact_handle04_3x_helper_dasm(output,pc,op,oprom,2,0); }
+int arcompact_handle04_35_dasm(DASM_OPS_32)  { return arcompact_handle04_3x_helper_dasm(output,pc,op,oprom,2,1); }
 // ZZ value of 0x3 is illegal
-int arcompact_handle04_36_dasm(DASM_OPS_32)  { print("LD r-r (illegal 0x36) (%08x)", op); return 4;}
-int arcompact_handle04_37_dasm(DASM_OPS_32)  { print("LD r-r (illegal 0x37) (%08x)", op); return 4;}
+int arcompact_handle04_36_dasm(DASM_OPS_32)  { return arcompact_handle04_3x_helper_dasm(output,pc,op,oprom,3,0); }
+int arcompact_handle04_37_dasm(DASM_OPS_32)  { return arcompact_handle04_3x_helper_dasm(output,pc,op,oprom,3,1); }
 
 
 
