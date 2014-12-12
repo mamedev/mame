@@ -1376,19 +1376,19 @@ void pc9801_state::egc_blit_w(UINT32 offset, UINT16 data, UINT16 mem_mask)
 	UINT16 mask = m_egc.regs[4] & mem_mask, out = 0;
 	bool dir = !(m_egc.regs[6] & 0x1000);
 	int dst_off = (m_egc.regs[6] >> 4) & 0xf;
-	offset &= 0x3fff;
+	offset &= 0x13fff;
 
 	if((((m_egc.regs[2] >> 11) & 3) == 1) || ((((m_egc.regs[2] >> 11) & 3) == 2) && !BIT(m_egc.regs[2], 10)))
 	{
 		// mask off the bits past the end of the blit
 		if(m_egc.count < 16)
-			mask &= dir ? ((1 << (m_egc.count + 1)) - 1) : ~((1 << (16 - m_egc.count)) - 1);
+			mask &= dir ? ((1 << m_egc.count) - 1) : ~((1 << (16 - m_egc.count)) - 1);
 
 		// mask off the bits before the start
 		if(m_egc.first)
 		{
 			m_egc.leftover[0] = m_egc.leftover[1] = m_egc.leftover[2] = m_egc.leftover[3] = 0;
-			mask &= dir ? ~((1 << (16 - dst_off)) - 1) : ((1 << (dst_off + 1)) - 1);
+			mask &= dir ? ~((1 << dst_off) - 1) : ((1 << (16 - dst_off)) - 1);
 		}
 	}
 
@@ -1455,7 +1455,7 @@ void pc9801_state::egc_blit_w(UINT32 offset, UINT16 data, UINT16 mem_mask)
 
 UINT16 pc9801_state::egc_blit_r(UINT32 offset, UINT16 mem_mask)
 {
-	UINT16 plane_off = offset & 0x3fff;
+	UINT16 plane_off = offset & 0x13fff;
 	if((m_egc.regs[2] & 0x300) == 0x100)
 	{
 		m_egc.pat[0] = m_video_ram_2[plane_off + 0x4000];
@@ -1488,7 +1488,7 @@ READ16_MEMBER(pc9801_state::upd7220_grcg_r)
 	{
 		int i;
 
-		offset &= 0x3fff;
+		offset &= 0x13fff;
 		res = 0;
 		for(i=0;i<4;i++)
 		{
@@ -1514,7 +1514,7 @@ WRITE16_MEMBER(pc9801_state::upd7220_grcg_w)
 	{
 		int i;
 		UINT8 *vram = (UINT8 *)m_video_ram_2.target();
-		offset = (offset << 1) & 0x7fff;
+		offset = (offset << 1) & 0x27fff;
 
 		if(m_grcg.mode & 0x40) // RMW
 		{
