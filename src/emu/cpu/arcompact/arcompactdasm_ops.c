@@ -386,18 +386,8 @@ int arcompact_handle03_dasm(DASM_OPS_32)
 	return 4;
 }
 
-int arcompact_handle04_00_dasm(DASM_OPS_32)  { print("ADD (%08x)", op); return 4;}
-int arcompact_handle04_01_dasm(DASM_OPS_32)  { print("ADC (%08x)", op); return 4;}
-int arcompact_handle04_02_dasm(DASM_OPS_32)  { print("SUB (%08x)", op); return 4;}
-int arcompact_handle04_03_dasm(DASM_OPS_32)  { print("SBC (%08x)", op); return 4;}
-int arcompact_handle04_04_dasm(DASM_OPS_32)  { print("AND (%08x)", op); return 4;}
-int arcompact_handle04_05_dasm(DASM_OPS_32)  { print("OR (%08x)", op); return 4;}
-int arcompact_handle04_06_dasm(DASM_OPS_32)  { print("BIC (%08x)", op); return 4;}
-int arcompact_handle04_07_dasm(DASM_OPS_32)  { print("XOR (%08x)", op); return 4;}
-int arcompact_handle04_08_dasm(DASM_OPS_32)  { print("MAX (%08x)", op); return 4;}
-int arcompact_handle04_09_dasm(DASM_OPS_32)  { print("MIN (%08x)", op); return 4;}
 
-int arcompact_handle04_0a_dasm(DASM_OPS_32)
+int arcompact_handle04_helper_dasm(char *output, offs_t pc, UINT32 op, const UINT8* oprom, const char* optext, int ignore_dst)
 {
 	//           PP
 	// 0010 0bbb 00ii iiii FBBB CCCC CCAA AAAA
@@ -409,7 +399,7 @@ int arcompact_handle04_0a_dasm(DASM_OPS_32)
 	int breg = b | (B << 3);
 	int F = (op & 0x00008000) >> 15;op &= ~0x00008000;
 
-	output  += sprintf( output, "MOV");
+	output  += sprintf( output, "%s", optext);
 	output  += sprintf( output, "%s", flagbit[F]);
 	output  += sprintf( output, " p(%d)", p);
 	output  += sprintf( output, " %s, ", regnames[breg]);
@@ -426,11 +416,16 @@ int arcompact_handle04_0a_dasm(DASM_OPS_32)
 			UINT32 limm;
 			GET_LIMM_32;
 			size = 8;	
-			output  += sprintf( output, "(%08x) A(%s)", limm, regnames[A]);
+			output  += sprintf( output, "(%08x) ", limm );
+			if (!ignore_dst) output  += sprintf( output, "A(%s)", regnames[A]);
+			else  output  += sprintf( output, "unused(%s)", regnames[A]);		
 		}
 		else
 		{
-			output  += sprintf( output, "C(%s) A(%s)", regnames[C], regnames[A]);
+			output  += sprintf( output, "C(%s) ", regnames[C]);
+			if (!ignore_dst) output  += sprintf( output, "A(%s)", regnames[A]);
+			else  output  += sprintf( output, "unused(%s)", regnames[A]);		
+
 		}
 	}
 	else if (p == 1)
@@ -439,8 +434,9 @@ int arcompact_handle04_0a_dasm(DASM_OPS_32)
 		int U = (op & 0x00000fc0) >> 6; op &= ~0x00000fc0;
 		int A = (op & 0x0000003f) >> 0; op &= ~0x0000003f;
 
-		output  += sprintf( output, "U(%02x) A(%s)", U, regnames[A]);
-
+		output  += sprintf( output, "U(%02x) ", U );
+		if (!ignore_dst) output  += sprintf( output, "A(%s)", regnames[A]);			
+		else  output  += sprintf( output, "unused(%s)", regnames[A]);		
 	}
 	else if (p == 2)
 	{
@@ -474,26 +470,156 @@ int arcompact_handle04_0a_dasm(DASM_OPS_32)
 	return size;
 }
 
+int arcompact_handle04_00_dasm(DASM_OPS_32)  
+{
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "ADD", 0);
+}
 
-int arcompact_handle04_0b_dasm(DASM_OPS_32)  { print("TST (%08x)", op); return 4;}
-int arcompact_handle04_0c_dasm(DASM_OPS_32)  { print("CMP (%08x)", op); return 4;}
-int arcompact_handle04_0d_dasm(DASM_OPS_32)  { print("RCMP (%08x)", op); return 4;}
-int arcompact_handle04_0e_dasm(DASM_OPS_32)  { print("RSUB (%08x)", op); return 4;}
-int arcompact_handle04_0f_dasm(DASM_OPS_32)  { print("BSET (%08x)", op); return 4;}
-int arcompact_handle04_10_dasm(DASM_OPS_32)  { print("BCLR (%08x)", op); return 4;}
-int arcompact_handle04_11_dasm(DASM_OPS_32)  { print("BTST (%08x)", op); return 4;}
-int arcompact_handle04_12_dasm(DASM_OPS_32)  { print("BXOR (%08x)", op); return 4;}
-int arcompact_handle04_13_dasm(DASM_OPS_32)  { print("BMSK (%08x)", op); return 4;}
-int arcompact_handle04_14_dasm(DASM_OPS_32)  { print("ADD1 (%08x)", op); return 4;}
-int arcompact_handle04_15_dasm(DASM_OPS_32)  { print("ADD2 (%08x)", op); return 4;}
-int arcompact_handle04_16_dasm(DASM_OPS_32)  { print("ADD3 (%08x)", op); return 4;}
-int arcompact_handle04_17_dasm(DASM_OPS_32)  { print("SUB1 (%08x)", op); return 4;}
-int arcompact_handle04_18_dasm(DASM_OPS_32)  { print("SUB2 (%08x)", op); return 4;}
-int arcompact_handle04_19_dasm(DASM_OPS_32)  { print("SUB3 (%08x)", op); return 4;}
-int arcompact_handle04_1a_dasm(DASM_OPS_32)  { print("MPY (%08x)", op); return 4;} // *
-int arcompact_handle04_1b_dasm(DASM_OPS_32)  { print("MPYH (%08x)", op); return 4;} // *
-int arcompact_handle04_1c_dasm(DASM_OPS_32)  { print("MPYHU (%08x)", op); return 4;} // *
-int arcompact_handle04_1d_dasm(DASM_OPS_32)  { print("MPYU (%08x)", op); return 4;} // *
+int arcompact_handle04_01_dasm(DASM_OPS_32)  
+{ 
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "ADC", 0);
+}
+
+int arcompact_handle04_02_dasm(DASM_OPS_32)  
+{ 
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "SUB", 0);
+}
+
+int arcompact_handle04_03_dasm(DASM_OPS_32)  
+{
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "SBC", 0);
+}
+
+int arcompact_handle04_04_dasm(DASM_OPS_32)  
+{
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "AND", 0);
+}
+
+int arcompact_handle04_05_dasm(DASM_OPS_32)  
+{
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "OR", 0);
+}
+
+int arcompact_handle04_06_dasm(DASM_OPS_32)  
+{
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "BIC", 0);
+}
+
+int arcompact_handle04_07_dasm(DASM_OPS_32)  
+{
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "XOR", 0);
+}
+
+int arcompact_handle04_08_dasm(DASM_OPS_32)  
+{
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "MAX", 0);
+}
+
+int arcompact_handle04_09_dasm(DASM_OPS_32) 
+{
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "MIN", 0);
+}
+
+
+int arcompact_handle04_0a_dasm(DASM_OPS_32)
+{
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "MOV", 1);
+}
+
+int arcompact_handle04_0b_dasm(DASM_OPS_32)
+{
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "TST", 1);
+}
+
+int arcompact_handle04_0c_dasm(DASM_OPS_32)
+{
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "CMP", 1);
+}
+
+int arcompact_handle04_0d_dasm(DASM_OPS_32)
+{ 
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "RCMP", 1);
+}
+
+int arcompact_handle04_0e_dasm(DASM_OPS_32)
+{ 
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "RSUB", 0);
+}
+
+int arcompact_handle04_0f_dasm(DASM_OPS_32)  
+{ 
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "BSET", 0);
+}
+
+int arcompact_handle04_10_dasm(DASM_OPS_32)  
+{ 
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "BCLR", 0);
+}
+
+int arcompact_handle04_11_dasm(DASM_OPS_32)  
+{ 
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "BTST", 0);
+}
+
+int arcompact_handle04_12_dasm(DASM_OPS_32)  
+{ 
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "BXOR", 0);
+}
+
+int arcompact_handle04_13_dasm(DASM_OPS_32)  
+{ 
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "BMSK", 0);
+}
+
+int arcompact_handle04_14_dasm(DASM_OPS_32)  
+{ 
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "ADD1", 0);
+}
+
+int arcompact_handle04_15_dasm(DASM_OPS_32)  
+{ 
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "ADD2", 0);
+}
+
+int arcompact_handle04_16_dasm(DASM_OPS_32)  
+{ 
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "ADD3", 0);
+}
+
+int arcompact_handle04_17_dasm(DASM_OPS_32)  
+{ 
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "SUB1", 0);
+}
+
+int arcompact_handle04_18_dasm(DASM_OPS_32)  
+{ 
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "SUB2", 0);
+}
+
+int arcompact_handle04_19_dasm(DASM_OPS_32)  
+{ 
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "SUB3", 0);
+}
+
+int arcompact_handle04_1a_dasm(DASM_OPS_32)  
+{ 
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "MPY", 0);
+} // *
+
+int arcompact_handle04_1b_dasm(DASM_OPS_32)  
+{ 
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "MPYH", 0);
+} // *
+
+int arcompact_handle04_1c_dasm(DASM_OPS_32)  
+{ 
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "MPYHU", 0);
+} // *
+
+int arcompact_handle04_1d_dasm(DASM_OPS_32)  
+{ 
+	return arcompact_handle04_helper_dasm(output, pc, op, oprom, "MPYU", 0);
+} // *
 
 
 
