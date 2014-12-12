@@ -9,16 +9,17 @@ Skeleton driver created on 2014-12-09.
 
 Chips: Z80A, 8251, 8253, 8255, 6845
 We have Basic 1.1. Other known versions are 1.01, 2.1
+There are 2 versions of the colour prom, which have different palettes.
+We have the later version.
 
 Control W then Enter will switch between 40 and 80 characters per line.
 
 ToDo:
-- Some keys can be connected to more than one position in the matrix. Need to
-  determine the correct positions.
-- The position of the "Line Insert" key is unknown.
 - Colours are approximate.
 - Disk controller
-- ROM banking
+- Graphics commands such as LINE and CIRCLE produce a syntax error.
+- Some commands such as HGRCLS are missing from the rom. Perhaps we need a later version?
+- SET command produces random graphics instead of the expected lo-res dot.
 - The schematic shows the audio counter connected to 2MHz, but this produces
   sounds that are too high. Connected to 1MHz for now.
 - Serial
@@ -103,7 +104,6 @@ static ADDRESS_MAP_START(excali64_io, AS_IO, 8, excali64_state)
 ADDRESS_MAP_END
 
 
-// Keyboard matrix is not included in schematics, so some guesswork
 static INPUT_PORTS_START( excali64 )
 	PORT_START("KEY.0")    /* line 0 */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R') PORT_CHAR(0x12)
@@ -153,7 +153,7 @@ static INPUT_PORTS_START( excali64 )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEL") PORT_CODE(KEYCODE_DEL) PORT_CHAR(0x7f) PORT_CHAR(0x7f) PORT_CHAR(0x1f)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC) PORT_CHAR(0x1b)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 !") PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED) //1
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("INS") PORT_CODE(KEYCODE_INSERT)
 
 	PORT_START("KEY.5")    /* line 5 */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[ {") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{') PORT_CHAR(0x1b)
@@ -245,8 +245,6 @@ WRITE8_MEMBER( excali64_state::port70_w )
 		membank("bankr1")->set_entry(0);
 		membank("bankr2")->set_entry(0);
 		membank("bankr3")->set_entry(0);
-		membank("bankr4")->set_entry(0);
-		membank("bankw1")->set_entry(0);
 		membank("bankw2")->set_entry(0);
 		membank("bankw3")->set_entry(0);
 		membank("bankw4")->set_entry(0);
@@ -258,8 +256,6 @@ WRITE8_MEMBER( excali64_state::port70_w )
 		membank("bankr1")->set_entry(1);
 		membank("bankr2")->set_entry(1);
 		membank("bankr3")->set_entry(1);
-		membank("bankr4")->set_entry(0);
-		membank("bankw1")->set_entry(0);
 		membank("bankw2")->set_entry(2);
 		membank("bankw3")->set_entry(2);
 		membank("bankw4")->set_entry(2);
@@ -270,12 +266,14 @@ WRITE8_MEMBER( excali64_state::port70_w )
 		membank("bankr1")->set_entry(1);
 		membank("bankr2")->set_entry(1);
 		membank("bankr3")->set_entry(1);
-		membank("bankr4")->set_entry(0);
-		membank("bankw1")->set_entry(0);
 		membank("bankw2")->set_entry(2);
 		membank("bankw3")->set_entry(2);
 		membank("bankw4")->set_entry(0);
 	}
+
+	// other half of ROM_1
+	if ((data & 0x22) == 0x20)
+		membank("bankr1")->set_entry(2);
 }
 
 MACHINE_RESET_MEMBER( excali64_state, excali64 )
@@ -342,6 +340,7 @@ PALETTE_INIT_MEMBER( excali64_state, excali64 )
 	membank("bankw4")->configure_entry(0, &ram[0x4000]);//boot
 	// rom_1
 	membank("bankr1")->configure_entry(1, &main[0x0000]);//boot
+	membank("bankr1")->configure_entry(2, &main[0x2000]);
 	// rom_2
 	membank("bankr2")->configure_entry(1, &main[0x4000]);//boot
 	membank("bankr3")->configure_entry(1, &main[0x5000]);//boot
