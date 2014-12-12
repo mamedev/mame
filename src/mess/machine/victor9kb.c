@@ -318,22 +318,22 @@ Key Layout (USA Variant): (the S0x markings appear on the back of the PCB)
 Keyboard Matrix
 ---------------
 Row select
-|         Columns
-|         0   1   2   3   4   5   6   7
-V         V   V   V   V   V   V   V   V
-Y0        12  13  33  34  54  55  75  76
-Y1        14  15  35  36  56  57  77  78
-Y2        16  17  37  38  58  59  79  80
-Y3        18  19  39  40  60  61  81  82
-Y4        20  21  41  42  62  63  83  84
-Y5        22  23  43  44  64  65  85  86
-Y6        24  25  45  46  66  67  87  88
-Y7        26  27  47  48  68  69  89  90
-Y8        28  29  49  50  70  71  91  92
-Y9        30  31  51  52  72  73  93  94
-Y10       32  11  53  10  74  09  07  06
-Y11       104 103 102 101 100 99  98  97
-/3Y       05  04  03  02  01  08  95  96
+|         Columns Sxxx by bit                 Columns Key by bit
+|         D0  D1  D2  D3  D4  D5  D6  D7      D0   D1   D2   D3   D4   D5   D6   D7
+V         V   V   V   V   V   V   V   V       V    V    V    V    V    V    V    V
+Y0        12  13  33  34  54  55  75  76      CLRH DEGR SCRL TAB  RVS  LOCK UNDL LSHFT
+Y1        14  15  35  36  56  57  77  78      1    2    Q    W    A    S    N/A  Z
+Y2        16  17  37  38  58  59  79  80      3    4    E    R    D    F    X    C
+Y3        18  19  39  40  60  61  81  82      5    6    T    Y    G    H    V    B
+Y4        20  21  41  42  62  63  83  84      7    8    U    I    J    K    N    M
+Y5        22  23  43  44  64  65  85  86      9    0    O    P    L    ;    ,    .
+Y6        24  25  45  46  66  67  87  88      -    =    1/2  []   '    N/A  ?    RSHFT
+Y7        26  27  47  48  68  69  89  90      BKSP INS  N/A  ERSE RETN WRDL UP   DOWN
+Y8        28  29  49  50  70  71  91  92      DEL  MODE REQ  k7   WRDR k4   k1   k2
+Y9        30  31  51  52  72  73  93  94      k%   kDIV k8   k9   k5   k6   k3   kENTR
+Y10       32  11  53  10  74  09  07  06      kMUL [10] k-   [9]  k+   N/A  [7]  [6]
+Y11       104 103 102 101 100 99  98  97      kN/A k.   k00  k0   RGHT LEFT PAUS SPACE
+/3Y       05  04  03  02  01  08  95  96      [5]  [4]  [3]  [2]  [1]  [8]  RPT  ALT
 
 */
 
