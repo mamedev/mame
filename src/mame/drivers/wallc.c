@@ -58,12 +58,17 @@ class wallc_state : public driver_device
 public:
 	wallc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_videoram(*this, "videoram") { }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	required_shared_ptr<UINT8> m_videoram;
+	
 	tilemap_t *m_bg_tilemap;
+	
 	DECLARE_WRITE8_MEMBER(wallc_videoram_w);
 	DECLARE_WRITE8_MEMBER(wallc_coin_counter_w);
 	DECLARE_DRIVER_INIT(wallc);
@@ -73,8 +78,6 @@ public:
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(wallc);
 	UINT32 screen_update_wallc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -143,15 +146,13 @@ PALETTE_INIT_MEMBER(wallc_state, wallc)
 
 WRITE8_MEMBER(wallc_state::wallc_videoram_w)
 {
-	UINT8 *videoram = m_videoram;
-	videoram[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info)
 {
-	UINT8 *videoram = m_videoram;
-	SET_TILE_INFO_MEMBER(0, videoram[tile_index] + 0x100, 1, 0);
+	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index] + 0x100, 1, 0);
 }
 
 void wallc_state::video_start()
@@ -487,8 +488,8 @@ DRIVER_INIT_MEMBER(wallc_state,sidam)
 
 }
 
-GAME( 1984, wallc,  0,      wallc,  wallc, wallc_state, wallc,  ROT0, "Midcoin", "Wall Crash (set 1)", 0 )
-GAME( 1984, wallca, wallc,  wallc,  wallc, wallc_state, wallca, ROT0, "Midcoin", "Wall Crash (set 2)", 0 )
-GAME( 1984, brkblast,wallc, wallc,  wallc, wallc_state, wallca, ROT0, "bootleg (Fadesa)", "Brick Blast (bootleg of Wall Crash)", 0 ) // Spanish bootleg board, Fadesa stickers / text on various components
+GAME( 1984, wallc,  0,      wallc,  wallc, wallc_state, wallc,  ROT0, "Midcoin", "Wall Crash (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1984, wallca, wallc,  wallc,  wallc, wallc_state, wallca, ROT0, "Midcoin", "Wall Crash (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1984, brkblast,wallc, wallc,  wallc, wallc_state, wallca, ROT0, "bootleg (Fadesa)", "Brick Blast (bootleg of Wall Crash)", GAME_SUPPORTS_SAVE ) // Spanish bootleg board, Fadesa stickers / text on various components
 
-GAME( 1984, sidampkr,0,     wallc,  wallc, wallc_state, sidam,  ROT270, "Sidam", "unknown Sidam Poker", GAME_NOT_WORKING )
+GAME( 1984, sidampkr,0,     wallc,  wallc, wallc_state, sidam,  ROT270, "Sidam", "unknown Sidam Poker", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

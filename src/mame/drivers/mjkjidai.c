@@ -282,6 +282,12 @@ INTERRUPT_GEN_MEMBER(mjkjidai_state::vblank_irq)
 void mjkjidai_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x8000, 0x4000);
+	
+	save_item(NAME(m_adpcm_pos));
+	save_item(NAME(m_adpcm_end));
+	save_item(NAME(m_keyb));
+	save_item(NAME(m_nmi_enable));
+	save_item(NAME(m_display_enable));
 }
 
 void mjkjidai_state::machine_reset()
@@ -361,4 +367,4 @@ ROM_START( mjkjidai )
 ROM_END
 
 
-GAME( 1986, mjkjidai, 0, mjkjidai, mjkjidai, driver_device, 0, ROT0, "Sanritsu",  "Mahjong Kyou Jidai (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1986, mjkjidai, 0, mjkjidai, mjkjidai, driver_device, 0, ROT0, "Sanritsu",  "Mahjong Kyou Jidai (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
