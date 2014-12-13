@@ -501,7 +501,7 @@ READ8_MEMBER(napple2_state::c000_r)
 
 		case 0x10:  // reads any key down, clears strobe
 			{
-				UINT8 rv = m_transchar | m_anykeydown;
+				UINT8 rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
 				m_strobe = 0;
 				return rv;
 			}

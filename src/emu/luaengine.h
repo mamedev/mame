@@ -76,6 +76,8 @@ private:
 
 	static int l_ioport_write(lua_State *L);
 	static int l_emu_after(lua_State *L);
+	static int l_emu_app_name(lua_State *L);
+	static int l_emu_app_version(lua_State *L);
 	static int l_emu_wait(lua_State *L);
 	static int l_emu_time(lua_State *L);
 	static int l_emu_gamename(lua_State *L);

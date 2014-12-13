@@ -84,7 +84,7 @@ public:
 	required_device<isbx_slot_device> m_isbx0;
 	required_device<isbx_slot_device> m_isbx1;
 	required_device<ram_device> m_ram;
-	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<UINT16> m_video_ram;
 	required_ioport m_s8;
 
 	virtual void machine_start();

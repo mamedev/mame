@@ -61,7 +61,7 @@ debug_view_memory_source::debug_view_memory_source(const char *name, memory_regi
 		m_memintf(NULL),
 		m_base(region.base()),
 		m_length(region.bytes()),
-		m_offsetxor(NATIVE_ENDIAN_VALUE_LE_BE(region.bytewidth() - 1, 0)),
+		m_offsetxor(ENDIAN_VALUE_NE_NNE(region.endianness(), 0, region.bytewidth() - 1)),
 		m_endianness(region.endianness()),
 		m_prefsize(MIN(region.bytewidth(), 8))
 {

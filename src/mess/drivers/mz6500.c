@@ -28,7 +28,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mz6500_vram_w);
 	void fdc_irq(bool state);
 	void fdc_drq(bool state);
-	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<UINT16> m_video_ram;
 	virtual void machine_reset();
 	virtual void video_start();
 	required_device<cpu_device> m_maincpu;
@@ -42,11 +42,11 @@ UPD7220_DISPLAY_PIXELS_MEMBER( mz6500_state::hgdc_display_pixels )
 	int gfx[3];
 	UINT8 i,pen;
 
-	gfx[0] = m_video_ram[address + 0x00000];
-	gfx[1] = m_video_ram[address + 0x10000];
-	gfx[2] = m_video_ram[address + 0x20000];
+	gfx[0] = m_video_ram[(address + 0x00000) >> 1];
+	gfx[1] = m_video_ram[(address + 0x10000) >> 1];
+	gfx[2] = m_video_ram[(address + 0x20000) >> 1];
 
-	for(i=0; i<8; i++)
+	for(i=0; i<16; i++)
 	{
 		pen = (BIT(gfx[0], i)) | (BIT(gfx[1], i) << 1) | (BIT(gfx[2], i) << 2);
 
@@ -62,12 +62,15 @@ void mz6500_state::video_start()
 
 READ8_MEMBER( mz6500_state::mz6500_vram_r )
 {
-	return m_video_ram[offset];
+	return m_video_ram[offset >> 1] >> ((offset & 1) ? 8 : 0);
 }
 
 WRITE8_MEMBER( mz6500_state::mz6500_vram_w )
 {
-	m_video_ram[offset] = data;
+	int mask = (offset & 1) ? 8 : 0;
+	offset >>= 1;
+	m_video_ram[offset] &= 0xff00 >> mask;
+	m_video_ram[offset] |= data << mask;
 }
 
 static ADDRESS_MAP_START(mz6500_map, AS_PROGRAM, 16, mz6500_state)
@@ -126,7 +129,7 @@ static SLOT_INTERFACE_START( mz6500_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
 
-static ADDRESS_MAP_START( upd7220_map, AS_0, 8, mz6500_state )
+static ADDRESS_MAP_START( upd7220_map, AS_0, 16, mz6500_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 

@@ -312,7 +312,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( upd7220_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( upd7220_map, AS_0, 8, compis_state )
+static ADDRESS_MAP_START( upd7220_map, AS_0, 16, compis_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x00000, 0x7fff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
@@ -451,11 +451,11 @@ INPUT_PORTS_END
 
 UPD7220_DISPLAY_PIXELS_MEMBER( compis_state::hgdc_display_pixels )
 {
-	UINT8 i,gfx = m_video_ram[(address & 0x7fff)];
+	UINT16 i,gfx = m_video_ram[(address & 0x7fff) >> 1];
 	const pen_t *pen = m_palette->pens();
 
-	for(i=0; i<8; i++)
-		bitmap.pix32(y, x + i) = pen[BIT(gfx, 7 - i)];
+	for(i=0; i<16; i++)
+		bitmap.pix32(y, x + i) = pen[BIT(gfx, i)];
 }
 
 

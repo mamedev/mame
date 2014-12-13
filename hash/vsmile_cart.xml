@@ -714,6 +714,17 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
+	<software name="redhood" supported="no">
+		<description>Entdecke die Welt von Rotkäppchen (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92024.bin" size="8388608" crc="cdeb71f9" sha1="21d2ecf5bc22fa94a1015de6f670415b6d42a3b1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="alphaprk" supported="no">
 		<description>Alphabet Park Adventure (USA)</description>
 		<year>200?</year>
@@ -731,7 +742,40 @@ V.Smile Smartbooks
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="092124.bin" size="8388608" crc="ce21b7ba" sha1="e992b113f014614db34b81bb22357847cef79a16" offset="0" />
+				<rom name="52-92124.bin" size="8388608" crc="ce21b7ba" sha1="e992b113f014614db34b81bb22357847cef79a16" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arieldk" cloneof="ariel" supported="no">
+		<description>Den Lille Havfrue - Ariels majestætiske rejse! (Den)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92133.bin" size="8388608" crc="182b5973" sha1="7f356a9890c7ea20c81db94f81037355b8cfb2c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arielsw" cloneof="ariel" supported="no">
+		<description>Den Lilla Sjöjungfrun - Ariels majestätiska resa! (Swe)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92134.bin" size="8388608" crc="e567db85" sha1="ca52eaca6cf1b361fd4b1ae2b2380095c612668d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barney" supported="no">
+		<description>Barney - Erlebnis-Reise (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92384.bin" size="8388608" crc="a73855fa" sha1="dcc61ecf05bb41779a78196145136c1e9cbfa415" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -755,6 +799,28 @@ V.Smile Smartbooks
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="092304.bin" size="8388608" crc="70c83b25" sha1="bebe311cfbeb25e01892b7636f4427ae0e0e4c9e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bobbdaydk" cloneof="bobbday" supported="no">
+		<description>Byggemand Bob - Bobs travle dag (Den)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92313.bin" size="8388608" crc="37498231" sha1="2966ba75fc4430ee5d9dc7003d7f7e54e5546382" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bobbdaysw" cloneof="bobbday" supported="no">
+		<description>Byggare Bob - Bobs stressiga dag (Swe)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92314.bin" size="8388608" crc="ac343df7" sha1="77dafa48ca0e015728c5ead844dd729e87eb6182" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -860,6 +926,17 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
+	<software name="elmo" supported="no">
+		<description>Elmos großes Abenteuer (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92264.bin" size="8388608" crc="906b6496" sha1="8932008fef144d2ad3d056fd24f64264825af8ce" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="footschl" supported="no">
 		<description>Fußball Schule (Ger)</description>
 		<year>200?</year>
@@ -889,6 +966,17 @@ V.Smile Smartbooks
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="092044.bin" size="8388608" crc="24988ef6" sha1="7f5d647dc8edf780ea86a43e08e8d2169b19a0ae" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionking" supported="no">
+		<description>Løvernes Konge - Simbas store eventyr (Den)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92113.bin" size="8388608" crc="924efa89" sha1="fd111f99ef101d318a66a728927d379559dc0106" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1014,6 +1102,17 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
+	<software name="scoobydog" cloneof="scoobydo" supported="no">
+		<description>Scooby-Doo! - Im Lernpark (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92164.bin" size="8388608" crc="97576369" sha1="81d84286a09068d54a4d1051040187a1b89c9d42" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="scoobydodk" cloneof="scoobydo" supported="no">
 		<description>Scooby-Doo! - Sjov i forlystelsesparken (Den)</description>
 		<year>200?</year>
@@ -1036,6 +1135,17 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
+	<software name="erniebrt" supported="no">
+		<description>Sesamestrasse - Ernies + Berts Fantastisches Abenteuer (Ger)</description>
+		<year>2006?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92464.bin" size="8388608" crc="064c620c" sha1="d44e8a5507f18e544de707cae4b9a7d309c56fdf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shrek3" supported="no">
 		<description>Shrek The Third - Arthur's School Day Adventure (USA)</description>
 		<year>200?</year>
@@ -1054,6 +1164,17 @@ V.Smile Smartbooks
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="52-92604.bin" size="8388608" crc="0abbb98b" sha1="7b23e7a5a1f1b5f3a39427b563e06340268db272" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spidermn" supported="no">
+		<description>Spider-Man &amp; Freunde - Wettkampf im Space-Labor (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92524.bin" size="8388608" crc="eb9e2303" sha1="07ee3fba4e850487c365fd883ac1fb53a25d0028" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1119,7 +1240,18 @@ V.Smile Smartbooks
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="092224.bin" size="8388608" crc="c6fbdb94" sha1="887f1d2acadc6902d386488577654a6786d802a9" offset="0" />
+				<rom name="52-92224.bin" size="8388608" crc="c6fbdb94" sha1="887f1d2acadc6902d386488577654a6786d802a9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toystor2sw" cloneof="toystor2" supported="no">
+		<description>Toy Story 2 - Operation: Rädda Woody! (Swe)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92234.bin" size="8388608" crc="a6aa6d6b" sha1="ca576d994441ffaac96e015f5a9309e0326280e1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1130,7 +1262,18 @@ V.Smile Smartbooks
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="092844.bin" size="8388608" crc="f4be4391" sha1="5e43c9dd4759218578d1a8364540db8bc6bc6416" offset="0" />
+				<rom name="52-92844.bin" size="8388608" crc="f4be4391" sha1="5e43c9dd4759218578d1a8364540db8bc6bc6416" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wallesw" cloneof="walle" supported="no">
+		<description>Wall-E (Swe)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92854.bin" size="8388608" crc="860194d2" sha1="3d5f40a0f523c9b090a826fef45a6bc63a58d519" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1141,7 +1284,7 @@ V.Smile Smartbooks
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="092064.bin" size="8388608" crc="38a17e7e" sha1="434849ba8867d0bfb16b0fb5abfec86286390c07" offset="0" />
+				<rom name="52-92064.bin" size="8388608" crc="38a17e7e" sha1="434849ba8867d0bfb16b0fb5abfec86286390c07" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1201,6 +1344,17 @@ V.Smile Smartbooks
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="meine kleinen tierfreunde (german) (v.smile baby).bin" size="8388608" crc="7b48544b" sha1="a736ef1313762c493a366990406c3a7393457b6e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohvb" supported="no">
+		<description>Nalle Puhs Aeventyr i Sjumilaskogen (Swe) (V.Smile Baby)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-99034.bin" size="8388608" crc="5dbe1c20" sha1="51f56cedbe99fc7438429a4c02c08f65d2313790" offset="0" />
 			</dataarea>
 		</part>
 	</software>

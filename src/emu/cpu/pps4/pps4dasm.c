@@ -33,10 +33,11 @@ typedef enum pps4_token_e {
     t_I4c  = 1 <<  8,   /* immediate 4 bit constant, complemented */
     t_I4p  = 1 <<  9,   /* immediate 4 bit offset into page 3 */
     t_I6p  = 1 << 10,   /* immediate 6 bit constant; address in current page */
-    t_I8   = 1 << 11,   /* immediate 8 bit constant (I/O port number) */
-    t_I8c  = 1 << 12,   /* immediate 8 bit constant inverted */
-    t_OVER = 1 << 13,   /* Debugger step over (CALL) */
-    t_OUT  = 1 << 14    /* Debugger step out (RETURN) */
+    t_I6i  = 1 << 11,   /* immediate 6 bit indirect page 3 offset (16 ... 63) + followed by page 1 address */
+    t_I8   = 1 << 12,   /* immediate 8 bit constant (I/O port number) */
+    t_I8c  = 1 << 13,   /* immediate 8 bit constant inverted */
+    t_OVER = 1 << 14,   /* Debugger step over (CALL) */
+    t_OUT  = 1 << 15    /* Debugger step out (RETURN) */
 }   pps4_token_e;
 
 static const char *token_str[t_COUNT] = {
@@ -314,56 +315,56 @@ static const UINT16 table[] = {
 /* ce */ t_LB | t_I4p,
 /* cf */ t_LB | t_I4p,
 
-/* d0 */ t_TM | t_I6p | t_OVER,
-/* d1 */ t_TM | t_I6p | t_OVER,
-/* d2 */ t_TM | t_I6p | t_OVER,
-/* d3 */ t_TM | t_I6p | t_OVER,
-/* d4 */ t_TM | t_I6p | t_OVER,
-/* d5 */ t_TM | t_I6p | t_OVER,
-/* d6 */ t_TM | t_I6p | t_OVER,
-/* d7 */ t_TM | t_I6p | t_OVER,
-/* d8 */ t_TM | t_I6p | t_OVER,
-/* d9 */ t_TM | t_I6p | t_OVER,
-/* da */ t_TM | t_I6p | t_OVER,
-/* db */ t_TM | t_I6p | t_OVER,
-/* dc */ t_TM | t_I6p | t_OVER,
-/* dd */ t_TM | t_I6p | t_OVER,
-/* de */ t_TM | t_I6p | t_OVER,
-/* df */ t_TM | t_I6p | t_OVER,
+/* d0 */ t_TM | t_I6i | t_OVER,
+/* d1 */ t_TM | t_I6i | t_OVER,
+/* d2 */ t_TM | t_I6i | t_OVER,
+/* d3 */ t_TM | t_I6i | t_OVER,
+/* d4 */ t_TM | t_I6i | t_OVER,
+/* d5 */ t_TM | t_I6i | t_OVER,
+/* d6 */ t_TM | t_I6i | t_OVER,
+/* d7 */ t_TM | t_I6i | t_OVER,
+/* d8 */ t_TM | t_I6i | t_OVER,
+/* d9 */ t_TM | t_I6i | t_OVER,
+/* da */ t_TM | t_I6i | t_OVER,
+/* db */ t_TM | t_I6i | t_OVER,
+/* dc */ t_TM | t_I6i | t_OVER,
+/* dd */ t_TM | t_I6i | t_OVER,
+/* de */ t_TM | t_I6i | t_OVER,
+/* df */ t_TM | t_I6i | t_OVER,
 
-/* e0 */ t_TM | t_I6p | t_OVER,
-/* e1 */ t_TM | t_I6p | t_OVER,
-/* e2 */ t_TM | t_I6p | t_OVER,
-/* e3 */ t_TM | t_I6p | t_OVER,
-/* e4 */ t_TM | t_I6p | t_OVER,
-/* e5 */ t_TM | t_I6p | t_OVER,
-/* e6 */ t_TM | t_I6p | t_OVER,
-/* e7 */ t_TM | t_I6p | t_OVER,
-/* e8 */ t_TM | t_I6p | t_OVER,
-/* e9 */ t_TM | t_I6p | t_OVER,
-/* ea */ t_TM | t_I6p | t_OVER,
-/* eb */ t_TM | t_I6p | t_OVER,
-/* ec */ t_TM | t_I6p | t_OVER,
-/* ed */ t_TM | t_I6p | t_OVER,
-/* ee */ t_TM | t_I6p | t_OVER,
-/* ef */ t_TM | t_I6p | t_OVER,
+/* e0 */ t_TM | t_I6i | t_OVER,
+/* e1 */ t_TM | t_I6i | t_OVER,
+/* e2 */ t_TM | t_I6i | t_OVER,
+/* e3 */ t_TM | t_I6i | t_OVER,
+/* e4 */ t_TM | t_I6i | t_OVER,
+/* e5 */ t_TM | t_I6i | t_OVER,
+/* e6 */ t_TM | t_I6i | t_OVER,
+/* e7 */ t_TM | t_I6i | t_OVER,
+/* e8 */ t_TM | t_I6i | t_OVER,
+/* e9 */ t_TM | t_I6i | t_OVER,
+/* ea */ t_TM | t_I6i | t_OVER,
+/* eb */ t_TM | t_I6i | t_OVER,
+/* ec */ t_TM | t_I6i | t_OVER,
+/* ed */ t_TM | t_I6i | t_OVER,
+/* ee */ t_TM | t_I6i | t_OVER,
+/* ef */ t_TM | t_I6i | t_OVER,
 
-/* f0 */ t_TM | t_I6p | t_OVER,
-/* f1 */ t_TM | t_I6p | t_OVER,
-/* f2 */ t_TM | t_I6p | t_OVER,
-/* f3 */ t_TM | t_I6p | t_OVER,
-/* f4 */ t_TM | t_I6p | t_OVER,
-/* f5 */ t_TM | t_I6p | t_OVER,
-/* f6 */ t_TM | t_I6p | t_OVER,
-/* f7 */ t_TM | t_I6p | t_OVER,
-/* f8 */ t_TM | t_I6p | t_OVER,
-/* f9 */ t_TM | t_I6p | t_OVER,
-/* fa */ t_TM | t_I6p | t_OVER,
-/* fb */ t_TM | t_I6p | t_OVER,
-/* fc */ t_TM | t_I6p | t_OVER,
-/* fd */ t_TM | t_I6p | t_OVER,
-/* fe */ t_TM | t_I6p | t_OVER,
-/* ff */ t_TM | t_I6p | t_OVER
+/* f0 */ t_TM | t_I6i | t_OVER,
+/* f1 */ t_TM | t_I6i | t_OVER,
+/* f2 */ t_TM | t_I6i | t_OVER,
+/* f3 */ t_TM | t_I6i | t_OVER,
+/* f4 */ t_TM | t_I6i | t_OVER,
+/* f5 */ t_TM | t_I6i | t_OVER,
+/* f6 */ t_TM | t_I6i | t_OVER,
+/* f7 */ t_TM | t_I6i | t_OVER,
+/* f8 */ t_TM | t_I6i | t_OVER,
+/* f9 */ t_TM | t_I6i | t_OVER,
+/* fa */ t_TM | t_I6i | t_OVER,
+/* fb */ t_TM | t_I6i | t_OVER,
+/* fc */ t_TM | t_I6i | t_OVER,
+/* fd */ t_TM | t_I6i | t_OVER,
+/* fe */ t_TM | t_I6i | t_OVER,
+/* ff */ t_TM | t_I6i | t_OVER
 };
 
 CPU_DISASSEMBLE( pps4 )
@@ -374,10 +375,11 @@ CPU_DISASSEMBLE( pps4 )
     UINT32 tok = table[op];
     char *dst = 0;
 
-    if (0 == (tok & t_MASK))
+    if (0 == (tok & t_MASK)) {
         sprintf(buffer, "%s", token_str[tok & t_MASK]);
-    else
+    } else {
         dst = buffer + sprintf(buffer, "%-7s", token_str[tok & t_MASK]);
+    }
 
     if (tok & t_I3c) {
         // 3 bit immediate, complemented
@@ -408,6 +410,15 @@ CPU_DISASSEMBLE( pps4 )
         // 6 bit immediate offset into current page
         UINT8 i = op & 63;
         dst += sprintf(dst, "%x", (PC & ~63) | i);
+    }
+
+    if (tok & t_I6i) {
+        // 6 bit immediate offset into page 3
+        UINT16 i6p3 = (3 << 6) | (op & 63);
+        // 8 bit absolute offset at 0x0100
+        UINT16 addr = (1 << 8) | 0;     // ROM[ip3] can't be reached!?
+        (void)addr; // avoid unused variable warning
+        dst += sprintf(dst, "[%x]", i6p3);
     }
 
     if (tok & t_I8) {

@@ -73,7 +73,7 @@ public:
 	required_device<floppy_connector> m_floppy1;
 	required_device<dmv_keyboard_device> m_keyboard;
 	required_device<speaker_sound_device> m_speaker;
-	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<UINT16> m_video_ram;
 	required_device<palette_device> m_palette;
 	required_memory_region m_ram;
 	required_memory_region m_bootrom;
@@ -286,15 +286,15 @@ UPD7220_DISPLAY_PIXELS_MEMBER( dmv_state::hgdc_display_pixels )
 	if (m_color_mode)
 	{
 		// 96KB videoram (32KB green + 32KB red + 32KB blue)
-		UINT8 green = m_video_ram[0x00000 + (address & 0x7fff)];
-		UINT8 red   = m_video_ram[0x08000 + (address & 0x7fff)];
-		UINT8 blue  = m_video_ram[0x10000 + (address & 0x7fff)];
+		UINT16 green = m_video_ram[(0x00000 + (address & 0x7fff)) >> 1];
+		UINT16 red   = m_video_ram[(0x08000 + (address & 0x7fff)) >> 1];
+		UINT16 blue  = m_video_ram[(0x10000 + (address & 0x7fff)) >> 1];
 
-		for(int xi=0; xi<8; xi++)
+		for(int xi=0; xi<16; xi++)
 		{
-			int r = ((red   >> (7-xi)) & 1) ? 255 : 0;
-			int g = ((green >> (7-xi)) & 1) ? 255 : 0;
-			int b = ((blue  >> (7-xi)) & 1) ? 255 : 0;
+			int r = ((red   >> xi) & 1) ? 255 : 0;
+			int g = ((green >> xi) & 1) ? 255 : 0;
+			int b = ((blue  >> xi) & 1) ? 255 : 0;
 
 			if (bitmap.cliprect().contains(x + xi, y))
 				bitmap.pix32(y, x + xi) = rgb_t(r, g, b);
@@ -305,12 +305,12 @@ UPD7220_DISPLAY_PIXELS_MEMBER( dmv_state::hgdc_display_pixels )
 		const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
 		// 32KB videoram
-		UINT8 gfx = m_video_ram[address & 0xffff];
+		UINT16 gfx = m_video_ram[(address & 0xffff) >> 1];
 
-		for(int xi=0;xi<8;xi++)
+		for(int xi=0;xi<16;xi++)
 		{
 			if (bitmap.cliprect().contains(x + xi, y))
-				bitmap.pix32(y, x + xi) = ((gfx >> (7-xi)) & 1) ? palette[1] : palette[0];
+				bitmap.pix32(y, x + xi) = ((gfx >> xi) & 1) ? palette[1] : palette[0];
 		}
 	}
 }
@@ -319,8 +319,8 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( dmv_state::hgdc_draw_text )
 {
 	for( int x = 0; x < pitch; x++ )
 	{
-		UINT8 tile = m_video_ram[((addr+x)*2) & 0x1ffff] & 0xff;
-		UINT8 attr = m_video_ram[((addr+x)*2 + 1) & 0x1ffff] & 0xff;
+		UINT8 tile = m_video_ram[(((addr+x)*2) & 0x1ffff) >> 1] & 0xff;
+		UINT8 attr = m_video_ram[(((addr+x)*2) & 0x1ffff) >> 1] >> 8;
 
 		rgb_t bg, fg;
 		if (m_color_mode)
@@ -554,7 +554,7 @@ static ADDRESS_MAP_START( dmv_kb_ctrl_io, AS_IO, 8, dmv_state )
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(kb_mcu_port2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( upd7220_map, AS_0, 8, dmv_state )
+static ADDRESS_MAP_START( upd7220_map, AS_0, 16, dmv_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM  AM_SHARE("video_ram")
 ADDRESS_MAP_END

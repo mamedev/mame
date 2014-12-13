@@ -1214,6 +1214,11 @@ ROM_START( vsmile )
 	ROM_LOAD16_WORD_SWAP( "bios german.bin", 0x000000, 0x200000, CRC(205c5296) SHA1(7fbcf761b5885c8b1524607aabaf364b4559c8cc) )
 ROM_END
 
+ROM_START( vsmilef )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
+	ROM_LOAD16_WORD_SWAP( "sysrom_france", 0x000000, 0x200000, CRC(0cd0bdf5) SHA1(5c8d1eada1b6b545555b8d2b09325d7127681af8) )
+ROM_END
+
 ROM_START( walle )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
 	ROM_LOAD16_WORD_SWAP( "walle.bin", 0x000000, 0x400000, BAD_DUMP CRC(bd554cba) SHA1(6cd06a036ab12e7b0e1fd8003db873b0bb783868) )
@@ -1224,5 +1229,6 @@ ROM_END
 /*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY                                              FULLNAME      FLAGS */
 CONS( 2004, batmantv, vii,      0,        batman,   batman, vii_state,   batman,   "JAKKS Pacific Inc / HotGen Ltd",                    "The Batman", GAME_NO_SOUND )
 CONS( 2005, vsmile,   0,        0,        vsmile,   vsmile, vii_state,   vsmile,   "V-Tech",                                            "V-Smile (Germany)",    GAME_NO_SOUND | GAME_NOT_WORKING )
+CONS( 2005, vsmilef,  vsmile,   0,        vsmile,   vsmile, vii_state,   vsmile,   "V-Tech",                                            "V-Smile (France)",    GAME_NO_SOUND | GAME_NOT_WORKING )
 CONS( 2007, vii,      0,        0,        vii,      vii, vii_state,      vii,      "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",        GAME_NO_SOUND )
 CONS( 2008, walle,    vii,      0,        batman,   walle, vii_state,    walle,    "JAKKS Pacific Inc",                                 "Wall-E",     GAME_NO_SOUND )

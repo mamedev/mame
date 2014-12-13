@@ -174,11 +174,11 @@ endif
 
 #-------------------------------------------------
 #
-#@src/emu/video/gf6800gt.h,VIDEOS += GF6800GT
+#@src/emu/video/gf7600gs.h,VIDEOS += GF7600GS
 #-------------------------------------------------
 
-ifneq ($(filter GF6800GT,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/gf6800gt.o
+ifneq ($(filter GF7600GS,$(VIDEOS)),)
+VIDEOOBJS+= $(VIDEOOBJ)/gf7600gs.o
 endif
 
 #-------------------------------------------------

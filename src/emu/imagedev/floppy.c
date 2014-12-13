@@ -295,6 +295,9 @@ void floppy_image_device::device_start()
 	ready_counter = 0;
 
 	setup_characteristics();
+
+	save_item(NAME(cyl));
+	save_item(NAME(subcyl));
 }
 
 void floppy_image_device::device_reset()

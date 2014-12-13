@@ -88,7 +88,7 @@ public:
 	required_device<rs232_port_device> m_kbd;
 	UINT8 m_vram_bank;
 	//required_shared_ptr<UINT8> m_video_ram;
-	UINT8 *m_video_ram;
+	UINT16 *m_video_ram;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -115,8 +115,8 @@ public:
 	DECLARE_READ8_MEMBER( get_slave_ack );
 	DECLARE_READ8_MEMBER( vram_bank_r );
 	DECLARE_WRITE8_MEMBER( vram_bank_w );
-	DECLARE_READ8_MEMBER( vram_r );
-	DECLARE_WRITE8_MEMBER( vram_w );
+	DECLARE_READ16_MEMBER( vram_r );
+	DECLARE_WRITE16_MEMBER( vram_w );
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_WRITE_LINE_MEMBER(keyboard_clk);
@@ -159,22 +159,22 @@ UPD7220_DISPLAY_PIXELS_MEMBER( qx10_state::hgdc_display_pixels )
 
 	if(m_color_mode)
 	{
-		gfx[0] = m_video_ram[(address) + 0x00000];
-		gfx[1] = m_video_ram[(address) + 0x20000];
-		gfx[2] = m_video_ram[(address) + 0x40000];
+		gfx[0] = m_video_ram[((address) + 0x00000) >> 1];
+		gfx[1] = m_video_ram[((address) + 0x20000) >> 1];
+		gfx[2] = m_video_ram[((address) + 0x40000) >> 1];
 	}
 	else
 	{
-		gfx[0] = m_video_ram[address];
+		gfx[0] = m_video_ram[(address) >> 1];
 		gfx[1] = 0;
 		gfx[2] = 0;
 	}
 
-	for(xi=0;xi<8;xi++)
+	for(xi=0;xi<16;xi++)
 	{
-		pen = ((gfx[0] >> (7-xi)) & 1) ? 1 : 0;
-		pen|= ((gfx[1] >> (7-xi)) & 1) ? 2 : 0;
-		pen|= ((gfx[2] >> (7-xi)) & 1) ? 4 : 0;
+		pen = ((gfx[0] >> xi) & 1) ? 1 : 0;
+		pen|= ((gfx[1] >> xi) & 1) ? 2 : 0;
+		pen|= ((gfx[2] >> xi) & 1) ? 4 : 0;
 
 		bitmap.pix32(y, x + xi) = palette[pen];
 	}
@@ -193,8 +193,8 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( qx10_state::hgdc_draw_text )
 
 	for( x = 0; x < pitch; x++ )
 	{
-		tile = m_video_ram[(addr+x)*2];
-		attr = m_video_ram[(addr+x)*2+1];
+		tile = m_video_ram[((addr+x)*2) >> 1] & 0xff;
+		attr = m_video_ram[((addr+x)*2) >> 1] >> 8;
 
 		color = (m_color_mode) ? 1 : (attr & 4) ? 2 : 1; /* TODO: color mode */
 
@@ -685,7 +685,7 @@ GFXDECODE_END
 void qx10_state::video_start()
 {
 	// allocate memory
-	m_video_ram = auto_alloc_array_clear(machine(), UINT8, 0x60000);
+	m_video_ram = auto_alloc_array_clear(machine(), UINT16, 0x30000);
 
 	// find memory regions
 	m_char_rom = memregion("chargen")->base();
@@ -696,7 +696,7 @@ PALETTE_INIT_MEMBER(qx10_state, qx10)
 	// ...
 }
 
-READ8_MEMBER( qx10_state::vram_r )
+READ16_MEMBER( qx10_state::vram_r )
 {
 	int bank = 0;
 
@@ -707,7 +707,7 @@ READ8_MEMBER( qx10_state::vram_r )
 	return m_video_ram[offset + (0x20000 * bank)];
 }
 
-WRITE8_MEMBER( qx10_state::vram_w )
+WRITE16_MEMBER( qx10_state::vram_w )
 {
 	int bank = 0;
 
@@ -715,10 +715,10 @@ WRITE8_MEMBER( qx10_state::vram_w )
 	else if(m_vram_bank & 2) { bank = 1; } // G
 	else if(m_vram_bank & 4) { bank = 2; } // R
 
-	m_video_ram[offset + (0x20000 * bank)] = data;
+	COMBINE_DATA(&m_video_ram[offset + (0x20000 * bank)]);
 }
 
-static ADDRESS_MAP_START( upd7220_map, AS_0, 8, qx10_state )
+static ADDRESS_MAP_START( upd7220_map, AS_0, 16, qx10_state )
 	AM_RANGE(0x00000, 0x5ffff) AM_READWRITE(vram_r,vram_w)
 ADDRESS_MAP_END
 

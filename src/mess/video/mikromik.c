@@ -38,7 +38,7 @@ I8275_DRAW_CHARACTER_MEMBER( mm1_state::crtc_display_pixels )
 //  ADDRESS_MAP( mm1_upd7220_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( mm1_upd7220_map, AS_0, 8, mm1_state )
+static ADDRESS_MAP_START( mm1_upd7220_map, AS_0, 16, mm1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
@@ -50,11 +50,11 @@ ADDRESS_MAP_END
 
 UPD7220_DISPLAY_PIXELS_MEMBER( mm1_state::hgdc_display_pixels )
 {
-	UINT8 data = m_video_ram[address];
+	UINT16 data = m_video_ram[address >> 1];
 
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < 16; i++)
 	{
-		if (BIT(data, 7 - i)) bitmap.pix32(y, x + i) = m_palette->pen(1);
+		if (BIT(data, i)) bitmap.pix32(y, x + i) = m_palette->pen(1);
 	}
 }
 

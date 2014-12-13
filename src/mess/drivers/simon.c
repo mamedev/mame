@@ -25,7 +25,7 @@
 
 // master clock is a single stage RC oscillator: R=33K, C=100pf,
 // according to the TMS 1000 series data manual this is around 350kHz
-#define SIMON_RC_CLOCK (350000)
+#define MASTER_CLOCK (350000)
 
 
 class simon_state : public driver_device
@@ -151,7 +151,7 @@ void simon_state::machine_start()
 static MACHINE_CONFIG_START( simon, simon_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, SIMON_RC_CLOCK)
+	MCFG_CPU_ADD("maincpu", TMS1000, MASTER_CLOCK)
 	MCFG_TMS1XXX_READ_K_CB(READ8(simon_state, read_k))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(simon_state, write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(simon_state, write_r))

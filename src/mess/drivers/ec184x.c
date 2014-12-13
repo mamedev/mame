@@ -202,7 +202,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ec1847_io, AS_IO, 8, ec184x_state )
 	ADDRESS_MAP_UNMAP_HIGH
-//  AM_RANGE(0x0210, 0x021f) AM_RAM // internal (non-standard?) bus extender
+//	AM_RANGE(0x0210, 0x021f) AM_RAM // internal (non-standard?) bus extender
 ADDRESS_MAP_END
 
 
@@ -252,7 +252,6 @@ static MACHINE_CONFIG_START( ec1841, ec184x_state )
 	MCFG_CPU_IO_MAP(ec1841_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
-//  MCFG_MACHINE_START_OVERRIDE(ec184x_state, ec184x)
 	MCFG_MACHINE_RESET_OVERRIDE(ec184x_state, ec184x)
 
 	MCFG_EC1841_MOTHERBOARD_ADD("mb", "maincpu")

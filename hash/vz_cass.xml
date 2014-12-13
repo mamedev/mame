@@ -1,0 +1,261 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+
+List of known tape releases by Dick Smith in Australia:
+
+X-7274	Attack of the Killer Tomatoes
+X-7231	Match Box
+X-7232	Poker
+X-7233	Hangman
+X-7234	Slot Machine/Knock Off/Russian Roulette
+X-7235	Blackjack
+X-7236	Circus (*)
+X-7237	Biorhythm/Pair Matching/Calendar
+X-7238	Horse Race
+X-7239	Invaders (*)
+X-7240	Dynasty Derby
+X-7241	Learjet
+X-7242	Ghost Hunter (*)
+X-7243	Hoppy (*)
+X-7244	Super Snake
+X-7245	Knights and Dragons
+X-7247	Star Blaster (*)
+X-7248	VZ-Asteroids
+X-7249	Air Traffic Controller
+X-7250	Lunar Lander
+X-7251	Statistics 1
+X-7252	Statistics 2
+X-7253	Matrix
+X-7254	Tennis Lesson/Golf Lesson
+X-7255	Introduction to BASIC
+X-7256	Elementary Geometry
+X-7257	Speed Reading
+X-7258	Typing Teacher
+X-7259	Mailing List
+X-7261	Portfolio Management
+X-7262	Discounted Cash Flow Analysis
+X-7263	Financial Ratio Analysis
+X-7264	Tennis (*)
+X-7265	Checkers
+X-7266	Planet Patrol (*)
+X-7268	Ladder Challenge (*)
+X-7270	Panik (*)
+X-7271	Othello
+X-7272	Dracula's Castle
+X-7273	Backgammon
+X-7275	VZ Chess (*)
+X-7276	Music Writer
+X-7278	Disassembler
+X-7279	Duel
+X-7280	Hex Utilities
+X-7281	Word Processor
+X-7282	Editor Assembler
+X-7285	Spell'O'Matic 1 & 2
+X-7286	Spell'O'Matic 3 & 4
+X-7287	Flashword 1 & 2
+X-7288	Flashword 3 & 4
+X-7289	Metric Spycatcher
+X-7290	Whizkid Spycatcher
+X-7330	Sprite Generator
+X-7331	Formula One
+X-7332	Galaxon (*)
+X-7333	Dawn Patrol (*)
+X-7339	Space RAM
+X-7342	Crash
+X-7344	Maze of Argon
+X-7345	Word Matching
+
+* = dumped
+
+Demonstration Tape (included with the VZ200)
+Demonstration Tape (included with the VZ300)
+
+-->
+
+<softwarelist name="vz_cass" description="Dick Smith VZ-200/300 cassettes">
+
+	<software name="chess">
+		<description>Chess</description>
+		<year>198?</year>
+		<publisher>Dick Smith</publisher>
+		<info name="serial" value="X-7275" />
+		<part name="cass1" interface="vtech1_cass">
+			<dataarea name="cass" size="2854400">
+				<rom name="chess.wav" size="2854400" crc="7cc80cf3" sha1="770b09e8755fad97e12f320cd5fea3416669cd36" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="circus">
+		<description>Circus</description>
+		<year>198?</year>
+		<publisher>Dick Smith</publisher>
+		<info name="serial" value="X-7236" />
+		<part name="cass1" interface="vtech1_cass">
+			<dataarea name="cass" size="1317376">
+				<rom name="circus.wav" size="1317376" crc="ab3ba833" sha1="1b33e2f3f2389f61f2e815be626b5d84083be77e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dawn">
+		<description>Dawn Patrol</description>
+		<year>198?</year>
+		<publisher>Dick Smith</publisher>
+		<info name="serial" value="X-7333" />
+		<part name="cass1" interface="vtech1_cass">
+			<dataarea name="cass" size="3640544">
+				<rom name="dawn.wav" size="3640544" crc="22d096f5" sha1="ac480a16b6d6b8d6f08875e9c6ca13cadc413fa1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Not released by Dick Smith? -->
+	<software name="defpen">
+		<description>Defense Penetrator</description>
+		<year>1982</year>
+		<publisher>Cosmic Software</publisher>
+		<info name="author" value="Tom Thiel" />
+		<part name="cass1" interface="vtech1_cass">
+			<dataarea name="cass" size="1926592">
+				<rom name="defpen.wav" size="1926592" crc="b3dfa117" sha1="b7b53d11483fd78dfc81484e0830e6f6913c6e47" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaxon">
+		<description>Galaxon</description>
+		<year>198?</year>
+		<publisher>Dick Smith</publisher>
+		<info name="serial" value="X-7332" />
+		<part name="cass1" interface="vtech1_cass">
+			<dataarea name="cass" size="1628976">
+				<rom name="galaxon.wav" size="1628976" crc="8909df05" sha1="4ee1ce9aa8538b8aad9d0839fdb1396335074945" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ghost">
+		<description>Ghost Hunter</description>
+		<year>198?</year>
+		<publisher>Dick Smith</publisher>
+		<info name="author" value="Dubois and McNamara" />
+		<info name="serial" value="X-7242" />
+		<part name="cass1" interface="vtech1_cass">
+			<dataarea name="cass" size="1732336">
+				<rom name="ghost.wav" size="1732336" crc="b5ed2320" sha1="f58e328e0b20d453a1c0486fd8e10c5f3e7ecfa7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hamsam">
+		<description>Hamburger Sam</description>
+		<year>????</year>
+		<publisher></publisher>
+		<part name="cass1" interface="vtech1_cass">
+			<dataarea name="cass" size="5109472">
+				<rom name="hamsam.wav" size="5109472" crc="7aed86a7" sha1="b5061edb1401cea4aee97d8cd92c582c9c14e66b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hoppy">
+		<description>Hoppy</description>
+		<year>198?</year>
+		<publisher>Dick Smith</publisher>
+		<info name="serial" value="X-7243" />
+		<part name="cass1" interface="vtech1_cass">
+			<dataarea name="cass" size="3172080">
+				<rom name="hoppy.wav" size="3172080" crc="60e7e15a" sha1="1d56a04af700a94d44d6bb0ddfaf89213db39ce8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="invaders">
+		<description>Invaders</description>
+		<year>198?</year>
+		<publisher>Dick Smith</publisher>
+		<info name="author" value="Dubois and McNamara" />
+		<info name="serial" value="X-7239" />
+		<part name="cass1" interface="vtech1_cass">
+			<dataarea name="cass" size="1723824">
+				<rom name="invaders.wav" size="1723824" crc="f959681e" sha1="e12bc9384e7fe1efc0ecff6356c3e3ded7ee8373" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ladder">
+		<description>Ladder Challenge</description>
+		<year>198?</year>
+		<publisher>Dick Smith</publisher>
+		<info name="serial" value="X-7268" />
+		<part name="cass1" interface="vtech1_cass">
+			<dataarea name="cass" size="1622288">
+				<rom name="ladder.wav" size="1622288" crc="47ab9ccf" sha1="e6d72b7bc26b124c906b9c0e0015137ae8844a4d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="missile">
+		<description>Missile</description>
+		<year>????</year>
+		<publisher></publisher>
+		<part name="cass1" interface="vtech1_cass">
+			<dataarea name="cass" size="5109776">
+				<rom name="missile.wav" size="5109776" crc="55a1fda4" sha1="1de495534447cee16d3db22b043d53b6d15f05fe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="panik">
+		<description>Panik</description>
+		<year>198?</year>
+		<publisher>Dick Smith</publisher>
+		<info name="serial" value="X-7270" />
+		<part name="cass1" interface="vtech1_cass">
+			<dataarea name="cass" size="1708928">
+				<rom name="panik.wav" size="1708928" crc="8b8c4c5a" sha1="e9e2ae5c406f9ac79b186cb34b2849b9e2a477e3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ppatrol">
+		<description>Planet Patrol</description>
+		<year>198?</year>
+		<publisher>Dick Smith</publisher>
+		<info name="serial" value="X-7266" />
+		<part name="cass1" interface="vtech1_cass">
+			<dataarea name="cass" size="2107776">
+				<rom name="ppatrol.wav" size="2107776" crc="3eb828ed" sha1="b56777b732587856f554d978d844a3815ec50f69" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starblas">
+		<description>Star Blaster</description>
+		<year>198?</year>
+		<publisher>Dick Smith</publisher>
+		<info name="serial" value="X-7247" />
+		<info name="usage" value="Needs 16k memory expansion" />
+		<part name="cass1" interface="vtech1_cass">
+			<dataarea name="cass" size="3327120">
+				<rom name="starblas.wav" size="3327120" crc="e6a5b55f" sha1="07715fd8104891d0d4d3b06b5609674ca93af920" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tennis">
+		<description>Tennis</description>
+		<year>198?</year>
+		<publisher>Dick Smith</publisher>
+		<info name="serial" value="X-7264" />
+		<part name="cass1" interface="vtech1_cass">
+			<dataarea name="cass" size="2100784">
+				<rom name="tennis.wav" size="2100784" crc="3eb5ed00" sha1="6c2f2d4c9d60b6f2bd977eddd397d6dbdbfc52f1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

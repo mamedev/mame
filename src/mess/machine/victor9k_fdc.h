@@ -135,7 +135,6 @@ private:
 		UINT8 e;
 
 		// read
-		attotime edge;
 		UINT16 shift_reg;
 		int bit_counter;
 		int sync_bit_counter;
@@ -223,20 +222,19 @@ private:
 	floppy_image_device* get_floppy();
 	void live_start();
 	void pll_reset(const attotime &when, const attotime clock);
+	void pll_start_writing(const attotime &tm);
+	void pll_commit(floppy_image_device *floppy, const attotime &tm);
+	void pll_stop_writing(floppy_image_device *floppy, const attotime &tm);
+	int pll_get_next_bit(attotime &tm, floppy_image_device *floppy, const attotime &limit);
+	bool pll_write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, const attotime &limit);
 	void pll_save_checkpoint();
 	void pll_retrieve_checkpoint();
 	void checkpoint();
 	void rollback();
-	bool write_next_bit(bool bit, const attotime &limit);
-	void start_writing(const attotime &tm);
-	void commit(const attotime &tm);
-	void stop_writing(const attotime &tm);
 	void live_delay(int state);
 	void live_sync();
 	void live_abort();
 	void live_run(const attotime &limit = attotime::never);
-	void get_next_edge(const attotime &when);
-	int get_next_bit(attotime &tm, const attotime &limit);
 };
 
 

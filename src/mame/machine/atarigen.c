@@ -1195,10 +1195,13 @@ inline void atarigen_state::slapstic_update_bank(int bank)
 
 void atarigen_state::device_post_load()
 {
-	if (!m_slapstic_device)
+	if (m_slapstic_num != 0)
+	{
+		if (!m_slapstic_device)
 		fatalerror("Slapstic device is missing?\n");
-
-	slapstic_update_bank(m_slapstic_device->slapstic_bank());
+	
+		slapstic_update_bank(m_slapstic_device->slapstic_bank());
+	}
 }
 
 

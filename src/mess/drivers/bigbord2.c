@@ -107,7 +107,7 @@ public:
 		m_maincpu(*this, Z80_TAG),
 		m_6845(*this, "crtc"),
 		m_ctca(*this, Z80CTCA_TAG),
-		m_ctcb(*this, Z80CTCA_TAG),
+		m_ctcb(*this, Z80CTCB_TAG),
 		m_dma(*this, Z80DMA_TAG),
 		m_fdc(*this, "fdc"),
 		m_floppy0(*this, "fdc:0"),

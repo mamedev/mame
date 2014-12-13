@@ -43,10 +43,10 @@ const d80_format::format d80_format::file_formats[] = {
 
 const UINT32 d80_format::d80_cell_size[] =
 {
-	2667, // 12MHz/16/2
-	2500, // 12MHz/15/2
-	2333, // 12MHz/14/2
-	2167  // 12MHz/13/2
+	2667, // 12MHz/2/16
+	2500, // 12MHz/2/15
+	2333, // 12MHz/2/14
+	2167  // 12MHz/2/13
 };
 
 const int d80_format::d80_sectors_per_track[] =

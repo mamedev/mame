@@ -993,6 +993,7 @@ $(MESSOBJ)/amstrad.a:           \
 
 $(MESSOBJ)/apf.a:               \
 	$(MESS_DRIVERS)/apf.o       \
+	$(MESS_DRIVERS)/mathmagi.o  \
 
 $(MESSOBJ)/apollo.a:            \
 	$(MESS_DRIVERS)/apollo.o $(MESS_MACHINE)/apollo.o $(MESS_MACHINE)/apollo_dbg.o $(MESS_MACHINE)/apollo_kbd.o $(MESS_VIDEO)/apollo.o \
@@ -1000,7 +1001,7 @@ $(MESSOBJ)/apollo.a:            \
 $(MESSOBJ)/apple.a:             \
 	$(MESS_DRIVERS)/apple1.o $(MESS_MACHINE)/apple1.o $(MESS_VIDEO)/apple1.o \
 	$(MESS_DRIVERS)/apple2.o $(MESS_DRIVERS)/apple2e.o $(MESS_MACHINE)/apple2.o $(MESS_VIDEO)/apple2.o \
-	$(MESS_DRIVERS)/tk2000.o \
+	$(MESS_DRIVERS)/tk2000.o    \
 	$(MESS_DRIVERS)/apple2gs.o $(MESS_MACHINE)/apple2gs.o $(MESS_VIDEO)/apple2gs.o \
 	$(MESS_DRIVERS)/apple3.o $(MESS_MACHINE)/apple3.o $(MESS_VIDEO)/apple3.o \
 	$(MESS_DRIVERS)/lisa.o $(MESS_MACHINE)/lisa.o \
@@ -1298,6 +1299,8 @@ $(MESSOBJ)/hp.a:                \
 	$(MESS_DRIVERS)/hp49gp.o    \
 	$(MESS_DRIVERS)/hp9845.o    \
 	$(MESS_DRIVERS)/hp9k.o      \
+	$(MESS_DRIVERS)/hp9k_3xx.o	\
+
 
 $(MESSOBJ)/hec2hrp.a:           \
 	$(MESS_DRIVERS)/hec2hrp.o   \
@@ -1887,6 +1890,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/beehive.o   \
 	$(MESS_DRIVERS)/binbug.o    \
 	$(MESS_DRIVERS)/besta.o     \
+	$(MESS_DRIVERS)/bitgraph.o  \
 	$(MESS_DRIVERS)/br8641.o    \
 	$(MESS_DRIVERS)/busicom.o $(MESS_VIDEO)/busicom.o \
 	$(MESS_DRIVERS)/chaos.o     \
@@ -1911,6 +1915,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/eacc.o      \
 	$(MESS_DRIVERS)/elwro800.o  \
 	$(MESS_DRIVERS)/eti660.o    \
+	$(MESS_DRIVERS)/excali64.o  \
 	$(MESS_DRIVERS)/fanucs15.o  \
 	$(MESS_DRIVERS)/fanucspmg.o \
 	$(MESS_DRIVERS)/fc100.o     \
@@ -2075,6 +2080,7 @@ $(MESS_DRIVERS)/avigo.o:    $(MESS_LAYOUT)/avigo.lh
 $(MESS_DRIVERS)/babbage.o:  $(MESS_LAYOUT)/babbage.lh
 $(MESS_DRIVERS)/bbc.o:      $(MESS_LAYOUT)/bbc.lh
 $(MESS_DRIVERS)/beta.o:     $(MESS_LAYOUT)/beta.lh
+$(MESS_DRIVERS)/bitgraph.o: $(MESS_LAYOUT)/bitgrpha.lh $(MESS_LAYOUT)/bitgrphb.lh
 $(MESS_DRIVERS)/bob85.o:    $(MESS_LAYOUT)/bob85.lh
 $(MESS_DRIVERS)/cc40.o:     $(MESS_LAYOUT)/cc40.lh
 $(MAME_DRIVERS)/cdi.o:      $(MAME_LAYOUT)/cdi.lh
@@ -2113,6 +2119,7 @@ $(MESS_DRIVERS)/lc80.o:     $(MESS_LAYOUT)/lc80.lh
 $(MESS_DRIVERS)/llc.o:      $(MESS_LAYOUT)/llc1.lh
 $(MESS_DRIVERS)/lynx.o:     $(MESS_LAYOUT)/lynx.lh
 $(MESS_DRIVERS)/mac.o:      $(MESS_LAYOUT)/mac.lh
+$(MESS_DRIVERS)/mathmagi.o: $(MESS_LAYOUT)/mathmagi.lh
 $(MESS_MACHINE)/megacd.o:   $(MESS_LAYOUT)/megacd.lh
 $(MESS_DRIVERS)/mekd2.o:    $(MESS_LAYOUT)/mekd2.lh
 $(MESS_DRIVERS)/mephisto.o: $(MESS_LAYOUT)/mephisto.lh

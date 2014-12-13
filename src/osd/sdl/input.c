@@ -167,7 +167,7 @@ static UINT8                input_paused;
 static sdl_window_info *    focus_window = NULL;
 
 // input buffer - only for SDLMAME_EVENTS_IN_WORKER_THREAD
-#define MAX_BUF_EVENTS      (500)       /* 100 not enough for SDL 1.3 */
+#define MAX_BUF_EVENTS      (1000)       /* 100 not enough for SDL 1.3 */
 static SDL_Event            event_buf[MAX_BUF_EVENTS];
 static int                  event_buf_count;
 

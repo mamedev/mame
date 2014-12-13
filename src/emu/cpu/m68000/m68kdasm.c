@@ -1718,6 +1718,32 @@ static void d68020_extb_32(void)
 	sprintf(g_dasm_str, "extb.l  D%d; (2+)", g_cpu_ir&7);
 }
 
+static void d68881_ftrap(void)
+{
+	UINT16 w2, w3;
+	UINT32 l2;
+
+	LIMIT_CPU_TYPES(M68020_PLUS);
+	w2 = read_imm_16();
+
+	switch (g_cpu_ir & 0x7)
+	{
+		case 2:	// word operand
+			w3 = read_imm_16();
+			sprintf(g_dasm_str, "ftrap%s.w   $%04x", g_cpcc[w2 & 0x3f], w3);
+			break;
+
+		case 3:	// long word operand
+			l2 = read_imm_32();
+			sprintf(g_dasm_str, "ftrap%s.l   $%08x", g_cpcc[w2 & 0x3f], l2);
+			break;
+
+		case 4: // no operand
+			sprintf(g_dasm_str, "ftrap%s", g_cpcc[w2 & 0x3f]);
+			break;
+	}
+}
+
 static void d68040_fpu(void)
 {
 	char float_data_format[8][3] =
@@ -3456,6 +3482,7 @@ static const opcode_struct g_opcode_info[] =
 	{d68020_bfins        , 0xffc0, 0xefc0, 0xa78},
 	{d68020_bfset        , 0xffc0, 0xeec0, 0xa78},
 	{d68020_bftst        , 0xffc0, 0xe8c0, 0xa7b},
+	{d68881_ftrap        , 0xfff8, 0xf278, 0x000},
 	{d68010_bkpt         , 0xfff8, 0x4848, 0x000},
 	{d68000_bra_8        , 0xff00, 0x6000, 0x000},
 	{d68000_bra_16       , 0xffff, 0x6000, 0x000},

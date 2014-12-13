@@ -115,11 +115,11 @@ offs_t pps4_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opr
  */
 inline UINT8 pps4_device::ROP()
 {
-    m_Ip = m_I;         // set previous opcode
-    m_I = m_direct->read_decrypted_byte(m_P & 0xFFF);
+    const UINT8 op = m_direct->read_decrypted_byte(m_P & 0xFFF);
+    m_Ip = m_I;         // save previous opcode
     m_P = (m_P + 1) & 0xFFF;
     m_icount -= 1;
-    return m_I;
+    return op;
 }
 
 /**
@@ -131,10 +131,10 @@ inline UINT8 pps4_device::ROP()
  */
 inline UINT8 pps4_device::ARG()
 {
-    m_I2 = m_direct->read_raw_byte(m_P & 0xFFF);
+    const UINT8 arg = m_direct->read_raw_byte(m_P & 0xFFF);
     m_P = (m_P + 1) & 0xFFF;
     m_icount -= 1;
-    return m_I2;
+    return arg;
 }
 
 /**
@@ -867,17 +867,17 @@ void pps4_device::iLB()
  */
 void pps4_device::iLBL()
 {
-    const UINT8 i8 = ~ARG() & 255;
+    m_I2 = ARG();
     // previous LB or LBL instruction?
     if (0xc0 == (m_Ip & 0xf0) || 0x00 == m_Ip) {
         LOG(("%s: skip prev:%02x op:%02x\n", __FUNCTION__, m_Ip, m_I));
         return;
     }
-    m_B = i8;
+    m_B = ~m_I2 & 255;  // Note: immediate is 1's complement
 }
 
 /**
- * @brief pps4_device::INCB
+ * @brief pps4_device::INCB Increment B lower, skip if 0000
  * OPCODE     cycles  mnemonic
  * -----------------------------
  * 0001 0111  1 cyc    INCB
@@ -903,7 +903,7 @@ void pps4_device::iINCB()
 }
 
 /**
- * @brief pps4_device::iDECB
+ * @brief pps4_device::iDECB Decrement B lower, skip if 1111
  * OPCODE     cycles  mnemonic
  * -----------------------------
  * 0001 1111  1 cyc    DECB
@@ -1190,12 +1190,13 @@ void pps4_device::iRTNSK()
  */
 void pps4_device::iIOL()
 {
-    const UINT8 ac = ~m_A & 15;
+    UINT8 ac = ~m_A & 15;
     m_I2 = ARG();
     m_io->write_byte(m_I2, ac);
     LOG(("%s: port:%02x <- %x\n", __FUNCTION__, m_I2, ac));
-    m_A = ~m_io->read_byte(m_I2) & 15;
-    LOG(("%s: port:%02x -> %x\n", __FUNCTION__, m_I2, m_A));
+    ac = m_io->read_byte(m_I2) & 15;
+    LOG(("%s: port:%02x -> %x\n", __FUNCTION__, m_I2, ac));
+    m_A = ~ac & 15;
 }
 
 /**

@@ -148,7 +148,7 @@ const device_type UPD7220 = &device_creator<upd7220_device>;
 
 
 // default address map
-static ADDRESS_MAP_START( upd7220_vram, AS_0, 8, upd7220_device )
+static ADDRESS_MAP_START( upd7220_vram, AS_0, 16, upd7220_device )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -204,6 +204,17 @@ inline UINT8 upd7220_device::readbyte(offs_t address)
 inline void upd7220_device::writebyte(offs_t address, UINT8 data)
 {
 	space().write_byte(address, data);
+}
+
+inline UINT16 upd7220_device::readword(offs_t address)
+{
+	return space().read_word(address);
+}
+
+
+inline void upd7220_device::writeword(offs_t address, UINT16 data)
+{
+	space().write_word(address, data);
 }
 
 //-------------------------------------------------
@@ -495,10 +506,7 @@ inline void upd7220_device::write_vram(UINT8 type, UINT8 mod)
 
 	result = 0;
 
-	if(((m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_GRAPHICS) || m_figs.m_gd)
-		result = BITSWAP8(m_pr[1],0,1,2,3,4,5,6,7) | (BITSWAP8(m_pr[2],0,1,2,3,4,5,6,7) << 8);
-	else
-		result = m_pr[1] | (m_pr[2] << 8);
+	result = m_pr[1] | (m_pr[2] << 8);
 
 	switch(type)
 	{
@@ -526,27 +534,35 @@ inline void upd7220_device::write_vram(UINT8 type, UINT8 mod)
 		switch(mod & 3)
 		{
 			case 0x00: //replace
-				if(type == 0 || type == 2)
+				if(type == 0)
+					writeword(m_ead*2+0, result);
+				if(type == 2)
 					writebyte(m_ead*2+0, result & 0xff);
-				if(type == 0 || type == 3)
+				if(type == 3)
 					writebyte(m_ead*2+1, result >> 8);
 				break;
 			case 0x01: //complement
-				if(type == 0 || type == 2)
+				if(type == 0)
+					writeword(m_ead*2+0, readword(m_ead*2+0) ^ result);
+				if(type == 2)
 					writebyte(m_ead*2+0, readbyte(m_ead*2+0) ^ (result & 0xff));
-				if(type == 0 || type == 3)
+				if(type == 3)
 					writebyte(m_ead*2+1, readbyte(m_ead*2+1) ^ (result >> 8));
 				break;
 			case 0x02: //reset to zero
-				if(type == 0 || type == 2)
+				if(type == 0)
+					writeword(m_ead*2+0, readword(m_ead*2+0) & ~result);
+				if(type == 2)
 					writebyte(m_ead*2+0, readbyte(m_ead*2+0) & ~(result & 0xff));
-				if(type == 0 || type == 3)
+				if(type == 3)
 					writebyte(m_ead*2+1, readbyte(m_ead*2+1) & ~(result >> 8));
 				break;
 			case 0x03: //set to one
-				if(type == 0 || type == 2)
+				if(type == 0)
+					writeword(m_ead*2+0, readword(m_ead*2+0) | result);
+				if(type == 2)
 					writebyte(m_ead*2+0, readbyte(m_ead*2+0) | (result & 0xff));
-				if(type == 0 || type == 3)
+				if(type == 3)
 					writebyte(m_ead*2+1, readbyte(m_ead*2+1) | (result >> 8));
 				break;
 		}
@@ -631,7 +647,7 @@ upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, d
 	m_disp(0),
 	m_gchr(0),
 	m_bitmap_mod(0),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 18, 0, NULL, *ADDRESS_MAP_NAME(upd7220_vram))
+	m_space_config("videoram", ENDIANNESS_LITTLE, 16, 18, 0, NULL, *ADDRESS_MAP_NAME(upd7220_vram))
 {
 	for (int i = 0; i < 16; i++)
 	{
@@ -773,23 +789,22 @@ void upd7220_device::device_timer(emu_timer &timer, device_timer_id id, int para
 void upd7220_device::draw_pixel(int x, int y, int xi, UINT16 tile_data)
 {
 	UINT32 addr = ((y * (m_pitch << (m_figs.m_gd ? 0 : 1))) + (x >> 3)) & 0x3ffff;
-	UINT8 data = readbyte(addr);
-	UINT8 new_pixel = (xi & 8 ? tile_data >> 8 : tile_data & 0xff) & (0x80 >> (xi & 7));
-	new_pixel = new_pixel ? (0xff & (0x80 >> (x & 7))) : 0;
+	UINT16 data = readword(addr);
+	UINT16 new_pixel = (tile_data & (1 << (xi & 0xf))) ? (1 << (x & 0xf)) : 0;
 
 	switch(m_bitmap_mod)
 	{
 		case 0: //replace
-			writebyte(addr, (data & ~(0x80 >> (x & 7))) | new_pixel);
+			writeword(addr, (data & ~(1 << (x & 0xf))) | new_pixel);
 			break;
 		case 1: //complement
-			writebyte(addr, data ^ new_pixel);
+			writeword(addr, data ^ new_pixel);
 			break;
 		case 2: //reset
-			writebyte(addr, data & ~new_pixel);
+			writeword(addr, data & ~new_pixel);
 			break;
 		case 3: //set
-			writebyte(addr, data | new_pixel);
+			writeword(addr, data | new_pixel);
 			break;
 	}
 }
@@ -986,8 +1001,7 @@ void upd7220_device::draw_char(int x, int y)
 
 	for(int pi = 0; pi < psize; pi++)
 	{
-		tile_data = BITSWAP8(m_ra[((psize-1-pi) & 7) | 8],0,1,2,3,4,5,6,7);
-		tile_data = (tile_data << 8) | (tile_data & 0xff);
+		tile_data = (m_ra[((psize-1-pi) & 7) | 8] << 8) | m_ra[((psize-1-pi) & 7) | 8];
 		for(int pz = 0; pz <= m_gchr; pz++)
 		{
 			for(int ii = 0, curpixel = 0; ii < isize; ii++)
@@ -1572,10 +1586,10 @@ void upd7220_device::draw_graphics_line(bitmap_rgb32 &bitmap, UINT32 addr, int y
 
 	for (sx = 0; sx < pitch; sx++)
 	{
-		if((sx << 3) < m_aw * 16 && y < al)
-			m_display_cb(bitmap, y, sx << 3, addr);
+		if((sx << 4) < m_aw * 16 && y < al)
+			m_display_cb(bitmap, y, sx << 4, addr);
 
-		addr+= wd + 1;
+		addr+= (wd + 1) * 2;
 	}
 }
 

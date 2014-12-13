@@ -533,17 +533,33 @@ ROM_END
 
 ROM_START( yamyam )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
-	ROM_LOAD( "b3.f10",       0x00000, 0x20000, CRC(96ae9088) SHA1(a605882dcdcf1e8cf8b0112f614e696d59acfd97) )
+	ROM_LOAD( "3.10f",       0x00000, 0x20000, CRC(96ae9088) SHA1(a605882dcdcf1e8cf8b0112f614e696d59acfd97) )
 	ROM_RELOAD(               0x10000, 0x20000 )    /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "mcu", 0 ) //unknown type, there must be one
 	ROM_LOAD( "mcu", 0x0000, 0x10000, NO_DUMP)
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "b2.d16",       0x00000, 0x10000, CRC(cb4f84ee) SHA1(54319ecbd74b763757eb6d17c8f7be0705ab0714) )
+	ROM_LOAD( "b2.16d",       0x00000, 0x10000, CRC(cb4f84ee) SHA1(54319ecbd74b763757eb6d17c8f7be0705ab0714) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "b1.a16",       0x00000, 0x20000, CRC(b122828d) SHA1(90994ba548893a2eacdd58351cfa3952f4af926a) )
+	ROM_LOAD( "1.16a",       0x00000, 0x20000, CRC(b122828d) SHA1(90994ba548893a2eacdd58351cfa3952f4af926a) )
+ROM_END
+
+/* only gfx are different, code is the same */
+ROM_START( yamyamk )
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_LOAD( "3.10f",       0x00000, 0x20000, CRC(96ae9088) SHA1(a605882dcdcf1e8cf8b0112f614e696d59acfd97) )
+	ROM_RELOAD(               0x10000, 0x20000 )    /* banked at 0x8000-0xbfff */
+
+	ROM_REGION( 0x10000, "mcu", 0 ) //unknown type, there must be one
+	ROM_LOAD( "mcu", 0x0000, 0x10000, NO_DUMP)
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "2.16d",       0x00000, 0x10000, CRC(dc9691d8) SHA1(118a05a1c94020d6739ed8c805c61b8ab003b6af) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "1.16a",       0x00000, 0x20000, CRC(b122828d) SHA1(90994ba548893a2eacdd58351cfa3952f4af926a) )
 ROM_END
 
 /* only gfx are different, code is the same */
@@ -556,10 +572,10 @@ ROM_START( wiseguy )
 	ROM_LOAD( "mcu", 0x0000, 0x10000, NO_DUMP)
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "wguyb2.bin",   0x00000, 0x10000, CRC(1c684c46) SHA1(041bc500e31b02a8bf3ce4683a67de998f938ccc) )
+	ROM_LOAD( "wguyb2.16d",   0x00000, 0x10000, CRC(1c684c46) SHA1(041bc500e31b02a8bf3ce4683a67de998f938ccc) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "b1.a16",       0x00000, 0x20000, CRC(b122828d) SHA1(90994ba548893a2eacdd58351cfa3952f4af926a) )
+	ROM_LOAD( "1.16a",       0x00000, 0x20000, CRC(b122828d) SHA1(90994ba548893a2eacdd58351cfa3952f4af926a) )
 ROM_END
 
 
@@ -570,5 +586,7 @@ ROM_END
 GAME( 1990, gundealr,  0,        gundealr, gundealr, driver_device, 0, ROT270, "Dooyong", "Gun Dealer",                GAME_SUPPORTS_SAVE )
 GAME( 1990, gundealra, gundealr, gundealr, gundealr, driver_device, 0, ROT270, "Dooyong", "Gun Dealer (alt card set)", GAME_SUPPORTS_SAVE )
 GAME( 1990, gundealrt, gundealr, gundealr, gundealt, driver_device, 0, ROT270, "Dooyong (Tecmo license)", "Gun Dealer (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1990, yamyam,    0,        yamyam,   yamyam, driver_device,   0, ROT0,   "Dooyong", "Yam! Yam!?",                GAME_SUPPORTS_SAVE )
+GAME( 1990, yamyamk,   yamyam,   yamyam,   yamyam, driver_device,   0, ROT0,   "Dooyong", "Yam! Yam!? (Korea)",        GAME_SUPPORTS_SAVE )
 GAME( 1990, wiseguy,   yamyam,   yamyam,   yamyam, driver_device,   0, ROT0,   "Dooyong", "Wise Guy",                  GAME_SUPPORTS_SAVE )

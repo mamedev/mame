@@ -48,7 +48,6 @@ const device_type PC_KBD_EC_1841 = &device_creator<ec_1841_keyboard_device>;
 
 ROM_START( ec_1841_keyboard )
 	ROM_REGION( 0x400, I8048_TAG, 0 )
-	// XXX add P/N etc
 	ROM_LOAD( "1816be48.bin", 0x000, 0x400, CRC(e9abfe44) SHA1(1db430c72c2d007ea0b8ae2514ff15c96baba308) )
 ROM_END
 

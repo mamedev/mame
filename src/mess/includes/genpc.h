@@ -154,7 +154,6 @@ extern const device_type IBM5150_MOTHERBOARD;
 	MCFG_DEVICE_ADD(_tag, EC1841_MOTHERBOARD, 0) \
 	ec1841_mb_device::static_set_cputag(*device, _cputag);
 
-// ======================> ibm5150_mb_device
 class ec1841_mb_device : public ibm5160_mb_device
 {
 public:
@@ -177,8 +176,6 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
 };
 
-
-// device type definition
 extern const device_type EC1841_MOTHERBOARD;
 
 #define MCFG_PCNOPPI_MOTHERBOARD_ADD(_tag, _cputag) \
