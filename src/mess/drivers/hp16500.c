@@ -1,5 +1,6 @@
-/*
-    Hewlett-Packard HP16500b Logic Analyzer
+/***************************************************************************
+ 
+	Hewlett-Packard HP16500b Logic Analyzer
 
     MC68EC030 @ 25 MHz
 
@@ -15,38 +16,105 @@
     IRQ 5 = 814a
     IRQ 6 = 35c8 (jump 840120)
     IRQ 7 = 35d4 (jump 840120)
-*/
 
+****************************************************************************/
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-
 
 class hp16500_state : public driver_device
 {
 public:
 	hp16500_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_vram(*this, "vram")
+	 { }                                      
 
 	virtual void video_start();
 	UINT32 screen_update_hp16500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-};
 
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT32> m_vram;
+
+
+	DECLARE_WRITE32_MEMBER(palette_w);
+
+private:
+	UINT32 m_palette[256], m_colors[3], m_count, m_clutoffs;
+};
 
 static ADDRESS_MAP_START(hp16500_map, AS_PROGRAM, 32, hp16500_state)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_REGION("bios", 0)
-	AM_RANGE(0x00600000, 0x0063ffff) AM_RAM
+	AM_RANGE(0x0020f000, 0x0020f003) AM_WRITE(palette_w)
+	AM_RANGE(0x00600000, 0x0063ffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x00800000, 0x009fffff) AM_RAM     // 284e end of test - d0 = 0 for pass
 ADDRESS_MAP_END
 
 void hp16500_state::video_start()
 {
+	m_count = 0;
+	m_clutoffs = 0;
+	memset(m_palette, 0, sizeof(m_palette));
 }
 
+WRITE32_MEMBER(hp16500_state::palette_w)
+{
+	if (mem_mask == 0xff000000)
+	{
+		m_clutoffs = (data>>24) & 0xff;
+	}
+	else if (mem_mask == 0x00ff0000)
+	{
+		UINT8 tmpcolor = (data>>16) & 0xff;
+
+		if ((tmpcolor & 0xf0) == 0x00)
+		{
+			tmpcolor |= (tmpcolor << 4);
+		}
+
+		m_colors[m_count++] = tmpcolor;
+
+		if (m_count == 3)
+		{
+			m_palette[m_clutoffs] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);
+			m_clutoffs++;
+			if (m_clutoffs > 255)
+			{
+				m_clutoffs = 0;
+			}
+			m_count = 0;
+		}
+	}
+}
+
+// 4 bpp
+// addr = ((Y * 0xfc0) + 0x360) + (X * 4)
 UINT32 hp16500_state::screen_update_hp16500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	UINT32 *scanline;
+	int x, y;
+	UINT8 pixels;
+
+	for (y = 0; y < 400; y++)
+	{
+		scanline = &bitmap.pix32(y);
+
+		for (x = 0; x < 576/8; x++)
+		{
+			pixels = m_vram[(y * (288/4)) + x];
+
+			*scanline++ = m_palette[((pixels&0xf0000000)>>28)];
+			*scanline++ = m_palette[((pixels&0xf000000)>>24)];
+			*scanline++ = m_palette[((pixels&0xf00000)>>20)];
+			*scanline++ = m_palette[((pixels&0xf0000)>>16)];
+			*scanline++ = m_palette[((pixels&0xf000)>>12)];
+			*scanline++ = m_palette[((pixels&0xf00)>>8)];
+			*scanline++ = m_palette[((pixels&0xf0)>>4)];
+			*scanline++ = m_palette[(pixels&0xf)];
+		}
+	}
+
 	return 0;
 }
 
@@ -56,14 +124,10 @@ static MACHINE_CONFIG_START( hp16500, hp16500_state )
 	MCFG_CPU_PROGRAM_MAP(hp16500_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_SIZE(1024, 768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hp16500_state, screen_update_hp16500)
-
-	MCFG_PALETTE_ADD("palette", 256)
-
+	MCFG_SCREEN_SIZE(576,400)
+	MCFG_SCREEN_VISIBLE_AREA(0, 576-1, 0, 400-1)
+	MCFG_SCREEN_REFRESH_RATE(60)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END
