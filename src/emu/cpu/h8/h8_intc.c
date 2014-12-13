@@ -22,6 +22,15 @@ h8_intc_device::h8_intc_device(const machine_config &mconfig, device_type type, 
 void h8_intc_device::device_start()
 {
 	memset(pending_irqs, 0, sizeof(pending_irqs));
+	save_item(NAME(pending_irqs));
+	save_item(NAME(irq_type));
+	save_item(NAME(nmi_input));
+	save_item(NAME(irq_input));
+	save_item(NAME(ier));
+	save_item(NAME(isr));
+	save_item(NAME(iscr));
+	save_item(NAME(icr_filter));
+	save_item(NAME(ipr_filter));
 }
 
 void h8_intc_device::device_reset()
@@ -195,6 +204,7 @@ h8h_intc_device::h8h_intc_device(const machine_config &mconfig, device_type type
 void h8h_intc_device::device_start()
 {
 	h8_intc_device::device_start();
+	save_item(NAME(icr));
 }
 
 void h8h_intc_device::device_reset()
