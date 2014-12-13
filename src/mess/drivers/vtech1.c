@@ -451,6 +451,9 @@ static MACHINE_CONFIG_START( laser110, vtech1_state )
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(vtech1_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	MCFG_CASSETTE_INTERFACE("vtech1_cass")
+
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "vz_cass")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( laser200, laser110 )
