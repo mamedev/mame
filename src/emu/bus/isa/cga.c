@@ -513,7 +513,7 @@ MC6845_UPDATE_ROW( isa8_cga_device::cga_text_inten_comp_grey_update_row )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int i;
 
-	if ( y == 0 ) CGA_LOG(1,"cga_text_inten_update_row",("\n"));
+	if ( y == 0 ) CGA_LOG(1,"cga_text_inten_comp_grey_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
 	{
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
@@ -632,7 +632,7 @@ MC6845_UPDATE_ROW( isa8_cga_device::cga_text_blink_update_row_si )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int i;
 
-	if ( y == 0 ) CGA_LOG(1,"cga_text_blink_update_row",("\n"));
+	if ( y == 0 ) CGA_LOG(1,"cga_text_blink_update_row_si",("\n"));
 	for ( i = 0; i < x_count; i++ )
 	{
 		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;

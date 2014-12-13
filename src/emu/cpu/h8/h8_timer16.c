@@ -162,6 +162,22 @@ void h8_timer16_channel_device::device_start()
 {
 	intc = owner()->siblingdevice<h8_intc_device>(intc_tag);
 	channel_active = false;
+	
+	save_item(NAME(tgr_clearing));
+	save_item(NAME(tcr));
+	save_item(NAME(tier));
+	save_item(NAME(ier));
+	save_item(NAME(isr));
+	save_item(NAME(clock_type));
+	save_item(NAME(clock_divider));
+	save_item(NAME(tcnt));
+	save_item(NAME(tgr));
+	save_item(NAME(last_clock_update));
+	save_item(NAME(event_time));
+	save_item(NAME(phase));
+	save_item(NAME(counter_cycle));
+	save_item(NAME(counter_incrementing));
+	save_item(NAME(channel_active));
 }
 
 void h8_timer16_channel_device::device_reset()
@@ -330,6 +346,8 @@ void h8_timer16_device::device_start()
 		sprintf(tm, "%d", i);
 		timer_channel[i] = subdevice<h8_timer16_channel_device>(tm);
 	}
+	
+	save_item(NAME(tstr));
 }
 
 void h8_timer16_device::device_reset()

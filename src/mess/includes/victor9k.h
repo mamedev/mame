@@ -15,6 +15,7 @@
 #define __VICTOR9K__
 
 #include "bus/rs232/rs232.h"
+#include "bus/centronics/ctronics.h"
 #include "cpu/i86/i86.h"
 #include "formats/victor9k_dsk.h"
 #include "imagedev/floppy.h"
@@ -47,7 +48,7 @@
 #define RS232_A_TAG     "rs232a"
 #define RS232_B_TAG     "rs232b"
 #define SCREEN_TAG      "screen"
-#define VICTOR9K_KEYBOARD_TAG   "victor9kb"
+#define KB_TAG   		"kb"
 #define FDC_TAG         "fdc"
 
 class victor9k_state : public driver_device
@@ -66,16 +67,17 @@ public:
 		m_cvsd(*this, HC55516_TAG),
 		m_crtc(*this, HD46505S_TAG),
 		m_ram(*this, RAM_TAG),
-		m_kb(*this, VICTOR9K_KEYBOARD_TAG),
+		m_kb(*this, KB_TAG),
 		m_fdc(*this, FDC_TAG),
+		m_centronics(*this, CENTRONICS_TAG),
 		m_rs232a(*this, RS232_A_TAG),
 		m_rs232b(*this, RS232_B_TAG),
 		m_palette(*this, "palette"),
+		m_rom(*this, I8088_TAG),
 		m_video_ram(*this, "video_ram"),
 		m_brt(0),
 		m_cont(0),
 		m_via1_irq(CLEAR_LINE),
-		m_via2_irq(CLEAR_LINE),
 		m_via3_irq(CLEAR_LINE),
 		m_fdc_irq(CLEAR_LINE),
 		m_ssda_irq(CLEAR_LINE)
@@ -92,11 +94,13 @@ public:
 	required_device<hc55516_device> m_cvsd;
 	required_device<mc6845_device> m_crtc;
 	required_device<ram_device> m_ram;
-	required_device<victor9k_keyboard_device> m_kb;
+	required_device<victor_9000_keyboard_t> m_kb;
 	required_device<victor_9000_fdc_t> m_fdc;
+	required_device<centronics_device> m_centronics;
 	required_device<rs232_port_device> m_rs232a;
 	required_device<rs232_port_device> m_rs232b;
 	required_device<palette_device> m_palette;
+	required_memory_region m_rom;
 	required_shared_ptr<UINT8> m_video_ram;
 
 	virtual void machine_start();
@@ -113,7 +117,6 @@ public:
 	DECLARE_WRITE8_MEMBER( via2_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( write_ria );
 	DECLARE_WRITE_LINE_MEMBER( write_rib );
-	DECLARE_WRITE_LINE_MEMBER( via2_irq_w );
 
 	DECLARE_WRITE8_MEMBER( via3_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( via3_irq_w );
@@ -134,7 +137,6 @@ public:
 
 	/* interrupts */
 	int m_via1_irq;
-	int m_via2_irq;
 	int m_via3_irq;
 	int m_fdc_irq;
 	int m_ssda_irq;

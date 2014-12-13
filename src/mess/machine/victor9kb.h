@@ -25,26 +25,26 @@
 //**************************************************************************
 
 #define MCFG_VICTOR9K_KBRDY_HANDLER(_devcb) \
-	devcb = &victor9k_keyboard_device::set_kbrdy_handler(*device, DEVCB_##_devcb);
+	devcb = &victor_9000_keyboard_t::set_kbrdy_cb(*device, DEVCB_##_devcb);
 
 #define MCFG_VICTOR9K_KBDATA_HANDLER(_devcb) \
-	devcb = &victor9k_keyboard_device::set_kbdata_handler(*device, DEVCB_##_devcb);
+	devcb = &victor_9000_keyboard_t::set_kbdata_cb(*device, DEVCB_##_devcb);
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> victor9k_keyboard_device
+// ======================> victor_9000_keyboard_t
 
-class victor9k_keyboard_device :  public device_t
+class victor_9000_keyboard_t :  public device_t
 {
 public:
 	// construction/destruction
-	victor9k_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	victor_9000_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb_base &set_kbrdy_handler(device_t &device, _Object object) { return downcast<victor9k_keyboard_device &>(device).m_kbrdy_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_kbdata_handler(device_t &device, _Object object) { return downcast<victor9k_keyboard_device &>(device).m_kbdata_handler.set_callback(object); }
+	template<class _Object> static devcb_base &set_kbrdy_cb(device_t &device, _Object object) { return downcast<victor_9000_keyboard_t &>(device).m_kbrdy_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_kbdata_cb(device_t &device, _Object object) { return downcast<victor_9000_keyboard_t &>(device).m_kbdata_cb.set_callback(object); }
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -62,7 +62,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_reset();
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -80,10 +79,13 @@ private:
 	required_ioport m_yb;
 	required_ioport m_yc;
 
-	devcb_write_line   m_kbrdy_handler;
-	devcb_write_line   m_kbdata_handler;
+	devcb_write_line   m_kbrdy_cb;
+	devcb_write_line   m_kbdata_cb;
 
+	UINT8 m_p1;
 	UINT8 m_y;
+	int m_stb;
+	int m_y12;
 	int m_kbrdy;
 	int m_kbdata;
 	int m_kback;

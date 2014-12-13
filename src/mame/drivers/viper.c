@@ -16,7 +16,7 @@ G?A29    2001    Mocap Boxing
 G?A30    2002    Tsurugi
 GMA41    2001    Thrill Drive 2
 G?A45    2001    Boxing Mania
-G?B11    2001    Police 911 2 (USA) / Police 24/7 2 (World) / Keisatsukan Shinjuku 24ji 2 (Japan)
+G*B11    2001    Police 911 2 (USA) / Police 24/7 2 (World) / Keisatsukan Shinjuku 24ji 2 (Japan)
 G?B33    2001    Mocap Golf
 G?B41    2001    Jurassic Park 3
 G?B4x    2002    Xtrial Racing
@@ -79,13 +79,73 @@ MB81G163222-80 - Fujitsu MB81G163222-80 256k x 32-bit x 2 banks Synchronous Grap
       ADC0838 - National Semiconductor ADC0838 Serial I/O 8-Bit A/D Converters with Multiplexer Options (SOIC20 @ U13)
        DS2430 - Dallas DS2430 256-bits 1-Wire EEPROM. Has 256 bits x8 EEPROM (32 bytes), 64 bits x8 (8 bytes)
                 one-time programmable application register and unique factory-lasered and tested 64-bit
-                registration number (8-bit family code + 48-bit serial number + 8-bit CRC tester) (TO-92 @ U37)
-                It appears the DS2430 is not protected from reading but the unique silicon serial number isn't
-                included in the 40 byte dump.
+                registration number (8-bit family code + 48-bit serial number + 8-bit CRC) (TO-92 @ U37)
+                The OTP application register on the common DS2430 and the Police 911 2 DS2430 are not programmed 
+                (application register reads all 0xFF and the status register reads back 0xFF), so it's probably safe 
+                to assume they're not used on any of them.
+                It appears the DS2430 is not protected from reading and the unique silicon serial number is
+                included in the 40 byte dump. This serial number is used as a check to verify the NVRAM and DS2430.
+                In the Police 911 2 NVRAM dump the serial number of the DS2430 is located at 0x002A and 0x1026
+                If the serial number in the NVRAM and DS2430 match then they are paired and the game accepts the NVRAM.
+                If they don't match the game requires an external DS2430 (i.e. dongle) and flags the NVRAM as 'BAD'
+                The serial number is not present in the CF card (2 different Police 911 2 cards of the same version 
+                were dumped and matched).
+                When the lasered ROM is read from the DS2430, it comes out from LSB to MSB (family code, LSB of 
+                S/N->MSB of S/N, CRC)
+                For Police 911 2 that is 0x14 0xB2 0xB7 0x4A 0x00 0x00 0x00 0x83
+                Family code=0x14
+                S/N=0x0000004AB7B2
+                CRC=0x83
+                In a DS2430 dump, the first 32 bytes is the EEPROM and the lasered ROM is 8 bytes and starts at 0x20h
+                For Police 911 2 that is....
+                00000000h CB 9B 56 EC A0 4C 87 53 51 46 28 E7 00 00 00 74
+                00000010h 30 A9 C7 76 B9 85 A3 43 87 53 50 42 1A E7 FA CF
+                00000020h 14 B2 B7 4A 00 00 00 83
+                It may be possible to hand craft a DS2430 for a dongle-protected version of a game simply by using
+                one of the existing DS2430 dumps and adjusting the serial number found in a dump of the NVRAM to pair them
+                or adjusting the serial number in the NVRAM to match the serial number found in one of the dumped DS2430s.
+                This Police 911 2 board was upgraded from Police 911 by plugging in the dongle and changing the CF card. 
+                The NVRAM had previously died and the board was dead. Normally for a Viper game that is fatal. Using 
+                the NVRAM from Police 911 allowed it to boot and then the NVRAM upgraded itself with some additional 
+                data (the original data remained untouched). This means the dongle does more than just protect the game.
+                Another interesting fact about this upgrade is it has been discovered that the PCB can write to the 
+                external DS2430 in the dongle. This has been proven because the serial number of the DS2430 soldered 
+                on the PCB is present in the EEPROM area of the Police 911 2 DS2430.
+                Here is a dump of the DS2430 from Police 911. Note the EEPROM area is empty and the serial number (from 0x20 onwards)
+                is present in the above Police 911 2 DS2430 dump at locations 0x11, 0x10 and 0x0F
+                00000000h FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+                00000010h FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+                00000020h 14 A9 30 74 00 00 00 E7
+                This proves that the EEPROM area in the DS2430 is unused by an unprotected game and in fact the on-board
+                DS2430 is completely unused by an unprotected game. That is why any unprotected game will work on any 
+                Viper PCB regardless of the on-board DS2430 serial number.
+                The existing DS2430 'common' dump used in the unprotected games was actually from a (dongle-protected) 
+                Mahjong Fight Club PCB but that PCB was used to test and run all of the unprotected Viper games.
       M48T58Y - ST Microelectronics M48T58Y Timekeeper RAM (DIP28 @ U39). When this dies (after 10 year lifespan)
                 the game will complain with error RTC BAD then reset. The data inside the RTC can not be hand created
                 (yet) so to revive the PCB the correct RTC data must be re-programmed to a new RTC and replaced
                 on the PCB.
+                Regarding the RTC and protection-related checks....
+                "RTC OK" checks 0x0000->0x0945 (i.e. I can clear the contents after 0x0945 and the game will still 
+                happily boot). The NVRAM contents are split into chunks, each of which are checksummed.  It is a 16-bit checksum,
+                computed by summing two consecutive bytes as a 16-bit integer, where the final sum must add up to 0xFFFF (mod 
+                65536).  The last two bytes in the chunk are used to make the value 0xFFFF.  There doesn't appear to be a 
+                complete checksum over all the chunks (I can pick and choose chunks from various NVRAMs, as long as each chunk 
+                checksum checks out). The important chunks for booting are the first two.
+                The first chunk goes from 0x0000-0x000F.  This seems to be a game/region identifier, and doesn't like its 
+                contents changed (I didn't try changing every byte, but several of the bytes would throw RTC errors, even with a 
+                fixed checksum).  I'd guess that the CF verifies this value, since it's different for every game (i.e. Mocap 
+                Boxing NVRAM would have a correct checksum, but shouldn't pass Police 911 checks).
+                The second chunk goes from 0x0010-0x0079.  This seems to be a board identifier.  This has (optionally) 
+                several fields, each of which are 20 bytes long.  I'm unsure of the first 6 bytes, the following 6 
+                bytes are the DS2430A S/N, and the last 8 bytes are a game/region/dongle identifier.  If running 
+                without a dongle, only the first 20 byte field is present.  With a dongle, a second 20 byte field will 
+                be present.  Moving this second field into the place of the first field (and fixing the checksum) 
+                doesn't work, and the second field will be ignored if the first field is valid for the game (and in 
+                which case the dongle will be ignored).  For example, Police 911 will boot with a valid first field, 
+                with or without the second field, and with or without the dongle plugged in.  If you have both fields, 
+                and leave the dongle plugged in, you can switch between Police 911 and Police 911/2 by simply swapping 
+                CF cards.
        29F002 - Fujitsu 29F002 256k x8 EEPROM stamped '941B01' (PLCC44 @ U25). Earlier revision stamped '941A01'
       CN4/CN5 - RCA-type network connection jacks
           CN7 - 80 pin connector (unused in all games?)
@@ -94,7 +154,7 @@ MB81G163222-80 - Fujitsu MB81G163222-80 256k x 32-bit x 2 banks Synchronous Grap
                 required and plugged in it overrides the DS2430 on the main board. Without the (on-board)
                 DS2430 the PCB will complain after the CF check with HARDWARE ERROR. If the DS2430 is not
                 correct for the game the error given is RTC BAD even if the RTC is correct. Most games don't require
-                a dongle and use the factory DS2430 on the main board.
+                a dongle and accept any DS2430 on the main board.
          CN12 - 4 pin connector (possibly stereo audio output?)
          CN13 - Power connector for plug-in daughterboard
     CN15/CN16 - Multi-pin IDC connectors for plug-in daughterboard (see detail below)
@@ -2131,8 +2191,8 @@ ROM_END
 ROM_START(code1d) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
-	ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("nvram.u39", 0x00000, 0x2000, NO_DUMP )
@@ -2144,8 +2204,8 @@ ROM_END
 ROM_START(code1db) //*
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
-	ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("nvram.u39", 0x00000, 0x2000, NO_DUMP )
@@ -2296,14 +2356,14 @@ ROM_START(p911j) //*
 	DISK_IMAGE( "a00jac02", 0, SHA1(d962d3a8ea84c380767d0fe336296911c289c224) )
 ROM_END
 
-ROM_START(p9112) //*
+ROM_START(p9112) /* dongle-protected version */
 	VIPER_BIOS
 
-	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
-	ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* plug-in male DIN5 dongle containing a DS2430. The sticker on the dongle says 'GCB11-UA' */
+	ROM_LOAD("ds2430_p9112.u3", 0x00, 0x28, CRC(d745c6ee) SHA1(065C9D0DF1703B3BBB53A07F4923FDEE3B16F80E))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
-	ROM_LOAD("nvram.u39", 0x000000, 0x2000, NO_DUMP )
+	ROM_LOAD("b11uad_nvram.u39", 0x000000, 0x2000, CRC(cda37033) SHA1(A94524824F21A0106928B4FE01D86F967BD5AA82))
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "b11a02", 0, SHA1(57665664321b78c1913d01f0d2c0b8d3efd42e04) )
@@ -2564,7 +2624,7 @@ GAME(2001, p911uc,    p911,      viper, viper, viper_state, vipercf,  ROT90,  "K
 GAME(2001, p911kc,    p911,      viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Police 911 (ver KAC)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, p911e,     p911,      viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Police 24/7 (ver EAA)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, p911j,     p911,      viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Keisatsukan Shinjuku 24ji (ver JAC)", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME(2001, p9112,     kviper,    viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Police 911 2 (ver A)", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME(2001, p9112,     kviper,    viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Police 911 2 (VER. UAA:B)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2003, popn9,     kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Pop'n Music 9 (ver JAB)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, sscopex,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Silent Scope EX (ver UAA)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2001, sogeki,    sscopex,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Sogeki (ver JAA)", GAME_NOT_WORKING|GAME_NO_SOUND)

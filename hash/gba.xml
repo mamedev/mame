@@ -30028,7 +30028,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<feature name="slot" value="gba_eeprom_64k" />
 			<dataarea name="rom" size="8388608">
-				<rom name="sansara naga 1x2 (japan).bin" size="8388608" crc="b3780a4f" sha1="b18e525a3a4b008d76a9c5a7b47cdd4a03b0baec" offset="000000" />
+				<rom name="sansara naga 1x2 (japan)(rev2).bin" size="8388608" crc="b3780a4f" sha1="b18e525a3a4b008d76a9c5a7b47cdd4a03b0baec" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

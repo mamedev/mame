@@ -7,16 +7,9 @@
 #include "emu.h"
 #include <stdarg.h>
 
-static char *output;
+#include "arcompactdasm_dispatch.h"
+#include "arcompactdasm_ops.h"
 
-static void ATTR_PRINTF(1,2) print(const char *fmt, ...)
-{
-	va_list vl;
-
-	va_start(vl, fmt);
-	vsprintf(output, fmt, vl);
-	va_end(vl);
-}
 
 /*****************************************************************************/
 
@@ -24,182 +17,16 @@ static void ATTR_PRINTF(1,2) print(const char *fmt, ...)
 
 /*****************************************************************************/
 
-
-static const char *basic[0x20] =
-{
-	/* opcode below are 32-bit mode */
-	/* 00 */ "Bcc",
-	/* 01 */ "BLcc/BRcc",
-	/* 02 */ "LD r+o",
-	/* 03 */ "ST r+o",
-	/* 04 */ "op a,b,c (basecase)", // basecase ops
-	/* 05 */ "op a,b,c (05 ARC ext)", // ARC processor specific extensions
-	/* 06 */ "op a,b,c (06 ARC ext)",
-	/* 07 */ "op a,b,c (07 User ext)", // User speciifc extensions
-	/* 08 */ "op a,b,c (08 User ext)",
-	/* 09 */ "op a,b,c (09 Market ext)", // Market specific extensions
-	/* 0a */ "op a,b,c (0a Market ext)",
-	/* 0b */ "op a,b,c (0b Market ext)",
-	/* opcodes below are 16-bit mode */
-	/* 0c */ "Load/Add reg-reg",
-	/* 0d */ "Add/Sub/Shft imm",
-	/* 0e */ "Mov/Cmp/Add",
-	/* 0f */ "op_S b,b,c", // single ops
-	/* 10 */ "LD_S",
-	/* 11 */ "LDB_S",
-	/* 12 */ "LDW_S",
-	/* 13 */ "LSW_S.X",
-	/* 14 */ "ST_S",
-	/* 15 */ "STB_S",
-	/* 16 */ "STW_S",
-	/* 17 */ "Shift/Sub/Bit",
-	/* 18 */ "Stack Instr",
-	/* 19 */ "GP Instr",
-	/* 1a */ "PCL Instr",
-	/* 1b */ "MOV_S",
-	/* 1c */ "ADD_S/CMP_S",
-	/* 1d */ "BRcc_S",
-	/* 1e */ "Bcc_S",
-	/* 1f */ "BL_S"
-};
-
-// condition codes (basic ones are the same as arc 
-static const char *conditions[0x20] =
-{
-	/* 00 */ "AL", // (aka RA         - Always)
-	/* 01 */ "EQ", // (aka Z          - Zero
-	/* 02 */ "NE", // (aka NZ         - Non-Zero)
-	/* 03 */ "PL", // (aka P          - Positive)
-	/* 04 */ "MI", // (aka N          - Negative)
-	/* 05 */ "CS", // (aka C,  LO     - Carry set / Lower than) (unsigned)
-	/* 06 */ "CC", // (aka CC, NC, HS - Carry Clear / Higher or Same) (unsigned) 
-	/* 07 */ "VS", // (aka V          - Overflow set)
-	/* 08 */ "VC", // (aka NV         - Overflow clear)
-	/* 09 */ "GT", // (               - Greater than) (signed)
-	/* 0a */ "GE", // (               - Greater than or Equal) (signed)
-	/* 0b */ "LT", // (               - Less than) (signed)
-	/* 0c */ "LE", // (               - Less than or Equal) (signed)
-	/* 0d */ "HI", // (               - Higher than) (unsigned)
-	/* 0e */ "LS", // (               - Lower or Same) (unsigned)
-	/* 0f */ "PNZ",// (               - Positive non-0 value)
-	/* 10 */ "0x10 Reserved", // possible CPU implementation specifics
-	/* 11 */ "0x11 Reserved",
-	/* 12 */ "0x12 Reserved",
-	/* 13 */ "0x13 Reserved",
-	/* 14 */ "0x14 Reserved",
-	/* 15 */ "0x15 Reserved",
-	/* 16 */ "0x16 Reserved",
-	/* 17 */ "0x17 Reserved",
-	/* 18 */ "0x18 Reserved",
-	/* 19 */ "0x19 Reserved",
-	/* 1a */ "0x1a Reserved",
-	/* 1b */ "0x1b Reserved",
-	/* 1c */ "0x1c Reserved",
-	/* 1d */ "0x1d Reserved",
-	/* 1e */ "0x1e Reserved",
-	/* 1f */ "0x1f Reserved"
-};
-
-static const char *table01_01_0x[0x10] =
-{
-	/* 00 */ "BREQ",
-	/* 01 */ "BRNE",
-	/* 02 */ "BRLT",
-	/* 03 */ "BRGE",
-	/* 04 */ "BRLO",
-	/* 05 */ "BRHS",
-	/* 06 */ "<reserved>",
-	/* 07 */ "<reserved>",
-	/* 08 */ "<reserved>",
-	/* 09 */ "<reserved>",
-	/* 0a */ "<reserved>",
-	/* 0b */ "<reserved>",
-	/* 0c */ "<reserved>",
-	/* 0d */ "<reserved>",
-	/* 0e */ "<BBIT0>",
-	/* 0f */ "<BBIT1>"
-};
-
-static const char *table18[0x8] =
-{
-	/* 00 */ "LD_S (SP)",
-	/* 01 */ "LDB_S (SP)",
-	/* 02 */ "ST_S (SP)",
-	/* 03 */ "STB_S (SP)",
-	/* 04 */ "ADD_S (SP)",
-	/* 05 */ "ADD_S/SUB_S (SP)",
-	/* 06 */ "POP_S (SP)",
-	/* 07 */ "PUSH_S (SP)",
-
-};
-
-static const char *table0f[0x20] =
-{
-	/* 00 */ "SOPs", // Sub Operation (another table..) ( table0f_00 )
-	/* 01 */ "0x01 <illegal>",
-	/* 02 */ "SUB_S",
-	/* 03 */ "0x03 <illegal>",
-	/* 04 */ "AND_S",
-	/* 05 */ "OR_S",
-	/* 06 */ "BIC_S",
-	/* 07 */ "XOR_S",
-	/* 08 */ "0x08 <illegal>",
-	/* 09 */ "0x09 <illegal>",
-	/* 0a */ "0x0a <illegal>",
-	/* 0b */ "TST_S",
-	/* 0c */ "MUL64_S",
-	/* 0d */ "SEXB_S",
-	/* 0e */ "SEXW_S",
-	/* 0f */ "EXTB_S",
-	/* 10 */ "EXTW_S",
-	/* 11 */ "ABS_S",
-	/* 12 */ "NOT_S",
-	/* 13 */ "NEG_S",
-	/* 14 */ "ADD1_S",
-	/* 15 */ "ADD2_S>",
-	/* 16 */ "ADD3_S",
-	/* 17 */ "0x17 <illegal>",
-	/* 18 */ "ASL_S (multiple)",
-	/* 19 */ "LSR_S (multiple)",
-	/* 1a */ "ASR_S (multiple)",
-	/* 1b */ "ASL_S (single)",
-	/* 1c */ "LSR_S (single)",
-	/* 1d */ "ASR_S (single)",
-	/* 1e */ "TRAP (not a5?)",
-	/* 1f */ "BRK_S" // 0x7fff only?
-};
-
-static const char *table0f_00[0x8] =
-{
-	/* 00 */ "J_S",
-	/* 01 */ "J_S.D",
-	/* 02 */ "JL_S",
-	/* 03 */ "JL_S.D",
-	/* 04 */ "0x04 <illegal>",
-	/* 05 */ "0x05 <illegal>",
-	/* 06 */ "SUB_S.NE",
-	/* 07 */ "ZOPs", // Sub Operations (yet another table..) ( table0f_00_07 )
-};
-
-static const char *table0f_00_07[0x8] =
-{
-	/* 00 */ "NOP_S",
-	/* 01 */ "UNIMP_S", // unimplemented (not a5?)
-	/* 02 */ "0x02 <illegal>",
-	/* 03 */ "0x03 <illegal>",
-	/* 04 */ "JEQ_S [BLINK]",
-	/* 05 */ "JNE_S [BLINK]",
-	/* 06 */ "J_S [BLINK]",
-	/* 07 */ "J_S.D [BLINK]",
-};
 
 #define ARCOMPACT_OPERATION ((op & 0xf800) >> 11)
+
+extern char *output;;
 
 CPU_DISASSEMBLE(arcompact)
 {
 	int size = 2;
 
-	UINT32 op = oprom[2] | (oprom[3] << 8);
+	UINT32 op = oprom[0] | (oprom[1] << 8);
 	output = buffer;
 
 	UINT8 instruction = ARCOMPACT_OPERATION;
@@ -208,171 +35,56 @@ CPU_DISASSEMBLE(arcompact)
 	{
 		size = 4;
 		op <<= 16;
-		op |= oprom[0] | (oprom[1] << 8);
+		op |= oprom[2] | (oprom[3] << 8);
 
-		switch (instruction)
+		op &= ~0xf8000000;
+
+		switch (instruction) // 32-bit instructions (with optional extra dword for immediate data)
 		{
-			case 0x00:
-				if (op & 0x00010000)
-				{ // Branch Unconditionally Far
-				  // 00000 ssssssssss 1  SSSSSSSSSS N R TTTT
-					INT32 address =   (op & 0x07fe0000) >> 17;
-					address |=        ((op & 0x0000ffc0) >> 6) << 10;
-					address |=        ((op & 0x0000000f) >> 0) << 20;
-					if (address & 0x800000) address = -(address&0x7fffff);	
-
-					print("B %08x (%08x)",  pc + (address *2) + 2, op & ~0xffffffcf );
-				}
-				else
-				{ // Branch Conditionally
-				  // 00000 ssssssssss 0 SSSSSSSSSS N QQQQQ
-					INT32 address =   (op & 0x07fe0000) >> 17;
-					address |=        ((op & 0x0000ffc0) >> 6) << 10;
-					if (address & 0x800000) address = -(address&0x7fffff);	
-
-					UINT8 condition = op & 0x0000001f;
-
-					print("B(%s) %08x (%08x)", conditions[condition], pc + (address *2) + 2, op & ~0xffffffdf );
-
-				}
-
-				break;
-
-			case 0x01:
-				if (op & 0x00010000)
-				{
-					if (op & 0x00000010)
-					{ // Branch on Compare / Bit Test - Register-Immediate
-						// 00001 bbb sssssss 1 S BBB UUUUUU N 1 iiii
-						UINT8 subinstr = op & 0x0000000f;
-						INT32 address =    (op & 0x00fe0000) >> 17;
-						address |=        ((op & 0x00008000) >> 15) << 7;
-						if (address & 0x80) address = -(address&0x7f);	
-
-						
-						print("%s (reg-imm) %08x (%08x)", table01_01_0x[subinstr], pc + (address *2) + 4, op & ~0xf8fe800f);
-
-
-					}
-					else
-					{
-						// Branch on Compare / Bit Test - Register-Register
-						// 00001 bbb sssssss 1 S BBB CCCCCC N 0 iiii
-						UINT8 subinstr = op & 0x0000000f;
-						INT32 address =    (op & 0x00fe0000) >> 17;
-						address |=        ((op & 0x00008000) >> 15) << 7;
-						if (address & 0x80) address = -(address&0x7f);	
-
-						print("%s (reg-reg) %08x (%08x)", table01_01_0x[subinstr], pc + (address *2) + 4, op & ~0xf8fe800f);
-
-					}
-
-				}
-				else
-				{
-					if (op & 0x00020000)
-					{ // Branch and Link Unconditionally Far
-					  // 00001 sssssssss 10  SSSSSSSSSS N R TTTT
-						INT32 address =   (op & 0x07fc0000) >> 17;
-						address |=        ((op & 0x0000ffc0) >> 6) << 10;
-						address |=        ((op & 0x0000000f) >> 0) << 20;
-						if (address & 0x800000) address = -(address&0x7fffff);	
-
-						print("BL %08x (%08x)",  pc + (address *2) + 2, op & ~0xffffffcf );
-					}
-					else
-					{ // Branch and Link Conditionally
-					  // 00001 sssssssss 00 SSSSSSSSSS N QQQQQ
-						INT32 address =   (op & 0x07fc0000) >> 17;
-						address |=        ((op & 0x0000ffc0) >> 6) << 10;
-						if (address & 0x800000) address = -(address&0x7fffff);	
-
-						UINT8 condition = op & 0x0000001f;
-
-						print("BL(%s) %08x (%08x)", conditions[condition], pc + (address *2) + 2, op & ~0xffffffdf );
-
-					}
-
-				}
-				break;
-
-			default:
-				print("%s (%08x)", basic[instruction], op & ~0xf8000000 );
-				break;
-
+			case 0x00: size = arcompact_handle00_dasm(DASM_PARAMS);	break; // Bcc
+			case 0x01: size = arcompact_handle01_dasm(DASM_PARAMS);	break; // BLcc/BRcc
+			case 0x02: size = arcompact_handle02_dasm(DASM_PARAMS);	break; // LD r+o
+			case 0x03: size = arcompact_handle03_dasm(DASM_PARAMS);	break; // ST r+o
+			case 0x04: size = arcompact_handle04_dasm(DASM_PARAMS);	break; // op a,b,c (basecase)
+			case 0x05: size = arcompact_handle05_dasm(DASM_PARAMS);	break; // op a,b,c (05 ARC ext)
+			case 0x06: size = arcompact_handle06_dasm(DASM_PARAMS);	break; // op a,b,c (06 ARC ext)
+			case 0x07: size = arcompact_handle07_dasm(DASM_PARAMS);	break; // op a,b,c (07 User ext)
+			case 0x08: size = arcompact_handle08_dasm(DASM_PARAMS);	break; // op a,b,c (08 User ext)
+			case 0x09: size = arcompact_handle09_dasm(DASM_PARAMS);	break; // op a,b,c (09 Market ext)
+			case 0x0a: size = arcompact_handle0a_dasm(DASM_PARAMS);	break; // op a,b,c (0a Market ext)
+			case 0x0b: size = arcompact_handle0b_dasm(DASM_PARAMS);	break; // op a,b,c (0b Market ext)
 		}
-
-		
 	}
 	else
 	{	
 		size = 2;
+		op &= ~0xf800;
 
-		switch (instruction)
+
+		switch (instruction) // 16-bit instructions
 		{
-			case 0x0f:
-			{
-				// General Register Instructions (16-bit)
-				// 01111 bbb ccc iiiii
-				UINT8 subinstr = (op & 0x01f) >> 0;
-				//print("%s (%04x)", table0f[subinstr], op & ~0xf81f);
-
-#if 1			
-				switch (subinstr)
-				{
-	
-					default:
-						print("%s (%04x)", table0f[subinstr], op & ~0xf81f);
-						break;
-
-					case 0x00:
-					{
-						// General Operations w/ Register
-						// 01111 bbb iii 00000
-						UINT8 subinstr2 = (op & 0x00e0) >> 5;
-
-						switch (subinstr2)
-						{
-							default:
-								print("%s (%04x)", table0f_00[subinstr2], op & ~0xf8ff);
-								break;
-
-							case 0x7:
-							{
-								// General Operations w/o Register
-								// 01111 iii 111 00000
-								UINT8 subinstr3 = (op & 0x0700) >> 8;
-
-								print("%s (%04x)", table0f_00_07[subinstr3], op & ~0xffff);
-
-								break;
-							}
-						}
-					}
-				}
-#endif				
-			
-				break;
-
-			}
-
-
-			case 0x18:
-			{
-				// Stack Pointer Based Instructions (16-bit)
-				// 11000 bbb iii uuuuu
-				UINT8 subinstr = (op & 0x00e0) >> 5;
-				print("%s (%04x)", table18[subinstr], op & ~0xf8e0);
-				break;
-
-			}
-
-			default:
-				print("%s (%04x)", basic[instruction], op & ~0xf800);
-				break;
+			case 0x0c: size = arcompact_handle0c_dasm(DASM_PARAMS);	break; // Load/Add reg-reg
+			case 0x0d: size = arcompact_handle0d_dasm(DASM_PARAMS);	break; // Add/Sub/Shft imm
+			case 0x0e: size = arcompact_handle0e_dasm(DASM_PARAMS);	break; // Mov/Cmp/Add
+			case 0x0f: size = arcompact_handle0f_dasm(DASM_PARAMS);	break; // op_S b,b,c (single 16-bit ops)
+			case 0x10: size = arcompact_handle10_dasm(DASM_PARAMS);	break; // LD_S
+			case 0x11: size = arcompact_handle11_dasm(DASM_PARAMS);	break; // LDB_S
+			case 0x12: size = arcompact_handle12_dasm(DASM_PARAMS);	break; // LDW_S
+			case 0x13: size = arcompact_handle13_dasm(DASM_PARAMS);	break; // LSW_S.X
+			case 0x14: size = arcompact_handle14_dasm(DASM_PARAMS);	break; // ST_S
+			case 0x15: size = arcompact_handle15_dasm(DASM_PARAMS);	break; // STB_S
+			case 0x16: size = arcompact_handle16_dasm(DASM_PARAMS);	break; // STW_S
+			case 0x17: size = arcompact_handle17_dasm(DASM_PARAMS);	break; // Shift/Sub/Bit
+			case 0x18: size = arcompact_handle18_dasm(DASM_PARAMS);	break; // Stack Instr
+			case 0x19: size = arcompact_handle19_dasm(DASM_PARAMS);	break; // GP Instr
+			case 0x1a: size = arcompact_handle1a_dasm(DASM_PARAMS);	break; // PCL Instr
+			case 0x1b: size = arcompact_handle1b_dasm(DASM_PARAMS);	break; // MOV_S
+			case 0x1c: size = arcompact_handle1c_dasm(DASM_PARAMS);	break; // ADD_S/CMP_S
+			case 0x1d: size = arcompact_handle1d_dasm(DASM_PARAMS);	break; // BRcc_S
+			case 0x1e: size = arcompact_handle1e_dasm(DASM_PARAMS);	break; // Bcc_S
+			case 0x1f: size = arcompact_handle1f_dasm(DASM_PARAMS);	break; // BL_S
 		}
 	}
-
 
 	return size | DASMFLAG_SUPPORTED;
 }

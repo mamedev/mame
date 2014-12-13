@@ -83,11 +83,12 @@ DEVICE_ADDRESS_MAP_START(internal_io_map, 32, i6300esb_lpc_device)
 	AM_RANGE(0x00ec, 0x00ef) AM_WRITE8(                           nop_w,             0x0000ff00) // Non-existing, used for delays by the bios/os
 ADDRESS_MAP_END
 
-
+	
 i6300esb_lpc_device::i6300esb_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pci_device(mconfig, I6300ESB_LPC, "i6300ESB southbridge ISA/LPC bridge", tag, owner, clock, "i6300esb_lpc", __FILE__),
-		acpi(*this, "acpi"),
-		rtc (*this, "rtc")
+	  acpi(*this, "acpi"),
+	  rtc (*this, "rtc"),
+	  pit (*this, "pit")
 {
 }
 
@@ -120,6 +121,7 @@ void i6300esb_lpc_device::device_reset()
 	memset(mon_trp_rng, 0, sizeof(mon_trp_rng));
 	mon_trp_msk = 0;
 	nmi_sc = 0;
+	gen_sta = 0x00;
 }
 
 void i6300esb_lpc_device::reset_all_mappings()
@@ -749,4 +751,5 @@ void i6300esb_lpc_device::map_extra(UINT64 memory_window_start, UINT64 memory_wi
 	rtc->map_device(memory_window_start, memory_window_end, 0, memory_space, io_window_start, io_window_end, 0, io_space);
 	if(rtc_conf & 4)
 		rtc->map_extdevice(memory_window_start, memory_window_end, 0, memory_space, io_window_start, io_window_end, 0, io_space);
+	pit->map_device(memory_window_start, memory_window_end, 0, memory_space, io_window_start, io_window_end, 0, io_space);
 }

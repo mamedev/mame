@@ -11,7 +11,7 @@
 
 const device_type ISA8_NUM_9_REV = &device_creator<isa8_number_9_rev_device>;
 
-static ADDRESS_MAP_START( upd7220_map, AS_0, 8, isa8_number_9_rev_device )
+static ADDRESS_MAP_START( upd7220_map, AS_0, 16, isa8_number_9_rev_device )
 	AM_RANGE(0x00000, 0x3ffff) AM_NOP
 ADDRESS_MAP_END
 
@@ -22,9 +22,9 @@ UPD7220_DISPLAY_PIXELS_MEMBER( isa8_number_9_rev_device::hgdc_display_pixels )
 	{
 		rgb_t color(0);
 		UINT16 overlay;
-		if(((address << 3) + 0xc0008) > (1024*1024))
+		if(((address << 3) + 0xc0016) > (1024*1024))
 			return;
-		for(int i = 0; i < 8; i++)
+		for(int i = 0; i < 16; i++)
 		{
 			UINT32 addr = (address << 3) + i;
 			overlay = m_ram[addr + 0xc0000] << 1;
@@ -37,10 +37,10 @@ UPD7220_DISPLAY_PIXELS_MEMBER( isa8_number_9_rev_device::hgdc_display_pixels )
 	}
 	else
 	{
-		if(((address << 3) + 8) > (1024*1024))
+		if(((address << 3) + 16) > (1024*1024))
 			return;
-		for(int i = 0; i < 8; i++)
-			bitmap.pix32(y, x + i) = pal->entry_color(m_ram[(address << 3) + i]);
+		for(int i = 0; i < 16; i++)
+			bitmap.pix32(y, x + i) = pal->entry_color(m_ram[(address << 4) + i]);
 	}
 }
 

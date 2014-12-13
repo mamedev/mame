@@ -168,12 +168,16 @@ INPUT_PORTS_END
 
 void comp4_state::machine_start()
 {
+	// zerofill
 	m_leds_state = 0;
 	memset(m_leds_decay, 0, sizeof(m_leds_decay));
+
 	m_o = 0;
 	
+	// register for savestates
 	save_item(NAME(m_leds_state));
 	save_item(NAME(m_leds_decay));
+
 	save_item(NAME(m_o));
 }
 

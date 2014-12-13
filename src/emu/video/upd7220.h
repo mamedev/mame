@@ -126,6 +126,8 @@ private:
 
 	inline UINT8 readbyte(offs_t address);
 	inline void writebyte(offs_t address, UINT8 data);
+	inline UINT16 readword(offs_t address);
+	inline void writeword(offs_t address, UINT16 data);
 	inline void fifo_clear();
 	inline int fifo_param_count();
 	inline void fifo_set_direction(int dir);

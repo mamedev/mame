@@ -456,24 +456,32 @@ class _5clown_state : public driver_device
 public:
 	_5clown_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_ay8910(*this, "ay8910"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram")
 	{
 	}
 
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<ay8910_device> m_ay8910;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
+	
 	UINT8 m_main_latch_d800;
 	UINT8 m_snd_latch_0800;
 	UINT8 m_snd_latch_0a02;
 	UINT8 m_ay8910_addr;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
 	tilemap_t *m_bg_tilemap;
 	int m_mux_data;
+	
 	DECLARE_WRITE8_MEMBER(fclown_videoram_w);
 	DECLARE_WRITE8_MEMBER(fclown_colorram_w);
 	DECLARE_WRITE8_MEMBER(cpu_c048_w);
@@ -490,18 +498,22 @@ public:
 	DECLARE_WRITE8_MEMBER(fclown_ay8910_w);
 	DECLARE_DRIVER_INIT(fclown);
 	TILE_GET_INFO_MEMBER(get_fclown_tile_info);
+	virtual void machine_start();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(_5clown);
 	UINT32 screen_update_fclown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<ay8910_device> m_ay8910;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };
 
-
-
+void _5clown_state::machine_start()
+{	
+	m_main_latch_d800 = m_snd_latch_0800 = m_snd_latch_0a02 = m_ay8910_addr = m_mux_data = 0;
+	
+	save_item(NAME(m_main_latch_d800));
+	save_item(NAME(m_snd_latch_0800));
+	save_item(NAME(m_snd_latch_0a02));
+	save_item(NAME(m_ay8910_addr));
+	save_item(NAME(m_mux_data));
+}
 
 /*************************
 *     Video Hardware     *
@@ -1210,6 +1222,6 @@ DRIVER_INIT_MEMBER(_5clown_state,fclown)
 *************************/
 
 /*    YEAR  NAME      PARENT  MACHINE INPUT   INIT    ROT    COMPANY  FULLNAME                      FLAGS... */
-GAME( 1993, 5clown,   0,      fclown, fclown, _5clown_state, fclown, ROT0, "IGS",   "Five Clown (English, set 1)", GAME_IMPERFECT_SOUND )
-GAME( 1993, 5clowna,  5clown, fclown, fclown, _5clown_state, fclown, ROT0, "IGS",   "Five Clown (English, set 2)", GAME_IMPERFECT_SOUND )
-GAME( 1993, 5clownsp, 5clown, fclown, fclown, _5clown_state, fclown, ROT0, "IGS",   "Five Clown (Spanish hack)",   GAME_IMPERFECT_SOUND )
+GAME( 1993, 5clown,   0,      fclown, fclown, _5clown_state, fclown, ROT0, "IGS",   "Five Clown (English, set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1993, 5clowna,  5clown, fclown, fclown, _5clown_state, fclown, ROT0, "IGS",   "Five Clown (English, set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1993, 5clownsp, 5clown, fclown, fclown, _5clown_state, fclown, ROT0, "IGS",   "Five Clown (Spanish hack)",   GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

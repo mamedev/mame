@@ -203,6 +203,27 @@ int lua_engine::l_ioport_write(lua_State *L)
 }
 
 //-------------------------------------------------
+//  emu_app_name - return application name
+//-------------------------------------------------
+
+int lua_engine::l_emu_app_name(lua_State *L)
+{
+	lua_pushstring(L, emulator_info::get_appname_lower());
+	return 1;
+}
+
+//-------------------------------------------------
+//  emu_app_version - return application version
+//-------------------------------------------------
+
+int lua_engine::l_emu_app_version(lua_State *L)
+{
+	lua_pushstring(L, bare_build_version);
+	return 1;
+}
+
+
+//-------------------------------------------------
 //  emu_gamename - returns game full name
 //-------------------------------------------------
 
@@ -527,6 +548,8 @@ void lua_engine::initialize()
 {
 	luabridge::getGlobalNamespace (m_lua_state)
 		.beginNamespace ("emu")
+			.addCFunction ("app_name",    l_emu_app_name )
+			.addCFunction ("app_version", l_emu_app_version )
 			.addCFunction ("gamename",    l_emu_gamename )
 			.addCFunction ("romname",     l_emu_romname )
 			.addCFunction ("keypost",     l_emu_keypost )
@@ -555,6 +578,7 @@ void lua_engine::initialize()
 				.addData ("manufacturer", &game_driver::manufacturer)
 			.endClass ()
 		.endNamespace ();
+
 	luabridge::push (m_lua_state, machine_manager::instance());
 	lua_setglobal(m_lua_state, "manager");
 }

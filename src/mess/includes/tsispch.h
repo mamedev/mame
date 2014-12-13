@@ -34,9 +34,6 @@ public:
 	required_device<i8251_device> m_uart;
 	required_device<pic8259_device> m_pic;
 
-	UINT8 m_infifo[32];         // input fifo
-	UINT8 m_infifo_tail_ptr;        // " tail
-	UINT8 m_infifo_head_ptr;        // " head
 	UINT8 m_paramReg;           // status leds and resets and etc
 
 	virtual void machine_reset();
@@ -51,6 +48,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(i8251_rxrdy_int);
 	DECLARE_WRITE_LINE_MEMBER(i8251_txempty_int);
 	DECLARE_WRITE_LINE_MEMBER(i8251_txrdy_int);
+	DECLARE_WRITE_LINE_MEMBER(dsp_to_8086_p0_w);
+	DECLARE_WRITE_LINE_MEMBER(dsp_to_8086_p1_w);
 };
 
 

@@ -1167,76 +1167,112 @@ MACHINE_CONFIG_END
 
 ROM_START( lastday )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
-	ROM_LOAD( "lday3.bin",    0x00000, 0x10000, CRC(a06dfb1e) SHA1(c6220eda8c01d55862700e369db7291dbbedc8c8) )
+	ROM_LOAD( "lday3.s5",     0x00000, 0x10000, CRC(a06dfb1e) SHA1(c6220eda8c01d55862700e369db7291dbbedc8c8) )
 	ROM_RELOAD(               0x10000, 0x10000 )                /* banked at 0x8000-0xbfff */
-	ROM_LOAD( "lday4.bin",    0x20000, 0x10000, CRC(70961ea6) SHA1(245d3da67abb4a511a024f030de461b9a2b4804e) )  /* banked at 0x8000-0xbfff */
+	ROM_LOAD( "4.u5",         0x20000, 0x10000, CRC(70961ea6) SHA1(245d3da67abb4a511a024f030de461b9a2b4804e) )  /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
-	ROM_LOAD( "lday1.bin",    0x0000, 0x8000, CRC(dd4316fd) SHA1(496e6657bb76d91f488a2464d1af1be095ab9105) )    /* empty */
-	ROM_CONTINUE(             0x0000, 0x8000 )
+	ROM_LOAD( "1.d3",    0x0000, 0x8000, CRC(dd4316fd) SHA1(496e6657bb76d91f488a2464d1af1be095ab9105) )    /* empty */
+	ROM_CONTINUE(        0x0000, 0x8000 )
 
 	ROM_REGION( 0x8000, "gfx1", 0 ) /* chars */
-	ROM_LOAD( "lday2.bin",    0x0000, 0x8000, CRC(83eb572c) SHA1(e915afd55d505bce202206c9ecfa89bad561ef6c) )    /* empty */
-	ROM_CONTINUE(             0x0000, 0x8000 )
+	ROM_LOAD( "2.j4",    0x0000, 0x8000, CRC(83eb572c) SHA1(e915afd55d505bce202206c9ecfa89bad561ef6c) )    /* empty */
+	ROM_CONTINUE(        0x0000, 0x8000 )
 
 	ROM_REGION( 0x40000, "gfx2", 0 )    /* sprites */
-	ROM_LOAD16_BYTE( "lday16.bin",   0x00000, 0x20000, CRC(df503504) SHA1(daa58a7bc24415b5f59b7c7cc918bc85de9702a3) )
-	ROM_LOAD16_BYTE( "lday15.bin",   0x00001, 0x20000, CRC(cd990442) SHA1(891b2163db23ab0bb40cbadce6e06fc067d0532f) )
+	ROM_LOAD16_BYTE( "16.d14",   0x00000, 0x20000, CRC(df503504) SHA1(daa58a7bc24415b5f59b7c7cc918bc85de9702a3) )
+	ROM_LOAD16_BYTE( "15.a14",   0x00001, 0x20000, CRC(cd990442) SHA1(891b2163db23ab0bb40cbadce6e06fc067d0532f) )
 
 	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles */
-	ROM_LOAD16_BYTE( "lday6.bin",    0x00000, 0x20000, CRC(1054361d) SHA1(52566786ca8177404be8b66fd7de94ac25fc49ea) )
-	ROM_LOAD16_BYTE( "lday9.bin",    0x00001, 0x20000, CRC(6952ef4d) SHA1(b4e5ec02e97df213fe0bd4cd8a2ca77d7ecf8ad5) )
-	ROM_LOAD16_BYTE( "lday7.bin",    0x40000, 0x20000, CRC(6e57a888) SHA1(8efe876ea3c788b83e8291f7fc6f55b90de158c8) )
-	ROM_LOAD16_BYTE( "lday10.bin",   0x40001, 0x20000, CRC(a5548dca) SHA1(9914e01c1739c3bfd868a01e53c9030726ced4ea) )
+	ROM_LOAD16_BYTE( "6.s9",     0x00000, 0x20000, CRC(1054361d) SHA1(52566786ca8177404be8b66fd7de94ac25fc49ea) )
+	ROM_LOAD16_BYTE( "9.s11",    0x00001, 0x20000, CRC(6952ef4d) SHA1(b4e5ec02e97df213fe0bd4cd8a2ca77d7ecf8ad5) )
+	ROM_LOAD16_BYTE( "7.u9",     0x40000, 0x20000, CRC(6e57a888) SHA1(8efe876ea3c788b83e8291f7fc6f55b90de158c8) )
+	ROM_LOAD16_BYTE( "10.u11",   0x40001, 0x20000, CRC(a5548dca) SHA1(9914e01c1739c3bfd868a01e53c9030726ced4ea) )
 
 	ROM_REGION( 0x40000, "gfx4", 0 )    /* tiles */
-	ROM_LOAD16_BYTE( "lday12.bin",   0x00000, 0x20000, CRC(992bc4af) SHA1(94570ebd1ee6acf1871cf914907acd12dca4026e) )
-	ROM_LOAD16_BYTE( "lday14.bin",   0x00001, 0x20000, CRC(a79abc85) SHA1(3e63dad11db9b7420331403a1d551d8c041c4cc2) )
+	ROM_LOAD16_BYTE( "12.s13",   0x00000, 0x20000, CRC(992bc4af) SHA1(94570ebd1ee6acf1871cf914907acd12dca4026e) )
+	ROM_LOAD16_BYTE( "14.s14",   0x00001, 0x20000, CRC(a79abc85) SHA1(3e63dad11db9b7420331403a1d551d8c041c4cc2) )
 
 	ROM_REGION( 0x20000, "gfx5", 0 )    /* background tilemaps */
-	ROM_LOAD16_BYTE( "lday5.bin",    0x00000, 0x10000, CRC(4789bae8) SHA1(6ffecc16eb8c9c783b02c4ef68cb5098b01fafef) )
-	ROM_LOAD16_BYTE( "lday8.bin",    0x00001, 0x10000, CRC(92402b9a) SHA1(2ca8078d2687afbe7b6fc5412de16c6fbc11a650) )
+	ROM_LOAD16_BYTE( "5.r9",     0x00000, 0x10000, CRC(4789bae8) SHA1(6ffecc16eb8c9c783b02c4ef68cb5098b01fafef) )
+	ROM_LOAD16_BYTE( "8.r11",    0x00001, 0x10000, CRC(92402b9a) SHA1(2ca8078d2687afbe7b6fc5412de16c6fbc11a650) )
 
 	ROM_REGION( 0x20000, "gfx6", 0 )    /* fg tilemaps */
-	ROM_LOAD16_BYTE( "lday11.bin",   0x00000, 0x10000, CRC(04b961de) SHA1(7a94c9d0800d79048660cf3758708a346ead33f9) )
-	ROM_LOAD16_BYTE( "lday13.bin",   0x00001, 0x10000, CRC(6bdbd887) SHA1(a54f26f9ddd72b8b8f7a030610c1c4a5f94a3358) )
-ROM_END
+	ROM_LOAD16_BYTE( "11.r13",   0x00000, 0x10000, CRC(04b961de) SHA1(7a94c9d0800d79048660cf3758708a346ead33f9) )
+	ROM_LOAD16_BYTE( "13.r14",   0x00001, 0x10000, CRC(6bdbd887) SHA1(a54f26f9ddd72b8b8f7a030610c1c4a5f94a3358) )ROM_END
 
 ROM_START( lastdaya )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
-	ROM_LOAD( "lday3.bin",    0x00000, 0x10000, CRC(a06dfb1e) SHA1(c6220eda8c01d55862700e369db7291dbbedc8c8) )
+	ROM_LOAD( "lday3.s5",     0x00000, 0x10000, CRC(a06dfb1e) SHA1(c6220eda8c01d55862700e369db7291dbbedc8c8) )
 	ROM_RELOAD(               0x10000, 0x10000 )                /* banked at 0x8000-0xbfff */
-	ROM_LOAD( "lday4.bin",    0x20000, 0x10000, CRC(70961ea6) SHA1(245d3da67abb4a511a024f030de461b9a2b4804e) )  /* banked at 0x8000-0xbfff */
+	ROM_LOAD( "4.u5",         0x20000, 0x10000, CRC(70961ea6) SHA1(245d3da67abb4a511a024f030de461b9a2b4804e) )  /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
-	ROM_LOAD( "e1",           0x0000, 0x8000, CRC(ce96e106) SHA1(5ef1f221618abd757e02db79c3d7016100f30c07) )    /* empty */
+	ROM_LOAD( "e1.d3",        0x0000, 0x8000, CRC(ce96e106) SHA1(5ef1f221618abd757e02db79c3d7016100f30c07) )    /* empty */
 	ROM_CONTINUE(             0x0000, 0x8000 )
 
 	ROM_REGION( 0x8000, "gfx1", 0 ) /* chars */
-	ROM_LOAD( "lday2.bin",    0x0000, 0x8000, CRC(83eb572c) SHA1(e915afd55d505bce202206c9ecfa89bad561ef6c) )    /* empty */
-	ROM_CONTINUE(             0x0000, 0x8000 )
+	ROM_LOAD( "2.j4",    0x0000, 0x8000, CRC(83eb572c) SHA1(e915afd55d505bce202206c9ecfa89bad561ef6c) )    /* empty */
+	ROM_CONTINUE(        0x0000, 0x8000 )
 
 	ROM_REGION( 0x40000, "gfx2", 0 )    /* sprites */
-	ROM_LOAD16_BYTE( "lday16.bin",   0x00000, 0x20000, CRC(df503504) SHA1(daa58a7bc24415b5f59b7c7cc918bc85de9702a3) )
-	ROM_LOAD16_BYTE( "lday15.bin",   0x00001, 0x20000, CRC(cd990442) SHA1(891b2163db23ab0bb40cbadce6e06fc067d0532f) )
+	ROM_LOAD16_BYTE( "16.d14",   0x00000, 0x20000, CRC(df503504) SHA1(daa58a7bc24415b5f59b7c7cc918bc85de9702a3) )
+	ROM_LOAD16_BYTE( "15.a14",   0x00001, 0x20000, CRC(cd990442) SHA1(891b2163db23ab0bb40cbadce6e06fc067d0532f) )
 
 	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles */
-	ROM_LOAD16_BYTE( "e6",           0x00000, 0x20000, CRC(7623c443) SHA1(abfed648a8cc438dbb7de9c23a663082667ca366) )
-	ROM_LOAD16_BYTE( "e9",           0x00001, 0x20000, CRC(717f6a0e) SHA1(0b2d98fa5b8734210df18bce7725972fd42a6e4a) )
-	ROM_LOAD16_BYTE( "lday7.bin",    0x40000, 0x20000, CRC(6e57a888) SHA1(8efe876ea3c788b83e8291f7fc6f55b90de158c8) )
-	ROM_LOAD16_BYTE( "lday10.bin",   0x40001, 0x20000, CRC(a5548dca) SHA1(9914e01c1739c3bfd868a01e53c9030726ced4ea) )
+	ROM_LOAD16_BYTE( "e6.s9",    0x00000, 0x20000, CRC(7623c443) SHA1(abfed648a8cc438dbb7de9c23a663082667ca366) )
+	ROM_LOAD16_BYTE( "e9.s11",   0x00001, 0x20000, CRC(717f6a0e) SHA1(0b2d98fa5b8734210df18bce7725972fd42a6e4a) )
+	ROM_LOAD16_BYTE( "7.u9",     0x40000, 0x20000, CRC(6e57a888) SHA1(8efe876ea3c788b83e8291f7fc6f55b90de158c8) )
+	ROM_LOAD16_BYTE( "10.u11",   0x40001, 0x20000, CRC(a5548dca) SHA1(9914e01c1739c3bfd868a01e53c9030726ced4ea) )
 
 	ROM_REGION( 0x40000, "gfx4", 0 )    /* tiles */
-	ROM_LOAD16_BYTE( "lday12.bin",   0x00000, 0x20000, CRC(992bc4af) SHA1(94570ebd1ee6acf1871cf914907acd12dca4026e) )
-	ROM_LOAD16_BYTE( "lday14.bin",   0x00001, 0x20000, CRC(a79abc85) SHA1(3e63dad11db9b7420331403a1d551d8c041c4cc2) )
+	ROM_LOAD16_BYTE( "12.s13",   0x00000, 0x20000, CRC(992bc4af) SHA1(94570ebd1ee6acf1871cf914907acd12dca4026e) )
+	ROM_LOAD16_BYTE( "14.s14",   0x00001, 0x20000, CRC(a79abc85) SHA1(3e63dad11db9b7420331403a1d551d8c041c4cc2) )
 
 	ROM_REGION( 0x20000, "gfx5", 0 )    /* bg tilemaps */
-	ROM_LOAD16_BYTE( "e5",           0x00000, 0x10000, CRC(5f801410) SHA1(382c1bcd69a6a5c245d2ba7603bc273fba840c8f) )
-	ROM_LOAD16_BYTE( "e8",           0x00001, 0x10000, CRC(a7b8250b) SHA1(4bd79c09dacf69e1993353d7fcc7746d1324e9b0) )
+	ROM_LOAD16_BYTE( "e5.r9",           0x00000, 0x10000, CRC(5f801410) SHA1(382c1bcd69a6a5c245d2ba7603bc273fba840c8f) )
+	ROM_LOAD16_BYTE( "e8.r11",          0x00001, 0x10000, CRC(a7b8250b) SHA1(4bd79c09dacf69e1993353d7fcc7746d1324e9b0) )
 
 	ROM_REGION( 0x20000, "gfx6", 0 )    /* fg tilemaps */
-	ROM_LOAD16_BYTE( "lday11.bin",   0x00000, 0x10000, CRC(04b961de) SHA1(7a94c9d0800d79048660cf3758708a346ead33f9) )
-	ROM_LOAD16_BYTE( "lday13.bin",   0x00001, 0x10000, CRC(6bdbd887) SHA1(a54f26f9ddd72b8b8f7a030610c1c4a5f94a3358) )
+	ROM_LOAD16_BYTE( "11.r13",   0x00000, 0x10000, CRC(04b961de) SHA1(7a94c9d0800d79048660cf3758708a346ead33f9) )
+	ROM_LOAD16_BYTE( "13.r14",   0x00001, 0x10000, CRC(6bdbd887) SHA1(a54f26f9ddd72b8b8f7a030610c1c4a5f94a3358) )
+ROM_END
+
+ROM_START( ddaydoo ) // closest to 'lastday' set
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_LOAD( "3.s5",    0x00000, 0x10000, CRC(7817d4f3) SHA1(b85db234c04f248fd2927a2224380783780673f5))
+	ROM_RELOAD(          0x10000, 0x10000 )                /* banked at 0x8000-0xbfff */
+	ROM_LOAD( "4.u5",    0x20000, 0x10000, CRC(70961ea6) SHA1(245d3da67abb4a511a024f030de461b9a2b4804e) )  /* banked at 0x8000-0xbfff */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
+	ROM_LOAD( "1.d3",    0x0000, 0x8000, CRC(dd4316fd) SHA1(496e6657bb76d91f488a2464d1af1be095ab9105) )    /* empty */
+	ROM_CONTINUE(        0x0000, 0x8000 )
+
+	ROM_REGION( 0x8000, "gfx1", 0 ) /* chars */
+	ROM_LOAD( "2.j4",    0x0000, 0x8000, CRC(83eb572c) SHA1(e915afd55d505bce202206c9ecfa89bad561ef6c) )    /* empty */
+	ROM_CONTINUE(        0x0000, 0x8000 )
+
+	ROM_REGION( 0x40000, "gfx2", 0 )    /* sprites */
+	ROM_LOAD16_BYTE( "16.d14",   0x00000, 0x20000, CRC(df503504) SHA1(daa58a7bc24415b5f59b7c7cc918bc85de9702a3) )
+	ROM_LOAD16_BYTE( "15.a14",   0x00001, 0x20000, CRC(cd990442) SHA1(891b2163db23ab0bb40cbadce6e06fc067d0532f) )
+
+	ROM_REGION( 0x80000, "gfx3", 0 )    /* tiles */
+	ROM_LOAD16_BYTE( "6.s9",     0x00000, 0x20000, CRC(1054361d) SHA1(52566786ca8177404be8b66fd7de94ac25fc49ea) )
+	ROM_LOAD16_BYTE( "9.s11",    0x00001, 0x20000, CRC(6952ef4d) SHA1(b4e5ec02e97df213fe0bd4cd8a2ca77d7ecf8ad5) )
+	ROM_LOAD16_BYTE( "7.u9",     0x40000, 0x20000, CRC(6e57a888) SHA1(8efe876ea3c788b83e8291f7fc6f55b90de158c8) )
+	ROM_LOAD16_BYTE( "10.u11",   0x40001, 0x20000, CRC(a5548dca) SHA1(9914e01c1739c3bfd868a01e53c9030726ced4ea) )
+
+	ROM_REGION( 0x40000, "gfx4", 0 )    /* tiles */
+	ROM_LOAD16_BYTE( "12.s13",   0x00000, 0x20000, CRC(992bc4af) SHA1(94570ebd1ee6acf1871cf914907acd12dca4026e) )
+	ROM_LOAD16_BYTE( "14.s14",   0x00001, 0x20000, CRC(a79abc85) SHA1(3e63dad11db9b7420331403a1d551d8c041c4cc2) )
+
+	ROM_REGION( 0x20000, "gfx5", 0 )    /* background tilemaps */
+	ROM_LOAD16_BYTE( "5.r9",     0x00000, 0x10000, CRC(4789bae8) SHA1(6ffecc16eb8c9c783b02c4ef68cb5098b01fafef) )
+	ROM_LOAD16_BYTE( "8.r11",    0x00001, 0x10000, CRC(92402b9a) SHA1(2ca8078d2687afbe7b6fc5412de16c6fbc11a650) )
+
+	ROM_REGION( 0x20000, "gfx6", 0 )    /* fg tilemaps */
+	ROM_LOAD16_BYTE( "11.r13",   0x00000, 0x10000, CRC(04b961de) SHA1(7a94c9d0800d79048660cf3758708a346ead33f9) )
+	ROM_LOAD16_BYTE( "13.r14",   0x00001, 0x10000, CRC(6bdbd887) SHA1(a54f26f9ddd72b8b8f7a030610c1c4a5f94a3358) )
 ROM_END
 
 ROM_START( gulfstrm )
@@ -2037,6 +2073,7 @@ ROM_END
 
 GAME( 1990, lastday,  0,        lastday,  lastday, driver_device,  0, ROT270, "Dooyong",                       "The Last Day (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1990, lastdaya, lastday,  lastday,  lastday, driver_device,  0, ROT270, "Dooyong",                       "The Last Day (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ddaydoo,  lastday,  lastday,  lastday, driver_device,  0, ROT270, "Dooyong",                       "D-Day (Dooyong) (Korea)", GAME_SUPPORTS_SAVE )
 
 GAME( 1991, gulfstrm, 0,        gulfstrm, gulfstrm, driver_device, 0, ROT270, "Dooyong",                       "Gulf Storm (set 1)",        GAME_SUPPORTS_SAVE )
 GAME( 1991, gulfstrma,gulfstrm, gulfstrm, gulfstrm, driver_device, 0, ROT270, "Dooyong",                       "Gulf Storm (set 2)",        GAME_SUPPORTS_SAVE )

@@ -1201,7 +1201,15 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 			switch (mon_type)
 			{
 				case 0:
-					artifact_map_ptr = &m_hires_artifact_map[((vram_row[col+1] & 0x80) >> 7) * 16];
+					// verified on h/w: setting dhires w/o 80col emulates a rev. 0 Apple ][ with no orange/blue
+					if (m_dhires)
+					{
+						artifact_map_ptr = m_hires_artifact_map;
+					}
+					else
+					{
+						artifact_map_ptr = &m_hires_artifact_map[((vram_row[col + 1] & 0x80) >> 7) * 16]; 
+					}
 					for (b = 0; b < 7; b++)
 					{
 						v = artifact_map_ptr[((w >> (b + 7-1)) & 0x07) | (((b ^ col) & 0x01) << 3)];

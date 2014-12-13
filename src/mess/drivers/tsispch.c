@@ -157,7 +157,7 @@ WRITE8_MEMBER( tsispch_state::i8251_rxd )
 READ8_MEMBER( tsispch_state::dsw_r )
 {
 	/* the only dipswitch I'm really sure about is s4-7 which enables the test mode
-	 * The switches are, for normal operation on my unit:
+	 * The switches are, for normal operation on my unit (and the older unit as well):
 	 * 1  2  3   4   5   6   7   8
 	 * ON ON OFF OFF OFF OFF OFF OFF
 	 * which makes this register read 0xFC
@@ -227,15 +227,23 @@ WRITE16_MEMBER( tsispch_state::dsp_status_w )
 	upd7725->snesdsp_write(false, data);
 }
 
+WRITE_LINE_MEMBER( tsispch_state::dsp_to_8086_p0_w )
+{
+	fprintf(stderr, "upd772x changed p0 state to %d!\n",state);
+	//TODO: do stuff here!
+}
+
+WRITE_LINE_MEMBER( tsispch_state::dsp_to_8086_p1_w )
+{
+	fprintf(stderr, "upd772x changed p1 state to %d!\n",state);
+	//TODO: do stuff here!
+}
+
 /*****************************************************************************
  Reset and Driver Init
 *****************************************************************************/
 void tsispch_state::machine_reset()
 {
-	// clear fifos (TODO: memset would work better here...)
-	int i;
-	for (i=0; i<32; i++) m_infifo[i] = 0;
-	m_infifo_tail_ptr = m_infifo_head_ptr = 0;
 	fprintf(stderr,"machine reset\n");
 }
 
@@ -381,6 +389,8 @@ static MACHINE_CONFIG_START( prose2k, tsispch_state )
 	MCFG_CPU_ADD("dsp", UPD7725, 8000000) /* VERIFIED clock, unknown divider; correct dsp type is UPD77P20 */
 	MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
 	MCFG_CPU_DATA_MAP(dsp_data_map)
+	MCFG_NECDSP_OUT_P0_CB(WRITELINE(tsispch_state, dsp_to_8086_p0_w))
+	MCFG_NECDSP_OUT_P1_CB(WRITELINE(tsispch_state, dsp_to_8086_p1_w))
 
 	/* PIC 8259 */
 	MCFG_PIC8259_ADD("pic8259", INPUTLINE("maincpu", 0), VCC, NULL)
@@ -513,13 +523,15 @@ ROM_START( prose2ko )
 	ROMX_LOAD( "v1.1__14__speech__plus__(c)1983.am2764.14.u28", 0xfc000, 0x2000, CRC(E616BD6E) SHA1(5DFAE2C5079D89F791C9D7166F9504231A464203),ROM_SKIP(1))
 	ROMX_LOAD( "v1.1__15__speech__plus__(c)1983.am2764.15.u51", 0xfc001, 0x2000, CRC(BEB1FA19) SHA1(72130FE45C3FD3DE7CF794936DC68ED2D4193DAF),ROM_SKIP(1))
 
-	// TSI/Speech plus DSP firmware v?.? (no sticker, but S140025 printed on chip), unlabeled chip, but clearly a NEC UPD77P20C ceramic
-	// NOT DUMPED YET, using the 3.12 dsp firmware as a placeholder
+	// TSI/Speech plus DSP firmware v?.? (no sticker, but S140025 printed on chip), unlabeled chip, but clearly a NEC UPD7720C ceramic
+	// NOT DUMPED YET, using the 3.12 dsp firmware as a placeholder, since the dsp on the older board is MASK ROM and doesn't dump easily
 	ROM_REGION( 0x600, "dspprgload", 0) // packed 24 bit data
-	ROM_LOAD( "s140025__dsp_prog.u29", 0x0000, 0x0600, BAD_DUMP CRC(9E46425A) SHA1(80A915D731F5B6863AEEB448261149FF15E5B786))
+	ROM_LOAD( "s140025__dsp_prog.u29", 0x0000, 0x0600, NO_DUMP)
+	ROM_LOAD( "v3.12__8-9-88__dsp_prog.u29", 0x0000, 0x0600, CRC(9E46425A) SHA1(80A915D731F5B6863AEEB448261149FF15E5B786)) // temp placeholder
 	ROM_REGION( 0x800, "dspprg", ROMREGION_ERASEFF) // for unpacking 24 bit data into 32 bit data which cpu core can understand
 	ROM_REGION( 0x400, "dspdata", 0)
-	ROM_LOAD( "s140025__dsp_data.u29", 0x0000, 0x0400, BAD_DUMP CRC(F4E4DD16) SHA1(6E184747DB2F26E45D0E02907105FF192E51BABA))
+	ROM_LOAD( "s140025__dsp_data.u29", 0x0000, 0x0400, NO_DUMP)
+	ROM_LOAD( "v3.12__8-9-88__dsp_data.u29", 0x0000, 0x0400, CRC(F4E4DD16) SHA1(6E184747DB2F26E45D0E02907105FF192E51BABA)) // temp placeholder
 
 	ROM_REGION(0x1000, "proms", 0)
 	ROM_LOAD( "dm74s288n.u77", 0x0000, 0x0020, CRC(A88757FC) SHA1(9066D6DBC009D7A126D75B8461CA464DDF134412)) // == am27s19.u77

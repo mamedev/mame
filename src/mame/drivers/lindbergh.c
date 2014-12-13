@@ -323,7 +323,7 @@ Sega 2005
 #include "machine/segabb.h"
 #include "sound/pci-ac97.h"
 #include "sound/sb0400.h"
-#include "video/gf6800gt.h"
+#include "video/gf7600gs.h"
 
 class lindbergh_state : public driver_device
 {
@@ -347,21 +347,12 @@ void lindbergh_state::machine_reset()
 }
 
 static MACHINE_CONFIG_START(lindbergh, lindbergh_state)
-//  MCFG_CPU_ADD("maincpu", PENTIUM, 2800000000U) /* Actually Celeron D at 2,8 GHz */
 	MCFG_CPU_ADD("maincpu", PENTIUM4, 28000000U*5) /* Actually Celeron D at 2,8 GHz */
-//  MCFG_CPU_PROGRAM_MAP(lindbergh_map)
-//  MCFG_CPU_IO_MAP(lindbergh_io)
-//  MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
-
-//  MCFG_FRAGMENT_ADD( pcat_common )
-//  MCFG_FRAGMENT_ADD( pcvideo_vga )
-
-//  MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 
 	MCFG_PCI_ROOT_ADD(                ":pci")
 	MCFG_I82875P_HOST_ADD(            ":pci:00.0",                        0x103382c0, ":maincpu", 512*1024*1024)
 	MCFG_I82875P_AGP_ADD(             ":pci:01.0")
-	MCFG_GEFORCE_6800GT_ADD(          ":pci:01.0:00.0",                   0x10de0204)
+	MCFG_GEFORCE_7600GS_ADD(          ":pci:01.0:00.0",                   0x10de02e1)
 	MCFG_PCI_BRIDGE_ADD(              ":pci:1c.0",      0x808625ae, 0x02)
 	MCFG_I82541PI_ADD(                ":pci:1c.0:00.0",                   0x103382c0)
 	MCFG_USB_UHCI_ADD(                ":pci:1d.0",      0x808625a9, 0x02, 0x103382c0)
@@ -375,6 +366,7 @@ static MACHINE_CONFIG_START(lindbergh, lindbergh_state)
 	MCFG_I6300ESB_LPC_ADD(            ":pci:1f.0")
 	MCFG_LPC_ACPI_ADD(                ":pci:1f.0:acpi")
 	MCFG_LPC_RTC_ADD(                 ":pci:1f.0:rtc")
+	MCFG_LPC_PIT_ADD(                 ":pci:1f.0:pit")
 	MCFG_SATA_ADD(                    ":pci:1f.2",      0x808625a3, 0x02, 0x103382c0)
 	MCFG_SMBUS_ADD(                   ":pci:1f.3",      0x808625a4, 0x02, 0x103382c0)
 	MCFG_AC97_ADD(                    ":pci:1f.5",      0x808625a6, 0x02, 0x103382c0)
@@ -392,7 +384,7 @@ MACHINE_CONFIG_END
 	ROM_REGION(0x400000, ":pci:1e.0:03.0", 0) /* Baseboard MPC firmware */ \
 	ROM_LOAD("fpr-24370b.ic6", 0x000000, 0x400000, CRC(c3b021a4) SHA1(1b6938a50fe0e4ae813864649eb103838c399ac0)) \
 \
-	ROM_REGION32_LE(0x10000, ":pci:01.0:00.0", 0) /* Geforce bios extension (custom or standard?) */ \
+	ROM_REGION32_LE(0x10000, ":pci:01.0:00.0", 0) /* Geforce bios extension (custom for the card) */ \
 	ROM_LOAD("vid_bios.u504", 0x00000, 0x10000, CRC(f78d14d7) SHA1(f129787e487984edd23bf344f2e9500c85052275)) \
 
 ROM_START(lindbios)

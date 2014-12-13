@@ -583,7 +583,7 @@ void hyperstone_device::hyperstone_set_trap_entry(int which)
 UINT32 hyperstone_device::compute_tr()
 {
 	UINT64 cycles_since_base = total_cycles() - m_tr_base_cycles;
-	UINT64 clocks_since_base = cycles_since_base >> m_clock_scale;
+	UINT64 clocks_since_base = cycles_since_base >> m_clck_scale;
 	return m_tr_base_value + (clocks_since_base / m_tr_clocks_per_tick);
 }
 
@@ -591,11 +591,11 @@ void hyperstone_device::update_timer_prescale()
 {
 	UINT32 prevtr = compute_tr();
 	TPR &= ~0x80000000;
-	m_clock_scale = (TPR >> 26) & m_clock_scale_mask;
-	m_clock_cycles_1 = 1 << m_clock_scale;
-	m_clock_cycles_2 = 2 << m_clock_scale;
-	m_clock_cycles_4 = 4 << m_clock_scale;
-	m_clock_cycles_6 = 6 << m_clock_scale;
+	m_clck_scale = (TPR >> 26) & m_clock_scale_mask;
+	m_clock_cycles_1 = 1 << m_clck_scale;
+	m_clock_cycles_2 = 2 << m_clck_scale;
+	m_clock_cycles_4 = 4 << m_clck_scale;
+	m_clock_cycles_6 = 6 << m_clck_scale;
 	m_tr_clocks_per_tick = ((TPR >> 16) & 0xff) + 2;
 	m_tr_base_value = prevtr;
 	m_tr_base_cycles = total_cycles();
@@ -604,17 +604,17 @@ void hyperstone_device::update_timer_prescale()
 void hyperstone_device::adjust_timer_interrupt()
 {
 	UINT64 cycles_since_base = total_cycles() - m_tr_base_cycles;
-	UINT64 clocks_since_base = cycles_since_base >> m_clock_scale;
-	UINT64 cycles_until_next_clock = cycles_since_base - (clocks_since_base << m_clock_scale);
+	UINT64 clocks_since_base = cycles_since_base >> m_clck_scale;
+	UINT64 cycles_until_next_clock = cycles_since_base - (clocks_since_base << m_clck_scale);
 
 	if (cycles_until_next_clock == 0)
-		cycles_until_next_clock = (UINT64)(1 << m_clock_scale);
+		cycles_until_next_clock = (UINT64)(1 << m_clck_scale);
 
 	/* special case: if we have a change pending, set a timer to fire then */
 	if (TPR & 0x80000000)
 	{
 		UINT64 clocks_until_int = m_tr_clocks_per_tick - (clocks_since_base % m_tr_clocks_per_tick);
-		UINT64 cycles_until_int = (clocks_until_int << m_clock_scale) + cycles_until_next_clock;
+		UINT64 cycles_until_int = (clocks_until_int << m_clck_scale) + cycles_until_next_clock;
 		m_timer->adjust(cycles_to_attotime(cycles_until_int + 1), 1);
 	}
 
@@ -631,7 +631,7 @@ void hyperstone_device::adjust_timer_interrupt()
 		else
 		{
 			UINT64 clocks_until_int = mulu_32x32(delta, m_tr_clocks_per_tick);
-			UINT64 cycles_until_int = (clocks_until_int << m_clock_scale) + cycles_until_next_clock;
+			UINT64 cycles_until_int = (clocks_until_int << m_clck_scale) + cycles_until_next_clock;
 			m_timer->adjust(cycles_to_attotime(cycles_until_int));
 		}
 	}
@@ -1536,7 +1536,7 @@ void hyperstone_device::init(int scale_mask)
 	m_op = 0;
 	m_trap_entry = 0;
 	m_clock_scale_mask = 0;
-	m_clock_scale = 0;
+	m_clck_scale = 0;
 	m_clock_cycles_1 = 0;
 	m_clock_cycles_2 = 0;
 	m_clock_cycles_4 = 0;
@@ -1685,6 +1685,15 @@ void hyperstone_device::init(int scale_mask)
 	save_item(NAME(m_intblock));
 	save_item(NAME(m_delay.delay_cmd));
 	save_item(NAME(m_tr_clocks_per_tick));
+	save_item(NAME(m_tr_base_value));
+	save_item(NAME(m_tr_base_cycles));
+	save_item(NAME(m_timer_int_pending));
+	save_item(NAME(m_clck_scale));
+	save_item(NAME(m_clock_scale_mask));
+	save_item(NAME(m_clock_cycles_1));
+	save_item(NAME(m_clock_cycles_2));
+	save_item(NAME(m_clock_cycles_4));
+	save_item(NAME(m_clock_cycles_6));
 
 	// set our instruction counter
 	m_icountptr = &m_icount;
@@ -2052,7 +2061,7 @@ void hyperstone_device::hyperstone_divu(struct hyperstone_device::regs_decode *d
 		}
 	}
 
-	m_icount -= 36 << m_clock_scale;
+	m_icount -= 36 << m_clck_scale;
 }
 
 void hyperstone_device::hyperstone_divs(struct hyperstone_device::regs_decode *decode)
@@ -2101,7 +2110,7 @@ void hyperstone_device::hyperstone_divs(struct hyperstone_device::regs_decode *d
 		}
 	}
 
-	m_icount -= 36 << m_clock_scale;
+	m_icount -= 36 << m_clck_scale;
 }
 
 void hyperstone_device::hyperstone_xm(struct hyperstone_device::regs_decode *decode)
@@ -4109,9 +4118,9 @@ void hyperstone_device::hyperstone_mul(struct hyperstone_device::regs_decode *de
 	}
 
 	if((SREG >= 0xffff8000 && SREG <= 0x7fff) && (DREG >= 0xffff8000 && DREG <= 0x7fff))
-		m_icount -= 3 << m_clock_scale;
+		m_icount -= 3 << m_clck_scale;
 	else
-		m_icount -= 5 << m_clock_scale;
+		m_icount -= 5 << m_clck_scale;
 }
 
 void hyperstone_device::hyperstone_fadd(struct hyperstone_device::regs_decode *decode)

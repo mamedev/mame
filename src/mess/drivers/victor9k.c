@@ -13,16 +13,14 @@
 
     TODO:
 
-	- centronics
+    - keyboard
 	- expansion bus
 		- Z80 card
 		- Winchester DMA card (Xebec S1410 + Tandon TM502/TM603SE)
 		- RAM cards
 		- clock cards
     - floppy 8048
-    - keyboard
     - hires graphics
-    - character attributes
     - brightness/contrast
     - MC6852
     - codec sound
@@ -42,11 +40,11 @@
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( victor9k_mem, AS_PROGRAM, 8, victor9k_state )
-//  AM_RANGE(0x00000, 0xdffff) AM_RAM
+	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 	AM_RANGE(0x20000, 0xdffff) AM_NOP
-	AM_RANGE(0xe0000, 0xe0001) AM_DEVREADWRITE(I8259A_TAG, pic8259_device, read, write)
-	AM_RANGE(0xe0020, 0xe0023) AM_DEVREADWRITE(I8253_TAG, pit8253_device, read, write)
-	AM_RANGE(0xe0040, 0xe0043) AM_DEVREADWRITE(UPD7201_TAG, upd7201_device, cd_ba_r, cd_ba_w)
+	AM_RANGE(0xe0000, 0xe0001) AM_MIRROR(0x7f00) AM_DEVREADWRITE(I8259A_TAG, pic8259_device, read, write)
+	AM_RANGE(0xe0020, 0xe0023) AM_MIRROR(0x7f00) AM_DEVREADWRITE(I8253_TAG, pit8253_device, read, write)
+	AM_RANGE(0xe0040, 0xe0043) AM_MIRROR(0x7f00) AM_DEVREADWRITE(UPD7201_TAG, upd7201_device, cd_ba_r, cd_ba_w)
 	AM_RANGE(0xe8000, 0xe8000) AM_MIRROR(0x7f00) AM_DEVREADWRITE(HD46505S_TAG, mc6845_device, status_r, address_w)
 	AM_RANGE(0xe8001, 0xe8001) AM_MIRROR(0x7f00) AM_DEVREADWRITE(HD46505S_TAG, mc6845_device, register_r, register_w)
 	AM_RANGE(0xe8020, 0xe802f) AM_MIRROR(0x7f00) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
@@ -57,7 +55,7 @@ static ADDRESS_MAP_START( victor9k_mem, AS_PROGRAM, 8, victor9k_state )
 	AM_RANGE(0xe80c0, 0xe80cf) AM_MIRROR(0x7f00) AM_DEVREADWRITE(FDC_TAG, victor_9000_fdc_t, cs6_r, cs6_w)
 	AM_RANGE(0xe80e0, 0xe80ef) AM_MIRROR(0x7f00) AM_DEVREADWRITE(FDC_TAG, victor_9000_fdc_t, cs7_r, cs7_w)
 	AM_RANGE(0xf0000, 0xf0fff) AM_MIRROR(0x1000) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION(I8088_TAG, 0)
+	AM_RANGE(0xf8000, 0xf9fff) AM_MIRROR(0x6000) AM_ROM AM_REGION(I8088_TAG, 0)
 ADDRESS_MAP_END
 
 
@@ -108,13 +106,17 @@ MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 			UINT32 char_ram_addr = (BIT(ma, 12) << 16) | ((code & 0xff) << 5) | (ra << 1);
 			UINT16 data = program.read_word(char_ram_addr);
 
+			if (code & CODE_REVERSE_VIDEO) data ^= 0xffff;
+			if (code & CODE_NON_DISPLAY) data = 0;
+			if (sx == cursor_x) data = 0xffff;
+
 			for (int x = 0; x <= 10; x++)
 			{
-				int color = BIT(data, x);
+				int pixel = BIT(data, x);
+				int color = palette[pixel && de];
+				if (!(code & CODE_LOW_INTENSITY) && color) color = 2;
 
-				if (sx == cursor_x) color = 1;
-
-				bitmap.pix32(vbp + y, hbp + x + sx*10) = palette[color && de];
+				bitmap.pix32(vbp + y, hbp + x + sx*10) = color;
 			}
 
 			video_ram_addr += 2;
@@ -166,7 +168,7 @@ WRITE_LINE_MEMBER( victor9k_state::ssda_irq_w )
 {
 	m_ssda_irq = state;
 
-	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_fdc_irq);
+	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via3_irq || m_fdc_irq);
 }
 
 
@@ -187,6 +189,17 @@ WRITE8_MEMBER( victor9k_state::via1_pa_w )
 
 	*/
 
+	// centronics
+	m_centronics->write_data0(BIT(data, 0));
+	m_centronics->write_data1(BIT(data, 1));
+	m_centronics->write_data2(BIT(data, 2));
+	m_centronics->write_data3(BIT(data, 3));
+	m_centronics->write_data4(BIT(data, 4));
+	m_centronics->write_data5(BIT(data, 5));
+	m_centronics->write_data6(BIT(data, 6));
+	m_centronics->write_data7(BIT(data, 7));
+
+	// IEEE-488
 	m_ieee488->dio_w(data);
 }
 
@@ -208,8 +221,8 @@ WRITE8_MEMBER( victor9k_state::via1_pb_w )
 
 	    bit     description
 
-	    PB0     DAV
-	    PB1     EOI
+	    PB0     DAV / DATA STROBE
+	    PB1     EOI / VFU?
 	    PB2     REN
 	    PB3     ATN
 	    PB4     IFC
@@ -218,6 +231,9 @@ WRITE8_MEMBER( victor9k_state::via1_pb_w )
 	    PB7     NDAC
 
 	*/
+
+	// centronics
+	m_centronics->write_strobe(BIT(data, 0));
 
 	// IEEE-488
 	m_ieee488->dav_w(BIT(data, 0));
@@ -238,7 +254,7 @@ WRITE_LINE_MEMBER( victor9k_state::via1_irq_w )
 {
 	m_via1_irq = state;
 
-	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_fdc_irq);
+	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via3_irq || m_fdc_irq);
 }
 
 WRITE8_MEMBER( victor9k_state::via2_pa_w )
@@ -301,14 +317,6 @@ WRITE_LINE_MEMBER( victor9k_state::write_rib )
 }
 
 
-WRITE_LINE_MEMBER( victor9k_state::via2_irq_w )
-{
-	m_via2_irq = state;
-
-	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_fdc_irq);
-}
-
-
 /*
     bit    description
 
@@ -345,7 +353,7 @@ WRITE_LINE_MEMBER( victor9k_state::via3_irq_w )
 {
 	m_via3_irq = state;
 
-	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_fdc_irq);
+	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via3_irq || m_fdc_irq);
 }
 
 
@@ -356,14 +364,14 @@ WRITE_LINE_MEMBER( victor9k_state::via3_irq_w )
 WRITE_LINE_MEMBER( victor9k_state::kbrdy_w )
 {
 	//logerror("KBRDY %u\n", state);
-	m_via2->write_cb1(state);
 
-	m_pic->ir6_w(state ? CLEAR_LINE : ASSERT_LINE);
+	m_via2->write_cb1(state);
 }
 
 WRITE_LINE_MEMBER( victor9k_state::kbdata_w )
 {
 	//logerror("KBDATA %u\n", state);
+
 	m_via2->write_cb2(state);
 	m_via2->write_pa6(state);
 }
@@ -373,7 +381,7 @@ WRITE_LINE_MEMBER( victor9k_state::fdc_irq_w )
 {
 	m_fdc_irq = state;
 
-	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_fdc_irq);
+	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via3_irq || m_fdc_irq);
 }
 
 
@@ -387,14 +395,18 @@ void victor9k_state::machine_start()
 	save_item(NAME(m_brt));
 	save_item(NAME(m_cont));
 	save_item(NAME(m_via1_irq));
-	save_item(NAME(m_via2_irq));
 	save_item(NAME(m_via3_irq));
 	save_item(NAME(m_fdc_irq));
 	save_item(NAME(m_ssda_irq));
 
-	// memory banking
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	program.install_ram(0x00000, m_ram->size() - 1, m_ram->pointer());
+	// patch out SCP self test
+	m_rom->base()[0x11ab] = 0xc3;
+
+	// patch out ROM checksum error
+	m_rom->base()[0x1d51] = 0x90;
+	m_rom->base()[0x1d52] = 0x90;
+	m_rom->base()[0x1d53] = 0x90;
+	m_rom->base()[0x1d54] = 0x90;
 }
 
 void victor9k_state::machine_reset()
@@ -408,6 +420,7 @@ void victor9k_state::machine_reset()
 	m_crtc->reset();
 	m_fdc->reset();
 }
+
 
 
 //**************************************************************************
@@ -432,9 +445,9 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT("palette")
 
-	MCFG_MC6845_ADD(HD46505S_TAG, HD6845, SCREEN_TAG, 1000000) // HD6845 == HD46505S
+	MCFG_MC6845_ADD(HD46505S_TAG, HD6845, SCREEN_TAG, XTAL_30MHz/11) // HD6845 == HD46505S
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(10)
 	MCFG_MC6845_UPDATE_ROW_CB(victor9k_state, crtc_update_row)
@@ -489,11 +502,16 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_DEVICE_ADD(M6522_2_TAG, VIA6522, XTAL_30MHz/30)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(victor9k_state, via2_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(victor9k_state, via2_pb_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor9k_state, via2_irq_w))
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE(I8259A_TAG, pic8259_device, ir6_w))
 
 	MCFG_DEVICE_ADD(M6522_3_TAG, VIA6522, XTAL_30MHz/30)
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(victor9k_state, via3_pb_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor9k_state, via3_irq_w))
+
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(M6522_1_TAG, via6522_device, write_pb5))
+	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(M6522_1_TAG, via6522_device, write_pb6))
+	MCFG_CENTRONICS_SELECT_HANDLER(DEVWRITELINE(M6522_1_TAG, via6522_device, write_pb7))
 
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, rxa_w))
@@ -509,7 +527,7 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, ctsb_w))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(M6522_2_TAG, via6522_device, write_pa5))
 
-	MCFG_DEVICE_ADD(VICTOR9K_KEYBOARD_TAG, VICTOR9K_KEYBOARD, 0)
+	MCFG_DEVICE_ADD(KB_TAG, VICTOR9K_KEYBOARD, 0)
 	MCFG_VICTOR9K_KBRDY_HANDLER(WRITELINE(victor9k_state, kbrdy_w))
 	MCFG_VICTOR9K_KBDATA_HANDLER(WRITELINE(victor9k_state, kbdata_w))
 
@@ -521,7 +539,6 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("256K,384K,512K,640K,768K,896K")
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "victor9k_flop")

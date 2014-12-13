@@ -18,10 +18,7 @@
 #include "formats/d64_dsk.h"
 #include "formats/d67_dsk.h"
 #include "formats/g64_dsk.h"
-#include "formats/d80_dsk.h"
-#include "formats/d82_dsk.h"
 #include "imagedev/floppy.h"
-#include "machine/fdc_pll.h"
 
 
 
@@ -50,7 +47,6 @@ class c2040_fdc_t :  public device_t
 {
 public:
 	// construction/destruction
-	c2040_fdc_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	c2040_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_sync_wr_callback(device_t &device, _Object object) { return downcast<c2040_fdc_t &>(device).m_write_sync.set_callback(object); }
@@ -68,8 +64,6 @@ public:
 
 	DECLARE_READ_LINE_MEMBER( wps_r ) { return checkpoint_live.drv_sel ? m_floppy1->wpt_r() : m_floppy0->wpt_r(); }
 	DECLARE_READ_LINE_MEMBER( sync_r ) { return checkpoint_live.sync; }
-	DECLARE_READ_LINE_MEMBER( ready_r ) { return checkpoint_live.ready; }
-	DECLARE_READ_LINE_MEMBER( error_r ) { return checkpoint_live.error; }
 
 	void stp0_w(int stp);
 	void stp1_w(int stp);
@@ -147,9 +141,10 @@ protected:
 	emu_timer *t_gen;
 
 	floppy_image_device* get_floppy();
-	virtual void live_start();
-	virtual void checkpoint();
-	virtual void rollback();
+
+	void live_start();
+	void checkpoint();
+	void rollback();
 	bool write_next_bit(bool bit, const attotime &limit);
 	void start_writing(const attotime &tm);
 	void commit(const attotime &tm);
@@ -157,43 +152,14 @@ protected:
 	void live_delay(int state);
 	void live_sync();
 	void live_abort();
-	virtual void live_run(const attotime &limit = attotime::never);
+	void live_run(const attotime &limit = attotime::never);
 	void get_next_edge(const attotime &when);
-	virtual int get_next_bit(attotime &tm, const attotime &limit);
+	int get_next_bit(attotime &tm, const attotime &limit);
 };
-
-
-// ======================> c8050_fdc_t
-
-class c8050_fdc_t :  public c2040_fdc_t
-{
-public:
-	// construction/destruction
-	c8050_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	DECLARE_WRITE_LINE_MEMBER( odd_hd_w );
-	DECLARE_WRITE_LINE_MEMBER( pull_sync_w );
-
-protected:
-	fdc_pll_t cur_pll, checkpoint_pll;
-
-	void stp_w(floppy_image_device *floppy, int mtr, int &old_stp, int stp);
-
-	virtual void live_start();
-	virtual void checkpoint();
-	virtual void rollback();
-	void pll_reset(const attotime &when, const attotime clock);
-	void pll_save_checkpoint();
-	void pll_retrieve_checkpoint();
-	virtual void live_run(const attotime &limit = attotime::never);
-	virtual int get_next_bit(attotime &tm, const attotime &limit);
-};
-
 
 
 // device type definition
 extern const device_type C2040_FDC;
-extern const device_type C8050_FDC;
 
 
 

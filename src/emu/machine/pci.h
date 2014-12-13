@@ -31,6 +31,7 @@ public:
 	pci_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	void set_ids(UINT32 main_id, UINT8 revision, UINT32 pclass, UINT32 subsystem_id);
+	void set_multifunction_device(bool enable);
 
 	virtual void set_remap_cb(mapper_cb _remap_cb);
 	virtual void reset_all_mappings();
@@ -74,6 +75,8 @@ public:
 	DECLARE_WRITE32_MEMBER(address_base_w);
 	DECLARE_READ16_MEMBER(subvendor_r);
 	DECLARE_READ16_MEMBER(subsystem_r);
+	DECLARE_READ32_MEMBER (expansion_base_r);
+	DECLARE_WRITE32_MEMBER(expansion_base_w);
 	virtual DECLARE_READ8_MEMBER(capptr_r);
 
 protected:
@@ -104,11 +107,13 @@ protected:
 	UINT32 pclass;
 	UINT8 revision;
 	UINT16 command, command_mask, status;
+	const UINT8 *expansion_rom;
+	UINT32 expansion_rom_size;
+	UINT32 expansion_rom_base;
+	bool is_multifunction_device;
 
 	virtual void device_start();
 	virtual void device_reset();
-
-	static void scan_sub_devices(pci_device **devices, dynamic_array<pci_device *> &all, dynamic_array<pci_device *> &bridges, device_t *root);
 
 	void skip_map_regs(int count);
 	void add_map(UINT64 size, int flags, address_map_delegate &map);
@@ -116,6 +121,9 @@ protected:
 		address_map_delegate delegate(map, name, static_cast<T *>(this));
 		add_map(size, flags, delegate);
 	}
+
+	void add_rom(const UINT8 *data, UINT32 size);
+	void add_rom_from_region();
 };
 
 class agp_device : public pci_device {
@@ -139,10 +147,54 @@ public:
 
 	virtual DECLARE_READ8_MEMBER(header_type_r);
 
+	virtual DECLARE_ADDRESS_MAP(config_map, 32);
+
+	DECLARE_READ32_MEMBER (b_address_base_r);
+	DECLARE_WRITE32_MEMBER(b_address_base_w);
+	DECLARE_READ8_MEMBER  (primary_bus_r);
+	DECLARE_WRITE8_MEMBER (primary_bus_w);
+	DECLARE_READ8_MEMBER  (secondary_bus_r);
+	DECLARE_WRITE8_MEMBER (secondary_bus_w);
+	DECLARE_READ8_MEMBER  (subordinate_bus_r);
+	DECLARE_WRITE8_MEMBER (subordinate_bus_w);
+	DECLARE_READ8_MEMBER  (secondary_latency_r);
+	DECLARE_WRITE8_MEMBER (secondary_latency_w);
+	DECLARE_READ8_MEMBER  (iobase_r);
+	DECLARE_WRITE8_MEMBER (iobase_w);
+	DECLARE_READ8_MEMBER  (iolimit_r);
+	DECLARE_WRITE8_MEMBER (iolimit_w);
+	DECLARE_READ16_MEMBER (secondary_status_r);
+	DECLARE_WRITE16_MEMBER(secondary_status_w);
+	DECLARE_READ16_MEMBER (memory_base_r);
+	DECLARE_WRITE16_MEMBER(memory_base_w);
+	DECLARE_READ16_MEMBER (memory_limit_r);
+	DECLARE_WRITE16_MEMBER(memory_limit_w);
+	DECLARE_READ16_MEMBER (prefetch_base_r);
+	DECLARE_WRITE16_MEMBER(prefetch_base_w);
+	DECLARE_READ16_MEMBER (prefetch_limit_r);
+	DECLARE_WRITE16_MEMBER(prefetch_limit_w);
+	DECLARE_READ32_MEMBER (prefetch_baseu_r);
+	DECLARE_WRITE32_MEMBER(prefetch_baseu_w);
+	DECLARE_READ32_MEMBER (prefetch_limitu_r);
+	DECLARE_WRITE32_MEMBER(prefetch_limitu_w);
+	DECLARE_READ16_MEMBER (iobaseu_r);
+	DECLARE_WRITE16_MEMBER(iobaseu_w);
+	DECLARE_READ16_MEMBER (iolimitu_r);
+	DECLARE_WRITE16_MEMBER(iolimitu_w);
+	DECLARE_READ8_MEMBER  (interrupt_line_r);
+	DECLARE_WRITE8_MEMBER (interrupt_line_w);
+	DECLARE_READ8_MEMBER  (interrupt_pin_r);
+	DECLARE_WRITE8_MEMBER (interrupt_pin_w);
+	DECLARE_READ16_MEMBER (bridge_control_r);
+	DECLARE_WRITE16_MEMBER(bridge_control_w);
+
 protected:
 	pci_device *sub_devices[32*8];
 	dynamic_array<pci_device *> all_devices;
-	dynamic_array<pci_device *> all_bridges;
+	dynamic_array<pci_bridge_device *> all_bridges;
+
+	UINT8 primary_bus, secondary_bus, subordinate_bus;
+	UINT16 bridge_control;
 
 	virtual void device_start();
 	virtual void device_reset();
@@ -150,6 +202,13 @@ protected:
 
 	virtual device_t *bus_root();
 	virtual void regenerate_config_mapping();
+
+	UINT32 do_config_read(UINT8 bus, UINT8 device, UINT16 reg, UINT32 mem_mask);
+	UINT32 propagate_config_read(UINT8 bus, UINT8 device, UINT16 reg, UINT32 mem_mask);
+	UINT32 config_read(UINT8 bus, UINT8 device, UINT16 reg, UINT32 mem_mask);
+	void do_config_write(UINT8 bus, UINT8 device, UINT16 reg, UINT32 data, UINT32 mem_mask);
+	void propagate_config_write(UINT8 bus, UINT8 device, UINT16 reg, UINT32 data, UINT32 mem_mask);
+	void config_write(UINT8 bus, UINT8 device, UINT16 reg, UINT32 data, UINT32 mem_mask);
 
 private:
 	address_space_config configure_space_config;
@@ -188,8 +247,8 @@ protected:
 	DECLARE_READ32_MEMBER(config_data_r);
 	DECLARE_WRITE32_MEMBER(config_data_w);
 
-	UINT32 config_read(UINT8 bus, UINT8 device, UINT16 reg, UINT32 mem_mask);
-	void config_write(UINT8 bus, UINT8 device, UINT16 reg, UINT32 data, UINT32 mem_mask);
+	UINT32 root_config_read(UINT8 bus, UINT8 device, UINT16 reg, UINT32 mem_mask);
+	void root_config_write(UINT8 bus, UINT8 device, UINT16 reg, UINT32 data, UINT32 mem_mask);
 
 	void regenerate_mapping();
 };

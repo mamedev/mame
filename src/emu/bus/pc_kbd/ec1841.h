@@ -15,7 +15,6 @@
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "pc_kbdc.h"
-#include "machine/rescap.h"
 
 
 
@@ -80,7 +79,5 @@ private:
 
 // device type definition
 extern const device_type PC_KBD_EC_1841;
-
-
 
 #endif

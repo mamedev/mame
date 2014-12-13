@@ -73,7 +73,7 @@ public:
 	DECLARE_WRITE8_MEMBER( a5105_upd765_w );
 	DECLARE_WRITE8_MEMBER(pcg_addr_w);
 	DECLARE_WRITE8_MEMBER(pcg_val_w);
-	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<UINT16> m_video_ram;
 	UINT8 *m_ram_base;
 	UINT8 *m_rom_base;
 	UINT8 *m_char_ram;
@@ -100,9 +100,9 @@ UPD7220_DISPLAY_PIXELS_MEMBER( a5105_state::hgdc_display_pixels )
 	int xi,gfx;
 	UINT8 pen;
 
-	gfx = m_video_ram[address & 0x1ffff];
+	gfx = m_video_ram[(address & 0x1ffff) >> 1];
 
-	for(xi=0;xi<8;xi++)
+	for(xi=0;xi<16;xi++)
 	{
 		pen = ((gfx >> xi) & 1) ? 7 : 0;
 
@@ -120,8 +120,8 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( a5105_state::hgdc_draw_text )
 
 	for( x = 0; x < pitch; x++ )
 	{
-		tile = (m_video_ram[((addr+x)*2) & 0x1ffff] & 0xff);
-		color = (m_video_ram[((addr+x)*2+1) & 0x1ffff] & 0x0f);
+		tile = (m_video_ram[(((addr+x)*2) & 0x1ffff) >> 1] & 0xff);
+		color = ((m_video_ram[(((addr+x)*2) & 0x1ffff) >> 1] >> 8) & 0x0f);
 
 		for( yi = 0; yi < lr; yi++)
 		{
@@ -533,7 +533,7 @@ void a5105_state::video_start()
 	m_char_ram = memregion("pcg")->base();
 }
 
-static ADDRESS_MAP_START( upd7220_map, AS_0, 8, a5105_state)
+static ADDRESS_MAP_START( upd7220_map, AS_0, 16, a5105_state)
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END

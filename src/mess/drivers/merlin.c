@@ -38,7 +38,7 @@
 
 // master clock is a single stage RC oscillator: R=33K, C=100pf,
 // according to the TMS 1000 series data manual this is around 350kHz
-#define MERLIN_RC_CLOCK (350000)
+#define MASTER_CLOCK (350000)
 
 
 class merlin_state : public driver_device
@@ -177,11 +177,11 @@ static const INT16 speaker_levels[] = { 0, 32767, 0, 32767 }; // unknown too, du
 static MACHINE_CONFIG_START( merlin, merlin_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, MERLIN_RC_CLOCK)
+	MCFG_CPU_ADD("maincpu", TMS1100, MASTER_CLOCK)
 	MCFG_TMS1XXX_OUTPUT_PLA(merlin_output_pla)
-	MCFG_TMS1XXX_READ_K_CB(READ8( merlin_state, read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16( merlin_state, write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16( merlin_state, write_r))
+	MCFG_TMS1XXX_READ_K_CB(READ8(merlin_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(merlin_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(merlin_state, write_r))
 
 	MCFG_DEFAULT_LAYOUT(layout_merlin)
 

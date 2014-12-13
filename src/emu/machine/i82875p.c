@@ -240,7 +240,8 @@ READ16_MEMBER( i82875p_host_device::toud_r)
 WRITE16_MEMBER(i82875p_host_device::toud_w)
 {
 	COMBINE_DATA(&toud);
-	logerror("%s: toud = %08x\n", tag(), 512*toud);
+	toud &= ~7;
+	logerror("%s: toud = %08x\n", tag(), toud << 16);
 	remap_cb();
 }
 
@@ -309,21 +310,27 @@ READ8_MEMBER(  i82875p_host_device::capreg2_r)
 	return 0x00;
 }
 
+void i82875p_host_device::reset_all_mappings()
+{
+	pci_host_device::reset_all_mappings();
+
+	toud = 0x0400;
+	smram = 0x02;
+	esmramc = 0x38;
+	memset(pam, 0, sizeof(pam));
+}
+
 void i82875p_host_device::device_reset()
 {
 	pci_host_device::device_reset();
 
 	agpm = 0x00;
 	fpllcont = 0x00;
-	memset(pam, 0, sizeof(pam));
-	smram = 0x02;
-	esmramc = 0x38;
 	agpctrl = 0x00000000;
 	apsize = 0x00;
 	attbase = 0x00000000;
 	amtt = 0x10;
 	lptt = 0x10;
-	toud = 0x0400;
 	mchcfg = 0x0000;
 	errcmd = 0x0000;
 	smicmd = 0x0000;
@@ -406,7 +413,6 @@ void i82875p_host_device::map_extra(UINT64 memory_window_start, UINT64 memory_wi
 
 	if((esmramc & 0x40) && (smram & 0x08))
 		memory_space->install_ram      (0xfeda0000, 0xfedbffff, &ram[0x000a0000/4]);
-
 }
 
 
