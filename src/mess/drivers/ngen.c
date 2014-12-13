@@ -119,6 +119,7 @@ public:
 	DECLARE_WRITE8_MEMBER( dma_3_dack_w ){  }
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	DECLARE_WRITE8_MEMBER(fdc_control_w);
 
 protected:
 	virtual void machine_reset();
@@ -379,12 +380,13 @@ WRITE16_MEMBER(ngen_state::port00_w)
 }
 
 // returns X-bus module ID (what is the low byte for?)
+// For now, we'll hard code a floppy disk module (or try to)
 READ16_MEMBER(ngen_state::port00_r)
 {
 	if(m_port00 > 0)
 		m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 	if(m_port00 == 0)
-		return 0x4000;  // module ID of 0x40 = dual floppy disk module (need hardware manual to find other module IDs)
+		return 0x0040;  // module ID of 0x40 = dual floppy disk module (need hardware manual to find other module IDs)
 	else
 		return 0x0080;  // invalid device?
 }
@@ -396,7 +398,14 @@ WRITE_LINE_MEMBER(ngen_state::fdc_irq_w)
 
 WRITE_LINE_MEMBER(ngen_state::fdc_drq_w)
 {
-	// TODO
+	m_dmac->dreq3_w(state);
+}
+
+WRITE8_MEMBER(ngen_state::fdc_control_w)
+{
+	m_fdc->set_floppy(m_fd0->get_device());
+	m_fd0->get_device()->mon_w((~data) & 0x80);
+	m_fdc->dden_w(~data & 0x04);
 }
 
 WRITE_LINE_MEMBER( ngen_state::dma_hrq_changed )
@@ -474,9 +483,11 @@ MC6845_UPDATE_ROW( ngen_state::crtc_update_row )
 
 void ngen_state::machine_reset()
 {
+	m_port00 = 0;
 	m_control = 0;
 	m_viduart->write_dsr(0);
 	m_viduart->write_cts(0);
+	m_fd0->get_device()->set_rpm(300);
 }
 
 static ADDRESS_MAP_START( ngen_mem, AS_PROGRAM, 16, ngen_state )
@@ -490,7 +501,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ngen_io, AS_IO, 16, ngen_state )
 	AM_RANGE(0x0000, 0x0001) AM_READWRITE(port00_r,port00_w)
 	AM_RANGE(0x0100, 0x0107) AM_DEVREADWRITE8("fdc",wd2797_t,read,write,0x00ff)  // a guess for now
-	// port 0x0108 is used also, maybe for motor control/side select?
+	AM_RANGE(0x0108, 0x0109) AM_WRITE8(fdc_control_w,0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ngen386_mem, AS_PROGRAM, 32, ngen_state )
@@ -517,7 +528,7 @@ static SLOT_INTERFACE_START(keyboard)
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START( ngen_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( ngen, ngen_state )
@@ -577,7 +588,7 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("iouart", upd7201_device, dcdb_w))
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE("iouart", upd7201_device, rib_w))
 
-	// TODO: SCN2652 MPCC, used for RS-422 cluster communications?
+	// TODO: SCN2652 MPCC (not implemented), used for RS-422 cluster communications?
 
 	// video board
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -603,13 +614,14 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(ngen_state,timer_clk_out))
 
 	// floppy disk / hard disk module (WD2797 FDC, WD1010 HDC, plus an 8253 timer for each)
-	MCFG_WD2797x_ADD("fdc", XTAL_20MHz / 10)
+	MCFG_WD2797x_ADD("fdc", XTAL_20MHz / 20)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(ngen_state,fdc_irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(ngen_state,fdc_drq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("maincpu",i80186_cpu_device,drq1_w))
+	MCFG_WD_FDC_FORCE_READY
 	MCFG_DEVICE_ADD("fdc_timer", PIT8253, 0)
 	// TODO: WD1010 HDC (not implemented)
 	MCFG_DEVICE_ADD("hdc_timer", PIT8253, 0)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ngen_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ngen_floppies, "525qd", floppy_image_device::default_floppy_formats)
 
 MACHINE_CONFIG_END
 
