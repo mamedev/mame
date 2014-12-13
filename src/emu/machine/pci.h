@@ -193,8 +193,9 @@ protected:
 	dynamic_array<pci_device *> all_devices;
 	dynamic_array<pci_bridge_device *> all_bridges;
 
-	UINT8 primary_bus, secondary_bus, subordinate_bus;
-	UINT16 bridge_control;
+	UINT32 prefetch_baseu, prefetch_limitu;
+	UINT16 bridge_control, memory_base, memory_limit, prefetch_base, prefetch_limit, iobaseu, iolimitu;
+	UINT8 primary_bus, secondary_bus, subordinate_bus, iobase, iolimit;
 
 	virtual void device_start();
 	virtual void device_reset();
