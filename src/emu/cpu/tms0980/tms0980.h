@@ -61,6 +61,9 @@ public:
 	template<class _Object> static devcb_base &set_write_r_callback(device_t &device, _Object object) { return downcast<tms1xxx_cpu_device &>(device).m_write_r.set_callback(object); }
 	template<class _Object> static devcb_base &set_power_off_callback(device_t &device, _Object object) { return downcast<tms1xxx_cpu_device &>(device).m_power_off.set_callback(object); }
 	static void set_output_pla(device_t &device, const UINT16 *output_pla) { downcast<tms1xxx_cpu_device &>(device).c_output_pla = output_pla; }
+	
+	// driver debugging
+	UINT8 debug_peek_o_index() { return m_o_index; }
 
 protected:
 	// device-level overrides
@@ -69,7 +72,7 @@ protected:
 
 	// device_execute_interface overrides
 	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 1; }
+	virtual UINT32 execute_max_cycles() const { return 6; }
 	virtual UINT32 execute_input_lines() const { return 1; }
 	virtual void execute_run();
 
@@ -84,7 +87,7 @@ protected:
 
 	void next_pc();
 
-	virtual void write_o_output(UINT8 data);
+	virtual void write_o_output(UINT8 index);
 	virtual UINT8 read_k_input();
 	virtual void set_cki_bus();
 	virtual void dynamic_output() { ; } // not used by default
@@ -122,18 +125,14 @@ protected:
 	UINT8   m_pa;        // 4-bit page address register
 	UINT8   m_pb;        // 4-bit page buffer register
 	UINT8   m_a;         // 4-bit accumulator
-	UINT8   m_a_prev;
 	UINT8   m_x;         // 2,3,or 4-bit RAM X register
 	UINT8   m_y;         // 4-bit RAM Y register
 	UINT8   m_ca;        // chapter address bit
 	UINT8   m_cb;        // chapter buffer bit
 	UINT8   m_cs;        // chapter subroutine bit
 	UINT16  m_r;
-	UINT16  m_r_prev;
 	UINT16  m_o;
-	UINT8   m_o_latch;   // TMC0270 hold latch
-	UINT8   m_o_latch_low;
-	UINT8   m_o_latch_prev;
+	UINT8   m_o_index;
 	UINT8   m_cki_bus;
 	UINT8   m_c4;
 	UINT8   m_p;         // 4-bit adder p(lus)-input
@@ -252,7 +251,7 @@ protected:
 	virtual void device_reset();
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	virtual void write_o_output(UINT8 data);
+	virtual void write_o_output(UINT8 index);
 	
 	virtual void op_setr();
 	virtual void op_tdo();
@@ -291,16 +290,27 @@ public:
 
 protected:
 	// overrides
+	virtual void device_start();
+	virtual void device_reset();
+
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	virtual void write_o_output(UINT8 data) { tms1xxx_cpu_device::write_o_output(data); }
+	virtual void write_o_output(UINT8 index) { tms1xxx_cpu_device::write_o_output(index); }
 	virtual UINT8 read_k_input();
 	virtual void dynamic_output();
 	virtual void read_opcode();
 	
-	virtual void op_setr() { tms1xxx_cpu_device::op_setr(); }
-	virtual void op_rstr() { tms1xxx_cpu_device::op_rstr(); }
+	virtual void op_setr();
+	virtual void op_rstr();
 	virtual void op_tdo();
+
+private:
+	UINT8   m_a_prev;
+	UINT16  m_r_prev;
+
+	UINT8   m_o_latch_low;
+	UINT8   m_o_latch;
+	UINT8   m_o_latch_prev;
 };
 
 
