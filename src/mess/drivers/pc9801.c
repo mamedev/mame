@@ -1432,14 +1432,14 @@ void pc9801_state::egc_blit_w(UINT32 offset, UINT16 data, UINT16 mem_mask)
 	{
 		dst_off &= 7;
 		if(m_egc.first)
-			m_egc.count -= dir ? 7 - dst_off : dst_off;
+			m_egc.count -= dir ? 8 - dst_off : (dst_off + 1);
 		else
 			m_egc.count -= 8;
 	}
 	else
 	{
 		if(m_egc.first)
-			m_egc.count -= dir ? 15 - dst_off : dst_off;
+			m_egc.count -= dir ? 16 - dst_off : (dst_off + 1);
 		else
 			m_egc.count -= 16;
 	}
@@ -1455,7 +1455,7 @@ void pc9801_state::egc_blit_w(UINT32 offset, UINT16 data, UINT16 mem_mask)
 
 UINT16 pc9801_state::egc_blit_r(UINT32 offset, UINT16 mem_mask)
 {
-	UINT16 plane_off = offset & 0x13fff;
+	UINT32 plane_off = offset & 0x13fff;
 	if((m_egc.regs[2] & 0x300) == 0x100)
 	{
 		m_egc.pat[0] = m_video_ram_2[plane_off + 0x4000];
