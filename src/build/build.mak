@@ -31,7 +31,7 @@ PNG2BDC = $(PNG2BDC_TARGET)
 VERINFO = $(VERINFO_TARGET)
 
 ifneq ($(TERM),cygwin)
-ifeq ($(TARGETOS),win32)
+ifeq ($(OS),Windows_NT)
 MAKEDEP = $(subst /,\,$(MAKEDEP_TARGET))
 MAKEMAK = $(subst /,\,$(MAKEMAK_TARGET))
 MAKELIST = $(subst /,\,$(MAKELIST_TARGET))
