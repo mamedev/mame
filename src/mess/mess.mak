@@ -1773,7 +1773,7 @@ $(MESSOBJ)/toshiba.a:           \
 	$(MESS_DRIVERS)/pasopia7.o  \
 	$(MESS_DRIVERS)/paso1600.o  \
 
-$(MESSOBJ)/trainer.a: \
+$(MESSOBJ)/trainer.a:           \
 	$(MESS_DRIVERS)/amico2k.o   \
 	$(MESS_DRIVERS)/babbage.o   \
 	$(MESS_DRIVERS)/bob85.o     \
@@ -1799,11 +1799,12 @@ $(MESSOBJ)/trs.a:               \
 	$(MESS_MACHINE)/dragon.o    \
 	$(MESS_MACHINE)/dgnalpha.o  \
 	$(MESS_VIDEO)/gime.o        \
+	$(MESS_DRIVERS)/tandy12.o   \
 	$(MESS_DRIVERS)/trs80.o $(MESS_MACHINE)/trs80.o $(MESS_VIDEO)/trs80.o \
 	$(MESS_DRIVERS)/trs80m2.o $(MESS_MACHINE)/trs80m2kb.o \
 	$(MESS_DRIVERS)/tandy2k.o $(MESS_MACHINE)/tandy2kb.o \
 
-$(MESSOBJ)/ultratec.a:        \
+$(MESSOBJ)/ultratec.a:          \
 	$(MESS_DRIVERS)/minicom.o   \
 
 $(MESSOBJ)/unisys.a:            \
@@ -1856,7 +1857,7 @@ $(MESSOBJ)/xerox.a:             \
 	$(MESS_DRIVERS)/bigbord2.o  \
 	$(MESS_DRIVERS)/alto2.o     \
 
-$(MESSOBJ)/xussrpc.a:            \
+$(MESSOBJ)/xussrpc.a:           \
 	$(MESS_DRIVERS)/ec184x.o    \
 	$(MESS_DRIVERS)/iskr103x.o  \
 	$(MESS_DRIVERS)/mc1502.o    \
@@ -2166,6 +2167,7 @@ $(MESS_DRIVERS)/supercon.o: $(MESS_LAYOUT)/supercon.lh
 $(MESS_DRIVERS)/svision.o:  $(MESS_LAYOUT)/svision.lh
 $(MESS_DRIVERS)/svmu.o:     $(MESS_LAYOUT)/svmu.lh
 $(MESS_DRIVERS)/sym1.o:     $(MESS_LAYOUT)/sym1.lh
+$(MESS_DRIVERS)/tandy12.o:  $(MESS_LAYOUT)/tandy12.lh
 $(MESS_DRIVERS)/tavernie.o: $(MESS_LAYOUT)/tavernie.lh
 $(MESS_DRIVERS)/tec1.o:     $(MESS_LAYOUT)/tec1.lh
 $(MESS_DRIVERS)/tecnbras.o: $(MESS_LAYOUT)/tecnbras.lh
