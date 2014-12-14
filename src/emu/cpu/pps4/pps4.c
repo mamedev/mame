@@ -1187,10 +1187,12 @@ void pps4_device::iRTNSK()
  * inverted are placed on the data lines for acceptance by
  * the I/O. At the same time, input data received by the I/O
  * device is transferred to the accumulator inverted.
+ *
+ * FIXME: Is BL on the I/D:8-5 lines during the I/O cycle?
  */
 void pps4_device::iIOL()
 {
-    UINT8 ac = ~m_A & 15;
+    UINT8 ac = ((m_B & 15) << 4) | (~m_A & 15);
     m_I2 = ARG();
     m_io->write_byte(m_I2, ac);
     LOG(("%s: port:%02x <- %x\n", __FUNCTION__, m_I2, ac));

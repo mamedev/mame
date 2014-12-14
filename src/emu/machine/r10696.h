@@ -22,7 +22,7 @@
  *
  *************************************/
 
-/* Set the writer used to update a display digit */
+/* Set the read and write group (4-bit; nibble) delegates */
 #define MCFG_R10696_IO(_devcb_rd,_devcb_wr) \
     r10696_device::set_iord(*device, DEVCB_##_devcb_rd); \
     r10696_device::set_iowr(*device, DEVCB_##_devcb_wr);
