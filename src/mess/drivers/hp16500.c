@@ -94,7 +94,7 @@ UINT32 hp16500_state::screen_update_hp16500(screen_device &screen, bitmap_rgb32 
 {
 	UINT32 *scanline;
 	int x, y;
-	UINT8 pixels;
+	UINT32 pixels;
 
 	for (y = 0; y < 400; y++)
 	{
@@ -104,6 +104,16 @@ UINT32 hp16500_state::screen_update_hp16500(screen_device &screen, bitmap_rgb32 
 		{
 			pixels = m_vram[(y * (288/4)) + x];
 
+			UINT8 gfx = ((pixels & 0xf0000) >> 12) | (pixels & 15);
+			*scanline++ = m_palette[BIT(gfx, 7) ? 2 : 0];
+			*scanline++ = m_palette[BIT(gfx, 6) ? 2 : 0];
+			*scanline++ = m_palette[BIT(gfx, 5) ? 2 : 0];
+			*scanline++ = m_palette[BIT(gfx, 4) ? 2 : 0];
+			*scanline++ = m_palette[BIT(gfx, 3) ? 2 : 0];
+			*scanline++ = m_palette[BIT(gfx, 2) ? 2 : 0];
+			*scanline++ = m_palette[BIT(gfx, 1) ? 2 : 0];
+			*scanline++ = m_palette[BIT(gfx, 0) ? 2 : 0];
+#if 0
 			*scanline++ = m_palette[((pixels&0xf0000000)>>28)];
 			*scanline++ = m_palette[((pixels&0xf000000)>>24)];
 			*scanline++ = m_palette[((pixels&0xf00000)>>20)];
@@ -112,6 +122,7 @@ UINT32 hp16500_state::screen_update_hp16500(screen_device &screen, bitmap_rgb32 
 			*scanline++ = m_palette[((pixels&0xf00)>>8)];
 			*scanline++ = m_palette[((pixels&0xf0)>>4)];
 			*scanline++ = m_palette[(pixels&0xf)];
+#endif
 		}
 	}
 
