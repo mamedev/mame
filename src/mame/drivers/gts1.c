@@ -108,8 +108,10 @@ public:
 private:
     virtual void machine_reset();
     required_device<cpu_device> m_maincpu;
-    UINT8 m_io[256];
-    UINT8 m_nvram_addr;
+    UINT8 m_io[256];            //!< dummy I/O values of undefined ranges (will be removed)
+    UINT8 m_nvram_addr;         //!< NVRAM address
+    bool m_nvram_e2;            //!< NVRWAM enable (E2 line)
+    bool m_nvram_wr;            //!< NVRWAM write (W/R line)
     UINT16 m_6351_addr;
     UINT16 m_z30_out;
 };
@@ -216,6 +218,8 @@ INPUT_PORTS_END
 void gts1_state::machine_reset()
 {
     m_nvram_addr = 0;
+    m_nvram_e2 = false;
+    m_nvram_wr = false;
     m_6351_addr = 0;
     m_z30_out = 0;
 }
@@ -233,7 +237,52 @@ READ8_MEMBER (gts1_state::gts1_solenoid_r)
 
 WRITE8_MEMBER(gts1_state::gts1_solenoid_w)
 {
-    LOG(("%s: solenoid[%02x] <- %x\n", __FUNCTION__, offset, data));
+    switch (offset) {
+    case  0:
+        LOG(("%s: outhole <- %x\n", __FUNCTION__, data));
+        break;
+    case  1:
+        LOG(("%s: knocker <- %x\n", __FUNCTION__, data));
+        break;
+    case  2:
+        LOG(("%s: tens chime <- %x\n", __FUNCTION__, data));
+        break;
+    case  3:
+        LOG(("%s: hundreds chime <- %x\n", __FUNCTION__, data));
+        break;
+    case  4:
+        LOG(("%s: thousands chime <- %x\n", __FUNCTION__, data));
+        break;
+    case  5:
+        LOG(("%s: no. 6 <- %x\n", __FUNCTION__, data));
+        break;
+    case  6:
+        LOG(("%s: no. 7 <- %x\n", __FUNCTION__, data));
+        break;
+    case  7:
+        LOG(("%s: no. 8 <- %x\n", __FUNCTION__, data));
+        break;
+    case  8:
+    case  9:
+    case 10:
+    case 11:
+        LOG(("%s: not used [%x] <- %x\n", __FUNCTION__, offset, data));
+        break;
+    case 12:    // spare
+        LOG(("%s: spare [%x] <- %x\n", __FUNCTION__, offset, data));
+        break;
+    case 13:    // RAM control E2
+        LOG(("%s: RAM control E2 <- %x\n", __FUNCTION__, data));
+        m_nvram_e2 = (data & 1) ? true : false;
+        break;
+    case 14:    // RAM control W/R
+        LOG(("%s: RAM control W/R <- %x\n", __FUNCTION__, data));
+        break;
+        m_nvram_wr = (data & 1) ? true : false;
+    case 15:    // spare
+        LOG(("%s: spare [%x] <- %x\n", __FUNCTION__, offset, data));
+        break;
+    }
 }
 
 READ8_MEMBER (gts1_state::gts1_switches_r)
@@ -327,6 +376,9 @@ READ8_MEMBER (gts1_state::gts1_nvram_r)
     {
         case 0: // group A
             // FIXME: Schematics says TO Z5
+            if (!m_nvram_wr && m_nvram_e2) {
+                // FIXME: read generic NVRAM data
+            }
             break;
         case 1: // group B
         case 2: // group C
@@ -352,8 +404,10 @@ WRITE8_MEMBER(gts1_state::gts1_nvram_w)
             m_nvram_addr = (m_nvram_addr & ~(15 << 4)) | ((data & 15) << 4);
             break;
         case 2: // group C - data bits 3:0 of NVRAM
-            // FIXME: schematics says write enable is U4-36 (O14)
-            LOG(("%s: nvram[%02x] <- %x\n", __FUNCTION__, m_nvram_addr, data & 15));
+            if (m_nvram_wr && m_nvram_e2) {
+                LOG(("%s: nvram[%02x] <- %x\n", __FUNCTION__, m_nvram_addr, data & 15));
+                // FIXME: write generic NVRAM data
+            }
             break;
     }
 }
@@ -515,13 +569,13 @@ static MACHINE_CONFIG_START( gts1, gts1_state )
 
     /* A1753CE 2048 x 8 ROM (000-7ff), 128 x 4 RAM (00-7f) and 16 I/O lines (20 ... 2f) */
     MCFG_DEVICE_ADD( "ra17xx_u5", RA17XX, 0 )
-    MCFG_RA17XX_READ ( READ8 (gts1_state,gts1_solenoid_r) )
-    MCFG_RA17XX_WRITE( WRITE8(gts1_state,gts1_solenoid_w) )
+    MCFG_RA17XX_READ ( READ8 (gts1_state,gts1_switches_r) )
+    MCFG_RA17XX_WRITE( WRITE8(gts1_state,gts1_switches_w) )
 
     /* A1752CF 2048 x 8 ROM (800-fff), 128 x 4 RAM (80-ff) and 16 I/O lines (40 ... 4f) */
     MCFG_DEVICE_ADD( "ra17xx_u4", RA17XX, 0 )
-    MCFG_RA17XX_READ ( READ8 (gts1_state,gts1_switches_r) )
-    MCFG_RA17XX_WRITE( WRITE8(gts1_state,gts1_switches_w) )
+    MCFG_RA17XX_READ ( READ8 (gts1_state,gts1_solenoid_r) )
+    MCFG_RA17XX_WRITE( WRITE8(gts1_state,gts1_solenoid_w) )
 
     /* 10696 General Purpose Input/Output */
     MCFG_DEVICE_ADD( "r10696_u2", R10696, 0 )
