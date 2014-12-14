@@ -135,6 +135,7 @@
 /************************************************************************/
 
 #include "emu.h"
+#include "sound/vgmwrite.h"
 #include "fm.h"
 
 /* shared function building option */
@@ -693,6 +694,8 @@ struct YM2612
 	/* dac output (YM2612) */
 	int         dacen;
 	INT32       dacout;
+
+	UINT16      vgm_idx;            /* VGM index */
 };
 
 /* log output level */
@@ -2390,6 +2393,9 @@ void * ym2612_init(void *param, device_t *device, int clock, int rate,
 #ifdef __SAVE_H__
 	YM2612_save_state(F2612, device);
 #endif
+
+	F2612->vgm_idx = vgm_open(VGMC_YM2612, F2612->OPN.ST.clock);
+
 	return F2612;
 }
 
@@ -2472,6 +2478,7 @@ int ym2612_write(void *chip, int a, UINT8 v)
 			break;  /* verified on real YM2608 */
 
 		addr = F2612->OPN.ST.address;
+		vgm_write(F2612->vgm_idx, 0x00, addr, v);
 		F2612->REGS[addr] = v;
 		switch( addr & 0xf0 )
 		{
@@ -2509,6 +2516,7 @@ int ym2612_write(void *chip, int a, UINT8 v)
 			break;  /* verified on real YM2608 */
 
 		addr = F2612->OPN.ST.address;
+		vgm_write(F2612->vgm_idx, 0x01, addr, v);
 		F2612->REGS[addr | 0x100] = v;
 		ym2612_update_req(F2612->OPN.ST.param);
 		OPNWriteReg(&(F2612->OPN),addr | 0x100,v);

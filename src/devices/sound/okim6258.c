@@ -12,6 +12,7 @@
 
 
 #include "emu.h"
+#include "sound/vgmwrite.h"
 #include "okim6258.h"
 
 #define COMMAND_STOP        (1 << 0)
@@ -116,10 +117,17 @@ void okim6258_device::device_start()
 
 	m_divider = dividers[m_start_divider];
 
-	m_stream = stream_alloc(0, 1, clock()/m_divider);
+	//m_stream = stream_alloc(0, 1, clock()/m_divider);
+	m_stream = stream_alloc(0, 2, clock()/m_divider);
 
 	m_signal = -2;
 	m_step = 0;
+	m_pan = 0x00;
+
+	m_vgm_idx = vgm_open(VGMC_OKIM6258, m_master_clock);
+	vgm_header_set(m_vgm_idx, 0x01, m_divider);
+	vgm_header_set(m_vgm_idx, 0x02, m_adpcm_type);
+	vgm_header_set(m_vgm_idx, 0x03, m_output_bits);
 
 	okim6258_state_save_register();
 }
@@ -136,6 +144,8 @@ void okim6258_device::device_reset()
 	m_signal = -2;
 	m_step = 0;
 	m_status = 0;
+	
+	m_pan = 0x00;
 }
 
 
@@ -145,9 +155,12 @@ void okim6258_device::device_reset()
 
 void okim6258_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	stream_sample_t *buffer = outputs[0];
+	//stream_sample_t *buffer = outputs[0];
+	stream_sample_t *bufL = outputs[0];
+	stream_sample_t *bufR = outputs[1];
 
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
+	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
 
 	if (m_status & STATUS_PLAYING)
 	{
@@ -163,7 +176,9 @@ void okim6258_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 
 			nibble_shift ^= 4;
 
-			*buffer++ = sample;
+			//*buffer++ = sample;
+			*bufL++ = (m_pan & 0x02) ? 0 : sample;
+			*bufR++ = (m_pan & 0x01) ? 0 : sample;
 			samples--;
 		}
 
@@ -174,7 +189,11 @@ void okim6258_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 	{
 		/* Fill with 0 */
 		while (samples--)
-			*buffer++ = 0;
+		{
+			//*buffer++ = 0;
+			*bufL++ = 0;
+			*bufR++ = 0;
+		}
 	}
 }
 
@@ -233,6 +252,8 @@ void okim6258_device::set_divider(int val)
 {
 	int divider = dividers[val];
 
+	vgm_write(m_vgm_idx, 0x00, 0x0C, val);
+
 	m_divider = dividers[val];
 	m_stream->set_sample_rate(m_master_clock / divider);
 }
@@ -246,6 +267,11 @@ void okim6258_device::set_divider(int val)
 
 void okim6258_device::set_clock(int val)
 {
+	vgm_write(m_vgm_idx, 0x00, 0x08, (val >>  0) & 0xFF);
+	vgm_write(m_vgm_idx, 0x00, 0x09, (val >>  8) & 0xFF);
+	vgm_write(m_vgm_idx, 0x00, 0x0A, (val >> 16) & 0xFF);
+	vgm_write(m_vgm_idx, 0x00, 0x0B, (val >> 24) & 0xFF);
+
 	m_master_clock = val;
 	m_stream->set_sample_rate(m_master_clock / m_divider);
 }
@@ -287,6 +313,8 @@ WRITE8_MEMBER( okim6258_device::okim6258_data_w )
 	/* update the stream */
 	m_stream->update();
 
+	vgm_write(m_vgm_idx, 0x00, 0x01, data);
+
 	m_data_in = data;
 	m_nibble_shift = 0;
 }
@@ -301,6 +329,8 @@ WRITE8_MEMBER( okim6258_device::okim6258_data_w )
 WRITE8_MEMBER( okim6258_device::okim6258_ctrl_w )
 {
 	m_stream->update();
+
+	vgm_write(m_vgm_idx, 0x00, 0x00, data);
 
 	if (data & COMMAND_STOP)
 	{
@@ -334,4 +364,14 @@ WRITE8_MEMBER( okim6258_device::okim6258_ctrl_w )
 	{
 		m_status &= ~STATUS_RECORDING;
 	}
+}
+
+WRITE8_MEMBER( okim6258_device::okim6258_pan_w )
+{
+	/* update the stream */
+	m_stream->update();
+
+	vgm_write(m_vgm_idx, 0x00, 0x02, data);
+
+	m_pan = data;
 }

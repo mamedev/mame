@@ -32,7 +32,7 @@
 #include "emu.h"
 #include "sound/cdda.h"
 #include "scsp.h"
-
+#include "sound/vgmwrite.h"
 
 #define ICLIP16(x) (x<-32768)?-32768:((x>32767)?32767:x)
 
@@ -514,10 +514,15 @@ void scsp_device::init()
 		m_Master=0;
 	}
 
+	vgm_idx = vgm_open(VGMC_SCSP, clock() ? clock() : (44100*512));
+
 	m_SCSPRAM = region()->base();
 	if (m_SCSPRAM)
 	{
 		m_SCSPRAM_LENGTH = region()->bytes();
+		vgm_write_large_data(vgm_idx, 0x02, m_SCSPRAM_LENGTH, 0x00, 0x00, m_SCSPRAM);
+		if (m_roffset)
+			logerror("SCSP Ram Offset: %06X\n", m_roffset);
 		m_DSP.SCSPRAM = (UINT16 *)m_SCSPRAM;
 		m_DSP.SCSPRAM_LENGTH = m_SCSPRAM_LENGTH/2;
 		m_SCSPRAM += m_roffset;
@@ -722,14 +727,15 @@ void scsp_device::UpdateReg(address_space &space, int reg)
 		case 0x19:
 			if(m_Master)
 			{
-				UINT32 time;
+				double time;
 
 				m_TimPris[0]=1<<((m_udata.data[0x18/2]>>8)&0x7);
 				m_TimCnt[0]=(m_udata.data[0x18/2]&0xff)<<8;
 
 				if ((m_udata.data[0x18/2]&0xff) != 255)
 				{
-					time = (44100 / m_TimPris[0]) / (255-(m_udata.data[0x18/2]&0xff));
+					time = (44100.0 / m_TimPris[0]) / (255-(m_udata.data[0x18/2]&0xff));
+
 					if (time)
 					{
 						m_timerA->adjust(attotime::from_hz(time));
@@ -741,14 +747,14 @@ void scsp_device::UpdateReg(address_space &space, int reg)
 		case 0x1b:
 			if(m_Master)
 			{
-				UINT32 time;
+				double time;
 
 				m_TimPris[1]=1<<((m_udata.data[0x1A/2]>>8)&0x7);
 				m_TimCnt[1]=(m_udata.data[0x1A/2]&0xff)<<8;
 
 				if ((m_udata.data[0x1A/2]&0xff) != 255)
 				{
-					time = (44100 / m_TimPris[1]) / (255-(m_udata.data[0x1A/2]&0xff));
+					time = (44100.0 / m_TimPris[1]) / (255-(m_udata.data[0x1A/2]&0xff));
 					if (time)
 					{
 						m_timerB->adjust(attotime::from_hz(time));
@@ -760,14 +766,14 @@ void scsp_device::UpdateReg(address_space &space, int reg)
 		case 0x1D:
 			if(m_Master)
 			{
-				UINT32 time;
+				double time;
 
 				m_TimPris[2]=1<<((m_udata.data[0x1C/2]>>8)&0x7);
 				m_TimCnt[2]=(m_udata.data[0x1C/2]&0xff)<<8;
 
 				if ((m_udata.data[0x1C/2]&0xff) != 255)
 				{
-					time = (44100 / m_TimPris[2]) / (255-(m_udata.data[0x1C/2]&0xff));
+					time = (44100.0 / m_TimPris[2]) / (255-(m_udata.data[0x1C/2]&0xff));
 					if (time)
 					{
 						m_timerC->adjust(attotime::from_hz(time));
@@ -1297,6 +1303,7 @@ void scsp_device::exec_dma(address_space &space)
 	logerror("SCSP: DMA transfer START\n"
 				"DMEA: %04x DRGA: %04x DTLG: %04x\n"
 				"DGATE: %d  DDIR: %d\n",m_dma.dmea,m_dma.drga,m_dma.dtlg,m_dma.dgate ? 1 : 0,m_dma.ddir ? 1 : 0);
+	vgm_write_large_data(vgm_idx, 0x01, m_SCSPRAM_LENGTH, m_dma.dmea, m_dma.dtlg, m_SCSPRAM + m_dma.dmea);
 
 	/* Copy the dma values in a temp storage for resuming later */
 		/* (DMA *can't* overwrite its parameters).                  */
@@ -1408,9 +1415,49 @@ WRITE16_MEMBER( scsp_device::write )
 
 	m_stream->update();
 
+	//logerror("SCSP write: Offset %04X, MemMask %04X Data %04X\n", offset, mem_mask, data);
+	if (mem_mask & 0xFF00)
+		vgm_write(vgm_idx, 0x00, (offset << 1) | 0x00, (data & 0xFF00) >> 8);
+	if (mem_mask & 0x00FF)
+		vgm_write(vgm_idx, 0x00, (offset << 1) | 0x01, (data & 0x00FF) >> 0);
+
 	tmp = r16(space, offset*2);
 	COMBINE_DATA(&tmp);
 	w16(space,offset*2, tmp);
+}
+
+/*READ16_MEMBER( scsp_device::scsp_mem_r )
+{
+	scsp_state *scsp = get_safe_token(device);
+	UINT16* ScspRam = (UINT16*)scsp->SCSPRAM;
+
+	//logerror("Trying to read RAM Offset %06X, Mem Mask %04X\n", offset, mem_mask);
+	offset &= 0x3FFFF;
+	return ScspRam[offset] & mem_mask;
+}*/
+
+#define ADDR_HIGH(x)	(((x) >> 16) & 0x07)
+#define ADDR_LOW(x)		((x) & 0xFFFF)
+WRITE16_MEMBER( scsp_device::scsp_mem_w )
+{
+	UINT16* ScspRam = (UINT16*)m_SCSPRAM;
+	UINT16 tmp;
+	
+	offset &= 0x3FFFF;
+	tmp = ScspRam[offset];
+	COMBINE_DATA(&tmp);
+	ScspRam[offset] = tmp;
+	
+	offset <<= 1;
+	if (offset >= 0x08000)	// don't log the RAM areas used by the audio cpu
+	{
+		if (ACCESSING_BITS_8_15)
+			vgm_write(vgm_idx, 0x80 | ADDR_HIGH(offset), ADDR_LOW(offset) | 0x00, (data & 0xFF00) >> 8);
+		if (ACCESSING_BITS_0_7)
+			vgm_write(vgm_idx, 0x80 | ADDR_HIGH(offset), ADDR_LOW(offset) | 0x01, (data & 0x00FF) >> 0);
+	}
+	
+	return;
 }
 
 WRITE16_MEMBER( scsp_device::midi_in )

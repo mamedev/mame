@@ -116,6 +116,8 @@ protected:
 	direct_read_data *  m_direct;
 
 	static const UINT8 s_volume_table[16];
+
+	UINT16 m_vgm_idx;
 };
 
 

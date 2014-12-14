@@ -50,6 +50,8 @@ private:
 	INT16 m_volume_table[32];
 	UINT32 m_noise_freq_tab[32];
 	UINT32 m_wave_freq_tab[4096];
+	
+	UINT16 m_vgm_idx;
 };
 
 extern const device_type C6280;

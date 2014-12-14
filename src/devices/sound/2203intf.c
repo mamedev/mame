@@ -133,7 +133,7 @@ void ym2203_device::device_start()
 	m_stream = machine().sound().stream_alloc(*this,0,1,rate, stream_update_delegate(FUNC(ym2203_device::stream_generate),this));
 
 	/* Initialize FM emurator */
-	m_chip = ym2203_init(this,this,clock(),rate,timer_handler,IRQHandler,&psgintf);
+	m_chip = ym2203_init(this,this,clock(),rate,timer_handler,IRQHandler,&psgintf,ay8910_device::m_flags);
 	assert_always(m_chip != NULL, "Error creating YM2203 chip");
 }
 

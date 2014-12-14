@@ -60,6 +60,7 @@ private:
 	sound_stream *  m_stream;
 	UINT8 *         m_rom;
 	UINT32          m_rom_size;
+	UINT16          m_vgm_idx;
 
 	// live state
 	UINT8           m_portdata[4];

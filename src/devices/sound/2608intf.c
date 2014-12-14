@@ -150,7 +150,7 @@ void ym2608_device::device_start()
 	/* initialize YM2608 */
 	m_chip = ym2608_init(this,this,clock(),rate,
 					pcmbufa,pcmsizea,
-					timer_handler,IRQHandler,&psgintf);
+					timer_handler,IRQHandler,&psgintf,ay8910_device::m_flags);
 	assert_always(m_chip != NULL, "Error creating YM2608 chip");
 }
 

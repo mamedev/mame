@@ -255,6 +255,8 @@ files {
 	MAME_DIR .. "src/devices/sound/flt_rc.h",
 	MAME_DIR .. "src/emu/sound/wavwrite.c",
 	MAME_DIR .. "src/emu/sound/wavwrite.h",
+	MAME_DIR .. "src/emu/sound/vgmwrite.c",
+	MAME_DIR .. "src/emu/sound/vgmwrite.h",
 	MAME_DIR .. "src/devices/sound/samples.c",
 	MAME_DIR .. "src/devices/sound/samples.h",
 	MAME_DIR .. "src/emu/drivers/empty.c",

@@ -96,6 +96,7 @@ private:
 	//I include these in the chip because they depend on the chip clock
 	unsigned int m_ARStep[0x40], m_DRStep[0x40]; //Envelope step table
 	unsigned int m_FNS_Table[0x400];      //Frequency step table
+	UINT16 m_vgm_idx;                 // VGM index
 
 	void EG_Calc(SLOT *slot);
 	void LFO_ComputeStep(LFO_t *LFO,UINT32 LFOF,UINT32 LFOS,int ALFO);

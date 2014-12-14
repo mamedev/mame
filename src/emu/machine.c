@@ -82,6 +82,7 @@
 #include "unzip.h"
 #include "debug/debugcon.h"
 #include "debug/debugvw.h"
+#include "sound/vgmwrite.h"
 
 #include <time.h>
 
@@ -281,6 +282,9 @@ void running_machine::start()
 	// this is where decryption is done and memory maps are altered
 	// so this location in the init order is important
 	ui().set_startup_text("Initializing...", true);
+
+	// call the Initialisation for VGM logging (MUST be called before driver init)
+	vgm_start(*this);
 
 	// register callbacks for the devices, then start them
 	add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(running_machine::reset_all_devices), this));
@@ -1152,6 +1156,9 @@ void running_machine::stop_all_devices()
 	device_iterator iter(root_device());
 	for (device_t *device = iter.first(); device != NULL; device = iter.next())
 		device->stop();
+
+	// stop VGM logging
+	vgm_stop();
 }
 
 

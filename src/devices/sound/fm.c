@@ -114,8 +114,11 @@
 /************************************************************************/
 
 #include "emu.h"
+#include "sound/vgmwrite.h"
 #include "fm.h"
 
+
+extern const device_type YM2610B;	// YM2610B mode detection
 
 /* include external DELTA-T unit (when needed) */
 #if (BUILD_YM2608||BUILD_YM2610||BUILD_YM2610B)
@@ -2093,6 +2096,7 @@ struct YM2203
 	UINT8 REGS[256];        /* registers         */
 	FM_OPN OPN;             /* OPN state         */
 	FM_CH CH[3];            /* channel state     */
+	UINT16 vgm_idx;         /* VGM index */
 };
 
 /* Generate samples for one of the YM2203s */
@@ -2258,7 +2262,8 @@ static void YM2203_save_state(YM2203 *F2203, device_t *device)
    'rate' is sampling rate
 */
 void * ym2203_init(void *param, device_t *device, int clock, int rate,
-				FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg)
+				FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg,
+				int psg_flags)
 {
 	YM2203 *F2203;
 
@@ -2285,6 +2290,10 @@ void * ym2203_init(void *param, device_t *device, int clock, int rate,
 #ifdef __SAVE_H__
 	YM2203_save_state(F2203, device);
 #endif
+
+	F2203->vgm_idx = vgm_open(VGMC_YM2203, F2203->OPN.ST.clock);
+	vgm_header_set(F2203->vgm_idx, 0x01, psg_flags);
+
 	return F2203;
 }
 
@@ -2312,11 +2321,15 @@ int ym2203_write(void *chip,int a,UINT8 v)
 
 		/* prescaler select : 2d,2e,2f  */
 		if( v >= 0x2d && v <= 0x2f )
+		{
+			vgm_write(F2203->vgm_idx, 0x00, v, 1);
 			OPNPrescaler_w(OPN , v , 1);
+		}
 	}
 	else
 	{   /* data port */
 		int addr = OPN->ST.address;
+		vgm_write(F2203->vgm_idx, 0x00, addr, v);
 		F2203->REGS[addr] = v;
 		switch( addr & 0xf0 )
 		{
@@ -2422,6 +2435,8 @@ struct YM2610
 
 	UINT8       flagmask;           /* YM2608 only */
 	UINT8       irqmask;            /* YM2608 only */
+
+	UINT16      vgm_idx;            /* VGM index */
 };
 
 /* here is the virtual YM2608 */
@@ -2934,7 +2949,8 @@ static void YM2608_deltat_status_reset(void *chip, UINT8 changebits)
 /* YM2608(OPNA) */
 void * ym2608_init(void *param, device_t *device, int clock, int rate,
 				void *pcmrom,int pcmsize,
-				FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg)
+				FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg,
+				int psg_flags)
 {
 	YM2608 *F2608;
 
@@ -2982,6 +2998,11 @@ void * ym2608_init(void *param, device_t *device, int clock, int rate,
 #ifdef __SAVE_H__
 	YM2608_save_state(F2608, device);
 #endif
+
+	F2608->vgm_idx = vgm_open(VGMC_YM2608, F2608->OPN.ST.clock);
+	vgm_header_set(F2608->vgm_idx, 0x01, psg_flags);
+	vgm_write_large_data(F2608->vgm_idx, 0x01, F2608->deltaT.memory_size, 0x00, 0x00, F2608->deltaT.memory);
+
 	return F2608;
 }
 
@@ -3097,6 +3118,7 @@ int ym2608_write(void *chip, int a,UINT8 v)
 		/* prescaler selecter : 2d,2e,2f  */
 		if( v >= 0x2d && v <= 0x2f )
 		{
+			vgm_write(F2608->vgm_idx, 0x00, v, 2);
 			OPNPrescaler_w(OPN , v , 2);
 			F2608->deltaT.freqbase = OPN->ST.freqbase;
 		}
@@ -3107,6 +3129,7 @@ int ym2608_write(void *chip, int a,UINT8 v)
 			break;  /* verified on real YM2608 */
 
 		addr = OPN->ST.address;
+		vgm_write(F2608->vgm_idx, 0x00, addr, v);
 		F2608->REGS[addr] = v;
 		switch(addr & 0xf0)
 		{
@@ -3145,6 +3168,7 @@ int ym2608_write(void *chip, int a,UINT8 v)
 			break;  /* verified on real YM2608 */
 
 		addr = OPN->ST.address;
+		vgm_write(F2608->vgm_idx, 0x01, addr, v);
 		F2608->REGS[addr | 0x100] = v;
 		ym2608_update_req(OPN->ST.param);
 		switch( addr & 0xf0 )
@@ -3618,6 +3642,7 @@ void *ym2610_init(void *param, device_t *device, int clock, int rate,
 
 {
 	YM2610 *F2610;
+	UINT8 mode_b;
 
 	/* allocate extend state space */
 	F2610 = auto_alloc_clear(device->machine(), YM2610);
@@ -3655,6 +3680,13 @@ void *ym2610_init(void *param, device_t *device, int clock, int rate,
 #ifdef __SAVE_H__
 	YM2610_save_state(F2610, device);
 #endif
+
+	F2610->vgm_idx = vgm_open(VGMC_YM2610, F2610->OPN.ST.clock);
+	mode_b = (device->type() == YM2610B);
+	vgm_header_set(F2610->vgm_idx, 0x00, mode_b);	// set YM2610B mode
+	vgm_write_large_data(F2610->vgm_idx, 0x01, F2610->pcm_size, 0x00, 0x00, F2610->pcmbuf);
+	vgm_write_large_data(F2610->vgm_idx, 0x02, F2610->deltaT.memory_size, 0x00, 0x00, F2610->deltaT.memory);
+
 	return F2610;
 }
 
@@ -3775,6 +3807,7 @@ int ym2610_write(void *chip, int a, UINT8 v)
 			break;  /* verified on real YM2608 */
 
 		addr = OPN->ST.address;
+		vgm_write(F2610->vgm_idx, 0x00, addr, v);
 		F2610->REGS[addr] = v;
 		switch(addr & 0xf0)
 		{
@@ -3844,6 +3877,7 @@ int ym2610_write(void *chip, int a, UINT8 v)
 
 		ym2610_update_req(OPN->ST.param);
 		addr = OPN->ST.address;
+		vgm_write(F2610->vgm_idx, 0x01, addr, v);
 		F2610->REGS[addr | 0x100] = v;
 		if( addr < 0x30 )
 			/* 100-12f : ADPCM A section */

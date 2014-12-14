@@ -53,6 +53,7 @@
 *********************************************************/
 
 #include "emu.h"
+#include "sound/vgmwrite.h"
 #include "k053260.h"
 
 #define LOG 0
@@ -96,6 +97,9 @@ void k053260_device::device_start()
 	memory_region *ROM = (m_rgnoverride) ? owner()->memregion(m_rgnoverride) : region();
 	m_rom = ROM->base();
 	m_rom_size = ROM->bytes();
+
+	m_vgm_idx = vgm_open(VGMC_K053260, clock());
+	vgm_write_large_data(m_vgm_idx, 0x01, m_rom_size, 0x00, 0x00, m_rom);
 
 	m_stream = stream_alloc( 0, 2, clock() / CLOCKS_PER_SAMPLE );
 
@@ -169,6 +173,7 @@ READ8_MEMBER( k053260_device::read )
 WRITE8_MEMBER( k053260_device::write )
 {
 	offset &= 0x3f;
+	vgm_write(m_vgm_idx, 0x00, offset, data);
 
 	m_stream->update();
 

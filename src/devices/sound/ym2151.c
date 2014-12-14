@@ -7,6 +7,7 @@
 ******************************************************************************/
 
 #include "emu.h"
+#include "sound/vgmwrite.h"
 #include "ym2151.h"
 
 
@@ -170,6 +171,8 @@ struct YM2151
 	device_t *device;
 	unsigned int clock;                 /* chip clock in Hz (passed from 2151intf.c) */
 	unsigned int sampfreq;              /* sampling frequency in Hz (passed from 2151intf.c) */
+
+	UINT16 vgm_idx; /* VGM index */
 };
 
 
@@ -1060,6 +1063,7 @@ void ym2151_write_reg(void *_chip, int r, int v)
 		fputc( (unsigned char)v, cymfile );
 	}
 
+	vgm_write(chip->vgm_idx, 0x00, r, v);
 
 	switch(r & 0xe0)
 	{
@@ -1551,6 +1555,7 @@ void * ym2151_init(device_t *device, int clock, int rate)
 			logerror("Could not create file 2151_.cym\n");
 	}
 
+	PSG->vgm_idx = vgm_open(VGMC_YM2151, clock);
 	return PSG;
 }
 

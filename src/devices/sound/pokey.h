@@ -372,6 +372,8 @@ private:
 	UINT32 m_poly9[0x1ff];
 	UINT32 m_poly17[0x1ffff];
 	UINT32 m_voltab[0x10000];
+	
+	UINT16 m_vgm_idx;       /* VGM index */
 };
 
 

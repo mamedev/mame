@@ -231,6 +231,12 @@ has twice the steps, happening twice as fast.
 
 #include "emu.h"
 #include "ay8910.h"
+#include "sound/vgmwrite.h"
+
+extern const device_type YM2203;
+extern const device_type YM2608;
+extern const device_type YM2610;
+extern const device_type YM2610B;
 
 /*************************************
  *
@@ -583,6 +589,8 @@ UINT16 ay8910_device::mix_3D()
 
 void ay8910_device::ay8910_write_reg(int r, int v)
 {
+	vgm_write(vgm_idx, 0x00, r, v);
+
 	//if (r >= 11 && r <= 13 ) printf("%d %x %02x\n", PSG->index, r, v);
 	m_regs[r] = v;
 
@@ -878,6 +886,7 @@ void ay8910_device::ay8910_statesave()
 void ay8910_device::device_start()
 {
 	int master_clock = clock();
+	UINT8 chp_tp_vgm;
 
 	if (m_ioports < 1 && !(m_port_a_read_cb.isnull() && m_port_a_write_cb.isnull()))
 		fatalerror("Device '%s' is a %s and has no port A!", tag(), name());
@@ -910,6 +919,34 @@ void ay8910_device::device_start()
 
 	ay_set_clock(master_clock);
 	ay8910_statesave();
+
+	if (type() == AY8910) chp_tp_vgm = 0x00;
+	else if (type() == AY8912) chp_tp_vgm = 0x01;
+	else if (type() == AY8913) chp_tp_vgm = 0x02;
+	else if (type() == AY8930) chp_tp_vgm = 0x03;
+	else if (type() == AY8914) chp_tp_vgm = 0x04;
+	else if (type() == YM2149) chp_tp_vgm = 0x10;
+	else if (type() == YM3439) chp_tp_vgm = 0x11;
+	else if (type() == YMZ284) chp_tp_vgm = 0x12;
+	else if (type() == YMZ294) chp_tp_vgm = 0x13;
+	else if (type() == YM2203) chp_tp_vgm = 0x20;
+	else if (type() == YM2608) chp_tp_vgm = 0x21;
+	else if (type() == YM2610 || type() == YM2610B) chp_tp_vgm = 0x22;
+	else chp_tp_vgm = 0xFF;
+
+	if (! (chp_tp_vgm & 0x20))
+	{
+		vgm_idx = vgm_open(VGMC_AY8910, clock());
+		vgm_header_set(vgm_idx, 0x00, chp_tp_vgm);
+		vgm_header_set(vgm_idx, 0x01, m_flags);
+		vgm_header_set(vgm_idx, 0x10, m_res_load[0]);
+		vgm_header_set(vgm_idx, 0x11, m_res_load[1]);
+		vgm_header_set(vgm_idx, 0x12, m_res_load[2]);
+	}
+	else
+	{
+		vgm_idx = 0xFFFF;
+	}
 }
 
 
@@ -1126,6 +1163,7 @@ const device_type AY8910 = &device_creator<ay8910_device>;
 ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, AY8910, "AY-3-8910A", tag, owner, clock, "ay8910", __FILE__),
 		device_sound_interface(mconfig, *this),
+		m_flags(AY8910_LEGACY_OUTPUT),
 		m_type(PSG_TYPE_AY),
 		m_streams(3),
 		m_ioports(2),
@@ -1148,7 +1186,6 @@ ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, dev
 		m_zero_is_off(1),
 		m_par(&ay8910_param),
 		m_par_env(&ay8910_param),
-		m_flags(AY8910_LEGACY_OUTPUT),
 		m_port_a_read_cb(*this),
 		m_port_b_read_cb(*this),
 		m_port_a_write_cb(*this),
@@ -1168,6 +1205,7 @@ ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, co
 								psg_type_t psg_type, int streams, int ioports, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
+		m_flags(AY8910_LEGACY_OUTPUT),
 		m_type(psg_type),
 		m_streams(streams),
 		m_ioports(ioports),
@@ -1190,7 +1228,6 @@ ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, co
 		m_zero_is_off(  psg_type == PSG_TYPE_AY ? 1 : 0),
 		m_par(          psg_type == PSG_TYPE_AY ? &ay8910_param : &ym2149_param),
 		m_par_env(      psg_type == PSG_TYPE_AY ? &ay8910_param : &ym2149_param_env),
-		m_flags(AY8910_LEGACY_OUTPUT),
 		m_port_a_read_cb(*this),
 		m_port_b_read_cb(*this),
 		m_port_a_write_cb(*this),
