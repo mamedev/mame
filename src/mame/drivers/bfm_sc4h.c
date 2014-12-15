@@ -517,40 +517,29 @@ void sc4_state::bfm_sc4_68307_porta_w(address_space &space, bool dedicated, UINT
 {
 	m_reel12_latch = data;
 
-	if ( stepper_update(0, data&0x0f   ) ) m_reel_changed |= 0x01;
-	if ( stepper_update(1, (data>>4))&0x0f ) m_reel_changed |= 0x02;
+	m_reel0->update( data    &0x0f);
+	m_reel1->update((data>>4)&0x0f);
 
-	if ( stepper_optic_state(0) ) m_optic_pattern |=  0x01;
-	else                          m_optic_pattern &= ~0x01;
-	if ( stepper_optic_state(1) ) m_optic_pattern |=  0x02;
-	else                          m_optic_pattern &= ~0x02;
-
-	awp_draw_reel(0);
-	awp_draw_reel(1);
+	awp_draw_reel(0, m_reel0);
+	awp_draw_reel(1, m_reel1);
 }
 
 WRITE8_MEMBER( sc4_state::bfm_sc4_reel3_w )
 {
 	m_reel3_latch = data;
 
-	if ( stepper_update(2, data&0x0f ) ) m_reel_changed |= 0x04;
+	m_reel2->update(data&0x0f);
 
-	if ( stepper_optic_state(2) ) m_optic_pattern |=  0x04;
-	else                          m_optic_pattern &= ~0x04;
-
-	awp_draw_reel(2);
+	awp_draw_reel(2, m_reel2);
 }
 
 WRITE8_MEMBER( sc4_state::bfm_sc4_reel4_w )
 {
 	m_reel4_latch = data;
 
-	if ( stepper_update(3, data&0x0f ) ) m_reel_changed |= 0x08;
+	m_reel3->update(data&0x0f );
 
-	if ( stepper_optic_state(3) ) m_optic_pattern |=  0x08;
-	else                          m_optic_pattern &= ~0x08;
-
-	awp_draw_reel(3);
+	awp_draw_reel(3, m_reel3);
 }
 
 void sc4_state::bfm_sc4_68307_portb_w(address_space &space, bool dedicated, UINT16 data, UINT16 line_mask)
@@ -591,17 +580,8 @@ UINT16 sc4_state::bfm_sc4_68307_portb_r(address_space &space, bool dedicated, UI
 
 MACHINE_RESET_MEMBER(sc4_state,sc4)
 {
-	int pattern =0, i;
-
-	for ( i = 0; i < m_reels; i++)
-	{
-		stepper_reset_position(i);
-		if ( stepper_optic_state(i) ) pattern |= 1<<i;
-	}
-
 	m_dochk41 = true;
 
-	m_optic_pattern = pattern;
 	sec.reset();
 }
 
@@ -620,10 +600,12 @@ MACHINE_START_MEMBER(sc4_state,sc4)
 	int reels = 6;
 	m_reels=reels;
 
-	for ( int n = 0; n < reels; n++ )
-	{
-			if (m_reel_setup[n]) stepper_config(machine(), n, m_reel_setup[n]);
-	}
+	if (m_reel_setup[0]) m_reel0->configure(m_reel_setup[0]);
+	if (m_reel_setup[1]) m_reel1->configure(m_reel_setup[1]);
+	if (m_reel_setup[2]) m_reel2->configure(m_reel_setup[2]);
+	if (m_reel_setup[3]) m_reel3->configure(m_reel_setup[3]);
+	if (m_reel_setup[4]) m_reel4->configure(m_reel_setup[4]);
+	if (m_reel_setup[5]) m_reel5->configure(m_reel_setup[5]);
 }
 
 
@@ -663,16 +645,11 @@ WRITE8_MEMBER(sc4_state::bfm_sc4_duart_output_w)
 //  logerror("bfm_sc4_duart_output_w\n");
 	m_reel56_latch = data;
 
-	if ( stepper_update(4, data&0x0f   ) ) m_reel_changed |= 0x10;
-	if ( stepper_update(5, (data>>4)&0x0f) ) m_reel_changed |= 0x20;
+	m_reel4->update( data    &0x0f);
+	m_reel5->update((data>>4)&0x0f);
 
-	if ( stepper_optic_state(4) ) m_optic_pattern |=  0x10;
-	else                          m_optic_pattern &= ~0x10;
-	if ( stepper_optic_state(5) ) m_optic_pattern |=  0x20;
-	else                          m_optic_pattern &= ~0x20;
-
-	awp_draw_reel(4);
-	awp_draw_reel(5);
+	awp_draw_reel(4, m_reel4);
+	awp_draw_reel(5, m_reel5);
 }
 
 
@@ -728,6 +705,19 @@ MACHINE_CONFIG_START( sc4, sc4_state )
 	MCFG_SOUND_ADD("ymz", YMZ280B, 16000000) // ?? Mhz
 	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(sc4_state, bfm_sc4_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_DEVICE_ADD("reel0", STEPPER, 0)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(sc4_state, reel0_optic_cb))
+	MCFG_DEVICE_ADD("reel1", STEPPER, 0)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(sc4_state, reel1_optic_cb))
+	MCFG_DEVICE_ADD("reel2", STEPPER, 0)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(sc4_state, reel2_optic_cb))
+	MCFG_DEVICE_ADD("reel3", STEPPER, 0)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(sc4_state, reel3_optic_cb))
+	MCFG_DEVICE_ADD("reel4", STEPPER, 0)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(sc4_state, reel4_optic_cb))
+	MCFG_DEVICE_ADD("reel5", STEPPER, 0)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(sc4_state, reel5_optic_cb))
 MACHINE_CONFIG_END
 
 

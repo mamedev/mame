@@ -160,6 +160,10 @@ static MACHINE_CONFIG_FRAGMENT( epson_lx810l )
 
 	/* 256-bit eeprom */
 	MCFG_EEPROM_SERIAL_93C06_ADD("eeprom")
+
+	/* steppers */
+	MCFG_DEVICE_ADD("pf_stepper", STEPPER, 0)
+	MCFG_DEVICE_ADD("cr_stepper", STEPPER, 0)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -278,6 +282,8 @@ epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, const char *tag, d
 	device_t(mconfig, EPSON_LX810L, "Epson LX-810L", tag, owner, clock, "lx810l", __FILE__),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
+	m_pf_stepper(*this, "pf_stepper"),
+	m_cr_stepper(*this, "cr_stepper"),
 	m_eeprom(*this, "eeprom"),
 	m_speaker(*this, "speaker"),
 	m_e05a30(*this, "e05a30"),
@@ -296,6 +302,8 @@ epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, device_type type, 
 	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
+	m_pf_stepper(*this, "pf_stepper"),
+	m_cr_stepper(*this, "cr_stepper"),
 	m_eeprom(*this, "eeprom"),
 	m_speaker(*this, "speaker"),
 	m_e05a30(*this, "e05a30"),
@@ -339,8 +347,8 @@ static const stepper_interface lx810l_cr_stepper =
 
 void epson_lx810l_t::device_start()
 {
-	stepper_config(machine(), 0, &lx810l_pf_stepper);
-	stepper_config(machine(), 1, &lx810l_cr_stepper);
+	m_pf_stepper->configure(&lx810l_pf_stepper);
+	m_cr_stepper->configure(&lx810l_cr_stepper);
 }
 
 
@@ -515,8 +523,8 @@ WRITE16_MEMBER( epson_lx810l_t::printhead )
 
 WRITE8_MEMBER( epson_lx810l_t::pf_stepper )
 {
-	stepper_update(0, data);
-	m_pf_pos_abs = 200 - stepper_get_absolute_position(0);
+	m_pf_stepper->update(data);
+	m_pf_pos_abs = 200 - m_pf_stepper->get_absolute_position();
 
 	LX810LLOG("%s: %s(%02x); abs %d\n", machine().describe_context(), __func__, data, m_pf_pos_abs);
 }
@@ -525,8 +533,8 @@ WRITE8_MEMBER( epson_lx810l_t::cr_stepper )
 {
 	int m_cr_pos_abs_prev = m_cr_pos_abs;
 
-	stepper_update(1, data);
-	m_cr_pos_abs = 200 - stepper_get_absolute_position(1);
+	m_cr_stepper->update(data);
+	m_cr_pos_abs = 200 - m_cr_stepper->get_absolute_position();
 
 	if (m_cr_pos_abs > m_cr_pos_abs_prev) {
 		/* going right */

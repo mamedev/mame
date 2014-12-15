@@ -181,12 +181,24 @@ public:
 	bfm_sc2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
+			m_reel0(*this, "reel0"),
+			m_reel1(*this, "reel1"),
+			m_reel2(*this, "reel2"),
+			m_reel3(*this, "reel3"),
+			m_reel4(*this, "reel4"),
+			m_reel5(*this, "reel5"),
 			m_upd7759(*this, "upd"),
 			m_vfd0(*this, "vfd0"),
 			m_vfd1(*this, "vfd1"),
 			m_dm01(*this, "dm01") { }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<stepper_device> m_reel0;
+	required_device<stepper_device> m_reel1;
+	required_device<stepper_device> m_reel2;
+	required_device<stepper_device> m_reel3;
+	required_device<stepper_device> m_reel4;
+	required_device<stepper_device> m_reel5;
 	required_device<upd7759_device> m_upd7759;
 	optional_device<bfm_bd1_t> m_vfd0;
 	optional_device<bfm_bd1_t> m_vfd1;
@@ -199,12 +211,17 @@ public:
 	int m_mmtr_latch;
 	int m_irq_status;
 	int m_optic_pattern;
+	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
+	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
+	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
+	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
+	DECLARE_WRITE_LINE_MEMBER(reel4_optic_cb) { if (state) m_optic_pattern |= 0x10; else m_optic_pattern &= ~0x10; }
+	DECLARE_WRITE_LINE_MEMBER(reel5_optic_cb) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
 	int m_uart1_data;
 	int m_uart2_data;
 	int m_data_to_uart1;
 	int m_data_to_uart2;
 	int m_is_timer_enabled;
-	int m_reel_changed;
 	int m_coin_inhibits;
 	int m_irq_timer_stat;
 	int m_expansion_latch;
@@ -387,20 +404,6 @@ void bfm_sc2_state::on_scorpion2_reset()
 
 	machine().device("ymsnd")->reset();
 
-	// reset stepper motors /////////////////////////////////////////////////
-	{
-		int pattern =0, i;
-
-		for ( i = 0; i < m_reels; i++)
-		{
-			stepper_reset_position(i);
-			if ( stepper_optic_state(i) ) pattern |= 1<<i;
-		}
-
-		m_optic_pattern = pattern;
-
-	}
-
 	// make sure no inputs are overidden ////////////////////////////////////
 	memset(m_input_override, 0, sizeof(m_input_override));
 
@@ -547,32 +550,22 @@ WRITE8_MEMBER(bfm_sc2_state::reel12_w)
 {
 	m_reel12_latch = data;
 
-	if ( stepper_update(0, data&0x0f   ) ) m_reel_changed |= 0x01;
-	if ( stepper_update(1, (data>>4))&0x0f ) m_reel_changed |= 0x02;
+	m_reel0->update( data    &0x0f);
+	m_reel1->update((data>>4)&0x0f);
 
-	if ( stepper_optic_state(0) ) m_optic_pattern |=  0x01;
-	else                          m_optic_pattern &= ~0x01;
-	if ( stepper_optic_state(1) ) m_optic_pattern |=  0x02;
-	else                          m_optic_pattern &= ~0x02;
-
-	awp_draw_reel(0);
-	awp_draw_reel(1);
+	awp_draw_reel(0, m_reel0);
+	awp_draw_reel(1, m_reel1);
 }
 
 WRITE8_MEMBER(bfm_sc2_state::reel34_w)
 {
 	m_reel34_latch = data;
 
-	if ( stepper_update(2, data&0x0f ) ) m_reel_changed |= 0x04;
-	if ( stepper_update(3, (data>>4)&0x0f) ) m_reel_changed |= 0x08;
+	m_reel2->update( data    &0x0f);
+	m_reel3->update((data>>4)&0x0f);
 
-	if ( stepper_optic_state(2) ) m_optic_pattern |=  0x04;
-	else                          m_optic_pattern &= ~0x04;
-	if ( stepper_optic_state(3) ) m_optic_pattern |=  0x08;
-	else                          m_optic_pattern &= ~0x08;
-
-	awp_draw_reel(2);
-	awp_draw_reel(3);
+	awp_draw_reel(2, m_reel2);
+	awp_draw_reel(3, m_reel3);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -581,16 +574,11 @@ WRITE8_MEMBER(bfm_sc2_state::reel56_w)
 {
 	m_reel56_latch = data;
 
-	if ( stepper_update(4, data&0x0f   ) ) m_reel_changed |= 0x10;
-	if ( stepper_update(5, (data>>4)&0x0f) ) m_reel_changed |= 0x20;
+	m_reel4->update( data    &0x0f);
+	m_reel5->update((data>>4)&0x0f);
 
-	if ( stepper_optic_state(4) ) m_optic_pattern |=  0x10;
-	else                          m_optic_pattern &= ~0x10;
-	if ( stepper_optic_state(5) ) m_optic_pattern |=  0x20;
-	else                          m_optic_pattern &= ~0x20;
-
-	awp_draw_reel(4);
-	awp_draw_reel(5);
+	awp_draw_reel(4, m_reel4);
+	awp_draw_reel(5, m_reel5);
 }
 
 
@@ -1399,7 +1387,6 @@ void bfm_sc2_state::save_state()
 	save_item(NAME(m_data_to_uart1));
 	save_item(NAME(m_data_to_uart2));
 	save_item(NAME(m_is_timer_enabled));
-	save_item(NAME(m_reel_changed));
 	save_item(NAME(m_coin_inhibits));
 	save_item(NAME(m_irq_timer_stat));
 	save_item(NAME(m_expansion_latch));
@@ -2176,6 +2163,20 @@ static MACHINE_CONFIG_START( scorpion2_vid, bfm_sc2_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_DEVICE_ADD("reel0", STEPPER, 0)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel0_optic_cb))
+	MCFG_DEVICE_ADD("reel1", STEPPER, 0)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel1_optic_cb))
+	MCFG_DEVICE_ADD("reel2", STEPPER, 0)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel2_optic_cb))
+	MCFG_DEVICE_ADD("reel3", STEPPER, 0)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel3_optic_cb))
+	MCFG_DEVICE_ADD("reel4", STEPPER, 0)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel4_optic_cb))
+	MCFG_DEVICE_ADD("reel5", STEPPER, 0)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel5_optic_cb))
+
 MACHINE_CONFIG_END
 
 
@@ -3666,29 +3667,37 @@ MACHINE_CONFIG_END
 
 void bfm_sc2_state::sc2awp_common_init(int reels, int decrypt)
 {
-	int n;
 	sc2_common_init(decrypt);
 	/* setup n default 96 half step reels */
 
 	m_reels=reels;
 
-	for ( n = 0; n < reels; n++ )
+	switch (reels)
 	{
-		stepper_config(machine(), n, &starpoint_interface_48step);
+	case 6: m_reel5->configure(&starpoint_interface_48step);
+	case 5: m_reel4->configure(&starpoint_interface_48step);
+	case 4: m_reel3->configure(&starpoint_interface_48step);
+	case 3: m_reel2->configure(&starpoint_interface_48step);
+	case 2: m_reel1->configure(&starpoint_interface_48step);
+	case 1: m_reel0->configure(&starpoint_interface_48step);
 	}
 }
 
 void bfm_sc2_state::sc2awpdmd_common_init(int reels, int decrypt)
 {
-	int n;
 	sc2_common_init(decrypt);
 	/* setup n default 96 half step reels */
 
 	m_reels=reels;
 
-	for ( n = 0; n < reels; n++ )
+	switch (reels)
 	{
-		stepper_config(machine(), n, &starpoint_interface_48step);
+	case 6: m_reel5->configure(&starpoint_interface_48step);
+	case 5: m_reel4->configure(&starpoint_interface_48step);
+	case 4: m_reel3->configure(&starpoint_interface_48step);
+	case 3: m_reel2->configure(&starpoint_interface_48step);
+	case 2: m_reel1->configure(&starpoint_interface_48step);
+	case 1: m_reel0->configure(&starpoint_interface_48step);
 	}
 }
 

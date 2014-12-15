@@ -7,8 +7,6 @@
 //                                                                       //
 //                                                                       //
 // TODO:  add further types of stepper motors if needed (Konami/IGT?)    //
-//        Someone who understands the device system may want to convert  //
-//        this                                                           //
 ///////////////////////////////////////////////////////////////////////////
 
 
@@ -49,17 +47,57 @@ extern const stepper_interface starpointrm20_interface_48step;
 extern const stepper_interface starpoint_interface_200step_reel;
 extern const stepper_interface ecoin_interface_200step_reel;
 
-void stepper_config(running_machine &machine, int which, const stepper_interface *intf);
 
-void stepper_reset_position(int id);        /* reset a motor to position 0 */
+#define MCFG_STEPPER_OPTIC_CALLBACK(_write) \
+	devcb = &stepper_device::set_optic_handler(*device, DEVCB_##_write);
 
-int  stepper_optic_state(   int id);        /* read a motor's optics */
+class stepper_device;
+const device_type STEPPER = &device_creator<stepper_device>;
 
-int  stepper_update(int id, UINT8 pattern); /* update a motor */
+class stepper_device : public device_t
+{
+public:
+	stepper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+		: device_t(mconfig, STEPPER, "Stepper Motor", tag, owner, clock, "stepper", __FILE__),
+		m_optic_cb(*this)
+	{ }
 
-int  stepper_get_position(int id);          /* get current position in half steps */
+	template<class _Object> static devcb_base &set_optic_handler(device_t &device, _Object object) { return downcast<stepper_device &>(device).m_optic_cb.set_callback(object); }
 
-int  stepper_get_absolute_position(int id); /* get current absolute position in half steps */
+	void configure(const stepper_interface *intf);
 
-int  stepper_get_max(int id);               /* get maximum position in half steps */
+	/* update a motor */
+	int update(UINT8 pattern);
+
+	/* get current position in half steps */
+	int get_position()          { return m_step_pos; }
+	/* get current absolute position in half steps */
+	int get_absolute_position() { return m_abs_step_pos; }
+	/* get maximum position in half steps */
+	int get_max()               { return m_max_steps; }
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+private:
+	UINT8 m_pattern;      /* coil pattern */
+	UINT8 m_old_pattern;  /* old coil pattern */
+	UINT8 m_initphase;
+	UINT8 m_phase;        /* motor phase */
+	UINT8 m_old_phase;    /* old phase */
+	UINT8 m_type;         /* reel type */
+	INT16 m_step_pos;     /* step position 0 - max_steps */
+	INT16 m_max_steps;    /* maximum step position */
+	INT32 m_abs_step_pos; /* absolute step position */
+	INT16 m_index_start;  /* start position of index (in half steps) */
+	INT16 m_index_end;    /* end position of index (in half steps) */
+	INT16 m_index_patt;   /* pattern needed on coils (0=don't care) */
+	UINT8 m_optic;
+
+	void update_optic();
+	devcb_write_line m_optic_cb;
+};
+
 #endif

@@ -101,6 +101,12 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_cpuregion(*this, "maincpu"),
 			m_nvram(*this, "nvram"),
+			m_reel0(*this, "reel0"),
+			m_reel1(*this, "reel1"),
+			m_reel2(*this, "reel2"),
+			m_reel3(*this, "reel3"),
+			m_reel4(*this, "reel4"),
+			m_reel5(*this, "reel5"),
 			m_io1(*this, "IN-0"),
 			m_io2(*this, "IN-1"),
 			m_io3(*this, "IN-2"),
@@ -122,16 +128,27 @@ public:
 	required_memory_region m_cpuregion;
 	// devices
 	required_device<nvram_device> m_nvram;
+	required_device<stepper_device> m_reel0;
+	required_device<stepper_device> m_reel1;
+	required_device<stepper_device> m_reel2;
+	required_device<stepper_device> m_reel3;
+	required_device<stepper_device> m_reel4;
+	required_device<stepper_device> m_reel5;
 
 
 	const stepper_interface **m_reel_setup;
-	int m_reel_changed;
 	int m_reels;
 	int m_reel12_latch;
 	int m_reel3_latch;
 	int m_reel4_latch;
 	int m_reel56_latch;
 	int m_optic_pattern;
+	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
+	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
+	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
+	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
+	DECLARE_WRITE_LINE_MEMBER(reel4_optic_cb) { if (state) m_optic_pattern |= 0x10; else m_optic_pattern &= ~0x10; }
+	DECLARE_WRITE_LINE_MEMBER(reel5_optic_cb) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
 	SEC sec;
 
 	int m_meterstatus;
