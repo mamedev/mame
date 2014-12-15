@@ -245,6 +245,14 @@ WRITE16_MEMBER(ngen_state::peripheral_w)
 		if(mem_mask & 0x00ff)
 			m_dma_offset[offset-0x80] = data & 0xff;
 		break;
+	case 0x10c:
+		if(mem_mask & 0x00ff)
+			m_pic->write(space,0,data & 0xff);
+		break;
+	case 0x10d:
+		if(mem_mask & 0x00ff)
+			m_pic->write(space,1,data & 0xff);
+		break;
 	case 0x110:
 		if(mem_mask & 0x00ff)
 			m_pit->write(space,0,data & 0x0ff);
