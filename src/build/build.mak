@@ -60,6 +60,7 @@ MAKEDEPOBJS = \
 	$(OBJ)/lib/util/corealloc.o \
 	$(OBJ)/lib/util/corefile.o \
 	$(OBJ)/lib/util/unicode.o \
+	$(OBJ)/lib/util/tagmap.o \
 
 $(MAKEDEP_TARGET): $(MAKEDEPOBJS) $(LIBOCORE) $(ZLIB)
 	@echo Linking $@...
@@ -78,6 +79,7 @@ MAKEMAKOBJS = \
 	$(OBJ)/lib/util/corefile.o \
 	$(OBJ)/lib/util/corestr.o \
 	$(OBJ)/lib/util/unicode.o \
+	$(OBJ)/lib/util/tagmap.o \
 
 $(MAKEMAK_TARGET): $(MAKEMAKOBJS) $(LIBOCORE) $(ZLIB)
 	@echo Linking $@...
@@ -96,6 +98,7 @@ MAKELISTOBJS = \
 	$(OBJ)/lib/util/cstrpool.o \
 	$(OBJ)/lib/util/corefile.o \
 	$(OBJ)/lib/util/unicode.o \
+	$(OBJ)/lib/util/tagmap.o \
 
 $(MAKELIST_TARGET): $(MAKELISTOBJS) $(LIBOCORE) $(ZLIB)
 	@echo Linking $@...
