@@ -250,7 +250,7 @@ static void drawd3d_window_destroy(win_window_info *window)
 	if (d3d == NULL)
 		return;
 
-	if (d3d->get_shaders()->recording())
+	if (d3d->get_shaders() != NULL && d3d->get_shaders()->recording())
 		d3d->get_shaders()->window_record();
 
 	// free the memory in the window
@@ -1040,11 +1040,14 @@ renderer::~renderer()
 
 void renderer::device_delete()
 {
-	// free our effects
-	m_shaders->delete_resources(false);
+	if (m_shaders != NULL)
+	{
+		// free our effects
+		m_shaders->delete_resources(false);
 
-	// delete the HLSL interface
-	global_free(m_shaders);
+		// delete the HLSL interface
+		global_free(m_shaders);
+	}
 
 	// free our base resources
 	device_delete_resources();
@@ -1070,7 +1073,8 @@ void renderer::device_delete()
 
 void renderer::device_delete_resources()
 {
-	m_texture_manager->delete_resources();
+	if (m_texture_manager != NULL)
+		m_texture_manager->delete_resources();
 	// free the vertex buffer
 	if (m_vertexbuf != NULL)
 		(*d3dintf->vertexbuf.release)(m_vertexbuf);
