@@ -120,6 +120,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE8_MEMBER(fdc_control_w);
+	DECLARE_READ8_MEMBER(irq_cb);
 
 protected:
 	virtual void machine_reset();
@@ -481,6 +482,11 @@ MC6845_UPDATE_ROW( ngen_state::crtc_update_row )
 	}
 }
 
+READ8_MEMBER( ngen_state::irq_cb )
+{
+	return m_pic->acknowledge();
+}
+
 void ngen_state::machine_reset()
 {
 	m_port00 = 0;
@@ -538,8 +544,9 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	MCFG_CPU_IO_MAP(ngen_io)
 	MCFG_80186_CHIP_SELECT_CB(WRITE16(ngen_state, cpu_peripheral_cb))
 	MCFG_80186_TMROUT1_HANDLER(WRITELINE(ngen_state, cpu_timer_w))
+	MCFG_80186_IRQ_SLAVE_ACK(READ8(ngen_state, irq_cb))
 
-	MCFG_PIC8259_ADD( "pic", INPUTLINE("maincpu", 0), VCC, NULL )
+	MCFG_PIC8259_ADD( "pic", DEVWRITELINE("maincpu",i80186_cpu_device,int0_w), VCC, NULL )
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
 	MCFG_PIT8253_CLK0(78120/4)  // 19.53kHz, /4 of the CPU timer output?
@@ -629,6 +636,8 @@ static MACHINE_CONFIG_DERIVED( ngen386, ngen )
 	MCFG_CPU_REPLACE("maincpu", I386, XTAL_50MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(ngen386_mem)
 	MCFG_CPU_IO_MAP(ngen386_io)
+	MCFG_DEVICE_REMOVE("pic")
+	MCFG_PIC8259_ADD( "pic", INPUTLINE("maincpu", 0), VCC, NULL )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( 386i, ngen386 )
