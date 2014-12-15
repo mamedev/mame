@@ -5343,7 +5343,7 @@ qmegamis        // 2000.05 Quiz Ah Megamisama
 derbyo2k        // 2000.06 Derby Owners Club 2000 Ver.2 (Rev A)
 starhrse        // 2000.?? Star Horse (big screens)
 starhrct        // 2000.12 Star Horse (server)
-starhrcl        // 2000.?? Star Horse (client)
+starhrcl        // 2000.11.28 Star Horse (satellite)
 vonot           // 2000.06 Virtual-on Oratorio Tangram M.S.B.S. Ver.5.66 2000 Edition
 ggx             // 2000.07 Guilty Gear X
 slasho          // 2000.07 Slashout
@@ -5433,7 +5433,7 @@ usagiym         // 2003.06 Usagi Yamashiro Mahjong Hen
 oinori          // 2003.08 Oinori-daimyoujin Matsuri
 psyvar2         // 2003.11 Psyvariar 2 - The Will To Fabricate
 puyofev         // 2003.11 Puyo Puyo Fever
-starhrsp        // 2003.12 Star Horse Progress (Rev A)
+starhrsp        // 2003.12.01 Star Horse Progress (satellite) (Rev A)
 puyofevp        // 2003.?? Puyo Puyo Fever (prototype)
 				// 2003.?? Dragon Treasure
 				// 2003.?? Rabbit 2
@@ -5489,6 +5489,7 @@ mamonoro        // 2008.07 Mamoru-kun wa Norowarete Shimatta!
 mbaa            // 2008.09 Melty Blood Actress Again
 mbaaa           // 2008.12 Melty Blood Actress Again Ver.A
 radirgyn        // 2009.06 Radirgy Noa
+starhrpr        // 2009.07.27 Star Horse Progress Returns (satellite)
 				// 2009.?? Project Cerberus (planned to be released in 2009)
 
 // NAOMI based (System SP)
