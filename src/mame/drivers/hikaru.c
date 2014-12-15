@@ -664,7 +664,7 @@ ROM_START( podrace )
 	ROM_LOAD32_WORD("mpr-23117.ic68s" , 0xf000002, 0x0800000, CRC(9d4d3529) SHA1(66008445629681ebf2f26b3f181d8524a8576d2f))
 
 	// current 315-5881 decryption simulation code can't produce valid output data with any of keys
-	ROM_REGION( 4, "rom_key", 0 )
+	ROM_REGION( 4, "rom_key", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( braveff )
@@ -709,7 +709,7 @@ ROM_START( braveff )
 	ROM_LOAD32_WORD( "mpr-22023.ic60s", 0xb000002, 0x800000, CRC(07f00869) SHA1(92282d09d72d3e65a91128e06bb0d4426bb90be5) )
 
 	// 315-5881 not populated
-	ROM_REGION( 4, "rom_key", 0 )
+	ROM_REGION( 4, "rom_key", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( sgnascar )
