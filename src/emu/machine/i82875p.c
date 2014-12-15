@@ -238,15 +238,12 @@ READ16_MEMBER( i82875p_host_device::toud_r)
 	return toud;
 }
 
-#include "debugger.h"
-
 WRITE16_MEMBER(i82875p_host_device::toud_w)
 {
 	COMBINE_DATA(&toud);
 	toud &= ~7;
 	logerror("%s: toud = %08x\n", tag(), toud << 16);
 	remap_cb();
-	debugger_break(machine());
 }
 
 READ16_MEMBER( i82875p_host_device::mchcfg_r)
