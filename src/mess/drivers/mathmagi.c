@@ -3,7 +3,27 @@
 /***************************************************************************
 
   APF Mathemagician
-  * TMS1100 MP1030
+  * TMS1100 MP1030 - MCU
+  * 2 x DS8870N - Hex LED Digit Driver
+  * 2 x DS8861N - MOS-to-LED 5-Segment Driver
+  
+  This is a tabletop educational calculator. It came with plastic overlays
+  for playing different kind of games. Refer to the manual on how to use it.
+  In short, to start from scratch, press [SEL]. By default the device is in
+  calculator teaching mode. If [SEL] is followed with 1-6 and then [NXT],
+  one of the games is started.
+  
+  1) Number Machine
+  2) Countin' On
+  3) Walk The Plank
+  4) Gooey Gumdrop
+  5) Football
+  6) Lunar Lander
+
+
+  TODO:
+  - some of the led symbols are probably wrong, output PLA is unknown
+  - microinstructions PLA is not verified
   
 ***************************************************************************/
 
@@ -26,8 +46,8 @@ public:
 		m_button_matrix(*this, "IN")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	optional_ioport_array<11> m_button_matrix;
+	required_device<tms1xxx_cpu_device> m_maincpu;
+	required_ioport_array<6> m_button_matrix;
 
 	UINT16 m_o;
 	UINT16 m_r;
@@ -48,32 +68,48 @@ public:
 
 READ8_MEMBER(mathmagi_state::read_k)
 {
-	printf("r");
-	
 	UINT8 k = 0;
 
 	// read selected button rows
-	for (int i = 0; i < 11; i++)
-		if (m_r >> i & 1)
+	for (int i = 0; i < 6; i++)
+	{
+		const int ki[6] = { 3, 5, 6, 7, 9, 10 };
+		if (m_r >> ki[i] & 1)
 			k |= m_button_matrix[i]->read();
+	}
 
 	return k;
 }
 
 WRITE16_MEMBER(mathmagi_state::write_o)
 {
+	// O1-O7: led segments A-G
+	// O0: N/C
 	m_o = data;
-	
-	printf("\n%02X ",m_o);
-	for (int i=0;i<11;i++) printf("%d",m_r>>(10-i)&1);
 }
 
 WRITE16_MEMBER(mathmagi_state::write_r)
 {
-	m_r = data;
+	// R3,R5-R7,R9,R10: input mux
+	// and outputs:
+	for (int i = 0; i < 11; i++)
+	{
+		if (data >> i & 1)
+		{
+			// R8: custom math symbols digit
+			// R9: custom equals digit
+			// R10: lamps
+			if (i >= 8)
+				for (int j = 0; j < 8; j++)
+					output_set_lamp_value(i*10 + j, m_o >> j & 1);
+			
+			// R0-R7: 7seg leds
+			else
+				output_set_digit_value(i, m_o >> 1 & 0x7f);
+		}
+	}
 
-	printf("\n%02X ",m_o);
-	for (int i=0;i<11;i++) printf("%d",m_r>>(10-i)&1);
+	m_r = data;
 }
 
 
@@ -94,71 +130,43 @@ WRITE16_MEMBER(mathmagi_state::write_r)
 */
 
 static INPUT_PORTS_START( mathmagi )
-	PORT_START("IN.0") // R0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4)
+	PORT_START("IN.0") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
 
-	PORT_START("IN.1") // R1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8)
+	PORT_START("IN.1") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE) PORT_NAME("_") // blank
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME("r")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
 
-	PORT_START("IN.2") // R2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W)
+	PORT_START("IN.2") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
 
-	PORT_START("IN.3") // R3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y)
+	PORT_START("IN.3") // R7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_NAME("SEL")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_NAME("NXT")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_NAME("?") // check
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
 
-	PORT_START("IN.4") // R4
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A)
+	PORT_START("IN.4") // R9
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
 
-	PORT_START("IN.5") // R5
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G)
-
-	PORT_START("IN.6") // R6
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L)
-
-	PORT_START("IN.7") // R7
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V)
-
-	PORT_START("IN.8") // R8
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA)
-
-	PORT_START("IN.9") // R9
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0_PAD)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3_PAD)
-
-	PORT_START("IN.10") // R10
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4_PAD) // 1P/2P switch?
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5_PAD)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7_PAD)
+	PORT_START("IN.5") // R10
+	PORT_CONFNAME( 0x01, 0x00, "Players")
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x01, "2" )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -178,22 +186,59 @@ void mathmagi_state::machine_start()
 	save_item(NAME(m_r));
 }
 
+// LED segments A-G
+enum
+{
+	lA = 0x02,
+	lB = 0x04,
+	lC = 0x08,
+	lD = 0x10,
+	lE = 0x20,
+	lF = 0x40,
+	lG = 0x80
+};
 
 static const UINT16 mathmagi_output_pla[0x20] =
 {
-	/* O output PLA configuration currently unknown */
-	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-	0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
+	lA+lB+lC+lD+lE+lF,      // 0
+	lB+lC,                  // 1
+	lA+lB+lG+lE+lD,         // 2
+	lA+lB+lG+lC+lD,         // 3
+	lF+lB+lG+lC,            // 4
+	lA+lF+lG+lC+lD,         // 5
+	lA+lF+lG+lC+lD+lE,      // 6
+	lA+lB+lC,               // 7
+	lA+lB+lC+lD+lE+lF+lG,   // 8
+	lA+lB+lG+lF+lC+lD,      // 9
+	lA+lB+lG+lE,            // question mark
+	lE+lG,                  // r
+	lD,                     // underscore?
+	lA+lF+lG+lE+lD,         // E
+	lG,                     // -
+	0,                      // empty
+	0,                      // empty
+	lG,                     // lamp 4 or MATH -
+	lD,                     // lamp 3
+	lF+lE+lD+lC+lG,         // b
+	lB,                     // lamp 2
+	lB+lG,                  // MATH +
+	lB+lC,                  // MATH mul
+	lF+lG+lB+lC+lD,         // y
+	lA,                     // lamp 1
+	lA+lG,                  // MATH div
+	lA+lD,                  // EQUALS
+	0,                      // ?
+	0,                      // ?
+	lE+lD+lC+lG,            // o
+	0,                      // ?
+	lA+lF+lE+lD+lC          // G
 };
 
 
 static MACHINE_CONFIG_START( mathmagi, mathmagi_state )
 
 	/* basic machine hardware */
-//	MCFG_CPU_ADD("maincpu", TMS1100, MASTER_CLOCK)
-	MCFG_CPU_ADD("maincpu", TMS1100, 10000) // temp
+	MCFG_CPU_ADD("maincpu", TMS1100, MASTER_CLOCK)
 	MCFG_TMS1XXX_OUTPUT_PLA(mathmagi_output_pla)
 	MCFG_TMS1XXX_READ_K_CB(READ8(mathmagi_state, read_k))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(mathmagi_state, write_o))
@@ -225,4 +270,4 @@ ROM_START( mathmagi )
 ROM_END
 
 
-COMP( 1980, mathmagi, 0, 0, mathmagi, mathmagi, driver_device, 0, "APF Electronics Inc.", "Mathemagician", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW | GAME_NOT_WORKING )
+COMP( 1980, mathmagi, 0, 0, mathmagi, mathmagi, driver_device, 0, "APF Electronics Inc.", "Mathemagician", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )

@@ -92,8 +92,8 @@ unknown cycle: CME, SSE, SSS
 #define M_SSE               0x00080000 /* Special Status Enable */
 #define M_SSS               0x00100000 /* Special Status Sample */
 
-#define M_RSTR              0x00200000 /* -> line #36, F_RSTR (TMC02x0 custom) */
-#define M_UNK1              0x00400000 /* -> line #37, F_???? (TMC0270 custom) */
+#define M_RSTR              0x00200000 /* -> line #36, F_RSTR (TMS02x0 custom) */
+#define M_UNK1              0x00400000 /* -> line #37, F_???? (TMS0270 custom) */
 
 /* Standard/fixed instructions - these are documented more in their specific handlers below */
 #define F_BR                0x00000001
@@ -154,13 +154,14 @@ const device_type TMS0980 = &device_creator<tms0980_cpu_device>; // 28-pin DIP, 
 // - 32-term microinstructions PLA between the RAM and ROM, supporting 15 microinstructions
 // - 16-term output PLA and segment PLA above the RAM (rotate opla 90 degrees)
 const device_type TMS0970 = &device_creator<tms0970_cpu_device>; // 28-pin DIP, 11 R pins
+// TMS0950 is same?
 
-// TMC0270 on the other hand, is a TMS0980 with earrings and a new hat. The new changes look like a quick afterthought, almost hacky
+// TMS0270 on the other hand, is a TMS0980 with earrings and a new hat. The new changes look like a quick afterthought, almost hacky
 // - RAM, ROM, and main instructions PLA is exactly the same as TMS0980
 // - 64-term microinstructions PLA between the RAM and ROM, supporting 20 microinstructions plus optional separate lines for custom opcode handling
 // - 48-term output PLA above the RAM (rotate opla 90 degrees)
-const device_type TMC0270 = &device_creator<tmc0270_cpu_device>; // 40-pin DIP, 16 O pins, 8 R pins (the other R pins are internally hooked up to support more I/O)
-// TMC0260 is same? except opla is 32 instead of 48 terms
+const device_type TMS0270 = &device_creator<tms0270_cpu_device>; // 40-pin DIP, 16 O pins, 8+ R pins (some R pins are internally hooked up to support more I/O)
+// TMS0260 is same? except opla is 32 instead of 48 terms
 
 
 static ADDRESS_MAP_START(program_11bit_9, AS_PROGRAM, 16, tms1xxx_cpu_device)
@@ -249,8 +250,8 @@ tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, device_typ
 }
 
 
-tmc0270_cpu_device::tmc0270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms0980_cpu_device(mconfig, TMC0270, "TMC0270", tag, owner, clock, 16, 8, 4, 7, 9, 4, 12, ADDRESS_MAP_NAME(program_11bit_9), 8, ADDRESS_MAP_NAME(data_64x9_as4), "tmc0270", __FILE__)
+tms0270_cpu_device::tms0270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms0980_cpu_device(mconfig, TMS0270, "TMS0270", tag, owner, clock, 16, 16, 4, 7, 9, 4, 12, ADDRESS_MAP_NAME(program_11bit_9), 8, ADDRESS_MAP_NAME(data_64x9_as4), "tms0270", __FILE__)
 {
 }
 
@@ -309,7 +310,7 @@ machine_config_constructor tms0980_cpu_device::device_mconfig_additions() const
 }
 
 
-static MACHINE_CONFIG_FRAGMENT(tmc0270)
+static MACHINE_CONFIG_FRAGMENT(tms0270)
 
 	// main opcodes PLA, microinstructions PLA, output PLA
 	MCFG_PLA_ADD("ipla", 9, 22, 24)
@@ -320,9 +321,9 @@ static MACHINE_CONFIG_FRAGMENT(tmc0270)
 	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
 MACHINE_CONFIG_END
 
-machine_config_constructor tmc0270_cpu_device::device_mconfig_additions() const
+machine_config_constructor tms0270_cpu_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME(tmc0270);
+	return MACHINE_CONFIG_NAME(tms0270);
 }
 
 
@@ -396,8 +397,6 @@ void tms1xxx_cpu_device::device_start()
 	m_cs = 0;
 	m_r = 0;
 	m_o = 0;
-	m_o_latch = 0;
-	m_o_latch_low = 0;
 	m_cki_bus = 0;
 	m_c4 = 0;
 	m_p = 0;
@@ -422,10 +421,6 @@ void tms1xxx_cpu_device::device_start()
 	m_micro = 0;
 	m_subcycle = 0;
 
-	m_a_prev = m_a;
-	m_r_prev = m_r;
-	m_o_latch_prev = m_o_latch;
-
 	// register for savestates
 	save_item(NAME(m_pc));
 	save_item(NAME(m_sr));
@@ -439,8 +434,6 @@ void tms1xxx_cpu_device::device_start()
 	save_item(NAME(m_cs));
 	save_item(NAME(m_r));
 	save_item(NAME(m_o));
-	save_item(NAME(m_o_latch));
-	save_item(NAME(m_o_latch_low));
 	save_item(NAME(m_cki_bus));
 	save_item(NAME(m_c4));
 	save_item(NAME(m_p));
@@ -465,10 +458,6 @@ void tms1xxx_cpu_device::device_start()
 	save_item(NAME(m_micro));
 	save_item(NAME(m_subcycle));
 
-	save_item(NAME(m_a_prev));
-	save_item(NAME(m_r_prev));
-	save_item(NAME(m_o_latch_prev));
-
 	// register state for debugger
 	state_add(TMS0980_PC,     "PC",     m_pc    ).formatstr("%02X");
 	state_add(TMS0980_SR,     "SR",     m_sr    ).formatstr("%01X");
@@ -483,6 +472,28 @@ void tms1xxx_cpu_device::device_start()
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_sr).formatstr("%8s").noshow();
 
 	m_icountptr = &m_icount;
+}
+
+void tms0270_cpu_device::device_start()
+{
+	// common init
+	tms1xxx_cpu_device::device_start();
+
+	// zerofill
+	m_a_prev = 0;
+	m_r_prev = 0;
+
+	m_o_latch_low = 0;
+	m_o_latch = 0;
+	m_o_latch_prev = 0;
+	
+	// register for savestates
+	save_item(NAME(m_a_prev));
+	save_item(NAME(m_r_prev));
+
+	save_item(NAME(m_o_latch_low));
+	save_item(NAME(m_o_latch));
+	save_item(NAME(m_o_latch_prev));
 }
 
 
@@ -513,8 +524,6 @@ void tms1xxx_cpu_device::device_reset()
 	// clear outputs
 	m_r = 0;
 	m_write_r(0, m_r & m_r_mask, 0xffff);
-	m_o_latch_low = 0;
-	m_o_latch = 0;
 	write_o_output(0);
 	m_write_r(0, m_r & m_r_mask, 0xffff);
 	m_power_off(0);
@@ -625,8 +634,8 @@ UINT32 tms0980_cpu_device::decode_micro(UINT8 sel)
 	UINT32 mask = m_mpla->read(sel);
 	mask ^= 0x43fc3; // invert active-negative
 	
-	// M_RSTR is specific to TMC02x0, it redirects to F_RSTR
-	// M_UNK1 is specific to TMC0270, unknown yet
+	// M_RSTR is specific to TMS02x0, it redirects to F_RSTR
+	// M_UNK1 is specific to TMS0270, unknown yet
 	//                      _______  ______                                _____  _____  _____  _____  ______  _____  ______  _____                            _____
 	const UINT32 md[22] = { M_NDMTP, M_DMTP, M_AUTY, M_AUTA, M_CKM, M_SSE, M_CKP, M_YTP, M_MTP, M_ATN, M_NATN, M_MTN, M_15TN, M_CKN, M_NE, M_C8, M_SSS, M_CME, M_CIN, M_STO, M_RSTR, M_UNK1 };
 	
@@ -671,6 +680,19 @@ void tms0980_cpu_device::device_reset()
 
 	for (int op = 0; op < 0x40; op++)
 		m_micro_direct[op] = decode_micro(op);
+}
+
+void tms0270_cpu_device::device_reset()
+{
+	// common reset
+	tms0980_cpu_device::device_reset();
+
+	m_a_prev = m_a;
+	m_r_prev = m_r;
+
+	m_o_latch_low = 0;
+	m_o_latch = 0;
+	m_o_latch_prev = 0;
 }
 
 
@@ -724,15 +746,13 @@ void tms0980_cpu_device::read_opcode()
 	next_pc();
 }
 
-void tmc0270_cpu_device::read_opcode()
+void tms0270_cpu_device::read_opcode()
 {
 	tms0980_cpu_device::read_opcode();
 	
 	// RSTR is on the mpla
 	if (m_micro & M_RSTR)
 		m_fixed |= F_RSTR;
-	
-	// TODO: M_UNK1
 }
 
 
@@ -741,21 +761,21 @@ void tmc0270_cpu_device::read_opcode()
 //  i/o handling
 //-------------------------------------------------
 
-void tms1xxx_cpu_device::write_o_output(UINT8 data)
+void tms1xxx_cpu_device::write_o_output(UINT8 index)
 {
 	// a hardcoded table is supported if the output pla is unknown
-	m_o = (c_output_pla == NULL) ? m_opla->read(data) : c_output_pla[data];
+	m_o = (c_output_pla == NULL) ? m_opla->read(index) : c_output_pla[index];
 	m_write_o(0, m_o & m_o_mask, 0xffff);
 }
 
-void tms0970_cpu_device::write_o_output(UINT8 data)
+void tms0970_cpu_device::write_o_output(UINT8 index)
 {
-	m_o = m_spla->read(data);
+	m_o = m_spla->read(index);
 	m_write_o(0, m_o & m_o_mask, 0xffff);
 }
 
 
-void tmc0270_cpu_device::dynamic_output()
+void tms0270_cpu_device::dynamic_output()
 {
 	// TODO..
 	
@@ -773,7 +793,7 @@ UINT8 tms1xxx_cpu_device::read_k_input()
 	return (k & 0xf) | k3;
 }
 
-UINT8 tmc0270_cpu_device::read_k_input()
+UINT8 tms0270_cpu_device::read_k_input()
 {
 	// TODO..
 	
@@ -994,8 +1014,8 @@ void tms1xxx_cpu_device::op_sbl()
 }
 
 
-// TMC0270-specific
-void tmc0270_cpu_device::op_tdo()
+// TMS0270-specific
+void tms0270_cpu_device::op_tdo()
 {
 	// TDO: transfer data out
 	if (m_status)
@@ -1003,7 +1023,19 @@ void tmc0270_cpu_device::op_tdo()
 	else
 		m_o_latch = m_o_latch_low | (m_a << 4 & 0x30);
 	
-	// handled further in dynamic_output
+	// write to output is done in dynamic_output
+}
+
+void tms0270_cpu_device::op_setr()
+{
+	// same as default, but handle write to output in dynamic_output
+	m_r = m_r | (1 << m_y);
+}
+
+void tms0270_cpu_device::op_rstr()
+{
+	// same as default, but handle write to output in dynamic_output
+	m_r = m_r & ~(1 << m_y);
 }
 
 
@@ -1070,8 +1102,8 @@ void tms1xxx_cpu_device::execute_run()
 			}
 
 			// execute: k input valid, read ram, clear alu inputs
-			set_cki_bus();
 			dynamic_output();
+			set_cki_bus();
 			m_ram_in = m_data->read_byte(m_ram_address) & 0xf;
 			m_dam_in = m_data->read_byte(m_ram_address | (0x10 << (m_x_bits-1))) & 0xf;
 			m_ram_out = -1;

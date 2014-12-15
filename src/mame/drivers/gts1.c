@@ -67,6 +67,7 @@ ToDo:
 
 
 #include "machine/genpin.h"
+#include "machine/ra17xx.h"
 #include "machine/r10696.h"
 #include "machine/r10788.h"
 #include "cpu/pps4/pps4.h"
@@ -90,21 +91,27 @@ public:
 
     DECLARE_DRIVER_INIT(gts1);
 
+    DECLARE_READ8_MEMBER (gts1_solenoid_r);
+    DECLARE_WRITE8_MEMBER(gts1_solenoid_w);
+    DECLARE_READ8_MEMBER (gts1_switches_r);
+    DECLARE_WRITE8_MEMBER(gts1_switches_w);
     DECLARE_WRITE8_MEMBER(gts1_display_w);
-    DECLARE_READ8_MEMBER (gts1_io_r);
-    DECLARE_WRITE8_MEMBER(gts1_io_w);
     DECLARE_READ8_MEMBER (gts1_lamp_apm_r);
     DECLARE_WRITE8_MEMBER(gts1_lamp_apm_w);
     DECLARE_READ8_MEMBER (gts1_nvram_r);
     DECLARE_WRITE8_MEMBER(gts1_nvram_w);
+    DECLARE_READ8_MEMBER (gts1_io_r);
+    DECLARE_WRITE8_MEMBER(gts1_io_w);
     DECLARE_READ8_MEMBER (gts1_pa_r);
     DECLARE_WRITE8_MEMBER(gts1_pa_w);
     DECLARE_WRITE8_MEMBER(gts1_pb_w);
 private:
     virtual void machine_reset();
     required_device<cpu_device> m_maincpu;
-    UINT8 m_io[256];
-    UINT8 m_nvram_addr;
+    UINT8 m_io[256];            //!< dummy I/O values of undefined ranges (will be removed)
+    UINT8 m_nvram_addr;         //!< NVRAM address
+    bool m_nvram_e2;            //!< NVRWAM enable (E2 line)
+    bool m_nvram_wr;            //!< NVRWAM write (W/R line)
     UINT16 m_6351_addr;
     UINT16 m_z30_out;
 };
@@ -118,12 +125,14 @@ static ADDRESS_MAP_START( gts1_data, AS_DATA, 8, gts1_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gts1_io, AS_IO, 8, gts1_state )
-    AM_RANGE(0x0030, 0x003f) AM_DEVREADWRITE ( "r10696", r10696_device, io_r, io_w ) // (U3) solenoid + dips
-    AM_RANGE(0x0060, 0x006f) AM_DEVREADWRITE ( "r10696", r10696_device, io_r, io_w ) // (U2) NVRAM io chip
-    AM_RANGE(0x00d0, 0x00df) AM_DEVREADWRITE ( "r10788", r10788_device, io_r, io_w ) // (U6) display chip
-    AM_RANGE(0x0000, 0x00ff) AM_READ ( gts1_io_r )   AM_WRITE( gts1_io_w ) // connects to all the other chips
-    AM_RANGE(0x0100, 0x0100) AM_READ ( gts1_pa_r ) AM_WRITE( gts1_pa_w )
-    AM_RANGE(0x0101, 0x0101) AM_WRITE(gts1_pb_w)
+    AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE ( "ra17xx_u4", ra17xx_device, io_r, io_w ) // (U4) solenoid
+    AM_RANGE(0x0030, 0x003f) AM_DEVREADWRITE ( "r10696_u3", r10696_device, io_r, io_w ) // (U3) solenoid + dips
+    AM_RANGE(0x0040, 0x004f) AM_DEVREADWRITE ( "ra17xx_u5", ra17xx_device, io_r, io_w ) // (U5) switch matrix
+    AM_RANGE(0x0060, 0x006f) AM_DEVREADWRITE ( "r10696_u2", r10696_device, io_r, io_w ) // (U2) NVRAM io chip
+    AM_RANGE(0x00d0, 0x00df) AM_DEVREADWRITE ( "r10788_u6", r10788_device, io_r, io_w ) // (U6) display chip
+    AM_RANGE(0x0000, 0x00ff) AM_READ ( gts1_io_r ) AM_WRITE( gts1_io_w )             // catch undecoded I/O accesss
+    AM_RANGE(0x0100, 0x0100) AM_READ ( gts1_pa_r ) AM_WRITE( gts1_pa_w )             // CPU I/O port A (input/output)
+    AM_RANGE(0x0101, 0x0101) AM_WRITE( gts1_pb_w )                                   // CPU I/O port B (output only)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gts1 )
@@ -209,12 +218,83 @@ INPUT_PORTS_END
 void gts1_state::machine_reset()
 {
     m_nvram_addr = 0;
+    m_nvram_e2 = false;
+    m_nvram_wr = false;
     m_6351_addr = 0;
     m_z30_out = 0;
 }
 
 DRIVER_INIT_MEMBER(gts1_state,gts1)
 {
+}
+
+READ8_MEMBER (gts1_state::gts1_solenoid_r)
+{
+    UINT8 data = 0;
+    LOG(("%s: solenoid[%02x] -> %x\n", __FUNCTION__, offset, data));
+    return data;
+}
+
+WRITE8_MEMBER(gts1_state::gts1_solenoid_w)
+{
+    switch (offset) {
+    case  0:
+        LOG(("%s: outhole <- %x\n", __FUNCTION__, data));
+        break;
+    case  1:
+        LOG(("%s: knocker <- %x\n", __FUNCTION__, data));
+        break;
+    case  2:
+        LOG(("%s: tens chime <- %x\n", __FUNCTION__, data));
+        break;
+    case  3:
+        LOG(("%s: hundreds chime <- %x\n", __FUNCTION__, data));
+        break;
+    case  4:
+        LOG(("%s: thousands chime <- %x\n", __FUNCTION__, data));
+        break;
+    case  5:
+        LOG(("%s: no. 6 <- %x\n", __FUNCTION__, data));
+        break;
+    case  6:
+        LOG(("%s: no. 7 <- %x\n", __FUNCTION__, data));
+        break;
+    case  7:
+        LOG(("%s: no. 8 <- %x\n", __FUNCTION__, data));
+        break;
+    case  8:
+    case  9:
+    case 10:
+    case 11:
+        LOG(("%s: not used [%x] <- %x\n", __FUNCTION__, offset, data));
+        break;
+    case 12:    // spare
+        LOG(("%s: spare [%x] <- %x\n", __FUNCTION__, offset, data));
+        break;
+    case 13:    // RAM control E2
+        LOG(("%s: RAM control E2 <- %x\n", __FUNCTION__, data));
+        m_nvram_e2 = (data & 1) ? true : false;
+        break;
+    case 14:    // RAM control W/R
+        LOG(("%s: RAM control W/R <- %x\n", __FUNCTION__, data));
+        break;
+        m_nvram_wr = (data & 1) ? true : false;
+    case 15:    // spare
+        LOG(("%s: spare [%x] <- %x\n", __FUNCTION__, offset, data));
+        break;
+    }
+}
+
+READ8_MEMBER (gts1_state::gts1_switches_r)
+{
+    UINT8 data = 0;
+    LOG(("%s: switches[%02x] -> %x\n", __FUNCTION__, offset, data));
+    return data;
+}
+
+WRITE8_MEMBER(gts1_state::gts1_switches_w)
+{
+    LOG(("%s: switches[%02x] <- %x\n", __FUNCTION__, offset, data));
 }
 
 /**
@@ -296,6 +376,9 @@ READ8_MEMBER (gts1_state::gts1_nvram_r)
     {
         case 0: // group A
             // FIXME: Schematics says TO Z5
+            if (!m_nvram_wr && m_nvram_e2) {
+                // FIXME: read generic NVRAM data
+            }
             break;
         case 1: // group B
         case 2: // group C
@@ -321,8 +404,10 @@ WRITE8_MEMBER(gts1_state::gts1_nvram_w)
             m_nvram_addr = (m_nvram_addr & ~(15 << 4)) | ((data & 15) << 4);
             break;
         case 2: // group C - data bits 3:0 of NVRAM
-            // FIXME: schematics says write enable is U4-36 (O14)
-            LOG(("%s: nvram[%02x] <- %x\n", __FUNCTION__, m_nvram_addr, data & 15));
+            if (m_nvram_wr && m_nvram_e2) {
+                LOG(("%s: nvram[%02x] <- %x\n", __FUNCTION__, m_nvram_addr, data & 15));
+                // FIXME: write generic NVRAM data
+            }
             break;
     }
 }
@@ -482,13 +567,28 @@ static MACHINE_CONFIG_START( gts1, gts1_state )
 
     //MCFG_NVRAM_ADD_0FILL("nvram")
 
-    /* General Purpose Input/Output */
-    MCFG_DEVICE_ADD( "r10696", R10696, 0 )
+    /* A1753CE 2048 x 8 ROM (000-7ff), 128 x 4 RAM (00-7f) and 16 I/O lines (20 ... 2f) */
+    MCFG_DEVICE_ADD( "ra17xx_u5", RA17XX, 0 )
+    MCFG_RA17XX_READ ( READ8 (gts1_state,gts1_switches_r) )
+    MCFG_RA17XX_WRITE( WRITE8(gts1_state,gts1_switches_w) )
+
+    /* A1752CF 2048 x 8 ROM (800-fff), 128 x 4 RAM (80-ff) and 16 I/O lines (40 ... 4f) */
+    MCFG_DEVICE_ADD( "ra17xx_u4", RA17XX, 0 )
+    MCFG_RA17XX_READ ( READ8 (gts1_state,gts1_solenoid_r) )
+    MCFG_RA17XX_WRITE( WRITE8(gts1_state,gts1_solenoid_w) )
+
+    /* 10696 General Purpose Input/Output */
+    MCFG_DEVICE_ADD( "r10696_u2", R10696, 0 )
     MCFG_R10696_IO( READ8 (gts1_state,gts1_nvram_r),
                     WRITE8(gts1_state,gts1_nvram_w) )
 
-    /* General Purpose Display and Keyboard */
-    MCFG_DEVICE_ADD( "r10788", R10788, XTAL_3_579545MHz / 18 )  // divided in the circuit
+    /* 10696 General Purpose Input/Output */
+    MCFG_DEVICE_ADD( "r10696_u3", R10696, 0 )
+    MCFG_R10696_IO( READ8 (gts1_state,gts1_lamp_apm_r),
+                    WRITE8(gts1_state,gts1_lamp_apm_w) )
+
+    /* 10788 General Purpose Display and Keyboard */
+    MCFG_DEVICE_ADD( "r10788_u6", R10788, XTAL_3_579545MHz / 18 )  // divided in the circuit
     MCFG_R10788_UPDATE( WRITE8(gts1_state,gts1_display_w) )
 
     /* Video */

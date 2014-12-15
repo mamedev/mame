@@ -21,7 +21,7 @@
 #include "cpu/tms0980/tms0980.h"
 #include "sound/speaker.h"
 
-#include "simon.lh"
+#include "simon.lh" // clickable
 
 // master clock is a single stage RC oscillator: R=33K, C=100pf,
 // according to the TMS 1000 series data manual this is around 350kHz

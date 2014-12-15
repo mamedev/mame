@@ -142,6 +142,8 @@ public:
 	struct {
 		UINT8 status;
 		UINT8 data;
+		UINT8 prev_data;
+		UINT16 repeat_count;
 	}m_keyb;
 
 	/* Saturn specific*/

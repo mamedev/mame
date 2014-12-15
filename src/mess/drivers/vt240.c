@@ -149,6 +149,7 @@ static ADDRESS_MAP_START( vt240_mem, AS_PROGRAM, 16, vt240_state )
 ADDRESS_MAP_END
 
 // PDF page 134 (6-9)
+#if 0
 static ADDRESS_MAP_START(vt240_char_mem, AS_PROGRAM, 8, vt240_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("charcpu", 0)
@@ -163,7 +164,7 @@ static ADDRESS_MAP_START(vt240_char_io, AS_IO, 8, vt240_state)
 	AM_RANGE(0x20, 0x20) AM_READ(test_r)
 	//AM_RANGE(0x30, 0x30) AM_READWRITE(pcg_r,pcg_w) // 0x30 PCG
 ADDRESS_MAP_END
-
+#endif
 
 static ADDRESS_MAP_START( upd7220_map, AS_0, 16, vt240_state)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram")

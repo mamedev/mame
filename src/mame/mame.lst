@@ -6936,6 +6936,8 @@ tempest1        // 136002           (c) 1980
 tempest1r       // 136002           (c) 1980
 temptube        // (hack)
 spacduel        // 136006           (c) 1980
+spacduel1       // 136006           (c) 1980
+spacduel0       // 136006           (c) 1980
 gravitar        // 136010           (c) 1982
 gravitar2       // 136010           (c) 1982
 gravitar1       // 136010           (c) 1982
@@ -11173,6 +11175,7 @@ peip0115        // (c) 1987 IGT - International Game Technology
 peip0116        // (c) 1987 IGT - International Game Technology
 peip0118        // (c) 1987 IGT - International Game Technology
 peip0120        // (c) 1987 IGT - International Game Technology
+pemg0183        // (c) 1994 IGT - International Game Technology
 pemg0252        // (c) 1994 IGT - International Game Technology
 pebe0014        // (c) 1994 IGT - International Game Technology
 peke0017        // (c) 1994 IGT - International Game Technology
@@ -11312,6 +11315,10 @@ pex2420p        // (c) 1995 IGT - International Game Technology
 pex2421p        // (c) 1995 IGT - International Game Technology
 pex2440p        // (c) 1995 IGT - International Game Technology
 pex2461p        // (c) 1995 IGT - International Game Technology
+pex2478p        // (c) 1995 IGT - International Game Technology
+pex2479p        // (c) 1995 IGT - International Game Technology
+pex2480p        // (c) 1995 IGT - International Game Technology
+pex2485p        // (c) 1995 IGT - International Game Technology
 pekoc766        // (c) 1997 IGT - International Game Technology
 pekoc801        // (c) 1997 IGT - International Game Technology
 pekoc802        // (c) 1997 IGT - International Game Technology
