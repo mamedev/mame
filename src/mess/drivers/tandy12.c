@@ -2,13 +2,28 @@
 // copyright-holders:hap
 /***************************************************************************
 
-  Tandy Radio Shack Tandy-12 - Computerized Arcade
+  Tandy Radio Shack Computerized Arcade (1981, 1982, 1995)
   * TMS1100 CD7282SL
   
-  This tabletop game looks and plays like "Fabulous Fred" by the Japanese
-  company Mego Corp. in 1980, which in turn is a mix of Merlin and Simon.
-  Unlike Merlin and Simon, these spin-offs were not successful.
+  This handheld contains 12 minigames. It looks and plays like "Fabulous Fred"
+  by the Japanese company Mego Corp. in 1980, which in turn is a mix of Merlin
+  and Simon. Unlike Merlin and Simon, spin-offs like these were not successful.
+  There were releases with and without the prefix "Tandy-12", I don't know
+  which name was more common. Also not worth noting is that it needed five
+  batteries; 4 C-cells and a 9-volt.
   
+  Some of the games require accessories included with the toy (eg. the Baseball
+  game is played with a board representing the playing field). To start a game,
+  hold the [SELECT] button, then press [START] when the game button lights up.
+  As always, refer to the official manual for more information.
+  
+  See below at the input defs for a list of the games.
+
+  
+  TODO:
+  - output PLA is not verified
+  - microinstructions PLA is not verified
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -28,13 +43,14 @@ public:
 	tandy12_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_button_matrix(*this, "IN"),
 		m_speaker(*this, "speaker")
 	{ }
 
 	required_device<tms1xxx_cpu_device> m_maincpu;
+	required_ioport_array<5> m_button_matrix;
 	required_device<speaker_sound_device> m_speaker;
 
-	UINT16 m_o;
 	UINT16 m_r;
 
 	DECLARE_READ8_MEMBER(read_k);
@@ -53,19 +69,33 @@ public:
 
 READ8_MEMBER(tandy12_state::read_k)
 {
-	return 0;
+	UINT8 k = 0;
+	
+	// read selected button rows
+	for (int i = 0; i < 5; i++)
+		if (m_r >> (i+5) & 1)
+			k |= m_button_matrix[i]->read();
+
+	return k;
 }
 
 WRITE16_MEMBER(tandy12_state::write_o)
 {
-	m_o = data;
+	// O0-O7: button lamps 1-8
+	for (int i = 0; i < 8; i++)
+		output_set_lamp_value(i, data >> i & 1);
 }
 
 WRITE16_MEMBER(tandy12_state::write_r)
 {
+	// R0-R3: button lamps 9-12
+	for (int i = 0; i < 4; i++)
+		output_set_lamp_value(i + 8, data >> i & 1);
+
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
-	
+
+	// R5-R9: input mux
 	m_r = data;
 }
 
@@ -77,7 +107,57 @@ WRITE16_MEMBER(tandy12_state::write_r)
 
 ***************************************************************************/
 
+/* physical button layout and labels is like this:
+
+        REPEAT-2              SPACE-2
+          [O]     OFF--ON       [O]
+
+    [purple]1     [blue]5       [l-green]9
+    ORGAN         TAG-IT        TREASURE HUNT
+    
+    [l-orange]2   [turquoise]6  [red]10
+    SONG WRITER   ROULETTE      COMPETE
+    
+    [pink]3       [yellow]7     [violet]11
+    REPEAT        BASEBALL      FIRE AWAY
+
+    [green]4      [orange]8     [brown]12
+    TORPEDO       REPEAT PLUS   HIDE 'N SEEK
+
+          [O]        [O]        [O]
+         START      SELECT    PLAY-2/HIT-7
+*/
+
 static INPUT_PORTS_START( tandy12 )
+	PORT_START("IN.0") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("12")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("11")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("10")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+
+	PORT_START("IN.1") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_NAME("Space-2")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_NAME("Play-2/Hit-7")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_NAME("Select")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Start")
+
+	PORT_START("IN.2") // R7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME("Repeat-2")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // R8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+
+	PORT_START("IN.4") // R9
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
 INPUT_PORTS_END
 
 
@@ -90,21 +170,21 @@ INPUT_PORTS_END
 
 void tandy12_state::machine_start()
 {
-	m_o = 0;
 	m_r = 0;
-
-	save_item(NAME(m_o));
 	save_item(NAME(m_r));
 }
 
 
 static const UINT16 tandy12_output_pla[0x20] =
 {
-	/* O output PLA configuration currently unknown */
-	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-	0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
+	// these are certain
+	0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40,
+	0x80, 0x00, 0x00, 0x00, 0x00,
+	
+	// rest is unused?
+	0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
 
@@ -146,4 +226,4 @@ ROM_START( tandy12 )
 ROM_END
 
 
-CONS( 1981, tandy12, 0, 0, tandy12, tandy12, driver_device, 0, "Tandy Radio Shack", "Tandy-12 - Computerized Arcade", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1981, tandy12, 0, 0, tandy12, tandy12, driver_device, 0, "Tandy Radio Shack", "Tandy-12 - Computerized Arcade", GAME_SUPPORTS_SAVE )

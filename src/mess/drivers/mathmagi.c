@@ -22,7 +22,8 @@
 
 
   TODO:
-  - some of the led symbols are probably wrong, output pla is unknown
+  - some of the led symbols are probably wrong, output PLA is unknown
+  - microinstructions PLA is not verified
   
 ***************************************************************************/
 
@@ -83,6 +84,7 @@ READ8_MEMBER(mathmagi_state::read_k)
 WRITE16_MEMBER(mathmagi_state::write_o)
 {
 	// O1-O7: led segments A-G
+	// O0: N/C
 	m_o = data;
 }
 
@@ -162,7 +164,9 @@ static INPUT_PORTS_START( mathmagi )
 	PORT_CONFNAME( 0x01, 0x00, "Players")
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
-	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -196,7 +200,6 @@ enum
 
 static const UINT16 mathmagi_output_pla[0x20] =
 {
-	/* O output PLA configuration currently unknown */
 	lA+lB+lC+lD+lE+lF,      // 0
 	lB+lC,                  // 1
 	lA+lB+lG+lE+lD,         // 2

@@ -5,6 +5,7 @@
   TMS0980/TMS1000-family MCU cores
 
 */
+
 #ifndef _TMS0980_H_
 #define _TMS0980_H_
 
@@ -12,20 +13,27 @@
 #include "machine/pla.h"
 
 
-#define MCFG_TMS1XXX_OUTPUT_PLA(_pla) \
-	tms1xxx_cpu_device::set_output_pla(*device, _pla);
-
+// K input pins
 #define MCFG_TMS1XXX_READ_K_CB(_devcb) \
 	tms1xxx_cpu_device::set_read_k_callback(*device, DEVCB_##_devcb);
 
+// O/Segment output pins
 #define MCFG_TMS1XXX_WRITE_O_CB(_devcb) \
 	tms1xxx_cpu_device::set_write_o_callback(*device, DEVCB_##_devcb);
 
+// R output pins (also called D on some chips)
 #define MCFG_TMS1XXX_WRITE_R_CB(_devcb) \
 	tms1xxx_cpu_device::set_write_r_callback(*device, DEVCB_##_devcb);
 
+// OFF opcode on TMS0980 and up
 #define MCFG_TMS1XXX_POWER_OFF_CB(_devcb) \
 	tms1xxx_cpu_device::set_power_off_callback(*device, DEVCB_##_devcb);
+
+// Use this if the output PLA is unknown:
+// If the microinstructions (or other) PLA is unknown, try using one from another romset.
+#define MCFG_TMS1XXX_OUTPUT_PLA(_pla) \
+	tms1xxx_cpu_device::set_output_pla(*device, _pla);
+
 
 
 class tms1xxx_cpu_device : public cpu_device
@@ -62,9 +70,6 @@ public:
 	template<class _Object> static devcb_base &set_power_off_callback(device_t &device, _Object object) { return downcast<tms1xxx_cpu_device &>(device).m_power_off.set_callback(object); }
 	static void set_output_pla(device_t &device, const UINT16 *output_pla) { downcast<tms1xxx_cpu_device &>(device).c_output_pla = output_pla; }
 	
-	// driver debugging
-	UINT8 debug_peek_o_index() { return m_o_index; }
-
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -132,7 +137,6 @@ protected:
 	UINT8   m_cs;        // chapter subroutine bit
 	UINT16  m_r;
 	UINT16  m_o;
-	UINT8   m_o_index;
 	UINT8   m_cki_bus;
 	UINT8   m_c4;
 	UINT8   m_p;         // 4-bit adder p(lus)-input
@@ -283,10 +287,10 @@ protected:
 };
 
 
-class tmc0270_cpu_device : public tms0980_cpu_device
+class tms0270_cpu_device : public tms0980_cpu_device
 {
 public:
-	tmc0270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms0270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// overrides
@@ -322,7 +326,7 @@ extern const device_type TMS1100;
 extern const device_type TMS1300;
 extern const device_type TMS0970;
 extern const device_type TMS0980;
-extern const device_type TMC0270;
+extern const device_type TMS0270;
 
 
 #endif /* _TMS0980_H_ */
