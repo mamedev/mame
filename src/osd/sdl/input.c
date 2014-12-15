@@ -757,7 +757,7 @@ static void sdlinput_register_joysticks(running_machine &machine)
 
 		osd_printf_verbose("Joystick: %s\n", devinfo->name.cstr());
 		osd_printf_verbose("Joystick:   ...  %d axes, %d buttons %d hats %d balls\n", SDL_JoystickNumAxes(joy), SDL_JoystickNumButtons(joy), SDL_JoystickNumHats(joy), SDL_JoystickNumBalls(joy));
-		osd_printf_verbose("Joystick:   ...  Physical id %d mapped to logical id %d\n", physical_stick, stick);
+		osd_printf_verbose("Joystick:   ...  Physical id %d mapped to logical id %d\n", physical_stick, stick + 1);
 
 		// loop over all axes
 		for (axis = 0; axis < SDL_JoystickNumAxes(joy); axis++)
