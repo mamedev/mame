@@ -73,8 +73,12 @@ $(FILE2STR_TARGET): $(FILE2STROBJS) $(LIBOCORE)
 
 MAKEDEPOBJS = \
 	$(BUILDOBJ)/makedep.o \
+	$(OBJ)/lib/util/astring.o \
+	$(OBJ)/lib/util/corealloc.o \
+	$(OBJ)/lib/util/corefile.o \
+	$(OBJ)/lib/util/unicode.o \
 
-$(MAKEDEP_TARGET): $(MAKEDEPOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB)
+$(MAKEDEP_TARGET): $(MAKEDEPOBJS) $(LIBOCORE) $(ZLIB)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 
@@ -86,9 +90,13 @@ $(MAKEDEP_TARGET): $(MAKEDEPOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB)
 
 MAKEMAKOBJS = \
 	$(BUILDOBJ)/makemak.o \
+	$(OBJ)/lib/util/astring.o \
+	$(OBJ)/lib/util/corealloc.o \
+	$(OBJ)/lib/util/corefile.o \
+	$(OBJ)/lib/util/corestr.o \
+	$(OBJ)/lib/util/unicode.o \
 
-# TODO: 7z and flac - really?
-$(MAKEMAK_TARGET): $(MAKEMAKOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB) $(7Z_LIB)
+$(MAKEMAK_TARGET): $(MAKEMAKOBJS) $(LIBOCORE) $(ZLIB)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 
@@ -100,9 +108,13 @@ $(MAKEMAK_TARGET): $(MAKEMAKOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB) $(7
 
 MAKELISTOBJS = \
 	$(BUILDOBJ)/makelist.o \
+	$(OBJ)/lib/util/astring.o \
+	$(OBJ)/lib/util/corealloc.o \
+	$(OBJ)/lib/util/cstrpool.o \
+	$(OBJ)/lib/util/corefile.o \
+	$(OBJ)/lib/util/unicode.o \
 
-# TODO: 7z and flac - really?
-$(MAKELIST_TARGET): $(MAKELISTOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB) $(7Z_LIB)
+$(MAKELIST_TARGET): $(MAKELISTOBJS) $(LIBOCORE) $(ZLIB)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 
@@ -114,8 +126,15 @@ $(MAKELIST_TARGET): $(MAKELISTOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB) $
 
 PNG2BDCOBJS = \
 	$(BUILDOBJ)/png2bdc.o \
+	$(OBJ)/lib/util/astring.o \
+	$(OBJ)/lib/util/corefile.o \
+	$(OBJ)/lib/util/corealloc.o \
+	$(OBJ)/lib/util/bitmap.o \
+	$(OBJ)/lib/util/png.o \
+	$(OBJ)/lib/util/palette.o \
+	$(OBJ)/lib/util/unicode.o \
 
-$(PNG2BDC_TARGET): $(PNG2BDCOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB)
+$(PNG2BDC_TARGET): $(PNG2BDCOBJS) $(LIBOCORE) $(ZLIB)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 
