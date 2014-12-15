@@ -459,6 +459,17 @@ void pci_bridge_device::reset_all_mappings()
 	for(int i=0; i != all_devices.count(); i++)
 		if(all_devices[i] != this)
 			all_devices[i]->reset_all_mappings();
+
+	prefetch_baseu = 0;
+	prefetch_limitu = 0;
+	memory_base = 0;
+	memory_limit = 0;
+	prefetch_base = 0;
+	prefetch_limit = 0;
+	iobaseu = 0;
+	iolimitu = 0;
+	iobase = 0;
+	iolimit = 0;
 }
 
 void pci_bridge_device::map_device(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
@@ -595,23 +606,23 @@ WRITE8_MEMBER (pci_bridge_device::secondary_latency_w)
 
 READ8_MEMBER  (pci_bridge_device::iobase_r)
 {
-	logerror("%s: iobase_r\n", tag());
-	return 0xff;
+	return iobase;
 }
 
 WRITE8_MEMBER (pci_bridge_device::iobase_w)
 {
+	iobase = data;
 	logerror("%s: iobase_w %02x\n", tag(), data);
 }
 
 READ8_MEMBER  (pci_bridge_device::iolimit_r)
 {
-	logerror("%s: iolimit_r\n", tag());
-	return 0xff;
+	return iolimit;
 }
 
 WRITE8_MEMBER (pci_bridge_device::iolimit_w)
 {
+	iolimit = data;
 	logerror("%s: iolimit_w %02x\n", tag(), data);
 }
 
@@ -628,90 +639,90 @@ WRITE16_MEMBER(pci_bridge_device::secondary_status_w)
 
 READ16_MEMBER (pci_bridge_device::memory_base_r)
 {
-	logerror("%s: memory_base_r\n", tag());
-	return 0xffff;
+	return memory_base;
 }
 
 WRITE16_MEMBER(pci_bridge_device::memory_base_w)
 {
-	logerror("%s: memory_base_w %04x\n", tag(), data);
+	COMBINE_DATA(&memory_base);
+	logerror("%s: memory_base_w %04x\n", tag(), memory_base);
 }
 
 READ16_MEMBER (pci_bridge_device::memory_limit_r)
 {
-	logerror("%s: memory_limit_r\n", tag());
-	return 0xffff;
+	return memory_limit;
 }
 
 WRITE16_MEMBER(pci_bridge_device::memory_limit_w)
 {
-	logerror("%s: memory_limit_w %04x\n", tag(), data);
+	COMBINE_DATA(&memory_limit);
+	logerror("%s: memory_limit_w %04x\n", tag(), memory_limit);
 }
 
 READ16_MEMBER (pci_bridge_device::prefetch_base_r)
 {
-	logerror("%s: prefetch_base_r\n", tag());
-	return 0xffff;
+	return prefetch_base;
 }
 
 WRITE16_MEMBER(pci_bridge_device::prefetch_base_w)
 {
-	logerror("%s: prefetch_base_w %04x\n", tag(), data);
+	COMBINE_DATA(&prefetch_base);
+	logerror("%s: prefetch_base_w %04x\n", tag(), prefetch_base);
 }
 
 READ16_MEMBER (pci_bridge_device::prefetch_limit_r)
 {
-	logerror("%s: prefetch_limit_r\n", tag());
-	return 0xffff;
+	return prefetch_limit;
 }
 
 WRITE16_MEMBER(pci_bridge_device::prefetch_limit_w)
 {
-	logerror("%s: prefetch_limit_w %04x\n", tag(), data);
+	COMBINE_DATA(&prefetch_limit);
+	logerror("%s: prefetch_limit_w %04x\n", tag(), prefetch_limit);
 }
 
 READ32_MEMBER (pci_bridge_device::prefetch_baseu_r)
 {
-	logerror("%s: prefetch_baseu_r\n", tag());
-	return 0xffffffff;
+	return prefetch_baseu;
 }
 
 WRITE32_MEMBER(pci_bridge_device::prefetch_baseu_w)
 {
-	logerror("%s: prefetch_baseu_w %08x\n", tag(), data);
+	COMBINE_DATA(&prefetch_baseu);
+	logerror("%s: prefetch_baseu_w %08x\n", tag(), prefetch_baseu);
 }
 
 READ32_MEMBER (pci_bridge_device::prefetch_limitu_r)
 {
-	logerror("%s: prefetch_limitu_r\n", tag());
-	return 0xffffffff;
+	return prefetch_limitu;
 }
 
 WRITE32_MEMBER(pci_bridge_device::prefetch_limitu_w)
 {
-	logerror("%s: prefetch_limitu_w %08x\n", tag(), data);
+	COMBINE_DATA(&prefetch_limitu);
+	logerror("%s: prefetch_limitu_w %08x\n", tag(), prefetch_limitu);
 }
 
 READ16_MEMBER (pci_bridge_device::iobaseu_r)
 {
-	logerror("%s: iobaseu_r\n", tag());
-	return 0xffff;
+	return iobaseu;
 }
 
 WRITE16_MEMBER(pci_bridge_device::iobaseu_w)
 {
-	logerror("%s: iobaseu_w %04x\n", tag(), data);
+	COMBINE_DATA(&iobaseu);
+	logerror("%s: iobaseu_w %04x\n", tag(), iobaseu);
 }
 
 READ16_MEMBER (pci_bridge_device::iolimitu_r)
 {
-	logerror("%s: iolimitu_r\n", tag());
-	return 0xffff;
+	return iolimitu;
 }
 
 WRITE16_MEMBER(pci_bridge_device::iolimitu_w)
 {
-	logerror("%s: iolimitu_w %04x\n", tag(), data);
+	COMBINE_DATA(&iolimitu);
+	logerror("%s: iolimitu_w %04x\n", tag(), iolimitu);
 }
 
 READ8_MEMBER  (pci_bridge_device::interrupt_line_r)
@@ -738,7 +749,6 @@ WRITE8_MEMBER (pci_bridge_device::interrupt_pin_w)
 
 READ16_MEMBER (pci_bridge_device::bridge_control_r)
 {
-	logerror("%s: bridge_control_r\n", tag());
 	return bridge_control;
 }
 
