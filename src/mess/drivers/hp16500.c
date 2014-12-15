@@ -27,18 +27,23 @@ class hp16500_state : public driver_device
 public:
 	hp16500_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_vram(*this, "vram")
+		m_maincpu(*this, "maincpu")
 	 { }                                      
 
 	virtual void video_start();
 	UINT32 screen_update_hp16500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT32> m_vram;
+	dynamic_array<UINT8> m_vram;
 
+	UINT8 m_mask, m_val;
 
 	DECLARE_WRITE32_MEMBER(palette_w);
+
+	DECLARE_WRITE8_MEMBER(vram_w);
+	DECLARE_READ8_MEMBER (vram_r);
+	DECLARE_WRITE8_MEMBER(mask_w);
+	DECLARE_WRITE8_MEMBER(val_w);
 
 private:
 	UINT32 m_palette[256], m_colors[3], m_count, m_clutoffs;
@@ -47,7 +52,10 @@ private:
 static ADDRESS_MAP_START(hp16500_map, AS_PROGRAM, 32, hp16500_state)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_REGION("bios", 0)
 	AM_RANGE(0x0020f000, 0x0020f003) AM_WRITE(palette_w)
-	AM_RANGE(0x00600000, 0x0063ffff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0x00600000, 0x0061ffff) AM_WRITE8(vram_w, 0x00ff00ff)
+	AM_RANGE(0x00600000, 0x0067ffff) AM_READ8 (vram_r, 0x00ff00ff)
+	AM_RANGE(0x00700000, 0x00700003) AM_WRITE8(mask_w, 0xff000000)
+	AM_RANGE(0x00740000, 0x00740003) AM_WRITE8(val_w,  0xff000000)
 	AM_RANGE(0x00800000, 0x009fffff) AM_RAM     // 284e end of test - d0 = 0 for pass
 ADDRESS_MAP_END
 
@@ -56,6 +64,35 @@ void hp16500_state::video_start()
 	m_count = 0;
 	m_clutoffs = 0;
 	memset(m_palette, 0, sizeof(m_palette));
+	m_vram.resize(0x40000);
+	m_mask = 0;
+	m_val = 0;
+}
+
+WRITE8_MEMBER(hp16500_state::vram_w)
+{
+	for(int i=0; i<4; i++) {
+		int off = offset + i * 0x10000;
+		if(data & (8 >> i))
+			m_vram[off] = (m_vram[off] & ~m_mask) | (m_val & m_mask);
+		else
+			m_vram[off] = (m_vram[off] & ~m_mask);
+	}
+}
+
+READ8_MEMBER (hp16500_state::vram_r)
+{
+	return m_vram[offset];
+}
+
+WRITE8_MEMBER(hp16500_state::mask_w)
+{
+	m_mask = data;
+}
+
+WRITE8_MEMBER(hp16500_state::val_w)
+{
+	m_val = data;
 }
 
 WRITE32_MEMBER(hp16500_state::palette_w)
@@ -92,37 +129,18 @@ WRITE32_MEMBER(hp16500_state::palette_w)
 // addr = ((Y * 0xfc0) + 0x360) + (X * 4)
 UINT32 hp16500_state::screen_update_hp16500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 *scanline;
-	int x, y;
-	UINT32 pixels;
-
-	for (y = 0; y < 400; y++)
+	int pos = 0;
+	for (int y = 0; y < 384; y++)
 	{
-		scanline = &bitmap.pix32(y);
+		UINT32 *scanline = &bitmap.pix32(y);
 
-		for (x = 0; x < 576/8; x++)
+		for (int x = 0; x < 576; x+=4)
 		{
-			pixels = m_vram[(y * (288/4)) + x];
-
-			UINT8 gfx = ((pixels & 0xf0000) >> 12) | (pixels & 15);
-			*scanline++ = m_palette[BIT(gfx, 7) ? 2 : 0];
-			*scanline++ = m_palette[BIT(gfx, 6) ? 2 : 0];
-			*scanline++ = m_palette[BIT(gfx, 5) ? 2 : 0];
-			*scanline++ = m_palette[BIT(gfx, 4) ? 2 : 0];
-			*scanline++ = m_palette[BIT(gfx, 3) ? 2 : 0];
-			*scanline++ = m_palette[BIT(gfx, 2) ? 2 : 0];
-			*scanline++ = m_palette[BIT(gfx, 1) ? 2 : 0];
-			*scanline++ = m_palette[BIT(gfx, 0) ? 2 : 0];
-#if 0
-			*scanline++ = m_palette[((pixels&0xf0000000)>>28)];
-			*scanline++ = m_palette[((pixels&0xf000000)>>24)];
-			*scanline++ = m_palette[((pixels&0xf00000)>>20)];
-			*scanline++ = m_palette[((pixels&0xf0000)>>16)];
-			*scanline++ = m_palette[((pixels&0xf000)>>12)];
-			*scanline++ = m_palette[((pixels&0xf00)>>8)];
-			*scanline++ = m_palette[((pixels&0xf0)>>4)];
-			*scanline++ = m_palette[(pixels&0xf)];
-#endif
+			*scanline++ = m_palette[m_vram[pos+0x00000]];
+			*scanline++ = m_palette[m_vram[pos+0x10000]];
+			*scanline++ = m_palette[m_vram[pos+0x20000]];
+			*scanline++ = m_palette[m_vram[pos+0x30000]];
+			pos++;
 		}
 	}
 
@@ -136,8 +154,8 @@ static MACHINE_CONFIG_START( hp16500, hp16500_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(hp16500_state, screen_update_hp16500)
-	MCFG_SCREEN_SIZE(576,400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 576-1, 0, 400-1)
+	MCFG_SCREEN_SIZE(576,384)
+	MCFG_SCREEN_VISIBLE_AREA(0, 576-1, 0, 384-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
