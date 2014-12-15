@@ -42,13 +42,13 @@ try:
                     dst.write('0x%02x' % ord(b))
                     offs = offs + 1
                     if offs != bytes:
-						dst.write(',')
+                        dst.write(',')
             else:
                 break
             if offs != bytes:
                 dst.write('\n\t')
     if terminate == 1:
-    	dst.write(',0x00')
+        dst.write(',0x00')
     dst.write('\n};\n')
     dst.close()
 except IOError:
