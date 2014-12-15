@@ -640,7 +640,7 @@ int arcompact_handle18_05_dasm(DASM_OPS_16)
 {
 	int size = 2;
 	UINT8 subinstr2 = (op & 0x0700) >> 8;
-	op &= ~0x001f;
+	op &= ~0x0700;
 
 	switch (subinstr2)
 	{

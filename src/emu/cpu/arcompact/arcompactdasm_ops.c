@@ -195,52 +195,6 @@ static const char *regnames[0x40] =
 
 
 
-int arcompact_01_01_00_helper(char *output, offs_t pc, UINT32 op, const UINT8* oprom, const char* optext)
-{
-	int size = 4;
-
-	// Branch on Compare / Bit Test - Register-Register
-	// 00001 bbb sssssss 1 S BBB CCCCCC N 0 iiii
-	INT32 address = (op & 0x00fe0000) >> 17;
-	address |= ((op & 0x00008000) >> 15) << 7;
-	if (address & 0x80) address = -(address & 0x7f);
-
-	int c = (op & 0x00000fc0) >> 6;
-	int b = (op & 0x07000000) >> 24;
-	b |= ((op & 0x00007000) >> 12) << 3;
-	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
-
-	op &= ~0x07007fe0;
-
-	if ((b != LIMM_REG) && (c != LIMM_REG))
-	{
-		print("%s%s (r%d) (r%d) %08x (%08x)", optext, delaybit[n], b, c, pc + (address * 2) + 4, op & ~0xf8fe800f);
-	}
-	else
-	{
-		UINT32 limm;
-		GET_LIMM_32;
-		size = 8;
-
-		if ((b == LIMM_REG) && (c != LIMM_REG))
-		{
-			print("%s%s (%08x) (r%d) %08x (%08x)", optext, delaybit[n], limm, c, pc + (address * 2) + 4, op & ~0xf8fe800f);
-		}
-		else if ((c == LIMM_REG) && (b != LIMM_REG))
-		{
-			print("%s%s (r%d) (%08x) %08x (%08x)", optext, delaybit[n], b, limm, pc + (address * 2) + 4, op & ~0xf8fe800f);
-		}
-		else
-		{
-			// b and c are LIMM? invalid??
-			print("%s%s (%08x) (%08x) (illegal?) %08x (%08x)", optext, delaybit[n], limm, limm, pc + (address * 2) + 4, op & ~0xf8fe800f);
-
-		}
-	}
-
-	return size;
-}
-
 #define GET_01_01_01_BRANCH_ADDR \
 	INT32 address = (op & 0x00fe0000) >> 17; \
 	address |= ((op & 0x00008000) >> 15) << 7; \
@@ -251,6 +205,34 @@ int arcompact_01_01_00_helper(char *output, offs_t pc, UINT32 op, const UINT8* o
 #define GROUP_0e_GET_h \
 	h =  ((op & 0x0007) << 3); \
     h |= ((op & 0x00e0) >> 5); \
+	op &= ~0x00e7; \
+
+#define COMMON16_GET_breg \
+	breg =  ((op & 0x0700) >>8); \
+	op &= ~0x0700; \
+
+#define COMMON16_GET_creg \
+	creg =  ((op & 0x00e0) >>5); \
+	op &= ~0x00e0; \
+
+#define COMMON16_GET_u5 \
+	u =  ((op & 0x001f) >>0); \
+	op &= ~0x001f; \
+
+#define COMMON16_GET_u8 \
+	u =  ((op & 0x00ff) >>0); \
+	op &= ~0x00ff; \
+
+#define COMMON16_GET_u7 \
+	u =  ((op & 0x007f) >>0); \
+	op &= ~0x007f; \
+
+// registers used in 16-bit opcodes hae a limited range
+// and can only address registers r0-r3 and r12-r15
+
+#define REG_16BIT_RANGE(_reg_) \
+	if (_reg_>3) _reg_+= 8; \
+
 
 // this is as messed up as the rest of the 16-bit alignment in LE mode...
 
@@ -269,7 +251,7 @@ int arcompact_handle00_00_dasm(DASM_OPS_32)
 {
 	int size = 4;
 	// Branch Conditionally
-	// 00000 ssssssssss 0 SSSSSSSSSS N QQQQQ
+	// 0000 0sss ssss sss0 SSSS SSSS SSNQ QQQQ
 	INT32 address = (op & 0x07fe0000) >> 17;
 	address |= ((op & 0x0000ffc0) >> 6) << 10;
 	if (address & 0x800000) address = -(address & 0x7fffff);
@@ -284,7 +266,7 @@ int arcompact_handle00_01_dasm(DASM_OPS_32)
 {
 	int size = 4;
 	// Branch Unconditionally Far
-	// 00000 ssssssssss 1  SSSSSSSSSS N R TTTT
+	// 0000 0sss ssss sss1 SSSS SSSS SSNR TTTT
 	INT32 address = (op & 0x07fe0000) >> 17;
 	address |= ((op & 0x0000ffc0) >> 6) << 10;
 	address |= ((op & 0x0000000f) >> 0) << 20;
@@ -333,26 +315,96 @@ int arcompact_handle01_00_01dasm(DASM_OPS_32)
 	return size;
 }
 
-int arcompact_handle01_01_00_00_dasm(DASM_OPS_32)  { return arcompact_01_01_00_helper( output, pc, op, oprom, "BREQ b - c"); }
-int arcompact_handle01_01_00_01_dasm(DASM_OPS_32)  { return arcompact_01_01_00_helper( output, pc, op, oprom, "BRNE b - c"); }
-int arcompact_handle01_01_00_02_dasm(DASM_OPS_32)  { return arcompact_01_01_00_helper( output, pc, op, oprom, "BRLT b - c"); }
-int arcompact_handle01_01_00_03_dasm(DASM_OPS_32)  { return arcompact_01_01_00_helper( output, pc, op, oprom, "BRGE b - c"); }
-int arcompact_handle01_01_00_04_dasm(DASM_OPS_32)  { return arcompact_01_01_00_helper( output, pc, op, oprom, "BRLO b - c"); }
-int arcompact_handle01_01_00_05_dasm(DASM_OPS_32)  { return arcompact_01_01_00_helper( output, pc, op, oprom, "BRHS b - c"); }
-int arcompact_handle01_01_00_0e_dasm(DASM_OPS_32)  { return arcompact_01_01_00_helper( output, pc, op, oprom, "BBIT0 (b & 1<<c) == 0");  }
-int arcompact_handle01_01_00_0f_dasm(DASM_OPS_32)  { return arcompact_01_01_00_helper( output, pc, op, oprom, "BBIT1 (b & 1<<c) != 0");  }
 
 
-int arcompact_handle01_01_01_00_dasm(DASM_OPS_32)  { GET_01_01_01_BRANCH_ADDR;  print("BREQ b - u6 (dst %08x) (%08x)", pc + (address * 2) + 4, op); return 4; }
-int arcompact_handle01_01_01_01_dasm(DASM_OPS_32)  { GET_01_01_01_BRANCH_ADDR;  print("BRNE b - u6 (dst %08x) (%08x)", pc + (address * 2) + 4, op); return 4; }
-int arcompact_handle01_01_01_02_dasm(DASM_OPS_32)  { GET_01_01_01_BRANCH_ADDR;  print("BRLT b - u6 (dst %08x) (%08x)", pc + (address * 2) + 4, op); return 4; }
-int arcompact_handle01_01_01_03_dasm(DASM_OPS_32)  { GET_01_01_01_BRANCH_ADDR;  print("BRGE b - u6 (dst %08x) (%08x)", pc + (address * 2) + 4, op); return 4; }
-int arcompact_handle01_01_01_04_dasm(DASM_OPS_32)  { GET_01_01_01_BRANCH_ADDR;  print("BRLO b - u6 (dst %08x) (%08x)", pc + (address * 2) + 4, op); return 4; }
-int arcompact_handle01_01_01_05_dasm(DASM_OPS_32)  { GET_01_01_01_BRANCH_ADDR;  print("BRHS b - u6 (dst %08x) (%08x)", pc + (address * 2) + 4, op); return 4; }
+int arcompact_01_01_00_helper(char *output, offs_t pc, UINT32 op, const UINT8* oprom, const char* optext)
+{
+	int size = 4;
+
+	// Branch on Compare / Bit Test - Register-Register
+	// 00001 bbb sssssss 1 S BBB CCCCCC N 0 iiii
+	GET_01_01_01_BRANCH_ADDR
 
 
-int arcompact_handle01_01_01_0e_dasm(DASM_OPS_32)  { GET_01_01_01_BRANCH_ADDR;  print("BBIT0 (b & 1<<u6) == 0 (dst %08x) (%08x)", pc + (address * 2) + 4, op); return 4; }
-int arcompact_handle01_01_01_0f_dasm(DASM_OPS_32)  { GET_01_01_01_BRANCH_ADDR;  print("BBIT1 (b & 1<<u6) != 0 (dst %08x) (%08x)", pc + (address * 2) + 4, op); return 4; }
+	int c = (op & 0x00000fc0) >> 6;
+	int b = (op & 0x07000000) >> 24;
+	b |= ((op & 0x00007000) >> 12) << 3;
+	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
+
+	op &= ~0x07007fe0;
+
+	if ((b != LIMM_REG) && (c != LIMM_REG))
+	{
+		print("%s%s %s %s %08x (%08x)", optext, delaybit[n], regnames[b], regnames[c], pc + (address * 2) + 4, op & ~0xf8fe800f);
+	}
+	else
+	{
+		UINT32 limm;
+		GET_LIMM_32;
+		size = 8;
+
+		if ((b == LIMM_REG) && (c != LIMM_REG))
+		{
+			print("%s%s (%08x) %s %08x (%08x)", optext, delaybit[n], limm, regnames[b], pc + (address * 2) + 4, op & ~0xf8fe800f);
+		}
+		else if ((c == LIMM_REG) && (b != LIMM_REG))
+		{
+			print("%s%s %s (%08x) %08x (%08x)", optext, delaybit[n], regnames[b], limm, pc + (address * 2) + 4, op & ~0xf8fe800f);
+		}
+		else
+		{
+			// b and c are LIMM? invalid??
+			print("%s%s (%08x) (%08x) (illegal?) %08x (%08x)", optext, delaybit[n], limm, limm, pc + (address * 2) + 4, op & ~0xf8fe800f);
+
+		}
+	}
+
+	return size;
+}
+
+
+// register - register cases
+int arcompact_handle01_01_00_00_dasm(DASM_OPS_32)  { return arcompact_01_01_00_helper( output, pc, op, oprom, "BREQ"); }
+int arcompact_handle01_01_00_01_dasm(DASM_OPS_32)  { return arcompact_01_01_00_helper( output, pc, op, oprom, "BRNE"); }
+int arcompact_handle01_01_00_02_dasm(DASM_OPS_32)  { return arcompact_01_01_00_helper( output, pc, op, oprom, "BRLT"); }
+int arcompact_handle01_01_00_03_dasm(DASM_OPS_32)  { return arcompact_01_01_00_helper( output, pc, op, oprom, "BRGE"); }
+int arcompact_handle01_01_00_04_dasm(DASM_OPS_32)  { return arcompact_01_01_00_helper( output, pc, op, oprom, "BRLO"); }
+int arcompact_handle01_01_00_05_dasm(DASM_OPS_32)  { return arcompact_01_01_00_helper( output, pc, op, oprom, "BRHS"); }
+int arcompact_handle01_01_00_0e_dasm(DASM_OPS_32)  { return arcompact_01_01_00_helper( output, pc, op, oprom, "BBIT0");}
+int arcompact_handle01_01_00_0f_dasm(DASM_OPS_32)  { return arcompact_01_01_00_helper( output, pc, op, oprom, "BBIT1");}
+
+int arcompact_01_01_01_helper(char *output, offs_t pc, UINT32 op, const UINT8* oprom, const char* optext)
+{
+	int size = 4;
+
+	// using 'b' as limm here makes no sense (comparing a long immediate against a short immediate) so I assume it isn't
+	// valid?
+
+	// Branch on Compare / Bit Test - Register-Immediate
+	// 0000 1bbb ssss sss1 SBBB uuuu uuN1 iiii
+	GET_01_01_01_BRANCH_ADDR
+
+	int u = (op & 0x00000fc0) >> 6;
+	int b = (op & 0x07000000) >> 24;
+	b |= ((op & 0x00007000) >> 12) << 3;
+	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
+
+	op &= ~0x07007fe0;
+
+	print("%s%s %s %02x %08x (%08x)", optext, delaybit[n], regnames[b], u, pc + (address * 2) + 4, op & ~0xf8fe800f);
+	
+	return size;
+}
+
+// register -immediate cases
+int arcompact_handle01_01_01_00_dasm(DASM_OPS_32)  { return arcompact_01_01_01_helper(output, pc, op, oprom, "BREQ"); }
+int arcompact_handle01_01_01_01_dasm(DASM_OPS_32)  { return arcompact_01_01_01_helper(output, pc, op, oprom, "BRNE"); }
+int arcompact_handle01_01_01_02_dasm(DASM_OPS_32)  { return arcompact_01_01_01_helper(output, pc, op, oprom, "BRLT"); }
+int arcompact_handle01_01_01_03_dasm(DASM_OPS_32)  { return arcompact_01_01_01_helper(output, pc, op, oprom, "BRGE"); }
+int arcompact_handle01_01_01_04_dasm(DASM_OPS_32)  { return arcompact_01_01_01_helper(output, pc, op, oprom, "BRLO"); }
+int arcompact_handle01_01_01_05_dasm(DASM_OPS_32)  { return arcompact_01_01_01_helper(output, pc, op, oprom, "BRHS"); }
+int arcompact_handle01_01_01_0e_dasm(DASM_OPS_32)  { return arcompact_01_01_01_helper(output, pc, op, oprom, "BBIT0"); }
+int arcompact_handle01_01_01_0f_dasm(DASM_OPS_32)  { return arcompact_01_01_01_helper(output, pc, op, oprom, "BBIT1"); }
 
 
 int arcompact_handle02_dasm(DASM_OPS_32)
@@ -989,91 +1041,52 @@ int arcompact_handle0d_03_dasm(DASM_OPS_16)
 
 
 
-
-
-
-int arcompact_handle0e_00_dasm(DASM_OPS_16)
+int arcompact_handle0e_0x_helper_dasm(char *output, offs_t pc, UINT16 op, const UINT8* oprom, const char* optext, int revop)
 {
-	int h;
+	int h,breg;
 	int size = 2;
 
 	GROUP_0e_GET_h;
-
+	COMMON16_GET_breg;
+	REG_16BIT_RANGE(breg);
+	
 	if (h == LIMM_REG)
 	{
 		UINT32 limm;
 		GET_LIMM;
 		size = 6;
-		print("ADD_S b <- b + (%08x) (%04x)", limm, op);
+		if (!revop) print("%s %s, (%08x) (%04x)", optext, regnames[breg], limm, op);
+		else print("%s (%08x), %s (%04x)", optext, limm, regnames[breg], op);
 	}
 	else
 	{
+		if (!revop) print("%s %s, %s (%04x)", optext, regnames[breg], regnames[h], op);
+		else print("%s %s, %s (%04x)", optext, regnames[h], regnames[breg], op);
 
-		print("ADD_S b <- b + (r%d) (%04x)", h, op);
 	}
 
 	return size;
+
+}
+
+int arcompact_handle0e_00_dasm(DASM_OPS_16)
+{
+	return arcompact_handle0e_0x_helper_dasm(output, pc, op, oprom, "ADD_S", 0);
 }
 
 int arcompact_handle0e_01_dasm(DASM_OPS_16)
 {
-	int h;
-	int size = 2;
-	GROUP_0e_GET_h;
-
-	if (h == LIMM_REG)
-	{
-		UINT32 limm;
-		GET_LIMM;
-		size = 6;
-		print("MOV_S b <- (%08x)  (%04x)", limm, op);
-	}
-	else
-	{
-		print("MOV_S b <- (r%d)  (%04x)", h, op);
-	}
-	return size;
+	return arcompact_handle0e_0x_helper_dasm(output, pc, op, oprom, "MOV_S", 0);
 }
 
 int arcompact_handle0e_02_dasm(DASM_OPS_16)
 {
-	int h;
-	int size = 2;
-	GROUP_0e_GET_h;
-
-	if (h == LIMM_REG)
-	{
-		UINT32 limm;
-		GET_LIMM;
-		size = 6;
-		print("CMP_S b - (%08x) (%04x)", limm, op);
-	}
-	else
-	{
-		print("CMP_S b - (r%d) (%04x)", h, op);
-	}
-	return size;
+	return arcompact_handle0e_0x_helper_dasm(output, pc, op, oprom, "CMP_S", 0);
 }
 
 int arcompact_handle0e_03_dasm(DASM_OPS_16)
 {
-	int h;
-	int size = 2;
-	GROUP_0e_GET_h;
-
-	if (h == LIMM_REG)
-	{
-		UINT32 limm;
-		GET_LIMM;
-		size = 6;
-		print("MOV_S (%08x) <- b (%04x)", limm, op);
-	}
-	else
-	{
-		print("MOV_S (r%d) <- b (%04x)", h, op);
-	}
-
-	return size;
+	return arcompact_handle0e_0x_helper_dasm(output, pc, op, oprom, "MOV_S", 1);
 }
 
 
@@ -1134,46 +1147,59 @@ int arcompact_handle0f_1e_dasm(DASM_OPS_16)  { print("TRAP_S (%08x)", op); retur
 int arcompact_handle0f_1f_dasm(DASM_OPS_16)  { print("BRK_S (%08x)", op); return 2;}
 
 
+int arcompact_handle_ld_helper_dasm(char *output, offs_t pc, UINT16 op, const UINT8* oprom, const char* optext, int shift, int swap)
+{
+	int breg, creg, u;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_creg;
+	COMMON16_GET_u5;
+
+	REG_16BIT_RANGE(breg);
+	REG_16BIT_RANGE(creg);
+
+	u <<= shift;
+
+	if (!swap) print("%s %s, [%s, 0x%02x] (%04x)", optext, regnames[creg], regnames[breg], u, op);
+	else  print("%s [%s, 0x%02x], %s (%04x)", optext, regnames[breg], u, regnames[creg], op);
+	return 2;
+
+}
+
+
 int arcompact_handle10_dasm(DASM_OPS_16)
 {
-	print("LD_S (%04x)",  op);
-	return 2;
+	return arcompact_handle_ld_helper_dasm(output, pc, op, oprom, "LD_S", 2, 0);
 }
 
 int arcompact_handle11_dasm(DASM_OPS_16)
 {
-	print("LDB_S (%04x)", op);
-	return 2;
+	return arcompact_handle_ld_helper_dasm(output, pc, op, oprom, "LDB_S", 0, 0);
 }
 
 int arcompact_handle12_dasm(DASM_OPS_16)
 {
-	print("LDW_S (%04x)", op);
-	return 2;
+	return arcompact_handle_ld_helper_dasm(output, pc, op, oprom, "LDW_S", 1, 0);
 }
 
 int arcompact_handle13_dasm(DASM_OPS_16)
 {
-	print("LSW_S.X (%04x)", op);
-	return 2;
+	return arcompact_handle_ld_helper_dasm(output, pc, op, oprom, "LDW_S.X", 1, 0);
 }
 
 int arcompact_handle14_dasm(DASM_OPS_16)
 {
-	print("ST_S (%04x)", op);
-	return 2;
+	return arcompact_handle_ld_helper_dasm(output, pc, op, oprom, "ST_S", 2, 1);
 }
 
 int arcompact_handle15_dasm(DASM_OPS_16)
 {
-	print("STB_S (%04x)", op);
-	return 2;
+	return arcompact_handle_ld_helper_dasm(output, pc, op, oprom, "STB_S", 0, 1);
 }
 
 int arcompact_handle16_dasm(DASM_OPS_16)
 {
-	print("STW_S (%04x)",  op);
-	return 2;
+	return arcompact_handle_ld_helper_dasm(output, pc, op, oprom, "STW_S", 1, 1);
 }
 
 
@@ -1289,10 +1315,11 @@ int arcompact_handle18_05_01_dasm(DASM_OPS_16)
 // op bits remaining for 0x18_06_xx subgroups 0x0700 
 int arcompact_handle18_06_01_dasm(DASM_OPS_16) 
 {
-	int b = (op & 0x0700) >> 8;
+	int breg = (op & 0x0700) >> 8;
 	op &= ~0x0700; // all bits now used
+	REG_16BIT_RANGE(breg)
 
-	print("POP_S [%02x]", b);
+	print("POP_S %s", regnames[breg]);
 
 	return 2;
 }
@@ -1313,10 +1340,11 @@ int arcompact_handle18_06_11_dasm(DASM_OPS_16)
 // op bits remaining for 0x18_07_xx subgroups 0x0700 
 int arcompact_handle18_07_01_dasm(DASM_OPS_16) 
 {
-	int b = (op & 0x0700) >> 8;
+	int breg = (op & 0x0700) >> 8;
 	op &= ~0x0700; // all bits now used
+	REG_16BIT_RANGE(breg)
 
-	print("PUSH_S [%02x]", b);
+	print("PUSH_S %s", regnames[breg]);
 
 	return 2;
 }
@@ -1348,12 +1376,36 @@ int arcompact_handle1a_dasm(DASM_OPS_16)
 
 int arcompact_handle1b_dasm(DASM_OPS_16)
 {
-	print("MOV_S (%04x)", op);
+	int breg, u;
+	COMMON16_GET_breg;
+	COMMON16_GET_u8;
+	REG_16BIT_RANGE(breg);
+
+	print("MOV_S %s, %02x", regnames[breg], u);
 	return 2;
 }
 
-int arcompact_handle1c_00_dasm(DASM_OPS_16)  { print("ADD_S b <- b + u7 (%04x)",  op); return 2;}
-int arcompact_handle1c_01_dasm(DASM_OPS_16)  { print("CMP_S b - u7 (%04x)",  op); return 2;}
+int arcompact_handle1c_00_dasm(DASM_OPS_16)
+{
+	int breg, u;
+	COMMON16_GET_breg;
+	COMMON16_GET_u7;
+	REG_16BIT_RANGE(breg);
+
+	print("ADD_S %s, %02x", regnames[breg], u);
+	return 2;
+}
+
+int arcompact_handle1c_01_dasm(DASM_OPS_16)
+{
+	int breg, u;
+	COMMON16_GET_breg;
+	COMMON16_GET_u7;
+	REG_16BIT_RANGE(breg);
+
+	print("CMP_S %s, %02x", regnames[breg], u);
+	return 2;
+}
 
 
 int arcompact_handle1d_00_dasm(DASM_OPS_16)  { print("BREQ_S (%04x)",  op); return 2;}
