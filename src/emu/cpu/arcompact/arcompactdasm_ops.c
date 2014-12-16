@@ -930,27 +930,37 @@ int arcompact_handle04_37_dasm(DASM_OPS_32)  { return arcompact_handle04_3x_help
 
 
 
-int arcompact_handle05_00_dasm(DASM_OPS_32)  { print("ASL a <- b asl c (%08x)", op); return 4;}
-int arcompact_handle05_01_dasm(DASM_OPS_32)  { print("LSR a <- b lsr c (%08x)", op); return 4;}
-int arcompact_handle05_02_dasm(DASM_OPS_32)  { print("ASR a <- b asr c (%08x)", op); return 4;}
-int arcompact_handle05_03_dasm(DASM_OPS_32)  { print("ROR a <- b ror c (%08x)", op); return 4;}
-int arcompact_handle05_04_dasm(DASM_OPS_32)  { print("MUL64 mulres <- b * c (%08x)", op); return 4;}
-int arcompact_handle05_05_dasm(DASM_OPS_32)  { print("MULU64 mulres <- b * c (%08x)", op); return 4;}
-int arcompact_handle05_06_dasm(DASM_OPS_32)  { print("ADDS a <- sat32 (b + c) (%08x)", op); return 4;}
-int arcompact_handle05_07_dasm(DASM_OPS_32)  { print("SUBS a <- sat32 (b + c) (%08x)", op); return 4;}
-int arcompact_handle05_08_dasm(DASM_OPS_32)  { print("DIVAW (%08x)", op); return 4;}
+int arcompact_handle05_00_dasm(DASM_OPS_32)  { return arcompact_handle04_helper_dasm(DASM_PARAMS, "ASL", 0,0); }
+int arcompact_handle05_01_dasm(DASM_OPS_32)  { return arcompact_handle04_helper_dasm(DASM_PARAMS, "LSR", 0,0); }
+int arcompact_handle05_02_dasm(DASM_OPS_32)  { return arcompact_handle04_helper_dasm(DASM_PARAMS, "ASR", 0,0); }
+int arcompact_handle05_03_dasm(DASM_OPS_32)  { return arcompact_handle04_helper_dasm(DASM_PARAMS, "ROR", 0,0); }
+int arcompact_handle05_04_dasm(DASM_OPS_32)  { return arcompact_handle04_helper_dasm(DASM_PARAMS, "MUL64", 0,0); } // special
+int arcompact_handle05_05_dasm(DASM_OPS_32)  { return arcompact_handle04_helper_dasm(DASM_PARAMS, "MULU64", 0,0);} // special
+int arcompact_handle05_06_dasm(DASM_OPS_32)  { return arcompact_handle04_helper_dasm(DASM_PARAMS, "ADDS", 0,0); }
+int arcompact_handle05_07_dasm(DASM_OPS_32)  { return arcompact_handle04_helper_dasm(DASM_PARAMS, "SUBS", 0,0); }
+int arcompact_handle05_08_dasm(DASM_OPS_32)  { return arcompact_handle04_helper_dasm(DASM_PARAMS, "DIVAW", 0,0); }
 
 
 
-int arcompact_handle05_0a_dasm(DASM_OPS_32)  { print("ASLS a <- sat32 (b << c) (%08x)", op); return 4;}
-int arcompact_handle05_0b_dasm(DASM_OPS_32)  { print("ASRS a ,- sat32 (b >> c) (%08x)", op); return 4;}
+int arcompact_handle05_0a_dasm(DASM_OPS_32)  { return arcompact_handle04_helper_dasm(DASM_PARAMS, "ASLS", 0,0); }
+int arcompact_handle05_0b_dasm(DASM_OPS_32)  { return arcompact_handle04_helper_dasm(DASM_PARAMS, "ASRS", 0,0); }
 
-int arcompact_handle05_28_dasm(DASM_OPS_32)  { print("ADDSDW (%08x)", op); return 4;}
-int arcompact_handle05_29_dasm(DASM_OPS_32)  { print("SUBSDW (%08x)", op); return 4;}
+int arcompact_handle05_28_dasm(DASM_OPS_32)  { return arcompact_handle04_helper_dasm(DASM_PARAMS, "ADDSDW", 0,0); }
+int arcompact_handle05_29_dasm(DASM_OPS_32)  { return arcompact_handle04_helper_dasm(DASM_PARAMS, "SUBSDW", 0,0); }
 
 
-int arcompact_handle05_2f_dasm(DASM_OPS_32)  { print("SOP (another table) (%08x)", op); return 4;}
+//int arcompact_handle05_2f_dasm(DASM_OPS_32)  { print("SOP (another table) (%08x)", op); return 4;}
 
+int arcompact_handle05_2f_00_dasm(DASM_OPS_32)  { print("SWAP (%08x)", op); return 4;}
+int arcompact_handle05_2f_01_dasm(DASM_OPS_32)  { print("NORM (%08x)", op); return 4;}
+int arcompact_handle05_2f_02_dasm(DASM_OPS_32)  { print("SAT16 (%08x)", op); return 4;}
+int arcompact_handle05_2f_03_dasm(DASM_OPS_32)  { print("RND16 (%08x)", op); return 4;}
+int arcompact_handle05_2f_04_dasm(DASM_OPS_32)  { print("ABSSW (%08x)", op); return 4;}
+int arcompact_handle05_2f_05_dasm(DASM_OPS_32)  { print("ABSS (%08x)", op); return 4;}
+int arcompact_handle05_2f_06_dasm(DASM_OPS_32)  { print("NEGSW (%08x)", op); return 4;}
+int arcompact_handle05_2f_07_dasm(DASM_OPS_32)  { print("NEGS (%08x)", op); return 4;}
+int arcompact_handle05_2f_08_dasm(DASM_OPS_32)  { print("NORMW (%08x)", op); return 4;}
+//int arcompact_handle05_2f_3f_dasm(DASM_OPS_32)  { print("ZOPs (another table) (%08x)", op); return 4;}
 
 
 
@@ -1145,34 +1155,48 @@ int arcompact_handle0f_00_07_07_dasm(DASM_OPS_16)  { print("J_S.D [blink] (%08x)
 int arcompact_handle0f_02_dasm(DASM_OPS_16)  { print("SUB_S b <- b - c (%08x)", op); return 2;}
 
 
-int arcompact_handle0f_04_dasm(DASM_OPS_16)  { print("AND_S b <- b and c (%08x)", op); return 2;}
-int arcompact_handle0f_05_dasm(DASM_OPS_16)  { print("OR_S b <- b or c (%08x)", op); return 2;}
-int arcompact_handle0f_06_dasm(DASM_OPS_16)  { print("BIC_S b <- b & !c (%08x)", op); return 2;}
-int arcompact_handle0f_07_dasm(DASM_OPS_16)  { print("XOR_S b <- b ^ c (%08x)", op); return 2;}
+
+int arcompact_handle0f_0x_helper_dasm(DASM_OPS_16, const char* optext)
+{
+	int breg, creg;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_creg;
+
+	REG_16BIT_RANGE(breg);
+	REG_16BIT_RANGE(creg);
 
 
-int arcompact_handle0f_0b_dasm(DASM_OPS_16)  { print("TST_S b & c (%08x)", op); return 2;}
-int arcompact_handle0f_0c_dasm(DASM_OPS_16)  { print("MUL64_S mulres <- b * c  (%08x)", op); return 2;}
-int arcompact_handle0f_0d_dasm(DASM_OPS_16)  { print("SEXB_S b <- sexb(c) (%08x)", op); return 2;}
-int arcompact_handle0f_0e_dasm(DASM_OPS_16)  { print("SEXW_S b <- sexw(c) (%08x)", op); return 2;}
-int arcompact_handle0f_0f_dasm(DASM_OPS_16)  { print("EXTB_S b <- extb(c) (%08x)", op); return 2;}
-int arcompact_handle0f_10_dasm(DASM_OPS_16)  { print("EXTW_S b <- extw(c) (%08x)", op); return 2;}
-int arcompact_handle0f_11_dasm(DASM_OPS_16)  { print("ABS_S b <- abs(c)  (%08x)", op); return 2;}
-int arcompact_handle0f_12_dasm(DASM_OPS_16)  { print("NOT_S b <- !(c) (%08x)", op); return 2;}
-int arcompact_handle0f_13_dasm(DASM_OPS_16)  { print("NEG_S b <- neg(c)  (%08x)", op); return 2;}
-int arcompact_handle0f_14_dasm(DASM_OPS_16)  { print("ADD1_S b <- b + (c << 1) (%08x)", op); return 2;}
-int arcompact_handle0f_15_dasm(DASM_OPS_16)  { print("ADD2_S b <- b + (c << 2) (%08x)", op); return 2;}
-int arcompact_handle0f_16_dasm(DASM_OPS_16)  { print("ADD3_S b <- b + (c << 3)  (%08x)", op); return 2;}
+	print("%s %s <- %s", optext, regnames[breg], regnames[creg]);
+	return 2;
+}
 
 
-int arcompact_handle0f_18_dasm(DASM_OPS_16)  { print("ASL_S b <- b asl c (%08x)", op); return 2;}
-int arcompact_handle0f_19_dasm(DASM_OPS_16)  { print("LSR_S b <- b lsr c (%08x)", op); return 2;}
-int arcompact_handle0f_1a_dasm(DASM_OPS_16)  { print("ASR_S b <- b asr c (%08x)", op); return 2;}
-int arcompact_handle0f_1b_dasm(DASM_OPS_16)  { print("ASL_S b <- c + c (%08x)", op); return 2;}
-int arcompact_handle0f_1c_dasm(DASM_OPS_16)  { print("ASR_S b <- c asr 1 (%08x)", op); return 2;}
-int arcompact_handle0f_1d_dasm(DASM_OPS_16)  { print("LSR_S b <- c lsr 1(%08x)", op); return 2;}
-int arcompact_handle0f_1e_dasm(DASM_OPS_16)  { print("TRAP_S (%08x)", op); return 2;}
-int arcompact_handle0f_1f_dasm(DASM_OPS_16)  { print("BRK_S (%08x)", op); return 2;}
+int arcompact_handle0f_04_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "AND_S");  }
+int arcompact_handle0f_05_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "OR_S");   }
+int arcompact_handle0f_06_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "BIC_S");  }
+int arcompact_handle0f_07_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "XOR_S");  }
+int arcompact_handle0f_0b_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "TST_S");  }
+int arcompact_handle0f_0d_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "SEXB_S"); }
+int arcompact_handle0f_0e_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "SEXW_S"); }
+int arcompact_handle0f_0f_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "EXTB_S"); }
+int arcompact_handle0f_10_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "EXTW_S"); }
+int arcompact_handle0f_11_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "ABS_S");  }
+int arcompact_handle0f_12_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "NOT_S");  }
+int arcompact_handle0f_13_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "NEG_S");  }
+int arcompact_handle0f_14_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "ADD1_S"); }
+int arcompact_handle0f_15_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "ADD2_S"); }
+int arcompact_handle0f_16_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "ADD3_S"); }
+int arcompact_handle0f_18_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "ASL_S");  }
+int arcompact_handle0f_19_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "LSR_S");  }
+int arcompact_handle0f_1a_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "ASR_S");  }
+int arcompact_handle0f_1b_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "ASL1_S"); }
+int arcompact_handle0f_1c_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "ASR1_S"); }
+int arcompact_handle0f_1d_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "LSR1_S"); }
+
+int arcompact_handle0f_0c_dasm(DASM_OPS_16)  { print("MUL64_S mulres <- b * c  (%08x)", op); return 2;} // special
+int arcompact_handle0f_1e_dasm(DASM_OPS_16)  { print("TRAP_S (%08x)", op); return 2;} // special
+int arcompact_handle0f_1f_dasm(DASM_OPS_16)  { print("BRK_S (%08x)", op); return 2;} // special
 
 
 int arcompact_handle_ld_helper_dasm(DASM_OPS_16, const char* optext, int shift, int swap)
@@ -1231,60 +1255,59 @@ int arcompact_handle16_dasm(DASM_OPS_16)
 }
 
 
+int arcompact_handle_l7_0x_helper_dasm(DASM_OPS_16, const char* optext)
+{
+	int breg, u;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_u5;
+
+	REG_16BIT_RANGE(breg);
+
+	print("%s %s, 0x%02x", optext, regnames[breg], u);
+
+	return 2;
+
+}
+
 int arcompact_handle17_00_dasm(DASM_OPS_16)
 {
-	int size = 2;
-	print("ASL_S b <- b asl u5 (%04x)",  op);
-	return size;
+	return arcompact_handle_l7_0x_helper_dasm(DASM_PARAMS, "ASL_S");
 }
 
 int arcompact_handle17_01_dasm(DASM_OPS_16)
 {
-	int size = 2;
-	print("LSR_S b <- b lsr u5 (%04x)",  op);
-	return size;
+	return arcompact_handle_l7_0x_helper_dasm(DASM_PARAMS, "LSR_S");
 }
 
 int arcompact_handle17_02_dasm(DASM_OPS_16)
 {
-	int size = 2;
-	print("ASR_S b <- b asr u5 (%04x)",  op);
-	return size;
+	return arcompact_handle_l7_0x_helper_dasm(DASM_PARAMS, "ASR_S");
 }
 
 int arcompact_handle17_03_dasm(DASM_OPS_16)
 {
-	int size = 2;
-	print("SUB_S b <- b - u5 (%04x)",  op);
-	return size;
+	return arcompact_handle_l7_0x_helper_dasm(DASM_PARAMS, "SUB_S");
 }
 
 int arcompact_handle17_04_dasm(DASM_OPS_16)
 {
-	int size = 2;
-	print("BSET_S b <- b | (1 << u5) (%04x)",  op);
-	return size;
+	return arcompact_handle_l7_0x_helper_dasm(DASM_PARAMS, "BSET_S");
 }
 
 int arcompact_handle17_05_dasm(DASM_OPS_16)
 {
-	int size = 2;
-	print("BCLR_S b <- b & !(1 << u5) (%04x)",  op);
-	return size;
+	return arcompact_handle_l7_0x_helper_dasm(DASM_PARAMS, "BCLR_S");
 }
 
 int arcompact_handle17_06_dasm(DASM_OPS_16)
 {
-	int size = 2;
-	print("BMSK_S (%04x)",  op);
-	return size;
+	return arcompact_handle_l7_0x_helper_dasm(DASM_PARAMS, "BSMK_S");
 }
 
 int arcompact_handle17_07_dasm(DASM_OPS_16)
 {
-	int size = 2;
-	print("BTST_S (%04x)",  op);
-	return size;
+	return arcompact_handle_l7_0x_helper_dasm(DASM_PARAMS, "BTST_S");
 }
 
 
@@ -1583,6 +1606,64 @@ int arcompact_handle04_2f_3c_dasm(DASM_OPS_32)  { print("<illegal 0x04_2f_3c> (%
 int arcompact_handle04_2f_3d_dasm(DASM_OPS_32)  { print("<illegal 0x04_2f_3d> (%08x)", op); return 4;}
 int arcompact_handle04_2f_3e_dasm(DASM_OPS_32)  { print("<illegal 0x04_2f_3e> (%08x)", op); return 4;}
 
+
+
+int arcompact_handle05_2f_09_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_09> (%08x)", op); return 4;}
+int arcompact_handle05_2f_0a_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_0a> (%08x)", op); return 4;}
+int arcompact_handle05_2f_0b_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_0b> (%08x)", op); return 4;}
+int arcompact_handle05_2f_0c_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_0c> (%08x)", op); return 4;}
+int arcompact_handle05_2f_0d_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_0d> (%08x)", op); return 4;}
+int arcompact_handle05_2f_0e_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_0e> (%08x)", op); return 4;}
+int arcompact_handle05_2f_0f_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_0f> (%08x)", op); return 4;}
+int arcompact_handle05_2f_10_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_10> (%08x)", op); return 4;}
+int arcompact_handle05_2f_11_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_11> (%08x)", op); return 4;}
+int arcompact_handle05_2f_12_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_12> (%08x)", op); return 4;}
+int arcompact_handle05_2f_13_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_13> (%08x)", op); return 4;}
+int arcompact_handle05_2f_14_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_14> (%08x)", op); return 4;}
+int arcompact_handle05_2f_15_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_15> (%08x)", op); return 4;}
+int arcompact_handle05_2f_16_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_16> (%08x)", op); return 4;}
+int arcompact_handle05_2f_17_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_17> (%08x)", op); return 4;}
+int arcompact_handle05_2f_18_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_18> (%08x)", op); return 4;}
+int arcompact_handle05_2f_19_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_19> (%08x)", op); return 4;}
+int arcompact_handle05_2f_1a_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_1a> (%08x)", op); return 4;}
+int arcompact_handle05_2f_1b_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_1b> (%08x)", op); return 4;}
+int arcompact_handle05_2f_1c_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_1c> (%08x)", op); return 4;}
+int arcompact_handle05_2f_1d_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_1d> (%08x)", op); return 4;}
+int arcompact_handle05_2f_1e_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_1e> (%08x)", op); return 4;}
+int arcompact_handle05_2f_1f_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_1f> (%08x)", op); return 4;}
+int arcompact_handle05_2f_20_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_20> (%08x)", op); return 4;}
+int arcompact_handle05_2f_21_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_21> (%08x)", op); return 4;}
+int arcompact_handle05_2f_22_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_22> (%08x)", op); return 4;}
+int arcompact_handle05_2f_23_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_23> (%08x)", op); return 4;}
+int arcompact_handle05_2f_24_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_24> (%08x)", op); return 4;}
+int arcompact_handle05_2f_25_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_25> (%08x)", op); return 4;}
+int arcompact_handle05_2f_26_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_26> (%08x)", op); return 4;}
+int arcompact_handle05_2f_27_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_27> (%08x)", op); return 4;}
+int arcompact_handle05_2f_28_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_28> (%08x)", op); return 4;}
+int arcompact_handle05_2f_29_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_29> (%08x)", op); return 4;}
+int arcompact_handle05_2f_2a_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_2a> (%08x)", op); return 4;}
+int arcompact_handle05_2f_2b_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_2b> (%08x)", op); return 4;}
+int arcompact_handle05_2f_2c_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_2c> (%08x)", op); return 4;}
+int arcompact_handle05_2f_2d_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_2d> (%08x)", op); return 4;}
+int arcompact_handle05_2f_2e_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_2e> (%08x)", op); return 4;}
+int arcompact_handle05_2f_2f_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_2f> (%08x)", op); return 4;}
+int arcompact_handle05_2f_30_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_30> (%08x)", op); return 4;}
+int arcompact_handle05_2f_31_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_31> (%08x)", op); return 4;}
+int arcompact_handle05_2f_32_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_32> (%08x)", op); return 4;}
+int arcompact_handle05_2f_33_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_33> (%08x)", op); return 4;}
+int arcompact_handle05_2f_34_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_34> (%08x)", op); return 4;}
+int arcompact_handle05_2f_35_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_35> (%08x)", op); return 4;}
+int arcompact_handle05_2f_36_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_36> (%08x)", op); return 4;}
+int arcompact_handle05_2f_37_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_37> (%08x)", op); return 4;}
+int arcompact_handle05_2f_38_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_38> (%08x)", op); return 4;}
+int arcompact_handle05_2f_39_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_39> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3a_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3a> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3b_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3b> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3c_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3c> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3d_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3d> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3e_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3e> (%08x)", op); return 4;}
+
+
 int arcompact_handle04_2f_3f_00_dasm(DASM_OPS_32)  { print("<illegal 0x04_2f_3f_00> (%08x)", op); return 4;}
 int arcompact_handle04_2f_3f_06_dasm(DASM_OPS_32)  { print("<illegal 0x04_2f_3f_06> (%08x)", op); return 4;}
 int arcompact_handle04_2f_3f_07_dasm(DASM_OPS_32)  { print("<illegal 0x04_2f_3f_07> (%08x)", op); return 4;}
@@ -1642,6 +1723,71 @@ int arcompact_handle04_2f_3f_3c_dasm(DASM_OPS_32)  { print("<illegal 0x04_2f_3f_
 int arcompact_handle04_2f_3f_3d_dasm(DASM_OPS_32)  { print("<illegal 0x04_2f_3f_3d> (%08x)", op); return 4;}
 int arcompact_handle04_2f_3f_3e_dasm(DASM_OPS_32)  { print("<illegal 0x04_2f_3f_3e> (%08x)", op); return 4;}
 int arcompact_handle04_2f_3f_3f_dasm(DASM_OPS_32)  { print("<illegal 0x04_2f_3f_3f> (%08x)", op); return 4;}
+
+int arcompact_handle05_2f_3f_00_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_00> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_01_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_01> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_02_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_02> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_03_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_03> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_04_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_04> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_05_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_05> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_06_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_06> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_07_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_07> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_08_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_08> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_09_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_09> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_0a_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_0a> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_0b_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_0b> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_0c_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_0c> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_0d_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_0d> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_0e_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_0e> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_0f_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_0f> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_10_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_10> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_11_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_11> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_12_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_12> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_13_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_13> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_14_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_14> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_15_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_15> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_16_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_16> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_17_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_17> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_18_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_18> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_19_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_19> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_1a_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_1a> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_1b_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_1b> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_1c_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_1c> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_1d_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_1d> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_1e_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_1e> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_1f_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_1f> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_20_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_20> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_21_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_21> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_22_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_22> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_23_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_23> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_24_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_24> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_25_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_25> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_26_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_26> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_27_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_27> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_28_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_28> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_29_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_29> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_2a_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_2a> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_2b_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_2b> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_2c_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_2c> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_2d_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_2d> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_2e_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_2e> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_2f_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_2f> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_30_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_30> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_31_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_31> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_32_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_32> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_33_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_33> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_34_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_34> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_35_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_35> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_36_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_36> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_37_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_37> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_38_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_38> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_39_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_39> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_3a_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_3a> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_3b_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_3b> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_3c_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_3c> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_3d_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_3d> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_3e_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_3e> (%08x)", op); return 4;}
+int arcompact_handle05_2f_3f_3f_dasm(DASM_OPS_32)  { print("<illegal 0x05_2f_3f_3f> (%08x)", op); return 4;}
 
 
 

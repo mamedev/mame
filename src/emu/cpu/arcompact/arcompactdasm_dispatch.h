@@ -27,6 +27,10 @@ int arcompact_handle04_2f_dasm(DASM_OPS_32);
 int arcompact_handle04_2f_3f_dasm(DASM_OPS_32);
 int arcompact_handle05_dasm(DASM_OPS_32);
 
+int arcompact_handle05_2f_dasm(DASM_OPS_32);
+int arcompact_handle05_2f_3f_dasm(DASM_OPS_32);
+
+
 int arcompact_handle0c_dasm(DASM_OPS_16);
 int arcompact_handle0d_dasm(DASM_OPS_16);
 int arcompact_handle0e_dasm(DASM_OPS_16);
