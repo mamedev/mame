@@ -1129,30 +1129,39 @@ int arcompact_handle0e_03_dasm(DASM_OPS_16)
 
 
 
+int arcompact_handle0f_00_0x_helper_dasm(DASM_OPS_16, const char* optext)
+{
+	int breg;
 
+	COMMON16_GET_breg;
+	REG_16BIT_RANGE(breg);
+	
+	print("%s %s", optext, regnames[breg]);
 
-int arcompact_handle0f_00_00_dasm(DASM_OPS_16)  { print("J_S pc <- b (%08x)", op); return 2;}
-int arcompact_handle0f_00_01_dasm(DASM_OPS_16)  { print("J_S.D pc <- b (%08x)", op); return 2;}
-int arcompact_handle0f_00_02_dasm(DASM_OPS_16)  { print("JL_S blink <- pc; pc <- b (%08x)", op); return 2;}
-int arcompact_handle0f_00_03_dasm(DASM_OPS_16)  { print("L_S.D blink <- pc; pc <- b( %08x)", op); return 2;}
-int arcompact_handle0f_00_06_dasm(DASM_OPS_16)  { print("SUB_S.NE if (f.Z==0) b <- b - b  (%08x)", op); return 2;}
+	return 2;
 
-
-
-
-
-int arcompact_handle0f_00_07_00_dasm(DASM_OPS_16)  { print("NOP_S (%08x)", op); return 2;}
-int arcompact_handle0f_00_07_01_dasm(DASM_OPS_16)  { print("UNIMP_S (%08x)", op); return 2;} // Unimplemented Instruction (how does this differ from illegal ops?)
+}
 
 
 
-int arcompact_handle0f_00_07_04_dasm(DASM_OPS_16)  { print("JEQ_S [blink] (%08x)", op); return 2;}
-int arcompact_handle0f_00_07_05_dasm(DASM_OPS_16)  { print("JNE_S [blink]  (%08x)", op); return 2;}
-int arcompact_handle0f_00_07_06_dasm(DASM_OPS_16)  { print("J_S [blink]  (%08x)", op); return 2;}
-int arcompact_handle0f_00_07_07_dasm(DASM_OPS_16)  { print("J_S.D [blink] (%08x)", op); return 2;}
+int arcompact_handle0f_00_00_dasm(DASM_OPS_16)  { return arcompact_handle0f_00_0x_helper_dasm(DASM_PARAMS, "J_S"); }
+int arcompact_handle0f_00_01_dasm(DASM_OPS_16)  { return arcompact_handle0f_00_0x_helper_dasm(DASM_PARAMS, "J_S.D"); }
+int arcompact_handle0f_00_02_dasm(DASM_OPS_16)  { return arcompact_handle0f_00_0x_helper_dasm(DASM_PARAMS, "JL_S");  }
+int arcompact_handle0f_00_03_dasm(DASM_OPS_16)  { return arcompact_handle0f_00_0x_helper_dasm(DASM_PARAMS, "JL_S.D");  }
+int arcompact_handle0f_00_06_dasm(DASM_OPS_16)  { return arcompact_handle0f_00_0x_helper_dasm(DASM_PARAMS, "SUB_S.NE"); }
 
 
-int arcompact_handle0f_02_dasm(DASM_OPS_16)  { print("SUB_S b <- b - c (%08x)", op); return 2;}
+
+
+// Zero parameters (ZOP)
+int arcompact_handle0f_00_07_00_dasm(DASM_OPS_16)  { print("NOP_S"); return 2;}
+int arcompact_handle0f_00_07_01_dasm(DASM_OPS_16)  { print("UNIMP_S"); return 2;} // Unimplemented Instruction, same as illegal, but recommended to fill blank space
+int arcompact_handle0f_00_07_04_dasm(DASM_OPS_16)  { print("JEQ_S [blink]"); return 2;}
+int arcompact_handle0f_00_07_05_dasm(DASM_OPS_16)  { print("JNE_S [blink]"); return 2;}
+int arcompact_handle0f_00_07_06_dasm(DASM_OPS_16)  { print("J_S [blink]"); return 2;}
+int arcompact_handle0f_00_07_07_dasm(DASM_OPS_16)  { print("J_S.D [blink]"); return 2;}
+
+
 
 
 
@@ -1171,7 +1180,7 @@ int arcompact_handle0f_0x_helper_dasm(DASM_OPS_16, const char* optext)
 	return 2;
 }
 
-
+int arcompact_handle0f_02_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "SUB_S");}
 int arcompact_handle0f_04_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "AND_S");  }
 int arcompact_handle0f_05_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "OR_S");   }
 int arcompact_handle0f_06_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "BIC_S");  }
