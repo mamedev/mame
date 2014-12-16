@@ -496,7 +496,7 @@ INLINE void K053936GP_copyroz32clip( running_machine &machine,
 
 	if (blend > 0)
 	{
-		dst_base += dst_pitch;      // draw blended
+		dst_ptr += dst_pitch;      // draw blended
 		starty += incyy;
 		startx += incyx;
 
@@ -539,35 +539,9 @@ INLINE void K053936GP_copyroz32clip( running_machine &machine,
 	}
 	else    //  draw solid
 	{
-		if (blend == 0)
-		{
-			dst_ptr += dst_pitch;
-			starty += incyy;
-			startx += incyx;
-		}
-		else
-		{
-			if ((sy & 1) ^ (blend & 1))
-			{
-				if (ty <= 1) return;
-
-				dst_ptr += dst_pitch;
-				cy += incyy;
-				cx += incyx;
-			}
-
-			if (ty > 1)
-			{
-				ty >>= 1;
-				dst_pitch <<= 1;
-				incyy <<= 1;
-				incyx <<= 1;
-
-				dst_ptr += dst_pitch;
-				starty = cy + incyy;
-				startx = cx + incyx;
-			}
-		}
+		dst_ptr += dst_pitch;
+		starty += incyy;
+		startx += incyx;
 
 		do {
 			do {
