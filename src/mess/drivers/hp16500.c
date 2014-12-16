@@ -40,10 +40,10 @@ public:
 
 	DECLARE_WRITE32_MEMBER(palette_w);
 
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER (vram_r);
-	DECLARE_WRITE8_MEMBER(mask_w);
-	DECLARE_WRITE8_MEMBER(val_w);
+	DECLARE_WRITE16_MEMBER(vram_w);
+	DECLARE_READ8_MEMBER  (vram_r);
+	DECLARE_WRITE8_MEMBER (mask_w);
+	DECLARE_WRITE8_MEMBER (val_w);
 
 	INTERRUPT_GEN_MEMBER(vblank);
 
@@ -57,10 +57,10 @@ static ADDRESS_MAP_START(hp16500_map, AS_PROGRAM, 32, hp16500_state)
 
 	AM_RANGE(0x00200000, 0x0020efff) AM_RAM
 
-	AM_RANGE(0x00600000, 0x0061ffff) AM_WRITE8(vram_w, 0x00ff00ff)
-	AM_RANGE(0x00600000, 0x0067ffff) AM_READ8 (vram_r, 0x00ff00ff)
-	AM_RANGE(0x00700000, 0x00700003) AM_WRITE8(mask_w, 0xff000000)
-	AM_RANGE(0x00740000, 0x00740003) AM_WRITE8(val_w,  0xff000000)
+	AM_RANGE(0x00600000, 0x0061ffff) AM_WRITE16(vram_w, 0xffffffff)
+	AM_RANGE(0x00600000, 0x0067ffff) AM_READ8  (vram_r, 0x00ff00ff)
+	AM_RANGE(0x00700000, 0x00700003) AM_WRITE8 (mask_w, 0xff000000)
+	AM_RANGE(0x00740000, 0x00740003) AM_WRITE8 (val_w,  0xff000000)
 	AM_RANGE(0x00800000, 0x009fffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -79,8 +79,16 @@ void hp16500_state::video_start()
 	m_val = 0;
 }
 
-WRITE8_MEMBER(hp16500_state::vram_w)
+// The test code is buggy, it writes a byte in the wrong position
+// (even instead of odd).  It still works because the 68k replicates
+// the byte on the word and the hardware doesn't decode UDS/LDS.  But
+// that is why the handler needs to be 16 bits, or it won't be called
+// in the first place.
+
+WRITE16_MEMBER(hp16500_state::vram_w)
 {
+	if(!ACCESSING_BITS_0_7)
+		data = data | (data >> 8);
 	for(int i=0; i<4; i++) {
 		int off = offset + i * 0x10000;
 		if(data & (8 >> i))
