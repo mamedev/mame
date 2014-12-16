@@ -1730,6 +1730,7 @@ $(MESSOBJ)/ti.a:                \
 	$(MESS_DRIVERS)/exelv.o     \
 	$(MESS_DRIVERS)/geneve.o    \
 	$(MESS_DRIVERS)/ticalc1x.o  \
+	$(MESS_DRIVERS)/tispeak.o   \
 	$(MESS_DRIVERS)/ti74.o      \
 	$(MESS_DRIVERS)/ti85.o $(MESS_MACHINE)/ti85.o $(MESS_VIDEO)/ti85.o \
 	$(MESS_DRIVERS)/ti89.o      \
@@ -2177,6 +2178,7 @@ $(MESS_DRIVERS)/ticalc1x.o: $(MESS_LAYOUT)/ti1270.lh \
 							$(MESS_LAYOUT)/ti30.lh \
 							$(MESS_LAYOUT)/tisr16.lh \
 							$(MESS_LAYOUT)/wizatron.lh
+$(MESS_DRIVERS)/tispeak.o:  $(MESS_LAYOUT)/tispeak.lh
 $(MESS_DRIVERS)/tk80.o:     $(MESS_LAYOUT)/tk80.lh
 $(MESS_DRIVERS)/tm990189.o: $(MESS_LAYOUT)/tm990189.lh \
 							$(MESS_LAYOUT)/tm990189v.lh
