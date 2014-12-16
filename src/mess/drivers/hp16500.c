@@ -9,7 +9,7 @@
     TMS9914A GPIB bus interface
     Dallas DS1286 RTC/CMOS RAM
 
-    IRQ 1 = 17732
+    IRQ 1 = VBL
     IRQ 2 = 35b8
     IRQ 3 = 35ce (jump 840120)
     IRQ 4 = 17768
@@ -45,6 +45,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mask_w);
 	DECLARE_WRITE8_MEMBER(val_w);
 
+	INTERRUPT_GEN_MEMBER(vblank);
+
 private:
 	UINT32 m_palette[256], m_colors[3], m_count, m_clutoffs;
 };
@@ -52,12 +54,20 @@ private:
 static ADDRESS_MAP_START(hp16500_map, AS_PROGRAM, 32, hp16500_state)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_REGION("bios", 0)
 	AM_RANGE(0x0020f000, 0x0020f003) AM_WRITE(palette_w)
+
+	AM_RANGE(0x00200000, 0x0020efff) AM_RAM
+
 	AM_RANGE(0x00600000, 0x0061ffff) AM_WRITE8(vram_w, 0x00ff00ff)
 	AM_RANGE(0x00600000, 0x0067ffff) AM_READ8 (vram_r, 0x00ff00ff)
 	AM_RANGE(0x00700000, 0x00700003) AM_WRITE8(mask_w, 0xff000000)
 	AM_RANGE(0x00740000, 0x00740003) AM_WRITE8(val_w,  0xff000000)
-	AM_RANGE(0x00800000, 0x009fffff) AM_RAM     // 284e end of test - d0 = 0 for pass
+	AM_RANGE(0x00800000, 0x009fffff) AM_RAM
 ADDRESS_MAP_END
+
+INTERRUPT_GEN_MEMBER(hp16500_state::vblank)
+{
+	m_maincpu->set_input_line(M68K_IRQ_1, HOLD_LINE);
+}
 
 void hp16500_state::video_start()
 {
@@ -151,6 +161,7 @@ static MACHINE_CONFIG_START( hp16500, hp16500_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(hp16500_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", hp16500_state, vblank)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(hp16500_state, screen_update_hp16500)
@@ -173,3 +184,4 @@ ROM_START( hp16500b )
 ROM_END
 
 COMP( 1994, hp16500b, 0, 0, hp16500, hp16500, driver_device, 0,  "Hewlett Packard", "HP 16500b", GAME_NOT_WORKING|GAME_NO_SOUND)
+
