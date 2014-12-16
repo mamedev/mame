@@ -479,8 +479,12 @@ int drawsdl2_init(running_machine &machine, sdl_draw_info *callbacks)
 
 	expand_copy_info(blit_info_default);
 
+#if USE_OPENGL
 	// Load the GL library now - else MT will fail
 	stemp = downcast<sdl_options &>(machine.options()).gl_lib();
+#else
+	stemp = NULL;
+#endif
 	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) == 0)
 		stemp = NULL;
 
