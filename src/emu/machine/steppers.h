@@ -52,15 +52,12 @@ extern const stepper_interface ecoin_interface_200step_reel;
 	devcb = &stepper_device::set_optic_handler(*device, DEVCB_##_write);
 
 class stepper_device;
-const device_type STEPPER = &device_creator<stepper_device>;
+extern const device_type STEPPER;
 
 class stepper_device : public device_t
 {
 public:
-	stepper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, STEPPER, "Stepper Motor", tag, owner, clock, "stepper", __FILE__),
-		m_optic_cb(*this)
-	{ }
+	stepper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb_base &set_optic_handler(device_t &device, _Object object) { return downcast<stepper_device &>(device).m_optic_cb.set_callback(object); }
 

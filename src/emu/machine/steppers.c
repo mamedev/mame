@@ -75,8 +75,13 @@ const stepper_interface ecoin_interface_200step_reel =
 	7
 };
 
+const device_type STEPPER = &device_creator<stepper_device>;
 
-
+stepper_device::stepper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+		: device_t(mconfig, STEPPER, "Stepper Motor", tag, owner, clock, "stepper", __FILE__),
+		m_optic_cb(*this)
+	{
+	}	
 ///////////////////////////////////////////////////////////////////////////
 void stepper_device::configure(const stepper_interface *intf)
 {

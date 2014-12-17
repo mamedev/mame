@@ -137,10 +137,10 @@ public:
 	required_device<upd7759_device> m_upd7759;
 	optional_device<palette_device> m_palette;
 	optional_device<tms34010_device> m_dsp;
-	required_device<stepper_device> m_reel0;
-	required_device<stepper_device> m_reel1;
-	required_device<stepper_device> m_reel2;
-	required_device<stepper_device> m_reel3;
-	required_device<stepper_device> m_reel4;
-	required_device<stepper_device> m_reel5;
+	optional_device<stepper_device> m_reel0;
+	optional_device<stepper_device> m_reel1;
+	optional_device<stepper_device> m_reel2;
+	optional_device<stepper_device> m_reel3;
+	optional_device<stepper_device> m_reel4;
+	optional_device<stepper_device> m_reel5;
 };

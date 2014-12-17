@@ -193,13 +193,13 @@ public:
 			m_dm01(*this, "dm01") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<stepper_device> m_reel0;
-	required_device<stepper_device> m_reel1;
-	required_device<stepper_device> m_reel2;
-	required_device<stepper_device> m_reel3;
-	required_device<stepper_device> m_reel4;
-	required_device<stepper_device> m_reel5;
-	required_device<upd7759_device> m_upd7759;
+	optional_device<stepper_device> m_reel0;
+	optional_device<stepper_device> m_reel1;
+	optional_device<stepper_device> m_reel2;
+	optional_device<stepper_device> m_reel3;
+	optional_device<stepper_device> m_reel4;
+	optional_device<stepper_device> m_reel5;
+	optional_device<upd7759_device> m_upd7759;
 	optional_device<bfm_bd1_t> m_vfd0;
 	optional_device<bfm_bd1_t> m_vfd1;
 	optional_device<bfmdm01_device> m_dm01;
@@ -2164,19 +2164,6 @@ static MACHINE_CONFIG_START( scorpion2_vid, bfm_sc2_state )
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("reel0", STEPPER, 0)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel0_optic_cb))
-	MCFG_DEVICE_ADD("reel1", STEPPER, 0)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel1_optic_cb))
-	MCFG_DEVICE_ADD("reel2", STEPPER, 0)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel2_optic_cb))
-	MCFG_DEVICE_ADD("reel3", STEPPER, 0)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel3_optic_cb))
-	MCFG_DEVICE_ADD("reel4", STEPPER, 0)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel4_optic_cb))
-	MCFG_DEVICE_ADD("reel5", STEPPER, 0)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel5_optic_cb))
-
 MACHINE_CONFIG_END
 
 
@@ -3626,6 +3613,19 @@ static MACHINE_CONFIG_START( scorpion2, bfm_sc2_state )
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_sc2_vfd)
+	
+	MCFG_DEVICE_ADD("reel0", STEPPER, 0)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel0_optic_cb))
+	MCFG_DEVICE_ADD("reel1", STEPPER, 0)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel1_optic_cb))
+	MCFG_DEVICE_ADD("reel2", STEPPER, 0)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel2_optic_cb))
+	MCFG_DEVICE_ADD("reel3", STEPPER, 0)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel3_optic_cb))	
+	MCFG_DEVICE_ADD("reel4", STEPPER, 0)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel4_optic_cb))
+	MCFG_DEVICE_ADD("reel5", STEPPER, 0)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel5_optic_cb))
 MACHINE_CONFIG_END
 
 
@@ -3663,6 +3663,19 @@ static MACHINE_CONFIG_START( scorpion2_dm01, bfm_sc2_state )
 	MCFG_CPU_ADD("matrix", M6809, 2000000 )             /* matrix board 6809 CPU at 2 Mhz ?? I don't know the exact freq.*/
 	MCFG_CPU_PROGRAM_MAP(bfm_dm01_memmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_sc2_state, nmi_line_assert, 1500 )          /* generate 1500 NMI's per second ?? what is the exact freq?? */
+	
+	MCFG_DEVICE_ADD("reel0", STEPPER, 0)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel0_optic_cb))
+	MCFG_DEVICE_ADD("reel1", STEPPER, 0)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel1_optic_cb))
+	MCFG_DEVICE_ADD("reel2", STEPPER, 0)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel2_optic_cb))
+	MCFG_DEVICE_ADD("reel3", STEPPER, 0)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel3_optic_cb))	
+	MCFG_DEVICE_ADD("reel4", STEPPER, 0)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel4_optic_cb))
+	MCFG_DEVICE_ADD("reel5", STEPPER, 0)
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel5_optic_cb))
 MACHINE_CONFIG_END
 
 void bfm_sc2_state::sc2awp_common_init(int reels, int decrypt)
