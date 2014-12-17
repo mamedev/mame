@@ -898,9 +898,178 @@ int arcompact_handle04_28_dasm(DASM_OPS_32) // LPcc (loop setup)
 
 
 
+int arcompact_handle04_2a_dasm(DASM_OPS_32)  // Load FROM Auxiliary register TO register
+{
+
+	//           pp        F
+	// 0010 0bbb 0010 1010 0BBB CCCC CCRR RRRR
+	// 0010 0bbb 0010 1010 0BBB 1111 10RR RRRR
+	// 0010 0bbb 0110 1010 0BBB uuuu uu00 0000
+	// 0010 0bbb 1010 1010 0BBB ssss ssSS SSSS
+
+
+	int size = 4;
+	UINT32 limm = 0;
+	int got_limm = 0;
+
+	int p = (op & 0x00c00000) >> 22; op &= ~0x00c00000;
+	COMMON32_GET_breg;
+	int F = (op & 0x00008000) >> 15; op &= ~0x00008000; // must be 0
+
+	output  += sprintf( output, "LR");
+	if (F) output  += sprintf( output, ".<F set, illegal>");
+//	output  += sprintf( output, " p(%d)", p);
+	
+	
+
+	if (breg == LIMM_REG)
+	{
+		output  += sprintf( output, "<no dest>" ); // illegal encoding?
+	}
+	else
+	{
+		output += sprintf(output, " %s, ", regnames[breg]);
+	}
+
+
+
+	if (p == 0)
+	{
+
+		int C = (op & 0x00000fc0) >> 6; op &= ~0x00000fc0;
+		int res = (op & 0x0000003f) >> 0; op &= ~0x0000003f;
+
+		if (C == LIMM_REG)
+		{
+			if (!got_limm)
+			{
+				GET_LIMM_32;
+				size = 8;
+			}
+
+			output  += sprintf( output, "(%08x) ", limm );
+	
+		}
+		else
+		{
+			output  += sprintf( output, "C(%s) ", regnames[C]);
+		}
+
+		if (res) output  += sprintf( output, "reserved(%02x) ", res );
+	}
+	else if (p == 1)
+	{
+		int U = (op & 0x00000fc0) >> 6; op &= ~0x00000fc0;
+		int res = (op & 0x0000003f) >> 0; op &= ~0x0000003f;
+
+		output  += sprintf( output, "U(%02x) ", U );
+		
+		if (res) output  += sprintf( output, "reserved(%02x) ", res );
+	}
+	else if (p == 2)
+	{
+		COMMON32_GET_s12;
+
+		output  += sprintf( output, "S(%03x)", S);
+
+	}
+	else if (p == 3)
+	{
+		output  += sprintf( output, " <mode 3, illegal>");
+	}
+
+	return size;
+}
+
+int arcompact_handle04_2b_dasm(DASM_OPS_32)  // Store TO Auxiliary register FROM register
+{	
+	// code at ~ 40073DFE in leapster bios is manually setting up a loop this way
+	// rather than using the lPcc opcode
+
+	int size = 4;
+	UINT32 limm = 0;
+	int got_limm = 0;
+
+	int p = (op & 0x00c00000) >> 22; op &= ~0x00c00000;
+	COMMON32_GET_breg;
+	int F = (op & 0x00008000) >> 15; op &= ~0x00008000;
+
+	output  += sprintf( output, "SR");
+	if (F) output  += sprintf( output, ".<F set, illegal>");
+//	output  += sprintf( output, " p(%d)", p);
+	
+	
+
+	if (breg == LIMM_REG)
+	{
+		GET_LIMM_32;
+		size = 8;
+		got_limm = 1;
+		output  += sprintf( output, " %08x -> ", limm );
+
+	}
+	else
+	{
+		output += sprintf(output, " %s -> ", regnames[breg]);
+	}
+
+
+
+	if (p == 0)
+	{
+
+		int C = (op & 0x00000fc0) >> 6; op &= ~0x00000fc0;
+		int res = (op & 0x0000003f) >> 0; op &= ~0x0000003f;
+
+		if (C == LIMM_REG)
+		{
+			if (!got_limm)
+			{
+				GET_LIMM_32;
+				size = 8;
+			}
+
+			output  += sprintf( output, "[%08x]", limm );
+
+		}
+		else
+		{
+			output  += sprintf( output, "[%s]", regnames[C]);
+
+
+		}
+
+		if (res) output  += sprintf( output, " (reserved %02x) ", res );
+
+
+	}
+	else if (p == 1)
+	{
+		int U = (op & 0x00000fc0) >> 6; op &= ~0x00000fc0;
+		int res = (op & 0x0000003f) >> 0; op &= ~0x0000003f;
+
+		output  += sprintf( output, "[%02x]", U );
+
+		if (res) output  += sprintf( output, " (reserved %02x) ", res );
+
+
+	}
+	else if (p == 2)
+	{
+		COMMON32_GET_s12;
+
+		output  += sprintf( output, "[%03x]", S);
+
+	}
+	else if (p == 3)
+	{
+		output  += sprintf( output, " <mode 3, illegal>");
+	}
+
+	return size;}
+
+
 int arcompact_handle04_29_dasm(DASM_OPS_32)  { print("FLAG (%08x)", op); return 4;}
-int arcompact_handle04_2a_dasm(DASM_OPS_32)  { print("LR (%08x)", op); return 4;}
-int arcompact_handle04_2b_dasm(DASM_OPS_32)  { print("SR (%08x)", op); return 4;}
 
 
 int arcompact_handle04_2f_helper_dasm(DASM_OPS_32, const char* optext)
@@ -1524,34 +1693,46 @@ int arcompact_handle17_07_dasm(DASM_OPS_16)
 
 // op bits remaining for 0x18_xx subgroups 0x071f 
 
+int arcompact_handle18_0x_helper_dasm(DASM_OPS_16, const char* optext, int st)
+{
+	int breg, u;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_u5;
+
+	REG_16BIT_RANGE(breg);
+
+	output  += sprintf( output, "%s %s ", optext, regnames[breg]);
+	if (st==1) output  += sprintf( output, "-> ");
+	else output  += sprintf( output, "<- ");
+	output  += sprintf( output, "[SP, 0x%02x]", u*4);
+
+	return 2;
+}
+
 int arcompact_handle18_00_dasm(DASM_OPS_16) 
 {
-	print("LD_S (SP) (%04x)",  op);
-	return 2;
+	return arcompact_handle18_0x_helper_dasm(DASM_PARAMS, "LD_S", 0);
 }
 
 int arcompact_handle18_01_dasm(DASM_OPS_16) 
 {
-	print("LDB_S (SP) (%04x)",  op);
-	return 2;
+	return arcompact_handle18_0x_helper_dasm(DASM_PARAMS, "LDB_S", 0);
 }
 
 int arcompact_handle18_02_dasm(DASM_OPS_16) 
 {
-	print("ST_S (SP) (%04x)",  op);
-	return 2;
+	return arcompact_handle18_0x_helper_dasm(DASM_PARAMS, "ST_S", 1);
 }
 
 int arcompact_handle18_03_dasm(DASM_OPS_16) 
 {
-	print("STB_S (SP) (%04x)",  op);
-	return 2;
+	return arcompact_handle18_0x_helper_dasm(DASM_PARAMS, "STB_S", 1);
 }
 
 int arcompact_handle18_04_dasm(DASM_OPS_16) 
 {
-	print("ADD_S (SP) (%04x)",  op);
-	return 2;
+	return arcompact_handle18_0x_helper_dasm(DASM_PARAMS, "ADD_S", 1); // check format
 }
 
 // op bits remaining for 0x18_05_xx subgroups 0x001f
@@ -1560,7 +1741,7 @@ int arcompact_handle18_05_00_dasm(DASM_OPS_16)
 	int u = op & 0x001f;
 	op &= ~0x001f; // all bits now used
 
-	print("ADD_S %02x (SP)", u);
+	print("ADD_S SP, SP, %02x", u*4);
 	return 2;
 
 }
@@ -1570,7 +1751,7 @@ int arcompact_handle18_05_01_dasm(DASM_OPS_16)
 	int u = op & 0x001f;
 	op &= ~0x001f; // all bits now used
 
-	print("SUB_S %02x (SP)", u);
+	print("SUB_S SP, SP, %02x", u*4);
 	return 2;
 }
 
