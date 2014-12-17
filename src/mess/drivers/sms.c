@@ -25,6 +25,10 @@
  - Emulate SRAM cartridges? (for use with Bock's dump tool)
  - Support for other DE-9 compatible controllers, like the Mega Drive 6-Button
    that has software support (at least a test tool made by Charles MacDonald)
+ - The MarkIII/SMS palette used on former tms9918 modes 0 to 3 is different than from SG1000;
+   the original tms9918 is based on luminance/chrominance, and the MarkIII/SMS is "posterized"
+   to a 6bit colourspace, and even has significant differences over that
+   (please check http://www.smspower.org/Development/Palette )
 
  The Game Gear SIO hardware is not emulated but has some
  placeholders in 'machine/sms.c'
