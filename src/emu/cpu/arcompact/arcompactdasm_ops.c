@@ -212,6 +212,15 @@ static const char *regnames[0x40] =
 	int B_temp = (op & 0x00007000) >> 12; op &= ~0x00007000; \
 	int breg = b_temp | (B_temp << 3); \
 
+#define COMMON32_GET_s12 \
+		int S_temp = (op & 0x0000003f) >> 0; op &= ~0x0000003f; \
+		int s_temp = (op & 0x00000fc0) >> 6; op &= ~0x00000fc0; \
+		int S = s_temp | (S_temp<<6); \
+
+#define COMMON32_GET_CONDITION \
+		UINT8 condition = op & 0x0000001f;  op &= ~0x0000001f;
+
+
 #define COMMON16_GET_breg \
 	breg =  ((op & 0x0700) >>8); \
 	op &= ~0x0700; \
@@ -272,7 +281,7 @@ int arcompact_handle00_00_dasm(DASM_OPS_32)
 	address |= ((op & 0x0000ffc0) >> 6) << 10;
 	if (address & 0x800000) address = -0x800000 + (address & 0x7fffff);
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
-	UINT8 condition = op & 0x0000001f;
+	COMMON32_GET_CONDITION
 
 	output  += sprintf( output, "B%s(%s) %08x", delaybit[n], conditions[condition], PC_ALIGNED32 + (address * 2));
 	return size;
@@ -307,7 +316,7 @@ int arcompact_handle01_00_00dasm(DASM_OPS_32)
 	if (address & 0x800000) address = -0x800000 + (address&0x7fffff);	
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
 
-	UINT8 condition = op & 0x0000001f;
+	COMMON32_GET_CONDITION
 
 	output  += sprintf( output, "BL%s(%s) %08x", delaybit[n], conditions[condition], PC_ALIGNED32 + (address *2) );
 	return size;
@@ -629,18 +638,18 @@ int arcompact_handle04_helper_dasm(DASM_OPS_32, const char* optext, int ignore_d
 	}
 	else if (p == 2)
 	{
-		int S = (op & 0x00000fff) >> 0; op &= ~0x00000fff;
+		COMMON32_GET_s12;
+
 		output  += sprintf( output, "S(%02x)", S);
 
 	}
 	else if (p == 3)
 	{
 		int M = (op & 0x00000020) >> 5; op &= ~0x00000020;
-		int Q = (op & 0x0000001f) >> 0; op &= ~0x0000001f;
-	
+		COMMON32_GET_CONDITION	
 
 		output  += sprintf( output, " M(%d)", M);
-		output  += sprintf( output, " Cond<%s> ", conditions[Q]);
+		output  += sprintf( output, " Cond<%s> ", conditions[condition]);
 
 		if (M == 0)
 		{
@@ -851,7 +860,44 @@ int arcompact_handle04_23_dasm(DASM_OPS_32)
 
 
 
-int arcompact_handle04_28_dasm(DASM_OPS_32)  { print("LPcc (%08x)", op); return 4;}
+int arcompact_handle04_28_dasm(DASM_OPS_32) // LPcc (loop setup)
+{
+	COMMON32_GET_breg; // breg is reserved
+	int p = (op & 0x00c00000) >> 22; op &= ~0x00c00000;
+
+	if (p == 0x00)
+	{
+		print("<illegal LPcc, p = 0x00)");
+	}
+	else if (p == 0x01)
+	{
+		print("<illegal LPcc, p = 0x01)");
+	}
+	else if (p == 0x02) // Loop unconditional
+	{ // 0010 0RRR 1010 1000 0RRR ssss ssSS SSSS
+		COMMON32_GET_s12
+		if (S & 0x800) S = -0x800 + (S&0x7ff);
+
+		output += sprintf(output, "LP (start %08x, end %08x)", pc + 4, pc + S*2);
+	}
+	else if (p == 0x03) // Loop conditional
+	{ // 0010 0RRR 1110 1000 0RRR uuuu uu1Q QQQQ
+		int u = (op & 0x00000fc0)>>6;
+		COMMON32_GET_CONDITION
+		output += sprintf(output, "LP<%s> (start %08x, end %08x)", conditions[condition], pc + 4, pc + u*2);
+
+		int unused = (op & 0x00000020)>>5;
+		if (unused==0) 	output += sprintf(output, "(unused bit not set)");
+
+	}
+
+	if (breg) output += sprintf(output, "(reseved B bits set %02x)", breg);
+
+	return 4;
+}
+
+
+
 int arcompact_handle04_29_dasm(DASM_OPS_32)  { print("FLAG (%08x)", op); return 4;}
 int arcompact_handle04_2a_dasm(DASM_OPS_32)  { print("LR (%08x)", op); return 4;}
 int arcompact_handle04_2b_dasm(DASM_OPS_32)  { print("SR (%08x)", op); return 4;}
@@ -871,9 +917,15 @@ int arcompact_handle04_2f_helper_dasm(DASM_OPS_32, const char* optext)
 	output  += sprintf( output, "%s", flagbit[F]);
 //	output  += sprintf( output, " p(%d)", p);
 	
-	
-	output += sprintf(output, " %s, ", regnames[breg]);
-
+	if (breg == LIMM_REG)
+	{
+		output += sprintf(output, " <no dst>, ");
+		// if using the 'EX' opcode this is illegal
+	}
+	else
+	{
+		output += sprintf(output, " %s, ", regnames[breg]);
+	}
 
 	if (p == 0)
 	{
@@ -943,7 +995,7 @@ int arcompact_handle04_2f_3f_05_dasm(DASM_OPS_32)  { print("BRK (%08x)", op); re
 int arcompact_handle04_3x_helper_dasm(DASM_OPS_32, int dsize, int extend)
 {
 	int size = 4;
-	UINT32 limm;
+	UINT32 limm=0;
 	int got_limm = 0;
 
 	output += sprintf(output, "LD");
@@ -1341,7 +1393,21 @@ int arcompact_handle0f_1d_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_help
 
 int arcompact_handle0f_0c_dasm(DASM_OPS_16)  { print("MUL64_S mulres <- b * c  (%08x)", op); return 2;} // special
 int arcompact_handle0f_1e_dasm(DASM_OPS_16)  { print("TRAP_S (%08x)", op); return 2;} // special
-int arcompact_handle0f_1f_dasm(DASM_OPS_16)  { print("BRK_S (%08x)", op); return 2;} // special
+
+int arcompact_handle0f_1f_dasm(DASM_OPS_16)  // special
+{
+	int bc = (op & 0x07e0)>>5; op &= ~0x07e0;
+
+	if (bc == 0x003f)
+	{
+		print("BRK_S");
+	}
+	else
+	{
+		print("<illegal BRK_S>");
+	}
+	return 2;
+}
 
 
 int arcompact_handle_ld_helper_dasm(DASM_OPS_16, const char* optext, int shift, int swap)

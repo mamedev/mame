@@ -663,7 +663,7 @@ int arcompact_handle0f_dasm(DASM_OPS_16)
 {
 	int size = 2;
 	// General Register Instructions (16-bit)
-	// 01111 bbb ccc iiiii
+	// 0111 1bbb ccci iiii
 	UINT8 subinstr = (op & 0x01f) >> 0;
 	op &= ~0x001f;
 
