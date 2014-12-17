@@ -16,7 +16,7 @@
     IRQ 5 = 814a
     IRQ 6 = 35c8 (jump 840120)
     IRQ 7 = 35d4 (jump 840120)
-
+ 
 ****************************************************************************/
 
 #include "emu.h"
@@ -44,6 +44,8 @@ public:
 	DECLARE_READ8_MEMBER  (vram_r);
 	DECLARE_WRITE8_MEMBER (mask_w);
 	DECLARE_WRITE8_MEMBER (val_w);
+	DECLARE_READ32_MEMBER(vbl_state_r);
+	DECLARE_WRITE32_MEMBER(vbl_ack_w);
 
 	INTERRUPT_GEN_MEMBER(vblank);
 
@@ -51,11 +53,25 @@ private:
 	UINT32 m_palette[256], m_colors[3], m_count, m_clutoffs;
 };
 
+READ32_MEMBER(hp16500_state::vbl_state_r)
+{
+	return 0x03000000;	// bit 0 set means the interrupt handler advances the pSOS tick counter.
+}
+
+WRITE32_MEMBER(hp16500_state::vbl_ack_w)
+{
+	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+}
+
 static ADDRESS_MAP_START(hp16500_map, AS_PROGRAM, 32, hp16500_state)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_REGION("bios", 0)
 	AM_RANGE(0x0020f000, 0x0020f003) AM_WRITE(palette_w)
 
-	AM_RANGE(0x00200000, 0x0020efff) AM_RAM
+	AM_RANGE(0x00202800, 0x00202803) AM_WRITE(vbl_ack_w)
+	AM_RANGE(0x00203000, 0x00203003) AM_WRITE(vbl_ack_w)
+	AM_RANGE(0x00209800, 0x00209803) AM_READ(vbl_state_r)
+
+	AM_RANGE(0x0020b800, 0x0020b8ff) AM_RAM	// system ram test is really strange.
 
 	AM_RANGE(0x00600000, 0x0061ffff) AM_WRITE16(vram_w, 0xffffffff)
 	AM_RANGE(0x00600000, 0x0067ffff) AM_READ8  (vram_r, 0x00ff00ff)
@@ -66,7 +82,7 @@ ADDRESS_MAP_END
 
 INTERRUPT_GEN_MEMBER(hp16500_state::vblank)
 {
-	m_maincpu->set_input_line(M68K_IRQ_1, HOLD_LINE);
+	m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 }
 
 void hp16500_state::video_start()
@@ -121,14 +137,7 @@ WRITE32_MEMBER(hp16500_state::palette_w)
 	}
 	else if (mem_mask == 0x00ff0000)
 	{
-		UINT8 tmpcolor = (data>>16) & 0xff;
-
-		if ((tmpcolor & 0xf0) == 0x00)
-		{
-			tmpcolor |= (tmpcolor << 4);
-		}
-
-		m_colors[m_count++] = tmpcolor;
+		m_colors[m_count++] = (data>>14) & 0xfc;
 
 		if (m_count == 3)
 		{
