@@ -19,7 +19,6 @@ ToDo:
 - Disk controller
 - Graphics commands such as LINE and CIRCLE produce a syntax error.
 - Some commands such as HGRCLS are missing from the rom. Perhaps we need a later version?
-- SET command produces random graphics instead of the expected lo-res dot.
 - The schematic shows the audio counter connected to 2MHz, but this produces
   sounds that are too high. Connected to 1MHz for now.
 - Serial
@@ -86,8 +85,8 @@ static ADDRESS_MAP_START(excali64_mem, AS_PROGRAM, 8, excali64_state)
 	AM_RANGE(0x0000, 0x1FFF) AM_READ_BANK("bankr1") AM_WRITE_BANK("bankw1")
 	AM_RANGE(0x2000, 0x2FFF) AM_READ_BANK("bankr2") AM_WRITE_BANK("bankw2")
 	AM_RANGE(0x3000, 0x3FFF) AM_READ_BANK("bankr3") AM_WRITE_BANK("bankw3")
-	AM_RANGE(0x4000, 0x4FFF) AM_READ_BANK("bankr4") AM_WRITE_BANK("bankw4")
-	AM_RANGE(0x5000, 0xFFFF) AM_RAM AM_REGION("rambank", 0x5000)
+	AM_RANGE(0x4000, 0xBFFF) AM_READ_BANK("bankr4") AM_WRITE_BANK("bankw4")
+	AM_RANGE(0xC000, 0xFFFF) AM_RAM AM_REGION("rambank", 0xC000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(excali64_io, AS_IO, 8, excali64_state)
@@ -245,6 +244,7 @@ WRITE8_MEMBER( excali64_state::port70_w )
 		membank("bankr1")->set_entry(0);
 		membank("bankr2")->set_entry(0);
 		membank("bankr3")->set_entry(0);
+		membank("bankr4")->set_entry(0);
 		membank("bankw2")->set_entry(0);
 		membank("bankw3")->set_entry(0);
 		membank("bankw4")->set_entry(0);
@@ -252,22 +252,24 @@ WRITE8_MEMBER( excali64_state::port70_w )
 	else
 	if BIT(data, 0)
 	{
-	// select videoram and hiresram for writing, and ROM for reading
+	// select videoram and hiresram
 		membank("bankr1")->set_entry(1);
-		membank("bankr2")->set_entry(1);
-		membank("bankr3")->set_entry(1);
+		membank("bankr2")->set_entry(2);
+		membank("bankr3")->set_entry(2);
 		membank("bankw2")->set_entry(2);
 		membank("bankw3")->set_entry(2);
+		membank("bankr4")->set_entry(2);
 		membank("bankw4")->set_entry(2);
 	}
 	else
 	{
-	// as above, except 4000-4FFF is main ram
+	// select rom, videoram, and main ram
 		membank("bankr1")->set_entry(1);
 		membank("bankr2")->set_entry(1);
 		membank("bankr3")->set_entry(1);
 		membank("bankw2")->set_entry(2);
 		membank("bankw3")->set_entry(2);
+		membank("bankr4")->set_entry(0);
 		membank("bankw4")->set_entry(0);
 	}
 
@@ -284,7 +286,7 @@ MACHINE_RESET_MEMBER( excali64_state, excali64 )
 	membank("bankr4")->set_entry(0); // read from RAM
 	membank("bankw1")->set_entry(0); // write to RAM
 	membank("bankw2")->set_entry(2); // write to videoram
-	membank("bankw3")->set_entry(2); // write to hiresram
+	membank("bankw3")->set_entry(2); // write to videoram hires pointers
 	membank("bankw4")->set_entry(0); // write to RAM
 	m_maincpu->reset();
 }
@@ -325,7 +327,7 @@ PALETTE_INIT_MEMBER( excali64_state, excali64 )
 	// do this here because driver_init hasn't run yet
 	m_p_videoram = memregion("videoram")->base();
 	m_p_chargen = memregion("chargen")->base();
-	m_p_hiresram = memregion("hiresram")->base();
+	m_p_hiresram = m_p_videoram + 0x2000;
 	UINT8 *main = memregion("roms")->base();
 	UINT8 *ram = memregion("rambank")->base();
 
@@ -345,9 +347,12 @@ PALETTE_INIT_MEMBER( excali64_state, excali64 )
 	membank("bankr2")->configure_entry(1, &main[0x4000]);//boot
 	membank("bankr3")->configure_entry(1, &main[0x5000]);//boot
 	// videoram
+	membank("bankr2")->configure_entry(2, &m_p_videoram[0x0000]);
 	membank("bankw2")->configure_entry(2, &m_p_videoram[0x0000]);//boot
 	// hiresram
-	membank("bankw3")->configure_entry(2, &m_p_hiresram[0x0000]);//boot
+	membank("bankr3")->configure_entry(2, &m_p_videoram[0x1000]);
+	membank("bankw3")->configure_entry(2, &m_p_videoram[0x1000]);//boot
+	membank("bankr4")->configure_entry(2, &m_p_hiresram[0x0000]);
 	membank("bankw4")->configure_entry(2, &m_p_hiresram[0x0000]);
 
 	// Set up foreground palettes
@@ -388,8 +393,11 @@ MC6845_UPDATE_ROW( excali64_state::update_row )
 		fg = col_base + (col >> 4);
 		bg = 32 + ((col >> 1) & 7);
 
-		if (BIT(col, 0) & BIT(chr, 7))
-			gfx = m_p_hiresram[(chr<<4) | ra]; // hires definition
+		if BIT(col, 0)
+		{
+			UINT16 hires_bank = (m_p_videoram[mem+0x1000] ^ 4) << 24;
+			gfx = m_p_hiresram[hires_bank | (chr<<4) | ra]; // hires definition
+		}
 		else
 			gfx = m_p_chargen[(chr<<4) | ra]; // normal character
 		
@@ -478,8 +486,7 @@ ROM_START( excali64 )
 	ROM_FILL(0x4f7, 1, 8)
 
 	ROM_REGION(0x10000, "rambank", ROMREGION_ERASE00)
-	ROM_REGION(0x1000, "videoram", ROMREGION_ERASE00)
-	ROM_REGION(0x1000, "hiresram", ROMREGION_ERASE00)
+	ROM_REGION(0xA000, "videoram", ROMREGION_ERASE00)
 
 	ROM_REGION(0x1020, "chargen", 0)
 	ROM_LOAD( "genex_3.ic43", 0x0000, 0x1000, CRC(b91619a9) SHA1(2ced636cb7b94ba9d329868d7ecf79963cefe9d9) )
