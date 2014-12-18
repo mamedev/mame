@@ -806,6 +806,29 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="skapon">
+		<description>Skapon Tanken-tai</description>
+		<year>1988?</year>
+		<publisher>パソコンショップ高知 (PSK)</publisher>
+		<info name="alt_title" value="SKAPON探険隊"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="disk1.d77" size="348848" crc="c85aa607" sha1="40fbb2a0521068a05bb7202d2217056dcf5a9c13" offset="0" />
+			</dataarea>
+		</part>
+		<!-- Disk 2 is the same as the FM7 version? -->
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="skapon7 disk2.d77" size="348848" crc="14482165" sha1="513ab8965e2fe02264089cdbefc2da74c122dbd4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="disk3.d77" size="348848" crc="d7f8e84f" sha1="e068551cba5da6eb9677d35a10296d320d8ac6ea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tetris">
 		<description>Tetris</description>
 		<year>1988</year>

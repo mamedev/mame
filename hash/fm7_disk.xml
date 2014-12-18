@@ -993,6 +993,34 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="skapon">
+		<description>Skapon Tanken-tai</description>
+		<year>1988?</year>
+		<publisher>パソコンショップ高知 (PSK)</publisher>
+		<info name="alt_title" value="SKAPON探険隊"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="disk1.d77" size="348848" crc="94978e45" sha1="325df382e064f31807f4d4639655aee7f7804046" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="disk2.d77" size="348848" crc="14482165" sha1="513ab8965e2fe02264089cdbefc2da74c122dbd4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="disk3.d77" size="348848" crc="76e09b6d" sha1="6af4f84f9b42870663e4257139fb00f5492dabda" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="User Disk" />
+			<dataarea name="flop" size="348848">
+				<rom name="disk user.d77" size="348848" crc="fe10eecf" sha1="906f8cab2b877bf3c165e7c98c0188e0f0a68cca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- These appeared in Oh!FM 1988-06 and 1988-11 respectively -->
 	<software name="sod12">
 		<description>Stone of Deity ~ Stone of Deity II - Stolen Stone</description>
