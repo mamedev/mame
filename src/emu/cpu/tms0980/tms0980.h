@@ -21,18 +21,29 @@
 #define MCFG_TMS1XXX_WRITE_O_CB(_devcb) \
 	tms1xxx_cpu_device::set_write_o_callback(*device, DEVCB_##_devcb);
 
-// R output pins (also called D on some chips)
-#define MCFG_TMS1XXX_WRITE_R_CB(_devcb) \
-	tms1xxx_cpu_device::set_write_r_callback(*device, DEVCB_##_devcb);
-
-// OFF opcode on TMS0980 and up
-#define MCFG_TMS1XXX_POWER_OFF_CB(_devcb) \
-	tms1xxx_cpu_device::set_power_off_callback(*device, DEVCB_##_devcb);
-
 // Use this if the output PLA is unknown:
 // If the microinstructions (or other) PLA is unknown, try using one from another romset.
 #define MCFG_TMS1XXX_OUTPUT_PLA(_pla) \
 	tms1xxx_cpu_device::set_output_pla(*device, _pla);
+
+// R output pins (also called D on some chips)
+#define MCFG_TMS1XXX_WRITE_R_CB(_devcb) \
+	tms1xxx_cpu_device::set_write_r_callback(*device, DEVCB_##_devcb);
+
+// OFF request on TMS0980 and up
+#define MCFG_TMS1XXX_POWER_OFF_CB(_devcb) \
+	tms1xxx_cpu_device::set_power_off_callback(*device, DEVCB_##_devcb);
+
+
+// TMS0270 was designed to interface with TMS5100, set it up at driver level
+#define MCFG_TMS0270_READ_CTL_CB(_devcb) \
+	tms0270_cpu_device::set_read_ctl_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_TMS0270_WRITE_CTL_CB(_devcb) \
+	tms0270_cpu_device::set_write_ctl_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_TMS0270_WRITE_PDC_CB(_devcb) \
+	tms0270_cpu_device::set_write_pdc_callback(*device, DEVCB_##_devcb);
 
 
 
@@ -40,9 +51,7 @@ class tms1xxx_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tms1xxx_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock
-						, UINT8 o_pins, UINT8 r_pins, UINT8 k_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits
-						, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
+	tms1xxx_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 		, m_program_config("program", ENDIANNESS_BIG, byte_bits > 8 ? 16 : 8, prgwidth, 0, program)
 		, m_data_config("data", ENDIANNESS_BIG, 8, datawidth, 0, data)
@@ -52,7 +61,6 @@ public:
 		, m_spla(*this, "spla")
 		, m_o_pins(o_pins)
 		, m_r_pins(r_pins)
-		, m_k_pins(k_pins)
 		, m_pc_bits(pc_bits)
 		, m_byte_bits(byte_bits)
 		, m_x_bits(x_bits)
@@ -164,7 +172,6 @@ protected:
 
 	UINT8   m_o_pins;    // how many O pins
 	UINT8   m_r_pins;    // how many R pins
-	UINT8   m_k_pins;    // how many K pins
 	UINT8   m_pc_bits;   // how many program counter bits
 	UINT8   m_byte_bits; // how many bits per 'byte'
 	UINT8   m_x_bits;    // how many X register bits
@@ -196,7 +203,7 @@ class tms1000_cpu_device : public tms1xxx_cpu_device
 {
 public:
 	tms1000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tms1000_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 k_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
+	tms1000_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
 
 protected:
 	// overrides
@@ -225,7 +232,7 @@ class tms1100_cpu_device : public tms1000_cpu_device
 {
 public:
 	tms1100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tms1100_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 k_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
+	tms1100_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
 
 protected:
 	// overrides
@@ -248,7 +255,7 @@ class tms0970_cpu_device : public tms1000_cpu_device
 {
 public:
 	tms0970_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tms0970_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 k_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
+	tms0970_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
 
 protected:
 	// overrides
@@ -266,7 +273,7 @@ class tms0980_cpu_device : public tms0970_cpu_device
 {
 public:
 	tms0980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tms0980_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 k_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
+	tms0980_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
 
 protected:
 	// overrides
@@ -278,6 +285,7 @@ protected:
 	virtual UINT32 disasm_max_opcode_bytes() const { return 2; }
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 	
+	virtual UINT8 read_k_input();
 	virtual void set_cki_bus();
 	virtual void read_opcode();
 	
@@ -291,6 +299,11 @@ class tms0270_cpu_device : public tms0980_cpu_device
 {
 public:
 	tms0270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	// static configuration helpers
+	template<class _Object> static devcb_base &set_read_ctl_callback(device_t &device, _Object object) { return downcast<tms0270_cpu_device &>(device).m_read_ctl.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_ctl_callback(device_t &device, _Object object) { return downcast<tms0270_cpu_device &>(device).m_write_ctl.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_pdc_callback(device_t &device, _Object object) { return downcast<tms0270_cpu_device &>(device).m_write_pdc.set_callback(object); }
 
 protected:
 	// overrides
@@ -307,14 +320,23 @@ protected:
 	virtual void op_setr();
 	virtual void op_rstr();
 	virtual void op_tdo();
+	virtual void op_off();
 
 private:
-	UINT8   m_a_prev;
+	// state specific to interface with TMS5100
 	UINT16  m_r_prev;
+	UINT8   m_chipsel;
+	UINT8   m_ctl_out;
+	UINT8   m_ctl_dir;
+	int     m_pdc;
 
 	UINT8   m_o_latch_low;
 	UINT8   m_o_latch;
 	UINT8   m_o_latch_prev;
+
+	devcb_read8 m_read_ctl;
+	devcb_write8 m_write_ctl;
+	devcb_write_line m_write_pdc;
 };
 
 
