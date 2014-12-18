@@ -41,7 +41,7 @@
 #include "emu.h"
 #include "machine/r10788.h"
 
-#define	VERBOSE	1
+#define	VERBOSE	0
 #if VERBOSE
 #define LOG(x) logerror x
 #else

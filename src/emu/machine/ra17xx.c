@@ -104,12 +104,12 @@ WRITE8_MEMBER( ra17xx_device::io_w )
         // SOS command
         if (data & (1 << 3)) {
             m_line[m_bl] = 1;   // enable output
-            if (m_enable)
-                m_iowr(m_bl, 1);
+//          if (m_enable)
+                m_iowr(m_bl, 1, 1);
         } else {
             m_line[m_bl] = 0;   // disable output
-            if (m_enable)
-                m_iowr(m_bl, 0);
+//          if (m_enable)
+                m_iowr(m_bl, 0, 1);
         }
     } else {
         // SES command
