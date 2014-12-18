@@ -138,140 +138,142 @@ static ADDRESS_MAP_START( gts1_io, AS_IO, 8, gts1_state )
     AM_RANGE(0x0101, 0x0101) AM_WRITE( gts1_pb_w )                               // CPU I/O port B (output only)
 ADDRESS_MAP_END
 
-#define DSW_GTS1                                    \
-    PORT_START("DSW0")                              \
-    PORT_DIPNAME( 0x01, 0x00, "S01")                \
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ))       \
-    PORT_DIPSETTING(    0x01, DEF_STR( On ))        \
-    PORT_DIPNAME( 0x02, 0x00, "S02")                \
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ))       \
-    PORT_DIPSETTING(    0x02, DEF_STR( On ))        \
-    PORT_DIPNAME( 0x04, 0x00, "S03")                \
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ))       \
-    PORT_DIPSETTING(    0x04, DEF_STR( On ))        \
-    PORT_DIPNAME( 0x08, 0x00, "S04")                \
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ))       \
-    PORT_DIPSETTING(    0x08, DEF_STR( On ))        \
-    PORT_DIPNAME( 0x10, 0x00, "S05")                \
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ))       \
-    PORT_DIPSETTING(    0x10, DEF_STR( On ))        \
-    PORT_DIPNAME( 0x20, 0x20, "S06")                \
-    PORT_DIPSETTING(    0x00, DEF_STR( No ))        \
-    PORT_DIPSETTING(    0x20, DEF_STR( Yes ))       \
-    PORT_DIPNAME( 0x40, 0x40, "S07")                \
-    PORT_DIPSETTING(    0x00, DEF_STR( No ))        \
-    PORT_DIPSETTING(    0x40, DEF_STR( Yes ))       \
-    PORT_DIPNAME( 0x80, 0x80, "S08")                \
-    PORT_DIPSETTING(    0x00, DEF_STR( No ))        \
-    PORT_DIPSETTING(    0x80, DEF_STR( Yes ))       \
-    \
-    PORT_START("DSW1")                              \
-    PORT_DIPNAME( 0x01, 0x00, "S09")                \
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ))       \
-    PORT_DIPSETTING(    0x01, DEF_STR( On ))        \
-    PORT_DIPNAME( 0x02, 0x00, "S10")                \
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ))       \
-    PORT_DIPSETTING(    0x02, DEF_STR( On ))        \
-    PORT_DIPNAME( 0x04, 0x00, "S11")                \
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ))       \
-    PORT_DIPSETTING(    0x04, DEF_STR( On ))        \
-    PORT_DIPNAME( 0x08, 0x00, "S12")                \
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ))       \
-    PORT_DIPSETTING(    0x08, DEF_STR( On ))        \
-    PORT_DIPNAME( 0x10, 0x00, "S13")                \
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ))       \
-    PORT_DIPSETTING(    0x10, DEF_STR( On ))        \
-    PORT_DIPNAME( 0x20, 0x00, "S14")                \
-    PORT_DIPSETTING(    0x00, DEF_STR( Yes ))       \
-    PORT_DIPSETTING(    0x20, DEF_STR( No ))        \
-    PORT_DIPNAME( 0x40, 0x40, "S15")                \
-    PORT_DIPSETTING(    0x00, DEF_STR( No ))        \
-    PORT_DIPSETTING(    0x40, DEF_STR( Yes ))       \
-    PORT_DIPNAME( 0x80, 0x00, "S16")                \
-    PORT_DIPSETTING(    0x00, DEF_STR( No ))        \
-    PORT_DIPSETTING(    0x80, DEF_STR( Yes ))       \
-    \
-    PORT_START("DSW2")                              \
-    PORT_DIPNAME( 0x01, 0x00, "S17")                \
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ))       \
-    PORT_DIPSETTING(    0x01, DEF_STR( On ))        \
-    PORT_DIPNAME( 0x02, 0x00, "S18")                \
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ))       \
-    PORT_DIPSETTING(    0x02, DEF_STR( On ))        \
-    PORT_DIPNAME( 0x04, 0x00, "S19")                \
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ))       \
-    PORT_DIPSETTING(    0x04, DEF_STR( On ))        \
-    PORT_DIPNAME( 0x08, 0x00, "S20")                \
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ))       \
-    PORT_DIPSETTING(    0x08, DEF_STR( On ))        \
-    PORT_DIPNAME( 0x10, 0x00, "S21")                \
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ))       \
-    PORT_DIPSETTING(    0x10, DEF_STR( On ))        \
-    PORT_DIPNAME( 0x20, 0x00, "S22")                \
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ))       \
-    PORT_DIPSETTING(    0x20, DEF_STR( On ))        \
-    PORT_DIPNAME( 0x40, 0x00, "S23")                \
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ))       \
-    PORT_DIPSETTING(    0x40, DEF_STR( On ))        \
-    PORT_DIPNAME( 0x80, 0x00, "S24")                \
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ))       \
-    PORT_DIPSETTING(    0x80, DEF_STR( On ))
+static INPUT_PORTS_START( gts1_dips )
+    PORT_START("DSW0")
+    PORT_DIPNAME( 0x01, 0x00, "S01")
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+    PORT_DIPSETTING(    0x01, DEF_STR( On ))
+    PORT_DIPNAME( 0x02, 0x00, "S02")
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+    PORT_DIPSETTING(    0x02, DEF_STR( On ))
+    PORT_DIPNAME( 0x04, 0x00, "S03")
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+    PORT_DIPSETTING(    0x04, DEF_STR( On ))
+    PORT_DIPNAME( 0x08, 0x00, "S04")
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+    PORT_DIPSETTING(    0x08, DEF_STR( On ))
+    PORT_DIPNAME( 0x10, 0x00, "S05")
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+    PORT_DIPSETTING(    0x10, DEF_STR( On ))
+    PORT_DIPNAME( 0x20, 0x20, "S06")
+    PORT_DIPSETTING(    0x00, DEF_STR( No ))
+    PORT_DIPSETTING(    0x20, DEF_STR( Yes ))
+    PORT_DIPNAME( 0x40, 0x40, "S07")
+    PORT_DIPSETTING(    0x00, DEF_STR( No ))
+    PORT_DIPSETTING(    0x40, DEF_STR( Yes ))
+    PORT_DIPNAME( 0x80, 0x80, "S08")
+    PORT_DIPSETTING(    0x00, DEF_STR( No ))
+    PORT_DIPSETTING(    0x80, DEF_STR( Yes ))
 
-#define SWITCHES_GTS1 \
-    PORT_START("X.0")                        \
-    PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_START("X.1")                        \
-    PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_START("X.2")                        \
-    PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_START("X.3")                        \
-    PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_START("X.4")                        \
-    PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) \
-    PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) \
+    PORT_START("DSW1")
+    PORT_DIPNAME( 0x01, 0x00, "S09")
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+    PORT_DIPSETTING(    0x01, DEF_STR( On ))
+    PORT_DIPNAME( 0x02, 0x00, "S10")
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+    PORT_DIPSETTING(    0x02, DEF_STR( On ))
+    PORT_DIPNAME( 0x04, 0x00, "S11")
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+    PORT_DIPSETTING(    0x04, DEF_STR( On ))
+    PORT_DIPNAME( 0x08, 0x00, "S12")
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+    PORT_DIPSETTING(    0x08, DEF_STR( On ))
+    PORT_DIPNAME( 0x10, 0x00, "S13")
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+    PORT_DIPSETTING(    0x10, DEF_STR( On ))
+    PORT_DIPNAME( 0x20, 0x00, "S14")
+    PORT_DIPSETTING(    0x00, DEF_STR( Yes ))
+    PORT_DIPSETTING(    0x20, DEF_STR( No ))
+    PORT_DIPNAME( 0x40, 0x40, "S15")
+    PORT_DIPSETTING(    0x00, DEF_STR( No ))
+    PORT_DIPSETTING(    0x40, DEF_STR( Yes ))
+    PORT_DIPNAME( 0x80, 0x00, "S16")
+    PORT_DIPSETTING(    0x00, DEF_STR( No ))
+    PORT_DIPSETTING(    0x80, DEF_STR( Yes ))
+
+    PORT_START("DSW2")
+    PORT_DIPNAME( 0x01, 0x00, "S17")
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+    PORT_DIPSETTING(    0x01, DEF_STR( On ))
+    PORT_DIPNAME( 0x02, 0x00, "S18")
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+    PORT_DIPSETTING(    0x02, DEF_STR( On ))
+    PORT_DIPNAME( 0x04, 0x00, "S19")
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+    PORT_DIPSETTING(    0x04, DEF_STR( On ))
+    PORT_DIPNAME( 0x08, 0x00, "S20")
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+    PORT_DIPSETTING(    0x08, DEF_STR( On ))
+    PORT_DIPNAME( 0x10, 0x00, "S21")
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+    PORT_DIPSETTING(    0x10, DEF_STR( On ))
+    PORT_DIPNAME( 0x20, 0x00, "S22")
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+    PORT_DIPSETTING(    0x20, DEF_STR( On ))
+    PORT_DIPNAME( 0x40, 0x00, "S23")
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+    PORT_DIPSETTING(    0x40, DEF_STR( On ))
+    PORT_DIPNAME( 0x80, 0x00, "S24")
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ))
+    PORT_DIPSETTING(    0x80, DEF_STR( On ))
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gts1_switches )
+    PORT_START("X.0")
+    PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_START("X.1")
+    PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_START("X.2")
+    PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_START("X.3")
+    PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_START("X.4")
+    PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( gts1 )
-    DSW_GTS1
+    PORT_INCLUDE( gts1_dips )
 
-    SWITCHES_GTS1
+    PORT_INCLUDE( gts1_switches )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jokrpokr )
-    DSW_GTS1
+    PORT_INCLUDE( gts1_dips )
 
     PORT_START("X.0")
     PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PLAY/TEST")
