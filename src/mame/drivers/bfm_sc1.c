@@ -123,7 +123,7 @@ public:
 
 	int m_mmtr_latch;
 	int m_triac_latch;
-	int m_vfd_latch;
+	int m_vfd_latch;  //initialized but not used
 	int m_irq_status;
 	int m_optic_pattern;
 	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
@@ -135,7 +135,7 @@ public:
 	int m_acia_status;
 	int m_locked;
 	int m_is_timer_enabled;
-	int m_coin_inhibits;
+	int m_coin_inhibits; //initialized but not used
 	int m_mux1_outputlatch;
 	int m_mux1_datalo;
 	int m_mux1_datahi;
@@ -178,6 +178,8 @@ public:
 	DECLARE_READ8_MEMBER(nec_r);
 	DECLARE_WRITE8_MEMBER(nec_reset_w);
 	DECLARE_WRITE8_MEMBER(nec_latch_w);
+	
+	void save_state();
 
 	DECLARE_DRIVER_INIT(toppoker);
 	DECLARE_DRIVER_INIT(lotse_bank0);
@@ -207,6 +209,31 @@ public:
 #define VFD_DATA   0x40
 
 #define MASTER_CLOCK    (XTAL_4MHz)
+
+
+void bfm_sc1_state::save_state()
+{
+	save_item(NAME(m_mmtr_latch));
+	save_item(NAME(m_triac_latch));
+	// save_item(NAME(m_vfd_latch));  //enable when used
+	save_item(NAME(m_irq_status));
+	save_item(NAME(m_optic_pattern));
+	save_item(NAME(m_acia_status));
+	save_item(NAME(m_locked));
+	//save_item(NAME(m_is_timer_enabled)); //currently always set to 1
+	//save_item(NAME(m_coin_inhibits)); //enable when used
+	save_item(NAME(m_mux1_outputlatch));
+	save_item(NAME(m_mux1_datalo));
+	save_item(NAME(m_mux1_datahi));
+	save_item(NAME(m_mux1_input));
+	save_item(NAME(m_mux2_outputlatch));
+	save_item(NAME(m_mux2_datalo));
+	save_item(NAME(m_mux2_datahi));
+	save_item(NAME(m_mux2_input));
+	save_item(NAME(m_sc1_Inputs));
+	save_item(NAME(m_codec_data));
+	save_item(NAME(m_defaultbank));
+}
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -1195,6 +1222,7 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,toppoker)
 	sc1_common_init(3,1, 3);
 	MechMtr_config(machine(),8);
 	sc1_find_project_string();
+	save_state();
 }
 
 DRIVER_INIT_MEMBER(bfm_sc1_state,lotse)
@@ -1202,6 +1230,7 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,lotse)
 	sc1_common_init(6,1, 3);
 	MechMtr_config(machine(),8);
 	sc1_find_project_string();
+	save_state();
 }
 
 DRIVER_INIT_MEMBER(bfm_sc1_state,lotse_bank0)
@@ -1209,6 +1238,7 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,lotse_bank0)
 	sc1_common_init(6,1, 0);
 	MechMtr_config(machine(),8);
 	sc1_find_project_string();
+	save_state();
 }
 
 
@@ -1217,6 +1247,7 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,nocrypt)
 	sc1_common_init(6,0, 3);
 	MechMtr_config(machine(),8);
 	sc1_find_project_string();
+	save_state();
 }
 
 DRIVER_INIT_MEMBER(bfm_sc1_state,nocrypt_bank0)
@@ -1224,6 +1255,7 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,nocrypt_bank0)
 	sc1_common_init(6,0, 0);
 	MechMtr_config(machine(),8);
 	sc1_find_project_string();
+	save_state();
 }
 
 
@@ -1234,6 +1266,7 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,rou029)
 	sc1_common_init(6,0, 3);
 	MechMtr_config(machine(),8);
 	sc1_find_project_string();
+	save_state();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -1248,6 +1281,7 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,clatt)
 	Scorpion1_SetSwitchState(3,6,1);
 	Scorpion1_SetSwitchState(4,1,1);
 	sc1_find_project_string();
+	save_state();
 }
 
 
