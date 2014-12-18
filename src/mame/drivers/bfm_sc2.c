@@ -199,7 +199,7 @@ public:
 	optional_device<stepper_device> m_reel3;
 	optional_device<stepper_device> m_reel4;
 	optional_device<stepper_device> m_reel5;
-	optional_device<upd7759_device> m_upd7759;
+	required_device<upd7759_device> m_upd7759;
 	optional_device<bfm_bd1_t> m_vfd0;
 	optional_device<bfm_bd1_t> m_vfd1;
 	optional_device<bfmdm01_device> m_dm01;
