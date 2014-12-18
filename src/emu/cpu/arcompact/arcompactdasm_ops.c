@@ -280,7 +280,7 @@ static const char *dataextend[0x2] =
 {
 #ifdef EXPLICIT_EXTENSIONS
 	/* 00 */ ".ZX", // Zero Extend (can use no extension, using .ZX to be explicit)
-else
+#else
 	/* 00 */ "", // Zero Extend
 #endif
 	/* 01 */ ".X" // Sign Extend
