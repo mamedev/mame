@@ -255,7 +255,10 @@ void running_machine::start()
 		primary_screen->register_vblank_callback(vblank_state_delegate(FUNC(running_machine::watchdog_vblank), this));
 	save().save_item(NAME(m_watchdog_enabled));
 	save().save_item(NAME(m_watchdog_counter));
-
+	
+	// save the random seed or save states might be broken in drivers that use the rand() method
+	save().save_item(NAME(m_rand_seed));
+	
 	// initialize image devices
 	image_init(*this);
 	m_tilemap.reset(global_alloc(tilemap_manager(*this)));

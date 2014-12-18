@@ -626,7 +626,7 @@ void device_t::device_pre_save()
 //-------------------------------------------------
 //  device_post_load - called after the loading a
 //  saved state, so that registered variables can
-//  be expaneded as necessary
+//  be expanded as necessary
 //-------------------------------------------------
 
 void device_t::device_post_load()
