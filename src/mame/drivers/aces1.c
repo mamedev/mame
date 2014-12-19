@@ -253,11 +253,6 @@ TIMER_CALLBACK_MEMBER(aces1_state::m_aces1_nmi_timer_callback)
 
 void aces1_state::machine_start()
 {
-	m_reel0->configure(&starpoint_interface_48step);
-	m_reel1->configure(&starpoint_interface_48step);
-	m_reel2->configure(&starpoint_interface_48step);
-	m_reel3->configure(&starpoint_interface_48step);
-
 	for (int reel=0; reel <4; reel++)
 	{
 		m_reel_clock[reel] =0;
@@ -471,13 +466,13 @@ static MACHINE_CONFIG_START( aces1, aces1_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* steppers */
-	MCFG_DEVICE_ADD("reel0", STEPPER, 0)
+	MCFG_STARPOINT_48STEP_ADD("reel0")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(aces1_state, reel0_optic_cb))
-	MCFG_DEVICE_ADD("reel1", STEPPER, 0)
+	MCFG_STARPOINT_48STEP_ADD("reel1")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(aces1_state, reel1_optic_cb))
-	MCFG_DEVICE_ADD("reel2", STEPPER, 0)
+	MCFG_STARPOINT_48STEP_ADD("reel2")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(aces1_state, reel2_optic_cb))
-	MCFG_DEVICE_ADD("reel3", STEPPER, 0)
+	MCFG_STARPOINT_48STEP_ADD("reel3")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(aces1_state, reel3_optic_cb))
 MACHINE_CONFIG_END
 

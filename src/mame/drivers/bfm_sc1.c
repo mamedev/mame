@@ -299,8 +299,8 @@ WRITE8_MEMBER(bfm_sc1_state::reel12_w)
 		m_reel0->update((data>>4)&0x0f);
 		m_reel1->update( data    &0x0f);
 	}
-	awp_draw_reel(0, m_reel0);
-	awp_draw_reel(1, m_reel1);
+	awp_draw_reel("reel1", m_reel0);
+	awp_draw_reel("reel2", m_reel1);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -316,8 +316,8 @@ WRITE8_MEMBER(bfm_sc1_state::reel34_w)
 		m_reel2->update((data>>4)&0x0f);
 		m_reel3->update( data    &0x0f);
 	}
-	awp_draw_reel(2, m_reel2);
-	awp_draw_reel(3, m_reel3);
+	awp_draw_reel("reel3", m_reel2);
+	awp_draw_reel("reel4", m_reel3);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -327,8 +327,8 @@ WRITE8_MEMBER(bfm_sc1_state::reel56_w)
 	m_reel4->update((data>>4)&0x0f);
 	m_reel5->update( data    &0x0f);
 
-	awp_draw_reel(4, m_reel4);
-	awp_draw_reel(5, m_reel5);
+	awp_draw_reel("reel5", m_reel4);
+	awp_draw_reel("reel6", m_reel5);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1079,17 +1079,17 @@ static MACHINE_CONFIG_START( scorpion1, bfm_sc1_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_DEFAULT_LAYOUT(layout_sc1_vfd)
 
-	MCFG_DEVICE_ADD("reel0", STEPPER, 0)
+	MCFG_STARPOINT_48STEP_ADD("reel0")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel0_optic_cb))
-	MCFG_DEVICE_ADD("reel1", STEPPER, 0)
+	MCFG_STARPOINT_48STEP_ADD("reel1")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel1_optic_cb))
-	MCFG_DEVICE_ADD("reel2", STEPPER, 0)
+	MCFG_STARPOINT_48STEP_ADD("reel2")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel2_optic_cb))
-	MCFG_DEVICE_ADD("reel3", STEPPER, 0)
+	MCFG_STARPOINT_48STEP_ADD("reel3")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel3_optic_cb))
-	MCFG_DEVICE_ADD("reel4", STEPPER, 0)
+	MCFG_STARPOINT_48STEP_ADD("reel4")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel4_optic_cb))
-	MCFG_DEVICE_ADD("reel5", STEPPER, 0)
+	MCFG_STARPOINT_48STEP_ADD("reel5")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc1_state, reel5_optic_cb))
 MACHINE_CONFIG_END
 
@@ -1125,7 +1125,7 @@ void bfm_sc1_state::sc1_common_init(int reels, int decrypt, int defaultbank)
 	memset(m_sc1_Inputs, 0, sizeof(m_sc1_Inputs));
 
 	// setup n default 96 half step reels ///////////////////////////////////////////
-	switch (reels)
+	/*switch (reels)
 	{
 	case 6: m_reel5->configure(&starpoint_interface_48step);
 	case 5: m_reel4->configure(&starpoint_interface_48step);
@@ -1133,7 +1133,7 @@ void bfm_sc1_state::sc1_common_init(int reels, int decrypt, int defaultbank)
 	case 3: m_reel2->configure(&starpoint_interface_48step);
 	case 2: m_reel1->configure(&starpoint_interface_48step);
 	case 1: m_reel0->configure(&starpoint_interface_48step);
-	}
+	}*/
 	if (decrypt) bfm_decode_mainrom(machine(),"maincpu", m_codec_data);    // decode main rom
 
 	m_defaultbank = defaultbank;

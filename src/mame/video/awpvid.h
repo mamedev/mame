@@ -8,6 +8,6 @@
 
 #include "machine/steppers.h"
 
-void awp_draw_reel(int rno, stepper_device &reel);
+void awp_draw_reel(const char* reeltag, stepper_device &reel);
 
 #endif

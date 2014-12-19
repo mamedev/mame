@@ -115,7 +115,6 @@ public:
 	UINT8 m_banksel;
 	UINT8 m_credsel;
 
-	DECLARE_MACHINE_START(ecoinfr);
 	required_device<cpu_device> m_maincpu;
 	required_device<stepper_device> m_reel0;
 	required_device<stepper_device> m_reel1;
@@ -166,7 +165,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port00_out_w)
 
 	m_reel0->update(data&0x0f);
 
-	awp_draw_reel(0, m_reel0);
+	awp_draw_reel("reel1", m_reel0);
 }
 
 WRITE8_MEMBER(ecoinfr_state::ec_port01_out_w)
@@ -178,7 +177,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port01_out_w)
 
 	m_reel1->update(data&0x0f);
 
-	awp_draw_reel(1, m_reel1);
+	awp_draw_reel("reel2", m_reel1);
 }
 
 WRITE8_MEMBER(ecoinfr_state::ec_port02_out_w)
@@ -190,7 +189,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port02_out_w)
 
 	m_reel2->update(data&0x0f);
 
-	awp_draw_reel(2, m_reel2);
+	awp_draw_reel("reel3", m_reel2);
 }
 
 
@@ -768,14 +767,6 @@ void ecoinfr_state::machine_reset()
 }
 
 
-MACHINE_START_MEMBER(ecoinfr_state,ecoinfr)
-{
-	m_reel0->configure(&ecoin_interface_200step_reel);
-	m_reel1->configure(&ecoin_interface_200step_reel);
-	m_reel2->configure(&ecoin_interface_200step_reel);
-	m_reel3->configure(&ecoin_interface_200step_reel);
-}
-
 static MACHINE_CONFIG_START( ecoinfr, ecoinfr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)
@@ -785,17 +776,16 @@ static MACHINE_CONFIG_START( ecoinfr, ecoinfr_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_ecoinfr)
 
-	MCFG_MACHINE_START_OVERRIDE(ecoinfr_state, ecoinfr )
 
 	MCFG_DEVICE_ADD(UPD8251_TAG, I8251, 0)
 
-	MCFG_DEVICE_ADD("reel0", STEPPER, 0)
+	MCFG_ECOIN_200STEP_ADD("reel0")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinfr_state, reel0_optic_cb))
-	MCFG_DEVICE_ADD("reel1", STEPPER, 0)
+	MCFG_ECOIN_200STEP_ADD("reel1")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinfr_state, reel1_optic_cb))
-	MCFG_DEVICE_ADD("reel2", STEPPER, 0)
+	MCFG_ECOIN_200STEP_ADD("reel2")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinfr_state, reel2_optic_cb))
-	MCFG_DEVICE_ADD("reel3", STEPPER, 0)
+	MCFG_ECOIN_200STEP_ADD("reel3")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinfr_state, reel3_optic_cb))	
 MACHINE_CONFIG_END
 

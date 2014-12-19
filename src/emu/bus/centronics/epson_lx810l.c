@@ -162,8 +162,21 @@ static MACHINE_CONFIG_FRAGMENT( epson_lx810l )
 	MCFG_EEPROM_SERIAL_93C06_ADD("eeprom")
 
 	/* steppers */
-	MCFG_DEVICE_ADD("pf_stepper", STEPPER, 0)
-	MCFG_DEVICE_ADD("cr_stepper", STEPPER, 0)
+	//should this have MCFG_STEPPER_MAX_STEPS(200*2) ? code shows 200 steps...
+	MCFG_STEPPER_ADD("pf_stepper")
+	MCFG_STEPPER_REEL_TYPE(NOT_A_REEL)
+	MCFG_STEPPER_START_INDEX(16)
+	MCFG_STEPPER_END_INDEX(24)
+	MCFG_STEPPER_INDEX_PATTERN(0x00)
+	MCFG_STEPPER_INIT_PHASE(0)
+
+	MCFG_STEPPER_ADD("cr_stepper")
+	MCFG_STEPPER_REEL_TYPE(NOT_A_REEL)
+	MCFG_STEPPER_START_INDEX(16)
+	MCFG_STEPPER_END_INDEX(24)
+	MCFG_STEPPER_INDEX_PATTERN(0x00)
+	MCFG_STEPPER_INIT_PHASE(2)
+	
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -327,28 +340,12 @@ epson_ap2000_t::epson_ap2000_t(const machine_config &mconfig, const char *tag, d
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-static const stepper_interface lx810l_pf_stepper =
-{
-	STARPOINT_48STEP_REEL,
-	16,
-	24,
-	0x00,
-	0
-};
 
-static const stepper_interface lx810l_cr_stepper =
-{
-	STARPOINT_48STEP_REEL,
-	16,
-	24,
-	0x00,
-	2
-};
+
 
 void epson_lx810l_t::device_start()
 {
-	m_pf_stepper->configure(&lx810l_pf_stepper);
-	m_cr_stepper->configure(&lx810l_cr_stepper);
+
 }
 
 

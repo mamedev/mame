@@ -227,8 +227,8 @@ public:
 		m_reel0->update( data    &0x0f);
 		m_reel1->update((data>>4)&0x0f);
 
-		awp_draw_reel(0, m_reel0);
-		awp_draw_reel(1, m_reel1);
+		awp_draw_reel("reel1", m_reel0);
+		awp_draw_reel("reel2", m_reel1);
 	}
 
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_b_reel23)
@@ -238,8 +238,8 @@ public:
 		m_reel2->update( data    &0x0f);
 		m_reel3->update((data>>4)&0x0f);
 
-		awp_draw_reel(2, m_reel2);
-		awp_draw_reel(3, m_reel3);
+		awp_draw_reel("reel3", m_reel2);
+		awp_draw_reel("reel4", m_reel3);
 	}
 
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_c) { logerror("%04x - ppi8255_intf_d_(used)write_c %02x\n", m_maincpu->pcbase(), data);}
@@ -268,8 +268,6 @@ public:
 
 	DECLARE_DRIVER_INIT(ecoinf3);
 	DECLARE_DRIVER_INIT(ecoinf3_swap);
-	DECLARE_MACHINE_START(ecoinf3);
-
 };
 
 
@@ -655,13 +653,6 @@ static INPUT_PORTS_START( ecoinf3 )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-MACHINE_START_MEMBER(ecoinf3_state,ecoinf3)
-{
-	m_reel0->configure(&ecoin_interface_200step_reel);
-	m_reel1->configure(&ecoin_interface_200step_reel);
-	m_reel2->configure(&ecoin_interface_200step_reel);
-	m_reel3->configure(&ecoin_interface_200step_reel);
-}
 
 static MACHINE_CONFIG_START( ecoinf3_pyramid, ecoinf3_state )
 	/* basic machine hardware */
@@ -671,8 +662,6 @@ static MACHINE_CONFIG_START( ecoinf3_pyramid, ecoinf3_state )
 	MCFG_CPU_IO_MAP(pyramid_portmap)
 
 	MCFG_DEFAULT_LAYOUT(layout_ecoinf3)
-
-	MCFG_MACHINE_START_OVERRIDE(ecoinf3_state, ecoinf3 )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -744,13 +733,13 @@ static MACHINE_CONFIG_START( ecoinf3_pyramid, ecoinf3_state )
 	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf3_state, ppi8255_intf_h_read_c))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecoinf3_state, ppi8255_intf_h_write_c))
 
-	MCFG_DEVICE_ADD("reel0", STEPPER, 0)
+	MCFG_ECOIN_200STEP_ADD("reel0")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf3_state, reel0_optic_cb))
-	MCFG_DEVICE_ADD("reel1", STEPPER, 0)
+	MCFG_ECOIN_200STEP_ADD("reel1")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf3_state, reel1_optic_cb))
-	MCFG_DEVICE_ADD("reel2", STEPPER, 0)
+	MCFG_ECOIN_200STEP_ADD("reel2")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf3_state, reel2_optic_cb))
-	MCFG_DEVICE_ADD("reel3", STEPPER, 0)
+	MCFG_ECOIN_200STEP_ADD("reel3")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf3_state, reel3_optic_cb))
 MACHINE_CONFIG_END
 

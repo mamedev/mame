@@ -39,94 +39,14 @@
 #include "emu.h"
 #include "steppers.h"
 
-/* useful interfaces (Starpoint is a very common setup)*/
-const stepper_interface starpoint_interface_48step =
-{
-	STARPOINT_48STEP_REEL,
-	1,
-	3,
-	0x09,
-	4
-};
-
-const stepper_interface starpointrm20_interface_48step =
-{
-	STARPOINT_48STEP_REEL,
-	16,
-	24,
-	0x09,
-	7
-};
-const stepper_interface starpoint_interface_200step_reel =
-{
-	STARPOINT_200STEP_REEL,
-	12,
-	24,
-	0x09,
-	7
-};
-// guess
-const stepper_interface ecoin_interface_200step_reel =
-{
-	ECOIN_200STEP_REEL,
-	12,
-	24,
-	0x09,
-	7
-};
-
 const device_type STEPPER = &device_creator<stepper_device>;
 
 stepper_device::stepper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, STEPPER, "Stepper Motor", tag, owner, clock, "stepper", __FILE__),
 		m_optic_cb(*this)
 	{
+		m_max_steps=(48*2);
 	}	
-///////////////////////////////////////////////////////////////////////////
-void stepper_device::configure(const stepper_interface *intf)
-{
-	assert_always(machine().phase() == MACHINE_PHASE_INIT, "Can only call configure at init time!");
-	assert_always(intf, "configure called with an invalid interface!");
-
-	m_type        = intf->type;
-	m_index_start = intf->index_start; /* location of first index value in half steps */
-	m_index_end   = intf->index_end;   /* location of last index value in half steps */
-	m_index_patt  = intf->index_patt;  /* hex value of coil pattern (0 if not needed)*/
-	m_initphase   = intf->initphase;   /* Phase at 0 steps, for alignment) */
-
-
-	m_pattern      = 0;
-	m_old_pattern  = 0;
-	m_step_pos     = 0;
-	m_abs_step_pos = 0;
-	m_phase        = m_initphase;
-	m_old_phase    = m_initphase;
-
-
-	switch ( m_type )
-	{   default:
-		case STARPOINT_48STEP_REEL:  /* STARPOINT RMxxx */
-		case BARCREST_48STEP_REEL :  /* Barcrest Reel unit */
-		case MPU3_48STEP_REEL :
-		case GAMESMAN_48STEP_REEL :  /* Gamesman GMxxxx */
-		case PROJECT_48STEP_REEL :
-		m_max_steps = (48*2);
-		break;
-		case GAMESMAN_100STEP_REEL :
-		m_max_steps = (100*2);
-		break;
-		case STARPOINT_144STEP_DICE :/* STARPOINT 1DCU DICE mechanism */
-		//Dice reels are 48 step motors, but complete three full cycles between opto updates
-		m_max_steps = ((48*3)*2);
-		break;
-		case STARPOINT_200STEP_REEL :
-		case GAMESMAN_200STEP_REEL :
-		case ECOIN_200STEP_REEL :
-		m_max_steps = (200*2);
-		break;
-	}
-}
-
 ///////////////////////////////////////////////////////////////////////////
 
 void stepper_device::update_optic()
@@ -227,6 +147,7 @@ int stepper_device::update(UINT8 pattern)
 		default:
 		logerror("No reel type specified!\n");
 		break;
+		case NOT_A_REEL :
 		case STARPOINT_48STEP_REEL : /* STARPOINT RMxxx */
 		case GAMESMAN_200STEP_REEL : /* Gamesman GMxxxx */
 		case STARPOINT_144STEP_DICE :/* STARPOINT 1DCU DICE mechanism */

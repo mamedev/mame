@@ -553,8 +553,8 @@ WRITE8_MEMBER(bfm_sc2_state::reel12_w)
 	m_reel0->update( data    &0x0f);
 	m_reel1->update((data>>4)&0x0f);
 
-	awp_draw_reel(0, m_reel0);
-	awp_draw_reel(1, m_reel1);
+	awp_draw_reel("reel1", m_reel0);
+	awp_draw_reel("reel2", m_reel1);
 }
 
 WRITE8_MEMBER(bfm_sc2_state::reel34_w)
@@ -564,8 +564,8 @@ WRITE8_MEMBER(bfm_sc2_state::reel34_w)
 	m_reel2->update( data    &0x0f);
 	m_reel3->update((data>>4)&0x0f);
 
-	awp_draw_reel(2, m_reel2);
-	awp_draw_reel(3, m_reel3);
+	awp_draw_reel("reel3", m_reel2);
+	awp_draw_reel("reel4", m_reel3);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -577,8 +577,8 @@ WRITE8_MEMBER(bfm_sc2_state::reel56_w)
 	m_reel4->update( data    &0x0f);
 	m_reel5->update((data>>4)&0x0f);
 
-	awp_draw_reel(4, m_reel4);
-	awp_draw_reel(5, m_reel5);
+	awp_draw_reel("reel5", m_reel4);
+	awp_draw_reel("reel6", m_reel5);
 }
 
 
@@ -3684,16 +3684,6 @@ void bfm_sc2_state::sc2awp_common_init(int reels, int decrypt)
 	/* setup n default 96 half step reels */
 
 	m_reels=reels;
-
-	switch (reels)
-	{
-	case 6: m_reel5->configure(&starpoint_interface_48step);
-	case 5: m_reel4->configure(&starpoint_interface_48step);
-	case 4: m_reel3->configure(&starpoint_interface_48step);
-	case 3: m_reel2->configure(&starpoint_interface_48step);
-	case 2: m_reel1->configure(&starpoint_interface_48step);
-	case 1: m_reel0->configure(&starpoint_interface_48step);
-	}
 }
 
 void bfm_sc2_state::sc2awpdmd_common_init(int reels, int decrypt)
@@ -3702,16 +3692,6 @@ void bfm_sc2_state::sc2awpdmd_common_init(int reels, int decrypt)
 	/* setup n default 96 half step reels */
 
 	m_reels=reels;
-
-	switch (reels)
-	{
-	case 6: m_reel5->configure(&starpoint_interface_48step);
-	case 5: m_reel4->configure(&starpoint_interface_48step);
-	case 4: m_reel3->configure(&starpoint_interface_48step);
-	case 3: m_reel2->configure(&starpoint_interface_48step);
-	case 2: m_reel1->configure(&starpoint_interface_48step);
-	case 1: m_reel0->configure(&starpoint_interface_48step);
-	}
 }
 
 

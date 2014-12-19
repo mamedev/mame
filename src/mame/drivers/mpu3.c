@@ -513,10 +513,10 @@ WRITE8_MEMBER(mpu3_state::pia_ic5_porta_w)
 	m_reel1->update((data>>2) & 0x03);
 	m_reel2->update((data>>4) & 0x03);
 	m_reel3->update((data>>6) & 0x03);
-	awp_draw_reel(0, m_reel0);
-	awp_draw_reel(1, m_reel1);
-	awp_draw_reel(2, m_reel2);
-	awp_draw_reel(3, m_reel3);
+	awp_draw_reel("reel1", m_reel0);
+	awp_draw_reel("reel2", m_reel1);
+	awp_draw_reel("reel3", m_reel2);
+	awp_draw_reel("reel4", m_reel3);
 }
 
 READ8_MEMBER(mpu3_state::pia_ic5_portb_r)
@@ -685,15 +685,6 @@ static INPUT_PORTS_START( mpu3 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")PORT_IMPULSE(5)
 INPUT_PORTS_END
 
-static const stepper_interface mpu3_reel_interface =
-{
-	MPU3_48STEP_REEL,
-	1,
-	3,
-	0x00,
-	2
-};
-
 /* Common configurations */
 void mpu3_state::mpu3_config_common()
 {
@@ -706,12 +697,6 @@ void mpu3_state::machine_start()
 
 	/* setup 8 mechanical meters */
 	MechMtr_config(machine(),8);
-
-	/* setup 4 reels */
-	m_reel0->configure(&mpu3_reel_interface);
-	m_reel1->configure(&mpu3_reel_interface);
-	m_reel2->configure(&mpu3_reel_interface);
-	m_reel3->configure(&mpu3_reel_interface);
 
 }
 /*
@@ -809,6 +794,14 @@ static ADDRESS_MAP_START( mpu3_basemap, AS_PROGRAM, 8, mpu3_state )
 	AM_RANGE(0x1000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+#define MCFG_MPU3_REEL_ADD(_tag)\
+	MCFG_STEPPER_ADD(_tag)\
+	MCFG_STEPPER_REEL_TYPE(MPU3_48STEP_REEL)\
+	MCFG_STEPPER_START_INDEX(1)\
+	MCFG_STEPPER_END_INDEX(3)\
+	MCFG_STEPPER_INDEX_PATTERN(0x00)\
+	MCFG_STEPPER_INIT_PHASE(2)
+	
 static MACHINE_CONFIG_START( mpu3base, mpu3_state )
 	MCFG_CPU_ADD("maincpu", M6808, MPU3_MASTER_CLOCK)///4)
 	MCFG_CPU_PROGRAM_MAP(mpu3_basemap)
@@ -856,13 +849,13 @@ static MACHINE_CONFIG_START( mpu3base, mpu3_state )
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(mpu3_state, cpu0_irq))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(mpu3_state, cpu0_irq))
 
-	MCFG_DEVICE_ADD("reel0", STEPPER, 0)
+	MCFG_MPU3_REEL_ADD("reel0")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu3_state, reel0_optic_cb))
-	MCFG_DEVICE_ADD("reel1", STEPPER, 0)
+	MCFG_MPU3_REEL_ADD("reel1")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu3_state, reel1_optic_cb))
-	MCFG_DEVICE_ADD("reel2", STEPPER, 0)
+	MCFG_MPU3_REEL_ADD("reel2")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu3_state, reel2_optic_cb))
-	MCFG_DEVICE_ADD("reel3", STEPPER, 0)
+	MCFG_MPU3_REEL_ADD("reel3")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(mpu3_state, reel3_optic_cb))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")

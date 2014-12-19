@@ -202,8 +202,8 @@ public:
 		m_reel0->update( data    &0x0f);
 		m_reel1->update((data>>4)&0x0f);
 
-		awp_draw_reel(0, m_reel0);
-		awp_draw_reel(1, m_reel1);
+		awp_draw_reel("reel1", m_reel0);
+		awp_draw_reel("reel2", m_reel1);
 	}
 
 	DECLARE_WRITE8_MEMBER(ppi8255_ic23_write_b_reel23)
@@ -211,8 +211,8 @@ public:
 		m_reel2->update( data    &0x0f);
 		m_reel3->update((data>>4)&0x0f);
 
-		awp_draw_reel(2, m_reel2);
-		awp_draw_reel(3, m_reel3);
+		awp_draw_reel("reel3", m_reel2);
+		awp_draw_reel("reel4", m_reel3);
 	}
 
 	DECLARE_READ8_MEMBER(ppi8255_ic23_read_c_key)
@@ -500,10 +500,6 @@ INPUT_PORTS_END
 MACHINE_START_MEMBER(ecoinf2_state,ecoinf2)
 {
 	MechMtr_config(machine(),8);
-	m_reel0->configure(&ecoin_interface_200step_reel);
-	m_reel1->configure(&ecoin_interface_200step_reel);
-	m_reel2->configure(&ecoin_interface_200step_reel);
-	m_reel3->configure(&ecoin_interface_200step_reel);
 }
 
 
@@ -543,13 +539,13 @@ static MACHINE_CONFIG_START( ecoinf2_oxo, ecoinf2_state )
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf2_state, ppi8255_ic13_write_b_strobedat1))
 	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf2_state, ppi8255_ic13_read_c_panel))
 
-	MCFG_DEVICE_ADD("reel0", STEPPER, 0)
+	MCFG_ECOIN_200STEP_ADD("reel0")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf2_state, reel0_optic_cb))
-	MCFG_DEVICE_ADD("reel1", STEPPER, 0)
+	MCFG_ECOIN_200STEP_ADD("reel1")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf2_state, reel1_optic_cb))
-	MCFG_DEVICE_ADD("reel2", STEPPER, 0)
+	MCFG_ECOIN_200STEP_ADD("reel2")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf2_state, reel2_optic_cb))
-	MCFG_DEVICE_ADD("reel3", STEPPER, 0)
+	MCFG_ECOIN_200STEP_ADD("reel3")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf2_state, reel3_optic_cb))
 
 //  MCFG_DEVICE_ADD("ic25_dips", I8255, 0)

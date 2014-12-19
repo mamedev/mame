@@ -964,13 +964,6 @@ MACHINE_START_MEMBER(jpmimpct_state,impctawp)
 	save_item(NAME(m_duart_1.ISR));
 	save_item(NAME(m_duart_1.IMR));
 	save_item(NAME(m_duart_1.CT));
-
-	m_reel0->configure(&starpoint_interface_48step);
-	m_reel1->configure(&starpoint_interface_48step);
-	m_reel2->configure(&starpoint_interface_48step);
-	m_reel3->configure(&starpoint_interface_48step);
-	m_reel4->configure(&starpoint_interface_48step);
-	m_reel5->configure(&starpoint_interface_48step);
 }
 
 MACHINE_RESET_MEMBER(jpmimpct_state,impctawp)
@@ -1093,18 +1086,18 @@ WRITE16_MEMBER(jpmimpct_state::jpmioawp_w)
 			m_reel1->update((data >> 1)& 0x0F);
 			m_reel2->update((data >> 2)& 0x0F);
 			m_reel3->update((data >> 3)& 0x0F);
-			awp_draw_reel(0, m_reel0);
-			awp_draw_reel(1, m_reel1);
-			awp_draw_reel(2, m_reel2);
-			awp_draw_reel(3, m_reel3);
+			awp_draw_reel("reel1", m_reel0);
+			awp_draw_reel("reel2", m_reel1);
+			awp_draw_reel("reel3", m_reel2);
+			awp_draw_reel("reel4", m_reel3);
 			break;
 		}
 		case 0x04:
 		{
 			m_reel4->update((data >> 4)& 0x0F);
 			m_reel5->update((data >> 5)& 0x0F);
-			awp_draw_reel(4, m_reel4);
-			awp_draw_reel(5, m_reel5);
+			awp_draw_reel("reel5", m_reel4);
+			awp_draw_reel("reel6", m_reel5);
 			break;
 		}
 		case 0x06:
@@ -1332,17 +1325,17 @@ MACHINE_CONFIG_START( impctawp, jpmimpct_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_DEFAULT_LAYOUT(layout_jpmimpct)
 	
-	MCFG_DEVICE_ADD("reel0", STEPPER, 0)
+	MCFG_STARPOINT_48STEP_ADD("reel0")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(jpmimpct_state, reel0_optic_cb))
-	MCFG_DEVICE_ADD("reel1", STEPPER, 0)
+	MCFG_STARPOINT_48STEP_ADD("reel1")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(jpmimpct_state, reel1_optic_cb))
-	MCFG_DEVICE_ADD("reel2", STEPPER, 0)
+	MCFG_STARPOINT_48STEP_ADD("reel2")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(jpmimpct_state, reel2_optic_cb))
-	MCFG_DEVICE_ADD("reel3", STEPPER, 0)
+	MCFG_STARPOINT_48STEP_ADD("reel3")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(jpmimpct_state, reel3_optic_cb))
-	MCFG_DEVICE_ADD("reel4", STEPPER, 0)
+	MCFG_STARPOINT_48STEP_ADD("reel4")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(jpmimpct_state, reel4_optic_cb))
-	MCFG_DEVICE_ADD("reel5", STEPPER, 0)
+	MCFG_STARPOINT_48STEP_ADD("reel5")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(jpmimpct_state, reel5_optic_cb))
 	
 MACHINE_CONFIG_END

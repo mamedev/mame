@@ -208,8 +208,8 @@ WRITE8_MEMBER(bfmsys85_state::reel12_w)
 	m_reel0->update((data>>4)&0x0f);
 	m_reel1->update( data    &0x0f);
 
-	awp_draw_reel(0, m_reel0);
-	awp_draw_reel(1, m_reel1);
+	awp_draw_reel("reel1", m_reel0);
+	awp_draw_reel("reel2", m_reel1);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -219,8 +219,8 @@ WRITE8_MEMBER(bfmsys85_state::reel34_w)
 	m_reel2->update((data>>4)&0x0f);
 	m_reel3->update( data    &0x0f);
 
-	awp_draw_reel(2, m_reel2);
-	awp_draw_reel(3, m_reel3);
+	awp_draw_reel("reel3", m_reel2);
+	awp_draw_reel("reel4", m_reel3);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -346,10 +346,6 @@ READ8_MEMBER(bfmsys85_state::triac_r)
 
 void bfmsys85_state::machine_start()
 {
-	m_reel0->configure(&starpoint_interface_48step);
-	m_reel1->configure(&starpoint_interface_48step);
-	m_reel2->configure(&starpoint_interface_48step);
-	m_reel3->configure(&starpoint_interface_48step);
 }
 
 // memory map for bellfruit system85 board ////////////////////////////////
@@ -406,13 +402,13 @@ static MACHINE_CONFIG_START( bfmsys85, bfmsys85_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")                       // load/save nv RAM
 
-	MCFG_DEVICE_ADD("reel0", STEPPER, 0)
+	MCFG_STARPOINT_48STEP_ADD("reel0")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfmsys85_state, reel0_optic_cb))
-	MCFG_DEVICE_ADD("reel1", STEPPER, 0)
+	MCFG_STARPOINT_48STEP_ADD("reel1")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfmsys85_state, reel1_optic_cb))
-	MCFG_DEVICE_ADD("reel2", STEPPER, 0)
+	MCFG_STARPOINT_48STEP_ADD("reel2")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfmsys85_state, reel2_optic_cb))
-	MCFG_DEVICE_ADD("reel3", STEPPER, 0)
+	MCFG_STARPOINT_48STEP_ADD("reel3")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfmsys85_state, reel3_optic_cb))
 
 	MCFG_DEFAULT_LAYOUT(layout_bfmsys85)
