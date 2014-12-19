@@ -28,6 +28,9 @@ ToDo:
 
 ****************************************************************************/
 
+#define NEWFDC 0
+
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
@@ -40,7 +43,15 @@ ToDo:
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
 #include "sound/speaker.h"
-
+#include "machine/z80dma.h"
+#if NEWFDC
+#include "machine/wd_fdc.h"
+#include "formats/excali64_dsk.h"
+#else
+#include "machine/wd17xx.h"
+#include "imagedev/flopdrv.h"
+#include "formats/basicdsk.h"
+#endif
 
 class excali64_state : public driver_device
 {
@@ -52,6 +63,12 @@ public:
 		, m_cass(*this, "cassette")
 		, m_crtc(*this, "crtc")
 		, m_io_keyboard(*this, "KEY")
+		, m_dma(*this, "dma")
+		, m_fdc(*this, "fdc")
+#if NEWFDC
+		, m_floppy0(*this, "fdc:0")
+		, m_floppy1(*this, "fdc:1")
+#endif
 	{ }
 
 	DECLARE_PALETTE_INIT(excali64);
@@ -61,6 +78,17 @@ public:
 	DECLARE_READ8_MEMBER(port00_r);
 	DECLARE_READ8_MEMBER(port50_r);
 	DECLARE_WRITE8_MEMBER(port70_w);
+	DECLARE_WRITE8_MEMBER(porte4_w);
+	DECLARE_READ8_MEMBER(porte8_r);
+	DECLARE_WRITE8_MEMBER(portec_w);
+#if NEWFDC
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+#endif
+	DECLARE_WRITE_LINE_MEMBER(busreq_w);
+	DECLARE_READ8_MEMBER(memory_read_byte);
+	DECLARE_WRITE8_MEMBER(memory_write_byte);
+	DECLARE_READ8_MEMBER(io_read_byte);
+	DECLARE_WRITE8_MEMBER(io_write_byte);
 	MC6845_UPDATE_ROW(update_row);
 	DECLARE_WRITE_LINE_MEMBER(crtc_de);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vs);
@@ -79,6 +107,14 @@ private:
 	required_device<cassette_image_device> m_cass;
 	required_device<mc6845_device> m_crtc;
 	required_ioport_array<8> m_io_keyboard;
+	required_device<z80dma_device> m_dma;
+#if NEWFDC
+	required_device<wd2793_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+#else
+	required_device<wd2793_device> m_fdc;
+#endif
 };
 
 static ADDRESS_MAP_START(excali64_mem, AS_PROGRAM, 8, excali64_state)
@@ -100,6 +136,15 @@ static ADDRESS_MAP_START(excali64_io, AS_IO, 8, excali64_state)
 	AM_RANGE(0x50, 0x5f) AM_READ(port50_r)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x0c) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0x70, 0x7f) AM_WRITE(port70_w)
+	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("dma", z80dma_device, read, write)
+	AM_RANGE(0xe4, 0xe7) AM_WRITE(porte4_w)
+	AM_RANGE(0xe8, 0xeb) AM_READ(porte8_r)
+	AM_RANGE(0xec, 0xef) AM_WRITE(portec_w)
+#if NEWFDC
+	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("fdc", wd2793_t, read, write)
+#else
+	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("fdc", wd2793_device, read, write)
+#endif
 ADDRESS_MAP_END
 
 
@@ -184,6 +229,112 @@ static INPUT_PORTS_START( excali64 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 (") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 &") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
 INPUT_PORTS_END
+
+#if NEWFDC
+FLOPPY_FORMATS_MEMBER( excali64_state::floppy_formats )
+	FLOPPY_EXCALI64_FORMAT
+FLOPPY_FORMATS_END
+
+static SLOT_INTERFACE_START( excali64_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
+#else
+static LEGACY_FLOPPY_OPTIONS_START(excali64)
+	LEGACY_FLOPPY_OPTION(excali64_ds, "raw", "Excalibur 64 DS disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([5])
+		SECTOR_LENGTH([1024])
+		FIRST_SECTOR_ID([1]))
+LEGACY_FLOPPY_OPTIONS_END
+
+static const floppy_interface excali64_floppy_interface =
+{
+	FLOPPY_STANDARD_5_25_DSDD,
+	LEGACY_FLOPPY_OPTIONS_NAME(excali64),
+	NULL
+};
+#endif
+
+READ8_MEMBER( excali64_state::porte8_r )
+{
+	return 0xff;
+}
+
+WRITE8_MEMBER( excali64_state::porte4_w )
+{
+//printf("%X ",data);
+#if NEWFDC
+	floppy_image_device *floppy = NULL;
+	if (BIT(data, 0)) floppy = m_floppy0->get_device();
+	//if (BIT(data, 1)) floppy = m_floppy1->get_device();
+	m_fdc->set_floppy(floppy);
+	if (floppy)
+		floppy->ss_w(BIT(data, 4));
+#else
+	UINT8 i;
+	for (i = 0; i < 4; i++)
+	{
+		if BIT(data, i)
+		{
+			m_fdc->set_drive(i);
+			break;
+		}
+	}
+	//if (data & 0x01) m_fdc->set_drive(0);
+	//if (data & 0x02) m_fdc->set_drive(1);
+	//if (data & 0x04) m_fdc->set_drive(2);
+	//if (data & 0x08) m_fdc->set_drive(3);
+	//if (data & 0x10) m_fdc->set_side((data & 0x10) >> 4);
+	const char *floppy_tags[4] = { FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3 };
+
+	m_fdc->dden_w(1);//!BIT(data, 6)); // we want double density
+	//if ((data & 0x04) == 0) // reset
+	//m_fdc->reset();
+
+	// bit 3 connected to pin 23 "HRDY" of FDC
+	// TEMP HACK, FDD motor and RDY FDC pin controlled by HLD pin of FDC
+	legacy_floppy_image_device *flop = subdevice<legacy_floppy_image_device>(floppy_tags[i]);
+	flop->floppy_mon_w(0); // motor on
+	flop->floppy_drive_set_ready_state(1, 0);
+#endif
+}
+
+WRITE8_MEMBER( excali64_state::portec_w )
+{
+}
+
+WRITE_LINE_MEMBER( excali64_state::busreq_w )
+{
+// since our Z80 has no support for BUSACK, we assume it is granted immediately
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
+	//m_maincpu->set_input_line(INPUT_LINE_HALT, state); // do we need this?
+	m_dma->bai_w(state); // tell dma that bus has been granted
+}
+
+READ8_MEMBER( excali64_state::memory_read_byte )
+{
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
+	return prog_space.read_byte(offset);
+}
+
+WRITE8_MEMBER( excali64_state::memory_write_byte )
+{
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
+	prog_space.write_byte(offset, data);
+}
+
+READ8_MEMBER( excali64_state::io_read_byte )
+{
+	address_space& prog_space = m_maincpu->space(AS_IO);
+	return prog_space.read_byte(offset);
+}
+
+WRITE8_MEMBER( excali64_state::io_write_byte )
+{
+	address_space& prog_space = m_maincpu->space(AS_IO);
+	prog_space.write_byte(offset, data);
+}
 
 WRITE8_MEMBER( excali64_state::ppib_w )
 {
@@ -461,7 +612,6 @@ static MACHINE_CONFIG_START( excali64, excali64_state )
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 40)
 	MCFG_PALETTE_INIT_OWNER(excali64_state, excali64)
-	//MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", excali64)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_16MHz / 16) // 1MHz for lowres; 2MHz for highres
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -472,7 +622,25 @@ static MACHINE_CONFIG_START( excali64, excali64_state )
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )
-	MACHINE_CONFIG_END
+#if NEWFDC
+	MCFG_WD2793x_ADD("fdc", XTAL_16MHz / 16)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", excali64_floppies, "525dd", floppy_image_device::default_floppy_formats)// excali64_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", excali64_floppies, "525dd", floppy_image_device::default_floppy_formats)
+#else
+	MCFG_DEVICE_ADD("fdc", WD2793, 0)
+	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
+	//MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(nascom1_state, nascom2_fdc_intrq_w))
+	//MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(nascom1_state, nascom2_fdc_drq_w))
+	//MCFG_WD17XX_DDEN_CALLBACK(VCC)
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(excali64_floppy_interface)
+#endif
+	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL_16MHz/4)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(excali64_state, busreq_w))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(excali64_state, memory_read_byte))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(excali64_state, memory_write_byte))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(excali64_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(excali64_state, io_write_byte))
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( excali64 )

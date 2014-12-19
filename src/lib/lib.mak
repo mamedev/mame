@@ -148,6 +148,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/ep64_dsk.o    \
 	$(LIBOBJ)/formats/esq8_dsk.o    \
 	$(LIBOBJ)/formats/esq16_dsk.o   \
+	$(LIBOBJ)/formats/excali64_dsk.o\
 	$(LIBOBJ)/formats/fc100_cas.o   \
 	$(LIBOBJ)/formats/fdi_dsk.o     \
 	$(LIBOBJ)/formats/fdd_dsk.o     \
