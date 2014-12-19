@@ -1035,11 +1035,11 @@ void tc0480scp_device::postload()
 	if (!flip)  reg = -reg;
 	m_bgscrolly[1] = reg;
 
-	reg = m_ctrl[6];
+	reg = m_ctrl[6] + 16;
 	if (!flip)  reg = -reg;
 	m_bgscrolly[2] = reg;
 
-	reg = m_ctrl[7];
+	reg = m_ctrl[7] + 16;
 	if (!flip)  reg = -reg;
 	m_bgscrolly[3] = reg;
 
