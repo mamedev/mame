@@ -79,9 +79,18 @@
 
 /* States for CTL */
 
-#define CTL_STATE_INPUT         (0)
-#define CTL_STATE_OUTPUT        (1)
-#define CTL_STATE_NEXT_OUTPUT   (2)
+// ctl bus is input to tms51xx
+#define CTL_STATE_INPUT               (0)
+// ctl bus is outputting a test talk command on CTL1(bit 0)
+#define CTL_STATE_TTALK_OUTPUT        (1)
+// ctl bus is switching direction, next will be above
+#define CTL_STATE_NEXT_TTALK_OUTPUT   (2)
+// ctl bus is outputting a read nybble 'output' command on CTL1,2,4,8 (bits 0-3)
+#define CTL_STATE_OUTPUT              (3)
+// ctl bus is switching direction, next will be above
+#define CTL_STATE_NEXT_OUTPUT         (4)
+
+
 
 /* Pull in the ROM tables */
 #include "tms5110r.inc"
@@ -125,18 +134,18 @@ void tms5110_device::new_int_write(UINT8 rc, UINT8 m0, UINT8 m1, UINT8 addr)
 
 void tms5110_device::new_int_write_addr(UINT8 addr)
 {
-	new_int_write(1, 0, 1, addr);
-	new_int_write(0, 0, 1, addr);
-	new_int_write(1, 0, 0, addr);
-	new_int_write(0, 0, 0, addr);
+	new_int_write(1, 0, 1, addr); // romclk 1, m0 0, m1 1, addr bus nybble = xxxx
+	new_int_write(0, 0, 1, addr); // romclk 0, m0 0, m1 1, addr bus nybble = xxxx
+	new_int_write(1, 0, 0, addr); // romclk 1, m0 0, m1 0, addr bus nybble = xxxx
+	new_int_write(0, 0, 0, addr); // romclk 0, m0 0, m1 0, addr bus nybble = xxxx
 }
 
 UINT8 tms5110_device::new_int_read()
 {
-	new_int_write(1, 1, 0, 0);
-	new_int_write(0, 1, 0, 0);
-	new_int_write(1, 0, 0, 0);
-	new_int_write(0, 0, 0, 0);
+	new_int_write(1, 1, 0, 0); // romclk 1, m0 1, m1 0, addr bus nybble = 0/open bus
+	new_int_write(0, 1, 0, 0); // romclk 0, m0 1, m1 0, addr bus nybble = 0/open bus
+	new_int_write(1, 0, 0, 0); // romclk 1, m0 0, m1 0, addr bus nybble = 0/open bus
+	new_int_write(0, 0, 0, 0); // romclk 0, m0 0, m1 0, addr bus nybble = 0/open bus
 	if (!m_data_cb.isnull())
 		return m_data_cb();
 	return 0;
@@ -179,6 +188,7 @@ void tms5110_device::register_for_save_states()
 	save_item(NAME(m_address));
 	save_item(NAME(m_schedule_dummy_read));
 	save_item(NAME(m_addr_bit));
+	save_item(NAME(m_CTL_buffer));
 
 	save_item(NAME(m_x));
 
@@ -587,6 +597,12 @@ void tms5110_device::PDC_set(int data)
 			case CTL_STATE_INPUT:
 				/* continue */
 				break;
+			case CTL_STATE_NEXT_TTALK_OUTPUT:
+				m_state = CTL_STATE_TTALK_OUTPUT;
+				return;
+			case CTL_STATE_TTALK_OUTPUT:
+				m_state = CTL_STATE_INPUT;
+				return;
 			case CTL_STATE_NEXT_OUTPUT:
 				m_state = CTL_STATE_OUTPUT;
 				return;
@@ -607,16 +623,23 @@ void tms5110_device::PDC_set(int data)
 			{
 				switch (m_CTL_pins & 0xe) /*CTL1 - don't care*/
 				{
-				case TMS5110_CMD_SPEAK:
-					perform_dummy_read();
-					m_speaking_now = 1;
-
-					//should FIFO be cleared now ?????
-					break;
-
 				case TMS5110_CMD_RESET:
 					perform_dummy_read();
 					reset();
+					break;
+
+				case TMS5110_CMD_LOAD_ADDRESS:
+					m_next_is_address = TRUE;
+					break;
+
+				case TMS5110_CMD_OUTPUT:
+					m_state = CTL_STATE_NEXT_OUTPUT;
+					break;
+
+				case TMS5110_CMD_SPKSLOW:
+					perform_dummy_read();
+					m_speaking_now = 1;
+					//should FIFO be cleared now ????? there is no fifo! the fifo is a lie!
 					break;
 
 				case TMS5110_CMD_READ_BIT:
@@ -625,12 +648,17 @@ void tms5110_device::PDC_set(int data)
 					else
 					{
 						request_bits(1);
-						m_CTL_pins = (m_CTL_pins & 0x0E) | extract_bits(1);
+						//m_CTL_pins = (m_CTL_pins & 0x0E) | extract_bits(1);
+						m_CTL_buffer <<= 1;
+						m_CTL_buffer |= extract_bits(1);
+						m_CTL_buffer &= 0xF;
 					}
 					break;
 
-				case TMS5110_CMD_LOAD_ADDRESS:
-					m_next_is_address = TRUE;
+				case TMS5110_CMD_SPEAK:
+					perform_dummy_read();
+					m_speaking_now = 1;
+					//should FIFO be cleared now ????? there is no fifo! the fifo is a lie!
 					break;
 
 				case TMS5110_CMD_READ_BRANCH:
@@ -644,7 +672,7 @@ void tms5110_device::PDC_set(int data)
 					break;
 
 				case TMS5110_CMD_TEST_TALK:
-					m_state = CTL_STATE_NEXT_OUTPUT;
+					m_state = CTL_STATE_NEXT_TTALK_OUTPUT;
 					break;
 
 				default:
@@ -917,6 +945,7 @@ void tms5110_device::device_reset()
 	m_speaking_now = m_talk_status = 0;
 	m_CTL_pins = 0;
 		m_RNG = 0x1fff;
+	m_CTL_buffer = 0;
 
 	/* initialize the energy/pitch/k states */
 	m_old_energy = m_new_energy = m_current_energy = m_target_energy = 0;
@@ -935,7 +964,6 @@ void tms5110_device::device_reset()
 	{
 		/* legacy interface */
 		m_schedule_dummy_read = TRUE;
-
 	}
 	else
 	{
@@ -998,10 +1026,15 @@ READ8_MEMBER( tms5110_device::ctl_r )
 {
 	/* bring up to date first */
 	m_stream->update();
-	if (m_state == CTL_STATE_OUTPUT)
+	if (m_state == CTL_STATE_TTALK_OUTPUT)
 	{
 		//if (DEBUG_5110) logerror("Status read (status=%2d)\n", m_talk_status);
 		return (m_talk_status << 0); /*CTL1 = still talking ? */
+	}
+	else if (m_state == CTL_STATE_OUTPUT)
+	{
+		//if (DEBUG_5110) logerror("Status read (status=%2d)\n", m_talk_status);
+		return (m_CTL_buffer); 
 	}
 	else
 	{
