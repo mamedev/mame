@@ -345,7 +345,7 @@ READ8_MEMBER(opwolf_state::z80_input2_r)
 
 WRITE8_MEMBER(opwolf_state::sound_bankswitch_w)
 {
-	membank("bank10")->set_entry((data - 1) & 0x03);
+	membank("z80bank")->set_entry(data & 0x03);
 }
 
 /***********************************************************
@@ -532,7 +532,7 @@ WRITE8_MEMBER(opwolf_state::opwolf_adpcm_e_w)
 
 static ADDRESS_MAP_START( opwolf_sound_z80_map, AS_PROGRAM, 8, opwolf_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank10")
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
 	AM_RANGE(0x9002, 0x9100) AM_READNOP
@@ -846,9 +846,8 @@ ROM_START( opwolfa )
 	ROM_LOAD16_BYTE( "b20-04.39",     0x20000, 0x10000, CRC(216b4838) SHA1(2851cae00bb3e32e20f35fdab8ed6f149e658363) )
 	ROM_LOAD16_BYTE( "b20-17.29",     0x20001, 0x10000, CRC(6043188e) SHA1(3a6f4836b1c19d37713f5714a947276baf1df50c) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )      /* sound cpu */
-	ROM_LOAD( "b20-07.10",  0x00000, 0x04000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
-	ROM_CONTINUE(           0x10000, 0x0c000 ) /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
+	ROM_LOAD( "b20-07.10",  0x00000, 0x10000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )    /* SCR tiles (8 x 8) */
@@ -867,9 +866,8 @@ ROM_START( opwolfj )
 	ROM_LOAD16_BYTE( "b20-04.39",     0x20000, 0x10000, CRC(216b4838) SHA1(2851cae00bb3e32e20f35fdab8ed6f149e658363) )
 	ROM_LOAD16_BYTE( "b20-18.29",     0x20001, 0x10000, CRC(fd202470) SHA1(3108c14953d2f50d861946e9f646813b7050b58a) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )      /* sound cpu */
-	ROM_LOAD( "b20-07.10",  0x00000, 0x04000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
-	ROM_CONTINUE(           0x10000, 0x0c000 ) /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
+	ROM_LOAD( "b20-07.10",  0x00000, 0x10000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )    /* SCR tiles (8 x 8) */
@@ -888,9 +886,8 @@ ROM_START( opwolfu ) /* Taito TC0030 C-Chip labeled B20-18 (yes, it has a specif
 	ROM_LOAD16_BYTE( "b20-04.39",     0x20000, 0x10000, CRC(216b4838) SHA1(2851cae00bb3e32e20f35fdab8ed6f149e658363) )
 	ROM_LOAD16_BYTE( "b20-19.29",     0x20001, 0x10000, CRC(b71bc44c) SHA1(5b404bd7630f01517ab98bda40ca43c11268035a) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )      /* sound cpu */
-	ROM_LOAD( "b20-07.10",  0x00000, 0x04000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
-	ROM_CONTINUE(           0x10000, 0x0c000 ) /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
+	ROM_LOAD( "b20-07.10",  0x00000, 0x10000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )    /* SCR tiles (8 x 8) */
@@ -909,9 +906,8 @@ ROM_START( opwolfb )
 	ROM_LOAD16_BYTE( "opwlfb.13",  0x20000, 0x10000, CRC(61230c6e) SHA1(942764aec0c55ba00df8dbb54e127b73e24192ae) )
 	ROM_LOAD16_BYTE( "opwlfb.11",  0x20001, 0x10000, CRC(342e318d) SHA1(a52918d16884ca42b2a3b910bc71bfd81b45f1ab) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )      /* sound cpu */
-	ROM_LOAD( "opwlfb.30",  0x00000, 0x04000, CRC(0669b94c) SHA1(f10894a6fad8ed144a528db696436b58f62ddee4) )
-	ROM_CONTINUE(           0x10000, 0x04000 ) /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
+	ROM_LOAD( "opwlfb.30",  0x00000, 0x08000, CRC(0669b94c) SHA1(f10894a6fad8ed144a528db696436b58f62ddee4) )
 
 	ROM_REGION( 0x10000, "sub", 0 )      /* c-chip substitute Z80 */
 	ROM_LOAD( "opwlfb.09",   0x00000, 0x08000, CRC(ab27a3dd) SHA1(cf589e7a9ccf3e86020b86f917fb91f3d8ba7512) )
@@ -960,7 +956,7 @@ DRIVER_INIT_MEMBER(opwolf_state,opwolf)
 	m_opwolf_gun_xoffs = 0xec - (rom[0x03ffb0 / 2] & 0xff);
 	m_opwolf_gun_yoffs = 0x1c - (rom[0x03ffae / 2] & 0xff);
 
-	membank("bank10")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000, 0x4000);
+	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 }
 
 
@@ -974,7 +970,7 @@ DRIVER_INIT_MEMBER(opwolf_state,opwolfb)
 	m_opwolf_gun_xoffs = -2;
 	m_opwolf_gun_yoffs = 17;
 
-	membank("bank10")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000, 0x4000);
+	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 }
 
 

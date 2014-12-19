@@ -25,7 +25,6 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_pivram(*this, "pivram"),
 		m_piv_ctrlram(*this, "piv_ctrlram"),
-		m_sharedram(*this, "sharedram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
@@ -40,8 +39,6 @@ public:
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_pivram;
 	required_shared_ptr<UINT16> m_piv_ctrlram;
-	required_shared_ptr<UINT16> m_sharedram;
-//  UINT16 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t   *m_piv_tilemap[3];
@@ -57,7 +54,6 @@ public:
 	/* misc */
 	UINT16      m_cpua_ctrl;
 	UINT16      m_port_sel;
-	INT32       m_banknum;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -69,8 +65,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_READ16_MEMBER(sharedram_r);
-	DECLARE_WRITE16_MEMBER(sharedram_w);
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
 	DECLARE_READ16_MEMBER(lan_status_r);
 	DECLARE_WRITE16_MEMBER(rotate_port_w);
@@ -100,7 +94,6 @@ public:
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
 	void wgp_piv_layer_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority );
 	void parse_control();
-	void reset_sound_region(  )  /* assumes Z80 sandwiched between the 68Ks */;
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 
 protected:

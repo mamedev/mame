@@ -54,7 +54,6 @@ public:
 
 	/* misc */
 	int           m_dsp_hold_signal;
-	INT32         m_banknum;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -99,7 +98,6 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_taitoair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void reset_sound_region();
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	void fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect, int color, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2 );
 	void multVecMtx(const INT16* vec4, const float* m, float* result);

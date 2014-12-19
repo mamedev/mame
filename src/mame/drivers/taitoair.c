@@ -371,17 +371,9 @@ READ16_MEMBER(taitoair_state::stick2_input_r)
 	return 0;
 }
 
-
-
-void taitoair_state::reset_sound_region()
-{
-	membank("bank1")->set_entry(m_banknum);
-}
-
 WRITE8_MEMBER(taitoair_state::sound_bankswitch_w)
 {
-	m_banknum = data & 3;
-	reset_sound_region();
+	membank("z80bank")->set_entry(data & 3);
 }
 
 
@@ -412,7 +404,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, taitoair_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
@@ -640,22 +632,16 @@ WRITE_LINE_MEMBER(taitoair_state::irqhandler)
 
 void taitoair_state::machine_start()
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
-	int i;
+	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
-	membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
-
-	save_item(NAME(m_banknum));
 	save_item(NAME(m_q.col));
 	save_item(NAME(m_q.pcount));
 
-	for (i = 0; i < TAITOAIR_POLY_MAX_PT; i++)
+	for (int i = 0; i < TAITOAIR_POLY_MAX_PT; i++)
 	{
 		state_save_register_item(machine(), "globals", NULL, i, m_q.p[i].x);
 		state_save_register_item(machine(), "globals", NULL, i, m_q.p[i].y);
 	}
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(taitoair_state::reset_sound_region), this));
 }
 
 void taitoair_state::machine_reset()
@@ -663,7 +649,6 @@ void taitoair_state::machine_reset()
 	int i;
 
 	m_dsp_hold_signal = ASSERT_LINE;
-	m_banknum = 0;
 
 	for (i = 0; i < TAITOAIR_POLY_MAX_PT; i++)
 	{
@@ -764,9 +749,8 @@ ROM_START( topland )
 	ROM_LOAD16_BYTE( "b62_23.41",  0x80000, 0x20000, CRC(ef3a971c) SHA1(0840668dda48f4c9a85410361bfba3ae9580a71f) )
 	ROM_LOAD16_BYTE( "b62_22.12",  0x80001, 0x20000, CRC(94279201) SHA1(8518d8e722d4f2516f75224d9a21ab20d8ee6c78) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* Z80 */
-	ROM_LOAD( "b62-42.34", 0x00000, 0x04000, CRC(389230e0) SHA1(3a336987aad7bf4df658f924de4bbe6f0fff6d59) )
-	ROM_CONTINUE(          0x10000, 0x0c000 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 */
+	ROM_LOAD( "b62-42.34", 0x00000, 0x10000, CRC(389230e0) SHA1(3a336987aad7bf4df658f924de4bbe6f0fff6d59) )
 
 	ROM_REGION( 0x20000, "dsp", 0 ) /* TMS320C25 */
 	ROM_LOAD16_BYTE( "b62-21.35", 0x00000, 0x02000, CRC(5f38460d) SHA1(0593718d15b30b10f7686959932e2c934de2a529) )  // cpu board
@@ -811,9 +795,8 @@ ROM_START( ainferno )
 
 	/* 0x80000 to 0xbffff is empty for this game */
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* Z80 */
-	ROM_LOAD( "c45-23.34", 0x00000, 0x04000, CRC(d0750c78) SHA1(63232c2acef86e8c8ffaad36ab0b6c4cc1eb48f8) )
-	ROM_CONTINUE(          0x10000, 0x0c000 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 */
+	ROM_LOAD( "c45-23.34", 0x00000, 0x10000, CRC(d0750c78) SHA1(63232c2acef86e8c8ffaad36ab0b6c4cc1eb48f8) )
 
 	ROM_REGION( 0x20000, "dsp", 0 ) /* TMS320C25 */
 	ROM_LOAD16_BYTE( "c45-25.35", 0x00000, 0x02000, CRC(c0d39f95) SHA1(542aa6e2af510aea00db40bf803cb6653d4e7747) )
@@ -864,9 +847,8 @@ ROM_START( ainfernoj )
 
 	/* 0x80000 to 0xbffff is empty for this game */
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* Z80 */
-	ROM_LOAD( "c45-23.34", 0x00000, 0x04000, CRC(d0750c78) SHA1(63232c2acef86e8c8ffaad36ab0b6c4cc1eb48f8) )
-	ROM_CONTINUE(          0x10000, 0x0c000 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 */
+	ROM_LOAD( "c45-23.34", 0x00000, 0x10000, CRC(d0750c78) SHA1(63232c2acef86e8c8ffaad36ab0b6c4cc1eb48f8) )
 
 	ROM_REGION( 0x20000, "dsp", 0 ) /* TMS320C25 */
 	ROM_LOAD16_BYTE( "c45-25.35", 0x00000, 0x02000, CRC(c0d39f95) SHA1(542aa6e2af510aea00db40bf803cb6653d4e7747) )

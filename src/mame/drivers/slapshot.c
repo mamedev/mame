@@ -218,15 +218,9 @@ WRITE16_MEMBER(slapshot_state::opwolf3_adc_req_w)
                 SOUND
 *****************************************************/
 
-void slapshot_state::reset_sound_region()
-{
-	membank("bank10")->set_entry(m_banknum);
-}
-
 WRITE8_MEMBER(slapshot_state::sound_bankswitch_w)
 {
-	m_banknum = data & 7;
-	reset_sound_region();
+	membank("z80bank")->set_entry(data & 3);
 }
 
 WRITE16_MEMBER(slapshot_state::slapshot_msb_sound_w)
@@ -291,7 +285,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( opwolf3_z80_sound_map, AS_PROGRAM, 8, slapshot_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank10")
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
@@ -468,11 +462,7 @@ WRITE_LINE_MEMBER(slapshot_state::irqhandler)
 
 void slapshot_state::machine_start()
 {
-	membank("bank10")->configure_entries(0, 4, memregion("audiocpu")->base() + 0xc000, 0x4000);
-
-	m_banknum = 0;
-	save_item(NAME(m_banknum));
-	machine().save().register_postload(save_prepost_delegate(FUNC(slapshot_state::reset_sound_region), this));
+	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 }
 
 
@@ -607,9 +597,8 @@ ROM_START( slapshot )
 	ROM_LOAD16_BYTE( "d71-15.3",  0x00000, 0x80000, CRC(1470153f) SHA1(63fd5314fcaafba7326fd9481e3c686901dde65c) )
 	ROM_LOAD16_BYTE( "d71-16.1",  0x00001, 0x80000, CRC(f13666e0) SHA1(e8b475163ea7da5ee3f2b900004cc67c684bab75) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD    ( "d71-07.77",    0x00000, 0x4000, CRC(dd5f670c) SHA1(743a9563c40fe40178c9ec8eece71a08380c2239) )
-	ROM_CONTINUE(                 0x10000, 0xc000 ) /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD    ( "d71-07.77",    0x00000, 0x10000, CRC(dd5f670c) SHA1(743a9563c40fe40178c9ec8eece71a08380c2239) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "d71-04.79", 0x00000, 0x80000, CRC(b727b81c) SHA1(9f56160e2b3e4d59cfa96b5c013f4e368781666e) )  /* SCR */
@@ -642,9 +631,8 @@ ROM_START( opwolf3 )
 	ROM_LOAD16_BYTE( "d74_18.18", 0x100000, 0x80000, CRC(bd5d7cdb) SHA1(29f1cd7b86bc05f873e93f088194113da87a3b86) ) // data ???
 	ROM_LOAD16_BYTE( "d74_17.17", 0x100001, 0x80000, CRC(ac35a672) SHA1(8136bd076443bfaeb3d339971d88951e8b2b59b4) ) // data ???
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD    ( "d74_22.77",    0x00000, 0x4000, CRC(118374a6) SHA1(cc1d0d28efdf1df3e648e7d932405811854ba4ee) )
-	ROM_CONTINUE(                 0x10000, 0xc000 ) /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD    ( "d74_22.77",    0x00000, 0x10000, CRC(118374a6) SHA1(cc1d0d28efdf1df3e648e7d932405811854ba4ee) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "d74_05.80", 0x000000, 0x200000, CRC(85ea64cc) SHA1(1960a934191c451df1554323d47f6fc64939b0ce) )    /* SCR */
@@ -669,9 +657,8 @@ ROM_START( opwolf3u )
 	ROM_LOAD16_BYTE( "d74_18.18", 0x100000, 0x80000, CRC(bd5d7cdb) SHA1(29f1cd7b86bc05f873e93f088194113da87a3b86) ) // data ???
 	ROM_LOAD16_BYTE( "d74_17.17", 0x100001, 0x80000, CRC(ac35a672) SHA1(8136bd076443bfaeb3d339971d88951e8b2b59b4) ) // data ???
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD    ( "d74_19.77",    0x00000, 0x4000, CRC(05d53f06) SHA1(48b0cd68ad3758f424552a4e3833c5a1c2f1825b) )
-	ROM_CONTINUE(                 0x10000, 0xc000 ) /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD    ( "d74_19.77",    0x00000, 0x10000, CRC(05d53f06) SHA1(48b0cd68ad3758f424552a4e3833c5a1c2f1825b) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "d74_05.80", 0x000000, 0x200000, CRC(85ea64cc) SHA1(1960a934191c451df1554323d47f6fc64939b0ce) )    /* SCR */

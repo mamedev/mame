@@ -48,7 +48,6 @@ public:
 	int         m_road_palbank;
 
 	/* misc */
-	INT32       m_banknum;
 	UINT16      m_cpua_ctrl;
 	INT32       m_sci_int6;
 	INT32       m_ioc220_port;
@@ -95,7 +94,6 @@ public:
 	DECLARE_WRITE16_MEMBER(taitoz_msb_sound_w);
 	DECLARE_READ16_MEMBER(taitoz_msb_sound_r);
 	DECLARE_WRITE8_MEMBER(taitoz_pancontrol);
-	DECLARE_WRITE16_MEMBER(spacegun_pancontrol);
 	DECLARE_READ16_MEMBER(sci_spriteframe_r);
 	DECLARE_WRITE16_MEMBER(sci_spriteframe_w);
 	DECLARE_WRITE16_MEMBER(contcirc_out_w);
@@ -115,7 +113,6 @@ public:
 	UINT32 screen_update_dblaxle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_racingb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sci_interrupt);
-	void taitoz_postload();
 	void contcirc_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
 	void chasehq_draw_sprites_16x16( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
 	void bshark_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
@@ -123,7 +120,6 @@ public:
 	void aquajack_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs);
 	void spacegun_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs);
 	void parse_cpu_control(  );
-	void reset_sound_region(  );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(irqhandlerb);
 
