@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "cpu/tms0980/tms0980.h"
 #include "sound/tms5110.h"
+#include "machine/tms6100.h"
 
 #include "tispeak.lh"
 
@@ -256,7 +257,7 @@ void tispeak_state::machine_start()
 static MACHINE_CONFIG_START( tispeak, tispeak_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS0270, MASTER_CLOCK)
+	MCFG_CPU_ADD("maincpu", TMS0270, XTAL_640kHz/2)
 	MCFG_TMS1XXX_READ_K_CB(READ8(tispeak_state, read_k))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispeak_state, write_r))
@@ -271,9 +272,17 @@ static MACHINE_CONFIG_START( tispeak, tispeak_state )
 	/* no video! */
 
 	/* sound hardware */
+	MCFG_DEVICE_ADD("tms6100", TMS6100, 0)
+
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("tms5100", TMS5100, XTAL_640kHz)
+	MCFG_TMS5110_M0_CB(DEVWRITELINE("tms6100", tms6100_device, tms6100_m0_w))
+	MCFG_TMS5110_M1_CB(DEVWRITELINE("tms6100", tms6100_device, tms6100_m1_w))
+	MCFG_TMS5110_ADDR_CB(DEVWRITE8("tms6100", tms6100_device, tms6100_addr_w))
+	MCFG_TMS5110_DATA_CB(DEVREADLINE("tms6100", tms6100_device, tms6100_data_r))
+	MCFG_TMS5110_ROMCLK_CB(DEVWRITELINE("tms6100", tms6100_device, tms6100_romclock_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	
 MACHINE_CONFIG_END
 
 
@@ -295,7 +304,7 @@ ROM_START( snspell )
 	ROM_REGION( 1246, "maincpu:opla", 0 )
 	ROM_LOAD( "tms0270_cd2708_opla.pla", 0, 1246, BAD_DUMP CRC(e70836e2) SHA1(70e7dcdf81ae2052874fb21c504fcc06b2649f9a) ) // "
 
-	ROM_REGION( 0x8000, "tms5100", 0 )
+	ROM_REGION( 0x8000, "tms6100", 0 )
 	ROM_LOAD( "tmc0351.vsm", 0x0000, 0x4000, CRC(beea3373) SHA1(8b0f7586d2f12c3d4a885fdb528cf23feffa1a3b) )
 	ROM_LOAD( "tmc0352.vsm", 0x4000, 0x4000, CRC(d51f0587) SHA1(ddaa484be1bba5fef46b481cafae517e4acaa8ed) )
 ROM_END
@@ -311,7 +320,7 @@ ROM_START( snmath )
 	ROM_REGION( 1246, "maincpu:opla", 0 )
 	ROM_LOAD( "tms0270_cd2708_opla.pla", 0, 1246, BAD_DUMP CRC(e70836e2) SHA1(70e7dcdf81ae2052874fb21c504fcc06b2649f9a) ) // "
 
-	ROM_REGION( 0x8000, "tms5100", 0 )
+	ROM_REGION( 0x8000, "tms6100", 0 )
 	ROM_LOAD( "cd2392.vsm", 0x0000, 0x4000, CRC(4ed2e920) SHA1(8896f29e25126c1e4d9a47c9a325b35dddecc61f) )
 	ROM_LOAD( "cd2393.vsm", 0x4000, 0x4000, CRC(571d5b5a) SHA1(83284755d9b77267d320b5b87fdc39f352433715) )
 ROM_END
