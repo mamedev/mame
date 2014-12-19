@@ -261,7 +261,7 @@ static void fpga_send(unsigned char cmd){
 WRITE8_MEMBER(barata_state::fpga_w)
 {
 	static unsigned char old_data = 0;
-	if (!BIT(old_data, 5) and BIT(data, 5)){
+	if (!BIT(old_data, 5) && BIT(data, 5)){
 		//process the command sent to the FPGA
 		fpga_send((data >> 2) & 7);
 	}

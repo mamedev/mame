@@ -58,7 +58,6 @@ const device_type R10788 = &device_creator<r10788_device>;
 
 r10788_device::r10788_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, R10788, "Rockwell 10788", tag, owner, clock, "r10788", __FILE__),
-        m_reg(),
         m_ktr(0), m_kts(0), m_kla(0), m_klb(0), m_mask_a(15), m_mask_b(15), m_ker(0),
         m_io_counter(0), m_scan_counter(0),
         m_display(*this)
@@ -93,8 +92,7 @@ void r10788_device::device_start()
  */
 void r10788_device::device_reset()
 {
-    for (int i = 0; i < 16; i++)
-        m_reg[0][i] = m_reg[1][i] = 0;
+	memset(m_reg, 0x00, sizeof(m_reg));
     m_ktr = 0;
     m_kts = 0;
     m_kla = 0;
