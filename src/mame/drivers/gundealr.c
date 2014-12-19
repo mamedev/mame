@@ -495,7 +495,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::yamyam_mcu_sim)
 
 static MACHINE_CONFIG_DERIVED( yamyam, gundealr )
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcusim", gundealr_state, yamyam_mcu_sim, attotime::from_hz(8000000/60))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcusim", gundealr_state, yamyam_mcu_sim, attotime::from_hz(6000000/60))	/* 6mhz confirmed */
 MACHINE_CONFIG_END
 
 
