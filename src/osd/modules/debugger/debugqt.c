@@ -25,6 +25,7 @@
 #include "qt/debugqtdasmwindow.h"
 #include "qt/debugqtmemorywindow.h"
 #include "qt/debugqtbreakpointswindow.h"
+#include "qt/debugqtdeviceswindow.h"
 #include "debugqt.h"
 
 
@@ -90,6 +91,7 @@ static void xml_configuration_load(running_machine &machine, int config_type, xm
 			case WindowQtConfig::WIN_TYPE_DASM:         xmlConfigurations.push_back(new DasmWindowQtConfig()); break;
 			case WindowQtConfig::WIN_TYPE_LOG:          xmlConfigurations.push_back(new LogWindowQtConfig()); break;
 			case WindowQtConfig::WIN_TYPE_BREAK_POINTS: xmlConfigurations.push_back(new BreakpointsWindowQtConfig()); break;
+			case WindowQtConfig::WIN_TYPE_DEVICES:      xmlConfigurations.push_back(new DevicesWindowQtConfig()); break;
 			default: continue;
 		}
 		xmlConfigurations.back()->recoverFromXmlNode(wnode);
@@ -145,6 +147,8 @@ static void gather_save_configurations()
 			xmlConfigurations.push_back(new LogWindowQtConfig());
 		else if (dynamic_cast<BreakpointsWindow*>(widget))
 			xmlConfigurations.push_back(new BreakpointsWindowQtConfig());
+		else if (dynamic_cast<DevicesWindow*>(widget))
+			xmlConfigurations.push_back(new DevicesWindowQtConfig());
 
 		xmlConfigurations.back()->buildFromQWidget(widget);
 	}
@@ -187,6 +191,8 @@ static void setup_additional_startup_windows(running_machine& machine, std::vect
 				foo = new LogWindow(&machine); break;
 			case WindowQtConfig::WIN_TYPE_BREAK_POINTS:
 				foo = new BreakpointsWindow(&machine); break;
+			case WindowQtConfig::WIN_TYPE_DEVICES:
+				foo = new DevicesWindow(&machine); break;
 			default: break;
 		}
 		config->applyToQWidget(foo);
