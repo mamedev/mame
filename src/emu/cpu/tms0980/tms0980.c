@@ -1156,8 +1156,6 @@ void tms1xxx_cpu_device::execute_run()
 			set_cki_bus();
 			m_ram_in = m_data->read_byte(m_ram_address) & 0xf;
 			m_dam_in = m_data->read_byte(m_ram_address | (0x10 << (m_x_bits-1))) & 0xf;
-			m_ram_out = -1;
-			m_status = 1;
 			m_p = 0;
 			m_n = 0;
 			m_carry_in = 0;
@@ -1197,11 +1195,12 @@ void tms1xxx_cpu_device::execute_run()
 			// note: officially, only 1 alu operation is allowed per opcode
 			m_adder_out = m_p + m_n + m_carry_in;
 			int carry_out = m_adder_out >> 4 & 1;
+			int status = 1;
+			m_ram_out = -1;
 
-			if (m_micro & M_C8) m_status &= carry_out;
-			if (m_micro & M_NE) m_status &= (m_n != m_p); // COMP
-
-			if (m_micro & M_CKM) m_ram_out = m_cki_bus;
+			if (m_micro & M_C8)    status &= carry_out;
+			if (m_micro & M_NE)    status &= (m_n != m_p); // COMP
+			if (m_micro & M_CKM)   m_ram_out = m_cki_bus;
 
 			// special status circuit
 			if (m_micro & M_SSE)
@@ -1233,8 +1232,9 @@ void tms1xxx_cpu_device::execute_run()
 			if (m_fixed & F_SAL)   op_sal();
 			if (m_fixed & F_SBL)   op_sbl();
 			if (m_fixed & F_XDA)   op_xda();
-
-			// execute: write ram
+			
+			// after fixed opcode handling: store status, write ram
+			m_status = status;
 			if (m_ram_out != -1)
 				m_data->write_byte(m_ram_address, m_ram_out);
 
@@ -1248,9 +1248,9 @@ void tms1xxx_cpu_device::execute_run()
 
 		case 4:
 			// execute: register store 2/2
-			if (m_micro & M_AUTA) m_a = m_adder_out & 0xf;
-			if (m_micro & M_AUTY) m_y = m_adder_out & 0xf;
-			if (m_micro & M_STSL) m_status_latch = m_status;
+			if (m_micro & M_AUTA)  m_a = m_adder_out & 0xf;
+			if (m_micro & M_AUTY)  m_y = m_adder_out & 0xf;
+			if (m_micro & M_STSL)  m_status_latch = m_status;
 
 			// fetch: update pc, ram address 2/2
 			read_opcode();
