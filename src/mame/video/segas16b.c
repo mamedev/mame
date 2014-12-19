@@ -18,7 +18,7 @@
 void segas16b_state::video_start()
 {
 	// initialize the tile/text layers
-	m_segaic16vid->segaic16_tilemap_init(machine(), 0, m_tilemap_type, 0x000, 0, 2);
+	m_segaic16vid->tilemap_init( 0, m_tilemap_type, 0x000, 0, 2);
 }
 
 
@@ -29,7 +29,7 @@ void segas16b_state::video_start()
 UINT32 segas16b_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// if no drawing is happening, fill with black and get out
-	if (!m_segaic16vid->segaic16_display_enable)
+	if (!m_segaic16vid->m_display_enable)
 	{
 		bitmap.fill(m_palette->black_pen(), cliprect);
 		return 0;
@@ -42,21 +42,21 @@ UINT32 segas16b_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	screen.priority().fill(0, cliprect);
 
 	// draw background opaquely first, not setting any priorities
-	m_segaic16vid->segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_BACKGROUND, 0 | TILEMAP_DRAW_OPAQUE, 0x00);
-	m_segaic16vid->segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_BACKGROUND, 1 | TILEMAP_DRAW_OPAQUE, 0x00);
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_BACKGROUND, 0 | TILEMAP_DRAW_OPAQUE, 0x00);
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_BACKGROUND, 1 | TILEMAP_DRAW_OPAQUE, 0x00);
 
 	// draw background again, just to set the priorities on non-transparent pixels
 	bitmap_ind16 dummy_bitmap;
-	m_segaic16vid->segaic16_tilemap_draw(screen, dummy_bitmap, cliprect, 0, SEGAIC16_TILEMAP_BACKGROUND, 0, 0x01);
-	m_segaic16vid->segaic16_tilemap_draw(screen, dummy_bitmap, cliprect, 0, SEGAIC16_TILEMAP_BACKGROUND, 1, 0x02);
+	m_segaic16vid->tilemap_draw( screen, dummy_bitmap, cliprect, 0, SEGAIC16_TILEMAP_BACKGROUND, 0, 0x01);
+	m_segaic16vid->tilemap_draw( screen, dummy_bitmap, cliprect, 0, SEGAIC16_TILEMAP_BACKGROUND, 1, 0x02);
 
 	// draw foreground
-	m_segaic16vid->segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_FOREGROUND, 0, 0x02);
-	m_segaic16vid->segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_FOREGROUND, 1, 0x04);
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_FOREGROUND, 0, 0x02);
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_FOREGROUND, 1, 0x04);
 
 	// text layer
-	m_segaic16vid->segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_TEXT, 0, 0x04);
-	m_segaic16vid->segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_TEXT, 1, 0x08);
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_TEXT, 0, 0x04);
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_TEXT, 1, 0x08);
 
 	// mix in sprites
 	bitmap_ind16 &sprites = m_sprites->bitmap();

@@ -99,51 +99,50 @@ public:
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 
-	UINT8 segaic16_display_enable;
-	UINT16 *segaic16_tileram_0;
-	UINT16 *segaic16_textram_0;
-	UINT16 *segaic16_rotateram_0;
+	UINT8 m_display_enable;
+	optional_shared_ptr<UINT16> m_tileram;
+	optional_shared_ptr<UINT16> m_textram;
+	optional_shared_ptr<UINT16> m_rotateram;
 
-	void segaic16_tilemap_set_colscroll(int which, int enable);
-	void segaic16_tilemap_set_rowscroll(int which, int enable);
-	void segaic16_tilemap_set_flip(int which, int flip);
-	void segaic16_tilemap_set_bank(int which, int banknum, int offset);
-	void segaic16_tilemap_reset(screen_device &screen);
-	void segaic16_tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int map, int priority, int priority_mark);
-//  void segaic16_tilemap_16b_draw_layer(screen_device &screen, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority);
-//  void segaic16_tilemap_16a_draw_layer(screen_device &screen, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority);
-//  void segaic16_draw_virtual_tilemap(screen_device &screen, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 pages, UINT16 xscroll, UINT16 yscroll, UINT32 flags, UINT32 priority);
-//  void segaic16_tilemap_16b_reset(screen_device &screen, struct tilemap_info *info);
+	void tilemap_set_colscroll(int which, int enable);
+	void tilemap_set_rowscroll(int which, int enable);
+	void tilemap_set_flip(int which, int flip);
+	void tilemap_set_bank(int which, int banknum, int offset);
+	void tilemap_reset(screen_device &screen);
+	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int map, int priority, int priority_mark);
+//  void tilemap_16b_draw_layer(screen_device &screen, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority);
+//  void tilemap_16a_draw_layer(screen_device &screen, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority);
+//  void draw_virtual_tilemap(screen_device &screen, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 pages, UINT16 xscroll, UINT16 yscroll, UINT32 flags, UINT32 priority);
+//  void tilemap_16b_reset(screen_device &screen, struct tilemap_info *info);
 
-	TIMER_CALLBACK_MEMBER( segaic16_tilemap_16b_latch_values );
+	TIMER_CALLBACK_MEMBER( tilemap_16b_latch_values );
 
-	struct rotate_info segaic16_rotate[SEGAIC16_MAX_ROTATE];
-	struct tilemap_info bg_tilemap[SEGAIC16_MAX_TILEMAPS];
+	struct rotate_info m_rotate[SEGAIC16_MAX_ROTATE];
+	struct tilemap_info m_bg_tilemap[SEGAIC16_MAX_TILEMAPS];
 
-	void segaic16_set_display_enable(int enable);
-	void segaic16_tilemap_init(running_machine &machine, int which, int type, int colorbase, int xoffs, int numbanks);
-	void segaic16_rotate_init(running_machine &machine, int which, int type, int colorbase);
+	void set_display_enable(int enable);
+	void tilemap_init(int which, int type, int colorbase, int xoffs, int numbanks);
+	void rotate_init(int which, int type, int colorbase);
 
-	DECLARE_READ16_MEMBER( segaic16_tileram_0_r );
-	DECLARE_READ16_MEMBER( segaic16_textram_0_r );
-	DECLARE_WRITE16_MEMBER( segaic16_tileram_0_w );
-	DECLARE_WRITE16_MEMBER( segaic16_textram_0_w );
+	DECLARE_READ16_MEMBER( tileram_r );
+	DECLARE_READ16_MEMBER( textram_r );
+	DECLARE_WRITE16_MEMBER( tileram_w );
+	DECLARE_WRITE16_MEMBER( textram_w );
 
-	void segaic16_rotate_draw(int which, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, bitmap_ind16 &srcbitmap);
+	void rotate_draw(int which, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, bitmap_ind16 &srcbitmap);
 
-	DECLARE_READ16_MEMBER( segaic16_rotate_control_0_r );
+	DECLARE_READ16_MEMBER( rotate_control_r );
 
-	TILE_GET_INFO_MEMBER( segaic16_tilemap_16b_tile_info );
-	TILE_GET_INFO_MEMBER( segaic16_tilemap_16b_text_info );
-	TILE_GET_INFO_MEMBER( segaic16_tilemap_16b_alt_tile_info );
-	TILE_GET_INFO_MEMBER( segaic16_tilemap_16b_alt_text_info );
+	TILE_GET_INFO_MEMBER( tilemap_16b_tile_info );
+	TILE_GET_INFO_MEMBER( tilemap_16b_text_info );
+	TILE_GET_INFO_MEMBER( tilemap_16b_alt_tile_info );
+	TILE_GET_INFO_MEMBER( tilemap_16b_alt_text_info );
 
-	TILE_GET_INFO_MEMBER( segaic16_tilemap_16a_tile_info );
-	TILE_GET_INFO_MEMBER( segaic16_tilemap_16a_text_info );
+	TILE_GET_INFO_MEMBER( tilemap_16a_tile_info );
+	TILE_GET_INFO_MEMBER( tilemap_16a_text_info );
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
