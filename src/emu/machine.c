@@ -256,8 +256,10 @@ void running_machine::start()
 	save().save_item(NAME(m_watchdog_enabled));
 	save().save_item(NAME(m_watchdog_counter));
 	
-	// save the random seed or save states might be broken in drivers that use the rand() method
-	save().save_item(NAME(m_rand_seed));
+	// we should save the random seed or save states might be broken in drivers that use the rand() method
+	// but for the time being we won't, since it would invalidate all the save states from previous MAME versions
+	// to be re-enabled if/when MAME save system becomes more flexible 
+	// save().save_item(NAME(m_rand_seed));
 	
 	// initialize image devices
 	image_init(*this);
