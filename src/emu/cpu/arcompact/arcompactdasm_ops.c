@@ -452,6 +452,10 @@ static const char *regnames[0x40] =
 	u =  ((op & 0x007f) >>0); \
 	op &= ~0x007f; \
 
+#define COMMON16_GET_s9 \
+	s =  ((op & 0x01ff) >>0); \
+	op &= ~0x01ff; \
+
 // registers used in 16-bit opcodes hae a limited range
 // and can only address registers r0-r3 and r12-r15
 
@@ -802,7 +806,11 @@ int arcompact_handle04_helper_dasm(DASM_OPS_32, const char* optext, int ignore_d
 			else
 			{
 				if (ignore_dst == 1) { if (A) output += sprintf(output, "unused(%s)", regnames[A]); }
-				else { if (A != LIMM_REG) output += sprintf(output, "invalid(%s)", regnames[A]); } // mul operations expect A to be set to LIMM (no output)
+				else
+				{
+					if (A != LIMM_REG) output += sprintf(output, "invalid(%s)", regnames[A]);
+					else  output += sprintf(output, "<mulres>");
+				} // mul operations expect A to be set to LIMM (no output)
 			}
 		}
 		else
@@ -816,7 +824,11 @@ int arcompact_handle04_helper_dasm(DASM_OPS_32, const char* optext, int ignore_d
 			else
 			{
 				if (ignore_dst == 1) { if (A) output += sprintf(output, "unused(%s)", regnames[A]); }
-				else { if (A != LIMM_REG) output += sprintf(output, "invalid(%s)", regnames[A]); } // mul operations expect A to be set to LIMM (no output)
+				else
+				{
+					if (A != LIMM_REG) output += sprintf(output, "invalid(%s)", regnames[A]);
+					else  output += sprintf(output, "<mulres>");
+				} // mul operations expect A to be set to LIMM (no output)
 			}
 
 		}
@@ -836,7 +848,11 @@ int arcompact_handle04_helper_dasm(DASM_OPS_32, const char* optext, int ignore_d
 		else
 		{
 			if (ignore_dst == 1) { if (A) output += sprintf(output, "unused(%s)", regnames[A]); }
-			else { if (A != LIMM_REG) output += sprintf(output, "invalid(%s)", regnames[A]); } // mul operations expect A to be set to LIMM (no output)
+			else
+			{
+				if (A != LIMM_REG) output += sprintf(output, "invalid(%s)", regnames[A]);
+				else  output += sprintf(output, "<mulres>");
+			} // mul operations expect A to be set to LIMM (no output)
 		}
 	}
 	else if (p == 2)
@@ -1739,7 +1755,7 @@ int arcompact_handle0f_00_07_07_dasm(DASM_OPS_16)  { print("J_S.D [blink]"); ret
 
 
 
-int arcompact_handle0f_0x_helper_dasm(DASM_OPS_16, const char* optext)
+int arcompact_handle0f_0x_helper_dasm(DASM_OPS_16, const char* optext, int nodst)
 {
 	int breg, creg;
 
@@ -1749,48 +1765,56 @@ int arcompact_handle0f_0x_helper_dasm(DASM_OPS_16, const char* optext)
 	REG_16BIT_RANGE(breg);
 	REG_16BIT_RANGE(creg);
 
+	if (nodst==0) print("%s %s <- %s", optext, regnames[breg], regnames[creg]);
+	else if (nodst==1) print("%s <no dst>, %s, %s", optext, regnames[breg], regnames[creg]);
+	else if (nodst==2) print("%s <mulres>, %s, %s", optext, regnames[breg], regnames[creg]);
 
-	print("%s %s <- %s", optext, regnames[breg], regnames[creg]);
 	return 2;
 }
 
-int arcompact_handle0f_02_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "SUB_S");}
-int arcompact_handle0f_04_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "AND_S");  }
-int arcompact_handle0f_05_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "OR_S");   }
-int arcompact_handle0f_06_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "BIC_S");  }
-int arcompact_handle0f_07_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "XOR_S");  }
-int arcompact_handle0f_0b_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "TST_S");  }
-int arcompact_handle0f_0d_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "SEXB_S"); }
-int arcompact_handle0f_0e_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "SEXW_S"); }
-int arcompact_handle0f_0f_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "EXTB_S"); }
-int arcompact_handle0f_10_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "EXTW_S"); }
-int arcompact_handle0f_11_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "ABS_S");  }
-int arcompact_handle0f_12_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "NOT_S");  }
-int arcompact_handle0f_13_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "NEG_S");  }
-int arcompact_handle0f_14_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "ADD1_S"); }
-int arcompact_handle0f_15_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "ADD2_S"); }
-int arcompact_handle0f_16_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "ADD3_S"); }
-int arcompact_handle0f_18_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "ASL_S");  }
-int arcompact_handle0f_19_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "LSR_S");  }
-int arcompact_handle0f_1a_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "ASR_S");  }
-int arcompact_handle0f_1b_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "ASL1_S"); }
-int arcompact_handle0f_1c_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "ASR1_S"); }
-int arcompact_handle0f_1d_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "LSR1_S"); }
+int arcompact_handle0f_02_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "SUB_S",0);  }
+int arcompact_handle0f_04_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "AND_S",0);  }
+int arcompact_handle0f_05_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "OR_S",0);   }
+int arcompact_handle0f_06_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "BIC_S",0);  }
+int arcompact_handle0f_07_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "XOR_S",0);  }
+int arcompact_handle0f_0b_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "TST_S",1);  }
+int arcompact_handle0f_0c_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "MUL64_S",2);  } // actual destination is special multiply registers
+int arcompact_handle0f_0d_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "SEXB_S",0); }
+int arcompact_handle0f_0e_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "SEXW_S",0); }
+int arcompact_handle0f_0f_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "EXTB_S",0); }
+int arcompact_handle0f_10_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "EXTW_S",0); }
+int arcompact_handle0f_11_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "ABS_S",0);  }
+int arcompact_handle0f_12_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "NOT_S",0);  }
+int arcompact_handle0f_13_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "NEG_S",0);  }
+int arcompact_handle0f_14_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "ADD1_S",0); }
+int arcompact_handle0f_15_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "ADD2_S",0); }
+int arcompact_handle0f_16_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "ADD3_S",0); }
+int arcompact_handle0f_18_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "ASL_S",0);  }
+int arcompact_handle0f_19_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "LSR_S",0);  }
+int arcompact_handle0f_1a_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "ASR_S",0);  }
+int arcompact_handle0f_1b_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "ASL1_S",0); }
+int arcompact_handle0f_1c_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "ASR1_S",0); }
+int arcompact_handle0f_1d_dasm(DASM_OPS_16)  { return arcompact_handle0f_0x_helper_dasm(DASM_PARAMS, "LSR1_S",0); }
 
-int arcompact_handle0f_0c_dasm(DASM_OPS_16)  { print("MUL64_S mulres <- b * c  (%08x)", op); return 2;} // special
-int arcompact_handle0f_1e_dasm(DASM_OPS_16)  { print("TRAP_S (%08x)", op); return 2;} // special
+
+int arcompact_handle0f_1e_dasm(DASM_OPS_16)  // special
+{ // 0111 1uuu uuu1 1110
+	int u = (op & 0x07e0)>>5;
+	print("TRAP_S %02x",u);
+	return 2;
+}
 
 int arcompact_handle0f_1f_dasm(DASM_OPS_16)  // special
 {
-	int bc = (op & 0x07e0)>>5; op &= ~0x07e0;
+	int u = (op & 0x07e0)>>5; op &= ~0x07e0;
 
-	if (bc == 0x003f)
+	if (u == 0x003f)
 	{
 		print("BRK_S");
 	}
 	else
 	{
-		print("<illegal BRK_S>");
+		print("<illegal BRK_S %02x>",u);
 	}
 	return 2;
 }
@@ -2023,14 +2047,43 @@ int arcompact_handle18_07_11_dasm(DASM_OPS_16)
 	return 2;
 }
 
-int arcompact_handle19_00_dasm(DASM_OPS_16)  { print("LD_S r0 <- m[GP + s11].long (%04x)",  op); return 2;}
-int arcompact_handle19_01_dasm(DASM_OPS_16)  { print("LDB_S r0 <- m[GP + s9].byte (%04x)",  op); return 2;}
-int arcompact_handle19_02_dasm(DASM_OPS_16)  { print("LDW_S r0 <- m[GP + s10].word (%04x)",  op); return 2;}
-int arcompact_handle19_03_dasm(DASM_OPS_16)  { print("ADD_S r0 <- GP + s11 (%04x)",  op); return 2;}
+
+int arcompact_handle19_0x_helper_dasm(DASM_OPS_16, const char* optext, int shift, int format)
+{
+	int s;
+
+	COMMON16_GET_s9;
+	// todo, signed
+	s <<= shift;
+
+
+	output  += sprintf( output, "%s %s, ", optext, regnames[0]);
+	if (format == 0)
+	{
+		output  += sprintf( output, "[GP, %03x]", s);
+	}
+	else
+	{
+		output  += sprintf( output, "GP, %03x", s);
+	}
+
+	return 2;
+}
+
+int arcompact_handle19_00_dasm(DASM_OPS_16)  { return arcompact_handle19_0x_helper_dasm(DASM_PARAMS, "LD_S", 2, 0); }
+int arcompact_handle19_01_dasm(DASM_OPS_16)  { return arcompact_handle19_0x_helper_dasm(DASM_PARAMS, "LDB_S", 0, 0); }
+int arcompact_handle19_02_dasm(DASM_OPS_16)  { return arcompact_handle19_0x_helper_dasm(DASM_PARAMS, "LDW_S", 1, 0);  }
+int arcompact_handle19_03_dasm(DASM_OPS_16)  { return arcompact_handle19_0x_helper_dasm(DASM_PARAMS, "ADD_S", 2, 1); }
 
 int arcompact_handle1a_dasm(DASM_OPS_16)
 {
-	print("PCL Instr (%04x)", op);
+	int breg, u;
+	COMMON16_GET_breg;
+	COMMON16_GET_u8;
+	REG_16BIT_RANGE(breg);
+
+	print("MOV_S %s, [PCL, %03x]", regnames[breg], u*4);
+
 	return 2;
 }
 
