@@ -91,8 +91,8 @@ public:
 
 	DECLARE_READ16_MEMBER( genesis_vdp_r ) { return m_vdp->vdp_r(space, offset, mem_mask); }
 	DECLARE_WRITE16_MEMBER( genesis_vdp_w ) { m_vdp->vdp_w(space, offset, data, mem_mask); }
-	DECLARE_WRITE16_MEMBER( sega_tileram_0_w ) { m_segaic16vid->segaic16_tileram_0_w(space, offset, data, mem_mask); }
-	DECLARE_WRITE16_MEMBER( sega_textram_0_w ) { m_segaic16vid->segaic16_textram_0_w(space, offset, data, mem_mask); }
+	DECLARE_WRITE16_MEMBER( tileram_w ) { m_segaic16vid->tileram_w(space, offset, data, mem_mask); }
+	DECLARE_WRITE16_MEMBER( textram_w ) { m_segaic16vid->textram_w(space, offset, data, mem_mask); }
 
 	DECLARE_WRITE_LINE_MEMBER(set_grayscale);
 	DECLARE_WRITE_LINE_MEMBER(set_vdp_enable);
