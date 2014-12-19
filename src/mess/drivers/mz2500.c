@@ -1183,13 +1183,14 @@ WRITE8_MEMBER(mz2500_state::mz2500_irq_data_w)
 WRITE8_MEMBER(mz2500_state::mz2500_fdc_w)
 {
 	mb8877_device *fdc = machine().device<mb8877_device>("mb8877a");
-
+	UINT8 drivenum;
 	switch(offset+0xdc)
 	{
 		case 0xdc:
-			fdc->set_drive(data & 3);
-			floppy_get_device(machine(), data & 3)->floppy_mon_w((data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
-			floppy_get_device(machine(), data & 3)->floppy_drive_set_ready_state(1,0);
+			drivenum = (data & 3) ^ m_fdc_reverse;
+			fdc->set_drive(drivenum);
+			floppy_get_device(machine(), drivenum)->floppy_mon_w((data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+			floppy_get_device(machine(), drivenum)->floppy_drive_set_ready_state(1,0);
 			break;
 		case 0xdd:
 			fdc->set_side((data & 1));
@@ -1267,13 +1268,13 @@ WRITE8_MEMBER(mz2500_state::palette4096_io_w)
 READ8_MEMBER(mz2500_state::mz2500_wd17xx_r)
 {
 	mb8877_device *fdc = machine().device<mb8877_device>("mb8877a");
-	return fdc->read(space, offset) ^ m_fdc_reverse;
+	return fdc->read(space, offset) ^ 0xff;
 }
 
 WRITE8_MEMBER(mz2500_state::mz2500_wd17xx_w)
 {
 	mb8877_device *fdc = machine().device<mb8877_device>("mb8877a");
-	fdc->write(space, offset, data ^ m_fdc_reverse);
+	fdc->write(space, offset, data ^ 0xff);
 }
 
 READ8_MEMBER(mz2500_state::mz2500_bplane_latch_r)
@@ -1982,7 +1983,7 @@ WRITE8_MEMBER(mz2500_state::opn_porta_w)
 	---- --x- floppy reverse bit (controls wd17xx bits in command registers)
 	*/
 
-	m_fdc_reverse = (data & 2) ? 0x00 : 0xff;
+	m_fdc_reverse = data & 2;
 	m_pal_select = (data & 4) ? 1 : 0;
 
 	m_ym_porta = data;
