@@ -37,6 +37,9 @@
 		<bezel name="digit7" element="digit">
 			<bounds x="70" y="0" width="10" height="15" />
 		</bezel>
+		<bezel name="digit8" element="digit">
+			<bounds x="80" y="0" width="10" height="15" />
+		</bezel>
 
 	</view>
 </mamelayout>
