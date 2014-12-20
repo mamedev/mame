@@ -510,4 +510,48 @@
 		</part>
 	</software>
 
+
+	<!-- Clone Systems -->
+
+	<!-- Voltmace Database No. 21 -->
+	<software name="musicmem">
+		<description>Musical Memory</description>
+		<year>19??</year>
+		<publisher>Voltmace?</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<feature name="slot" value="std" />
+			<dataarea name="rom" size="2048">
+				<rom name="musicalmemory.bin" size="2048" crc="d68da80a" sha1="4cf0f74b4a0d3305c9ffa830c067a054fab25419" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Voltmace Database No. 29 -->
+	<software name="ccrab">
+		<description>Crazy Crab</description>
+		<year>19??</year>
+		<publisher>Voltmace?</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<feature name="slot" value="ram1k" />
+			<dataarea name="rom" size="4096">
+				<rom name="d2732c.bin" size="4096" crc="8f3f2e9c" sha1="16b8b896f0f6495b12ae6eb12f452d4817a87f98" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="1024">
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Rowtron T.C.S. No. 1 -->
+	<software name="sportwld">
+		<description>SportsWorld</description>
+		<year>19??</year>
+		<publisher>Rowtron?</publisher>
+		<part name="cart" interface="vc4000_cart">
+			<feature name="slot" value="std" />
+			<dataarea name="rom" size="2048">
+				<rom name="rom.bin" size="2048" crc="682b876a" sha1="ecc0146c40daa79a13934b8884bc8fd0f96461c1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
