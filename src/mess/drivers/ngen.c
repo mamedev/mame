@@ -126,7 +126,7 @@ protected:
 	virtual void machine_reset();
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<i80186_cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<i8251_device> m_viduart;
 	required_device<upd7201_device> m_iouart;
@@ -151,6 +151,19 @@ private:
 	UINT16 m_control;
 };
 
+class ngen386_state : public driver_device
+{
+public:
+	ngen386_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu"),
+		m_pic(*this,"pic")
+		{}
+private:
+	required_device<i386_device> m_maincpu;
+	required_device<pic8259_device> m_pic;
+};
+
 WRITE_LINE_MEMBER(ngen_state::pit_out0_w)
 {
 	m_pic->ir3_w(state);  // Timer interrupt
@@ -168,7 +181,7 @@ WRITE_LINE_MEMBER(ngen_state::pit_out2_w)
 {
 	m_iouart->rxca_w(state);
 	m_iouart->txca_w(state);
-	//logerror("PIT Timer 2 state %i\n",state);
+	popmessage("PIT Timer 2 state %i\n",state);
 }
 
 WRITE_LINE_MEMBER(ngen_state::cpu_timer_w)
@@ -254,20 +267,11 @@ WRITE16_MEMBER(ngen_state::peripheral_w)
 			m_pic->write(space,1,data & 0xff);
 		break;
 	case 0x110:
-		if(mem_mask & 0x00ff)
-			m_pit->write(space,0,data & 0x0ff);
-		break;
 	case 0x111:
-		if(mem_mask & 0x00ff)
-			m_pit->write(space,1,data & 0x0ff);
-		break;
 	case 0x112:
-		if(mem_mask & 0x00ff)
-			m_pit->write(space,2,data & 0x0ff);
-		break;
 	case 0x113:
 		if(mem_mask & 0x00ff)
-			m_pit->write(space,3,data & 0x0ff);
+			m_pit->write(space,offset-0x110,data & 0xff);
 		break;
 	case 0x141:
 		// bit 1 enables speaker?
@@ -329,21 +333,20 @@ READ16_MEMBER(ngen_state::peripheral_r)
 		if(mem_mask & 0x00ff)
 			ret = m_dma_offset[offset-0x80] & 0xff;
 		break;
+	case 0x10c:
+		if(mem_mask & 0x00ff)
+			ret = m_pic->read(space,0);
+		break;
+	case 0x10d:
+		if(mem_mask & 0x00ff)
+			ret = m_pic->read(space,1);
+		break;
 	case 0x110:
-		if(mem_mask & 0x00ff)
-			ret = m_pit->read(space,0);
-		break;
 	case 0x111:
-		if(mem_mask & 0x00ff)
-			ret = m_pit->read(space,1);
-		break;
 	case 0x112:
-		if(mem_mask & 0x00ff)
-			ret = m_pit->read(space,2);
-		break;
 	case 0x113:
 		if(mem_mask & 0x00ff)
-			ret = m_pit->read(space,3);
+			ret = m_pit->read(space,offset-0x110);
 		break;
 	case 0x141:
 		ret = m_periph141;
@@ -367,10 +370,6 @@ READ16_MEMBER(ngen_state::peripheral_r)
 		break;
 	case 0x1a0:  // I/O control register?
 		ret = m_control;  // end of DMA transfer? (maybe a per-channel EOP?) Bit 6 is set during a transfer?
-		break;
-	case 0x1b1:
-		ret = 0;
-		ret |= 0x02;  // also checked after DMA transfer ends
 		break;
 	default:
 		logerror("(PC=%06x) Unknown 80186 peripheral read offset %04x mask %04x returning %04x\n",m_maincpu->device_t::safe_pc(),offset,mem_mask,ret);
@@ -516,6 +515,7 @@ static ADDRESS_MAP_START( ngen_io, AS_IO, 16, ngen_state )
 	AM_RANGE(0x0000, 0x0001) AM_READWRITE(port00_r,port00_w)
 	AM_RANGE(0x0100, 0x0107) AM_DEVREADWRITE8("fdc",wd2797_t,read,write,0x00ff)  // a guess for now
 	AM_RANGE(0x0108, 0x0109) AM_WRITE8(fdc_control_w,0x00ff)
+	AM_RANGE(0x0110, 0x0117) AM_DEVREADWRITE8("fdc_timer",pit8253_device,read,write,0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ngen386_mem, AS_PROGRAM, 32, ngen_state )
@@ -634,17 +634,22 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("maincpu",i80186_cpu_device,drq1_w))
 	MCFG_WD_FDC_FORCE_READY
 	MCFG_DEVICE_ADD("fdc_timer", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_20MHz / 20)
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic",pic8259_device,ir4_w))
+	MCFG_PIT8253_CLK1(XTAL_20MHz / 20)
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pic",pic8259_device,ir4_w))
+	MCFG_PIT8253_CLK2(XTAL_20MHz / 20)
+	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pic",pic8259_device,ir4_w))
 	// TODO: WD1010 HDC (not implemented)
 	MCFG_DEVICE_ADD("hdc_timer", PIT8253, 0)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ngen_floppies, "525qd", floppy_image_device::default_floppy_formats)
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ngen386, ngen )
-	MCFG_CPU_REPLACE("maincpu", I386, XTAL_50MHz / 2)
+static MACHINE_CONFIG_START( ngen386, ngen386_state )
+	MCFG_CPU_ADD("maincpu", I386, XTAL_50MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(ngen386_mem)
 	MCFG_CPU_IO_MAP(ngen386_io)
-	MCFG_DEVICE_REMOVE("pic")
 	MCFG_PIC8259_ADD( "pic", INPUTLINE("maincpu", 0), VCC, NULL )
 MACHINE_CONFIG_END
 
