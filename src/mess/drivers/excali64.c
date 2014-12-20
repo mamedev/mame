@@ -12,18 +12,22 @@ We have Basic 1.1. Other known versions are 1.01, 2.1
 There are 2 versions of the colour prom, which have different palettes.
 We have the later version.
 
-Control W then Enter will switch between 40 and 80 characters per line.
+Notes:
+- Control W then Enter will switch between 40 and 80 characters per line.
+- Control V turns cursor on
+- Graphics commands such as LINE, CIRCLE, HGRCLS, HGRSET etc only work with disk basic
 
 ToDo:
 - Colours are approximate.
-- Disk controller
-- Graphics commands such as LINE and CIRCLE produce a syntax error.
-- Some commands such as HGRCLS are missing from the rom. Perhaps we need a later version?
+- Issues with bitmap graphics
+- Disk controller, works with old wd17xx but crashes on new wd.
+- Hardware supports 8 and 5.25 inch floppies, but we only support 5.25 as this
+  is the only software that exists.
 - The schematic shows the audio counter connected to 2MHz, but this produces
   sounds that are too high. Connected to 1MHz for now.
 - Serial
 - Parallel / Centronics
-- Need software
+- Need more software
 - Pasting can sometimes drop a character.
 
 ****************************************************************************/
@@ -44,6 +48,8 @@ ToDo:
 #include "sound/wave.h"
 #include "sound/speaker.h"
 #include "machine/z80dma.h"
+#include "machine/rescap.h"
+#include "machine/74123.h"
 #if NEWFDC
 #include "machine/wd_fdc.h"
 #include "formats/excali64_dsk.h"
@@ -64,6 +70,7 @@ public:
 		, m_crtc(*this, "crtc")
 		, m_io_keyboard(*this, "KEY")
 		, m_dma(*this, "dma")
+		, m_u12(*this, "u12")
 		, m_fdc(*this, "fdc")
 #if NEWFDC
 		, m_floppy0(*this, "fdc:0")
@@ -92,6 +99,7 @@ public:
 	MC6845_UPDATE_ROW(update_row);
 	DECLARE_WRITE_LINE_MEMBER(crtc_de);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vs);
+	DECLARE_WRITE8_MEMBER(motor_w);
 	DECLARE_MACHINE_RESET(excali64);
 	required_device<palette_device> m_palette;
 	
@@ -103,11 +111,13 @@ private:
 	UINT8 m_kbdrow;
 	bool m_crtc_vs;
 	bool m_crtc_de;
+	bool m_motor;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<mc6845_device> m_crtc;
 	required_ioport_array<8> m_io_keyboard;
 	required_device<z80dma_device> m_dma;
+	required_device<ttl74123_device> m_u12;
 #if NEWFDC
 	required_device<wd2793_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
@@ -256,14 +266,27 @@ static const floppy_interface excali64_floppy_interface =
 };
 #endif
 
+// pulses from port E4 bit 5 restart the 74123. After 3.6 secs without a pulse, the motor gets turned off.
+WRITE8_MEMBER( excali64_state::motor_w )
+{
+	m_motor = BIT(data, 0);
+#if NEWFDC
+	m_floppy0->get_device()->mon_w(!m_motor);
+#else
+	//const char *floppy_tags[4] = { FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3 };
+	legacy_floppy_image_device *flop = subdevice<legacy_floppy_image_device>(FLOPPY_0);
+	flop->floppy_mon_w(!m_motor); // motor on
+	//flop->floppy_drive_set_ready_state(1, 0); // this is commented out in flopdrv.c, so does nothing
+#endif
+}
+
 READ8_MEMBER( excali64_state::porte8_r )
 {
-	return 0xff;
+	return 0xfc | (UINT8)m_motor;
 }
 
 WRITE8_MEMBER( excali64_state::porte4_w )
 {
-//printf("%X ",data);
 #if NEWFDC
 	floppy_image_device *floppy = NULL;
 	if (BIT(data, 0)) floppy = m_floppy0->get_device();
@@ -272,32 +295,24 @@ WRITE8_MEMBER( excali64_state::porte4_w )
 	if (floppy)
 		floppy->ss_w(BIT(data, 4));
 #else
-	UINT8 i;
-	for (i = 0; i < 4; i++)
-	{
-		if BIT(data, i)
-		{
-			m_fdc->set_drive(i);
-			break;
-		}
-	}
-	//if (data & 0x01) m_fdc->set_drive(0);
-	//if (data & 0x02) m_fdc->set_drive(1);
-	//if (data & 0x04) m_fdc->set_drive(2);
-	//if (data & 0x08) m_fdc->set_drive(3);
-	//if (data & 0x10) m_fdc->set_side((data & 0x10) >> 4);
-	const char *floppy_tags[4] = { FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3 };
+	//UINT8 i;
+	//for (i = 0; i < 4; i++)
+	//{
+	//	if BIT(data, i)
+	//	{
+	//		m_fdc->set_drive(i);
+	//		break;
+	//	}
+	//}
+	if BIT(data, 0) m_fdc->set_drive(0);
+	//if BIT(data, 1) m_fdc->set_drive(1);
+	//if BIT(data, 2) m_fdc->set_drive(2);
+	//if BIT(data, 3) m_fdc->set_drive(3);
+	m_fdc->set_side(BIT(data, 4));
 
 	m_fdc->dden_w(1);//!BIT(data, 6)); // we want double density
-	//if ((data & 0x04) == 0) // reset
-	//m_fdc->reset();
-
-	// bit 3 connected to pin 23 "HRDY" of FDC
-	// TEMP HACK, FDD motor and RDY FDC pin controlled by HLD pin of FDC
-	legacy_floppy_image_device *flop = subdevice<legacy_floppy_image_device>(floppy_tags[i]);
-	flop->floppy_mon_w(0); // motor on
-	flop->floppy_drive_set_ready_state(1, 0);
 #endif
+	m_u12->b_w(space,offset, BIT(data, 5));
 }
 
 WRITE8_MEMBER( excali64_state::portec_w )
@@ -624,15 +639,16 @@ static MACHINE_CONFIG_START( excali64, excali64_state )
 	MCFG_CASSETTE_ADD( "cassette" )
 #if NEWFDC
 	MCFG_WD2793x_ADD("fdc", XTAL_16MHz / 16)
+	MCFG_WD_FDC_FORCE_READY
+	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", excali64_floppies, "525dd", floppy_image_device::default_floppy_formats)// excali64_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", excali64_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	//MCFG_FLOPPY_DRIVE_ADD("fdc:1", excali64_floppies, "525dd", floppy_image_device::default_floppy_formats)
 #else
 	MCFG_DEVICE_ADD("fdc", WD2793, 0)
-	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
-	//MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(nascom1_state, nascom2_fdc_intrq_w))
-	//MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(nascom1_state, nascom2_fdc_drq_w))
-	//MCFG_WD17XX_DDEN_CALLBACK(VCC)
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(excali64_floppy_interface)
+	MCFG_WD17XX_DEFAULT_DRIVE1_TAGS
+	MCFG_WD17XX_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))
+	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, excali64_floppy_interface)
+	//MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(excali64_floppy_interface)
 #endif
 	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL_16MHz/4)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(excali64_state, busreq_w))
@@ -640,6 +656,15 @@ static MACHINE_CONFIG_START( excali64, excali64_state )
 	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(excali64_state, memory_write_byte))
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(excali64_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(excali64_state, io_write_byte))
+
+	MCFG_DEVICE_ADD("u12", TTL74123, 0)
+	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_GROUNDED)    /* the hook up type (no idea what this means */
+	MCFG_TTL74123_RESISTOR_VALUE(RES_K(100))               /* resistor connected between RCext & 5v */
+	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(100))               /* capacitor connected between Cext and RCext */
+	MCFG_TTL74123_A_PIN_VALUE(0)                  /* A pin - grounded */
+	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - driven by port e4 bit 5 */
+	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITE8(excali64_state, motor_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */
