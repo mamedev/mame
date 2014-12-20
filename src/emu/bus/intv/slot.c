@@ -263,7 +263,7 @@ int intv_cart_slot_device::load_fullpath()
 		if (temp != (num_segments ^ 0xff))
 			return IMAGE_INIT_FAIL;
 
-		m_cart->rom_alloc(0x10000, tag());
+		m_cart->rom_alloc(0x20000, tag());
 		ROM = (UINT8 *)m_cart->get_rom_base();
 
 		for (int i = 0; i < num_segments; i++)
