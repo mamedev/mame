@@ -101,11 +101,28 @@ $(CPUOBJ)/arc/arc.o:  $(CPUSRC)/arc/arc.c \
 ifneq ($(filter ARCOMPACT,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/arcompact
 CPUOBJS += $(CPUOBJ)/arcompact/arcompact.o
-DASMOBJS += $(CPUOBJ)/arcompact/arcompactdasm.o $(CPUOBJ)/arcompact/arcompactdasm_dispatch.o $(CPUOBJ)/arcompact/arcompactdasm_ops.o
+DASMOBJS += $(CPUOBJ)/arcompact/arcompactdasm.o $(CPUOBJ)/arcompact/arcompactdasm_dispatch.o $(CPUOBJ)/arcompact/arcompactdasm_ops.o $(CPUOBJ)/arcompact/arcompact_execute.o $(CPUOBJ)/arcompact/arcompact_common.o
 endif
 
 $(CPUOBJ)/arcompact/arcompact.o:  $(CPUSRC)/arcompact/arcompact.c \
-			$(CPUSRC)/arcompact/arcompact.h
+			$(CPUSRC)/arcompact/arcompact.h \
+			$(CPUSRC)/arcompact/arcompact_common.h
+
+$(CPUOBJ)/arcompact/arcompact_execute.o:  $(CPUSRC)/arcompact/arcompact_execute.c \
+			$(CPUSRC)/arcompact/arcompact.h \
+			$(CPUSRC)/arcompact/arcompact_common.h
+
+$(CPUOBJ)/arcompact/arcompactdasm_dispatch.o:  $(CPUSRC)/arcompact/arcompactdasm_dispatch.c \
+			$(CPUSRC)/arcompact/arcompactdasm_dispatch.h \
+			$(CPUSRC)/arcompact/arcompact_common.h
+
+$(CPUOBJ)/arcompact/arcompactdasm_ops.o:  $(CPUSRC)/arcompact/arcompactdasm_ops.c \
+			$(CPUSRC)/arcompact/arcompactdasm_ops.h \
+			$(CPUSRC)/arcompact/arcompact_common.h
+
+$(CPUOBJ)/arcompact/arcompact_common.o:  $(CPUSRC)/arcompact/arcompact_common.c \
+			$(CPUSRC)/arcompact/arcompact_common.h
+
 
 #-------------------------------------------------
 # Acorn ARM series
