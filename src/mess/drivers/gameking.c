@@ -121,7 +121,11 @@ void gameking_state::machine_start()
 	astring region_tag;
 	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
 
-	if (!m_cart_rom) printf("No Rom\n");
+	if (!m_cart_rom)
+	{
+		printf("No Rom\n");
+		return;
+	}
 
 	m_bank4000 = membank("bank4000");
 	m_bank8000 = membank("bank8000");
