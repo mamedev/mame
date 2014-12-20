@@ -25,7 +25,7 @@
 ***************************************************************************/
 
 #define SOUND_TIMER_RATE            attotime::from_usec(5)
-#define SOUND_TIMER_BOOST           attotime::from_usec(100)
+#define SOUND_TIMER_BOOST           attotime::from_usec(1000)
 
 
 
