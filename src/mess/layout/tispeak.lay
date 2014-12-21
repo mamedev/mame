@@ -6,18 +6,18 @@
 <!-- note: the TI Speak & Spell 14seg digits look different from MAME's default, most notably the right half is wider -->
 
 	<element name="digit" defstate="0">
-		<led14seg><color red="0.3" green="1.0" blue="0.7" /></led14seg>
+		<led14seg><color red="0.2" green="1.0" blue="0.85" /></led14seg>
 	</element>
 
 <!-- add our own for DP(display point) and the custom AP(apostrophe) segments -->
 
 	<element name="lamp_dp" defstate="0">
-		<disk state="0"><color red="0.0353" green="0.1255" blue="0.0863" /></disk>
-		<disk state="1"><color red="0.3" green="1.0" blue="0.7" /></disk>
+		<disk state="0"><color red="0.0235" green="0.1255" blue="0.1059" /></disk>
+		<disk state="1"><color red="0.2" green="1.0" blue="0.85" /></disk>
 	</element>
 	<element name="lamp_ap" defstate="0">
-		<rect state="0"><color red="0.0353" green="0.1255" blue="0.0863" /></rect>
-		<rect state="1"><color red="0.3" green="1.0" blue="0.7" /></rect>
+		<rect state="0"><color red="0.0235" green="0.1255" blue="0.1059" /></rect>
+		<rect state="1"><color red="0.2" green="1.0" blue="0.85" /></rect>
 	</element>
 
 
