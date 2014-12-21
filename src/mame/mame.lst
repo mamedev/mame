@@ -6887,6 +6887,7 @@ sbrkout         // 033453-033455    1978/09 [6502]
 sbrkoutc        // unrealeased proto
 atarifb         // 033xxx           1978/10 [6502]
 atarifb1        // 033xxx           1978/10 [6502]
+atarifb2		// 035330-035350	???		[6502]
 orbit           // 033689-033702    1978/11 [6800]
 boxer           // ?????? prototype 1978    [6502]
 wolfpack        // ?????? prototype         [6502]
