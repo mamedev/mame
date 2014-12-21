@@ -322,13 +322,14 @@ ROM_START( taiko9 )
 	DISK_IMAGE_READONLY( "tk9100-1-na-dvd0-a", 0, SHA1(6bd40b2c19f30a81689601c3dd46b6dac6d0a2f1) )
 ROM_END
 
+// only known System Super 256 game; if more surface the BIOS should be moved out like 246/256
 ROM_START( timecrs4 )
 	ROM_REGION(0x200000, "bios", 0)
-	SYSTEM256_BIOS	// does Super 256 have a different BIOS?
+	ROM_LOAD( "r27v1602f.8g", 0x000000, 0x200000, CRC(b2a8eeb6) SHA1(bc4fb4e1e53adbd92385f1726bd69663ff870f1e) ) 
 
 	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
-	ROM_LOAD( "tc4.ic002", 0x000000, 0x800000, NO_DUMP )
-	ROM_LOAD( "tc4.spr.ic002", 0x800000, 0x040000, NO_DUMP )
+	ROM_LOAD( "tsf1002-na-a.ic002", 0x000000, 0x800000, CRC(406183a4) SHA1(dd6afaa4808254b277c5969d071f1dd0019633a0) ) 
+	ROM_LOAD( "tsf1002-na-a_spr.ic002", 0x800000, 0x040000, CRC(e7339b66) SHA1(99a2fd5528daf11a7ea548d9de804f899a2a9c6b) ) 
 
 	DISK_REGION("dvd")	// HDD for this game
 	DISK_IMAGE_READONLY( "tsf1-ha", 0, SHA1(8ba7eec0d1add2192a115b295a32265c8d084aea) )
