@@ -19,7 +19,6 @@ Notes:
 
 ToDo:
 - Colours are approximate.
-- Issues with bitmap graphics
 - Disk controller, works with old wd17xx but crashes on new wd.
 - Hardware supports 8 and 5.25 inch floppies, but we only support 5.25 as this
   is the only software that exists.
@@ -97,7 +96,7 @@ public:
 	DECLARE_READ8_MEMBER(io_read_byte);
 	DECLARE_WRITE8_MEMBER(io_write_byte);
 	MC6845_UPDATE_ROW(update_row);
-	DECLARE_WRITE_LINE_MEMBER(crtc_de);
+	DECLARE_WRITE_LINE_MEMBER(crtc_hs);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vs);
 	DECLARE_WRITE8_MEMBER(motor_w);
 	DECLARE_MACHINE_RESET(excali64);
@@ -110,7 +109,7 @@ private:
 	UINT8 m_sys_status;
 	UINT8 m_kbdrow;
 	bool m_crtc_vs;
-	bool m_crtc_de;
+	bool m_crtc_hs;
 	bool m_motor;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
@@ -392,7 +391,8 @@ d5 : rombank
 READ8_MEMBER( excali64_state::port50_r )
 {
 	UINT8 data = m_sys_status & 0x2f;
-	data |= (UINT8)m_crtc_vs << 4;
+	bool csync = m_crtc_hs | m_crtc_vs;
+	data |= (UINT8)csync << 4;
 	return data;
 }
 
@@ -457,9 +457,9 @@ MACHINE_RESET_MEMBER( excali64_state, excali64 )
 	m_maincpu->reset();
 }
 
-WRITE_LINE_MEMBER( excali64_state::crtc_de )
+WRITE_LINE_MEMBER( excali64_state::crtc_hs )
 {
-	m_crtc_de = state;
+	m_crtc_hs = state;
 }
 
 WRITE_LINE_MEMBER( excali64_state::crtc_vs )
@@ -561,8 +561,11 @@ MC6845_UPDATE_ROW( excali64_state::update_row )
 
 		if BIT(col, 0)
 		{
-			UINT16 hires_bank = (m_p_videoram[mem+0x1000] ^ 4) << 24;
-			gfx = m_p_hiresram[hires_bank | (chr<<4) | ra]; // hires definition
+			UINT8 h = m_p_videoram[mem+0x1000] - 4;
+			if (h > 5)
+				h = 0; // keep us in bounds
+			// hires definition - pixels are opposite order to characters
+			gfx = BITSWAP8(m_p_hiresram[(h << 12) | (chr<<4) | ra], 0, 1, 2, 3, 4, 5, 6, 7);
 		}
 		else
 			gfx = m_p_chargen[(chr<<4) | ra]; // normal character
@@ -632,7 +635,7 @@ static MACHINE_CONFIG_START( excali64, excali64_state )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(excali64_state, update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(excali64_state, crtc_de))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(excali64_state, crtc_hs))
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(excali64_state, crtc_vs))
 
 	/* Devices */
