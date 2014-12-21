@@ -505,7 +505,7 @@ int arcompact_handle04_p01_helper_dasm(DASM_OPS_32, const char* optext, int igno
 		if (breg) output += sprintf(output, "reserved(%s), ", regnames[breg]);
 	}
 
-	output += sprintf(output, "U(%02x) ", u);
+	output += sprintf(output, " 0x%02x ", u);
 	if (ignore_dst == 0)
 	{
 		if (areg != LIMM_REG)  output += sprintf(output, "DST(%s)", regnames[areg]);

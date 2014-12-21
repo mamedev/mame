@@ -18,7 +18,7 @@
 
 
 #define ARCOMPACT_HANDLER04_P11_TYPE(name) \
-ARCOMPACT_RETTYPE arcompact_handle##name##_p11(OPS_16) \
+ARCOMPACT_RETTYPE arcompact_handle##name##_p11(OPS_32) \
 { \
 	int M = (op & 0x00000020) >> 5; \
 	 \
@@ -32,7 +32,7 @@ ARCOMPACT_RETTYPE arcompact_handle##name##_p11(OPS_16) \
 }; \
 
 #define ARCOMPACT_HANDLER04_TYPE(name) \
-ARCOMPACT_RETTYPE arcompact_handle##name(OPS_16) \
+ARCOMPACT_RETTYPE arcompact_handle##name(OPS_32) \
 { \
 	int p = (op & 0x00c00000) >> 22; \
 	\
@@ -49,11 +49,11 @@ ARCOMPACT_RETTYPE arcompact_handle##name(OPS_16) \
 
 
 #define ARCOMPACT_HANDLER04_TYPE_PM(name) \
-	ARCOMPACT_RETTYPE arcompact_handle##name##_p00(OPS_16); \
-	ARCOMPACT_RETTYPE arcompact_handle##name##_p01(OPS_16); \
-	ARCOMPACT_RETTYPE arcompact_handle##name##_p10(OPS_16); \
-	ARCOMPACT_RETTYPE arcompact_handle##name##_p11_m0(OPS_16); \
-	ARCOMPACT_RETTYPE arcompact_handle##name##_p11_m1(OPS_16); \
+	ARCOMPACT_RETTYPE arcompact_handle##name##_p00(OPS_32); \
+	ARCOMPACT_RETTYPE arcompact_handle##name##_p01(OPS_32); \
+	ARCOMPACT_RETTYPE arcompact_handle##name##_p10(OPS_32); \
+	ARCOMPACT_RETTYPE arcompact_handle##name##_p11_m0(OPS_32); \
+	ARCOMPACT_RETTYPE arcompact_handle##name##_p11_m1(OPS_32); \
 	ARCOMPACT_HANDLER04_P11_TYPE(name); \
 	ARCOMPACT_HANDLER04_TYPE(name); \
 
@@ -156,7 +156,7 @@ protected:
 	ARCOMPACT_RETTYPE arcompact_handle04_07(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_08(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_09(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_0a(OPS_32);
+//	ARCOMPACT_RETTYPE arcompact_handle04_0a(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_0b(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_0c(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_0d(OPS_32);
@@ -769,6 +769,7 @@ protected:
 
 
 	ARCOMPACT_HANDLER04_TYPE_PM(04_20);
+	ARCOMPACT_HANDLER04_TYPE_PM(04_0a);
 
 
 private:
