@@ -1476,13 +1476,13 @@ int arcompact_handle0e_0x_helper_dasm(DASM_OPS_16, const char* optext, int revop
 		UINT32 limm;
 		GET_LIMM;
 		size = 6;
-		if (!revop) print("%s %s, (%08x) (%04x)", optext, regnames[breg], limm, op);
-		else print("%s (%08x), %s (%04x)", optext, limm, regnames[breg], op);
+		if (!revop) print("%s %s <- 0x%08x", optext, regnames[breg], limm);
+		else print("%s 0x%08x <- %s", optext, limm, regnames[breg]);
 	}
 	else
 	{
-		if (!revop) print("%s %s, %s (%04x)", optext, regnames[breg], regnames[h], op);
-		else print("%s %s, %s (%04x)", optext, regnames[h], regnames[breg], op);
+		if (!revop) print("%s %s <- %s", optext, regnames[breg], regnames[h]);
+		else print("%s %s <- %s", optext, regnames[h], regnames[breg]);
 
 	}
 
@@ -1792,8 +1792,8 @@ int arcompact_handle18_05_01_dasm(DASM_OPS_16)
 // op bits remaining for 0x18_06_xx subgroups 0x0700 
 int arcompact_handle18_06_01_dasm(DASM_OPS_16) 
 {
-	int breg = (op & 0x0700) >> 8;
-	op &= ~0x0700; // all bits now used
+	int breg;
+	COMMON16_GET_breg
 	REG_16BIT_RANGE(breg)
 
 	print("POP_S %s", regnames[breg]);
@@ -1817,8 +1817,8 @@ int arcompact_handle18_06_11_dasm(DASM_OPS_16)
 // op bits remaining for 0x18_07_xx subgroups 0x0700 
 int arcompact_handle18_07_01_dasm(DASM_OPS_16) 
 {
-	int breg = (op & 0x0700) >> 8;
-	op &= ~0x0700; // all bits now used
+	int breg;
+	COMMON16_GET_breg
 	REG_16BIT_RANGE(breg)
 
 	print("PUSH_S %s", regnames[breg]);

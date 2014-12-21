@@ -15,4 +15,5 @@ extern const char *delaybit[0x2];
 extern const char *regnames[0x40];
 extern const char *opcodes_04[0x40];
 
-#define REG_BLINK (0x1f) // 31
+#define REG_BLINK (0x1f) // r31
+#define REG_SP (0x1c) // r28
