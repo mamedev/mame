@@ -1229,61 +1229,94 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle02(OPS_32)
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle03(OPS_32)
 {
 	int size = 4;
-	//UINT32 limm = 0;
+	UINT32 limm = 0;
 	int got_limm = 0; 
-	int S = (op & 0x00008000) >> 15;// op &= ~0x00008000;
-	int s = (op & 0x00ff0000) >> 16;// op &= ~0x00ff0000;
+	int S = (op & 0x00008000) >> 15;
+	int s = (op & 0x00ff0000) >> 16;
 
 	COMMON32_GET_breg;
 	COMMON32_GET_creg;
 
 	if (S) s = -0x100 + s;
 
-//	int R = (op & 0x00000001) >> 0; op &= ~0x00000001; // bit 0 is reserved
-	int Z = (op & 0x00000006) >> 1; op &= ~0x00000006;
-	int a = (op & 0x00000018) >> 3; op &= ~0x00000018;
-//	int D = (op & 0x00000020) >> 5; op &= ~0x00000020; // we don't use the data cache currently
+//	int R = (op & 0x00000001) >> 0; // bit 0 is reserved
+	int Z = (op & 0x00000006) >> 1; 
+	int a = (op & 0x00000018) >> 3; 
+//	int D = (op & 0x00000020) >> 5; // we don't use the data cache currently
+
+
+	UINT32 address = m_regs[breg];
 
 	if (breg == LIMM_REG)
 	{
-		//GET_LIMM_32;
+		GET_LIMM_32;
 		size = 8;
 		got_limm = 1;
+
+		address = limm;
 	}
+
+	UINT32 writedata = m_regs[creg];
 
 	if (creg == LIMM_REG)
 	{
 		if (!got_limm)
 		{
-			//GET_LIMM_32;
+			GET_LIMM_32;
 			size = 8;
 		}
+
+		writedata = limm;
 	}
-	else
+
+	// are LIMM addresses with 's' offset non-0 ('a' mode 0 / 3) legal?
+	// not mentioned in docs..
+
+	// address manipulation
+	if ((a == 0) || (a == 1))
 	{
-
+		address = address + s;
+	}
+	else if (a == 2)
+	{
+		//address = address;
+	}
+	else if (a == 3)
+	{
+		if (Z == 0)
+			address = address + (s << 2);
+		else if (Z==2)
+			address = address + (s << 1);
+		else // Z == 1 and Z == 3 are invalid here
+			arcompact_fatal("illegal ST %08x (data size %d mode %d)", op, Z, a);
 	}
 
+	// write data
 	if (Z == 0)
 	{
-		UINT32 address = m_regs[breg] + s;
-
-		WRITE32(address>>2, m_regs[creg]);
+		WRITE32(address >> 2, writedata);
 	}
 	else if (Z == 1)
 	{
-		arcompact_fatal("illegal ST %08x (data size %d mode %d)", op, Z, a);
+		WRITE8(address >> 0, writedata);
 	}
 	else if (Z == 2)
 	{
-		arcompact_fatal("illegal ST %08x (data size %d mode %d)", op, Z, a);
+		WRITE16(address >> 1, writedata);
 	}
-	else
-	{
+	else if (Z == 3)
+	{ // Z == 3 is always illegal
 		arcompact_fatal("illegal ST %08x (data size %d mode %d)", op, Z, a);
 	}
 
-	// todo, handle 'a' increment modes
+	// writeback / increment
+	if ((a == 1) || (a == 2))
+	{
+		if (breg==limm)
+			arcompact_fatal("illegal ST %08x (data size %d mode %d)", op, Z, a); // using the LIMM as the base register and an increment mode is illegal
+
+		m_regs[breg] = m_regs[breg] + s;
+	}
 
 	return m_pc + (size>>0);
 
@@ -2112,7 +2145,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0b(OPS_32)
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0c_helper(OPS_16, const char* optext)
 {
-	arcompact_log("unimplemented %s %04x", optext, op);
+	arcompact_log("unimplemented %s %04x (0x0c group)", optext, op);
 	return m_pc + (2 >> 0);;
 }
 
@@ -2315,19 +2348,44 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_1f(OPS_16)  // special
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle_ld_helper(OPS_16, const char* optext, int shift, int swap)
 {
-	arcompact_log("unimplemented %s %04x", optext, op);
+	arcompact_log("unimplemented %s %04x (ld/st group %d %d)", optext, op, shift, swap);
 	return m_pc + (2 >> 0);;
 }
 
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle10(OPS_16)
-{
-	return arcompact_handle_ld_helper(PARAMS, "LD_S", 2, 0);
+{ // LD_S c, [b, u7] 
+	int breg, creg, u;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_creg;
+	COMMON16_GET_u5;
+
+	REG_16BIT_RANGE(breg);
+	REG_16BIT_RANGE(creg);
+
+	u <<= 2; // check
+	m_regs[creg] = READ32((m_regs[breg] + u) >> 2);
+
+	return m_pc + (2 >> 0);
 }
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle11(OPS_16)
 {
-	return arcompact_handle_ld_helper(PARAMS, "LDB_S", 0, 0);
+ // LDB_S c, [b, u5] 
+	int breg, creg, u;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_creg;
+	COMMON16_GET_u5;
+
+	REG_16BIT_RANGE(breg);
+	REG_16BIT_RANGE(creg);
+
+//	u <<= 0; // check
+	m_regs[creg] = READ8((m_regs[breg] + u) >> 0);
+
+	return m_pc + (2 >> 0);
 }
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle12(OPS_16)
@@ -2404,7 +2462,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle17_07(OPS_16)
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle18_0x_helper(OPS_16, const char* optext, int st)
 {
-	arcompact_log("unimplemented %s %04x", optext, op);
+	arcompact_log("unimplemented %s %04x (0x18_0x group)", optext, op);
 	return m_pc + (2 >> 0);;
 }
 
@@ -2488,7 +2546,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle18_07_11(OPS_16)
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle19_0x_helper(OPS_16, const char* optext, int shift, int format)
 {
-	arcompact_log("unimplemented %s %04x", optext, op);
+	arcompact_log("unimplemented %s %04x (0x19_0x group)", optext, op);
 	return m_pc + (2 >> 0);;
 }
 

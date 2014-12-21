@@ -788,6 +788,8 @@ private:
 	inline void WRITE32(UINT32 address, UINT32 data) { m_program->write_dword(address << 2, data); }
 	inline UINT16 READ16(UINT32 address) { return m_program->read_word(address << 1); }
 	inline void WRITE16(UINT32 address, UINT16 data){ 	m_program->write_word(address << 1, data); }
+	inline UINT8 READ8(UINT32 address) { return m_program->read_byte(address << 0); }
+	inline void WRITE8(UINT32 address, UINT8 data){ 	m_program->write_byte(address << 0, data); }
 
 	UINT32 m_regs[0x40];
 
