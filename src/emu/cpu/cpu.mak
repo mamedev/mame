@@ -100,8 +100,8 @@ $(CPUOBJ)/arc/arc.o:  $(CPUSRC)/arc/arc.c \
 
 ifneq ($(filter ARCOMPACT,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/arcompact
-CPUOBJS += $(CPUOBJ)/arcompact/arcompact.o
-DASMOBJS += $(CPUOBJ)/arcompact/arcompactdasm.o $(CPUOBJ)/arcompact/arcompactdasm_dispatch.o $(CPUOBJ)/arcompact/arcompactdasm_ops.o $(CPUOBJ)/arcompact/arcompact_execute.o $(CPUOBJ)/arcompact/arcompact_common.o
+CPUOBJS += $(CPUOBJ)/arcompact/arcompact.o $(CPUOBJ)/arcompact/arcompact_execute.o
+DASMOBJS += $(CPUOBJ)/arcompact/arcompactdasm.o $(CPUOBJ)/arcompact/arcompactdasm_dispatch.o $(CPUOBJ)/arcompact/arcompactdasm_ops.o $(CPUOBJ)/arcompact/arcompact_common.o
 endif
 
 $(CPUOBJ)/arcompact/arcompact.o:  $(CPUSRC)/arcompact/arcompact.c \

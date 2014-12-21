@@ -57,6 +57,25 @@ void arcompact_device::execute_run()
 	int B_temp = (op & 0x00007000) >> 12; \
 	int breg = b_temp | (B_temp << 3); \
 
+#define COMMON32_GET_creg \
+	int creg = (op & 0x00000fc0) >> 6; \
+
+#define COMMON32_GET_u6 \
+	int u = (op & 0x00000fc0) >> 6; \
+
+#define COMMON32_GET_areg \
+	int areg = (op & 0x0000003f) >> 0; \
+
+#define COMMON32_GET_areg_reserved \
+	int ares = (op & 0x0000003f) >> 0; \
+
+#define COMMON32_GET_F \
+	int F = (op & 0x00008000) >> 15; \
+
+#define COMMON32_GET_p \
+	int p = (op & 0x00c00000) >> 22; \
+
+
 #define COMMON32_GET_s12 \
 		int S_temp = (op & 0x0000003f) >> 0; \
 		int s_temp = (op & 0x00000fc0) >> 6; \
@@ -118,44 +137,44 @@ ARCOMPACT_RETTYPE arcompact_device::get_insruction(OPS_32)
 
 		switch (instruction) // 32-bit instructions (with optional extra dword for immediate data)
 		{
-			case 0x00: return arcompact_handle00(PARAMS);	break; // Bcc
-			case 0x01: return arcompact_handle01(PARAMS);	break; // BLcc/BRcc
-			case 0x02: return arcompact_handle02(PARAMS);	break; // LD r+o
-			case 0x03: return arcompact_handle03(PARAMS);	break; // ST r+o
-			case 0x04: return arcompact_handle04(PARAMS);	break; // op a,b,c (basecase)
-			case 0x05: return arcompact_handle05(PARAMS);	break; // op a,b,c (05 ARC ext)
-			case 0x06: return arcompact_handle06(PARAMS);	break; // op a,b,c (06 ARC ext)
-			case 0x07: return arcompact_handle07(PARAMS);	break; // op a,b,c (07 User ext)
-			case 0x08: return arcompact_handle08(PARAMS);	break; // op a,b,c (08 User ext)
-			case 0x09: return arcompact_handle09(PARAMS);	break; // op a,b,c (09 Market ext)
-			case 0x0a: return arcompact_handle0a(PARAMS);	break; // op a,b,c (0a Market ext)
-			case 0x0b: return arcompact_handle0b(PARAMS);	break; // op a,b,c (0b Market ext)
+			case 0x00: return arcompact_handle00(PARAMS);	 // Bcc
+			case 0x01: return arcompact_handle01(PARAMS);	 // BLcc/BRcc
+			case 0x02: return arcompact_handle02(PARAMS);	 // LD r+o
+			case 0x03: return arcompact_handle03(PARAMS);	 // ST r+o
+			case 0x04: return arcompact_handle04(PARAMS);	 // op a,b,c (basecase)
+			case 0x05: return arcompact_handle05(PARAMS);	 // op a,b,c (05 ARC ext)
+			case 0x06: return arcompact_handle06(PARAMS);	 // op a,b,c (06 ARC ext)
+			case 0x07: return arcompact_handle07(PARAMS);	 // op a,b,c (07 User ext)
+			case 0x08: return arcompact_handle08(PARAMS);	 // op a,b,c (08 User ext)
+			case 0x09: return arcompact_handle09(PARAMS);	 // op a,b,c (09 Market ext)
+			case 0x0a: return arcompact_handle0a(PARAMS);	 // op a,b,c (0a Market ext)
+			case 0x0b: return arcompact_handle0b(PARAMS);	 // op a,b,c (0b Market ext)
 		}
 	}
 	else
 	{
 		switch (instruction) // 16-bit instructions
 		{
-			case 0x0c: return arcompact_handle0c(PARAMS);	break; // Load/Add reg-reg
-			case 0x0d: return arcompact_handle0d(PARAMS);	break; // Add/Sub/Shft imm
-			case 0x0e: return arcompact_handle0e(PARAMS);	break; // Mov/Cmp/Add
-			case 0x0f: return arcompact_handle0f(PARAMS);	break; // op_S b,b,c (single 16-bit ops)
-			case 0x10: return arcompact_handle10(PARAMS);	break; // LD_S
-			case 0x11: return arcompact_handle11(PARAMS);	break; // LDB_S
-			case 0x12: return arcompact_handle12(PARAMS);	break; // LDW_S
-			case 0x13: return arcompact_handle13(PARAMS);	break; // LSW_S.X
-			case 0x14: return arcompact_handle14(PARAMS);	break; // ST_S
-			case 0x15: return arcompact_handle15(PARAMS);	break; // STB_S
-			case 0x16: return arcompact_handle16(PARAMS);	break; // STW_S
-			case 0x17: return arcompact_handle17(PARAMS);	break; // Shift/Sub/Bit
-			case 0x18: return arcompact_handle18(PARAMS);	break; // Stack Instr
-			case 0x19: return arcompact_handle19(PARAMS);	break; // GP Instr
-			case 0x1a: return arcompact_handle1a(PARAMS);	break; // PCL Instr
-			case 0x1b: return arcompact_handle1b(PARAMS);	break; // MOV_S
-			case 0x1c: return arcompact_handle1c(PARAMS);	break; // ADD_S/CMP_S
-			case 0x1d: return arcompact_handle1d(PARAMS);	break; // BRcc_S
-			case 0x1e: return arcompact_handle1e(PARAMS);	break; // Bcc_S
-			case 0x1f: return arcompact_handle1f(PARAMS);	break; // BL_S
+			case 0x0c: return arcompact_handle0c(PARAMS);	 // Load/Add reg-reg
+			case 0x0d: return arcompact_handle0d(PARAMS);	 // Add/Sub/Shft imm
+			case 0x0e: return arcompact_handle0e(PARAMS);	 // Mov/Cmp/Add
+			case 0x0f: return arcompact_handle0f(PARAMS);	 // op_S b,b,c (single 16-bit ops)
+			case 0x10: return arcompact_handle10(PARAMS);	 // LD_S
+			case 0x11: return arcompact_handle11(PARAMS);	 // LDB_S
+			case 0x12: return arcompact_handle12(PARAMS);	 // LDW_S
+			case 0x13: return arcompact_handle13(PARAMS);	 // LSW_S.X
+			case 0x14: return arcompact_handle14(PARAMS);	 // ST_S
+			case 0x15: return arcompact_handle15(PARAMS);	 // STB_S
+			case 0x16: return arcompact_handle16(PARAMS);	 // STW_S
+			case 0x17: return arcompact_handle17(PARAMS);	 // Shift/Sub/Bit
+			case 0x18: return arcompact_handle18(PARAMS);	 // Stack Instr
+			case 0x19: return arcompact_handle19(PARAMS);	 // GP Instr
+			case 0x1a: return arcompact_handle1a(PARAMS);	 // PCL Instr
+			case 0x1b: return arcompact_handle1b(PARAMS);	 // MOV_S
+			case 0x1c: return arcompact_handle1c(PARAMS);	 // ADD_S/CMP_S
+			case 0x1d: return arcompact_handle1d(PARAMS);	 // BRcc_S
+			case 0x1e: return arcompact_handle1e(PARAMS);	 // Bcc_S
+			case 0x1f: return arcompact_handle1f(PARAMS);	 // BL_S
 		}
 	}
 
@@ -168,8 +187,8 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle00(OPS_32)
 
 	switch (subinstr)
 	{
-		case 0x00: return arcompact_handle00_00(PARAMS); break; // Branch Conditionally
-		case 0x01: return arcompact_handle00_01(PARAMS); break; // Branch Unconditionally Far
+		case 0x00: return arcompact_handle00_00(PARAMS);  // Branch Conditionally
+		case 0x01: return arcompact_handle00_01(PARAMS);  // Branch Unconditionally Far
 	}
 
 	return 0;
@@ -181,8 +200,8 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle01(OPS_32)
 
 	switch (subinstr)
 	{
-		case 0x00: return arcompact_handle01_00(PARAMS); break; // Branh & Link
-		case 0x01: return arcompact_handle01_01(PARAMS); break; // Branch on Compare
+		case 0x00: return arcompact_handle01_00(PARAMS);  // Branh & Link
+		case 0x01: return arcompact_handle01_01(PARAMS);  // Branch on Compare
 	}
 
 	return 0;
@@ -194,8 +213,8 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle01_00(OPS_32)
 
 	switch (subinstr2)
 	{
-		case 0x00: return arcompact_handle01_00_00dasm(PARAMS); break; // Branch and Link Conditionally
-		case 0x01: return arcompact_handle01_00_01dasm(PARAMS); break; // Branch and Link Unconditional Far
+		case 0x00: return arcompact_handle01_00_00dasm(PARAMS);  // Branch and Link Conditionally
+		case 0x01: return arcompact_handle01_00_01dasm(PARAMS);  // Branch and Link Unconditional Far
 	}
 
 	return 0;
@@ -207,8 +226,8 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle01_01(OPS_32)
 
 	switch (subinstr2)
 	{
-		case 0x00: return arcompact_handle01_01_00(PARAMS); break; // Branch on Compare Register-Register
-		case 0x01: return arcompact_handle01_01_01(PARAMS); break; // Branch on Compare/Bit Test Register-Immediate
+		case 0x00: return arcompact_handle01_01_00(PARAMS);  // Branch on Compare Register-Register
+		case 0x01: return arcompact_handle01_01_01(PARAMS);  // Branch on Compare/Bit Test Register-Immediate
 	}
 
 	return 0;
@@ -220,22 +239,22 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle01_01_00(OPS_32)
 
 	switch (subinstr3)
 	{
-		case 0x00: return arcompact_handle01_01_00_00(PARAMS); break; // BREQ (reg-reg)
-		case 0x01: return arcompact_handle01_01_00_01(PARAMS); break; // BRNE (reg-reg)
-		case 0x02: return arcompact_handle01_01_00_02(PARAMS); break; // BRLT (reg-reg)
-		case 0x03: return arcompact_handle01_01_00_03(PARAMS); break; // BRGE (reg-reg)
-		case 0x04: return arcompact_handle01_01_00_04(PARAMS); break; // BRLO (reg-reg)
-		case 0x05: return arcompact_handle01_01_00_05(PARAMS); break; // BRHS (reg-reg)
-		case 0x06: return arcompact_handle01_01_00_06(PARAMS); break; // reserved
-		case 0x07: return arcompact_handle01_01_00_07(PARAMS); break; // reserved
-		case 0x08: return arcompact_handle01_01_00_08(PARAMS); break; // reserved
-		case 0x09: return arcompact_handle01_01_00_09(PARAMS); break; // reserved
-		case 0x0a: return arcompact_handle01_01_00_0a(PARAMS); break; // reserved
-		case 0x0b: return arcompact_handle01_01_00_0b(PARAMS); break; // reserved
-		case 0x0c: return arcompact_handle01_01_00_0c(PARAMS); break; // reserved
-		case 0x0d: return arcompact_handle01_01_00_0d(PARAMS); break; // reserved
-		case 0x0e: return arcompact_handle01_01_00_0e(PARAMS); break; // BBIT0 (reg-reg)
-		case 0x0f: return arcompact_handle01_01_00_0f(PARAMS); break; // BBIT1 (reg-reg)
+		case 0x00: return arcompact_handle01_01_00_00(PARAMS);  // BREQ (reg-reg)
+		case 0x01: return arcompact_handle01_01_00_01(PARAMS);  // BRNE (reg-reg)
+		case 0x02: return arcompact_handle01_01_00_02(PARAMS);  // BRLT (reg-reg)
+		case 0x03: return arcompact_handle01_01_00_03(PARAMS);  // BRGE (reg-reg)
+		case 0x04: return arcompact_handle01_01_00_04(PARAMS);  // BRLO (reg-reg)
+		case 0x05: return arcompact_handle01_01_00_05(PARAMS);  // BRHS (reg-reg)
+		case 0x06: return arcompact_handle01_01_00_06(PARAMS);  // reserved
+		case 0x07: return arcompact_handle01_01_00_07(PARAMS);  // reserved
+		case 0x08: return arcompact_handle01_01_00_08(PARAMS);  // reserved
+		case 0x09: return arcompact_handle01_01_00_09(PARAMS);  // reserved
+		case 0x0a: return arcompact_handle01_01_00_0a(PARAMS);  // reserved
+		case 0x0b: return arcompact_handle01_01_00_0b(PARAMS);  // reserved
+		case 0x0c: return arcompact_handle01_01_00_0c(PARAMS);  // reserved
+		case 0x0d: return arcompact_handle01_01_00_0d(PARAMS);  // reserved
+		case 0x0e: return arcompact_handle01_01_00_0e(PARAMS);  // BBIT0 (reg-reg)
+		case 0x0f: return arcompact_handle01_01_00_0f(PARAMS);  // BBIT1 (reg-reg)
 	}
 
 	return 0;
@@ -247,22 +266,22 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle01_01_01(OPS_32) //  Branch 
 
 	switch (subinstr3)
 	{
-		case 0x00: return arcompact_handle01_01_01_00(PARAMS); break; // BREQ (reg-imm)
-		case 0x01: return arcompact_handle01_01_01_01(PARAMS); break; // BRNE (reg-imm)
-		case 0x02: return arcompact_handle01_01_01_02(PARAMS); break; // BRLT (reg-imm)
-		case 0x03: return arcompact_handle01_01_01_03(PARAMS); break; // BRGE (reg-imm)
-		case 0x04: return arcompact_handle01_01_01_04(PARAMS); break; // BRLO (reg-imm)
-		case 0x05: return arcompact_handle01_01_01_05(PARAMS); break; // BRHS (reg-imm)
-		case 0x06: return arcompact_handle01_01_01_06(PARAMS); break; // reserved
-		case 0x07: return arcompact_handle01_01_01_07(PARAMS); break; // reserved
-		case 0x08: return arcompact_handle01_01_01_08(PARAMS); break; // reserved
-		case 0x09: return arcompact_handle01_01_01_09(PARAMS); break; // reserved
-		case 0x0a: return arcompact_handle01_01_01_0a(PARAMS); break; // reserved
-		case 0x0b: return arcompact_handle01_01_01_0b(PARAMS); break; // reserved
-		case 0x0c: return arcompact_handle01_01_01_0c(PARAMS); break; // reserved
-		case 0x0d: return arcompact_handle01_01_01_0d(PARAMS); break; // reserved
-		case 0x0e: return arcompact_handle01_01_01_0e(PARAMS); break; // BBIT0 (reg-imm)
-		case 0x0f: return arcompact_handle01_01_01_0f(PARAMS); break; // BBIT1 (reg-imm)
+		case 0x00: return arcompact_handle01_01_01_00(PARAMS);  // BREQ (reg-imm)
+		case 0x01: return arcompact_handle01_01_01_01(PARAMS);  // BRNE (reg-imm)
+		case 0x02: return arcompact_handle01_01_01_02(PARAMS);  // BRLT (reg-imm)
+		case 0x03: return arcompact_handle01_01_01_03(PARAMS);  // BRGE (reg-imm)
+		case 0x04: return arcompact_handle01_01_01_04(PARAMS);  // BRLO (reg-imm)
+		case 0x05: return arcompact_handle01_01_01_05(PARAMS);  // BRHS (reg-imm)
+		case 0x06: return arcompact_handle01_01_01_06(PARAMS);  // reserved
+		case 0x07: return arcompact_handle01_01_01_07(PARAMS);  // reserved
+		case 0x08: return arcompact_handle01_01_01_08(PARAMS);  // reserved
+		case 0x09: return arcompact_handle01_01_01_09(PARAMS);  // reserved
+		case 0x0a: return arcompact_handle01_01_01_0a(PARAMS);  // reserved
+		case 0x0b: return arcompact_handle01_01_01_0b(PARAMS);  // reserved
+		case 0x0c: return arcompact_handle01_01_01_0c(PARAMS);  // reserved
+		case 0x0d: return arcompact_handle01_01_01_0d(PARAMS);  // reserved
+		case 0x0e: return arcompact_handle01_01_01_0e(PARAMS);  // BBIT0 (reg-imm)
+		case 0x0f: return arcompact_handle01_01_01_0f(PARAMS);  // BBIT1 (reg-imm)
 	}
 
 	return 0;
@@ -274,70 +293,70 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04(OPS_32)
 
 	switch (subinstr)
 	{
-		case 0x00: return arcompact_handle04_00(PARAMS); break; // ADD
-		case 0x01: return arcompact_handle04_01(PARAMS); break; // ADC
-		case 0x02: return arcompact_handle04_02(PARAMS); break; // SUB
-		case 0x03: return arcompact_handle04_03(PARAMS); break; // SBC
-		case 0x04: return arcompact_handle04_04(PARAMS); break; // AND
-		case 0x05: return arcompact_handle04_05(PARAMS); break; // OR
-		case 0x06: return arcompact_handle04_06(PARAMS); break; // BIC
-		case 0x07: return arcompact_handle04_07(PARAMS); break; // XOR
-		case 0x08: return arcompact_handle04_08(PARAMS); break; // MAX
-		case 0x09: return arcompact_handle04_09(PARAMS); break; // MIN
-		case 0x0a: return arcompact_handle04_0a(PARAMS); break; // MOV
-		case 0x0b: return arcompact_handle04_0b(PARAMS); break; // TST
-		case 0x0c: return arcompact_handle04_0c(PARAMS); break; // CMP
-		case 0x0d: return arcompact_handle04_0d(PARAMS); break; // RCMP
-		case 0x0e: return arcompact_handle04_0e(PARAMS); break; // RSUB
-		case 0x0f: return arcompact_handle04_0f(PARAMS); break; // BSET
-		case 0x10: return arcompact_handle04_10(PARAMS); break; // BCLR
-		case 0x11: return arcompact_handle04_11(PARAMS); break; // BTST
-		case 0x12: return arcompact_handle04_12(PARAMS); break; // BXOR
-		case 0x13: return arcompact_handle04_13(PARAMS); break; // BMSK
-		case 0x14: return arcompact_handle04_14(PARAMS); break; // ADD1
-		case 0x15: return arcompact_handle04_15(PARAMS); break; // ADD2
-		case 0x16: return arcompact_handle04_16(PARAMS); break; // ADD3
-		case 0x17: return arcompact_handle04_17(PARAMS); break; // SUB1
-		case 0x18: return arcompact_handle04_18(PARAMS); break; // SUB2
-		case 0x19: return arcompact_handle04_19(PARAMS); break; // SUB3
-		case 0x1a: return arcompact_handle04_1a(PARAMS); break; // MPY *
-		case 0x1b: return arcompact_handle04_1b(PARAMS); break; // MPYH *
-		case 0x1c: return arcompact_handle04_1c(PARAMS); break; // MPYHU *
-		case 0x1d: return arcompact_handle04_1d(PARAMS); break; // MPYU *
-		case 0x1e: return arcompact_handle04_1e(PARAMS); break; // illegal
-		case 0x1f: return arcompact_handle04_1f(PARAMS); break; // illegal
-		case 0x20: return arcompact_handle04_20(PARAMS); break; // Jcc
-		case 0x21: return arcompact_handle04_21(PARAMS); break; // Jcc.D
-		case 0x22: return arcompact_handle04_22(PARAMS); break; // JLcc
-		case 0x23: return arcompact_handle04_23(PARAMS); break; // JLcc.D
-		case 0x24: return arcompact_handle04_24(PARAMS); break; // illegal
-		case 0x25: return arcompact_handle04_25(PARAMS); break; // illegal
-		case 0x26: return arcompact_handle04_26(PARAMS); break; // illegal
-		case 0x27: return arcompact_handle04_27(PARAMS); break; // illegal
-		case 0x28: return arcompact_handle04_28(PARAMS); break; // LPcc
-		case 0x29: return arcompact_handle04_29(PARAMS); break; // FLAG
-		case 0x2a: return arcompact_handle04_2a(PARAMS); break; // LR
-		case 0x2b: return arcompact_handle04_2b(PARAMS); break; // SR
-		case 0x2c: return arcompact_handle04_2c(PARAMS); break; // illegal
-		case 0x2d: return arcompact_handle04_2d(PARAMS); break; // illegal
-		case 0x2e: return arcompact_handle04_2e(PARAMS); break; // illegal
-		case 0x2f: return arcompact_handle04_2f(PARAMS); break; // Sub Opcode
-		case 0x30: return arcompact_handle04_30(PARAMS); break; // LD r-r
-		case 0x31: return arcompact_handle04_31(PARAMS); break; // LD r-r
-		case 0x32: return arcompact_handle04_32(PARAMS); break; // LD r-r
-		case 0x33: return arcompact_handle04_33(PARAMS); break; // LD r-r
-		case 0x34: return arcompact_handle04_34(PARAMS); break; // LD r-r
-		case 0x35: return arcompact_handle04_35(PARAMS); break; // LD r-r
-		case 0x36: return arcompact_handle04_36(PARAMS); break; // LD r-r
-		case 0x37: return arcompact_handle04_37(PARAMS); break; // LD r-r
-		case 0x38: return arcompact_handle04_38(PARAMS); break; // illegal
-		case 0x39: return arcompact_handle04_39(PARAMS); break; // illegal
-		case 0x3a: return arcompact_handle04_3a(PARAMS); break; // illegal
-		case 0x3b: return arcompact_handle04_3b(PARAMS); break; // illegal
-		case 0x3c: return arcompact_handle04_3c(PARAMS); break; // illegal
-		case 0x3d: return arcompact_handle04_3d(PARAMS); break; // illegal
-		case 0x3e: return arcompact_handle04_3e(PARAMS); break; // illegal
-		case 0x3f: return arcompact_handle04_3f(PARAMS); break; // illegal
+		case 0x00: return arcompact_handle04_00(PARAMS);  // ADD
+		case 0x01: return arcompact_handle04_01(PARAMS);  // ADC
+		case 0x02: return arcompact_handle04_02(PARAMS);  // SUB
+		case 0x03: return arcompact_handle04_03(PARAMS);  // SBC
+		case 0x04: return arcompact_handle04_04(PARAMS);  // AND
+		case 0x05: return arcompact_handle04_05(PARAMS);  // OR
+		case 0x06: return arcompact_handle04_06(PARAMS);  // BIC
+		case 0x07: return arcompact_handle04_07(PARAMS);  // XOR
+		case 0x08: return arcompact_handle04_08(PARAMS);  // MAX
+		case 0x09: return arcompact_handle04_09(PARAMS);  // MIN
+		case 0x0a: return arcompact_handle04_0a(PARAMS);  // MOV
+		case 0x0b: return arcompact_handle04_0b(PARAMS);  // TST
+		case 0x0c: return arcompact_handle04_0c(PARAMS);  // CMP
+		case 0x0d: return arcompact_handle04_0d(PARAMS);  // RCMP
+		case 0x0e: return arcompact_handle04_0e(PARAMS);  // RSUB
+		case 0x0f: return arcompact_handle04_0f(PARAMS);  // BSET
+		case 0x10: return arcompact_handle04_10(PARAMS);  // BCLR
+		case 0x11: return arcompact_handle04_11(PARAMS);  // BTST
+		case 0x12: return arcompact_handle04_12(PARAMS);  // BXOR
+		case 0x13: return arcompact_handle04_13(PARAMS);  // BMSK
+		case 0x14: return arcompact_handle04_14(PARAMS);  // ADD1
+		case 0x15: return arcompact_handle04_15(PARAMS);  // ADD2
+		case 0x16: return arcompact_handle04_16(PARAMS);  // ADD3
+		case 0x17: return arcompact_handle04_17(PARAMS);  // SUB1
+		case 0x18: return arcompact_handle04_18(PARAMS);  // SUB2
+		case 0x19: return arcompact_handle04_19(PARAMS);  // SUB3
+		case 0x1a: return arcompact_handle04_1a(PARAMS);  // MPY *
+		case 0x1b: return arcompact_handle04_1b(PARAMS);  // MPYH *
+		case 0x1c: return arcompact_handle04_1c(PARAMS);  // MPYHU *
+		case 0x1d: return arcompact_handle04_1d(PARAMS);  // MPYU *
+		case 0x1e: return arcompact_handle04_1e(PARAMS);  // illegal
+		case 0x1f: return arcompact_handle04_1f(PARAMS);  // illegal
+		case 0x20: return arcompact_handle04_20(PARAMS);  // Jcc
+		case 0x21: return arcompact_handle04_21(PARAMS);  // Jcc.D
+		case 0x22: return arcompact_handle04_22(PARAMS);  // JLcc
+		case 0x23: return arcompact_handle04_23(PARAMS);  // JLcc.D
+		case 0x24: return arcompact_handle04_24(PARAMS);  // illegal
+		case 0x25: return arcompact_handle04_25(PARAMS);  // illegal
+		case 0x26: return arcompact_handle04_26(PARAMS);  // illegal
+		case 0x27: return arcompact_handle04_27(PARAMS);  // illegal
+		case 0x28: return arcompact_handle04_28(PARAMS);  // LPcc
+		case 0x29: return arcompact_handle04_29(PARAMS);  // FLAG
+		case 0x2a: return arcompact_handle04_2a(PARAMS);  // LR
+		case 0x2b: return arcompact_handle04_2b(PARAMS);  // SR
+		case 0x2c: return arcompact_handle04_2c(PARAMS);  // illegal
+		case 0x2d: return arcompact_handle04_2d(PARAMS);  // illegal
+		case 0x2e: return arcompact_handle04_2e(PARAMS);  // illegal
+		case 0x2f: return arcompact_handle04_2f(PARAMS);  // Sub Opcode
+		case 0x30: return arcompact_handle04_30(PARAMS);  // LD r-r
+		case 0x31: return arcompact_handle04_31(PARAMS);  // LD r-r
+		case 0x32: return arcompact_handle04_32(PARAMS);  // LD r-r
+		case 0x33: return arcompact_handle04_33(PARAMS);  // LD r-r
+		case 0x34: return arcompact_handle04_34(PARAMS);  // LD r-r
+		case 0x35: return arcompact_handle04_35(PARAMS);  // LD r-r
+		case 0x36: return arcompact_handle04_36(PARAMS);  // LD r-r
+		case 0x37: return arcompact_handle04_37(PARAMS);  // LD r-r
+		case 0x38: return arcompact_handle04_38(PARAMS);  // illegal
+		case 0x39: return arcompact_handle04_39(PARAMS);  // illegal
+		case 0x3a: return arcompact_handle04_3a(PARAMS);  // illegal
+		case 0x3b: return arcompact_handle04_3b(PARAMS);  // illegal
+		case 0x3c: return arcompact_handle04_3c(PARAMS);  // illegal
+		case 0x3d: return arcompact_handle04_3d(PARAMS);  // illegal
+		case 0x3e: return arcompact_handle04_3e(PARAMS);  // illegal
+		case 0x3f: return arcompact_handle04_3f(PARAMS);  // illegal
 	}
 
 	return 0;
@@ -349,70 +368,70 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f(OPS_32)
 
 	switch (subinstr2)
 	{
-		case 0x00: return arcompact_handle04_2f_00(PARAMS); break; // ASL
-		case 0x01: return arcompact_handle04_2f_01(PARAMS); break; // ASR
-		case 0x02: return arcompact_handle04_2f_02(PARAMS); break; // LSR
-		case 0x03: return arcompact_handle04_2f_03(PARAMS); break; // ROR
-		case 0x04: return arcompact_handle04_2f_04(PARAMS); break; // RCC
-		case 0x05: return arcompact_handle04_2f_05(PARAMS); break; // SEXB
-		case 0x06: return arcompact_handle04_2f_06(PARAMS); break; // SEXW
-		case 0x07: return arcompact_handle04_2f_07(PARAMS); break; // EXTB
-		case 0x08: return arcompact_handle04_2f_08(PARAMS); break; // EXTW
-		case 0x09: return arcompact_handle04_2f_09(PARAMS); break; // ABS
-		case 0x0a: return arcompact_handle04_2f_0a(PARAMS); break; // NOT
-		case 0x0b: return arcompact_handle04_2f_0b(PARAMS); break; // RLC
-		case 0x0c: return arcompact_handle04_2f_0c(PARAMS); break; // EX
-		case 0x0d: return arcompact_handle04_2f_0d(PARAMS); break; // illegal
-		case 0x0e: return arcompact_handle04_2f_0e(PARAMS); break; // illegal
-		case 0x0f: return arcompact_handle04_2f_0f(PARAMS); break; // illegal
-		case 0x10: return arcompact_handle04_2f_10(PARAMS); break; // illegal
-		case 0x11: return arcompact_handle04_2f_11(PARAMS); break; // illegal
-		case 0x12: return arcompact_handle04_2f_12(PARAMS); break; // illegal
-		case 0x13: return arcompact_handle04_2f_13(PARAMS); break; // illegal
-		case 0x14: return arcompact_handle04_2f_14(PARAMS); break; // illegal
-		case 0x15: return arcompact_handle04_2f_15(PARAMS); break; // illegal
-		case 0x16: return arcompact_handle04_2f_16(PARAMS); break; // illegal
-		case 0x17: return arcompact_handle04_2f_17(PARAMS); break; // illegal
-		case 0x18: return arcompact_handle04_2f_18(PARAMS); break; // illegal
-		case 0x19: return arcompact_handle04_2f_19(PARAMS); break; // illegal
-		case 0x1a: return arcompact_handle04_2f_1a(PARAMS); break; // illegal
-		case 0x1b: return arcompact_handle04_2f_1b(PARAMS); break; // illegal
-		case 0x1c: return arcompact_handle04_2f_1c(PARAMS); break; // illegal
-		case 0x1d: return arcompact_handle04_2f_1d(PARAMS); break; // illegal
-		case 0x1e: return arcompact_handle04_2f_1e(PARAMS); break; // illegal
-		case 0x1f: return arcompact_handle04_2f_1f(PARAMS); break; // illegal
-		case 0x20: return arcompact_handle04_2f_20(PARAMS); break; // illegal
-		case 0x21: return arcompact_handle04_2f_21(PARAMS); break; // illegal
-		case 0x22: return arcompact_handle04_2f_22(PARAMS); break; // illegal
-		case 0x23: return arcompact_handle04_2f_23(PARAMS); break; // illegal
-		case 0x24: return arcompact_handle04_2f_24(PARAMS); break; // illegal
-		case 0x25: return arcompact_handle04_2f_25(PARAMS); break; // illegal
-		case 0x26: return arcompact_handle04_2f_26(PARAMS); break; // illegal
-		case 0x27: return arcompact_handle04_2f_27(PARAMS); break; // illegal
-		case 0x28: return arcompact_handle04_2f_28(PARAMS); break; // illegal
-		case 0x29: return arcompact_handle04_2f_29(PARAMS); break; // illegal
-		case 0x2a: return arcompact_handle04_2f_2a(PARAMS); break; // illegal
-		case 0x2b: return arcompact_handle04_2f_2b(PARAMS); break; // illegal
-		case 0x2c: return arcompact_handle04_2f_2c(PARAMS); break; // illegal
-		case 0x2d: return arcompact_handle04_2f_2d(PARAMS); break; // illegal
-		case 0x2e: return arcompact_handle04_2f_2e(PARAMS); break; // illegal
-		case 0x2f: return arcompact_handle04_2f_2f(PARAMS); break; // illegal
-		case 0x30: return arcompact_handle04_2f_30(PARAMS); break; // illegal
-		case 0x31: return arcompact_handle04_2f_31(PARAMS); break; // illegal
-		case 0x32: return arcompact_handle04_2f_32(PARAMS); break; // illegal
-		case 0x33: return arcompact_handle04_2f_33(PARAMS); break; // illegal
-		case 0x34: return arcompact_handle04_2f_34(PARAMS); break; // illegal
-		case 0x35: return arcompact_handle04_2f_35(PARAMS); break; // illegal
-		case 0x36: return arcompact_handle04_2f_36(PARAMS); break; // illegal
-		case 0x37: return arcompact_handle04_2f_37(PARAMS); break; // illegal
-		case 0x38: return arcompact_handle04_2f_38(PARAMS); break; // illegal
-		case 0x39: return arcompact_handle04_2f_39(PARAMS); break; // illegal
-		case 0x3a: return arcompact_handle04_2f_3a(PARAMS); break; // illegal
-		case 0x3b: return arcompact_handle04_2f_3b(PARAMS); break; // illegal
-		case 0x3c: return arcompact_handle04_2f_3c(PARAMS); break; // illegal
-		case 0x3d: return arcompact_handle04_2f_3d(PARAMS); break; // illegal
-		case 0x3e: return arcompact_handle04_2f_3e(PARAMS); break; // illegal
-		case 0x3f: return arcompact_handle04_2f_3f(PARAMS); break; // ZOPs (Zero Operand Opcodes)
+		case 0x00: return arcompact_handle04_2f_00(PARAMS);  // ASL
+		case 0x01: return arcompact_handle04_2f_01(PARAMS);  // ASR
+		case 0x02: return arcompact_handle04_2f_02(PARAMS);  // LSR
+		case 0x03: return arcompact_handle04_2f_03(PARAMS);  // ROR
+		case 0x04: return arcompact_handle04_2f_04(PARAMS);  // RCC
+		case 0x05: return arcompact_handle04_2f_05(PARAMS);  // SEXB
+		case 0x06: return arcompact_handle04_2f_06(PARAMS);  // SEXW
+		case 0x07: return arcompact_handle04_2f_07(PARAMS);  // EXTB
+		case 0x08: return arcompact_handle04_2f_08(PARAMS);  // EXTW
+		case 0x09: return arcompact_handle04_2f_09(PARAMS);  // ABS
+		case 0x0a: return arcompact_handle04_2f_0a(PARAMS);  // NOT
+		case 0x0b: return arcompact_handle04_2f_0b(PARAMS);  // RLC
+		case 0x0c: return arcompact_handle04_2f_0c(PARAMS);  // EX
+		case 0x0d: return arcompact_handle04_2f_0d(PARAMS);  // illegal
+		case 0x0e: return arcompact_handle04_2f_0e(PARAMS);  // illegal
+		case 0x0f: return arcompact_handle04_2f_0f(PARAMS);  // illegal
+		case 0x10: return arcompact_handle04_2f_10(PARAMS);  // illegal
+		case 0x11: return arcompact_handle04_2f_11(PARAMS);  // illegal
+		case 0x12: return arcompact_handle04_2f_12(PARAMS);  // illegal
+		case 0x13: return arcompact_handle04_2f_13(PARAMS);  // illegal
+		case 0x14: return arcompact_handle04_2f_14(PARAMS);  // illegal
+		case 0x15: return arcompact_handle04_2f_15(PARAMS);  // illegal
+		case 0x16: return arcompact_handle04_2f_16(PARAMS);  // illegal
+		case 0x17: return arcompact_handle04_2f_17(PARAMS);  // illegal
+		case 0x18: return arcompact_handle04_2f_18(PARAMS);  // illegal
+		case 0x19: return arcompact_handle04_2f_19(PARAMS);  // illegal
+		case 0x1a: return arcompact_handle04_2f_1a(PARAMS);  // illegal
+		case 0x1b: return arcompact_handle04_2f_1b(PARAMS);  // illegal
+		case 0x1c: return arcompact_handle04_2f_1c(PARAMS);  // illegal
+		case 0x1d: return arcompact_handle04_2f_1d(PARAMS);  // illegal
+		case 0x1e: return arcompact_handle04_2f_1e(PARAMS);  // illegal
+		case 0x1f: return arcompact_handle04_2f_1f(PARAMS);  // illegal
+		case 0x20: return arcompact_handle04_2f_20(PARAMS);  // illegal
+		case 0x21: return arcompact_handle04_2f_21(PARAMS);  // illegal
+		case 0x22: return arcompact_handle04_2f_22(PARAMS);  // illegal
+		case 0x23: return arcompact_handle04_2f_23(PARAMS);  // illegal
+		case 0x24: return arcompact_handle04_2f_24(PARAMS);  // illegal
+		case 0x25: return arcompact_handle04_2f_25(PARAMS);  // illegal
+		case 0x26: return arcompact_handle04_2f_26(PARAMS);  // illegal
+		case 0x27: return arcompact_handle04_2f_27(PARAMS);  // illegal
+		case 0x28: return arcompact_handle04_2f_28(PARAMS);  // illegal
+		case 0x29: return arcompact_handle04_2f_29(PARAMS);  // illegal
+		case 0x2a: return arcompact_handle04_2f_2a(PARAMS);  // illegal
+		case 0x2b: return arcompact_handle04_2f_2b(PARAMS);  // illegal
+		case 0x2c: return arcompact_handle04_2f_2c(PARAMS);  // illegal
+		case 0x2d: return arcompact_handle04_2f_2d(PARAMS);  // illegal
+		case 0x2e: return arcompact_handle04_2f_2e(PARAMS);  // illegal
+		case 0x2f: return arcompact_handle04_2f_2f(PARAMS);  // illegal
+		case 0x30: return arcompact_handle04_2f_30(PARAMS);  // illegal
+		case 0x31: return arcompact_handle04_2f_31(PARAMS);  // illegal
+		case 0x32: return arcompact_handle04_2f_32(PARAMS);  // illegal
+		case 0x33: return arcompact_handle04_2f_33(PARAMS);  // illegal
+		case 0x34: return arcompact_handle04_2f_34(PARAMS);  // illegal
+		case 0x35: return arcompact_handle04_2f_35(PARAMS);  // illegal
+		case 0x36: return arcompact_handle04_2f_36(PARAMS);  // illegal
+		case 0x37: return arcompact_handle04_2f_37(PARAMS);  // illegal
+		case 0x38: return arcompact_handle04_2f_38(PARAMS);  // illegal
+		case 0x39: return arcompact_handle04_2f_39(PARAMS);  // illegal
+		case 0x3a: return arcompact_handle04_2f_3a(PARAMS);  // illegal
+		case 0x3b: return arcompact_handle04_2f_3b(PARAMS);  // illegal
+		case 0x3c: return arcompact_handle04_2f_3c(PARAMS);  // illegal
+		case 0x3d: return arcompact_handle04_2f_3d(PARAMS);  // illegal
+		case 0x3e: return arcompact_handle04_2f_3e(PARAMS);  // illegal
+		case 0x3f: return arcompact_handle04_2f_3f(PARAMS);  // ZOPs (Zero Operand Opcodes)
 	}
 
 	return 0;
@@ -425,70 +444,70 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle05_2f(OPS_32)
 
 	switch (subinstr2)
 	{
-		case 0x00: return arcompact_handle05_2f_00(PARAMS); break; // SWAP 
-		case 0x01: return arcompact_handle05_2f_01(PARAMS); break; // NORM 
-		case 0x02: return arcompact_handle05_2f_02(PARAMS); break; // SAT16
-		case 0x03: return arcompact_handle05_2f_03(PARAMS); break; // RND16 
-		case 0x04: return arcompact_handle05_2f_04(PARAMS); break; // ABSSW 
-		case 0x05: return arcompact_handle05_2f_05(PARAMS); break; // ABSS 
-		case 0x06: return arcompact_handle05_2f_06(PARAMS); break; // NEGSW 
-		case 0x07: return arcompact_handle05_2f_07(PARAMS); break; // NEGS 
-		case 0x08: return arcompact_handle05_2f_08(PARAMS); break; // NORMW 
-		case 0x09: return arcompact_handle05_2f_09(PARAMS); break; // illegal
-		case 0x0a: return arcompact_handle05_2f_0a(PARAMS); break; // illegal
-		case 0x0b: return arcompact_handle05_2f_0b(PARAMS); break; // illegal
-		case 0x0c: return arcompact_handle05_2f_0c(PARAMS); break; // illegal
-		case 0x0d: return arcompact_handle05_2f_0d(PARAMS); break; // illegal
-		case 0x0e: return arcompact_handle05_2f_0e(PARAMS); break; // illegal
-		case 0x0f: return arcompact_handle05_2f_0f(PARAMS); break; // illegal
-		case 0x10: return arcompact_handle05_2f_10(PARAMS); break; // illegal
-		case 0x11: return arcompact_handle05_2f_11(PARAMS); break; // illegal
-		case 0x12: return arcompact_handle05_2f_12(PARAMS); break; // illegal
-		case 0x13: return arcompact_handle05_2f_13(PARAMS); break; // illegal
-		case 0x14: return arcompact_handle05_2f_14(PARAMS); break; // illegal
-		case 0x15: return arcompact_handle05_2f_15(PARAMS); break; // illegal
-		case 0x16: return arcompact_handle05_2f_16(PARAMS); break; // illegal
-		case 0x17: return arcompact_handle05_2f_17(PARAMS); break; // illegal
-		case 0x18: return arcompact_handle05_2f_18(PARAMS); break; // illegal
-		case 0x19: return arcompact_handle05_2f_19(PARAMS); break; // illegal
-		case 0x1a: return arcompact_handle05_2f_1a(PARAMS); break; // illegal
-		case 0x1b: return arcompact_handle05_2f_1b(PARAMS); break; // illegal
-		case 0x1c: return arcompact_handle05_2f_1c(PARAMS); break; // illegal
-		case 0x1d: return arcompact_handle05_2f_1d(PARAMS); break; // illegal
-		case 0x1e: return arcompact_handle05_2f_1e(PARAMS); break; // illegal
-		case 0x1f: return arcompact_handle05_2f_1f(PARAMS); break; // illegal
-		case 0x20: return arcompact_handle05_2f_20(PARAMS); break; // illegal
-		case 0x21: return arcompact_handle05_2f_21(PARAMS); break; // illegal
-		case 0x22: return arcompact_handle05_2f_22(PARAMS); break; // illegal
-		case 0x23: return arcompact_handle05_2f_23(PARAMS); break; // illegal
-		case 0x24: return arcompact_handle05_2f_24(PARAMS); break; // illegal
-		case 0x25: return arcompact_handle05_2f_25(PARAMS); break; // illegal
-		case 0x26: return arcompact_handle05_2f_26(PARAMS); break; // illegal
-		case 0x27: return arcompact_handle05_2f_27(PARAMS); break; // illegal
-		case 0x28: return arcompact_handle05_2f_28(PARAMS); break; // illegal
-		case 0x29: return arcompact_handle05_2f_29(PARAMS); break; // illegal
-		case 0x2a: return arcompact_handle05_2f_2a(PARAMS); break; // illegal
-		case 0x2b: return arcompact_handle05_2f_2b(PARAMS); break; // illegal
-		case 0x2c: return arcompact_handle05_2f_2c(PARAMS); break; // illegal
-		case 0x2d: return arcompact_handle05_2f_2d(PARAMS); break; // illegal
-		case 0x2e: return arcompact_handle05_2f_2e(PARAMS); break; // illegal
-		case 0x2f: return arcompact_handle05_2f_2f(PARAMS); break; // illegal
-		case 0x30: return arcompact_handle05_2f_30(PARAMS); break; // illegal
-		case 0x31: return arcompact_handle05_2f_31(PARAMS); break; // illegal
-		case 0x32: return arcompact_handle05_2f_32(PARAMS); break; // illegal
-		case 0x33: return arcompact_handle05_2f_33(PARAMS); break; // illegal
-		case 0x34: return arcompact_handle05_2f_34(PARAMS); break; // illegal
-		case 0x35: return arcompact_handle05_2f_35(PARAMS); break; // illegal
-		case 0x36: return arcompact_handle05_2f_36(PARAMS); break; // illegal
-		case 0x37: return arcompact_handle05_2f_37(PARAMS); break; // illegal
-		case 0x38: return arcompact_handle05_2f_38(PARAMS); break; // illegal
-		case 0x39: return arcompact_handle05_2f_39(PARAMS); break; // illegal
-		case 0x3a: return arcompact_handle05_2f_3a(PARAMS); break; // illegal
-		case 0x3b: return arcompact_handle05_2f_3b(PARAMS); break; // illegal
-		case 0x3c: return arcompact_handle05_2f_3c(PARAMS); break; // illegal
-		case 0x3d: return arcompact_handle05_2f_3d(PARAMS); break; // illegal
-		case 0x3e: return arcompact_handle05_2f_3e(PARAMS); break; // illegal
-		case 0x3f: return arcompact_handle05_2f_3f(PARAMS); break; // ZOPs (Zero Operand Opcodes)
+		case 0x00: return arcompact_handle05_2f_00(PARAMS);  // SWAP 
+		case 0x01: return arcompact_handle05_2f_01(PARAMS);  // NORM 
+		case 0x02: return arcompact_handle05_2f_02(PARAMS);  // SAT16
+		case 0x03: return arcompact_handle05_2f_03(PARAMS);  // RND16 
+		case 0x04: return arcompact_handle05_2f_04(PARAMS);  // ABSSW 
+		case 0x05: return arcompact_handle05_2f_05(PARAMS);  // ABSS 
+		case 0x06: return arcompact_handle05_2f_06(PARAMS);  // NEGSW 
+		case 0x07: return arcompact_handle05_2f_07(PARAMS);  // NEGS 
+		case 0x08: return arcompact_handle05_2f_08(PARAMS);  // NORMW 
+		case 0x09: return arcompact_handle05_2f_09(PARAMS);  // illegal
+		case 0x0a: return arcompact_handle05_2f_0a(PARAMS);  // illegal
+		case 0x0b: return arcompact_handle05_2f_0b(PARAMS);  // illegal
+		case 0x0c: return arcompact_handle05_2f_0c(PARAMS);  // illegal
+		case 0x0d: return arcompact_handle05_2f_0d(PARAMS);  // illegal
+		case 0x0e: return arcompact_handle05_2f_0e(PARAMS);  // illegal
+		case 0x0f: return arcompact_handle05_2f_0f(PARAMS);  // illegal
+		case 0x10: return arcompact_handle05_2f_10(PARAMS);  // illegal
+		case 0x11: return arcompact_handle05_2f_11(PARAMS);  // illegal
+		case 0x12: return arcompact_handle05_2f_12(PARAMS);  // illegal
+		case 0x13: return arcompact_handle05_2f_13(PARAMS);  // illegal
+		case 0x14: return arcompact_handle05_2f_14(PARAMS);  // illegal
+		case 0x15: return arcompact_handle05_2f_15(PARAMS);  // illegal
+		case 0x16: return arcompact_handle05_2f_16(PARAMS);  // illegal
+		case 0x17: return arcompact_handle05_2f_17(PARAMS);  // illegal
+		case 0x18: return arcompact_handle05_2f_18(PARAMS);  // illegal
+		case 0x19: return arcompact_handle05_2f_19(PARAMS);  // illegal
+		case 0x1a: return arcompact_handle05_2f_1a(PARAMS);  // illegal
+		case 0x1b: return arcompact_handle05_2f_1b(PARAMS);  // illegal
+		case 0x1c: return arcompact_handle05_2f_1c(PARAMS);  // illegal
+		case 0x1d: return arcompact_handle05_2f_1d(PARAMS);  // illegal
+		case 0x1e: return arcompact_handle05_2f_1e(PARAMS);  // illegal
+		case 0x1f: return arcompact_handle05_2f_1f(PARAMS);  // illegal
+		case 0x20: return arcompact_handle05_2f_20(PARAMS);  // illegal
+		case 0x21: return arcompact_handle05_2f_21(PARAMS);  // illegal
+		case 0x22: return arcompact_handle05_2f_22(PARAMS);  // illegal
+		case 0x23: return arcompact_handle05_2f_23(PARAMS);  // illegal
+		case 0x24: return arcompact_handle05_2f_24(PARAMS);  // illegal
+		case 0x25: return arcompact_handle05_2f_25(PARAMS);  // illegal
+		case 0x26: return arcompact_handle05_2f_26(PARAMS);  // illegal
+		case 0x27: return arcompact_handle05_2f_27(PARAMS);  // illegal
+		case 0x28: return arcompact_handle05_2f_28(PARAMS);  // illegal
+		case 0x29: return arcompact_handle05_2f_29(PARAMS);  // illegal
+		case 0x2a: return arcompact_handle05_2f_2a(PARAMS);  // illegal
+		case 0x2b: return arcompact_handle05_2f_2b(PARAMS);  // illegal
+		case 0x2c: return arcompact_handle05_2f_2c(PARAMS);  // illegal
+		case 0x2d: return arcompact_handle05_2f_2d(PARAMS);  // illegal
+		case 0x2e: return arcompact_handle05_2f_2e(PARAMS);  // illegal
+		case 0x2f: return arcompact_handle05_2f_2f(PARAMS);  // illegal
+		case 0x30: return arcompact_handle05_2f_30(PARAMS);  // illegal
+		case 0x31: return arcompact_handle05_2f_31(PARAMS);  // illegal
+		case 0x32: return arcompact_handle05_2f_32(PARAMS);  // illegal
+		case 0x33: return arcompact_handle05_2f_33(PARAMS);  // illegal
+		case 0x34: return arcompact_handle05_2f_34(PARAMS);  // illegal
+		case 0x35: return arcompact_handle05_2f_35(PARAMS);  // illegal
+		case 0x36: return arcompact_handle05_2f_36(PARAMS);  // illegal
+		case 0x37: return arcompact_handle05_2f_37(PARAMS);  // illegal
+		case 0x38: return arcompact_handle05_2f_38(PARAMS);  // illegal
+		case 0x39: return arcompact_handle05_2f_39(PARAMS);  // illegal
+		case 0x3a: return arcompact_handle05_2f_3a(PARAMS);  // illegal
+		case 0x3b: return arcompact_handle05_2f_3b(PARAMS);  // illegal
+		case 0x3c: return arcompact_handle05_2f_3c(PARAMS);  // illegal
+		case 0x3d: return arcompact_handle05_2f_3d(PARAMS);  // illegal
+		case 0x3e: return arcompact_handle05_2f_3e(PARAMS);  // illegal
+		case 0x3f: return arcompact_handle05_2f_3f(PARAMS);  // ZOPs (Zero Operand Opcodes)
 	}
 
 	return 0;
@@ -501,70 +520,70 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_3f(OPS_32)
 
 	switch (subinstr3)
 	{
-		case 0x00: return arcompact_handle04_2f_3f_00(PARAMS); break; // illegal
-		case 0x01: return arcompact_handle04_2f_3f_01(PARAMS); break; // SLEEP
-		case 0x02: return arcompact_handle04_2f_3f_02(PARAMS); break; // SWI / TRAP9
-		case 0x03: return arcompact_handle04_2f_3f_03(PARAMS); break; // SYNC
-		case 0x04: return arcompact_handle04_2f_3f_04(PARAMS); break; // RTIE
-		case 0x05: return arcompact_handle04_2f_3f_05(PARAMS); break; // BRK
-		case 0x06: return arcompact_handle04_2f_3f_06(PARAMS); break; // illegal
-		case 0x07: return arcompact_handle04_2f_3f_07(PARAMS); break; // illegal
-		case 0x08: return arcompact_handle04_2f_3f_08(PARAMS); break; // illegal
-		case 0x09: return arcompact_handle04_2f_3f_09(PARAMS); break; // illegal
-		case 0x0a: return arcompact_handle04_2f_3f_0a(PARAMS); break; // illegal
-		case 0x0b: return arcompact_handle04_2f_3f_0b(PARAMS); break; // illegal
-		case 0x0c: return arcompact_handle04_2f_3f_0c(PARAMS); break; // illegal
-		case 0x0d: return arcompact_handle04_2f_3f_0d(PARAMS); break; // illegal
-		case 0x0e: return arcompact_handle04_2f_3f_0e(PARAMS); break; // illegal
-		case 0x0f: return arcompact_handle04_2f_3f_0f(PARAMS); break; // illegal
-		case 0x10: return arcompact_handle04_2f_3f_10(PARAMS); break; // illegal
-		case 0x11: return arcompact_handle04_2f_3f_11(PARAMS); break; // illegal
-		case 0x12: return arcompact_handle04_2f_3f_12(PARAMS); break; // illegal
-		case 0x13: return arcompact_handle04_2f_3f_13(PARAMS); break; // illegal
-		case 0x14: return arcompact_handle04_2f_3f_14(PARAMS); break; // illegal
-		case 0x15: return arcompact_handle04_2f_3f_15(PARAMS); break; // illegal
-		case 0x16: return arcompact_handle04_2f_3f_16(PARAMS); break; // illegal
-		case 0x17: return arcompact_handle04_2f_3f_17(PARAMS); break; // illegal
-		case 0x18: return arcompact_handle04_2f_3f_18(PARAMS); break; // illegal
-		case 0x19: return arcompact_handle04_2f_3f_19(PARAMS); break; // illegal
-		case 0x1a: return arcompact_handle04_2f_3f_1a(PARAMS); break; // illegal
-		case 0x1b: return arcompact_handle04_2f_3f_1b(PARAMS); break; // illegal
-		case 0x1c: return arcompact_handle04_2f_3f_1c(PARAMS); break; // illegal
-		case 0x1d: return arcompact_handle04_2f_3f_1d(PARAMS); break; // illegal
-		case 0x1e: return arcompact_handle04_2f_3f_1e(PARAMS); break; // illegal
-		case 0x1f: return arcompact_handle04_2f_3f_1f(PARAMS); break; // illegal
-		case 0x20: return arcompact_handle04_2f_3f_20(PARAMS); break; // illegal
-		case 0x21: return arcompact_handle04_2f_3f_21(PARAMS); break; // illegal
-		case 0x22: return arcompact_handle04_2f_3f_22(PARAMS); break; // illegal
-		case 0x23: return arcompact_handle04_2f_3f_23(PARAMS); break; // illegal
-		case 0x24: return arcompact_handle04_2f_3f_24(PARAMS); break; // illegal
-		case 0x25: return arcompact_handle04_2f_3f_25(PARAMS); break; // illegal
-		case 0x26: return arcompact_handle04_2f_3f_26(PARAMS); break; // illegal
-		case 0x27: return arcompact_handle04_2f_3f_27(PARAMS); break; // illegal
-		case 0x28: return arcompact_handle04_2f_3f_28(PARAMS); break; // illegal
-		case 0x29: return arcompact_handle04_2f_3f_29(PARAMS); break; // illegal
-		case 0x2a: return arcompact_handle04_2f_3f_2a(PARAMS); break; // illegal
-		case 0x2b: return arcompact_handle04_2f_3f_2b(PARAMS); break; // illegal
-		case 0x2c: return arcompact_handle04_2f_3f_2c(PARAMS); break; // illegal
-		case 0x2d: return arcompact_handle04_2f_3f_2d(PARAMS); break; // illegal
-		case 0x2e: return arcompact_handle04_2f_3f_2e(PARAMS); break; // illegal
-		case 0x2f: return arcompact_handle04_2f_3f_2f(PARAMS); break; // illegal
-		case 0x30: return arcompact_handle04_2f_3f_30(PARAMS); break; // illegal
-		case 0x31: return arcompact_handle04_2f_3f_31(PARAMS); break; // illegal
-		case 0x32: return arcompact_handle04_2f_3f_32(PARAMS); break; // illegal
-		case 0x33: return arcompact_handle04_2f_3f_33(PARAMS); break; // illegal
-		case 0x34: return arcompact_handle04_2f_3f_34(PARAMS); break; // illegal
-		case 0x35: return arcompact_handle04_2f_3f_35(PARAMS); break; // illegal
-		case 0x36: return arcompact_handle04_2f_3f_36(PARAMS); break; // illegal
-		case 0x37: return arcompact_handle04_2f_3f_37(PARAMS); break; // illegal
-		case 0x38: return arcompact_handle04_2f_3f_38(PARAMS); break; // illegal
-		case 0x39: return arcompact_handle04_2f_3f_39(PARAMS); break; // illegal
-		case 0x3a: return arcompact_handle04_2f_3f_3a(PARAMS); break; // illegal
-		case 0x3b: return arcompact_handle04_2f_3f_3b(PARAMS); break; // illegal
-		case 0x3c: return arcompact_handle04_2f_3f_3c(PARAMS); break; // illegal
-		case 0x3d: return arcompact_handle04_2f_3f_3d(PARAMS); break; // illegal
-		case 0x3e: return arcompact_handle04_2f_3f_3e(PARAMS); break; // illegal
-		case 0x3f: return arcompact_handle04_2f_3f_3f(PARAMS); break; // illegal
+		case 0x00: return arcompact_handle04_2f_3f_00(PARAMS);  // illegal
+		case 0x01: return arcompact_handle04_2f_3f_01(PARAMS);  // SLEEP
+		case 0x02: return arcompact_handle04_2f_3f_02(PARAMS);  // SWI / TRAP9
+		case 0x03: return arcompact_handle04_2f_3f_03(PARAMS);  // SYNC
+		case 0x04: return arcompact_handle04_2f_3f_04(PARAMS);  // RTIE
+		case 0x05: return arcompact_handle04_2f_3f_05(PARAMS);  // BRK
+		case 0x06: return arcompact_handle04_2f_3f_06(PARAMS);  // illegal
+		case 0x07: return arcompact_handle04_2f_3f_07(PARAMS);  // illegal
+		case 0x08: return arcompact_handle04_2f_3f_08(PARAMS);  // illegal
+		case 0x09: return arcompact_handle04_2f_3f_09(PARAMS);  // illegal
+		case 0x0a: return arcompact_handle04_2f_3f_0a(PARAMS);  // illegal
+		case 0x0b: return arcompact_handle04_2f_3f_0b(PARAMS);  // illegal
+		case 0x0c: return arcompact_handle04_2f_3f_0c(PARAMS);  // illegal
+		case 0x0d: return arcompact_handle04_2f_3f_0d(PARAMS);  // illegal
+		case 0x0e: return arcompact_handle04_2f_3f_0e(PARAMS);  // illegal
+		case 0x0f: return arcompact_handle04_2f_3f_0f(PARAMS);  // illegal
+		case 0x10: return arcompact_handle04_2f_3f_10(PARAMS);  // illegal
+		case 0x11: return arcompact_handle04_2f_3f_11(PARAMS);  // illegal
+		case 0x12: return arcompact_handle04_2f_3f_12(PARAMS);  // illegal
+		case 0x13: return arcompact_handle04_2f_3f_13(PARAMS);  // illegal
+		case 0x14: return arcompact_handle04_2f_3f_14(PARAMS);  // illegal
+		case 0x15: return arcompact_handle04_2f_3f_15(PARAMS);  // illegal
+		case 0x16: return arcompact_handle04_2f_3f_16(PARAMS);  // illegal
+		case 0x17: return arcompact_handle04_2f_3f_17(PARAMS);  // illegal
+		case 0x18: return arcompact_handle04_2f_3f_18(PARAMS);  // illegal
+		case 0x19: return arcompact_handle04_2f_3f_19(PARAMS);  // illegal
+		case 0x1a: return arcompact_handle04_2f_3f_1a(PARAMS);  // illegal
+		case 0x1b: return arcompact_handle04_2f_3f_1b(PARAMS);  // illegal
+		case 0x1c: return arcompact_handle04_2f_3f_1c(PARAMS);  // illegal
+		case 0x1d: return arcompact_handle04_2f_3f_1d(PARAMS);  // illegal
+		case 0x1e: return arcompact_handle04_2f_3f_1e(PARAMS);  // illegal
+		case 0x1f: return arcompact_handle04_2f_3f_1f(PARAMS);  // illegal
+		case 0x20: return arcompact_handle04_2f_3f_20(PARAMS);  // illegal
+		case 0x21: return arcompact_handle04_2f_3f_21(PARAMS);  // illegal
+		case 0x22: return arcompact_handle04_2f_3f_22(PARAMS);  // illegal
+		case 0x23: return arcompact_handle04_2f_3f_23(PARAMS);  // illegal
+		case 0x24: return arcompact_handle04_2f_3f_24(PARAMS);  // illegal
+		case 0x25: return arcompact_handle04_2f_3f_25(PARAMS);  // illegal
+		case 0x26: return arcompact_handle04_2f_3f_26(PARAMS);  // illegal
+		case 0x27: return arcompact_handle04_2f_3f_27(PARAMS);  // illegal
+		case 0x28: return arcompact_handle04_2f_3f_28(PARAMS);  // illegal
+		case 0x29: return arcompact_handle04_2f_3f_29(PARAMS);  // illegal
+		case 0x2a: return arcompact_handle04_2f_3f_2a(PARAMS);  // illegal
+		case 0x2b: return arcompact_handle04_2f_3f_2b(PARAMS);  // illegal
+		case 0x2c: return arcompact_handle04_2f_3f_2c(PARAMS);  // illegal
+		case 0x2d: return arcompact_handle04_2f_3f_2d(PARAMS);  // illegal
+		case 0x2e: return arcompact_handle04_2f_3f_2e(PARAMS);  // illegal
+		case 0x2f: return arcompact_handle04_2f_3f_2f(PARAMS);  // illegal
+		case 0x30: return arcompact_handle04_2f_3f_30(PARAMS);  // illegal
+		case 0x31: return arcompact_handle04_2f_3f_31(PARAMS);  // illegal
+		case 0x32: return arcompact_handle04_2f_3f_32(PARAMS);  // illegal
+		case 0x33: return arcompact_handle04_2f_3f_33(PARAMS);  // illegal
+		case 0x34: return arcompact_handle04_2f_3f_34(PARAMS);  // illegal
+		case 0x35: return arcompact_handle04_2f_3f_35(PARAMS);  // illegal
+		case 0x36: return arcompact_handle04_2f_3f_36(PARAMS);  // illegal
+		case 0x37: return arcompact_handle04_2f_3f_37(PARAMS);  // illegal
+		case 0x38: return arcompact_handle04_2f_3f_38(PARAMS);  // illegal
+		case 0x39: return arcompact_handle04_2f_3f_39(PARAMS);  // illegal
+		case 0x3a: return arcompact_handle04_2f_3f_3a(PARAMS);  // illegal
+		case 0x3b: return arcompact_handle04_2f_3f_3b(PARAMS);  // illegal
+		case 0x3c: return arcompact_handle04_2f_3f_3c(PARAMS);  // illegal
+		case 0x3d: return arcompact_handle04_2f_3f_3d(PARAMS);  // illegal
+		case 0x3e: return arcompact_handle04_2f_3f_3e(PARAMS);  // illegal
+		case 0x3f: return arcompact_handle04_2f_3f_3f(PARAMS);  // illegal
 	}
 
 	return 0;
@@ -578,70 +597,70 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle05_2f_3f(OPS_32) // useless 
 
 	switch (subinstr3)
 	{
-		case 0x00: return arcompact_handle05_2f_3f_00(PARAMS); break; // illegal
-		case 0x01: return arcompact_handle05_2f_3f_01(PARAMS); break; // illegal
-		case 0x02: return arcompact_handle05_2f_3f_02(PARAMS); break; // illegal
-		case 0x03: return arcompact_handle05_2f_3f_03(PARAMS); break; // illegal
-		case 0x04: return arcompact_handle05_2f_3f_04(PARAMS); break; // illegal
-		case 0x05: return arcompact_handle05_2f_3f_05(PARAMS); break; // illegal
-		case 0x06: return arcompact_handle05_2f_3f_06(PARAMS); break; // illegal
-		case 0x07: return arcompact_handle05_2f_3f_07(PARAMS); break; // illegal
-		case 0x08: return arcompact_handle05_2f_3f_08(PARAMS); break; // illegal
-		case 0x09: return arcompact_handle05_2f_3f_09(PARAMS); break; // illegal
-		case 0x0a: return arcompact_handle05_2f_3f_0a(PARAMS); break; // illegal
-		case 0x0b: return arcompact_handle05_2f_3f_0b(PARAMS); break; // illegal
-		case 0x0c: return arcompact_handle05_2f_3f_0c(PARAMS); break; // illegal
-		case 0x0d: return arcompact_handle05_2f_3f_0d(PARAMS); break; // illegal
-		case 0x0e: return arcompact_handle05_2f_3f_0e(PARAMS); break; // illegal
-		case 0x0f: return arcompact_handle05_2f_3f_0f(PARAMS); break; // illegal
-		case 0x10: return arcompact_handle05_2f_3f_10(PARAMS); break; // illegal
-		case 0x11: return arcompact_handle05_2f_3f_11(PARAMS); break; // illegal
-		case 0x12: return arcompact_handle05_2f_3f_12(PARAMS); break; // illegal
-		case 0x13: return arcompact_handle05_2f_3f_13(PARAMS); break; // illegal
-		case 0x14: return arcompact_handle05_2f_3f_14(PARAMS); break; // illegal
-		case 0x15: return arcompact_handle05_2f_3f_15(PARAMS); break; // illegal
-		case 0x16: return arcompact_handle05_2f_3f_16(PARAMS); break; // illegal
-		case 0x17: return arcompact_handle05_2f_3f_17(PARAMS); break; // illegal
-		case 0x18: return arcompact_handle05_2f_3f_18(PARAMS); break; // illegal
-		case 0x19: return arcompact_handle05_2f_3f_19(PARAMS); break; // illegal
-		case 0x1a: return arcompact_handle05_2f_3f_1a(PARAMS); break; // illegal
-		case 0x1b: return arcompact_handle05_2f_3f_1b(PARAMS); break; // illegal
-		case 0x1c: return arcompact_handle05_2f_3f_1c(PARAMS); break; // illegal
-		case 0x1d: return arcompact_handle05_2f_3f_1d(PARAMS); break; // illegal
-		case 0x1e: return arcompact_handle05_2f_3f_1e(PARAMS); break; // illegal
-		case 0x1f: return arcompact_handle05_2f_3f_1f(PARAMS); break; // illegal
-		case 0x20: return arcompact_handle05_2f_3f_20(PARAMS); break; // illegal
-		case 0x21: return arcompact_handle05_2f_3f_21(PARAMS); break; // illegal
-		case 0x22: return arcompact_handle05_2f_3f_22(PARAMS); break; // illegal
-		case 0x23: return arcompact_handle05_2f_3f_23(PARAMS); break; // illegal
-		case 0x24: return arcompact_handle05_2f_3f_24(PARAMS); break; // illegal
-		case 0x25: return arcompact_handle05_2f_3f_25(PARAMS); break; // illegal
-		case 0x26: return arcompact_handle05_2f_3f_26(PARAMS); break; // illegal
-		case 0x27: return arcompact_handle05_2f_3f_27(PARAMS); break; // illegal
-		case 0x28: return arcompact_handle05_2f_3f_28(PARAMS); break; // illegal
-		case 0x29: return arcompact_handle05_2f_3f_29(PARAMS); break; // illegal
-		case 0x2a: return arcompact_handle05_2f_3f_2a(PARAMS); break; // illegal
-		case 0x2b: return arcompact_handle05_2f_3f_2b(PARAMS); break; // illegal
-		case 0x2c: return arcompact_handle05_2f_3f_2c(PARAMS); break; // illegal
-		case 0x2d: return arcompact_handle05_2f_3f_2d(PARAMS); break; // illegal
-		case 0x2e: return arcompact_handle05_2f_3f_2e(PARAMS); break; // illegal
-		case 0x2f: return arcompact_handle05_2f_3f_2f(PARAMS); break; // illegal
-		case 0x30: return arcompact_handle05_2f_3f_30(PARAMS); break; // illegal
-		case 0x31: return arcompact_handle05_2f_3f_31(PARAMS); break; // illegal
-		case 0x32: return arcompact_handle05_2f_3f_32(PARAMS); break; // illegal
-		case 0x33: return arcompact_handle05_2f_3f_33(PARAMS); break; // illegal
-		case 0x34: return arcompact_handle05_2f_3f_34(PARAMS); break; // illegal
-		case 0x35: return arcompact_handle05_2f_3f_35(PARAMS); break; // illegal
-		case 0x36: return arcompact_handle05_2f_3f_36(PARAMS); break; // illegal
-		case 0x37: return arcompact_handle05_2f_3f_37(PARAMS); break; // illegal
-		case 0x38: return arcompact_handle05_2f_3f_38(PARAMS); break; // illegal
-		case 0x39: return arcompact_handle05_2f_3f_39(PARAMS); break; // illegal
-		case 0x3a: return arcompact_handle05_2f_3f_3a(PARAMS); break; // illegal
-		case 0x3b: return arcompact_handle05_2f_3f_3b(PARAMS); break; // illegal
-		case 0x3c: return arcompact_handle05_2f_3f_3c(PARAMS); break; // illegal
-		case 0x3d: return arcompact_handle05_2f_3f_3d(PARAMS); break; // illegal
-		case 0x3e: return arcompact_handle05_2f_3f_3e(PARAMS); break; // illegal
-		case 0x3f: return arcompact_handle05_2f_3f_3f(PARAMS); break; // illegal
+		case 0x00: return arcompact_handle05_2f_3f_00(PARAMS);  // illegal
+		case 0x01: return arcompact_handle05_2f_3f_01(PARAMS);  // illegal
+		case 0x02: return arcompact_handle05_2f_3f_02(PARAMS);  // illegal
+		case 0x03: return arcompact_handle05_2f_3f_03(PARAMS);  // illegal
+		case 0x04: return arcompact_handle05_2f_3f_04(PARAMS);  // illegal
+		case 0x05: return arcompact_handle05_2f_3f_05(PARAMS);  // illegal
+		case 0x06: return arcompact_handle05_2f_3f_06(PARAMS);  // illegal
+		case 0x07: return arcompact_handle05_2f_3f_07(PARAMS);  // illegal
+		case 0x08: return arcompact_handle05_2f_3f_08(PARAMS);  // illegal
+		case 0x09: return arcompact_handle05_2f_3f_09(PARAMS);  // illegal
+		case 0x0a: return arcompact_handle05_2f_3f_0a(PARAMS);  // illegal
+		case 0x0b: return arcompact_handle05_2f_3f_0b(PARAMS);  // illegal
+		case 0x0c: return arcompact_handle05_2f_3f_0c(PARAMS);  // illegal
+		case 0x0d: return arcompact_handle05_2f_3f_0d(PARAMS);  // illegal
+		case 0x0e: return arcompact_handle05_2f_3f_0e(PARAMS);  // illegal
+		case 0x0f: return arcompact_handle05_2f_3f_0f(PARAMS);  // illegal
+		case 0x10: return arcompact_handle05_2f_3f_10(PARAMS);  // illegal
+		case 0x11: return arcompact_handle05_2f_3f_11(PARAMS);  // illegal
+		case 0x12: return arcompact_handle05_2f_3f_12(PARAMS);  // illegal
+		case 0x13: return arcompact_handle05_2f_3f_13(PARAMS);  // illegal
+		case 0x14: return arcompact_handle05_2f_3f_14(PARAMS);  // illegal
+		case 0x15: return arcompact_handle05_2f_3f_15(PARAMS);  // illegal
+		case 0x16: return arcompact_handle05_2f_3f_16(PARAMS);  // illegal
+		case 0x17: return arcompact_handle05_2f_3f_17(PARAMS);  // illegal
+		case 0x18: return arcompact_handle05_2f_3f_18(PARAMS);  // illegal
+		case 0x19: return arcompact_handle05_2f_3f_19(PARAMS);  // illegal
+		case 0x1a: return arcompact_handle05_2f_3f_1a(PARAMS);  // illegal
+		case 0x1b: return arcompact_handle05_2f_3f_1b(PARAMS);  // illegal
+		case 0x1c: return arcompact_handle05_2f_3f_1c(PARAMS);  // illegal
+		case 0x1d: return arcompact_handle05_2f_3f_1d(PARAMS);  // illegal
+		case 0x1e: return arcompact_handle05_2f_3f_1e(PARAMS);  // illegal
+		case 0x1f: return arcompact_handle05_2f_3f_1f(PARAMS);  // illegal
+		case 0x20: return arcompact_handle05_2f_3f_20(PARAMS);  // illegal
+		case 0x21: return arcompact_handle05_2f_3f_21(PARAMS);  // illegal
+		case 0x22: return arcompact_handle05_2f_3f_22(PARAMS);  // illegal
+		case 0x23: return arcompact_handle05_2f_3f_23(PARAMS);  // illegal
+		case 0x24: return arcompact_handle05_2f_3f_24(PARAMS);  // illegal
+		case 0x25: return arcompact_handle05_2f_3f_25(PARAMS);  // illegal
+		case 0x26: return arcompact_handle05_2f_3f_26(PARAMS);  // illegal
+		case 0x27: return arcompact_handle05_2f_3f_27(PARAMS);  // illegal
+		case 0x28: return arcompact_handle05_2f_3f_28(PARAMS);  // illegal
+		case 0x29: return arcompact_handle05_2f_3f_29(PARAMS);  // illegal
+		case 0x2a: return arcompact_handle05_2f_3f_2a(PARAMS);  // illegal
+		case 0x2b: return arcompact_handle05_2f_3f_2b(PARAMS);  // illegal
+		case 0x2c: return arcompact_handle05_2f_3f_2c(PARAMS);  // illegal
+		case 0x2d: return arcompact_handle05_2f_3f_2d(PARAMS);  // illegal
+		case 0x2e: return arcompact_handle05_2f_3f_2e(PARAMS);  // illegal
+		case 0x2f: return arcompact_handle05_2f_3f_2f(PARAMS);  // illegal
+		case 0x30: return arcompact_handle05_2f_3f_30(PARAMS);  // illegal
+		case 0x31: return arcompact_handle05_2f_3f_31(PARAMS);  // illegal
+		case 0x32: return arcompact_handle05_2f_3f_32(PARAMS);  // illegal
+		case 0x33: return arcompact_handle05_2f_3f_33(PARAMS);  // illegal
+		case 0x34: return arcompact_handle05_2f_3f_34(PARAMS);  // illegal
+		case 0x35: return arcompact_handle05_2f_3f_35(PARAMS);  // illegal
+		case 0x36: return arcompact_handle05_2f_3f_36(PARAMS);  // illegal
+		case 0x37: return arcompact_handle05_2f_3f_37(PARAMS);  // illegal
+		case 0x38: return arcompact_handle05_2f_3f_38(PARAMS);  // illegal
+		case 0x39: return arcompact_handle05_2f_3f_39(PARAMS);  // illegal
+		case 0x3a: return arcompact_handle05_2f_3f_3a(PARAMS);  // illegal
+		case 0x3b: return arcompact_handle05_2f_3f_3b(PARAMS);  // illegal
+		case 0x3c: return arcompact_handle05_2f_3f_3c(PARAMS);  // illegal
+		case 0x3d: return arcompact_handle05_2f_3f_3d(PARAMS);  // illegal
+		case 0x3e: return arcompact_handle05_2f_3f_3e(PARAMS);  // illegal
+		case 0x3f: return arcompact_handle05_2f_3f_3f(PARAMS);  // illegal
 	}
 
 	return 0;
@@ -655,70 +674,70 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle05(OPS_32)
 
 	switch (subinstr)
 	{
-		case 0x00: return arcompact_handle05_00(PARAMS); break; // ASL
-		case 0x01: return arcompact_handle05_01(PARAMS); break; // LSR
-		case 0x02: return arcompact_handle05_02(PARAMS); break; // ASR
-		case 0x03: return arcompact_handle05_03(PARAMS); break; // ROR
-		case 0x04: return arcompact_handle05_04(PARAMS); break; // MUL64
-		case 0x05: return arcompact_handle05_05(PARAMS); break; // MULU64
-		case 0x06: return arcompact_handle05_06(PARAMS); break; // ADDS
-		case 0x07: return arcompact_handle05_07(PARAMS); break; // SUBS
-		case 0x08: return arcompact_handle05_08(PARAMS); break; // DIVAW
-		case 0x09: return arcompact_handle05_09(PARAMS); break; // illegal
-		case 0x0a: return arcompact_handle05_0a(PARAMS); break; // ASLS
-		case 0x0b: return arcompact_handle05_0b(PARAMS); break; // ASRS
-		case 0x0c: return arcompact_handle05_0c(PARAMS); break; // illegal
-		case 0x0d: return arcompact_handle05_0d(PARAMS); break; // illegal
-		case 0x0e: return arcompact_handle05_0e(PARAMS); break; // illegal
-		case 0x0f: return arcompact_handle05_0f(PARAMS); break; // illegal
-		case 0x10: return arcompact_handle05_10(PARAMS); break; // illegal
-		case 0x11: return arcompact_handle05_11(PARAMS); break; // illegal
-		case 0x12: return arcompact_handle05_12(PARAMS); break; // illegal
-		case 0x13: return arcompact_handle05_13(PARAMS); break; // illegal
-		case 0x14: return arcompact_handle05_14(PARAMS); break; // illegal
-		case 0x15: return arcompact_handle05_15(PARAMS); break; // illegal
-		case 0x16: return arcompact_handle05_16(PARAMS); break; // illegal
-		case 0x17: return arcompact_handle05_17(PARAMS); break; // illegal
-		case 0x18: return arcompact_handle05_18(PARAMS); break; // illegal
-		case 0x19: return arcompact_handle05_19(PARAMS); break; // illegal
-		case 0x1a: return arcompact_handle05_1a(PARAMS); break; // illegal
-		case 0x1b: return arcompact_handle05_1b(PARAMS); break; // illegal
-		case 0x1c: return arcompact_handle05_1c(PARAMS); break; // illegal
-		case 0x1d: return arcompact_handle05_1d(PARAMS); break; // illegal
-		case 0x1e: return arcompact_handle05_1e(PARAMS); break; // illegal
-		case 0x1f: return arcompact_handle05_1f(PARAMS); break; // illegal
-		case 0x20: return arcompact_handle05_20(PARAMS); break; // illegal
-		case 0x21: return arcompact_handle05_21(PARAMS); break; // illegal
-		case 0x22: return arcompact_handle05_22(PARAMS); break; // illegal
-		case 0x23: return arcompact_handle05_23(PARAMS); break; // illegal
-		case 0x24: return arcompact_handle05_24(PARAMS); break; // illegal
-		case 0x25: return arcompact_handle05_25(PARAMS); break; // illegal
-		case 0x26: return arcompact_handle05_26(PARAMS); break; // illegal
-		case 0x27: return arcompact_handle05_27(PARAMS); break; // illegal
-		case 0x28: return arcompact_handle05_28(PARAMS); break; // ADDSDW
-		case 0x29: return arcompact_handle05_29(PARAMS); break; // SUBSDW
-		case 0x2a: return arcompact_handle05_2a(PARAMS); break; // illegal
-		case 0x2b: return arcompact_handle05_2b(PARAMS); break; // illegal
-		case 0x2c: return arcompact_handle05_2c(PARAMS); break; // illegal
-		case 0x2d: return arcompact_handle05_2d(PARAMS); break; // illegal
-		case 0x2e: return arcompact_handle05_2e(PARAMS); break; // illegal
-		case 0x2f: return arcompact_handle05_2f(PARAMS); break; // SOPs
-		case 0x30: return arcompact_handle05_30(PARAMS); break; // illegal
-		case 0x31: return arcompact_handle05_31(PARAMS); break; // illegal
-		case 0x32: return arcompact_handle05_32(PARAMS); break; // illegal
-		case 0x33: return arcompact_handle05_33(PARAMS); break; // illegal
-		case 0x34: return arcompact_handle05_34(PARAMS); break; // illegal
-		case 0x35: return arcompact_handle05_35(PARAMS); break; // illegal
-		case 0x36: return arcompact_handle05_36(PARAMS); break; // illegal
-		case 0x37: return arcompact_handle05_37(PARAMS); break; // illegal
-		case 0x38: return arcompact_handle05_38(PARAMS); break; // illegal
-		case 0x39: return arcompact_handle05_39(PARAMS); break; // illegal
-		case 0x3a: return arcompact_handle05_3a(PARAMS); break; // illegal
-		case 0x3b: return arcompact_handle05_3b(PARAMS); break; // illegal
-		case 0x3c: return arcompact_handle05_3c(PARAMS); break; // illegal
-		case 0x3d: return arcompact_handle05_3d(PARAMS); break; // illegal
-		case 0x3e: return arcompact_handle05_3e(PARAMS); break; // illegal
-		case 0x3f: return arcompact_handle05_3f(PARAMS); break; // illegal
+		case 0x00: return arcompact_handle05_00(PARAMS);  // ASL
+		case 0x01: return arcompact_handle05_01(PARAMS);  // LSR
+		case 0x02: return arcompact_handle05_02(PARAMS);  // ASR
+		case 0x03: return arcompact_handle05_03(PARAMS);  // ROR
+		case 0x04: return arcompact_handle05_04(PARAMS);  // MUL64
+		case 0x05: return arcompact_handle05_05(PARAMS);  // MULU64
+		case 0x06: return arcompact_handle05_06(PARAMS);  // ADDS
+		case 0x07: return arcompact_handle05_07(PARAMS);  // SUBS
+		case 0x08: return arcompact_handle05_08(PARAMS);  // DIVAW
+		case 0x09: return arcompact_handle05_09(PARAMS);  // illegal
+		case 0x0a: return arcompact_handle05_0a(PARAMS);  // ASLS
+		case 0x0b: return arcompact_handle05_0b(PARAMS);  // ASRS
+		case 0x0c: return arcompact_handle05_0c(PARAMS);  // illegal
+		case 0x0d: return arcompact_handle05_0d(PARAMS);  // illegal
+		case 0x0e: return arcompact_handle05_0e(PARAMS);  // illegal
+		case 0x0f: return arcompact_handle05_0f(PARAMS);  // illegal
+		case 0x10: return arcompact_handle05_10(PARAMS);  // illegal
+		case 0x11: return arcompact_handle05_11(PARAMS);  // illegal
+		case 0x12: return arcompact_handle05_12(PARAMS);  // illegal
+		case 0x13: return arcompact_handle05_13(PARAMS);  // illegal
+		case 0x14: return arcompact_handle05_14(PARAMS);  // illegal
+		case 0x15: return arcompact_handle05_15(PARAMS);  // illegal
+		case 0x16: return arcompact_handle05_16(PARAMS);  // illegal
+		case 0x17: return arcompact_handle05_17(PARAMS);  // illegal
+		case 0x18: return arcompact_handle05_18(PARAMS);  // illegal
+		case 0x19: return arcompact_handle05_19(PARAMS);  // illegal
+		case 0x1a: return arcompact_handle05_1a(PARAMS);  // illegal
+		case 0x1b: return arcompact_handle05_1b(PARAMS);  // illegal
+		case 0x1c: return arcompact_handle05_1c(PARAMS);  // illegal
+		case 0x1d: return arcompact_handle05_1d(PARAMS);  // illegal
+		case 0x1e: return arcompact_handle05_1e(PARAMS);  // illegal
+		case 0x1f: return arcompact_handle05_1f(PARAMS);  // illegal
+		case 0x20: return arcompact_handle05_20(PARAMS);  // illegal
+		case 0x21: return arcompact_handle05_21(PARAMS);  // illegal
+		case 0x22: return arcompact_handle05_22(PARAMS);  // illegal
+		case 0x23: return arcompact_handle05_23(PARAMS);  // illegal
+		case 0x24: return arcompact_handle05_24(PARAMS);  // illegal
+		case 0x25: return arcompact_handle05_25(PARAMS);  // illegal
+		case 0x26: return arcompact_handle05_26(PARAMS);  // illegal
+		case 0x27: return arcompact_handle05_27(PARAMS);  // illegal
+		case 0x28: return arcompact_handle05_28(PARAMS);  // ADDSDW
+		case 0x29: return arcompact_handle05_29(PARAMS);  // SUBSDW
+		case 0x2a: return arcompact_handle05_2a(PARAMS);  // illegal
+		case 0x2b: return arcompact_handle05_2b(PARAMS);  // illegal
+		case 0x2c: return arcompact_handle05_2c(PARAMS);  // illegal
+		case 0x2d: return arcompact_handle05_2d(PARAMS);  // illegal
+		case 0x2e: return arcompact_handle05_2e(PARAMS);  // illegal
+		case 0x2f: return arcompact_handle05_2f(PARAMS);  // SOPs
+		case 0x30: return arcompact_handle05_30(PARAMS);  // illegal
+		case 0x31: return arcompact_handle05_31(PARAMS);  // illegal
+		case 0x32: return arcompact_handle05_32(PARAMS);  // illegal
+		case 0x33: return arcompact_handle05_33(PARAMS);  // illegal
+		case 0x34: return arcompact_handle05_34(PARAMS);  // illegal
+		case 0x35: return arcompact_handle05_35(PARAMS);  // illegal
+		case 0x36: return arcompact_handle05_36(PARAMS);  // illegal
+		case 0x37: return arcompact_handle05_37(PARAMS);  // illegal
+		case 0x38: return arcompact_handle05_38(PARAMS);  // illegal
+		case 0x39: return arcompact_handle05_39(PARAMS);  // illegal
+		case 0x3a: return arcompact_handle05_3a(PARAMS);  // illegal
+		case 0x3b: return arcompact_handle05_3b(PARAMS);  // illegal
+		case 0x3c: return arcompact_handle05_3c(PARAMS);  // illegal
+		case 0x3d: return arcompact_handle05_3d(PARAMS);  // illegal
+		case 0x3e: return arcompact_handle05_3e(PARAMS);  // illegal
+		case 0x3f: return arcompact_handle05_3f(PARAMS);  // illegal
 	}
 
 	return 0;
@@ -730,10 +749,10 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0c(OPS_16)
 
 	switch (subinstr)
 	{
-		case 0x00: return arcompact_handle0c_00(PARAMS); break; // LD_S
-		case 0x01: return arcompact_handle0c_01(PARAMS); break; // LDB_S
-		case 0x02: return arcompact_handle0c_02(PARAMS); break; // LDW_S
-		case 0x03: return arcompact_handle0c_03(PARAMS); break; // ADD_S
+		case 0x00: return arcompact_handle0c_00(PARAMS);  // LD_S
+		case 0x01: return arcompact_handle0c_01(PARAMS);  // LDB_S
+		case 0x02: return arcompact_handle0c_02(PARAMS);  // LDW_S
+		case 0x03: return arcompact_handle0c_03(PARAMS);  // ADD_S
 	}
 
 	return 0;
@@ -745,10 +764,10 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0d(OPS_16)
 
 	switch (subinstr)
 	{
-		case 0x00: return arcompact_handle0d_00(PARAMS); break; // ADD_S
-		case 0x01: return arcompact_handle0d_01(PARAMS); break; // SUB_S
-		case 0x02: return arcompact_handle0d_02(PARAMS); break; // ASL_S
-		case 0x03: return arcompact_handle0d_03(PARAMS); break; // ASR_S
+		case 0x00: return arcompact_handle0d_00(PARAMS);  // ADD_S
+		case 0x01: return arcompact_handle0d_01(PARAMS);  // SUB_S
+		case 0x02: return arcompact_handle0d_02(PARAMS);  // ASL_S
+		case 0x03: return arcompact_handle0d_03(PARAMS);  // ASR_S
 	}
 
 	return 0;
@@ -760,10 +779,10 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0e(OPS_16)
 
 	switch (subinstr)
 	{
-		case 0x00: return arcompact_handle0e_00(PARAMS); break; // ADD_S
-		case 0x01: return arcompact_handle0e_01(PARAMS); break; // MOV_S
-		case 0x02: return arcompact_handle0e_02(PARAMS); break; // CMP_S
-		case 0x03: return arcompact_handle0e_03(PARAMS); break; // MOV_S
+		case 0x00: return arcompact_handle0e_00(PARAMS);  // ADD_S
+		case 0x01: return arcompact_handle0e_01(PARAMS);  // MOV_S
+		case 0x02: return arcompact_handle0e_02(PARAMS);  // CMP_S
+		case 0x03: return arcompact_handle0e_03(PARAMS);  // MOV_S
 	}
 
 	return 0;
@@ -775,38 +794,38 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f(OPS_16)
 
 	switch (subinstr)
 	{
-		case 0x00: return arcompact_handle0f_00(PARAMS); break; // SOPs
-		case 0x01: return arcompact_handle0f_01(PARAMS); break; // 0x01 <illegal>
-		case 0x02: return arcompact_handle0f_02(PARAMS); break; // SUB_S
-		case 0x03: return arcompact_handle0f_03(PARAMS); break; // 0x03 <illegal>
-		case 0x04: return arcompact_handle0f_04(PARAMS); break; // AND_S
-		case 0x05: return arcompact_handle0f_05(PARAMS); break; // OR_S
-		case 0x06: return arcompact_handle0f_06(PARAMS); break; // BIC_S
-		case 0x07: return arcompact_handle0f_07(PARAMS); break; // XOR_S
-		case 0x08: return arcompact_handle0f_08(PARAMS); break; // 0x08 <illegal>
-		case 0x09: return arcompact_handle0f_09(PARAMS); break; // 0x09 <illegal>
-		case 0x0a: return arcompact_handle0f_0a(PARAMS); break; // 0x0a <illegal>
-		case 0x0b: return arcompact_handle0f_0b(PARAMS); break; // TST_S
-		case 0x0c: return arcompact_handle0f_0c(PARAMS); break; // MUL64_S
-		case 0x0d: return arcompact_handle0f_0d(PARAMS); break; // SEXB_S
-		case 0x0e: return arcompact_handle0f_0e(PARAMS); break; // SEXW_S
-		case 0x0f: return arcompact_handle0f_0f(PARAMS); break; // EXTB_S
-		case 0x10: return arcompact_handle0f_10(PARAMS); break; // EXTW_S
-		case 0x11: return arcompact_handle0f_11(PARAMS); break; // ABS_S
-		case 0x12: return arcompact_handle0f_12(PARAMS); break; // NOT_S
-		case 0x13: return arcompact_handle0f_13(PARAMS); break; // NEG_S
-		case 0x14: return arcompact_handle0f_14(PARAMS); break; // ADD1_S
-		case 0x15: return arcompact_handle0f_15(PARAMS); break; // ADD2_S
-		case 0x16: return arcompact_handle0f_16(PARAMS); break; // ADD3_S
-		case 0x17: return arcompact_handle0f_17(PARAMS); break; // 0x17 <illegal>
-		case 0x18: return arcompact_handle0f_18(PARAMS); break; // ASL_S (multiple)
-		case 0x19: return arcompact_handle0f_19(PARAMS); break; // LSR_S (multiple)
-		case 0x1a: return arcompact_handle0f_1a(PARAMS); break; // ASR_S (multiple)
-		case 0x1b: return arcompact_handle0f_1b(PARAMS); break; // ASL_S (single)
-		case 0x1c: return arcompact_handle0f_1c(PARAMS); break; // LSR_S (single)
-		case 0x1d: return arcompact_handle0f_1d(PARAMS); break; // ASR_S (single)
-		case 0x1e: return arcompact_handle0f_1e(PARAMS); break; // TRAP (not a5?)
-		case 0x1f: return arcompact_handle0f_1f(PARAMS); break; // BRK_S ( 0x7fff only? )
+		case 0x00: return arcompact_handle0f_00(PARAMS);  // SOPs
+		case 0x01: return arcompact_handle0f_01(PARAMS);  // 0x01 <illegal>
+		case 0x02: return arcompact_handle0f_02(PARAMS);  // SUB_S
+		case 0x03: return arcompact_handle0f_03(PARAMS);  // 0x03 <illegal>
+		case 0x04: return arcompact_handle0f_04(PARAMS);  // AND_S
+		case 0x05: return arcompact_handle0f_05(PARAMS);  // OR_S
+		case 0x06: return arcompact_handle0f_06(PARAMS);  // BIC_S
+		case 0x07: return arcompact_handle0f_07(PARAMS);  // XOR_S
+		case 0x08: return arcompact_handle0f_08(PARAMS);  // 0x08 <illegal>
+		case 0x09: return arcompact_handle0f_09(PARAMS);  // 0x09 <illegal>
+		case 0x0a: return arcompact_handle0f_0a(PARAMS);  // 0x0a <illegal>
+		case 0x0b: return arcompact_handle0f_0b(PARAMS);  // TST_S
+		case 0x0c: return arcompact_handle0f_0c(PARAMS);  // MUL64_S
+		case 0x0d: return arcompact_handle0f_0d(PARAMS);  // SEXB_S
+		case 0x0e: return arcompact_handle0f_0e(PARAMS);  // SEXW_S
+		case 0x0f: return arcompact_handle0f_0f(PARAMS);  // EXTB_S
+		case 0x10: return arcompact_handle0f_10(PARAMS);  // EXTW_S
+		case 0x11: return arcompact_handle0f_11(PARAMS);  // ABS_S
+		case 0x12: return arcompact_handle0f_12(PARAMS);  // NOT_S
+		case 0x13: return arcompact_handle0f_13(PARAMS);  // NEG_S
+		case 0x14: return arcompact_handle0f_14(PARAMS);  // ADD1_S
+		case 0x15: return arcompact_handle0f_15(PARAMS);  // ADD2_S
+		case 0x16: return arcompact_handle0f_16(PARAMS);  // ADD3_S
+		case 0x17: return arcompact_handle0f_17(PARAMS);  // 0x17 <illegal>
+		case 0x18: return arcompact_handle0f_18(PARAMS);  // ASL_S (multiple)
+		case 0x19: return arcompact_handle0f_19(PARAMS);  // LSR_S (multiple)
+		case 0x1a: return arcompact_handle0f_1a(PARAMS);  // ASR_S (multiple)
+		case 0x1b: return arcompact_handle0f_1b(PARAMS);  // ASL_S (single)
+		case 0x1c: return arcompact_handle0f_1c(PARAMS);  // LSR_S (single)
+		case 0x1d: return arcompact_handle0f_1d(PARAMS);  // ASR_S (single)
+		case 0x1e: return arcompact_handle0f_1e(PARAMS);  // TRAP (not a5?)
+		case 0x1f: return arcompact_handle0f_1f(PARAMS);  // BRK_S ( 0x7fff only? )
 
 	}
 
@@ -819,14 +838,14 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_00(OPS_16)
 
 	switch (subinstr)
 	{
-		case 0x00: return arcompact_handle0f_00_00(PARAMS); break; // J_S
-		case 0x01: return arcompact_handle0f_00_01(PARAMS); break; // J_S.D
-		case 0x02: return arcompact_handle0f_00_02(PARAMS); break; // JL_S
-		case 0x03: return arcompact_handle0f_00_03(PARAMS); break; // JL_S.D
-		case 0x04: return arcompact_handle0f_00_04(PARAMS); break; // 0x04 <illegal>
-		case 0x05: return arcompact_handle0f_00_05(PARAMS); break; // 0x05 <illegal>
-		case 0x06: return arcompact_handle0f_00_06(PARAMS); break; // SUB_S.NE
-		case 0x07: return arcompact_handle0f_00_07(PARAMS); break; // ZOPs
+		case 0x00: return arcompact_handle0f_00_00(PARAMS);  // J_S
+		case 0x01: return arcompact_handle0f_00_01(PARAMS);  // J_S.D
+		case 0x02: return arcompact_handle0f_00_02(PARAMS);  // JL_S
+		case 0x03: return arcompact_handle0f_00_03(PARAMS);  // JL_S.D
+		case 0x04: return arcompact_handle0f_00_04(PARAMS);  // 0x04 <illegal>
+		case 0x05: return arcompact_handle0f_00_05(PARAMS);  // 0x05 <illegal>
+		case 0x06: return arcompact_handle0f_00_06(PARAMS);  // SUB_S.NE
+		case 0x07: return arcompact_handle0f_00_07(PARAMS);  // ZOPs
 
 	}
 
@@ -839,14 +858,14 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_00_07(OPS_16)
 
 	switch (subinstr3)
 	{
-		case 0x00: return arcompact_handle0f_00_07_00(PARAMS); break; // NOP_S
-		case 0x01: return arcompact_handle0f_00_07_01(PARAMS); break; // UNIMP_S
-		case 0x02: return arcompact_handle0f_00_07_02(PARAMS); break; // 0x02 <illegal>
-		case 0x03: return arcompact_handle0f_00_07_03(PARAMS); break; // 0x03 <illegal>
-		case 0x04: return arcompact_handle0f_00_07_04(PARAMS); break; // JEQ_S [BLINK]
-		case 0x05: return arcompact_handle0f_00_07_05(PARAMS); break; // JNE_S [BLINK]
-		case 0x06: return arcompact_handle0f_00_07_06(PARAMS); break; // J_S [BLINK]
-		case 0x07: return arcompact_handle0f_00_07_07(PARAMS); break; // J_S.D [BLINK]
+		case 0x00: return arcompact_handle0f_00_07_00(PARAMS);  // NOP_S
+		case 0x01: return arcompact_handle0f_00_07_01(PARAMS);  // UNIMP_S
+		case 0x02: return arcompact_handle0f_00_07_02(PARAMS);  // 0x02 <illegal>
+		case 0x03: return arcompact_handle0f_00_07_03(PARAMS);  // 0x03 <illegal>
+		case 0x04: return arcompact_handle0f_00_07_04(PARAMS);  // JEQ_S [BLINK]
+		case 0x05: return arcompact_handle0f_00_07_05(PARAMS);  // JNE_S [BLINK]
+		case 0x06: return arcompact_handle0f_00_07_06(PARAMS);  // J_S [BLINK]
+		case 0x07: return arcompact_handle0f_00_07_07(PARAMS);  // J_S.D [BLINK]
 
 	}
 
@@ -859,14 +878,14 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle17(OPS_16)
 
 	switch (subinstr)
 	{
-		case 0x00: return arcompact_handle17_00(PARAMS); break; // ASL_S 
-		case 0x01: return arcompact_handle17_01(PARAMS); break; // LSR_S 
-		case 0x02: return arcompact_handle17_02(PARAMS); break; // ASR_S
-		case 0x03: return arcompact_handle17_03(PARAMS); break; // SUB_S 
-		case 0x04: return arcompact_handle17_04(PARAMS); break; // BSET_S 
-		case 0x05: return arcompact_handle17_05(PARAMS); break; // BCLR_S 
-		case 0x06: return arcompact_handle17_06(PARAMS); break; // BMSK_S 
-		case 0x07: return arcompact_handle17_07(PARAMS); break; // BTST_S
+		case 0x00: return arcompact_handle17_00(PARAMS);  // ASL_S 
+		case 0x01: return arcompact_handle17_01(PARAMS);  // LSR_S 
+		case 0x02: return arcompact_handle17_02(PARAMS);  // ASR_S
+		case 0x03: return arcompact_handle17_03(PARAMS);  // SUB_S 
+		case 0x04: return arcompact_handle17_04(PARAMS);  // BSET_S 
+		case 0x05: return arcompact_handle17_05(PARAMS);  // BCLR_S 
+		case 0x06: return arcompact_handle17_06(PARAMS);  // BMSK_S 
+		case 0x07: return arcompact_handle17_07(PARAMS);  // BTST_S
 	}
 
 	return 0;
@@ -878,14 +897,14 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle18(OPS_16)
 
 	switch (subinstr)
 	{
-		case 0x00: return arcompact_handle18_00(PARAMS); break; // LD_S (SP)
-		case 0x01: return arcompact_handle18_01(PARAMS); break; // LDB_S (SP)
-		case 0x02: return arcompact_handle18_02(PARAMS); break; // ST_S (SP)
-		case 0x03: return arcompact_handle18_03(PARAMS); break; // STB_S (SP)
-		case 0x04: return arcompact_handle18_04(PARAMS); break; // ADD_S (SP)
-		case 0x05: return arcompact_handle18_05(PARAMS); break; // subtable 18_05
-		case 0x06: return arcompact_handle18_06(PARAMS); break; // subtable 18_06
-		case 0x07: return arcompact_handle18_07(PARAMS); break; // subtable 18_07
+		case 0x00: return arcompact_handle18_00(PARAMS);  // LD_S (SP)
+		case 0x01: return arcompact_handle18_01(PARAMS);  // LDB_S (SP)
+		case 0x02: return arcompact_handle18_02(PARAMS);  // ST_S (SP)
+		case 0x03: return arcompact_handle18_03(PARAMS);  // STB_S (SP)
+		case 0x04: return arcompact_handle18_04(PARAMS);  // ADD_S (SP)
+		case 0x05: return arcompact_handle18_05(PARAMS);  // subtable 18_05
+		case 0x06: return arcompact_handle18_06(PARAMS);  // subtable 18_06
+		case 0x07: return arcompact_handle18_07(PARAMS);  // subtable 18_07
 	}
 
 	return 0;
@@ -897,14 +916,14 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle18_05(OPS_16)
 
 	switch (subinstr2)
 	{
-		case 0x00: return arcompact_handle18_05_00(PARAMS); break; // ADD_S (SP)
-		case 0x01: return arcompact_handle18_05_01(PARAMS); break; // SUB_S (SP)
-		case 0x02: return arcompact_handle18_05_02(PARAMS); break; // <illegal 0x18_05_02> 
-		case 0x03: return arcompact_handle18_05_03(PARAMS); break; // <illegal 0x18_05_03>
-		case 0x04: return arcompact_handle18_05_04(PARAMS); break; // <illegal 0x18_05_04>
-		case 0x05: return arcompact_handle18_05_05(PARAMS); break; // <illegal 0x18_05_05>
-		case 0x06: return arcompact_handle18_05_06(PARAMS); break; // <illegal 0x18_05_06>
-		case 0x07: return arcompact_handle18_05_07(PARAMS); break; // <illegal 0x18_05_07>
+		case 0x00: return arcompact_handle18_05_00(PARAMS);  // ADD_S (SP)
+		case 0x01: return arcompact_handle18_05_01(PARAMS);  // SUB_S (SP)
+		case 0x02: return arcompact_handle18_05_02(PARAMS);  // <illegal 0x18_05_02> 
+		case 0x03: return arcompact_handle18_05_03(PARAMS);  // <illegal 0x18_05_03>
+		case 0x04: return arcompact_handle18_05_04(PARAMS);  // <illegal 0x18_05_04>
+		case 0x05: return arcompact_handle18_05_05(PARAMS);  // <illegal 0x18_05_05>
+		case 0x06: return arcompact_handle18_05_06(PARAMS);  // <illegal 0x18_05_06>
+		case 0x07: return arcompact_handle18_05_07(PARAMS);  // <illegal 0x18_05_07>
 	}
 
 	return 0;
@@ -916,38 +935,38 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle18_06(OPS_16)
 
 	switch (subinstr2)
 	{
-		case 0x00: return arcompact_handle18_06_00(PARAMS); break; // <illegal 0x18_06_00>
-		case 0x01: return arcompact_handle18_06_01(PARAMS); break; // POP_S b
-		case 0x02: return arcompact_handle18_06_02(PARAMS); break; // <illegal 0x18_06_02>
-		case 0x03: return arcompact_handle18_06_03(PARAMS); break; // <illegal 0x18_06_03>
-		case 0x04: return arcompact_handle18_06_04(PARAMS); break; // <illegal 0x18_06_04>
-		case 0x05: return arcompact_handle18_06_05(PARAMS); break; // <illegal 0x18_06_05>
-		case 0x06: return arcompact_handle18_06_06(PARAMS); break; // <illegal 0x18_06_06>
-		case 0x07: return arcompact_handle18_06_07(PARAMS); break; // <illegal 0x18_06_07>
-		case 0x08: return arcompact_handle18_06_08(PARAMS); break; // <illegal 0x18_06_08>
-		case 0x09: return arcompact_handle18_06_09(PARAMS); break; // <illegal 0x18_06_09>
-		case 0x0a: return arcompact_handle18_06_0a(PARAMS); break; // <illegal 0x18_06_0a>
-		case 0x0b: return arcompact_handle18_06_0b(PARAMS); break; // <illegal 0x18_06_0b>
-		case 0x0c: return arcompact_handle18_06_0c(PARAMS); break; // <illegal 0x18_06_0c>
-		case 0x0d: return arcompact_handle18_06_0d(PARAMS); break; // <illegal 0x18_06_0d>
-		case 0x0e: return arcompact_handle18_06_0e(PARAMS); break; // <illegal 0x18_06_0e>
-		case 0x0f: return arcompact_handle18_06_0f(PARAMS); break; // <illegal 0x18_06_0f>
-		case 0x10: return arcompact_handle18_06_10(PARAMS); break; // <illegal 0x18_06_10>
-		case 0x11: return arcompact_handle18_06_11(PARAMS); break; // POP_S blink
-		case 0x12: return arcompact_handle18_06_12(PARAMS); break; // <illegal 0x18_06_12>
-		case 0x13: return arcompact_handle18_06_13(PARAMS); break; // <illegal 0x18_06_13>
-		case 0x14: return arcompact_handle18_06_14(PARAMS); break; // <illegal 0x18_06_14>
-		case 0x15: return arcompact_handle18_06_15(PARAMS); break; // <illegal 0x18_06_15>
-		case 0x16: return arcompact_handle18_06_16(PARAMS); break; // <illegal 0x18_06_16>
-		case 0x17: return arcompact_handle18_06_17(PARAMS); break; // <illegal 0x18_06_17>
-		case 0x18: return arcompact_handle18_06_18(PARAMS); break; // <illegal 0x18_06_18>
-		case 0x19: return arcompact_handle18_06_19(PARAMS); break; // <illegal 0x18_06_19>
-		case 0x1a: return arcompact_handle18_06_1a(PARAMS); break; // <illegal 0x18_06_1a>
-		case 0x1b: return arcompact_handle18_06_1b(PARAMS); break; // <illegal 0x18_06_1b>
-		case 0x1c: return arcompact_handle18_06_1c(PARAMS); break; // <illegal 0x18_06_1c>
-		case 0x1d: return arcompact_handle18_06_1d(PARAMS); break; // <illegal 0x18_06_1d>
-		case 0x1e: return arcompact_handle18_06_1e(PARAMS); break; // <illegal 0x18_06_1e>
-		case 0x1f: return arcompact_handle18_06_1f(PARAMS); break; // <illegal 0x18_06_1f>
+		case 0x00: return arcompact_handle18_06_00(PARAMS);  // <illegal 0x18_06_00>
+		case 0x01: return arcompact_handle18_06_01(PARAMS);  // POP_S b
+		case 0x02: return arcompact_handle18_06_02(PARAMS);  // <illegal 0x18_06_02>
+		case 0x03: return arcompact_handle18_06_03(PARAMS);  // <illegal 0x18_06_03>
+		case 0x04: return arcompact_handle18_06_04(PARAMS);  // <illegal 0x18_06_04>
+		case 0x05: return arcompact_handle18_06_05(PARAMS);  // <illegal 0x18_06_05>
+		case 0x06: return arcompact_handle18_06_06(PARAMS);  // <illegal 0x18_06_06>
+		case 0x07: return arcompact_handle18_06_07(PARAMS);  // <illegal 0x18_06_07>
+		case 0x08: return arcompact_handle18_06_08(PARAMS);  // <illegal 0x18_06_08>
+		case 0x09: return arcompact_handle18_06_09(PARAMS);  // <illegal 0x18_06_09>
+		case 0x0a: return arcompact_handle18_06_0a(PARAMS);  // <illegal 0x18_06_0a>
+		case 0x0b: return arcompact_handle18_06_0b(PARAMS);  // <illegal 0x18_06_0b>
+		case 0x0c: return arcompact_handle18_06_0c(PARAMS);  // <illegal 0x18_06_0c>
+		case 0x0d: return arcompact_handle18_06_0d(PARAMS);  // <illegal 0x18_06_0d>
+		case 0x0e: return arcompact_handle18_06_0e(PARAMS);  // <illegal 0x18_06_0e>
+		case 0x0f: return arcompact_handle18_06_0f(PARAMS);  // <illegal 0x18_06_0f>
+		case 0x10: return arcompact_handle18_06_10(PARAMS);  // <illegal 0x18_06_10>
+		case 0x11: return arcompact_handle18_06_11(PARAMS);  // POP_S blink
+		case 0x12: return arcompact_handle18_06_12(PARAMS);  // <illegal 0x18_06_12>
+		case 0x13: return arcompact_handle18_06_13(PARAMS);  // <illegal 0x18_06_13>
+		case 0x14: return arcompact_handle18_06_14(PARAMS);  // <illegal 0x18_06_14>
+		case 0x15: return arcompact_handle18_06_15(PARAMS);  // <illegal 0x18_06_15>
+		case 0x16: return arcompact_handle18_06_16(PARAMS);  // <illegal 0x18_06_16>
+		case 0x17: return arcompact_handle18_06_17(PARAMS);  // <illegal 0x18_06_17>
+		case 0x18: return arcompact_handle18_06_18(PARAMS);  // <illegal 0x18_06_18>
+		case 0x19: return arcompact_handle18_06_19(PARAMS);  // <illegal 0x18_06_19>
+		case 0x1a: return arcompact_handle18_06_1a(PARAMS);  // <illegal 0x18_06_1a>
+		case 0x1b: return arcompact_handle18_06_1b(PARAMS);  // <illegal 0x18_06_1b>
+		case 0x1c: return arcompact_handle18_06_1c(PARAMS);  // <illegal 0x18_06_1c>
+		case 0x1d: return arcompact_handle18_06_1d(PARAMS);  // <illegal 0x18_06_1d>
+		case 0x1e: return arcompact_handle18_06_1e(PARAMS);  // <illegal 0x18_06_1e>
+		case 0x1f: return arcompact_handle18_06_1f(PARAMS);  // <illegal 0x18_06_1f>
 	}
 
 	return 0;
@@ -959,38 +978,38 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle18_07(OPS_16)
 
 	switch (subinstr2)
 	{
-		case 0x00: return arcompact_handle18_07_00(PARAMS); break; // <illegal 0x18_07_00>
-		case 0x01: return arcompact_handle18_07_01(PARAMS); break; // PUSH_S b
-		case 0x02: return arcompact_handle18_07_02(PARAMS); break; // <illegal 0x18_07_02>
-		case 0x03: return arcompact_handle18_07_03(PARAMS); break; // <illegal 0x18_07_03>
-		case 0x04: return arcompact_handle18_07_04(PARAMS); break; // <illegal 0x18_07_04>
-		case 0x05: return arcompact_handle18_07_05(PARAMS); break; // <illegal 0x18_07_05>
-		case 0x06: return arcompact_handle18_07_06(PARAMS); break; // <illegal 0x18_07_06>
-		case 0x07: return arcompact_handle18_07_07(PARAMS); break; // <illegal 0x18_07_07>
-		case 0x08: return arcompact_handle18_07_08(PARAMS); break; // <illegal 0x18_07_08>
-		case 0x09: return arcompact_handle18_07_09(PARAMS); break; // <illegal 0x18_07_09>
-		case 0x0a: return arcompact_handle18_07_0a(PARAMS); break; // <illegal 0x18_07_0a>
-		case 0x0b: return arcompact_handle18_07_0b(PARAMS); break; // <illegal 0x18_07_0b>
-		case 0x0c: return arcompact_handle18_07_0c(PARAMS); break; // <illegal 0x18_07_0c>
-		case 0x0d: return arcompact_handle18_07_0d(PARAMS); break; // <illegal 0x18_07_0d>
-		case 0x0e: return arcompact_handle18_07_0e(PARAMS); break; // <illegal 0x18_07_0e>
-		case 0x0f: return arcompact_handle18_07_0f(PARAMS); break; // <illegal 0x18_07_0f>
-		case 0x10: return arcompact_handle18_07_10(PARAMS); break; // <illegal 0x18_07_10>
-		case 0x11: return arcompact_handle18_07_11(PARAMS); break; // PUSH_S blink
-		case 0x12: return arcompact_handle18_07_12(PARAMS); break; // <illegal 0x18_07_12>
-		case 0x13: return arcompact_handle18_07_13(PARAMS); break; // <illegal 0x18_07_13>
-		case 0x14: return arcompact_handle18_07_14(PARAMS); break; // <illegal 0x18_07_14>
-		case 0x15: return arcompact_handle18_07_15(PARAMS); break; // <illegal 0x18_07_15>
-		case 0x16: return arcompact_handle18_07_16(PARAMS); break; // <illegal 0x18_07_16>
-		case 0x17: return arcompact_handle18_07_17(PARAMS); break; // <illegal 0x18_07_17>
-		case 0x18: return arcompact_handle18_07_18(PARAMS); break; // <illegal 0x18_07_18>
-		case 0x19: return arcompact_handle18_07_19(PARAMS); break; // <illegal 0x18_07_19>
-		case 0x1a: return arcompact_handle18_07_1a(PARAMS); break; // <illegal 0x18_07_1a>
-		case 0x1b: return arcompact_handle18_07_1b(PARAMS); break; // <illegal 0x18_07_1b>
-		case 0x1c: return arcompact_handle18_07_1c(PARAMS); break; // <illegal 0x18_07_1c>
-		case 0x1d: return arcompact_handle18_07_1d(PARAMS); break; // <illegal 0x18_07_1d>
-		case 0x1e: return arcompact_handle18_07_1e(PARAMS); break; // <illegal 0x18_07_1e>
-		case 0x1f: return arcompact_handle18_07_1f(PARAMS); break; // <illegal 0x18_07_1f>
+		case 0x00: return arcompact_handle18_07_00(PARAMS);  // <illegal 0x18_07_00>
+		case 0x01: return arcompact_handle18_07_01(PARAMS);  // PUSH_S b
+		case 0x02: return arcompact_handle18_07_02(PARAMS);  // <illegal 0x18_07_02>
+		case 0x03: return arcompact_handle18_07_03(PARAMS);  // <illegal 0x18_07_03>
+		case 0x04: return arcompact_handle18_07_04(PARAMS);  // <illegal 0x18_07_04>
+		case 0x05: return arcompact_handle18_07_05(PARAMS);  // <illegal 0x18_07_05>
+		case 0x06: return arcompact_handle18_07_06(PARAMS);  // <illegal 0x18_07_06>
+		case 0x07: return arcompact_handle18_07_07(PARAMS);  // <illegal 0x18_07_07>
+		case 0x08: return arcompact_handle18_07_08(PARAMS);  // <illegal 0x18_07_08>
+		case 0x09: return arcompact_handle18_07_09(PARAMS);  // <illegal 0x18_07_09>
+		case 0x0a: return arcompact_handle18_07_0a(PARAMS);  // <illegal 0x18_07_0a>
+		case 0x0b: return arcompact_handle18_07_0b(PARAMS);  // <illegal 0x18_07_0b>
+		case 0x0c: return arcompact_handle18_07_0c(PARAMS);  // <illegal 0x18_07_0c>
+		case 0x0d: return arcompact_handle18_07_0d(PARAMS);  // <illegal 0x18_07_0d>
+		case 0x0e: return arcompact_handle18_07_0e(PARAMS);  // <illegal 0x18_07_0e>
+		case 0x0f: return arcompact_handle18_07_0f(PARAMS);  // <illegal 0x18_07_0f>
+		case 0x10: return arcompact_handle18_07_10(PARAMS);  // <illegal 0x18_07_10>
+		case 0x11: return arcompact_handle18_07_11(PARAMS);  // PUSH_S blink
+		case 0x12: return arcompact_handle18_07_12(PARAMS);  // <illegal 0x18_07_12>
+		case 0x13: return arcompact_handle18_07_13(PARAMS);  // <illegal 0x18_07_13>
+		case 0x14: return arcompact_handle18_07_14(PARAMS);  // <illegal 0x18_07_14>
+		case 0x15: return arcompact_handle18_07_15(PARAMS);  // <illegal 0x18_07_15>
+		case 0x16: return arcompact_handle18_07_16(PARAMS);  // <illegal 0x18_07_16>
+		case 0x17: return arcompact_handle18_07_17(PARAMS);  // <illegal 0x18_07_17>
+		case 0x18: return arcompact_handle18_07_18(PARAMS);  // <illegal 0x18_07_18>
+		case 0x19: return arcompact_handle18_07_19(PARAMS);  // <illegal 0x18_07_19>
+		case 0x1a: return arcompact_handle18_07_1a(PARAMS);  // <illegal 0x18_07_1a>
+		case 0x1b: return arcompact_handle18_07_1b(PARAMS);  // <illegal 0x18_07_1b>
+		case 0x1c: return arcompact_handle18_07_1c(PARAMS);  // <illegal 0x18_07_1c>
+		case 0x1d: return arcompact_handle18_07_1d(PARAMS);  // <illegal 0x18_07_1d>
+		case 0x1e: return arcompact_handle18_07_1e(PARAMS);  // <illegal 0x18_07_1e>
+		case 0x1f: return arcompact_handle18_07_1f(PARAMS);  // <illegal 0x18_07_1f>
 	}
 
 	return 0;
@@ -1002,10 +1021,10 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle19(OPS_16)
 
 	switch (subinstr)
 	{
-		case 0x00: return arcompact_handle19_00(PARAMS); break; // LD_S (GP)
-		case 0x01: return arcompact_handle19_01(PARAMS); break; // LDB_S (GP)
-		case 0x02: return arcompact_handle19_02(PARAMS); break; // LDW_S (GP)
-		case 0x03: return arcompact_handle19_03(PARAMS); break; // ADD_S (GP)
+		case 0x00: return arcompact_handle19_00(PARAMS);  // LD_S (GP)
+		case 0x01: return arcompact_handle19_01(PARAMS);  // LDB_S (GP)
+		case 0x02: return arcompact_handle19_02(PARAMS);  // LDW_S (GP)
+		case 0x03: return arcompact_handle19_03(PARAMS);  // ADD_S (GP)
 	}
 
 	return 0;
@@ -1017,8 +1036,8 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle1c(OPS_16)
 
 	switch (subinstr)
 	{
-		case 0x00: return arcompact_handle1c_00(PARAMS); break; // ADD_S
-		case 0x01: return arcompact_handle1c_01(PARAMS); break; // CMP_S
+		case 0x00: return arcompact_handle1c_00(PARAMS);  // ADD_S
+		case 0x01: return arcompact_handle1c_01(PARAMS);  // CMP_S
 	}
 
 	return 0;
@@ -1030,8 +1049,8 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle1d(OPS_16)
 
 	switch (subinstr)
 	{
-		case 0x00: return arcompact_handle1d_00(PARAMS); break; // BREQ_S
-		case 0x01: return arcompact_handle1d_01(PARAMS); break; // BRNE_S
+		case 0x00: return arcompact_handle1d_00(PARAMS);  // BREQ_S
+		case 0x01: return arcompact_handle1d_01(PARAMS);  // BRNE_S
 	}
 
 	return 0;
@@ -1043,10 +1062,10 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle1e(OPS_16)
 
 	switch (subinstr)
 	{
-		case 0x00: return arcompact_handle1e_00(PARAMS); break; // B_S
-		case 0x01: return arcompact_handle1e_01(PARAMS); break; // BEQ_S
-		case 0x02: return arcompact_handle1e_02(PARAMS); break; // BNE_S
-		case 0x03: return arcompact_handle1e_03(PARAMS); break; // Bcc_S
+		case 0x00: return arcompact_handle1e_00(PARAMS);  // B_S
+		case 0x01: return arcompact_handle1e_01(PARAMS);  // BEQ_S
+		case 0x02: return arcompact_handle1e_02(PARAMS);  // BNE_S
+		case 0x03: return arcompact_handle1e_03(PARAMS);  // Bcc_S
 	}
 
 	return 0;
@@ -1058,14 +1077,14 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle1e_03(OPS_16)
 
 	switch (subinstr2)
 	{
-		case 0x00: return arcompact_handle1e_03_00(PARAMS); break; // BGT_S
-		case 0x01: return arcompact_handle1e_03_01(PARAMS); break; // BGE_S 
-		case 0x02: return arcompact_handle1e_03_02(PARAMS); break; // BLT_S
-		case 0x03: return arcompact_handle1e_03_03(PARAMS); break; // BLE_S
-		case 0x04: return arcompact_handle1e_03_04(PARAMS); break; // BHI_S
-		case 0x05: return arcompact_handle1e_03_05(PARAMS); break; // BHS_S
-		case 0x06: return arcompact_handle1e_03_06(PARAMS); break; // BLO_S
-		case 0x07: return arcompact_handle1e_03_07(PARAMS); break; // BLS_S 
+		case 0x00: return arcompact_handle1e_03_00(PARAMS);  // BGT_S
+		case 0x01: return arcompact_handle1e_03_01(PARAMS);  // BGE_S 
+		case 0x02: return arcompact_handle1e_03_02(PARAMS);  // BLT_S
+		case 0x03: return arcompact_handle1e_03_03(PARAMS);  // BLE_S
+		case 0x04: return arcompact_handle1e_03_04(PARAMS);  // BHI_S
+		case 0x05: return arcompact_handle1e_03_05(PARAMS);  // BHS_S
+		case 0x06: return arcompact_handle1e_03_06(PARAMS);  // BLO_S
+		case 0x07: return arcompact_handle1e_03_07(PARAMS);  // BLS_S 
 	}
 
 	return 0;
@@ -1138,12 +1157,12 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_01_01_00_helper(OPS_32, const char
 
 	// Branch on Compare / Bit Test - Register-Register
 
-	int c = (op & 0x00000fc0) >> 6;
+	COMMON32_GET_creg
 	COMMON32_GET_breg;
 	//int n = (op & 0x00000020) >> 5;
 
 
-	if ((breg != LIMM_REG) && (c != LIMM_REG))
+	if ((breg != LIMM_REG) && (creg != LIMM_REG))
 	{
 
 	}
@@ -1211,8 +1230,8 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle03(OPS_32)
 	int got_limm = 0; 
 
 	COMMON32_GET_breg;
-	int C = (op & 0x00000fc0) >> 6;
-	
+	COMMON32_GET_creg;
+
 	if (breg == LIMM_REG)
 	{
 		//GET_LIMM_32;
@@ -1220,7 +1239,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle03(OPS_32)
 		got_limm = 1;
 	}
 
-	if (C == LIMM_REG)
+	if (creg == LIMM_REG)
 	{
 		if (!got_limm)
 		{
@@ -1239,13 +1258,16 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle03(OPS_32)
 }
 
 
+
+
+
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_helper(OPS_32, const char* optext, int ignore_dst, int b_reserved)
 {
 	int size = 4;
 	//UINT32 limm = 0;
 	int got_limm = 0;
 
-	int p = (op & 0x00c00000) >> 22;
+	COMMON32_GET_p;
 	COMMON32_GET_breg;
 	
 	if (!b_reserved)
@@ -1267,9 +1289,9 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_helper(OPS_32, const char
 
 	if (p == 0)
 	{
-		int C = (op & 0x00000fc0) >> 6;
+		COMMON32_GET_creg
 
-		if (C == LIMM_REG)
+		if (creg == LIMM_REG)
 		{
 			if (!got_limm)
 			{
@@ -1293,9 +1315,9 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_helper(OPS_32, const char
 
 		if (M == 0)
 		{
-			int C = (op & 0x00000fc0) >> 6;
+			COMMON32_GET_creg
 
-			if (C == LIMM_REG)
+			if (creg == LIMM_REG)
 			{
 				if (!got_limm)
 				{
@@ -1471,75 +1493,79 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_1d(OPS_32)
 } // *
 
 
-// arcompact_handle04_helper format
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_20(OPS_32)
+
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_20_p00(OPS_16)
 {
 	int size = 4;
 	UINT32 limm = 0;
 	int got_limm = 0;
 
-	int p = (op & 0x00c00000) >> 22;
+	COMMON32_GET_creg
 
-	if (p == 0)
+	if (creg == LIMM_REG)
 	{
-		int C = (op & 0x00000fc0) >> 6;
-
-		if (C == LIMM_REG)
+		if (!got_limm)
 		{
-			if (!got_limm)
-			{
-				GET_LIMM_32;
-				size = 8;
-			}
+			GET_LIMM_32;
+			size = 8;
+		}
 
-			return limm;
-		}
-		else
-		{
-			arcompact_log("unimplemented J %08x", op);
-		}
+		return limm;
 	}
-	else if (p == 1)
+	else
 	{
 		arcompact_log("unimplemented J %08x", op);
 	}
-	else if (p == 2)
+
+	return m_pc + (size>>0);
+}
+
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_20_p01(OPS_16)
+{
+	int size = 4;
+	arcompact_log("unimplemented J %08x", op);
+	return m_pc + (size>>0);
+}
+
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_20_p10(OPS_16)
+{
+	int size = 4;
+	arcompact_log("unimplemented J %08x", op);
+	return m_pc + (size>>0);
+}
+
+
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_20_p11_m0(OPS_16)
+{
+	int size = 4;
+//	UINT32 limm = 0;
+	int got_limm = 0;
+
+	COMMON32_GET_creg
+
+	if (creg == LIMM_REG)
+	{
+		if (!got_limm)
+		{
+			//GET_LIMM_32;
+			size = 8;
+		}
+
+		arcompact_log("unimplemented J %08x", op);
+	}
+	else
 	{
 		arcompact_log("unimplemented J %08x", op);
 	}
-	else if (p == 3)
-	{
-		int M = (op & 0x00000020) >> 5;
+	return m_pc + (size>>0);
+}
 
-		if (M == 0)
-		{
-			int C = (op & 0x00000fc0) >> 6;
-
-			if (C == LIMM_REG)
-			{
-				if (!got_limm)
-				{
-					//GET_LIMM_32;
-					size = 8;
-				}
-
-				arcompact_log("unimplemented J %08x", op);
-			}
-			else
-			{
-				arcompact_log("unimplemented J %08x", op);
-			}
-
-		}
-		else if (M == 1)
-		{
-			arcompact_log("unimplemented J %08x", op);
-		}
-
-	}
-
-
-	return m_pc + (size>>0);}
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_20_p11_m1(OPS_16)
+{
+	int size = 4;
+	arcompact_log("unimplemented J %08x", op);
+	return m_pc + (size>>0);
+}
 
 
 
@@ -1565,8 +1591,8 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_28(OPS_32) // LPcc (loop 
 {
 	int size = 4;
 
-	int p = (op & 0x00c00000) >> 22;
-
+	COMMON32_GET_p;
+		
 	if (p == 0x00)
 	{
 	}
@@ -1592,15 +1618,15 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2a(OPS_32)  // Load FROM 
 //	UINT32 limm = 0;
 	int got_limm = 0;
 
-	int p = (op & 0x00c00000) >> 22;
+	COMMON32_GET_p;
 	//COMMON32_GET_breg;
 
 	if (p == 0)
 	{
 
-		int C = (op & 0x00000fc0) >> 6;
+		COMMON32_GET_creg
 
-		if (C == LIMM_REG)
+		if (creg == LIMM_REG)
 		{
 			if (!got_limm)
 			{
@@ -1633,7 +1659,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2b(OPS_32)  // Store TO A
 //	UINT32 limm = 0;
 	int got_limm = 0;
 
-	int p = (op & 0x00c00000) >> 22;
+	COMMON32_GET_p;
 	COMMON32_GET_breg;
 
 	if (breg == LIMM_REG)
@@ -1650,9 +1676,9 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2b(OPS_32)  // Store TO A
 	if (p == 0)
 	{
 
-		int C = (op & 0x00000fc0) >> 6;
+		COMMON32_GET_creg
 
-		if (C == LIMM_REG)
+		if (creg == LIMM_REG)
 		{
 			if (!got_limm)
 			{
@@ -1689,14 +1715,14 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_helper(OPS_32, const c
 {
 	int size = 4;
 
-	int p = (op & 0x00c00000) >> 22;
+	COMMON32_GET_p;
 	//COMMON32_GET_breg;
 	
 	if (p == 0)
 	{
-		int C = (op & 0x00000fc0) >> 6;
+		COMMON32_GET_creg
 
-		if (C == LIMM_REG)
+		if (creg == LIMM_REG)
 		{
 			//UINT32 limm;
 			//GET_LIMM_32;
@@ -1752,7 +1778,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_3x_helper(OPS_32, int dsi
 
 
 	COMMON32_GET_breg;
-	int C = (op & 0x00000fc0) >> 6;
+	COMMON32_GET_creg
 
 
 
@@ -1767,7 +1793,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_3x_helper(OPS_32, int dsi
 	{
 	}
 
-	if (C == LIMM_REG)
+	if (creg == LIMM_REG)
 	{
 		if (!got_limm)
 		{
@@ -1824,14 +1850,14 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle05_2f_0x_helper(OPS_32, cons
 {
 	int size = 4;
 
-	int p = (op & 0x00c00000) >> 22;
+	COMMON32_GET_p;
 	//COMMON32_GET_breg;
 	
 	if (p == 0)
 	{
-		int C = (op & 0x00000fc0) >> 6;
+		COMMON32_GET_creg
 
-		if (C == LIMM_REG)
+		if (creg == LIMM_REG)
 		{
 			//UINT32 limm;
 			//GET_LIMM_32;
