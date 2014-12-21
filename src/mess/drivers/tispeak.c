@@ -20,24 +20,37 @@ public:
 	tispeak_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_tms5100(*this, "tms5100"),
+		m_tms6100(*this, "tms6100"),
+		m_filoff_timer(*this, "filoff"),
 		m_button_matrix(*this, "IN")
 	{ }
 
 	required_device<tms0270_cpu_device> m_maincpu;
+	required_device<tms5100_device> m_tms5100;
+	required_device<tms6100_device> m_tms6100;
+	required_device<timer_device> m_filoff_timer;
 	required_ioport_array<9> m_button_matrix;
 
 	UINT16 m_r;
 	UINT16 m_o;
+	int m_filament_on;
+	int m_power_on;
 
-	UINT16 m_leds_state[9];
-	void leds_update();
+	UINT16 m_digit_state[9];
+	void display_update();
+	TIMER_DEVICE_CALLBACK_MEMBER(delayed_filament_off);
 
 	DECLARE_READ8_MEMBER(snspell_read_k);
 	DECLARE_WRITE16_MEMBER(snmath_write_o);
 	DECLARE_WRITE16_MEMBER(snspell_write_o);
 	DECLARE_WRITE16_MEMBER(snspell_write_r);
-	DECLARE_WRITE_LINE_MEMBER(auto_power_off);
 
+	DECLARE_INPUT_CHANGED_MEMBER(power_button);
+	DECLARE_WRITE_LINE_MEMBER(auto_power_off);
+	void power_off();
+
+	virtual void machine_reset();
 	virtual void machine_start();
 };
 
@@ -45,22 +58,52 @@ public:
 
 /***************************************************************************
 
-  LEDs
+  VFD Display
 
 ***************************************************************************/
 
+// The device strobes the filament-enable very fast, it is unnoticeable to the user.
+// To prevent flickering here, we need to simulate a decay.
 
-void tispeak_state::leds_update()
+// decay time in milliseconds
+#define FILOFF_DECAY_TIME 20
+
+TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::delayed_filament_off)
 {
-	// update leds state
+	// turn off display
+	m_filament_on = 0;
+	display_update();
+}
+
+void tispeak_state::display_update()
+{
+	// filament on/off
+	if (m_r & 0x8000)
+	{
+		m_filament_on = 1;
+		m_filoff_timer->reset();
+	}
+	else if (m_filament_on && m_filoff_timer->time_left() == attotime::never)
+	{
+		// schedule delayed filament-off
+		m_filoff_timer->adjust(attotime::from_msec(FILOFF_DECAY_TIME));
+	}
+	
+	// update digit state
 	for (int i = 0; i < 9; i++)
 		if (m_r >> i & 1)
-			m_leds_state[i] = m_o & 0x3fff;
+			m_digit_state[i] = m_o;
 
-	// if filament (R15) is on, send to output
-//	if (m_r & 0x8000) // blank..
+	// send to output
 	for (int i = 0; i < 9; i++)
-		output_set_digit_value(i, m_leds_state[i]);
+	{
+		// standard led14seg
+		output_set_digit_value(i, m_filament_on ? m_digit_state[i] & 0x3fff : 0);
+		
+		// DP(display point) and AP(apostrophe) segments as lamps
+		output_set_lamp_value(i*10 + 0, m_digit_state[i] >> 14 & m_filament_on);
+		output_set_lamp_value(i*10 + 1, m_digit_state[i] >> 15 & m_filament_on);
+	}
 }
 
 
@@ -88,8 +131,11 @@ READ8_MEMBER(tispeak_state::snspell_read_k)
 
 WRITE16_MEMBER(tispeak_state::snspell_write_r)
 {
+	// R0-R7: input mux and select digit (+R8 if the device has 9 digits)
+	// R15: filament on
+	// other bits: MCU internal use
 	m_r = data;
-	leds_update();
+	display_update();
 }
 
 WRITE16_MEMBER(tispeak_state::snspell_write_o)
@@ -98,13 +144,24 @@ WRITE16_MEMBER(tispeak_state::snspell_write_o)
 	// E,D,C,G,B,A,I,M,L,K,N,J,[AP],H,F,[DP] (sidenote: TI KLMN = MAME MLNK)
 	m_o = BITSWAP16(data,12,15,10,7,8,9,11,6,13,3,14,0,1,2,4,5);
 
-	leds_update();
+	display_update();
 }
 
 
+void tispeak_state::power_off()
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_tms5100->reset();
+	m_tms6100->reset();
+
+	m_power_on = 0;
+}
+
 WRITE_LINE_MEMBER(tispeak_state::auto_power_off)
 {
-	//if (state) printf("X");
+	// power-off request from the MCU, usually after a couple of minutes of idling
+	if (state)
+		power_off();
 }
 
 
@@ -116,7 +173,7 @@ WRITE16_MEMBER(tispeak_state::snmath_write_o)
 	// [DP],D,C,H,F,B,I,M,L,K,N,J,[AP],E,G,A (sidenote: TI KLMN = MAME MLNK)
 	m_o = BITSWAP16(data,12,0,10,7,8,9,11,6,3,14,4,13,1,2,5,15);
 
-	leds_update();
+	display_update();
 }
 
 
@@ -126,6 +183,20 @@ WRITE16_MEMBER(tispeak_state::snmath_write_o)
   Inputs
 
 ***************************************************************************/
+
+INPUT_CHANGED_MEMBER(tispeak_state::power_button)
+{
+	// note: even though power buttons are on the matrix, they are not MCU-controlled
+	int on = (int)(FPTR)param;
+	
+	if (on)
+	{
+		m_power_on = 1;
+		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	}
+	else if (m_power_on)
+		power_off();
+}
 
 static INPUT_PORTS_START( snspell )
 	PORT_START("IN.0") // R0
@@ -174,7 +245,7 @@ static INPUT_PORTS_START( snspell )
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.7") // R7
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_NAME("Go")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME("Replay")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("Repeat")
@@ -185,7 +256,7 @@ static INPUT_PORTS_START( snspell )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Secret Code")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Letter")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("Say It")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Spell/On")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Spell/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)1)
 INPUT_PORTS_END
 
 
@@ -215,7 +286,7 @@ static INPUT_PORTS_START( snmath )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Go")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)0)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.4") // R4
@@ -237,7 +308,7 @@ static INPUT_PORTS_START( snmath )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_NAME("Write It")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_NAME("Greater/Less")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_NAME("Word Problems")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Solve It/On")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Solve It/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)1)
 
 	PORT_START("IN.7")
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -254,15 +325,27 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
+void tispeak_state::machine_reset()
+{
+	m_filament_on = 0;
+	m_power_on = 1;
+}
+
 void tispeak_state::machine_start()
 {
-	memset(m_leds_state, 0, sizeof(m_leds_state));
+	// zerofill
+	memset(m_digit_state, 0, sizeof(m_digit_state));
 	m_r = 0;
 	m_o = 0;
+	m_filament_on = 0;
+	m_power_on = 0;
 
-	save_item(NAME(m_leds_state));
+	// register for savestates
+	save_item(NAME(m_digit_state));
 	save_item(NAME(m_r));
 	save_item(NAME(m_o));
+	save_item(NAME(m_filament_on));
+	save_item(NAME(m_power_on));
 }
 
 
@@ -279,7 +362,8 @@ static MACHINE_CONFIG_START( snspell, tispeak_state )
 	MCFG_TMS0270_WRITE_CTL_CB(DEVWRITE8("tms5100", tms5100_device, ctl_w))
 	MCFG_TMS0270_WRITE_PDC_CB(DEVWRITELINE("tms5100", tms5100_device, pdc_w))
 
-	MCFG_DEFAULT_LAYOUT(layout_tispeak)
+	MCFG_TIMER_DRIVER_ADD("filoff", tispeak_state, delayed_filament_off)
+	MCFG_DEFAULT_LAYOUT(layout_tispeak) // max 9 digits
 
 	/* no video! */
 
