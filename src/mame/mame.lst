@@ -1098,6 +1098,7 @@ crszonev2a      // Crisis Zone - December 1999
 sys246
 bldyr3b
 rrvac
+rrvac2
 wanganmd
 dragchrn
 netchu02
@@ -1110,6 +1111,7 @@ tekken4
 tekken4a
 tekken4b
 tekken4c
+prdgp03
 timecrs3
 timecrs3e
 zgundm
@@ -1119,6 +1121,7 @@ zgundmdx
 gundzaft
 soulclb3
 soulclb3a
+qgundam
 fateulc
 fateulcb
 sbxc
@@ -1134,6 +1137,9 @@ yuyuhaku
 taiko10
 gdvsgd
 gdvsgdnx
+
+// Namco System Super 256
+timecrs4
 
 // Misc Namco games
 cswat           // (c) 1984
