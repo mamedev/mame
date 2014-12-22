@@ -404,24 +404,11 @@ int arcompact_handle04_p00_helper_dasm(DASM_OPS_32, const char* optext, int igno
 	//	output  += sprintf( output, " p(%d)", p);
 
 
-	if (!b_reserved)
+	if ((!b_reserved) && (breg == LIMM_REG))
 	{
-		if (breg == LIMM_REG)
-		{
-			GET_LIMM_32;
-			size = 8;
-			got_limm = 1;
-			output += sprintf(output, " 0x%08x ", limm);
-
-		}
-		else
-		{
-			output += sprintf(output, " %s, ", regnames[breg]);
-		}
-	}
-	else
-	{
-		if (breg) output += sprintf(output, "reserved(%s), ", regnames[breg]);
+		GET_LIMM_32;
+		size = 8;
+		got_limm = 1;
 	}
 
 	if (creg == LIMM_REG)
@@ -431,42 +418,42 @@ int arcompact_handle04_p00_helper_dasm(DASM_OPS_32, const char* optext, int igno
 			GET_LIMM_32;
 			size = 8;
 		}
+	}
 
-		output += sprintf(output, " 0x%08x ", limm);
-		if (ignore_dst == 0)
-		{
-			if (areg != LIMM_REG) output += sprintf(output, "DST(%s)", regnames[areg]);
-			else output += sprintf(output, "<no dst>");
-		}
+	// areg can be LIMM too, but in that case LIMM indicates 'no destination' rather than an actual LIMM value following
+
+	if (ignore_dst == 0)
+	{
+		if (areg != LIMM_REG)  output += sprintf(output, " %s <-", regnames[areg]);
+		else output += sprintf(output, " <no dst> <-");
+	}
+	else if (ignore_dst == 1) // certain opcode types ignore the 'a' field entirely, it should be set to 0.
+	{
+		 if (areg) output += sprintf(output, " <reserved %d> <-", areg);
+	}
+	else if (ignore_dst == 2) // for multiply operations areg should always be set to LIMM
+	{
+		if (areg != LIMM_REG) output += sprintf(output, " <invalid %d> <-", areg);
+		else  output += sprintf(output, " <mulres> <-");
+	}
+
+	if (!b_reserved)
+	{
+		if (breg == LIMM_REG)
+			output += sprintf(output, " 0x%08x,", limm);
 		else
-		{
-			if (ignore_dst == 1) { if (areg) output += sprintf(output, "unused(%s)", regnames[areg]); }
-			else
-			{
-				if (areg != LIMM_REG) output += sprintf(output, "invalid(%s)", regnames[areg]);
-				else  output += sprintf(output, "<mulres>");
-			} // mul operations expect A to be set to LIMM (no output)
-		}
+			output += sprintf(output, " %s,", regnames[breg]);
 	}
 	else
 	{
-		output += sprintf(output, "C(%s) ", regnames[creg]);
-		if (ignore_dst == 0)
-		{
-			if (areg != LIMM_REG)  output += sprintf(output, "DST(%s)", regnames[areg]);
-			else output += sprintf(output, "<no dst>");
-		}
-		else
-		{
-			if (ignore_dst == 1) { if (areg) output += sprintf(output, "unused(%s)", regnames[areg]); }
-			else
-			{
-				if (areg != LIMM_REG) output += sprintf(output, "invalid(%s)", regnames[areg]);
-				else  output += sprintf(output, "<mulres>");
-			} // mul operations expect A to be set to LIMM (no output)
-		}
-
+		if (breg) output += sprintf(output, "<reserved %d>,", breg);
 	}
+
+	if (creg == LIMM_REG)
+		output += sprintf(output, " 0x%08x", limm);
+	else
+		output += sprintf(output, " %s", regnames[creg]);
+
 	return size;
 }
 

@@ -1288,7 +1288,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle01_01_01_05(OPS_32) // regis
 		b = limm;
 	}
 
-	// BRHS
+	// BRHS"
 	if (b >= c) // check
 	{
 		// take jump
@@ -1510,10 +1510,85 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_helper(OPS_32, const char
 	return m_pc + (size>>0);
 }
 
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_00(OPS_32)  
+
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_00_p00(OPS_32)
 {
-	return arcompact_handle04_helper(PARAMS, opcodes_04[0x00], /*"ADD"*/ 0,0);
+	int size = 4;
+	UINT32 limm = 0;
+	int got_limm = 0;
+
+	COMMON32_GET_breg;
+	COMMON32_GET_F;
+	COMMON32_GET_creg
+	COMMON32_GET_areg
+
+	UINT32 b, c;
+
+	if (breg == LIMM_REG)
+	{
+		GET_LIMM_32;
+		size = 8;
+		got_limm = 1;
+		b = limm;
+	}
+	else
+	{
+		b = m_regs[breg];
+	}
+
+	if (creg == LIMM_REG)
+	{
+		if (!got_limm)
+		{
+			GET_LIMM_32;
+			size = 8;
+		}
+		c = limm;
+	}
+	else
+	{
+		c = m_regs[creg];
+	}
+
+	// todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?)
+	m_regs[areg] = b + c;
+
+	if (F)
+	{
+		arcompact_fatal("arcompact_handle04_00_p00 (ADD) (F set)\n"); // not yet supported
+	}
+
+	return m_pc + (size >> 0);
 }
+
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_00_p01(OPS_32)
+{
+	int size = 4;
+	arcompact_fatal("arcompact_handle04_00_p01 (ADD)\n");
+	return m_pc + (size >> 0);
+}
+
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_00_p10(OPS_32)
+{
+	int size = 4;
+	arcompact_fatal("arcompact_handle04_00_p10 (ADD)\n");
+	return m_pc + (size >> 0);
+}
+
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_00_p11_m0(OPS_32)
+{
+	int size = 4;
+	arcompact_fatal("arcompact_handle04_00_p11_m0 (ADD)\n");
+	return m_pc + (size >> 0);
+}
+
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_00_p11_m1(OPS_32)
+{
+	int size = 4;
+	arcompact_fatal("arcompact_handle04_00_p11_m1 (ADD)\n");
+	return m_pc + (size >> 0);
+}
+
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_01(OPS_32)  
 { 

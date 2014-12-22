@@ -146,7 +146,7 @@ protected:
 	ARCOMPACT_RETTYPE arcompact_handle01_01_01_0f(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle02(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle03(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_00(OPS_32);
+//	ARCOMPACT_RETTYPE arcompact_handle04_00(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_01(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_02(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_03(OPS_32);
@@ -767,10 +767,9 @@ protected:
 
 	ARCOMPACT_RETTYPE get_insruction(OPS_32);
 
-
-	ARCOMPACT_HANDLER04_TYPE_PM(04_20);
+	ARCOMPACT_HANDLER04_TYPE_PM(04_00);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_0a);
-
+	ARCOMPACT_HANDLER04_TYPE_PM(04_20);
 
 private:
 	address_space_config m_program_config;
