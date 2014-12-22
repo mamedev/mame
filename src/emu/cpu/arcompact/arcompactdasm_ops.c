@@ -1372,7 +1372,7 @@ int arcompact_handle0b_dasm(DASM_OPS_32)
 
 
 
-int arcompact_handle0c_helper_dasm(DASM_OPS_16, const char* optext)
+int arcompact_handle0c_helper_dasm(DASM_OPS_16, const char* optext, int format)
 {
 	int areg, breg, creg;
 
@@ -1385,29 +1385,31 @@ int arcompact_handle0c_helper_dasm(DASM_OPS_16, const char* optext)
 	REG_16BIT_RANGE(creg);
 
 
-	print("%s %s <- [%s, %s]", optext, regnames[areg], regnames[breg], regnames[creg]);
+	if (format==0) print("%s %s <- [%s, %s]", optext, regnames[areg], regnames[breg], regnames[creg]);
+	else print("%s %s <- %s, %s", optext, regnames[areg], regnames[breg], regnames[creg]);
+
 	return 2;
 }
 
 
 int arcompact_handle0c_00_dasm(DASM_OPS_16)
 {
-	return arcompact_handle0c_helper_dasm(DASM_PARAMS, "LD_S");
+	return arcompact_handle0c_helper_dasm(DASM_PARAMS, "LD_S", 0);
 }
 
 int arcompact_handle0c_01_dasm(DASM_OPS_16)
 {
-	return arcompact_handle0c_helper_dasm(DASM_PARAMS, "LDB_S");
+	return arcompact_handle0c_helper_dasm(DASM_PARAMS, "LDB_S", 0);
 }
 
 int arcompact_handle0c_02_dasm(DASM_OPS_16)
 {
-	return arcompact_handle0c_helper_dasm(DASM_PARAMS, "LDW_S");
+	return arcompact_handle0c_helper_dasm(DASM_PARAMS, "LDW_S", 0);
 }
 
 int arcompact_handle0c_03_dasm(DASM_OPS_16)
 {
-	return arcompact_handle0c_helper_dasm(DASM_PARAMS, "ADD_S");
+	return arcompact_handle0c_helper_dasm(DASM_PARAMS, "ADD_S", 1);
 }
 
 
