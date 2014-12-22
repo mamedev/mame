@@ -11,7 +11,7 @@
 		<info name="serial" value="CD2302"/>
 		<part name="cart" interface="snspell">
 			<dataarea name="rom" size="0x4000">
-				<rom name="cd2302.vsm" size="0x4000" crc="e4135cff" sha1="eab92188fb19545f677ede926c2c0b6af26b7e25" offset="0" />
+				<rom name="cd2302.vsm" size="0x4000" crc="c9b82e72" sha1="f4ef0f72993c14eca62a2e3e013aeb2683fb82fc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
