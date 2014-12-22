@@ -4394,6 +4394,10 @@
 	</software>
 
 	<software name="cpatrol">
+		<!-- Unknown source
+		<rom name="CRIMEPATROL.CUE" size="139" crc="5705c8a3" />
+		<rom name="CRIMEPATROL.BIN" size="282661008" crc="16da07cc" />
+		-->
 		<description>Crime Patrol (USA)</description>
 		<year>1994</year>
 		<publisher>American Laser Games</publisher>
@@ -4406,6 +4410,10 @@
 	</software>
 
 	<software name="demoman">
+		<!-- Unknown source
+		<rom name="Demolition Man (U).cue" size="679" crc="d08eafa7" />
+		<rom name="Demolition Man (U).bin" size="366314592" crc="426b8d81" />
+		-->
 		<description>Demolition Man (USA)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -4450,6 +4458,10 @@
 	</software>
 
 	<software name="espnnba">
+		<!-- Unknown source
+		<rom name="ESPN NBA Hang Time '95 (U).cue" size="1015" crc="69f92ad9" />
+		<rom name="ESPN NBA Hang Time '95 (U).bin" size="558425952" crc="1969b96a" />
+		-->
 		<description>ESPN NBA Hang Time '95 (USA)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
