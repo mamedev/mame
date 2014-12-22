@@ -8,6 +8,7 @@
      Various fixes by Lord Nightmare
      Additional enhancements by Couriersud
      Sub-interpolation-cycle parameter updating added by Lord Nightmare
+     Read-bit and Output fixes by Lord Nightmare
 
      Todo:
         - implement CS
@@ -79,9 +80,18 @@
 
 /* States for CTL */
 
-#define CTL_STATE_INPUT         (0)
-#define CTL_STATE_OUTPUT        (1)
-#define CTL_STATE_NEXT_OUTPUT   (2)
+// ctl bus is input to tms51xx
+#define CTL_STATE_INPUT               (0)
+// ctl bus is outputting a test talk command on CTL1(bit 0)
+#define CTL_STATE_TTALK_OUTPUT        (1)
+// ctl bus is switching direction, next will be above
+#define CTL_STATE_NEXT_TTALK_OUTPUT   (2)
+// ctl bus is outputting a read nybble 'output' command on CTL1,2,4,8 (bits 0-3)
+#define CTL_STATE_OUTPUT              (3)
+// ctl bus is switching direction, next will be above
+#define CTL_STATE_NEXT_OUTPUT         (4)
+
+
 
 /* Pull in the ROM tables */
 #include "tms5110r.inc"
@@ -125,20 +135,21 @@ void tms5110_device::new_int_write(UINT8 rc, UINT8 m0, UINT8 m1, UINT8 addr)
 
 void tms5110_device::new_int_write_addr(UINT8 addr)
 {
-	new_int_write(1, 0, 1, addr);
-	new_int_write(0, 0, 1, addr);
-	new_int_write(1, 0, 0, addr);
-	new_int_write(0, 0, 0, addr);
+	new_int_write(1, 0, 1, addr); // romclk 1, m0 0, m1 1, addr bus nybble = xxxx
+	new_int_write(0, 0, 1, addr); // romclk 0, m0 0, m1 1, addr bus nybble = xxxx
+	new_int_write(1, 0, 0, addr); // romclk 1, m0 0, m1 0, addr bus nybble = xxxx
+	new_int_write(0, 0, 0, addr); // romclk 0, m0 0, m1 0, addr bus nybble = xxxx
 }
 
 UINT8 tms5110_device::new_int_read()
 {
-	new_int_write(1, 1, 0, 0);
-	new_int_write(0, 1, 0, 0);
-	new_int_write(1, 0, 0, 0);
-	new_int_write(0, 0, 0, 0);
+	new_int_write(1, 1, 0, 0); // romclk 1, m0 1, m1 0, addr bus nybble = 0/open bus
+	new_int_write(0, 1, 0, 0); // romclk 0, m0 1, m1 0, addr bus nybble = 0/open bus
+	new_int_write(1, 0, 0, 0); // romclk 1, m0 0, m1 0, addr bus nybble = 0/open bus
+	new_int_write(0, 0, 0, 0); // romclk 0, m0 0, m1 0, addr bus nybble = 0/open bus
 	if (!m_data_cb.isnull())
 		return m_data_cb();
+	if (DEBUG_5110) logerror("WARNING: CALLBACK MISSING, RETURNING 0!\n");
 	return 0;
 }
 
@@ -179,6 +190,7 @@ void tms5110_device::register_for_save_states()
 	save_item(NAME(m_address));
 	save_item(NAME(m_schedule_dummy_read));
 	save_item(NAME(m_addr_bit));
+	save_item(NAME(m_CTL_buffer));
 
 	save_item(NAME(m_x));
 
@@ -220,13 +232,14 @@ void tms5110_device::FIFO_data_write(int data)
 int tms5110_device::extract_bits(int count)
 {
 	int val = 0;
-
+	if (DEBUG_5110) logerror("requesting %d bits from fifo: ", count);
 	while (count--)
 	{
 		val = (val << 1) | (m_fifo[m_fifo_head] & 1);
 		m_fifo_count--;
 		m_fifo_head = (m_fifo_head + 1) % FIFO_SIZE;
 	}
+	if (DEBUG_5110) logerror("returning: %02x\n", val);
 	return val;
 }
 
@@ -235,6 +248,7 @@ void tms5110_device::request_bits(int no)
 	for (int i = 0; i < no; i++)
 	{
 		UINT8 data = new_int_read();
+		if (DEBUG_5110) logerror("bit added to fifo: %d\n", data);
 		FIFO_data_write(data);
 	}
 }
@@ -581,22 +595,34 @@ void tms5110_device::PDC_set(int data)
 		m_PDC = data & 0x1;
 		if (m_PDC == 0) /* toggling 1->0 processes command on CTL_pins */
 		{
+			if (DEBUG_5110) logerror("PDC falling edge: ");
 			/* first pdc toggles output, next toggles input */
 			switch (m_state)
 			{
 			case CTL_STATE_INPUT:
 				/* continue */
 				break;
+			case CTL_STATE_NEXT_TTALK_OUTPUT:
+				if (DEBUG_5110) logerror("Switching CTL bus direction to output for Test Talk\n");
+				m_state = CTL_STATE_TTALK_OUTPUT;
+				return;
+			case CTL_STATE_TTALK_OUTPUT:
+				if (DEBUG_5110) logerror("Switching CTL bus direction back to input from Test Talk\n");
+				m_state = CTL_STATE_INPUT;
+				return;
 			case CTL_STATE_NEXT_OUTPUT:
+				if (DEBUG_5110) logerror("Switching CTL bus direction for Read Bit Buffer Output\n");
 				m_state = CTL_STATE_OUTPUT;
 				return;
 			case CTL_STATE_OUTPUT:
+				if (DEBUG_5110) logerror("Switching CTL bus direction back to input from Read Bit Buffer Output\n");
 				m_state = CTL_STATE_INPUT;
 				return;
 			}
 			/* the only real commands we handle now are SPEAK and RESET */
 			if (m_next_is_address)
 			{
+				if (DEBUG_5110) logerror("Loading address nybble %02x to VSMs\n", m_CTL_pins);
 				m_next_is_address = FALSE;
 				m_address = m_address | ((m_CTL_pins & 0x0F)<<m_addr_bit);
 				m_addr_bit = (m_addr_bit + 4) % 12;
@@ -605,35 +631,55 @@ void tms5110_device::PDC_set(int data)
 			}
 			else
 			{
+				if (DEBUG_5110) logerror("Got command nybble %02x: ", m_CTL_pins);
 				switch (m_CTL_pins & 0xe) /*CTL1 - don't care*/
 				{
-				case TMS5110_CMD_SPEAK:
-					perform_dummy_read();
-					m_speaking_now = 1;
-
-					//should FIFO be cleared now ?????
-					break;
-
 				case TMS5110_CMD_RESET:
+					if (DEBUG_5110) logerror("RESET\n");
 					perform_dummy_read();
 					reset();
 					break;
 
+				case TMS5110_CMD_LOAD_ADDRESS:
+					if (DEBUG_5110) logerror("LOAD ADDRESS\n");
+					m_next_is_address = TRUE;
+					break;
+
+				case TMS5110_CMD_OUTPUT:
+					if (DEBUG_5110) logerror("OUTPUT (from read-bit buffer)\n");
+					m_state = CTL_STATE_NEXT_OUTPUT;
+					break;
+
+				case TMS5110_CMD_SPKSLOW:
+					if (DEBUG_5110) logerror("SPKSLOW (todo: this isn't implemented right yet)\n");
+					perform_dummy_read();
+					m_speaking_now = 1;
+					//should FIFO be cleared now ????? there is no fifo! the fifo is a lie!
+					break;
+
 				case TMS5110_CMD_READ_BIT:
+					if (DEBUG_5110) logerror("READ BIT\n");
 					if (m_schedule_dummy_read)
 						perform_dummy_read();
 					else
 					{
+						if (DEBUG_5110) logerror("actually reading a bit now\n");
 						request_bits(1);
-						m_CTL_pins = (m_CTL_pins & 0x0E) | extract_bits(1);
+						m_CTL_buffer >>= 1;
+						m_CTL_buffer |= (extract_bits(1)<<3);
+						m_CTL_buffer &= 0xF;
 					}
 					break;
 
-				case TMS5110_CMD_LOAD_ADDRESS:
-					m_next_is_address = TRUE;
+				case TMS5110_CMD_SPEAK:
+					if (DEBUG_5110) logerror("SPEAK\n");
+					perform_dummy_read();
+					m_speaking_now = 1;
+					//should FIFO be cleared now ????? there is no fifo! the fifo is a lie!
 					break;
 
 				case TMS5110_CMD_READ_BRANCH:
+					if (DEBUG_5110) logerror("READ AND BRANCH\n");
 					new_int_write(0,1,1,0);
 					new_int_write(1,1,1,0);
 					new_int_write(0,1,1,0);
@@ -644,7 +690,8 @@ void tms5110_device::PDC_set(int data)
 					break;
 
 				case TMS5110_CMD_TEST_TALK:
-					m_state = CTL_STATE_NEXT_OUTPUT;
+					if (DEBUG_5110) logerror("TEST TALK\n");
+					m_state = CTL_STATE_NEXT_TTALK_OUTPUT;
 					break;
 
 				default:
@@ -917,6 +964,7 @@ void tms5110_device::device_reset()
 	m_speaking_now = m_talk_status = 0;
 	m_CTL_pins = 0;
 		m_RNG = 0x1fff;
+	m_CTL_buffer = 0;
 
 	/* initialize the energy/pitch/k states */
 	m_old_energy = m_new_energy = m_current_energy = m_target_energy = 0;
@@ -935,7 +983,6 @@ void tms5110_device::device_reset()
 	{
 		/* legacy interface */
 		m_schedule_dummy_read = TRUE;
-
 	}
 	else
 	{
@@ -981,16 +1028,18 @@ WRITE_LINE_MEMBER( tms5110_device::pdc_w )
 
 /******************************************************************************
 
-     tms5110_ctl_r -- read status from the sound chip
-
-        bit 0 = TS - Talk Status is active (high) when the VSP is processing speech data.
+     tms5110_ctl_r -- read from the VSP (51xx) control bus
+        The CTL bus can be in three states:
+        1. Test talk output:
+            bit 0 = TS - Talk Status is active (high) when the VSP is processing speech data.
                 Talk Status goes active at the initiation of a SPEAK command.
                 It goes inactive (low) when the stop code (Energy=1111) is processed, or
                 immediately(?????? not TMS5110) by a RESET command.
-        TMS5110 datasheets mention this is only available as a result of executing
-                TEST TALK command.
-
-                FIXME: data read not implemented, CTL1 only available after TALK command
+            other bits may be open bus
+        2. 'read bit' buffer contents output:
+            bits 0-3 = buffer contents
+        3. Input 'open bus' state:
+            bits 0-3 = high-z
 
 ******************************************************************************/
 
@@ -998,15 +1047,20 @@ READ8_MEMBER( tms5110_device::ctl_r )
 {
 	/* bring up to date first */
 	m_stream->update();
-	if (m_state == CTL_STATE_OUTPUT)
+	if (m_state == CTL_STATE_TTALK_OUTPUT)
 	{
-		//if (DEBUG_5110) logerror("Status read (status=%2d)\n", m_talk_status);
+		if (DEBUG_5110) logerror("Status read while outputting Test Talk (status=%2d)\n", m_talk_status);
 		return (m_talk_status << 0); /*CTL1 = still talking ? */
 	}
-	else
+	else if (m_state == CTL_STATE_OUTPUT)
 	{
-		//if (DEBUG_5110) logerror("Status read (not in output mode)\n");
-		return (0);
+		if (DEBUG_5110) logerror("Status read while outputting buffer (buffer=%2d)\n", m_CTL_buffer);
+		return (m_CTL_buffer); 
+	}
+	else // we're reading with the bus in input mode! just return the last thing written to the bus
+	{
+		if (DEBUG_5110) logerror("Status read (not in output mode), returning %02x\n", m_CTL_pins);
+		return (m_CTL_pins);
 	}
 }
 
@@ -1095,6 +1149,8 @@ void tms5110_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 /******************************************************************************
 
      tms5110_set_frequency -- adjusts the playback frequency
+	 TODO: kill this function; we should be adjusting the tms51xx device clock itself,
+	 not setting it here!
 
 ******************************************************************************/
 
@@ -1102,6 +1158,10 @@ void tms5110_device::set_frequency(int frequency)
 {
 	m_stream->set_sample_rate(frequency / 80);
 }
+
+
+
+/* from here on in this file is a VSM 'Emulator' circuit used by bagman and ad2083 */
 
 /*
  *

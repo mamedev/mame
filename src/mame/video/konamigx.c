@@ -695,8 +695,6 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_1(screen_device &screen, bi
 	int i = code<<1;
 	int j = mixerflags>>i & 3;
 	int k = 0;
-	static int parity = 0;
-	parity ^= 1;
 
 	int disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 	if ((disp & K55_INP_SUB1) || (rushingheroes_hack))
@@ -717,7 +715,7 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_1(screen_device &screen, bi
 			alpha = temp4 = m_k054338->set_alpha_level(temp2);
 
 			if (temp4 <= 0) return;
-			if (temp4 < 255) k = (j == GXMIX_BLEND_FAST) ? ~parity : 1;
+			if (temp4 < 255) k = 1;
 		}
 
 		int l = sub1flags & 0xf;
@@ -745,9 +743,6 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_2(screen_device &screen, bi
 	int temp1,temp2,temp3,temp4;
 	int i = code<<1;
 	int j = mixerflags>>i & 3;
-//  int k = 0;
-//  static int parity = 0;
-//  parity ^= 1;
 
 	int disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 	if (disp & K55_INP_SUB2)
@@ -768,7 +763,7 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_2(screen_device &screen, bi
 			temp4 = m_k054338->set_alpha_level(temp2);
 
 			if (temp4 <= 0) return;
-			//if (temp4 < 255) k = (j == GXMIX_BLEND_FAST) ? ~parity : 1;
+			//if (temp4 < 255) k = 1;
 		}
 
 		int l = sub2flags & 0xf;

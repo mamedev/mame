@@ -2,146 +2,917 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <softwarelist name="sol20_cass" description="PTC SOL-20 cassettes">
-	<software name="2progs" supported="no">
-		<description>2 Programs in 1</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
 
-		<part name="cass1" interface="sol20_cass">
-			<dataarea name="cass" size="25383">
-				<rom name="2 programs in 1 (19xx)(-).svt" size="25383" crc="d2e097e3" sha1="52eb5e4036201c8bcb7eea656cd1d4b42d80d58b" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+<!--
+These programs were .svt (Solace Virtual Tape) files, currently only partially supported in MESS emulator and therefore marked as unsupported.
+Downloaded from http://www.sol20.org (Note: .svt files: pilot, space and strategy, for which exist recreated .wav version, were rejected.)
+-->
 
-	<software name="metron" supported="no">
-		<description>Metron Computerware</description>
-		<year>1977</year>
-		<publisher>Tiny C Associates</publisher>
+<!--
+Proteus Cassette Software
 
-		<part name="cass1" interface="sol20_cass">
-			<dataarea name="cass" size="30719">
-				<rom name="metron computerware (1977)(tiny c associates).svt" size="30719" crc="6140c147" sha1="294487f58ec607decb69900b169a6b03208a61b4" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+    Proteus Cassette #1 -- Extended Cassette BASIC
+    Proteus Cassette #2 -- Extended Cassette BASIC
+    Proteus Cassette #3 -- Extended Cassette BASIC
+    Proteus Cassette #7 -- Assembly language source and object
+    Proteus Cassette #8 -- More Extended Cassette BASIC programs
 
-	<software name="pilot" supported="no">
-		<description>Pilot</description>
-		<year>19??</year>
-		<publisher>Processor Techonolgy</publisher>
-
-		<part name="cass1" interface="sol20_cass">
-			<dataarea name="cass" size="51064">
-				<rom name="pilot (19xx)(processor techonolgy).svt" size="51064" crc="e192a999" sha1="628b8e364f22a1a38b6f5487a2dcd518182ec5de" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="proteus1" supported="no">
-		<description>Proteus Cassete #1</description>
-		<year>19??</year>
+Contents of Proteus software collections at http://www.sol20.org/manuals/proteus_cass_library.txt
+C7 User Manual at http://www.sol20.org/manuals/proteus_c7.pdf
+-->
+	<software name="prtsclib" supported="no">
+		<description>Proteus Cassette Software Library</description>
+		<year>1979</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="77646">
-				<rom name="proteus cassete #1 (19xx)(-).svt" size="77646" crc="f40fd39a" sha1="fe0b70607dd556ba8dc5ffca7d087b68778cdbcf" offset="0" />
+				<rom name="proteus_1.svt" size="77646" crc="f40fd39a" sha1="fe0b70607dd556ba8dc5ffca7d087b68778cdbcf" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="proteus2" supported="no">
-		<description>Proteus Cassete #2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="cass1" interface="sol20_cass">
+		<part name="cass2" interface="sol20_cass">
 			<dataarea name="cass" size="95354">
-				<rom name="proteus cassete #2 (19xx)(-).svt" size="95354" crc="2b480f7b" sha1="06376865d8a0ce671c4a647c39f4ad2c4cef952d" offset="0" />
+				<rom name="proteus_2.svt" size="95354" crc="2b480f7b" sha1="06376865d8a0ce671c4a647c39f4ad2c4cef952d" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="proteus3" supported="no">
-		<description>Proteus Cassete #3</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="cass1" interface="sol20_cass">
+		<part name="cass3" interface="sol20_cass">
 			<dataarea name="cass" size="57116">
-				<rom name="proteus cassete #3 (19xx)(-).svt" size="57116" crc="b2ee57f0" sha1="561f205f37affbaeba6ef7060f36044f268bf133" offset="0" />
+				<rom name="proteus_3.svt" size="57116" crc="b2ee57f0" sha1="561f205f37affbaeba6ef7060f36044f268bf133" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="proteus7" supported="no">
-		<description>Proteus Cassete #7</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="cass1" interface="sol20_cass">
+		<part name="cass4" interface="sol20_cass">
 			<dataarea name="cass" size="178406">
-				<rom name="proteus cassete #7 (19xx)(-).svt" size="178406" crc="da305795" sha1="e9ce5023d288f52c303beb480e2a63531661ff90" offset="0" />
+				<rom name="proteus_7.svt" size="178406" crc="da305795" sha1="e9ce5023d288f52c303beb480e2a63531661ff90" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="proteus8" supported="no">
-		<description>Proteus Cassete #8</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="cass1" interface="sol20_cass">
+		<part name="cass5" interface="sol20_cass">
 			<dataarea name="cass" size="79094">
-				<rom name="proteus cassete #8 (19xx)(-).svt" size="79094" crc="d338d05a" sha1="8264f731acc676243e54d149d29b6cb13e691fa1" offset="0" />
+				<rom name="proteus_8.svt" size="79094" crc="d338d05a" sha1="8264f731acc676243e54d149d29b6cb13e691fa1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
+<!--
+P.T. Sol Printer I/O Software P/N 727056, Rev. A
+
+    AT16K   3D01 02FF
+    AT32K   7D01 02FF
+    TEST    0100 0150
+    HTYPE   0100 48D7
+    TESTS   0100 1042
+    END     0001 0000
+
+Note: No more infos about!
+-->
 	<software name="solprint" supported="no">
-		<description>Sol Printer</description>
+		<description>Sol Printer I/O Software P/N 727056, Rev. A</description>
 		<year>19??</year>
-		<publisher>Processor Techonolgy</publisher>
+		<publisher>Processor Technology Corp.</publisher>
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="56307">
-				<rom name="sol printer (19xx)(processor techonolgy).svt" size="56307" crc="46a4e367" sha1="8e5f0226dde3ea450077a945f9bf12c3c5b7ede3" offset="0" />
+				<rom name="io_printer_sw.svt" size="56307" crc="46a4e367" sha1="8e5f0226dde3ea450077a945f9bf12c3c5b7ede3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="spacegam" supported="no">
-		<description>Spaces Games</description>
-		<year>19??</year>
-		<publisher>Creative Computing Software</publisher>
+<!--
+TAD Enterprise -- utilities for moving PT BASIC
+
+    MODPG P 4120 0CDF           ;program patches Proc Tech Extended Cassette BASIC to run under CP/M
+    UTIL  B 3C20 1B16   (Ext BASIC) ;utilities allow for easily transferring programs to/from cassette/disk, and some other functions
+    END   ? FFFF 0001
+
+User Manual at http://www.sol20.org/manuals/img/tad-img.pdf
+-->
+	<software name="tad" supported="no">
+		<description>P.T. Extended Cassette BASIC on CP/M</description>
+		<year>1979</year>
+		<publisher>TAD Enterprises</publisher>
 
 		<part name="cass1" interface="sol20_cass">
-			<dataarea name="cass" size="47421">
-				<rom name="spaces games (19xx)(creative computing software).svt" size="47421" crc="4f1b8108" sha1="fc6cd419b45b7c1f88a16dba0df12d901edc5753" offset="0" />
+			<dataarea name="cass" size="23446">
+				<rom name="tad.svt" size="23446" crc="d9e60630" sha1="2cca9e3873a4acbfcde3ce4c417a9530f3c23de2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="strategy" supported="no">
-		<description>Strategy Games</description>
-		<year>19??</year>
-		<publisher>Creative Computing Software</publisher>
+<!--
+Tiny-C Solos
+
+    TC    C 0000 1600       ;tiny-c interpreter program ;runnable interfaced lower case 16K
+    PPS   c 0000 163E       ;program preparation system ;lower case 16K (Note: the "c" means tiny-c language code)
+    PPS   c 0001 0000       ;end-of-file record ;needed by the PPS
+    T.DOC i 0000 0769       ;same as http://www.sol20.org/tapes/tinyc/t.doc.txt (Note: the "i" means information)
+    T.DOC i 0001 0000       ;end-of-file record
+    EOF     0001 0000       ;end-of-file record
+    END     0000 0000
+
+Note: The tinyc.svt is possible faulty (tested in Solace emu)!(more infos in http://www.sol20.org/tapes/tinyc/tinyc.zip ;see using.txt)
+The reason: It is impossible to load PPS into TC using command: ".r PPS" !? (Other existing commands are: ".g" and ".x"!)
+In a case someone is willing to investigate what might be wrong, some general docs exist at http://primepuzzle.com/tiny-c/tinyc-doc.html
+Owner's Manual at http://primepuzzle.com/tc/tiny_c_docs_8080_PDP11.zip
+-->
+	<software name="tinyc" supported="no">
+		<description>Tiny-C Solos</description>
+		<year>1977</year>
+		<publisher>Metron Computerware Inc.</publisher>
 
 		<part name="cass1" interface="sol20_cass">
-			<dataarea name="cass" size="67400">
-				<rom name="strategy games (19xx)(creative computing software).svt" size="67400" crc="54d95385" sha1="54c8ca1542d9ec7cd711866bae3ceb3645735508" offset="0" />
+			<dataarea name="cass" size="30719">
+				<rom name="tinyc.svt" size="30719" crc="6140c147" sha1="294487f58ec607decb69900b169a6b03208a61b4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="strategya" cloneof="strategy" supported="no">
-		<description>Strategy Games (Alt)</description>
+
+
+<!--
+These programs were downloaded as ASCII text format files (.bs5, .ecb, .ent) and using MESS emu text paste option recreated into .wav tape files.
+NOTE: ALL RECREATED FILES HAVE BEEN TESTED TO WORK FINE WITH MESS EMULATOR ... THE COMPATIBILITY WITH A REAL SOL-20 SYSTEM IS UNKNOWN/UNTESTED!
+http://www.sol20.org/programs.html (Note: On the same link exist manuals for most programs, and some are necessary in order to know how to use.)
+-->
+
+<!--
+Processor Technology 8080 ALS-8 program development system
+
+    ALS-8   DF80 207C       ;ALS-8 is an editor/assembler
+
+In SOLOS monitor "XEQ ALS-8" to load/autorun or "GET ALS-8" and then "EXEC DF80".
+
+User Manual at http://www.sol20.org/manuals/als8.pdf
+-->
+	<software name="als8">
+		<description>ALS-8 program development system</description>
+		<year>1977</year>
+		<publisher>Processor Technolgy Corp.</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="7142712">
+				<rom name="als8.wav" size="7142712" crc="fb273e61" sha1="da7900fb8a8ad4305f408b370f6da592541a202a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Processor Technology Air Traffic Controller
+
+    ATC     0000 09F0       ;P.T. air traffic controller game
+
+In SOLOS monitor "XEQ ATC" to load/autorun or "GET ATC" and then "EXEC 0".
+
+User Manual at http://www.sol20.org/manuals/atc.pdf
+-->
+	<software name="atc">
+		<description>Air Traffic Control</description>
+		<year>1978</year>
+		<publisher>Processor Technolgy</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="2457454">
+				<rom name="atc.wav" size="2457454" crc="1aaebf0e" sha1="3b32f18353db7ce5bff268f3b20d1a623b80297a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Processor Technology Basic/5 -- a simple BASIC
+
+    BASIC B 0000 19B6
+    MTCHS B 1AD9 034D       ;21 matches; you play against the computer; last one to pick up a match loses
+    LUNAR B 1AD9 0953       ;Traditional text lunar lander
+
+In SOLOS moniotr "XEQ BASIC" to load/autorun or "GET BASIC" and then "EXEC 0".
+In BASIC program "XEQ MTCHS" to load/autorun or "GET MTCHS" and then "RUN".
+In BASIC program "XEQ LUNAR" to load/autorun or "GET LUNAR" and then "RUN". (see note below)
+
+Note:
+The released version assumes system has 8KB of RAM. In basic use "SET M=xxxxx" to change this.
+Thus, before loading program LUNAR, in basic use command "SET M=16384" or it will report "SO ERROR" after loading.
+The "basic5_48K.wav" has been patched to assume a 48KB system!
+
+User Manual at http://www.sol20.org/manuals/basic5.pdf
+-->
+	<software name="basic5">
+		<description>Sol BASIC/5</description>
+		<year>1977</year>
+		<publisher>Processor Technolgy Corp.</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="9203116">
+				<rom name="basic5_orig.wav" size="9203116" crc="40c272f8" sha1="69e26f90b6baa5dcf807dbf817105902ec3b2533" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="sol20_cass">
+			<dataarea name="cass" size="5735114">
+				<rom name="basic5_48k.wav" size="5735114" crc="c7ad6c9a" sha1="c6cce3565efa5d0ff6ff7af5e3a3f6bab228756d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Processor Technology 8080 Chess Cassette; P/N 727152
+
+    CHESS   0000 16F9
+    END     CC00 0000
+
+In SOLOS monitor "XEQ CHESS" to load/autorun or "GET CHESS" and then "EXEC 0".
+
+User Manual at http://www.sol20.org/manuals/chess.pdf
+-->
+	<software name="chess">
+		<description>8080 Chess Cassette; P/N 727152</description>
+		<year>19??</year>
+		<publisher>Processor Technolgy Corp.</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="5558420">
+				<rom name="chess.wav" size="5558420" crc="c33e7dac" sha1="c210655e27baa8cb2172e1410230cb6498757d69" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Processor Technology DEBUG, Advanced 8080 Debugger; P/N 727132
+
+    DBG8    0E00 11D4
+    DBG16   2E00 11D4
+    DBG32   6E00 11D4
+    DBG48   AE00 11D4
+    DBG64   EE00 11D4
+    END     CC00 0000
+
+(different versions for different sized memory systems)
+
+In SOLOS monitor "XEQ name" to load/autorun or "GET name" and then "EXEC address".
+
+User Manual at http://www.sol20.org/manuals/debug.pdf
+-->
+	<software name="debug">
+		<description>DEBUG, Advanced 8080 Debugger; P/N 727132</description>
+		<year>1978</year>
+		<publisher>Processor Technolgy Corp.</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="20877642">
+				<rom name="debug.wav" size="20877642" crc="15820da0" sha1="f7a24bb585ac12c88141b6da62cdefb489d3e6e6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Processor Technology EDIT, Advanced 8080 Editor; P/N 727142
+
+    EDIT    0000 1A44
+    UNPAC   0000 03E0
+    PACK    0000 0364
+    END     CC00 0000
+
+In SOLOS monitor "XEQ name" to load/autorun or "GET name" and then "EXEC 0".
+
+User Manual at http://www.sol20.org/manuals/img/edit-img.pdf
+-->
+	<software name="edit">
+		<description>EDIT, Advanced 8080 Editor; P/N 727142</description>
+		<year>1978</year>
+		<publisher>Processor Technolgy Corp.</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="8538414">
+				<rom name="edit.wav" size="8538414" crc="5810b0ec" sha1="370b86b7e46eb5a7db7c366655aedfca7836e634" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Processor Technology Extended Cassette BASIC; P/N 727019
+
+    BASIC B 0000 3F85
+    END   ? FFFF 0001
+
+In SOLOS monitor "XEQ BASIC" to load/autorun or "GET BASIC" and then "EXEC 0".
+
+Note: The original version has a bug where it cause a CS (control stack) error.
+P.T. put out an errata sheet with a small patch to fix this bug. (in pdf manual p.131)
+
+That has been applied in the file "extbasic_patched".
+
+    BASIC B 0000 3F85
+    END   B FFFF 0003
+
+It fixes the problem. However, when running "ROMLN" it will produce a CS error in patched version, but not with the original version!
+
+User Manual at http://www.sol20.org/manuals/extcassbasic.pdf
+-->
+	<software name="extbasic">
+		<description>Extended Cassette BASIC; P/N 727019</description>
+		<year>1977</year>
+		<publisher>Processor Technolgy Corp.</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="13985418">
+				<rom name="extbasic_orig.wav" size="13985418" crc="a7210025" sha1="cd8a115f8b8ce0af857d3bdb9bb9a6404a32531f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="sol20_cass">
+			<dataarea name="cass" size="13987042">
+				<rom name="extbasic_patched.wav" size="13987042" crc="2c091090" sha1="4f5ccec14b251f04a9ed4f05ac20cf796fde22f8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Processor Technology 8080 Cassette Focal(tm); P/N 727027
+
+    FOCAL   0000 1C93
+    END     CC00 0000
+
+In SOLOS monitor "XEQ FOCAL" to load/autorun or "GET FOCAL" and then "EXEC 0".
+
+Quote from FOCAL user manual on p.9-2:
+
+ "Remember that binary arithmetic is not exact-it is only very close.
+ Therefore, you may expect very small (but nevertheless disconcerting) errors such as
+
+    :T 23+31
+     54.00001
+
+ which are caused by FOCALs attempts at rounding numbers which it cannot store exactly.
+ You can make these errors much less frequent by not printing as many digits to the right
+ of the decimal point."
+
+User Manual at http://www.sol20.org/manuals/focal.pdf
+-->
+	<software name="focal">
+		<description>8080 Cassette Focal(tm); P/N 727027</description>
+		<year>1978</year>
+		<publisher>Processor Technolgy Corp.</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="6722676">
+				<rom name="focal.wav" size="6722676" crc="62fba867" sha1="8175af744e12f3f48bb8907946131e0136615223" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Processor Technology GAMEPAC 1; collection of four games
+
+    TARG  G 0000 0E42       ;the famous target game --shoot down ASCII spaceships
+    LIFE  G 0000 0CCC       ;conway's life
+    PTRN  G 0000 056E       ;simple kaleidoscope
+    ZING  G 0000 046B       ;a multi-ball pong-like game --requires external input device
+
+In SOLOS monitor "XEQ name" to load/autorun or "GET name" and then "EXEC 0".
+
+User Manual at http://www.sol20.org/manuals/gamepac1.pdf
+-->
+	<software name="gamepac1">
+		<description>GAMEPAC 1</description>
+		<year>1977</year>
+		<publisher>Processor Technolgy Corp.</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="4619686">
+				<rom name="gamepac1.wav" size="4619686" crc="7e14238e" sha1="467eed03ef32b73bc06b33d64d117c7736bc1d08" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Processor Technology GAMEPAC 2; collection of two games
+
+    HANG  G 0000 0E12       ;hangman --in speedy assembly language
+    QUBIC G 0000 0712       :play 3D tic-tac-toe against the computer
+
+In SOLOS monitor "XEQ name" to load/autorun or "GET name" and then "EXEC 0".
+
+User Manual at http://www.sol20.org/manuals/gamepac2.pdf
+-->
+	<software name="gamepac2">
+		<description>GAMEPAC 2</description>
+		<year>1978</year>
+		<publisher>Processor Technolgy Corp.</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="5118738">
+				<rom name="gamepac2.wav" size="5118738" crc="f8136510" sha1="959e415bb65a7415365b4ccc7f60b8d7e9d48a3c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Microsoft BASIC Rev. 4.7
+
+    BASIC B 0040 3F50
+
+In SOLOS monitor "XEQ BASIC" to load/autorun or "GET BASIC" and then "EXEC 40".
+-->
+	<software name="mbasic">
+		<description>Microsoft BASIC Rev. 4.7</description>
+		<year>1978</year>
+		<publisher>GRT - Microsoft</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="13548458">
+				<rom name="mbasic.wav" size="13548458" crc="cb407f7e" sha1="8cfa984fb01702a81616f5249b5234990f7879fd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Music System by Software Technology Corp., a division of Processor Technology
+
+    MUSIC M 0000 082E
+    PRELD M 08D3 09AE       ;score files (see manual p.22)
+    ALLEG M 08D3 02D2
+    SARAB M 08D3 059F
+    BOURE M 08D3 0435
+    AIR   M 08D3 0CF7
+    CHORL M 08D3 08B4
+    END   ? 0000 0001
+
+In SOLOS monitor "XEQ MUSIC" to load/autorun or "GET MUSIC" and then "EXEC 0".
+
+HOW TO USE THE MUSIC SYSTEM -- see manual p.22
+THE MUSIC SYSTEM CIRCUIT BOARD -- see manual p.3 (schematic p.7) (Note: Seems Solance emu support it but MESS dont!?)
+
+User Manual at http://www.sol20.org/manuals/music.pdf
+-->
+	<software name="music">
+		<description>Music System</description>
+		<year>1977</year>
+		<publisher>Software Technology Corp.</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="13654040">
+				<rom name="music.wav" size="13654040" crc="57fba4a5" sha1="5e86e80dcac037295958447f7fbb1e7461b6d8ea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+The Electric Pencil Word Processor by Michael Shrayer
+
+    PENCL   0000 0E01       ;word processor
+
+In SOLOS monitor "XEQ PENCL" to load/autorun or "GET PENCL" and then "EXEC 0".
+
+User Manual at http://www.sol20.org/manuals/pencil.pdf
+-->
+	<software name="pencil">
+		<description>Electric Pencil Word Processor</description>
+		<year>1977</year>
+		<publisher>Shrayer, Michael</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="3303146">
+				<rom name="pencil.wav" size="3303146" crc="b3407712" sha1="310d2707ae914c968913baa95827fdba0f1f8f24" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Processor Technology 8080 PILOT 2.2; P/N 727112
+
+    PILOT   0000 1FF6
+    PLTST   0001 118E
+    WAPP    0001 260B
+    END     CC00 0000
+
+In SOLOS monitor "XEQ PILOT" to load/autorun or "GET PILOT" and then "EXEC 0".
+In PILOT program "LOAD PLTST" or "LOAD WAPP" (Note: PLTST and WAPP are two test programs for PILOT).
+
+User Manual at http://www.sol20.org/manuals/img/pilot-img.pdf
+-->
+	<software name="pilot">
+		<description>Cassette PILOT P/N 727112 Rev. A</description>
+		<year>1978</year>
+		<publisher>Processor Technology Corp.</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="19764422">
+				<rom name="pilot.wav" size="19764422" crc="adc016f1" sha1="bc3b68cb2ac43977c0eaacfaa0786eed5e7644c0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Space Games from Creative Computing Software
+
+    ASTER   3000 0901           ;asteroids; not to be confused with arcade game
+    LUNAR C 3C20 1FFC   (Ext BASIC) ;lunar lander (Note: a problem with keyboard not responding in MESS emu!)
+    STRWR C 3C20 144D   (Ext BASIC) ;star wars
+    ROMLN C 3C20 13F4   (Ext BASIC) ;romulan
+
+In SOLOS monitor "XEQ ASTER" to load/autorun or "GET ASTER" and then "EXEC 3000".
+
+Note: LUNAR, STRWR, and ROMLN are all tokenized (binary) Extended Cassette BASIC programs.
+
+How to load EC BASIC programs:
+1)mount the Space Games .wav file into cass1 and Extended Cassette Basic .wav file into cass2
+2)run the EC BASIC with command "XEQ BASIC/2"
+3)in EC BASIC load the program with command "GET prgname" and then "RUN"
+
+User Manual at http://www.sol20.org/manuals/spacegames.pdf
+-->
+	<software name="spacegms">
+		<description>SPACE GAMES</description>
 		<year>19??</year>
 		<publisher>Creative Computing Software</publisher>
 
 		<part name="cass1" interface="sol20_cass">
-			<dataarea name="cass" size="67359">
-				<rom name="strategy games (19xx)(creative computing software)[a].svt" size="67359" crc="3f7a6908" sha1="230a8e72996f625959c77cd8350a9f7de087db80" offset="0" />
+			<dataarea name="cass" size="18452132">
+				<rom name="spacegames.wav" size="18452132" crc="60f98ab1" sha1="ed2a5713ebf8bec7a68e48261c612693a68cdd51" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Strategy Games 2 from Creative Computing Software
+
+    TRAP    3000 0901           ;person-against-person "growing snake" game
+    WMPUS C 3C20 0E9B   (Ext BASIC) ;Hunt the Wumpus
+    WMPS2 C 3C20 254C   (Ext BASIC) ;Hunt the Wumpus II
+    RACE  C 3C20 227D   (Ext BASIC) ;race your car around one of three courses
+    KNGDM C 3C20 1438   (Ext BASIC) ;a version of Hamurabi
+
+In SOLOS monitor "XEQ TRAP" to load/autorun or "GET TRAP" and then "EXEC 3000".
+
+Note: WMPUS, WMPS2, RACE, and KNGDM are all tokenized (binary) Extended Cassette BASIC programs.
+
+How to load EC BASIC programs:
+1)mount the Strategy Games 2 .wav file into cass1 and Extended Cassette Basic .wav file into cass2
+2)run the EC BASIC with command "XEQ BASIC/2"
+3)in EC BASIC load the program with command "GET prgname" and then "RUN"
+
+User Manual at http://www.sol20.org/manuals/strategygames2.pdf
+-->
+	<software name="stgygms2">
+		<description>STRATEGY GAMES-2</description>
+		<year>19??</year>
+		<publisher>Creative Computing Software</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="25987662">
+				<rom name="startegygames2.wav" size="25987662" crc="fffb8567" sha1="1bcd218311aafe4588fe0478df962ec1f8af9c1f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Processor Technology TREK80; Sol-specific version of the famous star trek game
+
+    TRK80   0000 1EA1
+
+In SOLOS monitor "XEQ TRK80" to load/autorun or "GET TRK80" and then "EXEC 0".
+
+User Manual at http://www.sol20.org/manuals/trek80.pdf
+-->
+	<software name="trek80">
+		<description>TREK-80</description>
+		<year>19??</year>
+		<publisher>Processor Technolgy Corp.</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="6757058">
+				<rom name="trek80.wav" size="6757058" crc="f4c3c7b0" sha1="e5a7379841c4c667d9b9685dd4c336c53ed6d411" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+TinyTrek; contains both the tiny basic interpreter and the tiny basic program
+
+    BTREK O 0000 2000       ;Tiny Star-Trek game in P.A. Tiny Basic, with BASIC
+
+In SOLOS monitor "XEQ BTREK" to load/autorun or "GET BTREK" and then "EXEC 0".
+
+Note: In game press "CTRL-C" to enter into Palo Alto Tiny Basic!
+
+This is Dr. Li-Chen Wang's Palo Alto Tiny BASIC ver 2.0 hooked up to
+Sol i/o and Dr. Wang's version of basic game Startrek Called TinyTrek.
+The basic and game run in 8k of ram (0-1FFF) on Sol-20. Basic is located
+(0-0768) and (1F66-1FFF).
+
+More docs find in http://www.sol20.org/tinytrek/tinytrek.zip
+-->
+	<software name="tinytrek">
+		<description>TinyTrek; Tiny Star-Trek game in P.A. Tiny Basic</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="7041650">
+				<rom name="tinytrek.wav" size="7041650" crc="66c77155" sha1="dc7945d924e2c61847546715704d9506cdd3b599" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Various games written by Ray White
+
+#1  DHMZI   0000 1360       ;deathmaze_instr    -- instructions for the deathmaze game
+    DHMZP   0000 5714       ;deathmaze_play -- dungeons & dragons game
+#2  FEUDL   0000 1AF4       ;feudal     -- run a simulated kingdom (hammurabi-like)
+#3  GOBBL   0000 06F4       ;gobble     -- race the clock to pick up as many pieces as you can)
+#4  PACMN   0000 0D04       ;pacman     -- pacman "clone"
+#5  REVRS   0000 0DD2       ;reversi        -- play reversi against the computer
+#6  ROBOI   0000 29B4       ;robot_instr    -- instructions for the robot game
+    ROBOP   0000 1FE4       ;robot_play     -- write robot programs then pit them against each other
+#7  SKULC   0000 41D4       ;skullcave      -- adventure game
+#8  STOMP   0000 0822       ;stomp      -- try to swat the flies
+#9  TICTT   0000 06A0       ;tic_tac_toe    -- play tic-tac-toe against the computer
+
+In SOLOS monitor "XEQ name" to load/autorun or "GET name" and then "EXEC 0".
+
+Note: If in some of games a screen starts blinking, then in MESS select in "Deep Swithches" Cursor Type "Solid"!
+-->
+	<software name="various1">
+		<description>Various games written by Ray White</description>
+		<year>19??</year>
+		<publisher>Ray White</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="22839364">
+				<rom name="deathmaze.wav" size="22839364" crc="7e6b1de5" sha1="40a12a0c6877017ab3871b6111b11a8d60ac43c5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="sol20_cass">
+			<dataarea name="cass" size="5993024">
+				<rom name="feudal.wav" size="5993024" crc="0dfd68da" sha1="b1f6c06dac2524e0f55154d82a64cc5663969189" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="sol20_cass">
+			<dataarea name="cass" size="1837334">
+				<rom name="gobble.wav" size="1837334" crc="bce45a7b" sha1="2345f874e13042d6f6cb7a357ac18a49217b56b3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass4" interface="sol20_cass">
+			<dataarea name="cass" size="3097786">
+				<rom name="pacman.wav" size="3097786" crc="e3a7a2fa" sha1="9b101df9e2cf90ef28cc440e7d4ab4fcf520af9a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass5" interface="sol20_cass">
+			<dataarea name="cass" size="3264338">
+				<rom name="reversi.wav" size="3264338" crc="860ed4eb" sha1="2171dc8c0ee9106dfe5f903e037661455aa56f82" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass6" interface="sol20_cass">
+			<dataarea name="cass" size="16010788">
+				<rom name="robot.wav" size="16010788" crc="49d7ae4d" sha1="c0ea68df70bcee9c06d36f3d34b8d1427cfc1a43" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass7" interface="sol20_cass">
+			<dataarea name="cass" size="14070748">
+				<rom name="skullcave.wav" size="14070748" crc="05f5b866" sha1="32f943e8e411d4f5efdddf34809f31e18d64a097" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass8" interface="sol20_cass">
+			<dataarea name="cass" size="2083118">
+				<rom name="stomp.wav" size="2083118" crc="cb9a7cc0" sha1="d7c425ab328f17be875ed9e913b901799d3bb6a1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass9" interface="sol20_cass">
+			<dataarea name="cass" size="1769420">
+				<rom name="tic_tac_toe.wav" size="1769420" crc="f7a06473" sha1="1502402948eaa0643fca77258922dc105764b4f2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Standalone software of various origins
+
+#1  BTSHP G 0000 1121       ;battleship game ;from Proteus Cassette #7
+#2  CHASE G 0000 05E6       ;the game of chase ;evade robots before they grab you --from Dr. Dobbs --modified for Sol
+#3  CHKR2 G 0000 2741       ;TCD checkers
+#4  DFLCT G 0000 0291       ;the game of deflection ;deflect target by typing a "/" or a "\" --by Andrew A. Recupero
+#5  MCHSS G 0000 1000       ;microchess ;a classic early chess program for microcomputers --written by Peter Jennings
+#6  MINE  G 0000 1495       ;mine field --by Carl E.Dawson, Programmer for ESV Computer Service
+#7  PIRAN G 0000 0876       ;piranha ;use the keypad to evade swarming piranhas
+#8  RAIDS G 0000 1124       ;space raiders ;space invaders clone --by Steve Maguire
+#9  TARGT G 0000 00E4       ;target ;a simple shooting game (not the famous target)
+
+In SOLOS monitor "XEQ name" to load/autorun or "GET name" and then "EXEC 0".
+
+Note: If in some of games a screen starts blinking, then in MESS emu select in "Deep Swithches" Cursor Type "Solid"!
+
+Note for #5: Moves are entered using decimal coordinates, using this grid:
+
+    00 01 02 03 04 05 06 07
+    10 11 12 13 14 15 16 17
+    20 21 22 23 24 25 26 27
+    30 31 32 33 34 35 36 37
+    40 41 42 43 44 45 46 47
+    50 51 52 53 54 55 56 57
+    60 61 62 63 64 65 66 67
+    70 71 72 73 74 75 76 77
+
+A typical opening move might be entered as 64-44.
+-->
+	<software name="various2">
+		<description>Standalone software of various origins</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="3952370">
+				<rom name="battleship.wav" size="3952370" crc="691fe9fb" sha1="e16eeb4adee1e4d5a27bd113e14c89d928e32a50" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="sol20_cass">
+			<dataarea name="cass" size="1618232">
+				<rom name="chase.wav" size="1618232" crc="428a016c" sha1="d13830b5b6d0398343ff1db4d82eda0b06cb80c9" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="sol20_cass">
+			<dataarea name="cass" size="8549502">
+				<rom name="chkr2.wav" size="8549502" crc="74840765" sha1="82d6535d4973b57c5663272d9092f959433f4b1f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass4" interface="sol20_cass">
+			<dataarea name="cass" size="926156">
+				<rom name="deflect.wav" size="926156" crc="01de1b7e" sha1="86cc9f4cbdc02391b2b5d528a3b059adb6a29f45" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass5" interface="sol20_cass">
+			<dataarea name="cass" size="3717098">
+				<rom name="microchess.wav" size="3717098" crc="4812c7a1" sha1="75f486742f5eb38b8a3d60f3b0e53bf390623370" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass6" interface="sol20_cass">
+			<dataarea name="cass" size="4671448">
+				<rom name="minefield.wav" size="4671448" crc="5a763441" sha1="43a806759dc123a14c35fd067b1e6cd87583665b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass7" interface="sol20_cass">
+			<dataarea name="cass" size="2151032">
+				<rom name="piranha.wav" size="2151032" crc="bddaf8d8" sha1="490ebaa76ca51bc5e453dce14e1467c6e5c790a7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass8" interface="sol20_cass">
+			<dataarea name="cass" size="3954796">
+				<rom name="raiders.wav" size="3954796" crc="b3354e6d" sha1="95b2cfbe37d2aab743a417a56cddf338edc902cb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass9" interface="sol20_cass">
+			<dataarea name="cass" size="577692">
+				<rom name="target.wav" size="577692" crc="7be287fa" sha1="f5868f21b1045620c3d1d34b8da43a6a545d7d7c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+P.T. Access newsletter, Volume 1, Number 4
+
+#1  GALAX   0000 0876       ;galaxy ;logic game from Access Vol 1, #4
+#2  TRAIN   0000 0287       ;a screen saver, of sorts
+#3  WINZI   C900 01D0       ;chase, hic, opps, and life --see the newsletter for more details on the program
+
+In SOLOS monitor "XEQ name" to load/autorun or "GET name" and then "EXEC address".
+
+Note for #3: Don't forget to SET S=80 from the monitor before playing the game, otherwise the game speed is way to fast.
+
+More infos http://www.sol20.org/articles/access_v1n4.pdf
+-->
+	<software name="acs_v1n4">
+		<description>Access newsletter, Volume 1, issue #4</description>
+		<year>1977</year>
+		<publisher>Processor Technolgy Corp.</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="2151032">
+				<rom name="galaxy.wav" size="2151032" crc="d910ab91" sha1="85d8e4e80e83eba3679442a36b61983f0559084c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="sol20_cass">
+			<dataarea name="cass" size="918070">
+				<rom name="train.wav" size="918070" crc="29512879" sha1="fa11f5efa5e211a238197affacc862fd61e5ff26" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="sol20_cass">
+			<dataarea name="cass" size="769306">
+				<rom name="winzi.wav" size="769306" crc="77c656ad" sha1="9168be4ec9f1a1582244a556c8d0bf5ce6df3db9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Collection of selected BASIC/5 programs
+
+#1  BOMB  B 1AD9 1381       ;bomb a dam while under enemy fire --has hidden assembly language routines & isn't entirely LIST'able
+#2  BOMRN B 1AD9 1D7E       ;BOMBRUN ;bombing run simulation --Jim Prelesnik Rev.A 2-2-78
+#3  KORPS B 1AD9 4A95       ;AFRIKA KORPS pits you as a 1942 German Commander against British armored units --Ralph Hopkins
+#4  PANZR B 1AD9 4958       ;PANZER pits you as a 1944 German Commander playing against the British & Americans --Ralph Hopkins; late 1970's
+#5  STRWR B 1AD9 2822       ;STARWAR ;Simulation: destroy the infamous 'STARWARS' Death Star --MECC "STRWAR1" === reworked  03-20-78
+#6  STTR  B 1AD9 2EDE       ;classic game of StarTrek ;a SOL-20 version of Univac 1100 Basic's STTR2 --Ralph Hopkins; late 1970's
+#7  SWOLF B 1AD9 4925       ;SeaWolf ;WWII pacific submarine game --by Ralph Hopkins; (Era Jun-79)
+#8  TANKS B 1AD9 4A78       ;you are an american commander playing against the germans post normandy --Ralph Hopkins; late 1970's
+#9  TANKZ B 1AD9 49DB       ;you command a Russian tank unit playing against the Germans on the Russian Front --Ralph Hopkins; late 1970's
+
+How to load BASIC/5 programs:
+1)mount the tape bs5 .wav file into cass1 and Sol BASIC/5 .wav file into cass2
+2)run the BASIC/5 with command "XEQ BASIC/2"
+3)in BASIC/5 load the program with command "GET prgname" and then "RUN"
+
+Note that BASIC/5 assumes your computer has 8KB of memory. If you need to work with programs larger than that,
+you must give a command "SET M=49000" (or whateer you want the top of memory to be) before running the program.
+Note if you using basic5_48K.wav instead od basic5_orig.wav, there is no need for this.
+-->
+	<software name="bs5_coll">
+		<description>Collection of selected BASIC/5 programs</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="4447494">
+				<rom name="bomb_bs5.wav" size="4447494" crc="2edc62a2" sha1="7b20a6d682fefe6a34cc831b49b6e6fc3b702ee1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="sol20_cass">
+			<dataarea name="cass" size="6522912">
+				<rom name="bomrn_bs5.wav" size="6522912" crc="3929f398" sha1="fa069a8b737c3802ffe4aca56fd36fb11f9013a4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="sol20_cass">
+			<dataarea name="cass" size="15889874">
+				<rom name="korps.bs5.wav" size="15889874" crc="45b6365c" sha1="5c8b89578d634514f517f3304b0efb566f7f5dba" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass4" interface="sol20_cass">
+			<dataarea name="cass" size="15632770">
+				<rom name="panzr.bs5.wav" size="15632770" crc="cf788eef" sha1="42aad567ca6a52e1ed16d1f95914e71abc9a6593" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass5" interface="sol20_cass">
+			<dataarea name="cass" size="8732222">
+				<rom name="strwr.bs5.wav" size="8732222" crc="ca4ccc3d" sha1="243be8c18963a99cf0e091dac7d64cf03d665839" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass6" interface="sol20_cass">
+			<dataarea name="cass" size="10130928">
+				<rom name="sttr.bs5.wav" size="10130928" crc="049d7f99" sha1="a9e4402af4d610a631d41411d92fb9904542c02d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass7" interface="sol20_cass">
+			<dataarea name="cass" size="15591536">
+				<rom name="swolf_bs5.wav" size="15591536" crc="041c5adb" sha1="a5054d9c57f068ff974bc61627cd659af32eb0e2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass8" interface="sol20_cass">
+			<dataarea name="cass" size="15866426">
+				<rom name="tanks_bs5.wav" size="15866426" crc="00756473" sha1="07958d3cf3140eb275d33f0e43eb31956758c1d4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass9" interface="sol20_cass">
+			<dataarea name="cass" size="15738684">
+				<rom name="tankz.bs5.wav" size="15738684" crc="0ffbfc6b" sha1="8096dff612d5d312168a30015575cd6aa2aff5fc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Collection of selected ECB programs
+
+#1  BOULE C 3C20 2AB5       ;impressive european variation of roulette (The Bowl) --Ralph Hopkins Eagan, MN (SOL-20 Ext BASIC) 9/1/78
+#2  ILAND C 3C20 5020       ;TREASURE ISLAND ;adventure --by Ralph Hopkins
+#3  NUMBR C 3C20 2E24       ;6 number games --RALPH HOPKINS  12-01-78
+#4  PLUS  C 3C20 3A3F       ;dots and pluses *WORD* game --by Ralph Hopkins, EAGAN, MINN. 06-06-78
+#5  ROLET C 3C20 30FA       ;play standard european computer roulette --author unknown; 5/1/78
+
+How to load EC BASIC programs:
+1)mount the tape ecb .wav file into cass1 and Extended Cassette BASIC .wav file into cass2
+2)run the EC BASIC with command "XEQ BASIC/2"
+3)in EC BASIC load the program with command "GET prgname" and then "RUN"
+-->
+	<software name="ecb_coll">
+		<description>Collection of selected ECB programs</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="sol20_cass">
+			<dataarea name="cass" size="9266646">
+				<rom name="boule.ecb.wav" size="9266646" crc="027d6b84" sha1="7a23430c25e82f62e857bbf6d56de6c771c2ae6a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="sol20_cass">
+			<dataarea name="cass" size="17041990">
+				<rom name="iland.ecb.wav" size="17041990" crc="516e415f" sha1="7cb30b363a66b71709f61075657141b1e82d6f9e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass3" interface="sol20_cass">
+			<dataarea name="cass" size="9980552">
+				<rom name="numbr.ecb.wav" size="9980552" crc="fb696a8e" sha1="2636dc0a25123089a8ff6a29c4cae5fedb340724" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass4" interface="sol20_cass">
+			<dataarea name="cass" size="12495794">
+				<rom name="plus.ecb.wav" size="12495794" crc="11a45f67" sha1="aa37eb1b344e70d6c93bdb9a4203787ca3acc5c3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass5" interface="sol20_cass">
+			<dataarea name="cass" size="10569140">
+				<rom name="rolet.ecb.wav" size="10569140" crc="e4880a81" sha1="3432bf1acbd8b05a96071d18cad99470774a2889" offset="0" />
 			</dataarea>
 		</part>
 	</software>

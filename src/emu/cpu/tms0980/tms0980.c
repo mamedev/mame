@@ -146,7 +146,7 @@ const device_type TMS1300 = &device_creator<tms1300_cpu_device>; // 40-pin DIP, 
 // - main instructions PLA at the top half, to the right of the midline
 // - 64-term microinstructions PLA between the RAM and ROM, supporting 20 microinstructions
 // - 16-term output PLA and segment PLA above the RAM (rotate opla 90 degrees)
-const device_type TMS0980 = &device_creator<tms0980_cpu_device>; // 28-pin DIP, 9 R pins, 5 K pins
+const device_type TMS0980 = &device_creator<tms0980_cpu_device>; // 28-pin DIP, 9 R pins
 
 // TMS0970 is a stripped-down version of the TMS0980, itself acting more like a TMS1000
 // - RAM and ROM is exactly the same as TMS1000
@@ -161,7 +161,7 @@ const device_type TMS0970 = &device_creator<tms0970_cpu_device>; // 28-pin DIP, 
 // - 64-term microinstructions PLA between the RAM and ROM, supporting 20 microinstructions plus optional separate lines for custom opcode handling
 // - 48-term output PLA above the RAM (rotate opla 90 degrees)
 const device_type TMS0270 = &device_creator<tms0270_cpu_device>; // 40-pin DIP, 16 O pins, 8+ R pins (some R pins are internally hooked up to support more I/O)
-// TMS0260 is same? except opla is 32 instead of 48 terms
+// TMS0260 is similar? except opla is 32 instead of 48 terms
 
 
 static ADDRESS_MAP_START(program_11bit_9, AS_PROGRAM, 16, tms1xxx_cpu_device)
@@ -192,68 +192,59 @@ ADDRESS_MAP_END
 
 
 tms1000_cpu_device::tms1000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms1xxx_cpu_device(mconfig, TMS1000, "TMS1000", tag, owner, clock, 8, 11, 4, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "tms1000", __FILE__)
-{
-}
+	: tms1xxx_cpu_device(mconfig, TMS1000, "TMS1000", tag, owner, clock, 8, 11, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "tms1000", __FILE__)
+{ }
 
-tms1000_cpu_device::tms1000_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 k_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
-	: tms1xxx_cpu_device(mconfig, type, name, tag, owner, clock, o_pins, r_pins, k_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data, shortname, source)
-{
-}
+tms1000_cpu_device::tms1000_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
+	: tms1xxx_cpu_device(mconfig, type, name, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data, shortname, source)
+{ }
 
 tms1070_cpu_device::tms1070_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms1000_cpu_device(mconfig, TMS1070, "TMS1070", tag, owner, clock, 8, 11, 4, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "tms1070", __FILE__)
-{
-}
+	: tms1000_cpu_device(mconfig, TMS1070, "TMS1070", tag, owner, clock, 8, 11, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "tms1070", __FILE__)
+{ }
 
 tms1200_cpu_device::tms1200_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms1000_cpu_device(mconfig, TMS1200, "TMS1200", tag, owner, clock, 8, 13, 4, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "tms1200", __FILE__)
-{
-}
+	: tms1000_cpu_device(mconfig, TMS1200, "TMS1200", tag, owner, clock, 8, 13, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "tms1200", __FILE__)
+{ }
 
 
 tms1100_cpu_device::tms1100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms1000_cpu_device(mconfig, TMS1100, "TMS1100", tag, owner, clock, 8, 11, 4, 6, 8, 3, 11, ADDRESS_MAP_NAME(program_11bit_8), 7, ADDRESS_MAP_NAME(data_128x4), "tms1100", __FILE__)
-{
-}
+	: tms1000_cpu_device(mconfig, TMS1100, "TMS1100", tag, owner, clock, 8, 11, 6, 8, 3, 11, ADDRESS_MAP_NAME(program_11bit_8), 7, ADDRESS_MAP_NAME(data_128x4), "tms1100", __FILE__)
+{ }
 
-tms1100_cpu_device::tms1100_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 k_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
-	: tms1000_cpu_device(mconfig, type, name, tag, owner, clock, o_pins, r_pins, k_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data, shortname, source)
-{
-}
+tms1100_cpu_device::tms1100_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
+	: tms1000_cpu_device(mconfig, type, name, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data, shortname, source)
+{ }
 
 tms1300_cpu_device::tms1300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms1100_cpu_device(mconfig, TMS1300, "TMS1200", tag, owner, clock, 8, 16, 4, 6, 8, 3, 11, ADDRESS_MAP_NAME(program_11bit_8), 7, ADDRESS_MAP_NAME(data_128x4), "tms1300", __FILE__)
-{
-}
+	: tms1100_cpu_device(mconfig, TMS1300, "TMS1200", tag, owner, clock, 8, 16, 6, 8, 3, 11, ADDRESS_MAP_NAME(program_11bit_8), 7, ADDRESS_MAP_NAME(data_128x4), "tms1300", __FILE__)
+{ }
 
 
 tms0970_cpu_device::tms0970_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms1000_cpu_device(mconfig, TMS0970, "TMS0970", tag, owner, clock, 8, 11, 4, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "tms0970", __FILE__)
-{
-}
+	: tms1000_cpu_device(mconfig, TMS0970, "TMS0970", tag, owner, clock, 8, 11, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "tms0970", __FILE__)
+{ }
 
-tms0970_cpu_device::tms0970_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 k_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
-	: tms1000_cpu_device(mconfig, type, name, tag, owner, clock, o_pins, r_pins, k_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data, shortname, source)
-{
-}
+tms0970_cpu_device::tms0970_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
+	: tms1000_cpu_device(mconfig, type, name, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data, shortname, source)
+{ }
 
 
 tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms0970_cpu_device(mconfig, TMS0980, "TMS0980", tag, owner, clock, 8, 9, 5, 7, 9, 4, 12, ADDRESS_MAP_NAME(program_11bit_9), 8, ADDRESS_MAP_NAME(data_64x9_as4), "tms0980", __FILE__)
-{
-}
+	: tms0970_cpu_device(mconfig, TMS0980, "TMS0980", tag, owner, clock, 8, 9, 7, 9, 4, 12, ADDRESS_MAP_NAME(program_11bit_9), 8, ADDRESS_MAP_NAME(data_64x9_as4), "tms0980", __FILE__)
+{ }
 
-tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 k_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
-	: tms0970_cpu_device(mconfig, type, name, tag, owner, clock, o_pins, r_pins, k_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data, shortname, source)
-{
-}
+tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
+	: tms0970_cpu_device(mconfig, type, name, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data, shortname, source)
+{ }
 
 
 tms0270_cpu_device::tms0270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms0980_cpu_device(mconfig, TMS0270, "TMS0270", tag, owner, clock, 16, 16, 4, 7, 9, 4, 12, ADDRESS_MAP_NAME(program_11bit_9), 8, ADDRESS_MAP_NAME(data_64x9_as4), "tms0270", __FILE__)
-{
-}
+	: tms0980_cpu_device(mconfig, TMS0270, "TMS0270", tag, owner, clock, 16, 16, 7, 9, 4, 12, ADDRESS_MAP_NAME(program_11bit_9), 8, ADDRESS_MAP_NAME(data_64x9_as4), "tms0270", __FILE__)
+	, m_read_ctl(*this)
+	, m_write_ctl(*this)
+	, m_write_pdc(*this)
+{ }
 
 
 
@@ -380,7 +371,6 @@ void tms1xxx_cpu_device::device_start()
 
 	m_o_mask = (1 << m_o_pins) - 1;
 	m_r_mask = (1 << m_r_pins) - 1;
-	m_k_mask = (1 << m_k_pins) - 1;
 	m_pc_mask = (1 << m_pc_bits) - 1;
 	m_x_mask = (1 << m_x_bits) - 1;
 	
@@ -479,17 +469,27 @@ void tms0270_cpu_device::device_start()
 	// common init
 	tms1xxx_cpu_device::device_start();
 
+	m_read_ctl.resolve_safe(0);
+	m_write_ctl.resolve_safe();
+	m_write_pdc.resolve_safe();
+
 	// zerofill
-	m_a_prev = 0;
 	m_r_prev = 0;
+	m_chipsel = 0;
+	m_ctl_dir = 0;
+	m_ctl_out = 0;
+	m_pdc = -1; // !
 
 	m_o_latch_low = 0;
 	m_o_latch = 0;
 	m_o_latch_prev = 0;
 	
 	// register for savestates
-	save_item(NAME(m_a_prev));
 	save_item(NAME(m_r_prev));
+	save_item(NAME(m_chipsel));
+	save_item(NAME(m_ctl_dir));
+	save_item(NAME(m_ctl_out));
+	save_item(NAME(m_pdc));
 
 	save_item(NAME(m_o_latch_low));
 	save_item(NAME(m_o_latch));
@@ -687,9 +687,6 @@ void tms0270_cpu_device::device_reset()
 	// common reset
 	tms0980_cpu_device::device_reset();
 
-	m_a_prev = m_a;
-	m_r_prev = m_r;
-
 	m_o_latch_low = 0;
 	m_o_latch = 0;
 	m_o_latch_prev = 0;
@@ -777,27 +774,75 @@ void tms0970_cpu_device::write_o_output(UINT8 index)
 
 void tms0270_cpu_device::dynamic_output()
 {
-	// TODO..
+	// R15: filament on (handled in the driver)
+	// R14: N/C by default
+	// R13: power off, trigger on falling edge
+	if ((m_r_prev >> 13 & 1) && !(m_r >> 13 & 1))
+		m_power_off(1);
 	
-	m_a_prev = m_a;
-	m_r_prev = m_r;
-	m_o_latch_prev = m_o_latch;
+	// R11: TMS5100 CTL port direction (0=read from TMS5100, 1=write to TMS5100)
+	m_ctl_dir = m_r >> 11 & 1;
+
+	// R12: chip select (off=display via OPLA, on=TMS5100 via ACC/CKB)
+	m_chipsel = m_r >> 12 & 1;
+	
+	if (m_chipsel)
+	{
+		// ACC via SEG B,C,D,G: TMS5100 CTL pins
+		if (m_ctl_dir && m_a != m_ctl_out)
+		{
+			m_ctl_out = m_a;
+			m_write_ctl(0, m_ctl_out, 0xff);
+		}
+
+		// R10 via SEG E: TMS5100 PDC pin
+		if (m_pdc != (m_r >> 10 & 1))
+		{
+			m_pdc = m_r >> 10 & 1;
+			m_write_pdc(m_pdc);
+		}
+	}
+	else
+	{
+		// standard O-output
+		if (m_o_latch != m_o_latch_prev)
+		{
+			write_o_output(m_o_latch);
+			m_o_latch_prev = m_o_latch;
+		}
+	}
+	
+	// standard R-output
+	if (m_r != m_r_prev)
+	{
+		m_write_r(0, m_r & m_r_mask, 0xffff);
+		m_r_prev = m_r;
+	}
 }
 
 
 UINT8 tms1xxx_cpu_device::read_k_input()
 {
-	// K1,2,4,8,3 (KC test pin is not emulated)
-	UINT8 k = m_read_k(0, 0xff) & m_k_mask;
-	UINT8 k3 = (k & 0x10) ? 3: 0; // the K3 line that is on some chips, is simply K1|K2
+	// K1,2,4,8 (KC test pin is not emulated)
+	return m_read_k(0, 0xff) & 0xf;
+}
+
+UINT8 tms0980_cpu_device::read_k_input()
+{
+	UINT8 k = m_read_k(0, 0xff) & 0x1f;
+	UINT8 k3 = (k & 0x10) ? 3: 0; // the TMS0980 K3 line is simply K1|K2
 	return (k & 0xf) | k3;
 }
 
 UINT8 tms0270_cpu_device::read_k_input()
 {
-	// TODO..
-	
-	return tms1xxx_cpu_device::read_k_input();
+	// external: TMS5100 CTL port via SEG B,C,D,G
+	if (m_chipsel)
+		return (m_ctl_dir) ? m_ctl_out : m_read_ctl(0, 0xff) & 0xf;
+
+	// standard K-input otherwise
+	UINT8 k = m_read_k(0, 0xff) & 0x1f;
+	return (k & 0x10) ? 0xf : k; // the TMS0270 KF line asserts all K-inputs
 }
 
 
@@ -1015,6 +1060,18 @@ void tms1xxx_cpu_device::op_sbl()
 
 
 // TMS0270-specific
+void tms0270_cpu_device::op_setr()
+{
+	// same as default, but handle write to output in dynamic_output
+	m_r = m_r | (1 << m_y);
+}
+
+void tms0270_cpu_device::op_rstr()
+{
+	// same as default, but handle write to output in dynamic_output
+	m_r = m_r & ~(1 << m_y);
+}
+
 void tms0270_cpu_device::op_tdo()
 {
 	// TDO: transfer data out
@@ -1026,16 +1083,9 @@ void tms0270_cpu_device::op_tdo()
 	// write to output is done in dynamic_output
 }
 
-void tms0270_cpu_device::op_setr()
+void tms0270_cpu_device::op_off()
 {
-	// same as default, but handle write to output in dynamic_output
-	m_r = m_r | (1 << m_y);
-}
-
-void tms0270_cpu_device::op_rstr()
-{
-	// same as default, but handle write to output in dynamic_output
-	m_r = m_r & ~(1 << m_y);
+	// OFF was moved to R13, handled in dynamic_output
 }
 
 
@@ -1106,8 +1156,6 @@ void tms1xxx_cpu_device::execute_run()
 			set_cki_bus();
 			m_ram_in = m_data->read_byte(m_ram_address) & 0xf;
 			m_dam_in = m_data->read_byte(m_ram_address | (0x10 << (m_x_bits-1))) & 0xf;
-			m_ram_out = -1;
-			m_status = 1;
 			m_p = 0;
 			m_n = 0;
 			m_carry_in = 0;
@@ -1147,11 +1195,12 @@ void tms1xxx_cpu_device::execute_run()
 			// note: officially, only 1 alu operation is allowed per opcode
 			m_adder_out = m_p + m_n + m_carry_in;
 			int carry_out = m_adder_out >> 4 & 1;
+			int status = 1;
+			m_ram_out = -1;
 
-			if (m_micro & M_C8) m_status &= carry_out;
-			if (m_micro & M_NE) m_status &= (m_n != m_p); // COMP
-
-			if (m_micro & M_CKM) m_ram_out = m_cki_bus;
+			if (m_micro & M_C8)    status &= carry_out;
+			if (m_micro & M_NE)    status &= (m_n != m_p); // COMP
+			if (m_micro & M_CKM)   m_ram_out = m_cki_bus;
 
 			// special status circuit
 			if (m_micro & M_SSE)
@@ -1183,8 +1232,9 @@ void tms1xxx_cpu_device::execute_run()
 			if (m_fixed & F_SAL)   op_sal();
 			if (m_fixed & F_SBL)   op_sbl();
 			if (m_fixed & F_XDA)   op_xda();
-
-			// execute: write ram
+			
+			// after fixed opcode handling: store status, write ram
+			m_status = status;
 			if (m_ram_out != -1)
 				m_data->write_byte(m_ram_address, m_ram_out);
 
@@ -1198,9 +1248,9 @@ void tms1xxx_cpu_device::execute_run()
 
 		case 4:
 			// execute: register store 2/2
-			if (m_micro & M_AUTA) m_a = m_adder_out & 0xf;
-			if (m_micro & M_AUTY) m_y = m_adder_out & 0xf;
-			if (m_micro & M_STSL) m_status_latch = m_status;
+			if (m_micro & M_AUTA)  m_a = m_adder_out & 0xf;
+			if (m_micro & M_AUTY)  m_y = m_adder_out & 0xf;
+			if (m_micro & M_STSL)  m_status_latch = m_status;
 
 			// fetch: update pc, ram address 2/2
 			read_opcode();

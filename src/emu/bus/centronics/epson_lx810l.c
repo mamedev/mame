@@ -160,6 +160,23 @@ static MACHINE_CONFIG_FRAGMENT( epson_lx810l )
 
 	/* 256-bit eeprom */
 	MCFG_EEPROM_SERIAL_93C06_ADD("eeprom")
+
+	/* steppers */
+	//should this have MCFG_STEPPER_MAX_STEPS(200*2) ? code shows 200 steps...
+	MCFG_STEPPER_ADD("pf_stepper")
+	MCFG_STEPPER_REEL_TYPE(NOT_A_REEL)
+	MCFG_STEPPER_START_INDEX(16)
+	MCFG_STEPPER_END_INDEX(24)
+	MCFG_STEPPER_INDEX_PATTERN(0x00)
+	MCFG_STEPPER_INIT_PHASE(0)
+
+	MCFG_STEPPER_ADD("cr_stepper")
+	MCFG_STEPPER_REEL_TYPE(NOT_A_REEL)
+	MCFG_STEPPER_START_INDEX(16)
+	MCFG_STEPPER_END_INDEX(24)
+	MCFG_STEPPER_INDEX_PATTERN(0x00)
+	MCFG_STEPPER_INIT_PHASE(2)
+	
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -278,6 +295,8 @@ epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, const char *tag, d
 	device_t(mconfig, EPSON_LX810L, "Epson LX-810L", tag, owner, clock, "lx810l", __FILE__),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
+	m_pf_stepper(*this, "pf_stepper"),
+	m_cr_stepper(*this, "cr_stepper"),
 	m_eeprom(*this, "eeprom"),
 	m_speaker(*this, "speaker"),
 	m_e05a30(*this, "e05a30"),
@@ -296,6 +315,8 @@ epson_lx810l_t::epson_lx810l_t(const machine_config &mconfig, device_type type, 
 	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
+	m_pf_stepper(*this, "pf_stepper"),
+	m_cr_stepper(*this, "cr_stepper"),
 	m_eeprom(*this, "eeprom"),
 	m_speaker(*this, "speaker"),
 	m_e05a30(*this, "e05a30"),
@@ -319,28 +340,12 @@ epson_ap2000_t::epson_ap2000_t(const machine_config &mconfig, const char *tag, d
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-static const stepper_interface lx810l_pf_stepper =
-{
-	STARPOINT_48STEP_REEL,
-	16,
-	24,
-	0x00,
-	0
-};
 
-static const stepper_interface lx810l_cr_stepper =
-{
-	STARPOINT_48STEP_REEL,
-	16,
-	24,
-	0x00,
-	2
-};
+
 
 void epson_lx810l_t::device_start()
 {
-	stepper_config(machine(), 0, &lx810l_pf_stepper);
-	stepper_config(machine(), 1, &lx810l_cr_stepper);
+
 }
 
 
@@ -515,8 +520,8 @@ WRITE16_MEMBER( epson_lx810l_t::printhead )
 
 WRITE8_MEMBER( epson_lx810l_t::pf_stepper )
 {
-	stepper_update(0, data);
-	m_pf_pos_abs = 200 - stepper_get_absolute_position(0);
+	m_pf_stepper->update(data);
+	m_pf_pos_abs = 200 - m_pf_stepper->get_absolute_position();
 
 	LX810LLOG("%s: %s(%02x); abs %d\n", machine().describe_context(), __func__, data, m_pf_pos_abs);
 }
@@ -525,8 +530,8 @@ WRITE8_MEMBER( epson_lx810l_t::cr_stepper )
 {
 	int m_cr_pos_abs_prev = m_cr_pos_abs;
 
-	stepper_update(1, data);
-	m_cr_pos_abs = 200 - stepper_get_absolute_position(1);
+	m_cr_stepper->update(data);
+	m_cr_pos_abs = 200 - m_cr_stepper->get_absolute_position();
 
 	if (m_cr_pos_abs > m_cr_pos_abs_prev) {
 		/* going right */

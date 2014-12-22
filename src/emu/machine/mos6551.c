@@ -605,7 +605,7 @@ WRITE_LINE_MEMBER(mos6551_device::receiver_clock)
 					m_rx_parity ^= m_rxd;
 
 					if ((m_rx_bits == m_wordlength && m_parity == PARITY_NONE) ||
-						(m_rx_bits == (m_wordlength + 1) && m_parity == PARITY_NONE))
+						(m_rx_bits == (m_wordlength + 1) && m_parity != PARITY_NONE))
 					{
 						m_rx_state = STATE_STOP;
 					}

@@ -101,6 +101,12 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_cpuregion(*this, "maincpu"),
 			m_nvram(*this, "nvram"),
+			m_reel1(*this, "reel1"),
+			m_reel2(*this, "reel2"),
+			m_reel3(*this, "reel3"),
+			m_reel4(*this, "reel4"),
+			m_reel5(*this, "reel5"),
+			m_reel6(*this, "reel6"),
 			m_io1(*this, "IN-0"),
 			m_io2(*this, "IN-1"),
 			m_io3(*this, "IN-2"),
@@ -122,16 +128,25 @@ public:
 	required_memory_region m_cpuregion;
 	// devices
 	required_device<nvram_device> m_nvram;
+	optional_device<stepper_device> m_reel1;
+	optional_device<stepper_device> m_reel2;
+	optional_device<stepper_device> m_reel3;
+	optional_device<stepper_device> m_reel4;
+	optional_device<stepper_device> m_reel5;
+	optional_device<stepper_device> m_reel6;
 
 
-	const stepper_interface **m_reel_setup;
-	int m_reel_changed;
-	int m_reels;
 	int m_reel12_latch;
 	int m_reel3_latch;
 	int m_reel4_latch;
 	int m_reel56_latch;
 	int m_optic_pattern;
+	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
+	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
+	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
+	DECLARE_WRITE_LINE_MEMBER(reel4_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
+	DECLARE_WRITE_LINE_MEMBER(reel5_optic_cb) { if (state) m_optic_pattern |= 0x10; else m_optic_pattern &= ~0x10; }
+	DECLARE_WRITE_LINE_MEMBER(reel6_optic_cb) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
 	SEC sec;
 
 	int m_meterstatus;
@@ -627,6 +642,28 @@ public:
 MACHINE_CONFIG_EXTERN( sc4 );
 MACHINE_CONFIG_EXTERN( sc4_adder4 );
 MACHINE_CONFIG_EXTERN( sc4dmd );
+MACHINE_CONFIG_EXTERN(sc4_3reel);
+MACHINE_CONFIG_EXTERN(sc4_4reel);
+MACHINE_CONFIG_EXTERN(sc4_4reel_alt);
+MACHINE_CONFIG_EXTERN(sc4_5reel);
+MACHINE_CONFIG_EXTERN(sc4_5reel_alt);
+MACHINE_CONFIG_EXTERN(sc4_200_std);
+MACHINE_CONFIG_EXTERN(sc4_200_alt);
+MACHINE_CONFIG_EXTERN(sc4_200_alta);
+MACHINE_CONFIG_EXTERN(sc4_200_altb);
+MACHINE_CONFIG_EXTERN(sc4_200_5r);
+MACHINE_CONFIG_EXTERN(sc4_200_5ra);
+MACHINE_CONFIG_EXTERN(sc4_200_5rb);
+MACHINE_CONFIG_EXTERN(sc4_200_5rc);
+MACHINE_CONFIG_EXTERN(sc4_200_5rc);
+MACHINE_CONFIG_EXTERN(sc4_200_4r);
+MACHINE_CONFIG_EXTERN(sc4_200_4ra);
+MACHINE_CONFIG_EXTERN(sc4_200_4rb);
+MACHINE_CONFIG_EXTERN(sc4_4reel_200);
+MACHINE_CONFIG_EXTERN(sc4_3reel_200);
+MACHINE_CONFIG_EXTERN(sc4_3reel_200_48);
+MACHINE_CONFIG_EXTERN(sc4_no_reels);
+
 
 INPUT_PORTS_EXTERN( sc4_base );
 INPUT_PORTS_EXTERN( sc4_raw );

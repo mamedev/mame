@@ -100,6 +100,8 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<stepper_device> m_pf_stepper;
+	required_device<stepper_device> m_cr_stepper;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<e05a30_device> m_e05a30;

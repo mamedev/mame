@@ -83,14 +83,14 @@ WRITE16_MEMBER(tandy12_state::write_o)
 {
 	// O0-O7: button lamps 1-8
 	for (int i = 0; i < 8; i++)
-		output_set_lamp_value(i, data >> i & 1);
+		output_set_lamp_value(i+1, data >> i & 1);
 }
 
 WRITE16_MEMBER(tandy12_state::write_r)
 {
 	// R0-R3: button lamps 9-12
 	for (int i = 0; i < 4; i++)
-		output_set_lamp_value(i + 8, data >> i & 1);
+		output_set_lamp_value(i+1 + 8, data >> i & 1);
 
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -226,4 +226,4 @@ ROM_START( tandy12 )
 ROM_END
 
 
-CONS( 1981, tandy12, 0, 0, tandy12, tandy12, driver_device, 0, "Tandy Radio Shack", "Tandy-12 - Computerized Arcade", GAME_SUPPORTS_SAVE )
+CONS( 1981, tandy12, 0, 0, tandy12, tandy12, driver_device, 0, "Tandy Radio Shack", "Tandy-12: Computerized Arcade", GAME_SUPPORTS_SAVE )

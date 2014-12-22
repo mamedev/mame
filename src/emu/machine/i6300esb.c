@@ -40,7 +40,7 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, i6300esb_lpc_device)
 	AM_RANGE(0x88, 0x8b) AM_READWRITE8 (d31_err_sts_r,          d31_err_sts_w,          0x00ff0000)
 	AM_RANGE(0x90, 0x93) AM_READWRITE16(pci_dma_cfg_r,          pci_dma_cfg_w,          0x0000ffff)
 	AM_RANGE(0xa0, 0xa3) AM_READWRITE16(gen_pmcon_1_r,          gen_pmcon_1_w,          0x0000ffff)
-	AM_RANGE(0xa0, 0xa3) AM_READWRITE16(gen_pmcon_2_r,          gen_pmcon_2_w,          0xffff0000)
+	AM_RANGE(0xa0, 0xa3) AM_READWRITE8 (gen_pmcon_2_r,          gen_pmcon_2_w,          0x00ff0000)
 	AM_RANGE(0xa4, 0xa7) AM_READWRITE8 (gen_pmcon_3_r,          gen_pmcon_3_w,          0x000000ff)
 	AM_RANGE(0xac, 0xaf) AM_READWRITE  (rst_cnt2_r,             rst_cnt2_w)
 	AM_RANGE(0xb0, 0xb3) AM_READWRITE8 (apm_cnt_r,              apm_cnt_w,              0x00ff0000)
@@ -294,15 +294,15 @@ WRITE16_MEMBER(i6300esb_lpc_device::gen_pmcon_1_w)
 	logerror("%s: gen_pmcon_1 = %04x\n", tag(), gen_pmcon_1);
 }
 
-READ16_MEMBER (i6300esb_lpc_device::gen_pmcon_2_r)
+READ8_MEMBER  (i6300esb_lpc_device::gen_pmcon_2_r)
 {
 	return gen_pmcon_2;
 }
 
-WRITE16_MEMBER(i6300esb_lpc_device::gen_pmcon_2_w)
+WRITE8_MEMBER (i6300esb_lpc_device::gen_pmcon_2_w)
 {
-	COMBINE_DATA(&gen_pmcon_2);
-	logerror("%s: gen_pmcon_2 = %04x\n", tag(), gen_pmcon_2);
+	gen_pmcon_2 = data;
+	logerror("%s: gen_pmcon_2 = %02x\n", tag(), gen_pmcon_2);
 }
 
 READ8_MEMBER  (i6300esb_lpc_device::gen_pmcon_3_r)

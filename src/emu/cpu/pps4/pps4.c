@@ -116,7 +116,7 @@ offs_t pps4_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opr
 inline UINT8 pps4_device::ROP()
 {
     const UINT8 op = m_direct->read_decrypted_byte(m_P & 0xFFF);
-    m_Ip = m_I;         // save previous opcode
+    m_Ip = m_I1;         // save previous opcode
     m_P = (m_P + 1) & 0xFFF;
     m_icount -= 1;
     return op;
@@ -158,12 +158,12 @@ inline UINT8 pps4_device::ARG()
 
 /**
  * @brief pps4_device::iAD Add
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0000 1011  1 cyc   AD
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x0b  0000 1011      1  AD
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * C, A <- A + M
  *
  * The result of the binary addition of contents of accumulator
@@ -180,12 +180,12 @@ void pps4_device::iAD()
 
 /**
  * @brief pps4_device::iADC Add with carry-in
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0000 1010  1 cyc   ADC
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x0a  0000 1010      1  ADC
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * C, A <- A + M + C
  *
  * Same as AD except the C flip-flop serves as a carry-in
@@ -200,12 +200,12 @@ void pps4_device::iADC()
 
 /**
  * @brief pps4_device::iADSK Add and skip if carry-out
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0000 1001  1 cyc   ADSK
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x09  0000 1001      1  ADSK
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * C, A <- A + M
  * Skip if C = 1
  *
@@ -222,12 +222,12 @@ void pps4_device::iADSK()
 
 /**
  * @brief pps4_device::iADCSK Add with carry-in and skip if carry-out
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0000 1000  1 cyc   ADCSK
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x08  0000 1000      1  ADCSK
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * C, A <- A + M + C
  * Skip if C = 1
  *
@@ -244,12 +244,12 @@ void pps4_device::iADCSK()
 
 /**
  * @brief pps4_device::iADI Add immediate
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0110 xxxx  1 cyc   ADI x
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x6*  0110 xxxx      1  ADI x
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * A <- A + [I(4:1)]
  *
  * The result of the binary addition of contents of
@@ -265,7 +265,7 @@ void pps4_device::iADCSK()
  */
 void pps4_device::iADI()
 {
-    const UINT8 imm = ~m_I & 15;
+    const UINT8 imm = ~m_I1 & 15;
     m_A = m_A + imm;
     m_Skip = (m_A >> 4) & 1;
     m_A = m_A & 15;
@@ -273,12 +273,12 @@ void pps4_device::iADI()
 
 /**
  * @brief pps4_device::iDC Decimal correction
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0110 0101  1 cyc   DC
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x65  0110 0101      1  DC
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * A <- A + 1010
  *
  * Decimal correction of accumulator.
@@ -293,12 +293,12 @@ void pps4_device::iDC()
 
 /**
  * @brief pps4_device::iAND Logical AND
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0000 1101  1 cyc   AND
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x0d  0000 1101      1  AND
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * A <- A & M
  *
  * The result of logical AND of accumulator and
@@ -312,12 +312,12 @@ void pps4_device::iAND()
 
 /**
  * @brief pps4_device::iOR Logical OR
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0000 1111  1 cyc   OR
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x0f  0000 1111      1  OR
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * A <- A | M
  *
  * The result of logical OR of accumulator and
@@ -331,12 +331,12 @@ void pps4_device::iOR()
 
 /**
  * @brief pps4_device::iEOR Logical exclusive-OR
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0000 1100  1 cyc   EOR
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x0c  0000 1100      1  EOR
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * A <- A ^ M
  *
  * The result of logical exclusive-OR of
@@ -351,12 +351,12 @@ void pps4_device::iEOR()
 
 /**
  * @brief pps4_device::iCOMP Complement
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0000 1110  1 cyc   COMP
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x0e  0000 1110      1  COMP
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * A <- ~A
  *
  * Each bit of the accumulator is logically
@@ -369,12 +369,12 @@ void pps4_device::iCOMP()
 
 /**
  * @brief pps4_device::iSC Set carry flip-flop
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0010 0000  1 cyc   SC
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x20  0010 0000      1  SC
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * C <- 1
  *
  * The C flip-flop is set to 1.
@@ -386,12 +386,12 @@ void pps4_device::iSC()
 
 /**
  * @brief pps4_device::iRC Reset carry flip-flop
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0010 0100  1 cyc   RC
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x28  0010 0100      1  RC
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * C <- 0
  *
  * The C flip-flop is set to 0.
@@ -403,12 +403,12 @@ void pps4_device::iRC()
 
 /**
  * @brief pps4_device::iSF1 Set flip-flop FF1
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0010 0010  1 cyc   SF1
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x22  0010 0010      1  SF1
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * FF1 <- 1
  *
  * The Flip-flop FF1 is set to 1.
@@ -420,12 +420,12 @@ void pps4_device::iSF1()
 
 /**
  * @brief pps4_device::iRF1 Reset flip-flop FF1
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0010 0110  1 cyc   RF1
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x26  0010 0110      1  RF1
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * FF1 <- 0
  *
  * The Flip-flop FF1 is set to 0.
@@ -437,12 +437,12 @@ void pps4_device::iRF1()
 
 /**
  * @brief pps4_device::iSF2 Set flip-flop FF2
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0010 0001  1 cyc   SF2
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x21  0010 0001      1  SF2
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * FF2 <- 1
  *
  * The Flip-flop FF2 is set to 1.
@@ -454,12 +454,12 @@ void pps4_device::iSF2()
 
 /**
  * @brief pps4_device::iRF2 Reset flip-flop FF2
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0010 0101  1 cyc   RF2
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x25  0010 0101      1  RF2
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * FF2 <- 0
  *
  * The flip-flop FF2 is set to 0.
@@ -471,12 +471,12 @@ void pps4_device::iRF2()
 
 /**
  * @brief pps4_device::iLD Load accumulator from memory
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0011 0xxx  1 cyc   LD x
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x30+ 0011 0xxx      1  LD x
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * A <- M
  * B(7:5) <- B(7:5) ^ [I(3:1)]
  *
@@ -490,19 +490,19 @@ void pps4_device::iRF2()
  */
 void pps4_device::iLD()
 {
-    const UINT16 i3c = ~m_I & 7;
+    const UINT16 i3c = ~m_I1 & 7;
     m_A = M();
     m_B = m_B ^ (i3c << 4);
 }
 
 /**
  * @brief pps4_device::iEX Exchange accumulator and memory
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0011 1xxx  1 cyc   EX x
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x38+ 0011 1xxx      1  EX x
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * A <-> M
  * B(7:5) <- B(7:5) ^ [I(3:1)]
  *
@@ -513,7 +513,7 @@ void pps4_device::iLD()
  */
 void pps4_device::iEX()
 {
-    const UINT16 i3c = ~m_I & 7;
+    const UINT16 i3c = ~m_I1 & 7;
     const UINT8 mem = M();
     W(m_A);
     m_A = mem;
@@ -522,12 +522,12 @@ void pps4_device::iEX()
 
 /**
  * @brief pps4_device::iEXD Exchange accumulator and memory and decrement BL
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0010 1xxx  1 cyc   EXD x
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x28+ 0010 1xxx      1  EXD x
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * A <-> M
  * B(7:5) <- B(7:5) ^ [I(3:1)]
  * BL <- BL - 1
@@ -542,7 +542,7 @@ void pps4_device::iEX()
  */
 void pps4_device::iEXD()
 {
-    const UINT8 i3c = ~m_I & 7;
+    const UINT8 i3c = ~m_I1 & 7;
     const UINT8 mem = M();
     UINT8 bl = m_B & 15;
     W(m_A);
@@ -560,12 +560,12 @@ void pps4_device::iEXD()
 
 /**
  * @brief pps4_device::iLDI Load accumualtor immediate
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0111 xxxx  1 cyc   LDI x
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x7*  0111 xxxx      1  LDI x
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * A <- [I(4:1)]
  *
  * The 4-bit contents, immediate field I(4:1),
@@ -581,20 +581,20 @@ void pps4_device::iLDI()
 {
     // previous LDI instruction?
     if (0x70 == (m_Ip & 0xf0)) {
-        LOG(("%s: skip prev:%02x op:%02x\n", __FUNCTION__, m_Ip, m_I));
+        LOG(("%s: skip prev:%02x op:%02x\n", __FUNCTION__, m_Ip, m_I1));
         return;
     }
-    m_A = ~m_I & 15;
+    m_A = ~m_I1 & 15;
 }
 
 /**
  * @brief pps4_device::iLAX
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0001 0010  1 cyc   LAX
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x12  0001 0010      1  LAX
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * A <- X
  *
  * The 4-bit contents of the X register are
@@ -607,12 +607,12 @@ void pps4_device::iLAX()
 
 /**
  * @brief pps4_device::iLXA
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0001 1011  1 cyc   LXA
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x1b  0001 1011      1  LXA
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * X <- A
  *
  * The contents of the accumulator are
@@ -625,12 +625,12 @@ void pps4_device::iLXA()
 
 /**
  * @brief pps4_device::iLABL
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0001 0001  1 cyc   LABL
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x11  0001 0001      1  LABL
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * A <- BL
  *
  * The contents of BL register are
@@ -643,12 +643,12 @@ void pps4_device::iLABL()
 
 /**
  * @brief pps4_device::iLBMX
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0001 0000  1 cyc   LBMX
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x10  0001 0000      1  LBMX
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * BM <- X
  *
  * The contents of X register are
@@ -661,12 +661,12 @@ void pps4_device::iLBMX()
 
 /**
  * @brief pps4_device::iLBUA
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0000 0100  1 cyc   LBUA
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x08  0000 0100      1  LBUA
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * BU <- A
  * A <- M
  *
@@ -682,12 +682,12 @@ void pps4_device::iLBUA()
 
 /**
  * @brief pps4_device::iXABL
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0001 1001  1 cyc   XABL
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x19  0001 1001      1  XABL
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * A <-> BL
  *
  * The contents of accumulator and BL register
@@ -703,12 +703,12 @@ void pps4_device::iXABL()
 
 /**
  * @brief pps4_device::iXMBX
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0001 1000  1 cyc   XMBX
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x18  0001 1000      1  XMBX
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * X <-> BM
  *
  * The contents of accumulator and BL register
@@ -724,12 +724,12 @@ void pps4_device::iXBMX()
 
 /**
  * @brief pps4_device::iXAX
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0001 1010  1 cyc   XAX
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x1a  0001 1010      1  XAX
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * A <-> X
  *
  * The contents of accumulator and X register
@@ -745,12 +745,12 @@ void pps4_device::iXAX()
 
 /**
  * @brief pps4_device::iXS
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0000 0110  1 cyc   XS
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x06  0000 0110      1  XS
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * SA <-> SB
  *
  * The 12-bit contents of SA and SB register
@@ -766,12 +766,12 @@ void pps4_device::iXS()
 
 /**
  * @brief pps4_device::iCYS
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0110 1111  1 cyc    CYS
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x6f  0110 1111      1   CYS
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * A <- SA(4:1)
  * SA(4:1) <- SA(8:5)
  * SA(8:5) <- SA(12:9)
@@ -793,12 +793,12 @@ void pps4_device::iCYS()
 
 /**
  * @brief pps4_device::iLB Load B indirect
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 1100 xxxx  2 cyc    LB x
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0xc*  1100 xxxx      2   LB x
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * SB <- SA, SA <- P
  * P(12:5) <- 0000 1100
  * P(4:1) <- I(4:1)
@@ -828,12 +828,12 @@ void pps4_device::iLB()
 {
     // previous LB or LBL instruction?
     if (0xc0 == (m_Ip & 0xf0) || 0x00 == m_Ip) {
-        LOG(("%s: skip prev:%02x op:%02x\n", __FUNCTION__, m_Ip, m_I));
+        LOG(("%s: skip prev:%02x op:%02x\n", __FUNCTION__, m_Ip, m_I1));
         return;
     }
     m_SB = m_SA;
     m_SA = (m_P + 1) & 0xFFF;
-    m_P = (3 << 6) | (m_I & 15);
+    m_P = (3 << 6) | (m_I1 & 15);
     m_B = ~ARG() & 255;
     m_P = m_SA;
     // swap SA and SB
@@ -844,12 +844,12 @@ void pps4_device::iLB()
 
 /**
  * @brief pps4_device::iLBL Load B long
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0000 0000  2 cyc    LBL
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x00  0000 0000      2   LBL
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * BU <- 0000
  * B(8:1) <- [I2(8:1)]
  *
@@ -870,7 +870,7 @@ void pps4_device::iLBL()
     m_I2 = ARG();
     // previous LB or LBL instruction?
     if (0xc0 == (m_Ip & 0xf0) || 0x00 == m_Ip) {
-        LOG(("%s: skip prev:%02x op:%02x\n", __FUNCTION__, m_Ip, m_I));
+        LOG(("%s: skip prev:%02x op:%02x\n", __FUNCTION__, m_Ip, m_I1));
         return;
     }
     m_B = ~m_I2 & 255;  // Note: immediate is 1's complement
@@ -878,12 +878,12 @@ void pps4_device::iLBL()
 
 /**
  * @brief pps4_device::INCB Increment B lower, skip if 0000
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0001 0111  1 cyc    INCB
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x17  0001 0111      1   INCB
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * BL <- BL + 1
  * Skip on BL = 0000
  *
@@ -904,12 +904,12 @@ void pps4_device::iINCB()
 
 /**
  * @brief pps4_device::iDECB Decrement B lower, skip if 1111
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0001 1111  1 cyc    DECB
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x1f  0001 1111      1   DECB
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * BL <- BL - 1
  * Skip on BL = 1111
  *
@@ -930,12 +930,12 @@ void pps4_device::iDECB()
 
 /**
  * @brief pps4_device::iT Transfer
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 10xx xxxx  1 cyc    T *xx
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x80+ 10xx xxxx      1   T *xx
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * P(6:1) <- I(6:1)
  *
  * An unconditional transfer to a ROM word on the current
@@ -945,20 +945,20 @@ void pps4_device::iDECB()
  */
 void pps4_device::iT()
 {
-    const UINT16 p = (m_P & ~63) | (m_I & 63);
-    LOG(("%s: P=%03x I=%02x -> P=%03x\n", __FUNCTION__, m_P, m_I, p));
+    const UINT16 p = (m_P & ~63) | (m_I1 & 63);
+    LOG(("%s: P=%03x I=%02x -> P=%03x\n", __FUNCTION__, m_P, m_I1, p));
     m_P = p;
 }
 
 /**
  * @brief pps4_device::iTM Transfer and mark indirect
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 11xx xxxx  2 cyc    TM x
- * yyyy yyyy  from page 3
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0xc0+ 11xx xxxx      2   TM x
+ *       yyyy yyyy  from page 3
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * SB <- SA, SA <- P
  * P(12:7) <- 000011
  * P(6:1) <- I1(6:1)
@@ -979,20 +979,20 @@ void pps4_device::iTM()
 {
     m_SB = m_SA;
     m_SA = m_P;
-    m_P = (3 << 6) | (m_I & 63);
+    m_P = (3 << 6) | (m_I1 & 63);
     m_I2 = ARG();
     m_P = (1 << 8) | m_I2;
 }
 
 /**
  * @brief pps4_device::iTL Transfer long
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0101 xxxx  2 cyc    TL xyy
- * yyyy yyyy
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x5x  0101 xxxx      2   TL xyy
+ *       yyyy yyyy
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * P(12:9) <- I1(4:1)
  * P(8:1) <- I2(8:1)
  *
@@ -1004,18 +1004,18 @@ void pps4_device::iTM()
 void pps4_device::iTL()
 {
     m_I2 = ARG();
-    m_P = ((m_I & 15) << 8) | m_I2;
+    m_P = ((m_I1 & 15) << 8) | m_I2;
 }
 
 /**
  * @brief pps4_device::iTML Transfer and mark long
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0101 xxxx  2 cyc    TML xyy
- * yyyy yyyy
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x0*  0000 xxxx      2   TML xyy
+ *       yyyy yyyy
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * SB <- SA, SA <- P
  * P(12:9) <- I1(4:1)
  * P(8:1) <- I2(8:1)
@@ -1031,17 +1031,17 @@ void pps4_device::iTML()
     m_I2 = ARG();
     m_SB = m_SA;
     m_SA = m_P;
-    m_P = ((m_I & 15) << 8) | m_I2;
+    m_P = ((m_I1 & 15) << 8) | m_I2;
 }
 
 /**
  * @brief pps4_device::iSKC Skip on carry flip-flop
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0001 0101  1 cyc    SKC
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x15  0001 0101      1   SKC
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * Skip if C = 1
  *
  * The next ROM word will be ignored if C flip-flop is 1.
@@ -1053,12 +1053,12 @@ void pps4_device::iSKC()
 
 /**
  * @brief pps4_device::iSKC Skip on carry flip-flop
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0001 1110  1 cyc    SKZ
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x1e  0001 1110      1   SKZ
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * Skip if A = 0
  *
  * The next ROM word will be ignored if C flip-flop is 1.
@@ -1070,12 +1070,12 @@ void pps4_device::iSKZ()
 
 /**
  * @brief pps4_device::iSKBI Skip if BL equal to immediate
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0100 xxxx  1 cyc    SKBI x
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x4*  0100 xxxx      1   SKBI x
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * Skip if BL = I(4:1)
  *
  * The next ROM word will be ignored if the least significant
@@ -1084,19 +1084,19 @@ void pps4_device::iSKZ()
  */
 void pps4_device::iSKBI()
 {
-    const UINT8 i4 = m_I & 15;
+    const UINT8 i4 = m_I1 & 15;
     const UINT8 bl = m_B & 15;
     m_Skip = bl == i4 ? 1 : 0;
 }
 
 /**
  * @brief pps4_device::iSKF1 Skip if FF1 equals 1
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0001 0110  1 cyc    SKF1
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x16  0001 0110      1   SKF1
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * Skip if FF1 = 1
  */
 void pps4_device::iSKF1()
@@ -1106,12 +1106,12 @@ void pps4_device::iSKF1()
 
 /**
  * @brief pps4_device::iSKF2 Skip if FF2 equals 1
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0001 0100  1 cyc    SKF2
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x14  0001 0100      1   SKF2
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * Skip if FF2 = 1
  */
 void pps4_device::iSKF2()
@@ -1121,12 +1121,12 @@ void pps4_device::iSKF2()
 
 /**
  * @brief pps4_device::iRTN Return
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0000 0101  1 cyc    RTN
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x05  0000 0101      1   RTN
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * P <- SA, SA <-> SB
  *
  * This instruction executes a return from subroutine
@@ -1143,13 +1143,13 @@ void pps4_device::iRTN()
 }
 
 /**
- * @brief pps4_device::iRTN Return
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0000 0111  1 cyc    RTNSK
+ * @brief pps4_device::iRTNSK Return and skip
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x07  0000 0111      1   RTNSK
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * P <- SA, SA <-> SB
  * P <- P + 1
  *
@@ -1167,14 +1167,14 @@ void pps4_device::iRTNSK()
 }
 
 /**
- * @brief pps4_device::IOL
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0001 1100  2 cyc    IOL yy
- * yyyy yyyy
+ * @brief pps4_device::IOL Input / Output Long
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x1c  0001 1100      2   IOL yy
+ *       yyyy yyyy
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * ~A -> Data Bus
  * A <- ~Data Bus
  * I2 -> I/O device
@@ -1189,6 +1189,9 @@ void pps4_device::iRTNSK()
  * device is transferred to the accumulator inverted.
  *
  * FIXME: Is BL on the I/D:8-5 lines during the I/O cycle?
+ * The ROM, RAM, I/O chips A17xx suggest this, because they
+ * expect the value of BL to address one of the sixteen
+ * input/output lines.
  */
 void pps4_device::iIOL()
 {
@@ -1203,12 +1206,12 @@ void pps4_device::iIOL()
 
 /**
  * @brief pps4_device::iDIA Discrete input group A
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0010 0111  1 cyc    DIA
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x27  0010 0111      1   DIA
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * A <- DIA
  *
  * Data at the inputs to discrete group A is
@@ -1221,12 +1224,12 @@ void pps4_device::iDIA()
 
 /**
  * @brief pps4_device::iDIB Discrete input group B
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0010 0011  1 cyc    DIB
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x23  0010 0011      1   DIB
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * A <- DIB
  *
  * Data at the inputs to discrete group B is
@@ -1239,12 +1242,12 @@ void pps4_device::iDIB()
 
 /**
  * @brief pps4_device::iDOA Discrete output
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0001 1101  1 cyc    DOA
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x1d  0001 1101      1   DOA
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * DOA <- A
  *
  * The contents of the accumulator are transferred
@@ -1257,12 +1260,12 @@ void pps4_device::iDOA()
 
 /**
  * @brief pps4_device::iSAG Special address generation
- * OPCODE     cycles  mnemonic
- * -----------------------------
- * 0010 1101  1 cyc    SAG
+ * HEX   BINARY    CYCLES  MNEMONIC
+ * ----------------------------------
+ * 0x2d  0001 0011      1   SAG
  *
  * Symbolic equation
- * -----------------------------
+ * ----------------------------------
  * A/B Bus (12:5) <- 0000 0000
  * A/B Bus (4:1) <- BL(4:1)
  * Contents of B remains unchanged
@@ -1283,13 +1286,13 @@ void pps4_device::iSAG()
 ***************************************************************************/
 void pps4_device::execute_one()
 {
-    m_I = ROP();
+    m_I1 = ROP();
     if (m_Skip) {
         m_Skip = 0;
-        LOG(("%s: skip op:%02x\n", __FUNCTION__, m_I));
+        LOG(("%s: skip op:%02x\n", __FUNCTION__, m_I1));
         return;
     }
-    switch (m_I) {
+    switch (m_I1) {
     case 0x00:
         iLBL();
         break;
@@ -1528,22 +1531,22 @@ void pps4_device::device_start()
     save_item(NAME(m_C));
     save_item(NAME(m_FF1));
     save_item(NAME(m_FF2));
-    save_item(NAME(m_I));
+    save_item(NAME(m_I1));
     save_item(NAME(m_I2));
     save_item(NAME(m_Ip));
 
     state_add( PPS4_PC, "PC", m_P ).mask(0xFFF).formatstr("%03X");
-    state_add( PPS4_A,  "A",  m_A ).formatstr("%01X");
-    state_add( PPS4_X,  "X",  m_X ).formatstr("%01X");
+    state_add( PPS4_A, "A",  m_A ).formatstr("%01X");
+    state_add( PPS4_X, "X",  m_X ).formatstr("%01X");
     state_add( PPS4_SA, "SA", m_SA ).formatstr("%03X");
     state_add( PPS4_SB, "SB", m_SB ).formatstr("%03X");
-    state_add( PPS4_Skip,  "Skip",  m_Skip ).formatstr("%01X");
-    state_add( PPS4_SAG,  "SAG",  m_SAG ).formatstr("%03X");
-    state_add( PPS4_B,  "B",  m_B ).formatstr("%03X");
-    state_add( PPS4_I2,  "I",  m_I ).formatstr("%02X").noshow();
-    state_add( PPS4_I2,  "I2",  m_I2 ).formatstr("%02X").noshow();
-    state_add( PPS4_Ip,  "Ip",  m_Ip ).formatstr("%02X").noshow();
-    state_add( STATE_GENPC, "GENPC", m_P ).noshow();
+    state_add( PPS4_Skip, "Skip",  m_Skip ).formatstr("%01X");
+    state_add( PPS4_SAG, "SAG",  m_SAG ).formatstr("%03X");
+    state_add( PPS4_B, "B",  m_B ).formatstr("%03X");
+    state_add( PPS4_I1, "I1",  m_I1 ).formatstr("%02X").noshow();
+    state_add( PPS4_I2, "I2",  m_I2 ).formatstr("%02X").noshow();
+    state_add( PPS4_Ip, "Ip",  m_Ip ).formatstr("%02X").noshow();
+    state_add( STATE_GENPC,    "GENPC", m_P ).noshow();
     state_add( STATE_GENFLAGS, "GENFLAGS", m_C).formatstr("%3s").noshow();
 
     m_icountptr = &m_icount;
@@ -1578,7 +1581,7 @@ void pps4_device::device_reset()
     m_C = 0;        // Carry flip-flop
     m_FF1 = 0;      // Flip-flop 1
     m_FF2 = 0;      // Flip-flop 2
-    m_I = 0;        // Most recent instruction I(8:1)
+    m_I1 = 0;        // Most recent instruction I(8:1)
     m_I2 = 0;       // Most recent parameter I2(8:1)
     m_Ip = 0;       // Previous instruction I(8:1)
 }

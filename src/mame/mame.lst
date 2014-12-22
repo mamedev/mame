@@ -1098,6 +1098,7 @@ crszonev2a      // Crisis Zone - December 1999
 sys246
 bldyr3b
 rrvac
+rrvac2
 wanganmd
 dragchrn
 netchu02
@@ -1110,6 +1111,7 @@ tekken4
 tekken4a
 tekken4b
 tekken4c
+prdgp03
 timecrs3
 timecrs3e
 zgundm
@@ -1119,6 +1121,7 @@ zgundmdx
 gundzaft
 soulclb3
 soulclb3a
+qgundam
 fateulc
 fateulcb
 sbxc
@@ -1126,6 +1129,7 @@ sbxc
 // Namco System 256
 sys256
 tekken51
+tekken5d
 superdbz
 kinniku
 kinniku2
@@ -1134,6 +1138,9 @@ yuyuhaku
 taiko10
 gdvsgd
 gdvsgdnx
+
+// Namco System Super 256
+timecrs4
 
 // Misc Namco games
 cswat           // (c) 1984
@@ -3557,6 +3564,7 @@ progearjd
 progearjbl
 hsf2d
 ssf2tbd
+ssf2tad
 ssf2xjd
 sgemfd
 armwar1d
@@ -4826,10 +4834,10 @@ radru           // 1991.09 Rad Rally (US)
 radrj           // 1991.07 Rad Rally (Japan)
 spidman         // 1991.?? Spiderman (World)
 spidmanu        // 1991.09 Spiderman (US)
-spidmanj    // 1991.09 Spiderman (Japan)
+spidmanj        // 1991.09 Spiderman (Japan)
 f1en            // 1991.?? F-1 Exhaust Note (World)
 f1enu           // 1992.01 F-1 Exhaust Note (US)
-				// 1991.11 F-1 Exhaust Note (Japan)
+f1enj           // 1991.11 F-1 Exhaust Note (Japan)
 arabfgt         // 1992.?? Arabian Fight (World)
 arabfgtu        // 1992.03 Arabian Fight (US)
 arabfgtj        // 1992.03 Arabian Fight (Japan)
@@ -5343,7 +5351,7 @@ qmegamis        // 2000.05 Quiz Ah Megamisama
 derbyo2k        // 2000.06 Derby Owners Club 2000 Ver.2 (Rev A)
 starhrse        // 2000.?? Star Horse (big screens)
 starhrct        // 2000.12 Star Horse (server)
-starhrcl        // 2000.?? Star Horse (client)
+starhrcl        // 2000.11.28 Star Horse (satellite)
 vonot           // 2000.06 Virtual-on Oratorio Tangram M.S.B.S. Ver.5.66 2000 Edition
 ggx             // 2000.07 Guilty Gear X
 slasho          // 2000.07 Slashout
@@ -5424,6 +5432,7 @@ shootopl        // 2002.?? Shootout Pool
 shootpl         // 2003.?? Shootout Pool The Medal / Shootout Pool Prize (Rev A)
 mtkob2          // 2003.02 MushiKing The King Of Beetle
 				// 2003.03 Sega Network Taisen Mahjong MJ
+ggxxrlo         // 2003.02 Guilty Gear XX # Reload
 ggxxrl          // 2003.03 Guilty Gear XX # Reload (Rev A)
 shikgam2        // 2003.04 Shikigami No Shiro II / The Castle of Shikigami II
 bdrdown         // 2003.04 Border Down (Rev A)
@@ -5432,7 +5441,7 @@ usagiym         // 2003.06 Usagi Yamashiro Mahjong Hen
 oinori          // 2003.08 Oinori-daimyoujin Matsuri
 psyvar2         // 2003.11 Psyvariar 2 - The Will To Fabricate
 puyofev         // 2003.11 Puyo Puyo Fever
-starhrsp        // 2003.12 Star Horse Progress (Rev A)
+starhrsp        // 2003.12.01 Star Horse Progress (satellite) (Rev A)
 puyofevp        // 2003.?? Puyo Puyo Fever (prototype)
 				// 2003.?? Dragon Treasure
 				// 2003.?? Rabbit 2
@@ -5443,12 +5452,12 @@ trizeal         // 2004.09 Trizeal
 shootplm        // 2004.?? Shootout Pool The Medal Ver. B / Shootout Pool Prize Ver. B
 kick4csh        // 2004.?? Kick '4' Cash
 				// 2004.?? The Quiz Show
-				// 2005.03 Melty Blood Act Cadenza
+meltyblo        // 2005.03 Melty Blood Act Cadenza
 ss2005          // 2005.03 Super Shanghai 2005
 ss2005a         // 2005.04 Super Shanghai 2005 (Rev A)
 senkoo          // 2005.04 Senko no Ronde
 senko           // 2005.08 Senko no Ronde (Rev A)
-meltybld        // 2005.08 Melty Blood Act Cadenza (Rev C)
+meltybld        // 2005.08 Melty Blood Act Cadenza Ver. A (Rev C)
 ggxxsla         // 2005.09 Guilty Gear XX Slash (Rev A)
 radirgy         // 2005.10 Radirgy
 undefeat        // 2005.10 Under Defeat
@@ -5466,11 +5475,9 @@ senkosp         // 2006.08 Senkou no Rondo SP
 jingystm        // 2006.09 Jingi Storm
 karous          // 2006.11 Karous
 ggxxac          // 2006.11 Guilty Gear XX Accent Core
-meltyb          // 2006.12 Melty Blood Act Cadenza Ver.B
-meltyba         // 2006.12 Melty Blood Act Cadenza Ver.B (Rev A)
-takoron         // 2006.12.16 Noukone Puzzle Takoron                        // Last GD-ROM game?
-				// 2007.03 Melty Blood Act Cadenza Ver.B Syuuseiban(Ver.B2)
-				// 2007.09 Rythm Tengoku (Japan)
+meltyb          // 2006.12 Melty Blood Act Cadenza Version B
+takoron         // 2006.12.16 Noukone Puzzle Takoron
+meltyba         // 2007.03 Melty Blood Act Cadenza Version B2 (Rev A)        // Last GD-ROM game?
 ndcfboxa        // 2009.04.01 DIMM Firmware Updater for CF-BOX (Rev A)
 ngdup23a        // DIMM Firmware Updater (Rev A)
 ngdup23c        // DIMM Firmware Updater (Rev C)
@@ -5486,8 +5493,9 @@ ausfache        // 2008.02 Akatsuki Denkou Senki Ausf.Achse
 illvelo         // 2008.06 Illvelo (Illmatic Envelope)
 mamonoro        // 2008.07 Mamoru-kun wa Norowarete Shimatta!
 mbaa            // 2008.09 Melty Blood Actress Again
-mbaaa           // 2008.12 Melty Blood Actress Again Ver.A
+mbaaa           // 2008.12 Melty Blood Actress Again Version A (Rev A)
 radirgyn        // 2009.06 Radirgy Noa
+starhrpr        // 2009.07.27 Star Horse Progress Returns (satellite)
 				// 2009.?? Project Cerberus (planned to be released in 2009)
 
 // NAOMI based (System SP)
@@ -6880,6 +6888,7 @@ sbrkout         // 033453-033455    1978/09 [6502]
 sbrkoutc        // unrealeased proto
 atarifb         // 033xxx           1978/10 [6502]
 atarifb1        // 033xxx           1978/10 [6502]
+atarifb2		// 035330-035350	???		[6502]
 orbit           // 033689-033702    1978/11 [6800]
 boxer           // ?????? prototype 1978    [6502]
 wolfpack        // ?????? prototype         [6502]
@@ -31852,6 +31861,8 @@ strike
 
 
 /* Below are misc lazy adds, or yet to be sorted out... */
+
+barata
 
 cspin2
 caprcyc

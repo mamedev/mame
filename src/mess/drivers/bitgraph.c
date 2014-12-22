@@ -453,7 +453,7 @@ void bitgraph_state::machine_reset()
 	m_misccr = 0;
 	m_pia_a = 0;
 	m_pia_b = 0;
-	memset(m_ppu, sizeof(m_ppu), 0);
+	memset(m_ppu, 0, sizeof(m_ppu));
 }
 
 

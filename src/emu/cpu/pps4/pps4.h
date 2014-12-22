@@ -17,6 +17,7 @@ enum
     PPS4_B,
     PPS4_Skip,
     PPS4_SAG,
+    PPS4_I1,
     PPS4_I2,
     PPS4_Ip,
     PPS4_GENPC = STATE_GENPC,
@@ -90,7 +91,7 @@ private:
     UINT8   m_C;        //!< Carry flip-flop
     UINT8   m_FF1;      //!< Flip-flop 1
     UINT8   m_FF2;      //!< Flip-flop 2
-    UINT8   m_I;        //!< Most recent instruction I(8:1)
+    UINT8   m_I1;        //!< Most recent instruction I(8:1)
     UINT8   m_I2;       //!< Most recent parameter I2(8:1)
     UINT8   m_Ip;       //!< Previous instruction I(8:1)
 

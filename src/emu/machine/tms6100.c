@@ -182,7 +182,7 @@ WRITE_LINE_MEMBER(tms6100_device::tms6100_romclock_w)
 				else
 				{
 					/* read bit at address */
-					m_data = (m_rom[m_address >> 3] >> ((m_address & 0x07) ^ 0x07)) & 1;
+					m_data = (m_rom[m_address >> 3] >> (m_address & 0x07)) & 1;
 					m_address++;
 				}
 				m_state &= ~TMS6100_READ_PENDING;

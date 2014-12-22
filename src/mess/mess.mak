@@ -180,7 +180,7 @@ SOUNDS += T6W28
 #SOUNDS += C352
 #SOUNDS += TMS36XX
 #SOUNDS += TMS3615
-#SOUNDS += TMS5110
+SOUNDS += TMS5110
 SOUNDS += TMS5220
 SOUNDS += VLM5030
 #SOUNDS += ADPCM
@@ -245,12 +245,12 @@ SOUNDS += ASC
 SOUNDS += SOCRATES
 SOUNDS += TMC0285
 SOUNDS += TMS5200
-#SOUNDS += CD2801
-#SOUNDS += CD2802
+SOUNDS += CD2801
+SOUNDS += CD2802
 #SOUNDS += M58817
-#SOUNDS += TMC0281
-#SOUNDS += TMS5100
-#SOUNDS += TMS5110A
+SOUNDS += TMC0281
+SOUNDS += TMS5100
+SOUNDS += TMS5110A
 SOUNDS += LMC1992
 SOUNDS += AWACS
 #SOUNDS += YMZ770
@@ -1730,6 +1730,7 @@ $(MESSOBJ)/ti.a:                \
 	$(MESS_DRIVERS)/exelv.o     \
 	$(MESS_DRIVERS)/geneve.o    \
 	$(MESS_DRIVERS)/ticalc1x.o  \
+	$(MESS_DRIVERS)/tispeak.o   \
 	$(MESS_DRIVERS)/ti74.o      \
 	$(MESS_DRIVERS)/ti85.o $(MESS_MACHINE)/ti85.o $(MESS_VIDEO)/ti85.o \
 	$(MESS_DRIVERS)/ti89.o      \
@@ -1868,9 +1869,9 @@ $(MESSOBJ)/yamaha.a:            \
 	$(MESS_DRIVERS)/fb01.o      \
 
 $(MESS_DRIVERS)/ymmu100.o: $(MESS_DRIVERS)/ymmu100.inc
-$(MESS_DRIVERS)/ymmu100.inc: $(MESSSRC)/drivers/ymmu100.ppm $(FILE2STR_TARGET)
+$(MESS_DRIVERS)/ymmu100.inc: $(MESSSRC)/drivers/ymmu100.ppm $(SRC)/build/file2str.py
 	@echo Converting $<...
-	@$(FILE2STR) $(MESSSRC)/drivers/ymmu100.ppm $@ ymmu100_bkg UINT8
+	@$(PYTHON) $(SRC)/build/file2str.py $(MESSSRC)/drivers/ymmu100.ppm $@ ymmu100_bkg UINT8
 
 $(MESSOBJ)/zenith.a:            \
 	$(MESS_DRIVERS)/z100.o      \
@@ -2177,6 +2178,7 @@ $(MESS_DRIVERS)/ticalc1x.o: $(MESS_LAYOUT)/ti1270.lh \
 							$(MESS_LAYOUT)/ti30.lh \
 							$(MESS_LAYOUT)/tisr16.lh \
 							$(MESS_LAYOUT)/wizatron.lh
+$(MESS_DRIVERS)/tispeak.o:  $(MESS_LAYOUT)/tispeak.lh
 $(MESS_DRIVERS)/tk80.o:     $(MESS_LAYOUT)/tk80.lh
 $(MESS_DRIVERS)/tm990189.o: $(MESS_LAYOUT)/tm990189.lh \
 							$(MESS_LAYOUT)/tm990189v.lh

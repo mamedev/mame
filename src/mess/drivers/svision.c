@@ -475,9 +475,13 @@ void svision_state::machine_start()
 	m_bank1 = membank("bank1");
 	m_bank2 = membank("bank2");
 	// bank1 is set to the first bank
-	m_bank1->set_base(m_cart_rom->base());
-	// bank2 is set to the last bank
-	m_bank2->set_base(m_cart_rom->base() + (num_banks - 1) * 0x4000);
+	// do not crash if no cart
+	if (num_banks)
+	{
+		m_bank1->set_base(m_cart_rom->base());
+		// bank2 is set to the last bank
+		m_bank2->set_base(m_cart_rom->base() + (num_banks - 1) * 0x4000);
+	}
 }
 
 void svision_state::machine_reset()

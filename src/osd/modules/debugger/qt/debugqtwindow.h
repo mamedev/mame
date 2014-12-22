@@ -34,6 +34,7 @@ protected slots:
 	void debugActOpenDasm();
 	void debugActOpenLog();
 	void debugActOpenPoints();
+	void debugActOpenDevices();
 	void debugActRun();
 	void debugActRunAndHide();
 	void debugActRunToNextCpu();
@@ -64,12 +65,14 @@ class WindowQtConfig
 public:
 	enum WindowType
 	{
-		WIN_TYPE_MAIN         = 0x01,
-		WIN_TYPE_MEMORY       = 0x02,
-		WIN_TYPE_DASM         = 0x04,
-		WIN_TYPE_LOG          = 0x08,
-		WIN_TYPE_BREAK_POINTS = 0x10,
-		WIN_TYPE_UNKNOWN      = 0x20
+		WIN_TYPE_UNKNOWN,
+		WIN_TYPE_MAIN,
+		WIN_TYPE_MEMORY,
+		WIN_TYPE_DASM,
+		WIN_TYPE_LOG,
+		WIN_TYPE_BREAK_POINTS,
+		WIN_TYPE_DEVICES,
+		WIN_TYPE_DEVICE_INFORMATION
 	};
 
 public:

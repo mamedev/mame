@@ -214,9 +214,4 @@
 		</bezel>
 	</view>
 
-	<view name="Terminal">
-		<screen index="0">
-			<bounds x="0" y="0" width="4" height="3" />
-		</screen>
-	</view>
 </mamelayout>

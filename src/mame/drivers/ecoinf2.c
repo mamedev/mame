@@ -22,6 +22,10 @@ public:
 	ecoinf2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_reel0(*this, "reel0"),
+		m_reel1(*this, "reel1"),
+		m_reel2(*this, "reel2"),
+		m_reel3(*this, "reel3"),
 		m_coins(*this, "COINS"),
 		m_key(*this, "PERKEY"),
 		m_panel(*this, "PANEL")
@@ -31,6 +35,10 @@ public:
 	}
 
 	required_device<cpu_device> m_maincpu;
+	required_device<stepper_device> m_reel0;
+	required_device<stepper_device> m_reel1;
+	required_device<stepper_device> m_reel2;
+	required_device<stepper_device> m_reel3;
 	required_ioport m_coins;
 	required_ioport m_key;
 	required_ioport m_panel;
@@ -40,6 +48,10 @@ public:
 	//UINT16 m_chars[14];
 //  void update_display();
 	int m_optic_pattern;
+	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
+	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
+	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
+	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
 	int strobe_addr;
 	int strobe_amount;
 
@@ -187,30 +199,20 @@ public:
 
 	DECLARE_WRITE8_MEMBER(ppi8255_ic23_write_a_reel01)
 	{
-		stepper_update(0, data&0x0f);
-		stepper_update(1, (data>>4)&0x0f);
+		m_reel0->update( data    &0x0f);
+		m_reel1->update((data>>4)&0x0f);
 
-		if ( stepper_optic_state(0) ) m_optic_pattern |=  0x10;
-		else                          m_optic_pattern &= ~0x10;
-		if ( stepper_optic_state(1) ) m_optic_pattern |=  0x20;
-		else                          m_optic_pattern &= ~0x20;
-
-		awp_draw_reel(0);
-		awp_draw_reel(1);
+		awp_draw_reel("reel1", m_reel0);
+		awp_draw_reel("reel2", m_reel1);
 	}
 
 	DECLARE_WRITE8_MEMBER(ppi8255_ic23_write_b_reel23)
 	{
-		stepper_update(2, data&0x0f);
-		stepper_update(3, (data>>4)&0x0f);
+		m_reel2->update( data    &0x0f);
+		m_reel3->update((data>>4)&0x0f);
 
-		if ( stepper_optic_state(2) ) m_optic_pattern |=  0x40;
-		else                          m_optic_pattern &= ~0x40;
-		if ( stepper_optic_state(3) ) m_optic_pattern |=  0x80;
-		else                          m_optic_pattern &= ~0x80;
-
-		awp_draw_reel(2);
-		awp_draw_reel(3);
+		awp_draw_reel("reel3", m_reel2);
+		awp_draw_reel("reel4", m_reel3);
 	}
 
 	DECLARE_READ8_MEMBER(ppi8255_ic23_read_c_key)
@@ -498,10 +500,6 @@ INPUT_PORTS_END
 MACHINE_START_MEMBER(ecoinf2_state,ecoinf2)
 {
 	MechMtr_config(machine(),8);
-	for ( int n = 0; n < 4; n++ )
-	{
-		stepper_config(machine(), n, &ecoin_interface_200step_reel);
-	}
 }
 
 
@@ -540,6 +538,15 @@ static MACHINE_CONFIG_START( ecoinf2_oxo, ecoinf2_state )
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf2_state, ppi8255_ic13_write_a_strobedat0))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf2_state, ppi8255_ic13_write_b_strobedat1))
 	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf2_state, ppi8255_ic13_read_c_panel))
+
+	MCFG_ECOIN_200STEP_ADD("reel0")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf2_state, reel0_optic_cb))
+	MCFG_ECOIN_200STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf2_state, reel1_optic_cb))
+	MCFG_ECOIN_200STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf2_state, reel2_optic_cb))
+	MCFG_ECOIN_200STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf2_state, reel3_optic_cb))
 
 //  MCFG_DEVICE_ADD("ic25_dips", I8255, 0)
 MACHINE_CONFIG_END

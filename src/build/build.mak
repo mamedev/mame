@@ -18,14 +18,12 @@ OBJDIRS += \
 # set of build targets
 #-------------------------------------------------
 
-FILE2STR_TARGET = $(BUILDOUT)/file2str$(BUILD_EXE)
 MAKEDEP_TARGET = $(BUILDOUT)/makedep$(BUILD_EXE)
 MAKEMAK_TARGET = $(BUILDOUT)/makemak$(BUILD_EXE)
 MAKELIST_TARGET = $(BUILDOUT)/makelist$(BUILD_EXE)
 PNG2BDC_TARGET = $(BUILDOUT)/png2bdc$(BUILD_EXE)
 VERINFO_TARGET = $(BUILDOUT)/verinfo$(BUILD_EXE)
 
-FILE2STR = $(FILE2STR_TARGET)
 MAKEDEP = $(MAKEDEP_TARGET)
 MAKEMAK = $(MAKEMAK_TARGET)
 MAKELIST = $(MAKELIST_TARGET)
@@ -34,34 +32,22 @@ VERINFO = $(VERINFO_TARGET)
 
 ifneq ($(CROSS_BUILD),1)
 BUILD += \
-	$(FILE2STR_TARGET) \
 	$(MAKEDEP_TARGET) \
 	$(MAKEMAK_TARGET) \
 	$(MAKELIST_TARGET) \
 	$(PNG2BDC_TARGET) \
 	$(VERINFO_TARGET) \
 
-
-
-#-------------------------------------------------
-# file2str
-#-------------------------------------------------
-
-FILE2STROBJS = \
-	$(BUILDOBJ)/file2str.o \
-
-$(FILE2STR_TARGET): $(FILE2STROBJS) $(LIBOCORE)
-	@echo Linking $@...
-	$(NATIVELD) $(NATIVELDFLAGS) $^ $(LIBS) -o $@
-
-
-
-#-------------------------------------------------
 # makedep
 #-------------------------------------------------
 
 MAKEDEPOBJS = \
 	$(BUILDOBJ)/makedep.o \
+	$(OBJ)/lib/util/astring.o \
+	$(OBJ)/lib/util/corealloc.o \
+	$(OBJ)/lib/util/corefile.o \
+	$(OBJ)/lib/util/unicode.o \
+	$(OBJ)/lib/util/tagmap.o \
 
 $(MAKEDEP_TARGET): $(MAKEDEPOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB)
 	@echo Linking $@...
@@ -75,9 +61,14 @@ $(MAKEDEP_TARGET): $(MAKEDEPOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB)
 
 MAKEMAKOBJS = \
 	$(BUILDOBJ)/makemak.o \
+	$(OBJ)/lib/util/astring.o \
+	$(OBJ)/lib/util/corealloc.o \
+	$(OBJ)/lib/util/corefile.o \
+	$(OBJ)/lib/util/corestr.o \
+	$(OBJ)/lib/util/unicode.o \
+	$(OBJ)/lib/util/tagmap.o \
 
-# TODO: 7z and flac - really?
-$(MAKEMAK_TARGET): $(MAKEMAKOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB) $(7Z_LIB)
+$(MAKEMAK_TARGET): $(MAKEMAKOBJS) $(LIBOCORE) $(ZLIB)
 	@echo Linking $@...
 	$(NATIVELD) $(NATIVELDFLAGS) $^ $(LIBS) -o $@
 
@@ -89,9 +80,14 @@ $(MAKEMAK_TARGET): $(MAKEMAKOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB) $(7
 
 MAKELISTOBJS = \
 	$(BUILDOBJ)/makelist.o \
+	$(OBJ)/lib/util/astring.o \
+	$(OBJ)/lib/util/corealloc.o \
+	$(OBJ)/lib/util/cstrpool.o \
+	$(OBJ)/lib/util/corefile.o \
+	$(OBJ)/lib/util/unicode.o \
+	$(OBJ)/lib/util/tagmap.o \
 
-# TODO: 7z and flac - really?
-$(MAKELIST_TARGET): $(MAKELISTOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB) $(7Z_LIB)
+$(MAKELIST_TARGET): $(MAKELISTOBJS) $(LIBOCORE) $(ZLIB)
 	@echo Linking $@...
 	$(NATIVELD) $(NATIVELDFLAGS) $^ $(LIBS) -o $@
 
@@ -103,6 +99,13 @@ $(MAKELIST_TARGET): $(MAKELISTOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB) $
 
 PNG2BDCOBJS = \
 	$(BUILDOBJ)/png2bdc.o \
+	$(OBJ)/lib/util/astring.o \
+	$(OBJ)/lib/util/corefile.o \
+	$(OBJ)/lib/util/corealloc.o \
+	$(OBJ)/lib/util/bitmap.o \
+	$(OBJ)/lib/util/png.o \
+	$(OBJ)/lib/util/palette.o \
+	$(OBJ)/lib/util/unicode.o \
 
 $(PNG2BDC_TARGET): $(PNG2BDCOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB) $(7Z_LIB)
 	@echo Linking $@...

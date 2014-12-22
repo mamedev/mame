@@ -87,6 +87,7 @@ public:
     gts1_state(const machine_config &mconfig, device_type type, const char *tag)
         : genpin_class(mconfig, type, tag)
         , m_maincpu(*this, "maincpu")
+        , m_switches(*this, "X")
     { }
 
     DECLARE_DRIVER_INIT(gts1);
@@ -108,12 +109,13 @@ public:
 private:
     virtual void machine_reset();
     required_device<cpu_device> m_maincpu;
-    UINT8 m_io[256];            //!< dummy I/O values of undefined ranges (will be removed)
+    required_ioport_array<5> m_switches;
+    UINT8 m_strobe;             //!< switches strobe lines (5 lower bits used)
     UINT8 m_nvram_addr;         //!< NVRAM address
     bool m_nvram_e2;            //!< NVRWAM enable (E2 line)
     bool m_nvram_wr;            //!< NVRWAM write (W/R line)
-    UINT16 m_6351_addr;
-    UINT16 m_z30_out;
+    UINT16 m_6351_addr;         //!< ROM MM6351 address (12 bits)
+    UINT16 m_z30_out;           //!< 4-to-16 decoder outputs
 };
 
 static ADDRESS_MAP_START( gts1_map, AS_PROGRAM, 8, gts1_state )
@@ -121,21 +123,22 @@ static ADDRESS_MAP_START( gts1_map, AS_PROGRAM, 8, gts1_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gts1_data, AS_DATA, 8, gts1_state )
-    AM_RANGE(0x0000, 0x00ff) AM_RAM // not correct
+    AM_RANGE(0x0000, 0x00ff) AM_RAM
+    AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gts1_io, AS_IO, 8, gts1_state )
-    AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE ( "ra17xx_u4", ra17xx_device, io_r, io_w ) // (U4) solenoid
-    AM_RANGE(0x0030, 0x003f) AM_DEVREADWRITE ( "r10696_u3", r10696_device, io_r, io_w ) // (U3) solenoid + dips
-    AM_RANGE(0x0040, 0x004f) AM_DEVREADWRITE ( "ra17xx_u5", ra17xx_device, io_r, io_w ) // (U5) switch matrix
-    AM_RANGE(0x0060, 0x006f) AM_DEVREADWRITE ( "r10696_u2", r10696_device, io_r, io_w ) // (U2) NVRAM io chip
-    AM_RANGE(0x00d0, 0x00df) AM_DEVREADWRITE ( "r10788_u6", r10788_device, io_r, io_w ) // (U6) display chip
-    AM_RANGE(0x0000, 0x00ff) AM_READ ( gts1_io_r ) AM_WRITE( gts1_io_w )             // catch undecoded I/O accesss
-    AM_RANGE(0x0100, 0x0100) AM_READ ( gts1_pa_r ) AM_WRITE( gts1_pa_w )             // CPU I/O port A (input/output)
-    AM_RANGE(0x0101, 0x0101) AM_WRITE( gts1_pb_w )                                   // CPU I/O port B (output only)
+    AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE ( "u4", ra17xx_device, io_r, io_w ) // (U4) solenoid
+    AM_RANGE(0x0030, 0x003f) AM_DEVREADWRITE ( "u3", r10696_device, io_r, io_w ) // (U3) solenoid + dips
+    AM_RANGE(0x0040, 0x004f) AM_DEVREADWRITE ( "u5", ra17xx_device, io_r, io_w ) // (U5) switch matrix
+    AM_RANGE(0x0060, 0x006f) AM_DEVREADWRITE ( "u2", r10696_device, io_r, io_w ) // (U2) NVRAM io chip
+    AM_RANGE(0x00d0, 0x00df) AM_DEVREADWRITE ( "u6", r10788_device, io_r, io_w ) // (U6) display chip
+    AM_RANGE(0x0000, 0x00ff) AM_READ ( gts1_io_r ) AM_WRITE( gts1_io_w )         // catch undecoded I/O accesss
+    AM_RANGE(0x0100, 0x0100) AM_READ ( gts1_pa_r ) AM_WRITE( gts1_pa_w )         // CPU I/O port A (input/output)
+    AM_RANGE(0x0101, 0x0101) AM_WRITE( gts1_pb_w )                               // CPU I/O port B (output only)
 ADDRESS_MAP_END
 
-static INPUT_PORTS_START( gts1 )
+static INPUT_PORTS_START( gts1_dips )
     PORT_START("DSW0")
     PORT_DIPNAME( 0x01, 0x00, "S01")
     PORT_DIPSETTING(    0x00, DEF_STR( Off ))
@@ -215,8 +218,117 @@ static INPUT_PORTS_START( gts1 )
     PORT_DIPSETTING(    0x80, DEF_STR( On ))
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( gts1_switches )
+    PORT_START("X.0")
+    PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_START("X.1")
+    PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_START("X.2")
+    PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_START("X.3")
+    PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_START("X.4")
+    PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gts1 )
+    PORT_INCLUDE( gts1_dips )
+
+    PORT_INCLUDE( gts1_switches )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( jokrpokr )
+    PORT_INCLUDE( gts1_dips )
+
+    PORT_START("X.0")
+    PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PLAY/TEST")
+    PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("POP/BUMBER")
+    PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("EXTRA BALL TARGET")
+    PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SPECIAL ROLLOVER")
+    PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("10 POINT CONTACTS")
+    PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("\"A\" DROP TARGET (red)")
+    PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+
+    PORT_START("X.1")
+    PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("#1 COIN CHUTE")
+    PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("\"A\" ROLLOVER")
+    PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("\"10\" DROP TARGET")
+    PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("\"Q\" DROP TARGET (red)")
+    PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("\"K\" DROP TARGET (black)")
+    PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("\"A\" DROP TARGET (black)")
+    PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+
+    PORT_START("X.2")
+    PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("#2 COIN CHUTE")
+    PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("\"B\" ROLLOVER")
+    PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("\"J\" DROP TARGET (black)")
+    PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("\"O\" DROP TARGET (black)")
+    PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("\"K\" DROP TARGET")
+    PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("JOKER DROP TARGET")
+    PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+
+    PORT_START("X.3")
+    PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("REPLAY BUTTON")
+    PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("\"C\" ROLLOVER")
+    PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("\"J\" DROP TARGET (red)")
+    PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("\"O\" DROP TARGET (red)")
+    PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("\"K\" DROP TARGET")
+    PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("\"A\" DROP TARGET (red)")
+    PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+
+    PORT_START("X.4")
+    PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("TILT PANEL")
+    PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("\"K\" DROP TARGET")
+    PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("\"A\" DROP TARGET (red)")
+    PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)
+    PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
+INPUT_PORTS_END
+
 void gts1_state::machine_reset()
 {
+    m_strobe = 0;
     m_nvram_addr = 0;
     m_nvram_e2 = false;
     m_nvram_wr = false;
@@ -237,7 +349,8 @@ READ8_MEMBER (gts1_state::gts1_solenoid_r)
 
 WRITE8_MEMBER(gts1_state::gts1_solenoid_w)
 {
-    switch (offset) {
+    switch (offset)
+    {
     case  0:
         LOG(("%s: outhole <- %x\n", __FUNCTION__, data));
         break;
@@ -262,10 +375,7 @@ WRITE8_MEMBER(gts1_state::gts1_solenoid_w)
     case  7:
         LOG(("%s: no. 8 <- %x\n", __FUNCTION__, data));
         break;
-    case  8:
-    case  9:
-    case 10:
-    case 11:
+    case  8: case  9: case 10: case 11:
         LOG(("%s: not used [%x] <- %x\n", __FUNCTION__, offset, data));
         break;
     case 12:    // spare
@@ -287,14 +397,26 @@ WRITE8_MEMBER(gts1_state::gts1_solenoid_w)
 
 READ8_MEMBER (gts1_state::gts1_switches_r)
 {
-    UINT8 data = 0;
-    LOG(("%s: switches[%02x] -> %x\n", __FUNCTION__, offset, data));
+    UINT8 data = 1;
+    if (offset >= 8 && offset < 16) {
+        const int bit = offset - 8;
+        for (int i = 0; i < 5; i++) {
+            if (m_strobe & (1 << i)) {
+                data &= BIT(m_switches[i]->read(), bit);
+            }
+        }
+    }
+    LOG(("%s: switches[%x,%x] -> %x\n", __FUNCTION__, m_strobe, offset, data));
     return data;
 }
 
 WRITE8_MEMBER(gts1_state::gts1_switches_w)
 {
-    LOG(("%s: switches[%02x] <- %x\n", __FUNCTION__, offset, data));
+    LOG(("%s: switches[%x] <- %x\n", __FUNCTION__, offset, data));
+    if (offset < 5) {
+        // outputs O-0 to O-4 are the 5 strobe lines
+        m_strobe = (m_strobe & ~(1 << offset)) | ((data & 1) << offset);
+    }
 }
 
 /**
@@ -337,7 +459,7 @@ WRITE8_MEMBER(gts1_state::gts1_display_w)
     };
     UINT8 a = ttl7448_mod[(data >> 0) & 15];
     UINT8 b = ttl7448_mod[(data >> 4) & 15];
-    LOG(("%s: offset:%d data:%02x a:%02x b:%02x\n", __FUNCTION__, offset, data, a, b));
+    // LOG(("%s: offset:%d data:%02x a:%02x b:%02x\n", __FUNCTION__, offset, data, a, b));
     if ((offset % 8) < 7) {
         output_set_indexed_value("digit8_", offset, a);
         output_set_indexed_value("digit8_", offset + 16, b);
@@ -377,7 +499,10 @@ READ8_MEMBER (gts1_state::gts1_nvram_r)
         case 0: // group A
             // FIXME: Schematics says TO Z5
             if (!m_nvram_wr && m_nvram_e2) {
-                // FIXME: read generic NVRAM data
+                UINT8* nvram = memregion("nvram")->base();
+                assert(nvram != NULL);
+                data = nvram[m_nvram_addr];
+                LOG(("%s: nvram[%02x] -> %x\n", __FUNCTION__, m_nvram_addr, data));
             }
             break;
         case 1: // group B
@@ -406,7 +531,9 @@ WRITE8_MEMBER(gts1_state::gts1_nvram_w)
         case 2: // group C - data bits 3:0 of NVRAM
             if (m_nvram_wr && m_nvram_e2) {
                 LOG(("%s: nvram[%02x] <- %x\n", __FUNCTION__, m_nvram_addr, data & 15));
-                // FIXME: write generic NVRAM data
+                UINT8* nvram = memregion("nvram")->base();
+                assert(nvram != NULL);
+                nvram[m_nvram_addr] = data & 15;
             }
             break;
     }
@@ -523,15 +650,14 @@ WRITE8_MEMBER(gts1_state::gts1_lamp_apm_w)
 
 READ8_MEMBER (gts1_state::gts1_io_r)
 {
-    UINT8 data = m_io[offset] & 0x0f;
-    LOG(("%s: io[%02x] -> %x\n", __FUNCTION__, offset, data));
+    const UINT8 data = 0x0f;
+    LOG(("%s: unmapped io[%02x] -> %x\n", __FUNCTION__, offset, data));
     return data;
 }
 
 WRITE8_MEMBER(gts1_state::gts1_io_w)
 {
-    LOG(("%s: io[%02x] <- %x\n", __FUNCTION__, offset, data));
-    m_io[offset] = data;
+    LOG(("%s: unmapped io[%02x] <- %x\n", __FUNCTION__, offset, data));
 }
 
 READ8_MEMBER (gts1_state::gts1_pa_r)
@@ -565,30 +691,30 @@ static MACHINE_CONFIG_START( gts1, gts1_state )
     MCFG_CPU_DATA_MAP(gts1_data)
     MCFG_CPU_IO_MAP(gts1_io)
 
-    //MCFG_NVRAM_ADD_0FILL("nvram")
+    MCFG_NVRAM_ADD_0FILL("nvram")
 
     /* A1753CE 2048 x 8 ROM (000-7ff), 128 x 4 RAM (00-7f) and 16 I/O lines (20 ... 2f) */
-    MCFG_DEVICE_ADD( "ra17xx_u5", RA17XX, 0 )
+    MCFG_DEVICE_ADD( "u5", RA17XX, 0 )
     MCFG_RA17XX_READ ( READ8 (gts1_state,gts1_switches_r) )
     MCFG_RA17XX_WRITE( WRITE8(gts1_state,gts1_switches_w) )
 
     /* A1752CF 2048 x 8 ROM (800-fff), 128 x 4 RAM (80-ff) and 16 I/O lines (40 ... 4f) */
-    MCFG_DEVICE_ADD( "ra17xx_u4", RA17XX, 0 )
+    MCFG_DEVICE_ADD( "u4", RA17XX, 0 )
     MCFG_RA17XX_READ ( READ8 (gts1_state,gts1_solenoid_r) )
     MCFG_RA17XX_WRITE( WRITE8(gts1_state,gts1_solenoid_w) )
 
     /* 10696 General Purpose Input/Output */
-    MCFG_DEVICE_ADD( "r10696_u2", R10696, 0 )
+    MCFG_DEVICE_ADD( "u2", R10696, 0 )
     MCFG_R10696_IO( READ8 (gts1_state,gts1_nvram_r),
                     WRITE8(gts1_state,gts1_nvram_w) )
 
     /* 10696 General Purpose Input/Output */
-    MCFG_DEVICE_ADD( "r10696_u3", R10696, 0 )
+    MCFG_DEVICE_ADD( "u3", R10696, 0 )
     MCFG_R10696_IO( READ8 (gts1_state,gts1_lamp_apm_r),
                     WRITE8(gts1_state,gts1_lamp_apm_w) )
 
     /* 10788 General Purpose Display and Keyboard */
-    MCFG_DEVICE_ADD( "r10788_u6", R10788, XTAL_3_579545MHz / 18 )  // divided in the circuit
+    MCFG_DEVICE_ADD( "u6", R10788, XTAL_3_579545MHz / 18 )  // divided in the circuit
     MCFG_R10788_UPDATE( WRITE8(gts1_state,gts1_display_w) )
 
     /* Video */
@@ -849,34 +975,34 @@ ROM_START(sys1test)
 ROM_END
 
 
-GAME(1977,  gts1,       0,          gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "System 1", GAME_IS_BIOS_ROOT)
+GAME(1977,  gts1,       0,          gts1,   gts1,     gts1_state,   gts1,   ROT0,   "Gottlieb",     "System 1", GAME_IS_BIOS_ROOT)
 
 //Exact same roms as gts1 with added hardware we'll likely need roms for to emulate properly
-GAME(1979,  gts1s,      gts1,       gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "System 1 with sound board", GAME_IS_BIOS_ROOT)
-GAME(19??,  sys1test,   gts1,       gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "System 1 Test prom",                   GAME_IS_SKELETON_MECHANICAL)
+GAME(1979,  gts1s,      gts1,       gts1,   gts1,     gts1_state,   gts1,   ROT0,   "Gottlieb",     "System 1 with sound board", GAME_IS_BIOS_ROOT)
+GAME(19??,  sys1test,   gts1,       gts1,   gts1,     gts1_state,   gts1,   ROT0,   "Gottlieb",     "System 1 Test prom",                   GAME_IS_SKELETON_MECHANICAL)
 
 // chimes
-GAME(1977,  cleoptra,   gts1,       gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "Cleopatra",                            GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,  sinbad,     gts1,       gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "Sinbad",                               GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,  sinbadn,    sinbad,     gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "Sinbad (Norway)",                      GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,  jokrpokr,   gts1,       gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "Joker Poker",                          GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,  dragon,     gts1,       gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "Dragon",                               GAME_IS_SKELETON_MECHANICAL)
-GAME(1979,  solaride,   gts1,       gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "Solar Ride",                           GAME_IS_SKELETON_MECHANICAL)
-GAME(1979,  countdwn,   gts1,       gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "Count-Down",                           GAME_IS_SKELETON_MECHANICAL)
+GAME(1977,  cleoptra,   gts1,       gts1,   gts1,     gts1_state,   gts1,   ROT0,   "Gottlieb",     "Cleopatra",                            GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,  sinbad,     gts1,       gts1,   gts1,     gts1_state,   gts1,   ROT0,   "Gottlieb",     "Sinbad",                               GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,  sinbadn,    sinbad,     gts1,   gts1,     gts1_state,   gts1,   ROT0,   "Gottlieb",     "Sinbad (Norway)",                      GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,  jokrpokr,   gts1,       gts1,   jokrpokr, gts1_state,   gts1,   ROT0,   "Gottlieb",     "Joker Poker",                          GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,  dragon,     gts1,       gts1,   gts1,     gts1_state,   gts1,   ROT0,   "Gottlieb",     "Dragon",                               GAME_IS_SKELETON_MECHANICAL)
+GAME(1979,  solaride,   gts1,       gts1,   gts1,     gts1_state,   gts1,   ROT0,   "Gottlieb",     "Solar Ride",                           GAME_IS_SKELETON_MECHANICAL)
+GAME(1979,  countdwn,   gts1,       gts1,   gts1,     gts1_state,   gts1,   ROT0,   "Gottlieb",     "Count-Down",                           GAME_IS_SKELETON_MECHANICAL)
 
 // NE555 beeper
-GAME(1978,  closeenc,   gts1,       gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "Close Encounters of the Third Kind",   GAME_IS_SKELETON_MECHANICAL)
-GAME(1978,  charlies,   gts1,       gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "Charlie's Angels",                     GAME_IS_SKELETON_MECHANICAL)
-GAME(1979,  pinpool,    gts1,       gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "Pinball Pool",                         GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,  closeenc,   gts1,       gts1,   gts1,     gts1_state,   gts1,   ROT0,   "Gottlieb",     "Close Encounters of the Third Kind",   GAME_IS_SKELETON_MECHANICAL)
+GAME(1978,  charlies,   gts1,       gts1,   gts1,     gts1_state,   gts1,   ROT0,   "Gottlieb",     "Charlie's Angels",                     GAME_IS_SKELETON_MECHANICAL)
+GAME(1979,  pinpool,    gts1,       gts1,   gts1,     gts1_state,   gts1,   ROT0,   "Gottlieb",     "Pinball Pool",                         GAME_IS_SKELETON_MECHANICAL)
 
 // sound card
-GAME(1979,  totem,      gts1s,      gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "Totem",                                GAME_IS_SKELETON_MECHANICAL)
-GAME(1979,  hulk,       gts1s,      gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "The Incredible Hulk",                  GAME_IS_SKELETON_MECHANICAL)
-GAME(1979,  geniep,     gts1s,      gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "Genie (Pinball)",                      GAME_IS_SKELETON_MECHANICAL)
-GAME(1980,  buckrgrs,   gts1s,      gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "Buck Rogers",                          GAME_IS_SKELETON_MECHANICAL)
-GAME(1980,  torch,      gts1s,      gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "Torch",                                GAME_IS_SKELETON_MECHANICAL)
-GAME(1980,  roldisco,   gts1s,      gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "Roller Disco",                         GAME_IS_SKELETON_MECHANICAL)
-GAME(1980,  astannie,   gts1s,      gts1,   gts1, gts1_state,   gts1,   ROT0,   "Gottlieb",     "Asteroid Annie and the Aliens",        GAME_IS_SKELETON_MECHANICAL)
+GAME(1979,  totem,      gts1s,      gts1,   gts1,     gts1_state,   gts1,   ROT0,   "Gottlieb",     "Totem",                                GAME_IS_SKELETON_MECHANICAL)
+GAME(1979,  hulk,       gts1s,      gts1,   gts1,     gts1_state,   gts1,   ROT0,   "Gottlieb",     "The Incredible Hulk",                  GAME_IS_SKELETON_MECHANICAL)
+GAME(1979,  geniep,     gts1s,      gts1,   gts1,     gts1_state,   gts1,   ROT0,   "Gottlieb",     "Genie (Pinball)",                      GAME_IS_SKELETON_MECHANICAL)
+GAME(1980,  buckrgrs,   gts1s,      gts1,   gts1,     gts1_state,   gts1,   ROT0,   "Gottlieb",     "Buck Rogers",                          GAME_IS_SKELETON_MECHANICAL)
+GAME(1980,  torch,      gts1s,      gts1,   gts1,     gts1_state,   gts1,   ROT0,   "Gottlieb",     "Torch",                                GAME_IS_SKELETON_MECHANICAL)
+GAME(1980,  roldisco,   gts1s,      gts1,   gts1,     gts1_state,   gts1,   ROT0,   "Gottlieb",     "Roller Disco",                         GAME_IS_SKELETON_MECHANICAL)
+GAME(1980,  astannie,   gts1s,      gts1,   gts1,     gts1_state,   gts1,   ROT0,   "Gottlieb",     "Asteroid Annie and the Aliens",        GAME_IS_SKELETON_MECHANICAL)
 
 // homebrew
-GAME(1986,  hexagone,   gts1s,      gts1,   gts1, gts1_state,   gts1,   ROT0,   "Christian Tabart",        "L'Hexagone (France)",       GAME_IS_SKELETON_MECHANICAL)
+GAME(1986,  hexagone,   gts1s,      gts1,   gts1,     gts1_state,   gts1,   ROT0,   "Christian Tabart",        "L'Hexagone (France)",       GAME_IS_SKELETON_MECHANICAL)

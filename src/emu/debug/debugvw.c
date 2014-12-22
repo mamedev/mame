@@ -74,8 +74,8 @@ debug_view::debug_view(running_machine &machine, debug_view_type type, debug_vie
 		m_source(NULL),
 		m_osdupdate(osdupdate),
 		m_osdprivate(osdprivate),
-		m_visible(10,10),
-		m_total(10,10),
+		m_visible(80,10),
+		m_total(80,10),
 		m_topleft(0,0),
 		m_cursor(0,0),
 		m_supports_cursor(false),
@@ -394,6 +394,20 @@ void debug_view_manager::free_view(debug_view &view)
 			auto_free(machine(), &view);
 			break;
 		}
+}
+
+
+//-------------------------------------------------
+//  update_all_except - force all views to refresh
+//  except one
+//-------------------------------------------------
+
+void debug_view_manager::update_all_except(debug_view_type type)
+{
+	// loop over each view and force an update
+	for (debug_view *view = m_viewlist; view != NULL; view = view->next())
+		if (type == DVT_NONE || type != view->type())
+			view->force_update();
 }
 
 

@@ -863,6 +863,8 @@ void i80186_cpu_device::update_interrupt_state()
 			}
 		}
 	}
+	m_intr.pending = 0;
+	set_input_line(0, CLEAR_LINE);
 	return;
 
 generate_int:

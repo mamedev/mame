@@ -1731,7 +1731,7 @@ void device_debug::start_hook(const attotime &endtime)
 		// check for periodic updates
 		if (&m_device == global->visiblecpu && osd_ticks() > global->last_periodic_update_time + osd_ticks_per_second()/4)
 		{
-			m_device.machine().debug_view().update_all();
+			m_device.machine().debug_view().update_all_except(DVT_DISASSEMBLY);
 			m_device.machine().debug_view().flush_osd_updates();
 			global->last_periodic_update_time = osd_ticks();
 		}
@@ -1995,11 +1995,11 @@ void device_debug::memory_write_hook(address_space &space, offs_t address, UINT6
 	if (m_track_mem)
 	{
 		dasm_memory_access newAccess(space.spacenum(), address, data, history_pc(0));
-		if (!m_track_mem_set.insert(newAccess))
-		{
-			m_track_mem_set.remove(newAccess);
+		dasm_memory_access* trackedAccess = m_track_mem_set.find(newAccess);
+		if (trackedAccess)
+			trackedAccess->m_pc = newAccess.m_pc;
+		else
 			m_track_mem_set.insert(newAccess);
-		}
 	}
 	watchpoint_check(space, WATCHPOINT_WRITE, address, data, mem_mask);
 }

@@ -280,7 +280,7 @@ void DebuggerMemView::mousePressEvent(QMouseEvent* event)
 	if (leftClick || rightClick)
 	{
 		QFontMetrics actualFont = fontMetrics();
-		const int fontWidth = MAX(1, actualFont.width('_'));
+		const double fontWidth = actualFont.width(QString(100, '_')) / 100.;
 		const int fontHeight = MAX(1, actualFont.height());
 
 		debug_view_xy topLeft = view()->visible_position();

@@ -41,7 +41,7 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 
 	UINT16 m_o;
-	bool m_power;
+	bool m_power_on;
 
 	UINT16 m_leds_state[0x10];
 	UINT16 m_leds_cache[0x10];
@@ -92,7 +92,7 @@ void stopthief_state::leds_update()
 				m_leds_decay[di] = LEDS_DECAY_TIME;
 			
 			// determine active state
-			int ds = (m_power && m_leds_decay[di] != 0) ? 1 : 0;
+			int ds = (m_power_on && m_leds_decay[di] != 0) ? 1 : 0;
 			active_state[i] |= (ds << j);
 		}
 	}
@@ -170,8 +170,8 @@ WRITE16_MEMBER(stopthief_state::write_o)
 
 INPUT_CHANGED_MEMBER(stopthief_state::power_button)
 {
-	m_power = (bool)(FPTR)param;
-	m_maincpu->set_input_line(INPUT_LINE_RESET, m_power ? CLEAR_LINE : ASSERT_LINE);
+	m_power_on = (bool)(FPTR)param;
+	m_maincpu->set_input_line(INPUT_LINE_RESET, m_power_on ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /* physical button layout and labels is like this:
@@ -220,7 +220,7 @@ WRITE_LINE_MEMBER(stopthief_state::auto_power_off)
 	// TMS0980 auto power-off opcode
 	if (state)
 	{
-		m_power = false;
+		m_power_on = false;
 		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 }
@@ -228,7 +228,7 @@ WRITE_LINE_MEMBER(stopthief_state::auto_power_off)
 
 void stopthief_state::machine_reset()
 {
-	m_power = true;
+	m_power_on = true;
 }
 
 void stopthief_state::machine_start()
@@ -239,7 +239,7 @@ void stopthief_state::machine_start()
 	memset(m_leds_decay, 0, sizeof(m_leds_decay));
 
 	m_o = 0;
-	m_power = false;
+	m_power_on = false;
 
 	// register for savestates
 	save_item(NAME(m_leds_state));
@@ -247,7 +247,7 @@ void stopthief_state::machine_start()
 	save_item(NAME(m_leds_decay));
 
 	save_item(NAME(m_o));
-	save_item(NAME(m_power));
+	save_item(NAME(m_power_on));
 }
 
 

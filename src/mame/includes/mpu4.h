@@ -113,6 +113,14 @@ public:
 			m_aux2_port(*this, "AUX2"),
 			m_bank1(*this, "bank1"),
 			m_msm6376(*this, "msm6376"),
+			m_reel0(*this, "reel0"),
+			m_reel1(*this, "reel1"),
+			m_reel2(*this, "reel2"),
+			m_reel3(*this, "reel3"),
+			m_reel4(*this, "reel4"),
+			m_reel5(*this, "reel5"),
+			m_reel6(*this, "reel6"),
+			m_reel7(*this, "reel7"),
 			m_palette(*this, "palette")
 	{}
 
@@ -201,10 +209,20 @@ public:
 	DECLARE_MACHINE_RESET(mpu4);
 	DECLARE_MACHINE_START(mpu4yam);
 	DECLARE_MACHINE_START(mpu4oki);
+	DECLARE_MACHINE_START(mpu4oki_alt);
+	DECLARE_MACHINE_START(mod4oki_5r);
+	DECLARE_MACHINE_START(mod2_alt);
 	DECLARE_MACHINE_START(mpu4bwb);
 	DECLARE_MACHINE_START(mpu4cry);
 	TIMER_DEVICE_CALLBACK_MEMBER(gen_50hz);
-
+	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
+	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
+	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
+	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
+	DECLARE_WRITE_LINE_MEMBER(reel4_optic_cb) { if (state) m_optic_pattern |= 0x10; else m_optic_pattern &= ~0x10; }
+	DECLARE_WRITE_LINE_MEMBER(reel5_optic_cb) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
+	DECLARE_WRITE_LINE_MEMBER(reel6_optic_cb) { if (state) m_optic_pattern |= 0x40; else m_optic_pattern &= ~0x40; }
+	DECLARE_WRITE_LINE_MEMBER(reel7_optic_cb) { if (state) m_optic_pattern |= 0x80; else m_optic_pattern &= ~0x80; }
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
@@ -212,7 +230,6 @@ protected:
 	void lamp_extend_large(int data,int column,int active);
 	void led_write_latch(int latch, int data, int column);
 	void update_meters();
-	void mpu4_stepper_reset();
 	void ic23_update();
 	void ic24_output(int data);
 	void ic24_setup();
@@ -242,6 +259,14 @@ protected:
 	required_ioport m_aux2_port;
 	optional_memory_bank m_bank1;
 	optional_device<okim6376_device> m_msm6376;
+	optional_device<stepper_device> m_reel0;
+	optional_device<stepper_device> m_reel1;
+	optional_device<stepper_device> m_reel2;
+	optional_device<stepper_device> m_reel3;
+	optional_device<stepper_device> m_reel4;
+	optional_device<stepper_device> m_reel5;
+	optional_device<stepper_device> m_reel6;
+	optional_device<stepper_device> m_reel7;
 
 	enum
 	{
@@ -280,6 +305,7 @@ protected:
 	UINT8 m_led_strobe;
 	UINT8 m_ay_data;
 	int m_optic_pattern;
+
 	int m_active_reel;
 	int m_remote_meter;
 	int m_reel_mux;
@@ -312,5 +338,8 @@ MACHINE_CONFIG_EXTERN( mpu4_common );
 MACHINE_CONFIG_EXTERN( mpu4_common2 );
 
 MACHINE_CONFIG_EXTERN( mod2     );
+MACHINE_CONFIG_EXTERN( mod4oki_alt );
+MACHINE_CONFIG_EXTERN( mod4oki_5r );
+MACHINE_CONFIG_EXTERN( mod2_alt );
 
 INPUT_PORTS_EXTERN( mpu4 );

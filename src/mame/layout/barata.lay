@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="0.75" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+	<element name="red_led">
+		<disk><color red="1.0" green="0.0" blue="0.0" /></disk>
+	</element>
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<view name="Default Layout">
+		<!-- Black background -->
+		<bezel element="background">
+			<bounds left="97" top="95" right="428" bottom="250" />
+		</bezel>
+		<bezel name="digit0" element="digit">
+			<bounds left="107" top="105" right="155" bottom="185" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds left="155" top="105" right="203" bottom="185" />
+		</bezel>
+		<bezel name="digit2" element="digit">
+			<bounds left="323" top="105" right="370" bottom="185" />
+		</bezel>
+		<bezel name="digit3" element="digit">
+			<bounds left="371" top="105" right="418" bottom="185" />
+		</bezel>
+
+		<bezel name="led0" element="red_led">
+			<bounds left="124" right="129" top="205" bottom="210" /></bezel>
+		<bezel name="led1" element="red_led">
+			<bounds left="134" right="139" top="205" bottom="210" /></bezel>
+		<bezel name="led2" element="red_led">
+			<bounds left="144" right="149" top="205" bottom="210" /></bezel>
+		<bezel name="led3" element="red_led">
+			<bounds left="154" right="159" top="205" bottom="210" /></bezel>
+		<bezel name="led4" element="red_led">
+			<bounds left="164" right="169" top="205" bottom="210" /></bezel>
+		<bezel name="led5" element="red_led">
+			<bounds left="174" right="179" top="205" bottom="210" /></bezel>
+		<bezel name="led6" element="red_led">
+			<bounds left="184" right="189" top="205" bottom="210" /></bezel>
+		<bezel name="led7" element="red_led">
+			<bounds left="194" right="199" top="205" bottom="210" /></bezel>
+
+		<bezel name="led8" element="red_led">
+			<bounds left="324" right="329" top="205" bottom="210" /></bezel>
+		<bezel name="led9" element="red_led">
+			<bounds left="334" right="339" top="205" bottom="210" /></bezel>
+		<bezel name="led10" element="red_led">
+			<bounds left="344" right="349" top="205" bottom="210" /></bezel>
+		<bezel name="led11" element="red_led">
+			<bounds left="354" right="359" top="205" bottom="210" /></bezel>
+		<bezel name="led12" element="red_led">
+			<bounds left="364" right="369" top="205" bottom="210" /></bezel>
+		<bezel name="led13" element="red_led">
+			<bounds left="374" right="379" top="205" bottom="210" /></bezel>
+		<bezel name="led14" element="red_led">
+			<bounds left="384" right="389" top="205" bottom="210" /></bezel>
+		<bezel name="led15" element="red_led">
+			<bounds left="394" right="399" top="205" bottom="210" /></bezel>
+
+	</view>
+</mamelayout>

@@ -74,6 +74,10 @@ public:
 	bfmsys85_state(const machine_config &mconfig, device_type type, const char *tag) : driver_device(mconfig, type, tag),
 		m_vfd(*this, "vfd"),
 		m_maincpu(*this, "maincpu"),
+		m_reel0(*this, "reel0"),
+		m_reel1(*this, "reel1"),
+		m_reel2(*this, "reel2"),
+		m_reel3(*this, "reel3"),
 		m_acia6850_0(*this, "acia6850_0")
 	{
 	}
@@ -84,9 +88,12 @@ public:
 	int m_alpha_clock;
 	int m_irq_status;
 	int m_optic_pattern;
+	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
+	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
+	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
+	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
 	int m_locked;
 	int m_is_timer_enabled;
-	int m_reel_changed;
 	int m_coin_inhibits;
 	int m_mux_output_strobe;
 	int m_mux_input_strobe;
@@ -118,6 +125,10 @@ public:
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	int b85_find_project_string( );
 	required_device<cpu_device> m_maincpu;
+	required_device<stepper_device> m_reel0;
+	required_device<stepper_device> m_reel1;
+	required_device<stepper_device> m_reel2;
+	required_device<stepper_device> m_reel3;
 	required_device<acia6850_device> m_acia6850_0;
 };
 
@@ -159,17 +170,6 @@ void bfmsys85_state::machine_reset()
 
 	m_vfd->reset(); // reset display1
 
-// reset stepper motors ///////////////////////////////////////////////////
-	{
-		int pattern =0, i;
-
-		for ( i = 0; i < 6; i++)
-		{
-			stepper_reset_position(i);
-			if ( stepper_optic_state(i) ) pattern |= 1<<i;
-		}
-	m_optic_pattern = pattern;
-	}
 	m_locked          = 0x00; // hardware is open
 }
 
@@ -205,30 +205,22 @@ READ8_MEMBER(bfmsys85_state::irqlatch_r)
 
 WRITE8_MEMBER(bfmsys85_state::reel12_w)
 {
-	if ( stepper_update(0, (data>>4)&0x0f) ) m_reel_changed |= 0x01;
-	if ( stepper_update(1, data&0x0f   ) ) m_reel_changed |= 0x02;
+	m_reel0->update((data>>4)&0x0f);
+	m_reel1->update( data    &0x0f);
 
-	if ( stepper_optic_state(0) ) m_optic_pattern |=  0x01;
-	else                          m_optic_pattern &= ~0x01;
-	if ( stepper_optic_state(1) ) m_optic_pattern |=  0x02;
-	else                          m_optic_pattern &= ~0x02;
-	awp_draw_reel(0);
-	awp_draw_reel(1);
+	awp_draw_reel("reel1", m_reel0);
+	awp_draw_reel("reel2", m_reel1);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
 WRITE8_MEMBER(bfmsys85_state::reel34_w)
 {
-	if ( stepper_update(2, (data>>4)&0x0f) ) m_reel_changed |= 0x04;
-	if ( stepper_update(3, data&0x0f   ) ) m_reel_changed |= 0x08;
+	m_reel2->update((data>>4)&0x0f);
+	m_reel3->update( data    &0x0f);
 
-	if ( stepper_optic_state(2) ) m_optic_pattern |=  0x04;
-	else                          m_optic_pattern &= ~0x04;
-	if ( stepper_optic_state(3) ) m_optic_pattern |=  0x08;
-	else                          m_optic_pattern &= ~0x08;
-	awp_draw_reel(2);
-	awp_draw_reel(3);
+	awp_draw_reel("reel3", m_reel2);
+	awp_draw_reel("reel4", m_reel3);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -354,12 +346,6 @@ READ8_MEMBER(bfmsys85_state::triac_r)
 
 void bfmsys85_state::machine_start()
 {
-	int i;
-	for ( i = 0; i < 4; i++ )
-	{
-		stepper_config(machine(), i, &starpoint_interface_48step);
-	}
-
 }
 
 // memory map for bellfruit system85 board ////////////////////////////////
@@ -415,6 +401,15 @@ static MACHINE_CONFIG_START( bfmsys85, bfmsys85_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")                       // load/save nv RAM
+
+	MCFG_STARPOINT_48STEP_ADD("reel0")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfmsys85_state, reel0_optic_cb))
+	MCFG_STARPOINT_48STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfmsys85_state, reel1_optic_cb))
+	MCFG_STARPOINT_48STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfmsys85_state, reel2_optic_cb))
+	MCFG_STARPOINT_48STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfmsys85_state, reel3_optic_cb))
 
 	MCFG_DEFAULT_LAYOUT(layout_bfmsys85)
 MACHINE_CONFIG_END

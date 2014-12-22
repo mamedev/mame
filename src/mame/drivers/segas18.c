@@ -57,8 +57,8 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 ind
 			break;
 
 		case 5:
-			mapper.map_as_ram(0x00000, 0x10000, 0xfe0000, "tileram", write16_delegate(FUNC(segas18_state::sega_tileram_0_w), this));
-			mapper.map_as_ram(0x10000, 0x01000, 0xfef000, "textram", write16_delegate(FUNC(segas18_state::sega_textram_0_w), this));
+			mapper.map_as_ram(0x00000, 0x10000, 0xfe0000, "tileram", write16_delegate(FUNC(segas18_state::tileram_w), this));
+			mapper.map_as_ram(0x10000, 0x01000, 0xfef000, "textram", write16_delegate(FUNC(segas18_state::textram_w), this));
 			break;
 
 		case 4:
@@ -141,10 +141,6 @@ void segas18_state::init_generic(segas18_rom_board rom_board)
 	// configure the NVRAM to point to our workram
 	m_nvram->set_base(m_workram, m_workram.bytes());
 
-	// point globals to allocated memory regions
-	m_segaic16vid->segaic16_tileram_0 = reinterpret_cast<UINT16 *>(memshare("tileram")->ptr());
-	m_segaic16vid->segaic16_textram_0 = reinterpret_cast<UINT16 *>(memshare("textram")->ptr());
-
 	// configure VDP
 	m_vdp->set_use_cram(1);
 	m_vdp->set_vdp_pal(FALSE);
@@ -181,7 +177,7 @@ void segas18_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void segas18_state::machine_reset()
 {
-	m_segaic16vid->segaic16_tilemap_reset(*m_screen);
+	m_segaic16vid->tilemap_reset(*m_screen);
 
 	m_vdp->device_reset_old();
 
@@ -202,7 +198,7 @@ WRITE8_MEMBER( segas18_state::misc_outputs_w )
 {
 	// miscellaneous output
 	set_grayscale(~data & 0x40);
-	m_segaic16vid->segaic16_tilemap_set_flip(0, data & 0x20);
+	m_segaic16vid->tilemap_set_flip(0, data & 0x20);
 	m_sprites->set_flip(data & 0x20);
 	// These are correct according to cgfm's docs, but mwalker and ddcrew both
 	// enable the lockout and never turn it off
@@ -284,8 +280,8 @@ WRITE8_MEMBER( segas18_state::rom_5874_bank_w )
 	{
 		for (int i = 0; i < 4; i++)
 		{
-			m_segaic16vid->segaic16_tilemap_set_bank(0, 0 + i, (data & 0xf) * 4 + i);
-			m_segaic16vid->segaic16_tilemap_set_bank(0, 4 + i, ((data >> 4) & 0xf) * 4 + i);
+			m_segaic16vid->tilemap_set_bank(0, 0 + i, (data & 0xf) * 4 + i);
+			m_segaic16vid->tilemap_set_bank(0, 4 + i, ((data >> 4) & 0xf) * 4 + i);
 		}
 	}
 }
@@ -305,7 +301,7 @@ WRITE16_MEMBER( segas18_state::rom_5987_bank_w )
 		int maxbanks = m_gfxdecode->gfx(0)->elements() / 1024;
 		if (data >= maxbanks)
 			data %= maxbanks;
-		m_segaic16vid->segaic16_tilemap_set_bank(0, offset, data);
+		m_segaic16vid->tilemap_set_bank(0, offset, data);
 	}
 
 	// sprite banking
@@ -335,7 +331,7 @@ WRITE16_MEMBER( segas18_state::rom_837_7525_bank_w )
 		if (data & 0x80) data += 0x20;
 		data &= 0x3f;
 
-		m_segaic16vid->segaic16_tilemap_set_bank(0, offset, data);
+		m_segaic16vid->tilemap_set_bank(0, offset, data);
 	}
 
 	// sprite banking
@@ -1217,7 +1213,7 @@ static MACHINE_CONFIG_START( system18, segas18_state )
 	MCFG_315_5296_IN_PORTF_CB(IOPORT("COINAGE"))
 	MCFG_315_5296_IN_PORTG_CB(IOPORT("DSW"))
 	MCFG_315_5296_OUT_PORTH_CB(WRITE8(segas18_state, rom_5874_bank_w))
-	MCFG_315_5296_OUT_CNT1_CB(DEVWRITELINE("segaic16vid", segaic16_video_device, segaic16_set_display_enable))
+	MCFG_315_5296_OUT_CNT1_CB(DEVWRITELINE("segaic16vid", segaic16_video_device, set_display_enable))
 	MCFG_315_5296_OUT_CNT2_CB(WRITELINE(segas18_state, set_vdp_enable))
 
 	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, 0)

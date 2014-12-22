@@ -28,8 +28,6 @@
 // 05-03-2004: Re-Animator                                               //
 //                                                                       //
 // TODO:  add further types of stepper motors if needed (Konami/IGT?)    //
-//        Someone who understands the device system may want to convert  //
-//        this                                                           //
 //        200 Step reels can alter their relative opto tab position,     //
 //        may be worth adding the phase setting to the interface         //
 //        There are reports that some games use a pulse that is too short//
@@ -41,215 +39,87 @@
 #include "emu.h"
 #include "steppers.h"
 
-/* local prototypes */
+const device_type STEPPER = &device_creator<stepper_device>;
 
-static void update_optic(int which);
-
-/* local vars */
-
-struct stepper
-{
-	const stepper_interface *intf;
-	UINT8    pattern,   /* coil pattern */
-			old_pattern,    /* old coil pattern */
-			initphase,
-				phase,  /* motor phase */
-			old_phase,  /* old phase */
-				type;   /* reel type */
-	INT16   step_pos,   /* step position 0 - max_steps */
-			max_steps;  /* maximum step position */
-	INT32   abs_step_pos; /* absolute step position */
-
-	INT16 index_start,  /* start position of index (in half steps) */
-			index_end,  /* end position of index (in half steps) */
-			index_patt; /* pattern needed on coils (0=don't care) */
-
-	UINT8 optic;
-};
-
-static stepper step[MAX_STEPPERS];
-
-/* useful interfaces (Starpoint is a very common setup)*/
-const stepper_interface starpoint_interface_48step =
-{
-	STARPOINT_48STEP_REEL,
-	1,
-	3,
-	0x09,
-	4
-};
-
-const stepper_interface starpointrm20_interface_48step =
-{
-	STARPOINT_48STEP_REEL,
-	16,
-	24,
-	0x09,
-	7
-};
-const stepper_interface starpoint_interface_200step_reel =
-{
-	STARPOINT_200STEP_REEL,
-	12,
-	24,
-	0x09,
-	7
-};
-// guess
-const stepper_interface ecoin_interface_200step_reel =
-{
-	ECOIN_200STEP_REEL,
-	12,
-	24,
-	0x09,
-	7
-};
-
-
-
-///////////////////////////////////////////////////////////////////////////
-void stepper_config(running_machine &machine, int which, const stepper_interface *intf)
-{
-	assert_always(machine.phase() == MACHINE_PHASE_INIT, "Can only call stepper_config at init time!");
-	assert_always((which >= 0) && (which < MAX_STEPPERS), "stepper_config called on an invalid stepper motor!");
-	assert_always(intf, "stepper_config called with an invalid interface!");
-
-	step[which].intf = intf;
-
-	step[which].type = intf->type;
-	step[which].index_start = intf->index_start;/* location of first index value in half steps */
-	step[which].index_end   = intf->index_end;  /* location of last index value in half steps */
-	step[which].index_patt  = intf->index_patt; /* hex value of coil pattern (0 if not needed)*/
-	step[which].initphase   = intf->initphase; /* Phase at 0 steps, for alignment) */
-
-
-	step[which].pattern     = 0;
-	step[which].old_pattern = 0;
-	step[which].step_pos    = 0;
-	step[which].abs_step_pos= 0;
-	step[which].phase = step[which].initphase;
-	step[which].old_phase = step[which].initphase;
-
-
-	switch ( step[which].type )
-	{   default:
-		case STARPOINT_48STEP_REEL:  /* STARPOINT RMxxx */
-		case BARCREST_48STEP_REEL :  /* Barcrest Reel unit */
-		case MPU3_48STEP_REEL :
-		case GAMESMAN_48STEP_REEL :  /* Gamesman GMxxxx */
-		case PROJECT_48STEP_REEL :
-		step[which].max_steps = (48*2);
-		break;
-		case GAMESMAN_100STEP_REEL :
-		step[which].max_steps = (100*2);
-		break;
-		case STARPOINT_144STEP_DICE :/* STARPOINT 1DCU DICE mechanism */
-		//Dice reels are 48 step motors, but complete three full cycles between opto updates
-		step[which].max_steps = ((48*3)*2);
-		break;
-		case STARPOINT_200STEP_REEL :
-		case GAMESMAN_200STEP_REEL :
-		case ECOIN_200STEP_REEL :
-		step[which].max_steps = (200*2);
-		break;
-	}
-
-	state_save_register_item(machine, "stepper", NULL, which, step[which].index_start);
-	state_save_register_item(machine, "stepper", NULL, which, step[which].index_end);
-	state_save_register_item(machine, "stepper", NULL, which, step[which].index_patt);
-	state_save_register_item(machine, "stepper", NULL, which, step[which].initphase);
-	state_save_register_item(machine, "stepper", NULL, which, step[which].phase);
-	state_save_register_item(machine, "stepper", NULL, which, step[which].old_phase);
-	state_save_register_item(machine, "stepper", NULL, which, step[which].pattern);
-	state_save_register_item(machine, "stepper", NULL, which, step[which].old_pattern);
-	state_save_register_item(machine, "stepper", NULL, which, step[which].step_pos);
-	state_save_register_item(machine, "stepper", NULL, which, step[which].abs_step_pos);
-	state_save_register_item(machine, "stepper", NULL, which, step[which].max_steps);
-	state_save_register_item(machine, "stepper", NULL, which, step[which].type);
-}
-
-///////////////////////////////////////////////////////////////////////////
-int stepper_get_position(int which)
-{
-	return step[which].step_pos;
-}
-
-///////////////////////////////////////////////////////////////////////////
-int stepper_get_absolute_position(int which)
-{
-	return step[which].abs_step_pos;
-}
-
+stepper_device::stepper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+		: device_t(mconfig, STEPPER, "Stepper Motor", tag, owner, clock, "stepper", __FILE__),
+		m_optic_cb(*this)
+	{
+		m_max_steps=(48*2);
+	}	
 ///////////////////////////////////////////////////////////////////////////
 
-int stepper_get_max(int which)
+void stepper_device::update_optic()
 {
-	return step[which].max_steps;
-}
-
-///////////////////////////////////////////////////////////////////////////
-
-static void update_optic(int which)
-{
-	int pos   = step[which].step_pos,
-		start = step[which].index_start,
-		end = step[which].index_end;
+	int pos   = m_step_pos,
+		start = m_index_start,
+		end = m_index_end;
 
 	if (start > end) // cope with index patterns that wrap around
 	{
 		if ( (( pos > start ) || ( pos < end )) &&
-		( ( step[which].pattern == step[which].index_patt || step[which].index_patt==0) ||
-		( step[which].pattern == 0 &&
-		(step[which].old_pattern == step[which].index_patt || step[which].index_patt==0)
+		( ( m_pattern == m_index_patt || m_index_patt==0) ||
+		( m_pattern == 0 &&
+		(m_old_pattern == m_index_patt || m_index_patt==0)
 		) ) )
 		{
-			step[which].optic = 1;
+			m_optic = 1;
 		}
-		else step[which].optic = 0;
+		else m_optic = 0;
 		}
 	else
 	{
 		if ( (( pos > start ) && ( pos < end )) &&
-		( ( step[which].pattern == step[which].index_patt || step[which].index_patt==0) ||
-		( step[which].pattern == 0 &&
-		(step[which].old_pattern == step[which].index_patt || step[which].index_patt==0)
+		( ( m_pattern == m_index_patt || m_index_patt==0) ||
+		( m_pattern == 0 &&
+		(m_old_pattern == m_index_patt || m_index_patt==0)
 		) ) )
 		{
-		step[which].optic = 1;
+		m_optic = 1;
 		}
-		else step[which].optic = 0;
-	}
-}
-///////////////////////////////////////////////////////////////////////////
-
-void stepper_reset_position(int which)
-{
-	step[which].step_pos    = 0x00;
-	step[which].abs_step_pos= 0x00;
-	step[which].pattern     = 0x00;
-	step[which].old_pattern = 0x00;
-	step[which].phase = step[which].initphase;
-	step[which].old_phase = step[which].initphase;
-	update_optic(which);
-}
-
-///////////////////////////////////////////////////////////////////////////
-
-int stepper_optic_state(int which)
-{
-	int result = 0;
-
-	if ( which < MAX_STEPPERS )
-	{
-		result = step[which].optic;
+		else m_optic = 0;
 	}
 
-	return result;
+	m_optic_cb(m_optic);
+}
+///////////////////////////////////////////////////////////////////////////
+
+void stepper_device::device_start()
+{
+	/* resolve callbacks */
+	m_optic_cb.resolve_safe();
+
+	/* register for state saving */
+	save_item(NAME(m_index_start));
+	save_item(NAME(m_index_end));
+	save_item(NAME(m_index_patt));
+	save_item(NAME(m_initphase));
+	save_item(NAME(m_phase));
+	save_item(NAME(m_old_phase));
+	save_item(NAME(m_pattern));
+	save_item(NAME(m_old_pattern));
+	save_item(NAME(m_step_pos));
+	save_item(NAME(m_abs_step_pos));
+	save_item(NAME(m_max_steps));
+	save_item(NAME(m_type));
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-int stepper_update(int which, UINT8 pattern)
+void stepper_device::device_reset()
+{
+	m_step_pos     = 0x00;
+	m_abs_step_pos = 0x00;
+	m_pattern      = 0x00;
+	m_old_pattern  = 0x00;
+	m_phase        = m_initphase;
+	m_old_phase    = m_initphase;
+	update_optic();
+}
+
+///////////////////////////////////////////////////////////////////////////
+
+int stepper_device::update(UINT8 pattern)
 {
 	int changed = 0;
 
@@ -271,12 +141,13 @@ int stepper_update(int which, UINT8 pattern)
 	*/
 
 	int pos,steps=0;
-	step[which].pattern = pattern;
-	switch ( step[which].type )
+	m_pattern = pattern;
+	switch ( m_type )
 	{
 		default:
-		logerror("No reel type specified for %x!\n",which);
+		logerror("No reel type specified!\n");
 		break;
+		case NOT_A_REEL :
 		case STARPOINT_48STEP_REEL : /* STARPOINT RMxxx */
 		case GAMESMAN_200STEP_REEL : /* Gamesman GMxxxx */
 		case STARPOINT_144STEP_DICE :/* STARPOINT 1DCU DICE mechanism */
@@ -287,51 +158,51 @@ int stepper_update(int which, UINT8 pattern)
 		switch (pattern)
 		{             //Black  Blue  Red  Yellow
 			case 0x02://  0     0     1     0
-			step[which].phase = 7;
+			m_phase = 7;
 			break;
 			case 0x06://  0     1     1     0
-			step[which].phase = 6;
+			m_phase = 6;
 			break;
 			case 0x04://  0     1     0     0
-			step[which].phase = 5;
+			m_phase = 5;
 			break;
 			case 0x05://  0     1     0     1
-			step[which].phase = 4;
+			m_phase = 4;
 			break;
 			case 0x01://  0     0     0     1
-			step[which].phase = 3;
+			m_phase = 3;
 			break;
 			case 0x09://  1     0     0     1
-			step[which].phase = 2;
+			m_phase = 2;
 			break;
 			case 0x08://  1     0     0     0
-			step[which].phase = 1;
+			m_phase = 1;
 			break;
 			case 0x0A://  1     0     1     0
-			step[which].phase = 0;
+			m_phase = 0;
 			break;
 			//          Black  Blue  Red  Yellow
 			case 0x03://  0     0     1     1
 			{
-				if ((step[which].old_phase ==6)||(step[which].old_phase == 0)) // if the previous pattern had the drum in the northern quadrant, it will point north now
+				if ((m_old_phase ==6)||(m_old_phase == 0)) // if the previous pattern had the drum in the northern quadrant, it will point north now
 				{
-					step[which].phase = 7;
+					m_phase = 7;
 				}
 				else //otherwise it will line up due south
 				{
-					step[which].phase = 3;
+					m_phase = 3;
 				}
 			}
 			break;
 			case 0x0C://  1     1     0     0
 			{
-				if ((step[which].old_phase ==6)||(step[which].old_phase == 4)) // if the previous pattern had the drum in the eastern quadrant, it will point east now
+				if ((m_old_phase ==6)||(m_old_phase == 4)) // if the previous pattern had the drum in the eastern quadrant, it will point east now
 				{
-					step[which].phase = 5;
+					m_phase = 5;
 				}
 				else //otherwise it will line up due west
 				{
-					step[which].phase = 1;
+					m_phase = 1;
 				}
 			}
 			break;
@@ -347,54 +218,54 @@ int stepper_update(int which, UINT8 pattern)
 		{
 			//             Yellow   Brown  Orange Black
 			case 0x01://  0        0      0      1
-			step[which].phase = 7;
+			m_phase = 7;
 			break;
 			case 0x03://  0        0      1      1
-			step[which].phase = 6;
+			m_phase = 6;
 			break;
 			case 0x02://  0        0      1      0
-			step[which].phase = 5;
+			m_phase = 5;
 			break;
 			case 0x06://  0        1      1      0
-			step[which].phase = 4;
+			m_phase = 4;
 			break;
 			case 0x04://  0        1      0      0
-			step[which].phase = 3;
+			m_phase = 3;
 			break;
 			case 0x0C://  1        1      0      0
-			step[which].phase = 2;
+			m_phase = 2;
 			break;
 			case 0x08://  1        0      0      0
-			step[which].phase = 1;
+			m_phase = 1;
 			break;//YOLB
 			case 0x09://  1        0      0      1
-			step[which].phase = 0;
+			m_phase = 0;
 			break;
 
 			// The below values should not be used by anything sane, as they effectively ignore one stator side entirely
 			//          Yellow   Brown  Orange Black
 			case 0x05://   0       1       0     1
 			{
-				if ((step[which].old_phase ==6)||(step[which].old_phase == 0)) // if the previous pattern had the drum in the northern quadrant, it will point north now
+				if ((m_old_phase ==6)||(m_old_phase == 0)) // if the previous pattern had the drum in the northern quadrant, it will point north now
 				{
-					step[which].phase = 7;
+					m_phase = 7;
 				}
 				else //otherwise it will line up due south
 				{
-					step[which].phase = 3;
+					m_phase = 3;
 				}
 			}
 			break;
 
 			case 0x0A://   1       0       1     0
 			{
-				if ((step[which].old_phase ==6)||(step[which].old_phase == 4)) // if the previous pattern had the drum in the eastern quadrant, it will point east now
+				if ((m_old_phase ==6)||(m_old_phase == 4)) // if the previous pattern had the drum in the eastern quadrant, it will point east now
 				{
-					step[which].phase = 5;
+					m_phase = 5;
 				}
 				else //otherwise it will line up due west
 				{
-					step[which].phase = 1;
+					m_phase = 1;
 				}
 			}
 			break;
@@ -410,16 +281,16 @@ int stepper_update(int which, UINT8 pattern)
 		{
 		//             Yellow(2)   Brown(1)  Orange(!2) Black(!1)
 			case 0x00 :// 0          0          1         1
-			step[which].phase = 6;
+			m_phase = 6;
 			break;
 			case 0x01 :// 0          1          1         0
-			step[which].phase = 4;
+			m_phase = 4;
 			break;
 			case 0x03 :// 1          1          0         0
-			step[which].phase = 2;
+			m_phase = 2;
 			break;
 			case 0x02 :// 1          0          0         1
-			step[which].phase = 0;
+			m_phase = 0;
 			break;
 		}
 		break;
@@ -431,50 +302,50 @@ int stepper_update(int which, UINT8 pattern)
 		switch (pattern)
 		{
 			case 0x08://  0     0     1     0
-			step[which].phase = 7;
+			m_phase = 7;
 			break;
 			case 0x0c://  0     1     1     0
-			step[which].phase = 6;
+			m_phase = 6;
 			break;
 			case 0x04://  0     1     0     0
-			step[which].phase = 5;
+			m_phase = 5;
 			break;
 			case 0x06://  0     1     0     1
-			step[which].phase = 4;
+			m_phase = 4;
 			break;
 			case 0x02://  0     0     0     1
-			step[which].phase = 3;
+			m_phase = 3;
 			break;
 			case 0x03://  1     0     0     1
-			step[which].phase = 2;
+			m_phase = 2;
 			break;
 			case 0x01://  1     0     0     0
-			step[which].phase = 1;
+			m_phase = 1;
 			break;
 			case 0x09://  1     0     1     0
-			step[which].phase = 0;
+			m_phase = 0;
 			break;
 			case 0x0a://  0     0     1     1
 			{
-				if ((step[which].old_phase ==6)||(step[which].old_phase == 0)) // if the previous pattern had the drum in the northern quadrant, it will point north now
+				if ((m_old_phase ==6)||(m_old_phase == 0)) // if the previous pattern had the drum in the northern quadrant, it will point north now
 				{
-					step[which].phase = 7;
+					m_phase = 7;
 				}
 				else //otherwise it will line up due south
 				{
-					step[which].phase = 3;
+					m_phase = 3;
 				}
 			}
 			break;
 			case 0x07://  1     1     0     0
 			{
-				if ((step[which].old_phase ==6)||(step[which].old_phase == 4)) // if the previous pattern had the drum in the eastern quadrant, it will point east now
+				if ((m_old_phase ==6)||(m_old_phase == 4)) // if the previous pattern had the drum in the eastern quadrant, it will point east now
 				{
-					step[which].phase = 5;
+					m_phase = 5;
 				}
 				else //otherwise it will line up due west
 				{
-					step[which].phase = 1;
+					m_phase = 1;
 				}
 			}
 			break;
@@ -488,50 +359,50 @@ int stepper_update(int which, UINT8 pattern)
 		switch (pattern)
 		{
 			case 0x08://  0     0     1     0
-			step[which].phase = 7;
+			m_phase = 7;
 			break;
 			case 0x0c://  0     1     1     0
-			step[which].phase = 6;
+			m_phase = 6;
 			break;
 			case 0x04://  0     1     0     0
-			step[which].phase = 5;
+			m_phase = 5;
 			break;
 			case 0x05://  0     1     0     1
-			step[which].phase = 4;
+			m_phase = 4;
 			break;
 			case 0x01://  0     0     0     1
-			step[which].phase = 3;
+			m_phase = 3;
 			break;
 			case 0x03://  1     0     0     1
-			step[which].phase = 2;
+			m_phase = 2;
 			break;
 			case 0x02://  1     0     0     0
-			step[which].phase = 1;
+			m_phase = 1;
 			break;
 			case 0x0a://  1     0     1     0
-			step[which].phase = 0;
+			m_phase = 0;
 			break;
 			case 0x09://  0     0     1     1
 			{
-				if ((step[which].old_phase ==6)||(step[which].old_phase == 0)) // if the previous pattern had the drum in the northern quadrant, it will point north now
+				if ((m_old_phase ==6)||(m_old_phase == 0)) // if the previous pattern had the drum in the northern quadrant, it will point north now
 				{
-					step[which].phase = 7;
+					m_phase = 7;
 				}
 				else //otherwise it will line up due south
 				{
-					step[which].phase = 3;
+					m_phase = 3;
 				}
 			}
 			break;
 			case 0x06://  1     1     0     0
 			{
-				if ((step[which].old_phase ==6)||(step[which].old_phase == 4)) // if the previous pattern had the drum in the eastern quadrant, it will point east now
+				if ((m_old_phase ==6)||(m_old_phase == 4)) // if the previous pattern had the drum in the eastern quadrant, it will point east now
 				{
-					step[which].phase = 5;
+					m_phase = 5;
 				}
 				else //otherwise it will line up due west
 				{
-					step[which].phase = 1;
+					m_phase = 1;
 				}
 			}
 			break;
@@ -542,7 +413,7 @@ int stepper_update(int which, UINT8 pattern)
 
 	}
 
-	steps = step[which].old_phase - step[which].phase;
+	steps = m_old_phase - m_phase;
 
 	if (steps < -4)
 	{
@@ -553,29 +424,25 @@ int stepper_update(int which, UINT8 pattern)
 		steps = steps -8;
 	}
 
-	step[which].old_phase = step[which].phase;
-	step[which].old_pattern = step[which].pattern;
+	m_old_phase   = m_phase;
+	m_old_pattern = m_pattern;
 
-	int max = step[which].max_steps;
+	int max = m_max_steps;
 	pos = 0;
 
 	if (max!=0)
 	{
-		step[which].abs_step_pos += steps;
-		pos = (step[which].step_pos + steps + max) % max;
-	}
-	else
-	{
-		logerror("step[%x].max_steps == 0\n",which);
+		m_abs_step_pos += steps;
+		pos = (m_step_pos + steps + max) % max;
 	}
 
-	if (pos != step[which].step_pos)
+	if (pos != m_step_pos)
 	{
 		changed++;
 	}
 
-	step[which].step_pos = pos;
-	update_optic(which);
+	m_step_pos = pos;
+	update_optic();
 
 	return changed;
 }

@@ -112,7 +112,13 @@ WRITE8_MEMBER(asteroid_state::asteroid_bank_switch_w)
 
 WRITE8_MEMBER(asteroid_state::astdelux_bank_switch_w)
 {
-	if (data & 0x80)
+	m_astdelux_bankswitch = data;
+	astdelux_bankswitch_restore();
+}
+
+void asteroid_state::astdelux_bankswitch_restore()
+{
+	if (m_astdelux_bankswitch & 0x80)
 	{
 		membank("bank1")->set_base(m_ram2);
 		membank("bank2")->set_base(m_ram1);
@@ -124,12 +130,10 @@ WRITE8_MEMBER(asteroid_state::astdelux_bank_switch_w)
 	}
 }
 
-
 WRITE8_MEMBER(asteroid_state::astdelux_led_w)
 {
 	set_led_status(machine(), offset, (data & 0x80) ? 0 : 1);
 }
-
 
 void asteroid_state::machine_reset()
 {

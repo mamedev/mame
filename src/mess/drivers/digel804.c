@@ -20,11 +20,8 @@
 *  hook up keypad via 74C923 and mode buttons via logic gate mess
 *
 *  TODO:
+*  remove ACIA hack in digel804_state::acia_command_w
 *  minor finishing touches to i/o map
-*  hook up 6551/ACIA interrupt (currently ACIA device doesn't have a callback for /IRQ line)
-*  attach terminal to 6551/ACIA serial for recieving from ep804
-*  correctly hook up 10937 vfd controller: por is not hooked up (relates to /MEMEN)
-*  SCLK line should be handled inside the 10937 device
 *  EPROM socket stuff (ports 0x40, 0x41, 0x42 and 0x47)
 *  artwork
 *
@@ -59,15 +56,14 @@
 /* Core includes */
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/terminal.h"
 #include "sound/speaker.h"
 #include "machine/roc10937.h"
 #include "machine/mos6551.h"
 #include "machine/mm74c922.h"
 #include "machine/ram.h"
+#include "bus/rs232/rs232.h"
 #include "digel804.lh"
 
-#define TERMINAL_TAG "terminal"
 
 class digel804_state : public driver_device
 {
@@ -75,22 +71,22 @@ public:
 	digel804_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG),
 		m_speaker(*this, "speaker"),
 		m_acia(*this, "acia"),
 		m_vfd(*this, "vfd"),
 		m_kb(*this, "74c923"),
-		m_ram(*this, RAM_TAG)
+		m_ram(*this, RAM_TAG),
+		m_rambank(*this, "bankedram")
 	{
 	}
 
 	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<mos6551_device> m_acia;
 	required_device<roc10937_t> m_vfd;
 	required_device<mm74c922_device> m_kb;
 	required_device<ram_device> m_ram;
+	required_memory_bank m_rambank;
 
 	virtual void machine_reset();
 	DECLARE_DRIVER_INIT(digel804);
@@ -115,13 +111,14 @@ public:
 	DECLARE_WRITE8_MEMBER( acia_command_w );
 	DECLARE_READ8_MEMBER( acia_control_r );
 	DECLARE_WRITE8_MEMBER( acia_control_w );
+	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( ep804_acia_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( da_w );
 	DECLARE_INPUT_CHANGED_MEMBER(mode_change);
 	// current speaker state for port 45
 	UINT8 m_speaker_state;
 	// ram stuff for banking
 	UINT8 m_ram_bank;
-	//required_shared_ptr<UINT8> m_main_ram;
 	// states
 	UINT8 m_acia_intq;
 	UINT8 m_overload_state;
@@ -133,7 +130,6 @@ public:
 	UINT8 m_chipinsert_state;
 	UINT8 m_keyen_state;
 	UINT8 m_op41;
-	DECLARE_WRITE8_MEMBER(digel804_serial_put);
 };
 
 
@@ -156,7 +152,7 @@ DRIVER_INIT_MEMBER(digel804_state,digel804)
 	m_op41 = 0;
 	m_keyen_state = 1; // /KEYEN
 
-	membank( "bankedram" )->set_base(m_ram->pointer());
+	m_rambank->set_base(m_ram->pointer());
 }
 
 void digel804_state::machine_reset()
@@ -236,7 +232,7 @@ READ8_MEMBER( digel804_state::ip43 )
 WRITE8_MEMBER( digel804_state::op00 )
 {
 	m_ram_bank = data;
-	membank( "bankedram" )->set_base(m_ram->pointer() + ((m_ram_bank * 0x8000) & m_ram->mask()));
+	m_rambank->set_base(m_ram->pointer() + ((m_ram_bank * 0x8000) & m_ram->mask()));
 }
 
 WRITE8_MEMBER( digel804_state::op43 )
@@ -257,7 +253,7 @@ WRITE8_MEMBER( digel804_state::op43 )
 	if ((data&0xF8)!=0)
 		logerror("Digel804: port 0x43 ram bank had unexpected data %02x written to it!\n", data);
 
-	membank( "bankedram" )->set_base(m_ram->pointer() + ((m_ram_bank * 0x8000) & m_ram->mask()));
+	m_rambank->set_base(m_ram->pointer() + ((m_ram_bank * 0x8000) & m_ram->mask()));
 }
 
 WRITE8_MEMBER( digel804_state::op43_1_4 )
@@ -372,6 +368,8 @@ INPUT_CHANGED_MEMBER( digel804_state::mode_change )
 				m_sim_mode = 0;
 				break;
 		}
+
+		m_acia->reset();
 	}
 
 	// press one of those keys reset the Z80
@@ -406,6 +404,8 @@ READ8_MEMBER( digel804_state::acia_command_r )
 
 WRITE8_MEMBER( digel804_state::acia_command_w )
 {
+	data |= 0x08;   // HACK for ep804 remote mode
+
 	m_acia->write(space, 2, data);
 }
 
@@ -458,7 +458,7 @@ static ADDRESS_MAP_START(z80_io_1_4, AS_IO, 8, digel804_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// io bits: x 1 x x x * * *
 	// writes to 47, 4e, 57, 5e, 67, 6e, 77, 7e, c7, ce, d7, de, e7, ee, f7, fe all go to 47, same with reads
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xB8) AM_WRITE(op00) // W, banked ram
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x38) AM_WRITE(op00) // W, banked ram
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0xB8) AM_READWRITE(ip40, op40) // RW, eprom socket data bus input/output value
 	AM_RANGE(0x41, 0x41) AM_MIRROR(0xB8) AM_WRITE(op41) // W, eprom socket address low out
 	AM_RANGE(0x42, 0x42) AM_MIRROR(0xB8) AM_WRITE(op42) // W, eprom socket address hi/control out
@@ -553,18 +553,33 @@ static INPUT_PORTS_START( digel804 )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static DEVICE_INPUT_DEFAULTS_START( digel804_rs232_defaults )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_ODD )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+DEVICE_INPUT_DEFAULTS_END
+
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-WRITE8_MEMBER(digel804_state::digel804_serial_put)
-{
-	//m_acia->receive_character(data);
-}
 
 WRITE_LINE_MEMBER( digel804_state::da_w )
 {
-	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 	m_key_intq = state ? 0 : 1;
+	m_maincpu->set_input_line(0, (m_key_intq & m_acia_intq) ? CLEAR_LINE : ASSERT_LINE);
+}
+
+WRITE_LINE_MEMBER( digel804_state::acia_irq_w )
+{
+	m_acia_intq = state ? 0 : 1;
+	m_maincpu->set_input_line(0, (m_key_intq & m_acia_intq) ? CLEAR_LINE : ASSERT_LINE);
+}
+
+WRITE_LINE_MEMBER( digel804_state::ep804_acia_irq_w )
+{
 }
 
 static MACHINE_CONFIG_START( digel804, digel804_state )
@@ -577,9 +592,6 @@ static MACHINE_CONFIG_START( digel804, digel804_state )
 	MCFG_ROC10937_ADD("vfd",0) // RIGHT_TO_LEFT
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(digel804_state, digel804_serial_put))
-
 	MCFG_DEFAULT_LAYOUT(layout_digel804)
 
 	MCFG_DEVICE_ADD("74c923", MM74C923, 0)
@@ -591,7 +603,18 @@ static MACHINE_CONFIG_START( digel804, digel804_state )
 
 	/* acia */
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL_3_6864MHz/2)
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(digel804_state, acia_irq_w))
+	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_MOS6551_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "null_modem")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", mos6551_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia", mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", mos6551_device, write_cts))
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("null_modem", digel804_rs232_defaults)
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", digel804_rs232_defaults)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")
@@ -608,6 +631,9 @@ static MACHINE_CONFIG_DERIVED( ep804, digel804 )
 	MCFG_CPU_MODIFY("maincpu")  /* Z80, X1(aka E0 on schematics): 3.6864Mhz */
 	MCFG_CPU_PROGRAM_MAP(z80_mem_804_1_2)
 	MCFG_CPU_IO_MAP(z80_io_1_2)
+
+	MCFG_DEVICE_MODIFY("acia")
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(digel804_state, ep804_acia_irq_w))
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")

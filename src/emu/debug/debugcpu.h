@@ -418,7 +418,10 @@ private:
 		{
 			if ((m_address == rhs.m_address) && (m_address_space == rhs.m_address_space))
 				return m_data < rhs.m_data;
-			return (m_address < rhs.m_address) && (m_address_space == rhs.m_address_space);
+			else if (m_address_space == rhs.m_address_space)
+				return m_address < rhs.m_address;
+			else
+				return m_address_space < rhs.m_address_space;
 		}
 
 		// Stores the PC for a given address, memory region, and data value

@@ -81,21 +81,9 @@
 // called if board is reset ///////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-void maygay1b_state::m1_stepper_reset()
-{
-	int pattern = 0,i;
-	for ( i = 0; i < 6; i++)
-	{
-		stepper_reset_position(i);
-		if ( stepper_optic_state(i) ) pattern |= 1<<i;
-	}
-	m_optic_pattern = pattern;
-}
-
 void maygay1b_state::machine_reset()
 {
 	m_vfd->reset(); // reset display1
-	m1_stepper_reset();
 	m_Vmm=false;
 }
 
@@ -293,58 +281,35 @@ INPUT_PORTS_END
 
 void maygay1b_state::machine_start()
 {
-	int i;
-
 // setup 8 mechanical meters ////////////////////////////////////////////
 	MechMtr_config(machine(),8);
-
-// setup 6 default 96 half step reels ///////////////////////////////////
-	for ( i = 0; i < 6; i++ )
-	{
-		stepper_config(machine(), i, &starpoint_interface_48step);
-	}
 
 }
 WRITE8_MEMBER(maygay1b_state::reel12_w)
 {
-	stepper_update(0, data & 0x0F );
-	stepper_update(1, (data>>4) & 0x0F );
+	m_reel0->update( data     & 0x0F);
+	m_reel1->update((data>>4) & 0x0F);
 
-	if ( stepper_optic_state(0) ) m_optic_pattern |=  0x01;
-	else                          m_optic_pattern &= ~0x01;
-	if ( stepper_optic_state(1) ) m_optic_pattern |=  0x02;
-	else                          m_optic_pattern &= ~0x02;
-
-	awp_draw_reel(0);
-	awp_draw_reel(1);
+	awp_draw_reel("reel1", m_reel0);
+	awp_draw_reel("reel2", m_reel1);
 }
 
 WRITE8_MEMBER(maygay1b_state::reel34_w)
 {
-	stepper_update(2, data & 0x0F );
-	stepper_update(3, (data>>4) & 0x0F );
+	m_reel2->update( data     & 0x0F);
+	m_reel3->update((data>>4) & 0x0F);
 
-	if ( stepper_optic_state(2) ) m_optic_pattern |=  0x04;
-	else                          m_optic_pattern &= ~0x04;
-	if ( stepper_optic_state(3) ) m_optic_pattern |=  0x08;
-	else                          m_optic_pattern &= ~0x08;
-
-	awp_draw_reel(2);
-	awp_draw_reel(3);
+	awp_draw_reel("reel3", m_reel2);
+	awp_draw_reel("reel4", m_reel3);
 }
 
 WRITE8_MEMBER(maygay1b_state::reel56_w)
 {
-	stepper_update(4, data & 0x0F );
-	stepper_update(5, (data>>4) & 0x0F );
+	m_reel4->update( data     & 0x0F);
+	m_reel5->update((data>>4) & 0x0F);
 
-	if ( stepper_optic_state(4) ) m_optic_pattern |=  0x10;
-	else                          m_optic_pattern &= ~0x10;
-	if ( stepper_optic_state(5) ) m_optic_pattern |=  0x20;
-	else                          m_optic_pattern &= ~0x20;
-
-	awp_draw_reel(4);
-	awp_draw_reel(5);
+	awp_draw_reel("reel5", m_reel4);
+	awp_draw_reel("reel6", m_reel5);
 }
 
 READ8_MEMBER(maygay1b_state::m1_duart_r)
@@ -651,6 +616,19 @@ MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
 	MCFG_DEVICE_ADD("i8279_2", I8279, M1_MASTER_CLOCK/4)        // unknown clock
 	MCFG_I8279_OUT_DISP_CB(WRITE8(maygay1b_state, lamp_data_2_w))       // display A&B
 
+	MCFG_STARPOINT_48STEP_ADD("reel0")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel0_optic_cb))
+	MCFG_STARPOINT_48STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel1_optic_cb))
+	MCFG_STARPOINT_48STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel2_optic_cb))
+	MCFG_STARPOINT_48STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel3_optic_cb))
+	MCFG_STARPOINT_48STEP_ADD("reel4")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel4_optic_cb))
+	MCFG_STARPOINT_48STEP_ADD("reel5")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel5_optic_cb))
+	
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEFAULT_LAYOUT(layout_maygay1b)
