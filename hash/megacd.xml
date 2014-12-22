@@ -1490,6 +1490,7 @@
 		</part>
 	</software>
 
+<!-- Do both coincide with redump.org disk? -->
 	<software name="cobracoma" cloneof="cobracom">
 		<!-- source toseciso
 		<rom name="Cobra Command (1993)(Sega)(PAL)[!][MK-4402P-00032 2].cue" size="301" crc="fecb8132" />
@@ -3470,6 +3471,10 @@
 
 <!-- Other images -->
 	<software name="timecop">
+		<!-- Unknown source
+		<rom name="Time Cop (PAL, Beta, Complete).cue" size="606" crc="7677dfb6" />
+		<rom name="Time Cop (PAL, Beta, Complete).bin" size="201693408" crc="8b53e357" />
+		-->
 		<description>Time Cop (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
