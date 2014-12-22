@@ -680,6 +680,7 @@ DEBUGOBJS = \
 	$(OSDOBJ)/modules/debugger/qt/debugqtmemorywindow.o \
 	$(OSDOBJ)/modules/debugger/qt/debugqtbreakpointswindow.o \
 	$(OSDOBJ)/modules/debugger/qt/debugqtdeviceswindow.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtdeviceinformationwindow.o \
 	$(OSDOBJ)/modules/debugger/qt/debugqtview.moc.o \
 	$(OSDOBJ)/modules/debugger/qt/debugqtwindow.moc.o \
 	$(OSDOBJ)/modules/debugger/qt/debugqtlogwindow.moc.o \
@@ -687,7 +688,8 @@ DEBUGOBJS = \
 	$(OSDOBJ)/modules/debugger/qt/debugqtmainwindow.moc.o \
 	$(OSDOBJ)/modules/debugger/qt/debugqtmemorywindow.moc.o \
 	$(OSDOBJ)/modules/debugger/qt/debugqtbreakpointswindow.moc.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtdeviceswindow.moc.o
+	$(OSDOBJ)/modules/debugger/qt/debugqtdeviceswindow.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/debugqtdeviceinformationwindow.moc.o
 endif
 
 ifeq ($(NO_DEBUGGER),1)

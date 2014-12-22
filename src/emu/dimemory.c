@@ -115,7 +115,7 @@ address_space_config::address_space_config(const char *name, endianness_t endian
 //-------------------------------------------------
 
 device_memory_interface::device_memory_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device)
+	: device_interface(device, "memory")
 {
 	memset(m_address_map, 0, sizeof(m_address_map));
 	memset(m_addrspace, 0, sizeof(m_addrspace));

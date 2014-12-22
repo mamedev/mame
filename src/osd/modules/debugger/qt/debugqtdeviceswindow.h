@@ -43,9 +43,14 @@ public:
 	DevicesWindow(running_machine* machine, QWidget* parent=NULL);
 	virtual ~DevicesWindow();
 
+public slots:
+    void currentRowChanged(const QModelIndex &current, const QModelIndex &previous);
+    void activated(const QModelIndex &index);
+
 private:
 	QTreeView *m_devices_view;
 	DevicesWindowModel m_devices_model;
+	device_t *m_selected_device;
 };
 
 

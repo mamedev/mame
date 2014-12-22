@@ -390,7 +390,7 @@ void device_state_entry::set_value(const char *string) const
 //-------------------------------------------------
 
 device_state_interface::device_state_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device)
+	: device_interface(device, "state")
 {
 	memset(m_fast_state, 0, sizeof(m_fast_state));
 

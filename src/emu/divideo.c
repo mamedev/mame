@@ -24,7 +24,7 @@ const char device_video_interface::s_unconfigured_screen_tag[] = "!!UNCONFIGURED
 //-------------------------------------------------
 
 device_video_interface::device_video_interface(const machine_config &mconfig, device_t &device, bool screen_required)
-	: device_interface(device),
+	: device_interface(device, "video"),
 		m_screen_required(screen_required),
 		m_screen_tag(s_unconfigured_screen_tag),
 		m_screen(NULL)
