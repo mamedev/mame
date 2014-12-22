@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="snspell" description="Speak &amp; Spell modules">
+
+
+	<software name="vpower">
+		<description>Vowel Power</description>
+		<year>1978</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="serial" value="CD2302"/>
+		<part name="cart" interface="snspell">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cd2302.vsm" size="0x4000" crc="e4135cff" sha1="eab92188fb19545f677ede926c2c0b6af26b7e25" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
