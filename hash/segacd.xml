@@ -4278,6 +4278,10 @@
 	<!-- Some of these have been sourced from MP3 based rips, and are thus tagged as BAD_DUMP -->
 
 	<software name="bariarm">
+		<!-- Unknown source
+		<rom name="android_assault_-_sega_CD_T-163015-00.cue" size="1253" crc="0503be31" />
+		<rom name="android_assault_-_sega_CD_T-163015-00.bin" size="362210352" crc="468cf3e8" />
+		-->
 		<!-- Ringcode: T-163015-00 - Alt. Title: Android Assault - The Revenge of Bari-Arm -->
 		<description>Bari-Arm (USA)</description>
 		<year>1994</year>
@@ -4359,7 +4363,6 @@
 
 	<software name="champs94">
 		<!-- Unknown source
-		<rom name="Battletech - Gray Death Legion (2007)(Good Deal Games)(NTSC)(US)[!][unreleased beta].cue" size="173" crc="14ae9d68" />
 		<rom name="Championship Soccer '94 (1994)(Sony Imagesoft)(NTSC)(US)[CDAC-068200 1].cue" size="6128" crc="41e9637d" />
 		<rom name="Championship Soccer '94 (1994)(Sony Imagesoft)(NTSC)(US)[CDAC-068200 1].bin" size="344502144" crc="0e409c1f" />
 		-->
@@ -4391,7 +4394,7 @@
 	</software>
 
 	<software name="cpatrol">
-		<description>Crime Patrol</description>
+		<description>Crime Patrol (USA)</description>
 		<year>1994</year>
 		<publisher>American Laser Games</publisher>
 		<info name="serial" value="T-111055"/>
@@ -4827,6 +4830,10 @@
 	</software>
 
 	<software name="syndicat">
+		<!-- Unknown source
+		<rom name="Syndicate.cue" size="75" crc="76504918" />
+		<rom name="Syndicate.bin" size="19411056" crc="a36311a7" />
+		-->
 		<description>Syndicate (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

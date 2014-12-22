@@ -209,7 +209,7 @@ int arcompact_01_01_00_helper(DASM_OPS_32, const char* optext)
 
 	if ((breg != LIMM_REG) && (creg != LIMM_REG))
 	{
-		print("%s%s %s, %s %08x (%08x)", optext, delaybit[n], regnames[breg], regnames[creg], PC_ALIGNED32 + (address * 2), op & ~0xf8fe800f);
+		print("%s%s %s, %s to 0x%08x", optext, delaybit[n], regnames[breg], regnames[creg], PC_ALIGNED32 + (address * 2) );
 	}
 	else
 	{
@@ -219,16 +219,16 @@ int arcompact_01_01_00_helper(DASM_OPS_32, const char* optext)
 
 		if ((breg == LIMM_REG) && (creg != LIMM_REG))
 		{
-			print("%s%s (%08x) %s %08x (%08x)", optext, delaybit[n], limm, regnames[creg], PC_ALIGNED32 + (address * 2), op & ~0xf8fe800f);
+			print("%s%s 0x%08x, %s to 0x%08x", optext, delaybit[n], limm, regnames[creg], PC_ALIGNED32 + (address * 2) );
 		}
 		else if ((creg == LIMM_REG) && (breg != LIMM_REG))
 		{
-			print("%s%s %s, (%08x) %08x (%08x)", optext, delaybit[n], regnames[breg], limm, PC_ALIGNED32 + (address * 2), op & ~0xf8fe800f);
+			print("%s%s %s, 0x%08x to 0x%08x", optext, delaybit[n], regnames[breg], limm, PC_ALIGNED32 + (address * 2) );
 		}
 		else
 		{
 			// b and c are LIMM? invalid??
-			print("%s%s (%08x), (%08x) (illegal?) %08x (%08x)", optext, delaybit[n], limm, limm, PC_ALIGNED32 + (address * 2), op & ~0xf8fe800f);
+			print("%s%s 0x%08x, 0x%08x (illegal?) to 0x%08x", optext, delaybit[n], limm, limm, PC_ALIGNED32 + (address * 2) );
 
 		}
 	}
@@ -404,24 +404,11 @@ int arcompact_handle04_p00_helper_dasm(DASM_OPS_32, const char* optext, int igno
 	//	output  += sprintf( output, " p(%d)", p);
 
 
-	if (!b_reserved)
+	if ((!b_reserved) && (breg == LIMM_REG))
 	{
-		if (breg == LIMM_REG)
-		{
-			GET_LIMM_32;
-			size = 8;
-			got_limm = 1;
-			output += sprintf(output, " 0x%08x ", limm);
-
-		}
-		else
-		{
-			output += sprintf(output, " %s, ", regnames[breg]);
-		}
-	}
-	else
-	{
-		if (breg) output += sprintf(output, "reserved(%s), ", regnames[breg]);
+		GET_LIMM_32;
+		size = 8;
+		got_limm = 1;
 	}
 
 	if (creg == LIMM_REG)
@@ -431,42 +418,42 @@ int arcompact_handle04_p00_helper_dasm(DASM_OPS_32, const char* optext, int igno
 			GET_LIMM_32;
 			size = 8;
 		}
+	}
 
-		output += sprintf(output, " 0x%08x ", limm);
-		if (ignore_dst == 0)
-		{
-			if (areg != LIMM_REG) output += sprintf(output, "DST(%s)", regnames[areg]);
-			else output += sprintf(output, "<no dst>");
-		}
+	// areg can be LIMM too, but in that case LIMM indicates 'no destination' rather than an actual LIMM value following
+
+	if (ignore_dst == 0)
+	{
+		if (areg != LIMM_REG)  output += sprintf(output, " %s <-", regnames[areg]);
+		else output += sprintf(output, " <no dst> <-");
+	}
+	else if (ignore_dst == 1) // certain opcode types ignore the 'a' field entirely, it should be set to 0.
+	{
+		 if (areg) output += sprintf(output, " <reserved %d> <-", areg);
+	}
+	else if (ignore_dst == 2) // for multiply operations areg should always be set to LIMM
+	{
+		if (areg != LIMM_REG) output += sprintf(output, " <invalid %d> <-", areg);
+		else  output += sprintf(output, " <mulres> <-");
+	}
+
+	if (!b_reserved)
+	{
+		if (breg == LIMM_REG)
+			output += sprintf(output, " 0x%08x,", limm);
 		else
-		{
-			if (ignore_dst == 1) { if (areg) output += sprintf(output, "unused(%s)", regnames[areg]); }
-			else
-			{
-				if (areg != LIMM_REG) output += sprintf(output, "invalid(%s)", regnames[areg]);
-				else  output += sprintf(output, "<mulres>");
-			} // mul operations expect A to be set to LIMM (no output)
-		}
+			output += sprintf(output, " %s,", regnames[breg]);
 	}
 	else
 	{
-		output += sprintf(output, "C(%s) ", regnames[creg]);
-		if (ignore_dst == 0)
-		{
-			if (areg != LIMM_REG)  output += sprintf(output, "DST(%s)", regnames[areg]);
-			else output += sprintf(output, "<no dst>");
-		}
-		else
-		{
-			if (ignore_dst == 1) { if (areg) output += sprintf(output, "unused(%s)", regnames[areg]); }
-			else
-			{
-				if (areg != LIMM_REG) output += sprintf(output, "invalid(%s)", regnames[areg]);
-				else  output += sprintf(output, "<mulres>");
-			} // mul operations expect A to be set to LIMM (no output)
-		}
-
+		if (breg) output += sprintf(output, "<reserved %d>,", breg);
 	}
+
+	if (creg == LIMM_REG)
+		output += sprintf(output, " 0x%08x", limm);
+	else
+		output += sprintf(output, " %s", regnames[creg]);
+
 	return size;
 }
 
@@ -1385,7 +1372,7 @@ int arcompact_handle0b_dasm(DASM_OPS_32)
 
 
 
-int arcompact_handle0c_helper_dasm(DASM_OPS_16, const char* optext)
+int arcompact_handle0c_helper_dasm(DASM_OPS_16, const char* optext, int format)
 {
 	int areg, breg, creg;
 
@@ -1398,29 +1385,31 @@ int arcompact_handle0c_helper_dasm(DASM_OPS_16, const char* optext)
 	REG_16BIT_RANGE(creg);
 
 
-	print("%s %s <- [%s, %s]", optext, regnames[areg], regnames[breg], regnames[creg]);
+	if (format==0) print("%s %s <- [%s, %s]", optext, regnames[areg], regnames[breg], regnames[creg]);
+	else print("%s %s <- %s, %s", optext, regnames[areg], regnames[breg], regnames[creg]);
+
 	return 2;
 }
 
 
 int arcompact_handle0c_00_dasm(DASM_OPS_16)
 {
-	return arcompact_handle0c_helper_dasm(DASM_PARAMS, "LD_S");
+	return arcompact_handle0c_helper_dasm(DASM_PARAMS, "LD_S", 0);
 }
 
 int arcompact_handle0c_01_dasm(DASM_OPS_16)
 {
-	return arcompact_handle0c_helper_dasm(DASM_PARAMS, "LDB_S");
+	return arcompact_handle0c_helper_dasm(DASM_PARAMS, "LDB_S", 0);
 }
 
 int arcompact_handle0c_02_dasm(DASM_OPS_16)
 {
-	return arcompact_handle0c_helper_dasm(DASM_PARAMS, "LDW_S");
+	return arcompact_handle0c_helper_dasm(DASM_PARAMS, "LDW_S", 0);
 }
 
 int arcompact_handle0c_03_dasm(DASM_OPS_16)
 {
-	return arcompact_handle0c_helper_dasm(DASM_PARAMS, "ADD_S");
+	return arcompact_handle0c_helper_dasm(DASM_PARAMS, "ADD_S", 1);
 }
 
 
@@ -1772,20 +1761,20 @@ int arcompact_handle18_04_dasm(DASM_OPS_16)
 // op bits remaining for 0x18_05_xx subgroups 0x001f
 int arcompact_handle18_05_00_dasm(DASM_OPS_16)
 {
-	int u = op & 0x001f;
-	op &= ~0x001f; // all bits now used
+	int u;
+	COMMON16_GET_u5;
 
-	print("ADD_S SP, SP, %02x", u*4);
+	print("ADD_S SP, SP, 0x%02x", u*4);
 	return 2;
 
 }
 
 int arcompact_handle18_05_01_dasm(DASM_OPS_16)
 {
-	int u = op & 0x001f;
-	op &= ~0x001f; // all bits now used
+	int u;
+	COMMON16_GET_u5;
 
-	print("SUB_S SP, SP, %02x", u*4);
+	print("SUB_S SP, SP, 0x%02x", u*4);
 	return 2;
 }
 
@@ -1887,7 +1876,7 @@ int arcompact_handle1b_dasm(DASM_OPS_16)
 	COMMON16_GET_u8;
 	REG_16BIT_RANGE(breg);
 
-	print("MOV_S %s, %02x", regnames[breg], u);
+	print("MOV_S %s <- 0x%02x", regnames[breg], u);
 	return 2;
 }
 
@@ -1898,7 +1887,7 @@ int arcompact_handle1c_00_dasm(DASM_OPS_16)
 	COMMON16_GET_u7;
 	REG_16BIT_RANGE(breg);
 
-	print("ADD_S %s, %02x", regnames[breg], u);
+	print("ADD_S %s <- %s, %02x", regnames[breg], regnames[breg], u);
 	return 2;
 }
 
