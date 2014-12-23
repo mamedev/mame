@@ -139,8 +139,9 @@ ifeq ($(TARGETOS),win32)
 
 # Autodetect PTR64
 ifndef PTR64
-ifneq (,$(findstring mingw64-w64,$(PATH)))
-PTR64=1
+WIN_TEST_GCC := $(shell gcc --version)
+ifeq ($(findstring x86_64,$(WIN_TEST_GCC)),x86_64)
+	PTR64=1
 endif
 endif
 
