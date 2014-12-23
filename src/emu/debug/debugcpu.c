@@ -1731,7 +1731,7 @@ void device_debug::start_hook(const attotime &endtime)
 		// check for periodic updates
 		if (&m_device == global->visiblecpu && osd_ticks() > global->last_periodic_update_time + osd_ticks_per_second()/4)
 		{
-			m_device.machine().debug_view().update_all_except(DVT_DISASSEMBLY);
+			m_device.machine().debug_view().update_all();
 			m_device.machine().debug_view().flush_osd_updates();
 			global->last_periodic_update_time = osd_ticks();
 		}
