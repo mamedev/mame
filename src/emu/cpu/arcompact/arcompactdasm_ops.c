@@ -1911,7 +1911,7 @@ int arcompact_handle1d_helper_dasm(DASM_OPS_16, const char* optext)
 	int s = (op & 0x007f) >> 0;	op &= ~0x007f;
 	if (s & 0x40) s = -0x40 + (s & 0x3f);
 
-	print("%s %s %08x", optext, regnames[breg], PC_ALIGNED32 + s*2);
+	print("%s %s, 0 to 0x%08x", optext, regnames[breg], PC_ALIGNED32 + s*2);
 	return 2;
 }
 
@@ -1931,7 +1931,7 @@ int arcompact_handle1e_0x_helper_dasm(DASM_OPS_16, const char* optext)
 
 
 
-int arcompact_handle1e_00_dasm(DASM_OPS_16)  { return arcompact_handle1e_0x_helper_dasm(DASM_PARAMS, "BL_S");  }
+int arcompact_handle1e_00_dasm(DASM_OPS_16)  { return arcompact_handle1e_0x_helper_dasm(DASM_PARAMS, "B_S");  }
 int arcompact_handle1e_01_dasm(DASM_OPS_16)  { return arcompact_handle1e_0x_helper_dasm(DASM_PARAMS, "BEQ_S"); }
 int arcompact_handle1e_02_dasm(DASM_OPS_16)  { return arcompact_handle1e_0x_helper_dasm(DASM_PARAMS, "BNE_S"); }
 
