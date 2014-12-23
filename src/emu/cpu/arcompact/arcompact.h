@@ -153,7 +153,7 @@ protected:
 //	ARCOMPACT_RETTYPE arcompact_handle04_04(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_05(OPS_32);
 //	ARCOMPACT_RETTYPE arcompact_handle04_06(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_07(OPS_32);
+//	ARCOMPACT_RETTYPE arcompact_handle04_07(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_08(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_09(OPS_32);
 //	ARCOMPACT_RETTYPE arcompact_handle04_0a(OPS_32);
@@ -161,7 +161,7 @@ protected:
 	ARCOMPACT_RETTYPE arcompact_handle04_0c(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_0d(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_0e(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_0f(OPS_32);
+//	ARCOMPACT_RETTYPE arcompact_handle04_0f(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_10(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_11(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_12(OPS_32);
@@ -763,14 +763,15 @@ protected:
 	ARCOMPACT_RETTYPE arcompact_handle19_0x_helper(OPS_16, const char* optext, int shift, int format);
 	ARCOMPACT_RETTYPE arcompact_handle1e_0x_helper(OPS_16, const char* optext);
 	ARCOMPACT_RETTYPE arcompact_handle1e_03_0x_helper(OPS_16, const char* optext);
-	ARCOMPACT_RETTYPE arcompact_handle1d_helper(OPS_16, const char* optext);
 
 	ARCOMPACT_RETTYPE get_insruction(OPS_32);
 
 	ARCOMPACT_HANDLER04_TYPE_PM(04_00);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_04);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_06);
+	ARCOMPACT_HANDLER04_TYPE_PM(04_07);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_0a);
+	ARCOMPACT_HANDLER04_TYPE_PM(04_0f);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_20);
 
 private:
