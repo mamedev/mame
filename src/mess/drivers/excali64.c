@@ -25,8 +25,6 @@ ToDo:
 - The schematic shows the audio counter connected to 2MHz, but this produces
   sounds that are too high. Connected to 1MHz for now.
 - Serial
-- Parallel / Centronics
-- Need more software
 - Pasting can sometimes drop a character.
 
 ****************************************************************************/
@@ -42,7 +40,7 @@ ToDo:
 //#include "machine/clock.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
-//#include "bus/centronics/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
 #include "sound/speaker.h"
@@ -70,6 +68,7 @@ public:
 		, m_io_keyboard(*this, "KEY")
 		, m_dma(*this, "dma")
 		, m_u12(*this, "u12")
+		, m_centronics(*this, "centronics")
 		, m_fdc(*this, "fdc")
 #if NEWFDC
 		, m_floppy0(*this, "fdc:0")
@@ -90,6 +89,7 @@ public:
 #if NEWFDC
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 #endif
+	DECLARE_WRITE_LINE_MEMBER(cent_busy_w);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
@@ -111,12 +111,14 @@ private:
 	bool m_crtc_vs;
 	bool m_crtc_hs;
 	bool m_motor;
+	bool m_centronics_busy;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<mc6845_device> m_crtc;
 	required_ioport_array<8> m_io_keyboard;
 	required_device<z80dma_device> m_dma;
 	required_device<ttl74123_device> m_u12;
+	required_device<centronics_device> m_centronics;
 #if NEWFDC
 	required_device<wd2793_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
@@ -238,6 +240,11 @@ static INPUT_PORTS_START( excali64 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 (") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 &") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
 INPUT_PORTS_END
+
+WRITE_LINE_MEMBER( excali64_state::cent_busy_w )
+{
+	m_centronics_busy = state;
+}
 
 #if NEWFDC
 FLOPPY_FORMATS_MEMBER( excali64_state::floppy_formats )
@@ -365,7 +372,8 @@ WRITE8_MEMBER( excali64_state::ppib_w )
 
 READ8_MEMBER( excali64_state::ppic_r )
 {
-	UINT8 data = 0xf7;
+	UINT8 data = 0xf4; // READY line must be low to print
+	data |= (UINT8)m_centronics_busy;
 	data |= (m_cass->input() > 0.1) << 3;
 	return data;
 }
@@ -373,6 +381,7 @@ READ8_MEMBER( excali64_state::ppic_r )
 WRITE8_MEMBER( excali64_state::ppic_w )
 {
 	m_cass->output(BIT(data, 7) ? -1.0 : +1.0);
+	m_centronics->write_strobe(BIT(data, 4));
 }
 
 READ8_MEMBER( excali64_state::port00_r )
@@ -607,14 +616,12 @@ static MACHINE_CONFIG_START( excali64, excali64_state )
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_16MHz / 16) /* Timer 0: tone gen for speaker */
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
-	MCFG_PIT8253_CLK1(XTAL_16MHz / 8) /* Timer 1: baud rate gen for 8251 */
+	//MCFG_PIT8253_CLK1(XTAL_16MHz / 16) /* Timer 1: baud rate gen for 8251 */
 	//MCFG_PIT8253_OUT1_HANDLER(WRITELINE(excali64_state, write_uart_clock))
-	//MCFG_PIT8253_CLK2(XTAL_16MHz / 8) /* Timer 2: not used */
+	//MCFG_PIT8253_CLK2(XTAL_16MHz / 16) /* Timer 2: not used */
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(excali64_state, ppia_r))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(excali64_state, ppia_w)) // parallel port
-	//MCFG_I8255_IN_PORTB_CB(READ8(excali64_state, ppib_r))
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write)) // parallel port
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(excali64_state, ppib_w))
 	MCFG_I8255_IN_PORTC_CB(READ8(excali64_state, ppic_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(excali64_state, ppic_w))
@@ -672,6 +679,10 @@ static MACHINE_CONFIG_START( excali64, excali64_state )
 	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - driven by port e4 bit 5 */
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
 	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITE8(excali64_state, motor_w))
+
+	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(excali64_state, cent_busy_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -696,4 +707,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     CLASS         INIT        COMPANY         FULLNAME        FLAGS */
-COMP( 1984, excali64, 0,      0,       excali64,  excali64, driver_device, 0,  "BGR Computers", "Excalibur 64", GAME_NOT_WORKING )
+COMP( 1984, excali64, 0,      0,       excali64,  excali64, driver_device, 0,  "BGR Computers", "Excalibur 64", 0 )
