@@ -3,6 +3,8 @@
 /***************************************************************************
 
   Texas Instruments Speak & Spell hardware
+  
+  (still need to write notes here..)
 
 ***************************************************************************/
 
@@ -600,13 +602,13 @@ ROM_END
 
 
 
-COMP( 1978, snspell,    0,       0, snspell, snspell, driver_device, 0, "Texas Instruments", "Speak & Spell (US set 1)", GAME_NOT_WORKING )
-COMP( 1980, snspella,   snspell, 0, snspell, snspell, driver_device, 0, "Texas Instruments", "Speak & Spell (US set 2)", GAME_NOT_WORKING )
-COMP( 1978, snspellp,   snspell, 0, snspell, snspell, driver_device, 0, "Texas Instruments", "Speak & Spell (US prototype)", GAME_NOT_WORKING )
-COMP( 1978, snspelluk,  snspell, 0, snspell, snspell, driver_device, 0, "Texas Instruments", "Speak & Spell (UK set 1)", GAME_NOT_WORKING )
-COMP( 1981, snspelluka, snspell, 0, snspell, snspell, driver_device, 0, "Texas Instruments", "Speak & Spell (UK set 2)", GAME_NOT_WORKING ) // different voice actor
-COMP( 1980, ladictee,   snspell, 0, snspell, snspell, driver_device, 0, "Texas Instruments", "La Dictee Magnifique (France)", GAME_NOT_WORKING ) // doesn't work, custom MCU ROM?
+COMP( 1978, snspell,    0,       0, snspell, snspell, driver_device, 0, "Texas Instruments", "Speak & Spell (US set 1)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+COMP( 1980, snspella,   snspell, 0, snspell, snspell, driver_device, 0, "Texas Instruments", "Speak & Spell (US set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+COMP( 1978, snspellp,   snspell, 0, snspell, snspell, driver_device, 0, "Texas Instruments", "Speak & Spell (US prototype)", GAME_IMPERFECT_SOUND )
+COMP( 1978, snspelluk,  snspell, 0, snspell, snspell, driver_device, 0, "Texas Instruments", "Speak & Spell (UK set 1)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+COMP( 1981, snspelluka, snspell, 0, snspell, snspell, driver_device, 0, "Texas Instruments", "Speak & Spell (UK set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // different voice actor
+COMP( 1980, ladictee,   snspell, 0, snspell, snspell, driver_device, 0, "Texas Instruments", "La Dictee Magnifique (France)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // doesn't work, custom MCU ROM?
 
-COMP( 1980, snmath,     0,       0, snmath,  snmath,  driver_device, 0, "Texas Instruments", "Speak & Math (US set 1)", GAME_NOT_WORKING )
-COMP( 1986, snmatha,    snmath,  0, snmath,  snmath,  driver_device, 0, "Texas Instruments", "Speak & Math (US set 2)", GAME_NOT_WORKING )
-COMP( 1980, snmathp,    snmath,  0, snmath,  snmath,  driver_device, 0, "Texas Instruments", "Speak & Math (US prototype)", GAME_NOT_WORKING )
+COMP( 1980, snmath,     0,       0, snmath,  snmath,  driver_device, 0, "Texas Instruments", "Speak & Math (US set 1)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+COMP( 1986, snmatha,    snmath,  0, snmath,  snmath,  driver_device, 0, "Texas Instruments", "Speak & Math (US set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+COMP( 1980, snmathp,    snmath,  0, snmath,  snmath,  driver_device, 0, "Texas Instruments", "Speak & Math (US prototype)", GAME_IMPERFECT_SOUND )
