@@ -1260,7 +1260,18 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle01_01_00_01(OPS_32) // regis
 }
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle01_01_00_02(OPS_32)  { return arcompact_01_01_00_helper( PARAMS, "BRLT"); }
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle01_01_00_03(OPS_32)  { return arcompact_01_01_00_helper( PARAMS, "BRGE"); }
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle01_01_00_03(OPS_32) // register - register BRGE 
+{
+	BR_REGREG_SETUP
+	
+	// BRGE  (signed operation)
+	if ((INT32)b >= (INT32)c)
+	{
+		BR_TAKEJUMP
+	}
+	
+	return m_pc + (size>>0);
+}
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle01_01_00_04(OPS_32) // register - register BRLO
 {
@@ -1364,7 +1375,19 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle01_01_01_02(OPS_32) // BRLT 
 	return m_pc + (size>>0);
 
 }
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle01_01_01_03(OPS_32)  { return arcompact_01_01_01_helper(PARAMS, "BRGE"); }
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle01_01_01_03(OPS_32)
+{
+	BR_REGIMM_SETUP
+	
+	// BRGE  (signed operation)
+	if ((INT32)b >= (INT32)c)
+	{
+		BR_TAKEJUMP
+	}
+	
+	return m_pc + (size>>0);
+}
+
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle01_01_01_04(OPS_32)  { return arcompact_01_01_01_helper(PARAMS, "BRLO"); }
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle01_01_01_05(OPS_32) // register - immediate BRHS
@@ -2529,6 +2552,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_helper(OPS_32, const c
 	{
 	}
 
+	arcompact_log("unimplemented %s %08x (type 04_2f)", optext, op);
 	return m_pc + (size>>0);
 }
 
@@ -2776,9 +2800,20 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0d_01(OPS_16)
 	return arcompact_handle0d_helper(PARAMS, "SUB_S");
 }
 
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0d_02(OPS_16)
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0d_02(OPS_16) // ASL_S c, b asl u3   (note, c destination)
 {
-	return arcompact_handle0d_helper(PARAMS, "ASL_S");
+	int u, breg, creg;
+
+	COMMON16_GET_u3;
+	COMMON16_GET_breg;
+	COMMON16_GET_creg;
+
+	REG_16BIT_RANGE(breg);
+	REG_16BIT_RANGE(creg);
+
+	m_regs[creg] = m_regs[breg] << u;
+
+	return m_pc + (2 >> 0);
 }
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0d_03(OPS_16)
@@ -2918,7 +2953,14 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_00_07_06(OPS_16) // J_S [
 }
 
 
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_00_07_07(OPS_16)  { arcompact_log("J_S.D [blink]"); return m_pc + (2 >> 0);}
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_00_07_07(OPS_16) // J_S.D [blink]
+{
+	m_delayactive = 1;
+	m_delayjump = m_regs[REG_BLINK];
+	m_delaylinks = 0;
+	
+	return m_pc + (2 >> 0);
+}
 
 
 
@@ -3110,9 +3152,22 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle14(OPS_16) // ST_S c, [b, u7
 	return m_pc + (2 >> 0);
 }
 
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle15(OPS_16)
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle15(OPS_16) // STB_S c. [b, u6]
 {
-	return arcompact_handle_ld_helper(PARAMS, "STB_S", 0, 1);
+	int breg, creg, u;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_creg;
+	COMMON16_GET_u5;
+
+	REG_16BIT_RANGE(breg);
+	REG_16BIT_RANGE(creg);
+
+//	u <<= 0;
+
+	WRITE8((m_regs[breg] + u) >> 0, m_regs[creg]);
+
+	return m_pc + (2 >> 0);
 }
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle16(OPS_16) // STW_S c. [b, u6]
