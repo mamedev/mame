@@ -20,7 +20,7 @@
 
 device_gfx_interface::device_gfx_interface(const machine_config &mconfig, device_t &device,
 										const gfx_decode_entry *gfxinfo, const char *palette_tag)
-	: device_interface(device),
+	: device_interface(device, "gfx"),
 	m_gfxdecodeinfo(gfxinfo),
 	m_palette_tag(palette_tag),
 	m_palette_is_sibling(palette_tag == NULL),

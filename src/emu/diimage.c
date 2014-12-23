@@ -53,7 +53,7 @@ const image_device_type_info device_image_interface::m_device_info_array[] =
 //-------------------------------------------------
 
 device_image_interface::device_image_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device),
+	: device_interface(device, "image"),
 		m_file(NULL),
 		m_mame_file(NULL),
 		m_software_info_ptr(NULL),

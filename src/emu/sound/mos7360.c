@@ -343,6 +343,7 @@ void mos7360_device::device_start()
 	save_item(NAME(m_cursor1));
 	save_item(NAME(m_chargenaddr));
 	save_item(NAME(m_bitmapaddr));
+	save_item(NAME(m_videoaddr));
 	save_item(NAME(m_x_begin));
 	save_item(NAME(m_x_end));
 	save_item(NAME(m_y_begin));

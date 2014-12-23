@@ -146,13 +146,13 @@ protected:
 	ARCOMPACT_RETTYPE arcompact_handle01_01_01_0f(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle02(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle03(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_00(OPS_32);
+//	ARCOMPACT_RETTYPE arcompact_handle04_00(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_01(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_02(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_03(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_04(OPS_32);
+//	ARCOMPACT_RETTYPE arcompact_handle04_04(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_05(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_06(OPS_32);
+//	ARCOMPACT_RETTYPE arcompact_handle04_06(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_07(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_08(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_09(OPS_32);
@@ -767,10 +767,11 @@ protected:
 
 	ARCOMPACT_RETTYPE get_insruction(OPS_32);
 
-
-	ARCOMPACT_HANDLER04_TYPE_PM(04_20);
+	ARCOMPACT_HANDLER04_TYPE_PM(04_00);
+	ARCOMPACT_HANDLER04_TYPE_PM(04_04);
+	ARCOMPACT_HANDLER04_TYPE_PM(04_06);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_0a);
-
+	ARCOMPACT_HANDLER04_TYPE_PM(04_20);
 
 private:
 	address_space_config m_program_config;
@@ -797,8 +798,35 @@ private:
 	int m_delaylinks;
 	UINT32 m_delayjump;
 
-
+//	f  e  d  c| b  a  9  8| 7  6  5  4| 3  2  1  0
+//  -  -  -  L| Z  N  C  V| U DE AE A2|A1 E2 E1  H
+	UINT32 m_status32;
 };
+
+#define V_OVERFLOW_FLAG (0x00000100)
+#define C_CARRY_FLAG (0x00000200)
+#define N_NEGATIVE_FLAG (0x00000400)
+#define Z_ZERO_FLAG (0x00000800)
+
+// V = overflow (set if signed operation would overflow)
+#define STATUS32_SET_V   (m_status32 |=  V_OVERFLOW_FLAG)
+#define STATUS32_CLEAR_V (m_status32 &= ~V_OVERFLOW_FLAG)
+#define STATUS32_CHECK_V (m_status32 &   V_OVERFLOW_FLAG)
+
+// C = carry (unsigned op, carry set is same condition as LO Lower Than, carry clear is same condition as HS Higher Same)
+#define STATUS32_SET_C   (m_status32 |=  C_CARRY_FLAG)
+#define STATUS32_CLEAR_C (m_status32 &= ~C_CARRY_FLAG)
+#define STATUS32_CHECK_C (m_status32 &   C_CARRY_FLAG)
+
+// N = negative (set if most significant bit of result is set)
+#define STATUS32_SET_N   (m_status32 |=  N_NEGATIVE_FLAG)
+#define STATUS32_CLEAR_N (m_status32 &= ~N_NEGATIVE_FLAG)
+#define STATUS32_CHECK_N (m_status32 &   N_NEGATIVE_FLAG)
+
+// Z = zero (set if result is zero, ie both values the same for CMP)
+#define STATUS32_SET_Z   (m_status32 |=  Z_ZERO_FLAG)
+#define STATUS32_CLEAR_Z (m_status32 &= ~Z_ZERO_FLAG)
+#define STATUS32_CHECK_Z (m_status32 &   Z_ZERO_FLAG)
 
 
 extern const device_type ARCA5;

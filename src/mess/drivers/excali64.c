@@ -20,13 +20,11 @@ Notes:
 ToDo:
 - Colours are approximate.
 - Disk controller, works with old wd17xx but crashes on new wd.
-- Hardware supports 8 and 5.25 inch floppies, but we only support 5.25 as this
+- Hardware supports 20cm and 13cm floppies, but we only support 13cm as this
   is the only software that exists.
 - The schematic shows the audio counter connected to 2MHz, but this produces
   sounds that are too high. Connected to 1MHz for now.
 - Serial
-- Parallel / Centronics
-- Need more software
 - Pasting can sometimes drop a character.
 
 ****************************************************************************/
@@ -42,7 +40,7 @@ ToDo:
 //#include "machine/clock.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
-//#include "bus/centronics/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
 #include "sound/speaker.h"
@@ -70,6 +68,7 @@ public:
 		, m_io_keyboard(*this, "KEY")
 		, m_dma(*this, "dma")
 		, m_u12(*this, "u12")
+		, m_centronics(*this, "centronics")
 		, m_fdc(*this, "fdc")
 #if NEWFDC
 		, m_floppy0(*this, "fdc:0")
@@ -90,6 +89,7 @@ public:
 #if NEWFDC
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 #endif
+	DECLARE_WRITE_LINE_MEMBER(cent_busy_w);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
@@ -111,12 +111,14 @@ private:
 	bool m_crtc_vs;
 	bool m_crtc_hs;
 	bool m_motor;
+	bool m_centronics_busy;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<mc6845_device> m_crtc;
 	required_ioport_array<8> m_io_keyboard;
 	required_device<z80dma_device> m_dma;
 	required_device<ttl74123_device> m_u12;
+	required_device<centronics_device> m_centronics;
 #if NEWFDC
 	required_device<wd2793_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
@@ -239,6 +241,11 @@ static INPUT_PORTS_START( excali64 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 &") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
 INPUT_PORTS_END
 
+WRITE_LINE_MEMBER( excali64_state::cent_busy_w )
+{
+	m_centronics_busy = state;
+}
+
 #if NEWFDC
 FLOPPY_FORMATS_MEMBER( excali64_state::floppy_formats )
 	FLOPPY_EXCALI64_FORMAT
@@ -270,12 +277,13 @@ WRITE8_MEMBER( excali64_state::motor_w )
 {
 	m_motor = BIT(data, 0);
 #if NEWFDC
+	m_floppy1->get_device()->mon_w(!m_motor);
 	m_floppy0->get_device()->mon_w(!m_motor);
 #else
-	//const char *floppy_tags[4] = { FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3 };
 	legacy_floppy_image_device *flop = subdevice<legacy_floppy_image_device>(FLOPPY_0);
 	flop->floppy_mon_w(!m_motor); // motor on
-	//flop->floppy_drive_set_ready_state(1, 0); // this is commented out in flopdrv.c, so does nothing
+	flop = subdevice<legacy_floppy_image_device>(FLOPPY_1);
+	flop->floppy_mon_w(!m_motor); // motor on
 #endif
 }
 
@@ -288,41 +296,48 @@ WRITE8_MEMBER( excali64_state::porte4_w )
 {
 #if NEWFDC
 	floppy_image_device *floppy = NULL;
-	if (BIT(data, 0)) floppy = m_floppy0->get_device();
-	//if (BIT(data, 1)) floppy = m_floppy1->get_device();
-	m_fdc->set_floppy(floppy);
-	if (floppy)
-		floppy->ss_w(BIT(data, 4));
-#else
-	//UINT8 i;
-	//for (i = 0; i < 4; i++)
-	//{
-	//	if BIT(data, i)
-	//	{
-	//		m_fdc->set_drive(i);
-	//		break;
-	//	}
-	//}
-	if BIT(data, 0) m_fdc->set_drive(0);
-	//if BIT(data, 1) m_fdc->set_drive(1);
-	//if BIT(data, 2) m_fdc->set_drive(2);
-	//if BIT(data, 3) m_fdc->set_drive(3);
-	m_fdc->set_side(BIT(data, 4));
+	if (BIT(data, 0))
+		floppy = m_floppy0->get_device();
 
-	m_fdc->dden_w(1);//!BIT(data, 6)); // we want double density
+	if (BIT(data, 1))
+		floppy = m_floppy1->get_device();
+
+	if (floppy)
+	{
+		m_fdc->set_floppy(floppy);
+		floppy->ss_w(BIT(data, 4));
+	}
+#else
+	if BIT(data, 0)
+		m_fdc->set_drive(0);
+
+	if BIT(data, 1)
+		m_fdc->set_drive(1);
+
+	m_fdc->set_side(BIT(data, 4));
 #endif
-	m_u12->b_w(space,offset, BIT(data, 5));
+
+	m_u12->b_w(space,offset, BIT(data, 5)); // motor pulse
 }
 
+/*
+d0 = precomp (selectable by jumper)
+d1 = size select (we only support 13cm)
+d2 = density select (0 = double)
+*/
 WRITE8_MEMBER( excali64_state::portec_w )
 {
+#if NEWFDC
+	m_fdc->dden_w(BIT(data, 2));
+#else
+	m_fdc->dden_w(!BIT(data, 2));
+#endif
 }
 
 WRITE_LINE_MEMBER( excali64_state::busreq_w )
 {
 // since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
-	//m_maincpu->set_input_line(INPUT_LINE_HALT, state); // do we need this?
 	m_dma->bai_w(state); // tell dma that bus has been granted
 }
 
@@ -357,7 +372,8 @@ WRITE8_MEMBER( excali64_state::ppib_w )
 
 READ8_MEMBER( excali64_state::ppic_r )
 {
-	UINT8 data = 0xf7;
+	UINT8 data = 0xf4; // READY line must be low to print
+	data |= (UINT8)m_centronics_busy;
 	data |= (m_cass->input() > 0.1) << 3;
 	return data;
 }
@@ -365,6 +381,7 @@ READ8_MEMBER( excali64_state::ppic_r )
 WRITE8_MEMBER( excali64_state::ppic_w )
 {
 	m_cass->output(BIT(data, 7) ? -1.0 : +1.0);
+	m_centronics->write_strobe(BIT(data, 4));
 }
 
 READ8_MEMBER( excali64_state::port00_r )
@@ -521,7 +538,7 @@ PALETTE_INIT_MEMBER( excali64_state, excali64 )
 	membank("bankr4")->configure_entry(2, &m_p_hiresram[0x0000]);
 	membank("bankw4")->configure_entry(2, &m_p_hiresram[0x0000]);
 
-	// Set up foreground palettes
+	// Set up foreground colours
 	UINT8 r,g,b,i,code;
 	for (i = 0; i < 32; i++)
 	{
@@ -599,20 +616,15 @@ static MACHINE_CONFIG_START( excali64, excali64_state )
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_16MHz / 16) /* Timer 0: tone gen for speaker */
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
-	MCFG_PIT8253_CLK1(XTAL_16MHz / 8) /* Timer 1: baud rate gen for 8251 */
+	//MCFG_PIT8253_CLK1(XTAL_16MHz / 16) /* Timer 1: baud rate gen for 8251 */
 	//MCFG_PIT8253_OUT1_HANDLER(WRITELINE(excali64_state, write_uart_clock))
-	//MCFG_PIT8253_CLK2(XTAL_16MHz / 8) /* Timer 2: not used */
+	//MCFG_PIT8253_CLK2(XTAL_16MHz / 16) /* Timer 2: not used */
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(excali64_state, ppia_r))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(excali64_state, ppia_w)) // parallel port
-	//MCFG_I8255_IN_PORTB_CB(READ8(excali64_state, ppib_r))
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write)) // parallel port
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(excali64_state, ppib_w))
 	MCFG_I8255_IN_PORTC_CB(READ8(excali64_state, ppic_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(excali64_state, ppic_w))
-
-	//MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	//MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(excali64_state, write_acia_clock))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -645,13 +657,12 @@ static MACHINE_CONFIG_START( excali64, excali64_state )
 	MCFG_WD_FDC_FORCE_READY
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", excali64_floppies, "525dd", floppy_image_device::default_floppy_formats)// excali64_state::floppy_formats)
-	//MCFG_FLOPPY_DRIVE_ADD("fdc:1", excali64_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", excali64_floppies, "525dd", floppy_image_device::default_floppy_formats)
 #else
 	MCFG_DEVICE_ADD("fdc", WD2793, 0)
-	MCFG_WD17XX_DEFAULT_DRIVE1_TAGS
+	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
 	MCFG_WD17XX_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, excali64_floppy_interface)
-	//MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(excali64_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(excali64_floppy_interface)
 #endif
 	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL_16MHz/4)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(excali64_state, busreq_w))
@@ -661,13 +672,17 @@ static MACHINE_CONFIG_START( excali64, excali64_state )
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(excali64_state, io_write_byte))
 
 	MCFG_DEVICE_ADD("u12", TTL74123, 0)
-	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_GROUNDED)    /* the hook up type (no idea what this means */
+	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_GROUNDED)    /* Hook up type (no idea what this means) */
 	MCFG_TTL74123_RESISTOR_VALUE(RES_K(100))               /* resistor connected between RCext & 5v */
 	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(100))               /* capacitor connected between Cext and RCext */
 	MCFG_TTL74123_A_PIN_VALUE(0)                  /* A pin - grounded */
 	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - driven by port e4 bit 5 */
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
 	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITE8(excali64_state, motor_w))
+
+	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(excali64_state, cent_busy_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -692,4 +707,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     CLASS         INIT        COMPANY         FULLNAME        FLAGS */
-COMP( 1984, excali64, 0,      0,       excali64,  excali64, driver_device, 0,  "BGR Computers", "Excalibur 64", GAME_NOT_WORKING )
+COMP( 1984, excali64, 0,      0,       excali64,  excali64, driver_device, 0,  "BGR Computers", "Excalibur 64", 0 )

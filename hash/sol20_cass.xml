@@ -11,11 +11,11 @@ Downloaded from http://www.sol20.org (Note: .svt files: pilot, space and strateg
 <!--
 Proteus Cassette Software
 
-    Proteus Cassette #1 -- Extended Cassette BASIC
-    Proteus Cassette #2 -- Extended Cassette BASIC
-    Proteus Cassette #3 -- Extended Cassette BASIC
-    Proteus Cassette #7 -- Assembly language source and object
-    Proteus Cassette #8 -- More Extended Cassette BASIC programs
+    Proteus Cassette #1 - Extended Cassette BASIC
+    Proteus Cassette #2 - Extended Cassette BASIC
+    Proteus Cassette #3 - Extended Cassette BASIC
+    Proteus Cassette #7 - Assembly language source and object
+    Proteus Cassette #8 - More Extended Cassette BASIC programs
 
 Contents of Proteus software collections at http://www.sol20.org/manuals/proteus_cass_library.txt
 C7 User Manual at http://www.sol20.org/manuals/proteus_c7.pdf
@@ -77,7 +77,7 @@ Note: No more infos about!
 	</software>
 
 <!--
-TAD Enterprise -- utilities for moving PT BASIC
+TAD Enterprise - utilities for moving PT BASIC
 
     MODPG P 4120 0CDF           ;program patches Proc Tech Extended Cassette BASIC to run under CP/M
     UTIL  B 3C20 1B16   (Ext BASIC) ;utilities allow for easily transferring programs to/from cassette/disk, and some other functions
@@ -176,7 +176,7 @@ User Manual at http://www.sol20.org/manuals/atc.pdf
 	</software>
 
 <!--
-Processor Technology Basic/5 -- a simple BASIC
+Processor Technology Basic/5 - a simple BASIC
 
     BASIC B 0000 19B6
     MTCHS B 1AD9 034D       ;21 matches; you play against the computer; last one to pick up a match loses
@@ -358,10 +358,10 @@ User Manual at http://www.sol20.org/manuals/focal.pdf
 <!--
 Processor Technology GAMEPAC 1; collection of four games
 
-    TARG  G 0000 0E42       ;the famous target game --shoot down ASCII spaceships
+    TARG  G 0000 0E42       ;the famous target game - shoot down ASCII spaceships
     LIFE  G 0000 0CCC       ;conway's life
     PTRN  G 0000 056E       ;simple kaleidoscope
-    ZING  G 0000 046B       ;a multi-ball pong-like game --requires external input device
+    ZING  G 0000 046B       ;a multi-ball pong-like game - requires external input device
 
 In SOLOS monitor "XEQ name" to load/autorun or "GET name" and then "EXEC 0".
 
@@ -382,7 +382,7 @@ User Manual at http://www.sol20.org/manuals/gamepac1.pdf
 <!--
 Processor Technology GAMEPAC 2; collection of two games
 
-    HANG  G 0000 0E12       ;hangman --in speedy assembly language
+    HANG  G 0000 0E12       ;hangman -in speedy assembly language
     QUBIC G 0000 0712       :play 3D tic-tac-toe against the computer
 
 In SOLOS monitor "XEQ name" to load/autorun or "GET name" and then "EXEC 0".
@@ -434,8 +434,8 @@ Music System by Software Technology Corp., a division of Processor Technology
 
 In SOLOS monitor "XEQ MUSIC" to load/autorun or "GET MUSIC" and then "EXEC 0".
 
-HOW TO USE THE MUSIC SYSTEM -- see manual p.22
-THE MUSIC SYSTEM CIRCUIT BOARD -- see manual p.3 (schematic p.7) (Note: Seems Solance emu support it but MESS dont!?)
+HOW TO USE THE MUSIC SYSTEM - see manual p.22
+THE MUSIC SYSTEM CIRCUIT BOARD - see manual p.3 (schematic p.7) (Note: Seems Solance emu support it but MESS dont!?)
 
 User Manual at http://www.sol20.org/manuals/music.pdf
 -->
@@ -612,17 +612,17 @@ More docs find in http://www.sol20.org/tinytrek/tinytrek.zip
 <!--
 Various games written by Ray White
 
-#1  DHMZI   0000 1360       ;deathmaze_instr    -- instructions for the deathmaze game
-    DHMZP   0000 5714       ;deathmaze_play -- dungeons & dragons game
-#2  FEUDL   0000 1AF4       ;feudal     -- run a simulated kingdom (hammurabi-like)
-#3  GOBBL   0000 06F4       ;gobble     -- race the clock to pick up as many pieces as you can)
-#4  PACMN   0000 0D04       ;pacman     -- pacman "clone"
-#5  REVRS   0000 0DD2       ;reversi        -- play reversi against the computer
-#6  ROBOI   0000 29B4       ;robot_instr    -- instructions for the robot game
-    ROBOP   0000 1FE4       ;robot_play     -- write robot programs then pit them against each other
-#7  SKULC   0000 41D4       ;skullcave      -- adventure game
-#8  STOMP   0000 0822       ;stomp      -- try to swat the flies
-#9  TICTT   0000 06A0       ;tic_tac_toe    -- play tic-tac-toe against the computer
+#1  DHMZI   0000 1360       ;deathmaze_instr    - instructions for the deathmaze game
+    DHMZP   0000 5714       ;deathmaze_play - dungeons & dragons game
+#2  FEUDL   0000 1AF4       ;feudal     - run a simulated kingdom (hammurabi-like)
+#3  GOBBL   0000 06F4       ;gobble     - race the clock to pick up as many pieces as you can)
+#4  PACMN   0000 0D04       ;pacman     - pacman "clone"
+#5  REVRS   0000 0DD2       ;reversi        - play reversi against the computer
+#6  ROBOI   0000 29B4       ;robot_instr    - instructions for the robot game
+    ROBOP   0000 1FE4       ;robot_play     - write robot programs then pit them against each other
+#7  SKULC   0000 41D4       ;skullcave      - adventure game
+#8  STOMP   0000 0822       ;stomp      - try to swat the flies
+#9  TICTT   0000 06A0       ;tic_tac_toe    - play tic-tac-toe against the computer
 
 In SOLOS monitor "XEQ name" to load/autorun or "GET name" and then "EXEC 0".
 
@@ -684,13 +684,13 @@ Note: If in some of games a screen starts blinking, then in MESS select in "Deep
 Standalone software of various origins
 
 #1  BTSHP G 0000 1121       ;battleship game ;from Proteus Cassette #7
-#2  CHASE G 0000 05E6       ;the game of chase ;evade robots before they grab you --from Dr. Dobbs --modified for Sol
+#2  CHASE G 0000 05E6       ;the game of chase ;evade robots before they grab you -from Dr. Dobbs -modified for Sol
 #3  CHKR2 G 0000 2741       ;TCD checkers
-#4  DFLCT G 0000 0291       ;the game of deflection ;deflect target by typing a "/" or a "\" --by Andrew A. Recupero
-#5  MCHSS G 0000 1000       ;microchess ;a classic early chess program for microcomputers --written by Peter Jennings
-#6  MINE  G 0000 1495       ;mine field --by Carl E.Dawson, Programmer for ESV Computer Service
+#4  DFLCT G 0000 0291       ;the game of deflection ;deflect target by typing a "/" or a "\" -by Andrew A. Recupero
+#5  MCHSS G 0000 1000       ;microchess ;a classic early chess program for microcomputers -written by Peter Jennings
+#6  MINE  G 0000 1495       ;mine field -by Carl E.Dawson, Programmer for ESV Computer Service
 #7  PIRAN G 0000 0876       ;piranha ;use the keypad to evade swarming piranhas
-#8  RAIDS G 0000 1124       ;space raiders ;space invaders clone --by Steve Maguire
+#8  RAIDS G 0000 1124       ;space raiders ;space invaders clone -by Steve Maguire
 #9  TARGT G 0000 00E4       ;target ;a simple shooting game (not the famous target)
 
 In SOLOS monitor "XEQ name" to load/autorun or "GET name" and then "EXEC 0".
@@ -767,7 +767,7 @@ P.T. Access newsletter, Volume 1, Number 4
 
 #1  GALAX   0000 0876       ;galaxy ;logic game from Access Vol 1, #4
 #2  TRAIN   0000 0287       ;a screen saver, of sorts
-#3  WINZI   C900 01D0       ;chase, hic, opps, and life --see the newsletter for more details on the program
+#3  WINZI   C900 01D0       ;chase, hic, opps, and life -see the newsletter for more details on the program
 
 In SOLOS monitor "XEQ name" to load/autorun or "GET name" and then "EXEC address".
 
@@ -800,15 +800,15 @@ More infos http://www.sol20.org/articles/access_v1n4.pdf
 <!--
 Collection of selected BASIC/5 programs
 
-#1  BOMB  B 1AD9 1381       ;bomb a dam while under enemy fire --has hidden assembly language routines & isn't entirely LIST'able
-#2  BOMRN B 1AD9 1D7E       ;BOMBRUN ;bombing run simulation --Jim Prelesnik Rev.A 2-2-78
-#3  KORPS B 1AD9 4A95       ;AFRIKA KORPS pits you as a 1942 German Commander against British armored units --Ralph Hopkins
-#4  PANZR B 1AD9 4958       ;PANZER pits you as a 1944 German Commander playing against the British & Americans --Ralph Hopkins; late 1970's
-#5  STRWR B 1AD9 2822       ;STARWAR ;Simulation: destroy the infamous 'STARWARS' Death Star --MECC "STRWAR1" === reworked  03-20-78
-#6  STTR  B 1AD9 2EDE       ;classic game of StarTrek ;a SOL-20 version of Univac 1100 Basic's STTR2 --Ralph Hopkins; late 1970's
-#7  SWOLF B 1AD9 4925       ;SeaWolf ;WWII pacific submarine game --by Ralph Hopkins; (Era Jun-79)
-#8  TANKS B 1AD9 4A78       ;you are an american commander playing against the germans post normandy --Ralph Hopkins; late 1970's
-#9  TANKZ B 1AD9 49DB       ;you command a Russian tank unit playing against the Germans on the Russian Front --Ralph Hopkins; late 1970's
+#1  BOMB  B 1AD9 1381       ;bomb a dam while under enemy fire -has hidden assembly language routines & isn't entirely LIST'able
+#2  BOMRN B 1AD9 1D7E       ;BOMBRUN ;bombing run simulation -Jim Prelesnik Rev.A 2-2-78
+#3  KORPS B 1AD9 4A95       ;AFRIKA KORPS pits you as a 1942 German Commander against British armored units -Ralph Hopkins
+#4  PANZR B 1AD9 4958       ;PANZER pits you as a 1944 German Commander playing against the British & Americans -Ralph Hopkins; late 1970's
+#5  STRWR B 1AD9 2822       ;STARWAR ;Simulation: destroy the infamous 'STARWARS' Death Star -MECC "STRWAR1" === reworked  03-20-78
+#6  STTR  B 1AD9 2EDE       ;classic game of StarTrek ;a SOL-20 version of Univac 1100 Basic's STTR2 -Ralph Hopkins; late 1970's
+#7  SWOLF B 1AD9 4925       ;SeaWolf ;WWII pacific submarine game -by Ralph Hopkins; (Era Jun-79)
+#8  TANKS B 1AD9 4A78       ;you are an american commander playing against the germans post normandy -Ralph Hopkins; late 1970's
+#9  TANKZ B 1AD9 49DB       ;you command a Russian tank unit playing against the Germans on the Russian Front -Ralph Hopkins; late 1970's
 
 How to load BASIC/5 programs:
 1)mount the tape bs5 .wav file into cass1 and Sol BASIC/5 .wav file into cass2
@@ -874,11 +874,11 @@ Note if you using basic5_48K.wav instead od basic5_orig.wav, there is no need fo
 <!--
 Collection of selected ECB programs
 
-#1  BOULE C 3C20 2AB5       ;impressive european variation of roulette (The Bowl) --Ralph Hopkins Eagan, MN (SOL-20 Ext BASIC) 9/1/78
-#2  ILAND C 3C20 5020       ;TREASURE ISLAND ;adventure --by Ralph Hopkins
-#3  NUMBR C 3C20 2E24       ;6 number games --RALPH HOPKINS  12-01-78
-#4  PLUS  C 3C20 3A3F       ;dots and pluses *WORD* game --by Ralph Hopkins, EAGAN, MINN. 06-06-78
-#5  ROLET C 3C20 30FA       ;play standard european computer roulette --author unknown; 5/1/78
+#1  BOULE C 3C20 2AB5       ;impressive european variation of roulette (The Bowl) -Ralph Hopkins Eagan, MN (SOL-20 Ext BASIC) 9/1/78
+#2  ILAND C 3C20 5020       ;TREASURE ISLAND ;adventure -by Ralph Hopkins
+#3  NUMBR C 3C20 2E24       ;6 number games -RALPH HOPKINS  12-01-78
+#4  PLUS  C 3C20 3A3F       ;dots and pluses *WORD* game -by Ralph Hopkins, EAGAN, MINN. 06-06-78
+#5  ROLET C 3C20 30FA       ;play standard european computer roulette -author unknown; 5/1/78
 
 How to load EC BASIC programs:
 1)mount the tape ecb .wav file into cass1 and Extended Cassette BASIC .wav file into cass2

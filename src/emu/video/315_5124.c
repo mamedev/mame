@@ -190,7 +190,7 @@ sega315_5246_device::sega315_5246_device(const machine_config &mconfig, const ch
 
 
 sega315_5378_device::sega315_5378_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: sega315_5124_device( mconfig, SEGA315_5378, "Sega 315-5378", tag, owner, clock, SEGA315_5378_CRAM_SIZE, 0x10, true, "sega315_5378", __FILE__, X_SCROLL_HPOS_5378)
+	: sega315_5124_device( mconfig, SEGA315_5378, "Sega 315-5378 VDP", tag, owner, clock, SEGA315_5378_CRAM_SIZE, 0x10, true, "sega315_5378", __FILE__, X_SCROLL_HPOS_5378)
 {
 }
 

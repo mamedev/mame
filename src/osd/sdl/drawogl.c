@@ -510,7 +510,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 	//load_gl_lib(window->machine());
 
 	// create the SDL window
-	window->sdl_window = SDL_CreateWindow(window->title, SDL_WINDOWPOS_UNDEFINED_DISPLAY(window->monitor->handle), SDL_WINDOWPOS_UNDEFINED,
+	window->sdl_window = SDL_CreateWindow(window->title, window->monitor->monitor_x, 0,
 			width, height, sdl->extra_flags);
 
 	if  (!window->sdl_window )

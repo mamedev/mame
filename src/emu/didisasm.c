@@ -20,7 +20,7 @@
 //-------------------------------------------------
 
 device_disasm_interface::device_disasm_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device)
+	: device_interface(device, "disasm")
 {
 }
 

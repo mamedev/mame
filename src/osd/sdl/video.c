@@ -437,7 +437,7 @@ static void init_monitors(void)
 
 	#if (SDLMAME_SDL2)
 	{
-		int i;
+		int i, monx = 0;
 
 		osd_printf_verbose("Enter init_monitors\n");
 
@@ -456,10 +456,13 @@ static void init_monitors(void)
 			monitor->monitor_height = dmode.h;
 			monitor->center_width = dmode.w;
 			monitor->center_height = dmode.h;
+			monitor->monitor_x = monx;
 			monitor->handle = i;
 			// guess the aspect ratio assuming square pixels
 			monitor->aspect = (float)(dmode.w) / (float)(dmode.h);
 			osd_printf_verbose("Adding monitor %s (%d x %d)\n", monitor->monitor_device, dmode.w, dmode.h);
+
+			monx += dmode.w;
 
 			// save the primary monitor handle
 			if (i == 0)
@@ -560,7 +563,15 @@ static void check_osd_inputs(running_machine &machine)
 
 	// check for toggling fullscreen mode
 	if (ui_input_pressed(machine, IPT_OSD_1))
-		sdlwindow_toggle_full_screen(machine, window);
+	{
+		sdl_window_info *curwin = sdl_window_list;
+
+		while (curwin != (sdl_window_info *)NULL)
+		{
+			sdlwindow_toggle_full_screen(machine, curwin);
+			curwin = curwin->next;
+		}
+	}
 
 	if (ui_input_pressed(machine, IPT_OSD_2))
 	{

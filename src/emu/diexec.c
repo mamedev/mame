@@ -42,7 +42,7 @@ const int TRIGGER_SUSPENDTIME   = -4000;
 //-------------------------------------------------
 
 device_execute_interface::device_execute_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device),
+	: device_interface(device, "execute"),
 		m_disabled(false),
 		m_vblank_interrupt_screen(NULL),
 		m_timed_interrupt_period(attotime::zero),

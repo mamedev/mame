@@ -387,6 +387,7 @@ void galaxold_state::state_save_register()
 	save_item(NAME(m_stars_on));
 	save_item(NAME(m_stars_scrollpos));
 	save_item(NAME(m_stars_blink_state));
+	save_item(NAME(m_timer_adjusted));
 
 	save_item(NAME(m_darkplnt_bullet_color));
 

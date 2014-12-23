@@ -19,7 +19,7 @@
 //-------------------------------------------------
 
 device_z80daisy_interface::device_z80daisy_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device)
+	: device_interface(device, "z80daisy")
 {
 }
 

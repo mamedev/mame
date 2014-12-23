@@ -523,6 +523,15 @@ void am9517a_device::device_start()
 	save_item(NAME(m_status));
 	save_item(NAME(m_temp));
 	save_item(NAME(m_request));
+	
+	for (int i = 0; i < 4; i++)
+	{
+		save_item(NAME(m_channel[i].m_address), i);
+		save_item(NAME(m_channel[i].m_count), i);
+		save_item(NAME(m_channel[i].m_base_address), i);
+		save_item(NAME(m_channel[i].m_base_count), i);
+		save_item(NAME(m_channel[i].m_mode), i);
+	}
 }
 
 
