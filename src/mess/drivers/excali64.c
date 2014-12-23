@@ -20,7 +20,7 @@ Notes:
 ToDo:
 - Colours are approximate.
 - Disk controller, works with old wd17xx but crashes on new wd.
-- Hardware supports 8 and 5.25 inch floppies, but we only support 5.25 as this
+- Hardware supports 20cm and 13cm floppies, but we only support 13cm as this
   is the only software that exists.
 - The schematic shows the audio counter connected to 2MHz, but this produces
   sounds that are too high. Connected to 1MHz for now.
@@ -270,12 +270,13 @@ WRITE8_MEMBER( excali64_state::motor_w )
 {
 	m_motor = BIT(data, 0);
 #if NEWFDC
+	m_floppy1->get_device()->mon_w(!m_motor);
 	m_floppy0->get_device()->mon_w(!m_motor);
 #else
-	//const char *floppy_tags[4] = { FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3 };
 	legacy_floppy_image_device *flop = subdevice<legacy_floppy_image_device>(FLOPPY_0);
 	flop->floppy_mon_w(!m_motor); // motor on
-	//flop->floppy_drive_set_ready_state(1, 0); // this is commented out in flopdrv.c, so does nothing
+	flop = subdevice<legacy_floppy_image_device>(FLOPPY_1);
+	flop->floppy_mon_w(!m_motor); // motor on
 #endif
 }
 
@@ -288,41 +289,48 @@ WRITE8_MEMBER( excali64_state::porte4_w )
 {
 #if NEWFDC
 	floppy_image_device *floppy = NULL;
-	if (BIT(data, 0)) floppy = m_floppy0->get_device();
-	//if (BIT(data, 1)) floppy = m_floppy1->get_device();
-	m_fdc->set_floppy(floppy);
-	if (floppy)
-		floppy->ss_w(BIT(data, 4));
-#else
-	//UINT8 i;
-	//for (i = 0; i < 4; i++)
-	//{
-	//	if BIT(data, i)
-	//	{
-	//		m_fdc->set_drive(i);
-	//		break;
-	//	}
-	//}
-	if BIT(data, 0) m_fdc->set_drive(0);
-	//if BIT(data, 1) m_fdc->set_drive(1);
-	//if BIT(data, 2) m_fdc->set_drive(2);
-	//if BIT(data, 3) m_fdc->set_drive(3);
-	m_fdc->set_side(BIT(data, 4));
+	if (BIT(data, 0))
+		floppy = m_floppy0->get_device();
 
-	m_fdc->dden_w(1);//!BIT(data, 6)); // we want double density
+	if (BIT(data, 1))
+		floppy = m_floppy1->get_device();
+
+	if (floppy)
+	{
+		m_fdc->set_floppy(floppy);
+		floppy->ss_w(BIT(data, 4));
+	}
+#else
+	if BIT(data, 0)
+		m_fdc->set_drive(0);
+
+	if BIT(data, 1)
+		m_fdc->set_drive(1);
+
+	m_fdc->set_side(BIT(data, 4));
 #endif
-	m_u12->b_w(space,offset, BIT(data, 5));
+
+	m_u12->b_w(space,offset, BIT(data, 5)); // motor pulse
 }
 
+/*
+d0 = precomp (selectable by jumper)
+d1 = size select (we only support 13cm)
+d2 = density select (0 = double)
+*/
 WRITE8_MEMBER( excali64_state::portec_w )
 {
+#if NEWFDC
+	m_fdc->dden_w(BIT(data, 2));
+#else
+	m_fdc->dden_w(!BIT(data, 2));
+#endif
 }
 
 WRITE_LINE_MEMBER( excali64_state::busreq_w )
 {
 // since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
-	//m_maincpu->set_input_line(INPUT_LINE_HALT, state); // do we need this?
 	m_dma->bai_w(state); // tell dma that bus has been granted
 }
 
@@ -521,7 +529,7 @@ PALETTE_INIT_MEMBER( excali64_state, excali64 )
 	membank("bankr4")->configure_entry(2, &m_p_hiresram[0x0000]);
 	membank("bankw4")->configure_entry(2, &m_p_hiresram[0x0000]);
 
-	// Set up foreground palettes
+	// Set up foreground colours
 	UINT8 r,g,b,i,code;
 	for (i = 0; i < 32; i++)
 	{
@@ -611,9 +619,6 @@ static MACHINE_CONFIG_START( excali64, excali64_state )
 	MCFG_I8255_IN_PORTC_CB(READ8(excali64_state, ppic_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(excali64_state, ppic_w))
 
-	//MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	//MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(excali64_state, write_acia_clock))
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -645,13 +650,12 @@ static MACHINE_CONFIG_START( excali64, excali64_state )
 	MCFG_WD_FDC_FORCE_READY
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", excali64_floppies, "525dd", floppy_image_device::default_floppy_formats)// excali64_state::floppy_formats)
-	//MCFG_FLOPPY_DRIVE_ADD("fdc:1", excali64_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", excali64_floppies, "525dd", floppy_image_device::default_floppy_formats)
 #else
 	MCFG_DEVICE_ADD("fdc", WD2793, 0)
-	MCFG_WD17XX_DEFAULT_DRIVE1_TAGS
+	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
 	MCFG_WD17XX_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, excali64_floppy_interface)
-	//MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(excali64_floppy_interface)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(excali64_floppy_interface)
 #endif
 	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL_16MHz/4)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(excali64_state, busreq_w))
@@ -661,7 +665,7 @@ static MACHINE_CONFIG_START( excali64, excali64_state )
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(excali64_state, io_write_byte))
 
 	MCFG_DEVICE_ADD("u12", TTL74123, 0)
-	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_GROUNDED)    /* the hook up type (no idea what this means */
+	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_GROUNDED)    /* Hook up type (no idea what this means) */
 	MCFG_TTL74123_RESISTOR_VALUE(RES_K(100))               /* resistor connected between RCext & 5v */
 	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(100))               /* capacitor connected between Cext and RCext */
 	MCFG_TTL74123_A_PIN_VALUE(0)                  /* A pin - grounded */
