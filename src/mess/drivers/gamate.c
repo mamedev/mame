@@ -2,6 +2,7 @@
  PeT mess@utanet.at 2007, 2014
  Peter Wilhelmsen peter.wilhelmsen@gmail.com
  Morten Shearman Kirkegaard morten+gamate@afdelingp.dk
+ Juan Félix Mateos vectrex@hackermesh.org
 ******************************************************************************/
 
 #include "emu.h"
@@ -27,6 +28,7 @@ public:
 	DECLARE_READ8_MEMBER(protection_r);
 	DECLARE_READ8_MEMBER(gamate_cart_protection_r);
 	DECLARE_WRITE8_MEMBER(gamate_cart_protection_w);
+	DECLARE_WRITE8_MEMBER(cart_bankswitchmulti_w);
 	DECLARE_WRITE8_MEMBER(cart_bankswitch_w);
 	DECLARE_READ8_MEMBER(gamate_video_r);
 	DECLARE_READ8_MEMBER(gamate_pad_r);
@@ -134,6 +136,11 @@ WRITE8_MEMBER( gamate_state::gamate_video_w )
   }
 }
 
+WRITE8_MEMBER( gamate_state::cart_bankswitchmulti_w )
+{
+	membank("bankmulti")->set_base(m_cart->get_rom_base()+0x4000*data);
+}
+
 WRITE8_MEMBER( gamate_state::cart_bankswitch_w )
 {
 	membank("bank")->set_base(m_cart->get_rom_base()+0x4000*data);
@@ -181,11 +188,12 @@ static ADDRESS_MAP_START( gamate_mem, AS_PROGRAM, 8, gamate_state )
   AM_RANGE(0x5000, 0x5007) AM_READWRITE(gamate_video_r, gamate_video_w)
   AM_RANGE(0x5a00, 0x5a00) AM_READ(protection_r)
 
-  AM_RANGE(0x6000, 0x9fff) AM_ROM
+  AM_RANGE(0x6000, 0x9fff) AM_READ_BANK("bankmulti")
   AM_RANGE(0xa000, 0xdfff) AM_READ_BANK("bank")
 
 	AM_RANGE(0x6000, 0x6002) AM_READWRITE(gamate_cart_protection_r, gamate_cart_protection_w)
 //	AM_RANGE(0x6000, 0xdfff) AM_READWRITE(gamate_cart_r, gamate_cart_w)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(cart_bankswitchmulti_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(cart_bankswitch_w)
 
   AM_RANGE(0xf000, 0xffff) AM_ROM AM_SHARE("bios")
@@ -290,9 +298,9 @@ DRIVER_INIT_MEMBER(gamate_state,gamate)
 void gamate_state::machine_start()
 {
 	if (m_cart->exists()) {
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x9fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 //		m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x6000, READ8_DELEGATE(gamate_state, gamate_cart_protection_r));
-		membank("bank")->set_base(m_cart->get_rom_base()+0x4000);
+		membank("bankmulti")->set_base(m_cart->get_rom_base());
+		membank("bank")->set_base(m_cart->get_rom_base()+0x4000); // bankswitched games in reality no offset
 	}
 	m_bios[0xdf1]=0xea; m_bios[0xdf2]=0xea; // $47 protection readback
 	card_protection.address=0x6005-0x6001;
