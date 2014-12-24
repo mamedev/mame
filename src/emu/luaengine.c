@@ -16,6 +16,7 @@
 #include "emuopts.h"
 #include "osdepend.h"
 #include "drivenum.h"
+#include "ui/ui.h"
 #include "web/mongoose.h"
 
 //**************************************************************************
@@ -254,6 +255,195 @@ int lua_engine::l_emu_unpause(lua_State *L)
 }
 
 //-------------------------------------------------
+//  gui_screen_width - return current screen width in pixels
+//-------------------------------------------------
+
+int lua_engine::l_gui_screen_width(lua_State *L)
+{
+	lua_pushunsigned(L, luaThis->m_screen.width());
+	return 1;
+}
+
+//-------------------------------------------------
+//  gui_screen_height - return current screen height in pixels
+//-------------------------------------------------
+
+int lua_engine::l_gui_screen_height(lua_State *L)
+{
+	lua_pushunsigned(L, luaThis->m_screen.height());
+	return 1;
+}
+
+//-------------------------------------------------
+//  gui_draw_box - draw a box to HUD
+//  -> gui.draw_box(x1, y1, x2, y2, fillcolor, outlinecolor)
+//-------------------------------------------------
+
+int lua_engine::l_gui_draw_box(lua_State *L)
+{
+	// ensure that we got 6 numerical parameters
+	luaL_argcheck(L, lua_isnumber(L, 1), 1, "x1 (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "y1 (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 3), 3, "x2 (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 4), 4, "y2 (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 5), 5, "fill color (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 6), 6, "outline color (integer) expected");
+
+	// retrieve all parameters
+	float x1, y1, x2, y2;
+	x1 = MIN(lua_tounsigned(L, 1) / static_cast<float>(luaThis->m_screen.width()) , 1.0f);
+	y1 = MIN(lua_tounsigned(L, 2) / static_cast<float>(luaThis->m_screen.height()), 1.0f);
+	x2 = MIN(lua_tounsigned(L, 3) / static_cast<float>(luaThis->m_screen.width()) , 1.0f);
+	y2 = MIN(lua_tounsigned(L, 4) / static_cast<float>(luaThis->m_screen.height()), 1.0f);
+	UINT32 bgcolor = lua_tounsigned(L, 5);
+	UINT32 fgcolor = lua_tounsigned(L, 6);
+
+	// draw the box
+	render_container &rc = luaThis->machine().first_screen()->container();
+	ui_manager &ui = luaThis->machine().ui();
+	ui.draw_outlined_box(&rc, x1, y1, x2, y2, fgcolor, bgcolor);
+
+	return 0;
+}
+
+//-------------------------------------------------
+//  gui_draw_line - draw a line to HUD
+//  -> gui.draw_line(x1, y1, x2, y2, color)
+//-------------------------------------------------
+
+int lua_engine::l_gui_draw_line(lua_State *L)
+{
+	// ensure that we got 5 numerical parameters
+	luaL_argcheck(L, lua_isnumber(L, 1), 1, "x1 (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "y1 (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 3), 3, "x2 (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 4), 4, "y2 (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 5), 5, "color (integer) expected");
+
+	// retrieve all parameters
+	float x1, y1, x2, y2;
+	x1 = MIN(lua_tounsigned(L, 1) / static_cast<float>(luaThis->m_screen.width()) , 1.0f);
+	y1 = MIN(lua_tounsigned(L, 2) / static_cast<float>(luaThis->m_screen.height()), 1.0f);
+	x2 = MIN(lua_tounsigned(L, 3) / static_cast<float>(luaThis->m_screen.width()) , 1.0f);
+	y2 = MIN(lua_tounsigned(L, 4) / static_cast<float>(luaThis->m_screen.height()), 1.0f);
+	UINT32 color = lua_tounsigned(L, 5);
+
+	// draw the line
+	render_container &rc = luaThis->machine().first_screen()->container();
+	rc.add_line(x1, y1, x2, y2, UI_LINE_WIDTH, rgb_t(color), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+
+	return 0;
+}
+
+//-------------------------------------------------
+//  gui_draw_text - draw text to HUD
+//  -> gui.draw_text(int x, int y, string msg[, color="white", outline="black"])
+//-------------------------------------------------
+
+int lua_engine::l_gui_draw_text(lua_State *L)
+{
+	// ensure that we got proper parameters
+	luaL_argcheck(L, lua_isnumber(L, 1), 1, "x (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "y (integer) expected");
+	luaL_argcheck(L, lua_isstring(L, 3), 3, "message (string) expected");
+
+	// retrieve all parameters
+	float x = MIN(lua_tounsigned(L, 1) / static_cast<float>(luaThis->m_screen.width()) , 1.0f);
+	float y = MIN(lua_tounsigned(L, 2) / static_cast<float>(luaThis->m_screen.height()), 1.0f);
+	const char *msg = luaL_checkstring(L,3);
+	// TODO: optional parameters
+
+	// draw the text
+	render_container &rc = luaThis->machine().first_screen()->container();
+	ui_manager &ui = luaThis->machine().ui();
+	ui.draw_text_full(&rc, msg, x, y , (1.0f - x),
+						JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR,
+						UI_TEXT_BG_COLOR, NULL, NULL);
+
+	return 0;
+}
+
+//-------------------------------------------------
+//  gui_show_fps - display/hide fps counter
+//-------------------------------------------------
+
+int lua_engine::l_gui_show_fps(lua_State *L)
+{
+	luaL_argcheck(L, lua_isboolean(L, 1), 1, "enabled (bool) expected");
+	bool enabled = lua_toboolean(L, 1);
+	render_container &rc = luaThis->machine().first_screen()->container();
+	ui_manager &ui = luaThis->machine().ui();
+	ui.set_show_fps(enabled);
+	lua_pushboolean(L, ui.show_fps_counter());
+	return 1;
+}
+
+//-------------------------------------------------
+//  cpu_mem_read - read values from main memory
+//  -> cpu.mem_read(integer address, integer size, bool signed)
+//-------------------------------------------------
+
+int lua_engine::l_cpu_mem_read(lua_State *L)
+{
+	// check and retrieve parameters
+	luaL_argcheck(L, lua_isnumber(L, 1), 1, "address (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "size (8/16/32/64) expected");
+	luaL_argcheck(L, lua_isboolean(L, 3), 3, "signed (bool) expected");
+	offs_t addr = lua_tounsigned(L, 1);
+	UINT32 size = lua_tounsigned(L, 2);
+	bool signd = lua_toboolean(L, 3);
+
+	// read memory and push the value back to LUA
+	if ((size == 8) || (size == 16) || (size == 32) || (size == 64)) {
+		luaThis->mem_read(L, addr, size, signd);
+	} else {
+		lua_pushnil(L);
+	}
+	return 1;
+}
+
+void lua_engine::mem_read(lua_State *L, offs_t address, UINT32 size, bool signd)
+{
+	address_space &sp = m_machine->firstcpu->space();
+	INT64 retv = 0;
+	switch(size) {
+		case 8:
+			retv = sp.read_byte(address);
+			break;
+		case 16:
+			if ((address & 1) == 0) {
+				retv = sp.read_word(address);
+			} else {
+				retv = sp.read_word_unaligned(address);
+			}
+			break;
+		case 32:
+			if ((address & 3) == 0) {
+				retv = sp.read_dword(address);
+			} else {
+				retv = sp.read_dword_unaligned(address);
+			}
+			break;
+		case 64:
+			if ((address & 7) == 0) {
+				retv = sp.read_qword(address);
+			} else {
+				retv = sp.read_qword_unaligned(address);
+			}
+			break;
+		default:
+			break;
+	}
+
+	// directly push the result back to LUA
+	if (signd) {
+		lua_pushnumber(L, retv);
+	} else {
+		lua_pushunsigned(L, retv);
+	}
+}
+
+//-------------------------------------------------
 //  emu_keypost - post keys to natural keyboard
 //-------------------------------------------------
 
@@ -335,6 +525,22 @@ int lua_engine::l_emu_hook_output(lua_State *L)
 	return 0;
 }
 
+//-------------------------------------------------
+//  emu_hook_frame - register callback to draw a HUD from LUA on top of each frame
+//  -> emu.hook_frame(function cb)
+//-------------------------------------------------
+
+int lua_engine::l_emu_hook_frame(lua_State *L)
+{
+	luaThis->emu_hook_frame(L);
+	return 0;
+}
+
+void lua_engine::emu_hook_frame(lua_State *L)
+{
+	luaL_argcheck(L, lua_isfunction(L, 1), 1, "callback function expected");
+	frame_hook_cb.set(L, 1);
+}
 
 void *lua_engine::checkparam(lua_State *L, int idx, const char *tname)
 {
@@ -480,7 +686,7 @@ static void *serve_lua(void *param)
 //  lua_engine - constructor
 //-------------------------------------------------
 
-lua_engine::lua_engine()
+lua_engine::lua_engine() :  m_screen()
 {
 	m_machine = NULL;
 	luaThis = this;
@@ -530,6 +736,8 @@ void lua_engine::update_machine()
 			}
 			port = port->next();
 		}
+		// Register a screen-tracking bitmap
+		m_machine->first_screen()->register_screen_bitmap(m_screen);
 	}
 	lua_setglobal(m_lua_state, "ioport");
 }
@@ -540,6 +748,7 @@ void lua_engine::update_machine()
 
 void lua_engine::initialize()
 {
+	// "emu" namespace
 	luabridge::getGlobalNamespace (m_lua_state)
 		.beginNamespace ("emu")
 			.addCFunction ("app_name",    l_emu_app_name )
@@ -548,6 +757,7 @@ void lua_engine::initialize()
 			.addCFunction ("romname",     l_emu_romname )
 			.addCFunction ("keypost",     l_emu_keypost )
 			.addCFunction ("hook_output", l_emu_hook_output )
+			.addCFunction ("hook_frame",  l_emu_hook_frame )
 			.addCFunction ("time",        l_emu_time )
 			.addCFunction ("wait",        l_emu_wait )
 			.addCFunction ("after",       l_emu_after )
@@ -573,6 +783,23 @@ void lua_engine::initialize()
 			.endClass ()
 		.endNamespace ();
 
+	// "gui" namespace
+	luabridge::getGlobalNamespace (m_lua_state)
+		.beginNamespace ("gui")
+			.addCFunction ("screen_width",    l_gui_screen_width )
+			.addCFunction ("screen_height",   l_gui_screen_height )
+			.addCFunction ("draw_box",        l_gui_draw_box )
+			.addCFunction ("draw_line",       l_gui_draw_line )
+			.addCFunction ("draw_text",       l_gui_draw_text )
+			.addCFunction ("show_fps",        l_gui_show_fps )
+		.endNamespace ();
+
+	// "cpu" namespace
+	luabridge::getGlobalNamespace (m_lua_state)
+		.beginNamespace ("cpu")
+			.addCFunction ("mem_read",        l_cpu_mem_read )
+	.endNamespace ();
+
 	luabridge::push (m_lua_state, machine_manager::instance());
 	lua_setglobal(m_lua_state, "manager");
 }
@@ -580,6 +807,25 @@ void lua_engine::initialize()
 void lua_engine::start_console()
 {
 	mg_start_thread(::serve_lua, this);
+}
+
+//-------------------------------------------------
+//  frame_hook - called at each frame refresh, used to draw a HUD
+//-------------------------------------------------
+bool lua_engine::frame_hook()
+{
+	bool is_cb_hooked = false;
+	if (m_machine != NULL)
+	{
+		// invoke registered callback (if any)
+		is_cb_hooked = frame_hook_cb.active();
+		if (is_cb_hooked)
+		{
+			lua_State *L = frame_hook_cb.precall();
+			frame_hook_cb.call(this, L, 0);
+		}
+	}
+	return is_cb_hooked;
 }
 
 void lua_engine::periodic_check()
