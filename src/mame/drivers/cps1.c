@@ -11523,6 +11523,7 @@ DRIVER_INIT_MEMBER(cps_state,dinohunt)
 	// is this shared with the new sound hw?
 	UINT8* ram = (UINT8*)m_maincpu->space(AS_PROGRAM).install_ram(0xf18000, 0xf19fff);
 	memset(ram,0xff,0x2000);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfc0000, 0xfc0001, read16_delegate(FUNC(cps_state::cps1_in2_r), this));
 	DRIVER_INIT_CALL(cps1);
 }
 
