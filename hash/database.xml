@@ -157,8 +157,7 @@
 		<publisher>Voltmace?</publisher>
 		<info name="serial" value="No.13"/>
 		<part name="cart" interface="vc4000_cart">
-			<!-- FIXME: PCB has no RAM, but 4k ROM => it needs a new slot option -->
-			<feature name="slot" value="std" />
+			<feature name="slot" value="rom4k" />
 			<dataarea name="rom" size="4096">
 				<rom name="boxing.bin" size="4096" crc="922c9f0d" sha1="b49a37dd6d0272f6c71d778ffada6bc7c90f8348" offset="0" />
 			</dataarea>
@@ -229,8 +228,7 @@
 		<publisher>Voltmace?</publisher>
 		<info name="serial" value="No.24"/>
 		<part name="cart" interface="vc4000_cart">
-			<!-- FIXME: PCB has no RAM, but 4k ROM => it needs a new slot option -->
-			<feature name="slot" value="std" />
+			<feature name="slot" value="rom4k" />
 			<dataarea name="rom" size="4096">
 				<rom name="munchcrn.bin" size="4096" crc="704a1593" sha1="5f0b95904d6d36368727c1e0c91d94627a7471d6" offset="0" />
 			</dataarea>
