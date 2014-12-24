@@ -82,7 +82,7 @@ WRITE8_MEMBER( stereo_fx_device::port00_w )
 
 ROM_START( stereo_fx )
 	ROM_REGION( 0x8000, "stereo_fx_cpu", 0 )
-	ROM_LOAD("ati_stereo_fx.bin", 0x0000, 0x8000, CRC(1BEBFFA6) SHA1(e66c2619a6c05199554b5702d67877ae3799d415))
+	ROM_LOAD("ati_stereo_fx.bin", 0x0000, 0x8000, CRC(1bebffa6) SHA1(e66c2619a6c05199554b5702d67877ae3799d415))
 ROM_END
 
 static ADDRESS_MAP_START(stereo_fx_io, AS_IO, 8, stereo_fx_device)

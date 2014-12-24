@@ -886,7 +886,7 @@ ROM_START( amerdart ) /* You need to check the sum16 values listed on the labels
 	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u58 48af", 0x080000, 0x10000, CRC(f1b3d7c4) SHA1(7b897230d110be7a5eb05eda927d00561ebb9ce3) ) /* Different then set 2 or 3 */
 
 	ROM_REGION( 0x10000, "dsp", 0 ) /* TMS32015 code  */
-	ROM_LOAD16_WORD( "tms320e15.bin", 0x0000, 0x2000, CRC(375DB4EA) SHA1(11689C89CE62F44F43CB8973B4EC6E6B0024ED14) ) /* Passes internal checksum routine */
+	ROM_LOAD16_WORD( "tms320e15.bin", 0x0000, 0x2000, CRC(375db4ea) SHA1(11689c89ce62f44f43cb8973b4ec6e6b0024ed14) ) /* Passes internal checksum routine */
 
 	ROM_REGION( 0x100000, "user2", 0 )              /* TMS32015 audio sample data */
 	ROM_LOAD16_WORD( "ameri corp copyright 1989 u1 4461",  0x000000, 0x10000, CRC(3f459482) SHA1(d9d489efd0d9217fceb3bf1a3b37a78d6823b4d9) ) /* Different then set 2 or 3 */
@@ -921,7 +921,7 @@ ROM_START( amerdart2 ) /* You need to check the sum16 values listed on the label
 	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u58 0d81", 0x080000, 0x10000, CRC(8bb81975) SHA1(b7666572ab543991c7deaa0ebefb8b4526a7e386) ) /* Different then set 1 or 3 */
 
 	ROM_REGION( 0x10000, "dsp", 0 ) /* TMS32015 code  */
-	ROM_LOAD16_WORD( "tms320e15.bin", 0x0000, 0x2000, CRC(375DB4EA) SHA1(11689C89CE62F44F43CB8973B4EC6E6B0024ED14) ) /* Passes internal checksum routine */
+	ROM_LOAD16_WORD( "tms320e15.bin", 0x0000, 0x2000, CRC(375db4ea) SHA1(11689c89ce62f44f43cb8973b4ec6e6b0024ed14) ) /* Passes internal checksum routine */
 
 	ROM_REGION( 0x100000, "user2", 0 )              /* TMS32015 audio sample data */
 	ROM_LOAD16_WORD( "ameri corp copyright 1989 u1 222f",  0x000000, 0x10000, CRC(e2bb7f54) SHA1(39eeb61a852b93331f445cc1c993727e52959660) ) /* Different then set 1 */
@@ -956,7 +956,7 @@ ROM_START( amerdart3 ) /* You need to check the sum16 values listed on the label
 	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u58 729e", 0x080000, 0x10000, CRC(8cef479a) SHA1(80002e215416a11ff071523ee67218a1aabe155b) ) /* Different then set 2 or 3 */
 
 	ROM_REGION( 0x10000, "dsp", 0 ) /* TMS32015 code  */
-	ROM_LOAD16_WORD( "tms320e15.bin", 0x0000, 0x2000, CRC(375DB4EA) SHA1(11689C89CE62F44F43CB8973B4EC6E6B0024ED14) ) /* Passes internal checksum routine */
+	ROM_LOAD16_WORD( "tms320e15.bin", 0x0000, 0x2000, CRC(375db4ea) SHA1(11689c89ce62f44f43cb8973b4ec6e6b0024ed14) ) /* Passes internal checksum routine */
 
 	ROM_REGION( 0x100000, "user2", 0 )              /* TMS32015 audio sample data */
 	ROM_LOAD16_WORD( "ameri corp copyright 1989 u1 222f",  0x000000, 0x10000, CRC(e2bb7f54) SHA1(39eeb61a852b93331f445cc1c993727e52959660) ) /* Same as set 2 */

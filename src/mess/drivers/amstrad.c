@@ -1133,7 +1133,7 @@ ROM_START( cpc664 )
 	/* this defines the total memory size - 64k ram, 16k OS, 16k BASIC, 16k DOS */
 	ROM_REGION(0x01c000, "maincpu", 0)
 	/* load the os to offset 0x01000 from memory base */
-	ROM_LOAD("cpc664.rom",  0x10000, 0x8000, CRC(9AB5A036) SHA1(073a7665527b5bd8a148747a3947dbd3328682c8))
+	ROM_LOAD("cpc664.rom",  0x10000, 0x8000, CRC(9ab5a036) SHA1(073a7665527b5bd8a148747a3947dbd3328682c8))
 	ROM_LOAD("cpcados.rom", 0x18000, 0x4000, CRC(1fe22ecd) SHA1(39102c8e9cb55fcc0b9b62098780ed4a3cb6a4bb))
 ROM_END
 

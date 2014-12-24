@@ -655,7 +655,7 @@ ROM_END
 // the later intellivision 2's exec rom is a single ro-3-9506-010 at location ic6 holding 8k plus 512 bytes; the 1st 512 bytes are at 0x400 and the 8k at 0x1000
 ROM_START(intv2)
 	ROM_REGION(0x10000<<1,"maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "ro-3-9506-010.ic6", (0x400<<1)+0, 0x200, CRC(DD7E1237) SHA1(FB821A643B7714ED4C812553CD3F668766FD44AB))
+	ROM_LOAD16_WORD_SWAP( "ro-3-9506-010.ic6", (0x400<<1)+0, 0x200, CRC(dd7e1237) SHA1(fb821a643b7714ed4c812553cd3f668766fd44ab))
 	ROM_CONTINUE( (0x1000<<1)+0, 0x2000 )
 ROM_END
 

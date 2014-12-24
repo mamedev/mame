@@ -1322,7 +1322,7 @@ ROM_END
 
 ROM_START( sc1roul )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "rou029.bin",   0x8000, 0x8000,  CRC(31723f0A) SHA1(e220976116a0aaf24dc0c4af78a9311a360e8104))
+	ROM_LOAD( "rou029.bin",   0x8000, 0x8000,  CRC(31723f0a) SHA1(e220976116a0aaf24dc0c4af78a9311a360e8104))
 ROM_END
 
 /////////////////////////////////////////////////////////////////////////////////////

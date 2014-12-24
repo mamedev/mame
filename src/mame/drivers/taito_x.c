@@ -1159,8 +1159,8 @@ ROM_END
 
 ROM_START( gigandes )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
-	ROM_LOAD16_BYTE( "east_1.10a", 0x00000, 0x20000, CRC(ae74e4e5) SHA1(1CAC0A0E591B63142D8D249C67F803256FB28C2A) ) /* 'fixed' test mode, see notes above */
-	ROM_LOAD16_BYTE( "east_3.5a",  0x00001, 0x20000, CRC(8bcf2116) SHA1(9255D7E0AB568AD7A894421D3260FA80B8A0A5D0) ) /* 'fixed' test mode, see notes above */
+	ROM_LOAD16_BYTE( "east_1.10a", 0x00000, 0x20000, CRC(ae74e4e5) SHA1(1cac0a0e591b63142d8d249c67f803256fb28c2a) ) /* 'fixed' test mode, see notes above */
+	ROM_LOAD16_BYTE( "east_3.5a",  0x00001, 0x20000, CRC(8bcf2116) SHA1(9255d7e0ab568ad7a894421d3260fa80b8a0a5d0) ) /* 'fixed' test mode, see notes above */
 	ROM_LOAD16_BYTE( "east_2.8a",  0x40000, 0x20000, CRC(dd94b4d0) SHA1(2efff9fd51b28fd1fb46d16b359f0991af91054e) )
 	ROM_LOAD16_BYTE( "east_4.3a",  0x40001, 0x20000, CRC(a647310a) SHA1(49db488a36f6c74729825bdf0214bcd30773eaf4) )
 
