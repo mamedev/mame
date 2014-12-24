@@ -227,6 +227,11 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(leapster_cart);
 	DECLARE_DRIVER_INIT(leapster);
 
+	DECLARE_READ32_MEMBER(leapster_random_r)
+	{
+		return rand() | (rand()<<16); // there is a loop checking that this is above a certain value
+	}
+
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
@@ -277,6 +282,7 @@ void leapster_state::machine_reset()
 
 static ADDRESS_MAP_START( leapster_map, AS_PROGRAM, 32, leapster_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_MIRROR(0x40000000) // pointers in the bios region seem to be to the 40xxxxxx region, either we mirror there or something (real bios?) is acutally missing
+	AM_RANGE(0x0180D800, 0x0180D803) AM_READ(leapster_random_r)
 	AM_RANGE(0x03000000, 0x030007ff) AM_RAM // puts stack here, writes a pointer @ 0x03000000 on startup 
 //	AM_RANGE(0x80000000, 0x807fffff) AM_ROMBANK("cartrom") // game ROM pointers are all to the 80xxxxxx region, so I assume it maps here - installed if a cart is present
 ADDRESS_MAP_END
