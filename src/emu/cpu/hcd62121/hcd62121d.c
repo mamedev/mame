@@ -3,6 +3,9 @@
 #include "debugger.h"
 #include "hcd62121.h"
 
+#ifdef _MSC_VER
+#undef _SP
+#endif
 
 enum
 {
@@ -29,7 +32,7 @@ enum
 	_KLO,       /* KO1 - KO8 output lines */
 	_KHI,       /* KO9 - KO14(?) output lines */
 	_KI,        /* K input lines */
-	_4,         /* for nibble shifts */
+	_4          /* for nibble shifts */
 };
 
 struct hcd62121_dasm
