@@ -737,6 +737,17 @@ V.Smile Smartbooks
 	</software>
 
 	<software name="ariel" supported="no">
+		<description>Arielle die Meerjungfrau - Arielles aufregendes Abenteuer (Ger, Newer?)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-9214(3).bin" size="8388608" crc="fc2d6d64" sha1="3747eb33304bb49a8f9ff912c0e3e07611e078dd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ariel1" supported="no">
 		<description>Arielle Die Meerjungfrau - Arielles aufregendes Abenteuer (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -970,6 +981,17 @@ V.Smile Smartbooks
 		</part>
 	</software>
 
+	<software name="dorag" cloneof="dora" supported="no">
+		<description>Dora - Doras Reparatur-Abenteuer (Ger, Rev. 1)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92284-104.bin" size="8388608" crc="070a72dc" sha1="3ca4820f2b54040d1d111b5ac41003c6e53b9164" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="elmo" supported="no">
 		<description>Elmos großes Abenteuer (Ger)</description>
 		<year>200?</year>
@@ -1026,6 +1048,17 @@ V.Smile Smartbooks
 	</software>
 
 	<software name="lionking" supported="no">
+		<description>The Lion King - Simba's Big Adventure (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92100(4).bin" size="8388608" crc="08af3249" sha1="193d824625040ae9e30d8f5b7b74d7348bf3b7cd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkingdk" cloneof="lionking" supported="no">
 		<description>Løvernes Konge - Simbas store eventyr (Den)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1059,6 +1092,17 @@ V.Smile Smartbooks
 	</software>
 
 	<software name="mickymag" supported="no">
+		<description>Micky - Mickys magisches Abenteuer (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92084.bin" size="8388608" crc="e50692f3" sha1="5c5a338e0186fdd643441455c778780ef5936042" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickymagsw" cloneof="mickymag" supported="no">
 		<description>Musse Pigg - Musses magiska äventyr (Swe)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1334,6 +1378,17 @@ V.Smile Smartbooks
 	</software>
 
 	<software name="thomas" supported="no">
+		<description>Thomas &amp; seine Freunde - Freunde halten zusammen (Ger, Rev. 1)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92344-104.bin" size="8388608" crc="9e9fc42c" sha1="27f7e98c180ee3b51cc2ce4fc19e3f3f5777887a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thomas1" cloneof="thomas" supported="no">
 		<description>Thomas &amp; seine Freunde - Freunde halten zusammen (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1534,6 +1589,17 @@ V.Smile Smartbooks
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="52-84604.bin" size="8388608" crc="0229cf3a" sha1="9c08e6370ecf08992924f067b64dd1950e3a2c6c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kfpanda" supported="no">
+		<description>Kung Fu Panda - Der Weg des Panda (Ger) (V.Smile Motion)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="80-084124.bin" size="8388608" crc="16493095" sha1="07c75e46c294901ee9309d98c925a39dc1b5e384" offset="0" />
 			</dataarea>
 		</part>
 	</software>
