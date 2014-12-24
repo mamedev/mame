@@ -79,7 +79,8 @@ void arcompact_device::execute_run()
 #define COMMON32_GET_s12 \
 		int S_temp = (op & 0x0000003f) >> 0; \
 		int s_temp = (op & 0x00000fc0) >> 6; \
-		int S = s_temp | (S_temp<<6); \
+		INT32 S = s_temp | (S_temp<<6); \
+		if (S & 0x800) S = -0x800 + (S&0x7ff) /* sign extend */ \
 
 #define COMMON32_GET_CONDITION \
 		UINT8 condition = op & 0x0000001f;
@@ -3137,7 +3138,19 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_00_0x_helper(OPS_16, cons
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_00_00(OPS_16)  { return arcompact_handle0f_00_0x_helper(PARAMS, "J_S"); }
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_00_01(OPS_16)  { return arcompact_handle0f_00_0x_helper(PARAMS, "J_S.D"); }
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_00_02(OPS_16)  { return arcompact_handle0f_00_0x_helper(PARAMS, "JL_S");  }
+
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_00_02(OPS_16) // JL_S
+{
+	int breg;
+
+	COMMON16_GET_breg;
+	REG_16BIT_RANGE(breg);
+	
+	m_regs[REG_BLINK] = m_pc + (2 >> 0);
+	
+	return m_regs[breg];
+}
+
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_00_03(OPS_16) // JL_S.D
 {
@@ -3456,9 +3469,18 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle17_03(OPS_16)
 	return arcompact_handle_l7_0x_helper(PARAMS, "SUB_S");
 }
 
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle17_04(OPS_16)
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle17_04(OPS_16) // BSET_S b,b,u5
 {
-	return arcompact_handle_l7_0x_helper(PARAMS, "BSET_S");
+	int breg, u;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_u5;
+
+	REG_16BIT_RANGE(breg);
+
+	m_regs[breg] = m_regs[breg] | (1 << (u & 0x1f));
+
+	return m_pc + (2 >> 0);
 }
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle17_05(OPS_16)
