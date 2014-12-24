@@ -1480,11 +1480,17 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle02(OPS_32)
 	else if (a == 3)
 	{
 		if (Z == 0)
+		{
 			address = address + (s << 2);
-		else if (Z==2)
+		}
+		else if (Z == 2)
+		{
 			address = address + (s << 1);
+		}
 		else // Z == 1 and Z == 3 are invalid here
-			arcompact_fatal("illegal LD %08x (data size %d mode %d)", op, Z, a);
+		{
+			arcompact_fatal("zz_ illegal LD %08x (data size %d mode %d)", op, Z, a);
+		}
 	}
 
 	UINT32 readdata = 0;
@@ -1516,7 +1522,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle02(OPS_32)
 	}
 	else if (Z == 3)
 	{ // Z == 3 is always illegal
-		arcompact_fatal("illegal LD %08x (data size %d mode %d)", op, Z, a);
+		arcompact_fatal("xx_ illegal LD %08x (data size %d mode %d)", op, Z, a);
 	}
 
 	m_regs[areg] = readdata;
@@ -1524,8 +1530,8 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle02(OPS_32)
 	// writeback / increment
 	if ((a == 1) || (a == 2))
 	{
-		if (breg==limm)
-			arcompact_fatal("illegal LD %08x (data size %d mode %d)", op, Z, a); // using the LIMM as the base register and an increment mode is illegal
+		if (breg==LIMM_REG)
+			arcompact_fatal("yy_ illegal LD %08x (data size %d mode %d)", op, Z, a); // using the LIMM as the base register and an increment mode is illegal
 
 		m_regs[breg] = m_regs[breg] + s;
 	}
@@ -1619,7 +1625,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle03(OPS_32)
 	// writeback / increment
 	if ((a == 1) || (a == 2))
 	{
-		if (breg==limm)
+		if (breg==LIMM_REG)
 			arcompact_fatal("illegal ST %08x (data size %d mode %d)", op, Z, a); // using the LIMM as the base register and an increment mode is illegal
 
 		m_regs[breg] = m_regs[breg] + s;
@@ -2033,8 +2039,14 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_06_p11_m1(OPS_32)
 // XOR
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_07_p00(OPS_32) // XOR
 {
-	int size = 4;
-	arcompact_fatal("arcompact_handle04_07_p00 (XOR)\n");
+	SETUP_HANDLE04_0x_P00
+	m_regs[areg] = b ^ c;
+
+	if (F)
+	{
+		arcompact_fatal("arcompact_handle04_07_p00 (XOR) (F set)\n"); // not yet supported
+	}
+
 	return m_pc + (size >> 0);
 }
 
@@ -2702,8 +2714,48 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_03(OPS_32)  { return a
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_04(OPS_32)  { return arcompact_handle04_2f_helper(PARAMS, "RCC"); } // RCC
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_05(OPS_32)  { return arcompact_handle04_2f_helper(PARAMS, "SEXB"); } // SEXB
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_06(OPS_32)  { return arcompact_handle04_2f_helper(PARAMS, "SEXW"); } // SEXW
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_07(OPS_32)  { return arcompact_handle04_2f_helper(PARAMS, "EXTB"); } // EXTB
 
+// EXTB
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_07_p00(OPS_32) // note 'b' destination for 04_2f_07_xx group
+{
+	SETUP_HANDLE04_2f_0x_P00;
+	
+	m_regs[breg] = c & 0x000000ff;
+	if (F)
+	{
+		arcompact_fatal("arcompact_handle04_2f_08_p00 (EXTW) (F set)\n"); // not yet supported
+	}
+
+	return m_pc + (size >> 0);
+}
+
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_07_p01(OPS_32) 
+{
+	int size = 4;
+	arcompact_fatal("arcompact_handle04_2f_07_p01 (EXTB)\n");
+	return m_pc + (size >> 0);
+}
+
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_07_p10(OPS_32)
+{
+	int size = 4;
+	arcompact_fatal("illegal 04_2f_07_p10 (EXTB)\n"); // illegal mode because 'S' bits have already been used for opcode select
+	return m_pc + (size >> 0);
+}
+
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_07_p11_m0(OPS_32)
+{
+	int size = 4;
+	arcompact_fatal("arcompact_handle04_2f_07_p11_m0 (EXTB)\n");  // illegal mode because 'Q' bits have already been used for opcode select
+	return m_pc + (size >> 0);
+}
+
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_07_p11_m1(OPS_32)
+{
+	int size = 4;
+	arcompact_fatal("arcompact_handle04_2f_07_p11_m1 (EXTB)\n");  // illegal mode because 'Q' bits have already been used for opcode select
+	return m_pc + (size >> 0);
+}
 
 // EXTW b <- c  or  EXTW  b <- limm   or EXTW  limm <- c (no result)  or EXTW  limm, limm (invalid?)
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_08_p00(OPS_32) // note 'b' destination for 04_2f_08_xx group
@@ -2836,10 +2888,16 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle05_00_p00(OPS_32) // ASL
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle05_00_p01(OPS_32)
 {
-	int size = 4;
-	arcompact_fatal("arcompact_handle05_00_p01 (ASL)\n");
-	return m_pc + (size >> 0);
-}
+	SETUP_HANDLE04_0x_P01
+
+	m_regs[areg] = b << (c&0x1f); // c = u
+
+	if (F)
+	{
+		arcompact_fatal("arcompact_handle05_00_p01 (ASL) (F set)\n"); // not yet supported
+	}
+
+	return m_pc + (size >> 0);}
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle05_00_p10(OPS_32)
 {
@@ -3059,9 +3117,20 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0d_helper(OPS_16, const char
 }
 
 
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0d_00(OPS_16)
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0d_00(OPS_16) // ADD_S c, b,  u3   (note, c destination)
 {
-	return arcompact_handle0d_helper(PARAMS, "ADD_S");
+	int u, breg, creg;
+
+	COMMON16_GET_u3;
+	COMMON16_GET_breg;
+	COMMON16_GET_creg;
+
+	REG_16BIT_RANGE(breg);
+	REG_16BIT_RANGE(creg);
+
+	m_regs[creg] = m_regs[breg] + u;
+
+	return m_pc + (2 >> 0);
 }
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0d_01(OPS_16)
@@ -3116,9 +3185,30 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0e_0x_helper(OPS_16, const c
 
 }
 
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0e_00(OPS_16)
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0e_00(OPS_16) // ADD_s b, b, h
 {
-	return arcompact_handle0e_0x_helper(PARAMS, "ADD_S", 0);
+	int h,breg;
+	int size = 2;
+
+	GROUP_0e_GET_h;
+	COMMON16_GET_breg;
+	REG_16BIT_RANGE(breg);
+	
+	if (h == LIMM_REG)
+	{
+		UINT32 limm;
+		GET_LIMM_16;
+		size = 6;
+
+		m_regs[breg] = m_regs[breg] + limm;
+
+	}
+	else
+	{
+		m_regs[breg] = m_regs[breg] + m_regs[h];
+	}
+
+	return m_pc+ (size>>0);
 }
 
 // 16-bit MOV with extended register range
@@ -3253,7 +3343,22 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_0x_helper(OPS_16, const c
 	return m_pc + (2 >> 0);
 }
 
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_02(OPS_16)  { return arcompact_handle0f_0x_helper(PARAMS, "SUB_S",0);  }
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_02(OPS_16) // SUB_S b <- b,c
+{
+	int breg, creg;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_creg;
+
+	REG_16BIT_RANGE(breg);
+	REG_16BIT_RANGE(creg);
+
+	m_regs[breg] = m_regs[breg] - m_regs[creg];
+
+	return m_pc + (2 >> 0);
+}
+
+
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_04(OPS_16) // AND_S b <- b, c
 {
 	int breg, creg;
@@ -3530,9 +3635,18 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle17_02(OPS_16) // ASR_S b,b,u
 	return m_pc + (2 >> 0);
 }
 
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle17_03(OPS_16)
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle17_03(OPS_16) // SUB_S b,b,u5
 {
-	return arcompact_handle_l7_0x_helper(PARAMS, "SUB_S");
+	int breg, u;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_u5;
+
+	REG_16BIT_RANGE(breg);
+
+	m_regs[breg] = m_regs[breg] - u;
+
+	return m_pc + (2 >> 0);
 }
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle17_04(OPS_16) // BSET_S b,b,u5
@@ -3870,7 +3984,19 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle1e_00(OPS_16) // B_S s10  (b
 	return realaddress;
 }
 
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle1e_01(OPS_16)  { return arcompact_handle1e_0x_helper(PARAMS, "BEQ_S"); }
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle1e_01(OPS_16) // BEQ_S s10 (branch is zero bit is set)
+{
+	if (STATUS32_CHECK_Z)
+	{
+		int s = (op & 0x01ff) >> 0;	op &= ~0x01ff;
+		if (s & 0x100) s = -0x100 + (s & 0xff);
+		UINT32 realaddress = PC_ALIGNED32 + (s * 2);
+		//m_regs[REG_BLINK] = m_pc + (2 >> 0); // don't link
+		return realaddress;
+	}
+
+	return m_pc + (2 >> 0);
+}
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle1e_02(OPS_16) // BNE_S s10  (branch if zero bit isn't set)
 {
