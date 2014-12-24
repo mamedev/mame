@@ -187,7 +187,9 @@ public:
 		m_cass(*this, "cassette"),
 		m_centronics(*this, "centronics"),
 		m_cent_data_out(*this, "cent_data_out"),
-		m_bank1(*this, "bank1")
+		m_bank1(*this, "bank1"),
+		m_bank2(*this, "bank2"),
+		m_bank1_switching(0)
 	{
 	}
 
@@ -197,8 +199,10 @@ public:
 	optional_device<centronics_device> m_centronics;
 	optional_device<output_latch_device> m_cent_data_out;
 	required_memory_bank m_bank1;
+	required_memory_bank m_bank2;
 	memory_region *m_cart_rom;
 
+	int m_bank1_switching;
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_READ8_MEMBER(tutor_mapper_r);
 	DECLARE_WRITE8_MEMBER(tutor_mapper_w);
@@ -226,13 +230,26 @@ void tutor_state::machine_start()
 
 	m_tape_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tutor_state::tape_interrupt_handler),this));
 
-	m_bank1->configure_entry(0, memregion("maincpu")->base() + 0x8000);
+	m_bank1->configure_entry(0, memregion("maincpu")->base() + 0x4000);
 	m_bank1->set_entry(0);
+	m_bank2->configure_entry(0, memregion("maincpu")->base() + 0x8000);
+	m_bank2->set_entry(0);
 
 	if (m_cart_rom)
 	{
-		m_bank1->configure_entry(1, m_cart_rom->base());
-		m_bank1->set_entry(1);
+		if (m_cart_rom->bytes() > 0x4000)
+		{
+			m_bank1_switching = 1;
+			m_bank1->configure_entry(1, m_cart_rom->base());
+			m_bank1->set_entry(1);
+			m_bank2->configure_entry(1, m_cart_rom->base() + 0x4000);
+			m_bank2->set_entry(1);
+		}
+		else
+		{
+			m_bank2->configure_entry(1, m_cart_rom->base());
+			m_bank2->set_entry(1);
+		}
 	}
 }
 
@@ -323,12 +340,17 @@ WRITE8_MEMBER( tutor_state::tutor_mapper_w )
 	case 0x08:
 		/* disable cartridge ROM, enable BASIC ROM at base >8000 */
 		m_bank1->set_entry(0);
+		m_bank2->set_entry(0);
 		break;
 
 	case 0x0c:
 		/* enable cartridge ROM, disable BASIC ROM at base >8000 */
 		if (m_cart_rom)
-			m_bank1->set_entry(1);
+		{
+			if (m_bank1_switching)
+				m_bank1->set_entry(1);
+			m_bank2->set_entry(1);
+		}
 		break;
 
 	default:
@@ -516,8 +538,9 @@ WRITE8_MEMBER( tutor_state::test_w )
 #endif
 
 static ADDRESS_MAP_START(tutor_memmap, AS_PROGRAM, 8, tutor_state)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM /*system ROM*/
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1") AM_WRITENOP /*BASIC ROM & cartridge ROM*/
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1") AM_WRITENOP
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2") AM_WRITENOP
 	AM_RANGE(0xc000, 0xdfff) AM_NOP /*free for expansion, or cartridge ROM?*/
 
 	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)    /*VDP data*/
@@ -531,9 +554,11 @@ static ADDRESS_MAP_START(tutor_memmap, AS_PROGRAM, 8, tutor_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pyuutajr_mem, AS_PROGRAM, 8, tutor_state)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM /*system ROM*/
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1") AM_WRITENOP /*BASIC ROM & cartridge ROM*/
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1") AM_WRITENOP
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2") AM_WRITENOP
 	AM_RANGE(0xc000, 0xdfff) AM_NOP /*free for expansion, or cartridge ROM?*/
+
 	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)    /*VDP data*/
 	AM_RANGE(0xe002, 0xe002) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)/*VDP status*/
 	AM_RANGE(0xe100, 0xe1ff) AM_READWRITE(tutor_mapper_r, tutor_mapper_w)   /*cartridge mapper*/
@@ -542,6 +567,7 @@ static ADDRESS_MAP_START(pyuutajr_mem, AS_PROGRAM, 8, tutor_state)
 	AM_RANGE(0xea00, 0xea00) AM_READ_PORT("LINE1")
 	AM_RANGE(0xec00, 0xec00) AM_READ_PORT("LINE2")
 	AM_RANGE(0xee00, 0xee00) AM_READ_PORT("LINE3")
+
 	AM_RANGE(0xf000, 0xffff) AM_READ(tutor_highmem_r) AM_WRITENOP /*free for expansion (and internal processor RAM)*/
 ADDRESS_MAP_END
 
