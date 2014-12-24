@@ -769,6 +769,7 @@ ROM_END
 
 ROM_START( megacdj )
 	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_DEFAULT_BIOS("v100g")	// this seems the only revision where the cursor in CD menu works, allowing to boot games
 	/* Confirmed by ElBarto */
 	ROM_SYSTEM_BIOS(0, "v100s", "v1.00S")
 	ROMX_LOAD( "mpr-14088h.bin", 0x000000,  0x020000, CRC(3773d5aa) SHA1(bbf729a1aaa1667b783749299e1ad932aaf5f253), ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE)
