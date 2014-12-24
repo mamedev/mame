@@ -1186,41 +1186,206 @@ UINT32 sms_state::screen_update_sms(screen_device &screen, bitmap_rgb32 &bitmap,
 
 VIDEO_START_MEMBER(sms_state,gamegear)
 {
+	m_prev_bitmap_copied = false;
 	m_main_scr->register_screen_bitmap(m_prev_bitmap);
+	m_main_scr->register_screen_bitmap(m_gg_sms_mode_bitmap);
+	m_line_buffer = auto_alloc_array(machine(), int, 160 * 4);
+
+	save_item(NAME(m_prev_bitmap_copied));
 	save_item(NAME(m_prev_bitmap));
+	save_item(NAME(m_gg_sms_mode_bitmap));
+	save_pointer(NAME(m_line_buffer), 160 * 4);
 }
+
+VIDEO_RESET_MEMBER(sms_state,gamegear)
+{
+	if (m_prev_bitmap_copied)
+	{
+		m_prev_bitmap.fill(rgb_t::black);
+		m_prev_bitmap_copied = false;
+	}
+	if (m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode())
+	{
+		m_gg_sms_mode_bitmap.fill(rgb_t::black);
+		memset(m_line_buffer, 0, 160 * 4 * sizeof(int));
+	}
+}
+
+
+void sms_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap_rgb32 &vdp_bitmap = m_vdp->get_bitmap();
+	const rectangle visarea = screen.visible_area();
+
+	/* Plot positions relative to visarea minimum values */
+	const int plot_min_x = cliprect.min_x - visarea.min_x;
+	const int plot_max_x = MIN(cliprect.max_x - visarea.min_x, 159); // avoid m_line_buffer overflow.
+	const int plot_min_y = cliprect.min_y - visarea.min_y;
+	const int plot_max_y = cliprect.max_y - visarea.min_y;
+
+	/* For each group of 3 SMS pixels, a group of 2 GG pixels is processed.
+	   In case the cliprect coordinates may map any region of the visible area,
+	   take in account the remaining position, if any, of the first group. */
+	const int plot_x_first_group = plot_min_x - (plot_min_x % 2);
+	const int plot_y_first_group = plot_min_y - (plot_min_y % 2);
+
+	/* Calculation of the minimum scaled value for X */
+	const int visarea_xcenter = visarea.xcenter();
+	const int sms_offset_min_x = ((int) (visarea_xcenter - cliprect.min_x) / 2) * 3;
+	const int sms_min_x = visarea_xcenter - sms_offset_min_x;
+
+	/* Calculation of the minimum scaled value for Y */
+	const int visarea_ycenter = visarea.ycenter();
+	const int sms_offset_min_y = ((int) (visarea_ycenter - cliprect.min_y) / 2) * 3;
+	const int sms_min_y = visarea_ycenter - sms_offset_min_y;
+
+	int sms_y = sms_min_y;
+	int plot_y_group = plot_y_first_group;
+
+	/* Auxiliary variable for vertical scaling */
+	int sms_y2 = sms_y - 1;
+
+	for (int plot_y = plot_min_y; plot_y <= plot_max_y;)
+	{
+		for (int i = (plot_y - plot_y_group); i <= MIN(1, plot_max_y - plot_y_group); i++)
+		{
+			/* Include additional lines that have influence over what appears on the LCD */
+			const int sms_min_y2 = sms_y + i - 1;
+			const int sms_max_y2 = sms_y + i + 2;
+
+			/* Process lines, but skip those already processed before */
+			for (sms_y2 = MAX(sms_min_y2, sms_y2); sms_y2 <= sms_max_y2; sms_y2++)
+			{
+				int *combineline_buffer =  m_line_buffer + (sms_y2 & 0x03) * 160;
+
+				if (sms_y2 >= vdp_bitmap.cliprect().min_y && sms_y2 <= vdp_bitmap.cliprect().max_y)
+				{
+					UINT32 *vdp_buffer =  &vdp_bitmap.pix32(sms_y2);
+
+					int sms_x = sms_min_x;
+					int plot_x_group = plot_x_first_group;
+
+					/* Do horizontal scaling */
+					for (int plot_x = plot_min_x; plot_x <= plot_max_x;)
+					{
+ 						for (int j = (plot_x - plot_x_group); j <= MIN(1, plot_max_x - plot_x_group); j++)
+						{
+							if (sms_x + j >= vdp_bitmap.cliprect().min_x && sms_x + j + 1 <= vdp_bitmap.cliprect().max_x)
+							{
+								int combined;
+
+								switch (j)
+								{
+								case 0:
+									/* Take red and green from first pixel, and blue from second pixel */
+									combined = (vdp_buffer[sms_x] & 0x00ffff00) | (vdp_buffer[sms_x + 1] & 0x000000ff);
+									combineline_buffer[plot_x] = combined;
+									break;
+								case 1:
+									/* Take red from second pixel, and green and blue from third pixel */
+									combined = (vdp_buffer[sms_x + 1] & 0x00ff0000) | (vdp_buffer[sms_x + 2] & 0x0000ffff);
+									combineline_buffer[plot_x + 1] = combined;
+									break;
+								}
+							}
+							else
+							{
+								combineline_buffer[plot_x + j] = 0;
+							}
+						}
+						sms_x += 3;
+						plot_x += 2 - (plot_x - plot_x_group);
+						plot_x_group = plot_x;
+					}
+				}
+				else
+				{
+					memset(combineline_buffer, 0, 160 * sizeof(int));
+				}
+			}
+
+			/* Do vertical scaling for a screen with 192 or 224 lines
+			   Lines 0-2 and 221-223 have no effect on the output on the GG screen.
+			   We will calculate the gamegear lines as follows:
+			   GG_0 = 1/6 * SMS_3 + 1/3 * SMS_4 + 1/3 * SMS_5 + 1/6 * SMS_6
+			   GG_1 = 1/6 * SMS_4 + 1/3 * SMS_5 + 1/3 * SMS_6 + 1/6 * SMS_7
+			   GG_2 = 1/6 * SMS_6 + 1/3 * SMS_7 + 1/3 * SMS_8 + 1/6 * SMS_9
+			   GG_3 = 1/6 * SMS_7 + 1/3 * SMS_8 + 1/3 * SMS_9 + 1/6 * SMS_10
+			   GG_4 = 1/6 * SMS_9 + 1/3 * SMS_10 + 1/3 * SMS_11 + 1/6 * SMS_12
+			   .....
+			   GG_142 = 1/6 * SMS_216 + 1/3 * SMS_217 + 1/3 * SMS_218 + 1/6 * SMS_219
+			   GG_143 = 1/6 * SMS_217 + 1/3 * SMS_218 + 1/3 * SMS_219 + 1/6 * SMS_220
+			*/
+			{
+				int *line1, *line2, *line3, *line4;
+
+				/* Setup our source lines */
+				line1 = m_line_buffer + ((sms_y + i - 1) & 0x03) * 160;
+				line2 = m_line_buffer + ((sms_y + i - 0) & 0x03) * 160;
+				line3 = m_line_buffer + ((sms_y + i + 1) & 0x03) * 160;
+				line4 = m_line_buffer + ((sms_y + i + 2) & 0x03) * 160;
+
+				UINT32 *p_bitmap = &bitmap.pix32(visarea.min_y + plot_y + i, visarea.min_x);
+
+				for (int plot_x = plot_min_x; plot_x <= plot_max_x; plot_x++)
+				{
+					rgb_t   c1 = line1[plot_x];
+					rgb_t   c2 = line2[plot_x];
+					rgb_t   c3 = line3[plot_x];
+					rgb_t   c4 = line4[plot_x];
+					p_bitmap[plot_x] =
+						rgb_t( ( c1.r() / 6 + c2.r() / 3 + c3.r() / 3 + c4.r() / 6 ),
+						       ( c1.g() / 6 + c2.g() / 3 + c3.g() / 3 + c4.g() / 6 ),
+						       ( c1.b() / 6 + c2.b() / 3 + c3.b() / 3 + c4.b() / 6 ) );
+				}
+			}
+		}
+		sms_y += 3;
+		plot_y += 2 - (plot_y - plot_y_group);
+		plot_y_group = plot_y;
+	}
+}
+
 
 UINT32 sms_state::screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-	bitmap_rgb32 &vdp_bitmap = m_vdp->get_bitmap();
-	static bool prev_bitmap_copied = false;
+	bitmap_rgb32 *source_bitmap;
+
+	if (m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode())
+	{
+		screen_gg_sms_mode_scaling(screen, m_gg_sms_mode_bitmap, cliprect);
+		source_bitmap = &m_gg_sms_mode_bitmap;
+	}
+	else
+	{
+		source_bitmap = &m_vdp->get_bitmap();
+	}
 
 	if (!m_port_persist->read())
 	{
-		copybitmap(bitmap, vdp_bitmap, 0, 0, 0, 0, cliprect);
-		if (prev_bitmap_copied)
+		copybitmap(bitmap, *source_bitmap, 0, 0, 0, 0, cliprect);
+		if (m_prev_bitmap_copied)
 		{
 			m_prev_bitmap.fill(rgb_t::black);
-			prev_bitmap_copied = false;
+			m_prev_bitmap_copied = false;
 		}
 	}
-	else if (!prev_bitmap_copied)
+	else if (!m_prev_bitmap_copied)
 	{
-		copybitmap(bitmap, vdp_bitmap, 0, 0, 0, 0, cliprect);
-		copybitmap(m_prev_bitmap, vdp_bitmap, 0, 0, 0, 0, cliprect);
-		prev_bitmap_copied = true;
+		copybitmap(bitmap, *source_bitmap, 0, 0, 0, 0, cliprect);
+		copybitmap(m_prev_bitmap, *source_bitmap, 0, 0, 0, 0, cliprect);
+		m_prev_bitmap_copied = true;
 	}
 	else
 	{
 		// HACK: fake LCD persistence effect
 		// (it would be better to generalize this in the core, to be used for all LCD systems)
-		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			UINT32 *linedst = &bitmap.pix32(y);
-			UINT32 *line0 = &vdp_bitmap.pix32(y);
+			UINT32 *line0 = &source_bitmap->pix32(y);
 			UINT32 *line1 = &m_prev_bitmap.pix32(y);
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				UINT32 color0 = line0[x];
 				UINT32 color1 = line1[x];
@@ -1236,7 +1401,7 @@ UINT32 sms_state::screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bi
 				linedst[x] = (r << 16) | (g << 8) | b;
 			}
 		}
-		copybitmap(m_prev_bitmap, vdp_bitmap, 0, 0, 0, 0, cliprect);
+		copybitmap(m_prev_bitmap, *source_bitmap, 0, 0, 0, 0, cliprect);
 	}
 	return 0;
 }
