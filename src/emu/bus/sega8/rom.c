@@ -35,6 +35,7 @@ const device_type SEGA8_ROM_4PAK = &device_creator<sega8_4pak_device>;
 const device_type SEGA8_ROM_ZEMINA = &device_creator<sega8_zemina_device>;
 const device_type SEGA8_ROM_NEMESIS = &device_creator<sega8_nemesis_device>;
 const device_type SEGA8_ROM_JANGGUN = &device_creator<sega8_janggun_device>;
+const device_type SEGA8_ROM_HICOM = &device_creator<sega8_hicom_device>;
 const device_type SEGA8_ROM_KOREAN = &device_creator<sega8_korean_device>;
 const device_type SEGA8_ROM_KOREAN_NB = &device_creator<sega8_korean_nb_device>;
 
@@ -145,6 +146,12 @@ sega8_nemesis_device::sega8_nemesis_device(const machine_config &mconfig, const 
 sega8_janggun_device::sega8_janggun_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, SEGA8_ROM_JANGGUN, "SMS Janggun Cart", tag, owner, clock, "sega8_janggun", __FILE__),
 						device_sega8_cart_interface( mconfig, *this )
+{
+}
+
+
+sega8_hicom_device::sega8_hicom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: sega8_rom_device(mconfig, SEGA8_ROM_HICOM, "SMS Hi-Com Carts", tag, owner, clock, "sega8_hicom", __FILE__)
 {
 }
 
@@ -295,6 +302,11 @@ void sega8_janggun_device::late_bank_setup()
 	m_rom_bank_base[3] = 3;
 	m_rom_bank_base[4] = 4;
 	m_rom_bank_base[5] = 5;
+}
+
+void sega8_hicom_device::late_bank_setup()
+{
+	m_rom_bank_base = 0;
 }
 
 void sega8_korean_device::late_bank_setup()
@@ -885,6 +897,27 @@ WRITE8_MEMBER(sega8_janggun_device::write_mapper)
 	}
 }
 
+
+/*-------------------------------------------------
+ 
+ Hi-Com X-in-1 cart, uses writes to 0xffff to
+ change program bank in 0x0000-0x7fff
+ 
+ -------------------------------------------------*/
+
+READ8_MEMBER(sega8_hicom_device::read_cart)
+{
+	if (offset >= 0x8000)
+		return m_rom[offset & 0x3fff];
+	
+	return m_rom[(m_rom_bank_base * 0x8000) + offset];
+}
+
+WRITE8_MEMBER(sega8_hicom_device::write_mapper)
+{
+	if (offset == 0x03)
+		m_rom_bank_base = data % (m_rom_page_count << 1);
+}
 
 /*-------------------------------------------------
 
