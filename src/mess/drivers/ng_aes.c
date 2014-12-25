@@ -1011,7 +1011,11 @@ void ng_aes_state::common_machine_start()
 	save_item(NAME(m_vblank_interrupt_pending));
 	save_item(NAME(m_display_position_interrupt_pending));
 	save_item(NAME(m_irq3_pending));
+	save_item(NAME(m_audio_cpu_nmi_enabled));
+	save_item(NAME(m_audio_cpu_nmi_pending));
 	save_item(NAME(m_controller_select));
+	save_item(NAME(m_use_cart_vectors));
+	save_item(NAME(m_use_cart_audio));
 	//save_item(NAME(m_main_cpu_bank_address));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(ng_aes_state::neogeo_postload), this));
