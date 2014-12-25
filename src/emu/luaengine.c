@@ -337,6 +337,31 @@ int lua_engine::l_emu_hook_output(lua_State *L)
 	return 0;
 }
 
+int lua_engine::l_emu_set_hook(lua_State *L)
+{
+	luaThis->emu_set_hook(L);
+	return 0;
+}
+
+void lua_engine::emu_set_hook(lua_State *L)
+{
+	luaL_argcheck(L, lua_isfunction(L, 1) || lua_isnil(L, 1), 1, "callback function expected");
+	luaL_argcheck(L, lua_isstring(L, 2), 2, "message (string) expected");
+	const char *hookname = luaL_checkstring(L,2);
+
+	if (strcmp(hookname, "output") == 0) {
+		hook_output_cb.set(L, 1);
+		if (!output_notifier_set) {
+			output_set_notifier(NULL, s_output_notifier, this);
+			output_notifier_set = true;
+		}
+	} else if (strcmp(hookname, "frame") == 0) {
+		hook_frame_cb.set(L, 1);
+	} else {
+		luai_writestringerror("%s", "Unknown hook name, aborting.\n");
+	}
+}
+
 //-------------------------------------------------
 //  machine_get_screens - return table of available screens userdata
 //  -> manager:machine().screens[":screen"]
@@ -773,6 +798,7 @@ void lua_engine::initialize()
 			.addCFunction ("romname",     l_emu_romname )
 			.addCFunction ("keypost",     l_emu_keypost )
 			.addCFunction ("hook_output", l_emu_hook_output )
+			.addCFunction ("sethook",     l_emu_set_hook )
 			.addCFunction ("time",        l_emu_time )
 			.addCFunction ("wait",        l_emu_wait )
 			.addCFunction ("after",       l_emu_after )
@@ -834,6 +860,23 @@ void lua_engine::initialize()
 void lua_engine::start_console()
 {
 	mg_start_thread(::serve_lua, this);
+}
+
+//-------------------------------------------------
+//  frame_hook - called at each frame refresh, used to draw a HUD
+//-------------------------------------------------
+bool lua_engine::frame_hook()
+{
+	bool is_cb_hooked = false;
+	if (m_machine != NULL) {
+		// invoke registered callback (if any)
+		is_cb_hooked = hook_frame_cb.active();
+		if (is_cb_hooked) {
+			lua_State *L = hook_frame_cb.precall();
+			hook_frame_cb.call(this, L, 0);
+		}
+	}
+	return is_cb_hooked;
 }
 
 void lua_engine::periodic_check()
