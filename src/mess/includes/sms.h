@@ -19,6 +19,7 @@
 #define CONTROL1_TAG   "ctrl1"
 #define CONTROL2_TAG   "ctrl2"
 
+#include "bus/gamegear/gear2gear.h"
 #include "bus/sms_ctrl/smsctrl.h"
 #include "bus/sms_exp/smsexp.h"
 #include "bus/sega8/sega8_slot.h"
@@ -36,6 +37,8 @@ public:
 		m_region_maincpu(*this, "maincpu"),
 		m_port_ctrl1(*this, CONTROL1_TAG),
 		m_port_ctrl2(*this, CONTROL2_TAG),
+		m_port_gear2gear(*this, "gear2gear"),
+		m_port_gg_dc(*this, "GG_PORT_DC"),
 		m_port_pause(*this, "PAUSE"),
 		m_port_reset(*this, "RESET"),
 		m_port_start(*this, "START"),
@@ -63,6 +66,8 @@ public:
 	required_memory_region m_region_maincpu;
 	optional_device<sms_control_port_device> m_port_ctrl1;
 	optional_device<sms_control_port_device> m_port_ctrl2;
+	optional_device<gg_gear2gear_port_device> m_port_gear2gear;
+	optional_ioport m_port_gg_dc;
 	optional_ioport m_port_pause;
 	optional_ioport m_port_reset;
 	optional_ioport m_port_start;
@@ -195,7 +200,7 @@ protected:
 	void setup_media_slots();
 	void setup_enabled_slots();
 	void lphaser_hcount_latch();
-	void sms_get_inputs(address_space &space);
+	void sms_get_inputs();
 };
 
 class smssdisp_state : public sms_state

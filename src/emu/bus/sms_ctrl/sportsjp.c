@@ -1,13 +1,13 @@
 /**********************************************************************
 
-    Sega Master System "Sports Pad" (japanese model) emulation
+    Sega Master System "Sports Pad" (Japanese model) emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 
-// The japanese Sports Pad controller is only required to play the cartridge
+// The Japanese Sports Pad controller is only required to play the cartridge
 // Sports Pad Soccer, released in Japan. It uses a different mode than the
 // used by the US model, due to missing output lines on Sega Mark III
 // controller ports.
