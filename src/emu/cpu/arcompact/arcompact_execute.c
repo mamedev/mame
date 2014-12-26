@@ -129,6 +129,49 @@ void arcompact_device::execute_run()
 #define PC_ALIGNED32 \
 	(m_pc&0xfffffffc)
 
+int arcompact_device::check_condition(UINT8 condition)
+{
+	switch (condition & 0x1f)
+	{
+		case 0x00: return 1; // AL
+		case 0x01: return CONDITION_EQ;
+
+		case 0x02: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x03: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x04: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x05: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x06: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x07: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x08: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x09: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x0a: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x0b: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x0c: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x0d: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x0e: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x0f: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x10: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x11: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x12: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x13: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x14: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x15: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x16: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x17: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x18: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x19: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x1a: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x1b: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x1c: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x1d: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x1e: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x1f: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+	}
+
+	 return -1;
+
+}
+
 
 ARCOMPACT_RETTYPE arcompact_device::get_insruction(OPS_32)
 {
@@ -1883,13 +1926,17 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_20_p10(OPS_32)
 }
 
 
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_20_p11_m0(OPS_32)
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_20_p11_m0(OPS_32) // Jcc   (no link, no delay)
 {
 	int size = 4;
-//	UINT32 limm = 0;
+	UINT32 limm = 0;
 	int got_limm = 0;
 
 	COMMON32_GET_creg
+	COMMON32_GET_CONDITION;
+	COMMON32_GET_F
+
+	UINT32 c = 0;
 
 	if (creg == LIMM_REG)
 	{
@@ -1897,19 +1944,56 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_20_p11_m0(OPS_32)
 		// Jcc limm        0010 0RRR 1110 0000 0RRR 1111 100Q QQQQ  [LIUMM]
 		if (!got_limm)
 		{
-			//GET_LIMM_32;
+			GET_LIMM_32;
 			size = 8;
 		}
 
-		arcompact_log("unimplemented J %08x", op);
+		c = limm;
+
 	}
 	else
 	{
 		// opcode          iiii i--- ppII IIII F--- cccc ccmq qqqq
 		// Jcc [c]         0010 0RRR 1110 0000 0RRR CCCC CC0Q QQQQ
 		// no conditional links to ILINK1, ILINK2?
-		arcompact_log("unimplemented J %08x", op);
+		
+		c = m_regs[creg];
 	}
+
+	if (!check_condition(condition))
+		return m_pc + (size>>0);
+
+	if (!F)
+	{
+		// if F isn't set then the destination can't be ILINK1 or ILINK2
+
+		if ((creg == REG_ILINK1) || (creg == REG_ILINK1))
+		{
+			arcompact_fatal ("fatal arcompact_handle04_20_p11_m0 J %08x (F not set but ILINK1 or ILINK2 used as dst)", op);
+		}
+		else
+		{
+			UINT32 realaddress = c;
+			return realaddress;
+		}
+	}
+
+	if (F)
+	{ 
+		// if F is set then the destination MUST be ILINK1 or ILINK2
+
+		if ((creg == REG_ILINK1) || (creg == REG_ILINK1))
+		{
+			arcompact_log("unimplemented arcompact_handle04_20_p11_m0 J %08x (F set)", op);
+		}
+		else
+		{
+			arcompact_fatal ("fatal arcompact_handle04_20_p11_m0 J %08x (F set but not ILINK1 or ILINK2 used as dst)", op);
+
+		}	
+	}
+
+
 	return m_pc + (size>>0);
 }
 
@@ -1918,7 +2002,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_20_p11_m1(OPS_32)
 	// opcode          iiii i--- ppII IIII F--- uuuu uumq qqqq
 	// Jcc u6          0010 0RRR 1110 0000 0RRR uuuu uu1Q QQQQ
 	int size = 4;
-	arcompact_log("unimplemented J %08x", op);
+	arcompact_log("unimplemented arcompact_handle04_20_p11_m1 J %08x (u6)", op);
 	return m_pc + (size>>0);
 }
 

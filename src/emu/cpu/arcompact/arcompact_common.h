@@ -17,3 +17,5 @@ extern const char *opcodes_04[0x40];
 
 #define REG_BLINK (0x1f) // r31
 #define REG_SP (0x1c) // r28
+#define REG_ILINK1 (0x1d) // r29
+#define REG_ILINK2 (0x1e) // r30

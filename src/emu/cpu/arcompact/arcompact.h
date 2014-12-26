@@ -803,6 +803,8 @@ private:
 	inline void WRITE16(UINT32 address, UINT16 data){ 	m_program->write_word(address << 1, data); }
 	inline UINT8 READ8(UINT32 address) { return m_program->read_byte(address << 0); }
 	inline void WRITE8(UINT32 address, UINT8 data){ 	m_program->write_byte(address << 0, data); }
+	
+	int check_condition(UINT8 condition);
 
 	UINT32 m_regs[0x40];
 
@@ -842,6 +844,7 @@ private:
 
 // Condition 0x0c (LE)
 #define CONDITION_LE ((STATUS32_CHECK_Z) || (STATUS32_CHECK_N && !STATUS32_CHECK_V) ||  (!STATUS32_CHECK_N && STATUS32_CHECK_V)) // Z or (N and /V) or (/N and V) 
+#define CONDITION_EQ (STATUS32_CHECK_Z)
 
 extern const device_type ARCA5;
 
