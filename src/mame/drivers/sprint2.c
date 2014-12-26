@@ -713,4 +713,4 @@ GAME( 1976, sprint2,  sprint1, sprint2, sprint2, sprint2_state, sprint2, ROT0, "
 GAME( 1976, sprint2a, sprint1, sprint2, sprint2, sprint2_state, sprint2, ROT0, "Atari (Kee Games)", "Sprint 2 (set 2)", 0 )
 GAME( 1976, sprint2h, sprint1, sprint2, sprint2, sprint2_state, sprint2, ROT0, "hack", "Sprint 2 (color kit, Italy)", GAME_WRONG_COLORS ) // Italian hack, supposedly is color instead of b/w? how?
 GAME( 1977, dominos,  0,       dominos, dominos, sprint2_state, dominos, ROT0, "Atari", "Dominos", 0 )
-GAME( 1977, dominos4, dominos, dominos, dominos4,sprint2_state, dominos4,ROT0, "Atari", "Dominos 4 (Coctail)", 0 )
+GAME( 1977, dominos4, dominos, dominos, dominos4,sprint2_state, dominos4,ROT0, "Atari", "Dominos 4 (Cocktail)", 0 )
