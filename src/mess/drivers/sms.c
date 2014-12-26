@@ -13,7 +13,6 @@
  To do:
 
  - SIO interface for Game Gear (needs netplay, I guess)
- - Gear to Gear Port SMS Controller Adaptor
  - Sega Demo Unit II (kiosk expansion device)
  - SMS Disk System (floppy disk drive expansion device) - unreleased
  - Rapid button of Japanese Master System
@@ -24,7 +23,7 @@
  - Software compatibility flags, by region and/or BIOS
  - Emulate SRAM cartridges? (for use with Bock's dump tool)
  - Support for other DE-9 compatible controllers, like the Mega Drive 6-Button
-   that has software support (at least a test tool made by Charles MacDonald)
+   that has homebrew software support
 
  The Game Gear SIO hardware is not emulated but has some
  placeholders in 'machine/sms.c'
@@ -44,6 +43,29 @@
     Jun 27, 02 - Version bits for Game Gear (bits 6 of port 00) (ML)
     Nov-Dec, 05 - Numerous cleanups, fixes, updates (WP)
     Mar, 07 - More cleanups, fixes, mapper additions, etc (WP)
+
+--------------------------------------------------------------------------------
+
+General compatibility issues on real hardware (not emulation bugs):
+
+- Some ROMs have issues or don't work when running on a console of different
+  region;
+- Many Japanese/Korean or homebrew ROMs don't have the signature required by
+  BIOSes of consoles sold overseas;
+- Paddle games need to detect the system region as Japanese to work with the
+  Paddle controller;
+- Few games of the ones with FM support need to detect the system region as
+  Japanese to play FM sound;
+- The Light Phaser gun doesn't work with the Japanese SMS;
+- There are reports about Light Phaser working on the second Korean console
+  version, and a Korean advert shows support on the first version (Gam*Boy I,
+  although based on Japanese SMS);
+- The Korean SMS versions have Japanese-format cartridge slot, but only on the
+  first (Gam*Boy I) the region is detected as Japanese;
+- Some SMS ROMs don't run when are plugged-in to SMS expansion slot, through
+  the gender adapter;
+- Some SMS ROMs don't run when are plugged-in to a Game Gear, through the
+  Master Gear adapter;
 
 --------------------------------------------------------------------------------
 
@@ -338,10 +360,10 @@ static ADDRESS_MAP_START( gg_io, AS_IO, 8, sms_state )
 	AM_RANGE(0x40, 0x7f)                 AM_DEVWRITE("gamegear", gamegear_device, write)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, vram_read, vram_write)
 	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, register_read, register_write)
-	AM_RANGE(0xc0, 0xc0)                 AM_READ_PORT("GG_PORT_DC")
-	AM_RANGE(0xc1, 0xc1)                 AM_READ_PORT("GG_PORT_DD")
-	AM_RANGE(0xdc, 0xdc)                 AM_READ_PORT("GG_PORT_DC")
-	AM_RANGE(0xdd, 0xdd)                 AM_READ_PORT("GG_PORT_DD")
+	AM_RANGE(0xc0, 0xc0)                 AM_READ(sms_input_port_dc_r)
+	AM_RANGE(0xc1, 0xc1)                 AM_READ(sms_input_port_dd_r)
+	AM_RANGE(0xdc, 0xdc)                 AM_READ(sms_input_port_dc_r)
+	AM_RANGE(0xdd, 0xdd)                 AM_READ(sms_input_port_dd_r)
 ADDRESS_MAP_END
 
 
@@ -438,9 +460,6 @@ static INPUT_PORTS_START( gg )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("GG_PORT_DD")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("START")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -785,6 +804,10 @@ static MACHINE_CONFIG_START( gamegear, sms_state )
 	MCFG_GG_CARTRIDGE_ADD("slot", gg_cart, NULL)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "gamegear")
+
+	MCFG_GG_GEAR2GEAR_PORT_ADD("gear2gear", gg_gear2gear_port_devices, NULL)
+	MCFG_GG_GEAR2GEAR_PORT_TH_INPUT_HANDLER(WRITELINE(sms_state, sms_ctrl2_th_input)) // not verified
+	//MCFG_GG_GEAR2GEAR_PORT_PIXEL_HANDLER(READ32(sms_state, sms_pixel_color)) // only for GG-TV mod
 MACHINE_CONFIG_END
 
 
@@ -962,6 +985,10 @@ ROM_END
    - Sega Mark III Soft Desk 5
    - Sega Mark III Soft Desk 10
    - Sega Shooting Zone
+
+   The SMS Store Display Unit is labeled PD-W UNIT. Pictures found on Internet
+   show cartridges with a label where a not-for-sale message is written along
+   the information that it is for use on the Product Display-Working Unit.
 
 ***************************************************************************/
 
