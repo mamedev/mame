@@ -155,6 +155,26 @@ def EmitGroup04(f,funcname, opname, opexecute):
     print >>f, ""
     print >>f, ""
 
+#  xxx_S b, b, u5 format opcodes
+def EmitGroup17(f,funcname, opname, opexecute):
+    print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s(OPS_16)" % (funcname)
+    print >>f, "{"
+    print >>f, "	int breg, u;"
+    print >>f, "	"
+    print >>f, "	COMMON16_GET_breg;"
+    print >>f, "	COMMON16_GET_u5;"
+    print >>f, "	"
+    print >>f, "	REG_16BIT_RANGE(breg);"
+    print >>f, "	"
+    print >>f, "	%s" % (opexecute) 
+    print >>f, "	"
+    print >>f, "	return m_pc + (2 >> 0);"
+    print >>f, "}"
+    print >>f, ""
+    print >>f, ""
+
+
+
 try:
     f = open(sys.argv[1], "w")
 except Exception, err:
@@ -164,6 +184,8 @@ except Exception, err:
 
 EmitGroup04(f, "04_00", "ADD", "m_regs[areg] = b + c;" )
 
+EmitGroup04(f, "04_02", "SUB", "m_regs[areg] = b - c;" )
+
 EmitGroup04(f, "04_04", "AND", "m_regs[areg] = b & c;" )
 EmitGroup04(f, "04_05", "OR",  "m_regs[areg] = b | c;" )
 EmitGroup04(f, "04_06", "BIC", "m_regs[areg] = b & (~c);" )
@@ -171,10 +193,22 @@ EmitGroup04(f, "04_07", "XOR", "m_regs[areg] = b ^ c;" )
 
 EmitGroup04(f, "04_0f", "BSET", "m_regs[areg] = b | (1 << (c & 0x1f));" )
 
+EmitGroup04(f, "04_15", "ADD2", "m_regs[areg] = b + (c << 2);" )
 EmitGroup04(f, "04_16", "ADD3", "m_regs[areg] = b + (c << 3);" )
 
 
 EmitGroup04(f, "05_00", "ASL", "m_regs[areg] = b << (c&0x1f);" )
 EmitGroup04(f, "05_01", "LSR", "m_regs[areg] = b >> (c&0x1f);" )
+
+#  xxx_S b, b, u5 format opcodes
+EmitGroup17(f, "17_00", "ASL_S",  "m_regs[breg] = m_regs[breg] << (u&0x1f);" )
+EmitGroup17(f, "17_01", "LSR_S",  "m_regs[breg] = m_regs[breg] >> (u&0x1f);" )
+EmitGroup17(f, "17_02", "ASR_S",  "INT32 temp = (INT32)m_regs[breg]; m_regs[breg] = temp >> (u&0x1f); // treat it as a signed value, so sign extension occurs during shift" )
+EmitGroup17(f, "17_03", "SUB_S",  "m_regs[breg] = m_regs[breg] - u;" )
+EmitGroup17(f, "17_04", "BSET_S", "m_regs[breg] = m_regs[breg] | (1 << (u & 0x1f));" )
+
+EmitGroup17(f, "17_06", "BMSK_S", "m_regs[breg] = m_regs[breg] | ((1 << (u + 1)) - 1);" )
+
+
 
 

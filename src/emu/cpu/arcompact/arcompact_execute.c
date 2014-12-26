@@ -1727,10 +1727,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_01(OPS_32)
 	return arcompact_handle04_helper(PARAMS, opcodes_04[0x01], /*"ADC"*/ 0,0);
 }
 
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_02(OPS_32)  
-{ 
-	return arcompact_handle04_helper(PARAMS, opcodes_04[0x02], /*"SUB"*/ 0,0);
-}
+
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_03(OPS_32)  
 {
@@ -1900,10 +1897,6 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_14(OPS_32)
 	return arcompact_handle04_helper(PARAMS, opcodes_04[0x14], /*"ADD1"*/ 0,0);
 }
 
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_15(OPS_32)  
-{ 
-	return arcompact_handle04_helper(PARAMS, opcodes_04[0x15], /*"ADD2"*/ 0,0);
-}
 
 
 
@@ -3036,97 +3029,17 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle_l7_0x_helper(OPS_16, const 
 	return m_pc + (2 >> 0);
 }
 
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle17_00(OPS_16) // ASL_S b, b, u5
-{
-	int breg, u;
-
-	COMMON16_GET_breg;
-	COMMON16_GET_u5;
-
-	REG_16BIT_RANGE(breg);
-
-	// only bottom 5 bits are used if ASL operations, we only have 5 bits anyway here
-	m_regs[breg] = m_regs[breg] << (u&0x1f);
-
-	return m_pc + (2 >> 0);
-
-}
-
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle17_01(OPS_16)
-{
-	return arcompact_handle_l7_0x_helper(PARAMS, "LSR_S");
-}
-
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle17_02(OPS_16) // ASR_S b,b,u5
-{
-	int breg, u;
-
-	COMMON16_GET_breg;
-	COMMON16_GET_u5;
-
-	REG_16BIT_RANGE(breg);
-
-	// only bottom 5 bits are used if ASR operations, we only have 5 bits anyway here
-	INT32 temp = (INT32)m_regs[breg]; // treat it as a signed value, so sign extension occurs during shift
-	
-	m_regs[breg] = temp >> (u&0x1f);
-
-	return m_pc + (2 >> 0);
-}
-
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle17_03(OPS_16) // SUB_S b,b,u5
-{
-	int breg, u;
-
-	COMMON16_GET_breg;
-	COMMON16_GET_u5;
-
-	REG_16BIT_RANGE(breg);
-
-	m_regs[breg] = m_regs[breg] - u;
-
-	return m_pc + (2 >> 0);
-}
-
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle17_04(OPS_16) // BSET_S b,b,u5
-{
-	int breg, u;
-
-	COMMON16_GET_breg;
-	COMMON16_GET_u5;
-
-	REG_16BIT_RANGE(breg);
-
-	m_regs[breg] = m_regs[breg] | (1 << (u & 0x1f));
-
-	return m_pc + (2 >> 0);
-}
-
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle17_05(OPS_16)
 {
 	return arcompact_handle_l7_0x_helper(PARAMS, "BCLR_S");
-}
-
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle17_06(OPS_16) // BMSK b,b,u5
-{
-	int breg, u;
-
-	COMMON16_GET_breg;
-	COMMON16_GET_u5;
-
-	REG_16BIT_RANGE(breg);
-
-	u &= 0x1f;
-
-	m_regs[breg] = m_regs[breg] | ((1 << (u + 1)) - 1);
-
-	return m_pc + (2 >> 0);
 }
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle17_07(OPS_16)
 {
 	return arcompact_handle_l7_0x_helper(PARAMS, "BTST_S");
 }
+
+
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle18_0x_helper(OPS_16, const char* optext, int st)
 {
@@ -3460,7 +3373,21 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle1e_03_0x_helper(OPS_16, cons
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle1e_03_00(OPS_16)  { return arcompact_handle1e_03_0x_helper(PARAMS, "BGT_S"); }
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle1e_03_01(OPS_16)  { return arcompact_handle1e_03_0x_helper(PARAMS, "BGE_S"); }
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle1e_03_02(OPS_16)  { return arcompact_handle1e_03_0x_helper(PARAMS, "BLT_S"); }
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle1e_03_03(OPS_16)  { return arcompact_handle1e_03_0x_helper(PARAMS, "BLE_S"); }
+
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle1e_03_03(OPS_16) // BLE_S
+{
+	if (CONDITION_LE)
+	{
+		int s = (op & 0x003f) >> 0;	op &= ~0x003f;
+		if (s & 0x020) s = -0x20 + (s & 0x1f);
+		UINT32 realaddress = PC_ALIGNED32 + (s * 2);
+		//m_regs[REG_BLINK] = m_pc + (2 >> 0); // don't link
+		return realaddress;
+	}
+
+	return m_pc + (2 >> 0);
+}
+
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle1e_03_04(OPS_16)  { return arcompact_handle1e_03_0x_helper(PARAMS, "BHI_S"); }
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle1e_03_05(OPS_16)  { return arcompact_handle1e_03_0x_helper(PARAMS, "BHS_S"); }
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle1e_03_06(OPS_16)  { return arcompact_handle1e_03_0x_helper(PARAMS, "BLO_S"); }
