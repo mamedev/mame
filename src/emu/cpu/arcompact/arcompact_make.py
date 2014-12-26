@@ -9,6 +9,16 @@ def EmitGroup04_Handle_NZ_Flags(f, funcname, opname):
         print >>f, "		if (result == 0x00000000) { STATUS32_SET_Z; }"
         print >>f, "		else { STATUS32_CLEAR_Z; }"
 
+def EmitGroup04_Handle_NZC_LSR1_Flags(f, funcname, opname):
+        print >>f, "		if (result & 0x80000000) { STATUS32_SET_N; }"
+        print >>f, "		else { STATUS32_CLEAR_N; }"
+        print >>f, "		if (result == 0x00000000) { STATUS32_SET_Z; }"
+        print >>f, "		else { STATUS32_CLEAR_Z; }"
+        print >>f, "		if (c == 0x00000001) { STATUS32_SET_C; }"
+        print >>f, "		else { STATUS32_CLEAR_C; }"
+
+
+
 def EmitGroup04_no_Flags(f, funcname, opname):
        print >>f, "		// no flag changes"
 
@@ -289,7 +299,9 @@ EmitGroup04(f, "05_00", "ASL", "UINT32 result = b << (c&0x1f);", "m_regs[areg] =
 EmitGroup04(f, "05_01", "LSR", "UINT32 result = b >> (c&0x1f);", "m_regs[areg] = result;", "m_regs[breg] = result;", 0,0, -1, EmitGroup04_unsupported_Flags  )
 
 # the 04_2f subgroup uses the same encoding, but the areg is already used as sub-opcode select, so any modes relying on areg bits for other reasons (sign, condition) (modes 10, 11m0, 11m1) are illegal.  the destination is also breg not areg
-EmitGroup04(f, "04_2f_07", "EXTB", "UINT32 result = c & 0x000000ff;", "m_regs[breg] = result;","", 2,1, -1, EmitGroup04_unsupported_Flags  ) # no alt handler (invalid path)
+EmitGroup04(f, "04_2f_02", "LSR1", "UINT32 result = c >> 1;",          "m_regs[breg] = result;","", 2,1, -1, EmitGroup04_Handle_NZC_LSR1_Flags  ) # no alt handler (invalid path)
+EmitGroup04(f, "04_2f_07", "EXTB", "UINT32 result = c & 0x000000ff;",  "m_regs[breg] = result;","", 2,1, -1, EmitGroup04_unsupported_Flags  ) # ^
+EmitGroup04(f, "04_2f_08", "EXTW", "UINT32 result = c & 0x0000ffff;",  "m_regs[breg] = result;","", 2,1, -1, EmitGroup04_unsupported_Flags  ) # ^
 
 
 #  xxx_S b, b, u5 format opcodes

@@ -63,6 +63,8 @@ void arcompact_device::device_start()
 	state_add( 0,  "PC", m_debugger_temp).callimport().callexport().formatstr("%08X");
 
 	state_add( 0x10,  "STATUS32", m_debugger_temp).callimport().callexport().formatstr("%08X");
+	state_add( 0x11,  "LP_START", m_debugger_temp).callimport().callexport().formatstr("%08X");
+	state_add( 0x12,  "LP_END", m_debugger_temp).callimport().callexport().formatstr("%08X");
 
 	state_add(STATE_GENPC, "GENPC", m_debugger_temp).callexport().noshow();
 
@@ -87,6 +89,12 @@ void arcompact_device::state_export(const device_state_entry &entry)
 
 		case 0x10:
 			m_debugger_temp = m_status32;
+			break;
+		case 0x11:
+			m_debugger_temp = m_LP_START;
+			break;
+		case 0x12:
+			m_debugger_temp = m_LP_END;
 			break;
 
 		case STATE_GENPC:
@@ -116,6 +124,12 @@ void arcompact_device::state_import(const device_state_entry &entry)
 		case 0x10:
 			m_status32 = m_debugger_temp;
 			break;
+		case 0x11:
+			m_LP_START = m_debugger_temp;
+			break;
+		case 0x12:
+			m_LP_END = m_debugger_temp;
+			break;
 
 		default:
 			if ((index >= 0x100) && (index < 0x140))
@@ -137,6 +151,9 @@ void arcompact_device::device_reset()
 		m_regs[i] = 0;
 
 	m_status32 = 0;
+	m_LP_START = 0;
+	m_LP_END = 0;
+
 }
 
 /*****************************************************************************/

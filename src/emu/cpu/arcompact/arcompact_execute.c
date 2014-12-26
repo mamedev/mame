@@ -36,6 +36,17 @@ void arcompact_device::execute_run()
 			m_pc = get_insruction(op);
 		}
 
+		// hardware loops
+		if (m_pc == m_LP_END)
+		{
+			if (m_regs[REG_LP_COUNT] != 1)
+			{
+				m_pc = m_LP_START;
+			}
+			m_regs[REG_LP_COUNT]--;
+
+		}
+
 		m_icount--;
 	}
 
@@ -138,7 +149,7 @@ int arcompact_device::check_condition(UINT8 condition)
 		case 0x02: return !CONDITION_EQ; // NE
 		case 0x03: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
 		case 0x04: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
-		case 0x05: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x05: return CONDITION_CS; // CS (Carry Set / Lower than)
 		case 0x06: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
 		case 0x07: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
 		case 0x08: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
@@ -2054,23 +2065,46 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_23(OPS_32)
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_28(OPS_32) // LPcc (loop setup)
 {
 	int size = 4;
-
+//	COMMON32_GET_breg; // breg is reserved
 	COMMON32_GET_p;
-		
+
 	if (p == 0x00)
 	{
+		arcompact_fatal("<illegal LPcc, p = 0x00)");
 	}
 	else if (p == 0x01)
 	{
+		arcompact_fatal("<illegal LPcc, p = 0x01)");
 	}
 	else if (p == 0x02) // Loop unconditional
-	{
+	{ // 0010 0RRR 1010 1000 0RRR ssss ssSS SSSS
+		COMMON32_GET_s12
+		if (S & 0x800) S = -0x800 + (S&0x7ff);
+
+		arcompact_fatal("Lp unconditional not supported %d", S);
 	}
 	else if (p == 0x03) // Loop conditional
-	{
+	{ // 0010 0RRR 1110 1000 0RRR uuuu uu1Q QQQQ
+		COMMON32_GET_u6
+		COMMON32_GET_CONDITION
+		//arcompact_fatal("Lp conditional %s not supported %d", conditions[condition], u);
+		
+		// if the loop condition fails then just jump to after the end of the loop, don't set any registers
+		if (!check_condition(condition))
+		{
+			UINT32 realoffset = PC_ALIGNED32 + (u * 2);
+			return realoffset;
+		}
+		else
+		{
+			// otherwise set up the loop positions
+			m_LP_START = m_pc + (size >> 0);
+			m_LP_END = PC_ALIGNED32 + (u * 2);
+			return m_pc + (size>>0);
+		}
+
 	}
 
-	arcompact_log("unimplemented LPcc %08x", op);
 	return m_pc + (size>>0);
 
 }
@@ -2211,81 +2245,14 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_helper(OPS_32, const c
 }
 
 
-#define SETUP_HANDLE04_2f_0x_P00 \
-	int size = 4; \
-	UINT32 limm = 0; \
-	\
-	COMMON32_GET_breg; \
-	COMMON32_GET_F; \
-	COMMON32_GET_creg; \
-	\
-	UINT32 c; \
-	\
-	if (creg == LIMM_REG) \
-	{ \
-		GET_LIMM_32; \
-		size = 8; \
-		c = limm; \
-	} \
-	else \
-	{ \
-		c = m_regs[creg]; \
-	} \
-	/* todo: is the limm, limm syntax valid? (it's pointless.) */ \
-	/* todo: if breg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */ \
-
-
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_00(OPS_32)  { return arcompact_handle04_2f_helper(PARAMS, "ASL"); } // ASL
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_01(OPS_32)  { return arcompact_handle04_2f_helper(PARAMS, "ASR"); } // ASR
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_02(OPS_32)  { return arcompact_handle04_2f_helper(PARAMS, "LSR"); } // LSR
+
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_03(OPS_32)  { return arcompact_handle04_2f_helper(PARAMS, "ROR"); } // ROR
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_04(OPS_32)  { return arcompact_handle04_2f_helper(PARAMS, "RCC"); } // RCC
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_05(OPS_32)  { return arcompact_handle04_2f_helper(PARAMS, "SEXB"); } // SEXB
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_06(OPS_32)  { return arcompact_handle04_2f_helper(PARAMS, "SEXW"); } // SEXW
-
-
-// EXTW b <- c  or  EXTW  b <- limm   or EXTW  limm <- c (no result)  or EXTW  limm, limm (invalid?)
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_08_p00(OPS_32) // note 'b' destination for 04_2f_08_xx group
-{
-	SETUP_HANDLE04_2f_0x_P00;
-	
-	m_regs[breg] = c & 0x0000ffff;
-	if (F)
-	{
-		arcompact_fatal("arcompact_handle04_2f_08_p00 (EXTW) (F set)\n"); // not yet supported
-	}
-
-	return m_pc + (size >> 0);
-}
-
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_08_p01(OPS_32) 
-{
-	int size = 4;
-	arcompact_fatal("arcompact_handle04_2f_08_p01 (EXTW)\n");
-	return m_pc + (size >> 0);
-}
-
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_08_p10(OPS_32)
-{
-	int size = 4;
-	arcompact_fatal("illegal 04_2f_08_p10 (EXTW)\n"); // illegal mode because 'S' bits have already been used for opcode select
-	return m_pc + (size >> 0);
-}
-
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_08_p11_m0(OPS_32)
-{
-	int size = 4;
-	arcompact_fatal("arcompact_handle04_2f_08_p11_m0 (EXTW)\n");  // illegal mode because 'Q' bits have already been used for opcode select
-	return m_pc + (size >> 0);
-}
-
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_08_p11_m1(OPS_32)
-{
-	int size = 4;
-	arcompact_fatal("arcompact_handle04_2f_08_p11_m1 (EXTW)\n");  // illegal mode because 'Q' bits have already been used for opcode select
-	return m_pc + (size >> 0);
-}
 
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_09(OPS_32)  { return arcompact_handle04_2f_helper(PARAMS, "ABS"); } // ABS

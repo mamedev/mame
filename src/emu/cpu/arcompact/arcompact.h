@@ -186,7 +186,7 @@ protected:
 	ARCOMPACT_RETTYPE arcompact_handle04_2b(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_00(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_01(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_02(OPS_32);
+//	ARCOMPACT_RETTYPE arcompact_handle04_2f_02(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_03(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_04(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_05(OPS_32);
@@ -778,6 +778,7 @@ protected:
 	ARCOMPACT_HANDLER04_TYPE_PM(04_16);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_20);
 
+	ARCOMPACT_HANDLER04_TYPE_PM(04_2f_02);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_2f_07);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_2f_08);
 
@@ -815,6 +816,10 @@ private:
 //	f  e  d  c| b  a  9  8| 7  6  5  4| 3  2  1  0
 //  -  -  -  L| Z  N  C  V| U DE AE A2|A1 E2 E1  H
 	UINT32 m_status32;
+
+	UINT32 m_LP_START;
+	UINT32 m_LP_END;
+
 };
 
 #define V_OVERFLOW_FLAG (0x00000100)
@@ -845,6 +850,7 @@ private:
 // Condition 0x0c (LE)
 #define CONDITION_LE ((STATUS32_CHECK_Z) || (STATUS32_CHECK_N && !STATUS32_CHECK_V) ||  (!STATUS32_CHECK_N && STATUS32_CHECK_V)) // Z or (N and /V) or (/N and V) 
 #define CONDITION_EQ (STATUS32_CHECK_Z)
+#define CONDITION_CS (STATUS32_CHECK_C)
 
 extern const device_type ARCA5;
 
