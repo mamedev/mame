@@ -21,7 +21,7 @@
 //-------------------------------------------------
 
 device_sound_interface::device_sound_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device),
+	: device_interface(device, "sound"),
 		m_outputs(0),
 		m_auto_allocated_inputs(0)
 {

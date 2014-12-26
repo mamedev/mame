@@ -1,6 +1,7 @@
 #define NO_MEM_TRACKING
 
 #include "debugqtdeviceswindow.h"
+#include "debugqtdeviceinformationwindow.h"
 
 DevicesWindowModel::DevicesWindowModel(running_machine *machine, QObject *parent)
 {
@@ -18,8 +19,8 @@ QVariant DevicesWindowModel::data(const QModelIndex &index, int role) const
 
 	device_t *dev = static_cast<device_t *>(index.internalPointer());
 	switch(index.column()) {
-	case 0: return QString(dev->basetag()); break;
-	case 1: return QString(dev->name()); break;
+	case 0: return dev == &m_machine->root_device() ? QString("<root>") : QString(dev->basetag());
+	case 1: return QString(dev->name());
 	}
 
 	return QVariant();
@@ -108,6 +109,8 @@ DevicesWindow::DevicesWindow(running_machine* machine, QWidget* parent) :
 	WindowQt(machine, NULL),
 	m_devices_model(machine)
 {
+	m_selected_device = NULL;
+
 	setWindowTitle("Debug: All Devices");
 
 	if (parent != NULL)
@@ -123,12 +126,27 @@ DevicesWindow::DevicesWindow(running_machine* machine, QWidget* parent) :
 	m_devices_view->setModel(&m_devices_model);
 	m_devices_view->expandAll();
 	m_devices_view->resizeColumnToContents(0);
+	connect(m_devices_view->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex &,const QModelIndex &)), this, SLOT(currentRowChanged(const QModelIndex &,const QModelIndex &)));
+	connect(m_devices_view, SIGNAL(activated(const QModelIndex &)), this, SLOT(activated(const QModelIndex &)));
 	setCentralWidget(m_devices_view);
 }
 
 
 DevicesWindow::~DevicesWindow()
 {
+}
+
+
+void DevicesWindow::currentRowChanged(const QModelIndex &current, const QModelIndex &previous)
+{
+	m_selected_device = static_cast<device_t *>(current.internalPointer());
+}
+
+
+void DevicesWindow::activated(const QModelIndex &index)
+{
+	device_t *dev = static_cast<device_t *>(index.internalPointer());
+	(new DeviceInformationWindow(m_machine, dev, this))->show();
 }
 
 

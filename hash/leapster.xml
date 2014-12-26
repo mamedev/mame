@@ -255,4 +255,94 @@
 		</part>
 	</software>
 
+
+	<software name="princess" supported="no">
+		<description>Disney Princess (US)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-13514-a - disney princess (us).bin" size="0x800000" crc="5ccb2ad3" sha1="42740f6597f4a2eb878a54ddbf75452a2cca301d" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="backyard" supported="no">
+		<description>The Backyardigans (US)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-13453-a - the backyardigans (us).bin" size="0x800000" crc="de5fb26e" sha1="2a1df737ec907d1f1b837f9b58323ee908cb45a9" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spongez" supported="no">
+		<description>Spongebob Schwammkopf - Zeitreise durch das Wurmloch (German)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-13273-a - spongebob schwammkopf - zeitreise durch das wurmloch (german).bin" size="0x400000" crc="8761fc61" sha1="90b0e1faf6964ec74643a45b46f0b064ebf9ea8a" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonicx" supported="no">
+		<description>SonicX (US)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-12296-a - sonicx (us).bin" size="0x800000" crc="a9d2cdbd" sha1="e239b209239252f0f6cd2a4c71d2a46a3abfd5eb" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cosmicmt" supported="no">
+		<description>Cosmic Math - Arcade-Style Learning! (US)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-11994-a - cosmic math - arcade-style learning! (us).bin" size="0x400000" crc="979346d5" sha1="ecd8d3f7bae4fea1710ee99c5637224180021dd6" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batman" supported="no">
+		<description>The Batman - Multipliziere, dividiere und regiere (German)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-11972-a - the batman - multipliziere, dividiere und regiere (german).bin" size="0x800000" crc="a0a362aa" sha1="442455a0bf2c3ca4c1084a1e8761eb80a4cd71e2" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grund" supported="no">
+		<description>Grundschule 1 (German)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-10935-a - grundschule 1 (german).bin" size="0x800000" crc="6fd44f1a" sha1="fe6e8e1aaf72901820ee99d22dcc40a01d627fac" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grund2" supported="no">
+		<description>Grundschule 2 - Musik in Gefahr (German)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="500-11494-a - grundschule 2 - musik in gefahr (german).bin" size="0x800000" crc="96d30f93" sha1="61dd156ae456a370a021061da9b3a4e33bda371e" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+
 </softwarelist>

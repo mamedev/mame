@@ -59,7 +59,7 @@ class sega315_5124_device : public device_t,
 public:
 	// construction/destruction
 	sega315_5124_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	sega315_5124_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 cram_size, UINT8 palette_offset, bool supports_224_240, const char *shortname, const char *source, int xscroll_hpos = X_SCROLL_HPOS_5124);
+	sega315_5124_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 cram_size, UINT8 palette_offset, bool supports_224_240, const char *shortname, const char *source);
 
 	static void set_signal_type(device_t &device, bool is_pal) { downcast<sega315_5124_device &>(device).m_is_pal = is_pal; }
 
@@ -90,21 +90,19 @@ public:
 	virtual void set_sega315_5124_compatibility_mode( bool sega315_5124_compatibility_mode ) { };
 
 protected:
-	static const int X_SCROLL_HPOS_5124 = 21;
-	static const int X_SCROLL_HPOS_5378 = 41;  // Not verified, needed for Chicago Syndicate
-
 	void set_display_settings();
 	virtual void update_palette();
 	virtual void cram_write(UINT8 data);
 	virtual void draw_scanline( int pixel_offset_x, int pixel_plot_y, int line );
+	virtual void blit_scanline( int *line_buffer, int *priority_selected, int pixel_offset_x, int pixel_plot_y, int line );
 	virtual UINT16 get_name_table_row(int row);
 	void process_line_timer();
+	void select_sprites( int line );
 	void draw_scanline_mode4( int *line_buffer, int *priority_selected, int line );
 	void draw_sprites_mode4( int *line_buffer, int *priority_selected, int line );
 	void draw_sprites_tms9918_mode( int *line_buffer, int line );
 	void draw_scanline_mode2( int *line_buffer, int line );
 	void draw_scanline_mode0( int *line_buffer, int line );
-	void select_sprites( int line );
 	void check_pending_flags();
 
 	// device-level overrides
@@ -152,11 +150,6 @@ protected:
 	int              m_sprite_count;
 	int              m_sprite_height;
 	int              m_sprite_zoom;
-
-	/* line_buffer will be used to hold 5 lines of line data. Line #0 is the regular blitting area.
-	   Lines #1-#4 will be used as a kind of cache to be used for vertical scaling in the gamegear
-	   sms compatibility mode. */
-	int              *m_line_buffer;
 	int              m_current_palette[32];
 	bool             m_is_pal;             /* false = NTSC, true = PAL */
 	devcb_write_line m_int_cb;       /* Interrupt callback function */
@@ -183,7 +176,6 @@ protected:
 	static const device_timer_id TIMER_FLAGS = 7;
 
 	required_device<palette_device> m_palette;
-	const int        m_xscroll_hpos;
 };
 
 
@@ -212,7 +204,7 @@ protected:
 
 	virtual void update_palette();
 	virtual void cram_write(UINT8 data);
-	virtual void draw_scanline( int pixel_offset_x, int pixel_plot_y, int line );
+	virtual void blit_scanline( int *line_buffer, int *priority_selected, int pixel_offset_x, int pixel_plot_y, int line );
 	virtual UINT16 get_name_table_row(int row);
 };
 

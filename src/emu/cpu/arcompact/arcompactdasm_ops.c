@@ -457,14 +457,17 @@ int arcompact_handle04_p00_helper_dasm(DASM_OPS_32, const char* optext, int igno
 	return size;
 }
 
+// like p00 but with 'u6' istead of C
 int arcompact_handle04_p01_helper_dasm(DASM_OPS_32, const char* optext, int ignore_dst, int b_reserved)
 {
+	//           PP
+	// 0010 0bbb 01ii iiii FBBB uuuu uuAA AAAA
 	int size = 4;
 	UINT32 limm = 0;
-	//int got_limm = 0;
+//	int got_limm = 0;
 
 	COMMON32_GET_breg;
-	COMMON32_GET_F
+	COMMON32_GET_F;
 	COMMON32_GET_u6
 	COMMON32_GET_areg
 
@@ -472,41 +475,45 @@ int arcompact_handle04_p01_helper_dasm(DASM_OPS_32, const char* optext, int igno
 	output += sprintf(output, "%s", flagbit[F]);
 	//	output  += sprintf( output, " p(%d)", p);
 
+
+	if ((!b_reserved) && (breg == LIMM_REG))
+	{
+		GET_LIMM_32;
+		size = 8;
+//		got_limm = 1;
+	}
+
+	// areg can be LIMM too, but in that case LIMM indicates 'no destination' rather than an actual LIMM value following
+
+	if (ignore_dst == 0)
+	{
+		if (areg != LIMM_REG)  output += sprintf(output, " %s <-", regnames[areg]);
+		else output += sprintf(output, " <no dst> <-");
+	}
+	else if (ignore_dst == 1) // certain opcode types ignore the 'a' field entirely, it should be set to 0.
+	{
+		 if (areg) output += sprintf(output, " <reserved %d> <-", areg);
+	}
+	else if (ignore_dst == 2) // for multiply operations areg should always be set to LIMM
+	{
+		if (areg != LIMM_REG) output += sprintf(output, " <invalid %d> <-", areg);
+		else  output += sprintf(output, " <mulres> <-");
+	}
+
 	if (!b_reserved)
 	{
 		if (breg == LIMM_REG)
-		{
-			GET_LIMM_32;
-			size = 8;
-			//got_limm = 1;
-			output += sprintf(output, " 0x%08x ", limm);
-
-		}
+			output += sprintf(output, " 0x%08x,", limm);
 		else
-		{
-			output += sprintf(output, " %s, ", regnames[breg]);
-		}
+			output += sprintf(output, " %s,", regnames[breg]);
 	}
 	else
 	{
-		if (breg) output += sprintf(output, "reserved(%s), ", regnames[breg]);
+		if (breg) output += sprintf(output, "<reserved %d>,", breg);
 	}
 
-	output += sprintf(output, " 0x%02x ", u);
-	if (ignore_dst == 0)
-	{
-		if (areg != LIMM_REG)  output += sprintf(output, "DST(%s)", regnames[areg]);
-		else output += sprintf(output, "<no dst>");
-	}
-	else
-	{
-		if (ignore_dst == 1) { if (areg) output += sprintf(output, "unused(%s)", regnames[areg]); }
-		else
-		{
-			if (areg != LIMM_REG) output += sprintf(output, "invalid(%s)", regnames[areg]);
-			else  output += sprintf(output, "<mulres>");
-		} // mul operations expect A to be set to LIMM (no output)
-	}
+	output += sprintf(output, " 0x%02x", u);
+
 	return size;
 }
 
@@ -1154,7 +1161,10 @@ int arcompact_handle04_2f_04_dasm(DASM_OPS_32)  { return arcompact_handle04_2f_h
 int arcompact_handle04_2f_05_dasm(DASM_OPS_32)  { return arcompact_handle04_2f_helper_dasm(DASM_PARAMS, "SEXB"); } // SEXB
 int arcompact_handle04_2f_06_dasm(DASM_OPS_32)  { return arcompact_handle04_2f_helper_dasm(DASM_PARAMS, "SEXW"); } // SEXW
 int arcompact_handle04_2f_07_dasm(DASM_OPS_32)  { return arcompact_handle04_2f_helper_dasm(DASM_PARAMS, "EXTB"); } // EXTB
+
 int arcompact_handle04_2f_08_dasm(DASM_OPS_32)  { return arcompact_handle04_2f_helper_dasm(DASM_PARAMS, "EXTW"); } // EXTW
+
+
 int arcompact_handle04_2f_09_dasm(DASM_OPS_32)  { return arcompact_handle04_2f_helper_dasm(DASM_PARAMS, "ABS"); } // ABS
 int arcompact_handle04_2f_0a_dasm(DASM_OPS_32)  { return arcompact_handle04_2f_helper_dasm(DASM_PARAMS, "NOT"); } // NOT
 int arcompact_handle04_2f_0b_dasm(DASM_OPS_32)  { return arcompact_handle04_2f_helper_dasm(DASM_PARAMS, "RCL"); } // RLC
@@ -1716,7 +1726,7 @@ int arcompact_handle17_07_dasm(DASM_OPS_16)
 
 // op bits remaining for 0x18_xx subgroups 0x071f 
 
-int arcompact_handle18_0x_helper_dasm(DASM_OPS_16, const char* optext, int st)
+int arcompact_handle18_0x_helper_dasm(DASM_OPS_16, const char* optext, int st, int format)
 {
 	int breg, u;
 
@@ -1728,34 +1738,37 @@ int arcompact_handle18_0x_helper_dasm(DASM_OPS_16, const char* optext, int st)
 	output  += sprintf( output, "%s %s ", optext, regnames[breg]);
 	if (st==1) output  += sprintf( output, "-> ");
 	else output  += sprintf( output, "<- ");
-	output  += sprintf( output, "[SP, 0x%02x]", u*4);
+
+	if (format==0) output  += sprintf( output, "[SP, 0x%02x]", u*4);
+	else  output  += sprintf( output, "SP, 0x%02x", u*4);
+
 
 	return 2;
 }
 
 int arcompact_handle18_00_dasm(DASM_OPS_16) 
 {
-	return arcompact_handle18_0x_helper_dasm(DASM_PARAMS, "LD_S", 0);
+	return arcompact_handle18_0x_helper_dasm(DASM_PARAMS, "LD_S", 0,0);
 }
 
 int arcompact_handle18_01_dasm(DASM_OPS_16) 
 {
-	return arcompact_handle18_0x_helper_dasm(DASM_PARAMS, "LDB_S", 0);
+	return arcompact_handle18_0x_helper_dasm(DASM_PARAMS, "LDB_S", 0,0);
 }
 
 int arcompact_handle18_02_dasm(DASM_OPS_16) 
 {
-	return arcompact_handle18_0x_helper_dasm(DASM_PARAMS, "ST_S", 1);
+	return arcompact_handle18_0x_helper_dasm(DASM_PARAMS, "ST_S", 1,0);
 }
 
 int arcompact_handle18_03_dasm(DASM_OPS_16) 
 {
-	return arcompact_handle18_0x_helper_dasm(DASM_PARAMS, "STB_S", 1);
+	return arcompact_handle18_0x_helper_dasm(DASM_PARAMS, "STB_S", 1,0);
 }
 
 int arcompact_handle18_04_dasm(DASM_OPS_16) 
 {
-	return arcompact_handle18_0x_helper_dasm(DASM_PARAMS, "ADD_S", 1); // check format
+	return arcompact_handle18_0x_helper_dasm(DASM_PARAMS, "ADD_S", 1,1); // check format
 }
 
 // op bits remaining for 0x18_05_xx subgroups 0x001f
@@ -1911,7 +1924,7 @@ int arcompact_handle1d_helper_dasm(DASM_OPS_16, const char* optext)
 	int s = (op & 0x007f) >> 0;	op &= ~0x007f;
 	if (s & 0x40) s = -0x40 + (s & 0x3f);
 
-	print("%s %s %08x", optext, regnames[breg], PC_ALIGNED32 + s*2);
+	print("%s %s, 0 to 0x%08x", optext, regnames[breg], PC_ALIGNED32 + s*2);
 	return 2;
 }
 
@@ -1931,7 +1944,7 @@ int arcompact_handle1e_0x_helper_dasm(DASM_OPS_16, const char* optext)
 
 
 
-int arcompact_handle1e_00_dasm(DASM_OPS_16)  { return arcompact_handle1e_0x_helper_dasm(DASM_PARAMS, "BL_S");  }
+int arcompact_handle1e_00_dasm(DASM_OPS_16)  { return arcompact_handle1e_0x_helper_dasm(DASM_PARAMS, "B_S");  }
 int arcompact_handle1e_01_dasm(DASM_OPS_16)  { return arcompact_handle1e_0x_helper_dasm(DASM_PARAMS, "BEQ_S"); }
 int arcompact_handle1e_02_dasm(DASM_OPS_16)  { return arcompact_handle1e_0x_helper_dasm(DASM_PARAMS, "BNE_S"); }
 

@@ -11518,11 +11518,21 @@ DRIVER_INIT_MEMBER(cps_state, ganbare)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff0000, 0xffffff, read16_delegate(FUNC(cps_state::ganbare_ram_r),this), write16_delegate(FUNC(cps_state::ganbare_ram_w),this));
 }
 
+READ16_MEMBER(cps_state::dinohunt_sound_r)
+{
+	/*TODO: understand what's really going on here. According to MT05805;
+	"I think that the values written are only qsound leftovers (after a lot of 0xFF values,
+	there is the same qsound starting sequence, eg: 0x88, 0xFF, 0x0B, 0x00, 0x00, 0x00, ...)."*/
+	return 0xff;
+}
+
 DRIVER_INIT_MEMBER(cps_state,dinohunt)
 {
 	// is this shared with the new sound hw?
-	UINT8* ram = (UINT8*)m_maincpu->space(AS_PROGRAM).install_ram(0xf18000, 0xf19fff);
-	memset(ram,0xff,0x2000);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf18000, 0xf19fff, read16_delegate(FUNC(cps_state::dinohunt_sound_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_port(0xfc0000, 0xfc0001, "IN2"); ;
+	// the ym2151 doesn't seem to be used. Is it actually on the PCB?
+	
 	DRIVER_INIT_CALL(cps1);
 }
 

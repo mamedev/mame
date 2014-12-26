@@ -766,6 +766,7 @@ static MACHINE_CONFIG_START( gamegear, sms_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_gamegear)
 
 	MCFG_VIDEO_START_OVERRIDE(sms_state,gamegear)
+	MCFG_VIDEO_RESET_OVERRIDE(sms_state,gamegear)
 
 	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5378, 0)
 	MCFG_SEGA315_5378_SET_SCREEN("screen")

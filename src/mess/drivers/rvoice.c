@@ -388,7 +388,7 @@ MACHINE_CONFIG_END
 ROM_START(rvoicepc)
 
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("rv_pc.bin", 0x08000, 0x08000, CRC(4001CD5F) SHA1(D973C6E19E493EEDD4F7216BC530DDB0B6C4921E))
+	ROM_LOAD("rv_pc.bin", 0x08000, 0x08000, CRC(4001cd5f) SHA1(d973c6e19e493eedd4f7216bc530ddb0b6c4921e))
 	ROM_CONTINUE(0x8000, 0x8000) // first half of 27c512 rom is blank due to stupid address decoder circuit
 
 ROM_END

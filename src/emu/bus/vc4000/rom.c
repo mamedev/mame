@@ -193,6 +193,7 @@
 //-------------------------------------------------
 
 const device_type VC4000_ROM_STD = &device_creator<vc4000_rom_device>;
+const device_type VC4000_ROM_ROM4K = &device_creator<vc4000_rom4k_device>;
 const device_type VC4000_ROM_RAM1K = &device_creator<vc4000_ram1k_device>;
 const device_type VC4000_ROM_CHESS2 = &device_creator<vc4000_chess2_device>;
 
@@ -206,6 +207,11 @@ vc4000_rom_device::vc4000_rom_device(const machine_config &mconfig, device_type 
 vc4000_rom_device::vc4000_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, VC4000_ROM_STD, "VC 4000 Standard Carts", tag, owner, clock, "vc4000_rom", __FILE__),
 						device_vc4000_cart_interface( mconfig, *this )
+{
+}
+
+vc4000_rom4k_device::vc4000_rom4k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: vc4000_rom_device(mconfig, VC4000_ROM_ROM4K, "VC 4000 Carts w/4K ROM", tag, owner, clock, "vc4000_rom4k", __FILE__)
 {
 }
 

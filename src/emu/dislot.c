@@ -10,7 +10,7 @@
 #include "emuopts.h"
 
 device_slot_interface::device_slot_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device),
+	: device_interface(device, "slot"),
 	m_default_option(NULL),
 	m_fixed(false)
 {
@@ -81,7 +81,7 @@ device_t* device_slot_interface::get_card_device()
 
 
 device_slot_card_interface::device_slot_card_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device)
+	: device_interface(device, "slot")
 {
 }
 

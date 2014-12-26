@@ -71,6 +71,7 @@ PAL frame timing
 #define VCOUNT_CHANGE_HPOS    23
 #define SPROVR_HPOS           24
 #define SPRCOL_BASEHPOS       59
+#define XSCROLL_HPOS          21
 #define DISPLAY_DISABLED_HPOS 24 /* not verified, works if above 18 (for 'pstrike2') and below 25 (for 'fantdizzy') */
 #define DISPLAY_CB_HPOS       2  /* fixes 'roadrash' (SMS game) title scrolling, due to line counter reload timing */
 
@@ -161,12 +162,11 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, const ch
 	, m_pause_cb(*this)
 	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(sega315_5124))
 	, m_palette(*this, "palette")
-	, m_xscroll_hpos(X_SCROLL_HPOS_5124)
 {
 }
 
 
-sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 cram_size, UINT8 palette_offset, bool supports_224_240, const char *shortname, const char *source, int xscroll_hpos)
+sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 cram_size, UINT8 palette_offset, bool supports_224_240, const char *shortname, const char *source)
 	: device_t( mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
@@ -178,19 +178,18 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 	, m_pause_cb(*this)
 	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(sega315_5124))
 	, m_palette(*this, "palette")
-	, m_xscroll_hpos(xscroll_hpos)
 {
 }
 
 
 sega315_5246_device::sega315_5246_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: sega315_5124_device( mconfig, SEGA315_5246, "Sega 315-5246 VDP", tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true, "sega315_5246", __FILE__, X_SCROLL_HPOS_5124)
+	: sega315_5124_device( mconfig, SEGA315_5246, "Sega 315-5246 VDP", tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true, "sega315_5246", __FILE__)
 {
 }
 
 
 sega315_5378_device::sega315_5378_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: sega315_5124_device( mconfig, SEGA315_5378, "Sega 315-5378", tag, owner, clock, SEGA315_5378_CRAM_SIZE, 0x10, true, "sega315_5378", __FILE__, X_SCROLL_HPOS_5378)
+	: sega315_5124_device( mconfig, SEGA315_5378, "Sega 315-5378 VDP", tag, owner, clock, SEGA315_5378_CRAM_SIZE, 0x10, true, "sega315_5378", __FILE__)
 {
 }
 
@@ -298,13 +297,11 @@ void sega315_5124_device::hcount_latch_at_hpos( int hpos )
 {
 	const int active_scr_start = 46;      /* 9 + 2 + 14 + 8 + 13 */
 
-	/* The emulation core returns a screen hpos that is one position ahead in comparison
-	   with the expected VDP hclock value, if the same range is used (from 0 to width-1). */
+	/* The hcount value returned by the VDP seems to be based on the previous hpos */
 	int hclock = hpos - 1;
 	if (hclock < 0)
 		hclock += SEGA315_5124_WIDTH;
 
-	/* Calculate and store the new hcount. */
 	m_hcounter = ((hclock - active_scr_start) >> 1) & 0xff;
 }
 
@@ -453,8 +450,9 @@ void sega315_5124_device::process_line_timer()
 		m_rborder_timer->adjust( m_screen->time_until_pos( vpos, SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256 ), vpos );
 
 		/* Draw middle of the border */
-		/* We need to do this through the regular drawing function so it will */
-		/* be included in the gamegear scaling functions */
+		/* We need to do this through the regular drawing function */
+		/* so sprite collisions can occur on the border. */
+		select_sprites( vpos - (vpos_limit - m_frame_timing[ACTIVE_DISPLAY_V]) );
 		m_draw_timer->adjust( m_screen->time_until_pos( vpos, m_draw_time ), vpos_limit - m_frame_timing[ACTIVE_DISPLAY_V] );
 		return;
 	}
@@ -508,8 +506,8 @@ void sega315_5124_device::process_line_timer()
 		m_rborder_timer->adjust( m_screen->time_until_pos( vpos, SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256 ), vpos );
 
 		/* Draw middle of the border */
-		/* We need to do this through the regular drawing function so it will */
-		/* be included in the gamegear scaling functions */
+		/* We need to do this through the regular drawing function */
+		/* so sprite collisions can occur on the border. */
 		select_sprites( vpos - (vpos_limit + m_frame_timing[TOP_BORDER]) );
 		m_draw_timer->adjust( m_screen->time_until_pos( vpos, m_draw_time ), vpos_limit + m_frame_timing[TOP_BORDER] );
 		return;
@@ -572,7 +570,7 @@ void sega315_5124_device::check_pending_flags()
 	if ((m_pending_status & STATUS_HINT) && hpos >= HINT_HPOS)
 	{
 		m_pending_status &= ~STATUS_HINT;
-		m_status |= STATUS_HINT;   // fake flag.
+		m_status |= STATUS_HINT;   // fake flag, it is overridden on register read.
 	}
 	if ((m_pending_status & STATUS_VINT) && hpos >= VINT_FLAG_HPOS)
 	{
@@ -691,7 +689,7 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 					m_display_disabled = !(m_reg[0x01] & 0x40);
 				break;
 			case 8:
-				if (m_screen->hpos() <= m_xscroll_hpos)
+				if (m_screen->hpos() <= XSCROLL_HPOS)
 					m_reg8copy = m_reg[0x08];
 			}
 
@@ -820,7 +818,7 @@ void sega315_5124_device::draw_scanline_mode4( int *line_buffer, int *priority_s
 		bit_plane_2 = space().read_byte(((tile_selected << 5) + ((tile_line & 0x07) << 2)) + 0x02);
 		bit_plane_3 = space().read_byte(((tile_selected << 5) + ((tile_line & 0x07) << 2)) + 0x03);
 
-		for (pixel_x = 0; pixel_x < 8 ; pixel_x++)
+		for (pixel_x = 0; pixel_x < 8; pixel_x++)
 		{
 			UINT8 pen_bit_0, pen_bit_1, pen_bit_2, pen_bit_3;
 			UINT8 pen_selected;
@@ -834,7 +832,6 @@ void sega315_5124_device::draw_scanline_mode4( int *line_buffer, int *priority_s
 			if (palette_selected)
 				pen_selected |= 0x10;
 
-
 			if (!horiz_selected)
 			{
 				pixel_plot_x = pixel_x;
@@ -843,11 +840,21 @@ void sega315_5124_device::draw_scanline_mode4( int *line_buffer, int *priority_s
 			{
 				pixel_plot_x = 7 - pixel_x;
 			}
+
 			pixel_plot_x = (0 - (x_scroll & 0x07) + (tile_column << 3) + pixel_plot_x);
 			if (pixel_plot_x >= 0 && pixel_plot_x < 256)
 			{
 				//logerror("%x %x\n", pixel_plot_x, line);
-				line_buffer[pixel_plot_x] = m_current_palette[pen_selected];
+				if (tile_column == 0 && (x_scroll & 0x07))
+				{
+					/* the VDP only draws the first column when it has completely entered
+					   in the screen, else it is filled with the sprite pattern #0 */
+					line_buffer[pixel_plot_x] = m_current_palette[0x10];
+				}
+				else
+				{
+					line_buffer[pixel_plot_x] = m_current_palette[pen_selected];
+				}
 				priority_selected[pixel_plot_x] = priority_select | (pen_selected & 0x0f);
 			}
 		}
@@ -1016,8 +1023,8 @@ void sega315_5124_device::select_sprites( int line )
 void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_selected, int line )
 {
 	bool sprite_col_occurred = false;
-	int sprite_col_x = SEGA315_5124_WIDTH;
-	UINT8 collision_buffer[SEGA315_5124_WIDTH];
+	int sprite_col_x = 255;
+	UINT8 collision_buffer[256];
 	int plot_min_x = 0;
 
 	if (m_display_disabled || m_sprite_count == 0)
@@ -1027,7 +1034,7 @@ void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_se
 	if (m_reg[0x00] & 0x20)
 		plot_min_x = 8;
 
-	memset(collision_buffer, 0, SEGA315_5124_WIDTH);
+	memset(collision_buffer, 0, sizeof(collision_buffer));
 
 	/* Draw sprite layer */
 	for (int sprite_buffer_index = m_sprite_count - 1; sprite_buffer_index >= 0; sprite_buffer_index--)
@@ -1041,72 +1048,35 @@ void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_se
 		UINT8 bit_plane_2 = space().read_byte((sprite_tile_selected << 5) + sprite_pattern_line + 0x02);
 		UINT8 bit_plane_3 = space().read_byte((sprite_tile_selected << 5) + sprite_pattern_line + 0x03);
 
-		for (int pixel_x = 0; pixel_x < 8 ; pixel_x++)
+		for (int pixel_x = 0; pixel_x < 8; pixel_x++)
 		{
+			int pixel_plot_x;
 			UINT8 pen_bit_0 = (bit_plane_0 >> (7 - pixel_x)) & 0x01;
 			UINT8 pen_bit_1 = (bit_plane_1 >> (7 - pixel_x)) & 0x01;
 			UINT8 pen_bit_2 = (bit_plane_2 >> (7 - pixel_x)) & 0x01;
 			UINT8 pen_bit_3 = (bit_plane_3 >> (7 - pixel_x)) & 0x01;
 			UINT8 pen_selected = (pen_bit_3 << 3 | pen_bit_2 << 2 | pen_bit_1 << 1 | pen_bit_0) | 0x10;
 
-			if (pen_selected == 0x10)       /* Transparent palette so skip draw */
+			if (pen_selected == 0x10)
 			{
+				/* Transparent palette so skip draw */
 				continue;
 			}
 
 			if (m_sprite_zoom > 1)
 			{
 				/* sprite doubling is enabled */
-				int pixel_plot_x = sprite_x + (pixel_x << 1);
-
-				/* check to prevent going outside of active display area */
-				if (pixel_plot_x < plot_min_x || pixel_plot_x > 255)
-				{
-					continue;
-				}
-
-				if (!(priority_selected[pixel_plot_x] & PRIORITY_BIT))
-				{
-					line_buffer[pixel_plot_x] = m_current_palette[pen_selected];
-					priority_selected[pixel_plot_x] = pen_selected;
-					line_buffer[pixel_plot_x + 1] = m_current_palette[pen_selected];
-					priority_selected[pixel_plot_x + 1] = pen_selected;
-				}
-				else
-				{
-					if (priority_selected[pixel_plot_x] == PRIORITY_BIT)
-					{
-						line_buffer[pixel_plot_x] = m_current_palette[pen_selected];
-						priority_selected[pixel_plot_x] = pen_selected;
-					}
-					if (priority_selected[pixel_plot_x + 1] == PRIORITY_BIT)
-					{
-						line_buffer[pixel_plot_x + 1] = m_current_palette[pen_selected];
-						priority_selected[pixel_plot_x + 1] = pen_selected;
-					}
-				}
-				if (collision_buffer[pixel_plot_x] != 1)
-				{
-					collision_buffer[pixel_plot_x] = 1;
-				}
-				else
-				{
-					sprite_col_occurred = true;
-					sprite_col_x = MIN(sprite_col_x, pixel_plot_x);
-				}
-				if (collision_buffer[pixel_plot_x + 1] != 1)
-				{
-					collision_buffer[pixel_plot_x + 1] = 1;
-				}
-				else
-				{
-					sprite_col_occurred = true;
-					sprite_col_x = MIN(sprite_col_x, pixel_plot_x);
-				}
+				pixel_plot_x = sprite_x + (pixel_x << 1);
 			}
 			else
 			{
-				int pixel_plot_x = sprite_x + pixel_x;
+				pixel_plot_x = sprite_x + pixel_x;
+			}
+
+			/* Draw at pixel position and, if zoomed, at pixel+1 */
+			for (int zoom = 0; zoom < m_sprite_zoom; zoom++)
+			{
+				pixel_plot_x += zoom;
 
 				/* check to prevent going outside of active display area */
 				if (pixel_plot_x < plot_min_x || pixel_plot_x > 255)
@@ -1121,6 +1091,7 @@ void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_se
 				}
 				else
 				{
+					/* Check if the higher priority background has transparent pixel */
 					if (priority_selected[pixel_plot_x] == PRIORITY_BIT)
 					{
 						line_buffer[pixel_plot_x] = m_current_palette[pen_selected];
@@ -1150,13 +1121,13 @@ void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_se
 void sega315_5124_device::draw_sprites_tms9918_mode( int *line_buffer, int line )
 {
 	bool sprite_col_occurred = false;
-	int sprite_col_x = SEGA315_5124_WIDTH;
-	UINT8 collision_buffer[SEGA315_5124_WIDTH];
+	int sprite_col_x = 255;
+	UINT8 collision_buffer[256];
 
 	if (m_display_disabled || m_sprite_count == 0)
 		return;
 
-	memset(collision_buffer, 0, SEGA315_5124_WIDTH);
+	memset(collision_buffer, 0, sizeof(collision_buffer));
 
 	/* Draw sprite layer */
 	for (int sprite_buffer_index = m_sprite_count - 1; sprite_buffer_index >= 0; sprite_buffer_index--)
@@ -1168,127 +1139,41 @@ void sega315_5124_device::draw_sprites_tms9918_mode( int *line_buffer, int line 
 		int sprite_tile_selected = m_sprite_tile_selected[sprite_buffer_index];
 		UINT16 sprite_pattern_line = m_sprite_pattern_line[sprite_buffer_index];
 
-		UINT8 pattern = space().read_byte( sprite_pattern_line + sprite_tile_selected * 8 );
-
-		for (int pixel_x = 0; pixel_x < 8; pixel_x++)
+		for (int height = 8; height <= m_sprite_height; height += 8)
 		{
-			if (m_reg[0x01] & 0x01)
+			if (height == 16)
 			{
-				int pixel_plot_x = sprite_x + pixel_x * 2;
-
-				if (pixel_plot_x < 0 || pixel_plot_x > 255)
-				{
-					continue;
-				}
-
-				if (pen_selected && (pattern & (1 << (7 - pixel_x))))
-				{
-					line_buffer[pixel_plot_x] = m_current_palette[pen_selected];
-
-					if (collision_buffer[pixel_plot_x] != 1)
-					{
-						collision_buffer[pixel_plot_x] = 1;
-					}
-					else
-					{
-						sprite_col_occurred = true;
-						sprite_col_x = MIN(sprite_col_x, pixel_plot_x);
-					}
-
-					line_buffer[pixel_plot_x+1] = m_current_palette[pen_selected];
-
-					if (collision_buffer[pixel_plot_x + 1] != 1)
-					{
-						collision_buffer[pixel_plot_x + 1] = 1;
-					}
-					else
-					{
-						sprite_col_occurred = true;
-						sprite_col_x = MIN(sprite_col_x, pixel_plot_x);
-					}
-				}
+				sprite_tile_selected += 2;
+				sprite_x += (m_sprite_zoom > 1 ? 16 : 8);
 			}
-			else
-			{
-				int pixel_plot_x = sprite_x + pixel_x;
 
-				if (pixel_plot_x < 0 || pixel_plot_x > 255)
-				{
-					continue;
-				}
-
-				if (pen_selected && (pattern & (1 << (7 - pixel_x))))
-				{
-					line_buffer[pixel_plot_x] = m_current_palette[pen_selected];
-
-					if (collision_buffer[pixel_plot_x] != 1)
-					{
-						collision_buffer[pixel_plot_x] = 1;
-					}
-					else
-					{
-						sprite_col_occurred = true;
-						sprite_col_x = MIN(sprite_col_x, pixel_plot_x);
-					}
-				}
-			}
-		}
-
-		if (m_sprite_height == 16)
-		{
-			sprite_tile_selected += 2;
-			pattern = space().read_byte( sprite_pattern_line + sprite_tile_selected * 8 );
-			sprite_x += (m_sprite_zoom > 1 ? 16 : 8);
+			UINT8 pattern = space().read_byte( sprite_pattern_line + sprite_tile_selected * 8 );
 
 			for (int pixel_x = 0; pixel_x < 8; pixel_x++)
 			{
-				if (m_reg[0x01] & 0x01)
+				if (pen_selected && (pattern & (1 << (7 - pixel_x))))
 				{
-					int pixel_plot_x = sprite_x + pixel_x * 2;
-
-					if (pixel_plot_x < 0 || pixel_plot_x > 255)
+					int pixel_plot_x;
+					if (m_sprite_zoom > 1)
 					{
-						continue;
+						pixel_plot_x = sprite_x + (pixel_x << 1);
+					}
+					else
+					{
+						pixel_plot_x = sprite_x + pixel_x;
 					}
 
-					if (pen_selected && (pattern & (1 << (7 - pixel_x))))
+					/* Draw at pixel position and, if zoomed, at pixel+1 */
+					for (int zoom = 0; zoom < m_sprite_zoom; zoom++)
 					{
-						line_buffer[pixel_plot_x] = m_current_palette[pen_selected];
+						pixel_plot_x += zoom;
 
-						if (collision_buffer[pixel_plot_x] != 1)
+						/* check to prevent going outside of active display area */
+						if (pixel_plot_x < 0 || pixel_plot_x > 255)
 						{
-							collision_buffer[pixel_plot_x] = 1;
-						}
-						else
-						{
-							sprite_col_occurred = true;
-							sprite_col_x = MIN(sprite_col_x, pixel_plot_x);
+							continue;
 						}
 
-						line_buffer[pixel_plot_x+1] = m_current_palette[pen_selected];
-
-						if (collision_buffer[pixel_plot_x + 1] != 1)
-						{
-							collision_buffer[pixel_plot_x + 1] = 1;
-						}
-						else
-						{
-							sprite_col_occurred = true;
-							sprite_col_x = MIN(sprite_col_x, pixel_plot_x);
-						}
-					}
-				}
-				else
-				{
-					int pixel_plot_x = sprite_x + pixel_x;
-
-					if (pixel_plot_x < 0 || pixel_plot_x > 255)
-					{
-						continue;
-					}
-
-					if (pen_selected && (pattern & (1 << (7 - pixel_x))))
-					{
 						line_buffer[pixel_plot_x] = m_current_palette[pen_selected];
 
 						if (collision_buffer[pixel_plot_x] != 1)
@@ -1403,8 +1288,7 @@ void sega315_5124_device::draw_scanline_mode0( int *line_buffer, int line )
 
 void sega315_5124_device::draw_scanline( int pixel_offset_x, int pixel_plot_y, int line )
 {
-	int x;
-	int *blitline_buffer = m_line_buffer;
+	int blitline_buffer[256];
 	int priority_selected[256];
 
 	/* Sprite processing is restricted because collisions on top border of extended
@@ -1448,217 +1332,102 @@ void sega315_5124_device::draw_scanline( int pixel_offset_x, int pixel_plot_y, i
 			if ( line >= 0 || ( line >= -13 && m_y_pixels == 192 ) )
 			{
 				draw_sprites_mode4( blitline_buffer, priority_selected, line );
-				if ( line >= 0 )
-				{
-					/* Fill column 0 with overscan color from m_reg[0x07] */
-					if (m_reg[0x00] & 0x20)
-					{
-						blitline_buffer[0] = m_current_palette[BACKDROP_COLOR];
-						priority_selected[0] = 1;
-						blitline_buffer[1] = m_current_palette[BACKDROP_COLOR];
-						priority_selected[1] = 1;
-						blitline_buffer[2] = m_current_palette[BACKDROP_COLOR];
-						priority_selected[2] = 1;
-						blitline_buffer[3] = m_current_palette[BACKDROP_COLOR];
-						priority_selected[3] = 1;
-						blitline_buffer[4] = m_current_palette[BACKDROP_COLOR];
-						priority_selected[4] = 1;
-						blitline_buffer[5] = m_current_palette[BACKDROP_COLOR];
-						priority_selected[5] = 1;
-						blitline_buffer[6] = m_current_palette[BACKDROP_COLOR];
-						priority_selected[6] = 1;
-						blitline_buffer[7] = m_current_palette[BACKDROP_COLOR];
-						priority_selected[7] = 1;
-					}
-				}
 			}
 			break;
 		}
 	}
 
-	UINT32 *p_bitmap = &m_tmpbitmap.pix32(pixel_plot_y + line, pixel_offset_x);
-	UINT8  *p_y1 = &m_y1_bitmap.pix8(pixel_plot_y + line, pixel_offset_x);
-
 	/* Check if display is disabled or we're below/above active area */
 	if (m_display_disabled || line < 0 || line >= m_frame_timing[ACTIVE_DISPLAY_V])
 	{
-		for (x = 0; x < 256; x++)
-		{
-			p_bitmap[x] = m_palette->pen(m_current_palette[BACKDROP_COLOR]);
-			p_y1[x] = 1;
-		}
+		rectangle rec;
+		rec.min_y = rec.max_y = pixel_plot_y + line;
+
+		rec.min_x = pixel_offset_x;
+		rec.max_x = pixel_offset_x + 255;
+		m_tmpbitmap.fill(m_palette->pen(m_current_palette[BACKDROP_COLOR]), rec);
+		m_y1_bitmap.fill(1, rec);
 	}
 	else
 	{
-		for (x = 0; x < 256; x++)
-		{
-			p_bitmap[x] = m_palette->pen(blitline_buffer[x]);
-			p_y1[x] = ( priority_selected[x] & 0x0f ) ? 0 : 1;
-		}
+		blit_scanline(blitline_buffer, priority_selected, pixel_offset_x, pixel_plot_y, line);
 	}
 }
 
 
-void sega315_5378_device::draw_scanline( int pixel_offset_x, int pixel_plot_y, int line )
+void sega315_5124_device::blit_scanline( int *line_buffer, int *priority_selected, int pixel_offset_x, int pixel_plot_y, int line )
 {
-	int x;
-	int *blitline_buffer = m_line_buffer;
-	int priority_selected[256];
+	UINT32 *p_bitmap = &m_tmpbitmap.pix32(pixel_plot_y + line, pixel_offset_x);
+	UINT8  *p_y1 = &m_y1_bitmap.pix8(pixel_plot_y + line, pixel_offset_x);
+	int x = 0;
 
-	if ( line < m_frame_timing[ACTIVE_DISPLAY_V] )
+	if (m_vdp_mode == 4 && m_reg[0x00] & 0x20)
 	{
-		switch( m_vdp_mode )
+		/* Fill column 0 with overscan color from m_reg[0x07] */
+		do
 		{
-		case 0:
-			if ( line >= 0 )
-			{
-				draw_scanline_mode0( blitline_buffer, line );
-			}
-			if ( line >= 0 || ( line >= -13 && m_y_pixels == 192 ) )
-			{
-				draw_sprites_tms9918_mode( blitline_buffer, line );
-			}
-			break;
-
-		case 2:
-			if ( line >= 0 )
-			{
-				draw_scanline_mode2( blitline_buffer, line );
-			}
-			if ( line >= 0 || ( line >= -13 && m_y_pixels == 192 ) )
-			{
-				draw_sprites_tms9918_mode( blitline_buffer, line );
-			}
-			break;
-
-		case 4:
-		default:
-			memset(priority_selected, 0, sizeof(priority_selected));
-			if ( line >= 0 )
-			{
-				draw_scanline_mode4( blitline_buffer, priority_selected, line );
-			}
-			if ( line >= 0 || ( line >= -13 && m_y_pixels == 192 ) )
-			{
-				draw_sprites_mode4( blitline_buffer, priority_selected, line );
-				if ( line >= 0 )
-				{
-					/* Fill column 0 with overscan color from m_reg[0x07] */
-					if (m_reg[0x00] & 0x20)
-					{
-						blitline_buffer[0] = m_current_palette[BACKDROP_COLOR];
-						priority_selected[0] = 1;
-						blitline_buffer[1] = m_current_palette[BACKDROP_COLOR];
-						priority_selected[1] = 1;
-						blitline_buffer[2] = m_current_palette[BACKDROP_COLOR];
-						priority_selected[2] = 1;
-						blitline_buffer[3] = m_current_palette[BACKDROP_COLOR];
-						priority_selected[3] = 1;
-						blitline_buffer[4] = m_current_palette[BACKDROP_COLOR];
-						priority_selected[4] = 1;
-						blitline_buffer[5] = m_current_palette[BACKDROP_COLOR];
-						priority_selected[5] = 1;
-						blitline_buffer[6] = m_current_palette[BACKDROP_COLOR];
-						priority_selected[6] = 1;
-						blitline_buffer[7] = m_current_palette[BACKDROP_COLOR];
-						priority_selected[7] = 1;
-					}
-				}
-			}
-			break;
+			p_bitmap[x] = m_palette->pen(m_current_palette[BACKDROP_COLOR]);
+			p_y1[x] = 1;
 		}
+		while(++x < 8);
 	}
 
-	/* Check if display is disabled or we're below/above active area */
-	if (m_display_disabled || line < 0 || line >= m_frame_timing[ACTIVE_DISPLAY_V])
+	do
 	{
-		for (x = 0; x < 256; x++)
-		{
-			blitline_buffer[x] = m_current_palette[BACKDROP_COLOR];
-		}
+		p_bitmap[x] = m_palette->pen(line_buffer[x]);
+		p_y1[x] = ( priority_selected[x] & 0x0f ) ? 0 : 1;
 	}
+	while(++x < 256);
+}
 
+
+void sega315_5378_device::blit_scanline( int *line_buffer, int *priority_selected, int pixel_offset_x, int pixel_plot_y, int line )
+{
 	if (m_sega315_5124_compatibility_mode)
 	{
-		int *combineline_buffer = m_line_buffer + ((line & 0x03) + 1) * 256;
-		int plot_x = 48;
-
-		/* Do horizontal scaling */
-		for (x = 8; x < 248;)
-		{
-			int combined;
-
-			/* Take red and green from first pixel, and blue from second pixel */
-			combined = (blitline_buffer[x] & 0x00ff) | (blitline_buffer[x + 1] & 0x0f00);
-			combineline_buffer[plot_x] = combined;
-
-			/* Take red from second pixel, and green and blue from third pixel */
-			combined = (blitline_buffer[x + 1] & 0x000f) | (blitline_buffer[x + 2] & 0x0ff0);
-			combineline_buffer[plot_x + 1] = combined;
-			x += 3;
-			plot_x += 2;
-		}
-
-		/* Do vertical scaling for a screen with 192 or 224 lines
-		   Lines 0-2 and 221-223 have no effect on the output on the GG screen.
-		   We will calculate the gamegear lines as follows:
-		   GG_0 = 1/6 * SMS_3 + 1/3 * SMS_4 + 1/3 * SMS_5 + 1/6 * SMS_6
-		   GG_1 = 1/6 * SMS_4 + 1/3 * SMS_5 + 1/3 * SMS_6 + 1/6 * SMS_7
-		   GG_2 = 1/6 * SMS_6 + 1/3 * SMS_7 + 1/3 * SMS_8 + 1/6 * SMS_9
-		   GG_3 = 1/6 * SMS_7 + 1/3 * SMS_8 + 1/3 * SMS_9 + 1/6 * SMS_10
-		   GG_4 = 1/6 * SMS_9 + 1/3 * SMS_10 + 1/3 * SMS_11 + 1/6 * SMS_12
-		   .....
-		   GG_142 = 1/6 * SMS_216 + 1/3 * SMS_217 + 1/3 * SMS_218 + 1/6 * SMS_219
-		   GG_143 = 1/6 * SMS_217 + 1/3 * SMS_218 + 1/3 * SMS_219 + 1/6 * SMS_220
-		*/
-		{
-			int gg_line;
-			int my_line = pixel_plot_y + line - (SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT);
-			int *line1, *line2, *line3, *line4;
-
-			/* First make sure there's enough data to draw anything */
-			/* We need one more line of data if we're on line 8, 11, 14, 17, etc */
-			if (my_line < 6 || my_line > 220 || ((my_line - 8) % 3 == 0))
-			{
-				return;
-			}
-
-			gg_line = ((my_line - 6) / 3) * 2;
-
-			/* If we're on SMS line 7, 10, 13, etc we're on an odd GG line */
-			if (my_line % 3)
-			{
-				gg_line++;
-			}
-
-			/* Calculate the line we will be drawing on */
-			pixel_plot_y = SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_192_TBORDER_HEIGHT + 24 + gg_line;
-
-			/* Setup our source lines */
-			line1 = m_line_buffer + (((my_line - 3) & 0x03) + 1) * 256;
-			line2 = m_line_buffer + (((my_line - 2) & 0x03) + 1) * 256;
-			line3 = m_line_buffer + (((my_line - 1) & 0x03) + 1) * 256;
-			line4 = m_line_buffer + (((my_line - 0) & 0x03) + 1) * 256;
-
-			for (x = 0 + 48; x < 160 + 48; x++)
-			{
-				rgb_t   c1 = m_palette->pen(line1[x]);
-				rgb_t   c2 = m_palette->pen(line2[x]);
-				rgb_t   c3 = m_palette->pen(line3[x]);
-				rgb_t   c4 = m_palette->pen(line4[x]);
-				m_tmpbitmap.pix32(pixel_plot_y, pixel_offset_x + x) =
-					rgb_t((c1.r() / 6 + c2.r() / 3 + c3.r() / 3 + c4.r() / 6 ),
-						(c1.g() / 6 + c2.g() / 3 + c3.g() / 3 + c4.g() / 6 ),
-						(c1.b() / 6 + c2.b() / 3 + c3.b() / 3 + c4.b() / 6 ) );
-			}
-			return;
-		}
-		blitline_buffer = combineline_buffer;
+		sega315_5124_device::blit_scanline(line_buffer, priority_selected, pixel_offset_x, pixel_plot_y, line);
 	}
-
-	for (x = 0; x < 256; x++)
+	else
 	{
-		m_tmpbitmap.pix32(pixel_plot_y + line, pixel_offset_x + x) = m_palette->pen(blitline_buffer[x]);
+		UINT32 *p_bitmap = &m_tmpbitmap.pix32(pixel_plot_y + line, pixel_offset_x);
+		UINT8  *p_y1 = &m_y1_bitmap.pix8(pixel_plot_y + line, pixel_offset_x);
+		int x = 0;
+
+		/* border on left side of the GG active screen */
+		do
+		{
+			p_bitmap[x] = m_palette->pen(m_current_palette[BACKDROP_COLOR]);
+			p_y1[x] = 1; // not verified
+		}
+		while (++x < 48);
+
+		if ( line >= 24 && line < 168 )
+		{
+			do
+			{
+				p_bitmap[x] = m_palette->pen(line_buffer[x]);
+				p_y1[x] = ( priority_selected[x] & 0x0f ) ? 0 : 1;
+			}
+			while (++x < 208);
+		}
+		else
+		{
+			/* top/bottom GG border */
+			do
+			{
+				p_bitmap[x] = m_palette->pen(m_current_palette[BACKDROP_COLOR]);
+				p_y1[x] = 1; // not verified
+			}
+			while (++x < 208);
+		}
+		
+		/* border on right side of the GG active screen */
+		do
+		{
+			p_bitmap[x] = m_palette->pen(m_current_palette[BACKDROP_COLOR]);
+			p_y1[x] = 1; // not verified
+		}
+		while (++x < 256);
 	}
 }
 
@@ -1807,7 +1576,6 @@ void sega315_5124_device::device_start()
 
 	/* Allocate video RAM */
 	astring tempstring;
-	m_line_buffer = auto_alloc_array(machine(), int, 256 * 5);
 
 	m_frame_timing = (m_is_pal) ? pal_192 : ntsc_192;
 
@@ -1846,7 +1614,6 @@ void sega315_5124_device::device_start()
 	save_item(NAME(m_hcounter));
 	save_item(NAME(m_reg));
 	save_item(NAME(m_current_palette));
-	save_pointer(NAME(m_line_buffer), 256 * 5);
 	save_item(NAME(m_tmpbitmap));
 	save_item(NAME(m_y1_bitmap));
 	save_item(NAME(m_draw_time));
@@ -1900,7 +1667,6 @@ void sega315_5124_device::device_reset()
 
 	/* Clear RAM */
 	memset(m_CRAM, 0, sizeof(m_CRAM));
-	memset(m_line_buffer, 0, 256 * 5 * sizeof(int));
 }
 
 static MACHINE_CONFIG_FRAGMENT( sega315_5124 )

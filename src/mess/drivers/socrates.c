@@ -1539,9 +1539,9 @@ ROM_START(socrates)
 	ROM_LOAD_OPTIONAL("speech_eng_internal.bin", 0x0000, 0x2000, CRC(edc1fb3f) SHA1(78b4631fc3b1c038e14911047f9edd6c4e8bae58)) // 8k on the speech chip itself
 
 	ROM_REGION(0x10000, "speechext", ROMREGION_ERASE00) // speech serial modules outside of the speech chip but still on speech cart
-	ROM_LOAD_OPTIONAL("speech_eng_vsm1.bin", 0x0000, 0x4000, CRC(888e3ddd) SHA1(33AF6A21BA6D826071C9D48557B1C9012752570B)) // 16k in serial rom
-	ROM_LOAD_OPTIONAL("speech_eng_vsm2.bin", 0x4000, 0x4000, CRC(de4ac89d) SHA1(3DFA853B02DF756A9B72DEF94A39310992EE11C7)) // 16k in serial rom
-	ROM_LOAD_OPTIONAL("speech_eng_vsm3.bin", 0x8000, 0x4000, CRC(972384aa) SHA1(FFCB1D633CA6BFFC7F481EC505DA447E5B847F16)) // 16k in serial rom
+	ROM_LOAD_OPTIONAL("speech_eng_vsm1.bin", 0x0000, 0x4000, CRC(888e3ddd) SHA1(33af6a21ba6d826071c9d48557b1c9012752570b)) // 16k in serial rom
+	ROM_LOAD_OPTIONAL("speech_eng_vsm2.bin", 0x4000, 0x4000, CRC(de4ac89d) SHA1(3dfa853b02df756a9b72def94a39310992ee11c7)) // 16k in serial rom
+	ROM_LOAD_OPTIONAL("speech_eng_vsm3.bin", 0x8000, 0x4000, CRC(972384aa) SHA1(ffcb1d633ca6bffc7f481ec505da447e5b847f16)) // 16k in serial rom
 	ROM_FILL(0xC000, 0x4000, 0xff) // last vsm isn't present, FF fill
 ROM_END
 

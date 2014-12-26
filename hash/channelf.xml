@@ -517,6 +517,18 @@
 		</part>
 	</software>
 
+	<software name="werbetxt">
+		<description>Werbetextcassette</description>
+		<year>198?</year>
+		<publisher>Electronic-Partner</publisher>
+		<part name="cart" interface="channelf_cart">
+			<feature name="slot" value="std" />
+			<dataarea name="rom" size="4096">
+				<rom name="werbetextcassette.bin" size="4096" crc="da351c39" sha1="e6d7bfc727d0d2f04788550360e09d1f4fc0e466" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="clrorgan">
 		<description>Color Organ (Prototype)</description>
 		<year>19??</year>

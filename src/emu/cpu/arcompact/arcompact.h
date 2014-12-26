@@ -150,10 +150,10 @@ protected:
 	ARCOMPACT_RETTYPE arcompact_handle04_01(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_02(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_03(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_04(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_05(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_06(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_07(OPS_32);
+//	ARCOMPACT_RETTYPE arcompact_handle04_04(OPS_32);
+//	ARCOMPACT_RETTYPE arcompact_handle04_05(OPS_32);
+//	ARCOMPACT_RETTYPE arcompact_handle04_06(OPS_32);
+//	ARCOMPACT_RETTYPE arcompact_handle04_07(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_08(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_09(OPS_32);
 //	ARCOMPACT_RETTYPE arcompact_handle04_0a(OPS_32);
@@ -161,14 +161,14 @@ protected:
 	ARCOMPACT_RETTYPE arcompact_handle04_0c(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_0d(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_0e(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_0f(OPS_32);
+//	ARCOMPACT_RETTYPE arcompact_handle04_0f(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_10(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_11(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_12(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_13(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_14(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_15(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_16(OPS_32);
+//	ARCOMPACT_RETTYPE arcompact_handle04_16(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_17(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_18(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_19(OPS_32);
@@ -191,8 +191,8 @@ protected:
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_04(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_05(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_06(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_07(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_08(OPS_32);
+//	ARCOMPACT_RETTYPE arcompact_handle04_2f_07(OPS_32);
+//	ARCOMPACT_RETTYPE arcompact_handle04_2f_08(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_09(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_0a(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_0b(OPS_32);
@@ -210,8 +210,8 @@ protected:
 	ARCOMPACT_RETTYPE arcompact_handle04_35(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_36(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_37(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_00(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_01(OPS_32);
+	//ARCOMPACT_RETTYPE arcompact_handle05_00(OPS_32);
+	//ARCOMPACT_RETTYPE arcompact_handle05_01(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle05_02(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle05_03(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle05_04(OPS_32);
@@ -763,13 +763,25 @@ protected:
 	ARCOMPACT_RETTYPE arcompact_handle19_0x_helper(OPS_16, const char* optext, int shift, int format);
 	ARCOMPACT_RETTYPE arcompact_handle1e_0x_helper(OPS_16, const char* optext);
 	ARCOMPACT_RETTYPE arcompact_handle1e_03_0x_helper(OPS_16, const char* optext);
-	ARCOMPACT_RETTYPE arcompact_handle1d_helper(OPS_16, const char* optext);
 
 	ARCOMPACT_RETTYPE get_insruction(OPS_32);
 
 	ARCOMPACT_HANDLER04_TYPE_PM(04_00);
+	ARCOMPACT_HANDLER04_TYPE_PM(04_04);
+	ARCOMPACT_HANDLER04_TYPE_PM(04_05);
+	ARCOMPACT_HANDLER04_TYPE_PM(04_06);
+	ARCOMPACT_HANDLER04_TYPE_PM(04_07);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_0a);
+	ARCOMPACT_HANDLER04_TYPE_PM(04_0f);
+	ARCOMPACT_HANDLER04_TYPE_PM(04_16);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_20);
+
+	ARCOMPACT_HANDLER04_TYPE_PM(04_2f_07);
+	ARCOMPACT_HANDLER04_TYPE_PM(04_2f_08);
+
+	ARCOMPACT_HANDLER04_TYPE_PM(05_00);
+	ARCOMPACT_HANDLER04_TYPE_PM(05_01);
+
 
 private:
 	address_space_config m_program_config;
@@ -796,8 +808,35 @@ private:
 	int m_delaylinks;
 	UINT32 m_delayjump;
 
-
+//	f  e  d  c| b  a  9  8| 7  6  5  4| 3  2  1  0
+//  -  -  -  L| Z  N  C  V| U DE AE A2|A1 E2 E1  H
+	UINT32 m_status32;
 };
+
+#define V_OVERFLOW_FLAG (0x00000100)
+#define C_CARRY_FLAG (0x00000200)
+#define N_NEGATIVE_FLAG (0x00000400)
+#define Z_ZERO_FLAG (0x00000800)
+
+// V = overflow (set if signed operation would overflow)
+#define STATUS32_SET_V   (m_status32 |=  V_OVERFLOW_FLAG)
+#define STATUS32_CLEAR_V (m_status32 &= ~V_OVERFLOW_FLAG)
+#define STATUS32_CHECK_V (m_status32 &   V_OVERFLOW_FLAG)
+
+// C = carry (unsigned op, carry set is same condition as LO Lower Than, carry clear is same condition as HS Higher Same)
+#define STATUS32_SET_C   (m_status32 |=  C_CARRY_FLAG)
+#define STATUS32_CLEAR_C (m_status32 &= ~C_CARRY_FLAG)
+#define STATUS32_CHECK_C (m_status32 &   C_CARRY_FLAG)
+
+// N = negative (set if most significant bit of result is set)
+#define STATUS32_SET_N   (m_status32 |=  N_NEGATIVE_FLAG)
+#define STATUS32_CLEAR_N (m_status32 &= ~N_NEGATIVE_FLAG)
+#define STATUS32_CHECK_N (m_status32 &   N_NEGATIVE_FLAG)
+
+// Z = zero (set if result is zero, ie both values the same for CMP)
+#define STATUS32_SET_Z   (m_status32 |=  Z_ZERO_FLAG)
+#define STATUS32_CLEAR_Z (m_status32 &= ~Z_ZERO_FLAG)
+#define STATUS32_CHECK_Z (m_status32 &   Z_ZERO_FLAG)
 
 
 extern const device_type ARCA5;

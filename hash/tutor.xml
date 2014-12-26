@@ -80,7 +80,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 
 <softwarelist name="tutor" description="Tomy Tutor &amp; Pyuuta cartridges">
 
-	<software name="baseball" supported="no">
+	<software name="baseball">
 		<description>Baseball (Jpn)</description>
 		<year>198?</year>
 		<publisher>Tomy</publisher>

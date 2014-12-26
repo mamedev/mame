@@ -867,6 +867,119 @@
 		</part>
 	</software>
 
+<!--
+    The labelling of Hi-Com multigame carts is arbitrary. The boxes appears to what was intended as unique product number 
+    but boxes are typically mixed up and patched with stickers added to change game titles (on both boxes and cartridges) 
+    making the product number rather unreliable AND realistically we may never find out the correct numbers. 
+-->
+	<software name="hicom3a">
+		<description>The Best Game Collection - Hang On + Pit Pot + Spy vs Spy (Kor)</description>
+		<year>1990</year>
+		<publisher>Hi-Com</publisher>
+		<part name="cart" interface="sms_cart">
+			<feature name="slot" value="hicom" />
+			<dataarea name="rom" size="131072">
+				<rom name="hi-com 3-in-1 the best game collection a (kr).sms" size="131072" crc="98af0236" sha1="a64f63eb81bfdd81476daf74a810b5b29fb55986" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hicom3b">
+		<description>The Best Game Collection - Great Baseball + Great Soccer + Super Tennis (Kor)</description>
+		<year>1990</year>
+		<publisher>Hi-Com</publisher>
+		<part name="cart" interface="sms_cart">
+			<feature name="slot" value="hicom" />
+			<dataarea name="rom" size="131072">
+				<rom name="hi-com 3-in-1 the best game collection b (kr).sms" size="131072" crc="6ebfe1c3" sha1="65ed4232b972e3d85147561b310115dd6b642b99" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hicom3c">
+		<description>The Best Game Collection - Teddy Boy Blues + Pit-Pot + Astro Flash (Kor)</description>
+		<year>1990</year>
+		<publisher>Hi-Com</publisher>
+		<part name="cart" interface="sms_cart">
+			<feature name="slot" value="hicom" />
+			<dataarea name="rom" size="131072">
+				<rom name="hi-com 3-in-1 the best game collection c (kr).sms" size="131072" crc="81a36a4f" sha1="d3912814b33ce9ca13340902524bcc01dcf397b0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hicom3d">
+		<description>The Best Game Collection - Teddy Boy Blues + Great Soccer + Comical Machine Gun Joe (Kor)</description>
+		<year>1990</year>
+		<publisher>Hi-Com</publisher>
+		<part name="cart" interface="sms_cart">
+			<feature name="slot" value="hicom" />
+			<dataarea name="rom" size="131072">
+				<rom name="hi-com 3-in-1 the best game collection d (kr).sms" size="131072" crc="8d2d695d" sha1="5e20414c5eb61c3c817509f794381e1577e69111" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hicom3e">
+		<description>The Best Game Collection - Ghost House + Teddy Boy Blues + Seishun Scandal (Kor)</description>
+		<year>1990</year>
+		<publisher>Hi-Com</publisher>
+		<part name="cart" interface="sms_cart">
+			<feature name="slot" value="hicom" />
+			<dataarea name="rom" size="131072">
+				<rom name="hi-com 3-in-1 the best game collection e (kr).sms" size="131072" crc="82c09b57" sha1="940af778df6190ef2606a3555d47c0a7d194e05c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hicom3f">
+		<description>The Best Game Collection - Satellite-7 + Great Baseball + Seishun Scandal (Kor)</description>
+		<year>1990</year>
+		<publisher>Hi-Com</publisher>
+		<part name="cart" interface="sms_cart">
+			<feature name="slot" value="hicom" />
+			<dataarea name="rom" size="131072">
+				<rom name="hi-com 3-in-1 the best game collection f (kr).sms" size="131072" crc="4088eeb4" sha1="9ee8554a85dfc0a5a278474f4886b311650b37dc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hicom8a">
+		<description>The Best Game Collection (Kor, 8 in 1 Ver. A)</description>
+		<year>1990</year>
+		<publisher>Hi-Com</publisher>
+		<part name="cart" interface="sms_cart">
+			<feature name="slot" value="hicom" />
+			<dataarea name="rom" size="262144">
+				<rom name="hi-com 8-in-1 the best game collection a (kr).sms" size="262144" crc="fba94148" sha1="cbcdcd85317becd7ced71612a72913c02fa805be" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hicom8b">
+		<description>The Best Game Collection (Kor, 8 in 1 Ver. B)</description>
+		<year>1990</year>
+		<publisher>Hi-Com</publisher>
+		<part name="cart" interface="sms_cart">
+			<feature name="slot" value="hicom" />
+			<dataarea name="rom" size="262144">
+				<rom name="hi-com 8-in-1 the best game collection b (kr).sms" size="262144" crc="8333c86e" sha1="657051e0cf27377b8c89c42d3a8f3deef165430a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hicom8c">
+		<description>The Best Game Collection (Kor, 8 in 1 Ver. C)</description>
+		<year>1990</year>
+		<publisher>Hi-Com</publisher>
+		<part name="cart" interface="sms_cart">
+			<feature name="slot" value="hicom" />
+			<dataarea name="rom" size="262144">
+				<rom name="hi-com 8-in-1 the best game collection c (kr).sms" size="262144" crc="00e9809f" sha1="c7eddfbdf0383e0b813abf2bbf47c1e779587adb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="blackblt">
 		<description>Black Belt (Euro, USA)</description>
 		<year>1986</year>

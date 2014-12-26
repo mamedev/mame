@@ -1362,9 +1362,9 @@ ROM_END
 // Someone who knows the DEC naming conventions should correct them -
 ROM_START( rainbow190 )
 	ROM_REGION(0x100000,"maincpu", 0)
-	ROM_LOAD( "dec190rom0.bin",  0xf0000, 0x4000, CRC(FAC191D2) SHA1(4aff5b1e031d3b5eafc568b23e68235270bb34de) )
+	ROM_LOAD( "dec190rom0.bin",  0xf0000, 0x4000, CRC(fac191d2) SHA1(4aff5b1e031d3b5eafc568b23e68235270bb34de) )
 	ROM_RELOAD(0xf4000,0x4000)
-	ROM_LOAD( "dec190rom1.bin", 0xf8000, 0x4000, CRC(5CE59632) SHA1(d29793f7014c57a4e7cb77bbf6e84f9113635ed2) )
+	ROM_LOAD( "dec190rom1.bin", 0xf8000, 0x4000, CRC(5ce59632) SHA1(d29793f7014c57a4e7cb77bbf6e84f9113635ed2) )
 
 	ROM_RELOAD(0xfc000,0x4000)
 	ROM_REGION(0x1000, "chargen", 0)

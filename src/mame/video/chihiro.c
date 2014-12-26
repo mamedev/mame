@@ -1213,14 +1213,19 @@ UINT32 nv2a_renderer::texture_get_texel(int number, int x, int y)
 	}
 }
 
-void nv2a_renderer::write_pixel(int x, int y, UINT32 color)
+void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 {
-	void *addr;
-	UINT32 fbcolor;
+	UINT32 *addr, *daddr;
+	UINT32 fbcolor, deptsten;
 	UINT32 c[4], fb[4], s[4], d[4], cc[4];
+	UINT32 dep, sten, stenc, stenv;
+	bool stencil_passed;
+	bool depth_passed;
 
-	addr = this->fb.raw_pixptr(y, x);
-	fbcolor = *((UINT32 *)addr);
+	addr=rendertarget + (pitch_rendertarget / 4)*y + x;
+	fbcolor = *addr;
+	daddr=depthbuffer + (pitch_depthbuffer / 4)*y + x;
+	deptsten = *daddr;
 	c[3] = color >> 24;
 	c[2] = (color >> 16) & 255;
 	c[1] = (color >> 8) & 255;
@@ -1233,329 +1238,523 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color)
 	cc[2] = (blend_color >> 16) & 255;
 	cc[1] = (blend_color >> 8) & 255;
 	cc[0] = blend_color & 255;
+	dep = deptsten >> 8;
+	sten = deptsten & 255;
+	if (depth > 0xffffff)
+		depth = 0xffffff;
+	if (depth & 0x80000000)
+		depth = 0;
 	// ownership test and scissor test not done
 	// alpha test
 	if (alpha_test_enabled) {
 		switch (alpha_func) {
+			case nv2a_renderer::NEVER:
+				return;
+			case nv2a_renderer::ALWAYS:
+			default:
+				break;
+			case nv2a_renderer::LESS:
+				if (c[3] >= alpha_reference)
+					return;
+				break;
+			case nv2a_renderer::LEQUAL:
+				if (c[3] > alpha_reference)
+					return;
+				break;
+			case nv2a_renderer::EQUAL:
+				if (c[3] != alpha_reference)
+					return;
+				break;
+			case nv2a_renderer::GEQUAL:
+				if (c[3] < alpha_reference)
+					return;
+				break;
+			case nv2a_renderer::GREATER:
+				if (c[3] <= alpha_reference)
+					return;
+				break;
+			case nv2a_renderer::NOTEQUAL:
+				if (c[3] == alpha_reference)
+					return;
+				break;
+		}
+	}
+	// stencil test
+	stencil_passed = true;
+	if (stencil_test_enabled) {
+		stenc=stencil_mask & stencil_ref;
+		stenv=stencil_mask & sten;
+		switch (stencil_func) {
 		case nv2a_renderer::NEVER:
-			return;
+			stencil_passed = false;
+			break;
+		case nv2a_renderer::LESS:
+			if (stenc >= stenv)
+				stencil_passed = false;
+			break;
+		case nv2a_renderer::EQUAL:
+			if (stenc != stenv)
+				stencil_passed = false;
+			break;
+		case nv2a_renderer::LEQUAL:
+			if (stenc > stenv)
+				stencil_passed = false;
+			break;
+		case nv2a_renderer::GREATER:
+			if (stenc <= stenv)
+				stencil_passed = false;
+			break;
+		case nv2a_renderer::NOTEQUAL:
+			if (stenc == stenv)
+				stencil_passed = false;
+			break;
+		case nv2a_renderer::GEQUAL:
+			if (stenc < stenv)
+				stencil_passed = false;
+			break;
 		case nv2a_renderer::ALWAYS:
 		default:
 			break;
-		case nv2a_renderer::LESS:
-			if (c[3] >= alpha_reference)
-				return;
+		}
+		if (stencil_passed == false) {
+			switch (stencil_op_fail) {
+			case nv2a_renderer::ZEROOP:
+				sten = 0;
+				break;
+			case nv2a_renderer::INVERTOP:
+				sten = sten ^ 255;
+				break;
+			case nv2a_renderer::KEEP:
+			default:
+				break;
+			case nv2a_renderer::REPLACE:
+				sten = stencil_ref;
+				break;
+			case nv2a_renderer::INCR:
+				if (sten < 255)
+					sten++;
+				break;
+			case nv2a_renderer::DECR:
+				if (sten > 0)
+					sten--;
+				break;
+			case nv2a_renderer::INCR_WRAP:
+				if (sten < 255)
+					sten++;
+				else
+					sten = 0;
+				break;
+			case nv2a_renderer::DECR_WRAP:
+				if (sten > 0)
+					sten--;
+				else
+					sten = 255;
+				break;
+			}
+			deptsten = (dep << 8) | sten;
+			*daddr = deptsten;
+			return;
+		}
+	}
+	// depth buffer test
+	depth_passed = true;
+	if (depth_test_enabled) {
+		switch (depth_function) {
+			case nv2a_renderer::NEVER:
+				depth_passed = false;
+				break;
+			case nv2a_renderer::LESS:
+				if (depth >= dep)
+					depth_passed = false;
+				break;
+			case nv2a_renderer::EQUAL:
+				if (depth != dep)
+					depth_passed = false;
+				break;
+			case nv2a_renderer::LEQUAL:
+				if (depth > dep)
+					depth_passed = false;
+				break;
+			case nv2a_renderer::GREATER:
+				if (depth <= dep)
+					depth_passed = false;
+				break;
+			case nv2a_renderer::NOTEQUAL:
+				if (depth == dep)
+					depth_passed = false;
+				break;
+			case nv2a_renderer::GEQUAL:
+				if (depth < dep)
+					depth_passed = false;
+				break;
+			case nv2a_renderer::ALWAYS:
+			default:
+				break;
+		}
+		if (depth_passed == false) {
+			switch (stencil_op_zfail) {
+			case nv2a_renderer::ZEROOP:
+				sten = 0;
+				break;
+			case nv2a_renderer::INVERTOP:
+				sten = sten ^ 255;
+				break;
+			case nv2a_renderer::KEEP:
+			default:
+				break;
+			case nv2a_renderer::REPLACE:
+				sten = stencil_ref;
+				break;
+			case nv2a_renderer::INCR:
+				if (sten < 255)
+					sten++;
+				break;
+			case nv2a_renderer::DECR:
+				if (sten > 0)
+					sten--;
+				break;
+			case nv2a_renderer::INCR_WRAP:
+				if (sten < 255)
+					sten++;
+				else
+					sten = 0;
+				break;
+			case nv2a_renderer::DECR_WRAP:
+				if (sten > 0)
+					sten--;
+				else
+					sten = 255;
+				break;
+			}
+			deptsten = (dep << 8) | sten;
+			*daddr = deptsten;
+			return;
+		}
+		switch (stencil_op_zpass) {
+		case nv2a_renderer::ZEROOP:
+			sten = 0;
 			break;
-		case nv2a_renderer::LEQUAL:
-			if (c[3] > alpha_reference)
-				return;
+		case nv2a_renderer::INVERTOP:
+			sten = sten ^ 255;
 			break;
-		case nv2a_renderer::EQUAL:
-			if (c[3] != alpha_reference)
-				return;
+		case nv2a_renderer::KEEP:
+		default:
 			break;
-		case nv2a_renderer::GEQUAL:
-			if (c[3] < alpha_reference)
-				return;
+		case nv2a_renderer::REPLACE:
+			sten = stencil_ref;
 			break;
-		case nv2a_renderer::GREATER:
-			if (c[3] <= alpha_reference)
-				return;
+		case nv2a_renderer::INCR:
+			if (sten < 255)
+				sten++;
 			break;
-		case nv2a_renderer::NOTEQUAL:
-			if (c[3] == alpha_reference)
-				return;
+		case nv2a_renderer::DECR:
+			if (sten > 0)
+				sten--;
+			break;
+		case nv2a_renderer::INCR_WRAP:
+			if (sten < 255)
+				sten++;
+			else
+				sten = 0;
+			break;
+		case nv2a_renderer::DECR_WRAP:
+			if (sten > 0)
+				sten--;
+			else
+				sten = 255;
 			break;
 		}
 	}
-	// stencil test not done
-	// depth buffer test not done
 	// blending
 	if (blending_enabled) {
 		switch (blend_function_source) {
-		case nv2a_renderer::ZERO:
-			s[3] = s[2] = s[1] = s[0] = 0;
-			break;
-		case nv2a_renderer::ONE:
-		default:
-			s[3] = s[2] = s[1] = s[0] = 255;
-			break;
-		case nv2a_renderer::DST_COLOR:
-			s[3] = fb[3];
-			s[2] = fb[2];
-			s[1] = fb[1];
-			s[0] = fb[0];
-			break;
-		case nv2a_renderer::ONE_MINUS_DST_COLOR:
-			s[3] = fb[3] ^ 255;
-			s[2] = fb[2] ^ 255;
-			s[1] = fb[1] ^ 255;
-			s[0] = fb[0] ^ 255;
-			break;
-		case nv2a_renderer::SRC_ALPHA:
-			s[3] = s[2] = s[1] = s[0] = c[3];
-			break;
-		case nv2a_renderer::ONE_MINUS_SRC_ALPHA:
-			s[3] = s[2] = s[1] = s[0] = c[3] ^ 255;
-			break;
-		case nv2a_renderer::DST_ALPHA:
-			s[3] = s[2] = s[1] = s[0] = fb[3];
-			break;
-		case nv2a_renderer::ONE_MINUS_DST_ALPHA:
-			s[3] = s[2] = s[1] = s[0] = fb[3] ^ 255;
-			break;
-		case nv2a_renderer::CONSTANT_COLOR:
-			s[3] = cc[3];
-			s[2] = cc[2];
-			s[1] = cc[1];
-			s[0] = cc[0];
-			break;
-		case nv2a_renderer::ONE_MINUS_CONSTANT_COLOR:
-			s[3] = cc[3] ^ 255;
-			s[2] = cc[2] ^ 255;
-			s[1] = cc[1] ^ 255;
-			s[0] = cc[0] ^ 255;
-			break;
-		case nv2a_renderer::CONSTANT_ALPHA:
-			s[3] = s[2] = s[1] = s[0] = cc[3];
-			break;
-		case nv2a_renderer::ONE_MINUS_CONSTANT_ALPHA:
-			s[3] = s[2] = s[1] = s[0] = cc[3] ^ 255;
-			break;
-		case nv2a_renderer::SRC_ALPHA_SATURATE:
-			s[3] = 255;
-			if (c[3] < (fb[3] ^ 255))
-				s[2] = c[3];
-			else
-				s[2] = fb[3];
-			s[1] = s[0] = s[2];
-			break;
+			case nv2a_renderer::ZERO:
+				s[3] = s[2] = s[1] = s[0] = 0;
+				break;
+			case nv2a_renderer::ONE:
+			default:
+				s[3] = s[2] = s[1] = s[0] = 255;
+				break;
+			case nv2a_renderer::DST_COLOR:
+				s[3] = fb[3];
+				s[2] = fb[2];
+				s[1] = fb[1];
+				s[0] = fb[0];
+				break;
+			case nv2a_renderer::ONE_MINUS_DST_COLOR:
+				s[3] = fb[3] ^ 255;
+				s[2] = fb[2] ^ 255;
+				s[1] = fb[1] ^ 255;
+				s[0] = fb[0] ^ 255;
+				break;
+			case nv2a_renderer::SRC_ALPHA:
+				s[3] = s[2] = s[1] = s[0] = c[3];
+				break;
+			case nv2a_renderer::ONE_MINUS_SRC_ALPHA:
+				s[3] = s[2] = s[1] = s[0] = c[3] ^ 255;
+				break;
+			case nv2a_renderer::DST_ALPHA:
+				s[3] = s[2] = s[1] = s[0] = fb[3];
+				break;
+			case nv2a_renderer::ONE_MINUS_DST_ALPHA:
+				s[3] = s[2] = s[1] = s[0] = fb[3] ^ 255;
+				break;
+			case nv2a_renderer::CONSTANT_COLOR:
+				s[3] = cc[3];
+				s[2] = cc[2];
+				s[1] = cc[1];
+				s[0] = cc[0];
+				break;
+			case nv2a_renderer::ONE_MINUS_CONSTANT_COLOR:
+				s[3] = cc[3] ^ 255;
+				s[2] = cc[2] ^ 255;
+				s[1] = cc[1] ^ 255;
+				s[0] = cc[0] ^ 255;
+				break;
+			case nv2a_renderer::CONSTANT_ALPHA:
+				s[3] = s[2] = s[1] = s[0] = cc[3];
+				break;
+			case nv2a_renderer::ONE_MINUS_CONSTANT_ALPHA:
+				s[3] = s[2] = s[1] = s[0] = cc[3] ^ 255;
+				break;
+			case nv2a_renderer::SRC_ALPHA_SATURATE:
+				s[3] = 255;
+				if (c[3] < (fb[3] ^ 255))
+					s[2] = c[3];
+				else
+					s[2] = fb[3];
+				s[1] = s[0] = s[2];
+				break;
 		}
 		switch (blend_function_destination) {
-		case nv2a_renderer::ZERO:
-		default:
-			d[3] = d[2] = d[1] = d[0] = 0;
-			break;
-		case nv2a_renderer::ONE:
-			d[3] = d[2] = d[1] = d[0] = 255;
-			break;
-		case nv2a_renderer::SRC_COLOR:
-			d[3] = c[3];
-			d[2] = c[2];
-			d[1] = c[1];
-			d[0] = c[0];
-			break;
-		case nv2a_renderer::ONE_MINUS_SRC_COLOR:
-			d[3] = c[3] ^ 255;
-			d[2] = c[2] ^ 255;
-			d[1] = c[1] ^ 255;
-			d[0] = c[0] ^ 255;
-			break;
-		case nv2a_renderer::SRC_ALPHA:
-			d[3] = d[2] = d[1] = d[0] = c[3];
-			break;
-		case nv2a_renderer::ONE_MINUS_SRC_ALPHA:
-			d[3] = d[2] = d[1] = d[0] = c[3] ^ 255;
-			break;
-		case nv2a_renderer::DST_ALPHA:
-			d[3] = d[2] = d[1] = d[0] = fb[3];
-			break;
-		case nv2a_renderer::ONE_MINUS_DST_ALPHA:
-			d[3] = d[2] = d[1] = d[0] = fb[3] ^ 255;
-			break;
-		case nv2a_renderer::CONSTANT_COLOR:
-			d[3] = cc[3];
-			d[2] = cc[2];
-			d[1] = cc[1];
-			d[0] = cc[0];
-			break;
-		case nv2a_renderer::ONE_MINUS_CONSTANT_COLOR:
-			d[3] = cc[3] ^ 255;
-			d[2] = cc[2] ^ 255;
-			d[1] = cc[1] ^ 255;
-			d[0] = cc[0] ^ 255;
-			break;
-		case nv2a_renderer::CONSTANT_ALPHA:
-			d[3] = d[2] = d[1] = d[0] = cc[3];
-			break;
-		case nv2a_renderer::ONE_MINUS_CONSTANT_ALPHA:
-			d[3] = d[2] = d[1] = d[0] = cc[3] ^ 255;
-			break;
+			case nv2a_renderer::ZERO:
+			default:
+				d[3] = d[2] = d[1] = d[0] = 0;
+				break;
+			case nv2a_renderer::ONE:
+				d[3] = d[2] = d[1] = d[0] = 255;
+				break;
+			case nv2a_renderer::SRC_COLOR:
+				d[3] = c[3];
+				d[2] = c[2];
+				d[1] = c[1];
+				d[0] = c[0];
+				break;
+			case nv2a_renderer::ONE_MINUS_SRC_COLOR:
+				d[3] = c[3] ^ 255;
+				d[2] = c[2] ^ 255;
+				d[1] = c[1] ^ 255;
+				d[0] = c[0] ^ 255;
+				break;
+			case nv2a_renderer::SRC_ALPHA:
+				d[3] = d[2] = d[1] = d[0] = c[3];
+				break;
+			case nv2a_renderer::ONE_MINUS_SRC_ALPHA:
+				d[3] = d[2] = d[1] = d[0] = c[3] ^ 255;
+				break;
+			case nv2a_renderer::DST_ALPHA:
+				d[3] = d[2] = d[1] = d[0] = fb[3];
+				break;
+			case nv2a_renderer::ONE_MINUS_DST_ALPHA:
+				d[3] = d[2] = d[1] = d[0] = fb[3] ^ 255;
+				break;
+			case nv2a_renderer::CONSTANT_COLOR:
+				d[3] = cc[3];
+				d[2] = cc[2];
+				d[1] = cc[1];
+				d[0] = cc[0];
+				break;
+			case nv2a_renderer::ONE_MINUS_CONSTANT_COLOR:
+				d[3] = cc[3] ^ 255;
+				d[2] = cc[2] ^ 255;
+				d[1] = cc[1] ^ 255;
+				d[0] = cc[0] ^ 255;
+				break;
+			case nv2a_renderer::CONSTANT_ALPHA:
+				d[3] = d[2] = d[1] = d[0] = cc[3];
+				break;
+			case nv2a_renderer::ONE_MINUS_CONSTANT_ALPHA:
+				d[3] = d[2] = d[1] = d[0] = cc[3] ^ 255;
+				break;
 		}
 		switch (blend_equation) {
-		case nv2a_renderer::FUNC_ADD:
-			c[3] = (c[3] * s[3] + fb[3] * d[3]) / 255;
-			if (c[3] > 255)
-				c[3] = 255;
-			c[2] = (c[2] * s[2] + fb[2] * d[2]) / 255;
-			if (c[2] > 255)
-				c[2] = 255;
-			c[1] = (c[1] * s[1] + fb[1] * d[1]) / 255;
-			if (c[1] > 255)
-				c[1] = 255;
-			c[0] = (c[0] * s[0] + fb[0] * d[0]) / 255;
-			if (c[0] > 255)
-				c[0] = 255;
-			break;
-		case nv2a_renderer::FUNC_SUBTRACT:
-			c[3] = (c[3] * s[3] - fb[3] * d[3]) / 255;
-			if (c[3] < 0)
-				c[3] = 255;
-			c[2] = (c[2] * s[2] - fb[2] * d[2]) / 255;
-			if (c[2] < 0)
-				c[2] = 255;
-			c[1] = (c[1] * s[1] - fb[1] * d[1]) / 255;
-			if (c[1] < 0)
-				c[1] = 255;
-			c[0] = (c[0] * s[0] - fb[0] * d[0]) / 255;
-			if (c[0] < 0)
-				c[0] = 255;
-			break;
-		case nv2a_renderer::FUNC_REVERSE_SUBTRACT:
-			c[3] = (fb[3] * d[3] - c[3] * s[3]) / 255;
-			if (c[3] < 0)
-				c[3] = 255;
-			c[2] = (fb[2] * d[2] - c[2] * s[2]) / 255;
-			if (c[2] < 0)
-				c[2] = 255;
-			c[1] = (fb[1] * d[1] - c[1] * s[1]) / 255;
-			if (c[1] < 0)
-				c[1] = 255;
-			c[0] = (fb[0] * d[0] - c[0] * s[0]) / 255;
-			if (c[0] < 0)
-				c[0] = 255;
-			break;
-		case nv2a_renderer::MIN:
-			c[3] = s[3];
-			if (d[3] < c[3])
-				c[3] = d[3];
-			c[2] = s[2];
-			if (d[2] < c[2])
-				c[2] = d[2];
-			c[1] = s[1];
-			if (d[1] < c[1])
-				c[1] = d[1];
-			c[0] = s[0];
-			if (d[0] < c[0])
-				c[0] = d[0];
-			break;
-		case nv2a_renderer::MAX:
-			c[3] = s[3];
-			if (d[3] > c[3])
-				c[3] = d[3];
-			c[2] = s[2];
-			if (d[2] > c[2])
-				c[2] = d[2];
-			c[1] = s[1];
-			if (d[1] > c[1])
-				c[1] = d[1];
-			c[0] = s[0];
-			if (d[0] > c[0])
-				c[0] = d[0];
-			break;
+			case nv2a_renderer::FUNC_ADD:
+				c[3] = (c[3] * s[3] + fb[3] * d[3]) / 255;
+				if (c[3] > 255)
+					c[3] = 255;
+				c[2] = (c[2] * s[2] + fb[2] * d[2]) / 255;
+				if (c[2] > 255)
+					c[2] = 255;
+				c[1] = (c[1] * s[1] + fb[1] * d[1]) / 255;
+				if (c[1] > 255)
+					c[1] = 255;
+				c[0] = (c[0] * s[0] + fb[0] * d[0]) / 255;
+				if (c[0] > 255)
+					c[0] = 255;
+				break;
+			case nv2a_renderer::FUNC_SUBTRACT:
+				c[3] = (c[3] * s[3] - fb[3] * d[3]) / 255;
+				if (c[3] < 0)
+					c[3] = 255;
+				c[2] = (c[2] * s[2] - fb[2] * d[2]) / 255;
+				if (c[2] < 0)
+					c[2] = 255;
+				c[1] = (c[1] * s[1] - fb[1] * d[1]) / 255;
+				if (c[1] < 0)
+					c[1] = 255;
+				c[0] = (c[0] * s[0] - fb[0] * d[0]) / 255;
+				if (c[0] < 0)
+					c[0] = 255;
+				break;
+			case nv2a_renderer::FUNC_REVERSE_SUBTRACT:
+				c[3] = (fb[3] * d[3] - c[3] * s[3]) / 255;
+				if (c[3] < 0)
+					c[3] = 255;
+				c[2] = (fb[2] * d[2] - c[2] * s[2]) / 255;
+				if (c[2] < 0)
+					c[2] = 255;
+				c[1] = (fb[1] * d[1] - c[1] * s[1]) / 255;
+				if (c[1] < 0)
+					c[1] = 255;
+				c[0] = (fb[0] * d[0] - c[0] * s[0]) / 255;
+				if (c[0] < 0)
+					c[0] = 255;
+				break;
+			case nv2a_renderer::MIN:
+				c[3] = s[3];
+				if (d[3] < c[3])
+					c[3] = d[3];
+				c[2] = s[2];
+				if (d[2] < c[2])
+					c[2] = d[2];
+				c[1] = s[1];
+				if (d[1] < c[1])
+					c[1] = d[1];
+				c[0] = s[0];
+				if (d[0] < c[0])
+					c[0] = d[0];
+				break;
+			case nv2a_renderer::MAX:
+				c[3] = s[3];
+				if (d[3] > c[3])
+					c[3] = d[3];
+				c[2] = s[2];
+				if (d[2] > c[2])
+					c[2] = d[2];
+				c[1] = s[1];
+				if (d[1] > c[1])
+					c[1] = d[1];
+				c[0] = s[0];
+				if (d[0] > c[0])
+					c[0] = d[0];
+				break;
 		}
 	}
 	// dithering not done
 	// logical operation
 	if (logical_operation_enabled) {
 		switch (logical_operation) {
-		case  nv2a_renderer::CLEAR:
-			c[3] = 0;
-			c[2] = 0;
-			c[1] = 0;
-			c[0] = 0;
-			break;
-		case  nv2a_renderer::AND:
-			c[3] = c[3] & fb[3];
-			c[2] = c[2] & fb[2];
-			c[1] = c[1] & fb[1];
-			c[0] = c[0] & fb[0];
-			break;
-		case  nv2a_renderer::AND_REVERSE:
-			c[3] = c[3] & (fb[3] ^ 255);
-			c[2] = c[2] & (fb[2] ^ 255);
-			c[1] = c[1] & (fb[1] ^ 255);
-			c[0] = c[0] & (fb[0] ^ 255);
-			break;
-		case  nv2a_renderer::COPY:
-		default:
-			break;
-		case  nv2a_renderer::AND_INVERTED:
-			c[3] = (c[3] ^ 255) & fb[3];
-			c[2] = (c[2] ^ 255) & fb[2];
-			c[1] = (c[1] ^ 255) & fb[1];
-			c[0] = (c[0] ^ 255) & fb[0];
-			break;
-		case  nv2a_renderer::NOOP:
-			c[3] = fb[3];
-			c[2] = fb[2];
-			c[1] = fb[1];
-			c[0] = fb[0];
-			break;
-		case  nv2a_renderer::XOR:
-			c[3] = c[3] ^ fb[3];
-			c[2] = c[2] ^ fb[2];
-			c[1] = c[1] ^ fb[1];
-			c[0] = c[0] ^ fb[0];
-			break;
-		case  nv2a_renderer::OR:
-			c[3] = c[3] | fb[3];
-			c[2] = c[2] | fb[2];
-			c[1] = c[1] | fb[1];
-			c[0] = c[0] | fb[0];
-			break;
-		case  nv2a_renderer::NOR:
-			c[3] = (c[3] | fb[3]) ^ 255;
-			c[2] = (c[2] | fb[2]) ^ 255;
-			c[1] = (c[1] | fb[1]) ^ 255;
-			c[0] = (c[0] | fb[0]) ^ 255;
-			break;
-		case  nv2a_renderer::EQUIV:
-			c[3] = (c[3] ^ fb[3]) ^ 255;
-			c[2] = (c[2] ^ fb[2]) ^ 255;
-			c[1] = (c[1] ^ fb[1]) ^ 255;
-			c[0] = (c[0] ^ fb[0]) ^ 255;
-			break;
-		case  nv2a_renderer::INVERT:
-			c[3] = fb[3] ^ 255;
-			c[2] = fb[2] ^ 255;
-			c[1] = fb[1] ^ 255;
-			c[0] = fb[0] ^ 255;
-			break;
-		case  nv2a_renderer::OR_REVERSE:
-			c[3] = c[3] | (fb[3] ^ 255);
-			c[2] = c[2] | (fb[2] ^ 255);
-			c[1] = c[1] | (fb[1] ^ 255);
-			c[0] = c[0] | (fb[0] ^ 255);
-			break;
-		case  nv2a_renderer::COPY_INVERTED:
-			c[3] = c[3] ^ 255;
-			c[2] = c[2] ^ 255;
-			c[1] = c[1] ^ 255;
-			c[0] = c[0] ^ 255;
-			break;
-		case  nv2a_renderer::OR_INVERTED:
-			c[3] = (c[3] ^ 255) | fb[3];
-			c[2] = (c[2] ^ 255) | fb[2];
-			c[1] = (c[1] ^ 255) | fb[1];
-			c[0] = (c[0] ^ 255) | fb[0];
-			break;
-		case  nv2a_renderer::NAND:
-			c[3] = (c[3] & fb[3]) ^ 255;
-			c[2] = (c[2] & fb[2]) ^ 255;
-			c[1] = (c[1] & fb[1]) ^ 255;
-			c[0] = (c[0] & fb[0]) ^ 255;
-			break;
-		case  nv2a_renderer::SET:
-			c[3] = 255;
-			c[2] = 255;
-			c[1] = 255;
-			c[0] = 255;
-			break;
+			case  nv2a_renderer::CLEAR:
+				c[3] = 0;
+				c[2] = 0;
+				c[1] = 0;
+				c[0] = 0;
+				break;
+			case  nv2a_renderer::AND:
+				c[3] = c[3] & fb[3];
+				c[2] = c[2] & fb[2];
+				c[1] = c[1] & fb[1];
+				c[0] = c[0] & fb[0];
+				break;
+			case  nv2a_renderer::AND_REVERSE:
+				c[3] = c[3] & (fb[3] ^ 255);
+				c[2] = c[2] & (fb[2] ^ 255);
+				c[1] = c[1] & (fb[1] ^ 255);
+				c[0] = c[0] & (fb[0] ^ 255);
+				break;
+			case  nv2a_renderer::COPY:
+			default:
+				break;
+			case  nv2a_renderer::AND_INVERTED:
+				c[3] = (c[3] ^ 255) & fb[3];
+				c[2] = (c[2] ^ 255) & fb[2];
+				c[1] = (c[1] ^ 255) & fb[1];
+				c[0] = (c[0] ^ 255) & fb[0];
+				break;
+			case  nv2a_renderer::NOOP:
+				c[3] = fb[3];
+				c[2] = fb[2];
+				c[1] = fb[1];
+				c[0] = fb[0];
+				break;
+			case  nv2a_renderer::XOR:
+				c[3] = c[3] ^ fb[3];
+				c[2] = c[2] ^ fb[2];
+				c[1] = c[1] ^ fb[1];
+				c[0] = c[0] ^ fb[0];
+				break;
+			case  nv2a_renderer::OR:
+				c[3] = c[3] | fb[3];
+				c[2] = c[2] | fb[2];
+				c[1] = c[1] | fb[1];
+				c[0] = c[0] | fb[0];
+				break;
+			case  nv2a_renderer::NOR:
+				c[3] = (c[3] | fb[3]) ^ 255;
+				c[2] = (c[2] | fb[2]) ^ 255;
+				c[1] = (c[1] | fb[1]) ^ 255;
+				c[0] = (c[0] | fb[0]) ^ 255;
+				break;
+			case  nv2a_renderer::EQUIV:
+				c[3] = (c[3] ^ fb[3]) ^ 255;
+				c[2] = (c[2] ^ fb[2]) ^ 255;
+				c[1] = (c[1] ^ fb[1]) ^ 255;
+				c[0] = (c[0] ^ fb[0]) ^ 255;
+				break;
+			case  nv2a_renderer::INVERT:
+				c[3] = fb[3] ^ 255;
+				c[2] = fb[2] ^ 255;
+				c[1] = fb[1] ^ 255;
+				c[0] = fb[0] ^ 255;
+				break;
+			case  nv2a_renderer::OR_REVERSE:
+				c[3] = c[3] | (fb[3] ^ 255);
+				c[2] = c[2] | (fb[2] ^ 255);
+				c[1] = c[1] | (fb[1] ^ 255);
+				c[0] = c[0] | (fb[0] ^ 255);
+				break;
+			case  nv2a_renderer::COPY_INVERTED:
+				c[3] = c[3] ^ 255;
+				c[2] = c[2] ^ 255;
+				c[1] = c[1] ^ 255;
+				c[0] = c[0] ^ 255;
+				break;
+			case  nv2a_renderer::OR_INVERTED:
+				c[3] = (c[3] ^ 255) | fb[3];
+				c[2] = (c[2] ^ 255) | fb[2];
+				c[1] = (c[1] ^ 255) | fb[1];
+				c[0] = (c[0] ^ 255) | fb[0];
+				break;
+			case  nv2a_renderer::NAND:
+				c[3] = (c[3] & fb[3]) ^ 255;
+				c[2] = (c[2] & fb[2]) ^ 255;
+				c[1] = (c[1] & fb[1]) ^ 255;
+				c[0] = (c[0] & fb[0]) ^ 255;
+				break;
+			case  nv2a_renderer::SET:
+				c[3] = 255;
+				c[2] = 255;
+				c[1] = 255;
+				c[0] = 255;
+				break;
 		}
 	}
 	fbcolor = (c[3] << 24) | (c[2] << 16) | (c[1] << 8) | c[0];
-	*((UINT32 *)addr) = fbcolor;
+	*addr = fbcolor;
+	if (depth_write_enabled)
+		dep = depth;
+	deptsten = (dep << 8) | sten;
+	*daddr = deptsten;
 }
 
 void nv2a_renderer::render_color(INT32 scanline, const extent_t &extent, const nvidia_object_data &objectdata, int threadid)
@@ -1567,15 +1766,17 @@ void nv2a_renderer::render_color(INT32 scanline, const extent_t &extent, const n
 	x = extent.stopx - extent.startx - 1; // number of pixels to draw
 	while (x >= 0) {
 		UINT32 a8r8g8b8;
+		UINT32 z;
 		int ca, cr, cg, cb;
 		int xp = extent.startx + x; // x coordinate of current pixel
 
-		cb = ((extent.param[0].start + (float)x*extent.param[0].dpdx))*255.0;
-		cg = ((extent.param[1].start + (float)x*extent.param[1].dpdx))*255.0;
-		cr = ((extent.param[2].start + (float)x*extent.param[2].dpdx))*255.0;
-		ca = ((extent.param[3].start + (float)x*extent.param[3].dpdx))*255.0;
+		cb = ((extent.param[PARAM_COLOR_B].start + (float)x*extent.param[PARAM_COLOR_B].dpdx))*255.0;
+		cg = ((extent.param[PARAM_COLOR_G].start + (float)x*extent.param[PARAM_COLOR_G].dpdx))*255.0;
+		cr = ((extent.param[PARAM_COLOR_R].start + (float)x*extent.param[PARAM_COLOR_R].dpdx))*255.0;
+		ca = ((extent.param[PARAM_COLOR_A].start + (float)x*extent.param[PARAM_COLOR_A].dpdx))*255.0;
 		a8r8g8b8 = (ca << 24) + (cr << 16) + (cg << 8) + cb; // pixel color obtained by interpolating the colors of the vertices
-		write_pixel(xp, scanline, a8r8g8b8);
+		z = (extent.param[PARAM_Z].start + (float)x*extent.param[PARAM_Z].dpdx);
+		write_pixel(xp, scanline, a8r8g8b8, z);
 		x--;
 	}
 }
@@ -1584,6 +1785,7 @@ void nv2a_renderer::render_texture_simple(INT32 scanline, const extent_t &extent
 {
 	int x;
 	UINT32 a8r8g8b8;
+	UINT32 z;
 
 	if (!objectdata.data->texture[0].enabled) {
 		return;
@@ -1595,10 +1797,11 @@ void nv2a_renderer::render_texture_simple(INT32 scanline, const extent_t &extent
 		int up, vp;
 		int xp = extent.startx + x; // x coordinate of current pixel
 
-		up = (extent.param[4].start + (float)x*extent.param[4].dpdx)*(float)(objectdata.data->texture[0].sizeu - 1); // x coordinate of texel in texture
-		vp = extent.param[5].start*(float)(objectdata.data->texture[0].sizev - 1); // y coordinate of texel in texture
+		up = (extent.param[PARAM_TEXTURE0_U].start + (float)x*extent.param[PARAM_TEXTURE0_U].dpdx)*(float)(objectdata.data->texture[0].sizeu - 1); // x coordinate of texel in texture
+		vp = (extent.param[PARAM_TEXTURE0_V].start + (float)x*extent.param[PARAM_TEXTURE0_V].dpdx)*(float)(objectdata.data->texture[0].sizev - 1); // y coordinate of texel in texture
 		a8r8g8b8 = texture_get_texel(0, up, vp);
-		write_pixel(xp, scanline, a8r8g8b8);
+		z = (extent.param[PARAM_Z].start + (float)x*extent.param[PARAM_Z].dpdx);
+		write_pixel(xp, scanline, a8r8g8b8, z);
 		x--;
 	}
 }
@@ -1610,6 +1813,7 @@ void nv2a_renderer::render_register_combiners(INT32 scanline, const extent_t &ex
 	int ca, cr, cg, cb;
 	UINT32 color[6];
 	UINT32 a8r8g8b8;
+	UINT32 z;
 	int n;//,m,i,j,k;
 
 	color[0] = color[1] = color[2] = color[3] = color[4] = color[5] = 0;
@@ -1622,17 +1826,17 @@ void nv2a_renderer::render_register_combiners(INT32 scanline, const extent_t &ex
 		xp = extent.startx + x;
 		// 1: fetch data
 		// 1.1: interpolated color from vertices
-		cb = ((extent.param[0].start + (float)x*extent.param[0].dpdx))*255.0;
-		cg = ((extent.param[1].start + (float)x*extent.param[1].dpdx))*255.0;
-		cr = ((extent.param[2].start + (float)x*extent.param[2].dpdx))*255.0;
-		ca = ((extent.param[3].start + (float)x*extent.param[3].dpdx))*255.0;
+		cb = ((extent.param[PARAM_COLOR_B].start + (float)x*extent.param[PARAM_COLOR_B].dpdx))*255.0;
+		cg = ((extent.param[PARAM_COLOR_G].start + (float)x*extent.param[PARAM_COLOR_G].dpdx))*255.0;
+		cr = ((extent.param[PARAM_COLOR_R].start + (float)x*extent.param[PARAM_COLOR_R].dpdx))*255.0;
+		ca = ((extent.param[PARAM_COLOR_A].start + (float)x*extent.param[PARAM_COLOR_A].dpdx))*255.0;
 		color[0] = (ca << 24) + (cr << 16) + (cg << 8) + cb; // pixel color obtained by interpolating the colors of the vertices
 		color[1] = 0; // lighting not yet
 		// 1.2: color for each of the 4 possible textures
 		for (n = 0; n < 4; n++) {
 			if (texture[n].enabled) {
-				up = (extent.param[4 + n * 2].start + (float)x*extent.param[4 + n * 2].dpdx)*(float)(objectdata.data->texture[n].sizeu - 1);
-				vp = extent.param[5 + n * 2].start*(float)(objectdata.data->texture[n].sizev - 1);
+				up = (extent.param[PARAM_TEXTURE0_U + n * 2].start + (float)x*extent.param[PARAM_TEXTURE0_U + n * 2].dpdx)*(float)(objectdata.data->texture[n].sizeu - 1);
+				vp = extent.param[PARAM_TEXTURE0_V + n * 2].start*(float)(objectdata.data->texture[n].sizev - 1);
 				color[n + 2] = texture_get_texel(n, up, vp);
 			}
 		}
@@ -1657,7 +1861,8 @@ void nv2a_renderer::render_register_combiners(INT32 scanline, const extent_t &ex
 		combiner_final_output();
 		a8r8g8b8 = combiner_float_argb8(combiner.output);
 		// 3: write pixel
-		write_pixel(xp, scanline, a8r8g8b8);
+		z = (extent.param[PARAM_Z].start + (float)x*extent.param[PARAM_Z].dpdx);
+		write_pixel(xp, scanline, a8r8g8b8, z);
 		x--;
 	}
 	osd_lock_release(combiner.lock);
@@ -1920,6 +2125,7 @@ int nv2a_renderer::read_vertices_0x1818(address_space & space, vertex_nv *destin
 
 void nv2a_renderer::convert_vertices_poly(vertex_nv *source, vertex_t *destination, int count)
 {
+	vertex_nv vert[4];
 	int m, u;
 
 	// take each vertex with its attributes and obtain data for drawing
@@ -1930,29 +2136,30 @@ void nv2a_renderer::convert_vertices_poly(vertex_nv *source, vertex_t *destinati
 		for (m = 0; m < count; m++) {
 			destination[m].x = source[m].attribute[0].fv[0];
 			destination[m].y = source[m].attribute[0].fv[1];
-			for (u = 0; u < 4; u++) // 0=b 1=g 2=r 3=a
+			for (u = PARAM_COLOR_B; u <= PARAM_COLOR_A; u++) // 0=b 1=g 2=r 3=a
 				destination[m].p[u] = source[m].attribute[3].fv[u];
 			for (u = 0; u < 4; u++) {
-				destination[m].p[4 + u * 2] = source[m].attribute[9 + u].fv[0];
-				destination[m].p[5 + u * 2] = source[m].attribute[9 + u].fv[1];
+				destination[m].p[PARAM_TEXTURE0_U + u * 2] = source[m].attribute[9 + u].fv[0];
+				destination[m].p[PARAM_TEXTURE0_V + u * 2] = source[m].attribute[9 + u].fv[1];
 			}
+			destination[m].p[PARAM_Z] = 0+0xffffff;
 		}
 	}
 	else {
 		// vertex program
-		vertex_nv vert[4];
 		// run vertex program
 		vertexprogram.exec.process(vertexprogram.start_instruction, source, vert, count);
 		// copy data for poly.c
 		for (m = 0; m < count; m++) {
 			destination[m].x = vert[m].attribute[0].fv[0];
 			destination[m].y = vert[m].attribute[0].fv[1];
-			for (u = 0; u < 4; u++) // 0=b 1=g 2=r 3=a
+			for (u = PARAM_COLOR_B; u <= PARAM_COLOR_A; u++) // 0=b 1=g 2=r 3=a
 				destination[m].p[u] = vert[m].attribute[3].fv[u];
 			for (u = 0; u < 4; u++) {
-				destination[m].p[4 + u * 2] = vert[m].attribute[9 + u].fv[0];
-				destination[m].p[5 + u * 2] = vert[m].attribute[9 + u].fv[1];
+				destination[m].p[PARAM_TEXTURE0_U + u * 2] = vert[m].attribute[9 + u].fv[0];
+				destination[m].p[PARAM_TEXTURE0_V + u * 2] = vert[m].attribute[9 + u].fv[1];
 			}
+			destination[m].p[PARAM_Z] = vert[m].attribute[0].fv[2];
 		}
 	}
 }
@@ -1998,7 +2205,7 @@ void nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UI
 
 				read_vertices_0x1810(space, vert, n + offset, 4);
 				convert_vertices_poly(vert, xy, 4);
-				render_polygon<4>(fb.cliprect(), renderspans, 4 + 4 * 2, xy); // 4 rgba, 4 texture units 2 uv
+				render_polygon<4>(limits_rendertarget, renderspans, 4 + 4 * 2, xy); // 4 rgba, 4 texture units 2 uv
 			}
 			wait();
 		}
@@ -2013,7 +2220,7 @@ void nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UI
 			for (n = 0; n <= count; n++) {
 				read_vertices_0x1810(space, vert + ((n + 2) & 3), offset + n, 1);
 				convert_vertices_poly(vert + ((n + 2) & 3), xy + ((n + 2) & 3), 1);
-				render_triangle(fb.cliprect(), renderspans, 4 + 4 * 2, xy[((n & 1) + n) & 3], xy[((~n & 1) + n) & 3], xy[(2 + n) & 3]);
+				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[((n & 1) + n) & 3], xy[((~n & 1) + n) & 3], xy[(2 + n) & 3]);
 			}
 			wait();
 		}
@@ -2052,7 +2259,7 @@ void nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UI
 				address = address + c * 4;
 				countlen = countlen - c;
 				convert_vertices_poly(vert, xy, 4);
-				render_polygon<4>(fb.cliprect(), renderspans, 4 + 4 * 2, xy); // 4 rgba, 4 texture units 2 uv
+				render_polygon<4>(limits_rendertarget, renderspans, 4 + 4 * 2, xy); // 4 rgba, 4 texture units 2 uv
 			}
 			while (countlen > 0) {
 				data = space.read_dword(address);
@@ -2077,7 +2284,7 @@ void nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UI
 				address = address + c * 4;
 				countlen = countlen - c;
 				convert_vertices_poly(vert, xy, 3);
-				render_triangle(fb.cliprect(), renderspans, 4 + 4 * 2, xy[0], xy[1], xy[2]); // 4 rgba, 4 texture units 2 uv
+				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[0], xy[1], xy[2]); // 4 rgba, 4 texture units 2 uv
 			}
 			while (countlen > 0) {
 				data = space.read_dword(address);
@@ -2108,7 +2315,7 @@ void nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UI
 					convert_vertices_poly(vert + ((n + 2) & 3), xy + ((n + 2) & 3), 1);
 					if (xy[(n + 2) & 3].y > 293800000.0)
 						xy[(n + 2) & 3].y = xy[(n + 2) & 3].y + 1.0;
-					render_triangle(fb.cliprect(), renderspans, 4 + 4 * 2, xy[((n & 1) + n) & 3], xy[((~n & 1) + n) & 3], xy[(2 + n) & 3]);
+					render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[((n & 1) + n) & 3], xy[((~n & 1) + n) & 3], xy[(2 + n) & 3]);
 				}
 			}
 			while (countlen > 0) {
@@ -2170,7 +2377,7 @@ void nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UI
 				}
 				address = address + c * 4;
 				convert_vertices_poly(vert + ((n & 1) + 1), xy + ((n & 1) + 1), 1);
-				render_triangle(fb.cliprect(), renderspans, 4 + 4 * 2, xy[0], xy[(~n & 1) + 1], xy[(n & 1) + 1]);
+				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[0], xy[(~n & 1) + 1], xy[(n & 1) + 1]);
 			}
 			wait();
 		}
@@ -2198,7 +2405,7 @@ void nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UI
 					break;
 				}
 				address = address + c * 4;
-				render_triangle(fb.cliprect(), renderspans, 4 + 4 * 2, xy[((n & 1) + n) & 3], xy[((~n & 1) + n) & 3], xy[(2 + n) & 3]);
+				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[((n & 1) + n) & 3], xy[((~n & 1) + n) & 3], xy[(2 + n) & 3]);
 			}
 			wait();
 		}
@@ -2217,7 +2424,7 @@ void nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UI
 					break;
 				}
 				address = address + c * 4;
-				render_polygon<4>(fb.cliprect(), renderspans, 4 + 4 * 2, xy); // 4 rgba, 4 texture units 2 uv
+				render_polygon<4>(limits_rendertarget, renderspans, 4 + 4 * 2, xy); // 4 rgba, 4 texture units 2 uv
 			}
 			wait();
 		}
@@ -2245,8 +2452,8 @@ void nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UI
 					return;
 				}
 				address = address + c * 4;
-				render_triangle(fb.cliprect(), renderspans, 4 + 4 * 2, xy[n & 3], xy[(n + 1) & 3], xy[(n + 2) & 3]);
-				render_triangle(fb.cliprect(), renderspans, 4 + 4 * 2, xy[(n + 2) & 3], xy[(n + 1) & 3], xy[(n + 3) & 3]);
+				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[n & 3], xy[(n + 1) & 3], xy[(n + 2) & 3]);
+				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[(n + 2) & 3], xy[(n + 1) & 3], xy[(n + 3) & 3]);
 			}
 			wait();
 		}
@@ -2320,26 +2527,78 @@ void nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UI
 		space.write_dword(base + offset, data);
 		countlen--;
 	}
+	if (maddress == 0x1d98) {
+		countlen--;
+	}
+	if (maddress == 0x1d9c) {
+		countlen--;
+	}
 	if (maddress == 0x1d94) {
+		int m;
+
+		m = channel[chanel][subchannel].object.method[0x1d7c / 4];
+		if (channel[chanel][subchannel].object.method[0x0208 / 4] & 0x2000)
+			m = 2;
+		else
+			m = 1;
 		// possible buffers: color, depth, stencil, and accumulation
 		// clear framebuffer
 		if (data & 0xf0) {
+			bitmap_rgb32 bm(rendertarget, (limits_rendertarget.right() + 1) * m, (limits_rendertarget.bottom() + 1) * m, pitch_rendertarget / 4); // why *2 ?
 			// clear colors
 			UINT32 color = channel[chanel][subchannel].object.method[0x1d90 / 4];
-			fb.fill(color);
+			bm.fill(color);
 			//printf("clearscreen\n\r");
 		}
-		if (data & 0x03) {
-			// clear stencil+zbuffer
+		if (data & 0x01) {
+			bitmap_rgb32 bm(depthbuffer, (limits_rendertarget.right() + 1) * m, (limits_rendertarget.bottom() + 1) * m, pitch_rendertarget / 4); // why *2 ?
+			// clear zbuffer
+			UINT32 depth = channel[chanel][subchannel].object.method[0x1d8c / 4];
+			bm.fill(depth);
 		}
 		countlen--;
 	}
+	if (maddress == 0x0200) {
+		//x = data & 0xffff;
+		//w = (data >> 16) & 0xffff;
+		limits_rendertarget.setx(0,((data >> 16) & 0xffff)-1);
+	}
+	if (maddress == 0x0204) {
+		//y = data & 0xffff;
+		//h = (data >> 16) & 0xffff;
+		limits_rendertarget.sety(0,((data >> 16) & 0xffff)-1);
+	}
+	if (maddress == 0x020c) {
+		// line size ?
+		pitch_rendertarget=data & 0xffff;
+		pitch_depthbuffer=(data >> 16) & 0xffff;
+		//printf("Pitch color %04X zbuffer %04X\n\r",pitch_rendertarget,pitch_depthbuffer);
+		countlen--;
+	}
+	if (maddress == 0x0100) {
+		// just temporarily
+		if ((data & 0x1f) == 1) {
+			data = data >> 5;
+			data = data & 0x0ffffff0;
+			displayedtarget = (UINT32 *)space.get_write_ptr(data);
+		}
+	}
 	if (maddress == 0x0210) {
 		// framebuffer offset ?
+		rendertarget = (UINT32 *)space.get_write_ptr(data);
+		//printf("Render target at %08X\n\r",data);
 		countlen--;
 	}
 	if (maddress == 0x0214) {
 		// zbuffer offset ?
+		depthbuffer = (UINT32 *)space.get_write_ptr(data);
+		//printf("Depth buffer at %08X\n\r",data);
+		if ((data == 0) || (data > 0x7ffffffc))
+			depth_write_enabled = false;
+		else if (channel[chanel][subchannel].object.method[0x035c / 4] != 0)
+			depth_write_enabled = true;
+		else
+			depth_write_enabled = false;
 		countlen--;
 	}
 	if (maddress == 0x0300) {
@@ -2356,6 +2615,41 @@ void nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UI
 			blending_enabled = false;
 		else
 			blending_enabled = data != 0;
+	}
+	if (maddress == 0x030c) {
+		depth_test_enabled = data != 0;
+	}
+	if (maddress == 0x0354) {
+		depth_function = data;
+	}
+	if (maddress == 0x035c) {
+		UINT32 g = channel[chanel][subchannel].object.method[0x0214 / 4];
+		depth_write_enabled = data != 0;
+		if ((g == 0) || (g > 0x7ffffffc))
+			depth_write_enabled = false;
+	}
+	if (maddress == 0x032c) {
+		stencil_test_enabled = data != 0;
+	}
+	if (maddress == 0x0364) {
+		stencil_func = data;
+	}
+	if (maddress == 0x0368) {
+		if (data > 255)
+			data = 255;
+		stencil_ref = data;
+	}
+	if (maddress == 0x036c) {
+		stencil_mask = data;
+	}
+	if (maddress == 0x0370) {
+		stencil_op_fail = data;
+	}
+	if (maddress == 0x0374) {
+		stencil_op_zfail = data;
+	}
+	if (maddress == 0x0378) {
+		stencil_op_zpass = data;
 	}
 	if (maddress == 0x0344) {
 		blend_function_source = data;
@@ -3285,11 +3579,13 @@ bool nv2a_renderer::vblank_callback(screen_device &screen, bool state)
 
 UINT32 nv2a_renderer::screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 *dst = (UINT32 *)bitmap.raw_pixptr(0, 0);
-	UINT32 *src = (UINT32 *)fb.raw_pixptr(0, 0);
+	if (displayedtarget != NULL) {
+		bitmap_rgb32 bm(displayedtarget, 640, 480, 640);
+		UINT32 *dst = (UINT32 *)bitmap.raw_pixptr(0, 0);
 
-	//printf("updatescreen\n\r");
-	memcpy(dst, src, bitmap.rowbytes()*bitmap.height());
+		//printf("updatescreen %08X\n\r",pcrtc[0x800/4]);
+		memcpy(dst, displayedtarget, bitmap.rowbytes()*bitmap.height());
+	}
 	return 0;
 }
 
@@ -3372,6 +3668,10 @@ WRITE32_MEMBER(nv2a_renderer::geforce_w)
 		if (e >= (sizeof(pcrtc) / sizeof(UINT32)))
 			return;
 		COMBINE_DATA(pcrtc + e);
+		if (e == 0x800 / 4) {
+			displayedtarget = (UINT32 *)space.get_read_ptr(data);
+			//printf("crtc buffer %08X\n\r", data);
+		}
 		//logerror("NV_2A: write PCRTC[%06X]=%08X\n",offset*4-0x00600000,data & mem_mask);
 	}
 	else if ((offset >= 0x00000000 / 4) && (offset < 0x00001000 / 4)) {

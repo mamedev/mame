@@ -19,6 +19,15 @@
 
 #include <map>
 
+// None is typedef'd already in SDL/X11 libs
+#ifdef None
+#undef None
+#endif
+
+#include "lua/lua.hpp"
+#include "lua/lib/lualibs.h"
+#include "lua/bridge/LuaBridge.h"
+
 struct lua_State;
 
 class lua_engine
@@ -88,6 +97,14 @@ private:
 	static int l_emu_start(lua_State *L);
 	static int l_emu_pause(lua_State *L);
 	static int l_emu_unpause(lua_State *L);
+
+	// "emu.machine" namespace
+	static luabridge::LuaRef l_machine_get_devices(const running_machine *r);
+	static luabridge::LuaRef l_dev_get_memspaces(const device_t *d);
+	static luabridge::LuaRef devtree_dfs(device_t *root, luabridge::LuaRef dev_table);
+	struct lua_addr_space {
+		template<typename T> int l_mem_read(lua_State *L);
+	};
 
 	void resume(void *L, INT32 param);
 	void report_errors(int status);

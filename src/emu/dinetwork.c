@@ -2,7 +2,7 @@
 #include "osdnet.h"
 
 device_network_interface::device_network_interface(const machine_config &mconfig, device_t &device, float bandwidth)
-	: device_interface(device)
+	: device_interface(device, "network")
 {
 	m_promisc = false;
 	m_bandwidth = bandwidth;

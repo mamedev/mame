@@ -3813,11 +3813,11 @@ ROM_END
 
 ROM_START( brapboysu ) /* US 'special version' with EXROM sub board; Serial RB92A0008x/9x; suffix code -10 */
 	ROM_REGION( 0x040000, "maincpu", 0 )            /* 68000 Code */
-	ROM_LOAD16_BYTE( "rb-030.10.u61", 0x000000, 0x020000, CRC(527EB92A) SHA1(64727675E58A4A71BEA1D88D7F76F60929196505) ) /* eprom labeled RB-030/U61-10 (red label) */
-	ROM_LOAD16_BYTE( "rb-031.10.u62", 0x000001, 0x020000, CRC(D5962BDD) SHA1(9BADAB4CC2A9064BD29C582D82EC0B003B9FB091) ) /* eprom labeled RB-031/U62-10 (red label) */
+	ROM_LOAD16_BYTE( "rb-030.10.u61", 0x000000, 0x020000, CRC(527eb92a) SHA1(64727675e58a4a71bea1d88d7f76f60929196505) ) /* eprom labeled RB-030/U61-10 (red label) */
+	ROM_LOAD16_BYTE( "rb-031.10.u62", 0x000001, 0x020000, CRC(d5962bdd) SHA1(9badab4cc2a9064bd29c582d82ec0b003b9fb091) ) /* eprom labeled RB-031/U62-10 (red label) */
 
 	ROM_REGION( 0x020000, "calc3_rom", 0 )/* MCU Data */
-	ROM_LOAD( "rb-040.10.u33",  0x000000, 0x020000, CRC(0C90D758) SHA1(9B1A9856AB00F80F15BFFC01276F636F92F0BD12) ) /* eprom labeled RB-040/U33-10 (red label)*/
+	ROM_LOAD( "rb-040.10.u33",  0x000000, 0x020000, CRC(0c90d758) SHA1(9b1a9856ab00f80f15bffc01276f636f92f0bd12) ) /* eprom labeled RB-040/U33-10 (red label)*/
 
 	ROM_REGION( 0x1000000, "gfx1", 0 )  /* Sprites */
 	ROM_LOAD( "rb-020.u100", 0x000000, 0x100000, CRC(ce220d38) SHA1(b88d7c89a3e1a826bf19a1fa692ec77c944596d9) ) // rb-020 0013 mask rom; really at location next to capacitor C2 on Z01DK-EXROM daughterboard
@@ -3826,7 +3826,7 @@ ROM_START( brapboysu ) /* US 'special version' with EXROM sub board; Serial RB92
 	ROM_LOAD( "rb-023.u78",  0x300000, 0x100000, CRC(0e6530c5) SHA1(72bff46f0672927e540f4f3546ae533dd0a231e0) ) // rb-023 0016 mask rom
 	ROM_LOAD( "rb-024.u79",  0x400000, 0x080000, CRC(65fa6447) SHA1(551e540d7bf412753b4a7098e25e6f9d8774bcf4) ) // rb-023 0017 w29 mask rom, both halves identical when dumped as larger
 	ROM_RELOAD( 0x480000,  0x080000 )
-	ROM_LOAD( "rb-025.10.u80a",   0x500000, 0x080000, CRC(140FE400) SHA1(A764767AACEC2F895F93256AB82125962C272951) ) // eprom labeled RB-025/U80a10 (red label), really at location next to capacitor C4 on Z01DK-EXROM daughterboard
+	ROM_LOAD( "rb-025.10.u80a",   0x500000, 0x080000, CRC(140fe400) SHA1(a764767aacec2f895f93256ab82125962c272951) ) // eprom labeled RB-025/U80a10 (red label), really at location next to capacitor C4 on Z01DK-EXROM daughterboard
 	ROM_LOAD( "rb-026.10.u80b",   0x580000, 0x080000, CRC(bb7604d4) SHA1(57d51ce4ea2000f9a50bae326cfcb66ec494249f) ) // eprom labeled RB-026/U80b10 (red label), matches japan version of rb-026, really at location next to capacitor C5 on Z01DK-EXROM daughterboard
 
 	ROM_REGION( 0x400000, "gfx2", 0 )   /* Tiles (scrambled) */

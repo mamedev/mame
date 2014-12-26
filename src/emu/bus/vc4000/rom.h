@@ -24,6 +24,15 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_rom);
 };
 
+// ======================> vc4000_rom4k_device
+
+class vc4000_rom4k_device : public vc4000_rom_device
+{
+public:
+	// construction/destruction
+	vc4000_rom4k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 // ======================> vc4000_ram1k_device
 
 class vc4000_ram1k_device : public vc4000_rom_device
@@ -57,6 +66,7 @@ public:
 
 // device type definition
 extern const device_type VC4000_ROM_STD;
+extern const device_type VC4000_ROM_ROM4K;
 extern const device_type VC4000_ROM_RAM1K;
 extern const device_type VC4000_ROM_CHESS2;
 

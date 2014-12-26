@@ -1227,7 +1227,7 @@ ROM_END
 
 ROM_START( czmon_5 ) // 030421
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "cm_m_030421.rom", 0x00000, 0x40000, CRC(6826564E) SHA1(6559e45e3ec39c1d201ed54a10fdb5c6aeff6582) )
+	ROM_LOAD( "cm_m_030421.rom", 0x00000, 0x40000, CRC(6826564e) SHA1(6559e45e3ec39c1d201ed54a10fdb5c6aeff6582) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "crazymonkey_m.001", 0x000000, 0x80000, CRC(683f2be3) SHA1(6fdba4ec07752bf049787a11638895352e9d5f10) )
@@ -1343,7 +1343,7 @@ ROM_END
 
 ROM_START( fcockt_3 ) // 030623
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "fc_m_030623.rom", 0x00000, 0x40000, CRC(00A267B2) SHA1(b95c5e06cf41762802199e1b55a5eda2243c9af7) )
+	ROM_LOAD( "fc_m_030623.rom", 0x00000, 0x40000, CRC(00a267b2) SHA1(b95c5e06cf41762802199e1b55a5eda2243c9af7) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "fruitcocktail_m.001", 0x000000, 0x80000, CRC(da72c0bb) SHA1(41c9eebccce82520dfe41d6a3a574b2890945ffa) )
@@ -1422,7 +1422,7 @@ ROM_START( fcockt_9 ) // 070305
 	ROM_LOAD( "fc_070305.rom", 0x00000, 0x40000, CRC(4eb835d9) SHA1(406b2fcad0ca587eacee123ac4b040cb6f6db18c) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
-	ROM_LOAD( "fruitcocktail.001",   0x000000, 0x80000, CRC(735FBE79) SHA1(6ab590e00043dcb6648fd942e11747486d497df1) ) /* Only this set is listed as official hashes */
+	ROM_LOAD( "fruitcocktail.001",   0x000000, 0x80000, CRC(735fbe79) SHA1(6ab590e00043dcb6648fd942e11747486d497df1) ) /* Only this set is listed as official hashes */
 	ROM_LOAD( "fruitcocktail.002",   0x100000, 0x80000, CRC(28fc888e) SHA1(2b8c55675bf61203682d560c9b3f29568719113f) )
 	ROM_LOAD( "fruitcocktail.003",   0x200000, 0x80000, CRC(01fc1a18) SHA1(4f73c6cde6ed741cc8c1bc32442f572ee7ba208a) )
 	ROM_LOAD( "fruitcocktail.004",   0x300000, 0x80000, CRC(68daa864) SHA1(b05c455e23ace80e102699616b75f3a0946c04bc) )
@@ -1437,7 +1437,7 @@ ROM_START( fcockt_10 ) // 070517
 	ROM_LOAD( "fc_070517.rom", 0x00000, 0x40000, CRC(8b43f765) SHA1(86412c37252cf1f12a3acd9359bbf1cdcf52da9f) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
-	ROM_LOAD( "fruitcocktail.001",   0x000000, 0x80000, CRC(735FBE79) SHA1(6ab590e00043dcb6648fd942e11747486d497df1) ) /* Only this set is listed as official hashes */
+	ROM_LOAD( "fruitcocktail.001",   0x000000, 0x80000, CRC(735fbe79) SHA1(6ab590e00043dcb6648fd942e11747486d497df1) ) /* Only this set is listed as official hashes */
 	ROM_LOAD( "fruitcocktail.002",   0x100000, 0x80000, CRC(28fc888e) SHA1(2b8c55675bf61203682d560c9b3f29568719113f) )
 	ROM_LOAD( "fruitcocktail.003",   0x200000, 0x80000, CRC(01fc1a18) SHA1(4f73c6cde6ed741cc8c1bc32442f572ee7ba208a) )
 	ROM_LOAD( "fruitcocktail.004",   0x300000, 0x80000, CRC(68daa864) SHA1(b05c455e23ace80e102699616b75f3a0946c04bc) )
@@ -1452,7 +1452,7 @@ ROM_START( fcockt_11 ) // 070822
 	ROM_LOAD( "fc_070822.rom", 0x00000, 0x40000, CRC(f156657d) SHA1(bd538e714a87461bdf84df18ae3f8caeee876747) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
-	ROM_LOAD( "fruitcocktail.001",   0x000000, 0x80000, CRC(735FBE79) SHA1(6ab590e00043dcb6648fd942e11747486d497df1) ) /* Only this set is listed as official hashes */
+	ROM_LOAD( "fruitcocktail.001",   0x000000, 0x80000, CRC(735fbe79) SHA1(6ab590e00043dcb6648fd942e11747486d497df1) ) /* Only this set is listed as official hashes */
 	ROM_LOAD( "fruitcocktail.002",   0x100000, 0x80000, CRC(28fc888e) SHA1(2b8c55675bf61203682d560c9b3f29568719113f) )
 	ROM_LOAD( "fruitcocktail.003",   0x200000, 0x80000, CRC(01fc1a18) SHA1(4f73c6cde6ed741cc8c1bc32442f572ee7ba208a) )
 	ROM_LOAD( "fruitcocktail.004",   0x300000, 0x80000, CRC(68daa864) SHA1(b05c455e23ace80e102699616b75f3a0946c04bc) )
@@ -1467,7 +1467,7 @@ ROM_START( fcockt_12 ) // 070911
 	ROM_LOAD( "fc_070911.rom", 0x00000, 0x40000, CRC(17c015bb) SHA1(5369549853f1c463b999bb4ff9d06c5d8e467c5b) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
-	ROM_LOAD( "fruitcocktail.001",   0x000000, 0x80000, CRC(735FBE79) SHA1(6ab590e00043dcb6648fd942e11747486d497df1) ) /* Only this set is listed as official hashes */
+	ROM_LOAD( "fruitcocktail.001",   0x000000, 0x80000, CRC(735fbe79) SHA1(6ab590e00043dcb6648fd942e11747486d497df1) ) /* Only this set is listed as official hashes */
 	ROM_LOAD( "fruitcocktail.002",   0x100000, 0x80000, CRC(28fc888e) SHA1(2b8c55675bf61203682d560c9b3f29568719113f) )
 	ROM_LOAD( "fruitcocktail.003",   0x200000, 0x80000, CRC(01fc1a18) SHA1(4f73c6cde6ed741cc8c1bc32442f572ee7ba208a) )
 	ROM_LOAD( "fruitcocktail.004",   0x300000, 0x80000, CRC(68daa864) SHA1(b05c455e23ace80e102699616b75f3a0946c04bc) )
@@ -1505,7 +1505,7 @@ ROM_END
 
 ROM_START( lhaunt_2 ) // 030804
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "lh_m_030804.rom", 0x00000, 0x40000, CRC(2A9A7267) SHA1(b75702a678d716cd0ccb1f2d1e58c1d3e9f7ca98) )
+	ROM_LOAD( "lh_m_030804.rom", 0x00000, 0x40000, CRC(2a9a7267) SHA1(b75702a678d716cd0ccb1f2d1e58c1d3e9f7ca98) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "luckyhaunter_m.001", 0x000000, 0x80000, CRC(5f1000c6) SHA1(05154d786caf7f5fb9ed90c7d3391cec42e871f8) )
@@ -1907,7 +1907,7 @@ ROM_END
 
 ROM_START( resdnt ) // 040415
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
-	ROM_LOAD( "rs_m_040415.rom", 0x00000, 0x40000, CRC(2E06F70C) SHA1(b9f07bc2765d4f366e548007e51b9f605c884ba1) )
+	ROM_LOAD( "rs_m_040415.rom", 0x00000, 0x40000, CRC(2e06f70c) SHA1(b9f07bc2765d4f366e548007e51b9f605c884ba1) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "resident_m.001", 0x000000, 0x80000, CRC(e0645da6) SHA1(dd72f4830d8011f603aa6d430f34ac2598005281) )

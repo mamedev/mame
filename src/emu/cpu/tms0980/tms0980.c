@@ -161,6 +161,7 @@ const device_type TMS0970 = &device_creator<tms0970_cpu_device>; // 28-pin DIP, 
 // - 64-term microinstructions PLA between the RAM and ROM, supporting 20 microinstructions plus optional separate lines for custom opcode handling
 // - 48-term output PLA above the RAM (rotate opla 90 degrees)
 const device_type TMS0270 = &device_creator<tms0270_cpu_device>; // 40-pin DIP, 16 O pins, 8+ R pins (some R pins are internally hooked up to support more I/O)
+// newer TMS0270 chips (eg. Speak & Math) have 42 pins
 // TMS0260 is similar? except opla is 32 instead of 48 terms
 
 

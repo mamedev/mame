@@ -236,11 +236,9 @@
 		<publisher>Interton</publisher>
 		<info name="serial" value="18"/>
 		<part name="cart" interface="vc4000_cart">
-			<feature name="slot" value="ram1k" />
+			<feature name="slot" value="rom4k" />
 			<dataarea name="rom" size="4096">
 				<rom name="boxing.bin" size="4096" crc="922c9f0d" sha1="b49a37dd6d0272f6c71d778ffada6bc7c90f8348" offset="0" />
-			</dataarea>
-			<dataarea name="ram" size="1024">
 			</dataarea>
 		</part>
 	</software>

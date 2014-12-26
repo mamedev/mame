@@ -21,7 +21,7 @@
 //-------------------------------------------------
 
 device_nvram_interface::device_nvram_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device)
+	: device_interface(device, "nvram")
 {
 }
 

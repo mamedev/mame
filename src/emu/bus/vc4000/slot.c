@@ -127,6 +127,7 @@ struct vc4000_slot
 static const vc4000_slot slot_list[] =
 {
 	{ VC4000_STD,     "std" },
+	{ VC4000_ROM4K,   "rom4k" },
 	{ VC4000_RAM1K,   "ram1k" },
 	{ VC4000_CHESS2,  "chess2" }
 };
@@ -183,7 +184,7 @@ bool vc4000_cart_slot_device::call_load()
 			// attempt to identify the non-standard types
 			if (size > 0x1000)  // 6k rom + 1k ram - Chess2 only
 				m_type = VC4000_CHESS2;
-			else if (size > 0x0800) // some 4k roms have 1k of mirrored ram
+			else if (size > 0x0800) // some 4k roms have 1k of mirrored ram (those who don't still work with RAM emulated luckily)
 				m_type = VC4000_RAM1K;
 
 			if (m_type == VC4000_RAM1K || m_type == VC4000_CHESS2)
