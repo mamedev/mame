@@ -26332,6 +26332,17 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
+	<software name="overstrm">
+		<description>Overstorm (Euro, Prototype Demo)</description>
+		<year>2003</year>
+		<publisher>Polyzoom</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="3470916">
+				<rom name="overstorm_demo.bin" size="3470916" crc="ee764cf6" sha1="88129a07e9dfb556c38a5c61c6e96fbfb4d23fea" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ozzydrix">
 		<description>Ozzy &amp; Drix (USA)</description>
 		<year>2003</year>
@@ -29111,6 +29122,17 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="rescue heroes - billy blazes! (usa).bin" size="4194304" crc="8111261c" sha1="481fd8ab9e8e980039e244ba31a6dff057235210" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="revil2d">
+		<description>Resident Evil 2 (Euro, Prototype Demo)</description>
+		<year>2000?</year>
+		<publisher>Raylight Studios</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="2908576">
+				<rom name="re2_tech.bin" size="2908576" crc="26b5cf8b" sha1="a70cf38071f639e783734bc9875ace0ebd2c5180" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
