@@ -106,11 +106,13 @@ endif
 
 $(CPUOBJ)/arcompact/arcompact.o:  $(CPUSRC)/arcompact/arcompact.c \
 			$(CPUSRC)/arcompact/arcompact.h \
-			$(CPUSRC)/arcompact/arcompact_common.h
+			$(CPUSRC)/arcompact/arcompact_common.h \
+			$(CPUOBJ)/arcompact/arcompact.inc
 
 $(CPUOBJ)/arcompact/arcompact_execute.o:  $(CPUSRC)/arcompact/arcompact_execute.c \
 			$(CPUSRC)/arcompact/arcompact.h \
-			$(CPUSRC)/arcompact/arcompact_common.h
+			$(CPUSRC)/arcompact/arcompact_common.h \
+			$(CPUOBJ)/arcompact/arcompact.inc
 
 $(CPUOBJ)/arcompact/arcompactdasm_dispatch.o:  $(CPUSRC)/arcompact/arcompactdasm_dispatch.c \
 			$(CPUSRC)/arcompact/arcompactdasm_dispatch.h \
@@ -123,7 +125,11 @@ $(CPUOBJ)/arcompact/arcompactdasm_ops.o:  $(CPUSRC)/arcompact/arcompactdasm_ops.
 $(CPUOBJ)/arcompact/arcompact_common.o:  $(CPUSRC)/arcompact/arcompact_common.c \
 			$(CPUSRC)/arcompact/arcompact_common.h
 
-
+# rule to generate the C files
+$(CPUOBJ)/arcompact/arcompact.inc: $(CPUSRC)/arcompact/arcompact_make.py
+	@echo Generating arcompact source .inc files...
+	$(PYTHON) $(CPUSRC)/arcompact/arcompact_make.py $@
+	
 #-------------------------------------------------
 # Acorn ARM series
 #
