@@ -135,8 +135,7 @@ int arcompact_device::check_condition(UINT8 condition)
 	{
 		case 0x00: return 1; // AL
 		case 0x01: return CONDITION_EQ;
-
-		case 0x02: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x02: return !CONDITION_EQ; // NE
 		case 0x03: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
 		case 0x04: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
 		case 0x05: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
@@ -1144,8 +1143,34 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle1e_03(OPS_16)
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle00_00(OPS_32)
 {
 	int size = 4;
+
+	COMMON32_GET_CONDITION
+
+	if (!check_condition(condition))
+		return m_pc + (size>>0);
+
 	// Branch Conditionally
-	arcompact_log("unimplemented Bcc %08x", op);
+	// 0000 0sss ssss sss0 SSSS SSSS SSNQ QQQQ
+	INT32 address = (op & 0x07fe0000) >> 17;
+	address |= ((op & 0x0000ffc0) >> 6) << 10;
+	if (address & 0x80000) address = -0x80000 + (address & 0x7ffff);
+	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
+
+	UINT32 realaddress = PC_ALIGNED32 + (address * 2);
+
+	if (n)
+	{
+		m_delayactive = 1;
+		m_delayjump = realaddress;
+		m_delaylinks = 0; // don't link
+	}
+	else
+	{
+	//	m_regs[REG_BLINK] = m_pc + (size >> 0);  // don't link
+		return realaddress;
+	}
+
+
 	return m_pc + (size>>0);
 }
 
@@ -2219,47 +2244,6 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_04(OPS_32)  { return a
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_05(OPS_32)  { return arcompact_handle04_2f_helper(PARAMS, "SEXB"); } // SEXB
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_06(OPS_32)  { return arcompact_handle04_2f_helper(PARAMS, "SEXW"); } // SEXW
 
-// EXTB
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_07_p00(OPS_32) // note 'b' destination for 04_2f_07_xx group
-{
-	SETUP_HANDLE04_2f_0x_P00;
-	
-	m_regs[breg] = c & 0x000000ff;
-	if (F)
-	{
-		arcompact_fatal("arcompact_handle04_2f_08_p00 (EXTW) (F set)\n"); // not yet supported
-	}
-
-	return m_pc + (size >> 0);
-}
-
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_07_p01(OPS_32) 
-{
-	int size = 4;
-	arcompact_fatal("arcompact_handle04_2f_07_p01 (EXTB)\n");
-	return m_pc + (size >> 0);
-}
-
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_07_p10(OPS_32)
-{
-	int size = 4;
-	arcompact_fatal("illegal 04_2f_07_p10 (EXTB)\n"); // illegal mode because 'S' bits have already been used for opcode select
-	return m_pc + (size >> 0);
-}
-
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_07_p11_m0(OPS_32)
-{
-	int size = 4;
-	arcompact_fatal("arcompact_handle04_2f_07_p11_m0 (EXTB)\n");  // illegal mode because 'Q' bits have already been used for opcode select
-	return m_pc + (size >> 0);
-}
-
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_07_p11_m1(OPS_32)
-{
-	int size = 4;
-	arcompact_fatal("arcompact_handle04_2f_07_p11_m1 (EXTB)\n");  // illegal mode because 'Q' bits have already been used for opcode select
-	return m_pc + (size >> 0);
-}
 
 // EXTW b <- c  or  EXTW  b <- limm   or EXTW  limm <- c (no result)  or EXTW  limm, limm (invalid?)
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_08_p00(OPS_32) // note 'b' destination for 04_2f_08_xx group

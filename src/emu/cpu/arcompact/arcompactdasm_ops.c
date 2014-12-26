@@ -129,7 +129,7 @@ int arcompact_handle00_00_dasm(DASM_OPS_32)
 	// 0000 0sss ssss sss0 SSSS SSSS SSNQ QQQQ
 	INT32 address = (op & 0x07fe0000) >> 17;
 	address |= ((op & 0x0000ffc0) >> 6) << 10;
-	if (address & 0x800000) address = -0x800000 + (address & 0x7fffff);
+	if (address & 0x80000) address = -0x80000 + (address & 0x7ffff);
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
 	COMMON32_GET_CONDITION
 
