@@ -4,10 +4,72 @@
 <softwarelist name="timex_dock" description="Timex Sinclair TS-2068 DOCK cartridges">
 
 
+<!--
+Timex Technical Docs... http://timex.comboios.info/home.html
+
+Timex Command Cartridges... http://timex.comboios.info/tscart.html
+
+NOTE: Below apply to BIN files only! (BIN file = DCK file minus the first 9 bytes of DCK header)
+
+
+Types of TS2068 Cartridges:
+
+Actually exists 3 types of cartridges:
+
+LROS (Language ROM Oriented Software) takes control of the computer, the internal ROMs are not used;
+AROS (Application ROM Oriented Software) uses BASIC interpreter;
+ROM is simply a ROM chip. In TS2068 to a ROM work, you must type OUT 244,3 to "page" the DOCK port.
+
+An LROS is identified by the following overhead bytes:
+
+Location    Description
+
+0000        Not Used
+0001        Cartridge Type
+            O1=LROS
+0002/0003   Starting Address (LSB/MSB)
+            Address to be jumped to after Operating System initialization is complete.
+            Order of bytes is as for a JP instruction.
+0004        Memory Chunk Specification
+            Bits 0-7 represent Chunks 0-7 respectively in the Dock Bank in low active format:
+            0 if in use
+            1 if not in use
+            NOTE: When writing to the Horizontal Select Register (Port F4H), the Chunk Specification is High Active
+
+
+An AROS is identified by the following overhead bytes:
+
+Location    Description
+
+8000H       Language Type
+            1 = BASIC [and machine code]
+            2 = Machine code only
+            (Any other value will result in Error S, Missing LROS)
+8001H       Cartridge Type
+            02=AROS
+8002/8003H  Starting Address(LSB/MSB)
+            (BASIC AROS= Addrs. of First Program Line)
+            (Machine Code AROS = Addrs. of First Z80 Instruction)
+8004H       Memory Chunk Specification
+            Bits 0-7 represent Chunks 0-7 respectively in the Dock Bank in low active format as follows:
+            0 if in use
+            1 if not in use
+            NOTE: Bits 0-3 must he set to 1 for proper execution.
+8005H       Autostart Specification:
+            0 = No Autostart
+            1 = Autostart
+8006/8007H  Number of bytes of RAM to be Reserved for Machine Code Variables
+            (LSB/MSB - 0100H=1 byte Reserved; 0002H=512 bytes Reserved)
+
+NOTE: info about release and publisher are taken from http://www.worldofspectrum.org/tmx/
+
+-->
+
+<!-- Cartridge Type: AROS (overhead bytes: 02 02 0C80 EF 01 0000) -->
 	<software name="android" supported="no">
 		<description>Androids</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>Timex Computer</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="androids.bin" size="8192" crc="fec4c2b4" sha1="52b1d4c8316adf74aeb685f54c789a90015215d6" offset="0x8000" />
@@ -15,10 +77,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: LROS (overhead bytes: 00 01 0500 FC) -->
 	<software name="backgamm" supported="no">
 		<description>Backgammon</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>Sinclair Research</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="backgammon.bin" size="16384" crc="2c125684" sha1="20d8be438259958a1f0eb0a3852b39fbd4c02c8c" offset="0x0000" />
@@ -26,10 +89,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: AROS (overhead bytes: 01 02 0880 CF 01 0000) -->
 	<software name="budgeter" supported="no">
 		<description>Budgeter</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>Timex Computer</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="budgeter.bin" size="16384" crc="9b5e4565" sha1="bead4247e05f22a26cdc6a835a62b1277685b709" offset="0x8000" />
@@ -37,10 +101,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: AROS (overhead bytes: 02 02 00C0 8F 01 1500) -->
 	<software name="casino1" supported="no">
 		<description>Casino1</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>Timex Computer</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="casino1.bin" size="24576" crc="3da6d3c9" sha1="f84ba979b94baf092bae70cfa1ec8f276b48885f" offset="0x8000" />
@@ -48,10 +113,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: LROS (overhead bytes: 00 01 F529 FC) -->
 	<software name="chess" supported="no">
 		<description>Chess</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>Timex Computer</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="chess.bin" size="16384" crc="e64367ef" sha1="cf7e02a6c20ee0d027f4676e2a1e7aed5d6ced95" offset="0x0000" />
@@ -59,10 +125,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: AROS (overhead bytes: 02 02 2892 EF 01 C017) -->
 	<software name="crazybug" supported="no">
 		<description>Crazy Bugs</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>Timex Computer</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="crazy bugs.bin" size="8192" crc="a440e8f2" sha1="c0f63b7492e542a3bb955a787e7394dc5a3e6fde" offset="0x8000" />
@@ -70,8 +137,9 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: AROS (overhead bytes: 01 02 0A80 8F 01 0000) -->
 	<software name="etoolkit" supported="no">
-		<description>eToolkit</description>
+		<description>eToolkit (Toolkit EPROM)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="timex_cart">
@@ -81,10 +149,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: AROS (overhead bytes: 02 02 73EC 0F 01 BF17) -->
 	<software name="fsim" supported="no">
 		<description>Flight Simulator</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>Timex Computer</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="flight simulator.bin" size="32768" crc="e1f2e4cc" sha1="30a78405f88041d36f43e2526fb01539bb469458" offset="0x8000" />
@@ -92,10 +161,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: LROS (overhead bytes: 00 01 0500 FC) -->
 	<software name="gyruss" supported="no">
 		<description>Gyruss</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>Parker Software</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="gyruss.bin" size="16384" crc="b2719977" sha1="d950810bf6b729edbc8a92e1e6bdc609cb4d5895" offset="0x0000" />
@@ -103,10 +173,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: LROS (overhead bytes: 00 01 0500 FC) -->
 	<software name="horacesp" supported="no">
 		<description>Horace &amp; the Spiders</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>Timex Computer</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="horace and the spiders.bin" size="16384" crc="86e3366d" sha1="904f4e566911b242f967f7d13a16fd81ff1255cd" offset="0x0000" />
@@ -114,10 +185,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: LROS (overhead bytes: 00 01 0500 FC) -->
 	<software name="horace" supported="no">
 		<description>Hungry Horace</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>Timex Computer</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="hungry horace.bin" size="16384" crc="1b31125f" sha1="429270c85b5692d9cdb173a7ce6f297b8f35c4c3" offset="0x0000" />
@@ -125,10 +197,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: LROS (overhead bytes: 00 01 F73F FC) -->
 	<software name="jupitace" supported="no">
 		<description>Jupiter ACE Emulator</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1985</year>
+		<publisher>Paul Farrow</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="jupiter ace emulator.bin" size="16384" crc="905c71fc" sha1="88544ccbc8acdf23adbfb0a37f34283702b09348" offset="0x0000" />
@@ -136,10 +209,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: LROS (overhead bytes: 00 01 0500 FC) -->
 	<software name="locomotn" supported="no">
 		<description>Loco Motion</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>Parker Software</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="loco motion.bin" size="16384" crc="0e0302ca" sha1="0974f75f99d2acb2f3e767c26a2efbef5eb93235" offset="0x0000" />
@@ -147,10 +221,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: LROS (overhead bytes: 00 01 0500 FE) -->
 	<software name="montezum" supported="no">
 		<description>Montezuma's Revenge</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>Parker Software</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="montezuma's revenge.bin" size="8192" crc="683f9f93" sha1="406e1ba6eeb94142696d22293782bfd067b2233c" offset="0x0000" />
@@ -158,10 +233,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: AROS (overhead bytes: 01 02 0880 EF 01 0000) -->
 	<software name="mterm" supported="no">
-		<description>MTERM</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>MTERM - Smart Terminal Program</description>
+		<year>1983</year>
+		<publisher>Westridge Communications</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="mterm.bin" size="8192" crc="8e0be19f" sha1="8b18268601c895dc90e79ec9605ed40925832979" offset="0x8000" />
@@ -169,10 +245,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: LROS (overhead bytes: 00 01 0500 F0) -->
 	<software name="penetrat" supported="no">
 		<description>Penetrator</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>Timex Computer</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="penetrator.bin" size="32768" crc="19cb2f78" sha1="826d03e2cfc176047a2e913315115d5f71c9ae2a" offset="0x0000" />
@@ -180,10 +257,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: LROS (overhead bytes: 00 01 0500 F8) -->
 	<software name="pinball" supported="no">
-		<description>Pinball</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Pro Pinball</description>
+		<year>1983</year>
+		<publisher>Timex Computer</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="pinball.bin" size="24576" crc="2fb6a452" sha1="ab74fbe21df513e52aef960be018369ebfb3c33f" offset="0x0000" />
@@ -191,10 +269,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: LROS (overhead bytes: 00 01 0500 FC) -->
 	<software name="planet" supported="no">
 		<description>Planetoids</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>Sinclair Research</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="planetoids.bin" size="16384" crc="a6c9cc94" sha1="70e05f2d1aaad79cfa2d90111ba0a58cca4cacd9" offset="0x0000" />
@@ -202,10 +281,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: LROS (overhead bytes: 00 01 4302 FE) -->
 	<software name="popeye" supported="no">
 		<description>Popeye</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>Parker Software</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="popeye.bin" size="8192" crc="dae064c0" sha1="dc0ab2c30a86647529d92a737d24f51f4de7ae19" offset="0x0000" />
@@ -213,10 +293,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: LROS (overhead bytes: 00 01 0500 FE) -->
 	<software name="qbert" supported="no">
 		<description>Q*Bert</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>Parker Software</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="qbert.bin" size="8192" crc="58b45e9d" sha1="d748e5b504f3ea4e0cf472dca1746c2654361863" offset="0x0000" />
@@ -224,10 +305,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: LROS (overhead bytes: 00 01 0500 FE) -->
 	<software name="jedi" supported="no">
 		<description>Return Of The Jedi - Death Star Battle</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>Parker Software</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="return of the jedi - death star battle.bin" size="8192" crc="0fafa2b8" sha1="27a50cf2a3272092f3bd350cb0d53619940f4453" offset="0x0000" />
@@ -235,6 +317,7 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: AROS (overhead bytes: 01 02 0880 EF 01 1500) -->
 	<!-- TODO: add support for RAM in this cart (0xa000-0xffff) -->
 	<software name="rwp32" supported="no">
 		<description>rWP32</description>
@@ -247,10 +330,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: LROS (overhead bytes: 00 01 0080 CC) -->
 	<software name="unicorn" supported="no">
 		<description>Shadow of the Unicorn</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1985</year>
+		<publisher>Mikro-Gen</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="shadow of the unicorn.bin" size="65536" crc="9f7af8ef" sha1="676c9142e11b3b706f64b7606aa084f1bb217d67" offset="0x0000" />
@@ -258,10 +342,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: LROS (overhead bytes: 00 01 0500 FC) -->
 	<software name="spacerai" supported="no">
 		<description>Space Raiders</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>Timex Computer</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="space raiders.bin" size="16384" crc="86d7a08b" sha1="8e1da4c183e9af2ba11b0745820fff4017cbad19" offset="0x0000" />
@@ -269,10 +354,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: LROS (overhead bytes: 00 01 0500 FC) -->
 	<software name="starwars" supported="no">
 		<description>Star Wars - The Arcade Game</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>Parker Software</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="star wars - the arcade game.bin" size="16384" crc="22cd482b" sha1="c12f38c382fa2a07430fe6daaa3acd96820aa76d" offset="0x0000" />
@@ -280,10 +366,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: AROS (overhead bytes: 01 02 0880 0F 01 0000) -->
 	<software name="statecap" supported="no">
 		<description>States and Capitals</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>Timex Computer</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="states and capitals.bin" size="32768" crc="04bf4a3b" sha1="0ea77fb538bce31cd90f8f926deda7b90d99cf99" offset="0x8000" />
@@ -291,10 +378,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: AROS (overhead bytes: 02 02 0880 0F 01 1500) -->
 	<software name="superhzd" supported="no">
 		<description>Super Hot-Z Disassembler v2.51 (AROS)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Ray Kingsley</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="superhotzdisassemblerv2.51-aros.bin" size="24576" crc="7bf239be" sha1="7c04c6e861b4b82ee3fd5bf21b17d6dd7d893386" offset="0x8000" />
@@ -302,10 +390,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: LROS (overhead bytes: 00 01 F45E F8) -->
 	<software name="swordfgt" supported="no">
 		<description>Swordfight</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>Timex Computer</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="swordfight.bin" size="24576" crc="95155511" sha1="69e7e0111ed8d8925314deb661990bf8c9eb5cc4" offset="0x0000" />
@@ -313,10 +402,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: AROS (overhead bytes: 01 02 0880 CF 01 0000) -->
 	<software name="tasword2" supported="no">
 		<description>Tasword II</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>Tasman Software</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="tasword ii.bin" size="16384" crc="7b2a0e31" sha1="2bdf3c10a70e4a02410d4f20cbc1c0aaa444d1e2" offset="0x8000" />
@@ -324,11 +414,11 @@
 		</part>
 	</software>
 
-<!-- This must map on the HOME memory?!? How does this actually work? -->
+<!-- Cartridge Type: ROM (you must type OUT 244,3 to activate) -->
 	<software name="timeword" supported="no">
 		<description>TimeWord</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1986</year>
+		<publisher>TMX Portugal</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="timeword.bin" size="16384" crc="a767d39e" sha1="5c606380234f867aafd3d215982eabf374553118" offset="0x0000" />
@@ -336,10 +426,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: LROS (overhead bytes: 00 01 0500 FE) -->
 	<software name="vucalc" supported="no">
-		<description>vu-calc</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>VU-Calc</description>
+		<year>1983</year>
+		<publisher>Timex Computer</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="vu-calc.bin" size="8192" crc="7bbcc167" sha1="efc626c55125b8a8da527bd986ed9d4065973e8c" offset="0x0000" />
@@ -347,10 +438,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: LROS (overhead bytes: 00 01 0500 FC) -->
 	<software name="vufile" supported="no">
-		<description>vu-file</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>VU-File</description>
+		<year>1983</year>
+		<publisher>Timex Computer</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="vu-file.bin" size="16384" crc="94dafab6" sha1="1007aba595085bc46c406f933484a4dbbd0154bb" offset="0x0000" />
@@ -358,10 +450,11 @@
 		</part>
 	</software>
 
+<!-- Cartridge Type: LROS (overhead bytes: 00 01 0500 FC) -->
 	<software name="zebraos" supported="no">
 		<description>Zebra OS 64</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1985</year>
+		<publisher>Zebra Systems</publisher>
 		<part name="cart" interface="timex_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="zebra os 64.bin" size="16384" crc="928a8207" sha1="335d2f858d5bbe63989a2df1620ab5838337cfbd" offset="0x0000" />

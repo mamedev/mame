@@ -67,7 +67,7 @@ Note: No more infos about!
 	<software name="solprint" supported="no">
 		<description>Sol Printer I/O Software P/N 727056, Rev. A</description>
 		<year>19??</year>
-		<publisher>Processor Technology Corp.</publisher>
+		<publisher>Processor Technology Corporation</publisher>
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="56307">
@@ -145,7 +145,7 @@ User Manual at http://www.sol20.org/manuals/als8.pdf
 	<software name="als8">
 		<description>ALS-8 program development system</description>
 		<year>1977</year>
-		<publisher>Processor Technolgy Corp.</publisher>
+		<publisher>Processor Technology Corporation</publisher>
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="7142712">
@@ -166,7 +166,7 @@ User Manual at http://www.sol20.org/manuals/atc.pdf
 	<software name="atc">
 		<description>Air Traffic Control</description>
 		<year>1978</year>
-		<publisher>Processor Technolgy</publisher>
+		<publisher>Processor Technology Corporation</publisher>
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="2457454">
@@ -182,7 +182,7 @@ Processor Technology Basic/5 - a simple BASIC
     MTCHS B 1AD9 034D       ;21 matches; you play against the computer; last one to pick up a match loses
     LUNAR B 1AD9 0953       ;Traditional text lunar lander
 
-In SOLOS moniotr "XEQ BASIC" to load/autorun or "GET BASIC" and then "EXEC 0".
+In SOLOS monitor "XEQ BASIC" to load/autorun or "GET BASIC" and then "EXEC 0".
 In BASIC program "XEQ MTCHS" to load/autorun or "GET MTCHS" and then "RUN".
 In BASIC program "XEQ LUNAR" to load/autorun or "GET LUNAR" and then "RUN". (see note below)
 
@@ -196,7 +196,7 @@ User Manual at http://www.sol20.org/manuals/basic5.pdf
 	<software name="basic5">
 		<description>Sol BASIC/5</description>
 		<year>1977</year>
-		<publisher>Processor Technolgy Corp.</publisher>
+		<publisher>Processor Technology Corporation</publisher>
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="9203116">
@@ -223,7 +223,7 @@ User Manual at http://www.sol20.org/manuals/chess.pdf
 	<software name="chess">
 		<description>8080 Chess Cassette; P/N 727152</description>
 		<year>19??</year>
-		<publisher>Processor Technolgy Corp.</publisher>
+		<publisher>Processor Technology Corporation</publisher>
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="5558420">
@@ -251,7 +251,7 @@ User Manual at http://www.sol20.org/manuals/debug.pdf
 	<software name="debug">
 		<description>DEBUG, Advanced 8080 Debugger; P/N 727132</description>
 		<year>1978</year>
-		<publisher>Processor Technolgy Corp.</publisher>
+		<publisher>Processor Technology Corporation</publisher>
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="20877642">
@@ -275,7 +275,7 @@ User Manual at http://www.sol20.org/manuals/img/edit-img.pdf
 	<software name="edit">
 		<description>EDIT, Advanced 8080 Editor; P/N 727142</description>
 		<year>1978</year>
-		<publisher>Processor Technolgy Corp.</publisher>
+		<publisher>Processor Technology Corporation</publisher>
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="8538414">
@@ -307,7 +307,7 @@ User Manual at http://www.sol20.org/manuals/extcassbasic.pdf
 	<software name="extbasic">
 		<description>Extended Cassette BASIC; P/N 727019</description>
 		<year>1977</year>
-		<publisher>Processor Technolgy Corp.</publisher>
+		<publisher>Processor Technology Corporation</publisher>
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="13985418">
@@ -346,7 +346,7 @@ User Manual at http://www.sol20.org/manuals/focal.pdf
 	<software name="focal">
 		<description>8080 Cassette Focal(tm); P/N 727027</description>
 		<year>1978</year>
-		<publisher>Processor Technolgy Corp.</publisher>
+		<publisher>Processor Technology Corporation</publisher>
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="6722676">
@@ -370,7 +370,7 @@ User Manual at http://www.sol20.org/manuals/gamepac1.pdf
 	<software name="gamepac1">
 		<description>GAMEPAC 1</description>
 		<year>1977</year>
-		<publisher>Processor Technolgy Corp.</publisher>
+		<publisher>Processor Technology Corporation</publisher>
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="4619686">
@@ -392,7 +392,7 @@ User Manual at http://www.sol20.org/manuals/gamepac2.pdf
 	<software name="gamepac2">
 		<description>GAMEPAC 2</description>
 		<year>1978</year>
-		<publisher>Processor Technolgy Corp.</publisher>
+		<publisher>Processor Technology Corporation</publisher>
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="5118738">
@@ -442,7 +442,7 @@ User Manual at http://www.sol20.org/manuals/music.pdf
 	<software name="music">
 		<description>Music System</description>
 		<year>1977</year>
-		<publisher>Software Technology Corp.</publisher>
+		<publisher>Software Technology</publisher>
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="13654040">
@@ -488,7 +488,7 @@ User Manual at http://www.sol20.org/manuals/img/pilot-img.pdf
 	<software name="pilot">
 		<description>Cassette PILOT P/N 727112 Rev. A</description>
 		<year>1978</year>
-		<publisher>Processor Technology Corp.</publisher>
+		<publisher>Processor Technology Corporation</publisher>
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="19764422">
@@ -572,7 +572,7 @@ User Manual at http://www.sol20.org/manuals/trek80.pdf
 	<software name="trek80">
 		<description>TREK-80</description>
 		<year>19??</year>
-		<publisher>Processor Technolgy Corp.</publisher>
+		<publisher>Processor Technology Corporation</publisher>
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="6757058">
@@ -778,7 +778,7 @@ More infos http://www.sol20.org/articles/access_v1n4.pdf
 	<software name="acs_v1n4">
 		<description>Access newsletter, Volume 1, issue #4</description>
 		<year>1977</year>
-		<publisher>Processor Technolgy Corp.</publisher>
+		<publisher>Processor Technology Corporation</publisher>
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="2151032">
