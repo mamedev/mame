@@ -19,7 +19,7 @@ Notes:
 
 ToDo:
 - Colours are approximate.
-- Disk controller, using the old wd17xx because new wd crashes on loading a disk.
+- Disk controller, works with old wd17xx but crashes on new wd.
 - Hardware supports 20cm and 13cm floppies, but we only support 13cm as this
   is the only software that exists.
 - The schematic shows the audio counter connected to 2MHz, but this produces
@@ -29,11 +29,15 @@ ToDo:
 
 ****************************************************************************/
 
+#define NEWFDC 0
+
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
 #include "machine/i8251.h"
 #include "bus/rs232/rs232.h"
+//#include "machine/clock.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "bus/centronics/ctronics.h"
@@ -43,9 +47,14 @@ ToDo:
 #include "machine/z80dma.h"
 #include "machine/rescap.h"
 #include "machine/74123.h"
+#if NEWFDC
+#include "machine/wd_fdc.h"
+#include "formats/excali64_dsk.h"
+#else
 #include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
+#endif
 
 class excali64_state : public driver_device
 {
@@ -61,6 +70,10 @@ public:
 		, m_u12(*this, "u12")
 		, m_centronics(*this, "centronics")
 		, m_fdc(*this, "fdc")
+#if NEWFDC
+		, m_floppy0(*this, "fdc:0")
+		, m_floppy1(*this, "fdc:1")
+#endif
 	{ }
 
 	DECLARE_PALETTE_INIT(excali64);
@@ -73,6 +86,9 @@ public:
 	DECLARE_WRITE8_MEMBER(porte4_w);
 	DECLARE_READ8_MEMBER(porte8_r);
 	DECLARE_WRITE8_MEMBER(portec_w);
+#if NEWFDC
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+#endif
 	DECLARE_WRITE_LINE_MEMBER(cent_busy_w);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
 	DECLARE_READ8_MEMBER(memory_read_byte);
@@ -103,7 +119,13 @@ private:
 	required_device<z80dma_device> m_dma;
 	required_device<ttl74123_device> m_u12;
 	required_device<centronics_device> m_centronics;
+#if NEWFDC
+	required_device<wd2793_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+#else
 	required_device<wd2793_device> m_fdc;
+#endif
 };
 
 static ADDRESS_MAP_START(excali64_mem, AS_PROGRAM, 8, excali64_state)
@@ -129,7 +151,11 @@ static ADDRESS_MAP_START(excali64_io, AS_IO, 8, excali64_state)
 	AM_RANGE(0xe4, 0xe7) AM_WRITE(porte4_w)
 	AM_RANGE(0xe8, 0xeb) AM_READ(porte8_r)
 	AM_RANGE(0xec, 0xef) AM_WRITE(portec_w)
+#if NEWFDC
+	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("fdc", wd2793_t, read, write)
+#else
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("fdc", wd2793_device, read, write)
+#endif
 ADDRESS_MAP_END
 
 
@@ -220,6 +246,15 @@ WRITE_LINE_MEMBER( excali64_state::cent_busy_w )
 	m_centronics_busy = state;
 }
 
+#if NEWFDC
+FLOPPY_FORMATS_MEMBER( excali64_state::floppy_formats )
+	FLOPPY_EXCALI64_FORMAT
+FLOPPY_FORMATS_END
+
+static SLOT_INTERFACE_START( excali64_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
+#else
 static LEGACY_FLOPPY_OPTIONS_START(excali64)
 	LEGACY_FLOPPY_OPTION(excali64_ds, "raw", "Excalibur 64 DS disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
@@ -235,15 +270,21 @@ static const floppy_interface excali64_floppy_interface =
 	LEGACY_FLOPPY_OPTIONS_NAME(excali64),
 	NULL
 };
+#endif
 
 // pulses from port E4 bit 5 restart the 74123. After 3.6 secs without a pulse, the motor gets turned off.
 WRITE8_MEMBER( excali64_state::motor_w )
 {
 	m_motor = BIT(data, 0);
+#if NEWFDC
+	m_floppy1->get_device()->mon_w(!m_motor);
+	m_floppy0->get_device()->mon_w(!m_motor);
+#else
 	legacy_floppy_image_device *flop = subdevice<legacy_floppy_image_device>(FLOPPY_0);
 	flop->floppy_mon_w(!m_motor); // motor on
 	flop = subdevice<legacy_floppy_image_device>(FLOPPY_1);
 	flop->floppy_mon_w(!m_motor); // motor on
+#endif
 }
 
 READ8_MEMBER( excali64_state::porte8_r )
@@ -253,6 +294,20 @@ READ8_MEMBER( excali64_state::porte8_r )
 
 WRITE8_MEMBER( excali64_state::porte4_w )
 {
+#if NEWFDC
+	floppy_image_device *floppy = NULL;
+	if (BIT(data, 0))
+		floppy = m_floppy0->get_device();
+
+	if (BIT(data, 1))
+		floppy = m_floppy1->get_device();
+
+	if (floppy)
+	{
+		m_fdc->set_floppy(floppy);
+		floppy->ss_w(BIT(data, 4));
+	}
+#else
 	if BIT(data, 0)
 		m_fdc->set_drive(0);
 
@@ -260,6 +315,7 @@ WRITE8_MEMBER( excali64_state::porte4_w )
 		m_fdc->set_drive(1);
 
 	m_fdc->set_side(BIT(data, 4));
+#endif
 
 	m_u12->b_w(space,offset, BIT(data, 5)); // motor pulse
 }
@@ -271,7 +327,11 @@ d2 = density select (0 = double)
 */
 WRITE8_MEMBER( excali64_state::portec_w )
 {
+#if NEWFDC
+	m_fdc->dden_w(BIT(data, 2));
+#else
 	m_fdc->dden_w(!BIT(data, 2));
+#endif
 }
 
 WRITE_LINE_MEMBER( excali64_state::busreq_w )
@@ -592,11 +652,18 @@ static MACHINE_CONFIG_START( excali64, excali64_state )
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )
+#if NEWFDC
+	MCFG_WD2793x_ADD("fdc", XTAL_16MHz / 16)
+	MCFG_WD_FDC_FORCE_READY
+	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", excali64_floppies, "525dd", floppy_image_device::default_floppy_formats)// excali64_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", excali64_floppies, "525dd", floppy_image_device::default_floppy_formats)
+#else
 	MCFG_DEVICE_ADD("fdc", WD2793, 0)
 	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
 	MCFG_WD17XX_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(excali64_floppy_interface)
-
+#endif
 	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL_16MHz/4)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(excali64_state, busreq_w))
 	MCFG_Z80DMA_IN_MREQ_CB(READ8(excali64_state, memory_read_byte))
