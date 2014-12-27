@@ -302,11 +302,10 @@ WRITE8_MEMBER( excali64_state::porte4_w )
 	if (BIT(data, 1))
 		floppy = m_floppy1->get_device();
 
+	m_fdc->set_floppy(floppy);
 	if (floppy)
-	{
-		m_fdc->set_floppy(floppy);
 		floppy->ss_w(BIT(data, 4));
-	}
+
 #else
 	if BIT(data, 0)
 		m_fdc->set_drive(0);
@@ -654,10 +653,9 @@ static MACHINE_CONFIG_START( excali64, excali64_state )
 	MCFG_CASSETTE_ADD( "cassette" )
 #if NEWFDC
 	MCFG_WD2793x_ADD("fdc", XTAL_16MHz / 16)
-	MCFG_WD_FDC_FORCE_READY
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", excali64_floppies, "525dd", floppy_image_device::default_floppy_formats)// excali64_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", excali64_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", excali64_floppies, "525dd", excali64_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", excali64_floppies, "525dd", excali64_state::floppy_formats)
 #else
 	MCFG_DEVICE_ADD("fdc", WD2793, 0)
 	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
