@@ -251,6 +251,25 @@ def EmitGroup04(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, b
         print >>f, ""
         print >>f, ""
 
+# xxx_S b <- b,c format opcodes
+def EmitGroup0f(f,funcname, opname, opexecute, opwrite):
+    print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s(OPS_16)"% (funcname)
+    print >>f, "{"
+    print >>f, "	int breg, creg;"
+    print >>f, ""
+    print >>f, "	COMMON16_GET_breg;"
+    print >>f, "	COMMON16_GET_creg;"
+    print >>f, ""
+    print >>f, "	REG_16BIT_RANGE(breg);"
+    print >>f, "	REG_16BIT_RANGE(creg);"
+    print >>f, ""
+    print >>f, "	%s" % (opexecute)
+    print >>f, "	%s" % (opwrite) 	
+    print >>f, ""
+    print >>f, "	return m_pc + (2 >> 0);"
+    print >>f, "}"
+
+
 #  xxx_S b, b, u5 format opcodes
 def EmitGroup17(f,funcname, opname, opexecute):
     print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s(OPS_16)" % (funcname)
@@ -291,6 +310,10 @@ EmitGroup04(f, "04_0a", "MOV", "UINT32 result = c;", "m_regs[breg] = result;", "
 
 EmitGroup04(f, "04_0f", "BSET", "UINT32 result = b | (1 << (c & 0x1f));", "m_regs[areg] = result;", "m_regs[breg] = result;", 0,0, -1, EmitGroup04_unsupported_Flags  )
 
+EmitGroup04(f, "04_13", "BMSK", "UINT32 result = b & ((1<<(c+1))-1);", "m_regs[areg] = result;", "m_regs[breg] = result;", 0,0, -1, EmitGroup04_unsupported_Flags  )
+
+
+
 EmitGroup04(f, "04_15", "ADD2", "UINT32 result = b + (c << 2);", "m_regs[areg] = result;", "m_regs[breg] = result;", 0,0, -1, EmitGroup04_unsupported_Flags  )
 EmitGroup04(f, "04_16", "ADD3", "UINT32 result = b + (c << 3);", "m_regs[areg] = result;", "m_regs[breg] = result;", 0,0, -1, EmitGroup04_unsupported_Flags  )
 
@@ -302,6 +325,15 @@ EmitGroup04(f, "05_01", "LSR", "UINT32 result = b >> (c&0x1f);", "m_regs[areg] =
 EmitGroup04(f, "04_2f_02", "LSR1", "UINT32 result = c >> 1;",          "m_regs[breg] = result;","", 2,1, -1, EmitGroup04_Handle_NZC_LSR1_Flags  ) # no alt handler (invalid path)
 EmitGroup04(f, "04_2f_07", "EXTB", "UINT32 result = c & 0x000000ff;",  "m_regs[breg] = result;","", 2,1, -1, EmitGroup04_unsupported_Flags  ) # ^
 EmitGroup04(f, "04_2f_08", "EXTW", "UINT32 result = c & 0x0000ffff;",  "m_regs[breg] = result;","", 2,1, -1, EmitGroup04_unsupported_Flags  ) # ^
+
+# xxx_S b <- b,c format opcodes  (or in some cases xxx_S b,c)
+EmitGroup0f(f, "0f_02", "SUB_S", "UINT32 result = m_regs[breg] - m_regs[creg];",  "m_regs[breg] = result;" )
+EmitGroup0f(f, "0f_04", "AND_S", "UINT32 result = m_regs[breg] & m_regs[creg];",  "m_regs[breg] = result;" )
+EmitGroup0f(f, "0f_05", "OR_S",  "UINT32 result = m_regs[breg] | m_regs[creg];",  "m_regs[breg] = result;" )
+EmitGroup0f(f, "0f_07", "XOR_S", "UINT32 result = m_regs[breg] ^ m_regs[creg];",  "m_regs[breg] = result;" )
+EmitGroup0f(f, "0f_0f", "EXTB_S","UINT32 result = m_regs[creg] & 0x000000ff;",    "m_regs[breg] = result;" )
+EmitGroup0f(f, "0f_10", "EXTW_S","UINT32 result = m_regs[creg] & 0x0000ffff;",    "m_regs[breg] = result;" )
+EmitGroup0f(f, "0f_1b", "ASL1_S","UINT32 result = m_regs[creg] << 1;",            "m_regs[breg] = result;" )
 
 
 #  xxx_S b, b, u5 format opcodes
