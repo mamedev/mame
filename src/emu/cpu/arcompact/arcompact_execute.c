@@ -2440,42 +2440,6 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0d_helper(OPS_16, const char
 }
 
 
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0d_00(OPS_16) // ADD_S c, b,  u3   (note, c destination)
-{
-	int u, breg, creg;
-
-	COMMON16_GET_u3;
-	COMMON16_GET_breg;
-	COMMON16_GET_creg;
-
-	REG_16BIT_RANGE(breg);
-	REG_16BIT_RANGE(creg);
-
-	m_regs[creg] = m_regs[breg] + u;
-
-	return m_pc + (2 >> 0);
-}
-
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0d_01(OPS_16)
-{
-	return arcompact_handle0d_helper(PARAMS, "SUB_S");
-}
-
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0d_02(OPS_16) // ASL_S c, b asl u3   (note, c destination)
-{
-	int u, breg, creg;
-
-	COMMON16_GET_u3;
-	COMMON16_GET_breg;
-	COMMON16_GET_creg;
-
-	REG_16BIT_RANGE(breg);
-	REG_16BIT_RANGE(creg);
-
-	m_regs[creg] = m_regs[breg] << u;
-
-	return m_pc + (2 >> 0);
-}
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0d_03(OPS_16)
 {

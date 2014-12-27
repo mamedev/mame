@@ -286,6 +286,27 @@ def EmitGroup04(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, b
         print >>f, ""
         print >>f, ""
 
+
+# xxx_S  c, b, u3  format opcodes (note c is destination)
+def EmitGroup0d(f,funcname, opname, opexecute, opwrite):
+    print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s(OPS_16)"  % (funcname)
+    print >>f, "{"
+    print >>f, "	int u, breg, creg;"
+    print >>f, ""
+    print >>f, "	COMMON16_GET_u3;"
+    print >>f, "	COMMON16_GET_breg;"
+    print >>f, "	COMMON16_GET_creg;"
+    print >>f, ""
+    print >>f, "	REG_16BIT_RANGE(breg);"
+    print >>f, "	REG_16BIT_RANGE(creg);"
+    print >>f, ""
+    print >>f, "	%s" % (opexecute)
+    print >>f, "	%s" % (opwrite)
+    print >>f, ""
+    print >>f, "	return m_pc + (2 >> 0);"
+    print >>f, "}"
+
+
 # xxx_S b <- b,c format opcodes
 def EmitGroup0f(f,funcname, opname, opexecute, opwrite):
     print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s(OPS_16)"% (funcname)
@@ -367,6 +388,11 @@ EmitGroup04(f, "05_01", "LSR", "UINT32 result = b >> (c&0x1f);", "m_regs[areg] =
 EmitGroup04(f, "04_2f_02", "LSR1", "UINT32 result = c >> 1;",          "m_regs[breg] = result;","", 2,1, -1, EmitGroup04_Handle_NZC_LSR1_Flags  ) # no alt handler (invalid path)
 EmitGroup04(f, "04_2f_07", "EXTB", "UINT32 result = c & 0x000000ff;",  "m_regs[breg] = result;","", 2,1, -1, EmitGroup04_unsupported_Flags  ) # ^
 EmitGroup04(f, "04_2f_08", "EXTW", "UINT32 result = c & 0x0000ffff;",  "m_regs[breg] = result;","", 2,1, -1, EmitGroup04_unsupported_Flags  ) # ^
+
+# xxx_S  c, b, u3  format opcodes (note c is destination)
+EmitGroup0d(f, "0d_00", "ADD_S", "UINT32 result = m_regs[breg] + u;",         "m_regs[creg] = result;" )
+EmitGroup0d(f, "0d_01", "SUB_S", "UINT32 result = m_regs[breg] - u;",         "m_regs[creg] = result;" )
+EmitGroup0d(f, "0d_02", "ASL_S", "UINT32 result = m_regs[breg] << u;",        "m_regs[creg] = result;" )
 
 # xxx_S b <- b,c format opcodes  (or in some cases xxx_S b,c)
 EmitGroup0f(f, "0f_02", "SUB_S", "UINT32 result = m_regs[breg] - m_regs[creg];",        "m_regs[breg] = result;" )
