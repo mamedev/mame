@@ -148,7 +148,7 @@ int arcompact_device::check_condition(UINT8 condition)
 		case 0x01: return CONDITION_EQ;
 		case 0x02: return !CONDITION_EQ; // NE
 		case 0x03: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
-		case 0x04: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
+		case 0x04: return CONDITION_MI; // MI (N)
 		case 0x05: return CONDITION_CS; // CS (Carry Set / Lower than)
 		case 0x06: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
 		case 0x07: fatalerror("unhandled condition check %s", conditions[condition]); return -1;
@@ -1501,7 +1501,19 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle01_01_01_03(OPS_32)
 	return m_pc + (size>>0);
 }
 
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle01_01_01_04(OPS_32)  { return arcompact_01_01_01_helper(PARAMS, "BRLO"); }
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle01_01_01_04(OPS_32) //  register - immediate BRLO
+{
+	BR_REGIMM_SETUP
+
+	// BRLO (unsigned operation)
+	if (b < c)
+	{
+		BR_TAKEJUMP
+	}
+	
+	return m_pc + (size>>0);
+
+}
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle01_01_01_05(OPS_32) // register - immediate BRHS
 {
@@ -1840,10 +1852,6 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_0d(OPS_32)
 	return arcompact_handle04_helper(PARAMS, opcodes_04[0x0d], /*"RCMP"*/ 1,0);
 }
 
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_0e(OPS_32)
-{ 
-	return arcompact_handle04_helper(PARAMS, opcodes_04[0x0e], /*"RSUB"*/ 0,0);
-}
 
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_10(OPS_32)  
@@ -1863,28 +1871,8 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_12(OPS_32)
 
 
 
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_14(OPS_32)  
-{ 
-	return arcompact_handle04_helper(PARAMS, opcodes_04[0x14], /*"ADD1"*/ 0,0);
-}
 
 
-
-
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_17(OPS_32)  
-{ 
-	return arcompact_handle04_helper(PARAMS, opcodes_04[0x17], /*"SUB1"*/ 0,0);
-}
-
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_18(OPS_32)  
-{ 
-	return arcompact_handle04_helper(PARAMS, opcodes_04[0x18], /*"SUB2"*/ 0,0);
-}
-
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_19(OPS_32)  
-{ 
-	return arcompact_handle04_helper(PARAMS, opcodes_04[0x19], /*"SUB3"*/ 0,0);
-}
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_1a(OPS_32)  
 { 
@@ -1913,6 +1901,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_20_p00(OPS_32)
 	int got_limm = 0;
 
 	COMMON32_GET_creg
+	COMMON32_GET_F
 
 	if (creg == LIMM_REG) 
 	{
@@ -1934,7 +1923,32 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_20_p00(OPS_32)
 		// J.F [ilink1]    0010 0RRR 0010 0000 1RRR 0111 01RR RRRR  (creg = ILINK1, FLAG must be set)
 		// J.F [ilink2]    0010 0RRR 0010 0000 1RRR 0111 10RR RRRR  (creg = ILINE2, FLAG must be set)
 
-		arcompact_log("unimplemented J %08x", op);
+		if (F)
+		{
+			if ((creg == REG_ILINK1) || (creg == REG_ILINK2))
+			{
+				arcompact_log("1 unimplemented J.F %08x", op);
+			}
+			else
+			{
+				// should not use .F unless jumping to ILINK1/2
+				arcompact_fatal ("illegal 1 unimplemented J.F (F should not be set) %08x", op);
+			}
+
+		}
+		else
+		{
+			if ((creg == REG_ILINK1) || (creg == REG_ILINK2))
+			{
+				// should only jumping to ILINK1/2 if .F is set
+				arcompact_fatal("illegal 1 unimplemented J (F not set) %08x", op);
+			}
+			else
+			{
+				
+				return m_regs[creg];
+			}
+		}
 	}
 
 	return m_pc + (size>>0);
@@ -1945,7 +1959,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_20_p01(OPS_32)
 	// opcode          iiii i--- ppII IIII F--- uuuu uu-- ----
 	// J u6            0010 0RRR 0110 0000 0RRR uuuu uuRR RRRR
 	int size = 4;
-	arcompact_log("unimplemented J %08x", op);
+	arcompact_log("2 unimplemented J %08x", op);
 	return m_pc + (size>>0);
 }
 
@@ -1954,7 +1968,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_20_p10(OPS_32)
 	// opcode          iiii i--- ppII IIII F--- ssss ssSS SSSS
 	// J s12           0010 0RRR 1010 0000 0RRR ssss ssSS SSSS
 	int size = 4;
-	arcompact_log("unimplemented J %08x", op);
+	arcompact_log("3 unimplemented J %08x", op);
 	return m_pc + (size>>0);
 }
 
@@ -2148,56 +2162,6 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2a(OPS_32)  // Load FROM 
 	return m_pc + (size>>0);
 }
 
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2b(OPS_32)  // Store TO Auxiliary register FROM register
-{	
-	int size = 4;
-//	UINT32 limm = 0;
-	int got_limm = 0;
-
-	COMMON32_GET_p;
-	COMMON32_GET_breg;
-
-	if (breg == LIMM_REG)
-	{
-		//GET_LIMM_32;
-		size = 8;
-		got_limm = 1;
-
-	}
-	else
-	{
-	}
-
-	if (p == 0)
-	{
-
-		COMMON32_GET_creg
-
-		if (creg == LIMM_REG)
-		{
-			if (!got_limm)
-			{
-				//GET_LIMM_32;
-				size = 8;
-			}
-		}
-		else
-		{
-		}
-	}
-	else if (p == 1)
-	{
-	}
-	else if (p == 2)
-	{
-	}
-	else if (p == 3)
-	{
-	}
-
-	arcompact_log("unimplemented SR %08x", op);
-	return m_pc + (size>>0);
-}
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_29(OPS_32)
 {
@@ -2672,7 +2636,7 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_00_06(OPS_16)  { return a
 
 
 // Zero parameters (ZOP)
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_00_07_00(OPS_16)  { arcompact_log("NOP_S"); return m_pc + (2 >> 0);}
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_00_07_00(OPS_16)  { /*arcompact_log("NOP_S");*/ return m_pc + (2 >> 0);}
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_00_07_01(OPS_16)  { arcompact_log("UNIMP_S"); return m_pc + (2 >> 0);} // Unimplemented Instruction, same as illegal, but recommended to fill blank space
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_00_07_04(OPS_16)  { arcompact_log("JEQ_S [blink]"); return m_pc + (2 >> 0);}
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_00_07_05(OPS_16)  { arcompact_log("JNE_S [blink]"); return m_pc + (2 >> 0);}
@@ -2719,12 +2683,10 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_0e(OPS_16)  { return arco
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_11(OPS_16)  { return arcompact_handle0f_0x_helper(PARAMS, "ABS_S",0);  }
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_12(OPS_16)  { return arcompact_handle0f_0x_helper(PARAMS, "NOT_S",0);  }
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_13(OPS_16)  { return arcompact_handle0f_0x_helper(PARAMS, "NEG_S",0);  }
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_14(OPS_16)  { return arcompact_handle0f_0x_helper(PARAMS, "ADD1_S",0); }
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_15(OPS_16)  { return arcompact_handle0f_0x_helper(PARAMS, "ADD2_S",0); }
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_16(OPS_16)  { return arcompact_handle0f_0x_helper(PARAMS, "ADD3_S",0); }
+
+
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_18(OPS_16)  { return arcompact_handle0f_0x_helper(PARAMS, "ASL_S",0);  }
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_19(OPS_16)  { return arcompact_handle0f_0x_helper(PARAMS, "LSR_S",0);  }
+
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle0f_1a(OPS_16)  { return arcompact_handle0f_0x_helper(PARAMS, "ASR_S",0);  }
 
 

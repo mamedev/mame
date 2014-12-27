@@ -17,6 +17,30 @@ def EmitGroup04_Handle_NZC_LSR1_Flags(f, funcname, opname):
         print >>f, "		if (c == 0x00000001) { STATUS32_SET_C; }"
         print >>f, "		else { STATUS32_CLEAR_C; }"
 
+def EmitGroup04_Handle_NZCV_ADD_Flags(f, funcname, opname):
+        print >>f, "		if (result & 0x80000000) { STATUS32_SET_N; }"
+        print >>f, "		else { STATUS32_CLEAR_N; }"
+        print >>f, "		if (result == 0x00000000) { STATUS32_SET_Z; }"
+        print >>f, "		else { STATUS32_CLEAR_Z; }"
+        print >>f, "		if ((b & 0x80000000) == (c & 0x80000000))"
+        print >>f, "		{"
+        print >>f, "			if ((result & 0x80000000) != (b & 0x80000000))"
+        print >>f, "			{"
+        print >>f, "				STATUS32_SET_V;"
+        print >>f, "			}"
+        print >>f, "			else"
+        print >>f, "			{"
+        print >>f, "				STATUS32_CLEAR_V;"
+        print >>f, "			}"
+        print >>f, "		}"
+        print >>f, "		if (b < c)"
+        print >>f, "		{"
+        print >>f, "			STATUS32_SET_C;"
+        print >>f, "		}"
+        print >>f, "		else"
+        print >>f, "		{"
+        print >>f, "			STATUS32_CLEAR_C;"
+        print >>f, "		}"
 
 
 def EmitGroup04_no_Flags(f, funcname, opname):
@@ -42,6 +66,53 @@ def EmitGroup04_Flaghandler(f,funcname, opname, flagcondition, flaghandler):
         flaghandler(f, funcname, opname)
         print >>f, "	}"
 
+def EmitGroup04_u5fragment(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, breg_is_dst_only, flagcondition, flaghandler):
+    print >>f, "	int size = 4;"
+    
+    if breg_is_dst_only == 0:	
+        print >>f, "	UINT32 limm = 0;"
+    
+    print >>f, "/*	int got_limm = 0; */"
+    print >>f, "	"
+    print >>f, "	COMMON32_GET_breg;"
+    
+    if flagcondition == -1:
+        print >>f, "	COMMON32_GET_F;"
+    
+    print >>f, "	COMMON32_GET_u6;"
+    
+    if ignore_a == 0:
+        print >>f, "	COMMON32_GET_areg;"
+    elif ignore_a == 1:
+        print >>f, "     //COMMON32_GET_areg; // areg is reserved / not used"
+    elif ignore_a == 2:
+        print >>f, "     //COMMON32_GET_areg; // areg bits already used as opcode select"
+    elif ignore_a == 3:
+        print >>f, "     //COMMON32_GET_areg; // areg bits already used as condition code select"
+    print >>f, "	"
+    
+    print >>f, "	UINT32 c;"
+    if breg_is_dst_only == 0:
+        print >>f, "	UINT32 b;"
+        print >>f, "	"
+        print >>f, "	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */"
+        print >>f, "	if (breg == LIMM_REG)"
+        print >>f, "	{"
+        print >>f, "		GET_LIMM_32;"
+        print >>f, "		size = 8;"
+        print >>f, "/*		got_limm = 1; */"
+        print >>f, "		b = limm;"
+        print >>f, "	}"
+        print >>f, "	else"
+        print >>f, "	{"
+        print >>f, "		b = m_regs[breg];"
+        print >>f, "	}"
+    
+    print >>f, "    "
+    print >>f, " 	c = u;"
+    print >>f, "	"
+    print >>f, "	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */"
+
 def EmitGroup04(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, breg_is_dst_only, flagcondition, flaghandler):
     # the mode 0x00 handler  
     print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s_p00(OPS_32)" % (funcname)
@@ -56,15 +127,15 @@ def EmitGroup04(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, b
 
     if flagcondition == -1:
         print >>f, "	COMMON32_GET_F;"
-    
+        
     print >>f, "	COMMON32_GET_creg;"
 
     if ignore_a == 0:
         print >>f, "	COMMON32_GET_areg;"
     elif ignore_a == 1:
-       print >>f, "     //COMMON32_GET_areg; // areg is reserved / not used"
+        print >>f, "     //COMMON32_GET_areg; // areg is reserved / not used"
     elif ignore_a == 2:
-       print >>f, "     //COMMON32_GET_areg; // areg bits already used as opcode select"
+        print >>f, "     //COMMON32_GET_areg; // areg bits already used as opcode select"
   
     print >>f, "	"
     
@@ -111,50 +182,7 @@ def EmitGroup04(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, b
     # the mode 0x01 handler    
     print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s_p01(OPS_32)" % (funcname)
     print >>f, "{"
-    print >>f, "	int size = 4;"
-    
-    if breg_is_dst_only == 0:	
-        print >>f, "	UINT32 limm = 0;"
-    
-    print >>f, "/*	int got_limm = 0; */"
-    print >>f, "	"
-    print >>f, "	COMMON32_GET_breg;"
-    
-    if flagcondition == -1:
-        print >>f, "	COMMON32_GET_F;"
-    
-    print >>f, "	COMMON32_GET_u6;"
-    
-    if ignore_a == 0:
-        print >>f, "	COMMON32_GET_areg;"
-    elif ignore_a == 1:
-       print >>f, "     //COMMON32_GET_areg; // areg is reserved / not used"
-    elif ignore_a == 2:
-       print >>f, "     //COMMON32_GET_areg; // areg bits already used as opcode select"
-    
-    print >>f, "	"
-    
-    print >>f, "	UINT32 c;"
-    if breg_is_dst_only == 0:
-        print >>f, "	UINT32 b;"
-        print >>f, "	"
-        print >>f, "	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */"
-        print >>f, "	if (breg == LIMM_REG)"
-        print >>f, "	{"
-        print >>f, "		GET_LIMM_32;"
-        print >>f, "		size = 8;"
-        print >>f, "/*		got_limm = 1; */"
-        print >>f, "		b = limm;"
-        print >>f, "	}"
-        print >>f, "	else"
-        print >>f, "	{"
-        print >>f, "		b = m_regs[breg];"
-        print >>f, "	}"
-    
-    print >>f, "    "
-    print >>f, " 	c = u;"
-    print >>f, "	"
-    print >>f, "	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */"
+    EmitGroup04_u5fragment(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, breg_is_dst_only, flagcondition, flaghandler)
     print >>f, "	%s" % (opexecute)
     print >>f, "	%s" % (opwrite)	
     print >>f, "	"
@@ -244,8 +272,15 @@ def EmitGroup04(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, b
         print >>f, "}"
     else:
         print >>f, "{"
-        print >>f, "	int size = 4;"
-        print >>f, "	arcompact_fatal(\"arcompact_handle%s_p11_m1 (%s)\\n\");"  % (funcname, opname)
+        EmitGroup04_u5fragment(f,funcname, opname, opexecute, opwrite, opwrite_alt, 3, breg_is_dst_only, flagcondition, flaghandler)
+        print >>f, "	COMMON32_GET_CONDITION;"
+        print >>f, "	if (!check_condition(condition))"
+        print >>f, "		return m_pc + (size>>0);"
+        print >>f, ""		
+        print >>f, "	%s" % (opexecute)
+        print >>f, "	%s" % (opwrite_alt)	
+        print >>f, "	"
+        EmitGroup04_Flaghandler(f,funcname,opname,flagcondition,flaghandler)
         print >>f, "	return m_pc + (size >> 0);"
         print >>f, "}"
         print >>f, ""
@@ -297,25 +332,32 @@ except Exception, err:
     sys.exit(1)
 
 
-EmitGroup04(f, "04_00", "ADD", "UINT32 result = b + c;", "m_regs[areg] = result;", "m_regs[breg] = result;", 0,0, -1, EmitGroup04_unsupported_Flags )
+EmitGroup04(f, "04_00", "ADD",  "UINT32 result = b + c;",                 "m_regs[areg] = result;", "m_regs[breg] = result;", 0,0, -1, EmitGroup04_Handle_NZCV_ADD_Flags )
 
-EmitGroup04(f, "04_02", "SUB", "UINT32 result = b - c;", "m_regs[areg] = result;", "m_regs[breg] = result;", 0,0, -1, EmitGroup04_unsupported_Flags  )
+EmitGroup04(f, "04_02", "SUB",  "UINT32 result = b - c;",                 "m_regs[areg] = result;", "m_regs[breg] = result;", 0,0, -1, EmitGroup04_unsupported_Flags  )
 
-EmitGroup04(f, "04_04", "AND", "UINT32 result = b & c;", "if (areg != LIMM_REG) { m_regs[areg] = result; }", "if (breg != LIMM_REG) { m_regs[breg] = result; }", 0,0, -1, EmitGroup04_Handle_NZ_Flags  )
-EmitGroup04(f, "04_05", "OR",  "UINT32 result = b | c;", "m_regs[areg] = result;", "m_regs[breg] = result;", 0,0, -1, EmitGroup04_unsupported_Flags  )
-EmitGroup04(f, "04_06", "BIC", "UINT32 result = b & (~c);", "m_regs[areg] = result;", "m_regs[breg] = result;",  0,0, -1, EmitGroup04_unsupported_Flags  )
-EmitGroup04(f, "04_07", "XOR", "UINT32 result = b ^ c;", "m_regs[areg] = result;", "m_regs[breg] = result;", 0,0, -1, EmitGroup04_unsupported_Flags  )
+EmitGroup04(f, "04_04", "AND",  "UINT32 result = b & c;",                 "if (areg != LIMM_REG) { m_regs[areg] = result; }", "if (breg != LIMM_REG) { m_regs[breg] = result; }", 0,0, -1, EmitGroup04_Handle_NZ_Flags  )
+EmitGroup04(f, "04_05", "OR",   "UINT32 result = b | c;",                 "m_regs[areg] = result;", "m_regs[breg] = result;", 0,0, -1, EmitGroup04_unsupported_Flags  )
+EmitGroup04(f, "04_06", "BIC",  "UINT32 result = b & (~c);",              "m_regs[areg] = result;", "m_regs[breg] = result;",  0,0, -1, EmitGroup04_unsupported_Flags  )
+EmitGroup04(f, "04_07", "XOR",  "UINT32 result = b ^ c;",                 "m_regs[areg] = result;", "m_regs[breg] = result;", 0,0, -1, EmitGroup04_unsupported_Flags  )
 
-EmitGroup04(f, "04_0a", "MOV", "UINT32 result = c;", "m_regs[breg] = result;", "m_regs[breg] = result;", 1,1, -1, EmitGroup04_Handle_NZ_Flags  ) # special case, result always goes to breg
+EmitGroup04(f, "04_0a", "MOV",  "UINT32 result = c;",                     "m_regs[breg] = result;", "m_regs[breg] = result;", 1,1, -1, EmitGroup04_Handle_NZ_Flags  ) # special case, result always goes to breg
 
+EmitGroup04(f, "04_0e", "RSUB", "UINT32 result = c - b;",                 "m_regs[areg] = result;", "m_regs[breg] = result;", 0,0, -1, EmitGroup04_unsupported_Flags  )
 EmitGroup04(f, "04_0f", "BSET", "UINT32 result = b | (1 << (c & 0x1f));", "m_regs[areg] = result;", "m_regs[breg] = result;", 0,0, -1, EmitGroup04_unsupported_Flags  )
 
-EmitGroup04(f, "04_13", "BMSK", "UINT32 result = b & ((1<<(c+1))-1);", "m_regs[areg] = result;", "m_regs[breg] = result;", 0,0, -1, EmitGroup04_unsupported_Flags  )
+EmitGroup04(f, "04_13", "BMSK", "UINT32 result = b & ((1<<(c+1))-1);",    "m_regs[areg] = result;", "m_regs[breg] = result;", 0,0, -1, EmitGroup04_unsupported_Flags  )
 
 
+EmitGroup04(f, "04_14", "ADD1", "UINT32 result = b + (c << 1);",          "m_regs[areg] = result;", "m_regs[breg] = result;", 0,0, -1, EmitGroup04_unsupported_Flags  )
+EmitGroup04(f, "04_15", "ADD2", "UINT32 result = b + (c << 2);",          "m_regs[areg] = result;", "m_regs[breg] = result;", 0,0, -1, EmitGroup04_unsupported_Flags  )
+EmitGroup04(f, "04_16", "ADD3", "UINT32 result = b + (c << 3);",          "m_regs[areg] = result;", "m_regs[breg] = result;", 0,0, -1, EmitGroup04_unsupported_Flags  )
+EmitGroup04(f, "04_17", "SUB1", "UINT32 result = b - (c << 1);",          "m_regs[areg] = result;", "m_regs[breg] = result;", 0,0, -1, EmitGroup04_unsupported_Flags  )
+EmitGroup04(f, "04_18", "SUB2", "UINT32 result = b - (c << 2);",          "m_regs[areg] = result;", "m_regs[breg] = result;", 0,0, -1, EmitGroup04_unsupported_Flags  )
+EmitGroup04(f, "04_19", "SUB3", "UINT32 result = b - (c << 3);",          "m_regs[areg] = result;", "m_regs[breg] = result;", 0,0, -1, EmitGroup04_unsupported_Flags  )
 
-EmitGroup04(f, "04_15", "ADD2", "UINT32 result = b + (c << 2);", "m_regs[areg] = result;", "m_regs[breg] = result;", 0,0, -1, EmitGroup04_unsupported_Flags  )
-EmitGroup04(f, "04_16", "ADD3", "UINT32 result = b + (c << 3);", "m_regs[areg] = result;", "m_regs[breg] = result;", 0,0, -1, EmitGroup04_unsupported_Flags  )
+EmitGroup04(f, "04_2b", "SR", "WRITEAUX(c,b);", "", "", 1,0, -1, EmitGroup04_unsupported_Flags  ) # this can't be conditional (todo)
+
 
 
 EmitGroup04(f, "05_00", "ASL", "UINT32 result = b << (c&0x1f);", "m_regs[areg] = result;", "m_regs[breg] = result;", 0,0, -1, EmitGroup04_unsupported_Flags  )
@@ -327,13 +369,20 @@ EmitGroup04(f, "04_2f_07", "EXTB", "UINT32 result = c & 0x000000ff;",  "m_regs[b
 EmitGroup04(f, "04_2f_08", "EXTW", "UINT32 result = c & 0x0000ffff;",  "m_regs[breg] = result;","", 2,1, -1, EmitGroup04_unsupported_Flags  ) # ^
 
 # xxx_S b <- b,c format opcodes  (or in some cases xxx_S b,c)
-EmitGroup0f(f, "0f_02", "SUB_S", "UINT32 result = m_regs[breg] - m_regs[creg];",  "m_regs[breg] = result;" )
-EmitGroup0f(f, "0f_04", "AND_S", "UINT32 result = m_regs[breg] & m_regs[creg];",  "m_regs[breg] = result;" )
-EmitGroup0f(f, "0f_05", "OR_S",  "UINT32 result = m_regs[breg] | m_regs[creg];",  "m_regs[breg] = result;" )
-EmitGroup0f(f, "0f_07", "XOR_S", "UINT32 result = m_regs[breg] ^ m_regs[creg];",  "m_regs[breg] = result;" )
-EmitGroup0f(f, "0f_0f", "EXTB_S","UINT32 result = m_regs[creg] & 0x000000ff;",    "m_regs[breg] = result;" )
-EmitGroup0f(f, "0f_10", "EXTW_S","UINT32 result = m_regs[creg] & 0x0000ffff;",    "m_regs[breg] = result;" )
-EmitGroup0f(f, "0f_1b", "ASL1_S","UINT32 result = m_regs[creg] << 1;",            "m_regs[breg] = result;" )
+EmitGroup0f(f, "0f_02", "SUB_S", "UINT32 result = m_regs[breg] - m_regs[creg];",        "m_regs[breg] = result;" )
+EmitGroup0f(f, "0f_04", "AND_S", "UINT32 result = m_regs[breg] & m_regs[creg];",        "m_regs[breg] = result;" )
+EmitGroup0f(f, "0f_05", "OR_S",  "UINT32 result = m_regs[breg] | m_regs[creg];",        "m_regs[breg] = result;" )
+EmitGroup0f(f, "0f_07", "XOR_S", "UINT32 result = m_regs[breg] ^ m_regs[creg];",        "m_regs[breg] = result;" )
+EmitGroup0f(f, "0f_0f", "EXTB_S","UINT32 result = m_regs[creg] & 0x000000ff;",          "m_regs[breg] = result;" )
+EmitGroup0f(f, "0f_10", "EXTW_S","UINT32 result = m_regs[creg] & 0x0000ffff;",          "m_regs[breg] = result;" )
+EmitGroup0f(f, "0f_13", "NEG_S"," UINT32 result = 0 - m_regs[creg];",                   "m_regs[breg] = result;" )
+
+EmitGroup0f(f, "0f_14", "ADD1_S"," UINT32 result = m_regs[breg] + (m_regs[creg] <<1);", "m_regs[breg] = result;" )
+EmitGroup0f(f, "0f_15", "ADD2_S"," UINT32 result = m_regs[breg] + (m_regs[creg] <<2);", "m_regs[breg] = result;" )
+EmitGroup0f(f, "0f_16", "ADD3_S"," UINT32 result = m_regs[breg] + (m_regs[creg] <<3);", "m_regs[breg] = result;" )
+
+EmitGroup0f(f, "0f_19", "LSR_S", "UINT32 result = m_regs[breg] >> (m_regs[creg]&0x1f);","m_regs[breg] = result;" )
+EmitGroup0f(f, "0f_1b", "ASL1_S","UINT32 result = m_regs[creg] << 1;",                  "m_regs[breg] = result;" )
 
 
 #  xxx_S b, b, u5 format opcodes

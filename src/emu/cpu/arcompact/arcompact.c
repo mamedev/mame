@@ -24,9 +24,14 @@
 
 const device_type ARCA5 = &device_creator<arcompact_device>;
 
+static ADDRESS_MAP_START( arcompact_auxreg_map, AS_IO, 32, arcompact_device )
+ADDRESS_MAP_END
+
+
 arcompact_device::arcompact_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, ARCA5, "ARCtangent-A5", tag, owner, clock, "arca5", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0) // some docs describe these as 'middle endian'?!
+	, m_io_config( "io", ENDIANNESS_LITTLE, 32, 34, 0, ADDRESS_MAP_NAME( arcompact_auxreg_map ) ) // IO space is 32 bits of dwords, so 34-bits
 {
 }
 
@@ -59,6 +64,7 @@ void arcompact_device::device_start()
 	m_debugger_temp = 0;
 
 	m_program = &space(AS_PROGRAM);
+	m_io = &space(AS_IO);
 
 	state_add( 0,  "PC", m_debugger_temp).callimport().callexport().formatstr("%08X");
 
@@ -156,7 +162,9 @@ void arcompact_device::device_reset()
 
 }
 
+
 /*****************************************************************************/
+	
 
 void arcompact_device::execute_set_input(int irqline, int state)
 {
