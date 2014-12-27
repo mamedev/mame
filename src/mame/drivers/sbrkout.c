@@ -6,7 +6,8 @@
 
     Games supported:
         * Super Breakout
-        * Super Breakout (Canyon and Vertical Breakout, prototype) - built from original source code
+        * Super Breakout (Canyon and Vertical Breakout, prototype) 
+		* Super Breakout (Cocktail, prototype)
 
     Known issues:
         * none at this time
@@ -59,11 +60,13 @@ public:
 	UINT8 m_pot_trigger[2];
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
 	DECLARE_READ8_MEMBER(switches_r);
+	DECLARE_READ8_MEMBER(sbrkoutct_switches_r);
 	DECLARE_WRITE8_MEMBER(pot_mask1_w);
 	DECLARE_WRITE8_MEMBER(pot_mask2_w);
 	DECLARE_WRITE8_MEMBER(start_1_led_w);
 	DECLARE_WRITE8_MEMBER(start_2_led_w);
 	DECLARE_WRITE8_MEMBER(serve_led_w);
+	DECLARE_WRITE8_MEMBER(serve_2_led_w);
 	DECLARE_WRITE8_MEMBER(coincount_w);
 	DECLARE_READ8_MEMBER(sync_r);
 	DECLARE_READ8_MEMBER(sync2_r);
@@ -212,6 +215,23 @@ READ8_MEMBER(sbrkout_state::switches_r)
 	return result;
 }
 
+READ8_MEMBER(sbrkout_state::sbrkoutct_switches_r)
+{
+	UINT8 result = 0xff;
+
+	switch( offset )
+	{
+		case 0x28: result = ioport("SELECT")->read(); break;
+		case 0x2e: result = ioport("SERVE")->read(); break;
+		case 0x2f: result = ioport("SERVE2")->read(); break;
+		case 0x30: result = (ioport("DIPS")->read() & 0x03) << 6; break;
+		case 0x31: result = (ioport("DIPS")->read() & 0x0c) << 4; break;
+		case 0x32: result = ioport("DIPS")->read() & 0xc0; break;
+		case 0x33: result = (ioport("DIPS")->read() & 0x30) << 2; break;
+		default: logerror("Unknown port read %x\n", offset); break;
+	}
+	return result;
+}
 
 void sbrkout_state::update_nmi_state()
 {
@@ -275,6 +295,10 @@ WRITE8_MEMBER(sbrkout_state::serve_led_w)
 	output_set_led_value(0, ~offset & 1);
 }
 
+WRITE8_MEMBER(sbrkout_state::serve_2_led_w)
+{
+	output_set_led_value(1, ~offset & 1);
+}
 
 WRITE8_MEMBER(sbrkout_state::coincount_w)
 {
@@ -387,6 +411,27 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, sbrkout_state )
 	AM_RANGE(0x2800, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( sbrkoutct_main_map, AS_PROGRAM, 8, sbrkout_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
+	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x380) AM_RAMBANK("bank1")
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(sbrkout_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x0800, 0x083f) AM_READ(sbrkoutct_switches_r)
+	AM_RANGE(0x0840, 0x0840) AM_MIRROR(0x003f) AM_READ_PORT("COIN")
+	AM_RANGE(0x0880, 0x0880) AM_MIRROR(0x003f) AM_READ_PORT("START")
+	AM_RANGE(0x08c0, 0x08c0) AM_MIRROR(0x003f) AM_READ_PORT("SERVICE")
+	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x03ff) AM_READ(sync_r)
+	AM_RANGE(0x0c10, 0x0c11) AM_MIRROR(0x000e) AM_WRITE(serve_led_w)
+	AM_RANGE(0x0c20, 0x0c21) AM_MIRROR(0x000e) AM_WRITE(serve_2_led_w)
+	AM_RANGE(0x0c30, 0x0c31) AM_MIRROR(0x000e) AM_WRITE(start_1_led_w)
+	AM_RANGE(0x0c40, 0x0c41) AM_MIRROR(0x000e) AM_WRITE(start_2_led_w)
+	AM_RANGE(0x0c50, 0x0c51) AM_MIRROR(0x000e) AM_WRITE(pot_mask1_w)
+	AM_RANGE(0x0c60, 0x0c61) AM_MIRROR(0x000e) AM_WRITE(pot_mask2_w)
+	AM_RANGE(0x0c70, 0x0c71) AM_MIRROR(0x000e) AM_WRITE(coincount_w)
+	AM_RANGE(0x0c80, 0x0c80) AM_MIRROR(0x007f) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x0e00, 0x0e00) AM_MIRROR(0x007f) AM_WRITE(irq_ack_w)
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x03ff) AM_READ(sync2_r)
+	AM_RANGE(0x2800, 0x3fff) AM_ROM
+ADDRESS_MAP_END
 
 
 /*************************************
@@ -475,6 +520,19 @@ static INPUT_PORTS_START( sbrkoutc )
 	PORT_CONFSETTING(    0x02, "Vertical" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sbrkoutct )
+	PORT_INCLUDE(sbrkout)
+
+	PORT_START("SERVE2")
+	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+
+	PORT_MODIFY("SELECT")
+	PORT_CONFNAME(0x80, 0x00, "Game Select" )
+	PORT_CONFSETTING( 0x00,	DEF_STR( Off ) )
+	PORT_CONFSETTING( 0x80, DEF_STR( On ) )
+INPUT_PORTS_END
+
 /*************************************
  *
  *  Graphics definitions
@@ -543,6 +601,10 @@ static MACHINE_CONFIG_START( sbrkout, sbrkout_state )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_DERIVED(sbrkoutct, sbrkout)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(sbrkoutct_main_map)
+MACHINE_CONFIG_END
 
 /*************************************
  *
@@ -598,7 +660,7 @@ ROM_START( sbrkout3 ) // rev 03; main cpu roms are on 1024x4bit (82s137 or equiv
 	ROM_LOAD( "006401.e2",    0x0100, 0x0020, CRC(857df8db) SHA1(06313d5bde03220b2bc313d18e50e4bb1d0cfbbb) )    /* memory mapper */
 ROM_END
 
-ROM_START( sbrkoutc )
+ROM_START( sbrkoutc ) // built from original Atari source code
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "a33443.bin",   0x2800, 0x1800, CRC(bf418976) SHA1(d766e220a284a7b9caf876207e8191aff0497a03) )
 
@@ -614,6 +676,23 @@ ROM_START( sbrkoutc )
 	ROM_LOAD( "006401.e2",    0x0100, 0x0020, CRC(857df8db) SHA1(06313d5bde03220b2bc313d18e50e4bb1d0cfbbb) )    /* memory mapper */
 ROM_END
 
+ROM_START( sbrkoutct ) // built from original Atari source code
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "034555-01.c1",   0x2800, 0x0800, CRC(2da82521) SHA1(1f53e549676052647486cea6738c5c7a45133538) )
+	ROM_LOAD( "034556-01.d11",  0x3000, 0x0800, CRC(5a6497ae) SHA1(96c2a136fb1e649e2db17bcb12bdc2a8d250a63e) )
+	ROM_LOAD( "034557-01.ef1",  0x3800, 0x0800, CRC(b6b3b07b) SHA1(c4d2cdcca89c2944afd4a4ed0bb5003b3eca4c7e) )
+
+	ROM_REGION( 0x0400, "gfx1", 0 )
+	ROM_LOAD( "034559-01.r4",    0x0000, 0x0200, CRC(84368539) SHA1(50b2c3f443346e3a355492ed1f7ec0a8cc6364d4) )
+	ROM_LOAD( "034558-01.p4",    0x0200, 0x0200, CRC(cc0f81f2) SHA1(a2180280991c9cf43f4e941d9ba4fe5654d1af65) )
+
+	ROM_REGION( 0x0020, "gfx2", 0 )
+	ROM_LOAD( "033282.k6",    0x0000, 0x0020, CRC(6228736b) SHA1(bc176261dba11521df19d545ce604f8cc294287a) )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "006400.m2",    0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )    /* sync (not used) */
+	ROM_LOAD( "006401.e2",    0x0100, 0x0020, CRC(857df8db) SHA1(06313d5bde03220b2bc313d18e50e4bb1d0cfbbb) )    /* memory mapper */
+ROM_END
 
 /*************************************
  *
@@ -621,6 +700,7 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1978, sbrkout, 0, sbrkout, sbrkout, driver_device, 0, ROT270,         "Atari", "Super Breakout (rev 04)", GAME_SUPPORTS_SAVE, layout_sbrkout )
-GAMEL( 1978, sbrkout3, sbrkout, sbrkout, sbrkout, driver_device, 0, ROT270,  "Atari", "Super Breakout (rev 03)", GAME_SUPPORTS_SAVE, layout_sbrkout )
-GAMEL( 1978, sbrkoutc, sbrkout, sbrkout, sbrkoutc, driver_device, 0, ROT270, "Atari", "Super Breakout (Canyon and Vertical Breakout, prototype)", GAME_SUPPORTS_SAVE, layout_sbrkout )
+GAMEL( 1978, sbrkout,   0,       sbrkout,   sbrkout,   driver_device, 0, ROT270, "Atari", "Super Breakout (rev 04)", GAME_SUPPORTS_SAVE, layout_sbrkout )
+GAMEL( 1978, sbrkout3,  sbrkout, sbrkout,   sbrkout,   driver_device, 0, ROT270, "Atari", "Super Breakout (rev 03)", GAME_SUPPORTS_SAVE, layout_sbrkout )
+GAMEL( 1978, sbrkoutc,  sbrkout, sbrkout,   sbrkoutc,  driver_device, 0, ROT270, "Atari", "Super Breakout (Canyon and Vertical Breakout, prototype)", GAME_SUPPORTS_SAVE, layout_sbrkout )
+GAMEL( 1978, sbrkoutct, sbrkout, sbrkoutct, sbrkoutct, driver_device, 0, ROT270, "Atari", "Super Breakout (Cocktail, prototype)", GAME_SUPPORTS_SAVE, layout_sbrkout )
