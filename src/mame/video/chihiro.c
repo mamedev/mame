@@ -2027,8 +2027,13 @@ void nv2a_renderer::read_vertex(address_space & space, offs_t address, vertex_nv
 		}
 		break;
 	case NV2A_VTXBUF_TYPE_UBYTE:
+		u = space.read_dword(address + 0);
+		for (c = l-1; c >= l; c--) {
+			vertex.attribute[attrib].fv[c] = (u & 0xff) / 255.0;
+			u = u >> 8;
+		}
 		break;
-	case  NV2A_VTXBUF_TYPE_UNKNOWN_0:
+	case  NV2A_VTXBUF_TYPE_UBYTE2:
 		u = space.read_dword(address + 0);
 		for (c = 0; c < l; c++) {
 			vertex.attribute[attrib].fv[c] = (u & 0xff) / 255.0;
@@ -2142,7 +2147,7 @@ void nv2a_renderer::convert_vertices_poly(vertex_nv *source, vertex_t *destinati
 				destination[m].p[PARAM_TEXTURE0_U + u * 2] = source[m].attribute[9 + u].fv[0];
 				destination[m].p[PARAM_TEXTURE0_V + u * 2] = source[m].attribute[9 + u].fv[1];
 			}
-			destination[m].p[PARAM_Z] = 0+0xffffff;
+			destination[m].p[PARAM_Z] = 0xffffff;
 		}
 	}
 	else {
@@ -2164,7 +2169,7 @@ void nv2a_renderer::convert_vertices_poly(vertex_nv *source, vertex_t *destinati
 	}
 }
 
-void nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UINT32 subchannel, UINT32 method, UINT32 address, int &countlen)
+int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UINT32 subchannel, UINT32 method, UINT32 address, int &countlen)
 {
 	UINT32 maddress;
 	UINT32 data;
@@ -2364,7 +2369,7 @@ void nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UI
 			if (countlen < 0) {
 				logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
 				countlen = 0;
-				return;
+				return 0;
 			}
 			address = address + c * 4;
 			for (n = 1; countlen > 0; n++) {
@@ -2392,7 +2397,7 @@ void nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UI
 			if (countlen < 0) {
 				logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
 				countlen = 0;
-				return;
+				return 0;
 			}
 			address = address + c * 4;
 			for (n = 0; countlen > 0; n++) {
@@ -2439,7 +2444,7 @@ void nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UI
 			if (countlen < 0) {
 				logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
 				countlen = 0;
-				return;
+				return 0;
 			}
 			address = address + c * 4;
 			for (n = 0; countlen > 0; n += 2) {
@@ -2449,7 +2454,7 @@ void nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UI
 				if (countlen < 0) {
 					logerror("Method 0x1818 missing %d words to draw a complete primitive\n", -countlen);
 					countlen = 0;
-					return;
+					return 0;
 				}
 				address = address + c * 4;
 				render_triangle(limits_rendertarget, renderspans, 4 + 4 * 2, xy[n & 3], xy[(n + 1) & 3], xy[(n + 2) & 3]);
@@ -2477,7 +2482,7 @@ void nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UI
 		vertexbuffer_kind[bit] = data & 15;
 		vertexbuffer_size[bit] = (data >> 4) & 15;
 		switch (vertexbuffer_kind[bit]) {
-		case NV2A_VTXBUF_TYPE_UNKNOWN_0:
+		case NV2A_VTXBUF_TYPE_UBYTE2:
 			vertex_attribute_words[bit] = (vertexbuffer_size[bit] * 1) >> 2;
 			break;
 		case NV2A_VTXBUF_TYPE_FLOAT:
@@ -2541,7 +2546,7 @@ void nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UI
 			m = 2;
 		else
 			m = 1;
-		// possible buffers: color, depth, stencil, and accumulation
+		// possible buffers: color, depth, stencil
 		// clear framebuffer
 		if (data & 0xf0) {
 			bitmap_rgb32 bm(rendertarget, (limits_rendertarget.right() + 1) * m, (limits_rendertarget.bottom() + 1) * m, pitch_rendertarget / 4); // why *2 ?
@@ -2550,12 +2555,14 @@ void nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UI
 			bm.fill(color);
 			//printf("clearscreen\n\r");
 		}
-		if (data & 0x01) {
+		if ((data & 0x03) == 3) {
 			bitmap_rgb32 bm(depthbuffer, (limits_rendertarget.right() + 1) * m, (limits_rendertarget.bottom() + 1) * m, pitch_rendertarget / 4); // why *2 ?
-			// clear zbuffer
-			UINT32 depth = channel[chanel][subchannel].object.method[0x1d8c / 4];
-			bm.fill(depth);
+			// clear zbuffer and stencil
+			UINT32 depth_stencil = channel[chanel][subchannel].object.method[0x1d8c / 4];
+			bm.fill(depth_stencil);
 		}
+		else if (((data & 0x03) == 1) || ((data & 0x03) == 2))
+			logerror("Unsupported clear method parameter %d\n\r", data & 0x03);
 		countlen--;
 	}
 	if (maddress == 0x0200) {
@@ -2582,6 +2589,13 @@ void nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UI
 			data = data & 0x0ffffff0;
 			displayedtarget = (UINT32 *)space.get_write_ptr(data);
 		}
+	}
+	if (maddress == 0x0130) {
+		countlen--;
+		if (waitvblank_used == 1)
+			return 1; // block until next vblank
+		else
+			return 0;
 	}
 	if (maddress == 0x0210) {
 		// framebuffer offset ?
@@ -2956,12 +2970,19 @@ void nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UI
 		//combiner.=(data >> 27) & 7;
 		countlen--;
 	}
+	return 0;
 }
 
 int nv2a_renderer::toggle_register_combiners_usage()
 {
 	combiner.used = 1 - combiner.used;
 	return combiner.used;
+}
+
+int nv2a_renderer::toggle_wait_vblank_support()
+{
+	waitvblank_used = 1 - waitvblank_used;
+	return waitvblank_used;
 }
 
 void nv2a_renderer::debug_grab_texture(int type, const char *filename)
@@ -2980,10 +3001,6 @@ void nv2a_renderer::debug_grab_vertex_program_slot(int slot, UINT32 *instruction
 	instruction[1] = vertexprogram.exec.op[slot].i[1];
 	instruction[2] = vertexprogram.exec.op[slot].i[2];
 	instruction[3] = vertexprogram.exec.op[slot].i[3];
-}
-
-void nv2a_renderer::savestate_items()
-{
 }
 
 void nv2a_renderer::combiner_argb8_float(UINT32 color, float reg[4])
@@ -3569,6 +3586,10 @@ bool nv2a_renderer::vblank_callback(screen_device &screen, bool state)
 		pmc[0x100 / 4] |= 0x1000000;
 	else
 		pmc[0x100 / 4] &= ~0x1000000;
+	if ((state == true) && (puller_waiting == 1)) {
+		puller_waiting = 0;
+		puller_timer_work(NULL, 0);
+	}
 	if ((pmc[0x100 / 4] != 0) && (pmc[0x140 / 4] != 0)) {
 		// send interrupt
 		return true;
@@ -3587,6 +3608,146 @@ UINT32 nv2a_renderer::screen_update_callback(screen_device &screen, bitmap_rgb32
 		memcpy(dst, displayedtarget, bitmap.rowbytes()*bitmap.height());
 	}
 	return 0;
+}
+
+TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
+{
+	int chanel, subchannel;
+	int method, count, handle, objclass;
+	UINT32 *dmaput, *dmaget;
+	UINT32 cmd, cmdtype;
+	int countlen;
+	int ret;
+	address_space *space = puller_space;
+
+	chanel = puller_channel;
+	subchannel = puller_subchannel;
+	dmaput = &channel[chanel][subchannel].regs[0x40 / 4];
+	dmaget = &channel[chanel][subchannel].regs[0x44 / 4];
+	chanel = puller_channel;
+	subchannel = puller_subchannel;
+	while (*dmaget != *dmaput) {
+		cmd = space->read_dword(*dmaget);
+		*dmaget += 4;
+		cmdtype = geforce_commandkind(cmd);
+		switch (cmdtype)
+		{
+		case 6: // jump
+#ifdef LOG_NV2A
+			printf("jump dmaget %08X", *dmaget);
+#endif
+			*dmaget = cmd & 0xfffffffc;
+#ifdef LOG_NV2A
+			printf(" -> %08X\n\r", *dmaget);
+#endif
+			break;
+		case 0: // increasing method
+			method = (cmd >> 2) & 2047; // method*4 is address // if method >= 0x40 send it to assigned object
+#ifdef LOG_NV2A
+			subch = (cmd >> 13) & 7;
+#endif
+			count = (cmd >> 18) & 2047;
+			if ((method == 0) && (count == 1)) {
+				handle = space->read_dword(*dmaget);
+				handle = geforce_object_offset(handle);
+#ifdef LOG_NV2A
+				logerror("  assign to subchannel %d object at %d\n", subch, handle);
+#endif
+				channel[chanel][subchannel].object.objhandle = handle;
+				handle = ramin[handle / 4];
+				objclass = handle & 0xff;
+				channel[chanel][subchannel].object.objclass = objclass;
+				*dmaget += 4;
+			}
+			else {
+#ifdef LOG_NV2A
+				logerror("  subch. %d method %04x offset %04x count %d\n", subch, method, method * 4, count);
+#endif
+				ret = 0;
+				while (count > 0) {
+					countlen = 1;
+					ret=geforce_exec_method(*space, chanel, subchannel, method, *dmaget, countlen);
+					count--;
+					method++;
+					*dmaget += 4;
+					if (ret != 0)
+						break;
+				}
+				if (ret != 0) {
+					puller_timer->enable(false);
+					puller_waiting = 1;
+					return;
+				}
+			}
+			break;
+		case 5: // non-increasing method
+			method = (cmd >> 2) & 2047;
+#ifdef LOG_NV2A
+			subch = (cmd >> 13) & 7;
+#endif
+			count = (cmd >> 18) & 2047;
+			if ((method == 0) && (count == 1)) {
+#ifdef LOG_NV2A
+				logerror("  assign channel %d\n", subch);
+#endif
+				handle = space->read_dword(*dmaget);
+				handle = geforce_object_offset(handle);
+#ifdef LOG_NV2A
+				logerror("  assign to subchannel %d object at %d\n", subch, handle);
+#endif
+				channel[chanel][subchannel].object.objhandle = handle;
+				handle = ramin[handle / 4];
+				objclass = handle & 0xff;
+				channel[chanel][subchannel].object.objclass = objclass;
+				*dmaget += 4;
+			}
+			else {
+#ifdef LOG_NV2A
+				logerror("  subch. %d method %04x offset %04x count %d\n", subch, method, method * 4, count);
+#endif
+				while (count > 0) {
+					countlen = count;
+					ret=geforce_exec_method(*space, chanel, subchannel, method, *dmaget, countlen);
+					*dmaget += 4 * (count - countlen);
+					count = countlen;
+				}
+			}
+			break;
+		case 3: // long non-increasing method
+			method = (cmd >> 2) & 2047;
+#ifdef LOG_NV2A
+			subch = (cmd >> 13) & 7;
+#endif
+			count = space->read_dword(*dmaget);
+			*dmaget += 4;
+			if ((method == 0) && (count == 1)) {
+				handle = space->read_dword(*dmaget);
+				handle = geforce_object_offset(handle);
+#ifdef LOG_NV2A
+				logerror("  assign to subchannel %d object at %d\n", subch, handle);
+#endif
+				channel[chanel][subchannel].object.objhandle = handle;
+				handle = ramin[handle / 4];
+				objclass = handle & 0xff;
+				channel[chanel][subchannel].object.objclass = objclass;
+				*dmaget += 4;
+			}
+			else {
+#ifdef LOG_NV2A
+				logerror("  subch. %d method %04x offset %04x count %d\n", subch, method, method * 4, count);
+#endif
+				while (count > 0) {
+					countlen = count;
+					ret=geforce_exec_method(*space, chanel, subchannel, method, *dmaget, countlen);
+					*dmaget += 4 * (count - countlen);
+					count = countlen;
+				}
+			}
+			break;
+		default:
+			logerror("  unimplemented command %08X\n", cmd);
+		}
+	}
 }
 
 READ32_MEMBER(nv2a_renderer::geforce_r)
@@ -3684,7 +3845,7 @@ WRITE32_MEMBER(nv2a_renderer::geforce_w)
 	else if ((offset >= 0x00800000 / 4) && (offset < 0x00900000 / 4)) {
 		// 32 channels size 0x10000 each, 8 subchannels per channel size 0x2000 each
 		int chanel, subchannel, suboffset;
-		int method, count, handle, objclass;
+		//int method, count, handle, objclass;
 #ifdef LOG_NV2A
 		int subch;
 #endif
@@ -3699,130 +3860,37 @@ WRITE32_MEMBER(nv2a_renderer::geforce_w)
 		COMBINE_DATA(&channel[chanel][subchannel].regs[suboffset]);
 		if ((suboffset == 0x40 / 4) || (suboffset == 0x44 / 4)) { // DMA_PUT or DMA_GET
 			UINT32 *dmaput, *dmaget;
-			UINT32 cmd, cmdtype;
-			int countlen;
 
 			dmaput = &channel[chanel][subchannel].regs[0x40 / 4];
 			dmaget = &channel[chanel][subchannel].regs[0x44 / 4];
 			//printf("dmaget %08X dmaput %08X\n\r",*dmaget,*dmaput);
-			if ((*dmaput == 0x048cf000) && (*dmaget == 0x07f4d000))
+			if ((*dmaput == 0x048cf000) && (*dmaget == 0x07f4d000)) {
 				*dmaget = *dmaput;
-			while (*dmaget != *dmaput) {
-				cmd = space.read_dword(*dmaget);
-				*dmaget += 4;
-				cmdtype = geforce_commandkind(cmd);
-				switch (cmdtype)
-				{
-				case 6: // jump
-#ifdef LOG_NV2A
-					printf("jump dmaget %08X", *dmaget);
-#endif
-					*dmaget = cmd & 0xfffffffc;
-#ifdef LOG_NV2A
-					printf(" -> %08X\n\r", *dmaget);
-#endif
-					break;
-				case 0: // increasing method
-					method = (cmd >> 2) & 2047; // method*4 is address // if method >= 0x40 send it to assigned object
-#ifdef LOG_NV2A
-					subch = (cmd >> 13) & 7;
-#endif
-					count = (cmd >> 18) & 2047;
-					if ((method == 0) && (count == 1)) {
-						handle = space.read_dword(*dmaget);
-						handle = geforce_object_offset(handle);
-#ifdef LOG_NV2A
-						logerror("  assign to subchannel %d object at %d\n", subch, handle);
-#endif
-						channel[chanel][subchannel].object.objhandle = handle;
-						handle = ramin[handle / 4];
-						objclass = handle & 0xff;
-						channel[chanel][subchannel].object.objclass = objclass;
-						*dmaget += 4;
-					}
-					else {
-#ifdef LOG_NV2A
-						logerror("  subch. %d method %04x offset %04x count %d\n", subch, method, method * 4, count);
-#endif
-						while (count > 0) {
-							countlen = 1;
-							geforce_exec_method(space, chanel, subchannel, method, *dmaget, countlen);
-							count--;
-							method++;
-							*dmaget += 4;
-						}
-					}
-					break;
-				case 5: // non-increasing method
-					method = (cmd >> 2) & 2047;
-#ifdef LOG_NV2A
-					subch = (cmd >> 13) & 7;
-#endif
-					count = (cmd >> 18) & 2047;
-					if ((method == 0) && (count == 1)) {
-#ifdef LOG_NV2A
-						logerror("  assign channel %d\n", subch);
-#endif
-						handle = space.read_dword(*dmaget);
-						handle = geforce_object_offset(handle);
-#ifdef LOG_NV2A
-						logerror("  assign to subchannel %d object at %d\n", subch, handle);
-#endif
-						channel[chanel][subchannel].object.objhandle = handle;
-						handle = ramin[handle / 4];
-						objclass = handle & 0xff;
-						channel[chanel][subchannel].object.objclass = objclass;
-						*dmaget += 4;
-					}
-					else {
-#ifdef LOG_NV2A
-						logerror("  subch. %d method %04x offset %04x count %d\n", subch, method, method * 4, count);
-#endif
-						while (count > 0) {
-							countlen = count;
-							geforce_exec_method(space, chanel, subchannel, method, *dmaget, countlen);
-							*dmaget += 4 * (count - countlen);
-							count = countlen;
-						}
-					}
-					break;
-				case 3: // long non-increasing method
-					method = (cmd >> 2) & 2047;
-#ifdef LOG_NV2A
-					subch = (cmd >> 13) & 7;
-#endif
-					count = space.read_dword(*dmaget);
-					*dmaget += 4;
-					if ((method == 0) && (count == 1)) {
-						handle = space.read_dword(*dmaget);
-						handle = geforce_object_offset(handle);
-#ifdef LOG_NV2A
-						logerror("  assign to subchannel %d object at %d\n", subch, handle);
-#endif
-						channel[chanel][subchannel].object.objhandle = handle;
-						handle = ramin[handle / 4];
-						objclass = handle & 0xff;
-						channel[chanel][subchannel].object.objclass = objclass;
-						*dmaget += 4;
-					}
-					else {
-#ifdef LOG_NV2A
-						logerror("  subch. %d method %04x offset %04x count %d\n", subch, method, method * 4, count);
-#endif
-						while (count > 0) {
-							countlen = count;
-							geforce_exec_method(space, chanel, subchannel, method, *dmaget, countlen);
-							*dmaget += 4 * (count - countlen);
-							count = countlen;
-						}
-					}
-					break;
-				default:
-					logerror("  unimplemented command %08X\n", cmd);
+				puller_waiting = 0;
+				puller_timer->enable(false);
+				return;
+			}
+			if (*dmaget != *dmaput) {
+				if (puller_waiting == 0) {
+					puller_channel = chanel;
+					puller_subchannel = subchannel;
+					puller_space = &space;
+					puller_timer->enable();
+					puller_timer->adjust(attotime::zero);
 				}
 			}
 		}
 	}
-	else;
+	//else
 	//      logerror("NV_2A: write at %08X mask %08X value %08X\n",0xfd000000+offset*4,mem_mask,data);
+}
+
+void nv2a_renderer::savestate_items()
+{
+}
+
+void nv2a_renderer::start()
+{
+	puller_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nv2a_renderer::puller_timer_work), this), (void *)"NV2A Puller Timer");
+	puller_timer->enable(false);
 }
