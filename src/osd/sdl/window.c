@@ -654,6 +654,16 @@ static void sdlwindow_update_cursor_state(running_machine &machine, sdl_window_i
 #endif
 }
 
+static OSDWORK_CALLBACK( sdlwindow_update_cursor_state_wt )
+{
+    worker_param *      wp = (worker_param *) param;
+    //sdl_window_info *   window = wp->window;
+
+    sdlwindow_update_cursor_state(*wp->m_machine, wp->window);
+
+    return NULL;
+}
+
 
 //============================================================
 //  sdlwindow_video_window_create
@@ -961,7 +971,17 @@ void sdlwindow_video_window_update(running_machine &machine, sdl_window_info *wi
 	ASSERT_MAIN_THREAD();
 
 	// adjust the cursor state
-	sdlwindow_update_cursor_state(machine, window);
+	//sdlwindow_update_cursor_state(machine, window);
+
+    {
+        worker_param wp;
+
+        clear_worker_param(&wp);
+        wp.window = window;
+        wp.m_machine = &machine;
+
+        execute_async(&sdlwindow_update_cursor_state_wt, &wp);
+    }
 
 	// if we're visible and running and not in the middle of a resize, draw
 	if (window->target != NULL)
