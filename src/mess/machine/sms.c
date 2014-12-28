@@ -45,6 +45,9 @@ WRITE_LINE_MEMBER(sms_state::sms_ctrl1_th_input)
 
 WRITE_LINE_MEMBER(sms_state::sms_ctrl2_th_input)
 {
+	if (m_is_gamegear && (!m_cartslot->exists() || !m_cartslot->m_cart->get_sms_mode()))
+		return;
+
 	// Check if TH of controller port 2 is set to input (1)
 	if (m_io_ctrl_reg & 0x08)
 	{
@@ -63,9 +66,10 @@ WRITE_LINE_MEMBER(sms_state::sms_ctrl2_th_input)
 }
 
 
-void sms_state::sms_get_inputs( address_space &space )
+void sms_state::sms_get_inputs()
 {
-	UINT8 data1, data2;
+	UINT8 data1 = 0xff;
+	UINT8 data2 = 0xff;
 
 	m_port_dc_reg = 0xff;
 	m_port_dd_reg = 0xff;
@@ -74,12 +78,28 @@ void sms_state::sms_get_inputs( address_space &space )
 	// physical pins numbering. For register bits whose order differs,
 	// it's necessary move the equivalent controller bits to match.
 
-	data1 = m_port_ctrl1->port_r();
-	m_port_dc_reg &= ~0x0f | data1; // Up, Down, Left, Right
-	m_port_dc_reg &= ~0x10 | (data1 >> 1); // TL (Button 1)
-	m_port_dc_reg &= ~0x20 | (data1 >> 2); // TR (Button 2)
+	if (m_is_gamegear)
+	{
+		data1 = m_port_gg_dc->read();
+		m_port_dc_reg &= ~0x03f | data1;
+	}
+	else
+	{
+		data1 = m_port_ctrl1->port_r();
+		m_port_dc_reg &= ~0x0f | data1; // Up, Down, Left, Right
+		m_port_dc_reg &= ~0x10 | (data1 >> 1); // TL (Button 1)
+		m_port_dc_reg &= ~0x20 | (data1 >> 2); // TR (Button 2)
+	}
 
-	data2 = m_port_ctrl2->port_r();
+	if (m_is_gamegear)
+	{
+		if (m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode())
+			data2 = m_port_gear2gear->port_r();
+	}
+	else
+	{
+		data2 = m_port_ctrl2->port_r();
+	}
 	m_port_dc_reg &= ~0xc0 | (data2 << 6); // Up, Down
 	m_port_dd_reg &= ~0x03 | (data2 >> 2); // Left, Right
 	m_port_dd_reg &= ~0x04 | (data2 >> 3); // TL (Button 1)
@@ -116,7 +136,7 @@ READ8_MEMBER(sms_state::sms_fm_detect_r)
 		}
 		else
 		{
-			sms_get_inputs(space);
+			sms_get_inputs();
 			return m_port_dc_reg;
 		}
 	}
@@ -128,6 +148,12 @@ WRITE8_MEMBER(sms_state::sms_io_control_w)
 	bool latch_hcount = false;
 	UINT8 ctrl1_port_data = 0xff;
 	UINT8 ctrl2_port_data = 0xff;
+
+	if (m_is_gamegear && (!m_cartslot->exists() || !m_cartslot->m_cart->get_sms_mode()))
+	{
+		m_io_ctrl_reg = data;
+		return;
+	}
 
 	// Controller Port 1:
 
@@ -171,12 +197,16 @@ WRITE8_MEMBER(sms_state::sms_io_control_w)
 		}
 		if (!m_is_gamegear)
 			m_port_ctrl2->port_w(ctrl2_port_data);
+		else
+			m_port_gear2gear->port_w(ctrl2_port_data); // not verified
 	}
 	// check if TH is set to input (1).
 	if (data & 0x08)
 	{
 		if (!m_is_gamegear)
 			ctrl2_port_data &= ~0x40 | m_port_ctrl2->port_r();
+		else
+			ctrl2_port_data &= ~0x40 | m_port_gear2gear->port_r(); // not verified
 
 		// check if TH input level is high (1) and was output/low (0)
 		if ((ctrl2_port_data & 0x40) && !(m_io_ctrl_reg & 0x88))
@@ -232,17 +262,17 @@ READ8_MEMBER(sms_state::sms_input_port_dc_r)
 {
 	if (m_is_mark_iii)
 	{
-		sms_get_inputs(space);
+		sms_get_inputs();
 		return m_port_dc_reg;
 	}
 
-	if (m_mem_ctrl_reg & IO_CHIP)
+	if (!m_is_gamegear && (m_mem_ctrl_reg & IO_CHIP))
 	{
 		return 0xff;
 	}
 	else
 	{
-		sms_get_inputs(space);
+		sms_get_inputs();
 
 		// Check if TR of controller port 1 is set to output (0)
 		if (!(m_io_ctrl_reg & 0x01))
@@ -260,14 +290,14 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 {
 	if (m_is_mark_iii)
 	{
-		sms_get_inputs(space);
+		sms_get_inputs();
 		return m_port_dd_reg;
 	}
 
-	if (m_mem_ctrl_reg & IO_CHIP)
+	if (!m_is_gamegear && (m_mem_ctrl_reg & IO_CHIP))
 		return 0xff;
 
-	sms_get_inputs(space);
+	sms_get_inputs();
 
 	// Check if TR of controller port 2 is set to output (0)
 	if (!(m_io_ctrl_reg & 0x04))
@@ -276,12 +306,13 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 		m_port_dd_reg &= ~0x08 | ((m_io_ctrl_reg & 0x40) >> 3);
 	}
 
-	if (m_is_smsj)
+	if (m_is_smsj || (m_is_gamegear && m_is_gg_region_japan))
 	{
 		// For Japanese Master System, set upper 4 bits with TH/TR
 		// direction bits of IO control register, according to Enri's
 		// docs (http://www43.tok2.com/home/cmpslv/Sms/EnrSms.htm).
 		// This makes the console incapable of using the Light Phaser.
+		// Assume the same for a Japanese Game Gear.
 		m_port_dd_reg &= ~0x10 | ((m_io_ctrl_reg & 0x01) << 4);
 		m_port_dd_reg &= ~0x20 | ((m_io_ctrl_reg & 0x04) << 3);
 		m_port_dd_reg &= ~0x40 | ((m_io_ctrl_reg & 0x02) << 5);

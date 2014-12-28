@@ -1,0 +1,57 @@
+/**********************************************************************
+
+    Sega Game Gear "Gear to Gear Port SMS Controller Adaptor" emulation
+    Also known as "Master Link" cable.
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************/
+
+#pragma once
+
+#ifndef __SMS_CTRL_ADAPTOR__
+#define __SMS_CTRL_ADAPTOR__
+
+
+#include "emu.h"
+#include "gear2gear.h"
+#include "../sms_ctrl/smsctrl.h"
+
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> sms_ctrl_adaptor_device
+
+class sms_ctrl_adaptor_device : public device_t,
+							public device_gg_gear2gear_port_interface
+{
+public:
+	// construction/destruction
+	sms_ctrl_adaptor_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	DECLARE_WRITE_LINE_MEMBER(th_pin_w);
+	DECLARE_READ32_MEMBER(pixel_r);
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const;
+
+	// device_gg_gear2gear_port_interface overrides
+	virtual UINT8 peripheral_r();
+	virtual void peripheral_w(UINT8 data);
+
+private:
+	required_device<sms_control_port_device> m_subctrl_port;
+};
+
+
+// device type definition
+extern const device_type SMS_CTRL_ADAPTOR;
+
+
+#endif

@@ -119,9 +119,9 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="u2" value="FANTASTIC DIZZY MD MDFD BB07"/>    <!-- location not really marked on PCB, using u2 for consistency -->
 			<feature name="left" value="GD74HC00"/>
 			<feature name="right" value="GD74HC74"/>
-			<dataarea name="rom" width="16" endianness="big" size="2621440">
-				<rom name="cosmic spacehead md mdcs e4f7.u1" size="1048576" crc="cb89e605" sha1="b5bc4a786639d1b8ae6de76f40dbe907b3f0b642" offset="0x000000"/>
-				<rom name="fantastic dizzy md mdfd bb07.u2" size="524288" crc="46447e7a" sha1="b320174d3b43f30b477818a27b4da30462a52003" offset="0x200000"/>
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
+				<rom name="fantastic dizzy md mdfd bb07.u2" size="524288" crc="46447e7a" sha1="b320174d3b43f30b477818a27b4da30462a52003" offset="0x000000"/>
+				<rom name="cosmic spacehead md mdcs e4f7.u1" size="1048576" crc="cb89e605" sha1="b5bc4a786639d1b8ae6de76f40dbe907b3f0b642" offset="0x200000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9602,7 +9602,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_cm2in1"/>
-			<dataarea name="rom" width="16" endianness="big" size="2621440">
+			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="mdppf821.bin" size="2097152" crc="32dd8351" sha1="928f46ca87886c6e72d10f7c9db29b09e483bc49" offset="0x000000"/>
 				<rom name="mdmm acd3.bin" size="524288" crc="50081a0b" sha1="56a8844c376f2e79e92cf128681fa3fef81c36d6" offset="0x200000"/>
 			</dataarea>
@@ -30078,6 +30078,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="linkdrgn">
+		<description>Link Dragon</description>
+		<year>1993</year>
+		<publisher>Songtly</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="262144">
+				<rom name="link dragon (unl).bin" size="262144" crc="1b86e623" sha1="09e4b59da3344f16ce6173c432c88ee9a12a3561" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lionkin3a" cloneof="lionkin3">
 		<description>Lion King 3 (Alt?)</description>
 		<year>199?</year>
@@ -30169,6 +30180,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="soul edge vs samurai spirits (unl)[f1].bin" size="2097152" crc="74a6d7a7" sha1="679e74efc254f08c7fe830f8394f10f24272d00b" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tankwar">
+		<description>Super Tank War</description>
+		<year>199?</year>
+		<publisher>Gamtec</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="262144">
+				<rom name="super tank war (unlicensed) [raw dump].bin" size="262144" crc="5e519ea1" sha1="7e00475f99035fb20f624a7fe0d6bb77c7e834b1" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>

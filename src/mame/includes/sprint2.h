@@ -54,6 +54,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sprint2_wram_w);
 	DECLARE_WRITE8_MEMBER(sprint2_lamp1_w);
 	DECLARE_WRITE8_MEMBER(sprint2_lamp2_w);
+	DECLARE_WRITE8_MEMBER(dominos4_lamp3_w);
+	DECLARE_WRITE8_MEMBER(dominos4_lamp4_w);
 	DECLARE_READ8_MEMBER(sprint2_collision1_r);
 	DECLARE_READ8_MEMBER(sprint2_collision2_r);
 	DECLARE_WRITE8_MEMBER(sprint2_collision_reset1_w);
@@ -66,6 +68,7 @@ public:
 	DECLARE_DRIVER_INIT(sprint1);
 	DECLARE_DRIVER_INIT(sprint2);
 	DECLARE_DRIVER_INIT(dominos);
+	DECLARE_DRIVER_INIT(dominos4);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(sprint2);

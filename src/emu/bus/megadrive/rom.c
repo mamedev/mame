@@ -531,7 +531,7 @@ WRITE16_MEMBER(md_rom_ssf2_device::write_a13)
  CODEMASTERS 2 IN 1 (RESET BASED)
  -------------------------------------------------*/
 
-#define MD_ADDR_CM2IN1(a) (m_base == 0 ? ((a << 1) & 0x1fffff)/2 : (((a << 1) & 0x7ffff) + 0x200000)/2)
+#define MD_ADDR_CM2IN1(a) (m_base == 0 ? ((a << 1) & 0x1fffff)/2 : (((a << 1) & 0x1fffff) + 0x200000)/2)
 
 READ16_MEMBER(md_rom_cm2in1_device::read)
 {

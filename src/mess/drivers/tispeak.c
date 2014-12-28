@@ -18,9 +18,10 @@
 #include "tispeak.lh"
 
 // The master clock is a single stage RC oscillator into TMS5100 RCOSC:
-// C is 68pf, R is a 50kohm trimpot wich is set to 33.6kohm. CPUCLK is this/2, ROMCLK is this/4.
+// In an early 1979 Speak & Spell, C is 68pf, R is a 50kohm trimpot which is set to around 33.6kohm
+// (measured in-circuit). CPUCLK is this osc freq /2, ROMCLK is this osc freq /4.
 // The typical osc freq curve for TMS5100 is unknown. Let's assume it is set to the default frequency,
-// which is 640kHz according to the TMS5100 documentation.
+// which is 640kHz for 8KHz according to the TMS5100 documentation.
 
 #define MASTER_CLOCK (640000)
 

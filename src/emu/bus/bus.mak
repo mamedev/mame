@@ -1254,6 +1254,17 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/gamegear/gear2gear.h,BUSES += GAMEGEAR
+#-------------------------------------------------
+
+ifneq ($(filter GAMEGEAR,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/gamegear
+BUSOBJS += $(BUSOBJ)/gamegear/gear2gear.o
+BUSOBJS += $(BUSOBJ)/gamegear/smsctrladp.o
+endif
+
+#-------------------------------------------------
+#
 #@src/emu/bus/gba/gba_slot.h,BUSES += GBA
 #-------------------------------------------------
 

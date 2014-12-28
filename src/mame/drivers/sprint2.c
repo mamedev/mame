@@ -39,6 +39,14 @@ DRIVER_INIT_MEMBER(sprint2_state,dominos)
 	m_game = 3;
 }
 
+DRIVER_INIT_MEMBER(sprint2_state,dominos4)
+{
+	m_game = 3;
+	m_maincpu->space(AS_PROGRAM).install_read_port(0x0880, 0x0880, "SELFTTEST");
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c50, 0x0c5f, write8_delegate(FUNC(sprint2_state::dominos4_lamp3_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c60, 0x0c6f, write8_delegate(FUNC(sprint2_state::dominos4_lamp4_w),this));
+}
+
 int sprint2_state::service_mode()
 {
 	UINT8 v = ioport("INB")->read();
@@ -234,8 +242,17 @@ WRITE8_MEMBER(sprint2_state::sprint2_lamp2_w)
 	set_led_status(machine(), 1, offset & 1);
 }
 
+WRITE8_MEMBER(sprint2_state::dominos4_lamp3_w)
+{
+	set_led_status(machine(), 2, offset & 1);
+}
+WRITE8_MEMBER(sprint2_state::dominos4_lamp4_w)
+{
+	set_led_status(machine(), 3, offset & 1);
+}
 
 static ADDRESS_MAP_START( sprint2_map, AS_PROGRAM, 8, sprint2_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(sprint2_wram_r,sprint2_wram_w)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(sprint2_video_ram_w) AM_SHARE("video_ram")
 	AM_RANGE(0x0818, 0x081f) AM_READ(sprint2_input_A_r)
@@ -261,7 +278,6 @@ static ADDRESS_MAP_START( sprint2_map, AS_PROGRAM, 8, sprint2_state )
 	AM_RANGE(0x1400, 0x17ff) AM_READ(sprint2_collision2_r)
 	AM_RANGE(0x1800, 0x1800) AM_READNOP  /* debugger ROM location? */
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -441,6 +457,32 @@ static INPUT_PORTS_START( dominos )
 	PORT_ADJUSTER( 50, "R23 - Tone Freq" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( dominos4 )
+	PORT_INCLUDE(dominos)
+
+	PORT_MODIFY("INA")   /* input A */
+	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
+
+	PORT_MODIFY("INB")   /* input A */
+	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(3)
+	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(3)
+	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(3)
+	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(3)
+	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(4)
+	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(4)
+	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(4)
+	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(4)
+
+	PORT_START("SELFTTEST")
+	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+INPUT_PORTS_END
 
 static const gfx_layout tile_layout =
 {
@@ -542,17 +584,12 @@ static MACHINE_CONFIG_DERIVED( dominos, sprint2 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-
 ROM_START( sprint1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "6290-01.b1", 0x2000, 0x0800, CRC(41fc985e) SHA1(7178846480cbf8d15955ccd987d0b0e902ab9f90) )
-	ROM_RELOAD(             0xe000, 0x0800 )
 	ROM_LOAD( "6291-01.c1", 0x2800, 0x0800, CRC(07f7a920) SHA1(845f65d2bd290eb295ca6bae2575f27aaa08c0dd) )
-	ROM_RELOAD(             0xe800, 0x0800 )
 	ROM_LOAD( "6442-01.d1", 0x3000, 0x0800, CRC(e9ff0124) SHA1(42fe028e2e595573ccc0821de3bb6970364c585d) )
-	ROM_RELOAD(             0xf000, 0x0800 )
 	ROM_LOAD( "6443-01.e1", 0x3800, 0x0800, CRC(d6bb00d0) SHA1(cdcd4bb7b32be7a11480d3312fcd8d536e2d0caf) )
-	ROM_RELOAD(             0xf800, 0x0800 )
 
 	ROM_REGION( 0x0200, "gfx1", 0 ) /* tiles */
 	ROM_LOAD_NIB_HIGH( "6396-01.p4", 0x0000, 0x0200, CRC(801b42dd) SHA1(1db58390d803f404253cbf36d562016441ca568d) )
@@ -571,13 +608,9 @@ ROM_END
 ROM_START( sprint2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "6290-01.b1", 0x2000, 0x0800, CRC(41fc985e) SHA1(7178846480cbf8d15955ccd987d0b0e902ab9f90) )
-	ROM_RELOAD(             0xe000, 0x0800 )
 	ROM_LOAD( "6291-01.c1", 0x2800, 0x0800, CRC(07f7a920) SHA1(845f65d2bd290eb295ca6bae2575f27aaa08c0dd) )
-	ROM_RELOAD(             0xe800, 0x0800 )
 	ROM_LOAD( "6404.d1",    0x3000, 0x0800, CRC(d2878ff6) SHA1(b742a8896c1bf1cfacf48d06908920d88a2c9ea8) )
-	ROM_RELOAD(             0xf000, 0x0800 )
 	ROM_LOAD( "6405.e1",    0x3800, 0x0800, CRC(6c991c80) SHA1(c30a5b340f05dd702c7a186eb62607a48fa19f72) )
-	ROM_RELOAD(             0xf800, 0x0800 )
 
 	ROM_REGION( 0x0200, "gfx1", 0 ) /* tiles */
 	ROM_LOAD_NIB_HIGH( "6396-01.p4", 0x0000, 0x0200, CRC(801b42dd) SHA1(1db58390d803f404253cbf36d562016441ca568d) )
@@ -596,13 +629,9 @@ ROM_END
 ROM_START( sprint2a )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "6290-01.b1", 0x2000, 0x0800, CRC(41fc985e) SHA1(7178846480cbf8d15955ccd987d0b0e902ab9f90) )
-	ROM_RELOAD(             0xe000, 0x0800 )
 	ROM_LOAD( "6291-01.c1", 0x2800, 0x0800, CRC(07f7a920) SHA1(845f65d2bd290eb295ca6bae2575f27aaa08c0dd) )
-	ROM_RELOAD(             0xe800, 0x0800 )
 	ROM_LOAD( "6404.d1",    0x3000, 0x0800, CRC(d2878ff6) SHA1(b742a8896c1bf1cfacf48d06908920d88a2c9ea8) )
-	ROM_RELOAD(             0xf000, 0x0800 )
 	ROM_LOAD( "6405-02.e1", 0x3800, 0x0800, CRC(e80fd249) SHA1(7bcf7dfd72ca83fdd80593eaf392570da1f71298) )
-	ROM_RELOAD(             0xf800, 0x0800 )
 
 	ROM_REGION( 0x0200, "gfx1", 0 ) /* tiles */
 	ROM_LOAD_NIB_HIGH( "6396-01.p4", 0x0000, 0x0200, CRC(801b42dd) SHA1(1db58390d803f404253cbf36d562016441ca568d) )
@@ -621,13 +650,9 @@ ROM_END
 ROM_START( sprint2h )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "6290-01.b1", 0x2000, 0x0800, CRC(41fc985e) SHA1(7178846480cbf8d15955ccd987d0b0e902ab9f90) )
-	ROM_RELOAD(             0xe000, 0x0800 )
 	ROM_LOAD( "6291-01.c1", 0x2800, 0x0800, CRC(07f7a920) SHA1(845f65d2bd290eb295ca6bae2575f27aaa08c0dd) )
-	ROM_RELOAD(             0xe800, 0x0800 )
 	ROM_LOAD( "6404.d1",    0x3000, 0x0800, CRC(d2878ff6) SHA1(b742a8896c1bf1cfacf48d06908920d88a2c9ea8) )
-	ROM_RELOAD(             0xf000, 0x0800 )
 	ROM_LOAD( "6405-02.e1", 0x3800, 0x0800, CRC(6de291f1) SHA1(00c2826011d80ac0784649a7bc156a97c26565fd) ) // sldh
-	ROM_RELOAD(             0xf800, 0x0800 )
 
 	ROM_REGION( 0x0200, "gfx1", 0 ) /* tiles */
 	ROM_LOAD_NIB_HIGH( "6396-01.p4", 0x0000, 0x0200, CRC(801b42dd) SHA1(1db58390d803f404253cbf36d562016441ca568d) )
@@ -646,9 +671,7 @@ ROM_END
 ROM_START( dominos )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "7352-02.d1",   0x3000, 0x0800, CRC(738b4413) SHA1(3a90ab25bb5f65504692f97da43f03e21392dcd8) )
-	ROM_RELOAD(               0xf000, 0x0800 )
 	ROM_LOAD( "7438-02.e1",   0x3800, 0x0800, CRC(c84e54e2) SHA1(383b388a1448a195f28352fc5e4ff1a2af80cc95) )
-	ROM_RELOAD(               0xf800, 0x0800 )
 
 	ROM_REGION( 0x200, "gfx1", 0 ) /* tiles */
 	ROM_LOAD_NIB_HIGH( "7439-01.p4",   0x0000, 0x0200, CRC(4f42fdd6) SHA1(f8ea4b582e26cad37b746174cdc9f1c7ae0819c3) )
@@ -662,9 +685,32 @@ ROM_START( dominos )
 	ROM_LOAD( "6401-01.e2", 0x0100, 0x0020, CRC(857df8db) SHA1(06313d5bde03220b2bc313d18e50e4bb1d0cfbbb) )  /* address */
 ROM_END
 
+ROM_START( dominos4 ) // built from original Atari source code
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD_NIB_HIGH( "007754-01.l1",   0x3000, 0x0400, CRC(03fae4a9) SHA1(a132bd8bc866e33cdf6b4881064c8d265c2b25f4) )
+	ROM_LOAD_NIB_LOW ( "007755-01.l0",   0x3000, 0x0400, CRC(fa2d0c04) SHA1(fcf618c7089db46d55933d58ea04701af515ad49) )
+	ROM_LOAD_NIB_HIGH( "007756-01.m1",   0x3400, 0x0400, CRC(d2acb1b5) SHA1(ad81eed9dd0a2d5ecfd42daf90825726e64063b3) )
+	ROM_LOAD_NIB_LOW ( "007757-01.m0",   0x3400, 0x0400, CRC(69f2db90) SHA1(a064c840599c4e7cb65670e5480adeb310247f16) )
+	ROM_LOAD_NIB_HIGH( "007758-01.n1",   0x3800, 0x0400, CRC(b49083b4) SHA1(41999e8d3fd6104c42f3a034045f9f9c75d8247a) )
+	ROM_LOAD_NIB_LOW ( "007759-01.n0",   0x3800, 0x0400, CRC(542200c7) SHA1(111f06e942e247b00b9f90fae2986c3c8d9ec8c5) )
+	ROM_LOAD_NIB_HIGH( "007760-01.p1",   0x3c00, 0x0400, CRC(7dc2a7a1) SHA1(9d02572cf689c6476b33226a5358dd1f72c4e61d) )
+	ROM_LOAD_NIB_LOW ( "007761-01.p0",   0x3c00, 0x0400, CRC(04365e0d) SHA1(fefc3c04e55f1aa8c80b1e5e1e403af8698c3530) )
+
+	ROM_REGION( 0x200, "gfx1", 0 ) /* tiles */
+	ROM_LOAD_NIB_HIGH( "007764-01.p4",   0x0000, 0x0200, CRC(e4332dc0) SHA1(1f16c5b9f9fd7d478fd729cc79968f17746111f4) )
+	ROM_LOAD_NIB_LOW ( "007765-01.r4",   0x0000, 0x0200, CRC(6e4e6c75) SHA1(0fc77fecaa73eac57baf778bc51387c75883aad4) )
+
+	ROM_REGION( 0x200, "gfx2", 0 ) /* sprites, not used */
+	ROM_FILL( 0x0000, 0x0200, 0 )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "6400-01.m2", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )  /* SYNC */
+	ROM_LOAD( "6401-01.e2", 0x0100, 0x0020, CRC(857df8db) SHA1(06313d5bde03220b2bc313d18e50e4bb1d0cfbbb) )  /* address */
+ROM_END
 
 GAME( 1978, sprint1,  0,       sprint1, sprint1, sprint2_state, sprint1, ROT0, "Atari (Kee Games)", "Sprint 1", 0 )
 GAME( 1976, sprint2,  sprint1, sprint2, sprint2, sprint2_state, sprint2, ROT0, "Atari (Kee Games)", "Sprint 2 (set 1)", 0 )
 GAME( 1976, sprint2a, sprint1, sprint2, sprint2, sprint2_state, sprint2, ROT0, "Atari (Kee Games)", "Sprint 2 (set 2)", 0 )
 GAME( 1976, sprint2h, sprint1, sprint2, sprint2, sprint2_state, sprint2, ROT0, "hack", "Sprint 2 (color kit, Italy)", GAME_WRONG_COLORS ) // Italian hack, supposedly is color instead of b/w? how?
 GAME( 1977, dominos,  0,       dominos, dominos, sprint2_state, dominos, ROT0, "Atari", "Dominos", 0 )
+GAME( 1977, dominos4, dominos, dominos, dominos4,sprint2_state, dominos4,ROT0, "Atari", "Dominos 4 (Cocktail)", 0 )
