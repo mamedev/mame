@@ -1145,7 +1145,7 @@ Addresses found at @0x510, cpu2
  0: 14 16       ... checkpoint charlie
  1: 14 18       ... checkpoint bravo
  2: 14 1A       ... checkpoint alpha
- 3: 1C          You'll notice
+ 3: 1C          Use Caution (sounds kinda like 'You'll notice')
  4: 1E 1E       Complete attack mission
  5: 10 10 10    trouble, trouble, trouble
  6: 12 12       all pilots climb up
