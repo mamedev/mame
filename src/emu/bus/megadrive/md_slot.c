@@ -384,7 +384,7 @@ int base_md_cart_slot_device::load_list()
 		m_type = md_get_pcb_id(slot_name);
 
 	// handle mirroring of ROM, unless it's SSF2 or Pier Solar
-	if (m_type != SSF2 && m_type != PSOLAR)
+	if (m_type != SSF2 && m_type != PSOLAR && m_type != CM_2IN1)
 		m_cart->rom_map_setup(length);
 
 	return IMAGE_INIT_PASS;

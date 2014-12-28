@@ -77,7 +77,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state);
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : NULL; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL ); }
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry);
@@ -160,18 +160,18 @@ protected:
 	ARCOMPACT_RETTYPE arcompact_handle04_0b(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_0c(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_0d(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_0e(OPS_32);
+//	ARCOMPACT_RETTYPE arcompact_handle04_0e(OPS_32);
 //	ARCOMPACT_RETTYPE arcompact_handle04_0f(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_10(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_11(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_12(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_13(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_14(OPS_32);
+//	ARCOMPACT_RETTYPE arcompact_handle04_13(OPS_32);
+//	ARCOMPACT_RETTYPE arcompact_handle04_14(OPS_32);
 //	ARCOMPACT_RETTYPE arcompact_handle04_15(OPS_32);
 //	ARCOMPACT_RETTYPE arcompact_handle04_16(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_17(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_18(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_19(OPS_32);
+//	ARCOMPACT_RETTYPE arcompact_handle04_17(OPS_32);
+//	ARCOMPACT_RETTYPE arcompact_handle04_18(OPS_32);
+//	ARCOMPACT_RETTYPE arcompact_handle04_19(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_1a(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_1b(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_1c(OPS_32);
@@ -183,10 +183,10 @@ protected:
 	ARCOMPACT_RETTYPE arcompact_handle04_28(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_29(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2a(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2b(OPS_32);
+//	ARCOMPACT_RETTYPE arcompact_handle04_2b(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_00(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_01(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_02(OPS_32);
+//	ARCOMPACT_RETTYPE arcompact_handle04_2f_02(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_03(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_04(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_05(OPS_32);
@@ -773,11 +773,19 @@ protected:
 	ARCOMPACT_HANDLER04_TYPE_PM(04_06);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_07);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_0a);
+	ARCOMPACT_HANDLER04_TYPE_PM(04_0e);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_0f);
+	ARCOMPACT_HANDLER04_TYPE_PM(04_13);
+	ARCOMPACT_HANDLER04_TYPE_PM(04_14);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_15);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_16);
+	ARCOMPACT_HANDLER04_TYPE_PM(04_17);	
+	ARCOMPACT_HANDLER04_TYPE_PM(04_18);
+	ARCOMPACT_HANDLER04_TYPE_PM(04_19);	
 	ARCOMPACT_HANDLER04_TYPE_PM(04_20);
+	ARCOMPACT_HANDLER04_TYPE_PM(04_2b);
 
+	ARCOMPACT_HANDLER04_TYPE_PM(04_2f_02);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_2f_07);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_2f_08);
 
@@ -786,11 +794,14 @@ protected:
 
 
 private:
-	address_space_config m_program_config;
+	const address_space_config m_program_config;
+	const address_space_config m_io_config;
 
 	UINT32 m_pc;
 
 	address_space *m_program;
+	address_space  *m_io;
+
 	int m_icount;
 
 	UINT32 m_debugger_temp;
@@ -803,6 +814,12 @@ private:
 	inline void WRITE16(UINT32 address, UINT16 data){ 	m_program->write_word(address << 1, data); }
 	inline UINT8 READ8(UINT32 address) { return m_program->read_byte(address << 0); }
 	inline void WRITE8(UINT32 address, UINT8 data){ 	m_program->write_byte(address << 0, data); }
+	
+	inline  UINT64 READAUX(UINT64 address) { return m_io->read_dword(address *4); }
+	inline void WRITEAUX(UINT64 address, UINT32 data) { m_io->write_dword(address *4, data); }
+
+
+	int check_condition(UINT8 condition);
 
 	UINT32 m_regs[0x40];
 
@@ -813,6 +830,10 @@ private:
 //	f  e  d  c| b  a  9  8| 7  6  5  4| 3  2  1  0
 //  -  -  -  L| Z  N  C  V| U DE AE A2|A1 E2 E1  H
 	UINT32 m_status32;
+
+	UINT32 m_LP_START;
+	UINT32 m_LP_END;
+
 };
 
 #define V_OVERFLOW_FLAG (0x00000100)
@@ -842,6 +863,10 @@ private:
 
 // Condition 0x0c (LE)
 #define CONDITION_LE ((STATUS32_CHECK_Z) || (STATUS32_CHECK_N && !STATUS32_CHECK_V) ||  (!STATUS32_CHECK_N && STATUS32_CHECK_V)) // Z or (N and /V) or (/N and V) 
+#define CONDITION_EQ (STATUS32_CHECK_Z)
+#define CONDITION_CS (STATUS32_CHECK_C)
+#define CONDITION_LT ((STATUS32_CHECK_N && !STATUS32_CHECK_V) || (!STATUS32_CHECK_N && STATUS32_CHECK_V))
+#define CONDITION_MI (STATUS32_CHECK_N)
 
 extern const device_type ARCA5;
 

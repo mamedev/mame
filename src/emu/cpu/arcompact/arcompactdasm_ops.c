@@ -129,7 +129,7 @@ int arcompact_handle00_00_dasm(DASM_OPS_32)
 	// 0000 0sss ssss sss0 SSSS SSSS SSNQ QQQQ
 	INT32 address = (op & 0x07fe0000) >> 17;
 	address |= ((op & 0x0000ffc0) >> 6) << 10;
-	if (address & 0x800000) address = -0x800000 + (address & 0x7fffff);
+	if (address & 0x80000) address = -0x80000 + (address & 0x7ffff);
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
 	COMMON32_GET_CONDITION
 
@@ -887,7 +887,7 @@ int arcompact_handle04_28_dasm(DASM_OPS_32) // LPcc (loop setup)
 	{ // 0010 0RRR 1110 1000 0RRR uuuu uu1Q QQQQ
 		COMMON32_GET_u6
 		COMMON32_GET_CONDITION
-		output += sprintf(output, "LP<%s> (start %08x, end %08x)", conditions[condition], pc + 4, pc + u*2);
+		output += sprintf(output, "LP<%s> (start %08x, end %08x)", conditions[condition], pc + 4, PC_ALIGNED32 + u*2);
 
 		int unused = (op & 0x00000020)>>5;
 		if (unused==0) 	output += sprintf(output, "(unused bit not set)");

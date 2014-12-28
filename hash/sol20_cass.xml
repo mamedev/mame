@@ -166,7 +166,7 @@ User Manual at http://www.sol20.org/manuals/atc.pdf
 	<software name="atc">
 		<description>Air Traffic Control</description>
 		<year>1978</year>
-		<publisher>Processor Technology Corporation</publisher>
+		<publisher>Creative Computing Software</publisher>
 
 		<part name="cass1" interface="sol20_cass">
 			<dataarea name="cass" size="2457454">

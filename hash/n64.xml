@@ -3084,6 +3084,61 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		</part>
 	</software>
 
+	<software name="conkerp" cloneof="conker" supported="no">
+		<description>Conker's Bad Fur Day (Prototype Debug)</description>
+		<year>2001?</year>
+		<publisher>Rare</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="67108864">
+				<rom name="conkers bfd debug_ec.bin" size="67108864" crc="8443ff39" sha1="8b0952b9d13d2f082badfb587a97f2762600cd14" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conkerd" cloneof="conker" supported="no">
+		<description>Conker's Bad Fur Day (ECTS Demo)</description>
+		<year>2001?</year>
+		<publisher>Rare</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="67108864">
+				<rom name="conkers bfd ects demo_ec.bin" size="67108864" crc="99b3c27a" sha1="3bf1f052ce728ad77971efd4882ec8e18b7bf9a3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+Note from marshallh about the dongle present in the Rare proto/demo above
+"The dongle is a pass-through, except that there is an Altera
+MAX7000 series CPLD intercepting the AD16 bus. This lets 
+all normal bus transactions through, but in the special case 
+mentioned below, takes control of the bus and gives its own data."
+
+We currently don't emulate this, and thus we include also versions where the dongle checks have been
+patched out (+ a fix for internal checksum)
+-->
+
+	<software name="conkerph" cloneof="conker" supported="no">
+		<description>Conker's Bad Fur Day (Prototype Debug, Decrypted)</description>
+		<year>2001?</year>
+		<publisher>Rare</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="67108864">
+				<rom name="bfd_ntsc_debug_dc.bin" size="67108864" crc="c9822f5c" sha1="6956bd77351a91cdd22af454a8d410a3b9c829f0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conkerdh" cloneof="conker" supported="no">
+		<description>Conker's Bad Fur Day (ECTS Demo, Decrypted)</description>
+		<year>2001?</year>
+		<publisher>Rare</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="67108864">
+				<rom name="conker_bfd_ects_dc.bin" size="67108864" crc="af9c5972" sha1="92575eed941324b9cd7d29df61e720b04d8b26cb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="crusnexo">
 		<description>Cruis'n Exotica (USA)</description>
 		<year>2000</year>
@@ -7774,6 +7829,45 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="perfect dark (usa).bin" size="33554432" crc="f0fe18f0" sha1="ea43d1f09b47107ae0d1b7472bca58d785e8573a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pdarkp" cloneof="pdark">
+		<description>Perfect Dark (Euro, Prototype Debug)</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="perfect dark eur debug.bin" size="33554432" crc="5c6ac287" sha1="278cec1806eb39690cd2a3ae4838cfa8b8e630d2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pdarkup" cloneof="pdark" supported="no">
+		<description>Perfect Dark (USA, Prototype Debug)</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="67108864">
+				<rom name="perfect dark ntsc debug_ec.bin" size="67108864" crc="571ca36e" sha1="578eef928e7f93310288ea1e319dc1d00dee51fa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+The original cart contained an Altera MAX7000 series CPLD intercepting the AD16 bus, acting as a dongle
+(see notes about Conker above).
+We currently don't emulate this, and thus we include also this version where the dongle checks have been
+patched out (+ a fix for internal checksum)
+-->
+	<software name="pdarkuph" cloneof="pdark">
+		<description>Perfect Dark (USA, Prototype Debug, Decrypted)</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="pd_ntsc_debug_dc.bin" size="33554432" crc="0ea2645f" sha1="40c60733840ee68ac60f0c951055c942a2573bfc" offset="0" />
 			</dataarea>
 		</part>
 	</software>

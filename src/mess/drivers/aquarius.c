@@ -357,6 +357,7 @@ static MACHINE_CONFIG_START( aquarius, aquarius_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", aquarius )
+	MCFG_TEA1002_ADD("encoder", XTAL_8_867238MHz)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(aquarius_state, aquarius)
