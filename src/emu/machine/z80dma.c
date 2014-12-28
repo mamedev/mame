@@ -688,7 +688,7 @@ void z80dma_device::write(UINT8 data)
 					if (LOG) logerror("Z80DMA '%s' CMD Read status Byte\n", tag());
 					READ_MASK = 1;
 					assert(m_read_num_follow < ARRAY_LENGTH(m_read_regs_follow));
-					m_read_regs_follow[m_read_num_follow++] = m_status;
+					m_read_regs_follow[0] = m_status;
 					break;
 				case COMMAND_RESET_AND_DISABLE_INTERRUPTS:
 					WR3 &= ~0x20;
