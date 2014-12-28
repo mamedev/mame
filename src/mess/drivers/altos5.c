@@ -221,7 +221,7 @@ READ8_MEMBER(altos5_state::memory_read_byte)
 WRITE8_MEMBER(altos5_state::memory_write_byte)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	return prog_space.write_byte(offset, data);
+	prog_space.write_byte(offset, data);
 }
 
 READ8_MEMBER(altos5_state::io_read_byte)
@@ -233,7 +233,7 @@ READ8_MEMBER(altos5_state::io_read_byte)
 WRITE8_MEMBER(altos5_state::io_write_byte)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
-	return prog_space.write_byte(offset, data);
+	prog_space.write_byte(offset, data);
 }
 
 WRITE_LINE_MEMBER( altos5_state::busreq_w )
