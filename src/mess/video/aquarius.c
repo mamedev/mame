@@ -10,27 +10,6 @@
 #include "includes/aquarius.h"
 
 
-
-static const rgb_t aquarius_colors[] =
-{
-	rgb_t::black,                  /* Black */
-	rgb_t(0xff, 0x00, 0x00), /* Red */
-	rgb_t(0x00, 0xff, 0x00), /* Green */
-	rgb_t(0xff, 0xff, 0x00), /* Yellow */
-	rgb_t(0x00, 0x00, 0xff), /* Blue */
-	rgb_t(0x7f, 0x00, 0x7f), /* Violet */
-	rgb_t(0x7f, 0xff, 0xff), /* Light Blue-Green */
-	rgb_t::white,                  /* White */
-	rgb_t(0xc0, 0xc0, 0xc0), /* Light Gray */
-	rgb_t(0x00, 0xff, 0xff), /* Blue-Green */
-	rgb_t(0xff, 0x00, 0xff), /* Magenta */
-	rgb_t(0x00, 0x00, 0x7f), /* Dark Blue */
-	rgb_t(0xff, 0xff, 0x7f), /* Light Yellow */
-	rgb_t(0x7f, 0xff, 0x7f), /* Light Green */
-	rgb_t(0xff, 0x7f, 0x00), /* Orange */
-	rgb_t(0x7f, 0x7f, 0x7f)  /* Dark Gray */
-};
-
 static const unsigned short aquarius_palette[] =
 {
 	0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8, 0, 9, 0,10, 0,11, 0,12, 0,13, 0,14, 0,15, 0,
@@ -56,7 +35,7 @@ PALETTE_INIT_MEMBER(aquarius_state, aquarius)
 	int i;
 
 	for (i = 0; i < 16; i++)
-		m_palette->set_indirect_color(i, aquarius_colors[i]);
+		m_palette->set_indirect_color(i, m_tea1002->color(i));
 
 	for (i = 0; i < 512; i++)
 		m_palette->set_pen_indirect(i, aquarius_palette[i]);

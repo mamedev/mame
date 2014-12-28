@@ -9,6 +9,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "video/tea1002.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "sound/ay8910.h"
@@ -38,6 +39,7 @@ public:
 			m_y7(*this, "Y7"),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_screen(*this, "screen"),
+			m_tea1002(*this, "encoder"),
 			m_palette(*this, "palette")
 	{ }
 
@@ -58,6 +60,7 @@ public:
 	required_ioport m_y7;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
+	required_device<tea1002_device> m_tea1002;
 	required_device<palette_device> m_palette;
 
 	UINT8 m_scrambler;
