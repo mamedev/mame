@@ -1075,7 +1075,7 @@ void snes_state::machine_start()
 
 	snes_init_timers();
 
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		save_item(NAME(m_dma_channel[i].dmap), i);
 		save_item(NAME(m_dma_channel[i].dest_addr), i);
