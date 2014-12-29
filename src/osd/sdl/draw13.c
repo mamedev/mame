@@ -551,17 +551,17 @@ static int drawsdl2_window_create(sdl_window_info *window, int width, int height
 
 	window->dxdata = sdl;
 
-	sdl->extra_flags = (window->fullscreen ?
+	sdl->extra_flags = (window->fullscreen() ?
 			SDL_WINDOW_BORDERLESS | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE);
 
 	// create the SDL window
-	window->sdl_window = SDL_CreateWindow(window->title, window->monitor->monitor_x, 0,
+	window->sdl_window = SDL_CreateWindow(window->title, window->monitor()->monitor_x, 0,
 			width, height, sdl->extra_flags);
 
-	if (window->fullscreen && video_config.switchres)
+	if (window->fullscreen() && video_config.switchres)
 	{
 		SDL_DisplayMode mode;
-		SDL_GetCurrentDisplayMode(window->monitor->handle, &mode);
+		SDL_GetCurrentDisplayMode(window->monitor()->handle, &mode);
 		mode.w = width;
 		mode.h = height;
 		if (window->refresh)
@@ -665,15 +665,15 @@ static int drawsdl2_xy_to_render_target(sdl_window_info *window, int x, int y, i
 
 static render_primitive_list &drawsdl2_window_get_primitives(sdl_window_info *window)
 {
-	if ((!window->fullscreen) || (video_config.switchres))
+	if ((!window->fullscreen()) || (video_config.switchres))
 	{
-		sdlwindow_blit_surface_size(window, window->width, window->height);
+		window->blit_surface_size(window->width, window->height);
 	}
 	else
 	{
-		sdlwindow_blit_surface_size(window, window->monitor->center_width, window->monitor->center_height);
+		window->blit_surface_size(window->monitor()->center_width, window->monitor()->center_height);
 	}
-	window->target->set_bounds(window->blitwidth, window->blitheight, sdlvideo_monitor_get_aspect(window->monitor));
+	window->target->set_bounds(window->blitwidth, window->blitheight, sdlvideo_monitor_get_aspect(window->monitor()));
 	return window->target->get_primitives();
 }
 
@@ -721,10 +721,10 @@ static int drawsdl2_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	{
 		int ch, cw;
 
-		if ((window->fullscreen) && (!video_config.switchres))
+		if ((window->fullscreen()) && (!video_config.switchres))
 		{
-			ch = window->monitor->center_height;
-			cw = window->monitor->center_width;
+			ch = window->monitor()->center_height;
+			cw = window->monitor()->center_width;
 		}
 		else
 		{

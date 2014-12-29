@@ -191,8 +191,12 @@ public:
 		rendertarget = NULL;
 		depthbuffer = NULL;
 		displayedtarget = NULL;
+		puller_channel = 0;
+		puller_subchannel = 0;
+		puller_waiting = 0;
 		debug_grab_texttype = -1;
 		debug_grab_textfile = NULL;
+		waitvblank_used = 0;
 		memset(vertex_attribute_words, 0, sizeof(vertex_attribute_words));
 		memset(vertex_attribute_offset, 0, sizeof(vertex_attribute_offset));
 	}
@@ -208,7 +212,7 @@ public:
 	int geforce_commandkind(UINT32 word);
 	UINT32 geforce_object_offset(UINT32 handle);
 	void geforce_read_dma_object(UINT32 handle, UINT32 &offset, UINT32 &size);
-	void geforce_exec_method(address_space &space, UINT32 channel, UINT32 subchannel, UINT32 method, UINT32 address, int &countlen);
+	int geforce_exec_method(address_space &space, UINT32 channel, UINT32 subchannel, UINT32 method, UINT32 address, int &countlen);
 	UINT32 texture_get_texel(int number, int x, int y);
 	void write_pixel(int x, int y, UINT32 color, UINT32 depth);
 	void combiner_initialize_registers(UINT32 argb8[6]);
@@ -238,15 +242,17 @@ public:
 	void computedilated(void);
 	void putpixtex(int xp, int yp, int up, int vp);
 	int toggle_register_combiners_usage();
+	int toggle_wait_vblank_support();
 	void debug_grab_texture(int type, const char *filename);
 	void debug_grab_vertex_program_slot(int slot, UINT32 *instruction);
+	void start();
 	void savestate_items();
-
 	void read_vertex(address_space & space, offs_t address, vertex_nv &vertex, int attrib);
 	int read_vertices_0x1810(address_space & space, vertex_nv *destination, int offset, int limit);
 	int read_vertices_0x1800(address_space & space, vertex_nv *destination, UINT32 address, int limit);
 	int read_vertices_0x1818(address_space & space, vertex_nv *destination, UINT32 address, int limit);
 	void convert_vertices_poly(vertex_nv *source, vertex_t *destination, int count);
+	TIMER_CALLBACK_MEMBER(puller_timer_work);
 
 	struct {
 		UINT32 regs[0x80 / 4];
@@ -429,12 +435,18 @@ public:
 	int enabled_vertex_attributes;
 	int vertex_attribute_words[16];
 	int vertex_attribute_offset[16];
+	emu_timer *puller_timer;
+	int puller_channel;
+	int puller_subchannel;
+	int puller_waiting;
+	address_space *puller_space;
 	UINT32 dilated0[16][2048];
 	UINT32 dilated1[16][2048];
 	int dilatechose[256];
 	nvidia_object_data *objectdata;
 	int debug_grab_texttype;
 	char *debug_grab_textfile;
+	int waitvblank_used;
 
 	enum VERTEX_PARAMETER {
 		PARAM_COLOR_B = 0,
@@ -479,7 +491,7 @@ public:
 		TEX3 = 12
 	};
 	enum NV2A_VTXBUF_TYPE {
-		NV2A_VTXBUF_TYPE_UNKNOWN_0 = 0, // used for vertex color ?
+		NV2A_VTXBUF_TYPE_UBYTE2 = 0, // what is the difference with UBYTE ?
 		NV2A_VTXBUF_TYPE_FLOAT = 2,
 		NV2A_VTXBUF_TYPE_UBYTE = 4,
 		NV2A_VTXBUF_TYPE_USHORT = 5,

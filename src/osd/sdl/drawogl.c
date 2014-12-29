@@ -493,7 +493,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 	window->dxdata = sdl;
 
 #if (SDLMAME_SDL2)
-	sdl->extra_flags = (window->fullscreen ?
+	sdl->extra_flags = (window->fullscreen() ?
 			SDL_WINDOW_BORDERLESS | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE);
 	sdl->extra_flags |= SDL_WINDOW_OPENGL;
 
@@ -510,7 +510,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 	//load_gl_lib(window->machine());
 
 	// create the SDL window
-	window->sdl_window = SDL_CreateWindow(window->title, window->monitor->monitor_x, 0,
+	window->sdl_window = SDL_CreateWindow(window->title, window->monitor()->monitor_x, 0,
 			width, height, sdl->extra_flags);
 
 	if  (!window->sdl_window )
@@ -519,10 +519,10 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 		return 1;
 	}
 
-	if (window->fullscreen && video_config.switchres)
+	if (window->fullscreen() && video_config.switchres)
 	{
 		SDL_DisplayMode mode;
-		SDL_GetCurrentDisplayMode(window->monitor->handle, &mode);
+		SDL_GetCurrentDisplayMode(window->monitor()->handle, &mode);
 		mode.w = width;
 		mode.h = height;
 		if (window->refresh)
@@ -547,7 +547,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 	SDL_GL_SetSwapInterval(video_config.waitvsync ? 2 : 0);
 
 #else
-	sdl->extra_flags = (window->fullscreen ?  SDL_FULLSCREEN : SDL_RESIZABLE);
+	sdl->extra_flags = (window->fullscreen() ?  SDL_FULLSCREEN : SDL_RESIZABLE);
 	sdl->extra_flags |= SDL_OPENGL | SDL_DOUBLEBUF;
 
 	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
@@ -794,15 +794,15 @@ static int drawogl_xy_to_render_target(sdl_window_info *window, int x, int y, in
 
 static render_primitive_list &drawogl_window_get_primitives(sdl_window_info *window)
 {
-	if ((!window->fullscreen) || (video_config.switchres))
+	if ((!window->fullscreen()) || (video_config.switchres))
 	{
-		sdlwindow_blit_surface_size(window, window->width, window->height);
+		window->blit_surface_size(window->width, window->height);
 	}
 	else
 	{
-		sdlwindow_blit_surface_size(window, window->monitor->center_width, window->monitor->center_height);
+		window->blit_surface_size(window->monitor()->center_width, window->monitor()->center_height);
 	}
-	window->target->set_bounds(window->blitwidth, window->blitheight, sdlvideo_monitor_get_aspect(window->monitor));
+	window->target->set_bounds(window->blitwidth, window->blitheight, sdlvideo_monitor_get_aspect(window->monitor()));
 	return window->target->get_primitives();
 }
 
@@ -1143,7 +1143,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 		screen_device_iterator myiter(window->machine().root_device());
 		for (screen = myiter.first(); screen != NULL; screen = myiter.next())
 		{
-			if (window->index == 0)
+			if (window->index() == 0)
 			{
 				if ((screen->width() != window->screen_width) || (screen->height() != window->screen_height))
 				{
@@ -1180,7 +1180,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	screen_device_iterator iter(window->machine().root_device());
 	for (screen = iter.first(); screen != NULL; screen = iter.next())
 	{
-		if (scrnum == window->index)
+		if (scrnum == window->index())
 		{
 			is_vector = (screen->screen_type() == SCREEN_TYPE_VECTOR) ? 1 : 0;
 			break;
@@ -1271,10 +1271,10 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	{
 		int ch, cw;
 
-		if ((window->fullscreen) && (!video_config.switchres))
+		if ((window->fullscreen()) && (!video_config.switchres))
 		{
-			ch = window->monitor->center_height;
-			cw = window->monitor->center_width;
+			ch = window->monitor()->center_height;
+			cw = window->monitor()->center_width;
 		}
 		else
 		{

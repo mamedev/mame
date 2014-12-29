@@ -251,7 +251,7 @@ static void setup_texture(sdl_window_info *window, int tempwidth, int tempheight
 	UINT32 fmt;
 
 	// Determine preferred pixelformat and set up yuv if necessary
-	SDL_GetCurrentDisplayMode(window->monitor->handle, &mode);
+	SDL_GetCurrentDisplayMode(window->monitor()->handle, &mode);
 
 	if (sdl->yuv_bitmap)
 	{
@@ -402,17 +402,17 @@ static int drawsdl_window_create(sdl_window_info *window, int width, int height)
 
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, sm->sdl_scale_mode);
 
-	sdl->extra_flags = (window->fullscreen ?
+	sdl->extra_flags = (window->fullscreen() ?
 			SDL_WINDOW_BORDERLESS | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS
 			| SDL_WINDOW_INPUT_GRABBED : SDL_WINDOW_RESIZABLE);
 
 	window->sdl_window = SDL_CreateWindow(window->title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 			width, height, sdl->extra_flags);
 
-	if (window->fullscreen && video_config.switchres)
+	if (window->fullscreen() && video_config.switchres)
 	{
 		SDL_DisplayMode mode;
-		SDL_GetCurrentDisplayMode(window->monitor->handle, &mode);
+		SDL_GetCurrentDisplayMode(window->monitor()->handle, &mode);
 		mode.w = width;
 		mode.h = height;
 		if (window->refresh)
@@ -424,12 +424,12 @@ static int drawsdl_window_create(sdl_window_info *window, int width, int height)
 
 	SDL_ShowWindow(window->sdl_window);
 
-	SDL_SetWindowFullscreen(window->sdl_window, (SDL_bool) window->fullscreen);
+	SDL_SetWindowFullscreen(window->sdl_window, (SDL_bool) window->fullscreen());
 	SDL_GetWindowSize(window->sdl_window, &window->width, &window->height);
 	SDL_RaiseWindow(window->sdl_window);
 
 	/* FIXME: Bug in SDL 1.3 */
-	if (window->fullscreen)
+	if (window->fullscreen())
 		SDL_SetWindowGrab(window->sdl_window, SDL_TRUE);
 
 	// create a texture
@@ -468,7 +468,7 @@ static int drawsdl_window_create(sdl_window_info *window, int width, int height)
 
 	setup_texture(window, width, height);
 #else
-	sdl->extra_flags = (window->fullscreen ?  SDL_FULLSCREEN : SDL_RESIZABLE);
+	sdl->extra_flags = (window->fullscreen() ?  SDL_FULLSCREEN : SDL_RESIZABLE);
 
 	sdl->extra_flags |= sm->extra_flags;
 
@@ -623,17 +623,17 @@ static render_primitive_list &drawsdl_window_get_primitives(sdl_window_info *win
 	sdl_info *sdl = (sdl_info *) window->dxdata;
 	const sdl_scale_mode *sm = &scale_modes[video_config.scale_mode];
 
-	if ((!window->fullscreen) || (video_config.switchres))
+	if ((!window->fullscreen()) || (video_config.switchres))
 	{
-		sdlwindow_blit_surface_size(window, window->width, window->height);
+		window->blit_surface_size(window->width, window->height);
 	}
 	else
 	{
-		sdlwindow_blit_surface_size(window, window->monitor->center_width, window->monitor->center_height);
+		window->blit_surface_size(window->monitor()->center_width, window->monitor()->center_height);
 	}
 
 	if (!sm->is_scale)
-		window->target->set_bounds(window->blitwidth, window->blitheight, sdlvideo_monitor_get_aspect(window->monitor));
+		window->target->set_bounds(window->blitwidth, window->blitheight, sdlvideo_monitor_get_aspect(window->monitor()));
 	else
 		window->target->set_bounds(sdl->hw_scale_width, sdl->hw_scale_height);
 
@@ -747,10 +747,10 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	// figure out what coordinate system to use for centering - in window mode it's always the
 	// SDL surface size.  in fullscreen the surface covers all monitors, so center according to
 	// the first one only
-	if ((window->fullscreen) && (!video_config.switchres))
+	if ((window->fullscreen()) && (!video_config.switchres))
 	{
-		ch = window->monitor->center_height;
-		cw = window->monitor->center_width;
+		ch = window->monitor()->center_height;
+		cw = window->monitor()->center_width;
 	}
 	else
 	{

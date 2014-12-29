@@ -77,6 +77,8 @@ USE_DISPATCH_GL = 1
 # change for custom OS X installations
 SDL_FRAMEWORK_PATH = /Library/Frameworks/
 
+# SDL_LIBVER = sdl
+
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
 ###########################################################################

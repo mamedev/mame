@@ -777,6 +777,18 @@ static void nv2a_combiners_command(running_machine &machine, int ref, int params
 		debug_console_printf(machine, "Register combiners disabled\n");
 }
 
+static void waitvblank_command(running_machine &machine, int ref, int params, const char **param)
+{
+	int en;
+
+	chihiro_state *chst = machine.driver_data<chihiro_state>();
+	en = chst->nvidia_nv2a->toggle_wait_vblank_support();
+	if (en != 0)
+		debug_console_printf(machine, "Vblank method enabled\n");
+	else
+		debug_console_printf(machine, "Vblank method disabled\n");
+}
+
 static void grab_texture_command(running_machine &machine, int ref, int params, const char **param)
 {
 	UINT64 type;
@@ -862,6 +874,7 @@ static void help_command(running_machine &machine, int ref, int params, const ch
 	debug_console_printf(machine, "  chihiro curthread -- Print information about current thread\n");
 	debug_console_printf(machine, "  chihiro irq,<number> -- Generate interrupt with irq number 0-15\n");
 	debug_console_printf(machine, "  chihiro nv2a_combiners -- Toggle use of register combiners\n");
+	debug_console_printf(machine, "  chihiro waitvblank -- Toggle support for wait vblank method\n");
 	debug_console_printf(machine, "  chihiro grab_texture,<type>,<filename> -- Save to <filename> the next used texture of type <type>\n");
 	debug_console_printf(machine, "  chihiro grab_vprog,<filename> -- save current vertex program instruction slots to <filename>\n");
 	debug_console_printf(machine, "  chihiro vprogdis,<address>,<length>[,<type>] -- disassemble <lenght> vertex program instructions at <address> of <type>\n");
@@ -886,6 +899,8 @@ static void chihiro_debug_commands(running_machine &machine, int ref, int params
 		generate_irq_command(machine, ref, params - 1, param + 1);
 	else if (strcmp("nv2a_combiners", param[0]) == 0)
 		nv2a_combiners_command(machine, ref, params - 1, param + 1);
+	else if (strcmp("waitvblank", param[0]) == 0)
+		waitvblank_command(machine, ref, params - 1, param + 1);
 	else if (strcmp("grab_texture", param[0]) == 0)
 		grab_texture_command(machine, ref, params - 1, param + 1);
 	else if (strcmp("grab_vprog", param[0]) == 0)
@@ -1787,6 +1802,7 @@ void chihiro_state::machine_start()
 	save_item(NAME(smbusst.words));
 	save_item(NAME(pic16lc_buffer));
 	save_item(NAME(usbhack_counter));
+	nvidia_nv2a->start();
 	nvidia_nv2a->savestate_items();
 }
 
