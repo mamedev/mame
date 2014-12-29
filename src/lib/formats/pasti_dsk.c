@@ -1,5 +1,5 @@
-#include "pasti_dsk.h"
 #include "emu.h"
+#include "pasti_dsk.h"
 
 // Pasti format supported using the documentation at
 // http://www.sarnau.info/atari:pasti_file_format

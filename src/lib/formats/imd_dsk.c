@@ -7,6 +7,7 @@
 *********************************************************************/
 
 #include <string.h>
+#include "emu.h"
 #include "flopimg.h"
 
 struct imddsk_tag

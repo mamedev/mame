@@ -342,7 +342,6 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 
   */
 
-#include "cdrom.h"
 #include "cpu/psx/psx.h"
 #include "machine/adc083x.h"
 #include "machine/ataintf.h"
@@ -361,6 +360,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 #include "sound/spu.h"
 #include "sound/cdda.h"
 #include "video/psx.h"
+#include "cdrom.h"
 
 #define VERBOSE_LEVEL ( 0 )
 
