@@ -248,12 +248,12 @@ public:
 	void update_windowmasks(void);
 	void update_offsets(void);
 	inline void draw_blend(UINT16 offset, UINT16 *colour, UINT8 prevent_color_math, UINT8 black_pen_clip, int switch_screens);
-	void refresh_scanline(running_machine &machine, bitmap_rgb32 &bitmap, UINT16 curline);
+	void refresh_scanline(bitmap_rgb32 &bitmap, UINT16 curline);
 
-	void latch_counters(running_machine &machine);
-	void dynamic_res_change(running_machine &machine);
-	inline UINT32 get_vram_address(running_machine &machine);
-	UINT8 dbg_video(running_machine &machine, UINT16 curline);
+	void latch_counters();
+	void dynamic_res_change();
+	inline UINT32 get_vram_address();
+	UINT8 dbg_video(UINT16 curline);
 
 	UINT8 read(address_space &space, UINT32 offset, UINT8 wrio_bit7);
 	void write(address_space &space, UINT32 offset, UINT8 data);
