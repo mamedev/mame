@@ -24096,6 +24096,69 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 
 <!-- Other Asian Pirate dumps to sort -->
 
+	<software name="digicrs2" cloneof="pokesaph">
+		<description>Digimon Crystal II (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<!-- cartridge ram -->
+			<dataarea name="rom"  size="2097152">
+				<rom name="digimon crystal ii (unlicensed, english) [raw dump].gbc" size="2097152" crc="685e76df" sha1="4e981044ac3a40d7a9cd63b79d5982b4b4e670a5" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="laofuzi">
+		<description>Lao Fuzi Chuanqi (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="老夫子傳奇"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<!-- cartridge ram -->
+			<dataarea name="rom"  size="2097152">
+				<rom name="lao fuzi chuanqi (unlicensed, chinese) [raw dump].gbc" size="2097152" crc="aeca45be" sha1="b7193fcb8b9b8958a2522be0d1a3874cffc1e1db" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yuenanzx">
+		<description>Yuenan Zhanyi X - Shenru Dihou (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="越南戰役X-深入敵後"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<!-- cartridge ram -->
+			<dataarea name="rom"  size="2097152">
+				<rom name="yuenan zhanyi x - shenru dihou (unlicensed, chinese) [raw dump].gbc" size="2097152" crc="602951a6" sha1="6703e9f68b989c976e93bd2eb63f884ceaff63f1" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dballadv">
+		<description>Qi Long Zhu Z 3 ~ Dragon Ball - Advance Adventure (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="七龍珠Z3"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<!-- cartridge ram -->
+			<dataarea name="rom"  size="2097152">
+				<rom name="qi long zhu z 3 (dragon ball - advance adventure) (unlicensed, chinese) [raw dump].gbc" size="2097152" crc="ccfdd63a" sha1="4f3b63cd11522b6fb291661f4d918601d95138e0" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
 <!-- World WarCraft? -->
 	<software name="moshosj">
 		<description>Mo Shou Shi Ji - Zhan Shen (Chi)</description>
@@ -24593,7 +24656,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-	<software name="bwarr5">
+	<software name="bwarr5" cloneof="dballadv">
 	<!-- 4MB rom with crc 9d332731 is taizou's cracked version running on base MBC5 -->
 		<description>Bynasty Warriors Advance 5 (Chi)</description>
 		<year>200?</year>
