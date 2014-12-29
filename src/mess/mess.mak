@@ -1119,6 +1119,7 @@ $(MESSOBJ)/coleco.a:            \
 	$(MESS_DRIVERS)/adam.o      \
 	$(MESS_DRIVERS)/coleco.o    \
 	$(MESS_MACHINE)/coleco.o    \
+	$(MESS_DRIVERS)/amaztron.o  \
 
 $(MESSOBJ)/cromemco.a:          \
 	$(MESS_DRIVERS)/c10.o       \
@@ -2074,6 +2075,7 @@ $(MESS_DRIVERS)/acrnsys1.o: $(MESS_LAYOUT)/acrnsys1.lh
 $(MESS_DRIVERS)/aim65.o:    $(MESS_LAYOUT)/aim65.lh
 $(MESS_DRIVERS)/aim65_40.o: $(MESS_LAYOUT)/aim65_40.lh
 $(MESS_DRIVERS)/alesis.o:   $(MESS_LAYOUT)/sr16.lh
+$(MESS_DRIVERS)/amaztron.o: $(MESS_LAYOUT)/amaztron.lh
 $(MESS_DRIVERS)/amico2k.o:  $(MESS_LAYOUT)/amico2k.lh
 $(MESS_DRIVERS)/amiga.o:    $(MESS_LAYOUT)/amiga.lh
 $(MESS_VIDEO)/apollo.o:     $(MESS_LAYOUT)/apollo.lh \
