@@ -326,7 +326,7 @@ void sdl_osd_interface::update(bool skip_redraw)
 	{
 //      profiler_mark(PROFILER_BLIT);
 		for (window = sdl_window_list; window != NULL; window = window->next)
-			sdlwindow_video_window_update(machine(), window);
+			window->video_window_update(machine());
 //      profiler_mark(PROFILER_END);
 	}
 
@@ -568,7 +568,7 @@ static void check_osd_inputs(running_machine &machine)
 
 		while (curwin != (sdl_window_info *)NULL)
 		{
-			sdlwindow_toggle_full_screen(machine, curwin);
+			curwin->toggle_full_screen(machine);
 			curwin = curwin->next;
 		}
 	}
@@ -597,10 +597,10 @@ static void check_osd_inputs(running_machine &machine)
 	#endif
 
 	if (ui_input_pressed(machine, IPT_OSD_6))
-		sdlwindow_modify_prescale(machine, window, -1);
+		window->modify_prescale(machine, -1);
 
 	if (ui_input_pressed(machine, IPT_OSD_7))
-		sdlwindow_modify_prescale(machine, window, 1);
+		window->modify_prescale(machine, 1);
 }
 
 //============================================================
