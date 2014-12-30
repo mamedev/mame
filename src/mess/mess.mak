@@ -1995,6 +1995,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/ti630.o     \
 	$(MESS_DRIVERS)/tsispch.o   \
 	$(MESS_DRIVERS)/unistar.o   \
+	$(MESS_DRIVERS)/unk3403.o   \
 	$(MESS_DRIVERS)/v6809.o     \
 	$(MESS_DRIVERS)/vector4.o   \
 	$(MESS_DRIVERS)/vii.o       \
