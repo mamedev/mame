@@ -599,11 +599,14 @@ endif
 ifneq (,$(findstring undefined,$(SANITIZE)))
 ifneq (,$(findstring clang,$(CC)))
 # TODO: check if linker is clang++
-CCOMFLAGS += -fno-sanitize=shift -fno-sanitize=object-size
 # produces a lot of messages - disable it for now
 CCOMFLAGS += -fno-sanitize=alignment
 # these are false positives because of the way our delegates work
 CCOMFLAGS += -fno-sanitize=function
+# clang takes forever to compile src/emu/cpu/tms57002/tms57002.c when this isn't disabled
+CCOMFLAGS += -fno-sanitize=shift
+# clang takes forever to compile src/emu/cpu/tms57002/tms57002.c, src/emu/cpu/m6809/hd6309.c when this isn't disabled
+CCOMFLAGS += -fno-sanitize=object-size
 # clang takes forever to compile src/emu/cpu/tms57002/tms57002.c, src/emu/cpu/m6809/konami.c, src/emu/cpu/m6809/hd6309.c, src/emu/video/psx.c when this isn't disabled
 CCOMFLAGS += -fno-sanitize=vptr
 # clang takes forever to compile src/emu/video/psx.c when this isn't disabled
