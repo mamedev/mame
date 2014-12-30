@@ -3102,6 +3102,33 @@ static INPUT_PORTS_START( fz2 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( fantzoneta )
+	PORT_INCLUDE( system16b_generic )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x0c, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x00, "240 (Cheat)")
+	PORT_DIPNAME( 0x30, 0x30, "Extra Ship Cost" ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x30, "5000" )
+	PORT_DIPSETTING(    0x20, "10000" )
+	PORT_DIPSETTING(    0x10, "15000" )
+	PORT_DIPSETTING(    0x00, "20000" )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+INPUT_PORTS_END
+
 // we use common sys16b tags to simplify port reads
 static INPUT_PORTS_START( atomicp )
 	PORT_START("SERVICE")   // P1
@@ -3176,6 +3203,8 @@ static INPUT_PORTS_START( atomicp )
 
 	PORT_START("DSW1")  // DUMMY
 INPUT_PORTS_END
+
+
 
 
 // we use common sys16b tags to simplify port reads
@@ -6603,6 +6632,25 @@ ROM_START( fantzn2xp ) // based on trial version
 	ROM_LOAD( "cpu2b.bin", 0x10000, 0x20000, CRC(2c8ad475) SHA1(9ef1ed5aab81a82844ccb0949cb393a8d1abac92) )
 ROM_END
 
+ROM_START( fantzoneta ) // based on PS2 version, from bootleg conversion board
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "fzta__a07.bin", 0x00000, 0x20000, CRC(ad07d1fd) SHA1(63fbaa135a3860bd956d5147a5f64d951d2ebdba) )
+	ROM_LOAD16_BYTE( "fzta__a05.bin", 0x00001, 0x20000, CRC(47dbe11b) SHA1(edc6960506745235bb8668eaf71139cef4a2cd16) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "fzta__a14.bin", 0x00000, 0x10000, CRC(9468ab33) SHA1(714660b9eafb78ef5d3aed218367b4e5708376f6) )
+	ROM_LOAD( "fzta__a15.bin", 0x10000, 0x10000, CRC(22a3cf75) SHA1(6f21bc2a565738b997f898ed6ee631e9452662ca) )
+	ROM_LOAD( "fzta__a16.bin", 0x20000, 0x10000, CRC(25cba87f) SHA1(abece2c27cd9d299319fa3ea87e016606426abc2) )
+
+	ROM_REGION16_BE( 0x180000, "sprites", ROMREGION_ERASEFF ) // sprites
+	ROM_LOAD16_BYTE( "fzta__b01.bin",  0x000001, 0x20000, CRC(0beb4a22) SHA1(e35f6d92b88f0730ccf03a090900ca2ed9824e74) )
+	ROM_LOAD16_BYTE( "fzta__b05.bin",  0x000000, 0x20000, CRC(7f676c69) SHA1(231e7829b4ddb039f9075aebd1f2a123c79d396d) )
+	ROM_LOAD16_BYTE( "fzta__a01.bin",  0x100001, 0x20000, CRC(40e1db9a) SHA1(305cd5e2d8512774638dfa724df6696ffa81ebb2) )
+	ROM_LOAD16_BYTE( "fzta__b10.bin",  0x100000, 0x20000, CRC(acbb5cff) SHA1(bd356f664ec1c0e955161aa3afd06f2aeda80357) )
+
+	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "fzta__a10.bin", 0x00000, 0x08000, CRC(dab6fcd0) SHA1(151b62c5353533ae8660cbeebd8fe3219adbf4b5) )
+ROM_END
 
 
 //**************************************************************************
@@ -6928,6 +6976,9 @@ GAME( 1989, wrestwar1,  wrestwar, system16b_fd1094,    wrestwar, segas16b_state,
 // Extra RAM, dubbed by M2 as 'System 16C'
 GAME( 2008, fantzn2x,   0,        system16c,           fz2,      segas16b_state,generic_5704,       ROT0,   "Sega / M2", "Fantasy Zone II - The Tears of Opa-Opa (System 16C version)", 0 ) // The 1987 copyright date shown ingame is false
 GAME( 2008, fantzn2xp,  fantzn2x, system16c,           fz2,      segas16b_state,generic_5704,       ROT0,   "Sega / M2", "Fantasy Zone II - The Tears of Opa-Opa (System 16C version, prototype)", 0 ) // "
+
+GAME( 2008, fantzoneta, fantzone, system16b,           fantzoneta,segas16b_state,generic_5704,       ROT0,  "bootleg", "Fantasy Zone (Time Attack, bootleg)", 0 ) // based on the PS2 version, unlicensed PCB conversion
+
 
 // Custom Korean Board - these probably belong with the bootlegs...
 GAME( 1990, atomicp,    0,        atomicp,             atomicp,  segas16b_state,generic_korean,     ROT0,   "Philko", "Atomic Point (Korea)", 0) // korean clone board..
