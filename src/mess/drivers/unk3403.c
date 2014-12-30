@@ -62,9 +62,9 @@ void unk3403_state::leds_update()
 	static UINT8 leds[0x10] = { 0 };
 	char msg[0x100] = { 0 };
 	char dig[0x100] = { 0 };
-	sprintf(msg, "i,  R,  O[R]");
+	sprintf(msg, "R,  *R,  O[R]");
 
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < 11; i++)
 	{
 		if (m_r >> i & 1)
 		{
