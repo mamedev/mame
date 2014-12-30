@@ -756,6 +756,7 @@ void a2_video_device::device_reset()
 	m_altcharset = false;
 	m_dhires = false;
 	m_flash = false;
+	m_mix = false;
 	m_sysconfig = 0;
 }
 
