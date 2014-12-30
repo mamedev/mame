@@ -963,8 +963,9 @@ void tms5110_device::device_reset()
 	/* initialize the chip state */
 	m_speaking_now = m_talk_status = 0;
 	m_CTL_pins = 0;
-		m_RNG = 0x1fff;
+	m_RNG = 0x1fff;
 	m_CTL_buffer = 0;
+	m_PDC = 0;
 
 	/* initialize the energy/pitch/k states */
 	m_old_energy = m_new_energy = m_current_energy = m_target_energy = 0;
