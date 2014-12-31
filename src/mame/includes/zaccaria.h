@@ -1,6 +1,5 @@
 #include "machine/6821pia.h"
 #include "sound/ay8910.h"
-#include "sound/dac.h"
 #include "sound/tms5220.h"
 
 class zaccaria_state : public driver_device
@@ -9,10 +8,8 @@ public:
 	zaccaria_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
 		m_audio2(*this, "audio2"),
-		m_pia(*this, "pia0"),
-		m_dac2(*this, "dac2"),
+		m_pia0(*this, "pia0"),
 		m_ay1(*this, "ay1"),
 		m_ay2(*this, "ay2"),
 		m_tms(*this, "tms"),
@@ -28,10 +25,8 @@ public:
 	
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_audio2;
-	required_device<pia6821_device> m_pia;
-	required_device<dac_device> m_dac2;
+	required_device<pia6821_device> m_pia0;
 	required_device<ay8910_device> m_ay1;
 	required_device<ay8910_device> m_ay2;
 	required_device<tms5220_device> m_tms;
@@ -69,13 +64,10 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(acs_r);
 	DECLARE_WRITE8_MEMBER(dsw_sel_w);
 	DECLARE_WRITE8_MEMBER(ay8910_port0a_w);
-	DECLARE_WRITE_LINE_MEMBER(irq0a);
-	DECLARE_WRITE_LINE_MEMBER(irq0b);
 	DECLARE_READ8_MEMBER(port0a_r);
 	DECLARE_WRITE8_MEMBER(port0a_w);
 	DECLARE_WRITE8_MEMBER(port0b_w);
 	DECLARE_WRITE8_MEMBER(port1b_w);
-	DECLARE_WRITE8_MEMBER(mc1408_data_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start();
 	virtual void machine_reset();

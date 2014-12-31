@@ -41,6 +41,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/i8255.h"
+#include "sound/dac.h"
 #include "includes/zaccaria.h"
 
 
@@ -115,17 +116,6 @@ WRITE8_MEMBER(zaccaria_state::ay8910_port0a_w)
 	m_ay2->set_volume(1, v);
 }
 
-
-WRITE_LINE_MEMBER(zaccaria_state::irq0a)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE_LINE_MEMBER(zaccaria_state::irq0b)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 READ8_MEMBER(zaccaria_state::port0a_r)
 {
 	return (m_active_8910 == 0) ? m_ay1->data_r(space, 0) : m_ay2->data_r(space, 0);
@@ -168,7 +158,7 @@ WRITE8_MEMBER(zaccaria_state::port0b_w)
 
 INTERRUPT_GEN_MEMBER(zaccaria_state::cb1_toggle)
 {
-	m_pia->cb1_w(m_toggle & 1);
+	m_pia0->cb1_w(m_toggle & 1);
 	m_toggle ^= 1;
 }
 
@@ -195,15 +185,9 @@ WRITE8_MEMBER(zaccaria_state::sound_command_w)
 
 WRITE8_MEMBER(zaccaria_state::sound1_command_w)
 {
-	m_pia->ca1_w(data & 0x80);
+	m_pia0->ca1_w(data & 0x80);
 	soundlatch2_byte_w(space, 0, data);
 }
-
-WRITE8_MEMBER(zaccaria_state::mc1408_data_w)
-{
-	m_dac2->write_unsigned8(data);
-}
-
 
 GAME_EXTERN(monymony);
 
@@ -331,7 +315,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map_2, AS_PROGRAM, 8, zaccaria_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM /* 6802 internal ram */
 	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia1", pia6821_device, read, write) AM_MIRROR(0x8F6C)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(mc1408_data_w) AM_MIRROR(0x83FF) /* MC1408 */
+	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE("mc1408", dac_device, write_unsigned8) AM_MIRROR(0x83FF) /* MC1408 */
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(sound1_command_w) AM_MIRROR(0xC3FF)
 	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_byte_r) AM_MIRROR(0xC3FF)
 	AM_RANGE(0x2000, 0x2fff) AM_ROM AM_MIRROR(0x8000) // rom 8 with A12 low
@@ -541,8 +525,8 @@ static MACHINE_CONFIG_START( zaccaria, zaccaria_state )
 	MCFG_PIA_READPA_HANDLER(READ8(zaccaria_state, port0a_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(zaccaria_state, port0a_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(zaccaria_state, port0b_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(zaccaria_state, irq0a))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(zaccaria_state, irq0b))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("audiocpu", m6802_cpu_device, nmi_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("audiocpu", m6802_cpu_device, irq_line))
 
 	MCFG_DEVICE_ADD( "pia1", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(DEVREAD8("tms", tms5220_device, status_r))
@@ -574,7 +558,7 @@ static MACHINE_CONFIG_START( zaccaria, zaccaria_state )
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_3_579545MHz/2) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_DAC_ADD("dac2")
+	MCFG_DAC_ADD("mc1408")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* There is no xtal, the clock is obtained from a RC oscillator as shown in the TMS5220 datasheet (R=100kOhm C=22pF) */
