@@ -97,7 +97,7 @@ struct osd_work_queue
 	volatile INT32      items;          // items in the queue
 	volatile INT32      livethreads;    // number of live threads
 	volatile INT32      waiting;        // is someone waiting on the queue to complete?
-	volatile UINT8      exiting;        // should the threads exit on their next opportunity?
+	volatile INT32      exiting;        // should the threads exit on their next opportunity?
 	UINT32              threads;        // number of threads in this queue
 	UINT32              flags;          // creation flags
 	work_thread_info *  thread;         // array of thread information
@@ -313,7 +313,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 		end_timing(queue->thread[queue->threads].waittime);
 
 		// signal all the threads to exit
-		queue->exiting = TRUE;
+		atomic_exchange32(&queue->exiting, TRUE);
 		for (threadnum = 0; threadnum < queue->threads; threadnum++)
 		{
 			work_thread_info *thread = &queue->thread[threadnum];
@@ -504,7 +504,7 @@ int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 	if (item->event == NULL)
 		item->event = osd_event_alloc(TRUE, FALSE);     // manual reset, not signalled
 	else
-			osd_event_reset(item->event);
+		osd_event_reset(item->event);
 
 	// if we don't have an event, we need to spin (shouldn't ever really happen)
 	if (item->event == NULL)
