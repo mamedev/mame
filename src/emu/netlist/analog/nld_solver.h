@@ -14,7 +14,7 @@
 
 #define USE_PIVOT_SEARCH (0)
 #define VECTALT 1
-#define USE_GABS 0
+#define USE_GABS 1
 #define USE_MATRIX_GS 0
 // savings are eaten up by effort
 #define USE_LINEAR_PREDICTION (0)
@@ -197,7 +197,13 @@ public:
 	typedef plinearlist_t<netlist_matrix_solver_t *> list_t;
 	typedef netlist_core_device_t::list_t dev_list_t;
 
-	ATTR_COLD netlist_matrix_solver_t(const netlist_solver_parameters_t &params);
+	enum eSolverType
+	{
+	    GAUSSIAN_ELIMINATION,
+	    GAUSS_SEIDEL
+	};
+
+	ATTR_COLD netlist_matrix_solver_t(const eSolverType type, const netlist_solver_parameters_t &params);
 	ATTR_COLD virtual ~netlist_matrix_solver_t();
 
 	ATTR_COLD virtual void vsetup(netlist_analog_net_t::list_t &nets) = 0;
@@ -224,6 +230,8 @@ public:
 	ATTR_COLD int get_net_idx(netlist_net_t *net);
 	ATTR_COLD virtual void log_stats() {};
 
+	inline const eSolverType type() const { return m_type; }
+
 protected:
 
 	ATTR_COLD void setup(netlist_analog_net_t::list_t &nets);
@@ -237,7 +245,10 @@ protected:
 	plinearlist_t<netlist_analog_net_t *> m_nets;
 	plinearlist_t<netlist_analog_output_t *> m_inps;
 
-	int m_calculations;
+    int m_stat_calculations;
+    int m_stat_newton_raphson;
+    int m_stat_vsolver_calls;
+
 	const netlist_solver_parameters_t &m_params;
 
 	ATTR_HOT inline const double current_timestep() { return m_cur_ts; }
@@ -255,6 +266,7 @@ private:
 
 	ATTR_HOT void update_inputs();
 
+    const eSolverType m_type;
 };
 
 
