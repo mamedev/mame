@@ -3,10 +3,10 @@
 /***************************************************************************
 
   Texas Instruments TMS1xxx/0970/0980 handheld calculators (mostly single-chip)
-  
+
   Refer to their official manuals on how to use them.
 
-  
+
   TODO:
   - MCU clocks are unknown
 
@@ -85,31 +85,31 @@ public:
 void ticalc1x_state::leds_update()
 {
 	UINT16 active_state[0x10];
-	
+
 	for (int i = 0; i < 0x10; i++)
 	{
 		active_state[i] = 0;
-		
+
 		for (int j = 0; j < 0x10; j++)
 		{
 			int di = j << 4 | i;
-			
+
 			// turn on powered leds
 			if (m_leds_state[i] >> j & 1)
 				m_leds_decay[di] = LEDS_DECAY_TIME;
-			
+
 			// determine active state
 			int ds = (m_power_on && m_leds_decay[di] != 0) ? 1 : 0;
 			active_state[i] |= (ds << j);
 		}
 	}
-	
+
 	// on difference, send to output
 	for (int i = 0; i < 0x10; i++)
 		if (m_leds_cache[i] != active_state[i])
 		{
 			output_set_digit_value(i, active_state[i]);
-			
+
 			for (int j = 0; j < 8; j++)
 				output_set_lamp_value(i*10 + j, active_state[i] >> j & 1);
 		}
@@ -123,7 +123,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ticalc1x_state::leds_decay_tick)
 	for (int i = 0; i < 0x100; i++)
 		if (!(m_leds_state[i & 0xf] >> (i>>4) & 1) && m_leds_decay[i])
 			m_leds_decay[i]--;
-	
+
 	leds_update();
 }
 
@@ -143,7 +143,7 @@ void ticalc1x_state::tisr16_leds_update()
 	for (int i = 0; i < 11; i++)
 		if (m_r >> i & 1)
 			m_leds_state[i] = m_o;
-	
+
 	// exponent sign (not 100% sure this is correct)
 	m_leds_state[11] = (m_leds_state[0] | m_leds_state[1]) ? 0x40 : 0;
 
@@ -169,7 +169,7 @@ WRITE16_MEMBER(ticalc1x_state::tisr16_write_r)
 	// R0-R10: input mux
 	// R0-R10: select digit (right-to-left)
 	m_r = data;
-	
+
 	tisr16_leds_update();
 }
 
@@ -233,7 +233,7 @@ WRITE16_MEMBER(ticalc1x_state::wizatron_write_r)
 	// note: 3rd digit is custom(not 7seg), for math symbols
 	for (int i = 0; i < 9; i++)
 		m_leds_state[i] = (data >> i & 1) ? m_o : 0;
-	
+
 	// 6th digit only has A and G for =
 	m_leds_state[3] &= 0x41;
 
@@ -272,7 +272,7 @@ WRITE16_MEMBER(ticalc1x_state::ti30_write_r)
 	UINT8 o = BITSWAP8(m_o,7,5,2,1,4,0,6,3);
 	for (int i = 0; i < 9; i++)
 		m_leds_state[i] = (data >> i & 1) ? o : 0;
-	
+
 	// 1st digit only has segments B,F,G,DP
 	m_leds_state[0] &= 0xe2;
 

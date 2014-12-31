@@ -31,29 +31,29 @@
 
 #define MCFG_STEPPER_ADD(_tag)\
 	MCFG_DEVICE_ADD(_tag, STEPPER, 0)
-	
+
 #define MCFG_STEPPER_REEL_TYPE(_data) \
 	stepper_device::set_reel_type(*device, _data);
 
 /* total size of reel (in half steps) */
 #define MCFG_STEPPER_MAX_STEPS(_write) \
-	stepper_device::set_max_steps(*device, _write);	
-	
+	stepper_device::set_max_steps(*device, _write);
+
 /* start position of index (in half steps) */
 #define MCFG_STEPPER_START_INDEX(_write) \
-	stepper_device::set_start_index(*device, _write);	
+	stepper_device::set_start_index(*device, _write);
 
-/* end position of index (in half steps) */	
+/* end position of index (in half steps) */
 #define MCFG_STEPPER_END_INDEX(_write) \
-	stepper_device::set_end_index(*device, _write);	
+	stepper_device::set_end_index(*device, _write);
 
-/* end position of index (in half steps) */	
+/* end position of index (in half steps) */
 #define MCFG_STEPPER_INDEX_PATTERN(_write) \
-	stepper_device::set_index_pattern(*device, _write);	
-	
+	stepper_device::set_index_pattern(*device, _write);
+
 /* Phase at 0, for opto linkage */
 #define MCFG_STEPPER_INIT_PHASE(_write) \
-	stepper_device::set_init_phase(*device, _write);	
+	stepper_device::set_init_phase(*device, _write);
 
 #define MCFG_STARPOINT_48STEP_ADD(_tag)\
 	MCFG_STEPPER_ADD(_tag)\
@@ -103,9 +103,9 @@ public:
 
 	template<class _Object> static devcb_base &set_optic_handler(device_t &device, _Object object) { return downcast<stepper_device &>(device).m_optic_cb.set_callback(object); }
 
-	static void set_reel_type(device_t &device, UINT8 type) 
-	{ 
-		downcast<stepper_device &>(device).m_type = type; 
+	static void set_reel_type(device_t &device, UINT8 type)
+	{
+		downcast<stepper_device &>(device).m_type = type;
 		switch ( type )
 		{   default:
 			case STARPOINT_48STEP_REEL:  /* STARPOINT RMxxx */
@@ -127,17 +127,17 @@ public:
 			case ECOIN_200STEP_REEL :
 			downcast<stepper_device &>(device).m_max_steps = (200*2);
 			break;
-		}	
+		}
 	}
 	static void set_max_steps(device_t &device, INT16 steps) { downcast<stepper_device &>(device).m_max_steps = steps; }
 	static void set_start_index(device_t &device, INT16 index) { downcast<stepper_device &>(device).m_index_start = index; }
-	static void set_end_index(device_t &device, INT16 index) { downcast<stepper_device &>(device).m_index_end = index; }	
-	static void set_index_pattern(device_t &device, INT16 index) { downcast<stepper_device &>(device).m_index_patt = index; }	
-	static void set_init_phase(device_t &device, UINT8 phase) 
+	static void set_end_index(device_t &device, INT16 index) { downcast<stepper_device &>(device).m_index_end = index; }
+	static void set_index_pattern(device_t &device, INT16 index) { downcast<stepper_device &>(device).m_index_patt = index; }
+	static void set_init_phase(device_t &device, UINT8 phase)
 	{
-		downcast<stepper_device &>(device).m_initphase = phase; 
-		downcast<stepper_device &>(device).m_phase = phase; 
-		downcast<stepper_device &>(device).m_old_phase = phase; 
+		downcast<stepper_device &>(device).m_initphase = phase;
+		downcast<stepper_device &>(device).m_phase = phase;
+		downcast<stepper_device &>(device).m_old_phase = phase;
 	}
 
 	/* update a motor */

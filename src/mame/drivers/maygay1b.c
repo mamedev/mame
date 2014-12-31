@@ -628,7 +628,7 @@ MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel4_optic_cb))
 	MCFG_STARPOINT_48STEP_ADD("reel5")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(maygay1b_state, reel5_optic_cb))
-	
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEFAULT_LAYOUT(layout_maygay1b)

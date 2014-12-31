@@ -736,7 +736,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		<publisher>Samsung</publisher>
 		<info name="serial" value="T-102021-08 ~ PICO-9507S"/>
 		<part name="cart" interface="pico_cart">
-			<feature name="pcb" value="??" />	<!-- non-Sega PCB, probably by Samsung -->
+			<feature name="pcb" value="??" />   <!-- non-Sega PCB, probably by Samsung -->
 			<feature name="ic1" value="PICO-9507S" />
 			<dataarea name="rom" size="524288">
 				<rom name="pico-9507s.ic1" size="524288" crc="042520ce" sha1="5dd748a1bdfc661d0b96f6a1d26babc6a0ae7f2d" offset="000000" loadflag="load16_word_swap" />

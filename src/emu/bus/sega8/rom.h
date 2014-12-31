@@ -318,17 +318,17 @@ class sega8_hicom_device : public sega8_rom_device
 public:
 	// construction/destruction
 	sega8_hicom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start() { save_item(NAME(m_rom_bank_base)); }
-	
+
 	virtual void late_bank_setup();
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_cart);
 	virtual DECLARE_WRITE8_MEMBER(write_cart) {}
 	virtual DECLARE_WRITE8_MEMBER(write_mapper);
-	
+
 protected:
 	UINT8 m_rom_bank_base;
 };

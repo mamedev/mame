@@ -101,33 +101,33 @@ static SDL_threadID window_threadid;
 static sdl_draw_info draw;
 
 struct worker_param {
-    worker_param()
-    : m_window(NULL), m_list(NULL), m_machine(NULL), m_resize_new_width(0), m_resize_new_height(0)
-    {
-    }
-    worker_param(running_machine &amachine, sdl_window_info *awindow)
-    : m_window(awindow), m_list(NULL), m_machine(&amachine), m_resize_new_width(0), m_resize_new_height(0)
-    {
-    }
-    worker_param(running_machine &amachine, sdl_window_info *awindow, render_primitive_list *alist)
-    : m_window(awindow), m_list(alist), m_machine(&amachine), m_resize_new_width(0), m_resize_new_height(0)
-    {
-    }
-    worker_param(sdl_window_info *awindow, int anew_width, int anew_height)
-    : m_window(awindow), m_list(NULL), m_machine(NULL), m_resize_new_width(anew_width), m_resize_new_height(anew_height)
-    {
-    }
-    worker_param(sdl_window_info *awindow)
-    : m_window(awindow), m_list(NULL), m_machine(NULL), m_resize_new_width(0), m_resize_new_height(0)
-    {
-    }
+	worker_param()
+	: m_window(NULL), m_list(NULL), m_machine(NULL), m_resize_new_width(0), m_resize_new_height(0)
+	{
+	}
+	worker_param(running_machine &amachine, sdl_window_info *awindow)
+	: m_window(awindow), m_list(NULL), m_machine(&amachine), m_resize_new_width(0), m_resize_new_height(0)
+	{
+	}
+	worker_param(running_machine &amachine, sdl_window_info *awindow, render_primitive_list *alist)
+	: m_window(awindow), m_list(alist), m_machine(&amachine), m_resize_new_width(0), m_resize_new_height(0)
+	{
+	}
+	worker_param(sdl_window_info *awindow, int anew_width, int anew_height)
+	: m_window(awindow), m_list(NULL), m_machine(NULL), m_resize_new_width(anew_width), m_resize_new_height(anew_height)
+	{
+	}
+	worker_param(sdl_window_info *awindow)
+	: m_window(awindow), m_list(NULL), m_machine(NULL), m_resize_new_width(0), m_resize_new_height(0)
+	{
+	}
 	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
 	sdl_window_info *window() const { assert(m_window != NULL); return m_window; }
-    render_primitive_list *list() const { return m_list; }
+	render_primitive_list *list() const { return m_list; }
 	int new_width() const { return m_resize_new_width; }
-    int new_height() const { return m_resize_new_height; }
-    // FIXME: only needed for window set-up which returns an error.
-    void set_window(sdl_window_info *window) { m_window = window; }
+	int new_height() const { return m_resize_new_height; }
+	// FIXME: only needed for window set-up which returns an error.
+	void set_window(sdl_window_info *window) { m_window = window; }
 private:
 	sdl_window_info *m_window;
 	render_primitive_list *m_list;
@@ -170,10 +170,10 @@ INLINE void execute_async(osd_work_callback callback, const worker_param &wp)
 
 INLINE void execute_sync(osd_work_callback callback, const worker_param &wp)
 {
-    worker_param *wp_temp = (worker_param *) osd_malloc(sizeof(worker_param));
-    *wp_temp = wp;
+	worker_param *wp_temp = (worker_param *) osd_malloc(sizeof(worker_param));
+	*wp_temp = wp;
 
-    callback((void *) wp_temp, 0);
+	callback((void *) wp_temp, 0);
 }
 
 
@@ -307,7 +307,7 @@ static OSDWORK_CALLBACK( sdlwindow_exit_wt )
 
 void sdl_osd_interface::window_exit()
 {
-    worker_param wp_dummy;
+	worker_param wp_dummy;
 
 	ASSERT_MAIN_THREAD();
 
@@ -319,8 +319,8 @@ void sdl_osd_interface::window_exit()
 		sdl_window_info *temp = sdl_window_list;
 		sdl_window_list = temp->next;
 		temp->video_window_destroy(machine());
-	    // free the window itself
-	    global_free(temp);
+		// free the window itself
+		global_free(temp);
 	}
 
 	// if we're multithreaded, clean up the window thread
@@ -495,7 +495,7 @@ void sdl_window_info::window_clear()
 		execute_async_wait(&sdlwindow_clear_surface_wt, worker_param(this));
 	}
 	else
-	    execute_sync(&sdlwindow_clear_surface_wt, worker_param(this));
+		execute_sync(&sdlwindow_clear_surface_wt, worker_param(this));
 }
 
 
@@ -651,12 +651,12 @@ static void sdlwindow_update_cursor_state(running_machine &machine, sdl_window_i
 
 static OSDWORK_CALLBACK( sdlwindow_update_cursor_state_wt )
 {
-    worker_param *      wp = (worker_param *) param;
-    //sdl_window_info *   window = wp->window;
+	worker_param *      wp = (worker_param *) param;
+	//sdl_window_info *   window = wp->window;
 
-    sdlwindow_update_cursor_state(wp->machine(), wp->window());
+	sdlwindow_update_cursor_state(wp->machine(), wp->window());
 
-    return NULL;
+	return NULL;
 }
 
 
@@ -725,8 +725,8 @@ int sdlwindow_video_window_create(running_machine &machine, int index, sdl_monit
 
 error:
 	window->video_window_destroy(machine);
-    // free the window itself
-    global_free(window);
+	// free the window itself
+	global_free(window);
 	return 1;
 }
 
@@ -946,7 +946,7 @@ void sdl_window_info::video_window_update(running_machine &machine)
 	// adjust the cursor state
 	//sdlwindow_update_cursor_state(machine, window);
 
-    execute_async(&sdlwindow_update_cursor_state_wt, worker_param(machine, this));
+	execute_async(&sdlwindow_update_cursor_state_wt, worker_param(machine, this));
 
 	// if we're visible and running and not in the middle of a resize, draw
 	if (target != NULL)
@@ -979,7 +979,7 @@ void sdl_window_info::video_window_update(running_machine &machine)
 
 		if (osd_event_wait(rendered_event, event_wait_ticks))
 		{
-            // ensure the target bounds are up-to-date, and then get the primitives
+			// ensure the target bounds are up-to-date, and then get the primitives
 			render_primitive_list *primlist = &get_primitives(this);
 
 			// and redraw now
@@ -1038,7 +1038,7 @@ static OSDWORK_CALLBACK( complete_create_wt )
 
 		// if we're allowed to switch resolutions, override with something better
 		if (video_config.switchres)
-		    window->pick_best_mode(&tempwidth, &tempheight);
+			window->pick_best_mode(&tempwidth, &tempheight);
 	}
 	else if (window->windowed_width)
 	{

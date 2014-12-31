@@ -43,13 +43,13 @@ public:
 	DECLARE_WRITE8_MEMBER(asteroid_noise_reset_w);
 	DECLARE_WRITE8_MEMBER(llander_snd_reset_w);
 	DECLARE_WRITE8_MEMBER(llander_sounds_w);
-	
+
 	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
-	
+
 	INTERRUPT_GEN_MEMBER(asteroid_interrupt);
 	INTERRUPT_GEN_MEMBER(asterock_interrupt);
 	INTERRUPT_GEN_MEMBER(llander_interrupt);
-	
+
 	DECLARE_DRIVER_INIT(asterock);
 	DECLARE_DRIVER_INIT(asteroidb);
 

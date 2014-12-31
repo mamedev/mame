@@ -4,7 +4,7 @@
 
   Kenner Star Wars - Electronic Battle Command
   * TMS1100 MCU, labeled MP3438A
-  
+
   This is a small tabletop space-dogfighting game. To start the game,
   press BASIC/INTER/ADV and enter P#(number of players), then
   START TURN. Refer to the official manual for more information.
@@ -46,7 +46,7 @@ public:
 	DECLARE_READ8_MEMBER(read_k);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_WRITE16_MEMBER(write_r);
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(leds_decay_tick);
 	void leds_update();
 	void prepare_and_update();
@@ -71,35 +71,35 @@ public:
 void starwbc_state::leds_update()
 {
 	UINT16 active_state[0x10];
-	
+
 	for (int i = 0; i < 0x10; i++)
 	{
 		active_state[i] = 0;
-		
+
 		for (int j = 0; j < 0x10; j++)
 		{
 			int di = j << 4 | i;
-			
+
 			// turn on powered leds
 			if (m_leds_state[i] >> j & 1)
 				m_leds_decay[di] = LEDS_DECAY_TIME;
-			
+
 			// determine active state
 			int ds = (m_leds_decay[di] != 0) ? 1 : 0;
 			active_state[i] |= (ds << j);
 		}
 	}
-	
+
 	// on difference, send to output
 	for (int i = 0; i < 0x10; i++)
 		if (m_leds_cache[i] != active_state[i])
 		{
 			output_set_digit_value(i, active_state[i]);
-			
+
 			for (int j = 0; j < 8; j++)
 				output_set_lamp_value(i*10 + j, active_state[i] >> j & 1);
 		}
-	
+
 	memcpy(m_leds_cache, active_state, sizeof(m_leds_cache));
 }
 
@@ -109,7 +109,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(starwbc_state::leds_decay_tick)
 	for (int i = 0; i < 0x100; i++)
 		if (!(m_leds_state[i & 0xf] >> (i>>4) & 1) && m_leds_decay[i])
 			m_leds_decay[i]--;
-	
+
 	leds_update();
 }
 
@@ -117,7 +117,7 @@ void starwbc_state::prepare_and_update()
 {
 	UINT8 o = (m_o << 4 & 0xf0) | (m_o >> 4 & 0x0f);
 	const UINT8 mask[5] = { 0x30, 0xff, 0xff, 0x7f, 0x7f };
-	
+
 	// R0,R2,R4,R6,R8
 	for (int i = 0; i < 5; i++)
 		m_leds_state[i*2] = (m_r >> (i*2) & 1) ? (o & mask[i]) : 0;
@@ -155,7 +155,7 @@ WRITE16_MEMBER(starwbc_state::write_r)
 	// R0,R1,R3,R5,R7: input mux
 	// R9: piezo speaker
 	m_speaker->level_w(data >> 9 & 1);
-	
+
 	m_r = data;
 	prepare_and_update();
 }
@@ -233,7 +233,7 @@ void starwbc_state::machine_start()
 
 	m_r = 0;
 	m_o = 0;
-	
+
 	// register for savestates
 	save_item(NAME(m_leds_state));
 	save_item(NAME(m_leds_cache));
@@ -253,7 +253,7 @@ static MACHINE_CONFIG_START( starwbc, starwbc_state )
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(starwbc_state, write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("leds_decay", starwbc_state, leds_decay_tick, attotime::from_msec(10))
-	
+
 	MCFG_DEFAULT_LAYOUT(layout_starwbc)
 
 	/* no video! */

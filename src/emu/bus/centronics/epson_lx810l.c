@@ -176,7 +176,7 @@ static MACHINE_CONFIG_FRAGMENT( epson_lx810l )
 	MCFG_STEPPER_END_INDEX(24)
 	MCFG_STEPPER_INDEX_PATTERN(0x00)
 	MCFG_STEPPER_INIT_PHASE(2)
-	
+
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -345,7 +345,6 @@ epson_ap2000_t::epson_ap2000_t(const machine_config &mconfig, const char *tag, d
 
 void epson_lx810l_t::device_start()
 {
-
 }
 
 

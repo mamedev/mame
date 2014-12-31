@@ -2,14 +2,14 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="adam_flop" description="Coleco ADAM diskettes">
 
-	<!-- 
+	<!--
 	Thanks to SacNews.net for their very comprehensive software database!
-	
+
 	TODO:
-		Add rest of images outside of TOSEC/SacNews databases
-		Proper testing for correct info? (current info is just copy-pasted from filenames)
+	    Add rest of images outside of TOSEC/SacNews databases
+	    Proper testing for correct info? (current info is just copy-pasted from filenames)
 	-->
-	
+
 	<!-- EOS Drivers -->
 
 	<software name="homeauto">
@@ -841,11 +841,11 @@
 			<dataarea name="flop" size="163840">
 				<rom name="world geography (1985) (a-ware educational software) [a1].dsk" size="163840" crc="c7d26848" sha1="c9581253ac1de95bbb45092bf3aeaa932f4006d7" offset="0" />
 			</dataarea>
-		</part>	
+		</part>
 	</software>
 
 	<!-- EOS Games -->
-	
+
 	<software name="2010">
 		<description>2010 - The Text Adventure Game</description>
 		<year>1984</year>
@@ -857,7 +857,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="2010a" cloneof="2010">
 		<description>2010 - The Text Adventure Game (Alt)</description>
 		<year>1984</year>
@@ -1083,7 +1083,7 @@
 			<dataarea name="flop" size="163840">
 				<rom name="adventure pack i (1984) (victory software) [a1].dsk" size="163840" crc="1754bbf4" sha1="a38a4ab0689917e66b3b6dda874f5a4f9ab9415a" offset="0" />
 			</dataarea>
-		</part>		
+		</part>
 	</software>
 
 	<software name="advpak2v">
@@ -2409,24 +2409,24 @@
 		</part>
 	</software>
 
-<!-- From NIAD's blog: 
+<!-- From NIAD's blog:
   Jeopardy for the ADAM Computer is in fact a finshed product which was copyrighted 1984, but for whatever reason (probably
-  completed just prior to Coleco's announcement in Jan. '85 that they were abandoning the ColecoVision and ADAM), Coleco 
-  decided not to release it commercially. They instead made it available to ADAM Users Groups circa 1985/1986 to share with 
-  the ADAM Community with the requirement that all copyright information would be removed from the program. Because of 
-  this requirement by Coleco, you will see multiple versions of Jeopardy available for download that have been hacked to 
-  change two title screens. This hacking actually eliminated the first title screen and then replaced the copyright information on 
+  completed just prior to Coleco's announcement in Jan. '85 that they were abandoning the ColecoVision and ADAM), Coleco
+  decided not to release it commercially. They instead made it available to ADAM Users Groups circa 1985/1986 to share with
+  the ADAM Community with the requirement that all copyright information would be removed from the program. Because of
+  this requirement by Coleco, you will see multiple versions of Jeopardy available for download that have been hacked to
+  change two title screens. This hacking actually eliminated the first title screen and then replaced the copyright information on
   the second.
-  When the original Jeopardy program was copied from data pack (256K max size) to disk (160K max size) a portion of the 
-  program that contained game play data/questions was lost to the ages. This disk version which floated around for a while 
-  would eventually crash due to the missing data, but this was later patched by Walters Software Co.'s Jim Walters to recycle to 
+  When the original Jeopardy program was copied from data pack (256K max size) to disk (160K max size) a portion of the
+  program that contained game play data/questions was lost to the ages. This disk version which floated around for a while
+  would eventually crash due to the missing data, but this was later patched by Walters Software Co.'s Jim Walters to recycle to
   the beginning of the questions.
 
-  In 1992, a member of NIAD had the tremendous fortune to come in contact with a former Coleco employee who was looking 
-  to sell off his entire lot of ADAM gear... a number of never before seen hardware and software protos included. In this lot was 
-  [...] a 2-disk version of Jeopardy. I have not tested this 2-disk version thoroughly, but it does seem to work properly and 
-  should be the version that you use as more than likely it is the complete version that would have been released for 
-  commercial sale. 
+  In 1992, a member of NIAD had the tremendous fortune to come in contact with a former Coleco employee who was looking
+  to sell off his entire lot of ADAM gear... a number of never before seen hardware and software protos included. In this lot was
+  [...] a 2-disk version of Jeopardy. I have not tested this 2-disk version thoroughly, but it does seem to work properly and
+  should be the version that you use as more than likely it is the complete version that would have been released for
+  commercial sale.
  -->
 
 	<software name="jeopardy">
@@ -3195,7 +3195,7 @@
 			<dataarea name="flop" size="163840">
 				<rom name="robothief (1991) (steve pitman software) [a1].dsk" size="163840" crc="8df50a33" sha1="69fde2a68c6c22ae268a209bc9054f6e7206c541" offset="0" />
 			</dataarea>
-		</part>		
+		</part>
 	</software>
 
 	<software name="rubychal">
@@ -3450,12 +3450,12 @@
 		</part>
 	</software>
 
-<!-- From NIAD's blog: 
-  The original prototype/demo/unreleased version as was obtained from Epyx was indeed buggy, but this mainly dealt with the 
-  inability to get it working on a disk, it was originally supplied on data pack, the save feature was a mess and there were a 
-  number of menu (especially at the start of the game) that were messed up. A programmer by the name of Joe Waters spent 
-  considerable time fixing these issues or most of them to get it to the state we now know. He actually lived in Albuquerque and 
-  released software for the ADAM under the Federation Software label and did the Temple hack and some others under the 
+<!-- From NIAD's blog:
+  The original prototype/demo/unreleased version as was obtained from Epyx was indeed buggy, but this mainly dealt with the
+  inability to get it working on a disk, it was originally supplied on data pack, the save feature was a mess and there were a
+  number of menu (especially at the start of the game) that were messed up. A programmer by the name of Joe Waters spent
+  considerable time fixing these issues or most of them to get it to the state we now know. He actually lived in Albuquerque and
+  released software for the ADAM under the Federation Software label and did the Temple hack and some others under the
   Falcon Federation Hack Group (or something like that) label.
 -->
 	<software name="apshai">
@@ -4000,7 +4000,7 @@
 	</software>
 
 	<!-- EOS Graphics Design -->
-	
+
 	<software name="adamgfx">
 		<description>ADAM Graphics</description>
 		<year>199?</year>
@@ -5421,7 +5421,7 @@
 	</software>
 
 	<!-- EOS Productivity -->
-	
+
 	<software name="atgradeb">
 		<description>A-Tech Gradebook</description>
 		<year>198?</year>
@@ -5433,7 +5433,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="atgradeba" cloneof="atgradeb">
 		<description>A-Tech Gradebook (Alt)</description>
 		<year>198?</year>
@@ -5467,7 +5467,7 @@
 			<dataarea name="flop" size="163840">
 				<rom name="adam agenda - the personal schedule keeper (198x) (jeff harris) [a1].dsk" size="163840" crc="057fd444" sha1="21b76438a43a4e19a1b996789f2073cf25654a19" offset="0" />
 			</dataarea>
-		</part>	
+		</part>
 	</software>
 
 	<software name="fbanalyz">
@@ -7231,7 +7231,7 @@
 
 
 	<!-- EOS Programming -->
-	
+
 	<software name="adambas">
 		<description>ADAM Basic (v1.6)</description>
 		<year>198?</year>
@@ -7842,7 +7842,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="smartlog">
 		<description>SmartLOGO</description>
 		<year>1984</year>
@@ -7854,7 +7854,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="smartloga" cloneof="smartlog">
 		<description>SmartLOGO (Alt)</description>
 		<year>1984</year>
@@ -7866,7 +7866,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="smartlogb" cloneof="smartlog">
 		<description>SmartLOGO (Alt 2)</description>
 		<year>1984</year>
@@ -8015,7 +8015,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="anetdata">
 		<description>A-Net ADAM BBS - Data Files</description>
 		<year>1990</year>
@@ -9816,7 +9816,7 @@
 			<dataarea name="flop" size="163840">
 				<rom name="turbodisk v1.0 (1987) (digital express inc.) [a1].dsk" size="163840" crc="bf60a7bb" sha1="ca04851345a882589f1b8d97b11df1643ad4e947" offset="0" />
 			</dataarea>
-		</part>		
+		</part>
 	</software>
 
 	<software name="turbload">
@@ -9936,7 +9936,7 @@
 			<dataarea name="flop" size="163840">
 				<rom name="xrampak i (1987) (digital express inc.) [a1].dsk" size="163840" crc="dc40400b" sha1="aeebdcf76d6fd369fe1720b0a57a48089ac8e050" offset="0" />
 			</dataarea>
-		</part>		
+		</part>
 	</software>
 
 	<!-- EOS Public Domain - ADAMLand -->
@@ -9966,7 +9966,7 @@
 	</software>
 
 	<!-- EOS Public Domain - ADAM Users Group -->
-	
+
 	<software name="augutils">
 		<description>A.U.G. - Utilities</description>
 		<year>198?</year>
@@ -12328,7 +12328,7 @@
 	</software>
 
 	<!-- EOS Public Domain - Nibbles & Bits -->
-	
+
 	<software name="nbbas01">
 		<description>N&amp;B - Basic Vol. #01</description>
 		<year>198?</year>
@@ -13582,7 +13582,7 @@
 	</software>
 
 	<!-- EOS Public Domain - Puget Sound ADAM Network -->
-	
+
 	<software name="psanutil">
 		<description>P.S.A.N. - Utilities</description>
 		<year>198?</year>
@@ -13807,7 +13807,7 @@
 	</software>
 
 	<!-- CP/M Drivers -->
-	
+
 	<software name="evecpm">
 		<description>EVE CP/M Utilities</description>
 		<year>198?</year>
@@ -13846,7 +13846,7 @@
 
 	<!-- CP/M Games -->
 
-<!-- This is a collection of Scott Adams' adventures -->	
+<!-- This is a collection of Scott Adams' adventures -->
 	<software name="adventur">
 		<description>Adventure (Scott Adams)</description>
 		<year>198?</year>
@@ -14269,7 +14269,7 @@
 	</software>
 
 	<!-- CP/M Public Domain - Misc -->
-	
+
 	<software name="cpmpd01">
 		<description>CP-M 2.2 or T-DOS P.D. Vol. #01</description>
 		<year>198?</year>
@@ -14331,7 +14331,7 @@
 	</software>
 
 	<!-- CP/M Public Domain - Northern Illiana ADAM User's Group -->
-	
+
 	<software name="cndv01">
 		<description>N.I.A.D. - CP/M CNDV #01</description>
 		<year>198?</year>
@@ -15111,7 +15111,7 @@
 	</software>
 
 	<!-- CP/M PrintMaster Artwork -->
-	
+
 	<software name="printm01">
 		<description>PrintMaster Artwork - ADAMGR01</description>
 		<year>198?</year>
@@ -15869,7 +15869,7 @@
 	</software>
 
 	<!-- CP/M Productivity -->
-	
+
 	<software name="abovepls">
 		<description>Above Plus</description>
 		<year>198?</year>
@@ -16046,7 +16046,7 @@
 	</software>
 
 	<!-- CP/M Programming -->
-	
+
 	<software name="dazzstar">
 		<description>DazzleStar Disassembler</description>
 		<year>1986</year>
@@ -16194,7 +16194,7 @@
 	</software>
 
 	<!-- CP/M Utilities -->
-	
+
 	<software name="1kutils">
 		<description>1K Utilities</description>
 		<year>198?</year>
@@ -16256,7 +16256,7 @@
 	</software>
 
 	<!-- ADAM News Network -->
-	
+
 	<software name="ann9103">
 		<description>ANN Disk - 1991-03 - E.O.S. Files</description>
 		<year>1991</year>

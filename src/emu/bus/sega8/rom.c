@@ -899,17 +899,17 @@ WRITE8_MEMBER(sega8_janggun_device::write_mapper)
 
 
 /*-------------------------------------------------
- 
+
  Hi-Com X-in-1 cart, uses writes to 0xffff to
  change program bank in 0x0000-0x7fff
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(sega8_hicom_device::read_cart)
 {
 	if (offset >= 0x8000)
 		return m_rom[offset & 0x3fff];
-	
+
 	return m_rom[(m_rom_bank_base * 0x8000) + offset];
 }
 

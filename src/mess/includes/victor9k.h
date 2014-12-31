@@ -48,7 +48,7 @@
 #define RS232_A_TAG     "rs232a"
 #define RS232_B_TAG     "rs232b"
 #define SCREEN_TAG      "screen"
-#define KB_TAG   		"kb"
+#define KB_TAG          "kb"
 #define FDC_TAG         "fdc"
 
 class victor9k_state : public driver_device

@@ -165,16 +165,16 @@ private:
 static ADDRESS_MAP_START(bitgrapha_mem, AS_PROGRAM, 16, bitgraph_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x007fff) AM_ROM
-	AM_RANGE(0x010000, 0x010001) AM_DEVREADWRITE8(ACIA0_TAG, acia6850_device, data_r, data_w, 0xff00)	// HOST
+	AM_RANGE(0x010000, 0x010001) AM_DEVREADWRITE8(ACIA0_TAG, acia6850_device, data_r, data_w, 0xff00)   // HOST
 	AM_RANGE(0x010002, 0x010003) AM_DEVREADWRITE8(ACIA0_TAG, acia6850_device, status_r, control_w, 0xff00)
-	AM_RANGE(0x010008, 0x010009) AM_DEVREADWRITE8(ACIA1_TAG, acia6850_device, data_r, data_w, 0x00ff)	// KEYBOARD
+	AM_RANGE(0x010008, 0x010009) AM_DEVREADWRITE8(ACIA1_TAG, acia6850_device, data_r, data_w, 0x00ff)   // KEYBOARD
 	AM_RANGE(0x01000a, 0x01000b) AM_DEVREADWRITE8(ACIA1_TAG, acia6850_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x010010, 0x010011) AM_DEVREADWRITE8(ACIA2_TAG, acia6850_device, data_r, data_w, 0x00ff)	// DEBUGGER
+	AM_RANGE(0x010010, 0x010011) AM_DEVREADWRITE8(ACIA2_TAG, acia6850_device, data_r, data_w, 0x00ff)   // DEBUGGER
 	AM_RANGE(0x010012, 0x010013) AM_DEVREADWRITE8(ACIA2_TAG, acia6850_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x010018, 0x010019) AM_DEVREADWRITE8(ACIA3_TAG, acia6850_device, data_r, data_w, 0x00ff)	// POINTER
+	AM_RANGE(0x010018, 0x010019) AM_DEVREADWRITE8(ACIA3_TAG, acia6850_device, data_r, data_w, 0x00ff)   // POINTER
 	AM_RANGE(0x01001a, 0x01001b) AM_DEVREADWRITE8(ACIA3_TAG, acia6850_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0x010020, 0x010027) AM_READWRITE8(adlc_r, adlc_w, 0xff00)
-	AM_RANGE(0x010028, 0x01002f) AM_READWRITE8(pia_r, pia_w, 0xff00)	// EAROM, PSG
+	AM_RANGE(0x010028, 0x01002f) AM_READWRITE8(pia_r, pia_w, 0xff00)    // EAROM, PSG
 	AM_RANGE(0x010030, 0x010031) AM_WRITE(baud_write)
 	AM_RANGE(0x3e0000, 0x3fffff) AM_RAM
 ADDRESS_MAP_END
@@ -182,18 +182,18 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(bitgraphb_mem, AS_PROGRAM, 16, bitgraph_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x007fff) AM_ROM
-	AM_RANGE(0x010000, 0x010001) AM_DEVREADWRITE8(ACIA0_TAG, acia6850_device, data_r, data_w, 0xff00)	// HOST
+	AM_RANGE(0x010000, 0x010001) AM_DEVREADWRITE8(ACIA0_TAG, acia6850_device, data_r, data_w, 0xff00)   // HOST
 	AM_RANGE(0x010002, 0x010003) AM_DEVREADWRITE8(ACIA0_TAG, acia6850_device, status_r, control_w, 0xff00)
-	AM_RANGE(0x010008, 0x010009) AM_DEVREADWRITE8(ACIA1_TAG, acia6850_device, data_r, data_w, 0x00ff)	// KEYBOARD
+	AM_RANGE(0x010008, 0x010009) AM_DEVREADWRITE8(ACIA1_TAG, acia6850_device, data_r, data_w, 0x00ff)   // KEYBOARD
 	AM_RANGE(0x01000a, 0x01000b) AM_DEVREADWRITE8(ACIA1_TAG, acia6850_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x010010, 0x010011) AM_DEVREADWRITE8(ACIA2_TAG, acia6850_device, data_r, data_w, 0x00ff)	// DEBUGGER
+	AM_RANGE(0x010010, 0x010011) AM_DEVREADWRITE8(ACIA2_TAG, acia6850_device, data_r, data_w, 0x00ff)   // DEBUGGER
 	AM_RANGE(0x010012, 0x010013) AM_DEVREADWRITE8(ACIA2_TAG, acia6850_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0x01001a, 0x01001b) AM_WRITE8(misccr_write, 0x00ff)
 	AM_RANGE(0x010020, 0x010027) AM_READWRITE8(adlc_r, adlc_w, 0xff00)
-	AM_RANGE(0x010028, 0x01002f) AM_READWRITE8(pia_r, pia_w, 0xff00)	// EAROM, PSG
+	AM_RANGE(0x010028, 0x01002f) AM_READWRITE8(pia_r, pia_w, 0xff00)    // EAROM, PSG
 	AM_RANGE(0x010030, 0x010031) AM_WRITE(baud_write)
-//	AM_RANGE(0x010030, 0x010037) AM_READ8(ppu_read, 0x00ff)
-//	AM_RANGE(0x010038, 0x01003f) AM_WRITE8(ppu_write, 0x00ff)
+//  AM_RANGE(0x010030, 0x010037) AM_READ8(ppu_read, 0x00ff)
+//  AM_RANGE(0x010038, 0x01003f) AM_WRITE8(ppu_write, 0x00ff)
 	AM_RANGE(0x380000, 0x3fffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -257,8 +257,8 @@ WRITE8_MEMBER(bitgraph_state::pia_pb_w)
 	m_pia_b = data;
 
 	switch (m_pia_b & 0x03) {
-		case 2:	m_psg->data_w(space, 0, m_pia_a); break;
-		case 3:	m_psg->address_w(space, 0, m_pia_a); break;
+		case 2: m_psg->data_w(space, 0, m_pia_a); break;
+		case 3: m_psg->address_w(space, 0, m_pia_a); break;
 	}
 
 	if (BIT(m_pia_b, 3)) {
@@ -302,10 +302,10 @@ WRITE_LINE_MEMBER(bitgraph_state::system_clock_write)
 WRITE16_MEMBER(bitgraph_state::baud_write)
 {
 	DBG_LOG(1,"Baud", ("%04X\n", data));
-	m_dbrgb->str_w(data & 15);		// 2 DBG
-	m_dbrga->stt_w((data >> 4) & 15);	// 1 KBD
-	m_dbrgb->stt_w((data >> 8) & 15);	// 3 PNT
-	m_dbrga->str_w((data >> 12) & 15);	// 0 HOST
+	m_dbrgb->str_w(data & 15);      // 2 DBG
+	m_dbrga->stt_w((data >> 4) & 15);   // 1 KBD
+	m_dbrgb->stt_w((data >> 8) & 15);   // 3 PNT
+	m_dbrga->str_w((data >> 12) & 15);  // 0 HOST
 }
 
 WRITE_LINE_MEMBER(bitgraph_state::com8116_a_fr_w)
@@ -398,18 +398,18 @@ WRITE8_MEMBER(bitgraph_state::ppu_write)
 
 #ifdef UNUSED_FUNCTION
 static ADDRESS_MAP_START(ppu_io, AS_IO, 8, bitgraph_state)
-//	AM_RANGE(0x00, 0x00) AM_READ(ppu_irq)
-//	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1)
-//	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(ppu_t0_r)
+//  AM_RANGE(0x00, 0x00) AM_READ(ppu_irq)
+//  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1)
+//  AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(ppu_t0_r)
 	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("i8243", i8243_device, i8243_prog_w)
 ADDRESS_MAP_END
 #endif
 
 /*
-	p4	O: Centronics data 3..0
-	p5	O: Centronics data 7..4
-	p6	O: Centronics control
-	p7	I: Centronics status
+    p4  O: Centronics data 3..0
+    p5  O: Centronics data 7..4
+    p6  O: Centronics control
+    p7  I: Centronics status
 */
 WRITE8_MEMBER(bitgraph_state::ppu_i8243_w)
 {
@@ -572,7 +572,7 @@ static MACHINE_CONFIG_START( bitgrphb, bitgraph_state )
 	MCFG_CPU_PROGRAM_MAP(bitgraphb_mem)
 
 	MCFG_FRAGMENT_ADD(bg_motherboard)
-//	MCFG_FRAGMENT_ADD(bg_ppu)
+//  MCFG_FRAGMENT_ADD(bg_ppu)
 
 	MCFG_DEVICE_ADD("system_clock", CLOCK, 1040)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(bitgraph_state, system_clock_write))

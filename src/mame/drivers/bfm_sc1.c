@@ -178,7 +178,7 @@ public:
 	DECLARE_READ8_MEMBER(nec_r);
 	DECLARE_WRITE8_MEMBER(nec_reset_w);
 	DECLARE_WRITE8_MEMBER(nec_latch_w);
-	
+
 	void save_state();
 
 	DECLARE_DRIVER_INIT(toppoker);

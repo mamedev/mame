@@ -21,16 +21,15 @@
 ARCOMPACT_RETTYPE arcompact_handle##name##_p11(OPS_32) \
 { \
 	int M = (op & 0x00000020) >> 5; \
-	 \
+		\
 	switch (M) \
 	{ \
 		case 0x00: return arcompact_handle##name##_p11_m0(PARAMS); \
 		case 0x01: return arcompact_handle##name##_p11_m1(PARAMS); \
 	} \
-	 \
+		\
 	return 0; \
-}; \
-
+};
 #define ARCOMPACT_HANDLER04_TYPE(name) \
 ARCOMPACT_RETTYPE arcompact_handle##name(OPS_32) \
 { \
@@ -45,8 +44,7 @@ ARCOMPACT_RETTYPE arcompact_handle##name(OPS_32) \
 	} \
 	\
 	return 0; \
-}; \
-
+};
 
 #define ARCOMPACT_HANDLER04_TYPE_PM(name) \
 	ARCOMPACT_RETTYPE arcompact_handle##name##_p00(OPS_32); \
@@ -55,8 +53,7 @@ ARCOMPACT_RETTYPE arcompact_handle##name(OPS_32) \
 	ARCOMPACT_RETTYPE arcompact_handle##name##_p11_m0(OPS_32); \
 	ARCOMPACT_RETTYPE arcompact_handle##name##_p11_m1(OPS_32); \
 	ARCOMPACT_HANDLER04_P11_TYPE(name); \
-	ARCOMPACT_HANDLER04_TYPE(name); \
-
+	ARCOMPACT_HANDLER04_TYPE(name);
 
 class arcompact_device : public cpu_device
 {
@@ -146,53 +143,53 @@ protected:
 	ARCOMPACT_RETTYPE arcompact_handle01_01_01_0f(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle02(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle03(OPS_32);
-//	ARCOMPACT_RETTYPE arcompact_handle04_00(OPS_32);
+//  ARCOMPACT_RETTYPE arcompact_handle04_00(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_01(OPS_32);
-//	ARCOMPACT_RETTYPE arcompact_handle04_02(OPS_32);
+//  ARCOMPACT_RETTYPE arcompact_handle04_02(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_03(OPS_32);
-//	ARCOMPACT_RETTYPE arcompact_handle04_04(OPS_32);
-//	ARCOMPACT_RETTYPE arcompact_handle04_05(OPS_32);
-//	ARCOMPACT_RETTYPE arcompact_handle04_06(OPS_32);
-//	ARCOMPACT_RETTYPE arcompact_handle04_07(OPS_32);
+//  ARCOMPACT_RETTYPE arcompact_handle04_04(OPS_32);
+//  ARCOMPACT_RETTYPE arcompact_handle04_05(OPS_32);
+//  ARCOMPACT_RETTYPE arcompact_handle04_06(OPS_32);
+//  ARCOMPACT_RETTYPE arcompact_handle04_07(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_08(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_09(OPS_32);
-//	ARCOMPACT_RETTYPE arcompact_handle04_0a(OPS_32);
+//  ARCOMPACT_RETTYPE arcompact_handle04_0a(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_0b(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_0c(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_0d(OPS_32);
-//	ARCOMPACT_RETTYPE arcompact_handle04_0e(OPS_32);
-//	ARCOMPACT_RETTYPE arcompact_handle04_0f(OPS_32);
+//  ARCOMPACT_RETTYPE arcompact_handle04_0e(OPS_32);
+//  ARCOMPACT_RETTYPE arcompact_handle04_0f(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_10(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_11(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_12(OPS_32);
-//	ARCOMPACT_RETTYPE arcompact_handle04_13(OPS_32);
-//	ARCOMPACT_RETTYPE arcompact_handle04_14(OPS_32);
-//	ARCOMPACT_RETTYPE arcompact_handle04_15(OPS_32);
-//	ARCOMPACT_RETTYPE arcompact_handle04_16(OPS_32);
-//	ARCOMPACT_RETTYPE arcompact_handle04_17(OPS_32);
-//	ARCOMPACT_RETTYPE arcompact_handle04_18(OPS_32);
-//	ARCOMPACT_RETTYPE arcompact_handle04_19(OPS_32);
+//  ARCOMPACT_RETTYPE arcompact_handle04_13(OPS_32);
+//  ARCOMPACT_RETTYPE arcompact_handle04_14(OPS_32);
+//  ARCOMPACT_RETTYPE arcompact_handle04_15(OPS_32);
+//  ARCOMPACT_RETTYPE arcompact_handle04_16(OPS_32);
+//  ARCOMPACT_RETTYPE arcompact_handle04_17(OPS_32);
+//  ARCOMPACT_RETTYPE arcompact_handle04_18(OPS_32);
+//  ARCOMPACT_RETTYPE arcompact_handle04_19(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_1a(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_1b(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_1c(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_1d(OPS_32);
-//	ARCOMPACT_RETTYPE arcompact_handle04_20(OPS_32);
+//  ARCOMPACT_RETTYPE arcompact_handle04_20(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_21(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_22(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_23(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_28(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_29(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2a(OPS_32);
-//	ARCOMPACT_RETTYPE arcompact_handle04_2b(OPS_32);
+//  ARCOMPACT_RETTYPE arcompact_handle04_2b(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_00(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_01(OPS_32);
-//	ARCOMPACT_RETTYPE arcompact_handle04_2f_02(OPS_32);
+//  ARCOMPACT_RETTYPE arcompact_handle04_2f_02(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_03(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_04(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_05(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_06(OPS_32);
-//	ARCOMPACT_RETTYPE arcompact_handle04_2f_07(OPS_32);
-//	ARCOMPACT_RETTYPE arcompact_handle04_2f_08(OPS_32);
+//  ARCOMPACT_RETTYPE arcompact_handle04_2f_07(OPS_32);
+//  ARCOMPACT_RETTYPE arcompact_handle04_2f_08(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_09(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_0a(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_0b(OPS_32);
@@ -779,9 +776,9 @@ protected:
 	ARCOMPACT_HANDLER04_TYPE_PM(04_14);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_15);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_16);
-	ARCOMPACT_HANDLER04_TYPE_PM(04_17);	
+	ARCOMPACT_HANDLER04_TYPE_PM(04_17);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_18);
-	ARCOMPACT_HANDLER04_TYPE_PM(04_19);	
+	ARCOMPACT_HANDLER04_TYPE_PM(04_19);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_20);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_2b);
 
@@ -811,10 +808,10 @@ private:
 	inline  UINT32 READ32(UINT32 address) { return m_program->read_dword(address << 2); }
 	inline void WRITE32(UINT32 address, UINT32 data) { m_program->write_dword(address << 2, data); }
 	inline UINT16 READ16(UINT32 address) { return m_program->read_word(address << 1); }
-	inline void WRITE16(UINT32 address, UINT16 data){ 	m_program->write_word(address << 1, data); }
+	inline void WRITE16(UINT32 address, UINT16 data){   m_program->write_word(address << 1, data); }
 	inline UINT8 READ8(UINT32 address) { return m_program->read_byte(address << 0); }
-	inline void WRITE8(UINT32 address, UINT8 data){ 	m_program->write_byte(address << 0, data); }
-	
+	inline void WRITE8(UINT32 address, UINT8 data){     m_program->write_byte(address << 0, data); }
+
 	inline  UINT64 READAUX(UINT64 address) { return m_io->read_dword(address *4); }
 	inline void WRITEAUX(UINT64 address, UINT32 data) { m_io->write_dword(address *4, data); }
 
@@ -827,7 +824,7 @@ private:
 	int m_delaylinks;
 	UINT32 m_delayjump;
 
-//	f  e  d  c| b  a  9  8| 7  6  5  4| 3  2  1  0
+//  f  e  d  c| b  a  9  8| 7  6  5  4| 3  2  1  0
 //  -  -  -  L| Z  N  C  V| U DE AE A2|A1 E2 E1  H
 	UINT32 m_status32;
 
@@ -862,7 +859,7 @@ private:
 #define STATUS32_CHECK_Z (m_status32 &   Z_ZERO_FLAG)
 
 // Condition 0x0c (LE)
-#define CONDITION_LE ((STATUS32_CHECK_Z) || (STATUS32_CHECK_N && !STATUS32_CHECK_V) ||  (!STATUS32_CHECK_N && STATUS32_CHECK_V)) // Z or (N and /V) or (/N and V) 
+#define CONDITION_LE ((STATUS32_CHECK_Z) || (STATUS32_CHECK_N && !STATUS32_CHECK_V) ||  (!STATUS32_CHECK_N && STATUS32_CHECK_V)) // Z or (N and /V) or (/N and V)
 #define CONDITION_EQ (STATUS32_CHECK_Z)
 #define CONDITION_CS (STATUS32_CHECK_C)
 #define CONDITION_LT ((STATUS32_CHECK_N && !STATUS32_CHECK_V) || (!STATUS32_CHECK_N && STATUS32_CHECK_V))

@@ -23,11 +23,11 @@ public:
 	QVariant headerData(int section, Qt::Orientation orientation,
 						int role = Qt::DisplayRole) const;
 	QModelIndex index(int row, int column,
-					  const QModelIndex &parent = QModelIndex()) const;
+						const QModelIndex &parent = QModelIndex()) const;
 	QModelIndex parent(const QModelIndex &index) const;
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	int columnCount(const QModelIndex &parent = QModelIndex()) const;
-	
+
 private:
 	running_machine *m_machine;
 };
@@ -44,8 +44,8 @@ public:
 	virtual ~DevicesWindow();
 
 public slots:
-    void currentRowChanged(const QModelIndex &current, const QModelIndex &previous);
-    void activated(const QModelIndex &index);
+	void currentRowChanged(const QModelIndex &current, const QModelIndex &previous);
+	void activated(const QModelIndex &index);
 
 private:
 	QTreeView *m_devices_view;

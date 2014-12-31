@@ -77,7 +77,7 @@ public:
 	template<class _Object> static devcb_base &set_write_r_callback(device_t &device, _Object object) { return downcast<tms1xxx_cpu_device &>(device).m_write_r.set_callback(object); }
 	template<class _Object> static devcb_base &set_power_off_callback(device_t &device, _Object object) { return downcast<tms1xxx_cpu_device &>(device).m_power_off.set_callback(object); }
 	static void set_output_pla(device_t &device, const UINT16 *output_pla) { downcast<tms1xxx_cpu_device &>(device).c_output_pla = output_pla; }
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -184,7 +184,7 @@ protected:
 	devcb_write16 m_write_o;
 	devcb_write16 m_write_r;
 	devcb_write_line m_power_off;
-	
+
 	UINT32 m_o_mask;
 	UINT32 m_r_mask;
 	UINT32 m_k_mask;
@@ -239,7 +239,7 @@ protected:
 	virtual void device_reset();
 
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-	
+
 	virtual void op_setr();
 	virtual void op_rstr();
 };
@@ -263,7 +263,7 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	virtual void write_o_output(UINT8 index);
-	
+
 	virtual void op_setr();
 	virtual void op_tdo();
 };
@@ -284,11 +284,11 @@ protected:
 	virtual UINT32 disasm_min_opcode_bytes() const { return 2; }
 	virtual UINT32 disasm_max_opcode_bytes() const { return 2; }
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-	
+
 	virtual UINT8 read_k_input();
 	virtual void set_cki_bus();
 	virtual void read_opcode();
-	
+
 	virtual void op_comx();
 
 	UINT32 decode_micro(UINT8 sel);
@@ -299,7 +299,7 @@ class tms0270_cpu_device : public tms0980_cpu_device
 {
 public:
 	tms0270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_read_ctl_callback(device_t &device, _Object object) { return downcast<tms0270_cpu_device &>(device).m_read_ctl.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_ctl_callback(device_t &device, _Object object) { return downcast<tms0270_cpu_device &>(device).m_write_ctl.set_callback(object); }
@@ -316,7 +316,7 @@ protected:
 	virtual UINT8 read_k_input();
 	virtual void dynamic_output();
 	virtual void read_opcode();
-	
+
 	virtual void op_setr();
 	virtual void op_rstr();
 	virtual void op_tdo();

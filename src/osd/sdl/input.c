@@ -1941,7 +1941,7 @@ void sdlinput_poll(running_machine &machine)
 			machine.schedule_exit();
 			break;
 		case SDL_VIDEORESIZE:
-		    sdl_window_list->window_resize(event.resize.w, event.resize.h);
+			sdl_window_list->window_resize(event.resize.w, event.resize.h);
 			break;
 #else
 		case SDL_TEXTINPUT:

@@ -3,14 +3,14 @@
 /***************************************************************************
 
   Milton Bradley Simon
-  
+
   Revision A hardware:
   * TMS1000 (has internal ROM), DS75494 lamp driver
-  
+
   Newer revisions have a smaller 16-pin MB4850 chip instead of the TMS1000.
   This one has been decapped too, but we couldn't find an internal ROM.
   It is possibly a cost-reduced custom ASIC specifically for Simon.
-  
+
   Other games assumed to be on similar hardware:
   - Pocket Simon, but there's a chance it only exists with MB4850 chip
   - Super Simon (TMS1100)
@@ -61,7 +61,7 @@ public:
 READ8_MEMBER(simon_state::read_k)
 {
 	UINT8 k = 0;
-	
+
 	// read selected button rows
 	for (int i = 0; i < 4; i++)
 	{
@@ -82,7 +82,7 @@ WRITE16_MEMBER(simon_state::write_r)
 	// R7 -> 75494 IN2 -> blue lamp
 	for (int i = 0; i < 4; i++)
 		output_set_lamp_value(i, data >> (4 + i) & 1);
-	
+
 	// R8 -> 75494 IN0 -> speaker
 	m_speaker->level_w(data >> 8 & 1);
 

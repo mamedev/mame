@@ -348,7 +348,7 @@ luabridge::LuaRef lua_engine::l_machine_get_devices(const running_machine *r)
 	luabridge::LuaRef devs_table = luabridge::LuaRef::newTable(L);
 
 	device_t *root = &(m->root_device());
-    devs_table = devtree_dfs(root, devs_table);
+	devs_table = devtree_dfs(root, devs_table);
 
 	return devs_table;
 }

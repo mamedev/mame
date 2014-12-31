@@ -129,7 +129,7 @@ $(CPUOBJ)/arcompact/arcompact_common.o:  $(CPUSRC)/arcompact/arcompact_common.c 
 $(CPUOBJ)/arcompact/arcompact.inc: $(CPUSRC)/arcompact/arcompact_make.py
 	@echo Generating arcompact source .inc files...
 	$(PYTHON) $(CPUSRC)/arcompact/arcompact_make.py $@
-	
+
 #-------------------------------------------------
 # Acorn ARM series
 #

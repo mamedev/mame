@@ -52,7 +52,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
@@ -74,7 +74,7 @@ public:
 	UINT8 m_color_mask;
 	tilemap_t *m_dambustr_tilemap2;
 	UINT8 *m_dambustr_videoram2;
-	
+
 	void (galaxold_state::*m_modify_charcode)(UINT16 *code, UINT8 x);     /* function to call to do character banking */
 	void (galaxold_state::*m_modify_spritecode)(UINT8 *spriteram, int*, int*, int*, int); /* function to call to do sprite banking */
 	void (galaxold_state::*m_modify_color)(UINT8 *color);   /* function to call to do modify how the color codes map to the PROM */
@@ -147,30 +147,30 @@ public:
 	DECLARE_WRITE8_MEMBER(dambustr_bg_split_line_w);
 	DECLARE_WRITE8_MEMBER(dambustr_bg_color_w);
 	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_2_q_callback);
-	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_1_callback);	
-	
+	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_1_callback);
+
 	DECLARE_CUSTOM_INPUT_MEMBER(_4in1_fake_port_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(vpool_lives_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(dkongjrm_coinage_r);
-	
+
 	DECLARE_DRIVER_INIT(bullsdrtg);
 	DECLARE_DRIVER_INIT(ladybugg);
 	DECLARE_DRIVER_INIT(4in1);
 	DECLARE_DRIVER_INIT(guttangt);
 	DECLARE_DRIVER_INIT(ckonggx);
-	
+
 	TILE_GET_INFO_MEMBER(drivfrcg_get_tile_info);
 	TILE_GET_INFO_MEMBER(racknrol_get_tile_info);
 	TILE_GET_INFO_MEMBER(dambustr_get_tile_info2);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(rockclim_get_tile_info);
 	TILE_GET_INFO_MEMBER(harem_get_tile_info);
-	
+
 	DECLARE_MACHINE_RESET(galaxold);
 	DECLARE_MACHINE_RESET(devilfsg);
 	DECLARE_MACHINE_RESET(hunchbkg);
-	
+
 	DECLARE_PALETTE_INIT(galaxold);
 	DECLARE_PALETTE_INIT(rockclim);
 	DECLARE_PALETTE_INIT(scrambold);
@@ -181,7 +181,7 @@ public:
 	DECLARE_PALETTE_INIT(mariner);
 	DECLARE_PALETTE_INIT(dambustr);
 	DECLARE_PALETTE_INIT(turtles);
-	
+
 	DECLARE_VIDEO_START(galaxold);
 	DECLARE_VIDEO_START(drivfrcg);
 	DECLARE_VIDEO_START(racknrol);
@@ -206,16 +206,16 @@ public:
 	DECLARE_VIDEO_START(dambustr);
 	DECLARE_VIDEO_START(harem);
 	DECLARE_VIDEO_START(bagmanmc);
-	
+
 	UINT32 screen_update_galaxold(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_dambustr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	INTERRUPT_GEN_MEMBER(hunchbks_vh_interrupt);
 	TIMER_CALLBACK_MEMBER(stars_blink_callback);
 	TIMER_CALLBACK_MEMBER(stars_scroll_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(galaxold_interrupt_timer);
 	IRQ_CALLBACK_MEMBER(hunchbkg_irq_callback);
-	
+
 	void state_save_register();
 	void video_start_common();
 	void pisces_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);

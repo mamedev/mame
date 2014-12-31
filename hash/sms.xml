@@ -868,9 +868,9 @@
 	</software>
 
 <!--
-    The labelling of Hi-Com multigame carts is arbitrary. The boxes appears to what was intended as unique product number 
-    but boxes are typically mixed up and patched with stickers added to change game titles (on both boxes and cartridges) 
-    making the product number rather unreliable AND realistically we may never find out the correct numbers. 
+    The labelling of Hi-Com multigame carts is arbitrary. The boxes appears to what was intended as unique product number
+    but boxes are typically mixed up and patched with stickers added to change game titles (on both boxes and cartridges)
+    making the product number rather unreliable AND realistically we may never find out the correct numbers.
 -->
 	<software name="hicom3a">
 		<description>The Best Game Collection - Hang On + Pit Pot + Spy vs Spy (Kor)</description>

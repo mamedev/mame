@@ -106,7 +106,7 @@ WRITE16_MEMBER(relief_state::audio_volume_w)
 
 static ADDRESS_MAP_START( oki_map, AS_0, 8, relief_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("okibank")
-	AM_RANGE(0x20000, 0x3ffff) AM_ROM 
+	AM_RANGE(0x20000, 0x3ffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -431,7 +431,7 @@ DRIVER_INIT_MEMBER(relief_state,relief)
 }
 
 
-		
+
 
 /*************************************
  *

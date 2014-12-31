@@ -20,9 +20,9 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2"),
 		m_dsw_port(*this, "DSW") { }
-		
-		
-	
+
+
+
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audio2;
@@ -32,13 +32,13 @@ public:
 	required_device<tms5220_device> m_tms;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_attributesram;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_spriteram2;
-	
+
 	required_ioport_array<3> m_dsw_port;
 
 	int m_dsw_sel;
@@ -49,7 +49,7 @@ public:
 	int m_toggle;
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_nmi_mask;
-	
+
 	DECLARE_READ8_MEMBER(dsw_r);
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(sound1_command_w);

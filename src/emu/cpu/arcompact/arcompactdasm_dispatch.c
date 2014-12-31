@@ -141,9 +141,9 @@ int arcompact_handle04_dasm(DASM_OPS_32)
 	// 00100 bbb 00 iiiiii F BBB CCCCCC A AAAAA   General Operations *UN*Conditional Register to Register
 	// 00100 bbb 01 iiiiii F BBB UUUUUU A AAAAA   General Operations *UN*Conditional Register (Unsigned 6-bit IMM)
 	// 00100 bbb 10 iiiiii F BBB ssssss S SSSSS   General Operations *UN*Conditional Register (Signed 12-bit IMM)
-	
-	// 00100 bbb 11 iiiiii F BBB CCCCCC 0 QQQQQ   General Operations Conditional Register 
-	// 00100 bbb 11 iiiiii F BBB UUUUUU 1 QQQQQ   General Operations Conditional Register (Unsigned 6-bit IMM) 
+
+	// 00100 bbb 11 iiiiii F BBB CCCCCC 0 QQQQQ   General Operations Conditional Register
+	// 00100 bbb 11 iiiiii F BBB UUUUUU 1 QQQQQ   General Operations Conditional Register (Unsigned 6-bit IMM)
 	UINT8 subinstr = (op & 0x003f0000) >> 16;
 	op &= ~0x003f0000;
 
@@ -304,15 +304,15 @@ int arcompact_handle05_2f_dasm(DASM_OPS_32)
 
 	switch (subinstr2)
 	{
-		case 0x00: size = arcompact_handle05_2f_00_dasm(DASM_PARAMS); break; // SWAP 
-		case 0x01: size = arcompact_handle05_2f_01_dasm(DASM_PARAMS); break; // NORM 
+		case 0x00: size = arcompact_handle05_2f_00_dasm(DASM_PARAMS); break; // SWAP
+		case 0x01: size = arcompact_handle05_2f_01_dasm(DASM_PARAMS); break; // NORM
 		case 0x02: size = arcompact_handle05_2f_02_dasm(DASM_PARAMS); break; // SAT16
-		case 0x03: size = arcompact_handle05_2f_03_dasm(DASM_PARAMS); break; // RND16 
-		case 0x04: size = arcompact_handle05_2f_04_dasm(DASM_PARAMS); break; // ABSSW 
-		case 0x05: size = arcompact_handle05_2f_05_dasm(DASM_PARAMS); break; // ABSS 
-		case 0x06: size = arcompact_handle05_2f_06_dasm(DASM_PARAMS); break; // NEGSW 
-		case 0x07: size = arcompact_handle05_2f_07_dasm(DASM_PARAMS); break; // NEGS 
-		case 0x08: size = arcompact_handle05_2f_08_dasm(DASM_PARAMS); break; // NORMW 
+		case 0x03: size = arcompact_handle05_2f_03_dasm(DASM_PARAMS); break; // RND16
+		case 0x04: size = arcompact_handle05_2f_04_dasm(DASM_PARAMS); break; // ABSSW
+		case 0x05: size = arcompact_handle05_2f_05_dasm(DASM_PARAMS); break; // ABSS
+		case 0x06: size = arcompact_handle05_2f_06_dasm(DASM_PARAMS); break; // NEGSW
+		case 0x07: size = arcompact_handle05_2f_07_dasm(DASM_PARAMS); break; // NEGS
+		case 0x08: size = arcompact_handle05_2f_08_dasm(DASM_PARAMS); break; // NORMW
 		case 0x09: size = arcompact_handle05_2f_09_dasm(DASM_PARAMS); break; // illegal
 		case 0x0a: size = arcompact_handle05_2f_0a_dasm(DASM_PARAMS); break; // illegal
 		case 0x0b: size = arcompact_handle05_2f_0b_dasm(DASM_PARAMS); break; // illegal
@@ -759,13 +759,13 @@ int arcompact_handle17_dasm(DASM_OPS_16)
 
 	switch (subinstr)
 	{
-		case 0x00: size = arcompact_handle17_00_dasm(DASM_PARAMS); break; // ASL_S 
-		case 0x01: size = arcompact_handle17_01_dasm(DASM_PARAMS); break; // LSR_S 
+		case 0x00: size = arcompact_handle17_00_dasm(DASM_PARAMS); break; // ASL_S
+		case 0x01: size = arcompact_handle17_01_dasm(DASM_PARAMS); break; // LSR_S
 		case 0x02: size = arcompact_handle17_02_dasm(DASM_PARAMS); break; // ASR_S
-		case 0x03: size = arcompact_handle17_03_dasm(DASM_PARAMS); break; // SUB_S 
-		case 0x04: size = arcompact_handle17_04_dasm(DASM_PARAMS); break; // BSET_S 
-		case 0x05: size = arcompact_handle17_05_dasm(DASM_PARAMS); break; // BCLR_S 
-		case 0x06: size = arcompact_handle17_06_dasm(DASM_PARAMS); break; // BMSK_S 
+		case 0x03: size = arcompact_handle17_03_dasm(DASM_PARAMS); break; // SUB_S
+		case 0x04: size = arcompact_handle17_04_dasm(DASM_PARAMS); break; // BSET_S
+		case 0x05: size = arcompact_handle17_05_dasm(DASM_PARAMS); break; // BCLR_S
+		case 0x06: size = arcompact_handle17_06_dasm(DASM_PARAMS); break; // BMSK_S
 		case 0x07: size = arcompact_handle17_07_dasm(DASM_PARAMS); break; // BTST_S
 	}
 
@@ -795,7 +795,7 @@ int arcompact_handle18_dasm(DASM_OPS_16)
 	return size;
 }
 
-int arcompact_handle18_05_dasm(DASM_OPS_16) 
+int arcompact_handle18_05_dasm(DASM_OPS_16)
 {
 	int size = 2;
 	UINT8 subinstr2 = (op & 0x0700) >> 8;
@@ -805,7 +805,7 @@ int arcompact_handle18_05_dasm(DASM_OPS_16)
 	{
 		case 0x00: size = arcompact_handle18_05_00_dasm(DASM_PARAMS); break; // ADD_S (SP)
 		case 0x01: size = arcompact_handle18_05_01_dasm(DASM_PARAMS); break; // SUB_S (SP)
-		case 0x02: size = arcompact_handle18_05_02_dasm(DASM_PARAMS); break; // <illegal 0x18_05_02> 
+		case 0x02: size = arcompact_handle18_05_02_dasm(DASM_PARAMS); break; // <illegal 0x18_05_02>
 		case 0x03: size = arcompact_handle18_05_03_dasm(DASM_PARAMS); break; // <illegal 0x18_05_03>
 		case 0x04: size = arcompact_handle18_05_04_dasm(DASM_PARAMS); break; // <illegal 0x18_05_04>
 		case 0x05: size = arcompact_handle18_05_05_dasm(DASM_PARAMS); break; // <illegal 0x18_05_05>
@@ -816,7 +816,7 @@ int arcompact_handle18_05_dasm(DASM_OPS_16)
 	return size;
 }
 
-int arcompact_handle18_06_dasm(DASM_OPS_16) 
+int arcompact_handle18_06_dasm(DASM_OPS_16)
 {
 	int size = 2;
 	UINT8 subinstr2 = (op & 0x001f) >> 0;
@@ -861,7 +861,7 @@ int arcompact_handle18_06_dasm(DASM_OPS_16)
 	return size;
 }
 
-int arcompact_handle18_07_dasm(DASM_OPS_16) 
+int arcompact_handle18_07_dasm(DASM_OPS_16)
 {
 	int size = 2;
 	UINT8 subinstr2 = (op & 0x001f) >> 0;
@@ -968,7 +968,6 @@ int arcompact_handle1e_dasm(DASM_OPS_16)
 
 int arcompact_handle1e_03_dasm(DASM_OPS_16)
 {
-	
 	int size = 2;
 	UINT8 subinstr2 = (op & 0x01c0) >> 6;
 	op &= ~0x01c0;
@@ -976,13 +975,13 @@ int arcompact_handle1e_03_dasm(DASM_OPS_16)
 	switch (subinstr2)
 	{
 		case 0x00: size = arcompact_handle1e_03_00_dasm(DASM_PARAMS); break; // BGT_S
-		case 0x01: size = arcompact_handle1e_03_01_dasm(DASM_PARAMS); break; // BGE_S 
+		case 0x01: size = arcompact_handle1e_03_01_dasm(DASM_PARAMS); break; // BGE_S
 		case 0x02: size = arcompact_handle1e_03_02_dasm(DASM_PARAMS); break; // BLT_S
 		case 0x03: size = arcompact_handle1e_03_03_dasm(DASM_PARAMS); break; // BLE_S
 		case 0x04: size = arcompact_handle1e_03_04_dasm(DASM_PARAMS); break; // BHI_S
 		case 0x05: size = arcompact_handle1e_03_05_dasm(DASM_PARAMS); break; // BHS_S
 		case 0x06: size = arcompact_handle1e_03_06_dasm(DASM_PARAMS); break; // BLO_S
-		case 0x07: size = arcompact_handle1e_03_07_dasm(DASM_PARAMS); break; // BLS_S 
+		case 0x07: size = arcompact_handle1e_03_07_dasm(DASM_PARAMS); break; // BLS_S
 	}
 	return size;
 

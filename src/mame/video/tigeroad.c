@@ -122,4 +122,3 @@ UINT32 tigeroad_state::screen_update_tigeroad(screen_device &screen, bitmap_ind1
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
 	return 0;
 }
-

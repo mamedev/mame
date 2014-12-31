@@ -383,14 +383,14 @@ UINT32 dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_ind1
 
 READ32_MEMBER(dreamwld_state::dreamwld_protdata_r)
 {
-//	static int count = 0;
+//  static int count = 0;
 
 	UINT8 *protdata = memregion("user1")->base();
 	size_t protsize = memregion("user1")->bytes();
 	UINT8 dat = protdata[(m_protindex++) % protsize];
 
-//	printf("protection read %04x %02x\n", count, dat);
-//	count++;
+//  printf("protection read %04x %02x\n", count, dat);
+//  count++;
 
 	// real hw returns 00 after end of data, I haven't checked if it's possible to overflow the read counter
 	// and read out the internal rom.
@@ -614,39 +614,39 @@ static INPUT_PORTS_START( cutefght )
 	PORT_START("DSW")
 	PORT_DIPUNUSED_DIPLOC( 0x0001, IP_ACTIVE_LOW, "SW2:1" ) /* As listed in service mode, but tested */
 	PORT_DIPUNUSED_DIPLOC( 0x0002, IP_ACTIVE_LOW, "SW2:2" ) /* These might have some use, requires investigation of code */
-    PORT_DIPUNUSED_DIPLOC( 0x0004, IP_ACTIVE_LOW, "SW2:3" )
-    PORT_DIPUNUSED_DIPLOC( 0x0008, IP_ACTIVE_LOW, "SW2:4" )
-    PORT_DIPUNUSED_DIPLOC( 0x0010, IP_ACTIVE_LOW, "SW2:5" )
-    PORT_DIPNAME( 0x0060, 0x0060, "Ticket Payout" )         PORT_DIPLOCATION("SW2:6,7")
-    PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
-    PORT_DIPSETTING(      0x0020, "Little" )
-    PORT_DIPSETTING(      0x0060, DEF_STR( Normal ) )
-    PORT_DIPSETTING(      0x0040, "Much" )
-    PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("SW2:8")
-    PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:1") /* Has no effect?? */
-    PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0e00, 0x0e00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:2,3,4")
-    PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
-    PORT_DIPSETTING(      0x0200, DEF_STR( 4C_1C ) )
-    PORT_DIPSETTING(      0x0400, DEF_STR( 3C_1C ) )
-    PORT_DIPSETTING(      0x0600, DEF_STR( 2C_1C ) )
-    PORT_DIPSETTING(      0x0e00, DEF_STR( 1C_1C ) )
-    PORT_DIPSETTING(      0x0a00, DEF_STR( 2C_3C ) )
-    PORT_DIPSETTING(      0x0c00, DEF_STR( 1C_2C ) )
-    PORT_DIPSETTING(      0x0800, DEF_STR( 1C_3C ) )
-    PORT_DIPNAME( 0x7000, 0x7000, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:5,6,7")
-    PORT_DIPSETTING(      0x2000, "Level 1" )
-    PORT_DIPSETTING(      0x1000, "Level 2" )
-    PORT_DIPSETTING(      0x0000, "Level 3" )
-    PORT_DIPSETTING(      0x7000, "Level 4" )
-    PORT_DIPSETTING(      0x6000, "Level 5" )
-    PORT_DIPSETTING(      0x5000, "Level 6" )
-    PORT_DIPSETTING(      0x4000, "Level 7" )
-    PORT_DIPSETTING(      0x3000, "Level 8" )
-    PORT_SERVICE_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW1:8" )
+	PORT_DIPUNUSED_DIPLOC( 0x0004, IP_ACTIVE_LOW, "SW2:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x0008, IP_ACTIVE_LOW, "SW2:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x0010, IP_ACTIVE_LOW, "SW2:5" )
+	PORT_DIPNAME( 0x0060, 0x0060, "Ticket Payout" )         PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0020, "Little" )
+	PORT_DIPSETTING(      0x0060, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0040, "Much" )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:1") /* Has no effect?? */
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0e00, 0x0e00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:2,3,4")
+	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0600, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0e00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0a00, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x0c00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x7000, 0x7000, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:5,6,7")
+	PORT_DIPSETTING(      0x2000, "Level 1" )
+	PORT_DIPSETTING(      0x1000, "Level 2" )
+	PORT_DIPSETTING(      0x0000, "Level 3" )
+	PORT_DIPSETTING(      0x7000, "Level 4" )
+	PORT_DIPSETTING(      0x6000, "Level 5" )
+	PORT_DIPSETTING(      0x5000, "Level 6" )
+	PORT_DIPSETTING(      0x4000, "Level 7" )
+	PORT_DIPSETTING(      0x3000, "Level 8" )
+	PORT_SERVICE_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW1:8" )
 INPUT_PORTS_END
 
 
@@ -1073,5 +1073,5 @@ ROM_END
 GAME( 1997, baryon,   0,      baryon,   baryon,   driver_device, 0, ROT270, "SemiCom",         "Baryon - Future Assault (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1997, baryona,  baryon, baryon,   baryon,   driver_device, 0, ROT270, "SemiCom",         "Baryon - Future Assault (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1998, cutefght, 0,      dreamwld, cutefght, driver_device, 0, ROT0,   "SemiCom",         "Cute Fighter", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // wrong linescroll?
-GAME( 1999, rolcrush, 0,      baryon,   rolcrush, driver_device, 0, ROT0,   "Trust / SemiCom", "Rolling Crush (version 1.07.E - 1999/02/11)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // wrong 
+GAME( 1999, rolcrush, 0,      baryon,   rolcrush, driver_device, 0, ROT0,   "Trust / SemiCom", "Rolling Crush (version 1.07.E - 1999/02/11)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) // wrong
 GAME( 2000, dreamwld, 0,      dreamwld, dreamwld, driver_device, 0, ROT0,   "SemiCom",         "Dream World", GAME_SUPPORTS_SAVE )

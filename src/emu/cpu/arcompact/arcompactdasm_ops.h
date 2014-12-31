@@ -15,8 +15,7 @@
 
 #define GET_LIMM_32 \
 	limm = oprom[6] | (oprom[7] << 8); \
-	limm |= (oprom[4] << 16) | (oprom[5] << 24); \
-
+	limm |= (oprom[4] << 16) | (oprom[5] << 24);
 
 int arcompact_handle00_00_dasm(DASM_OPS_32);
 int arcompact_handle00_01_dasm(DASM_OPS_32);
@@ -367,7 +366,7 @@ int arcompact_handle04_2f_3f_3a_dasm(DASM_OPS_32);
 int arcompact_handle04_2f_3f_3b_dasm(DASM_OPS_32);
 int arcompact_handle04_2f_3f_3c_dasm(DASM_OPS_32);
 int arcompact_handle04_2f_3f_3d_dasm(DASM_OPS_32);
-int arcompact_handle04_2f_3f_3e_dasm(DASM_OPS_32); 
+int arcompact_handle04_2f_3f_3e_dasm(DASM_OPS_32);
 int arcompact_handle04_2f_3f_3f_dasm(DASM_OPS_32);
 
 int arcompact_handle05_2f_00_dasm(DASM_OPS_32);
@@ -632,7 +631,7 @@ int arcompact_handle18_07_15_dasm(DASM_OPS_16);
 int arcompact_handle18_07_16_dasm(DASM_OPS_16);
 int arcompact_handle18_07_17_dasm(DASM_OPS_16);
 int arcompact_handle18_07_18_dasm(DASM_OPS_16);
-int arcompact_handle18_07_19_dasm(DASM_OPS_16); 
+int arcompact_handle18_07_19_dasm(DASM_OPS_16);
 int arcompact_handle18_07_1a_dasm(DASM_OPS_16);
 int arcompact_handle18_07_1b_dasm(DASM_OPS_16);
 int arcompact_handle18_07_1c_dasm(DASM_OPS_16);

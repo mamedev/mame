@@ -46,7 +46,7 @@ stepper_device::stepper_device(const machine_config &mconfig, const char *tag, d
 		m_optic_cb(*this)
 	{
 		m_max_steps=(48*2);
-	}	
+	}
 ///////////////////////////////////////////////////////////////////////////
 
 void stepper_device::update_optic()

@@ -125,7 +125,7 @@ void zac2650_state::video_start()
 
 	m_gfxdecode->gfx(1)->set_source(m_s2636_0_ram);
 	m_gfxdecode->gfx(2)->set_source(m_s2636_0_ram);
-	
+
 	save_item(NAME(m_bitmap));
 	save_item(NAME(m_spritebitmap));
 	save_item(NAME(m_CollisionBackground));

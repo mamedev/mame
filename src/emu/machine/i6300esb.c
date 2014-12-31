@@ -83,12 +83,12 @@ DEVICE_ADDRESS_MAP_START(internal_io_map, 32, i6300esb_lpc_device)
 	AM_RANGE(0x00ec, 0x00ef) AM_WRITE8(                           nop_w,             0x0000ff00) // Non-existing, used for delays by the bios/os
 ADDRESS_MAP_END
 
-	
+
 i6300esb_lpc_device::i6300esb_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pci_device(mconfig, I6300ESB_LPC, "i6300ESB southbridge ISA/LPC bridge", tag, owner, clock, "i6300esb_lpc", __FILE__),
-	  acpi(*this, "acpi"),
-	  rtc (*this, "rtc"),
-	  pit (*this, "pit")
+		acpi(*this, "acpi"),
+		rtc (*this, "rtc"),
+		pit (*this, "pit")
 {
 }
 

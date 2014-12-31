@@ -1056,7 +1056,7 @@ READ8_MEMBER( tms5110_device::ctl_r )
 	else if (m_state == CTL_STATE_OUTPUT)
 	{
 		if (DEBUG_5110) logerror("Status read while outputting buffer (buffer=%2d)\n", m_CTL_buffer);
-		return (m_CTL_buffer); 
+		return (m_CTL_buffer);
 	}
 	else // we're reading with the bus in input mode! just return the last thing written to the bus
 	{
@@ -1150,8 +1150,8 @@ void tms5110_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 /******************************************************************************
 
      tms5110_set_frequency -- adjusts the playback frequency
-	 TODO: kill this function; we should be adjusting the tms51xx device clock itself,
-	 not setting it here!
+     TODO: kill this function; we should be adjusting the tms51xx device clock itself,
+     not setting it here!
 
 ******************************************************************************/
 

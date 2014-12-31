@@ -3613,7 +3613,7 @@ static MACHINE_CONFIG_START( scorpion2, bfm_sc2_state )
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_sc2_vfd)
-	
+
 	MCFG_DEVICE_ADD("reel0", STEPPER, 0)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel0_optic_cb))
 	MCFG_DEVICE_ADD("reel1", STEPPER, 0)
@@ -3621,7 +3621,7 @@ static MACHINE_CONFIG_START( scorpion2, bfm_sc2_state )
 	MCFG_DEVICE_ADD("reel2", STEPPER, 0)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel2_optic_cb))
 	MCFG_DEVICE_ADD("reel3", STEPPER, 0)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel3_optic_cb))	
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel3_optic_cb))
 	MCFG_DEVICE_ADD("reel4", STEPPER, 0)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel4_optic_cb))
 	MCFG_DEVICE_ADD("reel5", STEPPER, 0)
@@ -3663,7 +3663,7 @@ static MACHINE_CONFIG_START( scorpion2_dm01, bfm_sc2_state )
 	MCFG_CPU_ADD("matrix", M6809, 2000000 )             /* matrix board 6809 CPU at 2 Mhz ?? I don't know the exact freq.*/
 	MCFG_CPU_PROGRAM_MAP(bfm_dm01_memmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_sc2_state, nmi_line_assert, 1500 )          /* generate 1500 NMI's per second ?? what is the exact freq?? */
-	
+
 	MCFG_DEVICE_ADD("reel0", STEPPER, 0)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel0_optic_cb))
 	MCFG_DEVICE_ADD("reel1", STEPPER, 0)
@@ -3671,7 +3671,7 @@ static MACHINE_CONFIG_START( scorpion2_dm01, bfm_sc2_state )
 	MCFG_DEVICE_ADD("reel2", STEPPER, 0)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel2_optic_cb))
 	MCFG_DEVICE_ADD("reel3", STEPPER, 0)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel3_optic_cb))	
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel3_optic_cb))
 	MCFG_DEVICE_ADD("reel4", STEPPER, 0)
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_state, reel4_optic_cb))
 	MCFG_DEVICE_ADD("reel5", STEPPER, 0)

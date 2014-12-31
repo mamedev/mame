@@ -1302,7 +1302,7 @@ $(MESSOBJ)/hp.a:                \
 	$(MESS_DRIVERS)/hp49gp.o    \
 	$(MESS_DRIVERS)/hp9845.o    \
 	$(MESS_DRIVERS)/hp9k.o      \
-	$(MESS_DRIVERS)/hp9k_3xx.o	\
+	$(MESS_DRIVERS)/hp9k_3xx.o  \
 
 
 $(MESSOBJ)/hec2hrp.a:           \

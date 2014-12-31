@@ -99,7 +99,6 @@ void arc_device::device_reset()
 
 void arc_device::execute_set_input(int irqline, int state)
 {
-
 }
 
 

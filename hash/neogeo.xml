@@ -438,7 +438,7 @@
 			<dataarea name="mcu" size="0x2000">
 				<!-- Hitachi HD6301V1 MCU -->
 				<rom offset="0x000000" size="0x02000" name="rhcom.bin" crc="e5cd6306" sha1="f6bbb8ae562804d67e137290c765c3589fa334c0" />
-        <!-- dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally) -->
+		<!-- dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally) -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="006-s1.s1" crc="eb5189f0" sha1="0239c342ea62e73140a2306052f226226461a478" />
@@ -491,7 +491,7 @@
 			<dataarea name="mcu" size="0x2000">
 				<!-- Hitachi HD6301V1 MCU -->
 				<rom offset="0x000000" size="0x02000" name="rhcom.bin" crc="e5cd6306" sha1="f6bbb8ae562804d67e137290c765c3589fa334c0" />
-        <!-- dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally) -->
+		<!-- dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally) -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="006-s1.s1" crc="eb5189f0" sha1="0239c342ea62e73140a2306052f226226461a478" />

@@ -3,15 +3,15 @@
 /***************************************************************************
 
   TMS1100NLL MP3403 DBS 7836 SINGAPORE some game board with 7-segs.
-  
+
   What old electronic game is this?
-  
+
   some clues:
   - it's from 1978
   - Merlin is MP3404, Amaze-A-Tron is MP3405, this one is MP3403
   - it plays some short jingles (you need to be lucky with button mashing),
     jingles feel like maybe a horse racing game
-  
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -42,9 +42,9 @@ public:
 	DECLARE_READ8_MEMBER(read_k);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_WRITE16_MEMBER(write_r);
-	
+
 	void leds_update();
-	
+
 	virtual void machine_start();
 };
 
@@ -73,7 +73,7 @@ void unk3403_state::leds_update()
 		sprintf(dig, "\n  %X   %c   %02X",i, (m_r >> i & 1) ? 'X' : '_', leds[i]);
 		strcat(msg, dig);
 	}
-	
+
 	popmessage("%s", msg);
 }
 
@@ -87,7 +87,7 @@ READ8_MEMBER(unk3403_state::read_k)
 		if (m_r >> (i + 4) & 1)
 			k |= m_button_matrix[i]->read();
 	}
-	
+
 	return k;
 }
 
@@ -97,7 +97,7 @@ WRITE16_MEMBER(unk3403_state::write_r)
 	// R10: maybe a switch or other button row?
 	// R9: speaker out
 	m_speaker->level_w(data >> 9 & 1);
-	
+
 	// others: ?
 	m_r = data;
 	leds_update();
@@ -156,7 +156,7 @@ void unk3403_state::machine_start()
 {
 	m_r = 0;
 	m_o = 0;
-	
+
 	save_item(NAME(m_r));
 	save_item(NAME(m_o));
 }

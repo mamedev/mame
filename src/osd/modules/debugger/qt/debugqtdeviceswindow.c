@@ -14,8 +14,8 @@ DevicesWindowModel::~DevicesWindowModel()
 
 QVariant DevicesWindowModel::data(const QModelIndex &index, int role) const
 {
-    if(!index.isValid() || role != Qt::DisplayRole)
-        return QVariant();
+	if(!index.isValid() || role != Qt::DisplayRole)
+		return QVariant();
 
 	device_t *dev = static_cast<device_t *>(index.internalPointer());
 	switch(index.column()) {
@@ -43,8 +43,8 @@ QVariant DevicesWindowModel::headerData(int section, Qt::Orientation orientation
 
 QModelIndex DevicesWindowModel::index(int row, int column, const QModelIndex &parent) const
 {
-    if(!hasIndex(row, column, parent))
-        return QModelIndex();
+	if(!hasIndex(row, column, parent))
+		return QModelIndex();
 
 	device_t *target = NULL;
 
@@ -67,10 +67,10 @@ QModelIndex DevicesWindowModel::index(int row, int column, const QModelIndex &pa
 
 QModelIndex DevicesWindowModel::parent(const QModelIndex &index) const
 {
-    if(!index.isValid())
-        return QModelIndex();
+	if(!index.isValid())
+		return QModelIndex();
 
-    device_t *dchild = static_cast<device_t *>(index.internalPointer());
+	device_t *dchild = static_cast<device_t *>(index.internalPointer());
 	device_t *dparent = dchild->owner();
 
 	if(!dparent)
@@ -82,14 +82,14 @@ QModelIndex DevicesWindowModel::parent(const QModelIndex &index) const
 		for(device_t *child = dpp->first_subdevice(); child && child != dparent; child = child->next())
 			row++;
 	}
-    return createIndex(row, 0, dparent);
+	return createIndex(row, 0, dparent);
 }
 
 int DevicesWindowModel::rowCount(const QModelIndex &parent) const
 {
 	if(!parent.isValid())
 		return 1;
-	
+
 	device_t *dparent = static_cast<device_t *>(parent.internalPointer());
 	int count = 0;
 	for(device_t *child = dparent->first_subdevice(); child; child = child->next())
@@ -157,14 +157,14 @@ void DevicesWindow::activated(const QModelIndex &index)
 void DevicesWindowQtConfig::buildFromQWidget(QWidget* widget)
 {
 	WindowQtConfig::buildFromQWidget(widget);
-	//	DevicesWindow* window = dynamic_cast<DevicesWindow*>(widget);
+	//  DevicesWindow* window = dynamic_cast<DevicesWindow*>(widget);
 }
 
 
 void DevicesWindowQtConfig::applyToQWidget(QWidget* widget)
 {
 	WindowQtConfig::applyToQWidget(widget);
-	//	DevicesWindow* window = dynamic_cast<DevicesWindow*>(widget);
+	//  DevicesWindow* window = dynamic_cast<DevicesWindow*>(widget);
 }
 
 

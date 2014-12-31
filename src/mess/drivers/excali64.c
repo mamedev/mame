@@ -101,7 +101,7 @@ public:
 	DECLARE_WRITE8_MEMBER(motor_w);
 	DECLARE_MACHINE_RESET(excali64);
 	required_device<palette_device> m_palette;
-	
+
 private:
 	const UINT8 *m_p_chargen;
 	UINT8 *m_p_videoram;
@@ -585,7 +585,7 @@ MC6845_UPDATE_ROW( excali64_state::update_row )
 		}
 		else
 			gfx = m_p_chargen[(chr<<4) | ra]; // normal character
-		
+
 		gfx ^= (x == cursor_x) ? 0xff : 0;
 
 		/* Display a scanline of a character */

@@ -4,7 +4,7 @@
 
   Coleco Amaze-A-Tron
   * TMS1100 MCU, labeled MP3405(die label too)
-  
+
   This is an electronic board game with a selection of 8 maze games,
   most of them for 2 players. A 5x5 playing grid and four markers are
   required to play. Refer to the official manual for more information.
@@ -42,9 +42,9 @@ public:
 	DECLARE_READ8_MEMBER(read_k);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_WRITE16_MEMBER(write_r);
-	
+
 	void leds_update();
-	
+
 	virtual void machine_start();
 };
 
@@ -85,11 +85,11 @@ WRITE16_MEMBER(amaztron_state::write_r)
 	// R6,R7: lamps
 	output_set_lamp_value(0, data >> 6 & 1);
 	output_set_lamp_value(1, data >> 7 & 1);
-	
+
 	// R8,R9: select digit
 	m_r = data;
 	leds_update();
-	
+
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
 }
@@ -166,7 +166,7 @@ void amaztron_state::machine_start()
 {
 	m_r = 0;
 	m_o = 0;
-	
+
 	save_item(NAME(m_r));
 	save_item(NAME(m_o));
 }

@@ -76632,7 +76632,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_hik300" />	<!-- mapper says 217 but it's not gc6in1 either! -->
+			<feature name="slot" value="bmc_hik300" />  <!-- mapper says 217 but it's not gc6in1 either! -->
 			<dataarea name="chr" size="65536">
 				<rom name="500-in-1 (anim splash, no rev, alt mapper)[p1][!].chr" size="65536" crc="25bdd64a" sha1="1f95eaf20fec9058b6917aa47dbdcec4b7a5b87d" offset="00000" status="baddump" />
 			</dataarea>
@@ -76647,7 +76647,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_hik300" />	<!-- mapper says 217 but it's not gc6in1 either! -->
+			<feature name="slot" value="bmc_hik300" />  <!-- mapper says 217 but it's not gc6in1 either! -->
 			<dataarea name="chr" size="65536">
 				<rom name="500-in-1 (static splash, no rev, alt mapper)[p1][!].chr" size="65536" crc="e7dacb8a" sha1="ece1b9c7fd8be955a1df6c8505533b4fac194eeb" offset="00000" status="baddump" />
 			</dataarea>
@@ -77576,7 +77576,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_hik300" />	<!-- mapper says 217 but it's not gc6in1 either! -->
+			<feature name="slot" value="bmc_hik300" />  <!-- mapper says 217 but it's not gc6in1 either! -->
 			<dataarea name="chr" size="65536">
 				<rom name="9999999-in-1 (static splash, no rev, alt mapper)[p1][!].chr" size="65536" crc="25bdd64a" sha1="1f95eaf20fec9058b6917aa47dbdcec4b7a5b87d" offset="00000" status="baddump" />
 			</dataarea>

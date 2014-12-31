@@ -769,7 +769,7 @@ ROM_END
 
 ROM_START( megacdj )
 	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
-	ROM_DEFAULT_BIOS("v100g")	// this seems the only revision where the cursor in CD menu works, allowing to boot games
+	ROM_DEFAULT_BIOS("v100g")   // this seems the only revision where the cursor in CD menu works, allowing to boot games
 	/* Confirmed by ElBarto */
 	ROM_SYSTEM_BIOS(0, "v100s", "v1.00S")
 	ROMX_LOAD( "mpr-14088h.bin", 0x000000,  0x020000, CRC(3773d5aa) SHA1(bbf729a1aaa1667b783749299e1ad932aaf5f253), ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE)
@@ -782,7 +782,7 @@ ROM_START( megacdj )
 	/* Confirmed by ElBarto */
 	ROM_SYSTEM_BIOS(3, "v100o", "v1.00O")
 	ROMX_LOAD( "epr-14088d.bin", 0x000000,  0x020000, CRC(dfa95ee9) SHA1(e13666c76fa0a2e94e2f651b26b0fd625bf55f07), ROM_BIOS(4) | ROM_GROUPWORD | ROM_REVERSE)
-	ROM_SYSTEM_BIOS(4, "v100p", "v1.00P")	// CRC: e2e70bc8 when byteswapped
+	ROM_SYSTEM_BIOS(4, "v100p", "v1.00P")   // CRC: e2e70bc8 when byteswapped
 	ROMX_LOAD( "epr-14088e.bin", 0x000000,  0x020000, CRC(9d2da8f2) SHA1(4846f448160059a7da0215a5df12ca160f26dd69), ROM_BIOS(5) )
 ROM_END
 

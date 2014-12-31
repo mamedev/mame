@@ -19,7 +19,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_s2636_0_ram;
@@ -29,7 +29,7 @@ public:
 	int m_CollisionBackground;
 	int m_CollisionSprite;
 	tilemap_t *m_bg_tilemap;
-	
+
 	DECLARE_WRITE8_MEMBER(tinvader_sound_w);
 	DECLARE_WRITE8_MEMBER(tinvader_videoram_w);
 	DECLARE_READ8_MEMBER(zac_s2636_r);

@@ -409,7 +409,6 @@ void atvtrack_state::machine_reset()
 
 void smashdrv_state::machine_start()
 {
-
 }
 
 void smashdrv_state::machine_reset()
@@ -423,7 +422,7 @@ void smashdrv_state::machine_reset()
 static ADDRESS_MAP_START( atvtrack_main_map, AS_PROGRAM, 64, atvtrack_state )
 	AM_RANGE(0x00000000, 0x000003ff) AM_RAM AM_SHARE("sharedmem")
 	AM_RANGE(0x00020000, 0x00020007) AM_READWRITE(control_r, control_w) // control registers
-//	AM_RANGE(0x00020040, 0x0002007f) // audio DAC buffer
+//  AM_RANGE(0x00020040, 0x0002007f) // audio DAC buffer
 	AM_RANGE(0x14000000, 0x14000007) AM_READWRITE(area2_r, area2_w) // data
 	AM_RANGE(0x14100000, 0x14100007) AM_READWRITE(area3_r, area3_w) // command
 	AM_RANGE(0x14200000, 0x14200007) AM_READWRITE(area4_r, area4_w) // address
@@ -585,9 +584,9 @@ ROM_START( smashdrv )
 	ROM_LOAD("prg.ic23", 0x0000000, 0x0400000, CRC(5cc6d3ac) SHA1(0c8426774212d891796b59c95b8c70f64db5b67a) )
 
 	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD32_WORD("sdra.ic15",	0x00000000,	0x01000000, CRC(cf702287) SHA1(84cd83c339831deff15fe5fcc353e0b596667500) )
-	ROM_LOAD32_WORD("sdrb.ic14",	0x00000002,	0x01000000, CRC(39b76f0e) SHA1(529943b6075925e5f72c6e966796e04b2c33686c) )
-	ROM_LOAD32_WORD("sdrc.ic20",	0x02000000,	0x01000000, CRC(c9021dd7) SHA1(1d08aab433614810af858a0fc5d7f03c7b782237) )
+	ROM_LOAD32_WORD("sdra.ic15",    0x00000000, 0x01000000, CRC(cf702287) SHA1(84cd83c339831deff15fe5fcc353e0b596667500) )
+	ROM_LOAD32_WORD("sdrb.ic14",    0x00000002, 0x01000000, CRC(39b76f0e) SHA1(529943b6075925e5f72c6e966796e04b2c33686c) )
+	ROM_LOAD32_WORD("sdrc.ic20",    0x02000000, 0x01000000, CRC(c9021dd7) SHA1(1d08aab433614810af858a0fc5d7f03c7b782237) )
 	// ic21 unpopulated
 ROM_END
 
