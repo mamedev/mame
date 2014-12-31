@@ -530,7 +530,9 @@ private:
 
 		osd_work_item *     m_osd;              // OSD work item running on this block
 		chd_file_compressor *m_compressor;      // pointer back to the compressor
-		volatile work_status m_status;          // current status of this item
+		// TODO: had to change this to be able to use atomic_* functions on this
+		//volatile work_status m_status;          // current status of this item
+		volatile INT32      m_status;           // current status of this item
 		UINT32              m_hunknum;          // number of the hunk we're working on
 		UINT8 *             m_data;             // pointer to the data we are working on
 		UINT8 *             m_compressed;       // pointer to the compressed data
