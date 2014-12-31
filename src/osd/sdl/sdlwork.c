@@ -412,10 +412,12 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 		osd_work_item *item;
 
 		// first allocate a new work item; try the free list first
+		INT32 lockslot = osd_scalable_lock_acquire(queue->lock);
 		do
 		{
 			item = (osd_work_item *)queue->free;
 		} while (item != NULL && compare_exchange_ptr((PVOID volatile *)&queue->free, item, item->next) != item);
+		osd_scalable_lock_release(queue->lock, lockslot);
 
 		// if nothing, allocate something new
 		if (item == NULL)
@@ -546,11 +548,13 @@ void osd_work_item_release(osd_work_item *item)
 	osd_work_item_wait(item, 100 * osd_ticks_per_second());
 
 	// add us to the free list on our queue
+	INT32 lockslot = osd_scalable_lock_acquire(item->queue->lock);
 	do
 	{
 		next = (osd_work_item *)item->queue->free;
 		item->next = next;
 	} while (compare_exchange_ptr((PVOID volatile *)&item->queue->free, next, item) != next);
+	osd_scalable_lock_release(item->queue->lock, lockslot);
 }
 
 
@@ -602,12 +606,22 @@ static void *worker_thread_entry(void *param)
 	{
 		// block waiting for work or exit
 		// bail on exit, and only wait if there are no pending items in queue
-		if (!queue->exiting && queue->list == NULL)
+		if (queue->exiting)
+			break;
+
 		{
-			begin_timing(thread->waittime);
-			osd_event_wait(thread->wakeevent, INFINITE);
-			end_timing(thread->waittime);
+			INT32 lockslot = osd_scalable_lock_acquire(queue->lock);
+			bool wait_for_event = (queue->list == NULL);
+			osd_scalable_lock_release(queue->lock, lockslot);
+
+			if (wait_for_event)
+			{
+				begin_timing(thread->waittime);
+				osd_event_wait(thread->wakeevent, INFINITE);
+				end_timing(thread->waittime);
+			}
 		}
+
 		if (queue->exiting)
 			break;
 
