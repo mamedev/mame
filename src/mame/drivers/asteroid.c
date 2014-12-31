@@ -237,8 +237,8 @@ WRITE8_MEMBER(asteroid_state::llander_led_w)
 static ADDRESS_MAP_START( asteroid_map, AS_PROGRAM, 8, asteroid_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x02ff) AM_RAMBANK("bank1") AM_SHARE("ram1")
-	AM_RANGE(0x0300, 0x03ff) AM_RAMBANK("bank2") AM_SHARE("ram2")
+	AM_RANGE(0x0200, 0x02ff) AM_RAMBANK("ram1") AM_SHARE("ram1")
+	AM_RANGE(0x0300, 0x03ff) AM_RAMBANK("ram2") AM_SHARE("ram2")
 	AM_RANGE(0x2000, 0x2007) AM_READ(asteroid_IN0_r)    /* IN0 */
 	AM_RANGE(0x2400, 0x2407) AM_READ(asteroid_IN1_r)    /* IN1 */
 	AM_RANGE(0x2800, 0x2803) AM_READ(asteroid_DSW1_r)   /* DSW1 */
@@ -258,8 +258,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( astdelux_map, AS_PROGRAM, 8, asteroid_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x02ff) AM_RAMBANK("bank1") AM_SHARE("ram1")
-	AM_RANGE(0x0300, 0x03ff) AM_RAMBANK("bank2") AM_SHARE("ram2")
+	AM_RANGE(0x0200, 0x02ff) AM_RAMBANK("ram1") AM_SHARE("ram1")
+	AM_RANGE(0x0300, 0x03ff) AM_RAMBANK("ram2") AM_SHARE("ram2")
 	AM_RANGE(0x2000, 0x2007) AM_READ(asteroid_IN0_r)    /* IN0 */
 	AM_RANGE(0x2400, 0x2407) AM_READ(asteroid_IN1_r)    /* IN1 */
 	AM_RANGE(0x2800, 0x2803) AM_READ(asteroid_DSW1_r)   /* DSW1 */
@@ -699,8 +699,6 @@ static MACHINE_CONFIG_DERIVED( llander, asteroid )
 	MCFG_CPU_PROGRAM_MAP(llander_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(asteroid_state, llander_interrupt,  (double)MASTER_CLOCK/4096/12)
 
-	MCFG_MACHINE_RESET_OVERRIDE(asteroid_state, llander)
-
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(CLOCK_3KHZ/12/6)
 	MCFG_SCREEN_VISIBLE_AREA(522, 1566, 270, 1070)
@@ -1013,12 +1011,6 @@ DRIVER_INIT_MEMBER(asteroid_state,asterock)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x2007, read8_delegate(FUNC(asteroid_state::asterock_IN0_r),this));
 }
 
-DRIVER_INIT_MEMBER(asteroid_state,astdelux)
-{
-	save_item(NAME(m_astdelux_bankswitch));
-	machine().save().register_postload(save_prepost_delegate(FUNC(asteroid_state::astdelux_bankswitch_restore), this));
-}
-
 /*************************************
  *
  *  Game drivers
@@ -1036,9 +1028,9 @@ GAME( 1979, meteorts,  asteroid,  asteroid,  asteroid,  driver_device,  0,      
 GAME( 1979, meteorho,  asteroid,  asteroid,  asteroid,  driver_device,  0,         ROT0, "bootleg (Hoei)",        "Meteor (bootleg of Asteroids)",     GAME_SUPPORTS_SAVE )
 GAME( 1979, hyperspc,  asteroid,  asteroid,  asteroid,  driver_device,  0,         ROT0, "bootleg (Rumiano)",     "Hyperspace (bootleg of Asteroids)", GAME_SUPPORTS_SAVE )
 
-GAMEL(1980, astdelux,  0,         astdelux,  astdelux,  asteroid_state, astdelux,  ROT0, "Atari",   "Asteroids Deluxe (rev 3)", GAME_SUPPORTS_SAVE, layout_astdelux )
-GAMEL(1980, astdelux2, astdelux,  astdelux,  astdelux,  asteroid_state, astdelux,  ROT0, "Atari",   "Asteroids Deluxe (rev 2)", GAME_SUPPORTS_SAVE, layout_astdelux )
-GAMEL(1980, astdelux1, astdelux,  astdelux,  astdelux,  asteroid_state, astdelux,  ROT0, "Atari",   "Asteroids Deluxe (rev 1)", GAME_SUPPORTS_SAVE, layout_astdelux )
+GAMEL(1980, astdelux,  0,         astdelux,  astdelux,  driver_device,  0,         ROT0, "Atari",   "Asteroids Deluxe (rev 3)", GAME_SUPPORTS_SAVE, layout_astdelux )
+GAMEL(1980, astdelux2, astdelux,  astdelux,  astdelux,  driver_device,  0,         ROT0, "Atari",   "Asteroids Deluxe (rev 2)", GAME_SUPPORTS_SAVE, layout_astdelux )
+GAMEL(1980, astdelux1, astdelux,  astdelux,  astdelux,  driver_device,  0,         ROT0, "Atari",   "Asteroids Deluxe (rev 1)", GAME_SUPPORTS_SAVE, layout_astdelux )
 
 GAME( 1979, llander,   0,         llander,   llander,   driver_device,  0,         ROT0, "Atari",   "Lunar Lander (rev 2)",     GAME_SUPPORTS_SAVE )
 GAME( 1979, llander1,  llander,   llander,   llander1,  driver_device,  0,         ROT0, "Atari",   "Lunar Lander (rev 1)",     GAME_SUPPORTS_SAVE )
