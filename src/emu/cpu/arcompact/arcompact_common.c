@@ -4,7 +4,7 @@
 
 \*********************************/
 
-// condition codes (basic ones are the same as arc 
+// condition codes (basic ones are the same as arc
 const char *conditions[0x20] =
 {
 	/* 00 */ "AL", // (aka RA         - Always)
@@ -13,7 +13,7 @@ const char *conditions[0x20] =
 	/* 03 */ "PL", // (aka P          - Positive)
 	/* 04 */ "MI", // (aka N          - Negative)
 	/* 05 */ "CS", // (aka C,  LO     - Carry set / Lower than) (unsigned)
-	/* 06 */ "CC", // (aka CC, NC, HS - Carry Clear / Higher or Same) (unsigned) 
+	/* 06 */ "CC", // (aka CC, NC, HS - Carry Clear / Higher or Same) (unsigned)
 	/* 07 */ "VS", // (aka V          - Overflow set)
 	/* 08 */ "VC", // (aka NV         - Overflow clear)
 	/* 09 */ "GT", // (               - Greater than) (signed)
@@ -44,7 +44,7 @@ const char *conditions[0x20] =
 #define UNUSED_REG "unusedreg"
 
 #define AUX_UNUSED_16 \
-	/* 0xxx0 */ UNUSED_REG,	/* 0xxx1 */ UNUSED_REG,	/* 0xxx2 */ UNUSED_REG,	/* 0xxx3 */ UNUSED_REG,	/* 0xxx4 */ UNUSED_REG,	/* 0xxx5 */ UNUSED_REG,	/* 0xxx6 */ UNUSED_REG,	/* 0xxx7 */ UNUSED_REG,	/* 0xxx8 */ UNUSED_REG,	/* 0xxx9 */ UNUSED_REG,	/* 0xxxa */ UNUSED_REG,	/* 0xxxb */ UNUSED_REG,	/* 0xxxc */ UNUSED_REG,	/* 0xxxd */ UNUSED_REG,	/* 0xxxe */ UNUSED_REG,	/* 0xxxf */ UNUSED_REG,
+	/* 0xxx0 */ UNUSED_REG, /* 0xxx1 */ UNUSED_REG, /* 0xxx2 */ UNUSED_REG, /* 0xxx3 */ UNUSED_REG, /* 0xxx4 */ UNUSED_REG, /* 0xxx5 */ UNUSED_REG, /* 0xxx6 */ UNUSED_REG, /* 0xxx7 */ UNUSED_REG, /* 0xxx8 */ UNUSED_REG, /* 0xxx9 */ UNUSED_REG, /* 0xxxa */ UNUSED_REG, /* 0xxxb */ UNUSED_REG, /* 0xxxc */ UNUSED_REG, /* 0xxxd */ UNUSED_REG, /* 0xxxe */ UNUSED_REG, /* 0xxxf */ UNUSED_REG,
 
 // the Auxiliary Register set is actually a 2^32 dword address space (so 16 GB / 34-bit)
 // this table just allows us to improve the debugger display for some of the common core / internal ones
@@ -125,7 +125,7 @@ const char *auxregnames[0x420] =
 	AUX_UNUSED_16 /* 0x090 - 0x09f */
 	AUX_UNUSED_16 /* 0x0a0 - 0x0af */
 	AUX_UNUSED_16 /* 0x0b0 - 0x0bf */
-	 // build configuration registers 0x0c0 - 0x0ff
+		// build configuration registers 0x0c0 - 0x0ff
 	/* 0x0c0 */ "RESERVED AUX 0xc0",/* 0x0c1 */ "RESERVED AUX 0xc1",/* 0x0c2 */ "RESERVED AUX 0xc2",/* 0x0c3 */ "RESERVED AUX 0xc3",/* 0x0c4 */ "RESERVED AUX 0xc4",/* 0x0c5 */ "RESERVED AUX 0xc5",/* 0x0c6 */ "RESERVED AUX 0xc6",/* 0x0c7 */ "RESERVED AUX 0xc7",/* 0x0c8 */ "RESERVED AUX 0xc8",/* 0x0c9 */ "RESERVED AUX 0xc9",/* 0x0ca */ "RESERVED AUX 0xca",/* 0x0cb */ "RESERVED AUX 0xcb",/* 0x0cc */ "RESERVED AUX 0xcc",/* 0x0cd */ "RESERVED AUX 0xcd",/* 0x0ce */ "RESERVED AUX 0xce",/* 0x0cf */ "RESERVED AUX 0xcf",
 	/* 0x0d0 */ "RESERVED AUX 0xd0",/* 0x0d1 */ "RESERVED AUX 0xd1",/* 0x0d2 */ "RESERVED AUX 0xd2",/* 0x0d3 */ "RESERVED AUX 0xd3",/* 0x0d4 */ "RESERVED AUX 0xd4",/* 0x0d5 */ "RESERVED AUX 0xd5",/* 0x0d6 */ "RESERVED AUX 0xd6",/* 0x0d7 */ "RESERVED AUX 0xd7",/* 0x0d8 */ "RESERVED AUX 0xd8",/* 0x0d9 */ "RESERVED AUX 0xd9",/* 0x0da */ "RESERVED AUX 0xda",/* 0x0db */ "RESERVED AUX 0xdb",/* 0x0dc */ "RESERVED AUX 0xdc",/* 0x0dd */ "RESERVED AUX 0xdd",/* 0x0de */ "RESERVED AUX 0xde",/* 0x0df */ "RESERVED AUX 0xdf",
 	/* 0x0e0 */ "RESERVED AUX 0xe0",/* 0x0e1 */ "RESERVED AUX 0xe1",/* 0x0e2 */ "RESERVED AUX 0xe2",/* 0x0e3 */ "RESERVED AUX 0xe3",/* 0x0e4 */ "RESERVED AUX 0xe4",/* 0x0e5 */ "RESERVED AUX 0xe5",/* 0x0e6 */ "RESERVED AUX 0xe6",/* 0x0e7 */ "RESERVED AUX 0xe7",/* 0x0e8 */ "RESERVED AUX 0xe8",/* 0x0e9 */ "RESERVED AUX 0xe9",/* 0x0ea */ "RESERVED AUX 0xea",/* 0x0eb */ "RESERVED AUX 0xeb",/* 0x0ec */ "RESERVED AUX 0xec",/* 0x0ed */ "RESERVED AUX 0xed",/* 0x0ee */ "RESERVED AUX 0xee",/* 0x0ef */ "RESERVED AUX 0xef",
@@ -371,8 +371,8 @@ const char *regnames[0x40] =
 	/* 37 */ "r55(ext)",
 	/* 38 */ "r56(ext)",
 	/* 39 */ "r57(M-LO)",  // MLO  (result registers for optional multply functions)
-	/* 3a */ "r58(M-MID)", // MMID 
-	/* 3b */ "r59(M-HI)",  // MHI 
+	/* 3a */ "r58(M-MID)", // MMID
+	/* 3b */ "r59(M-HI)",  // MHI
 	/* 3c */ "r60(LP_COUNT)",
 	/* 3d */ "r61(reserved)",
 	/* 3e */ "r62(LIMM)", // use Long Immediate Data instead of register
@@ -523,4 +523,3 @@ const char *opcodes_04[0x40] =
 	/* 3e */ "0x3e",
 	/* 3f */ "0x3f",
 };
-

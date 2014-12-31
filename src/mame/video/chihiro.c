@@ -546,7 +546,7 @@ int vertex_program_simulator::step()
 				}
 			}
 			if ((d->OutputWriteMask != 0) && (d->MultiplexerControl == 0)) {
-				//o[1] = 1; 
+				//o[1] = 1;
 				if (d->OutputSelect) { // assign to output
 					int wm = d->OutputWriteMask;
 					for (p1 = 0; p1 < 4; p1++) {
@@ -737,55 +737,55 @@ void vertex_program_simulator::compute_vectorial_operation(float t_out[4], int i
 		t_out[2] = par_in[p1_A + 2] * par_in[p2_B + 2];
 		t_out[3] = par_in[p1_A + 3] * par_in[p2_B + 3];
 		break;
-	case 3: // "ADD" 
+	case 3: // "ADD"
 		t_out[0] = par_in[p1_A + 0] + par_in[p3_C + 0];
 		t_out[1] = par_in[p1_A + 1] + par_in[p3_C + 1];
 		t_out[2] = par_in[p1_A + 2] + par_in[p3_C + 2];
 		t_out[3] = par_in[p1_A + 3] + par_in[p3_C + 3];
 		break;
-	case 4: // "MAD" 
+	case 4: // "MAD"
 		t_out[0] = par_in[p1_A + 0] * par_in[p2_B + 0] + par_in[p3_C + 0];
 		t_out[1] = par_in[p1_A + 1] * par_in[p2_B + 1] + par_in[p3_C + 1];
 		t_out[2] = par_in[p1_A + 2] * par_in[p2_B + 2] + par_in[p3_C + 2];
 		t_out[3] = par_in[p1_A + 3] * par_in[p2_B + 3] + par_in[p3_C + 3];
 		break;
-	case 5: // "DP3" 
+	case 5: // "DP3"
 		t_out[0] = par_in[p1_A + 0] * par_in[p2_B + 0] + par_in[p1_A + 1] * par_in[p2_B + 1] + par_in[p1_A + 2] * par_in[p2_B + 2];
 		t_out[1] = t_out[2] = t_out[3] = t_out[0];
 		break;
-	case 6: // "DPH" 
+	case 6: // "DPH"
 		t_out[0] = par_in[p1_A + 0] * par_in[p2_B + 0] + par_in[p1_A + 1] * par_in[p2_B + 1] + par_in[p1_A + 2] * par_in[p2_B + 2] + par_in[p2_B + 3];
 		t_out[1] = t_out[2] = t_out[3] = t_out[0];
 		break;
-	case 7: // "DP4" 
+	case 7: // "DP4"
 		t_out[0] = par_in[p1_A + 0] * par_in[p2_B + 0] + par_in[p1_A + 1] * par_in[p2_B + 1] + par_in[p1_A + 2] * par_in[p2_B + 2] + par_in[p1_A + 3] * par_in[p2_B + 3];
 		t_out[1] = t_out[2] = t_out[3] = t_out[0];
 		break;
-	case 8: // "DST" 
+	case 8: // "DST"
 		t_out[0] = 1.0;
 		t_out[1] = par_in[p1_A + 1] * par_in[p2_B + 1];
 		t_out[2] = par_in[p1_A + 2];
 		t_out[3] = par_in[p2_B + 3];
 		break;
-	case 9: // "MIN" 
+	case 9: // "MIN"
 		t_out[0] = fmin(par_in[p1_A + 0], par_in[p2_B + 0]);
 		t_out[1] = fmin(par_in[p1_A + 1], par_in[p2_B + 1]);
 		t_out[2] = fmin(par_in[p1_A + 2], par_in[p2_B + 2]);
 		t_out[3] = fmin(par_in[p1_A + 3], par_in[p2_B + 3]);
 		break;
-	case 10: // "MAX" 
+	case 10: // "MAX"
 		t_out[0] = fmax(par_in[p1_A + 0], par_in[p2_B + 0]);
 		t_out[1] = fmax(par_in[p1_A + 1], par_in[p2_B + 1]);
 		t_out[2] = fmax(par_in[p1_A + 2], par_in[p2_B + 2]);
 		t_out[3] = fmax(par_in[p1_A + 3], par_in[p2_B + 3]);
 		break;
-	case 11: // "SLT" 
+	case 11: // "SLT"
 		t_out[0] = (par_in[p1_A + 0] < par_in[p2_B + 0]) ? 1.0 : 0;
 		t_out[1] = (par_in[p1_A + 1] < par_in[p2_B + 1]) ? 1.0 : 0;
 		t_out[2] = (par_in[p1_A + 2] < par_in[p2_B + 2]) ? 1.0 : 0;
 		t_out[3] = (par_in[p1_A + 3] < par_in[p2_B + 3]) ? 1.0 : 0;
 		break;
-	case 12: // "SGE" 
+	case 12: // "SGE"
 		t_out[0] = (par_in[p1_A + 0] >= par_in[p2_B + 0]) ? 1.0 : 0;
 		t_out[1] = (par_in[p1_A + 1] >= par_in[p2_B + 1]) ? 1.0 : 0;
 		t_out[2] = (par_in[p1_A + 2] >= par_in[p2_B + 2]) ? 1.0 : 0;
@@ -817,16 +817,16 @@ void vertex_program_simulator::compute_scalar_operation(float t_out[4], int inst
 		t_out[2] = par_in[p3_C + 2];
 		t_out[3] = par_in[p3_C + 3];
 		break;
-	case 2:	// "RCP" 
+	case 2: // "RCP"
 		t_out[0] = t_out[1] = t_out[2] = t_out[3] = 1.0 / par_in[p3_C + 0];
 		break;
-	case 3:	// "RCC" 
+	case 3: // "RCC"
 		t_out[0] = t_out[1] = t_out[2] = t_out[3] = 1.0 / par_in[p3_C + 0]; // ?
 		break;
-	case 4: // "RSQ" 
+	case 4: // "RSQ"
 		t_out[0] = t_out[1] = t_out[2] = t_out[3] = 1.0 / sqrt(abs(par_in[p3_C + 0]));
 		break;
-	case 5: // "EXP" 
+	case 5: // "EXP"
 		t_out[0] = pow(2, floor(par_in[p3_C + 0]));
 		t_out[1] = par_in[p3_C + 0] - floor(par_in[p3_C + 0]);
 		t.f = pow(2, par_in[p3_C + 0]);
@@ -834,7 +834,7 @@ void vertex_program_simulator::compute_scalar_operation(float t_out[4], int inst
 		t_out[2] = t.f;
 		t_out[3] = 1.0;
 		break;
-	case 6: // "LOG" 
+	case 6: // "LOG"
 		t_out[1] = frexp(par_in[p3_C + 0], &e)*2.0; // frexp gives mantissa as 0.5....1
 		t_out[0] = e - 1;
 		t.f = log2(abs(par_in[p3_C + 0]));
@@ -958,27 +958,27 @@ void nv2a_renderer::geforce_read_dma_object(UINT32 handle, UINT32 &offset, UINT3
 {
 int xx1,yy1,xx2,yy2;
 
-	xx1=x1;
-	xx2=x2;
-	yy1=y1;
-	yy2=y2;
-	if (xx1 == xx2) {
-		if (yy1 > yy2) {
-			int t=yy1;
-			yy1=yy2;
-			yy2=t;
-		}
-		for (int y=yy1;y <= yy2;y++)
-			*((UINT32 *)bmp.raw_pixptr(y,xx1))= -1;
-		} else if (yy1 == yy2) {
-		if (xx1 > xx2) {
-			int t=xx1;
-			xx1=xx2;
-			xx2=t;
-		}
-		for (int x=xx1;x <= xx2;x++)
-			*((UINT32 *)bmp.raw_pixptr(yy1,x))= -1;
-	}
+    xx1=x1;
+    xx2=x2;
+    yy1=y1;
+    yy2=y2;
+    if (xx1 == xx2) {
+        if (yy1 > yy2) {
+            int t=yy1;
+            yy1=yy2;
+            yy2=t;
+        }
+        for (int y=yy1;y <= yy2;y++)
+            *((UINT32 *)bmp.raw_pixptr(y,xx1))= -1;
+        } else if (yy1 == yy2) {
+        if (xx1 > xx2) {
+            int t=xx1;
+            xx1=xx2;
+            xx2=t;
+        }
+        for (int x=xx1;x <= xx2;x++)
+            *((UINT32 *)bmp.raw_pixptr(yy1,x))= -1;
+    }
 }*/
 
 inline UINT32 convert_a4r4g4b4_a8r8g8b8(UINT32 a4r4g4b4)

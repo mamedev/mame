@@ -4,7 +4,7 @@
 
   Parker Brothers Stop Thief
   * TMS0980NLL MP6101B (die labeled 0980B-01A)
-  
+
   Stop Thief is actually a board game, the electronic device emulated here
   (called Electronic Crime Scanner) is an accessory. To start a game, press
   the ON button. Otherwise, it is in test-mode where you can hear all sounds.
@@ -78,30 +78,30 @@ public:
 void stopthief_state::leds_update()
 {
 	UINT16 active_state[0x10];
-	
+
 	for (int i = 0; i < 0x10; i++)
 	{
 		active_state[i] = 0;
-		
+
 		for (int j = 0; j < 0x10; j++)
 		{
 			int di = j << 4 | i;
-			
+
 			// turn on powered leds
 			if (m_leds_state[i] >> j & 1)
 				m_leds_decay[di] = LEDS_DECAY_TIME;
-			
+
 			// determine active state
 			int ds = (m_power_on && m_leds_decay[di] != 0) ? 1 : 0;
 			active_state[i] |= (ds << j);
 		}
 	}
-	
+
 	// on difference, send to output
 	for (int i = 0; i < 0x10; i++)
 		if (m_leds_cache[i] != active_state[i])
 			output_set_digit_value(i, active_state[i]);
-	
+
 	memcpy(m_leds_cache, active_state, sizeof(m_leds_cache));
 }
 
@@ -111,7 +111,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(stopthief_state::leds_decay_tick)
 	for (int i = 0; i < 0x100; i++)
 		if (!(m_leds_state[i & 0xf] >> (i>>4) & 1) && m_leds_decay[i])
 			m_leds_decay[i]--;
-	
+
 	leds_update();
 }
 
@@ -145,9 +145,9 @@ WRITE16_MEMBER(stopthief_state::write_r)
 	UINT8 o = BITSWAP8(m_o,3,5,2,1,4,0,6,7) & 0x7f;
 	for (int i = 0; i < 3; i++)
 		m_leds_state[i] = (data >> i & 1) ? o : 0;
-	
+
 	leds_update();
-	
+
 	// R3-R8: speaker on
 	m_speaker->level_w((data & 0x1f8 && m_o & 8) ? 1 : 0);
 }
@@ -261,7 +261,7 @@ static MACHINE_CONFIG_START( stopthief, stopthief_state )
 	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(stopthief_state, auto_power_off))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("leds_decay", stopthief_state, leds_decay_tick, attotime::from_msec(10))
-	
+
 	MCFG_DEFAULT_LAYOUT(layout_stopthie)
 
 	/* no video! */

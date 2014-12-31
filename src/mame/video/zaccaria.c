@@ -142,13 +142,13 @@ void zaccaria_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(zaccaria_state::zaccaria_videoram_w)
+WRITE8_MEMBER(zaccaria_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(zaccaria_state::zaccaria_attributes_w)
+WRITE8_MEMBER(zaccaria_state::attributes_w)
 {
 	if (offset & 1)
 	{
@@ -166,12 +166,12 @@ WRITE8_MEMBER(zaccaria_state::zaccaria_attributes_w)
 	m_attributesram[offset] = data;
 }
 
-WRITE8_MEMBER(zaccaria_state::zaccaria_flip_screen_x_w)
+WRITE8_MEMBER(zaccaria_state::flip_screen_x_w)
 {
 	flip_screen_x_set(data & 1);
 }
 
-WRITE8_MEMBER(zaccaria_state::zaccaria_flip_screen_y_w)
+WRITE8_MEMBER(zaccaria_state::flip_screen_y_w)
 {
 	flip_screen_y_set(data & 1);
 }
@@ -236,7 +236,7 @@ void zaccaria_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 	}
 }
 
-UINT32 zaccaria_state::screen_update_zaccaria(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 zaccaria_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 

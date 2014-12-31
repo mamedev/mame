@@ -1,23 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
 /***************************************************************************
-  
+
   hp9k3xx.c: preliminary driver for HP9000 300 Series (aka HP9000/3xx)
- 
+
   Currently supporting:
- 
+
   320:
       MC68020 CPU @ 16.67 MHz
       HP custom MMU
       MC68881 FPU
- 
+
   330:
-	  MC68020 CPU @ 16.67 MHz
-	  MC68851 MMU
-	  MC68881 FPU
- 
+      MC68020 CPU @ 16.67 MHz
+      MC68851 MMU
+      MC68881 FPU
+
   All models have an MC6840 PIT on IRQ6 clocked at 250 kHz.
- 
+
   TODO:
     BBCADDR   0x420000
     RTC_DATA: 0x420001
@@ -27,9 +27,9 @@
     KBDNMIST: 0x478005
     DMA:      0x500000
     FRAMEBUF: 0x560000
- 
+
     6840:     0x5F8001/3/5/7/9, IRQ 6
- 
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -88,14 +88,14 @@ UINT32 hp9k3xx_state::hp98544_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 // shared mappings for all 9000/3xx systems
 static ADDRESS_MAP_START(hp9k3xx_common, AS_PROGRAM, 32, hp9k3xx_state)
-	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_REGION("maincpu",0) AM_WRITENOP	// writes to 1fffc are the LED
+	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_REGION("maincpu",0) AM_WRITENOP  // writes to 1fffc are the LED
 
-	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_SHARE("vram")	// 98544 mono framebuffer
-	AM_RANGE(0x00560000, 0x00563fff) AM_ROM AM_REGION("graphics", 0x0000)	// 98544 mono ROM
+	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_SHARE("vram")    // 98544 mono framebuffer
+	AM_RANGE(0x00560000, 0x00563fff) AM_ROM AM_REGION("graphics", 0x0000)   // 98544 mono ROM
 
-	AM_RANGE(0x00510000, 0x00510003) AM_READWRITE(buserror_r, buserror_w) 	// no "Alpha display"
-	AM_RANGE(0x00538000, 0x00538003) AM_READWRITE(buserror_r, buserror_w)	// no "Graphics"
-	AM_RANGE(0x005c0000, 0x005c0003) AM_READWRITE(buserror_r, buserror_w)	// no add-on FP coprocessor
+	AM_RANGE(0x00510000, 0x00510003) AM_READWRITE(buserror_r, buserror_w)   // no "Alpha display"
+	AM_RANGE(0x00538000, 0x00538003) AM_READWRITE(buserror_r, buserror_w)   // no "Graphics"
+	AM_RANGE(0x005c0000, 0x005c0003) AM_READWRITE(buserror_r, buserror_w)   // no add-on FP coprocessor
 	AM_RANGE(0x005f8000, 0x005f800f) AM_DEVREADWRITE8(PTM6840_TAG, ptm6840_device, read, write, 0x00ff00ff)
 ADDRESS_MAP_END
 
@@ -148,7 +148,7 @@ static MACHINE_CONFIG_START( hp9k320, hp9k3xx_state )
 	MCFG_CPU_PROGRAM_MAP(hp9k320_map)
 
 	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(250000.0f)	// from oscillator module next to the 6840
+	MCFG_PTM6840_INTERNAL_CLOCK(250000.0f)  // from oscillator module next to the 6840
 	MCFG_PTM6840_EXTERNAL_CLOCKS(250000.0f, 250000.0f, 250000.0f)
 
 	MCFG_SCREEN_ADD( "screen", RASTER)
@@ -164,7 +164,7 @@ static MACHINE_CONFIG_START( hp9k330, hp9k3xx_state )
 	MCFG_CPU_PROGRAM_MAP(hp9k330_map)
 
 	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(250000.0f)	// from oscillator module next to the 6840
+	MCFG_PTM6840_INTERNAL_CLOCK(250000.0f)  // from oscillator module next to the 6840
 	MCFG_PTM6840_EXTERNAL_CLOCKS(250000.0f, 250000.0f, 250000.0f)
 
 	MCFG_SCREEN_ADD( "screen", RASTER)
@@ -176,10 +176,10 @@ MACHINE_CONFIG_END
 
 ROM_START( hp9k320 )
 	ROM_REGION( 0x20000, MAINCPU_TAG, 0 )
-	ROM_LOAD16_BYTE( "5061-6538.bin", 0x000001, 0x004000, CRC(d6aafeb1) SHA1(88c6b0b2f504303cbbac0c496c26b85458ac5d63) ) 
-	ROM_LOAD16_BYTE( "5061-6539.bin", 0x000000, 0x004000, CRC(a7ff104c) SHA1(c640fe68314654716bd41b04c6a7f4e560036c7e) ) 
-	ROM_LOAD16_BYTE( "5061-6540.bin", 0x008001, 0x004000, CRC(4f6796d6) SHA1(fd254897ac1afb8628f40ea93213f60a082c8d36) ) 
-	ROM_LOAD16_BYTE( "5061-6541.bin", 0x008000, 0x004000, CRC(39d32998) SHA1(6de1bda75187b0878c03c074942b807cf2924f0e) ) 
+	ROM_LOAD16_BYTE( "5061-6538.bin", 0x000001, 0x004000, CRC(d6aafeb1) SHA1(88c6b0b2f504303cbbac0c496c26b85458ac5d63) )
+	ROM_LOAD16_BYTE( "5061-6539.bin", 0x000000, 0x004000, CRC(a7ff104c) SHA1(c640fe68314654716bd41b04c6a7f4e560036c7e) )
+	ROM_LOAD16_BYTE( "5061-6540.bin", 0x008001, 0x004000, CRC(4f6796d6) SHA1(fd254897ac1afb8628f40ea93213f60a082c8d36) )
+	ROM_LOAD16_BYTE( "5061-6541.bin", 0x008000, 0x004000, CRC(39d32998) SHA1(6de1bda75187b0878c03c074942b807cf2924f0e) )
 
 	ROM_REGION( 0x4000, "graphics", ROMREGION_ERASEFF | ROMREGION_BE | ROMREGION_32BIT )
 	ROM_LOAD16_BYTE( "98544_1818-1999.bin", 0x000001, 0x002000, CRC(8c7d6480) SHA1(d2bcfd39452c38bc652df39f84c7041cfdf6bd51) )
@@ -187,8 +187,8 @@ ROM_END
 
 ROM_START( hp9k330 )
 	ROM_REGION( 0x20000, MAINCPU_TAG, 0 )
-	ROM_LOAD16_BYTE( "1818-4416.bin", 0x000000, 0x010000, CRC(cd71e85e) SHA1(3e83a80682f733417fdc3720410e45a2cfdcf869) ) 
-	ROM_LOAD16_BYTE( "1818-4417.bin", 0x000001, 0x010000, CRC(374d49db) SHA1(a12cbf6c151e2f421da4571000b5dffa3ef403b3) ) 
+	ROM_LOAD16_BYTE( "1818-4416.bin", 0x000000, 0x010000, CRC(cd71e85e) SHA1(3e83a80682f733417fdc3720410e45a2cfdcf869) )
+	ROM_LOAD16_BYTE( "1818-4417.bin", 0x000001, 0x010000, CRC(374d49db) SHA1(a12cbf6c151e2f421da4571000b5dffa3ef403b3) )
 
 	ROM_REGION( 0x4000, "graphics", ROMREGION_ERASEFF | ROMREGION_BE | ROMREGION_32BIT )
 	ROM_LOAD16_BYTE( "98544_1818-1999.bin", 0x000001, 0x002000, CRC(8c7d6480) SHA1(d2bcfd39452c38bc652df39f84c7041cfdf6bd51) )

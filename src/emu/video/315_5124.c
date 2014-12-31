@@ -1420,7 +1420,7 @@ void sega315_5378_device::blit_scanline( int *line_buffer, int *priority_selecte
 			}
 			while (++x < 208);
 		}
-		
+
 		/* border on right side of the GG active screen */
 		do
 		{

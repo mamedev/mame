@@ -68,7 +68,7 @@ static const char *conditions[0x20] =
 	/* 03 */ "PL", // (aka P          - Positive)
 	/* 04 */ "MI", // (aka N          - Negative)
 	/* 05 */ "CS", // (aka C,  LO     - Carry set / Lower than) (unsigned)
-	/* 06 */ "CC", // (aka CC, NC, HS - Carry Clear / Higher or Same) (unsigned) 
+	/* 06 */ "CC", // (aka CC, NC, HS - Carry Clear / Higher or Same) (unsigned)
 	/* 07 */ "VS", // (aka V          - Overflow set)
 	/* 08 */ "VC", // (aka NV         - Overflow clear)
 	/* 09 */ "GT", // (               - Greater than) (signed)
@@ -204,7 +204,7 @@ CPU_DISASSEMBLE(arc)
 		case 0x05: // BL
 		print("%s(%s)(%s) %08x", basic[opcode], conditions[ARC_CONDITION], delaytype[ARC_BRANCH_DELAY], (ARC_BRANCH_ADDR<<2)+pc+4);
 		break;
-	
+
 		case 0x08: // ADD
 		// todo, short / long immediate formats
 		print("%s %s , %s , %s (%08x)", basic[opcode], regnames[ARC_REGOP_DEST], regnames[ARC_REGOP_OP1], regnames[ARC_REGOP_OP2], op &~ 0xfffffe00);

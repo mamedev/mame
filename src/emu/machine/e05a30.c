@@ -151,7 +151,6 @@ void e05a30_device::update_cr_stepper(UINT8 data)
 WRITE_LINE_MEMBER( e05a30_device::centronics_input_strobe )
 {
 	if (m_centronics_strobe == TRUE && state == FALSE && !m_centronics_busy) {
-
 		m_centronics_data_latch   = m_centronics_data;
 
 		m_centronics_data_latched = TRUE;

@@ -3109,8 +3109,8 @@ Info on N64 chip labels (from The Cart Scan Repository)
 <!--
 Note from marshallh about the dongle present in the Rare proto/demo above
 "The dongle is a pass-through, except that there is an Altera
-MAX7000 series CPLD intercepting the AD16 bus. This lets 
-all normal bus transactions through, but in the special case 
+MAX7000 series CPLD intercepting the AD16 bus. This lets
+all normal bus transactions through, but in the special case
 mentioned below, takes control of the bus and gives its own data."
 
 We currently don't emulate this, and thus we include also versions where the dongle checks have been

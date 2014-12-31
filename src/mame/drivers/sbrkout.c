@@ -6,8 +6,8 @@
 
     Games supported:
         * Super Breakout
-        * Super Breakout (Canyon and Vertical Breakout, prototype) 
-		* Super Breakout (Cocktail, prototype)
+        * Super Breakout (Canyon and Vertical Breakout, prototype)
+        * Super Breakout (Cocktail, prototype)
 
     Known issues:
         * none at this time
@@ -529,7 +529,7 @@ static INPUT_PORTS_START( sbrkoutct )
 
 	PORT_MODIFY("SELECT")
 	PORT_CONFNAME(0x80, 0x00, "Game Select" )
-	PORT_CONFSETTING( 0x00,	DEF_STR( Off ) )
+	PORT_CONFSETTING( 0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING( 0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 

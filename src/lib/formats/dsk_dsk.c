@@ -8,6 +8,7 @@
 
 #include <string.h>
 
+#include "emu.h"
 #include "imageutl.h"
 #include "flopimg.h"
 

@@ -786,7 +786,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 			<dataarea name="flop" size="819200">
 				<rom name="enigma (1993)(archimedes world)[a].adf" size="819200" crc="9277d658" sha1="2bdd2d1f53ee5f359f12adb8b20e915d12978de0" offset="0" />
 			</dataarea>
-		</part>		
+		</part>
 	</software>
 
 	<software name="enigmab" cloneof="enigma" supported="no">
@@ -1075,7 +1075,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 			<dataarea name="flop" size="819200">
 				<rom name="mad professor mariarti (1990)(krisalis)[a].adf" size="819200" crc="020e0e93" sha1="e64f832705c6923edcec7e85df4cceafe30b817e" offset="0" />
 			</dataarea>
-		</part>	
+		</part>
 	</software>
 
 	<software name="mariartib" cloneof="mariarti" supported="no">
@@ -1504,7 +1504,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 			<dataarea name="flop" size="819200">
 				<rom name="super pool (1991)(fourth dimension)[a].adf" size="819200" crc="8fa28978" sha1="10d451076f38ab48e4b9bd754fdcb4c634935c36" offset="0" />
 			</dataarea>
-		</part>		
+		</part>
 	</software>
 
 	<software name="suprpoolb" cloneof="suprpool" supported="no">
@@ -1769,7 +1769,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 			</dataarea>
 		</part>
 	</software>
-	
+
 
 <!-- Other disks to sort (homebrew?!?) -->
 
@@ -2001,7 +2001,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 			<dataarea name="flop" size="819200">
 				<rom name="hacker, the v3.05 (1993)(doggysoft)[a].adf" size="819200" crc="c6a88514" sha1="b02d6495f6a9a1099cb06cac7d0e0d1756f175a0" offset="0" />
 			</dataarea>
-		</part>		
+		</part>
 	</software>
 
 	<software name="hackerb" cloneof="hacker" supported="no">
@@ -2213,7 +2213,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 			<dataarea name="flop" size="820224">
 				<rom name="acorn archimedes risc os application suite v1.00 (19xx)(acorn)(disk 2 of 2)[req risc os].adf" size="820224" crc="d5fdf2ca" sha1="bfc96eff8cab5b61f6db82dd135dd95b32f40d4f" offset="0" />
 			</dataarea>
-		</part>		
+		</part>
 	</software>
 
 	<software name="riscappsa" cloneof="riscapps" supported="no">

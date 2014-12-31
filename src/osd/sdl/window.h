@@ -34,62 +34,61 @@ typedef UINT32 HashT;
 
 struct sdl_window_info
 {
-
-    sdl_window_info(running_machine *a_machine, sdl_monitor_info *a_monitor,
-            int index, const sdl_window_config *config)
-    : next(NULL), m_minwidth(0), m_minheight(0),
-      startmaximized(0),
-      rendered_event(0), target(0), primlist(NULL), dxdata(NULL),
-      width(0), height(0), blitwidth(0), blitheight(0),
-      start_viewscreen(0),
+	sdl_window_info(running_machine *a_machine, sdl_monitor_info *a_monitor,
+			int index, const sdl_window_config *config)
+	: next(NULL), m_minwidth(0), m_minheight(0),
+		startmaximized(0),
+		rendered_event(0), target(0), primlist(NULL), dxdata(NULL),
+		width(0), height(0), blitwidth(0), blitheight(0),
+		start_viewscreen(0),
 #if (SDLMAME_SDL2)
-      sdl_window(NULL),
-      resize_width(0),
-      resize_height(0),
-      last_resize(0),
+		sdl_window(NULL),
+		resize_width(0),
+		resize_height(0),
+		last_resize(0),
 #else
-      screen_width(0), screen_height(0),
+		screen_width(0), screen_height(0),
 #endif
-      m_machine(a_machine), m_monitor(a_monitor), m_fullscreen(0), m_index(0)
-    {
-        m_maxwidth = config->width;
-        m_maxheight = config->height;
-        depth = config->depth;
-        refresh = config->refresh;
-        m_index = index;
+		m_machine(a_machine), m_monitor(a_monitor), m_fullscreen(0), m_index(0)
+	{
+		m_maxwidth = config->width;
+		m_maxheight = config->height;
+		depth = config->depth;
+		refresh = config->refresh;
+		m_index = index;
 
-        //FIXME: these should be per_window in config-> or even better a bit set
-        m_fullscreen = !video_config.windowed;
-        prescale = video_config.prescale;
+		//FIXME: these should be per_window in config-> or even better a bit set
+		m_fullscreen = !video_config.windowed;
+		prescale = video_config.prescale;
 
-        if (!m_fullscreen)
-        {
-            windowed_width = config->width;
-            windowed_height = config->height;
-        }
-    }
+		if (!m_fullscreen)
+		{
+			windowed_width = config->width;
+			windowed_height = config->height;
+		}
+	}
 
-    void video_window_update(running_machine &machine);
-    void blit_surface_size(int window_width, int window_height);
-    void toggle_full_screen(running_machine &machine);
-    void modify_prescale(running_machine &machine, int dir);
-    void window_resize(INT32 width, INT32 height);
-    void window_clear();
+	void video_window_update(running_machine &machine);
+	void blit_surface_size(int window_width, int window_height);
+	void toggle_full_screen(running_machine &machine);
+	void modify_prescale(running_machine &machine, int dir);
+	void window_resize(INT32 width, INT32 height);
+	void window_clear();
 
-    void video_window_destroy(running_machine &machine);
-    void pick_best_mode(int *fswidth, int *fsheight);
-    void get_min_bounds(int *window_width, int *window_height, int constrain);
-    void get_max_bounds(int *window_width, int *window_height, int constrain);
+	void video_window_destroy(running_machine &machine);
+	void pick_best_mode(int *fswidth, int *fsheight);
+	void get_min_bounds(int *window_width, int *window_height, int constrain);
+	void get_max_bounds(int *window_width, int *window_height, int constrain);
 
-    // Pointer to next window
+	// Pointer to next window
 	sdl_window_info *   next;
 
 	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
 	sdl_monitor_info *monitor() const { return m_monitor; }
-    int fullscreen() const { return m_fullscreen; }
-    int index() const { return m_index; }
+	int fullscreen() const { return m_fullscreen; }
+	int index() const { return m_index; }
 
-    void set_fullscreen(int afullscreen) { m_fullscreen = afullscreen; }
+	void set_fullscreen(int afullscreen) { m_fullscreen = afullscreen; }
 
 	// Draw Callbacks
 	int (*create)(sdl_window_info *window, int width, int height);
@@ -149,12 +148,12 @@ struct sdl_window_info
 private:
 	void constrain_to_aspect_ratio(int *window_width, int *window_height, int adjustment);
 
-    // Pointer to machine
-    running_machine *   m_machine;
-    // monitor info
-    sdl_monitor_info *  m_monitor;
-    int                 m_fullscreen;
-    int                 m_index;
+	// Pointer to machine
+	running_machine *   m_machine;
+	// monitor info
+	sdl_monitor_info *  m_monitor;
+	int                 m_fullscreen;
+	int                 m_index;
 
 };
 

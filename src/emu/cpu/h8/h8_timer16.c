@@ -347,7 +347,7 @@ void h8_timer16_device::device_start()
 		sprintf(tm, "%d", i);
 		timer_channel[i] = subdevice<h8_timer16_channel_device>(tm);
 	}
-	
+
 	save_item(NAME(tstr));
 }
 

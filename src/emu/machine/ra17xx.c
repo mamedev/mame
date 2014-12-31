@@ -40,7 +40,7 @@
 #include "emu.h"
 #include "machine/ra17xx.h"
 
-#define	VERBOSE	1
+#define VERBOSE 1
 #if VERBOSE
 #define LOG(x) logerror x
 #else
@@ -56,10 +56,10 @@
 const device_type RA17XX = &device_creator<ra17xx_device>;
 
 ra17xx_device::ra17xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, RA17XX, "Rockwell A17XX", tag, owner, clock, "ra17xx", __FILE__),
-        m_enable(false),
-        m_iord(*this),
-        m_iowr(*this)
+	: device_t(mconfig, RA17XX, "Rockwell A17XX", tag, owner, clock, "ra17xx", __FILE__),
+		m_enable(false),
+		m_iord(*this),
+		m_iowr(*this)
 {
 }
 
@@ -68,10 +68,10 @@ ra17xx_device::ra17xx_device(const machine_config &mconfig, const char *tag, dev
  */
 void ra17xx_device::device_start()
 {
-    m_iord.resolve();
-    m_iowr.resolve();
+	m_iord.resolve();
+	m_iowr.resolve();
 
-    save_item(NAME(m_line));
+	save_item(NAME(m_line));
 }
 
 /**
@@ -79,7 +79,7 @@ void ra17xx_device::device_start()
  */
 void ra17xx_device::device_reset()
 {
-    memset(m_line, 0, sizeof(m_line));
+	memset(m_line, 0, sizeof(m_line));
 }
 
 
@@ -97,36 +97,36 @@ void ra17xx_device::device_reset()
 
 WRITE8_MEMBER( ra17xx_device::io_w )
 {
-    assert(offset < 16);
-    m_bl = (data >> 4) & 15;    // BL on the data bus most significant bits
-    if (offset & 1) {
-        // SOS command
-        if (data & (1 << 3)) {
-            m_line[m_bl] = 1;   // enable output
+	assert(offset < 16);
+	m_bl = (data >> 4) & 15;    // BL on the data bus most significant bits
+	if (offset & 1) {
+		// SOS command
+		if (data & (1 << 3)) {
+			m_line[m_bl] = 1;   // enable output
 //          if (m_enable)
-                m_iowr(m_bl, 1, 1);
-        } else {
-            m_line[m_bl] = 0;   // disable output
+				m_iowr(m_bl, 1, 1);
+		} else {
+			m_line[m_bl] = 0;   // disable output
 //          if (m_enable)
-                m_iowr(m_bl, 0, 1);
-        }
-    } else {
-        // SES command
-        if (data & (1 << 3)) {
-            // enable all outputs
-            m_enable = true;
-            for (int i = 0; i < 16; i++)
-                m_iowr(i, m_line[i], 1);
-        } else {
-            // disable all outputs
-            m_enable = false;
-        }
-    }
+				m_iowr(m_bl, 0, 1);
+		}
+	} else {
+		// SES command
+		if (data & (1 << 3)) {
+			// enable all outputs
+			m_enable = true;
+			for (int i = 0; i < 16; i++)
+				m_iowr(i, m_line[i], 1);
+		} else {
+			// disable all outputs
+			m_enable = false;
+		}
+	}
 }
 
 
 READ8_MEMBER( ra17xx_device::io_r )
 {
-    assert(offset < 16);
-    return (m_iord(m_bl) & 1) ? 0x0f : 0x07;
+	assert(offset < 16);
+	return (m_iord(m_bl) & 1) ? 0x0f : 0x07;
 }

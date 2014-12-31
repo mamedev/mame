@@ -682,7 +682,7 @@ Intel 2732 "CPU 2D"     CPU2D.U21  4Kx8  EPROM, 6502 code
 
 TI    8S030N  1149-0360  0360.U58  32x8  Timing prom?
 TI    8S030N  1149-0370  0370.U74  32x8  Timing prom?
- 
+
 GI    RO-3-9502-024       024.U60  2Kx10 Mask ROM+Addr Decoder, CP1600 code
 GI    9316B-4D72         4D72.U62  2Kx8  Mask ROM, CP1600 code (upper)
 GI    9316B-4D71         4D71.U63  2Kx8  Mask ROM, CP1600 code (lower)
@@ -691,7 +691,7 @@ GI    9316B-4C52         4C52.U34  2Kx8  Mask ROM, Alphanumerics
 Main board also includes:
 
     2  2114 DRAMS        1Kx4  Character memory
-    10 MM5290J DRAMS    16Kx10 CP1600 memory?     
+    10 MM5290J DRAMS    16Kx10 CP1600 memory?
     1  6502
     1  Mystery 40-pin chip (under heat sink)
        (actually a SMC CRT5027 aka TI TMS9927 CRT controller)
@@ -715,7 +715,7 @@ ROM_START(intvkbd) // the intv1 exec rom should be two roms: RO-3-9502-011.U5 an
 
 	ROM_REGION(0x0100,"proms",0)
 	ROM_LOAD( "0360.u58", 0x00, 0x20, CRC(1295528a) SHA1(b35e598891f1185e02cbacb4811d2334357abd79))
-	ROM_LOAD( "0370.u74", 0x20, 0x20, CRC(19da5096) SHA1(76af50e4fd29649fc4837120c245321a8fc84cd3))	
+	ROM_LOAD( "0370.u74", 0x20, 0x20, CRC(19da5096) SHA1(76af50e4fd29649fc4837120c245321a8fc84cd3))
 ROM_END
 
 DRIVER_INIT_MEMBER(intv_state,intv)

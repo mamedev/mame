@@ -4,22 +4,22 @@
 
   Tandy Radio Shack Computerized Arcade (1981, 1982, 1995)
   * TMS1100 CD7282SL
-  
+
   This handheld contains 12 minigames. It looks and plays like "Fabulous Fred"
   by the Japanese company Mego Corp. in 1980, which in turn is a mix of Merlin
   and Simon. Unlike Merlin and Simon, spin-offs like these were not successful.
   There were releases with and without the prefix "Tandy-12", I don't know
   which name was more common. Also not worth noting is that it needed five
   batteries; 4 C-cells and a 9-volt.
-  
+
   Some of the games require accessories included with the toy (eg. the Baseball
   game is played with a board representing the playing field). To start a game,
   hold the [SELECT] button, then press [START] when the game button lights up.
   As always, refer to the official manual for more information.
-  
+
   See below at the input defs for a list of the games.
 
-  
+
   TODO:
   - output PLA is not verified
   - microinstructions PLA is not verified
@@ -70,7 +70,7 @@ public:
 READ8_MEMBER(tandy12_state::read_k)
 {
 	UINT8 k = 0;
-	
+
 	// read selected button rows
 	for (int i = 0; i < 5; i++)
 		if (m_r >> (i+5) & 1)
@@ -114,10 +114,10 @@ WRITE16_MEMBER(tandy12_state::write_r)
 
     [purple]1     [blue]5       [l-green]9
     ORGAN         TAG-IT        TREASURE HUNT
-    
+
     [l-orange]2   [turquoise]6  [red]10
     SONG WRITER   ROULETTE      COMPETE
-    
+
     [pink]3       [yellow]7     [violet]11
     REPEAT        BASEBALL      FIRE AWAY
 
@@ -180,7 +180,7 @@ static const UINT16 tandy12_output_pla[0x20] =
 	// these are certain
 	0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40,
 	0x80, 0x00, 0x00, 0x00, 0x00,
-	
+
 	// rest is unused?
 	0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,

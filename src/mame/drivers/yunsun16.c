@@ -634,7 +634,7 @@ static MACHINE_CONFIG_START( shocking, yunsun16_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", yunsun16_state,  irq2_line_hold)
-	
+
 	MCFG_MACHINE_START_OVERRIDE(yunsun16_state, shocking)
 	MCFG_MACHINE_RESET_OVERRIDE(yunsun16_state, shocking)
 
@@ -876,7 +876,7 @@ ROM_START( paprazzi )
 
 	ROM_REGION( 0x080000, "oki", 0 )    /* Samples */
 	ROM_LOAD( "u131.bin", 0x000000, 0x080000, CRC(bcf7aa12) SHA1(f7bf5258396ed0eb7e85eccf250c6d0a333a4d61) )
-	
+
 ROM_END
 
 /***************************************************************************
@@ -905,7 +905,7 @@ ROM_START( shocking )
 
 	ROM_REGION( 0x080000, "oki", 0 )    /* Samples */
 	ROM_LOAD( "yunsun16.131", 0x000000, 0x080000, CRC(d0a1bb8c) SHA1(10f33521bd6031ed73ee5c7be1382165925aa8f8) )
-	
+
 ROM_END
 
 ROM_START( shockingk )
@@ -928,7 +928,7 @@ ROM_START( shockingk )
 
 	ROM_REGION( 0x080000, "oki", 0 )    /* Samples */
 	ROM_LOAD( "yunsun16.131", 0x000000, 0x080000, CRC(d0a1bb8c) SHA1(10f33521bd6031ed73ee5c7be1382165925aa8f8) )
-	
+
 ROM_END
 
 
@@ -960,7 +960,7 @@ ROM_START( bombkick )
 
 	ROM_REGION( 0x080000, "oki", 0 )    /* Samples */
 	ROM_LOAD( "bk_u131", 0x000000, 0x080000, CRC(22cc5732) SHA1(38aefa4e543ea54e004eee428ee087121eb20905) )
-	
+
 ROM_END
 
 ROM_START( bombkicka ) // marked 'Bomb Kick 98'
@@ -983,7 +983,7 @@ ROM_START( bombkicka ) // marked 'Bomb Kick 98'
 
 	ROM_REGION( 0x080000, "oki", 0 )    /* Samples */
 	ROM_LOAD( "bk_u131", 0x000000, 0x080000, CRC(22cc5732) SHA1(38aefa4e543ea54e004eee428ee087121eb20905) )
-	
+
 ROM_END
 
 /***************************************************************************

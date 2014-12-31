@@ -1126,7 +1126,7 @@ void segaic16_video_device::tilemap_init(int which, int type, int colorbase, int
 		info->tilemaps[pagenum]->set_scrolldx(0, 22);
 		info->tilemaps[pagenum]->set_scrolldy(0, 38);
 	}
-	
+
 	save_item(NAME(info->flip), which);
 	save_item(NAME(info->rowscroll), which);
 	save_item(NAME(info->colscroll), which);

@@ -27,10 +27,10 @@ public:
 
 	/* devices */
 	required_device<e132xn_device>  m_maincpu;
-	
+
 	/* memory pointers */
 	required_shared_ptr<UINT32> m_videoram;
-	
+
 	DECLARE_READ32_MEMBER(f32_input_port_1_r);
 	UINT32 screen_update_mosaicf2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

@@ -250,7 +250,7 @@ tms0270_cpu_device::tms0270_cpu_device(const machine_config &mconfig, const char
 
 
 static MACHINE_CONFIG_FRAGMENT(tms1000)
-	
+
 	// microinstructions PLA, output PLA
 	MCFG_PLA_ADD("mpla", 8, 16, 30)
 	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
@@ -374,7 +374,7 @@ void tms1xxx_cpu_device::device_start()
 	m_r_mask = (1 << m_r_pins) - 1;
 	m_pc_mask = (1 << m_pc_bits) - 1;
 	m_x_mask = (1 << m_x_bits) - 1;
-	
+
 	// zerofill
 	m_pc = 0;
 	m_sr = 0;
@@ -401,7 +401,7 @@ void tms1xxx_cpu_device::device_start()
 	m_clatch = 0;
 	m_add = 0;
 	m_bl = 0;
-	
+
 	m_ram_in = 0;
 	m_dam_in = 0;
 	m_ram_out = 0;
@@ -484,7 +484,7 @@ void tms0270_cpu_device::device_start()
 	m_o_latch_low = 0;
 	m_o_latch = 0;
 	m_o_latch_prev = 0;
-	
+
 	// register for savestates
 	save_item(NAME(m_r_prev));
 	save_item(NAME(m_chipsel));
@@ -535,18 +535,18 @@ void tms1000_cpu_device::device_reset()
 {
 	// common reset
 	tms1xxx_cpu_device::device_reset();
-	
+
 	// pre-decode instructionset
 	m_fixed_decode.resize_and_clear(0x100);
 	m_micro_decode.resize_and_clear(0x100);
-	
+
 	for (int op = 0; op < 0x100; op++)
 	{
 		//                                              _____              _____  ______  _____  ______  _____  _____  _____  _____
 		const UINT32 md[16] = { M_STSL, M_AUTY, M_AUTA, M_CIN, M_C8, M_NE, M_CKN, M_15TN, M_MTN, M_NATN, M_ATN, M_MTP, M_YTP, M_CKP, M_CKM, M_STO };
 		UINT16 mask = m_mpla->read(op);
 		mask ^= 0x3fc8; // invert active-negative
-		
+
 		for (int bit = 0; bit < 16; bit++)
 			if (mask & (1 << bit))
 				m_micro_decode[op] |= md[bit];
@@ -559,7 +559,7 @@ void tms1000_cpu_device::device_reset()
 	m_fixed_decode[0x0c] = F_RSTR;
 	m_fixed_decode[0x0d] = F_SETR;
 	m_fixed_decode[0x0f] = F_RETN;
-	
+
 	for (int i = 0x10; i < 0x20; i++) m_fixed_decode[i] = F_LDP;
 	for (int i = 0x30; i < 0x34; i++) m_fixed_decode[i] = F_SBIT;
 	for (int i = 0x34; i < 0x38; i++) m_fixed_decode[i] = F_RBIT;
@@ -572,7 +572,7 @@ void tms1000_cpu_device::device_reset()
 void tms1100_cpu_device::device_reset()
 {
 	tms1000_cpu_device::device_reset();
-	
+
 	// small differences in 00-3f area
 	m_fixed_decode[0x00] = 0;
 	m_fixed_decode[0x09] = F_COMX8; // !
@@ -597,29 +597,29 @@ void tms0970_cpu_device::device_reset()
 		// upper half of the opcodes is always branch/call
 		if (op & 0x80)
 			m_fixed_decode[op] = (op & 0x40) ? F_CALL: F_BR;
-		
+
 		// 5 output bits select a microinstruction index
 		UINT32 imask = m_ipla->read(op);
 		UINT8 msel = imask & 0x1f;
-		
+
 		// but if (from bottom to top) term 1 is active and output bit 5 is 0, R2,R4-R7 directly select a microinstruction index
 		if (imask & 0x40 && (imask & 0x20) == 0)
 			msel = (op & 0xf) | (op >> 1 & 0x10);
-		
+
 		msel = BITSWAP8(msel,7,6,5,0,1,2,3,4); // lines are reversed
 		UINT32 mmask = m_mpla->read(msel);
 		mmask ^= 0x09fe; // invert active-negative
-		
+
 		//                             _____  _____  _____  _____  ______  _____  ______  _____              _____
 		const UINT32 md[15] = { M_CKM, M_CKP, M_YTP, M_MTP, M_ATN, M_NATN, M_MTN, M_15TN, M_CKN, M_NE, M_C8, M_CIN, M_AUTA, M_AUTY, M_STO };
 
 		for (int bit = 0; bit < 15; bit++)
 			if (mmask & (1 << bit))
 				m_micro_decode[op] |= md[bit];
-		
+
 		// the other ipla terms each select a fixed instruction
 		const UINT32 id[8] = { F_LDP, F_TDO, F_COMX, F_LDX, F_SBIT, F_RBIT, F_SETR, F_RETN };
-		
+
 		for (int bit = 0; bit < 8; bit++)
 			if (imask & (0x80 << bit))
 				m_fixed_decode[op] |= id[bit];
@@ -630,20 +630,20 @@ void tms0970_cpu_device::device_reset()
 UINT32 tms0980_cpu_device::decode_micro(UINT8 sel)
 {
 	UINT32 decode = 0;
-	
+
 	sel = BITSWAP8(sel,7,6,0,1,2,3,4,5); // lines are reversed
 	UINT32 mask = m_mpla->read(sel);
 	mask ^= 0x43fc3; // invert active-negative
-	
+
 	// M_RSTR is specific to TMS02x0, it redirects to F_RSTR
 	// M_UNK1 is specific to TMS0270, unknown yet
 	//                      _______  ______                                _____  _____  _____  _____  ______  _____  ______  _____                            _____
 	const UINT32 md[22] = { M_NDMTP, M_DMTP, M_AUTY, M_AUTA, M_CKM, M_SSE, M_CKP, M_YTP, M_MTP, M_ATN, M_NATN, M_MTN, M_15TN, M_CKN, M_NE, M_C8, M_SSS, M_CME, M_CIN, M_STO, M_RSTR, M_UNK1 };
-	
+
 	for (int bit = 0; bit < 22 && bit < m_mpla->outputs(); bit++)
 		if (mask & (1 << bit))
 			decode |= md[bit];
-	
+
 	return decode;
 }
 
@@ -651,7 +651,7 @@ void tms0980_cpu_device::device_reset()
 {
 	// common reset
 	tms1xxx_cpu_device::device_reset();
-	
+
 	// pre-decode instructionset
 	m_fixed_decode.resize_and_clear(0x200);
 	m_micro_decode.resize_and_clear(0x200);
@@ -661,20 +661,20 @@ void tms0980_cpu_device::device_reset()
 		// upper half of the opcodes is always branch/call
 		if (op & 0x100)
 			m_fixed_decode[op] = (op & 0x80) ? F_CALL: F_BR;
-		
+
 		UINT32 imask = m_ipla->read(op);
 
 		// 6 output bits select a microinstruction index
 		m_micro_decode[op] = decode_micro(imask & 0x3f);
-		
+
 		// the other ipla terms each select a fixed instruction
 		const UINT32 id[15] = { F_LDP, F_SBL, F_OFF, F_RBIT, F_SAL, F_XDA, F_REAC, F_SETR, F_RETN, F_SBIT, F_TDO, F_COMX8, F_COMX, F_LDX, F_SEAC };
-		
+
 		for (int bit = 0; bit < 15; bit++)
 			if (imask & (0x80 << bit))
 				m_fixed_decode[op] |= id[bit];
 	}
-	
+
 	// like on TMS0970, one of the terms directly select a microinstruction index (via R4-R8),
 	// but it can't be pre-determined when it's active
 	m_micro_direct.resize_and_clear(0x40);
@@ -710,7 +710,7 @@ void tms1xxx_cpu_device::next_pc()
 		fb = 1;
 	else if (m_pc == m_pc_mask)
 		fb = 0;
-	
+
 	m_pc = (m_pc << 1 | fb) & m_pc_mask;
 }
 
@@ -731,9 +731,9 @@ void tms0980_cpu_device::read_opcode()
 	debugger_instruction_hook(this, m_rom_address << 1);
 	m_opcode = m_program->read_word(m_rom_address << 1) & 0x1ff;
 	m_c4 = BITSWAP8(m_opcode,7,6,5,4,0,1,2,3) & 0xf; // opcode operand is bitswapped for most opcodes
-	
+
 	m_fixed = m_fixed_decode[m_opcode];
-	
+
 	// if ipla term 0 is active, R4-R8 directly select a microinstruction index when R0 or R0^BL is 0
 	int r0 = m_opcode >> 8 & 1;
 	if (m_ipla->read(m_opcode) & 0x40 && !((r0 & m_bl) ^ r0))
@@ -747,7 +747,7 @@ void tms0980_cpu_device::read_opcode()
 void tms0270_cpu_device::read_opcode()
 {
 	tms0980_cpu_device::read_opcode();
-	
+
 	// RSTR is on the mpla
 	if (m_micro & M_RSTR)
 		m_fixed |= F_RSTR;
@@ -780,13 +780,13 @@ void tms0270_cpu_device::dynamic_output()
 	// R13: power off, trigger on falling edge
 	if ((m_r_prev >> 13 & 1) && !(m_r >> 13 & 1))
 		m_power_off(1);
-	
+
 	// R11: TMS5100 CTL port direction (0=read from TMS5100, 1=write to TMS5100)
 	m_ctl_dir = m_r >> 11 & 1;
 
 	// R12: chip select (off=display via OPLA, on=TMS5100 via ACC/CKB)
 	m_chipsel = m_r >> 12 & 1;
-	
+
 	if (m_chipsel)
 	{
 		// ACC via SEG B,C,D,G: TMS5100 CTL pins
@@ -812,7 +812,7 @@ void tms0270_cpu_device::dynamic_output()
 			m_o_latch_prev = m_o_latch;
 		}
 	}
-	
+
 	// standard R-output
 	if (m_r != m_r_prev)
 	{
@@ -860,7 +860,7 @@ void tms1xxx_cpu_device::set_cki_bus()
 		case 0x30: case 0x38:
 			m_cki_bus = 1 << (m_c4 >> 2) ^ 0xf;
 			break;
-		
+
 		// 01XXXXXX: constant
 		case 0x00: // R2,3,4 are NANDed with eachother, and then ORed with R1, making 00000XXX valid too
 		case 0x40: case 0x48: case 0x50: case 0x58: case 0x60: case 0x68: case 0x70: case 0x78:
@@ -886,7 +886,7 @@ void tms0980_cpu_device::set_cki_bus()
 		case 0x020: case 0x0a0:
 			m_cki_bus = 1 << (m_c4 >> 2) ^ 0xf;
 			break;
-		
+
 		// 0X1XXXXXX: constant
 		case 0x040: case 0x048: case 0x050: case 0x058: case 0x060: case 0x068: case 0x070: case 0x078:
 		case 0x0c0: case 0x0c8: case 0x0d0: case 0x0d8: case 0x0e0: case 0x0e8: case 0x0f0: case 0x0f8:
@@ -1080,7 +1080,7 @@ void tms0270_cpu_device::op_tdo()
 		m_o_latch_low = m_a;
 	else
 		m_o_latch = m_o_latch_low | (m_a << 4 & 0x30);
-	
+
 	// write to output is done in dynamic_output
 }
 
@@ -1111,7 +1111,7 @@ void tms1xxx_cpu_device::execute_run()
 			if (m_status)
 			{
 				UINT8 new_pc = m_opcode & m_pc_mask;
-				
+
 				// BR: conditional branch
 				if (m_fixed & F_BR)
 				{
@@ -1120,7 +1120,7 @@ void tms1xxx_cpu_device::execute_run()
 					m_ca = m_cb;
 					m_pc = new_pc;
 				}
-				
+
 				// CALL: conditional call
 				if (m_fixed & F_CALL)
 				{
@@ -1166,7 +1166,7 @@ void tms1xxx_cpu_device::execute_run()
 		case 1:
 			// fetch: rom address 2/2
 			m_rom_address = (m_ca << (m_pc_bits+4)) | (m_pa << m_pc_bits) | m_pc;
-			
+
 			// execute: update alu inputs
 			// N inputs
 			if (m_micro & M_15TN)  m_n |= 0xf;
@@ -1233,7 +1233,7 @@ void tms1xxx_cpu_device::execute_run()
 			if (m_fixed & F_SAL)   op_sal();
 			if (m_fixed & F_SBL)   op_sbl();
 			if (m_fixed & F_XDA)   op_xda();
-			
+
 			// after fixed opcode handling: store status, write ram
 			m_status = status;
 			if (m_ram_out != -1)

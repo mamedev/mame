@@ -32,7 +32,7 @@ UINT32 snes_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 {
 	/* NTSC SNES draw range is 1-225. */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-		m_ppu->refresh_scanline(machine(), bitmap, y + 1);
+		m_ppu->refresh_scanline(bitmap, y + 1);
 
 	return 0;
 }
@@ -87,7 +87,7 @@ void snes_state::hirq_tick()
 {
 	// latch the counters and pull IRQ
 	// (don't need to switch to the 65816 context, we don't do anything dependant on it)
-	m_ppu->latch_counters(machine());
+	m_ppu->latch_counters();
 	SNES_CPU_REG(TIMEUP) = 0x80;    /* Indicate that irq occurred */
 	m_maincpu->set_input_line(G65816_LINE_IRQ, ASSERT_LINE);
 
@@ -142,7 +142,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 		{
 			SNES_CPU_REG(TIMEUP) = 0x80;    /* Indicate that irq occurred */
 			// IRQ latches the counters, do it now
-			m_ppu->latch_counters(machine());
+			m_ppu->latch_counters();
 			m_maincpu->set_input_line(G65816_LINE_IRQ, ASSERT_LINE );
 		}
 	}
@@ -539,7 +539,7 @@ WRITE8_MEMBER( snes_state::snes_w_io )
 			if (!(SNES_CPU_REG(WRIO) & 0x80) && (data & 0x80))
 			{
 				// external latch
-				m_ppu->latch_counters(space.machine());
+				m_ppu->latch_counters();
 			}
 			SNES_CPU_REG(WRIO) = data;
 			return;
@@ -1075,7 +1075,7 @@ void snes_state::machine_start()
 
 	snes_init_timers();
 
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		save_item(NAME(m_dma_channel[i].dmap), i);
 		save_item(NAME(m_dma_channel[i].dest_addr), i);

@@ -5,7 +5,7 @@ TRS80 memory map
 
 0000-2fff ROM                 R   D0-D7
 3000-37ff ROM on Model III        R   D0-D7
-          unused on Model I
+      unused on Model I
 37de      UART status             R/W D0-D7
 37df      UART data           R/W D0-D7
 37e0      interrupt latch address (lnw80 = for the realtime clock)
@@ -16,7 +16,7 @@ TRS80 memory map
 37e5      select disk drive 2         W
 37e7      select disk drive 3         W
 37e0-37e3 floppy motor            W   D0-D3
-          or floppy head select   W   D3
+      or floppy head select   W   D3
 37e8      send a byte to printer          W   D0-D7
 37e8      read printer status             R   D7
 37ec-37ef FDC WD179x              R/W D0-D7
@@ -42,10 +42,10 @@ It is assumed that the TRS80L2 UART setup is identical to the System80, apart fr
 Due to the above, the only working emulated UART is for the Model 3.
 
 Cassette baud rates:    Model I level I - 250 baud
-            Model I level II and all clones - 500 baud
-            Model III/4 - 500 and 1500 baud selectable at boot time
-            - When it says "Cass?" press L for 500 baud, or Enter otherwise.
-            LNW-80 - 500 baud @1.77MHz and 1000 baud @4MHz.
+        Model I level II and all clones - 500 baud
+        Model III/4 - 500 and 1500 baud selectable at boot time
+        - When it says "Cass?" press L for 500 baud, or Enter otherwise.
+        LNW-80 - 500 baud @1.77MHz and 1000 baud @4MHz.
 
 I/O ports
 FF:
@@ -92,29 +92,29 @@ Model 4 - C0-CF = hard drive (optional)
     - 80-8F hires graphics (optional)
 
 About the ht1080z - This was made for schools in Hungary. Each comes with a BASIC extension roms
-        which activated Hungarian features. To activate - start emulation - enter SYSTEM
-        Enter /12288 and the extensions will be installed and you are returned to READY.
-        The ht1080z is identical to the System 80, apart from the character rom.
-        The ht1080z2 has a modified extension rom and character generator.
+    which activated Hungarian features. To activate - start emulation - enter SYSTEM
+    Enter /12288 and the extensions will be installed and you are returned to READY.
+    The ht1080z is identical to the System 80, apart from the character rom.
+    The ht1080z2 has a modified extension rom and character generator.
 
 About the RTC - The time is incremented while ever the cursor is flashing. It is stored in a series
-        of bytes in the computer's work area. The bytes are in a certain order, this is:
-        seconds, minutes, hours, year, day, month. On a model 1, the seconds are stored at
-        0x4041, while on the model 4 it is 0x4217. A reboot always sets the time to zero.
+    of bytes in the computer's work area. The bytes are in a certain order, this is:
+    seconds, minutes, hours, year, day, month. On a model 1, the seconds are stored at
+    0x4041, while on the model 4 it is 0x4217. A reboot always sets the time to zero.
 
 Model 4 memory organisation -
-        Mode 0: ROM=0-37E7 and 37EA-3FFF; Printer=37E8-37E9; Keyboard=3800-3BFF; Video=3C00-3FFF
-        Mode 1: Keyboard and Video as above; 0-3FFF read=ROM and write=RAM
-        Mode 2: Keyboard=F400-F7FF; Video=F800-FFFF; the rest is RAM
-        Mode 3: All RAM
-        In the "maincpu" memory map, the first 64k is given to the ROM, keyboard, printer and video,
-            while the second 64k is RAM that is switched in as needed. The area from 4800-FFFF
-            is considered a "black hole", any writes to there will disappear.
-        The video is organised as 2 banks of 0x400 bytes, except in Mode 2 where it becomes contiguous.
+    Mode 0: ROM=0-37E7 and 37EA-3FFF; Printer=37E8-37E9; Keyboard=3800-3BFF; Video=3C00-3FFF
+    Mode 1: Keyboard and Video as above; 0-3FFF read=ROM and write=RAM
+    Mode 2: Keyboard=F400-F7FF; Video=F800-FFFF; the rest is RAM
+    Mode 3: All RAM
+    In the "maincpu" memory map, the first 64k is given to the ROM, keyboard, printer and video,
+        while the second 64k is RAM that is switched in as needed. The area from 4800-FFFF
+        is considered a "black hole", any writes to there will disappear.
+    The video is organised as 2 banks of 0x400 bytes, except in Mode 2 where it becomes contiguous.
 
 Model 4P - is the same as Model 4 except:
-        - ROM is only 0000-0FFF, while 1000-37FF is given over to RAM
-        - There is no cassette support in hardware.
+    - ROM is only 0000-0FFF, while 1000-37FF is given over to RAM
+    - There is no cassette support in hardware.
 
 ***************************************************************************
 

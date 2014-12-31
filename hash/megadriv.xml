@@ -17508,13 +17508,14 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="long">
-		<description>Long (Chi)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+	<software name="linkdrgn">
+		<description>Link Dragon</description>
+		<year>1993</year>
+		<publisher>Songtly</publisher>
+		<info name="alt_title" value="Long (Box?)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="262144">
-				<rom name="long (chi) (unl).bin" size="262144" crc="1b86e623" sha1="09e4b59da3344f16ce6173c432c88ee9a12a3561" offset="0x000000"/>
+				<rom name="link dragon (unl).bin" size="262144" crc="1b86e623" sha1="09e4b59da3344f16ce6173c432c88ee9a12a3561" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -30074,17 +30075,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="king of fighters 2000 (unl).bin" size="2097152" crc="34cbac5d" sha1="2073b1e14cbb8433abcbf356ea1831cc5f61c42e" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="linkdrgn">
-		<description>Link Dragon</description>
-		<year>1993</year>
-		<publisher>Songtly</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="262144">
-				<rom name="link dragon (unl).bin" size="262144" crc="1b86e623" sha1="09e4b59da3344f16ce6173c432c88ee9a12a3561" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>

@@ -4,18 +4,18 @@
 
     10-11-14 - Skeleton driver
 
-	Interrupts based on patents:
-	level 1 - SIO
-	level 3 - timer (from PIT, presumably channel 0? Patent says "channel 3")
-	level 4 - "interrupt detector" - keyboard, printer, RTC
-	level 7 - floppy/hard disk
+    Interrupts based on patents:
+    level 1 - SIO
+    level 3 - timer (from PIT, presumably channel 0? Patent says "channel 3")
+    level 4 - "interrupt detector" - keyboard, printer, RTC
+    level 7 - floppy/hard disk
 
-	DMA channels:
-	channel 0 - communications (RS-232)
-	channel 1 - X-Bus expansion modules (except disk and graphics)
-	channel 2 - graphics?
-	channel 3 - hard disk
-	
+    DMA channels:
+    channel 0 - communications (RS-232)
+    channel 1 - X-Bus expansion modules (except disk and graphics)
+    channel 2 - graphics?
+    channel 3 - hard disk
+
     To get to "menu mode", press Space quickly after reset (might need good timing)
     The bootstrap ROM version number is displayed, along with "B,D,L,M,P,T:"
     You can press one of these keys for the following tests:
@@ -33,18 +33,18 @@
     T: Type of Operating System
        Gives an "OS:" prompt, at which you can enter the number of the system image to
        load at the master workstation.
-       
+
     Panel Debugger:
     - Open/Modify RAM
     Enter an address (seg:off) followed by a forward-slash, the contents of this word will
     appear, you can enter a value to set it to, or just press Next (default: Enter) to leave
-    it as is.  It will then go on to the next word.  Pressing Return (scan code unknown 
+    it as is.  It will then go on to the next word.  Pressing Return (scan code unknown
     currently) will return to the debugger prompt.
     - Open/Modify Register
     Enter the register only, and the contents will appear, you can leave it or alter it (you
     must enter all digits (eg: 0A03 if you're modifying DX) then press Return.
     - I/O to or from a port
-    Input: Address (segment is ignored, and not required) followed by I, a byte is read from 
+    Input: Address (segment is ignored, and not required) followed by I, a byte is read from
     the port defined by the offset, and the byte is displayed.
     Output: Address followed by O, you are now prompted with an '='.  Enter the byte to send
     to the port, and press Return.
@@ -52,7 +52,7 @@
     Enter an address (seg:off) followed by H.  Sets a haltpoint at the specified address.  Does
     not work for ROM addresses.  Only one allowed at a time.  Haltpoint info is stored at
     0000:01F0.  Uses a software interrupt (INT 7C), rather than INT 3.
-    
+
     To start or continue from the current address, enter P.
     To start from a specific address, enter the address (seg:off) followed by a G.
 */
@@ -624,7 +624,7 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("keyboard", rs232_port_device, write_txd))
 	MCFG_RS232_PORT_ADD("keyboard", keyboard, "ngen")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("videouart", i8251_device, write_rxd))
-	
+
 	MCFG_DEVICE_ADD("refresh_clock", CLOCK, 19200*16)  // should be 19530Hz
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(ngen_state,timer_clk_out))
 
@@ -662,10 +662,10 @@ ROM_START( ngen )
 	ROM_REGION( 0x2000, "bios", 0)
 	ROM_LOAD16_BYTE( "72-00414_80186_cpu.bin",  0x000000, 0x001000, CRC(e1387a03) SHA1(ddca4eba67fbf8b731a8009c14f6b40edcbc3279) )  // bootstrap ROM v8.4
 	ROM_LOAD16_BYTE( "72-00415_80186_cpu.bin",  0x000001, 0x001000, CRC(a6dde7d9) SHA1(b4d15c1bce31460ab5b92ff43a68c15ac5485816) )
-	
+
 	ROM_REGION( 0x1000, "disk", 0)
 	ROM_LOAD( "72-00422_10mb_disk.bin", 0x000000, 0x001000,  CRC(f5b046b6) SHA1(b303c6f6aa40504016de9826879bc316e44389aa) )
-	
+
 	ROM_REGION( 0x20, "disk_prom", 0)
 	ROM_LOAD( "72-00422_10mb_disk_15d.bin", 0x000000, 0x000020,  CRC(121ee494) SHA1(9a8d3c336cc7378a71f9d48c99f88515eb236fbf) )
 ROM_END

@@ -97,7 +97,7 @@ struct osd_work_queue
 	volatile INT32      items;          // items in the queue
 	volatile INT32      livethreads;    // number of live threads
 	volatile INT32      waiting;        // is someone waiting on the queue to complete?
-	volatile UINT8      exiting;        // should the threads exit on their next opportunity?
+	volatile INT32      exiting;        // should the threads exit on their next opportunity?
 	UINT32              threads;        // number of threads in this queue
 	UINT32              flags;          // creation flags
 	work_thread_info *  thread;         // array of thread information
@@ -313,7 +313,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 		end_timing(queue->thread[queue->threads].waittime);
 
 		// signal all the threads to exit
-		queue->exiting = TRUE;
+		atomic_exchange32(&queue->exiting, TRUE);
 		for (threadnum = 0; threadnum < queue->threads; threadnum++)
 		{
 			work_thread_info *thread = &queue->thread[threadnum];
@@ -412,10 +412,12 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 		osd_work_item *item;
 
 		// first allocate a new work item; try the free list first
+		INT32 lockslot = osd_scalable_lock_acquire(queue->lock);
 		do
 		{
 			item = (osd_work_item *)queue->free;
 		} while (item != NULL && compare_exchange_ptr((PVOID volatile *)&queue->free, item, item->next) != item);
+		osd_scalable_lock_release(queue->lock, lockslot);
 
 		// if nothing, allocate something new
 		if (item == NULL)
@@ -502,7 +504,7 @@ int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 	if (item->event == NULL)
 		item->event = osd_event_alloc(TRUE, FALSE);     // manual reset, not signalled
 	else
-			osd_event_reset(item->event);
+		osd_event_reset(item->event);
 
 	// if we don't have an event, we need to spin (shouldn't ever really happen)
 	if (item->event == NULL)
@@ -546,11 +548,13 @@ void osd_work_item_release(osd_work_item *item)
 	osd_work_item_wait(item, 100 * osd_ticks_per_second());
 
 	// add us to the free list on our queue
+	INT32 lockslot = osd_scalable_lock_acquire(item->queue->lock);
 	do
 	{
 		next = (osd_work_item *)item->queue->free;
 		item->next = next;
 	} while (compare_exchange_ptr((PVOID volatile *)&item->queue->free, next, item) != next);
+	osd_scalable_lock_release(item->queue->lock, lockslot);
 }
 
 
@@ -602,12 +606,22 @@ static void *worker_thread_entry(void *param)
 	{
 		// block waiting for work or exit
 		// bail on exit, and only wait if there are no pending items in queue
-		if (!queue->exiting && queue->list == NULL)
+		if (queue->exiting)
+			break;
+
 		{
-			begin_timing(thread->waittime);
-			osd_event_wait(thread->wakeevent, INFINITE);
-			end_timing(thread->waittime);
+			INT32 lockslot = osd_scalable_lock_acquire(queue->lock);
+			bool wait_for_event = (queue->list == NULL);
+			osd_scalable_lock_release(queue->lock, lockslot);
+
+			if (wait_for_event)
+			{
+				begin_timing(thread->waittime);
+				osd_event_wait(thread->wakeevent, INFINITE);
+				end_timing(thread->waittime);
+			}
 		}
+
 		if (queue->exiting)
 			break;
 

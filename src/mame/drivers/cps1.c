@@ -11532,7 +11532,7 @@ DRIVER_INIT_MEMBER(cps_state,dinohunt)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf18000, 0xf19fff, read16_delegate(FUNC(cps_state::dinohunt_sound_r), this));
 	m_maincpu->space(AS_PROGRAM).install_read_port(0xfc0000, 0xfc0001, "IN2"); ;
 	// the ym2151 doesn't seem to be used. Is it actually on the PCB?
-	
+
 	DRIVER_INIT_CALL(cps1);
 }
 

@@ -471,17 +471,17 @@ public:
 	required_device<ay8910_device> m_ay8910;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
-	
+
 	UINT8 m_main_latch_d800;
 	UINT8 m_snd_latch_0800;
 	UINT8 m_snd_latch_0a02;
 	UINT8 m_ay8910_addr;
 	tilemap_t *m_bg_tilemap;
 	int m_mux_data;
-	
+
 	DECLARE_WRITE8_MEMBER(fclown_videoram_w);
 	DECLARE_WRITE8_MEMBER(fclown_colorram_w);
 	DECLARE_WRITE8_MEMBER(cpu_c048_w);
@@ -505,9 +505,9 @@ public:
 };
 
 void _5clown_state::machine_start()
-{	
+{
 	m_main_latch_d800 = m_snd_latch_0800 = m_snd_latch_0a02 = m_ay8910_addr = m_mux_data = 0;
-	
+
 	save_item(NAME(m_main_latch_d800));
 	save_item(NAME(m_snd_latch_0800));
 	save_item(NAME(m_snd_latch_0a02));

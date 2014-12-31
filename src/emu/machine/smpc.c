@@ -393,7 +393,7 @@ void saturn_state::smpc_analog_pad( UINT8 pad_num, UINT8 offset, UINT8 id)
 void saturn_state::smpc_keyboard(UINT8 pad_num, UINT8 offset)
 {
 	UINT16 game_key;
-	
+
 	game_key = 0xffff;
 
 	game_key ^= ((ioport("KEYS_1")->read() & 0x80) << 8); // right
@@ -415,8 +415,8 @@ void saturn_state::smpc_keyboard(UINT8 pad_num, UINT8 offset)
 	m_smpc.OREG[2+pad_num*offset] = game_key>>8; // game buttons, TODO
 	m_smpc.OREG[3+pad_num*offset] = game_key & 0xff;
 	/*
-		Keyboard Status hook-up
-		TODO: how shift key actually works? EGWord uses it in order to switch between hiragana and katakana modes.
+	    Keyboard Status hook-up
+	    TODO: how shift key actually works? EGWord uses it in order to switch between hiragana and katakana modes.
 	    x--- ---- 0
 	    -x-- ---- caps lock
 	    --x- ---- num lock

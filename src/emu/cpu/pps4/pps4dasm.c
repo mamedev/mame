@@ -16,81 +16,81 @@
 #define ARG(A)  opram[(A) - PC]
 
 typedef enum pps4_token_e {
-    t_AD,       t_ADC,      t_ADSK,     t_ADCSK,    t_ADI,
-    t_DC,       t_AND,      t_OR,       t_EOR,      t_COMP,
-    t_SC,       t_RC,       t_SF1,      t_RF1,      t_SF2,
-    t_RF2,      t_LD,       t_EX,       t_EXD,      t_LDI,
-    t_LAX,      t_LXA,      t_LABL,     t_LBMX,     t_LBUA,
-    t_XABL,     t_XBMX,     t_XAX,      t_XS,       t_CYS,
-    t_LB,       t_LBL,      t_INCB,     t_DECB,     t_T,
-    t_TM,       t_TL,       t_TML,      t_SKC,      t_SKZ,
-    t_SKBI,     t_SKF1,     t_SKF2,     t_RTN,      t_RTNSK,
-    t_IOL,      t_DIA,      t_DIB,      t_DOA,      t_SAG,
-    t_COUNT,
-    t_MASK = (1 << 6) - 1,
-    t_I3c  = 1 <<  6,   /* immediate 3 bit constant, complemented */
-    t_I4   = 1 <<  7,   /* immediate 4 bit constant */
-    t_I4c  = 1 <<  8,   /* immediate 4 bit constant, complemented */
-    t_I4p  = 1 <<  9,   /* immediate 4 bit offset into page 3 */
-    t_I6p  = 1 << 10,   /* immediate 6 bit constant; address in current page */
-    t_I6i  = 1 << 11,   /* immediate 6 bit indirect page 3 offset (16 ... 63) + followed by page 1 address */
-    t_I8   = 1 << 12,   /* immediate 8 bit constant (I/O port number) */
-    t_I8c  = 1 << 13,   /* immediate 8 bit constant inverted */
-    t_OVER = 1 << 14,   /* Debugger step over (CALL) */
-    t_OUT  = 1 << 15    /* Debugger step out (RETURN) */
+	t_AD,       t_ADC,      t_ADSK,     t_ADCSK,    t_ADI,
+	t_DC,       t_AND,      t_OR,       t_EOR,      t_COMP,
+	t_SC,       t_RC,       t_SF1,      t_RF1,      t_SF2,
+	t_RF2,      t_LD,       t_EX,       t_EXD,      t_LDI,
+	t_LAX,      t_LXA,      t_LABL,     t_LBMX,     t_LBUA,
+	t_XABL,     t_XBMX,     t_XAX,      t_XS,       t_CYS,
+	t_LB,       t_LBL,      t_INCB,     t_DECB,     t_T,
+	t_TM,       t_TL,       t_TML,      t_SKC,      t_SKZ,
+	t_SKBI,     t_SKF1,     t_SKF2,     t_RTN,      t_RTNSK,
+	t_IOL,      t_DIA,      t_DIB,      t_DOA,      t_SAG,
+	t_COUNT,
+	t_MASK = (1 << 6) - 1,
+	t_I3c  = 1 <<  6,   /* immediate 3 bit constant, complemented */
+	t_I4   = 1 <<  7,   /* immediate 4 bit constant */
+	t_I4c  = 1 <<  8,   /* immediate 4 bit constant, complemented */
+	t_I4p  = 1 <<  9,   /* immediate 4 bit offset into page 3 */
+	t_I6p  = 1 << 10,   /* immediate 6 bit constant; address in current page */
+	t_I6i  = 1 << 11,   /* immediate 6 bit indirect page 3 offset (16 ... 63) + followed by page 1 address */
+	t_I8   = 1 << 12,   /* immediate 8 bit constant (I/O port number) */
+	t_I8c  = 1 << 13,   /* immediate 8 bit constant inverted */
+	t_OVER = 1 << 14,   /* Debugger step over (CALL) */
+	t_OUT  = 1 << 15    /* Debugger step out (RETURN) */
 }   pps4_token_e;
 
 static const char *token_str[t_COUNT] = {
-    "ad",           /* add */
-    "adc",          /* add with carry-in */
-    "adsk",         /* add and skip on carry-out */
-    "adcsk",        /* add with carry-in and skip on carry-out */
-    "adi",          /* add immediate */
-    "dc",           /* decimal correction */
-    "and",          /* logical and */
-    "or",           /* logical or */
-    "eor",          /* logical exclusive-orf */
-    "comp",         /* complement */
-    "sc",           /* set C flip-flop */
-    "rc",           /* reset C flip-flop */
-    "sf1",          /* set FF1 flip-flop */
-    "rf1",          /* reset FF1 flip-flop */
-    "sf2",          /* set FF2 flip-flop */
-    "rf2",          /* reset FF2 flip-flop */
-    "ld",           /* load accumulator from memory */
-    "ex",           /* exchange accumulator and memory */
-    "exd",          /* exchange accumulator and memory and decrement BL */
-    "ldi",          /* load accumulator immediate */
-    "lax",          /* load accumulator from X register */
-    "lxa",          /* load X register from accumulator */
-    "labl",         /* load accumulator with BL */
-    "lbmx",         /* load BM with X */
-    "lbua",         /* load BU with A */
-    "xabl",         /* exchange accumulator and BL */
-    "xbmx",         /* exchange BM and X */
-    "xax",          /* exchange accumulator and X */
-    "xs",           /* exchange SA and SB */
-    "cys",          /* cycle SA register and accumulator */
-    "lb",           /* load B indirect */
-    "lbl",          /* load B long */
-    "incb",         /* increment BL */
-    "decb",         /* decrement BL */
-    "t",            /* transfer */
-    "tm",           /* transfer and mark indirect */
-    "tl",           /* transfer long */
-    "tml",          /* transfer and mark long */
-    "skc",          /* skip on C flip-flop equals 1 */
-    "skz",          /* skip on accumulator zero */
-    "skbi",         /* skip on BL equal to immediate */
-    "skf1",         /* skip on FF1 flip-flop equals 1 */
-    "skf2",         /* skip on FF2 flip-flop equals 1 */
-    "rtn",          /* return */
-    "rtnsk",        /* return and skip */
-    "iol",          /* input/output long */
-    "dia",          /* discrete input group A */
-    "dib",          /* discrete input group B */
-    "doa",          /* discrete output */
-    "sag"           /* special address generation */
+	"ad",           /* add */
+	"adc",          /* add with carry-in */
+	"adsk",         /* add and skip on carry-out */
+	"adcsk",        /* add with carry-in and skip on carry-out */
+	"adi",          /* add immediate */
+	"dc",           /* decimal correction */
+	"and",          /* logical and */
+	"or",           /* logical or */
+	"eor",          /* logical exclusive-orf */
+	"comp",         /* complement */
+	"sc",           /* set C flip-flop */
+	"rc",           /* reset C flip-flop */
+	"sf1",          /* set FF1 flip-flop */
+	"rf1",          /* reset FF1 flip-flop */
+	"sf2",          /* set FF2 flip-flop */
+	"rf2",          /* reset FF2 flip-flop */
+	"ld",           /* load accumulator from memory */
+	"ex",           /* exchange accumulator and memory */
+	"exd",          /* exchange accumulator and memory and decrement BL */
+	"ldi",          /* load accumulator immediate */
+	"lax",          /* load accumulator from X register */
+	"lxa",          /* load X register from accumulator */
+	"labl",         /* load accumulator with BL */
+	"lbmx",         /* load BM with X */
+	"lbua",         /* load BU with A */
+	"xabl",         /* exchange accumulator and BL */
+	"xbmx",         /* exchange BM and X */
+	"xax",          /* exchange accumulator and X */
+	"xs",           /* exchange SA and SB */
+	"cys",          /* cycle SA register and accumulator */
+	"lb",           /* load B indirect */
+	"lbl",          /* load B long */
+	"incb",         /* increment BL */
+	"decb",         /* decrement BL */
+	"t",            /* transfer */
+	"tm",           /* transfer and mark indirect */
+	"tl",           /* transfer long */
+	"tml",          /* transfer and mark long */
+	"skc",          /* skip on C flip-flop equals 1 */
+	"skz",          /* skip on accumulator zero */
+	"skbi",         /* skip on BL equal to immediate */
+	"skf1",         /* skip on FF1 flip-flop equals 1 */
+	"skf2",         /* skip on FF2 flip-flop equals 1 */
+	"rtn",          /* return */
+	"rtnsk",        /* return and skip */
+	"iol",          /* input/output long */
+	"dia",          /* discrete input group A */
+	"dib",          /* discrete input group B */
+	"doa",          /* discrete output */
+	"sag"           /* special address generation */
 };
 
 static const UINT16 table[] = {
@@ -369,75 +369,75 @@ static const UINT16 table[] = {
 
 CPU_DISASSEMBLE( pps4 )
 {
-    UINT32 flags = 0;
-    unsigned PC = pc;
-    UINT8 op = OP(pc++);
-    UINT32 tok = table[op];
-    char *dst = 0;
+	UINT32 flags = 0;
+	unsigned PC = pc;
+	UINT8 op = OP(pc++);
+	UINT32 tok = table[op];
+	char *dst = 0;
 
-    if (0 == (tok & t_MASK)) {
-        sprintf(buffer, "%s", token_str[tok & t_MASK]);
-    } else {
-        dst = buffer + sprintf(buffer, "%-7s", token_str[tok & t_MASK]);
-    }
+	if (0 == (tok & t_MASK)) {
+		sprintf(buffer, "%s", token_str[tok & t_MASK]);
+	} else {
+		dst = buffer + sprintf(buffer, "%-7s", token_str[tok & t_MASK]);
+	}
 
-    if (tok & t_I3c) {
-        // 3 bit immediate, complemented
-        UINT8 i = ~op & 7;
-        if (0 != i)  // only print if non-zero
-            dst += sprintf(dst, "%x", i);
-    }
+	if (tok & t_I3c) {
+		// 3 bit immediate, complemented
+		UINT8 i = ~op & 7;
+		if (0 != i)  // only print if non-zero
+			dst += sprintf(dst, "%x", i);
+	}
 
-    if (tok & t_I4) {
-        // 4 bit immediate
-        UINT8 i = op & 15;
-        dst += sprintf(dst, "%x", i);
-    }
+	if (tok & t_I4) {
+		// 4 bit immediate
+		UINT8 i = op & 15;
+		dst += sprintf(dst, "%x", i);
+	}
 
-    if (tok & t_I4c) {
-        // 4 bit immediate, complemented
-        UINT8 i = ~op & 15;
-        dst += sprintf(dst, "%x", i);
-    }
+	if (tok & t_I4c) {
+		// 4 bit immediate, complemented
+		UINT8 i = ~op & 15;
+		dst += sprintf(dst, "%x", i);
+	}
 
-    if (tok & t_I4p) {
-        // 4 bit immediate offset into page 3
-        UINT8 i = op & 15;
-        dst += sprintf(dst, "[%x]", 0x0c0 | i);
-    }
+	if (tok & t_I4p) {
+		// 4 bit immediate offset into page 3
+		UINT8 i = op & 15;
+		dst += sprintf(dst, "[%x]", 0x0c0 | i);
+	}
 
-    if (tok & t_I6p) {
-        // 6 bit immediate offset into current page
-        UINT8 i = op & 63;
-        dst += sprintf(dst, "%x", (PC & ~63) | i);
-    }
+	if (tok & t_I6p) {
+		// 6 bit immediate offset into current page
+		UINT8 i = op & 63;
+		dst += sprintf(dst, "%x", (PC & ~63) | i);
+	}
 
-    if (tok & t_I6i) {
-        // 6 bit immediate offset into page 3
-        UINT16 i6p3 = (3 << 6) | (op & 63);
-        // 8 bit absolute offset at 0x0100
-        UINT16 addr = (1 << 8) | 0;     // ROM[ip3] can't be reached!?
-        (void)addr; // avoid unused variable warning
-        dst += sprintf(dst, "[%x]", i6p3);
-    }
+	if (tok & t_I6i) {
+		// 6 bit immediate offset into page 3
+		UINT16 i6p3 = (3 << 6) | (op & 63);
+		// 8 bit absolute offset at 0x0100
+		UINT16 addr = (1 << 8) | 0;     // ROM[ip3] can't be reached!?
+		(void)addr; // avoid unused variable warning
+		dst += sprintf(dst, "[%x]", i6p3);
+	}
 
-    if (tok & t_I8) {
-        // 8 bit immediate I/O port address
-        UINT8 arg = ARG(pc++);
-        dst += sprintf(dst, "%02x", arg);
-    }
+	if (tok & t_I8) {
+		// 8 bit immediate I/O port address
+		UINT8 arg = ARG(pc++);
+		dst += sprintf(dst, "%02x", arg);
+	}
 
-    if (tok & t_I8c) {
-        // 8 bit immediate offset into page
-        UINT16 arg = ~ARG(pc++) & 255;
-        dst += sprintf(dst, "%02x", arg);
-    }
+	if (tok & t_I8c) {
+		// 8 bit immediate offset into page
+		UINT16 arg = ~ARG(pc++) & 255;
+		dst += sprintf(dst, "%02x", arg);
+	}
 
-    if (tok & t_OVER)  // TL or TML
-            flags |= DASMFLAG_STEP_OVER;
+	if (tok & t_OVER)  // TL or TML
+			flags |= DASMFLAG_STEP_OVER;
 
-    if (tok & t_OUT)   // RTN or RTNSK
-            flags |= DASMFLAG_STEP_OUT;
+	if (tok & t_OUT)   // RTN or RTNSK
+			flags |= DASMFLAG_STEP_OUT;
 
-    return (pc - PC) | flags | DASMFLAG_SUPPORTED;
+	return (pc - PC) | flags | DASMFLAG_SUPPORTED;
 }

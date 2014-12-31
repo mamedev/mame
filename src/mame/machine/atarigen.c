@@ -1199,7 +1199,7 @@ void atarigen_state::device_post_load()
 	{
 		if (!m_slapstic_device)
 		fatalerror("Slapstic device is missing?\n");
-	
+
 		slapstic_update_bank(m_slapstic_device->slapstic_bank());
 	}
 }

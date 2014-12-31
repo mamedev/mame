@@ -1810,7 +1810,7 @@ inline void snes_ppu_device::draw_blend( UINT16 offset, UINT16 *colour, UINT8 pr
  * the optimized averaging algorithm.
  *********************************************/
 
-void snes_ppu_device::refresh_scanline( running_machine &machine, bitmap_rgb32 &bitmap, UINT16 curline )
+void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, UINT16 curline )
 {
 	UINT16 ii;
 	int x;
@@ -1818,7 +1818,7 @@ void snes_ppu_device::refresh_scanline( running_machine &machine, bitmap_rgb32 &
 	struct SNES_SCANLINE *scanline1, *scanline2;
 	UINT16 c;
 	UINT16 prev_colour = 0;
-	int blurring = machine.root_device().ioport("OPTIONS")->read_safe(0) & 0x01;
+	int blurring = machine().root_device().ioport("OPTIONS")->read_safe(0) & 0x01;
 
 	g_profiler.start(PROFILER_VIDEO);
 
@@ -1866,7 +1866,7 @@ void snes_ppu_device::refresh_scanline( running_machine &machine, bitmap_rgb32 &
 		update_obsel();
 
 #if SNES_LAYER_DEBUG
-		if (dbg_video(machine, curline))
+		if (dbg_video(curline))
 		{
 			g_profiler.stop();
 			return;
@@ -1978,10 +1978,10 @@ static const UINT16 vram_fgr_inccnts[4] = { 0, 32, 64, 128 };
 static const UINT16 vram_fgr_shiftab[4] = { 0, 5, 6, 7 };
 
 // utility function - latches the H/V counters.  Used by IRQ, writes to WRIO, etc.
-void snes_ppu_device::latch_counters( running_machine &machine )
+void snes_ppu_device::latch_counters()
 {
-	m_beam.current_horz = machine.first_screen()->hpos() / m_htmult;
-	m_beam.latch_vert = machine.first_screen()->vpos();
+	m_beam.current_horz = m_screen->hpos() / m_htmult;
+	m_beam.latch_vert = m_screen->vpos();
 	m_beam.latch_horz = m_beam.current_horz;
 	m_stat78 |= 0x40;   // indicate we latched
 //  m_read_ophct = m_read_opvct = 0;    // clear read flags - 2009-08: I think we must clear these when STAT78 is read...
@@ -1989,9 +1989,9 @@ void snes_ppu_device::latch_counters( running_machine &machine )
 //  printf("latched @ H %d V %d\n", m_beam.latch_horz, m_beam.latch_vert);
 }
 
-void snes_ppu_device::dynamic_res_change( running_machine &machine )
+void snes_ppu_device::dynamic_res_change()
 {
-	rectangle visarea = machine.first_screen()->visible_area();
+	rectangle visarea = m_screen->visible_area();
 	attoseconds_t refresh;
 
 	visarea.min_x = visarea.min_y = 0;
@@ -2008,12 +2008,12 @@ void snes_ppu_device::dynamic_res_change( running_machine &machine )
 	if ((m_stat78 & 0x10) == SNES_NTSC)
 	{
 		refresh = HZ_TO_ATTOSECONDS(DOTCLK_NTSC) * SNES_HTOTAL * SNES_VTOTAL_NTSC;
-		machine.first_screen()->configure(SNES_HTOTAL * 2, SNES_VTOTAL_NTSC * m_interlace, visarea, refresh);
+		m_screen->configure(SNES_HTOTAL * 2, SNES_VTOTAL_NTSC * m_interlace, visarea, refresh);
 	}
 	else
 	{
 		refresh = HZ_TO_ATTOSECONDS(DOTCLK_PAL) * SNES_HTOTAL * SNES_VTOTAL_PAL;
-		machine.first_screen()->configure(SNES_HTOTAL * 2, SNES_VTOTAL_PAL * m_interlace, visarea, refresh);
+		m_screen->configure(SNES_HTOTAL * 2, SNES_VTOTAL_PAL * m_interlace, visarea, refresh);
 	}
 }
 
@@ -2033,7 +2033,7 @@ void snes_ppu_device::dynamic_res_change( running_machine &machine )
  when interlace is active.
 *************************************************/
 
-inline UINT32 snes_ppu_device::get_vram_address( running_machine &machine )
+inline UINT32 snes_ppu_device::get_vram_address()
 {
 	UINT32 addr = m_vmadd;
 
@@ -2308,7 +2308,7 @@ UINT8 snes_ppu_device::read(address_space &space, UINT32 offset, UINT8 wrio_bit7
 				return m_ppu1_open_bus;
 			}
 		case SLHV:      /* Software latch for H/V counter */
-			latch_counters(space.machine());
+			latch_counters();
 			return m_openbus_cb(space, 0);       /* Return value is meaningless */
 
 		case ROAMDATA:  /* Read data from OAM (DR) */
@@ -2323,7 +2323,7 @@ UINT8 snes_ppu_device::read(address_space &space, UINT32 offset, UINT8 wrio_bit7
 			return m_ppu1_open_bus;
 		case RVMDATAL:  /* Read data from VRAM (low) */
 			{
-				UINT32 addr = get_vram_address(space.machine());
+				UINT32 addr = get_vram_address();
 				m_ppu1_open_bus = m_vram_read_buffer & 0xff;
 
 				if (!m_vram_fgr_high)
@@ -2338,7 +2338,7 @@ UINT8 snes_ppu_device::read(address_space &space, UINT32 offset, UINT8 wrio_bit7
 			}
 		case RVMDATAH:  /* Read data from VRAM (high) */
 			{
-				UINT32 addr = get_vram_address(space.machine());
+				UINT32 addr = get_vram_address();
 				m_ppu1_open_bus = (m_vram_read_buffer >> 8) & 0xff;
 
 				if (m_vram_fgr_high)
@@ -2469,7 +2469,7 @@ void snes_ppu_device::write(address_space &space, UINT32 offset, UINT8 data)
 			return;
 		case BGMODE:    /* BG mode and character size settings */
 			m_mode = data & 0x07;
-			dynamic_res_change(space.machine());
+			dynamic_res_change();
 			m_bg3_priority_bit = BIT(data, 3);
 			m_layer[SNES_BG1].tile_size = BIT(data, 4);
 			m_layer[SNES_BG2].tile_size = BIT(data, 5);
@@ -2571,7 +2571,7 @@ void snes_ppu_device::write(address_space &space, UINT32 offset, UINT8 data)
 			{
 				UINT32 addr;
 				m_vmadd = (m_vmadd & 0xff00) | (data << 0);
-				addr = get_vram_address(space.machine());
+				addr = get_vram_address();
 				m_vram_read_buffer = vram_read(space, addr);
 				m_vram_read_buffer |= (vram_read(space, addr + 1) << 8);
 			}
@@ -2580,14 +2580,14 @@ void snes_ppu_device::write(address_space &space, UINT32 offset, UINT8 data)
 			{
 				UINT32 addr;
 				m_vmadd = (m_vmadd & 0x00ff) | (data << 8);
-				addr = get_vram_address(space.machine());
+				addr = get_vram_address();
 				m_vram_read_buffer = vram_read(space, addr);
 				m_vram_read_buffer |= (vram_read(space, addr + 1) << 8);
 			}
 			break;
 		case VMDATAL:   /* 2118: Data for VRAM write (low) */
 			{
-				UINT32 addr = get_vram_address(space.machine());
+				UINT32 addr = get_vram_address();
 				vram_write(space, addr, data);
 
 				if (!m_vram_fgr_high)
@@ -2596,7 +2596,7 @@ void snes_ppu_device::write(address_space &space, UINT32 offset, UINT8 data)
 			return;
 		case VMDATAH:   /* 2119: Data for VRAM write (high) */
 			{
-				UINT32 addr = get_vram_address(space.machine());
+				UINT32 addr = get_vram_address();
 				vram_write(space, addr + 1, data);
 
 				if (m_vram_fgr_high)
@@ -2800,7 +2800,7 @@ void snes_ppu_device::write(address_space &space, UINT32 offset, UINT8 data)
 			m_beam.last_visible_line = (data & 0x04) ? 240 : 225;
 			m_pseudo_hires = BIT(data, 3);
 			m_mode7.extbg = BIT(data, 6);
-			dynamic_res_change(space.machine());
+			dynamic_res_change();
 #ifdef SNES_DBG_REG_W
 			if ((data & 0x8) != (PPU_REG(SETINI) & 0x8))
 				osd_printf_debug("Pseudo 512 mode: %s\n", (data & 0x8) ? "on" : "off");
@@ -2827,16 +2827,16 @@ void snes_ppu_device::write(address_space &space, UINT32 offset, UINT8 data)
 		popmessage MSG2;                          \
 	}
 
-UINT8 snes_ppu_device::dbg_video( running_machine &machine, UINT16 curline )
+UINT8 snes_ppu_device::dbg_video( UINT16 curline )
 {
 	int i;
-	UINT8 toggles = machine.root_device().ioport("DEBUG1")->read_safe(0);
+	UINT8 toggles = machine().root_device().ioport("DEBUG1")->read_safe(0);
 	m_debug_options.select_pri[SNES_BG1] = (toggles & 0x03);
 	m_debug_options.select_pri[SNES_BG2] = (toggles & 0x0c) >> 2;
 	m_debug_options.select_pri[SNES_BG3] = (toggles & 0x30) >> 4;
 	m_debug_options.select_pri[SNES_BG4] = (toggles & 0xc0) >> 6;
 
-	toggles = machine.root_device().ioport("DEBUG2")->read_safe(0);
+	toggles = machine().root_device().ioport("DEBUG2")->read_safe(0);
 	for (i = 0; i < 4; i++)
 		DEBUG_TOGGLE(i, m_debug_options.bg_disabled[i], ("Debug: Disabled BG%d.\n", i + 1), ("Debug: Enabled BG%d.\n", i + 1))
 	DEBUG_TOGGLE(4, m_debug_options.bg_disabled[SNES_OAM], ("Debug: Disabled OAM.\n"), ("Debug: Enabled OAM.\n"))
@@ -2844,11 +2844,11 @@ UINT8 snes_ppu_device::dbg_video( running_machine &machine, UINT16 curline )
 	DEBUG_TOGGLE(6, m_debug_options.colormath_disabled, ("Debug: Disabled Color Math.\n"), ("Debug: Enabled Color Math.\n"))
 	DEBUG_TOGGLE(7, m_debug_options.windows_disabled, ("Debug: Disabled Window Masks.\n"), ("Debug: Enabled Window Masks.\n"))
 
-	toggles = machine.root_device().ioport("DEBUG4")->read_safe(0);
+	toggles = machine().root_device().ioport("DEBUG4")->read_safe(0);
 	for (i = 0; i < 8; i++)
 		DEBUG_TOGGLE(i, m_debug_options.mode_disabled[i], ("Debug: Disabled Mode %d drawing.\n", i), ("Debug: Enabled Mode %d drawing.\n", i))
 
-	toggles = machine.root_device().ioport("DEBUG3")->read_safe(0);
+	toggles = machine().root_device().ioport("DEBUG3")->read_safe(0);
 	DEBUG_TOGGLE(2, m_debug_options.mosaic_disabled, ("Debug: Disabled Mosaic.\n"), ("Debug: Enabled Mosaic.\n"))
 	m_debug_options.sprite_reversed = BIT(toggles, 7);
 	m_debug_options.select_pri[SNES_OAM] = (toggles & 0x70) >> 4;

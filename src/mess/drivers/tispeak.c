@@ -3,9 +3,9 @@
 /***************************************************************************
 
   Texas Instruments Speak & Spell hardware
-  
+
   (still need to write notes here..)
-  
+
   Other stuff on similar hardware:
   - Language Tutor/Translator
   - Touch & Tell, but it runs on a TMS1100!
@@ -134,7 +134,7 @@ void tispeak_state::display_update()
 		// schedule delayed filament-off
 		m_filoff_timer->adjust(attotime::from_msec(FILOFF_DECAY_TIME));
 	}
-	
+
 	// update digit state
 	for (int i = 0; i < 9; i++)
 		if (m_r >> i & 1)
@@ -145,7 +145,7 @@ void tispeak_state::display_update()
 	{
 		// standard led14seg
 		output_set_digit_value(i, m_filament_on ? m_digit_state[i] & 0x3fff : 0);
-		
+
 		// DP(display point) and AP(apostrophe) segments as lamps
 		output_set_lamp_value(i*10 + 0, m_digit_state[i] >> 14 & m_filament_on);
 		output_set_lamp_value(i*10 + 1, m_digit_state[i] >> 15 & m_filament_on);
@@ -233,7 +233,7 @@ WRITE16_MEMBER(tispeak_state::snmath_write_o)
 INPUT_CHANGED_MEMBER(tispeak_state::power_button)
 {
 	int on = (int)(FPTR)param;
-	
+
 	if (on && !m_power_on)
 	{
 		m_power_on = 1;
@@ -391,7 +391,7 @@ void tispeak_state::machine_start()
 	save_item(NAME(m_o));
 	save_item(NAME(m_filament_on));
 	save_item(NAME(m_power_on));
-	
+
 	// init cartridge
 	if (m_cart != NULL && m_cart->exists())
 	{
@@ -442,7 +442,7 @@ static MACHINE_CONFIG_DERIVED( snspell, snmath )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, snspell_write_o))
-	
+
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "snspell")
 	MCFG_GENERIC_EXTENSIONS("vsm")

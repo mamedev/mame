@@ -968,29 +968,29 @@
 	</software>
 
 <!--
-	<software name="macadam">
-	    <description>MacADAM (Fra)</description>
-	    <year>1984</year>
-	    <publisher>CBS Loisors - Coleco of France</publisher>
+    <software name="macadam">
+        <description>MacADAM (Fra)</description>
+        <year>1984</year>
+        <publisher>CBS Loisors - Coleco of France</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="macadam (1984) (cbs loisors - coleco of france).ddp" size="262144" crc="2fe95d33" sha1="e27e3515644c2fcd28b94b1aed69ae0b2cb76afc" offset="0" />
-	        </dataarea>
-	    </part>
-	</software>
+        <part name="cass1" interface="adam_cass">
+            <dataarea name="cass" size="262144">
+                <rom name="macadam (1984) (cbs loisors - coleco of france).ddp" size="262144" crc="2fe95d33" sha1="e27e3515644c2fcd28b94b1aed69ae0b2cb76afc" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="macadama" cloneof="macadam">
-	    <description>MacADAM (Fra, Alt)</description>
-	    <year>1984</year>
-	    <publisher>CBS Loisors - Coleco of France</publisher>
+    <software name="macadama" cloneof="macadam">
+        <description>MacADAM (Fra, Alt)</description>
+        <year>1984</year>
+        <publisher>CBS Loisors - Coleco of France</publisher>
 
-	    <part name="cass1" interface="adam_cass">
-	        <dataarea name="cass" size="262144">
-	            <rom name="macadam (1984) (cbs loisors - coleco of france) [a1].ddp" size="262144" crc="5288e332" sha1="4c1de35afefc356db7303f8f584946bbf0f7c528" offset="0" />
-	        </dataarea>
-	    </part>
-	</software>
+        <part name="cass1" interface="adam_cass">
+            <dataarea name="cass" size="262144">
+                <rom name="macadam (1984) (cbs loisors - coleco of france) [a1].ddp" size="262144" crc="5288e332" sha1="4c1de35afefc356db7303f8f584946bbf0f7c528" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 -->
 
 

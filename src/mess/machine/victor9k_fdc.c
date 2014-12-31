@@ -11,20 +11,20 @@
 
 /*
 
-	value   error description
+    value   error description
 
-	01      no sync pulse detected
-	02      no header track
-	03      checksum error in header
-	04      not right track
-	05      not right sector
-	06      not a data block
-	07      data checksum error
-	08      sync too long
-	99      not a system disc
+    01      no sync pulse detected
+    02      no header track
+    03      checksum error in header
+    04      not right track
+    05      not right sector
+    06      not a data block
+    07      data checksum error
+    08      sync too long
+    99      not a system disc
 
-	11      Noise on sync
-	FF      No sync (bad or unformatted disk)
+    11      Noise on sync
+    FF      No sync (bad or unformatted disk)
 
 */
 
@@ -32,9 +32,9 @@
 
     TODO:
 
-	- communication error with SCP after loading boot sector
-		- bp ff1a8
-		- patch ff1ab=c3
+    - communication error with SCP after loading boot sector
+        - bp ff1a8
+        - patch ff1ab=c3
     - single/double sided jumper
     - header sync length unknown (6 is too short)
     - 8048 spindle speed control
@@ -60,17 +60,17 @@
 
 // this is exactly the same decode/encode as used in the Commodore 4040/8050 series drives
 #define GCR_DECODE(_e, _i) \
-    ((BIT(_e, 6) << 7) | (BIT(_i, 7) << 6) | (_e & 0x33) | (BIT(_e, 2) << 3) | (_i & 0x04))
+	((BIT(_e, 6) << 7) | (BIT(_i, 7) << 6) | (_e & 0x33) | (BIT(_e, 2) << 3) | (_i & 0x04))
 
 // E7 E6 I7 E5 E4 E3 E2 I2 E1 E0
 #define GCR_ENCODE(_e, _i) \
-    ((_e & 0xc0) << 2 | (_i & 0x80) | (_e & 0x3c) << 1 | (_i & 0x04) | (_e & 0x03))
+	((_e & 0xc0) << 2 | (_i & 0x80) | (_e & 0x3c) << 1 | (_i & 0x04) | (_e & 0x03))
 
 // Tandon TM-100 spindle @ 300RPM, measured TACH 12VAC 256Hz
 // TACH = RPM / 60 * SPINDLE RATIO * MOTOR POLES
 // 256 = 300 / 60 * 6.4 * 8
-#define SPINDLE_RATIO 	6.4
-#define MOTOR_POLES		8
+#define SPINDLE_RATIO   6.4
+#define MOTOR_POLES     8
 
 // TODO wrong values here! motor speed is controlled by an LM2917, with help from the spindle TACH and a DAC0808 whose value is set by the SCP 8048
 const int victor_9000_fdc_t::rpm[] = { 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 254, 255, 257, 259, 260, 262, 264, 266, 267, 269, 271, 273, 275, 276, 278, 280, 282, 284, 286, 288, 290, 291, 293, 295, 297, 299, 301, 303, 305, 307, 309, 311, 313, 315, 318, 320, 322, 324, 326, 328, 330, 333, 335, 337, 339, 342, 344, 346, 348, 351, 353, 355, 358, 360, 362, 365, 367, 370, 372, 375, 377, 380, 382, 385, 387, 390, 392, 395, 398, 400, 403, 406, 408, 411, 414, 416, 419, 422, 425, 428, 430, 433, 436, 439, 442, 445, 448, 451, 454, 457, 460, 463, 466, 469, 472, 475, 478, 482, 485, 488, 491, 494, 498, 501, 504, 508, 511, 514, 518, 521, 525, 528, 532, 535, 539, 542, 546, 550, 553, 557, 561, 564, 568, 572, 576, 579, 583, 587, 591, 595, 599, 603, 607, 611, 615, 619, 623, 627, 631, 636, 640, 644, 648, 653, 657, 661, 666, 670, 674, 679, 683, 688, 693, 697, 702, 706, 711, 716, 721, 725, 730, 735, 740, 745, 750, 755, 760, 765, 770, 775, 780, 785, 790, 796, 801, 806, 812, 817, 822, 828, 833, 839, 844, 850, 856, 861, 867, 873, 878, 884 };

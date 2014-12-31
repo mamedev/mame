@@ -8,6 +8,7 @@
 
 #include <string.h>
 
+#include "emu.h"
 #include "formats/cpis_dsk.h"
 #include "formats/basicdsk.h"
 

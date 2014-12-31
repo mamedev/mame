@@ -365,7 +365,7 @@ void isa8_cga_device::device_start()
 	astring tempstring;
 	m_chr_gen_base = memregion(subtag(tempstring, "gfx1"))->base();
 	m_chr_gen = m_chr_gen_base + m_chr_gen_offset[1];
-	
+
 	save_item(NAME(m_framecnt));
 	save_item(NAME(m_mode_control));
 	save_item(NAME(m_color_select));
@@ -374,7 +374,7 @@ void isa8_cga_device::device_start()
 	save_item(NAME(m_vsync));
 	save_item(NAME(m_hsync));
 	save_item(NAME(m_vram));
-	save_item(NAME(m_plantronics)); 
+	save_item(NAME(m_plantronics));
 }
 
 

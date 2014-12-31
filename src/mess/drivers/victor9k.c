@@ -14,11 +14,11 @@
     TODO:
 
     - keyboard
-	- expansion bus
-		- Z80 card
-		- Winchester DMA card (Xebec S1410 + Tandon TM502/TM603SE)
-		- RAM cards
-		- clock cards
+    - expansion bus
+        - Z80 card
+        - Winchester DMA card (Xebec S1410 + Tandon TM502/TM603SE)
+        - RAM cards
+        - clock cards
     - floppy 8048
     - hires graphics
     - brightness/contrast

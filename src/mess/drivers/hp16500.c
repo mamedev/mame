@@ -1,6 +1,6 @@
 /***************************************************************************
- 
-	Hewlett-Packard HP16500b Logic Analyzer
+
+    Hewlett-Packard HP16500b Logic Analyzer
 
     MC68EC030 @ 25 MHz
 
@@ -16,7 +16,7 @@
     IRQ 5 = 814a
     IRQ 6 = 35c8 (jump 840120)
     IRQ 7 = 35d4 (jump 840120)
- 
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -28,7 +28,7 @@ public:
 	hp16500_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu")
-	 { }                                      
+		{ }
 
 	virtual void video_start();
 	UINT32 screen_update_hp16500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -55,7 +55,7 @@ private:
 
 READ32_MEMBER(hp16500_state::vbl_state_r)
 {
-	return 0x03000000;	// bit 0 set means the interrupt handler advances the pSOS tick counter.
+	return 0x03000000;  // bit 0 set means the interrupt handler advances the pSOS tick counter.
 }
 
 WRITE32_MEMBER(hp16500_state::vbl_ack_w)
@@ -71,7 +71,7 @@ static ADDRESS_MAP_START(hp16500_map, AS_PROGRAM, 32, hp16500_state)
 	AM_RANGE(0x00203000, 0x00203003) AM_WRITE(vbl_ack_w)
 	AM_RANGE(0x00209800, 0x00209803) AM_READ(vbl_state_r)
 
-	AM_RANGE(0x0020b800, 0x0020b8ff) AM_RAM	// system ram test is really strange.
+	AM_RANGE(0x0020b800, 0x0020b8ff) AM_RAM // system ram test is really strange.
 
 	AM_RANGE(0x00600000, 0x0061ffff) AM_WRITE16(vram_w, 0xffffffff)
 	AM_RANGE(0x00600000, 0x0067ffff) AM_READ8  (vram_r, 0x00ff00ff)
@@ -201,4 +201,3 @@ ROM_START( hp16500b )
 ROM_END
 
 COMP( 1994, hp16500b, 0, 0, hp16500, hp16500, driver_device, 0,  "Hewlett Packard", "HP 16500b", GAME_NOT_WORKING|GAME_NO_SOUND)
-

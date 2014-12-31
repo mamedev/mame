@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <sstream>
 #include "astring.h"
 #include "corefile.h"
 #include "corestr.h"

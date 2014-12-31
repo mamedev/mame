@@ -786,7 +786,7 @@ static MACHINE_CONFIG_START( ecoinfr, ecoinfr_state )
 	MCFG_ECOIN_200STEP_ADD("reel2")
 	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinfr_state, reel2_optic_cb))
 	MCFG_ECOIN_200STEP_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinfr_state, reel3_optic_cb))	
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinfr_state, reel3_optic_cb))
 MACHINE_CONFIG_END
 
 

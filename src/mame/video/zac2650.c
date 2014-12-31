@@ -16,8 +16,7 @@
 
 WRITE8_MEMBER(zac2650_state::tinvader_videoram_w)
 {
-	UINT8 *videoram = m_videoram;
-	videoram[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -111,8 +110,7 @@ int zac2650_state::SpriteCollision(int first,int second)
 
 TILE_GET_INFO_MEMBER(zac2650_state::get_bg_tile_info)
 {
-	UINT8 *videoram = m_videoram;
-	int code = videoram[tile_index];
+	int code = m_videoram[tile_index];
 
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
@@ -127,6 +125,11 @@ void zac2650_state::video_start()
 
 	m_gfxdecode->gfx(1)->set_source(m_s2636_0_ram);
 	m_gfxdecode->gfx(2)->set_source(m_s2636_0_ram);
+
+	save_item(NAME(m_bitmap));
+	save_item(NAME(m_spritebitmap));
+	save_item(NAME(m_CollisionBackground));
+	save_item(NAME(m_CollisionSprite));
 }
 
 void zac2650_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)

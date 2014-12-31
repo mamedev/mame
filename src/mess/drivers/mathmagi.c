@@ -6,13 +6,13 @@
   * TMS1100 MP1030 - MCU
   * 2 x DS8870N - Hex LED Digit Driver
   * 2 x DS8861N - MOS-to-LED 5-Segment Driver
-  
+
   This is a tabletop educational calculator. It came with plastic overlays
   for playing different kind of games. Refer to the manual on how to use it.
   In short, to start from scratch, press [SEL]. By default the device is in
   calculator teaching mode. If [SEL] is followed with 1-6 and then [NXT],
   one of the games is started.
-  
+
   1) Number Machine
   2) Countin' On
   3) Walk The Plank
@@ -24,7 +24,7 @@
   TODO:
   - some of the led symbols are probably wrong, output PLA is unknown
   - microinstructions PLA is not verified
-  
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -102,7 +102,7 @@ WRITE16_MEMBER(mathmagi_state::write_r)
 			if (i >= 8)
 				for (int j = 0; j < 8; j++)
 					output_set_lamp_value(i*10 + j, m_o >> j & 1);
-			
+
 			// R0-R7: 7seg leds
 			else
 				output_set_digit_value(i, m_o >> 1 & 0x7f);

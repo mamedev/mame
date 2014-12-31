@@ -202,7 +202,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ec1847_io, AS_IO, 8, ec184x_state )
 	ADDRESS_MAP_UNMAP_HIGH
-//	AM_RANGE(0x0210, 0x021f) AM_RAM // internal (non-standard?) bus extender
+//  AM_RANGE(0x0210, 0x021f) AM_RAM // internal (non-standard?) bus extender
 ADDRESS_MAP_END
 
 

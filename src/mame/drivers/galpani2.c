@@ -71,9 +71,9 @@ Notes:
 	  PISCES - NEC uPD78324 series MCU with 32k internal rom. Clock 13.500MHz [27/2] on pins 51 & 52
 	   VSync - 59.1856Hz
 	   HSync - 15.625kHz
-	   
+
 	   (TODO: VTOTAL = 264, HTOTAL = 432, pixel clock 27 MHz / 4)
-	   
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -346,23 +346,23 @@ static ADDRESS_MAP_START( galpani2_mem1, AS_PROGRAM, 16, galpani2_state )
 	AM_RANGE(0x300000, 0x301fff) AM_RAM                                             // ?
 	AM_RANGE(0x302000, 0x303fff) AM_RAM AM_SHARE("spriteram")   // Sprites
 	AM_RANGE(0x304000, 0x30401f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)
-//	AM_RANGE(0x308000, 0x308001) AM_WRITENOP                                        // ? 0 at startup
-//	AM_RANGE(0x30c000, 0x30c001) AM_WRITENOP                                        // ? hblank effect ?
+//  AM_RANGE(0x308000, 0x308001) AM_WRITENOP                                        // ? 0 at startup
+//  AM_RANGE(0x30c000, 0x30c001) AM_WRITENOP                                        // ? hblank effect ?
 	AM_RANGE(0x310000, 0x3101ff) AM_RAM_DEVWRITE("bg8palette", palette_device, write) AM_SHARE("bg8palette")    // ?
 	AM_RANGE(0x314000, 0x314001) AM_WRITENOP                                        // ? flip backgrounds ?
 	AM_RANGE(0x318000, 0x318001) AM_READWRITE(galpani2_eeprom_r, galpani2_eeprom_w) // EEPROM
 	AM_RANGE(0x380000, 0x387fff) AM_RAM                                             // Palette?
 	AM_RANGE(0x388000, 0x38ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")   // Palette
-//	AM_RANGE(0x390000, 0x3901ff) AM_WRITENOP                                        // ? at startup of service mode
+//  AM_RANGE(0x390000, 0x3901ff) AM_WRITENOP                                        // ? at startup of service mode
 
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_SHARE("bg8.0")    // Background 0
 	AM_RANGE(0x440000, 0x440001) AM_RAM AM_SHARE("bg8_scrollx.0")           // Background 0 Scroll X
 	AM_RANGE(0x480000, 0x480001) AM_RAM AM_SHARE("bg8_scrolly.0")           // Background 0 Scroll Y
-//	AM_RANGE(0x4c0000, 0x4c0001) AM_WRITENOP                                        // ? 0 at startup only
+//  AM_RANGE(0x4c0000, 0x4c0001) AM_WRITENOP                                        // ? 0 at startup only
 	AM_RANGE(0x500000, 0x53ffff) AM_RAM AM_SHARE("bg8.1")    // Background 1
 	AM_RANGE(0x540000, 0x540001) AM_RAM AM_SHARE("bg8_scrollx.1")           // Background 1 Scroll X
 	AM_RANGE(0x580000, 0x580001) AM_RAM AM_SHARE("bg8_scrolly.1")           // Background 1 Scroll Y
-//	AM_RANGE(0x5c0000, 0x5c0001) AM_WRITENOP                                        // ? 0 at startup only
+//  AM_RANGE(0x5c0000, 0x5c0001) AM_WRITENOP                                        // ? 0 at startup only
 
 	AM_RANGE(0x540572, 0x540573) AM_READNOP                                         // ? galpani2 at F0A4
 	AM_RANGE(0x54057a, 0x54057b) AM_READNOP                                         // ? galpani2 at F148
@@ -411,10 +411,10 @@ static ADDRESS_MAP_START( galpani2_mem2, AS_PROGRAM, 16, galpani2_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                             // ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM AM_SHARE("ram2")                                        // Work RAM
 	AM_RANGE(0x400000, 0x5fffff) AM_RAM AM_SHARE("bg15")  // bg15
-//	AM_RANGE(0x600000, 0x600001) AM_NOP // ? 0 at startup only
-//	AM_RANGE(0x640000, 0x640001) AM_WRITENOP                                // ? 0 at startup only
-//	AM_RANGE(0x680000, 0x680001) AM_WRITENOP                                // ? 0 at startup only
-//	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITENOP                                // ? 0 at startup only
+//  AM_RANGE(0x600000, 0x600001) AM_NOP // ? 0 at startup only
+//  AM_RANGE(0x640000, 0x640001) AM_WRITENOP                                // ? 0 at startup only
+//  AM_RANGE(0x680000, 0x680001) AM_WRITENOP                                // ? 0 at startup only
+//  AM_RANGE(0x6c0000, 0x6c0001) AM_WRITENOP                                // ? 0 at startup only
 	AM_RANGE(0x700000, 0x700001) AM_NOP                                 // Watchdog
 //  AM_RANGE(0x740000, 0x740001) AM_WRITENOP                                // ? Reset mcu
 	AM_RANGE(0x780000, 0x780001) AM_WRITE8(galpani2_mcu_nmi2_w, 0x00ff)             // ? 0 -> 1 -> 0 (lev 5)
@@ -520,7 +520,7 @@ static INPUT_PORTS_START( galpani2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
- 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SERVICE2  ) // this button is used in gp2se as an alt way to bring up the service menu, booting with it held down breaks the game tho!
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SERVICE2  ) // this button is used in gp2se as an alt way to bring up the service menu, booting with it held down breaks the game tho!
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_TILT     )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 

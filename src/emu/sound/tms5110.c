@@ -963,8 +963,9 @@ void tms5110_device::device_reset()
 	/* initialize the chip state */
 	m_speaking_now = m_talk_status = 0;
 	m_CTL_pins = 0;
-		m_RNG = 0x1fff;
+	m_RNG = 0x1fff;
 	m_CTL_buffer = 0;
+	m_PDC = 0;
 
 	/* initialize the energy/pitch/k states */
 	m_old_energy = m_new_energy = m_current_energy = m_target_energy = 0;
@@ -1055,7 +1056,7 @@ READ8_MEMBER( tms5110_device::ctl_r )
 	else if (m_state == CTL_STATE_OUTPUT)
 	{
 		if (DEBUG_5110) logerror("Status read while outputting buffer (buffer=%2d)\n", m_CTL_buffer);
-		return (m_CTL_buffer); 
+		return (m_CTL_buffer);
 	}
 	else // we're reading with the bus in input mode! just return the last thing written to the bus
 	{
@@ -1149,8 +1150,8 @@ void tms5110_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 /******************************************************************************
 
      tms5110_set_frequency -- adjusts the playback frequency
-	 TODO: kill this function; we should be adjusting the tms51xx device clock itself,
-	 not setting it here!
+     TODO: kill this function; we should be adjusting the tms51xx device clock itself,
+     not setting it here!
 
 ******************************************************************************/
 

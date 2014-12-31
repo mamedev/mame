@@ -28317,7 +28317,7 @@ GAMEL( 200?, sc4paccla   ,sc4paccl,  sc4_5reel, sc4paccl, sc4_state, sc4paccl, R
 GAMEL( 200?, sc4pacclb   ,sc4paccl,  sc4_5reel, sc4paccl, sc4_state, sc4paccl, ROT0, "Mazooma","Pac Man Club (PR2018, CPAC) (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 GAMEL( 200?, sc4pacclc   ,sc4paccl,  sc4_5reel, sc4paccl, sc4_state, sc4paccl, ROT0, "Mazooma","Pac Man Club (PR2018, CPAC) (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
-  
+
 // REEL 4 ERR 24 (what type should be here??)
 
 DRIVER_INIT_MEMBER(sc4_state,sc4pmani)

@@ -4642,6 +4642,7 @@ wb32            // (c) 1988 Sega / Westone (FD1094, decrypted)
 wrestwar        // (c) 1989 (8751)
 wrestwar2       // (c) 1989 (FD1094, decrypted)
 wrestwar1       // (c) 1989 (FD1094, decrypted)
+fantzoneta      // (c) 2008 Sega / M2 (bootleg conversion)
 
 // System 16C
 fantzn2x        // (c) 2008 Sega / M2
@@ -6860,7 +6861,7 @@ sprint4         // 008716           1977/12 [6502]
 sprint4a        // 008716           1977/12 [6502]
 nitedrvr        // 006321           1976/10 [6502]
 dominos         // 007305           1977/01 [6502]
-dominos4        // 007754-007765	??????? [6502]
+dominos4        // 007754-007765    ??????? [6502]
 triplhnt        // 008422-008791    1977/04 [6800]
 sprint8         // ??????           1977/05 [6800]
 sprint8a        // ??????           1977/05 [6800]
@@ -6890,7 +6891,7 @@ sbrkoutc        // unrealeased proto
 sbrkoutct       // 034555-034559 proto ???? [6502]
 atarifb         // 033xxx           1978/10 [6502]
 atarifb1        // 033xxx           1978/10 [6502]
-atarifb2		// 035330-035350	???		[6502]
+atarifb2        // 035330-035350    ???     [6502]
 orbit           // 033689-033702    1978/11 [6800]
 boxer           // ?????? prototype 1978    [6502]
 wolfpack        // ?????? prototype         [6502]
@@ -9245,7 +9246,7 @@ yamyamk         // (c) 1990 Dooyong
 wiseguy         // (c) 1990 Dooyong
 lastday         // (c) 1990 Dooyong
 lastdaya        // (c) 1990 Dooyong
-ddaydoo			// (c) 1990 Dooyong
+ddaydoo         // (c) 1990 Dooyong
 gulfstrm        // (c) 1991 Dooyong
 gulfstrma       // (c) 1991 Dooyong
 gulfstrmb       // (c) 1991 Dooyong
@@ -10374,7 +10375,7 @@ thedeep         // (c) 1987 Wood Place
 rundeep         // (c) 1988 Cream (bootleg?)
 wallc           // (c) 1984 Midcoin
 wallca          // (c) 1984 Midcoin
-brkblast		// bootleg (Fadesa)
+brkblast        // bootleg (Fadesa)
 sidampkr        //
 wink            // (c) 1985 Midcoin
 winka           // (c) 1985 Midcoin

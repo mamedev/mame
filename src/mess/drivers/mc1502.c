@@ -51,8 +51,8 @@ TIMER_CALLBACK_MEMBER(mc1502_state::keyb_signal_callback)
 	key |= ioport("Y10")->read();
 	key |= ioport("Y11")->read();
 	key |= ioport("Y12")->read();
-//	DBG_LOG(1,"mc1502_k_s_c",("= %02X (%d) %s\n", key, m_kbd.pulsing,
-//	    (key || m_kbd.pulsing) ? " will IRQ" : ""));
+//  DBG_LOG(1,"mc1502_k_s_c",("= %02X (%d) %s\n", key, m_kbd.pulsing,
+//      (key || m_kbd.pulsing) ? " will IRQ" : ""));
 
 	/*
 	   If a key is pressed and we're not pulsing yet, start pulsing the IRQ1;
@@ -73,7 +73,7 @@ TIMER_CALLBACK_MEMBER(mc1502_state::keyb_signal_callback)
 
 WRITE8_MEMBER(mc1502_state::mc1502_ppi_portb_w)
 {
-//	DBG_LOG(2,"mc1502_ppi_portb_w",("( %02X )\n", data));
+//  DBG_LOG(2,"mc1502_ppi_portb_w",("( %02X )\n", data));
 	m_ppi_portb = data;
 	m_pit8253->write_gate2(BIT(data, 0));
 	mc1502_speaker_set_spkrdata(BIT(data, 1));
@@ -87,7 +87,7 @@ WRITE8_MEMBER(mc1502_state::mc1502_ppi_portb_w)
 // bit 3: i8251 SYNDET pin triggers NMI (default = 1 = no)
 WRITE8_MEMBER(mc1502_state::mc1502_ppi_portc_w)
 {
-//	DBG_LOG(2,"mc1502_ppi_portc_w",("( %02X )\n", data));
+//  DBG_LOG(2,"mc1502_ppi_portc_w",("( %02X )\n", data));
 	m_ppi_portc = data & 15;
 }
 
@@ -104,8 +104,8 @@ READ8_MEMBER(mc1502_state::mc1502_ppi_portc_r)
 	data = ( data & ~0x20 ) | ( m_pit_out2 ? 0x20 : 0x00 );
 	data = ( data & ~0x10 ) | ( (BIT(m_ppi_portb, 1) && m_pit_out2) ? 0x10 : 0x00 );
 
-//	DBG_LOG(2,"mc1502_ppi_portc_r",("= %02X (tap_val %f t2out %d) at %s\n",
-//	    data, tap_val, m_pit_out2, machine().describe_context()));
+//  DBG_LOG(2,"mc1502_ppi_portc_r",("= %02X (tap_val %f t2out %d) at %s\n",
+//      data, tap_val, m_pit_out2, machine().describe_context()));
 	return data;
 }
 
@@ -126,7 +126,7 @@ READ8_MEMBER(mc1502_state::mc1502_kppi_porta_r)
 	if (m_kbd.mask & 0x0400) { key |= ioport("Y11")->read(); }
 	if (m_kbd.mask & 0x0800) { key |= ioport("Y12")->read(); }
 	key ^= 0xff;
-//	DBG_LOG(2,"mc1502_kppi_porta_r",("= %02X\n", key));
+//  DBG_LOG(2,"mc1502_kppi_porta_r",("= %02X\n", key));
 	return key;
 }
 
@@ -138,14 +138,14 @@ WRITE8_MEMBER(mc1502_state::mc1502_kppi_portb_w)
 		m_kbd.mask |= 1 << 11;
 	else
 		m_kbd.mask &= ~(1 << 11);
-//	DBG_LOG(2,"mc1502_kppi_portb_w",("( %02X -> %04X )\n", data, m_kbd.mask));
+//  DBG_LOG(2,"mc1502_kppi_portb_w",("( %02X -> %04X )\n", data, m_kbd.mask));
 }
 
 WRITE8_MEMBER(mc1502_state::mc1502_kppi_portc_w)
 {
 	m_kbd.mask &= ~(7 << 8);
 	m_kbd.mask |= ((data ^ 7) & 7) << 8;
-//	DBG_LOG(2,"mc1502_kppi_portc_w",("( %02X -> %04X )\n", data, m_kbd.mask));
+//  DBG_LOG(2,"mc1502_kppi_portc_w",("( %02X -> %04X )\n", data, m_kbd.mask));
 }
 
 WRITE_LINE_MEMBER(mc1502_state::mc1502_i8251_syndet)

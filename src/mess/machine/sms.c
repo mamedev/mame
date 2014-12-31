@@ -1299,7 +1299,7 @@ void sms_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &
 					/* Do horizontal scaling */
 					for (int plot_x = plot_min_x; plot_x <= plot_max_x;)
 					{
- 						for (int j = (plot_x - plot_x_group); j <= MIN(1, plot_max_x - plot_x_group); j++)
+						for (int j = (plot_x - plot_x_group); j <= MIN(1, plot_max_x - plot_x_group); j++)
 						{
 							if (sms_x + j >= vdp_bitmap.cliprect().min_x && sms_x + j + 1 <= vdp_bitmap.cliprect().max_x)
 							{
@@ -1366,8 +1366,8 @@ void sms_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &
 					rgb_t   c4 = line4[plot_x];
 					p_bitmap[plot_x] =
 						rgb_t( ( c1.r() / 6 + c2.r() / 3 + c3.r() / 3 + c4.r() / 6 ),
-						       ( c1.g() / 6 + c2.g() / 3 + c3.g() / 3 + c4.g() / 6 ),
-						       ( c1.b() / 6 + c2.b() / 3 + c3.b() / 3 + c4.b() / 6 ) );
+								( c1.g() / 6 + c2.g() / 3 + c3.g() / 3 + c4.g() / 6 ),
+								( c1.b() / 6 + c2.b() / 3 + c3.b() / 3 + c4.b() / 6 ) );
 				}
 			}
 		}

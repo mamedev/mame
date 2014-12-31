@@ -2,35 +2,35 @@
 // copyright-holders:FelipeSanches
 /*************************************************************************
 
-	barata.c
+    barata.c
 
-	"Dona Barata"
+    "Dona Barata"
 
-	Brazilian "whack-a-mole"-style game themed after stepping on cockroaches.
-	The name "Dona Barata" means "Lady Cockroach" in brazilian portuguese.
+    Brazilian "whack-a-mole"-style game themed after stepping on cockroaches.
+    The name "Dona Barata" means "Lady Cockroach" in brazilian portuguese.
 
-	Manufactured by Matic: http://maticplay.com.br/
-	This driver still only emulates an early prototype of the game.
-	Propper dumps of the actual released game is still lacking.
-	Photos on the web make us believe that there are at least 2 official
+    Manufactured by Matic: http://maticplay.com.br/
+    This driver still only emulates an early prototype of the game.
+    Propper dumps of the actual released game is still lacking.
+    Photos on the web make us believe that there are at least 2 official
     releases of this game.
 
-	http://www.maticplay.com.br/equipamentos.php?equipamento=dona-barata
-	http://www.valedosduendes.com.br/site/wp-content/uploads/2012/02/barata_1.jpg
+    http://www.maticplay.com.br/equipamentos.php?equipamento=dona-barata
+    http://www.valedosduendes.com.br/site/wp-content/uploads/2012/02/barata_1.jpg
 
     Driver by Felipe Sanches <juca@members.fsf.org>
 
 **************************************************************************
 
-	TO-DO:
+    TO-DO:
 
-	* at the moment, the portbits for the rows are still a guess
-	* as we don't have access to actual PCBs, the CPU clock frequency is a guess
-		(but maybe it can be infered by analysing the 1ms delay routine used)
-	* we don't have sound samples or background music dumps
-		(i.e. we lack dumps of all of the sound memory)
-	* we don't have ROM dumps of the official releases of the game
-	* it would be nice to add photographic artwork to improve the layout
+    * at the moment, the portbits for the rows are still a guess
+    * as we don't have access to actual PCBs, the CPU clock frequency is a guess
+        (but maybe it can be infered by analysing the 1ms delay routine used)
+    * we don't have sound samples or background music dumps
+        (i.e. we lack dumps of all of the sound memory)
+    * we don't have ROM dumps of the official releases of the game
+    * it would be nice to add photographic artwork to improve the layout
 
 **************************************************************************/
 
@@ -138,12 +138,12 @@ static UINT8 dec_7seg(int data)
 	return segment;
 }
 
-#define FPGA_PLAY_BGM				0
-#define FPGA_STOP_BGM				1
-#define FPGA_PLAY_SAMPLE			2
-#define FPGA_LAMP					3
-#define FPGA_COUNTER				4
-#define FPGA_WAITING_FOR_NEW_CMD	5
+#define FPGA_PLAY_BGM               0
+#define FPGA_STOP_BGM               1
+#define FPGA_PLAY_SAMPLE            2
+#define FPGA_LAMP                   3
+#define FPGA_COUNTER                4
+#define FPGA_WAITING_FOR_NEW_CMD    5
 
 const char* mode_strings[] = {
 "Play background music",
@@ -193,7 +193,7 @@ static void fpga_send(unsigned char cmd){
 				lamp_index = lamp_data & 0x0F;
 
 				if (erase_all){
-//					logerror("LED: ERASE ALL\n");
+//                  logerror("LED: ERASE ALL\n");
 					for (int i=0; i<16; i++){
 						output_set_led_value(i, 1);
 					}
@@ -329,4 +329,4 @@ ROM_END
 /*************************
 *      Game Drivers      *
 *************************/
-GAME( 2002, barata,     0,        barata,   barata,    driver_device, 0,        ROT0,  "Eletro Matic Equipamentos Eletromecânicos", "Dona Barata (early prototype)", GAME_IMPERFECT_GRAPHICS )
+GAME( 2002, barata,     0,        barata,   barata,    driver_device, 0,        ROT0,  "Eletro Matic Equipamentos Eletromec??nicos", "Dona Barata (early prototype)", GAME_IMPERFECT_GRAPHICS )

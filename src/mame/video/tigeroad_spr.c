@@ -1,14 +1,14 @@
 /*
 
-	very simple sprite scheme, used by some Capcom games and hardware cloned from them
+    very simple sprite scheme, used by some Capcom games and hardware cloned from them
 
-	bionicc.c
-	tigeroad.c
-	supduck.c
+    bionicc.c
+    tigeroad.c
+    supduck.c
 
-	it is unknown if this is handled by a custom chip, or simple logic.
-	y positions are inverted in Bionic Commando, but it seems otherwise the same as
-	Tiger Road
+    it is unknown if this is handled by a custom chip, or simple logic.
+    y positions are inverted in Bionic Commando, but it seems otherwise the same as
+    Tiger Road
 
 */
 
@@ -39,7 +39,7 @@ void tigeroad_spr_device::device_reset()
    4  words per sprite
 
    0  ---- ---t tttt tttt = tile number
-   
+
    1  ---- ---- --cc cc-- = colour
    1  ---- ---- ---- --x- = flip x
    1  ---- ---- ---- ---y = flip y

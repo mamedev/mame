@@ -164,9 +164,8 @@ void arcompact_device::device_reset()
 
 
 /*****************************************************************************/
-	
+
 
 void arcompact_device::execute_set_input(int irqline, int state)
 {
-
 }

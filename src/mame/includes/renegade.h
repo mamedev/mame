@@ -84,7 +84,7 @@ public:
 	DECLARE_WRITE8_MEMBER(adpcm_addr_w);
 	DECLARE_WRITE8_MEMBER(adpcm_stop_w);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
-	
+
 	DECLARE_DRIVER_INIT(kuniokun);
 	DECLARE_DRIVER_INIT(kuniokunb);
 	DECLARE_DRIVER_INIT(renegade);

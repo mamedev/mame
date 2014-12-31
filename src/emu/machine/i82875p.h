@@ -107,7 +107,7 @@ class i82875p_overflow_device : public pci_device {
 public:
 	i82875p_overflow_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	
+
 	DECLARE_READ8_MEMBER  (dram_row_boundary_r);
 	DECLARE_WRITE8_MEMBER (dram_row_boundary_w);
 	DECLARE_READ8_MEMBER  (dram_row_attribute_r);

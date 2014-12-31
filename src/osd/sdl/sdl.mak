@@ -768,17 +768,17 @@ endif # USE_XINPUT
 # Network (TAP/TUN)
 #-------------------------------------------------
 
+OSDOBJS += $(SDLOBJ)/netdev.o
+
 ifndef DONT_USE_NETWORK
+
 ifeq ($(SDL_NETWORK),taptun)
-OSDOBJS += \
-	$(SDLOBJ)/netdev.o \
-	$(SDLOBJ)/netdev_tap.o
+OSDOBJS += $(SDLOBJ)/netdev_tap.o
 
 DEFS += -DSDLMAME_NETWORK -DSDLMAME_NET_TAPTUN
 endif
 
 ifeq ($(SDL_NETWORK),pcap)
-OSDOBJS += $(SDLOBJ)/netdev.o
 
 ifeq ($(TARGETOS),macosx)
 OSDOBJS += $(SDLOBJ)/netdev_pcap_osx.o
@@ -787,13 +787,14 @@ OSDOBJS += $(SDLOBJ)/netdev_pcap.o
 endif
 
 DEFS += -DSDLMAME_NETWORK -DSDLMAME_NET_PCAP
+
 ifneq ($(TARGETOS),win32)
 LIBS += -lpcap
 endif
-endif
-else
-OSDOBJS += $(SDLOBJ)/netdev.o
-endif
+
+endif # ifeq ($(SDL_NETWORK),pcap)
+
+endif # ifndef DONT_USE_NETWORK
 
 #-------------------------------------------------
 # Dependencies
