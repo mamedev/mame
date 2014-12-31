@@ -69,6 +69,7 @@ void wswan_video_device::common_save()
 	save_item(NAME(m_timer_hblank_enable));
 	save_item(NAME(m_timer_hblank_mode));
 	save_item(NAME(m_timer_hblank_reload));
+	save_item(NAME(m_timer_hblank_count));
 	save_item(NAME(m_timer_vblank_enable));
 	save_item(NAME(m_timer_vblank_mode));
 	save_item(NAME(m_timer_vblank_reload));
