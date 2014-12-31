@@ -126,14 +126,14 @@ READ8_MEMBER(wrally_state::dallas_share_r)
 {
 	UINT8 *shareram = (UINT8 *)m_shareram.target();
 
-	return shareram[BYTE_XOR_LE(offset) ^ 1];
+	return shareram[BYTE_XOR_BE(offset)];
 }
 
 WRITE8_MEMBER(wrally_state::dallas_share_w)
 {
 	UINT8 *shareram = (UINT8 *)m_shareram.target();
 
-	shareram[BYTE_XOR_LE(offset) ^ 1] = data;
+	shareram[BYTE_XOR_BE(offset)] = data;
 }
 
 static ADDRESS_MAP_START( dallas_rom, AS_PROGRAM, 8, wrally_state )
