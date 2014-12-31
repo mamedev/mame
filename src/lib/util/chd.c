@@ -452,6 +452,9 @@ chd_error chd_file::hunk_info(UINT32 hunknum, chd_codec_type &compressor, UINT32
 					compressor = CHD_CODEC_PARENT;
 					compbytes = 0;
 					break;
+
+				default:
+					return CHDERR_UNKNOWN_COMPRESSION;
 			}
 			break;
 	}
