@@ -564,6 +564,9 @@ ifdef SANITIZE
 ifneq (,$(findstring thread,$(SANITIZE)))
 SQLITE3_FLAGS += -fPIC
 endif
+ifneq (,$(findstring memory,$(SANITIZE)))
+SQLITE3_FLAGS += -fPIC
+endif
 endif
 
 ifeq ($(TARGETOS),linux)
