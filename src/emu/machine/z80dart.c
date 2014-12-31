@@ -563,6 +563,7 @@ void z80dart_channel::device_start()
 	save_item(NAME(m_dtr));
 	save_item(NAME(m_rts));
 	save_item(NAME(m_sync));
+	device_serial_interface::register_save_state(machine().save(), name(), tag());
 }
 
 

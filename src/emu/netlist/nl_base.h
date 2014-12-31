@@ -337,6 +337,7 @@ public:
 		CAPACITOR,  // Capacitor
 		DIODE,      // Diode
 		DUMMY,      // DUMMY device without function
+        FRONTIER,   // Net frontier
 		BJT_EB,     // BJT(Ebers-Moll)
 		BJT_SWITCH, // BJT(Switch)
 		VCVS,       // Voltage controlled voltage source

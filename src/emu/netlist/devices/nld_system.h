@@ -39,6 +39,11 @@
 #define DUMMY_INPUT(_name)                                                     \
 		NET_REGISTER_DEV(dummy_input, _name)
 
+#define FRONTIER(_name, _IN, _OUT)                                             \
+        NET_REGISTER_DEV(frontier, _name)                                      \
+        NET_C(_IN, _name.I)                                                    \
+        NET_C(_OUT, _name.Q)                                                   \
+
 // -----------------------------------------------------------------------------
 // mainclock
 // -----------------------------------------------------------------------------
@@ -144,6 +149,41 @@ protected:
 
 private:
 	netlist_analog_input_t m_I;
+
+};
+
+// -----------------------------------------------------------------------------
+// nld_frontier
+// -----------------------------------------------------------------------------
+
+class NETLIB_NAME(frontier) : public netlist_device_t
+{
+public:
+    ATTR_COLD NETLIB_NAME(frontier)()
+            : netlist_device_t(DUMMY) { }
+
+    ATTR_COLD virtual ~NETLIB_NAME(frontier)() {}
+
+protected:
+
+    ATTR_COLD void start()
+    {
+        register_input("I", m_I);
+        register_output("Q", m_Q);
+    }
+
+    ATTR_COLD void reset()
+    {
+    }
+
+    ATTR_HOT ATTR_ALIGN void update()
+    {
+        OUTANALOG(m_Q, INPANALOG(m_I));
+    }
+
+private:
+    netlist_analog_input_t m_I;
+    netlist_analog_output_t m_Q;
 
 };
 

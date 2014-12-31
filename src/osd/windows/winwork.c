@@ -446,7 +446,7 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 		item->param = parambase;
 		item->result = NULL;
 		item->flags = flags;
-		item->done = FALSE;
+		atomic_exchange32(&item->done, FALSE);
 
 		// advance to the next
 		lastitem = item;
@@ -509,9 +509,13 @@ int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 
 	// if we don't have an event, create one
 	if (item->event == NULL)
+	{
+		INT32 lockslot = osd_scalable_lock_acquire(item->queue->lock);
 		item->event = osd_event_alloc(TRUE, FALSE);     // manual reset, not signalled
+		osd_scalable_lock_release(item->queue->lock, lockslot);
+	}
 	else
-			osd_event_reset(item->event);
+		osd_event_reset(item->event);
 
 	// if we don't have an event, we need to spin (shouldn't ever really happen)
 	if (item->event == NULL)
@@ -710,13 +714,19 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 				osd_work_item_release(item);
 
 			// set the result and signal the event
-			else if (item->event != NULL)
+			else
 			{
-				osd_event_set(item->event);
-				add_to_stat(&item->queue->setevents, 1);
+				INT32 lockslot = osd_scalable_lock_acquire(item->queue->lock);
+				if (item->event != NULL)
+				{
+					osd_event_set(item->event);
+					add_to_stat(&item->queue->setevents, 1);
+				}
+				osd_scalable_lock_release(item->queue->lock, lockslot);
 			}
 
 			// if we removed an item and there's still work to do, bump the stats
+			// TODO: data race
 			if (queue->list != NULL)
 				add_to_stat(&queue->extraitems, 1);
 		}
