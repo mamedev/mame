@@ -498,8 +498,10 @@ ifndef MACOSX_USE_LIBSDL
 # Compile using framework (compile using libSDL is the exception)
 ifeq ($(SDL_LIBVER),sdl2)
 LIBS += -F$(SDL_FRAMEWORK_PATH) -framework SDL2 -framework Cocoa -framework OpenGL -lpthread
+BASELIBS += -F$(SDL_FRAMEWORK_PATH) -framework SDL2 -framework Cocoa -framework OpenGL -lpthread
 else
 LIBS += -F$(SDL_FRAMEWORK_PATH) -framework SDL -framework Cocoa -framework OpenGL -lpthread
+BASELIBS += -F$(SDL_FRAMEWORK_PATH) -framework SDL -framework Cocoa -framework OpenGL -lpthread
 endif
 INCPATH += -F$(SDL_FRAMEWORK_PATH)
 else
