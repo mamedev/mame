@@ -656,6 +656,7 @@ static OSDWORK_CALLBACK( sdlwindow_update_cursor_state_wt )
 
 	sdlwindow_update_cursor_state(wp->machine(), wp->window());
 
+	osd_free(wp);
 	return NULL;
 }
 
