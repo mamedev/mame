@@ -622,7 +622,7 @@ private:
 		INT32 endx = setup.endx;
 
 		// ensure all parameters are valid
-		assert(prim.texture.palette != NULL);
+		assert(prim.texture.palette() != NULL);
 
 		// fast case: no coloring, no alpha
 		if (prim.color.r >= 1.0f && prim.color.g >= 1.0f && prim.color.b >= 1.0f && is_opaque(prim.color.a))
@@ -730,7 +730,7 @@ private:
 		INT32 endx = setup.endx;
 
 		// ensure all parameters are valid
-		assert(prim.texture.palette != NULL);
+		assert(prim.texture.palette() != NULL);
 
 		// fast case: no coloring, no alpha
 		if (prim.color.r >= 1.0f && prim.color.g >= 1.0f && prim.color.b >= 1.0f && is_opaque(prim.color.a))
@@ -823,7 +823,7 @@ private:
 		INT32 endx = setup.endx;
 
 		// ensure all parameters are valid
-		assert(prim.texture.palette != NULL);
+		assert(prim.texture.palette() != NULL);
 
 		// fast case: no coloring, no alpha
 		if (prim.color.r >= 1.0f && prim.color.g >= 1.0f && prim.color.b >= 1.0f && is_opaque(prim.color.a))
