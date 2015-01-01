@@ -45,6 +45,9 @@
 	MCFG_DEVICE_SLOT_INTERFACE(a8sio_cards, _def_slot, false) \
 	a8sio_slot_device::static_set_a8sio_slot(*device, _nbtag, _tag);
 
+#define MCFG_A8SIO_DATA_IN_CB(_devcb) \
+	devcb = &a8sio_device::set_data_in_callback(*device, DEVCB_##_devcb);
+
 
 class a8sio_slot_device : public device_t,
 							public device_slot_interface
