@@ -272,6 +272,7 @@ M68KMAKE_OPCODE_HANDLER_HEADER
 extern void m68040_fpu_op0(m68000_base_device *m68k);
 extern void m68040_fpu_op1(m68000_base_device *m68k);
 extern void m68881_mmu_ops(m68000_base_device *m68k);
+extern void m68881_ftrap(m68000_base_device *m68k); 
 
 /* ======================================================================== */
 /* ========================= INSTRUCTION HANDLERS ========================= */
@@ -551,6 +552,7 @@ cpdbcc    32  .     .     1111...001001...  ..........  . . U U . . U   .   .   
 cpgen     32  .     .     1111...000......  ..........  . . U U . . U   .   .   4   4   .   .   .
 cpscc     32  .     .     1111...001......  ..........  . . U U . . U   .   .   4   4   .   .   .
 cptrapcc  32  .     .     1111...001111...  ..........  . . U U . . U   .   .   4   4   .   .   .
+ftrapcc   32  .     .     1111001001111...  ..........  . . U U . . U   .   .   4   4   .   .   .
 dbt       16  .     .     0101000011001...  ..........  U U U U U U U  12  12   6   6   6   6   6
 dbf       16  .     .     0101000111001...  ..........  U U U U U U U  12  12   6   4   4   4   4
 dbcc      16  .     .     0101....11001...  ..........  U U U U U U U  12  12   6   6   6   6   6
@@ -4472,6 +4474,16 @@ M68KMAKE_OP(cptrapcc, 32, ., .)
 	{
 		logerror("%s at %08x: called unimplemented instruction %04x (cptrapcc)\n",
 						(mc68kcpu)->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
+		return;
+	}
+	m68ki_exception_1111(mc68kcpu);
+}
+
+M68KMAKE_OP(ftrapcc, 32, ., .)
+{
+	if((mc68kcpu)->has_fpu)
+	{
+		m68881_ftrap(mc68kcpu);
 		return;
 	}
 	m68ki_exception_1111(mc68kcpu);

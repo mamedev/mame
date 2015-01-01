@@ -2166,3 +2166,32 @@ void m68040_fpu_op1(m68000_base_device *m68k)
 		default:    fatalerror("m68040_fpu_op1: unimplemented op %d at %08X\n", (m68k->ir >> 6) & 0x3, REG_PC(m68k)-2);
 	}
 }
+
+void m68881_ftrap(m68000_base_device *m68k)
+{
+	UINT16 w2  = OPER_I_16(m68k);
+
+	// now check the condition
+	if (TEST_CONDITION(m68k, w2 & 0x3f))
+	{
+		// trap here
+		m68ki_exception_trap(m68k, EXCEPTION_TRAPV);
+	}
+	else	// fall through, requires eating the operand
+	{
+		switch (m68k->ir & 0x7)
+		{
+			case 2:	// word operand
+				OPER_I_16(m68k);
+				break;
+
+			case 3: // long word operand
+				OPER_I_32(m68k);
+				break;
+
+			case 4:	// no operand
+				break;
+		}
+	}
+}
+
