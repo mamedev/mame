@@ -681,14 +681,20 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 	begin_timing(thread->runtime);
 
 	// loop until everything is processed
-	while (queue->list != NULL)
+	while (true)
 	{
 		osd_work_item *item;
-		INT32 lockslot;
 
 		// use a critical section to synchronize the removal of items
-		lockslot = osd_scalable_lock_acquire(queue->lock);
+		INT32 lockslot = osd_scalable_lock_acquire(queue->lock);
 		{
+			if (queue->list == NULL)
+			{
+				osd_scalable_lock_release(queue->lock, lockslot);
+				break;
+			}
+			
+
 			// pull the item from the queue
 			item = (osd_work_item *)queue->list;
 			if (item != NULL)
