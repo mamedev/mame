@@ -181,6 +181,17 @@ static ADDRESS_MAP_START(hp9k330_map, AS_PROGRAM, 32, hp9k3xx_state)
 	AM_IMPORT_FROM(hp9k3xx_common)
 ADDRESS_MAP_END
 
+// 9000/370 - 8 MB RAM standard
+static ADDRESS_MAP_START(hp9k370_map, AS_PROGRAM, 32, hp9k3xx_state)
+	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_SHARE("vram")	// 98544 mono framebuffer
+	AM_RANGE(0x00560000, 0x00563fff) AM_ROM AM_REGION("graphics", 0x0000)	// 98544 mono ROM
+
+	AM_RANGE(0xff700000, 0xff7fffff) AM_READWRITE(buserror_r, buserror_w)
+	AM_RANGE(0xff800000, 0xffffffff) AM_RAM
+
+	AM_IMPORT_FROM(hp9k3xx_common)
+ADDRESS_MAP_END
+
 // 9000/382 - onboard VGA compatible video (where?)
 static ADDRESS_MAP_START(hp9k382_map, AS_PROGRAM, 32, hp9k3xx_state)
 	AM_RANGE(0xffb00000, 0xffbfffff) AM_READWRITE(buserror_r, buserror_w)
@@ -339,6 +350,22 @@ static MACHINE_CONFIG_START( hp9k340, hp9k3xx_state )
 	MCFG_SCREEN_REFRESH_RATE(70)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( hp9k370, hp9k3xx_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD(MAINCPU_TAG, M68030, 33000000)
+	MCFG_CPU_PROGRAM_MAP(hp9k370_map)
+
+	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 0)
+	MCFG_PTM6840_INTERNAL_CLOCK(250000.0f)	// from oscillator module next to the 6840
+	MCFG_PTM6840_EXTERNAL_CLOCKS(250000.0f, 250000.0f, 250000.0f)
+
+	MCFG_SCREEN_ADD( "screen", RASTER)
+	MCFG_SCREEN_UPDATE_DRIVER(hp9k3xx_state, hp98544_update)
+	MCFG_SCREEN_SIZE(1024,768)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
+	MCFG_SCREEN_REFRESH_RATE(70)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( hp9k380, hp9k3xx_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, M68040, 25000000)	// 25 MHz?  33?
@@ -413,6 +440,15 @@ ROM_START( hp9k340 )
 	ROM_LOAD16_BYTE( "98544_1818-1999.bin", 0x000001, 0x002000, CRC(8c7d6480) SHA1(d2bcfd39452c38bc652df39f84c7041cfdf6bd51) )
 ROM_END
 
+ROM_START( hp9k370 )
+	ROM_REGION( 0x20000, MAINCPU_TAG, 0 )
+	ROM_LOAD16_BYTE( "1818-4416.bin", 0x000000, 0x010000, CRC(cd71e85e) SHA1(3e83a80682f733417fdc3720410e45a2cfdcf869) )
+	ROM_LOAD16_BYTE( "1818-4417.bin", 0x000001, 0x010000, CRC(374d49db) SHA1(a12cbf6c151e2f421da4571000b5dffa3ef403b3) )
+
+	ROM_REGION( 0x4000, "graphics", ROMREGION_ERASEFF | ROMREGION_BE | ROMREGION_32BIT )
+	ROM_LOAD16_BYTE( "98544_1818-1999.bin", 0x000001, 0x002000, CRC(8c7d6480) SHA1(d2bcfd39452c38bc652df39f84c7041cfdf6bd51) )
+ROM_END
+
 ROM_START( hp9k380 )
 	ROM_REGION( 0x20000, MAINCPU_TAG, 0 )
 	ROM_LOAD16_WORD_SWAP( "1818-5062_98754_9000-380_27c210.bin", 0x000000, 0x020000, CRC(500a0797) SHA1(4c0a3929e45202a2689e353657e5c4b58ff9a1fd) )
@@ -434,5 +470,6 @@ COMP( 1985, hp9k310, 0,      0,      hp9k310,  hp9k330, driver_device, 0, "Hewle
 COMP( 1985, hp9k320, 0,      0,      hp9k320,  hp9k330, driver_device, 0, "Hewlett-Packard", "HP9000/320", GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1987, hp9k330, 0,      0,      hp9k330,  hp9k330, driver_device, 0, "Hewlett-Packard", "HP9000/330", GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1989, hp9k340, hp9k330,0,      hp9k340,  hp9k330, driver_device, 0, "Hewlett-Packard", "HP9000/340", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1988, hp9k370, hp9k330,0,      hp9k370,  hp9k330, driver_device, 0, "Hewlett-Packard", "HP9000/370", GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1991, hp9k380, 0,      0,      hp9k380,  hp9k330, driver_device, 0, "Hewlett-Packard", "HP9000/380", GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1991, hp9k382, 0,      0,      hp9k382,  hp9k330, driver_device, 0, "Hewlett-Packard", "HP9000/382", GAME_NOT_WORKING | GAME_NO_SOUND)
