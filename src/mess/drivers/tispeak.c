@@ -521,6 +521,22 @@ ROM_START( snspelluka )
 	ROM_LOAD( "cd62175.vsm", 0x0000, 0x4000, CRC(6e1063d4) SHA1(b5c66c51148c5921ecb8ffccd7a460ae639cdb68) )
 ROM_END
 
+ROM_START( snspelljp )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "us4189779_tmc0271", 0x0000, 0x1000, BAD_DUMP CRC(d3f5a37d) SHA1(f75ab617a6067d4d3a954a9f86126d2089554df8) ) // placeholder, use the one we have
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 2127, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0270_cd2708_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // taken from cd2708, need to verify if it's same as tmc0271
+	ROM_REGION( 1246, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0270_tmc0271_opla.pla", 0, 1246, CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) )
+
+	ROM_REGION( 0xc000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
+	ROM_LOAD( "cd2321.vsm", 0x0000, 0x4000, CRC(ac010cce) SHA1(c0200d857b62be696248ac2d684a390c66ab0c31) )
+	ROM_LOAD( "cd2322.vsm", 0x4000, 0x4000, CRC(b6f4bba4) SHA1(65d686a9385b5ef3f080a5f47c6b2418bb9455b0) )
+ROM_END
+
 ROM_START( ladictee )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "us4189779_tmc0271", 0x0000, 0x1000, BAD_DUMP CRC(d3f5a37d) SHA1(f75ab617a6067d4d3a954a9f86126d2089554df8) ) // placeholder, use the one we have
@@ -581,6 +597,7 @@ COMP( 1978, snspell,    0,       0, snspell, snspell, driver_device, 0, "Texas I
 COMP( 1980, snspella,   snspell, 0, snspell, snspell, driver_device, 0, "Texas Instruments", "Speak & Spell (US set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 COMP( 1978, snspelluk,  snspell, 0, snspell, snspell, driver_device, 0, "Texas Instruments", "Speak & Spell (UK set 1)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 COMP( 1981, snspelluka, snspell, 0, snspell, snspell, driver_device, 0, "Texas Instruments", "Speak & Spell (UK set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // different voice actor
+COMP( 1979, snspelljp,  snspell, 0, snspell, snspell, driver_device, 0, "Texas Instruments", "Speak & Spell (Japan)",       GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) 
 COMP( 1980, ladictee,   snspell, 0, snspell, snspell, driver_device, 0, "Texas Instruments", "La Dictee Magnifique (France)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // doesn't work due to missing CD2702 MCU dump, German version has CD2702 too
 
 COMP( 1980, snmath,     0,       0, snmath,  snmath,  driver_device, 0, "Texas Instruments", "Speak & Math (US prototype)", GAME_IMPERFECT_SOUND ) // also US set 1
