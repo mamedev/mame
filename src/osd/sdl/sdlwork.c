@@ -428,6 +428,11 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 				return NULL;
 			item->event = NULL;
 			item->queue = queue;
+			item->done = FALSE;
+		}
+		else
+		{
+			atomic_exchange32(&item->done, FALSE); // needs to be set this way to prevent data race/usage of uninitialized memory on Linux
 		}
 
 		// fill in the basics
@@ -436,7 +441,6 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 		item->param = parambase;
 		item->result = NULL;
 		item->flags = flags;
-		atomic_exchange32(&item->done, FALSE);
 
 		// advance to the next
 		lastitem = item;
