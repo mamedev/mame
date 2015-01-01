@@ -222,6 +222,21 @@ render_texinfo &render_texinfo::operator=(const render_texinfo &src)
     return *this;
 }
 
+render_texinfo::render_texinfo(const render_texinfo &src)
+{
+    base = src.base;
+    rowpixels = src.rowpixels;
+    width = src.width;
+    height = src.height;
+    seqid = src.seqid;
+    osddata = src.osddata;
+    m_palette = src.m_palette;
+    if (m_palette != NULL)
+    {
+        m_palette->ref_count++;
+    }
+}
+
 void render_texinfo::set_palette(const dynamic_array<rgb_t> *source)
 {
     free_palette();

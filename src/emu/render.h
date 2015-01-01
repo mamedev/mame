@@ -219,13 +219,14 @@ struct render_palette_copy
 
 class render_texinfo
 {
-private:
-    render_texinfo(const render_texinfo &src) {}
 public:
     render_texinfo()
     : base(NULL), rowpixels(0), width(0), height(0),
       seqid(0), osddata(0), m_palette(NULL)
     {}
+
+    render_texinfo(const render_texinfo &src);
+
     ~render_texinfo()
     {
         free_palette();
