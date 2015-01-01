@@ -557,6 +557,7 @@ INCPATH += `$(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-D[^ ]*\)::g
 endif
 CCOMFLAGS += `$(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-I[^ ]*\)::g'`
 
+BASELIBS += `$(SDL_CONFIG) --libs`
 LIBS += `$(SDL_CONFIG) --libs`
 
 ifeq ($(SDL_LIBVER),sdl2)
@@ -579,6 +580,7 @@ endif
 
 # libs that Haiku doesn't want but are mandatory on *IX
 ifneq ($(TARGETOS),haiku)
+BASELIBS += -lm -lutil -lpthread
 LIBS += -lm -lutil -lpthread
 endif
 
@@ -845,7 +847,7 @@ TESTKEYSOBJS = \
 
 testkeys$(EXE): $(TESTKEYSOBJS) $(LIBUTIL) $(LIBOCORE) $(SDLUTILMAIN)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+	$(LD) $(LDFLAGS) $^ $(BASELIBS) -o $@
 
 #-------------------------------------------------
 # clean up
