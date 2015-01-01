@@ -2100,6 +2100,7 @@ static MACHINE_CONFIG_START( atari_common_nodac, a400_state )
 	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("fdc", atari_fdc_device, pia_cb2_w))
 
 	MCFG_DEVICE_ADD("a8sio", A8SIO, 0)
+	MCFG_A8SIO_DATA_IN_CB(DEVWRITELINE("pokey", pokey_device, sid_w))
 	MCFG_A8SIO_SLOT_ADD("a8sio", "sio", NULL)
 
 	/* sound hardware */

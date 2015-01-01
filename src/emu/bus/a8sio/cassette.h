@@ -38,8 +38,13 @@ public:
 protected:
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	required_device<cassette_image_device> m_cassette;
+	emu_timer *m_read_timer;
+
+	UINT8 m_old_cass_signal;
+	UINT8 m_signal_count;
 };
 
 // device type definition
