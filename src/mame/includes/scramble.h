@@ -22,8 +22,6 @@ public:
 	optional_shared_ptr<UINT8> m_soundram;
 
 	UINT8 m_cavelon_bank;
-	UINT8 m_security_2B_counter;
-	UINT8 m_xb;
 
 	// harem
 	UINT8 m_harem_decrypt_mode;
@@ -83,8 +81,6 @@ public:
 	DECLARE_DRIVER_INIT(billiard);
 	DECLARE_MACHINE_RESET(scramble);
 	DECLARE_MACHINE_RESET(explorer);
-	DECLARE_WRITE8_MEMBER(scramble_protection_w);
-	DECLARE_READ8_MEMBER(scramble_protection_r);
 	DECLARE_WRITE_LINE_MEMBER(scramble_sh_7474_q_callback);
 	void cavelon_banksw();
 	inline int bit(int i,int n);

@@ -66,7 +66,6 @@ public:
 	UINT8 m__4in1_bank;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_rockclim_tilemap;
-	int m_mooncrst_gfxextend;
 	int m_spriteram2_present;
 	UINT8 m_gfxbank[5];
 	UINT8 m_flipscreen_x;

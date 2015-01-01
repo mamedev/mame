@@ -404,8 +404,6 @@ void galaxold_state::video_start_common()
 	m_modify_color = 0;
 	m_modify_ypos = 0;
 
-	m_mooncrst_gfxextend = 0;
-
 	m_draw_bullets = 0;
 
 	m_draw_background = &galaxold_state::galaxold_draw_background;
