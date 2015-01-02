@@ -2306,7 +2306,6 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_helper(OPS_32, const c
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_00(OPS_32)  { return arcompact_handle04_2f_helper(PARAMS, "ASL"); } // ASL
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_01(OPS_32)  { return arcompact_handle04_2f_helper(PARAMS, "ASR"); } // ASR
 
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_03(OPS_32)  { return arcompact_handle04_2f_helper(PARAMS, "ROR"); } // ROR
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_04(OPS_32)  { return arcompact_handle04_2f_helper(PARAMS, "RCC"); } // RCC
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_05(OPS_32)  { return arcompact_handle04_2f_helper(PARAMS, "SEXB"); } // SEXB
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2f_06(OPS_32)  { return arcompact_handle04_2f_helper(PARAMS, "SEXW"); } // SEXW

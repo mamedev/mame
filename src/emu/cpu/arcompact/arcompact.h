@@ -65,7 +65,12 @@ public:
 	DECLARE_WRITE32_MEMBER(arcompact_auxreg002_LPSTART_w);
 	DECLARE_READ32_MEMBER( arcompact_auxreg003_LPEND_r);
 	DECLARE_WRITE32_MEMBER(arcompact_auxreg003_LPEND_w);
+	
+	DECLARE_READ32_MEMBER( arcompact_auxreg00a_STATUS32_r);
+	DECLARE_READ32_MEMBER( arcompact_auxreg025_INTVECTORBASE_r);
+	DECLARE_WRITE32_MEMBER( arcompact_auxreg025_INTVECTORBASE_w);
 
+	
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -189,7 +194,7 @@ protected:
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_00(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_01(OPS_32);
 //  ARCOMPACT_RETTYPE arcompact_handle04_2f_02(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_03(OPS_32);
+//	ARCOMPACT_RETTYPE arcompact_handle04_2f_03(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_04(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_05(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_06(OPS_32);
@@ -794,6 +799,7 @@ protected:
 	ARCOMPACT_HANDLER04_TYPE_PM(04_2b);
 
 	ARCOMPACT_HANDLER04_TYPE_PM(04_2f_02);
+	ARCOMPACT_HANDLER04_TYPE_PM(04_2f_03);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_2f_07);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_2f_08);
 
@@ -841,6 +847,7 @@ private:
 
 	UINT32 m_LP_START;
 	UINT32 m_LP_END;
+	UINT32 m_INTVECTORBASE;
 
 };
 
