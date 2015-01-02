@@ -757,7 +757,6 @@ void nes_state::setup_disk(nes_disksys_device *slot)
 		slot->prgram_alloc(0x8000);
 
 		slot->pcb_start(machine(), m_ciram, FALSE);
-		slot->pcb_reg_postload(machine());
 		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(device_nes_cart_interface::chr_r),(device_nes_cart_interface *)slot), write8_delegate(FUNC(device_nes_cart_interface::chr_w),(device_nes_cart_interface *)slot));
 		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(device_nes_cart_interface::nt_r),(device_nes_cart_interface *)slot), write8_delegate(FUNC(device_nes_cart_interface::nt_w),(device_nes_cart_interface *)slot));
 		m_ppu->set_scanline_callback(ppu2c0x_scanline_delegate(FUNC(device_nes_cart_interface::scanline_irq),(device_nes_cart_interface *)slot));
@@ -772,6 +771,7 @@ MACHINE_START_MEMBER( nes_state, fds )
 	m_ciram = auto_alloc_array(machine(), UINT8, 0x800);
 	setup_ioports();
 	setup_disk(m_disk);
+	state_register();
 }
 
 MACHINE_RESET_MEMBER( nes_state, fds )
