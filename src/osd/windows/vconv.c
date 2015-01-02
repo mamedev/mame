@@ -205,6 +205,7 @@ static DWORD get_exe_version(const char *executable)
 	// retrieve the version info
 	if (!GetFileVersionInfo(path, 0, version_info_size, version_info))
 	{
+		GlobalFree(version_info);
 		fprintf(stderr, "GetFileVersionInfo() failed\n");
 		exit(-100);
 	}
@@ -212,6 +213,7 @@ static DWORD get_exe_version(const char *executable)
 	// extract the VS_FIXEDFILEINFO from the version info
 	if (!VerQueryValue(version_info, sub_block, &sub_buffer, &sub_buffer_size))
 	{
+		GlobalFree(version_info);
 		fprintf(stderr, "VerQueryValue() failed\n");
 		exit(-100);
 	}
