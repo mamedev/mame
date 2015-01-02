@@ -182,9 +182,7 @@ static ADDRESS_MAP_START(hp16500a_map, AS_PROGRAM, 16, hp16500_state)
 	AM_RANGE(0x600000, 0x61ffff) AM_WRITE(vram_w)
 	AM_RANGE(0x600000, 0x67ffff) AM_READ8(vram_r, 0x00ff)
 
-	AM_RANGE(0x980000, 0x9fffff) AM_RAM
-
-	AM_RANGE(0xa70000, 0xa7ffff) AM_RAM
+	AM_RANGE(0x980000, 0xa7ffff) AM_RAM
 ADDRESS_MAP_END
 
 UINT32 hp16500_state::screen_update_hp16500a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
