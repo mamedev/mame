@@ -60,6 +60,11 @@ class arcompact_device : public cpu_device
 public:
 	// construction/destruction
 	arcompact_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	DECLARE_READ32_MEMBER( arcompact_auxreg002_LPSTART_r);
+	DECLARE_WRITE32_MEMBER(arcompact_auxreg002_LPSTART_w);
+	DECLARE_READ32_MEMBER( arcompact_auxreg003_LPEND_r);
+	DECLARE_WRITE32_MEMBER(arcompact_auxreg003_LPEND_w);
 
 protected:
 	// device-level overrides
@@ -174,12 +179,12 @@ protected:
 	ARCOMPACT_RETTYPE arcompact_handle04_1c(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_1d(OPS_32);
 //  ARCOMPACT_RETTYPE arcompact_handle04_20(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_21(OPS_32);
+//	ARCOMPACT_RETTYPE arcompact_handle04_21(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_22(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_23(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_28(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_29(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2a(OPS_32);
+//	ARCOMPACT_RETTYPE arcompact_handle04_2a(OPS_32);
 //  ARCOMPACT_RETTYPE arcompact_handle04_2b(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_00(OPS_32);
 	ARCOMPACT_RETTYPE arcompact_handle04_2f_01(OPS_32);
@@ -760,6 +765,10 @@ protected:
 	ARCOMPACT_RETTYPE arcompact_handle19_0x_helper(OPS_16, const char* optext, int shift, int format);
 	ARCOMPACT_RETTYPE arcompact_handle1e_0x_helper(OPS_16, const char* optext);
 	ARCOMPACT_RETTYPE arcompact_handle1e_03_0x_helper(OPS_16, const char* optext);
+	
+
+	UINT32 handle_jump_to_addr(int delay, int link, UINT32 address, UINT32 next_addr);
+	UINT32 handle_jump_to_register(int delay, int link, UINT32 reg, UINT32 next_addr, int flag);
 
 	ARCOMPACT_RETTYPE get_insruction(OPS_32);
 
@@ -780,6 +789,8 @@ protected:
 	ARCOMPACT_HANDLER04_TYPE_PM(04_18);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_19);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_20);
+	ARCOMPACT_HANDLER04_TYPE_PM(04_21);
+	ARCOMPACT_HANDLER04_TYPE_PM(04_2a);
 	ARCOMPACT_HANDLER04_TYPE_PM(04_2b);
 
 	ARCOMPACT_HANDLER04_TYPE_PM(04_2f_02);
