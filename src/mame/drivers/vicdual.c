@@ -3374,6 +3374,21 @@ ROM_START( brdrlinb )
 	ROM_LOAD( "borderb.14",  0x0000, 0x0020, CRC(55dcdef1) SHA1(6fbd041edc258b7e1b99bbe9526612cfb1b541f8) )
 ROM_END
 
+ROM_START( startrks )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "0.1a",         0x0000, 0x0400, CRC(2ba4202a) SHA1(1e46e36c37c9f1cecb505a1fe393c24d0e271168) )
+	ROM_LOAD( "1.3a",         0x0400, 0x0400, CRC(cf6081b8) SHA1(2294cf6849a8191928f268ba1dbef21659a1475f) )
+	ROM_LOAD( "2.4a",         0x0800, 0x0400, CRC(fd983c0c) SHA1(a4aea8707878dcac8b4e3d9acad94f60eee956c6) )
+	ROM_LOAD( "3.6a",         0x0c00, 0x0400, CRC(607991c7) SHA1(abfbfdbcedc7192a0cf84f2d28c600fe6f7c7a84) )
+	ROM_LOAD( "4.8a",         0x1000, 0x0400, CRC(043bf767) SHA1(76dd79a4cdd23f75a4e7b5642db05e94e0d2b75e) )
+	ROM_LOAD( "5.9a",         0x1400, 0x0400, CRC(2aa21da3) SHA1(85bb7b74b3df678bf32370ef77ee620c5d7249ab) )
+	ROM_LOAD( "6.11a",        0x1800, 0x0400, CRC(a5315dc8) SHA1(ba6d27d03c9f0100fe89ebbf4b58d166bf259fa8) )
+
+	ROM_REGION( 0x0040, "user1", 0 )    /* timing PROMs */
+	ROM_LOAD( "82s123.15c", 0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )    /* control PROM */
+	ROM_LOAD( "82s123.14c", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )    /* sequence PROM */
+ROM_END
+
 ROM_START( digger )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "684.u27",      0x0000, 0x0400, CRC(bba0d7c2) SHA1(1e55dd95b07b562dcc1e52ecf9460d302b14ee60) )
@@ -3470,7 +3485,6 @@ ROM_START( alphaho )
 ROM_END
 
 
-
 /*************************************
  *
  *  Game drivers
@@ -3515,8 +3529,10 @@ GAME( 1981, starrkr,    brdrline, brdrline,  starrkr,   driver_device, 0, ROT270
 GAME( 1981, brdrlins,   brdrline, brdrline,  brdrline,  driver_device, 0, ROT270, "bootleg (Sidam)", "Borderline (Sidam bootleg)", GAME_NO_SOUND )
 GAME( 1981, brdrlinb,   brdrline, brdrline,  brdrline,  driver_device, 0, ROT270, "bootleg (Karateco)", "Borderline (Karateco bootleg)", GAME_NO_SOUND )
 GAME( 1981, brdrlinet,  brdrline, tranqgun,  tranqgun,  driver_device, 0, ROT270, "Sega", "Borderline (Tranquilizer Gun conversion)", GAME_NO_SOUND ) // official factory conversion
+GAME( 198?, startrks,   0,        headons,   headons,   driver_device, 0, ROT0,   "bootleg (Sidam)", "Star Trek (Head On hardware)", GAME_IMPERFECT_SOUND )
 
 GAME( 1980, digger,     0,        digger,    digger,    driver_device, 0, ROT270, "Sega", "Digger", GAME_NO_SOUND )
 GAME( 1981, pulsar,     0,        pulsar,    pulsar,    driver_device, 0, ROT270, "Sega", "Pulsar", GAME_IMPERFECT_SOUND )
 GAME( 1979, heiankyo,   0,        heiankyo,  heiankyo,  driver_device, 0, ROT270, "Denki Onkyo", "Heiankyo Alien", GAME_NO_SOUND )
 GAME( 19??, alphaho,    0,        alphaho,   alphaho,   driver_device, 0, ROT270, "Data East Corporation", "Alpha Fighter / Head On", GAME_WRONG_COLORS | GAME_NO_SOUND )
+
