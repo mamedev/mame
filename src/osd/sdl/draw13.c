@@ -60,6 +60,10 @@ enum
 
 struct quad_setup_data
 {
+    quad_setup_data()
+    : dudx(0), dvdx(0), dudy(0), dvdy(0), startu(0), startv(0),
+      rotwidth(0), rotheight(0)
+    {}
 	INT32           dudx, dvdx, dudy, dvdy;
 	INT32           startu, startv;
 	INT32           rotwidth, rotheight;
@@ -90,6 +94,12 @@ struct copy_info {
 /* texture_info holds information about a texture */
 struct texture_info
 {
+    texture_info()
+    : next(NULL), hash(0), flags(0), rawwidth(0), rawheight(0), format(0),
+      pixels(NULL), pitch(0), pixels_own(0), texture_id(NULL), copyinfo(NULL),
+      sdl_access(0), sdl_blendmode(SDL_BLENDMODE_NONE), is_rotated(0), last_access(0)
+    {
+    }
 	texture_info *      next;               // next texture in the list
 
 	HashT               hash;               // hash value for the texture (must be >= pointer size)
@@ -117,6 +127,12 @@ struct texture_info
 /* sdl_info is the information about SDL for the current screen */
 struct sdl_info
 {
+    sdl_info()
+    : blittimer(0), extra_flags(0), sdl_renderer(NULL), texlist(NULL),
+      texture_max_width(0), texture_max_height(0), last_hofs(0), last_vofs(0),
+      resize_pending(0), resize_width(0), resize_height(0),
+      last_blit_time(0), last_blit_pixels(0)
+    {}
 	INT32           blittimer;
 	UINT32          extra_flags;
 
@@ -441,7 +457,7 @@ static int RendererSupportsFormat(SDL_Renderer *renderer, Uint32 format, Uint32 
 
 static void add_list(copy_info **head, copy_info *element, Uint32 bm)
 {
-	copy_info *newci = (copy_info *) osd_malloc(sizeof(copy_info));
+	copy_info *newci = global_alloc(copy_info);
 	*newci = *element;
 
 	newci->bm_mask = bm;
@@ -515,7 +531,7 @@ static void drawsdl2_exit(void)
 						(int) bi->perf);
 			freeme = bi;
 			bi = bi->next;
-			osd_free(freeme);
+			global_free(freeme);
 		}
 }
 
@@ -543,11 +559,9 @@ static void drawsdl2_attach(sdl_draw_info *info, sdl_window_info *window)
 static int drawsdl2_window_create(sdl_window_info *window, int width, int height)
 {
 	// allocate memory for our structures
-	sdl_info *sdl = (sdl_info *) osd_malloc(sizeof(*sdl));
+	sdl_info *sdl = global_alloc(sdl_info);
 
 	osd_printf_verbose("Enter drawsdl2_window_create\n");
-
-	memset(sdl, 0, sizeof(*sdl));
 
 	window->dxdata = sdl;
 
@@ -819,7 +833,7 @@ static void drawsdl2_window_destroy(sdl_window_info *window)
 
 	SDL_DestroyWindow(window->sdl_window);
 
-	osd_free(sdl);
+	global_free(sdl);
 	window->dxdata = NULL;
 }
 
@@ -879,8 +893,7 @@ static texture_info *texture_create(sdl_window_info *window, const render_texinf
 	texture_info *texture;
 
 	// allocate a new texture
-	texture = (texture_info *) osd_malloc(sizeof(*texture));
-	memset(texture, 0, sizeof(*texture));
+	texture = global_alloc(texture_info);
 
 	// fill in the core data
 	texture->hash = texture_compute_hash(texsource, flags);
@@ -897,7 +910,7 @@ static texture_info *texture_create(sdl_window_info *window, const render_texinf
 			texture->format = SDL_TEXFORMAT_ARGB32;
 			break;
 		case TEXFORMAT_RGB32:
-			texture->format = texsource->palette ? SDL_TEXFORMAT_RGB32_PALETTED : SDL_TEXFORMAT_RGB32;
+			texture->format = texsource->palette() ? SDL_TEXFORMAT_RGB32_PALETTED : SDL_TEXFORMAT_RGB32;
 			break;
 		case TEXFORMAT_PALETTE16:
 			texture->format = SDL_TEXFORMAT_PALETTE16;
@@ -906,7 +919,7 @@ static texture_info *texture_create(sdl_window_info *window, const render_texinf
 			texture->format = SDL_TEXFORMAT_PALETTE16A;
 			break;
 		case TEXFORMAT_YUY16:
-			texture->format = texsource->palette ? SDL_TEXFORMAT_YUY16_PALETTED : SDL_TEXFORMAT_YUY16;
+			texture->format = texsource->palette() ? SDL_TEXFORMAT_YUY16_PALETTED : SDL_TEXFORMAT_YUY16;
 			break;
 
 		default:
@@ -940,7 +953,7 @@ static texture_info *texture_create(sdl_window_info *window, const render_texinf
 
 	if ( (texture->copyinfo->func != NULL) && (texture->sdl_access == SDL_TEXTUREACCESS_STATIC))
 	{
-		texture->pixels = osd_malloc_array(texture->setup.rotwidth * texture->setup.rotheight * texture->copyinfo->dst_bpp);
+		texture->pixels = malloc(texture->setup.rotwidth * texture->setup.rotheight * texture->copyinfo->dst_bpp);
 		texture->pixels_own=TRUE;
 	}
 	/* add us to the texture list */
@@ -1135,7 +1148,7 @@ static void drawsdl2_destroy_texture(sdl_info *sdl, texture_info *texture)
 	SDL_DestroyTexture(texture->texture_id);
 	if ( texture->pixels_own )
 	{
-		osd_free(texture->pixels);
+		free(texture->pixels);
 		texture->pixels=NULL;
 		texture->pixels_own=FALSE;
 	}
@@ -1147,7 +1160,7 @@ static void drawsdl2_destroy_texture(sdl_info *sdl, texture_info *texture)
 		sdl->texlist = NULL;
 	else
 		p->next = texture->next;
-	osd_free(texture);
+	global_free(texture);
 }
 
 static void drawsdl2_destroy_all_textures(sdl_window_info *window)

@@ -940,7 +940,7 @@ int shaders::create_resources(bool reset)
 		texture.rowpixels = shadow_bitmap.rowpixels();
 		texture.width = shadow_bitmap.width();
 		texture.height = shadow_bitmap.height();
-		texture.palette = NULL;
+		texture.set_palette(NULL);
 		texture.seqid = 0;
 
 		// now create it

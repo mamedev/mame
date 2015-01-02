@@ -376,6 +376,7 @@ public:
 	void init_cpu_m68008(void);
 	void init_cpu_m68010(void);
 	void init_cpu_m68020(void);
+	void init_cpu_m68020fpu(void);
 	void init_cpu_m68020pmmu(void);
 	void init_cpu_m68020hmmu(void);
 	void init_cpu_m68ec020(void);
@@ -539,6 +540,26 @@ class m68020_device : public m68000_base_device
 public:
 	// construction/destruction
 	m68020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const { return 20; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	virtual UINT32 execute_min_cycles() const { return 2; };
+	virtual UINT32 execute_max_cycles() const { return 158; };
+
+	virtual UINT32 execute_default_irq_vector() const { return -1; };
+
+	// device-level overrides
+	virtual void device_start();
+protected:
+};
+
+class m68020fpu_device : public m68000_base_device
+{
+public:
+	// construction/destruction
+	m68020fpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
 	virtual UINT32 disasm_max_opcode_bytes() const { return 20; };
@@ -773,6 +794,7 @@ extern const device_type M68008PLCC;
 extern const device_type M68010;
 extern const device_type M68EC020;
 extern const device_type M68020;
+extern const device_type M68020FPU;
 extern const device_type M68020PMMU;
 extern const device_type M68020HMMU;
 extern const device_type M68EC030;

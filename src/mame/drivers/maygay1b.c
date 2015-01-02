@@ -105,10 +105,13 @@ WRITE_LINE_MEMBER(maygay1b_state::duart_irq_handler)
 // FIRQ, related to the sample playback?
 READ8_MEMBER( maygay1b_state::m1_firq_trg_r )
 {
-	int nar = m_msm6376->nar_r();
-	if (nar)
+	if (m_msm6376)
 	{
-		cpu0_firq(1);
+		int nar = m_msm6376->nar_r();
+		if (nar)
+		{
+			cpu0_firq(1);
+		}
 	}
 	return 0xff;
 }
@@ -377,13 +380,19 @@ WRITE8_MEMBER(maygay1b_state::latch_ch2_w)
 //A strange setup this, the address lines are used to move st to the right level
 READ8_MEMBER(maygay1b_state::latch_st_hi)
 {
-	m_msm6376->st_w(1);
+	if (m_msm6376)
+	{
+		m_msm6376->st_w(1);
+	}
 	return 0xff;
 }
 
 READ8_MEMBER(maygay1b_state::latch_st_lo)
 {
-	m_msm6376->st_w(0);
+	if (m_msm6376)
+	{
+		m_msm6376->st_w(0);
+	}
 	return 0xff;
 }
 

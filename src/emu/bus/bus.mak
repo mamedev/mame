@@ -45,6 +45,18 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/a8sio/a8sio.h,BUSES += A8SIO
+#-------------------------------------------------
+
+ifneq ($(filter A8SIO,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/a8sio
+BUSOBJS += $(BUSOBJ)/a8sio/a8sio.o
+BUSOBJS += $(BUSOBJ)/a8sio/cassette.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/abcbus/abcbus.h,BUSES += ABCBUS
 #-------------------------------------------------
 

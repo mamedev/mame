@@ -1128,7 +1128,59 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle1e_03(OPS_16)
 
 // handlers
 
+UINT32 arcompact_device::handle_jump_to_addr(int delay, int link, UINT32 address, UINT32 next_addr)
+{
+	if (delay)
+	{
+		m_delayactive = 1;
+		m_delayjump = address;
+		if (link) m_delaylinks = 1;
+		else m_delaylinks = 0;
+		return next_addr;
+	}
+	else
+	{
+		if (link) m_regs[REG_BLINK] = next_addr;
+		return address;
+	}
 
+}
+
+UINT32 arcompact_device::handle_jump_to_register(int delay, int link, UINT32 reg, UINT32 next_addr, int flag)
+{
+	if (reg == LIMM_REG)
+		arcompact_fatal("handle_jump_to_register called with LIMM register, call handle_jump_to_addr instead");
+
+	if ((reg == REG_ILINK1) || (reg == REG_ILINK2))
+	{
+		if (flag)
+		{
+			arcompact_fatal("jump to ILINK1/ILINK2 not supported");
+			return next_addr;
+		}
+		else
+		{
+			arcompact_fatal("illegal jump to ILINK1/ILINK2 not supported"); // FLAG bit must be set
+			return next_addr;
+		}
+	}
+	else
+	{
+		if (flag)
+		{
+			arcompact_fatal("illegal jump (flag bit set)"); // FLAG bit must NOT be set
+			return next_addr;
+		}
+		else
+		{
+			//arcompact_fatal("jump not supported");
+			UINT32 target = m_regs[reg];
+			return handle_jump_to_addr(delay, link, target, next_addr);
+		}
+	}
+
+	return 0;
+}
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle00_00(OPS_32)
 {
@@ -2028,11 +2080,123 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_20_p11_m1(OPS_32)
 }
 
 
-
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_21(OPS_32)
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_21_p00(OPS_32)
 {
-	return arcompact_handle04_helper(PARAMS, opcodes_04[0x21], /*"J.D"*/ 1,1);
+	int size = 4;
+	UINT32 limm = 0;
+	int got_limm = 0;
+
+	COMMON32_GET_creg
+	COMMON32_GET_F
+
+	if (creg == LIMM_REG)
+	{
+		if (!got_limm)
+		{
+			GET_LIMM_32;
+			size = 8;
+		}
+
+		handle_jump_to_addr(1,0,limm, m_pc + (size>>0));
+	}
+	else
+	{
+		return handle_jump_to_register(1,0,creg, m_pc + (size>>0), F); // delay, no link
+	}
+
+	return m_pc + (size>>0);
 }
+
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_21_p01(OPS_32)
+{
+	int size = 4;
+	arcompact_log("unimplemented J.D (u6 type) %08x", op);
+	return m_pc + (size>>0);
+}
+
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_21_p10(OPS_32)
+{
+	int size = 4;
+	arcompact_log("unimplemented J.D (s12 type) %08x", op);
+	return m_pc + (size>>0);
+}
+
+
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_21_p11_m0(OPS_32) // Jcc.D   (no link, delay)
+{
+	int size = 4;
+	UINT32 limm = 0;
+	int got_limm = 0;
+
+	COMMON32_GET_creg
+	COMMON32_GET_CONDITION;
+	COMMON32_GET_F
+
+	//UINT32 c = 0;
+
+	if (creg == LIMM_REG)
+	{
+		if (!got_limm)
+		{
+			GET_LIMM_32;
+			size = 8;
+		}
+
+	//	c = limm;
+
+	}
+	else
+	{
+		// opcode          iiii i--- ppII IIII F--- cccc ccmq qqqq
+		// Jcc [c]         0010 0RRR 1110 0000 0RRR CCCC CC0Q QQQQ
+		// no conditional links to ILINK1, ILINK2?
+
+	//	c = m_regs[creg];
+	}
+
+	if (!check_condition(condition))
+		return m_pc + (size>>0);
+
+	if (!F)
+	{
+		// if F isn't set then the destination can't be ILINK1 or ILINK2
+
+		if ((creg == REG_ILINK1) || (creg == REG_ILINK1))
+		{
+			arcompact_log("unimplemented Jcc.D (p11_m0 type, illegal) %08x", op);
+		}
+		else
+		{
+			arcompact_log("unimplemented Jcc.D (p11_m0 type, unimplemented) %08x", op);
+		}
+	}
+
+	if (F)
+	{
+		// if F is set then the destination MUST be ILINK1 or ILINK2
+
+		if ((creg == REG_ILINK1) || (creg == REG_ILINK1))
+		{
+			arcompact_log("unimplemented Jcc.D.F (p11_m0 type, unimplemented) %08x", op);
+		}
+		else
+		{
+			arcompact_log("unimplemented Jcc.D.F (p11_m0 type, illegal) %08x", op);
+		}
+	}
+
+
+	return m_pc + (size>>0);
+}
+
+ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_21_p11_m1(OPS_32)
+{
+	int size = 4;
+	arcompact_log("unimplemented arcompact_handle04_21_p11_m1 J.D %08x (u6)", op);
+	return m_pc + (size>>0);
+}
+
+
 
 ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_22(OPS_32)
 {
@@ -2092,47 +2256,6 @@ ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_28(OPS_32) // LPcc (loop 
 
 	return m_pc + (size>>0);
 
-}
-
-
-ARCOMPACT_RETTYPE arcompact_device::arcompact_handle04_2a(OPS_32)  // Load FROM Auxiliary register TO register
-{
-	int size = 4;
-//  UINT32 limm = 0;
-	int got_limm = 0;
-
-	COMMON32_GET_p;
-	//COMMON32_GET_breg;
-
-	if (p == 0)
-	{
-		COMMON32_GET_creg
-
-		if (creg == LIMM_REG)
-		{
-			if (!got_limm)
-			{
-				//GET_LIMM_32;
-				size = 8;
-			}
-
-		}
-		else
-		{
-		}
-	}
-	else if (p == 1)
-	{
-	}
-	else if (p == 2)
-	{
-	}
-	else if (p == 3)
-	{
-	}
-
-	arcompact_log("unimplemented LR %08x", op);
-	return m_pc + (size>>0);
 }
 
 

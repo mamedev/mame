@@ -24,14 +24,24 @@
 
 const device_type ARCA5 = &device_creator<arcompact_device>;
 
+
+READ32_MEMBER( arcompact_device::arcompact_auxreg002_LPSTART_r) { return m_LP_START&0xfffffffe; }
+WRITE32_MEMBER(arcompact_device::arcompact_auxreg002_LPSTART_w) { m_LP_START = data&0xfffffffe; }
+READ32_MEMBER( arcompact_device::arcompact_auxreg003_LPEND_r) { return m_LP_END&0xfffffffe; }
+WRITE32_MEMBER(arcompact_device::arcompact_auxreg003_LPEND_w) { m_LP_END = data&0xfffffffe; }
+
 static ADDRESS_MAP_START( arcompact_auxreg_map, AS_IO, 32, arcompact_device )
+	AM_RANGE(0x000000008, 0x00000000b) AM_READWRITE(arcompact_auxreg002_LPSTART_r, arcompact_auxreg002_LPSTART_w)
+	AM_RANGE(0x00000000c, 0x00000000f) AM_READWRITE(arcompact_auxreg003_LPEND_r, arcompact_auxreg003_LPEND_w)
 ADDRESS_MAP_END
 
+//#define AUX_SPACE_ADDRESS_WIDTH 34  // IO space is 32 bits of dwords, so 34-bits
+#define AUX_SPACE_ADDRESS_WIDTH 64 // but the MAME core requires us to use power of 2 values for >32
 
 arcompact_device::arcompact_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, ARCA5, "ARCtangent-A5", tag, owner, clock, "arca5", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0) // some docs describe these as 'middle endian'?!
-	, m_io_config( "io", ENDIANNESS_LITTLE, 32, 34, 0, ADDRESS_MAP_NAME( arcompact_auxreg_map ) ) // IO space is 32 bits of dwords, so 34-bits
+	, m_io_config( "io", ENDIANNESS_LITTLE, 32, AUX_SPACE_ADDRESS_WIDTH, 0, ADDRESS_MAP_NAME( arcompact_auxreg_map ) ) 
 {
 }
 

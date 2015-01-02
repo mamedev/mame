@@ -1055,6 +1055,18 @@ void pokey_device::write_internal(offs_t offset, UINT8 data)
 
 }
 
+WRITE_LINE_MEMBER( pokey_device::sid_w )
+{
+	if (state)
+	{
+		m_SKSTAT |= SK_SERIN;
+	}
+	else
+	{
+		m_SKSTAT &= ~SK_SERIN;
+	}
+}
+
 void pokey_device::serin_ready(int after)
 {
 	timer_set(m_clock_period * after, 5, 0);

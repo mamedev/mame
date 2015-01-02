@@ -19,8 +19,6 @@ MACHINE_RESET_MEMBER(scramble_state,scramble)
 
 	if (m_audiocpu != NULL)
 		sh_init();
-
-	m_security_2B_counter = 0;
 }
 
 MACHINE_RESET_MEMBER(scramble_state,explorer)
@@ -48,29 +46,6 @@ CUSTOM_INPUT_MEMBER(scramble_state::darkplnt_custom_r)
 }
 
 /* state of the security PAL (6J) */
-
-WRITE8_MEMBER(scramble_state::scramble_protection_w)
-{
-	m_xb = data;
-}
-
-READ8_MEMBER(scramble_state::scramble_protection_r)
-{
-	switch (m_maincpu->pc())
-	{
-	case 0x00a8: return 0xf0;
-	case 0x00be: return 0xb0;
-	case 0x0c1d: return 0xf0;
-	case 0x0c6a: return 0xb0;
-	case 0x0ceb: return 0x40;
-	case 0x0d37: return 0x60;
-	case 0x1ca2: return 0x00;  /* I don't think it's checked */
-	case 0x1d7e: return 0xb0;
-	default:
-		logerror("%s: read protection\n",machine().describe_context());
-		return 0;
-	}
-}
 
 
 READ8_MEMBER(scramble_state::mariner_protection_1_r )

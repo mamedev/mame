@@ -312,6 +312,7 @@ ifeq ($(findstring 4.4.,$(TEST_GCC)),)
 endif
 
 # add the windows libraries
+BASELIBS += -luser32 -lgdi32 -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi -lwsock32
 LIBS += -luser32 -lgdi32 -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi -lwsock32
 
 ifdef USE_SDL

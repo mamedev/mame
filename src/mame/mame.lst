@@ -4329,6 +4329,7 @@ starrkr         // (c) 1981 Sega
 brdrlins        // Sidam bootleg
 brdrlinb        // Karateco bootleg
 brdrlinet       // (c) 1981 Sega
+startrks        // Sidam bootleg
 digger          // 684-691 no copyright notice
 pulsar          // 790-805 (c) 1981 Sega
 heiankyo        // (c) [1979?] Denki Onkyo
@@ -6593,6 +6594,8 @@ sbishik         // GX675 (c) 1998 (Korea)
 
 // Konami dual 68000 games
 overdriv        // GX789 (c) 1990
+overdriva       // GX789 (c) 1990
+overdrivb       // GX789 (c) 1990
 gradius3        // GX945 (c) 1989 (World)
 gradius3j       // GX945 (c) 1989 (Japan)
 gradius3a       // GX945 (c) 1989 (Asia)

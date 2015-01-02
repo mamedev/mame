@@ -139,6 +139,7 @@ int osd_num_processors = 0;
 static int effective_num_processors(void);
 static void * worker_thread_entry(void *param);
 static void worker_thread_process(osd_work_queue *queue, work_thread_info *thread);
+static bool queue_has_list_items(osd_work_queue *queue);
 
 
 //============================================================
@@ -428,6 +429,11 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 				return NULL;
 			item->event = NULL;
 			item->queue = queue;
+			item->done = FALSE;
+		}
+		else
+		{
+			atomic_exchange32(&item->done, FALSE); // needs to be set this way to prevent data race/usage of uninitialized memory on Linux
 		}
 
 		// fill in the basics
@@ -436,7 +442,6 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 		item->param = parambase;
 		item->result = NULL;
 		item->flags = flags;
-		atomic_exchange32(&item->done, FALSE);
 
 		// advance to the next
 		lastitem = item;
@@ -613,17 +618,11 @@ static void *worker_thread_entry(void *param)
 		if (queue->exiting)
 			break;
 
+		if (!queue_has_list_items(queue))
 		{
-			INT32 lockslot = osd_scalable_lock_acquire(queue->lock);
-			bool wait_for_event = (queue->list == NULL);
-			osd_scalable_lock_release(queue->lock, lockslot);
-
-			if (wait_for_event)
-			{
-				begin_timing(thread->waittime);
-				osd_event_wait(thread->wakeevent, INFINITE);
-				end_timing(thread->waittime);
-			}
+			begin_timing(thread->waittime);
+			osd_event_wait(thread->wakeevent, INFINITE);
+			end_timing(thread->waittime);
 		}
 
 		if (queue->exiting)
@@ -657,7 +656,7 @@ static void *worker_thread_entry(void *param)
 			}
 
 			// if nothing more, release the processor
-			if (queue->list == NULL)
+			if (!queue_has_list_items(queue))
 				break;
 			add_to_stat(&queue->spinloops, 1);
 		}
@@ -686,24 +685,35 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 	begin_timing(thread->runtime);
 
 	// loop until everything is processed
-	while (queue->list != NULL)
+	while (true)
 	{
 		osd_work_item *item;
-		INT32 lockslot;
+
+		bool end_loop = false;
 
 		// use a critical section to synchronize the removal of items
-		lockslot = osd_scalable_lock_acquire(queue->lock);
 		{
-			// pull the item from the queue
-			item = (osd_work_item *)queue->list;
-			if (item != NULL)
+			INT32 lockslot = osd_scalable_lock_acquire(queue->lock);
+			if (queue->list == NULL)
 			{
-				queue->list = item->next;
-				if (queue->list == NULL)
-					queue->tailptr = (osd_work_item **)&queue->list;
+				end_loop = true;
 			}
+			else
+			{
+				// pull the item from the queue
+				item = (osd_work_item *)queue->list;
+				if (item != NULL)
+				{
+					queue->list = item->next;
+					if (queue->list == NULL)
+						queue->tailptr = (osd_work_item **)&queue->list;
+				}
+			}
+			osd_scalable_lock_release(queue->lock, lockslot);
 		}
-		osd_scalable_lock_release(queue->lock, lockslot);
+
+		if (end_loop)
+			break;
 
 		// process non-NULL items
 		if (item != NULL)
@@ -735,8 +745,7 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 			}
 
 			// if we removed an item and there's still work to do, bump the stats
-			// TODO: data race
-			if (queue->list != NULL)
+			if (queue_has_list_items(queue))
 				add_to_stat(&queue->extraitems, 1);
 		}
 	}
@@ -751,4 +760,11 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 	end_timing(thread->runtime);
 }
 
+bool queue_has_list_items(osd_work_queue *queue)
+{
+	INT32 lockslot = osd_scalable_lock_acquire(queue->lock);
+	bool has_list_items = (queue->list != NULL);
+	osd_scalable_lock_release(queue->lock, lockslot);
+	return has_list_items;
+}
 #endif // SDLMAME_NOASM

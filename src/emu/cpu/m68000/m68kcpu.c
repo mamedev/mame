@@ -699,7 +699,7 @@ static void m68k_cause_bus_error(m68000_base_device *m68k)
 	{
 		/* only the 68010 throws this unique type-1000 frame */
 		m68ki_stack_frame_1000(m68k, REG_PPC(m68k), sr, EXCEPTION_BUS_ERROR);
-	}
+	} 
 	else if (m68k->mmu_tmp_buserror_address == REG_PPC(m68k))
 	{
 		m68ki_stack_frame_1010(m68k, sr, EXCEPTION_BUS_ERROR, REG_PPC(m68k), m68k->mmu_tmp_buserror_address);
@@ -1885,6 +1885,12 @@ void m68000_base_device::init_cpu_m68020(void)
 	define_state();
 }
 
+void m68000_base_device::init_cpu_m68020fpu(void)
+{
+	init_cpu_m68020();
+
+	has_fpu          = 1;
+}
 
 void m68000_base_device::init_cpu_m68020pmmu(void)
 {
@@ -2243,6 +2249,7 @@ offs_t m68008plcc_device::disasm_disassemble(char *buffer, offs_t pc, const UINT
 offs_t m68010_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68010)(this, buffer, pc, oprom, opram, options); };
 offs_t m68ec020_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, buffer, pc, oprom, opram, options); };
 offs_t m68020_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, buffer, pc, oprom, opram, options); };
+offs_t m68020fpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, buffer, pc, oprom, opram, options); };
 offs_t m68020pmmu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, buffer, pc, oprom, opram, options); };
 offs_t m68020hmmu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, buffer, pc, oprom, opram, options); };
 offs_t m68ec030_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68ec030)(this, buffer, pc, oprom, opram, options); };
@@ -2547,6 +2554,7 @@ const device_type M68008PLCC = &device_creator<m68008plcc_device>;
 const device_type M68010 = &device_creator<m68010_device>;
 const device_type M68EC020 = &device_creator<m68ec020_device>;
 const device_type M68020 = &device_creator<m68020_device>;
+const device_type M68020FPU = &device_creator<m68020fpu_device>;
 const device_type M68020PMMU = &device_creator<m68020pmmu_device>;
 const device_type M68020HMMU = &device_creator<m68020hmmu_device>;
 const device_type M68EC030 = &device_creator<m68ec030_device>;
@@ -2644,6 +2652,17 @@ m68020_device::m68020_device(const machine_config &mconfig, const char *tag, dev
 void m68020_device::device_start()
 {
 	init_cpu_m68020();
+}
+
+
+m68020fpu_device::m68020fpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: m68000_base_device(mconfig, "M68020FPU", tag, owner, clock, M68020, 32,32, "m68020fpu", __FILE__)
+{
+}
+
+void m68020fpu_device::device_start()
+{
+	init_cpu_m68020fpu();
 }
 
 // 68020 with 68851 PMMU
