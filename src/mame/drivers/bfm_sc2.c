@@ -1419,10 +1419,6 @@ void bfm_sc2_state::save_state()
 
 static ADDRESS_MAP_START( sc2_basemap, AS_PROGRAM, 8, bfm_sc2_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram") //8k
-	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_r)
-	AM_RANGE(0x2000, 0x20FF) AM_WRITE(reel12_w)
-	AM_RANGE(0x2100, 0x21FF) AM_WRITE(reel34_w)
-	AM_RANGE(0x2200, 0x22FF) AM_WRITE(reel56_w)
 
 	AM_RANGE(0x2300, 0x230B) AM_READ(mux_input_r)
 	AM_RANGE(0x2300, 0x231F) AM_WRITE(mux_output_w)
@@ -1464,6 +1460,14 @@ static ADDRESS_MAP_START( sc2_basemap, AS_PROGRAM, 8, bfm_sc2_state )
 	AM_RANGE(0x4000, 0xFFFF) AM_WRITE(unknown_w)            // contains unknown I/O registers
 	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xFFFF) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( memmap_no_vid, AS_PROGRAM, 8, bfm_sc2_state )
+	AM_IMPORT_FROM( sc2_basemap )
+	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_r)
+	AM_RANGE(0x2000, 0x20FF) AM_WRITE(reel12_w)
+	AM_RANGE(0x2100, 0x21FF) AM_WRITE(reel34_w)
+	AM_RANGE(0x2200, 0x22FF) AM_WRITE(reel56_w)
 ADDRESS_MAP_END
 
 // memory map for scorpion2 board video addon /////////////////////////////
@@ -2139,17 +2143,17 @@ MACHINE_START_MEMBER(bfm_sc2_state,bfm_sc2)
 }
 
 static MACHINE_CONFIG_START( scorpion2_vid, bfm_sc2_state )
-	MCFG_MACHINE_RESET_OVERRIDE(bfm_sc2_state, init )                           // main scorpion2 board initialisation
-	MCFG_QUANTUM_TIME(attotime::from_hz(960))                                   // needed for serial communication !!
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 ) // 6809 CPU at 2 Mhz
 	MCFG_CPU_PROGRAM_MAP(memmap_vid)                    // setup scorpion2 board memorymap
 	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_sc2_state, timer_irq,  1000)               // generate 1000 IRQ's per second
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
+	MCFG_QUANTUM_TIME(attotime::from_hz(960))                                   // needed for serial communication !!
 
 	MCFG_BFMBD1_ADD("vfd0",0)
 	MCFG_BFMBD1_ADD("vfd1",1)
 
 	MCFG_MACHINE_START_OVERRIDE(bfm_sc2_state,bfm_sc2)
+	MCFG_MACHINE_RESET_OVERRIDE(bfm_sc2_state, init )                           // main scorpion2 board initialisation
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("e2ram", bfm_sc2_state, e2ram_init)
@@ -3592,7 +3596,7 @@ MACHINE_START_MEMBER(bfm_sc2_state,sc2dmd)
 static MACHINE_CONFIG_START( scorpion2, bfm_sc2_state )
 	MCFG_MACHINE_RESET_OVERRIDE(bfm_sc2_state,awp_init)
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )
-	MCFG_CPU_PROGRAM_MAP(sc2_basemap)
+	MCFG_CPU_PROGRAM_MAP(memmap_no_vid)
 	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_sc2_state, timer_irq,  1000)
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
 
@@ -3632,7 +3636,7 @@ MACHINE_CONFIG_END
 /* machine driver for scorpion3 board */
 static MACHINE_CONFIG_DERIVED( scorpion3, scorpion2 )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sc2_basemap)
+	MCFG_CPU_PROGRAM_MAP(memmap_no_vid)
 MACHINE_CONFIG_END
 
 
@@ -3641,7 +3645,7 @@ static MACHINE_CONFIG_START( scorpion2_dm01, bfm_sc2_state )
 	MCFG_MACHINE_RESET_OVERRIDE(bfm_sc2_state,dm01_init)
 	MCFG_QUANTUM_TIME(attotime::from_hz(960))                                   // needed for serial communication !!
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )
-	MCFG_CPU_PROGRAM_MAP(sc2_basemap)
+	MCFG_CPU_PROGRAM_MAP(memmap_no_vid)
 	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_sc2_state, timer_irq,  1000)
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
 
