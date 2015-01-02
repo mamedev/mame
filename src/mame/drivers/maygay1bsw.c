@@ -211,9 +211,9 @@ ROM_START( m1bankrl )   ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    
 ROM_START( m1bankrlp )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa5-227", 0x0000, 0x010000, CRC(96528366) SHA1(5927c519d9a610b1026d685647cdac285566b1fc) ) ROM_END_M1A_MCU //1.1P
 ROM_START( m1bankrl2p ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa5-225", 0x0000, 0x010000, CRC(14d2a45e) SHA1(8f5875dfd517826a89b3b13063474eda2725be68) ) ROM_END_M1A_MCU //2.1p
 
-GAME( 1995, m1bankrl    ,0          ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bank Roll (Maygay) v1.1 (M1A/B)",GAME_FLAGS )
-GAME( 1995, m1bankrlp   ,m1bankrl   ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bank Roll (Maygay) v1.1 (Protocol) (M1A/B)",GAME_FLAGS )
-GAME( 1995, m1bankrl2p  ,m1bankrl   ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bank Roll (Maygay) v2.1 (Protocol) (M1A/B)",GAME_FLAGS )
+GAME( 1995, m1bankrl    ,0          ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bank Roll (Maygay) v1.1 (M1A/B)",GAME_FLAGS )
+GAME( 1995, m1bankrlp   ,m1bankrl   ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bank Roll (Maygay) v1.1 (Protocol) (M1A/B)",GAME_FLAGS )
+GAME( 1995, m1bankrl2p  ,m1bankrl   ,maygay_m1_no_oki,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bank Roll (Maygay) v2.1 (Protocol) (M1A/B)",GAME_FLAGS )
 
 /*******************************************************************************************************************************************************************************************************
   Club Fever

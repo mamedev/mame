@@ -2241,7 +2241,7 @@ ROM_END
 ROM_START( m4nod )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nod.bin", 0x0000, 0x010000, CRC(bc738af5) SHA1(8df436139554ccfb48c4db0a32e3333dbf3c4f46) )
-	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) //region was called "upd" but machine is mod4oki? Which one is correct?
 	ROM_LOAD( "nodsnd.bin", 0x0000, 0x080000, CRC(2134494a) SHA1(3b665bf79567a71195b20e76c50b02707d15b78d) )
 ROM_END
 
