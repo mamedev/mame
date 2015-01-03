@@ -232,6 +232,11 @@ public:
 		return rand() | (rand()<<16); // there is a loop checking that this is above a certain value
 	}
 
+	DECLARE_WRITE32_MEMBER(leapster_aux004b_w)
+	{
+		printf("leapster_aux004b_w %04x\n", data);
+	}
+
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
@@ -288,12 +293,16 @@ static ADDRESS_MAP_START( leapster_map, AS_PROGRAM, 32, leapster_state )
 //  AM_RANGE(0x80000000, 0x807fffff) AM_ROMBANK("cartrom") // game ROM pointers are all to the 80xxxxxx region, so I assume it maps here - installed if a cart is present
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( leapster_aux, AS_IO, 32, leapster_state )
+	AM_RANGE(0x00000012c, 0x00000012f) AM_WRITE(leapster_aux004b_w) // this address isn't used by ARC internal stuff afaik, so probably leapster specific
+ADDRESS_MAP_END
+
 static MACHINE_CONFIG_START( leapster, leapster_state )
 	/* basic machine hardware */
 	// CPU is ArcTangent-A5 '5.1' (ARCompact core)
 	MCFG_CPU_ADD("maincpu", ARCA5, 96000000/10)
 	MCFG_CPU_PROGRAM_MAP(leapster_map)
-
+	MCFG_CPU_IO_MAP(leapster_aux)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

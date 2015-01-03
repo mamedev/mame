@@ -340,6 +340,7 @@ LDFLAGS += -municode
 ifndef NO_USE_QTDEBUG
 QT_INSTALL_HEADERS = $(shell qmake -query QT_INSTALL_HEADERS)
 INCPATH += -I$(QT_INSTALL_HEADERS)/QtCore -I$(QT_INSTALL_HEADERS)/QtGui -I$(QT_INSTALL_HEADERS)
+BASELIBS += -lcomdlg32 -loleaut32 -limm32 -lwinspool -lmsimg32 -lole32 -luuid -lws2_32 -lshell32 -lkernel32
 LIBS += -L$(shell qmake -query QT_INSTALL_LIBS) -lqtmain -lQtGui4 -lQtCore4 -lcomdlg32 -loleaut32 -limm32 -lwinspool -lmsimg32 -lole32 -luuid -lws2_32 -lshell32 -lkernel32
 endif
 endif
@@ -651,11 +652,12 @@ endif
 
 ifeq ($(SDL_LIBVER),sdl2)
 LIBS += -lSDL2 -lImm32 -lversion -lole32 -loleaut32 -static
+BASELIBS += -lImm32 -lversion -lole32 -loleaut32 -static
 else
 LIBS += -lSDL -static
 endif
 LIBS += -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi
-
+BASELIBS += -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi
 endif   # Win32
 
 #-------------------------------------------------
