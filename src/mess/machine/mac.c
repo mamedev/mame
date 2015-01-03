@@ -840,13 +840,14 @@ void mac_state::mouse_callback()
 		{
 			count_x++;
 			m_mouse_bit_x = 0;
+			x_needs_update = 2;
 		}
 		else
 		{
 			count_x--;
 			m_mouse_bit_x = 1;
+			x_needs_update = 1;
 		}
-		x_needs_update = 1;
 	}
 	else if (count_y)
 	{
@@ -854,13 +855,14 @@ void mac_state::mouse_callback()
 		{
 			count_y++;
 			m_mouse_bit_y = 1;
+			y_needs_update = 1;
 		}
 		else
 		{
 			count_y--;
 			m_mouse_bit_y = 0;
+			y_needs_update = 2;
 		}
-		y_needs_update = 1;
 	}
 
 	if (x_needs_update || y_needs_update)
@@ -1040,21 +1042,98 @@ WRITE_LINE_MEMBER(mac_state::drq_539x_1_w)
 void mac_state::scc_mouse_irq(int x, int y)
 {
 	scc8530_t *scc = machine().device<scc8530_t>("scc");
+	static int lasty = 0;
+	static int lastx = 0;
+
 	if (x && y)
 	{
-		if (m_last_was_x)
+		if (m_last_was_x) {
 			scc->set_status(0x0a);
-		else
+			if(x == 2) {
+				if(lastx) {
+					scc->set_reg_a(0, 0x04);
+					m_mouse_bit_x = 0;
+				} else {
+					scc->set_reg_a(0, 0x0C);
+					m_mouse_bit_x = 1;
+				}
+			} else {
+				if(lastx) {
+					scc->set_reg_a(0, 0x04);
+					m_mouse_bit_x = 1;
+				} else {
+					scc->set_reg_a(0, 0x0C);
+					m_mouse_bit_x = 0;
+				}
+			}
+			lastx = !lastx;
+		} else {
 			scc->set_status(0x02);
+			if(y == 2) {
+				if(lasty) {
+					scc->set_reg_b(0, 0x04);
+					m_mouse_bit_y = 0;
+				} else {
+					scc->set_reg_b(0, 0x0C);
+					m_mouse_bit_y = 1;
+				}
+			} else {
+				if(lasty) {
+					scc->set_reg_b(0, 0x04);
+					m_mouse_bit_y = 1;
+				} else {
+					scc->set_reg_b(0, 0x0C);
+					m_mouse_bit_y = 0;
+				}
+			}
+			lasty = !lasty;
+		}
 
 		m_last_was_x ^= 1;
 	}
 	else
 	{
-		if (x)
+		if (x) {
 			scc->set_status(0x0a);
-		else
+			if(x == 2) {
+				if(lastx) {
+					scc->set_reg_a(0, 0x04);
+					m_mouse_bit_x = 0;
+				} else {
+					scc->set_reg_a(0, 0x0C);
+					m_mouse_bit_x = 1;
+				}
+			} else {
+				if(lastx) {
+					scc->set_reg_a(0, 0x04);
+					m_mouse_bit_x = 1;
+				} else {
+					scc->set_reg_a(0, 0x0C);
+					m_mouse_bit_x = 0;
+				}
+			}
+			lastx = !lastx;
+		} else {
 			scc->set_status(0x02);
+			if(y == 2) {
+				if(lasty) {
+					scc->set_reg_b(0, 0x04);
+					m_mouse_bit_y = 0;
+				} else {
+					scc->set_reg_b(0, 0x0C);
+					m_mouse_bit_y = 1;
+				}
+			} else {
+				if(lasty) {
+					scc->set_reg_b(0, 0x04);
+					m_mouse_bit_y = 1;
+				} else {
+					scc->set_reg_b(0, 0x0C);
+					m_mouse_bit_y = 0;
+				}
+			}
+			lasty = !lasty;
+		}
 	}
 
 	this->set_scc_interrupt(1);
