@@ -34,3 +34,11 @@ endif
 ifeq ($(TARGETOS),emscripten)
 CCOMFLAGS += -Qunused-arguments
 endif
+
+TEST_CCACHE = $(shell $(CC) --ccache-skip --version > /dev/null 2>1; echo $$?)
+ifeq ($(TEST_CCACHE),0)
+# caused by the preprocessing step
+CCOMFLAGS += -Qunused-arguments
+# caused by the resulting macro expansion from the preprocessing step
+CCOMFLAGS += -Wno-self-assign -Wno-parentheses-equality -Wno-unused-value -Wno-array-bounds -Wno-empty-body
+endif
