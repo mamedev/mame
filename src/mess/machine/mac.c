@@ -2090,8 +2090,8 @@ void mac_state::mac_driver_init(model_t model)
 		/* set up RAM mirror at 0x600000-0x6fffff (0x7fffff ???) */
 		mac_install_memory(0x600000, 0x6fffff, m_ram->size(), m_ram->pointer(), FALSE, "bank2");
 
-		/* set up ROM at 0x400000-0x43ffff (-0x5fffff for mac 128k/512k/512ke) */
-		mac_install_memory(0x400000, (model >= MODEL_MAC_PLUS) ? 0x43ffff : 0x5fffff,
+		/* set up ROM at 0x400000-0x4fffff (-0x5fffff for mac 128k/512k/512ke) */
+		mac_install_memory(0x400000, (model >= MODEL_MAC_PLUS) ? 0x4fffff : 0x5fffff,
 			memregion("bootrom")->bytes(), memregion("bootrom")->base(), TRUE, "bank3");
 	}
 
