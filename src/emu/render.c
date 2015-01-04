@@ -289,13 +289,19 @@ void render_primitive::reset()
     color.b = 0;
     flags = 0;
     width = 0.0f;
-    // texcoords; FIXME
+    texture.set_palette(NULL);
+    texture = render_texinfo();
+    texcoords.bl.u = 0.0f;
+    texcoords.bl.v = 0.0f;
+    texcoords.br.u = 0.0f;
+    texcoords.br.v = 0.0f;
+    texcoords.tl.u = 0.0f;
+    texcoords.tl.v = 0.0f;
+    texcoords.tr.u = 0.0f;
+    texcoords.tr.v = 0.0f;
 
     // do not clear m_next!
     // memset(&type, 0, FPTR(&texcoords + 1) - FPTR(&type));
-
-    texture.set_palette(NULL);
-    texture = render_texinfo();
 }
 
 
