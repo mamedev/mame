@@ -725,13 +725,8 @@ void mac_state::keyboard_receive(int val)
 		if (LOG_KEYBOARD)
 			logerror("keyboard command : inquiry\n");
 
-		m_keyboard_reply = scan_keyboard();
-		if (m_keyboard_reply == 0x7B)
-		{
-			/* if NULL, wait until key pressed or timeout */
-			m_inquiry_timeout->adjust(
-				attotime(0, DOUBLE_TO_ATTOSECONDS(0.25)), 0);
-		}
+		m_inquiry_timeout->adjust(
+			attotime(0, DOUBLE_TO_ATTOSECONDS(0.25)), 0);
 		break;
 
 	case 0x14:
@@ -2227,7 +2222,7 @@ void mac_state::vblank_irq()
 
 #ifndef MAC_USE_EMULATED_KBD
 	/* handle keyboard */
-	if (m_kbd_comm == TRUE)
+	if (m_kbd_comm == TRUE && m_kbd_receive == FALSE)
 	{
 		int keycode = scan_keyboard();
 
