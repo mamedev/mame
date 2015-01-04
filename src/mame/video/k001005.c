@@ -1320,7 +1320,7 @@ WRITE32_MEMBER( k001005_device::write )
 	{
 		case 0x000:         // FIFO write
 		{
-			osd_printf_debug("K001005 FIFO write: %08X at %08X\n", data, space.device().safe_pc());
+			//osd_printf_debug("K001005 FIFO write: %08X at %08X\n", data, space.device().safe_pc());
 			if (m_status != 1 && m_status != 2)
 			{
 				if (m_fifo_write_ptr < 0x400)

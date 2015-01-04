@@ -877,6 +877,7 @@ static const struct game_keys keys_table[] =
 	{ "ddsomj",   { 0xae92fa94,0x315a9045 }, 0x100000 },    // 0C81 1966 0419  cmpi.l  #$19660419,D1
 	{ "ddsomjr1", { 0xae92fa94,0x315a9045 }, 0x100000 },    // 0C81 1966 0419  cmpi.l  #$19660419,D1
 	{ "ddsoma",   { 0x8719abcd,0xef028345 }, 0x100000 },    // 0C81 1966 0419  cmpi.l  #$19660419,D1
+	{ "ddsomar1", { 0x8719abcd,0xef028345 }, 0x100000 },    // 0C81 1966 0419  cmpi.l  #$19660419,D1
 	{ "ddsomh",   { 0x42134245,0x120de607 }, 0x100000 },    // 0C81 1966 0419  cmpi.l  #$19660419,D1
 	{ "ddsomb",   { 0x7149a782,0xf3a5bfce }, 0x100000 },    // 0C81 1966 0419  cmpi.l  #$19660419,D1
 	{ "megaman2", { 0x50501cac,0xed346550 }, 0x100000 },    // 0C80 0164 7101  cmpi.l  #$01647101,D0
