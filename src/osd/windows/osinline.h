@@ -19,6 +19,26 @@
 #include "eivc.h"
 #endif
 
+#if __GNUC__ && defined(__i386__) && !defined(__x86_64)
+#undef YieldProcessor
+#endif
+
+#ifndef YieldProcessor
+#ifdef __GNUC__
+INLINE void osd_yield_processor(void)
+{
+    __asm__ __volatile__ ( "rep; nop" );
+}
+#else
+INLINE void osd_yield_processor(void)
+{
+    __asm { rep nop }
+}
+#endif
+#else
+#define osd_yield_processor YieldProcessor
+#endif
+
 INT32 win_compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange);
 INT32 win_atomic_exchange32(INT32 volatile *ptr, INT32 exchange);
 INT32 win_atomic_add32(INT32 volatile *ptr, INT32 delta);

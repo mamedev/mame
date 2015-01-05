@@ -15,7 +15,7 @@
 #include "sdlinc.h"
 #include "video.h"
 #include "render.h"
-#include "sdlsync.h"
+#include "modules/sync/osdsync.h"
 
 #include "osd_opengl.h"
 #include "osdsdl.h"

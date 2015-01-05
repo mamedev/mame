@@ -20,10 +20,12 @@
 // MAME headers
 #include "osdcore.h"
 
-#include "winsync.h"
+#include "modules/sync/osdsync.h"
 #include "winos.h"
 
 #include "eminline.h"
+
+#include "osinline.h"
 
 
 //============================================================
@@ -56,28 +58,6 @@
 #define begin_timing(v)         do { } while (0)
 #define end_timing(v)           do { } while (0)
 #endif
-
-#if __GNUC__ && defined(__i386__) && !defined(__x86_64)
-#undef YieldProcessor
-#endif
-
-#ifndef YieldProcessor
-#ifdef __GNUC__
-INLINE void osd_yield_processor(void)
-{
-	__asm__ __volatile__ ( "rep; nop" );
-}
-#else
-INLINE void osd_yield_processor(void)
-{
-	__asm { rep nop }
-}
-#endif
-#else
-#define osd_yield_processor YieldProcessor
-#endif
-
-
 
 //============================================================
 //  TYPE DEFINITIONS

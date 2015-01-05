@@ -322,7 +322,7 @@ endif
 
 ifeq ($(TARGETOS),win32)
 BASE_TARGETOS = win32
-SYNC_IMPLEMENTATION = win32
+SYNC_IMPLEMENTATION = windows
 NO_X11 = 1
 NO_USE_XINPUT = 1
 DEFS += -DSDLMAME_WIN32 -DX64_WINDOWS_ABI
@@ -391,7 +391,7 @@ endif
 SDLSRC = $(SRC)/osd/$(OSD)
 SDLOBJ = $(OBJ)/osd/$(OSD)
 
-OBJDIRS += $(SDLOBJ)
+OBJDIRS += $(SDLOBJ) $(OSDOBJ)/modules/sync
 
 #-------------------------------------------------
 # OSD core library
@@ -405,7 +405,7 @@ OSDCOREOBJS = \
 	$(SDLOBJ)/sdlsocket.o   \
 	$(SDLOBJ)/sdlmisc_$(BASE_TARGETOS).o    \
 	$(SDLOBJ)/sdlos_$(SDLOS_TARGETOS).o \
-	$(SDLOBJ)/sdlsync_$(SYNC_IMPLEMENTATION).o     \
+	$(OSDOBJ)/modules/sync/sync_$(SYNC_IMPLEMENTATION).o     \
 	$(SDLOBJ)/sdlwork.o
 
 # any "main" must be in LIBOSD or else the build will fail!

@@ -7,9 +7,7 @@
 //============================================================
 
 #include "osdcore.h"
-#include "sdlsync.h"
-
-#define USE_SCALABLE_LOCKS      (0)
+#include "osdsync.h"
 
 struct _osd_event
 {
