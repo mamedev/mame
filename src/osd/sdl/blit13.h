@@ -113,13 +113,13 @@ INLINE UINT32 pixel_ycc_to_rgb_pal(UINT16 *pixel, const rgb_t *palette)
 //============================================================
 
 #define TEXCOPY_M( _name, _src_type, _dest_type,  _op, _len_div) \
-INLINE void texcopy_##_name (texture_info *texture, const render_texinfo *texsource) { \
+INLINE void texcopy_##_name (const texture_info *texture, const render_texinfo *texsource) { \
     ATTR_UNUSED const rgb_t *palbase = texsource->palette(); \
 	int x, y; \
 	/* loop over Y */ \
 	for (y = 0; y < texsource->height; y++) { \
 		_src_type *src = (_src_type *)texsource->base + y * texsource->rowpixels / (_len_div); \
-		_dest_type *dst = (_dest_type *)((UINT8 *)texture->pixels + y * texture->pitch); \
+		_dest_type *dst = (_dest_type *)((UINT8 *)texture->m_pixels + y * texture->m_pitch); \
 		x = texsource->width / (_len_div); \
 		while (x > 0) { \
 			*dst++ = _op(*src); \
@@ -133,17 +133,17 @@ INLINE void texcopy_##_name (texture_info *texture, const render_texinfo *texsou
 	TEXCOPY_M( _name, _src_type, _dest_type,  _op, 1)
 
 #define TEXROT( _name, _src_type, _dest_type, _op) \
-INLINE void texcopy_rot_##_name (texture_info *texture, const render_texinfo *texsource) { \
+INLINE void texcopy_rot_##_name (const texture_info *texture, const render_texinfo *texsource) { \
     ATTR_UNUSED const rgb_t *palbase = texsource->palette(); \
 	int x, y; \
-	quad_setup_data *setup = &texture->setup; \
+	const quad_setup_data *setup = &texture->m_setup; \
 	int dudx = setup->dudx; \
 	int dvdx = setup->dvdx; \
 	/* loop over Y */ \
 	for (y = 0; y < setup->rotheight; y++) { \
 		INT32 curu = setup->startu + y * setup->dudy; \
 		INT32 curv = setup->startv + y * setup->dvdy; \
-		_dest_type *dst = (_dest_type *)((UINT8 *)texture->pixels + y * texture->pitch); \
+		_dest_type *dst = (_dest_type *)((UINT8 *)texture->m_pixels + y * texture->m_pitch); \
 		x = setup->rotwidth; \
 		while (x>0) { \
 			_src_type *src = (_src_type *) texsource->base + (curv >> 16) * texsource->rowpixels + (curu >> 16); \
