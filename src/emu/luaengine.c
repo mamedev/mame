@@ -17,6 +17,7 @@
 #include "emuopts.h"
 #include "osdepend.h"
 #include "drivenum.h"
+#include "ui/ui.h"
 #include "web/mongoose.h"
 
 //**************************************************************************
@@ -336,6 +337,51 @@ int lua_engine::l_emu_hook_output(lua_State *L)
 	return 0;
 }
 
+int lua_engine::l_emu_set_hook(lua_State *L)
+{
+	luaThis->emu_set_hook(L);
+	return 0;
+}
+
+void lua_engine::emu_set_hook(lua_State *L)
+{
+	luaL_argcheck(L, lua_isfunction(L, 1) || lua_isnil(L, 1), 1, "callback function expected");
+	luaL_argcheck(L, lua_isstring(L, 2), 2, "message (string) expected");
+	const char *hookname = luaL_checkstring(L,2);
+
+	if (strcmp(hookname, "output") == 0) {
+		hook_output_cb.set(L, 1);
+		if (!output_notifier_set) {
+			output_set_notifier(NULL, s_output_notifier, this);
+			output_notifier_set = true;
+		}
+	} else if (strcmp(hookname, "frame") == 0) {
+		hook_frame_cb.set(L, 1);
+	} else {
+		luai_writestringerror("%s", "Unknown hook name, aborting.\n");
+	}
+}
+
+//-------------------------------------------------
+//  machine_get_screens - return table of available screens userdata
+//  -> manager:machine().screens[":screen"]
+//-------------------------------------------------
+
+luabridge::LuaRef lua_engine::l_machine_get_screens(const running_machine *r)
+{
+	lua_State *L = luaThis->m_lua_state;
+	luabridge::LuaRef screens_table = luabridge::LuaRef::newTable(L);
+
+	for (device_t *dev = r->first_screen(); dev != NULL; dev = dev->next()) {
+		screen_device *sc = dynamic_cast<screen_device *>(dev);
+		if (sc && sc->configured() && sc->started() && sc->type()) {
+			screens_table[sc->tag()] = sc;
+		}
+	}
+
+	return screens_table;
+}
+
 //-------------------------------------------------
 //  machine_get_devices - return table of available devices userdata
 //  -> manager:machine().devices[":maincpu"]
@@ -436,6 +482,108 @@ int lua_engine::lua_addr_space::l_mem_read(lua_State *L)
 
 	return 1;
 
+}
+
+//-------------------------------------------------
+//  draw_box - draw a box on a screen container
+//  -> manager:machine().screens[":screen"]:draw_box(x1, y1, x2, y2, bgcolor, linecolor)
+//-------------------------------------------------
+
+int lua_engine::lua_screen::l_draw_box(lua_State *L)
+{
+	screen_device *sc = luabridge::Stack<screen_device *>::get(L, 1);
+	if(!sc) {
+		return 0;
+	}
+
+	// ensure that we got 6 numerical parameters
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "x1 (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 3), 3, "y1 (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 4), 4, "x2 (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 5), 5, "y2 (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 6), 6, "background color (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 7), 7, "outline color (integer) expected");
+
+	// retrieve all parameters
+	float x1, y1, x2, y2;
+	x1 = MIN(lua_tounsigned(L, 2) / static_cast<float>(sc->width()) , 1.0f);
+	y1 = MIN(lua_tounsigned(L, 3) / static_cast<float>(sc->height()), 1.0f);
+	x2 = MIN(lua_tounsigned(L, 4) / static_cast<float>(sc->width()) , 1.0f);
+	y2 = MIN(lua_tounsigned(L, 5) / static_cast<float>(sc->height()), 1.0f);
+	UINT32 bgcolor = lua_tounsigned(L, 6);
+	UINT32 fgcolor = lua_tounsigned(L, 7);
+
+	// draw the box
+	render_container &rc = sc->container();
+	ui_manager &ui = sc->machine().ui();
+	ui.draw_outlined_box(&rc, x1, y1, x2, y2, fgcolor, bgcolor);
+
+	return 0;
+}
+
+//-------------------------------------------------
+//  draw_line - draw a line on a screen container
+//  -> manager:machine().screens[":screen"]:draw_line(x1, y1, x2, y2, linecolor)
+//-------------------------------------------------
+
+int lua_engine::lua_screen::l_draw_line(lua_State *L)
+{
+	screen_device *sc = luabridge::Stack<screen_device *>::get(L, 1);
+	if(!sc) {
+		return 0;
+	}
+
+	// ensure that we got 5 numerical parameters
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "x1 (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 3), 3, "y1 (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 4), 4, "x2 (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 5), 5, "y2 (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 6), 6, "color (integer) expected");
+
+	// retrieve all parameters
+	float x1, y1, x2, y2;
+	x1 = MIN(lua_tounsigned(L, 2) / static_cast<float>(sc->width()) , 1.0f);
+	y1 = MIN(lua_tounsigned(L, 3) / static_cast<float>(sc->height()), 1.0f);
+	x2 = MIN(lua_tounsigned(L, 4) / static_cast<float>(sc->width()) , 1.0f);
+	y2 = MIN(lua_tounsigned(L, 5) / static_cast<float>(sc->height()), 1.0f);
+	UINT32 color = lua_tounsigned(L, 6);
+
+	// draw the line
+	sc->container().add_line(x1, y1, x2, y2, UI_LINE_WIDTH, rgb_t(color), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	return 0;
+}
+
+//-------------------------------------------------
+//  draw_text - draw text on a screen container
+//  -> manager:machine().screens[":screen"]:draw_text(x, y, message)
+//-------------------------------------------------
+
+int lua_engine::lua_screen::l_draw_text(lua_State *L)
+{
+	screen_device *sc = luabridge::Stack<screen_device *>::get(L, 1);
+	if(!sc) {
+		return 0;
+	}
+
+	// ensure that we got proper parameters
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "x (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 3), 3, "y (integer) expected");
+	luaL_argcheck(L, lua_isstring(L, 4), 4, "message (string) expected");
+
+	// retrieve all parameters
+	float x = MIN(lua_tounsigned(L, 2) / static_cast<float>(sc->width()) , 1.0f);
+	float y = MIN(lua_tounsigned(L, 3) / static_cast<float>(sc->height()), 1.0f);
+	const char *msg = luaL_checkstring(L,4);
+	// TODO: add optional parameters (colors, etc.)
+
+	// draw the text
+	render_container &rc = sc->container();
+	ui_manager &ui = sc->machine().ui();
+	ui.draw_text_full(&rc, msg, x, y , (1.0f - x),
+					   JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR,
+					   UI_TEXT_BG_COLOR, NULL, NULL);
+
+	return 0;
 }
 
 void *lua_engine::checkparam(lua_State *L, int idx, const char *tname)
@@ -650,6 +798,7 @@ void lua_engine::initialize()
 			.addCFunction ("romname",     l_emu_romname )
 			.addCFunction ("keypost",     l_emu_keypost )
 			.addCFunction ("hook_output", l_emu_hook_output )
+			.addCFunction ("sethook",     l_emu_set_hook )
 			.addCFunction ("time",        l_emu_time )
 			.addCFunction ("wait",        l_emu_wait )
 			.addCFunction ("after",       l_emu_after )
@@ -667,6 +816,7 @@ void lua_engine::initialize()
 				.addFunction ("soft_reset", &running_machine::schedule_soft_reset)
 				.addFunction ("system", &running_machine::system)
 				.addProperty <luabridge::LuaRef, void> ("devices", &lua_engine::l_machine_get_devices)
+				.addProperty <luabridge::LuaRef, void> ("screens", &lua_engine::l_machine_get_screens)
 			.endClass ()
 			.beginClass <game_driver> ("game_driver")
 				.addData ("name", &game_driver::name)
@@ -691,7 +841,17 @@ void lua_engine::initialize()
 			.deriveClass <address_space, lua_addr_space> ("addr_space")
 				.addFunction("name", &address_space::name)
 			.endClass()
-		.endNamespace ();
+			.beginClass <lua_screen> ("lua_screen_dev")
+				.addCFunction ("draw_box",  &lua_screen::l_draw_box)
+				.addCFunction ("draw_line", &lua_screen::l_draw_line)
+				.addCFunction ("draw_text", &lua_screen::l_draw_text)
+			.endClass()
+			.deriveClass <screen_device, lua_screen> ("screen_dev")
+				.addFunction ("name", &screen_device::name)
+				.addFunction ("height", &screen_device::height)
+				.addFunction ("width", &screen_device::width)
+			.endClass()
+		.endNamespace();
 
 	luabridge::push (m_lua_state, machine_manager::instance());
 	lua_setglobal(m_lua_state, "manager");
@@ -700,6 +860,23 @@ void lua_engine::initialize()
 void lua_engine::start_console()
 {
 	mg_start_thread(::serve_lua, this);
+}
+
+//-------------------------------------------------
+//  frame_hook - called at each frame refresh, used to draw a HUD
+//-------------------------------------------------
+bool lua_engine::frame_hook()
+{
+	bool is_cb_hooked = false;
+	if (m_machine != NULL) {
+		// invoke registered callback (if any)
+		is_cb_hooked = hook_frame_cb.active();
+		if (is_cb_hooked) {
+			lua_State *L = hook_frame_cb.precall();
+			hook_frame_cb.call(this, L, 0);
+		}
+	}
+	return is_cb_hooked;
 }
 
 void lua_engine::periodic_check()
