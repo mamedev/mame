@@ -302,7 +302,7 @@ CCOMFLAGS += -include $(WINSRC)/winprefix.h
 include $(SRC)/build/cc_detection.mak
 
 # ensure we statically link the gcc runtime lib
-LDFLAGS += -static-libgcc
+LDFLAGS += -static-libgcc -static
 
 # TODO: needs to use $(CC)
 TEST_GCC := $(shell gcc --version)
