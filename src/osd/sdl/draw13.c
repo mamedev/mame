@@ -200,7 +200,7 @@ static int drawsdl2_window_create(sdl_window_info *window, int width, int height
 static void drawsdl2_window_resize(sdl_window_info *window, int width, int height);
 static void drawsdl2_window_destroy(sdl_window_info *window);
 static int drawsdl2_window_draw(sdl_window_info *window, UINT32 dc, int update);
-static render_primitive_list &drawsdl2_window_get_primitives(sdl_window_info *window);
+static void drawsdl2_set_target_bounds(sdl_window_info *window);
 static void drawsdl2_destroy_all_textures(sdl_window_info *window);
 static void drawsdl2_window_clear(sdl_window_info *window);
 static int drawsdl2_xy_to_render_target(sdl_window_info *window, int x, int y, int *xt, int *yt);
@@ -559,7 +559,7 @@ static void drawsdl2_attach(sdl_draw_info *info, sdl_window_info *window)
 	// fill in the callbacks
 	window->create = drawsdl2_window_create;
 	window->resize = drawsdl2_window_resize;
-	window->get_primitives = drawsdl2_window_get_primitives;
+	window->set_target_bounds = drawsdl2_set_target_bounds;
 	window->draw = drawsdl2_window_draw;
 	window->destroy = drawsdl2_window_destroy;
 	window->destroy_all_textures = drawsdl2_destroy_all_textures;
@@ -687,18 +687,9 @@ static int drawsdl2_xy_to_render_target(sdl_window_info *window, int x, int y, i
 //  drawsdl2_window_get_primitives
 //============================================================
 
-static render_primitive_list &drawsdl2_window_get_primitives(sdl_window_info *window)
+static void drawsdl2_set_target_bounds(sdl_window_info *window)
 {
-	if ((!window->fullscreen()) || (video_config.switchres))
-	{
-		window->blit_surface_size(window->width, window->height);
-	}
-	else
-	{
-		window->blit_surface_size(window->monitor()->center_width, window->monitor()->center_height);
-	}
 	window->target->set_bounds(window->blitwidth, window->blitheight, sdlvideo_monitor_get_aspect(window->monitor()));
-	return window->target->get_primitives();
 }
 
 //============================================================

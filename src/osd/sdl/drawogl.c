@@ -367,7 +367,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 static void drawogl_window_resize(sdl_window_info *window, int width, int height);
 static void drawogl_window_destroy(sdl_window_info *window);
 static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update);
-static render_primitive_list &drawogl_window_get_primitives(sdl_window_info *window);
+static void drawogl_set_target_bounds(sdl_window_info *window);
 static void drawogl_destroy_all_textures(sdl_window_info *window);
 static void drawogl_window_clear(sdl_window_info *window);
 static int drawogl_xy_to_render_target(sdl_window_info *window, int x, int y, int *xt, int *yt);
@@ -454,7 +454,7 @@ static void drawogl_attach(sdl_draw_info *info, sdl_window_info *window)
 	// fill in the callbacks
 	window->create = drawogl_window_create;
 	window->resize = drawogl_window_resize;
-	window->get_primitives = drawogl_window_get_primitives;
+	window->set_target_bounds = drawogl_set_target_bounds;
 	window->draw = drawogl_window_draw;
 	window->destroy = drawogl_window_destroy;
 	window->destroy_all_textures = drawogl_destroy_all_textures;
@@ -840,18 +840,9 @@ static int drawogl_xy_to_render_target(sdl_window_info *window, int x, int y, in
 //  drawogl_window_get_primitives
 //============================================================
 
-static render_primitive_list &drawogl_window_get_primitives(sdl_window_info *window)
+static void drawogl_set_target_bounds(sdl_window_info *window)
 {
-	if ((!window->fullscreen()) || (video_config.switchres))
-	{
-		window->blit_surface_size(window->width, window->height);
-	}
-	else
-	{
-		window->blit_surface_size(window->monitor()->center_width, window->monitor()->center_height);
-	}
 	window->target->set_bounds(window->blitwidth, window->blitheight, sdlvideo_monitor_get_aspect(window->monitor()));
-	return window->target->get_primitives();
 }
 
 //============================================================

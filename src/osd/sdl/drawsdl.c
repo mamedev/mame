@@ -105,7 +105,7 @@ static void drawsdl_attach(sdl_draw_info *info, sdl_window_info *window);
 static int drawsdl_window_create(sdl_window_info *window, int width, int height);
 static void drawsdl_window_resize(sdl_window_info *window, int width, int height);
 static void drawsdl_window_destroy(sdl_window_info *window);
-static render_primitive_list &drawsdl_window_get_primitives(sdl_window_info *window);
+static void drawsdl_set_target_bounds(sdl_window_info *window);
 static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update);
 static void drawsdl_destroy_all_textures(sdl_window_info *window);
 static void drawsdl_window_clear(sdl_window_info *window);
@@ -221,7 +221,7 @@ static void drawsdl_attach(sdl_draw_info *info, sdl_window_info *window)
 	// fill in the callbacks
 	window->create = drawsdl_window_create;
 	window->resize = drawsdl_window_resize;
-	window->get_primitives = drawsdl_window_get_primitives;
+	window->set_target_bounds = drawsdl_set_target_bounds;
 	window->draw = drawsdl_window_draw;
 	window->destroy = drawsdl_window_destroy;
 	window->destroy_all_textures = drawsdl_destroy_all_textures;
@@ -460,8 +460,7 @@ static int drawsdl_window_create(sdl_window_info *window, int width, int height)
 
 			if (!found)
 			{
-				osd_printf_verbose("window: Scale mode %s not supported!\n", sm->name);
-				window->machine().ui().popup_time(3, "Scale mode %s not supported!", sm->name);
+				fatalerror("window: Scale mode %s not supported!", sm->name);
 			}
 		}
 	}
@@ -618,26 +617,15 @@ static int drawsdl_xy_to_render_target(sdl_window_info *window, int x, int y, in
 //  drawsdl_window_get_primitives
 //============================================================
 
-static render_primitive_list &drawsdl_window_get_primitives(sdl_window_info *window)
+static void drawsdl_set_target_bounds(sdl_window_info *window)
 {
 	sdl_info *sdl = (sdl_info *) window->dxdata;
 	const sdl_scale_mode *sm = &scale_modes[video_config.scale_mode];
-
-	if ((!window->fullscreen()) || (video_config.switchres))
-	{
-		window->blit_surface_size(window->width, window->height);
-	}
-	else
-	{
-		window->blit_surface_size(window->monitor()->center_width, window->monitor()->center_height);
-	}
 
 	if (!sm->is_scale)
 		window->target->set_bounds(window->blitwidth, window->blitheight, sdlvideo_monitor_get_aspect(window->monitor()));
 	else
 		window->target->set_bounds(sdl->hw_scale_width, sdl->hw_scale_height);
-
-	return window->target->get_primitives();
 }
 
 //============================================================

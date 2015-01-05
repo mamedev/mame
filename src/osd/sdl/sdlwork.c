@@ -687,7 +687,7 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 	// loop until everything is processed
 	while (true)
 	{
-		osd_work_item *item;
+		osd_work_item *item = NULL;
 
 		bool end_loop = false;
 
