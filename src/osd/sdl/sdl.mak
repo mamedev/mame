@@ -77,6 +77,7 @@ USE_DISPATCH_GL = 1
 # change for custom OS X installations
 SDL_FRAMEWORK_PATH = /Library/Frameworks/
 
+# uncomment to use SDL1.2 (depracated)
 # SDL_LIBVER = sdl
 
 ###########################################################################
@@ -741,6 +742,9 @@ else
 # Default libs
 DEFS += -DSDLMAME_X11
 LIBS += -lX11 -lXinerama
+ifneq ($(SDL_LIBVER),sdl2)
+BASELIBS += -lX11
+endif
 
 # The newer debugger uses QT
 ifndef NO_USE_QTDEBUG
