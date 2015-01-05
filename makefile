@@ -340,8 +340,14 @@ ifeq ($(TARGETOS),os2)
 EXE = .exe
 endif
 
-ifndef BUILD_EXE
-BUILD_EXE = $(EXE)
+# extension for build tools
+BUILD_EXE = 
+
+ifeq ($(OS),Windows_NT)
+BUILD_EXE = .exe
+endif
+ifneq ($(OS2_SHELL),)
+BUILD_EXE = .exe
 endif
 
 # compiler, linker and utilities
@@ -350,7 +356,7 @@ AR = @ar
 CC = @gcc
 LD = @g++
 endif
-MD = -mkdir$(EXE)
+MD = -mkdir$(BUILD_EXE)
 RM = @rm -f
 OBJDUMP = @objdump
 PYTHON = @python
