@@ -591,7 +591,7 @@ void h8_sci_device::rx_start()
 	ssr |= SSR_TDRE;
 	rx_parity = smr & SMR_OE ? 0 : 1;
 	rsr = 0x00;
-	logerror("%s: start recieve\n", tag());
+	logerror("%s: start receive\n", tag());
 	if(smr & SMR_CA) {
 		rx_state = ST_BIT;
 		rx_bit = 8;
@@ -609,13 +609,13 @@ void h8_sci_device::rx_done()
 	if(!(ssr & SSR_FER)) {
 		if((smr & SMR_PE) && rx_parity) {
 			ssr |= SSR_PER;
-			logerror("%s: Recieve parity error\n", tag());
+			logerror("%s: Receive parity error\n", tag());
 		} else if(ssr & SSR_RDRF) {
 			ssr |= SSR_ORER;
-			logerror("%s: Recieve overrun\n", tag());
+			logerror("%s: Receive overrun\n", tag());
 		} else {
 			ssr |= SSR_RDRF;
-			logerror("%s: Recieved %02x\n", tag(), rsr);
+			logerror("%s: Received %02x\n", tag(), rsr);
 			rdr = rsr;
 		}
 	}

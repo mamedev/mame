@@ -940,7 +940,7 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::data_timer_callback)
 		}
 		else
 		{
-			logerror("Succesfully read mode1 frame #%d\n", m_current_frame);
+			logerror("Successfully read mode1 frame #%d\n", m_current_frame);
 		}
 
 		m_data_buffer_index = 0;
