@@ -11,7 +11,7 @@
 //
 //============================================================
 
-#include "sdlsync.h"
+#include "modules/sync/osdsync.h"
 
 class watchdog
 {

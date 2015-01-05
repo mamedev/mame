@@ -655,6 +655,9 @@ bool video_manager::finish_screen_updates()
 		if (screen->update_quads())
 			anything_changed = true;
 
+	// draw HUD from LUA callback (if any)
+	anything_changed |= machine().manager().lua()->frame_hook();
+
 	// update our movie recording and burn-in state
 	if (!machine().paused())
 	{

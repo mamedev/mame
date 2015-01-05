@@ -84,7 +84,7 @@ WINOBJ = $(OBJ)/osd/$(OSD)
 OSDSRC = $(SRC)/osd
 OSDOBJ = $(OBJ)/osd
 
-OBJDIRS += $(WINOBJ)
+OBJDIRS += $(WINOBJ) $(OSDOBJ)/modules/sync
 
 ifdef USE_QTDEBUG
 OBJDIRS += $(OSDOBJ)/modules/debugger/qt
@@ -304,6 +304,10 @@ include $(SRC)/build/cc_detection.mak
 # ensure we statically link the gcc runtime lib
 LDFLAGS += -static-libgcc
 
+ifeq ($(CROSS_BUILD),1)
+	LDFLAGS += -static
+endif	
+
 # TODO: needs to use $(CC)
 TEST_GCC := $(shell gcc --version)
 ifeq ($(findstring 4.4.,$(TEST_GCC)),)
@@ -339,7 +343,7 @@ OSDCOREOBJS = \
 	$(WINOBJ)/windir.o \
 	$(WINOBJ)/winfile.o \
 	$(WINOBJ)/winmisc.o \
-	$(WINOBJ)/winsync.o \
+	$(OSDOBJ)/modules/sync/sync_windows.o \
 	$(WINOBJ)/wintime.o \
 	$(WINOBJ)/winutf8.o \
 	$(WINOBJ)/winutil.o \

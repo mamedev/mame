@@ -20,7 +20,7 @@
 // MAME headers
 #include "osdcore.h"
 
-#include "winsync.h"
+#include "modules/sync/osdsync.h"
 #include "winos.h"
 
 #include "eminline.h"

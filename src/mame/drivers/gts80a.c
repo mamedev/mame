@@ -15,6 +15,7 @@
 #include "audio/gottlieb.h"
 #include "cpu/i86/i86.h"
 #include "gts80a.lh"
+#include "gts80a_caveman.lh"
 
 class gts80a_state : public genpin_class
 {
@@ -384,25 +385,75 @@ public:
 	caveman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: gts80a_state(mconfig, type, tag)
 		, m_videocpu(*this, "video_cpu")
+		, m_vram(*this, "vram")
+
 	{ }
+
+
+	UINT32 screen_update_caveman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
 	required_device<cpu_device> m_videocpu;
+	required_shared_ptr<UINT8> m_vram;
 };
+
+UINT32 caveman_state::screen_update_caveman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int count = 0;
+	for (int y = 0; y < 256; y++)
+	{
+		for (int x = 0; x < 256; x += 4)
+		{
+			UINT8 pix = m_vram[count];
+
+			bitmap.pix16(y, x+0) = (pix >> 6)&0x3;
+			bitmap.pix16(y, x+1) = (pix >> 4)&0x3;
+			bitmap.pix16(y, x+2) = (pix >> 2)&0x3;
+			bitmap.pix16(y, x+3) = (pix >> 0)&0x3;
+
+			count++;
+		}
+	}
+
+	return 0;
+}
+
 
 static ADDRESS_MAP_START( video_map, AS_PROGRAM, 8, caveman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
-	AM_RANGE(0x0000, 0x5fff) AM_RAM
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x2000, 0x5fff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( video_io_map, AS_IO, 8, caveman_state )
+//	AM_RANGE(0x000, 0x002) AM_READWRITE() // 8259 irq controller
+//	AM_RANGE(0x100, 0x102) AM_READWRITE() // HD46505
+//	AM_RANGE(0x200, 0x200) AM_READWRITE() // 8212 in, ?? out
+//	AM_RANGE(0x300, 0x300) AM_READWRITE() // soundlatch (command?) in, ?? out
+
+//	AM_RANGE(0x400, 0x400) AM_READ() // joystick inputs
+//	AM_RANGE(0x500, 0x506) AM_WRITE() // palette
+
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_DERIVED( caveman, gts80a_ss )
+static MACHINE_CONFIG_DERIVED_CLASS( caveman, gts80a_ss, caveman_state )
 	MCFG_CPU_ADD("video_cpu", I8088, 5000000)
 	MCFG_CPU_PROGRAM_MAP(video_map)
 	MCFG_CPU_IO_MAP(video_io_map)
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 248-1)
+	MCFG_SCREEN_UPDATE_DRIVER(caveman_state, screen_update_caveman)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_PALETTE_ADD("palette", 16)
+
+	MCFG_DEFAULT_LAYOUT(layout_gts80a_caveman)
+
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( caveman )

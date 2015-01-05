@@ -11,13 +11,6 @@
 
 #if defined(SDLMAME_NOASM)
 
-/* must be exported
- * FIXME: NOASM should be taken care of in sdlsync.c
- *        This is not really a sound solution.
- */
-
-int osd_num_processors = 0;
-
 #include "../osdmini/miniwork.c"
 
 #else
@@ -25,7 +18,7 @@ int osd_num_processors = 0;
 #include "osdcore.h"
 #include "osinline.h"
 
-#include "sdlsync.h"
+#include "modules/sync/osdsync.h"
 #include "sdlos.h"
 
 #include "eminline.h"
@@ -64,8 +57,6 @@ int osd_num_processors = 0;
 #define begin_timing(v)         do { } while (0)
 #define end_timing(v)           do { } while (0)
 #endif
-
-
 
 //============================================================
 //  TYPE DEFINITIONS
@@ -687,7 +678,7 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 	// loop until everything is processed
 	while (true)
 	{
-		osd_work_item *item;
+		osd_work_item *item = NULL;
 
 		bool end_loop = false;
 

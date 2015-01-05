@@ -109,8 +109,8 @@ struct worker_param {
 	: m_window(awindow), m_list(NULL), m_machine(&amachine), m_resize_new_width(0), m_resize_new_height(0)
 	{
 	}
-	worker_param(running_machine &amachine, sdl_window_info *awindow, render_primitive_list *alist)
-	: m_window(awindow), m_list(alist), m_machine(&amachine), m_resize_new_width(0), m_resize_new_height(0)
+	worker_param(running_machine &amachine, sdl_window_info *awindow, render_primitive_list &alist)
+	: m_window(awindow), m_list(&alist), m_machine(&amachine), m_resize_new_width(0), m_resize_new_height(0)
 	{
 	}
 	worker_param(sdl_window_info *awindow, int anew_width, int anew_height)
@@ -980,8 +980,19 @@ void sdl_window_info::video_window_update(running_machine &machine)
 
 		if (osd_event_wait(rendered_event, event_wait_ticks))
 		{
+		    if ((!fullscreen()) || (video_config.switchres))
+		    {
+		        blit_surface_size(width, height);
+		    }
+		    else
+		    {
+		        blit_surface_size(monitor()->center_width, monitor()->center_height);
+		    }
+
 			// ensure the target bounds are up-to-date, and then get the primitives
-			render_primitive_list *primlist = &get_primitives(this);
+		    set_target_bounds(this);
+
+			render_primitive_list &primlist = target->get_primitives();
 
 			// and redraw now
 
