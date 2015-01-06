@@ -96,6 +96,28 @@ INLINE void osd_yield_processor(void)
 #define osd_yield_processor YieldProcessor
 #endif
 
+template<typename _PtrType>
+static void spin_while(const volatile _PtrType * volatile ptr, const _PtrType val, const osd_ticks_t timeout, const int invert = 0)
+{
+    osd_ticks_t stopspin = osd_ticks() + timeout;
+
+#if defined(OSD_WINDOWS)
+    while (((*ptr == val) ^ invert) && osd_ticks() < stopspin)
+        osd_yield_processor();
+#else
+    do {
+        int spin = 100000;
+        while (--spin && ((*ptr == val) ^ invert))
+            osd_yield_processor();
+    } while (((*ptr == val) ^ invert) && osd_ticks() < stopspin);
+#endif
+}
+
+template<typename _PtrType>
+static void spin_while_not(const volatile _PtrType * volatile ptr, const _PtrType val, const osd_ticks_t timeout)
+{
+    spin_while(ptr, val, timeout, 1);
+}
 
 
 //============================================================
@@ -169,7 +191,6 @@ static int effective_num_processors(void);
 static void * worker_thread_entry(void *param);
 static void worker_thread_process(osd_work_queue *queue, work_thread_info *thread);
 static bool queue_has_list_items(osd_work_queue *queue);
-static void spin_on_queue(work_thread_info *thread, osd_work_queue *queue, osd_ticks_t timeout);
 
 
 //============================================================
@@ -312,7 +333,11 @@ int osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout)
 		// if we're a high frequency queue, spin until done
 		if (queue->flags & WORK_QUEUE_FLAG_HIGH_FREQ && queue->items != 0)
 		{
-			spin_on_queue(thread, queue, timeout);
+			// spin until we're done
+			begin_timing(thread->spintime);
+			spin_while_not(&queue->items, 0, timeout);
+			end_timing(thread->spintime);
+
 			begin_timing(thread->waittime);
 			return (queue->items == 0);
 		}
@@ -550,19 +575,8 @@ int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 	// if we don't have an event, we need to spin (shouldn't ever really happen)
 	if (item->event == NULL)
 	{
-		// TODO: merge this with spin_on_queue()
 		// TODO: do we need to measure the spin time here as well? and how can we do it?
-		osd_ticks_t stopspin = osd_ticks() + timeout;
-#if defined(OSD_WINDOWS)
-		while (!item->done && osd_ticks() < stopspin)
-			osd_yield_processor();
-#else
-		do {
-			int spin = 10000;
-			while (--spin && !item->done)
-				osd_yield_processor();
-		} while (!item->done && osd_ticks() < stopspin);
-#endif
+        spin_while(&item->done, 0, timeout);
 	}
 
 	// otherwise, block on the event until done
@@ -680,7 +694,10 @@ static void *worker_thread_entry(void *param)
 			// if we're a high frequency queue, spin for a while before giving up
 			if (queue->flags & WORK_QUEUE_FLAG_HIGH_FREQ && queue->list == NULL)
 			{
-				spin_on_queue(thread, queue, SPIN_LOOP_TIME);
+				// spin for a while looking for more work
+				begin_timing(thread->spintime);
+				spin_while(&queue->list, (osd_work_item *)NULL, SPIN_LOOP_TIME);
+				end_timing(thread->spintime);
 			}
 
 			// if nothing more, release the processor
@@ -794,25 +811,4 @@ bool queue_has_list_items(osd_work_queue *queue)
 	bool has_list_items = (queue->list != NULL);
 	osd_scalable_lock_release(queue->lock, lockslot);
 	return has_list_items;
-}
-
-void spin_on_queue(work_thread_info *thread, osd_work_queue *queue, osd_ticks_t timeout)
-{
-	osd_ticks_t stopspin = osd_ticks() + timeout;
-
-	begin_timing(thread->spintime);
-	
-	// TODO: chose either
-#if defined(OSD_WINDOWS)
-	while (queue->list == NULL && osd_ticks() < stopspin)
-		osd_yield_processor();
-#else
-	do {
-		int spin = 10000;
-		while (--spin && queue->list == NULL)
-			osd_yield_processor();
-	} while (queue->list == NULL && osd_ticks() < stopspin);
-#endif
-
-	end_timing(thread->spintime);
 }
