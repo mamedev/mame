@@ -155,11 +155,18 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 	#if (SDLMAME_SDL2)
 	SDL_DisplayMode dmode;
 
+	#if defined(SDLMAME_WIN32)
 	SDL_GetDesktopDisplayMode(monitor->handle, &dmode);
+    #else
+    SDL_GetCurrentDisplayMode(monitor->handle, &dmode);
+    #endif
 	monitor->monitor_width = dmode.w;
 	monitor->monitor_height = dmode.h;
 	monitor->center_width = dmode.w;
 	monitor->center_height = dmode.h;
+
+	// FIXME: Use SDL_GetDisplayBounds(monitor->handle, &tt) to update monitor_x
+	// SDL_Rect tt;
 	#else
 	#if defined(SDLMAME_WIN32)  // Win32 version
 	MONITORINFOEX info;
@@ -456,6 +463,7 @@ static void init_monitors(void)
 			monitor->monitor_height = dmode.h;
 			monitor->center_width = dmode.w;
 			monitor->center_height = dmode.h;
+			// FIXME: this should use SDL_GetDisplayBounds!
 			monitor->monitor_x = monx;
 			monitor->handle = i;
 			// guess the aspect ratio assuming square pixels

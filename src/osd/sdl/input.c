@@ -1985,8 +1985,17 @@ void sdlinput_poll(running_machine &machine)
 				}
 				else
 				{
-					if (event.window.data1 != window->width || event.window.data2 != window->height)
-						window->window_resize(event.window.data1, event.window.data2);
+#ifndef SDLMAME_WIN32
+				    /* FIXME: SDL2 sends some spurious resize events on Ubuntu
+				     * while in fullscreen mode. Ignore them for now.
+				     */
+				    if (!window->fullscreen())
+#endif
+				    {
+	                    //printf("event data1,data2 %d x %d %ld\n", event.window.data1, event.window.data2, sizeof(SDL_Event));
+	                    if (event.window.data1 != window->width || event.window.data2 != window->height)
+	                        window->window_resize(event.window.data1, event.window.data2);
+				    }
 				}
 				focus_window = window;
 				break;

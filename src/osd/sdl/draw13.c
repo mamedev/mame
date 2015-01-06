@@ -186,6 +186,9 @@ struct sdl_info
 	// Stats
 	INT64           m_last_blit_time;
 	INT64           m_last_blit_pixels;
+
+	// Original display_mode
+	SDL_DisplayMode m_original_mode;
 };
 
 //============================================================
@@ -576,6 +579,13 @@ static int drawsdl2_window_create(sdl_window_info *window, int width, int height
 	// allocate memory for our structures
 	sdl_info *sdl = global_alloc(sdl_info);
 
+	/* FIXME: On Ubuntu and potentially other Linux OS you should use
+	 * to disable panning. This has to be done before every invocation of mame.
+	 *
+	 * xrandr --output HDMI-0 --panning 0x0+0+0 --fb 0x0
+	 *
+	 */
+
 	osd_printf_verbose("Enter drawsdl2_window_create\n");
 
 	window->dxdata = sdl;
@@ -590,7 +600,9 @@ static int drawsdl2_window_create(sdl_window_info *window, int width, int height
 	if (window->fullscreen() && video_config.switchres)
 	{
 		SDL_DisplayMode mode;
-		SDL_GetCurrentDisplayMode(window->monitor()->handle, &mode);
+		//SDL_GetCurrentDisplayMode(window->monitor()->handle, &mode);
+        SDL_GetWindowDisplayMode(window->sdl_window, &mode);
+		sdl->m_original_mode = mode;
 		mode.w = width;
 		mode.h = height;
 		if (window->refresh)
@@ -615,7 +627,14 @@ static int drawsdl2_window_create(sdl_window_info *window, int width, int height
 				osd_printf_warning("Ignoring depth %d\n", window->depth);
 			}
 		}
-		SDL_SetWindowDisplayMode(window->sdl_window, &mode);    // Try to set mode
+        SDL_SetWindowDisplayMode(window->sdl_window, &mode);    // Try to set mode
+#ifndef SDLMAME_WIN32
+        /* FIXME: Warp the mouse to 0,0 in case a virtual desktop resolution
+         * is in place after the mode switch - which will most likely be the case
+         * This is a hack to work around a deficiency in SDL2
+         */
+        SDL_WarpMouseInWindow(window->sdl_window, 1, 1);
+#endif
 	}
 	else
 		SDL_SetWindowDisplayMode(window->sdl_window, NULL); // Use desktop
@@ -638,7 +657,6 @@ static int drawsdl2_window_create(sdl_window_info *window, int width, int height
 	//SDL_SetWindowFullscreen(window->window_id, window->fullscreen);
 	SDL_RaiseWindow(window->sdl_window);
 	SDL_GetWindowSize(window->sdl_window, &window->width, &window->height);
-
 
 	sdl->m_blittimer = 3;
 
@@ -715,6 +733,8 @@ static int drawsdl2_window_draw(sdl_window_info *window, UINT32 dc, int update)
 		SDL_GetWindowSize(window->sdl_window, &window->width, &window->height);
 		sdl->m_resize_pending = 0;
 		SDL_RenderSetViewport(sdl->m_renderer, NULL);
+	    //sdlvideo_monitor_refresh(window->monitor());
+
 	}
 
 	//SDL_SelectRenderer(window->sdl_window);
@@ -832,7 +852,14 @@ static void drawsdl2_window_destroy(sdl_window_info *window)
 
 	drawsdl2_destroy_all_textures(window);
 
-	SDL_DestroyWindow(window->sdl_window);
+    if (window->fullscreen() && video_config.switchres)
+    {
+        SDL_SetWindowFullscreen(window->sdl_window, 0);    // Try to set mode
+        SDL_SetWindowDisplayMode(window->sdl_window, &sdl->m_original_mode);    // Try to set mode
+        SDL_SetWindowFullscreen(window->sdl_window, SDL_WINDOW_FULLSCREEN);    // Try to set mode
+    }
+
+    SDL_DestroyWindow(window->sdl_window);
 
 	global_free(sdl);
 	window->dxdata = NULL;
