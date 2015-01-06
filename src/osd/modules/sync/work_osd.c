@@ -76,6 +76,7 @@ typedef void *PVOID;
 #endif
 
 // TODO: move this in a common place
+#if defined(OSD_WINDOWS)
 #if __GNUC__ && defined(__i386__) && !defined(__x86_64)
 #undef YieldProcessor
 #endif
@@ -94,6 +95,7 @@ INLINE void osd_yield_processor(void)
 #endif
 #else
 #define osd_yield_processor YieldProcessor
+#endif
 #endif
 
 template<typename _PtrType>
@@ -203,9 +205,11 @@ static bool queue_has_list_items(osd_work_queue *queue);
 
 osd_work_queue *osd_work_queue_alloc(int flags)
 {
+	int threadnum;
 	int numprocs = effective_num_processors();
 	osd_work_queue *queue;
-	int threadnum;
+	int osdthreadnum = 0;
+	int allocthreadnum;
 	char *osdworkqueuemaxthreads = osd_getenv("OSDWORKQUEUEMAXTHREADS");
 
 	// allocate a new queue
@@ -231,37 +235,44 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	// determine how many threads to create...
 	// on a single-CPU system, create 1 thread for I/O queues, and 0 threads for everything else
 	if (numprocs == 1)
-		queue->threads = (flags & WORK_QUEUE_FLAG_IO) ? 1 : 0;
+		threadnum = (flags & WORK_QUEUE_FLAG_IO) ? 1 : 0;
 	// TODO: chose either
 #if defined(OSD_WINDOWS)
 	// on an n-CPU system, create n threads for multi queues, and 1 thread for everything else
 	else
-		queue->threads = (flags & WORK_QUEUE_FLAG_MULTI) ? numprocs : 1;
+		threadnum = (flags & WORK_QUEUE_FLAG_MULTI) ? numprocs : 1;
 #else
 	// on an n-CPU system, create (n-1) threads for multi queues, and 1 thread for everything else
 	else
-		queue->threads = (flags & WORK_QUEUE_FLAG_MULTI) ? (numprocs - 1) : 1;
+		threadnum = (flags & WORK_QUEUE_FLAG_MULTI) ? (numprocs - 1) : 1;
 #endif
 
-	if (osdworkqueuemaxthreads != NULL && sscanf(osdworkqueuemaxthreads, "%d", &threadnum) == 1 && queue->threads > threadnum)
-		queue->threads = threadnum;
+	if (osdworkqueuemaxthreads != NULL && sscanf(osdworkqueuemaxthreads, "%d", &osdthreadnum) == 1 && threadnum > osdthreadnum)
+		threadnum = osdthreadnum;
 
 	// TODO: do we still have the scaling problems?
 #if defined(OSD_WINDOWS)
 	// multi-queues with high frequency items should top out at 4 for now
 	// since we have scaling problems above that
-	if ((flags & WORK_QUEUE_FLAG_HIGH_FREQ) && queue->threads > 1)
-		queue->threads = MIN(queue->threads - 1, 4);
+	if ((flags & WORK_QUEUE_FLAG_HIGH_FREQ) && threadnum > 1)
+		threadnum = MIN(threadnum - 1, 4);
 #endif
 
 	// clamp to the maximum
-	queue->threads = MIN(queue->threads, WORK_MAX_THREADS);
+	queue->threads = MIN(threadnum, WORK_MAX_THREADS);
 
-	// allocate memory for thread array (+1 to count the calling thread)
-	queue->thread = (work_thread_info *)osd_malloc_array((queue->threads + 1) * sizeof(queue->thread[0]));
+	// allocate memory for thread array (+1 to count the calling thread if WORK_QUEUE_FLAG_MULTI)
+	if (flags & WORK_QUEUE_FLAG_MULTI)
+		allocthreadnum = queue->threads + 1;
+	else
+		allocthreadnum = queue->threads;
+
+	osd_printf_verbose("procs: %d threads: %d allocthreads: %d osdthreads: %d maxthreads: %d queuethreads: %d\n", osd_num_processors, threadnum, allocthreadnum, osdthreadnum, WORK_MAX_THREADS, queue->threads);
+
+	queue->thread = (work_thread_info *)osd_malloc_array(allocthreadnum * sizeof(queue->thread[0]));
 	if (queue->thread == NULL)
 		goto error;
-	memset(queue->thread, 0, (queue->threads + 1) * sizeof(queue->thread[0]));
+	memset(queue->thread, 0, allocthreadnum * sizeof(queue->thread[0]));
 
 	// iterate over threads
 	for (threadnum = 0; threadnum < queue->threads; threadnum++)
@@ -290,7 +301,10 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	}
 
 	// start a timer going for "waittime" on the main thread
-	begin_timing(queue->thread[queue->threads].waittime);
+	if (flags & WORK_QUEUE_FLAG_MULTI)
+	{
+		begin_timing(queue->thread[queue->threads].waittime);
+	}
 	return queue;
 
 error:
@@ -372,7 +386,10 @@ void osd_work_queue_free(osd_work_queue *queue)
 		int threadnum;
 
 		// stop the timer for "waittime" on the main thread
-		end_timing(queue->thread[queue->threads].waittime);
+		if (queue->flags & WORK_QUEUE_FLAG_MULTI)
+		{
+			end_timing(queue->thread[queue->threads].waittime);
+		}
 
 		// signal all the threads to exit
 		atomic_exchange32(&queue->exiting, TRUE);
@@ -400,8 +417,14 @@ void osd_work_queue_free(osd_work_queue *queue)
 		}
 
 #if KEEP_STATISTICS
+		int allocthreadnum;
+		if (queue->flags & WORK_QUEUE_FLAG_MULTI)
+			allocthreadnum = queue->threads + 1;
+		else
+			allocthreadnum = queue->threads;
+
 		// output per-thread statistics
-		for (threadnum = 0; threadnum <= queue->threads; threadnum++)
+		for (threadnum = 0; threadnum <= allocthreadnum; threadnum++)
 		{
 			work_thread_info *thread = &queue->thread[threadnum];
 			osd_ticks_t total = thread->runtime + thread->waittime + thread->spintime;
