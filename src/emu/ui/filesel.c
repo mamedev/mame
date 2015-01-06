@@ -328,6 +328,10 @@ void ui_menu_file_create::handle()
 					reset(UI_MENU_RESET_REMEMBER_POSITION);
 				}
 				break;
+
+			case IPT_UI_CANCEL:
+				ui_menu::stack_pop(machine());
+				break;
 		}
 	}
 }
