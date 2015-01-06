@@ -151,9 +151,9 @@ public:
 	DECLARE_READ8_MEMBER(sms_count_r);
 	DECLARE_READ8_MEMBER(sms_input_port_dc_r);
 	DECLARE_READ8_MEMBER(sms_input_port_dd_r);
+	DECLARE_READ8_MEMBER(gg_input_port_00_r);
 	DECLARE_WRITE8_MEMBER(sms_ym2413_register_port_w);
 	DECLARE_WRITE8_MEMBER(sms_ym2413_data_port_w);
-	DECLARE_READ8_MEMBER(gg_input_port_2_r);
 	DECLARE_READ8_MEMBER(sms_sscope_r);
 	DECLARE_WRITE8_MEMBER(sms_sscope_w);
 	DECLARE_READ8_MEMBER(sms_mapper_r);
