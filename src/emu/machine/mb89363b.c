@@ -83,7 +83,7 @@ extern const device_type MB89363B = &device_creator<mb89363b_device>;
 
 
 mb89363b_device::mb89363b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MB89363B, "MB89363B", tag, owner, clock, "mb89363b", __FILE__),
+	: device_t(mconfig, MB89363B, "MB89363 I/O", tag, owner, clock, "mb89363b", __FILE__),
 		m_i8255_a(*this, "i8255_a"),
 		m_i8255_b(*this, "i8255_b"),
 		m_in_a_pa_cb(*this),

@@ -95,7 +95,7 @@ WRITE16_MEMBER( sega_16bit_sprite_device::draw_write )
 //-------------------------------------------------
 
 sega_hangon_sprite_device::sega_hangon_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: sega_16bit_sprite_device(mconfig, SEGA_HANGON_SPRITES, "Sega Hang On Sprites", tag, owner, "sega_hangon_sprite", __FILE__)
+	: sega_16bit_sprite_device(mconfig, SEGA_HANGON_SPRITES, "Sega Custom Sprites (Hang On)", tag, owner, "sega_hangon_sprite", __FILE__)
 {
 	set_origin(189, -1);
 }
@@ -271,7 +271,7 @@ void sega_hangon_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 //-------------------------------------------------
 
 sega_sharrier_sprite_device::sega_sharrier_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: sega_16bit_sprite_device(mconfig, SEGA_SHARRIER_SPRITES, "Sega Space Harrier Sprites", tag, owner, "sega_sharrier_sprite", __FILE__)
+	: sega_16bit_sprite_device(mconfig, SEGA_SHARRIER_SPRITES, "Sega Custom Sprites (Space Harrier)", tag, owner, "sega_sharrier_sprite", __FILE__)
 {
 	set_origin(189, -1);
 }
@@ -1005,7 +1005,7 @@ void sega_sys16b_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 //-------------------------------------------------
 
 sega_outrun_sprite_device::sega_outrun_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: sega_16bit_sprite_device(mconfig, SEGA_OUTRUN_SPRITES, "Sega Out Run Sprites", tag, owner, "sega_outrun_sprite", __FILE__),
+	: sega_16bit_sprite_device(mconfig, SEGA_OUTRUN_SPRITES, "Sega Custom Sprites (Out Run)", tag, owner, "sega_outrun_sprite", __FILE__),
 		m_is_xboard(false)
 {
 	set_origin(189, 0x00);

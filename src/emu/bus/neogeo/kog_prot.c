@@ -7,7 +7,7 @@ extern const device_type KOG_PROT = &device_creator<kog_prot_device>;
 
 
 kog_prot_device::kog_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, KOG_PROT, "NeoGeo King of Gladiator Protection Device", tag, owner, clock, "kog_prot", __FILE__),
+	: device_t(mconfig, KOG_PROT, "NeoGeo Protection (King of Gladiator)", tag, owner, clock, "kog_prot", __FILE__),
 	m_jumper(*this, "JUMPER")
 {
 }

@@ -131,7 +131,7 @@ void nscsi_bus_device::device_config_complete()
 
 
 nscsi_connector::nscsi_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, NSCSI_CONNECTOR, "NSCSI device connector abstraction", tag, owner, clock, "nscsi_connector", __FILE__),
+	device_t(mconfig, NSCSI_CONNECTOR, "NSCSI Connector Abstraction", tag, owner, clock, "nscsi_connector", __FILE__),
 	device_slot_interface(mconfig, *this)
 {
 }
