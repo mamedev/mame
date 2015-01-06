@@ -389,17 +389,6 @@ void texture_info::render_quad(const render_primitive *prim, const int x, const 
 	target_rect.w = round_nearest(prim->bounds.x1 - prim->bounds.x0);
 	target_rect.h = round_nearest(prim->bounds.y1 - prim->bounds.y0);
 
-#if 0
-	// no longer supported in SDL2
-    if ((PRIMFLAG_GET_SCREENTEX(prim->m_flags)) && video_config.filter)
-    {
-        SDL_SetTextureScaleMode(texture->m_texture_id,  DRAW2_SCALEMODE_BEST);
-    }
-    else
-    {
-        SDL_SetTextureScaleMode(texture->m_texture_id,  DRAW2_SCALEMODE_NEAREST);
-    }
-#endif
     SDL_SetTextureBlendMode(m_texture_id, m_sdl_blendmode);
     set_coloralphamode(m_texture_id, &prim->color);
     SDL_RenderCopy(m_renderer,  m_texture_id, NULL, &target_rect);
@@ -527,6 +516,19 @@ int drawsdl2_init(running_machine &machine, sdl_draw_info *callbacks)
 		osd_printf_warning("Warning: Unable to load opengl library: %s\n", stemp ? stemp : "<default>");
 	else
 		osd_printf_verbose("Loaded opengl shared library: %s\n", stemp ? stemp : "<default>");
+
+    /* Enable bilinear filtering in case it is supported.
+     * This applies to all texture operations. However, artwort is pre-scaled
+     * and thus shouldn't be affected.
+     */
+    if (video_config.filter)
+    {
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+    }
+    else
+    {
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+    }
 
 	return 0;
 }
