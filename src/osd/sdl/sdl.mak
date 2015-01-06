@@ -405,8 +405,13 @@ OSDCOREOBJS = \
 	$(SDLOBJ)/sdlsocket.o   \
 	$(SDLOBJ)/sdlmisc_$(BASE_TARGETOS).o    \
 	$(SDLOBJ)/sdlos_$(SDLOS_TARGETOS).o \
-	$(OSDOBJ)/modules/sync/sync_$(SYNC_IMPLEMENTATION).o     \
-	$(SDLOBJ)/sdlwork.o
+	$(OSDOBJ)/modules/sync/sync_$(SYNC_IMPLEMENTATION).o
+
+ifdef NOASM
+OSDCOREOBJS += $(OSDOBJ)/modules/sync/work_mini.o
+else
+OSDCOREOBJS += $(OSDOBJ)/modules/sync/work_osd.o
+endif
 
 # any "main" must be in LIBOSD or else the build will fail!
 # for the windows build, we just add it to libocore as well.

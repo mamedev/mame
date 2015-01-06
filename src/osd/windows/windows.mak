@@ -349,7 +349,7 @@ OSDCOREOBJS = \
 	$(WINOBJ)/winutil.o \
 	$(WINOBJ)/winclip.o \
 	$(WINOBJ)/winsocket.o \
-	$(WINOBJ)/winwork.o \
+	$(OSDOBJ)/modules/sync/work_osd.o \
 	$(WINOBJ)/winptty.o \
 	$(WINOBJ)/winos.o \
 

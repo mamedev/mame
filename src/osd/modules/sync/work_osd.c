@@ -2,10 +2,14 @@
 // copyright-holders:Aaron Giles
 //============================================================
 //
-//  winwork.c - Win32 OSD core work item functions
+//  sdlwork.c - SDL OSD core work item functions
+//
+//  Copyright (c) 1996-2010, Nicola Salmoria and the MAME Team.
+//  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //============================================================
 
+#if defined(OSD_WINDOWS)
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -16,14 +20,25 @@
 #ifdef __GNUC__
 #include <stdint.h>
 #endif
+#endif
 
 // MAME headers
 #include "osdcore.h"
 
 #include "modules/sync/osdsync.h"
+
+#if defined(OSD_WINDOWS)
 #include "winos.h"
+#elif defined(OSD_SDL)
+#include "sdlos.h"
+typedef void *PVOID;
+#endif
 
 #include "eminline.h"
+
+#if defined(SDLMAME_MACOSX)
+#include "osxutils.h"
+#endif
 
 
 //============================================================
@@ -37,11 +52,13 @@
 //============================================================
 
 #define ENV_PROCESSORS               "OSDPROCESSORS"
-#define ENV_WORKQUEUEMAXTHREADS      "OSDWORKQUEUEMAXTHREADS"
 
+#if defined(OSD_WINDOWS)
 #define SPIN_LOOP_TIME          (osd_ticks_per_second() / 1000)
-
-
+#else
+#define INFINITE                (osd_ticks_per_second() *  (osd_ticks_t) 10000)
+#define SPIN_LOOP_TIME          (osd_ticks_per_second() / 10000)
+#endif
 
 //============================================================
 //  MACROS
@@ -187,18 +204,25 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	// on a single-CPU system, create 1 thread for I/O queues, and 0 threads for everything else
 	if (numprocs == 1)
 		queue->threads = (flags & WORK_QUEUE_FLAG_IO) ? 1 : 0;
-
+#if defined(OSD_WINDOWS)
 	// on an n-CPU system, create n threads for multi queues, and 1 thread for everything else
 	else
 		queue->threads = (flags & WORK_QUEUE_FLAG_MULTI) ? numprocs : 1;
+#else
+	// on an n-CPU system, create (n-1) threads for multi queues, and 1 thread for everything else
+	else
+		queue->threads = (flags & WORK_QUEUE_FLAG_MULTI) ? (numprocs - 1) : 1;
+#endif
 
 	if (osdworkqueuemaxthreads != NULL && sscanf(osdworkqueuemaxthreads, "%d", &threadnum) == 1 && queue->threads > threadnum)
 		queue->threads = threadnum;
 
+#if defined(OSD_WINDOWS)
 	// multi-queues with high frequency items should top out at 4 for now
 	// since we have scaling problems above that
 	if ((flags & WORK_QUEUE_FLAG_HIGH_FREQ) && queue->threads > 1)
 		queue->threads = MIN(queue->threads - 1, 4);
+#endif
 
 	// clamp to the maximum
 	queue->threads = MIN(queue->threads, WORK_MAX_THREADS);
@@ -287,8 +311,18 @@ int osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout)
 
 			// spin until we're done
 			begin_timing(thread->spintime);
+
+#if defined(OSD_WINDOWS)
 			while (queue->items != 0 && osd_ticks() < stopspin)
 				osd_yield_processor();
+#else
+			do {
+				int spin = 10000;
+				while (--spin && queue->items != 0)
+					osd_yield_processor();
+			} while (queue->items != 0 && osd_ticks() < stopspin);
+#endif
+
 			end_timing(thread->spintime);
 
 			begin_timing(thread->waittime);
@@ -495,8 +529,11 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 
 	// if no threads, run the queue now on this thread
 	if (queue->threads == 0)
+	{
+		end_timing(queue->thread[0].waittime);
 		worker_thread_process(queue, &queue->thread[0]);
-
+		begin_timing(queue->thread[0].waittime);
+	}
 	// only return the item if it won't get released automatically
 	return (flags & WORK_ITEM_FLAG_AUTO_RELEASE) ? NULL : lastitem;
 }
@@ -526,8 +563,16 @@ int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 	if (item->event == NULL)
 	{
 		osd_ticks_t stopspin = osd_ticks() + timeout;
+#if defined(OSD_WINDOWS)
 		while (!item->done && osd_ticks() < stopspin)
 			osd_yield_processor();
+#else
+		do {
+			int spin = 10000;
+			while (--spin && !item->done)
+				osd_yield_processor();
+		} while (!item->done && osd_ticks() < stopspin);
+#endif
 	}
 
 	// otherwise, block on the event until done
@@ -610,6 +655,10 @@ static void *worker_thread_entry(void *param)
 	work_thread_info *thread = (work_thread_info *)param;
 	osd_work_queue *queue = thread->queue;
 
+	#if defined(SDLMAME_MACOSX)
+	void *arp = NewAutoreleasePool();
+	#endif
+
 	// loop until we exit
 	for ( ;; )
 	{
@@ -646,8 +695,18 @@ static void *worker_thread_entry(void *param)
 				// spin for a while looking for more work
 				begin_timing(thread->spintime);
 				stopspin = osd_ticks() + SPIN_LOOP_TIME;
+
+#if defined(OSD_WINDOWS)
 				while (queue->list == NULL && osd_ticks() < stopspin)
 					osd_yield_processor();
+#else
+				do {
+					int spin = 10000;
+					while (--spin && queue->list == NULL)
+						osd_yield_processor();
+				} while (queue->list == NULL && osd_ticks() < stopspin);
+#endif
+
 				end_timing(thread->spintime);
 			}
 
@@ -661,6 +720,11 @@ static void *worker_thread_entry(void *param)
 		atomic_exchange32(&thread->active, FALSE);
 		atomic_decrement32(&queue->livethreads);
 	}
+
+	#if defined(SDLMAME_MACOSX)
+	ReleaseAutoreleasePool(arp);
+	#endif
+
 	return NULL;
 }
 

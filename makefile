@@ -491,7 +491,22 @@ ifdef FASTDEBUG
 DEFS += -DMAME_DEBUG_FAST
 endif
 
+# add a define identifying the target osd
 
+ifeq ($(OSD),sdl)
+DEFS += -DOSD_SDL
+else
+ifeq ($(OSD),windows)
+DEFS += -DOSD_WINDOWS
+else
+ifeq ($(OSD),osdmini)
+DEFS += -DOSD_MINI
+else
+$(error Unknown OSD)
+endif
+endif
+endif
+ 
 #-------------------------------------------------
 # compile flags
 # CCOMFLAGS are common flags
