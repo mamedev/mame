@@ -249,13 +249,12 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 
 	if (osdworkqueuemaxthreads != NULL && sscanf(osdworkqueuemaxthreads, "%d", &osdthreadnum) == 1 && threadnum > osdthreadnum)
 		threadnum = osdthreadnum;
-
-	// TODO: do we still have the scaling problems?
+	// TODO: also enable this for non-Windows platforms?
 #if defined(OSD_WINDOWS)
-	// multi-queues with high frequency items should top out at 4 for now
+	// multi-queues with high frequency items should top out at 3 for now
 	// since we have scaling problems above that
 	if ((flags & WORK_QUEUE_FLAG_HIGH_FREQ) && threadnum > 1)
-		threadnum = MIN(threadnum - 1, 4);
+		threadnum = MIN(threadnum - 1, 3);
 #endif
 
 	// clamp to the maximum
@@ -267,7 +266,7 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	else
 		allocthreadnum = queue->threads;
 
-	osd_printf_verbose("procs: %d threads: %d allocthreads: %d osdthreads: %d maxthreads: %d queuethreads: %d\n", osd_num_processors, threadnum, allocthreadnum, osdthreadnum, WORK_MAX_THREADS, queue->threads);
+	osd_printf_verbose("osdprocs: %d effecprocs: %d threads: %d allocthreads: %d osdthreads: %d maxthreads: %d queuethreads: %d\n", osd_num_processors, numprocs, threadnum, allocthreadnum, osdthreadnum, WORK_MAX_THREADS, queue->threads);
 
 	queue->thread = (work_thread_info *)osd_malloc_array(allocthreadnum * sizeof(queue->thread[0]));
 	if (queue->thread == NULL)
