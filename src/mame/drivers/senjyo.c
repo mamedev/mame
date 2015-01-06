@@ -11,7 +11,7 @@ TODO:
   Right now it does at second and half, presumably due of the unknown PCB clocks.
 
 Note:
-- Star Force shows default MAME palette at POST. Putted it all_black for now.
+- Star Force shows default MAME palette at POST. Flipped to all_black for now.
 
 This board was obviously born to run Senjyo. Four scrolling layers, gradient
 background, sprite/background priorities, and even a small bitmap for the
@@ -84,17 +84,18 @@ I/O read/write
 
 void senjyo_state::machine_reset()
 {
-	/* we must avoid generating interrupts for the first few frames otherwise */
-	/* Senjyo locks up. There must be an interrupt enable port somewhere, */
-	/* or maybe interrupts are genenrated by the CTC. */
-	/* Maybe a write to port d002 clears the IRQ line, but I'm not sure. */
-	m_int_delay_kludge = 10;
+	// ...
 }
 
 INTERRUPT_GEN_MEMBER(senjyo_state::senjyo_interrupt)
 {
-	if (m_int_delay_kludge == 0) device.execute().set_input_line(0, HOLD_LINE);
-	else m_int_delay_kludge--;
+	device.execute().set_input_line(0, ASSERT_LINE);
+}
+
+WRITE8_MEMBER(senjyo_state::irq_ctrl_w)
+{
+	// irq ack is mandatory for senjyo: it's basically used as an irq mask during POST.
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(senjyo_state::flip_screen_w)
@@ -154,7 +155,8 @@ static ADDRESS_MAP_START( senjyo_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0xb800, 0xbbff) AM_RAM AM_SHARE("radarram")
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("P1") AM_WRITE(flip_screen_w)
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("P2")
-	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("SYSTEM") AM_WRITE(irq_ctrl_w)
+	AM_RANGE(0xd003, 0xd003) AM_READNOP // debug cheat port? (i.e. bit 0 in starforc: invincibility, bit 3-0 in senyjo: disables enemy fire)
 	AM_RANGE(0xd004, 0xd004) AM_READ_PORT("DSW1") AM_WRITE(sound_cmd_w)
 	AM_RANGE(0xd005, 0xd005) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
@@ -213,7 +215,7 @@ static ADDRESS_MAP_START( starforb_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0xb800, 0xbbff) AM_RAM AM_SHARE("radarram")
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("P1") AM_WRITE(flip_screen_w)
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("P2")
-	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("SYSTEM") AM_WRITE(irq_ctrl_w)
 	AM_RANGE(0xd004, 0xd004) AM_READ_PORT("DSW1") AM_WRITE(sound_cmd_w)
 	AM_RANGE(0xd005, 0xd005) AM_READ_PORT("DSW2")
 
