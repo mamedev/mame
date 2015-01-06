@@ -20,6 +20,7 @@
  Flying Fortress/Flying Fortress II (1977)               UNKNOWN
  Gunman (1977)                                           YES        8 x 32bytes (or 11? )
  Interceptor (1976)                                      UNKNOWN
+ Missile-X (1977)                                        YES        10 - (5 x 512bytes, 5x32bytes)
  Pro Hockey (1973)                                       UNKNOWN
  Road Champion (1978)                                    UNKNOWN
  Sky Fighter 2 (1970)                                    UNKNOWN
@@ -198,6 +199,45 @@ ROM_START( bazookabr )
 ROM_END
 
 
+/*
+
+ Missile-X
+ 14.314 mhz XTAL
+
+ label  loc. Part #     Use?
+ ==========================================================
+ CR11   L4  74s287      numerics (yes, it says CRxx not GNxx)
+ MS09   F6  74s287      ground explosion
+ MS08   C2  74s287      400pt jeep graphics
+ MS07   N8  74s287      player missile
+ MS06   M8  74s287      missile animated graphics
+ MS05   11F IM5610      200pt tank R->L graphic
+ MS05   11E IM5610      200pt tank L->R graphic
+ MS04   N7  IM5610	    player missile trajectory pattern
+ MS03   F3  IM5610      anti-missile ack-ack graphics
+ MS02   L12 IM5610      missile left/right position
+ MS01   D8  IM5610      100pt tanks graphics
+ 
+*/
+
+ROM_START( missilex )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0800, "roms", ROMREGION_ERASE00 )
+	ROM_LOAD( "cr11.4l",      0x0000, 0x0200, CRC(3d10a407) SHA1(1a85581c34d7e6766eaebbcc9895ed0ab2f94387) ) 
+	ROM_LOAD( "ms09.6f",      0x0000, 0x0200, CRC(80787642) SHA1(9de2419f0ba16f9c2b06e417c1ebba441fdae053) )
+	ROM_LOAD( "ms08.2c",      0x0000, 0x0200, CRC(dd785590) SHA1(7ba6b6f6091595852d6feaef5a029b2aca684440) ) 
+	ROM_LOAD( "ms07.8n",      0x0000, 0x0200, CRC(e278d03a) SHA1(c40975e5807936fed40cda4a6881f6aef0e7f350) ) 
+	ROM_LOAD( "ms06.8m",      0x0000, 0x0200, CRC(fe6c9192) SHA1(d110e010cf685ee18479ca7f890fa9da2fa71603) ) 
+	ROM_LOAD( "ms05.11f",     0x0000, 0x0020, CRC(845fe0cc) SHA1(ce8db615c1f7be242fc2ee25c1ef75e8608a771a) ) 
+	ROM_LOAD( "ms05.11e",     0x0000, 0x0020, CRC(845fe0cc) SHA1(ce8db615c1f7be242fc2ee25c1ef75e8608a771a) ) 
+	ROM_LOAD( "ms04.7n",      0x0000, 0x0020, CRC(34d0bee4) SHA1(41848def6aeb128ec985c158f3ed01c5b20bdcf6) ) 
+	ROM_LOAD( "ms03.3f",      0x0000, 0x0020, CRC(d139f5fa) SHA1(29c05143d05553c2cb2831f9624f307f59436850) ) 
+	ROM_LOAD( "ms02.12l",     0x0000, 0x0020, CRC(157b7e68) SHA1(d1a98267af1562e6126faaf0850906224f8a608d) ) 
+	ROM_LOAD( "ms01.8d",      0x0000, 0x0020, CRC(e89e76c3) SHA1(1149b5d1f93baa8aecd54a618083cc13b63a894d) ) 
+ROM_END
+
+
 ROM_START( ttblock )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
@@ -219,5 +259,6 @@ ROM_END
 GAME( 1977, gunman,    0,       taitottl, 0, driver_device,  0, ROT0, "Taito", "Gunman [TTL]", GAME_IS_SKELETON )
 GAME( 1977, bazooka,   0,       taitottl, 0, driver_device,  0, ROT0, "Project Support Engineering", "Bazooka [TTL]", GAME_IS_SKELETON ) // clone of Taito Cross Fire - or is Cross Fire a clone of PSE Bazooka?
 GAME( 1977, bazookabr, bazooka, taitottl, 0, driver_device,  0, ROT0, "Taito do Brasil", "Bazooka (Brazil) [TTL]", GAME_IS_SKELETON )
+GAME( 1977, missilex,  0,       taitottl, 0, driver_device,  0, ROT0, "Taito", "Missile-X [TTL]", GAME_IS_SKELETON )
 GAME( 1977, ttblock,   0,       taitottl, 0, driver_device,  0, ROT0, "Taito", "T.T. Block [TTL]", GAME_IS_SKELETON )
 GAME( 1979, zzblock,   0,       taitottl, 0, driver_device,  0, ROT0, "Taito", "Zun Zun Block [TTL]", GAME_IS_SKELETON )

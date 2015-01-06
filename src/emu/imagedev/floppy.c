@@ -925,7 +925,7 @@ void ui_menu_control_floppy_image::hook_load(astring filename, bool softlist)
 void ui_menu_control_floppy_image::handle()
 {
 	floppy_image_device *fd = static_cast<floppy_image_device *>(image);
-	switch(state) {
+	switch (state) {
 	case DO_CREATE: {
 		floppy_image_format_t *fif_list = fd->get_formats();
 		int ext_match = 0, total_usable = 0;
@@ -980,12 +980,12 @@ void ui_menu_control_floppy_image::handle()
 			break;
 
 		case ui_menu_select_rw::WRITE_OTHER:
-			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_file_create(machine(), container, image, current_directory, current_file)));
-			state = CREATE_FILE;
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_file_create(machine(), container, image, current_directory, current_file, &create_ok)));
+			state = CHECK_CREATE;
 			break;
 
 		case -1:
-			ui_menu::stack_pop(machine());
+			state = START_FILE;
 			break;
 		}
 		break;

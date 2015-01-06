@@ -11,7 +11,7 @@ TODO:
   Right now it does at second and half, presumably due of the unknown PCB clocks.
 
 Note:
-- Star Force shows default MAME palette at POST. Putted it all_black for now.
+- Star Force shows default MAME palette at POST. Flipped to all_black for now.
 
 This board was obviously born to run Senjyo. Four scrolling layers, gradient
 background, sprite/background priorities, and even a small bitmap for the
@@ -78,23 +78,29 @@ I/O read/write
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
-#include "sound/samples.h"
 #include "machine/segacrpt.h"
 #include "includes/senjyo.h"
 
-void senjyo_state::machine_reset()
+void senjyo_state::machine_start()
 {
-	/* we must avoid generating interrupts for the first few frames otherwise */
-	/* Senjyo locks up. There must be an interrupt enable port somewhere, */
-	/* or maybe interrupts are genenrated by the CTC. */
-	/* Maybe a write to port d002 clears the IRQ line, but I'm not sure. */
-	m_int_delay_kludge = 10;
+	save_item(NAME(m_sound_cmd));
+	save_item(NAME(m_single_volume));
+	save_item(NAME(m_sound_state));
+	save_item(NAME(m_bgstripes));
 }
 
-INTERRUPT_GEN_MEMBER(senjyo_state::senjyo_interrupt)
+void senjyo_state::machine_reset()
 {
-	if (m_int_delay_kludge == 0) device.execute().set_input_line(0, HOLD_LINE);
-	else m_int_delay_kludge--;
+	m_sound_cmd = 0;
+	m_single_volume = 0;
+	m_sound_state = 0;
+	m_bgstripes = 0;
+}
+
+WRITE8_MEMBER(senjyo_state::irq_ctrl_w)
+{
+	// irq ack is mandatory for senjyo: it's basically used as an irq mask during POST.
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(senjyo_state::flip_screen_w)
@@ -104,15 +110,13 @@ WRITE8_MEMBER(senjyo_state::flip_screen_w)
 
 WRITE8_MEMBER(senjyo_state::sound_cmd_w)
 {
-	z80pio_device *device = machine().device<z80pio_device>("z80pio");
-
 	m_sound_cmd = data;
 
-	device->strobe_a(0);
-	device->strobe_a(1);
+	m_pio->strobe_a(0);
+	m_pio->strobe_a(1);
 }
 
-WRITE8_MEMBER(senjyo_state::senjyo_paletteram_w)
+WRITE8_MEMBER(senjyo_state::paletteram_w)
 {
 	int r = (data << 2) & 0xC;
 	int g = (data     ) & 0xC;
@@ -130,15 +134,15 @@ WRITE8_MEMBER(senjyo_state::senjyo_paletteram_w)
 static ADDRESS_MAP_START( senjyo_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(senjyo_fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(senjyo_fgcolorram_w) AM_SHARE("fgcolorram")
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(fgcolorram_w) AM_SHARE("fgcolorram")
 	AM_RANGE(0x9800, 0x987f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9c00, 0x9dff) AM_RAM_WRITE(senjyo_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x9c00, 0x9dff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x9e00, 0x9e1f) AM_RAM AM_SHARE("fgscroll")
 	AM_RANGE(0x9e20, 0x9e21) AM_RAM AM_SHARE("scrolly3")
 /*  AM_RANGE(0x9e22, 0x9e23) height of the layer (Senjyo only, fixed at 0x380) */
 	AM_RANGE(0x9e25, 0x9e25) AM_RAM AM_SHARE("scrollx3")
-	AM_RANGE(0x9e27, 0x9e27) AM_RAM_WRITE(senjyo_bgstripes_w) AM_SHARE("bgstripesram")  /* controls width of background stripes */
+	AM_RANGE(0x9e27, 0x9e27) AM_RAM AM_SHARE("bgstripesram")  /* controls width of background stripes */
 	AM_RANGE(0x9e28, 0x9e29) AM_RAM AM_SHARE("scrolly2")
 /*  AM_RANGE(0x9e2a, 0x9e2b) height of the layer (Senjyo only, fixed at 0x200) */
 	AM_RANGE(0x9e2d, 0x9e2d) AM_RAM AM_SHARE("scrollx2")
@@ -148,13 +152,14 @@ static ADDRESS_MAP_START( senjyo_map, AS_PROGRAM, 8, senjyo_state )
 /*  AM_RANGE(0x9e38, 0x9e38) probably radar y position (Senjyo only, fixed at 0x61) */
 /*  AM_RANGE(0x9e3d, 0x9e3d) probably radar x position (Senjyo only, 0x00/0xc0 depending on screen flip) */
 	AM_RANGE(0x9e00, 0x9e3f) AM_RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(senjyo_bg3videoram_w) AM_SHARE("bg3videoram")
-	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(senjyo_bg2videoram_w) AM_SHARE("bg2videoram")
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(senjyo_bg1videoram_w) AM_SHARE("bg1videoram")
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(bg3videoram_w) AM_SHARE("bg3videoram")
+	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(bg2videoram_w) AM_SHARE("bg2videoram")
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(bg1videoram_w) AM_SHARE("bg1videoram")
 	AM_RANGE(0xb800, 0xbbff) AM_RAM AM_SHARE("radarram")
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("P1") AM_WRITE(flip_screen_w)
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("P2")
-	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("SYSTEM") AM_WRITE(irq_ctrl_w)
+	AM_RANGE(0xd003, 0xd003) AM_READNOP // debug cheat port? (i.e. bit 0 in starforc: invincibility, bit 3-0 in senyjo: disables enemy fire)
 	AM_RANGE(0xd004, 0xd004) AM_READ_PORT("DSW1") AM_WRITE(sound_cmd_w)
 	AM_RANGE(0xd005, 0xd005) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
@@ -165,7 +170,7 @@ static ADDRESS_MAP_START( senjyo_sound_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("sn1", sn76496_device, write)
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("sn2", sn76496_device, write)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("sn3", sn76496_device, write)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(senjyo_volume_w)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(volume_w)
 #if 0
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(unknown)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(unknown)
@@ -196,10 +201,10 @@ WRITE8_MEMBER(senjyo_state::starforb_scrollx2)
 static ADDRESS_MAP_START( starforb_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(senjyo_fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(senjyo_fgcolorram_w) AM_SHARE("fgcolorram")
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(fgcolorram_w) AM_SHARE("fgcolorram")
 	AM_RANGE(0x9800, 0x987f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9c00, 0x9dff) AM_RAM_WRITE(senjyo_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x9c00, 0x9dff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	/* The format / use of the ram here is different on the bootleg */
 	AM_RANGE(0x9e20, 0x9e21) AM_RAM AM_SHARE("scrolly3")
 	AM_RANGE(0x9e25, 0x9e25) AM_RAM AM_SHARE("scrollx3")
@@ -207,19 +212,19 @@ static ADDRESS_MAP_START( starforb_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0x9e35, 0x9e35) AM_RAM_WRITE(starforb_scrollx2) AM_SHARE("scrollx2") // ok
 	AM_RANGE(0x9e00, 0x9e3f) AM_RAM
 
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(senjyo_bg3videoram_w) AM_SHARE("bg3videoram")
-	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(senjyo_bg2videoram_w) AM_SHARE("bg2videoram")
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(senjyo_bg1videoram_w) AM_SHARE("bg1videoram")
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(bg3videoram_w) AM_SHARE("bg3videoram")
+	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(bg2videoram_w) AM_SHARE("bg2videoram")
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(bg1videoram_w) AM_SHARE("bg1videoram")
 	AM_RANGE(0xb800, 0xbbff) AM_RAM AM_SHARE("radarram")
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("P1") AM_WRITE(flip_screen_w)
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("P2")
-	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("SYSTEM") AM_WRITE(irq_ctrl_w)
 	AM_RANGE(0xd004, 0xd004) AM_READ_PORT("DSW1") AM_WRITE(sound_cmd_w)
 	AM_RANGE(0xd005, 0xd005) AM_READ_PORT("DSW2")
 
 	/* these aren't used / written, left here to make sure memory is allocated */
 	AM_RANGE(0xfe00, 0xfe1f) AM_RAM AM_SHARE("fgscroll")
-	AM_RANGE(0xfe27, 0xfe27) AM_RAM_WRITE(senjyo_bgstripes_w) AM_SHARE("bgstripesram")  /* controls width of background stripes */
+	AM_RANGE(0xfe27, 0xfe27) AM_RAM AM_SHARE("bgstripesram")  /* controls width of background stripes */
 	AM_RANGE(0xfe28, 0xfe29) AM_RAM AM_SHARE("scrolly1")
 	AM_RANGE(0xfe2d, 0xfe2d) AM_RAM AM_SHARE("scrollx1")
 ADDRESS_MAP_END
@@ -231,7 +236,7 @@ static ADDRESS_MAP_START( starforb_sound_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("sn1", sn76496_device, write)
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("sn2", sn76496_device, write)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("sn3", sn76496_device, write)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(senjyo_volume_w)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(volume_w)
 #if 0
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(unknown)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(unknown)
@@ -554,7 +559,7 @@ static MACHINE_CONFIG_START( senjyo, senjyo_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(senjyo_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", senjyo_state,  senjyo_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", senjyo_state, irq0_line_assert)
 
 	MCFG_CPU_ADD("sub", Z80, 2000000)   /* 2 MHz? */
 	MCFG_CPU_CONFIG(senjyo_daisy_chain)
@@ -576,7 +581,7 @@ static MACHINE_CONFIG_START( senjyo, senjyo_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(senjyo_state, screen_update_senjyo)
+	MCFG_SCREEN_UPDATE_DRIVER(senjyo_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", senjyo)
@@ -923,10 +928,10 @@ DRIVER_INIT_MEMBER(senjyo_state,senjyo)
 }
 
 
-GAME( 1983, senjyo,   0,        senjyo,  senjyo, senjyo_state,   senjyo,   ROT90, "Tehkan", "Senjyo", 0 )
-GAME( 1984, starforc, 0,        senjyo,  starforc, senjyo_state, starforc, ROT90, "Tehkan", "Star Force", 0 )
-GAME( 1984, starforce,starforc, senjyo,  starforc, senjyo_state, starfore, ROT90, "Tehkan", "Star Force (encrypted, set 1)", 0 )
-GAME( 1984, starforcb,starforc, starforb,starforc, senjyo_state, starfore, ROT90, "bootleg", "Star Force (encrypted, bootleg)", 0 )
-GAME( 1984, starforca,starforc, senjyo,  starforc, senjyo_state, starfora, ROT90, "Tehkan", "Star Force (encrypted, set 2)", 0 )
-GAME( 1985, megaforc, starforc, senjyo,  starforc, senjyo_state, starforc, ROT90, "Tehkan (Video Ware license)", "Mega Force", 0 )
-GAME( 1986, baluba,   0,        senjyo,  baluba, senjyo_state,   starforc, ROT90, "Able Corp, Ltd.", "Baluba-louk no Densetsu (Japan)", 0 )
+GAME( 1983, senjyo,   0,        senjyo,  senjyo, senjyo_state,   senjyo,   ROT90, "Tehkan", "Senjyo", GAME_SUPPORTS_SAVE )
+GAME( 1984, starforc, 0,        senjyo,  starforc, senjyo_state, starforc, ROT90, "Tehkan", "Star Force", GAME_SUPPORTS_SAVE )
+GAME( 1984, starforce,starforc, senjyo,  starforc, senjyo_state, starfore, ROT90, "Tehkan", "Star Force (encrypted, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1984, starforcb,starforc, starforb,starforc, senjyo_state, starfore, ROT90, "bootleg", "Star Force (encrypted, bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1984, starforca,starforc, senjyo,  starforc, senjyo_state, starfora, ROT90, "Tehkan", "Star Force (encrypted, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1985, megaforc, starforc, senjyo,  starforc, senjyo_state, starforc, ROT90, "Tehkan (Video Ware license)", "Mega Force", GAME_SUPPORTS_SAVE )
+GAME( 1986, baluba,   0,        senjyo,  baluba, senjyo_state,   starforc, ROT90, "Able Corp, Ltd.", "Baluba-louk no Densetsu (Japan)", GAME_SUPPORTS_SAVE )

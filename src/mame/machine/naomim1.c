@@ -11,7 +11,7 @@ DEVICE_ADDRESS_MAP_START(submap, 16, naomi_m1_board)
 ADDRESS_MAP_END
 
 naomi_m1_board::naomi_m1_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: naomi_board(mconfig, NAOMI_M1_BOARD, "Sega NAOMI M1 BOARD", tag, owner, clock, "naomi_m1_board", __FILE__)
+	: naomi_board(mconfig, NAOMI_M1_BOARD, "Sega NAOMI M1 Board", tag, owner, clock, "naomi_m1_board", __FILE__)
 {
 	key_tag = 0;
 }

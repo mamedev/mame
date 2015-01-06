@@ -23,7 +23,7 @@
 const device_type RAIDEN2COP = &device_creator<raiden2cop_device>;
 
 raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, RAIDEN2COP, "RAIDEN2COP", tag, owner, clock, "raiden2cop", __FILE__),
+	: device_t(mconfig, RAIDEN2COP, "Seibu COP (Raiden 2)", tag, owner, clock, "raiden2cop", __FILE__),
 	cop_latch_addr(0),
 	cop_latch_trigger(0),
 	cop_latch_value(0),

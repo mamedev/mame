@@ -964,7 +964,8 @@ void sdl_window_info::video_window_update(running_machine &machine)
 			if (!this->m_fullscreen)
 			{
 				blit_surface_size(width, height);
-				window_resize(blitwidth, blitheight);
+				//Don't resize window without user interaction;
+				//window_resize(blitwidth, blitheight);
 			}
 			else if (video_config.switchres)
 			{

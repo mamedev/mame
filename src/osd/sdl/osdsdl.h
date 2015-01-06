@@ -26,8 +26,8 @@
 		#define SDL13_COMBINE_RESIZE (0)
 	#endif
 #else
+    #define SDLMAME_INIT_IN_WORKER_THREAD   (0)
 	#define SDL13_COMBINE_RESIZE (0)
-	#define SDLMAME_INIT_IN_WORKER_THREAD   (0)
 #endif
 
 #if defined(NO_DEBUGGER)

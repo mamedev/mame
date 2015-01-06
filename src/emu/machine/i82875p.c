@@ -40,7 +40,7 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, i82875p_host_device)
 ADDRESS_MAP_END
 
 i82875p_host_device::i82875p_host_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: pci_host_device(mconfig, I82875P_HOST, "i82875p northbridge", tag, owner, clock, "i82875p_host", __FILE__)
+	: pci_host_device(mconfig, I82875P_HOST, "I82875P Northbridge", tag, owner, clock, "i82875p_host", __FILE__)
 {
 }
 
@@ -425,7 +425,7 @@ void i82875p_host_device::map_extra(UINT64 memory_window_start, UINT64 memory_wi
 
 
 i82875p_agp_device::i82875p_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: agp_bridge_device(mconfig, I82875P_AGP, "i82875p AGP bridge", tag, owner, clock, "i82875p_agp", __FILE__)
+	: agp_bridge_device(mconfig, I82875P_AGP, "I82875P AGP Bridge", tag, owner, clock, "i82875p_agp", __FILE__)
 {
 }
 
@@ -448,7 +448,7 @@ ADDRESS_MAP_END
 
 
 i82875p_overflow_device::i82875p_overflow_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: pci_device(mconfig, I82875P_OVERFLOW, "i82875p configuration overflow", tag, owner, clock, "i82875p_overflow", __FILE__)
+	: pci_device(mconfig, I82875P_OVERFLOW, "I82875P Configuration Overflow", tag, owner, clock, "i82875p_overflow", __FILE__)
 {
 }
 

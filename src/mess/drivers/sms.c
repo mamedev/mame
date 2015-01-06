@@ -346,7 +346,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gg_io, AS_IO, 8, sms_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00)                 AM_READ(gg_input_port_2_r)
+	AM_RANGE(0x00, 0x00)                 AM_READ(gg_input_port_00_r)
 	AM_RANGE(0x01, 0x05)                 AM_READWRITE(gg_sio_r, gg_sio_w)
 	AM_RANGE(0x06, 0x06)                 AM_DEVWRITE("gamegear", gamegear_device, stereo_w)
 	AM_RANGE(0x07, 0x07)                 AM_WRITE(sms_io_control_w)

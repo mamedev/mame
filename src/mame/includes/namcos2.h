@@ -99,6 +99,7 @@ public:
 			m_dspmaster(*this, "dspmaster"),
 			m_dspslave(*this, "dspslave"),
 			m_c68(*this, "c68"),
+			m_gpu(*this, "gpu"),
 			m_gametype(0),
 			m_c169_roz_videoram(*this, "rozvideoram", 0),
 			m_c169_roz_gfxbank(0),
@@ -116,6 +117,7 @@ public:
 	optional_device<cpu_device> m_dspmaster;
 	optional_device<cpu_device> m_dspslave;
 	optional_device<m37450_device> m_c68;
+	optional_device<cpu_device> m_gpu; //to be moved to namco21_state after disentangling
 
 	// game type helpers
 	bool is_system21();

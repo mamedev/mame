@@ -28,12 +28,12 @@ const device_type PSX_SIO0 = &device_creator<psxsio0_device>;
 const device_type PSX_SIO1 = &device_creator<psxsio1_device>;
 
 psxsio0_device::psxsio0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	psxsio_device(mconfig, PSX_SIO0, "PSX SIO-0", tag, owner, clock, "psxsio0", __FILE__)
+	psxsio_device(mconfig, PSX_SIO0, "Sony PSX SIO-0", tag, owner, clock, "psxsio0", __FILE__)
 {
 }
 
 psxsio1_device::psxsio1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	psxsio_device(mconfig, PSX_SIO1, "PSX SIO-1", tag, owner, clock, "psxsio1", __FILE__)
+	psxsio_device(mconfig, PSX_SIO1, "Sony PSX SIO-1", tag, owner, clock, "psxsio1", __FILE__)
 {
 }
 
