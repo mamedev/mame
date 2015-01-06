@@ -106,9 +106,13 @@ static void spin_while(const volatile _PtrType * volatile ptr, const _PtrType va
         osd_yield_processor();
 #else
     do {
-        int spin = 100000;
-        while (--spin && ((*ptr == val) ^ invert))
-            osd_yield_processor();
+        int spin = 10000;
+        while (--spin)
+        {
+            //osd_yield_processor();
+            if ((*ptr == val) ^ invert)
+                return;
+        }
     } while (((*ptr == val) ^ invert) && osd_ticks() < stopspin);
 #endif
 }
