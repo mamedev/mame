@@ -76,48 +76,19 @@ typedef void *PVOID;
 #define end_timing(v)           do { } while (0)
 #endif
 
-// TODO: move this in a common place
-#if defined(OSD_WINDOWS)
-#if __GNUC__ && defined(__i386__) && !defined(__x86_64)
-#undef YieldProcessor
-#endif
-
-#ifndef YieldProcessor
-#ifdef __GNUC__
-INLINE void osd_yield_processor(void)
-{
-	__asm__ __volatile__ ( "rep; nop" );
-}
-#else
-INLINE void osd_yield_processor(void)
-{
-	__asm { rep nop }
-}
-#endif
-#else
-#define osd_yield_processor YieldProcessor
-#endif
-#endif
-
 template<typename _PtrType>
 static void spin_while(const volatile _PtrType * volatile ptr, const _PtrType val, const osd_ticks_t timeout, const int invert = 0)
 {
     osd_ticks_t stopspin = osd_ticks() + timeout;
 
-#if defined(OSD_WINDOWS)
-    while (((*ptr == val) ^ invert) && osd_ticks() < stopspin)
-        osd_yield_processor();
-#else
     do {
         int spin = 10000;
         while (--spin)
         {
-            //osd_yield_processor();
             if ((*ptr == val) ^ invert)
                 return;
         }
     } while (((*ptr == val) ^ invert) && osd_ticks() < stopspin);
-#endif
 }
 
 template<typename _PtrType>
