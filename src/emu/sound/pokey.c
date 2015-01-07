@@ -887,7 +887,7 @@ UINT8 pokey_device::read(offs_t offset)
 
 	default:
 		LOG(("POKEY '%s' register $%02x\n", tag(), offset));
-		data = 0x00;
+		data = 0xff;
 		break;
 	}
 	return data;
