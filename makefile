@@ -291,15 +291,6 @@ ifdef SANITIZE
 SYMBOLS = 1
 endif
 
-# specify a default optimization level if none explicitly stated
-ifndef OPTIMIZE
-ifndef SYMBOLS
-OPTIMIZE = 3
-else
-OPTIMIZE = 0
-endif
-endif
-
 # profiler defaults to on for DEBUG builds
 ifdef DEBUG
 ifndef PROFILER
@@ -307,7 +298,6 @@ PROFILER = 1
 endif
 endif
 
-# TODO: also move it up, so it isn't optimized by default?
 # allow gprof profiling as well, which overrides the internal PROFILER
 # also enable symbols as it is useless without them
 ifdef PROFILE
@@ -315,6 +305,15 @@ PROFILER =
 SYMBOLS = 1
 ifndef SYMLEVEL
 SYMLEVEL = 1
+endif
+endif
+
+# specify a default optimization level if none explicitly stated
+ifndef OPTIMIZE
+ifndef SYMBOLS
+OPTIMIZE = 3
+else
+OPTIMIZE = 0
 endif
 endif
 
