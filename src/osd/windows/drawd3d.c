@@ -250,7 +250,7 @@ static void drawd3d_window_destroy(win_window_info *window)
 	if (d3d == NULL)
 		return;
 
-	if (d3d->get_shaders()->recording())
+	if (d3d->get_shaders() != NULL && d3d->get_shaders()->recording())
 		d3d->get_shaders()->window_record();
 
 	// free the memory in the window
@@ -528,7 +528,7 @@ void texture_manager::create_resources()
 		texture.rowpixels = m_default_bitmap.rowpixels();
 		texture.width = m_default_bitmap.width();
 		texture.height = m_default_bitmap.height();
-		texture.palette = NULL;
+		texture.set_palette(NULL);
 		texture.seqid = 0;
 
 		// now create it
@@ -545,7 +545,7 @@ void texture_manager::create_resources()
 		texture.rowpixels = m_vector_bitmap.rowpixels();
 		texture.width = m_vector_bitmap.width();
 		texture.height = m_vector_bitmap.height();
-		texture.palette = NULL;
+		texture.set_palette(NULL);
 		texture.seqid = 0;
 
 		// now create it
@@ -1040,11 +1040,14 @@ renderer::~renderer()
 
 void renderer::device_delete()
 {
-	// free our effects
-	m_shaders->delete_resources(false);
+	if (m_shaders != NULL)
+	{
+		// free our effects
+		m_shaders->delete_resources(false);
 
-	// delete the HLSL interface
-	global_free(m_shaders);
+		// delete the HLSL interface
+		global_free(m_shaders);
+	}
 
 	// free our base resources
 	device_delete_resources();
@@ -1070,7 +1073,8 @@ void renderer::device_delete()
 
 void renderer::device_delete_resources()
 {
-	m_texture_manager->delete_resources();
+	if (m_texture_manager != NULL)
+		m_texture_manager->delete_resources();
 	// free the vertex buffer
 	if (m_vertexbuf != NULL)
 		(*d3dintf->vertexbuf.release)(m_vertexbuf);
@@ -2576,28 +2580,28 @@ void texture_info::set_data(const render_texinfo *texsource, UINT32 flags)
 		switch (PRIMFLAG_GET_TEXFORMAT(flags))
 		{
 			case TEXFORMAT_PALETTE16:
-				copyline_palette16((UINT32 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
+				copyline_palette16((UINT32 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette(), m_xborderpix);
 				break;
 
 			case TEXFORMAT_PALETTEA16:
-				copyline_palettea16((UINT32 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
+				copyline_palettea16((UINT32 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette(), m_xborderpix);
 				break;
 
 			case TEXFORMAT_RGB32:
-				copyline_rgb32((UINT32 *)dst, (UINT32 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
+				copyline_rgb32((UINT32 *)dst, (UINT32 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette(), m_xborderpix);
 				break;
 
 			case TEXFORMAT_ARGB32:
-				copyline_argb32((UINT32 *)dst, (UINT32 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
+				copyline_argb32((UINT32 *)dst, (UINT32 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette(), m_xborderpix);
 				break;
 
 			case TEXFORMAT_YUY16:
 				if (m_texture_manager->get_yuv_format() == D3DFMT_YUY2)
-					copyline_yuy16_to_yuy2((UINT16 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
+					copyline_yuy16_to_yuy2((UINT16 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette(), m_xborderpix);
 				else if (m_texture_manager->get_yuv_format() == D3DFMT_UYVY)
-					copyline_yuy16_to_uyvy((UINT16 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
+					copyline_yuy16_to_uyvy((UINT16 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette(), m_xborderpix);
 				else
-					copyline_yuy16_to_argb((UINT32 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
+					copyline_yuy16_to_argb((UINT32 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette(), m_xborderpix);
 				break;
 
 			default:

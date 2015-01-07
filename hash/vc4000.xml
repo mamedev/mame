@@ -3,11 +3,11 @@
 
 <softwarelist name="vc4000" description="Interton VC 4000 cartridges">
 
-	<!-- Cassette 1 -->
 	<software name="carraces">
 		<description>Autorennen / Car Races / Course Automobile</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="1"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
@@ -16,11 +16,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 2 -->
 	<software name="blckjack">
 		<description>Blackjack</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="2"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
@@ -29,11 +29,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 3 -->
 	<software name="paddleg">
 		<description>Ballspiele / Paddle Games / Jeux De Balle</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="3"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
@@ -42,11 +42,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 4 -->
 	<software name="tbattle">
 		<description>Panzerschlacht/Luftkampf / Tank Battle/Air Battle / Bataille De Blindes/Combat Aerien</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="4"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
@@ -55,11 +55,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 5 -->
 	<software name="mathema1">
 		<description>Mathematik I / Mathematics I / Mathematique I</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="5"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
@@ -68,11 +68,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 6 -->
 	<software name="mathema2">
 		<description>Mathematik II / Mathematics II / Mathematique II</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="6"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
@@ -81,11 +81,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 7 -->
 	<software name="airseaba">
 		<description>Luftkampf/Seegefecht / Air/Sea Battle / Combat Aerien/Bataile Navale</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="7"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
@@ -94,11 +94,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 8 -->
 	<software name="memory1">
 		<description>Memory I/Motivsuche / Memory I/Flag Capture / Memory I/Recherche De Motifs</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="8"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
@@ -107,11 +107,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 9 -->
 	<software name="intel1">
 		<description>Intelligenz I / Intelligence I</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="9"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
@@ -120,11 +120,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 10 -->
 	<software name="wintersp">
 		<description>Wintersport / Winter Sports / Sports D'Hiver</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="10"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="ram1k" />
 			<dataarea name="rom" size="4096">
@@ -135,11 +135,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 11 -->
 	<software name="hippodro">
 		<description>Hippodrom / Hippodrome</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="11"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
@@ -148,11 +148,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 12 -->
 	<software name="hunting">
 		<description>Jagd / Hunting / Chasse</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="12"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
@@ -161,11 +161,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 13 -->
 	<software name="chess">
 		<description>Schach / Chess / Les Echecs</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="13"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="chess2" />
 			<dataarea name="rom" size="4096">
@@ -176,11 +176,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 14 -->
 	<software name="motox">
 		<description>Motocross</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="14"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="ram1k" />
 			<dataarea name="rom" size="4096">
@@ -191,11 +191,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 15 -->
 	<software name="intel2">
 		<description>Intelligenz II / Intelligence II</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="15"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
@@ -204,11 +204,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 16 -->
 	<software name="intel3">
 		<description>Intelligenz III / Intelligence III</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="16"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
@@ -217,11 +217,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 17 -->
 	<software name="circus">
 		<description>Circus / Cirque</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="17"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
@@ -230,26 +230,24 @@
 		</part>
 	</software>
 
-	<!-- Cassette 18 -->
 	<software name="boxing">
 		<description>Boxkampf / Boxing Match / Match De Boxe</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="18"/>
 		<part name="cart" interface="vc4000_cart">
-			<feature name="slot" value="ram1k" />
+			<feature name="slot" value="rom4k" />
 			<dataarea name="rom" size="4096">
 				<rom name="boxing.bin" size="4096" crc="922c9f0d" sha1="b49a37dd6d0272f6c71d778ffada6bc7c90f8348" offset="0" />
-			</dataarea>
-			<dataarea name="ram" size="1024">
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Cassette 19 -->
 	<software name="outersc">
 		<description>Krieg im Weltraum / Outer Space Combat / Guerre Dans L'Espace</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="19"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
@@ -258,11 +256,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 20 -->
 	<software name="memory2">
 		<description>Memory II / Melodie/Melody / Simon</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="20"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
@@ -271,11 +269,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 21 -->
 	<software name="reversi">
 		<description>Intelligenz IV/Attacke (Reversi) / Intelligence IV/Attack (Reversi) / Intelligence IV/Attaque (Reversi)</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="21"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
@@ -284,11 +282,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 22 -->
 	<software name="chess2">
 		<description>Schach II / Chess II / Les Echecs II</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="22"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="chess2" />
 			<dataarea name="rom" size="6144">
@@ -300,11 +298,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 23 -->
 	<software name="pinball">
 		<description>Flipper / Pinball</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="23"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
@@ -313,11 +311,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 24 -->
 	<software name="soccer">
 		<description>Fussball / Soccer / Football</description>
 		<year>1979</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="24"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
@@ -326,11 +324,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 25 -->
 	<software name="bowling">
 		<description>Bowling/Kegeln / Bowling/Ninepins / Yeux Quilles</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="25"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
@@ -339,11 +337,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 26 -->
 	<software name="draughts">
 		<description>Dame / Draughts / Dames</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="26"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="ram1k" />
 			<dataarea name="rom" size="4096">
@@ -354,11 +352,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 27 -->
 	<software name="golf">
 		<description>Golf</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="27"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="ram1k" />
 			<dataarea name="rom" size="4096">
@@ -369,11 +367,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 28 -->
 	<software name="cockpit">
 		<description>Cockpit</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value="28"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="ram1k" />
 			<dataarea name="rom" size="4096">
@@ -384,11 +382,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 29 -->
 	<software name="metropol">
 		<description>Metropolis / Hangman</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="29"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="4096">
@@ -397,11 +395,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 30 -->
 	<software name="solitair">
 		<description>Solitär / Solitaire</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="30"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
@@ -410,11 +408,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 31 -->
 	<software name="casino">
 		<description>Casino</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="31"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
@@ -423,11 +421,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 32 -->
 	<software name="invaders">
 		<description>Weltrauminvasoren / Invaders / Invaseur De L'Espace</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="32"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
@@ -436,11 +434,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 33 -->
 	<software name="superinv">
 		<description>Super Invaders / Super Invaders / Super Envahisseurs</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="33"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
@@ -452,11 +450,11 @@
 	<!-- Cassette 34 (unreleased) -->
 	<!-- Cassette 35 (unreleased) -->
 
-	<!-- Cassette 36 -->
 	<software name="backgamm">
 		<description>Backgammon / Jacquet</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="36"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="ram1k" />
 			<dataarea name="rom" size="4096">
@@ -467,11 +465,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 37 -->
 	<software name="mnstrman">
 		<description>Monster-Man</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="37"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="ram1k" />
 			<dataarea name="rom" size="4096">
@@ -480,11 +478,11 @@
 		</part>
 	</software>
 
-	<!-- Cassette 38 -->
 	<software name="hyperspa">
 		<description>Hyperspace / Hyperespace</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="38"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
@@ -495,11 +493,11 @@
 
 	<!-- Cassette 39 (unreleased) -->
 
-	<!-- Cassette 40 -->
 	<software name="suprspac">
 		<description>Super-Space</description>
 		<year>19??</year>
 		<publisher>Interton</publisher>
+		<info name="serial" value="40"/>
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="ram1k" />
 			<dataarea name="rom" size="4096">

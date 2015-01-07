@@ -194,6 +194,14 @@ int mac_state::adb_pollkbd(int update)
 		// if we want to update the current read, do so
 		if (update)
 		{
+			if(m_adb_currentkeys[0] != codes[0]) {
+				m_adb_keybuf[m_adb_keybuf_end] = codes[0];
+				m_adb_keybuf_end = (m_adb_keybuf_end+1) % kADBKeyBufSize;
+			}
+			if(m_adb_currentkeys[1] != codes[1]) {
+				m_adb_keybuf[m_adb_keybuf_end] = codes[1];
+				m_adb_keybuf_end = (m_adb_keybuf_end+1) % kADBKeyBufSize;
+			}
 			m_adb_currentkeys[0] = codes[0];
 			m_adb_currentkeys[1] = codes[1];
 		}
@@ -388,6 +396,7 @@ void mac_state::adb_talk()
 				}
 				else if (addr == m_adb_keybaddr)
 				{
+					int kbd_has_data = 1;
 					#if LOG_ADB || LOG_ADB_TALK_LISTEN
 					printf("Talking to keyboard, register %x\n", reg);
 					#endif
@@ -402,7 +411,7 @@ void mac_state::adb_talk()
 							}
 							else
 							{
-								this->adb_pollkbd(1);
+								kbd_has_data = this->adb_pollkbd(1);
 							}
 
 /*                            if (m_adb_currentkeys[0] != 0xff)
@@ -414,9 +423,30 @@ void mac_state::adb_talk()
                                 printf("Keys[1] = %02x\n", m_adb_currentkeys[1]);
                             }*/
 
-							m_adb_buffer[0] = m_adb_currentkeys[1];
-							m_adb_buffer[1] = m_adb_currentkeys[0];
-							m_adb_datasize = 2;
+							if(kbd_has_data)
+							{
+								if(m_adb_keybuf_start == m_adb_keybuf_end)
+								{
+	//								printf("%s: buffer empty\n", __func__);
+									m_adb_buffer[0] = 0xff;
+									m_adb_buffer[1] = 0xff;
+								}
+								else
+								{
+									m_adb_buffer[1] = m_adb_keybuf[m_adb_keybuf_start];
+									m_adb_keybuf_start = (m_adb_keybuf_start+1) % kADBKeyBufSize;
+									if(m_adb_keybuf_start != m_adb_keybuf_end)
+									{
+										m_adb_buffer[0] = m_adb_keybuf[m_adb_keybuf_start];
+										m_adb_keybuf_start = (m_adb_keybuf_start+1) % kADBKeyBufSize;
+									}
+									else
+									{
+										m_adb_buffer[0] = 0xff;
+									}
+								}
+								m_adb_datasize = 2;
+							}
 							break;
 
 						// read modifier keys
@@ -633,6 +663,10 @@ TIMER_CALLBACK(mac_adb_tick)
 			if ((mac->m_adb_direction) && (ADB_IS_BITBANG))
 			{
 				mac->adb_talk();
+				if((mac->m_adb_last_talk == 2) && mac->m_adb_datasize) {
+					mac->m_adb_timer_ticks = 8;
+					mac->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+				}
 			}
 		}
 		else
@@ -1191,6 +1225,8 @@ void mac_state::adb_reset()
 	{
 		m_key_matrix[i] = 0;
 	}
+	m_adb_keybuf_start = 0;
+	m_adb_keybuf_end = 0;
 }
 
 WRITE_LINE_MEMBER(mac_state::adb_linechange_w)

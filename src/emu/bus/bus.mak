@@ -45,6 +45,18 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/a8sio/a8sio.h,BUSES += A8SIO
+#-------------------------------------------------
+
+ifneq ($(filter A8SIO,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/a8sio
+BUSOBJS += $(BUSOBJ)/a8sio/a8sio.o
+BUSOBJS += $(BUSOBJ)/a8sio/cassette.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/abcbus/abcbus.h,BUSES += ABCBUS
 #-------------------------------------------------
 
@@ -1250,6 +1262,17 @@ OBJDIRS += $(BUSOBJ)/gameboy
 BUSOBJS += $(BUSOBJ)/gameboy/gb_slot.o
 BUSOBJS += $(BUSOBJ)/gameboy/rom.o
 BUSOBJS += $(BUSOBJ)/gameboy/mbc.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/gamegear/gear2gear.h,BUSES += GAMEGEAR
+#-------------------------------------------------
+
+ifneq ($(filter GAMEGEAR,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/gamegear
+BUSOBJS += $(BUSOBJ)/gamegear/gear2gear.o
+BUSOBJS += $(BUSOBJ)/gamegear/smsctrladp.o
 endif
 
 #-------------------------------------------------

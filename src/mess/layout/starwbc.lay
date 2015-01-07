@@ -50,7 +50,7 @@
 
 	<view name="Internal Layout">
 		<bounds left="0" right="165" top="0" bottom="105" />
-		
+
 		<bezel element="static_yellow"><bounds x="3" y="17" width="10" height="83" /></bezel>
 		<bezel element="static_black"><bounds x="4" y="18" width="8" height="81" /></bezel>
 
@@ -75,9 +75,9 @@
 		<bezel element="text_3"><bounds x="64.5" y="4" width="8" height="8" /></bezel>
 		<bezel element="text_4"><bounds x="84.5" y="4" width="8" height="8" /></bezel>
 
-		
+
 	<!-- lamp matrix -->
-		
+
 		<bezel element="static_gray"><bounds x="17" y="17" width="83" height="83" /></bezel>
 
 		<bezel name="lamp20" element="lamp"><bounds x="20" y="20" width="17" height="17" /></bezel>

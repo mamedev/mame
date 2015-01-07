@@ -8,19 +8,19 @@ Info Taken from: http://www.floodgap.com/retrobits/tomy/carts.html
 
 Japanese Releases - Pyuuta
 
-001E Bombman ~ ボンブマン
-002E Monster Inn ~ モンスターイン
-003E Saurusland ~ ザウルスランド
-004E Turpin ~ ターピン
-005E Frogger ~ フロッガー
-006E Scramble ~ スクランブル
-007E NightFlight ~ ナイトフライト
+001E Bombman ~ ボンブマン    [dumped]
+002E Monster Inn ~ モンスターイン  [dumped]
+003E Saurusland ~ ザウルスランド   [dumped]
+004E Turpin ~ ターピン  [dumped]
+005E Frogger ~ フロッガー    [dumped]
+006E Scramble ~ スクランブル  [dumped]
+007E NightFlight ~ ナイトフライト  [dumped]
 008E Marine Adventure ~ マリン アドベンチャー
-009E Mission Attack ~ ミッション アタック
+009E Mission Attack ~ ミッション アタック    [dumped]
 010E Traffic Jam ~ トラフィック ジャム
 011E Mystery Gold ~ ミステリー ゴールド
-012E DonPan ~ ドンバン
-013E Micky Athletic Land ~ ミッキー アスレチックランド
+012E DonPan ~ ドンバン [dumped]
+013E Mickey Athletic Land ~ ミッキー アスレチックランド [dumped]
 014E Pooyan ~ プーヤン
 015E Jungler ~ ジャングラー
 016E Guttang Gottong ~ ガッタンゴットン
@@ -32,7 +32,7 @@ Japanese Releases - Pyuuta
 022E Triplecommand ~ トリプルコマンド
 023E SuperBike ~ スーパーバイク
 024E Rescue Copter [3D] ~ レスキュー コプター
-025E Baseball [3D] ~ ベースボール
+025E Baseball [3D] ~ ベースボール [dumped]
 026E Battlefighter [3D] ~ バトルファイター
 
 0XXE GajiGoji [Unreleased] ~ カジコジ
@@ -80,11 +80,25 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 
 <softwarelist name="tutor" description="Tomy Tutor &amp; Pyuuta cartridges">
 
+	<software name="baseball">
+		<description>Baseball (Jpn)</description>
+		<year>198?</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="ベースボール"/>
+		<info name="serial" value="025E"/>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="baseball.bin" size="32768" crc="8f857d5f" sha1="2b612245777749e26d9c92ce7222d8db9582617f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bombman">
-	<!-- (Japanese 001E)-->
-		<description>Bombman</description>
+		<description>Bombman (Jpn)</description>
 		<year>1982</year>
 		<publisher>Tomy</publisher>
+		<info name="alt_title" value="ボンブマン"/>
+		<info name="serial" value="001E"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="bombman.bin" size="8192" crc="e6a7b204" sha1="e39deede7d76021e3be2cab09142af54fe97a847" offset="0" />
@@ -93,10 +107,10 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="crzracer">
-	<!-- Stock No: 8302 -->
-		<description>Car-azy-racer</description>
+		<description>Car-azy-racer (USA)</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
+		<info name="serial" value="8302"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="crzracer.bin" size="16384" crc="6e9b98c7" sha1="1896464c91dd7549b2b3059fde1ff987c13ad11a" offset="0" />
@@ -106,9 +120,10 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 
 	<software name="crawlers">
 	<!-- Stock No: 8100, Clone of Maze Patrol (Japanese 017E)-->
-		<description>Cave Crawlers</description>
+		<description>Cave Crawlers (USA)</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
+		<info name="serial" value="8100"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="crawlers.bin" size="8192" crc="f3059779" sha1="fd51c445f0356ed3796bdbbd4a7f6086d7bb5331" offset="0" />
@@ -118,9 +133,10 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 
 	<software name="deepsix">
 	<!-- Stock No: 8106, Clone of Marine Adventure (Japanese 008E)-->
-		<description>Deep Six</description>
+		<description>Deep Six (USA)</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
+		<info name="serial" value="8106"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="deepsix.bin" size="8192" crc="f3c61b7d" sha1="efac38c955ef4c605a43a6f720e094c0fbd11cd9" offset="0" />
@@ -128,11 +144,25 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		</part>
 	</software>
 
+	<software name="donpan">
+		<description>DonPan (Jpn)</description>
+		<year>1982</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="ドンバン"/>
+		<info name="serial" value="012E"/>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="tomy33.5.u1" size="8192" crc="1ec59f0e" sha1="0cd5edf7c7ec9cf7d0066dc9e75a5cca0062cbfc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="frogger">
-	<!-- (Japanese 005E)-->
-		<description>Frogger</description>
+		<description>Frogger (Jpn)</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
+		<info name="alt_title" value="フロッガー"/>
+		<info name="serial" value="005E"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="frogger.bin" size="8192" crc="fffd897e" sha1="0778e0711e3c5a0d36b486f64bf7cc8ee8f9f8b5" offset="0" />
@@ -141,10 +171,10 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="hyperspc">
-	<!-- Stock No: 8102 -->
-		<description>Hyperspace</description>
+		<description>Hyperspace (USA)</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
+		<info name="serial" value="8102"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="hyperspc.bin" size="8192" crc="87bc1c05" sha1="4ff240e6d583c67565a4c857a40e05fe4e826a3f" offset="0" />
@@ -166,9 +196,10 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 
 	<software name="locomotn">
 	<!-- Stock No: 8203, Clone of Guttang Gottong (Japanese 016E)-->
-		<description>Loco-motion</description>
+		<description>Loco-motion (USA)</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
+		<info name="serial" value="8203"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="lmotion.bin" size="8192" crc="1f652f42" sha1="fa2e6129d29f9d38f1102da3678659d845daec5b" offset="0" />
@@ -176,11 +207,25 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		</part>
 	</software>
 
+	<software name="athland">
+		<description>Mickey Athletic Land (Jpn)</description>
+		<year>198?</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="ミッキー アスレチックランド"/>
+		<info name="serial" value="013E"/>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="m5l2764k.u1" size="8192" crc="b0cf81bc" sha1="782a5f0f86917739bbee772e4b836e6f3b67578c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="misattck">
-	<!-- (Japanese 009E)-->
-		<description>Mission Attack</description>
+		<description>Mission Attack (Jpn)</description>
 		<year>1982</year>
 		<publisher>Tomy</publisher>
+		<info name="alt_title" value="ミッション アタック"/>
+		<info name="serial" value="009E"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="misattck.bin" size="8192" crc="398b2321" sha1="e15d13a34b4aa0335d00c4c6bf1afda643f80905" offset="0" />
@@ -189,10 +234,11 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="mnstrinn">
-	<!-- (Japanese 002E)-->
-		<description>Monster Inn</description>
+		<description>Monster Inn (Jpn)</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
+		<info name="alt_title" value="モンスターイン"/>
+		<info name="serial" value="002E"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="mnstrinn.bin" size="8192" crc="2af704f8" sha1="457acdeb308f2874021741f13fc8f74d52c361af" offset="0" />
@@ -201,10 +247,11 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="nightfli">
-	<!-- (Japanese 007E)-->
-		<description>Night Flight</description>
+		<description>Night Flight (Jpn)</description>
 		<year>1982</year>
 		<publisher>Tomy</publisher>
+		<info name="alt_title" value="ナイトフライト"/>
+		<info name="serial" value="007E"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="nightfli.bin" size="8192" crc="db469444" sha1="d8b5f6888ec95b2e55ebfe8c9e0434f402cc0975" offset="0" />
@@ -225,10 +272,11 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="saurus">
-	<!-- (Japanese 003E)-->
-		<description>Saurusland</description>
+		<description>Saurusland (Jpn)</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
+		<info name="alt_title" value="ザウルスランド"/>
+		<info name="serial" value="003E"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="saurus.bin" size="8192" crc="87085401" sha1="bb4dd5b39a9a3992f4a67bf479be4ec0693c5845" offset="0" />
@@ -237,10 +285,10 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="scramble">
-	<!-- Stock No: 8201, (Japanese 006E)-->
 		<description>Scramble (USA)</description>
 		<year>1981</year>
 		<publisher>Tomy</publisher>
+		<info name="serial" value="8201"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="scramble.bin" size="8192" crc="cc9901d1" sha1="66b573a80b47a3fb62dbfb0abe512e80b2336735" offset="0" />
@@ -249,10 +297,11 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="scramblej" cloneof="scramble">
-	<!-- Stock No: 8201, (Japanese 006E)-->
 		<description>Scramble (Jpn)</description>
 		<year>1981</year>
 		<publisher>Tomy</publisher>
+		<info name="alt_title" value="スクランブル"/>
+		<info name="serial" value="006E"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="scramblej.bin" size="8192" crc="bd708ab4" sha1="9029d16c123e6d35a5f3ed4fbc9eefae8948215f" offset="0" />
@@ -265,6 +314,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<description>Torpedo Terror</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
+		<info name="serial" value="8101"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="torpedo.bin" size="8192" crc="95577ceb" sha1="4b75c4bdd2285eff5ed0df3a951d8527270e6b96" offset="0" />
@@ -297,10 +347,11 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="turpin">
-	<!-- (Japanese 004E)-->
-		<description>Turpin</description>
+		<description>Turpin (Jpn)</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
+		<info name="alt_title" value="ターピン"/>
+		<info name="serial" value="004E"/>
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="turpin.bin" size="8192" crc="d00210df" sha1="74b30511f899e0b060981aa68f93c511df15f3d3" offset="0" />

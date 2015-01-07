@@ -169,7 +169,7 @@ ROM_START( ac1 )
 	ROM_SYSTEM_BIOS( 0, "v1", "Version 3.1 (orig)" )
 	ROMX_LOAD( "mon_v31_16.bin",  0x0000, 0x0800, CRC(1ba65e4d) SHA1(3382b8d03f31166a56aea49fd1ec1e82a7108300), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "v2", "Version 3.1 (fixed)" )
-	ROMX_LOAD( "mon_v31_16_v2.bin",  0x0000, 0x0800, CRC(8904BEB4) SHA1(db8d00a2537ac3a662e3c91e55eb2bf824a72062), ROM_BIOS(2))
+	ROMX_LOAD( "mon_v31_16_v2.bin",  0x0000, 0x0800, CRC(8904beb4) SHA1(db8d00a2537ac3a662e3c91e55eb2bf824a72062), ROM_BIOS(2))
 	// from Funkamateur 01/85
 	ROM_LOAD( "minibasic.bin",   0x0800, 0x0800, CRC(06782639) SHA1(3fd57b3ae3f538374b0d794d8aa15d06bcaaddd8))
 	ROM_REGION(0x0800, "gfx1",0)

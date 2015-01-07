@@ -76,4 +76,4 @@ IMGTOOL_OBJS = \
 
 $(IMGTOOL): $(IMGTOOL_OBJS) $(LIBIMGTOOL) $(FORMATS_LIB) $(LIBEMU) $(LIBUTIL) $(EXPAT) $(ZLIB) $(FLAC_LIB) $(7Z_LIB) $(LIBOCORE)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+	$(LD) $(LDFLAGS) $^ $(BASELIBS) -o $@

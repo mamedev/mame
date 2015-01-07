@@ -114,8 +114,8 @@ Game                                           Dongle Sticker    PIC Number     
  WCC Football Intercontinental Clubs 2008-2009 ?                 ?               ?
  WCC Football Intercontinental Clubs 2009-2010 ?                 ?               ?
 
-* denotes these DVDs are archived. 
-^ denotes these PICs are archived. 
+* denotes these DVDs are archived.
+^ denotes these PICs are archived.
 This list is not necessarily correct or complete.
 Corrections and additions to the above are welcome.
 
@@ -353,6 +353,7 @@ static MACHINE_CONFIG_START(lindbergh, lindbergh_state)
 	MCFG_I82875P_HOST_ADD(            ":pci:00.0",                        0x103382c0, ":maincpu", 512*1024*1024)
 	MCFG_I82875P_AGP_ADD(             ":pci:01.0")
 	MCFG_GEFORCE_7600GS_ADD(          ":pci:01.0:00.0",                   0x10de02e1)
+	MCFG_I82875P_OVERFLOW_ADD(        ":pci:06.0",                        0x103382c0)
 	MCFG_PCI_BRIDGE_ADD(              ":pci:1c.0",      0x808625ae, 0x02)
 	MCFG_I82541PI_ADD(                ":pci:1c.0:00.0",                   0x103382c0)
 	MCFG_USB_UHCI_ADD(                ":pci:1d.0",      0x808625a9, 0x02, 0x103382c0)
@@ -385,8 +386,7 @@ MACHINE_CONFIG_END
 	ROM_LOAD("fpr-24370b.ic6", 0x000000, 0x400000, CRC(c3b021a4) SHA1(1b6938a50fe0e4ae813864649eb103838c399ac0)) \
 \
 	ROM_REGION32_LE(0x10000, ":pci:01.0:00.0", 0) /* Geforce bios extension (custom for the card) */ \
-	ROM_LOAD("vid_bios.u504", 0x00000, 0x10000, CRC(f78d14d7) SHA1(f129787e487984edd23bf344f2e9500c85052275)) \
-
+	ROM_LOAD("vid_bios.u504", 0x00000, 0x10000, CRC(f78d14d7) SHA1(f129787e487984edd23bf344f2e9500c85052275))
 ROM_START(lindbios)
 	LINDBERGH_BIOS
 ROM_END

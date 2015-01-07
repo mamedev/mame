@@ -20,7 +20,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_spritegen(*this, "spritegen")	
+		m_spritegen(*this, "spritegen")
 	{ }
 
 	/* memory pointers */

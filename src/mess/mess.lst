@@ -214,6 +214,8 @@ dina      // Telegames Dina
 prsarcde  // Telegames Personal Arcade
 adam      // Coleco Adam
 
+amaztron
+
 // NEC
 pce    // PC/Engine NEC 1987-1993
 tg16      // Turbo Grafix-16  NEC 1989-1993
@@ -1062,6 +1064,16 @@ avigo_fr     // 1997 Avigo (French)
 avigo_es     // 1997 Avigo (Spanish)
 avigo_it     // 1997 Avigo (Italian)
 
+// TI Speak & Spell
+snspell
+snspella
+snspelluk
+snspelluka
+snspelljp
+ladictee
+snmath
+snmatha
+
 // Texas Instruments Calculators
 tisr16    // 1974 SR-16
 ti1270
@@ -1220,6 +1232,7 @@ ht108064 // Hradstechnika Szvetkezet HT-1080Z/64
 radionic  // Radionic
 tandy2k
 tandy2khd
+tandy12
 
 coco      // Color Computer
 cocoe    // Color Computer (Extended BASIC 1.0)
@@ -1710,6 +1723,9 @@ hp48gx  // HP 48GX
 hp48gp  // HP 48G+
 hp49g
 hp49gp  // HP 49G+
+hp1650b
+hp1651b
+hp165ka0
 hp16500b
 hp9816
 hp9845a
@@ -1719,8 +1735,13 @@ hp9835b
 hp9845b
 hp9845t
 hp9845c
+hp9k310
 hp9k320
 hp9k330
+hp9k340
+hp9k370
+hp9k380
+hp9k382
 
 // SpectraVideo
 svi318  // SVI-318 (PAL)
@@ -2574,3 +2595,4 @@ leapstertv
 excali64
 bitgrpha
 bitgrphb
+unk3403

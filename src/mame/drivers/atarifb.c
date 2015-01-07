@@ -651,6 +651,19 @@ ROM_START( atarifb1 )
 	ROM_LOAD_NIB_HIGH( "033031.d5", 0x0000, 0x0200, CRC(89d619b8) SHA1(0af5d1f4e6f9a377dc2d49a8039866b1857af01f) )
 ROM_END
 
+ROM_START( atarifb2 ) // built from original Atari source code
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "035348-01.m1", 0x6800, 0x0800, CRC(eec61633) SHA1(e578f9392d18a5dbcb678c4e922da10c87ff6670) )
+	ROM_LOAD( "035350-01.p1", 0x7000, 0x0800, CRC(e3ec76d6) SHA1(2b9b544e7bf1624e6d0ec1fdc7b9d096bae87b30) )
+	ROM_LOAD( "035349-01.n1", 0x7800, 0x0800, CRC(c1e9d379) SHA1(77320dd8b74447cc55ba1cc3a50e7a9085f96c76) )
+
+	ROM_REGION( 0x0400, "gfx1", 0 )
+	ROM_LOAD_NIB_LOW ( "033029.n7", 0x0000, 0x0400, CRC(12f43dca) SHA1(a463f5068d5522ddf74052429aa6da23e5475844) )
+
+	ROM_REGION( 0x0200, "gfx2", 0 )
+	ROM_LOAD_NIB_LOW ( "033030.c5", 0x0000, 0x0200, CRC(eac9ef90) SHA1(0e6284392852695ab7323be82105d32f57ad00f1) )
+	ROM_LOAD_NIB_HIGH( "033031.d5", 0x0000, 0x0200, CRC(89d619b8) SHA1(0af5d1f4e6f9a377dc2d49a8039866b1857af01f) )
+ROM_END
 
 ROM_START( atarifb4 )
 	ROM_REGION( 0x8000, "maincpu", 0 ) /* 64k for code, the ROMs are nibble-wide */
@@ -774,6 +787,7 @@ ROM_END
 /*     YEAR  NAME      PARENT   MACHINE   INPUT */
 GAMEL( 1978, atarifb,  0,       atarifb,  atarifb, driver_device,  0, ROT0, "Atari", "Atari Football (revision 2)", GAME_SUPPORTS_SAVE, layout_atarifb )
 GAMEL( 1978, atarifb1, atarifb, atarifb,  atarifb, driver_device,  0, ROT0, "Atari", "Atari Football (revision 1)", GAME_SUPPORTS_SAVE, layout_atarifb )
+GAMEL( 1978, atarifb2, atarifb, atarifb,  atarifb, driver_device,  0, ROT0, "Atari", "Atari Football II", GAME_SUPPORTS_SAVE, layout_atarifb )
 GAMEL( 1979, atarifb4, atarifb, atarifb4, atarifb4, driver_device, 0, ROT0, "Atari", "Atari Football (4 players)", GAME_SUPPORTS_SAVE, layout_atarifb4 )
 GAMEL( 1979, abaseb,   0,       abaseb,   abaseb, driver_device,   0, ROT0, "Atari", "Atari Baseball (set 1)", GAME_SUPPORTS_SAVE, layout_abaseb )
 GAMEL( 1979, abaseb2,  abaseb,  abaseb,   abaseb, driver_device,   0, ROT0, "Atari", "Atari Baseball (set 2)", GAME_SUPPORTS_SAVE, layout_abaseb )

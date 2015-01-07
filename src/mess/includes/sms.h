@@ -19,6 +19,7 @@
 #define CONTROL1_TAG   "ctrl1"
 #define CONTROL2_TAG   "ctrl2"
 
+#include "bus/gamegear/gear2gear.h"
 #include "bus/sms_ctrl/smsctrl.h"
 #include "bus/sms_exp/smsexp.h"
 #include "bus/sega8/sega8_slot.h"
@@ -36,6 +37,8 @@ public:
 		m_region_maincpu(*this, "maincpu"),
 		m_port_ctrl1(*this, CONTROL1_TAG),
 		m_port_ctrl2(*this, CONTROL2_TAG),
+		m_port_gear2gear(*this, "gear2gear"),
+		m_port_gg_dc(*this, "GG_PORT_DC"),
 		m_port_pause(*this, "PAUSE"),
 		m_port_reset(*this, "RESET"),
 		m_port_start(*this, "START"),
@@ -63,6 +66,8 @@ public:
 	required_memory_region m_region_maincpu;
 	optional_device<sms_control_port_device> m_port_ctrl1;
 	optional_device<sms_control_port_device> m_port_ctrl2;
+	optional_device<gg_gear2gear_port_device> m_port_gear2gear;
+	optional_ioport m_port_gg_dc;
 	optional_ioport m_port_pause;
 	optional_ioport m_port_reset;
 	optional_ioport m_port_start;
@@ -92,6 +97,13 @@ public:
 
 	// for gamegear LCD persistence hack
 	bitmap_rgb32 m_prev_bitmap;
+	bool m_prev_bitmap_copied;
+
+	// for gamegear SMS mode scaling
+	bitmap_rgb32 m_gg_sms_mode_bitmap;
+	// line_buffer will be used to hold 4 lines of line data as a kind of cache for
+	// vertical scaling in the gamegear sms compatibility mode.
+	int *m_line_buffer;
 
 	// for 3D glass binocular hack
 	bitmap_rgb32 m_prevleft_bitmap;
@@ -139,9 +151,9 @@ public:
 	DECLARE_READ8_MEMBER(sms_count_r);
 	DECLARE_READ8_MEMBER(sms_input_port_dc_r);
 	DECLARE_READ8_MEMBER(sms_input_port_dd_r);
+	DECLARE_READ8_MEMBER(gg_input_port_00_r);
 	DECLARE_WRITE8_MEMBER(sms_ym2413_register_port_w);
 	DECLARE_WRITE8_MEMBER(sms_ym2413_data_port_w);
-	DECLARE_READ8_MEMBER(gg_input_port_2_r);
 	DECLARE_READ8_MEMBER(sms_sscope_r);
 	DECLARE_WRITE8_MEMBER(sms_sscope_w);
 	DECLARE_READ8_MEMBER(sms_mapper_r);
@@ -168,8 +180,10 @@ public:
 	DECLARE_MACHINE_START(sms);
 	DECLARE_MACHINE_RESET(sms);
 	DECLARE_VIDEO_START(gamegear);
+	DECLARE_VIDEO_RESET(gamegear);
 	DECLARE_VIDEO_START(sms1);
 	DECLARE_VIDEO_RESET(sms1);
+	void screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -186,7 +200,7 @@ protected:
 	void setup_media_slots();
 	void setup_enabled_slots();
 	void lphaser_hcount_latch();
-	void sms_get_inputs(address_space &space);
+	void sms_get_inputs();
 };
 
 class smssdisp_state : public sms_state

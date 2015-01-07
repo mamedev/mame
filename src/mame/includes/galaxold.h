@@ -27,23 +27,33 @@ class galaxold_state : public driver_device
 public:
 	galaxold_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_videoram(*this,"videoram"),
-			m_spriteram(*this,"spriteram"),
-			m_spriteram2(*this,"spriteram2"),
-			m_attributesram(*this,"attributesram"),
-			m_bulletsram(*this,"bulletsram"),
-			m_rockclim_videoram(*this,"rockclim_vram"),
-			m_racknrol_tiles_bank(*this,"racknrol_tbank"),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
 			m_7474_9m_1(*this, "7474_9m_1"),
 			m_7474_9m_2(*this, "7474_9m_2"),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_screen(*this, "screen"),
-			m_palette(*this, "palette")
+			m_palette(*this, "palette"),
+			m_videoram(*this,"videoram"),
+			m_spriteram(*this,"spriteram"),
+			m_spriteram2(*this,"spriteram2"),
+			m_attributesram(*this,"attributesram"),
+			m_bulletsram(*this,"bulletsram"),
+			m_rockclim_videoram(*this,"rockclim_vram"),
+			m_racknrol_tiles_bank(*this,"racknrol_tbank")
 	{
 	}
 
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
+	optional_device<ttl7474_device> m_7474_9m_1;
+	optional_device<ttl7474_device> m_7474_9m_2;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
+	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT8> m_spriteram2;
@@ -56,7 +66,6 @@ public:
 	UINT8 m__4in1_bank;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_rockclim_tilemap;
-	int m_mooncrst_gfxextend;
 	int m_spriteram2_present;
 	UINT8 m_gfxbank[5];
 	UINT8 m_flipscreen_x;
@@ -64,6 +73,7 @@ public:
 	UINT8 m_color_mask;
 	tilemap_t *m_dambustr_tilemap2;
 	UINT8 *m_dambustr_videoram2;
+
 	void (galaxold_state::*m_modify_charcode)(UINT16 *code, UINT8 x);     /* function to call to do character banking */
 	void (galaxold_state::*m_modify_spritecode)(UINT8 *spriteram, int*, int*, int*, int); /* function to call to do sprite banking */
 	void (galaxold_state::*m_modify_color)(UINT8 *color);   /* function to call to do modify how the color codes map to the PROM */
@@ -132,46 +142,37 @@ public:
 	DECLARE_WRITE8_MEMBER(rockclim_videoram_w);
 	DECLARE_WRITE8_MEMBER(rockclim_scroll_w);
 	DECLARE_WRITE8_MEMBER(guttang_rombank_w);
-
-
-
 	DECLARE_READ8_MEMBER(rockclim_videoram_r);
 	DECLARE_WRITE8_MEMBER(dambustr_bg_split_line_w);
 	DECLARE_WRITE8_MEMBER(dambustr_bg_color_w);
+	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_2_q_callback);
+	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_1_callback);
+
 	DECLARE_CUSTOM_INPUT_MEMBER(_4in1_fake_port_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(vpool_lives_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(dkongjrm_coinage_r);
+
 	DECLARE_DRIVER_INIT(bullsdrtg);
 	DECLARE_DRIVER_INIT(ladybugg);
 	DECLARE_DRIVER_INIT(4in1);
 	DECLARE_DRIVER_INIT(guttangt);
 	DECLARE_DRIVER_INIT(ckonggx);
+
 	TILE_GET_INFO_MEMBER(drivfrcg_get_tile_info);
 	TILE_GET_INFO_MEMBER(racknrol_get_tile_info);
 	TILE_GET_INFO_MEMBER(dambustr_get_tile_info2);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(rockclim_get_tile_info);
 	TILE_GET_INFO_MEMBER(harem_get_tile_info);
+
 	DECLARE_MACHINE_RESET(galaxold);
-	DECLARE_VIDEO_START(galaxold);
-	DECLARE_PALETTE_INIT(galaxold);
-	DECLARE_VIDEO_START(drivfrcg);
-	DECLARE_PALETTE_INIT(rockclim);
-	DECLARE_VIDEO_START(racknrol);
-	DECLARE_VIDEO_START(batman2);
-	DECLARE_VIDEO_START(mooncrst);
-	DECLARE_VIDEO_START(scrambold);
-	DECLARE_PALETTE_INIT(scrambold);
-	DECLARE_VIDEO_START(pisces);
 	DECLARE_MACHINE_RESET(devilfsg);
-	DECLARE_VIDEO_START(dkongjrm);
-	DECLARE_VIDEO_START(rockclim);
-	DECLARE_VIDEO_START(galaxold_plain);
-	DECLARE_VIDEO_START(ozon1);
-	DECLARE_VIDEO_START(bongo);
 	DECLARE_MACHINE_RESET(hunchbkg);
-	DECLARE_VIDEO_START(ckongs);
+
+	DECLARE_PALETTE_INIT(galaxold);
+	DECLARE_PALETTE_INIT(rockclim);
+	DECLARE_PALETTE_INIT(scrambold);
 	DECLARE_PALETTE_INIT(stratgyx);
 	DECLARE_PALETTE_INIT(darkplnt);
 	DECLARE_PALETTE_INIT(minefld);
@@ -179,6 +180,20 @@ public:
 	DECLARE_PALETTE_INIT(mariner);
 	DECLARE_PALETTE_INIT(dambustr);
 	DECLARE_PALETTE_INIT(turtles);
+
+	DECLARE_VIDEO_START(galaxold);
+	DECLARE_VIDEO_START(drivfrcg);
+	DECLARE_VIDEO_START(racknrol);
+	DECLARE_VIDEO_START(batman2);
+	DECLARE_VIDEO_START(mooncrst);
+	DECLARE_VIDEO_START(scrambold);
+	DECLARE_VIDEO_START(pisces);
+	DECLARE_VIDEO_START(dkongjrm);
+	DECLARE_VIDEO_START(rockclim);
+	DECLARE_VIDEO_START(galaxold_plain);
+	DECLARE_VIDEO_START(ozon1);
+	DECLARE_VIDEO_START(bongo);
+	DECLARE_VIDEO_START(ckongs);
 	DECLARE_VIDEO_START(darkplnt);
 	DECLARE_VIDEO_START(rescue);
 	DECLARE_VIDEO_START(minefld);
@@ -189,16 +204,17 @@ public:
 	DECLARE_VIDEO_START(ad2083);
 	DECLARE_VIDEO_START(dambustr);
 	DECLARE_VIDEO_START(harem);
+	DECLARE_VIDEO_START(bagmanmc);
+
 	UINT32 screen_update_galaxold(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_dambustr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	INTERRUPT_GEN_MEMBER(hunchbks_vh_interrupt);
 	TIMER_CALLBACK_MEMBER(stars_blink_callback);
 	TIMER_CALLBACK_MEMBER(stars_scroll_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(galaxold_interrupt_timer);
-	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_2_q_callback);
-	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_1_callback);
-	DECLARE_VIDEO_START(bagmanmc);
 	IRQ_CALLBACK_MEMBER(hunchbkg_irq_callback);
+
 	void state_save_register();
 	void video_start_common();
 	void pisces_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);
@@ -247,13 +263,6 @@ public:
 	void bagmanmc_modify_charcode(UINT16 *code, UINT8 x);
 	void bagmanmc_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void machine_reset_common(int line);
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
-	optional_device<ttl7474_device> m_7474_9m_1;
-	optional_device<ttl7474_device> m_7474_9m_2;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 };
 
 #define galaxold_coin_counter_0_w galaxold_coin_counter_w

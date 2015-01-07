@@ -34,7 +34,7 @@ private:
 class ui_menu_file_create : public ui_menu
 {
 public:
-	ui_menu_file_create(running_machine &machine, render_container *container, device_image_interface *image, astring &current_directory, astring &current_file);
+	ui_menu_file_create(running_machine &machine, render_container *container, device_image_interface *image, astring &current_directory, astring &current_file, bool *ok);
 	virtual ~ui_menu_file_create();
 	virtual void populate();
 	virtual void handle();
@@ -46,6 +46,9 @@ private:
 	astring &                       m_current_file;
 	const image_device_format *     m_current_format;
 	char                            m_filename_buffer[1024];
+
+protected:
+	bool *                          m_ok;
 };
 
 

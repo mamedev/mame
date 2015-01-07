@@ -387,6 +387,7 @@ void galaxold_state::state_save_register()
 	save_item(NAME(m_stars_on));
 	save_item(NAME(m_stars_scrollpos));
 	save_item(NAME(m_stars_blink_state));
+	save_item(NAME(m_timer_adjusted));
 
 	save_item(NAME(m_darkplnt_bullet_color));
 
@@ -402,8 +403,6 @@ void galaxold_state::video_start_common()
 	m_modify_spritecode = 0;
 	m_modify_color = 0;
 	m_modify_ypos = 0;
-
-	m_mooncrst_gfxextend = 0;
 
 	m_draw_bullets = 0;
 

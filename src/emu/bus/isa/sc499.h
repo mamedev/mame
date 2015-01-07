@@ -28,13 +28,13 @@ class sc499_ctape_image_device : public device_t, public device_image_interface
 public:
 	// construction/destruction
 	sc499_ctape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// image-level overrides
 	virtual bool call_load();
 	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
 	virtual void call_unload();
 	virtual iodevice_t image_type() const { return IO_MAGTAPE; }
-	
+
 	virtual bool is_readable()  const { return 1; }
 	virtual bool is_writeable() const { return 1; }
 	virtual bool is_creatable() const { return 1; }

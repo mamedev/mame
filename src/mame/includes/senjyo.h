@@ -8,7 +8,11 @@ class senjyo_state : public driver_device
 public:
 	senjyo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_pio(*this, "z80pio"),
 		m_dac(*this, "dac"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
 		m_spriteram(*this, "spriteram"),
 		m_fgscroll(*this, "fgscroll"),
 		m_scrollx1(*this, "scrollx1"),
@@ -24,20 +28,16 @@ public:
 		m_bg3videoram(*this, "bg3videoram"),
 		m_radarram(*this, "radarram"),
 		m_bgstripesram(*this, "bgstripesram"),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
 		m_generic_paletteram_8(*this, "paletteram") { }
 
-	int m_int_delay_kludge;
-	UINT8 m_sound_cmd;
-	INT16 *m_single_data;
-	int m_single_rate;
-	int m_single_volume;
-	int m_sound_state;
-
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<z80pio_device> m_pio;
 	required_device<dac_device> m_dac;
-
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	
+	/* memory pointers */
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_fgscroll;
 	required_shared_ptr<UINT8> m_scrollx1;
@@ -53,48 +53,54 @@ public:
 	required_shared_ptr<UINT8> m_bg3videoram;
 	required_shared_ptr<UINT8> m_radarram;
 	required_shared_ptr<UINT8> m_bgstripesram;
+	required_shared_ptr<UINT8> m_generic_paletteram_8;
+
+	// game specific initialization
 	int m_is_senjyo;
 	int m_scrollhack;
+	
+	UINT8 m_sound_cmd;
+	int m_single_volume;
+	int m_sound_state;
+	int m_bgstripes;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg1_tilemap;
 	tilemap_t *m_bg2_tilemap;
 	tilemap_t *m_bg3_tilemap;
-
-	int m_bgstripes;
+	
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	DECLARE_WRITE8_MEMBER(senjyo_paletteram_w);
+	DECLARE_WRITE8_MEMBER(paletteram_w);
 	DECLARE_WRITE8_MEMBER(starforb_scrolly2);
 	DECLARE_WRITE8_MEMBER(starforb_scrollx2);
-	DECLARE_WRITE8_MEMBER(senjyo_fgvideoram_w);
-	DECLARE_WRITE8_MEMBER(senjyo_fgcolorram_w);
-	DECLARE_WRITE8_MEMBER(senjyo_bg1videoram_w);
-	DECLARE_WRITE8_MEMBER(senjyo_bg2videoram_w);
-	DECLARE_WRITE8_MEMBER(senjyo_bg3videoram_w);
-	DECLARE_WRITE8_MEMBER(senjyo_bgstripes_w);
-	DECLARE_WRITE8_MEMBER(senjyo_volume_w);
+	DECLARE_WRITE8_MEMBER(fgvideoram_w);
+	DECLARE_WRITE8_MEMBER(fgcolorram_w);
+	DECLARE_WRITE8_MEMBER(bg1videoram_w);
+	DECLARE_WRITE8_MEMBER(bg2videoram_w);
+	DECLARE_WRITE8_MEMBER(bg3videoram_w);
+	DECLARE_WRITE8_MEMBER(volume_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_line_clock);
 	DECLARE_WRITE8_MEMBER(sound_cmd_w);
+	DECLARE_WRITE8_MEMBER(irq_ctrl_w);
+	DECLARE_READ8_MEMBER(pio_pa_r);
+	
 	DECLARE_DRIVER_INIT(starfora);
 	DECLARE_DRIVER_INIT(senjyo);
 	DECLARE_DRIVER_INIT(starfore);
 	DECLARE_DRIVER_INIT(starforc);
+	
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(senjyo_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(starforc_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg3_tile_info);
+	
+	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	UINT32 screen_update_senjyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(senjyo_interrupt);
-	DECLARE_READ8_MEMBER(pio_pa_r);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bgbitmap(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void draw_radar(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int priority);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT8> m_generic_paletteram_8;
 };
 
 /*----------- defined in audio/senjyo.c -----------*/

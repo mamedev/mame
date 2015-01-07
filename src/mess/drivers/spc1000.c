@@ -482,7 +482,7 @@ ROM_END
 #if 0
 ROM_START( spc1000 )
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("spcall.rom", 0x0000, 0x8000, CRC(2FBB6ECA) SHA1(cc9a076b0f00d54b2aec31f1f558b10f43ef61c8))
+	ROM_LOAD("spcall.rom", 0x0000, 0x8000, CRC(2fbb6eca) SHA1(cc9a076b0f00d54b2aec31f1f558b10f43ef61c8))
 	/// more roms to come...
 ROM_END
 #endif

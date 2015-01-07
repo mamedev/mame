@@ -1995,11 +1995,11 @@ void device_debug::memory_write_hook(address_space &space, offs_t address, UINT6
 	if (m_track_mem)
 	{
 		dasm_memory_access newAccess(space.spacenum(), address, data, history_pc(0));
-		if (!m_track_mem_set.insert(newAccess))
-		{
-			m_track_mem_set.remove(newAccess);
+		dasm_memory_access* trackedAccess = m_track_mem_set.find(newAccess);
+		if (trackedAccess)
+			trackedAccess->m_pc = newAccess.m_pc;
+		else
 			m_track_mem_set.insert(newAccess);
-		}
 	}
 	watchpoint_check(space, WATCHPOINT_WRITE, address, data, mem_mask);
 }

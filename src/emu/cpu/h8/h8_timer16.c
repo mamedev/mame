@@ -162,7 +162,8 @@ void h8_timer16_channel_device::device_start()
 {
 	intc = owner()->siblingdevice<h8_intc_device>(intc_tag);
 	channel_active = false;
-	
+	clock_type = DIV_1;
+
 	save_item(NAME(tgr_clearing));
 	save_item(NAME(tcr));
 	save_item(NAME(tier));
@@ -346,7 +347,7 @@ void h8_timer16_device::device_start()
 		sprintf(tm, "%d", i);
 		timer_channel[i] = subdevice<h8_timer16_channel_device>(tm);
 	}
-	
+
 	save_item(NAME(tstr));
 }
 

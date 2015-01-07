@@ -3027,7 +3027,7 @@ ROM_END
 
 ROM_START( rdftam ) // Metrotainment license
 	ROM_REGION32_LE( 0x200000, "maincpu", 0 ) /* i386 program */
-	ROM_LOAD32_BYTE("seibu_1.u0211",        0x000000, 0x080000, CRC(156D8DB0) SHA1(93662B3EE494E37A56428A7AA3DAD7A957835950) ) // socket is silkscreened on pcb PRG0
+	ROM_LOAD32_BYTE("seibu_1.u0211",        0x000000, 0x080000, CRC(156d8db0) SHA1(93662b3ee494e37a56428a7aa3dad7a957835950) ) // socket is silkscreened on pcb PRG0
 	ROM_LOAD32_BYTE("raiden-f_prg2.u0212",  0x000001, 0x080000, CRC(58ccb10c) SHA1(0cce4057bfada78121d9586574b98d46cdd7dd46) ) // socket is silkscreened on pcb PRG1
 	ROM_LOAD32_WORD("raiden-f_prg34.u0219", 0x000002, 0x100000, CRC(63f01d17) SHA1(74dbd0417b974583da87fc6c7a081b03fd4e16b8) ) // socket is silkscreened on pcb PRG23
 

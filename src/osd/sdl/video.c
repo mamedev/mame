@@ -155,11 +155,18 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 	#if (SDLMAME_SDL2)
 	SDL_DisplayMode dmode;
 
+	#if defined(SDLMAME_WIN32)
 	SDL_GetDesktopDisplayMode(monitor->handle, &dmode);
+    #else
+    SDL_GetCurrentDisplayMode(monitor->handle, &dmode);
+    #endif
 	monitor->monitor_width = dmode.w;
 	monitor->monitor_height = dmode.h;
 	monitor->center_width = dmode.w;
 	monitor->center_height = dmode.h;
+
+	// FIXME: Use SDL_GetDisplayBounds(monitor->handle, &tt) to update monitor_x
+	// SDL_Rect tt;
 	#else
 	#if defined(SDLMAME_WIN32)  // Win32 version
 	MONITORINFOEX info;
@@ -326,7 +333,7 @@ void sdl_osd_interface::update(bool skip_redraw)
 	{
 //      profiler_mark(PROFILER_BLIT);
 		for (window = sdl_window_list; window != NULL; window = window->next)
-			sdlwindow_video_window_update(machine(), window);
+			window->video_window_update(machine());
 //      profiler_mark(PROFILER_END);
 	}
 
@@ -437,7 +444,7 @@ static void init_monitors(void)
 
 	#if (SDLMAME_SDL2)
 	{
-		int i;
+		int i, monx = 0;
 
 		osd_printf_verbose("Enter init_monitors\n");
 
@@ -456,10 +463,14 @@ static void init_monitors(void)
 			monitor->monitor_height = dmode.h;
 			monitor->center_width = dmode.w;
 			monitor->center_height = dmode.h;
+			// FIXME: this should use SDL_GetDisplayBounds!
+			monitor->monitor_x = monx;
 			monitor->handle = i;
 			// guess the aspect ratio assuming square pixels
 			monitor->aspect = (float)(dmode.w) / (float)(dmode.h);
 			osd_printf_verbose("Adding monitor %s (%d x %d)\n", monitor->monitor_device, dmode.w, dmode.h);
+
+			monx += dmode.w;
 
 			// save the primary monitor handle
 			if (i == 0)
@@ -560,7 +571,15 @@ static void check_osd_inputs(running_machine &machine)
 
 	// check for toggling fullscreen mode
 	if (ui_input_pressed(machine, IPT_OSD_1))
-		sdlwindow_toggle_full_screen(machine, window);
+	{
+		sdl_window_info *curwin = sdl_window_list;
+
+		while (curwin != (sdl_window_info *)NULL)
+		{
+			curwin->toggle_full_screen(machine);
+			curwin = curwin->next;
+		}
+	}
 
 	if (ui_input_pressed(machine, IPT_OSD_2))
 	{
@@ -586,10 +605,10 @@ static void check_osd_inputs(running_machine &machine)
 	#endif
 
 	if (ui_input_pressed(machine, IPT_OSD_6))
-		sdlwindow_modify_prescale(machine, window, -1);
+		window->modify_prescale(machine, -1);
 
 	if (ui_input_pressed(machine, IPT_OSD_7))
-		sdlwindow_modify_prescale(machine, window, 1);
+		window->modify_prescale(machine, 1);
 }
 
 //============================================================

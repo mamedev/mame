@@ -4,11 +4,11 @@
 
   Milton Bradley Comp IV
   * TMC0904NL CP0904A (die labeled 4A0970D-04A)
-  
+
   This is small tabletop Mastermind game; a code-breaking game where the player
   needs to find out the correct sequence of colours (numbers in our case).
   It is known as Logic 5 in Europe, and as Pythaligoras in Japan.
-  
+
   Press the R key to start, followed by a set of unique numbers and E.
   Refer to the official manual for more information.
 
@@ -74,7 +74,7 @@ void comp4_state::leds_update()
 		// turn on powered leds
 		if (m_leds_state >> i & 1)
 			m_leds_decay[i] = LEDS_DECAY_TIME;
-		
+
 		// send to output
 		output_set_lamp_value(i, (m_leds_decay[i] != 0) ? 1 : 0);
 	}
@@ -86,7 +86,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(comp4_state::leds_decay_tick)
 	for (int i = 0; i < 0x10; i++)
 		if (!(m_leds_state >> i & 1) && m_leds_decay[i])
 			m_leds_decay[i]--;
-	
+
 	leds_update();
 }
 
@@ -106,7 +106,7 @@ READ8_MEMBER(comp4_state::read_k)
 	for (int i = 0; i < 3; i++)
 		if (m_o >> (i+1) & 1)
 			k |= m_button_matrix[i]->read();
-	
+
 	return k;
 }
 
@@ -173,7 +173,7 @@ void comp4_state::machine_start()
 	memset(m_leds_decay, 0, sizeof(m_leds_decay));
 
 	m_o = 0;
-	
+
 	// register for savestates
 	save_item(NAME(m_leds_state));
 	save_item(NAME(m_leds_decay));
@@ -189,7 +189,7 @@ static MACHINE_CONFIG_START( comp4, comp4_state )
 	MCFG_TMS1XXX_READ_K_CB(READ8(comp4_state, read_k))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(comp4_state, write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(comp4_state, write_r))
-	
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("leds_decay", comp4_state, leds_decay_tick, attotime::from_msec(10))
 
 	MCFG_DEFAULT_LAYOUT(layout_comp4)

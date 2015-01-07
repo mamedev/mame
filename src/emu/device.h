@@ -132,6 +132,7 @@ public:
 	astring default_bios_tag() const { return m_default_bios_tag; }
 
 	// interface helpers
+	device_interface *first_interface() const { return m_interface_list; }
 	template<class _DeviceClass> bool interface(_DeviceClass *&intf) { intf = dynamic_cast<_DeviceClass *>(this); return (intf != NULL); }
 	template<class _DeviceClass> bool interface(_DeviceClass *&intf) const { intf = dynamic_cast<const _DeviceClass *>(this); return (intf != NULL); }
 
@@ -297,10 +298,12 @@ class device_interface
 
 protected:
 	// construction/destruction
-	device_interface(device_t &device);
+	device_interface(device_t &device, const char *type);
 	virtual ~device_interface();
 
 public:
+	const char *interface_type() const { return m_type; }
+
 	// casting helpers
 	device_t &device() { return m_device; }
 	const device_t &device() const { return m_device; }
@@ -333,6 +336,7 @@ protected:
 	// internal state
 	device_interface *      m_interface_next;
 	device_t &              m_device;
+	const char *            m_type;
 };
 
 

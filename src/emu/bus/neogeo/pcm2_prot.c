@@ -9,7 +9,7 @@ extern const device_type PCM2_PROT = &device_creator<pcm2_prot_device>;
 
 
 pcm2_prot_device::pcm2_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PCM2_PROT, "NeoGeo NEOPCM2 Protection Device", tag, owner, clock, "pcm2_prot", __FILE__)
+	: device_t(mconfig, PCM2_PROT, "NeoGeo Protection (NEOPCM2)", tag, owner, clock, "pcm2_prot", __FILE__)
 {
 }
 

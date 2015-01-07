@@ -1550,9 +1550,17 @@ UINT8 a2_edd_format::pick(const UINT8 *data, int pos)
 
 bool a2_edd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
-	UINT8 img[2244608];
+	UINT8 *img;
 	UINT8 nibble[16384], stream[16384];
 	int npos[16384];
+
+	img = (UINT8 *) malloc(2244608);
+
+	if (!img)
+	{
+		return false;
+	}
+
 	io_generic_read(io, img, 0, 2244608);
 
 	for(int i=0; i<137; i++) {
@@ -1620,6 +1628,7 @@ bool a2_edd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image
 		generate_track_from_bitstream(i >> 2, 0, stream, len, image, i & 3);
 		image->set_write_splice_position(i >> 2, 0, UINT32(U64(200000000)*splice/len), i & 3);
 	}
+	free(img);
 	return true;
 }
 

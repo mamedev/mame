@@ -9,8 +9,7 @@
         22/06/2011 Working [Robbbert]
 
     TODO:
-    Add 8251A for serial
-    Add optional 2x 8255A
+    Add optional 2x 8255A port read/write logging
 
 
 
@@ -19,6 +18,7 @@ This is an evaluation kit for the 8086 cpu.
 There is no speaker or storage facility in the standard kit.
 
 Download the User Manual to get the operating procedures.
+The user manual is available from: http://www.bitsavers.org/pdf/intel/8086/9800698A_SDK-86_Users_Man_Apr79.pdf
 
 ToDo:
 - Artwork

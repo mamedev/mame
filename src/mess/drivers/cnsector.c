@@ -4,7 +4,7 @@
 
   Parker Brothers Code Name: Sector
   * MP0905BNL ZA0379 (die labeled 0970F-05B)
-  
+
   This is a tabletop submarine pursuit game. A grid board and small toy
   boats are used to remember your locations (a Paint app should be ok too).
   Refer to the official manual for more information, it is not a simple game.
@@ -69,30 +69,30 @@ public:
 void cnsector_state::leds_update()
 {
 	UINT16 active_state[0x10];
-	
+
 	for (int i = 0; i < 0x10; i++)
 	{
 		active_state[i] = 0;
-		
+
 		for (int j = 0; j < 0x10; j++)
 		{
 			int di = j << 4 | i;
-			
+
 			// turn on powered leds
 			if (m_leds_state[i] >> j & 1)
 				m_leds_decay[di] = LEDS_DECAY_TIME;
-			
+
 			// determine active state
 			int ds = (m_leds_decay[di] != 0) ? 1 : 0;
 			active_state[i] |= (ds << j);
 		}
 	}
-	
+
 	// on difference, send to output
 	for (int i = 0; i < 0x10; i++)
 		if (m_leds_cache[i] != active_state[i])
 			output_set_digit_value(i, active_state[i]);
-	
+
 	memcpy(m_leds_cache, active_state, sizeof(m_leds_cache));
 }
 
@@ -102,7 +102,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cnsector_state::leds_decay_tick)
 	for (int i = 0; i < 0x100; i++)
 		if (!(m_leds_state[i & 0xf] >> (i>>4) & 1) && m_leds_decay[i])
 			m_leds_decay[i]--;
-	
+
 	leds_update();
 }
 
@@ -122,7 +122,7 @@ READ8_MEMBER(cnsector_state::read_k)
 	for (int i = 0; i < 5; i++)
 		if (m_o >> i & 1)
 			k |= m_button_matrix[i]->read();
-	
+
 	return k;
 }
 
@@ -201,7 +201,7 @@ void cnsector_state::machine_start()
 	memset(m_leds_decay, 0, sizeof(m_leds_decay));
 
 	m_o = 0;
-	
+
 	// register for savestates
 	save_item(NAME(m_leds_state));
 	save_item(NAME(m_leds_cache));
@@ -218,7 +218,7 @@ static MACHINE_CONFIG_START( cnsector, cnsector_state )
 	MCFG_TMS1XXX_READ_K_CB(READ8(cnsector_state, read_k))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(cnsector_state, write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(cnsector_state, write_r))
-	
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("leds_decay", cnsector_state, leds_decay_tick, attotime::from_msec(10))
 
 	MCFG_DEFAULT_LAYOUT(layout_cnsector)

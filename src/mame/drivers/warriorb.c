@@ -159,15 +159,9 @@ Colscroll effects?
                           SOUND
 ***********************************************************/
 
-void warriorb_state::reset_sound_region()
-{
-	membank("bank10")->set_entry(m_banknum);
-}
-
 WRITE8_MEMBER(warriorb_state::sound_bankswitch_w)
 {
-	m_banknum = data & 7;
-	reset_sound_region();
+	membank("z80bank")->set_entry(data & 7);
 }
 
 WRITE16_MEMBER(warriorb_state::warriorb_sound_w)
@@ -251,7 +245,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_sound_map, AS_PROGRAM, 8, warriorb_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank10")
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
@@ -425,17 +419,13 @@ WRITE_LINE_MEMBER(warriorb_state::irqhandler)
 
 void warriorb_state::machine_start()
 {
-	membank("bank10")->configure_entries(0, 8, memregion("audiocpu")->base() + 0xc000, 0x4000);
+	membank("z80bank")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 
-	save_item(NAME(m_banknum));
 	save_item(NAME(m_pandata));
-	machine().save().register_postload(save_prepost_delegate(FUNC(warriorb_state::reset_sound_region), this));
 }
 
 void warriorb_state::machine_reset()
 {
-	m_banknum = 0;
-
 	/**** mixer control enable ****/
 	machine().sound().system_enable(true);  /* mixer enabled */
 }
@@ -630,9 +620,8 @@ ROM_START( sagaia )
 
 	ROM_LOAD16_WORD_SWAP( "c07-09.75",   0x80000, 0x80000, CRC(cc69c2ce) SHA1(47883b9e14d8b6dd74db221bff396477231938f2) )   /* data rom */
 
-	ROM_REGION( 0x2c000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "c07_41.69", 0x00000, 0x04000, CRC(b50256ea) SHA1(6ed271e4dafd1c759adaa55d5b2343d7374c721a) )
-	ROM_CONTINUE(          0x10000, 0x1c000 ) /* banked stuff */
+	ROM_REGION( 0x20000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "c07_41.69", 0x00000, 0x20000, CRC(b50256ea) SHA1(6ed271e4dafd1c759adaa55d5b2343d7374c721a) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "c07-03.12", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) ) /* SCr(screen 1) */
@@ -676,9 +665,8 @@ ROM_START( darius2d )
 
 	ROM_LOAD16_WORD_SWAP( "c07-09.75",   0x80000, 0x80000, CRC(cc69c2ce) SHA1(47883b9e14d8b6dd74db221bff396477231938f2) )   /* data rom */
 
-	ROM_REGION( 0x2c000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "c07_17.69", 0x00000, 0x04000, CRC(ae16c905) SHA1(70ba5aacd8a8e00b94719e3955abad8827c67aa8) )
-	ROM_CONTINUE(          0x10000, 0x1c000 ) /* banked stuff */
+	ROM_REGION( 0x20000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "c07_17.69", 0x00000, 0x20000, CRC(ae16c905) SHA1(70ba5aacd8a8e00b94719e3955abad8827c67aa8) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "c07-03.12", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) ) /* SCr(screen 1) */
@@ -722,9 +710,8 @@ ROM_START( darius2do )
 
 	ROM_LOAD16_WORD_SWAP( "c07-09.75",   0x80000, 0x80000, CRC(cc69c2ce) SHA1(47883b9e14d8b6dd74db221bff396477231938f2) )   /* data rom */
 
-	ROM_REGION( 0x2c000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "c07_17.69", 0x00000, 0x04000, CRC(ae16c905) SHA1(70ba5aacd8a8e00b94719e3955abad8827c67aa8) )
-	ROM_CONTINUE(          0x10000, 0x1c000 ) /* banked stuff */
+	ROM_REGION( 0x20000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "c07_17.69", 0x00000, 0x20000, CRC(ae16c905) SHA1(70ba5aacd8a8e00b94719e3955abad8827c67aa8) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "c07-03.12", 0x00000, 0x80000, CRC(189bafce) SHA1(d885e444523489fe24269b90dec58e0d92cfbd6e) ) /* SCr(screen 1) */
@@ -765,9 +752,8 @@ ROM_START( warriorb )
 	ROM_LOAD16_WORD_SWAP( "d24-09.75",   0x100000, 0x100000, CRC(ece5cc59) SHA1(337db41d5a74fa4202b1be1a672a068ec3b205a8) ) /* data rom */
 	/* Note: Raine wrongly doubles up d24-09 as delta-t samples */
 
-	ROM_REGION( 0x2c000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "d24_17.69",  0x00000, 0x04000, CRC(e41e4aae) SHA1(9bf40b6e8aa5c6ec62c5d21edbb2214f6550c94f) )
-	ROM_CONTINUE(           0x10000, 0x1c000 ) /* banked stuff */
+	ROM_REGION( 0x20000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "d24_17.69",  0x00000, 0x20000, CRC(e41e4aae) SHA1(9bf40b6e8aa5c6ec62c5d21edbb2214f6550c94f) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "d24-02.12", 0x000000, 0x100000, CRC(9f50c271) SHA1(1a1b2ae7cb7785e7f66aa26258a6cd2921a29545) )   /* SCR A, screen 1 */

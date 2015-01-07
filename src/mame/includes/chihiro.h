@@ -147,10 +147,10 @@ offset in ramht+4 contains in the lower 16 bits the offset in RAMIN divided by 1
 objects have methods used to do drawing
 most methods set parameters, others actually draw
 */
-class nv2a_renderer : public poly_manager<float, nvidia_object_data, 12, 8192>
+class nv2a_renderer : public poly_manager<float, nvidia_object_data, 13, 8192>
 {
 public:
-	nv2a_renderer(running_machine &machine) : poly_manager<float, nvidia_object_data, 12, 8192>(machine)
+	nv2a_renderer(running_machine &machine) : poly_manager<float, nvidia_object_data, 13, 8192>(machine)
 	{
 		memset(channel, 0, sizeof(channel));
 		memset(pfifo, 0, sizeof(pfifo));
@@ -158,7 +158,6 @@ public:
 		memset(pmc, 0, sizeof(pmc));
 		memset(ramin, 0, sizeof(ramin));
 		computedilated();
-		fb.allocate(640, 480);
 		objectdata = &(object_data_alloc());
 		objectdata->data = this;
 		combiner.used = 0;
@@ -169,6 +168,16 @@ public:
 		alpha_test_enabled = false;
 		alpha_reference = 0;
 		alpha_func = nv2a_renderer::ALWAYS;
+		depth_test_enabled = false;
+		depth_function = nv2a_renderer::LESS;
+		depth_write_enabled = false;
+		stencil_test_enabled = false;
+		stencil_func = nv2a_renderer::ALWAYS;
+		stencil_ref = 0;
+		stencil_mask = -1;
+		stencil_op_fail = nv2a_renderer::KEEP;
+		stencil_op_zfail = nv2a_renderer::KEEP;
+		stencil_op_zpass = nv2a_renderer::KEEP;
 		blending_enabled = false;
 		blend_equation = nv2a_renderer::FUNC_ADD;
 		blend_color = 0;
@@ -176,8 +185,18 @@ public:
 		blend_function_source = nv2a_renderer::ONE;
 		logical_operation_enabled = false;
 		logical_operation = nv2a_renderer::COPY;
+		limits_rendertarget.set(0, 0, 640, 480);
+		pitch_rendertarget = 0;
+		pitch_depthbuffer = 0;
+		rendertarget = NULL;
+		depthbuffer = NULL;
+		displayedtarget = NULL;
+		puller_channel = 0;
+		puller_subchannel = 0;
+		puller_waiting = 0;
 		debug_grab_texttype = -1;
 		debug_grab_textfile = NULL;
+		waitvblank_used = 0;
 		memset(vertex_attribute_words, 0, sizeof(vertex_attribute_words));
 		memset(vertex_attribute_offset, 0, sizeof(vertex_attribute_offset));
 	}
@@ -193,9 +212,9 @@ public:
 	int geforce_commandkind(UINT32 word);
 	UINT32 geforce_object_offset(UINT32 handle);
 	void geforce_read_dma_object(UINT32 handle, UINT32 &offset, UINT32 &size);
-	void geforce_exec_method(address_space &space, UINT32 channel, UINT32 subchannel, UINT32 method, UINT32 address, int &countlen);
+	int geforce_exec_method(address_space &space, UINT32 channel, UINT32 subchannel, UINT32 method, UINT32 address, int &countlen);
 	UINT32 texture_get_texel(int number, int x, int y);
-	void write_pixel(int x, int y, UINT32 color);
+	void write_pixel(int x, int y, UINT32 color, UINT32 depth);
 	void combiner_initialize_registers(UINT32 argb8[6]);
 	void combiner_initialize_stage(int stage_number);
 	void combiner_initialize_final();
@@ -223,15 +242,17 @@ public:
 	void computedilated(void);
 	void putpixtex(int xp, int yp, int up, int vp);
 	int toggle_register_combiners_usage();
+	int toggle_wait_vblank_support();
 	void debug_grab_texture(int type, const char *filename);
 	void debug_grab_vertex_program_slot(int slot, UINT32 *instruction);
+	void start();
 	void savestate_items();
-
 	void read_vertex(address_space & space, offs_t address, vertex_nv &vertex, int attrib);
 	int read_vertices_0x1810(address_space & space, vertex_nv *destination, int offset, int limit);
 	int read_vertices_0x1800(address_space & space, vertex_nv *destination, UINT32 address, int limit);
 	int read_vertices_0x1818(address_space & space, vertex_nv *destination, UINT32 address, int limit);
 	void convert_vertices_poly(vertex_nv *source, vertex_t *destination, int count);
+	TIMER_CALLBACK_MEMBER(puller_timer_work);
 
 	struct {
 		UINT32 regs[0x80 / 4];
@@ -247,6 +268,12 @@ public:
 	UINT32 ramin[0x100000 / 4];
 	UINT32 dma_offset[2];
 	UINT32 dma_size[2];
+	rectangle limits_rendertarget;
+	UINT32 pitch_rendertarget;
+	UINT32 pitch_depthbuffer;
+	UINT32 *rendertarget;
+	UINT32 *depthbuffer;
+	UINT32 *displayedtarget;
 	UINT32 vertexbuffer_address[16];
 	int vertexbuffer_stride[16];
 	int vertexbuffer_kind[16];
@@ -371,6 +398,16 @@ public:
 	bool alpha_test_enabled;
 	int alpha_func;
 	int alpha_reference;
+	bool depth_test_enabled;
+	int depth_function;
+	bool depth_write_enabled;
+	bool stencil_test_enabled;
+	int stencil_func;
+	int stencil_ref;
+	int stencil_mask;
+	int stencil_op_fail;
+	int stencil_op_zfail;
+	int stencil_op_zpass;
 	bool blending_enabled;
 	int blend_equation;
 	int blend_function_source;
@@ -398,14 +435,34 @@ public:
 	int enabled_vertex_attributes;
 	int vertex_attribute_words[16];
 	int vertex_attribute_offset[16];
-	bitmap_rgb32 fb;
+	emu_timer *puller_timer;
+	int puller_channel;
+	int puller_subchannel;
+	int puller_waiting;
+	address_space *puller_space;
 	UINT32 dilated0[16][2048];
 	UINT32 dilated1[16][2048];
 	int dilatechose[256];
 	nvidia_object_data *objectdata;
 	int debug_grab_texttype;
 	char *debug_grab_textfile;
+	int waitvblank_used;
 
+	enum VERTEX_PARAMETER {
+		PARAM_COLOR_B = 0,
+		PARAM_COLOR_G = 1,
+		PARAM_COLOR_R = 2,
+		PARAM_COLOR_A = 3,
+		PARAM_TEXTURE0_U = 4,
+		PARAM_TEXTURE0_V = 5,
+		PARAM_TEXTURE1_U = 6,
+		PARAM_TEXTURE1_V = 7,
+		PARAM_TEXTURE2_U = 8,
+		PARAM_TEXTURE2_V = 9,
+		PARAM_TEXTURE3_U = 10,
+		PARAM_TEXTURE3_V = 11,
+		PARAM_Z = 12
+	};
 	enum NV2A_BEGIN_END {
 		STOP = 0,
 		POINTS = 1,
@@ -434,7 +491,7 @@ public:
 		TEX3 = 12
 	};
 	enum NV2A_VTXBUF_TYPE {
-		NV2A_VTXBUF_TYPE_UNKNOWN_0 = 0, // used for vertex color ?
+		NV2A_VTXBUF_TYPE_UBYTE2 = 0, // what is the difference with UBYTE ?
 		NV2A_VTXBUF_TYPE_FLOAT = 2,
 		NV2A_VTXBUF_TYPE_UBYTE = 4,
 		NV2A_VTXBUF_TYPE_USHORT = 5,

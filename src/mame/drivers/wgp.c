@@ -401,16 +401,6 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "sound/2610intf.h"
 #include "includes/wgp.h"
 
-READ16_MEMBER(wgp_state::sharedram_r)
-{
-	return m_sharedram[offset];
-}
-
-WRITE16_MEMBER(wgp_state::sharedram_w)
-{
-	COMBINE_DATA(&m_sharedram[offset]);
-}
-
 void wgp_state::parse_control()
 {
 	/* bit 0 enables cpu B */
@@ -596,15 +586,9 @@ WRITE16_MEMBER(wgp_state::wgp_adinput_w)
                           SOUND
 **********************************************************/
 
-void wgp_state::reset_sound_region(  )  /* assumes Z80 sandwiched between the 68Ks */
-{
-	membank("bank10")->set_entry(m_banknum);
-}
-
 WRITE8_MEMBER(wgp_state::sound_bankswitch_w)
 {
-	m_banknum = data & 7;
-	reset_sound_region();
+	membank("z80bank")->set_entry(data & 3);
 }
 
 WRITE16_MEMBER(wgp_state::wgp_sound_w)
@@ -650,7 +634,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 16  /* LAN areas not mapped... */, wgp_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
-	AM_RANGE(0x140000, 0x143fff) AM_READWRITE(sharedram_r,sharedram_w)
+	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x200000, 0x200003) AM_READWRITE(wgp_sound_r,wgp_sound_w)
 //  AM_RANGE(0x380000, 0x383fff) AM_READONLY       // LAN RAM
 //  AM_RANGE(0x380000, 0x383fff) AM_WRITEONLY    // LAN RAM
@@ -663,8 +647,8 @@ ADDRESS_MAP_END
 /***************************************************************************/
 
 static ADDRESS_MAP_START( z80_sound_map, AS_PROGRAM, 8, wgp_state )
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank10")   /* Fallthrough */
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
@@ -901,14 +885,12 @@ graphics glitches.
 void wgp_state::wgp_postload()
 {
 	parse_control();
-	reset_sound_region();
 }
 
 void wgp_state::machine_reset()
 {
 	int i;
 
-	m_banknum = 0;
 	m_cpua_ctrl = 0xff;
 	m_port_sel = 0;
 	m_piv_ctrl_reg = 0;
@@ -925,10 +907,9 @@ void wgp_state::machine_reset()
 
 void wgp_state::machine_start()
 {
-	membank("bank10")->configure_entries(0, 4, memregion("audiocpu")->base() + 0xc000, 0x4000);
+	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
 	save_item(NAME(m_cpua_ctrl));
-	save_item(NAME(m_banknum));
 	save_item(NAME(m_port_sel));
 	machine().save().register_postload(save_prepost_delegate(FUNC(wgp_state::wgp_postload), this));
 }
@@ -1019,9 +1000,8 @@ ROM_START( wgp )
 	ROM_LOAD16_BYTE( "c32-28.64", 0x00000, 0x20000, CRC(38f3c7bf) SHA1(bfcaa036e5ff23f2bbf74d738498eda7d6ccd554) )
 	ROM_LOAD16_BYTE( "c32-27.63", 0x00001, 0x20000, CRC(be2397fb) SHA1(605a02d56ae6007b36299a2eceb7ca180cbf6df9) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* Z80 sound cpu */
-	ROM_LOAD( "c32-24.34",   0x00000, 0x04000, CRC(e9adb447) SHA1(8b7044b6ea864e4cfd60b87abd28c38caecb147d) )
-	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 sound cpu */
+	ROM_LOAD( "c32-24.34",   0x00000, 0x10000, CRC(e9adb447) SHA1(8b7044b6ea864e4cfd60b87abd28c38caecb147d) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "c32-09.16", 0x00000, 0x80000, CRC(96495f35) SHA1(ce99b4d8aeb98304e8ae3aa4966289c76ae4ff69) ) /* SCR */
@@ -1072,9 +1052,8 @@ ROM_START( wgpj )
 	ROM_LOAD16_BYTE( "c32-28.64", 0x00000, 0x20000, CRC(38f3c7bf) SHA1(bfcaa036e5ff23f2bbf74d738498eda7d6ccd554) )
 	ROM_LOAD16_BYTE( "c32-27.63", 0x00001, 0x20000, CRC(be2397fb) SHA1(605a02d56ae6007b36299a2eceb7ca180cbf6df9) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* Z80 sound cpu */
-	ROM_LOAD( "c32-24.34",   0x00000, 0x04000, CRC(e9adb447) SHA1(8b7044b6ea864e4cfd60b87abd28c38caecb147d) )
-	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 sound cpu */
+	ROM_LOAD( "c32-24.34",   0x00000, 0x10000, CRC(e9adb447) SHA1(8b7044b6ea864e4cfd60b87abd28c38caecb147d) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "c32-09.16", 0x00000, 0x80000, CRC(96495f35) SHA1(ce99b4d8aeb98304e8ae3aa4966289c76ae4ff69) ) /* SCR */
@@ -1108,9 +1087,8 @@ ROM_START( wgpjoy )
 	ROM_LOAD16_BYTE( "c32-60.64", 0x00000, 0x20000, CRC(7a980312) SHA1(c85beff4c8201061b99d87f8db67e2b85dff00e3) )
 	ROM_LOAD16_BYTE( "c32-59.63", 0x00001, 0x20000, CRC(ed75b333) SHA1(fa47ea38f7ba1cb3463065357db9a9b0f0eeab77) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* Z80 sound cpu */
-	ROM_LOAD( "c32-61.34",   0x00000, 0x04000, CRC(2fcad5a3) SHA1(f0f658490655b521af631af763c07e37834dc5a0) )
-	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 sound cpu */
+	ROM_LOAD( "c32-61.34",   0x00000, 0x10000, CRC(2fcad5a3) SHA1(f0f658490655b521af631af763c07e37834dc5a0) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "c32-09.16", 0x00000, 0x80000, CRC(96495f35) SHA1(ce99b4d8aeb98304e8ae3aa4966289c76ae4ff69) ) /* SCR */
@@ -1144,9 +1122,8 @@ ROM_START( wgpjoya )    /* Older joystick version ??? */
 	ROM_LOAD16_BYTE( "c32-46.64", 0x00000, 0x20000, CRC(64191891) SHA1(91d1d51478f1c2785470de0ac2a048e367f7ea48) )  // older rev?
 	ROM_LOAD16_BYTE( "c32-45.63", 0x00001, 0x20000, CRC(759b39d5) SHA1(ed4ccd295c5595bdcac965b59293efb3c21ce48a) )  // older rev?
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* Z80 sound cpu */
-	ROM_LOAD( "c32-61.34",   0x00000, 0x04000, CRC(2fcad5a3) SHA1(f0f658490655b521af631af763c07e37834dc5a0) )
-	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 sound cpu */
+	ROM_LOAD( "c32-61.34",   0x00000, 0x10000, CRC(2fcad5a3) SHA1(f0f658490655b521af631af763c07e37834dc5a0) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "c32-09.16", 0x00000, 0x80000, CRC(96495f35) SHA1(ce99b4d8aeb98304e8ae3aa4966289c76ae4ff69) ) /* SCR */
@@ -1180,9 +1157,8 @@ ROM_START( wgp2 )
 	ROM_LOAD16_BYTE( "c73-04.64", 0x00000, 0x20000, CRC(383aa776) SHA1(bad18f0506e99a07d53e50abe7a548ff3d745e09) )
 	ROM_LOAD16_BYTE( "c73-03.63", 0x00001, 0x20000, CRC(eb5067ef) SHA1(08d9d921c7a74877d7bb7641ae30c82d4d0653e3) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* Z80 sound cpu */
-	ROM_LOAD( "c73-05.34",   0x00000, 0x04000, CRC(7e00a299) SHA1(93696a229f17a15a92a8d9ef3b34d340de5dec44) )
-	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 sound cpu */
+	ROM_LOAD( "c73-05.34",   0x00000, 0x10000, CRC(7e00a299) SHA1(93696a229f17a15a92a8d9ef3b34d340de5dec44) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "c32-09.16", 0x00000, 0x80000, CRC(96495f35) SHA1(ce99b4d8aeb98304e8ae3aa4966289c76ae4ff69) ) /* SCR */

@@ -912,8 +912,8 @@ void segas16b_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 in
 			break;
 
 		case 5: // 64k of tileram + 4k of textram
-			mapper.map_as_ram(0x00000, 0x10000, 0xfe0000, "tileram", write16_delegate(FUNC(segas16b_state::sega_tileram_0_w), this));
-			mapper.map_as_ram(0x10000, 0x01000, 0xfef000, "textram", write16_delegate(FUNC(segas16b_state::sega_textram_0_w), this));
+			mapper.map_as_ram(0x00000, 0x10000, 0xfe0000, "tileram", write16_delegate(FUNC(segas16b_state::tileram_w), this));
+			mapper.map_as_ram(0x10000, 0x01000, 0xfef000, "textram", write16_delegate(FUNC(segas16b_state::textram_w), this));
 			break;
 
 		case 4: // 2k of spriteram
@@ -1003,7 +1003,7 @@ void segas16b_state::mapper_sound_w(UINT8 data)
 WRITE16_MEMBER( segas16b_state::rom_5704_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
-		m_segaic16vid->segaic16_tilemap_set_bank(0, offset & 1, data & 7);
+		m_segaic16vid->tilemap_set_bank(0, offset & 1, data & 7);
 }
 
 
@@ -1051,7 +1051,7 @@ WRITE16_MEMBER( segas16b_state::rom_5797_bank_math_w )
 
 		case 0x2000/2:
 			if (ACCESSING_BITS_0_7)
-				m_segaic16vid->segaic16_tilemap_set_bank(0, offset & 1, data & 7);
+				m_segaic16vid->tilemap_set_bank(0, offset & 1, data & 7);
 			break;
 	}
 }
@@ -1124,10 +1124,10 @@ WRITE16_MEMBER( segas16b_state::standard_io_w )
 			//  D1 : (Output to coin counter 2?)
 			//  D0 : Output to coin counter 1
 			//
-			m_segaic16vid->segaic16_tilemap_set_flip(0, data & 0x40);
+			m_segaic16vid->tilemap_set_flip(0, data & 0x40);
 			m_sprites->set_flip(data & 0x40);
 			if (!m_disable_screen_blanking)
-				m_segaic16vid->segaic16_set_display_enable(data & 0x20);
+				m_segaic16vid->set_display_enable(data & 0x20);
 			set_led_status(machine(), 1, data & 0x08);
 			set_led_status(machine(), 0, data & 0x04);
 			coin_counter_w(machine(), 1, data & 0x02);
@@ -1288,7 +1288,7 @@ void segas16b_state::machine_reset()
 	synchronize(TID_INIT_I8751);
 
 	// reset tilemap state
-	m_segaic16vid->segaic16_tilemap_reset(*m_screen);
+	m_segaic16vid->tilemap_reset(*m_screen);
 
 	// configure sprite banks
 	static const UINT8 default_banklist[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
@@ -3102,6 +3102,33 @@ static INPUT_PORTS_START( fz2 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( fantzoneta )
+	PORT_INCLUDE( system16b_generic )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x0c, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x00, "240 (Cheat)")
+	PORT_DIPNAME( 0x30, 0x30, "Extra Ship Cost" ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x30, "5000" )
+	PORT_DIPSETTING(    0x20, "10000" )
+	PORT_DIPSETTING(    0x10, "15000" )
+	PORT_DIPSETTING(    0x00, "20000" )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+INPUT_PORTS_END
+
 // we use common sys16b tags to simplify port reads
 static INPUT_PORTS_START( atomicp )
 	PORT_START("SERVICE")   // P1
@@ -3176,6 +3203,8 @@ static INPUT_PORTS_START( atomicp )
 
 	PORT_START("DSW1")  // DUMMY
 INPUT_PORTS_END
+
+
 
 
 // we use common sys16b tags to simplify port reads
@@ -6603,6 +6632,25 @@ ROM_START( fantzn2xp ) // based on trial version
 	ROM_LOAD( "cpu2b.bin", 0x10000, 0x20000, CRC(2c8ad475) SHA1(9ef1ed5aab81a82844ccb0949cb393a8d1abac92) )
 ROM_END
 
+ROM_START( fantzoneta ) // based on PS2 version, from bootleg conversion board
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "fzta__a07.bin", 0x00000, 0x20000, CRC(ad07d1fd) SHA1(63fbaa135a3860bd956d5147a5f64d951d2ebdba) )
+	ROM_LOAD16_BYTE( "fzta__a05.bin", 0x00001, 0x20000, CRC(47dbe11b) SHA1(edc6960506745235bb8668eaf71139cef4a2cd16) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "fzta__a14.bin", 0x00000, 0x10000, CRC(9468ab33) SHA1(714660b9eafb78ef5d3aed218367b4e5708376f6) )
+	ROM_LOAD( "fzta__a15.bin", 0x10000, 0x10000, CRC(22a3cf75) SHA1(6f21bc2a565738b997f898ed6ee631e9452662ca) )
+	ROM_LOAD( "fzta__a16.bin", 0x20000, 0x10000, CRC(25cba87f) SHA1(abece2c27cd9d299319fa3ea87e016606426abc2) )
+
+	ROM_REGION16_BE( 0x180000, "sprites", ROMREGION_ERASEFF ) // sprites
+	ROM_LOAD16_BYTE( "fzta__b01.bin",  0x000001, 0x20000, CRC(0beb4a22) SHA1(e35f6d92b88f0730ccf03a090900ca2ed9824e74) )
+	ROM_LOAD16_BYTE( "fzta__b05.bin",  0x000000, 0x20000, CRC(7f676c69) SHA1(231e7829b4ddb039f9075aebd1f2a123c79d396d) )
+	ROM_LOAD16_BYTE( "fzta__a01.bin",  0x100001, 0x20000, CRC(40e1db9a) SHA1(305cd5e2d8512774638dfa724df6696ffa81ebb2) )
+	ROM_LOAD16_BYTE( "fzta__b10.bin",  0x100000, 0x20000, CRC(acbb5cff) SHA1(bd356f664ec1c0e955161aa3afd06f2aeda80357) )
+
+	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "fzta__a10.bin", 0x00000, 0x08000, CRC(dab6fcd0) SHA1(151b62c5353533ae8660cbeebd8fe3219adbf4b5) )
+ROM_END
 
 
 //**************************************************************************
@@ -6624,10 +6672,6 @@ void segas16b_state::init_generic(segas16b_rom_board rom_board)
 	// create default read/write handlers
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::standard_io_r), this);
 	m_custom_io_w = write16_delegate(FUNC(segas16b_state::standard_io_w), this);
-
-	// point globals to allocated memory regions
-	m_segaic16vid->segaic16_tileram_0 = reinterpret_cast<UINT16 *>(memshare("tileram")->ptr());
-	m_segaic16vid->segaic16_textram_0 = reinterpret_cast<UINT16 *>(memshare("textram")->ptr());
 
 	// save state
 	save_item(NAME(m_atomicp_sound_count));
@@ -6654,7 +6698,7 @@ DRIVER_INIT_MEMBER(segas16b_state,generic_korean)
 	// configure special behaviors for the Korean boards
 	m_disable_screen_blanking = true;
 	m_atomicp_sound_divisor = 1;
-	m_segaic16vid->segaic16_display_enable = 1;
+	m_segaic16vid->m_display_enable = 1;
 
 	// allocate a sound timer
 	emu_timer *timer = timer_alloc(TID_ATOMICP_SOUND_IRQ);
@@ -6932,6 +6976,9 @@ GAME( 1989, wrestwar1,  wrestwar, system16b_fd1094,    wrestwar, segas16b_state,
 // Extra RAM, dubbed by M2 as 'System 16C'
 GAME( 2008, fantzn2x,   0,        system16c,           fz2,      segas16b_state,generic_5704,       ROT0,   "Sega / M2", "Fantasy Zone II - The Tears of Opa-Opa (System 16C version)", 0 ) // The 1987 copyright date shown ingame is false
 GAME( 2008, fantzn2xp,  fantzn2x, system16c,           fz2,      segas16b_state,generic_5704,       ROT0,   "Sega / M2", "Fantasy Zone II - The Tears of Opa-Opa (System 16C version, prototype)", 0 ) // "
+
+GAME( 2008, fantzoneta, fantzone, system16b,           fantzoneta,segas16b_state,generic_5704,       ROT0,  "bootleg", "Fantasy Zone (Time Attack, bootleg)", 0 ) // based on the PS2 version, unlicensed PCB conversion
+
 
 // Custom Korean Board - these probably belong with the bootlegs...
 GAME( 1990, atomicp,    0,        atomicp,             atomicp,  segas16b_state,generic_korean,     ROT0,   "Philko", "Atomic Point (Korea)", 0) // korean clone board..
@@ -7221,8 +7268,8 @@ static ADDRESS_MAP_START( isgsm_map, AS_PROGRAM, 16, isgsm_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROMBANK(ISGSM_MAIN_BANK) AM_REGION("bios", 0) // this area is ALWAYS read-only, even when the game is banked in
 	AM_RANGE(0x200000, 0x23ffff) AM_RAM // used during startup for decompression
 	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE(rom_5704_bank_w)
-	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, segaic16_tileram_0_r, segaic16_tileram_0_w) AM_SHARE("textram")
-	AM_RANGE(0x410000, 0x410fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, segaic16_textram_0_r, segaic16_textram_0_w) AM_SHARE("tileram")
+	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, tileram_r, tileram_w) AM_SHARE("tileram")
+	AM_RANGE(0x410000, 0x410fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, textram_r, textram_w) AM_SHARE("textram")
 	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc40000, 0xc43fff) AM_READWRITE(standard_io_r, standard_io_w)
@@ -7358,7 +7405,7 @@ INPUT_PORTS_END
 
 void isgsm_state::machine_reset()
 {
-	m_segaic16vid->segaic16_tilemap_reset(*m_screen);
+	m_segaic16vid->tilemap_reset(*m_screen);
 
 	// configure sprite banks
 	for (int i = 0; i < 16; i++)

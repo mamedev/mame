@@ -7,17 +7,17 @@
     PC98 DCP & DCU disk images
 
     0xA2 header, followed by track data
-	header[0] - disk format
+    header[0] - disk format
     header[1-0xA1] - track map (1=track used, 0=track unused/unformatted)
-    header[0xA2] - all tracks used? 
+    header[0xA2] - all tracks used?
                    (there seems to be a diff in its usage between DCP and DCU)
 
-    TODO: 
+    TODO:
      - add support for track map. images available for tests were all
        of type 0x01, with all 154 tracks present. combined with pete_j
        reporting some images have faulty track map, we need some more
        test cases to properly handle these disks!
- 
+
 *********************************************************************/
 
 #include "emu.h"
@@ -52,7 +52,7 @@ int dcp_format::identify(io_generic *io, UINT32 form_factor)
 	io_generic_read(io, h, 0, 0xa2);
 
 	// First byte is the disk format (see below in load() for details)
-	switch (h[0]) 
+	switch (h[0])
 	{
 		case 0x01:
 		default:
@@ -99,7 +99,7 @@ int dcp_format::identify(io_generic *io, UINT32 form_factor)
 		if (h[i])
 			count_tracks++;
 
-	// in theory track map should be enough (former check), but some images have it wrong! 
+	// in theory track map should be enough (former check), but some images have it wrong!
 	// hence, if this check fails, we also allow for images with all tracks and wrong track map
 	if (size - 0xa2 == (heads * count_tracks * spt * bps) || size - 0xa2 == (heads * tracks * spt * bps))
 		return 100;
@@ -107,7 +107,7 @@ int dcp_format::identify(io_generic *io, UINT32 form_factor)
 	// for disk type 0x11 the head 0 track 0 has 26 sectors of half width, so we need to compensate calculation
 	if (is_hdb && (size - 0xa2 + (0x80 * 26) == (heads * count_tracks * spt * bps) || size - 0xa2 + (0x80 * 26) == (heads * tracks * spt * bps)))
 		return 100;
-	
+
 	return 0;
 }
 
@@ -116,11 +116,11 @@ bool dcp_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	UINT8 h[0xa2];
 	int heads, tracks, spt, bps;
 	bool is_hdb = false;
-	
+
 	io_generic_read(io, h, 0, 0xa2);
-	
+
 	// First byte is the disk format:
-	switch (h[0]) 
+	switch (h[0])
 	{
 		case 0x01:
 		default:
@@ -212,11 +212,11 @@ bool dcp_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	if (!is_hdb)
 	{
 		for (int track = 0; track < tracks; track++)
-			for (int head = 0; head < heads; head++) 
+			for (int head = 0; head < heads; head++)
 			{
 				io_generic_read(io, sect_data, 0xa2 + bps * spt * (track * heads + head), bps * spt);
-				
-				for (int i = 0; i < spt; i++) 
+
+				for (int i = 0; i < spt; i++)
 				{
 					sects[i].track       = track;
 					sects[i].head        = head;
@@ -227,16 +227,16 @@ bool dcp_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 					sects[i].bad_crc     = false;
 					sects[i].data        = sect_data + i * bps;
 				}
-				
+
 				build_pc_track_mfm(track, head, image, cell_count, spt, sects, calc_default_pc_gap3_size(form_factor, bps));
 			}
 	}
-	else	// FIXME: the code below is untested, because no image was found... there might be some silly mistake in the disk geometry!
+	else    // FIXME: the code below is untested, because no image was found... there might be some silly mistake in the disk geometry!
 	{
 		// Read Head 0 Track 0 is FM with 26 sectors of 128bytes instead of 256
 		io_generic_read(io, sect_data, 0xa2, 128 * spt);
-		
-		for (int i = 0; i < spt; i++) 
+
+		for (int i = 0; i < spt; i++)
 		{
 			sects[i].track       = 0;
 			sects[i].head        = 0;
@@ -247,13 +247,13 @@ bool dcp_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			sects[i].bad_crc     = false;
 			sects[i].data        = sect_data + i * 128;
 		}
-		
+
 		build_pc_track_fm(0, 0, image, cell_count, spt, sects, calc_default_pc_gap3_size(form_factor, 128));
-		
+
 		// Read Head 1 Track 0 is MFM with 26 sectors of 256bytes
 		io_generic_read(io, sect_data, 0xa2 + 128 * spt, bps * spt);
-		
-		for (int i = 0; i < spt; i++) 
+
+		for (int i = 0; i < spt; i++)
 		{
 			sects[i].track       = 0;
 			sects[i].head        = 1;
@@ -264,17 +264,17 @@ bool dcp_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			sects[i].bad_crc     = false;
 			sects[i].data        = sect_data + i * bps;
 		}
-		
+
 		build_pc_track_mfm(0, 1, image, cell_count, spt, sects, calc_default_pc_gap3_size(form_factor, bps));
-		
+
 		// Read other tracks as usual
 		UINT32 data_offs = 0xa2 + (26 * 0x80) + (26 * 0x100);
 		for (int track = 1; track < tracks; track++)
-			for (int head = 0; head < heads; head++) 
+			for (int head = 0; head < heads; head++)
 			{
 				io_generic_read(io, sect_data, data_offs + bps * spt * ((track - 1) * heads + head), bps * spt);
-				
-				for (int i = 0; i < spt; i++) 
+
+				for (int i = 0; i < spt; i++)
 				{
 					sects[i].track       = track;
 					sects[i].head        = head;
@@ -285,11 +285,11 @@ bool dcp_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 					sects[i].bad_crc     = false;
 					sects[i].data        = sect_data + i * bps;
 				}
-				
+
 				build_pc_track_mfm(track, head, image, cell_count, spt, sects, calc_default_pc_gap3_size(form_factor, bps));
 			}
 	}
-	
+
 	return true;
 }
 

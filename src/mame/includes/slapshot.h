@@ -58,9 +58,6 @@ public:
 
 	UINT16      m_spritebank[8];
 
-	/* misc */
-	INT32      m_banknum;
-
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -83,7 +80,6 @@ public:
 	UINT32 screen_update_slapshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_taito_no_buffer(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(slapshot_interrupt);
-	void reset_sound_region();
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks, int y_offset );
 	void taito_handle_sprite_buffering(  );
 	void taito_update_sprites_active_area(  );

@@ -31,7 +31,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine& machine, int n_level, 
 const device_type PSX_MDEC = &device_creator<psxmdec_device>;
 
 psxmdec_device::psxmdec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PSX_MDEC, "PSX MDEC", tag, owner, clock, "psxmdec", __FILE__)
+	: device_t(mconfig, PSX_MDEC, "Sony PSX MDEC", tag, owner, clock, "psxmdec", __FILE__)
 {
 }
 

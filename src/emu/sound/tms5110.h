@@ -115,6 +115,8 @@ private:
 	UINT8  m_next_is_address;
 	UINT8  m_schedule_dummy_read;
 	UINT8  m_addr_bit;
+	/* read byte */
+	UINT8  m_CTL_buffer;
 
 	/* callbacks */
 	devcb_write_line   m_m0_cb;      // the M0 line

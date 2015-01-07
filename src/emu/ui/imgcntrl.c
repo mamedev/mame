@@ -276,8 +276,8 @@ void ui_menu_control_device_image::handle()
 			break;
 
 		case ui_menu_file_selector::R_CREATE:
-			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_file_create(machine(), container, image, current_directory, current_file)));
-			state = CREATE_FILE;
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_file_create(machine(), container, image, current_directory, current_file, &create_ok)));
+			state = CHECK_CREATE;
 			break;
 
 		case ui_menu_file_selector::R_SOFTLIST:
@@ -309,12 +309,16 @@ void ui_menu_control_device_image::handle()
 		break;
 	}
 
-	case CREATE_CONFIRM: {
+	case CREATE_CONFIRM:
 		state = create_confirmed ? DO_CREATE : START_FILE;
 		handle();
 		break;
-	}
 
+	case CHECK_CREATE:
+		state = create_ok ? CREATE_FILE : START_FILE;
+		handle();
+		break;
+			
 	case DO_CREATE: {
 		astring path;
 		zippath_combine(path, current_directory, current_file);

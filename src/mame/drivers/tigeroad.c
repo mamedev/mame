@@ -619,7 +619,7 @@ static MACHINE_CONFIG_START( tigeroad, tigeroad_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tigeroad)
-	
+
 	MCFG_DEVICE_ADD("spritegen", TIGEROAD_SPRITE, 0)
 
 	MCFG_PALETTE_ADD("palette", 1024)

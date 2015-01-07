@@ -234,6 +234,7 @@ public:
 	UINT8 read(offs_t offset);
 	void  write(offs_t offset, UINT8 data);
 
+	DECLARE_WRITE_LINE_MEMBER( sid_w ); // pin 24
 	void serin_ready(int after);
 
 	// analog output configuration

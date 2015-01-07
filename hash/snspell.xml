@@ -1,0 +1,159 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="snspell" description="Speak &amp; Spell modules">
+
+
+<!-- Speak N Spell (US) -->
+
+	<software name="basbuild">
+		<description>Basic Builders</description>
+		<year>1979</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="serial" value="CD2308"/>
+		<part name="cart" interface="snspell">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cd2308.vsm" size="0x4000" crc="7784f917" sha1="c985d0f9b7d85f4a702e7281f3ba29c078ea38a7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="etf">
+		<description>E.T. Fantasy</description>
+		<year>1982</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="serial" value="CD2360"/>
+		<part name="cart" interface="snspell">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cd2360nl.vsm" size="0x4000" crc="a8446791" sha1="cfdfdea221395717d5d5e6ee8ef559f4b63f5a71" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="homohero">
+		<description>Homonym Heroes</description>
+		<year>1980</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="serial" value="CD2310"/>
+		<part name="cart" interface="snspell">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cd2310.vsm" size="0x4000" crc="91745409" sha1="71195611efa3ae24005584fac86fecf181f02c4c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magmods">
+		<description>Magnificent Modifiers</description>
+		<year>1980</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="serial" value="CD2349"/>
+		<part name="cart" interface="snspell">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cd2349a.vsm" size="0x4000" crc="4664a82e" sha1="59c2b6b245b01d767527a69e8471ef18a712e168" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="migverbs">
+		<description>Mighty Verbs</description>
+		<year>1979</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="serial" value="CD2309"/>
+		<part name="cart" interface="snspell">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cd2309b.vsm" size="0x4000" crc="53e3323f" sha1="4d5c67bb7a2250898c37a83a5b7a4b671eac0280" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nounends">
+		<description>Noun Endings</description>
+		<year>1980</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="serial" value="CD2348"/>
+		<part name="cart" interface="snspell">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cd2348.vsm" size="0x4000" crc="5ce12b32" sha1="61a590a27b66c7cd2409f39e776a9bcf0bfe4b02" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sstump46">
+		<description>Super Stumpers 4-6</description>
+		<year>1979</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="serial" value="CD2305"/>
+		<part name="cart" interface="snspell">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cd2305n.vsm" size="0x4000" crc="98b1f65a" sha1="a418f6e328196163d311cffba1f23d0306dc3ef7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sstump78">
+		<!-- note: cartridge label is "Super Stumpers 7-8", even though manual says it is for Grades 6-8 -->
+		<description>Super Stumpers 7-8</description>
+		<year>1979</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="serial" value="CD2307"/>
+		<part name="cart" interface="snspell">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cd2307a.vsm" size="0x4000" crc="c0467604" sha1="a75f3731f0a3285ecafa91c1ec6aa456c03946e0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vpower">
+		<description>Vowel Power</description>
+		<year>1978</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="serial" value="CD2302"/>
+		<part name="cart" interface="snspell">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cd2302.vsm" size="0x4000" crc="c9b82e72" sha1="f4ef0f72993c14eca62a2e3e013aeb2683fb82fc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vventure">
+		<description>Vowel Ventures</description>
+		<year>1980</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="serial" value="CD2347"/>
+		<part name="cart" interface="snspell">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cd2347c.vsm" size="0x4000" crc="2f2e5376" sha1="b014dde6f3fa1f9edca0b0d157ec7b760baebdef" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- La Dictee Magique (France) -->
+
+	<software name="motsbase">
+		<description>Les Mots de Base (Module No. 1)</description>
+		<!-- 1st release was called "Module No. 1 de Jacques Capelovici" -->
+		<year>1980</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="serial" value="CD2353"/>
+		<part name="cart" interface="snspell">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cd2353.vsm" size="0x4000" crc="d29bd1fe" sha1="3bebf4370be3e6e5fff86d2ee27ff56f17368ba6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magasrue">
+		<description>Les Magasins de la Rue (Module No. 4)</description>
+		<year>1981</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="serial" value="CD62048"/>
+		<part name="cart" interface="snspell">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cd62048.vsm" size="0x4000" crc="543ab068" sha1="479eaecaadb31bdd99e9bb0f424191ec554202bd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+</softwarelist>

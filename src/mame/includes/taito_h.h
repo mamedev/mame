@@ -22,10 +22,6 @@ public:
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_m68000_mainram;
-//  UINT16 *    paletteram;    // currently this uses generic palette handling
-
-	/* misc */
-	INT32       m_banknum;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -42,7 +38,6 @@ public:
 	UINT32 screen_update_syvalion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_recordbr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_dleague(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void reset_sound_region();
 	void syvalion_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void recordbr_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	void dleague_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );

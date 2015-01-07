@@ -367,7 +367,7 @@ READ8_MEMBER(super6_state::memory_read_byte)
 WRITE8_MEMBER(super6_state::memory_write_byte)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	return prog_space.write_byte(offset, data);
+	prog_space.write_byte(offset, data);
 }
 
 READ8_MEMBER(super6_state::io_read_byte)
@@ -379,7 +379,7 @@ READ8_MEMBER(super6_state::io_read_byte)
 WRITE8_MEMBER(super6_state::io_write_byte)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
-	return prog_space.write_byte(offset, data);
+	prog_space.write_byte(offset, data);
 }
 
 //-------------------------------------------------
@@ -400,7 +400,7 @@ WRITE_LINE_MEMBER( super6_state::fr_w )
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START( super6_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
 WRITE_LINE_MEMBER( super6_state::fdc_intrq_w )

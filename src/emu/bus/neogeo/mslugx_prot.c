@@ -7,7 +7,7 @@ extern const device_type MSLUGX_PROT = &device_creator<mslugx_prot_device>;
 
 
 mslugx_prot_device::mslugx_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MSLUGX_PROT, "NeoGeo Metal Slug X Protection Device", tag, owner, clock, "mslugx_prot", __FILE__)
+	: device_t(mconfig, MSLUGX_PROT, "NeoGeo Protection (Metal Slug X)", tag, owner, clock, "mslugx_prot", __FILE__)
 {
 }
 

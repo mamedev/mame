@@ -2241,7 +2241,7 @@ ROM_END
 ROM_START( m4nod )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nod.bin", 0x0000, 0x010000, CRC(bc738af5) SHA1(8df436139554ccfb48c4db0a32e3333dbf3c4f46) )
-	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) //region was called "upd" but machine is mod4oki? Which one is correct?
 	ROM_LOAD( "nodsnd.bin", 0x0000, 0x080000, CRC(2134494a) SHA1(3b665bf79567a71195b20e76c50b02707d15b78d) )
 ROM_END
 
@@ -2428,86 +2428,86 @@ GAME(199?, m4luckwbf    ,m4luckwb   ,mod4oki    ,mpu4               , mpu4_state
 
 
 // won't boot with current reel setup, not even in test mode
-GAME(199?, m4maglin ,0          ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Magic Liner (Barcrest) (MPU4) (DMA2.1)",GAME_FLAGS )
-GAME(199?, m4magdrg ,0          ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Magic Dragon (Barcrest) (MPU4) (DMD1.0)",GAME_FLAGS )
-GAME(199?, m4clbveg ,0          ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4clbvega,m4clbveg   ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4clbvegb,m4clbveg   ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
-GAME(199?, m4clbvegc,m4clbveg   ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
-GAME(199?, m4chasei ,0          ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4chaseia,m4chasei   ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4chaseib,m4chasei   ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
-GAME(199?, m4chaseic,m4chasei   ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
-GAME(199?, m4chaseid,m4chasei   ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 5)",GAME_FLAGS )
-GAME(199?, m4chaseie,m4chasei   ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 6)",GAME_FLAGS )
-GAME(199?, m4chaseif,m4chasei   ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 7)",GAME_FLAGS )
+GAME(199?, m4maglin ,0          ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Magic Liner (Barcrest) (MPU4) (DMA2.1)",GAME_FLAGS )
+GAME(199?, m4magdrg ,0          ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Magic Dragon (Barcrest) (MPU4) (DMD1.0)",GAME_FLAGS )
+GAME(199?, m4clbveg ,0          ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4clbvega,m4clbveg   ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4clbvegb,m4clbveg   ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4clbvegc,m4clbveg   ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Club Vegas (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
+GAME(199?, m4chasei ,0          ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4chaseia,m4chasei   ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4chaseib,m4chasei   ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4chaseic,m4chasei   ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
+GAME(199?, m4chaseid,m4chasei   ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 5)",GAME_FLAGS )
+GAME(199?, m4chaseie,m4chasei   ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 6)",GAME_FLAGS )
+GAME(199?, m4chaseif,m4chasei   ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Chase Invaders (Barcrest) (MPU4) (set 7)",GAME_FLAGS )
 
-GAME(199?, m4bluedm ,0          ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Blue Diamond (Barcrest) (MPU4) (DBD1.0)",GAME_FLAGS )
-GAME(199?, m4amhiwy ,0          ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","American Highway (Barcrest) (MPU4) (DAH)",GAME_FLAGS )
-GAME(199?, m4addrd  ,m4addr     ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Adders & Ladders (Barcrest) (DAL, Dutch) (MPU4)",GAME_FLAGS )
-GAME(199?, m4nudshf ,0          ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4nudshfa,m4nudshf   ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4nudshfb,m4nudshf   ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
-GAME(199?, m4nudshfc,m4nudshf   ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
+GAME(199?, m4bluedm ,0          ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Blue Diamond (Barcrest) (MPU4) (DBD1.0)",GAME_FLAGS )
+GAME(199?, m4amhiwy ,0          ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","American Highway (Barcrest) (MPU4) (DAH)",GAME_FLAGS )
+GAME(199?, m4addrd  ,m4addr     ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Adders & Ladders (Barcrest) (DAL, Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4nudshf ,0          ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4nudshfa,m4nudshf   ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4nudshfb,m4nudshf   ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4nudshfc,m4nudshf   ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Nudge Shuffle (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
 
-GAME(199?, m4prem   ,0          ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Premier (Barcrest) (MPU4) (DPM)",GAME_FLAGS )
-GAME(199?, m4rdht   ,0          ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Red Heat (Golden Nugget?) (Barcrest) (MPU4) (DRH 1.2)",GAME_FLAGS )
-GAME(199?, m4rwb    ,0          ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Red White & Blue (Barcrest) (MPU4) (DRW)",GAME_FLAGS )
-GAME(199?, m4salsa  ,0          ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Salsa (Barcrest) (MPU4) (DSA)",GAME_FLAGS )
-GAME(199?, m4techno ,0          ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Techno Reel (Barcrest) (MPU4) (DTE) (set 1)",GAME_FLAGS )
-GAME(199?, m4technoa,m4techno   ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Techno Reel (Barcrest) (MPU4) (DTE) (set 2)",GAME_FLAGS )
-GAME(199?, m4twintm ,0          ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Twin Timer (Barcrest) (MPU4) (D2T 1.1)",GAME_FLAGS )
-GAME(199?, m4blkbul ,0          ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Super Play (Black Bull?) (Czech) (Barcrest) [XSP] (MPU4)",GAME_FLAGS ) // complains about coin dip
-GAME(199?, m4calicl ,0          ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4calicla,m4calicl   ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4caliclb,m4calicl   ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
-GAME(199?, m4caliclc,m4calicl   ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
-GAME(199?, m4calicld,m4calicl   ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 5)",GAME_FLAGS )
+GAME(199?, m4prem   ,0          ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Premier (Barcrest) (MPU4) (DPM)",GAME_FLAGS )
+GAME(199?, m4rdht   ,0          ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Red Heat (Golden Nugget?) (Barcrest) (MPU4) (DRH 1.2)",GAME_FLAGS )
+GAME(199?, m4rwb    ,0          ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Red White & Blue (Barcrest) (MPU4) (DRW)",GAME_FLAGS )
+GAME(199?, m4salsa  ,0          ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Salsa (Barcrest) (MPU4) (DSA)",GAME_FLAGS )
+GAME(199?, m4techno ,0          ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Techno Reel (Barcrest) (MPU4) (DTE) (set 1)",GAME_FLAGS )
+GAME(199?, m4technoa,m4techno   ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Techno Reel (Barcrest) (MPU4) (DTE) (set 2)",GAME_FLAGS )
+GAME(199?, m4twintm ,0          ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Twin Timer (Barcrest) (MPU4) (D2T 1.1)",GAME_FLAGS )
+GAME(199?, m4blkbul ,0          ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Super Play (Black Bull?) (Czech) (Barcrest) [XSP] (MPU4)",GAME_FLAGS ) // complains about coin dip
+GAME(199?, m4calicl ,0          ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4calicla,m4calicl   ,mod2_alt      ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4caliclb,m4calicl   ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4caliclc,m4calicl   ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
+GAME(199?, m4calicld,m4calicl   ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","California Club (Barcrest) (MPU4) (set 5)",GAME_FLAGS )
 
-GAME(199?, m4bucks  ,0          ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Bucks Fizz Club (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4bucks  ,0          ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Bucks Fizz Club (Barcrest) (MPU4)",GAME_FLAGS )
 
-GAME(199?, m4gldgat ,0          ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Golden Gate (Barcrest) [DGG, Dutch] (MPU4)",GAME_FLAGS )
-GAME(199?, m4hirise ,0          ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4hirisea,m4hirise   ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4hiriseb,m4hirise   ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
-GAME(199?, m4hirisec,m4hirise   ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
-GAME(199?, m4hirised,m4hirise   ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (set 5)",GAME_FLAGS )
-GAME(199?, m4hirisee,m4hirise   ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (set 6)",GAME_FLAGS )
+GAME(199?, m4gldgat ,0          ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Golden Gate (Barcrest) [DGG, Dutch] (MPU4)",GAME_FLAGS )
+GAME(199?, m4hirise ,0          ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4hirisea,m4hirise   ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4hiriseb,m4hirise   ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4hirisec,m4hirise   ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
+GAME(199?, m4hirised,m4hirise   ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (set 5)",GAME_FLAGS )
+GAME(199?, m4hirisee,m4hirise   ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","High Rise (Barcrest) (MPU4) (set 6)",GAME_FLAGS )
 
-GAME(199?, m4nspot  ,0          ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Night Spot Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4nspota ,m4nspot    ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Night Spot Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4nspotb ,m4nspot    ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Night Spot Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4nspot  ,0          ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Night Spot Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4nspota ,m4nspot    ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Night Spot Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4nspotb ,m4nspot    ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Night Spot Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
 
-GAME(199?, m4supbf  ,0          ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Super Bucks Fizz Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4supbfa ,m4supbf    ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Super Bucks Fizz Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4supbf  ,0          ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Super Bucks Fizz Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4supbfa ,m4supbf    ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Super Bucks Fizz Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
 
-GAME(199?, m4toma   ,0          ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Tomahawk (Barcrest) (MPU4)",GAME_FLAGS )
-GAME(199?, m4tropcl ,0          ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
-GAME(199?, m4tropcla,m4tropcl   ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
-GAME(199?, m4tropclb,m4tropcl   ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
-GAME(199?, m4tropclc,m4tropcl   ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
-GAME(199?, m4tropcld,m4tropcl   ,mod2       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 5)",GAME_FLAGS )
+GAME(199?, m4toma   ,0          ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Tomahawk (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4tropcl ,0          ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS )
+GAME(199?, m4tropcla,m4tropcl   ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS )
+GAME(199?, m4tropclb,m4tropcl   ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
+GAME(199?, m4tropclc,m4tropcl   ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 4)",GAME_FLAGS )
+GAME(199?, m4tropcld,m4tropcl   ,mod2_alt       ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Tropicana Club (Barcrest) (MPU4) (set 5)",GAME_FLAGS )
 
 
 // these all seem quite close to Old Timer (unsurprising, many are called XX timer), the 'altreels' is just the same as the oldtimer init, but with the 'guess' CHR emulation
-GAME(199?, m4holdtm ,0          ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Hold Timer (Barcrest) (Dutch) (MPU4) (DHT)",GAME_FLAGS )
-GAME(199?, m4exgam  ,0          ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Extra Game (Fairplay - Barcrest) (MPU4)",GAME_FLAGS )
-GAME(199?, m4brook  ,0          ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Brooklyn (Barcrest) (MPU4) (PFT 1.8)",GAME_FLAGS )
-GAME(199?, m4roadrn ,0          ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Road Runner (Barcrest) (Dutch) (MPU4) (DRO1.9)",GAME_FLAGS )
-GAME(199?, m4showtm ,0          ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Show Timer (Barcrest) (Dutch) (MPU4) (DSH1.3)",GAME_FLAGS )
-GAME(199?, m4steptm ,0          ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Step Timer (Barcrest) (Dutch) (MPU4) (DST 1.1)",GAME_FLAGS )
-GAME(199?, m4toptim ,0          ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Top Timer (Barcrest) (Dutch) (MPU4) (DTT) (set 1)",GAME_FLAGS )
-GAME(199?, m4toptima,m4toptim   ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Top Timer (Barcrest) (Dutch) (MPU4) (DTT) (set 2)",GAME_FLAGS )
+GAME(199?, m4holdtm ,0          ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Hold Timer (Barcrest) (Dutch) (MPU4) (DHT)",GAME_FLAGS )
+GAME(199?, m4exgam  ,0          ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Extra Game (Fairplay - Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4brook  ,0          ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Brooklyn (Barcrest) (MPU4) (PFT 1.8)",GAME_FLAGS )
+GAME(199?, m4roadrn ,0          ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Road Runner (Barcrest) (Dutch) (MPU4) (DRO1.9)",GAME_FLAGS )
+GAME(199?, m4showtm ,0          ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Show Timer (Barcrest) (Dutch) (MPU4) (DSH1.3)",GAME_FLAGS )
+GAME(199?, m4steptm ,0          ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Step Timer (Barcrest) (Dutch) (MPU4) (DST 1.1)",GAME_FLAGS )
+GAME(199?, m4toptim ,0          ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Top Timer (Barcrest) (Dutch) (MPU4) (DTT) (set 1)",GAME_FLAGS )
+GAME(199?, m4toptima,m4toptim   ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Top Timer (Barcrest) (Dutch) (MPU4) (DTT) (set 2)",GAME_FLAGS )
 
-GAME(199?, m4univ   ,0          ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Universe (Barcrest) (Dutch) (MPU4) (DUN)",GAME_FLAGS )
-GAME(199?, m4wildtm ,0          ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Wild Timer (Barcrest) (Dutch) (MPU4) (DWT 1.3)",GAME_FLAGS )
+GAME(199?, m4univ   ,0          ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Universe (Barcrest) (Dutch) (MPU4) (DUN)",GAME_FLAGS )
+GAME(199?, m4wildtm ,0          ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Wild Timer (Barcrest) (Dutch) (MPU4) (DWT 1.3)",GAME_FLAGS )
 
 
-GAME(199?, m4frtgm  ,0          ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Fruit Game (Barcrest) (MPU4)",GAME_FLAGS ) // SAMPLE EEPROM ALARM (and has a weird sample rom..)
-GAME(199?, m4reeltm ,0          ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Reel Timer (Barcrest) (MPU4) (DWT)",GAME_FLAGS ) // SAMPLE EEPROM ALARM
-GAME(199?, m4fortcb ,0          ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS ) // INVALID ALARM
-GAME(199?, m4fortcba,m4fortcb   ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS ) // INVALID ALARM
-GAME(199?, m4fortcbb,m4fortcb   ,mod4oki    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS ) // INVALID ALARM
+GAME(199?, m4frtgm  ,0          ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Fruit Game (Barcrest) (MPU4)",GAME_FLAGS ) // SAMPLE EEPROM ALARM (and has a weird sample rom..)
+GAME(199?, m4reeltm ,0          ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Reel Timer (Barcrest) (MPU4) (DWT)",GAME_FLAGS ) // SAMPLE EEPROM ALARM
+GAME(199?, m4fortcb ,0          ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (set 1)",GAME_FLAGS ) // INVALID ALARM
+GAME(199?, m4fortcba,m4fortcb   ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (set 2)",GAME_FLAGS ) // INVALID ALARM
+GAME(199?, m4fortcbb,m4fortcb   ,mod4oki_alt    ,mpu4               , mpu4_state,m4altreels         ,ROT0,   "Barcrest","Fortune Club (Barcrest) (MPU4) (set 3)",GAME_FLAGS ) // INVALID ALARM
 
 
 
@@ -2544,9 +2544,9 @@ GAME(199?, m4blkcat ,0          ,mod4oki    ,mpu4               , mpu4_state,m4d
 GAME(199?, m4gnsmk  ,0          ,mod4oki    ,mpu4               , mpu4_state,m4default          ,ROT0,   "Barcrest","Gun Smoke (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 GAME(199?, m4blkbuld,m4blkbul   ,mod4oki    ,mpu4               , mpu4_state,m4default          ,ROT0,   "Barcrest","Gun Smoke (Barcrest) (Dutch, alt sound roms) (MPU4)",GAME_FLAGS ) // not sure either set of sound roms is right
 GAME(199?, m4blkwhd ,0          ,mod4oki    ,mpu4               , mpu4_state,m4default          ,ROT0,   "Barcrest","Black & White (Barcrest) [Dutch] (MPU4) (DBW 1.1)",GAME_FLAGS )
-GAME(199?, m4oldtmr ,0          ,mod4oki    ,mpu4               , mpu4_state,m_oldtmr           ,ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch) (MPU4) (DOT1.1)",GAME_FLAGS )
-GAME(199?, m4casot  ,m4oldtmr   ,mod4oki    ,mpu4               , mpu4_state,m_oldtmr           ,ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch, alt 'Black and White' sound roms) (DOT1.1)",GAME_FLAGS ) // uses the same program???
-GAME(199?, m4jpmcla ,m4oldtmr   ,mod4oki    ,mpu4               , mpu4_state,m_oldtmr           ,ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch, alt 'JPM Classic' sound roms) (DOT1.1)",GAME_FLAGS ) // uses the same program???
+GAME(199?, m4oldtmr ,0          ,mod4oki_alt,mpu4               , mpu4_state,m_oldtmr           ,ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch) (MPU4) (DOT1.1)",GAME_FLAGS )
+GAME(199?, m4casot  ,m4oldtmr   ,mod4oki_alt,mpu4               , mpu4_state,m_oldtmr           ,ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch, alt 'Black and White' sound roms) (DOT1.1)",GAME_FLAGS ) // uses the same program???
+GAME(199?, m4jpmcla ,m4oldtmr   ,mod4oki_alt,mpu4               , mpu4_state,m_oldtmr           ,ROT0,   "Barcrest","Old Timer (Barcrest) (Dutch, alt 'JPM Classic' sound roms) (DOT1.1)",GAME_FLAGS ) // uses the same program???
 GAME(199?, m4tbplay ,0          ,mod4oki    ,mpu4               , mpu4_state,m4default          ,ROT0,   "Barcrest","Turbo Play (Barcrest) (Dutch) (MPU4) (DTP) (set 1)",GAME_FLAGS )
 GAME(199?, m4tbplaya,m4tbplay   ,mod4oki    ,mpu4               , mpu4_state,m4default          ,ROT0,   "Barcrest","Turbo Play (Barcrest) (Dutch) (MPU4) (DTP) (set 2)",GAME_FLAGS )
 GAME(199?, m4tbplayb,m4tbplay   ,mod4oki    ,mpu4               , mpu4_state,m4default          ,ROT0,   "Barcrest","Turbo Play (Barcrest) (Dutch) (MPU4) (DTP) (set 3)",GAME_FLAGS )

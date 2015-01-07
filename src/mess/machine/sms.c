@@ -45,6 +45,9 @@ WRITE_LINE_MEMBER(sms_state::sms_ctrl1_th_input)
 
 WRITE_LINE_MEMBER(sms_state::sms_ctrl2_th_input)
 {
+	if (m_is_gamegear && !(m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode()))
+		return;
+
 	// Check if TH of controller port 2 is set to input (1)
 	if (m_io_ctrl_reg & 0x08)
 	{
@@ -63,9 +66,12 @@ WRITE_LINE_MEMBER(sms_state::sms_ctrl2_th_input)
 }
 
 
-void sms_state::sms_get_inputs( address_space &space )
+void sms_state::sms_get_inputs()
 {
-	UINT8 data1, data2;
+	bool port_dd_has_th_input = true;
+
+	UINT8 data1 = 0xff;
+	UINT8 data2 = 0xff;
 
 	m_port_dc_reg = 0xff;
 	m_port_dd_reg = 0xff;
@@ -74,20 +80,43 @@ void sms_state::sms_get_inputs( address_space &space )
 	// physical pins numbering. For register bits whose order differs,
 	// it's necessary move the equivalent controller bits to match.
 
-	data1 = m_port_ctrl1->port_r();
-	m_port_dc_reg &= ~0x0f | data1; // Up, Down, Left, Right
-	m_port_dc_reg &= ~0x10 | (data1 >> 1); // TL (Button 1)
-	m_port_dc_reg &= ~0x20 | (data1 >> 2); // TR (Button 2)
+	if (m_is_gamegear)
+	{
+		// Assume the Japanese Game Gear behaves as the
+		// Japanese Master System, regarding TH input.
+		if (m_is_gg_region_japan)
+			port_dd_has_th_input = false;
 
-	data2 = m_port_ctrl2->port_r();
+		// For Game Gear, this function is used only if SMS mode is
+		// enabled, else only register $dc receives input data, through
+		// direct read of the m_port_gg_dc I/O port.
+
+		data1 = m_port_gg_dc->read();
+		m_port_dc_reg &= ~0x03f | data1;
+
+		data2 = m_port_gear2gear->port_r();
+	}
+	else
+	{
+		// Sega Mark III does not have TH lines connected.
+		// The Japanese Master System does not set port $dd with TH input.
+		if (m_is_mark_iii || m_is_smsj)
+			port_dd_has_th_input = false;
+
+		data1 = m_port_ctrl1->port_r();
+		m_port_dc_reg &= ~0x0f | data1; // Up, Down, Left, Right
+		m_port_dc_reg &= ~0x10 | (data1 >> 1); // TL (Button 1)
+		m_port_dc_reg &= ~0x20 | (data1 >> 2); // TR (Button 2)
+
+		data2 = m_port_ctrl2->port_r();
+	}
+
 	m_port_dc_reg &= ~0xc0 | (data2 << 6); // Up, Down
 	m_port_dd_reg &= ~0x03 | (data2 >> 2); // Left, Right
 	m_port_dd_reg &= ~0x04 | (data2 >> 3); // TL (Button 1)
 	m_port_dd_reg &= ~0x08 | (data2 >> 4); // TR (Button 2)
 
-	// Sega Mark III does not have TH line connected.
-	// Also, the Japanese Master System does not set port $dd with TH input.
-	if (!m_is_mark_iii && !m_is_smsj)
+	if (port_dd_has_th_input)
 	{
 		m_port_dd_reg &= ~0x40 | data1; // TH ctrl1
 		m_port_dd_reg &= ~0x80 | (data2 << 1); // TH ctrl2
@@ -116,7 +145,7 @@ READ8_MEMBER(sms_state::sms_fm_detect_r)
 		}
 		else
 		{
-			sms_get_inputs(space);
+			sms_get_inputs();
 			return m_port_dc_reg;
 		}
 	}
@@ -128,6 +157,12 @@ WRITE8_MEMBER(sms_state::sms_io_control_w)
 	bool latch_hcount = false;
 	UINT8 ctrl1_port_data = 0xff;
 	UINT8 ctrl2_port_data = 0xff;
+
+	if (m_is_gamegear && !(m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode()))
+	{
+		m_io_ctrl_reg = data;
+		return;
+	}
 
 	// Controller Port 1:
 
@@ -171,12 +206,16 @@ WRITE8_MEMBER(sms_state::sms_io_control_w)
 		}
 		if (!m_is_gamegear)
 			m_port_ctrl2->port_w(ctrl2_port_data);
+		else
+			m_port_gear2gear->port_w(ctrl2_port_data); // not verified
 	}
 	// check if TH is set to input (1).
 	if (data & 0x08)
 	{
 		if (!m_is_gamegear)
 			ctrl2_port_data &= ~0x40 | m_port_ctrl2->port_r();
+		else
+			ctrl2_port_data &= ~0x40 | m_port_gear2gear->port_r(); // not verified
 
 		// check if TH input level is high (1) and was output/low (0)
 		if ((ctrl2_port_data & 0x40) && !(m_io_ctrl_reg & 0x88))
@@ -206,10 +245,30 @@ READ8_MEMBER(sms_state::sms_count_r)
  */
 WRITE_LINE_MEMBER(sms_state::sms_pause_callback)
 {
-	if (m_is_gamegear && m_cartslot->exists() && !m_cartslot->m_cart->get_sms_mode())
-		return;
+	bool pause_pressed = false;
 
-	if ((m_is_gamegear && !(m_port_start->read() & 0x80)) || (!m_is_gamegear && !(m_port_pause->read() & 0x80)))
+	if (!m_is_mark_iii)
+	{
+		// clear TH latch of the controller ports
+		m_ctrl1_th_latch = 0;
+		m_ctrl2_th_latch = 0;
+	}
+
+	if (m_is_gamegear)
+	{
+		if (!(m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode()))
+			return;
+
+		if (!(m_port_start->read() & 0x80))
+			pause_pressed = true;
+	}
+	else
+	{
+		if (!(m_port_pause->read() & 0x80))
+			pause_pressed = true;
+	}
+
+	if (pause_pressed)
 	{
 		if (!m_paused)
 			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -218,13 +277,6 @@ WRITE_LINE_MEMBER(sms_state::sms_pause_callback)
 	}
 	else
 		m_paused = 0;
-
-	if (!m_is_mark_iii)
-	{
-		// clear TH latch of the controller ports
-		m_ctrl1_th_latch = 0;
-		m_ctrl2_th_latch = 0;
-	}
 }
 
 
@@ -232,27 +284,35 @@ READ8_MEMBER(sms_state::sms_input_port_dc_r)
 {
 	if (m_is_mark_iii)
 	{
-		sms_get_inputs(space);
+		sms_get_inputs();
 		return m_port_dc_reg;
 	}
 
-	if (m_mem_ctrl_reg & IO_CHIP)
+	if (m_is_gamegear)
 	{
-		return 0xff;
+		// If SMS mode is disabled, just return the data read from the
+		// input port. Its mapped port bits match the bits of register $dc.
+		if (!(m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode()))
+			return m_port_gg_dc->read();
 	}
 	else
 	{
-		sms_get_inputs(space);
-
-		// Check if TR of controller port 1 is set to output (0)
-		if (!(m_io_ctrl_reg & 0x01))
-		{
-			// Read TR state set through IO control port
-			m_port_dc_reg &= ~0x20 | ((m_io_ctrl_reg & 0x10) << 1);
-		}
-
-		return m_port_dc_reg;
+		// Return if the I/O chip is disabled (1). This check isn't performed
+		// for the Game Gear because has no effect on it (even in SMS mode?).
+		if (m_mem_ctrl_reg & IO_CHIP)
+			return 0xff;
 	}
+
+	sms_get_inputs();
+
+	// Check if TR of controller port 1 is set to output (0)
+	if (!(m_io_ctrl_reg & 0x01))
+	{
+		// Read TR state set through IO control port
+		m_port_dc_reg &= ~0x20 | ((m_io_ctrl_reg & 0x10) << 1);
+	}
+
+	return m_port_dc_reg;
 }
 
 
@@ -260,14 +320,24 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 {
 	if (m_is_mark_iii)
 	{
-		sms_get_inputs(space);
+		sms_get_inputs();
 		return m_port_dd_reg;
 	}
 
-	if (m_mem_ctrl_reg & IO_CHIP)
-		return 0xff;
+	if (m_is_gamegear)
+	{
+		if (!(m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode()))
+			return 0xff;
+	}
+	else
+	{
+		// Return if the I/O chip is disabled (1). This check isn't performed
+		// for the Game Gear because has no effect on it (even in SMS mode?).
+		if (m_mem_ctrl_reg & IO_CHIP)
+			return 0xff;
+	}
 
-	sms_get_inputs(space);
+	sms_get_inputs();
 
 	// Check if TR of controller port 2 is set to output (0)
 	if (!(m_io_ctrl_reg & 0x04))
@@ -276,12 +346,13 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 		m_port_dd_reg &= ~0x08 | ((m_io_ctrl_reg & 0x40) >> 3);
 	}
 
-	if (m_is_smsj)
+	if (m_is_smsj || (m_is_gamegear && m_is_gg_region_japan))
 	{
 		// For Japanese Master System, set upper 4 bits with TH/TR
 		// direction bits of IO control register, according to Enri's
 		// docs (http://www43.tok2.com/home/cmpslv/Sms/EnrSms.htm).
 		// This makes the console incapable of using the Light Phaser.
+		// Assume the same for a Japanese Game Gear.
 		m_port_dd_reg &= ~0x10 | ((m_io_ctrl_reg & 0x01) << 4);
 		m_port_dd_reg &= ~0x20 | ((m_io_ctrl_reg & 0x04) << 3);
 		m_port_dd_reg &= ~0x40 | ((m_io_ctrl_reg & 0x02) << 5);
@@ -346,10 +417,17 @@ WRITE8_MEMBER(sms_state::sms_ym2413_data_port_w)
 }
 
 
-READ8_MEMBER(sms_state::gg_input_port_2_r)
+READ8_MEMBER(sms_state::gg_input_port_00_r)
 {
-	//logerror("joy 2 read, val: %02x, pc: %04x\n", (m_is_gg_region_japan ? 0x00 : 0x40) | (m_port_start->read() & 0x80), activecpu_get_pc());
-	return (m_is_gg_region_japan ? 0x00 : 0x40) | (m_port_start->read() & 0x80);
+	if (m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode())
+		return 0xff;
+	else
+	{
+		UINT8 data = (m_is_gg_region_japan ? 0x00 : 0x40) | (m_port_start->read() & 0x80);
+
+		//logerror("port $00 read, val: %02x, pc: %04x\n", data, activecpu_get_pc());
+		return data;
+	}
 }
 
 
@@ -1186,41 +1264,206 @@ UINT32 sms_state::screen_update_sms(screen_device &screen, bitmap_rgb32 &bitmap,
 
 VIDEO_START_MEMBER(sms_state,gamegear)
 {
+	m_prev_bitmap_copied = false;
 	m_main_scr->register_screen_bitmap(m_prev_bitmap);
+	m_main_scr->register_screen_bitmap(m_gg_sms_mode_bitmap);
+	m_line_buffer = auto_alloc_array(machine(), int, 160 * 4);
+
+	save_item(NAME(m_prev_bitmap_copied));
 	save_item(NAME(m_prev_bitmap));
+	save_item(NAME(m_gg_sms_mode_bitmap));
+	save_pointer(NAME(m_line_buffer), 160 * 4);
 }
+
+VIDEO_RESET_MEMBER(sms_state,gamegear)
+{
+	if (m_prev_bitmap_copied)
+	{
+		m_prev_bitmap.fill(rgb_t::black);
+		m_prev_bitmap_copied = false;
+	}
+	if (m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode())
+	{
+		m_gg_sms_mode_bitmap.fill(rgb_t::black);
+		memset(m_line_buffer, 0, 160 * 4 * sizeof(int));
+	}
+}
+
+
+void sms_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap_rgb32 &vdp_bitmap = m_vdp->get_bitmap();
+	const rectangle visarea = screen.visible_area();
+
+	/* Plot positions relative to visarea minimum values */
+	const int plot_min_x = cliprect.min_x - visarea.min_x;
+	const int plot_max_x = MIN(cliprect.max_x - visarea.min_x, 159); // avoid m_line_buffer overflow.
+	const int plot_min_y = cliprect.min_y - visarea.min_y;
+	const int plot_max_y = cliprect.max_y - visarea.min_y;
+
+	/* For each group of 3 SMS pixels, a group of 2 GG pixels is processed.
+	   In case the cliprect coordinates may map any region of the visible area,
+	   take in account the remaining position, if any, of the first group. */
+	const int plot_x_first_group = plot_min_x - (plot_min_x % 2);
+	const int plot_y_first_group = plot_min_y - (plot_min_y % 2);
+
+	/* Calculation of the minimum scaled value for X */
+	const int visarea_xcenter = visarea.xcenter();
+	const int sms_offset_min_x = ((int) (visarea_xcenter - cliprect.min_x) / 2) * 3;
+	const int sms_min_x = visarea_xcenter - sms_offset_min_x;
+
+	/* Calculation of the minimum scaled value for Y */
+	const int visarea_ycenter = visarea.ycenter();
+	const int sms_offset_min_y = ((int) (visarea_ycenter - cliprect.min_y) / 2) * 3;
+	const int sms_min_y = visarea_ycenter - sms_offset_min_y;
+
+	int sms_y = sms_min_y;
+	int plot_y_group = plot_y_first_group;
+
+	/* Auxiliary variable for vertical scaling */
+	int sms_y2 = sms_y - 1;
+
+	for (int plot_y = plot_min_y; plot_y <= plot_max_y;)
+	{
+		for (int i = (plot_y - plot_y_group); i <= MIN(1, plot_max_y - plot_y_group); i++)
+		{
+			/* Include additional lines that have influence over what appears on the LCD */
+			const int sms_min_y2 = sms_y + i - 1;
+			const int sms_max_y2 = sms_y + i + 2;
+
+			/* Process lines, but skip those already processed before */
+			for (sms_y2 = MAX(sms_min_y2, sms_y2); sms_y2 <= sms_max_y2; sms_y2++)
+			{
+				int *combineline_buffer =  m_line_buffer + (sms_y2 & 0x03) * 160;
+
+				if (sms_y2 >= vdp_bitmap.cliprect().min_y && sms_y2 <= vdp_bitmap.cliprect().max_y)
+				{
+					UINT32 *vdp_buffer =  &vdp_bitmap.pix32(sms_y2);
+
+					int sms_x = sms_min_x;
+					int plot_x_group = plot_x_first_group;
+
+					/* Do horizontal scaling */
+					for (int plot_x = plot_min_x; plot_x <= plot_max_x;)
+					{
+						for (int j = (plot_x - plot_x_group); j <= MIN(1, plot_max_x - plot_x_group); j++)
+						{
+							if (sms_x + j >= vdp_bitmap.cliprect().min_x && sms_x + j + 1 <= vdp_bitmap.cliprect().max_x)
+							{
+								int combined;
+
+								switch (j)
+								{
+								case 0:
+									/* Take red and green from first pixel, and blue from second pixel */
+									combined = (vdp_buffer[sms_x] & 0x00ffff00) | (vdp_buffer[sms_x + 1] & 0x000000ff);
+									combineline_buffer[plot_x] = combined;
+									break;
+								case 1:
+									/* Take red from second pixel, and green and blue from third pixel */
+									combined = (vdp_buffer[sms_x + 1] & 0x00ff0000) | (vdp_buffer[sms_x + 2] & 0x0000ffff);
+									combineline_buffer[plot_x + 1] = combined;
+									break;
+								}
+							}
+							else
+							{
+								combineline_buffer[plot_x + j] = 0;
+							}
+						}
+						sms_x += 3;
+						plot_x += 2 - (plot_x - plot_x_group);
+						plot_x_group = plot_x;
+					}
+				}
+				else
+				{
+					memset(combineline_buffer, 0, 160 * sizeof(int));
+				}
+			}
+
+			/* Do vertical scaling for a screen with 192 or 224 lines
+			   Lines 0-2 and 221-223 have no effect on the output on the GG screen.
+			   We will calculate the gamegear lines as follows:
+			   GG_0 = 1/6 * SMS_3 + 1/3 * SMS_4 + 1/3 * SMS_5 + 1/6 * SMS_6
+			   GG_1 = 1/6 * SMS_4 + 1/3 * SMS_5 + 1/3 * SMS_6 + 1/6 * SMS_7
+			   GG_2 = 1/6 * SMS_6 + 1/3 * SMS_7 + 1/3 * SMS_8 + 1/6 * SMS_9
+			   GG_3 = 1/6 * SMS_7 + 1/3 * SMS_8 + 1/3 * SMS_9 + 1/6 * SMS_10
+			   GG_4 = 1/6 * SMS_9 + 1/3 * SMS_10 + 1/3 * SMS_11 + 1/6 * SMS_12
+			   .....
+			   GG_142 = 1/6 * SMS_216 + 1/3 * SMS_217 + 1/3 * SMS_218 + 1/6 * SMS_219
+			   GG_143 = 1/6 * SMS_217 + 1/3 * SMS_218 + 1/3 * SMS_219 + 1/6 * SMS_220
+			*/
+			{
+				int *line1, *line2, *line3, *line4;
+
+				/* Setup our source lines */
+				line1 = m_line_buffer + ((sms_y + i - 1) & 0x03) * 160;
+				line2 = m_line_buffer + ((sms_y + i - 0) & 0x03) * 160;
+				line3 = m_line_buffer + ((sms_y + i + 1) & 0x03) * 160;
+				line4 = m_line_buffer + ((sms_y + i + 2) & 0x03) * 160;
+
+				UINT32 *p_bitmap = &bitmap.pix32(visarea.min_y + plot_y + i, visarea.min_x);
+
+				for (int plot_x = plot_min_x; plot_x <= plot_max_x; plot_x++)
+				{
+					rgb_t   c1 = line1[plot_x];
+					rgb_t   c2 = line2[plot_x];
+					rgb_t   c3 = line3[plot_x];
+					rgb_t   c4 = line4[plot_x];
+					p_bitmap[plot_x] =
+						rgb_t( ( c1.r() / 6 + c2.r() / 3 + c3.r() / 3 + c4.r() / 6 ),
+								( c1.g() / 6 + c2.g() / 3 + c3.g() / 3 + c4.g() / 6 ),
+								( c1.b() / 6 + c2.b() / 3 + c3.b() / 3 + c4.b() / 6 ) );
+				}
+			}
+		}
+		sms_y += 3;
+		plot_y += 2 - (plot_y - plot_y_group);
+		plot_y_group = plot_y;
+	}
+}
+
 
 UINT32 sms_state::screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-	bitmap_rgb32 &vdp_bitmap = m_vdp->get_bitmap();
-	static bool prev_bitmap_copied = false;
+	bitmap_rgb32 *source_bitmap;
+
+	if (m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode())
+	{
+		screen_gg_sms_mode_scaling(screen, m_gg_sms_mode_bitmap, cliprect);
+		source_bitmap = &m_gg_sms_mode_bitmap;
+	}
+	else
+	{
+		source_bitmap = &m_vdp->get_bitmap();
+	}
 
 	if (!m_port_persist->read())
 	{
-		copybitmap(bitmap, vdp_bitmap, 0, 0, 0, 0, cliprect);
-		if (prev_bitmap_copied)
+		copybitmap(bitmap, *source_bitmap, 0, 0, 0, 0, cliprect);
+		if (m_prev_bitmap_copied)
 		{
 			m_prev_bitmap.fill(rgb_t::black);
-			prev_bitmap_copied = false;
+			m_prev_bitmap_copied = false;
 		}
 	}
-	else if (!prev_bitmap_copied)
+	else if (!m_prev_bitmap_copied)
 	{
-		copybitmap(bitmap, vdp_bitmap, 0, 0, 0, 0, cliprect);
-		copybitmap(m_prev_bitmap, vdp_bitmap, 0, 0, 0, 0, cliprect);
-		prev_bitmap_copied = true;
+		copybitmap(bitmap, *source_bitmap, 0, 0, 0, 0, cliprect);
+		copybitmap(m_prev_bitmap, *source_bitmap, 0, 0, 0, 0, cliprect);
+		m_prev_bitmap_copied = true;
 	}
 	else
 	{
 		// HACK: fake LCD persistence effect
 		// (it would be better to generalize this in the core, to be used for all LCD systems)
-		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			UINT32 *linedst = &bitmap.pix32(y);
-			UINT32 *line0 = &vdp_bitmap.pix32(y);
+			UINT32 *line0 = &source_bitmap->pix32(y);
 			UINT32 *line1 = &m_prev_bitmap.pix32(y);
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				UINT32 color0 = line0[x];
 				UINT32 color1 = line1[x];
@@ -1236,7 +1479,7 @@ UINT32 sms_state::screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bi
 				linedst[x] = (r << 16) | (g << 8) | b;
 			}
 		}
-		copybitmap(m_prev_bitmap, vdp_bitmap, 0, 0, 0, 0, cliprect);
+		copybitmap(m_prev_bitmap, *source_bitmap, 0, 0, 0, 0, cliprect);
 	}
 	return 0;
 }

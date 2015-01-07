@@ -4,8 +4,8 @@
 
 
   - some history:
-    2014-12-01 Mike Saarna, Robert Tuccitto Implemented "colorburst kill" bit 
-	            of the MARIA CTRL register.
+    2014-12-01 Mike Saarna, Robert Tuccitto Implemented "colorburst kill" bit
+                of the MARIA CTRL register.
     2014-10-05 Mike Saarna, Robert Tuccitto Last Line DMA value corrected
                 to 6. GCC and Atari docs both show a difference between
                 Other Line and Last Line as +6 at the lowest part of the

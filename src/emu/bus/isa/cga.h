@@ -65,7 +65,7 @@ public:
 
 	UINT8   m_mode_control;  /* wo 0x3d8 */
 	UINT8   m_color_select;  /* wo 0x3d9 */
-	UINT8   m_status;        /* ro 0x3da */
+	//UINT8   m_status;   //unused?     /* ro 0x3da */
 
 	int     m_update_row_type;
 	UINT8   m_palette_lut_2bpp[4];

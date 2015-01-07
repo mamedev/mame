@@ -205,10 +205,10 @@ static MACHINE_CONFIG_FRAGMENT( vt240_motherboard )
 	MCFG_T11_INITIAL_MODE(5 << 13)
 
 /*
-	MCFG_CPU_ADD("charcpu", I8085A, XTAL_16MHz / 4)
-	MCFG_CPU_PROGRAM_MAP(vt240_char_mem)
-	MCFG_CPU_IO_MAP(vt240_char_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vt240_state, vt240_irq)
+    MCFG_CPU_ADD("charcpu", I8085A, XTAL_16MHz / 4)
+    MCFG_CPU_PROGRAM_MAP(vt240_char_mem)
+    MCFG_CPU_IO_MAP(vt240_char_io)
+    MCFG_CPU_VBLANK_INT_DRIVER("screen", vt240_state, vt240_irq)
 */
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -216,7 +216,7 @@ static MACHINE_CONFIG_FRAGMENT( vt240_motherboard )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-//	MCFG_VIDEO_START_OVERRIDE(vt240_state,vt240)
+//  MCFG_VIDEO_START_OVERRIDE(vt240_state,vt240)
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vt240)
@@ -226,17 +226,17 @@ static MACHINE_CONFIG_FRAGMENT( vt240_motherboard )
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(vt240_state, hgdc_draw_text)
 
 	MCFG_MC68681_ADD("duart", XTAL_3_6864MHz) /* 2681 duart (not 68681!) */
-//	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(dectalk_state, dectalk_duart_irq_handler))
+//  MCFG_MC68681_IRQ_CALLBACK(WRITELINE(dectalk_state, dectalk_duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-//	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(dectalk_state, dectalk_duart_txa))
-//	MCFG_MC68681_INPORT_CALLBACK(READ8(dectalk_state, dectalk_duart_input))
-//	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(dectalk_state, dectalk_duart_output))
-//	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-//	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+//  MCFG_MC68681_B_TX_CALLBACK(WRITELINE(dectalk_state, dectalk_duart_txa))
+//  MCFG_MC68681_INPORT_CALLBACK(READ8(dectalk_state, dectalk_duart_input))
+//  MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(dectalk_state, dectalk_duart_output))
+//  MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+//  MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "null_modem")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart", mc68681_device, rx_a_w))
-//	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("duart", mc68681_device, ipX_w))
+//  MCFG_RS232_DSR_HANDLER(DEVWRITELINE("duart", mc68681_device, ipX_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mc7105, vt240_state )
@@ -244,7 +244,7 @@ static MACHINE_CONFIG_START( mc7105, vt240_state )
 
 	// serial connection to MS7004 keyboard
 	MCFG_DEVICE_ADD("i8251", I8251, 0)
-//	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir1_w))
+//  MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir1_w))
 
 	MCFG_DEVICE_ADD("ms7004", MS7004, 0)
 	MCFG_MS7004_TX_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxd))

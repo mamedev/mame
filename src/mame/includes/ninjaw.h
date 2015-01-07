@@ -40,7 +40,6 @@ public:
 
 	/* misc */
 	UINT16     m_cpua_ctrl;
-	INT32      m_banknum;
 	int        m_pandata[4];
 
 	/* devices */
@@ -75,8 +74,7 @@ public:
 	UINT32 screen_update_ninjaw_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void ninjaw_postload();
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int x_offs, int y_offs );
-	void parse_control(  )   /* assumes Z80 sandwiched between 68Ks */;
-	void reset_sound_region(  );
+	void parse_control(  );
 	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, tc0100scn_device *tc0100scn);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

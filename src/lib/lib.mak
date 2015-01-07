@@ -148,6 +148,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/ep64_dsk.o    \
 	$(LIBOBJ)/formats/esq8_dsk.o    \
 	$(LIBOBJ)/formats/esq16_dsk.o   \
+	$(LIBOBJ)/formats/excali64_dsk.o\
 	$(LIBOBJ)/formats/fc100_cas.o   \
 	$(LIBOBJ)/formats/fdi_dsk.o     \
 	$(LIBOBJ)/formats/fdd_dsk.o     \
@@ -558,10 +559,20 @@ SQLITEOBJS = \
 
 $(OBJ)/libsqlite3.a: $(SQLITEOBJS)
 
+SQLITE3_FLAGS =
+ifdef SANITIZE
+ifneq (,$(findstring thread,$(SANITIZE)))
+SQLITE3_FLAGS += -fPIC
+endif
+ifneq (,$(findstring memory,$(SANITIZE)))
+SQLITE3_FLAGS += -fPIC
+endif
+endif
+
 ifeq ($(TARGETOS),linux)
 LIBS += -ldl
 endif
 
 $(LIBOBJ)/sqlite3/sqlite3.o: $(LIBSRC)/sqlite3/sqlite3.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CONLYFLAGS) -Wno-bad-function-cast -I$(LIBSRC)/sqlite3 -c $< -o $@
+	$(CC) $(CDEFS) $(CONLYFLAGS) -Wno-bad-function-cast -I$(LIBSRC)/sqlite3 $(SQLITE3_FLAGS) -c $< -o $@

@@ -13,7 +13,7 @@
       do some tight synch between the master CPU and a code simulation,but I think
       it's not worth the effort...
     - Identify and hook-up the FDC device, apparently PC-6001 and PC-6601 doesn't even use the same thing;
-    - PC-6601: mon r-0 type games doesn't seem to work at all on this version?
+    - PC-6601: mon r-0 type games doesn't seem to work at all on this system?
     - PC-6001SR: get it to boot, also implement MK-2 compatibility mode (it changes the memory map to behave like the older versions)
     - Currently rewriting the video part without the MC6847 for two reasons:
         A) the later models have a custom video chip in the place of the MC6847,
@@ -29,7 +29,7 @@
                             nothing is shown on screen, other emus behaves the same, bad dump?
     - Dawn Patrol (cart): presumably too slow;
     (Mk2 mode 5 games)
-    - 3D Golf Simulation Super Version: gameplay / inputs looks broken
+    - 3D Golf Simulation Super Version: gameplay / inputs seems broken
     - American Truck: Screen is offset at the loading screen, loading bug?
     - Castle Excellent: copyright text drawing is quite bogus, scans text in vertical instead of horizontal?
     - Dezeni Land (ALL versions) / Hurry Fox 1/2: asks you to "load something", can't do it with current cassette kludge, also, for Dezeni Land(s) keyboard irqs

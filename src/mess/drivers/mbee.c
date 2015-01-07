@@ -15,6 +15,13 @@
     TeleTerm roms dumped by ejwords. The correct slots found by ubee512 author.
     Swedish roms dumped by nama. The correct slots found by ubee512 author.
 
+    Please note: the rom version 1.31 which appears to fit the 256TC is actually
+    part of the Z80 emulation in the Matilda model. If you fit this rom into a real
+    256TC, the floppy disk will not be detected.
+
+    The unemulated Matilda is a IBM XT clone fitted with a NEC V40, and has the
+    ability to emulate the 256TC as mentioned above.
+
     Floppy Disk types (as used by ubee512)
     - ss80 - single sided 80 track
     - ds40 - double-sided 40 track - 400KB
@@ -649,6 +656,7 @@ FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( mbee_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
 
@@ -805,7 +813,7 @@ static MACHINE_CONFIG_DERIVED( mbee56, mbeeic )
 	MCFG_CPU_IO_MAP(mbee56_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee56 )
 	MCFG_WD2793x_ADD("fdc", XTAL_4MHz / 4) // divided by 2 externally, then divided by 2 internally (/ENMF pin not emulated)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbee_floppies, "35dd", mbee_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbee_floppies, "525dd", mbee_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbee_floppies, "35dd", mbee_state::floppy_formats)
 MACHINE_CONFIG_END
 
@@ -823,7 +831,7 @@ static MACHINE_CONFIG_DERIVED( mbee128, mbeeppc )
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee128 )
 	MCFG_WD2793x_ADD("fdc", XTAL_4MHz / 4)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbee_floppies, "35dd", mbee_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbee_floppies, "35dd", mbee_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbee_floppies, "525dd", mbee_state::floppy_formats)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbee256, mbee128 )
@@ -1155,12 +1163,10 @@ ROM_START( mbee256 ) // 256tc
 	ROM_REGION(0x40000,"maincpu", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x7000,"bootrom", ROMREGION_ERASEFF)
-	ROM_SYSTEM_BIOS( 0, "1.31", "Version 1.31" )
-	ROMX_LOAD("256tc_boot_1.31.rom", 0x0000,  0x4000, CRC(923baef9) SHA1(3d30d18e765439fb913fbd3e03dd5127fd6b9167), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "1.20", "Version 1.20" )
-	ROMX_LOAD("256tc_boot_1.20.rom", 0x0000,  0x4000, CRC(fe8d6a84) SHA1(a037a1b90b18a2180e9f5f216b829fcd480449a4), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 2, "1.15", "Version 1.15" )
-	ROMX_LOAD("256tc_boot_1.15.rom", 0x0000,  0x4000, CRC(1902062d) SHA1(e4a1c0b3f4996e313da0bac0edb6d34e3270723e), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 0, "1.20", "Version 1.20" )
+	ROMX_LOAD("256tc_boot_1.20.rom", 0x0000,  0x4000, CRC(fe8d6a84) SHA1(a037a1b90b18a2180e9f5f216b829fcd480449a4), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "1.15", "Version 1.15" )
+	ROMX_LOAD("256tc_boot_1.15.rom", 0x0000,  0x4000, CRC(1902062d) SHA1(e4a1c0b3f4996e313da0bac0edb6d34e3270723e), ROM_BIOS(2) )
 
 	ROM_REGION(0x9800, "gfx", 0)
 	ROM_LOAD("char256.bin",           0x1000,  0x1000, CRC(9372af3c) SHA1(a63591822c0504de2fed52e88d64e1dbd6124b74) )

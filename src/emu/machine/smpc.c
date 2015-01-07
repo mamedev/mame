@@ -171,7 +171,7 @@ void saturn_state::stv_select_game(int gameno)
 		if (m_cart_reg[gameno] && m_cart_reg[gameno]->base())
 			memcpy(memregion("abus")->base(), m_cart_reg[gameno]->base(), 0x3000000);
 		else
-			memset(memregion("abus")->base(), 0x00, 0x3000000);
+			memset(memregion("abus")->base(), 0x00, 0x3000000); // TODO: 1-filled?
 
 		m_prev_bankswitch = gameno;
 	}
@@ -415,6 +415,8 @@ void saturn_state::smpc_keyboard(UINT8 pad_num, UINT8 offset)
 	m_smpc.OREG[2+pad_num*offset] = game_key>>8; // game buttons, TODO
 	m_smpc.OREG[3+pad_num*offset] = game_key & 0xff;
 	/*
+	    Keyboard Status hook-up
+	    TODO: how shift key actually works? EGWord uses it in order to switch between hiragana and katakana modes.
 	    x--- ---- 0
 	    -x-- ---- caps lock
 	    --x- ---- num lock
@@ -425,7 +427,19 @@ void saturn_state::smpc_keyboard(UINT8 pad_num, UINT8 offset)
 	    ---- ---x Break key
 	*/
 	m_smpc.OREG[4+pad_num*offset] = m_keyb.status | 6;
-	m_smpc.OREG[5+pad_num*offset] = m_keyb.data;
+	if(m_keyb.prev_data != m_keyb.data)
+	{
+		m_smpc.OREG[5+pad_num*offset] = m_keyb.data;
+		m_keyb.repeat_count = 0;
+		m_keyb.prev_data = m_keyb.data;
+	}
+	else
+	{
+		/* Very crude repeat support */
+		m_keyb.repeat_count ++;
+		m_keyb.repeat_count = m_keyb.repeat_count > 32 ? 32 : m_keyb.repeat_count;
+		m_smpc.OREG[5+pad_num*offset] = (m_keyb.repeat_count == 32) ? m_keyb.data : 0;
+	}
 }
 
 void saturn_state::smpc_mouse(UINT8 pad_num, UINT8 offset, UINT8 id)

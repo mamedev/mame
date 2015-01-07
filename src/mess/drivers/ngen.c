@@ -4,18 +4,18 @@
 
     10-11-14 - Skeleton driver
 
-	Interrupts based on patents:
-	level 1 - SIO
-	level 3 - timer (from PIT, presumably channel 0? Patent says "channel 3")
-	level 4 - "interrupt detector" - keyboard, printer, RTC
-	level 7 - floppy/hard disk
+    Interrupts based on patents:
+    level 1 - SIO
+    level 3 - timer (from PIT, presumably channel 0? Patent says "channel 3")
+    level 4 - "interrupt detector" - keyboard, printer, RTC
+    level 7 - floppy/hard disk
 
-	DMA channels:
-	channel 0 - communications (RS-232)
-	channel 1 - X-Bus expansion modules (except disk and graphics)
-	channel 2 - graphics?
-	channel 3 - hard disk
-	
+    DMA channels:
+    channel 0 - communications (RS-232)
+    channel 1 - X-Bus expansion modules (except disk and graphics)
+    channel 2 - graphics?
+    channel 3 - hard disk
+
     To get to "menu mode", press Space quickly after reset (might need good timing)
     The bootstrap ROM version number is displayed, along with "B,D,L,M,P,T:"
     You can press one of these keys for the following tests:
@@ -33,18 +33,18 @@
     T: Type of Operating System
        Gives an "OS:" prompt, at which you can enter the number of the system image to
        load at the master workstation.
-       
+
     Panel Debugger:
     - Open/Modify RAM
     Enter an address (seg:off) followed by a forward-slash, the contents of this word will
     appear, you can enter a value to set it to, or just press Next (default: Enter) to leave
-    it as is.  It will then go on to the next word.  Pressing Return (scan code unknown 
+    it as is.  It will then go on to the next word.  Pressing Return (scan code unknown
     currently) will return to the debugger prompt.
     - Open/Modify Register
     Enter the register only, and the contents will appear, you can leave it or alter it (you
     must enter all digits (eg: 0A03 if you're modifying DX) then press Return.
     - I/O to or from a port
-    Input: Address (segment is ignored, and not required) followed by I, a byte is read from 
+    Input: Address (segment is ignored, and not required) followed by I, a byte is read from
     the port defined by the offset, and the byte is displayed.
     Output: Address followed by O, you are now prompted with an '='.  Enter the byte to send
     to the port, and press Return.
@@ -52,7 +52,7 @@
     Enter an address (seg:off) followed by H.  Sets a haltpoint at the specified address.  Does
     not work for ROM addresses.  Only one allowed at a time.  Haltpoint info is stored at
     0000:01F0.  Uses a software interrupt (INT 7C), rather than INT 3.
-    
+
     To start or continue from the current address, enter P.
     To start from a specific address, enter the address (seg:off) followed by a G.
 */
@@ -120,12 +120,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE8_MEMBER(fdc_control_w);
+	DECLARE_READ8_MEMBER(irq_cb);
 
 protected:
 	virtual void machine_reset();
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<i80186_cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<i8251_device> m_viduart;
 	required_device<upd7201_device> m_iouart;
@@ -150,6 +151,19 @@ private:
 	UINT16 m_control;
 };
 
+class ngen386_state : public driver_device
+{
+public:
+	ngen386_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu"),
+		m_pic(*this,"pic")
+		{}
+private:
+	required_device<i386_device> m_maincpu;
+	required_device<pic8259_device> m_pic;
+};
+
 WRITE_LINE_MEMBER(ngen_state::pit_out0_w)
 {
 	m_pic->ir3_w(state);  // Timer interrupt
@@ -167,7 +181,7 @@ WRITE_LINE_MEMBER(ngen_state::pit_out2_w)
 {
 	m_iouart->rxca_w(state);
 	m_iouart->txca_w(state);
-	//logerror("PIT Timer 2 state %i\n",state);
+	popmessage("PIT Timer 2 state %i\n",state);
 }
 
 WRITE_LINE_MEMBER(ngen_state::cpu_timer_w)
@@ -244,21 +258,20 @@ WRITE16_MEMBER(ngen_state::peripheral_w)
 		if(mem_mask & 0x00ff)
 			m_dma_offset[offset-0x80] = data & 0xff;
 		break;
+	case 0x10c:
+		if(mem_mask & 0x00ff)
+			m_pic->write(space,0,data & 0xff);
+		break;
+	case 0x10d:
+		if(mem_mask & 0x00ff)
+			m_pic->write(space,1,data & 0xff);
+		break;
 	case 0x110:
-		if(mem_mask & 0x00ff)
-			m_pit->write(space,0,data & 0x0ff);
-		break;
 	case 0x111:
-		if(mem_mask & 0x00ff)
-			m_pit->write(space,1,data & 0x0ff);
-		break;
 	case 0x112:
-		if(mem_mask & 0x00ff)
-			m_pit->write(space,2,data & 0x0ff);
-		break;
 	case 0x113:
 		if(mem_mask & 0x00ff)
-			m_pit->write(space,3,data & 0x0ff);
+			m_pit->write(space,offset-0x110,data & 0xff);
 		break;
 	case 0x141:
 		// bit 1 enables speaker?
@@ -320,21 +333,20 @@ READ16_MEMBER(ngen_state::peripheral_r)
 		if(mem_mask & 0x00ff)
 			ret = m_dma_offset[offset-0x80] & 0xff;
 		break;
+	case 0x10c:
+		if(mem_mask & 0x00ff)
+			ret = m_pic->read(space,0);
+		break;
+	case 0x10d:
+		if(mem_mask & 0x00ff)
+			ret = m_pic->read(space,1);
+		break;
 	case 0x110:
-		if(mem_mask & 0x00ff)
-			ret = m_pit->read(space,0);
-		break;
 	case 0x111:
-		if(mem_mask & 0x00ff)
-			ret = m_pit->read(space,1);
-		break;
 	case 0x112:
-		if(mem_mask & 0x00ff)
-			ret = m_pit->read(space,2);
-		break;
 	case 0x113:
 		if(mem_mask & 0x00ff)
-			ret = m_pit->read(space,3);
+			ret = m_pit->read(space,offset-0x110);
 		break;
 	case 0x141:
 		ret = m_periph141;
@@ -358,10 +370,6 @@ READ16_MEMBER(ngen_state::peripheral_r)
 		break;
 	case 0x1a0:  // I/O control register?
 		ret = m_control;  // end of DMA transfer? (maybe a per-channel EOP?) Bit 6 is set during a transfer?
-		break;
-	case 0x1b1:
-		ret = 0;
-		ret |= 0x02;  // also checked after DMA transfer ends
 		break;
 	default:
 		logerror("(PC=%06x) Unknown 80186 peripheral read offset %04x mask %04x returning %04x\n",m_maincpu->device_t::safe_pc(),offset,mem_mask,ret);
@@ -481,6 +489,11 @@ MC6845_UPDATE_ROW( ngen_state::crtc_update_row )
 	}
 }
 
+READ8_MEMBER( ngen_state::irq_cb )
+{
+	return m_pic->acknowledge();
+}
+
 void ngen_state::machine_reset()
 {
 	m_port00 = 0;
@@ -502,6 +515,7 @@ static ADDRESS_MAP_START( ngen_io, AS_IO, 16, ngen_state )
 	AM_RANGE(0x0000, 0x0001) AM_READWRITE(port00_r,port00_w)
 	AM_RANGE(0x0100, 0x0107) AM_DEVREADWRITE8("fdc",wd2797_t,read,write,0x00ff)  // a guess for now
 	AM_RANGE(0x0108, 0x0109) AM_WRITE8(fdc_control_w,0x00ff)
+	AM_RANGE(0x0110, 0x0117) AM_DEVREADWRITE8("fdc_timer",pit8253_device,read,write,0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ngen386_mem, AS_PROGRAM, 32, ngen_state )
@@ -538,8 +552,9 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	MCFG_CPU_IO_MAP(ngen_io)
 	MCFG_80186_CHIP_SELECT_CB(WRITE16(ngen_state, cpu_peripheral_cb))
 	MCFG_80186_TMROUT1_HANDLER(WRITELINE(ngen_state, cpu_timer_w))
+	MCFG_80186_IRQ_SLAVE_ACK(READ8(ngen_state, irq_cb))
 
-	MCFG_PIC8259_ADD( "pic", INPUTLINE("maincpu", 0), VCC, NULL )
+	MCFG_PIC8259_ADD( "pic", DEVWRITELINE("maincpu",i80186_cpu_device,int0_w), VCC, NULL )
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
 	MCFG_PIT8253_CLK0(78120/4)  // 19.53kHz, /4 of the CPU timer output?
@@ -609,7 +624,7 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("keyboard", rs232_port_device, write_txd))
 	MCFG_RS232_PORT_ADD("keyboard", keyboard, "ngen")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("videouart", i8251_device, write_rxd))
-	
+
 	MCFG_DEVICE_ADD("refresh_clock", CLOCK, 19200*16)  // should be 19530Hz
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(ngen_state,timer_clk_out))
 
@@ -619,16 +634,23 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("maincpu",i80186_cpu_device,drq1_w))
 	MCFG_WD_FDC_FORCE_READY
 	MCFG_DEVICE_ADD("fdc_timer", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_20MHz / 20)
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic",pic8259_device,ir4_w))
+	MCFG_PIT8253_CLK1(XTAL_20MHz / 20)
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pic",pic8259_device,ir4_w))
+	MCFG_PIT8253_CLK2(XTAL_20MHz / 20)
+	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pic",pic8259_device,ir4_w))
 	// TODO: WD1010 HDC (not implemented)
 	MCFG_DEVICE_ADD("hdc_timer", PIT8253, 0)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ngen_floppies, "525qd", floppy_image_device::default_floppy_formats)
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ngen386, ngen )
-	MCFG_CPU_REPLACE("maincpu", I386, XTAL_50MHz / 2)
+static MACHINE_CONFIG_START( ngen386, ngen386_state )
+	MCFG_CPU_ADD("maincpu", I386, XTAL_50MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(ngen386_mem)
 	MCFG_CPU_IO_MAP(ngen386_io)
+	MCFG_PIC8259_ADD( "pic", INPUTLINE("maincpu", 0), VCC, NULL )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( 386i, ngen386 )
@@ -640,10 +662,10 @@ ROM_START( ngen )
 	ROM_REGION( 0x2000, "bios", 0)
 	ROM_LOAD16_BYTE( "72-00414_80186_cpu.bin",  0x000000, 0x001000, CRC(e1387a03) SHA1(ddca4eba67fbf8b731a8009c14f6b40edcbc3279) )  // bootstrap ROM v8.4
 	ROM_LOAD16_BYTE( "72-00415_80186_cpu.bin",  0x000001, 0x001000, CRC(a6dde7d9) SHA1(b4d15c1bce31460ab5b92ff43a68c15ac5485816) )
-	
+
 	ROM_REGION( 0x1000, "disk", 0)
 	ROM_LOAD( "72-00422_10mb_disk.bin", 0x000000, 0x001000,  CRC(f5b046b6) SHA1(b303c6f6aa40504016de9826879bc316e44389aa) )
-	
+
 	ROM_REGION( 0x20, "disk_prom", 0)
 	ROM_LOAD( "72-00422_10mb_disk_15d.bin", 0x000000, 0x000020,  CRC(121ee494) SHA1(9a8d3c336cc7378a71f9d48c99f88515eb236fbf) )
 ROM_END

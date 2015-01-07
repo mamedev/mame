@@ -13,7 +13,7 @@
 const device_type SEGA315_5313 = &device_creator<sega315_5313_device>;
 
 sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: sega315_5124_device( mconfig, SEGA315_5246, "Sega 315-5313 (Genesis VDP)", tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true, "sega315_5313", __FILE__),
+	: sega315_5124_device(mconfig, SEGA315_5313, "Sega 315-5313 Megadrive VDP", tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true, "sega315_5313", __FILE__),
 	m_sndirqline_callback(*this),
 	m_lv6irqline_callback(*this),
 	m_lv4irqline_callback(*this),

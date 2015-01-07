@@ -7,9 +7,7 @@
     - Devil Paradise
     - Hash Block, Jacky Lucky, Challenger Tank, Brain Power (4-in-1)
     - Jade Legend
-    - Jouney to the West
     - Lucky Jack (Jacky Lucky clone or a name mistake?)
-    - MahJongg (SV10012)
     - Money Bee
     - Pacific Bomber
     - USA Sea Battle
@@ -517,6 +515,20 @@
 		</part>
 	</software>
 
+	<software name="mjleitai">
+		<description>Mahjang Leitai</description>
+		<year>1992</year>
+		<publisher>Bon Treasure</publisher>
+		<info name="serial" value="SV10012" />
+		<info name="alt_title" value="麻将擂台" />
+
+		<part name="cart" interface="svision_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="sv10012.bin" size="65536" crc="96e2e6d7" sha1="9eef723f67a91fabf3ddda6411204883c50f8574" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mattablt">
 		<description>Matta Blatta (Euro, USA)</description>
 		<year>199?</year>
@@ -820,6 +832,19 @@
 		<part name="cart" interface="svision_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="wittycat.bin" size="65536" crc="24a115f9" sha1="f5476f1c663d34c3dda2bc6e9631e6f2dc661e1d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="jrnywest" supported="no">
+		<description>Jouney to the West</description>
+		<year>199?</year>
+		<publisher>Watara?</publisher>
+
+		<part name="cart" interface="svision_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="journeytothewest.bin" size="524288" crc="9fb4db9a" sha1="548dd9165edd4bc1d1f2c2b5dc519574b7f43f3b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

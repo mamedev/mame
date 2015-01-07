@@ -48,6 +48,7 @@
 #include "machine/atarifdc.h"
 #include "bus/a800/a800_slot.h"
 #include "bus/a800/a800_carts.h"
+#include "bus/a8sio/a8sio.h"
 
 
 /******************************************************************************
@@ -2075,6 +2076,7 @@ WRITE8_MEMBER(a400_state::a800xl_pia_pb_w)
  *
  **************************************************************/
 
+
 static MACHINE_CONFIG_START( atari_common_nodac, a400_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, FREQ_17_EXACT)
@@ -2094,7 +2096,12 @@ static MACHINE_CONFIG_START( atari_common_nodac, a400_state )
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("djoy_0_1"))
 	MCFG_PIA_READPB_HANDLER(IOPORT("djoy_2_3"))
+	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("a8sio", a8sio_device, motor_w))
 	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("fdc", atari_fdc_device, pia_cb2_w))
+
+	MCFG_DEVICE_ADD("a8sio", A8SIO, 0)
+	MCFG_A8SIO_DATA_IN_CB(DEVWRITELINE("pokey", pokey_device, sid_w))
+	MCFG_A8SIO_SLOT_ADD("a8sio", "sio", NULL)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

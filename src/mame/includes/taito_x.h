@@ -6,7 +6,6 @@ public:
 	taitox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: seta_state(mconfig, type, tag) { }
 
-	int m_banknum;
 	DECLARE_READ16_MEMBER(superman_dsw_input_r);
 	DECLARE_READ16_MEMBER(daisenpu_input_r);
 	DECLARE_WRITE16_MEMBER(daisenpu_input_w);
@@ -15,7 +14,6 @@ public:
 	DECLARE_DRIVER_INIT(kyustrkr);
 	DECLARE_MACHINE_START(taitox);
 	DECLARE_MACHINE_START(superman);
-	void reset_sound_region();
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 
 	// superman c-chip

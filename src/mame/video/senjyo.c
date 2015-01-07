@@ -114,35 +114,30 @@ void senjyo_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(senjyo_state::senjyo_fgvideoram_w)
+WRITE8_MEMBER(senjyo_state::fgvideoram_w)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
-WRITE8_MEMBER(senjyo_state::senjyo_fgcolorram_w)
+WRITE8_MEMBER(senjyo_state::fgcolorram_w)
 {
 	m_fgcolorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
-WRITE8_MEMBER(senjyo_state::senjyo_bg1videoram_w)
+WRITE8_MEMBER(senjyo_state::bg1videoram_w)
 {
 	m_bg1videoram[offset] = data;
 	m_bg1_tilemap->mark_tile_dirty(offset);
 }
-WRITE8_MEMBER(senjyo_state::senjyo_bg2videoram_w)
+WRITE8_MEMBER(senjyo_state::bg2videoram_w)
 {
 	m_bg2videoram[offset] = data;
 	m_bg2_tilemap->mark_tile_dirty(offset);
 }
-WRITE8_MEMBER(senjyo_state::senjyo_bg3videoram_w)
+WRITE8_MEMBER(senjyo_state::bg3videoram_w)
 {
 	m_bg3videoram[offset] = data;
 	m_bg3_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE8_MEMBER(senjyo_state::senjyo_bgstripes_w)
-{
-	*m_bgstripesram = data;
 }
 
 /***************************************************************************
@@ -153,28 +148,25 @@ WRITE8_MEMBER(senjyo_state::senjyo_bgstripes_w)
 
 void senjyo_state::draw_bgbitmap(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	int x,y,pen,strwid,count;
-
-
 	if (m_bgstripes == 0xff) /* off */
 		bitmap.fill(0, cliprect);
 	else
 	{
 		int flip = flip_screen();
 
-		pen = 0;
-		count = 0;
-		strwid = m_bgstripes;
+		int pen = 0;
+		int count = 0;
+		int strwid = m_bgstripes;
 		if (strwid == 0) strwid = 0x100;
 		if (flip) strwid ^= 0xff;
 
-		for (x = 0;x < 256;x++)
+		for (int x = 0;x < 256;x++)
 		{
 			if (flip)
-				for (y = 0;y < 256;y++)
+				for (int y = 0;y < 256;y++)
 					bitmap.pix16(y, 255 - x) = 384 + pen;
 			else
-				for (y = 0;y < 256;y++)
+				for (int y = 0;y < 256;y++)
 					bitmap.pix16(y, x) = 384 + pen;
 
 			count += 0x10;
@@ -189,10 +181,8 @@ void senjyo_state::draw_bgbitmap(bitmap_ind16 &bitmap,const rectangle &cliprect)
 
 void senjyo_state::draw_radar(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	int offs,x;
-
-	for (offs = 0;offs < 0x400;offs++)
-		for (x = 0;x < 8;x++)
+	for (int offs = 0;offs < 0x400;offs++)
+		for (int x = 0;x < 8;x++)
 			if (m_radarram[offs] & (1 << x))
 			{
 				int sx, sy;
@@ -213,26 +203,23 @@ void senjyo_state::draw_radar(bitmap_ind16 &bitmap,const rectangle &cliprect)
 
 void senjyo_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int priority)
 {
-	UINT8 *spriteram = m_spriteram;
-	int offs;
-
-	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int big,sx,sy,flipx,flipy;
 
-		if (((spriteram[offs+1] & 0x30) >> 4) == priority)
+		if (((m_spriteram[offs+1] & 0x30) >> 4) == priority)
 		{
 			if (m_is_senjyo) /* Senjyo */
-				big = (spriteram[offs] & 0x80);
+				big = (m_spriteram[offs] & 0x80);
 			else    /* Star Force */
-				big = ((spriteram[offs] & 0xc0) == 0xc0);
-			sx = spriteram[offs+3];
+				big = ((m_spriteram[offs] & 0xc0) == 0xc0);
+			sx = m_spriteram[offs+3];
 			if (big)
-				sy = 224-spriteram[offs+2];
+				sy = 224-m_spriteram[offs+2];
 			else
-				sy = 240-spriteram[offs+2];
-			flipx = spriteram[offs+1] & 0x40;
-			flipy = spriteram[offs+1] & 0x80;
+				sy = 240-m_spriteram[offs+2];
+			flipx = m_spriteram[offs+1] & 0x40;
+			flipy = m_spriteram[offs+1] & 0x80;
 
 			if (flip_screen())
 			{
@@ -253,32 +240,28 @@ void senjyo_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,i
 
 
 			m_gfxdecode->gfx(big ? 5 : 4)->transpen(bitmap,cliprect,
-					spriteram[offs],
-					spriteram[offs + 1] & 0x07,
+					m_spriteram[offs],
+					m_spriteram[offs + 1] & 0x07,
 					flipx,flipy,
 					sx,sy,0);
 		}
 	}
 }
 
-UINT32 senjyo_state::screen_update_senjyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 senjyo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
-
-
 	/* two colors for the radar dots (verified on the real board) */
 	m_palette->set_pen_color(512,rgb_t(0xff,0x00,0x00));  /* red for enemies */
 	m_palette->set_pen_color(513,rgb_t(0xff,0xff,0x00));  /* yellow for player */
 
 	{
 		int flip = flip_screen();
-		int scrollx,scrolly;
 
-		for (i = 0;i < 32;i++)
+		for (int i = 0;i < 32;i++)
 			m_fg_tilemap->set_scrolly(i, m_fgscroll[i]);
 
-		scrollx = m_scrollx1[0];
-		scrolly = m_scrolly1[0] + 256 * m_scrolly1[1];
+		int scrollx = m_scrollx1[0];
+		int scrolly = m_scrolly1[0] + 256 * m_scrolly1[1];
 		if (flip)
 			scrollx = -scrollx;
 		m_bg1_tilemap->set_scrollx(0, scrollx);

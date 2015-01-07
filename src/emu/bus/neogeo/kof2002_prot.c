@@ -8,7 +8,7 @@ extern const device_type KOF2002_PROT = &device_creator<kof2002_prot_device>;
 
 
 kof2002_prot_device::kof2002_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, KOF2002_PROT, "NeoGeo KOF2002 Protection Device", tag, owner, clock, "kof2002_prot", __FILE__)
+	: device_t(mconfig, KOF2002_PROT, "NeoGeo Protection (KOF2002)", tag, owner, clock, "kof2002_prot", __FILE__)
 {
 }
 

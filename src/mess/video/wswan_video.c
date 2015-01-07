@@ -69,6 +69,7 @@ void wswan_video_device::common_save()
 	save_item(NAME(m_timer_hblank_enable));
 	save_item(NAME(m_timer_hblank_mode));
 	save_item(NAME(m_timer_hblank_reload));
+	save_item(NAME(m_timer_hblank_count));
 	save_item(NAME(m_timer_vblank_enable));
 	save_item(NAME(m_timer_vblank_mode));
 	save_item(NAME(m_timer_vblank_reload));
@@ -1153,7 +1154,7 @@ void wswan_video_device::scanline_interrupt()
 			else
 				m_timer_hblank_reload = 0;
 
-			logerror( "trigerring hbltmr interrupt\n" );
+			logerror( "triggering hbltmr interrupt\n" );
 			m_set_irq_cb(WSWAN_VIDEO_IFLAG_HBLTMR);
 		}
 	}

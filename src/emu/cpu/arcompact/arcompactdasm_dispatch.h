@@ -12,8 +12,7 @@
 
 #define GET_LIMM_32 \
 	limm = oprom[6] | (oprom[7] << 8); \
-	limm |= (oprom[4] << 16) | (oprom[5] << 24); \
-
+	limm |= (oprom[4] << 16) | (oprom[5] << 24);
 
 
 int arcompact_handle00_dasm(DASM_OPS_32);
@@ -26,6 +25,10 @@ int arcompact_handle04_dasm(DASM_OPS_32);
 int arcompact_handle04_2f_dasm(DASM_OPS_32);
 int arcompact_handle04_2f_3f_dasm(DASM_OPS_32);
 int arcompact_handle05_dasm(DASM_OPS_32);
+
+int arcompact_handle05_2f_dasm(DASM_OPS_32);
+int arcompact_handle05_2f_3f_dasm(DASM_OPS_32);
+
 
 int arcompact_handle0c_dasm(DASM_OPS_16);
 int arcompact_handle0d_dasm(DASM_OPS_16);

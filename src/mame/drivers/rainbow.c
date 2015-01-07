@@ -48,7 +48,7 @@ Notes:
       2018        - 2kx8 SRAM (sprite RAM)
       4556        - NEC uPC4556 dual operational amplifier IC (DIP8)
       TL074       - Texas Instruments TL074 low noise j-fet quad operational amplifier (DIP14)
-      YM3102      - Yamaha YM3012 2-channel serial input floating DAC (DIP16)
+      YM3012      - Yamaha YM3012 2-channel serial input floating DAC (DIP16)
       MB3735      - Fujitsu MB3735 20 watt BTL audio power amplifier (SIP9)
       PC080SN     - Taito custom tilemap generator IC (connected to 43256 SRAM)
       PC0900J     - Taito custom sprite generator IC (connected to 2018 SRAM)

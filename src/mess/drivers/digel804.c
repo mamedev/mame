@@ -20,11 +20,8 @@
 *  hook up keypad via 74C923 and mode buttons via logic gate mess
 *
 *  TODO:
+*  remove ACIA hack in digel804_state::acia_command_w
 *  minor finishing touches to i/o map
-*  hook up 6551/ACIA interrupt (currently ACIA device doesn't have a callback for /IRQ line)
-*  attach terminal to 6551/ACIA serial for recieving from ep804
-*  correctly hook up 10937 vfd controller: por is not hooked up (relates to /MEMEN)
-*  SCLK line should be handled inside the 10937 device
 *  EPROM socket stuff (ports 0x40, 0x41, 0x42 and 0x47)
 *  artwork
 *
@@ -59,15 +56,14 @@
 /* Core includes */
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/terminal.h"
 #include "sound/speaker.h"
 #include "machine/roc10937.h"
 #include "machine/mos6551.h"
 #include "machine/mm74c922.h"
 #include "machine/ram.h"
+#include "bus/rs232/rs232.h"
 #include "digel804.lh"
 
-#define TERMINAL_TAG "terminal"
 
 class digel804_state : public driver_device
 {
@@ -75,22 +71,22 @@ public:
 	digel804_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG),
 		m_speaker(*this, "speaker"),
 		m_acia(*this, "acia"),
 		m_vfd(*this, "vfd"),
 		m_kb(*this, "74c923"),
-		m_ram(*this, RAM_TAG)
+		m_ram(*this, RAM_TAG),
+		m_rambank(*this, "bankedram")
 	{
 	}
 
 	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<mos6551_device> m_acia;
 	required_device<roc10937_t> m_vfd;
 	required_device<mm74c922_device> m_kb;
 	required_device<ram_device> m_ram;
+	required_memory_bank m_rambank;
 
 	virtual void machine_reset();
 	DECLARE_DRIVER_INIT(digel804);
@@ -115,13 +111,14 @@ public:
 	DECLARE_WRITE8_MEMBER( acia_command_w );
 	DECLARE_READ8_MEMBER( acia_control_r );
 	DECLARE_WRITE8_MEMBER( acia_control_w );
+	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( ep804_acia_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( da_w );
 	DECLARE_INPUT_CHANGED_MEMBER(mode_change);
 	// current speaker state for port 45
 	UINT8 m_speaker_state;
 	// ram stuff for banking
 	UINT8 m_ram_bank;
-	//required_shared_ptr<UINT8> m_main_ram;
 	// states
 	UINT8 m_acia_intq;
 	UINT8 m_overload_state;
@@ -133,7 +130,6 @@ public:
 	UINT8 m_chipinsert_state;
 	UINT8 m_keyen_state;
 	UINT8 m_op41;
-	DECLARE_WRITE8_MEMBER(digel804_serial_put);
 };
 
 
@@ -156,7 +152,7 @@ DRIVER_INIT_MEMBER(digel804_state,digel804)
 	m_op41 = 0;
 	m_keyen_state = 1; // /KEYEN
 
-	membank( "bankedram" )->set_base(m_ram->pointer());
+	m_rambank->set_base(m_ram->pointer());
 }
 
 void digel804_state::machine_reset()
@@ -236,7 +232,7 @@ READ8_MEMBER( digel804_state::ip43 )
 WRITE8_MEMBER( digel804_state::op00 )
 {
 	m_ram_bank = data;
-	membank( "bankedram" )->set_base(m_ram->pointer() + ((m_ram_bank * 0x8000) & m_ram->mask()));
+	m_rambank->set_base(m_ram->pointer() + ((m_ram_bank * 0x8000) & m_ram->mask()));
 }
 
 WRITE8_MEMBER( digel804_state::op43 )
@@ -257,7 +253,7 @@ WRITE8_MEMBER( digel804_state::op43 )
 	if ((data&0xF8)!=0)
 		logerror("Digel804: port 0x43 ram bank had unexpected data %02x written to it!\n", data);
 
-	membank( "bankedram" )->set_base(m_ram->pointer() + ((m_ram_bank * 0x8000) & m_ram->mask()));
+	m_rambank->set_base(m_ram->pointer() + ((m_ram_bank * 0x8000) & m_ram->mask()));
 }
 
 WRITE8_MEMBER( digel804_state::op43_1_4 )
@@ -372,6 +368,8 @@ INPUT_CHANGED_MEMBER( digel804_state::mode_change )
 				m_sim_mode = 0;
 				break;
 		}
+
+		m_acia->reset();
 	}
 
 	// press one of those keys reset the Z80
@@ -406,6 +404,8 @@ READ8_MEMBER( digel804_state::acia_command_r )
 
 WRITE8_MEMBER( digel804_state::acia_command_w )
 {
+	data |= 0x08;   // HACK for ep804 remote mode
+
 	m_acia->write(space, 2, data);
 }
 
@@ -458,7 +458,7 @@ static ADDRESS_MAP_START(z80_io_1_4, AS_IO, 8, digel804_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// io bits: x 1 x x x * * *
 	// writes to 47, 4e, 57, 5e, 67, 6e, 77, 7e, c7, ce, d7, de, e7, ee, f7, fe all go to 47, same with reads
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xB8) AM_WRITE(op00) // W, banked ram
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x38) AM_WRITE(op00) // W, banked ram
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0xB8) AM_READWRITE(ip40, op40) // RW, eprom socket data bus input/output value
 	AM_RANGE(0x41, 0x41) AM_MIRROR(0xB8) AM_WRITE(op41) // W, eprom socket address low out
 	AM_RANGE(0x42, 0x42) AM_MIRROR(0xB8) AM_WRITE(op42) // W, eprom socket address hi/control out
@@ -553,18 +553,33 @@ static INPUT_PORTS_START( digel804 )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static DEVICE_INPUT_DEFAULTS_START( digel804_rs232_defaults )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_ODD )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+DEVICE_INPUT_DEFAULTS_END
+
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-WRITE8_MEMBER(digel804_state::digel804_serial_put)
-{
-	//m_acia->receive_character(data);
-}
 
 WRITE_LINE_MEMBER( digel804_state::da_w )
 {
-	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 	m_key_intq = state ? 0 : 1;
+	m_maincpu->set_input_line(0, (m_key_intq & m_acia_intq) ? CLEAR_LINE : ASSERT_LINE);
+}
+
+WRITE_LINE_MEMBER( digel804_state::acia_irq_w )
+{
+	m_acia_intq = state ? 0 : 1;
+	m_maincpu->set_input_line(0, (m_key_intq & m_acia_intq) ? CLEAR_LINE : ASSERT_LINE);
+}
+
+WRITE_LINE_MEMBER( digel804_state::ep804_acia_irq_w )
+{
 }
 
 static MACHINE_CONFIG_START( digel804, digel804_state )
@@ -577,9 +592,6 @@ static MACHINE_CONFIG_START( digel804, digel804_state )
 	MCFG_ROC10937_ADD("vfd",0) // RIGHT_TO_LEFT
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(digel804_state, digel804_serial_put))
-
 	MCFG_DEFAULT_LAYOUT(layout_digel804)
 
 	MCFG_DEVICE_ADD("74c923", MM74C923, 0)
@@ -591,7 +603,18 @@ static MACHINE_CONFIG_START( digel804, digel804_state )
 
 	/* acia */
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL_3_6864MHz/2)
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(digel804_state, acia_irq_w))
+	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_MOS6551_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "null_modem")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", mos6551_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia", mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", mos6551_device, write_cts))
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("null_modem", digel804_rs232_defaults)
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", digel804_rs232_defaults)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")
@@ -608,6 +631,9 @@ static MACHINE_CONFIG_DERIVED( ep804, digel804 )
 	MCFG_CPU_MODIFY("maincpu")  /* Z80, X1(aka E0 on schematics): 3.6864Mhz */
 	MCFG_CPU_PROGRAM_MAP(z80_mem_804_1_2)
 	MCFG_CPU_IO_MAP(z80_io_1_2)
+
+	MCFG_DEVICE_MODIFY("acia")
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(digel804_state, ep804_acia_irq_w))
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
@@ -676,17 +702,17 @@ ROM_START(ep804) // address mapper 804-1-2
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_DEFAULT_BIOS("ep804_v1.6")
 	ROM_SYSTEM_BIOS( 0, "ep804_v1.6", "Wavetek/Digelec EP804 FWv1.6") // hardware 1.1
-	ROMX_LOAD("804-2__rev_1.6__07f7.hn482764g-4.d41", 0x0000, 0x2000, CRC(2D4C334C) SHA1(1BE70ED5F4F315A8D2E38A17327A049E00FA174E), ROM_BIOS(1))
-	ROMX_LOAD("804-3__rev_1.6__265c.hn482764g-4.d42", 0x2000, 0x2000, CRC(9C14906B) SHA1(41996039E604011C7C0F757397F82B6479EE3F62), ROM_BIOS(1))
+	ROMX_LOAD("804-2__rev_1.6__07f7.hn482764g-4.d41", 0x0000, 0x2000, CRC(2d4c334c) SHA1(1be70ed5f4f315a8d2e38a17327a049e00fa174e), ROM_BIOS(1))
+	ROMX_LOAD("804-3__rev_1.6__265c.hn482764g-4.d42", 0x2000, 0x2000, CRC(9c14906b) SHA1(41996039e604011c7c0f757397f82b6479ee3f62), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "ep804_v1.4", "Wavetek/Digelec EP804 FWv1.4") // hardware 1.1
-	ROMX_LOAD("804-2_rev_1.4__7a7e.hn482764g-4.d41", 0x0000, 0x2000, CRC(FDC0D2E3) SHA1(DA1BC1E8C4CB2A2D8CD2273F3E1A9F318AE8CB87), ROM_BIOS(2))
-	ROMX_LOAD("804-3_rev_1.4__f240.2732.d42", 0x2000, 0x1000, CRC(29827E29) SHA1(4C7FADF81BCF32349A564D946F5D215DE50315C5), ROM_BIOS(2))
-	ROMX_LOAD("804-3_rev_1.4__f240.2732.d42", 0x3000, 0x1000, CRC(29827E29) SHA1(4C7FADF81BCF32349A564D946F5D215DE50315C5), ROM_BIOS(2)) // load this twice
+	ROMX_LOAD("804-2_rev_1.4__7a7e.hn482764g-4.d41", 0x0000, 0x2000, CRC(fdc0d2e3) SHA1(da1bc1e8c4cb2a2d8cd2273f3e1a9f318ae8cb87), ROM_BIOS(2))
+	ROMX_LOAD("804-3_rev_1.4__f240.2732.d42", 0x2000, 0x1000, CRC(29827e29) SHA1(4c7fadf81bcf32349a564d946f5d215de50315c5), ROM_BIOS(2))
+	ROMX_LOAD("804-3_rev_1.4__f240.2732.d42", 0x3000, 0x1000, CRC(29827e29) SHA1(4c7fadf81bcf32349a564d946f5d215de50315c5), ROM_BIOS(2)) // load this twice
 	ROM_SYSTEM_BIOS( 2, "ep804_v2.21", "Wavetek/Digelec EP804 FWv2.21") // hardware 1.5 NOTE: this may use the address mapper 804-1-3 which is not dumped!
 	ROMX_LOAD("804-2_rev2.21__cs_ab50.hn482764g.d41", 0x0000, 0x2000, CRC(ffbc95f6) SHA1(b12aa97e23d546064f1d17aa9b90772017fec5ec), ROM_BIOS(3))
 	ROMX_LOAD("804-3_rev2.21__cs_6b98.hn482764g.d42", 0x2000, 0x2000, CRC(a4acb9fe) SHA1(bbc7e3e2e6b3b1abe747380909dcddc985ef8d0d), ROM_BIOS(3))
 	ROM_REGION(0x20, "proms", 0)
-	ROM_LOAD("804-1-2.mmi_6330-in.d30", 0x0000, 0x0020, CRC(30DD4721) SHA1(E4B2F5756118BE4C8AB56C708DC4F42469C7E51B)) // Address mapper prom, 82s23/mmi6330/tbp18sa030 equivalent 32x8 open collector
+	ROM_LOAD("804-1-2.mmi_6330-in.d30", 0x0000, 0x0020, CRC(30dd4721) SHA1(e4b2f5756118be4c8ab56c708dc4f42469c7e51b)) // Address mapper prom, 82s23/mmi6330/tbp18sa030 equivalent 32x8 open collector
 ROM_END
 
 

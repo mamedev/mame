@@ -216,4 +216,3 @@ void ngen_keyboard_device::rcv_complete()
 }
 
 const device_type NGEN_KEYBOARD = &device_creator<ngen_keyboard_device>;
-

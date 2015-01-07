@@ -4888,23 +4888,31 @@ Notes:
       HSync - 15.55kHz
 
 
-Korean version of Dharma runs on Metro hardware PCB Number - METRO CORP. MTR527
-There is known to be an international version of Dharma on the MTR527 PCB:
+Korean version & international version of Dharma run on Metro hardware PCB Number - METRO CORP. MTR527
 
-DD WEA5 | Program roms
-DD WEA6 /
-
-DD WA 1 | Graphics roms
-DD WA 2 |
-DD WA 3 |
-DD WA 4/
-
-DD WA 7 - Samples rom
-DD WA 8 - 78C10 program rom
 
 ***************************************************************************/
 
 ROM_START( dharma )
+	ROM_REGION( 0x040000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "dd__wea5.u39", 0x000000, 0x020000, CRC(960319d7) SHA1(f76783fcbb5e5a027889620c783f053d372346a8) )
+	ROM_LOAD16_BYTE( "dd__wea6.u42", 0x000001, 0x020000, CRC(386eb6b3) SHA1(e353ea70bae521c4cc362cf2f5ce643c98c61681) )
+
+	ROM_REGION( 0x02c000, "audiocpu", 0 )       /* NEC78C10 Code */
+	ROM_LOAD( "dd__wa-8.u9", 0x000000, 0x004000, CRC(af7ebc4c) SHA1(6abf0036346da10be56932f9674f8c250a3ea592) ) // (c)1992 Imagetek (11xxxxxxxxxxxxxxx = 0xFF) // == dd_ja-8
+	ROM_CONTINUE(        0x010000, 0x01c000 )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )   /* Gfx + Data (Addressable by CPU & Blitter) */
+	ROMX_LOAD( "dd__wa-2.u4",  0x000000, 0x080000, CRC(2c67a5c8) SHA1(777d5f64446004bbb6dafee610ad9a1ff262349d) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "dd__wa-4.u5",  0x000002, 0x080000, CRC(36ca7848) SHA1(278788727193ae65ed012d230a4e5966c07afe9e) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "dd__wa-1.u10", 0x000004, 0x080000, CRC(d8034574) SHA1(a9bf29ae980033dfaae43b6ab46f850744020d92) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "dd__wa-3.u11", 0x000006, 0x080000, CRC(fe320fa3) SHA1(80532cc38bd21608e4cff1254d993e0df72eaccf) , ROM_GROUPWORD | ROM_SKIP(6))
+
+	ROM_REGION( 0x040000, "oki", 0 )    /* Samples */
+	ROM_LOAD( "dd__wa-7.u3", 0x000000, 0x040000, CRC(7ce817eb) SHA1(9dfb79021a552877fbc26049cca853c0b93735b5) ) // == dd_ja-7
+ROM_END
+
+ROM_START( dharmaj )
 	ROM_REGION( 0x040000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "dd_jc-5", 0x000000, 0x020000, CRC(b5d44426) SHA1(d68aaf6b9976ccf5cb665d7ec0afa44e2453094d) )
 	ROM_LOAD16_BYTE( "dd_jc-6", 0x000001, 0x020000, CRC(bc5a202e) SHA1(c2b6d2e44e3605e0525bde4030c5162badad4d4b) )
@@ -6281,7 +6289,8 @@ GAME( 1993, ladykill,  0,        karatour, ladykill, metro_state, karatour, ROT9
 GAME( 1993, moegonta,  ladykill, karatour, moegonta, metro_state, karatour, ROT90,  "Yanyaka",                                         "Moeyo Gonta!! (Japan)",                  GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1993, poitto,    0,        poitto,   poitto,   metro_state, metro,    ROT0,   "Metro / Able Corp.",                              "Poitto!",                                GAME_SUPPORTS_SAVE )
 GAME( 1994, blzntrnd,  0,        blzntrnd, blzntrnd, metro_state, blzntrnd, ROT0,   "Human Amusement",                                 "Blazing Tornado",                        GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1994, dharma,    0,        dharma,   dharma,   metro_state, metro,    ROT0,   "Metro",                                           "Dharma Doujou",                          GAME_SUPPORTS_SAVE )
+GAME( 1994, dharma,    0,        dharma,   dharma,   metro_state, dharmak,  ROT0,   "Metro",                                           "Dharma Doujou",                          GAME_SUPPORTS_SAVE )
+GAME( 1994, dharmaj,   dharma,   dharma,   dharma,   metro_state, metro,    ROT0,   "Metro",                                           "Dharma Doujou (Japan)",                  GAME_SUPPORTS_SAVE )
 GAME( 1994, dharmak,   dharma,   dharma,   dharma,   metro_state, dharmak,  ROT0,   "Metro",                                           "Dharma Doujou (Korea)",                  GAME_SUPPORTS_SAVE )
 GAME( 1994, lastfort,  0,        lastfort, lastfort, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride",                 GAME_SUPPORTS_SAVE )
 GAME( 1994, lastforte, lastfort, lastfort, lastfero, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (Erotic, Rev C)", GAME_SUPPORTS_SAVE )

@@ -412,7 +412,7 @@ ROM_START( bwings )
 	ROM_LOAD( "bw_bv-00-.4a", 0x0c000, 0x04000, CRC(1f83804c) SHA1(afd5eb0822db4fd982062945ca27e66ed9680645) )  // different
 
 	ROM_REGION( 0x10000, "sub", 0 ) // sub CPU
-	ROM_LOAD( "bw_bv-06-.10d",0x0a000, 0x02000, CRC(ECA00FCB) SHA1(C7AFFBB900E3940257F8CEBC91266328A4A5DCA3) )  // different
+	ROM_LOAD( "bw_bv-06-.10d",0x0a000, 0x02000, CRC(eca00fcb) SHA1(c7affbb900e3940257f8cebc91266328a4a5dca3) )  // different
 	ROM_LOAD( "bw_bv-05-.9d", 0x0c000, 0x02000, CRC(1e393300) SHA1(8d847256eb5dbccf5f524ec3aa836073d70b4edc) )  // different
 	ROM_LOAD( "bw_bv-04-.7d", 0x0e000, 0x02000, CRC(6548c5bb) SHA1(d12cc8d0d5692c3de766f5c42c818dd8f685760a) )  // different
 

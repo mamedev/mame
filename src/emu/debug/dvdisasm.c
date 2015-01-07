@@ -420,7 +420,7 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 			offs_t comment_address = source.m_space.byte_to_address(m_byteaddress[instr]);
 			const char *text = source.m_device.debug()->comment_text(comment_address);
 			if (text != NULL)
-				sprintf(&destbuf[m_divider2], "// %.*s", row_width - m_divider2 - 1, text);
+				sprintf(&destbuf[m_divider2], "// %.*s", row_width - m_divider2 - 4, text);
 		}
 
 		// see if the line changed at all

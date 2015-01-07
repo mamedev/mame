@@ -43,6 +43,7 @@ void fifo7200_device::device_start()
 	m_hf_handler.resolve_safe();
 
 	// state save
+	save_item(NAME(m_buffer));
 	save_item(NAME(m_read_ptr));
 	save_item(NAME(m_write_ptr));
 	save_item(NAME(m_ef));

@@ -369,6 +369,9 @@ void vc4000_state::machine_start()
 			case VC4000_STD:
 				m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x07ff, read8_delegate(FUNC(vc4000_cart_slot_device::read_rom),(vc4000_cart_slot_device*)m_cart));
 				break;
+			case VC4000_ROM4K:
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8_delegate(FUNC(vc4000_cart_slot_device::read_rom),(vc4000_cart_slot_device*)m_cart));
+				break;
 			case VC4000_RAM1K:
 				m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8_delegate(FUNC(vc4000_cart_slot_device::read_rom),(vc4000_cart_slot_device*)m_cart));
 				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x15ff, read8_delegate(FUNC(vc4000_cart_slot_device::read_ram),(vc4000_cart_slot_device*)m_cart), write8_delegate(FUNC(vc4000_cart_slot_device::write_ram),(vc4000_cart_slot_device*)m_cart));
@@ -513,6 +516,7 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 
 static SLOT_INTERFACE_START(vc4000_cart)
 	SLOT_INTERFACE_INTERNAL("std",      VC4000_ROM_STD)
+	SLOT_INTERFACE_INTERNAL("rom4k",    VC4000_ROM_ROM4K)
 	SLOT_INTERFACE_INTERNAL("ram1k",    VC4000_ROM_RAM1K)
 	SLOT_INTERFACE_INTERNAL("chess2",   VC4000_ROM_CHESS2)
 SLOT_INTERFACE_END
@@ -549,8 +553,33 @@ static MACHINE_CONFIG_START( vc4000, vc4000_state )
 	MCFG_VC4000_CARTRIDGE_ADD("cartslot", vc4000_cart, NULL)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","vc4000")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "vc4000")
 MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( cx3000tc, vc4000 )
+	MCFG_DEVICE_REMOVE("cart_list")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "cx3000tc")
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( mpu1000, vc4000 )
+	MCFG_DEVICE_REMOVE("cart_list")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "mpu1000")
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( database, vc4000 )
+	MCFG_DEVICE_REMOVE("cart_list")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "database")
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( rwtrntcs, vc4000 )
+	MCFG_DEVICE_REMOVE("cart_list")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "rwtrntcs")
+MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_DERIVED( elektor, vc4000 )
 	MCFG_CPU_MODIFY("maincpu")
@@ -662,12 +691,12 @@ ROM_END
 /*   YEAR  NAME      PARENT     COMPAT    MACHINE    INPUT        INIT      COMPANY             FULLNAME */
 CONS(1978, vc4000,   0,         0,        vc4000,    vc4000, driver_device,      0,        "Interton",         "Interton Electronic VC 4000", GAME_IMPERFECT_GRAPHICS )          /* Germany, Austria, UK, Australia */
 CONS(1979, spc4000,  vc4000,    0,        vc4000,    vc4000, driver_device,      0,        "Grundig",          "Super Play Computer 4000", GAME_IMPERFECT_GRAPHICS )  /* Germany, Austria */
-CONS(1979, cx3000tc, vc4000,    0,        vc4000,    vc4000, driver_device,      0,        "Palson",           "CX 3000 Tele Computer", GAME_IMPERFECT_GRAPHICS )     /* Spain */
+CONS(1979, cx3000tc, vc4000,    0,        cx3000tc,  vc4000, driver_device,      0,        "Palson",           "CX 3000 Tele Computer", GAME_IMPERFECT_GRAPHICS )     /* Spain */
 CONS(1979, tvc4000,  vc4000,    0,        vc4000,    vc4000, driver_device,      0,        "Koerting",         "TVC-4000",         GAME_IMPERFECT_GRAPHICS )          /* Argentina */
 CONS(1976, 1292apvs, 0,         vc4000,   vc4000,    vc4000, driver_device,      0,        "Radofin",          "1292 Advanced Programmable Video System", GAME_IMPERFECT_GRAPHICS )/* Europe */
 CONS(1976, 1392apvs, 1292apvs,  0,        vc4000,    vc4000, driver_device,      0,        "Radofin",          "1392 Advanced Programmable Video System", GAME_IMPERFECT_GRAPHICS )/* Europe */
-CONS(1979, mpu1000,  1292apvs,  0,        vc4000,    vc4000, driver_device,      0,        "Acetronic",        "MPU-1000",         GAME_IMPERFECT_GRAPHICS )          /* Europe */
-CONS(1979, mpu2000,  1292apvs,  0,        vc4000,    vc4000, driver_device,      0,        "Acetronic",        "MPU-2000",         GAME_IMPERFECT_GRAPHICS )          /* Europe */
+CONS(1979, mpu1000,  1292apvs,  0,        mpu1000,   vc4000, driver_device,      0,        "Acetronic",        "MPU-1000",         GAME_IMPERFECT_GRAPHICS )          /* Europe */
+CONS(1979, mpu2000,  1292apvs,  0,        mpu1000,   vc4000, driver_device,      0,        "Acetronic",        "MPU-2000",         GAME_IMPERFECT_GRAPHICS )          /* Europe */
 CONS(1978, pp1292,   1292apvs,  0,        vc4000,    vc4000, driver_device,      0,        "Audio Sonic",      "PP-1292 Advanced Programmable Video System", GAME_IMPERFECT_GRAPHICS )/* Europe */
 CONS(1978, pp1392,   1292apvs,  0,        vc4000,    vc4000, driver_device,      0,        "Audio Sonic",      "PP-1392 Advanced Programmable Video System", GAME_IMPERFECT_GRAPHICS )/* Europe */
 CONS(1979, f1392,    1292apvs,  0,        vc4000,    vc4000, driver_device,      0,        "Fountain",         "Fountain 1392",    GAME_IMPERFECT_GRAPHICS )          /* New Zealand */
@@ -676,10 +705,10 @@ CONS(1979, hmg1292,  1292apvs,  0,        vc4000,    vc4000, driver_device,     
 CONS(1979, hmg1392,  1292apvs,  0,        vc4000,    vc4000, driver_device,      0,        "Hanimex",          "HMG 1392",         GAME_IMPERFECT_GRAPHICS )          /* Europe */
 CONS(1979, lnsy1392, 1292apvs,  0,        vc4000,    vc4000, driver_device,      0,        "Lansay",           "Lansay 1392",      GAME_IMPERFECT_GRAPHICS )          /* Europe */
 CONS(1979, vc6000,   1292apvs,  0,        vc4000,    vc4000, driver_device,      0,        "Prinztronic",      "VC 6000",          GAME_IMPERFECT_GRAPHICS )          /* UK */
-CONS(1979, database, 0,         vc4000,   vc4000,    vc4000, driver_device,      0,        "Voltmace",         "Voltmace Database", GAME_IMPERFECT_GRAPHICS )         /* UK */
-CONS(1979, vmdtbase, database,  0,        vc4000,    vc4000, driver_device,      0,        "Videomaster",      "Videomaster Database Games-Computer", GAME_IMPERFECT_GRAPHICS )/* UK */
-CONS(1979, rwtrntcs, 0,         vc4000,   vc4000,    vc4000, driver_device,      0,        "Rowtron",          "Rowtron Television Computer System", GAME_IMPERFECT_GRAPHICS )/* UK */
-CONS(1979, telngtcs, rwtrntcs,  0,        vc4000,    vc4000, driver_device,      0,        "Teleng",           "Teleng Television Computer System", GAME_IMPERFECT_GRAPHICS )/* UK */
+CONS(1979, database, 0,         vc4000,   database,  vc4000, driver_device,      0,        "Voltmace",         "Voltmace Database", GAME_IMPERFECT_GRAPHICS )         /* UK */
+CONS(1979, vmdtbase, database,  0,        database,  vc4000, driver_device,      0,        "Videomaster",      "Videomaster Database Games-Computer", GAME_IMPERFECT_GRAPHICS )/* UK */
+CONS(1979, rwtrntcs, 0,         vc4000,   rwtrntcs,  vc4000, driver_device,      0,        "Rowtron",          "Rowtron Television Computer System", GAME_IMPERFECT_GRAPHICS )/* UK */
+CONS(1979, telngtcs, rwtrntcs,  0,        rwtrntcs,  vc4000, driver_device,      0,        "Teleng",           "Teleng Television Computer System", GAME_IMPERFECT_GRAPHICS )/* UK */
 CONS(1979, krvnjvtv, 0,         vc4000,   vc4000,    vc4000, driver_device,      0,        "SOE",              "OC Jeu Video TV Karvan", GAME_IMPERFECT_GRAPHICS )    /* France */
 CONS(1979, oc2000,   krvnjvtv,  0,        vc4000,    vc4000, driver_device,      0,        "SOE",              "OC-2000",          GAME_IMPERFECT_GRAPHICS )          /* France */
 CONS(1980, mpt05,    0,         vc4000,   vc4000,    vc4000, driver_device,      0,        "ITMC",             "MPT-05",           GAME_IMPERFECT_GRAPHICS )          /* France */

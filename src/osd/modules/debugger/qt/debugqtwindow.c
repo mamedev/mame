@@ -5,6 +5,7 @@
 #include "debugqtdasmwindow.h"
 #include "debugqtmemorywindow.h"
 #include "debugqtbreakpointswindow.h"
+#include "debugqtdeviceswindow.h"
 
 bool WindowQt::s_refreshAll = false;
 bool WindowQt::s_hideAll = false;
@@ -37,6 +38,10 @@ WindowQt::WindowQt(running_machine* machine, QWidget* parent) :
 	QAction* debugActOpenPoints = new QAction("New &Break|Watchpoints Window", this);
 	debugActOpenPoints->setShortcut(QKeySequence("Ctrl+B"));
 	connect(debugActOpenPoints, SIGNAL(triggered()), this, SLOT(debugActOpenPoints()));
+
+	QAction* debugActOpenDevices = new QAction("New D&evices Window", this);
+	debugActOpenDevices->setShortcut(QKeySequence("Shift+Ctrl+D"));
+	connect(debugActOpenDevices, SIGNAL(triggered()), this, SLOT(debugActOpenDevices()));
 
 	QAction* dbgActRun = new QAction("Run", this);
 	dbgActRun->setShortcut(Qt::Key_F5);
@@ -92,6 +97,7 @@ WindowQt::WindowQt(running_machine* machine, QWidget* parent) :
 	debugMenu->addAction(debugActOpenDasm);
 	debugMenu->addAction(debugActOpenLog);
 	debugMenu->addAction(debugActOpenPoints);
+	debugMenu->addAction(debugActOpenDevices);
 	debugMenu->addSeparator();
 	debugMenu->addAction(dbgActRun);
 	debugMenu->addAction(dbgActRunAndHide);
@@ -148,6 +154,16 @@ void WindowQt::debugActOpenLog()
 void WindowQt::debugActOpenPoints()
 {
 	BreakpointsWindow* foo = new BreakpointsWindow(m_machine, this);
+	// A valiant effort, but it just doesn't wanna' hide behind the main window & not make a new toolbar icon
+	// foo->setWindowFlags(Qt::Dialog);
+	// foo->setWindowFlags(foo->windowFlags() & ~Qt::WindowStaysOnTopHint);
+	foo->show();
+}
+
+
+void WindowQt::debugActOpenDevices()
+{
+	DevicesWindow* foo = new DevicesWindow(m_machine, this);
 	// A valiant effort, but it just doesn't wanna' hide behind the main window & not make a new toolbar icon
 	// foo->setWindowFlags(Qt::Dialog);
 	// foo->setWindowFlags(foo->windowFlags() & ~Qt::WindowStaysOnTopHint);

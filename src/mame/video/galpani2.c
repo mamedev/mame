@@ -115,7 +115,7 @@ void galpani2_state::copybg8(screen_device &screen, bitmap_rgb32 &bitmap, const 
 void galpani2_state::copybg15(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT16* ram = m_bg15 + 0x40000/2;
-	
+
 	//int x = 0;
 	//int y = 0;
 

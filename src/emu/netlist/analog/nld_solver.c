@@ -36,7 +36,7 @@
 #include "../nl_lists.h"
 
 #if HAS_OPENMP
-#include <omp.h>
+#include "omp.h"
 #endif
 
 vector_ops_t *vector_ops_t::create_ops(const int size)
@@ -99,8 +99,13 @@ ATTR_COLD void terms_t::set_pointers()
 // netlist_matrix_solver
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD netlist_matrix_solver_t::netlist_matrix_solver_t(const netlist_solver_parameters_t &params)
-: m_calculations(0), m_params(params), m_cur_ts(0)
+ATTR_COLD netlist_matrix_solver_t::netlist_matrix_solver_t(const eSolverType type, const netlist_solver_parameters_t &params)
+: m_stat_calculations(0),
+  m_stat_newton_raphson(0),
+  m_stat_vsolver_calls(0),
+ m_params(params),
+ m_cur_ts(0),
+ m_type(type)
 {
 }
 
@@ -254,6 +259,7 @@ ATTR_HOT void netlist_matrix_solver_t::step(const netlist_time delta)
 template<class C >
 void netlist_matrix_solver_t::solve_base(C *p)
 {
+    m_stat_vsolver_calls++;
 	if (is_dynamic())
 	{
 		int this_resched;
@@ -266,6 +272,7 @@ void netlist_matrix_solver_t::solve_base(C *p)
 			newton_loops++;
 		} while (this_resched > 1 && newton_loops < m_params.m_nr_loops);
 
+        m_stat_newton_raphson += newton_loops;
 		// reschedule ....
 		if (this_resched > 1 && !m_Q_sync.net().is_queued())
 		{
@@ -285,6 +292,7 @@ ATTR_HOT double netlist_matrix_solver_t::solve()
 	netlist_time delta = now - m_last_step;
 
 	// We are already up to date. Avoid oscillations.
+	// FIXME: Make this a parameter!
 	if (delta < netlist_time::from_nsec(1))
 		return -1.0;
 

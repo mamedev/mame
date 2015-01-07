@@ -7,7 +7,7 @@
 const device_type WPC_SHIFT = &device_creator<wpc_shift_device>;
 
 wpc_shift_device::wpc_shift_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, WPC_SHIFT, "Williams Pinball Controller shifter", tag, owner, clock, "wpc_shift", __FILE__)
+	device_t(mconfig, WPC_SHIFT, "Williams Pinball Controller Shifter", tag, owner, clock, "wpc_shift", __FILE__)
 {
 }
 

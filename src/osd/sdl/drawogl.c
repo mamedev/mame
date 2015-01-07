@@ -161,6 +161,25 @@ struct texture_info;
 /* texture_info holds information about a texture */
 struct texture_info
 {
+    texture_info()
+    : hash(0), flags(0), rawwidth(0), rawheight(0),
+      rawwidth_create(0), rawheight_create(0),
+      type(0), format(0), borderpix(0), xprescale(0), yprescale(0), nocopy(0),
+      texture(0), texTarget(0), texpow2(0), mpass_dest_idx(0), pbo(0), data(NULL),
+      data_own(0), texCoordBufferName(0)
+    {
+        for (int i=0; i<2; i++)
+        {
+            mpass_textureunit[i] = 0;
+            mpass_texture_mamebm[i] = 0;
+            mpass_fbo_mamebm[i] = 0;
+            mpass_texture_scrn[i] = 0;
+            mpass_fbo_scrn[i] = 0;
+        }
+        for (int i=0; i<8; i++)
+            texCoord[i] = 0.0f;
+    }
+
 	HashT               hash;               // hash value for the texture (must be >= pointer size)
 	UINT32              flags;              // rendering flags
 	render_texinfo      texinfo;            // copy of the texture info
@@ -198,6 +217,36 @@ struct texture_info
 /* sdl_info is the information about SDL for the current screen */
 struct sdl_info
 {
+    sdl_info()
+    : blittimer(0), extra_flags(0),
+#if (SDLMAME_SDL2)
+      gl_context_id(0),
+#else
+      sdlsurf(NULL),
+#endif
+      initialized(0),
+      last_blendmode(0),
+      texture_max_width(0),
+      texture_max_height(0),
+      texpoweroftwo(0),
+      usevbo(0), usepbo(0), usefbo(0), useglsl(0), glsl(NULL),
+      glsl_program_num(0),
+      glsl_program_mb2sc(0),
+      usetexturerect(0),
+      init_context(0),
+      last_hofs(0.0f),
+      last_vofs(0.0f),
+      surf_w(0),
+      surf_h(0)
+    {
+        for (int i=0; i < HASH_SIZE + OVERFLOW_SIZE; i++)
+            texhash[i] = NULL;
+        for (int i=0; i < 2*GLSL_SHADER_MAX; i++)
+            glsl_program[i] = 0;
+        for (int i=0; i < 8; i++)
+            texVerticex[i] = 0.0f;
+    }
+
 	INT32           blittimer;
 	UINT32          extra_flags;
 
@@ -318,7 +367,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 static void drawogl_window_resize(sdl_window_info *window, int width, int height);
 static void drawogl_window_destroy(sdl_window_info *window);
 static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update);
-static render_primitive_list &drawogl_window_get_primitives(sdl_window_info *window);
+static void drawogl_set_target_bounds(sdl_window_info *window);
 static void drawogl_destroy_all_textures(sdl_window_info *window);
 static void drawogl_window_clear(sdl_window_info *window);
 static int drawogl_xy_to_render_target(sdl_window_info *window, int x, int y, int *xt, int *yt);
@@ -405,7 +454,7 @@ static void drawogl_attach(sdl_draw_info *info, sdl_window_info *window)
 	// fill in the callbacks
 	window->create = drawogl_window_create;
 	window->resize = drawogl_window_resize;
-	window->get_primitives = drawogl_window_get_primitives;
+	window->set_target_bounds = drawogl_set_target_bounds;
 	window->draw = drawogl_window_draw;
 	window->destroy = drawogl_window_destroy;
 	window->destroy_all_textures = drawogl_destroy_all_textures;
@@ -487,13 +536,12 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 	int has_and_allow_texturerect = 0;
 
 	// allocate memory for our structures
-	sdl = (sdl_info *) osd_malloc(sizeof(*sdl));
-	memset(sdl, 0, sizeof(*sdl));
+	sdl = global_alloc(sdl_info);
 
 	window->dxdata = sdl;
 
 #if (SDLMAME_SDL2)
-	sdl->extra_flags = (window->fullscreen ?
+	sdl->extra_flags = (window->fullscreen() ?
 			SDL_WINDOW_BORDERLESS | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE);
 	sdl->extra_flags |= SDL_WINDOW_OPENGL;
 
@@ -510,7 +558,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 	//load_gl_lib(window->machine());
 
 	// create the SDL window
-	window->sdl_window = SDL_CreateWindow(window->title, SDL_WINDOWPOS_UNDEFINED_DISPLAY(window->monitor->handle), SDL_WINDOWPOS_UNDEFINED,
+	window->sdl_window = SDL_CreateWindow(window->title, window->monitor()->monitor_x, 0,
 			width, height, sdl->extra_flags);
 
 	if  (!window->sdl_window )
@@ -519,10 +567,10 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 		return 1;
 	}
 
-	if (window->fullscreen && video_config.switchres)
+	if (window->fullscreen() && video_config.switchres)
 	{
 		SDL_DisplayMode mode;
-		SDL_GetCurrentDisplayMode(window->monitor->handle, &mode);
+		SDL_GetCurrentDisplayMode(window->monitor()->handle, &mode);
 		mode.w = width;
 		mode.h = height;
 		if (window->refresh)
@@ -547,7 +595,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 	SDL_GL_SetSwapInterval(video_config.waitvsync ? 2 : 0);
 
 #else
-	sdl->extra_flags = (window->fullscreen ?  SDL_FULLSCREEN : SDL_RESIZABLE);
+	sdl->extra_flags = (window->fullscreen() ?  SDL_FULLSCREEN : SDL_RESIZABLE);
 	sdl->extra_flags |= SDL_OPENGL | SDL_DOUBLEBUF;
 
 	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
@@ -792,18 +840,9 @@ static int drawogl_xy_to_render_target(sdl_window_info *window, int x, int y, in
 //  drawogl_window_get_primitives
 //============================================================
 
-static render_primitive_list &drawogl_window_get_primitives(sdl_window_info *window)
+static void drawogl_set_target_bounds(sdl_window_info *window)
 {
-	if ((!window->fullscreen) || (video_config.switchres))
-	{
-		sdlwindow_blit_surface_size(window, window->width, window->height);
-	}
-	else
-	{
-		sdlwindow_blit_surface_size(window, window->monitor->center_width, window->monitor->center_height);
-	}
-	window->target->set_bounds(window->blitwidth, window->blitheight, sdlvideo_monitor_get_aspect(window->monitor));
-	return window->target->get_primitives();
+	window->target->set_bounds(window->blitwidth, window->blitheight, sdlvideo_monitor_get_aspect(window->monitor()));
 }
 
 //============================================================
@@ -1143,7 +1182,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 		screen_device_iterator myiter(window->machine().root_device());
 		for (screen = myiter.first(); screen != NULL; screen = myiter.next())
 		{
-			if (window->index == 0)
+			if (window->index() == 0)
 			{
 				if ((screen->width() != window->screen_width) || (screen->height() != window->screen_height))
 				{
@@ -1180,7 +1219,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	screen_device_iterator iter(window->machine().root_device());
 	for (screen = iter.first(); screen != NULL; screen = iter.next())
 	{
-		if (scrnum == window->index)
+		if (scrnum == window->index())
 		{
 			is_vector = (screen->screen_type() == SCREEN_TYPE_VECTOR) ? 1 : 0;
 			break;
@@ -1271,10 +1310,10 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	{
 		int ch, cw;
 
-		if ((window->fullscreen) && (!video_config.switchres))
+		if ((window->fullscreen()) && (!video_config.switchres))
 		{
-			ch = window->monitor->center_height;
-			cw = window->monitor->center_width;
+			ch = window->monitor()->center_height;
+			cw = window->monitor()->center_width;
 		}
 		else
 		{
@@ -1612,7 +1651,7 @@ static void drawogl_window_destroy(sdl_window_info *window)
 	}
 #endif
 
-	osd_free(sdl);
+	global_free(sdl);
 	window->dxdata = NULL;
 }
 
@@ -1654,7 +1693,7 @@ static void texture_compute_type_subroutine(sdl_info *sdl, const render_texinfo 
 	if    ( texture_copy_properties[texture->format][SDL_TEXFORMAT_SRC_EQUALS_DEST] &&
 			!texture_copy_properties[texture->format][SDL_TEXFORMAT_SRC_HAS_PALETTE] &&
 			texture->xprescale == 1 && texture->yprescale == 1 &&
-			!texture->borderpix && !texsource->palette &&
+			!texture->borderpix && !texsource->palette() &&
 			texsource->rowpixels <= sdl->texture_max_width )
 	{
 		texture->nocopy = TRUE;
@@ -2068,8 +2107,7 @@ static texture_info *texture_create(sdl_window_info *window, const render_texinf
 	texture_info *texture;
 
 	// allocate a new texture
-	texture = (texture_info *) malloc(sizeof(*texture));
-	memset(texture, 0, sizeof(*texture));
+	texture = global_alloc(texture_info);
 
 	// fill in the core data
 	texture->hash = texture_compute_hash(texsource, flags);
@@ -2107,7 +2145,7 @@ static texture_info *texture_create(sdl_window_info *window, const render_texinf
 			texture->format = SDL_TEXFORMAT_ARGB32;
 			break;
 		case TEXFORMAT_RGB32:
-			if (texsource->palette != NULL)
+			if (texsource->palette() != NULL)
 				texture->format = SDL_TEXFORMAT_RGB32_PALETTED;
 			else
 				texture->format = SDL_TEXFORMAT_RGB32;
@@ -2119,7 +2157,7 @@ static texture_info *texture_create(sdl_window_info *window, const render_texinf
 			texture->format = SDL_TEXFORMAT_PALETTE16A;
 			break;
 		case TEXFORMAT_YUY16:
-			if (texsource->palette != NULL)
+			if (texsource->palette() != NULL)
 				texture->format = SDL_TEXFORMAT_YUY16_PALETTED;
 			else
 				texture->format = SDL_TEXFORMAT_YUY16;
@@ -2143,7 +2181,7 @@ static texture_info *texture_create(sdl_window_info *window, const render_texinf
 	{
 		if ( texture_shader_create(window, texsource, texture, flags) )
 		{
-			free(texture);
+			global_free(texture);
 			return NULL;
 		}
 	}
@@ -2229,7 +2267,7 @@ static texture_info *texture_create(sdl_window_info *window, const render_texinf
 				sdl->texhash[i] = texture;
 				break;
 			}
-		assert(i < HASH_SIZE + OVERFLOW_SIZE);
+		assert_always(i < HASH_SIZE + OVERFLOW_SIZE, "texture hash exhausted ...");
 	}
 
 	if(sdl->usevbo)
@@ -2561,23 +2599,23 @@ static void texture_set_data(texture_info *texture, const render_texinfo *texsou
 				switch (PRIMFLAG_GET_TEXFORMAT(flags))
 				{
 					case TEXFORMAT_PALETTE16:
-						copyline_palette16((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
+						copyline_palette16((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette(), texture->borderpix, texture->xprescale);
 						break;
 
 					case TEXFORMAT_PALETTEA16:
-						copyline_palettea16((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
+						copyline_palettea16((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette(), texture->borderpix, texture->xprescale);
 						break;
 
 					case TEXFORMAT_RGB32:
-						copyline_rgb32((UINT32 *)dst, (UINT32 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
+						copyline_rgb32((UINT32 *)dst, (UINT32 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette(), texture->borderpix, texture->xprescale);
 						break;
 
 					case TEXFORMAT_ARGB32:
-						copyline_argb32((UINT32 *)dst, (UINT32 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
+						copyline_argb32((UINT32 *)dst, (UINT32 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette(), texture->borderpix, texture->xprescale);
 						break;
 
 					case TEXFORMAT_YUY16:
-						copyline_yuy16_to_argb((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
+						copyline_yuy16_to_argb((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette(), texture->borderpix, texture->xprescale);
 						break;
 
 					default:
@@ -2650,7 +2688,7 @@ static int compare_texture_primitive(const texture_info *texture, const render_p
 		texture->texinfo.width == prim->texture.width &&
 		texture->texinfo.height == prim->texture.height &&
 		texture->texinfo.rowpixels == prim->texture.rowpixels &&
-		texture->texinfo.palette == prim->texture.palette &&
+		/* texture->texinfo.palette() == prim->texture.palette() && */
 		((texture->flags ^ prim->flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0)
 		return 1;
 	else
@@ -3041,40 +3079,40 @@ static void drawogl_destroy_all_textures(sdl_window_info *window)
 		sdl->texhash[i] = NULL;
 		if (texture != NULL)
 		{
-		if(sdl->usevbo)
-		{
-			pfn_glDeleteBuffers( 1, &(texture->texCoordBufferName) );
-			texture->texCoordBufferName=0;
-		}
+            if(sdl->usevbo)
+            {
+                pfn_glDeleteBuffers( 1, &(texture->texCoordBufferName) );
+                texture->texCoordBufferName=0;
+            }
 
-		if(sdl->usepbo && texture->pbo)
-		{
-			pfn_glDeleteBuffers( 1, (GLuint *)&(texture->pbo) );
-			texture->pbo=0;
-		}
+            if(sdl->usepbo && texture->pbo)
+            {
+                pfn_glDeleteBuffers( 1, (GLuint *)&(texture->pbo) );
+                texture->pbo=0;
+            }
 
-		if( sdl->glsl_program_num > 1 )
-		{
-			assert(sdl->usefbo);
-			pfn_glDeleteFramebuffers(2, (GLuint *)&texture->mpass_fbo_mamebm[0]);
-			glDeleteTextures(2, (GLuint *)&texture->mpass_texture_mamebm[0]);
-		}
+            if( sdl->glsl_program_num > 1 )
+            {
+                assert(sdl->usefbo);
+                pfn_glDeleteFramebuffers(2, (GLuint *)&texture->mpass_fbo_mamebm[0]);
+                glDeleteTextures(2, (GLuint *)&texture->mpass_texture_mamebm[0]);
+            }
 
-		if ( sdl->glsl_program_mb2sc < sdl->glsl_program_num - 1 )
-		{
-			assert(sdl->usefbo);
-			pfn_glDeleteFramebuffers(2, (GLuint *)&texture->mpass_fbo_scrn[0]);
-			glDeleteTextures(2, (GLuint *)&texture->mpass_texture_scrn[0]);
-		}
+            if ( sdl->glsl_program_mb2sc < sdl->glsl_program_num - 1 )
+            {
+                assert(sdl->usefbo);
+                pfn_glDeleteFramebuffers(2, (GLuint *)&texture->mpass_fbo_scrn[0]);
+                glDeleteTextures(2, (GLuint *)&texture->mpass_texture_scrn[0]);
+            }
 
-		glDeleteTextures(1, (GLuint *)&texture->texture);
-		if ( texture->data_own )
-		{
-			free(texture->data);
-			texture->data=NULL;
-			texture->data_own=FALSE;
-		}
-		free(texture);
+            glDeleteTextures(1, (GLuint *)&texture->texture);
+            if ( texture->data_own )
+            {
+                free(texture->data);
+                texture->data=NULL;
+                texture->data_own=FALSE;
+            }
+            global_free(texture);
 		}
 		i++;
 	}

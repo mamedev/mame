@@ -451,22 +451,22 @@ UINT16 namcos2_shared_state::readwrite_c148( address_space &space, offs_t offset
 	UINT16 *pC148RegAlt = NULL;
 	UINT16 result = 0;
 
-	if (&space.device() == space.machine().device("maincpu"))
+	if (&space.device() == m_maincpu)
 	{
 		pC148Reg = m_68k_master_C148;
-		altcpu = space.machine().device("slave");
+		altcpu = m_slave;
 		pC148RegAlt = m_68k_slave_C148;
 	}
-	else if (&space.device() == space.machine().device("slave"))
+	else if (&space.device() == m_slave)
 	{
 		pC148Reg = m_68k_slave_C148;
-		altcpu = space.machine().device("maincpu");
+		altcpu = m_maincpu;
 		pC148RegAlt = m_68k_master_C148;
 	}
-	else if (&space.device() == space.machine().device("gpu"))
+	else if (&space.device() == m_gpu)
 	{
 		pC148Reg = m_68k_gpu_C148;
-		altcpu = space.machine().device("maincpu");
+		altcpu = m_maincpu;
 		pC148RegAlt = m_68k_master_C148;
 	}
 
@@ -548,18 +548,18 @@ UINT16 namcos2_shared_state::readwrite_c148( address_space &space, offs_t offset
 		break;
 
 	case 0x1e2000: /* Sound CPU Reset control */
-		if (&space.device() == space.machine().device("maincpu")) /* ? */
+		if (&space.device() == m_maincpu) /* ? */
 		{
 			if (data & 0x01)
 			{
 				/* Resume execution */
-				space.machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+				m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 				space.device().execute().yield();
 			}
 			else
 			{
 				/* Suspend execution */
-				space.machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+				m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 			}
 			if (namcos2_kickstart != NULL)
 			{
@@ -573,7 +573,7 @@ UINT16 namcos2_shared_state::readwrite_c148( address_space &space, offs_t offset
 		break;
 
 	case 0x1e4000: /* Alt 68000 & IO CPU Reset */
-		if (&space.device() == space.machine().device("maincpu")) /* ? */
+		if (&space.device() == m_maincpu) /* ? */
 		{
 			if (data & 0x01)
 			{ /* Resume execution */
@@ -640,7 +640,7 @@ TIMER_CALLBACK_MEMBER(namcos2_shared_state::namcos2_posirq_tick)
 	if (is_system21()) {
 		if (m_68k_gpu_C148[NAMCOS2_C148_POSIRQ]) {
 			m_screen->update_partial(param);
-			machine().device("gpu")->execute().set_input_line(m_68k_gpu_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
+			m_gpu->set_input_line(m_68k_gpu_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
 		}
 		return;
 	}

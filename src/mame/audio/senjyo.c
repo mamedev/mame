@@ -26,7 +26,7 @@ WRITE_LINE_MEMBER(senjyo_state::sound_line_clock)
 	}
 }
 
-WRITE8_MEMBER(senjyo_state::senjyo_volume_w)
+WRITE8_MEMBER(senjyo_state::volume_w)
 {
 	m_single_volume = data & 0x0f;
 }

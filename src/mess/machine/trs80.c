@@ -593,6 +593,7 @@ WRITE8_MEMBER( trs80_state::trs80_ff_w )
     d1, d0 Cassette output */
 
 	static const double levels[4] = { 0.0, -1.0, 0.0, 1.0 };
+	static int init = 0;
 
 	m_cassette->change_state(( data & 4 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR );
 	m_cassette->output(levels[data & 3]);
@@ -600,6 +601,13 @@ WRITE8_MEMBER( trs80_state::trs80_ff_w )
 
 	m_mode = (m_mode & 0xfe) | ((data & 8) >> 3);
 
+	if (!init)
+	{
+		init = 1;
+		static INT16 speaker_levels[4] = { 0, -32768, 0, 32767 };
+		m_speaker->static_set_levels(*m_speaker, 4, speaker_levels);
+
+	}
 	/* Speaker for System-80 MK II - only sounds if relay is off */
 	if (~data & 4)
 		m_speaker->level_w(data & 3);

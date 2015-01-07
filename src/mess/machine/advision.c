@@ -76,7 +76,8 @@ WRITE8_MEMBER( advision_state::bankswitch_w )
 	m_rambank = (data & 0x03) << 8;
 
 	m_maincpu->set_input_line(MCS48_INPUT_EA, m_ea_bank ? ASSERT_LINE : CLEAR_LINE);
-	m_bank1->set_entry(m_ea_bank);
+	if (m_cart_rom)
+		m_bank1->set_entry(m_ea_bank);
 }
 
 /* External RAM */

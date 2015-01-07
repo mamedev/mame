@@ -12,22 +12,25 @@ We have Basic 1.1. Other known versions are 1.01, 2.1
 There are 2 versions of the colour prom, which have different palettes.
 We have the later version.
 
-Control W then Enter will switch between 40 and 80 characters per line.
+Notes:
+- Control W then Enter will switch between 40 and 80 characters per line.
+- Control V turns cursor on
+- Graphics commands such as LINE, CIRCLE, HGRCLS, HGRSET etc only work with disk basic
 
 ToDo:
 - Colours are approximate.
-- Disk controller
-- Graphics commands such as LINE and CIRCLE produce a syntax error.
-- Some commands such as HGRCLS are missing from the rom. Perhaps we need a later version?
-- SET command produces random graphics instead of the expected lo-res dot.
+- Disk controller, works with old wd17xx but crashes on new wd.
+- Hardware supports 20cm and 13cm floppies, but we only support 13cm as this
+  is the only software that exists.
 - The schematic shows the audio counter connected to 2MHz, but this produces
   sounds that are too high. Connected to 1MHz for now.
 - Serial
-- Parallel / Centronics
-- Need software
 - Pasting can sometimes drop a character.
 
 ****************************************************************************/
+
+#define NEWFDC 0
+
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -37,11 +40,21 @@ ToDo:
 //#include "machine/clock.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
-//#include "bus/centronics/ctronics.h"
+#include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
 #include "sound/speaker.h"
-
+#include "machine/z80dma.h"
+#include "machine/rescap.h"
+#include "machine/74123.h"
+#if NEWFDC
+#include "machine/wd_fdc.h"
+#include "formats/excali64_dsk.h"
+#else
+#include "machine/wd17xx.h"
+#include "imagedev/flopdrv.h"
+#include "formats/basicdsk.h"
+#endif
 
 class excali64_state : public driver_device
 {
@@ -53,6 +66,14 @@ public:
 		, m_cass(*this, "cassette")
 		, m_crtc(*this, "crtc")
 		, m_io_keyboard(*this, "KEY")
+		, m_dma(*this, "dma")
+		, m_u12(*this, "u12")
+		, m_centronics(*this, "centronics")
+		, m_fdc(*this, "fdc")
+#if NEWFDC
+		, m_floppy0(*this, "fdc:0")
+		, m_floppy1(*this, "fdc:1")
+#endif
 	{ }
 
 	DECLARE_PALETTE_INIT(excali64);
@@ -62,12 +83,25 @@ public:
 	DECLARE_READ8_MEMBER(port00_r);
 	DECLARE_READ8_MEMBER(port50_r);
 	DECLARE_WRITE8_MEMBER(port70_w);
+	DECLARE_WRITE8_MEMBER(porte4_w);
+	DECLARE_READ8_MEMBER(porte8_r);
+	DECLARE_WRITE8_MEMBER(portec_w);
+#if NEWFDC
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+#endif
+	DECLARE_WRITE_LINE_MEMBER(cent_busy_w);
+	DECLARE_WRITE_LINE_MEMBER(busreq_w);
+	DECLARE_READ8_MEMBER(memory_read_byte);
+	DECLARE_WRITE8_MEMBER(memory_write_byte);
+	DECLARE_READ8_MEMBER(io_read_byte);
+	DECLARE_WRITE8_MEMBER(io_write_byte);
 	MC6845_UPDATE_ROW(update_row);
-	DECLARE_WRITE_LINE_MEMBER(crtc_de);
+	DECLARE_WRITE_LINE_MEMBER(crtc_hs);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vs);
+	DECLARE_WRITE8_MEMBER(motor_w);
 	DECLARE_MACHINE_RESET(excali64);
 	required_device<palette_device> m_palette;
-	
+
 private:
 	const UINT8 *m_p_chargen;
 	UINT8 *m_p_videoram;
@@ -75,19 +109,31 @@ private:
 	UINT8 m_sys_status;
 	UINT8 m_kbdrow;
 	bool m_crtc_vs;
-	bool m_crtc_de;
+	bool m_crtc_hs;
+	bool m_motor;
+	bool m_centronics_busy;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<mc6845_device> m_crtc;
 	required_ioport_array<8> m_io_keyboard;
+	required_device<z80dma_device> m_dma;
+	required_device<ttl74123_device> m_u12;
+	required_device<centronics_device> m_centronics;
+#if NEWFDC
+	required_device<wd2793_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+#else
+	required_device<wd2793_device> m_fdc;
+#endif
 };
 
 static ADDRESS_MAP_START(excali64_mem, AS_PROGRAM, 8, excali64_state)
 	AM_RANGE(0x0000, 0x1FFF) AM_READ_BANK("bankr1") AM_WRITE_BANK("bankw1")
 	AM_RANGE(0x2000, 0x2FFF) AM_READ_BANK("bankr2") AM_WRITE_BANK("bankw2")
 	AM_RANGE(0x3000, 0x3FFF) AM_READ_BANK("bankr3") AM_WRITE_BANK("bankw3")
-	AM_RANGE(0x4000, 0x4FFF) AM_READ_BANK("bankr4") AM_WRITE_BANK("bankw4")
-	AM_RANGE(0x5000, 0xFFFF) AM_RAM AM_REGION("rambank", 0x5000)
+	AM_RANGE(0x4000, 0xBFFF) AM_READ_BANK("bankr4") AM_WRITE_BANK("bankw4")
+	AM_RANGE(0xC000, 0xFFFF) AM_RAM AM_REGION("rambank", 0xC000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(excali64_io, AS_IO, 8, excali64_state)
@@ -101,6 +147,15 @@ static ADDRESS_MAP_START(excali64_io, AS_IO, 8, excali64_state)
 	AM_RANGE(0x50, 0x5f) AM_READ(port50_r)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x0c) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0x70, 0x7f) AM_WRITE(port70_w)
+	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("dma", z80dma_device, read, write)
+	AM_RANGE(0xe4, 0xe7) AM_WRITE(porte4_w)
+	AM_RANGE(0xe8, 0xeb) AM_READ(porte8_r)
+	AM_RANGE(0xec, 0xef) AM_WRITE(portec_w)
+#if NEWFDC
+	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("fdc", wd2793_t, read, write)
+#else
+	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("fdc", wd2793_device, read, write)
+#endif
 ADDRESS_MAP_END
 
 
@@ -186,6 +241,129 @@ static INPUT_PORTS_START( excali64 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 &") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
 INPUT_PORTS_END
 
+WRITE_LINE_MEMBER( excali64_state::cent_busy_w )
+{
+	m_centronics_busy = state;
+}
+
+#if NEWFDC
+FLOPPY_FORMATS_MEMBER( excali64_state::floppy_formats )
+	FLOPPY_EXCALI64_FORMAT
+FLOPPY_FORMATS_END
+
+static SLOT_INTERFACE_START( excali64_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
+#else
+static LEGACY_FLOPPY_OPTIONS_START(excali64)
+	LEGACY_FLOPPY_OPTION(excali64_ds, "raw", "Excalibur 64 DS disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([5])
+		SECTOR_LENGTH([1024])
+		FIRST_SECTOR_ID([1]))
+LEGACY_FLOPPY_OPTIONS_END
+
+static const floppy_interface excali64_floppy_interface =
+{
+	FLOPPY_STANDARD_5_25_DSDD,
+	LEGACY_FLOPPY_OPTIONS_NAME(excali64),
+	NULL
+};
+#endif
+
+// pulses from port E4 bit 5 restart the 74123. After 3.6 secs without a pulse, the motor gets turned off.
+WRITE8_MEMBER( excali64_state::motor_w )
+{
+	m_motor = BIT(data, 0);
+#if NEWFDC
+	m_floppy1->get_device()->mon_w(!m_motor);
+	m_floppy0->get_device()->mon_w(!m_motor);
+#else
+	legacy_floppy_image_device *flop = subdevice<legacy_floppy_image_device>(FLOPPY_0);
+	flop->floppy_mon_w(!m_motor); // motor on
+	flop = subdevice<legacy_floppy_image_device>(FLOPPY_1);
+	flop->floppy_mon_w(!m_motor); // motor on
+#endif
+}
+
+READ8_MEMBER( excali64_state::porte8_r )
+{
+	return 0xfc | (UINT8)m_motor;
+}
+
+WRITE8_MEMBER( excali64_state::porte4_w )
+{
+#if NEWFDC
+	floppy_image_device *floppy = NULL;
+	if (BIT(data, 0))
+		floppy = m_floppy0->get_device();
+
+	if (BIT(data, 1))
+		floppy = m_floppy1->get_device();
+
+	m_fdc->set_floppy(floppy);
+	if (floppy)
+		floppy->ss_w(BIT(data, 4));
+
+#else
+	if BIT(data, 0)
+		m_fdc->set_drive(0);
+
+	if BIT(data, 1)
+		m_fdc->set_drive(1);
+
+	m_fdc->set_side(BIT(data, 4));
+#endif
+
+	m_u12->b_w(space,offset, BIT(data, 5)); // motor pulse
+}
+
+/*
+d0 = precomp (selectable by jumper)
+d1 = size select (we only support 13cm)
+d2 = density select (0 = double)
+*/
+WRITE8_MEMBER( excali64_state::portec_w )
+{
+#if NEWFDC
+	m_fdc->dden_w(BIT(data, 2));
+#else
+	m_fdc->dden_w(!BIT(data, 2));
+#endif
+}
+
+WRITE_LINE_MEMBER( excali64_state::busreq_w )
+{
+// since our Z80 has no support for BUSACK, we assume it is granted immediately
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
+	m_dma->bai_w(state); // tell dma that bus has been granted
+}
+
+READ8_MEMBER( excali64_state::memory_read_byte )
+{
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
+	return prog_space.read_byte(offset);
+}
+
+WRITE8_MEMBER( excali64_state::memory_write_byte )
+{
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
+	prog_space.write_byte(offset, data);
+}
+
+READ8_MEMBER( excali64_state::io_read_byte )
+{
+	address_space& prog_space = m_maincpu->space(AS_IO);
+	return prog_space.read_byte(offset);
+}
+
+WRITE8_MEMBER( excali64_state::io_write_byte )
+{
+	address_space& prog_space = m_maincpu->space(AS_IO);
+	prog_space.write_byte(offset, data);
+}
+
 WRITE8_MEMBER( excali64_state::ppib_w )
 {
 	m_kbdrow = data;
@@ -193,7 +371,8 @@ WRITE8_MEMBER( excali64_state::ppib_w )
 
 READ8_MEMBER( excali64_state::ppic_r )
 {
-	UINT8 data = 0xf7;
+	UINT8 data = 0xf4; // READY line must be low to print
+	data |= (UINT8)m_centronics_busy;
 	data |= (m_cass->input() > 0.1) << 3;
 	return data;
 }
@@ -201,6 +380,7 @@ READ8_MEMBER( excali64_state::ppic_r )
 WRITE8_MEMBER( excali64_state::ppic_w )
 {
 	m_cass->output(BIT(data, 7) ? -1.0 : +1.0);
+	m_centronics->write_strobe(BIT(data, 4));
 }
 
 READ8_MEMBER( excali64_state::port00_r )
@@ -227,7 +407,8 @@ d5 : rombank
 READ8_MEMBER( excali64_state::port50_r )
 {
 	UINT8 data = m_sys_status & 0x2f;
-	data |= (UINT8)m_crtc_vs << 4;
+	bool csync = m_crtc_hs | m_crtc_vs;
+	data |= (UINT8)csync << 4;
 	return data;
 }
 
@@ -245,6 +426,7 @@ WRITE8_MEMBER( excali64_state::port70_w )
 		membank("bankr1")->set_entry(0);
 		membank("bankr2")->set_entry(0);
 		membank("bankr3")->set_entry(0);
+		membank("bankr4")->set_entry(0);
 		membank("bankw2")->set_entry(0);
 		membank("bankw3")->set_entry(0);
 		membank("bankw4")->set_entry(0);
@@ -252,22 +434,24 @@ WRITE8_MEMBER( excali64_state::port70_w )
 	else
 	if BIT(data, 0)
 	{
-	// select videoram and hiresram for writing, and ROM for reading
+	// select videoram and hiresram
 		membank("bankr1")->set_entry(1);
-		membank("bankr2")->set_entry(1);
-		membank("bankr3")->set_entry(1);
+		membank("bankr2")->set_entry(2);
+		membank("bankr3")->set_entry(2);
 		membank("bankw2")->set_entry(2);
 		membank("bankw3")->set_entry(2);
+		membank("bankr4")->set_entry(2);
 		membank("bankw4")->set_entry(2);
 	}
 	else
 	{
-	// as above, except 4000-4FFF is main ram
+	// select rom, videoram, and main ram
 		membank("bankr1")->set_entry(1);
 		membank("bankr2")->set_entry(1);
 		membank("bankr3")->set_entry(1);
 		membank("bankw2")->set_entry(2);
 		membank("bankw3")->set_entry(2);
+		membank("bankr4")->set_entry(0);
 		membank("bankw4")->set_entry(0);
 	}
 
@@ -284,14 +468,14 @@ MACHINE_RESET_MEMBER( excali64_state, excali64 )
 	membank("bankr4")->set_entry(0); // read from RAM
 	membank("bankw1")->set_entry(0); // write to RAM
 	membank("bankw2")->set_entry(2); // write to videoram
-	membank("bankw3")->set_entry(2); // write to hiresram
+	membank("bankw3")->set_entry(2); // write to videoram hires pointers
 	membank("bankw4")->set_entry(0); // write to RAM
 	m_maincpu->reset();
 }
 
-WRITE_LINE_MEMBER( excali64_state::crtc_de )
+WRITE_LINE_MEMBER( excali64_state::crtc_hs )
 {
-	m_crtc_de = state;
+	m_crtc_hs = state;
 }
 
 WRITE_LINE_MEMBER( excali64_state::crtc_vs )
@@ -325,7 +509,7 @@ PALETTE_INIT_MEMBER( excali64_state, excali64 )
 	// do this here because driver_init hasn't run yet
 	m_p_videoram = memregion("videoram")->base();
 	m_p_chargen = memregion("chargen")->base();
-	m_p_hiresram = memregion("hiresram")->base();
+	m_p_hiresram = m_p_videoram + 0x2000;
 	UINT8 *main = memregion("roms")->base();
 	UINT8 *ram = memregion("rambank")->base();
 
@@ -345,12 +529,15 @@ PALETTE_INIT_MEMBER( excali64_state, excali64 )
 	membank("bankr2")->configure_entry(1, &main[0x4000]);//boot
 	membank("bankr3")->configure_entry(1, &main[0x5000]);//boot
 	// videoram
+	membank("bankr2")->configure_entry(2, &m_p_videoram[0x0000]);
 	membank("bankw2")->configure_entry(2, &m_p_videoram[0x0000]);//boot
 	// hiresram
-	membank("bankw3")->configure_entry(2, &m_p_hiresram[0x0000]);//boot
+	membank("bankr3")->configure_entry(2, &m_p_videoram[0x1000]);
+	membank("bankw3")->configure_entry(2, &m_p_videoram[0x1000]);//boot
+	membank("bankr4")->configure_entry(2, &m_p_hiresram[0x0000]);
 	membank("bankw4")->configure_entry(2, &m_p_hiresram[0x0000]);
 
-	// Set up foreground palettes
+	// Set up foreground colours
 	UINT8 r,g,b,i,code;
 	for (i = 0; i < 32; i++)
 	{
@@ -388,11 +575,17 @@ MC6845_UPDATE_ROW( excali64_state::update_row )
 		fg = col_base + (col >> 4);
 		bg = 32 + ((col >> 1) & 7);
 
-		if (BIT(col, 0) & BIT(chr, 7))
-			gfx = m_p_hiresram[(chr<<4) | ra]; // hires definition
+		if BIT(col, 0)
+		{
+			UINT8 h = m_p_videoram[mem+0x1000] - 4;
+			if (h > 5)
+				h = 0; // keep us in bounds
+			// hires definition - pixels are opposite order to characters
+			gfx = BITSWAP8(m_p_hiresram[(h << 12) | (chr<<4) | ra], 0, 1, 2, 3, 4, 5, 6, 7);
+		}
 		else
 			gfx = m_p_chargen[(chr<<4) | ra]; // normal character
-		
+
 		gfx ^= (x == cursor_x) ? 0xff : 0;
 
 		/* Display a scanline of a character */
@@ -422,20 +615,15 @@ static MACHINE_CONFIG_START( excali64, excali64_state )
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_16MHz / 16) /* Timer 0: tone gen for speaker */
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
-	MCFG_PIT8253_CLK1(XTAL_16MHz / 8) /* Timer 1: baud rate gen for 8251 */
+	//MCFG_PIT8253_CLK1(XTAL_16MHz / 16) /* Timer 1: baud rate gen for 8251 */
 	//MCFG_PIT8253_OUT1_HANDLER(WRITELINE(excali64_state, write_uart_clock))
-	//MCFG_PIT8253_CLK2(XTAL_16MHz / 8) /* Timer 2: not used */
+	//MCFG_PIT8253_CLK2(XTAL_16MHz / 16) /* Timer 2: not used */
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(excali64_state, ppia_r))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(excali64_state, ppia_w)) // parallel port
-	//MCFG_I8255_IN_PORTB_CB(READ8(excali64_state, ppib_r))
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write)) // parallel port
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(excali64_state, ppib_w))
 	MCFG_I8255_IN_PORTC_CB(READ8(excali64_state, ppic_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(excali64_state, ppic_w))
-
-	//MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	//MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(excali64_state, write_acia_clock))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -453,18 +641,47 @@ static MACHINE_CONFIG_START( excali64, excali64_state )
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 40)
 	MCFG_PALETTE_INIT_OWNER(excali64_state, excali64)
-	//MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", excali64)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_16MHz / 16) // 1MHz for lowres; 2MHz for highres
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(excali64_state, update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(excali64_state, crtc_de))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(excali64_state, crtc_hs))
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(excali64_state, crtc_vs))
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )
-	MACHINE_CONFIG_END
+#if NEWFDC
+	MCFG_WD2793x_ADD("fdc", XTAL_16MHz / 16)
+	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", excali64_floppies, "525dd", excali64_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", excali64_floppies, "525dd", excali64_state::floppy_formats)
+#else
+	MCFG_DEVICE_ADD("fdc", WD2793, 0)
+	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
+	MCFG_WD17XX_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(excali64_floppy_interface)
+#endif
+	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL_16MHz/4)
+	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(excali64_state, busreq_w))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(excali64_state, memory_read_byte))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(excali64_state, memory_write_byte))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(excali64_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(excali64_state, io_write_byte))
+
+	MCFG_DEVICE_ADD("u12", TTL74123, 0)
+	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_GROUNDED)    /* Hook up type (no idea what this means) */
+	MCFG_TTL74123_RESISTOR_VALUE(RES_K(100))               /* resistor connected between RCext & 5v */
+	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(100))               /* capacitor connected between Cext and RCext */
+	MCFG_TTL74123_A_PIN_VALUE(0)                  /* A pin - grounded */
+	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - driven by port e4 bit 5 */
+	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITE8(excali64_state, motor_w))
+
+	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(excali64_state, cent_busy_w))
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( excali64 )
@@ -478,8 +695,7 @@ ROM_START( excali64 )
 	ROM_FILL(0x4f7, 1, 8)
 
 	ROM_REGION(0x10000, "rambank", ROMREGION_ERASE00)
-	ROM_REGION(0x1000, "videoram", ROMREGION_ERASE00)
-	ROM_REGION(0x1000, "hiresram", ROMREGION_ERASE00)
+	ROM_REGION(0xA000, "videoram", ROMREGION_ERASE00)
 
 	ROM_REGION(0x1020, "chargen", 0)
 	ROM_LOAD( "genex_3.ic43", 0x0000, 0x1000, CRC(b91619a9) SHA1(2ced636cb7b94ba9d329868d7ecf79963cefe9d9) )
@@ -489,4 +705,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     CLASS         INIT        COMPANY         FULLNAME        FLAGS */
-COMP( 1984, excali64, 0,      0,       excali64,  excali64, driver_device, 0,  "BGR Computers", "Excalibur 64", GAME_NOT_WORKING )
+COMP( 1984, excali64, 0,      0,       excali64,  excali64, driver_device, 0,  "BGR Computers", "Excalibur 64", 0 )

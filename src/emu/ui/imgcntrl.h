@@ -25,7 +25,9 @@ public:
 
 protected:
 	enum {
-		START_FILE, START_OTHER_PART, START_SOFTLIST, SELECT_PARTLIST, SELECT_ONE_PART, SELECT_OTHER_PART, SELECT_FILE, CREATE_FILE, CREATE_CONFIRM, DO_CREATE, SELECT_SOFTLIST,
+		START_FILE, START_OTHER_PART, START_SOFTLIST, 
+		SELECT_PARTLIST, SELECT_ONE_PART, SELECT_OTHER_PART, 
+		SELECT_FILE, CREATE_FILE, CREATE_CONFIRM, CHECK_CREATE, DO_CREATE, SELECT_SOFTLIST,
 		LAST_ID
 	};
 
@@ -38,6 +40,8 @@ protected:
 
 	// methods
 	virtual void hook_load(astring filename, bool softlist);
+
+	bool create_ok;
 
 private:
 	// instance variables

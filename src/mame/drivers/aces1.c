@@ -38,6 +38,10 @@ public:
 	aces1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
+			m_reel0(*this, "reel0"),
+			m_reel1(*this, "reel1"),
+			m_reel2(*this, "reel2"),
+			m_reel3(*this, "reel3"),
 			m_io1_port(*this, "IO1"),
 			m_io2_port(*this, "IO2"),
 			m_io3_port(*this, "IO3"),
@@ -53,6 +57,11 @@ public:
 	int m_reel_clock[4];
 	int m_reel_phase[4];
 	int m_reel_count[4];
+	int m_optic_pattern;
+	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
+	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
+	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
+	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
 
 	DECLARE_READ8_MEMBER( aces1_unk_r )
 	{
@@ -148,7 +157,13 @@ public:
 				{
 					int sense = ((data & (4 + (1<<reel))) ? -2:2);
 					m_reel_phase[reel] = ((m_reel_phase[reel] + sense + 8) % 8);
-					stepper_update(reel, phases[m_reel_phase[reel]]);
+					switch (reel)
+					{
+					case 0: m_reel0->update(phases[m_reel_phase[reel]]); break;
+					case 1: m_reel1->update(phases[m_reel_phase[reel]]); break;
+					case 2: m_reel2->update(phases[m_reel_phase[reel]]); break;
+					case 3: m_reel3->update(phases[m_reel_phase[reel]]); break;
+					}
 					m_reel_clock[reel] = clock;
 					if ( m_reel_phase[reel] % 4 ==0)
 					{
@@ -187,19 +202,21 @@ public:
 
 	DECLARE_READ8_MEMBER( ic37_read_c )
 	{
-		int pattern =0;
 		int action =0;
 		for (int reel = 0; reel < 4; reel++)
 		{
-			if (stepper_optic_state(reel)) pattern |= 1<<reel;
 			if (m_reel_count[reel]) action |= 1<<reel;
 		}
 
-		return ((pattern << 4) | action);
+		return ((m_optic_pattern << 4) | action);
 	}
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_device<stepper_device> m_reel0;
+	required_device<stepper_device> m_reel1;
+	required_device<stepper_device> m_reel2;
+	required_device<stepper_device> m_reel3;
 	required_ioport m_io1_port;
 	required_ioport m_io2_port;
 	required_ioport m_io3_port;
@@ -236,11 +253,6 @@ TIMER_CALLBACK_MEMBER(aces1_state::m_aces1_nmi_timer_callback)
 
 void aces1_state::machine_start()
 {
-	stepper_config(machine(), 0, &starpoint_interface_48step);
-	stepper_config(machine(), 1, &starpoint_interface_48step);
-	stepper_config(machine(), 2, &starpoint_interface_48step);
-	stepper_config(machine(), 3, &starpoint_interface_48step);
-
 	for (int reel=0; reel <4; reel++)
 	{
 		m_reel_clock[reel] =0;
@@ -452,6 +464,16 @@ static MACHINE_CONFIG_START( aces1, aces1_state )
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* steppers */
+	MCFG_STARPOINT_48STEP_ADD("reel0")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(aces1_state, reel0_optic_cb))
+	MCFG_STARPOINT_48STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(aces1_state, reel1_optic_cb))
+	MCFG_STARPOINT_48STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(aces1_state, reel2_optic_cb))
+	MCFG_STARPOINT_48STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(aces1_state, reel3_optic_cb))
 MACHINE_CONFIG_END
 
 

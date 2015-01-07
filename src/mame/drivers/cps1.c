@@ -1855,7 +1855,7 @@ INPUT_PORTS_END
 
 /* SWB.4, SWB.5 and SWB.6 need to be enabled simultaneously for turbo mode */
 static INPUT_PORTS_START( sf2amf )
-	PORT_INCLUDE( sf2 )
+	PORT_INCLUDE( sf2hack )
 
 	PORT_MODIFY("DSWB")
 	PORT_DIPNAME( 0x08, 0x08, "Turbo Mode Switch 1 of 3" )   PORT_DIPLOCATION("SW(B):4")
@@ -11518,11 +11518,21 @@ DRIVER_INIT_MEMBER(cps_state, ganbare)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff0000, 0xffffff, read16_delegate(FUNC(cps_state::ganbare_ram_r),this), write16_delegate(FUNC(cps_state::ganbare_ram_w),this));
 }
 
+READ16_MEMBER(cps_state::dinohunt_sound_r)
+{
+	/*TODO: understand what's really going on here. According to MT05805;
+	"I think that the values written are only qsound leftovers (after a lot of 0xFF values,
+	there is the same qsound starting sequence, eg: 0x88, 0xFF, 0x0B, 0x00, 0x00, 0x00, ...)."*/
+	return 0xff;
+}
+
 DRIVER_INIT_MEMBER(cps_state,dinohunt)
 {
 	// is this shared with the new sound hw?
-	UINT8* ram = (UINT8*)m_maincpu->space(AS_PROGRAM).install_ram(0xf18000, 0xf19fff);
-	memset(ram,0xff,0x2000);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf18000, 0xf19fff, read16_delegate(FUNC(cps_state::dinohunt_sound_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_port(0xfc0000, 0xfc0001, "IN2"); ;
+	// the ym2151 doesn't seem to be used. Is it actually on the PCB?
+
 	DRIVER_INIT_CALL(cps1);
 }
 
@@ -11656,7 +11666,7 @@ GAME( 1992, sf2v004,     sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     
 GAME( 1992, sf2acc,      sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Accelerator!, bootleg, set 1)", GAME_SUPPORTS_SAVE )          // 920313 - based on World version
 GAME( 1992, sf2acca,     sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Accelerator!, bootleg, set 2)", GAME_SUPPORTS_SAVE )          // 920313 - based on World version
 GAME( 1992, sf2accp2,    sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Accelerator Pt.II, bootleg)", GAME_SUPPORTS_SAVE )        // 920313 - based on World version
-GAME( 1992, sf2amf,      sf2ce,    cps1_12MHz, sf2amf,   cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Alpha Magic-F, bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )     // 920313 - based on World version
+GAME( 1992, sf2amf,      sf2ce,    cps1_12MHz, sf2amf,   cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (Alpha Magic-F, bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )     // 920313 - based on World version
 GAME( 1992, sf2amf2,     sf2ce,    cps1_12MHz, sf2hack,  cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (L735 Test Rom, bootleg)", GAME_SUPPORTS_SAVE )     // 920313 - based on World version
 GAME( 1992, sf2dkot2,    sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Double K.O. Turbo II, bootleg)", GAME_SUPPORTS_SAVE ) // 902140 !!! - based on USA version
 GAME( 1992, sf2ceblp,    sf2ce,    cps1_10MHz, sf2,      cps_state,   sf2ceblp, ROT0,   "bootleg", "Street Fighter II': Champion Edition (protected bootleg on non-dash board)", GAME_SUPPORTS_SAVE )          // 920313 - based on USA version

@@ -18,7 +18,7 @@
     - Dust Box vol. 1-3: they die with text garbage, might be bad dumps;
     - Dust Box vol. 4: window effect transition is bugged;
     - Dust Box vol. n: three items returns "purple" text, presumably HW failures (DFJustin: joystick "digital", mouse "not installed", HDD "not installed");
-    - LayDock: hangs by reading the FDC status and expecting it to become 0x81;
+    - LayDock: hangs at title screen due of a PIT bug (timer irq dies for whatever reason);
     - Moon Child: needs mixed 3+3bpp tvram supported, kludged for now (not a real test case);
     - Moon Child: window masking doesn't mask bottom part of the screen?
     - Moon Child: appears to be a network / system link game, obviously doesn't work with current MAME / MESS framework;
@@ -95,6 +95,7 @@ public:
 	UINT8 m_irq_sel;
 	UINT8 m_irq_vector[4];
 	UINT8 m_irq_mask[4];
+	UINT8 m_irq_pending[4];
 	UINT8 m_kanji_bank;
 	UINT8 m_dic_bank;
 	UINT8 m_fdc_reverse;
@@ -204,6 +205,7 @@ public:
 	DECLARE_WRITE8_MEMBER(opn_porta_w);
 	DECLARE_WRITE_LINE_MEMBER(pit8253_clk0_irq);
 	DECLARE_WRITE_LINE_MEMBER(mz2500_rtc_alarm_irq);
+	IRQ_CALLBACK_MEMBER( mz2500_irq_ack );
 
 	void draw_80x25(bitmap_ind16 &bitmap,const rectangle &cliprect,UINT16 map_addr);
 	void draw_40x25(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,UINT16 map_addr);
@@ -1183,13 +1185,14 @@ WRITE8_MEMBER(mz2500_state::mz2500_irq_data_w)
 WRITE8_MEMBER(mz2500_state::mz2500_fdc_w)
 {
 	mb8877_device *fdc = machine().device<mb8877_device>("mb8877a");
-
+	UINT8 drivenum;
 	switch(offset+0xdc)
 	{
 		case 0xdc:
-			fdc->set_drive(data & 3);
-			floppy_get_device(machine(), data & 3)->floppy_mon_w((data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
-			floppy_get_device(machine(), data & 3)->floppy_drive_set_ready_state(1,0);
+			drivenum = (data & 3) ^ m_fdc_reverse;
+			fdc->set_drive(drivenum);
+			floppy_get_device(machine(), drivenum)->floppy_mon_w((data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+			floppy_get_device(machine(), drivenum)->floppy_drive_set_ready_state(1,0);
 			break;
 		case 0xdd:
 			fdc->set_side((data & 1));
@@ -1267,13 +1270,13 @@ WRITE8_MEMBER(mz2500_state::palette4096_io_w)
 READ8_MEMBER(mz2500_state::mz2500_wd17xx_r)
 {
 	mb8877_device *fdc = machine().device<mb8877_device>("mb8877a");
-	return fdc->read(space, offset) ^ m_fdc_reverse;
+	return fdc->read(space, offset) ^ 0xff;
 }
 
 WRITE8_MEMBER(mz2500_state::mz2500_wd17xx_w)
 {
 	mb8877_device *fdc = machine().device<mb8877_device>("mb8877a");
-	fdc->write(space, offset, data ^ m_fdc_reverse);
+	fdc->write(space, offset, data ^ 0xff);
 }
 
 READ8_MEMBER(mz2500_state::mz2500_bplane_latch_r)
@@ -1794,8 +1797,10 @@ void mz2500_state::machine_reset()
 
 	/* disable IRQ */
 	for(i=0;i<4;i++)
+	{
 		m_irq_mask[i] = 0;
-
+		m_irq_pending[i] = 0;
+	}
 	m_kanji_bank = 0;
 
 	m_cg_clear_flag = 0;
@@ -1852,9 +1857,26 @@ GFXDECODE_END
 INTERRUPT_GEN_MEMBER(mz2500_state::mz2500_vbl)
 {
 	if(m_irq_mask[0])
-		device.execute().set_input_line_and_vector(0, HOLD_LINE, m_irq_vector[0]);
-
+	{
+		m_irq_pending[0] = 1;
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+	}
 	m_cg_clear_flag = 0;
+}
+
+IRQ_CALLBACK_MEMBER(mz2500_state::mz2500_irq_ack)
+{
+	int i;
+	for(i=0;i<4;i++)
+	{
+		if(m_irq_mask[i] && m_irq_pending[i])
+		{
+			m_irq_pending[i] = 0;
+			m_maincpu->set_input_line(0, CLEAR_LINE);
+			return m_irq_vector[i];
+		}
+	}
+	return 0;
 }
 
 READ8_MEMBER(mz2500_state::mz2500_porta_r)
@@ -1982,7 +2004,7 @@ WRITE8_MEMBER(mz2500_state::opn_porta_w)
 	---- --x- floppy reverse bit (controls wd17xx bits in command registers)
 	*/
 
-	m_fdc_reverse = (data & 2) ? 0x00 : 0xff;
+	m_fdc_reverse = data & 2;
 	m_pal_select = (data & 4) ? 1 : 0;
 
 	m_ym_porta = data;
@@ -2031,8 +2053,11 @@ PALETTE_INIT_MEMBER(mz2500_state, mz2500)
 
 WRITE_LINE_MEMBER(mz2500_state::pit8253_clk0_irq)
 {
-	if(m_irq_mask[1]/* && state & 1*/)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,m_irq_vector[1]);
+	if(m_irq_mask[1] && state & 1)
+	{
+		m_irq_pending[1] = 1;
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+	}
 }
 
 WRITE_LINE_MEMBER(mz2500_state::mz2500_rtc_alarm_irq)
@@ -2048,6 +2073,7 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	MCFG_CPU_PROGRAM_MAP(mz2500_map)
 	MCFG_CPU_IO_MAP(mz2500_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mz2500_state,  mz2500_vbl)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(mz2500_state,mz2500_irq_ack)
 
 	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(mz2500_state, mz2500_porta_r))
@@ -2070,8 +2096,9 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(31250)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(mz2500_state, pit8253_clk0_irq))
+	// TODO: is this really right?
 	MCFG_PIT8253_CLK1(0)
-	MCFG_PIT8253_CLK2(16) //CH2, trusted, used by Super MZ demo / The Black Onyx and a bunch of others (TODO: timing of this)
+	MCFG_PIT8253_CLK2(16) //CH2, used by Super MZ demo / The Black Onyx and a few others (TODO: timing of this)
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pit", pit8253_device, write_clk1))
 
 	MCFG_DEVICE_ADD("mb8877a", MB8877, 0)

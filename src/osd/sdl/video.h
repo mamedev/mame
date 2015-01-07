@@ -70,6 +70,7 @@ struct sdl_monitor_info
 	float               aspect;                 // computed/configured aspect ratio of the physical device
 	int                 center_width;           // width of first physical screen for centering
 	int                 center_height;          // height of first physical screen for centering
+	int                 monitor_x;              // X position of this monitor in virtual desktop space (SDL virtual space has them all horizontally stacked, not real geometry)
 };
 
 

@@ -334,6 +334,20 @@ WRITE8_MEMBER(bwidow_state::bwidow_misc_w)
 	m_lastdata = data;
 }
 
+WRITE8_MEMBER(bwidow_state::spacduel_coin_counter_w)
+{
+	if (data == m_lastdata) return;
+	set_led_status(machine(), 0, !BIT(data,5)); // start lamp
+	set_led_status(machine(), 1, !BIT(data,4)); // select lamp
+	coin_lockout_w(machine(), 0, !BIT(data,3));
+	coin_lockout_w(machine(), 1, !BIT(data,3));
+	coin_lockout_w(machine(), 2, !BIT(data,3));
+	coin_counter_w(machine(), 0, BIT(data,0));
+	coin_counter_w(machine(), 1, BIT(data,1));
+	coin_counter_w(machine(), 2, BIT(data,2));
+	m_lastdata = data;
+}
+
 /*************************************
  *
  *  Interrupt ack
@@ -379,15 +393,15 @@ static ADDRESS_MAP_START( spacduel_map, AS_PROGRAM, 8, bwidow_state )
 	AM_RANGE(0x0900, 0x0907) AM_READ(spacduel_IN3_r)    /* IN1 */
 	AM_RANGE(0x0905, 0x0906) AM_WRITENOP /* ignore? */
 	AM_RANGE(0x0a00, 0x0a00) AM_DEVREAD("earom", atari_vg_earom_device, read)
-//  AM_RANGE(0x0c00, 0x0c00) AM_WRITE(coin_counter_w) /* coin out */
+	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(spacduel_coin_counter_w) /* coin out */
 	AM_RANGE(0x0c80, 0x0c80) AM_DEVWRITE("avg", avg_device, go_w)
 	AM_RANGE(0x0d00, 0x0d00) AM_WRITENOP /* watchdog clear */
 	AM_RANGE(0x0d80, 0x0d80) AM_DEVWRITE("avg", avg_device, reset_w)
 	AM_RANGE(0x0e00, 0x0e00) AM_WRITE(irq_ack_w) /* interrupt acknowledge */
 	AM_RANGE(0x0e80, 0x0e80) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
 	AM_RANGE(0x0f00, 0x0f3f) AM_DEVWRITE("earom", atari_vg_earom_device, write)
-	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
-	AM_RANGE(0x1400, 0x140f) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
+	AM_RANGE(0x1000, 0x10ff) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
+	AM_RANGE(0x1400, 0x14ff) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("vectorram") AM_REGION("maincpu", 0x2000)
 	AM_RANGE(0x2800, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0xffff) AM_ROM
@@ -936,6 +950,53 @@ ROM_START( spacduel )
 	ROM_LOAD( "136002-125.n4",  0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
+ROM_START( spacduel1 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	/* Vector ROM */
+	ROM_LOAD( "136006-106.r7",  0x2800, 0x0800, CRC(691122fe) SHA1(f53be76a49dba319050ca7767de3441521910e83) )
+	ROM_LOAD( "136006-107.np7", 0x3000, 0x1000, CRC(d8dd0461) SHA1(58060b20b2511d30d2ec06479d21840bdd0b53c6) )
+	/* Program ROM */
+	ROM_LOAD( "136006-101.r1",  0x4000, 0x1000, CRC(cd239e6c) SHA1(b6143d979dd35a46bcb783bb0ac02d4dca30f0c2) )
+	ROM_LOAD( "136006-102.np1", 0x5000, 0x1000, CRC(4c451e8a) SHA1(c05c52bb08acccb60950a15f05c960c3bc163d3e) )
+	ROM_LOAD( "136006-103.m1",  0x6000, 0x1000, CRC(ee72da63) SHA1(d36d62cdf7fe76ee9cdbfc2e76ac5d90f22986ba) )
+	ROM_LOAD( "136006-104.kl1", 0x7000, 0x1000, CRC(e41b38a3) SHA1(9e8773e78d65d74db824cfd7108e7038f26757db) )
+	ROM_LOAD( "136006-105.j1",  0x8000, 0x1000, CRC(5652710f) SHA1(b15891d22a47ac3448d2ced40c04d0ab80606c7d) )
+	ROM_RELOAD(                 0x9000, 0x1000 )
+	ROM_RELOAD(                 0xa000, 0x1000 )
+	ROM_RELOAD(                 0xb000, 0x1000 )
+	ROM_RELOAD(                 0xc000, 0x1000 )
+	ROM_RELOAD(                 0xd000, 0x1000 )
+	ROM_RELOAD(                 0xe000, 0x1000 )
+	ROM_RELOAD(                 0xf000, 0x1000 )   /* for reset/interrupt vectors */
+
+	/* AVG PROM */
+	ROM_REGION( 0x100, "user1", 0 )
+	ROM_LOAD( "136002-125.n4",  0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
+ROM_END
+
+ROM_START( spacduel0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	/* Vector ROM */
+	ROM_LOAD( "136006-006.r7",  0x2800, 0x0800, CRC(691122fe) SHA1(f53be76a49dba319050ca7767de3441521910e83) )
+	ROM_LOAD( "136006-007.np7", 0x3000, 0x1000, CRC(d8dd0461) SHA1(58060b20b2511d30d2ec06479d21840bdd0b53c6) )
+	/* Program ROM */
+	ROM_LOAD( "136006-001.r1",  0x4000, 0x1000, CRC(8f993ac8) SHA1(38b6d1ee3f19bb77b8aca24fbbae38684f194796) )
+	ROM_LOAD( "136006-002.np1", 0x5000, 0x1000, CRC(32cca051) SHA1(a01982e4362ba3dcdafd02d5403f8a190042e314) )
+	ROM_LOAD( "136006-003.m1",  0x6000, 0x1000, CRC(36624d57) SHA1(e66cbd747c2a298f402b91c2cf042a0697ff8296) )
+	ROM_LOAD( "136006-004.kl1", 0x7000, 0x1000, CRC(b322bf0b) SHA1(d67bf4e1e9b5b14b0455f37f9be11167aa3575c2) )
+	ROM_LOAD( "136006-005.j1",  0x8000, 0x1000, CRC(0edb1242) SHA1(5ec62e48d15c5baf0fb583e014cae2ec4bd5f5e4) )
+	ROM_RELOAD(                 0x9000, 0x1000 )
+	ROM_RELOAD(                 0xa000, 0x1000 )
+	ROM_RELOAD(                 0xb000, 0x1000 )
+	ROM_RELOAD(                 0xc000, 0x1000 )
+	ROM_RELOAD(                 0xd000, 0x1000 )
+	ROM_RELOAD(                 0xe000, 0x1000 )
+	ROM_RELOAD(                 0xf000, 0x1000 )   /* for reset/interrupt vectors */
+
+	/* AVG PROM */
+	ROM_REGION( 0x100, "user1", 0 )
+	ROM_LOAD( "136002-125.n4",  0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
+ROM_END
 
 
 /*************************************
@@ -944,7 +1005,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, spacduel, 0,        spacduel, spacduel, driver_device, 0, ROT0, "Atari", "Space Duel", GAME_SUPPORTS_SAVE )
+GAME( 1980, spacduel, 0,        spacduel, spacduel, driver_device, 0, ROT0, "Atari", "Space Duel (version 2)", GAME_SUPPORTS_SAVE )
+GAME( 1980, spacduel1,spacduel, spacduel, spacduel, driver_device, 0, ROT0, "Atari", "Space Duel (version 1)", GAME_SUPPORTS_SAVE )
+GAME( 1980, spacduel0,spacduel, spacduel, spacduel, driver_device, 0, ROT0, "Atari", "Space Duel (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1982, bwidow,   0,        bwidow,   bwidow, driver_device,   0, ROT0, "Atari", "Black Widow", GAME_SUPPORTS_SAVE )
 GAME( 1982, gravitar, 0,        gravitar, gravitar, driver_device, 0, ROT0, "Atari", "Gravitar (version 3)", GAME_SUPPORTS_SAVE )
 GAME( 1982, gravitar2,gravitar, gravitar, gravitar, driver_device, 0, ROT0, "Atari", "Gravitar (version 2)", GAME_SUPPORTS_SAVE )

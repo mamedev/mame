@@ -7,8 +7,8 @@
 //
 //============================================================
 
-#ifndef __WINSYNC__
-#define __WINSYNC__
+#ifndef __OSDSYNC__
+#define __OSDSYNC__
 
 /***************************************************************************
     SYNCHRONIZATION INTERFACES - Events
@@ -197,4 +197,4 @@ void osd_scalable_lock_release(osd_scalable_lock *lock, INT32 myslot);
 
 void osd_scalable_lock_free(osd_scalable_lock *lock);
 
-#endif  /* __WINSYNC__ */
+#endif  /* __OSDSYNC__ */

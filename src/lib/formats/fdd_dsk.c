@@ -5,7 +5,7 @@
     formats/fdd_dsk.h
 
     PC98 FDD disk images
- 
+
     0xC3FC header, followed by track data
     Sector map starts at offset 0xDC, with 12bytes for each sector
 
@@ -15,15 +15,15 @@
     - 0x2 = sector number
     - 0x3 = sector size (128 << this byte)
     - 0x4 = fill byte. if it's not 0xff, then this sector in the original
-            disk consisted of this single value repeated for the whole 
-            sector size, and the sector is skipped in the .fdd file. 
-            if it's 0xff, then this sector is wholly contained in the .fdd 
+            disk consisted of this single value repeated for the whole
+            sector size, and the sector is skipped in the .fdd file.
+            if it's 0xff, then this sector is wholly contained in the .fdd
             file
     - 0x5 = ??
     - 0x6 = ??
     - 0x7 = ??
     - 0x8-0x0b = absolute offset of the data for this sector, or 0xfffffff
-                 if the sector was skipped in the .fdd (and it has to be 
+                 if the sector was skipped in the .fdd (and it has to be
                  filled with the value at 0x4)
 
  TODO:
@@ -55,19 +55,19 @@ const char *fdd_format::extensions() const
 
 int fdd_format::identify(io_generic *io, UINT32 form_factor)
 {
-	UINT8 h[7];	
+	UINT8 h[7];
 	io_generic_read(io, h, 0, 7);
-	
+
 	if (strncmp((const char *)h, "VFD1.0", 6) == 0)
 		return 100;
-	
+
 	return 0;
 }
 
 bool fdd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
-	UINT8 hsec[0x0c];	
-	
+	UINT8 hsec[0x0c];
+
 	// sector map
 	UINT8 num_secs[160];
 	UINT8 tracks[160 * 26];
@@ -76,9 +76,9 @@ bool fdd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	UINT8 fill_vals[160 * 26];
 	UINT32 sec_offs[160 * 26];
 	UINT8 sec_sizes[160 * 26];
-	
+
 	int pos = 0xdc;
-	
+
 	for (int track = 0; track < 160; track++)
 	{
 		int curr_num_sec = 0, curr_track_size = 0;
@@ -87,10 +87,10 @@ bool fdd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			// read sector map for this sector
 			io_generic_read(io, hsec, pos, 0x0c);
 			pos += 0x0c;
-			
-			if (hsec[0] == 0xff)	// unformatted/unused sector
+
+			if (hsec[0] == 0xff)    // unformatted/unused sector
 				continue;
-			
+
 			tracks[(track * 26) + sect] = hsec[0];
 			heads[(track * 26) + sect] = hsec[1];
 			secs[(track * 26) + sect] = hsec[2];
@@ -110,9 +110,9 @@ bool fdd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	int cur_sec_map = 0, sector_size;
 
 	for (int track = 0; track < 160; track++)
-	{		
+	{
 		int cur_pos = 0;
-		for (int i = 0; i < num_secs[track]; i++) 
+		for (int i = 0; i < num_secs[track]; i++)
 		{
 			cur_sec_map = track * 26 + i;
 			sector_size = 128 << sec_sizes[cur_sec_map];
@@ -121,7 +121,7 @@ bool fdd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				memset(sect_data + cur_pos, fill_vals[cur_sec_map], sector_size);
 			else
 				io_generic_read(io, sect_data + cur_pos, sec_offs[cur_sec_map], sector_size);
-			
+
 			sects[i].track       = tracks[cur_sec_map];
 			sects[i].head        = heads[cur_sec_map];
 			sects[i].sector      = secs[cur_sec_map];
@@ -135,7 +135,7 @@ bool fdd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 		build_pc_track_mfm(track / 2, track % 2, image, cell_count, num_secs[track], sects, calc_default_pc_gap3_size(form_factor, (128 << sec_sizes[track * 26])));
 	}
-	
+
 	return true;
 }
 

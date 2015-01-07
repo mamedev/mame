@@ -311,6 +311,29 @@ protected:
 };
 
 
+// ======================> sega8_hicom_device
+
+class sega8_hicom_device : public sega8_rom_device
+{
+public:
+	// construction/destruction
+	sega8_hicom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// device-level overrides
+	virtual void device_start() { save_item(NAME(m_rom_bank_base)); }
+
+	virtual void late_bank_setup();
+
+	// reading and writing
+	virtual DECLARE_READ8_MEMBER(read_cart);
+	virtual DECLARE_WRITE8_MEMBER(write_cart) {}
+	virtual DECLARE_WRITE8_MEMBER(write_mapper);
+
+protected:
+	UINT8 m_rom_bank_base;
+};
+
+
 // ======================> sega8_korean_device
 
 class sega8_korean_device : public sega8_rom_device
@@ -356,6 +379,7 @@ extern const device_type SEGA8_ROM_4PAK;
 extern const device_type SEGA8_ROM_ZEMINA;
 extern const device_type SEGA8_ROM_NEMESIS;
 extern const device_type SEGA8_ROM_JANGGUN;
+extern const device_type SEGA8_ROM_HICOM;
 extern const device_type SEGA8_ROM_KOREAN;
 extern const device_type SEGA8_ROM_KOREAN_NB;
 

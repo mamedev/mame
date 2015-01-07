@@ -14,7 +14,7 @@
 const device_type DECO_ZOOMSPR = &device_creator<deco_zoomspr_device>;
 
 deco_zoomspr_device::deco_zoomspr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, DECO_ZOOMSPR, "Data East Zooming Sprites", tag, owner, clock, "deco_zoomspr", __FILE__),
+	: device_t(mconfig, DECO_ZOOMSPR, "DECO Zooming Sprites", tag, owner, clock, "deco_zoomspr", __FILE__),
 	m_palette(*this),
 	m_gfxdecode(*this)
 {

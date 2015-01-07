@@ -64,11 +64,11 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	
+
 	required_shared_ptr<UINT8> m_videoram;
-	
+
 	tilemap_t *m_bg_tilemap;
-	
+
 	DECLARE_WRITE8_MEMBER(wallc_videoram_w);
 	DECLARE_WRITE8_MEMBER(wallc_coin_counter_w);
 	DECLARE_DRIVER_INIT(wallc);

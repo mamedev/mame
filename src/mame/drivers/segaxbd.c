@@ -449,7 +449,7 @@ WRITE16_MEMBER( segaxbd_state::iochip_0_w )
 			if (((oldval ^ data) & 0x40) && !(data & 0x40))
 				machine().watchdog_reset();
 
-			m_segaic16vid->segaic16_set_display_enable(data & 0x20);
+			m_segaic16vid->set_display_enable(data & 0x20);
 
 			m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 			if (m_soundcpu2 != NULL)
@@ -640,7 +640,7 @@ READ8_MEMBER( segaxbd_state::sound_data_r )
 
 void segaxbd_state::machine_reset()
 {
-	m_segaic16vid->segaic16_tilemap_reset(*m_screen);
+	m_segaic16vid->tilemap_reset(*m_screen);
 
 	// hook the RESET line, which resets CPU #1
 	m_maincpu->set_reset_callback(write_line_delegate(FUNC(segaxbd_state::m68k_reset_callback),this));
@@ -876,8 +876,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segaxbd_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("backup1")
 	AM_RANGE(0x0a0000, 0x0a3fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("backup2")
-	AM_RANGE(0x0c0000, 0x0cffff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, segaic16_tileram_0_r, segaic16_tileram_0_w) AM_SHARE("textram")
-	AM_RANGE(0x0d0000, 0x0d0fff) AM_MIRROR(0x00f000) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, segaic16_textram_0_r, segaic16_textram_0_w) AM_SHARE("tileram")
+	AM_RANGE(0x0c0000, 0x0cffff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, tileram_r, tileram_w) AM_SHARE("tileram")
+	AM_RANGE(0x0d0000, 0x0d0fff) AM_MIRROR(0x00f000) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, textram_r, textram_w) AM_SHARE("textram")
 	AM_RANGE(0x0e0000, 0x0e0007) AM_MIRROR(0x003ff8) AM_DEVREADWRITE("multiplier_main", sega_315_5248_multiplier_device, read, write)
 	AM_RANGE(0x0e4000, 0x0e401f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE("divider_main", sega_315_5249_divider_device, read, write)
 	AM_RANGE(0x0e8000, 0x0e801f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE("cmptimer_main", sega_315_5250_compare_timer_device, read, write)
@@ -3209,8 +3209,6 @@ DRIVER_INIT_MEMBER(segaxbd_state,generic)
 	m_iochip_custom_io_w[0][3] = iowrite_delegate(FUNC(segaxbd_state::generic_iochip0_lamps_w), this);
 
 	// point globals to allocated memory regions
-	m_segaic16vid->segaic16_tileram_0 = reinterpret_cast<UINT16 *>(memshare("tileram")->ptr());
-	m_segaic16vid->segaic16_textram_0 = reinterpret_cast<UINT16 *>(memshare("textram")->ptr());
 	m_segaic16road->segaic16_roadram_0 = reinterpret_cast<UINT16 *>(memshare("roadram")->ptr());
 
 	// save state

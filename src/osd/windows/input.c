@@ -506,12 +506,15 @@ void windows_osd_interface::input_resume()
 void windows_osd_interface::input_exit()
 {
 	// acquire the lock and turn off input (this ensures everyone is done)
-	osd_lock_acquire(input_lock);
-	input_enabled = false;
-	osd_lock_release(input_lock);
+	if (input_lock != NULL)
+	{
+		osd_lock_acquire(input_lock);
+		input_enabled = false;
+		osd_lock_release(input_lock);
 
-	// free the lock
-	osd_lock_free(input_lock);
+		// free the lock
+		osd_lock_free(input_lock);
+	}
 }
 
 

@@ -46805,6 +46805,19 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
+	<software name="loopyq">
+		<description>LoopyQ</description>
+		<year>1992</year>
+		<publisher>日本ソフテック (Nihon Softec)</publisher>
+		<info name="alt_title" value="ルービーＱ" />
+		<info name="release" value="19921119" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="loopyq.hdm" size="1261568" crc="5aaf0dc8" sha1="d9720bc05f91354187ff362ceefe43d81234f84d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lotus123" supported="no">
 		<description>Lotus 1-2-3 (Demo)</description>
 		<year>19??</year>
@@ -49259,6 +49272,56 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="trial_of_fours.hdm" size="1261568" crc="7ada1ec4" sha1="a17ece2c44f3a1e24fa5e56ccb55d252a2a5ed9b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultrasak">
+		<description>Ultra Sakusen - Kagaku Tokusoutai Shutsugeki Seyo!</description>
+		<year>1992</year>
+		<publisher>バンプレスト (Banpresto)</publisher>
+		<info name="alt_title" value="ウルトラ作戦 科学特捜隊出撃せよ！" />
+		<info name="release" value="19921208" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="system.hdm" size="1261568" crc="ad35a329" sha1="db8f34d1b126dad253e44035cf295248dd8c1d1c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="a.hdm" size="1261568" crc="8daf39f0" sha1="53a1f3290b2cd07b72fb42eb970b0120106b76fd" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="b.hdm" size="1261568" crc="bc7ebede" sha1="b6cc7d3d18198deb918556eaefb422c3f9311148" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="c.hdm" size="1261568" crc="1513def4" sha1="fabc4016c6f38e98a36a6a8b04e9e8b6a21a9599" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="d.hdm" size="1261568" crc="dfa1fbd2" sha1="22bbc1bfcbef5807241a3958a3773c959948b209" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk E"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="e.hdm" size="1261568" crc="553015ef" sha1="085e87a73ccc767ff157e0ef8342fc2dd3a69217" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk F"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="f.hdm" size="1261568" crc="1e0680ce" sha1="52fb9ecd5edab9c8f653330699849ad075344cbb" offset="0" />
 			</dataarea>
 		</part>
 	</software>

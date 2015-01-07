@@ -1113,7 +1113,7 @@ MACHINE_CONFIG_END
 	ROM_SYSTEM_BIOS( 1, "v10", "v1.0 v41" ) /* MAC address/serial number word at 0xC: 003090 */ \
 	ROMX_LOAD( "rev_1.0_v41.bin", 0x0000, 0x10000, CRC(54df32b9) SHA1(06e3ecf09ab67a571186efd870e6b44028612371), ROM_BIOS(2)) /* Label: "(C) 1989 NeXT, Inc. // All Rights Reserved. // Release 1.0 // 1142.00", underlabel: "MYF // 1.0.41 // 0D5C" */ \
 	ROM_SYSTEM_BIOS( 2, "v10p", "v1.0 v41 alternate" ) /* MAC address/serial number word at 0xC: 0023D9 */ \
-	ROMX_LOAD( "rev_1.0_proto.bin", 0x0000, 0x10000, CRC(F44974F9) SHA1(09EAF9F5D47E379CFA0E4DC377758A97D2869DDC), ROM_BIOS(3)) /* Label: "(C) 1989 NeXT, Inc. // All Rights Reserved. // Release 1.0 // 1142.00", no underlabel */
+	ROMX_LOAD( "rev_1.0_proto.bin", 0x0000, 0x10000, CRC(f44974f9) SHA1(09eaf9f5d47e379cfa0e4dc377758a97d2869ddc), ROM_BIOS(3)) /* Label: "(C) 1989 NeXT, Inc. // All Rights Reserved. // Release 1.0 // 1142.00", no underlabel */
 
 #define ROM_NEXT_V2 \
 	ROM_REGION32_BE( 0x20000, "user1", ROMREGION_ERASEFF ) \
@@ -1122,11 +1122,11 @@ MACHINE_CONFIG_END
 	ROM_SYSTEM_BIOS( 1, "v24", "v2.4 v65" ) /* MAC address/serial number word at 0xC: 00A634 */ \
 	ROMX_LOAD( "rev_2.4_v65.bin", 0x0000, 0x20000, CRC(74e9e541) SHA1(67d195351288e90818336c3a84d55e6a070960d2), ROM_BIOS(2)) \
 	ROM_SYSTEM_BIOS( 2, "v22", "v2.2 v63" ) /* MAC address/serial number word at 0xC: 00894C */ \
-	ROMX_LOAD( "rev_2.2_v63.bin", 0x0000, 0x20000, CRC(739D7C07) SHA1(48FFE54CF2038782A92A0850337C5C6213C98571), ROM_BIOS(3)) /* Label: "(C) 1990 NeXT Computer, Inc. // All Rights Reserved. // Release 2.1 // 2918.AB" */ \
+	ROMX_LOAD( "rev_2.2_v63.bin", 0x0000, 0x20000, CRC(739d7c07) SHA1(48ffe54cf2038782a92a0850337c5c6213c98571), ROM_BIOS(3)) /* Label: "(C) 1990 NeXT Computer, Inc. // All Rights Reserved. // Release 2.1 // 2918.AB" */ \
 	ROM_SYSTEM_BIOS( 3, "v21", "v2.1 v59" ) /* MAC address/serial number word at 0xC: 0072FE */ \
 	ROMX_LOAD( "rev_2.1_v59.bin", 0x0000, 0x20000, CRC(f20ef956) SHA1(09586c6de1ca73995f8c9b99870ee3cc9990933a), ROM_BIOS(4)) \
 	ROM_SYSTEM_BIOS( 4, "v12", "v1.2 v58" ) /* MAC address/serial number word at 0xC: 006372 */ \
-	ROMX_LOAD( "rev_1.2_v58.bin", 0x0000, 0x20000, CRC(B815B6A4) SHA1(97D8B09D03616E1487E69D26609487486DB28090), ROM_BIOS(5)) /* Label: "V58 // (C) 1990 NeXT, Inc. // All Rights Reserved // Release 1.2 // 1142.02" */
+	ROMX_LOAD( "rev_1.2_v58.bin", 0x0000, 0x20000, CRC(b815b6a4) SHA1(97d8b09d03616e1487e69d26609487486db28090), ROM_BIOS(5)) /* Label: "V58 // (C) 1990 NeXT, Inc. // All Rights Reserved // Release 1.2 // 1142.02" */
 
 #define ROM_NEXT_V3 \
 	ROM_REGION32_BE( 0x20000, "user1", ROMREGION_ERASEFF ) \

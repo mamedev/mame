@@ -964,14 +964,6 @@ MACHINE_START_MEMBER(jpmimpct_state,impctawp)
 	save_item(NAME(m_duart_1.ISR));
 	save_item(NAME(m_duart_1.IMR));
 	save_item(NAME(m_duart_1.CT));
-
-	stepper_config(machine(), 0, &starpoint_interface_48step);
-	stepper_config(machine(), 1, &starpoint_interface_48step);
-	stepper_config(machine(), 2, &starpoint_interface_48step);
-	stepper_config(machine(), 3, &starpoint_interface_48step);
-	stepper_config(machine(), 4, &starpoint_interface_48step);
-	stepper_config(machine(), 5, &starpoint_interface_48step);
-	stepper_config(machine(), 6, &starpoint_interface_48step);
 }
 
 MACHINE_RESET_MEMBER(jpmimpct_state,impctawp)
@@ -1062,13 +1054,6 @@ READ16_MEMBER(jpmimpct_state::inputs1awp_r)
 
 READ16_MEMBER(jpmimpct_state::optos_r)
 {
-	int i;
-
-	for (i=0; i<6; i++)
-	{
-		if ( stepper_optic_state(i) ) m_optic_pattern |= (1 << i);
-		else                          m_optic_pattern &= ~(1 << i);
-	}
 	return m_optic_pattern;
 }
 
@@ -1097,20 +1082,22 @@ WRITE16_MEMBER(jpmimpct_state::jpmioawp_w)
 
 		case 0x02:
 		{
-			for (i=0; i<4; i++)
-			{
-				stepper_update(i, (data >> i)& 0x0F );
-				awp_draw_reel(i);
-			}
+			m_reel0->update((data >> 0)& 0x0F);
+			m_reel1->update((data >> 1)& 0x0F);
+			m_reel2->update((data >> 2)& 0x0F);
+			m_reel3->update((data >> 3)& 0x0F);
+			awp_draw_reel("reel1", m_reel0);
+			awp_draw_reel("reel2", m_reel1);
+			awp_draw_reel("reel3", m_reel2);
+			awp_draw_reel("reel4", m_reel3);
 			break;
 		}
 		case 0x04:
 		{
-			for (i=0; i<2; i++)
-			{
-				stepper_update(i+4, (data >> (i + 4)& 0x0F ));
-				awp_draw_reel(i+4);
-			}
+			m_reel4->update((data >> 4)& 0x0F);
+			m_reel5->update((data >> 5)& 0x0F);
+			awp_draw_reel("reel5", m_reel4);
+			awp_draw_reel("reel6", m_reel5);
 			break;
 		}
 		case 0x06:
@@ -1337,6 +1324,20 @@ MACHINE_CONFIG_START( impctawp, jpmimpct_state )
 	MCFG_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_DEFAULT_LAYOUT(layout_jpmimpct)
+
+	MCFG_STARPOINT_48STEP_ADD("reel0")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(jpmimpct_state, reel0_optic_cb))
+	MCFG_STARPOINT_48STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(jpmimpct_state, reel1_optic_cb))
+	MCFG_STARPOINT_48STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(jpmimpct_state, reel2_optic_cb))
+	MCFG_STARPOINT_48STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(jpmimpct_state, reel3_optic_cb))
+	MCFG_STARPOINT_48STEP_ADD("reel4")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(jpmimpct_state, reel4_optic_cb))
+	MCFG_STARPOINT_48STEP_ADD("reel5")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(jpmimpct_state, reel5_optic_cb))
+
 MACHINE_CONFIG_END
 
 

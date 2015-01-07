@@ -1351,13 +1351,13 @@ inline UINT16 pc9801_state::egc_do_partial_op(int plane, UINT16 src, UINT16 pat,
 	{
 		src = src_tmp << (dst_off - src_off);
 		src |= m_egc.leftover[plane];
-		m_egc.leftover[plane] = src_tmp >> (15 - (dst_off - src_off));
+		m_egc.leftover[plane] = src_tmp >> (16 - (dst_off - src_off));
 	}
 	else
 	{
 		src = src_tmp >> (src_off - dst_off);
 		src |= m_egc.leftover[plane];
-		m_egc.leftover[plane] = src_tmp << (15 - (src_off - dst_off));
+		m_egc.leftover[plane] = src_tmp << (16 - (src_off - dst_off));
 	}
 
 	for(int i = 7; i >= 0; i--)
@@ -1380,16 +1380,28 @@ void pc9801_state::egc_blit_w(UINT32 offset, UINT16 data, UINT16 mem_mask)
 
 	if((((m_egc.regs[2] >> 11) & 3) == 1) || ((((m_egc.regs[2] >> 11) & 3) == 2) && !BIT(m_egc.regs[2], 10)))
 	{
-		// mask off the bits past the end of the blit
-		if(m_egc.count < 16)
-			mask &= dir ? ((1 << m_egc.count) - 1) : ~((1 << (16 - m_egc.count)) - 1);
-
+		UINT16 end_mask = 0xffff, start_mask = 0xffff;
 		// mask off the bits before the start
 		if(m_egc.first)
 		{
 			m_egc.leftover[0] = m_egc.leftover[1] = m_egc.leftover[2] = m_egc.leftover[3] = 0;
-			mask &= dir ? ~((1 << dst_off) - 1) : ((1 << (16 - dst_off)) - 1);
+			start_mask = dir ? ~((1 << dst_off) - 1) : ((1 << (15 - dst_off)) - 1);
 		}
+
+		// mask off the bits past the end of the blit
+		if(m_egc.count < 16)
+		{
+			end_mask = dir ? ((1 << m_egc.count) - 1) : ~((1 << (16 - m_egc.count)) - 1);
+			// if the blit is less than 16 bits, adjust the masks
+			if(start_mask != 0xffff)
+			{
+				if(dir)
+					end_mask <<= dst_off;
+				else
+					end_mask >>= (15 - dst_off);
+			}
+		}
+		mask &= end_mask & start_mask;
 	}
 
 	for(int i = 0; i < 4; i++)
@@ -1432,14 +1444,14 @@ void pc9801_state::egc_blit_w(UINT32 offset, UINT16 data, UINT16 mem_mask)
 	{
 		dst_off &= 7;
 		if(m_egc.first)
-			m_egc.count -= dir ? 7 - dst_off : dst_off;
+			m_egc.count -= dir ? 8 - dst_off : (dst_off + 1);
 		else
 			m_egc.count -= 8;
 	}
 	else
 	{
 		if(m_egc.first)
-			m_egc.count -= dir ? 15 - dst_off : dst_off;
+			m_egc.count -= dir ? 16 - dst_off : (dst_off + 1);
 		else
 			m_egc.count -= 16;
 	}
@@ -1455,7 +1467,7 @@ void pc9801_state::egc_blit_w(UINT32 offset, UINT16 data, UINT16 mem_mask)
 
 UINT16 pc9801_state::egc_blit_r(UINT32 offset, UINT16 mem_mask)
 {
-	UINT16 plane_off = offset & 0x13fff;
+	UINT32 plane_off = offset & 0x13fff;
 	if((m_egc.regs[2] & 0x300) == 0x100)
 	{
 		m_egc.pat[0] = m_video_ram_2[plane_off + 0x4000];

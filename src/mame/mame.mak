@@ -499,9 +499,10 @@ MACHINES += PCKEYBRD
 MACHINES += PIC8259
 MACHINES += PIT8253
 MACHINES += PLA
+#MACHINES += PROFILE
 MACHINES += R10696
 MACHINES += R10788
-#MACHINES += PROFILE
+MACHINES += RA17XX
 #MACHINES += R64H156
 MACHINES += RF5C296
 #MACHINES += RIOT6532
@@ -707,6 +708,7 @@ DRVLIBS += \
 	$(MAMEOBJ)/jpm.a \
 	$(MAMEOBJ)/kaneko.a \
 	$(MAMEOBJ)/konami.a \
+	$(MAMEOBJ)/matic.a \
 	$(MAMEOBJ)/maygay.a \
 	$(MAMEOBJ)/meadows.a \
 	$(MAMEOBJ)/merit.a \
@@ -1431,6 +1433,8 @@ $(MAMEOBJ)/konami.a: \
 	$(VIDEO)/k001005.o \
 	$(VIDEO)/k001604.o \
 
+$(MAMEOBJ)/matic.a: \
+	$(DRIVERS)/barata.o
 
 $(MAMEOBJ)/maygay.a: \
 	$(DRIVERS)/maygay1b.o \
@@ -2528,6 +2532,8 @@ $(DRIVERS)/avalnche.o:  $(LAYOUT)/avalnche.lh
 
 $(DRIVERS)/balsente.o:  $(LAYOUT)/stocker.lh
 
+$(DRIVERS)/barata.o:   $(LAYOUT)/barata.lh
+
 $(DRIVERS)/beaminv.o:   $(LAYOUT)/beaminv.lh
 
 $(DRIVERS)/bfm_sc1.o:   $(LAYOUT)/sc1_vfd.lh \
@@ -2655,7 +2661,8 @@ $(DRIVERS)/goldnpkr.o:  $(LAYOUT)/goldnpkr.lh \
 $(DRIVERS)/gts1.o:      $(LAYOUT)/gts1.lh
 $(DRIVERS)/gts3.o:      $(LAYOUT)/gts3.lh
 $(DRIVERS)/gts80.o:     $(LAYOUT)/gts80.lh
-$(DRIVERS)/gts80a.o:    $(LAYOUT)/gts80a.lh
+$(DRIVERS)/gts80a.o:    $(LAYOUT)/gts80a.lh \
+			$(LAYOUT)/gts80a_caveman.lh
 $(DRIVERS)/gts80b.o:    $(LAYOUT)/gts80b.lh
 
 $(DRIVERS)/lbeach.o:    $(LAYOUT)/lbeach.lh

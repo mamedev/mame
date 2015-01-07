@@ -626,7 +626,7 @@ void device_t::device_pre_save()
 //-------------------------------------------------
 //  device_post_load - called after the loading a
 //  saved state, so that registered variables can
-//  be expaneded as necessary
+//  be expanded as necessary
 //-------------------------------------------------
 
 void device_t::device_post_load()
@@ -841,9 +841,10 @@ finder_base *device_t::register_auto_finder(finder_base &autodev)
 //  device_interface - constructor
 //-------------------------------------------------
 
-device_interface::device_interface(device_t &device)
+device_interface::device_interface(device_t &device, const char *type)
 	: m_interface_next(NULL),
-		m_device(device)
+		m_device(device),
+		m_type(type)
 {
 	device_interface **tailptr;
 	for (tailptr = &device.m_interface_list; *tailptr != NULL; tailptr = &(*tailptr)->m_interface_next) ;

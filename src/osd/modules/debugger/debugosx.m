@@ -22,12 +22,15 @@
 //  * Scroll views with content narrower than clipping area are flaky under Tiger - nothing I can do about this
 
 
+// Workaround for Nil being re=defined in luabridge
+#include "emu.h"
+
 // standard Cocoa headers
 #include <AvailabilityMacros.h>
 #import <Cocoa/Cocoa.h>
 
 // MAME headers
-#include "emu.h"
+//#include "emu.h"
 #include "debug/debugvw.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"

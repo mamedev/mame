@@ -14,6 +14,7 @@ class netlist_matrix_solver_direct_t: public netlist_matrix_solver_t
 public:
 
 	netlist_matrix_solver_direct_t(const netlist_solver_parameters_t &params, int size);
+    netlist_matrix_solver_direct_t(const eSolverType type, const netlist_solver_parameters_t &params, int size);
 
 	virtual ~netlist_matrix_solver_direct_t();
 
@@ -186,13 +187,17 @@ ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(netlist_a
 	 * Sorting as a general matrix pre-conditioning is mentioned in
 	 * literature but I have found no articles about Gauss Seidel.
 	 *
+     * For Gaussian Elimination however increasing order is better suited.
+     * FIXME: Even better would be to sort on elements right of the matrix diagonal.
+     *
 	 */
 
+    int sort_order = (type() == GAUSS_SEIDEL ? 1 : -1);
 
 	for (int k = 0; k < N() / 2; k++)
 		for (int i = 0; i < N() - 1; i++)
 		{
-			if (m_terms[i]->m_railstart < m_terms[i+1]->m_railstart)
+            if ((m_terms[i]->m_railstart - m_terms[i+1]->m_railstart) * sort_order < 0)
 			{
 				std::swap(m_terms[i],m_terms[i+1]);
 				m_nets.swap(i, i+1);
@@ -443,7 +448,7 @@ ATTR_HOT inline int netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve_non_
 
 template <int m_N, int _storage_N>
 netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(const netlist_solver_parameters_t &params, int size)
-: netlist_matrix_solver_t(params)
+: netlist_matrix_solver_t(GAUSSIAN_ELIMINATION, params)
 , m_dim(size)
 , m_lp_fact(0)
 {
@@ -458,6 +463,22 @@ netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(
 	m_row_ops[N()] = vector_ops_t::create_ops(N());
 }
 
+template <int m_N, int _storage_N>
+netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(const eSolverType type, const netlist_solver_parameters_t &params, int size)
+: netlist_matrix_solver_t(type, params)
+, m_dim(size)
+, m_lp_fact(0)
+{
+    m_terms = new terms_t *[N()];
+    m_rails_temp = new terms_t[N()];
+
+    for (int k = 0; k < N(); k++)
+    {
+        m_terms[k] = new terms_t;
+        m_row_ops[k] = vector_ops_t::create_ops(k);
+    }
+    m_row_ops[N()] = vector_ops_t::create_ops(N());
+}
 
 
 #endif /* NLD_MS_DIRECT_H_ */

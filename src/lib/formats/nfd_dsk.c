@@ -30,22 +30,22 @@
     0xA     = PDA (disk type)
     0xB-0xF = reserved and equal to 0x00 (possibly available for future format extensions?)
 
- 
-	Revision 1
+
+    Revision 1
     ==========
- 
+
     header structure (variable length > 0x120, header length = DWORD at 0x110)
     0x000-0x11F = same as Rev. 0 format
-	0x120-0x3AF = 164 DWORDs containing, for each track, the absolute position of the sector maps
+    0x120-0x3AF = 164 DWORDs containing, for each track, the absolute position of the sector maps
                   for sectors of the track. for unformatted/unused tracks 0 is used
     0x3B0-0x3B3 = absolute position of addintional info in the header, if any
     0x3B4-0x3BF = reserved
-    0x120-EOHeader = sector map + special data for each track: 
+    0x120-EOHeader = sector map + special data for each track:
                      first 0x10 of each track = #sectors (WORD), #extra data (WORD), reserved 0xc bytes zeroed
                      then 0x10 for each sector of this track and 0x10 for each extra data chunk
 
     sector map structure
-	0x0     = track number
+    0x0     = track number
     0x1     = head
     0x2     = sector number
     0x3     = sector size (in 128byte chunks)
@@ -74,7 +74,7 @@
     - add support for DDAM in Rev. 0 (need an image which set it in some sector)
     - investigate the READ DATA bytes of sector headers
     - investigate RETRY DATA chunks
- 
+
  *********************************************************************/
 
 #include "emu.h"
@@ -101,9 +101,9 @@ const char *nfd_format::extensions() const
 
 int nfd_format::identify(io_generic *io, UINT32 form_factor)
 {
-	UINT8 h[16];	
+	UINT8 h[16];
 	io_generic_read(io, h, 0, 16);
-	
+
 	if (strncmp((const char *)h, "T98FDDIMAGE.R0", 14) == 0 || strncmp((const char *)h, "T98FDDIMAGE.R1", 14) == 0)
 		return 100;
 
@@ -113,7 +113,7 @@ int nfd_format::identify(io_generic *io, UINT32 form_factor)
 bool nfd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	UINT64 size = io_generic_size(io);
-	UINT8 h[0x120], hsec[0x10];	
+	UINT8 h[0x120], hsec[0x10];
 	io_generic_read(io, h, 0, 0x120);
 	int format_version = !strncmp((const char *)h, "T98FDDIMAGE.R0", 14) ? 0 : 1;
 
@@ -156,17 +156,17 @@ bool nfd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				for (int sect = 0; sect < num_secs[track]; sect++)
 				{
 					io_generic_read(io, hsec, secmap_addr, 0x10);
-					
+
 					if (track == 0 && sect == 0)
-						disk_type = hsec[0xb];	// can this change across the disk? I don't think so...
+						disk_type = hsec[0xb];  // can this change across the disk? I don't think so...
 					secmap_addr += 0x10;
-					
+
 					tracks[(track * 26) + sect] = hsec[0];
 					heads[(track * 26) + sect] = hsec[1];
 					secs[(track * 26) + sect] = hsec[2];
 					sec_sizes[(track * 26) + sect] = hsec[3];
 					mfm[(track * 26) + sect] = hsec[4];
-					
+
 					curr_track_size += (128 << hsec[3]);
 				}
 
@@ -174,7 +174,7 @@ bool nfd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				{
 					for (int sect = 0; sect < num_specials[track]; sect++)
 					{
-						io_generic_read(io, hsec, secmap_addr, 0x10);	
+						io_generic_read(io, hsec, secmap_addr, 0x10);
 						secmap_addr += 0x10;
 						curr_track_size += (hsec[9] + 1) * LITTLE_ENDIANIZE_INT32(*(UINT32 *)(hsec + 0x0a));
 					}
@@ -200,18 +200,18 @@ bool nfd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				io_generic_read(io, hsec, pos, 0x10);
 
 				if (track == 0 && sect == 0)
-					disk_type = hsec[0xa];	// can this change across the disk? I don't think so...
+					disk_type = hsec[0xa];  // can this change across the disk? I don't think so...
 				pos += 0x10;
-				
-				if (hsec[0] == 0xff)	// unformatted/unused sector
+
+				if (hsec[0] == 0xff)    // unformatted/unused sector
 					continue;
-				
+
 				tracks[(track * 26) + sect] = hsec[0];
 				heads[(track * 26) + sect] = hsec[1];
 				secs[(track * 26) + sect] = hsec[2];
 				sec_sizes[(track * 26) + sect] = hsec[3];
 				mfm[(track * 26) + sect] = hsec[4];
-				
+
 				curr_track_size += (128 << hsec[3]);
 				curr_num_sec++;
 			}
@@ -226,12 +226,12 @@ bool nfd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 	switch (disk_type)
 	{
-		case 0x10:	// 640K disk, 2DD
+		case 0x10:  // 640K disk, 2DD
 			image->set_variant(floppy_image::DSDD);
 			break;
-		//case 0x30:	// 1.44M disk, ?? (no images found)
-		//	break;
-		case 0x90:	// 1.2M disk, 2HD
+		//case 0x30:    // 1.44M disk, ?? (no images found)
+		//  break;
+		case 0x90:  // 1.2M disk, 2HD
 		default:
 			image->set_variant(floppy_image::DSHD);
 			break;
@@ -246,7 +246,7 @@ bool nfd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	{
 		io_generic_read(io, sect_data, pos, track_sizes[track]);
 
-		for (int i = 0; i < num_secs[track]; i++) 
+		for (int i = 0; i < num_secs[track]; i++)
 		{
 			cur_sec_map = track * 26 + i;
 			sector_size = 128 << sec_sizes[cur_sec_map];
@@ -261,7 +261,7 @@ bool nfd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		}
 		pos += track_sizes[track];
 
-		// notice that the operation below might fail if sectors of the same track have variable sec_sizes, 
+		// notice that the operation below might fail if sectors of the same track have variable sec_sizes,
 		// because the gap3 calculation would account correctly only for the first sector...
 		// examined images had constant sec_sizes in the each track, so probably this is not an issue
 		if (mfm[track * 26])
@@ -269,7 +269,7 @@ bool nfd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		else
 			build_pc_track_fm(track / 2, track % 2, image, cell_count, num_secs[track], sects, calc_default_pc_gap3_size(form_factor, (128 << sec_sizes[track * 26])));
 	}
-	
+
 	return true;
 }
 

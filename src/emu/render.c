@@ -201,6 +201,69 @@ inline item_layer get_layer_and_blendmode(const layout_view &view, int index, in
 	return item_layer(layer);
 }
 
+//**************************************************************************
+//  render_texinfo
+//**************************************************************************
+
+render_texinfo &render_texinfo::operator=(const render_texinfo &src)
+{
+    free_palette();
+    base = src.base;
+    rowpixels = src.rowpixels;
+    width = src.width;
+    height = src.height;
+    seqid = src.seqid;
+    osddata = src.osddata;
+    m_palette = src.m_palette;
+    if (m_palette != NULL)
+    {
+        m_palette->ref_count++;
+    }
+    return *this;
+}
+
+render_texinfo::render_texinfo(const render_texinfo &src)
+{
+    base = src.base;
+    rowpixels = src.rowpixels;
+    width = src.width;
+    height = src.height;
+    seqid = src.seqid;
+    osddata = src.osddata;
+    m_palette = src.m_palette;
+    if (m_palette != NULL)
+    {
+        m_palette->ref_count++;
+    }
+}
+
+void render_texinfo::set_palette(const dynamic_array<rgb_t> *source)
+{
+    free_palette();
+    if (source != NULL)
+    {
+        m_palette = global_alloc(render_palette_copy);
+        m_palette->palette.copyfrom(*source);
+        m_palette->ref_count = 1;
+    }
+    else
+    {
+        m_palette = NULL;
+    }
+}
+
+void render_texinfo::free_palette()
+{
+    if (m_palette != NULL)
+    {
+        m_palette->ref_count--;
+        if (m_palette->ref_count == 0)
+        {
+            global_free(m_palette);
+        }
+    }
+    m_palette = NULL;
+}
 
 
 //**************************************************************************
@@ -214,7 +277,31 @@ inline item_layer get_layer_and_blendmode(const layout_view &view, int index, in
 
 void render_primitive::reset()
 {
-	memset(&type, 0, FPTR(&texcoords + 1) - FPTR(&type));
+    // public state
+    type = INVALID;
+    bounds.x0 = 0;
+    bounds.y0 = 0;
+    bounds.x1 = 0;
+    bounds.y1 = 0;
+    color.a = 0;
+    color.r = 0;
+    color.g = 0;
+    color.b = 0;
+    flags = 0;
+    width = 0.0f;
+    texture.set_palette(NULL);
+    texture = render_texinfo();
+    texcoords.bl.u = 0.0f;
+    texcoords.bl.v = 0.0f;
+    texcoords.br.u = 0.0f;
+    texcoords.br.v = 0.0f;
+    texcoords.tl.u = 0.0f;
+    texcoords.tl.v = 0.0f;
+    texcoords.tr.u = 0.0f;
+    texcoords.tr.v = 0.0f;
+
+    // do not clear m_next!
+    // memset(&type, 0, FPTR(&texcoords + 1) - FPTR(&type));
 }
 
 
@@ -447,7 +534,7 @@ void render_texture::hq_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const 
 //  get_scaled - get a scaled bitmap (if we can)
 //-------------------------------------------------
 
-bool render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &texinfo, render_primitive_list &primlist)
+void render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &texinfo, render_primitive_list &primlist)
 {
 	// source width/height come from the source bounds
 	int swidth = m_sbounds.width();
@@ -460,7 +547,6 @@ bool render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &t
 	texinfo.osddata = m_osddata;
 
 	// are we scaler-free? if so, just return the source bitmap
-	const rgb_t *palbase = (m_format == TEXFORMAT_PALETTE16 || m_format == TEXFORMAT_PALETTEA16) ? m_bitmap->palette()->entry_list_adjusted() : NULL;
 	if (m_scaler == NULL || (m_bitmap != NULL && swidth == dwidth && sheight == dheight))
 	{
 		// add a reference and set up the source bitmap
@@ -469,63 +555,65 @@ bool render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &t
 		texinfo.rowpixels = m_bitmap->rowpixels();
 		texinfo.width = swidth;
 		texinfo.height = sheight;
-		texinfo.palette = palbase;
+		// will be set later
+        texinfo.set_palette(NULL);
 		texinfo.seqid = ++m_curseq;
-		return true;
 	}
-
-	// make sure we can recover the original argb32 bitmap
-	bitmap_argb32 dummy;
-	bitmap_argb32 &srcbitmap = (m_bitmap != NULL) ? downcast<bitmap_argb32 &>(*m_bitmap) : dummy;
-
-	// is it a size we already have?
-	scaled_texture *scaled = NULL;
-	int scalenum;
-	for (scalenum = 0; scalenum < ARRAY_LENGTH(m_scaled); scalenum++)
+	else
 	{
-		scaled = &m_scaled[scalenum];
+        // make sure we can recover the original argb32 bitmap
+        bitmap_argb32 dummy;
+        bitmap_argb32 &srcbitmap = (m_bitmap != NULL) ? downcast<bitmap_argb32 &>(*m_bitmap) : dummy;
 
-		// we need a non-NULL bitmap with matching dest size
-		if (scaled->bitmap != NULL && dwidth == scaled->bitmap->width() && dheight == scaled->bitmap->height())
-			break;
+        // is it a size we already have?
+        scaled_texture *scaled = NULL;
+        int scalenum;
+        for (scalenum = 0; scalenum < ARRAY_LENGTH(m_scaled); scalenum++)
+        {
+            scaled = &m_scaled[scalenum];
+
+            // we need a non-NULL bitmap with matching dest size
+            if (scaled->bitmap != NULL && dwidth == scaled->bitmap->width() && dheight == scaled->bitmap->height())
+                break;
+        }
+
+        // did we get one?
+        if (scalenum == ARRAY_LENGTH(m_scaled))
+        {
+            int lowest = -1;
+
+            // didn't find one -- take the entry with the lowest seqnum
+            for (scalenum = 0; scalenum < ARRAY_LENGTH(m_scaled); scalenum++)
+                if ((lowest == -1 || m_scaled[scalenum].seqid < m_scaled[lowest].seqid) && !primlist.has_reference(m_scaled[scalenum].bitmap))
+                    lowest = scalenum;
+            assert_always(lowest != -1, "Too many live texture instances!");
+
+            // throw out any existing entries
+            scaled = &m_scaled[lowest];
+            if (scaled->bitmap != NULL)
+            {
+                m_manager->invalidate_all(scaled->bitmap);
+                global_free(scaled->bitmap);
+            }
+
+            // allocate a new bitmap
+            scaled->bitmap = global_alloc(bitmap_argb32(dwidth, dheight));
+            scaled->seqid = ++m_curseq;
+
+            // let the scaler do the work
+            (*m_scaler)(*scaled->bitmap, srcbitmap, m_sbounds, m_param);
+        }
+
+        // finally fill out the new info
+        primlist.add_reference(scaled->bitmap);
+        texinfo.base = &scaled->bitmap->pix32(0);
+        texinfo.rowpixels = scaled->bitmap->rowpixels();
+        texinfo.width = dwidth;
+        texinfo.height = dheight;
+        // will be set later
+        texinfo.set_palette(NULL);
+        texinfo.seqid = scaled->seqid;
 	}
-
-	// did we get one?
-	if (scalenum == ARRAY_LENGTH(m_scaled))
-	{
-		int lowest = -1;
-
-		// didn't find one -- take the entry with the lowest seqnum
-		for (scalenum = 0; scalenum < ARRAY_LENGTH(m_scaled); scalenum++)
-			if ((lowest == -1 || m_scaled[scalenum].seqid < m_scaled[lowest].seqid) && !primlist.has_reference(m_scaled[scalenum].bitmap))
-				lowest = scalenum;
-		assert_always(lowest != -1, "Too many live texture instances!");
-
-		// throw out any existing entries
-		scaled = &m_scaled[lowest];
-		if (scaled->bitmap != NULL)
-		{
-			m_manager->invalidate_all(scaled->bitmap);
-			global_free(scaled->bitmap);
-		}
-
-		// allocate a new bitmap
-		scaled->bitmap = global_alloc(bitmap_argb32(dwidth, dheight));
-		scaled->seqid = ++m_curseq;
-
-		// let the scaler do the work
-		(*m_scaler)(*scaled->bitmap, srcbitmap, m_sbounds, m_param);
-	}
-
-	// finally fill out the new info
-	primlist.add_reference(scaled->bitmap);
-	texinfo.base = &scaled->bitmap->pix32(0);
-	texinfo.rowpixels = scaled->bitmap->rowpixels();
-	texinfo.width = dwidth;
-	texinfo.height = dheight;
-	texinfo.palette = palbase;
-	texinfo.seqid = scaled->seqid;
-	return true;
 }
 
 
@@ -534,7 +622,7 @@ bool render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &t
 //  palette for a texture
 //-------------------------------------------------
 
-const rgb_t *render_texture::get_adjusted_palette(render_container &container)
+const dynamic_array<rgb_t> *render_texture::get_adjusted_palette(render_container &container)
 {
 	// override the palette with our adjusted palette
 	switch (m_format)
@@ -546,7 +634,7 @@ const rgb_t *render_texture::get_adjusted_palette(render_container &container)
 
 			// if no adjustment necessary, return the raw palette
 			if (!container.has_brightness_contrast_gamma_changes())
-				return m_bitmap->palette()->entry_list_adjusted();
+				return m_bitmap->palette()->entry_list_adjusted_darray();
 
 			// otherwise, return our adjusted palette
 			return container.bcg_lookup_table(m_format, m_bitmap->palette());
@@ -582,7 +670,8 @@ render_container::render_container(render_manager &manager, screen_device *scree
 		m_manager(manager),
 		m_screen(screen),
 		m_overlaybitmap(NULL),
-		m_overlaytexture(NULL)
+		m_overlaytexture(NULL),
+		m_bcglookup256(0x400)
 {
 	// make sure it is empty
 	empty();
@@ -722,7 +811,7 @@ float render_container::apply_brightness_contrast_gamma_fp(float value)
 //  given texture mode
 //-------------------------------------------------
 
-const rgb_t *render_container::bcg_lookup_table(int texformat, palette_t *palette)
+const dynamic_array<rgb_t> *render_container::bcg_lookup_table(int texformat, palette_t *palette)
 {
 	switch (texformat)
 	{
@@ -736,12 +825,12 @@ const rgb_t *render_container::bcg_lookup_table(int texformat, palette_t *palett
 				recompute_lookups();
 			}
 			assert (palette == &m_palclient->palette());
-			return m_bcglookup;
+			return &m_bcglookup;
 
 		case TEXFORMAT_RGB32:
 		case TEXFORMAT_ARGB32:
 		case TEXFORMAT_YUY16:
-			return m_bcglookup256;
+			return &m_bcglookup256;
 
 		default:
 			return NULL;
@@ -1726,24 +1815,28 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 					int height = (finalorient & ORIENTATION_SWAP_XY) ? (prim->bounds.x1 - prim->bounds.x0) : (prim->bounds.y1 - prim->bounds.y0);
 					width = MIN(width, m_maxtexwidth);
 					height = MIN(height, m_maxtexheight);
-					if (curitem->texture()->get_scaled(width, height, prim->texture, list))
-					{
-						// set the palette
-						prim->texture.palette = curitem->texture()->get_adjusted_palette(container);
 
-						// determine UV coordinates and apply clipping
-						prim->texcoords = oriented_texcoords[finalorient];
-						clipped = render_clip_quad(&prim->bounds, &cliprect, &prim->texcoords);
+					curitem->texture()->get_scaled(width, height, prim->texture, list);
+                    // set the palette
+#if 1
+					const dynamic_array<rgb_t> *adjusted_pal = curitem->texture()->get_adjusted_palette(container);
+                    prim->texture.set_palette(adjusted_pal);
+#else
+                    prim->texture.palette = curitem->texture()->get_adjusted_palette(container);
+#endif
 
-						// apply the final orientation from the quad flags and then build up the final flags
-						prim->flags = (curitem->flags() & ~(PRIMFLAG_TEXORIENT_MASK | PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) |
-										PRIMFLAG_TEXORIENT(finalorient) |
-										PRIMFLAG_TEXFORMAT(curitem->texture()->format());
-						if (blendmode != -1)
-							prim->flags |= PRIMFLAG_BLENDMODE(blendmode);
-						else
-							prim->flags |= PRIMFLAG_BLENDMODE(PRIMFLAG_GET_BLENDMODE(curitem->flags()));
-					}
+                    // determine UV coordinates and apply clipping
+                    prim->texcoords = oriented_texcoords[finalorient];
+                    clipped = render_clip_quad(&prim->bounds, &cliprect, &prim->texcoords);
+
+                    // apply the final orientation from the quad flags and then build up the final flags
+                    prim->flags = (curitem->flags() & ~(PRIMFLAG_TEXORIENT_MASK | PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) |
+                                    PRIMFLAG_TEXORIENT(finalorient) |
+                                    PRIMFLAG_TEXFORMAT(curitem->texture()->format());
+                    if (blendmode != -1)
+                        prim->flags |= PRIMFLAG_BLENDMODE(blendmode);
+                    else
+                        prim->flags |= PRIMFLAG_BLENDMODE(PRIMFLAG_GET_BLENDMODE(curitem->flags()));
 				}
 				else
 				{
@@ -1778,21 +1871,20 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 		width = render_round_nearest(prim->bounds.x1) - render_round_nearest(prim->bounds.x0);
 		height = render_round_nearest(prim->bounds.y1) - render_round_nearest(prim->bounds.y0);
 
-		bool got_scaled = container.overlay()->get_scaled(
+		container.overlay()->get_scaled(
 				(container_xform.orientation & ORIENTATION_SWAP_XY) ? height : width,
 				(container_xform.orientation & ORIENTATION_SWAP_XY) ? width : height, prim->texture, list);
-		if (got_scaled)
-		{
-			// determine UV coordinates
-			prim->texcoords = oriented_texcoords[container_xform.orientation];
 
-			// set the flags and add it to the list
-			prim->flags = PRIMFLAG_TEXORIENT(container_xform.orientation) |
-							PRIMFLAG_BLENDMODE(BLENDMODE_RGB_MULTIPLY) |
-							PRIMFLAG_TEXFORMAT(container.overlay()->format()) |
-							PRIMFLAG_TEXSHADE(1);
-		}
-		list.append_or_return(*prim, !got_scaled);
+		// determine UV coordinates
+        prim->texcoords = oriented_texcoords[container_xform.orientation];
+
+        // set the flags and add it to the list
+        prim->flags = PRIMFLAG_TEXORIENT(container_xform.orientation) |
+                        PRIMFLAG_BLENDMODE(BLENDMODE_RGB_MULTIPLY) |
+                        PRIMFLAG_TEXFORMAT(container.overlay()->format()) |
+                        PRIMFLAG_TEXSHADE(1);
+
+        list.append_or_return(*prim, false);
 	}
 }
 
@@ -1830,21 +1922,20 @@ void render_target::add_element_primitives(render_primitive_list &list, const ob
 		height = MIN(height, m_maxtexheight);
 
 		// get the scaled texture and append it
-		bool clipped = true;
-		if (texture->get_scaled(width, height, prim->texture, list))
-		{
-			// compute the clip rect
-			render_bounds cliprect;
-			cliprect.x0 = render_round_nearest(xform.xoffs);
-			cliprect.y0 = render_round_nearest(xform.yoffs);
-			cliprect.x1 = render_round_nearest(xform.xoffs + xform.xscale);
-			cliprect.y1 = render_round_nearest(xform.yoffs + xform.yscale);
-			sect_render_bounds(&cliprect, &m_bounds);
 
-			// determine UV coordinates and apply clipping
-			prim->texcoords = oriented_texcoords[xform.orientation];
-			clipped = render_clip_quad(&prim->bounds, &cliprect, &prim->texcoords);
-		}
+		texture->get_scaled(width, height, prim->texture, list);
+
+        // compute the clip rect
+        render_bounds cliprect;
+        cliprect.x0 = render_round_nearest(xform.xoffs);
+        cliprect.y0 = render_round_nearest(xform.yoffs);
+        cliprect.x1 = render_round_nearest(xform.xoffs + xform.xscale);
+        cliprect.y1 = render_round_nearest(xform.yoffs + xform.yscale);
+        sect_render_bounds(&cliprect, &m_bounds);
+
+        // determine UV coordinates and apply clipping
+        prim->texcoords = oriented_texcoords[xform.orientation];
+        bool clipped = render_clip_quad(&prim->bounds, &cliprect, &prim->texcoords);
 
 		// add to the list or free if we're clipped out
 		list.append_or_return(*prim, clipped);

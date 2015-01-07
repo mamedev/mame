@@ -159,8 +159,6 @@ TODO:
   written out of order and hooking them up in the usual way causes the MCU to
   stop receiving interrupts.
 
-- rthunder1 crashes often after you die; I've seen this happen only in area 5, though.
-
 - In wndrmomo, nothing happens when setting the service mode dip switch while
   the game is running. This is unusual for Namco.
   Also, in rthunder it works during attract mode but not while playing. If you

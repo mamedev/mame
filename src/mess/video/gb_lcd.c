@@ -215,6 +215,7 @@ cgb_lcd_device::cgb_lcd_device(const machine_config &mconfig, const char *tag, d
 void gb_lcd_device::common_start()
 {
 	m_screen->register_screen_bitmap(m_bitmap);
+	save_item(NAME(m_bitmap));
 	m_oam = auto_alloc_array_clear(machine(), UINT8, 0x100);
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(gb_lcd_device::videoptr_restore), this));

@@ -1728,12 +1728,12 @@ static void d68881_ftrap(void)
 
 	switch (g_cpu_ir & 0x7)
 	{
-		case 2:	// word operand
+		case 2: // word operand
 			w3 = read_imm_16();
 			sprintf(g_dasm_str, "ftrap%s.w   $%04x", g_cpcc[w2 & 0x3f], w3);
 			break;
 
-		case 3:	// long word operand
+		case 3: // long word operand
 			l2 = read_imm_32();
 			sprintf(g_dasm_str, "ftrap%s.l   $%08x", g_cpcc[w2 & 0x3f], l2);
 			break;

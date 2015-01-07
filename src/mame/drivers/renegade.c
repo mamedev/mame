@@ -131,10 +131,10 @@ WRITE8_MEMBER(renegade_state::adpcm_addr_w)
 	// (chip select for an unpopulated fourth ROM?)
 	switch (data & 0x1c)
 	{
-		case 0x18: m_adpcm_pos = 0 * 0x8000 * 2; break;		// 110 -> ic33
-		case 0x14: m_adpcm_pos = 1 * 0x8000 * 2; break;		// 101 -> ic32
-		case 0x0c: m_adpcm_pos = 2 * 0x8000 * 2; break;		// 011 -> ic31
-		default: m_adpcm_pos = m_adpcm_end = 0; return;	// doesn't happen
+		case 0x18: m_adpcm_pos = 0 * 0x8000 * 2; break;     // 110 -> ic33
+		case 0x14: m_adpcm_pos = 1 * 0x8000 * 2; break;     // 101 -> ic32
+		case 0x0c: m_adpcm_pos = 2 * 0x8000 * 2; break;     // 011 -> ic31
+		default: m_adpcm_pos = m_adpcm_end = 0; return; // doesn't happen
 	}
 	// bits 0-1 are a13-a14
 	m_adpcm_pos |= (data & 0x03) * 0x2000 * 2;

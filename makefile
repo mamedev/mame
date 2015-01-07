@@ -139,8 +139,9 @@ ifeq ($(TARGETOS),win32)
 
 # Autodetect PTR64
 ifndef PTR64
-ifneq (,$(findstring mingw64-w64,$(PATH)))
-PTR64=1
+WIN_TEST_GCC := $(shell gcc --version)
+ifeq ($(findstring x86_64,$(WIN_TEST_GCC)),x86_64)
+	PTR64=1
 endif
 endif
 
@@ -339,8 +340,14 @@ ifeq ($(TARGETOS),os2)
 EXE = .exe
 endif
 
-ifndef BUILD_EXE
-BUILD_EXE = $(EXE)
+# extension for build tools
+BUILD_EXE = 
+
+ifeq ($(OS),Windows_NT)
+BUILD_EXE = .exe
+endif
+ifneq ($(OS2_SHELL),)
+BUILD_EXE = .exe
 endif
 
 # compiler, linker and utilities
@@ -349,7 +356,7 @@ AR = @ar
 CC = @gcc
 LD = @g++
 endif
-MD = -mkdir$(EXE)
+MD = -mkdir$(BUILD_EXE)
 RM = @rm -f
 OBJDUMP = @objdump
 PYTHON = @python
@@ -484,7 +491,22 @@ ifdef FASTDEBUG
 DEFS += -DMAME_DEBUG_FAST
 endif
 
+# add a define identifying the target osd
 
+ifeq ($(OSD),sdl)
+DEFS += -DOSD_SDL
+else
+ifeq ($(OSD),windows)
+DEFS += -DOSD_WINDOWS
+else
+ifeq ($(OSD),osdmini)
+DEFS += -DOSD_MINI
+else
+$(error Unknown OSD)
+endif
+endif
+endif
+ 
 #-------------------------------------------------
 # compile flags
 # CCOMFLAGS are common flags
@@ -598,7 +620,18 @@ endif
 ifneq (,$(findstring undefined,$(SANITIZE)))
 ifneq (,$(findstring clang,$(CC)))
 # TODO: check if linker is clang++
-CCOMFLAGS += -fno-sanitize=alignment -fno-sanitize=function -fno-sanitize=shift -fno-sanitize=null  -fno-sanitize=vptr -fno-sanitize=object-size
+# produces a lot of messages - disable it for now
+CCOMFLAGS += -fno-sanitize=alignment
+# these are false positives because of the way our delegates work
+CCOMFLAGS += -fno-sanitize=function
+# clang takes forever to compile src/emu/cpu/tms57002/tms57002.c when this isn't disabled
+CCOMFLAGS += -fno-sanitize=shift
+# clang takes forever to compile src/emu/cpu/tms57002/tms57002.c, src/emu/cpu/m6809/hd6309.c when this isn't disabled
+CCOMFLAGS += -fno-sanitize=object-size
+# clang takes forever to compile src/emu/cpu/tms57002/tms57002.c, src/emu/cpu/m6809/konami.c, src/emu/cpu/m6809/hd6309.c, src/emu/video/psx.c when this isn't disabled
+CCOMFLAGS += -fno-sanitize=vptr
+# clang takes forever to compile src/emu/video/psx.c when this isn't disabled
+CCOMFLAGS += -fno-sanitize=null
 # clang takes forever to compile src/emu/cpu/tms57002/tms57002.c when this isn't disabled
 CCOMFLAGS += -fno-sanitize=signed-integer-overflow
 endif
@@ -910,7 +943,7 @@ $(EMULATOR): $(EMUINFOOBJ) $(DRIVLISTOBJ) $(DRVLIBS) $(LIBOSD) $(LIBBUS) $(LIBOP
 	$(CC) $(CDEFS) $(CFLAGS) -c $(SRC)/version.c -o $(VERSIONOBJ)
 	@echo Linking $@...
 ifeq ($(TARGETOS),emscripten)
-# Emscripten's linker seems to be stricter about the ordering of .a files
+	# Emscripten's linker seems to be stricter about the ordering of .a files
 	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $(VERSIONOBJ) -Wl,--start-group $^ -Wl,--end-group $(LIBS) -o $@
 else
 	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $(VERSIONOBJ) $^ $(LIBS) -o $@
@@ -959,14 +992,14 @@ ifdef CPPCHECK
 	@$(CPPCHECK) $(CPPCHECKFLAGS) $<
 endif
 
-$(OBJ)/%.lh: $(SRC)/%.lay $(FILE2STR_TARGET)
+$(OBJ)/%.lh: $(SRC)/%.lay $(SRC)/build/file2str.py
 	@echo Converting $<...
-	@$(FILE2STR) $< $@ layout_$(basename $(notdir $<))
+	@$(PYTHON) $(SRC)/build/file2str.py $< $@ layout_$(basename $(notdir $<))
 
-$(OBJ)/%.fh: $(SRC)/%.png $(PNG2BDC_TARGET) $(FILE2STR_TARGET)
+$(OBJ)/%.fh: $(SRC)/%.png $(PNG2BDC_TARGET) $(SRC)/build/file2str.py
 	@echo Converting $<...
 	@$(PNG2BDC) $< $(OBJ)/temp.bdc
-	@$(FILE2STR) $(OBJ)/temp.bdc $@ font_$(basename $(notdir $<)) UINT8
+	@$(PYTHON) $(SRC)/build/file2str.py $(OBJ)/temp.bdc $@ font_$(basename $(notdir $<)) UINT8
 
 $(DRIVLISTOBJ): $(DRIVLISTSRC)
 	@echo Compiling $<...
