@@ -208,16 +208,9 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	// on a single-CPU system, create 1 thread for I/O queues, and 0 threads for everything else
 	if (numprocs == 1)
 		threadnum = (flags & WORK_QUEUE_FLAG_IO) ? 1 : 0;
-	// TODO: chose either
-#if defined(OSD_WINDOWS)
 	// on an n-CPU system, create n threads for multi queues, and 1 thread for everything else
 	else
 		threadnum = (flags & WORK_QUEUE_FLAG_MULTI) ? numprocs : 1;
-#else
-	// on an n-CPU system, create (n-1) threads for multi queues, and 1 thread for everything else
-	else
-		threadnum = (flags & WORK_QUEUE_FLAG_MULTI) ? (numprocs - 1) : 1;
-#endif
 
 	if (osdworkqueuemaxthreads != NULL && sscanf(osdworkqueuemaxthreads, "%d", &osdthreadnum) == 1 && threadnum > osdthreadnum)
 		threadnum = osdthreadnum;
