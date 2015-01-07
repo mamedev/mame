@@ -250,14 +250,6 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 
 	if (osdworkqueuemaxthreads != NULL && sscanf(osdworkqueuemaxthreads, "%d", &osdthreadnum) == 1 && threadnum > osdthreadnum)
 		threadnum = osdthreadnum;
-	// TODO: also enable this for non-Windows platforms?
-	// TODO: it appears lowering SPIN_LOOP_TIME value fixed the scaling issues - needs a test case with a higher workload than n64dd
-#if defined(OSD_WINDOWS)
-	// multi-queues with high frequency items should top out at 3 for now
-	// since we have scaling problems above that
-	if ((flags & WORK_QUEUE_FLAG_HIGH_FREQ) && threadnum > 1)
-		threadnum = MIN(threadnum - 1, 3);
-#endif
 
 	// clamp to the maximum
 	queue->threads = MIN(threadnum, WORK_MAX_THREADS);
