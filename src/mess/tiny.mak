@@ -48,6 +48,12 @@ VIDEOS += TMS9928A
 
 
 #-------------------------------------------------
+# specify available bus cores
+#-------------------------------------------------
+
+BUSES += COLECO
+
+#-------------------------------------------------
 # This is the list of files that are necessary
 # for building all of the drivers referenced
 # in tiny.c
