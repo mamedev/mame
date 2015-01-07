@@ -499,6 +499,9 @@ else
 ifeq ($(OSD),windows)
 DEFS += -DOSD_WINDOWS
 else
+ifeq ($(OSD),winui)
+DEFS += -DOSD_WINDOWS
+else
 ifeq ($(OSD),osdmini)
 DEFS += -DOSD_MINI
 else
@@ -506,7 +509,8 @@ $(error Unknown OSD)
 endif
 endif
 endif
- 
+endif
+
 #-------------------------------------------------
 # compile flags
 # CCOMFLAGS are common flags
