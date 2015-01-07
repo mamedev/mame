@@ -9,21 +9,19 @@
 
 *********************************************************************/
 
-#include "emu.h"
-#include "osdnet.h"
-#include "emuopts.h"
-#include "ui/ui.h"
-#include "rendutil.h"
-#include "cheat.h"
-#include "uiinput.h"
-#include "ui/filemngr.h"
-#include "ui/miscmenu.h"
-#include "audit.h"
-#include "crsshair.h"
 #include <ctype.h>
-#include "imagedev/cassette.h"
-#include "imagedev/bitbngr.h"
 
+#include "emu.h"
+#include "emuopts.h"
+
+#include "cheat.h"
+#include "osdnet.h"
+#include "rendutil.h"
+
+#include "uiinput.h"
+#include "ui/ui.h"
+#include "ui/miscmenu.h"
+#include "ui/filemngr.h"
 
 
 /***************************************************************************
@@ -257,7 +255,7 @@ void ui_menu_slot_devices::populate()
 		item_append(slot->device().tag()+1, option == NULL ? "------" : option->name(), (slot->fixed() || slot_get_length(slot) == 0) ? 0 : (MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW), (void *)slot);
 	}
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
-	item_append("Reset",  NULL, 0, NULL);
+	item_append("Reset",  NULL, 0, (void *)1);
 }
 
 ui_menu_slot_devices::~ui_menu_slot_devices()
@@ -275,14 +273,15 @@ void ui_menu_slot_devices::handle()
 
 	if (menu_event != NULL && menu_event->itemref != NULL)
 	{
-		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT) {
+		if ((FPTR)menu_event->itemref == 1 && menu_event->iptkey == IPT_UI_SELECT)
+			machine().schedule_hard_reset();
+		else if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
+		{
 			device_slot_interface *slot = (device_slot_interface *)menu_event->itemref;
 			const char *val = (menu_event->iptkey == IPT_UI_LEFT) ? slot_get_prev(slot) : slot_get_next(slot);
-			set_slot_device(slot,val);
+			set_slot_device(slot, val);
 			reset(UI_MENU_RESET_REMEMBER_REF);
 		}
-	} else if (menu_event != NULL && menu_event->iptkey == IPT_UI_SELECT) {
-		machine().schedule_hard_reset();
 	}
 }
 
@@ -315,7 +314,7 @@ void ui_menu_bios_selection::populate()
 	}
 
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
-	item_append("Reset",  NULL, 0, NULL);
+	item_append("Reset",  NULL, 0, (void *)1);
 }
 
 ui_menu_bios_selection::~ui_menu_bios_selection()
@@ -333,7 +332,10 @@ void ui_menu_bios_selection::handle()
 
 	if (menu_event != NULL && menu_event->itemref != NULL)
 	{
-		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT) {
+		if ((FPTR)menu_event->itemref == 1 && menu_event->iptkey == IPT_UI_SELECT)
+			machine().schedule_hard_reset();
+		else if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
+		{
 			device_t *dev = (device_t *)menu_event->itemref;
 			int cnt = 0;
 			for (const rom_entry *rom = dev->rom_region(); !ROMENTRY_ISEND(rom); rom++)
@@ -358,10 +360,10 @@ void ui_menu_bios_selection::handle()
 			}
 			reset(UI_MENU_RESET_REMEMBER_REF);
 		}
-	} else if (menu_event != NULL && menu_event->iptkey == IPT_UI_SELECT) {
-		machine().schedule_hard_reset();
 	}
 }
+
+
 
 ui_menu_network_devices::ui_menu_network_devices(running_machine &machine, render_container *container) : ui_menu(machine, container)
 {
@@ -842,42 +844,52 @@ ui_menu_settings_driver_config::~ui_menu_settings_driver_config()
 
 void ui_menu_settings::handle()
 {
-	/* process the menu */
+	// process the menu
 	const ui_menu_event *menu_event = process(0);
 
-	/* handle events */
+	// handle events
 	if (menu_event != NULL && menu_event->itemref != NULL)
 	{
-		ioport_field *field = (ioport_field *)menu_event->itemref;
-		ioport_field::user_settings settings;
-		int changed = false;
-
-		switch (menu_event->iptkey)
+		// reset
+		if ((FPTR)menu_event->itemref == 1) 
 		{
-			/* if selected, reset to default value */
-			case IPT_UI_SELECT:
-				field->get_user_settings(settings);
-				settings.value = field->defvalue();
-				field->set_user_settings(settings);
-				changed = true;
-				break;
-
-			/* left goes to previous setting */
-			case IPT_UI_LEFT:
-				field->select_previous_setting();
-				changed = true;
-				break;
-
-			/* right goes to next setting */
-			case IPT_UI_RIGHT:
-				field->select_next_setting();
-				changed = true;
-				break;
+			if (menu_event->iptkey == IPT_UI_SELECT)
+				machine().schedule_hard_reset();
 		}
-
-		/* if anything changed, rebuild the menu, trying to stay on the same field */
-		if (changed)
-			reset(UI_MENU_RESET_REMEMBER_REF);
+		// actual settings
+		else
+		{
+			ioport_field *field = (ioport_field *)menu_event->itemref;
+			ioport_field::user_settings settings;
+			int changed = false;
+			
+			switch (menu_event->iptkey)
+			{
+				/* if selected, reset to default value */
+				case IPT_UI_SELECT:
+					field->get_user_settings(settings);
+					settings.value = field->defvalue();
+					field->set_user_settings(settings);
+					changed = true;
+					break;
+					
+				/* left goes to previous setting */
+				case IPT_UI_LEFT:
+					field->select_previous_setting();
+					changed = true;
+					break;
+					
+				/* right goes to next setting */
+				case IPT_UI_RIGHT:
+					field->select_next_setting();
+					changed = true;
+					break;
+			}
+			
+			/* if anything changed, rebuild the menu, trying to stay on the same field */
+			if (changed)
+				reset(UI_MENU_RESET_REMEMBER_REF);
+		}
 	}
 }
 
@@ -949,8 +961,7 @@ void ui_menu_settings::populate()
 							dip->mask = dip->state = 0;
 							*diplist_tailptr = dip;
 							diplist_tailptr = &dip->next;
-							if (core_stricmp(dip->name, "FAKE") != 0)
-								dipcount++;
+							dipcount++;
 						}
 
 						/* apply the bits */
@@ -964,7 +975,10 @@ void ui_menu_settings::populate()
 				}
 			}
 	if (type == IPT_DIPSWITCH)
-		custombottom = dipcount * (DIP_SWITCH_HEIGHT + DIP_SWITCH_SPACING) + DIP_SWITCH_SPACING;
+		custombottom = dipcount ? dipcount * (DIP_SWITCH_HEIGHT + DIP_SWITCH_SPACING) + DIP_SWITCH_SPACING : 0;
+	
+	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+	item_append("Reset",  NULL, 0, (void *)1);
 }
 
 ui_menu_settings::~ui_menu_settings()
@@ -978,38 +992,38 @@ ui_menu_settings::~ui_menu_settings()
 
 void ui_menu_settings_dip_switches::custom_render(void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2)
 {
-	ioport_field *field = (ioport_field *)selectedref;
-	dip_descriptor *dip;
-
-	if (field==NULL || field->first_diplocation() == NULL)
+	// catch if no diploc has to be drawn
+	if (bottom == 0)
 		return;
 
-	/* add borders */
+	// add borders
 	y1 = y2 + UI_BOX_TB_BORDER;
 	y2 = y1 + bottom;
 
-	/* draw extra menu area */
+	// draw extra menu area
 	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 	y1 += (float)DIP_SWITCH_SPACING;
 
-	/* iterate over DIP switches */
-	for (dip = diplist; dip != NULL; dip = dip->next)
+	// iterate over DIP switches
+	for (dip_descriptor *dip = diplist; dip != NULL; dip = dip->next)
 	{
-		if (core_stricmp(dip->name, "FAKE") != 0)
+		const ioport_diplocation *diploc;
+		UINT32 selectedmask = 0;
+		
+		// determine the mask of selected bits
+		if ((FPTR)selectedref != 1)
 		{
-			const ioport_diplocation *diploc;
-			UINT32 selectedmask = 0;
-
-			/* determine the mask of selected bits */
-			if (field != NULL)
+			ioport_field *field = (ioport_field *)selectedref;
+			
+			if (field != NULL && field->first_diplocation() != NULL)
 				for (diploc = field->first_diplocation(); diploc != NULL; diploc = diploc->next())
 					if (strcmp(dip->name, diploc->name()) == 0)
 						selectedmask |= 1 << (diploc->number() - 1);
-
-			/* draw one switch */
-			custom_render_one(x1, y1, x2, y1 + DIP_SWITCH_HEIGHT, dip, selectedmask);
-			y1 += (float)(DIP_SWITCH_SPACING + DIP_SWITCH_HEIGHT);
 		}
+		
+		// draw one switch
+		custom_render_one(x1, y1, x2, y1 + DIP_SWITCH_HEIGHT, dip, selectedmask);
+		y1 += (float)(DIP_SWITCH_SPACING + DIP_SWITCH_HEIGHT);
 	}
 }
 
