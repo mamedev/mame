@@ -58,7 +58,6 @@ typedef void *PVOID;
 #if defined(OSD_WINDOWS)
 #define SPIN_LOOP_TIME          (osd_ticks_per_second() / 50000)
 #else
-#define INFINITE                (osd_ticks_per_second() *  (osd_ticks_t) 10000)
 #define SPIN_LOOP_TIME          (osd_ticks_per_second() / 10000)
 #endif
 
@@ -659,7 +658,7 @@ static void *worker_thread_entry(void *param)
 		if (!queue_has_list_items(queue))
 		{
 			begin_timing(thread->waittime);
-			osd_event_wait(thread->wakeevent, INFINITE);
+			osd_event_wait(thread->wakeevent, OSD_EVENT_WAIT_INFINITE);
 			end_timing(thread->waittime);
 		}
 

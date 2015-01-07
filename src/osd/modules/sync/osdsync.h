@@ -14,6 +14,8 @@
     SYNCHRONIZATION INTERFACES - Events
 ***************************************************************************/
 
+#define OSD_EVENT_WAIT_INFINITE -1
+
 /* osd_event is an opaque type which represents a setable/resetable event */
 
 struct osd_event;

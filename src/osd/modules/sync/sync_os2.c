@@ -381,11 +381,17 @@ void osd_event_reset(osd_event *event)
 int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 {
 	ULONG rc;
+	ULONG timeout_param;
+	
+	if (timeout == OSD_EVENT_WAIT_INFINITE)
+		timeout_param = SEM_INDEFINITE_WAIT;
+	else
+		timeout_param = timeout * 1000 / osd_ticks_per_second();
 
 	if(event->autoreset)
 		DosRequestMutexSem(event->hmtx, -1);
 
-	rc = DosWaitEventSem(event->hev, timeout * 1000 / osd_ticks_per_second());
+	rc = DosWaitEventSem(event->hev, timeout_param);
 
 	if(event->autoreset)
 	{
