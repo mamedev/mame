@@ -61,9 +61,9 @@ public:
 
 	required_shared_ptr<UINT16> m_generic_paletteram_16;
 	optional_shared_ptr<UINT8> m_gfx_rom;
-	
+
 	optional_ioport_array<6> m_ports;
-	
+
 	DECLARE_IOPORT_ARRAY(ports);
 
 	UINT16 *m_cmos_ram;

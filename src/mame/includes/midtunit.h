@@ -32,12 +32,12 @@ public:
 	optional_device<dcs_audio_device> m_dcs;
 	optional_device<williams_cvsd_sound_device> m_cvsd_sound;
 	optional_device<williams_adpcm_sound_device> m_adpcm_sound;
-	
+
 	required_shared_ptr<UINT16> m_generic_paletteram_16;
 	required_shared_ptr<UINT16> m_nvram;
-	
+
 	required_memory_region m_gfxrom;
-	
+
 	required_ioport_array<4> m_ports;
 	DECLARE_IOPORT_ARRAY(tunit_ports);
 
@@ -76,18 +76,18 @@ public:
 	DECLARE_READ16_MEMBER(midxunit_paletteram_r);
 	DECLARE_READ16_MEMBER(midtunit_dma_r);
 	DECLARE_WRITE16_MEMBER(midtunit_dma_w);
-	
+
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
-	
+
 	DECLARE_DRIVER_INIT(mktunit);
 	DECLARE_DRIVER_INIT(mkturbo);
 	DECLARE_DRIVER_INIT(nbajamte);
 	DECLARE_DRIVER_INIT(nbajam);
 	DECLARE_DRIVER_INIT(jdreddp);
 	DECLARE_DRIVER_INIT(mk2);
-	
+
 	DECLARE_MACHINE_RESET(midtunit);
 	DECLARE_VIDEO_START(midtunit);
 
