@@ -504,7 +504,7 @@ else
 ifeq ($(OSD),osdmini)
 DEFS += -DOSD_MINI
 else
-$(warning Please add -DOSD_[SDL|WINDOWS|MINI] in $(OSD).mk)
+$(warning Please add -DOSD_[SDL|WINDOWS|MINI] in $(OSD).mak)
 endif
 endif
 endif
