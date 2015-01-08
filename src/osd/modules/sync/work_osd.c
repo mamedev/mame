@@ -54,13 +54,7 @@ typedef void *PVOID;
 #define ENV_PROCESSORS               "OSDPROCESSORS"
 #define ENV_WORKQUEUEMAXTHREADS      "OSDWORKQUEUEMAXTHREADS"
 
-// TODO: use either
-// TODO: make configurable via environment for tests
-#if defined(OSD_WINDOWS)
-#define SPIN_LOOP_TIME          (osd_ticks_per_second() / 50000)
-#else
 #define SPIN_LOOP_TIME          (osd_ticks_per_second() / 10000)
-#endif
 
 //============================================================
 //  MACROS
