@@ -84,7 +84,7 @@ void ui_menu_main::populate()
 		/* add tape control menu */
 		cassette_device_iterator cassiter(machine().root_device());
 		if (cassiter.first() != NULL)
-			item_append("Tape Control", NULL, 0, (void *)MESS_MENU_TAPE_CONTROL);
+			item_append("Tape Control", NULL, 0, (void *)TAPE_CONTROL);
 	}
 
 	if (machine().ioport().has_bioses())
@@ -184,8 +184,8 @@ void ui_menu_main::handle()
 			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_file_manager(machine(), container)));
 			break;
 
-		case MESS_MENU_TAPE_CONTROL:
-			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_mess_tape_control(machine(), container, NULL)));
+		case TAPE_CONTROL:
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_tape_control(machine(), container, NULL)));
 			break;
 
 		case SLOT_DEVICES:
