@@ -542,6 +542,11 @@ ifdef SYMBOLS
 CCOMFLAGS += -g$(SYMLEVEL) -fno-omit-frame-pointer -fno-optimize-sibling-calls
 endif
 
+# we need to disable some additional implicit optimizations for profiling
+ifdef PROFILE
+CCOMFLAGS += -mno-omit-leaf-frame-pointer
+endif
+
 # add -v if we need verbose build information
 ifdef VERBOSE
 CCOMFLAGS += -v
