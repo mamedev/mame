@@ -110,11 +110,11 @@ READ16_MEMBER(midyunit_state::midyunit_protection_r)
  *
  *************************************/
 
+IOPORT_ARRAY_MEMBER(midyunit_state::ports) { "IN0", "IN1", "IN2", "DSW", "UNK0", "UNK1" };
+
 READ16_MEMBER(midyunit_state::midyunit_input_r)
 {
-	static const char *const portnames[] = { "IN0", "IN1", "IN2", "DSW", "UNK0", "UNK1" };
-
-	return ioport(portnames[offset])->read();
+	return m_ports[offset]->read();
 }
 
 
@@ -127,10 +127,8 @@ READ16_MEMBER(midyunit_state::midyunit_input_r)
 
 READ16_MEMBER(midyunit_state::term2_input_r)
 {
-	static const char *const portnames[] = { "IN0", "IN1", NULL, "DSW", "UNK0", "UNK1" };
-
 	if (offset != 2)
-		return ioport(portnames[offset])->read();
+		return m_ports[offset]->read();
 
 	switch (m_term2_analog_select)
 	{
@@ -502,7 +500,7 @@ void midyunit_state::term2_init_common(write16_delegate hack_w)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01e00000, 0x01e0001f, write16_delegate(FUNC(midyunit_state::term2_sound_w), this));
 
 	/* HACK: this prevents the freeze on the movies */
-	/* until we figure whats causing it, this is better than nothing */
+	/* until we figure what's causing it, this is better than nothing */
 	m_t2_hack_mem = m_maincpu->space(AS_PROGRAM).install_write_handler(0x010aa0e0, 0x010aa0ff, hack_w);
 }
 

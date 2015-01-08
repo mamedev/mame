@@ -113,10 +113,10 @@ WRITE16_MEMBER(midwunit_state::midwunit_io_w)
  *
  *************************************/
 
+IOPORT_ARRAY_MEMBER(midwunit_state::wunit_ports) { "IN0", "IN1", "DSW", "IN2" };
+
 READ16_MEMBER(midwunit_state::midwunit_io_r)
 {
-	static const char *const portnames[] = { "IN0", "IN1", "DSW", "IN2" };
-
 	/* apply I/O shuffling */
 	offset = m_ioshuffle[offset % 16];
 
@@ -126,7 +126,7 @@ READ16_MEMBER(midwunit_state::midwunit_io_r)
 		case 1:
 		case 2:
 		case 3:
-			return ioport(portnames[offset])->read();
+			return m_ports[offset]->read();
 
 		case 4:
 			return (m_midway_serial_pic->status_r(space,0) << 12) | midwunit_sound_state_r(space,0,0xffff);
