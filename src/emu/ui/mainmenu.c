@@ -229,7 +229,7 @@ void ui_menu_main::handle()
 			break;
 
 		case BARCODE_READ:
-			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_barcode_reader(machine(), container)));
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_barcode_reader(machine(), container, NULL)));
 			break;
 
 		default:
