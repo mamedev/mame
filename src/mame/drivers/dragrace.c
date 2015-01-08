@@ -27,6 +27,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(dragrace_state::dragrace_frame_callback)
 			case 0x10: m_gear[i] = 0; break;
 		}
 	}
+	output_set_value("P1gear", m_gear[0]);
+	output_set_value("P2gear", m_gear[1]);
 
 	/* watchdog is disabled during service mode */
 	machine().watchdog_enable(ioport("IN0")->read() & 0x20);
