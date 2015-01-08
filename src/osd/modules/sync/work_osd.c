@@ -223,10 +223,11 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 		allocthreadnum = queue->threads + 1;
 	else
 		allocthreadnum = queue->threads;
-#if 0
-	// tools like chdman are not linked with osd_printf_*
-	osd_printf_verbose("osdprocs: %d effecprocs: %d threads: %d allocthreads: %d osdthreads: %d maxthreads: %d queuethreads: %d\n", osd_num_processors, numprocs, threadnum, allocthreadnum, osdthreadnum, WORK_MAX_THREADS, queue->threads);
+
+#if KEEP_STATISTICS
+	printf("osdprocs: %d effecprocs: %d threads: %d allocthreads: %d osdthreads: %d maxthreads: %d queuethreads: %d\n", osd_num_processors, numprocs, threadnum, allocthreadnum, osdthreadnum, WORK_MAX_THREADS, queue->threads);
 #endif
+
 	queue->thread = (work_thread_info *)osd_malloc_array(allocthreadnum * sizeof(queue->thread[0]));
 	if (queue->thread == NULL)
 		goto error;
@@ -382,7 +383,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 			allocthreadnum = queue->threads;
 
 		// output per-thread statistics
-		for (threadnum = 0; threadnum <= allocthreadnum; threadnum++)
+		for (threadnum = 0; threadnum < allocthreadnum; threadnum++)
 		{
 			work_thread_info *thread = &queue->thread[threadnum];
 			osd_ticks_t total = thread->runtime + thread->waittime + thread->spintime;
