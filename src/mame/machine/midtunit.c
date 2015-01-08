@@ -28,14 +28,14 @@
 
 void midtunit_state::register_state_saving()
 {
-	save_item(NAME(cmos_write_enable));
-	save_item(NAME(fake_sound_state));
-	save_item(NAME(mk_prot_index));
-	save_item(NAME(mk2_prot_data));
-	save_item(NAME(nbajam_prot_queue));
-	save_item(NAME(nbajam_prot_index));
-	save_item(NAME(jdredd_prot_index));
-	save_item(NAME(jdredd_prot_max));
+	save_item(NAME(m_cmos_write_enable));
+	save_item(NAME(m_fake_sound_state));
+	save_item(NAME(m_mk_prot_index));
+	save_item(NAME(m_mk2_prot_data));
+	save_item(NAME(m_nbajam_prot_queue));
+	save_item(NAME(m_nbajam_prot_index));
+	save_item(NAME(m_jdredd_prot_index));
+	save_item(NAME(m_jdredd_prot_max));
 }
 
 
@@ -48,16 +48,16 @@ void midtunit_state::register_state_saving()
 
 WRITE16_MEMBER(midtunit_state::midtunit_cmos_enable_w)
 {
-	cmos_write_enable = 1;
+	m_cmos_write_enable = 1;
 }
 
 
 WRITE16_MEMBER(midtunit_state::midtunit_cmos_w)
 {
-	if (1)/*cmos_write_enable)*/
+	if (1)/*m_cmos_write_enable*/
 	{
 		COMBINE_DATA(m_nvram+offset);
-		cmos_write_enable = 0;
+		m_cmos_write_enable = 0;
 	}
 	else
 	{
@@ -80,11 +80,11 @@ READ16_MEMBER(midtunit_state::midtunit_cmos_r)
  *
  *************************************/
 
+IOPORT_ARRAY_MEMBER(midtunit_state::tunit_ports) { "IN0", "IN1", "IN2", "DSW" };
+
 READ16_MEMBER(midtunit_state::midtunit_input_r)
 {
-	static const char *const portnames[] = { "IN0", "IN1", "IN2", "DSW" };
-
-	return ioport(portnames[offset])->read();
+	return m_ports[offset]->read();
 }
 
 
@@ -109,16 +109,16 @@ static const UINT8 mk_prot_values[] =
 
 READ16_MEMBER(midtunit_state::mk_prot_r)
 {
-	logerror("%08X:Protection R @ %05X = %04X\n", space.device().safe_pc(), offset, mk_prot_values[mk_prot_index] << 9);
+	logerror("%08X:Protection R @ %05X = %04X\n", space.device().safe_pc(), offset, mk_prot_values[m_mk_prot_index] << 9);
 
 	/* just in case */
-	if (mk_prot_index >= sizeof(mk_prot_values))
+	if (m_mk_prot_index >= sizeof(mk_prot_values))
 	{
 		logerror("%08X:Unexpected protection R @ %05X\n", space.device().safe_pc(), offset);
-		mk_prot_index = 0;
+		m_mk_prot_index = 0;
 	}
 
-	return mk_prot_values[mk_prot_index++] << 9;
+	return mk_prot_values[m_mk_prot_index++] << 9;
 }
 
 WRITE16_MEMBER(midtunit_state::mk_prot_w)
@@ -132,7 +132,7 @@ WRITE16_MEMBER(midtunit_state::mk_prot_w)
 		for (i = 0; i < sizeof(mk_prot_values); i++)
 			if (mk_prot_values[i] == first_val)
 			{
-				mk_prot_index = i;
+				m_mk_prot_index = i;
 				break;
 			}
 
@@ -140,7 +140,7 @@ WRITE16_MEMBER(midtunit_state::mk_prot_w)
 		if (i == sizeof(mk_prot_values))
 		{
 			logerror("%08X:Unhandled protection W @ %05X = %04X\n", space.device().safe_pc(), offset, data);
-			mk_prot_index = 0;
+			m_mk_prot_index = 0;
 		}
 
 		logerror("%08X:Protection W @ %05X = %04X\n", space.device().safe_pc(), offset, data);
@@ -177,17 +177,17 @@ READ16_MEMBER(midtunit_state::mk2_prot_const_r)
 
 READ16_MEMBER(midtunit_state::mk2_prot_r)
 {
-	return mk2_prot_data;
+	return m_mk2_prot_data;
 }
 
 READ16_MEMBER(midtunit_state::mk2_prot_shift_r)
 {
-	return mk2_prot_data >> 1;
+	return m_mk2_prot_data >> 1;
 }
 
 WRITE16_MEMBER(midtunit_state::mk2_prot_w)
 {
-	COMBINE_DATA(&mk2_prot_data);
+	COMBINE_DATA(&m_mk2_prot_data);
 }
 
 
@@ -240,23 +240,23 @@ static const UINT32 nbajamte_prot_values[128] =
 
 READ16_MEMBER(midtunit_state::nbajam_prot_r)
 {
-	int result = nbajam_prot_queue[nbajam_prot_index];
-	if (nbajam_prot_index < 4)
-		nbajam_prot_index++;
+	int result = m_nbajam_prot_queue[m_nbajam_prot_index];
+	if (m_nbajam_prot_index < 4)
+		m_nbajam_prot_index++;
 	return result;
 }
 
 WRITE16_MEMBER(midtunit_state::nbajam_prot_w)
 {
 	int table_index = (offset >> 6) & 0x7f;
-	UINT32 protval = nbajam_prot_table[table_index];
+	UINT32 protval = m_nbajam_prot_table[table_index];
 
-	nbajam_prot_queue[0] = data;
-	nbajam_prot_queue[1] = ((protval >> 24) & 0xff) << 9;
-	nbajam_prot_queue[2] = ((protval >> 16) & 0xff) << 9;
-	nbajam_prot_queue[3] = ((protval >> 8) & 0xff) << 9;
-	nbajam_prot_queue[4] = ((protval >> 0) & 0xff) << 9;
-	nbajam_prot_index = 0;
+	m_nbajam_prot_queue[0] = data;
+	m_nbajam_prot_queue[1] = ((protval >> 24) & 0xff) << 9;
+	m_nbajam_prot_queue[2] = ((protval >> 16) & 0xff) << 9;
+	m_nbajam_prot_queue[3] = ((protval >> 8) & 0xff) << 9;
+	m_nbajam_prot_queue[4] = ((protval >> 0) & 0xff) << 9;
+	m_nbajam_prot_index = 0;
 }
 
 
@@ -316,37 +316,37 @@ WRITE16_MEMBER(midtunit_state::jdredd_prot_w)
 	switch (offset)
 	{
 		case TOWORD(0x10740):
-			jdredd_prot_index = 0;
-			jdredd_prot_table = jdredd_prot_values_10740;
-			jdredd_prot_max = sizeof(jdredd_prot_values_10740);
+			m_jdredd_prot_index = 0;
+			m_jdredd_prot_table = jdredd_prot_values_10740;
+			m_jdredd_prot_max = sizeof(jdredd_prot_values_10740);
 			logerror("-- reset prot table 10740\n");
 			break;
 
 		case TOWORD(0x13240):
-			jdredd_prot_index = 0;
-			jdredd_prot_table = jdredd_prot_values_13240;
-			jdredd_prot_max = sizeof(jdredd_prot_values_13240);
+			m_jdredd_prot_index = 0;
+			m_jdredd_prot_table = jdredd_prot_values_13240;
+			m_jdredd_prot_max = sizeof(jdredd_prot_values_13240);
 			logerror("-- reset prot table 13240\n");
 			break;
 
 		case TOWORD(0x76540):
-			jdredd_prot_index = 0;
-			jdredd_prot_table = jdredd_prot_values_76540;
-			jdredd_prot_max = sizeof(jdredd_prot_values_76540);
+			m_jdredd_prot_index = 0;
+			m_jdredd_prot_table = jdredd_prot_values_76540;
+			m_jdredd_prot_max = sizeof(jdredd_prot_values_76540);
 			logerror("-- reset prot table 76540\n");
 			break;
 
 		case TOWORD(0x77760):
-			jdredd_prot_index = 0;
-			jdredd_prot_table = jdredd_prot_values_77760;
-			jdredd_prot_max = sizeof(jdredd_prot_values_77760);
+			m_jdredd_prot_index = 0;
+			m_jdredd_prot_table = jdredd_prot_values_77760;
+			m_jdredd_prot_max = sizeof(jdredd_prot_values_77760);
 			logerror("-- reset prot table 77760\n");
 			break;
 
 		case TOWORD(0x80020):
-			jdredd_prot_index = 0;
-			jdredd_prot_table = jdredd_prot_values_80020;
-			jdredd_prot_max = sizeof(jdredd_prot_values_80020);
+			m_jdredd_prot_index = 0;
+			m_jdredd_prot_table = jdredd_prot_values_80020;
+			m_jdredd_prot_max = sizeof(jdredd_prot_values_80020);
 			logerror("-- reset prot table 80020\n");
 			break;
 	}
@@ -356,8 +356,8 @@ READ16_MEMBER(midtunit_state::jdredd_prot_r)
 {
 	UINT16 result = 0xffff;
 
-	if (jdredd_prot_table && jdredd_prot_index < jdredd_prot_max)
-		result = jdredd_prot_table[jdredd_prot_index++] << 9;
+	if (m_jdredd_prot_table && m_jdredd_prot_index < m_jdredd_prot_max)
+		result = m_jdredd_prot_table[m_jdredd_prot_index++] << 9;
 
 	logerror("%08X:jdredd_prot_r(%04X) = %04X\n", space.device().safe_pcbase(), offset*16, result);
 	return result;
@@ -392,7 +392,7 @@ void midtunit_state::init_tunit_generic(int sound)
 	register_state_saving();
 
 	/* load sound ROMs and set up sound handlers */
-	chip_type = sound;
+	m_chip_type = sound;
 
 
 	/* default graphics functionality */
@@ -437,12 +437,12 @@ void midtunit_state::init_nbajam_common(int te_protection)
 	/* protection */
 	if (!te_protection)
 	{
-		nbajam_prot_table = nbajam_prot_values;
+		m_nbajam_prot_table = nbajam_prot_values;
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b14020, 0x1b2503f, read16_delegate(FUNC(midtunit_state::nbajam_prot_r),this), write16_delegate(FUNC(midtunit_state::nbajam_prot_w),this));
 	}
 	else
 	{
-		nbajam_prot_table = nbajamte_prot_values;
+		m_nbajam_prot_table = nbajamte_prot_values;
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b15f40, 0x1b37f5f, read16_delegate(FUNC(midtunit_state::nbajam_prot_r),this), write16_delegate(FUNC(midtunit_state::nbajam_prot_w),this));
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b95f40, 0x1bb7f5f, read16_delegate(FUNC(midtunit_state::nbajam_prot_r),this), write16_delegate(FUNC(midtunit_state::nbajam_prot_w),this));
 	}
@@ -523,7 +523,7 @@ DRIVER_INIT_MEMBER(midtunit_state,mk2)
 MACHINE_RESET_MEMBER(midtunit_state,midtunit)
 {
 	/* reset sound */
-	switch (chip_type)
+	switch (m_chip_type)
 	{
 		case SOUND_ADPCM:
 		case SOUND_ADPCM_LARGE:
@@ -550,12 +550,12 @@ READ16_MEMBER(midtunit_state::midtunit_sound_state_r)
 {
 /*  logerror("%08X:Sound status read\n", space.device().safe_pc());*/
 
-	if (chip_type == SOUND_DCS)
+	if (m_chip_type == SOUND_DCS)
 		return m_dcs->control_r() >> 4;
 
-	if (fake_sound_state)
+	if (m_fake_sound_state)
 	{
-		fake_sound_state--;
+		m_fake_sound_state--;
 		return 0;
 	}
 	return ~0;
@@ -565,7 +565,7 @@ READ16_MEMBER(midtunit_state::midtunit_sound_r)
 {
 	logerror("%08X:Sound data read\n", space.device().safe_pc());
 
-	if (chip_type == SOUND_DCS)
+	if (m_chip_type == SOUND_DCS)
 		return m_dcs->data_r() & 0xff;
 
 	return ~0;
@@ -582,7 +582,7 @@ WRITE16_MEMBER(midtunit_state::midtunit_sound_w)
 
 	/* call through based on the sound type */
 	if (ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15)
-		switch (chip_type)
+		switch (m_chip_type)
 		{
 			case SOUND_ADPCM:
 			case SOUND_ADPCM_LARGE:
@@ -590,7 +590,7 @@ WRITE16_MEMBER(midtunit_state::midtunit_sound_w)
 				m_adpcm_sound->write(space, offset, data & 0xff);
 
 				/* the games seem to check for $82 loops, so this should be just barely enough */
-				fake_sound_state = 128;
+				m_fake_sound_state = 128;
 				break;
 
 			case SOUND_DCS:
@@ -598,7 +598,7 @@ WRITE16_MEMBER(midtunit_state::midtunit_sound_w)
 				m_dcs->reset_w(~data & 0x100);
 				m_dcs->data_w(data & 0xff);
 				/* the games seem to check for $82 loops, so this should be just barely enough */
-				fake_sound_state = 128;
+				m_fake_sound_state = 128;
 				break;
 		}
 }

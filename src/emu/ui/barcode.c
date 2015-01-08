@@ -2,7 +2,7 @@
 
     ui/barcode.c
 
-    MESS's "barcode reader" control
+    "Barcode Reader" control
 
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -11,19 +11,18 @@
 
 #include "emu.h"
 #include "ui/ui.h"
-#include "ui/menu.h"
 #include "ui/barcode.h"
-
 
 // itemrefs for key menu items
 #define ITEMREF_NEW_BARCODE    ((void *) 0x0001)
-#define ITEMREF_ENTER          ((void *) 0x0002)
+#define ITEMREF_ENTER_BARCODE  ((void *) 0x0002)
+#define ITEMREF_SELECT_READER  ((void *) 0x0003)
 
 
 /**************************************************
-
- BARCODE INPUT MENU
-
+ 
+ BARCODE READER MENU
+ 
  **************************************************/
 
 
@@ -31,10 +30,9 @@
 //  ctor
 //-------------------------------------------------
 
-ui_menu_barcode_code::ui_menu_barcode_code(running_machine &machine, render_container *container, barcode_reader_device *reader)
-						: ui_menu(machine, container)
+ui_menu_barcode_reader::ui_menu_barcode_reader(running_machine &machine, render_container *container, barcode_reader_device *device)
+						: ui_menu_device_control<barcode_reader_device>(machine, container, device)
 {
-	m_reader = reader;
 }
 
 
@@ -42,7 +40,7 @@ ui_menu_barcode_code::ui_menu_barcode_code(running_machine &machine, render_cont
 //  dtor
 //-------------------------------------------------
 
-ui_menu_barcode_code::~ui_menu_barcode_code()
+ui_menu_barcode_reader::~ui_menu_barcode_reader()
 {
 }
 
@@ -50,29 +48,35 @@ ui_menu_barcode_code::~ui_menu_barcode_code()
 //  populate - populates the barcode input menu
 //-------------------------------------------------
 
-void ui_menu_barcode_code::populate()
+void ui_menu_barcode_reader::populate()
 {
-	astring buffer;
-	const char *new_barcode;
+	if (current_device())
+	{		
+		astring buffer;
+		const char *new_barcode;
 
-	// append the "New Barcode" item
-	if (get_selection() == ITEMREF_NEW_BARCODE)
-	{
-		buffer.cat(m_barcode_buffer);
-		new_barcode = buffer;
+		// selected device
+		item_append(current_display_name().cstr(), "", current_display_flags(), ITEMREF_SELECT_READER);
+
+		// append the "New Barcode" item
+		if (get_selection() == ITEMREF_NEW_BARCODE)
+		{
+			buffer.cat(m_barcode_buffer);
+			new_barcode = buffer;
+		}
+		else
+		{
+			new_barcode = m_barcode_buffer;
+		}
+		
+		item_append("New Barcode:", new_barcode, 0, ITEMREF_NEW_BARCODE);
+		
+		// finish up the menu
+		item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+		item_append("Enter Code", NULL, 0, ITEMREF_ENTER_BARCODE);
+		
+		customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 	}
-	else
-	{
-		new_barcode = m_barcode_buffer;
-	}
-
-	item_append("New Barcode:", new_barcode, 0, ITEMREF_NEW_BARCODE);
-
-	// finish up the menu
-	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
-	item_append("Enter Code", NULL, 0, ITEMREF_ENTER);
-
-	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
 
@@ -80,10 +84,14 @@ void ui_menu_barcode_code::populate()
 //  handle - manages inputs in the barcode input menu
 //-------------------------------------------------
 
-void ui_menu_barcode_code::handle()
+void ui_menu_barcode_reader::handle()
 {
+	// rebuild the menu (so to update the selected device, if the user has pressed L or R)
+	reset(UI_MENU_RESET_REMEMBER_POSITION);
+	populate();
+
 	// process the menu
-	const ui_menu_event *event = process(0);
+	const ui_menu_event *event = process(UI_MENU_PROCESS_LR_REPEAT);
 
 	// process the event
 	if (event != NULL)
@@ -91,16 +99,26 @@ void ui_menu_barcode_code::handle()
 		// handle selections
 		switch (event->iptkey)
 		{
+			case IPT_UI_LEFT:
+				if (event->itemref == ITEMREF_SELECT_READER)
+					previous();
+				break;
+				
+			case IPT_UI_RIGHT:
+				if (event->itemref == ITEMREF_SELECT_READER)
+					next();
+				break;
+
 			case IPT_UI_SELECT:
-				if (event->itemref == ITEMREF_ENTER)
+				if (event->itemref == ITEMREF_ENTER_BARCODE)
 				{
 					astring tmp_file(m_barcode_buffer);
 					//printf("code %s\n", m_barcode_buffer);
-					if (!m_reader->is_valid(tmp_file.len()))
+					if (!current_device()->is_valid(tmp_file.len()))
 						machine().ui().popup_time(5, "Barcode length invalid!");
 					else
 					{
-						m_reader->write_code(tmp_file.cstr(), tmp_file.len());
+						current_device()->write_code(tmp_file.cstr(), tmp_file.len());
 						// if sending was successful, reset char buffer
 						if (m_barcode_buffer[0] != '\0')
 							memset(m_barcode_buffer, '\0', ARRAY_LENGTH(m_barcode_buffer));
@@ -132,69 +150,5 @@ void ui_menu_barcode_code::handle()
 					memset(m_barcode_buffer, '\0', ARRAY_LENGTH(m_barcode_buffer));
 				break;
 		}
-	}
-}
-
-
-
-/**************************************************
-
- READER MENU
-
-**************************************************/
-
-//-------------------------------------------------
-//  ctor
-//-------------------------------------------------
-
-ui_menu_barcode_reader::ui_menu_barcode_reader(running_machine &machine, render_container *container)
-						: ui_menu(machine, container)
-{
-}
-
-//-------------------------------------------------
-//  dtor
-//-------------------------------------------------
-
-ui_menu_barcode_reader::~ui_menu_barcode_reader()
-{
-}
-
-
-//-------------------------------------------------
-//  populate - populates the barcode reader menu
-//-------------------------------------------------
-
-void ui_menu_barcode_reader::populate()
-{
-	astring buffer;
-
-	barcode_reader_device_iterator iter(machine().config().root_device());
-	for (const barcode_reader_device *bcreader = iter.first(); bcreader != NULL; bcreader = iter.next())
-	{
-		char label[0x400];
-		sprintf(label,"[%s (%s)]",bcreader->name(),bcreader->basetag());
-		item_append(label, NULL, 0, (void *)bcreader);
-	}
-}
-
-
-//-------------------------------------------------
-//  handle - manages inputs in the barcode reader menu
-//-------------------------------------------------
-
-void ui_menu_barcode_reader::handle()
-{
-	// process the menu
-	const ui_menu_event *event = process(0);
-
-	// process the event
-	if (event != NULL && event->iptkey == IPT_UI_SELECT)
-	{
-		if (event->itemref != NULL)
-		{
-			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_barcode_code(machine(), container, (barcode_reader_device *)event->itemref)));
-		}
-
 	}
 }

@@ -106,6 +106,8 @@ void ui_menu_file_manager::populate()
 		// record the menu item
 		item_append(buffer, tmp_name.cstr(), 0, (void *) image);
 	}
+	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+	item_append("Reset",  NULL, 0, (void *)1);
 
 	custombottom = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
@@ -117,20 +119,22 @@ void ui_menu_file_manager::populate()
 
 void ui_menu_file_manager::handle()
 {
-	// update the selected device
-	selected_device = (device_image_interface *) get_selection();
-
 	// process the menu
 	const ui_menu_event *event = process(0);
-	if (event != NULL && event->iptkey == IPT_UI_SELECT)
+	if (event != NULL && event->itemref != NULL && event->iptkey == IPT_UI_SELECT)
 	{
-		selected_device = (device_image_interface *) event->itemref;
-		if (selected_device != NULL)
+		if ((FPTR)event->itemref == 1)
+			machine().schedule_hard_reset();
+		else
 		{
-			ui_menu::stack_push(selected_device->get_selection_menu(machine(), container));
-
-			// reset the existing menu
-			reset(UI_MENU_RESET_REMEMBER_POSITION);
+			selected_device = (device_image_interface *) event->itemref;
+			if (selected_device != NULL)
+			{
+				ui_menu::stack_push(selected_device->get_selection_menu(machine(), container));
+				
+				// reset the existing menu
+				reset(UI_MENU_RESET_REMEMBER_POSITION);
+			}
 		}
 	}
 }

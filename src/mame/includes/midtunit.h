@@ -17,19 +17,29 @@ public:
 
 	midtunit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_nvram(*this, "nvram"),
-			m_gfxrom(*this, "gfxrom"),
-			m_cvsd_sound(*this, "cvsd"),
-			m_adpcm_sound(*this, "adpcm") ,
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
 		m_dcs(*this, "dcs"),
-		m_generic_paletteram_16(*this, "paletteram") { }
+		m_cvsd_sound(*this, "cvsd"),
+		m_adpcm_sound(*this, "adpcm") ,
+		m_generic_paletteram_16(*this, "paletteram"),
+		m_nvram(*this, "nvram"),
+		m_gfxrom(*this, "gfxrom"),
+		m_ports(*this, tunit_ports) { }
 
-	required_shared_ptr<UINT16> m_nvram;
-	required_memory_region m_gfxrom;
+	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
+	optional_device<dcs_audio_device> m_dcs;
 	optional_device<williams_cvsd_sound_device> m_cvsd_sound;
 	optional_device<williams_adpcm_sound_device> m_adpcm_sound;
+
+	required_shared_ptr<UINT16> m_generic_paletteram_16;
+	required_shared_ptr<UINT16> m_nvram;
+
+	required_memory_region m_gfxrom;
+
+	required_ioport_array<4> m_ports;
+	DECLARE_IOPORT_ARRAY(tunit_ports);
 
 	DECLARE_WRITE16_MEMBER(midtunit_cmos_enable_w);
 	DECLARE_WRITE16_MEMBER(midtunit_cmos_w);
@@ -66,44 +76,43 @@ public:
 	DECLARE_READ16_MEMBER(midxunit_paletteram_r);
 	DECLARE_READ16_MEMBER(midtunit_dma_r);
 	DECLARE_WRITE16_MEMBER(midtunit_dma_w);
+
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
+
 	DECLARE_DRIVER_INIT(mktunit);
 	DECLARE_DRIVER_INIT(mkturbo);
 	DECLARE_DRIVER_INIT(nbajamte);
 	DECLARE_DRIVER_INIT(nbajam);
 	DECLARE_DRIVER_INIT(jdreddp);
 	DECLARE_DRIVER_INIT(mk2);
+
 	DECLARE_MACHINE_RESET(midtunit);
 	DECLARE_VIDEO_START(midtunit);
-	required_device<cpu_device> m_maincpu;
-	required_device<palette_device> m_palette;
-	optional_device<dcs_audio_device> m_dcs;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
 
 	void register_state_saving();
 	void init_tunit_generic(int sound);
 	void init_nbajam_common(int te_protection);
 
 	/* CMOS-related variables */
-	UINT8    cmos_write_enable;
+	UINT8    m_cmos_write_enable;
 
 	/* sound-related variables */
-	UINT8    chip_type;
-	UINT8    fake_sound_state;
+	UINT8    m_chip_type;
+	UINT8    m_fake_sound_state;
 
 	/* protection */
-	UINT8    mk_prot_index;
-	UINT16   mk2_prot_data;
+	UINT8    m_mk_prot_index;
+	UINT16   m_mk2_prot_data;
 
-	const UINT32 *nbajam_prot_table;
-	UINT16   nbajam_prot_queue[5];
-	UINT8    nbajam_prot_index;
+	const UINT32 *m_nbajam_prot_table;
+	UINT16   m_nbajam_prot_queue[5];
+	UINT8    m_nbajam_prot_index;
 
-	const UINT8 *jdredd_prot_table;
-	UINT8    jdredd_prot_index;
-	UINT8    jdredd_prot_max;
+	const UINT8 *m_jdredd_prot_table;
+	UINT8    m_jdredd_prot_index;
+	UINT8    m_jdredd_prot_max;
 
 	UINT8 m_gfx_rom_large;
 

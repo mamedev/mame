@@ -238,6 +238,9 @@ void osd_event_reset(osd_event *event)
 
 int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 {
+	if (timeout == OSD_EVENT_WAIT_INFINITE)
+		timeout = osd_ticks_per_second() * (osd_ticks_t)10000;
+	
 	pthread_mutex_lock(&event->mutex);
 	if (!timeout)
 	{

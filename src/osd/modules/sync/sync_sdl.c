@@ -13,6 +13,8 @@
 
 // standard C headers
 #include <unistd.h>
+#include <sys/types.h>
+#include <signal.h>
 
 // MAME headers
 #include "osdcore.h"
@@ -247,6 +249,8 @@ void osd_event_reset(osd_event *event)
 int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 {
 	LOG(("osd_event_wait"));
+	if (timeout == OSD_EVENT_WAIT_INFINITE)
+		timeout = osd_ticks_per_second() * (osd_ticks_t)10000;
 	SDL_mutexP(event->mutex);
 	if (!timeout)
 	{
@@ -313,7 +317,11 @@ osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam)
 	thread = (osd_thread *)calloc(1, sizeof(osd_thread));
 	thread->callback = callback;
 	thread->param = cbparam;
-	thread->thread = SDL_CreateThread(worker_thread_entry, thread);
+#ifdef SDLMAME_SDL2
+    thread->thread = SDL_CreateThread(worker_thread_entry, "Thread", thread);
+#else
+    thread->thread = SDL_CreateThread(worker_thread_entry, thread);
+#endif
 	if ( thread->thread == NULL )
 	{
 		free(thread);
@@ -349,4 +357,13 @@ void osd_thread_wait_free(osd_thread *thread)
 	int status;
 	SDL_WaitThread(thread->thread, &status);
 	free(thread);
+}
+
+//============================================================
+//  osd_process_kill
+//============================================================
+
+void osd_process_kill(void)
+{
+    kill(getpid(), SIGKILL);
 }

@@ -251,7 +251,8 @@ void pokey_device::device_start()
 	m_KBCODE = 0x09;         /* Atari 800 'no key' */
 	m_SKCTL = SK_RESET;  /* let the RNG run after reset */
 	m_SKSTAT = 0;
-	m_IRQST = 0;
+	/* This bit should probably get set later. Acid5200 pokey_setoc test tests this. */
+	m_IRQST = IRQ_SEROC;
 	m_IRQEN = 0;
 	m_AUDCTL = 0;
 	m_p4 = 0;
@@ -887,7 +888,7 @@ UINT8 pokey_device::read(offs_t offset)
 
 	default:
 		LOG(("POKEY '%s' register $%02x\n", tag(), offset));
-		data = 0x00;
+		data = 0xff;
 		break;
 	}
 	return data;
@@ -1010,11 +1011,17 @@ void pokey_device::write_internal(offs_t offset, UINT8 data)
 		/* acknowledge one or more IRQST bits ? */
 		if( m_IRQST & ~data )
 		{
-			/* reset IRQST bits that are masked now */
-			m_IRQST &= data;
+			/* reset IRQST bits that are masked now, except the SEROC bit (acid5200 pokey_seroc test) */
+			m_IRQST &= (IRQ_SEROC | data);
 		}
 		/* store irq enable */
 		m_IRQEN = data;
+		/* if SEROC irq is enabled trigger an irq (acid5200 pokey_seroc test) */
+		if (m_IRQEN & m_IRQST & IRQ_SEROC)
+		{
+			if (!m_irq_f.isnull())
+				m_irq_f(IRQ_SEROC);
+		}
 		break;
 
 	case SKCTL_C:

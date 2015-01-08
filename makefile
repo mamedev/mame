@@ -291,15 +291,6 @@ ifdef SANITIZE
 SYMBOLS = 1
 endif
 
-# specify a default optimization level if none explicitly stated
-ifndef OPTIMIZE
-ifndef SYMBOLS
-OPTIMIZE = 3
-else
-OPTIMIZE = 0
-endif
-endif
-
 # profiler defaults to on for DEBUG builds
 ifdef DEBUG
 ifndef PROFILER
@@ -307,7 +298,6 @@ PROFILER = 1
 endif
 endif
 
-# TODO: also move it up, so it isn't optimized by default?
 # allow gprof profiling as well, which overrides the internal PROFILER
 # also enable symbols as it is useless without them
 ifdef PROFILE
@@ -315,6 +305,15 @@ PROFILER =
 SYMBOLS = 1
 ifndef SYMLEVEL
 SYMLEVEL = 1
+endif
+endif
+
+# specify a default optimization level if none explicitly stated
+ifndef OPTIMIZE
+ifndef SYMBOLS
+OPTIMIZE = 3
+else
+OPTIMIZE = 0
 endif
 endif
 
@@ -499,14 +498,18 @@ else
 ifeq ($(OSD),windows)
 DEFS += -DOSD_WINDOWS
 else
+ifeq ($(OSD),winui)
+DEFS += -DOSD_WINDOWS
+else
 ifeq ($(OSD),osdmini)
 DEFS += -DOSD_MINI
 else
-$(error Unknown OSD)
+$(warning Please add -DOSD_[SDL|WINDOWS|MINI] in $(OSD).mak)
 endif
 endif
 endif
- 
+endif
+
 #-------------------------------------------------
 # compile flags
 # CCOMFLAGS are common flags
@@ -537,6 +540,11 @@ CCOMFLAGS += -pipe
 # add -g if we need symbols, and ensure we have frame pointers
 ifdef SYMBOLS
 CCOMFLAGS += -g$(SYMLEVEL) -fno-omit-frame-pointer -fno-optimize-sibling-calls
+endif
+
+# we need to disable some additional implicit optimizations for profiling
+ifdef PROFILE
+CCOMFLAGS += -mno-omit-leaf-frame-pointer
 endif
 
 # add -v if we need verbose build information

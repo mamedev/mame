@@ -2,7 +2,17 @@
 
     ui/devctrl.h
 
-    Device specific control (base class for tapectrl)
+    Device specific control menu
+    This source provides a base class for any device which need a specific
+    submenu and which can occur multiple times in the same driver (at the
+    moment, cassette tapes and barcode readers, in future possibly other like
+    printers)
+    The base class contains calls to get the total number of devices of
+    the same kind connected to the driver, and shortcuts to switch current
+    device to next one or previous one attached. This allows, for instance, 
+    users to pass from a device to another one by simply pressing left/right 
+    and the menu is rebuilt accordingly, without the need of a preliminary 
+    submenu listing available devices of the same kind.
 
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -27,6 +37,8 @@ protected:
 	int current_index();
 	void previous();
 	void next();
+	astring current_display_name();
+	UINT32 current_display_flags();
 
 private:
 	// device iterator
@@ -103,5 +115,44 @@ void ui_menu_device_control<_DeviceType>::next()
 		m_device = iter.byindex(index);
 	}
 }
+
+
+//-------------------------------------------------
+//  current_display_name
+//-------------------------------------------------
+
+template<class _DeviceType>
+astring ui_menu_device_control<_DeviceType>::current_display_name()
+{
+	astring display_name;
+	display_name.cpy(current_device()->name());
+	if (count() > 1)
+	{
+		astring temp;
+		temp.printf(" %d", current_index() + 1);
+		display_name.cat(temp);
+	}
+	return display_name;
+}
+
+
+//-------------------------------------------------
+//  current_display_flags
+//-------------------------------------------------
+
+template<class _DeviceType>
+UINT32 ui_menu_device_control<_DeviceType>::current_display_flags()
+{
+	UINT32 flags = 0;
+	if (count() > 1)
+	{
+		if (current_index() > 0)
+			flags |= MENU_FLAG_LEFT_ARROW;
+		if (current_index() < count() - 1)
+			flags |= MENU_FLAG_RIGHT_ARROW;
+	}
+	return flags;
+}
+
 
 #endif /* __UI_DEVCTRL_H__ */
