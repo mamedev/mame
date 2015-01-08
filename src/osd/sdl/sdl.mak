@@ -657,8 +657,8 @@ MOC = @moc
 endif
 
 ifeq ($(SDL_LIBVER),sdl2)
-LIBS += -lSDL2 -lImm32 -lversion -lole32 -loleaut32 -static
-BASELIBS += -lImm32 -lversion -lole32 -loleaut32 -static
+LIBS += -lSDL2 -limm32 -lversion -lole32 -loleaut32 -lws2_32 -static
+BASELIBS += -limm32 -lversion -lole32 -loleaut32 -lws2_32 -static
 else
 LIBS += -lSDL -static
 endif
