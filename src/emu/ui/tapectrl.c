@@ -55,20 +55,10 @@ ui_menu_tape_control::~ui_menu_tape_control()
 
 void ui_menu_tape_control::populate()
 {
-	UINT32 flags = 0;
-
-	if (count() > 1)
-	{
-		if (current_index() == (count() - 1))
-			flags |= MENU_FLAG_LEFT_ARROW;
-		else
-			flags |= MENU_FLAG_RIGHT_ARROW;
-	}
-
 	if (current_device())
 	{		
 		// name of tape
-		item_append(current_display_name().cstr(), current_device()->exists() ? current_device()->filename() : "No Tape Image loaded", flags, TAPECMD_SELECT);
+		item_append(current_display_name().cstr(), current_device()->exists() ? current_device()->filename() : "No Tape Image loaded", current_display_flags(), TAPECMD_SELECT);
 
 		if (current_device()->exists())
 		{
@@ -125,7 +115,7 @@ void ui_menu_tape_control::populate()
 
 void ui_menu_tape_control::handle()
 {
-	// rebuild the menu - we have to do this so that the counter updates
+	// rebuild the menu (so to update the selected device, if the user has pressed L or R, and the tape counter)
 	reset(UI_MENU_RESET_REMEMBER_POSITION);
 	populate();
 

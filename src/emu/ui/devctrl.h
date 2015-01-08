@@ -38,6 +38,7 @@ protected:
 	void previous();
 	void next();
 	astring current_display_name();
+	UINT32 current_display_flags();
 
 private:
 	// device iterator
@@ -124,7 +125,7 @@ template<class _DeviceType>
 astring ui_menu_device_control<_DeviceType>::current_display_name()
 {
 	astring display_name;
-	display_name.cpy(current_device()->device().name());
+	display_name.cpy(current_device()->name());
 	if (count() > 1)
 	{
 		astring temp;
@@ -133,5 +134,25 @@ astring ui_menu_device_control<_DeviceType>::current_display_name()
 	}
 	return display_name;
 }
+
+
+//-------------------------------------------------
+//  current_display_flags
+//-------------------------------------------------
+
+template<class _DeviceType>
+UINT32 ui_menu_device_control<_DeviceType>::current_display_flags()
+{
+	UINT32 flags = 0;
+	if (count() > 1)
+	{
+		if (current_index() > 0)
+			flags |= MENU_FLAG_LEFT_ARROW;
+		if (current_index() < count() - 1)
+			flags |= MENU_FLAG_RIGHT_ARROW;
+	}
+	return flags;
+}
+
 
 #endif /* __UI_DEVCTRL_H__ */
