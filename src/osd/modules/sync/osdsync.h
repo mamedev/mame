@@ -1,6 +1,6 @@
 //============================================================
 //
-//  winsync.h - Windows core synchronization functions
+//  osdsync.h - Core synchronization functions
 //
 //  Copyright (c) 1996-2014, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.

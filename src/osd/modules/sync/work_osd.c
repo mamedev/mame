@@ -52,6 +52,7 @@ typedef void *PVOID;
 //============================================================
 
 #define ENV_PROCESSORS               "OSDPROCESSORS"
+#define ENV_WORKQUEUEMAXTHREADS      "OSDWORKQUEUEMAXTHREADS"
 
 // TODO: use either
 // TODO: make configurable via environment for tests
@@ -181,7 +182,7 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	osd_work_queue *queue;
 	int osdthreadnum = 0;
 	int allocthreadnum;
-	char *osdworkqueuemaxthreads = osd_getenv("OSDWORKQUEUEMAXTHREADS");
+	char *osdworkqueuemaxthreads = osd_getenv(ENV_WORKQUEUEMAXTHREADS);
 
 	// allocate a new queue
 	queue = (osd_work_queue *)osd_malloc(sizeof(*queue));
