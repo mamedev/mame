@@ -874,6 +874,8 @@ file_error osd_get_full_path(char **dst, const char *path);
 ***************************************************************************/
 struct osd_midi_device;
 
+bool osd_midi_init();
+void osd_midi_exit();
 void osd_list_midi_devices(void);
 // free result with osd_close_midi_channel()
 osd_midi_device *osd_open_midi_input(const char *devname);

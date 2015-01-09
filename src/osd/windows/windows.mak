@@ -87,7 +87,10 @@ WINOBJ = $(OBJ)/osd/$(OSD)
 OSDSRC = $(SRC)/osd
 OSDOBJ = $(OBJ)/osd
 
-OBJDIRS += $(WINOBJ) $(OSDOBJ)/modules/sync $(OSDOBJ)/modules/lib
+OBJDIRS += $(WINOBJ) \
+	$(OSDOBJ)/modules/sync \
+	$(OSDOBJ)/modules/lib \
+	$(OSDOBJ)/modules/midi \
 
 ifdef USE_QTDEBUG
 OBJDIRS += $(OSDOBJ)/modules/debugger/qt
@@ -374,7 +377,8 @@ OSDOBJS = \
 	$(WINOBJ)/video.o \
 	$(WINOBJ)/window.o \
 	$(WINOBJ)/winmenu.o \
-	$(WINOBJ)/winmain.o
+	$(WINOBJ)/winmain.o \
+	$(OSDOBJ)/modules/midi/portmidi.o \
 
 ifdef USE_SDL
 OSDOBJS += \

@@ -11,7 +11,6 @@
 
 #include "emu.h"
 #include "osdepend.h"
-#include "portmidi/portmidi.h"
 #include "modules/sound/none.h"
 #include "modules/debugger/none.h"
 #include "modules/debugger/debugint.h"
@@ -474,15 +473,6 @@ bool osd_interface::network_init()
 	return true;
 }
 
-bool osd_interface::midi_init()
-{
-	#ifndef DISABLE_MIDI
-	Pm_Initialize();
-	#endif
-	return true;
-}
-
-
 void osd_interface::exit_subsystems()
 {
 	video_exit();
@@ -519,13 +509,6 @@ void osd_interface::output_exit()
 
 void osd_interface::network_exit()
 {
-}
-
-void osd_interface::midi_exit()
-{
-	#ifndef DISABLE_MIDI
-	Pm_Terminate();
-	#endif
 }
 
 void osd_interface::osd_exit()

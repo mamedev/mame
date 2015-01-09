@@ -394,7 +394,10 @@ endif
 SDLSRC = $(SRC)/osd/$(OSD)
 SDLOBJ = $(OBJ)/osd/$(OSD)
 
-OBJDIRS += $(SDLOBJ) $(OSDOBJ)/modules/sync $(OSDOBJ)/modules/lib
+OBJDIRS += $(SDLOBJ) \
+	$(OSDOBJ)/modules/sync \
+	$(OSDOBJ)/modules/lib \
+	$(OSDOBJ)/modules/midi \
 
 #-------------------------------------------------
 # OSD core library
@@ -430,12 +433,14 @@ OSDOBJS = \
 	$(SDLOBJ)/output.o \
 	$(SDLOBJ)/watchdog.o \
 
-ifeq ($(BASE_TARGETOS),win32)
-	OSDOBJS += $(OSDOBJ)/modules/sound/direct_sound.o
+ifdef NO_USE_MIDI
+	OSDOBJS += $(OSDOBJ)/modules/midi/none.o
+else
+	OSDOBJS += $(OSDOBJ)/modules/midi/portmidi.o
 endif
 
-ifdef NO_USE_MIDI
-DEFS += -DDISABLE_MIDI=1
+ifeq ($(BASE_TARGETOS),win32)
+	OSDOBJS += $(OSDOBJ)/modules/sound/direct_sound.o
 endif
 
 # Add SDL2.0 support

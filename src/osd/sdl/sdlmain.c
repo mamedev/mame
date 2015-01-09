@@ -1438,3 +1438,28 @@ bool sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, bitma
 }
 #endif
 #endif
+
+//-------------------------------------------------
+// FIXME: Doesn't belong here but there's no better
+//        place currently.
+//-------------------------------------------------
+
+bool osd_interface::midi_init()
+{
+    // this should be done on the OS_level
+    return osd_midi_init();
+}
+
+//-------------------------------------------------
+//  list_midi_devices - list available midi devices
+//-------------------------------------------------
+
+void osd_interface::list_midi_devices(void)
+{
+    osd_list_midi_devices();
+}
+
+void osd_interface::midi_exit()
+{
+    osd_midi_exit();
+}
