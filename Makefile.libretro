@@ -387,7 +387,7 @@ else
 	LIBS += -lws2_32
 	DEFS = -DCRLF=3
 	DEFS += -DX64_WINDOWS_ABI
-	ifneq (,$(findstring mingw64-w64,$(PATH)))
+    ifneq ($(findstring MINGW,$(shell uname -a)),)
 		PTR64=1
 	endif
 
