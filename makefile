@@ -490,26 +490,6 @@ ifdef FASTDEBUG
 DEFS += -DMAME_DEBUG_FAST
 endif
 
-# add a define identifying the target osd
-
-ifeq ($(OSD),sdl)
-DEFS += -DOSD_SDL
-else
-ifeq ($(OSD),windows)
-DEFS += -DOSD_WINDOWS
-else
-ifeq ($(OSD),winui)
-DEFS += -DOSD_WINDOWS
-else
-ifeq ($(OSD),osdmini)
-DEFS += -DOSD_MINI
-else
-$(warning Please add -DOSD_[SDL|WINDOWS|MINI] in $(OSD).mak)
-endif
-endif
-endif
-endif
-
 #-------------------------------------------------
 # compile flags
 # CCOMFLAGS are common flags
@@ -885,6 +865,13 @@ CDEFS = $(DEFS)
 # TODO: -x c++ should not be hard-coded
 CPPCHECKFLAGS = $(CDEFS) $(INCPATH) -x c++ --enable=style
 
+#-------------------------------------------------
+# sanity check OSD additions
+#-------------------------------------------------
+
+ifeq (,$(findstring -DOSD_,$(CDEFS)))
+$(error $(OSD).mak should have defined -DOSD_)
+endif
 
 #-------------------------------------------------
 # primary targets

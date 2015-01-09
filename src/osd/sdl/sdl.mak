@@ -86,6 +86,9 @@ SDL_FRAMEWORK_PATH = /Library/Frameworks/
 OSDSRC = $(SRC)/osd
 OSDOBJ = $(OBJ)/osd
 
+# add a define identifying the target osd
+DEFS += -DOSD_SDL
+
 # default to SDL2 for non-OS/2, non-Emscripten builds now
 ifndef SDL_LIBVER
 ifneq ($(TARGETOS),os2)

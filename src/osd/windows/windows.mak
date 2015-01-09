@@ -73,6 +73,9 @@
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
 ###########################################################################
 
+# add a define identifying the target osd
+DEFS += -DOSD_WINDOWS
+
 
 #-------------------------------------------------
 # object and source roots

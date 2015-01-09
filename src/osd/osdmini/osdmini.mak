@@ -37,6 +37,8 @@
 #
 ###########################################################################
 
+# add a define identifying the target osd
+DEFS += -DOSD_MINI
 
 #-------------------------------------------------
 # object and source roots
