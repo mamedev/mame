@@ -70,80 +70,6 @@ void osd_sleep(osd_ticks_t duration)
 	}
 }
 
-//============================================================
-//  osd_num_processors
-//============================================================
-
-int osd_get_num_processors(void)
-{
-	int processors = 1;
-
-#if defined(_SC_NPROCESSORS_ONLN)
-	processors = sysconf(_SC_NPROCESSORS_ONLN);
-#endif
-	return processors;
-}
-
-//============================================================
-//  osd_malloc
-//============================================================
-
-void *osd_malloc(size_t size)
-{
-#ifndef MALLOC_DEBUG
-	return malloc(size);
-#else
-#error "MALLOC_DEBUG not yet supported"
-#endif
-}
-
-
-//============================================================
-//  osd_malloc_array
-//============================================================
-
-void *osd_malloc_array(size_t size)
-{
-#ifndef MALLOC_DEBUG
-	return malloc(size);
-#else
-#error "MALLOC_DEBUG not yet supported"
-#endif
-}
-
-
-//============================================================
-//  osd_free
-//============================================================
-
-void osd_free(void *ptr)
-{
-#ifndef MALLOC_DEBUG
-	free(ptr);
-#else
-#error "MALLOC_DEBUG not yet supported"
-#endif
-}
-
-//============================================================
-//  osd_getenv
-//============================================================
-
-char *osd_getenv(const char *name)
-{
-	return getenv(name);
-}
-
-
-//============================================================
-//  osd_setenv
-//============================================================
-
-int osd_setenv(const char *name, const char *value, int overwrite)
-{
-	return setenv(name, value, overwrite);
-}
-
 #if (SDLMAME_SDL2)
 
 //============================================================
@@ -306,15 +232,6 @@ const char *osd_get_volume_name(int idx)
 {
 	if (idx!=0) return NULL;
 	return "/";
-}
-
-//============================================================
-//  osd_get_slider_list
-//============================================================
-
-const void *osd_get_slider_list()
-{
-	return NULL;
 }
 
 //============================================================

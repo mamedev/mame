@@ -28,7 +28,7 @@
 
 // OpenGL headers
 #include "osd_opengl.h"
-#include "sdlos.h"
+#include "modules/lib/osdlib.h"
 
 
 #include "gl_shader_tool.h"

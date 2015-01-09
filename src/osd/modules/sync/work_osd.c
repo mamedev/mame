@@ -26,13 +26,7 @@
 #include "osdcore.h"
 
 #include "modules/sync/osdsync.h"
-
-#if defined(OSD_WINDOWS)
-#include "winos.h"
-#elif defined(OSD_SDL)
-#include "sdlos.h"
-typedef void *PVOID;
-#endif
+#include "modules/lib/osdlib.h"
 
 #include "eminline.h"
 
@@ -40,6 +34,9 @@ typedef void *PVOID;
 #include "osxutils.h"
 #endif
 
+#if defined(OSD_SDL)
+typedef void *PVOID;
+#endif
 
 //============================================================
 //  DEBUGGING

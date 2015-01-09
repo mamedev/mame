@@ -84,7 +84,7 @@ WINOBJ = $(OBJ)/osd/$(OSD)
 OSDSRC = $(SRC)/osd
 OSDOBJ = $(OBJ)/osd
 
-OBJDIRS += $(WINOBJ) $(OSDOBJ)/modules/sync
+OBJDIRS += $(WINOBJ) $(OSDOBJ)/modules/sync $(OSDOBJ)/modules/lib
 
 ifdef USE_QTDEBUG
 OBJDIRS += $(OSDOBJ)/modules/debugger/qt
@@ -350,8 +350,8 @@ OSDCOREOBJS = \
 	$(WINOBJ)/winclip.o \
 	$(WINOBJ)/winsocket.o \
 	$(OSDOBJ)/modules/sync/work_osd.o \
+	$(OSDOBJ)/modules/lib/osdlib_win32.o \
 	$(WINOBJ)/winptty.o \
-	$(WINOBJ)/winos.o \
 
 
 #-------------------------------------------------

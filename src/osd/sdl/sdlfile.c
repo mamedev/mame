@@ -41,7 +41,7 @@
 
 // MAME headers
 #include "sdlfile.h"
-
+#include "modules/lib/osdlib.h"
 
 //============================================================
 //  GLOBAL IDENTIFIERS

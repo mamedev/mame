@@ -139,88 +139,6 @@ void osd_sleep(osd_ticks_t duration)
 	}
 }
 
-//============================================================
-//  osd_num_processors
-//============================================================
-
-int osd_get_num_processors(void)
-{
-	int processors = 1;
-
-	struct host_basic_info host_basic_info;
-	unsigned int count;
-	kern_return_t r;
-	mach_port_t my_mach_host_self;
-
-	count = HOST_BASIC_INFO_COUNT;
-	my_mach_host_self = mach_host_self();
-	if ( ( r = host_info(my_mach_host_self, HOST_BASIC_INFO, (host_info_t)(&host_basic_info), &count)) == KERN_SUCCESS )
-	{
-		processors = host_basic_info.avail_cpus;
-	}
-	mach_port_deallocate(mach_task_self(), my_mach_host_self);
-
-	return processors;
-}
-
-//============================================================
-//  osd_malloc
-//============================================================
-
-void *osd_malloc(size_t size)
-{
-#ifndef MALLOC_DEBUG
-	return malloc(size);
-#else
-#error "MALLOC_DEBUG not yet supported"
-#endif
-}
-
-
-//============================================================
-//  osd_malloc_array
-//============================================================
-
-void *osd_malloc_array(size_t size)
-{
-#ifndef MALLOC_DEBUG
-	return malloc(size);
-#else
-#error "MALLOC_DEBUG not yet supported"
-#endif
-}
-
-
-//============================================================
-//  osd_free
-//============================================================
-
-void osd_free(void *ptr)
-{
-#ifndef MALLOC_DEBUG
-	free(ptr);
-#else
-#error "MALLOC_DEBUG not yet supported"
-#endif
-}
-
-//============================================================
-//  osd_getenv
-//============================================================
-
-char *osd_getenv(const char *name)
-{
-	return getenv(name);
-}
-
-//============================================================
-//  osd_setenv
-//============================================================
-
-int osd_setenv(const char *name, const char *value, int overwrite)
-{
-	return setenv(name, value, overwrite);
-}
 
 //============================================================
 //  osd_get_clipboard_text
@@ -362,15 +280,6 @@ const char *osd_get_volume_name(int idx)
 {
 	if (idx!=0) return NULL;
 	return "/";
-}
-
-//============================================================
-//  osd_get_slider_list
-//============================================================
-
-const void *osd_get_slider_list()
-{
-	return NULL;
 }
 
 //============================================================

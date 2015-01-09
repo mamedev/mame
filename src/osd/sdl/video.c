@@ -50,7 +50,7 @@
 #include "window.h"
 #include "input.h"
 #include "osdsdl.h"
-#include "sdlos.h"
+#include "modules/lib/osdlib.h"
 
 //============================================================
 //  CONSTANTS

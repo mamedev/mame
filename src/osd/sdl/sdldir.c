@@ -37,7 +37,7 @@
 #include <dirent.h>
 
 #include "osdcore.h"
-#include "sdlos.h"
+#include "modules/lib/osdlib.h"
 
 #if defined(SDLMAME_WIN32) || defined(SDLMAME_OS2)
 #define PATHSEPCH '\\'

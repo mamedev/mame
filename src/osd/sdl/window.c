@@ -235,6 +235,7 @@ bool sdl_osd_interface::window_init()
 		if (work_queue == NULL)
 			return false;
 		osd_work_item_queue(work_queue, &sdlwindow_thread_id, NULL, WORK_ITEM_FLAG_AUTO_RELEASE);
+		sdlwindow_sync();
 	}
 	else
 	{
@@ -263,6 +264,31 @@ bool sdl_osd_interface::window_init()
 		if (drawsdl_init(&draw))
 			return false;
 	}
+
+#if SDLMAME_SDL2
+	/* We may want to set a number of the hints SDL2 provides.
+	 * The code below will document which hints were set.
+	 */
+    const char * hints[] = { SDL_HINT_RENDER_DRIVER,    SDL_HINT_RENDER_OPENGL_SHADERS,
+            SDL_HINT_RENDER_DIRECT3D_THREADSAFE, SDL_HINT_RENDER_SCALE_QUALITY,
+            SDL_HINT_RENDER_VSYNC, SDL_HINT_VIDEO_ALLOW_SCREENSAVER,
+            SDL_HINT_VIDEO_X11_XVIDMODE, SDL_HINT_VIDEO_X11_XINERAMA,
+            SDL_HINT_VIDEO_X11_XRANDR, SDL_HINT_GRAB_KEYBOARD,
+            SDL_HINT_MOUSE_RELATIVE_MODE_WARP,
+            SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, SDL_HINT_IDLE_TIMER_DISABLED,
+            SDL_HINT_ORIENTATIONS, SDL_HINT_ACCELEROMETER_AS_JOYSTICK,
+            SDL_HINT_XINPUT_ENABLED, SDL_HINT_GAMECONTROLLERCONFIG,
+            SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, SDL_HINT_ALLOW_TOPMOST,
+            SDL_HINT_TIMER_RESOLUTION, SDL_HINT_MAC_CTRL_CLICK_EMULATE_RIGHT_CLICK,
+            SDL_HINT_VIDEO_WIN_D3DCOMPILER, SDL_HINT_VIDEO_WINDOW_SHARE_PIXEL_FORMAT,
+            SDL_HINT_VIDEO_MAC_FULLSCREEN_SPACES,
+            NULL
+    };
+
+    osd_printf_verbose("\nHints:\n");
+    for (int i = 0; hints[i] != NULL; i++)
+        osd_printf_verbose("\t%-40s %s\n", hints[i], SDL_GetHint(hints[i]));
+#endif
 
 	// set up the window list
 	last_window_ptr = &sdl_window_list;
