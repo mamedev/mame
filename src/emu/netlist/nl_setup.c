@@ -92,7 +92,7 @@ netlist_device_t *netlist_setup_t::register_dev(netlist_device_t *dev, const pst
 template <class T>
 static void remove_start_with(T &hm, pstring &sw)
 {
-	for (int i = hm.count() - 1; i >= 0; i++)
+	for (int i = hm.count() - 1; i >= 0; i--)
 	{
 		pstring x = hm[i]->name();
 		if (sw.equals(x.substr(0, sw.len())))
