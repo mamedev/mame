@@ -1611,20 +1611,20 @@ static INPUT_PORTS_START( reelquak )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("P1")    // $400001.b
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_POKER_CANCEL  )    // bet cancel
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE   )    // collect
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP   )    // double up
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH   ) PORT_NAME("Big")  // big
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_BET     )    // bet
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_GAMBLE_LOW    ) PORT_NAME("Small")    // small
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL   )    // start
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_POKER_CANCEL  )                    // bet cancel
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE   )                    // collect
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP   )                    // double up
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH   ) PORT_NAME("Big")   // big
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_BET     )                    // bet
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_GAMBLE_LOW    ) PORT_NAME("Small") // small
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL   )                    // start
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 
 	PORT_START("TICKET")    // $400003.b
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL       ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)    // ticket sensor
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )                            // knock down
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Knock Down")    // knock down
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE2      ) PORT_NAME("Ticket Clear")  // ticket clear
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE3      ) PORT_NAME("Ticket Resume") // ticket resume
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  )                            // key in
@@ -1648,6 +1648,11 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( endrichs )
 	PORT_INCLUDE(reelquak)
+	
+	PORT_MODIFY("DSW1")  // $400300.w
+	PORT_DIPNAME( 0x0001, 0x0001, "Payout Style" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(      0x0001, "Normal Payout" )
+	PORT_DIPSETTING(      0x0000, "Ticket Payout" ) // Ticket Printer?
 
 	PORT_MODIFY("DSW2")  // $400302.w
 	PORT_DIPUNUSED_DIPLOC( 0x0001, IP_ACTIVE_LOW, "SW2:1" ) // DSW2 unpopulated
@@ -3207,6 +3212,8 @@ CN2   - 8 Pin connector
 
 Note:
   8-Liner version of P-FG-02 (see Reel'N Quake! above)
+  Hitting Service Mode "F2" will show Ver 1.7, but going through the diagnostic "0"
+   Main Menu --> Test Mode --> Memory Test will show Version 1.20
 
 ***************************************************************************/
 
@@ -3547,7 +3554,7 @@ GAME( 1996, mj4simai, 0,        mj4simai, mj4simai, driver_device, 0,        ROT
 GAME( 1996, myangel,  0,        myangel,  myangel,  driver_device, 0,        ROT0, "MOSS / Namco",          "Kosodate Quiz My Angel (Japan)",               GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, myangel2, 0,        myangel2, myangel2, driver_device, 0,        ROT0, "MOSS / Namco",          "Kosodate Quiz My Angel 2 (Japan)",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, reelquak, 0,        reelquak, reelquak, driver_device, 0,        ROT0, "<unknown>",             "Reel'N Quake! (Version 1.05)",                 GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 199?, endrichs, 0,        reelquak, endrichs, driver_device, 0,        ROT0, "E.N.Tiger",             "Endless Riches (Ver 1.7)",                     GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 199?, endrichs, 0,        reelquak, endrichs, driver_device, 0,        ROT0, "E.N.Tiger",             "Endless Riches (Ver 1.20)",                    GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, pzlbowl,  0,        pzlbowl,  pzlbowl,  driver_device, 0,        ROT0, "MOSS / Nihon System",   "Puzzle De Bowling (Japan)",                    GAME_NO_COCKTAIL )
 GAME( 2000, penbros,  0,        penbros,  penbros,  driver_device, 0,        ROT0, "Subsino",               "Penguin Brothers (Japan)",                     GAME_NO_COCKTAIL )
 GAME( 2000, namcostr, 0,        namcostr, funcube,  driver_device, 0,        ROT0, "Namco",                 "Namco Stars",                                  GAME_NO_COCKTAIL | GAME_NOT_WORKING )
