@@ -44,9 +44,9 @@ static const char *const s_mnemonic[] = {
 
 
 static const UINT32 s_flags[] = {
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  _OVER, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _OVER, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, _OUT, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0,
@@ -265,16 +265,16 @@ CPU_DISASSEMBLE( tms0980 ) {
 	case zB0:
 		break;
 	case zB2:
-		dst += sprintf( dst, "#$%d", tms0980_bit_value[ op & 3 ] );
+		dst += sprintf( dst, "%d", tms0980_bit_value[ op & 3 ] );
 		break;
 	case zI2:
-		dst += sprintf( dst, "#$%01X", tms0980_i2_value[ op & 0x03 ] );
+		dst += sprintf( dst, "%d", tms0980_i2_value[ op & 0x03 ] );
 		break;
 	case zI4:
-		dst += sprintf( dst, "#$%01X", tms0980_i4_value[ op & 0x0F ] );
+		dst += sprintf( dst, "%d", tms0980_i4_value[ op & 0x0F ] );
 		break;
 	case zB7:
-		dst += sprintf( dst, "#$%02X", ( op & 0x7F ) << 1 );
+		dst += sprintf( dst, "$%02X", ( op & 0x7F ) << 1 );
 		break;
 	}
 
@@ -298,16 +298,16 @@ CPU_DISASSEMBLE( tms1000 ) {
 	case zB0:
 		break;
 	case zB2:
-		dst += sprintf( dst, "#$%d", tms0980_bit_value[ op & 3 ] );
+		dst += sprintf( dst, "%d", tms0980_bit_value[ op & 3 ] );
 		break;
 	case zI2:
-		dst += sprintf( dst, "#$%01X", tms0980_i2_value[ op & 0x03 ] );
+		dst += sprintf( dst, "%d", tms0980_i2_value[ op & 0x03 ] );
 		break;
 	case zI4:
-		dst += sprintf( dst, "#$%01X", tms0980_i4_value[ op & 0x0F ] );
+		dst += sprintf( dst, "%d", tms0980_i4_value[ op & 0x0F ] );
 		break;
 	case zB7:
-		dst += sprintf( dst, "#$%02X", ( op & 0x3F ) );
+		dst += sprintf( dst, "$%02X", ( op & 0x3F ) );
 		break;
 	}
 
@@ -331,19 +331,19 @@ CPU_DISASSEMBLE( tms1100 ) {
 	case zB0:
 		break;
 	case zB2:
-		dst += sprintf( dst, "#$%d", tms0980_bit_value[ op & 3 ] );
+		dst += sprintf( dst, "%d", tms0980_bit_value[ op & 3 ] );
 		break;
 	case zI2:
-		dst += sprintf( dst, "#$%01X", tms0980_i2_value[ op & 0x03 ] );
+		dst += sprintf( dst, "%d", tms0980_i2_value[ op & 0x03 ] );
 		break;
 	case zI3:
-		dst += sprintf( dst, "#$%01X", tms0980_i3_value[ op & 0x07 ] );
+		dst += sprintf( dst, "%d", tms0980_i3_value[ op & 0x07 ] );
 		break;
 	case zI4:
-		dst += sprintf( dst, "#$%01X", tms0980_i4_value[ op & 0x0F ] );
+		dst += sprintf( dst, "%d", tms0980_i4_value[ op & 0x0F ] );
 		break;
 	case zB7:
-		dst += sprintf( dst, "#$%02X", ( op & 0x3F ) );
+		dst += sprintf( dst, "$%02X", ( op & 0x3F ) );
 		break;
 	}
 
