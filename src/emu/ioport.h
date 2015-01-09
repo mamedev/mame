@@ -992,14 +992,15 @@ class ioport_field
 	friend class dynamic_field;
 
 	// flags for ioport_fields
-	static const int FIELD_FLAG_UNUSED = 0x01;      // set if this field is unused but relevant to other games on the same hw
-	static const int FIELD_FLAG_COCKTAIL = 0x02;    // set if this field is relevant only for cocktail cabinets
-	static const int FIELD_FLAG_TOGGLE = 0x04;      // set if this field should behave as a toggle
-	static const int FIELD_FLAG_ROTATED = 0x08;     // set if this field represents a rotated control
-	static const int ANALOG_FLAG_REVERSE = 0x10;    // analog only: reverse the sense of the axis
-	static const int ANALOG_FLAG_RESET = 0x20;      // analog only: always preload in->default for relative axes, returning only deltas
-	static const int ANALOG_FLAG_WRAPS = 0x40;      // analog only: positional count wraps around
-	static const int ANALOG_FLAG_INVERT = 0x80;     // analog only: bitwise invert bits
+	static const int FIELD_FLAG_UNUSED =   0x0001;    // set if this field is unused but relevant to other games on the same hw
+	static const int FIELD_FLAG_COCKTAIL = 0x0002;    // set if this field is relevant only for cocktail cabinets
+	static const int FIELD_FLAG_TOGGLE =   0x0004;    // set if this field should behave as a toggle
+	static const int FIELD_FLAG_ROTATED =  0x0008;    // set if this field represents a rotated control
+	static const int FIELD_FLAG_DEVICE =   0x0010;    // set if this field is used only in a device
+	static const int ANALOG_FLAG_REVERSE = 0x0020;    // analog only: reverse the sense of the axis
+	static const int ANALOG_FLAG_RESET =   0x0040;    // analog only: always preload in->default for relative axes, returning only deltas
+	static const int ANALOG_FLAG_WRAPS =   0x0080;    // analog only: positional count wraps around
+	static const int ANALOG_FLAG_INVERT =  0x0100;    // analog only: bitwise invert bits
 
 public:
 	// construction/destruction
@@ -1027,6 +1028,7 @@ public:
 	bool cocktail() const { return ((m_flags & FIELD_FLAG_COCKTAIL) != 0); }
 	bool toggle() const { return ((m_flags & FIELD_FLAG_TOGGLE) != 0); }
 	bool rotated() const { return ((m_flags & FIELD_FLAG_ROTATED) != 0); }
+	bool used_in_device() const { return ((m_flags & FIELD_FLAG_DEVICE) != 0); }
 	bool analog_reverse() const { return ((m_flags & ANALOG_FLAG_REVERSE) != 0); }
 	bool analog_reset() const { return ((m_flags & ANALOG_FLAG_RESET) != 0); }
 	bool analog_wraps() const { return ((m_flags & ANALOG_FLAG_WRAPS) != 0); }
@@ -1489,6 +1491,7 @@ public:
 	void field_set_way(int way) const { m_curfield->m_way = way; }
 	void field_set_rotated() const { m_curfield->m_flags |= ioport_field::FIELD_FLAG_ROTATED; }
 	void field_set_name(const char *name) const { m_curfield->m_name = string_from_token(name); }
+	void field_set_device() const { m_curfield->m_flags |= ioport_field::FIELD_FLAG_DEVICE; }
 	void field_set_player(int player) const { m_curfield->m_player = player - 1; }
 	void field_set_cocktail() const { m_curfield->m_flags |= ioport_field::FIELD_FLAG_COCKTAIL; field_set_player(2); }
 	void field_set_toggle() const { m_curfield->m_flags |= ioport_field::FIELD_FLAG_TOGGLE; }
@@ -1623,6 +1626,9 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, a
 // general flags
 #define PORT_NAME(_name) \
 	configurer.field_set_name(_name);
+
+#define PORT_DEVICE \
+	configurer.field_set_device();
 
 #define PORT_PLAYER(_player) \
 	configurer.field_set_player(_player);
