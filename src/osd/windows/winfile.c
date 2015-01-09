@@ -22,6 +22,12 @@
 #include "winutil.h"
 #include "winutf8.h"
 
+#if defined(SDLMAME_WIN32) || defined(SDLMAME_OS2)
+#define INVPATHSEPCH '/'
+#else
+#define INVPATHSEPCH '\\'
+#endif
+
 #include "winfile.h"
 
 //============================================================
@@ -118,17 +124,16 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	if ((*file)->handle == INVALID_HANDLE_VALUE)
 	{
 		DWORD error = GetLastError();
-
 		// create the path if necessary
 		if (error == ERROR_PATH_NOT_FOUND && (openflags & OPEN_FLAG_CREATE) && (openflags & OPEN_FLAG_CREATE_PATHS))
 		{
-			TCHAR *pathsep = _tcsrchr((*file)->filename, '\\');
+			TCHAR *pathsep = _tcsrchr((*file)->filename, INVPATHSEPCH);
 			if (pathsep != NULL)
 			{
 				// create the path up to the file
 				*pathsep = 0;
 				error = create_path_recursive((*file)->filename);
-				*pathsep = '\\';
+				*pathsep = INVPATHSEPCH;
 
 				// attempt to reopen the file
 				if (error == NO_ERROR)
@@ -401,14 +406,14 @@ int osd_uchar_from_osdchar(UINT32 *uchar, const char *osdchar, size_t count)
 
 DWORD create_path_recursive(const TCHAR *path)
 {
-	TCHAR *sep = (TCHAR *)_tcsrchr(path, '\\');
+	TCHAR *sep = (TCHAR *)_tcsrchr(path, INVPATHSEPCH);
 
 	// if there's still a separator, and it's not the root, nuke it and recurse
-	if (sep != NULL && sep > path && sep[0] != ':' && sep[-1] != '\\')
+	if (sep != NULL && sep > path && sep[0] != ':' && sep[-1] != INVPATHSEPCH)
 	{
 		*sep = 0;
 		create_path_recursive(path);
-		*sep = '\\';
+		*sep = INVPATHSEPCH;
 	}
 
 	// if the path already exists, we're done
