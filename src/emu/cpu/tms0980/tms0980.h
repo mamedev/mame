@@ -320,7 +320,6 @@ protected:
 	virtual void op_setr();
 	virtual void op_rstr();
 	virtual void op_tdo();
-	virtual void op_off();
 
 private:
 	// state specific to interface with TMS5100
