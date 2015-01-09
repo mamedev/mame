@@ -22,12 +22,6 @@
 #include "winutil.h"
 #include "winutf8.h"
 
-#if defined(SDLMAME_WIN32) || defined(SDLMAME_OS2)
-#define INVPATHSEPCH '/'
-#else
-#define INVPATHSEPCH '\\'
-#endif
-
 #include "winfile.h"
 
 //============================================================
@@ -96,8 +90,13 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 
 	// convert the path into something Windows compatible
 	dst = (*file)->filename;
+#if defined(SDLMAME_WIN32) || defined(SDLMAME_OS2)
+	for (src = t_path; *src != 0; src++)
+		*dst++ = (*src == '/') ? '\\' : *src;
+#else
 	for (src = t_path; *src != 0; src++)
 		*dst++ = *src;//(*src == '/') ? '\\' : *src;
+#endif
 	*dst++ = 0;
 
 	// select the file open modes
@@ -127,13 +126,13 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 		// create the path if necessary
 		if (error == ERROR_PATH_NOT_FOUND && (openflags & OPEN_FLAG_CREATE) && (openflags & OPEN_FLAG_CREATE_PATHS))
 		{
-			TCHAR *pathsep = _tcsrchr((*file)->filename, INVPATHSEPCH);
+			TCHAR *pathsep = _tcsrchr((*file)->filename, '\\');
 			if (pathsep != NULL)
 			{
 				// create the path up to the file
 				*pathsep = 0;
 				error = create_path_recursive((*file)->filename);
-				*pathsep = INVPATHSEPCH;
+				*pathsep = '\\';
 
 				// attempt to reopen the file
 				if (error == NO_ERROR)
@@ -406,14 +405,14 @@ int osd_uchar_from_osdchar(UINT32 *uchar, const char *osdchar, size_t count)
 
 DWORD create_path_recursive(const TCHAR *path)
 {
-	TCHAR *sep = (TCHAR *)_tcsrchr(path, INVPATHSEPCH);
+	TCHAR *sep = (TCHAR *)_tcsrchr(path, '\\');
 
 	// if there's still a separator, and it's not the root, nuke it and recurse
-	if (sep != NULL && sep > path && sep[0] != ':' && sep[-1] != INVPATHSEPCH)
+	if (sep != NULL && sep > path && sep[0] != ':' && sep[-1] != '\\')
 	{
 		*sep = 0;
 		create_path_recursive(path);
-		*sep = INVPATHSEPCH;
+		*sep = '\\';
 	}
 
 	// if the path already exists, we're done
