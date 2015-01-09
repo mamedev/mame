@@ -26,49 +26,6 @@
 
 
 
-//============================================================
-//   osd_cycles
-//============================================================
-
-osd_ticks_t osd_ticks(void)
-{
-#ifdef SDLMAME_EMSCRIPTEN
-		return (osd_ticks_t)(emscripten_get_now() * 1000.0);
-#else
-		struct timeval    tp;
-		static osd_ticks_t start_sec = 0;
-
-		gettimeofday(&tp, NULL);
-		if (start_sec==0)
-			start_sec = tp.tv_sec;
-		return (tp.tv_sec - start_sec) * (osd_ticks_t) 1000000 + tp.tv_usec;
-#endif
-}
-
-osd_ticks_t osd_ticks_per_second(void)
-{
-	return (osd_ticks_t) 1000000;
-}
-
-//============================================================
-//  osd_sleep
-//============================================================
-
-void osd_sleep(osd_ticks_t duration)
-{
-	UINT32 msec;
-
-	// convert to milliseconds, rounding down
-	msec = (UINT32)(duration * 1000 / osd_ticks_per_second());
-
-	// only sleep if at least 2 full milliseconds
-	if (msec >= 2)
-	{
-		// take a couple of msecs off the top for good measure
-		msec -= 2;
-		usleep(msec*1000);
-	}
-}
 
 #if (SDLMAME_SDL2)
 

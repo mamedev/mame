@@ -350,7 +350,6 @@ OSDCOREOBJS = \
 	$(WINOBJ)/winfile.o \
 	$(WINOBJ)/winmisc.o \
 	$(OSDOBJ)/modules/sync/sync_windows.o \
-	$(WINOBJ)/wintime.o \
 	$(WINOBJ)/winutf8.o \
 	$(WINOBJ)/winutil.o \
 	$(WINOBJ)/winclip.o \
