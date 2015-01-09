@@ -67,6 +67,8 @@ osd_scalable_lock *osd_scalable_lock_alloc(void)
 	osd_scalable_lock *lock;
 
 	lock = (osd_scalable_lock *)calloc(1, sizeof(*lock));
+	if (lock == NULL)
+		return NULL;
 
 	lock->mutex = SDL_CreateMutex();
 	return lock;
@@ -100,6 +102,8 @@ osd_lock *osd_lock_alloc(void)
 	hidden_mutex_t *mutex;
 
 	mutex = (hidden_mutex_t *)calloc(1, sizeof(hidden_mutex_t));
+	if (mutex == NULL)
+		return NULL;
 
 	mutex->id = SDL_CreateMutex();
 
@@ -191,6 +195,8 @@ osd_event *osd_event_alloc(int manualreset, int initialstate)
 	osd_event *ev;
 
 	ev = (osd_event *)calloc(1, sizeof(osd_event));
+	if (ev == NULL)
+		return NULL;
 
 	ev->mutex = SDL_CreateMutex();
 	ev->cond = SDL_CreateCond();
@@ -315,6 +321,8 @@ osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam)
 	osd_thread *thread;
 
 	thread = (osd_thread *)calloc(1, sizeof(osd_thread));
+	if (thread == NULL)
+		return NULL;
 	thread->callback = callback;
 	thread->param = cbparam;
 #ifdef SDLMAME_SDL2

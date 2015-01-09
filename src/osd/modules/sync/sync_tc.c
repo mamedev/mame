@@ -73,6 +73,8 @@ osd_scalable_lock *osd_scalable_lock_alloc(void)
 	osd_scalable_lock *lock;
 
 	lock = (osd_scalable_lock *)calloc(1, sizeof(*lock));
+	if (lock == NULL)
+		return NULL;
 
 	lock->lock = osd_lock_alloc();
 	return lock;
@@ -108,6 +110,8 @@ osd_lock *osd_lock_alloc(void)
 	pthread_mutexattr_t mtxattr;
 
 	mutex = (hidden_mutex_t *)calloc(1, sizeof(hidden_mutex_t));
+	if (mutex == NULL)
+		return NULL;
 
 	pthread_mutexattr_init(&mtxattr);
 	pthread_mutexattr_settype(&mtxattr, PTHREAD_MUTEX_RECURSIVE);
@@ -182,6 +186,8 @@ osd_event *osd_event_alloc(int manualreset, int initialstate)
 	pthread_mutexattr_t mtxattr;
 
 	ev = (osd_event *)calloc(1, sizeof(osd_event));
+	if (ev == NULL)
+		return NULL;
 
 	pthread_mutexattr_init(&mtxattr);
 	pthread_mutex_init(&ev->mutex, &mtxattr);
@@ -307,6 +313,8 @@ osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam)
 	pthread_attr_t  attr;
 
 	thread = (osd_thread *)calloc(1, sizeof(osd_thread));
+	if (thread == NULL)
+		return NULL;
 	pthread_attr_init(&attr);
 	pthread_attr_setinheritsched(&attr, PTHREAD_INHERIT_SCHED);
 	if ( pthread_create(&thread->thread, &attr, callback, cbparam) != 0 )
