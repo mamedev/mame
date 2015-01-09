@@ -271,9 +271,16 @@ osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam)
 	uintptr_t handle;
 
 	thread = (osd_thread *)calloc(1, sizeof(osd_thread));
+	if (thread == NULL)
+		return NULL;
 	thread->callback = callback;
 	thread->param = cbparam;
 	handle = _beginthreadex(NULL, 0, worker_thread_entry, thread, 0, NULL);
+	if (handle == 0)
+	{
+		free(thread);
+		return NULL;
+	}
 	thread->handle = (HANDLE) handle;
 	return thread;
 }
@@ -320,6 +327,8 @@ osd_scalable_lock *osd_scalable_lock_alloc(void)
 	osd_scalable_lock *lock;
 
 	lock = (osd_scalable_lock *)calloc(1, sizeof(*lock));
+	if (lock == NULL)
+		return NULL;
 
 	memset(lock, 0, sizeof(*lock));
 #if USE_SCALABLE_LOCKS
