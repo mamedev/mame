@@ -281,8 +281,8 @@ $(LIBOBJ)/zlib/%.o: $(3RDPARTY)/zlib/%.c | $(OSPREBUILD)
 # SoftFloat library objects
 #-------------------------------------------------
 
-PROCESSOR_H = $(LIBSRC)/softfloat/processors/mamesf.h
-SOFTFLOAT_MACROS = $(LIBSRC)/softfloat/softfloat/bits64/softfloat-macros
+PROCESSOR_H = $(3RDPARTY)/softfloat/processors/mamesf.h
+SOFTFLOAT_MACROS = $(3RDPARTY)/softfloat/softfloat/bits64/softfloat-macros
 
 SOFTFLOATOBJS = \
 	$(LIBOBJ)/softfloat/softfloat.o \
@@ -291,10 +291,12 @@ SOFTFLOATOBJS = \
 
 $(OBJ)/libsoftfloat.a: $(SOFTFLOATOBJS)
 
-$(LIBOBJ)/softfloat/softfloat.o: $(LIBSRC)/softfloat/softfloat.c $(LIBSRC)/softfloat/softfloat.h $(LIBSRC)/softfloat/softfloat-macros $(LIBSRC)/softfloat/softfloat-specialize
-$(LIBOBJ)/softfloat/fsincos.o: $(LIBSRC)/softfloat/fsincos.c $(LIBSRC)/softfloat/fpu_constant.h $(LIBSRC)/softfloat/softfloat.h $(LIBSRC)/softfloat/softfloat-macros $(LIBSRC)/softfloat/softfloat-specialize
+$(LIBOBJ)/softfloat/softfloat.o: $(3RDPARTY)/softfloat/softfloat.c $(3RDPARTY)/softfloat/softfloat.h $(3RDPARTY)/softfloat/softfloat-macros $(3RDPARTY)/softfloat/softfloat-specialize
+$(LIBOBJ)/softfloat/fsincos.o: $(3RDPARTY)/softfloat/fsincos.c $(3RDPARTY)/softfloat/fpu_constant.h $(3RDPARTY)/softfloat/softfloat.h $(3RDPARTY)/softfloat/softfloat-macros $(3RDPARTY)/softfloat/softfloat-specialize
 
-
+$(LIBOBJ)/softfloat/%.o: $(3RDPARTY)/softfloat/%.c | $(OSPREBUILD)
+	@echo Compiling $<...
+	$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
 
 #-------------------------------------------------
 # libJPEG library objects
