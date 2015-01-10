@@ -69,7 +69,7 @@ typedef signed char int16_t;
 #if SIZEOF_INT == 4
 typedef unsigned int u_int32_t;
 typedef signed int int32_t;
-#elif SIZEOF_LONG == 4
+#elif defined(SIZEOF_LONG) && (SIZEOF_LONG == 4)
 typedef unsigned long u_int32_t;
 typedef signed long int32_t;
 #elif SIZEOF_SHORT == 4
@@ -92,7 +92,7 @@ typedef unsigned _int64 u_int64_t;
 typedef _int64 int64_t;
 #elif SIZEOF_INT == 8
 typedef unsigned int u_int64_t;
-#elif SIZEOF_LONG == 8
+#elif defined(SIZEOF_LONG) && (SIZEOF_LONG == 8)
 typedef unsigned long u_int64_t;
 #elif SIZEOF_SHORT == 8
 typedef unsigned short u_int64_t;

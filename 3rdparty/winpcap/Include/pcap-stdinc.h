@@ -60,13 +60,15 @@
 
 #define caddr_t char*
 
-#if _MSC_VER < 1500
+#if defined(_MSC_VER) && (_MSC_VER < 1500)
 #define snprintf _snprintf
 #define vsnprintf _vsnprintf
 #define strdup _strdup
 #endif
 
+#if defined(_MSC_VER) && (_MSC_VER < 1700)
 #define inline __inline 
+#endif
 
 #ifdef __MINGW32__
 #include <stdint.h>
