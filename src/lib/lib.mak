@@ -397,7 +397,7 @@ LIBFLACOBJS = \
 
 $(OBJ)/libflac.a: $(LIBFLACOBJS)
 
-$(LIBOBJ)/libflac/%.o: $(LIBSRC)/libflac/libFLAC/%.c | $(OSPREBUILD)
+$(LIBOBJ)/libflac/%.o: $(3RDPARTY)/libflac/src/libFLAC/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CONLYFLAGS) $(CCOMFLAGS) $(FLACOPTS) -I$(LIBSRC)/libflac/include -I$(LIBSRC)/libflac/libFLAC/include -c $< -o $@
 
