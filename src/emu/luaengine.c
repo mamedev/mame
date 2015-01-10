@@ -10,7 +10,6 @@
 
 #include <limits>
 #include "lua/lua.hpp"
-#include "lua/lib/lualibs.h"
 #include "luabridge/Source/LuaBridge/LuaBridge.h"
 #include <signal.h>
 #include "emu.h"
@@ -45,6 +44,9 @@ static lua_State *globalL = NULL;
 const char *const lua_engine::tname_ioport = "lua.ioport";
 lua_engine* lua_engine::luaThis = NULL;
 
+extern "C" {
+	int luaopen_lsqlite3(lua_State *L);
+}
 
 static void lstop(lua_State *L, lua_Debug *ar)
 {

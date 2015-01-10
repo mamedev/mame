@@ -25,7 +25,6 @@
 #endif
 
 #include "lua/lua.hpp"
-#include "lua/lib/lualibs.h"
 #include "luabridge/Source/LuaBridge/LuaBridge.h"
 
 struct lua_State;

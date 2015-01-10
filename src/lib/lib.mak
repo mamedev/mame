@@ -24,7 +24,7 @@ OBJDIRS += \
 	$(LIBOBJ)/lib7z \
 	$(LIBOBJ)/portmidi \
 	$(LIBOBJ)/lua \
-	$(LIBOBJ)/lua/lib \
+	$(LIBOBJ)/lua/lsqlite3 \
 	$(LIBOBJ)/mongoose \
 	$(LIBOBJ)/jsoncpp \
 	$(LIBOBJ)/sqlite3 \
