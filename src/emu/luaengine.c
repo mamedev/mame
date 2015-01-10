@@ -11,7 +11,7 @@
 #include <limits>
 #include "lua/lua.hpp"
 #include "lua/lib/lualibs.h"
-#include "lua/bridge/LuaBridge.h"
+#include "luabridge/Source/LuaBridge/LuaBridge.h"
 #include <signal.h>
 #include "emu.h"
 #include "emuopts.h"

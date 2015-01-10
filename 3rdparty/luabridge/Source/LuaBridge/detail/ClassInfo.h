@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 /*
   https://github.com/vinniefalco/LuaBridge
-
+  
   Copyright 2012, Vinnie Falco <vinnie.falco@gmail.com>
 
   License: The MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -26,88 +26,48 @@
 */
 //==============================================================================
 
-/** Allows table iteration.
+/** Unique Lua registry keys for a class.
+
+    Each registered class inserts three keys into the registry, whose
+    values are the corresponding static, class, and const metatables. This
+    allows a quick and reliable lookup for a metatable from a template type.
 */
-class Iterator
+template <class T>
+class ClassInfo
 {
-private:
-	lua_State* m_L;
-	LuaRef m_table;
-	LuaRef m_key;
-	LuaRef m_value;
-
-	void next ()
-	{
-	m_table.push(m_L);
-	m_key.push (m_L);
-	if (lua_next (m_L, -2))
-	{
-		m_value.pop (m_L);
-		m_key.pop (m_L);
-	}
-	else
-	{
-		m_key = Nil();
-		m_value = Nil();
-	}
-	lua_pop(m_L, 1);
-	}
-
 public:
-	explicit Iterator (LuaRef table)
-	: m_L (table.state ())
-	, m_table (table)
-	, m_key (table.state ()) // m_key is nil
-	, m_value (table.state ()) // m_value is nil
-	{
-	next (); // get the first (key, value) pair from table
-	}
+  /** Get the key for the static table.
 
-	lua_State* state () const
-	{
-	return m_L;
-	}
+      The static table holds the static data members, static properties, and
+      static member functions for a class.
+  */
+  static void const* getStaticKey ()
+  {
+    static char value;
+    return &value;
+  }
 
-	LuaRef operator* () const
-	{
-	return m_value;
-	}
+  /** Get the key for the class table.
 
-	LuaRef operator-> () const
-	{
-	return m_value;
-	}
+      The class table holds the data members, properties, and member functions
+      of a class. Read-only data and properties, and const member functions are
+      also placed here (to save a lookup in the const table).
+  */
+  static void const* getClassKey ()
+  {
+    static char value;
+    return &value;
+  }
 
-	Iterator& operator++ ()
-	{
-	if (isNil())
-	{
-		// if the iterator reaches the end, do nothing
-		return *this;
-	}
-	else
-	{
-		next();
-		return *this;
-	}
-	}
+  /** Get the key for the const table.
 
-	inline bool isNil () const
-	{
-	return m_key.isNil ();
-	}
-
-	inline LuaRef key () const
-	{
-	return m_key;
-	}
-
-	inline LuaRef value () const
-	{
-	return m_value;
-	}
-
-private:
-	// Don't use postfix increment, it is less efficient
-	Iterator operator++ (int);
+      The const table holds read-only data members and properties, and const
+      member functions of a class.
+  */
+  static void const* getConstKey ()
+  {
+    static char value;
+    return &value;
+  }
 };
+
