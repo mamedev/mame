@@ -752,7 +752,7 @@ LIBS =
 
 # add expat XML library
 ifeq ($(BUILD_EXPAT),1)
-INCPATH += -I$(SRC)/lib/expat
+INCPATH += -I$(3RDPARTY)/expat/lib
 EXPAT = $(OBJ)/libexpat.a
 else
 LIBS += -lexpat
@@ -761,7 +761,7 @@ endif
 
 # add ZLIB compression library
 ifeq ($(BUILD_ZLIB),1)
-INCPATH += -I$(SRC)/lib/zlib
+INCPATH += -I$(3RDPARTY)/zlib
 ZLIB = $(OBJ)/libz.a
 else
 LIBS += -lz
