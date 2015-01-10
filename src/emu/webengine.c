@@ -8,7 +8,7 @@
 
 ***************************************************************************/
 
-#include "web/mongoose.h"
+#include "mongoose/mongoose.h"
 #include "web/json/json.h"
 #include "emu.h"
 #include "emuopts.h"
@@ -455,7 +455,7 @@ int web_engine::begin_request_handler(struct mg_connection *conn)
 		mg_send_header(conn, "Cache-Control", "no-cache, no-store, must-revalidate");
 		mg_send_header(conn, "Pragma", "no-cache");
 		mg_send_header(conn, "Expires", "0");
-		mg_send_file(conn, fullpath.cstr());
+		mg_send_file(conn, fullpath.cstr(), NULL);
 		return MG_MORE; // It is important to return MG_MORE after mg_send_file!
 	}
 	return 0;
@@ -531,16 +531,15 @@ void web_engine::serve()
 	if (m_http) mg_poll_server(m_server, 0);
 }
 
-static int websocket_callback(struct mg_connection *c, enum mg_event ev) {
-	if (c->is_websocket) {
-	const char *message = (const char *)c->callback_param;
-	mg_websocket_write(c, 1, message, strlen(message));
-	}
-	return MG_TRUE;
-}
-
 void web_engine::push_message(const char *message)
 {
-	if (m_server!=NULL)
-		mg_iterate_over_connections(m_server, websocket_callback, (void*)message);
+	struct mg_connection *c;
+	if (m_server!=NULL) {
+		// Iterate over all connections, and push current time message to websocket ones.
+		for (c = mg_next(m_server, NULL); c != NULL; c = mg_next(m_server, c)) {
+			if (c->is_websocket) {
+				mg_websocket_write(c, 1, message, strlen(message));
+			}
+		}
+	}
 }

@@ -18,7 +18,7 @@
 #include "osdepend.h"
 #include "drivenum.h"
 #include "ui/ui.h"
-#include "web/mongoose.h"
+#include "mongoose/mongoose.h"
 
 //**************************************************************************
 //  LUA ENGINE
