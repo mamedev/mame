@@ -643,6 +643,7 @@ INCPATH += \
 	-I$(SRC)/lib/util \
 	-I$(SRC)/lib \
 	-I$(3RDPARTY) \
+	-I$(3RDPARTY)/lua/src \
 	-I$(SRC)/osd \
 	-I$(SRC)/osd/$(OSD) \
 

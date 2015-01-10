@@ -24,7 +24,7 @@
 #undef None
 #endif
 
-#include "lua/lua.hpp"
+#include "lua.hpp"
 #include "luabridge/Source/LuaBridge/LuaBridge.h"
 
 struct lua_State;

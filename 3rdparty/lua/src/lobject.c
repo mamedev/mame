@@ -104,7 +104,7 @@ static int isneg (const char **s) {
 
 static lua_Number readhexa (const char **s, lua_Number r, int *count) {
   for (; lisxdigit(cast_uchar(**s)); (*s)++) {  /* read integer part */
-    r = (r * cast_num(16.0)) + cast_num(luaO_hexavalue(cast_uchar(**s)));
+    r = (r * cast_num(16.0)) + cast_num(1.0*luaO_hexavalue(cast_uchar(**s)));
     (*count)++;
   }
   return r;

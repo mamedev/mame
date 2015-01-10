@@ -31,8 +31,8 @@
 #include <assert.h>
 
 #define LUA_LIB
-#include "lua/lua.h"
-#include "lua/lauxlib.h"
+#include "lua.h"
+#include "lauxlib.h"
 
 #if LUA_VERSION_NUM > 501
 //

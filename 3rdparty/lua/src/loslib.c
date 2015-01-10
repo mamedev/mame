@@ -120,7 +120,7 @@ static int os_getenv (lua_State *L) {
 
 
 static int os_clock (lua_State *L) {
-  lua_pushnumber(L, ((lua_Number)clock())/(lua_Number)CLOCKS_PER_SEC);
+  lua_pushnumber(L, ((lua_Number)(1.0*clock()))/(lua_Number)CLOCKS_PER_SEC);
   return 1;
 }
 
@@ -194,7 +194,7 @@ static const char *checkoption (lua_State *L, const char *conv, char *buff) {
 
 static int os_date (lua_State *L) {
   const char *s = luaL_optstring(L, 1, "%c");
-  time_t t = luaL_opt(L, (time_t)luaL_checknumber, 2, time(NULL));
+  time_t t = luaL_opt(L, luaL_checknumber, 2, time(NULL));
   struct tm tmr, *stm;
   if (*s == '!') {  /* UTC? */
     stm = l_gmtime(&t, &tmr);
@@ -264,8 +264,8 @@ static int os_time (lua_State *L) {
 
 
 static int os_difftime (lua_State *L) {
-  lua_pushnumber(L, difftime((time_t)(luaL_checknumber(L, 1)),
-                             (time_t)(luaL_optnumber(L, 2, 0))));
+  lua_pushnumber(L, difftime((luaL_checknumber(L, 1)),
+                             (luaL_optnumber(L, 2, 0))));
   return 1;
 }
 

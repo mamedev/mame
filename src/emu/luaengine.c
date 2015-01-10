@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include <limits>
-#include "lua/lua.hpp"
+#include "lua.hpp"
 #include "luabridge/Source/LuaBridge/LuaBridge.h"
 #include <signal.h>
 #include "emu.h"

@@ -556,7 +556,7 @@ static int f_seek (lua_State *L) {
   if (op)
     return luaL_fileresult(L, 0, NULL);  /* error */
   else {
-    lua_pushnumber(L, (lua_Number)l_ftell(f));
+    lua_pushnumber(L, (lua_Number)(1.0 * l_ftell(f)));
     return 1;
   }
 }
