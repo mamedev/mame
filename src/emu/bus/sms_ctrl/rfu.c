@@ -23,7 +23,7 @@ const device_type SMS_RAPID_FIRE = &device_creator<sms_rapid_fire_device>;
 
 static INPUT_PORTS_START( sms_rapid_fire )
 	PORT_START("rfu_sw")   // Rapid Fire Unit switches
-	PORT_CONFNAME( 0x03, 0x00, "Rapid Fire Unit" ) PORT_DEVICE
+	PORT_CONFNAME( 0x03, 0x00, "Rapid Fire Unit" )
 	PORT_CONFSETTING( 0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING( 0x01, "Button 1" )
 	PORT_CONFSETTING( 0x02, "Button 2" )

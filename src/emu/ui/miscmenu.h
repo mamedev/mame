@@ -82,7 +82,7 @@ protected:
 		const input_seq *   defseq;             /* pointer to the default sequence */
 		const char *        name;               /* pointer to the base name of the item */
 		const char *        owner_name;         /* pointer to the name of the owner of the item */
-		UINT16              sortorder;          /* sorting information */
+		UINT32              sortorder;          /* sorting information */
 		UINT8               type;               /* type of port */
 	};
 
