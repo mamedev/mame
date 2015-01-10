@@ -6708,7 +6708,7 @@ bmfinal         // GXC01 (c) 2002 (Japan)
 popn1           // GX803 (c) 1998 (Asia)
 //popn1j        // GX803 (c) 1998 (Japan)
 popn2           // GX831 (c) 1998 (Japan)
-//popn3         // GX980 (c) 1999 (Japan)
+popn3         	// GX980 (c) 1999 (Japan)
 //popnstex      // GX970 (c) 1999 (Japan)
 
 // Firebeat games
