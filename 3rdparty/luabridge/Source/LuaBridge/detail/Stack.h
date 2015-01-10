@@ -457,7 +457,7 @@ struct Stack <std::string const&>
 {
   static inline void push (lua_State* L, std::string const& str)
   {
-    lua_pushstring (L, str.c_str(), str.size());
+    lua_pushstring (L, str.c_str());
   }
 
   static inline std::string get (lua_State* L, int index)
