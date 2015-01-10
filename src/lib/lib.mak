@@ -453,7 +453,7 @@ PMOPTS = -DPMALSA=1
 LIBPMOBJS += \
 	$(LIBOBJ)/portmidi/pm_linux/pmlinux.o \
 	$(LIBOBJ)/portmidi/pm_linux/pmlinuxalsa.o \
-	$(LIBOBJ)/portmidi/pm_linux/finddefaultlinux.o \
+	$(LIBOBJ)/portmidi/pm_linux/finddefault.o \
 	$(LIBOBJ)/portmidi/porttime/ptlinux.o
 endif
 

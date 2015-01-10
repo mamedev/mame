@@ -29,7 +29,6 @@ int match_string(FILE *inf, char *s)
 } 
 
 
-/* 
 /* Parse preference files, find default device, search devices --
  */
 PmDeviceID find_default_device(char *path, int input, PmDeviceID id)
