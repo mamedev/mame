@@ -991,9 +991,9 @@ $(OBJ)/%.lh: $(SRC)/%.lay $(SRC)/build/file2str.py
 	@echo Converting $<...
 	@$(PYTHON) $(SRC)/build/file2str.py $< $@ layout_$(basename $(notdir $<))
 
-$(OBJ)/%.fh: $(SRC)/%.png $(PNG2BDC_TARGET) $(SRC)/build/file2str.py
+$(OBJ)/%.fh: $(SRC)/%.png $(SRC)/build/png2bdc.py $(SRC)/build/file2str.py
 	@echo Converting $<...
-	@$(PNG2BDC) $< $(OBJ)/temp.bdc
+	@$(PYTHON) $(SRC)/build/png2bdc.py $< $(OBJ)/temp.bdc
 	@$(PYTHON) $(SRC)/build/file2str.py $(OBJ)/temp.bdc $@ font_$(basename $(notdir $<)) UINT8
 
 $(DRIVLISTOBJ): $(DRIVLISTSRC)
