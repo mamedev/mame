@@ -442,7 +442,7 @@ endif
 #-------------------------------------------------
 # WinPCap
 #-------------------------------------------------
-INCPATH += -I$(SRC)/lib/winpcap
+INCPATH += -I$(3RDPARTY)/winpcap
 
 #-------------------------------------------------
 # rules for building the libaries

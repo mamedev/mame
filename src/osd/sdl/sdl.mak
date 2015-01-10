@@ -334,7 +334,7 @@ SDLMAIN = $(SDLOBJ)/main.o
 # needed for unidasm
 LDFLAGS += -Wl,--allow-multiple-definition
 SDL_NETWORK = pcap
-INCPATH += -I$(SRC)/lib/winpcap
+INCPATH += -I$(3RDPARTY)/winpcap
 
 # enable UNICODE
 DEFS += -Dmain=utf8_main -DUNICODE -D_UNICODE
