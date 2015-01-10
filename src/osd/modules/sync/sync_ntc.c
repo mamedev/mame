@@ -91,6 +91,8 @@ osd_scalable_lock *osd_scalable_lock_alloc(void)
 	osd_scalable_lock *lock;
 
 	lock = (osd_scalable_lock *)calloc(1, sizeof(*lock));
+	if (lock == NULL)
+		return NULL;
 
 	memset(lock, 0, sizeof(*lock));
 	lock->slot[0].haslock = TRUE;
@@ -208,6 +210,8 @@ osd_lock *osd_lock_alloc(void)
 	osd_lock *lock;
 
 	lock = (osd_lock *)calloc(1, sizeof(osd_lock));
+	if (lock == NULL)
+		return NULL;
 
 	lock->holder = 0;
 	lock->count = 0;
@@ -347,6 +351,8 @@ osd_event *osd_event_alloc(int manualreset, int initialstate)
 	pthread_mutexattr_t mtxattr;
 
 	ev = (osd_event *)calloc(1, sizeof(osd_event));
+	if (ev == NULL)
+		return NULL;
 
 	pthread_mutexattr_init(&mtxattr);
 	pthread_mutex_init(&ev->mutex, &mtxattr);
@@ -472,6 +478,8 @@ osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam)
 	pthread_attr_t  attr;
 
 	thread = (osd_thread *)calloc(1, sizeof(osd_thread));
+	if (thread == NULL)
+		return NULL;
 	pthread_attr_init(&attr);
 #ifndef SDLMAME_HAIKU
 	pthread_attr_setinheritsched(&attr, PTHREAD_INHERIT_SCHED);
@@ -524,11 +532,3 @@ void osd_thread_wait_free(osd_thread *thread)
 	free(thread);
 }
 
-//============================================================
-//  osd_process_kill
-//============================================================
-
-void osd_process_kill(void)
-{
-	kill(getpid(), SIGKILL);
-}

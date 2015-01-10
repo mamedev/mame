@@ -1824,3 +1824,28 @@ void sampling_profiler::thread_run()
 		Sleep(1);
 	}
 }
+
+//-------------------------------------------------
+// FIXME: Doesn't belong here but there's no better
+//        place currently.
+//-------------------------------------------------
+
+bool osd_interface::midi_init()
+{
+    // this should be done on the OS_level
+    return osd_midi_init();
+}
+
+//-------------------------------------------------
+//  list_midi_devices - list available midi devices
+//-------------------------------------------------
+
+void osd_interface::list_midi_devices(void)
+{
+    osd_list_midi_devices();
+}
+
+void osd_interface::midi_exit()
+{
+    osd_midi_exit();
+}

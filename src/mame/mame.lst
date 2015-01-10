@@ -5374,11 +5374,11 @@ ninjaslt1       // 2000.11 Ninja Assault (NJA1 Ver. A)
 ninjaslt2       // 2000.11 Ninja Assault (NJA2 Ver. A)
 ninjaslt        // 2000.11 Ninja Assault (NJA3 Ver. A)
 ninjaslt4       // 2000.11 Ninja Assault (NJA4 Ver. A)
-				// 2000.11 Shakatto Tambourine (Rev B)
 wwfroyal        // 2000.11 WWF Royal Rumble
 sprtjam         // 2000.11.13 Sports Jam
 pjustic         // 2000.12 Moero Justice Gakuen / Project Justice
 samba2k         // 2000.12 Samba de Amigo Ver.2000
+shaktam	        // 2000.12.28 Shakatto Tambourine (Rev B)
 				// 2000.?? Boat Race Ocean Heats
 csmash          // 2000.?? Cosmic Smash
 csmasho         // 2000.?? Cosmic Smash (original)
@@ -5388,9 +5388,8 @@ f355twn2        // 2001.01 F355 Challenge 2 Twin
 sfz3ugd         // 2001.02 Street Fighter ZERO3 Upper
 gundmgd         // 2001.03 Mobile Suit Gundam: Federation Vs. Zeon (GD-ROM)
 gundmct         // 2001.03 Mobile Suit Gundam: Federation Vs. Zeon (cartridge)
+shaktmsp        // 2001.04.04 Shakatto Tambourine Motto Norinori Shinkyoku Tsuika (2K1 SPR)
 dygolf          // 2001.04.27 Dynamic Golf / Virtua Golf (Rev A)
-				// 2001.04 Shakatto Tambourine Motto Norinori Shinkyoku Tsuika
-shaktmsp        // 2001.04.04 Shakatto Tambourine 2K1 SPR
 monkeyba        // 2001.05 Monkey Ball
 zerogu2         // 2001.05 Zero Gunner 2
 cvsgd           // 2001.06 Capcom Vs. SNK Millennium Fight 2000 Pro
@@ -5410,7 +5409,7 @@ gundmxgd        // 2001.09 Mobile Suit Gundam: Federation Vs. Zeon DX
 derbyoc2        // 2001.10 Derby Owners Club II (Rev B)
 inunoos         // 2001.10 Inu No Osanpo / Dog Walking (Rev A)
 vtenis2c        // 2001.10 Virtua Tennis 2 / Power Smash 2 (cartridge)
-shaktamb        // 2001.10.17 Shakatto Tambourine Cho Powerup Chu 2K1 AUT
+shaktamb        // 2001.10.17 Shakatto Tambourine Cho Powerup Chu (2K1 AUT)
 keyboard        // 2001.11 La Keyboard
 ikaruga         // 2001.12 Ikaruga
 lupinsho        // 2001.12 Lupin the Third: the Shooting
@@ -6709,7 +6708,7 @@ bmfinal         // GXC01 (c) 2002 (Japan)
 popn1           // GX803 (c) 1998 (Asia)
 //popn1j        // GX803 (c) 1998 (Japan)
 popn2           // GX831 (c) 1998 (Japan)
-//popn3         // GX980 (c) 1999 (Japan)
+popn3         	// GX980 (c) 1999 (Japan)
 //popnstex      // GX970 (c) 1999 (Japan)
 
 // Firebeat games
@@ -9067,6 +9066,7 @@ mj4simai        // (c) 1996 Maboroshi Ware
 myangel         // (c) 1996 Namco
 myangel2        // (c) 1997 Namco
 reelquak        // (c) 1997 <unknown>
+endrichs        // (c) 199? E.N.Tiger
 pzlbowl         // (c) 1999 Nihon System / Moss
 namcostr        // (c) 2000 Namco
 penbros         // (c) 2000 Subsino

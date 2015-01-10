@@ -775,12 +775,6 @@ void tms0970_cpu_device::write_o_output(UINT8 index)
 
 void tms0270_cpu_device::dynamic_output()
 {
-	// R15: filament on (handled in the driver)
-	// R14: N/C by default
-	// R13: power off, trigger on falling edge
-	if ((m_r_prev >> 13 & 1) && !(m_r >> 13 & 1))
-		m_power_off(1);
-
 	// R11: TMS5100 CTL port direction (0=read from TMS5100, 1=write to TMS5100)
 	m_ctl_dir = m_r >> 11 & 1;
 
@@ -1082,11 +1076,6 @@ void tms0270_cpu_device::op_tdo()
 		m_o_latch = m_o_latch_low | (m_a << 4 & 0x30);
 
 	// write to output is done in dynamic_output
-}
-
-void tms0270_cpu_device::op_off()
-{
-	// OFF was moved to R13, handled in dynamic_output
 }
 
 

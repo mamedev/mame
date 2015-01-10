@@ -26,13 +26,7 @@
 #include "osdcore.h"
 
 #include "modules/sync/osdsync.h"
-
-#if defined(OSD_WINDOWS)
-#include "winos.h"
-#elif defined(OSD_SDL)
-#include "sdlos.h"
-typedef void *PVOID;
-#endif
+#include "modules/lib/osdlib.h"
 
 #include "eminline.h"
 
@@ -40,6 +34,9 @@ typedef void *PVOID;
 #include "osxutils.h"
 #endif
 
+#if defined(OSD_SDL)
+typedef void *PVOID;
+#endif
 
 //============================================================
 //  DEBUGGING
@@ -79,7 +76,7 @@ static void spin_while(const volatile _PtrType * volatile ptr, const _PtrType va
         int spin = 10000;
         while (--spin)
         {
-            if ((*ptr == val) ^ invert)
+            if ((*ptr != val) ^ invert)
                 return;
         }
     } while (((*ptr == val) ^ invert) && osd_ticks() < stopspin);

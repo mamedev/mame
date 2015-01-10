@@ -116,7 +116,7 @@ NETLIB_UPDATE(9316)
 	sub.m_ent = INPLOGIC(m_ENT);
 	const netlist_sig_t clrq = INPLOGIC(m_CLRQ);
 
-	if ((!sub.m_loadq | (sub.m_ent & INPLOGIC(m_ENP))) & clrq)
+	if ((!sub.m_loadq || (sub.m_ent & INPLOGIC(m_ENP))) && clrq)
 	{
 		sub.m_CLK.activate_lh();
 	}
@@ -124,7 +124,7 @@ NETLIB_UPDATE(9316)
 	{
 		UINT8 cnt = sub.m_cnt;
 		sub.m_CLK.inactivate();
-		if (!clrq & (cnt>0))
+		if (!clrq && (cnt>0))
 		{
 			cnt = 0;
 			sub.update_outputs(cnt);

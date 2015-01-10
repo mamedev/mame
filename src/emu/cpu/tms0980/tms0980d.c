@@ -1,7 +1,6 @@
 /*******************************************************************
 
-tms0980d.c
-TMS0980 disassembly
+  TMS0980 disassembly
 
 *******************************************************************/
 
@@ -17,7 +16,7 @@ TMS0980 disassembly
 enum e_mnemonics {
 	zA10AAC=0, zA6AAC, zA8AAC, zAC1AC, zACACC, zACNAA, zALEC, zALEM, zAMAAC, zBRANCH, zCALL, zCCLA,
 	zCLA, zCLO, zCOMC, zCOMX, zCOMX8, zCPAIZ, zCTMDYN, zDAN, zDMAN, zDMEA, zDNAA,
-	zDYN, zIA, zIMAC, zIYC, zKNE, zKNEZ, zLDP, zLDX, zLDX3, zLDX4, zMNEA, zMNEZ,
+	zDYN, zIA, zIMAC, zIYC, zKNEZ, zLDP, zLDX, zLDX3, zLDX4, zMNEA, zMNEZ,
 	zNDMEA, zOFF, zRBIT, zREAC, zRETN, zRSTR, zSAL, zSAMAN, zSBIT,
 	zSBL, zSEAC, zSETR, zTAM, zTAMACS, zTAMDYN, zTAMIY, zTAMIYC, zTAMZA,
 	zTAY, zTBIT, zTCMIY, zTCY, zTDO, zTKA, zTKM, zTMA,
@@ -27,14 +26,14 @@ enum e_mnemonics {
 
 
 enum e_addressing {
-	zB0=0, zB2, zI2, zI3, zI4, zB7
+	zB0=0, zI2, zI3, zI4, zB7
 };
 
 
 static const char *const s_mnemonic[] = {
 	"a10aac", "a6aac", "a8aac", "ac1ac", "acacc", "acnaa", "alec", "alem", "amaac", "branch", "call", "ccla",
 	"cla", "clo", "comc", "comx", "comx8", "cpaiz", "ctmdyn", "dan", "dman", "dmea", "dnaa",
-	"dyn", "ia", "imac", "iyc", "kne", "knez", "ldp", "ldx", "ldx", "ldx", "mnea", "mnez",
+	"dyn", "ia", "imac", "iyc", "knez", "ldp", "ldx", "ldx", "ldx", "mnea", "mnez",
 	"ndmea", "off", "rbit", "reac", "retn", "rstr", "sal", "saman", "sbit",
 	"sbl", "seac", "setr", "tam", "tamacs", "tamdyn", "tamiy", "tamiyc", "tamza",
 	"tay", "tbit", "tcmiy", "tcy", "tdo", "tka", "tkm", "tma",
@@ -44,7 +43,7 @@ static const char *const s_mnemonic[] = {
 
 
 static const UINT32 s_flags[] = {
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  _OVER, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _OVER, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, _OUT, 0, 0, 0, 0,
@@ -58,10 +57,10 @@ static const UINT32 s_flags[] = {
 static const UINT8 s_addressing[] = {
 	zB0, zB0, zB0, zI4, zI4, zI4, zI4, zB0, zB0, zB7, zB7, zB0,
 	zB0, zB0, zB0, zB0, zB0, zB0, zB0, zB0, zB0, zB0, zB0,
-	zB0, zB0, zB0, zB0, zB0, zB0, zI4, zI2, zI3, zI4, zB0, zB0,
-	zB0, zB0, zB0, zB0, zB0, zB0, zB0, zB0, zB0,
-	zB0, zB0, zB0, zB0, zI4, zB0, zB0, zB0, zB2,
-	zB0, zB2, zI4, zI4, zB0, zB0, zB0, zB0,
+	zB0, zB0, zB0, zB0, zB0, zI4, zI2, zI3, zI4, zB0, zB0,
+	zB0, zB0, zI2, zB0, zB0, zB0, zB0, zB0, zI2,
+	zB0, zB0, zB0, zB0, zI4, zB0, zB0, zB0, zB0,
+	zB0, zI2, zI4, zI4, zB0, zB0, zB0, zB0,
 	zB0, zB0, zB0, zB0, zI4, zB0, zI4,
 	zB0
 };
@@ -70,7 +69,7 @@ static const UINT8 s_addressing[] = {
 static const UINT8 tms0980_mnemonic[512] = {
 	/* 0x000 */
 	zCOMX, zALEM, zYNEA, zXMA, zDYN, zIYC, zCLA, zDMAN,
-	zTKA, zMNEA, zTKM, zILL, zILL, zSETR, zKNE, zILL,
+	zTKA, zMNEA, zTKM, zILL, zILL, zSETR, zKNEZ, zILL,
 	/* 0x010 */
 	zDMEA, zDNAA, zCCLA, zNDMEA, zILL, zAMAAC, zILL, zILL,
 	zCTMDYN, zXDA, zILL, zILL, zILL, zILL, zILL, zILL,
@@ -234,6 +233,7 @@ static const UINT8 tms1100_mnemonic[256] = {
 	zCALL, zCALL, zCALL, zCALL, zCALL, zCALL, zCALL, zCALL,
 };
 
+
 static const UINT8 tms0980_i2_value[4] =
 {
 	0x00, 0x02, 0x01, 0x03
@@ -246,7 +246,6 @@ static const UINT8 tms0980_i4_value[16] =
 {
 	0x00, 0x08, 0x04, 0x0C, 0x02, 0x0A, 0x06, 0x0E, 0x01, 0x09, 0x05, 0x0D, 0x03, 0x0B, 0x07, 0x0F
 };
-static const UINT8 tms0980_bit_value[4] = { 1, 4, 2, 8 };
 
 
 CPU_DISASSEMBLE( tms0980 ) {
@@ -262,19 +261,17 @@ CPU_DISASSEMBLE( tms0980 ) {
 	dst += sprintf( dst, "%-8s ", s_mnemonic[instr] );
 
 	switch( s_addressing[instr] ) {
+	default:
 	case zB0:
 		break;
-	case zB2:
-		dst += sprintf( dst, "#$%d", tms0980_bit_value[ op & 3 ] );
-		break;
 	case zI2:
-		dst += sprintf( dst, "#$%01X", tms0980_i2_value[ op & 0x03 ] );
+		dst += sprintf( dst, "%d", tms0980_i2_value[ op & 0x03 ] );
 		break;
 	case zI4:
-		dst += sprintf( dst, "#$%01X", tms0980_i4_value[ op & 0x0F ] );
+		dst += sprintf( dst, "%d", tms0980_i4_value[ op & 0x0F ] );
 		break;
 	case zB7:
-		dst += sprintf( dst, "#$%02X", ( op & 0x7F ) << 1 );
+		dst += sprintf( dst, "$%02X", ( op & 0x7F ) << 1 );
 		break;
 	}
 
@@ -295,19 +292,17 @@ CPU_DISASSEMBLE( tms1000 ) {
 	dst += sprintf( dst, "%-8s ", s_mnemonic[instr] );
 
 	switch( s_addressing[instr] ) {
+	default:
 	case zB0:
 		break;
-	case zB2:
-		dst += sprintf( dst, "#$%d", tms0980_bit_value[ op & 3 ] );
-		break;
 	case zI2:
-		dst += sprintf( dst, "#$%01X", tms0980_i2_value[ op & 0x03 ] );
+		dst += sprintf( dst, "%d", tms0980_i2_value[ op & 0x03 ] );
 		break;
 	case zI4:
-		dst += sprintf( dst, "#$%01X", tms0980_i4_value[ op & 0x0F ] );
+		dst += sprintf( dst, "%d", tms0980_i4_value[ op & 0x0F ] );
 		break;
 	case zB7:
-		dst += sprintf( dst, "#$%02X", ( op & 0x3F ) );
+		dst += sprintf( dst, "$%02X", ( op & 0x3F ) );
 		break;
 	}
 
@@ -328,22 +323,20 @@ CPU_DISASSEMBLE( tms1100 ) {
 	dst += sprintf( dst, "%-8s ", s_mnemonic[instr] );
 
 	switch( s_addressing[instr] ) {
+	default:
 	case zB0:
 		break;
-	case zB2:
-		dst += sprintf( dst, "#$%d", tms0980_bit_value[ op & 3 ] );
-		break;
 	case zI2:
-		dst += sprintf( dst, "#$%01X", tms0980_i2_value[ op & 0x03 ] );
+		dst += sprintf( dst, "%d", tms0980_i2_value[ op & 0x03 ] );
 		break;
 	case zI3:
-		dst += sprintf( dst, "#$%01X", tms0980_i3_value[ op & 0x07 ] );
+		dst += sprintf( dst, "%d", tms0980_i3_value[ op & 0x07 ] );
 		break;
 	case zI4:
-		dst += sprintf( dst, "#$%01X", tms0980_i4_value[ op & 0x0F ] );
+		dst += sprintf( dst, "%d", tms0980_i4_value[ op & 0x0F ] );
 		break;
 	case zB7:
-		dst += sprintf( dst, "#$%02X", ( op & 0x3F ) );
+		dst += sprintf( dst, "$%02X", ( op & 0x3F ) );
 		break;
 	}
 

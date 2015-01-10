@@ -510,6 +510,7 @@ void ui_menu_input_general::populate()
 				item->sortorder = sortorder * 4 + suborder[seqtype];
 				item->type = ioport_manager::type_is_analog(entry->type()) ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
 				item->name = entry->name();
+				item->owner_name = NULL;
 				item->next = itemlist;
 				itemlist = item;
 
@@ -560,11 +561,15 @@ void ui_menu_input_specific::populate()
 				((field->type() == IPT_OTHER && field->name() != NULL) || machine().ioport().type_group(field->type(), field->player()) != IPG_INVALID))
 			{
 				input_seq_type seqtype;
-				UINT16 sortorder;
+				UINT32 sortorder;
 
 				/* determine the sorting order */
 				if (field->type() >= IPT_START1 && field->type() < IPT_ANALOG_LAST)
+				{
 					sortorder = (field->type() << 2) | (field->player() << 12);
+					if (strcmp(field->device().tag(), ":"))
+						sortorder |= 0x10000;
+				}
 				else
 					sortorder = field->type() | 0xf000;
 
@@ -583,6 +588,7 @@ void ui_menu_input_specific::populate()
 					item->sortorder = sortorder + suborder[seqtype];
 					item->type = field->is_analog() ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
 					item->name = name;
+					item->owner_name = field->device().tag();
 					item->next = itemlist;
 					itemlist = item;
 
@@ -760,8 +766,10 @@ void ui_menu_input::populate_and_sort(input_item_data *itemlist)
 	const char *nameformat[INPUT_TYPE_TOTAL] = { 0 };
 	input_item_data **itemarray, *item;
 	int numitems = 0, curitem;
-	astring subtext;
 	astring text;
+	astring subtext;
+	astring prev_owner;
+	bool first_entry = true;
 
 	/* create a mini lookup table for name format based on type */
 	nameformat[INPUT_TYPE_DIGITAL] = "%s";
@@ -789,6 +797,18 @@ void ui_menu_input::populate_and_sort(input_item_data *itemlist)
 		/* generate the name of the item itself, based off the base name and the type */
 		item = itemarray[curitem];
 		assert(nameformat[item->type] != NULL);
+
+		if (strcmp(item->owner_name, prev_owner.cstr()) != 0)
+		{
+			if (first_entry)
+				first_entry = false;
+			else
+				item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+			text.printf("[root%s]", item->owner_name);
+			item_append(text, NULL, 0, NULL);
+			prev_owner.cpy(item->owner_name);
+		}
+
 		text.printf(nameformat[item->type], item->name);
 
 		/* if we're polling this item, use some spaces with left/right arrows */
@@ -909,6 +929,8 @@ void ui_menu_settings::populate()
 	ioport_field *field;
 	ioport_port *port;
 	dip_descriptor **diplist_tailptr;
+	astring prev_owner;
+	bool first_entry = true;
 
 	/* reset the dip switch tracking */
 	dipcount = 0;
@@ -921,6 +943,7 @@ void ui_menu_settings::populate()
 			if (field->type() == type && field->enabled())
 			{
 				UINT32 flags = 0;
+				astring name;
 
 				/* set the left/right flags appropriately */
 				if (field->has_previous_setting())
@@ -929,7 +952,20 @@ void ui_menu_settings::populate()
 					flags |= MENU_FLAG_RIGHT_ARROW;
 
 				/* add the menu item */
-				item_append(field->name(), field->setting_name(), flags, (void *)field);
+				if (strcmp(field->device().tag(), prev_owner.cstr()) != 0)
+				{
+					if (first_entry)
+						first_entry = false;
+					else
+						item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+					name.printf("[root%s]", field->device().tag());
+					item_append(name, NULL, 0, NULL);
+					prev_owner.cpy(field->device().tag());
+				}
+
+				name.cpy(field->name());
+
+				item_append(name, field->setting_name(), flags, (void *)field);
 
 				/* for DIP switches, build up the model */
 				if (type == IPT_DIPSWITCH && field->first_diplocation() != NULL)
@@ -1173,8 +1209,10 @@ void ui_menu_analog::populate()
 {
 	ioport_field *field;
 	ioport_port *port;
-	astring subtext;
 	astring text;
+	astring subtext;
+	astring prev_owner;
+	bool first_entry = true;
 
 	/* loop over input ports and add the items */
 	for (port = machine().ioport().first_port(); port != NULL; port = port->next())
@@ -1217,7 +1255,20 @@ void ui_menu_analog::populate()
 					{
 						analog_item_data *data;
 						UINT32 flags = 0;
+						astring name;
+						if (strcmp(field->device().tag(), prev_owner.cstr()) != 0)
+						{
+							if (first_entry)
+								first_entry = false;
+							else
+								item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+							name.printf("[root%s]", field->device().tag());
+							item_append(name, NULL, 0, NULL);
+							prev_owner.cpy(field->device().tag());
+						}
 
+						name.cpy(field->name());
+						
 						/* allocate a data item for tracking what this menu item refers to */
 						data = (analog_item_data *)m_pool_alloc(sizeof(*data));
 						data->field = field;
@@ -1228,7 +1279,7 @@ void ui_menu_analog::populate()
 						{
 							default:
 							case ANALOG_ITEM_KEYSPEED:
-								text.printf("%s Digital Speed", field->name());
+								text.printf("%s Digital Speed", name.cstr());
 								subtext.printf("%d", settings.delta);
 								data->min = 0;
 								data->max = 255;
@@ -1237,7 +1288,7 @@ void ui_menu_analog::populate()
 								break;
 
 							case ANALOG_ITEM_CENTERSPEED:
-								text.printf("%s Autocenter Speed", field->name());
+								text.printf("%s Autocenter Speed", name.cstr());
 								subtext.printf("%d", settings.centerdelta);
 								data->min = 0;
 								data->max = 255;
@@ -1246,7 +1297,7 @@ void ui_menu_analog::populate()
 								break;
 
 							case ANALOG_ITEM_REVERSE:
-								text.printf("%s Reverse", field->name());
+								text.printf("%s Reverse", name.cstr());
 								subtext.cpy(settings.reverse ? "On" : "Off");
 								data->min = 0;
 								data->max = 1;
@@ -1255,7 +1306,7 @@ void ui_menu_analog::populate()
 								break;
 
 							case ANALOG_ITEM_SENSITIVITY:
-								text.printf("%s Sensitivity", field->name());
+								text.printf("%s Sensitivity", name.cstr());
 								subtext.printf("%d", settings.sensitivity);
 								data->min = 1;
 								data->max = 255;

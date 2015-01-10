@@ -90,8 +90,13 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 
 	// convert the path into something Windows compatible
 	dst = (*file)->filename;
+#if defined(SDLMAME_WIN32) || defined(SDLMAME_OS2)
+	for (src = t_path; *src != 0; src++)
+		*dst++ = (*src == '/') ? '\\' : *src;
+#else
 	for (src = t_path; *src != 0; src++)
 		*dst++ = *src;//(*src == '/') ? '\\' : *src;
+#endif
 	*dst++ = 0;
 
 	// select the file open modes
@@ -118,7 +123,6 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	if ((*file)->handle == INVALID_HANDLE_VALUE)
 	{
 		DWORD error = GetLastError();
-
 		// create the path if necessary
 		if (error == ERROR_PATH_NOT_FOUND && (openflags & OPEN_FLAG_CREATE) && (openflags & OPEN_FLAG_CREATE_PATHS))
 		{

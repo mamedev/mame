@@ -780,7 +780,7 @@ void cli_frontend::listmedia(const char *gamename)
 
 void cli_frontend::listmididevices(const char *gamename)
 {
-	osd_list_midi_devices();
+	m_osd.list_midi_devices();
 }
 
 

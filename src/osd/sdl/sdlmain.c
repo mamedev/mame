@@ -52,7 +52,7 @@
 #include "video.h"
 #include "input.h"
 #include "osdsdl.h"
-#include "sdlos.h"
+#include "modules/lib/osdlib.h"
 #include "modules/sound/sdl_sound.h"
 #if defined(SDLMAME_EMSCRIPTEN)
 #include "modules/sound/js_sound.h"
@@ -269,21 +269,17 @@ sdl_options::sdl_options()
 
 // we do some special sauce on Win32...
 
-#if !defined(SDLMAME_WIN32)
-int main(int argc, char **argv)
-{
-	int res = 0;
-
-#else
-
+#if defined(SDLMAME_WIN32)
 /* gee */
 extern "C" DECLSPEC void SDLCALL SDL_SetModuleHandle(void *hInst);
+#endif
 
 // translated to utf8_main
 int main(int argc, char *argv[])
 {
 	int res = 0;
 
+#if defined(SDLMAME_WIN32)
 #if !(SDLMAME_SDL2)
 	/* Load SDL dynamic link library */
 	if ( SDL_Init(SDL_INIT_NOPARACHUTE) < 0 ) {
@@ -293,6 +289,7 @@ int main(int argc, char *argv[])
 	SDL_SetModuleHandle(GetModuleHandle(NULL));
 #endif
 #endif
+
 	// disable I/O buffering
 	setvbuf(stdout, (char *) NULL, _IONBF, 0);
 	setvbuf(stderr, (char *) NULL, _IONBF, 0);
@@ -527,6 +524,7 @@ static void osd_sdl_info(void)
 	{
 		osd_printf_verbose("\t%-20s\n", SDL_GetAudioDriver(i));
 	}
+
 #endif
 }
 
@@ -1440,3 +1438,28 @@ bool sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, bitma
 }
 #endif
 #endif
+
+//-------------------------------------------------
+// FIXME: Doesn't belong here but there's no better
+//        place currently.
+//-------------------------------------------------
+
+bool osd_interface::midi_init()
+{
+    // this should be done on the OS_level
+    return osd_midi_init();
+}
+
+//-------------------------------------------------
+//  list_midi_devices - list available midi devices
+//-------------------------------------------------
+
+void osd_interface::list_midi_devices(void)
+{
+    osd_list_midi_devices();
+}
+
+void osd_interface::midi_exit()
+{
+    osd_midi_exit();
+}

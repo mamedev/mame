@@ -171,8 +171,8 @@ MC6845_UPDATE_ROW( alphatro_state::crtc_update_row )
 		mem = (ma + x) & 0x7ff;
 		chr = m_p_videoram[mem];
 		attr = m_p_videoram[mem | 0x800];
-		fg = (palette) ? 8 : attr & 7; // amber or RGB
-		bg = (palette) ? 0 : (attr & 0x38) >> 3;
+		bg = (palette) ? 8 : attr & 7; // amber or RGB
+		fg = (palette) ? 0 : (attr & 0x38) >> 3;
 
 		if BIT(attr, 7) // reverse video
 		{

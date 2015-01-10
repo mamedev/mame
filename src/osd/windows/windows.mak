@@ -73,6 +73,9 @@
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
 ###########################################################################
 
+# add a define identifying the target osd
+DEFS += -DOSD_WINDOWS
+
 
 #-------------------------------------------------
 # object and source roots
@@ -84,7 +87,10 @@ WINOBJ = $(OBJ)/osd/$(OSD)
 OSDSRC = $(SRC)/osd
 OSDOBJ = $(OBJ)/osd
 
-OBJDIRS += $(WINOBJ) $(OSDOBJ)/modules/sync
+OBJDIRS += $(WINOBJ) \
+	$(OSDOBJ)/modules/sync \
+	$(OSDOBJ)/modules/lib \
+	$(OSDOBJ)/modules/midi \
 
 ifdef USE_QTDEBUG
 OBJDIRS += $(OSDOBJ)/modules/debugger/qt
@@ -344,14 +350,13 @@ OSDCOREOBJS = \
 	$(WINOBJ)/winfile.o \
 	$(WINOBJ)/winmisc.o \
 	$(OSDOBJ)/modules/sync/sync_windows.o \
-	$(WINOBJ)/wintime.o \
 	$(WINOBJ)/winutf8.o \
 	$(WINOBJ)/winutil.o \
 	$(WINOBJ)/winclip.o \
 	$(WINOBJ)/winsocket.o \
 	$(OSDOBJ)/modules/sync/work_osd.o \
+	$(OSDOBJ)/modules/lib/osdlib_win32.o \
 	$(WINOBJ)/winptty.o \
-	$(WINOBJ)/winos.o \
 
 
 #-------------------------------------------------
@@ -371,7 +376,8 @@ OSDOBJS = \
 	$(WINOBJ)/video.o \
 	$(WINOBJ)/window.o \
 	$(WINOBJ)/winmenu.o \
-	$(WINOBJ)/winmain.o
+	$(WINOBJ)/winmain.o \
+	$(OSDOBJ)/modules/midi/portmidi.o \
 
 ifdef USE_SDL
 OSDOBJS += \

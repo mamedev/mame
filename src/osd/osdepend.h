@@ -167,6 +167,13 @@ public:
 	// video overridables
 	virtual void *get_slider_list();
 
+	// midi overridables
+	// FIXME: this should return a list of devices, not list them on stdout
+	virtual void list_midi_devices(void);
+
+	// FIXME: everything below seems to be osd specific and not part of
+	//        this INTERFACE but part of the osd IMPLEMENTATION
+
 	void init_subsystems();
 
 	virtual bool video_init();

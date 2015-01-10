@@ -30,6 +30,7 @@ P0-123A                 1996    Wakakusamonogatari Mahjong Yonshimai    Maborosh
 P0-125A ; KE (Namco)    1996    Kosodate Quiz My Angel                  Namco
 P0-136A ; KL (Namco)    1997    Kosodate Quiz My Angel 2                Namco
 P-FG-02                 1997    Reel'N Quake                            <unknown>
+P-FG-03              <unknown>  Endless Riches                          E.N.Tiger
 P0-140B                 2000    Funcube                                 Namco
 P0-140B                 2000    Namco Stars                             Namco
 P0-142A                 1999    Puzzle De Bowling                       MOSS / Nihon System
@@ -40,9 +41,6 @@ B0-006B                 2001-2  Funcube 2 - 5                           Namco
 B0-010A                 2001    Wing Shooting Championship              Sammy
 B0-010A                 2002    Trophy Hunting - Bear & Moose           Sammy
 -------------------------------------------------------------------------------------------
-
-* Not dumped: Endless Riches by <unknown> 8-liner gambler on modified Reel'N Quake PCB that
-              uses an 8-liner harness instead of a JAMMA connector.
 
 TODO:
 
@@ -1563,10 +1561,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( reelquak )
 	PORT_START("DSW1")  // $400300.w
-	PORT_DIPNAME( 0x0001, 0x0001, "Game Style" )
+	PORT_DIPNAME( 0x0001, 0x0001, "Game Style" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Standard ) )
 	PORT_DIPSETTING(      0x0000, "Redemption" )
-	PORT_DIPNAME( 0x000e, 0x000e, "Key-In Credits" )
+	PORT_DIPNAME( 0x000e, 0x000e, "Key-In Credits" ) PORT_DIPLOCATION("SW1:2,3,4")
 	PORT_DIPSETTING(      0x000c, "1 Turn / 2 Credits" )
 	PORT_DIPSETTING(      0x000a, "1 Turn / 3 Credits" )
 	PORT_DIPSETTING(      0x0008, "1 Turn / 5 Credits" )
@@ -1575,58 +1573,58 @@ static INPUT_PORTS_START( reelquak )
 	PORT_DIPSETTING(      0x0004, "1 Turn / 25 Credits" )
 	PORT_DIPSETTING(      0x0002, "1 Turn / 50 Credits" )
 	PORT_DIPSETTING(      0x0000, "1 Turn / 100 Credits" )
-	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0000, "1 Coin/10 Credits" )
-	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) )   // bit 7 tested according to game style
+	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:7,8")   // bit 7 tested according to game style
 	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0000, "1 Coin/10 Credits" )
 
-	PORT_START("DSW2")  // $400302.w
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )  // used
+	PORT_START("DSW2")  // $400302.w	PORT_START("DSW2")  // $400302.w
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:1")  // used
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("P1")    // $400001.b
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_POKER_CANCEL  )    // bet cancel
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE   )    // collect
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP   )    // double up
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH   )    // big
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_BET     )    // bet
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_GAMBLE_LOW    )    // small
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL   )    // start
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_POKER_CANCEL  )                    // bet cancel
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE   )                    // collect
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP   )                    // double up
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH   ) PORT_NAME("Big")   // big
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_BET     )                    // bet
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_GAMBLE_LOW    ) PORT_NAME("Small") // small
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL   )                    // start
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 
 	PORT_START("TICKET")    // $400003.b
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL       ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)    // ticket sensor
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )                            // knock down
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Knock Down")    // knock down
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE2      ) PORT_NAME("Ticket Clear")  // ticket clear
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE3      ) PORT_NAME("Ticket Resume") // ticket resume
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  )                            // key in
@@ -1641,6 +1639,30 @@ static INPUT_PORTS_START( reelquak )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+INPUT_PORTS_END
+
+
+/***************************************************************************
+                              Endless Riches
+***************************************************************************/
+
+static INPUT_PORTS_START( endrichs )
+	PORT_INCLUDE(reelquak)
+	
+	PORT_MODIFY("DSW1")  // $400300.w
+	PORT_DIPNAME( 0x0001, 0x0001, "Payout Style" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(      0x0001, "Normal Payout" )
+	PORT_DIPSETTING(      0x0000, "Ticket Payout" ) // Ticket Printer?
+
+	PORT_MODIFY("DSW2")  // $400302.w
+	PORT_DIPUNUSED_DIPLOC( 0x0001, IP_ACTIVE_LOW, "SW2:1" ) // DSW2 unpopulated
+	PORT_DIPUNUSED_DIPLOC( 0x0002, IP_ACTIVE_LOW, "SW2:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x0004, IP_ACTIVE_LOW, "SW2:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x0008, IP_ACTIVE_LOW, "SW2:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x0010, IP_ACTIVE_LOW, "SW2:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x0020, IP_ACTIVE_LOW, "SW2:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x0040, IP_ACTIVE_LOW, "SW2:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x0080, IP_ACTIVE_LOW, "SW2:8" )
 INPUT_PORTS_END
 
 
@@ -3121,6 +3143,101 @@ ROM_END
 
 /***************************************************************************
 
+Endless Riches
+(c) 199? E.N.Tiger
+
+   CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
+ Video: NEC DX-101 (240 Pin PQFP, @ U10)
+        NEC DX-102 (52 Pin PQFP x3, @ U28 U30 & U45)
+ Sound: X1-010 (Mitsubishi M60016 Gate Array, 80 Pin PQFP @ U26)
+   OSC: 50MHz & 28MHz
+ Other: 8 Position Dipswitch x 2
+        Push Button SW1
+        3.6V Battery at BT1
+        GAL 16V8 - labeled "KF-001" at U38
+
+Memory:
+M1 are TC551001BFL-70L at U42 & U43
+M2 is  W2465K-70LL at U27
+M3 are LH5168D-10L at U8 & U9
+M4 are UT62256SC-70L at U6, U7, U13 & U14
+
+PCB Number: P-FG-03
++-----+_+----------------------------------------------------+
+|             +------+      U  U                             |
+| VOL         |Seta  |   M  5  5            +---------------+|
+|             |X1-010|   2  8  7    +-+  M  |KFC-U16-C00 U16||
+|             +------+      *  *    | |  1  +---------------+|
++-+                                 |U|                      |
+  |  +-+    +-+           BT1       |3|            U20*      |
++-+  | |    | |         M           |2|  M                   |
+|    |U| U  |U| U  M M  4           | |  1  +---------------+|
+|    |3| 5  |2| 4  3 3              +-+     |KFC-U15-C00 U15||
+|8   | | *  | | *       M                   +---------------+|
+|    +-+    +-+         4                                    |
+|L                                                 U19*      |
+|I                                                           |
+|N                                          +---------------+|
+|E                                          |KFC-U18-C00 U18||
+|R                           +----------+   +---------------+|
+|           +-------+        |          |                    |
+|C C        |Toshiba|        |   NEC    |          U22*      |
+|o N        |  TMP  |        |  DX-101  |                    |
+|n 1        | 68301 |        |          |   +---------------+|
+|n        U +-------+        |          |   |KFC-U17-C00 U17||
+|e C      5                  +----------+   +---------------+|
+|c N      6                                                  |
+|t 2      *                                        U21*      |
+|e  +---+    +---+       U  50MHz 28MHz                      |
+|r    |DX | S  |DX |       3                                 |
+|     |102| W  |102|       8                   +---+    OSC2*|
+|     +---+ 1  +---+                    M  M   |DX |         |
++-+            D D                      4  4   |102|         |
+  |            S S                             +---+         |
++-+            W W                                           |
+|              2 1                                           |
++------------------------------------------------------------+
+
+CN1   - 7 Pin connector
+CN2   - 8 Pin connector
+
+* Denotes not populated.
+  U56 is unpopulated 93C45 EEPROM
+  DSW2 is unpopulated
+
+    U3-U5 silkscreened 27C4001
+  U57-U58 silkscreened 23C8001E
+  U15-U22 silkscreened 23C32000
+      U32 silkscreened 23C32000
+
+Note:
+  8-Liner version of P-FG-02 (see Reel'N Quake! above)
+  Hitting Service Mode "F2" will show Ver 1.7, but going through the diagnostic "0"
+   Main Menu --> Test Mode --> Memory Test will show Version 1.20
+
+***************************************************************************/
+
+ROM_START( endrichs )
+	ROM_REGION( 0x100000, "maincpu", 0 )    // TMP68301 Code
+	ROM_LOAD16_BYTE( "kfp_u02_c12.u2", 0x00000, 0x80000, CRC(462341d2) SHA1(a88215d74469513f4239853f62d4dbbffe2aa83a) )
+	ROM_LOAD16_BYTE( "kfp_u03_c12.u3", 0x00001, 0x80000, CRC(2baee8d1) SHA1(f86920382c54a259adb1dee253859561746d215a) )
+
+	ROM_REGION( 0x800000, "sprites", 0 )    // Sprites
+	ROM_LOAD( "kfc-u16-c00.u16", 0x000000, 0x200000, CRC(cbfe5e0f) SHA1(6c7c8088c43231997ac47ce05cf43c78c1fdad47) )
+	ROM_LOAD( "kfc-u15-c00.u15", 0x200000, 0x200000, CRC(98e4c36c) SHA1(651be122b78f225d38878ae90776f66989440590) )
+	ROM_LOAD( "kfc-u18-c00.u18", 0x400000, 0x200000, CRC(561ac136) SHA1(96da493157405a5d3d72b8cc3004abd3fa3eadfa) )
+	ROM_LOAD( "kfc-u17-c00.u17", 0x600000, 0x200000, CRC(34660029) SHA1(cf09b97422497d739f71e6ff8b9974fca0329928) )
+
+	ROM_REGION( 0x300000, "x1snd", 0 )  // Samples
+	// Leave 1MB empty (addressable by the chip)
+	ROM_LOAD( "kfs-u32-c00.u32", 0x100000, 0x200000, CRC(e9ffbecf) SHA1(3cc9ab3f4be1a305235603a68ca1e15797fb27cb) ) // Yes, it's actually "KFS" here
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "gal16v8_kf-001.u38", 0x000, 0x117, NO_DUMP )
+ROM_END
+
+/***************************************************************************
+
 Sammy USA Outdoor Shooting Series PCB
 
 PCB B0-003A (or B0-003B):
@@ -3436,7 +3553,8 @@ GAME( 1995, grdians,  0,        grdians,  grdians,  driver_device, 0,        ROT
 GAME( 1996, mj4simai, 0,        mj4simai, mj4simai, driver_device, 0,        ROT0, "Maboroshi Ware",        "Wakakusamonogatari Mahjong Yonshimai (Japan)", GAME_NO_COCKTAIL )
 GAME( 1996, myangel,  0,        myangel,  myangel,  driver_device, 0,        ROT0, "MOSS / Namco",          "Kosodate Quiz My Angel (Japan)",               GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, myangel2, 0,        myangel2, myangel2, driver_device, 0,        ROT0, "MOSS / Namco",          "Kosodate Quiz My Angel 2 (Japan)",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, reelquak, 0,        reelquak, reelquak, driver_device, 0,        ROT0, "<unknown>",             "Reel'N Quake! (Ver. 1.05)",                    GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, reelquak, 0,        reelquak, reelquak, driver_device, 0,        ROT0, "<unknown>",             "Reel'N Quake! (Version 1.05)",                 GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 199?, endrichs, 0,        reelquak, endrichs, driver_device, 0,        ROT0, "E.N.Tiger",             "Endless Riches (Ver 1.20)",                    GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, pzlbowl,  0,        pzlbowl,  pzlbowl,  driver_device, 0,        ROT0, "MOSS / Nihon System",   "Puzzle De Bowling (Japan)",                    GAME_NO_COCKTAIL )
 GAME( 2000, penbros,  0,        penbros,  penbros,  driver_device, 0,        ROT0, "Subsino",               "Penguin Brothers (Japan)",                     GAME_NO_COCKTAIL )
 GAME( 2000, namcostr, 0,        namcostr, funcube,  driver_device, 0,        ROT0, "Namco",                 "Namco Stars",                                  GAME_NO_COCKTAIL | GAME_NOT_WORKING )
