@@ -26,8 +26,7 @@ OBJDIRS += \
 	$(LIBOBJ)/lua \
 	$(LIBOBJ)/lua/lib \
 	$(LIBOBJ)/mongoose \
-	$(LIBOBJ)/web \
-	$(LIBOBJ)/web/json \
+	$(LIBOBJ)/jsoncpp \
 	$(LIBOBJ)/sqlite3 \
 
 #-------------------------------------------------
@@ -537,15 +536,15 @@ $(LIBOBJ)/lua/%.o: $(LIBSRC)/lua/%.c | $(OSPREBUILD)
 
 WEBOBJS = \
 	$(LIBOBJ)/mongoose/mongoose.o \
-	$(LIBOBJ)/web/json/json_reader.o \
-	$(LIBOBJ)/web/json/json_value.o \
-	$(LIBOBJ)/web/json/json_writer.o \
+	$(LIBOBJ)/jsoncpp/json_reader.o \
+	$(LIBOBJ)/jsoncpp/json_value.o \
+	$(LIBOBJ)/jsoncpp/json_writer.o \
 
 $(OBJ)/libweb.a: $(WEBOBJS)
 
-$(LIBOBJ)/web/%.o: $(LIBSRC)/web/%.cpp | $(OSPREBUILD)
+$(LIBOBJ)/jsoncpp/%.o: $(3RDPARTY)/jsoncpp/src/lib_json/%.cpp | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CFLAGS) -I$(LIBSRC)/web -c $< -o $@
+	$(CC) $(CDEFS) $(CFLAGS) -I$(3RDPARTY)/jsoncpp/include -c $< -o $@
 
 $(LIBOBJ)/mongoose/%.o: $(3RDPARTY)/mongoose/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
