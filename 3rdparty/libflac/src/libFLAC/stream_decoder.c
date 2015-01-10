@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
@@ -46,9 +46,11 @@
 #include <string.h> /* for memset/memcpy() */
 #include <sys/stat.h> /* for stat() */
 #include <sys/types.h> /* for off_t */
-#if defined _MSC_VER || defined __BORLANDC__ || defined __MINGW32__
-#if _MSC_VER <= 1600 || defined __BORLANDC__ /* @@@ [2G limit] */
+#if defined _MSC_VER || defined __BORLANDC__ || defined __MINGW32__ /* @@@ [2G limit] */
+#ifndef fseeko
 #define fseeko fseek
+#endif
+#ifndef ftello
 #define ftello ftell
 #endif
 #endif
@@ -1467,6 +1469,7 @@ FLAC__bool read_metadata_(FLAC__StreamDecoder *decoder)
 		block.is_last = is_last;
 		block.type = (FLAC__MetadataType)type;
 		block.length = length;
+		memset(&block.data, 0, sizeof(block.data));
 
 		if(type == FLAC__METADATA_TYPE_APPLICATION) {
 			if(!FLAC__bitreader_read_byte_block_aligned_no_crc(decoder->private_->input, block.data.application.id, FLAC__STREAM_METADATA_APPLICATION_ID_LEN/8))

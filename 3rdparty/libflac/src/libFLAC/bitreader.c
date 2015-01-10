@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
@@ -156,6 +156,8 @@ static _inline FLAC__uint32 local_swap32_(FLAC__uint32 x)
 	x = ((x<<8)&0xFF00FF00) | ((x>>8)&0x00FF00FF);
 	return (x>>16) | (x<<16);
 }
+
+#if defined(_M_IX86)
 static void local_swap32_block_(FLAC__uint32 *start, FLAC__uint32 len)
 {
 	__asm {
@@ -173,6 +175,7 @@ loop1:
 done1:
 	}
 }
+#endif
 #endif
 
 static FLaC__INLINE void crc16_update_word_(FLAC__BitReader *br, brword word)
@@ -263,7 +266,7 @@ FLAC__bool bitreader_read_from_client_(FLAC__BitReader *br)
 #if WORDS_BIGENDIAN
 #else
 	end = (br->words*FLAC__BYTES_PER_WORD + br->bytes + bytes + (FLAC__BYTES_PER_WORD-1)) / FLAC__BYTES_PER_WORD;
-# if defined(_MSC_VER) && (FLAC__BYTES_PER_WORD == 4)
+# if defined(_MSC_VER) && (FLAC__BYTES_PER_WORD == 4) && defined(_M_IX86)
 	if(br->cpu_info.type == FLAC__CPUINFO_TYPE_IA32 && br->cpu_info.data.ia32.bswap) {
 		start = br->words;
 		local_swap32_block_(br->buffer + start, end - start);

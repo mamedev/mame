@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
@@ -46,9 +46,11 @@
 #include <stdlib.h> /* for malloc() */
 #include <string.h> /* for memcpy() */
 #include <sys/types.h> /* for off_t */
-#if defined _MSC_VER || defined __BORLANDC__ || defined __MINGW32__
-#if _MSC_VER <= 1600 || defined __BORLANDC__ /* @@@ [2G limit] */
+#if defined _MSC_VER || defined __BORLANDC__ || defined __MINGW32__ /* @@@ [2G limit] */
+#ifndef fseeko
 #define fseeko fseek
+#endif
+#ifndef ftello
 #define ftello ftell
 #endif
 #endif
@@ -3750,9 +3752,9 @@ unsigned find_best_partition_order_(
 
 		/* save best parameters and raw_bits */
 		FLAC__format_entropy_coding_method_partitioned_rice_contents_ensure_size(prc, max(6, best_partition_order));
-		memcpy(prc->parameters, private_->partitioned_rice_contents_extra[best_parameters_index].parameters, sizeof(unsigned)*(1<<(best_partition_order)));
+		memcpy(prc->parameters, private_->partitioned_rice_contents_extra[best_parameters_index].parameters, sizeof(unsigned)*((unsigned long long)1<<(best_partition_order)));
 		if(do_escape_coding)
-			memcpy(prc->raw_bits, private_->partitioned_rice_contents_extra[best_parameters_index].raw_bits, sizeof(unsigned)*(1<<(best_partition_order)));
+			memcpy(prc->raw_bits, private_->partitioned_rice_contents_extra[best_parameters_index].raw_bits, sizeof(unsigned)*((unsigned long long)1<<(best_partition_order)));
 		/*
 		 * Now need to check if the type should be changed to
 		 * FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE2 based on the

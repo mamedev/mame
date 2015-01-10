@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
 
@@ -60,6 +60,9 @@ void FLAC__lpc_window_data(const FLAC__int32 in[], const FLAC__real window[], FL
 		out[i] = in[i] * window[i];
 }
 
+#if defined(__GNUC__) && defined(__i386__) && (__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ >= 3)
+__attribute__((optimize("O0")))
+#endif
 void FLAC__lpc_compute_autocorrelation(const FLAC__real data[], unsigned data_len, unsigned lag, FLAC__real autoc[])
 {
 	/* a readable, but slower, version */
@@ -88,7 +91,7 @@ void FLAC__lpc_compute_autocorrelation(const FLAC__real data[], unsigned data_le
 	 * this version tends to run faster because of better data locality
 	 * ('data_len' is usually much larger than 'lag')
 	 */
-	FLAC__real d;
+	FLAC__real d, tmp;
 	unsigned sample, coeff;
 	const unsigned limit = data_len - lag;
 
@@ -99,20 +102,24 @@ void FLAC__lpc_compute_autocorrelation(const FLAC__real data[], unsigned data_le
 		autoc[coeff] = 0.0;
 	for(sample = 0; sample <= limit; sample++) {
 		d = data[sample];
-		for(coeff = 0; coeff < lag; coeff++)
-			autoc[coeff] += d * data[sample+coeff];
+		for(coeff = 0; coeff < lag; coeff++) {
+			tmp = d * data[sample+coeff];
+			autoc[coeff] += tmp;
+		}
 	}
 	for(; sample < data_len; sample++) {
 		d = data[sample];
-		for(coeff = 0; coeff < data_len - sample; coeff++)
-			autoc[coeff] += d * data[sample+coeff];
+		for(coeff = 0; coeff < data_len - sample; coeff++) {
+			tmp = d * data[sample+coeff];
+			autoc[coeff] += tmp;
+		}
 	}
 }
 
 void FLAC__lpc_compute_lp_coefficients(const FLAC__real autoc[], unsigned *max_order, FLAC__real lp_coeff[][FLAC__MAX_LPC_ORDER], FLAC__double error[])
 {
 	unsigned i, j;
-	FLAC__double r, err, ref[FLAC__MAX_LPC_ORDER], lpc[FLAC__MAX_LPC_ORDER];
+	FLAC__double r, err, lpc[FLAC__MAX_LPC_ORDER];
 
 	FLAC__ASSERT(0 != max_order);
 	FLAC__ASSERT(0 < *max_order);
@@ -126,7 +133,7 @@ void FLAC__lpc_compute_lp_coefficients(const FLAC__real autoc[], unsigned *max_o
 		r = -autoc[i+1];
 		for(j = 0; j < i; j++)
 			r -= lpc[j] * autoc[i-j];
-		ref[i] = (r/=err);
+		r/=err;
 
 		/* Update LPC coefficients and total error. */
 		lpc[i]=r;
