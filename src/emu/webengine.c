@@ -14,7 +14,7 @@
 #include "emuopts.h"
 #include "ui/ui.h"
 #include "webengine.h"
-#include "lua/lua.hpp"
+#include "lua.hpp"
 
 
 
