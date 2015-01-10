@@ -513,7 +513,7 @@ LUAOBJS = \
 	$(LIBOBJ)/lua/ltablib.o \
 	$(LIBOBJ)/lua/loadlib.o \
 	$(LIBOBJ)/lua/linit.o \
-	$(LIBOBJ)/lua/lib/lsqlite3.o \
+	$(LIBOBJ)/lua/lsqlite3/lsqlite3.o \
 
 $(OBJ)/liblua.a: $(LUAOBJS)
 
@@ -527,6 +527,10 @@ LUA_FLAGS += -DLUA_USE_POSIX
 endif
 
 $(LIBOBJ)/lua/%.o: $(LIBSRC)/lua/%.c | $(OSPREBUILD)
+	@echo Compiling $<...
+	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -DLUA_COMPAT_ALL $(LUA_FLAGS) -c $< -o $@
+
+$(LIBOBJ)/lua/lsqlite3/%.o: $(3RDPARTY)/lsqlite3/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -DLUA_COMPAT_ALL $(LUA_FLAGS) -c $< -o $@
 
