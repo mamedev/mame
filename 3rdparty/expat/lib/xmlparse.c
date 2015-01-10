@@ -10,17 +10,7 @@
 
 #define XML_BUILDING_EXPAT 1
 
-#ifdef COMPILED_FROM_DSP
-#include "winconfig.h"
-#elif defined(MACOS_CLASSIC)
-#include "macconfig.h"
-#elif defined(__amigaos__)
-#include "amigaconfig.h"
-#elif defined(__WATCOMC__)
-#include "watcomconfig.h"
-#elif defined(HAVE_EXPAT_CONFIG_H)
-#include <expat_config.h>
-#endif /* ndef COMPILED_FROM_DSP */
+#include "intconfig.h"
 
 #include "ascii.h"
 #include "expat.h"
