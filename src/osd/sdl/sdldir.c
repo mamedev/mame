@@ -235,4 +235,5 @@ void osd_closedir(osd_directory *dir)
 	osd_free(dir);
 }
 
+
 #endif
