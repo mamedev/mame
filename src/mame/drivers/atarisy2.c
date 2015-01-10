@@ -354,6 +354,8 @@ READ8_MEMBER(atarisy2_state::switch_6502_r)
 
 WRITE8_MEMBER(atarisy2_state::switch_6502_w)
 {
+	set_led_status(machine(), 0, data & 0x04);
+	set_led_status(machine(), 1, data & 0x08);
 	if (m_has_tms5220)
 	{
 		data = 12 | ((data >> 5) & 1);
