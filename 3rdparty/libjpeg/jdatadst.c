@@ -128,7 +128,7 @@ empty_mem_output_buffer (j_compress_ptr cinfo)
 
   /* Try to allocate new buffer with double size */
   nextsize = dest->bufsize * 2;
-  nextbuffer = malloc(nextsize);
+  nextbuffer = (JOCTET*)malloc(nextsize);
 
   if (nextbuffer == NULL)
     ERREXIT1(cinfo, JERR_OUT_OF_MEMORY, 10);
@@ -256,7 +256,7 @@ jpeg_mem_dest (j_compress_ptr cinfo,
 
   if (*outbuffer == NULL || *outsize == 0) {
     /* Allocate initial buffer */
-    dest->newbuffer = *outbuffer = malloc(OUTPUT_BUF_SIZE);
+    dest->newbuffer = *outbuffer = (unsigned char*)malloc(OUTPUT_BUF_SIZE);
     if (dest->newbuffer == NULL)
       ERREXIT1(cinfo, JERR_OUT_OF_MEMORY, 10);
     *outsize = OUTPUT_BUF_SIZE;
