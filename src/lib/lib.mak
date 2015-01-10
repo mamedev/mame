@@ -25,6 +25,7 @@ OBJDIRS += \
 	$(LIBOBJ)/portmidi \
 	$(LIBOBJ)/lua \
 	$(LIBOBJ)/lua/lib \
+	$(LIBOBJ)/mongoose \
 	$(LIBOBJ)/web \
 	$(LIBOBJ)/web/json \
 	$(LIBOBJ)/sqlite3 \
@@ -535,7 +536,7 @@ $(LIBOBJ)/lua/%.o: $(LIBSRC)/lua/%.c | $(OSPREBUILD)
 #-------------------------------------------------
 
 WEBOBJS = \
-	$(LIBOBJ)/web/mongoose.o \
+	$(LIBOBJ)/mongoose/mongoose.o \
 	$(LIBOBJ)/web/json/json_reader.o \
 	$(LIBOBJ)/web/json/json_value.o \
 	$(LIBOBJ)/web/json/json_writer.o \
@@ -546,9 +547,9 @@ $(LIBOBJ)/web/%.o: $(LIBSRC)/web/%.cpp | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CFLAGS) -I$(LIBSRC)/web -c $< -o $@
 
-$(LIBOBJ)/web/%.o: $(LIBSRC)/web/%.c | $(OSPREBUILD)
+$(LIBOBJ)/mongoose/%.o: $(3RDPARTY)/mongoose/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CFLAGS) -I$(LIBSRC)/web -DNS_STACK_SIZE=0 -c $< -o $@
+	$(CC) $(CDEFS) $(CFLAGS) -I$(3RDPARTY)/mongoose -DNS_STACK_SIZE=0 -c $< -o $@
 
 #-------------------------------------------------
 # SQLite3 library objects
