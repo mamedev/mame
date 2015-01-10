@@ -26,10 +26,10 @@ void pm_init()
     pm_initialized = TRUE;
     if (!err) {
         pm_default_input_device_id = find_default_device(
-                "/PortMidi/PM_RECOMMENDED_INPUT_DEVICE", TRUE, 
+                (char *)"/PortMidi/PM_RECOMMENDED_INPUT_DEVICE", TRUE, 
                 pm_default_input_device_id);
         pm_default_output_device_id = find_default_device(
-                "/PortMidi/PM_RECOMMENDED_OUTPUT_DEVICE", FALSE, 
+                (char *)"/PortMidi/PM_RECOMMENDED_OUTPUT_DEVICE", FALSE, 
                 pm_default_output_device_id);
     }
 }

@@ -20,6 +20,7 @@
 #ifdef DEBUG
 #include "stdio.h"
 #endif
+#undef UNICODE
 #include <windows.h>
 
 /* pm_exit is called when the program exits.
@@ -62,7 +63,7 @@ static PmDeviceID pm_get_default_device_id(int is_input, char *key) {
     HKEY hkey;
 #define PATTERN_MAX 256
     char pattern[PATTERN_MAX];
-    long pattern_max = PATTERN_MAX;
+    DWORD pattern_max = PATTERN_MAX;
     DWORD dwType;
     /* Find first input or device -- this is the default. */
     PmDeviceID id = pmNoDevice;
@@ -75,23 +76,23 @@ static PmDeviceID pm_get_default_device_id(int is_input, char *key) {
         }
     }
     /* Look in registry for a default device name pattern. */
-    if (RegOpenKeyEx(HKEY_CURRENT_USER, "Software", 0, KEY_READ, &hkey) != 
+    if (RegOpenKeyExA(HKEY_CURRENT_USER, "Software", 0, KEY_READ, &hkey) != 
         ERROR_SUCCESS) {
         return id;
     }
-    if (RegOpenKeyEx(hkey, "JavaSoft", 0, KEY_READ, &hkey) !=
+    if (RegOpenKeyExA(hkey, "JavaSoft", 0, KEY_READ, &hkey) !=
         ERROR_SUCCESS) {
         return id;
     }
-    if (RegOpenKeyEx(hkey, "Prefs", 0, KEY_READ, &hkey) !=
+    if (RegOpenKeyExA(hkey, "Prefs", 0, KEY_READ, &hkey) !=
         ERROR_SUCCESS) {
         return id;
     }
-    if (RegOpenKeyEx(hkey, "/Port/Midi", 0, KEY_READ, &hkey) !=
+    if (RegOpenKeyExA(hkey, "/Port/Midi", 0, KEY_READ, &hkey) !=
         ERROR_SUCCESS) {
         return id;
     }
-    if (RegQueryValueEx(hkey, key, NULL, &dwType, pattern, &pattern_max) != 
+    if (RegQueryValueExA(hkey, key, NULL, &dwType, (BYTE *)pattern, &pattern_max) != 
 	ERROR_SUCCESS) {
         return id;
     }
@@ -119,13 +120,13 @@ static PmDeviceID pm_get_default_device_id(int is_input, char *key) {
 
 PmDeviceID Pm_GetDefaultInputDeviceID() {
     return pm_get_default_device_id(TRUE, 
-           "/P/M_/R/E/C/O/M/M/E/N/D/E/D_/I/N/P/U/T_/D/E/V/I/C/E");
+           (char *)"/P/M_/R/E/C/O/M/M/E/N/D/E/D_/I/N/P/U/T_/D/E/V/I/C/E");
 }
 
 
 PmDeviceID Pm_GetDefaultOutputDeviceID() {
   return pm_get_default_device_id(FALSE,
-          "/P/M_/R/E/C/O/M/M/E/N/D/E/D_/O/U/T/P/U/T_/D/E/V/I/C/E");
+          (char *)"/P/M_/R/E/C/O/M/M/E/N/D/E/D_/O/U/T/P/U/T_/D/E/V/I/C/E");
 }
 
 

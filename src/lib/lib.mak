@@ -23,6 +23,11 @@ OBJDIRS += \
 	$(LIBOBJ)/libflac \
 	$(LIBOBJ)/lib7z \
 	$(LIBOBJ)/portmidi \
+	$(LIBOBJ)/portmidi/pm_common \
+	$(LIBOBJ)/portmidi/pm_linux \
+	$(LIBOBJ)/portmidi/pm_mac \
+	$(LIBOBJ)/portmidi/pm_win \
+	$(LIBOBJ)/portmidi/porttime \
 	$(LIBOBJ)/lua \
 	$(LIBOBJ)/lua/lsqlite3 \
 	$(LIBOBJ)/mongoose \
@@ -438,43 +443,42 @@ PMOPTS =
 
 # common objects
 LIBPMOBJS = \
-	$(LIBOBJ)/portmidi/portmidi.o \
-	$(LIBOBJ)/portmidi/porttime.o \
-	$(LIBOBJ)/portmidi/pmutil.o
+	$(LIBOBJ)/portmidi/pm_common/portmidi.o \
+	$(LIBOBJ)/portmidi/pm_common/pmutil.o \
+	$(LIBOBJ)/portmidi/porttime/porttime.o \
 
 ifeq ($(TARGETOS),linux)
 PMOPTS = -DPMALSA=1
 
 LIBPMOBJS += \
-	$(LIBOBJ)/portmidi/pmlinux.o \
-	$(LIBOBJ)/portmidi/pmlinuxalsa.o \
-	$(LIBOBJ)/portmidi/finddefaultlinux.o \
-	$(LIBOBJ)/portmidi/ptlinux.o
-
+	$(LIBOBJ)/portmidi/pm_linux/pmlinux.o \
+	$(LIBOBJ)/portmidi/pm_linux/pmlinuxalsa.o \
+	$(LIBOBJ)/portmidi/pm_linux/finddefaultlinux.o \
+	$(LIBOBJ)/portmidi/porttime/ptlinux.o
 endif
 
 ifeq ($(TARGETOS),macosx)
 LIBPMOBJS += \
-	$(LIBOBJ)/portmidi/pmmac.o \
-	$(LIBOBJ)/portmidi/pmmacosxcm.o \
-	$(LIBOBJ)/portmidi/finddefault.o \
-	$(LIBOBJ)/portmidi/readbinaryplist.o \
-	$(LIBOBJ)/portmidi/ptmacosx_mach.o \
-	$(LIBOBJ)/portmidi/osxsupport.o
+	$(LIBOBJ)/portmidi/pm_mac/pmmac.o \
+	$(LIBOBJ)/portmidi/pm_mac/pmmacosxcm.o \
+	$(LIBOBJ)/portmidi/pm_mac/finddefault.o \
+	$(LIBOBJ)/portmidi/pm_mac/readbinaryplist.o \
+	$(LIBOBJ)/portmidi/pm_mac/osxsupport.o \
+	$(LIBOBJ)/portmidi/porttime/ptmacosx_mach.o
 endif
 
 ifeq ($(TARGETOS),win32)
 LIBPMOBJS += \
-	$(LIBOBJ)/portmidi/pmwin.o \
-	$(LIBOBJ)/portmidi/pmwinmm.o \
-	$(LIBOBJ)/portmidi/ptwinmm.o
+	$(LIBOBJ)/portmidi/pm_win/pmwin.o \
+	$(LIBOBJ)/portmidi/pm_win/pmwinmm.o \
+	$(LIBOBJ)/portmidi/porttime/ptwinmm.o
 endif
 
 $(OBJ)/libportmidi.a: $(LIBPMOBJS)
 
 $(LIBOBJ)/portmidi/%.o: $(3RDPARTY)/portmidi/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(PMOPTS) $(CCOMFLAGS) $(CONLYFLAGS) -I$(LIBSRC)/portmidi/ -c $< -o $@
+	$(CC) $(CDEFS) $(PMOPTS) $(CCOMFLAGS) $(CONLYFLAGS) -I$(3RDPARTY)/portmidi/pm_common -I$(3RDPARTY)/portmidi/porttime -c $< -o $@
 
 #-------------------------------------------------
 # LUA library objects

@@ -26,6 +26,8 @@
 PmDeviceID pm_default_input_device_id = -1;
 PmDeviceID pm_default_output_device_id = -1;
 
+extern PmDeviceID find_default_device(char *path, int input, PmDeviceID id);
+
 void pm_init()
 {
     /* Note: it is not an error for PMALSA to fail to initialize. 
@@ -43,10 +45,10 @@ void pm_init()
     // now in order to (successfully) call Pm_CountDevices()
     pm_initialized = TRUE;      
     pm_default_input_device_id = find_default_device(
-        "/PortMidi/PM_RECOMMENDED_INPUT_DEVICE", TRUE,
+        (char *)"/PortMidi/PM_RECOMMENDED_INPUT_DEVICE", TRUE,
         pm_default_input_device_id);
     pm_default_output_device_id = find_default_device(
-        "/PortMidi/PM_RECOMMENDED_OUTPUT_DEVICE", FALSE,
+        (char *)"/PortMidi/PM_RECOMMENDED_OUTPUT_DEVICE", FALSE,
         pm_default_output_device_id);
 }
 

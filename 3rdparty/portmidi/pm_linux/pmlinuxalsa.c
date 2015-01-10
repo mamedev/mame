@@ -15,6 +15,7 @@
 #include "string.h"
 #include "porttime.h"
 #include "pmlinux.h"
+#include "osdcomm.h"
 
 #include <alsa/asoundlib.h>
 
@@ -32,9 +33,10 @@
 #endif
 
 /* to store client/port in the device descriptor */
-#define MAKE_DESCRIPTOR(client, port) ((void*)(((client) << 8) | (port)))
-#define GET_DESCRIPTOR_CLIENT(info) ((((int)(info)) >> 8) & 0xff)
-#define GET_DESCRIPTOR_PORT(info) (((int)(info)) & 0xff)
+
+#define MAKE_DESCRIPTOR(client, port) ((void*)(FPTR)(((client) << 8) | (port)))
+#define GET_DESCRIPTOR_CLIENT(info) ((((int)(FPTR)(info)) >> 8) & 0xff)
+#define GET_DESCRIPTOR_PORT(info) (((int)(FPTR)(info)) & 0xff)
 
 #define BYTE unsigned char
 
@@ -201,7 +203,7 @@ static PmError alsa_write_byte(PmInternal *midi, unsigned char byte,
             /* compute relative time of event = timestamp - now + latency */
             PmTimestamp now = (midi->time_proc ? 
                                midi->time_proc(midi->time_info) : 
-                               Pt_Time(NULL));
+                               Pt_Time());
             int when = timestamp;
             /* if timestamp is zero, send immediately */
             /* otherwise compute time delay and use delay if positive */
@@ -242,8 +244,8 @@ static PmError alsa_out_close(PmInternal *midi)
     alsa_descriptor_type desc = (alsa_descriptor_type) midi->descriptor;
     if (!desc) return pmBadPtr;
 
-    if (pm_hosterror = snd_seq_disconnect_to(seq, desc->this_port, 
-                                             desc->client, desc->port)) {
+    if ((pm_hosterror = snd_seq_disconnect_to(seq, desc->this_port, 
+                                             desc->client, desc->port))) {
         // if there's an error, try to delete the port anyway, but don't
         // change the pm_hosterror value so we retain the first error
         snd_seq_delete_port(seq, desc->this_port);
@@ -332,8 +334,8 @@ static PmError alsa_in_close(PmInternal *midi)
 {
     alsa_descriptor_type desc = (alsa_descriptor_type) midi->descriptor;
     if (!desc) return pmBadPtr;
-    if (pm_hosterror = snd_seq_disconnect_from(seq, desc->this_port, 
-                                               desc->client, desc->port)) {
+    if ((pm_hosterror = snd_seq_disconnect_from(seq, desc->this_port, 
+                                               desc->client, desc->port))) {
         snd_seq_delete_port(seq, desc->this_port); /* try to close port */
     } else {
         pm_hosterror = snd_seq_delete_port(seq, desc->this_port);
@@ -433,7 +435,7 @@ static PmError alsa_write(PmInternal *midi, PmEvent *buffer, int32_t length)
 static PmError alsa_write_flush(PmInternal *midi, PmTimestamp timestamp)
 {
     alsa_descriptor_type desc = (alsa_descriptor_type) midi->descriptor;
-    VERBOSE printf("snd_seq_drain_output: 0x%x\n", (unsigned int) seq);
+    VERBOSE printf("snd_seq_drain_output: 0x%x\n", (unsigned int)(FPTR) seq);
     desc->error = snd_seq_drain_output(seq);
     if (desc->error < 0) return pmHostError;
 
@@ -744,7 +746,8 @@ PmError pm_linuxalsa_init( void )
             if (caps & SND_SEQ_PORT_CAP_SUBS_WRITE) {
                 if (pm_default_output_device_id == -1) 
                     pm_default_output_device_id = pm_descriptor_index;
-                pm_add_device("ALSA",
+				// FIXME: pm_strdup() result is leaked
+                pm_add_device((char *)"ALSA",
                               pm_strdup(snd_seq_port_info_get_name(pinfo)),
                               FALSE,
                               MAKE_DESCRIPTOR(snd_seq_port_info_get_client(pinfo),
@@ -754,7 +757,8 @@ PmError pm_linuxalsa_init( void )
             if (caps & SND_SEQ_PORT_CAP_SUBS_READ) {
                 if (pm_default_input_device_id == -1) 
                     pm_default_input_device_id = pm_descriptor_index;
-                pm_add_device("ALSA",
+				// FIXME: pm_strdup() result is leaked
+                pm_add_device((char *)"ALSA",
                               pm_strdup(snd_seq_port_info_get_name(pinfo)),
                               TRUE,
                               MAKE_DESCRIPTOR(snd_seq_port_info_get_client(pinfo),

@@ -25,11 +25,7 @@ extern "C" {
 #endif
 
 #ifndef PMEXPORT
-#ifdef _WINDLL
-#define PMEXPORT __declspec(dllexport)
-#else
 #define PMEXPORT 
-#endif
 #endif
 
 typedef enum {
@@ -66,17 +62,17 @@ PMEXPORT PtError Pt_Start(int resolution, PtCallback *callback, void *userData);
     return value:
     Upon success, returns ptNoError. See PtError for other values.
 */
-PMEXPORT PtError Pt_Stop();
+PMEXPORT PtError Pt_Stop(void);
 
 /*
     Pt_Started() returns true iff the timer is running.
 */
-PMEXPORT int Pt_Started();
+PMEXPORT int Pt_Started(void);
 
 /* 
     Pt_Time() returns the current time in ms.
 */
-PMEXPORT PtTimestamp Pt_Time();
+PMEXPORT PtTimestamp Pt_Time(void);
 
 /*
     Pt_Sleep() pauses, allowing other threads to run.

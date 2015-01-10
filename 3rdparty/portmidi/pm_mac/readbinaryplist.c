@@ -72,19 +72,21 @@ memory requested or calls longjmp, so callers don't have to check.
 */
 
 #include <sys/types.h>
+#include <sys/param.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #include <stdio.h>
 #include <sys/stat.h>
 #include "readbinaryplist.h"
+#include "osxsupport.h"
 #include <Carbon/Carbon.h>
 
 #define NO 0
 #define YES 1
 #define BOOL int
 
-#define MAXPATHLEN 256
+//#define MAXPATHLEN 256
 
 /* there are 2 levels of error logging/printing:
  *   BPLIST_LOG and BPLIST_LOG_VERBOSE
@@ -97,7 +99,8 @@ memory requested or calls longjmp, so callers don't have to check.
  * parameters like printf but might be a no-op.
  */
  
-/* #define BPLIST_LOG_VERBOSE 1 */
+#define BPLIST_LOG_VERBOSE 0
+#define BPLIST_LOG 0
 
 #if BPLIST_LOG_VERBOSE
     #ifndef BPLIST_LOG
@@ -222,7 +225,7 @@ static value_ptr extract_array(bplist_info_ptr bplist, uint64_t offset);
 static value_ptr extract_dictionary(bplist_info_ptr bplist, uint64_t offset);
 
 
-value_ptr value_create()
+value_ptr value_create(void)
 {
     value_ptr value = (value_ptr) allocate(sizeof(value_node));
     return value;
@@ -377,7 +380,8 @@ value_ptr bplist_read_file(char *filename)
     return value;
 }
 
-
+// use old Carbon method on PPC
+#ifdef OSX_PPC
 value_ptr bplist_read_pref(char *filename, OSType folder_type)
 {
     FSRef prefdir;
@@ -398,7 +402,41 @@ value_ptr bplist_read_pref(char *filename, OSType folder_type)
     strlcat(cstr, filename, MAXPATHLEN);
     return bplist_read_file(cstr);
 }
+#else
+value_ptr bplist_read_pref(char *filename, OSType folder_type)
+{
+	char cstr[MAXPATHLEN];
+	char *foundstr;
 
+	memset(cstr, 0, MAXPATHLEN);
+
+	// for later OS X, the user preferences folder (~/Library/Preferences) is not available directly from Cocoa,
+	// Apple documentation suggests just using POSIX APIs like so.
+	if (folder_type == kPreferencesFolderType)
+	{
+		strlcpy(cstr, getenv("HOME"), MAXPATHLEN);
+		strlcat(cstr, "/Library/Preferences", MAXPATHLEN);
+	}
+	else // the system preferences folder (~/Library/PreferencePanes) is accessible from Cocoa however
+	{
+		foundstr = FindPrefsDir();
+
+		if (!foundstr) {
+			bplist_log("Error finding preferences folder\n");
+			return NULL;
+		}
+
+		strlcat(cstr, foundstr, MAXPATHLEN);
+		free(foundstr);
+		foundstr = NULL;
+	}
+
+	strlcat(cstr, "/", MAXPATHLEN);
+	strlcat(cstr, filename, MAXPATHLEN);
+
+	return bplist_read_file(cstr);
+}
+#endif
 
 value_ptr bplist_read_system_pref(char *filename) {
     return bplist_read_pref(filename, kSystemPreferencesFolderType);
@@ -776,7 +814,7 @@ static value_ptr extract_data(bplist_info_ptr bplist, uint64_t offset)
         
     assert(bplist->data_bytes != NULL && offset < bplist->length);
         
-    if ((size = bplist_get_a_size(bplist, &offset, "data")) == UINT64_MAX) 
+    if ((size = bplist_get_a_size(bplist, &offset, (char *)"data")) == UINT64_MAX) 
         return NULL;
         
     value = value_create();
@@ -793,7 +831,7 @@ static value_ptr extract_ascii_string(bplist_info_ptr bplist, uint64_t offset)
         
     assert(bplist->data_bytes != NULL && offset < bplist->length);
         
-    if ((size = bplist_get_a_size(bplist, &offset, "ascii string")) ==
+    if ((size = bplist_get_a_size(bplist, &offset, (char *)"ascii string")) ==
         UINT64_MAX) 
         return NULL;
 
@@ -812,7 +850,7 @@ static value_ptr extract_unicode_string(bplist_info_ptr bplist, uint64_t offset)
         
     assert(bplist->data_bytes != NULL && offset < bplist->length);
         
-    if ((size = bplist_get_a_size(bplist, &offset, "unicode string")) == 
+    if ((size = bplist_get_a_size(bplist, &offset, (char *)"unicode string")) == 
         UINT64_MAX)
         return NULL;
         
@@ -873,7 +911,7 @@ static value_ptr extract_array(bplist_info_ptr bplist, uint64_t offset)
         
     assert(bplist->data_bytes != NULL && offset < bplist->length);
         
-    if ((count = bplist_get_a_size(bplist, &offset, "array")) == UINT64_MAX)
+    if ((count = bplist_get_a_size(bplist, &offset, (char *)"array")) == UINT64_MAX)
         return NULL;
         
     if (count > UINT64_MAX / bplist->object_ref_size - offset) {
@@ -935,7 +973,7 @@ static value_ptr extract_dictionary(bplist_info_ptr bplist, uint64_t offset)
     assert(bplist->data_bytes != NULL && offset < bplist->length);
         
         
-    if ((count = bplist_get_a_size(bplist, &offset, "array")) == UINT64_MAX)
+    if ((count = bplist_get_a_size(bplist, &offset, (char *)"array")) == UINT64_MAX)
         return NULL;
 
     if (count > UINT64_MAX / (bplist->object_ref_size * 2) - offset) {

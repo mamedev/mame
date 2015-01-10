@@ -941,7 +941,7 @@ PmError pm_macosxcm_init(void)
     /* Initialize the client handle */
     macHostError = MIDIClientCreate(CFSTR("PortMidi"), NULL, NULL, &client);
     if (macHostError != noErr) {
-        error_text = "MIDIClientCreate() in pm_macosxcm_init()";
+        error_text = (char *)"MIDIClientCreate() in pm_macosxcm_init()";
         goto error_return;
     }
 
@@ -949,14 +949,14 @@ PmError pm_macosxcm_init(void)
     macHostError = MIDIInputPortCreate(client, CFSTR("Input port"), readProc,
                                           NULL, &portIn);
     if (macHostError != noErr) {
-        error_text = "MIDIInputPortCreate() in pm_macosxcm_init()";
+        error_text = (char *)"MIDIInputPortCreate() in pm_macosxcm_init()";
         goto error_return;
     }
         
     /* Create the output port */
     macHostError = MIDIOutputPortCreate(client, CFSTR("Output port"), &portOut);
     if (macHostError != noErr) {
-        error_text = "MIDIOutputPortCreate() in pm_macosxcm_init()";
+        error_text = (char *)"MIDIOutputPortCreate() in pm_macosxcm_init()";
         goto error_return;
     }
 
@@ -972,7 +972,7 @@ PmError pm_macosxcm_init(void)
             pm_default_input_device_id = pm_descriptor_index;
         
         /* Register this device with PortMidi */
-        pm_add_device("CoreMIDI", cm_get_full_endpoint_name(endpoint),
+        pm_add_device((char *)"CoreMIDI", cm_get_full_endpoint_name(endpoint),
                       TRUE, (void *) (long) endpoint, &pm_macosx_in_dictionary);
     }
 
@@ -988,7 +988,7 @@ PmError pm_macosxcm_init(void)
             pm_default_output_device_id = pm_descriptor_index;
 
         /* Register this device with PortMidi */
-        pm_add_device("CoreMIDI", cm_get_full_endpoint_name(endpoint),
+        pm_add_device((char *)"CoreMIDI", cm_get_full_endpoint_name(endpoint),
                       FALSE, (void *) (long) endpoint,
                       &pm_macosx_out_dictionary);
     }

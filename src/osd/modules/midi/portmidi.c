@@ -6,7 +6,7 @@
 
 *******************************************************************c********/
 
-#include "portmidi/portmidi.h"
+#include "portmidi/pm_common/portmidi.h"
 #include "osdcore.h"
 
 static const int RX_EVENT_BUF_SIZE = 512;

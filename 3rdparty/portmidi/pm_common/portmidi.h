@@ -106,11 +106,11 @@ typedef unsigned int uint32_t;
 #endif
 #endif
 
-#ifdef _WINDLL
-#define PMEXPORT __declspec(dllexport)
-#else
+//#ifdef _WINDLL
+//#define PMEXPORT __declspec(dllexport)
+//#else
 #define PMEXPORT 
-#endif
+//#endif
 
 #ifndef FALSE
     #define FALSE 0

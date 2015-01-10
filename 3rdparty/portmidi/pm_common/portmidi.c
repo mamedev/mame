@@ -144,7 +144,7 @@ int pm_find_default_device(char *pattern, int is_input)
     int id = pmNoDevice;
     int i;
     /* first parse pattern into name, interf parts */
-    char *interf_pref = ""; /* initially assume it is not there */
+    char *interf_pref = (char *)""; /* initially assume it is not there */
     char *name_pref = strstr(pattern, ", ");
 
     if (name_pref) { /* found separator, adjust the pointer */
