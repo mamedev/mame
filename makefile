@@ -420,6 +420,9 @@ EMULATOR = $(FULLNAME)$(EXE)
 # all sources are under the src/ directory
 SRC = src
 
+# all 3rd party sources are under the 3rdparty/ directory
+3RDPARTY = 3rdparty
+
 # build the targets in different object dirs, so they can co-exist
 OBJ = obj/$(PREFIX)$(OSD)$(SUFFIX)$(SUFFIX64)$(SUFFIXDEBUG)$(SUFFIXPROFILE)
 
