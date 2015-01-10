@@ -642,6 +642,7 @@ INCPATH += \
 	-I$(OBJ)/emu/layout \
 	-I$(SRC)/lib/util \
 	-I$(SRC)/lib \
+	-I$(3RDPARTY) \
 	-I$(SRC)/osd \
 	-I$(SRC)/osd/$(OSD) \
 

@@ -573,6 +573,6 @@ ifeq ($(TARGETOS),linux)
 LIBS += -ldl
 endif
 
-$(LIBOBJ)/sqlite3/sqlite3.o: $(LIBSRC)/sqlite3/sqlite3.c | $(OSPREBUILD)
+$(LIBOBJ)/sqlite3/sqlite3.o: $(3RDPARTY)/sqlite3/sqlite3.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CONLYFLAGS) -Wno-bad-function-cast -I$(LIBSRC)/sqlite3 $(SQLITE3_FLAGS) -c $< -o $@
+	$(CC) $(CDEFS) $(CONLYFLAGS) -Wno-bad-function-cast -I$(3RDPARTY)/sqlite3 $(SQLITE3_FLAGS) -c $< -o $@
