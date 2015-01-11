@@ -296,7 +296,7 @@ ioport_constructor nes_karaokestudio_device::device_input_ports() const
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START(karaoke_studio_cart)
-	SLOT_INTERFACE("ks_exp", NES_KSEXPANSION_ROM)
+	SLOT_INTERFACE_INTERNAL("ks_exp", NES_KSEXPANSION_ROM)
 SLOT_INTERFACE_END
 
 

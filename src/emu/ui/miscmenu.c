@@ -120,7 +120,7 @@ device_slot_option *ui_menu_slot_devices::slot_get_current_option(device_slot_in
 	else
 	{
 		astring temp;
-		current = machine().options().main_value(temp,slot->device().tag()+1);
+		current = machine().options().main_value(temp, slot->device().tag() + 1);
 	}
 
 	return slot->option(current);
@@ -154,11 +154,9 @@ int ui_menu_slot_devices::slot_get_current_index(device_slot_interface *slot)
 -------------------------------------------------*/
 int ui_menu_slot_devices::slot_get_length(device_slot_interface *slot)
 {
-	const device_slot_option *current = slot_get_current_option(slot);
-
 	int val = 0;
 	for (const device_slot_option *option = slot->first_option(); option != NULL; option = option->next())
-		if (option == current || option->selectable())
+		if (option->selectable())
 			val++;
 
 	return val;
@@ -203,9 +201,7 @@ const char *ui_menu_slot_devices::slot_get_prev(device_slot_interface *slot)
 -------------------------------------------------*/
 const char *ui_menu_slot_devices::slot_get_option(device_slot_interface *slot, int index)
 {
-	const device_slot_option *current = slot_get_current_option(slot);
-
-	if (index >= 0 )
+	if (index >= 0)
 	{
 		int val = 0;
 		for (const device_slot_option *option = slot->first_option(); option != NULL; option = option->next())
@@ -213,7 +209,7 @@ const char *ui_menu_slot_devices::slot_get_option(device_slot_interface *slot, i
 			if (val == index)
 				return option->name();
 
-			if (option == current || option->selectable())
+			if (option->selectable())
 				val++;
 		}
 	}
@@ -251,8 +247,17 @@ void ui_menu_slot_devices::populate()
 	{
 		/* record the menu item */
 		const device_slot_option *option = slot_get_current_option(slot);
+		astring opt_name;
+		if (option == NULL)
+			opt_name.cpy("------");
+		else
+		{
+			opt_name.cpy(option->name());
+			if (slot->fixed() || slot_get_length(slot) == 0)
+				opt_name.cat(" [internal]");
+		}
 
-		item_append(slot->device().tag()+1, option == NULL ? "------" : option->name(), (slot->fixed() || slot_get_length(slot) == 0) ? 0 : (MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW), (void *)slot);
+		item_append(slot->device().tag() + 1, opt_name, (slot->fixed() || slot_get_length(slot) == 0) ? 0 : (MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW), (void *)slot);
 	}
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 	item_append("Reset",  NULL, 0, (void *)1);
