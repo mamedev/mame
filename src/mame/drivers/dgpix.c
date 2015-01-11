@@ -159,14 +159,19 @@ class dgpix_state : public driver_device
 public:
 	dgpix_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_vblank(*this, "VBLANK") { }
 
+	required_device<cpu_device> m_maincpu;
+	required_ioport m_vblank;
+	
 	UINT32 *m_vram;
 	int m_vbuffer;
 	int m_flash_roms;
 	int m_old_vbuf;
 	UINT32 m_flash_cmd;
 	INT32 m_first_offset;
+	
 	DECLARE_READ32_MEMBER(flash_r);
 	DECLARE_WRITE32_MEMBER(flash_w);
 	DECLARE_WRITE32_MEMBER(vram_w);
@@ -174,16 +179,19 @@ public:
 	DECLARE_WRITE32_MEMBER(vbuffer_w);
 	DECLARE_WRITE32_MEMBER(coin_w);
 	DECLARE_READ32_MEMBER(vblank_r);
+	
 	DECLARE_DRIVER_INIT(elfin);
 	DECLARE_DRIVER_INIT(jumpjump);
 	DECLARE_DRIVER_INIT(xfiles);
 	DECLARE_DRIVER_INIT(xfilesk);
 	DECLARE_DRIVER_INIT(kdynastg);
 	DECLARE_DRIVER_INIT(fmaniac3);
+	
+	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	
 	UINT32 screen_update_dgpix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -307,7 +315,7 @@ READ32_MEMBER(dgpix_state::vblank_r)
 {
 	/* burn a bunch of cycles because this is polled frequently during busy loops */
 	space.device().execute().eat_cycles(100);
-	return ioport("VBLANK")->read();
+	return m_vblank->read();
 }
 
 static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 32, dgpix_state )
@@ -390,6 +398,14 @@ UINT32 dgpix_state::screen_update_dgpix(screen_device &screen, bitmap_ind16 &bit
 	}
 
 	return 0;
+}
+
+void dgpix_state::machine_start()
+{
+	save_item(NAME(m_vbuffer));
+	save_item(NAME(m_flash_cmd));
+	save_item(NAME(m_first_offset));
+	save_item(NAME(m_old_vbuf));
 }
 
 void dgpix_state::machine_reset()
@@ -666,9 +682,9 @@ DRIVER_INIT_MEMBER(dgpix_state,fmaniac3)
 	m_flash_roms = 2;
 }
 
-GAME( 1999, elfin,          0, dgpix, dgpix, dgpix_state, elfin,    ROT0, "dgPIX Entertainment Inc.", "Elfin",                             GAME_NO_SOUND )
-GAME( 1999, jumpjump,       0, dgpix, dgpix, dgpix_state, jumpjump, ROT0, "dgPIX Entertainment Inc.", "Jump Jump",                         GAME_NO_SOUND )
-GAME( 1999, xfiles,         0, dgpix, dgpix, dgpix_state, xfiles,   ROT0, "dgPIX Entertainment Inc.", "The X-Files",                       GAME_NO_SOUND )
-GAME( 1999, xfilesk,   xfiles, dgpix, dgpix, dgpix_state, xfilesk,  ROT0, "dgPIX Entertainment Inc.", "The X-Files (Censored, Korea)",     GAME_NO_SOUND )
-GAME( 1999, kdynastg,       0, dgpix, dgpix, dgpix_state, kdynastg, ROT0, "EZ Graphics",              "King of Dynast Gear (version 1.8)", GAME_NO_SOUND )
-GAME( 2002, fmaniac3,       0, dgpix, dgpix, dgpix_state, fmaniac3, ROT0, "Saero Entertainment",      "Fishing Maniac 3",                  GAME_NO_SOUND )
+GAME( 1999, elfin,          0, dgpix, dgpix, dgpix_state, elfin,    ROT0, "dgPIX Entertainment Inc.", "Elfin",                             GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1999, jumpjump,       0, dgpix, dgpix, dgpix_state, jumpjump, ROT0, "dgPIX Entertainment Inc.", "Jump Jump",                         GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1999, xfiles,         0, dgpix, dgpix, dgpix_state, xfiles,   ROT0, "dgPIX Entertainment Inc.", "The X-Files",                       GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1999, xfilesk,   xfiles, dgpix, dgpix, dgpix_state, xfilesk,  ROT0, "dgPIX Entertainment Inc.", "The X-Files (Censored, Korea)",     GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1999, kdynastg,       0, dgpix, dgpix, dgpix_state, kdynastg, ROT0, "EZ Graphics",              "King of Dynast Gear (version 1.8)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2002, fmaniac3,       0, dgpix, dgpix, dgpix_state, fmaniac3, ROT0, "Saero Entertainment",      "Fishing Maniac 3",                  GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
