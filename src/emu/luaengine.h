@@ -24,10 +24,11 @@
 #undef None
 #endif
 
-#include "lua.hpp"
-#include "luabridge/Source/LuaBridge/LuaBridge.h"
-
 struct lua_State;
+namespace luabridge
+{
+	class LuaRef;
+}
 
 class lua_engine
 {
