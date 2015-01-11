@@ -961,3 +961,21 @@ void lua_engine::start()
 {
 	resume(m_lua_state);
 }
+
+
+//**************************************************************************
+//  LuaBridge Stack specializations
+//**************************************************************************
+
+namespace luabridge {
+	template <>
+	struct Stack <UINT64> {
+		static inline void push (lua_State* L, UINT64 value) {
+			lua_pushunsigned(L, static_cast <lua_Unsigned> (value));
+		}
+
+		static inline UINT64 get (lua_State* L, int index) {
+			return static_cast <UINT64> (luaL_checkunsigned (L, index));
+		}
+	};
+}
