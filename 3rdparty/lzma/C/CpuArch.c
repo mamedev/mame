@@ -72,16 +72,28 @@ static void MyCPUID(UInt32 function, UInt32 *a, UInt32 *b, UInt32 *c, UInt32 *d)
 
   #else
 
-  __asm__ __volatile__ (
-    "cpuid"
-    : "=a" (*a) ,
-      "=b" (*b) ,
-      "=c" (*c) ,
-      "=d" (*d)
-    : "0" (function)) ;
-
-  #endif
+	#ifdef __PIC__
+	__asm__ __volatile__ (
+	"mov %%ebx, %%edi;"
+	"cpuid;"
+	"xchgl %%ebx, %%edi;"
+	: "=a" (*a) ,
+		"=D" (*b) , /* edi */
+		"=c" (*c) ,
+		"=d" (*d)
+	: "0" (function)) ;
+	#else   // __PIC__
+	__asm__ __volatile__ (
+	"cpuid"
+	: "=a" (*a) ,
+		"=b" (*b) ,
+		"=c" (*c) ,
+		"=d" (*d)
+	: "0" (function)) ;
+	#endif  // __PIC__
   
+	#endif
+
   #else
 
   int CPUInfo[4];
@@ -123,7 +135,7 @@ int x86cpuid_GetFirm(const Cx86cpuid *p)
   return -1;
 }
 
-Bool CPU_Is_InOrder()
+Bool CPU_Is_InOrder(void)
 {
   Cx86cpuid p;
   int firm;
@@ -142,8 +154,8 @@ Bool CPU_Is_InOrder()
   return True;
 }
 
-#if !defined(MY_CPU_AMD64) && defined(_WIN32)
-static Bool CPU_Sys_Is_SSE_Supported()
+#if !defined(MY_CPU_AMD64) && defined(_WIN32_7Z)
+static Bool CPU_Sys_Is_SSE_Supported(void)
 {
   OSVERSIONINFO vi;
   vi.dwOSVersionInfoSize = sizeof(vi);
@@ -156,7 +168,7 @@ static Bool CPU_Sys_Is_SSE_Supported()
 #define CHECK_SYS_SSE_SUPPORT
 #endif
 
-Bool CPU_Is_Aes_Supported()
+Bool CPU_Is_Aes_Supported(void)
 {
   Cx86cpuid p;
   CHECK_SYS_SSE_SUPPORT

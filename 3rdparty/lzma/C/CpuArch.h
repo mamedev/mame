@@ -20,7 +20,7 @@ If MY_CPU_LE_UNALIGN is not defined, we don't know about these properties of pla
 #define MY_CPU_AMD64
 #endif
 
-#if defined(MY_CPU_AMD64) || defined(_M_IA64)
+#ifdef PTR64
 #define MY_CPU_64BIT
 #endif
 
@@ -36,11 +36,11 @@ If MY_CPU_LE_UNALIGN is not defined, we don't know about these properties of pla
 #define MY_CPU_32BIT
 #endif
 
-#if defined(_WIN32) && defined(_M_ARM)
+#if defined(_WIN32_7Z) && defined(_M_ARM)
 #define MY_CPU_ARM_LE
 #endif
 
-#if defined(_WIN32) && defined(_M_IA64)
+#if defined(_WIN32_7Z) && defined(_M_IA64)
 #define MY_CPU_IA64_LE
 #endif
 
@@ -52,7 +52,7 @@ If MY_CPU_LE_UNALIGN is not defined, we don't know about these properties of pla
 #define MY_CPU_LE
 #endif
 
-#if defined(__BIG_ENDIAN__) || defined(__m68k__) ||  defined(__ARMEB__) || defined(__MIPSEB__)
+#ifdef BIGENDIAN
 #define MY_CPU_BE
 #endif
 
@@ -97,7 +97,8 @@ Stop_Compiling_Bad_Endian
 
 #endif
 
-#if defined(MY_CPU_LE_UNALIGN) && defined(_WIN64) && (_MSC_VER >= 1300)
+#if defined(MY_CPU_LE_UNALIGN) && defined(_WIN64) && (defined(_MSC_VER) && (_MSC_VER >= 1300))
+#include <stdlib.h>
 
 #pragma intrinsic(_byteswap_ulong)
 #pragma intrinsic(_byteswap_uint64)
@@ -145,8 +146,8 @@ int x86cpuid_GetFirm(const Cx86cpuid *p);
 #define x86cpuid_GetModel(p) (((p)->ver >> 4) & 0xF00F)
 #define x86cpuid_GetStepping(p) ((p)->ver & 0xF)
 
-Bool CPU_Is_InOrder();
-Bool CPU_Is_Aes_Supported();
+Bool CPU_Is_InOrder(void);
+Bool CPU_Is_Aes_Supported(void);
 
 #endif
 

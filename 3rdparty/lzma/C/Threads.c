@@ -1,7 +1,7 @@
 /* Threads.c -- multithreading library
 2009-09-20 : Igor Pavlov : Public domain */
 
-#ifndef _WIN32_WCE
+#ifndef _WIN32_7Z_WCE
 #include <process.h>
 #endif
 
