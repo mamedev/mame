@@ -17,9 +17,9 @@
 
 #include "osdcore.h"
 
-#include "../lib7z/7z.h"
-#include "../lib7z/7zCrc.h"
-#include "../lib7z/7zVersion.h"
+#include "../../3rdparty/lzma/C/7z.h"
+#include "../../3rdparty/lzma/C/7zCrc.h"
+#include "../../3rdparty/lzma/C/7zVersion.h"
 
 
 void *SZipAlloc(void *p, size_t size);
