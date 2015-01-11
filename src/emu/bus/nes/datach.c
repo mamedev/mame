@@ -372,8 +372,8 @@ WRITE8_MEMBER(nes_datach_device::write_h)
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START(datach_cart)
-	SLOT_INTERFACE("datach_rom", NES_DATACH_ROM)
-	SLOT_INTERFACE("datach_ep1", NES_DATACH_24C01)
+	SLOT_INTERFACE_INTERNAL("datach_rom", NES_DATACH_ROM)
+	SLOT_INTERFACE_INTERNAL("datach_ep1", NES_DATACH_24C01)
 SLOT_INTERFACE_END
 
 
