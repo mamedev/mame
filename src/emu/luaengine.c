@@ -436,6 +436,46 @@ luabridge::LuaRef lua_engine::l_dev_get_memspaces(const device_t *d)
 }
 
 //-------------------------------------------------
+//  device_get_state - return table of available state userdata
+//  -> manager:machine().devices[":maincpu"].state
+//-------------------------------------------------
+
+luabridge::LuaRef lua_engine::l_dev_get_states(const device_t *d)
+{
+	device_t *dev = const_cast<device_t *>(d);
+	lua_State *L = luaThis->m_lua_state;
+	luabridge::LuaRef st_table = luabridge::LuaRef::newTable(L);
+	for (const device_state_entry *s = dev->state().state_first(); s != NULL; s = s->next()) {
+		// XXX: refrain from exporting non-visible entries?
+		if (s) {
+			st_table[s->symbol()] = const_cast<device_state_entry *>(s);
+		}
+	}
+
+	return st_table;
+}
+
+//-------------------------------------------------
+//  state_get_value - return value of a devices state
+//  -> manager:machine().devices[":maincpu"].state["PC"].value
+//-------------------------------------------------
+
+UINT64 lua_engine::l_state_get_value(const device_state_entry *d)
+{
+	return d->value();
+}
+
+//-------------------------------------------------
+//  state_set_value - set value of a devices state
+//  -> manager:machine().devices[":maincpu"].state["D0"].value = 0x0c00
+//-------------------------------------------------
+
+void lua_engine::l_state_set_value(device_state_entry *d, UINT64 val)
+{
+	d->set_value(val);
+}
+
+//-------------------------------------------------
 //  mem_read - templated memory readers for <sign>,<size>
 //  -> manager:machine().devices[":maincpu"].spaces["program"]:read_i8(0xC000)
 //-------------------------------------------------
@@ -831,6 +871,7 @@ void lua_engine::initialize()
 				.addFunction ("shortname", &device_t::shortname)
 				.addFunction ("tag", &device_t::tag)
 				.addProperty <luabridge::LuaRef, void> ("spaces", &lua_engine::l_dev_get_memspaces)
+				.addProperty <luabridge::LuaRef, void> ("state", &lua_engine::l_dev_get_states)
 			.endClass()
 			.beginClass <lua_addr_space> ("lua_addr_space")
 				.addCFunction ("read_i8", &lua_addr_space::l_mem_read<INT8>)
@@ -856,6 +897,12 @@ void lua_engine::initialize()
 				.addFunction ("tag", &screen_device::tag)
 				.addFunction ("height", &screen_device::height)
 				.addFunction ("width", &screen_device::width)
+			.endClass()
+			.beginClass <device_state_entry> ("dev_space")
+				.addFunction ("name", &device_state_entry::symbol)
+				.addProperty <UINT64, UINT64> ("value", &lua_engine::l_state_get_value, &lua_engine::l_state_set_value)
+				.addFunction ("is_visible", &device_state_entry::visible)
+				.addFunction ("is_divider", &device_state_entry::divider)
 			.endClass()
 		.endNamespace();
 
