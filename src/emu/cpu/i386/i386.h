@@ -5,8 +5,8 @@
 #ifndef __I386INTF_H__
 #define __I386INTF_H__
 
-#include "../../../../3rdparty/softfloat/milieu.h"
-#include "../../../../3rdparty/softfloat/softfloat.h"
+#include "softfloat/milieu.h"
+#include "softfloat/softfloat.h"
 #include "debug/debugcpu.h"
 #include "cpu/vtlb.h"
 
