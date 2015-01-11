@@ -74,7 +74,7 @@ typedef struct value_struct {
 value_ptr bplist_read_file(char *filename);
 value_ptr bplist_read_user_pref(char *filename);
 value_ptr bplist_read_system_pref(char *filename);
-void bplist_free_data();
+void bplist_free_data(void);
 
 /*************** functions for accessing values ****************/
 
