@@ -335,7 +335,7 @@ void debugger_qt::wait_for_debugger(device_t &device, bool firststop)
 		gather_save_configurations();
 	}
 #if defined(WIN32) && !defined(SDLMAME_WIN32)
-		winwindow_update_cursor_state(device.machine()); // make sure the cursor isn't hidden while in debugger
+		winwindow_update_cursor_state(*m_machine); // make sure the cursor isn't hidden while in debugger
 #endif
 }
 
