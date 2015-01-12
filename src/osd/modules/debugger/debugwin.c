@@ -257,7 +257,7 @@ void debugger_windows::wait_for_debugger(device_t &device, bool firststop)
 
 	// create a console window
 	if (main_console == NULL)
-		console_create_window(m_osd.machine());
+		console_create_window(*m_machine);
 
 	// update the views in the console to reflect the current CPU
 	if (main_console != NULL)
@@ -276,7 +276,7 @@ void debugger_windows::wait_for_debugger(device_t &device, bool firststop)
 	smart_show_all(TRUE);
 
 	// run input polling to ensure that our status is in sync
-	wininput_poll(m_osd.machine());
+	wininput_poll(*m_machine);
 
 	// get and process messages
 	GetMessage(&message, NULL, 0, 0);
@@ -294,7 +294,7 @@ void debugger_windows::wait_for_debugger(device_t &device, bool firststop)
 
 		// process everything else
 		default:
-			winwindow_dispatch_message(m_osd.machine(), &message);
+			winwindow_dispatch_message(*m_machine, &message);
 			break;
 	}
 
@@ -368,10 +368,11 @@ static int debugwin_seq_pressed(running_machine &machine)
 //  debugwin_init_windows
 //============================================================
 
-void debugger_windows::init_debugger()
+void debugger_windows::init_debugger(running_machine &machine)
 {
 	static int class_registered;
 
+	m_machine = &machine;
 	// register the window classes
 	if (!class_registered)
 	{
@@ -414,7 +415,7 @@ void debugger_windows::init_debugger()
 
 		if (temp_dc != NULL)
 		{
-			windows_options &options = downcast<windows_options &>(m_osd.machine().options());
+			windows_options &options = downcast<windows_options &>(m_machine->options());
 			int size = options.debugger_font_size();
 			TCHAR *t_face;
 
@@ -474,15 +475,15 @@ void debugger_windows::debugger_exit()
 void debugger_windows::debugger_update()
 {
 	// if we're running live, do some checks
-	if (!winwindow_has_focus() && !debug_cpu_is_stopped(m_osd.machine()) && m_osd.machine().phase() == MACHINE_PHASE_RUNNING)
+	if (!winwindow_has_focus() && !debug_cpu_is_stopped(*m_machine) && m_machine->phase() == MACHINE_PHASE_RUNNING)
 	{
 		// see if the interrupt key is pressed and break if it is
-		if (debugwin_seq_pressed(m_osd.machine()))
+		if (debugwin_seq_pressed(*m_machine))
 		{
 			HWND focuswnd = GetFocus();
 			debugwin_info *info;
 
-			debug_cpu_get_visible_cpu(m_osd.machine())->debug()->halt_on_next_instruction("User-initiated break\n");
+			debug_cpu_get_visible_cpu(*m_machine)->debug()->halt_on_next_instruction("User-initiated break\n");
 
 			// if we were focused on some window's edit box, reset it to default
 			for (info = window_list; info != NULL; info = info->next)

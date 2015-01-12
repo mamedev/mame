@@ -432,6 +432,7 @@ OSDOBJS = \
 	$(SDLOBJ)/window.o \
 	$(SDLOBJ)/output.o \
 	$(SDLOBJ)/watchdog.o \
+	$(OSDOBJ)/modules/lib/osdobj_common.o  \
 
 ifdef NO_USE_MIDI
 	OSDOBJS += $(OSDOBJ)/modules/midi/none.o

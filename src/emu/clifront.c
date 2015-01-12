@@ -791,9 +791,7 @@ void cli_frontend::listmididevices(const char *gamename)
 
 void cli_frontend::listnetworkadapters(const char *gamename)
 {
-	m_osd.network_init();
-	osd_list_network_adapters();
-	m_osd.network_exit();
+    m_osd.list_network_adapters();
 }
 
 

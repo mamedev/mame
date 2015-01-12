@@ -73,7 +73,7 @@ const osd_debugger_type OSD_DEBUGGER_OSX = &osd_debugger_creator<debugger_osx>;
 //  debugger_osx - constructor
 //-------------------------------------------------
 debugger_osx::debugger_osx(const osd_interface &osd)
-	: osd_debugger_interface(osd)
+	: osd_debugger_interface(osd), m_machine(NULL)
 {
 }
 
@@ -81,8 +81,9 @@ debugger_osx::debugger_osx(const osd_interface &osd)
 //  debugger_osx::init_debugger
 //============================================================
 
-void debugger_osx::init_debugger()
+void debugger_osx::init_debugger(running_machine &machine)
 {
+    m_machine = &machine;
 }
 
 //============================================================
@@ -93,7 +94,7 @@ void debugger_osx::wait_for_debugger(device_t &device, bool firststop)
 {
 	// create a console window
 	if (main_console == nil)
-		console_create_window(m_osd.machine());
+		console_create_window(*m_machine);
 
 	// make sure the debug windows are visible
 	waiting_for_debugger = YES;

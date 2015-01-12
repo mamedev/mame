@@ -401,7 +401,7 @@ sdl_osd_interface::~sdl_osd_interface()
 
 void sdl_osd_interface::osd_exit()
 {
-	osd_interface::osd_exit();
+	osd_common_t::osd_exit();
 
 	if (!SDLMAME_INIT_IN_WORKER_THREAD)
 	{
@@ -585,7 +585,7 @@ void sdl_osd_interface::debugger_register()
 void sdl_osd_interface::init(running_machine &machine)
 {
 	// call our parent
-	osd_interface::init(machine);
+	osd_common_t::init(machine);
 
 	sdl_options &options = downcast<sdl_options &>(machine.options());
 	const char *stemp;
@@ -681,7 +681,7 @@ void sdl_osd_interface::init(running_machine &machine)
 			exit(-1);
 		}
 
-	osd_interface::init_subsystems();
+	osd_common_t::init_subsystems();
 
 	if (options.oslog())
 		machine.add_logerror_callback(output_oslog);
@@ -1439,27 +1439,4 @@ bool sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, bitma
 #endif
 #endif
 
-//-------------------------------------------------
-// FIXME: Doesn't belong here but there's no better
-//        place currently.
-//-------------------------------------------------
 
-bool osd_interface::midi_init()
-{
-    // this should be done on the OS_level
-    return osd_midi_init();
-}
-
-//-------------------------------------------------
-//  list_midi_devices - list available midi devices
-//-------------------------------------------------
-
-void osd_interface::list_midi_devices(void)
-{
-    osd_list_midi_devices();
-}
-
-void osd_interface::midi_exit()
-{
-    osd_midi_exit();
-}

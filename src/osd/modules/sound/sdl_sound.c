@@ -80,14 +80,14 @@ const osd_sound_type OSD_SOUND_SDL = &osd_sound_creator<sound_sdl>;
 //-------------------------------------------------
 //  sound_sdl - constructor
 //-------------------------------------------------
-sound_sdl::sound_sdl(const osd_interface &osd)
-	: osd_sound_interface(osd)
+sound_sdl::sound_sdl(const osd_interface &osd, running_machine &machine)
+	: osd_sound_interface(osd, machine)
 {
 	if (LOG_SOUND)
 		sound_log = fopen(SDLMAME_SOUND_LOG, "w");
 
 	// skip if sound disabled
-	if (osd.machine().sample_rate() != 0)
+	if (m_machine.sample_rate() != 0)
 	{
 		if (initialized_audio)
 		{
@@ -95,7 +95,7 @@ sound_sdl::sound_sdl(const osd_interface &osd)
 		}
 
 		// attempt to initialize SDL
-		if (sdl_init(osd.machine()))
+		if (sdl_init(m_machine))
 			return;
 
 		// set the startup volume
@@ -112,11 +112,11 @@ sound_sdl::sound_sdl(const osd_interface &osd)
 sound_sdl::~sound_sdl()
 {
 	// if nothing to do, don't do it
-	if (m_osd.machine().sample_rate() == 0)
+	if (m_machine.sample_rate() == 0)
 		return;
 
 	// kill the buffers and dsound
-	sdl_kill(m_osd.machine());
+	sdl_kill(m_machine);
 	sdl_destroy_buffers();
 
 	// print out over/underflow stats
@@ -267,7 +267,7 @@ static void copy_sample_data(running_machine &machine, const INT16 *data, int by
 void sound_sdl::update_audio_stream(const INT16 *buffer, int samples_this_frame)
 {
 	// if nothing to do, don't do it
-	if (m_osd.machine().sample_rate() != 0 && stream_buffer)
+	if (m_machine.sample_rate() != 0 && stream_buffer)
 	{
 		int bytes_this_frame = samples_this_frame * sizeof(INT16) * 2;
 		int play_position, write_position, stream_in;
@@ -275,7 +275,7 @@ void sound_sdl::update_audio_stream(const INT16 *buffer, int samples_this_frame)
 
 		play_position = stream_playpos;
 
-		write_position = stream_playpos + ((m_osd.machine().sample_rate() / 50) * sizeof(INT16) * 2);
+		write_position = stream_playpos + ((m_machine.sample_rate() / 50) * sizeof(INT16) * 2);
 		orig_write = write_position;
 
 		if (!stream_in_initialized)
@@ -336,7 +336,7 @@ void sound_sdl::update_audio_stream(const INT16 *buffer, int samples_this_frame)
 
 		// now we know where to copy; let's do it
 		stream_buffer_in = stream_in;
-		copy_sample_data(m_osd.machine(), buffer, bytes_this_frame);
+		copy_sample_data(m_machine, buffer, bytes_this_frame);
 	}
 }
 

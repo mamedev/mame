@@ -378,6 +378,7 @@ OSDOBJS = \
 	$(WINOBJ)/winmenu.o \
 	$(WINOBJ)/winmain.o \
 	$(OSDOBJ)/modules/midi/portmidi.o \
+	$(OSDOBJ)/modules/lib/osdobj_common.o  \
 
 ifdef USE_SDL
 OSDOBJS += \

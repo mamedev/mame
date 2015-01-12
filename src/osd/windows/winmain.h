@@ -8,6 +8,7 @@
 
 #include "clifront.h"
 #include "osdepend.h"
+#include "modules/lib/osdobj_common.h"
 
 
 //============================================================
@@ -234,7 +235,7 @@ private:
 //  TYPE DEFINITIONS
 //============================================================
 
-class windows_osd_interface : public osd_interface
+class windows_osd_interface : public osd_common_t
 {
 public:
 	// construction/destruction

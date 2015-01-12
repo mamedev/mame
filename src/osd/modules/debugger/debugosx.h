@@ -18,6 +18,7 @@
 // MAME headers
 #include "emu.h"
 #include "debug/debugvw.h"
+#include "modules/lib/osdobj_common.h"
 
 
 #ifdef __OBJC__
@@ -373,10 +374,12 @@ public:
 	debugger_osx(const osd_interface &osd);
 	virtual ~debugger_osx() { }
 
-	virtual void init_debugger();
+	virtual void init_debugger(running_machine &machine);
 	virtual void wait_for_debugger(device_t &device, bool firststop);
 	virtual void debugger_update();
 	virtual void debugger_exit();
+private:
+	running_machine *m_machine;
 };
 
 extern const osd_debugger_type OSD_DEBUGGER_OSX;

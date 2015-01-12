@@ -14,12 +14,13 @@
 #define __SOUND_NONE_H__
 
 #include "osdepend.h"
+#include "modules/lib/osdobj_common.h"
 
 class sound_none : public osd_sound_interface
 {
 public:
 	// construction/destruction
-	sound_none(const osd_interface &osd);
+	sound_none(const osd_interface &osd, running_machine &machine);
 	virtual ~sound_none() { }
 
 	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame) { }

@@ -572,7 +572,7 @@ void windows_osd_interface::debugger_register()
 void windows_osd_interface::init(running_machine &machine)
 {
 	// call our parent
-	osd_interface::init(machine);
+	osd_common_t::init(machine);
 
 	const char *stemp;
 	windows_options &options = downcast<windows_options &>(machine.options());
@@ -619,7 +619,7 @@ void windows_osd_interface::init(running_machine &machine)
 	}
 
 	// initialize the subsystems
-	osd_interface::init_subsystems();
+	osd_common_t::init_subsystems();
 
 	// notify listeners of screen configuration
 	astring tempstring;
@@ -680,7 +680,7 @@ void windows_osd_interface::osd_exit()
 	// cleanup sockets
 	win_cleanup_sockets();
 
-	osd_interface::osd_exit();
+	osd_common_t::osd_exit();
 
 	// take down the watchdog thread if it exists
 	if (watchdog_thread != NULL)
@@ -1823,29 +1823,4 @@ void sampling_profiler::thread_run()
 		// sleep for 1ms
 		Sleep(1);
 	}
-}
-
-//-------------------------------------------------
-// FIXME: Doesn't belong here but there's no better
-//        place currently.
-//-------------------------------------------------
-
-bool osd_interface::midi_init()
-{
-    // this should be done on the OS_level
-    return osd_midi_init();
-}
-
-//-------------------------------------------------
-//  list_midi_devices - list available midi devices
-//-------------------------------------------------
-
-void osd_interface::list_midi_devices(void)
-{
-    osd_list_midi_devices();
-}
-
-void osd_interface::midi_exit()
-{
-    osd_midi_exit();
 }

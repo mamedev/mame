@@ -5,6 +5,7 @@
 
 #include "watchdog.h"
 #include "clifront.h"
+#include "modules/lib/osdobj_common.h"
 
 //============================================================
 //  System dependent defines
@@ -176,7 +177,7 @@ private:
 };
 
 
-class sdl_osd_interface : public osd_interface
+class sdl_osd_interface : public osd_common_t
 {
 public:
 	// construction/destruction
@@ -208,6 +209,7 @@ public:
 	#ifdef USE_NETWORK
 	virtual bool network_init();
 	#endif
+    //virtual bool midi_init();
 
 	virtual void video_exit();
 	virtual void window_exit();
@@ -216,6 +218,7 @@ public:
 	#ifdef USE_NETWORK
 	virtual void network_exit();
 	#endif
+    //virtual void midi_exit();
 
 private:
 	virtual void osd_exit();

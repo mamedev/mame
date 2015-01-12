@@ -14,8 +14,8 @@
 //-------------------------------------------------
 //  sound_none - constructor
 //-------------------------------------------------
-sound_none::sound_none(const osd_interface &osd)
-	: osd_sound_interface(osd)
+sound_none::sound_none(const osd_interface &osd, running_machine &machine)
+	: osd_sound_interface(osd, machine)
 {
 }
 
