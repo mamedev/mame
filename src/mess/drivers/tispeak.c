@@ -21,7 +21,7 @@
 #include "bus/generic/carts.h"
 
 #include "lantutor.lh"
-#include "tispeak.lh"
+#include "snspell.lh"
 
 // The master clock is a single stage RC oscillator into TMS5100 RCOSC:
 // In an early 1979 Speak & Spell, C is 68pf, R is a 50kohm trimpot which is set to around 33.6kohm
@@ -484,7 +484,7 @@ static MACHINE_CONFIG_START( snmath, tispeak_state )
 	MCFG_TMS0270_WRITE_PDC_CB(DEVWRITELINE("tms5100", tms5100_device, pdc_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("leds_decay", tispeak_state, leds_decay_tick, attotime::from_msec(10))
-	MCFG_DEFAULT_LAYOUT(layout_tispeak) // max 9 digits
+	MCFG_DEFAULT_LAYOUT(layout_snspell) // max 9 digits
 
 	/* no video! */
 
