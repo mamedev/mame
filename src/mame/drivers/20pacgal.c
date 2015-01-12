@@ -192,21 +192,16 @@ WRITE8_MEMBER(_20pacgal_state::sprite_lookup_w)
 // likewise the sound table.. is it being uploaded in a different format at 0x0c000?
 // we also need the palette data because there is only a single rom on this pcb?
 static ADDRESS_MAP_START( 25pacman_map, AS_PROGRAM, 8, _25pacman_state )
-
 	AM_RANGE(0x04000, 0x047ff) AM_RAM AM_SHARE("video_ram")
-
 	AM_RANGE(0x04800, 0x05fff) AM_RAM
-
 	AM_RANGE(0x06000, 0x06fff) AM_WRITEONLY AM_SHARE("char_gfx_ram")
 	AM_RANGE(0x07000, 0x0717f) AM_WRITE(sprite_ram_w)
 //  AM_RANGE(0x08000, 0x09fff) AM_READ_BANK("bank1") AM_WRITE(ram_48000_w)
 	AM_RANGE(0x08000, 0x09fff) AM_WRITENOP
 	AM_RANGE(0x0a000, 0x0bfff) AM_WRITE(sprite_gfx_w)
-
 	AM_RANGE(0x0c000, 0x0dfff) AM_WRITENOP // is this the sound waveforms in a different format?
 	AM_RANGE(0x0e000, 0x0ffff) AM_WRITENOP
 	AM_RANGE(0x1c000, 0x1ffff) AM_WRITENOP
-
 	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("flash", amd_29lv200t_device, read, write )  // (always fall through if nothing else is mapped?)
 
 ADDRESS_MAP_END
@@ -338,12 +333,12 @@ static INPUT_PORTS_START( 25pacman )
 	PORT_INCLUDE(20pacgal)
 
 	PORT_MODIFY("SERVICE")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME ( "Service Volume Up" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME ( "Service Volume Down" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
