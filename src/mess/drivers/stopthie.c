@@ -88,11 +88,11 @@ void stopthief_state::leds_update()
 			int di = j << 4 | i;
 
 			// turn on powered leds
-			if (m_leds_state[i] >> j & 1)
+			if (m_power_on && m_leds_state[i] >> j & 1)
 				m_leds_decay[di] = LEDS_DECAY_TIME;
 
 			// determine active state
-			int ds = (m_power_on && m_leds_decay[di] != 0) ? 1 : 0;
+			int ds = (m_leds_decay[di] != 0) ? 1 : 0;
 			active_state[i] |= (ds << j);
 		}
 	}

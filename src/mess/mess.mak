@@ -729,6 +729,7 @@ DRVLIBS += \
 	$(MESSOBJ)/homebrew.a \
 	$(MESSOBJ)/homelab.a \
 	$(MESSOBJ)/hp.a \
+	$(MESSOBJ)/ideal.a \
 	$(MESSOBJ)/imp.a \
 	$(MESSOBJ)/intel.a \
 	$(MESSOBJ)/interton.a \
@@ -1305,7 +1306,6 @@ $(MESSOBJ)/hp.a:                \
 	$(MESS_DRIVERS)/hp9k.o      \
 	$(MESS_DRIVERS)/hp9k_3xx.o  \
 
-
 $(MESSOBJ)/hec2hrp.a:           \
 	$(MESS_DRIVERS)/hec2hrp.o   \
 	$(MESS_MACHINE)/hec2hrp.o   \
@@ -1322,6 +1322,9 @@ $(MESSOBJ)/intel.a:             \
 	$(MESS_DRIVERS)/rex6000.o   \
 	$(MESS_DRIVERS)/sdk85.o     \
 	$(MESS_DRIVERS)/sdk86.o     \
+
+$(MESSOBJ)/ideal.a:             \
+	$(MESS_DRIVERS)/elecdet.o   \
 
 $(MESSOBJ)/imp.a:               \
 	$(MESS_DRIVERS)/tim011.o    \
@@ -2106,8 +2109,9 @@ $(MESS_DRIVERS)/digel804.o: $(MESS_LAYOUT)/digel804.lh
 $(MESS_DRIVERS)/dmv.o:      $(MESS_LAYOUT)/dmv.lh
 $(MESS_DRIVERS)/dolphunk.o: $(MESS_LAYOUT)/dolphunk.lh
 $(MESS_DRIVERS)/eacc.o:     $(MESS_LAYOUT)/eacc.lh
-$(MESS_DRIVERS)/elf.o:      $(MESS_LAYOUT)/elf2.lh
+$(MESS_DRIVERS)/elecdet.o:  $(MESS_LAYOUT)/elecdet.lh
 $(MESS_DRIVERS)/elekscmp.o: $(MESS_LAYOUT)/elekscmp.lh
+$(MESS_DRIVERS)/elf.o:      $(MESS_LAYOUT)/elf2.lh
 $(MESS_MACHINE)/esqvfd.o:   $(MESS_LAYOUT)/esq2by40.lh \
 							$(MESS_LAYOUT)/esq1by22.lh
 $(MESS_DRIVERS)/et3400.o:   $(MESS_LAYOUT)/et3400.lh
