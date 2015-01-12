@@ -27,6 +27,11 @@ public:
 //	virtual void customize_input_type_list(input_type_desc *typelist);
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist);
 
+   virtual void list_midi_devices();
+
+   virtual bool midi_init();
+   virtual void midi_exit();
+
 private:
 	void osd_exit();//static void osd_exit(running_machine &machine);
 };

@@ -221,3 +221,15 @@ void retro_osd_interface::customize_input_type_list(simple_list<input_type_entry
 	// you won't need to change a thing.
 }
  
+void retro_osd_interface::list_midi_devices()
+{
+}
+
+bool retro_osd_interface::midi_init()
+{
+   return false;
+}
+
+void retro_osd_interface::midi_exit()
+{
+}
