@@ -1,4 +1,4 @@
-/* Copyright  (C) 2010-2014 The RetroArch team
+/* Copyright  (C) 2010-2015 The RetroArch team
  *
  * ---------------------------------------------------------------------------------------
  * The following license statement only applies to this file (filter.h).
@@ -23,10 +23,18 @@
 #ifndef __LIBRETRO_SDK_SCALER_FILTER_H__
 #define __LIBRETRO_SDK_SCALER_FILTER_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <boolean.h>
 #include <gfx/scaler/scaler.h>
 
 bool scaler_gen_filter(struct scaler_ctx *ctx);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

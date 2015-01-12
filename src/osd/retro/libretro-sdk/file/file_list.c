@@ -1,4 +1,4 @@
-/* Copyright  (C) 2010-2014 The RetroArch team
+/* Copyright  (C) 2010-2015 The RetroArch team
  *
  * ---------------------------------------------------------------------------------------
  * The following license statement only applies to this file (file_list.c).
@@ -48,9 +48,9 @@ void file_list_push(file_list_t *list,
 
 size_t file_list_get_size(const file_list_t *list)
 {
-   if (list)
-      return list->size;
-   return 0;
+   if (!list)
+      return 0;
+   return list->size;
 }
 
 size_t file_list_get_directory_ptr(const file_list_t *list)
@@ -175,21 +175,23 @@ void file_list_sort_on_alt(file_list_t *list)
 
 void *file_list_get_userdata_at_offset(const file_list_t *list, size_t idx)
 {
+   if (!list)
+      return NULL;
    return list->list[idx].userdata;
 }
 
 void *file_list_get_actiondata_at_offset(const file_list_t *list, size_t idx)
 {
-   if (list)
-      return list->list[idx].actiondata;
-   return NULL;
+   if (!list)
+      return NULL;
+   return list->list[idx].actiondata;
 }
 
 void *file_list_get_last_actiondata(const file_list_t *list)
 {
-   if (list)
-      return list->list[list->size - 1].actiondata;
-   return NULL;
+   if (!list)
+      return NULL;
+   return list->list[list->size - 1].actiondata;
 }
 
 void file_list_get_at_offset(const file_list_t *list, size_t idx,

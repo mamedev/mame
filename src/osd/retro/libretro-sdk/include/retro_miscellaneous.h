@@ -1,4 +1,4 @@
-/* Copyright  (C) 2010-2014 The RetroArch team
+/* Copyright  (C) 2010-2015 The RetroArch team
  *
  * ---------------------------------------------------------------------------------------
  * The following license statement only applies to this file (retro_miscellaneous.h).
@@ -51,14 +51,8 @@
 #include <retro_endianness.h>
 #include <limits.h>
 
-/* Some platforms do not set this value.
- * Just assume a value. It's usually 4KiB.
- * Platforms with a known value (like Win32)
- * set this value explicitly in platform specific headers.
- */
-
-#ifndef PATH_MAX
-#define PATH_MAX 4096
+#ifndef PATH_MAX_LENGTH
+#define PATH_MAX_LENGTH 4096
 #endif
 
 #ifndef max
@@ -69,13 +63,24 @@
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #endif
 
+#ifdef RARCH_INTERNAL
 #define rarch_assert(cond) do { \
    if (!(cond)) { RARCH_ERR("Assertion failed at %s:%d.\n", __FILE__, __LINE__); abort(); } \
 } while(0)
+#else
+#include <assert.h>
+#define rarch_assert(cond) assert(cond)
+#endif
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 #define RARCH_SCALE_BASE 256
 
+/**
+ * rarch_sleep:
+ * @msec         : amount in milliseconds to sleep
+ *
+ * Sleeps for a specified amount of milliseconds (@msec).
+ **/
 static INLINE void rarch_sleep(unsigned msec)
 {
 #if defined(__CELLOS_LV2__) && !defined(__PSL1GHT__)
@@ -96,6 +101,14 @@ static INLINE void rarch_sleep(unsigned msec)
 #endif
 }
 
+/**
+ * next_pow2:
+ * @v         : initial value
+ *
+ * Get next power of 2 value based on  initial value.
+ *
+ * Returns: next power of 2 value (derived from @v).
+ **/
 static INLINE uint32_t next_pow2(uint32_t v)
 {
    v--;
@@ -108,6 +121,14 @@ static INLINE uint32_t next_pow2(uint32_t v)
    return v;
 }
 
+/**
+ * prev_pow2:
+ * @v         : initial value
+ *
+ * Get previous power of 2 value based on initial value.
+ *
+ * Returns: previous power of 2 value (derived from @v).
+ **/
 static INLINE uint32_t prev_pow2(uint32_t v)
 {
    v |= v >> 1;
@@ -149,6 +170,5 @@ typedef struct
 #define BIT128_CLEAR(a, bit) ((a).data[(bit) >> 5] &= ~(1 << ((bit) & 31)))
 #define BIT128_GET(a, bit)   ((a).data[(bit) >> 5] &   (1 << ((bit) & 31)))
 #define BIT128_CLEAR_ALL(a)  memset(&(a), 0, sizeof(a));
-
 
 #endif

@@ -1,7 +1,7 @@
 /* Copyright  (C) 2010-2015 The RetroArch team
  *
  * ---------------------------------------------------------------------------------------
- * The following license statement only applies to this file (strl.h).
+ * The following license statement only applies to this file (boolean.h).
  * ---------------------------------------------------------------------------------------
  *
  * Permission is hereby granted, free of charge,
@@ -20,31 +20,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef __LIBRETRO_SDK_COMPAT_STRL_H
-#define __LIBRETRO_SDK_COMPAT_STRL_H
+#ifndef __LIBRETRO_SDK_FIFO_BUFFER_H
+#define __LIBRETRO_SDK_FIFO_BUFFER_H
 
-#include <string.h>
+#include <stdint.h>
 #include <stddef.h>
-
-#ifdef HAVE_CONFIG_H
-#include "../../../config.h"
-#endif
-
-#ifndef HAVE_STRL
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-/* Avoid possible naming collisions during link since 
- * we prefer to use the actual name. */
-#define strlcpy(dst, src, size) strlcpy_rarch__(dst, src, size)
-#define strlcat(dst, src, size) strlcat_rarch__(dst, src, size)
 
-size_t strlcpy(char *dest, const char *source, size_t size);
-size_t strlcat(char *dest, const char *source, size_t size);
+struct fifo_buffer
+{
+   uint8_t *buffer;
+   size_t bufsize;
+   size_t first;
+   size_t end;
+};
+
+typedef struct fifo_buffer fifo_buffer_t;
+
+fifo_buffer_t *fifo_new(size_t size);
+
+void fifo_write(fifo_buffer_t *buffer, const void *in_buf, size_t size);
+
+void fifo_read(fifo_buffer_t *buffer, void *in_buf, size_t size);
+
+void fifo_free(fifo_buffer_t *buffer);
+
+size_t fifo_read_avail(fifo_buffer_t *buffer);
+
+size_t fifo_write_avail(fifo_buffer_t *buffer);
+
 #ifdef __cplusplus
 }
 #endif
-#endif
+
 #endif
 

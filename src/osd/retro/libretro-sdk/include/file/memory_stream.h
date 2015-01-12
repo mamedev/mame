@@ -1,7 +1,7 @@
 /* Copyright  (C) 2010-2015 The RetroArch team
  *
  * ---------------------------------------------------------------------------------------
- * The following license statement only applies to this file (strl.h).
+ * The following license statement only applies to this file (memory_stream.h).
  * ---------------------------------------------------------------------------------------
  *
  * Permission is hereby granted, free of charge,
@@ -20,31 +20,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef __LIBRETRO_SDK_COMPAT_STRL_H
-#define __LIBRETRO_SDK_COMPAT_STRL_H
+#ifndef _LIBRETRO_SDK_FILE_MEMORY_STREAM_H
+#define _LIBRETRO_SDK_FILE_MEMORY_STREAM_H
 
-#include <string.h>
 #include <stddef.h>
+#include <stdint.h>
 
-#ifdef HAVE_CONFIG_H
-#include "../../../config.h"
-#endif
+typedef struct memstream memstream_t;
 
-#ifndef HAVE_STRL
+memstream_t *memstream_open(void);
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-/* Avoid possible naming collisions during link since 
- * we prefer to use the actual name. */
-#define strlcpy(dst, src, size) strlcpy_rarch__(dst, src, size)
-#define strlcat(dst, src, size) strlcat_rarch__(dst, src, size)
+void memstream_close(memstream_t * stream);
 
-size_t strlcpy(char *dest, const char *source, size_t size);
-size_t strlcat(char *dest, const char *source, size_t size);
-#ifdef __cplusplus
-}
-#endif
-#endif
-#endif
+size_t memstream_read(memstream_t * stream, void *data, size_t bytes);
 
+size_t memstream_write(memstream_t * stream, const void *data, size_t bytes);
+
+int memstream_getc(memstream_t * stream);
+
+char *memstream_gets(memstream_t * stream, char *buffer, size_t len);
+
+size_t memstream_pos(memstream_t * stream);
+
+int memstream_seek(memstream_t * stream, int offset, int whence);
+
+void memstream_set_buffer(uint8_t *buffer, size_t size);
+
+size_t memstream_get_last_size(void);
+
+#endif

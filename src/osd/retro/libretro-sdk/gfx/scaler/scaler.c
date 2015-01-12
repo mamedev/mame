@@ -1,4 +1,4 @@
-/* Copyright  (C) 2010-2014 The RetroArch team
+/* Copyright  (C) 2010-2015 The RetroArch team
  *
  * ---------------------------------------------------------------------------------------
  * The following license statement only applies to this file (scaler.c).
@@ -29,15 +29,36 @@
 #include <stdio.h>
 #include <math.h>
 
-// In case aligned allocs are needed later ...
+/* In case aligned allocs are needed later. */
+
+/**
+ * scaler_alloc:
+ * @elem_size    : size of the elements to be used.
+ * @siz          : size of the image that the scaler needs to handle.
+ *
+ * Allocate and returns a scaler object.
+ *
+ * Returns: pointer to a scaler object of type 'void *' on success,
+ * NULL in case of error. Has to be freed manually.
+ **/
 void *scaler_alloc(size_t elem_size, size_t size)
 {
-   return calloc(elem_size, size);
+   void *ptr = calloc(elem_size, size);
+   if (!ptr)
+      return NULL;
+   return ptr;
 }
 
+/**
+ * scaler_free:
+ * @ptr          : pointer to scaler object.
+ *
+ * Frees a scaler object.
+ **/
 void scaler_free(void *ptr)
 {
-   free(ptr);
+   if (ptr)
+      free(ptr);
 }
 
 static bool allocate_frames(struct scaler_ctx *ctx)
@@ -74,47 +95,68 @@ static bool allocate_frames(struct scaler_ctx *ctx)
    return true;
 }
 
+/**
+ * set_direct_pix_conv:
+ * @ctx          : pointer to scaler context object.
+ *
+ * Bind a pixel converter callback function to the 'direct_pixconv' function pointer
+ * of the scaler context object.
+ *
+ * Returns: true if a pixel converter function callback could be bound, false if not.
+ * If false, the function callback 'direct_pixconv' is still unbound.
+ **/
 static bool set_direct_pix_conv(struct scaler_ctx *ctx)
 {
    if (ctx->in_fmt == ctx->out_fmt)
+   {
       ctx->direct_pixconv = conv_copy;
-   else if (ctx->in_fmt == SCALER_FMT_0RGB1555
-         && ctx->out_fmt == SCALER_FMT_ARGB8888)
-      ctx->direct_pixconv = conv_0rgb1555_argb8888;
-   else if (ctx->in_fmt == SCALER_FMT_RGB565
-         && ctx->out_fmt == SCALER_FMT_ARGB8888)
-      ctx->direct_pixconv = conv_rgb565_argb8888;
-   else if (ctx->in_fmt == SCALER_FMT_RGB565
-         && ctx->out_fmt == SCALER_FMT_BGR24)
-      ctx->direct_pixconv = conv_rgb565_bgr24;
-   else if (ctx->in_fmt == SCALER_FMT_0RGB1555
-         && ctx->out_fmt == SCALER_FMT_RGB565)
-      ctx->direct_pixconv = conv_0rgb1555_rgb565;
-   else if (ctx->in_fmt == SCALER_FMT_RGB565
-         && ctx->out_fmt == SCALER_FMT_0RGB1555)
-      ctx->direct_pixconv = conv_rgb565_0rgb1555;
-   else if (ctx->in_fmt == SCALER_FMT_BGR24
-         && ctx->out_fmt == SCALER_FMT_ARGB8888)
-      ctx->direct_pixconv = conv_bgr24_argb8888;
-   else if (ctx->in_fmt == SCALER_FMT_ARGB8888
-         && ctx->out_fmt == SCALER_FMT_0RGB1555)
-      ctx->direct_pixconv = conv_argb8888_0rgb1555;
-   else if (ctx->in_fmt == SCALER_FMT_ARGB8888
-         && ctx->out_fmt == SCALER_FMT_BGR24)
-      ctx->direct_pixconv = conv_argb8888_bgr24;
-   else if (ctx->in_fmt == SCALER_FMT_0RGB1555
-         && ctx->out_fmt == SCALER_FMT_BGR24)
-      ctx->direct_pixconv = conv_0rgb1555_bgr24;
-   else if (ctx->in_fmt == SCALER_FMT_ARGB8888
-         && ctx->out_fmt == SCALER_FMT_ABGR8888)
-      ctx->direct_pixconv = conv_argb8888_abgr8888;
-   else if (ctx->in_fmt == SCALER_FMT_YUYV
-         && ctx->out_fmt == SCALER_FMT_ARGB8888)
-      ctx->direct_pixconv = conv_yuyv_argb8888;
-   else if (ctx->in_fmt == SCALER_FMT_RGBA4444
-         && ctx->out_fmt == SCALER_FMT_ARGB8888)
-      ctx->direct_pixconv = conv_rgba4444_argb8888;
-   else
+      return true;
+   }
+
+   switch (ctx->in_fmt)
+   {
+      case SCALER_FMT_0RGB1555:
+         if (ctx->out_fmt == SCALER_FMT_ARGB8888)
+            ctx->direct_pixconv = conv_0rgb1555_argb8888;
+         else if (ctx->out_fmt == SCALER_FMT_RGB565)
+            ctx->direct_pixconv = conv_0rgb1555_rgb565;
+         else if (ctx->out_fmt == SCALER_FMT_BGR24)
+            ctx->direct_pixconv = conv_0rgb1555_bgr24;
+         break;
+      case SCALER_FMT_RGB565:
+         if (ctx->out_fmt == SCALER_FMT_ARGB8888)
+            ctx->direct_pixconv = conv_rgb565_argb8888;
+         else if (ctx->out_fmt == SCALER_FMT_BGR24)
+            ctx->direct_pixconv = conv_rgb565_bgr24;
+         else if (ctx->out_fmt == SCALER_FMT_0RGB1555)
+            ctx->direct_pixconv = conv_rgb565_0rgb1555;
+         break;
+      case SCALER_FMT_BGR24:
+         if (ctx->out_fmt == SCALER_FMT_ARGB8888)
+            ctx->direct_pixconv = conv_bgr24_argb8888;
+         break;
+      case SCALER_FMT_ARGB8888:
+         if (ctx->out_fmt == SCALER_FMT_0RGB1555)
+            ctx->direct_pixconv = conv_argb8888_0rgb1555;
+         else if (ctx->out_fmt == SCALER_FMT_BGR24)
+            ctx->direct_pixconv = conv_argb8888_bgr24;
+         else if (ctx->out_fmt == SCALER_FMT_ABGR8888)
+            ctx->direct_pixconv = conv_argb8888_abgr8888;
+         break;
+      case SCALER_FMT_YUYV:
+         if (ctx->out_fmt == SCALER_FMT_ARGB8888)
+            ctx->direct_pixconv = conv_yuyv_argb8888;
+         break;
+      case SCALER_FMT_RGBA4444:
+         if (ctx->out_fmt == SCALER_FMT_ARGB8888)
+            ctx->direct_pixconv = conv_rgba4444_argb8888;
+         break;
+      case SCALER_FMT_ABGR8888:
+         /* FIXME/TODO */
+         break;
+   }
+
+   if (!ctx->direct_pixconv)
       return false;
 
    return true;
@@ -221,11 +263,21 @@ void scaler_ctx_gen_reset(struct scaler_ctx *ctx)
    memset(&ctx->output, 0, sizeof(ctx->output));
 }
 
+/**
+ * scaler_ctx_scale:
+ * @ctx          : pointer to scaler context object.
+ * @output       : pointer to output image.
+ * @input        : pointer to input image.
+ *
+ * Scales an input image to an output image.
+ **/
 void scaler_ctx_scale(struct scaler_ctx *ctx,
       void *output, const void *input)
 {
-   if (!ctx)
-      return;
+   const void *input_frame = input;
+   void *output_frame      = output;
+   int input_stride        = ctx->in_stride;
+   int output_stride       = ctx->out_stride;
 
    if (ctx->unscaled)
    {
@@ -233,77 +285,43 @@ void scaler_ctx_scale(struct scaler_ctx *ctx,
       ctx->direct_pixconv(output, input,
             ctx->out_width, ctx->out_height,
             ctx->out_stride, ctx->in_stride);
+      return;
    }
-   else if (ctx->scaler_special)
+
+   if (ctx->in_fmt != SCALER_FMT_ARGB8888)
+   {
+      ctx->in_pixconv(ctx->input.frame, input,
+            ctx->in_width, ctx->in_height,
+            ctx->input.stride, ctx->in_stride);
+
+      input_frame       = ctx->input.frame;
+      input_stride      = ctx->input.stride;
+   }
+
+   if (ctx->out_fmt != SCALER_FMT_ARGB8888)
+   {
+      output_frame  = ctx->output.frame;
+      output_stride = ctx->output.stride;
+   }
+
+   if (ctx->scaler_special)
    {
       /* Take some special, and (hopefully) more optimized path. */
-      const void *inp = input;
-      int in_stride   = ctx->in_stride;
-
-      if (ctx->in_fmt != SCALER_FMT_ARGB8888)
-      {
-         ctx->in_pixconv(ctx->input.frame, input,
-               ctx->in_width, ctx->in_height,
-               ctx->input.stride, ctx->in_stride);
-
-         inp       = ctx->input.frame;
-         in_stride = ctx->input.stride;
-      }
-
-      bool conv_out  = ctx->out_fmt != SCALER_FMT_ARGB8888;
-      void *outp     = output;
-      int out_stride = ctx->out_stride;
-
-      if (conv_out)
-      {
-         outp       = ctx->output.frame;
-         out_stride = ctx->output.stride;
-      }
-
-      ctx->scaler_special(ctx, outp, inp,
+      ctx->scaler_special(ctx, output_frame, input_frame,
             ctx->out_width, ctx->out_height,
             ctx->in_width, ctx->in_height,
-            out_stride, in_stride);
-
-      if (conv_out)
-      {
-         ctx->out_pixconv(output, ctx->output.frame,
-               ctx->out_width, ctx->out_height,
-               ctx->out_stride, ctx->output.stride);
-      }
+            output_stride, input_stride);
    }
    else
    {
-      bool inp_fmt_is_not_argb8888  = (ctx->in_fmt != SCALER_FMT_ARGB8888);
-      const void *inp_fmt_frame = inp_fmt_is_not_argb8888 ? ctx->input.frame : input;
-      int inp_fmt_stride = inp_fmt_is_not_argb8888 ? ctx->input.stride : ctx->in_stride;
-
-      bool out_fmt_is_not_argb8888 = (ctx->out_fmt != SCALER_FMT_ARGB8888);
-      void *out_fmt_frame = out_fmt_is_not_argb8888 ? ctx->output.frame : output;
-      int out_fmt_stride = out_fmt_is_not_argb8888 ? ctx->output.stride : ctx->out_stride;
-
       /* Take generic filter path. */
-      if (inp_fmt_is_not_argb8888)
-      {
-         if (ctx->in_pixconv)
-            ctx->in_pixconv(ctx->input.frame, input,
-                  ctx->in_width, ctx->in_height,
-                  ctx->input.stride, ctx->in_stride);
-      }
-
-      if (ctx->scaler_horiz)
-         ctx->scaler_horiz(ctx, inp_fmt_frame, inp_fmt_stride);
-
-      if (ctx->scaler_vert)
-         ctx->scaler_vert(ctx, out_fmt_frame, out_fmt_stride);
-
-      if (out_fmt_is_not_argb8888)
-      {
-         if (ctx->out_pixconv)
-            ctx->out_pixconv(output, ctx->output.frame,
-                  ctx->out_width, ctx->out_height,
-                  ctx->out_stride, ctx->output.stride);
-      }
+      ctx->scaler_horiz(ctx, input_frame, input_stride);
+      ctx->scaler_vert (ctx, output, output_stride);
    }
+
+   if (ctx->out_fmt != SCALER_FMT_ARGB8888)
+      ctx->out_pixconv(output, ctx->output.frame,
+            ctx->out_width, ctx->out_height,
+            ctx->out_stride, ctx->output.stride);
 }
 
