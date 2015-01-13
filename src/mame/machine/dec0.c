@@ -14,6 +14,13 @@ Data East machine functions - Bryan McPhail, mish@tendril.co.uk
 
 /******************************************************************************/
 
+void dec0_state::machine_start()
+{
+	save_item(NAME(m_i8751_return));
+	save_item(NAME(m_i8751_command));
+	save_item(NAME(m_i8751_ports));
+}
+
 READ16_MEMBER(dec0_state::dec0_controls_r)
 {
 	switch (offset<<1)
@@ -294,9 +301,9 @@ void dec0_state::dec0_i8751_write(int data)
 	m_i8751_command=data;
 
 	/* Writes to this address cause an IRQ to the i8751 microcontroller */
-	if (m_GAME == 1) m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
-	if (m_GAME == 2) baddudes_i8751_write(data);
-	if (m_GAME == 3) birdtry_i8751_write(data);
+	if (m_game == 1) m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
+	if (m_game == 2) baddudes_i8751_write(data);
+	if (m_game == 3) birdtry_i8751_write(data);
 
 	//logerror("%s: warning - write %02x to i8751\n",machine().describe_context(),data);
 }
@@ -357,6 +364,9 @@ DRIVER_INIT_MEMBER(dec0_state,hippodrm)
 	RAM[0x1af] = 0x60; /* RTS prot area */
 	RAM[0x1db] = 0x60; /* RTS prot area */
 	RAM[0x21a] = 0x60; /* RTS prot area */
+	
+	save_item(NAME(m_hippodrm_msb));
+	save_item(NAME(m_hippodrm_lsb));
 }
 
 DRIVER_INIT_MEMBER(dec0_state,slyspy)
@@ -367,6 +377,8 @@ DRIVER_INIT_MEMBER(dec0_state,slyspy)
 	/* Slyspy sound cpu has some protection */
 	RAM[0xf2d] = 0xea;
 	RAM[0xf2e] = 0xea;
+	
+	save_item(NAME(m_slyspy_state));
 }
 
 DRIVER_INIT_MEMBER(dec0_state,robocop)
@@ -376,15 +388,15 @@ DRIVER_INIT_MEMBER(dec0_state,robocop)
 
 DRIVER_INIT_MEMBER(dec0_state,baddudes)
 {
-	m_GAME = 2;
+	m_game = 2;
 }
 
 DRIVER_INIT_MEMBER(dec0_state,hbarrel)
 {
-	m_GAME = 1;
+	m_game = 1;
 }
 
 DRIVER_INIT_MEMBER(dec0_state,birdtry)
 {
-	m_GAME=3;
+	m_game=3;
 }
