@@ -493,6 +493,9 @@ ifdef FASTDEBUG
 DEFS += -DMAME_DEBUG_FAST
 endif
 
+# To support casting in Lua 5.3
+DEFS += -DLUA_COMPAT_APIINTCASTS
+
 #-------------------------------------------------
 # compile flags
 # CCOMFLAGS are common flags

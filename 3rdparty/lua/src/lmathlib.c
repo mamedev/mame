@@ -240,7 +240,7 @@ static int math_max (lua_State *L) {
 */
 static int math_random (lua_State *L) {
   lua_Integer low, up;
-  double r = (double)l_rand() * (1.0 / ((double)L_RANDMAX + 1.0));
+  double r = (double)(1.0 * l_rand()) * (1.0 / ((double)L_RANDMAX + 1.0));
   switch (lua_gettop(L)) {  /* check number of arguments */
     case 0: {  /* no arguments */
       lua_pushnumber(L, (lua_Number)r);  /* Number between 0 and 1 */
@@ -269,7 +269,8 @@ static int math_random (lua_State *L) {
 
 
 static int math_randomseed (lua_State *L) {
-  l_srand((unsigned int)(lua_Integer)luaL_checknumber(L, 1));
+  lua_Number seed = (lua_Number)luaL_checknumber(L, 1);
+  l_srand((unsigned int)seed);
   (void)rand(); /* discard first value to avoid undesirable correlations */
   return 0;
 }

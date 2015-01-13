@@ -525,6 +525,7 @@ LUAOBJS = \
 	$(LIBOBJ)/lua/ltablib.o \
 	$(LIBOBJ)/lua/loadlib.o \
 	$(LIBOBJ)/lua/linit.o \
+	$(LIBOBJ)/lua/lutf8lib.o \
 	$(LIBOBJ)/lua/lsqlite3/lsqlite3.o \
 
 $(OBJ)/liblua.a: $(LUAOBJS)

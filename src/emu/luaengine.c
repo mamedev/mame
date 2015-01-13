@@ -68,7 +68,7 @@ int lua_engine::report(int status) {
 	{
 		const char *msg = lua_tostring(m_lua_state, -1);
 		if (msg == NULL) msg = "(error object is not a string)";
-		luai_writestringerror("%s\n", msg);
+		lua_writestringerror("%s\n", msg);
 		lua_pop(m_lua_state, 1);
 		/* force a complete garbage collection in case of errors */
 		lua_gc(m_lua_state, LUA_GCCOLLECT, 0);
@@ -360,7 +360,7 @@ void lua_engine::emu_set_hook(lua_State *L)
 	} else if (strcmp(hookname, "frame") == 0) {
 		hook_frame_cb.set(L, 1);
 	} else {
-		luai_writestringerror("%s", "Unknown hook name, aborting.\n");
+		lua_writestringerror("%s", "Unknown hook name, aborting.\n");
 	}
 }
 
@@ -948,7 +948,7 @@ void lua_engine::periodic_check()
 			lua_getglobal(m_lua_state, "print");
 			lua_insert(m_lua_state, 1);
 			if (lua_pcall(m_lua_state, lua_gettop(m_lua_state) - 1, 0, 0) != LUA_OK)
-				luai_writestringerror("%s\n", lua_pushfstring(m_lua_state,
+				lua_writestringerror("%s\n", lua_pushfstring(m_lua_state,
 				"error calling " LUA_QL("print") " (%s)",
 				lua_tostring(m_lua_state, -1)));
 		}
