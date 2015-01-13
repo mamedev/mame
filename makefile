@@ -493,6 +493,9 @@ ifdef FASTDEBUG
 DEFS += -DMAME_DEBUG_FAST
 endif
 
+# To support casting in Lua 5.3
+DEFS += -DLUA_COMPAT_APIINTCASTS
+
 #-------------------------------------------------
 # compile flags
 # CCOMFLAGS are common flags
@@ -509,7 +512,7 @@ CPPONLYFLAGS =
 
 # CFLAGS is defined based on C or C++ targets
 # (remember, expansion only happens when used, so doing it here is ok)
-CFLAGS = $(CCOMFLAGS) $(CPPONLYFLAGS)
+CFLAGS = $(CCOMFLAGS) $(CPPONLYFLAGS) $(INCPATH)
 
 # we compile C-only to C89 standard with GNU extensions
 # we compile C++ code to C++98 standard with GNU extensions
@@ -864,7 +867,6 @@ include $(SRC)/tools/tools.mak
 include $(SRC)/regtests/regtests.mak
 
 # combine the various definitions to one
-CCOMFLAGS += $(INCPATH)
 CDEFS = $(DEFS)
 
 # TODO: -x c++ should not be hard-coded
@@ -1020,7 +1022,7 @@ $(OBJ)/%.a:
 ifeq ($(TARGETOS),macosx)
 $(OBJ)/%.o: $(SRC)/%.m | $(OSPREBUILD)
 	@echo Objective-C compiling $<...
-	$(CC) $(CDEFS) $(COBJFLAGS) $(CCOMFLAGS) -c $< -o $@
+	$(CC) $(CDEFS) $(COBJFLAGS) $(CCOMFLAGS) $(INCPATH) -c $< -o $@
 endif
 
 

@@ -476,7 +476,7 @@ static int dbvm_get_named_types(lua_State *L) {
 static int dbvm_bind_index(lua_State *L, sqlite3_stmt *vm, int index, int lindex) {
 	switch (lua_type(L, lindex)) {
 		case LUA_TSTRING:
-			return sqlite3_bind_text(vm, index, lua_tostring(L, lindex), lua_strlen(L, lindex), SQLITE_TRANSIENT);
+			return sqlite3_bind_text(vm, index, lua_tostring(L, lindex), lua_rawlen(L, lindex), SQLITE_TRANSIENT);
 		case LUA_TNUMBER:
 			return sqlite3_bind_double(vm, index, lua_tonumber(L, lindex));
 		case LUA_TBOOLEAN:
@@ -522,7 +522,7 @@ static int dbvm_bind_blob(lua_State *L) {
 	sdb_vm *svm = lsqlite_checkvm(L, 1);
 	int index = luaL_checkint(L, 2);
 	const char *value = luaL_checkstring(L, 3);
-	int len = lua_strlen(L, 3);
+	int len = lua_rawlen(L, 3);
 
 	lua_pushnumber(L, sqlite3_bind_blob(svm->vm, index, value, len, SQLITE_TRANSIENT));
 	return 1;
@@ -797,7 +797,7 @@ static int lcontext_result(lua_State *L) {
 			sqlite3_result_double(ctx->ctx, luaL_checknumber(L, 2));
 			break;
 		case LUA_TSTRING:
-			sqlite3_result_text(ctx->ctx, luaL_checkstring(L, 2), lua_strlen(L, 2), SQLITE_TRANSIENT);
+			sqlite3_result_text(ctx->ctx, luaL_checkstring(L, 2), lua_rawlen(L, 2), SQLITE_TRANSIENT);
 			break;
 		case LUA_TNIL:
 		case LUA_TNONE:
@@ -814,7 +814,7 @@ static int lcontext_result(lua_State *L) {
 static int lcontext_result_blob(lua_State *L) {
 	lcontext *ctx = lsqlite_checkcontext(L, 1);
 	const char *blob = luaL_checkstring(L, 2);
-	int size = lua_strlen(L, 2);
+	int size = lua_rawlen(L, 2);
 	sqlite3_result_blob(ctx->ctx, (const void*)blob, size, SQLITE_TRANSIENT);
 	return 0;
 }
@@ -829,7 +829,7 @@ static int lcontext_result_double(lua_State *L) {
 static int lcontext_result_error(lua_State *L) {
 	lcontext *ctx = lsqlite_checkcontext(L, 1);
 	const char *err = luaL_checkstring(L, 2);
-	int size = lua_strlen(L, 2);
+	int size = lua_rawlen(L, 2);
 	sqlite3_result_error(ctx->ctx, err, size);
 	return 0;
 }
@@ -850,7 +850,7 @@ static int lcontext_result_null(lua_State *L) {
 static int lcontext_result_text(lua_State *L) {
 	lcontext *ctx = lsqlite_checkcontext(L, 1);
 	const char *text = luaL_checkstring(L, 2);
-	int size = lua_strlen(L, 2);
+	int size = lua_rawlen(L, 2);
 	sqlite3_result_text(ctx->ctx, text, size, SQLITE_TRANSIENT);
 	return 0;
 }
@@ -1001,7 +1001,7 @@ static void db_sql_normal_function(sqlite3_context *context, int argc, sqlite3_v
 
 	if (lua_pcall(L, argc + 1, 0, 0)) {
 		const char *errmsg = lua_tostring(L, -1);
-		int size = lua_strlen(L, -1);
+		int size = lua_rawlen(L, -1);
 		sqlite3_result_error(context, errmsg, size);
 	}
 
@@ -1658,7 +1658,7 @@ static int db_exec(lua_State *L) {
 static int db_prepare(lua_State *L) {
 	sdb *db = lsqlite_checkdb(L, 1);
 	const char *sql = luaL_checkstring(L, 2);
-	int sql_len = lua_strlen(L, 2);
+	int sql_len = lua_rawlen(L, 2);
 	const char *sqltail;
 	sdb_vm *svm;
 	lua_settop(L,2); /* sql is on top of stack for call to newvm */

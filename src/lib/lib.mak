@@ -480,12 +480,12 @@ $(OBJ)/libportmidi.a: $(LIBPMOBJS)
 
 $(LIBOBJ)/portmidi/%.o: $(3RDPARTY)/portmidi/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(PMOPTS) $(CCOMFLAGS) $(CONLYFLAGS) -I$(3RDPARTY)/portmidi/pm_common -I$(3RDPARTY)/portmidi/porttime -c $< -o $@
+	$(CC) $(CDEFS) $(PMOPTS) $(CCOMFLAGS) $(CONLYFLAGS) $(INCPATH) -I$(3RDPARTY)/portmidi/pm_common -I$(3RDPARTY)/portmidi/porttime -c $< -o $@
 
 ifeq ($(TARGETOS),macosx)
 $(LIBOBJ)/portmidi/%.o: $(3RDPARTY)/portmidi/%.m | $(OSPREBUILD)
 	@echo Objective-C compiling $<...
-	$(CC) $(CDEFS) $(COBJFLAGS) $(CCOMFLAGS) -c $< -o $@
+	$(CC) $(CDEFS) $(COBJFLAGS) $(CCOMFLAGS) $(INCPATH) -c $< -o $@
 endif
 
 #-------------------------------------------------
@@ -525,6 +525,7 @@ LUAOBJS = \
 	$(LIBOBJ)/lua/ltablib.o \
 	$(LIBOBJ)/lua/loadlib.o \
 	$(LIBOBJ)/lua/linit.o \
+	$(LIBOBJ)/lua/lutf8lib.o \
 	$(LIBOBJ)/lua/lsqlite3/lsqlite3.o \
 
 $(OBJ)/liblua.a: $(LUAOBJS)
@@ -544,7 +545,7 @@ $(LIBOBJ)/lua/%.o: $(3RDPARTY)/lua/src/%.c | $(OSPREBUILD)
 
 $(LIBOBJ)/lua/lsqlite3/%.o: $(3RDPARTY)/lsqlite3/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -DLUA_COMPAT_ALL $(LUA_FLAGS) -c $< -o $@
+	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -DLUA_COMPAT_ALL -I$(3RDPARTY)/lua/src -I$(3RDPARTY) $(LUA_FLAGS) -c $< -o $@
 
 #-------------------------------------------------
 # web library objects
