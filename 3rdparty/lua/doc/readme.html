@@ -1,15 +1,15 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <HTML>
 <HEAD>
-<TITLE>Lua 5.2 readme</TITLE>
+<TITLE>Lua 5.3 readme</TITLE>
 <LINK REL="stylesheet" TYPE="text/css" HREF="lua.css">
 <META HTTP-EQUIV="content-type" CONTENT="text/html; charset=iso-8859-1">
 <STYLE TYPE="text/css">
 blockquote, .display {
 	border: solid #a0a0a0 2px ;
-	border-radius: 8px ;
 	padding: 1em ;
 	margin: 0px ;
+	border-radius: 8px ;
 }
 
 .display {
@@ -31,7 +31,7 @@ tt, kbd, code {
 <HR>
 <H1>
 <A HREF="http://www.lua.org/"><IMG SRC="logo.gif" ALT="Lua" BORDER=0></A>
-Welcome to Lua 5.2
+Welcome to Lua 5.3.0
 </H1>
 
 <P>
@@ -70,7 +70,7 @@ and
 updated
 <A HREF="http://www.lua.org/docs.html">documentation</A>,
 especially the
-<A HREF="http://www.lua.org/manual/5.2/">reference manual</A>,
+<A HREF="http://www.lua.org/manual/5.3/">reference manual</A>,
 which may differ slightly from the
 <A HREF="contents.html">local copy</A>
 distributed in this package.
@@ -98,8 +98,8 @@ If you don't have the time or the inclination to compile Lua yourself,
 get a binary from
 <A HREF="http://lua-users.org/wiki/LuaBinaries">LuaBinaries</A>.
 Try also
-<A HREF="http://luaforwindows.luaforge.net/">Lua for Windows</A>,
-an easy-to-use distribution of Lua that includes many useful libraries.
+<A HREF="http://luadist.org/">LuaDist</A>,
+a multi-platform distribution of Lua that includes batteries.
 
 <H3>Building Lua</H3>
 
@@ -110,22 +110,22 @@ Here are the details.
 <OL>
 <LI>
 Open a terminal window and move to
-the top-level directory, which is named <TT>lua-5.2.3</TT>.
-The Makefile there controls both the build process and the installation process.
+the top-level directory, which is named <TT>lua-5.3.0</TT>.
+The <TT>Makefile</TT> there controls both the build process and the installation process.
 <P>
 <LI>
   Do "<KBD>make</KBD>" and see if your platform is listed.
   The platforms currently supported are:
 <P>
 <P CLASS="display">
-   aix ansi bsd freebsd generic linux macosx mingw posix solaris
+   aix bsd c89 freebsd generic linux macosx mingw posix solaris
 </P>
 <P>
   If your platform is listed, just do "<KBD>make xxx</KBD>", where xxx
   is your platform name.
 <P>
   If your platform is not listed, try the closest one or posix, generic,
-  ansi, in this order.
+  c89, in this order.
 <P>
 <LI>
 The compilation takes only a few moments
@@ -136,7 +136,7 @@ and liblua.a (the library).
 <P>
 <LI>
   To check that Lua has been built correctly, do "<KBD>make test</KBD>"
-  after building Lua. This will run the interpreter and print its version string.
+  after building Lua. This will run the interpreter and print its version.
 </OL>
 <P>
 If you're running Linux and get compilation errors,
@@ -148,7 +148,7 @@ then try "<KBD>make linux MYLIBS=-ltermcap</KBD>".
 <P>
   Once you have built Lua, you may want to install it in an official
   place in your system. In this case, do "<KBD>make install</KBD>". The official
-  place and the way to install files are defined in the Makefile. You'll
+  place and the way to install files are defined in the <TT>Makefile</TT>. You'll
   probably need the right permissions to install files.
 
 <P>
@@ -158,11 +158,13 @@ then try "<KBD>make linux MYLIBS=-ltermcap</KBD>".
 <P>
   To install Lua locally, do "<KBD>make local</KBD>".
   This will create a directory <TT>install</TT> with subdirectories
-  <TT>bin</TT>, <TT>include</TT>, <TT>lib</TT>, <TT>man</TT>,
+  <TT>bin</TT>, <TT>include</TT>, <TT>lib</TT>, <TT>man</TT>, <TT>share</TT>,
   and install Lua as listed below.
 
   To install Lua locally, but in some other directory, do
   "<KBD>make install INSTALL_TOP=xxx</KBD>", where xxx is your chosen directory.
+  The installation starts in the <TT>src</TT> and <TT>doc</TT> directories,
+  so take care if <TT>INSTALL_TOP</TT> is not an absolute path.
 
 <DL CLASS="display">
 <DT>
@@ -172,7 +174,7 @@ then try "<KBD>make linux MYLIBS=-ltermcap</KBD>".
 <DT>
     include:
 <DD>
-    lua.h luaconf.h lualib.h lauxlib.h lua.hpp
+    lauxlib.h lua.h lua.hpp luaconf.h lualib.h
 <DT>
     lib:
 <DD>
@@ -186,8 +188,8 @@ then try "<KBD>make linux MYLIBS=-ltermcap</KBD>".
 <P>
   These are the only directories you need for development.
   If you only want to run Lua programs,
-  you only need the files in bin and man.
-  The files in include and lib are needed for
+  you only need the files in <TT>bin</TT> and <TT>man</TT>.
+  The files in <TT>include</TT> and <TT>lib</TT> are needed for
   embedding Lua in C or C++ programs.
 
 <H3><A NAME="customization">Customization</A></H3>
@@ -203,7 +205,7 @@ then try "<KBD>make linux MYLIBS=-ltermcap</KBD>".
   You don't actually need to edit the Makefiles because you may set the
   relevant variables in the command line when invoking make.
   Nevertheless, it's probably best to edit and save the Makefiles to
-  record the changes you need.
+  record the changes you've made.
 
 <P>
   On the other hand, if you need to customize some Lua features, you'll need
@@ -211,11 +213,6 @@ then try "<KBD>make linux MYLIBS=-ltermcap</KBD>".
   The edited file will be the one installed, and
   it will be used by any Lua clients that you build, to ensure consistency.
   Further customization is available to experts by editing the Lua sources.
-
-<P>
-  We strongly recommend that you enable dynamic loading in <TT>src/luaconf.h</TT>.
-  This is done automatically for all platforms listed above that have
-  this feature and also for Windows.
 
 <H3><A NAME="other">Building Lua on other systems</A></H3>
 
@@ -233,7 +230,7 @@ lapi.c lcode.c lctype.c ldebug.c ldo.c ldump.c lfunc.c lgc.c llex.c
 lmem.c lobject.c lopcodes.c lparser.c lstate.c lstring.c ltable.c
 ltm.c lundump.c lvm.c lzio.c
 lauxlib.c lbaselib.c lbitlib.c lcorolib.c ldblib.c liolib.c
-lmathlib.c loslib.c lstrlib.c ltablib.c loadlib.c linit.c
+lmathlib.c loslib.c lstrlib.c ltablib.c lutf8lib.c loadlib.c linit.c
 <DT>
 interpreter:
 <DD>
@@ -254,15 +251,16 @@ compiler:
   be linked statically into the host program and its symbols exported for
   dynamic linking; <TT>src/Makefile</TT> does this for the Lua interpreter.
   For Windows, we recommend that the Lua library be a DLL.
+  In all cases, the compiler luac should be linked statically.
 
 <P>
   As mentioned above, you may edit <TT>src/luaconf.h</TT> to customize
   some features before building Lua.
 
-<H2><A NAME="changes">Changes since Lua 5.1</A></H2>
+<H2><A NAME="changes">Changes since Lua 5.2</A></H2>
 
 <P>
-Here are the main changes introduced in Lua 5.2.
+Here are the main changes introduced in Lua 5.3.
 The
 <A HREF="contents.html">reference manual</A>
 lists the
@@ -270,90 +268,50 @@ lists the
 
 <H3>Main changes</H3>
 <UL>
-<LI> yieldable pcall and metamethods
-<LI> new lexical scheme for globals
-<LI> ephemeron tables
-<LI> new library for bitwise operations
-<LI> light C functions
-<LI> emergency garbage collector
-<LI> <CODE>goto</CODE> statement
-<LI> finalizers for tables
+<LI> integers (64-bit by default)
+<LI> official support for 32-bit numbers
+<LI> bitwise operators
+<LI> basic utf-8 support
+<LI> functions for packing and unpacking values
+
 </UL>
 
-Here are the other changes introduced in Lua 5.2:
+Here are the other changes introduced in Lua 5.3:
 <H3>Language</H3>
 <UL>
-<LI> no more fenv for threads or functions
-<LI> tables honor the <CODE>__len</CODE> metamethod
-<LI> hex and <CODE>\z</CODE> escapes in strings
-<LI> support for hexadecimal floats
-<LI> order metamethods work for different types
-<LI> no more verification of opcode consistency
-<LI> hook event "tail return" replaced by "tail call"
-<LI> empty statement
-<LI> <CODE>break</CODE> statement may appear in the middle of a block
+<LI> userdata can have any Lua value as uservalue
+<LI> integer division
+<LI> more flexible rules for some metamethods
 </UL>
 
 <H3>Libraries</H3>
 <UL>
-<LI> arguments for function called through <CODE>xpcall</CODE>
-<LI> optional 'mode' argument to load and loadfile (to control binary x text)
-<LI> optional 'env' argument to load and loadfile (environment for loaded chunk)
-<LI> <CODE>loadlib</CODE> may load libraries with global names (RTLD_GLOBAL)
-<LI> new function <CODE>package.searchpath</CODE>
-<LI> modules receive their paths when loaded
-<LI> optional base in <CODE>math.log</CODE>
-<LI> optional separator in <CODE>string.rep</CODE>
-<LI> <CODE>file:write</CODE> returns <CODE>file</CODE>
-<LI> closing a pipe returns exit status
-<LI> <CODE>os.exit</CODE> may close state
-<LI> new metamethods <CODE>__pairs</CODE> and <CODE>__ipairs</CODE>
-<LI> new option 'isrunning' for <CODE>collectgarbage</CODE> and <CODE>lua_gc</CODE>
-<LI> frontier patterns
-<LI> <CODE>\0</CODE> in patterns
-<LI> new option <CODE>*L</CODE> for <CODE>io.read</CODE>
-<LI> options for <CODE>io.lines</CODE>
-<LI> <CODE>debug.getlocal</CODE> can access function varargs
+<LI> <CODE>ipairs</CODE> and the table library respect metamethods
+<LI> strip option in <CODE>string.dump</CODE>
+<LI> table library respects metamethods
+<LI> new function <CODE>table.move</CODE>
+<LI> new function <CODE>string.pack</CODE>
+<LI> new function <CODE>string.unpack</CODE>
+<LI> new function <CODE>string.packsize</CODE>
 </UL>
 
 <H3>C API</H3>
 <UL>
-<LI> main thread predefined in the registry
-<LI> new functions
-<CODE>lua_absindex</CODE>,
-<CODE>lua_arith</CODE>,
-<CODE>lua_compare</CODE>,
-<CODE>lua_copy</CODE>,
-<CODE>lua_len</CODE>,
-<CODE>lua_rawgetp</CODE>,
-<CODE>lua_rawsetp</CODE>,
-<CODE>lua_upvalueid</CODE>,
-<CODE>lua_upvaluejoin</CODE>,
-<CODE>lua_version</CODE>.
-<LI> new functions
-<CODE>luaL_checkversion</CODE>,
-<CODE>luaL_setmetatable</CODE>,
-<CODE>luaL_testudata</CODE>,
-<CODE>luaL_tolstring</CODE>.
-<LI> <CODE>lua_pushstring</CODE> and <CODE>pushlstring</CODE> return string
-<LI> <CODE>nparams</CODE> and <CODE>isvararg</CODE> available in debug API
-<LI> new <CODE>lua_Unsigned</CODE>
-</UL>
-
-<H3>Implementation</H3>
-<UL>
-<LI> max constants per function raised to 2<SUP>26</SUP>
-<LI> generational mode for garbage collection (experimental)
-<LI> NaN trick (experimental)
-<LI> internal (immutable) version of ctypes
-<LI> simpler implementation for string buffers
-<LI> parser uses much less C-stack space (no more auto arrays)
+<LI> simpler API for continuation functions in C
+<LI> <CODE>lua_gettable</CODE> and similar functions return type of resulted value
+<LI> strip option in <CODE>lua_dump</CODE>
+<LI> new function: <CODE>lua_geti</CODE>
+<LI> new function: <CODE>lua_seti</CODE>
+<LI> new function: <CODE>lua_isyieldable</CODE>
+<LI> new function: <CODE>lua_numbertointeger</CODE>
+<LI> new function: <CODE>lua_rotate</CODE>
+<LI> new function: <CODE>lua_stringtonumber</CODE>
 </UL>
 
 <H3>Lua standalone interpreter</H3>
 <UL>
-<LI> new <CODE>-E</CODE> option to avoid environment variables
-<LI> handling of non-string error messages
+<LI> can be used as calculator; no need to prefix with '='
+<LI> <CODE>arg</CODE> table available to all code
 </UL>
 
 <H2><A NAME="license">License</A></H2>
@@ -375,7 +333,7 @@ For details, see
 <A HREF="http://www.lua.org/license.html">this</A>.
 
 <BLOCKQUOTE STYLE="padding-bottom: 0em">
-Copyright &copy; 1994&ndash;2013 Lua.org, PUC-Rio.
+Copyright &copy; 1994&ndash;2015 Lua.org, PUC-Rio.
 
 <P>
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -403,10 +361,10 @@ THE SOFTWARE.
 <HR>
 <SMALL CLASS="footer">
 Last update:
-Sat Nov  9 22:39:16 BRST 2013
+Fri Dec 12 09:58:42 BRST 2014
 </SMALL>
 <!--
-Last change: revised for Lua 5.2.3
+Last change: updated for Lua 5.3.0 (final)
 -->
 
 </BODY>
