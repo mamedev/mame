@@ -267,12 +267,6 @@ static GFXDECODE_START( gamate )
 GFXDECODE_END
 #endif
 
-static const unsigned short gamate_palette[4] =
-{
-	0,1,2,3
-};
-
-
 /* palette in red, green, blue tribles */
 static const unsigned char gamate_colors[4][3] =
 {
