@@ -14,14 +14,105 @@
 #define __OSDOBJ_COMMON__
 
 #include "osdepend.h"
-#include "options.h"
+#include "cliopts.h"
 
+//============================================================
+//  Defines
+//============================================================
 
-#if 0
-// forward references
-class input_type_entry;
-class device_t;
-#endif
+/* FIXME: void cli_frontend::listnetworkadapters should be
+ * moved here.
+ */
+
+#define OSDOPTION_DEBUGGER              "debugger"
+#define OSDOPTION_WATCHDOG              "watchdog"
+
+#define OSDOPTION_MULTITHREADING        "multithreading"
+#define OSDOPTION_NUMPROCESSORS         "numprocessors"
+#define OSDOPTION_BENCH                 "bench"
+
+#define OSDOPTION_VIDEO                 "video"
+#define OSDOPTION_NUMSCREENS            "numscreens"
+#define OSDOPTION_WINDOW                "window"
+#define OSDOPTION_MAXIMIZE              "maximize"
+#define OSDOPTION_KEEPASPECT            "keepaspect"
+#define OSDOPTION_UNEVENSTRETCH         "unevenstretch"
+#define OSDOPTION_WAITVSYNC             "waitvsync"
+#define OSDOPTION_SYNCREFRESH           "syncrefresh"
+
+#define OSDOPTION_SCREEN                "screen"
+#define OSDOPTION_ASPECT                "aspect"
+#define OSDOPTION_RESOLUTION            "resolution"
+#define OSDOPTION_VIEW                  "view"
+
+#define OSDOPTION_SWITCHRES             "switchres"
+
+#define OSDOPTION_SOUND                 "sound"
+#define OSDOPTION_AUDIO_LATENCY         "audio_latency"
+
+#define OSDOPTVAL_AUTO                  "auto"
+
+//============================================================
+//  TYPE DEFINITIONS
+//============================================================
+
+/* FIXME: core_options inherits from osd_options. This will force any
+ * future osd implementation to use the options below. Actually, these
+ * options are *private* to the osd_core. This object should actually be an
+ * accessor object. Later ...
+ */
+
+/* FIXME: core_options inherits from osd_options. This will force any
+ * future osd implementation to use the options below. Actually, these
+ * options are *private* to the osd_core. This object should actually be an
+ * accessor object. Later ...
+ */
+
+class osd_options : public cli_options
+{
+public:
+    // construction/destruction
+    osd_options();
+
+    // debugging options
+    const char *debugger() const { return value(OSDOPTION_DEBUGGER); }
+    int watchdog() const { return int_value(OSDOPTION_WATCHDOG); }
+
+    // performance options
+    bool multithreading() const { return bool_value(OSDOPTION_MULTITHREADING); }
+    const char *numprocessors() const { return value(OSDOPTION_NUMPROCESSORS); }
+    int bench() const { return int_value(OSDOPTION_BENCH); }
+
+    // video options
+    const char *video() const { return value(OSDOPTION_VIDEO); }
+    int numscreens() const { return int_value(OSDOPTION_NUMSCREENS); }
+    bool window() const { return bool_value(OSDOPTION_WINDOW); }
+    bool maximize() const { return bool_value(OSDOPTION_MAXIMIZE); }
+    bool keep_aspect() const { return bool_value(OSDOPTION_KEEPASPECT); }
+    bool uneven_stretch() const { return bool_value(OSDOPTION_UNEVENSTRETCH); }
+    bool wait_vsync() const { return bool_value(OSDOPTION_WAITVSYNC); }
+    bool sync_refresh() const { return bool_value(OSDOPTION_SYNCREFRESH); }
+
+    // per-window options
+    const char *screen() const { return value(OSDOPTION_SCREEN); }
+    const char *aspect() const { return value(OSDOPTION_ASPECT); }
+    const char *resolution() const { return value(OSDOPTION_RESOLUTION); }
+    const char *view() const { return value(OSDOPTION_VIEW); }
+    const char *screen(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_SCREEN, index)); }
+    const char *aspect(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_ASPECT, index)); }
+    const char *resolution(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_RESOLUTION, index)); }
+    const char *view(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_VIEW, index)); }
+
+    // full screen options
+    bool switch_res() const { return bool_value(OSDOPTION_SWITCHRES); }
+
+    // sound options
+    const char *sound() const { return value(OSDOPTION_SOUND); }
+    int audio_latency() const { return int_value(OSDOPTION_AUDIO_LATENCY); }
+
+private:
+    static const options_entry s_option_entries[];
+};
 
 class osd_sound_interface;
 class osd_debugger_interface;
@@ -40,10 +131,11 @@ class osd_common_t : public osd_interface
 {
 public:
 	// construction/destruction
-	osd_common_t();
+	osd_common_t(osd_options &options);
 	virtual ~osd_common_t();
 
-	virtual void register_options(osd_options &options);
+	// FIXME: simply option handling
+	virtual void register_options();
 
 	// general overridables
 	virtual void init(running_machine &machine);
@@ -123,11 +215,14 @@ public:
     virtual void sound_options_add(const char *name, osd_sound_type type);
     virtual void debugger_options_add(const char *name, osd_debugger_type type);
 
+    osd_options &options() { return m_options; }
+
 private:
 	// internal state
 	running_machine *   m_machine;
+	osd_options& m_options;
 
-	void update_option(osd_options &options, const char * key, dynamic_array<const char *> &values);
+	void update_option(const char * key, dynamic_array<const char *> &values);
 
 protected:
 	osd_sound_interface* m_sound;

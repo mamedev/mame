@@ -421,8 +421,8 @@ int main(int argc, char *argv[])
 	DWORD result = 0;
 	{
 		windows_options options;
-		windows_osd_interface osd;
-		osd.register_options(options);
+		windows_osd_interface osd(options);
+		osd.register_options();
 		cli_frontend frontend(options, osd);
 		result = frontend.execute(argc, argv);
 	}
@@ -437,6 +437,7 @@ int main(int argc, char *argv[])
 //============================================================
 
 windows_options::windows_options()
+: osd_options()
 {
 	add_entries(s_option_entries);
 }
@@ -512,7 +513,8 @@ static void output_oslog(running_machine &machine, const char *buffer)
 //  constructor
 //============================================================
 
-windows_osd_interface::windows_osd_interface()
+windows_osd_interface::windows_osd_interface(windows_options &options)
+: osd_common_t(options)
 {
 }
 

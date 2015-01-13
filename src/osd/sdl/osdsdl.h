@@ -120,7 +120,7 @@ typedef void *osd_font;
 //  TYPE DEFINITIONS
 //============================================================
 
-class sdl_options : public cli_options
+class sdl_options : public osd_options
 {
 public:
 	// construction/destruction
@@ -181,7 +181,7 @@ class sdl_osd_interface : public osd_common_t
 {
 public:
 	// construction/destruction
-	sdl_osd_interface();
+	sdl_osd_interface(sdl_options &options);
 	virtual ~sdl_osd_interface();
 
 	// general overridables
@@ -220,8 +220,11 @@ public:
 	#endif
     //virtual void midi_exit();
 
+    sdl_options &options() { return m_options; }
+
 private:
 	virtual void osd_exit();
+    sdl_options &m_options;
 
 	watchdog *m_watchdog;
 

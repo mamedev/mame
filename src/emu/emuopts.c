@@ -150,6 +150,10 @@ const options_entry emu_options::s_option_entries[] =
 
 	// debugging options
 	{ NULL,                                              NULL,        OPTION_HEADER,     "CORE DEBUGGING OPTIONS" },
+    { OPTION_VERBOSE ";v",                               "0",         OPTION_BOOLEAN,    "display additional diagnostic information" },
+    { OPTION_LOG,                                        "0",         OPTION_BOOLEAN,    "generate an error.log file" },
+    { OPTION_OSLOG,                                      "0",         OPTION_BOOLEAN,    "output error.log data to the system debugger" },
+    { OPTION_DEBUG ";d",                                 "0",         OPTION_BOOLEAN,    "enable/disable debugger" },
 	{ OPTION_UPDATEINPAUSE,                              "0",         OPTION_BOOLEAN,    "keep calling video updates while in pause" },
 	{ OPTION_DEBUGSCRIPT,                                NULL,        OPTION_STRING,     "script for debugger" },
 
@@ -187,9 +191,9 @@ const options_entry emu_options::s_option_entries[] =
 //-------------------------------------------------
 
 emu_options::emu_options()
+: core_options()
 {
-	add_entries(s_option_entries);
-	add_osd_options();
+	add_entries(emu_options::s_option_entries);
 }
 
 
@@ -503,18 +507,6 @@ void emu_options::set_system_name(const char *name)
 		} while(num != options_count());
 	}
 }
-
-
-//-------------------------------------------------
-//  device_option - return the value of the
-//  device-specific option
-//-------------------------------------------------
-
-const char *emu_options::device_option(device_image_interface &image)
-{
-	return value(image.instance_name());
-}
-
 
 //-------------------------------------------------
 //  parse_one_ini - parse a single INI file

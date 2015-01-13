@@ -114,7 +114,7 @@
 //  TYPE DEFINITIONS
 //============================================================
 
-class windows_options : public cli_options
+class windows_options : public osd_options
 {
 public:
 	// construction/destruction
@@ -239,7 +239,7 @@ class windows_osd_interface : public osd_common_t
 {
 public:
 	// construction/destruction
-	windows_osd_interface();
+	windows_osd_interface(windows_options &options);
 	virtual ~windows_osd_interface();
 
 	// general overridables

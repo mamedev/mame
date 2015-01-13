@@ -255,9 +255,10 @@ void MorphToPM()
 //============================================================
 
 sdl_options::sdl_options()
+: osd_options()
 {
 	astring ini_path(INI_PATH);
-	add_entries(s_option_entries);
+	add_entries(sdl_options::s_option_entries);
 	ini_path.replace(0, "APP_NAME", emulator_info::get_appname_lower());
 	set_default_value(SDLOPTION_INIPATH, ini_path.cstr());
 }
@@ -333,9 +334,9 @@ int main(int argc, char *argv[])
 #endif
 
 	{
-		sdl_osd_interface osd;
-		sdl_options options;
-		osd.register_options(options);
+	    sdl_options options;
+		sdl_osd_interface osd(options);
+		osd.register_options();
 		cli_frontend frontend(options, osd);
 		res = frontend.execute(argc, argv);
 	}
@@ -380,7 +381,8 @@ static void output_oslog(running_machine &machine, const char *buffer)
 //  constructor
 //============================================================
 
-sdl_osd_interface::sdl_osd_interface()
+sdl_osd_interface::sdl_osd_interface(sdl_options &options)
+: osd_common_t(options), m_options(options)
 {
 	m_watchdog = NULL;
 }
