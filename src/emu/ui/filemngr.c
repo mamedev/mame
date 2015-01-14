@@ -66,21 +66,26 @@ void ui_menu_file_manager::custom_render(void *selectedref, float top, float bot
 void ui_menu_file_manager::populate()
 {
 	astring buffer;
-	astring tmp_name;
+	bool first = true;
 
 	// cycle through all devices for this system
 	image_interface_iterator iter(machine().root_device());
 	for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
 	{
+		if (first)
+			first = false;
+		else
+			item_append("", NULL, MENU_FLAG_DISABLE, NULL);
+
 		// get the image type/id
-		buffer.printf(
-			"%s (%s)",
-			image->device().name(), image->brief_instance_name());
+		buffer.printf("%s (%s)", image->instance_name(), image->brief_instance_name());
+		item_append(buffer, "", MENU_FLAG_DISABLE, NULL);
+		item_append("Device", image->device().tag(), MENU_FLAG_DISABLE, NULL);
 
 		// get the base name
 		if (image->basename() != NULL)
 		{
-			tmp_name.cpy(image->basename());
+			buffer.cpy(image->basename());
 
 			// if the image has been loaded through softlist, also show the loaded part
 			if (image->part_entry() != NULL)
@@ -88,23 +93,23 @@ void ui_menu_file_manager::populate()
 				const software_part *tmp = image->part_entry();
 				if (tmp->name() != NULL)
 				{
-					tmp_name.cat(" (");
-					tmp_name.cat(tmp->name());
+					buffer.cat(" (");
+					buffer.cat(tmp->name());
 					// also check if this part has a specific part_id (e.g. "Map Disc", "Bonus Disc", etc.), and in case display it
 					if (image->get_feature("part_id") != NULL)
 					{
-						tmp_name.cat(": ");
-						tmp_name.cat(image->get_feature("part_id"));
+						buffer.cat(": ");
+						buffer.cat(image->get_feature("part_id"));
 					}
-					tmp_name.cat(")");
+					buffer.cat(")");
 				}
 			}
 		}
 		else
-			tmp_name.cpy("---");
+			buffer.cpy("---");
 
 		// record the menu item
-		item_append(buffer, tmp_name.cstr(), 0, (void *) image);
+		item_append("Mounted File", buffer, 0, (void *) image);
 	}
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 	item_append("Reset",  NULL, 0, (void *)1);
