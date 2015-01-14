@@ -47,8 +47,6 @@
 #define CLICOMMAND_VERIFYSOFTWARE       "verifysoftware"
 #define CLICOMMAND_GETSOFTLIST          "getsoftlist"
 #define CLICOMMAND_VERIFYSOFTLIST       "verifysoftlist"
-#define CLICOMMAND_LIST_MIDI_DEVICES    "listmidi"
-#define CLICOMMAND_LIST_NETWORK_ADAPTERS "listnetwork"
 
 
 //**************************************************************************

@@ -20,9 +20,8 @@
 //  Defines
 //============================================================
 
-/* FIXME: void cli_frontend::listnetworkadapters should be
- * moved here.
- */
+#define OSDCOMMAND_LIST_MIDI_DEVICES    "listmidi"
+#define OSDCOMMAND_LIST_NETWORK_ADAPTERS "listnetwork"
 
 #define OSDOPTION_DEBUGGER              "debugger"
 #define OSDOPTION_WATCHDOG              "watchdog"
@@ -161,17 +160,8 @@ public:
 	// video overridables
 	virtual void *get_slider_list();
 
-	// midi overridables
-	// FIXME: this should return a list of devices, not list them on stdout
-	virtual void list_midi_devices(void);
-
-	virtual void list_network_adapters()
-    {
-        network_init();
-        osd_list_network_adapters();
-        network_exit();
-    }
-
+    // command option overrides
+    virtual bool execute_command(const char *command);
 
 	// FIXME: everything below seems to be osd specific and not part of
 	//        this INTERFACE but part of the osd IMPLEMENTATION
@@ -193,8 +183,6 @@ public:
     virtual bool sound_init();
     virtual void sound_register();
 
-    virtual bool input_init();
-    virtual void input_pause();
     virtual void input_resume();
     virtual bool output_init();
     virtual bool network_init();
@@ -216,6 +204,10 @@ public:
     virtual void debugger_options_add(const char *name, osd_debugger_type type);
 
     osd_options &options() { return m_options; }
+
+protected:
+    virtual bool input_init();
+    virtual void input_pause();
 
 private:
 	// internal state

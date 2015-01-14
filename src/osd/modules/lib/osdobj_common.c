@@ -20,6 +20,10 @@ extern bool g_print_verbose;
 
 const options_entry osd_options::s_option_entries[] =
 {
+    { NULL,                                   NULL,       OPTION_HEADER,     "OSD CLI OPTIONS" },
+    { OSDCOMMAND_LIST_MIDI_DEVICES ";mlist",  "0",        OPTION_COMMAND,    "list available MIDI I/O devices" },
+    { OSDCOMMAND_LIST_NETWORK_ADAPTERS ";nlist", "0",     OPTION_COMMAND,    "list available network adapters" },
+
     // debugging options
     { NULL,                                   NULL,       OPTION_HEADER,     "OSD DEBUGGING OPTIONS" },
     { OSDOPTION_DEBUGGER,                     OSDOPTVAL_AUTO,      OPTION_STRING,    "debugger used : " },
@@ -375,9 +379,34 @@ bool osd_common_t::font_get_bitmap(osd_font font, unicode_char chnum, bitmap_arg
 //  get_slider_list - allocate and populate a
 //  list of OS-dependent slider values.
 //-------------------------------------------------
+
 void *osd_common_t::get_slider_list()
 {
 	return NULL;
+}
+
+//-------------------------------------------------
+//  execute_command - execute a command not yet
+//  handled by the core
+//-------------------------------------------------
+
+bool osd_common_t::execute_command(const char *command)
+{
+    if (strcmp(command, OSDCOMMAND_LIST_NETWORK_ADAPTERS) == 0)
+    {
+        network_init();
+        osd_list_network_adapters();
+        network_exit();
+        return true;
+    }
+    else if (strcmp(command, OSDCOMMAND_LIST_MIDI_DEVICES) == 0)
+    {
+        osd_list_midi_devices();
+        return true;
+    }
+
+    return false;
+
 }
 
 void osd_common_t::init_subsystems()
@@ -535,15 +564,6 @@ bool osd_common_t::midi_init()
 {
     // this should be done on the OS_level
     return osd_midi_init();
-}
-
-//-------------------------------------------------
-//  list_midi_devices - list available midi devices
-//-------------------------------------------------
-
-void osd_common_t::list_midi_devices(void)
-{
-    osd_list_midi_devices();
 }
 
 void osd_common_t::midi_exit()

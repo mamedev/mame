@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "cliopts.h"
+#include "clifront.h"
 
 //**************************************************************************
 //  COMMAND-LINE OPTIONS
@@ -45,8 +46,20 @@ const options_entry cli_options::s_option_entries[] =
 	{ CLICOMMAND_VERIFYSOFTWARE ";vsoft", "0",     OPTION_COMMAND,    "verify known software for the system" },
 	{ CLICOMMAND_GETSOFTLIST ";glist",  "0",       OPTION_COMMAND,    "retrieve software list by name" },
 	{ CLICOMMAND_VERIFYSOFTLIST ";vlist", "0",     OPTION_COMMAND,    "verify software list by name" },
-	{ CLICOMMAND_LIST_MIDI_DEVICES ";mlist", "0",  OPTION_COMMAND,    "list available MIDI I/O devices" },
-	{ CLICOMMAND_LIST_NETWORK_ADAPTERS ";nlist", "0",  OPTION_COMMAND,    "list available network adapters" },
 	{ NULL }
 };
+
+//**************************************************************************
+//  CLI OPTIONS
+//**************************************************************************
+
+//-------------------------------------------------
+//  cli_options - constructor
+//-------------------------------------------------
+
+cli_options::cli_options()
+: emu_options()
+{
+    add_entries(cli_options::s_option_entries);
+}
 

@@ -49,7 +49,6 @@ public:
 	virtual void set_mastervolume(int attenuation) = 0;
 	virtual bool no_sound() = 0;
 
-
 	// input overridables
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) = 0;
 
@@ -61,12 +60,8 @@ public:
 	// video overridables
 	virtual void *get_slider_list() = 0; // FIXME: returns slider_state *
 
-	// midi overridables
-	// FIXME: this should return a list of devices, not list them on stdout, even better
-	// move this to OSD_OPTIONS
-	virtual void list_midi_devices(void) = 0;
-
-    virtual void list_network_adapters() = 0;
+	// command option overrides
+	virtual bool execute_command(const char *command) = 0;
 
 };
 

@@ -55,6 +55,7 @@ EMUOBJS = \
 	$(EMUOBJ)/audit.o \
 	$(EMUOBJ)/cheat.o \
 	$(EMUOBJ)/clifront.o \
+	$(EMUOBJ)/cliopts.o \
 	$(EMUOBJ)/config.o \
 	$(EMUOBJ)/crsshair.o \
 	$(EMUOBJ)/debugger.o \
@@ -145,7 +146,6 @@ EMUOBJS = \
 	$(EMUOBJ)/profiler.o \
 	$(EMUOBJ)/webengine.o \
 	$(OSDOBJ)/osdcore.o \
-	$(OSDOBJ)/osdepend.o \
 	$(OSDOBJ)/osdnet.o \
 	$(OSDOBJ)/modules/sound/none.o \
 	$(OSDOBJ)/modules/debugger/none.o \

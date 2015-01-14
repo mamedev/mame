@@ -13,6 +13,7 @@
 #ifndef __CLIFRONT_H__
 #define __CLIFRONT_H__
 
+#include "emu.h"
 #include "cliopts.h"
 #include "osdepend.h"
 
