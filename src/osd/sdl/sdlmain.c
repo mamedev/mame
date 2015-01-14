@@ -589,30 +589,29 @@ void sdl_osd_interface::init(running_machine &machine)
 	// call our parent
 	osd_common_t::init(machine);
 
-	sdl_options &options = downcast<sdl_options &>(machine.options());
 	const char *stemp;
 
 	// determine if we are benchmarking, and adjust options appropriately
-	int bench = options.bench();
+	int bench = options().bench();
 	astring error_string;
 	if (bench > 0)
 	{
-		options.set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM, error_string);
-		options.set_value(OSDOPTION_SOUND, "none", OPTION_PRIORITY_MAXIMUM, error_string);
-		options.set_value(OSDOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM, error_string);
-		options.set_value(OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM, error_string);
+		options().set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM, error_string);
+		options().set_value(OSDOPTION_SOUND, "none", OPTION_PRIORITY_MAXIMUM, error_string);
+		options().set_value(OSDOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM, error_string);
+		options().set_value(OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM, error_string);
 		assert(!error_string);
 	}
 
 	// Some driver options - must be before audio init!
-	stemp = options.audio_driver();
+	stemp = options().audio_driver();
 	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 	{
 		osd_printf_verbose("Setting SDL audiodriver '%s' ...\n", stemp);
 		osd_setenv(SDLENV_AUDIODRIVER, stemp, 1);
 	}
 
-	stemp = options.video_driver();
+	stemp = options().video_driver();
 	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 	{
 		osd_printf_verbose("Setting SDL videodriver '%s' ...\n", stemp);
@@ -620,7 +619,7 @@ void sdl_osd_interface::init(running_machine &machine)
 	}
 
 #if (SDLMAME_SDL2)
-		stemp = options.render_driver();
+		stemp = options().render_driver();
 		if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 		{
 			osd_printf_verbose("Setting SDL renderdriver '%s' ...\n", stemp);
@@ -635,7 +634,7 @@ void sdl_osd_interface::init(running_machine &machine)
 #if USE_OPENGL
 	/* FIXME: move lib loading code from drawogl.c here */
 
-	stemp = options.gl_lib();
+	stemp = options().gl_lib();
 	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 	{
 		osd_setenv("SDL_VIDEO_GL_DRIVER", stemp, 1);
@@ -644,7 +643,7 @@ void sdl_osd_interface::init(running_machine &machine)
 #endif
 
 	/* get number of processors */
-	stemp = options.numprocessors();
+	stemp = options().numprocessors();
 
 	osd_num_processors = 0;
 
@@ -685,12 +684,12 @@ void sdl_osd_interface::init(running_machine &machine)
 
 	osd_common_t::init_subsystems();
 
-	if (options.oslog())
+	if (options().oslog())
 		machine.add_logerror_callback(output_oslog);
 
 	/* now setup watchdog */
 
-	int watchdog_timeout = options.watchdog();
+	int watchdog_timeout = options().watchdog();
 
 	if (watchdog_timeout != 0)
 	{
@@ -1037,7 +1036,7 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 	if (!font)
 	{
 		osd_printf_verbose("Searching font %s in -%s\n", name.cstr(), OPTION_FONTPATH);
-		emu_file file(machine().options().font_path(), OPEN_FLAG_READ);
+		emu_file file(options().font_path(), OPEN_FLAG_READ);
 		if (file.open(name) == FILERR_NONE)
 		{
 			astring full_name = file.fullpath();

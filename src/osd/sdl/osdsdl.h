@@ -6,6 +6,7 @@
 #include "watchdog.h"
 #include "clifront.h"
 #include "modules/lib/osdobj_common.h"
+#include "video.h"
 
 //============================================================
 //  System dependent defines
@@ -224,19 +225,18 @@ public:
 
 private:
 	virtual void osd_exit();
+
+	void extract_window_config(int index, sdl_window_config *conf);
+
+	// FIXME: remove machine usage
+	void extract_video_config(running_machine &machine);
+
+
     sdl_options &m_options;
 
 	watchdog *m_watchdog;
 
 };
-
-
-
-//============================================================
-//  sound.c
-//============================================================
-
-void sdlaudio_init(running_machine &machine);
 
 //============================================================
 //  sdlwork.c
