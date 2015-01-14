@@ -25,7 +25,15 @@ TODO:
 #include "includes/xyonix.h"
 
 
-WRITE8_MEMBER(xyonix_state::xyonix_irqack_w)
+void xyonix_state::machine_start()
+{
+	save_item(NAME(m_e0_data));
+	save_item(NAME(m_credits));
+	save_item(NAME(m_coins));
+	save_item(NAME(m_prev_coin));
+}
+
+WRITE8_MEMBER(xyonix_state::irqack_w)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -71,7 +79,7 @@ void xyonix_state::handle_coins(int coin)
 }
 
 
-READ8_MEMBER(xyonix_state::xyonix_io_r)
+READ8_MEMBER(xyonix_state::io_r)
 {
 	int regPC = space.device().safe_pc();
 
@@ -122,7 +130,7 @@ READ8_MEMBER(xyonix_state::xyonix_io_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(xyonix_state::xyonix_io_w)
+WRITE8_MEMBER(xyonix_state::io_w)
 {
 	//logerror ("xyonix_port_e0_w %02x - PC = %04x\n", data, space.device().safe_pc());
 	m_e0_data = data;
@@ -133,7 +141,7 @@ WRITE8_MEMBER(xyonix_state::xyonix_io_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, xyonix_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(xyonix_vidram_w) AM_SHARE("vidram")
+	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(vidram_w) AM_SHARE("vidram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( port_map, AS_IO, 8, xyonix_state )
@@ -141,9 +149,9 @@ static ADDRESS_MAP_START( port_map, AS_IO, 8, xyonix_state )
 	AM_RANGE(0x20, 0x20) AM_READNOP AM_DEVWRITE("sn1", sn76496_device, write)   /* SN76496 ready signal */
 	AM_RANGE(0x21, 0x21) AM_READNOP AM_DEVWRITE("sn2", sn76496_device, write)
 	AM_RANGE(0x40, 0x40) AM_WRITENOP        /* NMI ack? */
-	AM_RANGE(0x50, 0x50) AM_WRITE(xyonix_irqack_w)
+	AM_RANGE(0x50, 0x50) AM_WRITE(irqack_w)
 	AM_RANGE(0x60, 0x61) AM_WRITENOP        /* mc6845 */
-	AM_RANGE(0xe0, 0xe0) AM_READWRITE(xyonix_io_r, xyonix_io_w)
+	AM_RANGE(0xe0, 0xe0) AM_READWRITE(io_r, io_w)
 ADDRESS_MAP_END
 
 /* Inputs Ports **************************************************************/
@@ -226,7 +234,7 @@ static MACHINE_CONFIG_START( xyonix, xyonix_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(80*4, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*4-1, 0, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(xyonix_state, screen_update_xyonix)
+	MCFG_SCREEN_UPDATE_DRIVER(xyonix_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xyonix)
@@ -259,4 +267,4 @@ ROM_END
 
 /* GAME drivers **************************************************************/
 
-GAME( 1989, xyonix, 0, xyonix, xyonix, driver_device, 0, ROT0, "Philko", "Xyonix", 0 )
+GAME( 1989, xyonix, 0, xyonix, xyonix, driver_device, 0, ROT0, "Philko", "Xyonix", GAME_SUPPORTS_SAVE )
