@@ -16,7 +16,6 @@
 #include "machine/at28c16.h"
 #include "sound/qs1000.h"
 #include "includes/eolith.h"
-#include "includes/eolithsp.h"
 
 
 class vegaeo_state : public eolith_state
@@ -27,19 +26,20 @@ public:
 
 	UINT32 *m_vega_vram;
 	UINT8 m_vega_vbuffer;
+	
 	DECLARE_WRITE32_MEMBER(vega_vram_w);
 	DECLARE_READ32_MEMBER(vega_vram_r);
 	DECLARE_WRITE32_MEMBER(vega_misc_w);
 	DECLARE_READ32_MEMBER(vegaeo_custom_read);
 	DECLARE_WRITE32_MEMBER(soundlatch_w);
-
 	DECLARE_READ8_MEMBER(qs1000_p1_r);
-
 	DECLARE_WRITE8_MEMBER(qs1000_p1_w);
 	DECLARE_WRITE8_MEMBER(qs1000_p2_w);
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
+
 	DECLARE_DRIVER_INIT(vegaeo);
 	DECLARE_VIDEO_START(vega);
+
 	UINT32 screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -62,12 +62,10 @@ WRITE8_MEMBER( vegaeo_state::qs1000_p3_w )
 	// ...x .... - ?
 	// ..x. .... - /IRQ clear
 
-	qs1000_device *qs1000 = machine().device<qs1000_device>("qs1000");
-
 	membank("qs1000:bank")->set_entry(data & 0x07);
 
 	if (!BIT(data, 5))
-		qs1000->set_irq(CLEAR_LINE);
+		m_qs1000->set_irq(CLEAR_LINE);
 }
 
 WRITE32_MEMBER(vegaeo_state::vega_vram_w)
@@ -115,16 +113,14 @@ WRITE32_MEMBER(vegaeo_state::vega_misc_w)
 
 READ32_MEMBER(vegaeo_state::vegaeo_custom_read)
 {
-	eolith_speedup_read(space);
+	speedup_read();
 	return ioport("SYSTEM")->read();
 }
 
 WRITE32_MEMBER(vegaeo_state::soundlatch_w)
 {
-	qs1000_device *qs1000 = space.machine().device<qs1000_device>("qs1000");
-
 	soundlatch_byte_w(space, 0, data);
-	qs1000->set_irq(ASSERT_LINE);
+	m_qs1000->set_irq(ASSERT_LINE);
 
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
@@ -180,6 +176,8 @@ INPUT_PORTS_END
 VIDEO_START_MEMBER(vegaeo_state,vega)
 {
 	m_vega_vram = auto_alloc_array(machine(), UINT32, 0x14000*2/4);
+	save_pointer(NAME(m_vega_vram), 0x14000*2/4);
+	save_item(NAME(m_vega_vbuffer));
 }
 
 UINT32 vegaeo_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -328,7 +326,7 @@ DRIVER_INIT_MEMBER(vegaeo_state,vegaeo)
 	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "bank");
 	membank("qs1000:bank")->configure_entries(0, 8, memregion("qs1000:cpu")->base()+0x100, 0x10000);
 
-	init_eolith_speedup(machine());
+	init_speedup();
 }
 
-GAME( 2002, crazywar, 0, vega, crazywar, vegaeo_state, vegaeo, ROT0, "Eolith", "Crazy War", GAME_IMPERFECT_SOUND )
+GAME( 2002, crazywar, 0, vega, crazywar, vegaeo_state, vegaeo, ROT0, "Eolith", "Crazy War", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

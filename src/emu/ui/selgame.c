@@ -17,6 +17,7 @@
 #include "cheat.h"
 #include "uiinput.h"
 #include "ui/selgame.h"
+#include "ui/inputmap.h"
 #include "ui/miscmenu.h"
 #include "audit.h"
 #include "crsshair.h"

@@ -98,6 +98,8 @@ INTERRUPT_GEN_MEMBER(sprint2_state::sprint2)
 			case 4: m_gear[i] = 3; break;
 			case 8: m_gear[i] = 4; break;
 			}
+			output_set_value("P1gear", m_gear[0]);
+			output_set_value("P2gear", m_gear[1]);
 		}
 	}
 
