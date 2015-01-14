@@ -15,7 +15,6 @@
 
 #include "sound/okim6295.h"
 #include "includes/eolith.h"
-#include "includes/eolithsp.h"
 
 
 class eolith16_state : public eolith_state
@@ -26,13 +25,16 @@ public:
 
 	UINT16 *m_vram;
 	int m_vbuffer;
+	
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 	DECLARE_READ16_MEMBER(eolith16_custom_r);
 	DECLARE_WRITE16_MEMBER(vram_w);
 	DECLARE_READ16_MEMBER(vram_r);
+	
 	DECLARE_DRIVER_INIT(eolith16);
 	DECLARE_VIDEO_START(eolith16);
 	DECLARE_PALETTE_INIT(eolith16);
+	
 	UINT32 screen_update_eolith16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -43,14 +45,14 @@ WRITE16_MEMBER(eolith16_state::eeprom_w)
 	m_vbuffer = (data & 0x80) >> 7;
 	coin_counter_w(machine(), 0, data & 1);
 
-	ioport("EEPROMOUT")->write(data, 0xff);
+	m_eepromoutport->write(data, 0xff);
 
 	//data & 0x100 and data & 0x004 always set
 }
 
 READ16_MEMBER(eolith16_state::eolith16_custom_r)
 {
-	eolith_speedup_read(space);
+	speedup_read();
 	return ioport("SPECIAL")->read();
 }
 
@@ -113,6 +115,8 @@ INPUT_PORTS_END
 VIDEO_START_MEMBER(eolith16_state,eolith16)
 {
 	m_vram = auto_alloc_array(machine(), UINT16, 0x10000);
+	save_pointer(NAME(m_vram), 0x10000);
+	save_item(NAME(m_vbuffer));
 }
 
 UINT32 eolith16_state::screen_update_eolith16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -253,7 +257,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(eolith16_state,eolith16)
 {
-	init_eolith_speedup(machine());
+	init_speedup();
 }
 
-GAME( 1999, klondkp, 0, eolith16, eolith16, eolith16_state, eolith16, ROT0, "Eolith", "KlonDike+", 0 )
+GAME( 1999, klondkp, 0, eolith16, eolith16, eolith16_state, eolith16, ROT0, "Eolith", "KlonDike+", GAME_SUPPORTS_SAVE )
