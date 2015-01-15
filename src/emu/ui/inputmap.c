@@ -412,7 +412,7 @@ void ui_menu_input::populate_and_sort(input_item_data *itemlist)
 		item = itemarray[curitem];
 		assert(nameformat[item->type] != NULL);
 
-		if (strcmp(item->owner_name, prev_owner.cstr()) != 0)
+		if (item->owner_name && strcmp(item->owner_name, prev_owner.cstr()) != 0)
 		{
 			if (first_entry)
 				first_entry = false;
