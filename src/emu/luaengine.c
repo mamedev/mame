@@ -537,6 +537,38 @@ int lua_engine::lua_addr_space::l_mem_read(lua_State *L)
 }
 
 //-------------------------------------------------
+//  screen_height - return screen visible height
+//  -> manager:machine().screens[":screen"]:height()
+//-------------------------------------------------
+
+int lua_engine::lua_screen::l_height(lua_State *L)
+{
+	screen_device *sc = luabridge::Stack<screen_device *>::get(L, 1);
+	if(!sc) {
+		return 0;
+	}
+
+	lua_pushunsigned(L, sc->visible_area().height());
+	return 1;
+}
+
+//-------------------------------------------------
+//  screen_width - return screen visible width
+//  -> manager:machine().screens[":screen"]:width()
+//-------------------------------------------------
+
+int lua_engine::lua_screen::l_width(lua_State *L)
+{
+	screen_device *sc = luabridge::Stack<screen_device *>::get(L, 1);
+	if(!sc) {
+		return 0;
+	}
+
+	lua_pushunsigned(L, sc->visible_area().width());
+	return 1;
+}
+
+//-------------------------------------------------
 //  draw_box - draw a box on a screen container
 //  -> manager:machine().screens[":screen"]:draw_box(x1, y1, x2, y2, bgcolor, linecolor)
 //-------------------------------------------------
@@ -558,10 +590,10 @@ int lua_engine::lua_screen::l_draw_box(lua_State *L)
 
 	// retrieve all parameters
 	float x1, y1, x2, y2;
-	x1 = MIN(lua_tounsigned(L, 2) / static_cast<float>(sc->width()) , 1.0f);
-	y1 = MIN(lua_tounsigned(L, 3) / static_cast<float>(sc->height()), 1.0f);
-	x2 = MIN(lua_tounsigned(L, 4) / static_cast<float>(sc->width()) , 1.0f);
-	y2 = MIN(lua_tounsigned(L, 5) / static_cast<float>(sc->height()), 1.0f);
+	x1 = MIN(lua_tounsigned(L, 2) / static_cast<float>(sc->visible_area().width()) , 1.0f);
+	y1 = MIN(lua_tounsigned(L, 3) / static_cast<float>(sc->visible_area().height()), 1.0f);
+	x2 = MIN(lua_tounsigned(L, 4) / static_cast<float>(sc->visible_area().width()) , 1.0f);
+	y2 = MIN(lua_tounsigned(L, 5) / static_cast<float>(sc->visible_area().height()), 1.0f);
 	UINT32 bgcolor = lua_tounsigned(L, 6);
 	UINT32 fgcolor = lua_tounsigned(L, 7);
 
@@ -594,10 +626,10 @@ int lua_engine::lua_screen::l_draw_line(lua_State *L)
 
 	// retrieve all parameters
 	float x1, y1, x2, y2;
-	x1 = MIN(lua_tounsigned(L, 2) / static_cast<float>(sc->width()) , 1.0f);
-	y1 = MIN(lua_tounsigned(L, 3) / static_cast<float>(sc->height()), 1.0f);
-	x2 = MIN(lua_tounsigned(L, 4) / static_cast<float>(sc->width()) , 1.0f);
-	y2 = MIN(lua_tounsigned(L, 5) / static_cast<float>(sc->height()), 1.0f);
+	x1 = MIN(lua_tounsigned(L, 2) / static_cast<float>(sc->visible_area().width()) , 1.0f);
+	y1 = MIN(lua_tounsigned(L, 3) / static_cast<float>(sc->visible_area().height()), 1.0f);
+	x2 = MIN(lua_tounsigned(L, 4) / static_cast<float>(sc->visible_area().width()) , 1.0f);
+	y2 = MIN(lua_tounsigned(L, 5) / static_cast<float>(sc->visible_area().height()), 1.0f);
 	UINT32 color = lua_tounsigned(L, 6);
 
 	// draw the line
@@ -623,8 +655,8 @@ int lua_engine::lua_screen::l_draw_text(lua_State *L)
 	luaL_argcheck(L, lua_isstring(L, 4), 4, "message (string) expected");
 
 	// retrieve all parameters
-	float x = MIN(lua_tounsigned(L, 2) / static_cast<float>(sc->width()) , 1.0f);
-	float y = MIN(lua_tounsigned(L, 3) / static_cast<float>(sc->height()), 1.0f);
+	float x = MIN(lua_tounsigned(L, 2) / static_cast<float>(sc->visible_area().width()) , 1.0f);
+	float y = MIN(lua_tounsigned(L, 3) / static_cast<float>(sc->visible_area().height()), 1.0f);
 	const char *msg = luaL_checkstring(L,4);
 	// TODO: add optional parameters (colors, etc.)
 
@@ -900,13 +932,13 @@ void lua_engine::initialize()
 				.addCFunction ("draw_box",  &lua_screen::l_draw_box)
 				.addCFunction ("draw_line", &lua_screen::l_draw_line)
 				.addCFunction ("draw_text", &lua_screen::l_draw_text)
+				.addCFunction ("height", &lua_screen::l_height)
+				.addCFunction ("width", &lua_screen::l_width)
 			.endClass()
 			.deriveClass <screen_device, lua_screen> ("screen_dev")
 				.addFunction ("name", &screen_device::name)
 				.addFunction ("shortname", &screen_device::shortname)
 				.addFunction ("tag", &screen_device::tag)
-				.addFunction ("height", &screen_device::height)
-				.addFunction ("width", &screen_device::width)
 			.endClass()
 			.beginClass <device_state_entry> ("dev_space")
 				.addFunction ("name", &device_state_entry::symbol)

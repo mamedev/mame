@@ -115,6 +115,8 @@ private:
 	};
 	static luabridge::LuaRef l_machine_get_screens(const running_machine *r);
 	struct lua_screen {
+		int l_height(lua_State *L);
+		int l_width(lua_State *L);
 		int l_draw_box(lua_State *L);
 		int l_draw_line(lua_State *L);
 		int l_draw_text(lua_State *L);
