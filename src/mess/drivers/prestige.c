@@ -779,6 +779,10 @@ static MACHINE_CONFIG_DERIVED( gl7007sl, prestige_base )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( gjmovie, prestige_base )
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "gjmovie")
+MACHINE_CONFIG_END
+
 /* ROM definition */
 ROM_START( gl6000sl )
 	ROM_REGION(0x100000, "maincpu", 0)
@@ -865,7 +869,7 @@ COMP( 1999, gwnf,      0,       0,  prestige,   prestige, driver_device,     0, 
 
 // these systems need to be moved into a separate driver
 COMP( 1996, gj4000,    0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior 4000 (Germany)", GAME_IS_SKELETON)
-COMP( 1993, gjmovie,   0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior Movie (Germany)", GAME_IS_SKELETON)
+COMP( 1993, gjmovie,   0,       0,  gjmovie,    prestige, driver_device,     0,  "VTech",   "Genius Junior Movie (Germany)", GAME_IS_SKELETON)
 COMP( 1996, gjrstar,   0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior Redstar(Germany)", GAME_IS_SKELETON)
 COMP( 1996, gjrstar2,  gjrstar, 0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior Redstar 2 (Germany)", GAME_IS_SKELETON)
 COMP( 1998, gjrstar3,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior Redstar 3 (Germany)", GAME_IS_SKELETON)
