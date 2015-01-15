@@ -438,17 +438,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( 11beat )
 	PORT_INCLUDE( aleck64 )
 
-	PORT_MODIFY("P1_ANALOG_Y")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_MODIFY("P2_ANALOG_X")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_MODIFY("P2_ANALOG_Y")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_MODIFY("P1_ANALOG_X")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
-
 	PORT_MODIFY("P1")
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_UNUSED ) // "joystick type error" happens because game expects D-PADs to be unconnected
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -458,6 +450,7 @@ static INPUT_PORTS_START( 11beat )
 
 	PORT_MODIFY("P2")
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_UNUSED ) // "joystick type error" happens because game expects D-PADs to be unconnected
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1082,7 +1075,7 @@ ROM_END
 GAME( 1998, aleck64,  0,        aleck64, aleck64, aleck64_state,  aleck64, ROT0, "Nintendo / Seta", "Aleck64 PIF BIOS", GAME_IS_BIOS_ROOT)
 
 // games
-GAME( 1998, 11beat,   aleck64,  aleck64, 11beat, aleck64_state,   aleck64, ROT0, "Hudson", "Eleven Beat", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1998, 11beat,   aleck64,  aleck64, 11beat, aleck64_state,   aleck64, ROT0, "Hudson", "Eleven Beat", GAME_NOT_WORKING|GAME_NO_SOUND ) // crashes at kick off / during attract
 GAME( 1998, mtetrisc, aleck64,  aleck64, mtetrisc, aleck64_state, aleck64, ROT0, "Capcom", "Magical Tetris Challenge (981009 Japan)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, starsldr, aleck64,  aleck64, starsldr, aleck64_state, aleck64, ROT0, "Hudson / Seta", "Star Soldier: Vanishing Earth", GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, vivdolls, aleck64,  aleck64, aleck64, aleck64_state,  aleck64, ROT0, "Visco", "Vivid Dolls", GAME_IMPERFECT_GRAPHICS )
