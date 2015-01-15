@@ -36,12 +36,16 @@ Memo:
 #endif
 
 
+void pastelg_state::machine_start()
+{
+	save_item(NAME(m_mux_data));
+}
 
 READ8_MEMBER(pastelg_state::pastelg_sndrom_r)
 {
 	UINT8 *ROM = memregion("voice")->base();
 
-	return ROM[pastelg_blitter_src_addr_r(space) & 0x7fff];
+	return ROM[pastelg_blitter_src_addr_r() & 0x7fff];
 }
 
 static ADDRESS_MAP_START( pastelg_map, AS_PROGRAM, 8, pastelg_state )
@@ -66,7 +70,7 @@ static ADDRESS_MAP_START( pastelg_io_map, AS_IO, 8, pastelg_state )
 	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("nb1413m3", nb1413m3_device, inputport1_r, inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_DEVREAD("nb1413m3", nb1413m3_device, inputport2_r) AM_WRITE(pastelg_romsel_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ(pastelg_sndrom_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(pastelg_clut_w)
+	AM_RANGE(0xc0, 0xcf) AM_WRITEONLY AM_SHARE("clut")
 	AM_RANGE(0xd0, 0xd0) AM_READ(pastelg_irq_ack_r) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0xe0, 0xe0) AM_READ_PORT("DSWC")
 ADDRESS_MAP_END
@@ -118,7 +122,7 @@ static ADDRESS_MAP_START( threeds_io_map, AS_IO, 8, pastelg_state )
 	AM_RANGE(0xf0, 0xf6) AM_WRITE(pastelg_blitter_w)
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE(threeds_inputport1_r, threeds_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READ(threeds_inputport2_r) AM_WRITE(threeds_output_w)//writes: bit 3 is coin lockout, bit 1 is coin counter
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(pastelg_clut_w)
+	AM_RANGE(0xc0, 0xcf) AM_WRITEONLY AM_SHARE("clut")
 	AM_RANGE(0xc0, 0xc0) AM_READ(threeds_rom_readback_r)
 	AM_RANGE(0xd0, 0xd0) AM_READ(pastelg_irq_ack_r) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 ADDRESS_MAP_END
@@ -559,6 +563,6 @@ ROM_END
 
 
 
-GAME( 1985, pastelg, 0,       pastelg, pastelg, driver_device, 0, ROT0, "Nichibutsu", "Pastel Gal (Japan 851224)", 0 )
-GAME( 1985, threeds, 0,       threeds, threeds, driver_device, 0, ROT0, "Nichibutsu", "Three Ds - Three Dealers Casino House", 0 )
-GAME( 1985, galds,   threeds, threeds, galds,   driver_device, 0, ROT0, "Nihon System Corp.", "Gals Ds - Three Dealers Casino House (bootleg?)", 0 )
+GAME( 1985, pastelg, 0,       pastelg, pastelg, driver_device, 0, ROT0, "Nichibutsu", "Pastel Gal (Japan 851224)", GAME_SUPPORTS_SAVE )
+GAME( 1985, threeds, 0,       threeds, threeds, driver_device, 0, ROT0, "Nichibutsu", "Three Ds - Three Dealers Casino House", GAME_SUPPORTS_SAVE )
+GAME( 1985, galds,   threeds, threeds, galds,   driver_device, 0, ROT0, "Nihon System Corp.", "Gals Ds - Three Dealers Casino House (bootleg?)", GAME_SUPPORTS_SAVE )
