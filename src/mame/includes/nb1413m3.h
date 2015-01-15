@@ -129,6 +129,11 @@ public:
 
 	// (static) configuration helpers
 	static void set_type(device_t &device, int type) { downcast<nb1413m3_device &>(device).m_nb1413m3_type = type; }
+	
+	enum
+	{
+		TIMER_CB
+	};
 
 	DECLARE_WRITE8_MEMBER( nmi_clock_w );
 	DECLARE_READ8_MEMBER( sndrom_r );
@@ -161,10 +166,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	
 private:
 
 	int m_74ls193_counter;
@@ -176,9 +181,8 @@ private:
 	int m_gfxradr_h;
 	int m_gfxrombank;
 	int m_outcoin_enable;
-
+	emu_timer *m_timer_cb;
 	TIMER_CALLBACK_MEMBER( timer_callback );
-
 };
 
 /* used in: hyhoo.c, niyanpai.c, pastelg.c, nbmj8688.c, nbmj8891.c, nbmj8991.c, nbmj9195.c*/
