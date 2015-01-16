@@ -1698,7 +1698,7 @@ static void do_create_hd(parameters_t &params)
 		astring *size_str = params.find(OPTION_SIZE);
 		if (size_str != NULL)
 		{
-			if (sscanf(*size_str, "%d", &filesize) != 1)
+			if (sscanf(*size_str, "%"I64FMT"d", &filesize) != 1)
 				report_error(1, "Invalid size string");
 		}
 	}
