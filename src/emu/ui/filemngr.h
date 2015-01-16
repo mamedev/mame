@@ -25,6 +25,8 @@ public:
 	virtual void populate();
 	virtual void handle();
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
+
+	void fill_image_line(device_image_interface *img, astring &instance, astring &filename);
 };
 
 #endif  /* __UI_FILEMNGR_H__ */
