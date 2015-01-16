@@ -83,6 +83,7 @@ public:
 		m_dmac(*this,"dmac"),
 		m_pic(*this,"pic"),
 		m_pit(*this,"pit"),
+		m_disk_rom(*this,"disk"),
 		m_vram(*this,"vram"),
 		m_fontram(*this,"fontram"),
 		m_fdc(*this,"fdc"),
@@ -112,15 +113,17 @@ public:
 	DECLARE_READ8_MEMBER( dma_0_dack_r ) { UINT16 ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
 	DECLARE_READ8_MEMBER( dma_1_dack_r ) { UINT16 ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
 	DECLARE_READ8_MEMBER( dma_2_dack_r ) { UINT16 ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
-	DECLARE_READ8_MEMBER( dma_3_dack_r ) { UINT16 ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
-	DECLARE_WRITE8_MEMBER( dma_0_dack_w ){ popmessage("IOW: data %02x",data); }
+	DECLARE_READ8_MEMBER( dma_3_dack_r );
+	DECLARE_WRITE8_MEMBER( dma_0_dack_w ){ popmessage("IOW0: data %02x",data); }
 	DECLARE_WRITE8_MEMBER( dma_1_dack_w ){  }
 	DECLARE_WRITE8_MEMBER( dma_2_dack_w ){  }
-	DECLARE_WRITE8_MEMBER( dma_3_dack_w ){  }
+	DECLARE_WRITE8_MEMBER( dma_3_dack_w ){ popmessage("IOW3: data %02x",data); }
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE8_MEMBER(fdc_control_w);
 	DECLARE_READ8_MEMBER(irq_cb);
+	DECLARE_WRITE8_MEMBER(hdc_control_w);
+	DECLARE_WRITE8_MEMBER(disk_addr_ext);
 
 protected:
 	virtual void machine_reset();
@@ -133,6 +136,7 @@ private:
 	required_device<am9517a_device> m_dmac;
 	required_device<pic8259_device> m_pic;
 	required_device<pit8254_device> m_pit;
+	optional_memory_region m_disk_rom;
 	optional_shared_ptr<UINT16> m_vram;
 	optional_shared_ptr<UINT16> m_fontram;
 	optional_device<wd2797_t> m_fdc;
@@ -149,6 +153,9 @@ private:
 	INT8 m_dma_channel;
 	UINT16 m_dma_high_byte;
 	UINT16 m_control;
+	UINT16 m_disk_rom_ptr;
+	UINT8 m_hdc_control;
+	UINT8 m_disk_page;
 };
 
 class ngen386_state : public driver_device
@@ -249,7 +256,7 @@ WRITE16_MEMBER(ngen_state::peripheral_w)
 	case 0x0f:
 		if(mem_mask & 0x00ff)
 			m_dmac->write(space,offset,data & 0xff);
-		//logerror("(PC=%06x) DMA write offset %04x data %04x mask %04x\n",m_maincpu->device_t::safe_pc(),offset,data,mem_mask);
+		logerror("(PC=%06x) DMA write offset %04x data %04x mask %04x\n",m_maincpu->device_t::safe_pc(),offset,data,mem_mask);
 		break;
 	case 0x80: // DMA page offset?
 	case 0x81:
@@ -388,13 +395,12 @@ WRITE16_MEMBER(ngen_state::port00_w)
 }
 
 // returns X-bus module ID (what is the low byte for?)
-// For now, we'll hard code a floppy disk module (or try to)
 READ16_MEMBER(ngen_state::port00_r)
 {
 	if(m_port00 > 0)
 		m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 	if(m_port00 == 0)
-		return 0x0040;  // module ID of 0x40 = dual floppy disk module (need hardware manual to find other module IDs)
+		return 0x1070;  // module ID of 0x1070, according to the floppy/hard disk tech manual
 	else
 		return 0x0080;  // invalid device?
 }
@@ -409,11 +415,44 @@ WRITE_LINE_MEMBER(ngen_state::fdc_drq_w)
 	m_dmac->dreq3_w(state);
 }
 
+// Floppy disk control register
+// Bit 0 - enable drive and LED
+// Bit 2 - floppy motor
+// Bit 5 - side select
+// Bit 6 - 1 = 2Mhz for seek, 0 = 1MHz for read/write
+// Bit 7 - FDC reset
 WRITE8_MEMBER(ngen_state::fdc_control_w)
 {
 	m_fdc->set_floppy(m_fd0->get_device());
-	m_fd0->get_device()->mon_w((~data) & 0x80);
-	m_fdc->dden_w(~data & 0x04);
+	m_fd0->get_device()->mon_w((~data) & 0x04);
+	m_fd0->get_device()->ss_w(~data & 0x20);
+	m_fdc->soft_reset();
+}
+
+// Hard disk control register
+// bit 0 - Drive select 0 - selects module hard disk
+// bit 1 - Drive select 1 - selects expansion module hard disk (if available)
+// bit 2 - enable DMA transfer of module ROM contents to X-Bus master memory
+// bits 3-5 - select head / expansion module head
+// bit 6 - write enable, must be set to write to a hard disk
+// bit 7 - HDC reset
+WRITE8_MEMBER(ngen_state::hdc_control_w)
+{
+	m_hdc_control = data;
+	if(m_hdc_control & 0x04)
+	{
+		m_disk_rom_ptr = 0;
+		popmessage("HDD: DMA ROM transfer start\n");
+		m_dmac->dreq3_w(1);
+		//m_dmac->dreq3_w(0);
+	}
+}
+
+// page of system RAM to access
+// bit 7 = disables read/write signals to the WD1010
+WRITE8_MEMBER(ngen_state::disk_addr_ext)
+{
+	m_disk_page = data & 0x7f;
 }
 
 WRITE_LINE_MEMBER( ngen_state::dma_hrq_changed )
@@ -430,6 +469,14 @@ WRITE_LINE_MEMBER( ngen_state::dma_eop_changed )
 		else
 			m_control &= ~0x02;
 	}
+	if(m_dma_channel == 3)
+	{
+		if(state)
+		{
+			if(m_hdc_control & 0x04) // ROM transfer?
+				m_hdc_control &= ~0x04;  // switch it off when done
+		}
+	}
 }
 
 void ngen_state::set_dma_channel(int channel, int state)
@@ -444,6 +491,24 @@ WRITE_LINE_MEMBER( ngen_state::dack0_w ) { set_dma_channel(0, state); }
 WRITE_LINE_MEMBER( ngen_state::dack1_w ) { set_dma_channel(1, state); }
 WRITE_LINE_MEMBER( ngen_state::dack2_w ) { set_dma_channel(2, state); }
 WRITE_LINE_MEMBER( ngen_state::dack3_w ) { set_dma_channel(3, state); }
+
+READ8_MEMBER(ngen_state::dma_3_dack_r)
+{
+	UINT16 ret = 0xffff; 
+	
+	if((m_hdc_control & 0x04) && m_disk_rom)
+	{
+		ret = m_disk_rom->base()[m_disk_rom_ptr++] << 8;
+		printf("DMA3 DACK: returning %02x\n",ret);
+		if(m_disk_rom_ptr < 0x1000)
+		{
+			m_dmac->dreq3_w(1);
+			//m_dmac->dreq3_w(0);
+		}
+	}
+	m_dma_high_byte = ret & 0xff00; 
+	return ret;
+}
 
 READ8_MEMBER(ngen_state::dma_read_word)
 {
@@ -513,9 +578,17 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ngen_io, AS_IO, 16, ngen_state )
 	AM_RANGE(0x0000, 0x0001) AM_READWRITE(port00_r,port00_w)
+	
+	// TODO: allow for expansion modules to be allocated where asked to
+	// Floppy/Hard disk module
 	AM_RANGE(0x0100, 0x0107) AM_DEVREADWRITE8("fdc",wd2797_t,read,write,0x00ff)  // a guess for now
 	AM_RANGE(0x0108, 0x0109) AM_WRITE8(fdc_control_w,0x00ff)
+	AM_RANGE(0x010a, 0x010b) AM_WRITE8(hdc_control_w,0x00ff)
+	AM_RANGE(0x010e, 0x010f) AM_WRITE8(disk_addr_ext,0x00ff)  // X-Bus extended address register
 	AM_RANGE(0x0110, 0x0117) AM_DEVREADWRITE8("fdc_timer",pit8253_device,read,write,0x00ff)
+	// 0x0120-0x012f - WD1010 Winchester disk controller (unemulated)
+	AM_RANGE(0x0130, 0x0137) AM_DEVREADWRITE8("hdc_timer",pit8253_device,read,write,0x00ff)
+	
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ngen386_mem, AS_PROGRAM, 32, ngen_state )
@@ -620,7 +693,7 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 
 	// keyboard UART (patent says i8251 is used for keyboard communications, it is located on the video board)
 	MCFG_DEVICE_ADD("videouart", I8251, 0)  // main clock unknown, Rx/Tx clocks are 19.53kHz
-	MCFG_I8251_TXEMPTY_HANDLER(DEVWRITELINE("pic",pic8259_device,ir4_w))
+//	MCFG_I8251_TXEMPTY_HANDLER(DEVWRITELINE("pic",pic8259_device,ir4_w))
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("keyboard", rs232_port_device, write_txd))
 	MCFG_RS232_PORT_ADD("keyboard", keyboard, "ngen")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("videouart", i8251_device, write_rxd))
@@ -635,11 +708,11 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	MCFG_WD_FDC_FORCE_READY
 	MCFG_DEVICE_ADD("fdc_timer", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_20MHz / 20)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic",pic8259_device,ir4_w))
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic",pic8259_device,ir7_w))
 	MCFG_PIT8253_CLK1(XTAL_20MHz / 20)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pic",pic8259_device,ir4_w))
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pic",pic8259_device,ir7_w))
 	MCFG_PIT8253_CLK2(XTAL_20MHz / 20)
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pic",pic8259_device,ir4_w))
+	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pic",pic8259_device,ir7_w))
 	// TODO: WD1010 HDC (not implemented)
 	MCFG_DEVICE_ADD("hdc_timer", PIT8253, 0)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ngen_floppies, "525qd", floppy_image_device::default_floppy_formats)
