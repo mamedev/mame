@@ -537,6 +537,52 @@ int lua_engine::lua_addr_space::l_mem_read(lua_State *L)
 }
 
 //-------------------------------------------------
+//  mem_write - templated memory writer for <sign>,<size>
+//  -> manager:machine().devices[":maincpu"].spaces["program"]:write_u16(0xC000, 0xF00D)
+//-------------------------------------------------
+
+template <typename T>
+int lua_engine::lua_addr_space::l_mem_write(lua_State *L)
+{
+	address_space &sp = luabridge::Stack<address_space &>::get(L, 1);
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 3), 3, "value (integer) expected");
+	offs_t address = lua_tounsigned(L, 2);
+	T val = lua_tounsigned(L, 3);
+
+	switch(sizeof(val) * 8) {
+		case 8:
+			sp.write_byte(address, val);
+			break;
+		case 16:
+			if ((address & 1) == 0) {
+				sp.write_word(address, val);
+			} else {
+				sp.read_word_unaligned(address, val);
+			}
+			break;
+		case 32:
+			if ((address & 3) == 0) {
+				sp.write_dword(address, val);
+			} else {
+				sp.write_dword_unaligned(address, val);
+			}
+			break;
+		case 64:
+			if ((address & 7) == 0) {
+				sp.write_qword(address, val);
+			} else {
+				sp.write_qword_unaligned(address, val);
+			}
+			break;
+		default:
+			break;
+	}
+
+	return 0;
+}
+
+//-------------------------------------------------
 //  screen_height - return screen visible height
 //  -> manager:machine().screens[":screen"]:height()
 //-------------------------------------------------
@@ -924,6 +970,14 @@ void lua_engine::initialize()
 				.addCFunction ("read_u32", &lua_addr_space::l_mem_read<UINT32>)
 				.addCFunction ("read_i64", &lua_addr_space::l_mem_read<INT64>)
 				.addCFunction ("read_u64", &lua_addr_space::l_mem_read<UINT64>)
+				.addCFunction ("write_i8", &lua_addr_space::l_mem_write<INT8>)
+				.addCFunction ("write_u8", &lua_addr_space::l_mem_write<UINT8>)
+				.addCFunction ("write_i16", &lua_addr_space::l_mem_write<INT16>)
+				.addCFunction ("write_u16", &lua_addr_space::l_mem_write<UINT16>)
+				.addCFunction ("write_i32", &lua_addr_space::l_mem_write<INT32>)
+				.addCFunction ("write_u32", &lua_addr_space::l_mem_write<UINT32>)
+				.addCFunction ("write_i64", &lua_addr_space::l_mem_write<INT64>)
+				.addCFunction ("write_u64", &lua_addr_space::l_mem_write<UINT64>)
 			.endClass()
 			.deriveClass <address_space, lua_addr_space> ("addr_space")
 				.addFunction("name", &address_space::name)
