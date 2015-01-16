@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="apple3" description="Apple III 5.25 disks">
+
+	<software name="magneto">
+		<description>Capt'n Magneto (PD release APPLE-3-WAP-GAM-03)</description> <!-- was also released commercially - need those images, original game is 1983, this is a PD release of it from 1995 -->
+		<year>1995</year>
+		<publisher>Al Evans / WAP</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="apple-3-wap-gam-03a.dsk" size="143360" crc="fec20dbb" sha1="5ee6b1610649ad32df8ab00a2a272c3b79a92f26" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="apple-3-wap-gam-03b.dsk" size="143360" crc="a489f0b3" sha1="82c369ffec141b551732522edbe6d726b28da181" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+
+</softwarelist>
