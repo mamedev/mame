@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  machine.c
+  stfight.c
 
   Functions to emulate general aspects of the machine (RAM, ROM, interrupts,
   I/O ports)
@@ -63,6 +63,7 @@ DRIVER_INIT_MEMBER(stfight_state,empcity)
 				( ( ( src ^ A ) >> 1 ) & 0x08 ) |
 				( ~( ( src >> 6 ) ^ A ) & 0x01 );
 	}
+	
 }
 
 DRIVER_INIT_MEMBER(stfight_state,stfight)
@@ -72,6 +73,27 @@ DRIVER_INIT_MEMBER(stfight_state,stfight)
 
 DRIVER_INIT_MEMBER(stfight_state,cshooter)
 {
+}
+
+void stfight_state::machine_start()
+{
+	save_item(NAME(m_fm_data));
+	save_item(NAME(m_cpu_to_mcu_data));
+	save_item(NAME(m_cpu_to_mcu_empty));
+	save_item(NAME(m_adpcm_data_offs));
+	save_item(NAME(m_adpcm_nibble));
+	save_item(NAME(m_adpcm_reset));
+	save_item(NAME(m_coin_state));
+	save_item(NAME(m_sprite_base));
+	save_item(NAME(m_portA_out));
+	save_item(NAME(m_portA_in));
+	save_item(NAME(m_portB_out));
+	save_item(NAME(m_portB_in));
+	save_item(NAME(m_portC_out));
+	save_item(NAME(m_portC_in));
+	save_item(NAME(m_ddrA));
+	save_item(NAME(m_ddrB));
+	save_item(NAME(m_ddrC));
 }
 
 void stfight_state::machine_reset()
