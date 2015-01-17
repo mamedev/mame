@@ -4772,6 +4772,8 @@ MG0183 has 4 poker games:
   Four of a Kind Bonus Poker
   Deuces Wild Poker
 
+Also uses a Dallas (Maxim) DS1216 SmartWatch RAM for RTC (Real Time Clock) functions
+
 Came out of an IGT machine with belly glass calling it Montana Choice
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
