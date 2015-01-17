@@ -344,7 +344,6 @@ LIBS += -lcomdlg32
 #-------------------------------------------------
 
 OSDCOREOBJS = \
-	$(OSDOBJ)/osdcore.o \
 	$(WINOBJ)/main.o    \
 	$(WINOBJ)/strconv.o \
 	$(WINOBJ)/windir.o \

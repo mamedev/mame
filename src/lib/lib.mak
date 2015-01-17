@@ -39,6 +39,7 @@ OBJDIRS += \
 #-------------------------------------------------
 
 UTILOBJS = \
+	$(OSDOBJ)/osdcore.o \
 	$(LIBOBJ)/util/astring.o \
 	$(LIBOBJ)/util/avhuff.o \
 	$(LIBOBJ)/util/aviio.o \

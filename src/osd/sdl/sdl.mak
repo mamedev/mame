@@ -404,7 +404,6 @@ OBJDIRS += $(SDLOBJ) \
 #-------------------------------------------------
 
 OSDCOREOBJS = \
-	$(OSDOBJ)/osdcore.o \
 	$(SDLOBJ)/strconv.o \
 	$(SDLOBJ)/sdldir.o  \
 	$(SDLOBJ)/sdlfile.o     \
