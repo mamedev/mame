@@ -456,23 +456,33 @@ luabridge::LuaRef lua_engine::l_dev_get_states(const device_t *d)
 }
 
 //-------------------------------------------------
-//  state_get_value - return value of a devices state
+//  state_get_value - return value of a device state entry
 //  -> manager:machine().devices[":maincpu"].state["PC"].value
 //-------------------------------------------------
 
 UINT64 lua_engine::l_state_get_value(const device_state_entry *d)
 {
-	return d->value();
+	device_state_interface *state = d->parent_state();
+	if(state) {
+		luaThis->machine().save().dispatch_presave();
+		return state->state_int(d->index());
+	} else {
+		return 0;
+	}
 }
 
 //-------------------------------------------------
-//  state_set_value - set value of a devices state
+//  state_set_value - set value of a device state entry
 //  -> manager:machine().devices[":maincpu"].state["D0"].value = 0x0c00
 //-------------------------------------------------
 
 void lua_engine::l_state_set_value(device_state_entry *d, UINT64 val)
 {
-	d->set_value(val);
+	device_state_interface *state = d->parent_state();
+	if(state) {
+		state->set_state_int(d->index(), val);
+		luaThis->machine().save().dispatch_presave();
+	}
 }
 
 //-------------------------------------------------
