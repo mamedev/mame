@@ -23,8 +23,8 @@ const osd_sound_type OSD_SOUND_RETRO = &osd_sound_creator<sound_retro>;
 //-------------------------------------------------
 //  sound_none - constructor
 //-------------------------------------------------
-sound_retro::sound_retro(const osd_interface &osd)
-	: osd_sound_interface(osd)
+sound_retro::sound_retro(const osd_interface &osd, running_machine &machine)
+	: osd_sound_interface(osd, machine)
 {
 	set_mastervolume(attenuation);
 }

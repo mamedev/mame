@@ -12,12 +12,13 @@
 #define __SOUND_RETRO_H__
 
 #include "osdepend.h"
+#include "modules/lib/osdobj_common.h"
 
 class sound_retro : public osd_sound_interface
 {
 public:
 	// construction/destruction
-	sound_retro(const osd_interface &osd);
+	sound_retro(const osd_interface &osd, running_machine &machine);
 	virtual ~sound_retro() { }
 	
 	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame);
