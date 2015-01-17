@@ -103,8 +103,6 @@ Magical Tetris Challenge
         JAPAN
 
 
-On bootup, they also mention 'T.L.S' (Temporary Landing System), which seems
-to be the hardware system, designed by Arika Co. Ltd.
 
 
 PCB Layout
@@ -185,6 +183,8 @@ public:
 	DECLARE_DRIVER_INIT(aleck64);
 	DECLARE_WRITE32_MEMBER(aleck_dips_w);
 	DECLARE_READ32_MEMBER(aleck_dips_r);
+	DECLARE_READ16_MEMBER(e90_prot_r);
+	DECLARE_WRITE16_MEMBER(e90_prot_w);
 private:
 	UINT32 m_dip_read_offset;
 };
@@ -311,15 +311,47 @@ static ADDRESS_MAP_START( n64_map, AS_PROGRAM, 32, aleck64_state )
 	AM_RANGE(0x1fc00000, 0x1fc007bf) AM_ROM AM_REGION("user1", 0)   // PIF ROM
 	AM_RANGE(0x1fc007c0, 0x1fc007ff) AM_DEVREADWRITE("rcp", n64_periphs, pif_ram_r, pif_ram_w)
 
-	/*
-	    Surely this should mirror main ram? srmvs crashes, and
-	    vivdolls overwrites it's memory test code if it does mirror
-	*/
-	AM_RANGE(0xc0000000, 0xc07fffff) AM_RAM
+	AM_RANGE(0xc0000000, 0xc07fffff) AM_RAM // SDRAM, Aleck 64 specific
 
 	AM_RANGE(0xc0800000, 0xc0800fff) AM_READWRITE(aleck_dips_r,aleck_dips_w)
-	AM_RANGE(0xd0000000, 0xd00fffff) AM_RAM // mtetrisc, write only, mirror?
+ADDRESS_MAP_END
 
+/*
+ E90 protection handlers 
+*/
+
+READ16_MEMBER(aleck64_state::e90_prot_r)
+{
+// offset 0 $800 = status ready, active high
+	return 0;
+}
+
+WRITE16_MEMBER(aleck64_state::e90_prot_w)
+{	
+	switch(offset*2)
+	{
+		case 0x16:
+			if(data != 6 && data != 7)
+				printf("! %04x %04x %08x\n",offset*2,data,mem_mask);
+
+			if(data & 1) // 0 -> 1 transition
+			{
+				for(int i=0;i<0x1000;i+=4)
+					space.write_dword(0x007502f4+i,space.read_dword(0xd0000000+i));
+			}
+			break;
+		//0x1e bit 0 probably enables the chip
+		default:
+			printf("%04x %04x %08x\n",offset*2,data,mem_mask);
+			break;
+	}
+}
+
+static ADDRESS_MAP_START( e90_map, AS_PROGRAM, 32, aleck64_state )
+	AM_IMPORT_FROM( n64_map )
+	AM_RANGE(0xd0000000, 0xd0000fff) AM_RAM
+	AM_RANGE(0xd0010000, 0xd0010fff) AM_RAM
+	AM_RANGE(0xd0030000, 0xd003001f) AM_READWRITE16(e90_prot_r, e90_prot_w,0xffffffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rsp_map, AS_PROGRAM, 32, aleck64_state )
@@ -841,6 +873,11 @@ static MACHINE_CONFIG_START( aleck64, aleck64_state )
 	MCFG_N64_PERIPHS_ADD("rcp");
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( a64_e90, aleck64 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(e90_map)
+MACHINE_CONFIG_END
+
 DRIVER_INIT_MEMBER(aleck64_state,aleck64)
 {
 	UINT8 *rom = memregion("user2")->base();
@@ -1075,7 +1112,7 @@ GAME( 1998, aleck64,  0,        aleck64, aleck64, aleck64_state,  aleck64, ROT0,
 
 // games
 GAME( 1998, 11beat,   aleck64,  aleck64, 11beat, aleck64_state,   aleck64, ROT0, "Hudson", "Eleven Beat", GAME_NOT_WORKING ) // crashes at kick off / during attract with DRC
-GAME( 1998, mtetrisc, aleck64,  aleck64, mtetrisc, aleck64_state, aleck64, ROT0, "Capcom", "Magical Tetris Challenge (981009 Japan)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, mtetrisc, aleck64,  a64_e90, mtetrisc, aleck64_state, aleck64, ROT0, "Capcom", "Magical Tetris Challenge (981009 Japan)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, starsldr, aleck64,  aleck64, starsldr, aleck64_state, aleck64, ROT0, "Hudson / Seta", "Star Soldier: Vanishing Earth", GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, vivdolls, aleck64,  aleck64, aleck64, aleck64_state,  aleck64, ROT0, "Visco", "Vivid Dolls", GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, srmvs,    aleck64,  aleck64, srmvs, aleck64_state,    aleck64, ROT0, "Seta", "Super Real Mahjong VS", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
