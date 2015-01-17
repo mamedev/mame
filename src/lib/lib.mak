@@ -488,7 +488,6 @@ $(LIBOBJ)/portmidi/%.o: $(3RDPARTY)/portmidi/%.m | $(OSPREBUILD)
 	@echo Objective-C compiling $<...
 	$(CC) $(CDEFS) $(COBJFLAGS) $(CCOMFLAGS) $(INCPATH) -c $< -o $@
 endif
->>>>>>> 27b34159d23e714c95f8fc837a6f0c0f97437855
 
 #-------------------------------------------------
 # LUA library objects
