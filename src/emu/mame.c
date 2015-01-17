@@ -92,6 +92,12 @@
 
 machine_manager* machine_manager::m_manager = NULL;
 
+osd_interface &machine_manager::osd() const
+{
+    return m_osd;
+}
+
+
 machine_manager* machine_manager::instance(emu_options &options,osd_interface &osd)
 {
 	if(!m_manager)

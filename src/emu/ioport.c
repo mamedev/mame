@@ -99,6 +99,8 @@
 #include "uiinput.h"
 #include "debug/debugcon.h"
 
+#include "osdepend.h"
+
 #include <ctype.h>
 #include <time.h>
 

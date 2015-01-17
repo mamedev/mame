@@ -19,7 +19,8 @@
 
 #include <time.h>
 
-
+// forward declaration instead of osdepend.h
+class osd_interface;
 
 //**************************************************************************
 //  CONSTANTS
@@ -157,7 +158,7 @@ public:
 	const machine_config &config() const { return m_config; }
 	device_t &root_device() const { return m_config.root_device(); }
 	const game_driver &system() const { return m_system; }
-	osd_interface &osd() const { return m_manager.osd(); }
+	osd_interface &osd() const;
 	machine_manager &manager() const { return m_manager; }
 	resource_pool &respool() { return m_respool; }
 	device_scheduler &scheduler() { return m_scheduler; }

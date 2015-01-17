@@ -27,7 +27,7 @@ class input_type_entry;     // FIXME: including emu.h does not work because emu.
 //============================================================
 
 // FIXME: We can do better than this
-typedef void *osd_font;
+class osd_font;
 
 // ======================> osd_interface
 
@@ -53,9 +53,9 @@ public:
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) = 0;
 
 	// font overridables
-	virtual osd_font font_open(const char *name, int &height) = 0;
-	virtual void font_close(osd_font font) = 0;
-	virtual bool font_get_bitmap(osd_font font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs) = 0;
+	virtual osd_font *font_open(const char *name, int &height) = 0;
+	virtual void font_close(osd_font *font) = 0;
+	virtual bool font_get_bitmap(osd_font *font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs) = 0;
 
 	// video overridables
 	virtual void *get_slider_list() = 0; // FIXME: returns slider_state *

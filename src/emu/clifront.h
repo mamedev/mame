@@ -15,8 +15,9 @@
 
 #include "emu.h"
 #include "cliopts.h"
-#include "osdepend.h"
 
+// don't include osd_interface in header files
+class osd_interface;
 
 //**************************************************************************
 //  TYPE DEFINITIONS

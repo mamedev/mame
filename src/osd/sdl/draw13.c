@@ -134,11 +134,12 @@ public:
     const HashT hash() const { return m_hash; }
     const UINT32 flags() const { return m_flags; }
     const bool is_pixels_owned() const { // do we own / allocated it ?
-        return m_sdl_access == SDL_TEXTUREACCESS_STATIC
-                && m_copyinfo->func != NULL ;
+        return false && ((m_sdl_access == SDL_TEXTUREACCESS_STATIC)
+                && (m_copyinfo->func != NULL)) ;
     }
 
 private:
+    Uint32              m_sdl_access;
     SDL_Renderer *      m_renderer;
     render_texinfo      m_texinfo;            // copy of the texture info
     HashT               m_hash;               // hash value for the texture (must be >= pointer size)
@@ -149,7 +150,6 @@ private:
 
     int                 m_format;             // texture format
     SDL_BlendMode       m_sdl_blendmode;
-    Uint32              m_sdl_access;
 
     texture_info *      m_next;               // next texture in the list
 };
@@ -490,6 +490,7 @@ static void expand_copy_info(copy_info_t *list)
 	}
 }
 
+// FIXME: machine only used to access options.
 int drawsdl2_init(running_machine &machine, sdl_draw_info *callbacks)
 {
 	const char *stemp;
@@ -1007,9 +1008,9 @@ texture_info::texture_info(SDL_Renderer *renderer, const render_texinfo &texsour
 
 texture_info::~texture_info()
 {
-    SDL_DestroyTexture(m_texture_id);
-    if ( is_pixels_owned() && m_pixels != NULL )
+    if ( is_pixels_owned() && (m_pixels != NULL) )
         free(m_pixels);
+    SDL_DestroyTexture(m_texture_id);
 }
 
 //============================================================

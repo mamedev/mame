@@ -24,6 +24,8 @@
 
 #include "drivenum.h"
 
+#include "osdepend.h"
+
 #include <new>
 #include <ctype.h>
 

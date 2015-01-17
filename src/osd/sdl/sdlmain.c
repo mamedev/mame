@@ -717,7 +717,13 @@ void sdl_osd_interface::init(running_machine &machine)
 //  font with the given name
 //-------------------------------------------------
 
-osd_font sdl_osd_interface::font_open(const char *_name, int &height)
+class osd_font
+{
+public:
+    CTFontRef m_font;
+};
+
+osd_font *sdl_osd_interface::font_open(const char *_name, int &height)
 {
 	CFStringRef font_name = NULL;
 	CTFontRef ct_font = NULL;
@@ -770,7 +776,9 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 	line_height += CTFontGetLeading(ct_font);
 	height = ceilf(line_height * EXTRA_HEIGHT);
 
-	return (osd_font)ct_font;
+	osd_font *ret = global_alloc(osd_font);
+	ret->m_font = ct_font;
+	return ret;
 }
 
 //-------------------------------------------------
@@ -778,14 +786,15 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 //  a given OSD font
 //-------------------------------------------------
 
-void sdl_osd_interface::font_close(osd_font font)
+void sdl_osd_interface::font_close(osd_font *font)
 {
-	CTFontRef ct_font = (CTFontRef)font;
+	CTFontRef ct_font = font->m_font;
 
 	if( ct_font != NULL )
 	{
 		CFRelease( ct_font );
 	}
+	global_free(font);
 }
 
 //-------------------------------------------------
@@ -796,11 +805,11 @@ void sdl_osd_interface::font_close(osd_font font)
 //  pixel of a black & white font
 //-------------------------------------------------
 
-bool sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
+bool sdl_osd_interface::font_get_bitmap(osd_font *font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
 {
 	UniChar uni_char;
 	CGGlyph glyph;
-	CTFontRef ct_font = (CTFontRef)font;
+	CTFontRef ct_font = font->m_font;
 	const CFIndex count = 1;
 	CGRect bounding_rect, success_rect;
 	CGContextRef context_ref;
@@ -1009,7 +1018,13 @@ static TTF_Font *search_font_config(astring name, bool bold, bool italic, bool u
 //  font with the given name
 //-------------------------------------------------
 
-osd_font sdl_osd_interface::font_open(const char *_name, int &height)
+class osd_font
+{
+public:
+    TTF_Font *m_font;
+};
+
+osd_font *sdl_osd_interface::font_open(const char *_name, int &height)
 {
 	TTF_Font *font = (TTF_Font *)NULL;
 	bool bakedstyles = false;
@@ -1081,7 +1096,9 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 
 	height = TTF_FontLineSkip(font);
 
-	return (osd_font)font;
+	osd_font *ret = global_alloc(osd_font);
+	ret->m_font = font;
+	return ret;
 }
 
 //-------------------------------------------------
@@ -1089,13 +1106,10 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 //  a given OSD font
 //-------------------------------------------------
 
-void sdl_osd_interface::font_close(osd_font font)
+void sdl_osd_interface::font_close(osd_font *font)
 {
-	TTF_Font *ttffont;
-
-	ttffont = (TTF_Font *)font;
-
-	TTF_CloseFont(ttffont);
+	TTF_CloseFont(font->m_font);
+	global_free(font);
 }
 
 //-------------------------------------------------
@@ -1106,14 +1120,14 @@ void sdl_osd_interface::font_close(osd_font font)
 //  pixel of a black & white font
 //-------------------------------------------------
 
-bool sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
+bool sdl_osd_interface::font_get_bitmap(osd_font *font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
 {
 	TTF_Font *ttffont;
 	SDL_Surface *drawsurf;
 	SDL_Color fcol = { 0xff, 0xff, 0xff };
 	UINT16 ustr[16];
 
-	ttffont = (TTF_Font *)font;
+	ttffont = font->m_font;
 
 	memset(ustr,0,sizeof(ustr));
 	ustr[0] = (UINT16)chnum;

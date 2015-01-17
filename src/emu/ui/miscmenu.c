@@ -23,6 +23,7 @@
 #include "ui/miscmenu.h"
 #include "ui/filemngr.h"
 
+#include "osdepend.h"
 
 /*-------------------------------------------------
     ui_slider_ui_handler - pushes the slider
