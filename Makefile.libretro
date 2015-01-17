@@ -627,6 +627,7 @@ INCPATH += \
 	-I$(OBJ)/emu/layout \
 	-I$(SRC)/lib/util \
 	-I$(SRC)/lib \
+	-I3rdparty \
 	-I$(SRC)/osd \
 	-I$(SRC)/osd/$(OSD) \
 	-I$(SRC)/osd/$(OSD)/libretro-sdk/include
