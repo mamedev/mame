@@ -88,7 +88,7 @@ public:
 	vector_ops_impl_t(int size)
 	: vector_ops_t(size)
 	{
-		assert(m_N == 0);
+		nl_assert(m_N == 0);
 	}
 
 	virtual ~vector_ops_impl_t() {}

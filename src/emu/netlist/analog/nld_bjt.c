@@ -75,7 +75,7 @@ NETLIB_START(QBJT_switch)
 	connect(m_RB.m_P, m_BC_dummy.m_P);
 	connect(m_RC.m_P, m_BC_dummy.m_N);
 
-	save(NAME(m_state_on));
+	save(NLNAME(m_state_on));
 
 	m_RB.set(netlist().gmin(), 0.0, 0.0);
 	m_RC.set(netlist().gmin(), 0.0, 0.0);

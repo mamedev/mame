@@ -23,7 +23,7 @@ NETLIB_START(7483)
 	register_output("S4", m_S4);
 	register_output("C4", m_C4);
 
-	save(NAME(m_lastr));
+	save(NLNAME(m_lastr));
 }
 
 NETLIB_RESET(7483)

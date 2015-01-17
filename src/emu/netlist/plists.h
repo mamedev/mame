@@ -108,7 +108,7 @@ public:
 
 	ATTR_HOT inline void remove_at(const int pos)
 	{
-		assert((pos>=0) && (pos<m_count));
+		nl_assert((pos>=0) && (pos<m_count));
 		m_count--;
 		for (int i = pos; i < m_count; i++)
 		{
@@ -118,8 +118,8 @@ public:
 
 	ATTR_HOT inline void swap(const int pos1, const int pos2)
 	{
-		assert((pos1>=0) && (pos1<m_count));
-		assert((pos2>=0) && (pos2<m_count));
+		nl_assert((pos1>=0) && (pos1<m_count));
+		nl_assert((pos2>=0) && (pos2<m_count));
 		_ListClass tmp = m_list[pos1];
 		m_list[pos1] = m_list[pos2];
 		m_list[pos2] =tmp;
@@ -331,7 +331,7 @@ public:
 				}
 				p = p->m_next;
 			}
-			assert_always(false, "element not found");
+			nl_assert_always(false, "element not found");
 		}
 	}
 
@@ -357,7 +357,7 @@ public:
 		_ListClass **p = &m_head;
 		while (*p != &elem)
 		{
-			assert(*p != NULL);
+			nl_assert(*p != NULL);
 			p = &((*p)->m_next);
 		}
 		(*p) = elem.m_next;

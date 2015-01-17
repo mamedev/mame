@@ -51,7 +51,7 @@ NETLIB_START(4020_sub)
 	register_output("Q13", m_Q[12]);
 	register_output("Q14", m_Q[13]);
 
-	save(NAME(m_cnt));
+	save(NLNAME(m_cnt));
 }
 
 NETLIB_RESET(4020_sub)

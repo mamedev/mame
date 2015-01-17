@@ -73,9 +73,9 @@ NETLIB_START(9316_sub)
 	register_output("QD", m_QD);
 	register_output("RC", m_RC);
 
-	save(NAME(m_cnt.ref()));
-	save(NAME(m_loadq.ref()));
-	save(NAME(m_ent.ref()));
+	save(NLNAME(m_cnt.ref()));
+	save(NLNAME(m_loadq.ref()));
+	save(NLNAME(m_ent.ref()));
 }
 
 NETLIB_RESET(9316_sub)
