@@ -522,6 +522,9 @@ EMULATOR = $(TARGET)
 # all sources are under the src/ directory
 SRC = src
 
+# all 3rd party sources are under the 3rdparty/ directory
+3RDPARTY = 3rdparty
+
 # build the targets in different object dirs, so they can co-exist
 ifeq ($(NATIVE),1)
 OBJ = obj/$(PREFIX)$(OSD)$(SUFFIX)$(SUFFIX64)$(SUFFIXDEBUG)$(SUFFIXPROFILE)
@@ -627,7 +630,8 @@ INCPATH += \
 	-I$(OBJ)/emu/layout \
 	-I$(SRC)/lib/util \
 	-I$(SRC)/lib \
-	-I3rdparty \
+	-I$(3RDPARTY) \
+	-I$(3RDPARTY)/lua/src \
 	-I$(SRC)/osd \
 	-I$(SRC)/osd/$(OSD) \
 	-I$(SRC)/osd/$(OSD)/libretro-sdk/include
@@ -680,7 +684,7 @@ DRIVLISTOBJ = $(OBJ)/$(TARGET)/$(SUBTARGET)/drivlist.o
 
 # add expat XML library
 ifeq ($(BUILD_EXPAT),1)
-INCPATH += -I$(SRC)/lib/expat
+INCPATH += -I$(3RDPARTY)/lib/expat
 EXPAT = $(OBJ)/libexpat.a
 else
 LIBS += -lexpat
@@ -689,7 +693,7 @@ endif
 
 # add ZLIB compression library
 ifeq ($(BUILD_ZLIB),1)
-INCPATH += -I$(SRC)/lib/zlib
+INCPATH += -I$(3RDPARTY)/lib/zlib
 ZLIB = $(OBJ)/libz.a
 else
 LIBS += -lz
@@ -708,7 +712,7 @@ endif
 
 # add jpeglib image library
 ifeq ($(BUILD_JPEGLIB),1)
-INCPATH += -I$(SRC)/lib/libjpeg
+INCPATH += -I$(3RDPARTY)/lib/libjpeg
 JPEG_LIB = $(OBJ)/libjpeg.a
 else
 LIBS += -ljpeg
