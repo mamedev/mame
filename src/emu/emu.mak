@@ -147,7 +147,6 @@ EMUOBJS = \
 	$(EMUOBJ)/debug/textbuf.o \
 	$(EMUOBJ)/profiler.o \
 	$(EMUOBJ)/webengine.o \
-	$(OSDOBJ)/osdcore.o \
 	$(OSDOBJ)/osdnet.o \
 	$(OSDOBJ)/modules/sound/none.o \
 	$(OSDOBJ)/modules/debugger/none.o \
