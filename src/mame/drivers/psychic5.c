@@ -800,7 +800,7 @@ MACHINE_CONFIG_END
 
 
 
-ROM_START( psychic5 )
+ROM_START( psychic5j )
 	ROM_REGION( 0x20000, "maincpu", 0 )                     /* Main CPU */
 	ROM_LOAD( "p5d",          0x00000, 0x08000, CRC(90259249) SHA1(ac2d8dd95f6c04b6ad726136931e37dcd537e977) )
 	ROM_LOAD( "p5e",          0x10000, 0x10000, CRC(72298f34) SHA1(725be2fbf5f3622f646c0fb8e6677cbddf0b1fc2) )
@@ -824,7 +824,7 @@ ROM_START( psychic5 )
 	ROM_LOAD( "my09.3t",    0x200, 0x400, CRC(59e44236) SHA1(f53d99694fa5acd7cc51dd78e09f0d2ef730e7a4) )
 ROM_END
 
-ROM_START( psychic5a )
+ROM_START( psychic5 )
 	ROM_REGION( 0x20000, "maincpu", 0 )                     /* Main CPU */
 	ROM_LOAD( "myp5d",          0x00000, 0x08000, CRC(1d40a8c7) SHA1(79b36e690ea334c066b55b1e39ceb5fe0688cd7b) )
 	ROM_LOAD( "myp5e",          0x10000, 0x10000, CRC(2fa7e8c0) SHA1(d5096ebec58329346a3292ad2da1be3742fad093) )
@@ -944,6 +944,7 @@ ROM_START( bombsa )
 ROM_END
 
 
-GAME( 1987, psychic5,  0,        psychic5, psychic5, driver_device, 0, ROT270, "Jaleco", "Psychic 5 (set 1)", 0 )
-GAME( 1987, psychic5a, psychic5, psychic5, psychic5, driver_device, 0, ROT270, "Jaleco", "Psychic 5 (set 2)", 0 ) // player doesn't die as early in attract mode on this set..
-GAME( 1988, bombsa,    0,        bombsa,   bombsa, driver_device,   0, ROT270, "Jaleco", "Bombs Away", GAME_NOT_WORKING )
+GAME( 1987, psychic5,  0,        psychic5, psychic5, driver_device, 0, ROT270, "Jaleco / NMK", "Psychic 5 (World)", 0 ) // "Oversea's version V2.00 CHANGED BY TAMIO NAKASATO" text present in ROM, various modifications (English names, more complete attract demo etc.)
+GAME( 1987, psychic5j, psychic5, psychic5, psychic5, driver_device, 0, ROT270, "Jaleco / NMK", "Psychic 5 (Japan)", 0 )
+GAME( 1988, bombsa,    0,        bombsa,   bombsa,   driver_device, 0, ROT270, "Jaleco", "Bombs Away", GAME_NOT_WORKING )
+

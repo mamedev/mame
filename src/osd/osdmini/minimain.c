@@ -55,6 +55,16 @@ static INT32 keyboard_get_state(void *device_internal, void *item_internal);
 
 
 //============================================================
+//  mini_osd_options
+//============================================================
+
+mini_osd_options::mini_osd_options()
+: osd_options()
+{
+	//add_entries(s_option_entries);
+}
+
+//============================================================
 //  main
 //============================================================
 
@@ -62,9 +72,9 @@ int main(int argc, char *argv[])
 {
 	// cli_frontend does the heavy lifting; if we have osd-specific options, we
 	// create a derivative of cli_options and add our own
-	cli_options options;
-	mini_osd_interface osd;
-	osd.register_options(options);
+	mini_osd_options options;
+	mini_osd_interface osd(options);
+	osd.register_options();
 	cli_frontend frontend(options, osd);
 	return frontend.execute(argc, argv);
 }
@@ -74,7 +84,8 @@ int main(int argc, char *argv[])
 //  constructor
 //============================================================
 
-mini_osd_interface::mini_osd_interface()
+mini_osd_interface::mini_osd_interface(mini_osd_options &options)
+: osd_common_t(options)
 {
 }
 
@@ -95,7 +106,7 @@ mini_osd_interface::~mini_osd_interface()
 void mini_osd_interface::init(running_machine &machine)
 {
 	// call our parent
-	osd_interface::init(machine);
+	osd_common_t::init(machine);
 
 	// initialize the video system by allocating a rendering target
 	our_target = machine.render().target_alloc();

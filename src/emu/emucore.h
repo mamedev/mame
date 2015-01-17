@@ -289,65 +289,10 @@ class emu_exception : public std::exception { };
 class emu_fatalerror : public emu_exception
 {
 public:
-	emu_fatalerror(const char *format, ...) ATTR_PRINTF(2,3)
-		: code(0)
-	{
-		if (format == NULL)
-		{
-			text[0] = '\0';
-		}
-		else
-		{
-			va_list ap;
-			va_start(ap, format);
-			vsprintf(text, format, ap);
-			va_end(ap);
-		}
-		osd_break_into_debugger(text);
-	}
-
-	emu_fatalerror(const char *format, va_list ap)
-		: code(0)
-	{
-		if (format == NULL)
-		{
-			text[0] = '\0';
-		}
-		else
-		{
-			vsprintf(text, format, ap);
-		}
-		osd_break_into_debugger(text);
-	}
-
-	emu_fatalerror(int _exitcode, const char *format, ...) ATTR_PRINTF(3,4)
-		: code(_exitcode)
-	{
-		if (format == NULL)
-		{
-			text[0] = '\0';
-		}
-		else
-		{
-			va_list ap;
-			va_start(ap, format);
-			vsprintf(text, format, ap);
-			va_end(ap);
-		}
-	}
-
-	emu_fatalerror(int _exitcode, const char *format, va_list ap)
-		: code(_exitcode)
-	{
-		if (format == NULL)
-		{
-			text[0] = '\0';
-		}
-		else
-		{
-			vsprintf(text, format, ap);
-		}
-	}
+	emu_fatalerror(const char *format, ...) ATTR_PRINTF(2,3);
+	emu_fatalerror(const char *format, va_list ap);
+	emu_fatalerror(int _exitcode, const char *format, ...) ATTR_PRINTF(3,4);
+	emu_fatalerror(int _exitcode, const char *format, va_list ap);
 
 	const char *string() const { return text; }
 	int exitcode() const { return code; }
@@ -420,26 +365,6 @@ inline _Dest downcast(_Source &src)
 
 ATTR_NORETURN void fatalerror(const char *format, ...) ATTR_PRINTF(1,2);
 ATTR_NORETURN void fatalerror_exitcode(running_machine &machine, int exitcode, const char *format, ...) ATTR_PRINTF(3,4);
-
-inline void fatalerror(const char *format, ...)
-{
-	va_list ap;
-	va_start(ap, format);
-	emu_fatalerror error(format, ap);
-	va_end(ap);
-	throw error;
-}
-
-inline void fatalerror_exitcode(running_machine &machine, int exitcode, const char *format, ...)
-{
-	va_list ap;
-	va_start(ap, format);
-	emu_fatalerror error(exitcode, format, ap);
-	va_end(ap);
-	throw error;
-}
-
-
 
 //**************************************************************************
 //  INLINE FUNCTIONS

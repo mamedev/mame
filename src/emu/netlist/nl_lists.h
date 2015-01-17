@@ -59,7 +59,7 @@ public:
 		}
 		*i = e;
 		inc_stat(m_prof_sort);
-		assert(m_end - m_list < _Size);
+		nl_assert(m_end - m_list < _Size);
 	}
 
 	ATTR_HOT inline const entry_t *pop()

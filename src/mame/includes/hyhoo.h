@@ -10,15 +10,15 @@ public:
 
 	hyhoo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_clut(*this, "clut"),
 		m_maincpu(*this, "maincpu"),
 		m_nb1413m3(*this, "nb1413m3"),
-		m_screen(*this, "screen")   { }
+		m_screen(*this, "screen"),
+		m_clut(*this, "clut") { }
 
-	required_shared_ptr<UINT8> m_clut;
 	required_device<cpu_device> m_maincpu;
 	required_device<nb1413m3_device> m_nb1413m3;
 	required_device<screen_device> m_screen;
+	required_shared_ptr<UINT8> m_clut;
 
 	int m_blitter_destx;
 	int m_blitter_desty;
@@ -32,10 +32,14 @@ public:
 	int m_highcolorflag;
 	int m_flipscreen;
 	bitmap_rgb32 m_tmpbitmap;
+	
 	DECLARE_WRITE8_MEMBER(hyhoo_blitter_w);
 	DECLARE_WRITE8_MEMBER(hyhoo_romsel_w);
+	
 	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
+	
 	virtual void video_start();
+	
 	UINT32 screen_update_hyhoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void hyhoo_gfxdraw();
 

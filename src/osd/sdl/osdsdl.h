@@ -5,6 +5,8 @@
 
 #include "watchdog.h"
 #include "clifront.h"
+#include "modules/lib/osdobj_common.h"
+#include "video.h"
 
 //============================================================
 //  System dependent defines
@@ -113,13 +115,7 @@
 //  TYPE DEFINITIONS
 //============================================================
 
-typedef void *osd_font;
-
-//============================================================
-//  TYPE DEFINITIONS
-//============================================================
-
-class sdl_options : public cli_options
+class sdl_options : public osd_options
 {
 public:
 	// construction/destruction
@@ -176,11 +172,11 @@ private:
 };
 
 
-class sdl_osd_interface : public osd_interface
+class sdl_osd_interface : public osd_common_t
 {
 public:
 	// construction/destruction
-	sdl_osd_interface();
+	sdl_osd_interface(sdl_options &options);
 	virtual ~sdl_osd_interface();
 
 	// general overridables
@@ -191,9 +187,9 @@ public:
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist);
 
 	// font overridables
-	virtual osd_font font_open(const char *name, int &height);
-	virtual void font_close(osd_font font);
-	virtual bool font_get_bitmap(osd_font font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs);
+	virtual osd_font *font_open(const char *name, int &height);
+	virtual void font_close(osd_font *font);
+	virtual bool font_get_bitmap(osd_font *font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs);
 
 	virtual void video_register();
 	virtual void sound_register();
@@ -208,6 +204,7 @@ public:
 	#ifdef USE_NETWORK
 	virtual bool network_init();
 	#endif
+    //virtual bool midi_init();
 
 	virtual void video_exit();
 	virtual void window_exit();
@@ -216,21 +213,24 @@ public:
 	#ifdef USE_NETWORK
 	virtual void network_exit();
 	#endif
+    //virtual void midi_exit();
+
+    sdl_options &options() { return m_options; }
 
 private:
 	virtual void osd_exit();
 
+	void extract_window_config(int index, sdl_window_config *conf);
+
+	// FIXME: remove machine usage
+	void extract_video_config(running_machine &machine);
+
+
+    sdl_options &m_options;
+
 	watchdog *m_watchdog;
 
 };
-
-
-
-//============================================================
-//  sound.c
-//============================================================
-
-void sdlaudio_init(running_machine &machine);
 
 //============================================================
 //  sdlwork.c

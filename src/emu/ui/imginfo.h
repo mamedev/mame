@@ -23,7 +23,7 @@ public:
 	virtual void handle();
 
 private:
-	void image_info_astring(running_machine &machine, astring &string);
+	void image_info(device_image_interface *image);
 };
 
 #endif // __UI_IMGINFO_H__

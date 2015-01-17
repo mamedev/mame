@@ -45,6 +45,7 @@ class device_state_entry
 {
 	friend class device_state_interface;
 	friend class simple_list<device_state_entry>;
+	friend class lua_engine;
 
 private:
 	// construction/destruction

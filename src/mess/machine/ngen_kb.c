@@ -12,6 +12,10 @@ ngen_keyboard_device::ngen_keyboard_device(const machine_config& mconfig, const 
 void ngen_keyboard_device::write(UINT8 data)
 {
 	// To be figured out
+	// Code 0x92 is sent on startup, perhaps resets the keyboard MCU
+	// Codes 0xAx and 0xBx appear to control the keyboard LEDs, lower nibbles controlling the state of the LEDs
+	// When setting an error code via the LEDs, 0xB0 then 0xAE is sent (presumably for error code 0xE0),
+	// so that means that 0xAx controls the Overtype, Lock, F1 and F2 LEDs, and 0xBx controls the F3, F8, F9 and F10 LEDs.
 	logerror("KB: received character %02x\n",data);
 }
 

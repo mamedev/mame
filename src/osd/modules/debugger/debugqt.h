@@ -14,7 +14,7 @@
 #ifndef __DEBUGGER_QT_H__
 #define __DEBUGGER_QT_H__
 
-#include "osdepend.h"
+#include "emu.h"
 
 class debugger_qt : public osd_debugger_interface
 {
@@ -23,10 +23,13 @@ public:
 	debugger_qt(const osd_interface &osd);
 	virtual ~debugger_qt();
 
-	virtual void init_debugger();
+	virtual void init_debugger(running_machine &machine);
 	virtual void wait_for_debugger(device_t &device, bool firststop);
 	virtual void debugger_update();
 	virtual void debugger_exit();
+
+private:
+	running_machine *m_machine;
 };
 
 extern const osd_debugger_type OSD_DEBUGGER_QT;

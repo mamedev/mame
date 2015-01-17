@@ -21,12 +21,13 @@
 #undef interface
 
 #include "osdepend.h"
+#include "modules/lib/osdobj_common.h"
 
 class sound_direct_sound : public osd_sound_interface
 {
 public:
 	// construction/destruction
-	sound_direct_sound(const osd_interface &osd);
+	sound_direct_sound(const osd_interface &osd, running_machine &machine);
 	virtual ~sound_direct_sound();
 
 	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame);

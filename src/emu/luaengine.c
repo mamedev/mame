@@ -9,16 +9,15 @@
 ***************************************************************************/
 
 #include <limits>
-#include "lua/lua.hpp"
-#include "lua/lib/lualibs.h"
-#include "lua/bridge/LuaBridge.h"
+#include "lua.hpp"
+#include "luabridge/Source/LuaBridge/LuaBridge.h"
 #include <signal.h>
 #include "emu.h"
 #include "emuopts.h"
 #include "osdepend.h"
 #include "drivenum.h"
 #include "ui/ui.h"
-#include "web/mongoose.h"
+#include "mongoose/mongoose.h"
 
 #ifdef __LIBRETRO__
 #ifdef __ANDROID__
@@ -51,6 +50,9 @@ static lua_State *globalL = NULL;
 const char *const lua_engine::tname_ioport = "lua.ioport";
 lua_engine* lua_engine::luaThis = NULL;
 
+extern "C" {
+	int luaopen_lsqlite3(lua_State *L);
+}
 
 static void lstop(lua_State *L, lua_Debug *ar)
 {
@@ -72,7 +74,7 @@ int lua_engine::report(int status) {
 	{
 		const char *msg = lua_tostring(m_lua_state, -1);
 		if (msg == NULL) msg = "(error object is not a string)";
-		luai_writestringerror("%s\n", msg);
+		lua_writestringerror("%s\n", msg);
 		lua_pop(m_lua_state, 1);
 		/* force a complete garbage collection in case of errors */
 		lua_gc(m_lua_state, LUA_GCCOLLECT, 0);
@@ -364,7 +366,7 @@ void lua_engine::emu_set_hook(lua_State *L)
 	} else if (strcmp(hookname, "frame") == 0) {
 		hook_frame_cb.set(L, 1);
 	} else {
-		luai_writestringerror("%s", "Unknown hook name, aborting.\n");
+		lua_writestringerror("%s", "Unknown hook name, aborting.\n");
 	}
 }
 
@@ -437,6 +439,46 @@ luabridge::LuaRef lua_engine::l_dev_get_memspaces(const device_t *d)
 	}
 
 	return sp_table;
+}
+
+//-------------------------------------------------
+//  device_get_state - return table of available state userdata
+//  -> manager:machine().devices[":maincpu"].state
+//-------------------------------------------------
+
+luabridge::LuaRef lua_engine::l_dev_get_states(const device_t *d)
+{
+	device_t *dev = const_cast<device_t *>(d);
+	lua_State *L = luaThis->m_lua_state;
+	luabridge::LuaRef st_table = luabridge::LuaRef::newTable(L);
+	for (const device_state_entry *s = dev->state().state_first(); s != NULL; s = s->next()) {
+		// XXX: refrain from exporting non-visible entries?
+		if (s) {
+			st_table[s->symbol()] = const_cast<device_state_entry *>(s);
+		}
+	}
+
+	return st_table;
+}
+
+//-------------------------------------------------
+//  state_get_value - return value of a devices state
+//  -> manager:machine().devices[":maincpu"].state["PC"].value
+//-------------------------------------------------
+
+UINT64 lua_engine::l_state_get_value(const device_state_entry *d)
+{
+	return d->value();
+}
+
+//-------------------------------------------------
+//  state_set_value - set value of a devices state
+//  -> manager:machine().devices[":maincpu"].state["D0"].value = 0x0c00
+//-------------------------------------------------
+
+void lua_engine::l_state_set_value(device_state_entry *d, UINT64 val)
+{
+	d->set_value(val);
 }
 
 //-------------------------------------------------
@@ -831,8 +873,11 @@ void lua_engine::initialize()
 				.addData ("manufacturer", &game_driver::manufacturer)
 			.endClass ()
 			.beginClass <device_t> ("device")
-				.addFunction("name", &device_t::tag)
+				.addFunction ("name", &device_t::name)
+				.addFunction ("shortname", &device_t::shortname)
+				.addFunction ("tag", &device_t::tag)
 				.addProperty <luabridge::LuaRef, void> ("spaces", &lua_engine::l_dev_get_memspaces)
+				.addProperty <luabridge::LuaRef, void> ("state", &lua_engine::l_dev_get_states)
 			.endClass()
 			.beginClass <lua_addr_space> ("lua_addr_space")
 				.addCFunction ("read_i8", &lua_addr_space::l_mem_read<INT8>)
@@ -854,8 +899,16 @@ void lua_engine::initialize()
 			.endClass()
 			.deriveClass <screen_device, lua_screen> ("screen_dev")
 				.addFunction ("name", &screen_device::name)
+				.addFunction ("shortname", &screen_device::shortname)
+				.addFunction ("tag", &screen_device::tag)
 				.addFunction ("height", &screen_device::height)
 				.addFunction ("width", &screen_device::width)
+			.endClass()
+			.beginClass <device_state_entry> ("dev_space")
+				.addFunction ("name", &device_state_entry::symbol)
+				.addProperty <UINT64, UINT64> ("value", &lua_engine::l_state_get_value, &lua_engine::l_state_set_value)
+				.addFunction ("is_visible", &device_state_entry::visible)
+				.addFunction ("is_divider", &device_state_entry::divider)
 			.endClass()
 		.endNamespace();
 
@@ -903,7 +956,7 @@ void lua_engine::periodic_check()
 			lua_getglobal(m_lua_state, "print");
 			lua_insert(m_lua_state, 1);
 			if (lua_pcall(m_lua_state, lua_gettop(m_lua_state) - 1, 0, 0) != LUA_OK)
-				luai_writestringerror("%s\n", lua_pushfstring(m_lua_state,
+				lua_writestringerror("%s\n", lua_pushfstring(m_lua_state,
 				"error calling " LUA_QL("print") " (%s)",
 				lua_tostring(m_lua_state, -1)));
 		}
@@ -962,4 +1015,22 @@ void lua_engine::load_string(const char *value)
 void lua_engine::start()
 {
 	resume(m_lua_state);
+}
+
+
+//**************************************************************************
+//  LuaBridge Stack specializations
+//**************************************************************************
+
+namespace luabridge {
+	template <>
+	struct Stack <UINT64> {
+		static inline void push (lua_State* L, UINT64 value) {
+			lua_pushunsigned(L, static_cast <lua_Unsigned> (value));
+		}
+
+		static inline UINT64 get (lua_State* L, int index) {
+			return static_cast <UINT64> (luaL_checkunsigned (L, index));
+		}
+	};
 }

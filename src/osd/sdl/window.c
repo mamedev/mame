@@ -222,7 +222,7 @@ bool sdl_osd_interface::window_init()
 {
 	osd_printf_verbose("Enter sdlwindow_init\n");
 	// determine if we are using multithreading or not
-	multithreading_enabled = downcast<sdl_options &>(machine().options()).multithreading();
+	multithreading_enabled = options().multithreading();
 
 	// get the main thread ID before anything else
 	main_threadid = SDL_ThreadID();

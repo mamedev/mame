@@ -76,7 +76,7 @@ NETLIB_START(7474sub)
 	register_output("Q",   m_Q);
 	register_output("QQ",  m_QQ);
 
-	save(NAME(m_nextD));
+	save(NLNAME(m_nextD));
 }
 
 NETLIB_RESET(7474sub)

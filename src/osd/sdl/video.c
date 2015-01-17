@@ -85,8 +85,6 @@ static sdl_monitor_info *pick_monitor(sdl_options &options, int index);
 
 static void check_osd_inputs(running_machine &machine);
 
-static void extract_video_config(running_machine &machine);
-static void extract_window_config(running_machine &machine, int index, sdl_window_config *conf);
 static float get_aspect(const char *defdata, const char *data, int report_error);
 static void get_resolution(const char *defdata, const char *data, sdl_window_config *config, int report_error);
 
@@ -106,20 +104,19 @@ bool sdl_osd_interface::video_init()
 	init_monitors();
 
 	// we need the beam width in a float, contrary to what the core does.
-	video_config.beamwidth = machine().options().beam();
+	video_config.beamwidth = options().beam();
 
 	// initialize the window system so we can make windows
 	if (!window_init())
 		return false;
 
 	// create the windows
-	sdl_options &options = downcast<sdl_options &>(machine().options());
 	for (index = 0; index < video_config.numscreens; index++)
 	{
 		sdl_window_config conf;
 		memset(&conf, 0, sizeof(conf));
-		extract_window_config(machine(), index, &conf);
-		if (sdlwindow_video_window_create(machine(), index, pick_monitor(options, index), &conf))
+		extract_window_config(index, &conf);
+		if (sdlwindow_video_window_create(machine(), index, pick_monitor(options(), index), &conf))
 			return false;
 	}
 
@@ -615,31 +612,29 @@ static void check_osd_inputs(running_machine &machine)
 //  extract_window_config
 //============================================================
 
-static void extract_window_config(running_machine &machine, int index, sdl_window_config *conf)
+void sdl_osd_interface::extract_window_config(int index, sdl_window_config *conf)
 {
-	sdl_options &options = downcast<sdl_options &>(machine.options());
 	// per-window options: extract the data
-	get_resolution(options.resolution(), options.resolution(index), conf, TRUE);
+	get_resolution(options().resolution(), options().resolution(index), conf, TRUE);
 }
 
 //============================================================
 //  extract_video_config
 //============================================================
 
-static void extract_video_config(running_machine &machine)
+void sdl_osd_interface::extract_video_config(running_machine &machine)
 {
 	const char *stemp;
-	sdl_options &options = downcast<sdl_options &>(machine.options());
 
-	video_config.perftest    = options.video_fps();
+	video_config.perftest    = options().video_fps();
 
 	// global options: extract the data
-	video_config.windowed      = options.window();
-	video_config.keepaspect    = options.keep_aspect();
-	video_config.numscreens    = options.numscreens();
-	video_config.fullstretch   = options.uneven_stretch();
+	video_config.windowed      = options().window();
+	video_config.keepaspect    = options().keep_aspect();
+	video_config.numscreens    = options().numscreens();
+	video_config.fullstretch   = options().uneven_stretch();
 	#ifdef SDLMAME_X11
-	video_config.restrictonemonitor = !options.use_all_heads();
+	video_config.restrictonemonitor = !options().use_all_heads();
 	#endif
 
 
@@ -650,7 +645,7 @@ static void extract_video_config(running_machine &machine)
 	video_config.novideo = 0;
 
 	// d3d options: extract the data
-	stemp = options.video();
+	stemp = options().video();
 	if (strcmp(stemp, "auto") == 0)
 	{
 #ifdef SDLMAME_MACOSX
@@ -666,7 +661,7 @@ static void extract_video_config(running_machine &machine)
 		video_config.mode = VIDEO_MODE_SOFT;
 		video_config.novideo = 1;
 
-		if (options.seconds_to_run() == 0)
+		if (options().seconds_to_run() == 0)
 			osd_printf_warning("Warning: -video none doesn't make much sense without -seconds_to_run\n");
 	}
 	else if (USE_OPENGL && (strcmp(stemp, SDLOPTVAL_OPENGL) == 0))
@@ -681,11 +676,11 @@ static void extract_video_config(running_machine &machine)
 		video_config.mode = VIDEO_MODE_SOFT;
 	}
 
-	video_config.switchres     = options.switch_res();
-	video_config.centerh       = options.centerh();
-	video_config.centerv       = options.centerv();
-	video_config.waitvsync     = options.wait_vsync();
-	video_config.syncrefresh   = options.sync_refresh();
+	video_config.switchres     = options().switch_res();
+	video_config.centerh       = options().centerh();
+	video_config.centerv       = options().centerv();
+	video_config.waitvsync     = options().wait_vsync();
+	video_config.syncrefresh   = options().sync_refresh();
 	if (!video_config.waitvsync && video_config.syncrefresh)
 	{
 		osd_printf_warning("-syncrefresh specified without -waitsync. Reverting to -nosyncrefresh\n");
@@ -693,33 +688,33 @@ static void extract_video_config(running_machine &machine)
 	}
 
 	#if (USE_OPENGL || SDLMAME_SDL2)
-		video_config.filter        = options.filter();
+		video_config.filter        = options().filter();
 	#endif
 
 	#if (USE_OPENGL)
-		video_config.prescale      = options.prescale();
+		video_config.prescale      = options().prescale();
 		if (video_config.prescale < 1 || video_config.prescale > 3)
 		{
 			osd_printf_warning("Invalid prescale option, reverting to '1'\n");
 			video_config.prescale = 1;
 		}
 		// default to working video please
-		video_config.forcepow2texture = options.gl_force_pow2_texture();
-		video_config.allowtexturerect = !(options.gl_no_texture_rect());
-		video_config.vbo         = options.gl_vbo();
-		video_config.pbo         = options.gl_pbo();
-		video_config.glsl        = options.gl_glsl();
+		video_config.forcepow2texture = options().gl_force_pow2_texture();
+		video_config.allowtexturerect = !(options().gl_no_texture_rect());
+		video_config.vbo         = options().gl_vbo();
+		video_config.pbo         = options().gl_pbo();
+		video_config.glsl        = options().gl_glsl();
 		if ( video_config.glsl )
 		{
 			int i;
 
-			video_config.glsl_filter = options.glsl_filter();
+			video_config.glsl_filter = options().glsl_filter();
 
 			video_config.glsl_shader_mamebm_num=0;
 
 			for(i=0; i<GLSL_SHADER_MAX; i++)
 			{
-				stemp = options.shader_mame(i);
+				stemp = options().shader_mame(i);
 				if (stemp && strcmp(stemp, SDLOPTVAL_NONE) != 0 && strlen(stemp)>0)
 				{
 					video_config.glsl_shader_mamebm[i] = (char *) malloc(strlen(stemp)+1);
@@ -734,7 +729,7 @@ static void extract_video_config(running_machine &machine)
 
 			for(i=0; i<GLSL_SHADER_MAX; i++)
 			{
-				stemp = options.shader_screen(i);
+				stemp = options().shader_screen(i);
 				if (stemp && strcmp(stemp, SDLOPTVAL_NONE) != 0 && strlen(stemp)>0)
 				{
 					video_config.glsl_shader_scrn[i] = (char *) malloc(strlen(stemp)+1);
@@ -777,7 +772,7 @@ static void extract_video_config(running_machine &machine)
 	}
 #endif
 	// yuv settings ...
-	stemp = options.scale_mode();
+	stemp = options().scale_mode();
 	video_config.scale_mode = drawsdl_scale_mode(stemp);
 	if (video_config.scale_mode < 0)
 	{

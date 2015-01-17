@@ -1416,7 +1416,7 @@ bool sdl_osd_interface::input_init()
 	}
 
 	// get Sixaxis special mode info
-	sixaxis_mode = downcast<sdl_options &>(machine().options()).sixaxis();
+	sixaxis_mode = options().sixaxis();
 
 	// register the joysticks
 	sdlinput_register_joysticks(machine());
@@ -2086,7 +2086,7 @@ void sdl_osd_interface::customize_input_type_list(simple_list<input_type_entry> 
 		{
 			// configurable UI mode switch
 			case IPT_UI_TOGGLE_UI:
-				uimode = downcast<sdl_options &>(machine().options()).ui_mode_key();
+				uimode = options().ui_mode_key();
 				if(!strcmp(uimode,"auto"))
 				{
 					#if defined(__APPLE__) && defined(__MACH__)

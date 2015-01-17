@@ -42,7 +42,7 @@ NETLIB_START(NE555)
 	connect(m_R2.m_N, m_R3.m_P);
 	connect(m_RDIS.m_N, m_R3.m_N);
 
-	save(NAME(m_last_out));
+	save(NLNAME(m_last_out));
 }
 
 NETLIB_RESET(NE555)

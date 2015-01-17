@@ -226,6 +226,18 @@ void hyhoo_state::hyhoo_gfxdraw()
 void hyhoo_state::video_start()
 {
 	m_screen->register_screen_bitmap(m_tmpbitmap);
+	save_item(NAME(m_blitter_destx));
+	save_item(NAME(m_blitter_desty));
+	save_item(NAME(m_blitter_sizex));
+	save_item(NAME(m_blitter_sizey));
+	save_item(NAME(m_blitter_src_addr));
+	save_item(NAME(m_blitter_direction_x));
+	save_item(NAME(m_blitter_direction_y));
+	save_item(NAME(m_gfxrom));
+	save_item(NAME(m_dispflag));
+	save_item(NAME(m_highcolorflag));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_tmpbitmap));
 }
 
 

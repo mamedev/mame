@@ -10,7 +10,11 @@
 
 /* FIXME: at some time, make it compile on it's own */
 
-#include "emu.h"
+#include "osdcore.h"
+#include "corealloc.h"
+#include <math.h>
+#include <exception>
+#include <typeinfo>
 
 //============================================================
 //  SETUP
@@ -102,6 +106,38 @@
 #define end_timing(v)           do { } while (0)
 #endif
 
+// this macro passes an item followed by a string version of itself as two consecutive parameters
+#define NLNAME(x) x, #x
+
+// emu_fatalerror is a generic fatal exception that provides an error string
+class nl_fatalerror : public std::exception
+{
+public:
+    nl_fatalerror(const char *format, ...) ATTR_PRINTF(2,3)
+    {
+        char text[1024];
+        va_list ap;
+        va_start(ap, format);
+        vsprintf(text, format, ap);
+        va_end(ap);
+        osd_printf_error("%s\n", text);
+    }
+    nl_fatalerror(const char *format, va_list ap)
+    {
+        char text[1024];
+        vsprintf(text, format, ap);
+        osd_printf_error("%s\n", text);
+    }
+};
+
+#ifdef MAME_DEBUG
+#define nl_assert(x)               do { if (!(x)) throw nl_fatalerror("assert: %s:%d: %s", __FILE__, __LINE__, #x); } while (0)
+#define nl_assert_always(x, msg)   do { if (!(x)) throw nl_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
+#else
+#define nl_assert(x)               do { } while (0)
+//#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s (%s:%d)", msg, __FILE__, __LINE__); } while (0)
+#define nl_assert_always(x, msg)   do { } while (0)
+#endif
 
 //============================================================
 //  Compiling standalone
@@ -110,7 +146,7 @@
 // Compiling without mame ?
 
 #ifndef ATTR_HOT
-//#warning ATTR_HOT not defined
+#warning ATTR_HOT not defined
 
 // standard C includes
 #include <math.h>
@@ -131,9 +167,6 @@
 #define EXPECTED
 #define UNEXPECTED
 #define ATTR_UNUSED             __attribute__((__unused__))
-
-// this macro passes an item followed by a string version of itself as two consecutive parameters
-#define NAME(x) x, #x
 
 /* 8-bit values */
 typedef unsigned char                       UINT8;
@@ -158,15 +191,6 @@ typedef unsigned __int64                    UINT64;
 __extension__ typedef unsigned long long    UINT64;
 __extension__ typedef signed long long      INT64;
 #endif
-#endif
-
-#ifdef MAME_DEBUG
-#define assert(x)               do { if (!(x)) throw emu_fatalerror("assert: %s:%d: %s", __FILE__, __LINE__, #x); } while (0)
-#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
-#else
-#define assert(x)               do { } while (0)
-//#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s (%s:%d)", msg, __FILE__, __LINE__); } while (0)
-#define assert_always(x, msg)   do { } while (0)
 #endif
 
 /* U64 and S64 are used to wrap long integer constants. */

@@ -80,7 +80,7 @@ public:
 // To prevent flickering here, we need to simulate a decay.
 
 // decay time, in steps of 10ms
-#define LEDS_DECAY_TIME 4
+#define LEDS_DECAY_TIME 5
 
 void ticalc1x_state::leds_update()
 {
@@ -95,11 +95,11 @@ void ticalc1x_state::leds_update()
 			int di = j << 4 | i;
 
 			// turn on powered leds
-			if (m_leds_state[i] >> j & 1)
+			if (m_power_on && m_leds_state[i] >> j & 1)
 				m_leds_decay[di] = LEDS_DECAY_TIME;
 
 			// determine active state
-			int ds = (m_power_on && m_leds_decay[di] != 0) ? 1 : 0;
+			int ds = (m_leds_decay[di] != 0) ? 1 : 0;
 			active_state[i] |= (ds << j);
 		}
 	}
@@ -676,7 +676,7 @@ void ticalc1x_state::machine_start()
 static MACHINE_CONFIG_START( tisr16, ticalc1x_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 250000)
+	MCFG_CPU_ADD("maincpu", TMS1000, 250000) // guessed
 	MCFG_TMS1XXX_READ_K_CB(READ8(ticalc1x_state, tisr16_read_k))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, tisr16_write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, tisr16_write_r))
@@ -698,7 +698,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( ti1270, t9base )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS0970, 250000)
+	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // guessed
 	MCFG_TMS1XXX_READ_K_CB(READ8(ticalc1x_state, ti1270_read_k))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, ti1270_write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, ti1270_write_r))
@@ -709,7 +709,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( wizatron, t9base )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS0970, 250000)
+	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // guessed
 	MCFG_TMS1XXX_READ_K_CB(READ8(ticalc1x_state, wizatron_read_k))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, wizatron_write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, wizatron_write_r))
@@ -721,7 +721,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( ti30, t9base )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS0980, 250000)
+	MCFG_CPU_ADD("maincpu", TMS0980, 400000) // guessed
 	MCFG_TMS1XXX_READ_K_CB(READ8(ticalc1x_state, ti30_read_k))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, ti30_write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, ti30_write_r))

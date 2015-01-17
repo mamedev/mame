@@ -334,7 +334,7 @@ SDLMAIN = $(SDLOBJ)/main.o
 # needed for unidasm
 LDFLAGS += -Wl,--allow-multiple-definition
 SDL_NETWORK = pcap
-INCPATH += -I$(SRC)/lib/winpcap
+INCPATH += -I$(3RDPARTY)/winpcap/Include
 
 # enable UNICODE
 DEFS += -Dmain=utf8_main -DUNICODE -D_UNICODE
@@ -432,6 +432,7 @@ OSDOBJS = \
 	$(SDLOBJ)/window.o \
 	$(SDLOBJ)/output.o \
 	$(SDLOBJ)/watchdog.o \
+	$(OSDOBJ)/modules/lib/osdobj_common.o  \
 
 ifdef NO_USE_MIDI
 	OSDOBJS += $(OSDOBJ)/modules/midi/none.o

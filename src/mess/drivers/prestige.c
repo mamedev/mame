@@ -779,6 +779,10 @@ static MACHINE_CONFIG_DERIVED( gl7007sl, prestige_base )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( gjmovie, prestige_base )
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "gjmovie")
+MACHINE_CONFIG_END
+
 /* ROM definition */
 ROM_START( gl6000sl )
 	ROM_REGION(0x100000, "maincpu", 0)
@@ -793,6 +797,11 @@ ROM_END
 ROM_START( prestige )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "27-6020-02.u2", 0x00000, 0x100000, CRC(6bb6db14) SHA1(5d51fc3fd799e7f01ee99c453f9005fb07747b1e) )
+ROM_END
+
+ROM_START( gwnf )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "27-6372-00.bin", 0x00000, 0x100000, CRC(1bb574bd) SHA1(04234a33405782e8641883ebd6dee46a24e014d5) )
 ROM_END
 
 ROM_START( glcolor )
@@ -818,6 +827,11 @@ ROM_END
 ROM_START( gj5000 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "27-6019-01.u2", 0x000000, 0x80000, CRC(946e5b7d) SHA1(80963d6ad80d49e54c8996bfc77ac135c4935be5))
+ROM_END
+
+ROM_START( gjmovie )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "lh532hlk.bin", 0x000000, 0x40000, CRC(2e64c296) SHA1(604034f902e20851cb9af60964031a508ceef83e))
 ROM_END
 
 ROM_START( gjrstar )
@@ -850,10 +864,12 @@ COMP( 1996, glmcolor,  0,       0,  glmcolor,   glmcolor, driver_device,     0, 
 COMP( 1997, gl6000sl,  0,       0,  gl6000sl,   prestige, driver_device,     0,  "VTech",   "Genius Leader 6000SL (Germany)",   GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1998, gl7007sl,  0,       0,  gl7007sl,   prestige, driver_device,     0,  "VTech",   "Genius Leader 7007SL (Germany)",   GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1998, prestige,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "PreComputer Prestige Elite",       GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1999, gwnf,      0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Winner Notebook Fun (Germany)", GAME_NOT_WORKING | GAME_NO_SOUND)
 
 
 // these systems need to be moved into a separate driver
 COMP( 1996, gj4000,    0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior 4000 (Germany)", GAME_IS_SKELETON)
+COMP( 1993, gjmovie,   0,       0,  gjmovie,    prestige, driver_device,     0,  "VTech",   "Genius Junior Movie (Germany)", GAME_IS_SKELETON)
 COMP( 1996, gjrstar,   0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior Redstar(Germany)", GAME_IS_SKELETON)
 COMP( 1996, gjrstar2,  gjrstar, 0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior Redstar 2 (Germany)", GAME_IS_SKELETON)
 COMP( 1998, gjrstar3,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior Redstar 3 (Germany)", GAME_IS_SKELETON)

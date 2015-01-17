@@ -198,7 +198,7 @@ public:
 	ATTR_COLD nld_a_to_d_proxy(netlist_input_t &in_proxied)
 			: netlist_device_t()
 	{
-		assert(in_proxied.family() == LOGIC);
+		nl_assert(in_proxied.family() == LOGIC);
 		m_I.m_logic_family = in_proxied.m_logic_family;
 	}
 
@@ -240,7 +240,7 @@ public:
 	ATTR_COLD nld_base_d_to_a_proxy(netlist_output_t &out_proxied)
 			: netlist_device_t()
 	{
-		assert(out_proxied.family() == LOGIC);
+		nl_assert(out_proxied.family() == LOGIC);
 		m_logic_family = out_proxied.m_logic_family;
 	}
 

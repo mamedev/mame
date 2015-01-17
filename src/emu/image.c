@@ -210,7 +210,7 @@ void image_device_init(running_machine &machine)
 	for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
 	{
 		/* is an image specified for this image */
-		image_name = machine.options().device_option(*image);
+		image_name = machine.options().value(image->instance_name());
 
 		if ((image_name != NULL) && (image_name[0] != '\0'))
 		{

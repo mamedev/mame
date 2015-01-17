@@ -1,0 +1,9 @@
+
+CC	=	gcc
+INCLDIR	=	-I /usr/src/sys
+LIBS	= 	-lpcap 
+
+pktdump: pcap_filter.o
+        $(CC) $(INCLDIR) pcap_filter.o $(LIBS) -o pf
+	rm *.o
+

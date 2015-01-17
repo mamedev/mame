@@ -19,6 +19,7 @@
 #include "emu.h"
 #include "config.h"
 #include "debugger.h"
+#include "modules/lib/osdobj_common.h"
 
 #include "qt/debugqtlogwindow.h"
 #include "qt/debugqtmainwindow.h"
@@ -50,7 +51,7 @@ static MainWindow* mainQtWindow = NULL;
 //  debugger_qt - constructor
 //-------------------------------------------------
 debugger_qt::debugger_qt(const osd_interface &osd)
-	: osd_debugger_interface(osd)
+	: osd_debugger_interface(osd), m_machine(NULL)
 {
 }
 
@@ -227,7 +228,7 @@ static void bring_main_window_to_front()
 bool winwindow_qt_filter(void *message);
 #endif
 
-void debugger_qt::init_debugger()
+void debugger_qt::init_debugger(running_machine &machine)
 {
 	if (qApp == NULL)
 	{
@@ -249,11 +250,12 @@ void debugger_qt::init_debugger()
 		oneShot = true;
 	}
 
+	m_machine = &machine;
 	// Setup the configuration XML saving and loading
-	config_register(m_osd.machine(),
+	config_register(machine,
 					"debugger",
-					config_saveload_delegate(FUNC(xml_configuration_load), &m_osd.machine()),
-					config_saveload_delegate(FUNC(xml_configuration_save), &m_osd.machine()));
+					config_saveload_delegate(FUNC(xml_configuration_load), &machine),
+					config_saveload_delegate(FUNC(xml_configuration_save), &machine));
 }
 
 
@@ -276,9 +278,9 @@ void debugger_qt::wait_for_debugger(device_t &device, bool firststop)
 	// Dialog initialization
 	if (oneShot)
 	{
-		mainQtWindow = new MainWindow(&m_osd.machine());
+		mainQtWindow = new MainWindow(m_machine);
 		load_and_clear_main_window_config(xmlConfigurations);
-		setup_additional_startup_windows(m_osd.machine(), xmlConfigurations);
+		setup_additional_startup_windows(*m_machine, xmlConfigurations);
 		mainQtWindow->show();
 		oneShot = false;
 	}
@@ -325,7 +327,7 @@ void debugger_qt::wait_for_debugger(device_t &device, bool firststop)
 	}
 
 	// Exit if the machine has been instructed to do so (scheduled event == exit || hard_reset)
-	if (m_osd.machine().scheduled_event_pending())
+	if (m_machine->scheduled_event_pending())
 	{
 		// Keep a list of windows we want to save.
 		// We need to do this here because by the time xml_configuration_save gets called
@@ -333,7 +335,7 @@ void debugger_qt::wait_for_debugger(device_t &device, bool firststop)
 		gather_save_configurations();
 	}
 #if defined(WIN32) && !defined(SDLMAME_WIN32)
-		winwindow_update_cursor_state(m_osd.machine()); // make sure the cursor isn't hidden while in debugger
+		winwindow_update_cursor_state(*m_machine); // make sure the cursor isn't hidden while in debugger
 #endif
 }
 

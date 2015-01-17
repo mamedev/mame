@@ -110,6 +110,11 @@ static char giant_string_buffer[65536] = { 0 };
 
 int cpunum;
 
+osd_interface &running_machine::osd() const
+{
+    return m_manager.osd();
+}
+
 //-------------------------------------------------
 //  running_machine - constructor
 //-------------------------------------------------

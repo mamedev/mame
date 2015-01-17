@@ -729,6 +729,7 @@ DRVLIBS += \
 	$(MESSOBJ)/homebrew.a \
 	$(MESSOBJ)/homelab.a \
 	$(MESSOBJ)/hp.a \
+	$(MESSOBJ)/ideal.a \
 	$(MESSOBJ)/imp.a \
 	$(MESSOBJ)/intel.a \
 	$(MESSOBJ)/interton.a \
@@ -1305,7 +1306,6 @@ $(MESSOBJ)/hp.a:                \
 	$(MESS_DRIVERS)/hp9k.o      \
 	$(MESS_DRIVERS)/hp9k_3xx.o  \
 
-
 $(MESSOBJ)/hec2hrp.a:           \
 	$(MESS_DRIVERS)/hec2hrp.o   \
 	$(MESS_MACHINE)/hec2hrp.o   \
@@ -1322,6 +1322,9 @@ $(MESSOBJ)/intel.a:             \
 	$(MESS_DRIVERS)/rex6000.o   \
 	$(MESS_DRIVERS)/sdk85.o     \
 	$(MESS_DRIVERS)/sdk86.o     \
+
+$(MESSOBJ)/ideal.a:             \
+	$(MESS_DRIVERS)/elecdet.o   \
 
 $(MESSOBJ)/imp.a:               \
 	$(MESS_DRIVERS)/tim011.o    \
@@ -1487,6 +1490,7 @@ $(MESSOBJ)/palm.a:              \
 $(MESSOBJ)/parker.a:            \
 	$(MESS_DRIVERS)/cnsector.o  \
 	$(MESS_DRIVERS)/merlin.o    \
+	$(MESS_DRIVERS)/splitsec.o  \
 	$(MESS_DRIVERS)/stopthie.o  \
 
 $(MESSOBJ)/pitronic.a:          \
@@ -2106,8 +2110,9 @@ $(MESS_DRIVERS)/digel804.o: $(MESS_LAYOUT)/digel804.lh
 $(MESS_DRIVERS)/dmv.o:      $(MESS_LAYOUT)/dmv.lh
 $(MESS_DRIVERS)/dolphunk.o: $(MESS_LAYOUT)/dolphunk.lh
 $(MESS_DRIVERS)/eacc.o:     $(MESS_LAYOUT)/eacc.lh
-$(MESS_DRIVERS)/elf.o:      $(MESS_LAYOUT)/elf2.lh
+$(MESS_DRIVERS)/elecdet.o:  $(MESS_LAYOUT)/elecdet.lh
 $(MESS_DRIVERS)/elekscmp.o: $(MESS_LAYOUT)/elekscmp.lh
+$(MESS_DRIVERS)/elf.o:      $(MESS_LAYOUT)/elf2.lh
 $(MESS_MACHINE)/esqvfd.o:   $(MESS_LAYOUT)/esq2by40.lh \
 							$(MESS_LAYOUT)/esq1by22.lh
 $(MESS_DRIVERS)/et3400.o:   $(MESS_LAYOUT)/et3400.lh
@@ -2167,6 +2172,7 @@ $(MESS_DRIVERS)/simon.o:    $(MESS_LAYOUT)/simon.lh
 $(MESS_DRIVERS)/sitcom.o:   $(MESS_LAYOUT)/sitcom.lh
 $(MESS_DRIVERS)/slc1.o:     $(MESS_LAYOUT)/slc1.lh
 $(MESS_DRIVERS)/sms.o:      $(MESS_LAYOUT)/sms1.lh
+$(MESS_DRIVERS)/splitsec.o: $(MESS_LAYOUT)/splitsec.lh
 $(MESS_DRIVERS)/starwbc.o:  $(MESS_LAYOUT)/starwbc.lh
 $(MESS_DRIVERS)/stopthie.o: $(MESS_LAYOUT)/stopthie.lh
 $(MESS_DRIVERS)/super80.o:  $(MESS_LAYOUT)/super80.lh
@@ -2185,7 +2191,7 @@ $(MESS_DRIVERS)/ticalc1x.o: $(MESS_LAYOUT)/ti1270.lh \
 							$(MESS_LAYOUT)/tisr16.lh \
 							$(MESS_LAYOUT)/wizatron.lh
 $(MESS_DRIVERS)/tispeak.o:  $(MESS_LAYOUT)/lantutor.lh \
-							$(MESS_LAYOUT)/tispeak.lh
+							$(MESS_LAYOUT)/snspell.lh
 $(MESS_DRIVERS)/tk80.o:     $(MESS_LAYOUT)/tk80.lh
 $(MESS_DRIVERS)/tm990189.o: $(MESS_LAYOUT)/tm990189.lh \
 							$(MESS_LAYOUT)/tm990189v.lh

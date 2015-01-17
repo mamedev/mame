@@ -33,6 +33,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	virtual void pcb_reset();
+	virtual void pcb_start(running_machine &machine, UINT8 *ciram_ptr, bool cart_mounted);
 
 private:
 	// emulate the Game Genie!

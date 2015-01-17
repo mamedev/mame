@@ -1,8 +1,16 @@
 #ifndef MARIO_H_
 #define MARIO_H_
 
-#include "sound/discrete.h"
 #include "machine/z80dma.h"
+
+#define OLD_SOUND   (1)
+
+#if !OLD_SOUND
+#include "machine/netlist.h"
+#include "netlist/devices/net_lib.h"
+#else
+#include "sound/discrete.h"
+#endif
 
 /*
  * From the schematics:
@@ -42,7 +50,13 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_z80dma(*this, "z80dma"),
+#if OLD_SOUND
 		m_discrete(*this, "discrete"),
+#else
+		m_audio_snd0(*this, "snd_nl:snd0"),
+        m_audio_snd7(*this, "snd_nl:snd7"),
+        m_audio_dac(*this, "snd_nl:dac"),
+#endif
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_monitor(0) { }
@@ -53,7 +67,13 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<z80dma_device> m_z80dma;
+#if OLD_SOUND
 	optional_device<discrete_device> m_discrete;
+#else
+	optional_device<netlist_mame_logic_input_t> m_audio_snd0;
+    optional_device<netlist_mame_logic_input_t> m_audio_snd7;
+    optional_device<netlist_mame_logic_input_t> m_audio_dac;
+#endif
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_spriteram;

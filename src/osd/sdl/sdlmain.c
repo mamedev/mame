@@ -255,9 +255,10 @@ void MorphToPM()
 //============================================================
 
 sdl_options::sdl_options()
+: osd_options()
 {
 	astring ini_path(INI_PATH);
-	add_entries(s_option_entries);
+	add_entries(sdl_options::s_option_entries);
 	ini_path.replace(0, "APP_NAME", emulator_info::get_appname_lower());
 	set_default_value(SDLOPTION_INIPATH, ini_path.cstr());
 }
@@ -333,9 +334,9 @@ int main(int argc, char *argv[])
 #endif
 
 	{
-		sdl_osd_interface osd;
-		sdl_options options;
-		osd.register_options(options);
+	    sdl_options options;
+		sdl_osd_interface osd(options);
+		osd.register_options();
 		cli_frontend frontend(options, osd);
 		res = frontend.execute(argc, argv);
 	}
@@ -380,7 +381,8 @@ static void output_oslog(running_machine &machine, const char *buffer)
 //  constructor
 //============================================================
 
-sdl_osd_interface::sdl_osd_interface()
+sdl_osd_interface::sdl_osd_interface(sdl_options &options)
+: osd_common_t(options), m_options(options)
 {
 	m_watchdog = NULL;
 }
@@ -401,7 +403,7 @@ sdl_osd_interface::~sdl_osd_interface()
 
 void sdl_osd_interface::osd_exit()
 {
-	osd_interface::osd_exit();
+	osd_common_t::osd_exit();
 
 	if (!SDLMAME_INIT_IN_WORKER_THREAD)
 	{
@@ -585,32 +587,31 @@ void sdl_osd_interface::debugger_register()
 void sdl_osd_interface::init(running_machine &machine)
 {
 	// call our parent
-	osd_interface::init(machine);
+	osd_common_t::init(machine);
 
-	sdl_options &options = downcast<sdl_options &>(machine.options());
 	const char *stemp;
 
 	// determine if we are benchmarking, and adjust options appropriately
-	int bench = options.bench();
+	int bench = options().bench();
 	astring error_string;
 	if (bench > 0)
 	{
-		options.set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM, error_string);
-		options.set_value(OSDOPTION_SOUND, "none", OPTION_PRIORITY_MAXIMUM, error_string);
-		options.set_value(OSDOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM, error_string);
-		options.set_value(OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM, error_string);
+		options().set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM, error_string);
+		options().set_value(OSDOPTION_SOUND, "none", OPTION_PRIORITY_MAXIMUM, error_string);
+		options().set_value(OSDOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM, error_string);
+		options().set_value(OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM, error_string);
 		assert(!error_string);
 	}
 
 	// Some driver options - must be before audio init!
-	stemp = options.audio_driver();
+	stemp = options().audio_driver();
 	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 	{
 		osd_printf_verbose("Setting SDL audiodriver '%s' ...\n", stemp);
 		osd_setenv(SDLENV_AUDIODRIVER, stemp, 1);
 	}
 
-	stemp = options.video_driver();
+	stemp = options().video_driver();
 	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 	{
 		osd_printf_verbose("Setting SDL videodriver '%s' ...\n", stemp);
@@ -618,7 +619,7 @@ void sdl_osd_interface::init(running_machine &machine)
 	}
 
 #if (SDLMAME_SDL2)
-		stemp = options.render_driver();
+		stemp = options().render_driver();
 		if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 		{
 			osd_printf_verbose("Setting SDL renderdriver '%s' ...\n", stemp);
@@ -633,7 +634,7 @@ void sdl_osd_interface::init(running_machine &machine)
 #if USE_OPENGL
 	/* FIXME: move lib loading code from drawogl.c here */
 
-	stemp = options.gl_lib();
+	stemp = options().gl_lib();
 	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 	{
 		osd_setenv("SDL_VIDEO_GL_DRIVER", stemp, 1);
@@ -642,7 +643,7 @@ void sdl_osd_interface::init(running_machine &machine)
 #endif
 
 	/* get number of processors */
-	stemp = options.numprocessors();
+	stemp = options().numprocessors();
 
 	osd_num_processors = 0;
 
@@ -681,14 +682,14 @@ void sdl_osd_interface::init(running_machine &machine)
 			exit(-1);
 		}
 
-	osd_interface::init_subsystems();
+	osd_common_t::init_subsystems();
 
-	if (options.oslog())
+	if (options().oslog())
 		machine.add_logerror_callback(output_oslog);
 
 	/* now setup watchdog */
 
-	int watchdog_timeout = options.watchdog();
+	int watchdog_timeout = options().watchdog();
 
 	if (watchdog_timeout != 0)
 	{
@@ -716,7 +717,13 @@ void sdl_osd_interface::init(running_machine &machine)
 //  font with the given name
 //-------------------------------------------------
 
-osd_font sdl_osd_interface::font_open(const char *_name, int &height)
+class osd_font
+{
+public:
+    CTFontRef m_font;
+};
+
+osd_font *sdl_osd_interface::font_open(const char *_name, int &height)
 {
 	CFStringRef font_name = NULL;
 	CTFontRef ct_font = NULL;
@@ -769,7 +776,9 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 	line_height += CTFontGetLeading(ct_font);
 	height = ceilf(line_height * EXTRA_HEIGHT);
 
-	return (osd_font)ct_font;
+	osd_font *ret = global_alloc(osd_font);
+	ret->m_font = ct_font;
+	return ret;
 }
 
 //-------------------------------------------------
@@ -777,14 +786,15 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 //  a given OSD font
 //-------------------------------------------------
 
-void sdl_osd_interface::font_close(osd_font font)
+void sdl_osd_interface::font_close(osd_font *font)
 {
-	CTFontRef ct_font = (CTFontRef)font;
+	CTFontRef ct_font = font->m_font;
 
 	if( ct_font != NULL )
 	{
 		CFRelease( ct_font );
 	}
+	global_free(font);
 }
 
 //-------------------------------------------------
@@ -795,11 +805,11 @@ void sdl_osd_interface::font_close(osd_font font)
 //  pixel of a black & white font
 //-------------------------------------------------
 
-bool sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
+bool sdl_osd_interface::font_get_bitmap(osd_font *font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
 {
 	UniChar uni_char;
 	CGGlyph glyph;
-	CTFontRef ct_font = (CTFontRef)font;
+	CTFontRef ct_font = font->m_font;
 	const CFIndex count = 1;
 	CGRect bounding_rect, success_rect;
 	CGContextRef context_ref;
@@ -1008,7 +1018,13 @@ static TTF_Font *search_font_config(astring name, bool bold, bool italic, bool u
 //  font with the given name
 //-------------------------------------------------
 
-osd_font sdl_osd_interface::font_open(const char *_name, int &height)
+class osd_font
+{
+public:
+    TTF_Font *m_font;
+};
+
+osd_font *sdl_osd_interface::font_open(const char *_name, int &height)
 {
 	TTF_Font *font = (TTF_Font *)NULL;
 	bool bakedstyles = false;
@@ -1035,7 +1051,7 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 	if (!font)
 	{
 		osd_printf_verbose("Searching font %s in -%s\n", name.cstr(), OPTION_FONTPATH);
-		emu_file file(machine().options().font_path(), OPEN_FLAG_READ);
+		emu_file file(options().font_path(), OPEN_FLAG_READ);
 		if (file.open(name) == FILERR_NONE)
 		{
 			astring full_name = file.fullpath();
@@ -1080,7 +1096,9 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 
 	height = TTF_FontLineSkip(font);
 
-	return (osd_font)font;
+	osd_font *ret = global_alloc(osd_font);
+	ret->m_font = font;
+	return ret;
 }
 
 //-------------------------------------------------
@@ -1088,13 +1106,10 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 //  a given OSD font
 //-------------------------------------------------
 
-void sdl_osd_interface::font_close(osd_font font)
+void sdl_osd_interface::font_close(osd_font *font)
 {
-	TTF_Font *ttffont;
-
-	ttffont = (TTF_Font *)font;
-
-	TTF_CloseFont(ttffont);
+	TTF_CloseFont(font->m_font);
+	global_free(font);
 }
 
 //-------------------------------------------------
@@ -1105,14 +1120,14 @@ void sdl_osd_interface::font_close(osd_font font)
 //  pixel of a black & white font
 //-------------------------------------------------
 
-bool sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
+bool sdl_osd_interface::font_get_bitmap(osd_font *font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
 {
 	TTF_Font *ttffont;
 	SDL_Surface *drawsurf;
 	SDL_Color fcol = { 0xff, 0xff, 0xff };
 	UINT16 ustr[16];
 
-	ttffont = (TTF_Font *)font;
+	ttffont = font->m_font;
 
 	memset(ustr,0,sizeof(ustr));
 	ustr[0] = (UINT16)chnum;
@@ -1439,27 +1454,4 @@ bool sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, bitma
 #endif
 #endif
 
-//-------------------------------------------------
-// FIXME: Doesn't belong here but there's no better
-//        place currently.
-//-------------------------------------------------
 
-bool osd_interface::midi_init()
-{
-    // this should be done on the OS_level
-    return osd_midi_init();
-}
-
-//-------------------------------------------------
-//  list_midi_devices - list available midi devices
-//-------------------------------------------------
-
-void osd_interface::list_midi_devices(void)
-{
-    osd_list_midi_devices();
-}
-
-void osd_interface::midi_exit()
-{
-    osd_midi_exit();
-}

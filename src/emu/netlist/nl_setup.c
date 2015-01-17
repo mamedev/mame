@@ -14,6 +14,9 @@
 #include "analog/nld_solver.h"
 #include "analog/nld_twoterm.h"
 
+//FIXME: we need a nl_getenv
+#include <stdlib.h>
+
 static NETLIST_START(base)
 	TTL_INPUT(ttlhigh, 1)
 	TTL_INPUT(ttllow, 0)
@@ -378,7 +381,7 @@ netlist_param_t *netlist_setup_t::find_param(const pstring &param_in, bool requi
 
 nld_base_d_to_a_proxy *netlist_setup_t::get_d_a_proxy(netlist_output_t &out)
 {
-	assert(out.isFamily(netlist_terminal_t::LOGIC));
+	nl_assert(out.isFamily(netlist_terminal_t::LOGIC));
 
 	//printf("proxy for %s\n", out.name().cstr());;
 	netlist_logic_output_t &out_cast = dynamic_cast<netlist_logic_output_t &>(out);
@@ -499,8 +502,8 @@ void netlist_setup_t::connect_terminal_output(netlist_terminal_t &in, netlist_ou
 
 void netlist_setup_t::connect_terminals(netlist_core_terminal_t &t1, netlist_core_terminal_t &t2)
 {
-	//assert(in.isType(netlist_terminal_t::TERMINAL));
-	//assert(out.isType(netlist_terminal_t::TERMINAL));
+	//nl_assert(in.isType(netlist_terminal_t::TERMINAL));
+	//nl_assert(out.isType(netlist_terminal_t::TERMINAL));
 
 	if (t1.has_net() && t2.has_net())
 	{
@@ -683,6 +686,7 @@ void netlist_setup_t::resolve_inputs()
 
 void netlist_setup_t::start_devices()
 {
+    //FIXME: we need a nl_getenv
 	if (getenv("NL_LOGS"))
 	{
 		NL_VERBOSE_OUT(("Creating dynamic logs ...\n"));

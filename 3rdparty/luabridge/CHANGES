@@ -1,0 +1,37 @@
+Version 2.0
+
+  * Numerous bug fixes
+  * Feature Requests from Github Issues
+  * Added LuaRef object
+  * Rewritten documentation
+
+Version 1.1.0
+
+  * Split code up into several files
+  * Add Lua table and type representations (based on Nigel's code)
+  * Reformat documentation as external HTML file
+
+Version 1.0.3
+
+  * Pass nil to Lua when a null pointer is passed for objects with shared lifetime.
+
+Version 1.0.2
+
+  * Option to hide metatables selectable at runtime, default to true.
+  * addStaticMethod () renamed to addStaticFunction () for consistency.
+  * addMethod () renamed to addFunction() for consistency.
+  * addCFunction () registrations.
+  * Convert null pointers to and from nil.
+  * Small performance increase in class pointer extraction.
+
+2012-05-30  Version 1.0.1
+
+  * Backward compatibility with Lua 5.1.x.
+
+2012-05-29  Version 1.0
+
+  * Explicit lifetime management models.
+  * Generalized containers.
+  * Single header distribution.
+
+

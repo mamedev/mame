@@ -339,14 +339,15 @@ WRITE16_MEMBER(dec0_state::dec0_priority_w)
 VIDEO_START_MEMBER(dec0_state,dec0_nodma)
 {
 	save_item(NAME(m_pri));
-
 	m_buffered_spriteram = m_spriteram;
+	save_pointer(NAME(m_buffered_spriteram), 0x800/2);
 }
 
 VIDEO_START_MEMBER(dec0_state,dec0)
 {
-	VIDEO_START_CALL_MEMBER(dec0_nodma);
+	save_item(NAME(m_pri));
 	m_buffered_spriteram = auto_alloc_array(machine(), UINT16, 0x800/2);
+	save_pointer(NAME(m_buffered_spriteram), 0x800/2);
 }
 
 /******************************************************************************/

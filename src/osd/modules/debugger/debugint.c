@@ -851,18 +851,21 @@ void debugger_internal::debugger_exit()
 	}
 	if (debug_font != NULL)
 	{
-		m_osd.machine().render().font_free(debug_font);
+		m_machine->render().font_free(debug_font);
 		debug_font = NULL;
 	}
 	if (menu)
 		global_free(menu);
 }
 
-void debugger_internal::init_debugger()
+void debugger_internal::init_debugger(running_machine &machine)
 {
 	unicode_char ch;
 	int chw;
-	debug_font = m_osd.machine().render().font_alloc("ui.bdf"); //ui_get_font(machine);
+
+	m_machine = &machine;
+
+	debug_font = m_machine->render().font_alloc("ui.bdf"); //ui_get_font(machine);
 	debug_font_width = 0;
 	debug_font_height = 15;
 
@@ -871,7 +874,7 @@ void debugger_internal::init_debugger()
 	list = NULL;
 	focus_view = NULL;
 
-	debug_font_aspect = m_osd.machine().render().ui_aspect();
+	debug_font_aspect = m_machine->render().ui_aspect();
 
 	for (ch=0;ch<=127;ch++)
 	{
@@ -1442,7 +1445,7 @@ void debugger_internal::wait_for_debugger(device_t &device, bool firststop)
 
 void debugger_internal::debugger_update()
 {
-	if (!debug_cpu_is_stopped(m_osd.machine()) && m_osd.machine().phase() == MACHINE_PHASE_RUNNING)
+	if (!debug_cpu_is_stopped(*m_machine) && m_machine->phase() == MACHINE_PHASE_RUNNING)
 	{
 		update_views();
 	}
@@ -1452,6 +1455,6 @@ void debugger_internal::debugger_update()
 //  debugger_internal - constructor
 //-------------------------------------------------
 debugger_internal::debugger_internal(const osd_interface &osd)
-	: osd_debugger_interface(osd)
+	: osd_debugger_interface(osd), m_machine(NULL)
 {
 }

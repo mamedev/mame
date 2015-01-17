@@ -244,7 +244,24 @@ void qs1000_device::device_start()
 
 	m_cpu->i8051_set_serial_rx_callback(read8_delegate(FUNC(qs1000_device::data_to_i8052),this));
 
-	// TODO: register state for saving
+	save_item(NAME(m_serial_data_in));
+	save_item(NAME(m_wave_regs));
+	
+	for (int i = 0; i < QS1000_CHANNELS; i++)
+	{
+		save_item(NAME(m_channels[i].m_acc), i);
+		save_item(NAME(m_channels[i].m_adpcm_signal), i);
+		save_item(NAME(m_channels[i].m_start), i);
+		save_item(NAME(m_channels[i].m_addr), i);
+		save_item(NAME(m_channels[i].m_adpcm_addr), i);
+		save_item(NAME(m_channels[i].m_loop_start), i);
+		save_item(NAME(m_channels[i].m_loop_end), i);
+		save_item(NAME(m_channels[i].m_freq), i);
+		save_item(NAME(m_channels[i].m_flags), i);
+		save_item(NAME(m_channels[i].m_regs), i);
+		save_item(NAME(m_channels[i].m_adpcm.m_signal), i);
+		save_item(NAME(m_channels[i].m_adpcm.m_step), i);
+	}
 }
 
 

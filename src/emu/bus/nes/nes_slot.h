@@ -216,7 +216,7 @@ public:
 	virtual void scanline_irq(int scanline, int vblank, int blanked) {}
 
 	virtual void pcb_reset() {} // many pcb expect specific PRG/CHR banking at start
-	void pcb_start(running_machine &machine, UINT8 *ciram_ptr, bool cart_mounted);
+	virtual void pcb_start(running_machine &machine, UINT8 *ciram_ptr, bool cart_mounted);
 	void pcb_reg_postload(running_machine &machine);
 	void nes_banks_restore();
 

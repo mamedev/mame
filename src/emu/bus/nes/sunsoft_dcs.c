@@ -283,7 +283,7 @@ READ8_MEMBER(nes_sunsoft_dcs_device::read_m)
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START(ntb_cart)
-	SLOT_INTERFACE("ntbrom", NES_NTB_ROM)
+	SLOT_INTERFACE_INTERNAL("ntbrom", NES_NTB_ROM)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( sub_slot )

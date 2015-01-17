@@ -116,9 +116,9 @@ void deco_bac06_device::device_start()
 	save_pointer(NAME(m_pf_data), 0x4000/2);
 	save_pointer(NAME(m_pf_rowscroll), 0x2000/2);
 	save_pointer(NAME(m_pf_colscroll), 0x2000/2);
-	save_pointer(NAME(m_pf_control_0), 8);
-	save_pointer(NAME(m_pf_control_1), 8);
-
+	save_item(NAME(m_pf_control_0));
+	save_item(NAME(m_pf_control_1));
+	save_item(NAME(m_gfxcolmask));
 	save_item(NAME(m_rambank));
 }
 

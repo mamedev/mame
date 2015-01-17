@@ -12,6 +12,7 @@
 #include "softlist.h"
 #include "clifront.h"
 #include "validity.h"
+#include "expat.h"
 
 #include <ctype.h>
 

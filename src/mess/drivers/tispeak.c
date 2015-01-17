@@ -21,7 +21,7 @@
 #include "bus/generic/carts.h"
 
 #include "lantutor.lh"
-#include "tispeak.lh"
+#include "snspell.lh"
 
 // The master clock is a single stage RC oscillator into TMS5100 RCOSC:
 // In an early 1979 Speak & Spell, C is 68pf, R is a 50kohm trimpot which is set to around 33.6kohm
@@ -41,7 +41,6 @@ public:
 		m_tms5100(*this, "tms5100"),
 		m_tms6100(*this, "tms6100"),
 		m_cart(*this, "cartslot"),
-		m_filoff_timer(*this, "filoff"),
 		m_button_matrix(*this, "IN")
 	{ }
 
@@ -49,17 +48,17 @@ public:
 	required_device<tms5100_device> m_tms5100;
 	required_device<tms6100_device> m_tms6100;
 	optional_device<generic_slot_device> m_cart;
-	required_device<timer_device> m_filoff_timer;
 	required_ioport_array<9> m_button_matrix;
 
 	UINT16 m_r;
 	UINT16 m_o;
-	int m_filament_on;
 	int m_power_on;
 
-	UINT16 m_digit_state[0x10];
-	void display_update();
-	TIMER_DEVICE_CALLBACK_MEMBER(delayed_filament_off);
+	UINT16 m_leds_state[0x10];
+	UINT16 m_leds_cache[0x10];
+	UINT8 m_leds_decay[0x100];
+	void leds_update();
+	TIMER_DEVICE_CALLBACK_MEMBER(leds_decay_tick);
 
 	UINT32 m_cart_max_size;
 	UINT8* m_cart_base;
@@ -128,45 +127,57 @@ DRIVER_INIT_MEMBER(tispeak_state, lantutor)
 // The device strobes the filament-enable very fast, it is unnoticeable to the user.
 // To prevent flickering here, we need to simulate a decay.
 
-// decay time in milliseconds
-#define FILOFF_DECAY_TIME 20
+// decay time, in steps of 10ms
+#define LEDS_DECAY_TIME 4
 
-TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::delayed_filament_off)
+void tispeak_state::leds_update()
 {
-	// turn off display
-	m_filament_on = 0;
-	display_update();
+	int filament_on = (m_r & 0x8000) ? 1 : 0;
+	UINT16 active_state[0x10];
+
+	for (int i = 0; i < 0x10; i++)
+	{
+		// update current state
+		if (m_r >> i & 1)
+			m_leds_state[i] = m_o;
+
+		active_state[i] = 0;
+
+		for (int j = 0; j < 0x10; j++)
+		{
+			int di = j << 4 | i;
+
+			// turn on powered leds
+			if (m_power_on && filament_on && m_leds_state[i] >> j & 1)
+				m_leds_decay[di] = LEDS_DECAY_TIME;
+
+			// determine active state
+			int ds = (m_leds_decay[di] != 0) ? 1 : 0;
+			active_state[i] |= (ds << j);
+		}
+	}
+
+	// on difference, send to output
+	for (int i = 0; i < 0x10; i++)
+		if (m_leds_cache[i] != active_state[i])
+		{
+			output_set_digit_value(i, active_state[i] & 0x3fff);
+
+			for (int j = 0; j < 0x10; j++)
+				output_set_lamp_value(i*0x10 + j, active_state[i] >> j & 1);
+		}
+
+	memcpy(m_leds_cache, active_state, sizeof(m_leds_cache));
 }
 
-void tispeak_state::display_update()
+TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::leds_decay_tick)
 {
-	// filament on/off
-	if (m_r & 0x8000)
-	{
-		m_filament_on = 1;
-		m_filoff_timer->reset();
-	}
-	else if (m_filament_on && m_filoff_timer->time_left() == attotime::never)
-	{
-		// schedule delayed filament-off
-		m_filoff_timer->adjust(attotime::from_msec(FILOFF_DECAY_TIME));
-	}
+	// slowly turn off unpowered leds
+	for (int i = 0; i < 0x100; i++)
+		if (!(m_leds_state[i & 0xf] >> (i>>4) & 1) && m_leds_decay[i])
+			m_leds_decay[i]--;
 
-	// update digit state
-	for (int i = 0; i < 0x10; i++)
-		if (m_r >> i & 1)
-			m_digit_state[i] = m_o;
-
-	// send to output
-	for (int i = 0; i < 0x10; i++)
-	{
-		// standard led14seg
-		output_set_digit_value(i, m_filament_on ? m_digit_state[i] & 0x3fff : 0);
-
-		// DP(display point) and AP(apostrophe) segments as lamps
-		output_set_lamp_value(i*10 + 0, m_digit_state[i] >> 14 & m_filament_on);
-		output_set_lamp_value(i*10 + 1, m_digit_state[i] >> 15 & m_filament_on);
-	}
+	leds_update();
 }
 
 
@@ -195,14 +206,14 @@ READ8_MEMBER(tispeak_state::snspell_read_k)
 WRITE16_MEMBER(tispeak_state::snspell_write_r)
 {
 	// R0-R7: input mux and select digit (+R8 if the device has 9 digits)
-	// R15: filament on (handled in display_update)
+	// R15: filament on (handled in leds_update)
 	// R13: power-off request, on falling edge
 	if ((m_r >> 13 & 1) && !(data >> 13 & 1))
 		power_off();
 
 	// other bits: MCU internal use
 	m_r = data;
-	display_update();
+	leds_update();
 }
 
 WRITE16_MEMBER(tispeak_state::snspell_write_o)
@@ -211,7 +222,7 @@ WRITE16_MEMBER(tispeak_state::snspell_write_o)
 	// E,D,C,G,B,A,I,M,L,K,N,J,[AP],H,F,[DP] (sidenote: TI KLMN = MAME MLNK)
 	m_o = BITSWAP16(data,12,15,10,7,8,9,11,6,13,3,14,0,1,2,4,5);
 
-	display_update();
+	leds_update();
 }
 
 
@@ -233,7 +244,7 @@ WRITE16_MEMBER(tispeak_state::snmath_write_o)
 	// [DP],D,C,H,F,B,I,M,L,K,N,J,[AP],E,G,A (sidenote: TI KLMN = MAME MLNK)
 	m_o = BITSWAP16(data,12,0,10,7,8,9,11,6,3,14,4,13,1,2,5,15);
 
-	display_update();
+	leds_update();
 }
 
 
@@ -243,7 +254,7 @@ WRITE16_MEMBER(tispeak_state::lantutor_write_r)
 {
 	// same as default, except R13 is used for an extra digit
 	m_r = data;
-	display_update();
+	leds_update();
 }
 
 
@@ -426,24 +437,27 @@ INPUT_PORTS_END
 
 void tispeak_state::machine_reset()
 {
-	m_filament_on = 0;
 	m_power_on = 1;
 }
 
 void tispeak_state::machine_start()
 {
 	// zerofill
-	memset(m_digit_state, 0, sizeof(m_digit_state));
+	memset(m_leds_state, 0, sizeof(m_leds_state));
+	memset(m_leds_cache, 0, sizeof(m_leds_cache));
+	memset(m_leds_decay, 0, sizeof(m_leds_decay));
+
 	m_r = 0;
 	m_o = 0;
-	m_filament_on = 0;
 	m_power_on = 0;
 
 	// register for savestates
-	save_item(NAME(m_digit_state));
+	save_item(NAME(m_leds_state));
+	save_item(NAME(m_leds_cache));
+	save_item(NAME(m_leds_decay));
+
 	save_item(NAME(m_r));
 	save_item(NAME(m_o));
-	save_item(NAME(m_filament_on));
 	save_item(NAME(m_power_on));
 
 	// init cartridge
@@ -469,8 +483,8 @@ static MACHINE_CONFIG_START( snmath, tispeak_state )
 	MCFG_TMS0270_WRITE_CTL_CB(DEVWRITE8("tms5100", tms5100_device, ctl_w))
 	MCFG_TMS0270_WRITE_PDC_CB(DEVWRITELINE("tms5100", tms5100_device, pdc_w))
 
-	MCFG_TIMER_DRIVER_ADD("filoff", tispeak_state, delayed_filament_off)
-	MCFG_DEFAULT_LAYOUT(layout_tispeak) // max 9 digits
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("leds_decay", tispeak_state, leds_decay_tick, attotime::from_msec(10))
+	MCFG_DEFAULT_LAYOUT(layout_snspell) // max 9 digits
 
 	/* no video! */
 

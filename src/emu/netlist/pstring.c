@@ -5,6 +5,7 @@
 
 #include "pstring.h"
 #include <cstdio>
+#include <stdlib.h>
 
 
 // The following will work on linux, however not on Windows ....

@@ -6,8 +6,8 @@
 
 
 
-#include "../../../lib/softfloat/milieu.h"
-#include "../../../lib/softfloat/softfloat.h"
+#include "softfloat/milieu.h"
+#include "softfloat/softfloat.h"
 
 
 /* MMU constants */

@@ -14,6 +14,7 @@
 #define __DEBUGGER_NONE_H__
 
 #include "osdepend.h"
+#include "modules/lib/osdobj_common.h"
 
 class debugger_none : public osd_debugger_interface
 {
@@ -22,10 +23,12 @@ public:
 	debugger_none(const osd_interface &osd);
 	virtual ~debugger_none() { }
 
-	virtual void init_debugger();
+	virtual void init_debugger(running_machine &machine);
 	virtual void wait_for_debugger(device_t &device, bool firststop);
 	virtual void debugger_update();
 	virtual void debugger_exit();
+private:
+	running_machine *m_machine;
 };
 
 extern const osd_debugger_type OSD_DEBUGGER_NONE;

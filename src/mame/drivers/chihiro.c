@@ -369,7 +369,6 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
 #include "debug/debugcpu.h"
-#include "osdcore.h"
 #include "includes/chihiro.h"
 
 #define LOG_PCI

@@ -14,6 +14,7 @@
 #include "emuopts.h"
 #include <zlib.h>
 
+#include "osdepend.h"
 #include "uismall.fh"
 
 

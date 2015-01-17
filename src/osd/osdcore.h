@@ -27,6 +27,7 @@
 
 #include "osdcomm.h"
 #include "delegate.h"
+#include <stdarg.h>
 
 /***************************************************************************
     FILE I/O INTERFACES

@@ -444,7 +444,7 @@ public:
 	ATTR_HOT inline const state_e state() const { return m_state; }
 	ATTR_HOT inline void set_state(const state_e astate)
 	{
-		assert(astate != STATE_NONEX);
+		nl_assert(astate != STATE_NONEX);
 		m_state = astate;
 	}
 
@@ -453,7 +453,7 @@ public:
 protected:
 	ATTR_COLD virtual void save_register()
 	{
-		save(NAME(m_state));
+		save(NLNAME(m_state));
 		netlist_owned_object_t::save_register();
 	}
 
@@ -710,7 +710,7 @@ public:
 	 */
 	ATTR_COLD inline netlist_sig_t &Q_state_ptr()
 	{
-		assert(family() == LOGIC);
+		nl_assert(family() == LOGIC);
 		return m_cur_Q;
 	}
 
@@ -738,15 +738,15 @@ public:
 
 	ATTR_HOT inline const double Q_Analog() const
 	{
-		//assert(object_type(SIGNAL_MASK) == SIGNAL_ANALOG);
-		assert(family() == ANALOG);
+		//nl_assert(object_type(SIGNAL_MASK) == SIGNAL_ANALOG);
+		nl_assert(family() == ANALOG);
 		return m_cur_Analog;
 	}
 
 	ATTR_COLD inline double &Q_Analog_state_ptr()
 	{
-		//assert(object_type(SIGNAL_MASK) == SIGNAL_ANALOG);
-		assert(family() == ANALOG);
+		//nl_assert(object_type(SIGNAL_MASK) == SIGNAL_ANALOG);
+		nl_assert(family() == ANALOG);
 		return m_cur_Analog;
 	}
 
@@ -883,7 +883,7 @@ public:
 protected:
 	ATTR_COLD virtual void save_register()
 	{
-		save(NAME(m_param));
+		save(NLNAME(m_param));
 		netlist_param_t::save_register();
 	}
 
@@ -905,7 +905,7 @@ public:
 protected:
 	ATTR_COLD virtual void save_register()
 	{
-		save(NAME(m_param));
+		save(NLNAME(m_param));
 		netlist_param_t::save_register();
 	}
 
@@ -988,7 +988,7 @@ public:
 
 	ATTR_HOT inline const netlist_sig_t INPLOGIC(const netlist_logic_input_t &inp) const
 	{
-		assert(inp.state() != netlist_input_t::STATE_INP_PASSIVE);
+		nl_assert(inp.state() != netlist_input_t::STATE_INP_PASSIVE);
 		return inp.Q();
 	}
 
@@ -1262,25 +1262,25 @@ ATTR_HOT inline void netlist_param_double_t::setTo(const double param)
 
 ATTR_HOT inline netlist_logic_net_t & RESTRICT netlist_net_t::as_logic()
 {
-	assert(family() == LOGIC);
+	nl_assert(family() == LOGIC);
 	return static_cast<netlist_logic_net_t &>(*this);
 }
 
 ATTR_HOT inline const netlist_logic_net_t & RESTRICT netlist_net_t::as_logic() const
 {
-	assert(family() == LOGIC);
+    nl_assert(family() == LOGIC);
 	return static_cast<const netlist_logic_net_t &>(*this);
 }
 
 ATTR_HOT inline netlist_analog_net_t & RESTRICT netlist_net_t::as_analog()
 {
-	assert(family() == ANALOG);
+    nl_assert(family() == ANALOG);
 	return static_cast<netlist_analog_net_t &>(*this);
 }
 
 ATTR_HOT inline const netlist_analog_net_t & RESTRICT netlist_net_t::as_analog() const
 {
-	assert(family() == ANALOG);
+	nl_assert(family() == ANALOG);
 	return static_cast<const netlist_analog_net_t &>(*this);
 }
 

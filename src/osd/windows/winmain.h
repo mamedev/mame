@@ -8,6 +8,7 @@
 
 #include "clifront.h"
 #include "osdepend.h"
+#include "modules/lib/osdobj_common.h"
 
 
 //============================================================
@@ -113,7 +114,7 @@
 //  TYPE DEFINITIONS
 //============================================================
 
-class windows_options : public cli_options
+class windows_options : public osd_options
 {
 public:
 	// construction/destruction
@@ -234,11 +235,11 @@ private:
 //  TYPE DEFINITIONS
 //============================================================
 
-class windows_osd_interface : public osd_interface
+class windows_osd_interface : public osd_common_t
 {
 public:
 	// construction/destruction
-	windows_osd_interface();
+	windows_osd_interface(windows_options &options);
 	virtual ~windows_osd_interface();
 
 	// general overridables
@@ -252,9 +253,9 @@ public:
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist);
 
 	// font overridables
-	virtual osd_font font_open(const char *name, int &height);
-	virtual void font_close(osd_font font);
-	virtual bool font_get_bitmap(osd_font font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs);
+	virtual osd_font *font_open(const char *name, int &height);
+	virtual void font_close(osd_font *font);
+	virtual bool font_get_bitmap(osd_font *font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs);
 
 	virtual void video_register();
 	virtual void sound_register();

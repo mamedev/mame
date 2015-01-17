@@ -8,17 +8,26 @@
 
 #include "options.h"
 #include "osdepend.h"
+#include "modules/lib/osdobj_common.h"
 
+
+class mini_osd_options : public osd_options
+{
+public:
+	// construction/destruction
+	mini_osd_options();
+
+};
 
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
 
-class mini_osd_interface : public osd_interface
+class mini_osd_interface : public osd_common_t
 {
 public:
 	// construction/destruction
-	mini_osd_interface();
+	mini_osd_interface(mini_osd_options &options);
 	virtual ~mini_osd_interface();
 
 	// general overridables

@@ -110,3 +110,16 @@ bool finder_base::report_missing(bool found, const char *objname, bool required)
 		osd_printf_verbose("Optional %s '%s' not found\n", objname, m_tag);
 	return !required;
 }
+
+
+void finder_base::printf_warning(const char *format, ...)
+{
+    va_list argptr;
+    char buffer[1024];
+
+    /* do the output */
+    va_start(argptr, format);
+    vsnprintf(buffer, 1024, format, argptr);
+    osd_printf_warning("%s", buffer);
+    va_end(argptr);
+}

@@ -15,7 +15,6 @@
 
 #include "options.h"
 
-
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
@@ -155,6 +154,10 @@ enum
 #define OPTION_MOUSE_DEVICE         "mouse_device"
 
 // core debugging options
+#define OPTION_LOG                  "log"
+#define OPTION_DEBUG                "debug"
+#define OPTION_VERBOSE              "verbose"
+#define OPTION_OSLOG                "oslog"
 #define OPTION_UPDATEINPAUSE        "update_in_pause"
 #define OPTION_DEBUGSCRIPT          "debugscript"
 
@@ -194,7 +197,7 @@ enum
 struct game_driver;
 
 
-class emu_options : public osd_options
+class emu_options : public core_options
 {
 	static const UINT32 OPTION_FLAG_DEVICE = 0x80000000;
 
@@ -323,7 +326,11 @@ public:
 	bool joystick_contradictory() const { return bool_value(OPTION_JOYSTICK_CONTRADICTORY); }
 	int coin_impulse() const { return int_value(OPTION_COIN_IMPULSE); }
 
-	// core debugging options
+    // core debugging options
+    bool log() const { return bool_value(OPTION_LOG); }
+    bool debug() const { return bool_value(OPTION_DEBUG); }
+    bool verbose() const { return bool_value(OPTION_VERBOSE); }
+    bool oslog() const { return bool_value(OPTION_OSLOG); }
 	const char *debug_script() const { return value(OPTION_DEBUGSCRIPT); }
 	bool update_in_pause() const { return bool_value(OPTION_UPDATEINPAUSE); }
 
@@ -355,17 +362,16 @@ public:
 	const char *http_path() const { return value(OPTION_HTTP_PATH); }
 	bool console() const { return bool_value(OPTION_CONSOLE); }
 
-	// device-specific options
-	const char *device_option(device_image_interface &image);
-
+	// FIXME: Couriersud: This should be in image_device_exit
 	void remove_device_options();
 
 	const char *main_value(astring &buffer, const char *option) const;
 	const char *sub_value(astring &buffer, const char *name, const char *subname) const;
+	bool add_slot_options(bool isfirst);
+
 private:
 	// device-specific option handling
 	void add_device_options(bool isfirst);
-	bool add_slot_options(bool isfirst);
 	void update_slot_options();
 
 	// INI parsing helper

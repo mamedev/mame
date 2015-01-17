@@ -35,13 +35,13 @@ READ16_MEMBER(stadhero_state::stadhero_control_r)
 	switch (offset<<1)
 	{
 		case 0:
-			return ioport("INPUTS")->read();
+			return m_inputs->read();
 
 		case 2:
-			return ioport("COIN")->read();
+			return m_coin->read();
 
 		case 4:
-			return ioport("DSW")->read();
+			return m_dsw->read();
 	}
 
 	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n",space.device().safe_pc(),0x30c000+offset);
@@ -305,4 +305,4 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1988, stadhero, 0, stadhero, stadhero, driver_device, 0, ROT0, "Data East Corporation", "Stadium Hero (Japan)", 0 )
+GAME( 1988, stadhero, 0, stadhero, stadhero, driver_device, 0, ROT0, "Data East Corporation", "Stadium Hero (Japan)", GAME_SUPPORTS_SAVE )

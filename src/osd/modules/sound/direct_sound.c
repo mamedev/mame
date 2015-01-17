@@ -78,8 +78,8 @@ const osd_sound_type OSD_SOUND_DIRECT_SOUND = &osd_sound_creator<sound_direct_so
 //-------------------------------------------------
 //  sound_direct_sound - constructor
 //-------------------------------------------------
-sound_direct_sound::sound_direct_sound(const osd_interface &osd)
-	: osd_sound_interface(osd)
+sound_direct_sound::sound_direct_sound(const osd_interface &osd, running_machine &machine)
+	: osd_sound_interface(osd, machine)
 {
 	// attempt to initialize directsound
 	// don't make it fatal if we can't -- we'll just run without sound
@@ -268,7 +268,7 @@ HRESULT sound_direct_sound::dsound_init()
 	stream_format.wBitsPerSample    = 16;
 	stream_format.wFormatTag        = WAVE_FORMAT_PCM;
 	stream_format.nChannels         = 2;
-	stream_format.nSamplesPerSec    = m_osd.machine().sample_rate();
+	stream_format.nSamplesPerSec    = m_machine.sample_rate();
 	stream_format.nBlockAlign       = stream_format.wBitsPerSample * stream_format.nChannels / 8;
 	stream_format.nAvgBytesPerSec   = stream_format.nSamplesPerSec * stream_format.nBlockAlign;
 
@@ -276,9 +276,9 @@ HRESULT sound_direct_sound::dsound_init()
 	// compute the buffer size based on the output sample rate
 	int audio_latency;
 	#ifdef SDLMAME_WIN32
-	audio_latency = downcast<sdl_options &>(m_osd.machine().options()).audio_latency();
+	audio_latency = downcast<sdl_options &>(m_machine.options()).audio_latency();
 	#else
-	audio_latency = downcast<windows_options &>(m_osd.machine().options()).audio_latency();
+	audio_latency = downcast<windows_options &>(m_machine.options()).audio_latency();
 	#endif
 	stream_buffer_size = stream_format.nSamplesPerSec * stream_format.nBlockAlign * audio_latency / 10;
 	stream_buffer_size = (stream_buffer_size / 1024) * 1024;

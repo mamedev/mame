@@ -58,7 +58,7 @@ void ui_menu_tape_control::populate()
 	if (current_device())
 	{		
 		// name of tape
-		item_append(current_display_name().cstr(), current_device()->exists() ? current_device()->filename() : "No Tape Image loaded", current_display_flags(), TAPECMD_SELECT);
+		item_append(current_display_name(), current_device()->exists() ? current_device()->filename() : "No Tape Image loaded", current_display_flags(), TAPECMD_SELECT);
 
 		if (current_device()->exists())
 		{

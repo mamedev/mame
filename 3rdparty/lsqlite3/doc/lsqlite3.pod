@@ -1,0 +1,866 @@
+=pod
+
+=head1 NAME
+
+B<LuaSQLite 3> - a Lua 5.1 wrapper for the SQLite3 library
+
+=head1 OVERVIEW
+
+B<LuaSQLite 3> is a thin wrapper around the public domain SQLite3
+database engine. 
+
+The C<lsqlite3> module supports the creation and manipulation of 
+SQLite3 databases. After a C<require('lsqlite3')> the exported 
+functions are called with prefix C<sqlite3>. However, most sqlite3 
+functions are called via an object-oriented interface to either 
+database or SQL statement objects; see below for details.
+
+This documentation does not attempt to describe how SQLite3 itself
+works, it just describes the Lua binding and the available functions.
+For more information about the SQL features supported by SQLite3 and
+details about the syntax of SQL statements and queries, please see the
+B<SQLite3 documentation> L<http://www.sqlite.org/>. Using some of the
+advanced features (how to use callbacks, for instance) will require 
+some familiarity with the SQLite3 API.
+
+=head1 DOWNLOAD
+
+B<LuaSQLite 3> source code can be downloaded from its 
+LuaForge (L<http://luaforge.net/projects/luasqlite/>) page.
+
+You will also need to build or obtain an SQLite3 loadable library 
+(DLL or .so). See L<http://www.sqlite.org/> for obtaining SQLite3 
+source code or downloading a binary SQLite3 library.
+
+=head1 INSTALLATION
+
+A I<Makefile> is provided; it assumes an SQLite3 library is already
+installed. 
+
+=head1 EXAMPLES
+
+The distribution contains an I<examples> directory. The unit tests
+also show some example use.
+
+=head1 VERIFICATION TESTS
+
+The distribution contains some units tests using Michael Roth's
+C<lunit> (which is also included). Some of the tests were also derived 
+from Michael's B<lua-sqlite3> module, and more unit tests added by 
+Doug Currie.
+
+The distribution also contains some functional tests by Tiago.
+
+This version of C<lsqlite3> was tested with SQLite 3.4.2.
+
+=head1 REFERENCE
+
+=head1 SQLite3 functions
+
+=head2 sqlite3.complete
+
+	sqlite3.complete(sql)
+
+Returns true if the string C<sql> comprises one or more complete SQL
+statements and false otherwise.
+
+=head2 sqlite3.open
+
+	sqlite3.open(filename)
+
+Opens (or creates if it does not exist) an SQLite database with name
+C<filename> and returns its handle as userdata (the returned object 
+should be used for all further method calls in connection with this 
+specific database, see L</Database methods>). Example:
+
+	myDB=sqlite3.open('MyDatabase.sqlite3')  -- open
+	-- do some database calls...
+	myDB:close()  -- close
+
+In case of an error, the function returns nil, an error code and an
+error message.
+
+=head2 sqlite3.open_memory
+
+	sqlite3.open_memory()
+
+Opens an SQLite database B<in memory> and returns its handle as
+userdata. In case of an error, the function returns nil, an error code
+and an error message. (In-memory databases are volatile as they are
+never stored on disk.)
+
+=head2 sqlite3.temp_directory
+
+	sqlite3.temp_directory([temp])
+
+Sets or queries the directory used by SQLite for temporary files. If
+string C<temp> is a directory name or nil, the temporary directory is 
+set accordingly and the old value is returned. If C<temp> is missing, 
+the function simply returns the current temporary directory.
+
+=head2 sqlite3.version
+
+	sqlite3.version()
+
+Returns a string with SQLite version information, in the form 'x.y[.z]'.
+
+=head1 Database methods
+
+After opening a database with L<C<sqlite3.open()>|/sqlite3.open> or 
+L<C<sqlite3.open_memory()>|/sqlite3.open_memory>
+the returned database object should be used for all further method calls
+in connection with that database. An open database object supports the
+following methods.
+
+=head2 db:busy_handler
+
+	db:busy_handler([func[,udata]])
+
+Sets or removes a busy handler for a database. C<func> is either a Lua
+function that implements the busy handler or nil to remove a previously
+set handler. This function returns nothing.
+
+The handler function is called with two parameters: C<udata> and the 
+number of (re-)tries for a pending transaction. It should return nil, 
+false or 0 if the transaction is to be aborted. All other values will 
+result in another attempt to perform the transaction. (See the SQLite
+documentation for important hints about writing busy handlers.)
+
+=head2 db:busy_timeout
+
+	db:busy_timeout(t)
+
+Sets a busy handler that waits for C<t> milliseconds if a transaction 
+cannot proceed. Calling this function will remove any busy handler set 
+by L<C<db:busy_handler()>|/db:busy_handler>; calling it with an argument 
+less than or equal to 0 will turn off all busy handlers.
+
+=head2 db:changes
+
+	db:changes()
+
+This function returns the number of database rows that were changed (or
+inserted or deleted) by the most recent SQL statement. Only changes that
+are directly specified by INSERT, UPDATE, or DELETE statements are
+counted. Auxiliary changes caused by triggers are not counted. Use
+L<C<db:total_changes()>|/db:total_changes> to find the total number of 
+changes.
+
+=head2 db:close
+
+	db:close()
+
+Closes a database. All SQL statements prepared using 
+L<C<db:prepare()>|/db:prepare> should
+have been finalized before this function is called. The function returns
+C<sqlite3.OK> on success or else a numerical error code (see the list of
+L</Numerical error and result codes>).
+
+=head2 db:close_vm
+
+	db:close_vm(temponly)
+
+Finalizes all statements that have not been explicitly finalized. If
+C<temponly> is true, only internal, temporary statements are finalized.
+This function returns nothing.
+
+=head2 db:create_aggregate
+
+	db:create_aggregate(name,nargs,step,final)
+
+This function creates an aggregate callback function. Aggregates perform
+an operation over all rows in a query. C<name> is a string with the name 
+of the aggregate function as given in an SQL statement; C<nargs> is the 
+number of arguments this call will provide. C<step> is the actual Lua 
+function that gets called once for every row; it should accept a function 
+context (see L</Methods for callback contexts>) plus the same number of
+parameters as given in C<nargs>. C<final> is a function that is called 
+once after all rows have been processed; it receives one argument, the
+function context.
+
+The function context can be used inside the two callback functions to
+communicate with SQLite3. Here is a simple example:
+
+	db:exec[=[
+	  CREATE TABLE numbers(num1,num2);
+	  INSERT INTO numbers VALUES(1,11);
+	  INSERT INTO numbers VALUES(2,22);
+	  INSERT INTO numbers VALUES(3,33);
+	]=]
+	local num_sum=0
+	local function oneRow(context,num)  -- add one column in all rows
+	  num_sum=num_sum+num
+	end
+	local function afterLast(context)   -- return sum after last row has been processed
+	  context:result_number(num_sum)
+	  num_sum=0
+	end
+	db:create_aggregate("do_the_sums",1,oneRow,afterLast)
+	for sum in db:urows('SELECT do_the_sums(num1) FROM numbers') do print("Sum of col 1:",sum) end
+	for sum in db:urows('SELECT do_the_sums(num2) FROM numbers') do print("Sum of col 2:",sum) end
+
+This prints:
+
+	Sum of col 1:   6
+	Sum of col 2:   66
+
+=head2 db:create_collation
+
+	db:create_collation(name,func)
+
+This creates a collation callback. A collation callback is used to
+establish a collation order, mostly for string comparisons and sorting
+purposes. C<name> is a string with the name of the collation to be created;
+C<func> is a function that accepts two string arguments, compares them 
+and returns 0 if both strings are identical, -1 if the first argument is
+lower in the collation order than the second and 1 if the first argument
+is higher in the collation order than the second. A simple example:
+
+	local function collate(s1,s2)
+	  s1=s1:lower()
+	  s2=s2:lower()
+	  if s1==s2 then return 0
+	  elseif s1<s2 then return -1
+	  else return 1 end
+	end
+	db:exec[=[
+	  CREATE TABLE test(id INTEGER PRIMARY KEY,content COLLATE CINSENS);
+	  INSERT INTO test VALUES(NULL,'hello world');
+	  INSERT INTO test VALUES(NULL,'Buenos dias');
+	  INSERT INTO test VALUES(NULL,'HELLO WORLD');
+	]=]
+	db:create_collation('CINSENS',collate)
+	for row in db:nrows('SELECT * FROM test') do print(row.id,row.content) end
+
+=head2 db:create_function
+
+	db:create_function(name,nargs,func)
+
+This function creates a callback function. Callback function are called
+by SQLite3 once for every row in a query. C<name> is a string with the 
+name of the callback function as given in an SQL statement; C<nargs> is 
+the number of arguments this call will provide. C<func> is the actual Lua
+function that gets called once for every row; it should accept a
+function context (see L</Methods for callback contexts>) plus the same
+number of parameters as given in nargs. Here is an example:
+
+	db:exec'CREATE TABLE test(col1,col2,col3)'
+	db:exec'INSERT INTO test VALUES(1,2,4)'
+	db:exec'INSERT INTO test VALUES(2,4,9)'
+	db:exec'INSERT INTO test VALUES(3,6,16)'
+	db:create_function('sum_cols',3,function(ctx,a,b,c)
+	  ctx:result_number(a+b+c)
+	end))
+	for col1,col2,col3,sum in db:urows('SELECT *,sum_cols(col1,col2,col3) FROM test') do
+	  util.printf('%2i+%2i+%2i=%2i\n',col1,col2,col3,sum)
+	end
+
+=head2 db:errcode
+
+	db:errcode()
+	db:error_code()
+
+Returns the numerical result code (or extended result code) for the most
+recent failed call associated with database db. See
+L</Numerical error and result codes> for details.
+
+=head2 db:errmsg
+
+	db:errmsg()
+	db:error_message()
+
+Returns a string that contains an error message for the most recent
+failed call associated with database db.
+
+=head2 db:exec
+
+	db:exec(sql[,func[,udata]])
+	db:execute(sql[,func[,udata]])
+
+Compiles and executes the SQL statement(s) given in string C<sql>. The
+statements are simply executed one after the other and not stored. The
+function returns C<sqlite3.OK> on success or else a numerical error code
+(see L</Numerical error and result codes>).
+
+If one or more of the SQL statements are queries, then the callback
+function specified in C<func> is invoked once for each row of the query
+result (if C<func> is nil, no callback is invoked). The callback receives
+four arguments: C<udata> (the third parameter of the C<db:exec()> call), 
+the number of columns in the row, a table with the column values and 
+another table with the column names. The callback function should return 
+0. If the callback returns a non-zero value then the query is aborted, 
+all subsequent SQL statements are skipped and C<db:exec()> returns
+C<sqlite3.ABORT>. Here is a simple example:
+
+	sql=[=[
+	  CREATE TABLE numbers(num1,num2,str);
+	  INSERT INTO numbers VALUES(1,11,"ABC");
+	  INSERT INTO numbers VALUES(2,22,"DEF");
+	  INSERT INTO numbers VALUES(3,33,"UVW");
+	  INSERT INTO numbers VALUES(4,44,"XYZ");
+	  SELECT * FROM numbers;
+	]=]
+	function showrow(udata,cols,values,names)
+	  assert(udata=='test_udata')
+	  print('exec:')
+	  for i=1,cols do print('',names[i],values[i]) end
+	  return 0
+	end
+	db:exec(sql,showrow,'test_udata')
+
+=head2 db:interrupt
+
+	db:interrupt()
+
+This function causes any pending database operation to abort and return
+at the next opportunity. This function returns nothing.
+
+=head2 db:isopen
+
+	db:isopen()
+
+Returns true if database db is open, false otherwise.
+
+=head2 db:last_insert_rowid
+
+	db:last_insert_rowid()
+
+This function returns the rowid of the most recent INSERT into the
+database. If no inserts have ever occurred, 0 is returned. (Each row in
+an SQLite table has a unique 64-bit signed integer key called the
+'rowid'. This id is always available as an undeclared column named
+ROWID, OID, or _ROWID_. If the table has a column of type INTEGER
+PRIMARY KEY then that column is another alias for the rowid.)
+
+If an INSERT occurs within a trigger, then the rowid of the inserted row
+is returned as long as the trigger is running. Once the trigger
+terminates, the value returned reverts to the last value inserted before
+the trigger fired.
+
+=head2 db:nrows
+
+	db:nrows(sql)
+
+Creates an iterator that returns the successive rows selected by the SQL
+statement given in string C<sql>. Each call to the iterator returns a 
+table in which the named fields correspond to the columns in the database.
+Here is an example:
+
+	db:exec[=[
+	  CREATE TABLE numbers(num1,num2);
+	  INSERT INTO numbers VALUES(1,11);
+	  INSERT INTO numbers VALUES(2,22);
+	  INSERT INTO numbers VALUES(3,33);
+	]=]
+	for a in db:nrows('SELECT * FROM numbers') do table.print(a) end
+
+This script prints:
+
+	num2: 11
+	num1: 1
+	num2: 22
+	num1: 2
+	num2: 33
+	num1: 3
+
+=head2 db:prepare
+
+	db:prepare(sql)
+
+This function compiles the SQL statement in string C<sql> into an internal
+representation and returns this as userdata. The returned object should
+be used for all further method calls in connection with this specific
+SQL statement (see L</Methods for prepared statements>).
+
+=head2 db:progress_handler
+
+	db:progress_handler(n,func,udata)
+
+This function installs a callback function C<func> that is invoked
+periodically during long-running calls to L<C<db:exec()>|/db:exec>
+or L<C<stmt:step()>|/stmt:step>. The
+progress callback is invoked once for every C<n> internal operations, 
+where C<n> is the first argument to this function. C<udata> is passed to 
+the progress callback function each time it is invoked. If a call to
+C<db:exec()> or C<stmt:step()> results in fewer than C<n> operations 
+being executed, then the progress callback is never invoked. Only a 
+single progress callback function may be registered for each opened 
+database and a call to this function will overwrite any previously set 
+callback function. To remove the progress callback altogether, pass nil 
+as the second argument.
+
+If the progress callback returns a result other than 0, then the current
+query is immediately terminated, any database changes are rolled back
+and the containing C<db:exec()> or C<stmt:step()> call returns
+C<sqlite3.INTERRUPT>. This feature can be used to cancel long-running
+queries.
+
+=head2 db:rows
+
+	db:rows(sql)
+
+Creates an iterator that returns the successive rows selected by the SQL
+statement given in string C<sql>. Each call to the iterator returns a table
+in which the numerical indices 1 to n correspond to the selected columns
+1 to n in the database. Here is an example:
+
+	db:exec[=[
+	  CREATE TABLE numbers(num1,num2);
+	  INSERT INTO numbers VALUES(1,11);
+	  INSERT INTO numbers VALUES(2,22);
+	  INSERT INTO numbers VALUES(3,33);
+	]=]
+	for a in db:rows('SELECT * FROM numbers') do table.print(a) end
+
+This script prints:
+
+	1: 1
+	2: 11
+	1: 2
+	2: 22
+	1: 3
+	2: 33
+
+=head2 db:total_changes
+
+	db:total_changes()
+
+This function returns the number of database rows that have been
+modified by INSERT, UPDATE or DELETE statements since the database was
+opened. This includes UPDATE, INSERT and DELETE statements executed as
+part of trigger programs. All changes are counted as soon as the
+statement that produces them is completed by calling either 
+L<C<stmt:reset()>|/stmt:reset> or L<C<stmt:finalize()>|/stmt:finalize>.
+
+=head2 db:trace
+
+	db:trace(func,udata)
+
+This function installs a trace callback handler. C<func> is a Lua
+function that is called by SQLite3 just before the evaluation of an SQL
+statement. This callback receives two arguments: the first is the 
+C<udata> argument used when the callback was installed; the second is a 
+string with the SQL statement about to be executed.
+
+=head2 db:urows
+
+	db:urows(sql)
+
+Creates an iterator that returns the successive rows selected by the SQL
+statement given in string C<sql>. Each call to the iterator returns the
+values that correspond to the columns in the currently selected row.
+Here is an example:
+
+	db:exec[=[
+	  CREATE TABLE numbers(num1,num2);
+	  INSERT INTO numbers VALUES(1,11);
+	  INSERT INTO numbers VALUES(2,22);
+	  INSERT INTO numbers VALUES(3,33);
+	]=]
+	for num1,num2 in db:urows('SELECT * FROM numbers') do print(num1,num2) end
+
+This script prints:
+
+	1       11
+	2       22
+	3       33
+
+=head1 Methods for prepared statements
+
+After creating a prepared statement with L<C<db:prepare()>|/db:prepare> 
+the returned statement object should be used for all further calls in 
+connection with that statement. Statement objects support the following 
+methods.
+
+=head2 stmt:bind
+
+	stmt:bind(n[,value])
+
+Binds value to statement parameter C<n>. If the type of value is string 
+or number, it is bound as text or double, respectively. If C<value> is a
+boolean or nil or missing, any previous binding is removed. The function
+returns C<sqlite3.OK> on success or else a numerical error code (see
+L</Numerical error and result codes>).
+
+=head2 stmt:bind_blob
+
+	stmt:bind_blob(n,blob)
+
+Binds string C<blob> (which can be a binary string) as a blob to 
+statement parameter C<n>. The function returns C<sqlite3.OK> on success 
+or else a numerical error code (see L</Numerical error and result codes>).
+
+=head2 stmt:bind_names
+
+	stmt:bind_names(nametable)
+
+Binds the values in C<nametable> to statement parameters. If the 
+statement parameters are named (i.e., of the form ":AAA" or "$AAA") 
+then this function looks for appropriately named fields in C<nametable>; 
+if the statement parameters are
+not named, it looks for numerical fields 1 to the number of statement
+parameters. The function returns C<sqlite3.OK> on success or else a
+numerical error code (see L</Numerical error and result codes>).
+
+=head2 stmt:bind_parameter_count
+
+	stmt:bind_parameter_count()
+
+Returns the largest statement parameter index in prepared statement 
+C<stmt>. When the statement parameters are of the forms ":AAA" or "?", 
+then they are assigned sequentially increasing numbers beginning with 
+one, so the value returned is the number of parameters. However if the 
+same statement parameter name is used multiple times, each occurrence 
+is given the same number, so the value returned is the number of unique 
+statement parameter names.
+
+If statement parameters of the form "?NNN" are used (where NNN is an 
+integer) then there might be gaps in the numbering and the value 
+returned by this interface is the index of the statement parameter with 
+the largest index value.
+
+=head2 stmt:bind_parameter_name
+
+	stmt:bind_parameter_name(n)
+
+Returns the name of the C<n>-th parameter in prepared statement C<stmt>. 
+Statement parameters of the form ":AAA" or "@AAA" or "$VVV" have a name 
+which  is the string ":AAA" or "@AAA" or "$VVV". In other words, the 
+initial ":" or "$" or "@" is included as part of the name. Parameters 
+of the form "?" or "?NNN" have no name. The first bound parameter has 
+an index of 1.
+If the value C<n> is out of range or if the C<n>-th parameter is
+nameless, then nil is returned. The function returns C<sqlite3.OK> on
+success or else a numerical error code (see
+L</Numerical error and result codes>)
+
+=head2 stmt:bind_values
+
+	stmt:bind_values(value1,value2,...,valueN)
+
+Binds the given values to statement parameters. The function returns
+C<sqlite3.OK> on success or else a numerical error code (see
+L</Numerical error and result codes>).
+
+=head2 stmt:columns
+
+	stmt:columns()
+
+Returns the number of columns in the result set returned by statement
+stmt or 0 if the statement does not return data (for example an UPDATE).
+
+=head2 stmt:finalize
+
+	stmt:finalize()
+
+This function frees prepared statement stmt. If the statement was
+executed successfully, or not executed at all, then C<sqlite3.OK> is
+returned. If execution of the statement failed then an error code is
+returned.
+
+=head2 stmt:get_name
+
+	stmt:get_name(n)
+
+Returns the name of column C<n> in the result set of statement stmt. (The
+left-most column is number 0.)
+
+=head2 stmt:get_named_types
+
+	stmt:get_named_types()
+
+Returns a table with the names and types of all columns in the result
+set of statement stmt.
+
+=head2 stmt:get_named_values
+
+	stmt:get_named_values()
+
+This function returns a table with names and values of all columns in
+the current result row of a query.
+
+=head2 stmt:get_names
+
+	stmt:get_names()
+
+This function returns an array with the names of all columns in the
+result set returned by statement stmt.
+
+=head2 stmt:get_type
+
+	stmt:get_type(n)
+
+Returns the type of column C<n> in the result set of statement stmt. (The
+left-most column is number 0.)
+
+=head2 stmt:get_types
+
+	stmt:get_types()
+
+This function returns an array with the types of all columns in the
+result set returned by statement stmt.
+
+=head2 stmt:get_unames
+
+	stmt:get_unames()
+
+This function returns a list with the names of all columns in the result
+set returned by statement stmt.
+
+=head2 stmt:get_utypes
+
+	stmt:get_utypes()
+
+This function returns a list with the types of all columns in the result
+set returned by statement stmt.
+
+=head2 stmt:get_uvalues
+
+	stmt:get_uvalues()
+
+This function returns a list with the values of all columns in the
+current result row of a query.
+
+=head2 stmt:get_value
+
+	stmt:get_value(n)
+
+Returns the value of column C<n> in the result set of statement stmt. (The
+left-most column is number 0.)
+
+=head2 stmt:get_values
+
+	stmt:get_values()
+
+This function returns an array with the values of all columns in the
+result set returned by statement stmt.
+
+=head2 stmt:isopen
+
+	stmt:isopen()
+
+Returns true if stmt has not yet been finalized, false otherwise.
+
+=head2 stmt:nrows
+
+	stmt:nrows()
+
+Returns an function that iterates over the names and values of the
+result set of statement C<stmt>. Each iteration returns a table with the
+names and values for the current row.
+This is the prepared statement equivalent of L<C<db:nrows()>|/db:nrows>.
+
+=head2 stmt:reset
+
+	stmt:reset()
+
+This function resets SQL statement C<stmt>, so that it is ready to be
+re-executed. Any statement variables that had values bound to them using
+the C<stmt:bind*()> functions retain their values.
+
+=head2 stmt:rows
+
+	stmt:rows()
+
+Returns an function that iterates over the values of the result set of
+statement stmt. Each iteration returns an array with the values for the
+current row.
+This is the prepared statement equivalent of L<C<db:rows()>|/db:rows>.
+
+=head2 stmt:step
+
+	stmt:step()
+
+This function must be called to evaluate the (next iteration of the)
+prepared statement stmt. It will return one of the following values:
+
+=over 4
+
+=item *
+
+C<sqlite3.BUSY>: the engine was unable to acquire the locks needed. If the
+statement is a COMMIT or occurs outside of an explicit transaction, then
+you can retry the statement. If the statement is not a COMMIT and occurs
+within a explicit transaction then you should rollback the transaction
+before continuing.
+
+=item *
+
+C<sqlite3.DONE>: the statement has finished executing successfully.
+L<C<stmt:step()>|/stmt:step> should not be called again on this statement 
+without first calling L<C<stmt:reset()>|/stmt:reset> to reset the virtual 
+machine back to the initial state.
+
+=item *
+
+C<sqlite3.ROW>: this is returned each time a new row of data is ready for
+processing by the caller. The values may be accessed using the column
+access functions. L<C<stmt:step()>|/stmt:step> can be called again to 
+retrieve the next row of data.
+
+=item *
+
+C<sqlite3.ERROR>: a run-time error (such as a constraint violation) has
+occurred. L<C<stmt:step()>|/stmt:step> should not be called again. More 
+information may be found by calling L<C<db:errmsg()>|/db:errmsg>. A more 
+specific error 
+code (can be obtained by calling L<C<stmt:reset()>|/stmt:reset>.
+
+=item *
+
+C<sqlite3.MISUSE>: the function was called inappropriately, perhaps 
+because the statement has already been finalized or a previous call to
+L<C<stmt:step()>|/stmt:step> has returned C<sqlite3.ERROR> or 
+C<sqlite3.DONE>.
+
+=back
+
+=head2 stmt:urows
+
+	stmt:urows()
+
+Returns an function that iterates over the values of the result set of
+statement stmt. Each iteration returns the values for the current row.
+This is the prepared statement equivalent of L<C<db:urows()>|/db:urows>.
+
+=head1 Methods for callback contexts
+
+A callback context is available as a parameter inside the callback
+functions L<C<db:create_aggregate()>|/db:create_aggregate> and 
+L<C<db:create_function()>|/db:create_function>. It can be used
+to get further information about the state of a query.
+
+=head2 context:aggregate_count
+
+	context:aggregate_count()
+
+Returns the number of calls to the aggregate step function.
+
+=head2 context:get_aggregate_data
+
+	context:get_aggregate_data()
+
+Returns the user-definable data field for callback funtions.
+
+=head2 context:set_aggregate_data
+
+	context:set_aggregate_data(udata)
+
+Set the user-definable data field for callback funtions to C<udata>.
+
+=head2 context:result
+
+	context:result(res)
+
+This function sets the result of a callback function to res. The type of
+the result depends on the type of res and is either a number or a string
+or nil. All other values will raise an error message.
+
+=head2 context:result_null
+
+	context:result_null()
+
+This function sets the result of a callback function to nil. It returns
+nothing.
+
+=head2 context:result_number
+
+	context:result_number(number)
+	context:result_double(number)
+
+This function sets the result of a callback function to the value
+C<number>. It returns nothing.
+
+=head2 context:result_int
+
+	context:result_int(number)
+
+This function sets the result of a callback function to the integer
+value in C<number>. It returns nothing.
+
+=head2 context:result_text
+
+	context:result_text(str)
+
+This function sets the result of a callback function to the string in
+C<str>. It returns nothing.
+
+=head2 context:result_blob
+
+	context:result_blob(blob)
+
+This function sets the result of a callback function to the binary
+string in C<blob>. It returns nothing.
+
+=head2 context:result_error
+
+	context:result_error(err)
+
+This function sets the result of a callback function to the error value
+in C<err>. It returns nothing.
+
+=head2 context:user_data
+
+	context:user_data()
+
+Returns the userdata parameter given in the call to install the callback
+function (see L<C<db:create_aggregate()>|/db:create_aggregate> and 
+L<C<db:create_function()>|/db:create_function> for details).
+
+=head1 Numerical error and result codes
+
+The following constants are defined by module sqlite3:
+
+	OK: 0          ERROR: 1       INTERNAL: 2    PERM: 3        ABORT: 4
+	BUSY: 5        LOCKED: 6      NOMEM: 7       READONLY: 8    INTERRUPT: 9
+	IOERR: 10      CORRUPT: 11    NOTFOUND: 12   FULL: 13       CANTOPEN: 14
+	PROTOCOL: 15   EMPTY: 16      SCHEMA: 17     TOOBIG: 18     CONSTRAINT: 19
+	MISMATCH: 20   MISUSE: 21     NOLFS: 22      FORMAT: 24     RANGE: 25
+	NOTADB: 26     ROW: 100       DONE: 101
+
+For details about their exact meaning please see the B<SQLite3
+documentation> L<http://www.sqlite.org/>.
+
+=head1 VERSION
+
+This is C<lsqlite3> subversion 6, also known as "devel-0.6".
+
+=head1 CREDITS
+
+C<lsqlite3> was developed by Tiago Dionizio and Doug Currie with 
+contributions from Thomas Lauer and Michael Roth.
+
+This documentation is based on the "(very) preliminary" documents
+for the Idle-SQLite3 database module. Thanks to Thomas Lauer for
+making it available.
+
+=head1 LICENSE
+
+    /************************************************************************
+    * lsqlite3                                                              *
+    * Copyright (C) 2002-2007 Tiago Dionizio, Doug Currie                   *
+    * All rights reserved.                                                  *
+    * Author    : Tiago Dionizio <tiago.dionizio@ist.utl.pt>                *
+    * Author    : Doug Currie <doug.currie@alum.mit.edu>                    *
+    * Library   : lsqlite3 - a SQLite 3 database binding for Lua 5          *
+    *                                                                       *
+    * Permission is hereby granted, free of charge, to any person obtaining *
+    * a copy of this software and associated documentation files (the       *
+    * "Software"), to deal in the Software without restriction, including   *
+    * without limitation the rights to use, copy, modify, merge, publish,   *
+    * distribute, sublicense, and/or sell copies of the Software, and to    *
+    * permit persons to whom the Software is furnished to do so, subject to *
+    * the following conditions:                                             *
+    *                                                                       *
+    * The above copyright notice and this permission notice shall be        *
+    * included in all copies or substantial portions of the Software.       *
+    *                                                                       *
+    * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,       *
+    * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF    *
+    * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.*
+    * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY  *
+    * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,  *
+    * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE     *
+    * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                *
+    ************************************************************************/
+

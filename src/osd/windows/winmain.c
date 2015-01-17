@@ -421,8 +421,8 @@ int main(int argc, char *argv[])
 	DWORD result = 0;
 	{
 		windows_options options;
-		windows_osd_interface osd;
-		osd.register_options(options);
+		windows_osd_interface osd(options);
+		osd.register_options();
 		cli_frontend frontend(options, osd);
 		result = frontend.execute(argc, argv);
 	}
@@ -437,6 +437,7 @@ int main(int argc, char *argv[])
 //============================================================
 
 windows_options::windows_options()
+: osd_options()
 {
 	add_entries(s_option_entries);
 }
@@ -512,7 +513,8 @@ static void output_oslog(running_machine &machine, const char *buffer)
 //  constructor
 //============================================================
 
-windows_osd_interface::windows_osd_interface()
+windows_osd_interface::windows_osd_interface(windows_options &options)
+: osd_common_t(options)
 {
 }
 
@@ -572,7 +574,7 @@ void windows_osd_interface::debugger_register()
 void windows_osd_interface::init(running_machine &machine)
 {
 	// call our parent
-	osd_interface::init(machine);
+	osd_common_t::init(machine);
 
 	const char *stemp;
 	windows_options &options = downcast<windows_options &>(machine.options());
@@ -619,7 +621,7 @@ void windows_osd_interface::init(running_machine &machine)
 	}
 
 	// initialize the subsystems
-	osd_interface::init_subsystems();
+	osd_common_t::init_subsystems();
 
 	// notify listeners of screen configuration
 	astring tempstring;
@@ -680,7 +682,7 @@ void windows_osd_interface::osd_exit()
 	// cleanup sockets
 	win_cleanup_sockets();
 
-	osd_interface::osd_exit();
+	osd_common_t::osd_exit();
 
 	// take down the watchdog thread if it exists
 	if (watchdog_thread != NULL)
@@ -717,7 +719,7 @@ void windows_osd_interface::osd_exit()
 //  font with the given name
 //-------------------------------------------------
 
-osd_font windows_osd_interface::font_open(const char *_name, int &height)
+osd_font *windows_osd_interface::font_open(const char *_name, int &height)
 {
 	// accept qualifiers from the name
 	astring name(_name);
@@ -749,7 +751,7 @@ osd_font windows_osd_interface::font_open(const char *_name, int &height)
 
 	// create the font
 	height = logfont.lfHeight;
-	osd_font font = reinterpret_cast<osd_font>(CreateFontIndirect(&logfont));
+	osd_font *font = reinterpret_cast<osd_font *>(CreateFontIndirect(&logfont));
 	if (font == NULL)
 		return NULL;
 
@@ -781,7 +783,7 @@ osd_font windows_osd_interface::font_open(const char *_name, int &height)
 //  a given OSD font
 //-------------------------------------------------
 
-void windows_osd_interface::font_close(osd_font font)
+void windows_osd_interface::font_close(osd_font *font)
 {
 	// delete the font ojbect
 	if (font != NULL)
@@ -797,7 +799,7 @@ void windows_osd_interface::font_close(osd_font font)
 //  pixel of a black & white font
 //-------------------------------------------------
 
-bool windows_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
+bool windows_osd_interface::font_get_bitmap(osd_font *font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
 {
 	// create a dummy DC to work with
 	HDC dummyDC = CreateCompatibleDC(NULL);
@@ -1823,29 +1825,4 @@ void sampling_profiler::thread_run()
 		// sleep for 1ms
 		Sleep(1);
 	}
-}
-
-//-------------------------------------------------
-// FIXME: Doesn't belong here but there's no better
-//        place currently.
-//-------------------------------------------------
-
-bool osd_interface::midi_init()
-{
-    // this should be done on the OS_level
-    return osd_midi_init();
-}
-
-//-------------------------------------------------
-//  list_midi_devices - list available midi devices
-//-------------------------------------------------
-
-void osd_interface::list_midi_devices(void)
-{
-    osd_list_midi_devices();
-}
-
-void osd_interface::midi_exit()
-{
-    osd_midi_exit();
 }

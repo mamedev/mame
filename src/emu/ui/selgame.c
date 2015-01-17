@@ -17,6 +17,7 @@
 #include "cheat.h"
 #include "uiinput.h"
 #include "ui/selgame.h"
+#include "ui/inputmap.h"
 #include "ui/miscmenu.h"
 #include "audit.h"
 #include "crsshair.h"
@@ -238,7 +239,7 @@ void ui_menu_select_game::populate()
 					emulator_info::get_gamesnoun(),
 					emulator_info::get_configname(),
 					emulator_info::get_appname(),emulator_info::get_appname() );
-		item_append(txt.cstr(), NULL, MENU_FLAG_MULTILINE | MENU_FLAG_REDTEXT, NULL);
+		item_append(txt, NULL, MENU_FLAG_MULTILINE | MENU_FLAG_REDTEXT, NULL);
 		return;
 	}
 

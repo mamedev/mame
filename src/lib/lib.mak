@@ -23,10 +23,15 @@ OBJDIRS += \
 	$(LIBOBJ)/libflac \
 	$(LIBOBJ)/lib7z \
 	$(LIBOBJ)/portmidi \
+	$(LIBOBJ)/portmidi/pm_common \
+	$(LIBOBJ)/portmidi/pm_linux \
+	$(LIBOBJ)/portmidi/pm_mac \
+	$(LIBOBJ)/portmidi/pm_win \
+	$(LIBOBJ)/portmidi/porttime \
 	$(LIBOBJ)/lua \
-	$(LIBOBJ)/lua/lib \
-	$(LIBOBJ)/web \
-	$(LIBOBJ)/web/json \
+	$(LIBOBJ)/lua/lsqlite3 \
+	$(LIBOBJ)/mongoose \
+	$(LIBOBJ)/jsoncpp \
 	$(LIBOBJ)/sqlite3 \
 
 #-------------------------------------------------
@@ -34,6 +39,7 @@ OBJDIRS += \
 #-------------------------------------------------
 
 UTILOBJS = \
+	$(OSDOBJ)/osdcore.o \
 	$(LIBOBJ)/util/astring.o \
 	$(LIBOBJ)/util/avhuff.o \
 	$(LIBOBJ)/util/aviio.o \
@@ -84,7 +90,7 @@ EXPATOBJS = \
 
 $(OBJ)/libexpat.a: $(EXPATOBJS)
 
-$(LIBOBJ)/expat/%.o: $(LIBSRC)/expat/%.c | $(OSPREBUILD)
+$(LIBOBJ)/expat/%.o: $(3RDPARTY)/expat/lib/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC_AS) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -c $< -o $@
 
@@ -266,7 +272,7 @@ ZLIBOBJS = \
 
 $(OBJ)/libz.a: $(ZLIBOBJS)
 
-$(LIBOBJ)/zlib/%.o: $(LIBSRC)/zlib/%.c | $(OSPREBUILD)
+$(LIBOBJ)/zlib/%.o: $(3RDPARTY)/zlib/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC_AS) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) $(ZLIBOPTS) -c $< -o $@
 
@@ -276,8 +282,8 @@ $(LIBOBJ)/zlib/%.o: $(LIBSRC)/zlib/%.c | $(OSPREBUILD)
 # SoftFloat library objects
 #-------------------------------------------------
 
-PROCESSOR_H = $(LIBSRC)/softfloat/processors/mamesf.h
-SOFTFLOAT_MACROS = $(LIBSRC)/softfloat/softfloat/bits64/softfloat-macros
+PROCESSOR_H = $(3RDPARTY)/softfloat/processors/mamesf.h
+SOFTFLOAT_MACROS = $(3RDPARTY)/softfloat/softfloat/bits64/softfloat-macros
 
 SOFTFLOATOBJS = \
 	$(LIBOBJ)/softfloat/softfloat.o \
@@ -286,10 +292,12 @@ SOFTFLOATOBJS = \
 
 $(OBJ)/libsoftfloat.a: $(SOFTFLOATOBJS)
 
-$(LIBOBJ)/softfloat/softfloat.o: $(LIBSRC)/softfloat/softfloat.c $(LIBSRC)/softfloat/softfloat.h $(LIBSRC)/softfloat/softfloat-macros $(LIBSRC)/softfloat/softfloat-specialize
-$(LIBOBJ)/softfloat/fsincos.o: $(LIBSRC)/softfloat/fsincos.c $(LIBSRC)/softfloat/fpu_constant.h $(LIBSRC)/softfloat/softfloat.h $(LIBSRC)/softfloat/softfloat-macros $(LIBSRC)/softfloat/softfloat-specialize
+$(LIBOBJ)/softfloat/softfloat.o: $(3RDPARTY)/softfloat/softfloat.c $(3RDPARTY)/softfloat/softfloat.h $(3RDPARTY)/softfloat/softfloat-macros $(3RDPARTY)/softfloat/softfloat-specialize
+$(LIBOBJ)/softfloat/fsincos.o: $(3RDPARTY)/softfloat/fsincos.c $(3RDPARTY)/softfloat/fpu_constant.h $(3RDPARTY)/softfloat/softfloat.h $(3RDPARTY)/softfloat/softfloat-macros $(3RDPARTY)/softfloat/softfloat-specialize
 
-
+$(LIBOBJ)/softfloat/%.o: $(3RDPARTY)/softfloat/%.c | $(OSPREBUILD)
+	@echo Compiling $<...
+	$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
 
 #-------------------------------------------------
 # libJPEG library objects
@@ -345,9 +353,9 @@ LIBJPEGOBJS= \
 
 $(OBJ)/libjpeg.a: $(LIBJPEGOBJS)
 
-$(LIBOBJ)/libjpeg/%.o: $(LIBSRC)/libjpeg/%.c | $(OSPREBUILD)
+$(LIBOBJ)/libjpeg/%.o: $(3RDPARTY)/libjpeg/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC_AS) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -I$(LIBSRC)/libjpeg -c $< -o $@
+	$(CC_AS) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -I$(3RDPARTY)/libjpeg -c $< -o $@
 
 
 
@@ -392,9 +400,9 @@ LIBFLACOBJS = \
 
 $(OBJ)/libflac.a: $(LIBFLACOBJS)
 
-$(LIBOBJ)/libflac/%.o: $(LIBSRC)/libflac/libFLAC/%.c | $(OSPREBUILD)
+$(LIBOBJ)/libflac/%.o: $(3RDPARTY)/libflac/src/libFLAC/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC_AS) $(CDEFS) $(CONLYFLAGS) $(CCOMFLAGS) $(FLACOPTS) -I$(LIBSRC)/libflac/include -I$(LIBSRC)/libflac/libFLAC/include -c $< -o $@
+	$(CC_AS) $(CDEFS) $(CONLYFLAGS) $(CCOMFLAGS) $(FLACOPTS) -I$(3RDPARTY)/libflac/include -I$(3RDPARTY)/libflac/libFLAC/include -c $< -o $@
 
 
 
@@ -426,9 +434,9 @@ LIB7ZOBJS = \
 
 $(OBJ)/lib7z.a: $(LIB7ZOBJS)
 
-$(LIBOBJ)/lib7z/%.o: $(LIBSRC)/lib7z/%.c | $(OSPREBUILD)
+$(LIBOBJ)/lib7z/%.o: $(3RDPARTY)/lzma/C/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC_AS) $(CDEFS) $(7ZOPTS) $(CCOMFLAGS) $(CONLYFLAGS) -I$(LIBSRC)/lib7z/ -c $< -o $@
+	$(CC_AS) $(CDEFS) $(7ZOPTS) $(CCOMFLAGS) $(CONLYFLAGS) -I$(3RDPARTY)/lzma/C -c $< -o $@
 
 #-------------------------------------------------
 # portmidi library objects
@@ -438,43 +446,49 @@ PMOPTS =
 
 # common objects
 LIBPMOBJS = \
-	$(LIBOBJ)/portmidi/portmidi.o \
-	$(LIBOBJ)/portmidi/porttime.o \
-	$(LIBOBJ)/portmidi/pmutil.o
+	$(LIBOBJ)/portmidi/pm_common/portmidi.o \
+	$(LIBOBJ)/portmidi/pm_common/pmutil.o \
+	$(LIBOBJ)/portmidi/porttime/porttime.o \
 
 ifeq ($(TARGETOS),linux)
 PMOPTS = -DPMALSA=1
 
 LIBPMOBJS += \
-	$(LIBOBJ)/portmidi/pmlinux.o \
-	$(LIBOBJ)/portmidi/pmlinuxalsa.o \
-	$(LIBOBJ)/portmidi/finddefaultlinux.o \
-	$(LIBOBJ)/portmidi/ptlinux.o
-
+	$(LIBOBJ)/portmidi/pm_linux/pmlinux.o \
+	$(LIBOBJ)/portmidi/pm_linux/pmlinuxalsa.o \
+	$(LIBOBJ)/portmidi/pm_linux/finddefault.o \
+	$(LIBOBJ)/portmidi/porttime/ptlinux.o
 endif
 
 ifeq ($(TARGETOS),macosx)
 LIBPMOBJS += \
-	$(LIBOBJ)/portmidi/pmmac.o \
-	$(LIBOBJ)/portmidi/pmmacosxcm.o \
-	$(LIBOBJ)/portmidi/finddefault.o \
-	$(LIBOBJ)/portmidi/readbinaryplist.o \
-	$(LIBOBJ)/portmidi/ptmacosx_mach.o \
-	$(LIBOBJ)/portmidi/osxsupport.o
+	$(LIBOBJ)/portmidi/pm_mac/pmmac.o \
+	$(LIBOBJ)/portmidi/pm_mac/pmmacosxcm.o \
+	$(LIBOBJ)/portmidi/pm_mac/finddefault.o \
+	$(LIBOBJ)/portmidi/pm_mac/readbinaryplist.o \
+	$(LIBOBJ)/portmidi/pm_mac/osxsupport.o \
+	$(LIBOBJ)/portmidi/porttime/ptmacosx_mach.o
 endif
 
 ifeq ($(TARGETOS),win32)
 LIBPMOBJS += \
-	$(LIBOBJ)/portmidi/pmwin.o \
-	$(LIBOBJ)/portmidi/pmwinmm.o \
-	$(LIBOBJ)/portmidi/ptwinmm.o
+	$(LIBOBJ)/portmidi/pm_win/pmwin.o \
+	$(LIBOBJ)/portmidi/pm_win/pmwinmm.o \
+	$(LIBOBJ)/portmidi/porttime/ptwinmm.o
 endif
 
 $(OBJ)/libportmidi.a: $(LIBPMOBJS)
 
-$(LIBOBJ)/portmidi/%.o: $(LIBSRC)/portmidi/%.c | $(OSPREBUILD)
+$(LIBOBJ)/portmidi/%.o: $(3RDPARTY)/portmidi/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC_AS) $(CDEFS) $(PMOPTS) $(CCOMFLAGS) $(CONLYFLAGS) -I$(LIBSRC)/portmidi/ -c $< -o $@
+	$(CC_AS) $(CDEFS) $(PMOPTS) $(CCOMFLAGS) $(CONLYFLAGS) $(INCPATH) -I$(3RDPARTY)/portmidi/pm_common -I$(3RDPARTY)/portmidi/porttime -c $< -o $@
+
+ifeq ($(TARGETOS),macosx)
+$(LIBOBJ)/portmidi/%.o: $(3RDPARTY)/portmidi/%.m | $(OSPREBUILD)
+	@echo Objective-C compiling $<...
+	$(CC) $(CDEFS) $(COBJFLAGS) $(CCOMFLAGS) $(INCPATH) -c $< -o $@
+endif
+>>>>>>> 27b34159d23e714c95f8fc837a6f0c0f97437855
 
 #-------------------------------------------------
 # LUA library objects
@@ -513,7 +527,8 @@ LUAOBJS = \
 	$(LIBOBJ)/lua/ltablib.o \
 	$(LIBOBJ)/lua/loadlib.o \
 	$(LIBOBJ)/lua/linit.o \
-	$(LIBOBJ)/lua/lib/lsqlite3.o \
+	$(LIBOBJ)/lua/lutf8lib.o \
+	$(LIBOBJ)/lua/lsqlite3/lsqlite3.o \
 
 $(OBJ)/liblua.a: $(LUAOBJS)
 
@@ -530,29 +545,13 @@ ifeq ($(platform),android)
 LUA_FLAGS += -D"getlocaledecpoint() ='.'"
 endif
 
-$(LIBOBJ)/lua/%.o: $(LIBSRC)/lua/%.c | $(OSPREBUILD)
+$(LIBOBJ)/lua/%.o: $(3RDPARTY)/lua/src/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC_AS) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -DLUA_COMPAT_ALL $(LUA_FLAGS) -c $< -o $@
 
-#-------------------------------------------------
-# web library objects
-#-------------------------------------------------
-
-#WEBOBJS = \
-#	$(LIBOBJ)/web/mongoose.o \
-#	$(LIBOBJ)/web/json/json_reader.o \
-#	$(LIBOBJ)/web/json/json_value.o \
-#	$(LIBOBJ)/web/json/json_writer.o \
-#
-#$(OBJ)/libweb.a: $(WEBOBJS)
-#
-#$(LIBOBJ)/web/%.o: $(LIBSRC)/web/%.cpp | $(OSPREBUILD)
-#	@echo Compiling $<...
-#	$(CC) $(CDEFS) $(CFLAGS) -I$(LIBSRC)/web -c $< -o $@
-
-#$(LIBOBJ)/web/%.o: $(LIBSRC)/web/%.c | $(OSPREBUILD)
-#	@echo Compiling $<...
-#	$(CC) $(CDEFS) $(CFLAGS) -I$(LIBSRC)/web -DNS_STACK_SIZE=0 -c $< -o $@
+$(LIBOBJ)/lua/lsqlite3/%.o: $(3RDPARTY)/lsqlite3/%.c | $(OSPREBUILD)
+	@echo Compiling $<...
+	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -DLUA_COMPAT_ALL -I$(3RDPARTY)/lua/src -I$(3RDPARTY) $(LUA_FLAGS) -c $< -o $@
 
 #-------------------------------------------------
 # SQLite3 library objects
@@ -567,6 +566,6 @@ $(OBJ)/libsqlite3.a: $(SQLITEOBJS)
 #LIBS += -ldl
 #endif
 
-$(LIBOBJ)/sqlite3/sqlite3.o: $(LIBSRC)/sqlite3/sqlite3.c | $(OSPREBUILD)
+$(LIBOBJ)/sqlite3/sqlite3.o: $(3RDPARTY)/sqlite3/sqlite3.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC_AS) $(CDEFS) -fPIC $(CONLYFLAGS) -Wno-bad-function-cast -I$(LIBSRC)/sqlite3 -c $< -o $@
+	$(CC_AS) $(CDEFS) -fPIC $(CONLYFLAGS) -Wno-bad-function-cast -I$(3RDPARTY)/sqlite3 -c $< -o $@

@@ -162,6 +162,7 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 		fif_list(NULL)
 {
 	extension_list[0] = '\0';
+	m_err = IMAGE_ERROR_INVALIDIMAGE;
 }
 
 //-------------------------------------------------

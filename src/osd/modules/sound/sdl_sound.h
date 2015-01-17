@@ -14,12 +14,13 @@
 #define __SOUND_SDL_H__
 
 #include "osdepend.h"
+#include "modules/lib/osdobj_common.h"
 
 class sound_sdl : public osd_sound_interface
 {
 public:
 	// construction/destruction
-	sound_sdl(const osd_interface &osd);
+	sound_sdl(const osd_interface &osd, running_machine &machine);
 	virtual ~sound_sdl();
 
 	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame);

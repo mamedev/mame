@@ -14,7 +14,6 @@
 #define __COREFILE_H__
 
 #include <stdarg.h>
-#include "osdcore.h"
 #include "astring.h"
 #include "coretmpl.h"
 

@@ -103,8 +103,6 @@ Magical Tetris Challenge
         JAPAN
 
 
-On bootup, they also mention 'T.L.S' (Temporary Landing System), which seems
-to be the hardware system, designed by Arika Co. Ltd.
 
 
 PCB Layout
@@ -185,6 +183,8 @@ public:
 	DECLARE_DRIVER_INIT(aleck64);
 	DECLARE_WRITE32_MEMBER(aleck_dips_w);
 	DECLARE_READ32_MEMBER(aleck_dips_r);
+	DECLARE_READ16_MEMBER(e90_prot_r);
+	DECLARE_WRITE16_MEMBER(e90_prot_w);
 private:
 	UINT32 m_dip_read_offset;
 };
@@ -311,15 +311,47 @@ static ADDRESS_MAP_START( n64_map, AS_PROGRAM, 32, aleck64_state )
 	AM_RANGE(0x1fc00000, 0x1fc007bf) AM_ROM AM_REGION("user1", 0)   // PIF ROM
 	AM_RANGE(0x1fc007c0, 0x1fc007ff) AM_DEVREADWRITE("rcp", n64_periphs, pif_ram_r, pif_ram_w)
 
-	/*
-	    Surely this should mirror main ram? srmvs crashes, and
-	    vivdolls overwrites it's memory test code if it does mirror
-	*/
-	AM_RANGE(0xc0000000, 0xc07fffff) AM_RAM
+	AM_RANGE(0xc0000000, 0xc07fffff) AM_RAM // SDRAM, Aleck 64 specific
 
 	AM_RANGE(0xc0800000, 0xc0800fff) AM_READWRITE(aleck_dips_r,aleck_dips_w)
-	AM_RANGE(0xd0000000, 0xd00fffff) AM_RAM // mtetrisc, write only, mirror?
+ADDRESS_MAP_END
 
+/*
+ E90 protection handlers 
+*/
+
+READ16_MEMBER(aleck64_state::e90_prot_r)
+{
+// offset 0 $800 = status ready, active high
+	return 0;
+}
+
+WRITE16_MEMBER(aleck64_state::e90_prot_w)
+{	
+	switch(offset*2)
+	{
+		case 0x16:
+			if(data != 6 && data != 7)
+				printf("! %04x %04x %08x\n",offset*2,data,mem_mask);
+
+			if(data & 1) // 0 -> 1 transition
+			{
+				//for(int i=0;i<0x1000;i+=4)
+				//	space.write_dword(0x007502f4+i,space.read_dword(0xd0000000+i));
+			}
+			break;
+		//0x1e bit 0 probably enables the chip
+		default:
+			printf("%04x %04x %08x\n",offset*2,data,mem_mask);
+			break;
+	}
+}
+
+static ADDRESS_MAP_START( e90_map, AS_PROGRAM, 32, aleck64_state )
+	AM_IMPORT_FROM( n64_map )
+	AM_RANGE(0xd0000000, 0xd0000fff) AM_RAM // x/y offsets
+	AM_RANGE(0xd0010000, 0xd0010fff) AM_RAM // RGB555 palette
+	AM_RANGE(0xd0030000, 0xd003001f) AM_READWRITE16(e90_prot_r, e90_prot_w,0xffffffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rsp_map, AS_PROGRAM, 32, aleck64_state )
@@ -351,7 +383,7 @@ static INPUT_PORTS_START( aleck64 )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
 
 	PORT_START("P1_ANALOG_Y")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0xff,0x00) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1) PORT_REVERSE
 
 	PORT_START("P2")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)          // Button A
@@ -374,7 +406,7 @@ static INPUT_PORTS_START( aleck64 )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(2)
 
 	PORT_START("P2_ANALOG_Y")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0xff,0x00) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(2) PORT_REVERSE
 
 	PORT_START("IN0")
 	PORT_DIPNAME( 0x80000000, 0x80000000, "DIPSW1 #8" ) PORT_DIPLOCATION("SW1:8")
@@ -438,17 +470,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( 11beat )
 	PORT_INCLUDE( aleck64 )
 
-	PORT_MODIFY("P1_ANALOG_Y")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_MODIFY("P2_ANALOG_X")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_MODIFY("P2_ANALOG_Y")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_MODIFY("P1_ANALOG_X")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
-
 	PORT_MODIFY("P1")
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_UNUSED ) // "joystick type error" happens because game expects D-PADs to be unconnected
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -458,13 +482,13 @@ static INPUT_PORTS_START( 11beat )
 
 	PORT_MODIFY("P2")
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_UNUSED ) // "joystick type error" happens because game expects D-PADs to be unconnected
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2)
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mtetrisc )
@@ -849,6 +873,11 @@ static MACHINE_CONFIG_START( aleck64, aleck64_state )
 	MCFG_N64_PERIPHS_ADD("rcp");
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( a64_e90, aleck64 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(e90_map)
+MACHINE_CONFIG_END
+
 DRIVER_INIT_MEMBER(aleck64_state,aleck64)
 {
 	UINT8 *rom = memregion("user2")->base();
@@ -881,7 +910,7 @@ ROM_START( 11beat )
 	PIF_BOOTROM
 
 	ROM_REGION32_BE( 0x4000000, "user2", 0 )
-	ROM_LOAD16_WORD_SWAP( "nus-zhaj.u3", 0x000000, 0x0800000, BAD_DUMP CRC(95258ba2) SHA1(0299b8fb9a8b1b24428d0f340f6bf1cfaf99c672) )
+	ROM_LOAD16_WORD_SWAP( "nus-zhaj.u3", 0x000000, 0x0800000, CRC(02faa8a7) SHA1(824911452639cedf6a8186c05cd046e61fc98896) )
 
 	ROM_REGION16_BE( 0x80, "normpoint", 0 )
 	ROM_LOAD( "normpnt.rom", 0x00, 0x80, CRC(e7f2a005) SHA1(c27b4a364a24daeee6e99fd286753fd6216362b4) )
@@ -1082,8 +1111,8 @@ ROM_END
 GAME( 1998, aleck64,  0,        aleck64, aleck64, aleck64_state,  aleck64, ROT0, "Nintendo / Seta", "Aleck64 PIF BIOS", GAME_IS_BIOS_ROOT)
 
 // games
-GAME( 1998, 11beat,   aleck64,  aleck64, 11beat, aleck64_state,   aleck64, ROT0, "Hudson", "Eleven Beat", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1998, mtetrisc, aleck64,  aleck64, mtetrisc, aleck64_state, aleck64, ROT0, "Capcom", "Magical Tetris Challenge (981009 Japan)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, 11beat,   aleck64,  aleck64, 11beat, aleck64_state,   aleck64, ROT0, "Hudson", "Eleven Beat", GAME_NOT_WORKING ) // crashes at kick off / during attract with DRC
+GAME( 1998, mtetrisc, aleck64,  a64_e90, mtetrisc, aleck64_state, aleck64, ROT0, "Capcom", "Magical Tetris Challenge (981009 Japan)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, starsldr, aleck64,  aleck64, starsldr, aleck64_state, aleck64, ROT0, "Hudson / Seta", "Star Soldier: Vanishing Earth", GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, vivdolls, aleck64,  aleck64, aleck64, aleck64_state,  aleck64, ROT0, "Visco", "Vivid Dolls", GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, srmvs,    aleck64,  aleck64, srmvs, aleck64_state,    aleck64, ROT0, "Seta", "Super Real Mahjong VS", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
