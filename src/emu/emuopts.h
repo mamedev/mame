@@ -354,10 +354,11 @@ public:
 
 	const char *main_value(astring &buffer, const char *option) const;
 	const char *sub_value(astring &buffer, const char *name, const char *subname) const;
+	bool add_slot_options(bool isfirst);
+
 private:
 	// device-specific option handling
 	void add_device_options(bool isfirst);
-	bool add_slot_options(bool isfirst);
 	void update_slot_options();
 
 	// INI parsing helper

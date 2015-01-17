@@ -13,6 +13,7 @@
 
 #include "ui/ui.h"
 #include "ui/slotopt.h"
+#include "ui/devopt.h"
 
 
 /*-------------------------------------------------
@@ -187,13 +188,23 @@ void ui_menu_slot_devices::handle()
 	if (menu_event != NULL && menu_event->itemref != NULL)
 	{
 		if ((FPTR)menu_event->itemref == 1 && menu_event->iptkey == IPT_UI_SELECT)
+		{
+			machine().options().add_slot_options(false);
 			machine().schedule_hard_reset();
+		}
 		else if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 		{
 			device_slot_interface *slot = (device_slot_interface *)menu_event->itemref;
 			const char *val = (menu_event->iptkey == IPT_UI_LEFT) ? slot_get_prev(slot) : slot_get_next(slot);
 			set_slot_device(slot, val);
 			reset(UI_MENU_RESET_REMEMBER_REF);
+		}
+		else if (menu_event->iptkey == IPT_UI_SELECT)
+		{
+			device_slot_interface *slot = (device_slot_interface *)menu_event->itemref;
+			device_slot_option *option = slot_get_current_option(slot);
+			if (option)
+				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_device_config(machine(), container, slot, option)));
 		}
 	}
 }
