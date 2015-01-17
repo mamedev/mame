@@ -188,7 +188,10 @@ void ui_menu_slot_devices::handle()
 	if (menu_event != NULL && menu_event->itemref != NULL)
 	{
 		if ((FPTR)menu_event->itemref == 1 && menu_event->iptkey == IPT_UI_SELECT)
+		{
+			machine().options().add_slot_options(false);
 			machine().schedule_hard_reset();
+		}
 		else if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 		{
 			device_slot_interface *slot = (device_slot_interface *)menu_event->itemref;
