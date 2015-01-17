@@ -702,7 +702,7 @@ endif
 
 # add flac library
 ifeq ($(BUILD_FLAC),1)
-INCPATH += -I$(SRC)/lib/util
+INCPATH += -I$(SRC)/lib/util -I$(3RDPARTY)/libflac/src/libFLAC/include
 FLAC_LIB = $(OBJ)/libflac.a
 # $(OBJ)/libflac++.a
 else
