@@ -82,6 +82,7 @@ void ata_hle_device::device_start()
 	m_buffer.resize(sector_length());
 	save_item(NAME(m_buffer));
 	save_item(NAME(m_buffer_offset));
+	save_item(NAME(m_buffer_size));
 	save_item(NAME(m_error));
 	save_item(NAME(m_feature));
 	save_item(NAME(m_sector_count));
