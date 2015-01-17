@@ -20,11 +20,12 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
+	required_device<cpu_device> m_maincpu;
+	
 	DECLARE_WRITE8_MEMBER(tourtabl_led_w);
 	DECLARE_READ16_MEMBER(tourtabl_read_input_port);
 	DECLARE_READ8_MEMBER(tourtabl_get_databus_contents);
 	DECLARE_WRITE8_MEMBER(watchdog_w);
-	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -201,5 +202,5 @@ ROM_START( tourtab2 )
 ROM_END
 
 
-GAME( 1978, tourtabl, 0,        tourtabl, tourtabl, driver_device, 0, ROT0, "Atari", "Tournament Table (set 1)", 0 )
-GAME( 1978, tourtab2, tourtabl, tourtabl, tourtabl, driver_device, 0, ROT0, "Atari", "Tournament Table (set 2)", 0 )
+GAME( 1978, tourtabl, 0,        tourtabl, tourtabl, driver_device, 0, ROT0, "Atari", "Tournament Table (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1978, tourtab2, tourtabl, tourtabl, tourtabl, driver_device, 0, ROT0, "Atari", "Tournament Table (set 2)", GAME_SUPPORTS_SAVE )

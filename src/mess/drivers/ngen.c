@@ -87,7 +87,9 @@ public:
 		m_vram(*this,"vram"),
 		m_fontram(*this,"fontram"),
 		m_fdc(*this,"fdc"),
-		m_fd0(*this,"fdc:0")
+		m_fd0(*this,"fdc:0"),
+		m_fdc_timer(*this,"fdc_timer"),
+		m_hdc_timer(*this,"hdc_timer")
 	{}
 
 	DECLARE_WRITE_LINE_MEMBER(pit_out0_w);
@@ -98,8 +100,8 @@ public:
 	DECLARE_WRITE16_MEMBER(cpu_peripheral_cb);
 	DECLARE_WRITE16_MEMBER(peripheral_w);
 	DECLARE_READ16_MEMBER(peripheral_r);
-	DECLARE_WRITE16_MEMBER(port00_w);
-	DECLARE_READ16_MEMBER(port00_r);
+	DECLARE_WRITE16_MEMBER(xbus_w);
+	DECLARE_READ16_MEMBER(xbus_r);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
 	DECLARE_WRITE_LINE_MEMBER(dma_eop_changed);
 	DECLARE_WRITE_LINE_MEMBER(dack0_w);
@@ -118,6 +120,9 @@ public:
 	DECLARE_WRITE8_MEMBER( dma_1_dack_w ){  }
 	DECLARE_WRITE8_MEMBER( dma_2_dack_w ){  }
 	DECLARE_WRITE8_MEMBER( dma_3_dack_w ){ popmessage("IOW3: data %02x",data); }
+
+	DECLARE_WRITE16_MEMBER(hfd_w);
+	DECLARE_READ16_MEMBER(fhd_r);
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE8_MEMBER(fdc_control_w);
@@ -141,9 +146,12 @@ private:
 	optional_shared_ptr<UINT16> m_fontram;
 	optional_device<wd2797_t> m_fdc;
 	optional_device<floppy_connector> m_fd0;
+	optional_device<pit8253_device> m_fdc_timer;
+	optional_device<pit8253_device> m_hdc_timer;
 
 	void set_dma_channel(int channel, int state);
 
+	UINT8 m_xbus_current;  // currently selected X-Bus module
 	UINT16 m_peripheral;
 	UINT16 m_upper;
 	UINT16 m_middle;
@@ -264,6 +272,9 @@ WRITE16_MEMBER(ngen_state::peripheral_w)
 	case 0x83:
 		if(mem_mask & 0x00ff)
 			m_dma_offset[offset-0x80] = data & 0xff;
+		break;
+	case 0xc0:  // X-Bus modules reset
+		m_xbus_current = 0;
 		break;
 	case 0x10c:
 		if(mem_mask & 0x00ff)
@@ -386,23 +397,141 @@ READ16_MEMBER(ngen_state::peripheral_r)
 
 // X-bus module select
 // The bootstrap ROM creates a table at 0:FC9h, with a count, followed by the module IDs of each
-// expansion module.  The base I/O address for each module is 0x100*module number.
-// Module 0 is the main processor module, module 1 is the next module attached, and so on.
-WRITE16_MEMBER(ngen_state::port00_w)
+// expansion module.  The base I/O address for the currently selected module is set by writing to 
+// this register (bits 0-7 are ignored)
+// TODO: make expansion modules slot devices
+WRITE16_MEMBER(ngen_state::xbus_w)
 {
-	m_port00 = data;
-	logerror("SYS: X-Bus module select %04x\n",data);
+	UINT16 addr = (data & 0x00ff) << 8;
+	address_space& io = m_maincpu->device_t::memory().space(AS_IO);
+	switch(m_xbus_current)
+	{
+		case 0x00:  // Floppy/Hard disk module
+			io.install_readwrite_handler(addr,addr+0xff,0,0,read16_delegate(FUNC(ngen_state::fhd_r),this),write16_delegate(FUNC(ngen_state::hfd_w),this));
+			break;
+		default:
+			m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);  // reached end of the modules
+			break;
+	}
+	if(addr != 0)
+		logerror("SYS: X-Bus module %i address set %04x\n",m_xbus_current+1,addr);
+	m_xbus_current++;
 }
 
-// returns X-bus module ID (what is the low byte for?)
-READ16_MEMBER(ngen_state::port00_r)
+// returns X-bus module ID and info in the low byte (can indicate if the device is bootable, has a boot ROM (needs to be written to RAM via DMA), or if it supports a non-80186 CPU)
+// bit 6, I think, indicates a bootable device
+// Known module IDs:
+//  0x1070 - Floppy/Hard disk module
+//  0x3141 - QIC Tape module
+READ16_MEMBER(ngen_state::xbus_r)
 {
-	if(m_port00 > 0)
-		m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
-	if(m_port00 == 0)
-		return 0x1070;  // module ID of 0x1070, according to the floppy/hard disk tech manual
-	else
-		return 0x0080;  // invalid device?
+	UINT16 ret = 0xffff;
+	
+	switch(m_xbus_current)
+	{
+		case 0x00:
+			ret = 0x1070;  // Floppy/Hard disk module
+			break;
+		default:
+			m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);  // reached the end of the modules
+			ret = 0x0080;
+			break;
+	}
+	return ret;
+}
+
+
+// Floppy/Hard disk module
+WRITE16_MEMBER(ngen_state::hfd_w)
+{
+	switch(offset)
+	{
+		case 0x00:
+		case 0x01:
+		case 0x02:
+		case 0x03:
+			if(mem_mask & 0x00ff)
+				m_fdc->write(space,offset,data & 0xff);
+			break;
+		case 0x04:
+			if(mem_mask & 0x00ff)
+				fdc_control_w(space,offset,data & 0xff);
+			break;
+		case 0x05:
+			if(mem_mask & 0x00ff)
+				hdc_control_w(space,offset,data & 0xff);
+			break;
+		case 0x07:
+			if(mem_mask & 0x00ff)
+				disk_addr_ext(space,offset,data & 0xff);
+			break;
+		case 0x08:
+		case 0x09:
+		case 0x0a:
+		case 0x0b:
+			if(mem_mask & 0x00ff)
+				m_fdc_timer->write(space,offset,data & 0xff);
+			break;
+		case 0x10:
+		case 0x11:
+		case 0x12:
+		case 0x13:
+		case 0x14:
+		case 0x15:
+		case 0x16:
+		case 0x17:
+			logerror("WD1010 register %i write %02x mask %04x\n",offset-0x10,data & 0xff,mem_mask);
+			break;
+		case 0x18:
+		case 0x19:
+		case 0x1a:
+		case 0x1b:
+			if(mem_mask & 0x00ff)
+				m_hdc_timer->write(space,offset,data & 0xff);
+			break;
+	}
+}
+
+READ16_MEMBER(ngen_state::fhd_r)
+{
+	UINT16 ret = 0xffff;
+
+	switch(offset)
+	{
+		case 0x00:
+		case 0x01:
+		case 0x02:
+		case 0x03:
+			if(mem_mask & 0x00ff)
+				ret = m_fdc->read(space,offset);
+			break;
+		case 0x08:
+		case 0x09:
+		case 0x0a:
+		case 0x0b:
+			if(mem_mask & 0x00ff)
+				ret = m_fdc_timer->read(space,offset);
+			break;
+		case 0x10:
+		case 0x11:
+		case 0x12:
+		case 0x13:
+		case 0x14:
+		case 0x15:
+		case 0x16:
+		case 0x17:
+			logerror("WD1010 register %i read, mask %04x\n",offset-0x10,mem_mask);
+			break;
+		case 0x18:
+		case 0x19:
+		case 0x1a:
+		case 0x1b:
+			if(mem_mask & 0x00ff)
+				ret = m_hdc_timer->read(space,offset);
+			break;
+	}
+
+	return ret;
 }
 
 WRITE_LINE_MEMBER(ngen_state::fdc_irq_w)
@@ -564,6 +693,7 @@ void ngen_state::machine_reset()
 {
 	m_port00 = 0;
 	m_control = 0;
+	m_xbus_current = 0;
 	m_viduart->write_dsr(0);
 	m_viduart->write_cts(0);
 	m_fd0->get_device()->set_rpm(300);
@@ -578,17 +708,16 @@ static ADDRESS_MAP_START( ngen_mem, AS_PROGRAM, 16, ngen_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ngen_io, AS_IO, 16, ngen_state )
-	AM_RANGE(0x0000, 0x0001) AM_READWRITE(port00_r,port00_w)
+	AM_RANGE(0x0000, 0x0001) AM_READWRITE(xbus_r,xbus_w)
 	
-	// TODO: allow for expansion modules to be allocated where asked to
 	// Floppy/Hard disk module
-	AM_RANGE(0x0100, 0x0107) AM_DEVREADWRITE8("fdc",wd2797_t,read,write,0x00ff)  // a guess for now
-	AM_RANGE(0x0108, 0x0109) AM_WRITE8(fdc_control_w,0x00ff)
-	AM_RANGE(0x010a, 0x010b) AM_WRITE8(hdc_control_w,0x00ff)
-	AM_RANGE(0x010e, 0x010f) AM_WRITE8(disk_addr_ext,0x00ff)  // X-Bus extended address register
-	AM_RANGE(0x0110, 0x0117) AM_DEVREADWRITE8("fdc_timer",pit8253_device,read,write,0x00ff)
+//	AM_RANGE(0x0100, 0x0107) AM_DEVREADWRITE8("fdc",wd2797_t,read,write,0x00ff)  // a guess for now
+//	AM_RANGE(0x0108, 0x0109) AM_WRITE8(fdc_control_w,0x00ff)
+//	AM_RANGE(0x010a, 0x010b) AM_WRITE8(hdc_control_w,0x00ff)
+//	AM_RANGE(0x010e, 0x010f) AM_WRITE8(disk_addr_ext,0x00ff)  // X-Bus extended address register
+//	AM_RANGE(0x0110, 0x0117) AM_DEVREADWRITE8("fdc_timer",pit8253_device,read,write,0x00ff)
 	// 0x0120-0x012f - WD1010 Winchester disk controller (unemulated)
-	AM_RANGE(0x0130, 0x0137) AM_DEVREADWRITE8("hdc_timer",pit8253_device,read,write,0x00ff)
+//	AM_RANGE(0x0130, 0x0137) AM_DEVREADWRITE8("hdc_timer",pit8253_device,read,write,0x00ff)
 	
 ADDRESS_MAP_END
 
