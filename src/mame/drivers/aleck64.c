@@ -336,8 +336,8 @@ WRITE16_MEMBER(aleck64_state::e90_prot_w)
 
 			if(data & 1) // 0 -> 1 transition
 			{
-				for(int i=0;i<0x1000;i+=4)
-					space.write_dword(0x007502f4+i,space.read_dword(0xd0000000+i));
+				//for(int i=0;i<0x1000;i+=4)
+				//	space.write_dword(0x007502f4+i,space.read_dword(0xd0000000+i));
 			}
 			break;
 		//0x1e bit 0 probably enables the chip
@@ -349,8 +349,8 @@ WRITE16_MEMBER(aleck64_state::e90_prot_w)
 
 static ADDRESS_MAP_START( e90_map, AS_PROGRAM, 32, aleck64_state )
 	AM_IMPORT_FROM( n64_map )
-	AM_RANGE(0xd0000000, 0xd0000fff) AM_RAM
-	AM_RANGE(0xd0010000, 0xd0010fff) AM_RAM
+	AM_RANGE(0xd0000000, 0xd0000fff) AM_RAM // x/y offsets
+	AM_RANGE(0xd0010000, 0xd0010fff) AM_RAM // RGB555 palette
 	AM_RANGE(0xd0030000, 0xd003001f) AM_READWRITE16(e90_prot_r, e90_prot_w,0xffffffff)
 ADDRESS_MAP_END
 
