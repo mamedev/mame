@@ -7,8 +7,9 @@
   hardware (and concept) is very similar to Parker Bros Stop Thief
 
   This is an electronic board game. It requires game cards with suspect info,
-  and good old pen and paper to record game progress. Refer to the manual
-  on how to play it.
+  and good old pen and paper to record game progress. To start the game, enter
+  difficulty(1-3), then number of players(1-4), then [ENTER]. Refer to the
+  manual for more information.
 
 
   TODO:
@@ -296,7 +297,7 @@ MACHINE_CONFIG_END
 
 ROM_START( elecdet )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "tms0980nll_mp6100a", 0x0000, 0x1000, CRC(f33f02ae) SHA1(a978d9cc1ba7897f6e8997715da265eb8c4a0c34) )
+	ROM_LOAD( "tms0980nll_mp6100a", 0x0000, 0x1000, CRC(8160a081) SHA1(14cbfc0529ad83a58e0dc15fe8ba594947e49f08) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
