@@ -50,9 +50,10 @@ MINIOBJ = $(OBJ)/osd/$(OSD)
 OSDSRC = $(SRC)/osd
 OSDOBJ = $(OBJ)/osd
 
-OBJDIRS += $(MINIOBJ) $(OSDOBJ)/modules/sync
-
-
+OBJDIRS += $(MINIOBJ) \
+	$(OSDOBJ)/modules/sync \
+	$(OSDOBJ)/modules/lib \
+	$(OSDOBJ)/modules/midi
 
 #-------------------------------------------------
 # OSD core library
@@ -64,14 +65,16 @@ OSDCOREOBJS = \
 	$(MINIOBJ)/minimisc.o \
 	$(MINIOBJ)/minisync.o \
 	$(MINIOBJ)/minitime.o \
-	$(OSDOBJ)/modules/sync/work_mini.o \
 
 #-------------------------------------------------
 # OSD mini library
 #-------------------------------------------------
 
 OSDOBJS = \
-	$(MINIOBJ)/minimain.o
+	$(MINIOBJ)/minimain.o \
+	$(OSDOBJ)/modules/sync/work_mini.o \
+	$(OSDOBJ)/modules/lib/osdobj_common.o  \
+	$(OSDOBJ)/modules/midi/none.o \
 
 ifeq ($(OS),Windows_NT)
 LIBS += -lwinmm -lwsock32

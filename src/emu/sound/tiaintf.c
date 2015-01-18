@@ -30,7 +30,7 @@ tia_device::tia_device(const machine_config &mconfig, const char *tag, device_t 
 void tia_device::device_start()
 {
 	m_channel = stream_alloc(0, 1, clock());
-	m_chip = tia_sound_init(clock(), clock(), 16);
+	m_chip = tia_sound_init(this, clock(), clock(), 16);
 	assert_always(m_chip != NULL, "Error creating TIA chip");
 }
 

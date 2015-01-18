@@ -44,7 +44,7 @@ public:
 		{
 			register_input(sIN[i], m_i[i]);
 		}
-		save(NAME(m_active));
+		save(NLNAME(m_active));
 	}
 
 	ATTR_COLD void reset()
@@ -118,7 +118,7 @@ public:
 		register_input("A", m_i[0]);
 		register_input("B", m_i[1]);
 
-		save(NAME(m_active));
+		save(NLNAME(m_active));
 	}
 
 	ATTR_COLD void reset()

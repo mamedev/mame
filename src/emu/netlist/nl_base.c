@@ -9,6 +9,8 @@
 #include "pstring.h"
 #include "nl_util.h"
 
+#include <stdlib.h> // FIXME: only included for atof
+
 const netlist_time netlist_time::zero = netlist_time::from_raw(0);
 
 netlist_logic_family_desc_t netlist_family_TTL =
@@ -150,7 +152,7 @@ netlist_base_t::~netlist_base_t()
 	{
 		if (!m_nets[i]->isRailNet())
 		{
-			delete m_nets[i];
+			global_free(m_nets[i]);
 		}
 	}
 
@@ -164,7 +166,7 @@ netlist_base_t::~netlist_base_t()
 ATTR_COLD void netlist_base_t::save_register()
 {
 	save(static_cast<pstate_callback_t &>(m_queue), "m_queue");
-	save(NAME(m_time));
+	save(NLNAME(m_time));
 	netlist_object_t::save_register();
 }
 
@@ -529,7 +531,7 @@ ATTR_HOT void netlist_net_t::dec_active(netlist_core_terminal_t &term)
 
 ATTR_COLD void netlist_net_t::register_railterminal(netlist_output_t &mr)
 {
-	assert(m_railterminal == NULL);
+	nl_assert(m_railterminal == NULL);
 	m_railterminal = &mr;
 }
 
@@ -545,12 +547,12 @@ ATTR_COLD void netlist_net_t::rebuild_list()
 
 ATTR_COLD void netlist_net_t::save_register()
 {
-	save(NAME(m_time));
-	save(NAME(m_active));
-	save(NAME(m_in_queue));
-	save(NAME(m_cur_Analog));
-	save(NAME(m_cur_Q));
-	save(NAME(m_new_Q));
+	save(NLNAME(m_time));
+	save(NLNAME(m_active));
+	save(NLNAME(m_in_queue));
+	save(NLNAME(m_cur_Analog));
+	save(NLNAME(m_cur_Q));
+	save(NLNAME(m_new_Q));
 	netlist_object_t::save_register();
 }
 
@@ -569,7 +571,7 @@ ATTR_HOT ATTR_ALIGN static inline void update_dev(const netlist_core_terminal_t 
 ATTR_HOT ATTR_ALIGN inline void netlist_net_t::update_devs()
 {
 	//assert(m_num_cons != 0);
-	assert(this->isRailNet());
+	nl_assert(this->isRailNet());
 
 	const UINT32 masks[4] = { 1, 5, 3, 1 };
 	const UINT32 mask = masks[ (m_cur_Q  << 1) | m_new_Q ];
@@ -707,8 +709,8 @@ ATTR_COLD void netlist_analog_net_t::reset()
 
 ATTR_COLD void netlist_analog_net_t::save_register()
 {
-	save(NAME(m_DD_n_m_1));
-	save(NAME(m_h_n_m_1));
+	save(NLNAME(m_DD_n_m_1));
+	save(NLNAME(m_h_n_m_1));
 	netlist_net_t::save_register();
 }
 
@@ -803,9 +805,9 @@ ATTR_COLD void netlist_terminal_t::reset()
 
 ATTR_COLD void netlist_terminal_t::save_register()
 {
-	save(NAME(m_Idr1));
-	save(NAME(m_go1));
-	save(NAME(m_gt1));
+	save(NLNAME(m_Idr1));
+	save(NLNAME(m_go1));
+	save(NLNAME(m_gt1));
 	netlist_core_terminal_t::save_register();
 }
 

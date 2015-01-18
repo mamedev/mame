@@ -1490,6 +1490,7 @@ $(MESSOBJ)/palm.a:              \
 $(MESSOBJ)/parker.a:            \
 	$(MESS_DRIVERS)/cnsector.o  \
 	$(MESS_DRIVERS)/merlin.o    \
+	$(MESS_DRIVERS)/splitsec.o  \
 	$(MESS_DRIVERS)/stopthie.o  \
 
 $(MESSOBJ)/pitronic.a:          \
@@ -2171,6 +2172,7 @@ $(MESS_DRIVERS)/simon.o:    $(MESS_LAYOUT)/simon.lh
 $(MESS_DRIVERS)/sitcom.o:   $(MESS_LAYOUT)/sitcom.lh
 $(MESS_DRIVERS)/slc1.o:     $(MESS_LAYOUT)/slc1.lh
 $(MESS_DRIVERS)/sms.o:      $(MESS_LAYOUT)/sms1.lh
+$(MESS_DRIVERS)/splitsec.o: $(MESS_LAYOUT)/splitsec.lh
 $(MESS_DRIVERS)/starwbc.o:  $(MESS_LAYOUT)/starwbc.lh
 $(MESS_DRIVERS)/stopthie.o: $(MESS_LAYOUT)/stopthie.lh
 $(MESS_DRIVERS)/super80.o:  $(MESS_LAYOUT)/super80.lh

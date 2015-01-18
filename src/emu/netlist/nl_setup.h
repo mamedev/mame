@@ -11,6 +11,7 @@
 #define NLSETUP_H_
 
 #include "nl_base.h"
+#include "nl_factory.h"
 
 //============================================================
 //  MACROS / inline netlist definitions

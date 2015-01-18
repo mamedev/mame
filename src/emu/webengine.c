@@ -16,7 +16,7 @@
 #include "webengine.h"
 #include "lua.hpp"
 
-
+#include "osdepend.h"
 
 //**************************************************************************
 //  WEB ENGINE

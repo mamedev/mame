@@ -153,9 +153,9 @@ public:
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist);
 
 	// font overridables
-	virtual osd_font font_open(const char *name, int &height);
-	virtual void font_close(osd_font font);
-	virtual bool font_get_bitmap(osd_font font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs);
+	virtual osd_font *font_open(const char *name, int &height);
+	virtual void font_close(osd_font *font);
+	virtual bool font_get_bitmap(osd_font *font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs);
 
 	// video overridables
 	virtual void *get_slider_list();

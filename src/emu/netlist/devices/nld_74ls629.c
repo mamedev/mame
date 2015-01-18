@@ -49,9 +49,9 @@ NETLIB_START(SN74LS629clk)
 
 	reset();
 
-	save(NAME(m_enableq));
-	save(NAME(m_inc));
-	save(NAME(m_out));
+	save(NLNAME(m_enableq));
+	save(NLNAME(m_inc));
+	save(NLNAME(m_out));
 }
 
 NETLIB_RESET(SN74LS629clk)

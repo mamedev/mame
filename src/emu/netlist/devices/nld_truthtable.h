@@ -50,11 +50,11 @@ public:
 		{
 			nl_util::pstring_list io = nl_util::split(ttline,"|");
 			// checks
-			assert(io.count() == 2);
+			nl_assert(io.count() == 2);
 			nl_util::pstring_list inout = nl_util::split(io[0], ",");
-			assert(inout.count() == m_num_bits);
+			nl_assert(inout.count() == m_num_bits);
 			nl_util::pstring_list out = nl_util::split(io[1], ",");
-			assert(out.count() == m_NO);
+			nl_assert(out.count() == m_NO);
 
 			for (int i=0; i < m_NI; i++)
 			{
@@ -133,13 +133,13 @@ public:
 		{
 			nl_util::pstring_list io = nl_util::split(ttline,"|");
 			// checks
-			assert(io.count() == 3);
+			nl_assert(io.count() == 3);
 			nl_util::pstring_list inout = nl_util::split(io[0], ",");
-			assert(inout.count() == m_num_bits);
+			nl_assert(inout.count() == m_num_bits);
 			nl_util::pstring_list out = nl_util::split(io[1], ",");
-			assert(out.count() == m_NO);
+			nl_assert(out.count() == m_NO);
 			nl_util::pstring_list times = nl_util::split(io[2], ",");
-			assert(times.count() == m_NO);
+			nl_assert(times.count() == m_NO);
 
 			UINT16 val = 0;
 			UINT8 tindex[m_NO];

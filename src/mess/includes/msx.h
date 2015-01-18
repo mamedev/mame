@@ -24,7 +24,6 @@
 #include "formats/basicdsk.h"
 #include "formats/fmsx_cas.h"
 #include "formats/msx_dsk.h"
-//#include "osdepend.h"
 #include "hashfile.h"
 #include "machine/wd_fdc.h"
 #include "imagedev/floppy.h"

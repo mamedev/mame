@@ -53,8 +53,10 @@ static output_delegate output_cb[OSD_OUTPUT_CHANNEL_COUNT] =
 
 output_delegate osd_set_output_channel(output_channel channel, output_delegate callback)
 {
-	assert(channel < OSD_OUTPUT_CHANNEL_COUNT);
-	assert(!callback.isnull());
+	if (!(channel < OSD_OUTPUT_CHANNEL_COUNT) || callback.isnull())
+    {
+	    throw std::exception();
+    }
 
 	/* return the originals if requested */
 	output_delegate prevcb = output_cb[channel];

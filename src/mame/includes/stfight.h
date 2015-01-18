@@ -10,29 +10,30 @@ public:
 
 	stfight_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_text_char_ram(*this, "text_char_ram"),
-		m_text_attr_ram(*this, "text_attr_ram"),
-		m_tx_vram(*this, "tx_vram"),
-		m_vh_latch_ram(*this, "vh_latch_ram"),
-		m_sprite_ram(*this, "sprite_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_mcu(*this, "mcu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_text_char_ram(*this, "text_char_ram"),
+		m_text_attr_ram(*this, "text_attr_ram"),
+		m_tx_vram(*this, "tx_vram"),
+		m_vh_latch_ram(*this, "vh_latch_ram"),
+		m_sprite_ram(*this, "sprite_ram") { }
 
-	optional_shared_ptr<UINT8> m_text_char_ram;
-	optional_shared_ptr<UINT8> m_text_attr_ram;
-	optional_shared_ptr<UINT8> m_tx_vram;
-	required_shared_ptr<UINT8> m_vh_latch_ram;
-	required_shared_ptr<UINT8> m_sprite_ram;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_mcu;
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	
+	optional_shared_ptr<UINT8> m_text_char_ram;
+	optional_shared_ptr<UINT8> m_text_attr_ram;
+	optional_shared_ptr<UINT8> m_tx_vram;
+	required_shared_ptr<UINT8> m_vh_latch_ram;
+	required_shared_ptr<UINT8> m_sprite_ram;
 
 	UINT8 *m_decrypt;
 	UINT8 m_fm_data;
@@ -79,6 +80,7 @@ public:
 
 	DECLARE_VIDEO_START(stfight);
 	DECLARE_VIDEO_START(cshooter);
+	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_PALETTE_INIT(stfight);
 	UINT32 screen_update_stfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -106,7 +108,6 @@ public:
 	UINT8 m_portB_out, m_portB_in;
 	UINT8 m_portC_out, m_portC_in;
 	UINT8 m_ddrA, m_ddrB, m_ddrC;
-	UINT8 m_from_main, m_main_sent;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

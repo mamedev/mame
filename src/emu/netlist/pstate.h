@@ -145,13 +145,7 @@ private:
 	pstate_entry_t::list_t m_save;
 };
 
-template<> ATTR_COLD inline void pstate_manager_t::save_item(pstate_callback_t &state, const void *owner, const pstring &stname)
-{
-	//save_state_ptr(stname, DT_CUSTOM, 0, 1, &state);
-	pstate_entry_t *p = new pstate_entry_t(stname, owner, &state);
-	m_save.add(p);
-	state.register_state(*this, stname);
-}
+template<> ATTR_COLD void pstate_manager_t::save_item(pstate_callback_t &state, const void *owner, const pstring &stname);
 
 template<> ATTR_COLD inline void pstate_manager_t::save_item(netlist_time &nlt, const void *owner, const pstring &stname)
 {

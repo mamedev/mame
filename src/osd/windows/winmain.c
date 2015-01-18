@@ -719,7 +719,7 @@ void windows_osd_interface::osd_exit()
 //  font with the given name
 //-------------------------------------------------
 
-osd_font windows_osd_interface::font_open(const char *_name, int &height)
+osd_font *windows_osd_interface::font_open(const char *_name, int &height)
 {
 	// accept qualifiers from the name
 	astring name(_name);
@@ -751,7 +751,7 @@ osd_font windows_osd_interface::font_open(const char *_name, int &height)
 
 	// create the font
 	height = logfont.lfHeight;
-	osd_font font = reinterpret_cast<osd_font>(CreateFontIndirect(&logfont));
+	osd_font *font = reinterpret_cast<osd_font *>(CreateFontIndirect(&logfont));
 	if (font == NULL)
 		return NULL;
 
@@ -783,7 +783,7 @@ osd_font windows_osd_interface::font_open(const char *_name, int &height)
 //  a given OSD font
 //-------------------------------------------------
 
-void windows_osd_interface::font_close(osd_font font)
+void windows_osd_interface::font_close(osd_font *font)
 {
 	// delete the font ojbect
 	if (font != NULL)
@@ -799,7 +799,7 @@ void windows_osd_interface::font_close(osd_font font)
 //  pixel of a black & white font
 //-------------------------------------------------
 
-bool windows_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
+bool windows_osd_interface::font_get_bitmap(osd_font *font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
 {
 	// create a dummy DC to work with
 	HDC dummyDC = CreateCompatibleDC(NULL);

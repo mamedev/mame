@@ -40,7 +40,7 @@ NETLIB_START(7493ff)
 	register_input("CLK", m_I);
 	register_output("Q", m_Q);
 
-	save(NAME(m_reset));
+	save(NLNAME(m_reset));
 }
 
 NETLIB_RESET(7493ff)

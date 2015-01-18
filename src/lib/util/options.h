@@ -11,7 +11,6 @@
 #ifndef __OPTIONS_H__
 #define __OPTIONS_H__
 
-#include "osdcore.h"
 #include "corefile.h"
 #include "tagmap.h"
 

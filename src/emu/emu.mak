@@ -120,6 +120,7 @@ EMUOBJS = \
 	$(EMUOBJ)/ui/mainmenu.o \
 	$(EMUOBJ)/ui/miscmenu.o \
 	$(EMUOBJ)/ui/barcode.o \
+	$(EMUOBJ)/ui/devopt.o \
 	$(EMUOBJ)/ui/filemngr.o \
 	$(EMUOBJ)/ui/filesel.o \
 	$(EMUOBJ)/ui/imgcntrl.o \
@@ -147,7 +148,6 @@ EMUOBJS = \
 	$(EMUOBJ)/debug/textbuf.o \
 	$(EMUOBJ)/profiler.o \
 	$(EMUOBJ)/webengine.o \
-	$(OSDOBJ)/osdcore.o \
 	$(OSDOBJ)/osdnet.o \
 	$(OSDOBJ)/modules/sound/none.o \
 	$(OSDOBJ)/modules/debugger/none.o \

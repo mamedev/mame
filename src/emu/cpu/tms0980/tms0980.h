@@ -106,6 +106,10 @@ protected:
 	virtual void dynamic_output() { ; } // not used by default
 	virtual void read_opcode();
 
+	virtual void op_br();
+	virtual void op_call();
+	virtual void op_retn();
+
 	virtual void op_sbit();
 	virtual void op_rbit();
 	virtual void op_setr();
@@ -118,6 +122,7 @@ protected:
 	virtual void op_ldp();
 
 	virtual void op_comc();
+	virtual void op_tpc();
 	virtual void op_xda();
 	virtual void op_off();
 	virtual void op_seac();
@@ -134,15 +139,16 @@ protected:
 	optional_device<pla_device> m_spla;
 
 	UINT8   m_pc;        // 6 or 7-bit program counter
-	UINT8   m_sr;        // 6 or 7-bit subroutine return register
+	UINT32  m_sr;        // 6 or 7-bit subroutine return register(s)
 	UINT8   m_pa;        // 4-bit page address register
 	UINT8   m_pb;        // 4-bit page buffer register
+	UINT16  m_ps;        // 4-bit page subroutine register(s)
 	UINT8   m_a;         // 4-bit accumulator
 	UINT8   m_x;         // 2,3,or 4-bit RAM X register
 	UINT8   m_y;         // 4-bit RAM Y register
-	UINT8   m_ca;        // chapter address bit
-	UINT8   m_cb;        // chapter buffer bit
-	UINT8   m_cs;        // chapter subroutine bit
+	UINT8   m_ca;        // chapter address register
+	UINT8   m_cb;        // chapter buffer register
+	UINT16  m_cs;        // chapter subroutine register(s)
 	UINT16  m_r;
 	UINT16  m_o;
 	UINT8   m_cki_bus;
@@ -155,7 +161,7 @@ protected:
 	UINT8   m_status;
 	UINT8   m_status_latch;
 	UINT8   m_eac;       // end around carry bit
-	UINT8   m_clatch;    // call latch bit
+	UINT8   m_clatch;    // call latch bit(s)
 	UINT8   m_add;       // add latch bit
 	UINT8   m_bl;        // branch latch bit
 
@@ -244,10 +250,48 @@ protected:
 	virtual void op_rstr();
 };
 
+class tms1170_cpu_device : public tms1100_cpu_device
+{
+public:
+	tms1170_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 class tms1300_cpu_device : public tms1100_cpu_device
 {
 public:
 	tms1300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class tms1370_cpu_device : public tms1100_cpu_device
+{
+public:
+	tms1370_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
+class tms1400_cpu_device : public tms1100_cpu_device
+{
+public:
+	tms1400_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms1400_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
+
+protected:
+	// overrides
+	virtual void device_reset();
+	virtual machine_config_constructor device_mconfig_additions() const;
+
+	virtual void op_br();
+	virtual void op_call();
+	virtual void op_retn();
+
+	virtual void op_setr() { tms1xxx_cpu_device::op_setr(); } // no anomaly with MSB of X register
+	virtual void op_rstr() { tms1xxx_cpu_device::op_rstr(); } // "
+};
+
+class tms1470_cpu_device : public tms1400_cpu_device
+{
+public:
+	tms1470_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -344,7 +388,11 @@ extern const device_type TMS1000;
 extern const device_type TMS1070;
 extern const device_type TMS1200;
 extern const device_type TMS1100;
+extern const device_type TMS1170;
 extern const device_type TMS1300;
+extern const device_type TMS1370;
+extern const device_type TMS1400;
+extern const device_type TMS1470;
 extern const device_type TMS0970;
 extern const device_type TMS0980;
 extern const device_type TMS0270;

@@ -346,7 +346,7 @@ void osd_common_t::customize_input_type_list(simple_list<input_type_entry> &type
 //  font with the given name
 //-------------------------------------------------
 
-osd_font osd_common_t::font_open(const char *name, int &height)
+osd_font *osd_common_t::font_open(const char *name, int &height)
 {
 	return NULL;
 }
@@ -357,7 +357,7 @@ osd_font osd_common_t::font_open(const char *name, int &height)
 //  a given OSD font
 //-------------------------------------------------
 
-void osd_common_t::font_close(osd_font font)
+void osd_common_t::font_close(osd_font *font)
 {
 }
 
@@ -370,7 +370,7 @@ void osd_common_t::font_close(osd_font font)
 //  pixel of a black & white font
 //-------------------------------------------------
 
-bool osd_common_t::font_get_bitmap(osd_font font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
+bool osd_common_t::font_get_bitmap(osd_font *font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
 {
 	return false;
 }
