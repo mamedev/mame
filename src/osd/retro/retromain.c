@@ -486,10 +486,10 @@ int mmain(int argc, const char *argv)
 //    osd_init_midi();
 
     osd_options options;
-    retro_osd_interface MRosd(options);
+    retro_osd_interface osd(options);
     cli_options MRoptions;
-    MRosd.register_options(MRoptions);
-    cli_frontend frontend(MRoptions, MRosd);
+    osd.register_options();
+    cli_frontend frontend(options, osd);
 
     result = frontend.execute(PARAMCOUNT, ( char **)xargv_cmd);
 
