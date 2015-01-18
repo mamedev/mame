@@ -99,6 +99,10 @@ public:
 	void register_presave(save_prepost_delegate func);
 	void register_postload(save_prepost_delegate func);
 
+	// callback dispatching
+	void dispatch_presave();
+	void dispatch_postload();
+
 	// generic memory registration
 	void save_memory(const char *module, const char *tag, UINT32 index, const char *name, void *val, UINT32 valsize, UINT32 valcount = 1);
 

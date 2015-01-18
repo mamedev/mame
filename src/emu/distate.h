@@ -45,12 +45,11 @@ class device_state_entry
 {
 	friend class device_state_interface;
 	friend class simple_list<device_state_entry>;
-	friend class lua_engine;
 
 private:
 	// construction/destruction
-	device_state_entry(int index, const char *symbol, void *dataptr, UINT8 size);
-	device_state_entry(int index);
+	device_state_entry(int index, const char *symbol, void *dataptr, UINT8 size, device_state_interface *dev);
+	device_state_entry(int index, device_state_interface *dev);
 
 public:
 	// post-construction modifiers
@@ -70,6 +69,7 @@ public:
 	const char *symbol() const { return m_symbol; }
 	bool visible() const { return ((m_flags & DSF_NOSHOW) == 0); }
 	bool divider() const { return m_flags & DSF_DIVIDER; }
+	device_state_interface *parent_state() const {return m_device_state;}
 
 protected:
 	// device state flags
@@ -98,6 +98,7 @@ protected:
 	static const UINT64 k_decimal_divisor[20];      // divisors for outputting decimal values
 
 	// public state description
+	device_state_interface *m_device_state;         // link to parent device state
 	device_state_entry *    m_next;                 // link to next item
 	UINT32                  m_index;                // index by which this item is referred
 	generic_ptr             m_dataptr;              // pointer to where the data lives
