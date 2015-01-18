@@ -1,17 +1,17 @@
 
 #include "options.h"
 #include "osdepend.h"
-
+#include "modules/lib/osdobj_common.h"
 
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
 
-class retro_osd_interface : public osd_interface
+class retro_osd_interface : public osd_common_t
 {
 public:
 	// construction/destruction
-	retro_osd_interface();
+	retro_osd_interface(osd_options &options);
 	virtual ~retro_osd_interface();
 
 	// general overridables
@@ -27,13 +27,8 @@ public:
 //	virtual void customize_input_type_list(input_type_desc *typelist);
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist);
 
-   virtual void list_midi_devices();
-
-   virtual bool midi_init();
-   virtual void midi_exit();
-
 private:
-	void osd_exit();//static void osd_exit(running_machine &machine);
+	virtual void osd_exit();
 };
 
 

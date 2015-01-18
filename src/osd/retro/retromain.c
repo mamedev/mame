@@ -485,7 +485,8 @@ int mmain(int argc, const char *argv)
 
 //    osd_init_midi();
 
-    retro_osd_interface MRosd;
+    osd_options options;
+    retro_osd_interface MRosd(options);
     cli_options MRoptions;
     MRosd.register_options(MRoptions);
     cli_frontend frontend(MRoptions, MRosd);

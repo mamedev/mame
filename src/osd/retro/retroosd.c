@@ -15,7 +15,7 @@
 //  constructor
 //============================================================
 
-retro_osd_interface::retro_osd_interface()
+retro_osd_interface::retro_osd_interface(osd_options &options) : osd_common_t(options)
 {
 }
 
@@ -38,7 +38,7 @@ void retro_osd_interface::osd_exit()
 	if (NULL!=retro)free(retro);
 #endif
 
-	osd_interface::osd_exit();
+	osd_common_t::osd_exit();
 	
 /*
 	global_free(Pad_device[0]);
@@ -76,7 +76,7 @@ void retro_osd_interface::init(running_machine &machine)
     gamRot = (ROT90  == orient) ? 3 : gamRot;
 
     // initialize the subsystems
-	osd_interface::init_subsystems();
+	osd_common_t::init_subsystems();
 
 	//prep_retro_rotation(gamRot);
 	our_target->compute_minimum_size(rtwi, rthe);
@@ -219,17 +219,4 @@ void retro_osd_interface::customize_input_type_list(simple_list<input_type_entry
 	// configuration from disk. Scan the list, and change the
 	// default control mappings you want. It is quite possible
 	// you won't need to change a thing.
-}
- 
-void retro_osd_interface::list_midi_devices()
-{
-}
-
-bool retro_osd_interface::midi_init()
-{
-   return false;
-}
-
-void retro_osd_interface::midi_exit()
-{
 }
