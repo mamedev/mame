@@ -32,7 +32,8 @@ enum pstate_data_type_e {
 	DT_INT16,
 	DT_INT8,
 	DT_INT,
-	DT_BOOLEAN
+	DT_BOOLEAN,
+	DT_FLOAT
 };
 
 template<typename _ItemType> struct nl_datatype
@@ -55,6 +56,7 @@ template<typename _ItemType> struct nl_datatype<_ItemType *>
 
 NETLIST_SAVE_TYPE(char, DT_INT8);
 NETLIST_SAVE_TYPE(double, DT_DOUBLE);
+NETLIST_SAVE_TYPE(float, DT_FLOAT);
 NETLIST_SAVE_TYPE(INT8, DT_INT8);
 NETLIST_SAVE_TYPE(UINT8, DT_INT8);
 NETLIST_SAVE_TYPE(INT64, DT_INT64);

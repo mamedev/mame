@@ -30,17 +30,17 @@
 struct Mono555Desc
 {
 public:
-		double r, c;
+		nl_double r, c;
 
-		Mono555Desc(double res, double cap) : r(res), c(cap) { }
+		Mono555Desc(nl_double res, nl_double cap) : r(res), c(cap) { }
 };
 
 struct SeriesRCDesc
 {
 public:
-		double r, c;
+		nl_double r, c;
 
-		SeriesRCDesc(double res, double cap) : r(res), c(cap) { }
+		SeriesRCDesc(nl_double res, nl_double cap) : r(res), c(cap) { }
 };
 
 #define CHIP_555_Mono(_name,  _pdesc)   \

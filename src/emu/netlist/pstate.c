@@ -23,7 +23,8 @@ ATTR_COLD void pstate_manager_t::save_state_ptr(const pstring &stname, const pst
 			"DT_INT16",
 			"DT_INT8",
 			"DT_INT",
-			"DT_BOOLEAN"
+			"DT_BOOLEAN",
+            "DT_FLOAT"
 	};
 
 	NL_VERBOSE_OUT(("SAVE: <%s> %s(%d) %p\n", fullname.cstr(), ts[dt].cstr(), size, ptr));

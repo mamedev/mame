@@ -49,6 +49,10 @@
 
 #define NETLIST_GMIN_DEFAULT    (1e-9)
 
+//typedef double   nl_double;
+
+#define nl_double double
+
 //============================================================
 //  DEBUGGING
 //============================================================

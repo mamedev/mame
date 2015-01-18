@@ -233,7 +233,7 @@ ATTR_COLD void netlist_matrix_solver_t::reset()
 
 ATTR_COLD void netlist_matrix_solver_t::update()
 {
-	const double new_timestep = solve();
+	const nl_double new_timestep = solve();
 
 	if (m_params.m_dynamic && is_timestep() && new_timestep > 0)
 		m_Q_sync.net().reschedule_in_queue(netlist_time::from_double(new_timestep));
@@ -241,7 +241,7 @@ ATTR_COLD void netlist_matrix_solver_t::update()
 
 ATTR_COLD void netlist_matrix_solver_t::update_forced()
 {
-	ATTR_UNUSED const double new_timestep = solve();
+	ATTR_UNUSED const nl_double new_timestep = solve();
 
 	if (m_params.m_dynamic && is_timestep())
 		m_Q_sync.net().reschedule_in_queue(netlist_time::from_double(m_params.m_min_timestep));
@@ -249,7 +249,7 @@ ATTR_COLD void netlist_matrix_solver_t::update_forced()
 
 ATTR_HOT void netlist_matrix_solver_t::step(const netlist_time delta)
 {
-	const double dd = delta.as_double();
+	const nl_double dd = delta.as_double();
 	for (int k=0; k < m_step_devices.count(); k++)
 		m_step_devices[k]->step_time(dd);
 }
@@ -284,7 +284,7 @@ void netlist_matrix_solver_t::solve_base(C *p)
 	}
 }
 
-ATTR_HOT double netlist_matrix_solver_t::solve()
+ATTR_HOT nl_double netlist_matrix_solver_t::solve()
 {
 	netlist_time now = netlist().time();
 	netlist_time delta = now - m_last_step;
@@ -300,7 +300,7 @@ ATTR_HOT double netlist_matrix_solver_t::solve()
 
 	step(delta);
 
-	const double next_time_step = vsolve();
+	const nl_double next_time_step = vsolve();
 
 	update_inputs();
 	return next_time_step;
@@ -348,7 +348,7 @@ NETLIB_START(solver)
 	register_param("GMIN", m_gmin, NETLIST_GMIN_DEFAULT);
 	register_param("DYNAMIC_TS", m_dynamic, 0);
 	register_param("LTE", m_lte, 5e-5);                     // diff/timestep
-	register_param("MIN_TIMESTEP", m_min_timestep, 1e-6);   // double timestep resolution
+	register_param("MIN_TIMESTEP", m_min_timestep, 1e-6);   // nl_double timestep resolution
 
 	// internal staff
 
@@ -417,7 +417,7 @@ NETLIB_UPDATE(solver)
 		if (m_mat_solvers[i]->is_timestep())
 			{
 				// Ignore return value
-				ATTR_UNUSED const double ts = m_mat_solvers[i]->solve();
+				ATTR_UNUSED const nl_double ts = m_mat_solvers[i]->solve();
 			}
 	}
 #endif

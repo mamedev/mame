@@ -3,7 +3,7 @@
 
 #include "machine/z80dma.h"
 
-#define OLD_SOUND   (1)
+#define OLD_SOUND   (0)
 
 #if !OLD_SOUND
 #include "machine/netlist.h"

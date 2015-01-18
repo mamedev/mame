@@ -170,7 +170,7 @@ ATTR_COLD void netlist_base_t::save_register()
 	netlist_object_t::save_register();
 }
 
-ATTR_HOT const double netlist_base_t::gmin() const
+ATTR_HOT const nl_double netlist_base_t::gmin() const
 {
 	return solver()->gmin();
 }
@@ -452,6 +452,7 @@ ATTR_COLD void netlist_device_t::register_param(const pstring &sname, C &param, 
 }
 
 template ATTR_COLD void netlist_device_t::register_param(const pstring &sname, netlist_param_double_t &param, const double initialVal);
+template ATTR_COLD void netlist_device_t::register_param(const pstring &sname, netlist_param_double_t &param, const float initialVal);
 template ATTR_COLD void netlist_device_t::register_param(const pstring &sname, netlist_param_int_t &param, const int initialVal);
 template ATTR_COLD void netlist_device_t::register_param(const pstring &sname, netlist_param_logic_t &param, const int initialVal);
 template ATTR_COLD void netlist_device_t::register_param(const pstring &sname, netlist_param_str_t &param, const char * const initialVal);
@@ -874,7 +875,7 @@ ATTR_COLD netlist_analog_output_t::netlist_analog_output_t()
 	net().as_analog().m_cur_Analog = 0.98;
 }
 
-ATTR_COLD void netlist_analog_output_t::initial(const double val)
+ATTR_COLD void netlist_analog_output_t::initial(const nl_double val)
 {
 	net().as_analog().m_cur_Analog = val * 0.99;
 }
@@ -931,7 +932,7 @@ ATTR_COLD const pstring netlist_param_model_t::model_type() const
 }
 
 
-ATTR_COLD double netlist_param_model_t::model_value(const pstring &entity, const double defval) const
+ATTR_COLD nl_double netlist_param_model_t::model_value(const pstring &entity, const nl_double defval) const
 {
 	pstring tmp = this->Value();
 	// .model 1N914 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)
@@ -945,7 +946,7 @@ ATTR_COLD double netlist_param_model_t::model_value(const pstring &entity, const
 		if (pequal < 0)
 			netlist().error("parameter %s misformat in model %s temp %s\n", entity.cstr(), Value().cstr(), tmp.cstr());
 		tmp = tmp.substr(pequal+1);
-		double factor = 1.0;
+		nl_double factor = 1.0;
 		switch (*(tmp.right(1).cstr()))
 		{
 			case 'm': factor = 1e-3; break;

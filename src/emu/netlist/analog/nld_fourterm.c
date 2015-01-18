@@ -17,7 +17,7 @@ NETLIB_START(VCCS)
 	m_gfac = 1.0;
 }
 
-void NETLIB_NAME(VCCS)::start_internal(const double def_RI)
+void NETLIB_NAME(VCCS)::start_internal(const nl_double def_RI)
 {
 	register_param("G", m_G, 1.0);
 	register_param("RI", m_RI, def_RI);
@@ -45,8 +45,8 @@ void NETLIB_NAME(VCCS)::start_internal(const double def_RI)
 
 NETLIB_RESET(VCCS)
 {
-	const double m_mult = m_G.Value() * m_gfac; // 1.0 ==> 1V ==> 1A
-	const double GI = 1.0 / m_RI.Value();
+	const nl_double m_mult = m_G.Value() * m_gfac; // 1.0 ==> 1V ==> 1A
+	const nl_double GI = 1.0 / m_RI.Value();
 
 	m_IP.set(GI);
 	m_IN.set(GI);
