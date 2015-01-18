@@ -254,8 +254,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu")
 	{
-		m_spu_hle[0x200] = 0;
-		m_spu_hle[0x202] = 0;
 	}
 
 	required_device<am53cf96_device> m_am53cf96;
@@ -264,7 +262,6 @@ public:
 
 	UINT16 m_spu_ctrl;      // SPU board control register
 	UINT8 m_spu_shared[0x400];  // SPU/PSX shared dual-ported RAM
-	UINT8 m_spu_hle[0x400];
 	UINT32 m_spu_ata_dma;
 	int m_spu_ata_dmarq;
 
@@ -285,6 +282,7 @@ public:
 	DECLARE_WRITE16_MEMBER(twinkle_waveram_w);
 	DECLARE_READ16_MEMBER(shared_68k_r);
 	DECLARE_WRITE16_MEMBER(shared_68k_w);
+	DECLARE_READ16_MEMBER(unk_68k_r);
 	DECLARE_WRITE_LINE_MEMBER(spu_ata_irq);
 	DECLARE_WRITE_LINE_MEMBER(spu_ata_dmarq);
 	required_device<cpu_device> m_maincpu;
@@ -671,100 +669,21 @@ WRITE16_MEMBER(twinkle_state::serial_w)
 
 WRITE8_MEMBER(twinkle_state::shared_psx_w)
 {
-	//printf("shared_psx_w: %04x, %04x, %04x\n", offset, data, mem_mask);
+//	printf("shared_psx_w: %04x, %04x, %04x\n", offset, data, mem_mask);
 
 	m_spu_shared[offset] = data;
 
-	// HLE sound board
-	m_spu_hle[offset] = data;
-
 	if (offset == 0x03fe && data == 0xff)
 	{
-		//printf("spu command %02x %02x\n", m_spu_hle[1], m_spu_hle[3]);
+//		printf("spu command %02x %02x\n", m_spu_shared[1], m_spu_shared[3]);
 
-		for (int i = 0x200; i < 0x300; i++) m_spu_hle[i] = 0xea;
-
-		switch (m_spu_hle[1])
-		{
-		case 0x91: // hdd sum 1
-			m_spu_hle[0x200] = 0; // ?
-			m_spu_hle[0x202] = 0; // ?
-			break;
-
-		case 0x9a: // hdd sum 2
-			m_spu_hle[0x200] = 0; // ?
-			m_spu_hle[0x202] = 0; // ?
-			m_spu_hle[0x203] = 1; // Must be 1 to pass test
-			break;
-
-		case 0xa1: // version
-			m_spu_hle[0x200] = 0; // ?
-			m_spu_hle[0x202] = 0; // ?
-
-			if (strcmp(machine().system().name, "bmiidx") == 0 ||
-				strcmp(machine().system().name, "bmiidxa") == 0 ||
-				strcmp(machine().system().name, "bmiidxc") == 0 ||
-				strcmp(machine().system().name, "bmiidxca") == 0)
-			{
-				strcpy((char *)&m_spu_hle[0x204], "GQ863JA_A");
-			}
-			else if (strcmp(machine().system().name, "bmiidxs") == 0 ||
-				strcmp(machine().system().name, "bmiidxc2") == 0)
-			{
-				strcpy((char *)&m_spu_hle[0x204], "GC983JA_R");
-			}
-			else if (strcmp(machine().system().name, "bmiidx2") == 0)
-			{
-				strcpy((char *)&m_spu_hle[0x204], "GC985JA_A");
-			}
-			else if (strcmp(machine().system().name, "bmiidx3") == 0 ||
-				strcmp(machine().system().name, "bmiidx3a") == 0)
-			{
-				strcpy((char *)&m_spu_hle[0x204], "GC992JA_A");
-			}
-			else if (strcmp(machine().system().name, "bmiidx4") == 0)
-			{
-				strcpy((char *)&m_spu_hle[0x204], "GCA03JA_A");
-			}
-			else if (strcmp(machine().system().name, "bmiidx5") == 0)
-			{
-				strcpy((char *)&m_spu_hle[0x204], "GCA17JA_A");
-			}
-			else if (strcmp(machine().system().name, "bmiidx6") == 0 ||
-				strcmp(machine().system().name, "bmiidx6a") == 0)
-			{
-				strcpy((char *)&m_spu_hle[0x204], "GCB4UJA_A");
-			}
-			else if (strcmp(machine().system().name, "bmiidx7") == 0)
-			{
-				strcpy((char *)&m_spu_hle[0x204], "GCB44JA_A");
-			}
-			else if (strcmp(machine().system().name, "bmiidx8") == 0)
-			{
-				strcpy((char *)&m_spu_hle[0x204], "GCC44JA_A");
-			}
-			break;
-
-		case 0x30: // play sound [3]=sound code
-		case 0x51: // sound off
-		case 0x25: // spu rom error ([3]==0x0f)
-		case 0x26: // spu rom error ([3]==0x0f)
-		case 0x08: // spu rom error
-		case 0x40: // spu rom error ([3]==0x01 coin sound?)
-		case 0x2f: // spu rom error
-		case 0x52: // spu rom error
-		case 0x04: // spu rom error ([3]==?)
-			m_spu_hle[0x200] = 0;
-			m_spu_hle[0x202] = 0;
-			break;
-		}
+		m_audiocpu->set_input_line(M68K_IRQ_4, HOLD_LINE);
 	}
 }
 
 READ8_MEMBER(twinkle_state::shared_psx_r)
 {
-	//UINT32 result = m_spu_shared[offset];
-	UINT32 result = m_spu_hle[offset];
+	UINT32 result = m_spu_shared[offset];
 
 	//printf("shared_psx_r: %04x, %04x, %04x\n", offset, result, mem_mask);
 
@@ -803,11 +722,11 @@ WRITE_LINE_MEMBER(twinkle_state::spu_ata_irq)
 /*
     System control register (Konami always has one)
 
-    bit 7  = write 0 to ack IRQ 1, write 1 to enable (IRQ 1 appears to be vblank)
+    bit 7  = write 0 to ack IRQ 1, write 1 to enable (IRQ 1 appears to be an RF5C400-related timer, or some free-running timing source)
     bit 8  = write 0 to ack IRQ 2, write 1 to enable (IRQ 2 appears to be DMA completion)
-    bit 9  = write 0 to ack IRQ 4, write 1 to enable (IRQ 4 appears to be "command sent", unsure how the MIPS causes it yet however)
-    bit 10 = write 0 to ack IRQ 6, write 1 to enable (IRQ 6 is IDE)
-    bit 11 = watchdog toggle?
+    bit 9  = write 0 to ack IRQ 4, write 1 to enable (IRQ 4 is "command available")
+    bit 10 = write 0 to ack IRQ 6, write 1 to enable (IRQ 6 is the ATA IRQ)
+    bit 11 = watchdog toggle
 
     Other bits unknown.
 */
@@ -836,15 +755,11 @@ WRITE16_MEMBER(twinkle_state::twinkle_spu_ctrl_w)
 WRITE16_MEMBER(twinkle_state::spu_ata_dma_low_w)
 {
 	m_spu_ata_dma = (m_spu_ata_dma & ~0xffff) | data;
-
-	//printf("dma_low %08x\n", m_spu_ata_dma * 2);
 }
 
 WRITE16_MEMBER(twinkle_state::spu_ata_dma_high_w)
 {
 	m_spu_ata_dma = (m_spu_ata_dma & 0xffff) | (data << 16);
-
-	//printf("dma_high %08x\n", m_spu_ata_dma * 2);
 }
 
 WRITE_LINE_MEMBER(twinkle_state::spu_ata_dmarq)
@@ -864,7 +779,14 @@ WRITE_LINE_MEMBER(twinkle_state::spu_ata_dmarq)
 				//waveram[m_spu_ata_dma++] = (data >> 8) | (data << 8);
 				// bp 4a0e ;bmiidx4 checksum
 				// bp 4d62 ;bmiidx4 dma
-				m_waveram[m_spu_ata_dma++] = data;
+
+				// $$$HACK - game DMAs nothing useful to 0x400000 but all sound plays are 0x400000 or above
+				//           so limit sound RAM to 4MB (there's 6 MB on the board) and let the 5c400's address masking
+				//           work for us until we figure out what's actually going on.
+				if (m_spu_ata_dma < 0x200000)
+				{
+					m_waveram[m_spu_ata_dma++] = data; 
+				}
 			}
 
 			m_ata->write_dmack(CLEAR_LINE);
@@ -886,21 +808,27 @@ READ16_MEMBER(twinkle_state::shared_68k_r)
 {
 	UINT16 result = m_spu_shared[offset];
 
-	//printf("shared_68k_r: %04x, %04x, %04x\n", offset, result, mem_mask);
+//	printf("shared_68k_r: %04x, %04x, %04x\n", offset, result, mem_mask);
 
 	return result;
 }
 
 WRITE16_MEMBER(twinkle_state::shared_68k_w)
 {
-	//printf("shared_68k_w: %04x, %04x, %04x\n", offset, data, mem_mask);
+//	printf("shared_68k_w: %04x, %04x, %04x\n", offset, data, mem_mask);
 
 	m_spu_shared[offset] = data & 0xff;
+}
+
+READ16_MEMBER(twinkle_state::unk_68k_r)
+{
+	return 0xffff;	// must return 0xff for 68000 POST to complete properly
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, twinkle_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM
+	AM_RANGE(0x200000, 0x200001) AM_READ(unk_68k_r)
 	// 220000 = LEDs?
 	AM_RANGE(0x230000, 0x230003) AM_WRITE(twinkle_spu_ctrl_w)
 	AM_RANGE(0x240000, 0x240003) AM_WRITE(spu_ata_dma_low_w)
@@ -909,8 +837,10 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, twinkle_state )
 	AM_RANGE(0x280000, 0x280fff) AM_READWRITE(shared_68k_r, shared_68k_w)
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("ata", ata_interface_device, read_cs0, write_cs0)
 	// 34000E = ???
+	AM_RANGE(0x34000e, 0x34000f) AM_WRITENOP
 	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE("rfsnd", rf5c400_device, rf5c400_r, rf5c400_w)
-	AM_RANGE(0x800000, 0xffffff) AM_READWRITE(twinkle_waveram_r, twinkle_waveram_w )    // 8 MB window wave RAM
+	AM_RANGE(0x800000, 0xbfffff) AM_READWRITE(twinkle_waveram_r, twinkle_waveram_w )
+	AM_RANGE(0xfe0000, 0xffffff) AM_RAM	// ...and the RAM test checks this last 128k (mirror of the work RAM at 0x100000?)
 ADDRESS_MAP_END
 
 /* SCSI */
@@ -1011,6 +941,8 @@ static MACHINE_CONFIG_START( twinkle, twinkle_state )
 
 	MCFG_CPU_ADD("audiocpu", M68000, 32000000/2)    /* 16.000 MHz */
 	MCFG_CPU_PROGRAM_MAP( sound_map )
+	MCFG_CPU_PERIODIC_INT_DRIVER(twinkle_state, irq1_line_assert, 60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(twinkle_state, irq2_line_assert, 60)
 
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1200)) /* check TD pin on LTC1232 */
 
@@ -1149,7 +1081,7 @@ INPUT_PORTS_END
 	ROM_REGION32_LE( 0x080000, "audiocpu", 0 )\
 	ROM_LOAD16_WORD_SWAP( "863a05.2x",    0x000000, 0x080000, CRC(6f42a09e) SHA1(cab5209f90f47b9ee6e721479913ad74e3ba84b1) )\
 \
-	ROM_REGION16_LE(0x1800000, "rfsnd", ROMREGION_ERASE00)
+	ROM_REGION16_LE(0x400000, "rfsnd", ROMREGION_ERASE00)
 
 ROM_START( gq863 )
 	TWINKLE_BIOS
