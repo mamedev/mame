@@ -429,6 +429,7 @@ void tms1xxx_cpu_device::device_start()
 	m_sr = 0;
 	m_pa = 0;
 	m_pb = 0;
+	m_ps = 0;
 	m_a = 0;
 	m_x = 0;
 	m_y = 0;
@@ -466,6 +467,7 @@ void tms1xxx_cpu_device::device_start()
 	save_item(NAME(m_sr));
 	save_item(NAME(m_pa));
 	save_item(NAME(m_pb));
+	save_item(NAME(m_ps));
 	save_item(NAME(m_a));
 	save_item(NAME(m_x));
 	save_item(NAME(m_y));
@@ -636,7 +638,7 @@ void tms1400_cpu_device::device_reset()
 	tms1100_cpu_device::device_reset();
 
 	// small differences in 00-3f area
-	m_fixed_decode[0x09] = F_COMX; // !
+	m_fixed_decode[0x09] = F_COMX;
 	m_fixed_decode[0x0b] = F_TPC;
 }
 
@@ -958,49 +960,50 @@ void tms0980_cpu_device::set_cki_bus()
 //-------------------------------------------------
 
 // handle branches:
+
+// TMS1000/common
 // note: add(latch) and bl(branch latch) are specific to 0980 series,
 // c(chapter) bits are specific to 1100(and 1400) series
-
-// TMS1000/common:
 
 void tms1xxx_cpu_device::op_br()
 {
 	// BR/BL: conditional branch
-	if (!m_status)
-		return;
-
-	if (!m_clatch)
-		m_pa = m_pb;
-	m_ca = m_cb;
-	m_pc = m_opcode & m_pc_mask;
+	if (m_status)
+	{
+		if (m_clatch == 0)
+			m_pa = m_pb;
+		m_ca = m_cb;
+		m_pc = m_opcode & m_pc_mask;
+	}
 }
 
 void tms1xxx_cpu_device::op_call()
 {
 	// CALL/CALLL: conditional call
-	if (!m_status)
-		return;
-
-	UINT8 prev_pa = m_pa;
-	if (!m_clatch)
+	if (m_status)
 	{
-		m_sr = m_pc;
-		m_clatch = 1;
-		m_pa = m_pb;
-		m_cs = m_ca;
+		UINT8 prev_pa = m_pa;
+
+		if (m_clatch == 0)
+		{
+			m_clatch = 1;
+			m_sr = m_pc;
+			m_pa = m_pb;
+			m_cs = m_ca;
+		}
+		m_ca = m_cb;
+		m_pb = prev_pa;
+		m_pc = m_opcode & m_pc_mask;
 	}
-	m_ca = m_cb;
-	m_pb = prev_pa;
-	m_pc = m_opcode & m_pc_mask;
 }
 
 void tms1xxx_cpu_device::op_retn()
 {
 	// RETN: return from subroutine
-	if (m_clatch)
+	if (m_clatch == 1)
 	{
-		m_pc = m_sr;
 		m_clatch = 0;
+		m_pc = m_sr;
 		m_ca = m_cs;
 	}
 	m_add = 0;
@@ -1014,31 +1017,60 @@ void tms1xxx_cpu_device::op_retn()
 void tms1400_cpu_device::op_br()
 {
 	// BR/BL: conditional branch
-	if (!m_status)
-		return;
-	
-	//..
+	if (m_status)
+	{
+		m_pa = m_pb; // don't care about clatch
+		m_ca = m_cb;
+		m_pc = m_opcode & m_pc_mask;
+	}
 }
 
 void tms1400_cpu_device::op_call()
 {
 	// CALL/CALLL: conditional call
-	if (!m_status)
-		return;
+	if (m_status)
+	{
+		// 3-level stack, mask clatch 3 bits (no need to mask others)
+		m_clatch = (m_clatch << 1 | 1) & 7;
 
-	//..
+		m_sr = m_sr << m_pc_bits | m_pc;
+		m_pc = m_opcode & m_pc_mask;
+
+		m_ps = m_ps << 4 | m_pa;
+		m_pa = m_pb;
+		
+		m_cs = m_cs << 2 | m_ca;
+		m_ca = m_cb;
+	}
+	else
+	{
+		m_pb = m_pa;
+		m_cb = m_ca;
+	}
 }
 
 void tms1400_cpu_device::op_retn()
 {
 	// RETN: return from subroutine
-	//..
+	if (m_clatch & 1)
+	{
+		m_clatch >>= 1;
+
+		m_pc = m_sr & m_pc_mask;
+		m_sr >>= m_pc_bits;
+		
+		m_pa = m_pb = m_ps & 0xf;
+		m_ps >>= 4;
+		
+		m_ca = m_cb = m_cs & 3;
+		m_cs >>= 2;
+	}
 }
 
 
 // handle other:
 
-// TMS1000/common:
+// TMS1000/common
 
 void tms1xxx_cpu_device::op_sbit()
 {
@@ -1158,6 +1190,7 @@ void tms0970_cpu_device::op_tdo()
 
 
 // TMS0980-specific (and possibly child classes)
+
 void tms0980_cpu_device::op_comx()
 {
 	// COMX: complement X register, but not the MSB
@@ -1203,6 +1236,7 @@ void tms1xxx_cpu_device::op_sbl()
 
 
 // TMS0270-specific
+
 void tms0270_cpu_device::op_setr()
 {
 	// same as default, but handle write to output in dynamic_output
