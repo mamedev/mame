@@ -297,7 +297,7 @@ MACHINE_CONFIG_END
 
 ROM_START( elecdet )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "tms0980nll_mp6100a", 0x0000, 0x1000, CRC(8160a081) SHA1(14cbfc0529ad83a58e0dc15fe8ba594947e49f08) )
+	ROM_LOAD( "tms0980nll_mp6100a", 0x0000, 0x1000, CRC(6f396bb8) SHA1(1f104d4ca9bee0d4572be4779b7551dfe20c4f04) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
