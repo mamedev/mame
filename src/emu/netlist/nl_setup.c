@@ -41,7 +41,7 @@ netlist_setup_t::netlist_setup_t(netlist_base_t &netlist)
 
 void netlist_setup_t::init()
 {
-	m_factory.initialize();
+	nl_initialize_factory(factory());
 	NETLIST_NAME(base)(*this);
 }
 
@@ -390,7 +390,7 @@ nld_base_d_to_a_proxy *netlist_setup_t::get_d_a_proxy(netlist_output_t &out)
 	if (proxy == NULL)
 	{
 		// create a new one ...
-		proxy = new nld_d_to_a_proxy(out);
+		proxy = nl_alloc(nld_d_to_a_proxy ,out);
 		pstring x = pstring::sprintf("proxy_da_%s_%d", out.name().cstr(), m_proxy_cnt);
 		m_proxy_cnt++;
 
@@ -419,7 +419,7 @@ void netlist_setup_t::connect_input_output(netlist_input_t &in, netlist_output_t
 {
 	if (out.isFamily(netlist_terminal_t::ANALOG) && in.isFamily(netlist_terminal_t::LOGIC))
 	{
-		nld_a_to_d_proxy *proxy = new nld_a_to_d_proxy(in);
+		nld_a_to_d_proxy *proxy = nl_alloc(nld_a_to_d_proxy, in);
 		pstring x = pstring::sprintf("proxy_ad_%s_%d", in.name().cstr(), m_proxy_cnt);
 		m_proxy_cnt++;
 
@@ -455,7 +455,7 @@ void netlist_setup_t::connect_terminal_input(netlist_terminal_t &term, netlist_i
 	else if (inp.isFamily(netlist_terminal_t::LOGIC))
 	{
 		NL_VERBOSE_OUT(("connect_terminal_input: connecting proxy\n"));
-		nld_a_to_d_proxy *proxy = new nld_a_to_d_proxy(inp);
+		nld_a_to_d_proxy *proxy = nl_alloc(nld_a_to_d_proxy, inp);
 		pstring x = pstring::sprintf("proxy_ad_%s_%d", inp.name().cstr(), m_proxy_cnt);
 		m_proxy_cnt++;
 
@@ -523,7 +523,7 @@ void netlist_setup_t::connect_terminals(netlist_core_terminal_t &t1, netlist_cor
 	else
 	{
 		NL_VERBOSE_OUT(("adding net ...\n"));
-		netlist_analog_net_t *anet =  new netlist_analog_net_t();
+		netlist_analog_net_t *anet =  nl_alloc(netlist_analog_net_t);
 		t1.set_net(*anet);
 		//m_netlist.solver()->m_nets.add(anet);
 		// FIXME: Nets should have a unique name

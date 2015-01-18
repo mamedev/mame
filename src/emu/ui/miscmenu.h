@@ -44,14 +44,6 @@ private:
 	attotime prevtime;
 };
 
-class ui_menu_game_info : public ui_menu {
-public:
-	ui_menu_game_info(running_machine &machine, render_container *container);
-	virtual ~ui_menu_game_info();
-	virtual void populate();
-	virtual void handle();
-};
-
 class ui_menu_cheat : public ui_menu {
 public:
 	ui_menu_cheat(running_machine &machine, render_container *container);

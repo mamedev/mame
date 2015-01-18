@@ -19,7 +19,6 @@
 #include "rendutil.h"
 
 #include "uiinput.h"
-#include "ui/ui.h"
 #include "ui/miscmenu.h"
 #include "ui/filemngr.h"
 
@@ -303,31 +302,6 @@ void ui_menu_bookkeeping::populate()
 	item_append(tempstring, NULL, MENU_FLAG_MULTILINE, NULL);
 }
 
-
-/*-------------------------------------------------
-    menu_game_info - handle the game information
-    menu
--------------------------------------------------*/
-
-ui_menu_game_info::ui_menu_game_info(running_machine &machine, render_container *container) : ui_menu(machine, container)
-{
-}
-
-void ui_menu_game_info::populate()
-{
-	astring tempstring;
-	item_append(machine().ui().game_info_astring(tempstring), NULL, MENU_FLAG_MULTILINE, NULL);
-}
-
-void ui_menu_game_info::handle()
-{
-	/* process the menu */
-	process(0);
-}
-
-ui_menu_game_info::~ui_menu_game_info()
-{
-}
 
 /*-------------------------------------------------
     menu_cheat - handle the cheat menu

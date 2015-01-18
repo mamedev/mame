@@ -109,6 +109,10 @@
 // this macro passes an item followed by a string version of itself as two consecutive parameters
 #define NLNAME(x) x, #x
 
+//============================================================
+//  Exceptions
+//============================================================
+
 // emu_fatalerror is a generic fatal exception that provides an error string
 class nl_fatalerror : public std::exception
 {
@@ -129,6 +133,21 @@ public:
         osd_printf_error("%s\n", text);
     }
 };
+
+//============================================================
+//  Memory allocation
+//============================================================
+
+#define nl_alloc(T, ...)        global_alloc(T(__VA_ARGS__))
+#define nl_alloc_array(T, N)    global_alloc_array(T, N)
+
+#define nl_free(_ptr)           global_free(_ptr)
+#define nl_free_array(_ptr)     global_free_array(_ptr)
+
+
+//============================================================
+//  Asserts
+//============================================================
 
 #ifdef MAME_DEBUG
 #define nl_assert(x)               do { if (!(x)) throw nl_fatalerror("assert: %s:%d: %s", __FILE__, __LINE__, #x); } while (0)

@@ -129,7 +129,7 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 			if (env_phase == PHASE_NONE) break;
 
-			tmp = rom[pos>>16];
+			tmp = rom[(pos>>16) & m_rommask];
 			switch ( type )
 			{
 				case TYPE_16:
@@ -331,6 +331,8 @@ void rf5c400_device::rf5c400_init_chip()
 	}
 
 	m_stream = stream_alloc(0, 2, clock()/384);
+
+	m_rommask = m_rom.length() - 1;
 }
 
 

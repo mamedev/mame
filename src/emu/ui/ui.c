@@ -20,6 +20,7 @@
 #include "uiinput.h"
 #include "ui/mainmenu.h"
 #include "ui/miscmenu.h"
+#include "ui/filemngr.h"
 #include "ui/viewgfx.h"
 #include "imagedev/cassette.h"
 #include <ctype.h>
@@ -311,7 +312,7 @@ extern bool hide_warnings;
 
 void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
 {
-	const int maxstate = 3;
+	const int maxstate = 4;
 	int str = machine().options().seconds_to_run();
 	bool show_gameinfo = !machine().options().skip_gameinfo();
 	bool show_warnings = true;
@@ -363,6 +364,15 @@ void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
 			case 2:
 				if (show_gameinfo && game_info_astring(messagebox_text).len() > 0)
 					set_handler(handler_messagebox_anykey, 0);
+				break;
+
+			case 3:
+				if (image_mandatory_scan(machine(), messagebox_text).len() > 0)
+				{
+					astring warning;
+					warning.cpy("This driver requires images to be loaded in the following device(s): ").cat(messagebox_text.substr(0, messagebox_text.len() - 2));
+					ui_menu_file_manager::force_file_manager(machine(), &machine().render().ui_container(), warning.cstr());
+				}
 				break;
 		}
 

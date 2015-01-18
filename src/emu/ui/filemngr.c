@@ -20,6 +20,7 @@
 #include "ui/swlist.h"
 #include "ui/filemngr.h"
 #include "ui/filesel.h"
+#include "ui/miscmenu.h"
 
 
 /***************************************************************************
@@ -30,8 +31,14 @@
 //  ctor
 //-------------------------------------------------
 
-ui_menu_file_manager::ui_menu_file_manager(running_machine &machine, render_container *container) : ui_menu(machine, container)
+ui_menu_file_manager::ui_menu_file_manager(running_machine &machine, render_container *container, const char *warnings) : ui_menu(machine, container)
 {
+	// This warning string is used when accessing from the force_file_manager call, i.e.
+	// when the file manager is loaded top front in the case of mandatory image devices
+	if (warnings)
+		m_warnings.cpy(warnings);
+	else
+		m_warnings.reset();
 }
 
 
@@ -101,6 +108,12 @@ void ui_menu_file_manager::populate()
 	bool first_entry = true;
 	astring prev_owner;
 
+	if (m_warnings)
+	{
+		item_append(m_warnings, NULL, MENU_FLAG_DISABLE, NULL);
+		item_append("", NULL, MENU_FLAG_DISABLE, NULL);
+	}
+		
 	// cycle through all devices for this system
 	device_iterator iter(machine().root_device());
 	tagmap_t<UINT8> devtags;
@@ -171,4 +184,23 @@ void ui_menu_file_manager::handle()
 			}
 		}
 	}
+}
+
+// force file manager menu
+void ui_menu_file_manager::force_file_manager(running_machine &machine, render_container *container, const char *warnings)
+{	
+	// reset the menu stack
+	ui_menu::stack_reset(machine);
+	
+	// add the quit entry followed by the game select entry
+	ui_menu *quit = auto_alloc_clear(machine, ui_menu_quit_game(machine, container));
+	quit->set_special_main_menu(true);
+	ui_menu::stack_push(quit);
+	ui_menu::stack_push(auto_alloc_clear(machine, ui_menu_file_manager(machine, container, warnings)));
+	
+	// force the menus on
+	machine.ui().show_menu();
+	
+	// make sure MAME is paused
+	machine.pause();
 }

@@ -28,8 +28,8 @@ static const struct game_keys keys_table[] =
 {
 	// name             key              gameid #         year
 // M2
-	{ "wldkicks",        0x00ae2901 }, // 25209801    2000
-	{ "toukon4",         0x012e2901 }, // 25349801    2000
+	{ "wldkicks",        0x052e2901 }, // 25209801    2000
+	{ "toukon4",         0x052e2901 }, // 25349801    2000
 	{ "ninjaslt",        0x000ca510 }, // 25469801    2000
 	{ "ninjaslt4",       0x000ca510 }, // 25469801    2000
 	{ "gunsur2e",        0x000680d0 }, // 25709801    2001
@@ -68,7 +68,7 @@ static const struct game_keys keys_table[] =
 	{ "alienfnt",        0x00174343 }, // 840-0048    2001
 	{ "alienfnta",       0x00174343 }, // 840-0048    2001
 	{ "crackdj2",        0x00428247 }, // 840-0068    2001
-	{ "vf4cart",         0x02ef2f96 }, // 840-0080    2002
+	{ "vf4cart",         0x06ef2f92 }, // 840-0080    2002
 	{ "pstone",          0x000e69c1 }, // 841-0001    1999
 	{ "suchie3",         0x000368e1 }, // 841-0002    1999
 	{ "doa2",            0x0008ad01 }, // 841-0003    1999

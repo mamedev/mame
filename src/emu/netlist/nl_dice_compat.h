@@ -13,7 +13,7 @@
  * -------------------------------------------------------------------- */
 
 //#define CHIP(_n, _t) netlist.register_dev(NET_NEW(_t ## _dip), _n);
-#define CHIP(_n, _t) setup.register_dev( new nld_ ## _t ## _dip(), _n);
+#define CHIP(_n, _t) setup.register_dev( nl_alloc(nld_ ## _t ## _dip), _n);
 
 #define CONNECTION( ... ) CONNECTIONY( CONNECTIONX( __VA_ARGS__ ) )
 #define CONNECTIONY(_a) _a

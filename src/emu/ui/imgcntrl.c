@@ -217,7 +217,6 @@ void ui_menu_control_device_image::handle()
 		{
 			swp = swi->first_part();
 			load_software_part();
-			ui_menu::stack_pop(machine());
 		}
 		break;
 
@@ -225,7 +224,6 @@ void ui_menu_control_device_image::handle()
 		switch(submenu_result) {
 		case ui_menu_software_parts::T_ENTRY: {
 			load_software_part();
-			ui_menu::stack_pop(machine());
 			break;
 		}
 
