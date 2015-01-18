@@ -98,15 +98,15 @@ public:
 
 	NETLIB_UPDATE_TERMINALS()
 	{
-		const double m = (is_qtype( BJT_NPN) ? 1 : -1);
+		const nl_double m = (is_qtype( BJT_NPN) ? 1 : -1);
 
 		const int new_state = (m_RB.deltaV() * m > m_V ) ? 1 : 0;
 		if (m_state_on ^ new_state)
 		{
 #if 0
-			double gb = m_gB;
-			double gc = m_gC;
-			double v  = m_V * m;
+			nl_double gb = m_gB;
+			nl_double gc = m_gC;
+			nl_double v  = m_V * m;
 			if (!new_state )
 			{
 				// not conducting
@@ -115,9 +115,9 @@ public:
 				gc = netlist().gmin();
 			}
 #else
-			const double gb = new_state ? m_gB : netlist().gmin();
-			const double gc = new_state ? m_gC : netlist().gmin();
-			const double v  = new_state ? m_V * m : 0;
+			const nl_double gb = new_state ? m_gB : netlist().gmin();
+			const nl_double gc = new_state ? m_gC : netlist().gmin();
+			const nl_double v  = new_state ? m_V * m : 0;
 #endif
 			m_RB.set(gb, v,   0.0);
 			m_RC.set(gc, 0.0, 0.0);
@@ -142,9 +142,9 @@ protected:
 	ATTR_COLD virtual void start();
 	ATTR_HOT void update_param();
 
-	double m_gB; // base conductance / switch on
-	double m_gC; // collector conductance / switch on
-	double m_V; // internal voltage source
+	nl_double m_gB; // base conductance / switch on
+	nl_double m_gC; // collector conductance / switch on
+	nl_double m_V; // internal voltage source
 	UINT8 m_state_on;
 
 private:
@@ -169,19 +169,19 @@ public:
 
 	NETLIB_UPDATE_TERMINALS()
 	{
-		const double polarity = (qtype() == BJT_NPN ? 1.0 : -1.0);
+		const nl_double polarity = (qtype() == BJT_NPN ? 1.0 : -1.0);
 
 		m_gD_BE.update_diode(-m_D_EB.deltaV() * polarity);
 		m_gD_BC.update_diode(-m_D_CB.deltaV() * polarity);
 
-		const double gee = m_gD_BE.G();
-		const double gcc = m_gD_BC.G();
-		const double gec =  m_alpha_r * gcc;
-		const double gce =  m_alpha_f * gee;
-		const double sIe = -m_gD_BE.I() + m_alpha_r * m_gD_BC.I();
-		const double sIc = m_alpha_f * m_gD_BE.I() - m_gD_BC.I();
-		const double Ie = (sIe + gee * m_gD_BE.Vd() - gec * m_gD_BC.Vd()) * polarity;
-		const double Ic = (sIc - gce * m_gD_BE.Vd() + gcc * m_gD_BC.Vd()) * polarity;
+		const nl_double gee = m_gD_BE.G();
+		const nl_double gcc = m_gD_BC.G();
+		const nl_double gec =  m_alpha_r * gcc;
+		const nl_double gce =  m_alpha_f * gee;
+		const nl_double sIe = -m_gD_BE.I() + m_alpha_r * m_gD_BC.I();
+		const nl_double sIc = m_alpha_f * m_gD_BE.I() - m_gD_BC.I();
+		const nl_double Ie = (sIe + gee * m_gD_BE.Vd() - gec * m_gD_BC.Vd()) * polarity;
+		const nl_double Ic = (sIc - gce * m_gD_BE.Vd() + gcc * m_gD_BC.Vd()) * polarity;
 
 		m_D_EB.set_mat(gee, gec - gee, gce - gee, gee - gec, Ie, -Ie);
 		m_D_CB.set_mat(gcc, gce - gcc, gec - gcc, gcc - gce, Ic, -Ic);
@@ -202,8 +202,8 @@ protected:
 	nld_twoterm m_D_EB;  // gee, gec - gee, gce - gee, gee - gec | Ie
 	nld_twoterm m_D_EC;  // 0, -gec, -gcc, 0 | 0
 
-	double m_alpha_f;
-	double m_alpha_r;
+	nl_double m_alpha_f;
+	nl_double m_alpha_r;
 
 private:
 };

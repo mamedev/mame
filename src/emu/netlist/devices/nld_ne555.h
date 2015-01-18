@@ -39,7 +39,7 @@ NETLIB_DEVICE(NE555,
 
 	netlist_state_t<bool> m_last_out;
 
-	inline double clamp(const double v, const double a, const double b);
+	inline nl_double clamp(const nl_double v, const nl_double a, const nl_double b);
 
 );
 

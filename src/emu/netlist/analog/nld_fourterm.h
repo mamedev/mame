@@ -59,7 +59,7 @@ protected:
 	ATTR_COLD virtual void update_param();
 	ATTR_HOT ATTR_ALIGN void update();
 
-	ATTR_COLD void start_internal(const double def_RI);
+	ATTR_COLD void start_internal(const nl_double def_RI);
 
 	netlist_terminal_t m_OP;
 	netlist_terminal_t m_ON;
@@ -73,7 +73,7 @@ protected:
 	netlist_param_double_t m_G;
 	netlist_param_double_t m_RI;
 
-	double m_gfac;
+	nl_double m_gfac;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -115,7 +115,7 @@ protected:
 	ATTR_COLD virtual void update_param();
 	ATTR_HOT ATTR_ALIGN void update();
 
-	double m_gfac;
+	nl_double m_gfac;
 };
 
 

@@ -69,7 +69,7 @@ NETLIB_UPDATE(74123)
 
 	if (m_state == 1)
 	{
-		const double vLow = m_KP * TERMANALOG(m_RP.m_P);
+		const nl_double vLow = m_KP * TERMANALOG(m_RP.m_P);
 		if (INPANALOG(m_CV) < vLow)
 		{
 			m_RN.set_R(R_OFF);
@@ -78,7 +78,7 @@ NETLIB_UPDATE(74123)
 	}
 	else if (m_state == 2)
 	{
-		const double vHigh = TERMANALOG(m_RP.m_P) * (1.0 - m_KP);
+		const nl_double vHigh = TERMANALOG(m_RP.m_P) * (1.0 - m_KP);
 		if (INPANALOG(m_CV) > vHigh)
 		{
 			m_RP.set_R(R_OFF);

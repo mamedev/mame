@@ -3,14 +3,13 @@
 /*
  * nlsetup.h
  *
- *  Created on: 3 Nov 2013
- *      Author: andre
  */
 
 #ifndef NLSETUP_H_
 #define NLSETUP_H_
 
 #include "nl_base.h"
+//#include "nl_factory.h"
 
 //============================================================
 //  MACROS / inline netlist definitions
@@ -24,10 +23,10 @@
 #define ALIAS(_alias, _name)                                                        \
 	setup.register_alias(# _alias, # _name);
 
-#define NET_NEW(_type)  setup.factory().new_device_by_classname(NETLIB_NAME_STR(_type), setup)
+//#define NET_NEW(_type)  setup.factory().new_device_by_classname(NETLIB_NAME_STR(_type), setup)
 
 #define NET_REGISTER_DEV(_type, _name)                                              \
-		setup.register_dev(NET_NEW(_type), # _name);
+		setup.register_dev(NETLIB_NAME_STR(_type), # _name);
 
 #define NET_REMOVE_DEV(_name)                                                       \
 		setup.remove_dev(# _name);
@@ -66,14 +65,11 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &setup)                      
 		setup.namespace_pop();
 
 // ----------------------------------------------------------------------------------------
-// FIXME: Clean this up
-// ----------------------------------------------------------------------------------------
-
-//class NETLIB_NAME(analog_callback);
-
-// ----------------------------------------------------------------------------------------
 // netlist_setup_t
 // ----------------------------------------------------------------------------------------
+
+// Forward definition so we keep nl_factory.h out of the public
+class netlist_factory_t;
 
 class netlist_setup_t
 {
@@ -117,12 +113,11 @@ public:
 
 	netlist_base_t &netlist() { return m_netlist; }
 	const netlist_base_t &netlist() const { return m_netlist; }
-	netlist_factory_t &factory() { return m_factory; }
-	const netlist_factory_t &factory() const { return m_factory; }
 
 	pstring build_fqn(const pstring &obj_name) const;
 
 	netlist_device_t *register_dev(netlist_device_t *dev, const pstring &name);
+	netlist_device_t *register_dev(const pstring &classname, const pstring &name);
 	void remove_dev(const pstring &name);
 
 	void register_model(const pstring &model);
@@ -151,10 +146,13 @@ public:
 	void namespace_push(const pstring &aname);
 	void namespace_pop();
 
-	/* not ideal, but needed for save_state */
-	tagmap_terminal_t  m_terminals;
+    netlist_factory_t &factory() { return *m_factory; }
+    const netlist_factory_t &factory() const { return *m_factory; }
 
-	void print_stats() const;
+    /* not ideal, but needed for save_state */
+    tagmap_terminal_t  m_terminals;
+
+    void print_stats() const;
 
 protected:
 
@@ -167,7 +165,7 @@ private:
 	tagmap_link_t   m_links;
 	tagmap_nstring_t m_params_temp;
 
-	netlist_factory_t m_factory;
+	netlist_factory_t *m_factory;
 
 	plinearlist_t<pstring> m_models;
 

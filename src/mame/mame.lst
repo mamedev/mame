@@ -2678,6 +2678,7 @@ snowbrosj       // MIN16-02 (c) 1990 Toaplan
 snowbrosd       // MIN16-02 (c) 1990 Toaplan + Dooyong license
 wintbob         // bootleg
 snowbroswb      //
+toto			//
 // modified snowbros 'clone' hardware
 honeydol        // (c) 1995 Barko Corp
 twinadv         // (c) 1995 Barko Corp
@@ -5446,7 +5447,6 @@ puyofev         // 2003.11 Puyo Puyo Fever
 starhrsp        // 2003.12.01 Star Horse Progress (satellite) (Rev A)
 puyofevp        // 2003.?? Puyo Puyo Fever (prototype)
 				// 2003.?? Dragon Treasure
-				// 2003.?? Rabbit 2
 cfield          // 2004.06 Chaos Field
 tetkiwam        // 2004.06 Tetris Kiwamemichi (Arcade TV Game List - P.88, Right, 11 from bottom)
 trizeal         // 2004.09 Trizeal
@@ -5513,13 +5513,13 @@ starhrpr        // 2009.07.27 Star Horse Progress Returns (satellite)
 
 // NAOMI 2
 naomi2          // 2001.?? Naomi 2 BIOS
-vstrik3         // 2001.04.06 Virtua Striker 3 Ver. 2002
+vstrik3c        // 2001.04 Virtua Striker 3 (cartridge)
 vstrik3cb       // 2001.04 Virtua Striker 3 (Rev B) (cartridge)
-vstrik3c        // 2001.04 Virtua Striker 3 (Rev C) (cartridge)
+vstrik3         // 2001.04.06 Virtua Striker 3 Ver. 2002
 wldrider        // 2001.05 Wild Riders
 clubkrte        // 2001.06 Club Kart: European Session
-clubkrtd        // 2001.06 Club Kart: European Session (Rev D)
 clubkrtc        // 2001.?? Club Kart: European Session (Rev C)
+clubkrtd        // 2001.06 Club Kart: European Session (Rev D)
 beachspi        // 2001.07 Beach Spikers
 vf4cart         // 2001.08.02 Virtua Fighter 4 (cartridge)
 vf4             // 2001.08.02 Virtua Fighter 4 (GD-ROM)

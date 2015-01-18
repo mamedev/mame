@@ -124,7 +124,7 @@ EMUOBJS = \
 	$(EMUOBJ)/ui/filemngr.o \
 	$(EMUOBJ)/ui/filesel.o \
 	$(EMUOBJ)/ui/imgcntrl.o \
-	$(EMUOBJ)/ui/imginfo.o \
+	$(EMUOBJ)/ui/info.o \
 	$(EMUOBJ)/ui/inputmap.o \
 	$(EMUOBJ)/ui/selgame.o \
 	$(EMUOBJ)/ui/slotopt.o \

@@ -48,6 +48,7 @@
 #include "netlist.h"
 #include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"
+#include "netlist/nl_factory.h"
 #include "netlist/devices/net_lib.h"
 #include "debugger.h"
 
@@ -134,9 +135,8 @@ void netlist_mame_analog_output_t::custom_netlist_additions(netlist_setup_t &set
 	pstring dname = "OUT_" + m_in;
 	m_delegate.bind_relative_to(owner()->machine().root_device());
 	NETLIB_NAME(analog_callback) *dev = downcast<NETLIB_NAME(analog_callback) *>(
-			setup.factory().new_device_by_classname("nld_analog_callback", setup));
+			setup.register_dev("nld_analog_callback", dname));
 
-	setup.register_dev(dev, dname);
 	dev->register_callback(m_delegate);
 	setup.register_link(dname + ".IN", m_in);
 }
@@ -208,10 +208,7 @@ void netlist_mame_stream_input_t::custom_netlist_additions(netlist_setup_t &setu
 {
 	NETLIB_NAME(sound_in) *snd_in = setup.netlist().get_first_device<NETLIB_NAME(sound_in)>();
 	if (snd_in == NULL)
-	{
-		snd_in = dynamic_cast<NETLIB_NAME(sound_in) *>(setup.factory().new_device_by_classname("nld_sound_in", setup));
-		setup.register_dev(snd_in, "STREAM_INPUT");
-	}
+		snd_in = dynamic_cast<NETLIB_NAME(sound_in) *>(setup.register_dev("nld_sound_in", "STREAM_INPUT"));
 
 	pstring sparam = pstring::sprintf("STREAM_INPUT.CHAN%d", m_channel);
 	setup.register_param(sparam, m_param_name);
@@ -247,11 +244,11 @@ void netlist_mame_stream_output_t::device_start()
 
 void netlist_mame_stream_output_t::custom_netlist_additions(netlist_setup_t &setup)
 {
-	NETLIB_NAME(sound_out) *snd_out;
+	//NETLIB_NAME(sound_out) *snd_out;
 	pstring sname = pstring::sprintf("STREAM_OUT_%d", m_channel);
 
-	snd_out = dynamic_cast<NETLIB_NAME(sound_out) *>(setup.factory().new_device_by_classname("nld_sound_out", setup));
-	setup.register_dev(snd_out, sname);
+	//snd_out = dynamic_cast<NETLIB_NAME(sound_out) *>(setup.register_dev("nld_sound_out", sname));
+	setup.register_dev("nld_sound_out", sname);
 
 	setup.register_param(sname + ".CHAN" , m_channel);
 	setup.register_param(sname + ".MULT",  m_mult);
@@ -443,6 +440,12 @@ ATTR_COLD void netlist_mame_device_t::save_state()
 					if (td != NULL) save_pointer(td, s->m_name, s->m_count);
 				}
 				break;
+            case DT_FLOAT:
+                {
+                    float *td = s->resolved<float>();
+                    if (td != NULL) save_pointer(td, s->m_name, s->m_count);
+                }
+                break;
 			case DT_INT64:
 				save_pointer((INT64 *) s->m_ptr, s->m_name, s->m_count);
 				break;

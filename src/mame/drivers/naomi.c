@@ -521,8 +521,8 @@ Star Horse (big screens)                        840-0054C  23625    4 (128Mb)  3
 Star Horse (satellite)                          840-0056C  23627    6 (128Mb)* 315-6319   315-6213  not present   * +1 (64Mb), requires 837-13785 ARCNET&IO BD
 Star Horse Progress (satellite) (Rev A)         840-0123C  24122A   7 (128Mb)  315-6319A  315-6213  not present   requires 837-13785 ARCNET&IO BD
 The King of Route 66 (Rev A)                    840-0087C  23819A  10 (128Mb)  315-6319A  315-6213  not present
+Virtua Striker 3                                840-0061C  23663   11 (128Mb)  315-6319A  315-6213  317-0310-COM
 Virtua Striker 3 (Rev B)                        840-0061C  23663B  11 (128Mb)  315-6319A  315-6213  317-0310-COM
-Virtua Striker 3 (Rev C)                        840-0061C  23663C  11 (128Mb)  315-6319A  315-6213  317-0310-COM
 Wave Runner GP                                  840-0064C  24059    6 (128Mb)  315-6319A  315-6213  not present
 Wild Riders                                     840-0046C  23622   10 (128Mb)  315-6319A  315-6213  317-0301-COM
 WWF Royal Rumble                                840-0040C  22261    8 (128Mb)  315-6319   315-6213  317-0285-COM
@@ -6014,7 +6014,7 @@ ROM_START( wldkicks )
 	ROM_LOAD( "wk1ma10.4c",  0xa000000, 0x1000000, CRC(e96f312c) SHA1(0a92640277111aef5c6e9dab4218a8ae2196ce61) )
 
 	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "wldkicks-key.bin", 0, 4, CRC(c1e3000b) SHA1(36c2546833effe9452e2b3f7d31335fc5e349f49) )
+	ROM_LOAD( "wldkicks-key.bin", 0, 4, CRC(1708ebb9) SHA1(c1115e4dd675f10d5fb41f57c1eea8e6a4f09fed) )
 ROM_END
 
 ROM_START( wldkicksa )
@@ -6036,7 +6036,7 @@ ROM_START( wldkicksa )
 	ROM_LOAD( "wk1ma10.4c",  0xa000000, 0x1000000, CRC(e96f312c) SHA1(0a92640277111aef5c6e9dab4218a8ae2196ce61) )
 
 	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "wldkicks-key.bin", 0, 4, CRC(c1e3000b) SHA1(36c2546833effe9452e2b3f7d31335fc5e349f49) )
+	ROM_LOAD( "wldkicks-key.bin", 0, 4, CRC(1708ebb9) SHA1(c1115e4dd675f10d5fb41f57c1eea8e6a4f09fed) )
 ROM_END
 
 ROM_START( wldkicksb )
@@ -6058,7 +6058,7 @@ ROM_START( wldkicksb )
 	ROM_LOAD( "wk1ma10.4c",  0xa000000, 0x1000000, CRC(e96f312c) SHA1(0a92640277111aef5c6e9dab4218a8ae2196ce61) )
 
 	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "wldkicks-key.bin", 0, 4, CRC(c1e3000b) SHA1(36c2546833effe9452e2b3f7d31335fc5e349f49) )
+	ROM_LOAD( "wldkicks-key.bin", 0, 4, CRC(1708ebb9) SHA1(c1115e4dd675f10d5fb41f57c1eea8e6a4f09fed) )
 ROM_END
 
 ROM_START( toukon4 )
@@ -6085,7 +6085,7 @@ ROM_START( toukon4 )
 	ROM_LOAD( "trf1ma15.6l", 0xf000000, 0x1000000, CRC(42d318c5) SHA1(f9fe82ffbfc51fcb52333f94c55a7092e7124fb4) )
 
 	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "tr4ae-key.bin", 0x000000, 0x000004, CRC(986a7cee) SHA1(70c3ff80f86de6a0655251658c66a156fb644995) )
+	ROM_LOAD( "tr4ae-key.bin", 0x000000, 0x000004, CRC(1708ebb9) SHA1(c1115e4dd675f10d5fb41f57c1eea8e6a4f09fed) )
 ROM_END
 
 ROM_START( ninjaslt )
@@ -7790,7 +7790,8 @@ ROM_START( vstrik3c )
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD( "epr-23663c.ic22",0x0000000, 0x0400000, CRC(7007fec7) SHA1(523168f0b218d0bd5c815d65bf0caba2c8468c9d) )
+	// rom was handmade from 2 damaged dumps, needs to be verified
+	ROM_LOAD( "epr-23663.ic22", 0x0000000, 0x0400000, BAD_DUMP CRC(6910a008) SHA1(865affff1cf31321725ef727a17be384555e3aae) )
 	ROM_LOAD( "mpr-23652.ic1",  0x0800000, 0x1000000, CRC(992758a2) SHA1(5e2a25c520c1795128e5026fc00d355c24852ded) )
 	ROM_LOAD( "mpr-23653.ic2",  0x1800000, 0x1000000, CRC(e210e932) SHA1(2f6f0a31c3e98b21f1ff3af1680e50b3535b130f) )
 	ROM_LOAD( "mpr-23654.ic3",  0x2800000, 0x1000000, CRC(91335971) SHA1(fc7599b836fb7995dd7da940e64b08b3c09cb180) )
@@ -7804,7 +7805,7 @@ ROM_START( vstrik3c )
 	ROM_LOAD( "mpr-23662.ic11", 0xa800000, 0x0800000, CRC(d6ef7d68) SHA1(4ee396af6c5caf4c5af6e9ad0e03a7ac2c5039f4) )
 
 	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "vstrik3c-key.bin", 0, 4, CRC(049f41b0) SHA1(4ea444878c8e9288ec95b1763d48bc92c634acdd) )
+	ROM_LOAD( "vstrik3c-key.bin", 0, 4, CRC(8c9012fe) SHA1(d81e00d6377a3f0eeed01dc523707e36ca1b434d) )
 ROM_END
 
 ROM_START( vstrik3cb )
@@ -7826,7 +7827,7 @@ ROM_START( vstrik3cb )
 	ROM_LOAD( "mpr-23662.ic11", 0xa800000, 0x0800000, CRC(d6ef7d68) SHA1(4ee396af6c5caf4c5af6e9ad0e03a7ac2c5039f4) )
 
 	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "vstrik3c-key.bin", 0, 4, CRC(049f41b0) SHA1(4ea444878c8e9288ec95b1763d48bc92c634acdd) )
+	ROM_LOAD( "vstrik3c-key.bin", 0, 4, CRC(8c9012fe) SHA1(d81e00d6377a3f0eeed01dc523707e36ca1b434d) )
 ROM_END
 
 ROM_START( wldrider )
@@ -7847,7 +7848,7 @@ ROM_START( wldrider )
 	ROM_LOAD( "mpr-23620.ic10", 0x9800000, 0x1000000, CRC(67aa15a9) SHA1(42c24cbf7069c27430a71509a872cd1c4224aaeb) )
 
 	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "wldrider-key.bin", 0, 4, CRC(f5a662ad) SHA1(a75b1e490d1f7d57cd8976115572266d1ca05202) )
+	ROM_LOAD( "wldrider-key.bin", 0, 4, CRC(7ac4f5fa) SHA1(5d08ecfbdc5f4bf26a9ea521a647c93141e7f635) )
 ROM_END
 
 ROM_START( vf4cart )
@@ -7869,7 +7870,7 @@ ROM_START( vf4cart )
 	ROM_LOAD( "mpr-23784.ic11", 0xa800000, 0x1000000, CRC(f74f2fee) SHA1(84b07baa6d116727e66ef27e24ba6484c3393891) )
 
 	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "vf4cart-key.bin", 0, 4, CRC(22838e16) SHA1(afee674dce3cfdd20360c30da2da5ba69f8d4682) )
+	ROM_LOAD( "vf4cart-key.bin", 0, 4, CRC(aa8cdd58) SHA1(e282b7d215044a005b50c8553b8056f3d599135c) )
 ROM_END
 
 // There is also a development cart (171-7885A) with 20x 64Mb FlashROMs instead of 10x 128Mb MaskROMs. Content is the same.
@@ -7992,7 +7993,7 @@ ROM_START( clubkrte )
 	ROM_LOAD( "mpr-23703.ic11", 0xa800000, 0x1000000, CRC(702b8b4a) SHA1(3a8dfde458f341e7db20664382b9fce2b6e5d462) )
 
 	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "clubkrte-key.bin", 0, 4, CRC(db426a5d) SHA1(6a6a0b80ec0416605541159efea379dc19fe796d) )
+	ROM_LOAD( "clubkrte-key.bin", 0, 4, CRC(5420fd0a) SHA1(06cb480c12f0ddc10e7601d34c5f42dda6ac6145) )
 ROM_END
 
 ROM_START( clubkrtd )
@@ -9034,7 +9035,7 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 
 /* 840-xxxxx (Sega Naomi 2 cart games) */
 /* 0046 */ GAME( 2001, wldrider, naomi2,  naomi2m2, naomi, naomi_state, naomi2,   ROT0, "Sega", "Wild Riders (JPN, USA, EXP, KOR, AUS)", GAME_FLAGS )
-/* 0061 */ GAME( 2001, vstrik3c, naomi2,  naomi2m2, naomi, naomi_state, naomi2,   ROT0, "Sega", "Virtua Striker 3 (USA, EXP, KOR, AUS) (Cart, Rev C)", GAME_FLAGS )
+/* 0061 */ GAME( 2001, vstrik3c, naomi2,  naomi2m2, naomi, naomi_state, naomi2,   ROT0, "Sega", "Virtua Striker 3 (USA, EXP, KOR, AUS) (Cart)", GAME_FLAGS )
 /* 0061 */ GAME( 2001, vstrik3cb,vstrik3c,naomi2m2, naomi, naomi_state, naomi2,   ROT0, "Sega", "Virtua Striker 3 (USA, EXP, KOR, AUS) (Cart, Rev B)", GAME_FLAGS )
 /* 0062 */ GAME( 2001, clubkrte, naomi2,  naomi2m2, naomi, naomi_state, naomi2,   ROT0, "Sega", "Club Kart: European Session", GAME_FLAGS )
 /* 0062 */ GAME( 2001, clubkrtd, clubkrte,naomi2m2, naomi, naomi_state, naomi2,   ROT0, "Sega", "Club Kart: European Session (Rev D)", GAME_FLAGS )

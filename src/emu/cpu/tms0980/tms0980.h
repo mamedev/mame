@@ -139,15 +139,16 @@ protected:
 	optional_device<pla_device> m_spla;
 
 	UINT8   m_pc;        // 6 or 7-bit program counter
-	UINT8   m_sr;        // 6 or 7-bit subroutine return register
+	UINT32  m_sr;        // 6 or 7-bit subroutine return register(s)
 	UINT8   m_pa;        // 4-bit page address register
 	UINT8   m_pb;        // 4-bit page buffer register
+	UINT16  m_ps;        // 4-bit page subroutine register(s)
 	UINT8   m_a;         // 4-bit accumulator
 	UINT8   m_x;         // 2,3,or 4-bit RAM X register
 	UINT8   m_y;         // 4-bit RAM Y register
-	UINT8   m_ca;        // chapter address bit
-	UINT8   m_cb;        // chapter buffer bit
-	UINT8   m_cs;        // chapter subroutine bit
+	UINT8   m_ca;        // chapter address register
+	UINT8   m_cb;        // chapter buffer register
+	UINT16  m_cs;        // chapter subroutine register(s)
 	UINT16  m_r;
 	UINT16  m_o;
 	UINT8   m_cki_bus;
@@ -160,7 +161,7 @@ protected:
 	UINT8   m_status;
 	UINT8   m_status_latch;
 	UINT8   m_eac;       // end around carry bit
-	UINT8   m_clatch;    // call latch bit
+	UINT8   m_clatch;    // call latch bit(s)
 	UINT8   m_add;       // add latch bit
 	UINT8   m_bl;        // branch latch bit
 

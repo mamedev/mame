@@ -118,8 +118,8 @@ ATTR_HOT ATTR_ALIGN void nld_d_to_a_proxy::update()
 	if (state != m_last_state)
 	{
 		m_last_state = state;
-		const double R = state ? m_logic_family->m_R_high : m_logic_family->m_R_low;
-		const double V = state ? m_logic_family->m_high_V : m_logic_family->m_low_V;
+		const nl_double R = state ? m_logic_family->m_R_high : m_logic_family->m_R_low;
+		const nl_double V = state ? m_logic_family->m_high_V : m_logic_family->m_low_V;
 
 		// We only need to update the net first if this is a time stepping net
 		if (m_RV.m_P.net().as_analog().solver()->is_timestep())

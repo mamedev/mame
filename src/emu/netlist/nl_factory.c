@@ -2,7 +2,7 @@
 // copyright-holders:Couriersud
 /***************************************************************************
 
-    net_lib.h
+    nl_factory.c
 
     Discrete netlist implementation.
 
@@ -47,58 +47,76 @@
 
 ****************************************************************************/
 
-#ifndef NET_LIB_H
-#define NET_LIB_H
+#include "nl_factory.h"
+#include "nl_setup.h"
 
-#include "../nl_base.h"
-#include "nld_signal.h"
-#include "nld_system.h"
+// ----------------------------------------------------------------------------------------
+// net_device_t_base_factory
+// ----------------------------------------------------------------------------------------
 
-#include "nld_4020.h"
-#include "nld_4066.h"
-#include "nld_7400.h"
-#include "nld_7402.h"
-#include "nld_7404.h"
-#include "nld_7408.h"
-#include "nld_7410.h"
-#include "nld_7411.h"
-#include "nld_7420.h"
-#include "nld_7425.h"
-#include "nld_7427.h"
-#include "nld_7430.h"
-#include "nld_7432.h"
-#include "nld_7437.h"
-#include "nld_7448.h"
-#include "nld_7450.h"
-#include "nld_7474.h"
-#include "nld_7483.h"
-#include "nld_7486.h"
-#include "nld_7490.h"
-#include "nld_7493.h"
-#include "nld_74107.h"
-#include "nld_74123.h"
-#include "nld_74153.h"
-#include "nld_74ls629.h"
-#include "nld_9316.h"
+ATTR_COLD const nl_util::pstring_list net_device_t_base_factory::term_param_list()
+{
+    if (m_def_param.startsWith("+"))
+        return nl_util::split(m_def_param.substr(1), ",");
+    else
+        return nl_util::pstring_list();
+}
 
-#include "nld_ne555.h"
+ATTR_COLD const nl_util::pstring_list net_device_t_base_factory::def_params()
+{
+    if (m_def_param.startsWith("+") || m_def_param.equals("-"))
+        return nl_util::pstring_list();
+    else
+        return nl_util::split(m_def_param, ",");
+}
 
-#include "nld_r2r_dac.h"
 
-#include "nld_log.h"
+netlist_factory_t::netlist_factory_t()
+{
+}
 
-#include "../analog/nld_bjt.h"
-#include "../analog/nld_fourterm.h"
-#include "../analog/nld_solver.h"
-#include "../analog/nld_switches.h"
-#include "../analog/nld_twoterm.h"
-#include "../analog/nld_opamps.h"
+netlist_factory_t::~netlist_factory_t()
+{
+	for (net_device_t_base_factory * const *e = m_list.first(); e != NULL; e = m_list.next(e))
+	{
+		net_device_t_base_factory *p = *e;
+		global_free(p);
+	}
+	m_list.clear();
+}
 
-#include "nld_legacy.h"
+netlist_device_t *netlist_factory_t::new_device_by_classname(const pstring &classname) const
+{
+	for (net_device_t_base_factory * const *e = m_list.first(); e != NULL; e = m_list.next(e))
+	{
+		net_device_t_base_factory *p = *e;
+		if (strcmp(p->classname(), classname) == 0)
+		{
+			netlist_device_t *ret = p->Create();
+			return ret;
+		}
+		p++;
+	}
+	return NULL; // appease code analysis
+}
 
-NETLIST_EXTERNAL(diode_models);
-NETLIST_EXTERNAL(bjt_models);
+netlist_device_t *netlist_factory_t::new_device_by_name(const pstring &name, netlist_setup_t &setup) const
+{
+	net_device_t_base_factory *f = factory_by_name(name, setup);
+	return f->Create();
+}
 
-void nl_initialize_factory(netlist_factory_t &factory);
-
-#endif
+net_device_t_base_factory * netlist_factory_t::factory_by_name(const pstring &name, netlist_setup_t &setup) const
+{
+	for (net_device_t_base_factory * const *e = m_list.first(); e != NULL; e = m_list.next(e))
+	{
+		net_device_t_base_factory *p = *e;
+		if (strcmp(p->name(), name) == 0)
+		{
+			return p;
+		}
+		p++;
+	}
+	setup.netlist().error("Class %s not found!\n", name.cstr());
+	return NULL; // appease code analysis
+}

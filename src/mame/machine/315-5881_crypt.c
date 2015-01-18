@@ -121,7 +121,7 @@ Notes below refer to M2 & M3.
 The encryption is done by a stream cipher operating in counter mode, which use a 16-bits internal block cipher.
 
 There are 2 "control bits" at the start of the decrypted stream which control the mode of operation: bit #1 set to 1 means
-that the decrypted stream needs to be decompressed after being decrypted. More on this later.
+that the stream needs to be decompressed after being decrypted. More on this later.
 
 The next 16-bits are part of the header (they don't belong to the plaintext), but his meaning is unclear. It has been
 conjectured that it could stablish when to "reset" the process and start processing a new stream (based on some tests
@@ -134,12 +134,12 @@ internal block-cipher. So, at a given step, the internal block cipher will outpu
 given plaintext word, and the remaining 2 to the next plaintext word.
 
 The underlying block cipher consists of two 4-round Feistel Networks (FN): the first one takes the counter (16 bits),
-the game-key (>=26 bits) and the sequence-key (16 bits) and output a middle result (16 bits) which will act as another key
+the game-key (>=27 bits) and the sequence-key (16 bits) and output a middle result (16 bits) which will act as another key
 for the second one. The second FN will take the encrypted word (16 bits), the game-key, the sequence-key and the result
 from the first FN and will output the decrypted word (16 bits).
 
-Each round of the Feistel Networks use four substitution sboxes, each having 6 inputs and 2 outputs. The input can be the
-XOR of at most two "sources bits", being source bits the bits from the previous round and the bits from the different keys.
+Each round of the Feistel Networks use four substitution sboxes, each having 6 inputs and 2 outputs. The input is the
+XOR of at most one bit from the previous round and at most one bit from the different keys.
 
 The underlying block cipher has the same structure than the one used by the CPS-2 (Capcom Play System 2) and,
 indeed, some of the used sboxes are exactly the same and appear in the same FN/round in both systems (this is not evident,
@@ -151,10 +151,6 @@ Due to the small key-length, no sophisticated attacks are needed to recover the 
 some (encrypted word-decrypted word) pairs suffice. However, due to the weak key scheduling, it should be noted that some
 related keys can produce the same output bytes for some (short) input sequences.
 
-The only difference in the decryption process between M2 and M3 is the initialization of the counter. In M3, the counter is
-always set to 0 at the beginning of the decryption while, in M2, the bits #1-#16 of the ciphertext's address are used
-to initialize the counter.
-
 Note that this implementation considers that the counter initialization for ram decryption is 0 simply because the ram is
 mapped to multiples of 128K.
 
@@ -164,7 +160,7 @@ accordingly the s-boxes' definitions. So the order of the bits in the keys is ar
 chosen so as to make the key for CAPSNK equal to 0.
 
 It can be observed that a couple of sboxes have incomplete tables (a 255 value indicate an unknown value). The recovered keys
-as of december/2010 show small randomness and big correlations, making possible that some unseen bits could make the
+as of january/2015 show small randomness and big correlations, making possible that some unseen bits could make the
 decryption need those incomplete parts.
 
 ****************************************************************************************/
@@ -478,16 +474,16 @@ const int sega_315_5881_crypt_device::fn1_game_key_scheduling[38][2] = {
 	{1,29},  {1,71},  {2,4},   {2,54},  {3,8},   {4,56},  {4,73},  {5,11},
 	{6,51},  {7,92},  {8,89},  {9,9},   {9,10},  {9,39},  {9,41},  {9,58},
 	{9,59},  {9,86},  {10,90}, {11,6},  {12,64}, {13,49}, {14,44}, {15,40},
-	{16,69}, {17,15}, {18,23}, {18,43}, {19,82}, {20,81}, {21,32}, {21,61},
-	{22,5},  {23,66}, {24,13}, {24,45}, {25,12}, {25,35}
+    {16,69}, {17,15}, {18,23}, {18,43}, {19,82}, {20,81}, {21,32}, {22,5},
+	{23,66}, {24,13}, {24,45}, {25,12}, {25,35}, {26,61},
 };
 
 const int sega_315_5881_crypt_device::fn2_game_key_scheduling[34][2] = {
 	{0,0},   {1,3},   {2,11},  {3,20},  {4,22},  {5,23},  {6,29},  {7,38},
 	{8,39},  {9,47},  {9,55},  {9,86},  {9,87},  {9,90},  {10,50}, {10,53},
 	{11,57}, {12,59}, {13,61}, {13,64}, {14,63}, {15,67}, {16,72}, {17,83},
-	{18,88}, {19,94}, {20,35}, {21,17}, {21,92}, {22,6},  {22,11}, {23,85},
-	{24,16}, {25,25}
+    {18,88}, {19,94}, {20,35}, {21,17}, {22,6},  {22,11}, {23,85}, {24,16},
+	{25,25}, {26,92}
 };
 
 const int sega_315_5881_crypt_device::fn1_sequence_key_scheduling[20][2] = {

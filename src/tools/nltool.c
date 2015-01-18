@@ -18,12 +18,16 @@
 #include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"
 #include "netlist/nl_parser.h"
+#include "netlist/nl_factory.h"
 #include "netlist/nl_util.h"
+#include "netlist/devices/net_lib.h"
 #include "options.h"
 
 /***************************************************************************
-    MAME COMPATIBILITY ...
-***************************************************************************/
+ * MAME COMPATIBILITY ...
+ *
+ * These are needed if we link without libutil
+ ***************************************************************************/
 
 #if 0
 void ATTR_PRINTF(1,2) osd_printf_warning(const char *format, ...)
@@ -35,7 +39,6 @@ void ATTR_PRINTF(1,2) osd_printf_warning(const char *format, ...)
 	vprintf(format, argptr);
 	va_end(argptr);
 }
-#endif
 
 void *malloc_file_line(size_t size, const char *file, int line)
 {
@@ -72,6 +75,7 @@ void report_bad_cast(const std::type_info &src_type, const std::type_info &dst_t
 			src_type.name(), dst_type.name());
 	throw;
 }
+#endif
 
 struct options_entry oplist[] =
 {
@@ -82,6 +86,14 @@ struct options_entry oplist[] =
 	{ "help;h",          "0",   OPTION_BOOLEAN, "display help" },
 	{ NULL }
 };
+
+NETLIST_START(dummy)
+    /* Standard stuff */
+
+    CLOCK(clk, 1000) // 1000 Hz
+    SOLVER(Solver, 48000)
+
+NETLIST_END()
 
 /***************************************************************************
     CORE IMPLEMENTATION
@@ -160,9 +172,8 @@ public:
 		nl_util::pstring_list ll = nl_util::split(m_logs, ":");
 		for (int i=0; i < ll.count(); i++)
 		{
-			netlist_device_t *nc = m_setup->factory().new_device_by_classname("nld_log", *m_setup);
-			pstring name = "log_" + ll[i];
-			m_setup->register_dev(nc, name);
+            pstring name = "log_" + ll[i];
+			netlist_device_t *nc = m_setup->register_dev("nld_log", name);
 			m_setup->register_link(name + ".I", ll[i]);
 		}
 	}
@@ -229,6 +240,11 @@ static void listdevices()
 	netlist_tool_t nt;
 	nt.init();
 	const netlist_factory_t::list_t &list = nt.setup().factory().list();
+
+    netlist_sources_t sources;
+
+    sources.add(netlist_source_t("dummy", &netlist_dummy));
+    sources.parse(nt.setup(),"dummy");
 
 	nt.setup().start_devices();
 	nt.setup().resolve_inputs();

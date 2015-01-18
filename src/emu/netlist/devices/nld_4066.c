@@ -19,11 +19,11 @@ NETLIB_RESET(4066)
 
 NETLIB_UPDATE(4066)
 {
-	double sup = (m_supply.get()->vdd() - m_supply.get()->vss());
-	double low = 0.45 * sup;
-	double high = 0.55 * sup;
-	double in = INPANALOG(m_control) - m_supply.get()->vss();
-	double rON = 270.0 * 5.0 / sup;
+	nl_double sup = (m_supply.get()->vdd() - m_supply.get()->vss());
+	nl_double low = 0.45 * sup;
+	nl_double high = 0.55 * sup;
+	nl_double in = INPANALOG(m_control) - m_supply.get()->vss();
+	nl_double rON = 270.0 * 5.0 / sup;
 
 	if (in < low)
 	{
@@ -53,7 +53,7 @@ NETLIB_START(4066_dip)
 	register_subalias("4", m_B.m_R.m_N);
 	register_subalias("5", m_B.m_control);
 	register_subalias("6", m_C.m_control);
-	register_input("7", m_supply.m_vss);
+	register_subalias("7", m_supply.m_vss);
 
 	register_subalias("8", m_C.m_R.m_P);
 	register_subalias("9", m_C.m_R.m_N);
@@ -61,7 +61,7 @@ NETLIB_START(4066_dip)
 	register_subalias("11", m_D.m_R.m_N);
 	register_subalias("12", m_D.m_control);
 	register_subalias("13", m_A.m_control);
-	register_input("14", m_supply.m_vdd);
+	register_subalias("14", m_supply.m_vdd);
 
 }
 

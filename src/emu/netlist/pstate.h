@@ -32,7 +32,8 @@ enum pstate_data_type_e {
 	DT_INT16,
 	DT_INT8,
 	DT_INT,
-	DT_BOOLEAN
+	DT_BOOLEAN,
+	DT_FLOAT
 };
 
 template<typename _ItemType> struct nl_datatype
@@ -55,6 +56,7 @@ template<typename _ItemType> struct nl_datatype<_ItemType *>
 
 NETLIST_SAVE_TYPE(char, DT_INT8);
 NETLIST_SAVE_TYPE(double, DT_DOUBLE);
+NETLIST_SAVE_TYPE(float, DT_FLOAT);
 NETLIST_SAVE_TYPE(INT8, DT_INT8);
 NETLIST_SAVE_TYPE(UINT8, DT_INT8);
 NETLIST_SAVE_TYPE(INT64, DT_INT64);
@@ -145,13 +147,7 @@ private:
 	pstate_entry_t::list_t m_save;
 };
 
-template<> ATTR_COLD inline void pstate_manager_t::save_item(pstate_callback_t &state, const void *owner, const pstring &stname)
-{
-	//save_state_ptr(stname, DT_CUSTOM, 0, 1, &state);
-	pstate_entry_t *p = new pstate_entry_t(stname, owner, &state);
-	m_save.add(p);
-	state.register_state(*this, stname);
-}
+template<> ATTR_COLD void pstate_manager_t::save_item(pstate_callback_t &state, const void *owner, const pstring &stname);
 
 template<> ATTR_COLD inline void pstate_manager_t::save_item(netlist_time &nlt, const void *owner, const pstring &stname)
 {

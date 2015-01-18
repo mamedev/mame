@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic
+// copyright-holders:Miodrag Milanovic,Luca Bruno
 /***************************************************************************
 
     luaengine.c
@@ -456,23 +456,33 @@ luabridge::LuaRef lua_engine::l_dev_get_states(const device_t *d)
 }
 
 //-------------------------------------------------
-//  state_get_value - return value of a devices state
+//  state_get_value - return value of a device state entry
 //  -> manager:machine().devices[":maincpu"].state["PC"].value
 //-------------------------------------------------
 
 UINT64 lua_engine::l_state_get_value(const device_state_entry *d)
 {
-	return d->value();
+	device_state_interface *state = d->parent_state();
+	if(state) {
+		luaThis->machine().save().dispatch_presave();
+		return state->state_int(d->index());
+	} else {
+		return 0;
+	}
 }
 
 //-------------------------------------------------
-//  state_set_value - set value of a devices state
+//  state_set_value - set value of a device state entry
 //  -> manager:machine().devices[":maincpu"].state["D0"].value = 0x0c00
 //-------------------------------------------------
 
 void lua_engine::l_state_set_value(device_state_entry *d, UINT64 val)
 {
-	d->set_value(val);
+	device_state_interface *state = d->parent_state();
+	if(state) {
+		state->set_state_int(d->index(), val);
+		luaThis->machine().save().dispatch_presave();
+	}
 }
 
 //-------------------------------------------------
@@ -527,6 +537,84 @@ int lua_engine::lua_addr_space::l_mem_read(lua_State *L)
 }
 
 //-------------------------------------------------
+//  mem_write - templated memory writer for <sign>,<size>
+//  -> manager:machine().devices[":maincpu"].spaces["program"]:write_u16(0xC000, 0xF00D)
+//-------------------------------------------------
+
+template <typename T>
+int lua_engine::lua_addr_space::l_mem_write(lua_State *L)
+{
+	address_space &sp = luabridge::Stack<address_space &>::get(L, 1);
+	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
+	luaL_argcheck(L, lua_isnumber(L, 3), 3, "value (integer) expected");
+	offs_t address = lua_tounsigned(L, 2);
+	T val = lua_tounsigned(L, 3);
+
+	switch(sizeof(val) * 8) {
+		case 8:
+			sp.write_byte(address, val);
+			break;
+		case 16:
+			if ((address & 1) == 0) {
+				sp.write_word(address, val);
+			} else {
+				sp.read_word_unaligned(address, val);
+			}
+			break;
+		case 32:
+			if ((address & 3) == 0) {
+				sp.write_dword(address, val);
+			} else {
+				sp.write_dword_unaligned(address, val);
+			}
+			break;
+		case 64:
+			if ((address & 7) == 0) {
+				sp.write_qword(address, val);
+			} else {
+				sp.write_qword_unaligned(address, val);
+			}
+			break;
+		default:
+			break;
+	}
+
+	return 0;
+}
+
+//-------------------------------------------------
+//  screen_height - return screen visible height
+//  -> manager:machine().screens[":screen"]:height()
+//-------------------------------------------------
+
+int lua_engine::lua_screen::l_height(lua_State *L)
+{
+	screen_device *sc = luabridge::Stack<screen_device *>::get(L, 1);
+	if(!sc) {
+		return 0;
+	}
+
+	lua_pushunsigned(L, sc->visible_area().height());
+	return 1;
+}
+
+//-------------------------------------------------
+//  screen_width - return screen visible width
+//  -> manager:machine().screens[":screen"]:width()
+//-------------------------------------------------
+
+int lua_engine::lua_screen::l_width(lua_State *L)
+{
+	screen_device *sc = luabridge::Stack<screen_device *>::get(L, 1);
+	if(!sc) {
+		return 0;
+	}
+
+	lua_pushunsigned(L, sc->visible_area().width());
+	return 1;
+}
+
+//-------------------------------------------------
 //  draw_box - draw a box on a screen container
 //  -> manager:machine().screens[":screen"]:draw_box(x1, y1, x2, y2, bgcolor, linecolor)
 //-------------------------------------------------
@@ -548,10 +636,10 @@ int lua_engine::lua_screen::l_draw_box(lua_State *L)
 
 	// retrieve all parameters
 	float x1, y1, x2, y2;
-	x1 = MIN(lua_tounsigned(L, 2) / static_cast<float>(sc->width()) , 1.0f);
-	y1 = MIN(lua_tounsigned(L, 3) / static_cast<float>(sc->height()), 1.0f);
-	x2 = MIN(lua_tounsigned(L, 4) / static_cast<float>(sc->width()) , 1.0f);
-	y2 = MIN(lua_tounsigned(L, 5) / static_cast<float>(sc->height()), 1.0f);
+	x1 = MIN(lua_tounsigned(L, 2) / static_cast<float>(sc->visible_area().width()) , 1.0f);
+	y1 = MIN(lua_tounsigned(L, 3) / static_cast<float>(sc->visible_area().height()), 1.0f);
+	x2 = MIN(lua_tounsigned(L, 4) / static_cast<float>(sc->visible_area().width()) , 1.0f);
+	y2 = MIN(lua_tounsigned(L, 5) / static_cast<float>(sc->visible_area().height()), 1.0f);
 	UINT32 bgcolor = lua_tounsigned(L, 6);
 	UINT32 fgcolor = lua_tounsigned(L, 7);
 
@@ -584,10 +672,10 @@ int lua_engine::lua_screen::l_draw_line(lua_State *L)
 
 	// retrieve all parameters
 	float x1, y1, x2, y2;
-	x1 = MIN(lua_tounsigned(L, 2) / static_cast<float>(sc->width()) , 1.0f);
-	y1 = MIN(lua_tounsigned(L, 3) / static_cast<float>(sc->height()), 1.0f);
-	x2 = MIN(lua_tounsigned(L, 4) / static_cast<float>(sc->width()) , 1.0f);
-	y2 = MIN(lua_tounsigned(L, 5) / static_cast<float>(sc->height()), 1.0f);
+	x1 = MIN(lua_tounsigned(L, 2) / static_cast<float>(sc->visible_area().width()) , 1.0f);
+	y1 = MIN(lua_tounsigned(L, 3) / static_cast<float>(sc->visible_area().height()), 1.0f);
+	x2 = MIN(lua_tounsigned(L, 4) / static_cast<float>(sc->visible_area().width()) , 1.0f);
+	y2 = MIN(lua_tounsigned(L, 5) / static_cast<float>(sc->visible_area().height()), 1.0f);
 	UINT32 color = lua_tounsigned(L, 6);
 
 	// draw the line
@@ -613,8 +701,8 @@ int lua_engine::lua_screen::l_draw_text(lua_State *L)
 	luaL_argcheck(L, lua_isstring(L, 4), 4, "message (string) expected");
 
 	// retrieve all parameters
-	float x = MIN(lua_tounsigned(L, 2) / static_cast<float>(sc->width()) , 1.0f);
-	float y = MIN(lua_tounsigned(L, 3) / static_cast<float>(sc->height()), 1.0f);
+	float x = MIN(lua_tounsigned(L, 2) / static_cast<float>(sc->visible_area().width()) , 1.0f);
+	float y = MIN(lua_tounsigned(L, 3) / static_cast<float>(sc->visible_area().height()), 1.0f);
 	const char *msg = luaL_checkstring(L,4);
 	// TODO: add optional parameters (colors, etc.)
 
@@ -882,6 +970,14 @@ void lua_engine::initialize()
 				.addCFunction ("read_u32", &lua_addr_space::l_mem_read<UINT32>)
 				.addCFunction ("read_i64", &lua_addr_space::l_mem_read<INT64>)
 				.addCFunction ("read_u64", &lua_addr_space::l_mem_read<UINT64>)
+				.addCFunction ("write_i8", &lua_addr_space::l_mem_write<INT8>)
+				.addCFunction ("write_u8", &lua_addr_space::l_mem_write<UINT8>)
+				.addCFunction ("write_i16", &lua_addr_space::l_mem_write<INT16>)
+				.addCFunction ("write_u16", &lua_addr_space::l_mem_write<UINT16>)
+				.addCFunction ("write_i32", &lua_addr_space::l_mem_write<INT32>)
+				.addCFunction ("write_u32", &lua_addr_space::l_mem_write<UINT32>)
+				.addCFunction ("write_i64", &lua_addr_space::l_mem_write<INT64>)
+				.addCFunction ("write_u64", &lua_addr_space::l_mem_write<UINT64>)
 			.endClass()
 			.deriveClass <address_space, lua_addr_space> ("addr_space")
 				.addFunction("name", &address_space::name)
@@ -890,13 +986,14 @@ void lua_engine::initialize()
 				.addCFunction ("draw_box",  &lua_screen::l_draw_box)
 				.addCFunction ("draw_line", &lua_screen::l_draw_line)
 				.addCFunction ("draw_text", &lua_screen::l_draw_text)
+				.addCFunction ("height", &lua_screen::l_height)
+				.addCFunction ("width", &lua_screen::l_width)
 			.endClass()
 			.deriveClass <screen_device, lua_screen> ("screen_dev")
+				.addFunction ("frame_number", &screen_device::frame_number)
 				.addFunction ("name", &screen_device::name)
 				.addFunction ("shortname", &screen_device::shortname)
 				.addFunction ("tag", &screen_device::tag)
-				.addFunction ("height", &screen_device::height)
-				.addFunction ("width", &screen_device::width)
 			.endClass()
 			.beginClass <device_state_entry> ("dev_space")
 				.addFunction ("name", &device_state_entry::symbol)

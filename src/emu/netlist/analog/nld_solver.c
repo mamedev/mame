@@ -44,31 +44,31 @@ vector_ops_t *vector_ops_t::create_ops(const int size)
 	switch (size)
 	{
 		case 1:
-			return new vector_ops_impl_t<1>();
+			return nl_alloc(vector_ops_impl_t<1>);
 		case 2:
-			return new vector_ops_impl_t<2>();
+			return nl_alloc(vector_ops_impl_t<2>);
 		case 3:
-			return new vector_ops_impl_t<3>();
+			return nl_alloc(vector_ops_impl_t<3>);
 		case 4:
-			return new vector_ops_impl_t<4>();
+			return nl_alloc(vector_ops_impl_t<4>);
 		case 5:
-			return new vector_ops_impl_t<5>();
+			return nl_alloc(vector_ops_impl_t<5>);
 		case 6:
-			return new vector_ops_impl_t<6>();
+			return nl_alloc(vector_ops_impl_t<6>);
 		case 7:
-			return new vector_ops_impl_t<7>();
+			return nl_alloc(vector_ops_impl_t<7>);
 		case 8:
-			return new vector_ops_impl_t<8>();
+			return nl_alloc(vector_ops_impl_t<8>);
 		case 9:
-			return new vector_ops_impl_t<9>();
+			return nl_alloc(vector_ops_impl_t<9>);
 		case 10:
-			return new vector_ops_impl_t<10>();
+			return nl_alloc(vector_ops_impl_t<10>);
 		case 11:
-			return new vector_ops_impl_t<11>();
+			return nl_alloc(vector_ops_impl_t<11>);
 		case 12:
-			return new vector_ops_impl_t<12>();
+			return nl_alloc(vector_ops_impl_t<12>);
 		default:
-			return new vector_ops_impl_t<0>(size);
+			return nl_alloc(vector_ops_impl_t<0>, size);
 	}
 }
 
@@ -91,8 +91,6 @@ ATTR_COLD void terms_t::set_pointers()
 		m_term[i]->m_Idr1 = &m_Idr[i];
 		m_other_curanalog[i] = &m_term[i]->m_otherterm->net().as_analog().m_cur_Analog;
 	}
-
-	m_ops = vector_ops_t::create_ops(m_gt.count());
 }
 
 // ----------------------------------------------------------------------------------------
@@ -112,7 +110,7 @@ ATTR_COLD netlist_matrix_solver_t::netlist_matrix_solver_t(const eSolverType typ
 ATTR_COLD netlist_matrix_solver_t::~netlist_matrix_solver_t()
 {
 	for (int i = 0; i < m_inps.count(); i++)
-		delete m_inps[i];
+		global_free(m_inps[i]);
 }
 
 ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets)
@@ -176,7 +174,7 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_analog_net_t::list_t &nets
 
 						if (net_proxy_output == NULL)
 						{
-							net_proxy_output = new netlist_analog_output_t();
+							net_proxy_output = nl_alloc(netlist_analog_output_t);
 							net_proxy_output->init_object(*this, this->name() + "." + pstring::sprintf("m%d", m_inps.count()));
 							m_inps.add(net_proxy_output);
 							net_proxy_output->m_proxied_net = &p->net().as_analog();
@@ -235,7 +233,7 @@ ATTR_COLD void netlist_matrix_solver_t::reset()
 
 ATTR_COLD void netlist_matrix_solver_t::update()
 {
-	const double new_timestep = solve();
+	const nl_double new_timestep = solve();
 
 	if (m_params.m_dynamic && is_timestep() && new_timestep > 0)
 		m_Q_sync.net().reschedule_in_queue(netlist_time::from_double(new_timestep));
@@ -243,7 +241,7 @@ ATTR_COLD void netlist_matrix_solver_t::update()
 
 ATTR_COLD void netlist_matrix_solver_t::update_forced()
 {
-	ATTR_UNUSED const double new_timestep = solve();
+	ATTR_UNUSED const nl_double new_timestep = solve();
 
 	if (m_params.m_dynamic && is_timestep())
 		m_Q_sync.net().reschedule_in_queue(netlist_time::from_double(m_params.m_min_timestep));
@@ -251,7 +249,7 @@ ATTR_COLD void netlist_matrix_solver_t::update_forced()
 
 ATTR_HOT void netlist_matrix_solver_t::step(const netlist_time delta)
 {
-	const double dd = delta.as_double();
+	const nl_double dd = delta.as_double();
 	for (int k=0; k < m_step_devices.count(); k++)
 		m_step_devices[k]->step_time(dd);
 }
@@ -286,7 +284,7 @@ void netlist_matrix_solver_t::solve_base(C *p)
 	}
 }
 
-ATTR_HOT double netlist_matrix_solver_t::solve()
+ATTR_HOT nl_double netlist_matrix_solver_t::solve()
 {
 	netlist_time now = netlist().time();
 	netlist_time delta = now - m_last_step;
@@ -302,7 +300,7 @@ ATTR_HOT double netlist_matrix_solver_t::solve()
 
 	step(delta);
 
-	const double next_time_step = vsolve();
+	const nl_double next_time_step = vsolve();
 
 	update_inputs();
 	return next_time_step;
@@ -350,7 +348,7 @@ NETLIB_START(solver)
 	register_param("GMIN", m_gmin, NETLIST_GMIN_DEFAULT);
 	register_param("DYNAMIC_TS", m_dynamic, 0);
 	register_param("LTE", m_lte, 5e-5);                     // diff/timestep
-	register_param("MIN_TIMESTEP", m_min_timestep, 1e-6);   // double timestep resolution
+	register_param("MIN_TIMESTEP", m_min_timestep, 1e-6);   // nl_double timestep resolution
 
 	// internal staff
 
@@ -380,7 +378,7 @@ NETLIB_NAME(solver)::~NETLIB_NAME(solver)()
 	while (e != NULL)
 	{
 		netlist_matrix_solver_t * const *en = m_mat_solvers.next(e);
-		delete *e;
+		global_free(*e);
 		e = en;
 	}
 
@@ -419,7 +417,7 @@ NETLIB_UPDATE(solver)
 		if (m_mat_solvers[i]->is_timestep())
 			{
 				// Ignore return value
-				ATTR_UNUSED const double ts = m_mat_solvers[i]->solve();
+				ATTR_UNUSED const nl_double ts = m_mat_solvers[i]->solve();
 			}
 	}
 #endif
@@ -435,15 +433,16 @@ template <int m_N, int _storage_N>
 netlist_matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const int gs_threshold, const bool use_specific)
 {
 	if (use_specific && m_N == 1)
-		return new netlist_matrix_solver_direct1_t(m_params);
+		return nl_alloc(netlist_matrix_solver_direct1_t, m_params);
 	else if (use_specific && m_N == 2)
-		return new netlist_matrix_solver_direct2_t(m_params);
+		return nl_alloc(netlist_matrix_solver_direct2_t, m_params);
 	else
 	{
+	    typedef netlist_matrix_solver_gauss_seidel_t<m_N,_storage_N> solver_N;
 		if (size >= gs_threshold)
-			return new netlist_matrix_solver_gauss_seidel_t<m_N,_storage_N>(m_params, size);
+			return nl_alloc(solver_N, m_params, size);
 		else
-			return new netlist_matrix_solver_direct_t<m_N, _storage_N>(m_params, size);
+			return nl_alloc(solver_N, m_params, size);
 	}
 }
 

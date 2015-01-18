@@ -18,7 +18,7 @@ public:
 		{}
 	ATTR_HOT inline int vsolve_non_dynamic();
 protected:
-	ATTR_HOT virtual double vsolve();
+	ATTR_HOT virtual nl_double vsolve();
 private:
 };
 
@@ -26,7 +26,7 @@ private:
 // netlist_matrix_solver - Direct1
 // ----------------------------------------------------------------------------------------
 
-ATTR_HOT double netlist_matrix_solver_direct1_t::vsolve()
+ATTR_HOT nl_double netlist_matrix_solver_direct1_t::vsolve()
 {
 	solve_base<netlist_matrix_solver_direct1_t>(this);
 	return this->compute_next_timestep();
@@ -38,10 +38,10 @@ ATTR_HOT inline int netlist_matrix_solver_direct1_t::vsolve_non_dynamic()
 	this->build_LE();
 	//NL_VERBOSE_OUT(("%f %f\n", new_val, m_RHS[0] / m_A[0][0]);
 
-	double new_val =  m_RHS[0] / m_A[0][0];
+	nl_double new_val =  m_RHS[0] / m_A[0][0];
 
-	double e = (new_val - net->m_cur_Analog);
-	double cerr = fabs(e);
+	nl_double e = (new_val - net->m_cur_Analog);
+	nl_double cerr = fabs(e);
 
 	net->m_cur_Analog = new_val;
 

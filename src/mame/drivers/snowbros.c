@@ -185,6 +185,13 @@ WRITE16_MEMBER(snowbros_state::semicom_soundcmd_w)
 	if (ACCESSING_BITS_0_7) soundlatch_byte_w(space,0,data & 0xff);
 }
 
+READ16_MEMBER(snowbros_state::toto_read)
+{
+	int pc = space.device().safe_pc();
+	if ((pc!= 0x3f010) && (pc!= 0x38008)) printf("toto prot %08x %04x\n", pc, mem_mask);
+	return 0x0700;
+}
+
 /* Snow Bros Memory Map */
 
 static ADDRESS_MAP_START( snowbros_map, AS_PROGRAM, 16, snowbros_state )
@@ -1955,6 +1962,21 @@ ROM_START( snowbroswb )
 	ROM_LOAD16_BYTE( "wb09.bin",     0x60001, 0x10000, CRC(9be718ca) SHA1(5c195e4f13efbdb229201d2408d018861bf389cc) )
 ROM_END
 
+ROM_START( toto )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "u60.5j",  0x00000, 0x20000, CRC(39203792) SHA1(4c8d560be02a514cbf91774c7a0b4a95cf573356) )
+	ROM_LOAD16_BYTE( "u51.4j",  0x00001, 0x20000, CRC(7b846cd4) SHA1(04aa0bbaab4303fb08dff52d5515f7e764f1be6d))
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )    /* 64k for z80 sound code */
+	ROM_LOAD( "u46.4c",   0x0000, 0x8000, CRC(77b1ef42) SHA1(75e3c8c2b687669cc56f972dd7375dab5185859c) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "u107.8k",          0x00000, 0x20000, CRC(4486153b) SHA1(a6dc0c17bf2328ab725bce4aaa0a413a42129fb0) )
+	ROM_LOAD( "u108.8l",          0x20000, 0x20000, CRC(3286cf5f) SHA1(133366b0e10ab86111247cbedf329e8e3a7f2148) )
+	ROM_LOAD( "u109.8m",          0x40000, 0x20000, CRC(464d7251) SHA1(f03ee54e9301ea87de4171cecdbad4a5e17929c4) )
+	ROM_LOAD( "u110.8n",          0x60000, 0x20000, CRC(7dea56df) SHA1(7e7b9238837c6f4221cff416a2de21723d2c9272) )
+ROM_END
+
 /* Barko */
 
 ROM_START( honeydol )
@@ -2866,6 +2888,39 @@ DRIVER_INIT_MEMBER(snowbros_state,pzlbreak)
 
 
 
+DRIVER_INIT_MEMBER(snowbros_state,toto)
+{
+	// every single rom has bits 0x10 and 0x08 swapped
+	UINT8 *src = memregion("maincpu")->base();
+	int len = memregion("maincpu")->bytes();
+
+	for (int i = 0; i < len; i++)
+	{
+		src[i] = BITSWAP8(src[i], 7, 6, 5, 3, 4, 2, 1, 0);
+	}
+
+	src = memregion("gfx1")->base();
+	len = memregion("gfx1")->bytes();
+
+	for (int i = 0; i < len; i++)
+	{
+		src[i] = BITSWAP8(src[i], 7, 6, 5, 3, 4, 2, 1, 0);
+	}
+
+	src = memregion("soundcpu")->base();
+	len = memregion("soundcpu")->bytes();
+
+	for (int i = 0; i < len; i++)
+	{
+		src[i] = BITSWAP8(src[i], 7, 6, 5, 3, 4, 2, 1, 0);
+	}
+
+	// protection? (just return 0x07)
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x500006, 0x500007, read16_delegate(FUNC(snowbros_state::toto_read),this));
+}
+
+
+
 GAME( 1990, snowbros,  0,        snowbros, snowbros, driver_device, 0, ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 1)", 0 )
 GAME( 1990, snowbrosa, snowbros, snowbros, snowbros, driver_device, 0, ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 2)", 0 )
 GAME( 1990, snowbrosb, snowbros, snowbros, snowbros, driver_device, 0, ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 3)", 0 )
@@ -2874,6 +2929,8 @@ GAME( 1990, snowbrosj, snowbros, snowbros, snowbroj, driver_device, 0, ROT0, "To
 GAME( 1990, snowbrosd, snowbros, snowbros, snowbroj, driver_device, 0, ROT0, "Toaplan (Dooyong license)",      "Snow Bros. - Nick & Tom (Dooyong license)", 0 )
 GAME( 1990, wintbob,   snowbros, wintbob,  snowbros, driver_device, 0, ROT0, "bootleg (Sakowa Project Korea)", "The Winter Bobble (bootleg of Snow Bros.)", 0 )
 GAME( 1990, snowbroswb,snowbros, wintbob,  snowbros, driver_device, 0, ROT0, "bootleg",                        "Snow Bros. - Nick & Tom (The Winter Bobble hardware bootleg)", 0 ) // this was probably unhacked back from the more common Winter Bobble to make it look more original
+
+GAME( 1996, toto,      0,        snowbros, snowbros, snowbros_state, toto, ROT0, "SoftClub",                    "Come Back Toto", 0 ) // modified from 'snowbros' code
 
 // none of the games below are on genuine SnowBros hardware, but they clone the functionality of it.
 
