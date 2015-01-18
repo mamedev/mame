@@ -46,6 +46,9 @@ MINISRC = $(SRC)/osd/$(OSD)
 MINIOBJ = $(OBJ)/osd/$(OSD)
 LIBCOOBJ = $(OBJ)/osd/$(OSD)/libretro-sdk/libco
 
+OSDCOMMONSRC  = $(SRC)/osd/modules/lib
+OSDCOMMONOBJ = $(SRC)/osd/modules/lib
+
 OBJDIRS += $(MINIOBJ) $(LIBCOOBJ) 
 
 ifeq ($(VRENDER),opengl)
@@ -65,6 +68,7 @@ OSDCOREOBJS := \
 	$(MINIOBJ)/retrowork.o \
 	$(MINIOBJ)/retroos.o \
 	$(MINIOBJ)/../modules/sound/retro_sound.o \
+	$(OSDCOMMONOBJ)/osdobj_common.o
 
 #-------------------------------------------------
 # OSD mini library

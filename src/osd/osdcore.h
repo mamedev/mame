@@ -19,15 +19,14 @@
 #ifndef __OSDCORE_H__
 #define __OSDCORE_H__
 
-#ifdef __LIBRETRO__
-#ifdef __ANDROID__
 #include <stdarg.h>
-#endif
+
+#ifndef INLINE
+#define INLINE static inline
 #endif
 
 #include "osdcomm.h"
 #include "delegate.h"
-#include <stdarg.h>
 
 /***************************************************************************
     FILE I/O INTERFACES
