@@ -16,6 +16,7 @@
 #include "ui/filesel.h"
 #include "ui/swlist.h"
 #include "zippath.h"
+#include "audit.h"
 
 
 /***************************************************************************
@@ -132,7 +133,18 @@ void ui_menu_control_device_image::test_create(bool &can_create, bool &need_conf
 void ui_menu_control_device_image::load_software_part()
 {
 	astring temp_name(sld->list_name(), ":", swi->shortname(), ":", swp->name());
-	hook_load(temp_name, true);
+
+	driver_enumerator drivlist(machine().options(), machine().options().system_name());
+	media_auditor auditor(drivlist);
+	media_auditor::summary summary = auditor.audit_software(sld->list_name(), (software_info *)swi, AUDIT_VALIDATE_FAST);
+	// if everything looks good, load software
+	if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
+		hook_load(temp_name, true);
+	else
+	{
+		popmessage("The selected game is missing one or more required ROM or CHD images. Please select a different game.");
+		state = SELECT_SOFTLIST;
+	}
 }
 
 
