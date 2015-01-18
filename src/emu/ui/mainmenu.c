@@ -19,7 +19,7 @@
 #include "ui/filemngr.h"
 #include "ui/filesel.h"
 #include "ui/barcode.h"
-#include "ui/imginfo.h"
+#include "ui/info.h"
 #include "ui/inputmap.h"
 #include "ui/mainmenu.h"
 #include "ui/miscmenu.h"
@@ -183,7 +183,7 @@ void ui_menu_main::handle()
 			break;
 
 		case IMAGE_MENU_FILE_MANAGER:
-			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_file_manager(machine(), container)));
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_file_manager(machine(), container, NULL)));
 			break;
 
 		case TAPE_CONTROL:

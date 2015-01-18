@@ -237,21 +237,24 @@ void image_device_init(running_machine &machine)
 			}
 		}
 	}
+}
 
+/*-------------------------------------------------
+ image_mandatory_scan - search for devices which
+ need an image to be loaded
+ -------------------------------------------------*/
+
+astring &image_mandatory_scan(running_machine &machine, astring &mandatory)
+{
+	mandatory.reset();
+	// make sure that any required image has a mounted file
+	image_interface_iterator iter(machine.root_device());
 	for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
 	{
-		/* is an image specified for this image */
-		image_name = image->filename();
-
-		if (!((image_name != NULL) && (image_name[0] != '\0')))
-		{
-			/* no image... must this device be loaded? */
-			if (image->must_be_loaded())
-			{
-				fatalerror_exitcode(machine, MAMERR_DEVICE, "Driver requires that device \"%s\" must have an image to load", image->instance_name());
-			}
-		}
+		if (image->filename() == NULL && image->must_be_loaded())
+			mandatory.cat("\"").cat(image->instance_name()).cat("\", ");
 	}
+	return mandatory;
 }
 
 /*-------------------------------------------------
