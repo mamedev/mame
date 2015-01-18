@@ -2,12 +2,15 @@
 // copyright-holders:Aaron Giles
 //============================================================
 //
-//  strconv.h - Win32 string conversion
+//  strconv.h - String conversion
+//
+//  Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+//  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //============================================================
 
-#ifndef __WIN_STRCONV__
-#define __WIN_STRCONV__
+#ifndef __OSD_STRCONV__
+#define __OSD_STRCONV__
 
 #include "osdcore.h"
 
@@ -16,6 +19,8 @@
 //============================================================
 //  FUNCTION PROTOTYPES
 //============================================================
+
+#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
 
 // the result of these functions has to be released with osd_free()
 
@@ -33,6 +38,7 @@ char *utf8_from_wstring(const WCHAR *s);
 #define utf8_from_tstring   utf8_from_astring
 #endif // UNICODE
 
+#endif //SDLMAME_WIN32
 
 
-#endif // __WIN_STRCONV__
+#endif // __OSD_STRCONV__

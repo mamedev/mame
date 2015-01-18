@@ -31,6 +31,13 @@
 #include <unistd.h>
 #endif
 
+// only for strconv.h
+#if defined(SDLMAME_WIN32)
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
+
+
 #ifdef SDLMAME_OS2
 #define INCL_DOS
 #include <os2.h>
@@ -47,6 +54,7 @@
 #include "emu.h"
 #include "clifront.h"
 #include "emuopts.h"
+#include "strconv.h"
 
 // OSD headers
 #include "video.h"
@@ -1203,7 +1211,7 @@ char *utf8_from_wstring(const WCHAR *wstring)
 	return result;
 }
 
-osd_font sdl_osd_interface::font_open(const char *_name, int &height)
+osd_font *sdl_osd_interface::font_open(const char *_name, int &height)
 {
 	// accept qualifiers from the name
 	astring name(_name);
@@ -1228,14 +1236,14 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 	logfont.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
 
 	// copy in the face name
-	TCHAR *face = wstring_from_utf8(name);
-	wcsncpy(logfont.lfFaceName, face, sizeof(logfont.lfFaceName) / sizeof(TCHAR));
+	TCHAR *face = tstring_from_utf8(name);
+	_tcsncpy(logfont.lfFaceName, face, sizeof(logfont.lfFaceName) / sizeof(TCHAR));
 	logfont.lfFaceName[sizeof(logfont.lfFaceName) / sizeof(TCHAR)-1] = 0;
 	osd_free(face);
 
 	// create the font
 	height = logfont.lfHeight;
-	osd_font font = reinterpret_cast<osd_font>(CreateFontIndirect(&logfont));
+	osd_font *font = reinterpret_cast<osd_font *>(CreateFontIndirect(&logfont));
 	if (font == NULL)
 		return NULL;
 
@@ -1248,7 +1256,7 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 	DeleteDC(dummyDC);
 
 	// if it doesn't match our request, fail
-	char *utf = utf8_from_wstring(realname);
+	char *utf = utf8_from_tstring(realname);
 	int result = core_stricmp(utf, name);
 	osd_free(utf);
 
@@ -1267,7 +1275,7 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 //  a given OSD font
 //-------------------------------------------------
 
-void sdl_osd_interface::font_close(osd_font font)
+void sdl_osd_interface::font_close(osd_font *font)
 {
 	// delete the font ojbect
 	if (font != NULL)
@@ -1283,7 +1291,7 @@ void sdl_osd_interface::font_close(osd_font font)
 //  pixel of a black & white font
 //-------------------------------------------------
 
-bool sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
+bool sdl_osd_interface::font_get_bitmap(osd_font *font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
 {
 	// create a dummy DC to work with
 	HDC dummyDC = CreateCompatibleDC(NULL);
@@ -1425,9 +1433,9 @@ bool sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, bitma
 //  font with the given name
 //-------------------------------------------------
 
-osd_font sdl_osd_interface::font_open(const char *_name, int &height)
+osd_font *sdl_osd_interface::font_open(const char *_name, int &height)
 {
-	return (osd_font)NULL;
+	return (osd_font *)NULL;
 }
 
 //-------------------------------------------------
@@ -1435,7 +1443,7 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 //  a given OSD font
 //-------------------------------------------------
 
-void sdl_osd_interface::font_close(osd_font font)
+void sdl_osd_interface::font_close(osd_font *font)
 {
 }
 
@@ -1447,7 +1455,7 @@ void sdl_osd_interface::font_close(osd_font font)
 //  pixel of a black & white font
 //-------------------------------------------------
 
-bool sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
+bool sdl_osd_interface::font_get_bitmap(osd_font *font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
 {
 	return false;
 }

@@ -1,14 +1,16 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 //============================================================
 //
-//  strconv.h - SDL string conversion
+//  strconv.h - String conversion
 //
 //  Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //============================================================
 
-#ifndef __SDLSTRCONV__
-#define __SDLSTRCONV__
+#ifndef __OSD_STRCONV__
+#define __OSD_STRCONV__
 
 #include "osdcore.h"
 
@@ -18,8 +20,10 @@
 //  FUNCTION PROTOTYPES
 //============================================================
 
-#ifdef SDLMAME_WIN32
+#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
 
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 // the result of these functions has to be released with osd_free()
 
 CHAR *astring_from_utf8(const char *s);
@@ -36,6 +40,11 @@ char *utf8_from_wstring(const WCHAR *s);
 #define utf8_from_tstring   utf8_from_astring
 #endif // UNICODE
 
+#if defined(SDLMAME_WIN32)
+#define _tcsncpy wcsncpy
+#endif
+
 #endif //SDLMAME_WIN32
 
-#endif // __SDLSTRCONV__
+
+#endif // __OSD_STRCONV__
