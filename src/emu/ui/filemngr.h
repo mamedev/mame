@@ -20,13 +20,18 @@ public:
 	astring current_file;
 	device_image_interface *selected_device;
 
-	ui_menu_file_manager(running_machine &machine, render_container *container);
+	static void force_file_manager(running_machine &machine, render_container *container, const char *warnings);
+
+	ui_menu_file_manager(running_machine &machine, render_container *container, const char *warnings);
 	virtual ~ui_menu_file_manager();
 	virtual void populate();
 	virtual void handle();
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
 
 	void fill_image_line(device_image_interface *img, astring &instance, astring &filename);
+
+private:
+	astring m_warnings;
 };
 
 #endif  /* __UI_FILEMNGR_H__ */
