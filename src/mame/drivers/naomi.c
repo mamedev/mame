@@ -7848,7 +7848,7 @@ ROM_START( wldrider )
 	ROM_LOAD( "mpr-23620.ic10", 0x9800000, 0x1000000, CRC(67aa15a9) SHA1(42c24cbf7069c27430a71509a872cd1c4224aaeb) )
 
 	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "wldrider-key.bin", 0, 4, CRC(f5a662ad) SHA1(a75b1e490d1f7d57cd8976115572266d1ca05202) )
+	ROM_LOAD( "wldrider-key.bin", 0, 4, CRC(7ac4f5fa) SHA1(5d08ecfbdc5f4bf26a9ea521a647c93141e7f635) )
 ROM_END
 
 ROM_START( vf4cart )
@@ -7993,7 +7993,7 @@ ROM_START( clubkrte )
 	ROM_LOAD( "mpr-23703.ic11", 0xa800000, 0x1000000, CRC(702b8b4a) SHA1(3a8dfde458f341e7db20664382b9fce2b6e5d462) )
 
 	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "clubkrte-key.bin", 0, 4, CRC(db426a5d) SHA1(6a6a0b80ec0416605541159efea379dc19fe796d) )
+	ROM_LOAD( "clubkrte-key.bin", 0, 4, CRC(5420fd0a) SHA1(06cb480c12f0ddc10e7601d34c5f42dda6ac6145) )
 ROM_END
 
 ROM_START( clubkrtd )
