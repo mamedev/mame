@@ -69,10 +69,16 @@ netlist_matrix_solver_direct_t<m_N, _storage_N>::~netlist_matrix_solver_direct_t
 	{
 		//delete[] m_A[k];
 	}
-	//delete[] m_last_RHS;
+    for (int k = 0; k < N(); k++)
+    {
+        nl_free(m_terms[k]);
+        nl_free(m_row_ops[k]);
+    }
+    nl_free(m_row_ops[N()]);
+    //delete[] m_last_RHS;
 	//delete[] m_RHS;
-	delete[] m_terms;
-	delete[] m_rails_temp;
+	nl_free_array(m_terms);
+	nl_free_array(m_rails_temp);
 	//delete[] m_row_ops;
 
 }
@@ -452,12 +458,12 @@ netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(
 , m_dim(size)
 , m_lp_fact(0)
 {
-	m_terms = new terms_t *[N()];
-	m_rails_temp = new terms_t[N()];
+	m_terms = nl_alloc_array(terms_t *, N());
+	m_rails_temp = nl_alloc_array(terms_t, N());
 
 	for (int k = 0; k < N(); k++)
 	{
-		m_terms[k] = new terms_t;
+		m_terms[k] = nl_alloc(terms_t);
 		m_row_ops[k] = vector_ops_t::create_ops(k);
 	}
 	m_row_ops[N()] = vector_ops_t::create_ops(N());
@@ -469,12 +475,12 @@ netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(
 , m_dim(size)
 , m_lp_fact(0)
 {
-    m_terms = new terms_t *[N()];
-    m_rails_temp = new terms_t[N()];
+    m_terms = nl_alloc_array(terms_t *, N());
+    m_rails_temp = nl_alloc_array(terms_t, N());
 
     for (int k = 0; k < N(); k++)
     {
-        m_terms[k] = new terms_t;
+        m_terms[k] = nl_alloc(terms_t);
         m_row_ops[k] = vector_ops_t::create_ops(k);
     }
     m_row_ops[N()] = vector_ops_t::create_ops(N());

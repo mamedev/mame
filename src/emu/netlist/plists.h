@@ -28,7 +28,7 @@ public:
 		if (m_num_elements == 0)
 			m_list = NULL;
 		else
-			m_list = new _ListClass[m_num_elements];
+			m_list = nl_alloc_array(_ListClass, m_num_elements);
 		m_count = 0;
 	}
 
@@ -38,7 +38,7 @@ public:
 		if (m_num_elements == 0)
 			m_list = NULL;
 		else
-			m_list = new _ListClass[m_num_elements];
+			m_list = nl_alloc_array(_ListClass, m_num_elements);
 		m_count = 0;
 		for (int i=0; i<rhs.count(); i++)
 		{
@@ -60,7 +60,7 @@ public:
 	ATTR_COLD ~plinearlist_t()
 	{
 		if (m_list != NULL)
-			delete[] m_list;
+		    nl_free_array(m_list);
 		m_list = NULL;
 	}
 
@@ -157,18 +157,18 @@ public:
 	{
 		for (_ListClass *i = m_list; i < m_list + m_count; i++)
 		{
-			delete *i;
+			nl_free(*i);
 		}
 		clear();
 	}
 
 private:
-	ATTR_HOT inline void resize(const int new_size)
+	ATTR_COLD void resize(const int new_size)
 	{
 		int cnt = count();
 		if (new_size > 0)
 		{
-			_ListClass *m_new = new _ListClass[new_size];
+			_ListClass *m_new = nl_alloc_array(_ListClass, new_size);
 			_ListClass *pd = m_new;
 
 			if (cnt > new_size)
@@ -176,14 +176,14 @@ private:
 			for (_ListClass *ps = m_list; ps < m_list + cnt; ps++, pd++)
 				*pd = *ps;
 			if (m_list != NULL)
-				delete[] m_list;
+				nl_free_array(m_list);
 			m_list = m_new;
 			m_count = cnt;
 		}
 		else
 		{
 			if (m_list != NULL)
-				delete[] m_list;
+			    nl_free_array(m_list);
 			m_list = NULL;
 			m_count = 0;
 		}

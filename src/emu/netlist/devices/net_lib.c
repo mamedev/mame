@@ -49,6 +49,7 @@
 
 #include "net_lib.h"
 #include "nld_system.h"
+#include "../nl_factory.h"
 
 NETLIST_START(diode_models)
 	NET_MODEL(".model 1N914 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)")
@@ -64,24 +65,10 @@ NETLIST_END()
 
 
 #define xstr(s) # s
-#define ENTRY1(_nic, _name, _defparam) register_device<_nic>( # _name, xstr(_nic), _defparam );
+#define ENTRY1(_nic, _name, _defparam) factory.register_device<_nic>( # _name, xstr(_nic), _defparam );
 #define ENTRY(_nic, _name, _defparam) ENTRY1(NETLIB_NAME(_nic), _name, _defparam)
 
-netlist_factory_t::netlist_factory_t()
-{
-}
-
-netlist_factory_t::~netlist_factory_t()
-{
-	for (net_device_t_base_factory * const *e = m_list.first(); e != NULL; e = m_list.next(e))
-	{
-		net_device_t_base_factory *p = *e;
-		delete p;
-	}
-	m_list.clear();
-}
-
-void netlist_factory_t::initialize()
+void nl_initialize_factory(netlist_factory_t &factory)
 {
 	ENTRY(R,                    RES,                    "R")
 	ENTRY(POT,                  POT,                    "R")
@@ -162,39 +149,3 @@ void netlist_factory_t::initialize()
 	ENTRY(NE555_dip,            NE555_DIP,              "-")
 }
 
-netlist_device_t *netlist_factory_t::new_device_by_classname(const pstring &classname, netlist_setup_t &setup) const
-{
-	for (net_device_t_base_factory * const *e = m_list.first(); e != NULL; e = m_list.next(e))
-	{
-		net_device_t_base_factory *p = *e;
-		if (strcmp(p->classname(), classname) == 0)
-		{
-			netlist_device_t *ret = p->Create();
-			return ret;
-		}
-		p++;
-	}
-	setup.netlist().error("Class %s not found!\n", classname.cstr());
-	return NULL; // appease code analysis
-}
-
-netlist_device_t *netlist_factory_t::new_device_by_name(const pstring &name, netlist_setup_t &setup) const
-{
-	net_device_t_base_factory *f = factory_by_name(name, setup);
-	return f->Create();
-}
-
-net_device_t_base_factory * netlist_factory_t::factory_by_name(const pstring &name, netlist_setup_t &setup) const
-{
-	for (net_device_t_base_factory * const *e = m_list.first(); e != NULL; e = m_list.next(e))
-	{
-		net_device_t_base_factory *p = *e;
-		if (strcmp(p->name(), name) == 0)
-		{
-			return p;
-		}
-		p++;
-	}
-	setup.netlist().error("Class %s not found!\n", name.cstr());
-	return NULL; // appease code analysis
-}

@@ -14,7 +14,6 @@
 //pstring::str_t *pstring::m_zero = new(pstring::m_pool, 0) pstring::str_t(0);
 
 pblockpool pstring::m_pool;
-
 pstring::str_t pstring::m_zero;
 
 /*

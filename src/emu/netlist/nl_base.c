@@ -152,7 +152,7 @@ netlist_base_t::~netlist_base_t()
 	{
 		if (!m_nets[i]->isRailNet())
 		{
-			delete m_nets[i];
+			global_free(m_nets[i]);
 		}
 	}
 

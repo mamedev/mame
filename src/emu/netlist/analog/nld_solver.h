@@ -155,7 +155,7 @@ class ATTR_ALIGNED(64) terms_t
 	NETLIST_PREVENT_COPYING(terms_t)
 
 	public:
-	ATTR_COLD terms_t() : m_railstart(0), m_ops(NULL)
+	ATTR_COLD terms_t() : m_railstart(0)
 	{}
 
 	ATTR_COLD void clear()
@@ -175,7 +175,6 @@ class ATTR_ALIGNED(64) terms_t
 	ATTR_HOT inline double *go() { return m_go; }
 	ATTR_HOT inline double *Idr() { return m_Idr; }
 	ATTR_HOT inline double **other_curanalog() { return m_other_curanalog; }
-	ATTR_HOT vector_ops_t *ops() { return m_ops; }
 
 	ATTR_COLD void set_pointers();
 
@@ -188,7 +187,6 @@ private:
 	plinearlist_t<double> m_gt;
 	plinearlist_t<double> m_Idr;
 	plinearlist_t<double *> m_other_curanalog;
-	vector_ops_t * m_ops;
 };
 
 class netlist_matrix_solver_t : public netlist_device_t
