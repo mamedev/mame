@@ -76,7 +76,7 @@
     Starting with GT Fore!, I.T. moved to a redesigned hardware platform known as the Eagle platform.
         It has a main board with a 3Dfx video card and is hard drive based. This series started with
         GT Fore! in 2000 and continued through 2006 ending with Golden Tee Complete. This final
-        version incuded all the courses from all the previous years in the Fore! series.
+        version included all the courses from all the previous years in the Fore! series.
         The Eagle platform also supports I.T.'s hunting series "Big Buck Hunter", the light game gun
         called Carnival King as well as the limited release game Virtual Pool.
 
@@ -1615,7 +1615,7 @@ static INPUT_PORTS_START( s_ver )
 
 	PORT_MODIFY("DIPS")
 	PORT_DIPNAME( 0x00100000, 0x00000000, "Trackball Orientation" ) PORT_DIPLOCATION("SW1:4")   /* Determined by actual use / trial & error */
-	PORT_DIPSETTING(          0x00000000, "Normal Mount" )                      /* The manual says "Always on (defualt)" and "Off -- UNUSED --" */
+	PORT_DIPSETTING(          0x00000000, "Normal Mount" )                      /* The manual says "Always on (default)" and "Off -- UNUSED --" */
 	PORT_DIPSETTING(          0x00100000, "45 Degree Angle" )
 	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")    /* Single controller version -  has no effect */
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
@@ -1631,7 +1631,7 @@ static INPUT_PORTS_START( aama )
 
 	PORT_MODIFY("DIPS")
 	PORT_DIPNAME( 0x00100000, 0x00000000, "Trackball Orientation" ) PORT_DIPLOCATION("SW1:4")   /* Determined by actual use / trial & error */
-	PORT_DIPSETTING(          0x00000000, "Normal Mount" )                      /* The manual says "Always on (defualt)" and "Off -- UNUSED --" */
+	PORT_DIPSETTING(          0x00000000, "Normal Mount" )                      /* The manual says "Always on (default)" and "Off -- UNUSED --" */
 	PORT_DIPSETTING(          0x00100000, "45 Degree Angle" )
 	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Upright ) )
@@ -2450,7 +2450,7 @@ ROM_START( wcbowl15 )   /* Version 1.5 (3-tier board set: P/N 1059 Rev 3, P/N 10
 	ROM_CONTINUE(                 0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, "gfx1", 0 )
-	/* No known set specificly checks for this, however the GROM data may be in the form of four 8 Meg roms:
+	/* No known set specifically checks for this, however the GROM data may be in the form of four 8 Meg roms:
 	ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" ect
 	ROM_LOAD32_BYTE( "wcb_grom0_1_+.grm0_1", 0x000001, 0x100000, CRC(1615aee8) SHA1(6184919371a894b1d6f2e06a2b328cb55abed4a9) )
 	ROM_LOAD32_BYTE( "wcb_grom0_2_+.grm0_2", 0x000002, 0x100000, CRC(d8e0b06e) SHA1(4981c0cf16df68a1b4da7ebf65ca587c21292478) )
@@ -2485,7 +2485,7 @@ ROM_START( wcbowl14 )   /* Version 1.4 (3-tier board set: P/N 1059 Rev 3, P/N 10
 	ROM_CONTINUE(                 0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, "gfx1", 0 )
-	/* No known set specificly checks for this, however the GROM data may be in the form of four 8 Meg roms:
+	/* No known set specifically checks for this, however the GROM data may be in the form of four 8 Meg roms:
 	ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" ect
 	ROM_LOAD32_BYTE( "wcb_grom0_1_+.grm0_1", 0x000001, 0x100000, CRC(1615aee8) SHA1(6184919371a894b1d6f2e06a2b328cb55abed4a9) )
 	ROM_LOAD32_BYTE( "wcb_grom0_2_+.grm0_2", 0x000002, 0x100000, CRC(d8e0b06e) SHA1(4981c0cf16df68a1b4da7ebf65ca587c21292478) )
@@ -2520,7 +2520,7 @@ ROM_START( wcbowl13 )   /* Version 1.3 (3-tier board set: P/N 1059 Rev 3, P/N 10
 	ROM_CONTINUE(                 0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, "gfx1", 0 )
-	/* No known set specificly checks for this, however the GROM data may be in the form of four 8 Meg roms:
+	/* No known set specifically checks for this, however the GROM data may be in the form of four 8 Meg roms:
 	ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" ect
 	ROM_LOAD32_BYTE( "wcb_grom0_1_+.grm0_1", 0x000001, 0x100000, CRC(1615aee8) SHA1(6184919371a894b1d6f2e06a2b328cb55abed4a9) )
 	ROM_LOAD32_BYTE( "wcb_grom0_2_+.grm0_2", 0x000002, 0x100000, CRC(d8e0b06e) SHA1(4981c0cf16df68a1b4da7ebf65ca587c21292478) )
@@ -2555,7 +2555,7 @@ ROM_START( wcbowl13j )  /* Version 1.3 (3-tier board set: P/N 1059 Rev 3, P/N 10
 	ROM_CONTINUE(                 0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, "gfx1", 0 )
-	/* No known set specificly checks for this, however the GROM data may be in the form of four 8 Meg roms:
+	/* No known set specifically checks for this, however the GROM data may be in the form of four 8 Meg roms:
 	ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" ect
 	ROM_LOAD32_BYTE( "wcb_grom0_1_+.grm0_1", 0x000001, 0x100000, CRC(1615aee8) SHA1(6184919371a894b1d6f2e06a2b328cb55abed4a9) )
 	ROM_LOAD32_BYTE( "wcb_grom0_2_+.grm0_2", 0x000002, 0x100000, CRC(d8e0b06e) SHA1(4981c0cf16df68a1b4da7ebf65ca587c21292478) )
@@ -2590,7 +2590,7 @@ ROM_START( wcbowl12 )   /* Version 1.2 (3-tier board set: P/N 1059 Rev 3, P/N 10
 	ROM_CONTINUE(                 0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, "gfx1", 0 )
-	/* No known set specificly checks for this, however the GROM data may be in the form of four 8 Meg roms:
+	/* No known set specifically checks for this, however the GROM data may be in the form of four 8 Meg roms:
 	ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" ect
 	ROM_LOAD32_BYTE( "wcb_grom0_1_+.grm0_1", 0x000001, 0x100000, CRC(1615aee8) SHA1(6184919371a894b1d6f2e06a2b328cb55abed4a9) )
 	ROM_LOAD32_BYTE( "wcb_grom0_2_+.grm0_2", 0x000002, 0x100000, CRC(d8e0b06e) SHA1(4981c0cf16df68a1b4da7ebf65ca587c21292478) )
@@ -2625,7 +2625,7 @@ ROM_START( wcbowl11 )   /* Version 1.1 (3-tier board set: P/N 1059 Rev 3, P/N 10
 	ROM_CONTINUE(                 0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, "gfx1", 0 )
-	/* No known set specificly checks for this, however the GROM data may be in the form of four 8 Meg roms:
+	/* No known set specifically checks for this, however the GROM data may be in the form of four 8 Meg roms:
 	ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" ect
 	ROM_LOAD32_BYTE( "wcb_grom0_1_+.grm0_1", 0x000001, 0x100000, CRC(1615aee8) SHA1(6184919371a894b1d6f2e06a2b328cb55abed4a9) )
 	ROM_LOAD32_BYTE( "wcb_grom0_2_+.grm0_2", 0x000002, 0x100000, CRC(d8e0b06e) SHA1(4981c0cf16df68a1b4da7ebf65ca587c21292478) )
@@ -3354,7 +3354,7 @@ ROM_START( gt3dt211 ) /* Version 2.11 Tournament Edition (PCB P/N 1083 Rev 2) */
 	ROM_LOAD32_BYTE( "gtg3_grom0_3++.grm0_3", 0x000003, 0x100000, CRC(1173a710) SHA1(1f612c1efbf38796707f5b5fecf9d4044691f031) )
 	/*
 	The above 4 roms have the same exact data as the other sets, but in 8 meg roms instead of 4 meg roms.
-	This is the only set that specificaly checks for these roms in this format
+	This is the only set that specifically checks for these roms in this format
 	*/
 	ROM_LOAD32_BYTE( "gtg3_grom1_0+.grm1_0", 0x400000, 0x080000, CRC(80ae7148) SHA1(e19d3390a2a0dad260d770fdbbb64d1f8e43d53f) ) /* actually labeled "GTG3 GROM1_0*" ect */
 	ROM_LOAD32_BYTE( "gtg3_grom1_1+.grm1_1", 0x400001, 0x080000, CRC(0f85a618) SHA1(d9ced21c20f9ed6b7f19e7645d75b239ea709b79) )
@@ -4036,7 +4036,7 @@ ROM_START( gtsupreme ) /* Version 5.10T ELC S (Tournament Edition, PCB P/N 1083 
 	ROM_LOAD32_BYTE( "gt2k_grom1_3.grm1_3", 0x200003, 0x80000, CRC(59f48688) SHA1(37b2c84e487f4f3a9145bef34c573a3716b4a6a7) )
 
 	/* GT99, GT2K & GT Classic all share the above listed 8 graphics roms and may be labeled GT99, GT2K or GTClassic */
-	/* The Euro version has different GROM2_x compared to the standard US versions.  GT Superme PCBs have been seen  */
+	/* The Euro version has different GROM2_x compared to the standard US versions.  GT Supreme PCBs have been seen  */
 	/* with GT 2K mask roms as well as all GROMs labeled "GT SUPREME" */
 
 	ROM_LOAD32_BYTE( "gt_supreme_grom2_0.grm2_0", 0x400000, 0x80000, CRC(33998a3e) SHA1(53832e37c42155eb9c774eb33b8b36fe387fa162) )
@@ -4505,19 +4505,19 @@ GAME( 1999, wcbowldx,    0,        sftm,     wcbowldx, itech32_state, shufshot, 
     NOTE: Due to various different upgrade packages from IT, the 3 tier boards can end up with any combination
         of rom boards and sound boards.  For historical reasons, GTG3 3 tier S versions will use the oldest
         sound file set up. Version L will use the newer Ensoniq sample rom and v2.X sound code, while gt97
-        through gtclassic will use the lastest "NR" versions.
+        through gtclassic will use the latest "NR" versions.
 
   GT Diamond Edition Tournament is a Euro GT98 with different GROM2_0 through GROM2_3
   GT Royal Edition Tournament is a Euro GT99
   GT Supreme Edition Tournament is a Euro GT2K with different GROM2_0 through GROM2_3
      GT Supreme (on a real PCB with actual tournament data) comes up with a different title screen and is (c) 2002
-     showing the title as GT Supreme Plus! and the Hole-In-One board shows an aditional course, Coconut Cove from GT99
+     showing the title as GT Supreme Plus! and the Hole-In-One board shows an additional course, Coconut Cove from GT99
      Current emulation does not reproduce this extra title screen due to missing tournament data.
   There doesn't seem to be a Euro version of GT Classic (at least none have been found).
 
 NOTE: There is an "8 Meg board" version of the P/N 1083 Rev 2 PCB, so GROM0_0 through GROM0_3 are 8 meg roms and labeled "GTxx GROM0_0 **" ect
       while GROM1_0 through GROM1_3 are 4 meg roms matching "4 Meg board" GROM2_0 through GROM2_3 and are labeled "GTxx GROM1_0 *" ect
-      It is possible to find these rom combinations on any given GT board set.  There is only 1 known GT set which specificly checks for 8 meg
+      It is possible to find these rom combinations on any given GT board set.  There is only 1 known GT set which specifically checks for 8 meg
       roms under the GROM Checksum test.
 
     Parent set will always be gt(year) with the most recent version.  IE: gt97 is Golden Tee '97 v1.30
