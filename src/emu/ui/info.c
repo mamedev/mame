@@ -1,8 +1,8 @@
 /***************************************************************************
 
-    ui/imginfo.c
+    ui/info.c
 
-    Image info screen
+    System and image info screens
 
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -11,34 +11,47 @@
 
 #include "emu.h"
 #include "ui/menu.h"
-#include "ui/imginfo.h"
+#include "ui/info.h"
+#include "ui/ui.h"
+
+/*-------------------------------------------------
+  menu_game_info - handle the game information
+  menu
+ -------------------------------------------------*/
+
+ui_menu_game_info::ui_menu_game_info(running_machine &machine, render_container *container) : ui_menu(machine, container)
+{
+}
+
+ui_menu_game_info::~ui_menu_game_info()
+{
+}
+
+void ui_menu_game_info::populate()
+{
+	astring tempstring;
+	item_append(machine().ui().game_info_astring(tempstring), NULL, MENU_FLAG_MULTILINE, NULL);
+}
+
+void ui_menu_game_info::handle()
+{
+	// process the menu
+	process(0);
+}
 
 
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
-
-//-------------------------------------------------
-//  ctor
-//-------------------------------------------------
+/*-------------------------------------------------
+  ui_menu_image_info - handle the image information
+  menu
+ -------------------------------------------------*/
 
 ui_menu_image_info::ui_menu_image_info(running_machine &machine, render_container *container) : ui_menu(machine, container)
 {
 }
 
-
-//-------------------------------------------------
-//  dtor
-//-------------------------------------------------
-
 ui_menu_image_info::~ui_menu_image_info()
 {
 }
-
-
-//-------------------------------------------------
-//  populate
-//-------------------------------------------------
 
 void ui_menu_image_info::populate()
 {
@@ -50,11 +63,6 @@ void ui_menu_image_info::populate()
 			image_info(image);
 }
 
-
-//-------------------------------------------------
-//  handle
-//-------------------------------------------------
-
 void ui_menu_image_info::handle()
 {
 	// process the menu
@@ -62,10 +70,10 @@ void ui_menu_image_info::handle()
 }
 
 
-//-------------------------------------------------
-//  image_info - display image info for a specific
-//  image interface device
-//-------------------------------------------------
+/*-------------------------------------------------
+  image_info - display image info for a specific
+  image interface device
+-------------------------------------------------*/
 
 void ui_menu_image_info::image_info(device_image_interface *image)
 {

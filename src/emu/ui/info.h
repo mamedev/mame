@@ -1,8 +1,8 @@
 /***************************************************************************
 
-    ui/imginfo.h
+    ui/info.h
 
-    Image info screen
+    System and image info screens
 
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -11,8 +11,17 @@
 
 #pragma once
 
-#ifndef __UI_IMGINFO_H__
-#define __UI_IMGINFO_H__
+#ifndef __UI_INFO_H__
+#define __UI_INFO_H__
+
+class ui_menu_game_info : public ui_menu {
+public:
+	ui_menu_game_info(running_machine &machine, render_container *container);
+	virtual ~ui_menu_game_info();
+	virtual void populate();
+	virtual void handle();
+};
+
 
 class ui_menu_image_info : public ui_menu
 {
@@ -26,4 +35,4 @@ private:
 	void image_info(device_image_interface *image);
 };
 
-#endif // __UI_IMGINFO_H__
+#endif // __UI_INFO_H__

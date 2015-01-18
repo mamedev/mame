@@ -19,7 +19,7 @@
 #include "ui/filemngr.h"
 #include "ui/filesel.h"
 #include "ui/barcode.h"
-#include "ui/imginfo.h"
+#include "ui/info.h"
 #include "ui/inputmap.h"
 #include "ui/mainmenu.h"
 #include "ui/miscmenu.h"
