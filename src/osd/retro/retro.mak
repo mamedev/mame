@@ -68,6 +68,9 @@ OSDCOREOBJS := \
 	$(MINIOBJ)/retrowork.o \
 	$(MINIOBJ)/retroos.o \
 	$(MINIOBJ)/../modules/sound/retro_sound.o \
+	$(MINIOBJ)/../modules/sound/none.o \
+	$(MINIOBJ)/../modules/debugger/none.o \
+	$(MINIOBJ)/../modules/debugger/debugint.o \
 	$(OSDCOMMONOBJ)/osdobj_common.o
 
 #-------------------------------------------------
