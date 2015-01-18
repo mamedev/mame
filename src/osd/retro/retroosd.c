@@ -60,7 +60,7 @@ void retro_osd_interface::init(running_machine &machine)
 	memset(retro, 0, sizeof(*retro));
 #endif
 
-	osd_interface::init(machine);
+	osd_common_t::init(machine);
 	our_target = machine.render().target_alloc();
 
 	initInput(machine);
