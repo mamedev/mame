@@ -6,6 +6,7 @@
  */
 
 #include "nl_parser.h"
+#include "nl_factory.h"
 
 //#undef NL_VERBOSE_OUT
 //#define NL_VERBOSE_OUT(x) printf x

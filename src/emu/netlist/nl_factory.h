@@ -80,7 +80,7 @@ public:
 		m_list.add(nl_alloc(net_device_t_factory< _C >, name, classname, def_param));
 	}
 
-	ATTR_COLD netlist_device_t *new_device_by_classname(const pstring &classname, netlist_setup_t &setup) const;
+	ATTR_COLD netlist_device_t *new_device_by_classname(const pstring &classname) const;
 	ATTR_COLD netlist_device_t *new_device_by_name(const pstring &name, netlist_setup_t &setup) const;
 	ATTR_COLD net_device_t_base_factory * factory_by_name(const pstring &name, netlist_setup_t &setup) const;
 

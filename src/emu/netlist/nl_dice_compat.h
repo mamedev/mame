@@ -8,12 +8,23 @@
 #ifndef NL_DICE_COMPAT_H_
 #define NL_DICE_COMPAT_H_
 
+#include "netlist/devices/net_lib.h"
+
 /* --------------------------------------------------------------------
  * Compatibility macros for DICE netlists ...
  * -------------------------------------------------------------------- */
 
-//#define CHIP(_n, _t) netlist.register_dev(NET_NEW(_t ## _dip), _n);
+/*
+ * define NETLIST_DEVELOPMENT in IDEs before including this header file
+ * to get compile time errors on unknown devices. This should only be
+ * a temporary support and not be used in commits.
+ */
+
+#ifdef NETLIST_DEVELOPMENT
 #define CHIP(_n, _t) setup.register_dev( nl_alloc(nld_ ## _t ## _dip), _n);
+#else
+#define CHIP(_n, _t) setup.register_dev(NETLIB_NAME_STR(_t ## _dip), _n);
+#endif
 
 #define CONNECTION( ... ) CONNECTIONY( CONNECTIONX( __VA_ARGS__ ) )
 #define CONNECTIONY(_a) _a

@@ -159,7 +159,7 @@ public:
 #else
 #define nl_assert(x)               do { } while (0)
 //#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s (%s:%d)", msg, __FILE__, __LINE__); } while (0)
-#define nl_assert_always(x, msg)   do { } while (0)
+#define nl_assert_always(x, msg)    do { if (!(x)) throw nl_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
 #endif
 
 //============================================================
