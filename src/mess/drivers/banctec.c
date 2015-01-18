@@ -39,6 +39,13 @@ UINT32 banctec_state::screen_update_banctec(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
+/* ROCKWELL 6545 - Transparent Memory Addressing */
+
+MC6845_ON_UPDATE_ADDR_CHANGED(banctec_state::crtc_addr)
+{
+  /* What is this function meant to do ? */
+}
+
 /******************************
 * Graphics Decode Information *
 ******************************/
@@ -81,6 +88,7 @@ static MACHINE_CONFIG_START( banctec, banctec_state )
 	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL_20MHz) /* (?) */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_ADDR_CHANGED_CB(banctec_state, crtc_addr)
 
 MACHINE_CONFIG_END
 

@@ -7,6 +7,7 @@
 #ifndef BANCTEC_H_
 #define BANCTEC_H_
 
+#include "video/mc6845.h"
 
 class banctec_state : public driver_device
 {
@@ -20,6 +21,7 @@ public:
 	DECLARE_READ8_MEMBER(banctec_read);
 	DECLARE_WRITE8_MEMBER(banctec_write);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_banctec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
