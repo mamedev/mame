@@ -559,6 +559,9 @@ ifneq ($(BUILD_JPEGLIB),1)
 DEFS += -DUSE_SYSTEM_JPEGLIB
 endif
 
+# To support casting in Lua 5.3
+DEFS += -DLUA_COMPAT_APIINTCASTS
+
 # CFLAGS is defined based on C or C++ targets
 # (remember, expansion only happens when used, so doing it here is ok)
 CFLAGS = $(CCOMFLAGS) $(CPPONLYFLAGS)
