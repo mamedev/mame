@@ -13,7 +13,6 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "sound/ay8910.h"
 #include "includes/bogeyman.h"
 
 
@@ -21,23 +20,23 @@
 
 // Sound section is copied from Mysterious Stones driver by Nicola, Mike, Brad
 
-WRITE8_MEMBER(bogeyman_state::bogeyman_8910_latch_w)
+WRITE8_MEMBER(bogeyman_state::ay8910_latch_w)
 {
 	m_psg_latch = data;
 }
 
-WRITE8_MEMBER(bogeyman_state::bogeyman_8910_control_w)
+WRITE8_MEMBER(bogeyman_state::ay8910_control_w)
 {
 	// bit 0 is flipscreen
 	flip_screen_set(data & 0x01);
 
 	// bit 5 goes to 8910 #0 BDIR pin
 	if ((m_last_write & 0x20) == 0x20 && (data & 0x20) == 0x00)
-		machine().device<ay8910_device>("ay1")->data_address_w(space, m_last_write >> 4, m_psg_latch);
+		m_ay1->data_address_w(space, m_last_write >> 4, m_psg_latch);
 
 	// bit 7 goes to 8910 #1 BDIR pin
 	if ((m_last_write & 0x80) == 0x80 && (data & 0x80) == 0x00)
-		machine().device<ay8910_device>("ay2")->data_address_w(space, m_last_write >> 6, m_psg_latch);
+		m_ay2->data_address_w(space, m_last_write >> 6, m_psg_latch);
 
 	m_last_write = data;
 }
@@ -46,14 +45,14 @@ WRITE8_MEMBER(bogeyman_state::bogeyman_8910_control_w)
 
 static ADDRESS_MAP_START( bogeyman_map, AS_PROGRAM, 8, bogeyman_state )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(bogeyman_videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(bogeyman_colorram2_w) AM_SHARE("colorram2")
-	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(bogeyman_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x2100, 0x21ff) AM_RAM_WRITE(bogeyman_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(colorram2_w) AM_SHARE("colorram2")
+	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x2100, 0x21ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3000, 0x300f) AM_RAM_WRITE(bogeyman_paletteram_w) AM_SHARE("palette")
-	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("P1") AM_WRITE(bogeyman_8910_control_w)
-	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("P2") AM_WRITE(bogeyman_8910_latch_w)
+	AM_RANGE(0x3000, 0x300f) AM_RAM_WRITE(paletteram_w) AM_SHARE("palette")
+	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("P1") AM_WRITE(ay8910_control_w)
+	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("P2") AM_WRITE(ay8910_latch_w)
 	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW2") AM_WRITENOP // ??? sound
 	AM_RANGE(0x4000, 0xffff) AM_ROM
@@ -205,15 +204,17 @@ void bogeyman_state::machine_start()
 {
 	save_item(NAME(m_psg_latch));
 	save_item(NAME(m_last_write));
+	save_item(NAME(m_colbank));
 }
 
 void bogeyman_state::machine_reset()
 {
 	m_psg_latch = 0;
 	m_last_write = 0;
+	m_colbank = 0;
 }
 
-WRITE8_MEMBER(bogeyman_state::bogeyman_colbank_w)
+WRITE8_MEMBER(bogeyman_state::colbank_w)
 {
 	if((data & 1) != (m_colbank & 1))
 	{
@@ -237,7 +238,7 @@ static MACHINE_CONFIG_START( bogeyman, bogeyman_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(bogeyman_state, screen_update_bogeyman)
+	MCFG_SCREEN_UPDATE_DRIVER(bogeyman_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bogeyman)
@@ -249,7 +250,7 @@ static MACHINE_CONFIG_START( bogeyman, bogeyman_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 1500000)  /* Verified */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(bogeyman_state, bogeyman_colbank_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(bogeyman_state, colbank_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 1500000)  /* Verified */
