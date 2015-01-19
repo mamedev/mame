@@ -738,6 +738,11 @@ ROM_START( sgnascar )
 	ROM_LOAD32_WORD( "mpr-23483.ic32", 0xc000002, 0x1000000, CRC(c37adebe) SHA1(e84f6d2cc364c743f7f3b73d8c8d0271952bb093) )
 	ROM_LOAD32_WORD( "mpr-23480.ic33", 0xe000000, 0x1000000, CRC(f517b8b3) SHA1(c04740adb612473c4c9f8186e7e93d2f73d1bb1a) )
 	ROM_LOAD32_WORD( "mpr-23484.ic34", 0xe000002, 0x1000000, CRC(2ebe1aa1) SHA1(16b39f7422da1a334dde27169c2949e1d95bddb3) )
+
+	// 317-0283-COM Actel A54SX32
+	// ID 0x4252
+	ROM_REGION( 4, "rom_key", 0 )
+	ROM_LOAD( "sgnascar-key.bin", 0x000000, 0x000004, CRC(f1452f9e) SHA1(86fb0f278a2eb0aba66a24032fb683f7a516b32b) )
 ROM_END
 
 GAME( 2000, hikaru,   0,        hikaru,   hikaru, driver_device,   0, ROT0, "Sega",            "Hikaru Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
