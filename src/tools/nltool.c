@@ -173,7 +173,7 @@ public:
 		for (int i=0; i < ll.count(); i++)
 		{
             pstring name = "log_" + ll[i];
-			netlist_device_t *nc = m_setup->register_dev("nld_log", name);
+			/*netlist_device_t *nc = */ m_setup->register_dev("nld_log", name);
 			m_setup->register_link(name + ".I", ll[i]);
 		}
 	}
