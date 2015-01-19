@@ -26,15 +26,15 @@
 
 static ADDRESS_MAP_START( yard_map, AS_PROGRAM, 8, m58_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(yard_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0x9fff) AM_WRITE(yard_scroll_panel_w)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9000, 0x9fff) AM_WRITE(scroll_panel_w)
 	AM_RANGE(0xc820, 0xc87f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xa000, 0xa000) AM_RAM AM_SHARE("scroll_x_low")
 	AM_RANGE(0xa200, 0xa200) AM_RAM AM_SHARE("scroll_x_high")
 	AM_RANGE(0xa400, 0xa400) AM_RAM AM_SHARE("scroll_y_low")
 	AM_RANGE(0xa800, 0xa800) AM_RAM AM_SHARE("score_disable")
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(yard_flipscreen_w)    /* + coin counters */
+	AM_RANGE(0xd001, 0xd001) AM_WRITE(flipscreen_w)    /* + coin counters */
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("IN0")
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("IN1")
 	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN2")
@@ -203,7 +203,7 @@ static MACHINE_CONFIG_START( yard, m58_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 256, 282, 42, 266)
-	MCFG_SCREEN_UPDATE_DRIVER(m58_state, screen_update_yard)
+	MCFG_SCREEN_UPDATE_DRIVER(m58_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
