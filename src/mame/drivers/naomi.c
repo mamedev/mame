@@ -7805,7 +7805,7 @@ ROM_START( vstrik3c )
 	ROM_LOAD( "mpr-23662.ic11", 0xa800000, 0x0800000, CRC(d6ef7d68) SHA1(4ee396af6c5caf4c5af6e9ad0e03a7ac2c5039f4) )
 
 	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "vstrik3c-key.bin", 0, 4, CRC(8c9012fe) SHA1(d81e00d6377a3f0eeed01dc523707e36ca1b434d) )
+	ROM_LOAD( "vstrik3c-key.bin", 0, 4, CRC(8bfdd6e7) SHA1(850ae78d77603209ef6dfd4bebf6fea5361677e8) )
 ROM_END
 
 ROM_START( vstrik3cb )
@@ -7827,7 +7827,7 @@ ROM_START( vstrik3cb )
 	ROM_LOAD( "mpr-23662.ic11", 0xa800000, 0x0800000, CRC(d6ef7d68) SHA1(4ee396af6c5caf4c5af6e9ad0e03a7ac2c5039f4) )
 
 	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "vstrik3c-key.bin", 0, 4, CRC(8c9012fe) SHA1(d81e00d6377a3f0eeed01dc523707e36ca1b434d) )
+	ROM_LOAD( "vstrik3c-key.bin", 0, 4, CRC(8bfdd6e7) SHA1(850ae78d77603209ef6dfd4bebf6fea5361677e8) )
 ROM_END
 
 ROM_START( wldrider )
@@ -7870,7 +7870,7 @@ ROM_START( vf4cart )
 	ROM_LOAD( "mpr-23784.ic11", 0xa800000, 0x1000000, CRC(f74f2fee) SHA1(84b07baa6d116727e66ef27e24ba6484c3393891) )
 
 	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "vf4cart-key.bin", 0, 4, CRC(aa8cdd58) SHA1(e282b7d215044a005b50c8553b8056f3d599135c) )
+	ROM_LOAD( "vf4cart-key.bin", 0, 4, CRC(ade11941) SHA1(2d2c5fc0d625a67b2940c195313ff05566020d13) )
 ROM_END
 
 // There is also a development cart (171-7885A) with 20x 64Mb FlashROMs instead of 10x 128Mb MaskROMs. Content is the same.
