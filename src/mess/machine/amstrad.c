@@ -2842,7 +2842,7 @@ void amstrad_state::enumerate_roms()
 	int i;
 	bool slot3 = false,slot7 = false;
 
-	if(m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000)
+	if (m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000)
 	{
 		UINT8 *crt = m_region_cart->base();
 		int bank_mask = (m_cart->get_rom_size() / 0x4000) - 1;
@@ -3034,6 +3034,8 @@ MACHINE_START_MEMBER(amstrad_state,plus)
 
 	astring region_tag;
 	m_region_cart = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	if (!m_region_cart)	// this should never happen, since we make carts mandatory!
+		m_region_cart = memregion("maincpu");
 }
 
 
@@ -3076,6 +3078,8 @@ MACHINE_START_MEMBER(amstrad_state,gx4000)
 
 	astring region_tag;
 	m_region_cart = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	if (!m_region_cart)	// this should never happen, since we make carts mandatory!
+		m_region_cart = memregion("maincpu");
 }
 
 MACHINE_RESET_MEMBER(amstrad_state,gx4000)
