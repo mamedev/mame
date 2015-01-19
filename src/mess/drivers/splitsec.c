@@ -4,7 +4,20 @@
 
   Parker Brothers Split Second
   * TMS1400NLL MP7314-N2 (die labeled MP7314)
+  
+  This is an electronic handheld reflex gaming device, it's straightforward
+  to use. The included mini-games are:
+  1, 2, 3: Mad Maze*
+  4, 5: Space Attack*
+  6: Auto Cross
+  7: Stomp
+  8: Speedball
+  
+  *: higher number indicates harder difficulty
 
+
+  TODO:
+  - MCU clock is unknown
 
 ***************************************************************************/
 
@@ -14,9 +27,13 @@
 
 #include "splitsec.lh"
 
-// master clock is a single stage RC oscillator: R=24K, C=100pf,
-// according to the TMS 1000 series data manual this is around 375kHz
-#define MASTER_CLOCK (375000)
+// The master clock is a single stage RC oscillator: R=24K, C=100pf,
+// according to the TMS 1000 series data manual this is around 375kHz.
+// However, this sounds too low-pitched and runs too slow when compared
+// to recordings, maybe the RC osc curve is different for TMS1400?
+
+// so for now, the value below is an approximation
+#define MASTER_CLOCK (485000)
 
 
 class splitsec_state : public driver_device
@@ -160,13 +177,13 @@ WRITE16_MEMBER(splitsec_state::write_o)
 
 static INPUT_PORTS_START( splitsec )
 	PORT_START("IN.0") // R9
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // R10
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Select")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Start")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -230,7 +247,7 @@ MACHINE_CONFIG_END
 
 ROM_START( splitsec )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "tms1400nll_mp7314", 0x0000, 0x1000, CRC(0cccdf59) SHA1(06a533134a433aaf856b80f0ca239d0498b98d5f) )
+	ROM_LOAD( "tms1400nll_mp7314", 0x0000, 0x1000, CRC(e94b2098) SHA1(f0fc1f56a829252185592a2508740354c50bedf8) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_default_mpla.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
@@ -239,4 +256,4 @@ ROM_START( splitsec )
 ROM_END
 
 
-CONS( 1980, splitsec, 0, 0, splitsec, splitsec, driver_device, 0, "Parker Brothers", "Split Second", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1980, splitsec, 0, 0, splitsec, splitsec, driver_device, 0, "Parker Brothers", "Split Second", GAME_SUPPORTS_SAVE )

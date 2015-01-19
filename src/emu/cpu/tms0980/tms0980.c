@@ -638,7 +638,6 @@ void tms1400_cpu_device::device_reset()
 	tms1100_cpu_device::device_reset();
 
 	// small differences in 00-3f area
-	m_fixed_decode[0x09] = F_COMX;
 	m_fixed_decode[0x0b] = F_TPC;
 }
 

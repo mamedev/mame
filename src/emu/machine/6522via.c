@@ -223,8 +223,10 @@ void via6522_device::device_start()
 	save_item(NAME(m_acr));
 	save_item(NAME(m_ier));
 	save_item(NAME(m_ifr));
+	save_item(NAME(m_time1));
 	save_item(NAME(m_t1_active));
 	save_item(NAME(m_t1_pb7));
+	save_item(NAME(m_time2));
 	save_item(NAME(m_t2_active));
 	save_item(NAME(m_shift_counter));
 }

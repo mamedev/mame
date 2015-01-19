@@ -36,31 +36,31 @@ PALETTE_INIT_MEMBER(bogeyman_state, bogeyman)
 	}
 }
 
-WRITE8_MEMBER(bogeyman_state::bogeyman_videoram_w)
+WRITE8_MEMBER(bogeyman_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bogeyman_state::bogeyman_colorram_w)
+WRITE8_MEMBER(bogeyman_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bogeyman_state::bogeyman_videoram2_w)
+WRITE8_MEMBER(bogeyman_state::videoram2_w)
 {
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bogeyman_state::bogeyman_colorram2_w)
+WRITE8_MEMBER(bogeyman_state::colorram2_w)
 {
 	m_colorram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bogeyman_state::bogeyman_paletteram_w)
+WRITE8_MEMBER(bogeyman_state::paletteram_w)
 {
 	/* RGB output is inverted */
 	m_palette->write(space, offset, UINT8(~data));
@@ -94,11 +94,9 @@ void bogeyman_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-void bogeyman_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void bogeyman_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs;
-
-	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
+	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		int attr = m_spriteram[offs];
 
@@ -139,7 +137,7 @@ void bogeyman_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 bogeyman_state::screen_update_bogeyman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 bogeyman_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);

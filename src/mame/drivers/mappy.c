@@ -2462,7 +2462,7 @@ GAME( 1984, grobda3,  grobda,   grobda,   grobda, mappy_state,   grobda,   ROT90
 
 /* 3x6809, static tilemap, 2bpp sprites (Gaplus type) */
 GAME( 1983, phozon,   0,        phozon,   phozon, mappy_state,   phozon,        ROT90, "Namco", "Phozon (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1983, phozons,  phozon,   phozon,   phozon, mappy_state,   phozon,        ROT90, "bootleg? (Sidam)", "Phozon (Sidam)", GAME_SUPPORTS_SAVE )
+GAME( 1983, phozons,  phozon,   phozon,   phozon, mappy_state,   phozon,        ROT90, "Namco (Sidam license)", "Phozon (Sidam)", GAME_SUPPORTS_SAVE )
 
 /* 2x6809, scroling tilemap, 4bpp sprites (Super Pacman type) */
 GAME( 1983, mappy,    0,        mappy,    mappy, mappy_state,   mappy,        ROT90, "Namco", "Mappy (US)", GAME_SUPPORTS_SAVE )
