@@ -89,12 +89,17 @@ render_font::render_font(render_manager &manager, const char *filename)
 	// if this is an OSD font, we're done
 	if (filename != NULL)
 	{
-		m_osdfont = manager.machine().osd().font_open(filename, m_height);
+		m_osdfont = manager.machine().osd().font_alloc();
 		if (m_osdfont != NULL)
 		{
-			m_scale = 1.0f / (float)m_height;
-			m_format = FF_OSD;
-			return;
+		    if (m_osdfont->open(manager.machine().options().font_path(), filename, m_height))
+		    {
+	            m_scale = 1.0f / (float)m_height;
+	            m_format = FF_OSD;
+	            return;
+		    }
+		    global_free(m_osdfont);
+		    m_osdfont = NULL;
 		}
 	}
 
@@ -130,7 +135,10 @@ render_font::~render_font()
 
 	// release the OSD font
 	if (m_osdfont != NULL)
-		m_manager.machine().osd().font_close(m_osdfont);
+	{
+        m_osdfont->close();
+        global_free(m_osdfont);
+	}
 }
 
 
@@ -149,7 +157,7 @@ void render_font::char_expand(unicode_char chnum, glyph &gl)
 			return;
 
 		// attempt to get the font bitmap; if we fail, set bmwidth to -1
-		if (!m_manager.machine().osd().font_get_bitmap(m_osdfont, chnum, gl.bitmap, gl.width, gl.xoffs, gl.yoffs))
+		if (!m_osdfont->get_bitmap(chnum, gl.bitmap, gl.width, gl.xoffs, gl.yoffs))
 		{
 			gl.bitmap.reset();
 			gl.bmwidth = -1;

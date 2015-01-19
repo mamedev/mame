@@ -26,10 +26,25 @@ class input_type_entry;     // FIXME: including emu.h does not work because emu.
 //  TYPE DEFINITIONS
 //============================================================
 
-// FIXME: We can do better than this
-class osd_font;
+// ======================> osd_font interface
+
+class osd_font
+{
+public:
+    virtual ~osd_font() {}
+
+    virtual bool open(const char *font_path, const char *name, int &height) = 0;
+    virtual void close() = 0;
+    virtual bool get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs) = 0;
+};
 
 // ======================> osd_interface
+
+/* FIXME: this should be replaced by a proper module implementation
+ * For the time being only one font provider can be linked
+ */
+
+osd_font *osd_font_alloc();
 
 // description of the currently-running machine
 class osd_interface
@@ -52,13 +67,13 @@ public:
 	// input overridables
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) = 0;
 
-	// font overridables
-	virtual osd_font *font_open(const char *name, int &height) = 0;
-	virtual void font_close(osd_font *font) = 0;
-	virtual bool font_get_bitmap(osd_font *font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs) = 0;
-
 	// video overridables
 	virtual void *get_slider_list() = 0; // FIXME: returns slider_state *
+
+	// font interface
+
+	// font is allocated with global_alloc; therefore use global_free!
+	osd_font *font_alloc() { return osd_font_alloc(); }
 
 	// command option overrides
 	virtual bool execute_command(const char *command) = 0;

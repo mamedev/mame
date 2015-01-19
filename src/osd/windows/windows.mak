@@ -91,6 +91,7 @@ OBJDIRS += $(WINOBJ) \
 	$(OSDOBJ)/modules/sync \
 	$(OSDOBJ)/modules/lib \
 	$(OSDOBJ)/modules/midi \
+	$(OSDOBJ)/modules/font \
 
 ifdef USE_QTDEBUG
 OBJDIRS += $(OSDOBJ)/modules/debugger/qt
@@ -356,6 +357,7 @@ OSDCOREOBJS = \
 	$(WINOBJ)/winsocket.o \
 	$(OSDOBJ)/modules/sync/work_osd.o \
 	$(OSDOBJ)/modules/lib/osdlib_win32.o \
+	$(OSDOBJ)/modules/font/font_windows.o \
 	$(WINOBJ)/winptty.o \
 
 
