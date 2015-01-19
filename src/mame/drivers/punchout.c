@@ -10,6 +10,7 @@ the bottom screen.
 driver by Nicola Salmoria
 
 TODO:
+- finish spunchout protection, currently using a hacky workaround
 - add useless driver config to choose between pink and white color proms
 - video raw params - pixel clock is derived from 20.16mhz xtal
 - money bag placement might not be 100% correct in Arm Wrestling
@@ -226,6 +227,15 @@ READ8_MEMBER(punchout_state::spunchout_exp_r)
 	ret |= m_rtc->alarm_r() ? 0x00 : 0x20;
 	ret |= m_rp5h01->counter_r() ? 0x00 : 0x40;
 	ret |= m_rp5h01->data_r() ? 0x00 : 0x80;
+
+	// FIXME - hack d6/d7 state until we figure out why the game resets
+	/* PC = 0x0313 */
+	/* (ret or 0x10) -> (D7DF),(D7A0) - (D7DF),(D7A0) = 0d0h(ret nc) */
+	ret &= 0x3f;
+	if (space.device().safe_pcbase() == 0x0313)
+	{
+		ret |= 0xc0;
+	}
 
 	return ret;
 }
