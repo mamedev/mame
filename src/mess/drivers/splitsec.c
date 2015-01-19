@@ -13,7 +13,7 @@
   7: Stomp
   8: Speedball
   
-  *: higher number indicates harder difficulty
+  *: higher number indicates higher difficulty
 
 
   TODO:
@@ -80,6 +80,21 @@ public:
 
 // decay time, in steps of 10ms
 #define LEDS_DECAY_TIME 4
+
+/* display layout, where number xy is lamp R(x),O(y)
+
+       00    02    04
+    10 01 12 03 14 05 16
+       11    13    15
+    20 21 22 23 24 25 26
+       31    33    35
+    30 41 32 43 34 45 36
+       51    53    55
+    40 61 42 63 44 65 46
+       71    73    75
+    50 60 52 62 54 64 56
+       70    72    74
+*/
 
 void splitsec_state::leds_update()
 {
@@ -177,7 +192,7 @@ WRITE16_MEMBER(splitsec_state::write_o)
 
 static INPUT_PORTS_START( splitsec )
 	PORT_START("IN.0") // R9
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY // 4 separate directional buttons, hence 16way
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
