@@ -14,7 +14,6 @@
 #ifndef __UI_MAINMENU_H__
 #define __UI_MAINMENU_H__
 
-#include "crsshair.h"
 #include "drivenum.h"
 
 class ui_menu_main : public ui_menu {

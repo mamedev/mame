@@ -14,8 +14,8 @@
 #ifndef __UI_MISCMENU_H__
 #define __UI_MISCMENU_H__
 
-#include "crsshair.h"
 #include "drivenum.h"
+#include "crsshair.h"
 
 class ui_menu_keyboard_mode : public ui_menu {
 public:
@@ -42,59 +42,6 @@ public:
 
 private:
 	attotime prevtime;
-};
-
-class ui_menu_cheat : public ui_menu {
-public:
-	ui_menu_cheat(running_machine &machine, render_container *container);
-	virtual ~ui_menu_cheat();
-	virtual void populate();
-	virtual void handle();
-};
-
-class ui_menu_sliders : public ui_menu {
-public:
-	ui_menu_sliders(running_machine &machine, render_container *container, bool menuless_mode = false);
-	virtual ~ui_menu_sliders();
-	virtual void populate();
-	virtual void handle();
-
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
-
-	static UINT32 ui_handler(running_machine &machine, render_container *container, UINT32 state);
-
-private:
-	bool menuless_mode, hidden;
-};
-
-class ui_menu_video_targets : public ui_menu {
-public:
-	ui_menu_video_targets(running_machine &machine, render_container *container);
-	virtual ~ui_menu_video_targets();
-	virtual void populate();
-	virtual void handle();
-};
-
-class ui_menu_video_options : public ui_menu {
-public:
-	ui_menu_video_options(running_machine &machine, render_container *container, render_target *target);
-	virtual ~ui_menu_video_options();
-	virtual void populate();
-	virtual void handle();
-
-private:
-	enum {
-		VIDEO_ITEM_ROTATE = 0x80000000,
-		VIDEO_ITEM_BACKDROPS,
-		VIDEO_ITEM_OVERLAYS,
-		VIDEO_ITEM_BEZELS,
-		VIDEO_ITEM_CPANELS,
-		VIDEO_ITEM_MARQUEES,
-		VIDEO_ITEM_ZOOM,
-		VIDEO_ITEM_VIEW
-	};
-
-	render_target *target;
 };
 
 class ui_menu_crosshair : public ui_menu {

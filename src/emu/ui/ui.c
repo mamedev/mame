@@ -16,14 +16,15 @@
 #include "render.h"
 #include "cheat.h"
 #include "rendfont.h"
-#include "ui/ui.h"
 #include "uiinput.h"
+#include "ui/ui.h"
+#include "ui/cheatopt.h"
 #include "ui/mainmenu.h"
 #include "ui/miscmenu.h"
 #include "ui/filemngr.h"
+#include "ui/sliders.h"
 #include "ui/viewgfx.h"
 #include "imagedev/cassette.h"
-#include <ctype.h>
 
 
 /***************************************************************************

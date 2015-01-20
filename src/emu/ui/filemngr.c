@@ -6,14 +6,8 @@
 
     TODO
         - Restrict directory listing by file extension
-        - Support file manager invocation from the main menu for
-          required images
 
 *********************************************************************/
-
-#include <stdio.h>
-#include <ctype.h>
-#include <stdlib.h>
 
 #include "emu.h"
 #include "ui/ui.h"

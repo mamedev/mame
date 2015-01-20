@@ -120,6 +120,7 @@ EMUOBJS = \
 	$(EMUOBJ)/ui/mainmenu.o \
 	$(EMUOBJ)/ui/miscmenu.o \
 	$(EMUOBJ)/ui/barcode.o \
+	$(EMUOBJ)/ui/cheatopt.o \
 	$(EMUOBJ)/ui/devopt.o \
 	$(EMUOBJ)/ui/filemngr.o \
 	$(EMUOBJ)/ui/filesel.o \
@@ -127,9 +128,11 @@ EMUOBJS = \
 	$(EMUOBJ)/ui/info.o \
 	$(EMUOBJ)/ui/inputmap.o \
 	$(EMUOBJ)/ui/selgame.o \
+	$(EMUOBJ)/ui/sliders.o \
 	$(EMUOBJ)/ui/slotopt.o \
 	$(EMUOBJ)/ui/swlist.o \
 	$(EMUOBJ)/ui/tapectrl.o \
+	$(EMUOBJ)/ui/videoopt.o \
 	$(EMUOBJ)/ui/viewgfx.o \
 	$(EMUOBJ)/validity.o \
 	$(EMUOBJ)/video.o \

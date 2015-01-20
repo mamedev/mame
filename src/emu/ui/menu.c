@@ -11,13 +11,12 @@
 
 #include "emu.h"
 #include "emuopts.h"
-#include "ui/ui.h"
 #include "rendutil.h"
-#include "uiinput.h"
 #include "cheat.h"
+#include "uiinput.h"
+#include "ui/ui.h"
 #include "ui/mainmenu.h"
-#include "ui/miscmenu.h"
-#include <ctype.h>
+#include "ui/cheatopt.h"
 
 
 
