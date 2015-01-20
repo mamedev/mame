@@ -46,7 +46,7 @@ void ui_menu_device_config::populate()
 	string.catprintf("Option: %s\n", m_option->name());
 
 	dev = const_cast<machine_config &>(machine().config()).device_add(&machine().config().root_device(), m_option->name(), m_option->devtype(), 0);
-		
+
 	string.catprintf("Device: %s\n", dev->name());
 	if (!m_mounted)
 		string.cat("\nIf you select this option, the following items will be enabled:\n");
@@ -153,9 +153,34 @@ void ui_menu_device_config::populate()
 				string.cat("\n");
 		}
 	}
+
+	// scan for BIOS settings
+	int bios = 0;
+	if (dev->rom_region()) 
+	{
+		astring bios_str;
+		// first loop through roms in search of default bios (shortname)
+		for (const rom_entry *rom = dev->rom_region(); !ROMENTRY_ISEND(rom); rom++)
+			if (ROMENTRY_ISDEFAULT_BIOS(rom))
+				bios_str.cpy(ROM_GETNAME(rom));
+
+		// then loop again to count bios options and to get the default bios complete name
+		for (const rom_entry *rom = dev->rom_region(); !ROMENTRY_ISEND(rom); rom++)
+		{
+			if (ROMENTRY_ISSYSTEM_BIOS(rom))
+			{
+				bios++;
+				if (bios_str == ROM_GETNAME(rom))
+					bios_str.cpy(ROM_GETHASHDATA(rom));
+			}
+		}
+		
+		if (bios)
+			string.catprintf("* BIOS settings:\n  %d options    [default: %s]\n", bios, bios_str.cstr());
+	}
 	
 	int input = 0, input_mj = 0, input_hana = 0, input_gamble = 0, input_analog = 0, input_adjust = 0;
-	int dips = 0, confs = 0;
+	int input_keypad = 0, input_keyboard = 0, dips = 0, confs = 0;
 	astring errors, dips_opt, confs_opt;
 	ioport_list portlist;
 	device_iterator iptiter(*dev);
@@ -176,6 +201,10 @@ void ui_menu_device_config::populate()
 				input_analog++;
 			else if (field->type() == IPT_ADJUSTER)
 				input_adjust++;
+			else if (field->type() == IPT_KEYPAD)
+				input_keypad++;
+			else if (field->type() == IPT_KEYBOARD)
+				input_keyboard++;
 			else if (field->type() >= IPT_START1 && field->type() < IPT_UI_FIRST)
 				input++;
 			else if (field->type() == IPT_DIPSWITCH)
@@ -210,10 +239,10 @@ void ui_menu_device_config::populate()
 		string.cat("* Dispwitch settings:\n").cat(dips_opt);
 	if (confs)
 		string.cat("* Configuration settings:\n").cat(confs_opt);
-	if (input + input_mj + input_hana + input_gamble + input_analog + input_adjust)
+	if (input + input_mj + input_hana + input_gamble + input_analog + input_adjust + input_keypad + input_keyboard)
 		string.cat("* Input device(s):\n");
 	if (input)
-		string.catprintf("  Player inputs    [%d inputs]\n", input);
+		string.catprintf("  User inputs    [%d inputs]\n", input);
 	if (input_mj)
 		string.catprintf("  Mahjong inputs    [%d inputs]\n", input_mj);
 	if (input_hana)
@@ -224,6 +253,10 @@ void ui_menu_device_config::populate()
 		string.catprintf("  Analog inputs    [%d inputs]\n", input_analog);
 	if (input_adjust)
 		string.catprintf("  Adjuster inputs    [%d inputs]\n", input_adjust);
+	if (input_keypad)
+		string.catprintf("  Keypad inputs    [%d inputs]\n", input_keypad);
+	if (input_keyboard)
+		string.catprintf("  Keyboard inputs    [%d inputs]\n", input_keyboard);
 
 	image_interface_iterator imgiter(*dev);
 	if (imgiter.count() > 0)
@@ -241,7 +274,8 @@ void ui_menu_device_config::populate()
 			string.catprintf("  %s    [default: %s]\n", slot->device().tag(), slot->default_option() ? slot->default_option() : "----");
 	}
 
-	if ((execiter.count() + scriter.count() + snditer.count() + imgiter.count() + slotiter.count() + input + input_mj + input_hana + input_gamble + input_analog + input_adjust) == 0)
+	if ((execiter.count() + scriter.count() + snditer.count() + imgiter.count() + slotiter.count() + bios + dips + confs
+		 + input + input_mj + input_hana + input_gamble + input_analog + input_adjust + input_keypad + input_keyboard) == 0)
 		string.cat("[None]\n");
 
 	const_cast<machine_config &>(machine().config()).device_remove(&machine().config().root_device(), m_option->name());
