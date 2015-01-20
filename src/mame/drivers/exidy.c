@@ -186,20 +186,12 @@ CUSTOM_INPUT_MEMBER(exidy_state::teetert_input_r)
 
 WRITE8_MEMBER(exidy_state::fax_bank_select_w)
 {
-	m_fax_bank = data;
+	membank("bank1")->set_entry(data & 0x1f);
 	
-	fax_bank_restore();
+	if ((data & 0x1f) > 0x17)
+		logerror("Banking to unpopulated ROM bank %02X!\n", data & 0x1f);
+	
 }
-
-void exidy_state::fax_bank_restore()
-{
-	UINT8 *RAM = memregion("maincpu")->base();
-
-	membank("bank1")->set_base(&RAM[0x10000 + (0x2000 * (m_fax_bank & 0x1f))]);
-	if ((m_fax_bank & 0x1f) > 0x17)
-		logerror("Banking to unpopulated ROM bank %02X!\n", m_fax_bank & 0x1f);
-}
-
 
 
 /*************************************
@@ -1548,11 +1540,7 @@ DRIVER_INIT_MEMBER(exidy_state,fax)
 
 	exidy_video_config(0x04, 0x04, TRUE);
 
-	/* reset the ROM bank */
-	fax_bank_select_w(space,0,0);
-	
-	save_item(NAME(m_fax_bank));
-	machine().save().register_postload(save_prepost_delegate(FUNC(exidy_state::fax_bank_restore), this));
+	membank("bank1")->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x2000);
 }
 
 

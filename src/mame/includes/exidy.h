@@ -73,7 +73,6 @@ public:
 	UINT8 m_collision_invert;
 	int m_is_2bpp;
 	UINT8 m_int_condition;
-	int m_fax_bank;
 	bitmap_ind16 m_background_bitmap;
 	bitmap_ind16 m_motion_object_1_vid;
 	bitmap_ind16 m_motion_object_2_vid;
@@ -110,7 +109,6 @@ public:
 	inline int sprite_1_enabled();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void check_collision();
-	void fax_bank_restore();
 
 	/* Targ and Spectar samples */
 	int m_max_freq;
