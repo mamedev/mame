@@ -890,9 +890,10 @@ UINT32 aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &bit
 		int pal_offs;
 		int pal_shift;
 		//UINT16 tile = m_e90_vram[offs] >> 16;
-		UINT16 pal = m_e90_vram[offs] & 0x3f; // guess: 0x1000 entries / word / 4bpp = 0x7f, bit 6 seems to have some special meaning tho ...
+		UINT16 pal = m_e90_vram[offs] & 0xff; // guess: 0x1000 entries / word / 4bpp = 0x7f, divided by two below (TODO: why?)
 		INT16 x = m_e90_vram[offs+1] >> 16;
 		INT16 y = m_e90_vram[offs+1] & 0xffff;
+		pal>>=1;
 		x>>=1;
 		pal_offs = (pal*0x20);
 		pal_offs+= 1; // edit this to get the other colors in the range
