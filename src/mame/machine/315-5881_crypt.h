@@ -40,7 +40,7 @@ protected:
 private:
 
 	enum {
-		BUFFER_SIZE = 32768*8, LINE_SIZE = 512*8,
+		BUFFER_SIZE = 32768, LINE_SIZE = 512,
 		FLAG_COMPRESSED = 0x10000, FLAG_LINE_SIZE_512 = 0x20000
 	};
 
