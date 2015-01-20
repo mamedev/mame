@@ -1536,7 +1536,7 @@ DRIVER_INIT_MEMBER(exidy_state,pepper2)
 
 DRIVER_INIT_MEMBER(exidy_state,fax)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
+	//address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	exidy_video_config(0x04, 0x04, TRUE);
 
