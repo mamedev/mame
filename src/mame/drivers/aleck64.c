@@ -179,9 +179,11 @@ public:
 	aleck64_state(const machine_config &mconfig, device_type type, const char *tag)
 		: n64_state(mconfig, type, tag),
 		  m_e90_vram(*this,"e90vram"),
+		  m_e90_pal(*this,"e90pal"),
 			m_dip_read_offset(0) { }
 
 	optional_shared_ptr<UINT32> m_e90_vram;
+	optional_shared_ptr<UINT32> m_e90_pal;
 	DECLARE_DRIVER_INIT(aleck64);
 	DECLARE_WRITE32_MEMBER(aleck_dips_w);
 	DECLARE_READ32_MEMBER(aleck_dips_r);
@@ -353,7 +355,7 @@ WRITE16_MEMBER(aleck64_state::e90_prot_w)
 static ADDRESS_MAP_START( e90_map, AS_PROGRAM, 32, aleck64_state )
 	AM_IMPORT_FROM( n64_map )
 	AM_RANGE(0xd0000000, 0xd0000fff) AM_RAM AM_SHARE("e90vram")// x/y offsets
-	AM_RANGE(0xd0010000, 0xd0010fff) AM_RAM // RGB555 palette
+	AM_RANGE(0xd0010000, 0xd0010fff) AM_RAM AM_SHARE("e90pal")// RGB555 palette
 	AM_RANGE(0xd0030000, 0xd003001f) AM_READWRITE16(e90_prot_r, e90_prot_w,0xffffffff)
 ADDRESS_MAP_END
 
@@ -878,32 +880,32 @@ MACHINE_CONFIG_END
 
 UINT32 aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	static int testx,testy;
 	bitmap.fill(0, cliprect);
 	screen_update_n64(screen,bitmap,cliprect);
 	
-	if(machine().input().code_pressed(KEYCODE_Z))
-		testx++;
-
-	if(machine().input().code_pressed(KEYCODE_X))
-		testx--;
-
-	if(machine().input().code_pressed_once(KEYCODE_A))
-		testy++;
-
-	if(machine().input().code_pressed_once(KEYCODE_S))
-		testy--;
-		
-	popmessage("%d %d",testx,testy);
 	for(int offs=0;offs<0x1000/4;offs+=2)
 	{
 		int xi,yi;
+		int r,g,b;
+		int pal_offs;
+		int pal_shift;
 		//UINT16 tile = m_e90_vram[offs] >> 16;
-		UINT16 pal = m_e90_vram[offs] & 0x7f; // guess: 0x1000 entries / word / 4bpp = 0x7f
+		UINT16 pal = m_e90_vram[offs] & 0x3f; // guess: 0x1000 entries / word / 4bpp = 0x7f, bit 6 seems to have some special meaning tho ...
 		INT16 x = m_e90_vram[offs+1] >> 16;
 		INT16 y = m_e90_vram[offs+1] & 0xffff;
 		x>>=1;
-		
+		pal_offs = (pal*0x20);
+		pal_offs+= 1; // edit this to get the other colors in the range
+		pal_shift = pal_offs & 1 ? 0 : 16;
+		r = m_e90_pal[pal_offs>>1] >> pal_shift;
+		g = (m_e90_pal[pal_offs>>1] >> (5+pal_shift));
+		b = (m_e90_pal[pal_offs>>1] >> (10+pal_shift));
+		r&=0x1f;
+		g&=0x1f;
+		b&=0x1f;
+		r = (r << 3) | (r >> 2); 
+		g = (g << 3) | (g >> 2);
+		b = (b << 3) | (b >> 2); 
 		for(yi=0;yi<8;yi++)
 			for(xi=0;xi<8;xi++)
 			{
@@ -912,7 +914,7 @@ UINT32 aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &bit
 				res_y = y+yi + 7;
 				
 				if(cliprect.contains(res_x, res_y))
-					bitmap.pix32(res_y, res_x) = pal << 16;
+					bitmap.pix32(res_y, res_x) = r << 16 | g << 8 | b;
 			}
 	}
 	return 0;
