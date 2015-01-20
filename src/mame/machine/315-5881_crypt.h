@@ -66,8 +66,10 @@ private:
 	static const sbox fn1_sboxes[4][4];
 	static const sbox fn2_sboxes[4][4];
 
-	static const int fn1_game_key_scheduling[38][2];
-	static const int fn2_game_key_scheduling[34][2];
+	static const int FN1GK = 39;
+	static const int FN2GK = 35;
+	static const int fn1_game_key_scheduling[FN1GK][2];
+	static const int fn2_game_key_scheduling[FN2GK][2];
 	static const int fn1_sequence_key_scheduling[20][2];
 	static const int fn2_sequence_key_scheduling[16];
 	static const int fn2_middle_result_scheduling[16];
