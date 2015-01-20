@@ -701,7 +701,8 @@ public:
 		: saturn_state(mconfig, type, tag),
 		m_adsp(*this, "adsp"),
 		m_adsp_pram(*this, "adsp_pram"),
-		m_cryptdevice(*this, "315_5881")
+		m_cryptdevice(*this, "315_5881"),
+		m_using_crypt_device(0)
 	{
 	}
 
@@ -839,6 +840,7 @@ public:
 
 	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
 	UINT16 crypt_read_callback(UINT32 addr);
+	int m_using_crypt_device;
 };
 
 

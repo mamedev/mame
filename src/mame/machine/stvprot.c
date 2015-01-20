@@ -92,6 +92,8 @@ For now I'm writing this function with a command basis so I can work better with
 #include "emu.h"
 #include "includes/stv.h"
 
+//FILE *fp;
+//FILE *fp2;
 
 
 /************************
@@ -494,24 +496,6 @@ UINT32 sss_prot_read_callback( address_space &space, int protaddr, UINT32 key )
 	}
 }
 
-UINT32 astrass_prot_read_callback( address_space &space, int protaddr, UINT32 key )
-{
-	/* we're reading from a custom region where we've loaded the data from the Saturn version
-	   NOT the rom address, so we're based at 0.  The real data likely exists at the given
-	   address in encrypted form */
-	int read_offset_hack = 0x4ec260;
-	int useoffset = (protaddr-read_offset_hack);
-	UINT32 data = 0;
-	UINT32 *prot_data = (UINT32 *)space.machine().root_device().memregion("user2")->base();
-	int prot_size = space.machine().root_device().memregion("user2")->bytes();
-
-	if (useoffset<prot_size)
-	{
-		data = prot_data[useoffset/4];
-		return data;
-	}
-	return 0x00;
-}
 
 
 UINT32 elandore_prot_read_callback( address_space &space, int protaddr, UINT32 key )
@@ -585,16 +569,28 @@ READ32_MEMBER( stv_state::common_prot_r )
 			#ifdef MAME_DEBUG
 			popmessage("Prot read at %06x with data = %08x",space.device().safe_pc(),m_abus_protkey);
 			#endif
-			UINT32 realret = space.read_dword(0x2000000+m_ctrl_index);
-			UINT32 retdata = m_prot_readback(space, m_ctrl_index, m_abus_protkey);
+			if (!m_using_crypt_device) // decrypt using hacks
+			{
+				UINT32 realret = space.read_dword(0x2000000 + m_ctrl_index);
+				UINT32 retdata = m_prot_readback(space, m_ctrl_index, m_abus_protkey);
+				//fwrite(&realret, 1, 4, fp);
+				//fwrite(&retdata, 1, 4, fp2);
 
-			logerror("A-Bus control protection read at %06x with data = %08x Returning = %08x Would otherwise return = %08x\n",space.device().safe_pc(),m_abus_protkey, retdata, realret);
-
-			//UINT16 res = m_cryptdevice->do_decrypt(base);
-
-			m_ctrl_index += 4;
-			return retdata;
-
+				logerror("A-Bus control protection read at %06x with data = %08x Returning = %08x Would otherwise return = %08x\n", space.device().safe_pc(), m_abus_protkey, retdata, realret);
+				m_ctrl_index += 4;
+				return retdata;
+			}
+			else // decrypt using real decryption device
+			{
+				UINT8* base;
+				UINT16 res = m_cryptdevice->do_decrypt(base);
+				UINT16 res2 = m_cryptdevice->do_decrypt(base);
+				res = ((res & 0xff00) >> 8) | ((res & 0x00ff) << 8);
+				res2 = ((res2 & 0xff00) >> 8) | ((res2 & 0x00ff) << 8);
+				
+				return res2 | (res << 16);
+			}
+			
 		}
 		return m_a_bus[offset];
 	}
@@ -608,8 +604,8 @@ READ32_MEMBER( stv_state::common_prot_r )
 
 UINT16 stv_state::crypt_read_callback(UINT32 addr)
 {
-	const UINT8 *base = m_cart_reg[0]->base() + 2*addr;
-	return base[1] | (base[0] << 8);
+	UINT16 dat= m_maincpu->space().read_word((0x02000000+2*addr));
+	return ((dat&0xff00)>>8)|((dat&0x00ff)<<8);
 }
 
 WRITE32_MEMBER ( stv_state::common_prot_w )
@@ -640,6 +636,24 @@ WRITE32_MEMBER ( stv_state::common_prot_w )
 		a_bus_vector = m_abus_prot_addr >> 16;
 		a_bus_vector|= (m_abus_prot_addr & 0xffff) << 16;
 		a_bus_vector<<= 1;
+		/*
+		if (fp)
+		{
+			fclose(fp);
+			fp = 0;
+		}
+		if (fp2)
+		{
+			fclose(fp2);
+			fp2 = 0;
+		}
+		char filename[256];
+		sprintf(filename,"encrypted_%s_key_%04x_address_%08x", machine().system().name, m_abus_protkey>>16, a_bus_vector);
+		fp=fopen(filename, "w+b");
+		sprintf(filename,"not-encrypted_%s_key_%04x_address_%08x", machine().system().name, m_abus_protkey>>16, a_bus_vector);
+		fp2=fopen(filename, "w+b");
+		*/
+
 		//printf("MAIN : %08x  DATA : %08x %08x\n",m_abus_protkey,m_abus_prot_addr,a_bus_vector);
 
 		// if you look at the first transfer in ffreveng this is clearly a ROM address from a table |  MAIN : 10d70000  DATA : 0b780013 002616f0
@@ -659,6 +673,8 @@ WRITE32_MEMBER ( stv_state::common_prot_w )
 void stv_state::install_common_protection()
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x4fffff0, 0x4ffffff, read32_delegate(FUNC(stv_state::common_prot_r), this), write32_delegate(FUNC(stv_state::common_prot_w), this));
+
+
 }
 
 void stv_state::install_sss_protection()
@@ -670,8 +686,9 @@ void stv_state::install_sss_protection()
 void stv_state::install_astrass_protection()
 {
 	install_common_protection();
-	m_prot_readback = astrass_prot_read_callback;
-//  m_cryptdevice->set_key(0x00000000);
+//	m_prot_readback = astrass_prot_read_callback;
+	m_cryptdevice->set_key(0x052e2901); // same key as wldkicks / toukon4
+	m_using_crypt_device = 1;
 }
 
 void stv_state::install_ffreveng_protection()
@@ -696,13 +713,16 @@ void stv_state::install_twcup98_protection()
 {
 	install_common_protection();
 	m_prot_readback = twcup98_prot_read_callback;
-
+	m_cryptdevice->set_key(0x05200913 );
+	m_using_crypt_device = 0; // doesn't currently work
 }
 
 
 
 void stv_state::stv_register_protection_savestates()
 {
+
+
 	save_item(NAME(m_a_bus));
 	save_item(NAME(m_ctrl_index));
 	save_item(NAME(m_internal_counter));

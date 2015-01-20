@@ -1824,11 +1824,6 @@ ROM_START( astrass )
 	ROM_LOAD16_WORD_SWAP( "mpr20826.1",     0x1800000, 0x0400000, CRC(bdc4b941) SHA1(c5e8b1b186324c2ccab617915f7bdbfe6897ca9f) ) // good (was .17)
 	ROM_LOAD16_WORD_SWAP( "mpr20832.8",     0x1c00000, 0x0400000, CRC(af1b0985) SHA1(d7a0e4e0a8b0556915f924bdde8c3d14e5b3423e) ) // good (was .18s)
 	ROM_LOAD16_WORD_SWAP( "mpr20833.9",     0x2000000, 0x0400000, CRC(cb6af231) SHA1(4a2e5d7c2fd6179c19cdefa84a03f9a34fbb9e70) ) // good (was .19s)
-
-	ROM_REGION32_BE( 0x11ea0, "user2", 0 )
-	// protection data (text layer tiles) extracted from Saturn version
-	// stat_t.bin is name of the file from Saturn version CD
-	ROM_LOAD( "stat_t.bin", 0x0000000, 0x11ea0,  BAD_DUMP CRC(52a0b542) SHA1(2b352dee919d7e7a5d338ece1691577d0b288eca) )
 ROM_END
 
 ROM_START( bakubaku )
