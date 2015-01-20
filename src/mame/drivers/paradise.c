@@ -678,7 +678,7 @@ void paradise_state::machine_start()
 
 	save_item(NAME(m_palbank));
 	save_item(NAME(m_priority));
-	save_item(NAME(irq_count));
+	save_item(NAME(m_irq_count));
 }
 
 void paradise_state::machine_reset()
@@ -686,14 +686,14 @@ void paradise_state::machine_reset()
 	m_palbank = 0;
 	m_priority = 0;
 
-	irq_count = 0;
+	m_irq_count = 0;
 
 }
 
 INTERRUPT_GEN_MEMBER(paradise_state::paradise_irq)
 {
-	if (irq_count<300)
-		irq_count++;
+	if (m_irq_count<300)
+		m_irq_count++;
 	else
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 }

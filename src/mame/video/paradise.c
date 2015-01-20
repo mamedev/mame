@@ -164,6 +164,7 @@ void paradise_state::video_start()
 	m_tilemap_2->set_transparent_pen(0xff);
 
 	save_item(NAME(m_tmpbitmap));
+	save_item(NAME(m_pixbank));
 }
 
 
@@ -179,16 +180,14 @@ WRITE8_MEMBER(paradise_state::paradise_priority_w)
 	m_priority = data;
 }
 
-void paradise_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void paradise_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
-	int i;
-	for (i = 0; i < m_spriteram.bytes() ; i += m_sprite_inc)
+	for (int i = 0; i < m_spriteram.bytes() ; i += m_sprite_inc)
 	{
-		int code = spriteram[i + 0];
-		int x    = spriteram[i + 1];
-		int y    = spriteram[i + 2] - 2;
-		int attr = spriteram[i + 3];
+		int code = m_spriteram[i + 0];
+		int x    = m_spriteram[i + 1];
+		int y    = m_spriteram[i + 2] - 2;
+		int attr = m_spriteram[i + 3];
 
 		int flipx = 0;  // ?
 		int flipy = 0;
