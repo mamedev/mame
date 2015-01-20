@@ -34,6 +34,12 @@ public:
 
 	exidy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_dac(*this, "dac"),
+		m_samples(*this, "samples"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
 		m_sprite1_xpos(*this, "sprite1_xpos"),
 		m_sprite1_ypos(*this, "sprite1_ypos"),
@@ -42,15 +48,16 @@ public:
 		m_spriteno(*this, "spriteno"),
 		m_sprite_enable(*this, "sprite_enable"),
 		m_color_latch(*this, "color_latch"),
-		m_characterram(*this, "characterram"),
-		m_maincpu(*this, "maincpu"),
-		m_dac(*this, "dac"),
-		m_samples(*this, "samples"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_characterram(*this, "characterram") { }
 
 
+	required_device<cpu_device> m_maincpu;
+	optional_device<dac_device> m_dac;
+	optional_device<samples_device> m_samples;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_sprite1_xpos;
 	required_shared_ptr<UINT8> m_sprite1_ypos;
@@ -61,25 +68,22 @@ public:
 	required_shared_ptr<UINT8> m_color_latch;
 	required_shared_ptr<UINT8> m_characterram;
 
-	required_device<cpu_device> m_maincpu;
-	optional_device<dac_device> m_dac;
-	optional_device<samples_device> m_samples;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-
 	UINT8 m_last_dial;
 	UINT8 m_collision_mask;
 	UINT8 m_collision_invert;
 	int m_is_2bpp;
 	UINT8 m_int_condition;
+	int m_fax_bank;
 	bitmap_ind16 m_background_bitmap;
 	bitmap_ind16 m_motion_object_1_vid;
 	bitmap_ind16 m_motion_object_2_vid;
 	bitmap_ind16 m_motion_object_2_clip;
+	
 	DECLARE_WRITE8_MEMBER(fax_bank_select_w);
 	DECLARE_READ8_MEMBER(exidy_interrupt_r);
+	
 	DECLARE_CUSTOM_INPUT_MEMBER(teetert_input_r);
+	
 	DECLARE_DRIVER_INIT(fax);
 	DECLARE_DRIVER_INIT(sidetrac);
 	DECLARE_DRIVER_INIT(pepper2);
@@ -90,10 +94,14 @@ public:
 	DECLARE_DRIVER_INIT(venture);
 	DECLARE_DRIVER_INIT(spectar);
 	DECLARE_DRIVER_INIT(phantoma);
+	
 	virtual void video_start();
 	DECLARE_MACHINE_START(teetert);
+	
 	UINT32 screen_update_exidy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	
 	INTERRUPT_GEN_MEMBER(exidy_vblank_interrupt);
+	
 	void exidy_video_config(UINT8 _collision_mask, UINT8 _collision_invert, int _is_2bpp);
 	inline void latch_condition(int collision);
 	inline void set_1_color(int index, int which);
@@ -102,6 +110,7 @@ public:
 	inline int sprite_1_enabled();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void check_collision();
+	void fax_bank_restore();
 
 	/* Targ and Spectar samples */
 	int m_max_freq;
