@@ -8,6 +8,7 @@
   Hikaru
   Model 2
   Model 3
+  SP/Aurora
   (more?)
 
   As the encryption isn't fully understood yet this file holds the current keys, these are subject to change.
@@ -123,7 +124,7 @@ static const struct game_keys keys_table[] =
 	{ "pharrier",        0x0912c68a }, // 834-14144   2001  317-0297-COM  Hikaru
 	{ "podrace",         0x0903dad5 }, // 834-14002   2001  317-0277-COM  Hikaru
 
-	{ "vs298",           0x09234e96 }, //             ????  317-????-COM  Model 3
+	{ "vs298",           0x09234e96 }, //             ????  317-0237-COM  Model 3
 	{ "vs299",           0x09222ac8 }, //             ????  317-0245-COM  Model 3
 	{ "swt",             0x11272a01 }, //             ????  317-0241-COM  Model 3
 
