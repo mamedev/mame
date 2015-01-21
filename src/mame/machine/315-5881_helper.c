@@ -32,8 +32,8 @@ struct game_keys
 static const struct game_keys keys_table[] =
 {
 	// name             key              gameid #     year     chip label     platform
-//	{ "twcup98",         0x05200913 }, // 25209801    1998     317-5039-COM   ST-V   (this is correct key, but not yet working with our code)
-	{ "twcup98",         -1         }, // 25209801    1998     317-5039-COM   ST-V
+	{ "twcup98",         0x05200913 }, // 25209801    1998     317-5039-COM   ST-V   (this is correct key, but not yet working with our code)
+//	{ "twcup98",         -1         }, // 25209801    1998     317-5039-COM   ST-V
 	{ "astrass",         0x052e2901 }, // 25349801    1998     317-5040-COM   ST-V   (yes, the 317-5040-COM chip was reused for 3 different games and on both Naomi and ST-V!)
 	{ "wldkicks",        0x052e2901 }, // 25209801    2000     317-5040-COM   Naomi
 	{ "toukon4",         0x052e2901 }, // 25349801    2000     317-5040-COM   Naomi

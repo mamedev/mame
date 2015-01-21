@@ -661,12 +661,15 @@ void sega_315_5881_crypt_device::enc_start()
 	// in astrass the first block is 0xffff (for a 0x10000 block) followed by 0x3f3f (for a 0x1000 block)
 	// etc. after each block a new header must be read, it looks like compressed and uncompressed blocks
 	// can be mixed like this, I don't know if the length is src length of decompressed length.
-	int blockx = ((dec_header & 0x00ff) >> 0) + 1;
-	int blocky = ((dec_header & 0xff00) >> 8) + 1;
+	// deathcox and others confirm format as 0x20000 bit as compressed bit, 0x1ff00 bits as block size 1, 0x000ff bits as block size 2
+	// for compressed streams the 'line size' is block size 1.  
+
+	int blockx = ((dec_header & 0x000000ff) >> 0) + 1;
+	int blocky = ((dec_header & 0x0001ff00) >> 8) + 1;
 	block_size = blockx * blocky;
 
 	if(dec_header & FLAG_COMPRESSED) {
-		line_buffer_size = dec_header & FLAG_LINE_SIZE_512 ? 512 : 256;
+		line_buffer_size = blocky;
 		line_buffer_pos = line_buffer_size;
 		buffer_bit = 7;
 	}
@@ -683,12 +686,16 @@ void sega_315_5881_crypt_device::enc_fill()
 		buffer[i] = val;
 		buffer[i+1] = val >> 8;
 		block_pos+=2;
-		if (block_pos == block_size)
-		{
-			// if we reach the size specified we need to read a new header
-			// todo: how should this work with compressed blocks??
 
-			enc_start();
+		if (!(dec_header & FLAG_COMPRESSED))
+		{
+			if (block_pos == block_size)
+			{
+				// if we reach the size specified we need to read a new header
+				// todo: for compressed blocks this depends on OUTPUT size, not input size, so things get messy
+
+				enc_start();
+			}
 		}
 	}
 	buffer_pos = 0;
@@ -788,8 +795,6 @@ void sega_315_5881_crypt_device::line_fill()
 	line_buffer_prev = lp;
 	line_buffer_pos = 0;
 
-	UINT32 line_buffer_mask = line_buffer_size-1;
-
 	for(int i=0; i != line_buffer_size;) {
 		// vlc 0: start of line
 		// vlc 1: interior of line
@@ -812,7 +817,7 @@ void sega_315_5881_crypt_device::line_fill()
 				static int offsets[4] = {0, 1, 0, -1};
 				int offset = offsets[(tmp & 0x18) >> 3];
 				for(int j=0; j != count; j++) {
-					lc[i^1] = lp[((i+offset) & line_buffer_mask)^1];
+					lc[i^1] = lp[((i+offset) % line_buffer_size)^1];
 					i++;
 				}
 
