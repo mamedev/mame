@@ -8,7 +8,6 @@
   Hikaru
   Model 2
   Model 3
-  SP/Aurora
   (more?)
 
   As the encryption isn't fully understood yet this file holds the current keys, these are subject to change.
