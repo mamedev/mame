@@ -56,9 +56,12 @@ private:
 
 	bool enc_ready;
 
-	int buffer_pos, line_buffer_pos, line_buffer_size, buffer_bit;
+	int buffer_pos, line_buffer_pos, line_buffer_size, buffer_bit, buffer_bit2;
+	UINT8 buffer2[2];
+
 	int block_size;
 	int block_pos;
+	int block_numlines;
 
 	struct sbox {
 		UINT8 table[64];

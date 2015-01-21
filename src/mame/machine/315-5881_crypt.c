@@ -664,17 +664,18 @@ void sega_315_5881_crypt_device::enc_start()
 	// deathcox and others confirm format as 0x20000 bit as compressed bit, 0x1ff00 bits as block size 1, 0x000ff bits as block size 2
 	// for compressed streams the 'line size' is block size 1.  
 
-	int blockx = ((dec_header & 0x000000ff) >> 0) + 1;
+	block_numlines = ((dec_header & 0x000000ff) >> 0) + 1;
 	int blocky = ((dec_header & 0x0001ff00) >> 8) + 1;
-	block_size = blockx * blocky;
+	block_size = block_numlines * blocky;
 
 	if(dec_header & FLAG_COMPRESSED) {
 		line_buffer_size = blocky;
 		line_buffer_pos = line_buffer_size;
 		buffer_bit = 7;
+		buffer_bit2 = 15;
 	}
 
-//	printf("header %08x\n", dec_header);
+	printf("header %08x\n", dec_header);
 	enc_ready = true;
 }
 
@@ -775,9 +776,27 @@ const UINT8 sega_315_5881_crypt_device::trees[9][2][32] = {
 
 int sega_315_5881_crypt_device::get_compressed_bit()
 {
-	if(buffer_pos == BUFFER_SIZE)
-		enc_fill();
-	int res = (buffer[buffer_pos^1] >> buffer_bit) & 1;
+//	if(buffer_pos == BUFFER_SIZE)
+//		enc_fill();
+
+	if (buffer_bit2 == 15)
+	{
+		buffer_bit2 = 0;
+		UINT16 buffer2a = get_decrypted_16();
+		buffer2[0] = buffer2a;
+		buffer2[1] = buffer2a >> 8;
+	//	block_pos+=2;
+		buffer_pos = 0;
+
+	}
+	else
+	{
+		buffer_bit2++;
+	}
+
+//	if (buffer_bit ==7) printf("using byte %02x\n", buffer2[(buffer_pos&1) ^ 1]);
+
+	int res = (buffer2[(buffer_pos&1)^1] >> buffer_bit) & 1;
 	buffer_bit--;
 	if(buffer_bit == -1) {
 		buffer_bit = 7;
@@ -785,7 +804,6 @@ int sega_315_5881_crypt_device::get_compressed_bit()
 	}
 	return res;
 }
-
 void sega_315_5881_crypt_device::line_fill()
 {
 	assert(line_buffer_pos == line_buffer_size);
@@ -837,5 +855,14 @@ void sega_315_5881_crypt_device::line_fill()
 
 			}
 		}
+	}
+
+	if (block_numlines == block_pos)
+	{
+		enc_start();
+	}
+	else
+	{
+		block_pos++;
 	}
 }
