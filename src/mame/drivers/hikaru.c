@@ -381,6 +381,8 @@ Notes:
 
 #include "emu.h"
 #include "cpu/sh4/sh4.h"
+#include "machine/naomicrypt.h"
+#include "machine/315-5881_helper.h"
 
 #define CPU_CLOCK (200000000)
 									/* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
@@ -571,8 +573,7 @@ ROM_START( airtrix )
 	/* ic66 unpopulated */
 
 	// 315-5881 security IC key
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "airtrix-key.bin", 0, 4, CRC(bebdc179) SHA1(327ea299934ef78f3c88329fc624dc3771877453) )
+	_315_5881_KEYFILE("airtrix-key.bin", CRC(11111111) SHA1(1111111111111111111111111111111111111111))
 ROM_END
 
 
@@ -610,8 +611,7 @@ ROM_START( pharrier )
 	ROM_LOAD32_WORD( "mpr-23564.ic66", 0xe000002, 0x1000000, CRC(255724b6) SHA1(1b382fad165831de3f2e39352c031146759dfc69) )
 
 	// 315-5881 security IC key
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "pharrier-key.bin", 0, 4, CRC(1697d591) SHA1(8ad4c93f63e2e379795e820d3edbdd990f8ca7e1) )
+	_315_5881_KEYFILE("pharrier-key.bin", CRC(11111111) SHA1(1111111111111111111111111111111111111111))
 ROM_END
 
 ROM_START( podrace )
@@ -709,7 +709,7 @@ ROM_START( braveff )
 	ROM_LOAD32_WORD( "mpr-22023.ic60s", 0xb000002, 0x800000, CRC(07f00869) SHA1(92282d09d72d3e65a91128e06bb0d4426bb90be5) )
 
 	// 315-5881 not populated
-	ROM_REGION( 4, "rom_key", ROMREGION_ERASE00 )
+	_315_5881_UNUSED
 ROM_END
 
 ROM_START( sgnascar )
@@ -741,8 +741,7 @@ ROM_START( sgnascar )
 
 	// 317-0283-COM Actel A54SX32
 	// ID 0x4252
-	ROM_REGION( 4, "rom_key", 0 )
-	ROM_LOAD( "sgnascar-key.bin", 0x000000, 0x000004, CRC(f1452f9e) SHA1(86fb0f278a2eb0aba66a24032fb683f7a516b32b) )
+	_NAOMI_M1_KEYFILE( "sgnascar-key.bin", CRC(f1452f9e) SHA1(86fb0f278a2eb0aba66a24032fb683f7a516b32b) )
 ROM_END
 
 GAME( 2000, hikaru,   0,        hikaru,   hikaru, driver_device,   0, ROT0, "Sega",            "Hikaru Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )

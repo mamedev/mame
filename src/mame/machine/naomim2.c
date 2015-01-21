@@ -135,8 +135,8 @@ void naomi_m2_board::device_reset()
 
 	rom_cur_address = 0;
 
-#if USE_NAOMICRYPT
-	m_cryptdevice->set_key(get_naomi_key(machine()));
+#if USE_315_5881_HELPER
+	m_cryptdevice->set_key(get_315_5881_key(machine()));
 #else
 	const UINT8 *key_data = memregion(key_tag)->base();
 	m_cryptdevice->set_key((key_data[0] << 24) | (key_data[1] << 16) | (key_data[2] << 8) | key_data[3]);

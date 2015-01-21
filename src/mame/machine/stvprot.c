@@ -674,7 +674,15 @@ void stv_state::install_common_protection()
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x4fffff0, 0x4ffffff, read32_delegate(FUNC(stv_state::common_prot_r), this), write32_delegate(FUNC(stv_state::common_prot_w), this));
 
+	INT64 key = get_315_5881_key(machine());
 
+	if (key != -1)
+	{
+		m_cryptdevice->set_key(key); // use real decryption
+		m_using_crypt_device = 1;
+	}
+	else
+		m_using_crypt_device = 0; // use protection sim
 }
 
 void stv_state::install_sss_protection()
@@ -686,9 +694,6 @@ void stv_state::install_sss_protection()
 void stv_state::install_astrass_protection()
 {
 	install_common_protection();
-//	m_prot_readback = astrass_prot_read_callback;
-	m_cryptdevice->set_key(0x052e2901); // same key as wldkicks / toukon4
-	m_using_crypt_device = 1;
 }
 
 void stv_state::install_ffreveng_protection()
@@ -713,16 +718,11 @@ void stv_state::install_twcup98_protection()
 {
 	install_common_protection();
 	m_prot_readback = twcup98_prot_read_callback;
-	m_cryptdevice->set_key(0x05200913 );
-	m_using_crypt_device = 0; // doesn't currently work
 }
-
 
 
 void stv_state::stv_register_protection_savestates()
 {
-
-
 	save_item(NAME(m_a_bus));
 	save_item(NAME(m_ctrl_index));
 	save_item(NAME(m_internal_counter));

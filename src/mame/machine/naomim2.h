@@ -4,6 +4,7 @@
 #include "naomibd.h"
 #include "315-5881_crypt.h"
 
+
 #define MCFG_NAOMI_M2_BOARD_ADD(_tag, _key_tag, _eeprom_tag, _actel_tag, _irq_cb) \
 	MCFG_NAOMI_BOARD_ADD(_tag, NAOMI_M2_BOARD, _eeprom_tag, _actel_tag, _irq_cb) \
 	naomi_m2_board::static_set_tags(*device, _key_tag);

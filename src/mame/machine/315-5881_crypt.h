@@ -4,6 +4,8 @@
 #ifndef __SEGA315_5881_CRYPT__
 #define __SEGA315_5881_CRYPT__
 
+#include "315-5881_helper.h"
+
 typedef device_delegate<UINT16 (UINT32)> sega_m2_read_delegate;
 
 extern const device_type SEGA315_5881_CRYPT;
