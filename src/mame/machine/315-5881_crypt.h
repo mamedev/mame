@@ -58,10 +58,12 @@ private:
 
 	int buffer_pos, line_buffer_pos, line_buffer_size, buffer_bit, buffer_bit2;
 	UINT8 buffer2[2];
+	UINT16 buffer2a;
 
 	int block_size;
 	int block_pos;
 	int block_numlines;
+	int done_compression;
 
 	struct sbox {
 		UINT8 table[64];

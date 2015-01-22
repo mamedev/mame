@@ -70,8 +70,15 @@ UINT16 sega_315_5881_crypt_device::do_decrypt(UINT8 *&base)
 	if(!enc_ready)
 		enc_start();
 	if(dec_header & FLAG_COMPRESSED) {
-		if(line_buffer_pos == line_buffer_size)
+		if (line_buffer_pos == line_buffer_size) // if there's no data left to read..
+		{
+			if (done_compression == 1)
+				enc_start();
+				
+
+
 			line_fill();
+		}
 		base = line_buffer + line_buffer_pos;
 		line_buffer_pos += 2;
 	} else {
@@ -94,6 +101,9 @@ void sega_315_5881_crypt_device::set_addr_high(UINT16 data)
 {
 	prot_cur_address = (prot_cur_address & 0x0000ffff) | (data << 16);
 	enc_ready = false;
+
+	buffer_bit = 7;
+	buffer_bit2 = 15;
 }
 
 void sega_315_5881_crypt_device::set_subkey(UINT16 data)
@@ -645,16 +655,29 @@ UINT16 sega_315_5881_crypt_device::get_decrypted_16()
 
 	prot_cur_address ++;
 
+//	printf("get_decrypted_16 %04x\n", res);
+
 	return res;
 }
 
 
 void sega_315_5881_crypt_device::enc_start()
 {
-	dec_hist = 0; // seems to be needed by astrass at least otherwise any call after the first one will be influenced by the one before it.
 	block_pos = 0;
+	done_compression = 0;
 	buffer_pos = BUFFER_SIZE;
-	dec_header = get_decrypted_16() << 16;
+	
+	if (buffer_bit2 != 15) // if we have remaining bits in the decompression buffer we shouldn't read the next word yet but should instead use the bits we have?? (twcup98) (might just be because we should be pulling bytes not words?)
+	{
+//		printf("buffer_bit2 is %d\n", buffer_bit2);
+		dec_header = (buffer2a & 0x0003) << 16;
+	}
+	else
+	{
+		dec_hist = 0; // seems to be needed by astrass at least otherwise any call after the first one will be influenced by the one before it.
+		dec_header = get_decrypted_16() << 16;
+	}
+
 	dec_header |= get_decrypted_16();
 
 	// the lower header bits are 2 values that multiply together to get the current stream length
@@ -782,7 +805,7 @@ int sega_315_5881_crypt_device::get_compressed_bit()
 	if (buffer_bit2 == 15)
 	{
 		buffer_bit2 = 0;
-		UINT16 buffer2a = get_decrypted_16();
+		buffer2a = get_decrypted_16();
 		buffer2[0] = buffer2a;
 		buffer2[1] = buffer2a >> 8;
 	//	block_pos+=2;
@@ -857,12 +880,12 @@ void sega_315_5881_crypt_device::line_fill()
 		}
 	}
 
+	block_pos++;
 	if (block_numlines == block_pos)
 	{
-		enc_start();
+		done_compression = 1;
 	}
 	else
 	{
-		block_pos++;
 	}
 }
