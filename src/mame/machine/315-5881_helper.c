@@ -140,6 +140,9 @@ static const struct game_keys keys_table[] =
 	{ "swtrilgy",        0x11272a01 }, //             ????     317-0241-COM   Model 3
 	{ "swtrilgya",       0x11272a01 }, //             ????     317-0241-COM   Model 3
 	{ "vs299",           0x09222ac8 }, //             ????     317-0245-COM   Model 3
+	{ "vs2v991",         0x09222ac8 }, //             ????     317-0245-COM   Model 3
+	{ "vs299b",          0x09222ac8 }, //             ????     317-0245-COM   Model 3
+	{ "vs299a",          0x09222ac8 }, //             ????     317-0245-COM   Model 3
 
 
 	{ NULL, 0 }    // end of table
