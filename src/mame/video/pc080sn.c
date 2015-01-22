@@ -377,10 +377,9 @@ void pc080sn_device::topspeed_custom_draw( screen_device &screen, bitmap_ind16 &
 
 	UINT16 a, color;
 	int sx, x_index;
-	int i, y, y_index, src_y_index, row_index;
+	int y_index, src_y_index, row_index;
 
 	int flip = 0;
-	int machine_flip = 0;   /* for  ROT 180 ? */
 
 	int min_x = cliprect.min_x;
 	int max_x = cliprect.max_x;
@@ -400,12 +399,7 @@ void pc080sn_device::topspeed_custom_draw( screen_device &screen, bitmap_ind16 &
 		y_index = 0;
 	}
 
-	if (!machine_flip)
-		y = min_y;
-	else
-		y = max_y;
-
-	do
+	for (int y = min_y; y <= max_y; y++)
 	{
 		src_y_index = y_index & 0x1ff;  /* tilemaps are 512 px up/down */
 		row_index = (src_y_index - m_bgscrolly[layer]) & 0x1ff;
@@ -419,7 +413,7 @@ void pc080sn_device::topspeed_custom_draw( screen_device &screen, bitmap_ind16 &
 
 		if (flags & TILEMAP_DRAW_OPAQUE)
 		{
-			for (i = 0; i < screen_width; i++)
+			for (int i = 0; i < screen_width; i++)
 			{
 				a = src16[x_index & width_mask];
 #ifdef TOPSPEED_ROAD_COLORS
@@ -431,7 +425,7 @@ void pc080sn_device::topspeed_custom_draw( screen_device &screen, bitmap_ind16 &
 		}
 		else
 		{
-			for (i = 0; i < screen_width; i++)
+			for (int i = 0; i < screen_width; i++)
 			{
 				if (tsrc[x_index & width_mask])
 				{
@@ -449,13 +443,7 @@ void pc080sn_device::topspeed_custom_draw( screen_device &screen, bitmap_ind16 &
 
 		taitoic_drawscanline(bitmap, cliprect, 0, y, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? 0 : 1, ROT0, screen.priority(), priority);
 		y_index++;
-
-		if (!machine_flip)
-			y++;
-		else
-			y--;
 	}
-	while ((!machine_flip && y <= max_y) || (machine_flip && y >= min_y));
 }
 
 void pc080sn_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority )
