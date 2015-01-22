@@ -3084,7 +3084,7 @@ GAME( 1997, techbowl,  stvbios, stv,      stv, stv_state,        stv,        ROT
 GAME( 1999, micrombc,  stvbios, stv,      stv, stv_state,        stv,        ROT0,   "Sega",                         "Microman Battle Charge (J 990326 V1.000)", GAME_NOT_WORKING )
 
 /* Black screen */
-GAME( 1999, ffreveng,  stvbios, stv,      stv, stv_state,        ffreveng,   ROT0,   "Capcom",                       "Final Fight Revenge (JUET 990714 V1.000)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1999, ffreveng,  stvbios, stv,      stv, stv_state,        ffreveng,   ROT0,   "Capcom",                       "Final Fight Revenge (JUET 990714 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 
 /* CD games */
 GAME( 1995, sfish2,    0,       stv,      stv, stv_state,        stv,        ROT0,   "Sega",                         "Sport Fishing 2 (UET 951106 V1.10e)", GAME_NO_SOUND | GAME_NOT_WORKING )
