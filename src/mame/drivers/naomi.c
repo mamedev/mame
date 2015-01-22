@@ -521,6 +521,7 @@ Star Horse (big screens)                        840-0054C  23625    4 (128Mb)  3
 Star Horse (satellite)                          840-0056C  23627    6 (128Mb)* 315-6319   315-6213  not present   * +1 (64Mb), requires 837-13785 ARCNET&IO BD
 Star Horse Progress (satellite) (Rev A)         840-0123C  24122A   7 (128Mb)  315-6319A  315-6213  not present   requires 837-13785 ARCNET&IO BD
 The King of Route 66 (Rev A)                    840-0087C  23819A  10 (128Mb)  315-6319A  315-6213  not present
+Virtua Fighter 4                                840-0080C  23785   11 (128Mb)  ?          ?         ?
 Virtua Striker 3                                840-0061C  23663   11 (128Mb)  315-6319A  315-6213  317-0310-COM
 Virtua Striker 3 (Rev B)                        840-0061C  23663B  11 (128Mb)  315-6319A  315-6213  317-0310-COM
 Wave Runner GP                                  840-0064C  24059    6 (128Mb)  315-6319A  315-6213  not present
