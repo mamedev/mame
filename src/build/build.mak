@@ -50,7 +50,7 @@ $(MAKEDEP_TARGET): $(MAKEDEPOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB)
 	@echo Linking $@...
 	$(NATIVELD) $(NATIVELDFLAGS) $^ $(LIBS) -o $@
 
-
+#$(LIBOCORE)
 
 #-------------------------------------------------
 # makemak
@@ -58,14 +58,16 @@ $(MAKEDEP_TARGET): $(MAKEDEPOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB)
 
 MAKEMAKOBJS = \
 	$(BUILDOBJ)/makemak.o \
-	$(OBJ)/lib/util/astring.o \
-	$(OBJ)/lib/util/corealloc.o \
-	$(OBJ)/lib/util/corefile.o \
-	$(OBJ)/lib/util/corestr.o \
-	$(OBJ)/lib/util/unicode.o \
-	$(OBJ)/lib/util/tagmap.o \
+#	$(OBJ)/lib/util/astring.o \
+#	$(OBJ)/lib/util/corealloc.o \
+#	$(OBJ)/lib/util/corefile.o \
+#	$(OBJ)/lib/util/corestr.o \
+#	$(OBJ)/lib/util/unicode.o \
+#	$(OBJ)/lib/util/tagmap.o \
+#	$(OBJ)/lib/util/options.o \
 
-$(MAKEMAK_TARGET): $(MAKEMAKOBJS) $(LIBOCORE) $(ZLIB)
+
+$(MAKEMAK_TARGET): $(MAKEMAKOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB) $(7Z_LIB)
 	@echo Linking $@...
 	$(NATIVELD) $(NATIVELDFLAGS) $^ $(LIBS) -o $@
 
@@ -84,7 +86,7 @@ MAKELISTOBJS = \
 	$(OBJ)/lib/util/unicode.o \
 	$(OBJ)/lib/util/tagmap.o \
 
-$(MAKELIST_TARGET): $(MAKELISTOBJS) $(LIBOCORE) $(ZLIB)
+$(MAKELIST_TARGET): $(MAKELISTOBJS) $(LIBOCORE) $(ZLIB) 
 	@echo Linking $@...
 	$(NATIVELD) $(NATIVELDFLAGS) $^ $(LIBS) -o $@
 

@@ -38,7 +38,26 @@
 #define end_timing(v)           do { } while (0)
 #endif
 
+template<typename _PtrType>
+static void spin_while(const volatile _PtrType * volatile ptr, const _PtrType val, const osd_ticks_t timeout, const int invert = 0)
+{
+    osd_ticks_t stopspin = osd_ticks() + timeout;
 
+    do {
+        int spin = 10000;
+        while (--spin)
+        {
+            if ((*ptr != val) ^ invert)
+                return;
+        }
+    } while (((*ptr == val) ^ invert) && osd_ticks() < stopspin);
+}
+
+template<typename _PtrType>
+static void spin_while_not(const volatile _PtrType * volatile ptr, const _PtrType val, const osd_ticks_t timeout)
+{
+    spin_while(ptr, val, timeout, 1);
+}
 
 //============================================================
 //  TYPE DEFINITIONS

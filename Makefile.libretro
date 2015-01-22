@@ -116,6 +116,7 @@ ifeq ($(platform), unix)
 	NATIVELDFLAGS = -Wl,--warn-common -lstdc++ -Wl,--no-undefined
 	NATIVECC = g++
 	NATIVECFLAGS = -std=gnu99
+BASELIBS +=  -lpthread
 	CC_AS = gcc 
 	CC = g++
 	AR = @ar

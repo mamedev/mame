@@ -36,7 +36,7 @@
 #   POSSIBILITY OF SUCH DAMAGE.
 #
 ###########################################################################
-
+DEFS += -DOSD_RETRO
 
 #-------------------------------------------------
 # object and source roots
@@ -44,12 +44,16 @@
 
 MINISRC = $(SRC)/osd/$(OSD)
 MINIOBJ = $(OBJ)/osd/$(OSD)
+
 LIBCOOBJ = $(OBJ)/osd/$(OSD)/libretro-sdk/libco
 
-OSDCOMMONSRC  = $(SRC)/osd/modules/lib
-OSDCOMMONOBJ = $(SRC)/osd/modules/lib
+OSDSRC = $(SRC)/osd
+OSDOBJ = $(OBJ)/osd
 
-OBJDIRS += $(MINIOBJ) $(LIBCOOBJ) 
+OBJDIRS += $(MINIOBJ) $(LIBCOOBJ) \
+	$(OSDOBJ)/modules/sync \
+	$(OSDOBJ)/modules/lib \
+	$(OSDOBJ)/modules/midi
 
 ifeq ($(VRENDER),opengl)
 GLOBJ = $(OBJ)/osd/$(OSD)/libretro-sdk/glsym
@@ -64,20 +68,38 @@ OSDCOREOBJS := \
 	$(MINIOBJ)/retrodir.o \
 	$(MINIOBJ)/retrofile.o \
 	$(MINIOBJ)/retromisc.o \
-	$(MINIOBJ)/retrosync.o \
-	$(MINIOBJ)/retrowork.o \
 	$(MINIOBJ)/retroos.o \
-	$(MINIOBJ)/../modules/sound/retro_sound.o \
-	$(MINIOBJ)/../modules/sound/none.o \
-	$(MINIOBJ)/../modules/debugger/none.o \
-	$(MINIOBJ)/../modules/debugger/debugint.o \
-	$(OSDCOMMONOBJ)/osdobj_common.o
+	$(MINIOBJ)/../modules/lib/osdlib_retro.o \
+	$(OSDOBJ)/modules/sync/sync_retro.o
+
+ifdef NOASM
+OSDCOREOBJS += $(OSDOBJ)/modules/sync/work_mini.o
+else
+OSDCOREOBJS += $(OSDOBJ)/modules/sync/work_osd.o
+endif
+#	$(MINIOBJ)/retrowork.o \
+#	$(MINIOBJ)/retroos.o 
 
 #-------------------------------------------------
 # OSD mini library
 #-------------------------------------------------
 
-OSDOBJS = $(LIBCOOBJ)/libco.o 
+OSDOBJS = \
+	$(MINIOBJ)/../modules/sound/retro_sound.o \
+	$(MINIOBJ)/../modules/sound/none.o \
+	$(MINIOBJ)/../modules/debugger/none.o \
+	$(MINIOBJ)/../modules/debugger/debugint.o \
+	$(OSDOBJ)/modules/lib/osdobj_common.o
+
+DISABLE_MIDI_ON = 1
+
+ifeq ($(DISABLE_MIDI_ON), 1)
+	OSDOBJS += $(OSDOBJ)/modules/midi/none.o
+else
+	OSDOBJS += $(OSDOBJ)/modules/midi/portmidi.o
+endif
+
+OSDOBJS += $(LIBCOOBJ)/libco.o 
 
 ifeq ($(VRENDER),opengl)
 OSDOBJS += $(GLOBJ)/rglgen.o
