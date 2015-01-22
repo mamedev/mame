@@ -4,6 +4,7 @@
 #include "machine/eepromser.h"
 #include "cpu/i960/i960.h"
 #include "sound/scsp.h"
+#include "machine/315-5881_crypt.h"
 
 struct raster_state;
 struct geo_state;
@@ -34,7 +35,9 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_scsp(*this, "scsp") { }
+		m_scsp(*this, "scsp"),
+		m_cryptdevice(*this, "315_5881")
+		{ }
 
 	required_shared_ptr<UINT32> m_workram;
 	required_shared_ptr<UINT32> m_bufferram;
@@ -59,6 +62,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<scsp_device> m_scsp;
+	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
 
 	UINT32 m_intreq;
 	UINT32 m_intena;
@@ -156,6 +160,7 @@ public:
 	DECLARE_WRITE32_MEMBER(model2_serial_w);
 	DECLARE_READ32_MEMBER(model2_prot_r);
 	DECLARE_WRITE32_MEMBER(model2_prot_w);
+	DECLARE_WRITE32_MEMBER(doa_prot_w);
 	DECLARE_READ32_MEMBER(maxx_r);
 	DECLARE_READ32_MEMBER(network_r);
 	DECLARE_WRITE32_MEMBER(network_w);
@@ -217,6 +222,8 @@ public:
 	DECLARE_WRITE32_MEMBER(copro_tgp_fifoout_push);
 	DECLARE_READ8_MEMBER(virtuacop_lightgun_r);
 	DECLARE_READ8_MEMBER(virtuacop_lightgun_offscreen_r);
+	
+	UINT16 crypt_read_callback(UINT32 addr);
 
 	bool copro_fifoin_pop(device_t *device, UINT32 *result,UINT32 offset, UINT32 mem_mask);
 	void copro_fifoin_push(device_t *device, UINT32 data, UINT32 offset, UINT32 mem_mask);

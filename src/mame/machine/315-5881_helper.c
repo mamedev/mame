@@ -123,7 +123,18 @@ static const struct game_keys keys_table[] =
 	{ "airtrix",         0x091b02c7 }, // 834-14149   2000     317-0294-COM   Hikaru
 	{ "pharrier",        0x0912c68a }, // 834-14144   2001     317-0297-COM   Hikaru
 
-	{ "dynamcop",        0x0c2a4a93 }, //             ????     317-0236-COM   Model 2
+	{ "dynamcop",        0x0c2a4a93 }, //             1998     317-0236-COM   Model 2
+	{ "dyndeka2",        0x0c2a4a93 }, //             1998     317-0236-COM   Model 2
+	{ "dynamcopb",       0x0c2a4a93 }, //             1998     317-0236-COM   Model 2
+	{ "dyndeka2b",       0x0c2a4a93 }, //             1998     317-0236-COM   Model 2
+	{ "dynamcopc",       0x0c2a4a93 }, //             1998     317-0236-COM   Model 2
+	{ "pltkids",         -1         }, //             1998     317-5044-COM   Model 2
+	{ "pltkidsa",        -1         }, //             1998     317-5044-COM   Model 2
+	{ "zerogun",         -1         }, //             1997     317-5038-COM   Model 2  // lowest numbered chip?
+	{ "zerogunj",        -1         }, //             1997     317-5038-COM   Model 2  
+	{ "zeroguna",        -1         }, //             1997     317-5038-COM   Model 2  
+	{ "zerogunaj",       -1         }, //             1997     317-5038-COM   Model 2  
+
 
 	{ "vs298",           0x09234e96 }, //             ????     317-0237-COM   Model 3
 	{ "swt",             0x11272a01 }, //             ????     317-0241-COM   Model 3
