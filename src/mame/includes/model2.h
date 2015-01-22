@@ -160,7 +160,12 @@ public:
 	DECLARE_WRITE32_MEMBER(model2_serial_w);
 	DECLARE_READ32_MEMBER(model2_prot_r);
 	DECLARE_WRITE32_MEMBER(model2_prot_w);
+	DECLARE_READ32_MEMBER(doa_prot_r);
 	DECLARE_WRITE32_MEMBER(doa_prot_w);
+	DECLARE_READ32_MEMBER(model2_5881prot_r);
+	DECLARE_WRITE32_MEMBER(model2_5881prot_w);
+	int first_read;
+
 	DECLARE_READ32_MEMBER(maxx_r);
 	DECLARE_READ32_MEMBER(network_r);
 	DECLARE_WRITE32_MEMBER(network_w);

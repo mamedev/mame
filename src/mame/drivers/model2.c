@@ -1234,10 +1234,6 @@ static const UINT8 ZGUNProt[] =
 	0xE4,0x66,0xD0,0x4A,0x7D,0x4A,0x13,0xDE,0xD7,0x9F,0x38,0xAA,0x00,0x56,0x85,0x0A
 };
 
-static const UINT8 DCOPKey1326[]=
-{
-	0x43,0x66,0x54,0x11,0x99,0xfe,0xcc,0x8e,0xdd,0x87,0x11,0x89,0x22,0xdf,0x44,0x09
-};
 
 READ32_MEMBER(model2_state::model2_prot_r)
 {
@@ -1250,22 +1246,9 @@ READ32_MEMBER(model2_state::model2_prot_r)
 	}
 	else if (offset == 0x1000e/4)
 	{
-		retval = m_protram[m_protstate+1] | m_protram[m_protstate]<<8;
+		retval = m_protram[m_protstate+1] | m_protram[m_protstate+0]<<8;
 		retval <<= 16;
 		m_protstate+=2;
-	}
-	else if (offset == 0x7ff8/4)
-	{
-		retval = m_protram[m_protstate+1] | m_protram[m_protstate]<<8;
-		m_protstate+=2;
-	}
-	else if (offset == 0x400c/4)
-	{
-		m_prot_a = !m_prot_a;
-		if (m_prot_a)
-			retval = 0xffff;
-		else
-			retval = 0xfff0;
 	}
 	else logerror("Unhandled Protection READ @ %x mask %x (PC=%x)\n", offset, mem_mask, space.device().safe_pc());
 
@@ -1291,17 +1274,6 @@ WRITE32_MEMBER(model2_state::model2_prot_w)
 	{
 		switch (data)
 		{
-			// dynamcop
-			case 0x7700:
-				strcpy((char *)m_protram+2, "UCHIDA MOMOKA   ");
-				break;
-
-			// dynamcop
-			case 0x1326:
-				m_protstate = 0;
-				memcpy(m_protram+2, DCOPKey1326, sizeof(DCOPKey1326));
-				break;
-
 			// zerogun
 			case 0xA1BC:
 			case 0xAD23:
@@ -1336,6 +1308,91 @@ WRITE32_MEMBER(model2_state::model2_prot_w)
 	else logerror("Unhandled Protection WRITE %x @ %x mask %x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
 
 }
+
+
+READ32_MEMBER(model2_state::model2_5881prot_r)
+{
+	UINT32 retval = 0;
+
+	if (offset == 0x0000/4)
+	{
+		// status: bit 0 = 1 for busy, 0 for ready
+		retval = 0;   // we're always ready
+	}
+	else if (offset == 0x000e/4)
+	{
+		if (first_read == 1)
+		{
+			// is there a CPU core bug or similar? 
+			// the only way to return the same stream as the previous simulation (for dynamite cop) is to return a
+			// 0x0000 as the first return value before returning the actual sequence.
+			// note that even with our simulation code pilot kids crashes in the way it would if the protection failed, so something seems wrong.
+			first_read = 0;
+			retval = 0;
+		}
+		else
+		{
+			UINT8* base;
+			retval = m_cryptdevice->do_decrypt(base);
+			retval = ((retval & 0xff00) >> 8) | ((retval & 0x00ff) << 8);
+			retval <<= 16;
+		}
+	}
+	else logerror("Unhandled Protection READ @ %x mask %x (PC=%x)\n", offset, mem_mask, space.device().safe_pc());
+
+	logerror("model2_5881prot_r %08x: %08x (%08x)\n", offset*4, retval, mem_mask);
+
+	return retval;
+}
+
+WRITE32_MEMBER(model2_state::model2_5881prot_w)
+{
+	logerror("model2_5881prot_w %08x: %08x (%08x)\n", offset*4, data, mem_mask);
+
+
+	if (offset == 0x0008/4)
+	{
+		// code is copied to RAM first, so base address is always 0
+		m_cryptdevice->set_addr_low(0);
+		m_cryptdevice->set_addr_high(0);
+
+		if (data != 0)
+			printf("model2_5881prot_w address isn't 0?\n");
+
+		first_read = 1;
+	}
+	else if (offset == 0x000c/4)
+	{
+		printf("subkey %08x (%08x)\n", data, mem_mask);
+		m_cryptdevice->set_subkey(data&0xffff);
+	}
+	else printf("Unhandled Protection WRITE %x @ %x mask %x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
+
+}
+
+
+READ32_MEMBER(model2_state::doa_prot_r)
+{
+	UINT32 retval = 0;
+
+	if (offset == 0x7ff8/4)
+	{
+		retval = m_protram[m_protstate+1] | m_protram[m_protstate]<<8;
+		m_protstate+=2;
+	}
+	else if (offset == 0x400c/4)
+	{
+		m_prot_a = !m_prot_a;
+		if (m_prot_a)
+			retval = 0xffff;
+		else
+			retval = 0xfff0;
+	}
+	else logerror("Unhandled Protection READ @ %x mask %x (PC=%x)\n", offset, mem_mask, space.device().safe_pc());
+
+	return retval;
+}
+
 
 WRITE32_MEMBER(model2_state::doa_prot_w)
 {
@@ -5911,8 +5968,20 @@ ROM_END
 
 DRIVER_INIT_MEMBER(model2_state,genprot)
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x01d80000, 0x01dfffff, read32_delegate(FUNC(model2_state::model2_prot_r),this), write32_delegate(FUNC(model2_state::model2_prot_w),this));
-	m_protstate = m_protpos = 0;
+	
+	INT64 key = get_315_5881_key(machine());
+
+	if (key != -1)
+	{
+		m_maincpu->space(AS_PROGRAM).install_ram(0x01d80000, 0x01d8ffff);
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x01d90000, 0x01d9ffff, read32_delegate(FUNC(model2_state::model2_5881prot_r), this), write32_delegate(FUNC(model2_state::model2_5881prot_w), this));
+		m_cryptdevice->set_key(key);
+	}
+	else
+	{
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x01d80000, 0x01dfffff, read32_delegate(FUNC(model2_state::model2_prot_r), this), write32_delegate(FUNC(model2_state::model2_prot_w), this));                    
+		m_protstate = m_protpos = 0;
+	}
 }
 
 DRIVER_INIT_MEMBER(model2_state,pltkids)
@@ -5983,7 +6052,7 @@ DRIVER_INIT_MEMBER(model2_state,overrev)
 
 DRIVER_INIT_MEMBER(model2_state,doa)
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01d80000, 0x01dfffff, write32_delegate(FUNC(model2_state::doa_prot_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x01d80000, 0x01dfffff, read32_delegate(FUNC(model2_state::doa_prot_r),this),  write32_delegate(FUNC(model2_state::doa_prot_w),this));
 	m_protstate = m_protpos = 0;
 
 	
