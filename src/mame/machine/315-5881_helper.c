@@ -34,9 +34,9 @@ static const struct game_keys keys_table[] =
 	// name             key              gameid #     year     chip label     platform
 	{ "twcup98",         0x05200913 }, // 25209801    1998     317-5039-COM   ST-V
 	{ "astrass",         0x052e2901 }, // 25349801    1998     317-5040-COM   ST-V      (yes, the 317-5040-COM chip was reused for 3 different games and on both Naomi and ST-V!)
-	{ "rsgun",           -1         }, //             1998     317-5041-COM   ST-V
-	{ "sss",             -1         }, //             1998     317-5042-COM   ST-V
-	{ "elandore",        -1         }, //             1998     317-5043-COM   ST-V
+	{ "rsgun",           0x05272d01 }, //             1998     317-5041-COM   ST-V
+	{ "sss",             0x052b6901 }, //             1998     317-5042-COM   ST-V
+	{ "elandore",        0x05226d41 }, //             1998     317-5043-COM   ST-V
 	{ "ffreveng",        0x0524ac01 }, //             1998     317-5049-COM   ST-V
 
 	{ "gundmct",         0x000e8010 }, // 841-0017    2001     ???            Naomi
@@ -137,8 +137,10 @@ static const struct game_keys keys_table[] =
 
 
 	{ "vs298",           0x09234e96 }, //             ????     317-0237-COM   Model 3
-	{ "swt",             0x11272a01 }, //             ????     317-0241-COM   Model 3
+	{ "swtrilgy",        0x11272a01 }, //             ????     317-0241-COM   Model 3
+	{ "swtrilgya",       0x11272a01 }, //             ????     317-0241-COM   Model 3
 	{ "vs299",           0x09222ac8 }, //             ????     317-0245-COM   Model 3
+
 
 	{ NULL, 0 }    // end of table
 };

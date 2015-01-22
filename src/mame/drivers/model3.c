@@ -1756,15 +1756,17 @@ static const UINT16 oceanhun_prot_data[] =
 
 READ64_MEMBER(model3_state::model3_security_r)
 {
+	UINT64 retvalue = U64(0xffffffffffffffff);
+
 	switch(offset)
 	{
-		case 0x00/8:    return 0;       /* status */
+		case 0x00 / 8:    retvalue = 0; break;       /* status */
 		case 0x1c/8:                    /* security board data read */
 		{
 			if (core_stricmp(machine().system().name, "vs299") == 0 ||
 				core_stricmp(machine().system().name, "vs2v991") == 0)
 			{
-				return (UINT64)vs299_prot_data[m_prot_data_ptr++] << 48;
+				retvalue = (UINT64)vs299_prot_data[m_prot_data_ptr++] << 48;
 			}
 			else if (core_stricmp(machine().system().name, "swtrilgy") == 0 ||
 						core_stricmp(machine().system().name, "swtrilgya") == 0)
@@ -1774,7 +1776,7 @@ READ64_MEMBER(model3_state::model3_security_r)
 				{
 					m_prot_data_ptr = 0;
 				}
-				return data;
+				retvalue = data;
 			}
 			else if (core_stricmp(machine().system().name, "fvipers2") == 0)
 			{
@@ -1783,7 +1785,7 @@ READ64_MEMBER(model3_state::model3_security_r)
 				{
 					m_prot_data_ptr = 0;
 				}
-				return data;
+				retvalue = data;
 			}
 			else if (core_stricmp(machine().system().name, "spikeout") == 0 ||
 						core_stricmp(machine().system().name, "spikeofe") == 0)
@@ -1793,7 +1795,7 @@ READ64_MEMBER(model3_state::model3_security_r)
 				{
 					m_prot_data_ptr = 0;
 				}
-				return data;
+				retvalue = data;
 			}
 			else if (core_stricmp(machine().system().name, "eca") == 0 ||
 						core_stricmp(machine().system().name, "ecax") == 0)
@@ -1803,7 +1805,7 @@ READ64_MEMBER(model3_state::model3_security_r)
 				{
 					m_prot_data_ptr = 0;
 				}
-				return data;
+				retvalue = data;
 			}
 			else if (core_stricmp(machine().system().name, "oceanhun") == 0)
 			{
@@ -1812,15 +1814,84 @@ READ64_MEMBER(model3_state::model3_security_r)
 				{
 					m_prot_data_ptr = 0;
 				}
-				return data;
+				retvalue = data;
 			}
 			else
 			{
-				return 0;
+				retvalue = 0;
 			}
+			break;
 		}
 	}
-	return U64(0xffffffffffffffff);
+	printf("model3_security_r offset %08x : %08x%08x (%08x%08x)\n", offset * 8, (UINT32)(retvalue >> 32), (UINT32)(retvalue & 0xffffffff), (UINT32)(mem_mask >> 32), (UINT32)(mem_mask & 0xffffffff));
+
+	return retvalue;
+}
+
+READ64_MEMBER(model3_state::model3_5881prot_r)
+{
+	UINT64 retvalue = U64(0xffffffffffffffff);
+
+	if (offset == 0x00 / 8)
+	{
+		retvalue = 0;
+	}
+	else if (offset == 0x18 / 8)
+	{
+		if (first_read == 1)
+		{
+			// the RAM based schemes expect a dummy value before the start of the stream
+			// to match the previous simulation I use 0xffff here
+			first_read = 0;
+			retvalue = 0xffff << 16;
+		}
+		else
+		{
+			UINT8* base;
+			retvalue = m_cryptdevice->do_decrypt(base);
+			//	retvalue = ((retvalue & 0xff00) >> 8) | ((retvalue & 0x00ff) << 8); // don't endian swap the return value on this hardware
+			retvalue <<= 16;
+		}
+
+	//	printf("model3_5881prot_r offset %08x : %08x%08x (%08x%08x)\n", offset * 8, (UINT32)(retvalue >> 32), (UINT32)(retvalue & 0xffffffff), (UINT32)(mem_mask >> 32), (UINT32)(mem_mask & 0xffffffff));
+	}
+	else
+	{
+		printf("model3_5881prot_r offset %08x : %08x%08x (%08x%08x)\n", offset * 8, (UINT32)(retvalue >> 32), (UINT32)(retvalue & 0xffffffff), (UINT32)(mem_mask >> 32), (UINT32)(mem_mask & 0xffffffff));
+	}
+
+	return retvalue;
+
+
+}
+
+WRITE64_MEMBER(model3_state::model3_5881prot_w)
+{
+	if (offset == 0x10 / 8)
+	{
+		// code is copied to RAM first, so base address is always 0
+		m_cryptdevice->set_addr_low(0);
+		m_cryptdevice->set_addr_high(0);
+
+		if (data != 0)
+			printf("model3_5881prot_w address isn't 0?\n");
+
+		first_read = 1;
+	}
+	else if (offset == 0x18 / 8)
+	{
+		UINT16 subkey = data >> (32 + 16);
+		subkey = ((subkey & 0xff00) >> 8) | ((subkey & 0x00ff) << 8); // endian swap the sub-key for this hardware
+		printf("model3_5881prot_w setting subkey %04x\n", subkey);
+		m_cryptdevice->set_subkey(subkey);
+	}
+	else
+	{
+		printf("model3_5881prot_w offset %08x : %08x%08x (%08x%08x)\n", offset * 8, (UINT32)(data >> 32), (UINT32)(data & 0xffffffff), (UINT32)(mem_mask >> 32), (UINT32)(mem_mask & 0xffffffff));
+	}
+
+
+
 }
 
 WRITE64_MEMBER(model3_state::daytona2_rombank_w)
@@ -1847,8 +1918,6 @@ static ADDRESS_MAP_START( model3_mem, AS_PROGRAM, 64, model3_state )
 	AM_RANGE(0xf00c0000, 0xf00dffff) AM_MIRROR(0x0e000000) AM_RAM AM_SHARE("backup")    /* backup SRAM */
 	AM_RANGE(0xf0100000, 0xf010003f) AM_MIRROR(0x0e000000) AM_READWRITE(model3_sys_r, model3_sys_w )
 	AM_RANGE(0xf0140000, 0xf014003f) AM_MIRROR(0x0e000000) AM_READWRITE(model3_rtc_r, model3_rtc_w )
-	AM_RANGE(0xf0180000, 0xf019ffff) AM_MIRROR(0x0e000000) AM_RAM                           /* Security Board RAM */
-	AM_RANGE(0xf01a0000, 0xf01a003f) AM_MIRROR(0x0e000000) AM_READ(model3_security_r )  /* Security board */
 
 	AM_RANGE(0xf1000000, 0xf10f7fff) AM_READWRITE(model3_char_r, model3_char_w )    /* character RAM */
 	AM_RANGE(0xf10f8000, 0xf10fffff) AM_READWRITE(model3_tile_r, model3_tile_w )    /* tilemaps */
@@ -5591,6 +5660,25 @@ static MACHINE_CONFIG_START( model3_21, model3_state )
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 MACHINE_CONFIG_END
 
+UINT16 model3_state::crypt_read_callback(UINT32 addr)
+{
+	UINT16 dat = 0;
+	if (addr < 0x8000)
+	{
+		dat = m_maincpu->space().read_word((0xf0180000 + 4 * addr)); // every other word is unused in this RAM, probably 32-bit ram on 64-bit bus?
+	}
+
+//	dat = ((dat & 0xff00) >> 8) | ((dat & 0x00ff) << 8);
+//	printf("reading %04x\n", dat);
+	return dat;
+}
+
+static MACHINE_CONFIG_DERIVED( model3_21_5881, model3_21 )
+	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
+	MCFG_SET_READ_CALLBACK(model3_state, crypt_read_callback)
+MACHINE_CONFIG_END
+
+
 static void interleave_vroms(running_machine &machine)
 {
 	model3_state *state = machine.driver_data<model3_state>();
@@ -5619,6 +5707,24 @@ static void interleave_vroms(running_machine &machine)
 			vrom[i+x+8] = vrom2[(j+x)^1];
 		}
 		j+=8;
+	}
+}
+
+DRIVER_INIT_MEMBER(model3_state, genprot)
+{
+	INT64 key = get_315_5881_key(machine());
+
+	m_maincpu->space(AS_PROGRAM).install_ram(0xf0180000, 0xf019ffff, 0, 0x0e000000);
+
+	if (key != -1)
+	{
+//		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf01a0000, 0xf01a003f, read64_delegate(FUNC(model3_state::model3_5881prot_r), this), write64_delegate(FUNC(model3_state::model3_5881prot_w), this));
+		m_cryptdevice->set_key(key);
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf01a0000, 0xf01a003f, 0, 0x0e000000, read64_delegate(FUNC(model3_state::model3_5881prot_r), this), write64_delegate(FUNC(model3_state::model3_5881prot_w), this) );                    
+	}
+	else
+	{
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xf01a0000, 0xf01a003f, 0, 0x0e000000, read64_delegate(FUNC(model3_state::model3_security_r), this) );                    
 	}
 }
 
@@ -5842,6 +5948,7 @@ DRIVER_INIT_MEMBER(model3_state,srally2)
 
 DRIVER_INIT_MEMBER(model3_state,swtrilgy)
 {
+
 	UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
@@ -5852,6 +5959,10 @@ DRIVER_INIT_MEMBER(model3_state,swtrilgy)
 
 	rom[(0x043dc^4)/4] = 0x48000090;        // skip force feedback setup
 	rom[(0xf6e44^4)/4] = 0x60000000;
+
+
+	DRIVER_INIT_CALL(genprot);
+
 }
 
 DRIVER_INIT_MEMBER(model3_state,swtrilga)
@@ -6003,15 +6114,15 @@ GAME( 1999, vs299a,   vs2v991, model3_20, model3, model3_state,     vs299a, ROT0
 GAME( 1999, vs299,    vs2v991, model3_20, model3, model3_state,      vs299, ROT0, "Sega", "Virtua Striker 2 '99", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 /* Model 3 Step 2.1 */
-GAME( 1998, daytona2,         0, model3_21, daytona2, model3_state, daytona2, ROT0, "Sega", "Daytona USA 2 (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, dayto2pe,         0, model3_21, daytona2, model3_state, dayto2pe, ROT0, "Sega", "Daytona USA 2 Power Edition", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, dirtdvls,         0, model3_21, scud, model3_state,     dirtdvls, ROT0, "Sega", "Dirt Devils (set 1) (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, dirtdvlsa, dirtdvls, model3_21, scud, model3_state,     dirtdvls, ROT0, "Sega", "Dirt Devils (set 2) (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, swtrilgy,         0, model3_21, swtrilgy, model3_state, swtrilgy, ROT0, "Sega / LucasArts", "Star Wars Trilogy (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, swtrilgya, swtrilgy, model3_21, swtrilgy, model3_state, swtrilga, ROT0, "Sega / LucasArts", "Star Wars Trilogy", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, spikeout,         0, model3_21, model3, model3_state,   spikeout, ROT0, "Sega", "Spikeout (Revision C)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, spikeofe,         0, model3_21, model3, model3_state,   spikeofe, ROT0, "Sega", "Spikeout Final Edition", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, magtruck,         0, model3_21, eca, model3_state,      magtruck, ROT0, "Sega", "Magical Truck Adventure", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, eca,              0, model3_21, eca, model3_state,           eca, ROT0, "Sega", "Emergency Call Ambulance", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, ecax,           eca, model3_21, eca, model3_state,           eca, ROT0, "Sega", "Emergency Call Ambulance (Export)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, ecap,           eca, model3_21, eca, model3_state,           eca, ROT0, "Sega", "Emergency Call Ambulance (US location test?)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, daytona2,         0, model3_21,      daytona2, model3_state, daytona2, ROT0, "Sega", "Daytona USA 2 (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, dayto2pe,         0, model3_21,      daytona2, model3_state, dayto2pe, ROT0, "Sega", "Daytona USA 2 Power Edition", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, dirtdvls,         0, model3_21,      scud, model3_state,     dirtdvls, ROT0, "Sega", "Dirt Devils (set 1) (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, dirtdvlsa, dirtdvls, model3_21,      scud, model3_state,     dirtdvls, ROT0, "Sega", "Dirt Devils (set 2) (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, swtrilgy,         0, model3_21_5881, swtrilgy, model3_state, swtrilgy, ROT0, "Sega / LucasArts", "Star Wars Trilogy (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, swtrilgya, swtrilgy, model3_21_5881, swtrilgy, model3_state, swtrilga, ROT0, "Sega / LucasArts", "Star Wars Trilogy", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, spikeout,         0, model3_21,      model3, model3_state,   spikeout, ROT0, "Sega", "Spikeout (Revision C)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, spikeofe,         0, model3_21,      model3, model3_state,   spikeofe, ROT0, "Sega", "Spikeout Final Edition", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, magtruck,         0, model3_21,      eca, model3_state,      magtruck, ROT0, "Sega", "Magical Truck Adventure", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, eca,              0, model3_21,      eca, model3_state,           eca, ROT0, "Sega", "Emergency Call Ambulance", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, ecax,           eca, model3_21,      eca, model3_state,           eca, ROT0, "Sega", "Emergency Call Ambulance (Export)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, ecap,           eca, model3_21,      eca, model3_state,           eca, ROT0, "Sega", "Emergency Call Ambulance (US location test?)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
