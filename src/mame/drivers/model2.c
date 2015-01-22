@@ -1323,10 +1323,8 @@ READ32_MEMBER(model2_state::model2_5881prot_r)
 	{
 		if (first_read == 1)
 		{
-			// is there a CPU core bug or similar? 
-			// the only way to return the same stream as the previous simulation (for dynamite cop) is to return a
-			// 0x0000 as the first return value before returning the actual sequence.
-			// note that even with our simulation code pilot kids crashes in the way it would if the protection failed, so something seems wrong.
+			// the RAM based schemes expect a dummy value before the start of the stream
+			// to match the previous simulation (dynamite cop) I use 0x0000 here
 			first_read = 0;
 			retval = 0;
 		}
