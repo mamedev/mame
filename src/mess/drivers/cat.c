@@ -219,8 +219,12 @@ J2: unpopulated 8-pin sip header, serial/rs232-related?
 J3: Floppy Connector
     (standard DIL 34 pin 2-row rectangular connector for mini-shugart/pc floppy cable; pin 2 IS connected somewhere and ?probably? is used for /DISKCHANGE like on an Amiga, with pin 34 being /TRUEREADY?)
     (as opposed to normal ibm pc 3.5" drives where pin 2 is unconnected or is /DENSITY *input to drive*, and pin 34 is /DISKCHANGE)
-J4: 18-pin sip header for keyboard ribbon cable
-    (needs tracing to see the VIA hookup order)
+J4: 18-pin sip header for keyboard ribbon cable; bottom edge of board is pin 1
+    Pins:
+    1: GND through 220k resistor r78
+    2: ? phone hook related? anode of diode d7; one of the pins of relay k2; topmost (boardwise) pin of transistor Q10
+    3: 74HCT34 pin 
+
 J5: locking-tab-type "CONN HEADER VERT 4POS .100 TIN" connector for supplying power
     through a small cable with a berg connector at the other end, to the floppy drive
     (5v gnd gnd 12v)
@@ -232,11 +236,14 @@ J8: 9-pin Video out/power in connector "CONN RECEPT 6POS .156 R/A PCB" plus "CON
 J9: unpopulated DIL 40-pin straight connector for a ROM debug/expansion/RAM-shadow daughterboard
     the pins after pin 12 connect to that of the ROM-LO 27256 pinout counting pins 1,28,2,27,3,26,etc
     the ROM-HI rom has a different /HICE pin which is not connected to this connector
-    /LOCE is most likely !(a19|a18)&a15
-    /HICE is most likely !(a19|a18)&!a15
+    /LOCE is a15
+    /HICE is !a15
+    /ROM_OE comes from pin 14 of DECODE_E pal, and is shorted to /ROM_OE' by the cuttable jumper B1 which is not cut
+    /ROM_OE' goes to the two EPROMS
+	DECODE_18 is DECODE_E pal pin 18
     pin 1 (GND) is in the lower left and the pins count low-high then to the right
-    (gnd ? ? ? ?   ? vcc a14 a13 a8 a9 a11 /OE a10 /LOCE d7 d6 d5 d4 d3 )
-    (GND ? ? ? gnd ? vcc a12 a7  a6 a5 a4  a3  a2  a1    a0 d0 d1 d2 gnd)
+    (gnd N/C   E_CLK     R/W    /ROM_OE a17 vcc a14 a13 a8 a9 a11 /ROM_OE' a10 a15 d7 d6 d5 d4 d3 )
+    (GND /IPL1 DECODE_18 /RESET gnd     a16 vcc a12 a7  a6 a5 a4  a3       a2  a1  a0 d0 d1 d2 gnd)
 Jx: 4 pin on top side, 6 pin on bottom side edge ?debug? connector (doesn't have a Jx number)
     (trace me!)
 B1: a cuttable trace on the pcb. Not cut, affects one of the pins on the unpopulated J9 connector only.
@@ -328,6 +335,98 @@ ToDo:
 - Keypad? (also likely on a via done as a grid scan?)
 - Forth button (on the port on the back; keep in mind shift-usefront-space ALWAYS enables forth on a swyft)
 - Multple undumped firmware revisions exist (330 and 331 are dumped)
+
+// 74ls107 @ u18 pin 1 is 68008 /BERR pin
+
+// mc6850 @ u33 pin 2 (RX_DATA) is
+// mc6850 @ u33 pin 3 (RX_CLK) is 6522 @ u35 pin 17 (PB7)
+// mc6850 @ u33 pin 4 (TX_CLK) is 6522 @ u35 pin 17 (PB7)
+// mc6850 @ u33 pin 5 (/RTS) is
+// mc6850 @ u33 pin 6 (TX_DATA) is
+// mc6850 @ u33 pin 7 (/IRQ) is 68008 /IPL1 pin 41
+// mc6850 @ u33 pin 8 (CS0) is 68008 A12 pin 10
+// mc6850 @ u33 pin 9 (CS2) is DECODE E pin 18
+// mc6850 @ u33 pin 10 (CS1) is 68008 /BERR pin 40
+// mc6850 @ u33 pin 11 (RS) is 68008 A0 pin 46
+// mc6850 @ u33 pin 13 (R/W) is 68008 R/W pin 30
+// mc6850 @ u33 pin 14 (E) is 68008 E pin 38
+// mc6850 @ u33 pin 15-22 (D7-D0) are 68008 D7 to D0 pins 20-27
+// mc6850 @ u33 pin 23 (/DCD) is 74hc02 @ u35 pin 1
+// mc6850 @ u33 pin 24 (/CTS) is N/C?
+
+// 6522 @ u34:
+// pin 2 (PA0) :
+// pin 3 (PA1) :
+// pin 4 (PA2) :
+// pin 5 (PA3) :
+// pin 6 (PA4) :
+// pin 7 (PA5) :
+// pin 8 (PA6) :
+// pin 9 (PA7) :
+// pin 10 (PB0) :
+// pin 11 (PB1) :
+// pin 12 (PB2) :
+// pin 13 (PB3) :
+// pin 14 (PB4) :
+// pin 15 (PB5) :
+// pin 16 (PB6) : 
+// pin 17 (PB7) :
+// pin 18 (CB1) : ?from/to? Floppy connector j3 pin 8 
+// pin 19 (CB2) : ?from/to? 6522 @ u35 pin 16 (PB6) 
+// pin 21 (/IRQ) : out to 68008 /IPL1 pin 41
+// pin 22 (R/W) : in from 68008 R/W pin 30
+// pin 23 (/CS2) : in from DECODE E pin 18
+// pin 24 (CS1) : in from 68008 A13 pin 11
+// pin 25 (Phi2) : in from 68008 E pin 38
+// pins 26-33 : in/out from/to 68008 D7 to D0 pins 20-27
+// pin 34 (/RES) : in from 68008 /RESET pin 37 AND 68008 /HALT pin 36
+// pins 35-38 (RS3-RS0) are 68008 A9-A6 pins 7-4
+// pin 39 (CA2) is through inductor L11 and resistor r128 to peripheral connector pin 35 <end minus 26>
+// pin 40 (CA1) is through inductor L30 and resistor r138 to peripheral connector pin 53 <end minus 8>
+
+// 6522 @ u35 
+// pin 2 (PA0) :
+// pin 3 (PA1) :
+// pin 4 (PA2) :
+// pin 5 (PA3) :
+// pin 6 (PA4) :
+// pin 7 (PA5) :
+// pin 8 (PA6) :
+// pin 9 (PA7) :
+// pin 10 (PB0) :
+// pin 11 (PB1) : in from 74hc02 @ u36 pin 4
+// pin 12 (PB2) :
+// pin 13 (PB3) :
+// pin 14 (PB4) :
+// pin 15 (PB5) :
+// pin 16 (PB6) : 6522 @ u34 pin 19 (CB2)
+// pin 17 (PB7) : mc6850 @ u33 pins 3 and 4 (RX_CLK, TX_CLK)
+// pin 18 (CB1) : ds1489an @ u45 pin 11
+// pin 19 (CB2) : mn4053b @ u40 pin 11 and mc14412 @ u41 pin 10
+// pin 21 (/IRQ) : out to 68008 /IPL1 pin 41
+// pin 22 (R/W) : in from 68008 R/W pin 30
+// pin 23 (/CS2) : in from DECODE E pin 18
+// pin 24 (CS1) : in from 68008 A14 pin 12
+// pin 25 (Phi2) : in from 68008 E pin 38
+// pins 26-33 : in/out from/to 68008 D7 to D0 pins 20-27
+// pin 34 (/RES) : in from 68008 /RESET pin 37 AND 68008 /HALT pin 36
+// pins 35-38 (RS3-RS0) : in from 68008 A9-A6 pins 7-4
+// pin 39 (CA2) : out to 74HCT34 pin 11 (CLK) (keyboard column latch)
+// pin 40 (CA1) : out? to? ds1489an @ u45 pin 8
+
+// 74hc02 @ u36:
+// pin 1 (Y1) : out to mc6850 @ u33 pin 23 /DCD
+// pin 2 (A1) : in from (2 places: resistor R58 to ua339 @ u38 pin 4 (In1-)) <where does this actually come from? modem offhook?>
+// pin 3 (B1) : in from mn4053b @ u40  pin 10 <probably from rs232>
+// pin 4 (Y2) : out to 6522 @u35 pin 11
+// pin 5 (A2) : in from 4N37 @ u48 pin 5 (output side emitter pin) (tied via R189 to gnd) <ring indicator?>
+// pin 6 (B2) : in from 4N37 @ u48 pin 5 (output side emitter pin) (tied via R189 to gnd) <ring indicator?>
+// pin 8 (B3) : 
+// pin 9 (A3) : 
+// pin 10 (Y3) : 
+// pin 11 (B4) : in from 68008 A15
+// pin 12 (A4) : in from 68008 A15
+// pin 13 (Y4) : out to EPROM @ U31 /CE
 
 ****************************************************************************/
 
@@ -1265,10 +1364,11 @@ x   x   x   x   0   0   ?   ?   0   *   *   *   *   *   *   *   *   *   *   *   
 x   x   x   x   0   0   ?   ?   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *        R   ROM-HI (/LOCE is 1, /HICE is 0)
 x   x   x   x   0   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   a        RW  RAM
 x   x   x   x   1   1  ?0? ?1?  ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   *   *   *   *        R   ? status of something? floppy?
-x   x   x   x   1   1  ?1? ?0?  ?   0   0   1   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?   ?        ?R?W   6850 acia control reg lives here, gets 0x55 steadystate and 0x57 written to it to reset it
-x   x   x   x   1   1  ?1? ?0?  ?   0   1   0   ?   ?   *   *   *   *  ?*?  ?   ?   ?   ?   ?        RW  VIA 0
-x   x   x   x   1   1  ?1? ?0?  ?   1   0   0   ?   ?   *   *   *   *  ?*?  ?   ?   ?   ?   ?        RW  VIA 1
+x   x   x   x   1   1  ?1? ?0?  ?   0   0   1   x   x   x   x   x   x   x   x   x   x   x   *        RW  6850 acia @U33, gets 0x55 steadystate and 0x57 written to it to reset it
+x   x   x   x   1   1  ?1? ?0?  ?   0   1   0   x   x   *   *   *   *   x   x   x   x   x   x        RW  Parallel VIA 0 @ U34
+x   x   x   x   1   1  ?1? ?0?  ?   1   0   0   x   x   *   *   *   *   x   x   x   x   x   x        RW  Keyboard VIA 1 @ U35
               ^               ^               ^               ^               ^
+
 */
 
 /* Swyft rom and ram notes:
@@ -1578,11 +1678,11 @@ static MACHINE_CONFIG_START( swyft, cat_state )
 	MCFG_VIDEO_START_OVERRIDE(cat_state,swyft)
 
 	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
-
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 3579545) // guess
+	// acia rx and tx clocks come from one of the VIA pins and are tied together, fix this below? acia e clock comes from 68008
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, (XTAL_15_8976MHz/2)/5) // out e clock from 68008, ~ 10in clocks per out clock
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(cat_state, write_acia_clock))
 
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, XTAL_15_8976MHz/16) // unknown clock, GUESSED
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, (XTAL_15_8976MHz/2)/5) // out e clock from 68008
 	MCFG_VIA6522_READPA_HANDLER(READ8(cat_state, via0_pa_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(cat_state, via0_pb_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(cat_state, via0_pa_w))
@@ -1592,7 +1692,7 @@ static MACHINE_CONFIG_START( swyft, cat_state )
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(cat_state, via0_cb2_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(cat_state, via0_int_w))
 
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL_15_8976MHz/16) // unknown clock, GUESSED
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, (XTAL_15_8976MHz/2)/5) // out e clock from 68008
 	MCFG_VIA6522_READPA_HANDLER(READ8(cat_state, via1_pa_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(cat_state, via1_pb_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(cat_state, via1_pa_w))
@@ -1623,31 +1723,55 @@ ROM_START( swyft )
 	 */
 	/* U9: Timing AMPAL16R4
 	 *
-	 * input
-	 * 76543210
-	 * |||||||\-- ?
-	 * ||||||\--- ?
-	 * |||||\---- ?
-	 * ||||\----- ?
-	 * |||\------ ?
-	 * ||\------- ?
-	 * |\-------- ?
-	 * \--------- ?
-	 * /CK ------ 15.8976mhz crystal and transistor oscillator
-	 * /OE ------ ?
-	 *
-	 * output
-	 * 76543210
-	 * |||||||\-- ?
-	 * ||||||\--- ?
-	 * |||||\-R-- ?
-	 * ||||\--R-- ?
-	 * |||\---R-- ?
-	 * ||\----R-- ?
-	 * |\-------- ?
-	 * \--------- ?
+	 * pins:
+	 * 111111111000000000
+	 * 987654321987654321
+	 * ??QQQQ??EIIIIIIIIC
+	 * |||||||||||||||||\-< /CK input - 15.8976mhz crystal and transistor oscillator
+	 * ||||||||||||||||\--< ?
+	 * |||||||||||||||\---< ?
+	 * ||||||||||||||\----< ?
+	 * |||||||||||||\-----< ?<also input to decode pal pin 1, video pal pin 1, source is ?>
+	 * ||||||||||||\------< ?
+	 * |||||||||||\-------< ?
+	 * ||||||||||\--------< ?
+	 * |||||||||\---------< ?
+	 * ||||||||\----------< /OE input - shorted to GND
+	 * |||||||\-----------? ?
+	 * ||||||\------------? ?
+	 * |||||\------------Q> /ROM_OE (to both eproms through jumper b1 and optionally j9 connector)
+	 * ||||\-------------Q? ?
+	 * |||\--------------Q? ?
+	 * ||\---------------Q> output to decode pal pin 2
+	 * |\----------------->? output? to ram multiplexer 'A' pins 
+	 * \------------------< ?
 	 */
 	ROM_LOAD( "timing_b.ampal16r4a.u9.jed", 0x0000, 0xb08, CRC(643e6e83) SHA1(7db167883f9d6cf385ce496d08976dc16fc3e2c3))
+	/* U20: Decode AMPAL16L8
+	 *
+	 * pins:
+	 * 111111111000000000
+	 * 987654321987654321
+	 * O??????OIIIIIIIIII
+	 * |||||||||||||||||\-< TIMING PAL pin 5
+	 * ||||||||||||||||\--< TIMING PAL pin 17
+	 * |||||||||||||||\---< 68008 R/W (pin 30)
+	 * ||||||||||||||\----< 68008 /DS (pin 29)
+	 * |||||||||||||\-----< 68008 E (pin 38)
+	 * ||||||||||||\------< 68008 A19
+	 * |||||||||||\-------< 68008 A18
+	 * ||||||||||\--------< 68008 A17
+	 * |||||||||\---------< 68008 A16
+	 * ||||||||\----------< ?
+	 * |||||||\-----------> ?
+	 * ||||||\------------? 68008 /VPA (pin 39)
+	 * |||||\-------------> /ROM_OE (to both eproms through jumper b1 and optionally j9 connector)
+	 * ||||\--------------? ?
+	 * |||\---------------? ?
+	 * ||\----------------? ?
+	 * |\-----------------? goes to j9 connector pin 5
+	 * \------------------< ?
+	 */
 	ROM_LOAD( "decode_e.ampal16l8.u20.jed", 0x1000, 0xb08, CRC(0b1dbd76) SHA1(08c144ad7a7bbdd53eefd271b2f6813f8b3b1594))
 	ROM_LOAD( "video_2b.ampal16r4.u25.jed", 0x2000, 0xb08, CRC(caf91148) SHA1(3f8ddcb512a1c05395c74ad9a6ba7b87027ce4ec))
 	ROM_LOAD( "disk_3.5c.ampal16r4.u28.jed", 0x3000, 0xb08, CRC(fd994d02) SHA1(f910ab16587dd248d63017da1e5b37855e4c1a0c))
