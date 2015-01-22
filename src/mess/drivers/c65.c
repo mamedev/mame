@@ -76,16 +76,19 @@ QUICKLOAD_LOAD_MEMBER( c65_state, cbm_c65 )
  *************************************/
 
 static ADDRESS_MAP_START( c65_mem , AS_PROGRAM, 8, c65_state )
-	AM_RANGE(0x00000, 0x07fff) AM_RAMBANK("bank11")
-	AM_RANGE(0x08000, 0x09fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank12")
-	AM_RANGE(0x0a000, 0x0bfff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank13")
-	AM_RANGE(0x0c000, 0x0cfff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank14")
-	AM_RANGE(0x0d000, 0x0d7ff) AM_READ_BANK("bank4") AM_WRITE_BANK("bank5")
-	AM_RANGE(0x0d800, 0x0dbff) AM_READ_BANK("bank6") AM_WRITE_BANK("bank7")
-	AM_RANGE(0x0dc00, 0x0dfff) AM_READ_BANK("bank8") AM_WRITE_BANK("bank9")
-	AM_RANGE(0x0e000, 0x0ffff) AM_READ_BANK("bank10") AM_WRITE_BANK("bank15")
-	AM_RANGE(0x10000, 0x1f7ff) AM_RAM
-	AM_RANGE(0x1f800, 0x1ffff) AM_RAM AM_SHARE("colorram")
+	AM_RANGE(0xf0000, 0xf7fff) AM_RAMBANK("bank11")
+	AM_RANGE(0xf8000, 0xf9fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank12")
+	AM_RANGE(0xfa000, 0xfbfff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank13")
+	AM_RANGE(0xfc000, 0xfcfff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank14")
+	AM_RANGE(0xfd000, 0xfd7ff) AM_READ_BANK("bank4") AM_WRITE_BANK("bank5")
+	AM_RANGE(0xfd800, 0xfdbff) AM_READ_BANK("bank6") AM_WRITE_BANK("bank7")
+	AM_RANGE(0xfdc00, 0xfdfff) AM_READ_BANK("bank8") AM_WRITE_BANK("bank9")
+	AM_RANGE(0xfe000, 0xfffff) AM_READ_BANK("bank10") AM_WRITE_BANK("bank15")
+//	AM_RANGE(0x10000, 0x1f7ff) AM_RAM
+//	AM_RANGE(0x1f800, 0x1ffff) AM_RAM AM_SHARE("colorram")
+	AM_RANGE(0x00000, 0x1ffff) AM_ROM AM_REGION("maincpu",0x20000)
+	
+	AM_RANGE(0x20000, 0x207ff) AM_RAM AM_SHARE("colorram")
 
 	AM_RANGE(0x20000, 0x23fff) AM_ROM /* &c65_dos,     maps to 0x8000    */
 	AM_RANGE(0x24000, 0x28fff) AM_ROM /* reserved */
