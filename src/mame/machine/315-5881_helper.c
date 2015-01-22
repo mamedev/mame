@@ -37,7 +37,7 @@ static const struct game_keys keys_table[] =
 	{ "rsgun",           -1         }, //             1998     317-5041-COM   ST-V
 	{ "sss",             -1         }, //             1998     317-5042-COM   ST-V
 	{ "elandore",        -1         }, //             1998     317-5043-COM   ST-V
-	{ "ffreveng",        -1         }, //             1998     317-5049-COM   ST-V
+	{ "ffreveng",        0x0524ac01 }, //             1998     317-5049-COM   ST-V
 
 	{ "gundmct",         0x000e8010 }, // 841-0017    2001     ???            Naomi
 	{ "puyoda",          0x000acd40 }, // 841-0006    1999     ???            Naomi
