@@ -116,8 +116,7 @@ def renderFontSaveCached(font, filename, hash32):
     CACHED_CHAR_SIZE = 12
     CACHED_HEADER_SIZE = 16
     
-    #try:
-    if 0 == 0:
+    try:
         fp.write('f')
         fp.write('o')
         fp.write('n')
@@ -199,7 +198,7 @@ def renderFontSaveCached(font, filename, hash32):
         fp.close()
         return 0
 
-    #except:
+    except:
         return 1
     
 
