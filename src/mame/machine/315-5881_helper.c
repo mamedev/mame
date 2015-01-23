@@ -143,8 +143,8 @@ static const struct game_keys keys_table[] =
 	{ "dirtdvls",        0x09290f17 }, //             ????     317-0238-COM   Model 3
 	{ "dirtdvlsa",       0x09290f17 }, //             ????     317-0238-COM   Model 3
 	{ "daytona2",        0x09250e16 }, //             ????     317-0239-COM   Model 3
-	{ "spikeout",        -1         }, //             ????     317-0240-COM   Model 3
-	{ "spikeofe",        -1         }, //             ????     ?317-0240-COM? Model 3
+	{ "spikeout",        0x092f2b04 }, //             ????     317-0240-COM   Model 3
+	{ "spikeofe",        0x09236fc8 }, //             ????     317-0247-COM   Model 3
 	{ "swtrilgy",        0x11272a01 }, //             ????     317-0241-COM   Model 3
 	{ "swtrilgya",       0x11272a01 }, //             ????     317-0241-COM   Model 3
 	{ "oceanhun",        0x092b6a01 }, //             ????     317-0242-COM   Model 3
