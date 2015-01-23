@@ -20,6 +20,9 @@ extern bool g_print_verbose;
 
 const options_entry osd_options::s_option_entries[] =
 {
+    { NULL,                                   NULL,       OPTION_HEADER,     "OSD FONT OPTIONS" },
+    { OSD_FONT_PROVIDER,                      "auto",     OPTION_STRING,     "provider for ui font: " },
+
     { NULL,                                   NULL,       OPTION_HEADER,     "OSD CLI OPTIONS" },
     { OSDCOMMAND_LIST_MIDI_DEVICES ";mlist",  "0",        OPTION_COMMAND,    "list available MIDI I/O devices" },
     { OSDCOMMAND_LIST_NETWORK_ADAPTERS ";nlist", "0",     OPTION_COMMAND,    "list available network adapters" },
@@ -106,9 +109,30 @@ osd_common_t::osd_common_t(osd_options &options)
 {
 }
 
+#define REGISTER_MODULE(_O, _X ) { extern const module_type _X; _O . register_module( _X ); }
 
 void osd_common_t::register_options()
 {
+
+    REGISTER_MODULE(m_mod_man, FONT_OSX);
+    REGISTER_MODULE(m_mod_man, FONT_WINDOWS);
+    REGISTER_MODULE(m_mod_man, FONT_SDL);
+    REGISTER_MODULE(m_mod_man, FONT_NONE);
+
+    // after initialization we know which modules are supported
+
+    const char *names[20];
+    int num;
+    m_mod_man.get_module_names(OSD_FONT_PROVIDER, 20, &num, names);
+    dynamic_array<const char *> dnames;
+    for (int i = 0; i < num; i++)
+        dnames.append(names[i]);
+    update_option(OSD_FONT_PROVIDER, dnames);
+
+
+
+
+
     // Register video options and update options
     video_options_add("none", NULL);
     video_register();
@@ -208,6 +232,11 @@ void osd_common_t::init(running_machine &machine)
 	// extract the verbose printing option
 	if (options.verbose())
 		g_print_verbose = true;
+
+    m_font_module = select_module_options<font_module *>(options, OSD_FONT_PROVIDER);
+
+    m_mod_man.init();
+
 
 	// ensure we get called on the way out
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(osd_common_t::osd_exit), this));
@@ -539,7 +568,9 @@ void osd_common_t::network_exit()
 
 void osd_common_t::osd_exit()
 {
-	exit_subsystems();
+    m_mod_man.exit();
+
+    exit_subsystems();
 }
 
 void osd_common_t::video_options_add(const char *name, void *type)

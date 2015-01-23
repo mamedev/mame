@@ -12,11 +12,6 @@
 
 #ifdef SDLMAME_UNIX
 #if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_EMSCRIPTEN))
-#if (SDLMAME_SDL2)
-#include <SDL2/SDL_ttf.h>
-#else
-#include <SDL/SDL_ttf.h>
-#endif
 #ifndef SDLMAME_HAIKU
 #include <fontconfig/fontconfig.h>
 #endif
@@ -61,7 +56,9 @@
 #include "input.h"
 #include "osdsdl.h"
 #include "modules/lib/osdlib.h"
+
 #include "modules/sound/sdl_sound.h"
+
 #if defined(SDLMAME_EMSCRIPTEN)
 #include "modules/sound/js_sound.h"
 #endif
@@ -269,7 +266,6 @@ sdl_options::sdl_options()
 	set_default_value(SDLOPTION_INIPATH, ini_path.cstr());
 }
 
-
 //============================================================
 //  main
 //============================================================
@@ -301,14 +297,11 @@ int main(int argc, char *argv[])
 	setvbuf(stdout, (char *) NULL, _IONBF, 0);
 	setvbuf(stderr, (char *) NULL, _IONBF, 0);
 
-	//FIXME: move to font module
+	// FIXME: this should be done differently
+
 	#ifdef SDLMAME_UNIX
 	sdl_entered_debugger = 0;
 	#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN))
-	if (TTF_Init() == -1)
-	{
-		printf("SDL_ttf failed: %s\n", TTF_GetError());
-	}
 	FcInit();
 	#endif
 	#endif
@@ -355,12 +348,8 @@ int main(int argc, char *argv[])
 	}
 #endif
 
-	// already called...
-	//SDL_Quit();
-
 	#ifdef SDLMAME_UNIX
 	#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN))
-	TTF_Quit();
 	if (!sdl_entered_debugger)
 	{
 		FcFini();
@@ -590,6 +579,7 @@ void sdl_osd_interface::debugger_register()
 //============================================================
 //  init
 //============================================================
+
 
 void sdl_osd_interface::init(running_machine &machine)
 {

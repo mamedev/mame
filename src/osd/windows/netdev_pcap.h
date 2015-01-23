@@ -1,5 +1,5 @@
-#ifndef __NETDEV_H
-#define __NETDEV_H
+#ifndef __NETDEV_PCAP_H__
+#define __NETDEV_PCAP_H__
 
 void init_pcap();
 void deinit_pcap();

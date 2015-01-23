@@ -3,6 +3,11 @@
  *
  */
 
+#include "font_module.h"
+#include "modules/osdmodule.h"
+
+#if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
+
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <commctrl.h>
@@ -10,7 +15,8 @@
 #include <tchar.h>
 #include <io.h>
 
-#include "osdepend.h"
+#include "font_module.h"
+#include "modules/osdmodule.h"
 
 #include "strconv.h"
 #include "astring.h"
@@ -77,11 +83,6 @@ public:
 private:
     HGDIOBJ m_font;
 };
-
-osd_font *osd_font_alloc()
-{
-    return global_alloc(osd_font_windows);
-}
 
 bool osd_font_windows::open(const char *font_path, const char *_name, int &height)
 {
@@ -298,3 +299,22 @@ bool osd_font_windows::get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT
     return bitmap.valid();
 }
 
+class font_win : public osd_module, public font_module
+{
+public:
+    font_win()
+    : osd_module(OSD_FONT_PROVIDER, "win"), font_module()
+    {
+    }
+
+    osd_font *font_alloc()
+    {
+        return global_alloc(osd_font_windows);
+    }
+
+};
+#else /* SDLMAME_UNIX */
+    MODULE_NOT_SUPPORTED(font_win, OSD_FONT_PROVIDER, "win")
+#endif
+
+MODULE_DEFINITION(FONT_WINDOWS, font_win)

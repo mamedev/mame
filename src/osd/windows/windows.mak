@@ -358,6 +358,7 @@ OSDCOREOBJS = \
 	$(OSDOBJ)/modules/sync/work_osd.o \
 	$(OSDOBJ)/modules/lib/osdlib_win32.o \
 	$(OSDOBJ)/modules/font/font_windows.o \
+	$(OSDOBJ)/modules/osdmodule.o \
 	$(WINOBJ)/winptty.o \
 
 
@@ -381,6 +382,10 @@ OSDOBJS = \
 	$(WINOBJ)/winmain.o \
 	$(OSDOBJ)/modules/midi/portmidi.o \
 	$(OSDOBJ)/modules/lib/osdobj_common.o  \
+	$(OSDOBJ)/modules/font/font_sdl.o \
+	$(OSDOBJ)/modules/font/font_windows.o \
+	$(OSDOBJ)/modules/font/font_osx.o \
+	$(OSDOBJ)/modules/font/font_none.o \
 
 ifdef USE_SDL
 OSDOBJS += \

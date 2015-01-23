@@ -204,14 +204,14 @@ endif
 ifeq ($(TARGETOS),unix)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = tc
-FONT_IMPLEMENTATION = unix
+FONT_IMPLEMENTATION = sdl
 endif
 
 ifeq ($(TARGETOS),linux)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = tc
 SDL_NETWORK = taptun
-FONT_IMPLEMENTATION = unix
+FONT_IMPLEMENTATION = sdl
 
 ifndef NO_USE_MIDI
 INCPATH += `pkg-config --cflags alsa`
@@ -223,7 +223,7 @@ endif
 ifeq ($(TARGETOS),freebsd)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = tc
-FONT_IMPLEMENTATION = unix
+FONT_IMPLEMENTATION = sdl
 DEFS += -DNO_AFFINITY_NP
 LIBS += -lutil
 # /usr/local/include is not considered a system include directory
@@ -235,7 +235,7 @@ endif
 ifeq ($(TARGETOS),openbsd)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = ntc
-FONT_IMPLEMENTATION = unix
+FONT_IMPLEMENTATION = sdl
 LIBS += -lutil
 NO_USE_MIDI = 1
 endif
@@ -243,7 +243,7 @@ endif
 ifeq ($(TARGETOS),netbsd)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = ntc
-FONT_IMPLEMENTATION = unix
+FONT_IMPLEMENTATION = sdl
 LIBS += -lutil
 NO_USE_MIDI = 1
 endif
@@ -252,14 +252,14 @@ ifeq ($(TARGETOS),solaris)
 BASE_TARGETOS = unix
 DEFS += -DNO_AFFINITY_NP -UHAVE_VSNPRINTF -DNO_vsnprintf
 SYNC_IMPLEMENTATION = tc
-FONT_IMPLEMENTATION = unix
+FONT_IMPLEMENTATION = sdl
 NO_USE_MIDI = 1
 endif
 
 ifeq ($(TARGETOS),haiku)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = ntc
-FONT_IMPLEMENTATION = unix
+FONT_IMPLEMENTATION = sdl
 NO_X11 = 1
 NO_USE_XINPUT = 1
 NO_USE_MIDI = 1
@@ -430,7 +430,7 @@ OSDCOREOBJS = \
 	$(SDLOBJ)/sdlos_$(SDLOS_TARGETOS).o \
 	$(OSDOBJ)/modules/lib/osdlib_$(SDLOS_TARGETOS).o \
 	$(OSDOBJ)/modules/sync/sync_$(SYNC_IMPLEMENTATION).o \
-	$(OSDOBJ)/modules/font/font_$(FONT_IMPLEMENTATION).o  \
+	$(OSDOBJ)/modules/osdmodule.o \
 
 ifdef NOASM
 OSDCOREOBJS += $(OSDOBJ)/modules/sync/work_mini.o
@@ -451,6 +451,10 @@ OSDOBJS = \
 	$(SDLOBJ)/output.o \
 	$(SDLOBJ)/watchdog.o \
 	$(OSDOBJ)/modules/lib/osdobj_common.o  \
+	$(OSDOBJ)/modules/font/font_sdl.o \
+	$(OSDOBJ)/modules/font/font_windows.o \
+	$(OSDOBJ)/modules/font/font_osx.o \
+	$(OSDOBJ)/modules/font/font_none.o \
 
 ifdef NO_USE_MIDI
 	OSDOBJS += $(OSDOBJ)/modules/midi/none.o

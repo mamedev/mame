@@ -14,6 +14,8 @@
 #define __OSDOBJ_COMMON__
 
 #include "osdepend.h"
+#include "modules/osdmodule.h"
+#include "modules/font/font_module.h"
 #include "cliopts.h"
 
 //============================================================
@@ -54,18 +56,6 @@
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
-
-/* FIXME: core_options inherits from osd_options. This will force any
- * future osd implementation to use the options below. Actually, these
- * options are *private* to the osd_core. This object should actually be an
- * accessor object. Later ...
- */
-
-/* FIXME: core_options inherits from osd_options. This will force any
- * future osd implementation to use the options below. Actually, these
- * options are *private* to the osd_core. This object should actually be an
- * accessor object. Later ...
- */
 
 class osd_options : public cli_options
 {
@@ -163,6 +153,8 @@ public:
     // command option overrides
     virtual bool execute_command(const char *command);
 
+    osd_font *font_alloc() { return m_font_module->font_alloc(); }
+
 	// FIXME: everything below seems to be osd specific and not part of
 	//        this INTERFACE but part of the osd IMPLEMENTATION
 
@@ -214,7 +206,29 @@ private:
 	running_machine *   m_machine;
 	osd_options& m_options;
 
+    osd_module_manager m_mod_man;
+    font_module *m_font_module;
+
 	void update_option(const char * key, dynamic_array<const char *> &values);
+    // FIXME: should be elsewhere
+    osd_module *select_module_options(const core_options &opts, const astring &opt_name)
+    {
+        astring opt_val = opts.value(opt_name);
+        if (opt_val == "auto")
+            opt_val = "";
+        else if (!m_mod_man.type_has_name(opt_name, opt_val))
+        {
+            osd_printf_warning("Value %s not supported for option %s - falling back to auto\n", opt_val.cstr(), opt_name.cstr());
+            opt_val = "";
+        }
+        return m_mod_man.select_module(opt_name, opt_val);
+    }
+
+    template<class C>
+    C select_module_options(const core_options &opts, const astring &opt_name)
+    {
+        return dynamic_cast<C>(select_module_options(opts, opt_name));
+    }
 
 protected:
 	osd_sound_interface* m_sound;

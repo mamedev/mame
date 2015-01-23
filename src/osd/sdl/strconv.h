@@ -22,8 +22,10 @@
 
 #if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
 
+#if defined(SDLMAME_WIN32)
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#endif
 // the result of these functions has to be released with osd_free()
 
 CHAR *astring_from_utf8(const char *s);

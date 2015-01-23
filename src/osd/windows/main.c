@@ -7,6 +7,9 @@
 //============================================================
 
 // standard windows headers
+#ifdef OSD_SDL
+#define _WIN32_WINNT 0x0400
+#endif
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <tchar.h>
@@ -34,6 +37,14 @@ extern "C" int _tmain(int argc, TCHAR **argv)
 	int i, rc;
 	char **utf8_argv;
 
+#ifdef OSD_SDL
+#ifdef MALLOC_DEBUG
+{
+	extern int winalloc_in_main_code;
+	winalloc_in_main_code = TRUE;
+#endif
+#endif
+
 	/* convert arguments to UTF-8 */
 	utf8_argv = (char **) malloc(argc * sizeof(*argv));
 	if (utf8_argv == NULL)
@@ -52,6 +63,17 @@ extern "C" int _tmain(int argc, TCHAR **argv)
 	for (i = 0; i < argc; i++)
 		osd_free(utf8_argv[i]);
 	free(utf8_argv);
+
+#ifdef OSD_SDL
+#ifdef MALLOC_DEBUG
+	{
+		void check_unfreed_mem(void);
+		check_unfreed_mem();
+	}
+	winalloc_in_main_code = FALSE;
+}
+#endif
+#endif
 
 	return rc;
 }

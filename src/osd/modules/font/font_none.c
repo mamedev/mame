@@ -3,7 +3,8 @@
  *
  */
 
-#include "osdepend.h"
+#include "font_module.h"
+#include "modules/osdmodule.h"
 
 #include "astring.h"
 #include "corealloc.h"
@@ -24,11 +25,6 @@ public:
     virtual bool get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs);
 private:
 };
-
-osd_font *osd_font_alloc()
-{
-    return global_alloc(osd_font_none);
-}
 
 bool osd_font_none::open(const char *font_path, const char *_name, int &height)
 {
@@ -56,3 +52,20 @@ bool osd_font_none::get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT32 
 {
     return false;
 }
+
+class font_none : public osd_module, public font_module
+{
+public:
+    font_none()
+    : osd_module(OSD_FONT_PROVIDER, "none"), font_module()
+    {
+    }
+
+    osd_font *font_alloc()
+    {
+        return global_alloc(osd_font_none);
+    }
+};
+
+MODULE_DEFINITION(FONT_NONE, font_none)
+

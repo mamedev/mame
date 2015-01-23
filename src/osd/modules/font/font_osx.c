@@ -3,9 +3,12 @@
  *
  */
 
-#include <Carbon/Carbon.h>
+#include "font_module.h"
+#include "modules/osdmodule.h"
 
-#include "osdepend.h"
+#ifdef SDLMAME_MACOSX
+
+#include <Carbon/Carbon.h>
 
 #include "astring.h"
 #include "corealloc.h"
@@ -31,11 +34,6 @@ public:
 private:
     CTFontRef m_font;
 };
-
-osd_font *osd_font_alloc()
-{
-    return global_alloc(osd_font_osx);
-}
 
 bool osd_font_osx::open(const char *font_path, const char *_name, int &height)
 {
@@ -183,3 +181,23 @@ bool osd_font_osx::get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT32 &
     return bitmap.valid();
 }
 
+
+class font_osx : public osd_module, public font_module
+{
+public:
+    font_osx()
+    : osd_module(OSD_FONT_PROVIDER, "osx"), font_module()
+    {
+    }
+
+    osd_font *font_alloc()
+    {
+        return global_alloc(osd_font_osx);
+    }
+
+};
+#else /* SDLMAME_UNIX */
+    MODULE_NOT_SUPPORTED(font_osx, OSD_FONT_PROVIDER, "osx")
+#endif
+
+MODULE_DEFINITION(FONT_OSX, font_osx)

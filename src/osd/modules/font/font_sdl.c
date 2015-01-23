@@ -3,6 +3,11 @@
  *
  */
 
+#include "font_module.h"
+#include "modules/osdmodule.h"
+
+#if defined(SDLMAME_UNIX) && (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN))
+
 #if (SDLMAME_SDL2)
 #include <SDL2/SDL_ttf.h>
 #else
@@ -12,7 +17,6 @@
 #include <fontconfig/fontconfig.h>
 #endif
 
-#include "osdepend.h"
 
 #include "astring.h"
 #include "corealloc.h"
@@ -25,10 +29,10 @@
 //  font with the given name
 //-------------------------------------------------
 
-class osd_font_unix : public osd_font
+class osd_font_sdl : public osd_font
 {
 public:
-    virtual ~osd_font_unix() {};
+    virtual ~osd_font_sdl() {};
 
     virtual bool open(const char *font_path, const char *name, int &height);
     virtual void close();
@@ -42,12 +46,7 @@ private:
     TTF_Font *m_font;
 };
 
-osd_font *osd_font_alloc()
-{
-    return global_alloc(osd_font_unix);
-}
-
-bool osd_font_unix::open(const char *font_path, const char *_name, int &height)
+bool osd_font_sdl::open(const char *font_path, const char *_name, int &height)
 {
     TTF_Font *font = (TTF_Font *)NULL;
     bool bakedstyles = false;
@@ -129,7 +128,7 @@ bool osd_font_unix::open(const char *font_path, const char *_name, int &height)
 //  a given OSD font
 //-------------------------------------------------
 
-void osd_font_unix::close()
+void osd_font_sdl::close()
 {
     TTF_CloseFont(this->m_font);
 }
@@ -142,7 +141,7 @@ void osd_font_unix::close()
 //  pixel of a black & white font
 //-------------------------------------------------
 
-bool osd_font_unix::get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
+bool osd_font_sdl::get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
 {
     TTF_Font *ttffont;
     SDL_Surface *drawsurf;
@@ -185,7 +184,7 @@ bool osd_font_unix::get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT32 
     return bitmap.valid();
 }
 
-TTF_Font * osd_font_unix::TTF_OpenFont_Magic(astring name, int fsize)
+TTF_Font * osd_font_sdl::TTF_OpenFont_Magic(astring name, int fsize)
 {
     emu_file file(OPEN_FLAG_READ);
     if (file.open(name) == FILERR_NONE)
@@ -199,7 +198,7 @@ TTF_Font * osd_font_unix::TTF_OpenFont_Magic(astring name, int fsize)
     return TTF_OpenFont(name.cstr(), POINT_SIZE);
 }
 
-bool osd_font_unix::BDF_Check_Magic(astring name)
+bool osd_font_sdl::BDF_Check_Magic(astring name)
 {
     emu_file file(OPEN_FLAG_READ);
     if (file.open(name) == FILERR_NONE)
@@ -216,7 +215,7 @@ bool osd_font_unix::BDF_Check_Magic(astring name)
 }
 
 #ifndef SDLMAME_HAIKU
-TTF_Font *osd_font_unix::search_font_config(astring name, bool bold, bool italic, bool underline, bool &bakedstyles)
+TTF_Font *osd_font_sdl::search_font_config(astring name, bool bold, bool italic, bool underline, bool &bakedstyles)
 {
     TTF_Font *font = (TTF_Font *)NULL;
     FcConfig *config;
@@ -324,3 +323,38 @@ TTF_Font *osd_font_unix::search_font_config(astring name, bool bold, bool italic
     return font;
 }
 #endif
+
+
+class font_sdl : public osd_module, public font_module
+{
+public:
+    font_sdl()
+    : osd_module(OSD_FONT_PROVIDER, "sdl"), font_module()
+    {
+    }
+
+    osd_font *font_alloc()
+    {
+        return global_alloc(osd_font_sdl);
+    }
+
+    virtual void init()
+    {
+        if (TTF_Init() == -1)
+        {
+            osd_printf_error("SDL_ttf failed: %s\n", TTF_GetError());
+        }
+    }
+
+    virtual void exit()
+    {
+        TTF_Quit();
+    }
+};
+#else /* SDLMAME_UNIX */
+    MODULE_NOT_SUPPORTED(font_sdl, OSD_FONT_PROVIDER, "sdl")
+#endif
+
+MODULE_DEFINITION(FONT_SDL, font_sdl)
+
+

@@ -7,6 +7,8 @@
 #include "clifront.h"
 #include "modules/lib/osdobj_common.h"
 #include "video.h"
+#include "modules/osdmodule.h"
+#include "modules/font/font_module.h"
 
 //============================================================
 //  System dependent defines
@@ -219,7 +221,6 @@ private:
 
 	// FIXME: remove machine usage
 	void extract_video_config(running_machine &machine);
-
 
     sdl_options &m_options;
 

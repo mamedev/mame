@@ -18,6 +18,7 @@
 #include "unicode.h"
 #include "cliopts.h"
 
+
 // forward references
 class input_type_entry;     // FIXME: including emu.h does not work because emu.h includes osdepend.h
 
@@ -39,12 +40,6 @@ public:
 };
 
 // ======================> osd_interface
-
-/* FIXME: this should be replaced by a proper module implementation
- * For the time being only one font provider can be linked
- */
-
-osd_font *osd_font_alloc();
 
 // description of the currently-running machine
 class osd_interface
@@ -71,9 +66,7 @@ public:
 	virtual void *get_slider_list() = 0; // FIXME: returns slider_state *
 
 	// font interface
-
-	// font is allocated with global_alloc; therefore use global_free!
-	osd_font *font_alloc() { return osd_font_alloc(); }
+	virtual osd_font *font_alloc() = 0;
 
 	// command option overrides
 	virtual bool execute_command(const char *command) = 0;
