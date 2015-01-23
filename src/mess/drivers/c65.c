@@ -25,15 +25,28 @@ public:
 	c65_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
-			m_screen(*this, "screen")
+			m_screen(*this, "screen"),
+			m_palette(*this, "palette"),
+			m_palred(*this, "redpal"),
+			m_palgreen(*this, "greenpal"),
+			m_palblue(*this, "bluepal")
+			
 	{ }
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT8> m_palred;
+	required_shared_ptr<UINT8> m_palgreen;
+	required_shared_ptr<UINT8> m_palblue;
+	 
 	DECLARE_READ8_MEMBER(vic4567_dummy_r);
 	DECLARE_WRITE8_MEMBER(vic4567_dummy_w);
-
+	DECLARE_WRITE8_MEMBER(PalRed_w);
+	DECLARE_WRITE8_MEMBER(PalGreen_w);
+	DECLARE_WRITE8_MEMBER(PalBlue_w);
+	
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(c65);
@@ -45,6 +58,8 @@ protected:
 	virtual void machine_reset();
 
 	virtual void video_start();
+private:
+	void PalEntryFlush(UINT8 offset);
 };
 
 void c65_state::video_start()
@@ -89,16 +104,39 @@ WRITE8_MEMBER(c65_state::vic4567_dummy_w)
 
 }
 
+void c65_state::PalEntryFlush(UINT8 offset)
+{
+	m_palette->set_pen_color(offset, pal4bit(m_palred[offset]), pal4bit(m_palgreen[offset]), pal4bit(m_palblue[offset]));
+}
+
+WRITE8_MEMBER(c65_state::PalRed_w)
+{
+	m_palred[offset] = data;
+	PalEntryFlush(offset);
+}
+
+WRITE8_MEMBER(c65_state::PalGreen_w)
+{
+	m_palblue[offset] = data;
+	PalEntryFlush(offset);
+}
+
+WRITE8_MEMBER(c65_state::PalBlue_w)
+{
+	m_palgreen[offset] = data;
+	PalEntryFlush(offset);
+}
+
+
 static ADDRESS_MAP_START( c65_map, AS_PROGRAM, 8, c65_state )
 	AM_RANGE(0x00000, 0x01fff) AM_RAM // TODO: bank
 	AM_RANGE(0x0c800, 0x0cfff) AM_ROM AM_REGION("maincpu", 0xc800)
-	AM_RANGE(0x0d000, 0x0d07f) AM_READWRITE(vic4567_dummy_r,vic4567_dummy_w)
-	// 0x0d000, 0x0d07f VIC-4567
+	AM_RANGE(0x0d000, 0x0d07f) AM_READWRITE(vic4567_dummy_r,vic4567_dummy_w) // 0x0d000, 0x0d07f VIC-4567
 	// 0x0d080, 0x0d09f FDC
 	// 0x0d0a0, 0x0d0ff Ram Expansion Control (REC)
-	// 0x0d100, 0x0d1ff Red Palette
-	// 0x0d200, 0x0d2ff Green Palette
-	// 0x0d300, 0x0d3ff Blue Palette
+	AM_RANGE(0x0d100, 0x0d1ff) AM_RAM_WRITE(PalRed_w) AM_SHARE("redpal")// 0x0d100, 0x0d1ff Red Palette
+	AM_RANGE(0x0d200, 0x0d2ff) AM_RAM_WRITE(PalGreen_w) AM_SHARE("greenpal") // 0x0d200, 0x0d2ff Green Palette
+	AM_RANGE(0x0d300, 0x0d3ff) AM_RAM_WRITE(PalBlue_w) AM_SHARE("bluepal") // 0x0d300, 0x0d3ff Blue Palette
 	// 0x0d400, 0x0d4*f Right SID
 	// 0x0d440, 0x0d4*f Left  SID
 	// 0x0d600, 0x0d6** UART
@@ -107,7 +145,7 @@ static ADDRESS_MAP_START( c65_map, AS_PROGRAM, 8, c65_state )
 	// 0x0dc00, 0x0dc** CIA-1
 	// 0x0dd00, 0x0dd** CIA-2
 	// 0x0de00, 0x0de** Ext I/O Select 1
-	// 0x0df00, 0x0df** Ext I/O Select 2
+	AM_RANGE(0x0df00, 0x0dfff) AM_RAM // 0x0df00, 0x0df** Ext I/O Select 2 (RAM window?)
 	AM_RANGE(0x20000, 0x3ffff) AM_ROM AM_REGION("maincpu",0)
 ADDRESS_MAP_END
 
@@ -181,6 +219,7 @@ void c65_state::machine_reset()
 
 PALETTE_INIT_MEMBER(c65_state, c65)
 {
+	// TODO: initial state? 
 }
 
 static MACHINE_CONFIG_START( c65, c65_state )
