@@ -6,24 +6,33 @@ C=65 / C=64DX (c) 1991 Commodore
 
 Attempt at rewriting the driver ...
 
+Note:
+- VIC-4567 will be eventually be added via compile switch, once that I
+  get the hang of the system (and checking where the old code fails 
+  eventually)
+
 ***************************************************************************/
 
 
 #include "emu.h"
 #include "cpu/m6502/m4510.h"
 
-#define MAIN_CLOCK XTAL_8MHz
+#define MAIN_CLOCK XTAL_3_5MHz
 
 class c65_state : public driver_device
 {
 public:
 	c65_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu"),
+			m_screen(*this, "screen")
 	{ }
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	DECLARE_READ8_MEMBER(vic4567_dummy_r);
+	DECLARE_WRITE8_MEMBER(vic4567_dummy_w);
 
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -47,9 +56,43 @@ UINT32 c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, co
 	return 0;
 }
 
+READ8_MEMBER(c65_state::vic4567_dummy_r)
+{
+	UINT8 res;
+
+	res=0xff;
+	switch(offset)
+	{
+		case 0x11:
+			res = (m_screen->vpos() & 0x100) >> 1;
+			return res;
+		case 0x12:
+			res = (m_screen->vpos() & 0xff);
+			return res;
+	}
+	
+	printf("%02x\n",offset); // TODO: PC
+	return res;
+}
+
+WRITE8_MEMBER(c65_state::vic4567_dummy_w)
+{
+	switch(offset)
+	{
+		/* KEY register, handles vic-iii and vic-ii modes via two consecutive writes 
+		  0xa5 -> 0x96 vic-iii mode
+          any other write vic-ii mode
+		  */
+		//case 0x2f: break;
+		default: printf("%02x %02x\n",offset,data); break;
+	}
+
+}
+
 static ADDRESS_MAP_START( c65_map, AS_PROGRAM, 8, c65_state )
 	AM_RANGE(0x00000, 0x01fff) AM_RAM // TODO: bank
 	AM_RANGE(0x0c800, 0x0cfff) AM_ROM AM_REGION("maincpu", 0xc800)
+	AM_RANGE(0x0d000, 0x0d07f) AM_READWRITE(vic4567_dummy_r,vic4567_dummy_w)
 	// 0x0d000, 0x0d07f VIC-4567
 	// 0x0d080, 0x0d09f FDC
 	// 0x0d0a0, 0x0d0ff Ram Expansion Control (REC)
@@ -143,7 +186,7 @@ PALETTE_INIT_MEMBER(c65_state, c65)
 static MACHINE_CONFIG_START( c65, c65_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M4510,MAIN_CLOCK/2)
+	MCFG_CPU_ADD("maincpu",M4510,MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(c65_map)
 
 	/* video hardware */
@@ -153,7 +196,7 @@ static MACHINE_CONFIG_START( c65, c65_state )
 	MCFG_SCREEN_UPDATE_DRIVER(c65_state, screen_update)
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 442, 0, 320, 264, 0, 240) /* generic NTSC video timing, change accordingly */
+	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, 525, 0, 320, 525, 0, 240) // mods needed
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x100)
