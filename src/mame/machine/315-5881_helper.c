@@ -39,12 +39,6 @@ static const struct game_keys keys_table[] =
 	{ "elandore",        0x05226d41 }, //             1998     317-5043-COM   ST-V
 	{ "ffreveng",        0x0524ac01 }, //             1998     317-5049-COM   ST-V
 
-	{ "gundmct",         0x000e8010 }, // 841-0017    2001     ???            Naomi
-	{ "puyoda",          0x000acd40 }, // 841-0006    1999     ???            Naomi
-	{ "smlg99",          0x08048a01 }, // 840-0012    1999     ???            Naomi
-	{ "vf4cart",         0x0eef2f96 }, // 840-0080    2002     ???            Naomi 2
-	{ "vonot",           0x08010715 }, // 840-0028    2000     ???            Naomi
-	{ "marstv",          0x080b8ef5 }, // 840-0025    1999     317-0074-JPN   Naomi
 	{ "dybbnao",         0x080e6ae1 }, // 840-0001    1998     317-0246-JPN   Naomi
 	{ "crzytaxi",        0x080d2f45 }, // 840-0002    1999     317-0248-COM   Naomi
 	{ "zombrvn",         0x08012b41 }, // 840-0003    1999     317-0249-COM   Naomi
@@ -56,6 +50,7 @@ static const struct game_keys keys_table[] =
 	{ "tduno",           0x08028ea5 }, // 840-0008    1999     317-0255-JPN   Naomi
 	{ "toyfight",        0x0802ca85 }, // 840-0011    1999     317-0257-COM   Naomi
 	{ "vs2_2k",          0x08088b08 }, // 840-0010    1999     317-0258-COM   Naomi
+	{ "smlg99",          0x08048a01 }, // 840-0012    1999     317-0259-COM   Naomi
 	{ "derbyoc",         0x080fee35 }, // 840-0016    1999     317-0262-JPN   Naomi
 	{ "vtennis",         0x0803eb15 }, // 840-0015    1999     317-0263-COM   Naomi
 	{ "jambo",           0x080fab95 }, // 840-0013    1999     317-0264-COM   Naomi
@@ -72,6 +67,8 @@ static const struct game_keys keys_table[] =
 	{ "18wheelr",        0x0807cf54 }, // 840-0023    2000     317-0273-COM   Naomi
 	{ "18wheels",        0x0807cf54 }, // 840-0036    2000     317-0273-COM   Naomi
 	{ "18wheelu",        0x0807cf54 }, // 840-0037    2000     317-0273-COM   Naomi
+	{ "marstv",          0x080b8ef5 }, // 840-0025    1999     317-0274-JPN   Naomi
+	{ "vonot",           0x08010715 }, // 840-0028    2000     317-0279-COM   Naomi
 	{ "sstrkfgt",        0x08132303 }, // 840-0035    2000     317-0281-COM   Naomi
 	{ "sstrkfgta",       0x08132303 }, // 840-0035    2000     317-0281-COM   Naomi
 	{ "wwfroyal",        0x081627c3 }, // 840-0040    2000     317-0285-COM   Naomi
@@ -91,6 +88,7 @@ static const struct game_keys keys_table[] =
 	{ "clubkrtd",        0x0ce7d742 }, // 840-0062    2001     317-0313-COM   Naomi 2
 	{ "clubkrte",        0x0ce7d742 }, // 840-0062    2001     317-0313-COM   Naomi 2
 	{ "inunoos",         0x094bc3e3 }, // 840-0073    2001     317-0316-JPN   Naomi
+	{ "vf4cart",         0x0eef2f96 }, // 840-0080    2002     317-0324-COM   Naomi 2
 	{ "toukon4",         0x052e2901 }, // 25349801    2000     317-5040-COM   Naomi
 	{ "wldkicks",        0x052e2901 }, // 25209801    2000     317-5040-COM   Naomi
 	{ "wldkicksa",       0x052e2901 }, // 25209801    2000     317-5040-COM   Naomi
@@ -101,6 +99,7 @@ static const struct game_keys keys_table[] =
 	{ "doa2m",           0x0008ad01 }, // 841-0003    1999     317-5048-COM   Naomi
 	{ "shangril",        -1         }, // 841-0004    1999     317-5050-JPN   Naomi     seems not used by game
 	{ "spawn",           0x00078d01 }, // 841-0005    1999     317-5051-COM   Naomi
+	{ "puyoda",          0x000acd40 }, // 841-0006    1999     317-5052-COM   Naomi
 	{ "pstone2",         0x000b8dc0 }, // 841-0008    2000     317-5054-COM   Naomi
 	{ "capsnk",          0x00000000 }, // 841-0011    2000     317-5059-COM   Naomi
 	{ "capsnka",         0x00000000 }, // 841-0011    2000     317-5059-COM   Naomi
@@ -114,6 +113,7 @@ static const struct game_keys keys_table[] =
 	{ "ninjaslt1",       0x000ca510 }, // 25469801    2000     317-5068-COM   Naomi
 	{ "ninjaslt2",       0x000ca510 }, // 25469801    2000     317-5068-COM   Naomi
 	{ "ninjaslt4",       0x000ca510 }, // 25469801    2000     317-5068-COM   Naomi
+	{ "gundmct",         0x000e8010 }, // 841-0017    2001     317-5070-COM   Naomi
 	{ "hmgeo",           0x00038510 }, // HMG016007   2001     317-5071-COM   Naomi
 	{ "zerogu2",         0x0007c010 }, // 841-0020    2001     317-5073-COM   Naomi
 	{ "gunsur2",         0x000680d0 }, // 25709801    2001     317-5075-COM   Naomi
@@ -135,7 +135,6 @@ static const struct game_keys keys_table[] =
 	{ "pltkids",         -1         }, //             1998     317-5044-COM   Model 2
 	{ "pltkidsa",        -1         }, //             1998     317-5044-COM   Model 2
 
-	{ "magtruck",        0x09266e45 }, //             ????     ?              Model 3
 	{ "von2",            0x092a0e97 }, //             ????     317-0234-COM   Model 3
 	{ "von254g",         0x092a0e97 }, //             ????     317-0234-COM   Model 3
 	{ "fvipers2",        -1         }, //             ????     317-0235-COM   Model 3
@@ -148,6 +147,7 @@ static const struct game_keys keys_table[] =
 	{ "swtrilgy",        0x11272a01 }, //             ????     317-0241-COM   Model 3
 	{ "swtrilgya",       0x11272a01 }, //             ????     317-0241-COM   Model 3
 	{ "oceanhun",        0x092b6a01 }, //             ????     317-0242-COM   Model 3
+	{ "magtruck",        0x09266e45 }, //             ????     317-0243-COM   Model 3
 	{ "lamachin",        0x092a2bc5 }, //             ????     317-0244-COM   Model 3
 	{ "vs299",           0x09222ac8 }, //             ????     317-0245-COM   Model 3
 	{ "vs2v991",         0x09222ac8 }, //             ????     317-0245-COM   Model 3

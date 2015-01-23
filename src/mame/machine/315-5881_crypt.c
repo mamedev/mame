@@ -130,8 +130,10 @@ Notes below refer to M2 & M3.
 
 The encryption is done by a stream cipher operating in counter mode, which use a 16-bits internal block cipher.
 
-There are 2 "control bits" at the start of the decrypted stream which control the mode of operation: bit #1 set to 1 means
-that the stream needs to be decompressed after being decrypted. More on this later.
+Every stream can be composed by several substreams; there are 18 header bits at the start of every substream, with
+a 1+9+8 format; the highest bit control the mode of operation: set to 1 means that the substream needs to be decompressed
+after being decrypted. The other two blocks (A||B) encode the length of the substream, as (A+1)*(B+1). When a
+substream end, the header of the next one, if existing, follows inmediatly.
 
 The next 16-bits are part of the header (they don't belong to the plaintext), but his meaning is unclear. It has been
 conjectured that it could stablish when to "reset" the process and start processing a new stream (based on some tests
@@ -144,22 +146,16 @@ internal block-cipher. So, at a given step, the internal block cipher will outpu
 given plaintext word, and the remaining 2 to the next plaintext word.
 
 The underlying block cipher consists of two 4-round Feistel Networks (FN): the first one takes the counter (16 bits),
-the game-key (>=29 bits) and the sequence-key (16 bits) and output a middle result (16 bits) which will act as another key
-for the second one. The second FN will take the encrypted word (16 bits), the game-key, the sequence-key and the result
-from the first FN and will output the decrypted word (16 bits).
+the game-key (>=29 bits; probably 64) and the sequence-key (16 bits) and output a middle result (16 bits) which will act
+as another key for the second one. The second FN will take the encrypted word (16 bits), the game-key, the sequence-key
+and the result from the first FN and will output the decrypted word (16 bits).
 
 Each round of the Feistel Networks use four substitution sboxes, each having 6 inputs and 2 outputs. The input is the
 XOR of at most one bit from the previous round and at most one bit from the different keys.
 
 The underlying block cipher has the same structure than the one used by the CPS-2 (Capcom Play System 2) and,
 indeed, some of the used sboxes are exactly the same and appear in the same FN/round in both systems (this is not evident,
-as you need to apply a bitswapping and some XORs to the input & output of the sboxes to get the same values due). However,
-the key scheduling used by this implementation is much weaker than the CPS-2's one. Many s-boxes inputs aren't XORed with any
-key bit.
-
-Due to the small key-length, no sophisticated attacks are needed to recover the keys; a brute-force attack knowing just
-some (encrypted word-decrypted word) pairs suffice. However, due to the weak key scheduling, it should be noted that some
-related keys can produce the same output bytes for some (short) input sequences.
+as you need to apply a bitswapping and some XORs to the input & output of the sboxes to get the same values due).
 
 Note that this implementation considers that the counter initialization for ram decryption is 0 simply because the ram is
 mapped to multiples of 128K.
@@ -172,6 +168,37 @@ chosen so as to make the key for CAPSNK equal to 0.
 It can be observed that a couple of sboxes have incomplete tables (a 255 value indicate an unknown value). The recovered keys
 as of january/2015 show small randomness and big correlations, making possible that some unseen bits could make the
 decryption need those incomplete parts.
+
+SEGA apparently used his security part label (317-xxxx-yyy) as part of the key; the mapping of the current keys to the chip label
+is given by the following function:
+
+void key2label(uint32_t key)
+{
+	int bcd0 = ((BIT(key,17)<<3)|(BIT(key,7)<<2)|(BIT(key,14)<<1)|BIT(key,19))^9;
+	int bcd1 = ((BIT(key,20)<<3)|(BIT(key,1)<<2)|(BIT(key,4)<<1)|BIT(key,13))^5;
+	int bcd2 = (BIT(key,9)<<1)|BIT(key,22);
+	int bcd3 = ((BIT(key,9)<<2)|BIT(key,9))^5;
+	
+	char chiplabel[13];
+	sprintf(chiplabel, "317-%d%d%d%d-%s", bcd3, bcd2, bcd1, bcd0, (BIT(key,5)?"JPN":"COM"));
+	
+	printf("%s", chiplabel);
+}
+
+Given the use of the BCD-encoded security module labels, it's expected that at least other 6 additional bits be present in the
+real keys but undetected in the current implementation (due to them being set to fixed values on all the known 315-5881 chip labels).
+That would rise the bit count at least to 35.
+
+Other key bits not directly related to the 315-5881 label still show low entropies, making possible that
+they be derived from other non-random sources.
+
+In the second Feistel Network, every key bit seem to be used at most once (the various uses of current bit #9 are fictitious, as
+that bit really represent various bits in the real key; see comments on the use of the labels above). Given that, it seems probable
+that the real key is 64 bits long, exactly as in the related CPS-2 scheme, and the designers tried to cover all 96 input bits with 
+the bits provening from the game key, the sequence key and the result from the first feistel network (64+16+16=96). In the first
+Feistel Network, as only 80 bits are available, some bits would be used twice (as can be partially seen in the current implementation).
+The fact that only 29 bits out of the expected 64 have been observed till now would be due to the generation of the key by composing
+low-entropy sources.
 
 ****************************************************************************************/
 
