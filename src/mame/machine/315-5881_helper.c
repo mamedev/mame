@@ -150,8 +150,14 @@ static const struct game_keys keys_table[] =
 	{ "eca",             -1         }, //             ????     317-0265-COM   Model 3
 	{ "ecax",            -1         }, //             ????     317-0265-COM   Model 3
 	{ "ecap",            -1         }, //             ????     317-0265-COM   Model 3
-	{ "spikeout",        -1         }, //             ????     ?              Model 3
-	{ "spikeofe",        -1         }, //             ????     ?              Model 3
+	{ "spikeout",        -1         }, //             ????     317-0247-COM   Model 3
+	{ "spikeofe",        -1         }, //             ????     317-0247-COM   Model 3
+	{ "lamachin",        -1         }, //             ????     317-0244-COM   Model 3
+	{ "magtruck",        -1         }, //             ????     ?              Model 3
+	{ "von2",            -1         }, //             ????     ?              Model 3
+	{ "von254g",         -1         }, //             ????     ?              Model 3
+	{ "daytona2",        -1         }, //             ????     ?              Model 3
+	{ "dayto2pe",        -1         }, //             ????     ?              Model 3
 
 	
 	{ NULL, 0 }    // end of table
