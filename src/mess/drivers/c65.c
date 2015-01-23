@@ -29,23 +29,25 @@ public:
 			m_palette(*this, "palette"),
 			m_palred(*this, "redpal"),
 			m_palgreen(*this, "greenpal"),
-			m_palblue(*this, "bluepal")
-			
+			m_palblue(*this, "bluepal"),
+			m_dmalist(*this, "dmalist")			
 	{ }
 
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<m4510_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT8> m_palred;
 	required_shared_ptr<UINT8> m_palgreen;
 	required_shared_ptr<UINT8> m_palblue;
+	required_shared_ptr<UINT8> m_dmalist;
 	 
 	DECLARE_READ8_MEMBER(vic4567_dummy_r);
 	DECLARE_WRITE8_MEMBER(vic4567_dummy_w);
 	DECLARE_WRITE8_MEMBER(PalRed_w);
 	DECLARE_WRITE8_MEMBER(PalGreen_w);
 	DECLARE_WRITE8_MEMBER(PalBlue_w);
+	DECLARE_WRITE8_MEMBER(DMAgic_w);
 	
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -60,6 +62,7 @@ protected:
 	virtual void video_start();
 private:
 	void PalEntryFlush(UINT8 offset);
+	void DMAgicExecute(address_space &space,UINT32 address);
 };
 
 void c65_state::video_start()
@@ -86,7 +89,8 @@ READ8_MEMBER(c65_state::vic4567_dummy_r)
 			return res;
 	}
 	
-	printf("%02x\n",offset); // TODO: PC
+	if(!space.debugger_access())
+		printf("%02x\n",offset); // TODO: PC
 	return res;
 }
 
@@ -99,7 +103,10 @@ WRITE8_MEMBER(c65_state::vic4567_dummy_w)
           any other write vic-ii mode
 		  */
 		//case 0x2f: break;
-		default: printf("%02x %02x\n",offset,data); break;
+		default: 
+			if(!space.debugger_access())
+				printf("%02x %02x\n",offset,data); 
+			break;
 	}
 
 }
@@ -127,6 +134,60 @@ WRITE8_MEMBER(c65_state::PalBlue_w)
 	PalEntryFlush(offset);
 }
 
+void c65_state::DMAgicExecute(address_space &space,UINT32 address)
+{
+	UINT8 cmd;// = space.read_byte(address++);
+	UINT16 length; //= space.read_byte(address++);
+	UINT32 src, dst;
+	static const char *const dma_cmd_string[] =
+	{
+		"COPY",                 // 0
+		"MIX",
+		"SWAP",
+		"FILL"
+	};
+	cmd = space.read_byte(address++);
+	length = space.read_byte(address++);
+	length|=(space.read_byte(address++)<<8);
+	src = space.read_byte(address++);
+	src|=(space.read_byte(address++)<<8);
+	src|=(space.read_byte(address++)<<16);
+	dst = space.read_byte(address++);
+	dst|=(space.read_byte(address++)<<8);
+	dst|=(space.read_byte(address++)<<16);
+
+	switch(cmd & 3)
+	{
+		case 3: // fill
+			{
+				/* TODO: upper bits of source */
+				printf("DMAgic %s %02x -> %08x %04x (CHAIN=%s)\n",dma_cmd_string[cmd & 3],src & 0xff,dst,length,cmd & 4 ? "yes" : "no");
+				UINT8 FillValue;
+				UINT32 DestIndex;
+				UINT16 SizeIndex;
+				FillValue = src & 0xff;
+				DestIndex = dst & 0xfffff;
+				SizeIndex = length;
+				do
+				{
+					space.write_byte(DestIndex++,FillValue);
+					SizeIndex--;
+				}while(SizeIndex != 0);
+			}
+			return;
+	}
+	printf("DMAgic %s %08x %08x %04x (CHAIN=%s)\n",dma_cmd_string[cmd & 3],src,dst,length,cmd & 4 ? "yes" : "no");
+}
+
+
+WRITE8_MEMBER(c65_state::DMAgic_w)
+{
+	m_dmalist[offset] = data;
+	if(offset == 0)
+		DMAgicExecute(space,(m_dmalist[0])|(m_dmalist[1]<<8)|(m_dmalist[2]<<16));
+}
+
+
 
 static ADDRESS_MAP_START( c65_map, AS_PROGRAM, 8, c65_state )
 	AM_RANGE(0x00000, 0x01fff) AM_RAM // TODO: bank
@@ -140,12 +201,15 @@ static ADDRESS_MAP_START( c65_map, AS_PROGRAM, 8, c65_state )
 	// 0x0d400, 0x0d4*f Right SID
 	// 0x0d440, 0x0d4*f Left  SID
 	// 0x0d600, 0x0d6** UART
-	// 0x0d700, 0x0d7** DMAgic
+	AM_RANGE(0x0d700, 0x0d702) AM_WRITE(DMAgic_w) AM_SHARE("dmalist") // 0x0d700, 0x0d7** DMAgic
+	//AM_RANGE(0x0d703, 0x0d703) AM_READ(DMAgic_r)
 	// 0x0d800, 0x0d8** Color matrix
 	// 0x0dc00, 0x0dc** CIA-1
 	// 0x0dd00, 0x0dd** CIA-2
 	// 0x0de00, 0x0de** Ext I/O Select 1
 	AM_RANGE(0x0df00, 0x0dfff) AM_RAM // 0x0df00, 0x0df** Ext I/O Select 2 (RAM window?)
+	AM_RANGE(0x10000, 0x1f7ff) AM_RAM 
+	AM_RANGE(0x1f800, 0x1ffff) AM_RAM // VRAM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROM AM_REGION("maincpu",0)
 ADDRESS_MAP_END
 
