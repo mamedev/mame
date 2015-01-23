@@ -1774,6 +1774,10 @@ READ64_MEMBER(model3_state::model3_security_r)
 				}
 				retvalue = data;
 			}
+			else if (core_stricmp(machine().system().name, "dirtdvls") == 0)
+			{
+				retvalue = U64(0xffffffffffffffff);
+			}
 			else
 			{
 				retvalue = 0;
@@ -5937,6 +5941,7 @@ DRIVER_INIT_MEMBER(model3_state,dirtdvls)
 	m_step20_with_old_real3d = true;
 
 	DRIVER_INIT_CALL(model3_20);
+	DRIVER_INIT_CALL(genprot);
 }
 
 DRIVER_INIT_MEMBER(model3_state,daytona2)
@@ -5975,6 +5980,7 @@ DRIVER_INIT_MEMBER(model3_state,spikeout)
 
 	rom[(0x6059cc^4)/4] = 0x60000000;
 	rom[(0x6059ec^4)/4] = 0x60000000;
+	DRIVER_INIT_CALL(genprot);
 }
 
 DRIVER_INIT_MEMBER(model3_state,spikeofe)
@@ -5984,11 +5990,13 @@ DRIVER_INIT_MEMBER(model3_state,spikeofe)
 
 	rom[(0x6059cc^4)/4] = 0x60000000;
 	rom[(0x6059ec^4)/4] = 0x60000000;
+	DRIVER_INIT_CALL(genprot);
 }
 
 DRIVER_INIT_MEMBER(model3_state,eca)
 {
 	DRIVER_INIT_CALL(model3_20);
+	DRIVER_INIT_CALL(genprot);
 }
 
 DRIVER_INIT_MEMBER(model3_state,skichamp)
@@ -6010,6 +6018,8 @@ DRIVER_INIT_MEMBER(model3_state,oceanhun)
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x57995c^4)/4] = 0x60000000;   // decrementer
+
+	DRIVER_INIT_CALL(genprot);
 }
 
 DRIVER_INIT_MEMBER(model3_state,magtruck)
@@ -6052,13 +6062,13 @@ GAME( 1997, vs2,            0, model3_20,      model3, model3_state,        vs2,
 GAME( 1997, harley,         0, model3_20,      harley, model3_state,     harley, ROT0, "Sega", "Harley-Davidson and L.A. Riders (Revision B)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, harleya,   harley, model3_20,      harley, model3_state,     harleya, ROT0, "Sega", "Harley-Davidson and L.A. Riders (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, lamachin,       0, model3_20,      model3, model3_state,   lamachin, ROT0, "Sega", "L.A. Machineguns", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, oceanhun,       0, model3_20,      model3, model3_state,   oceanhun, ROT0, "Sega", "The Ocean Hunter", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, oceanhun,       0, model3_20_5881, model3, model3_state,   oceanhun, ROT0, "Sega", "The Ocean Hunter", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, skichamp,       0, model3_20,      skichamp, model3_state, skichamp, ROT0, "Sega", "Ski Champ", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, srally2,        0, model3_20,      scud, model3_state,      srally2, ROT0, "Sega", "Sega Rally 2", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, srally2x,       0, model3_20,      scud, model3_state,      srally2, ROT0, "Sega", "Sega Rally 2 DX", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, von2,           0, model3_20,      model3, model3_state,       von2, ROT0, "Sega", "Virtual On 2: Oratorio Tangram (Revision B)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, von254g,     von2, model3_20,      model3, model3_state,       von2, ROT0, "Sega", "Virtual On 2: Oratorio Tangram (ver 5.4g)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, fvipers2,       0, model3_20,      model3, model3_state,  model3_20, ROT0, "Sega", "Fighting Vipers 2 (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, fvipers2,       0, model3_20_5881, model3, model3_state,      vs299, ROT0, "Sega", "Fighting Vipers 2 (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, vs298,          0, model3_20_5881, model3, model3_state,      vs298, ROT0, "Sega", "Virtua Striker 2 '98 (Step 2.0)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, vs2v991,        0, model3_20_5881, model3, model3_state,      vs299, ROT0, "Sega", "Virtua Striker 2 '99.1 (Revision B)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, vs299b,   vs2v991, model3_20_5881, model3, model3_state,      vs299, ROT0, "Sega", "Virtua Striker 2 '99 (Revision B)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
@@ -6068,13 +6078,13 @@ GAME( 1999, vs299,    vs2v991, model3_20_5881, model3, model3_state,      vs299,
 /* Model 3 Step 2.1 */
 GAME( 1998, daytona2,         0, model3_21,      daytona2, model3_state, daytona2, ROT0, "Sega", "Daytona USA 2 (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, dayto2pe,         0, model3_21,      daytona2, model3_state, dayto2pe, ROT0, "Sega", "Daytona USA 2 Power Edition", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, dirtdvls,         0, model3_21,      scud, model3_state,     dirtdvls, ROT0, "Sega", "Dirt Devils (set 1) (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, dirtdvlsa, dirtdvls, model3_21,      scud, model3_state,     dirtdvls, ROT0, "Sega", "Dirt Devils (set 2) (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, dirtdvls,         0, model3_21_5881, scud,     model3_state, dirtdvls, ROT0, "Sega", "Dirt Devils (set 1) (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, dirtdvlsa, dirtdvls, model3_21_5881, scud,     model3_state, dirtdvls, ROT0, "Sega", "Dirt Devils (set 2) (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, swtrilgy,         0, model3_21_5881, swtrilgy, model3_state, swtrilgy, ROT0, "Sega / LucasArts", "Star Wars Trilogy (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, swtrilgya, swtrilgy, model3_21_5881, swtrilgy, model3_state, swtrilga, ROT0, "Sega / LucasArts", "Star Wars Trilogy", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, spikeout,         0, model3_21,      model3, model3_state,   spikeout, ROT0, "Sega", "Spikeout (Revision C)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, spikeofe,         0, model3_21,      model3, model3_state,   spikeofe, ROT0, "Sega", "Spikeout Final Edition", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, magtruck,         0, model3_21,      eca, model3_state,      magtruck, ROT0, "Sega", "Magical Truck Adventure", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, eca,              0, model3_21,      eca, model3_state,           eca, ROT0, "Sega", "Emergency Call Ambulance", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, ecax,           eca, model3_21,      eca, model3_state,           eca, ROT0, "Sega", "Emergency Call Ambulance (Export)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, ecap,           eca, model3_21,      eca, model3_state,           eca, ROT0, "Sega", "Emergency Call Ambulance (US location test?)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, spikeout,         0, model3_21_5881, model3,   model3_state, spikeout, ROT0, "Sega", "Spikeout (Revision C)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, spikeofe,         0, model3_21_5881, model3,   model3_state, spikeofe, ROT0, "Sega", "Spikeout Final Edition", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, magtruck,         0, model3_21,      eca,      model3_state, magtruck, ROT0, "Sega", "Magical Truck Adventure", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, eca,              0, model3_21_5881, eca,      model3_state, eca,      ROT0, "Sega", "Emergency Call Ambulance", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, ecax,           eca, model3_21_5881, eca,      model3_state, eca,      ROT0, "Sega", "Emergency Call Ambulance (Export)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, ecap,           eca, model3_21_5881, eca,      model3_state, eca,      ROT0, "Sega", "Emergency Call Ambulance (US location test?)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
