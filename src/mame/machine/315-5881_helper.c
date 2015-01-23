@@ -128,31 +128,35 @@ static const struct game_keys keys_table[] =
 	{ "dynamcopb",       0x0c2a4a93 }, //             1998     317-0236-COM   Model 2
 	{ "dyndeka2b",       0x0c2a4a93 }, //             1998     317-0236-COM   Model 2
 	{ "dynamcopc",       0x0c2a4a93 }, //             1998     317-0236-COM   Model 2
-	{ "pltkids",         -1         }, //             1998     317-5044-COM   Model 2
-	{ "pltkidsa",        -1         }, //             1998     317-5044-COM   Model 2
 	{ "zerogun",         -1         }, //             1997     317-5038-COM   Model 2  // lowest numbered chip?
 	{ "zerogunj",        -1         }, //             1997     317-5038-COM   Model 2  
 	{ "zeroguna",        -1         }, //             1997     317-5038-COM   Model 2  
 	{ "zerogunaj",       -1         }, //             1997     317-5038-COM   Model 2  
+	{ "pltkids",         -1         }, //             1998     317-5044-COM   Model 2
+	{ "pltkidsa",        -1         }, //             1998     317-5044-COM   Model 2
 
-
+	{ "magtruck",        0x09266e45 }, //             ????     ?              Model 3
+	{ "von2",            0x092a0e97 }, //             ????     317-0234-COM   Model 3
+	{ "von254g",         0x092a0e97 }, //             ????     317-0234-COM   Model 3
+	{ "fvipers2",        -1         }, //             ????     317-0235-COM   Model 3
 	{ "vs298",           0x09234e96 }, //             ????     317-0237-COM   Model 3
+	{ "dirtdvls",        0x09290f17 }, //             ????     317-0238-COM   Model 3
+	{ "dirtdvlsa",       0x09290f17 }, //             ????     317-0238-COM   Model 3
+	{ "daytona2",        0x09250e16 }, //             ????     317-0239-COM   Model 3
+	{ "spikeout",        -1         }, //             ????     317-0240-COM   Model 3
+	{ "spikeofe",        -1         }, //             ????     ?317-0240-COM? Model 3
 	{ "swtrilgy",        0x11272a01 }, //             ????     317-0241-COM   Model 3
 	{ "swtrilgya",       0x11272a01 }, //             ????     317-0241-COM   Model 3
+	{ "oceanhun",        0x092b6a01 }, //             ????     317-0242-COM   Model 3
+	{ "lamachin",        0x092a2bc5 }, //             ????     317-0244-COM   Model 3
 	{ "vs299",           0x09222ac8 }, //             ????     317-0245-COM   Model 3
 	{ "vs2v991",         0x09222ac8 }, //             ????     317-0245-COM   Model 3
 	{ "vs299b",          0x09222ac8 }, //             ????     317-0245-COM   Model 3
 	{ "vs299a",          0x09222ac8 }, //             ????     317-0245-COM   Model 3
-	{ "dirtdvls",        0x09290f17 }, //             ????     317-0238-COM   Model 3
-	{ "dirtdvlsa",       0x09290f17 }, //             ????     317-0238-COM   Model 3
-	{ "oceanhun",        0x092b6a01 }, //             ????     317-0242-COM   Model 3
-	{ "fvipers2",        -1         }, //             ????     ?              Model 3
-	{ "eca",             -1         }, //             ????     317-0265-COM   Model 3
-	{ "ecax",            -1         }, //             ????     317-0265-COM   Model 3
-	{ "ecap",            -1         }, //             ????     317-0265-COM   Model 3
-	{ "spikeout",        -1         }, //             ????     ?              Model 3
-	{ "spikeofe",        -1         }, //             ????     ?              Model 3
-
+	{ "eca",             0x0923aa91 }, //             ????     317-0265-COM   Model 3
+	{ "ecax",            0x0923aa91 }, //             ????     317-0265-COM   Model 3
+	{ "ecap",            0x0923aa91 }, //             ????     317-0265-COM   Model 3
+	{ "dayto2pe",        -1         }, //             ????     317-5045-COM   Model 3
 	
 	{ NULL, 0 }    // end of table
 };
