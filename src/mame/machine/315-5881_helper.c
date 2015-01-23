@@ -145,7 +145,7 @@ static const struct game_keys keys_table[] =
 	{ "vs299a",          0x09222ac8 }, //             ????     317-0245-COM   Model 3
 	{ "dirtdvls",        0x09290f17 }, //             ????     317-0238-COM   Model 3
 	{ "dirtdvlsa",       0x09290f17 }, //             ????     317-0238-COM   Model 3
-	{ "oceanhun",        -1         }, //             ????     317-0244-COM   Model 3
+	{ "oceanhun",        0x092b6a01 }, //             ????     317-0242-COM   Model 3
 	{ "fvipers2",        -1         }, //             ????     ?              Model 3
 	{ "eca",             -1         }, //             ????     317-0265-COM   Model 3
 	{ "ecax",            -1         }, //             ????     317-0265-COM   Model 3
