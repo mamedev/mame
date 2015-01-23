@@ -4,6 +4,7 @@
 
 ***************************************************************************/
 #include "machine/msm6242.h"
+#include "sound/2413intf.h"
 #include "sound/msm5205.h"
 #include "sound/okim6295.h"
 
@@ -12,11 +13,9 @@ class dynax_state : public driver_device
 public:
 	dynax_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_dsw_sel16(*this, "dsw_sel16"),
-			m_protection1(*this, "protection1"),
-			m_protection2(*this, "protection2"),
 			m_maincpu(*this, "maincpu"),
 			m_soundcpu(*this, "soundcpu"),
+			m_ym2413(*this, "ym2413"),
 			m_oki(*this, "oki"),
 			m_msm(*this, "msm"),
 			m_screen(*this, "screen"),
@@ -24,9 +23,18 @@ public:
 			m_rtc(*this, "rtc")
 		{ }
 
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_soundcpu;
+	optional_device<ym2413_device> m_ym2413;
+	optional_device<okim6295_device> m_oki;
+	optional_device<msm5205_device> m_msm;
+	optional_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	optional_device<msm6242_device> m_rtc;
+
 	// up to 8 layers, 2 images per layer (interleaved on screen)
 	UINT8 *  m_pixmap[8][2];
-	UINT8 *  m_ddenlovr_pixmap[8];
 
 	/* irq */
 	typedef void (dynax_state::*irq_func)();    // some games trigger IRQ at blitter end, some don't
@@ -76,42 +84,6 @@ public:
 	const int *m_priority_table;
 	int m_hanamai_priority;
 
-	/* ddenlovr blitter (TODO: merge with the above, where possible) */
-	int m_extra_layers;
-	int m_ddenlovr_dest_layer;
-	int m_ddenlovr_blit_flip;
-	int m_ddenlovr_blit_x;
-	int m_ddenlovr_blit_y;
-	int m_ddenlovr_blit_address;
-	int m_ddenlovr_blit_pen;
-	int m_ddenlovr_blit_pen_mode;
-	int m_ddenlovr_blitter_irq_flag;
-	int m_ddenlovr_blitter_irq_enable;
-	int m_ddenlovr_rect_width;
-	int m_ddenlovr_rect_height;
-	int m_ddenlovr_clip_width;
-	int m_ddenlovr_clip_height;
-	int m_ddenlovr_line_length;
-	int m_ddenlovr_clip_ctrl;
-	int m_ddenlovr_clip_x;
-	int m_ddenlovr_clip_y;
-	int m_ddenlovr_scroll[8*2];
-	int m_ddenlovr_priority;
-	int m_ddenlovr_priority2;
-	int m_ddenlovr_bgcolor;
-	int m_ddenlovr_bgcolor2;
-	int m_ddenlovr_layer_enable;
-	int m_ddenlovr_layer_enable2;
-	int m_ddenlovr_palette_base[8];
-	int m_ddenlovr_palette_mask[8];
-	int m_ddenlovr_transparency_pen[8];
-	int m_ddenlovr_transparency_mask[8];
-	int m_ddenlovr_blit_latch;
-	int m_ddenlovr_blit_pen_mask;   // not implemented
-	int m_ddenlovr_blit_rom_bits;           // usually 8, 16 in hanakanz
-	const int *m_ddenlovr_blit_commands;
-	int m_ddenlovr_blit_regs[2];
-
 	/* input */
 	UINT8 m_input_sel;
 	UINT8 m_dsw_sel;
@@ -139,40 +111,6 @@ public:
 	UINT8 m_gekisha_rom_enable;
 	UINT8 *m_romptr;
 
-	/* ddenlovr misc (TODO: merge with the above, where possible) */
-	UINT8 m_palram[0x200];
-	int m_okibank;
-	UINT8 m_rongrong_blitter_busy_select;
-
-	optional_shared_ptr<UINT16> m_dsw_sel16;
-	optional_shared_ptr<UINT16> m_protection1;
-	optional_shared_ptr<UINT16> m_protection2;
-	UINT8 m_prot_val;
-	UINT16 m_prot_16;
-	UINT16 m_quiz365_protection[2];
-
-	UINT16 m_mmpanic_leds;  /* A led for each of the 9 buttons */
-	UINT8 m_funkyfig_lockout;
-	UINT8 m_romdata[2];
-	int m_palette_index;
-	UINT8 m_hginga_rombank;
-	UINT8 m_mjflove_irq_cause;
-	UINT8 m_daimyojn_palette_sel;
-
-	int m_irq_count;
-
-
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_soundcpu;
-	device_t *m_ymsnd;
-	optional_device<okim6295_device> m_oki;
-	optional_device<msm5205_device> m_msm;
-	optional_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	optional_device<msm6242_device> m_rtc;
-	device_t *m_top_scr;
-	device_t *m_bot_scr;
 	DECLARE_WRITE8_MEMBER(dynax_vblank_ack_w);
 	DECLARE_WRITE8_MEMBER(dynax_blitter_ack_w);
 	DECLARE_WRITE8_MEMBER(jantouki_vblank_ack_w);
@@ -275,27 +213,33 @@ public:
 	DECLARE_WRITE8_MEMBER(jantouki_blitter2_rev2_w);
 	DECLARE_WRITE8_MEMBER(hanamai_priority_w);
 	DECLARE_WRITE8_MEMBER(tenkai_priority_w);
+	
 	DECLARE_DRIVER_INIT(mjelct3);
 	DECLARE_DRIVER_INIT(blktouch);
 	DECLARE_DRIVER_INIT(mjelct3a);
 	DECLARE_DRIVER_INIT(mjreach);
 	DECLARE_DRIVER_INIT(maya);
+	
 	UINT32 screen_update_hanamai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_hnoridur(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_sprtmtch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_mjdialq2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_jantouki_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_jantouki_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	
 	INTERRUPT_GEN_MEMBER(sprtmtch_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(jantouki_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(jantouki_sound_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(yarunara_clock_interrupt);
 	INTERRUPT_GEN_MEMBER(mjelctrn_vblank_interrupt);
+	
 	TIMER_DEVICE_CALLBACK_MEMBER(neruton_irq_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(majxtal7_vblank_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(tenkai_interrupt);
+	
 	void tenkai_update_rombank();
 	void gekisha_bank_postload();
+	
 	DECLARE_WRITE_LINE_MEMBER(sprtmtch_sound_callback);
 	DECLARE_WRITE_LINE_MEMBER(jantouki_sound_callback);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
@@ -324,6 +268,7 @@ public:
 	DECLARE_VIDEO_START(mcnpshnt);
 	DECLARE_PALETTE_INIT(janyuki);
 	DECLARE_VIDEO_START(neruton);
+	
 	inline void blitter_plot_pixel( int layer, int mask, int x, int y, int pen, int wrap, int flags );
 	int blitter_drawgfx( int layer, int mask, const char *gfx, int src, int pen, int x, int y, int wrap, int flags );
 	void dynax_blitter_start( int flags );

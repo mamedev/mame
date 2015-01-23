@@ -672,7 +672,7 @@ DRIVER_INIT_MEMBER(stv_state,astrass)
 	m_maincpu->sh2drc_add_pcflush(0x60011ba);
 	m_maincpu->sh2drc_add_pcflush(0x605b9da);
 
-	install_astrass_protection();
+	install_common_protection();
 
 	DRIVER_INIT_CALL(stv);
 }
@@ -766,7 +766,7 @@ DRIVER_INIT_MEMBER(stv_state,sss)
 	m_maincpu->sh2drc_add_pcflush(0x6026398);
 	m_slave->sh2drc_add_pcflush(0x6028cd6);
 
-	install_sss_protection();
+	install_common_protection();
 
 	DRIVER_INIT_CALL(stv);
 
@@ -829,7 +829,7 @@ DRIVER_INIT_MEMBER(stv_state,twcup98)
 	m_slave->sh2drc_add_pcflush(0x6062bca);
 
 	DRIVER_INIT_CALL(stv);
-	install_twcup98_protection();
+	install_common_protection();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5);
 }
@@ -886,7 +886,7 @@ DRIVER_INIT_MEMBER(stv_state,elandore)
 	m_maincpu->sh2drc_add_pcflush(0x604eac0);
 	m_slave->sh2drc_add_pcflush(0x605340a);
 
-	install_elandore_protection();
+	install_common_protection();
 
 	DRIVER_INIT_CALL(stv);
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(0);
@@ -897,7 +897,7 @@ DRIVER_INIT_MEMBER(stv_state,rsgun)
 	m_maincpu->sh2drc_add_pcflush(0x6034d04);
 	m_slave->sh2drc_add_pcflush(0x6036152);
 
-	install_rsgun_protection();
+	install_common_protection();
 
 	DRIVER_INIT_CALL(stv);
 
@@ -906,7 +906,7 @@ DRIVER_INIT_MEMBER(stv_state,rsgun)
 
 DRIVER_INIT_MEMBER(stv_state,ffreveng)
 {
-	install_ffreveng_protection();
+	install_common_protection();
 	DRIVER_INIT_CALL(stv);
 }
 

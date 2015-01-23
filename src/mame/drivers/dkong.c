@@ -302,6 +302,59 @@ Donkey Kong Junior Notes
     ------------------------------------------------
 
 
+Donkey Kong Notes
+=================
+
+    Nintendo Service Department Bulletin # TKG-02 12-11-81
+    GAME: Donkey Kong
+    SUBJECT: Speed-up Kit #1
+
+    TO prevent extremely long play times, we are making available
+    a speed-up kit. This kit prevents players from waiting on top
+    of ladders, on screen #1, while the barrels roll across
+    instead of coming donw on top of him. Whit this kit, barrels
+    will roll on top of the player on a ladder 70 to 80 percent of
+    the time.
+
+    Machines above serial #30,000 will have this kit installed at
+    the factory, and all TKG4 board sets will come with this kit.
+
+    To install this kit in a four-board set, follow these
+    instructions:
+
+    1) Remove P.C. Boards from game, leaving them
+    attached to P.C. Board bracket.
+
+    2) Using a pair of needle-nose pliers, separate the
+    sound P.C. Board fromt he CPU P.C. Board, exposing
+    the entire surface of the CPU Board.
+
+    3) Remove the EPROMS's at location 5F, 5A, 5H and 5K
+    from the CPU Board. (Note 5A should read 5G - MSH)
+
+    4) Install the speed-up kit EPROM's in the corres-
+    ponding locations.
+
+    5) Reconnect the sound P.C. Board to the CPU P.C.
+    Board and mount the P.C. Boards in the game.
+    --------------------------------------------------------------
+
+    That kit included the following 4 EPROM's
+
+    USA (c) 1981 Nintendo of America set 
+    ------------------------------------
+
+    Filename Label Type Loc/PCB *Label *Loc/PCB CSum
+    --------- ---------- ------ ------- ---------- -------- ----
+    2532.5K TKG4-C-5At 2532 5A(CPU) TKG3-C-5K 5K(CPU) A0F0
+    2532.5H TKG4-C-5Bt 2532 5B(CPU) TKG3-C-5H 5H(CPU) B2BC
+    2532.5G TKG4-C-5Ct 2532 5C(CPU) TKG3-C-5G 5G(CPU) 73BA
+    2532.5F TKG4-C-5Et 2532 5E(CPU) TKG3-C-5F 5F(CPU) AA97
+
+    Not only did the eprom fix the ladder bug, but it also changed
+    the copyright screen to read "(C)1981 Nintendo of America".
+
+
     D2K Jumpman returns Notes
     =========================
 
@@ -313,16 +366,16 @@ Donkey Kong Junior Notes
     6800 and E800.
 
 
-Donkey Kong "Hard" Kit
-======================
+    Donkey Kong "Hard" Kit
+    ======================
 
-A yet "unconfirmed original" rom replacement kit which is a replacement for
-TKG-03 and -04 boards and greatly increases the speed and amount of fireballs
-showing on all levels.  Such behavior can be seen easily on the Rivet Board,
-where most of the fireballs have appeared even before removing the first rivet.
+    A yet "unconfirmed original" rom replacement kit which is a replacement for
+    TKG-03 and -04 boards and greatly increases the speed and amount of fireballs
+    showing on all levels.  Such behavior can be seen easily on the Rivet Board,
+    where most of the fireballs have appeared even before removing the first rivet.
 
-Hopefully confirmation and information will come along later which confirms
-this is a legitimate Nintendo Kit.
+    Hopefully confirmation and information will come along later which confirms
+    this is a legitimate Nintendo Kit.
 
 ***************************************************************************/
 
@@ -1894,7 +1947,7 @@ ROM_START( radarscp1 )
 	ROM_LOAD( "trs01v1d.bin",    0x0300, 0x0100, BAD_DUMP CRC(1b828315) SHA1(00c9f8c5ae86b68d38c66f9071b5f1ef421c1005) ) /* character color codes on a per-column basis */
 ROM_END
 
-ROM_START( dkong )
+ROM_START( dkong ) /* Confirmed TKG-04 Upgrade as mentioned in Nintendo Service Department Bulletin # TKG-02 12-11-81 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "c_5et_g.bin",  0x0000, 0x1000, CRC(ba70b88b) SHA1(d76ebecfea1af098d843ee7e578e480cd658ac1a) )
 	ROM_LOAD( "c_5ct_g.bin",  0x1000, 0x1000, CRC(5ec461ec) SHA1(acb11a8fbdbb3ab46068385fe465f681e3c824bd) )
@@ -2254,7 +2307,7 @@ ROM_START( dkongjnrj )
 	ROM_LOAD( "v-2n.bpr",  0x0200, 0x0100, CRC(dbf185bf) SHA1(2697a991a4afdf079dd0b7e732f71c7618f43b70) )   /* character color codes on a per-column basis */
 ROM_END
 
-ROM_START( dkongjre )
+ROM_START( dkongjre )  /* Confirmed E-Kit set mentioned in Nintendo Service Department Bulletin # DJR-03 (02-23-83) */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "djr1-c.5b",    0x0000, 0x1000, CRC(ffe9e1a5) SHA1(715dc79d85169b4c1faf43458592e69b434afefd) )
 	ROM_CONTINUE(             0x3000, 0x1000 )
@@ -2291,7 +2344,7 @@ ROM_START( dkongjrpb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dkjr1-c.5b-p", 0x0000, 0x1000, CRC(8d99b3e0) SHA1(311a9f353e62d9d07c678e45baa2efec575a8f3b) ) // does not match SUM16 of bulletin (see notes), definitely not from Nintendo
 	ROM_CONTINUE(             0x3000, 0x1000 )
-	ROM_LOAD( "dkjr1-c.5c-p", 0x2000, 0x0800, CRC(b92d258c) SHA1(793483e249d08cbbbefe06d3ddc4c2eda5428ee8) ) // "
+	ROM_LOAD( "dkjr1-c.5c-p", 0x2000, 0x0800, CRC(b92d258c) SHA1(793483e249d08cbbbefe06d3ddc4c2eda5428ee8) )
 	ROM_CONTINUE(             0x4800, 0x0800 )
 	ROM_CONTINUE(             0x1000, 0x0800 )
 	ROM_CONTINUE(             0x5800, 0x0800 )

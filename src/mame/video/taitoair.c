@@ -229,20 +229,32 @@ void taitoair_state::fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect
 			int xx1 = x1 >> TAITOAIR_FRAC_SHIFT;
 			int xx2 = x2 >> TAITOAIR_FRAC_SHIFT;
 			int grad_col;
-
+			int base_color;
+			
 			if (xx1 <= cliprect.max_x || xx2 >= cliprect.min_x)
 			{
 				if (xx1 < cliprect.min_x)
 					xx1 = cliprect.min_x;
 				if (xx2 > cliprect.max_x)
 					xx2 = cliprect.max_x;
-
-				/* TODO: it's unknown if gradient color applies by global screen Y coordinate or there's a calculation to somewhere ... */
-				grad_col = (y1 >> 3) & 0x3f;
+				
+				if(color & 0x40)
+				{
+					/* Non-terrain elements are colored with this. */
+					base_color = (color & 0x3f) + 0x340;
+					grad_col = 0;
+				}
+				else
+				{
+					/* Terrain elements, with a gradient applied. */
+					/* TODO: it's unknown if gradient color applies by global screen Y coordinate or there's a calculation to somewhere ... */
+					base_color = ((color & 0x3f) * 0x80) + 0x2040;
+					grad_col = (y1 >> 3) & 0x3f;
+				}
 
 				while (xx1 <= xx2)
 				{
-					bitmap.pix16(y1, xx1) = color + grad_col;
+					bitmap.pix16(y1, xx1) = base_color + grad_col;
 					xx1++;
 				}
 			}
@@ -393,7 +405,8 @@ WRITE16_MEMBER(taitoair_state::dsp_flags_w)
 						logerror("quad: unknown value %04x at %04x\n", m_line_ram[adr], adr);
 						break;
 					}
-					m_q.col = ((m_line_ram[adr] & 0x007f) * 0x80) + 0x2040;
+					m_q.col = m_line_ram[adr] & 0x7f;//((m_line_ram[adr] & 0x007f) * 0x80) + 0x2040;
+
 					adr--;
 					pcount = 0;
 					while (pcount < TAITOAIR_POLY_MAX_PT && adr >= 1 && !(m_line_ram[adr] & 0xc000))
