@@ -6,7 +6,6 @@ Exidy discrete hardware games
  Attack (1977)
  Death Race (1976)
  Destruction Derby (1975)
- Football (1978)
  Old Time Basketball (1976)
  Spiders From Space (1976)
  Score (1977)
