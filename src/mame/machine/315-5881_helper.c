@@ -31,7 +31,7 @@ struct game_keys
 
 static const struct game_keys keys_table[] =
 {
-	// name             key              gameid #     year     chip label     platform
+	// name              key              gameid #    year     chip label     platform
 	{ "twcup98",         0x05200913 }, // 25209801    1998     317-5039-COM   ST-V
 	{ "astrass",         0x052e2901 }, // 25349801    1998     317-5040-COM   ST-V      (yes, the 317-5040-COM chip was reused for 3 different games and on both Naomi and ST-V!)
 	{ "rsgun",           0x05272d01 }, //             1998     317-5041-COM   ST-V
@@ -128,12 +128,12 @@ static const struct game_keys keys_table[] =
 	{ "dynamcopb",       0x0c2a4a93 }, //             1998     317-0236-COM   Model 2
 	{ "dyndeka2b",       0x0c2a4a93 }, //             1998     317-0236-COM   Model 2
 	{ "dynamcopc",       0x0c2a4a93 }, //             1998     317-0236-COM   Model 2
-	{ "zerogun",         -1         }, //             1997     317-5038-COM   Model 2  // lowest numbered chip?
-	{ "zerogunj",        -1         }, //             1997     317-5038-COM   Model 2  
-	{ "zeroguna",        -1         }, //             1997     317-5038-COM   Model 2  
-	{ "zerogunaj",       -1         }, //             1997     317-5038-COM   Model 2  
-	{ "pltkids",         -1         }, //             1998     317-5044-COM   Model 2
-	{ "pltkidsa",        -1         }, //             1998     317-5044-COM   Model 2
+	{ "zerogun",         0x042c0d13 }, //             1997     317-5038-COM   Model 2
+	{ "zerogunj",        0x042c0d13 }, //             1997     317-5038-COM   Model 2
+	{ "zeroguna",        0x042c0d13 }, //             1997     317-5038-COM   Model 2
+	{ "zerogunaj",       0x042c0d13 }, //             1997     317-5038-COM   Model 2
+	{ "pltkids",         0x042e2dc1 }, //             1998     317-5044-COM   Model 2
+	{ "pltkidsa",        0x042e2dc1 }, //             1998     317-5044-COM   Model 2
 
 	{ "von2",            0x092a0e97 }, //             ????     317-0234-COM   Model 3
 	{ "von254g",         0x092a0e97 }, //             ????     317-0234-COM   Model 3
