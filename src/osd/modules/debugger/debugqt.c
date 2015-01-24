@@ -31,9 +31,9 @@
 #include "debugqt.h"
 
 
-osd_debugger_interface *qt_osd_debugger_creator(const osd_interface &osd)
+debug_module *qt_osd_debugger_creator()
 {
-	return new debugger_qt(osd);
+	return new debugger_qt();
 }
 const osd_debugger_type OSD_DEBUGGER_QT = &qt_osd_debugger_creator;
 
@@ -50,8 +50,8 @@ static MainWindow* mainQtWindow = NULL;
 //-------------------------------------------------
 //  debugger_qt - constructor
 //-------------------------------------------------
-debugger_qt::debugger_qt(const osd_interface &osd)
-	: osd_debugger_interface(osd), m_machine(NULL)
+debugger_qt::debugger_qt()
+	: debug_module(), m_machine(NULL)
 {
 }
 

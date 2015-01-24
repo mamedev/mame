@@ -12,8 +12,8 @@ const osd_debugger_type OSD_DEBUGGER_NONE = &osd_debugger_creator<debugger_none>
 //-------------------------------------------------
 //  debugger_none - constructor
 //-------------------------------------------------
-debugger_none::debugger_none(const osd_interface &osd)
-	: osd_debugger_interface(osd), m_machine(NULL)
+debugger_none::debugger_none()
+	: debug_module(), m_machine(NULL)
 {
 }
 

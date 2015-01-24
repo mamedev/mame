@@ -1454,7 +1454,7 @@ void debugger_internal::debugger_update()
 //-------------------------------------------------
 //  debugger_internal - constructor
 //-------------------------------------------------
-debugger_internal::debugger_internal(const osd_interface &osd)
-	: osd_debugger_interface(osd), m_machine(NULL)
+debugger_internal::debugger_internal()
+	: debug_module(), m_machine(NULL)
 {
 }

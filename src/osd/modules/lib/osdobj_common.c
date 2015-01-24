@@ -270,7 +270,7 @@ void osd_common_t::init_debugger()
 		osd_printf_warning("debugger_init: option %s not found switching to auto\n",options().debugger());
 		debugger = m_debugger_options.find("auto");
 	}
-	m_debugger = (*debugger)(*this);
+	m_debugger = (*debugger)();
 
 	m_debugger->init_debugger(machine());
 }
@@ -569,20 +569,4 @@ void osd_common_t::midi_exit()
     osd_midi_exit();
 }
 
-//-------------------------------------------------
-//  osd_debugger_interface - constructor
-//-------------------------------------------------
-
-osd_debugger_interface::osd_debugger_interface(const osd_interface &osd)
-    : m_osd(osd)
-{
-}
-
-//-------------------------------------------------
-//  osd_debugger_interface - destructor
-//-------------------------------------------------
-
-osd_debugger_interface::~osd_debugger_interface()
-{
-}
 

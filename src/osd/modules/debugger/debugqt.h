@@ -15,12 +15,13 @@
 #define __DEBUGGER_QT_H__
 
 #include "emu.h"
+#include "debug_module.h"
 
-class debugger_qt : public osd_debugger_interface
+class debugger_qt : public debug_module
 {
 public:
 	// construction/destruction
-	debugger_qt(const osd_interface &osd);
+	debugger_qt();
 	virtual ~debugger_qt();
 
 	virtual void init_debugger(running_machine &machine);

@@ -17,6 +17,7 @@
 #include "modules/osdmodule.h"
 #include "modules/font/font_module.h"
 #include "modules/sound/sound_module.h"
+#include "modules/debugger/debug_module.h"
 #include "cliopts.h"
 
 //============================================================
@@ -104,10 +105,8 @@ private:
     static const options_entry s_option_entries[];
 };
 
-class osd_debugger_interface;
-
 // a osd_sound_type is simply a pointer to its alloc function
-typedef osd_debugger_interface *(*osd_debugger_type)(const osd_interface &osd);
+typedef debug_module *(*osd_debugger_type)();
 
 
 // ======================> osd_interface
@@ -224,7 +223,7 @@ private:
 
 protected:
 	sound_module* m_sound;
-	osd_debugger_interface* m_debugger;
+	debug_module* m_debugger;
 private:
 	//tagmap_t<osd_video_type>  m_video_options;
 	dynamic_array<const char *> m_video_names;
@@ -233,27 +232,11 @@ private:
 };
 
 
-class osd_debugger_interface
-{
-public:
-	// construction/destruction
-	osd_debugger_interface(const osd_interface &osd);
-	virtual ~osd_debugger_interface();
-
-	virtual void init_debugger(running_machine &machine) = 0;
-	virtual void wait_for_debugger(device_t &device, bool firststop) = 0;
-	virtual void debugger_update() = 0;
-	virtual void debugger_exit() = 0;
-
-protected:
-	const osd_interface& m_osd;
-};
-
 // this template function creates a stub which constructs a debugger
 template<class _DeviceClass>
-osd_debugger_interface *osd_debugger_creator(const osd_interface &osd)
+debug_module *osd_debugger_creator()
 {
-	return global_alloc(_DeviceClass(osd));
+	return global_alloc(_DeviceClass());
 }
 
 #endif  /* __OSDOBJ_COMMON_H__ */

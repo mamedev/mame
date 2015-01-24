@@ -16,12 +16,13 @@
 
 #include "osdepend.h"
 #include "modules/lib/osdobj_common.h"
+#include "debug_module.h"
 
-class debugger_internal : public osd_debugger_interface
+class debugger_internal : public debug_module
 {
 public:
 	// construction/destruction
-	debugger_internal(const osd_interface &osd);
+	debugger_internal();
 	virtual ~debugger_internal() { }
 
 	virtual void init_debugger(running_machine &machine);

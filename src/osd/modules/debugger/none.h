@@ -14,13 +14,14 @@
 #define __DEBUGGER_NONE_H__
 
 #include "osdepend.h"
+#include "debug_module.h"
 #include "modules/lib/osdobj_common.h"
 
-class debugger_none : public osd_debugger_interface
+class debugger_none : public debug_module
 {
 public:
 	// construction/destruction
-	debugger_none(const osd_interface &osd);
+	debugger_none();
 	virtual ~debugger_none() { }
 
 	virtual void init_debugger(running_machine &machine);
