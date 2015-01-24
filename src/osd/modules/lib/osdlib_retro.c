@@ -1,7 +1,13 @@
 
 #include <stdlib.h>
 #include <unistd.h>
+#ifndef WIN32
 #include <sys/mman.h>
++#else
++#define WIN32_LEAN_AND_MEAN
++#include <windows.h>
++#include <mmsystem.h>
+#endif
 #include <sys/types.h>
 #include <signal.h>
 #include <time.h>
