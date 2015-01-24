@@ -1,12 +1,12 @@
 
 #include <stdlib.h>
 #include <unistd.h>
-#ifndef WIN32
+#ifndef _WIN32
 #include <sys/mman.h>
-+#else
-+#define WIN32_LEAN_AND_MEAN
-+#include <windows.h>
-+#include <mmsystem.h>
+#else
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <mmsystem.h>
 #endif
 #include <sys/types.h>
 #include <signal.h>
@@ -35,7 +35,7 @@ char *osd_getenv(const char *name)
 
 int osd_setenv(const char *name, const char *value, int overwrite)
 {
-#if defined(WIN32)
+#if defined(_WIN32)
    char *buf;
    int result;
 
@@ -64,8 +64,7 @@ int osd_setenv(const char *name, const char *value, int overwrite)
 
 int osd_get_num_processors(void)
 {
-#ifdef WIN32
-
+#ifdef _WIN32
 	SYSTEM_INFO info;
 
 	// otherwise, fetch the info from the system
@@ -90,7 +89,7 @@ int osd_get_num_processors(void)
 
 void osd_process_kill(void)
 {
-#ifndef WIN32
+#ifndef _WIN32
     kill(getpid(), SIGKILL);
 #else
     TerminateProcess(GetCurrentProcess(), -1);
@@ -141,7 +140,7 @@ void osd_free(void *ptr)
 //============================================================
 //   osd_cycles
 //============================================================
-#ifdef WIN32
+#ifdef _WIN32
 static osd_ticks_t ticks_per_second = 0;
 static osd_ticks_t suspend_ticks = 0;
 #endif
@@ -181,7 +180,7 @@ osd_ticks_t osd_ticks(void)
 
 osd_ticks_t osd_ticks_per_second(void)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	if (ticks_per_second == 0)
 		osd_ticks();
 	return ticks_per_second;
@@ -194,7 +193,7 @@ osd_ticks_t osd_ticks_per_second(void)
 //============================================================
 void osd_sleep(osd_ticks_t duration)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	DWORD msec;
 
 	// make sure we've computed ticks_per_second
