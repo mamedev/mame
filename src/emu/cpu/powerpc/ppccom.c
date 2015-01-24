@@ -693,6 +693,8 @@ void ppc_device::device_start()
 	m_hotspot_select = 0;
 	memset(m_hotspot, 0, sizeof(m_hotspot));
 
+	m_debugger_temp = 0;
+
 	m_cache_line_size = 32;
 	m_cpu_clock = clock();
 	m_program = &space(AS_PROGRAM);
