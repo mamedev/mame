@@ -1694,28 +1694,6 @@ static const UINT16 fvipers2_prot_data[] =
 	0x2e64, 0x2a20, 0x2a2a, 0x2a2a, 0x2a2a, 0x2a2a, 0x2a2a, 0x2a2a,
 };
 
-static const UINT16 spikeout_prot_data[] =
-{
-	0x0000,
-	0x4f4d, 0x4544, 0x2d4c, 0x2033, 0x7953, 0x7473, 0x6d65, 0x5020,
-	0x6f72, 0x7267, 0x6d61, 0x4320, 0x706f, 0x7279, 0x6769, 0x7468,
-	0x2820, 0x2943, 0x3120, 0x3939, 0x2035, 0x4553, 0x4147, 0x4520,
-	0x746e, 0x7265, 0x7270, 0x7369, 0x7365, 0x4c2c, 0x4454, 0x202e,
-	0x6c41, 0x206c, 0x6972, 0x6867, 0x2074, 0x6572, 0x6573, 0x7672,
-	0x6465, 0x202e, 0x2020, 0x0020
-};
-
-static const UINT16 eca_prot_data[] =
-{
-	0x0000,
-	0x2d2f, 0x202d, 0x4d45, 0x5245, 0x4547, 0x434e, 0x2059, 0x4143,
-	0x4c4c, 0x4120, 0x424d, 0x4c55, 0x4e41, 0x4543, 0x2d20, 0x0a2d,
-	0x6f43, 0x7970, 0x6952, 0x6867, 0x2074, 0x4553, 0x4147, 0x4520,
-	0x746e, 0x7265, 0x7270, 0x7369, 0x7365, 0x202c, 0x744c, 0x2e64,
-	0x530a, 0x666f, 0x7774, 0x7261, 0x2065, 0x2652, 0x2044, 0x6544,
-	0x7470, 0x202e, 0x3123, 0x660a, 0x726f, 0x7420, 0x7365, 0x0a74,
-};
-
 
 
 
@@ -1737,26 +1715,6 @@ READ64_MEMBER(model3_state::model3_security_r)
 			{
 				UINT64 data = (UINT64)fvipers2_prot_data[m_prot_data_ptr++] << 16;
 				if (m_prot_data_ptr >= 0x41)
-				{
-					m_prot_data_ptr = 0;
-				}
-				retvalue = data;
-			}
-			else if (core_stricmp(machine().system().name, "spikeout") == 0 ||
-						core_stricmp(machine().system().name, "spikeofe") == 0)
-			{
-				UINT64 data = (UINT64)spikeout_prot_data[m_prot_data_ptr++] << 16;
-				if (m_prot_data_ptr >= 0x55)
-				{
-					m_prot_data_ptr = 0;
-				}
-				retvalue = data;
-			}
-			else if (core_stricmp(machine().system().name, "eca") == 0 ||
-						core_stricmp(machine().system().name, "ecax") == 0)
-			{
-				UINT64 data = (UINT64)eca_prot_data[m_prot_data_ptr++] << 16;
-				if (m_prot_data_ptr >= 0x31)
 				{
 					m_prot_data_ptr = 0;
 				}
@@ -5714,7 +5672,6 @@ DRIVER_INIT_MEMBER(model3_state, genprot)
 
 	if (key != -1)
 	{
-//		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf01a0000, 0xf01a003f, read64_delegate(FUNC(model3_state::model3_5881prot_r), this), write64_delegate(FUNC(model3_state::model3_5881prot_w), this));
 		m_cryptdevice->set_key(key);
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf01a0000, 0xf01a003f, 0, 0x0e000000, read64_delegate(FUNC(model3_state::model3_5881prot_r), this), write64_delegate(FUNC(model3_state::model3_5881prot_w), this) );                    
 	}
@@ -5977,33 +5934,33 @@ DRIVER_INIT_MEMBER(model3_state,dirtdvls)
 
 DRIVER_INIT_MEMBER(model3_state,daytona2)
 {
-	UINT32 *rom = (UINT32*)memregion("user1")->base();
+//	UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc3800000, 0xc3800007, write64_delegate(FUNC(model3_state::daytona2_rombank_w),this));
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xc3000000, 0xc37fffff, "bank2" );
 
 	//rom[(0x68468c^4)/4] = 0x60000000;
-	rom[(0x6063c4^4)/4] = 0x60000000;
-	rom[(0x616434^4)/4] = 0x60000000;
-	rom[(0x69f4e4^4)/4] = 0x60000000;
+	//rom[(0x6063c4^4)/4] = 0x60000000;
+	//rom[(0x616434^4)/4] = 0x60000000;
+	//rom[(0x69f4e4^4)/4] = 0x60000000;
 
 	DRIVER_INIT_CALL(genprot);
 }
 
 DRIVER_INIT_MEMBER(model3_state,dayto2pe)
 {
-	UINT32 *rom = (UINT32*)memregion("user1")->base();
+//	UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc3800000, 0xc3800007, write64_delegate(FUNC(model3_state::daytona2_rombank_w),this));
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xc3000000, 0xc37fffff, "bank2" );
 
-	rom[(0x606784^4)/4] = 0x60000000;
-	rom[(0x69a3fc^4)/4] = 0x60000000;       // jump to encrypted code
-	rom[(0x618b28^4)/4] = 0x60000000;       // jump to encrypted code
+//	rom[(0x606784^4)/4] = 0x60000000;
+//	rom[(0x69a3fc^4)/4] = 0x60000000;       // jump to encrypted code
+//	rom[(0x618b28^4)/4] = 0x60000000;       // jump to encrypted code
 
-	rom[(0x64ca34^4)/4] = 0x60000000;       // dec
+//	rom[(0x64ca34^4)/4] = 0x60000000;       // dec
 
 	DRIVER_INIT_CALL(genprot);
 }

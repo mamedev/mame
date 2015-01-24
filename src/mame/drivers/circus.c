@@ -6,6 +6,7 @@ name                 year  CPU    board/rom numbers
 
 Robot Bowl           1977  6502   4020-4027, 4010-4013
 Circus               1977  6502   9000-9003, 9004-9011
+Football         Aug,1978  6502   unknown
 Rip Cord         May,1979  6502   RC30-0014 (cpu) 0015 (snd)
                                   9023-9026, 9027-9034, 9035
 Crash           July,1979  6502   CR30-3162 (cpu) 3161 (snd)  9036 (?)
