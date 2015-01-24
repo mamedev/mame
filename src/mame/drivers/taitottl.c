@@ -21,7 +21,7 @@
  Dead Heat (??/1975)                                                       UNKNOWN
  Elepong (07/1973)                                                         UNKNOWN
  Flying Fortress (??/1977)                                                 UNKNOWN
- /Flying Fortress II (06/1977)                                             UNKNOWN
+ Flying Fortress II (06/1977)                                             UNKNOWN
  Gunman (10/1977)                                                          YES        8 x 32bytes (or 11? )
  Interceptor (03/1976)                                                     UNKNOWN
  Missile-X (??/1977)                                                       YES        10 - (5 x 512bytes, 5x32bytes)
