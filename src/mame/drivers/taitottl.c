@@ -3,41 +3,54 @@
  Taito Discrete Hardware Games
 
 
- Game Name(s)                                  Part #'s     Data      PROM/ROM Chip Numbers
- --------------------------------------------+-----------+---------+---------------------------------------
- Acrobat (1978)                                            UNKNOWN
- Astro Race (1973)                                         UNKNOWN
- Avenger (1976) (clone of Electra's Avenger)               UNKNOWN
- Attack (1976)                                             UNKNOWN
- Attack UFO (1974)                                         UNKNOWN
- Barricade II (1977)                                       UNKNOWN
- Basketball (1974)                                         UNKNOWN
- Cisco/Fisco 400 (1977)                                    UNKNOWN
- Crashing Race (1976)                                      UNKNOWN
- Cross Fire (1977) (aka Bazooka)                           UNKNOWN
- Davis Cup (1973)                                          UNKNOWN
- Elepong (1973)                                            UNKNOWN
- Flying Fortress/Flying Fortress II (1977)                 UNKNOWN
- Gunman (1977)                                             YES        8 x 32bytes (or 11? )
- Interceptor (1976)                                        UNKNOWN
- Missile-X (1977)                                          YES        10 - (5 x 512bytes, 5x32bytes)
- Pro Hockey (1973)                                         UNKNOWN
- Road Champion (1978)                                      UNKNOWN
- Sky Fighter 2 (1970)                                      UNKNOWN
- Soccer (1973)                                             UNKNOWN
- Speed Race (1974)                                         UNKNOWN
- Speed Race Twin (1976)                                    UNKNOWN
- Speed Race GP-5 (1980)                                    UNKNOWN
- Sub Hunter (1977)                                         UNKNOWN
- Super Block (1978)                                        UNKNOWN
- Super Speed Race 5 (1978)                                 UNKNOWN
- Super Speed Race GP-V (1980)                              UNKNOWN
- Top Bowler (1978)                                         UNKNOWN
- T. T. Block (1977)                                        YES        1 x 2048bytes
- Trampoline (1978)                                         UNKNOWN
- Wall Block (1978)                                         UNKNOWN
- Western Gun (1975)                                        UNKNOWN
- Zun Zun Block (1979)                                      YES        3 - (2 x 512bytes, 1 x 32bytes)
+ Game Name(s)                                               Part #'s       Data      PROM/ROM Chip Numbers
+ ---------------------------------------------------------+--------------+---------+---------------------------------------
+ Astro Race (11/1973)                                                      UNKNOWN
+ Attack (09/1976)                                                          UNKNOWN
+ Attack UFO (08/1974)                                                      UNKNOWN
+ Avenger (??/1976) (clone of Electra's Avenger)                            UNKNOWN
+ Ball Park/TT Ball Park (??/1974)                                          UNKNOWN
+ Basketball (04/1974)                                                      UNKNOWN
+ Bombs Away (??/1977)                                                      UNKNOWN
+ Cisco/Fisco 400 (04/1977)                                                 UNKNOWN
+ Clean Sweep (??/1976) (clone of Ramtek's Clean Sweep)                     UNKNOWN
+ Clean Sweep II (??/1976) (clone of Ramtek's Clean Sweep)                  UNKNOWN
+ Crashing Race (06/1976)                                                   UNKNOWN
+ Cross Fire (08/1977) (aka Bazooka)                                        UNKNOWN
+ Davis Cup (12/1973)                                                       UNKNOWN
+ Dead Heat (??/1975)                                                       UNKNOWN
+ Elepong (07/1973)                                                         UNKNOWN
+ Flying Fortress (??/1977)                                                 UNKNOWN
+ Flying Fortress II (06/1977)                                             UNKNOWN
+ Gunman (10/1977)                                                          YES        8 x 32bytes (or 11? )
+ Interceptor (03/1976)                                                     UNKNOWN
+ Missile-X (??/1977)                                                       YES        10 - (5 x 512bytes, 5x32bytes)
+ Pro Hockey (11/1973)                                                      UNKNOWN
+ Road Champion (04/1977)                                                   UNKNOWN
+ Road Champion S (06/1977)                                                 UNKNOWN
+ Soccer (11/1973)                                                          UNKNOWN
+ Soccer DX (??/1977)                                                       UNKNOWN
+ Speed Race (11/1974)                                                      UNKNOWN
+ Speed Race CL-5 (10/1978)                                                 UNKNOWN
+ Speed Race Color (10/1978)                                                UNKNOWN
+ Speed Race DX (08/1975)                                                   UNKNOWN
+ Speed Race Twin (04/1976)                                                 UNKNOWN
+ Speed Race GP-5 (??/1980)                                                 UNKNOWN
+ Super Block (02/1978)                                                     UNKNOWN
+ Super Speed Race (12/1977)                                                UNKNOWN
+ Super Speed Race V (07/1978)                                              UNKNOWN
+ Super Speed Race GP-V (??/1980)                                           UNKNOWN
+ Table Football (??/1977)                                                  UNKNOWN
+ Tahitian (??/1975)                                                        UNKNOWN
+ Tennis (??/1977)                                                          UNKNOWN
+ T. T. Block (08/1977)                                                     YES        1 x 2048bytes
+ T. T. Block C (05/1978)                                                   UNKNOWN
+ T. T. Block CU (08/1978)                                                  UNKNOWN
+ T. T. Speed Race (??/1978)                                                UNKNOWN
+ Wall Block (08/1978)                                                      UNKNOWN
+ Wall Break (01/1977)                                                      UNKNOWN
+ Western Gun (09/1975)                                                     UNKNOWN
+ Zun Zun Block (04/1979)                                                   YES        3 - (2 x 512bytes, 1 x 32bytes)
 
 ***************************************************************************/
 
