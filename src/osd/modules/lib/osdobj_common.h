@@ -16,6 +16,7 @@
 #include "osdepend.h"
 #include "modules/osdmodule.h"
 #include "modules/font/font_module.h"
+#include "modules/sound/sound_module.h"
 #include "cliopts.h"
 
 //============================================================
@@ -103,11 +104,7 @@ private:
     static const options_entry s_option_entries[];
 };
 
-class osd_sound_interface;
 class osd_debugger_interface;
-
-// a osd_sound_type is simply a pointer to its alloc function
-typedef osd_sound_interface *(*osd_sound_type)(const osd_interface &osd, running_machine &machine);
 
 // a osd_sound_type is simply a pointer to its alloc function
 typedef osd_debugger_interface *(*osd_debugger_type)(const osd_interface &osd);
@@ -172,9 +169,6 @@ public:
     virtual void video_register();
     virtual bool window_init();
 
-    virtual bool sound_init();
-    virtual void sound_register();
-
     virtual void input_resume();
     virtual bool output_init();
     virtual bool network_init();
@@ -183,7 +177,6 @@ public:
     virtual void exit_subsystems();
     virtual void video_exit();
     virtual void window_exit();
-    virtual void sound_exit();
     virtual void input_exit();
     virtual void output_exit();
     virtual void network_exit();
@@ -192,7 +185,6 @@ public:
     virtual void osd_exit();
 
     virtual void video_options_add(const char *name, void *type);
-    virtual void sound_options_add(const char *name, osd_sound_type type);
     virtual void debugger_options_add(const char *name, osd_debugger_type type);
 
     osd_options &options() { return m_options; }
@@ -231,38 +223,15 @@ private:
     }
 
 protected:
-	osd_sound_interface* m_sound;
+	sound_module* m_sound;
 	osd_debugger_interface* m_debugger;
 private:
 	//tagmap_t<osd_video_type>  m_video_options;
 	dynamic_array<const char *> m_video_names;
-	tagmap_t<osd_sound_type>  m_sound_options;
-	dynamic_array<const char *> m_sound_names;
 	tagmap_t<osd_debugger_type>  m_debugger_options;
 	dynamic_array<const char *> m_debugger_names;
 };
 
-
-class osd_sound_interface
-{
-public:
-	// construction/destruction
-	osd_sound_interface(const osd_interface &osd, running_machine &machine);
-	virtual ~osd_sound_interface();
-
-	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame) = 0;
-	virtual void set_mastervolume(int attenuation) = 0;
-protected:
-	const osd_interface& m_osd;
-	running_machine& m_machine;
-};
-
-// this template function creates a stub which constructs a sound subsystem
-template<class _DeviceClass>
-osd_sound_interface *osd_sound_creator(const osd_interface &osd, running_machine &machine)
-{
-	return global_alloc(_DeviceClass(osd, machine));
-}
 
 class osd_debugger_interface
 {

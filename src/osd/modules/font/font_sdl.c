@@ -338,12 +338,14 @@ public:
         return global_alloc(osd_font_sdl);
     }
 
-    virtual void init()
+    int init()
     {
         if (TTF_Init() == -1)
         {
             osd_printf_error("SDL_ttf failed: %s\n", TTF_GetError());
+            return -1;
         }
+        return 0;
     }
 
     virtual void exit()

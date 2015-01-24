@@ -6,10 +6,6 @@
 #include "font_module.h"
 #include "modules/osdmodule.h"
 
-#include "astring.h"
-#include "corealloc.h"
-#include "fileio.h"
-
 //-------------------------------------------------
 //  font_open - attempt to "open" a handle to the
 //  font with the given name

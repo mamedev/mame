@@ -36,8 +36,8 @@ public:
 
     virtual bool probe() const { return true; }
 
-    virtual void init() {  }
-    virtual void exit() {  }
+    virtual int init() { return 0; }
+    virtual void exit() { }
 
 private:
     astring     m_name;

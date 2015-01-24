@@ -39,11 +39,6 @@
 #include "debugger.h"
 #include "winfile.h"
 
-#include "modules/sound/direct_sound.h"
-#if (USE_SDL)
-#include "modules/sound/sdl_sound.h"
-#endif
-
 #include "modules/debugger/debugwin.h"
 
 #if (USE_QTDEBUG)
@@ -539,20 +534,6 @@ void windows_osd_interface::video_register()
 	video_options_add("d3d", NULL);
 	//video_options_add("auto", NULL); // making d3d video default one
 }
-
-//============================================================
-//  sound_register
-//============================================================
-
-void windows_osd_interface::sound_register()
-{
-	sound_options_add("dsound", OSD_SOUND_DIRECT_SOUND);
-#if (USE_SDL)
-	sound_options_add("sdl", OSD_SOUND_SDL);
-#endif
-	sound_options_add("auto", OSD_SOUND_DIRECT_SOUND); // making Direct Sound audio default one
-}
-
 
 //============================================================
 //  debugger_register

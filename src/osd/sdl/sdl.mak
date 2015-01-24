@@ -204,14 +204,12 @@ endif
 ifeq ($(TARGETOS),unix)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = tc
-FONT_IMPLEMENTATION = sdl
 endif
 
 ifeq ($(TARGETOS),linux)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = tc
 SDL_NETWORK = taptun
-FONT_IMPLEMENTATION = sdl
 
 ifndef NO_USE_MIDI
 INCPATH += `pkg-config --cflags alsa`
@@ -223,7 +221,6 @@ endif
 ifeq ($(TARGETOS),freebsd)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = tc
-FONT_IMPLEMENTATION = sdl
 DEFS += -DNO_AFFINITY_NP
 LIBS += -lutil
 # /usr/local/include is not considered a system include directory
@@ -235,7 +232,6 @@ endif
 ifeq ($(TARGETOS),openbsd)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = ntc
-FONT_IMPLEMENTATION = sdl
 LIBS += -lutil
 NO_USE_MIDI = 1
 endif
@@ -243,7 +239,6 @@ endif
 ifeq ($(TARGETOS),netbsd)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = ntc
-FONT_IMPLEMENTATION = sdl
 LIBS += -lutil
 NO_USE_MIDI = 1
 endif
@@ -252,14 +247,12 @@ ifeq ($(TARGETOS),solaris)
 BASE_TARGETOS = unix
 DEFS += -DNO_AFFINITY_NP -UHAVE_VSNPRINTF -DNO_vsnprintf
 SYNC_IMPLEMENTATION = tc
-FONT_IMPLEMENTATION = sdl
 NO_USE_MIDI = 1
 endif
 
 ifeq ($(TARGETOS),haiku)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = ntc
-FONT_IMPLEMENTATION = sdl
 NO_X11 = 1
 NO_USE_XINPUT = 1
 NO_USE_MIDI = 1
@@ -270,7 +263,6 @@ endif
 ifeq ($(TARGETOS),emscripten)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = mini
-FONT_IMPLEMENTATION = none
 NO_DEBUGGER = 1
 NO_X11 = 1
 NO_USE_XINPUT = 1
@@ -282,7 +274,6 @@ endif
 ifeq ($(TARGETOS),macosx)
 NO_USE_QTDEBUG = 1
 BASE_TARGETOS = unix
-FONT_IMPLEMENTATION = osx
 DEFS += -DSDLMAME_UNIX -DSDLMAME_MACOSX -DSDLMAME_DARWIN
 
 ifndef NO_USE_MIDI
@@ -335,7 +326,6 @@ endif
 ifeq ($(TARGETOS),win32)
 BASE_TARGETOS = win32
 SYNC_IMPLEMENTATION = windows
-FONT_IMPLEMENTATION = windows
 NO_X11 = 1
 NO_USE_XINPUT = 1
 DEFS += -DSDLMAME_WIN32 -DX64_WINDOWS_ABI
@@ -373,7 +363,6 @@ ifeq ($(TARGETOS),os2)
 BASE_TARGETOS = os2
 DEFS += -DSDLMAME_OS2
 SYNC_IMPLEMENTATION = os2
-FONT_IMPLEMENTATION = none
 NO_DEBUGGER = 1
 NO_X11 = 1
 NO_USE_XINPUT = 1
@@ -397,11 +386,6 @@ ifdef NO_USE_QTDEBUG
 NO_DEBUGGER = 1
 endif
 endif
-
-ifndef FONT_IMPLEMENTATION
-$(error Please define FONT_IMPLEMENTATION !)
-endif
-
 
 #-------------------------------------------------
 # object and source roots
@@ -444,7 +428,10 @@ OSDOBJS = \
 	$(SDLMAIN) \
 	$(SDLOBJ)/sdlmain.o \
 	$(SDLOBJ)/input.o \
+	$(OSDOBJ)/modules/sound/js_sound.o  \
+	$(OSDOBJ)/modules/sound/direct_sound.o  \
 	$(OSDOBJ)/modules/sound/sdl_sound.o  \
+	$(OSDOBJ)/modules/sound/none.o  \
 	$(SDLOBJ)/video.o \
 	$(SDLOBJ)/drawsdl.o \
 	$(SDLOBJ)/window.o \

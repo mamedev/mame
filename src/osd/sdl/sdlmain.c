@@ -57,14 +57,6 @@
 #include "osdsdl.h"
 #include "modules/lib/osdlib.h"
 
-#include "modules/sound/sdl_sound.h"
-
-#if defined(SDLMAME_EMSCRIPTEN)
-#include "modules/sound/js_sound.h"
-#endif
-#if defined(SDLMAME_WIN32)
-#include "modules/sound/direct_sound.h"
-#endif
 #if !defined(NO_DEBUGGER)
 #include "modules/debugger/debugqt.h"
 #endif
@@ -536,25 +528,6 @@ void sdl_osd_interface::video_register()
 	video_options_add("soft", NULL);
 	video_options_add("opengl", NULL);
 	//video_options_add("auto", NULL); // making d3d video default one
-}
-
-//============================================================
-//  sound_register
-//============================================================
-
-void sdl_osd_interface::sound_register()
-{
-	sound_options_add("sdl", OSD_SOUND_SDL);
-#if defined(SDLMAME_WIN32)
-	sound_options_add("dsound", OSD_SOUND_DIRECT_SOUND);
-#endif
-
-#if defined(SDLMAME_EMSCRIPTEN)
-	sound_options_add("js", OSD_SOUND_JS);
-	sound_options_add("auto", OSD_SOUND_JS); // making JS audio default one
-#else
-	sound_options_add("auto", OSD_SOUND_SDL); // making SDL audio default one
-#endif
 }
 
 //============================================================
