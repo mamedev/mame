@@ -1350,13 +1350,16 @@ WRITE32_MEMBER(model2_state::model2_5881prot_w)
 
 	if (offset == 0x0008/4)
 	{
-		// code is copied to RAM first, so base address is always 0
-		m_cryptdevice->set_addr_low(0);
-		m_cryptdevice->set_addr_high(0);
-
-		if (data != 0)
-			printf("model2_5881prot_w address isn't 0?\n");
-
+		// Zero Gunner uses this, it's encrypted data in prot.RAM consists of several small chunks, selected using low address
+		// so far this is only known game with 315-5881 which uses not 0 offset in prot.RAM
+		if (mem_mask == 0x0000ffff)
+			m_cryptdevice->set_addr_low(data&0xffff);
+		else if (mem_mask == 0xffff0000)
+		{
+			m_cryptdevice->set_addr_high(0);
+			if (data != 0)
+				printf("model2_5881prot_w not zero high address %08x (%08x)\n", data, mem_mask);
+		}
 		first_read = 1;
 	}
 	else if (offset == 0x000c/4)
