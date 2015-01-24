@@ -419,6 +419,7 @@ cld_ce_imp
 cle_imp
 	read_pc_noinc();
 	P &= ~F_E;
+	logerror("CLE\n");
 	prefetch();
 
 cli_ce_imp

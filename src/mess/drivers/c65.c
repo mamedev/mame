@@ -6,6 +6,9 @@ C=65 / C=64DX (c) 1991 Commodore
 
 Attempt at rewriting the driver ...
 
+TODO:
+- Dies as soon as it enters into DOS ROM (bp 0x9d1a, it never returns due of a bad stack pointer read);
+
 Note:
 - VIC-4567 will be eventually be added via compile switch, once that I
   get the hang of the system (and checking where the old code fails 
@@ -30,7 +33,8 @@ public:
 			m_palred(*this, "redpal"),
 			m_palgreen(*this, "greenpal"),
 			m_palblue(*this, "bluepal"),
-			m_dmalist(*this, "dmalist")			
+			m_dmalist(*this, "dmalist"),
+			m_cram(*this, "cram")
 	{ }
 
 	// devices
@@ -41,19 +45,26 @@ public:
 	required_shared_ptr<UINT8> m_palgreen;
 	required_shared_ptr<UINT8> m_palblue;
 	required_shared_ptr<UINT8> m_dmalist;
-	 
+	required_shared_ptr<UINT8> m_cram;
+	
 	DECLARE_READ8_MEMBER(vic4567_dummy_r);
 	DECLARE_WRITE8_MEMBER(vic4567_dummy_w);
 	DECLARE_WRITE8_MEMBER(PalRed_w);
 	DECLARE_WRITE8_MEMBER(PalGreen_w);
 	DECLARE_WRITE8_MEMBER(PalBlue_w);
 	DECLARE_WRITE8_MEMBER(DMAgic_w);
+	DECLARE_READ8_MEMBER(CIASelect_r);
+	DECLARE_WRITE8_MEMBER(CIASelect_w);
+	
+	DECLARE_READ8_MEMBER(dummy_r);
 	
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(c65);
 	DECLARE_DRIVER_INIT(c65);
 	DECLARE_DRIVER_INIT(c65pal);
+	
+	INTERRUPT_GEN_MEMBER(vic3_vblank_irq);
 protected:
 	// driver_device overrides
 	virtual void machine_start();
@@ -61,6 +72,8 @@ protected:
 
 	virtual void video_start();
 private:
+	UINT8 m_VIC2_IRQMask;
+	UINT8 m_VIC3_ControlA;
 	void PalEntryFlush(UINT8 offset);
 	void DMAgicExecute(address_space &space,UINT32 address);
 };
@@ -87,6 +100,8 @@ READ8_MEMBER(c65_state::vic4567_dummy_r)
 		case 0x12:
 			res = (m_screen->vpos() & 0xff);
 			return res;
+		case 0x30:
+			return m_VIC3_ControlA;
 	}
 	
 	if(!space.debugger_access())
@@ -98,11 +113,18 @@ WRITE8_MEMBER(c65_state::vic4567_dummy_w)
 {
 	switch(offset)
 	{
+		case 0x1a:
+			m_VIC2_IRQMask = data & 0xf;
+			break;
 		/* KEY register, handles vic-iii and vic-ii modes via two consecutive writes 
 		  0xa5 -> 0x96 vic-iii mode
           any other write vic-ii mode
 		  */
 		//case 0x2f: break;
+		case 0x30: 
+			printf("CONTROL A %02x\n",data); 
+			m_VIC3_ControlA = data;
+			break;
 		default: 
 			if(!space.debugger_access())
 				printf("%02x %02x\n",offset,data); 
@@ -187,13 +209,39 @@ WRITE8_MEMBER(c65_state::DMAgic_w)
 		DMAgicExecute(space,(m_dmalist[0])|(m_dmalist[1]<<8)|(m_dmalist[2]<<16));
 }
 
+READ8_MEMBER(c65_state::CIASelect_r)
+{
+	if(m_VIC3_ControlA & 1)
+		return m_cram[offset];
+	else
+	{
+		// CIA
+	}
 
+	return 0xff;
+}
+
+WRITE8_MEMBER(c65_state::CIASelect_w)
+{
+	if(m_VIC3_ControlA & 1)
+		m_cram[offset] = data;
+	else
+	{
+		// CIA
+	}
+	
+}
+
+READ8_MEMBER(c65_state::dummy_r)
+{
+	return 0xff;
+}
 
 static ADDRESS_MAP_START( c65_map, AS_PROGRAM, 8, c65_state )
 	AM_RANGE(0x00000, 0x01fff) AM_RAM // TODO: bank
 	AM_RANGE(0x0c800, 0x0cfff) AM_ROM AM_REGION("maincpu", 0xc800)
 	AM_RANGE(0x0d000, 0x0d07f) AM_READWRITE(vic4567_dummy_r,vic4567_dummy_w) // 0x0d000, 0x0d07f VIC-4567
-	// 0x0d080, 0x0d09f FDC
+	AM_RANGE(0x0d080, 0x0d081) AM_READ(dummy_r) // 0x0d080, 0x0d09f FDC
 	// 0x0d0a0, 0x0d0ff Ram Expansion Control (REC)
 	AM_RANGE(0x0d100, 0x0d1ff) AM_RAM_WRITE(PalRed_w) AM_SHARE("redpal")// 0x0d100, 0x0d1ff Red Palette
 	AM_RANGE(0x0d200, 0x0d2ff) AM_RAM_WRITE(PalGreen_w) AM_SHARE("greenpal") // 0x0d200, 0x0d2ff Green Palette
@@ -204,10 +252,12 @@ static ADDRESS_MAP_START( c65_map, AS_PROGRAM, 8, c65_state )
 	AM_RANGE(0x0d700, 0x0d702) AM_WRITE(DMAgic_w) AM_SHARE("dmalist") // 0x0d700, 0x0d7** DMAgic
 	//AM_RANGE(0x0d703, 0x0d703) AM_READ(DMAgic_r)
 	// 0x0d800, 0x0d8** Color matrix
+	AM_RANGE(0x0dc00, 0x0dfff) AM_READWRITE(CIASelect_r,CIASelect_w) AM_SHARE("cram")
 	// 0x0dc00, 0x0dc** CIA-1
 	// 0x0dd00, 0x0dd** CIA-2
 	// 0x0de00, 0x0de** Ext I/O Select 1
-	AM_RANGE(0x0df00, 0x0dfff) AM_RAM // 0x0df00, 0x0df** Ext I/O Select 2 (RAM window?)
+	// 0x0df00, 0x0df** Ext I/O Select 2 (RAM window?)
+	AM_RANGE(0x0e000, 0x0ffff) AM_ROM AM_REGION("maincpu",0x0e000)
 	AM_RANGE(0x10000, 0x1f7ff) AM_RAM 
 	AM_RANGE(0x1f800, 0x1ffff) AM_RAM // VRAM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROM AM_REGION("maincpu",0)
@@ -286,11 +336,33 @@ PALETTE_INIT_MEMBER(c65_state, c65)
 	// TODO: initial state? 
 }
 
+static const gfx_layout charlayout =
+{
+	8,8,
+	0x1000/8,
+	1,
+	{ RGN_FRAC(0,1) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
+static GFXDECODE_START( c65 )
+	GFXDECODE_ENTRY( "maincpu", 0xd000, charlayout,     0, 1 ) // another identical copy is at 0x9000
+GFXDECODE_END
+
+INTERRUPT_GEN_MEMBER(c65_state::vic3_vblank_irq)
+{
+	if(m_VIC2_IRQMask & 1)
+		m_maincpu->set_input_line(M4510_IRQ_LINE,HOLD_LINE);
+}
+
 static MACHINE_CONFIG_START( c65, c65_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M4510,MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(c65_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen",c65_state,vic3_vblank_irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -299,8 +371,10 @@ static MACHINE_CONFIG_START( c65, c65_state )
 	MCFG_SCREEN_UPDATE_DRIVER(c65_state, screen_update)
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, 525, 0, 320, 525, 0, 240) // mods needed
+	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, 910, 0, 320, 525, 0, 240) // mods needed
 	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", c65)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(c65_state, c65)
