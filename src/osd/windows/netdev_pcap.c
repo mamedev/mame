@@ -112,13 +112,13 @@ void init_pcap()
 	catch (DWORD e)
 	{
 		FreeLibrary(handle);
-		osd_printf_verbose("Unable to load winpcap: %lx\n", e);
+		osd_printf_warning("Unable to load winpcap: %lx\n", e);
 		return;
 	}
 	if(pcap_findalldevs_dl(&devs, errbuf) == -1)
 	{
 		FreeLibrary(handle);
-		osd_printf_verbose("Unable to get network devices: %s\n", errbuf);
+		osd_printf_warning("Unable to get network devices: %s\n", errbuf);
 		return;
 	}
 
