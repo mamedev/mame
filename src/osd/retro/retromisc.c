@@ -1,4 +1,4 @@
-#ifdef WIN32
+#ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #else
@@ -22,7 +22,7 @@
 
 void *osd_alloc_executable(size_t size)
 {
-#if defined(WIN32)
+#if defined(_WIN32)
    return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 #else
 	return (void *)mmap(0, size, PROT_EXEC|PROT_READ|PROT_WRITE, MAP_ANON|MAP_SHARED, -1, 0);
@@ -37,7 +37,7 @@ void *osd_alloc_executable(size_t size)
 
 void osd_free_executable(void *ptr, size_t size)
 {
-#if defined(WIN32)
+#if defined(_WIN32)
    VirtualFree(ptr, 0, MEM_RELEASE);
 #else
 	munmap(ptr, size);

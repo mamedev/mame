@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <unistd.h>
-#ifdef WIN32
+#ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #else
@@ -35,17 +35,17 @@ osd_directory_entry *osd_stat(const char *path)
 {
 	int err;
 	osd_directory_entry *result = NULL;
-	#if defined(SDLMAME_NO64BITIO) || defined(RETRO_AND) || defined(WIN32) || defined(SDLMAME_BSD)
-	struct stat st;
-	#else
-	struct stat64 st;
-	#endif
+#if defined(SDLMAME_NO64BITIO) || defined(RETRO_AND) || defined(_WIN32) || defined(SDLMAME_BSD)
+   struct stat st;
+#else
+   struct stat64 st;
+#endif
 
-	#if defined(SDLMAME_NO64BITIO) || defined(RETRO_AND) || defined(WIN32) || defined(SDLMAME_BSD)
-	err = stat(path, &st);
-	#else
-	err = stat64(path, &st);
-	#endif
+#if defined(SDLMAME_NO64BITIO) || defined(RETRO_AND) || defined(_WIN32) || defined(SDLMAME_BSD)
+   err = stat(path, &st);
+#else
+   err = stat64(path, &st);
+#endif
 
 	if( err == -1) return NULL;
 

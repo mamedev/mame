@@ -33,7 +33,7 @@ extern const char *sdlfile_ptty_identifier;
 //  CONSTANTS
 //============================================================
 
-#if defined(WIN32)
+#if defined(_WIN32)
 #define PATHSEPCH '\\'
 #define INVPATHSEPCH '/'
 #else
@@ -64,7 +64,7 @@ file_error error_to_file_error(UINT32 error)
 
 	case EACCES:
 	case EROFS:
-	#ifndef WIN32
+	#ifndef _WIN32
 	case ETXTBSY:
 	#endif
 	case EEXIST:
@@ -92,7 +92,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	UINT32 access;
 	const char *src;
 	char *dst;
-	#if defined(__MACH__) || defined(WIN32) ||  defined(SDLMAME_NO64BITIO) || defined(RETRO_AND) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2) || defined(SDLMAME_HAIKU)
+	#if defined(__MACH__) || defined(_WIN32) ||  defined(SDLMAME_NO64BITIO) || defined(RETRO_AND) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2) || defined(SDLMAME_HAIKU)
 	struct stat st;
 	#else
 	struct stat64 st;
@@ -187,12 +187,12 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 		osd_free(envstr);
 	}
 
-	#if defined(WIN32) || defined(SDLMAME_OS2)
+	#if defined(_WIN32) || defined(SDLMAME_OS2)
 	access |= O_BINARY;
 	#endif
 
 	// attempt to open the file
-	#if defined(__MACH__) || defined(WIN32) || defined(SDLMAME_NO64BITIO) || defined(RETRO_AND) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2) || defined(SDLMAME_HAIKU)
+	#if defined(__MACH__) || defined(_WIN32) || defined(SDLMAME_NO64BITIO) || defined(RETRO_AND) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2) || defined(SDLMAME_HAIKU)
 	(*file)->handle = open(tmpstr, access, 0666);
 	#else
 	(*file)->handle = open64(tmpstr, access, 0666);
@@ -215,7 +215,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 				// attempt to reopen the file
 				if (error == NO_ERROR)
 				{
-					#if defined(__MACH__) || defined(WIN32) || defined(SDLMAME_NO64BITIO) || defined(RETRO_AND) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2) || defined(SDLMAME_HAIKU)
+					#if defined(__MACH__) || defined(_WIN32) || defined(SDLMAME_NO64BITIO) || defined(RETRO_AND) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2) || defined(SDLMAME_HAIKU)
 					(*file)->handle = open(tmpstr, access, 0666);
 					#else
 					(*file)->handle = open64(tmpstr, access, 0666);
@@ -235,7 +235,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	}
 
 	// get the file size
-	#if defined(__MACH__) || defined(WIN32) || defined(SDLMAME_NO64BITIO) || defined(RETRO_AND) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2) || defined(SDLMAME_HAIKU)
+	#if defined(__MACH__) || defined(_WIN32) || defined(SDLMAME_NO64BITIO) || defined(RETRO_AND) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2) || defined(SDLMAME_HAIKU)
 	fstat((*file)->handle, &st);
 	#else
 	fstat64((*file)->handle, &st);
@@ -271,7 +271,7 @@ file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 count, U
 #if defined(__MACH__) || defined(SDLMAME_BSD)
 			result = pread(file->handle, buffer, count, offset);
 			if (result < 0)
-#elif defined(WIN32) || defined(SDLMAME_NO64BITIO) || defined(RETRO_AND) || defined(SDLMAME_OS2)
+#elif defined(_WIN32) || defined(SDLMAME_NO64BITIO) || defined(RETRO_AND) || defined(SDLMAME_OS2)
 			lseek(file->handle, (UINT32)offset&0xffffffff, SEEK_SET);
 			result = read(file->handle, buffer, count);
 			if (result < 0)
@@ -317,7 +317,7 @@ file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 c
 #if defined(__MACH__) || defined(SDLMAME_BSD)
 			result = pwrite(file->handle, buffer, count, offset);
 			if (!result)
-#elif defined(WIN32) || defined(SDLMAME_NO64BITIO) || defined(RETRO_AND) || defined(SDLMAME_OS2)
+#elif defined(_WIN32) || defined(SDLMAME_NO64BITIO) || defined(RETRO_AND) || defined(SDLMAME_OS2)
 			lseek(file->handle, (UINT32)offset&0xffffffff, SEEK_SET);
 			result = write(file->handle, buffer, count);
 			if (!result)
@@ -415,7 +415,7 @@ static UINT32 create_path_recursive(char *path)
 		return NO_ERROR;
 
 	// create the path
-	#ifdef WIN32
+	#ifdef _WIN32
 	if (mkdir(path) != 0)
 	#else
 	if (mkdir(path, 0777) != 0)

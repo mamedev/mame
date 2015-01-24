@@ -13,7 +13,7 @@
 #define _GNU_SOURCE     // for PTHREAD_MUTEX_RECURSIVE; needs to be here before other glibc headers are included
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <process.h>
@@ -23,7 +23,7 @@
 #include <math.h>
 #include <stdint.h>
 
-#ifndef WIN32
+#ifndef _WIN32
 #include <unistd.h>
 #endif
 
@@ -34,7 +34,7 @@
 #include "retrosync.h"
 #include <stdlib.h>
 
-#ifndef WIN32
+#ifndef _WIN32
 #include <pthread.h>
 #endif
 
@@ -42,14 +42,14 @@
 #include <signal.h>
 #include <sys/time.h>
 
-#ifndef WIN32
+#ifndef _WIN32
 struct hidden_mutex_t {
 	pthread_mutex_t id;
 };
 #endif
 
 struct osd_event {
-#ifndef WIN32
+#ifndef _WIN32
 	pthread_mutex_t     mutex;
 	pthread_cond_t      cond;
 	volatile INT32      autoreset;
@@ -69,7 +69,7 @@ struct osd_event {
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
-#ifdef WIN32
+#ifdef _WIN32
 typedef BOOL (WINAPI *try_enter_critical_section_ptr)(LPCRITICAL_SECTION lpCriticalSection);
 static try_enter_critical_section_ptr try_enter_critical_section = NULL;
 static int checked_for_try_enter = FALSE;
@@ -81,7 +81,7 @@ struct osd_lock
 #endif
 
 struct osd_thread {
-#ifdef WIN32
+#ifdef _WIN32
    HANDLE handle;
    osd_thread_callback callback;
    void *params;
@@ -92,7 +92,7 @@ struct osd_thread {
 
 struct osd_scalable_lock
 {
-#ifdef WIN32
+#ifdef _WIN32
 	CRITICAL_SECTION    critsect;
 #else
 	osd_lock            *lock;
@@ -109,7 +109,7 @@ osd_scalable_lock *osd_scalable_lock_alloc(void)
 
 	lock = (osd_scalable_lock *)calloc(1, sizeof(*lock));
 
-#ifdef WIN32
+#ifdef _WIN32
 	memset(lock, 0, sizeof(*lock));
 	InitializeCriticalSection(&lock->critsect);
 #else
@@ -121,7 +121,7 @@ osd_scalable_lock *osd_scalable_lock_alloc(void)
 
 INT32 osd_scalable_lock_acquire(osd_scalable_lock *lock)
 {
-#if defined(WIN32)
+#if defined(_WIN32)
    EnterCriticalSection(&lock->critsect);
 #else
 	osd_lock_acquire(lock->lock);
@@ -132,7 +132,7 @@ INT32 osd_scalable_lock_acquire(osd_scalable_lock *lock)
 
 void osd_scalable_lock_release(osd_scalable_lock *lock, INT32 myslot)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	LeaveCriticalSection(&lock->critsect);
 #else
 	osd_lock_release(lock->lock);
@@ -141,7 +141,7 @@ void osd_scalable_lock_release(osd_scalable_lock *lock, INT32 myslot)
 
 void osd_scalable_lock_free(osd_scalable_lock *lock)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	DeleteCriticalSection(&lock->critsect);
 #else
 	osd_lock_free(lock->lock);
@@ -156,7 +156,7 @@ void osd_scalable_lock_free(osd_scalable_lock *lock)
 
 osd_lock *osd_lock_alloc(void)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	osd_lock *lock = (osd_lock *)malloc(sizeof(*lock));
 	if (lock == NULL)
 		return NULL;
@@ -182,7 +182,7 @@ osd_lock *osd_lock_alloc(void)
 
 void osd_lock_acquire(osd_lock *lock)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	// block until we can acquire the lock
 	EnterCriticalSection(&lock->critsect);
 #else
@@ -201,7 +201,7 @@ void osd_lock_acquire(osd_lock *lock)
 
 int osd_lock_try(osd_lock *lock)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	int result = TRUE;
 
 	// if we haven't yet checked for the TryEnter API, do it now
@@ -237,7 +237,7 @@ int osd_lock_try(osd_lock *lock)
 
 void osd_lock_release(osd_lock *lock)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	LeaveCriticalSection(&lock->critsect);
 #else
 	hidden_mutex_t *mutex = (hidden_mutex_t *) lock;
@@ -252,7 +252,7 @@ void osd_lock_release(osd_lock *lock)
 
 void osd_lock_free(osd_lock *lock)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	DeleteCriticalSection(&lock->critsect);
 	free(lock);
 #else
@@ -270,7 +270,7 @@ void osd_lock_free(osd_lock *lock)
 
 osd_event *osd_event_alloc(int manualreset, int initialstate)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	return (osd_event *) CreateEvent(NULL, manualreset, initialstate, NULL);
 #else
 	osd_event *ev;
@@ -294,7 +294,7 @@ osd_event *osd_event_alloc(int manualreset, int initialstate)
 
 void osd_event_free(osd_event *event)
 {
-#ifndef WIN32
+#ifndef _WIN32
 	pthread_mutex_destroy(&event->mutex);
 	pthread_cond_destroy(&event->cond);
 	free(event);
@@ -309,7 +309,7 @@ void osd_event_free(osd_event *event)
 
 void osd_event_set(osd_event *event)
 {
-#ifndef WIN32
+#ifndef _WIN32
 	pthread_mutex_lock(&event->mutex);
 	if (event->signalled == FALSE)
 	{
@@ -333,7 +333,7 @@ void osd_event_set(osd_event *event)
 
 void osd_event_reset(osd_event *event)
 {
-#ifndef WIN32
+#ifndef _WIN32
 	pthread_mutex_lock(&event->mutex);
 	event->signalled = FALSE;
 	pthread_mutex_unlock(&event->mutex);
@@ -348,7 +348,7 @@ void osd_event_reset(osd_event *event)
 
 int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 {
-#ifdef WIN32
+#ifdef _WIN32
 	int ret = WaitForSingleObject((HANDLE) event, timeout * 1000 / osd_ticks_per_second());
 	return ( ret == WAIT_OBJECT_0);
 #else
@@ -413,7 +413,7 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 //============================================================
 //  osd_thread_create
 //============================================================
-#ifdef WIN32
+#ifdef _WIN32
 static unsigned __stdcall worker_thread_entry(void *param)
 {
    osd_thread *thread = (osd_thread *) param;
@@ -430,14 +430,14 @@ static unsigned __stdcall worker_thread_entry(void *param)
 osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam)
 {
 	osd_thread *thread;
-#ifndef WIN32
+#ifndef _WIN32
 	pthread_attr_t  attr;
 #else
 	uintptr_t handle;
 #endif
 
 	thread = (osd_thread *)calloc(1, sizeof(osd_thread));
-#ifdef WIN32
+#ifdef _WIN32
    thread->callback = callback;
    thread->params = cbparam;
    handle = _beginthreadex(NULL, 0, worker_thread_entry, thread, 0, NULL);
@@ -462,7 +462,7 @@ osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam)
 
 int osd_thread_adjust_priority(osd_thread *thread, int adjust)
 {
-#ifdef WIN32
+#ifdef _WIN32
    if (adjust)
       SetThreadPriority(thread->handle, THREAD_PRIORITY_ABOVE_NORMAL);
    else
@@ -491,7 +491,7 @@ int osd_thread_adjust_priority(osd_thread *thread, int adjust)
 
 int osd_thread_cpu_affinity(osd_thread *thread, UINT32 mask)
 {
-#if defined(__GNUC__) && defined(WIN32)
+#if defined(__GNUC__) && defined(_WIN32)
    return TRUE; /* stub */
 #elif !defined(NO_AFFINITY_NP) && !defined(__MACH__) && !defined(RETRO_AND)
 	cpu_set_t   cmask;
@@ -527,7 +527,7 @@ int osd_thread_cpu_affinity(osd_thread *thread, UINT32 mask)
 
 void osd_thread_wait_free(osd_thread *thread)
 {
-#if defined(WIN32)
+#if defined(_WIN32)
    WaitForSingleObject(thread->handle, INFINITE);
    CloseHandle(thread->handle);
    free(thread);
@@ -543,7 +543,7 @@ void osd_thread_wait_free(osd_thread *thread)
 
 void osd_process_kill(void)
 {
-#if defined(WIN32)
+#if defined(_WIN32)
    TerminateProcess(GetCurrentProcess(), -1);
 #else
 	kill(getpid(), SIGKILL);
