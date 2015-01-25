@@ -91,7 +91,7 @@ void sh2_device::load_fast_iregs(drcuml_block *block)
 	{
 		if (m_regmap[regnum].is_int_register())
 		{
-			UML_MOV(block, parameter::make_ireg(m_regmap[regnum].ireg()), mem(&m_sh2_state->r[regnum]));
+			UML_MOV(block, uml::parameter::make_ireg(m_regmap[regnum].ireg()), mem(&m_sh2_state->r[regnum]));
 		}
 	}
 }
@@ -110,7 +110,7 @@ void sh2_device::save_fast_iregs(drcuml_block *block)
 	{
 		if (m_regmap[regnum].is_int_register())
 		{
-			UML_MOV(block, mem(&m_sh2_state->r[regnum]), parameter::make_ireg(m_regmap[regnum].ireg()));
+			UML_MOV(block, mem(&m_sh2_state->r[regnum]), uml::parameter::make_ireg(m_regmap[regnum].ireg()));
 		}
 	}
 }
@@ -1220,7 +1220,7 @@ void sh2_device::log_add_disasm_comment(drcuml_block *block, UINT32 pc, UINT32 o
     subtract cycles from the icount and generate
     an exception if out
 -------------------------------------------------*/
-void sh2_device::generate_update_cycles(drcuml_block *block, compiler_state *compiler, parameter param, int allow_exception)
+void sh2_device::generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, int allow_exception)
 {
 	/* check full interrupts if pending */
 	if (compiler->checkints)
