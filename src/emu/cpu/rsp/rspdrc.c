@@ -641,7 +641,7 @@ void rsp_device::static_generate_memory_accessor(int size, int iswrite, const ch
     subtract cycles from the icount and generate
     an exception if out
 -------------------------------------------------*/
-void rsp_device::generate_update_cycles(drcuml_block *block, compiler_state *compiler, parameter param, int allow_exception)
+void rsp_device::generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, int allow_exception)
 {
 	/* account for cycles */
 	if (compiler->cycles > 0)
