@@ -368,6 +368,12 @@ INPUT_PORTS_END
 
 void segajw_state::machine_start()
 {
+	save_item(NAME(m_coin_start_cycles));
+	save_item(NAME(m_hopper_start_cycles));
+	save_item(NAME(m_coin_counter));
+	save_item(NAME(m_coin_lockout));
+	save_item(NAME(m_hopper_ctrl));
+	save_item(NAME(m_lamps));
 }
 
 
@@ -438,4 +444,4 @@ ROM_START( segajw )
 ROM_END
 
 
-GAMEL( 1991, segajw,  0,   segajw,  segajw, driver_device,  0, ROT0, "Sega", "Golden Poker Series \"Joker's Wild\" (Rev. B)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS, layout_segajw ) // TODO: correct title
+GAMEL( 1991, segajw,  0,   segajw,  segajw, driver_device,  0, ROT0, "Sega", "Golden Poker Series \"Joker's Wild\" (Rev. B)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_segajw ) // TODO: correct title

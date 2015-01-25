@@ -165,6 +165,7 @@ public:
 	save_manager &save() { return m_save; }
 	memory_manager &memory() { return m_memory; }
 	ioport_manager &ioport() { return m_ioport; }
+	parameters_manager &parameters() { return m_parameters; }
 	cheat_manager &cheat() const { assert(m_cheat != NULL); return *m_cheat; }
 	render_manager &render() const { assert(m_render != NULL); return *m_render; }
 	input_manager &input() const { assert(m_input != NULL); return *m_input; }
@@ -357,6 +358,7 @@ private:
 	save_manager            m_save;                 // save manager
 	memory_manager          m_memory;               // memory manager
 	ioport_manager          m_ioport;               // I/O port manager
+	parameters_manager      m_parameters;           // parameters manager
 	device_scheduler        m_scheduler;            // scheduler object
 	emu_timer               *m_autoboot_timer;      // autoboot timer
 };

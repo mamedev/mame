@@ -107,6 +107,8 @@ private:
 	void video_registers_w(int offset);
 	int translate_command(UINT16 data);
 	void draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int vs, int y, int layer_n, bool active, bool ins_window);
+	
+	void register_save_state();
 
 	h63484_display_delegate  m_display_cb;
 

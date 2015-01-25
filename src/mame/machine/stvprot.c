@@ -83,9 +83,6 @@ WRITE32_MEMBER ( stv_state::common_prot_w )
 void stv_state::install_common_protection()
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x4fffff0, 0x4ffffff, read32_delegate(FUNC(stv_state::common_prot_r), this), write32_delegate(FUNC(stv_state::common_prot_w), this));
-
-	INT64 key = get_315_5881_key(machine());
-	m_cryptdevice->set_key(key);
 }
 
 void stv_state::stv_register_protection_savestates()

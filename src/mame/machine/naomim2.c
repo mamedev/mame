@@ -108,13 +108,6 @@ naomi_m2_board::naomi_m2_board(const machine_config &mconfig, const char *tag, d
 	: naomi_board(mconfig, NAOMI_M2_BOARD, "Sega NAOMI M2 Board", tag, owner, clock, "naomi_m2_board", __FILE__),
 	m_cryptdevice(*this, "segam2crypt")
 {
-	key_tag = 0;
-}
-
-void naomi_m2_board::static_set_tags(device_t &device, const char *_key_tag)
-{
-	naomi_m2_board &dev = downcast<naomi_m2_board &>(device);
-	dev.key_tag = _key_tag;
 }
 
 void naomi_m2_board::device_start()
@@ -134,13 +127,6 @@ void naomi_m2_board::device_reset()
 	memset(ram, 0, RAM_SIZE);
 
 	rom_cur_address = 0;
-
-#if USE_315_5881_HELPER
-	m_cryptdevice->set_key(get_315_5881_key(machine()));
-#else
-	const UINT8 *key_data = memregion(key_tag)->base();
-	m_cryptdevice->set_key((key_data[0] << 24) | (key_data[1] << 16) | (key_data[2] << 8) | key_data[3]);
-#endif
 }
 
 void naomi_m2_board::board_setup_address(UINT32 address, bool is_dma)

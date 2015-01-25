@@ -45,6 +45,14 @@ void sega_315_5881_crypt_device::device_start()
 	save_item(NAME(line_buffer_pos));
 	save_item(NAME(line_buffer_size));
 
+	astring skey = parameter("key");
+	if(skey)
+		key = strtoll(skey.cstr(), 0, 16);
+	else
+	{
+		logerror("%s: Warning: key not provided\n", tag());
+		key = 0;
+	}
 }
 
 void sega_315_5881_crypt_device::device_reset()
@@ -109,12 +117,6 @@ void sega_315_5881_crypt_device::set_addr_high(UINT16 data)
 void sega_315_5881_crypt_device::set_subkey(UINT16 data)
 {
 	subkey = data;
-	enc_ready = false;
-}
-
-void sega_315_5881_crypt_device::set_key(UINT32 data)
-{
-	key = data;
 	enc_ready = false;
 }
 

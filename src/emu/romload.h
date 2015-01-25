@@ -39,6 +39,7 @@ enum
 	ROMENTRYTYPE_IGNORE,        /* this entry continues loading the previous ROM but throws the data away */
 	ROMENTRYTYPE_SYSTEM_BIOS,   /* this entry specifies a bios */
 	ROMENTRYTYPE_DEFAULT_BIOS,  /* this entry specifies a default bios */
+	ROMENTRYTYPE_PARAMETER,     /* this entry specifies a per-game parameter */
 	ROMENTRYTYPE_COUNT
 };
 
@@ -152,7 +153,8 @@ struct rom_entry
 #define ROMENTRY_ISIGNORE(r)        (ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_IGNORE)
 #define ROMENTRY_ISSYSTEM_BIOS(r)   (ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_SYSTEM_BIOS)
 #define ROMENTRY_ISDEFAULT_BIOS(r)  (ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_DEFAULT_BIOS)
-#define ROMENTRY_ISREGIONEND(r)     (ROMENTRY_ISREGION(r) || ROMENTRY_ISEND(r))
+#define ROMENTRY_ISPARAMETER(r)     (ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_PARAMETER)
+#define ROMENTRY_ISREGIONEND(r)     (ROMENTRY_ISREGION(r) || ROMENTRY_ISPARAMETER(r) || ROMENTRY_ISEND(r))
 
 /* ----- per-region macros ----- */
 #define ROMREGION_GETTAG(r)         ((r)->_name)
@@ -243,6 +245,9 @@ struct rom_entry
 #define ROM_DEFAULT_BIOS(name)                      { name, NULL, 0, 0, ROMENTRYTYPE_DEFAULT_BIOS },
 
 
+/* ----- game parameter macro ----- */
+#define ROM_PARAMETER(tag, value)                   { tag, value, 0, 0, ROMENTRYTYPE_PARAMETER },
+
 /* ----- disk loading macros ----- */
 #define DISK_REGION(tag)                            ROM_REGION(1, tag, ROMREGION_DATATYPEDISK)
 #define DISK_IMAGE(name,idx,hash)                   ROMX_LOAD(name, idx, 0, hash, DISK_READWRITE)
@@ -277,7 +282,7 @@ file_error common_process_file(emu_options &options, const char *location, bool 
 /* ----- ROM iteration ----- */
 
 /* return pointer to the first ROM region within a source */
-const rom_entry *rom_first_region(const device_t &romp);
+const rom_entry *rom_first_region(const device_t &device);
 
 /* return pointer to the next ROM region within a source */
 const rom_entry *rom_next_region(const rom_entry *romp);
@@ -294,6 +299,17 @@ UINT32 rom_file_size(const rom_entry *romp);
 /* return the appropriate name for a rom region */
 astring &rom_region_name(astring &result, const device_t &device, const rom_entry *romp);
 
+/* return pointer to the first per-game parameter */
+const rom_entry *rom_first_parameter(const device_t &device);
+
+/* return pointer to the next per-game parameter */
+const rom_entry *rom_next_parameter(const rom_entry *romp);
+
+/* return the appropriate name for a per-game parameter */
+astring &rom_parameter_name(astring &result, const device_t &device, const rom_entry *romp);
+
+/* return the value for a per-game parameter */
+astring rom_parameter_value(const rom_entry *romp);
 
 
 /* ----- disk handling ----- */

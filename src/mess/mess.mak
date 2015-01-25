@@ -796,6 +796,7 @@ DRVLIBS += \
 	$(MESSOBJ)/siemens.a \
 	$(MESSOBJ)/sinclair.a \
 	$(MESSOBJ)/skeleton.a \
+	$(MESSOBJ)/slicer.a \
 	$(MESSOBJ)/snk.a \
 	$(MESSOBJ)/sony.a \
 	$(MESSOBJ)/sord.a \
@@ -1647,6 +1648,9 @@ $(MESSOBJ)/sinclair.a:          \
 
 $(MESSOBJ)/siemens.a:           \
 	$(MESS_DRIVERS)/pcd.o       \
+
+$(MESSOBJ)/slicer.a:           \
+	$(MESS_DRIVERS)/slicer.o   \
 
 $(MESSOBJ)/snk.a:               \
 	$(MESS_DRIVERS)/ng_aes.o    \

@@ -3437,6 +3437,9 @@ ROM_START( vs298 )  /* Step 2.0, Sega ID# 833-13346, ROM board ID# 834-13347 */
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
 	ROM_FILL( 0x000000, 0x80000, 0 )
+
+	//             ????     317-0237-COM   Model 3
+	ROM_PARAMETER( ":315_5881:key", "09234e96" )
 ROM_END
 
 ROM_START( vs29815 )    /* Step 1.5, ROM board ID# 834-13495 VS2 VER98 STEP 1.5 */
@@ -3587,6 +3590,9 @@ ROM_START( vs2v991 )    /* Step 2.0 */
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
 	ROM_FILL( 0x000000, 0x80000, 0 )
+
+	//             ????     317-0245-COM   Model 3
+	ROM_PARAMETER( ":315_5881:key", "09222ac8" )
 ROM_END
 
 ROM_START( vs299b ) /* Step 2.0 */
@@ -3662,6 +3668,9 @@ ROM_START( vs299b ) /* Step 2.0 */
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
 	ROM_FILL( 0x000000, 0x80000, 0 )
+
+	//             ????     317-0245-COM   Model 3
+	ROM_PARAMETER( ":315_5881:key", "09222ac8" )
 ROM_END
 
 ROM_START( vs299a ) /* Step 2.0 */
@@ -3737,6 +3746,9 @@ ROM_START( vs299a ) /* Step 2.0 */
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
 	ROM_FILL( 0x000000, 0x80000, 0 )
+
+	//             ????     317-0245-COM   Model 3
+	ROM_PARAMETER( ":315_5881:key", "09222ac8" )
 ROM_END
 
 ROM_START( vs299 )  /* Step 2.0 */
@@ -3812,6 +3824,9 @@ ROM_START( vs299 )  /* Step 2.0 */
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
 	ROM_FILL( 0x000000, 0x80000, 0 )
+
+	//             ????     317-0245-COM   Model 3
+	ROM_PARAMETER( ":315_5881:key", "09222ac8" )
 ROM_END
 
 ROM_START( von2 )   /* Step 2.0 */
@@ -3888,6 +3903,9 @@ ROM_START( von2 )   /* Step 2.0 */
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
 	ROM_FILL( 0x000000, 0x80000, 0 )
+
+	//             ????     317-0234-COM   Model 3
+	ROM_PARAMETER( ":315_5881:key", "092a0e97" )
 ROM_END
 
 ROM_START( von254g )    /* Step 2.0, Sega game ID# is 833-13789 */
@@ -3964,6 +3982,9 @@ ROM_START( von254g )    /* Step 2.0, Sega game ID# is 833-13789 */
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
 	ROM_FILL( 0x000000, 0x80000, 0 )
+
+	//             ????     317-0234-COM   Model 3
+	ROM_PARAMETER( ":315_5881:key", "092a0e97" )
 ROM_END
 
 ROM_START( skichamp )   /* Step 2.0 */
@@ -4108,6 +4129,9 @@ ROM_START( swtrilgy )   /* Step 2.1, Sega game ID# is 833-13586, ROM board ID# 8
 
 	ROM_REGION( 0x10000, "ffcpu", 0 )   /* force feedback controller prg */
 	ROM_LOAD( "epr21119.ic8",  0x00000, 0x10000, CRC(65082b14) SHA1(6c3c192dd6ef3780c6202dd63fc6086328928818) )
+
+	//             ????     317-0241-COM   Model 3
+	ROM_PARAMETER( ":315_5881:key", "11272a01" )
 ROM_END
 
 ROM_START( swtrilgya )  /* Step 2.1, Sega game ID# is 833-13586, ROM board ID# 834-13587 STAR WARS TRILOGY, Security board ID# 837-13588-COM */
@@ -4177,6 +4201,9 @@ ROM_START( swtrilgya )  /* Step 2.1, Sega game ID# is 833-13586, ROM board ID# 8
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
 	ROM_FILL( 0x000000, 0x80000, 0 )
+
+	//             ????     317-0241-COM   Model 3
+	ROM_PARAMETER( ":315_5881:key", "11272a01" )
 ROM_END
 
 ROM_START( dirtdvls )   /* Step 2.1, Sega game ID# is 833-13427, ROM board ID# 834-13528 DRT */
@@ -4238,6 +4265,9 @@ ROM_START( dirtdvls )   /* Step 2.1, Sega game ID# is 833-13427, ROM board ID# 8
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
 	ROM_FILL( 0x000000, 0x80000, 0 )
+
+	//             ????     317-0238-COM   Model 3
+	ROM_PARAMETER( ":315_5881:key", "09290f17" )
 ROM_END
 
 ROM_START( dirtdvlsa )  /* Step 2.1 */
@@ -4299,6 +4329,9 @@ ROM_START( dirtdvlsa )  /* Step 2.1 */
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
 	ROM_FILL( 0x000000, 0x80000, 0 )
+
+	//             ????     317-0238-COM   Model 3
+	ROM_PARAMETER( ":315_5881:key", "09290f17" )
 ROM_END
 
 ROM_START( daytona2 )   /* Step 2.1, ROM board ID# 834-13428 DAYTONA USA2, Security board ID# 837-13507-COM */
@@ -4379,6 +4412,9 @@ ROM_START( daytona2 )   /* Step 2.1, ROM board ID# 834-13428 DAYTONA USA2, Secur
 
 	ROM_REGION( 0x10000, "drivebd", 0 ) /* drive board ROM */
 	ROM_LOAD( "epr-20985.bin", 0x000000, 0x010000, CRC(b139481d) SHA1(05fca7db7c8b084c53bd157ba3e8296f1a961a99) )
+
+	//             ????     317-0239-COM   Model 3
+	ROM_PARAMETER( ":315_5881:key", "09250e16" )
 ROM_END
 
 ROM_START( dayto2pe )   /* Step 2.1, Sega game ID# is 833-13610 DAYTONA USA2 SP, ROM board ID# 834-13609 DAYTONA USA2 SP, Security board ID# 837-13645-COM */
@@ -4459,6 +4495,9 @@ ROM_START( dayto2pe )   /* Step 2.1, Sega game ID# is 833-13610 DAYTONA USA2 SP,
 
 	ROM_REGION( 0x10000, "drivebd", 0 ) /* drive board ROM */
 	ROM_LOAD( "epr-20985.bin", 0x000000, 0x010000, CRC(b139481d) SHA1(05fca7db7c8b084c53bd157ba3e8296f1a961a99) )
+
+	//             ????     317-5045-COM   Model 3
+	ROM_PARAMETER( ":315_5881:key", "0" ) // unknown
 ROM_END
 
 ROM_START( srally2 )    /* Step 2.0, Sega game ID# is 833-13373, ROM board ID# 834-13374 SRT TWIN */
@@ -4811,6 +4850,9 @@ ROM_START( fvipers2 )   /* Step 2.0 */
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
 	ROM_FILL( 0x000000, 0x80000, 0 )
+
+	//             ????     317-0235-COM   Model 3
+	ROM_PARAMETER( ":315_5881:key", "09260e96" )
 ROM_END
 
 ROM_START( spikeout )   /* Step 2.1 */
@@ -4888,6 +4930,9 @@ ROM_START( spikeout )   /* Step 2.1 */
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
 	ROM_FILL( 0x000000, 0x80000, 0 )
+
+	//             ????     317-0240-COM   Model 3
+	ROM_PARAMETER( ":315_5881:key", "092f2b04" )
 ROM_END
 
 ROM_START( spikeofe )   /* Step 2.1, Sega game ID# is 833-13746, ROM board ID# 834-13747 SPK F/E, Security board ID# 837-13726-COM */
@@ -4965,6 +5010,9 @@ ROM_START( spikeofe )   /* Step 2.1, Sega game ID# is 833-13746, ROM board ID# 8
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
 	ROM_FILL( 0x000000, 0x80000, 0 )
+
+	//             ????     317-0247-COM   Model 3
+	ROM_PARAMETER( ":315_5881:key", "09236fc8" )
 ROM_END
 
 ROM_START( eca )    /* Step 2.1, ROM board ID# 834-13946-01 ECA */
@@ -5033,6 +5081,9 @@ ROM_START( eca )    /* Step 2.1, ROM board ID# 834-13946-01 ECA */
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
 	ROM_FILL( 0x000000, 0x80000, 0 )
+
+	//             ????     317-0265-COM   Model 3
+	ROM_PARAMETER( ":315_5881:key", "0923aa91" )
 ROM_END
 
 ROM_START( ecax )   /* Step 2.1 */
@@ -5101,6 +5152,9 @@ ROM_START( ecax )   /* Step 2.1 */
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
 	ROM_FILL( 0x000000, 0x80000, 0 )
+
+	//             ????     317-0265-COM   Model 3
+	ROM_PARAMETER( ":315_5881:key", "0923aa91" )
 ROM_END
 
 ROM_START( ecap )   /* Step 2.1 - Proto or Location test - No security dongle */
@@ -5172,6 +5226,9 @@ ROM_START( ecap )   /* Step 2.1 - Proto or Location test - No security dongle */
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
 	ROM_FILL( 0x000000, 0x80000, 0 )
+
+	//             ????     317-0265-COM   Model 3
+	ROM_PARAMETER( ":315_5881:key", "0923aa91" )
 ROM_END
 
 ROM_START( magtruck )   /* Step 2.1, Sega game ID# is 833-13601-01 (Export), ROM board ID# 834-13600-01 RCS EXP (Export), Security board ID# 837-13599-COM */
@@ -5228,6 +5285,9 @@ ROM_START( magtruck )   /* Step 2.1, Sega game ID# is 833-13601-01 (Export), ROM
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
 	ROM_FILL( 0x000000, 0x80000, 0 )
+
+	//             ????     317-0243-COM   Model 3
+	ROM_PARAMETER( ":315_5881:key", "09266e45" )
 ROM_END
 
 ROM_START( oceanhun )   /* Step 2.0, Sega game ID# is 833-13571, ROM board ID# 834-13572 THE OCEAN HUNTER, 317-0242-COM security chip (837-13576-COM security board) */
@@ -5296,6 +5356,9 @@ ROM_START( oceanhun )   /* Step 2.0, Sega game ID# is 833-13571, ROM board ID# 8
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
 	ROM_FILL( 0x000000, 0x80000, 0 )
+
+	//             ????     317-0242-COM   Model 3
+	ROM_PARAMETER( ":315_5881:key", "092b6a01" )
 ROM_END
 
 ROM_START( lamachin )   /* Step 2.0, Sega game ID# is 833-13664, ROM board ID# 834-13665 L.A.MACHINEGUNS, 317-0244-COM security chip (837-13666-COM security board) */
@@ -5365,6 +5428,9 @@ ROM_START( lamachin )   /* Step 2.0, Sega game ID# is 833-13664, ROM board ID# 8
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
 	ROM_FILL( 0x000000, 0x80000, 0 )
+
+	//             ????     317-0244-COM   Model 3
+	ROM_PARAMETER( ":315_5881:key", "092a2bc5" )
 ROM_END
 
 /* Model 3 sound board emulation */
@@ -5666,13 +5732,12 @@ static void interleave_vroms(running_machine &machine)
 
 DRIVER_INIT_MEMBER(model3_state, genprot)
 {
-	INT64 key = get_315_5881_key(machine());
+	astring key = parameter(":315_5881:key");
 
 	m_maincpu->space(AS_PROGRAM).install_ram(0xf0180000, 0xf019ffff, 0, 0x0e000000);
 
-	if (key != -1)
+	if (key)
 	{
-		m_cryptdevice->set_key(key);
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf01a0000, 0xf01a003f, 0, 0x0e000000, read64_delegate(FUNC(model3_state::model3_5881prot_r), this), write64_delegate(FUNC(model3_state::model3_5881prot_w), this) );                    
 	}
 	else
