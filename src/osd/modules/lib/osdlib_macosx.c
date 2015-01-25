@@ -9,9 +9,11 @@
 //
 //============================================================
 
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/mman.h>
 #include <sys/types.h>
 #include <signal.h>
-#include <unistd.h>
 
 #include <mach/mach.h>
 #include <mach/mach_time.h>
