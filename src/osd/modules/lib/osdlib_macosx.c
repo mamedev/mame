@@ -1,4 +1,13 @@
-// This file is a placeholder.
+//============================================================
+//
+//  sdlos_*.c - OS specific low level code
+//
+//  Copyright (c) 1996-2010, Nicola Salmoria and the MAME Team.
+//  Visit http://mamedev.org for licensing and usage restrictions.
+//
+//  SDLMAME by Olivier Galibert and R. Belmont
+//
+//============================================================
 
 #include <sys/types.h>
 #include <signal.h>
@@ -16,6 +25,24 @@
 // FIXME: We shouldn't use SDL functions in here
 
 #include "sdlinc.h"
+
+//============================================================
+//  osd_getenv
+//============================================================
+
+char *osd_getenv(const char *name)
+{
+    return getenv(name);
+}
+
+//============================================================
+//  osd_setenv
+//============================================================
+
+int osd_setenv(const char *name, const char *value, int overwrite)
+{
+    return setenv(name, value, overwrite);
+}
 
 //============================================================
 //  osd_process_kill
@@ -91,23 +118,53 @@ void osd_free(void *ptr)
 #endif
 }
 
+
 //============================================================
-//  osd_getenv
+//  osd_alloc_executable
+//
+//  allocates "size" bytes of executable memory.  this must take
+//  things like NX support into account.
 //============================================================
 
-char *osd_getenv(const char *name)
+void *osd_alloc_executable(size_t size)
 {
-    return getenv(name);
+#if defined(SDLMAME_BSD) || defined(SDLMAME_MACOSX)
+    return (void *)mmap(0, size, PROT_EXEC|PROT_READ|PROT_WRITE, MAP_ANON|MAP_SHARED, -1, 0);
+#elif defined(SDLMAME_UNIX)
+    return (void *)mmap(0, size, PROT_EXEC|PROT_READ|PROT_WRITE, MAP_ANON|MAP_SHARED, 0, 0);
+#endif
 }
 
 //============================================================
-//  osd_setenv
+//  osd_free_executable
+//
+//  frees memory allocated with osd_alloc_executable
 //============================================================
 
-int osd_setenv(const char *name, const char *value, int overwrite)
+void osd_free_executable(void *ptr, size_t size)
 {
-    return setenv(name, value, overwrite);
+#ifdef SDLMAME_SOLARIS
+    munmap((char *)ptr, size);
+#else
+    munmap(ptr, size);
+#endif
 }
+
+//============================================================
+//  osd_break_into_debugger
+//============================================================
+
+void osd_break_into_debugger(const char *message)
+{
+    #ifdef MAME_DEBUG
+    printf("MAME exception: %s\n", message);
+    printf("Attempting to fall into debugger\n");
+    kill(getpid(), SIGTRAP);
+    #else
+    printf("Ignoring MAME exception: %s\n", message);
+    #endif
+}
+
 
 //============================================================
 //  PROTOTYPES
@@ -177,7 +234,7 @@ static osd_ticks_t mach_cycle_counter(void)
 }
 
 //============================================================
-//   osd_cycles
+//   osd_ticks
 //============================================================
 
 osd_ticks_t osd_ticks(void)
@@ -225,4 +282,3 @@ void osd_sleep(osd_ticks_t duration)
         usleep(msec*1000);
     }
 }
-

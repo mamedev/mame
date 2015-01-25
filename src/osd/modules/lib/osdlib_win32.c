@@ -1,6 +1,11 @@
 //============================================================
 //
-//  winos.c - Win32 OS specific low level code
+//  sdlos_*.c - OS specific low level code
+//
+//  Copyright (c) 1996-2010, Nicola Salmoria and the MAME Team.
+//  Visit http://mamedev.org for licensing and usage restrictions.
+//
+//  SDLMAME by Olivier Galibert and R. Belmont
 //
 //============================================================
 
@@ -18,6 +23,8 @@
 #include "osdcomm.h"
 #include "osdcore.h"
 
+#include "winutf8.h"
+
 //============================================================
 //  MACROS
 //============================================================
@@ -28,20 +35,15 @@
 // align allocations to start or end of the page?
 #define GUARD_ALIGN_START   0
 
+
 //============================================================
-//  osd_num_processors
+//  GLOBAL VARIABLES
 //============================================================
 
-int osd_get_num_processors(void)
-{
-    SYSTEM_INFO info;
+#ifdef OSD_WINDOWS
+void (*s_debugger_stack_crawler)() = NULL;
+#endif
 
-    // otherwise, fetch the info from the system
-    GetSystemInfo(&info);
-
-    // max out at 4 for now since scaling above that seems to do poorly
-    return MIN(info.dwNumberOfProcessors, 4);
-}
 
 //============================================================
 //  osd_getenv
@@ -51,6 +53,7 @@ char *osd_getenv(const char *name)
 {
     return getenv(name);
 }
+
 
 //============================================================
 //  osd_setenv
@@ -84,6 +87,21 @@ int osd_setenv(const char *name, const char *value, int overwrite)
 void osd_process_kill(void)
 {
     TerminateProcess(GetCurrentProcess(), -1);
+}
+
+//============================================================
+//  osd_num_processors
+//============================================================
+
+int osd_get_num_processors(void)
+{
+    SYSTEM_INFO info;
+
+    // otherwise, fetch the info from the system
+    GetSystemInfo(&info);
+
+    // max out at 4 for now since scaling above that seems to do poorly
+    return MIN(info.dwNumberOfProcessors, 4);
 }
 
 //============================================================
@@ -169,6 +187,54 @@ void osd_free(void *ptr)
 
 
 //============================================================
+//  osd_alloc_executable
+//
+//  allocates "size" bytes of executable memory.  this must take
+//  things like NX support into account.
+//============================================================
+
+void *osd_alloc_executable(size_t size)
+{
+    return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+}
+
+
+//============================================================
+//  osd_free_executable
+//
+//  frees memory allocated with osd_alloc_executable
+//============================================================
+
+void osd_free_executable(void *ptr, size_t size)
+{
+    VirtualFree(ptr, 0, MEM_RELEASE);
+}
+
+
+//============================================================
+//  osd_break_into_debugger
+//============================================================
+
+void osd_break_into_debugger(const char *message)
+{
+#ifdef OSD_WINDOWS
+    if (IsDebuggerPresent())
+    {
+        win_output_debug_string_utf8(message);
+        DebugBreak();
+    }
+    else if (s_debugger_stack_crawler != NULL)
+        (*s_debugger_stack_crawler)();
+#else
+    if (IsDebuggerPresent())
+    {
+        OutputDebugStringA(message);
+        DebugBreak();
+    }
+#endif
+}
+
+//============================================================
 //  GLOBAL VARIABLES
 //============================================================
 
@@ -227,7 +293,6 @@ osd_ticks_t osd_ticks_per_second(void)
         osd_ticks();
     return ticks_per_second;
 }
-
 
 //============================================================
 //  osd_sleep

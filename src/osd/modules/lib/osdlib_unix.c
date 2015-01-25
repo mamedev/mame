@@ -1,3 +1,13 @@
+//============================================================
+//
+//  sdlos_*.c - OS specific low level code
+//
+//  Copyright (c) 1996-2010, Nicola Salmoria and the MAME Team.
+//  Visit http://mamedev.org for licensing and usage restrictions.
+//
+//  SDLMAME by Olivier Galibert and R. Belmont
+//
+//============================================================
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -33,6 +43,15 @@ int osd_setenv(const char *name, const char *value, int overwrite)
 }
 
 //============================================================
+//  osd_process_kill
+//============================================================
+
+void osd_process_kill(void)
+{
+    kill(getpid(), SIGKILL);
+}
+
+//============================================================
 //  osd_num_processors
 //============================================================
 
@@ -44,15 +63,6 @@ int osd_get_num_processors(void)
     processors = sysconf(_SC_NPROCESSORS_ONLN);
 #endif
     return processors;
-}
-
-//============================================================
-//  osd_process_kill
-//============================================================
-
-void osd_process_kill(void)
-{
-    kill(getpid(), SIGKILL);
 }
 
 //============================================================
@@ -97,7 +107,54 @@ void osd_free(void *ptr)
 }
 
 //============================================================
-//   osd_cycles
+//  osd_alloc_executable
+//
+//  allocates "size" bytes of executable memory.  this must take
+//  things like NX support into account.
+//============================================================
+
+void *osd_alloc_executable(size_t size)
+{
+#if defined(SDLMAME_BSD) || defined(SDLMAME_MACOSX)
+    return (void *)mmap(0, size, PROT_EXEC|PROT_READ|PROT_WRITE, MAP_ANON|MAP_SHARED, -1, 0);
+#elif defined(SDLMAME_UNIX)
+    return (void *)mmap(0, size, PROT_EXEC|PROT_READ|PROT_WRITE, MAP_ANON|MAP_SHARED, 0, 0);
+#endif
+}
+
+//============================================================
+//  osd_free_executable
+//
+//  frees memory allocated with osd_alloc_executable
+//============================================================
+
+void osd_free_executable(void *ptr, size_t size)
+{
+#ifdef SDLMAME_SOLARIS
+    munmap((char *)ptr, size);
+#else
+    munmap(ptr, size);
+#endif
+}
+
+//============================================================
+//  osd_break_into_debugger
+//============================================================
+
+void osd_break_into_debugger(const char *message)
+{
+    #ifdef MAME_DEBUG
+    printf("MAME exception: %s\n", message);
+    printf("Attempting to fall into debugger\n");
+    kill(getpid(), SIGTRAP);
+    #else
+    printf("Ignoring MAME exception: %s\n", message);
+    #endif
+}
+
+
+//============================================================
+//   osd_ticks
 //============================================================
 
 osd_ticks_t osd_ticks(void)
@@ -114,6 +171,11 @@ osd_ticks_t osd_ticks(void)
         return (tp.tv_sec - start_sec) * (osd_ticks_t) 1000000 + tp.tv_usec;
 #endif
 }
+
+
+//============================================================
+//  osd_ticks_per_second
+//============================================================
 
 osd_ticks_t osd_ticks_per_second(void)
 {

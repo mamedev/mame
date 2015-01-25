@@ -411,7 +411,6 @@ OSDCOREOBJS = \
 	$(SDLOBJ)/sdlfile.o     \
 	$(SDLOBJ)/sdlptty_$(BASE_TARGETOS).o    \
 	$(SDLOBJ)/sdlsocket.o   \
-	$(SDLOBJ)/sdlmisc_$(BASE_TARGETOS).o    \
 	$(SDLOBJ)/sdlos_$(SDLOS_TARGETOS).o \
 	$(OSDOBJ)/modules/lib/osdlib_$(SDLOS_TARGETOS).o \
 	$(OSDOBJ)/modules/sync/sync_$(SYNC_IMPLEMENTATION).o \
