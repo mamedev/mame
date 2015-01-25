@@ -11,8 +11,6 @@
 
 #include "emu.h"
 #include "osdepend.h"
-#include "modules/debugger/none.h"
-#include "modules/debugger/debugint.h"
 #include "modules/lib/osdobj_common.h"
 
 extern bool g_print_verbose;
@@ -123,6 +121,14 @@ void osd_common_t::register_options()
     REGISTER_MODULE(m_mod_man, SOUND_SDL);
     REGISTER_MODULE(m_mod_man, SOUND_NONE);
 
+#ifdef SDLMAME_MACOSX
+    REGISTER_MODULE(m_mod_man, DEBUG_OSX);
+#endif
+    REGISTER_MODULE(m_mod_man, DEBUG_WINDOWS);
+    REGISTER_MODULE(m_mod_man, DEBUG_QT);
+    REGISTER_MODULE(m_mod_man, DEBUG_INTERNAL);
+    REGISTER_MODULE(m_mod_man, DEBUG_NONE);
+
     // after initialization we know which modules are supported
 
     const char *names[20];
@@ -139,16 +145,17 @@ void osd_common_t::register_options()
         dnames.append(names[i]);
     update_option(OSD_SOUND_PROVIDER, dnames);
 
+    // Register debugger options and update options
+    m_mod_man.get_module_names(OSD_DEBUG_PROVIDER, 20, &num, names);
+    dnames.reset();
+    for (int i = 0; i < num; i++)
+        dnames.append(names[i]);
+    update_option(OSD_DEBUG_PROVIDER, dnames);
+
     // Register video options and update options
     video_options_add("none", NULL);
     video_register();
     update_option(OSDOPTION_VIDEO, m_video_names);
-
-    // Register debugger options and update options
-    debugger_options_add("none", OSD_DEBUGGER_NONE);
-    debugger_options_add("internal", OSD_DEBUGGER_INTERNAL);
-    debugger_register();
-    update_option(OSDOPTION_DEBUGGER, m_debugger_names);
 }
 
 void osd_common_t::update_option(const char * key, dynamic_array<const char *> &values)
@@ -180,10 +187,6 @@ osd_common_t::~osd_common_t()
 	for(int i= 0; i < m_video_names.count(); ++i)
 		osd_free(const_cast<char*>(m_video_names[i]));
 	//m_video_options,reset();
-
-	for(int i= 0; i < m_debugger_names.count(); ++i)
-		osd_free(const_cast<char*>(m_debugger_names[i]));
-	m_debugger_options.reset();
 }
 
 
@@ -264,14 +267,6 @@ void osd_common_t::init_debugger()
 	// is active. This gives any OSD debugger interface a chance to
 	// create all of its structures.
 	//
-	osd_debugger_type debugger = m_debugger_options.find(options().debugger());
-	if (debugger==NULL)
-	{
-		osd_printf_warning("debugger_init: option %s not found switching to auto\n",options().debugger());
-		debugger = m_debugger_options.find("auto");
-	}
-	m_debugger = (*debugger)();
-
 	m_debugger->init_debugger(machine());
 }
 
@@ -297,15 +292,6 @@ void osd_common_t::debugger_update()
 	if (m_debugger) m_debugger->debugger_update();
 }
 
-void osd_common_t::debugger_exit()
-{
-	if (m_debugger)
-	{
-		m_debugger->debugger_exit();
-		global_free(m_debugger);
-		m_debugger = NULL;
-	}
-}
 
 //-------------------------------------------------
 //  update_audio_stream - update the stereo audio
@@ -457,6 +443,8 @@ void osd_common_t::init_subsystems()
     m_sound->m_sample_rate = options().sample_rate();
     m_sound->m_audio_latency = options().audio_latency();
 
+    m_debugger = select_module_options<debug_module *>(options(), OSD_DEBUG_PROVIDER);
+
     m_mod_man.init();
 
 }
@@ -477,10 +465,6 @@ bool osd_common_t::no_sound()
 }
 
 void osd_common_t::video_register()
-{
-}
-
-void osd_common_t::debugger_register()
 {
 }
 
@@ -516,7 +500,6 @@ void osd_common_t::exit_subsystems()
 	network_exit();
 	#endif
 	midi_exit();
-	debugger_exit();
 }
 
 void osd_common_t::video_exit()
@@ -550,12 +533,6 @@ void osd_common_t::video_options_add(const char *name, void *type)
 {
 	//m_video_options.add(name, type, false);
 	m_video_names.append(core_strdup(name));
-}
-
-void osd_common_t::debugger_options_add(const char *name, osd_debugger_type type)
-{
-	m_debugger_options.add(name, type, false);
-	m_debugger_names.append(core_strdup(name));
 }
 
 bool osd_common_t::midi_init()

@@ -39,13 +39,7 @@
 #include "debugger.h"
 #include "winfile.h"
 
-#include "modules/debugger/debugwin.h"
-
-#if (USE_QTDEBUG)
-#include "modules/debugger/debugqt.h"
-#endif
 #define DEBUG_SLOW_LOCKS    0
-
 
 //**************************************************************************
 //  MACROS
@@ -533,19 +527,6 @@ void windows_osd_interface::video_register()
 	video_options_add("ddraw", NULL);
 	video_options_add("d3d", NULL);
 	//video_options_add("auto", NULL); // making d3d video default one
-}
-
-//============================================================
-//  debugger_register
-//============================================================
-
-void windows_osd_interface::debugger_register()
-{
-	debugger_options_add("windows", OSD_DEBUGGER_WINDOWS);
-#if (USE_QTDEBUG)
-	debugger_options_add("qt", OSD_DEBUGGER_QT);
-#endif
-	debugger_options_add("auto", OSD_DEBUGGER_WINDOWS); // making windows debugger default one
 }
 
 //============================================================

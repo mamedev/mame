@@ -152,9 +152,6 @@ EMUOBJS = \
 	$(EMUOBJ)/profiler.o \
 	$(EMUOBJ)/webengine.o \
 	$(OSDOBJ)/osdnet.o \
-	$(OSDOBJ)/modules/sound/none.o \
-	$(OSDOBJ)/modules/debugger/none.o \
-	$(OSDOBJ)/modules/debugger/debugint.o \
 
 EMUSOUNDOBJS = \
 	$(EMUOBJ)/sound/filter.o \

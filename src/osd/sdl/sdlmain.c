@@ -57,13 +57,6 @@
 #include "osdsdl.h"
 #include "modules/lib/osdlib.h"
 
-#if !defined(NO_DEBUGGER)
-#include "modules/debugger/debugqt.h"
-#endif
-#include "modules/debugger/none.h"
-#if defined(SDLMAME_MACOSX)
-#include "modules/debugger/debugosx.h"
-#endif
 // we override SDL's normal startup on Win32
 // please see sdlprefix.h as well
 
@@ -528,25 +521,6 @@ void sdl_osd_interface::video_register()
 	video_options_add("soft", NULL);
 	video_options_add("opengl", NULL);
 	//video_options_add("auto", NULL); // making d3d video default one
-}
-
-//============================================================
-//  debugger_register
-//============================================================
-
-void sdl_osd_interface::debugger_register()
-{
-#if defined(NO_DEBUGGER)
-	debugger_options_add("auto", OSD_DEBUGGER_NONE);
-#else
-#if defined(SDLMAME_MACOSX)
-	debugger_options_add("osx", OSD_DEBUGGER_OSX);
-	debugger_options_add("auto", OSD_DEBUGGER_OSX); // making OSX debugger default one
-#else
-	debugger_options_add("qt", OSD_DEBUGGER_QT);
-	debugger_options_add("auto", OSD_DEBUGGER_QT); // making QT debugger default one
-#endif // SDLMAME_MACOSX
-#endif // NO_DEBUGGER
 }
 
 //============================================================

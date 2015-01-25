@@ -26,47 +26,6 @@
 //#define POINT_SIZE 144.0
 #define DEFAULT_FONT_HEIGHT (200)
 
-#if 0
-//============================================================
-//  wstring_from_utf8
-//============================================================
-
-// FIXME: defined in multiple locations ... FIXME
-
-WCHAR *wstring_from_utf8(const char *utf8string)
-{
-    int char_count;
-    WCHAR *result;
-
-    // convert MAME string (UTF-8) to UTF-16
-    char_count = MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, NULL, 0);
-    result = (WCHAR *)osd_malloc_array(char_count * sizeof(*result));
-    if (result != NULL)
-        MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, result, char_count);
-
-    return result;
-}
-
-
-//============================================================
-//  utf8_from_wstring
-//============================================================
-
-char *utf8_from_wstring(const WCHAR *wstring)
-{
-    int char_count;
-    char *result;
-
-    // convert UTF-16 to MAME string (UTF-8)
-    char_count = WideCharToMultiByte(CP_UTF8, 0, wstring, -1, NULL, 0, NULL, NULL);
-    result = (char *)osd_malloc_array(char_count * sizeof(*result));
-    if (result != NULL)
-        WideCharToMultiByte(CP_UTF8, 0, wstring, -1, result, char_count, NULL, NULL);
-
-    return result;
-}
-#endif
-
 //-------------------------------------------------
 //  font_open - attempt to "open" a handle to the
 //  font with the given name

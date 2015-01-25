@@ -210,6 +210,7 @@ ifeq ($(TARGETOS),linux)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = tc
 SDL_NETWORK = taptun
+#SDL_NETWORK = pcap
 
 ifndef NO_USE_MIDI
 INCPATH += `pkg-config --cflags alsa`
@@ -706,7 +707,6 @@ $(OSDOBJ)/%.moc.c: $(OSDSRC)/%.h
 	$(MOC) $(MOCINCPATH) $(DEFS) $< -o $@
 
 DEBUGOBJS = \
-	$(OSDOBJ)/modules/debugger/debugqt.o \
 	$(OSDOBJ)/modules/debugger/qt/debugqtview.o \
 	$(OSDOBJ)/modules/debugger/qt/debugqtwindow.o \
 	$(OSDOBJ)/modules/debugger/qt/debugqtlogwindow.o \
@@ -725,7 +725,18 @@ DEBUGOBJS = \
 	$(OSDOBJ)/modules/debugger/qt/debugqtbreakpointswindow.moc.o \
 	$(OSDOBJ)/modules/debugger/qt/debugqtdeviceswindow.moc.o \
 	$(OSDOBJ)/modules/debugger/qt/debugqtdeviceinformationwindow.moc.o
+
+DEFS += -DUSE_QTDEBUG=1
+	
+else
+DEFS += -DUSE_QTDEBUG=0
 endif
+
+DEBUGOBJS += \
+	$(OSDOBJ)/modules/debugger/none.o \
+	$(OSDOBJ)/modules/debugger/debugint.o \
+	$(OSDOBJ)/modules/debugger/debugwin.o \
+	$(OSDOBJ)/modules/debugger/debugqt.o \
 
 ifeq ($(NO_DEBUGGER),1)
 DEFS += -DNO_DEBUGGER

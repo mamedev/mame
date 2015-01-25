@@ -105,10 +105,6 @@ private:
     static const options_entry s_option_entries[];
 };
 
-// a osd_sound_type is simply a pointer to its alloc function
-typedef debug_module *(*osd_debugger_type)();
-
-
 // ======================> osd_interface
 
 // description of the currently-running machine
@@ -159,8 +155,6 @@ public:
 
 
     virtual void debugger_update();
-    virtual void debugger_exit();
-    virtual void debugger_register();
 
     virtual void init_subsystems();
 
@@ -184,7 +178,6 @@ public:
     virtual void osd_exit();
 
     virtual void video_options_add(const char *name, void *type);
-    virtual void debugger_options_add(const char *name, osd_debugger_type type);
 
     osd_options &options() { return m_options; }
 
@@ -227,8 +220,6 @@ protected:
 private:
 	//tagmap_t<osd_video_type>  m_video_options;
 	dynamic_array<const char *> m_video_names;
-	tagmap_t<osd_debugger_type>  m_debugger_options;
-	dynamic_array<const char *> m_debugger_names;
 };
 
 

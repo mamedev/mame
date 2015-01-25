@@ -42,14 +42,44 @@
 // MAMEOS headers
 #include "debugosx.h"
 #include "osdsdl.h"
+#include "debug_module.h"
 
+//============================================================
+//  MODULE SUPPORT
+//============================================================
 
+static MAMEDebugConsole *main_console = nil;
+
+class debugger_osx : public osd_module, public debug_module
+{
+public:
+    debugger_osx()
+    : osd_module(OSD_DEBUG_PROVIDER, "osx"), debug_module(),
+      m_machine(NULL)
+    {
+    }
+
+    virtual ~debugger_osx() { }
+
+    virtual int init() { return 0;}
+    virtual void exit() 
+    { 
+    }
+
+    virtual void init_debugger(running_machine &machine);
+    virtual void wait_for_debugger(device_t &device, bool firststop);
+    virtual void debugger_update();
+
+private:
+    running_machine *m_machine;
+};
+
+MODULE_DEFINITION(DEBUG_OSX, debugger_osx)
 
 //============================================================
 //  LOCAL VARIABLES
 //============================================================
 
-static MAMEDebugConsole *main_console = nil;
 
 static BOOL waiting_for_debugger = NO;
 
@@ -66,16 +96,6 @@ static NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification
 static void debugwin_view_update(debug_view &view, void *osdprivate);
 
 static void console_create_window(running_machine &machine);
-
-const osd_debugger_type OSD_DEBUGGER_OSX = &osd_debugger_creator<debugger_osx>;
-
-//-------------------------------------------------
-//  debugger_osx - constructor
-//-------------------------------------------------
-debugger_osx::debugger_osx(const osd_interface &osd)
-	: osd_debugger_interface(osd), m_machine(NULL)
-{
-}
 
 //============================================================
 //  debugger_osx::init_debugger
@@ -127,14 +147,6 @@ void debugger_osx::wait_for_debugger(device_t &device, bool firststop)
 //============================================================
 
 void debugger_osx::debugger_update()
-{
-}
-
-//============================================================
-//  debugger_exit
-//============================================================
-
-void debugger_osx::debugger_exit()
 {
 }
 

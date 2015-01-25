@@ -253,7 +253,6 @@ public:
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist);
 
 	virtual void video_register();
-	virtual void debugger_register();
 
 	virtual bool video_init();
 	virtual bool window_init();
