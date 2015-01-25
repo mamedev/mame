@@ -98,6 +98,10 @@ endif
 ifeq ($(firstword $(filter Haiku,$(UNAME))),Haiku)
 TARGETOS = haiku
 endif
+ifeq ($(firstword $(filter SunOS,$(UNAME))),SunOS)
+TARGETOS = solaris
+SDL_LIBVER = sdl
+endif
 
 ifndef TARGETOS
 $(error Unable to detect TARGETOS from uname -a: $(UNAME))
@@ -113,6 +117,11 @@ PTR64 = 1
 endif
 ifeq ($(firstword $(filter ppc64,$(UNAME))),ppc64)
 PTR64 = 1
+endif
+ifeq ($(TARGETOS), solaris)
+ifeq ($(firstword $(filter amd64,$(shell /usr/bin/isainfo -k))),amd64)
+PTR64 = 1
+endif
 endif
 endif
 

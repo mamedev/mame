@@ -246,9 +246,11 @@ endif
 
 ifeq ($(TARGETOS),solaris)
 BASE_TARGETOS = unix
-DEFS += -DNO_AFFINITY_NP -UHAVE_VSNPRINTF -DNO_vsnprintf
+#DEFS += -DNO_AFFINITY_NP -UHAVE_VSNPRINTF -DNO_vsnprintf
+DEFS += -DNO_AFFINITY_NP
 SYNC_IMPLEMENTATION = tc
 NO_USE_MIDI = 1
+NO_USE_QTDEBUG = 1
 endif
 
 ifeq ($(TARGETOS),haiku)
@@ -606,11 +608,21 @@ else
 LIBS += -lSDL_ttf
 endif
 
+# FIXME: should be dealt with elsewhere
 # libs that Haiku doesn't want but are mandatory on *IX
 ifneq ($(TARGETOS),haiku)
-BASELIBS += -lm -lutil -lpthread
-LIBS += -lm -lutil -lpthread
+BASELIBS += -lm -lpthread
+LIBS += -lm -lpthread
+ifneq ($(TARGETOS),solaris)
+BASELIBS += -lutil
+LIBS += -lutil
+else
+SUPPORTSM32M64 = 1
+BASELIBS += -lsocket -lnsl
+LIBS += -lsocket -lnsl
 endif
+endif
+
 
 endif # not Mac OS X
 

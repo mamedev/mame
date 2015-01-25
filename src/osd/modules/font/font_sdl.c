@@ -6,7 +6,7 @@
 #include "font_module.h"
 #include "modules/osdmodule.h"
 
-#if defined(SDLMAME_UNIX) && (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN))
+#if defined(SDLMAME_UNIX) && (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_SOLARIS)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN))
 
 #if (SDLMAME_SDL2)
 #include <SDL2/SDL_ttf.h>
