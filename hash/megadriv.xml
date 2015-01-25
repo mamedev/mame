@@ -10731,7 +10731,7 @@ but dumps still have to be confirmed.
 	<software name="babyboom">
 		<description>Baby Boom (Prototype, 19940811)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>STI?</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="baby boom (prototype - aug 11, 1994).bin" size="2097152" crc="bd697054" sha1="7baa515001aff4fa93c871189c891e5bd2eaab11" offset="0x000000"/>
@@ -10740,20 +10740,9 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="babyboom1" cloneof="babyboom">
-		<description>Baby Boom (Prototype, 19940603)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="baby boom (prototype - jun 03, 1994).bin" size="2097152" crc="c0d97f6f" sha1="24b5a84fb68b89a5ac4e7a9e85af95880067fc5f" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="babyboom2" cloneof="babyboom">
 		<description>Baby Boom (Prototype, 19940606)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>STI?</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="baby boom (prototype - jun 06, 1994).bin" size="2097152" crc="6e0cf48d" sha1="22c8e6ac65de990a3f30aedf777f7336f7791e66" offset="0x000000"/>
@@ -10761,10 +10750,21 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
+	<software name="babyboom2" cloneof="babyboom">
+		<description>Baby Boom (Prototype, 19940603)</description>
+		<year>199?</year>
+		<publisher>STI?</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="baby boom (prototype - jun 03, 1994).bin" size="2097152" crc="c0d97f6f" sha1="24b5a84fb68b89a5ac4e7a9e85af95880067fc5f" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="babyd">
 		<description>Baby's Day Out (USA, Prototype)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Hi Tech Entertainment</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="baby's day out (usa) (prototype).bin" size="1048576" crc="b2e7cc49" sha1="5cc32a2826b3cc5c581043fe6c481ffb753321dd" offset="0x000000"/>
@@ -10774,8 +10774,8 @@ but dumps still have to be confirmed.
 
 	<software name="babydo" cloneof="babyd">
 		<description>Baby's Day Out (USA, Prototype, Earlier)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Hi Tech Entertainment</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="baby's day out (usa) (prototype) (earlier).bin" size="1048576" crc="459b891c" sha1="99983282e75e1cf01a47d00f0be15e20eaae0907" offset="0x000000"/>
@@ -12086,7 +12086,7 @@ but dumps still have to be confirmed.
 	<software name="chaosen2">
 		<description>The Chaos Engine 2 (Euro, Prototype)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Renegade</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="chaos engine 2, the (euro) (prototype).bin" size="1048576" crc="3fb045c2" sha1="9e2e12e90b60e6ca28af6a5afb213cafe1868a95" offset="0x000000"/>
@@ -12669,10 +12669,11 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
+	<!-- would have been compatible with the unreleased Teleplay Modem -->
 	<software name="combat">
 		<description>Combat Aces (Prototype)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1992?</year>
+		<publisher>Baton Technologies?</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="combat aces (beta).bin" size="524288" crc="84560d5a" sha1="0492bcd5341e768455bd353e786fac74837289af" offset="0x000000"/>
@@ -12877,7 +12878,7 @@ but dumps still have to be confirmed.
 	<software name="congo">
 		<description>Congo (Prototype)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Viacom</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1015094">
 				<rom name="congo (unknown) (prototype).bin" size="1015094" crc="13746716" sha1="976d7610eb80691f50466f5102ccd49cc3a2b9f7" offset="0x000000"/>
@@ -12987,8 +12988,8 @@ but dumps still have to be confirmed.
 
 	<software name="twistedf" cloneof="crueball">
 		<description>Twisted Flipper (USA, Prototype)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1992</year>
+		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="twisted flipper (usa) (beta).bin" size="524288" crc="6dd47554" sha1="a6eac3e1b9df9d138fceeccbe34113015d3a676f" offset="0x000000"/>
@@ -13379,23 +13380,23 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="daviscp2">
-		<description>Davis Cup World Tour Tennis 2 (Prototype 1)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Davis Cup II (USA, Prototype, 19940728)</description>
+		<year>1994</year>
+		<publisher>Tengen? Virgin?</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="davis cup world tour tennis 2 (beta 1).bin" size="2097152" crc="6f4183c0" sha1="3c8527d1a01a4c7ab97b2664046f9c11283e3332" offset="0x000000"/>
+				<rom name="davis cup ii (usa) (prototype).bin" size="2097152" crc="76f2bed8" sha1="5b548c9794a8af0d9fba4d7abfb6ca96a7f01709" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="daviscp2a" cloneof="daviscp2">
-		<description>Davis Cup II (USA, Prototype)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Davis Cup World Tour Tennis 2 (Euro, Prototype, 19940710)</description>
+		<year>1994</year>
+		<publisher>Tengen? Virgin?</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="davis cup ii (usa) (prototype).bin" size="2097152" crc="76f2bed8" sha1="5b548c9794a8af0d9fba4d7abfb6ca96a7f01709" offset="0x000000"/>
+				<rom name="davis cup world tour tennis 2 (beta 1).bin" size="2097152" crc="6f4183c0" sha1="3c8527d1a01a4c7ab97b2664046f9c11283e3332" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13745,7 +13746,7 @@ but dumps still have to be confirmed.
 	<software name="dominus">
 		<description>Dominus (USA, Prototype)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Asciiware</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="786432">
@@ -13839,10 +13840,11 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="dongguri" cloneof="drrobotn">
-		<description>Dong Gu Ri Te Chi Jak Jeon (Kor)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="drrobotnk" cloneof="drrobotn">
+		<description>Dr. Robotnik's Mean Bean Machine (Kor)</description>
+		<year>1993</year>
+		<publisher>Samsung</publisher>
+		<info name="alt_title" value="Dong Gu Ri Te Chi Jak Jeon"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="dong gu ri te chi jak jeon (kor).bin" size="1048576" crc="e32f0b1c" sha1="a698c4eda62032d1f98b3e4f824b6475c2612859" offset="0x000000"/>
@@ -14109,6 +14111,17 @@ but dumps still have to be confirmed.
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="dynamite headdy (prototype - jun 22, 1994).bin" size="2097152" crc="61001ec8" sha1="74a1d84ccde678d9209f7aa872b50f0a98ec07aa" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dynoblaz">
+		<description>Dyno Blaze (Early Prototype)</description>
+		<year>199?</year>
+		<publisher>Virgin Interactive</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1511878">
+				<rom name="dyno blaze (proto).bin" size="1511878" crc="d625e584" sha1="c5f01dcfbf01d9a3b08e4d6ebe0c460cc3508413" offset="0x000000" loadflag="load16_word_swap"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15221,8 +15234,8 @@ but dumps still have to be confirmed.
 
 	<software name="flashp">
 		<description>Flash Point (Jpn, Prototype)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1989</year>
+		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="131072">
 				<rom name="flash point (japan) (proto).bin" size="131072" crc="0655074d" sha1="358e4dc17b4269b34273b7c4ce1d57c0c01ffd4e" offset="0x000000"/>
@@ -15341,9 +15354,9 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="funcar">
-		<description>Fun Car Rally (USA, Prototype)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Fun Car Rally (USA, Prototype)</description><!-- prototype of Combat Cars? -->
+		<year>1992</year>
+		<publisher>Accolade?</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="fun car rally (usa) (prototype).bin" size="1048576" crc="42e27845" sha1="779aba11bf77ca59e6ae981854805bf3fabe4b0e" offset="0x000000"/>
@@ -15425,9 +15438,9 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="gamenko">
-		<description>Game no Kandume Otokuyou (Jpn)</description>
+		<description>Game no Kanzume Otokuyou (Jpn, Sega Channel)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="game no kandume otokuyou (jpn).bin" size="3145728" crc="cdad7e6b" sha1="31c66bd13abf4ae8271c09ec5286a0ee0289dbbc" offset="0x000000"/>
@@ -18146,8 +18159,9 @@ but dumps still have to be confirmed.
 
 	<software name="megaga10">
 		<description>Mega Games 10 (Bra)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Tectoy</publisher>
+		<info name="alt_title" value="Sega Top Ten, 10 Super Jogos"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="mega games 10 (bra).bin" size="4194304" crc="c19ae368" sha1="791a4de13cfe2af4302aac969753d67dd76e89c8" offset="0x000000"/>
@@ -20635,8 +20649,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="junker" cloneof="outr2019">
 		<description>Junker's High (Jpn, Prototype)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1992</year>
+		<publisher>Sims</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -21568,7 +21582,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	<software name="ppersia2">
 		<description>Prince of Persia 2 - The Shadow and the Flame (Euro, Prototype)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Psygnosis</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="prince of persia 2 - the shadow and the flame (euro) (prototype).bin" size="2097152" crc="3ab44d46" sha1="ba63dc1e521bee68b4121b626061ebb203ac63c6" offset="0x000000"/>
@@ -22137,7 +22151,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	<software name="resq">
 		<description>Resq (Euro, Prototype)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Psygnosis</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="resq (euro) (prototype).bin" size="1048576" crc="558e35e0" sha1="f572443bd1e0cf956c87e6cd925412cb0f35045f" offset="0x000000"/>
@@ -22526,7 +22540,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	<software name="robowrek">
 		<description>Robot Wreckage (USA, Prototype)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Novotrade</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="robot wreckage (usa) (prototype).bin" size="1048576" crc="c67ddb14" sha1="8cecca591f781a638b45f99f69bf2f18b7abb289" offset="0x000000"/>
@@ -22810,8 +22824,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="sanguo" cloneof="sangoret">
 		<description>San Guo Zhi Lie Zhuan - Luan Shi Qun Ying (Chi)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1991</year>
+		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -22877,8 +22891,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="scrabble">
 		<description>Scrabble (Euro, Prototype)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Supervision</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="scrabble (euro) (prototype).bin" size="1048576" crc="360b2610" sha1="b2a06070eda30eb2ef745dcb2676dc25d39a07ed" offset="0x000000"/>
@@ -22910,8 +22924,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="segatop">
 		<description>Sega Top Five (Bra)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Tectoy</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="sega top five (bra).bin" size="2097152" crc="61069069" sha1="b13ba8e49fb9e8b41835e3d4af86ad25f27c804c" offset="0x000000"/>
@@ -23010,8 +23024,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="shadowrnj" cloneof="shadowrn">
 		<description>Shadowrun (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -23468,9 +23482,9 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="slamshaq">
-		<description>Slam - Shaq vs. the Legends (Prototype)</description>
+		<description>Slam - Shaq Vs. The Legends (Prototype)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2050138">
 				<rom name="slam - shaq vs. the legends (prototype).bin" size="2050138" crc="c19c200e" sha1="beee61d339b307b2e3124ceac4a49375f7a04c81" offset="0x000000"/>
@@ -23789,8 +23803,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="knucklp">
 		<description>Knuckles in Sonic 2 (Prototype 0524, 19940527, 10.46)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
 				<rom name="knuckles in sonic 2 (prototype 0524 - may 27, 1994, 10.46).bin" size="4194304" crc="8878c1a8" sha1="3a827d575f5a484c24e6c31417f32d6c5f0045de" offset="0x000000"/>
@@ -23810,27 +23824,27 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="sonic3c">
-		<description>Sonic 3C (Prototype 0408, 19940408, 17.29)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Sonic 3C (Prototype 0517, 19940517, 17.08)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_fram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="sonic 3c (prototype 0408 - apr 08, 1994, 17.29).bin" size="4194304" crc="59d23df5" sha1="5f96ddccff1e95d82201687b939973c642a05394" offset="0x000000"/>
+				<rom name="sonic 3c (prototype 0517 - may 17, 1994, 17.08).bin" size="4194304" crc="766c4b81" sha1="d6012af0f7856476892982e50b3d512d606dcb96" offset="0x000000"/>
 			</dataarea>
 			<dataarea name="fram" size="1024">
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="sonic3ca">
-		<description>Sonic 3C (Prototype 0517, 19940517, 17.08)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="sonic3ca" cloneof="sonic3c">
+		<description>Sonic 3C (Prototype 0408, 19940408, 17.29)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_fram"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="sonic 3c (prototype 0517 - may 17, 1994, 17.08).bin" size="4194304" crc="766c4b81" sha1="d6012af0f7856476892982e50b3d512d606dcb96" offset="0x000000"/>
+				<rom name="sonic 3c (prototype 0408 - apr 08, 1994, 17.29).bin" size="4194304" crc="59d23df5" sha1="5f96ddccff1e95d82201687b939973c642a05394" offset="0x000000"/>
 			</dataarea>
 			<dataarea name="fram" size="1024">
 			</dataarea>
@@ -23927,8 +23941,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="scrack">
 		<description>Sonic Crackers (Jpn, Prototype)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="sonic crackers (jpn) (prototype).bin" size="1048576" crc="7fada88d" sha1="05f460a6ebbc1f86eb40b5f762083a59fb29f3e2" offset="0x000000"/>
@@ -23963,8 +23977,12 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="1310720">
-				<rom name="sonic spinball (beta).bin" size="1310720" crc="b1524979" sha1="b426457e5b440ed33ee1756bc6dad2bdcd0c0d9f" offset="0x000000"/>
+			<dataarea name="rom" width="16" endianness="big" size="1179648">
+				<!-- the following dump has 0x20000 of subterrp2 in SMD format at 0x120000, size after removing is same as specified in header
+				<rom name="sonic spinball (beta).bin" size="1310720" crc="b1524979" sha1="b426457e5b440ed33ee1756bc6dad2bdcd0c0d9f" offset="0x000000" status="baddump"/>
+				-->
+				<!-- Cracktro at 0x103400 -->
+				<rom name="sonic spinball (beta).bin" size="1179648" crc="9b90bcff" sha1="8cfeb7bad4432ebe1934212a99286de870a875d2" offset="0x000000" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -25838,8 +25856,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	<!-- // BAD DUMP -->
 	<software name="tecmocup">
 		<description>Tecmo Cup (Jpn, Prototype?)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="tecmo cup (jpn) (prototype maybe) (bad dump).bin" size="524288" crc="88fdd060" sha1="67e9261097e1ed9c8d7d11fd45a7c7e04ac1145f" offset="0x000000" status="baddump"/>
@@ -26122,10 +26140,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<!-- contains some sort of modem for communication with Bradesco -->
 	<software name="telebrad" supported="no">
 		<description>Telebradesco Residencia (Bra)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Tectoy</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="262144">
 				<rom name="telebradesco residencia (bra).bin" size="262144" crc="1db99045" sha1="917c0f72e21c98ee2ee367c4d42c992c886a3aa2" offset="0x000000"/>
@@ -26826,6 +26845,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="ultsoccrp" cloneof="ultsoccr">
+		<description>Ultimate Soccer (Euro, Prototype)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="world soccer (prototype).bin" size="1048576" crc="9d451f72" sha1="892747034876a7f587bbf0e3f21c9f35237bb1ea" offset="0x000000" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ultraman">
 		<description>Ultraman (Jpn)</description>
 		<year>1993</year>
@@ -27282,7 +27312,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	<software name="wackyrac">
 		<description>Wacky Races (USA, Prototype)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Eden Entertainment</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="wacky races (usa) (prototype).bin" size="2097152" crc="1b173f09" sha1="5f310699e017e0becb4f41e7f00cb86606dbc0ed" offset="0x000000"/>
@@ -27985,8 +28015,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="whj" cloneof="wh">
 		<description>World Heroes (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="world heroes (jpn).bin" size="2097152" crc="56e3ceff" sha1="0c806b701069ae72b6cfd19b7b65a123192cff23" offset="0x000000"/>
@@ -29172,7 +29202,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="youngind">
 		<description>The Young Indiana Jones Chronicles (USA, Prototype)</description>
-		<year>199?</year>
+		<year>1992</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
@@ -29317,8 +29347,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="zombhigh">
 		<description>Zombie High (USA, Prototype)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1992</year>
+		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1024240">
 				<rom name="zombie high (usa) (prototype).bin" size="1024239" crc="7bea6194" sha1="56f1a0b616e178315bdb9f2e43ddc942dcf3780e" offset="0x000000"/>
@@ -29393,8 +29423,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	<!-- To be used in conjuction with a MegaCD -->
 	<software name="flux">
 		<description>Flux (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="262144">
 				<rom name="flux (euro).bin" size="262144" crc="2a1da08c" sha1="6357f38db012278bc889c77c5780a82d535760fd" offset="0x000000"/>
@@ -29402,10 +29432,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<!-- to be used with the Sega Mega Modem -->
 	<software name="meganser">
 		<description>Mega Anser (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1989</year>
+		<publisher>Sega</publisher>
 		<info name="serial" value="G-4502"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
@@ -29416,8 +29447,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="meganet">
 		<description>MegaNet (Bra)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="262144">
 				<rom name="meganet (bra).bin" size="262144" crc="fab33cc2" sha1="7969fe1b43d29b65a1e24e118f4a6fea27437e9c" offset="0x000000"/>
@@ -30057,17 +30088,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="ultsoccrp" cloneof="ultsoccr">
-		<description>Ultimate Soccer (Euro, Prototype)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="world soccer (prototype).bin" size="1048576" crc="9d451f72" sha1="892747034876a7f587bbf0e3f21c9f35237bb1ea" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="kof2k" cloneof="kof98">
 		<description>K.O.F 2000</description>
 		<year>199?</year>
@@ -30187,17 +30207,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 
 <!-- Other Dumps to be sorted -->
-
-	<software name="dynoblaz">
-		<description>Dyno Blaze (Early Prototype)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="1511878">
-				<rom name="dyno blaze (proto).bin" size="1511878" crc="d625e584" sha1="c5f01dcfbf01d9a3b08e4d6ebe0c460cc3508413" offset="0x000000"/>
-			</dataarea>
-		</part>
-	</software>
 
 	<software name="asscreed" cloneof="dlair">
 		<description>Assassins Creed (Rus)</description>
@@ -31225,10 +31234,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 <!-- Non game cartridge -->
 
-	<software name="ar" supported="no">
+	<software name="ar" supported="partial">
 		<description>Action Replay (Euro)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Datel</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="32768">
 				<rom name="action replay (euro).bin" size="32768" crc="95ff7c3e" sha1="1e0f246826be4ebc7b99bb3f9de7f1de347122e5" offset="0x000000"/>
@@ -31238,8 +31247,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="ggenie">
 		<description>Game Genie (Euro, USA, Rev. A)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1992</year>
+		<publisher>Galoob</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_ggenie"/>
 			<dataarea name="rom" width="16" endianness="big" size="32768">
@@ -31250,8 +31259,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="ggenie1" cloneof="ggenie">
 		<description>Game Genie (Euro, USA)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1992</year>
+		<publisher>Galoob</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_ggenie"/>
 			<dataarea name="rom" width="16" endianness="big" size="32768">
@@ -31263,7 +31272,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	<software name="par" supported="no">
 		<description>Pro Action Replay (Euro)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Datel</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="131072">
 				<rom name="pro action replay (euro).bin" size="131072" crc="17255224" sha1="b0bbfe0c201b2ab2fc17b37e5709785fedc07170" offset="0x000000"/>
@@ -31274,7 +31283,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	<software name="par2" supported="no">
 		<description>Pro Action Replay 2 (Euro)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Datel</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="65536">
 				<rom name="pro action replay 2 (euro).bin" size="65536" crc="a73abd27" sha1="c488883a0270766d8fff503fd2e4b5e25a15d523" offset="0x000000"/>
@@ -31285,7 +31294,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	<software name="par2a" cloneof="par2" supported="no">
 		<description>Pro Action Replay 2 (Euro, Alt)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Datel</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="65536">
 				<rom name="pro action replay 2 (euro) (alt).bin" size="65536" crc="e6669a61" sha1="00e4266f3cd7ab2178ca37d564bc5315efdbe967" offset="0x000000"/>
@@ -31368,8 +31377,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="gems">
 		<description>GEMS v2.8</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="262144">
 				<rom name="gems.bin" size="262144" crc="98ebb058" sha1="83412622877d9df8ac7c1486b06c490dfa52ebf6" offset="0x000000"/>
@@ -31379,8 +31388,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="sndtool">
 		<description>Sound Tool v2.2?</description>
-		<year>1991</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1990</year>
+		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="262144">
 				<rom name="sndtool.bin" size="262144" crc="ee41b452" sha1="a99238e3fdedbeca602f05a4c83f70db1bf1ba84" offset="0x000000"/>
@@ -31391,7 +31400,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	<software name="arttool" supported="no">
 		<description>Art Tool</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sega?</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="262144">
 				<rom name="arttool.bin" size="262144" crc="5353f532" sha1="7f3233f4938fcd26af0733e7645d1a401999de86" offset="0x000000"/>
