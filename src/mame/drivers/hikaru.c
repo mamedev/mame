@@ -382,7 +382,6 @@ Notes:
 #include "emu.h"
 #include "cpu/sh4/sh4.h"
 #include "machine/naomicrypt.h"
-#include "machine/315-5881_helper.h"
 
 #define CPU_CLOCK (200000000)
 									/* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
@@ -572,8 +571,8 @@ ROM_START( airtrix )
 	/* ic65 unpopulated */
 	/* ic66 unpopulated */
 
-	// 315-5881 security IC key
-	_315_5881_KEYFILE("airtrix-key.bin", CRC(11111111) SHA1(1111111111111111111111111111111111111111))
+	// 834-14149   2000     317-0294-COM   Hikaru
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "091b02c7" )
 ROM_END
 
 
@@ -610,8 +609,8 @@ ROM_START( pharrier )
 	ROM_LOAD32_WORD( "mpr-23560.ic65", 0xe000000, 0x1000000, CRC(24bb7072) SHA1(dad5135c89d292e4a1f96bd0ad28be6a17154be0) )
 	ROM_LOAD32_WORD( "mpr-23564.ic66", 0xe000002, 0x1000000, CRC(255724b6) SHA1(1b382fad165831de3f2e39352c031146759dfc69) )
 
-	// 315-5881 security IC key
-	_315_5881_KEYFILE("pharrier-key.bin", CRC(11111111) SHA1(1111111111111111111111111111111111111111))
+	// 834-14144   2001     317-0297-COM   Hikaru
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "0912c68a" )
 ROM_END
 
 ROM_START( podrace )
@@ -664,7 +663,8 @@ ROM_START( podrace )
 	ROM_LOAD32_WORD("mpr-23117.ic68s" , 0xf000002, 0x0800000, CRC(9d4d3529) SHA1(66008445629681ebf2f26b3f181d8524a8576d2f))
 
 	// current 315-5881 decryption simulation code can't produce valid output data with any of keys
-	ROM_REGION( 4, "rom_key", ROMREGION_ERASE00 )
+	// 834-14002   2001     317-0277-COM   Hikaru
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "0903dad5" )
 ROM_END
 
 ROM_START( braveff )
@@ -708,8 +708,7 @@ ROM_START( braveff )
 	ROM_LOAD32_WORD( "mpr-22022.ic59s", 0xb000000, 0x800000, CRC(abd3d888) SHA1(9654c3a38feab46b4983a602831fb29cccdd0526) )
 	ROM_LOAD32_WORD( "mpr-22023.ic60s", 0xb000002, 0x800000, CRC(07f00869) SHA1(92282d09d72d3e65a91128e06bb0d4426bb90be5) )
 
-	// 315-5881 not populated
-	_315_5881_UNUSED
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "0" ) // 315-5881 not populated
 ROM_END
 
 ROM_START( sgnascar )

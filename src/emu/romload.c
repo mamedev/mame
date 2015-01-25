@@ -171,6 +171,8 @@ int set_disk_handle(running_machine &machine, const char *region, const char *fu
 const rom_entry *rom_first_region(const device_t &device)
 {
 	const rom_entry *romp = device.rom_region();
+	while (romp && ROMENTRY_ISPARAMETER(romp))
+		romp++;
 	return (romp != NULL && !ROMENTRY_ISEND(romp)) ? romp : NULL;
 }
 
@@ -184,6 +186,8 @@ const rom_entry *rom_next_region(const rom_entry *romp)
 {
 	romp++;
 	while (!ROMENTRY_ISREGIONEND(romp))
+		romp++;
+	while (ROMENTRY_ISPARAMETER(romp))
 		romp++;
 	return ROMENTRY_ISEND(romp) ? NULL : romp;
 }
@@ -218,6 +222,34 @@ const rom_entry *rom_next_file(const rom_entry *romp)
 
 
 /*-------------------------------------------------
+    rom_first_parameter - return pointer to the first
+    per-game parameter
+-------------------------------------------------*/
+
+const rom_entry *rom_first_parameter(const device_t &device)
+{
+	const rom_entry *romp = device.rom_region();
+	while (romp && !ROMENTRY_ISEND(romp) && !ROMENTRY_ISPARAMETER(romp))
+		romp++;
+	return (romp != NULL && !ROMENTRY_ISEND(romp)) ? romp : NULL;
+}
+
+
+/*-------------------------------------------------
+    rom_next_parameter - return pointer to the next
+    per-game parameter
+-------------------------------------------------*/
+
+const rom_entry *rom_next_parameter(const rom_entry *romp)
+{
+	romp++;
+	while (!ROMENTRY_ISREGIONEND(romp) && !ROMENTRY_ISPARAMETER(romp))
+		romp++;
+	return ROMENTRY_ISEND(romp) ? NULL : romp;
+}
+
+
+/*-------------------------------------------------
     rom_region_name - return the appropriate name
     for a rom region
 -------------------------------------------------*/
@@ -225,6 +257,28 @@ const rom_entry *rom_next_file(const rom_entry *romp)
 astring &rom_region_name(astring &result, const device_t &device, const rom_entry *romp)
 {
 	return device.subtag(result, ROM_GETNAME(romp));
+}
+
+
+/*-------------------------------------------------
+    rom_parameter_name - return the appropriate name
+    for a per-game parameter
+-------------------------------------------------*/
+
+astring &rom_parameter_name(astring &result, const device_t &device, const rom_entry *romp)
+{
+	return device.subtag(result, romp->_name);
+}
+
+
+/*-------------------------------------------------
+    rom_parameter_name - return the value for a
+    per-game parameter
+-------------------------------------------------*/
+
+astring rom_parameter_value(const rom_entry *romp)
+{
+	return romp->_hashdata;
 }
 
 
@@ -1453,6 +1507,14 @@ static void process_region_list(romload_private *romdata)
 		{
 			rom_region_name(regiontag, *device, region);
 			region_post_process(romdata, regiontag, ROMREGION_ISINVERTED(region));
+		}
+
+	/* and finally register all per-game parameters */
+	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
+		for (const rom_entry *param = rom_first_parameter(*device); param != NULL; param = rom_next_parameter(param))
+		{
+			rom_parameter_name(regiontag, *device, param);
+			romdata->machine().parameters().add(regiontag, rom_parameter_value(param));
 		}
 }
 

@@ -2842,6 +2842,9 @@ ROM_START( zeroguna ) /* Zero Gunner (Export), Model 2A */
 	ROM_LOAD("mpr-20303.32", 0x000000, 0x200000, CRC(c040973f) SHA1(57a496c5dcc1a3931b6e41bf8d41e45d6dac0c31) )
 	ROM_LOAD("mpr-20304.33", 0x200000, 0x200000, CRC(6decfe83) SHA1(d73adafceff2f1776c93e53bd5677d67f1c2c08f) )
 
+	//             1997     317-5038-COM   Model 2
+	ROM_PARAMETER( ":315_5881:key", "042c0d13" )
+
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
 ROM_END
@@ -2874,6 +2877,9 @@ ROM_START( zerogunaj ) /* Zero Gunner (Japan), Model 2A - Sega game ID# 833-1134
 	ROM_LOAD("mpr-20303.32", 0x000000, 0x200000, CRC(c040973f) SHA1(57a496c5dcc1a3931b6e41bf8d41e45d6dac0c31) )
 	ROM_LOAD("mpr-20304.33", 0x200000, 0x200000, CRC(6decfe83) SHA1(d73adafceff2f1776c93e53bd5677d67f1c2c08f) )
 
+	//             1997     317-5038-COM   Model 2
+	ROM_PARAMETER( ":315_5881:key", "042c0d13" )
+
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
 ROM_END
@@ -2905,6 +2911,9 @@ ROM_START( zerogun ) /* Zero Gunner (Export), Model 2B */
 	ROM_REGION( 0x400000, "scsp", 0 ) // Samples
 	ROM_LOAD("mpr-20303.32", 0x000000, 0x200000, CRC(c040973f) SHA1(57a496c5dcc1a3931b6e41bf8d41e45d6dac0c31) )
 	ROM_LOAD("mpr-20304.33", 0x200000, 0x200000, CRC(6decfe83) SHA1(d73adafceff2f1776c93e53bd5677d67f1c2c08f) )
+
+	//             1997     317-5038-COM   Model 2
+	ROM_PARAMETER( ":315_5881:key", "042c0d13" )
 ROM_END
 
 ROM_START( zerogunj ) /* Zero Gunner (Japan), Model 2B */
@@ -2934,6 +2943,9 @@ ROM_START( zerogunj ) /* Zero Gunner (Japan), Model 2B */
 	ROM_REGION( 0x400000, "scsp", 0 ) // Samples
 	ROM_LOAD("mpr-20303.32", 0x000000, 0x200000, CRC(c040973f) SHA1(57a496c5dcc1a3931b6e41bf8d41e45d6dac0c31) )
 	ROM_LOAD("mpr-20304.33", 0x200000, 0x200000, CRC(6decfe83) SHA1(d73adafceff2f1776c93e53bd5677d67f1c2c08f) )
+
+	//             1997     317-5038-COM   Model 2
+	ROM_PARAMETER( ":315_5881:key", "042c0d13" )
 ROM_END
 
 ROM_START( gunblade ) /* Gunblade NY Revision A, Model 2B, Sega game ID# 833-12562 GUN BLADE, Sega ROM board ID# 834-12563 */
@@ -3669,6 +3681,9 @@ ROM_START( dynamcop ) /* Dynamite Cop (Export), Model 2A, Sega Game ID# 833-1134
 	ROM_LOAD("mpr-20814.36", 0x400000, 0x200000, CRC(e8ebc74c) SHA1(731ce721bb9e148f3a9f7fbe569522567a681c4e) )
 	ROM_LOAD("mpr-20815.37", 0x600000, 0x200000, CRC(1b5aaae4) SHA1(32b4bf6c096fdccdd5d8f1ddb6c27d3389a52234) )
 
+	//             1998     317-0236-COM   Model 2
+	ROM_PARAMETER( ":315_5881:key", "0c2a4a93" )
+
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
 ROM_END
@@ -3717,6 +3732,9 @@ ROM_START( dyndeka2 ) /* Dynamite Deka 2 (Japan), Model 2A */
 	ROM_LOAD("mpr-20814.36", 0x400000, 0x200000, CRC(e8ebc74c) SHA1(731ce721bb9e148f3a9f7fbe569522567a681c4e) )
 	ROM_LOAD("mpr-20815.37", 0x600000, 0x200000, CRC(1b5aaae4) SHA1(32b4bf6c096fdccdd5d8f1ddb6c27d3389a52234) )
 
+	//             1998     317-0236-COM   Model 2
+	ROM_PARAMETER( ":315_5881:key", "0c2a4a93" )
+
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
 ROM_END
@@ -3764,6 +3782,9 @@ ROM_START( dynamcopb ) /* Dynamite Cop (Export), Model 2B */
 	ROM_LOAD("mpr-20813.32", 0x200000, 0x200000, CRC(1908679c) SHA1(32913385f09da2e43af0c4a4612b955527bfe759) )
 	ROM_LOAD("mpr-20814.36", 0x400000, 0x200000, CRC(e8ebc74c) SHA1(731ce721bb9e148f3a9f7fbe569522567a681c4e) )
 	ROM_LOAD("mpr-20815.37", 0x600000, 0x200000, CRC(1b5aaae4) SHA1(32b4bf6c096fdccdd5d8f1ddb6c27d3389a52234) )
+
+	//             1998     317-0236-COM   Model 2
+	ROM_PARAMETER( ":315_5881:key", "0c2a4a93" )
 ROM_END
 
 ROM_START( dyndeka2b ) /* Dynamite Deka 2 (Japan), Model 2B */
@@ -3809,6 +3830,9 @@ ROM_START( dyndeka2b ) /* Dynamite Deka 2 (Japan), Model 2B */
 	ROM_LOAD("mpr-20813.32", 0x200000, 0x200000, CRC(1908679c) SHA1(32913385f09da2e43af0c4a4612b955527bfe759) )
 	ROM_LOAD("mpr-20814.36", 0x400000, 0x200000, CRC(e8ebc74c) SHA1(731ce721bb9e148f3a9f7fbe569522567a681c4e) )
 	ROM_LOAD("mpr-20815.37", 0x600000, 0x200000, CRC(1b5aaae4) SHA1(32b4bf6c096fdccdd5d8f1ddb6c27d3389a52234) )
+
+	//             1998     317-0236-COM   Model 2
+	ROM_PARAMETER( ":315_5881:key", "0c2a4a93" )
 ROM_END
 
 ROM_START( dynamcopc ) /* Dynamite Cop (USA), Model 2C */
@@ -3854,6 +3878,9 @@ ROM_START( dynamcopc ) /* Dynamite Cop (USA), Model 2C */
 	ROM_LOAD("mpr-20813.32", 0x200000, 0x200000, CRC(1908679c) SHA1(32913385f09da2e43af0c4a4612b955527bfe759) ) /* Located at position 33 on 2C-CRX rom board */
 	ROM_LOAD("mpr-20814.36", 0x400000, 0x200000, CRC(e8ebc74c) SHA1(731ce721bb9e148f3a9f7fbe569522567a681c4e) ) /* Located at position 34 on 2C-CRX rom board */
 	ROM_LOAD("mpr-20815.37", 0x600000, 0x200000, CRC(1b5aaae4) SHA1(32b4bf6c096fdccdd5d8f1ddb6c27d3389a52234) ) /* Located at position 35 on 2C-CRX rom board */
+
+	//             1998     317-0236-COM   Model 2
+	ROM_PARAMETER( ":315_5881:key", "0c2a4a93" )
 ROM_END
 
 ROM_START( schamp ) /* Sonic Championship, Model 2B - Sega ROM board ID# 834-12786 */
@@ -4396,6 +4423,9 @@ ROM_START( pltkidsa ) /* Pilot Kids, Model 2A */
 	ROM_LOAD("mpr-21279.sd3", 0x0400000, 0x200000, CRC(3a8dcf68) SHA1(312496b45b699051c8b4dd0e5d94e73fe5f3ad8d) )
 	ROM_LOAD("mpr-21280.sd4", 0x0600000, 0x200000, CRC(aa548124) SHA1(a94adfe16b5c3236746451c181ccd3e1c27432f4) )
 
+	//             1998     317-5044-COM   Model 2
+	ROM_PARAMETER( ":315_5881:key", "042e2dc1" )
+
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
 ROM_END
@@ -4435,6 +4465,9 @@ ROM_START( pltkids ) /* Pilot Kids Revision A, Model 2B */
 	ROM_LOAD("mpr-21278.sd2", 0x0200000, 0x200000, CRC(27e18e08) SHA1(254c0ad4d6bd572ff0efc3ea80489e73716a31a7) )
 	ROM_LOAD("mpr-21279.sd3", 0x0400000, 0x200000, CRC(3a8dcf68) SHA1(312496b45b699051c8b4dd0e5d94e73fe5f3ad8d) )
 	ROM_LOAD("mpr-21280.sd4", 0x0600000, 0x200000, CRC(aa548124) SHA1(a94adfe16b5c3236746451c181ccd3e1c27432f4) )
+
+	//             1998     317-5044-COM   Model 2
+	ROM_PARAMETER( ":315_5881:key", "042e2dc1" )
 ROM_END
 
 ROM_START( indy500 ) /* Defaults to Twin (Stand Alone) Cab version.  2 credits to start - Can be set to Deluxe setting in service mode, Sega Game ID# 833-12361, ROM board ID# 834-12362 */
@@ -5968,15 +6001,13 @@ ROM_START( desert ) /* Desert Tank, Model 2 */
 ROM_END
 
 DRIVER_INIT_MEMBER(model2_state,genprot)
-{
-	
-	INT64 key = get_315_5881_key(machine());
+{	
+	astring key = parameter(":315_5881:key");
 
-	if (key != -1)
+	if (key)
 	{
 		m_maincpu->space(AS_PROGRAM).install_ram(0x01d80000, 0x01d8ffff);
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x01d90000, 0x01d9ffff, read32_delegate(FUNC(model2_state::model2_5881prot_r), this), write32_delegate(FUNC(model2_state::model2_5881prot_w), this));
-		m_cryptdevice->set_key(key);
 	}
 	else
 	{

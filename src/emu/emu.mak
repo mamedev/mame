@@ -99,6 +99,7 @@ EMUOBJS = \
 	$(EMUOBJ)/memarray.o \
 	$(EMUOBJ)/memory.o \
 	$(EMUOBJ)/network.o \
+	$(EMUOBJ)/parameters.o \
 	$(EMUOBJ)/output.o \
 	$(EMUOBJ)/render.o \
 	$(EMUOBJ)/rendfont.o \
