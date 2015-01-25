@@ -199,6 +199,10 @@ private:
 // pnamedlist_t: a simple list
 // ----------------------------------------------------------------------------------------
 
+#ifdef SDLMAME_SOLARIS
+#undef _C
+#endif
+
 template <class _C>
 class pnamedlist_t : public plinearlist_t<_C>
 {

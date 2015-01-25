@@ -33,7 +33,6 @@
 //#undef _XPG6
 //#undef _XPG5
 //#undef _XPG4_2
-
 //#define _XOPEN_SOURCE
 //#define _XOPEN_VERSION 4
 #elif defined(__irix__) || defined(__sgi)

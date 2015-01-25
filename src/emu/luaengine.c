@@ -130,6 +130,10 @@ lua_engine::hook::hook()
 	cb = -1;
 }
 
+#ifdef SDLMAME_SOLARIS
+#undef _L
+#endif
+
 void lua_engine::hook::set(lua_State *_L, int idx)
 {
 	if (L)
