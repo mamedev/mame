@@ -85,6 +85,7 @@ private:
 	emu_timer *timer1;
 	emu_timer *timer2;
 	UINT8 bank_multi;  
+	UINT8 *m_cart_ptr;
 };
 
 WRITE8_MEMBER( gamate_state::gamate_cart_protection_w )
@@ -96,7 +97,7 @@ WRITE8_MEMBER( gamate_state::gamate_cart_protection_w )
 		card_protection.failed= card_protection.failed || ((card_protection.cartridge_byte&0x80)!=0) != ((data&4)!=0);
 		card_protection.bit_shifter++;
 		if (card_protection.bit_shifter>=8) {
-			card_protection.cartridge_byte=m_cart->get_rom_base()[card_protection.address++];
+			card_protection.cartridge_byte=m_cart_ptr[card_protection.address++];
 			card_protection.bit_shifter=0;
 		}
 		break;
@@ -107,7 +108,7 @@ READ8_MEMBER( gamate_state::gamate_cart_protection_r )
 
   UINT8 ret=1;
   if (card_protection.bit_shifter==7 && card_protection.unprotected) {
-    ret=m_cart->get_rom_base()[bank_multi*0x4000];
+    ret=m_cart_ptr[bank_multi*0x4000];
   } else {
 	card_protection.bit_shifter++;
 	if (card_protection.bit_shifter==8) {
@@ -132,7 +133,7 @@ WRITE8_MEMBER( gamate_state::protection_reset )
   // writes 0x20
   card_protection.address=0x6005-0x6001;
   card_protection.bit_shifter=0;
-  card_protection.cartridge_byte=m_cart->get_rom_base()[card_protection.address++];//m_cart_rom[card_protection.address++];
+  card_protection.cartridge_byte=m_cart_ptr[card_protection.address++];//m_cart_rom[card_protection.address++];
   card_protection.failed=false;
   card_protection.unprotected=false;
 }
@@ -172,12 +173,12 @@ WRITE8_MEMBER( gamate_state::gamate_video_w )
 WRITE8_MEMBER( gamate_state::cart_bankswitchmulti_w )
 {
   bank_multi=data;
-  membank("bankmulti")->set_base(m_cart->get_rom_base()+0x4000*data+1);
+  membank("bankmulti")->set_base(m_cart_ptr+0x4000*data+1);
 }
 
 WRITE8_MEMBER( gamate_state::cart_bankswitch_w )
 {
-	membank("bank")->set_base(m_cart->get_rom_base()+0x4000*data);
+	membank("bank")->set_base(m_cart_ptr+0x4000*data);
 }
 
 READ8_MEMBER( gamate_state::gamate_video_r )
@@ -329,8 +330,10 @@ DRIVER_INIT_MEMBER(gamate_state,gamate)
 
 void gamate_state::machine_start()
 {
+	m_cart_ptr = memregion("maincpu")->base() + 0x6000;
 	if (m_cart->exists()) {
 //		m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x6000, READ8_DELEGATE(gamate_state, gamate_cart_protection_r));
+		m_cart_ptr = m_cart->get_rom_base();
 		membank("bankmulti")->set_base(m_cart->get_rom_base()+1);
 		membank("bank")->set_base(m_cart->get_rom_base()+0x4000); // bankswitched games in reality no offset
 	}
