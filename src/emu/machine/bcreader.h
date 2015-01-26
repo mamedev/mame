@@ -25,6 +25,8 @@ public:
 	barcode_reader_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	void write_code(const char *barcode, int len);
+	int get_pending_code() { return m_new_code; }
+	int get_byte_length() { return m_byte_length; }
 	UINT8 read_code();
 	int read_pixel();
 
