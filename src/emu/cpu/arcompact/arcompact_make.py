@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 import sys
-import re
 
 def EmitGroup04_Handle_NZ_Flags(f, funcname, opname):
         print >>f, "		if (result & 0x80000000) { STATUS32_SET_N; }"

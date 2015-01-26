@@ -130,11 +130,10 @@ void ui_menu_sliders::handle()
 
 void ui_menu_sliders::populate()
 {
-	const slider_state *curslider;
 	astring tempstring;
 
-	/* add all sliders */
-	for (curslider = machine().ui().get_slider_list(); curslider != NULL; curslider = curslider->next)
+	/* add UI sliders */
+	for (const slider_state *curslider = machine().ui().get_slider_list(); curslider != NULL; curslider = curslider->next)
 	{
 		INT32 curval = (*curslider->update)(machine(), curslider->arg, &tempstring, SLIDER_NOCHANGE);
 		UINT32 flags = 0;
@@ -148,8 +147,8 @@ void ui_menu_sliders::populate()
 			break;
 	}
 
-	/* add all sliders */
-	for (curslider = (slider_state*)machine().osd().get_slider_list(); curslider != NULL; curslider = curslider->next)
+	/* add OSD sliders */
+	for (const slider_state *curslider = (slider_state*)machine().osd().get_slider_list(); curslider != NULL; curslider = curslider->next)
 	{
 		INT32 curval = (*curslider->update)(machine(), curslider->arg, &tempstring, SLIDER_NOCHANGE);
 		UINT32 flags = 0;
