@@ -1509,7 +1509,6 @@ Sushi Bar
 #include "machine/jvs13551.h"
 #include "includes/dc.h"
 #include "includes/naomi.h"
-#include "machine/naomicrypt.h"
 
 #define CPU_CLOCK (200000000)
 
@@ -2654,7 +2653,7 @@ MACHINE_CONFIG_END
  */
 
 static MACHINE_CONFIG_DERIVED( naomim1, naomi_base )
-	MCFG_NAOMI_M1_BOARD_ADD("rom_board", ":rom_key", "naomibd_eeprom", ":boardid", WRITE8(dc_state, g1_irq))
+	MCFG_NAOMI_M1_BOARD_ADD("rom_board", "naomibd_eeprom", ":boardid", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 /*
@@ -4075,7 +4074,8 @@ ROM_START( gram2000 )
 
 	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
 
-	_NAOMI_M1_KEYFILE( "gram2000-key.bin", CRC(179314d9) SHA1(3dbbc04e9ff62800d08c4a239af3a83252a28dc0) )
+	// 840-0039    2000
+	ROM_PARAMETER( ":rom_board:key", "3f5c807f" )
 ROM_END
 
 ROM_START( tduno )
@@ -4116,7 +4116,8 @@ ROM_START( tduno2 )
 
 	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
 
-	_NAOMI_M1_KEYFILE("tduno2.key", CRC(8e0f0f3b) SHA1(914d3db8746c806d559539cc0851169161d32c04) )
+	// 840-0022    2000
+	ROM_PARAMETER( ":rom_board:key", "2f6f0f8d" )
 ROM_END
 
 ROM_START( mtkob2 )
@@ -4134,7 +4135,8 @@ ROM_START( mtkob2 )
 
 	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
 
-	_NAOMI_M1_KEYFILE("mtkob2-key.bin", CRC(db088208) SHA1(14d65ad2555183a445abcd93907c85df4032b41d) )
+	// 840-0150    2003
+	ROM_PARAMETER( ":rom_board:key", "3892fb3a" )
 ROM_END
 
 ROM_START( mushi2k5 )
@@ -4498,7 +4500,8 @@ ROM_START( mvsc2 )
 
 	ROM_COPY( "rom_board", 0x1200000, 0x400000, 0x400000 )
 
-	_NAOMI_M1_KEYFILE( "mvsc2-key.bin", CRC(76f095b4) SHA1(773fd67e1eb471a989b3ee6e969a3d33bf61e779) )
+	// 841-0007-02 2000
+	ROM_PARAMETER( ":rom_board:key", "7c6e8bc1" )
 ROM_END
 
 /* toy fighter - 1999 sega */
@@ -5102,7 +5105,8 @@ ROM_START( qmegamis )
 
 	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
 
-	_NAOMI_M1_KEYFILE("qmegamis-key.bin", CRC(b08650c0) SHA1(9e6b0fac6fb05209da9e01bb1a5437949d218078) )
+	// 840-0030    2000
+	ROM_PARAMETER( ":rom_board:key", "96489bcd" )
 ROM_END
 
 /*
@@ -5233,7 +5237,8 @@ ROM_START( shootopl )
 
 	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
 
-	_NAOMI_M1_KEYFILE( "shootopl-key.bin", CRC(45547e02) SHA1(4f79f478ff1eea14bc939a67ff570143cb56a4bf) )
+	// 840-0098    2002
+	ROM_PARAMETER( ":rom_board:key", "a77cf3a0" )
 ROM_END
 
 // Shootout Pool Prize
@@ -5250,7 +5255,8 @@ ROM_START( shootpl )
 
 	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
 
-	_NAOMI_M1_KEYFILE( "shootpl-key.bin", CRC(03c30b17) SHA1(e8e8659aa27b3d1cac2268850d3973d9afeaeba9) )
+	// 840-0128    2002
+	ROM_PARAMETER( ":rom_board:key", "cde98d9d" )
 ROM_END
 
 // Shootout Pool Prize Ver. B
@@ -5267,7 +5273,8 @@ ROM_START( shootplm )
 
 	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
 
-	_NAOMI_M1_KEYFILE( "shootpl-key.bin", CRC(03c30b17) SHA1(e8e8659aa27b3d1cac2268850d3973d9afeaeba9) )
+	// 840-0128    2002
+	ROM_PARAMETER( ":rom_board:key", "cde98d9d" )
 ROM_END
 
 /* Oinori-daimyoujin Matsuri (medal) */
@@ -6249,7 +6256,8 @@ ROM_START( vtenis2c )
 
 	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
 
-	_NAOMI_M1_KEYFILE("vtenis2c-key.bin", CRC(b8c5b510) SHA1(f36d037a62a576e71211093e075f0ffa7e312c2d) )
+	// 840-0084    2001
+	ROM_PARAMETER( ":rom_board:key", "43472d2d" )
 ROM_END
 
 ROM_START( kick4csh )
@@ -6278,7 +6286,8 @@ ROM_START( kick4csh )
 
 	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
 
-	_NAOMI_M1_KEYFILE( "kick4csh-key.bin", CRC(889d2ea1) SHA1(daf7acf41b6bc607d443a93221a3e4554b99547f) )
+	// 840-0140    2004
+	ROM_PARAMETER( ":rom_board:key", "c9570882" )
 ROM_END
 
 ROM_START( wrungp )
@@ -6587,7 +6596,7 @@ ROM_START( puyofevp )
 	ROM_COPY( "rom_board", 0x01000000, 0x400000, 0xc00000 )
 
 	// M1 board, but it doesn't appear the protection is used
-	_NAOMI_M1_KEYFILE_UNUSED
+	ROM_PARAMETER( ":rom_board:key", "0" )
 
 	// this dump can't be used as main_eeprom, because that's exactly 0x80 bytes
 	ROM_REGION(0x84, "some_eeprom", 0)
@@ -7949,7 +7958,8 @@ ROM_START( vf4evoct )
 
 	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
 
-	_NAOMI_M1_KEYFILE( "vf4evoct-key.bin", CRC(11111111) SHA1(1111111111111111111111111111111111111111) )
+	// 840-0106    2002
+	ROM_PARAMETER( ":rom_board:key", "cdb05b1e" )
 ROM_END
 
 ROM_START( hopper )

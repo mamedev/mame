@@ -381,7 +381,6 @@ Notes:
 
 #include "emu.h"
 #include "cpu/sh4/sh4.h"
-#include "machine/naomicrypt.h"
 
 #define CPU_CLOCK (200000000)
 									/* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
@@ -740,7 +739,7 @@ ROM_START( sgnascar )
 
 	// 317-0283-COM Actel A54SX32
 	// ID 0x4252
-	_NAOMI_M1_KEYFILE( "sgnascar-key.bin", CRC(f1452f9e) SHA1(86fb0f278a2eb0aba66a24032fb683f7a516b32b) )
+	ROM_PARAMETER( ":rom_board:key", "56dedf33" )
 ROM_END
 
 GAME( 2000, hikaru,   0,        hikaru,   hikaru, driver_device,   0, ROT0, "Sega",            "Hikaru Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
