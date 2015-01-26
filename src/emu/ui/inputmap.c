@@ -154,10 +154,9 @@ ui_menu_input_specific::ui_menu_input_specific(running_machine &machine, render_
 void ui_menu_input_specific::populate()
 {
 	input_item_data *itemlist = NULL;
-	ioport_field *field;
-	ioport_port *port;
 	int suborder[SEQ_TYPE_TOTAL];
 	astring tempstring;
+	int port_count = 0;
 
 	/* create a mini lookup table for sort order based on sequence type */
 	suborder[SEQ_TYPE_STANDARD] = 0;
@@ -165,8 +164,10 @@ void ui_menu_input_specific::populate()
 	suborder[SEQ_TYPE_INCREMENT] = 2;
 
 	/* iterate over the input ports and add menu items */
-	for (port = machine().ioport().first_port(); port != NULL; port = port->next())
-		for (field = port->first_field(); field != NULL; field = field->next())
+	for (ioport_port *port = machine().ioport().first_port(); port != NULL; port = port->next())
+	{
+		port_count++;
+		for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
 		{
 			const char *name = field->name();
 
@@ -182,7 +183,7 @@ void ui_menu_input_specific::populate()
 				{
 					sortorder = (field->type() << 2) | (field->player() << 12);
 					if (strcmp(field->device().tag(), ":"))
-						sortorder |= 0x10000;
+						sortorder |= (port_count & 0xfff) * 0x10000;
 				}
 				else
 					sortorder = field->type() | 0xf000;
@@ -212,6 +213,7 @@ void ui_menu_input_specific::populate()
 				}
 			}
 		}
+	}
 
 	/* sort and populate the menu in a standard fashion */
 	populate_and_sort(itemlist);
