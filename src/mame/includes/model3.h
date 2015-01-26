@@ -230,9 +230,6 @@ public:
 	DECLARE_WRITE8_MEMBER(model3_sound_w);
 	DECLARE_READ64_MEMBER(network_r);
 	DECLARE_WRITE64_MEMBER(network_w);
-	DECLARE_READ64_MEMBER(model3_security_r);
-	DECLARE_WRITE64_MEMBER(model3_security_w);
-
 
 	DECLARE_WRITE64_MEMBER(daytona2_rombank_w);
 	DECLARE_WRITE16_MEMBER(model3snd_ctrl);

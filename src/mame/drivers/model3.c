@@ -664,12 +664,7 @@ ALL VROM ROMs are 16M MASK
 #include "machine/nvram.h"
 #include "includes/model3.h"
 
-//#define DECRYPT_ANALYSIS_HACKS
 
-#ifdef DECRYPT_ANALYSIS_HACKS
-int readcount = 0;
-int segcount = 0;
-#endif
 
 void model3_state::update_irq_state()
 {
@@ -1679,104 +1674,6 @@ WRITE64_MEMBER(model3_state::network_w)
 }
 
 
-
-
-static const UINT16 fvipers2_prot_data[] =
-{
-	0x2a2a,
-	0x2a2a, 0x2a2a, 0x2a2a, 0x2a2a, 0x2a2a, 0x2a2a, 0x202a, 0x5b5b,
-	0x4620, 0x6769, 0x7468, 0x6e69, 0x2067, 0x6956, 0x6570, 0x7372,
-	0x3220, 0x5d20, 0x205d, 0x6e69, 0x3c20, 0x4d3c, 0x444f, 0x4c45,
-	0x332d, 0x3e3e, 0x4320, 0x706f, 0x7279, 0x6769, 0x7468, 0x2820,
-	0x2943, 0x3931, 0x3839, 0x5320, 0x4745, 0x2041, 0x6e45, 0x6574,
-	0x7072, 0x6972, 0x6573, 0x2c73, 0x544c, 0x2e44, 0x2020, 0x4120,
-	0x6c6c, 0x7220, 0x6769, 0x7468, 0x7220, 0x7365, 0x7265, 0x6576,
-	0x2e64, 0x2a20, 0x2a2a, 0x2a2a, 0x2a2a, 0x2a2a, 0x2a2a, 0x2a2a,
-};
-
-
-
-
-READ64_MEMBER(model3_state::model3_security_r)
-{
-	UINT64 retvalue = U64(0xffffffffffffffff);
-
-	switch(offset)
-	{
-		case 0x00 / 8:    retvalue = 0; break;       /* status */
-		case 0x1c/8:                    /* security board data read */
-		{
-			#ifdef DECRYPT_ANALYSIS_HACKS
-			readcount += 2;
-			printf("model3_security_r offset %08x : %08x%08x (%08x%08x) count %08x\n", offset * 8, (UINT32)(retvalue >> 32), (UINT32)(retvalue & 0xffffffff), (UINT32)(mem_mask >> 32), (UINT32)(mem_mask & 0xffffffff), readcount);
-			#endif
-			
-			if (core_stricmp(machine().system().name, "fvipers2") == 0)
-			{
-				UINT64 data = (UINT64)fvipers2_prot_data[m_prot_data_ptr++] << 16;
-				if (m_prot_data_ptr >= 0x41)
-				{
-					m_prot_data_ptr = 0;
-				}
-				retvalue = data;
-			}
-			else
-			{
-				retvalue = 0;
-			}
-			break;
-		}
-	}
-
-	return retvalue;
-}
-
-
-
-WRITE64_MEMBER(model3_state::model3_security_w)
-{
-	if (offset == 0x10 / 8)
-	{
-		if (data != 0)
-			printf("model3_security_w address isn't 0?\n");
-
-		first_read = 1;
-
-		printf("setting base %08x%08x\n",  (UINT32)(data >> 32), (UINT32)(data & 0xffffffff));
-	}
-	else if (offset == 0x18 / 8)
-	{
-		UINT16 subkey = data >> (32 + 16);
-		subkey = ((subkey & 0xff00) >> 8) | ((subkey & 0x00ff) << 8); // endian swap the sub-key for this hardware
-		printf("model3_5881prot_w setting subkey %04x\n", subkey);
-
-#ifdef DECRYPT_ANALYSIS_HACKS // dump out a copy of protection RAM
-		FILE* fp2;
-		char filename[256];
-		sprintf(filename,"xxxencrypted_%s_part%d", machine().system().name, segcount);
-		segcount++;
-		readcount = 0;
-		fp2 = fopen(filename, "w+b");
-
-		{
-			for (int i = 0; i < 0x8000; i++)
-			{
-				UINT16 dat = m_maincpu->space().read_word((0xf0180000 + 4 * i));
-				UINT8* dst2 = (UINT8*)&dat;
-				fwrite(&dst2[1], 1, 1, fp2);
-				fwrite(&dst2[0], 1, 1, fp2);
-			}
-
-		}
-		fclose(fp2);
-#endif 
-
-	}
-	else
-	{
-		printf("model3_5881prot_w offset %08x : %08x%08x (%08x%08x)\n", offset * 8, (UINT32)(data >> 32), (UINT32)(data & 0xffffffff), (UINT32)(mem_mask >> 32), (UINT32)(mem_mask & 0xffffffff));
-	}
-}
 
 READ64_MEMBER(model3_state::model3_5881prot_r)
 {
@@ -5732,18 +5629,12 @@ static void interleave_vroms(running_machine &machine)
 
 DRIVER_INIT_MEMBER(model3_state, genprot)
 {
-	astring key = parameter(":315_5881:key");
+//	astring key = parameter(":315_5881:key");
 
 	m_maincpu->space(AS_PROGRAM).install_ram(0xf0180000, 0xf019ffff, 0, 0x0e000000);
 
-	if (key)
-	{
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf01a0000, 0xf01a003f, 0, 0x0e000000, read64_delegate(FUNC(model3_state::model3_5881prot_r), this), write64_delegate(FUNC(model3_state::model3_5881prot_w), this) );                    
-	}
-	else
-	{
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf01a0000, 0xf01a003f, 0, 0x0e000000, read64_delegate(FUNC(model3_state::model3_security_r), this), write64_delegate(FUNC(model3_state::model3_security_w), this) );                    
-	}
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf01a0000, 0xf01a003f, 0, 0x0e000000, read64_delegate(FUNC(model3_state::model3_5881prot_r), this), write64_delegate(FUNC(model3_state::model3_5881prot_w), this) );                    
+
 }
 
 DRIVER_INIT_MEMBER(model3_state,model3_10)
