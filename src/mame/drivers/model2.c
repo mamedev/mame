@@ -1235,80 +1235,6 @@ static const UINT8 ZGUNProt[] =
 };
 
 
-READ32_MEMBER(model2_state::model2_prot_r)
-{
-	UINT32 retval = 0;
-
-	if (offset == 0x10000/4)
-	{
-		// status: bit 0 = 1 for busy, 0 for ready
-		retval = 0;   // we're always ready
-	}
-	else if (offset == 0x1000e/4)
-	{
-		retval = m_protram[m_protstate+1] | m_protram[m_protstate+0]<<8;
-		retval <<= 16;
-		m_protstate+=2;
-	}
-	else logerror("Unhandled Protection READ @ %x mask %x (PC=%x)\n", offset, mem_mask, space.device().safe_pc());
-
-	printf("model2_prot_r %08x: %08x (%08x)\n", offset*4, retval, mem_mask);
-
-	return retval;
-}
-
-WRITE32_MEMBER(model2_state::model2_prot_w)
-{
-	printf("model2_prot_w %08x: %08x (%08x)\n", offset*4, data, mem_mask);
-
-	if (mem_mask == 0xffff0000)
-	{
-		data >>= 16;
-	}
-
-	if (offset == 0x10008/4)
-	{
-		m_protpos = data;
-	}
-	else if (offset == 0x1000c/4)
-	{
-		switch (data)
-		{
-			// zerogun
-			case 0xA1BC:
-			case 0xAD23:
-			case 0x13CD:
-			case 0x4D53:
-			case 0x234D:
-			case 0x113D:
-			case 0x1049:
-			case 0x993D:
-			case 0x983C:
-			case 0x935:
-			case 0x9845:
-			case 0x556D:
-			case 0x98CC:
-			case 0x3422:
-			case 0x10:
-				m_protstate = 0;
-				memcpy(m_protram+2, ZGUNProt+((2*m_protpos)/12)*8, sizeof(ZGUNProt));
-				break;
-
-			// pltkids
-			case 0x7140:
-				m_protstate = 0;
-				strcpy((char *)m_protram+2, "98-PILOT  ");
-				break;
-
-			default:
-				m_protstate = 0;
-				break;
-		}
-	}
-	else logerror("Unhandled Protection WRITE %x @ %x mask %x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
-
-}
-
 
 READ32_MEMBER(model2_state::model2_5881prot_r)
 {
@@ -1372,41 +1298,6 @@ WRITE32_MEMBER(model2_state::model2_5881prot_w)
 }
 
 
-READ32_MEMBER(model2_state::doa_prot_r)
-{
-	UINT32 retval = 0;
-
-	if (offset == 0x7ff8/4)
-	{
-		retval = m_protram[m_protstate+1] | m_protram[m_protstate]<<8;
-		m_protstate+=2;
-	}
-	else if (offset == 0x400c/4)
-	{
-		m_prot_a = !m_prot_a;
-		if (m_prot_a)
-			retval = 0xffff;
-		else
-			retval = 0xfff0;
-	}
-	else logerror("Unhandled Protection READ @ %x mask %x (PC=%x)\n", offset, mem_mask, space.device().safe_pc());
-
-	return retval;
-}
-
-
-WRITE32_MEMBER(model2_state::doa_prot_w)
-{
-	if (offset == 0x7ff2 / 4)
-	{
-		if (data == 0)
-		{
-			m_protstate = 0;
-			strcpy((char *)m_protram, "  TECMO LTD.  DEAD OR ALIVE  1996.10.22  VER. 1.00");
-		}
-	}
-	else logerror("Unhandled Protection WRITE %x @ %x mask %x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
-}
 
 /* Daytona "To The MAXX" PIC protection simulation */
 
@@ -2611,6 +2502,11 @@ static MACHINE_CONFIG_DERIVED( model2a_5881, model2a )
 	MCFG_SET_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( model2a_0229, model2a )
+	MCFG_DEVICE_ADD("317_0229", SEGA315_5838_COMP, 0)
+//	MCFG_SET_5838_READ_CALLBACK(model2_state, crypt_read_callback)
+MACHINE_CONFIG_END
+
 READ8_MEMBER(model2_state::driveio_port_r)
 {
 	return m_driveio_comm_data;
@@ -2713,6 +2609,12 @@ static MACHINE_CONFIG_DERIVED( model2b_5881, model2b )
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( model2b_0229, model2b )
+	MCFG_DEVICE_ADD("317_0229", SEGA315_5838_COMP, 0)
+//	MCFG_SET_5838_READ_CALLBACK(model2_state, crypt_read_callback)
+MACHINE_CONFIG_END
+
 
 static ADDRESS_MAP_START( copro_tgpx4_map, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x00000000, 0x00007fff) AM_RAM AM_SHARE("tgpx4_program")
@@ -6004,16 +5906,9 @@ DRIVER_INIT_MEMBER(model2_state,genprot)
 {	
 	astring key = parameter(":315_5881:key");
 
-	if (key)
-	{
-		m_maincpu->space(AS_PROGRAM).install_ram(0x01d80000, 0x01d8ffff);
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x01d90000, 0x01d9ffff, read32_delegate(FUNC(model2_state::model2_5881prot_r), this), write32_delegate(FUNC(model2_state::model2_5881prot_w), this));
-	}
-	else
-	{
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x01d80000, 0x01dfffff, read32_delegate(FUNC(model2_state::model2_prot_r), this), write32_delegate(FUNC(model2_state::model2_prot_w), this));                    
-		m_protstate = m_protpos = 0;
-	}
+	m_maincpu->space(AS_PROGRAM).install_ram(0x01d80000, 0x01d8ffff);
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x01d90000, 0x01d9ffff, read32_delegate(FUNC(model2_state::model2_5881prot_r), this), write32_delegate(FUNC(model2_state::model2_5881prot_w), this));
+
 }
 
 DRIVER_INIT_MEMBER(model2_state,pltkids)
@@ -6084,9 +5979,7 @@ DRIVER_INIT_MEMBER(model2_state,overrev)
 
 DRIVER_INIT_MEMBER(model2_state,doa)
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x01d80000, 0x01dfffff, read32_delegate(FUNC(model2_state::doa_prot_r),this),  write32_delegate(FUNC(model2_state::doa_prot_w),this));
-	m_protstate = m_protpos = 0;
-
+	m_0229crypt->install_doa_protection();
 	
 	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
 	ROM[0x630/4] = 0x08000004;
@@ -6128,7 +6021,7 @@ GAME( 1995, vf2a,          vf2, model2a,      model2,  driver_device, 0,       R
 GAME( 1995, vf2o,          vf2, model2a,      model2,  driver_device, 0,       ROT0, "Sega",   "Virtua Fighter 2", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, vcop2,           0, model2a,      vcop2,   driver_device, 0,       ROT0, "Sega",   "Virtua Cop 2", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, skytargt,        0, model2a,      skytargt,driver_device, 0,       ROT0, "Sega",   "Sky Target", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, doaa,          doa, model2a,      model2,  model2_state,  doa,     ROT0, "Sega",   "Dead or Alive (Model 2A, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, doaa,          doa, model2a_0229,  model2,  model2_state,  doa,     ROT0, "Sega",   "Dead or Alive (Model 2A, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, zeroguna,  zerogun, model2a_5881, model2,  model2_state,  zerogun, ROT0, "Psikyo", "Zero Gunner (Export, Model 2A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, zerogunaj, zerogun, model2a_5881, model2,  model2_state,  zerogun, ROT0, "Psikyo", "Zero Gunner (Japan, Model 2A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, motoraid,        0, model2a,      manxtt,  driver_device, 0,       ROT0, "Sega",   "Motor Raid - Twin", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
@@ -6149,7 +6042,7 @@ GAME( 1996, sfight,     schamp, model2b,      model2,  driver_device, 0,       R
 GAME( 1996, lastbrnx,        0, model2b,      model2,  driver_device, 0,       ROT0, "Sega",   "Last Bronx (Export, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, lastbrnxu,lastbrnx, model2b,      model2,  driver_device, 0,       ROT0, "Sega",   "Last Bronx (USA, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, lastbrnxj,lastbrnx, model2b,      model2,  driver_device, 0,       ROT0, "Sega",   "Last Bronx (Japan, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, doa,             0, model2b,      model2,  model2_state,  doa,     ROT0, "Sega",   "Dead or Alive (Model 2B, Revision B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, doa,             0, model2b_0229, model2,  model2_state,  doa,     ROT0, "Sega",   "Dead or Alive (Model 2B, Revision B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, sgt24h,          0, model2b,      srallyc, model2_state,  sgt24h,  ROT0, "Jaleco", "Super GT 24h", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, von,             0, model2b,      model2,  driver_device, 0,       ROT0, "Sega",   "Cyber Troopers Virtual-On (USA, Revision B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, vonj,          von, model2b,      model2,  driver_device, 0,       ROT0, "Sega",   "Cyber Troopers Virtual-On (Japan, Revision B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )

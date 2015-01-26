@@ -10,6 +10,7 @@
 #include "bus/generic/carts.h"
 
 #include "machine/315-5881_crypt.h"
+#include "machine/315-5838_317-0229_comp.h"
 
 #define MAX_FILTERS (24)
 #define MAX_BLOCKS  (200)
@@ -701,7 +702,8 @@ public:
 		: saturn_state(mconfig, type, tag),
 		m_adsp(*this, "adsp"),
 		m_adsp_pram(*this, "adsp_pram"),
-		m_cryptdevice(*this, "315_5881")
+		m_cryptdevice(*this, "315_5881"),
+		m_5838crypt(*this, "315_5838")
 	{
 	}
 
@@ -808,22 +810,10 @@ public:
 	void install_common_protection();
 	void stv_register_protection_savestates();
 
-	// Decathlete specific variables and functions (see machine/decathlt.c)
-	UINT32 m_decathlt_protregs[4];
-	UINT32 m_decathlt_lastcount;
-	UINT32 m_decathlt_part;
-	UINT32 m_decathlt_prot_uploadmode;
-	UINT32 m_decathlt_prot_uploadoffset;
-	UINT16 m_decathlt_prottable1[24];
-	UINT16 m_decathlt_prottable2[128];
 
-	DECLARE_READ32_MEMBER( decathlt_prot_r );
-	DECLARE_WRITE32_MEMBER( decathlt_prot1_w );
-	DECLARE_WRITE32_MEMBER( decathlt_prot2_w );
-	void write_prot_data(UINT32 data, UINT32 mem_mask, int offset, int which);
-	void install_decathlt_protection();
 
 	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
+	optional_device<sega_315_5838_comp_device> m_5838crypt;
 	UINT16 crypt_read_callback(UINT32 addr);
 };
 

@@ -5,6 +5,7 @@
 #include "cpu/i960/i960.h"
 #include "sound/scsp.h"
 #include "machine/315-5881_crypt.h"
+#include "machine/315-5838_317-0229_comp.h"
 
 struct raster_state;
 struct geo_state;
@@ -36,7 +37,9 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_scsp(*this, "scsp"),
-		m_cryptdevice(*this, "315_5881")
+		m_cryptdevice(*this, "315_5881"),
+		m_0229crypt(*this, "317_0229")
+
 		{ }
 
 	required_shared_ptr<UINT32> m_workram;
@@ -63,6 +66,7 @@ public:
 	required_device<palette_device> m_palette;
 	optional_device<scsp_device> m_scsp;
 	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
+	optional_device<sega_315_5838_comp_device> m_0229crypt;
 
 	UINT32 m_intreq;
 	UINT32 m_intena;
@@ -92,10 +96,7 @@ public:
 	int m_geo_iop_write_num;
 	UINT32 m_geo_iop_data;
 	int m_to_68k;
-	int m_protstate;
-	int m_protpos;
-	UINT8 m_protram[256];
-	int m_prot_a;
+
 	int m_maxxstate;
 	UINT32 m_netram[0x8000/4];
 	int m_zflagi;
@@ -158,10 +159,6 @@ public:
 	DECLARE_READ32_MEMBER(model2_serial_r);
 	DECLARE_WRITE32_MEMBER(model2o_serial_w);
 	DECLARE_WRITE32_MEMBER(model2_serial_w);
-	DECLARE_READ32_MEMBER(model2_prot_r);
-	DECLARE_WRITE32_MEMBER(model2_prot_w);
-	DECLARE_READ32_MEMBER(doa_prot_r);
-	DECLARE_WRITE32_MEMBER(doa_prot_w);
 	DECLARE_READ32_MEMBER(model2_5881prot_r);
 	DECLARE_WRITE32_MEMBER(model2_5881prot_w);
 	int first_read;
