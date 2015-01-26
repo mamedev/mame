@@ -53,7 +53,6 @@ private:
 
 	// Doa
 	int m_protstate;
-	int m_protpos;
 	int m_prot_a;
 	UINT8 m_protram[256];
 };
