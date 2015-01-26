@@ -1,8 +1,6 @@
 #!/usr/bin/python
 
 import sys
-import logging
-import fileinput
 import re
 
 # Initial state
