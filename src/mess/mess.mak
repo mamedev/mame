@@ -679,6 +679,7 @@ DRVLIBS += \
 	$(MESSOBJ)/att.a \
 	$(MESSOBJ)/bally.a \
 	$(MESSOBJ)/bandai.a \
+	$(MESSOBJ)/banctec.a \
 	$(MESSOBJ)/be.a \
 	$(MESSOBJ)/bnpo.a \
 	$(MESSOBJ)/bondwell.a \
@@ -1041,6 +1042,9 @@ $(MESSOBJ)/att.a:               \
 
 $(MESSOBJ)/bally.a:             \
 	$(MESS_DRIVERS)/astrocde.o  \
+
+$(MESSOBJ)/banctec.a:            \
+	$(MESS_DRIVERS)/banctec.o    \
 
 $(MESSOBJ)/bandai.a:            \
 	$(MESS_DRIVERS)/sv8000.o    \
