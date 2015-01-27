@@ -28,7 +28,7 @@
 //  osd_getenv
 //============================================================
 
-char *osd_getenv(const char *name)
+const char *osd_getenv(const char *name)
 {
     return getenv(name);
 }

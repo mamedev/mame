@@ -47,19 +47,6 @@ int osd_get_num_processors(void);
 void osd_process_kill(void);
 
 /*-----------------------------------------------------------------------------
-    osd_getenv: return pointer to environment variable
-
-    Parameters:
-
-        name  - name of environment variable
-
-    Return value:
-
-        pointer to value
------------------------------------------------------------------------------*/
-char *osd_getenv(const char *name);
-
-/*-----------------------------------------------------------------------------
     osd_setenv: set environment variable
 
     Parameters:

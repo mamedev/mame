@@ -176,7 +176,6 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	// does path start with an environment variable?
 	if (tmpstr[0] == '$')
 	{
-		char *envval;
 		envstr = (char *) osd_malloc_array(strlen(tmpstr)+1);
 
 		strcpy(envstr, tmpstr);
@@ -189,7 +188,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 
 		envstr[i] = '\0';
 
-		envval = osd_getenv(&envstr[1]);
+        const char *envval = osd_getenv(&envstr[1]);
 		if (envval != NULL)
 		{
 			j = strlen(envval) + strlen(tmpstr) + 1;

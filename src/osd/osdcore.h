@@ -196,6 +196,20 @@ file_error osd_rmfile(const char *filename);
 
 
 /*-----------------------------------------------------------------------------
+    osd_getenv: return pointer to environment variable
+
+    Parameters:
+
+        name  - name of environment variable
+
+    Return value:
+
+        pointer to value
+-----------------------------------------------------------------------------*/
+const char *osd_getenv(const char *name);
+
+
+/*-----------------------------------------------------------------------------
     osd_get_physical_drive_geometry: if the given path points to a physical
         drive, return the geometry of that drive
 

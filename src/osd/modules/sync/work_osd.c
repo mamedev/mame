@@ -173,7 +173,7 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	osd_work_queue *queue;
 	int osdthreadnum = 0;
 	int allocthreadnum;
-	char *osdworkqueuemaxthreads = osd_getenv(ENV_WORKQUEUEMAXTHREADS);
+	const char *osdworkqueuemaxthreads = osd_getenv(ENV_WORKQUEUEMAXTHREADS);
 
 	// allocate a new queue
 	queue = (osd_work_queue *)osd_malloc(sizeof(*queue));
@@ -612,12 +612,11 @@ static int effective_num_processors(void)
 	}
 	else
 	{
-		char *procsoverride;
 		int numprocs = 0;
 
 		// if the OSDPROCESSORS environment variable is set, use that value if valid
 		// note that we permit more than the real number of processors for testing
-		procsoverride = osd_getenv(ENV_PROCESSORS);
+		const char *procsoverride = osd_getenv(ENV_PROCESSORS);
 		if (procsoverride != NULL && sscanf(procsoverride, "%d", &numprocs) == 1 && numprocs > 0)
 			return MIN(4 * physprocs, numprocs);
 
