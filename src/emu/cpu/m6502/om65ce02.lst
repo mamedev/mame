@@ -342,7 +342,6 @@ bra_ce_rel
 	prefetch();
 
 bra_rw2
-	printf("PC=%04x\n",PC);
 	TMP = read_pc();
 	TMP = set_h(TMP, read_pc());
 	PC += TMP - 1;
