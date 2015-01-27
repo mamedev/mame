@@ -1271,11 +1271,6 @@ static GFXDECODE_START( wbbc97 )
 	GFXDECODE_ENTRY( "gfx2", 0, wbbc97_spritelayout, 1024, 64 ) /* colors 1024-2047 in 4 banks */
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(aerofgt_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 
 MACHINE_START_MEMBER(aerofgt_state,common)
 {
@@ -1343,7 +1338,7 @@ static MACHINE_CONFIG_START( pspikes, aerofgt_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(aerofgt_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
@@ -1502,7 +1497,7 @@ static MACHINE_CONFIG_START( karatblz, aerofgt_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz ) /* verified on pcb */
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(aerofgt_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
@@ -1556,7 +1551,7 @@ static MACHINE_CONFIG_START( spinlbrk, aerofgt_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)  /* verified on pcb */
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(aerofgt_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
@@ -1609,7 +1604,7 @@ static MACHINE_CONFIG_START( turbofrc, aerofgt_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)  /* verified on pcb */
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(aerofgt_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
@@ -1663,7 +1658,7 @@ static MACHINE_CONFIG_START( aerofgtb, aerofgt_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(aerofgt_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
@@ -1711,7 +1706,7 @@ static MACHINE_CONFIG_START( aerofgt, aerofgt_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)  /* verified on pcb */
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(aerofgt_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
@@ -1824,7 +1819,7 @@ static MACHINE_CONFIG_START( wbbc97, aerofgt_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3579545)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(aerofgt_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified

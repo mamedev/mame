@@ -203,8 +203,6 @@ public:
 	void metro_common(  );
 	void draw_tilemap( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 flags, UINT32 pcode,
 					int sx, int sy, int wx, int wy, int big, UINT16 *tilemapram, int layer );
-	DECLARE_WRITE_LINE_MEMBER(blzntrnd_irqhandler);
-	DECLARE_WRITE_LINE_MEMBER(ymf278b_interrupt);
 	DECLARE_READ_LINE_MEMBER(metro_rxd_r);
 
 protected:

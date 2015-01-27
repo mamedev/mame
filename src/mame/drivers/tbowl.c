@@ -423,15 +423,6 @@ static GFXDECODE_START( tbowl )
 
 GFXDECODE_END
 
-/*** Sound Bits
-
-*/
-
-WRITE_LINE_MEMBER(tbowl_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state);
-}
-
 
 /*** Machine Driver
 
@@ -500,7 +491,7 @@ static MACHINE_CONFIG_START( tbowl, tbowl_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym1", YM3812, 4000000)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(tbowl_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("ym2", YM3812, 4000000)

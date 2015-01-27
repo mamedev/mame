@@ -9,18 +9,6 @@
 
 /******************************************************************************/
 
-void actfancr_state::register_savestate()
-{
-	save_item(NAME(m_flipscreen));
-}
-
-void actfancr_state::video_start()
-{
-	register_savestate();
-}
-
-/******************************************************************************/
-
 UINT32 actfancr_state::screen_update_actfancr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* Draw playfield */

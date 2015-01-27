@@ -622,11 +622,6 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(lordgun_state::soundirq)
-{
-	m_soundcpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 static MACHINE_CONFIG_START( lordgun, lordgun_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(lordgun_map)
@@ -668,7 +663,7 @@ static MACHINE_CONFIG_START( lordgun, lordgun_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(lordgun_state, soundirq))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_20MHz / 20, OKIM6295_PIN7_HIGH)   // ? 5MHz can't be right!
@@ -718,7 +713,7 @@ static MACHINE_CONFIG_START( aliencha, lordgun_state )
 
 	MCFG_SOUND_ADD("ymf", YMF278B, 26000000)            // ? 26MHz matches video (decrease for faster music tempo)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, ymf278_map)
-	MCFG_YMF278B_IRQ_HANDLER(WRITELINE(lordgun_state, soundirq))
+	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_20MHz / 20, OKIM6295_PIN7_HIGH)   // ? 5MHz can't be right

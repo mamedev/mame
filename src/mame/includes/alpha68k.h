@@ -115,7 +115,6 @@ public:
 	void jongbou_video_banking(int *bank, int data);
 	void kyros_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d );
 	void sstingry_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d );
-	DECLARE_WRITE_LINE_MEMBER(ym3812_irq);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

@@ -255,12 +255,6 @@ INTERRUPT_GEN_MEMBER(metro_state::puzzlet_interrupt)
 	update_irq_state();
 }
 
-WRITE_LINE_MEMBER(metro_state::ymf278b_interrupt)
-{
-	m_maincpu->set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
 /***************************************************************************
 
 
@@ -1606,11 +1600,6 @@ WRITE8_MEMBER(metro_state::blzntrnd_sh_bankswitch_w)
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x4000;
 	membank("bank1")->set_base(&RAM[bankaddress]);
-}
-
-WRITE_LINE_MEMBER(metro_state::blzntrnd_irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( blzntrnd_sound_map, AS_PROGRAM, 8, metro_state )
@@ -3660,7 +3649,7 @@ static MACHINE_CONFIG_START( msgogo, metro_state )
 
 	MCFG_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, ymf278_map)
-	MCFG_YMF278B_IRQ_HANDLER(WRITELINE(metro_state, ymf278b_interrupt))
+	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("maincpu", 2))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -4384,7 +4373,7 @@ static MACHINE_CONFIG_START( blzntrnd, metro_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(metro_state, blzntrnd_irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)

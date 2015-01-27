@@ -1906,14 +1906,6 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-/* handler called by the 3812 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(dec8_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state); /* M6502_IRQ_LINE */
-}
-
-/******************************************************************************/
-
 INTERRUPT_GEN_MEMBER(dec8_state::gondo_interrupt)
 {
 	if (m_nmi_enable)
@@ -2254,7 +2246,7 @@ static MACHINE_CONFIG_START( ghostb, dec8_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3812, 3000000)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(dec8_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2418,7 +2410,7 @@ static MACHINE_CONFIG_START( srdarwin, dec8_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3812, 3000000)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(dec8_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2475,7 +2467,7 @@ static MACHINE_CONFIG_START( cobracom, dec8_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
 	MCFG_SOUND_ADD("ym2", YM3812, 3000000)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(dec8_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 

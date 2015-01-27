@@ -84,7 +84,6 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_onetwo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_color(int offset);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };
 
 
@@ -331,16 +330,6 @@ static GFXDECODE_START( onetwo )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x6_layout, 0, 2 )
 GFXDECODE_END
 
-/*************************************
- *
- *  Sound interface
- *
- *************************************/
-
-WRITE_LINE_MEMBER(onetwo_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state);
-}
 
 /*************************************
  *
@@ -386,7 +375,7 @@ static MACHINE_CONFIG_START( onetwo, onetwo_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, MASTER_CLOCK)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(onetwo_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki", 1056000*2, OKIM6295_PIN7_LOW) // clock frequency & pin 7 not verified

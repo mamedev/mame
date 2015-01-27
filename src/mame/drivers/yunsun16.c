@@ -582,11 +582,6 @@ MACHINE_RESET_MEMBER(yunsun16_state, shocking)
                                 Magic Bubble
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(yunsun16_state::soundirq)
-{
-	m_audiocpu->set_input_line(0, state);
-}
-
 static MACHINE_CONFIG_START( magicbub, yunsun16_state )
 
 	/* basic machine hardware */
@@ -614,7 +609,7 @@ static MACHINE_CONFIG_START( magicbub, yunsun16_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_16MHz/4)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(yunsun16_state, soundirq))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 

@@ -583,12 +583,6 @@ WRITE8_MEMBER(itech8_state::itech8_nmi_ack_w)
 }
 
 
-WRITE_LINE_MEMBER(itech8_state::generate_sound_irq)
-{
-	m_soundcpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
 
 /*************************************
  *
@@ -1655,7 +1649,7 @@ static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym2203 )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("ymsnd", YM2203, CLOCK_8MHz/2)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(itech8_state, generate_sound_irq))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", M6809_FIRQ_LINE))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(itech8_state, ym2203_portb_out))
 	MCFG_SOUND_ROUTE(0, "mono", 0.07)
 	MCFG_SOUND_ROUTE(1, "mono", 0.07)
@@ -1675,7 +1669,7 @@ static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym2608b )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("ymsnd", YM2608, CLOCK_8MHz)
-	MCFG_YM2608_IRQ_HANDLER(WRITELINE(itech8_state, generate_sound_irq))
+	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("soundcpu", M6809_FIRQ_LINE))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(itech8_state, ym2203_portb_out))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
@@ -1694,7 +1688,7 @@ static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym3812 )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("ymsnd", YM3812, CLOCK_8MHz/2)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(itech8_state, generate_sound_irq))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_OKIM6295_ADD("oki", CLOCK_8MHz/8, OKIM6295_PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
@@ -1710,7 +1704,7 @@ static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym3812_external )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("ymsnd", YM3812, CLOCK_8MHz/2)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(itech8_state, generate_sound_irq))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_OKIM6295_ADD("oki", CLOCK_8MHz/8, OKIM6295_PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified

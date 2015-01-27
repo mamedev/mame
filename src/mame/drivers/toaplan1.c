@@ -1760,11 +1760,6 @@ static GFXDECODE_START( rallybik )
 GFXDECODE_END
 
 
-WRITE_LINE_MEMBER(toaplan1_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state);
-}
-
 #define PIXEL_CLOCK         (XTAL_28MHz/4)
 
 // HTOTAL and VTOTAL taken from CRTC registers (toaplan1_bcu_control_w)
@@ -1816,7 +1811,7 @@ static MACHINE_CONFIG_START( rallybik, toaplan1_rallybik_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(toaplan1_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1854,7 +1849,7 @@ static MACHINE_CONFIG_START( truxton, toaplan1_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(toaplan1_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1892,7 +1887,7 @@ static MACHINE_CONFIG_START( hellfire, toaplan1_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(toaplan1_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1930,7 +1925,7 @@ static MACHINE_CONFIG_START( zerowing, toaplan1_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(toaplan1_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1972,7 +1967,7 @@ static MACHINE_CONFIG_START( demonwld, toaplan1_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(toaplan1_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2008,7 +2003,7 @@ static MACHINE_CONFIG_START( samesame, toaplan1_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(toaplan1_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2046,7 +2041,7 @@ static MACHINE_CONFIG_START( outzone, toaplan1_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(toaplan1_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2082,7 +2077,7 @@ static MACHINE_CONFIG_START( vimana, toaplan1_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)   /* verified on pcb */
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(toaplan1_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

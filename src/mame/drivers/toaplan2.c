@@ -3049,12 +3049,6 @@ static GFXDECODE_START( fixeightbl )
 GFXDECODE_END
 
 
-WRITE_LINE_MEMBER(toaplan2_state::irqhandler)
-{
-	if (m_audiocpu != NULL)       // wouldn't tekipaki have problem without this? "mcu" is not generally added
-		m_audiocpu->set_input_line(0, state);
-}
-
 WRITE_LINE_MEMBER(toaplan2_state::bbakraid_irqhandler)
 {
 	// Not used ???  Connected to a test pin (TP082)
@@ -3100,7 +3094,9 @@ static MACHINE_CONFIG_START( tekipaki, toaplan2_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_27MHz/8)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(toaplan2_state, irqhandler))
+#ifdef USE_HD64x180
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+#endif
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -3411,7 +3407,7 @@ static MACHINE_CONFIG_START( pipibibs, toaplan2_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_27MHz/8)           /* verified on pcb */
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(toaplan2_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -3454,7 +3450,7 @@ static MACHINE_CONFIG_START( pipibibsbl, toaplan2_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_27MHz/8)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(toaplan2_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

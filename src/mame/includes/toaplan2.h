@@ -153,7 +153,6 @@ public:
 	void truxton2_postload();
 	void create_tx_tilemap(int dx = 0, int dx_flipped = 0);
 	void toaplan2_vblank_irq(int irq_line);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(bbakraid_irqhandler);
 
 	UINT8 m_pwrkick_hopper;

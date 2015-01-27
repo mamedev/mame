@@ -756,12 +756,6 @@ static INPUT_PORTS_START( mjgtaste )
 INPUT_PORTS_END
 
 
-WRITE_LINE_MEMBER(psikyosh_state::irqhandler)
-{
-	m_maincpu->set_input_line(12, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
 void psikyosh_state::machine_start()
 {
 	membank("gfxbank")->configure_entries(0, 0x1000, memregion("gfx1")->base(), 0x20000);
@@ -799,7 +793,7 @@ static MACHINE_CONFIG_START( psikyo3v1, psikyosh_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymf", YMF278B, MASTER_CLOCK/2)
-	MCFG_YMF278B_IRQ_HANDLER(WRITELINE(psikyosh_state, irqhandler))
+	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("maincpu", 12))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END

@@ -600,12 +600,6 @@ static GFXDECODE_START( tecmo )
 GFXDECODE_END
 
 
-
-WRITE_LINE_MEMBER(tecmo_state::irqhandler)
-{
-	m_soundcpu->set_input_line(0, state);
-}
-
 MACHINE_RESET_MEMBER(tecmo_state,rygar)
 {
 	m_adpcm_pos = 0;
@@ -647,7 +641,7 @@ static MACHINE_CONFIG_START( rygar, tecmo_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz) /* verified on pcb */
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(tecmo_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb, even if schematics shows a 384khz resonator */
@@ -710,7 +704,7 @@ static MACHINE_CONFIG_START( backfirt, tecmo_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz) /* verified on pcb */
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(tecmo_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* no MSM on this PCB */

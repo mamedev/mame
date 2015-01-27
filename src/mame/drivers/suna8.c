@@ -1779,11 +1779,6 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(suna8_state::soundirq)
-{
-	m_audiocpu->set_input_line(0, state);
-}
-
 /* In games with only 2 CPUs, port A&B of the AY8910 are used
    for sample playing. */
 
@@ -1950,7 +1945,7 @@ static MACHINE_CONFIG_START( brickzn, suna8_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 6)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(suna8_state, soundirq))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 

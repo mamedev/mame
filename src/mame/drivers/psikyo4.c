@@ -616,12 +616,6 @@ static INPUT_PORTS_START( hotdebut )
 INPUT_PORTS_END
 
 
-WRITE_LINE_MEMBER(psikyo4_state::irqhandler)
-{
-	m_maincpu->set_input_line(12, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
 void psikyo4_state::machine_start()
 {
 	// configure YMF ROM banks
@@ -693,7 +687,7 @@ static MACHINE_CONFIG_START( ps4big, psikyo4_state )
 
 	MCFG_SOUND_ADD("ymf", YMF278B, MASTER_CLOCK/2)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, ps4_ymf_map)
-	MCFG_YMF278B_IRQ_HANDLER(WRITELINE(psikyo4_state, irqhandler))
+	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("maincpu", 12))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
