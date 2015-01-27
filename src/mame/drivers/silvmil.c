@@ -28,18 +28,23 @@ class silvmil_state : public driver_device
 public:
 	silvmil_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
+			m_gfxdecode(*this, "gfxdecode"),
+			m_sprgen(*this, "spritegen"),
 			m_bg_videoram(*this, "bg_videoram"),
 			m_fg_videoram(*this, "fg_videoram"),
-			m_spriteram(*this, "spriteram"),
-			m_sprgen(*this, "spritegen"),
-			m_maincpu(*this, "maincpu"),
-			m_gfxdecode(*this, "gfxdecode") { }
+			m_spriteram(*this, "spriteram") { }
+
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<decospr_device> m_sprgen;
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg_videoram;
 	required_shared_ptr<UINT16> m_fg_videoram;
 	required_shared_ptr<UINT16> m_spriteram;
-	optional_device<decospr_device> m_sprgen;
 
 	/* video-related */
 	tilemap_t   *m_bg_layer;
@@ -114,8 +119,6 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_silvmil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tumblepb_gfx1_rearrange();
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -280,6 +283,8 @@ GFXDECODE_END
 
 void silvmil_state::machine_start()
 {
+	save_item(NAME(m_silvmil_tilebank));
+	save_item(NAME(m_whichbank));
 }
 
 void silvmil_state::machine_reset()
@@ -427,4 +432,4 @@ DRIVER_INIT_MEMBER(silvmil_state,silvmil)
 	tumblepb_gfx1_rearrange();
 }
 
-GAME( 1995, silvmil, 0, silvmil, silvmil, silvmil_state, silvmil, ROT270, "Para", "Silver Millennium", 0 )
+GAME( 1995, silvmil, 0, silvmil, silvmil, silvmil_state, silvmil, ROT270, "Para", "Silver Millennium", GAME_SUPPORTS_SAVE )

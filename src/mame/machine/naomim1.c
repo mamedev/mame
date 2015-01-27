@@ -13,13 +13,6 @@ ADDRESS_MAP_END
 naomi_m1_board::naomi_m1_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: naomi_board(mconfig, NAOMI_M1_BOARD, "Sega NAOMI M1 Board", tag, owner, clock, "naomi_m1_board", __FILE__)
 {
-	key_tag = 0;
-}
-
-void naomi_m1_board::static_set_tags(device_t &device, const char *_key_tag)
-{
-	naomi_m1_board &dev = downcast<naomi_m1_board &>(device);
-	dev.key_tag = _key_tag;
 }
 
 READ16_MEMBER(naomi_m1_board::actel_id_r)
@@ -37,12 +30,15 @@ void naomi_m1_board::device_start()
 {
 	naomi_board::device_start();
 
-#if USE_NAOMICRYPT
-	key = get_naomi_key(machine());
-#else
-	const UINT8 *key_data = memregion(key_tag)->base();
-	key = (key_data[0] << 24) | (key_data[1] << 16) | (key_data[2] << 8) | key_data[3];
-#endif
+	astring skey = parameter("key");
+	if(skey)
+		key = strtoll(skey.cstr(), 0, 16);
+	else
+	{
+		logerror("%s: Warning: key not provided\n", tag());
+		key = 0;
+	}
+
 	buffer = auto_alloc_array(machine(), UINT8, BUFFER_SIZE);
 
 	save_pointer(NAME(buffer), BUFFER_SIZE);

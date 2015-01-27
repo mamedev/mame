@@ -54,6 +54,9 @@ lynx      // Atari Lynx Handheld
 jaguar  // Atari Jaguar
 jaguarcd  // Atari Jaguar CD
 
+//BancTec
+banctec // BancTec ESeries panel
+
 // Nintendo
 nes       // Nintendo Entertainment System
 nespal    // Nintendo Entertainment System PAL
