@@ -92,6 +92,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	MC6845_UPDATE_ROW(update_row);
 	DECLARE_READ16_MEMBER( mem_r );
 	DECLARE_WRITE16_MEMBER( mem_w );
 	DECLARE_READ8_MEMBER( prtr_snd_r );
