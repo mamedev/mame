@@ -734,14 +734,11 @@ jmp_ce_ind
 jsr_ce_adr
 	TMP = read_pc();
 	write(SP, PC>>8);
-	printf("a %04x\n",SP);
 	dec_SP_ce();
 	write(SP, PC);
-		printf("b %04x\n",SP);
 	dec_SP_ce();
 	TMP = set_h(TMP, read_pc());
 	PC = TMP;
-	printf("%04x\n",TMP);
 	prefetch();
 
 jsr_iax
