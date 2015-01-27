@@ -743,17 +743,19 @@ else
 DEFS += -DUSE_QTDEBUG=0
 endif
 
-DEBUGOBJS += \
-	$(OSDOBJ)/modules/debugger/none.o \
-	$(OSDOBJ)/modules/debugger/debugint.o \
-	$(OSDOBJ)/modules/debugger/debugwin.o \
-	$(OSDOBJ)/modules/debugger/debugqt.o \
-
 ifeq ($(NO_DEBUGGER),1)
 DEFS += -DNO_DEBUGGER
 else
 OSDOBJS += $(DEBUGOBJS)
 endif # NO_DEBUGGER
+
+# Always add these
+OSDOBJS += \
+	$(OSDOBJ)/modules/debugger/none.o \
+	$(OSDOBJ)/modules/debugger/debugint.o \
+	$(OSDOBJ)/modules/debugger/debugwin.o \
+	$(OSDOBJ)/modules/debugger/debugqt.o \
+
 
 #-------------------------------------------------
 # OPENGL
