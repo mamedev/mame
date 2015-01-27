@@ -194,12 +194,12 @@ nes_fcpad2_device::nes_fcpad2_device(const machine_config &mconfig, const char *
 }
 
 nes_ccpadl_device::nes_ccpadl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-					nes_joypad_device(mconfig, NES_CCPAD_LEFT, "Crazy Climber Left Pad", tag, owner, clock, "nes_ccpadl", __FILE__)
+					nes_joypad_device(mconfig, NES_CCPAD_LEFT, "FC Crazy Climber Left Pad", tag, owner, clock, "nes_ccpadl", __FILE__)
 {
 }
 
 nes_ccpadr_device::nes_ccpadr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-					nes_joypad_device(mconfig, NES_CCPAD_RIGHT, "Crazy Climber Right Pad", tag, owner, clock, "nes_ccpadr", __FILE__)
+					nes_joypad_device(mconfig, NES_CCPAD_RIGHT, "FC Crazy Climber Right Pad", tag, owner, clock, "nes_ccpadr", __FILE__)
 {
 }
 

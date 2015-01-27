@@ -51,7 +51,7 @@ ioport_constructor sms_joypad_device::device_input_ports() const
 //-------------------------------------------------
 
 sms_joypad_device::sms_joypad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, SMS_JOYPAD, "Control Pad", tag, owner, clock, "sms_joypad", __FILE__),
+	device_t(mconfig, SMS_JOYPAD, "Sega SMS Control Pad", tag, owner, clock, "sms_joypad", __FILE__),
 	device_sms_control_port_interface(mconfig, *this),
 	m_joypad(*this, "JOYPAD")
 {

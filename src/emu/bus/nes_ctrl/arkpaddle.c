@@ -54,7 +54,7 @@ nes_vaus_device::nes_vaus_device(const machine_config &mconfig, device_type type
 }
 
 nes_vaus_device::nes_vaus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-					device_t(mconfig, NES_ARKPADDLE, "Arkanoid Vaus NES Controller", tag, owner, clock, "nes_vaus", __FILE__),
+					device_t(mconfig, NES_ARKPADDLE, "NES Arkanoid Vaus Controller", tag, owner, clock, "nes_vaus", __FILE__),
 					device_nes_control_port_interface(mconfig, *this),
 					m_paddle(*this, "PADDLE"),
 					m_button(*this, "BUTTON")
@@ -62,7 +62,7 @@ nes_vaus_device::nes_vaus_device(const machine_config &mconfig, const char *tag,
 }
 
 nes_vausfc_device::nes_vausfc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-					nes_vaus_device(mconfig, NES_ARKPADDLE_FC, "Arkanoid Vaus FC Controller", tag, owner, clock, "nes_vausfc", __FILE__)
+					nes_vaus_device(mconfig, NES_ARKPADDLE_FC, "FC Arkanoid Vaus Controller", tag, owner, clock, "nes_vausfc", __FILE__)
 {
 }
 
