@@ -125,7 +125,7 @@ WRITE8_MEMBER(c65_state::vic4567_dummy_w)
 			printf("CONTROL A %02x\n",data); 
 			m_VIC3_ControlA = data;
 			break;
-		default: 
+		default:
 			if(!space.debugger_access())
 				printf("%02x %02x\n",offset,data); 
 			break;
