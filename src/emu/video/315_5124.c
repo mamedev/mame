@@ -14,6 +14,7 @@ To do:
   - Display mode 1 (text)
   - Display mode 3 (multicolor)
   - Sprite doubling bug of the 315-5124 chip
+  - Verify timing on the Game Gear (315-5378 chip)
 
 
 SMS Display Timing
@@ -343,7 +344,7 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 			rec.min_x = SEGA315_5124_LBORDER_START;
 			rec.max_x = SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH - 1;
 			m_tmpbitmap.fill(m_palette->pen(m_current_palette[BACKDROP_COLOR]), rec);
-			m_y1_bitmap.fill(1, rec);
+			m_y1_bitmap.fill(( m_reg[0x07] & 0x0f ) ? 1 : 0, rec);
 		}
 		break;
 
@@ -358,7 +359,7 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 			rec.min_x = SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256;
 			rec.max_x = rec.min_x + SEGA315_5124_RBORDER_WIDTH - 1;
 			m_tmpbitmap.fill(m_palette->pen(m_current_palette[BACKDROP_COLOR]), rec);
-			m_y1_bitmap.fill(1, rec);
+			m_y1_bitmap.fill(( m_reg[0x07] & 0x0f ) ? 1 : 0, rec);
 		}
 		break;
 
@@ -847,15 +848,16 @@ void sega315_5124_device::draw_scanline_mode4( int *line_buffer, int *priority_s
 				//logerror("%x %x\n", pixel_plot_x, line);
 				if (tile_column == 0 && (x_scroll & 0x07))
 				{
-					/* the VDP only draws the first column when it has completely entered
-					   in the screen, else it is filled with the sprite pattern #0 */
-					line_buffer[pixel_plot_x] = m_current_palette[0x10];
+					/* when the first column hasn't completely entered in the screen, its
+					   background is filled only with color #0 of the selected palette */
+					line_buffer[pixel_plot_x] = m_current_palette[palette_selected ? 0x10 : 0x00];
+					priority_selected[pixel_plot_x] = priority_select;
 				}
 				else
 				{
 					line_buffer[pixel_plot_x] = m_current_palette[pen_selected];
+					priority_selected[pixel_plot_x] = priority_select | (pen_selected & 0x0f);
 				}
-				priority_selected[pixel_plot_x] = priority_select | (pen_selected & 0x0f);
 			}
 		}
 	}
@@ -1012,7 +1014,8 @@ void sega315_5124_device::select_sprites( int line )
 
 		m_sprite_count = max_sprites;
 
-		if (line >= 0 && line < m_frame_timing[ACTIVE_DISPLAY_V])
+		/* Overflow is flagged only on active display and when VINT isn't active */
+		if (!(m_status & STATUS_VINT) && line >= 0 && line < m_frame_timing[ACTIVE_DISPLAY_V])
 		{
 			m_pending_status |= STATUS_SPROVR;
 		}
@@ -1030,7 +1033,8 @@ void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_se
 	if (m_display_disabled || m_sprite_count == 0)
 		return;
 
-	/* Sprites aren't drawn and collisions don't occur on column 0 if it is disabled */
+	/* Sprites aren't drawn and collisions don't occur on column 0 if it is disabled.
+	   Note: On Megadrive/Genesis VDP, collisions occur on the disabled column 0. */
 	if (m_reg[0x00] & 0x20)
 		plot_min_x = 8;
 
@@ -1084,6 +1088,8 @@ void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_se
 					continue;
 				}
 
+				/* Draw sprite pixel */
+				/* Check if the background has lower priority */
 				if (!(priority_selected[pixel_plot_x] & PRIORITY_BIT))
 				{
 					line_buffer[pixel_plot_x] = m_current_palette[pen_selected];
@@ -1296,10 +1302,11 @@ void sega315_5124_device::draw_scanline( int pixel_offset_x, int pixel_plot_y, i
 
 	if ( line < m_frame_timing[ACTIVE_DISPLAY_V] )
 	{
+		memset(priority_selected, 1, sizeof(priority_selected));
+
 		switch( m_vdp_mode )
 		{
 		case 0:
-			memset(priority_selected, 1, sizeof(priority_selected));
 			if ( line >= 0 )
 			{
 				draw_scanline_mode0( blitline_buffer, line );
@@ -1311,7 +1318,6 @@ void sega315_5124_device::draw_scanline( int pixel_offset_x, int pixel_plot_y, i
 			break;
 
 		case 2:
-			memset(priority_selected, 1, sizeof(priority_selected));
 			if ( line >= 0 )
 			{
 				draw_scanline_mode2( blitline_buffer, line );
@@ -1324,7 +1330,6 @@ void sega315_5124_device::draw_scanline( int pixel_offset_x, int pixel_plot_y, i
 
 		case 4:
 		default:
-			memset(priority_selected, 0, sizeof(priority_selected));
 			if ( line >= 0 )
 			{
 				draw_scanline_mode4( blitline_buffer, priority_selected, line );
@@ -1346,7 +1351,7 @@ void sega315_5124_device::draw_scanline( int pixel_offset_x, int pixel_plot_y, i
 		rec.min_x = pixel_offset_x;
 		rec.max_x = pixel_offset_x + 255;
 		m_tmpbitmap.fill(m_palette->pen(m_current_palette[BACKDROP_COLOR]), rec);
-		m_y1_bitmap.fill(1, rec);
+		m_y1_bitmap.fill(( m_reg[0x07] & 0x0f ) ? 1 : 0, rec);
 	}
 	else
 	{
@@ -1361,13 +1366,13 @@ void sega315_5124_device::blit_scanline( int *line_buffer, int *priority_selecte
 	UINT8  *p_y1 = &m_y1_bitmap.pix8(pixel_plot_y + line, pixel_offset_x);
 	int x = 0;
 
-	if (m_vdp_mode == 4 && m_reg[0x00] & 0x20)
+	if (m_vdp_mode == 4 && (m_reg[0x00] & 0x20))
 	{
 		/* Fill column 0 with overscan color from m_reg[0x07] */
 		do
 		{
 			p_bitmap[x] = m_palette->pen(m_current_palette[BACKDROP_COLOR]);
-			p_y1[x] = 1;
+			p_y1[x] = ( m_reg[0x07] & 0x0f ) ? 1 : 0;
 		}
 		while(++x < 8);
 	}
@@ -1375,7 +1380,7 @@ void sega315_5124_device::blit_scanline( int *line_buffer, int *priority_selecte
 	do
 	{
 		p_bitmap[x] = m_palette->pen(line_buffer[x]);
-		p_y1[x] = ( priority_selected[x] & 0x0f ) ? 0 : 1;
+		p_y1[x] = ( priority_selected[x] & 0x0f ) ? 1 : 0;
 	}
 	while(++x < 256);
 }
@@ -1397,7 +1402,7 @@ void sega315_5378_device::blit_scanline( int *line_buffer, int *priority_selecte
 		do
 		{
 			p_bitmap[x] = m_palette->pen(m_current_palette[BACKDROP_COLOR]);
-			p_y1[x] = 1; // not verified
+			p_y1[x] = ( m_reg[0x07] & 0x0f ) ? 1 : 0;
 		}
 		while (++x < 48);
 
@@ -1406,7 +1411,7 @@ void sega315_5378_device::blit_scanline( int *line_buffer, int *priority_selecte
 			do
 			{
 				p_bitmap[x] = m_palette->pen(line_buffer[x]);
-				p_y1[x] = ( priority_selected[x] & 0x0f ) ? 0 : 1;
+				p_y1[x] = ( priority_selected[x] & 0x0f ) ? 1 : 0;
 			}
 			while (++x < 208);
 		}
@@ -1416,7 +1421,7 @@ void sega315_5378_device::blit_scanline( int *line_buffer, int *priority_selecte
 			do
 			{
 				p_bitmap[x] = m_palette->pen(m_current_palette[BACKDROP_COLOR]);
-				p_y1[x] = 1; // not verified
+				p_y1[x] = ( m_reg[0x07] & 0x0f ) ? 1 : 0;
 			}
 			while (++x < 208);
 		}
@@ -1425,7 +1430,7 @@ void sega315_5378_device::blit_scanline( int *line_buffer, int *priority_selecte
 		do
 		{
 			p_bitmap[x] = m_palette->pen(m_current_palette[BACKDROP_COLOR]);
-			p_y1[x] = 1; // not verified
+			p_y1[x] = ( m_reg[0x07] & 0x0f ) ? 1 : 0;
 		}
 		while (++x < 256);
 	}

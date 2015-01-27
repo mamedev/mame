@@ -19,7 +19,7 @@
 #define CONTROL1_TAG   "ctrl1"
 #define CONTROL2_TAG   "ctrl2"
 
-#include "bus/gamegear/gear2gear.h"
+#include "bus/gamegear/ggext.h"
 #include "bus/sms_ctrl/smsctrl.h"
 #include "bus/sms_exp/smsexp.h"
 #include "bus/sega8/sega8_slot.h"
@@ -37,7 +37,7 @@ public:
 		m_region_maincpu(*this, "maincpu"),
 		m_port_ctrl1(*this, CONTROL1_TAG),
 		m_port_ctrl2(*this, CONTROL2_TAG),
-		m_port_gear2gear(*this, "gear2gear"),
+		m_port_gg_ext(*this, "ext"),
 		m_port_gg_dc(*this, "GG_PORT_DC"),
 		m_port_pause(*this, "PAUSE"),
 		m_port_reset(*this, "RESET"),
@@ -66,7 +66,7 @@ public:
 	required_memory_region m_region_maincpu;
 	optional_device<sms_control_port_device> m_port_ctrl1;
 	optional_device<sms_control_port_device> m_port_ctrl2;
-	optional_device<gg_gear2gear_port_device> m_port_gear2gear;
+	optional_device<gg_ext_port_device> m_port_gg_ext;
 	optional_ioport m_port_gg_dc;
 	optional_ioport m_port_pause;
 	optional_ioport m_port_reset;
@@ -75,25 +75,15 @@ public:
 	optional_ioport m_port_scope_binocular;
 	optional_ioport m_port_persist;
 
-	device_t *m_left_lcd;
-	device_t *m_right_lcd;
 	address_space *m_space;
-
-	UINT8 m_bios_page_count;
-	UINT8 m_fm_detect;
-	UINT8 m_io_ctrl_reg;
-	int m_paused;
-	UINT8 m_mem_ctrl_reg;
-	UINT8 m_mem_device_enabled;
 	UINT8 *m_mainram;
 	UINT8 *m_BIOS;
-	UINT8 m_mapper[4];
-	UINT8 m_port_dc_reg;
-	UINT8 m_port_dd_reg;
-	UINT8 m_gg_sio[5];
 
-	// [0] for 0x400-0x3fff, [1] for 0x4000-0x7fff, [2] for 0x8000-0xffff, [3] for 0x0000-0x0400
-	UINT8 m_bios_page[4];
+	// for 3D glass binocular hack
+	device_t *m_left_lcd;
+	device_t *m_right_lcd;
+	bitmap_rgb32 m_prevleft_bitmap;
+	bitmap_rgb32 m_prevright_bitmap;
 
 	// for gamegear LCD persistence hack
 	bitmap_rgb32 m_prev_bitmap;
@@ -104,10 +94,6 @@ public:
 	// line_buffer will be used to hold 4 lines of line data as a kind of cache for
 	// vertical scaling in the gamegear sms compatibility mode.
 	int *m_line_buffer;
-
-	// for 3D glass binocular hack
-	bitmap_rgb32 m_prevleft_bitmap;
-	bitmap_rgb32 m_prevright_bitmap;
 
 	// model identifiers
 	UINT8 m_is_gamegear;
@@ -121,6 +107,20 @@ public:
 	UINT8 m_has_fm;
 	UINT8 m_has_jpn_sms_cart_slot;
 
+	// [0] for 0x400-0x3fff, [1] for 0x4000-0x7fff, [2] for 0x8000-0xffff, [3] for 0x0000-0x0400
+	UINT8 m_bios_page[4];
+
+	UINT8 m_bios_page_count;
+	UINT8 m_mapper[4];
+	UINT8 m_io_ctrl_reg;
+	UINT8 m_mem_ctrl_reg;
+	UINT8 m_mem_device_enabled;
+	UINT8 m_fm_detect;
+	UINT8 m_port_dc_reg;
+	UINT8 m_port_dd_reg;
+	UINT8 m_gg_sio[5];
+	int m_paused;
+
 	// Data needed for Light Phaser
 	UINT8 m_ctrl1_th_state;
 	UINT8 m_ctrl2_th_state;
@@ -132,31 +132,18 @@ public:
 	UINT8 m_sscope_state;
 	UINT8 m_frame_sscope_state;
 
+	// slot devices
 	sega8_cart_slot_device *m_cartslot;
 	sega8_card_slot_device *m_cardslot;
 	sms_expansion_slot_device *m_expslot;
 
 	// these are only used by the Store Display unit, but we keep them here temporarily to avoid the need of separate start/reset
-	UINT8 m_store_control;
-	UINT8 m_store_cart_selection_data;
 	sega8_cart_slot_device *m_slots[16];
 	sega8_card_slot_device *m_cards[16];
+	UINT8 m_store_control;
+	UINT8 m_store_cart_selection_data;
 	void store_post_load();
 	void store_select_cart(UINT8 data);
-
-	/* Cartridge slot info */
-	DECLARE_WRITE8_MEMBER(sms_fm_detect_w);
-	DECLARE_READ8_MEMBER(sms_fm_detect_r);
-	DECLARE_WRITE8_MEMBER(sms_io_control_w);
-	DECLARE_READ8_MEMBER(sms_count_r);
-	DECLARE_READ8_MEMBER(sms_input_port_dc_r);
-	DECLARE_READ8_MEMBER(sms_input_port_dd_r);
-	DECLARE_READ8_MEMBER(gg_input_port_00_r);
-	DECLARE_WRITE8_MEMBER(sms_ym2413_register_port_w);
-	DECLARE_WRITE8_MEMBER(sms_ym2413_data_port_w);
-	DECLARE_READ8_MEMBER(sms_sscope_r);
-	DECLARE_WRITE8_MEMBER(sms_sscope_w);
-	DECLARE_READ8_MEMBER(sms_mapper_r);
 
 	DECLARE_READ8_MEMBER(read_0000);
 	DECLARE_READ8_MEMBER(read_4000);
@@ -165,10 +152,29 @@ public:
 	DECLARE_WRITE8_MEMBER(write_ram);
 	DECLARE_WRITE8_MEMBER(write_cart);
 
+	DECLARE_READ8_MEMBER(sms_mapper_r);
 	DECLARE_WRITE8_MEMBER(sms_mapper_w);
 	DECLARE_WRITE8_MEMBER(sms_mem_control_w);
+	DECLARE_WRITE8_MEMBER(sms_io_control_w);
+	DECLARE_READ8_MEMBER(sms_count_r);
+	DECLARE_READ8_MEMBER(sms_input_port_dc_r);
+	DECLARE_READ8_MEMBER(sms_input_port_dd_r);
+	DECLARE_READ8_MEMBER(gg_input_port_00_r);
 	DECLARE_WRITE8_MEMBER(gg_sio_w);
 	DECLARE_READ8_MEMBER(gg_sio_r);
+	DECLARE_WRITE8_MEMBER(sms_fm_detect_w);
+	DECLARE_READ8_MEMBER(sms_fm_detect_r);
+	DECLARE_WRITE8_MEMBER(sms_ym2413_register_port_w);
+	DECLARE_WRITE8_MEMBER(sms_ym2413_data_port_w);
+	DECLARE_READ8_MEMBER(sms_sscope_r);
+	DECLARE_WRITE8_MEMBER(sms_sscope_w);
+
+	DECLARE_WRITE_LINE_MEMBER(sms_int_callback);
+	DECLARE_WRITE_LINE_MEMBER(sms_pause_callback);
+	DECLARE_WRITE_LINE_MEMBER(sms_ctrl1_th_input);
+	DECLARE_WRITE_LINE_MEMBER(sms_ctrl2_th_input);
+	DECLARE_READ32_MEMBER(sms_pixel_color);
+
 	DECLARE_DRIVER_INIT(sg1000m3);
 	DECLARE_DRIVER_INIT(gamegear);
 	DECLARE_DRIVER_INIT(gamegeaj);
@@ -183,16 +189,12 @@ public:
 	DECLARE_VIDEO_RESET(gamegear);
 	DECLARE_VIDEO_START(sms1);
 	DECLARE_VIDEO_RESET(sms1);
-	void screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	UINT32 screen_update_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_vblank_sms1(screen_device &screen, bool state);
-	DECLARE_WRITE_LINE_MEMBER(sms_int_callback);
-	DECLARE_WRITE_LINE_MEMBER(sms_pause_callback);
-	DECLARE_READ32_MEMBER(sms_pixel_color);
-	DECLARE_WRITE_LINE_MEMBER(sms_ctrl1_th_input);
-	DECLARE_WRITE_LINE_MEMBER(sms_ctrl2_th_input);
 
 protected:
 	UINT8 read_bus(address_space &space, unsigned int bank, UINT16 base_addr, UINT16 offset);

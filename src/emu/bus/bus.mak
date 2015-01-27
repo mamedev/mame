@@ -1291,12 +1291,12 @@ endif
 
 #-------------------------------------------------
 #
-#@src/emu/bus/gamegear/gear2gear.h,BUSES += GAMEGEAR
+#@src/emu/bus/gamegear/ggext.h,BUSES += GAMEGEAR
 #-------------------------------------------------
 
 ifneq ($(filter GAMEGEAR,$(BUSES)),)
 OBJDIRS += $(BUSOBJ)/gamegear
-BUSOBJS += $(BUSOBJ)/gamegear/gear2gear.o
+BUSOBJS += $(BUSOBJ)/gamegear/ggext.o
 BUSOBJS += $(BUSOBJ)/gamegear/smsctrladp.o
 endif
 
