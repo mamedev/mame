@@ -91,7 +91,7 @@ struct sdl_video_config
 
 	// global configuration
 	int                 windowed;               // start windowed?
-	int                 prescale;               // prescale factor (not currently supported)
+	int                 prescale;               // prescale factor (supported by accel driver)
 	int                 keepaspect;             // keep aspect ratio?
 	int                 numscreens;             // number of screens
 	int                 centerh;
