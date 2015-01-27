@@ -648,7 +648,7 @@ void sdl_osd_interface::extract_video_config(running_machine &machine)
 	stemp = options().video();
 	if (strcmp(stemp, "auto") == 0)
 	{
-#ifdef SDLMAME_MACOSX
+#if (defined SDLMAME_MACOSX || defined SDLMAME_WIN32)
 		stemp = "opengl";
 #else
 		stemp = "soft";
