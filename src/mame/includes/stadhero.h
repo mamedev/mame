@@ -12,10 +12,7 @@ public:
 		m_spritegen(*this, "spritegen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_spriteram(*this, "spriteram"),
-		m_pf1_data(*this, "pf1_data"),
-		m_inputs(*this, "INPUTS"),
-		m_coin(*this, "COIN"),
-		m_dsw(*this, "DSW") { }
+		m_pf1_data(*this, "pf1_data") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -25,17 +22,11 @@ public:
 	
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_pf1_data;
-	
-	required_ioport m_inputs;
-	required_ioport m_coin;
-	required_ioport m_dsw;
 
 	tilemap_t *m_pf1_tilemap;
 	
-	DECLARE_READ16_MEMBER(stadhero_control_r);
 	DECLARE_WRITE16_MEMBER(stadhero_control_w);
 	DECLARE_WRITE16_MEMBER(stadhero_pf1_data_w);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	
 	virtual void video_start();
 	
