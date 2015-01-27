@@ -607,39 +607,16 @@ COBJFLAGS += \
 # warnings only applicable to C++ compiles
 CPPONLYFLAGS += \
 	-Woverloaded-virtual
-	
-include $(SRC)/build/cc_detection.mak
 
 ifdef SANITIZE
 CCOMFLAGS += -fsanitize=$(SANITIZE)
+
 ifneq (,$(findstring thread,$(SANITIZE)))
 CCOMFLAGS += -fPIE
 endif
-ifneq (,$(findstring memory,$(SANITIZE)))
-ifneq (,$(findstring clang,$(CC)))
-CCOMFLAGS += -fsanitize-memory-track-origins -fPIE
 endif
-endif
-ifneq (,$(findstring undefined,$(SANITIZE)))
-ifneq (,$(findstring clang,$(CC)))
-# TODO: check if linker is clang++
-# produces a lot of messages - disable it for now
-CCOMFLAGS += -fno-sanitize=alignment
-# these are false positives because of the way our delegates work
-CCOMFLAGS += -fno-sanitize=function
-# clang takes forever to compile src/emu/cpu/tms57002/tms57002.c when this isn't disabled
-CCOMFLAGS += -fno-sanitize=shift
-# clang takes forever to compile src/emu/cpu/tms57002/tms57002.c, src/emu/cpu/m6809/hd6309.c when this isn't disabled
-CCOMFLAGS += -fno-sanitize=object-size
-# clang takes forever to compile src/emu/cpu/tms57002/tms57002.c, src/emu/cpu/m6809/konami.c, src/emu/cpu/m6809/hd6309.c, src/emu/video/psx.c when this isn't disabled
-CCOMFLAGS += -fno-sanitize=vptr
-# clang takes forever to compile src/emu/video/psx.c when this isn't disabled
-CCOMFLAGS += -fno-sanitize=null
-# clang takes forever to compile src/emu/cpu/tms57002/tms57002.c when this isn't disabled
-CCOMFLAGS += -fno-sanitize=signed-integer-overflow
-endif
-endif
-endif
+
+include $(SRC)/build/cc_detection.mak
 
 #-------------------------------------------------
 # include paths
