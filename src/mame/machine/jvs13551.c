@@ -144,11 +144,13 @@ bool sega_837_13551::analogs(UINT8 *&buf, UINT8 count)
 
 bool sega_837_13551::swoutputs(UINT8 count, const UINT8 *vals)
 {
+	// WARNING! JVS standard have reversed bits count order
+	// so "board have 6 output bits" means 6 MSB bits is used, the same rules for input too
 	if(count > 1)
 		return false;
-	jvs_outputs = vals[0] & 0x3f;
+	jvs_outputs = vals[0] & 0xfc;
 	logerror("837-13551: output %02x\n", jvs_outputs);
-	ioport(port_tag[11])->write_safe(jvs_outputs, 0x3f);
+	ioport(port_tag[11])->write_safe(jvs_outputs, 0xfc);
 	return true;
 }
 
