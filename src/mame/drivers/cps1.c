@@ -9346,7 +9346,7 @@ ROM_START( cworld2ja )
 
 	ROM_REGION( 0x0200, "bboardplds", 0 )
 	ROM_LOAD( "q529b.1a",     0x0000, 0x0117, NO_DUMP )
-	ROM_LOAD( "lwio.12e",     0x0000, 0x0117, CRC(ad52b90c) SHA1(f0fd6aeea515ee449320fe15684e6b3ab7f97bf4) )    /* seen the same pcb with IOB1.12E */
+	ROM_LOAD( "iob1.11d",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
 
 	ROM_REGION( 0x0200, "cboardplds", 0 )
 	ROM_LOAD( "ioc1.ic1",     0x0000, 0x0117, CRC(0d182081) SHA1(475b3d417785da4bc512cce2b274bb00d4cc6792) )
