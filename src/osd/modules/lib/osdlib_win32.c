@@ -23,6 +23,10 @@
 #include "osdcomm.h"
 #include "osdcore.h"
 
+#ifdef OSD_WINDOWS
+#include "winutf8.h"
+#endif
+
 //============================================================
 //  MACROS
 //============================================================
