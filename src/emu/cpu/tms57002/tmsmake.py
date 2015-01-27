@@ -417,7 +417,7 @@ ins_list = LoadLst(sys.argv[1])
 try:
     f = open(sys.argv[2], "w")
 except Exception, err:
-    logging.error("cannot write file %s [%s]", fname, err)
+    sys.stderr.write("cannot write file %s [%s]\n" % (sys.argv[2], err))
     sys.exit(1)
 
 EmitDasm(f, ins_list)
