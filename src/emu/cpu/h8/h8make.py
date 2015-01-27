@@ -139,7 +139,7 @@ class Opcode:
         for i in range(0, extra_words):
             self.source.append("\tfetch(%d);\n" % (i+base_offset));
 
-    def description():
+    def description(self):
         return "%s %s %s" % (self.name, self.am1, self.am2)
     
     def add_source_line(self, line):
