@@ -2400,35 +2400,22 @@ static INPUT_PORTS_START( naomi_mp )
 	PORT_INCLUDE( naomi_mie )
 	PORT_INCLUDE( naomi_debug )
 
-	PORT_START("P1") /* inputs are all there, it needs a mux write mechanism of some sort ... */
-	PORT_DIPNAME( 0x0100, 0x0000, "SYSA" )
-	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0100, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0200, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0400, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0800, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x1000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x2000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x4000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x8000, DEF_STR( On ) )
+	PORT_START("OUTPUT")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_CHANGED_MEMBER(DEVICE_SELF, naomi_state,naomi_mp_w, NULL)
+
+	PORT_START("P1")
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL )  PORT_CUSTOM_MEMBER(DEVICE_SELF, naomi_state,naomi_mp_r, "KEY1\0KEY2\0KEY3\0KEY4\0KEY5")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("KEY1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED ) //TODO: mahjong panel test & service buttons are presumably here
-
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_FLIP_FLOP )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_MAHJONG_LAST_CHANCE )
 	PORT_START("KEY2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
@@ -2440,7 +2427,7 @@ static INPUT_PORTS_START( naomi_mp )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_MAHJONG_A )
 	PORT_START("KEY3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_BET )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_REACH )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_N )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_J )
@@ -2465,6 +2452,12 @@ static INPUT_PORTS_START( naomi_mp )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_MAHJONG_H )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_MAHJONG_D )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( suchie3 )
+	PORT_INCLUDE( naomi_mp )
+	PORT_MODIFY("P1")
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL )  PORT_CUSTOM_MEMBER(DEVICE_SELF, naomi_state,naomi_mp_r, "KEY5\0KEY2\0KEY3\0KEY4\0KEY1")
 INPUT_PORTS_END
 
 // Atomiswave - inputs are read as standard Dreamcast controllers.
@@ -2625,7 +2618,7 @@ static MACHINE_CONFIG_START( naomi_aw_base, naomi_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( naomi_base, naomi_aw_base )
-	MCFG_MIE_ADD("mie", 4000000, "maple_dc", 0, 0, 0, 0, ":MIE.3", 0, ":MIE.5", 0, 0) // Actual frequency unknown
+	MCFG_MIE_ADD("mie", XTAL_32MHz/2, "maple_dc", 0, 0, 0, 0, ":MIE.3", 0, ":MIE.5", 0, 0) // Actual frequency unknown, most likely 1/2 of 32MHz XTAL or even 2/3 (yes, 21MHz Z80 core)
 	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "mie", ":TILT", ":P1", ":P2", ":A0", ":A1", ":A2", ":A3", ":A4", ":A5", ":A6", ":A7", ":OUTPUT")
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("mie_eeprom")
 
@@ -9055,7 +9048,7 @@ GAME( 2003, puyofevp, naomi, naomim1, naomi, naomi_state, naomi, ROT0, "Sega", "
 
 /* 841-xxxxx ("Licensed by Sega" Naomi cart games)*/
 /* 0001 */ GAME( 1999, pstone,   naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom",          "Power Stone (JPN, USA, EUR, ASI, AUS)", GAME_FLAGS )
-/* 0002 */ GAME( 1999, suchie3,  naomi, naomim2, naomi_mp,naomi_state,naomi_mp,ROT0,  "Jaleco",          "Idol Janshi Suchie-Pai 3 (JPN)", GAME_FLAGS )
+/* 0002 */ GAME( 1999, suchie3,  naomi, naomim2, suchie3, naomi_state,naomi_mp,ROT0,  "Jaleco",          "Idol Janshi Suchie-Pai 3 (JPN)", GAME_FLAGS )
 /* 0003 */ GAME( 1999, doa2,     naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Tecmo",           "Dead or Alive 2 (JPN, USA, EXP, KOR, AUS)", GAME_FLAGS )
 /* 0003 */ GAME( 2000, doa2m,    doa2,  naomim2, naomi,   naomi_state, naomi,  ROT0,  "Tecmo",           "Dead or Alive 2 Millennium (JPN, USA, EXP, KOR, AUS)", GAME_FLAGS )
 /* 0004 */ GAME( 1999, shangril, naomi, naomim2, naomi_mp,naomi_state,naomi_mp,ROT0,  "Marvelous Ent.",  "Dengen Tenshi Taisen Janshi Shangri-la (JPN, USA, EXP, KOR, AUS)", GAME_FLAGS )

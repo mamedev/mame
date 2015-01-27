@@ -103,6 +103,11 @@ void mie_device::device_start()
 	save_item(NAME(irq_enable));
 	save_item(NAME(irq_pending));
 	save_item(NAME(maple_irqlevel));
+
+	// patch out MIE RAM test
+	// TODO: figure out why SH4 code doesn't wait long enough for internal firmware's RAM test completed in the case of reset
+	UINT32 *rom = (UINT32*)memregion("mie")->base();
+	rom[0x144/4] = 0x0001d8c3;
 }
 
 void mie_device::device_reset()
@@ -164,13 +169,17 @@ void mie_device::device_timer(emu_timer &_timer, device_timer_id id, int param, 
 			control |= CTRL_TFB|CTRL_EMP;
 		}
 	}
+	if(control & CTRL_HRES) {
+		raise_irq(maple_irqlevel);
+	}
 }
 
 void mie_device::maple_w(const UINT32 *data, UINT32 in_size)
 {
 	memcpy(tbuf, data, in_size*4);
 	lreg = in_size-1;
-	control &= ~(CTRL_TXB|CTRL_TFB|CTRL_RFB|CTRL_BFOV);
+	// currently not known how/then CTRL_HRES is cleared after reset, lets clear it at packet receive
+	control &= ~(CTRL_HRES|CTRL_TXB|CTRL_TFB|CTRL_RFB|CTRL_BFOV);
 	control |= CTRL_RXB;
 
 	timer->adjust(attotime::from_usec(20));
@@ -357,8 +366,8 @@ READ8_MEMBER(mie_device::jvs_sense_r)
 
 void mie_device::maple_reset()
 {
-	// ignoring reset maple pattern is HUGE HACK
-	// current implementation works only because of in such case procedure of firmware upload by games will be skipped at all
-	// so in better case - inputs doesnt work if game uses very different firmware version than already uploaded by BIOS, in worst case - game hang/reboot
-	// TODO: figure out why game code doesn't wait long enough for internal firmware's RAM test completed in the case of proper reset
+	control &= ~(CTRL_RXB|CTRL_TXB|CTRL_TFB|CTRL_RFB|CTRL_BFOV);
+	control |= CTRL_HRES;
+
+	timer->adjust(attotime::from_usec(20));
 }
