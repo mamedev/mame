@@ -1026,9 +1026,21 @@ static MACHINE_CONFIG_DERIVED( stv_5881, stv )
 	MCFG_SET_READ_CALLBACK(stv_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
+
+UINT16 stv_state::crypt_read_callback_ch1(UINT32 addr)
+{
+	return m_maincpu->space().read_word(0x02000000 + 0x1000000 + (addr * 2));
+}
+
+UINT16 stv_state::crypt_read_callback_ch2(UINT32 addr)
+{
+	return m_maincpu->space().read_word(0x02000000 + 0x0000000 + (addr * 2));
+}
+
 static MACHINE_CONFIG_DERIVED( stv_5838, stv )
 	MCFG_DEVICE_ADD("315_5838", SEGA315_5838_COMP, 0)
-//	MCFG_SET_5838_READ_CALLBACK(stv_state, crypt_read_callback)
+	MCFG_SET_5838_READ_CALLBACK_CH1(stv_state, crypt_read_callback_ch1)
+	MCFG_SET_5838_READ_CALLBACK_CH2(stv_state, crypt_read_callback_ch2)
 MACHINE_CONFIG_END
 
 

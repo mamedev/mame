@@ -9,9 +9,24 @@
 	Decathlete uses it to compress ALL the game graphics, Dead or Alive uses it for a
 	dumb security check, decompressing a single string.
 
+	Each channel appears to be connected to a different set of ROMs, however there is
+	defintiely only 315-5838 single chip.
+
 	Dead of Alive only uses a single channel, and has the source data in RAM, not ROM.
 	This is similar to how some 5881 games were set up, with the ST-V versions decrypting
 	data directly from ROM and the Model 2 ones using a RAM source buffer.
+
+	Looking at the values read I don't think there is any address based encryption, for
+	example many blocks where you'd expect a zero fill start with repeating patterns
+	of 8f708f70 (different lengths) which would appear to relate to compressed 0x00 data
+
+	read addr 0071253c, blah_r 8f708f70 - read count count 00000004
+	read addr 00712540, blah_r 8f708f70 - read count count 00000008
+	read addr 00712544, blah_r 8f708f70 - read count count 0000000c
+	read addr 00712548, blah_r 8f708f70 - read count count 00000010
+	read addr 0071254c, blah_r 8f708f70 - read count count 00000014
+	read addr 00712550, blah_r 8f708f70 - read count count 00000018
+	read addr 00712554, blah_r 8f708f70 - read count count 0000001c
 
 */
 
@@ -20,6 +35,7 @@
 
 extern const device_type SEGA315_5838_COMP = &device_creator<sega_315_5838_comp_device>;
 
+//#define DEBUG_DATA_DUMP
 
 sega_315_5838_comp_device::sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGA315_5838_COMP, "Sega 315-5838 / 317-0029 Compression (Encryption?)", tag, owner, clock, "SEGA315_5838", __FILE__)
@@ -33,6 +49,9 @@ void sega_315_5838_comp_device::device_start()
 	m_decathlt_lastcount = 0;
 	m_decathlt_prot_uploadmode = 0;
 	m_decathlt_prot_uploadoffset = 0;
+
+	m_read_ch1.bind_relative_to(*owner());
+	m_read_ch2.bind_relative_to(*owner());
 }
 
 void sega_315_5838_comp_device::device_reset()
@@ -53,32 +72,63 @@ void sega_315_5838_comp_device::device_reset()
 *
 **************************/
 
-READ32_MEMBER( sega_315_5838_comp_device::decathlt_prot_r )
+#ifdef DEBUG_DATA_DUMP
+FILE* tempfile;
+#endif
+
+
+READ32_MEMBER(sega_315_5838_comp_device::decathlt_prot_r)
 {
-	// the offsets written to the protection device definitely only refer to 2 of the roms
-	//  it's a fair assumption to say that only those 2 are connected to the protection device
-	UINT8 *ROM = (UINT8 *)memregion(":abus")->base()+0x1000000;
-	UINT32 *fake0 = (UINT32*)memregion( ":fake0" )->base();
+	return genericdecathlt_prot_r(offset, mem_mask, 0);
+}
+
+READ32_MEMBER(sega_315_5838_comp_device::decathlt_prot_ch2_r)
+{
+	return genericdecathlt_prot_r(offset, mem_mask, 1);
+}
+
+
+UINT32 sega_315_5838_comp_device::genericdecathlt_prot_r(UINT32 offset, UINT32 mem_mask, int which)
+{
+
+//	UINT32 *fake0 = (UINT32*)memregion( ":fake0" )->base();
 
 	if (offset==2)
 	{
-		UINT32 retvalue = 0xffff;
+//		UINT32 retvalue = 0xffff;
 
 		switch (m_decathlt_protregs[0])
 		{
 			default:
-			retvalue = ROM[(m_decathlt_protregs[0]*2)-2];
-			retvalue <<= 8;
-			retvalue |= ROM[((m_decathlt_protregs[0]+1)*2)+1-2];
-			retvalue <<= 8;
-			retvalue |= ROM[((m_decathlt_protregs[0]+1)*2)-2];
-			retvalue <<= 8;
-			retvalue |= ROM[((m_decathlt_protregs[0]+2)*2)+1-2];
-			m_decathlt_lastcount++;
-			logerror("read addr %08x, blah_r %08x - read count count %08x\n", m_decathlt_protregs[0], retvalue, m_decathlt_lastcount*4);
-			m_decathlt_protregs[0]+=2;
-			return retvalue;
 
+			m_decathlt_lastcount++;
+
+			UINT32 tempdata = 0;
+
+			if (which == 0)
+			{
+				tempdata |= m_read_ch1(m_decathlt_protregs[0]) << 16;
+				m_decathlt_protregs[0]++;
+				tempdata |= m_read_ch1(m_decathlt_protregs[0]) << 0;
+				m_decathlt_protregs[0]++;
+			}
+			else
+			{
+				tempdata |= m_read_ch2(m_decathlt_protregs[0]) << 16;
+				m_decathlt_protregs[0]++;
+				tempdata |= m_read_ch2(m_decathlt_protregs[0]) << 0;
+				m_decathlt_protregs[0]++;
+			}
+
+			#ifdef DEBUG_DATA_DUMP
+			//printf("read addr %08x, blah_r %08x - read count count %08x\n", m_decathlt_protregs[0]*2, tempdata,  m_decathlt_lastcount*4);
+			fwrite(&tempdata, 1, 4, tempfile);
+			#else
+			logerror("read addr %08x, blah_r %08x - read count count %08x\n", m_decathlt_protregs[0]*2, tempdata,  m_decathlt_lastcount*4);
+			#endif
+
+			return tempdata;
+#if 0
 			case 0x03228e4:
 				if (fake0) retvalue = fake0[(((0x20080/4)+m_decathlt_lastcount))];
 				m_decathlt_lastcount++;
@@ -128,6 +178,7 @@ READ32_MEMBER( sega_315_5838_comp_device::decathlt_prot_r )
 			case 0x0018424:
 
 				return retvalue;
+#endif
 		}
 
 
@@ -156,6 +207,19 @@ void sega_315_5838_comp_device::write_prot_data(UINT32 data, UINT32 mem_mask, in
 		//if (m_decathlt_part==0) logerror("%d, last read count was %06x\n",which, m_decathlt_lastcount*4);
 		m_decathlt_lastcount = 0;
 		if (m_decathlt_part==1) logerror("%d Decathlete prot W offset %04x data %08x, %08x, >>> regs %08x <<<<, %08x, %08x, %08x\n",which, offset, data, m_decathlt_protregs[0], m_decathlt_protregs[0]*4, m_decathlt_protregs[1], m_decathlt_protregs[2], m_decathlt_protregs[3]);
+
+#ifdef DEBUG_DATA_DUMP
+		if (mem_mask == 0x0000ffff)
+		{
+			if (tempfile)
+				fclose(tempfile);
+
+			char filename[256];
+			sprintf(filename, "%d_compressed_%08x", which, m_decathlt_protregs[0] );
+			tempfile = fopen(filename, "w+b");
+		}
+#endif
+
 	}
 
 	if (offset==1) // uploads 2 tables...
@@ -287,7 +351,7 @@ void sega_315_5838_comp_device::install_decathlt_protection()
 
 	cpu->space(AS_PROGRAM).install_readwrite_handler(0x37FFFF0, 0x37FFFFF, read32_delegate(FUNC(sega_315_5838_comp_device::decathlt_prot_r), this), write32_delegate(FUNC(sega_315_5838_comp_device::decathlt_prot1_w), this));
 	/* It accesses the device at this address too, with different tables, for the game textures, should it just act like a mirror, or a secondary device? */
-	cpu->space(AS_PROGRAM).install_readwrite_handler(0x27FFFF0, 0x27FFFFF, read32_delegate(FUNC(sega_315_5838_comp_device::decathlt_prot_r), this), write32_delegate(FUNC(sega_315_5838_comp_device::decathlt_prot2_w), this));
+	cpu->space(AS_PROGRAM).install_readwrite_handler(0x27FFFF0, 0x27FFFFF, read32_delegate(FUNC(sega_315_5838_comp_device::decathlt_prot_ch2_r), this), write32_delegate(FUNC(sega_315_5838_comp_device::decathlt_prot2_w), this));
 }
 
 

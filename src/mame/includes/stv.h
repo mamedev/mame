@@ -815,6 +815,8 @@ public:
 	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
 	optional_device<sega_315_5838_comp_device> m_5838crypt;
 	UINT16 crypt_read_callback(UINT32 addr);
+	UINT16 crypt_read_callback_ch1(UINT32 addr);
+	UINT16 crypt_read_callback_ch2(UINT32 addr);
 };
 
 
