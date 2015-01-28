@@ -28,7 +28,7 @@ class nes_miracle_device : public device_t,
 							public device_nes_control_port_interface
 {
 public:
-	static const int XMIT_RING_SIZE = 16;
+	static const int XMIT_RING_SIZE = 64;
 
 	// construction/destruction
 	nes_miracle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
