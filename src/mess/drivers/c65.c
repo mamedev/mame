@@ -125,11 +125,13 @@ UINT32 c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, co
 			int ym = (y & 7);
 			UINT8 tile = m_workram[xi+yi*80+0x800];
 			UINT8 attr = m_cram[xi+yi*80];
+			if(attr & 0xf0)
+				attr = machine().rand() & 0xf;
+			
 			int enable_dot = ((m_iplrom[(tile<<3)+ym+0xd000] >> xm) & 1);
 						
 			//if(cliprect.contains(x, y))
-						
-				bitmap.pix16(y, x) = m_palette->pen((enable_dot) ? attr & 0xf : border_color);
+			bitmap.pix16(y, x) = m_palette->pen((enable_dot) ? attr & 0xf : border_color);
 
 			
 			//gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
@@ -247,6 +249,8 @@ void c65_state::DMAgicExecute(address_space &space,UINT32 address)
 	dst|=(space.read_byte(address++)<<8);
 	dst|=(space.read_byte(address++)<<16);
 
+	if(cmd & 0xfc)
+		printf("%02x\n",cmd & 0xfc);
 	switch(cmd & 3)
 	{
 		case 0: // copy - TODO: untested
