@@ -3571,7 +3571,7 @@ ROM_START( dynamcop ) /* Dynamite Cop (Export), Model 2A, Sega Game ID# 833-1134
 	ROM_LOAD("mpr-20815.37", 0x600000, 0x200000, CRC(1b5aaae4) SHA1(32b4bf6c096fdccdd5d8f1ddb6c27d3389a52234) )
 
 	//             1998     317-0236-COM   Model 2
-	ROM_PARAMETER( ":315_5881:key", "0c2a4a93" )
+	ROM_PARAMETER( ":315_5881:key", "2c2a4a93" )
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
@@ -3622,7 +3622,7 @@ ROM_START( dyndeka2 ) /* Dynamite Deka 2 (Japan), Model 2A */
 	ROM_LOAD("mpr-20815.37", 0x600000, 0x200000, CRC(1b5aaae4) SHA1(32b4bf6c096fdccdd5d8f1ddb6c27d3389a52234) )
 
 	//             1998     317-0236-COM   Model 2
-	ROM_PARAMETER( ":315_5881:key", "0c2a4a93" )
+	ROM_PARAMETER( ":315_5881:key", "2c2a4a93" )
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
@@ -3673,7 +3673,7 @@ ROM_START( dynamcopb ) /* Dynamite Cop (Export), Model 2B */
 	ROM_LOAD("mpr-20815.37", 0x600000, 0x200000, CRC(1b5aaae4) SHA1(32b4bf6c096fdccdd5d8f1ddb6c27d3389a52234) )
 
 	//             1998     317-0236-COM   Model 2
-	ROM_PARAMETER( ":315_5881:key", "0c2a4a93" )
+	ROM_PARAMETER( ":315_5881:key", "2c2a4a93" )
 ROM_END
 
 ROM_START( dyndeka2b ) /* Dynamite Deka 2 (Japan), Model 2B */
@@ -3721,7 +3721,7 @@ ROM_START( dyndeka2b ) /* Dynamite Deka 2 (Japan), Model 2B */
 	ROM_LOAD("mpr-20815.37", 0x600000, 0x200000, CRC(1b5aaae4) SHA1(32b4bf6c096fdccdd5d8f1ddb6c27d3389a52234) )
 
 	//             1998     317-0236-COM   Model 2
-	ROM_PARAMETER( ":315_5881:key", "0c2a4a93" )
+	ROM_PARAMETER( ":315_5881:key", "2c2a4a93" )
 ROM_END
 
 ROM_START( dynamcopc ) /* Dynamite Cop (USA), Model 2C */
@@ -3769,7 +3769,7 @@ ROM_START( dynamcopc ) /* Dynamite Cop (USA), Model 2C */
 	ROM_LOAD("mpr-20815.37", 0x600000, 0x200000, CRC(1b5aaae4) SHA1(32b4bf6c096fdccdd5d8f1ddb6c27d3389a52234) ) /* Located at position 35 on 2C-CRX rom board */
 
 	//             1998     317-0236-COM   Model 2
-	ROM_PARAMETER( ":315_5881:key", "0c2a4a93" )
+	ROM_PARAMETER( ":315_5881:key", "2c2a4a93" )
 ROM_END
 
 ROM_START( schamp ) /* Sonic Championship, Model 2B - Sega ROM board ID# 834-12786 */

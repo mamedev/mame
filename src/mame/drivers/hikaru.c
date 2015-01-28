@@ -571,7 +571,7 @@ ROM_START( airtrix )
 	/* ic66 unpopulated */
 
 	// 834-14149   2000     317-0294-COM   Hikaru
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "091b02c7" )
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "291b02c7" )
 ROM_END
 
 
@@ -609,7 +609,7 @@ ROM_START( pharrier )
 	ROM_LOAD32_WORD( "mpr-23564.ic66", 0xe000002, 0x1000000, CRC(255724b6) SHA1(1b382fad165831de3f2e39352c031146759dfc69) )
 
 	// 834-14144   2001     317-0297-COM   Hikaru
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "0912c68a" )
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "2912c68a" )
 ROM_END
 
 ROM_START( podrace )
@@ -663,7 +663,7 @@ ROM_START( podrace )
 
 	// current 315-5881 decryption simulation code can't produce valid output data with any of keys
 	// 834-14002   2001     317-0277-COM   Hikaru
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "0903dad5" )
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "2903dad5" )
 ROM_END
 
 ROM_START( braveff )
