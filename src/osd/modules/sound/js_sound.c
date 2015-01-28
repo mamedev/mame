@@ -13,7 +13,6 @@
 
 #if (defined(SDLMAME_EMSCRIPTEN))
 
-#include "js_sound.h"
 #include "emscripten.h"
 
 class sound_js : public osd_module, public sound_module
