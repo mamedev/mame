@@ -7,7 +7,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_nmk112(*this, "nmk112"),
 		m_vctrl_0(*this, "vctrl_0"),
 		m_vram_0(*this, "vram_0"),
 		m_vram_1(*this, "vram_1"),
@@ -20,7 +19,6 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
-	optional_device<nmk112_device> m_nmk112;
 	required_shared_ptr<UINT16> m_vctrl_0;
 	required_shared_ptr<UINT16> m_vram_0;
 	required_shared_ptr<UINT16> m_vram_1;

@@ -3049,13 +3049,6 @@ static GFXDECODE_START( fixeightbl )
 GFXDECODE_END
 
 
-WRITE_LINE_MEMBER(toaplan2_state::bbakraid_irqhandler)
-{
-	// Not used ???  Connected to a test pin (TP082)
-	logerror("YMZ280 is generating an interrupt. State=%08x\n",state);
-}
-
-
 static MACHINE_CONFIG_START( tekipaki, toaplan2_state )
 
 	/* basic machine hardware */
@@ -4003,7 +3996,7 @@ static MACHINE_CONFIG_START( bbakraid, toaplan2_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(toaplan2_state, bbakraid_irqhandler))
+	// IRQ not used ???  Connected to a test pin (TP082)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

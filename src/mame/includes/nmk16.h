@@ -11,7 +11,6 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_oki1(*this, "oki1"),
 		m_oki2(*this, "oki2"),
-		m_nmk112(*this, "nmk112"),
 		m_nmk_bgvideoram0(*this, "nmk_bgvideoram0"),
 		m_nmk_txvideoram(*this, "nmk_txvideoram"),
 		m_mainram(*this, "mainram"),
@@ -34,7 +33,6 @@ public:
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki1;
 	optional_device<okim6295_device> m_oki2;
-	optional_device<nmk112_device> m_nmk112;
 	required_shared_ptr<UINT16> m_nmk_bgvideoram0;
 	optional_shared_ptr<UINT16> m_nmk_txvideoram;
 	required_shared_ptr<UINT16> m_mainram;
@@ -196,6 +194,4 @@ public:
 	void decode_gfx();
 	void decode_tdragonb();
 	void decode_ssmissin();
-	DECLARE_WRITE_LINE_MEMBER(ym2203_irqhandler);
-
 };

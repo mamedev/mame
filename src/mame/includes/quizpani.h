@@ -6,14 +6,12 @@ public:
 	quizpani_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_nmk112(*this, "nmk112"),
 		m_scrollreg(*this, "scrollreg"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_txt_videoram(*this, "txt_videoram"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<nmk112_device> m_nmk112;
 	required_shared_ptr<UINT16> m_scrollreg;
 	required_shared_ptr<UINT16> m_bg_videoram;
 	required_shared_ptr<UINT16> m_txt_videoram;

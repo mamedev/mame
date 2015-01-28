@@ -514,7 +514,7 @@ static MACHINE_CONFIG_START( kothello, shanghai_state )
 
 	/* same as standard seibu ym2203, but "ym1" also reads "DSW" */
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_16MHz/4)
-	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, ym2203_irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 

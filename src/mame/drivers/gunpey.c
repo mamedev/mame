@@ -263,8 +263,6 @@ public:
 
 	int write_dest_byte(UINT8 usedata);
 	//UINT16 main_m_vram[0x800][0x800];
-
-	DECLARE_WRITE_LINE_MEMBER(sound_irq_gen);
 };
 
 
@@ -1316,15 +1314,6 @@ ADDRESS_MAP_END
 
 /***************************************************************************************/
 
-
-WRITE_LINE_MEMBER(gunpey_state::sound_irq_gen)
-{
-	logerror("sound irq\n");
-}
-
-
-/***************************************************************************************/
-
 static INPUT_PORTS_START( gunpey )
 	PORT_START("DSW1")  // IN0 - 7f40
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:1,2")
@@ -1467,7 +1456,6 @@ static MACHINE_CONFIG_START( gunpey, gunpey_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(gunpey_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
 MACHINE_CONFIG_END
