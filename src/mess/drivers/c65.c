@@ -30,23 +30,27 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_screen(*this, "screen"),
 			m_palette(*this, "palette"),
+			m_workram(*this, "wram"),
 			m_palred(*this, "redpal"),
 			m_palgreen(*this, "greenpal"),
 			m_palblue(*this, "bluepal"),
 			m_dmalist(*this, "dmalist"),
-			m_cram(*this, "cram")
+			m_cram(*this, "cram"),
+			m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	// devices
 	required_device<m4510_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<UINT8> m_workram;
 	required_shared_ptr<UINT8> m_palred;
 	required_shared_ptr<UINT8> m_palgreen;
 	required_shared_ptr<UINT8> m_palblue;
 	required_shared_ptr<UINT8> m_dmalist;
 	required_shared_ptr<UINT8> m_cram;
-	
+	required_device<gfxdecode_device> m_gfxdecode;
+
 	DECLARE_READ8_MEMBER(vic4567_dummy_r);
 	DECLARE_WRITE8_MEMBER(vic4567_dummy_w);
 	DECLARE_WRITE8_MEMBER(PalRed_w);
@@ -84,6 +88,18 @@ void c65_state::video_start()
 
 UINT32 c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
+	int y,x;
+	gfx_element *gfx = m_gfxdecode->gfx(0);
+
+	for(y=0;y<30;y++)
+	{
+		for(x=0;x<40;x++)
+		{
+			UINT8 tile = m_workram[x+y*40+0x800];
+			gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
+		}
+	}
+
 	return 0;
 }
 
@@ -264,11 +280,11 @@ WRITE8_MEMBER(c65_state::CIASelect_w)
 
 READ8_MEMBER(c65_state::dummy_r)
 {
-	return 0xff;
+	return 0;
 }
 
 static ADDRESS_MAP_START( c65_map, AS_PROGRAM, 8, c65_state )
-	AM_RANGE(0x00000, 0x07fff) AM_RAM // TODO: bank
+	AM_RANGE(0x00000, 0x07fff) AM_RAM AM_SHARE("wram") // TODO: bank
 	AM_RANGE(0x0c800, 0x0cfff) AM_ROM AM_REGION("maincpu", 0xc800)
 	AM_RANGE(0x0d000, 0x0d07f) AM_READWRITE(vic4567_dummy_r,vic4567_dummy_w) // 0x0d000, 0x0d07f VIC-4567
 	AM_RANGE(0x0d080, 0x0d081) AM_READ(dummy_r) // 0x0d080, 0x0d09f FDC
@@ -289,7 +305,7 @@ static ADDRESS_MAP_START( c65_map, AS_PROGRAM, 8, c65_state )
 	// 0x0df00, 0x0df** Ext I/O Select 2 (RAM window?)
 	AM_RANGE(0x0e000, 0x0ffff) AM_ROM AM_REGION("maincpu",0x0e000)
 	AM_RANGE(0x10000, 0x1f7ff) AM_RAM 
-	AM_RANGE(0x1f800, 0x1ffff) AM_RAM // VRAM
+	AM_RANGE(0x1f800, 0x1ffff) AM_RAM // VRAM attributes
 	AM_RANGE(0x20000, 0x3ffff) AM_ROM AM_REGION("maincpu",0)
 ADDRESS_MAP_END
 
