@@ -48,12 +48,12 @@ enum
 
 static inline bool is_opaque(const float &a)
 {
-	return (a >= 1.0f);
+    return (a >= 1.0f);
 }
 
 static inline bool is_transparent(const float &a)
 {
-	return (a <  0.0001f);
+    return (a <  0.0001f);
 }
 
 //============================================================
@@ -63,11 +63,11 @@ static inline bool is_transparent(const float &a)
 
 struct quad_setup_data
 {
-	quad_setup_data()
-	: dudx(0), dvdx(0), dudy(0), dvdy(0), startu(0), startv(0),
-		rotwidth(0), rotheight(0)
-	{}
-	void compute(const render_primitive &prim);
+    quad_setup_data()
+    : dudx(0), dvdx(0), dudy(0), dvdy(0), startu(0), startv(0),
+      rotwidth(0), rotheight(0)
+    {}
+    void compute(const render_primitive &prim);
 
 	INT32           dudx, dvdx, dudy, dvdy;
 	INT32           startu, startv;
@@ -105,16 +105,16 @@ struct sdl_info;
 /* texture_info holds information about a texture */
 class texture_info
 {
-	friend class simple_list<texture_info>;
+    friend class simple_list<texture_info>;
 public:
-	texture_info(SDL_Renderer *renderer, const render_texinfo &texsource, const quad_setup_data &setup, const UINT32 flags);
-	~texture_info();
+    texture_info(SDL_Renderer *renderer, const render_texinfo &texsource, const quad_setup_data &setup, const UINT32 flags);
+    ~texture_info();
 
-	void set_data(const render_texinfo &texsource, const UINT32 flags);
-	void render_quad(const render_primitive *prim, const int x, const int y);
-	bool matches(const render_primitive &prim, const quad_setup_data &setup);
+    void set_data(const render_texinfo &texsource, const UINT32 flags);
+    void render_quad(const render_primitive *prim, const int x, const int y);
+    bool matches(const render_primitive &prim, const quad_setup_data &setup);
 
-	copy_info_t *compute_size_type();
+    copy_info_t *compute_size_type();
 
 	void                *m_pixels;            // pixels for the texture
 	int                 m_pitch;
@@ -125,49 +125,50 @@ public:
 	osd_ticks_t         m_last_access;
 
 	int raw_width() const { return m_texinfo.width; }
-	int raw_height() const { return m_texinfo.height; }
+    int raw_height() const { return m_texinfo.height; }
 
-	texture_info *next() { return m_next; }
-	const render_texinfo &texinfo() const { return m_texinfo; }
-	render_texinfo &texinfo() { return m_texinfo; }
+    texture_info *next() { return m_next; }
+    const render_texinfo &texinfo() const { return m_texinfo; }
+    render_texinfo &texinfo() { return m_texinfo; }
 
-	const HashT hash() const { return m_hash; }
-	const UINT32 flags() const { return m_flags; }
-	const bool is_pixels_owned() const { // do we own / allocated it ?
-		return false && ((m_sdl_access == SDL_TEXTUREACCESS_STATIC)
-				&& (m_copyinfo->func != NULL)) ;
-	}
+    const HashT hash() const { return m_hash; }
+    const UINT32 flags() const { return m_flags; }
+    // FIXME:
+    const bool is_pixels_owned() const { // do we own / allocated it ?
+        return false && ((m_sdl_access == SDL_TEXTUREACCESS_STATIC)
+                && (m_copyinfo->func != NULL)) ;
+    }
 
 private:
-	Uint32              m_sdl_access;
-	SDL_Renderer *      m_renderer;
-	render_texinfo      m_texinfo;            // copy of the texture info
-	HashT               m_hash;               // hash value for the texture (must be >= pointer size)
-	UINT32              m_flags;              // rendering flags
+    Uint32              m_sdl_access;
+    SDL_Renderer *      m_renderer;
+    render_texinfo      m_texinfo;            // copy of the texture info
+    HashT               m_hash;               // hash value for the texture (must be >= pointer size)
+    UINT32              m_flags;              // rendering flags
 
-	SDL_Texture *       m_texture_id;
-	int                 m_is_rotated;
+    SDL_Texture *       m_texture_id;
+    int                 m_is_rotated;
 
-	int                 m_format;             // texture format
-	SDL_BlendMode       m_sdl_blendmode;
+    int                 m_format;             // texture format
+    SDL_BlendMode       m_sdl_blendmode;
 
-	texture_info *      m_next;               // next texture in the list
+    texture_info *      m_next;               // next texture in the list
 };
 
 /* sdl_info is the information about SDL for the current screen */
 struct sdl_info
 {
-	sdl_info()
-	: m_blittimer(0), m_renderer(NULL),
-		m_hofs(0), m_vofs(0),
-		m_resize_pending(0), m_resize_width(0), m_resize_height(0),
-		m_last_blit_time(0), m_last_blit_pixels(0)
-	{}
+    sdl_info()
+    : m_blittimer(0), m_renderer(NULL),
+      m_hofs(0), m_vofs(0),
+      m_resize_pending(0), m_resize_width(0), m_resize_height(0),
+      m_last_blit_time(0), m_last_blit_pixels(0)
+    {}
 
-	void render_quad(texture_info *texture, const render_primitive *prim, const int x, const int y);
+    void render_quad(texture_info *texture, const render_primitive *prim, const int x, const int y);
 
-	texture_info *texture_find(const render_primitive &prim, const quad_setup_data &setup);
-	texture_info *texture_update(const render_primitive &prim);
+    texture_info *texture_find(const render_primitive &prim, const quad_setup_data &setup);
+    texture_info *texture_update(const render_primitive &prim);
 
 	INT32           m_blittimer;
 
@@ -227,6 +228,7 @@ static int drawsdl2_xy_to_render_target(sdl_window_info *window, int x, int y, i
 #define ENTRY_BM(a,b,c,d,f,bm) { SDL_TEXFORMAT_ ## a, SDL_PIXELFORMAT_ ## b, c, d, texcopy_ ## f, bm, #a, #b, 0, 0, 0, 0}
 #define ENTRY_LR(a,b,c,d,f) { SDL_TEXFORMAT_ ## a, SDL_PIXELFORMAT_ ## b, c, d, texcopy_ ## f, BM_ALL, #a, #b, 0, 0, 0, -1}
 
+
 static copy_info_t blit_info_default[] =
 {
 	/* no rotation */
@@ -283,11 +285,11 @@ static copy_info_t blit_info_default[] =
 	ENTRY(RGB32_PALETTED,   ARGB8888,   4, 1, rot_rgb32pal_argb32),
 	ENTRY(RGB32_PALETTED,   RGB888,     4, 1, rot_rgb32pal_argb32),
 
-	ENTRY(YUY16,            ARGB8888,   4, 1, rot_yuv16_argb32),
-	ENTRY(YUY16,            RGB888,     4, 1, rot_yuv16_argb32),
+	ENTRY(YUY16,            ARGB8888,   4, 1, rot_yuv16_argb32rot),
+	ENTRY(YUY16,            RGB888,     4, 1, rot_yuv16_argb32rot),
 
-	ENTRY(YUY16_PALETTED,   ARGB8888,   4, 1, rot_yuv16pal_argb32),
-	ENTRY(YUY16_PALETTED,   RGB888,     4, 1, rot_yuv16pal_argb32),
+	ENTRY(YUY16_PALETTED,   ARGB8888,   4, 1, rot_yuv16pal_argb32rot),
+	ENTRY(YUY16_PALETTED,   RGB888,     4, 1, rot_yuv16pal_argb32rot),
 
 	ENTRY(PALETTE16,        ARGB8888,   4, 1, rot_pal16_argb32),
 	ENTRY(PALETTE16,        RGB888,     4, 1, rot_pal16_argb32),
