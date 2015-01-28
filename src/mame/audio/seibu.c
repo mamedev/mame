@@ -229,19 +229,9 @@ WRITE8_MEMBER( seibu_sound_device::rst18_ack_w )
 	update_irq_lines(RST18_CLEAR);
 }
 
-void seibu_sound_device::ym3812_irqhandler(int linestate)
-{
-	update_irq_lines(linestate ? RST10_ASSERT : RST10_CLEAR);
-}
-
-WRITE_LINE_MEMBER( seibu_sound_device::ym2151_irqhandler )
+WRITE_LINE_MEMBER( seibu_sound_device::fm_irqhandler )
 {
 	update_irq_lines(state ? RST10_ASSERT : RST10_CLEAR);
-}
-
-void seibu_sound_device::ym2203_irqhandler(int linestate)
-{
-	update_irq_lines(linestate ? RST10_ASSERT : RST10_CLEAR);
 }
 
 WRITE8_MEMBER( seibu_sound_device::bank_w )
