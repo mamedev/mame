@@ -33,8 +33,9 @@ static ADDRESS_MAP_START( mie_port, AS_IO, 8, mie_device)
 	AM_RANGE(0x00, 0x07) AM_READWRITE(gpio_r, gpio_w)
 	AM_RANGE(0x08, 0x08) AM_READWRITE(gpiodir_r, gpiodir_w)
 	AM_RANGE(0x0f, 0x0f) AM_READWRITE(adc_r, adc_w)
-	AM_RANGE(0x10, 0x10) AM_READWRITE(jvs_r, jvs_w)
+	AM_RANGE(0x10, 0x10) AM_READWRITE(jvs_r, jvs_w)		// ports 1x and 2x is standard UARTs, TODO handle it properly
 	AM_RANGE(0x12, 0x12) AM_WRITE(jvs_dest_w)
+	AM_RANGE(0x13, 0x13) AM_WRITE(jvs_lcr_w)
 	AM_RANGE(0x15, 0x15) AM_READ(jvs_status_r)
 	AM_RANGE(0x30, 0x30) AM_READWRITE(irq_enable_r, irq_enable_w)
 	AM_RANGE(0x50, 0x50) AM_READWRITE(maple_irqlevel_r, maple_irqlevel_w)
@@ -319,6 +320,9 @@ WRITE8_MEMBER(mie_device::lreg_w)
 
 READ8_MEMBER(mie_device::jvs_r)
 {
+	if (jvs_lcr & 0x80)
+		return 0;
+
 	const UINT8 *buf;
 	UINT32 size;
 	jvs->get_encoded_reply(buf, size);
@@ -329,9 +333,10 @@ READ8_MEMBER(mie_device::jvs_r)
 
 WRITE8_MEMBER(mie_device::jvs_w)
 {
-	// Hack until the ports are better understood
-	if(jvs_dest == 2)
-		jvs->push(data);
+	if (jvs_lcr & 0x80)
+		return;
+
+	jvs->push(data);
 }
 
 WRITE8_MEMBER(mie_device::jvs_dest_w)
@@ -357,6 +362,11 @@ WRITE8_MEMBER(mie_device::jvs_control_w)
 		jvs_rpos = 0;
 	}
 	jvs_control = data;
+}
+
+WRITE8_MEMBER(mie_device::jvs_lcr_w)
+{
+	jvs_lcr = data;
 }
 
 READ8_MEMBER(mie_device::jvs_sense_r)

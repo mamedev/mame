@@ -48,17 +48,13 @@ void jvs_host::commit_raw()
 	// - have the message length without the two header bytes but with the checksum byte in the second byte
 	// - have at least one command byte
 	if(send_size < 3 || send_buffer[0] == 0x00 || send_buffer[1] != send_size-1) {
-		logerror("JVS checksum error\n");
-	} /*
-        Naomi suchie3 have bad working controls with this
-
-        // "This message is crap" doesn't exist so call it checksum error
-        recv_buffer[0] = 0x00;
-        recv_buffer[1] = 0x02;
-        recv_buffer[2] = 0x03;
-        recv_size = 3;
-
-    } else */ {
+                logerror("JVS checksum error\n");
+                // "This message is crap" doesn't exist so call it checksum error
+                recv_buffer[0] = 0x00;
+                recv_buffer[1] = 0x02;
+                recv_buffer[2] = 0x03;
+                recv_size = 3;
+        } else {
 		if(first_device) {
 			first_device->message(send_buffer[0], send_buffer+2, send_size-2, recv_buffer+2, recv_size);
 			recv_is_encoded = false;
@@ -146,7 +142,7 @@ void jvs_host::decode(UINT8 *buffer, UINT32 &size)
 	if(!size)
 		return;
 	UINT32 pos = 0;
-	for(UINT32 i=0; i<size-1; i++) {
+	for(UINT32 i=0; i<size; i++) {
 		UINT8 t = buffer[i];
 		if(!i && t == 0xe0)
 			continue;
@@ -156,5 +152,5 @@ void jvs_host::decode(UINT8 *buffer, UINT32 &size)
 		}
 		buffer[pos++] = t;
 	}
-	size = pos;
+	size = pos ? pos - 1 : 0;
 }
