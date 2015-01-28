@@ -107,6 +107,12 @@ public:
 			m_objram(*this, "objram"),
 			m_rcram(*this, "rcram"),
 			m_z80_ram(*this, "z80_ram"),
+			m_char_tiles(*this, "char_tiles"),
+			m_obj_tiles(*this, "obj_tiles"),
+			m_road_rom(*this, "road"),
+			m_obj_map(*this, "obj_map"),
+			m_obj_luts(*this, "obj_luts"),
+			m_proms(*this, "proms"),
 			m_screen(*this, "screen") { }
 
 	required_device<cpu_device> m_maincpu;
@@ -117,6 +123,14 @@ public:
 	required_shared_ptr<UINT16> m_objram;
 	required_shared_ptr<UINT16> m_rcram;
 	required_shared_ptr<UINT8> m_z80_ram;
+
+	required_region_ptr<UINT8> m_char_tiles;
+	required_region_ptr<UINT8> m_obj_tiles;
+	required_region_ptr<UINT8> m_road_rom;
+	required_region_ptr<UINT8> m_obj_map;
+	required_region_ptr<UINT8> m_obj_luts;
+	required_region_ptr<UINT8> m_proms;
+
 	required_device<screen_device> m_screen;
 
 	emu_timer *m_interrupt_timer;
