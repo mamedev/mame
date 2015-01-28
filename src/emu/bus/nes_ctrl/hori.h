@@ -51,17 +51,17 @@ class nes_hori4p_device : public device_t,
 public:
 	// construction/destruction
 	nes_hori4p_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	virtual ioport_constructor device_input_ports() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
-	
-protected:	
+
+protected:
 	// device-level overrides
 	virtual void device_start() {}
-	
+
 	virtual UINT8 read_exp(offs_t offset);
 	virtual void write(UINT8 data);
-	
+
 private:
 	required_device<nes_control_port_device> m_port1;
 	required_device<nes_control_port_device> m_port2;

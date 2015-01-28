@@ -17,61 +17,61 @@
 emu_fatalerror::emu_fatalerror(const char *format, ...)
 : code(0)
 {
-    if (format == NULL)
-    {
-        text[0] = '\0';
-    }
-    else
-    {
-        va_list ap;
-        va_start(ap, format);
-        vsprintf(text, format, ap);
-        va_end(ap);
-    }
-    osd_break_into_debugger(text);
+	if (format == NULL)
+	{
+		text[0] = '\0';
+	}
+	else
+	{
+		va_list ap;
+		va_start(ap, format);
+		vsprintf(text, format, ap);
+		va_end(ap);
+	}
+	osd_break_into_debugger(text);
 }
 
 emu_fatalerror::emu_fatalerror(const char *format, va_list ap)
 : code(0)
 {
-    if (format == NULL)
-    {
-        text[0] = '\0';
-    }
-    else
-    {
-        vsprintf(text, format, ap);
-    }
-    osd_break_into_debugger(text);
+	if (format == NULL)
+	{
+		text[0] = '\0';
+	}
+	else
+	{
+		vsprintf(text, format, ap);
+	}
+	osd_break_into_debugger(text);
 }
 
 emu_fatalerror::emu_fatalerror(int _exitcode, const char *format, ...)
 : code(_exitcode)
 {
-    if (format == NULL)
-    {
-        text[0] = '\0';
-    }
-    else
-    {
-        va_list ap;
-        va_start(ap, format);
-        vsprintf(text, format, ap);
-        va_end(ap);
-    }
+	if (format == NULL)
+	{
+		text[0] = '\0';
+	}
+	else
+	{
+		va_list ap;
+		va_start(ap, format);
+		vsprintf(text, format, ap);
+		va_end(ap);
+	}
 }
 
 emu_fatalerror::emu_fatalerror(int _exitcode, const char *format, va_list ap)
 : code(_exitcode)
 {
-    if (format == NULL)
-    {
-        text[0] = '\0';
-    }
-    else
-    {
-        vsprintf(text, format, ap);
-    }
+	if (format == NULL)
+	{
+		text[0] = '\0';
+	}
+	else
+	{
+		vsprintf(text, format, ap);
+	}
 }
 
 
@@ -89,18 +89,18 @@ void report_bad_device_cast(const device_t *dev, const std::type_info &src_type,
 
 void fatalerror(const char *format, ...)
 {
-    va_list ap;
-    va_start(ap, format);
-    emu_fatalerror error(format, ap);
-    va_end(ap);
-    throw error;
+	va_list ap;
+	va_start(ap, format);
+	emu_fatalerror error(format, ap);
+	va_end(ap);
+	throw error;
 }
 
 void fatalerror_exitcode(running_machine &machine, int exitcode, const char *format, ...)
 {
-    va_list ap;
-    va_start(ap, format);
-    emu_fatalerror error(exitcode, format, ap);
-    va_end(ap);
-    throw error;
+	va_list ap;
+	va_start(ap, format);
+	emu_fatalerror error(exitcode, format, ap);
+	va_end(ap);
+	throw error;
 }

@@ -121,21 +121,21 @@
 class nl_fatalerror : public std::exception
 {
 public:
-    nl_fatalerror(const char *format, ...) ATTR_PRINTF(2,3)
-    {
-        char text[1024];
-        va_list ap;
-        va_start(ap, format);
-        vsprintf(text, format, ap);
-        va_end(ap);
-        osd_printf_error("%s\n", text);
-    }
-    nl_fatalerror(const char *format, va_list ap)
-    {
-        char text[1024];
-        vsprintf(text, format, ap);
-        osd_printf_error("%s\n", text);
-    }
+	nl_fatalerror(const char *format, ...) ATTR_PRINTF(2,3)
+	{
+		char text[1024];
+		va_list ap;
+		va_start(ap, format);
+		vsprintf(text, format, ap);
+		va_end(ap);
+		osd_printf_error("%s\n", text);
+	}
+	nl_fatalerror(const char *format, va_list ap)
+	{
+		char text[1024];
+		vsprintf(text, format, ap);
+		osd_printf_error("%s\n", text);
+	}
 };
 
 //============================================================

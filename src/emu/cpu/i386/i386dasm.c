@@ -98,7 +98,7 @@ enum
 #define ALWAYS64            0x400
 #define SPECIAL64           0x800
 #define SPECIAL64_ENT(x)    (SPECIAL64 | ((x) << 24))
-#define GROUP_MOD			0x1000
+#define GROUP_MOD           0x1000
 
 struct I386_OPCODE {
 	const char *mnemonic;
@@ -1953,7 +1953,7 @@ static const GROUP_OP group_op_table[] =
 	{ "group0F0D",          group0F0D_table         },
 	{ "group0F12",          group0F12_table         },
 	{ "group0F16",          group0F16_table         },
-	{ "group0F18",	        group0F18_table         },
+	{ "group0F18",          group0F18_table         },
 	{ "group0F71",          group0F71_table         },
 	{ "group0F72",          group0F72_table         },
 	{ "group0F73",          group0F73_table         },

@@ -89,21 +89,21 @@ void ui_menu_image_info::image_info(device_image_interface *image)
 
 			// display long filename
 			item_append(image->longname(), "", MENU_FLAG_DISABLE, NULL);
-			
+
 			// display manufacturer and year
 			string.catprintf("%s, %s", image->manufacturer(), image->year());
 			item_append(string, "", MENU_FLAG_DISABLE, NULL);
 
 			// display supported information, if available
-			switch (image->supported()) 
+			switch (image->supported())
 			{
-				case SOFTWARE_SUPPORTED_NO: 
+				case SOFTWARE_SUPPORTED_NO:
 					item_append("Not supported", "", MENU_FLAG_DISABLE, NULL);
 					break;
-				case SOFTWARE_SUPPORTED_PARTIAL: 
+				case SOFTWARE_SUPPORTED_PARTIAL:
 					item_append("Partially supported", "", MENU_FLAG_DISABLE, NULL);
 					break;
-				default: 
+				default:
 					break;
 			}
 		}

@@ -43,7 +43,7 @@ NETLIB_START(4020_sub)
 	register_output("Q5", m_Q[4]);
 	register_output("Q6", m_Q[5]);
 	register_output("Q7", m_Q[6]);
-    register_output("Q8", m_Q[7]);
+	register_output("Q8", m_Q[7]);
 	register_output("Q9", m_Q[8]);
 	register_output("Q10", m_Q[9]);
 	register_output("Q11", m_Q[10]);

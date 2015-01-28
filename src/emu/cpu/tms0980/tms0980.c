@@ -1037,7 +1037,7 @@ void tms1400_cpu_device::op_call()
 
 		m_ps = m_ps << 4 | m_pa;
 		m_pa = m_pb;
-		
+
 		m_cs = m_cs << 2 | m_ca;
 		m_ca = m_cb;
 	}
@@ -1057,10 +1057,10 @@ void tms1400_cpu_device::op_retn()
 
 		m_pc = m_sr & m_pc_mask;
 		m_sr >>= m_pc_bits;
-		
+
 		m_pa = m_pb = m_ps & 0xf;
 		m_ps >>= 4;
-		
+
 		m_ca = m_cb = m_cs & 3;
 		m_cs >>= 2;
 	}

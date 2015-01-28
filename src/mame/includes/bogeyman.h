@@ -21,14 +21,14 @@ public:
 		m_colorram(*this, "colorram"),
 		m_colorram2(*this, "colorram2"),
 		m_spriteram(*this, "spriteram")  { }
-	
+
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<ay8910_device> m_ay1;
 	required_device<ay8910_device> m_ay2;
-	
+
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_videoram2;
@@ -45,7 +45,7 @@ public:
 	int        m_psg_latch;
 	int        m_last_write;
 	int        m_colbank;
-	
+
 	DECLARE_WRITE8_MEMBER(ay8910_latch_w);
 	DECLARE_WRITE8_MEMBER(ay8910_control_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
@@ -54,14 +54,14 @@ public:
 	DECLARE_WRITE8_MEMBER(colorram2_w);
 	DECLARE_WRITE8_MEMBER(paletteram_w);
 	DECLARE_WRITE8_MEMBER(colbank_w);
-	
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	
+
 	DECLARE_PALETTE_INIT(bogeyman);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -64,12 +64,12 @@ void ui_menu_file_manager::fill_image_line(device_image_interface *img, astring 
 {
 	// get the image type/id
 	instance.printf("%s (%s)", img->instance_name(), img->brief_instance_name());
-	
+
 	// get the base name
 	if (img->basename() != NULL)
 	{
 		filename.cpy(img->basename());
-		
+
 		// if the image has been loaded through softlist, also show the loaded part
 		if (img->part_entry() != NULL)
 		{
@@ -107,7 +107,7 @@ void ui_menu_file_manager::populate()
 		item_append(m_warnings, NULL, MENU_FLAG_DISABLE, NULL);
 		item_append("", NULL, MENU_FLAG_DISABLE, NULL);
 	}
-		
+
 	// cycle through all devices for this system
 	device_iterator iter(machine().root_device());
 	tagmap_t<UINT8> devtags;
@@ -120,7 +120,7 @@ void ui_menu_file_manager::populate()
 		// check whether it owns an image interface
 		image_interface_iterator subiter(*dev);
 		if (subiter.count() > 0)
-		{			
+		{
 			// if so, cycle through all its image interfaces
 			image_interface_iterator subiter(*dev);
 			for (device_image_interface *scan = subiter.first(); scan != NULL; scan = subiter.next())
@@ -172,7 +172,7 @@ void ui_menu_file_manager::handle()
 			if (selected_device != NULL)
 			{
 				ui_menu::stack_push(selected_device->get_selection_menu(machine(), container));
-				
+
 				// reset the existing menu
 				reset(UI_MENU_RESET_REMEMBER_POSITION);
 			}
@@ -182,19 +182,19 @@ void ui_menu_file_manager::handle()
 
 // force file manager menu
 void ui_menu_file_manager::force_file_manager(running_machine &machine, render_container *container, const char *warnings)
-{	
+{
 	// reset the menu stack
 	ui_menu::stack_reset(machine);
-	
+
 	// add the quit entry followed by the game select entry
 	ui_menu *quit = auto_alloc_clear(machine, ui_menu_quit_game(machine, container));
 	quit->set_special_main_menu(true);
 	ui_menu::stack_push(quit);
 	ui_menu::stack_push(auto_alloc_clear(machine, ui_menu_file_manager(machine, container, warnings)));
-	
+
 	// force the menus on
 	machine.ui().show_menu();
-	
+
 	// make sure MAME is paused
 	machine.pause();
 }

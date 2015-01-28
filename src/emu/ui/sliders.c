@@ -242,18 +242,18 @@ void ui_menu_sliders::custom_render(void *selectedref, float top, float bottom, 
 UINT32 ui_menu_sliders::ui_handler(running_machine &machine, render_container *container, UINT32 state)
 {
 	UINT32 result;
-	
+
 	/* if this is the first call, push the sliders menu */
 	if (state)
 		ui_menu::stack_push(auto_alloc_clear(machine, ui_menu_sliders(machine, container, true)));
-	
+
 	/* handle standard menus */
 	result = ui_menu::ui_handler(machine, container, state);
-	
+
 	/* if we are cancelled, pop the sliders menu */
 	if (result == UI_HANDLER_CANCEL)
 		ui_menu::stack_pop(machine);
-	
+
 	ui_menu_sliders *uim = dynamic_cast<ui_menu_sliders *>(menu_stack);
 	return uim && uim->menuless_mode ? 0 : UI_HANDLER_CANCEL;
 }

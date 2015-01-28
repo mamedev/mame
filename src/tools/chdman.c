@@ -1702,7 +1702,7 @@ static void do_create_hd(parameters_t &params)
 				report_error(1, "Invalid size string");
 		}
 	}
-	
+
 	// process compression
 	chd_codec_type compression[4];
 	memcpy(compression, s_default_hd_compression, sizeof(compression));
@@ -1757,7 +1757,7 @@ static void do_create_hd(parameters_t &params)
 		if (sscanf(metadata, HARD_DISK_METADATA_FORMAT, &cylinders, &heads, &sectors, &sector_size) != 4)
 			report_error(1, "Error parsing hard disk metadata in parent CHD");
 	}
-		
+
 	// validate the size
 	if (filesize % sector_size != 0)
 		report_error(1, "Data size is not divisible by sector size %d", sector_size);

@@ -2001,7 +2001,7 @@ WRITE8_MEMBER( h63484_device::data_w )
 void h63484_device::device_start()
 {
 	m_display_cb.bind_relative_to(*owner());
-	
+
 	register_save_state();
 }
 

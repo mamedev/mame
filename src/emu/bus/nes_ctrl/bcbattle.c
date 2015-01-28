@@ -5,7 +5,7 @@
     TODO: this should be actually emulated as a standalone system with
     a few 7segments LEDs, once we get a dump of its BIOS
     At the moment we only emulated the connection with a Famicom
- 
+
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
@@ -57,26 +57,26 @@ void nes_bcbattle_device::device_timer(emu_timer &timer, device_timer_id id, int
 			if (m_reader->get_byte_length() == 13)
 			{
 				for (int i = 0; i < 13; i++)
-					m_current_barcode[i] = m_reader->read_code() + '0'; 
+					m_current_barcode[i] = m_reader->read_code() + '0';
 			}
 			else if (m_reader->get_byte_length() == 8)
 			{
 				for (int i = 0; i < 5; i++)
-					m_current_barcode[i] = 0x20; 
+					m_current_barcode[i] = 0x20;
 				for (int i = 5; i < 13; i++)
-					m_current_barcode[i] = m_reader->read_code() + '0'; 
+					m_current_barcode[i] = m_reader->read_code() + '0';
 			}
 			// read one more, to reset the internal byte counter
 			m_reader->read_code();
 
 			// the string "SUNSOFT" is accepted as well by Barcode World
-			m_current_barcode[13] = 'E'; 
-			m_current_barcode[14] = 'P'; 
-			m_current_barcode[15] = 'O'; 
-			m_current_barcode[16] = 'C'; 
-			m_current_barcode[17] = 'H'; 
-			m_current_barcode[18] = 0x0d; 
-			m_current_barcode[19] = 0x0a; 
+			m_current_barcode[13] = 'E';
+			m_current_barcode[14] = 'P';
+			m_current_barcode[15] = 'O';
+			m_current_barcode[16] = 'C';
+			m_current_barcode[17] = 'H';
+			m_current_barcode[18] = 0x0d;
+			m_current_barcode[19] = 0x0a;
 			m_pending_code = 1;
 		}
 		m_new_code = m_reader->get_pending_code();
@@ -110,7 +110,7 @@ void nes_bcbattle_device::device_start()
 	// and sending the proper serial bits, instead of our read_current_bit() function!
 	battler_timer = timer_alloc(TIMER_BATTLER);
 	battler_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1000));
-	
+
 	save_item(NAME(m_current_barcode));
 	save_item(NAME(m_new_code));
 	save_item(NAME(m_pending_code));
@@ -184,7 +184,7 @@ int nes_bcbattle_device::read_current_bit()
 UINT8 nes_bcbattle_device::read_exp(offs_t offset)
 {
 	UINT8 ret = 0;
-	if (offset == 1)	//$4017
+	if (offset == 1)    //$4017
 	{
 		ret |= read_current_bit() << 2;
 	}

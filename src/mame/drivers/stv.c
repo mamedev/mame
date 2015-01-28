@@ -1844,7 +1844,7 @@ ROM_START( astrass )
 	ROM_LOAD16_WORD_SWAP( "mpr20833.9",     0x2000000, 0x0400000, CRC(cb6af231) SHA1(4a2e5d7c2fd6179c19cdefa84a03f9a34fbb9e70) ) // good (was .19s)
 
 	// 25349801    1998     317-5040-COM   ST-V      (yes, the 317-5040-COM chip was reused for 3 different games and on both Naomi and ST-V!)
-	ROM_PARAMETER( ":315_5881:key", "052e2901" ) 
+	ROM_PARAMETER( ":315_5881:key", "052e2901" )
 ROM_END
 
 ROM_START( bakubaku )

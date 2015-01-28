@@ -56,7 +56,7 @@ class nes_vausfc_device : public nes_vaus_device
 public:
 	// construction/destruction
 	nes_vausfc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 protected:
 	virtual UINT8 read_bit34() { return 0; }
 	virtual UINT8 read_exp(offs_t offset);

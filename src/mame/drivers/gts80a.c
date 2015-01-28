@@ -427,13 +427,13 @@ static ADDRESS_MAP_START( video_map, AS_PROGRAM, 8, caveman_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( video_io_map, AS_IO, 8, caveman_state )
-//	AM_RANGE(0x000, 0x002) AM_READWRITE() // 8259 irq controller
-//	AM_RANGE(0x100, 0x102) AM_READWRITE() // HD46505
-//	AM_RANGE(0x200, 0x200) AM_READWRITE() // 8212 in, ?? out
-//	AM_RANGE(0x300, 0x300) AM_READWRITE() // soundlatch (command?) in, ?? out
+//  AM_RANGE(0x000, 0x002) AM_READWRITE() // 8259 irq controller
+//  AM_RANGE(0x100, 0x102) AM_READWRITE() // HD46505
+//  AM_RANGE(0x200, 0x200) AM_READWRITE() // 8212 in, ?? out
+//  AM_RANGE(0x300, 0x300) AM_READWRITE() // soundlatch (command?) in, ?? out
 
-//	AM_RANGE(0x400, 0x400) AM_READ() // joystick inputs
-//	AM_RANGE(0x500, 0x506) AM_WRITE() // palette
+//  AM_RANGE(0x400, 0x400) AM_READ() // joystick inputs
+//  AM_RANGE(0x500, 0x506) AM_WRITE() // palette
 
 ADDRESS_MAP_END
 

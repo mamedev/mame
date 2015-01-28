@@ -78,7 +78,7 @@ void nl_initialize_factory(netlist_factory_t &factory)
 	ENTRY(VCCS,                 VCCS,                   "-")
 	ENTRY(CCCS,                 CCCS,                   "-")
 	ENTRY(dummy_input,          DUMMY_INPUT,            "-")
-    ENTRY(frontier,             FRONTIER,               "+I,Q")
+	ENTRY(frontier,             FRONTIER,               "+I,Q")
 	ENTRY(QBJT_EB,              QBJT_EB,                "model")
 	ENTRY(QBJT_switch,          QBJT_SW,                "model")
 	ENTRY(ttl_input,            TTL_INPUT,              "IN")
@@ -148,4 +148,3 @@ void nl_initialize_factory(netlist_factory_t &factory)
 	ENTRY(SN74LS629_dip,        SN74LS629_DIP,          "1.CAP1,2.CAP2")
 	ENTRY(NE555_dip,            NE555_DIP,              "-")
 }
-

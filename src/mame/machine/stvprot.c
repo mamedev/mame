@@ -39,8 +39,8 @@ READ32_MEMBER( stv_state::common_prot_r )
 			UINT16 res2 = m_cryptdevice->do_decrypt(base);
 			res = ((res & 0xff00) >> 8) | ((res & 0x00ff) << 8);
 			res2 = ((res2 & 0xff00) >> 8) | ((res2 & 0x00ff) << 8);
-				
-			return res2 | (res << 16);			
+
+			return res2 | (res << 16);
 		}
 		return m_a_bus[offset];
 	}

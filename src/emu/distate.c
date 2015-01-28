@@ -89,7 +89,7 @@ device_state_entry::device_state_entry(int index, const char *symbol, void *data
 
 device_state_entry::device_state_entry(int index, device_state_interface *dev)
 	: m_device_state(dev),
-	    m_next(NULL),
+		m_next(NULL),
 		m_index(index),
 		m_dataptr(NULL),
 		m_datamask(0),

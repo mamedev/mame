@@ -270,35 +270,35 @@ bool sdl_osd_interface::window_init()
 	 * The code below will document which hints were set.
 	 */
 	const char * hints[] = { SDL_HINT_FRAMEBUFFER_ACCELERATION,
-	        SDL_HINT_RENDER_DRIVER, SDL_HINT_RENDER_OPENGL_SHADERS,
-            SDL_HINT_RENDER_SCALE_QUALITY,
-            SDL_HINT_RENDER_VSYNC,
-            SDL_HINT_VIDEO_X11_XVIDMODE, SDL_HINT_VIDEO_X11_XINERAMA,
-            SDL_HINT_VIDEO_X11_XRANDR, SDL_HINT_GRAB_KEYBOARD,
-            SDL_HINT_MOUSE_RELATIVE_MODE_WARP,
-            SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, SDL_HINT_IDLE_TIMER_DISABLED,
-            SDL_HINT_ORIENTATIONS,
-            SDL_HINT_XINPUT_ENABLED, SDL_HINT_GAMECONTROLLERCONFIG,
-            SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, SDL_HINT_ALLOW_TOPMOST,
-            SDL_HINT_TIMER_RESOLUTION,
+			SDL_HINT_RENDER_DRIVER, SDL_HINT_RENDER_OPENGL_SHADERS,
+			SDL_HINT_RENDER_SCALE_QUALITY,
+			SDL_HINT_RENDER_VSYNC,
+			SDL_HINT_VIDEO_X11_XVIDMODE, SDL_HINT_VIDEO_X11_XINERAMA,
+			SDL_HINT_VIDEO_X11_XRANDR, SDL_HINT_GRAB_KEYBOARD,
+			SDL_HINT_MOUSE_RELATIVE_MODE_WARP,
+			SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, SDL_HINT_IDLE_TIMER_DISABLED,
+			SDL_HINT_ORIENTATIONS,
+			SDL_HINT_XINPUT_ENABLED, SDL_HINT_GAMECONTROLLERCONFIG,
+			SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, SDL_HINT_ALLOW_TOPMOST,
+			SDL_HINT_TIMER_RESOLUTION,
 #if SDL_VERSION_ATLEAST(2, 0, 2)
-            SDL_HINT_RENDER_DIRECT3D_THREADSAFE, SDL_HINT_VIDEO_ALLOW_SCREENSAVER,
-            SDL_HINT_ACCELEROMETER_AS_JOYSTICK, SDL_HINT_MAC_CTRL_CLICK_EMULATE_RIGHT_CLICK,
-            SDL_HINT_VIDEO_WIN_D3DCOMPILER, SDL_HINT_VIDEO_WINDOW_SHARE_PIXEL_FORMAT,
-            SDL_HINT_VIDEO_MAC_FULLSCREEN_SPACES,
+			SDL_HINT_RENDER_DIRECT3D_THREADSAFE, SDL_HINT_VIDEO_ALLOW_SCREENSAVER,
+			SDL_HINT_ACCELEROMETER_AS_JOYSTICK, SDL_HINT_MAC_CTRL_CLICK_EMULATE_RIGHT_CLICK,
+			SDL_HINT_VIDEO_WIN_D3DCOMPILER, SDL_HINT_VIDEO_WINDOW_SHARE_PIXEL_FORMAT,
+			SDL_HINT_VIDEO_MAC_FULLSCREEN_SPACES,
 #endif
 #if SDL_VERSION_ATLEAST(2, 0, 3)
-            SDL_HINT_RENDER_DIRECT3D11_DEBUG, SDL_HINT_VIDEO_HIGHDPI_DISABLED,
-            SDL_HINT_WINRT_PRIVACY_POLICY_URL, SDL_HINT_WINRT_PRIVACY_POLICY_LABEL,
-            SDL_HINT_WINRT_HANDLE_BACK_BUTTON,
+			SDL_HINT_RENDER_DIRECT3D11_DEBUG, SDL_HINT_VIDEO_HIGHDPI_DISABLED,
+			SDL_HINT_WINRT_PRIVACY_POLICY_URL, SDL_HINT_WINRT_PRIVACY_POLICY_LABEL,
+			SDL_HINT_WINRT_HANDLE_BACK_BUTTON,
 #endif
-            NULL
-    };
+			NULL
+	};
 
 
-    osd_printf_verbose("\nHints:\n");
-    for (int i = 0; hints[i] != NULL; i++)
-        osd_printf_verbose("\t%-40s %s\n", hints[i], SDL_GetHint(hints[i]));
+	osd_printf_verbose("\nHints:\n");
+	for (int i = 0; hints[i] != NULL; i++)
+		osd_printf_verbose("\t%-40s %s\n", hints[i], SDL_GetHint(hints[i]));
 #endif
 
 	// set up the window list
@@ -1018,17 +1018,17 @@ void sdl_window_info::video_window_update(running_machine &machine)
 
 		if (osd_event_wait(rendered_event, event_wait_ticks))
 		{
-		    if ((!fullscreen()) || (video_config.switchres))
-		    {
-		        blit_surface_size(width, height);
-		    }
-		    else
-		    {
-		        blit_surface_size(monitor()->center_width, monitor()->center_height);
-		    }
+			if ((!fullscreen()) || (video_config.switchres))
+			{
+				blit_surface_size(width, height);
+			}
+			else
+			{
+				blit_surface_size(monitor()->center_width, monitor()->center_height);
+			}
 
 			// ensure the target bounds are up-to-date, and then get the primitives
-		    set_target_bounds(this);
+			set_target_bounds(this);
 
 			render_primitive_list &primlist = target->get_primitives();
 

@@ -161,24 +161,24 @@ struct texture_info;
 /* texture_info holds information about a texture */
 struct texture_info
 {
-    texture_info()
-    : hash(0), flags(0), rawwidth(0), rawheight(0),
-      rawwidth_create(0), rawheight_create(0),
-      type(0), format(0), borderpix(0), xprescale(0), yprescale(0), nocopy(0),
-      texture(0), texTarget(0), texpow2(0), mpass_dest_idx(0), pbo(0), data(NULL),
-      data_own(0), texCoordBufferName(0)
-    {
-        for (int i=0; i<2; i++)
-        {
-            mpass_textureunit[i] = 0;
-            mpass_texture_mamebm[i] = 0;
-            mpass_fbo_mamebm[i] = 0;
-            mpass_texture_scrn[i] = 0;
-            mpass_fbo_scrn[i] = 0;
-        }
-        for (int i=0; i<8; i++)
-            texCoord[i] = 0.0f;
-    }
+	texture_info()
+	: hash(0), flags(0), rawwidth(0), rawheight(0),
+		rawwidth_create(0), rawheight_create(0),
+		type(0), format(0), borderpix(0), xprescale(0), yprescale(0), nocopy(0),
+		texture(0), texTarget(0), texpow2(0), mpass_dest_idx(0), pbo(0), data(NULL),
+		data_own(0), texCoordBufferName(0)
+	{
+		for (int i=0; i<2; i++)
+		{
+			mpass_textureunit[i] = 0;
+			mpass_texture_mamebm[i] = 0;
+			mpass_fbo_mamebm[i] = 0;
+			mpass_texture_scrn[i] = 0;
+			mpass_fbo_scrn[i] = 0;
+		}
+		for (int i=0; i<8; i++)
+			texCoord[i] = 0.0f;
+	}
 
 	HashT               hash;               // hash value for the texture (must be >= pointer size)
 	UINT32              flags;              // rendering flags
@@ -217,35 +217,35 @@ struct texture_info
 /* sdl_info is the information about SDL for the current screen */
 struct sdl_info
 {
-    sdl_info()
-    : blittimer(0), extra_flags(0),
+	sdl_info()
+	: blittimer(0), extra_flags(0),
 #if (SDLMAME_SDL2)
-      gl_context_id(0),
+		gl_context_id(0),
 #else
-      sdlsurf(NULL),
+		sdlsurf(NULL),
 #endif
-      initialized(0),
-      last_blendmode(0),
-      texture_max_width(0),
-      texture_max_height(0),
-      texpoweroftwo(0),
-      usevbo(0), usepbo(0), usefbo(0), useglsl(0), glsl(NULL),
-      glsl_program_num(0),
-      glsl_program_mb2sc(0),
-      usetexturerect(0),
-      init_context(0),
-      last_hofs(0.0f),
-      last_vofs(0.0f),
-      surf_w(0),
-      surf_h(0)
-    {
-        for (int i=0; i < HASH_SIZE + OVERFLOW_SIZE; i++)
-            texhash[i] = NULL;
-        for (int i=0; i < 2*GLSL_SHADER_MAX; i++)
-            glsl_program[i] = 0;
-        for (int i=0; i < 8; i++)
-            texVerticex[i] = 0.0f;
-    }
+		initialized(0),
+		last_blendmode(0),
+		texture_max_width(0),
+		texture_max_height(0),
+		texpoweroftwo(0),
+		usevbo(0), usepbo(0), usefbo(0), useglsl(0), glsl(NULL),
+		glsl_program_num(0),
+		glsl_program_mb2sc(0),
+		usetexturerect(0),
+		init_context(0),
+		last_hofs(0.0f),
+		last_vofs(0.0f),
+		surf_w(0),
+		surf_h(0)
+	{
+		for (int i=0; i < HASH_SIZE + OVERFLOW_SIZE; i++)
+			texhash[i] = NULL;
+		for (int i=0; i < 2*GLSL_SHADER_MAX; i++)
+			glsl_program[i] = 0;
+		for (int i=0; i < 8; i++)
+			texVerticex[i] = 0.0f;
+	}
 
 	INT32           blittimer;
 	UINT32          extra_flags;
@@ -3079,40 +3079,40 @@ static void drawogl_destroy_all_textures(sdl_window_info *window)
 		sdl->texhash[i] = NULL;
 		if (texture != NULL)
 		{
-            if(sdl->usevbo)
-            {
-                pfn_glDeleteBuffers( 1, &(texture->texCoordBufferName) );
-                texture->texCoordBufferName=0;
-            }
+			if(sdl->usevbo)
+			{
+				pfn_glDeleteBuffers( 1, &(texture->texCoordBufferName) );
+				texture->texCoordBufferName=0;
+			}
 
-            if(sdl->usepbo && texture->pbo)
-            {
-                pfn_glDeleteBuffers( 1, (GLuint *)&(texture->pbo) );
-                texture->pbo=0;
-            }
+			if(sdl->usepbo && texture->pbo)
+			{
+				pfn_glDeleteBuffers( 1, (GLuint *)&(texture->pbo) );
+				texture->pbo=0;
+			}
 
-            if( sdl->glsl_program_num > 1 )
-            {
-                assert(sdl->usefbo);
-                pfn_glDeleteFramebuffers(2, (GLuint *)&texture->mpass_fbo_mamebm[0]);
-                glDeleteTextures(2, (GLuint *)&texture->mpass_texture_mamebm[0]);
-            }
+			if( sdl->glsl_program_num > 1 )
+			{
+				assert(sdl->usefbo);
+				pfn_glDeleteFramebuffers(2, (GLuint *)&texture->mpass_fbo_mamebm[0]);
+				glDeleteTextures(2, (GLuint *)&texture->mpass_texture_mamebm[0]);
+			}
 
-            if ( sdl->glsl_program_mb2sc < sdl->glsl_program_num - 1 )
-            {
-                assert(sdl->usefbo);
-                pfn_glDeleteFramebuffers(2, (GLuint *)&texture->mpass_fbo_scrn[0]);
-                glDeleteTextures(2, (GLuint *)&texture->mpass_texture_scrn[0]);
-            }
+			if ( sdl->glsl_program_mb2sc < sdl->glsl_program_num - 1 )
+			{
+				assert(sdl->usefbo);
+				pfn_glDeleteFramebuffers(2, (GLuint *)&texture->mpass_fbo_scrn[0]);
+				glDeleteTextures(2, (GLuint *)&texture->mpass_texture_scrn[0]);
+			}
 
-            glDeleteTextures(1, (GLuint *)&texture->texture);
-            if ( texture->data_own )
-            {
-                free(texture->data);
-                texture->data=NULL;
-                texture->data_own=FALSE;
-            }
-            global_free(texture);
+			glDeleteTextures(1, (GLuint *)&texture->texture);
+			if ( texture->data_own )
+			{
+				free(texture->data);
+				texture->data=NULL;
+				texture->data_own=FALSE;
+			}
+			global_free(texture);
 		}
 		i++;
 	}

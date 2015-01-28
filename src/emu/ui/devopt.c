@@ -66,7 +66,7 @@ void ui_menu_device_config::populate()
 
 			// get cpu specific clock that takes internal multiplier/dividers into account
 			int clock = exec->device().clock();
-			
+
 			// count how many identical CPUs we have
 			int count = 1;
 			const char *name = exec->device().name();
@@ -77,14 +77,14 @@ void ui_menu_device_config::populate()
 					if (exectags.add(scan->device().tag(), 1, FALSE) != TMERR_DUPLICATE)
 						count++;
 			}
-			
+
 			// if more than one, prepend a #x in front of the CPU name
 			if (count > 1)
 				string.catprintf("  %d" UTF8_MULTIPLY, count);
 			else
 				string.cat("  ");
 			string.cat(name);
-			
+
 			// display clock in kHz or MHz
 			if (clock >= 1000000)
 				string.catprintf(" %d.%06d" UTF8_NBSP "MHz\n", clock / 1000000, clock % 1000000);
@@ -92,7 +92,7 @@ void ui_menu_device_config::populate()
 				string.catprintf(" %d.%03d" UTF8_NBSP "kHz\n", clock / 1000, clock % 1000);
 		}
 	}
-	
+
 	// display screen information
 	screen_device_iterator scriter(*dev);
 	if (scriter.count() > 0)
@@ -101,21 +101,21 @@ void ui_menu_device_config::populate()
 		for (screen_device *screen = scriter.first(); screen != NULL; screen = scriter.next())
 		{
 			string.catprintf("  Screen '%s': ", screen->tag());
-			
+
 			if (screen->screen_type() == SCREEN_TYPE_VECTOR)
 				string.cat("Vector\n");
 			else
 			{
 				const rectangle &visarea = screen->visible_area();
-				
+
 				string.catprintf("%d " UTF8_MULTIPLY " %d (%s) %f" UTF8_NBSP "Hz\n",
-								 visarea.width(), visarea.height(),
-								 (machine().system().flags & ORIENTATION_SWAP_XY) ? "V" : "H",
-								 ATTOSECONDS_TO_HZ(screen->frame_period().attoseconds));
+									visarea.width(), visarea.height(),
+									(machine().system().flags & ORIENTATION_SWAP_XY) ? "V" : "H",
+									ATTOSECONDS_TO_HZ(screen->frame_period().attoseconds));
 			}
 		}
 	}
-	
+
 	// loop over all sound chips
 	sound_interface_iterator snditer(*dev);
 	if (snditer.count() > 0)
@@ -126,7 +126,7 @@ void ui_menu_device_config::populate()
 		{
 			if (soundtags.add(sound->device().tag(), 1, FALSE) == TMERR_DUPLICATE)
 				continue;
-			
+
 			// count how many identical sound chips we have
 			int count = 1;
 			sound_interface_iterator sndinneriter(*dev);
@@ -142,7 +142,7 @@ void ui_menu_device_config::populate()
 			else
 				string.cat("  ");
 			string.cat(sound->device().name());
-			
+
 			// display clock in kHz or MHz
 			int clock = sound->device().clock();
 			if (clock >= 1000000)
@@ -156,7 +156,7 @@ void ui_menu_device_config::populate()
 
 	// scan for BIOS settings
 	int bios = 0;
-	if (dev->rom_region()) 
+	if (dev->rom_region())
 	{
 		astring bios_str;
 		// first loop through roms in search of default bios (shortname)
@@ -174,11 +174,11 @@ void ui_menu_device_config::populate()
 					bios_str.cpy(ROM_GETHASHDATA(rom));
 			}
 		}
-		
+
 		if (bios)
 			string.catprintf("* BIOS settings:\n  %d options    [default: %s]\n", bios, bios_str.cstr());
 	}
-	
+
 	int input = 0, input_mj = 0, input_hana = 0, input_gamble = 0, input_analog = 0, input_adjust = 0;
 	int input_keypad = 0, input_keyboard = 0, dips = 0, confs = 0;
 	astring errors, dips_opt, confs_opt;
@@ -265,7 +265,7 @@ void ui_menu_device_config::populate()
 		for (const device_image_interface *imagedev = imgiter.first(); imagedev != NULL; imagedev = imgiter.next())
 			string.catprintf("  %s    [tag: %s]\n", imagedev->image_type_name(), imagedev->device().tag());
 	}
-	
+
 	slot_interface_iterator slotiter(*dev);
 	if (slotiter.count() > 0)
 	{
@@ -275,7 +275,7 @@ void ui_menu_device_config::populate()
 	}
 
 	if ((execiter.count() + scriter.count() + snditer.count() + imgiter.count() + slotiter.count() + bios + dips + confs
-		 + input + input_mj + input_hana + input_gamble + input_analog + input_adjust + input_keypad + input_keyboard) == 0)
+			+ input + input_mj + input_hana + input_gamble + input_analog + input_adjust + input_keypad + input_keyboard) == 0)
 		string.cat("[None]\n");
 
 	const_cast<machine_config &>(machine().config()).device_remove(&machine().config().root_device(), m_option->name());

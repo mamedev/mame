@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    Nintendo Family Computer & Entertainment System controller ports 
+    Nintendo Family Computer & Entertainment System controller ports
     and Family Computer expansion port emulation
 
     Here we emulate in fact 3 different kind of ports, which are
@@ -9,15 +9,15 @@
       corresponding address ($4016 for port1, $4017 for port2)
     - FC controller ports: these are only hooked to bit 0 of the
       corresponding address (so that e.g. a NES Zapper could not
-      be connected to a later FC AV model, because its inputs 
+      be connected to a later FC AV model, because its inputs
       would not be detected)
     - FC expansion port: this is hooked to bits 0-4 of both addresses
     To make things a little bit more complex, old FC models have the
     controller hardwired to the unit, and the P2 controllers are
-    directly hooked also to one of the expansion port lines (namely, 
+    directly hooked also to one of the expansion port lines (namely,
     microphone inputs from P2 go to $4016 bit 2)
 
-    Even if the controller port and the expansion port are 
+    Even if the controller port and the expansion port are
     physically different (the FC expansion is a 15pin port, while
     the controller ports are 7pin), we emulate them as variants of a
     common device, exposing the following handlers:
@@ -25,15 +25,15 @@
       inputs from controllers
     - read_bit34: for bit3,4 reading, expected to be at the correct
       offset (but we don't currently check for read_bit34 & 0xf8==0)
-    - read_exp: for reads going through the expansion, with a offset 
+    - read_exp: for reads going through the expansion, with a offset
       parameter to decide whether we are reading from $4016 and $4017
     - write: to acknowledge writes to $4016
 
-    The driver emulation will take care to only call the correct 
-    handlers they have hooks for: Basic usage is that the expansion 
-    port calls read_exp, FC ctrl ports call read_bit0, and NES ctrl 
-    ports call both read_bit0 and read_bit34. However, to cope with 
-    the original FC microphone, we will have the second controller 
+    The driver emulation will take care to only call the correct
+    handlers they have hooks for: Basic usage is that the expansion
+    port calls read_exp, FC ctrl ports call read_bit0, and NES ctrl
+    ports call both read_bit0 and read_bit34. However, to cope with
+    the original FC microphone, we will have the second controller
     port calling read_exp too.
 
     Copyright MESS Team.
@@ -168,7 +168,7 @@ SLOT_INTERFACE_START( nes_control_port1_devices )
 	SLOT_INTERFACE("joypad", NES_JOYPAD)
 	SLOT_INTERFACE("zapper", NES_ZAPPER)
 	SLOT_INTERFACE("4score_p1p3", NES_4SCORE_P1P3)
-//	SLOT_INTERFACE("miracle_piano", NES_MIRACLE)
+//  SLOT_INTERFACE("miracle_piano", NES_MIRACLE)
 SLOT_INTERFACE_END
 
 SLOT_INTERFACE_START( nes_control_port2_devices )

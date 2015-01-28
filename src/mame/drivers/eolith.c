@@ -1494,7 +1494,7 @@ DRIVER_INIT_MEMBER(eolith_state,eolith)
 
 	// Configure the sound ROM banking
 	membank("sound_bank")->configure_entries(0, 16, memregion("sounddata")->base(), 0x8000);
-	
+
 	save_item(NAME(m_sound_data));
 }
 

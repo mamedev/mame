@@ -91,7 +91,7 @@ static const translation_info gcc_translate[] =
 	// warning C4510: 'xxx' : default constructor could not be generated
 	// warning C4512: 'xxx' : assignment operator could not be generated
 	// warning C4514: 'xxx' : unreferenced inline function has been removed
-	// warning C4619: #pragma warning : there is no warning number 'xxx' 
+	// warning C4619: #pragma warning : there is no warning number 'xxx'
 	// warning C4571: Informational: catch(...) semantics changed since Visual C++ 7.1; structured exceptions (SEH) are no longer caught
 	// warning C4610: struct 'xxx' can never be instantiated - user defined constructor required
 	// warning C4625: 'xxx' : copy constructor could not be generated because a base class copy constructor is inaccessible or deleted

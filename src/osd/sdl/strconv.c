@@ -127,15 +127,15 @@ int osd_uchar_from_osdchar(UINT32 *uchar, const char *osdchar, size_t count)
 
 int osd_uchar_from_osdchar(unicode_char *uchar, const char *osdchar, size_t count)
 {
-    wchar_t wch;
+	wchar_t wch;
 
-    count = mbstowcs(&wch, (char *)osdchar, 1);
-    if (count != -1)
-        *uchar = wch;
-    else
-        *uchar = 0;
+	count = mbstowcs(&wch, (char *)osdchar, 1);
+	if (count != -1)
+		*uchar = wch;
+	else
+		*uchar = 0;
 
-    return count;
+	return count;
 }
 
 #endif

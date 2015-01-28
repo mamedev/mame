@@ -36,7 +36,7 @@ public:
 	required_device<dac_device> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_fgscroll;
@@ -58,7 +58,7 @@ public:
 	// game specific initialization
 	int m_is_senjyo;
 	int m_scrollhack;
-	
+
 	UINT8 m_sound_cmd;
 	int m_single_volume;
 	int m_sound_state;
@@ -67,7 +67,7 @@ public:
 	tilemap_t *m_bg1_tilemap;
 	tilemap_t *m_bg2_tilemap;
 	tilemap_t *m_bg3_tilemap;
-	
+
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
 	DECLARE_WRITE8_MEMBER(paletteram_w);
 	DECLARE_WRITE8_MEMBER(starforb_scrolly2);
@@ -82,18 +82,18 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_cmd_w);
 	DECLARE_WRITE8_MEMBER(irq_ctrl_w);
 	DECLARE_READ8_MEMBER(pio_pa_r);
-	
+
 	DECLARE_DRIVER_INIT(starfora);
 	DECLARE_DRIVER_INIT(senjyo);
 	DECLARE_DRIVER_INIT(starfore);
 	DECLARE_DRIVER_INIT(starforc);
-	
+
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(senjyo_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(starforc_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg3_tile_info);
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();

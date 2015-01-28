@@ -30,7 +30,7 @@
 		#define SDL13_COMBINE_RESIZE (0)
 	#endif
 #else
-    #define SDLMAME_INIT_IN_WORKER_THREAD   (0)
+	#define SDLMAME_INIT_IN_WORKER_THREAD   (0)
 	#define SDL13_COMBINE_RESIZE (0)
 #endif
 
@@ -199,7 +199,7 @@ public:
 	#ifdef USE_NETWORK
 	virtual bool network_init();
 	#endif
-    //virtual bool midi_init();
+	//virtual bool midi_init();
 
 	virtual void video_exit();
 	virtual void window_exit();
@@ -208,9 +208,9 @@ public:
 	#ifdef USE_NETWORK
 	virtual void network_exit();
 	#endif
-    //virtual void midi_exit();
+	//virtual void midi_exit();
 
-    sdl_options &options() { return m_options; }
+	sdl_options &options() { return m_options; }
 
 private:
 	virtual void osd_exit();
@@ -220,7 +220,7 @@ private:
 	// FIXME: remove machine usage
 	void extract_video_config(running_machine &machine);
 
-    sdl_options &m_options;
+	sdl_options &m_options;
 
 	watchdog *m_watchdog;
 

@@ -24,4 +24,3 @@ void parameters_manager::add(astring tag, astring value)
 {
 	m_parameters.add(tag, value);
 }
-

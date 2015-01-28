@@ -1,8 +1,8 @@
 /**********************************************************************
 
     Nintendo Entertainment System - Miracle Piano Keyboard
- 
-    TODO: basically everything, this is just a skeleton with no 
+
+    TODO: basically everything, this is just a skeleton with no
     real MIDI handling at the moment.
 
     Copyright MESS Team.
@@ -13,8 +13,8 @@
 #include "miracle.h"
 
 #define MIRACLE_MIDI_WAITING 0
-#define MIRACLE_MIDI_RECEIVE 1		// receive byte from piano
-#define MIRACLE_MIDI_SEND 2			// send byte to piano
+#define MIRACLE_MIDI_RECEIVE 1      // receive byte from piano
+#define MIRACLE_MIDI_SEND 2         // send byte to piano
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -129,7 +129,7 @@ UINT8 nes_miracle_device::read_bit0()
 
 void nes_miracle_device::write(UINT8 data)
 {
-//	printf("write: %d (%d %02x %d)\n", data & 1, m_sent_bits, m_data_sent, m_midi_mode);
+//  printf("write: %d (%d %02x %d)\n", data & 1, m_sent_bits, m_data_sent, m_midi_mode);
 
 	if (m_midi_mode == MIRACLE_MIDI_SEND)
 	{
@@ -142,7 +142,7 @@ void nes_miracle_device::write(UINT8 data)
 		// then we go back to waiting
 		if (m_sent_bits == 8)
 		{
-//			printf("xmit MIDI byte %02x\n", m_data_sent);
+//          printf("xmit MIDI byte %02x\n", m_data_sent);
 			xmit_char(m_data_sent);
 			m_midi_mode = MIRACLE_MIDI_WAITING;
 			m_sent_bits = 0;
@@ -157,13 +157,13 @@ void nes_miracle_device::write(UINT8 data)
 		m_strobe_on = 1;
 		return;
 	}
-	
+
 	if (m_strobe_on)
 	{
 		// was timer running?
 		if (m_strobe_clock > 0)
 		{
-//			printf("got strobe at %d clocks\n", m_strobe_clock);
+//          printf("got strobe at %d clocks\n", m_strobe_clock);
 
 			if (m_strobe_clock < 66 && data == 0)
 			{
@@ -199,7 +199,7 @@ void nes_miracle_device::write(UINT8 data)
 void nes_miracle_device::rcv_complete()    // Rx completed receiving byte
 {
 	receive_register_extract();
-//	UINT8 rcv = get_received_char();
+//  UINT8 rcv = get_received_char();
 }
 
 void nes_miracle_device::tra_complete()    // Tx completed sending byte
@@ -247,4 +247,3 @@ void nes_miracle_device::xmit_char(UINT8 data)
 		}
 	}
 }
-

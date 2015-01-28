@@ -97,10 +97,10 @@ netlist_device_t *netlist_setup_t::register_dev(netlist_device_t *dev, const pst
 
 netlist_device_t *netlist_setup_t::register_dev(const pstring &classname, const pstring &name)
 {
-    netlist_device_t *dev = factory().new_device_by_classname(classname);
-    if (dev == NULL)
-        netlist().error("Class %s not found!\n", classname.cstr());
-    return register_dev(dev, name);
+	netlist_device_t *dev = factory().new_device_by_classname(classname);
+	if (dev == NULL)
+		netlist().error("Class %s not found!\n", classname.cstr());
+	return register_dev(dev, name);
 }
 
 template <class T>
@@ -697,7 +697,7 @@ void netlist_setup_t::resolve_inputs()
 
 void netlist_setup_t::start_devices()
 {
-    //FIXME: we need a nl_getenv
+	//FIXME: we need a nl_getenv
 	if (getenv("NL_LOGS"))
 	{
 		NL_VERBOSE_OUT(("Creating dynamic logs ...\n"));

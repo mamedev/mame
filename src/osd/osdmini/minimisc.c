@@ -81,4 +81,3 @@ char *osd_get_clipboard_text(void)
 	// can't support clipboards generically
 	return NULL;
 }
-

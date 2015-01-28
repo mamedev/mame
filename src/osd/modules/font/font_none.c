@@ -14,17 +14,17 @@
 class osd_font_none : public osd_font
 {
 public:
-    virtual ~osd_font_none() {};
+	virtual ~osd_font_none() {};
 
-    virtual bool open(const char *font_path, const char *name, int &height);
-    virtual void close();
-    virtual bool get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs);
+	virtual bool open(const char *font_path, const char *name, int &height);
+	virtual void close();
+	virtual bool get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs);
 private:
 };
 
 bool osd_font_none::open(const char *font_path, const char *_name, int &height)
 {
-    return false;
+	return false;
 }
 
 //-------------------------------------------------
@@ -46,22 +46,21 @@ void osd_font_none::close()
 
 bool osd_font_none::get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs)
 {
-    return false;
+	return false;
 }
 
 class font_none : public osd_module, public font_module
 {
 public:
-    font_none()
-    : osd_module(OSD_FONT_PROVIDER, "none"), font_module()
-    {
-    }
+	font_none()
+	: osd_module(OSD_FONT_PROVIDER, "none"), font_module()
+	{
+	}
 
-    osd_font *font_alloc()
-    {
-        return global_alloc(osd_font_none);
-    }
+	osd_font *font_alloc()
+	{
+		return global_alloc(osd_font_none);
+	}
 };
 
 MODULE_DEFINITION(FONT_NONE, font_none)
-

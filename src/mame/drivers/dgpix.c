@@ -164,14 +164,14 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_ioport m_vblank;
-	
+
 	UINT32 *m_vram;
 	int m_vbuffer;
 	int m_flash_roms;
 	int m_old_vbuf;
 	UINT32 m_flash_cmd;
 	INT32 m_first_offset;
-	
+
 	DECLARE_READ32_MEMBER(flash_r);
 	DECLARE_WRITE32_MEMBER(flash_w);
 	DECLARE_WRITE32_MEMBER(vram_w);
@@ -179,18 +179,18 @@ public:
 	DECLARE_WRITE32_MEMBER(vbuffer_w);
 	DECLARE_WRITE32_MEMBER(coin_w);
 	DECLARE_READ32_MEMBER(vblank_r);
-	
+
 	DECLARE_DRIVER_INIT(elfin);
 	DECLARE_DRIVER_INIT(jumpjump);
 	DECLARE_DRIVER_INIT(xfiles);
 	DECLARE_DRIVER_INIT(xfilesk);
 	DECLARE_DRIVER_INIT(kdynastg);
 	DECLARE_DRIVER_INIT(fmaniac3);
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	
+
 	UINT32 screen_update_dgpix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 

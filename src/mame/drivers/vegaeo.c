@@ -26,7 +26,7 @@ public:
 
 	UINT32 *m_vega_vram;
 	UINT8 m_vega_vbuffer;
-	
+
 	DECLARE_WRITE32_MEMBER(vega_vram_w);
 	DECLARE_READ32_MEMBER(vega_vram_r);
 	DECLARE_WRITE32_MEMBER(vega_misc_w);

@@ -16,7 +16,7 @@ public:
 		m_videoram(*this, "videoram"),
 		m_paletteram(*this, "paletteram"),
 		m_spriteram(*this, "spriteram") { }
-		
+
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki2;
@@ -36,14 +36,14 @@ public:
 	tilemap_t *m_tilemap_0;
 	tilemap_t *m_tilemap_1;
 	tilemap_t *m_tilemap_2;
-	
+
 	bitmap_ind16 m_tmpbitmap;
 	UINT8 m_palbank;
 	UINT8 m_priority;
 	UINT8 m_pixbank;
 	int m_sprite_inc;
 	int m_irq_count;
-	
+
 	DECLARE_WRITE8_MEMBER(paradise_rombank_w);
 	DECLARE_WRITE8_MEMBER(torus_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(paradise_flipscreen_w);
@@ -56,25 +56,25 @@ public:
 	DECLARE_WRITE8_MEMBER(paradise_pixmap_w);
 	DECLARE_WRITE8_MEMBER(paradise_priority_w);
 	DECLARE_WRITE8_MEMBER(paradise_okibank_w);
-	
+
 	DECLARE_DRIVER_INIT(torus);
 	DECLARE_DRIVER_INIT(paradise);
 	DECLARE_DRIVER_INIT(tgtball);
-	
+
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 	TILE_GET_INFO_MEMBER(get_tile_info_2);
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	
+
 	UINT32 screen_update_paradise(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_torus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_madball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	INTERRUPT_GEN_MEMBER(paradise_irq);
-	
+
 	void update_pix_palbank();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

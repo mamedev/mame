@@ -47,12 +47,12 @@ class nes_4score_p1p3_device : public nes_4score_device
 public:
 	// construction/destruction
 	nes_4score_p1p3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	virtual ioport_constructor device_input_ports() const;
-	
+
 protected:
 	virtual void write(UINT8 data);
-	
+
 private:
 	required_ioport m_joypad1;
 	required_ioport m_joypad3;
@@ -67,10 +67,10 @@ public:
 	nes_4score_p2p4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual ioport_constructor device_input_ports() const;
-	
+
 protected:
 	virtual void write(UINT8 data);
-	
+
 private:
 	required_ioport m_joypad2;
 	required_ioport m_joypad4;

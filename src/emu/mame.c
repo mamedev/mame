@@ -94,7 +94,7 @@ machine_manager* machine_manager::m_manager = NULL;
 
 osd_interface &machine_manager::osd() const
 {
-    return m_osd;
+	return m_osd;
 }
 
 

@@ -17,16 +17,16 @@ class ATTR_ALIGNED(64) netlist_matrix_solver_gauss_seidel_t: public netlist_matr
 public:
 
 	netlist_matrix_solver_gauss_seidel_t(const netlist_solver_parameters_t &params, int size)
-      : netlist_matrix_solver_direct_t<m_N, _storage_N>(netlist_matrix_solver_t::GAUSS_SEIDEL, params, size)
+		: netlist_matrix_solver_direct_t<m_N, _storage_N>(netlist_matrix_solver_t::GAUSS_SEIDEL, params, size)
 		, m_lp_fact(0)
 		, m_gs_fail(0)
 		, m_gs_total(0)
 		{
-	        const char *p = osd_getenv("NETLIST_STATS");
-	        if (p != NULL)
-	            m_log_stats = (bool) atoi(p);
-	        else
-	            m_log_stats = false;
+			const char *p = osd_getenv("NETLIST_STATS");
+			if (p != NULL)
+				m_log_stats = (bool) atoi(p);
+			else
+				m_log_stats = false;
 		}
 
 	virtual ~netlist_matrix_solver_gauss_seidel_t() {}
@@ -52,21 +52,21 @@ private:
 template <int m_N, int _storage_N>
 void netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::log_stats()
 {
-    if (this->m_stat_calculations != 0 && m_log_stats)
-    {
-        printf("==============================================\n");
-        printf("Solver %s\n", this->name().cstr());
-        printf("       ==> %d nets\n", this->N()); //, (*(*groups[i].first())->m_core_terms.first())->name().cstr());
-        printf("       has %s elements\n", this->is_dynamic() ? "dynamic" : "no dynamic");
-        printf("       has %s elements\n", this->is_timestep() ? "timestep" : "no timestep");
-        printf("       %6.3f average newton raphson loops\n", (double) this->m_stat_newton_raphson / (double) this->m_stat_vsolver_calls);
-        printf("       %10d invocations (%6d Hz)  %10d gs fails (%6.2f%%) %6.3f average\n",
-                this->m_stat_calculations,
-                this->m_stat_calculations * 10 / (int) (this->netlist().time().as_double() * 10.0),
-                this->m_gs_fail,
-                100.0 * (double) this->m_gs_fail / (double) this->m_stat_calculations,
-                (double) this->m_gs_total / (double) this->m_stat_calculations);
-    }
+	if (this->m_stat_calculations != 0 && m_log_stats)
+	{
+		printf("==============================================\n");
+		printf("Solver %s\n", this->name().cstr());
+		printf("       ==> %d nets\n", this->N()); //, (*(*groups[i].first())->m_core_terms.first())->name().cstr());
+		printf("       has %s elements\n", this->is_dynamic() ? "dynamic" : "no dynamic");
+		printf("       has %s elements\n", this->is_timestep() ? "timestep" : "no timestep");
+		printf("       %6.3f average newton raphson loops\n", (double) this->m_stat_newton_raphson / (double) this->m_stat_vsolver_calls);
+		printf("       %10d invocations (%6d Hz)  %10d gs fails (%6.2f%%) %6.3f average\n",
+				this->m_stat_calculations,
+				this->m_stat_calculations * 10 / (int) (this->netlist().time().as_double() * 10.0),
+				this->m_gs_fail,
+				100.0 * (double) this->m_gs_fail / (double) this->m_stat_calculations,
+				(double) this->m_gs_total / (double) this->m_stat_calculations);
+	}
 }
 
 template <int m_N, int _storage_N>
@@ -299,7 +299,7 @@ ATTR_HOT inline int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::vsolv
 		//if (fabs(gabs_t - fabs(gtot_t)) > 1e-20)
 		//    printf("%d %e abs: %f tot: %f\n",k, gabs_t / gtot_t -1.0, gabs_t, gtot_t);
 
-        gabs_t *= 0.95; // avoid rounding issues
+		gabs_t *= 0.95; // avoid rounding issues
 		if (!USE_GABS || gabs_t <= gtot_t)
 		{
 			w[k] = ws / gtot_t;
@@ -343,7 +343,7 @@ ATTR_HOT inline int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::vsolv
 		this->m_nets[k]->m_cur_Analog = new_V[k];
 
 	this->m_gs_total += resched_cnt;
-    this->m_stat_calculations++;
+	this->m_stat_calculations++;
 
 	if (resched)
 	{

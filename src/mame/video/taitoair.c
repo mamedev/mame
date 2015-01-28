@@ -230,14 +230,14 @@ void taitoair_state::fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect
 			int xx2 = x2 >> TAITOAIR_FRAC_SHIFT;
 			int grad_col;
 			int base_color;
-			
+
 			if (xx1 <= cliprect.max_x || xx2 >= cliprect.min_x)
 			{
 				if (xx1 < cliprect.min_x)
 					xx1 = cliprect.min_x;
 				if (xx2 > cliprect.max_x)
 					xx2 = cliprect.max_x;
-				
+
 				if(color & 0x40)
 				{
 					/* Non-terrain elements are colored with this. */

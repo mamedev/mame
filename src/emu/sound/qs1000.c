@@ -246,7 +246,7 @@ void qs1000_device::device_start()
 
 	save_item(NAME(m_serial_data_in));
 	save_item(NAME(m_wave_regs));
-	
+
 	for (int i = 0; i < QS1000_CHANNELS; i++)
 	{
 		save_item(NAME(m_channels[i].m_acc), i);

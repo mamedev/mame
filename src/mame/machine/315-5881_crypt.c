@@ -82,7 +82,7 @@ UINT16 sega_315_5881_crypt_device::do_decrypt(UINT8 *&base)
 		{
 			if (done_compression == 1)
 				enc_start();
-				
+
 
 
 			line_fill();
@@ -176,15 +176,15 @@ is given by the following function:
 
 void key2label(uint32_t key)
 {
-	int bcd0 = ((BIT(key,17)<<3)|(BIT(key,7)<<2)|(BIT(key,14)<<1)|BIT(key,19))^9;
-	int bcd1 = ((BIT(key,20)<<3)|(BIT(key,1)<<2)|(BIT(key,4)<<1)|BIT(key,13))^5;
-	int bcd2 = (BIT(key,9)<<1)|BIT(key,22);
-	int bcd3 = ((BIT(key,9)<<2)|BIT(key,9))^5;
-	
-	char chiplabel[13];
-	sprintf(chiplabel, "317-%d%d%d%d-%s", bcd3, bcd2, bcd1, bcd0, (BIT(key,5)?"JPN":"COM"));
-	
-	printf("%s", chiplabel);
+    int bcd0 = ((BIT(key,17)<<3)|(BIT(key,7)<<2)|(BIT(key,14)<<1)|BIT(key,19))^9;
+    int bcd1 = ((BIT(key,20)<<3)|(BIT(key,1)<<2)|(BIT(key,4)<<1)|BIT(key,13))^5;
+    int bcd2 = (BIT(key,9)<<1)|BIT(key,22);
+    int bcd3 = ((BIT(key,9)<<2)|BIT(key,9))^5;
+
+    char chiplabel[13];
+    sprintf(chiplabel, "317-%d%d%d%d-%s", bcd3, bcd2, bcd1, bcd0, (BIT(key,5)?"JPN":"COM"));
+
+    printf("%s", chiplabel);
 }
 
 Given the use of the BCD-encoded security module labels, it's expected that at least other 6 additional bits be present in the
@@ -196,7 +196,7 @@ they be derived from other non-random sources.
 
 In the second Feistel Network, every key bit seem to be used at most once (the various uses of current bit #9 are fictitious, as
 that bit really represent various bits in the real key; see comments on the use of the labels above). Given that, it seems probable
-that the real key is 64 bits long, exactly as in the related CPS-2 scheme, and the designers tried to cover all 96 input bits with 
+that the real key is 64 bits long, exactly as in the related CPS-2 scheme, and the designers tried to cover all 96 input bits with
 the bits provening from the game key, the sequence key and the result from the first feistel network (64+16+16=96). In the first
 Feistel Network, as only 80 bits are available, some bits would be used twice (as can be partially seen in the current implementation).
 The fact that only 29 bits out of the expected 64 have been observed till now would be due to the generation of the key by composing
@@ -453,7 +453,7 @@ const sega_315_5881_crypt_device::sbox sega_315_5881_crypt_device::fn2_sboxes[4]
 
 		{
 			{
-				2,2,0,3,0,3,1,0,1,1,2,3,2,3,1,0,0,0,3,2,2,0,2,3,1,3,2,0,3,3,1,3,				
+				2,2,0,3,0,3,1,0,1,1,2,3,2,3,1,0,0,0,3,2,2,0,2,3,1,3,2,0,3,3,1,3,
 				// unused?
 				255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
 			},
@@ -511,7 +511,7 @@ const sega_315_5881_crypt_device::sbox sega_315_5881_crypt_device::fn2_sboxes[4]
 
 const int sega_315_5881_crypt_device::fn1_game_key_scheduling[FN1GK][2] = {
 	{1,29},  {1,71},  {2,4},   {2,54},  {3,8},   {4,56},  {4,73},  {5,11},
-	{6,51},  {7,92},  {8,89},  {9,9},   {9,39},  {9,58},  {9,86},  {10,90}, 
+	{6,51},  {7,92},  {8,89},  {9,9},   {9,39},  {9,58},  {9,86},  {10,90},
 	{11,6},  {12,64}, {13,49}, {14,44}, {15,40}, {16,69}, {17,15}, {18,23},
 	{18,43}, {19,82}, {20,81}, {21,32}, {22,5},  {23,66}, {24,13}, {24,45},
 	{25,12}, {25,35}, {26,61}, {27,10}, {27,59}, {28,25}
@@ -680,7 +680,7 @@ UINT16 sega_315_5881_crypt_device::get_decrypted_16()
 
 	prot_cur_address ++;
 
-//	printf("get_decrypted_16 %04x\n", res);
+//  printf("get_decrypted_16 %04x\n", res);
 
 	return res;
 }
@@ -691,10 +691,10 @@ void sega_315_5881_crypt_device::enc_start()
 	block_pos = 0;
 	done_compression = 0;
 	buffer_pos = BUFFER_SIZE;
-	
+
 	if (buffer_bit2 != 15) // if we have remaining bits in the decompression buffer we shouldn't read the next word yet but should instead use the bits we have?? (twcup98) (might just be because we should be pulling bytes not words?)
 	{
-//		printf("buffer_bit2 is %d\n", buffer_bit2);
+//      printf("buffer_bit2 is %d\n", buffer_bit2);
 		dec_header = (buffer2a & 0x0003) << 16;
 	}
 	else
@@ -710,7 +710,7 @@ void sega_315_5881_crypt_device::enc_start()
 	// etc. after each block a new header must be read, it looks like compressed and uncompressed blocks
 	// can be mixed like this, I don't know if the length is src length of decompressed length.
 	// deathcox and others confirm format as 0x20000 bit as compressed bit, 0x1ff00 bits as block size 1, 0x000ff bits as block size 2
-	// for compressed streams the 'line size' is block size 1.  
+	// for compressed streams the 'line size' is block size 1.
 
 	block_numlines = ((dec_header & 0x000000ff) >> 0) + 1;
 	int blocky = ((dec_header & 0x0001ff00) >> 8) + 1;
@@ -824,8 +824,8 @@ const UINT8 sega_315_5881_crypt_device::trees[9][2][32] = {
 
 int sega_315_5881_crypt_device::get_compressed_bit()
 {
-//	if(buffer_pos == BUFFER_SIZE)
-//		enc_fill();
+//  if(buffer_pos == BUFFER_SIZE)
+//      enc_fill();
 
 	if (buffer_bit2 == 15)
 	{
@@ -833,7 +833,7 @@ int sega_315_5881_crypt_device::get_compressed_bit()
 		buffer2a = get_decrypted_16();
 		buffer2[0] = buffer2a;
 		buffer2[1] = buffer2a >> 8;
-	//	block_pos+=2;
+	//  block_pos+=2;
 		buffer_pos = 0;
 
 	}
@@ -842,7 +842,7 @@ int sega_315_5881_crypt_device::get_compressed_bit()
 		buffer_bit2++;
 	}
 
-//	if (buffer_bit ==7) printf("using byte %02x\n", buffer2[(buffer_pos&1) ^ 1]);
+//  if (buffer_bit ==7) printf("using byte %02x\n", buffer2[(buffer_pos&1) ^ 1]);
 
 	int res = (buffer2[(buffer_pos&1)^1] >> buffer_bit) & 1;
 	buffer_bit--;

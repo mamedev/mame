@@ -50,15 +50,15 @@ void jvs_host::commit_raw()
 	if(send_size < 3 || send_buffer[0] == 0x00 || send_buffer[1] != send_size-1) {
 		logerror("JVS checksum error\n");
 	} /*
-		Naomi suchie3 have bad working controls with this
-	
-		// "This message is crap" doesn't exist so call it checksum error
-		recv_buffer[0] = 0x00;
-		recv_buffer[1] = 0x02;
-		recv_buffer[2] = 0x03;
-		recv_size = 3;
+        Naomi suchie3 have bad working controls with this
 
-	} else */ {
+        // "This message is crap" doesn't exist so call it checksum error
+        recv_buffer[0] = 0x00;
+        recv_buffer[1] = 0x02;
+        recv_buffer[2] = 0x03;
+        recv_size = 3;
+
+    } else */ {
 		if(first_device) {
 			first_device->message(send_buffer[0], send_buffer+2, send_size-2, recv_buffer+2, recv_size);
 			recv_is_encoded = false;

@@ -37,7 +37,7 @@ void dpc_device::device_start()
 		save_item(NAME(m_df[i].music_mode), i);
 		save_item(NAME(m_df[i].osc_clk), i);
 	}
-	
+
 	save_item(NAME(m_movamt));
 	save_item(NAME(m_latch_62));
 	save_item(NAME(m_latch_64));

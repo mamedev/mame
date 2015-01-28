@@ -121,4 +121,3 @@ char *osd_get_clipboard_text(void)
 
 	return result;
 }
-

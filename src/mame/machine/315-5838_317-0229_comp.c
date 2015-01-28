@@ -1,33 +1,33 @@
 /* Sega Compression (and possibly encryption) device
 
-	315-5838 - Decathlete (ST-V)
-	317-0229 - Dead or Alive (Model 2A)
+    315-5838 - Decathlete (ST-V)
+    317-0229 - Dead or Alive (Model 2A)
 
-	Package Type: TQFP100
+    Package Type: TQFP100
 
-	This appears to be a dual channel compression chip, used in 1996, predating the 5881.
-	Decathlete uses it to compress ALL the game graphics, Dead or Alive uses it for a
-	dumb security check, decompressing a single string.
+    This appears to be a dual channel compression chip, used in 1996, predating the 5881.
+    Decathlete uses it to compress ALL the game graphics, Dead or Alive uses it for a
+    dumb security check, decompressing a single string.
 
-	Each channel appears to be connected to a different set of ROMs, however there is
-	defintiely only a single 315-5838 chip. (could the different channels actually just
-	be mirror addresses, with part of the address determining the ROMs to use?)
+    Each channel appears to be connected to a different set of ROMs, however there is
+    defintiely only a single 315-5838 chip. (could the different channels actually just
+    be mirror addresses, with part of the address determining the ROMs to use?)
 
-	Dead of Alive only uses a single channel, and has the source data in RAM, not ROM.
-	This is similar to how some 5881 games were set up, with the ST-V versions decrypting
-	data directly from ROM and the Model 2 ones using a RAM source buffer.
+    Dead of Alive only uses a single channel, and has the source data in RAM, not ROM.
+    This is similar to how some 5881 games were set up, with the ST-V versions decrypting
+    data directly from ROM and the Model 2 ones using a RAM source buffer.
 
-	Looking at the values read I don't think there is any address based encryption, for
-	example many blocks where you'd expect a zero fill start with repeating patterns
-	of 8f708f70 (different lengths) channel would appear to relate to compressed 0x00 data
+    Looking at the values read I don't think there is any address based encryption, for
+    example many blocks where you'd expect a zero fill start with repeating patterns
+    of 8f708f70 (different lengths) channel would appear to relate to compressed 0x00 data
 
-	read addr 0071253c, blah_r 8f708f70 - read count count 00000004
-	read addr 00712540, blah_r 8f708f70 - read count count 00000008
-	read addr 00712544, blah_r 8f708f70 - read count count 0000000c
-	read addr 00712548, blah_r 8f708f70 - read count count 00000010
-	read addr 0071254c, blah_r 8f708f70 - read count count 00000014
-	read addr 00712550, blah_r 8f708f70 - read count count 00000018
-	read addr 00712554, blah_r 8f708f70 - read count count 0000001c
+    read addr 0071253c, blah_r 8f708f70 - read count count 00000004
+    read addr 00712540, blah_r 8f708f70 - read count count 00000008
+    read addr 00712544, blah_r 8f708f70 - read count count 0000000c
+    read addr 00712548, blah_r 8f708f70 - read count count 00000010
+    read addr 0071254c, blah_r 8f708f70 - read count count 00000014
+    read addr 00712550, blah_r 8f708f70 - read count count 00000018
+    read addr 00712554, blah_r 8f708f70 - read count count 0000001c
 
 */
 
@@ -95,8 +95,8 @@ READ32_MEMBER(sega_315_5838_comp_device::decathlt_prot2_r)
 
 UINT32 sega_315_5838_comp_device::genericdecathlt_prot_r(UINT32 mem_mask, int channel)
 {
-//	UINT32 *fake0 = (UINT32*)memregion( ":fake0" )->base();
-//	UINT32 retvalue = 0xffff;
+//  UINT32 *fake0 = (UINT32*)memregion( ":fake0" )->base();
+//  UINT32 retvalue = 0xffff;
 
 	switch (m_channel[channel].m_srcoffset)
 	{
@@ -177,7 +177,7 @@ UINT32 sega_315_5838_comp_device::genericdecathlt_prot_r(UINT32 mem_mask, int ch
 
 void sega_315_5838_comp_device::set_prot_addr(UINT32 data, UINT32 mem_mask, int channel)
 {
-//	printf("set_prot_addr\n");
+//  printf("set_prot_addr\n");
 	COMBINE_DATA(&m_channel[channel].m_srcoffset);
 
 	//if (m_decathlt_part==0) logerror("%d, last read count was %06x\n",channel, m_channel[channel].m_decathlt_lastcount*4);
@@ -361,6 +361,6 @@ void sega_315_5838_comp_device::install_doa_protection()
 	cpu->space(AS_PROGRAM).install_readwrite_handler(0x01d80000, 0x01dfffff, read32_delegate(FUNC(sega_315_5838_comp_device::doa_prot_r), this), write32_delegate(FUNC(sega_315_5838_comp_device::doa_prot_w), this));
 	cpu->space(AS_PROGRAM).install_write_handler(0x01d87ff0, 0x01d87ff3, write32_delegate(FUNC(sega_315_5838_comp_device::decathlt_prot1_srcaddr_w), this)); // set compressed data source address (always set 0, data is in RAM)
 	cpu->space(AS_PROGRAM).install_write_handler(0x01d87ff4, 0x01d87ff7, write32_delegate(FUNC(sega_315_5838_comp_device::decathlt_prot1_w_doa), this)); // upload tab
-//	cpu->space(AS_PROGRAM).install_read_handler(0x01d87ff8, 0x01d87ffb, read32_delegate(FUNC(sega_315_5838_comp_device::decathlt_prot1_r), this)); // read decompressed data
+//  cpu->space(AS_PROGRAM).install_read_handler(0x01d87ff8, 0x01d87ffb, read32_delegate(FUNC(sega_315_5838_comp_device::decathlt_prot1_r), this)); // read decompressed data
 
 }

@@ -51,9 +51,9 @@ class nes_fcpad2_device : public nes_joypad_device
 public:
 	// construction/destruction
 	nes_fcpad2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	virtual ioport_constructor device_input_ports() const;
-	
+
 protected:
 	virtual UINT8 read_exp(offs_t offset);
 	virtual void write(UINT8 data);
@@ -66,7 +66,7 @@ class nes_ccpadl_device : public nes_joypad_device
 public:
 	// construction/destruction
 	nes_ccpadl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	virtual ioport_constructor device_input_ports() const;
 };
 
@@ -77,7 +77,7 @@ class nes_ccpadr_device : public nes_joypad_device
 public:
 	// construction/destruction
 	nes_ccpadr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	virtual ioport_constructor device_input_ports() const;
 };
 
@@ -88,7 +88,7 @@ class nes_arcstick_device : public nes_joypad_device
 public:
 	// construction/destruction
 	nes_arcstick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	virtual ioport_constructor device_input_ports() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 
@@ -96,7 +96,7 @@ protected:
 	virtual UINT8 read_bit0() { return 0; }
 	virtual UINT8 read_exp(offs_t offset);
 	virtual void write(UINT8 data);
-	
+
 	required_device<nes_control_port_device> m_daisychain;
 	required_ioport m_cfg;
 };

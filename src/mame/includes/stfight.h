@@ -28,7 +28,7 @@ public:
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	optional_shared_ptr<UINT8> m_text_char_ram;
 	optional_shared_ptr<UINT8> m_text_attr_ram;
 	optional_shared_ptr<UINT8> m_tx_vram;

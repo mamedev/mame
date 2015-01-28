@@ -139,7 +139,7 @@ READ8_MEMBER(nes_state::fc_in0_r)
 	// bit 0 to controller port
 	ret |= m_ctrl1->read_bit0();
 
-	// expansion port bits (in the original FC, P2 controller was hooked to these lines 
+	// expansion port bits (in the original FC, P2 controller was hooked to these lines
 	// too, so in principle some homebrew hardware modification could use the same
 	// connection with P1 controller too)
 	ret |= m_ctrl1->read_exp(0);
@@ -160,7 +160,7 @@ READ8_MEMBER(nes_state::fc_in1_r)
 	// bit 0 to controller port
 	ret |= m_ctrl2->read_bit0();
 
-	// expansion port bits (in the original FC, P2 controller was hooked to these lines 
+	// expansion port bits (in the original FC, P2 controller was hooked to these lines
 	// too, so in principle some homebrew hardware modification could use the same
 	// connection with P1 controller too)
 	ret |= m_ctrl1->read_exp(1);
@@ -193,10 +193,10 @@ NESCTRL_BRIGHTPIXEL_CB(nes_state::bright_pixel)
 {
 	// get the pixel at the gun position
 	UINT32 pix = m_ppu->get_pixel(x, y);
-	
+
 	// get the color base from the ppu
 	UINT32 color_base = m_ppu->get_colorbase();
-	
+
 	// check if the cursor is over a bright pixel
 	if ((pix == color_base + 0x20) || (pix == color_base + 0x30) ||
 		(pix == color_base + 0x33) || (pix == color_base + 0x34))

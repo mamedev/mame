@@ -32,11 +32,11 @@ class input_type_entry;     // FIXME: including emu.h does not work because emu.
 class osd_font
 {
 public:
-    virtual ~osd_font() {}
+	virtual ~osd_font() {}
 
-    virtual bool open(const char *font_path, const char *name, int &height) = 0;
-    virtual void close() = 0;
-    virtual bool get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs) = 0;
+	virtual bool open(const char *font_path, const char *name, int &height) = 0;
+	virtual void close() = 0;
+	virtual bool get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs) = 0;
 };
 
 // ======================> osd_interface

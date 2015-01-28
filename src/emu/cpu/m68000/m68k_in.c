@@ -272,7 +272,7 @@ M68KMAKE_OPCODE_HANDLER_HEADER
 extern void m68040_fpu_op0(m68000_base_device *m68k);
 extern void m68040_fpu_op1(m68000_base_device *m68k);
 extern void m68881_mmu_ops(m68000_base_device *m68k);
-extern void m68881_ftrap(m68000_base_device *m68k); 
+extern void m68881_ftrap(m68000_base_device *m68k);
 
 /* ======================================================================== */
 /* ========================= INSTRUCTION HANDLERS ========================= */

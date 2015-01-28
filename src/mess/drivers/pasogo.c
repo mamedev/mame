@@ -681,7 +681,7 @@ void pasogo_state::machine_reset()
 	astring region_tag;
 	m_maincpu_rom = memregion("maincpu");
 	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
-	if (!m_cart_rom)	// this should never happen, since we make carts mandatory!
+	if (!m_cart_rom)    // this should never happen, since we make carts mandatory!
 		m_cart_rom = memregion("maincpu");
 
 	membank("bank27")->set_base(m_cart_rom->base());

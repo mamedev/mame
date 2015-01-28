@@ -160,4 +160,3 @@ int osd_thread_cpu_affinity(osd_thread *thread, UINT32 mask)
 void osd_thread_wait_free(osd_thread *thread)
 {
 }
-

@@ -199,7 +199,7 @@ private:
 	bitmap_ind16 *helper[3];
 
 	UINT16 screen_height;
-	
+
 	void register_save_state();
 };
 

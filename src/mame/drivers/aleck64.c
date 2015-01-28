@@ -178,8 +178,8 @@ class aleck64_state : public n64_state
 public:
 	aleck64_state(const machine_config &mconfig, device_type type, const char *tag)
 		: n64_state(mconfig, type, tag),
-		  m_e90_vram(*this,"e90vram"),
-		  m_e90_pal(*this,"e90pal"),
+			m_e90_vram(*this,"e90vram"),
+			m_e90_pal(*this,"e90pal"),
 			m_dip_read_offset(0) { }
 
 	optional_shared_ptr<UINT32> m_e90_vram;
@@ -322,7 +322,7 @@ static ADDRESS_MAP_START( n64_map, AS_PROGRAM, 32, aleck64_state )
 ADDRESS_MAP_END
 
 /*
- E90 protection handlers 
+ E90 protection handlers
 */
 
 READ16_MEMBER(aleck64_state::e90_prot_r)
@@ -332,7 +332,7 @@ READ16_MEMBER(aleck64_state::e90_prot_r)
 }
 
 WRITE16_MEMBER(aleck64_state::e90_prot_w)
-{	
+{
 	switch(offset*2)
 	{
 		case 0x16:
@@ -342,7 +342,7 @@ WRITE16_MEMBER(aleck64_state::e90_prot_w)
 			if(data & 1) // 0 -> 1 transition
 			{
 				//for(int i=0;i<0x1000;i+=4)
-				//	space.write_dword(0x007502f4+i,space.read_dword(0xd0000000+i));
+				//  space.write_dword(0x007502f4+i,space.read_dword(0xd0000000+i));
 			}
 			break;
 		//0x1e bit 0 probably enables the chip
@@ -882,7 +882,7 @@ UINT32 aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &bit
 {
 	bitmap.fill(0, cliprect);
 	screen_update_n64(screen,bitmap,cliprect);
-	
+
 	for(int offs=0;offs<0x1000/4;offs+=2)
 	{
 		int xi,yi;
@@ -904,16 +904,16 @@ UINT32 aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &bit
 		r&=0x1f;
 		g&=0x1f;
 		b&=0x1f;
-		r = (r << 3) | (r >> 2); 
+		r = (r << 3) | (r >> 2);
 		g = (g << 3) | (g >> 2);
-		b = (b << 3) | (b >> 2); 
+		b = (b << 3) | (b >> 2);
 		for(yi=0;yi<8;yi++)
 			for(xi=0;xi<8;xi++)
 			{
 				int res_x,res_y;
 				res_x = x+xi + 4;
 				res_y = y+yi + 7;
-				
+
 				if(cliprect.contains(res_x, res_y))
 					bitmap.pix32(res_y, res_x) = r << 16 | g << 8 | b;
 			}
@@ -926,7 +926,7 @@ static MACHINE_CONFIG_DERIVED( a64_e90, aleck64 )
 	MCFG_CPU_PROGRAM_MAP(e90_map)
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(aleck64_state, screen_update_e90)	
+	MCFG_SCREEN_UPDATE_DRIVER(aleck64_state, screen_update_e90)
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(aleck64_state,aleck64)

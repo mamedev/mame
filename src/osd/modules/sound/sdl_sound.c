@@ -43,53 +43,53 @@ class sound_sdl : public osd_module, public sound_module
 {
 public:
 
-    friend void sdl_callback(void *userdata, Uint8 *stream, int len);
+	friend void sdl_callback(void *userdata, Uint8 *stream, int len);
 
-    // number of samples per SDL callback
-    static const int SDL_XFER_SAMPLES = 512;
+	// number of samples per SDL callback
+	static const int SDL_XFER_SAMPLES = 512;
 
-    sound_sdl()
-    : osd_module(OSD_SOUND_PROVIDER, "sdl"), sound_module(),
-      stream_in_initialized(0),
-      stream_loop(0),
-      attenuation(0)
-    {
-        sdl_xfer_samples = SDL_XFER_SAMPLES;
-    }
-    virtual ~sound_sdl() { }
+	sound_sdl()
+	: osd_module(OSD_SOUND_PROVIDER, "sdl"), sound_module(),
+		stream_in_initialized(0),
+		stream_loop(0),
+		attenuation(0)
+	{
+		sdl_xfer_samples = SDL_XFER_SAMPLES;
+	}
+	virtual ~sound_sdl() { }
 
-    virtual int init();
-    virtual void exit();
+	virtual int init();
+	virtual void exit();
 
-    // sound_module
+	// sound_module
 
-    virtual void update_audio_stream(bool is_throttled, const INT16 *buffer, int samples_this_frame);
-    virtual void set_mastervolume(int attenuation);
+	virtual void update_audio_stream(bool is_throttled, const INT16 *buffer, int samples_this_frame);
+	virtual void set_mastervolume(int attenuation);
 
 private:
-    int lock_buffer(bool is_throttled, long offset, long size, void **buffer1, long *length1, void **buffer2, long *length2);
-    void unlock_buffer(void);
-    void att_memcpy(void *dest, const INT16 *data, int bytes_to_copy);
-    void copy_sample_data(bool is_throttled, const INT16 *data, int bytes_to_copy);
-    int sdl_create_buffers(void);
-    void sdl_destroy_buffers(void);
+	int lock_buffer(bool is_throttled, long offset, long size, void **buffer1, long *length1, void **buffer2, long *length2);
+	void unlock_buffer(void);
+	void att_memcpy(void *dest, const INT16 *data, int bytes_to_copy);
+	void copy_sample_data(bool is_throttled, const INT16 *data, int bytes_to_copy);
+	int sdl_create_buffers(void);
+	void sdl_destroy_buffers(void);
 
-    int sdl_xfer_samples;
-    int stream_in_initialized;
-    int stream_loop;
-    int attenuation;
+	int sdl_xfer_samples;
+	int stream_in_initialized;
+	int stream_loop;
+	int attenuation;
 
-    int              buf_locked;
+	int              buf_locked;
 
-    INT8             *stream_buffer;
-    volatile INT32   stream_playpos;
+	INT8             *stream_buffer;
+	volatile INT32   stream_playpos;
 
-    UINT32           stream_buffer_size;
-    UINT32           stream_buffer_in;
+	UINT32           stream_buffer_size;
+	UINT32           stream_buffer_in;
 
-    // buffer over/underflow counts
-    int              buffer_underflows;
-    int              buffer_overflows;
+	// buffer over/underflow counts
+	int              buffer_underflows;
+	int              buffer_overflows;
 
 
 };
@@ -354,7 +354,7 @@ void sound_sdl::set_mastervolume(int _attenuation)
 //============================================================
 static void sdl_callback(void *userdata, Uint8 *stream, int len)
 {
-    sound_sdl *thiz = (sound_sdl *) userdata;
+	sound_sdl *thiz = (sound_sdl *) userdata;
 	int len1, len2, sb_in;
 
 	sb_in = thiz->stream_buffer_in;
@@ -379,20 +379,20 @@ static void sdl_callback(void *userdata, Uint8 *stream, int len)
 		len2 = 0;
 	}
 
-    memcpy(stream, thiz->stream_buffer + thiz->stream_playpos, len1);
-    memset(thiz->stream_buffer + thiz->stream_playpos, 0, len1); // no longer needed
-    if (len2)
-    {
-        memcpy(stream+len1, thiz->stream_buffer, len2);
-        memset(thiz->stream_buffer, 0, len2); // no longer needed
-    }
+	memcpy(stream, thiz->stream_buffer + thiz->stream_playpos, len1);
+	memset(thiz->stream_buffer + thiz->stream_playpos, 0, len1); // no longer needed
+	if (len2)
+	{
+		memcpy(stream+len1, thiz->stream_buffer, len2);
+		memset(thiz->stream_buffer, 0, len2); // no longer needed
+	}
 
 
 	// move the play cursor
-    thiz->stream_playpos += len1 + len2;
+	thiz->stream_playpos += len1 + len2;
 	if (thiz->stream_playpos >= thiz->stream_buffer_size)
 	{
-	    thiz->stream_playpos -= thiz->stream_buffer_size;
+		thiz->stream_playpos -= thiz->stream_buffer_size;
 		thiz->stream_loop = 0;
 
 		if (LOG_SOUND)
@@ -416,81 +416,81 @@ int sound_sdl::init()
 	SDL_AudioSpec   aspec, obtained;
 	char audio_driver[16] = "";
 
-    if (LOG_SOUND)
-        sound_log = fopen(SDLMAME_SOUND_LOG, "w");
+	if (LOG_SOUND)
+		sound_log = fopen(SDLMAME_SOUND_LOG, "w");
 
-    // skip if sound disabled
-    if (sample_rate() != 0)
-    {
-        if (SDL_InitSubSystem(SDL_INIT_AUDIO)) {
-            osd_printf_error("Could not initialize SDL %s\n", SDL_GetError());
-            return -1;
-        }
+	// skip if sound disabled
+	if (sample_rate() != 0)
+	{
+		if (SDL_InitSubSystem(SDL_INIT_AUDIO)) {
+			osd_printf_error("Could not initialize SDL %s\n", SDL_GetError());
+			return -1;
+		}
 
-        osd_printf_verbose("Audio: Start initialization\n");
-    #if (SDLMAME_SDL2)
-        strncpy(audio_driver, SDL_GetCurrentAudioDriver(), sizeof(audio_driver));
-    #else
-        SDL_AudioDriverName(audio_driver, sizeof(audio_driver));
-    #endif
-        osd_printf_verbose("Audio: Driver is %s\n", audio_driver);
+		osd_printf_verbose("Audio: Start initialization\n");
+	#if (SDLMAME_SDL2)
+		strncpy(audio_driver, SDL_GetCurrentAudioDriver(), sizeof(audio_driver));
+	#else
+		SDL_AudioDriverName(audio_driver, sizeof(audio_driver));
+	#endif
+		osd_printf_verbose("Audio: Driver is %s\n", audio_driver);
 
-        sdl_xfer_samples = SDL_XFER_SAMPLES;
-        stream_in_initialized = 0;
-        stream_loop = 0;
+		sdl_xfer_samples = SDL_XFER_SAMPLES;
+		stream_in_initialized = 0;
+		stream_loop = 0;
 
-        // set up the audio specs
-        aspec.freq = sample_rate();
-        aspec.format = AUDIO_S16SYS;    // keep endian independent
-        aspec.channels = n_channels;
-        aspec.samples = sdl_xfer_samples;
-        aspec.callback = sdl_callback;
-        aspec.userdata = this;
+		// set up the audio specs
+		aspec.freq = sample_rate();
+		aspec.format = AUDIO_S16SYS;    // keep endian independent
+		aspec.channels = n_channels;
+		aspec.samples = sdl_xfer_samples;
+		aspec.callback = sdl_callback;
+		aspec.userdata = this;
 
-        if (SDL_OpenAudio(&aspec, &obtained) < 0)
-            goto cant_start_audio;
+		if (SDL_OpenAudio(&aspec, &obtained) < 0)
+			goto cant_start_audio;
 
-        osd_printf_verbose("Audio: frequency: %d, channels: %d, samples: %d\n",
-                            obtained.freq, obtained.channels, obtained.samples);
+		osd_printf_verbose("Audio: frequency: %d, channels: %d, samples: %d\n",
+							obtained.freq, obtained.channels, obtained.samples);
 
-        sdl_xfer_samples = obtained.samples;
+		sdl_xfer_samples = obtained.samples;
 
-        audio_latency = m_audio_latency;
+		audio_latency = m_audio_latency;
 
-        // pin audio latency
-        if (audio_latency > MAX_AUDIO_LATENCY)
-        {
-            audio_latency = MAX_AUDIO_LATENCY;
-        }
-        else if (audio_latency < 1)
-        {
-            audio_latency = 1;
-        }
+		// pin audio latency
+		if (audio_latency > MAX_AUDIO_LATENCY)
+		{
+			audio_latency = MAX_AUDIO_LATENCY;
+		}
+		else if (audio_latency < 1)
+		{
+			audio_latency = 1;
+		}
 
-        // compute the buffer sizes
-        stream_buffer_size = (sample_rate() * 2 * sizeof(INT16) * (2 + audio_latency)) / 30;
-        stream_buffer_size = (stream_buffer_size / 1024) * 1024;
-        if (stream_buffer_size < 1024)
-            stream_buffer_size = 1024;
+		// compute the buffer sizes
+		stream_buffer_size = (sample_rate() * 2 * sizeof(INT16) * (2 + audio_latency)) / 30;
+		stream_buffer_size = (stream_buffer_size / 1024) * 1024;
+		if (stream_buffer_size < 1024)
+			stream_buffer_size = 1024;
 
-        // create the buffers
-        if (sdl_create_buffers())
-            goto cant_create_buffers;
+		// create the buffers
+		if (sdl_create_buffers())
+			goto cant_create_buffers;
 
-        // set the startup volume
-        set_mastervolume(attenuation);
-        osd_printf_verbose("Audio: End initialization\n");
-        return 0;
+		// set the startup volume
+		set_mastervolume(attenuation);
+		osd_printf_verbose("Audio: End initialization\n");
+		return 0;
 
-        // error handling
-    cant_create_buffers:
-    cant_start_audio:
-        osd_printf_verbose("Audio: Initialization failed. SDL error: %s\n", SDL_GetError());
+		// error handling
+	cant_create_buffers:
+	cant_start_audio:
+		osd_printf_verbose("Audio: Initialization failed. SDL error: %s\n", SDL_GetError());
 
-        return -1;
-    }
+		return -1;
+	}
 
-    return 0;
+	return 0;
 }
 
 
@@ -501,27 +501,27 @@ int sound_sdl::init()
 
 void sound_sdl::exit()
 {
-    // if nothing to do, don't do it
-    if (sample_rate() == 0)
-        return;
+	// if nothing to do, don't do it
+	if (sample_rate() == 0)
+		return;
 
-    osd_printf_verbose("sdl_kill: closing audio\n");
+	osd_printf_verbose("sdl_kill: closing audio\n");
 	SDL_CloseAudio();
 
 	SDL_QuitSubSystem(SDL_INIT_AUDIO);
 
-    // kill the buffers
-    sdl_destroy_buffers();
+	// kill the buffers
+	sdl_destroy_buffers();
 
-    // print out over/underflow stats
-    if (buffer_overflows || buffer_underflows)
-        osd_printf_verbose("Sound buffer: overflows=%d underflows=%d\n", buffer_overflows, buffer_underflows);
+	// print out over/underflow stats
+	if (buffer_overflows || buffer_underflows)
+		osd_printf_verbose("Sound buffer: overflows=%d underflows=%d\n", buffer_overflows, buffer_underflows);
 
-    if (LOG_SOUND)
-    {
-        fprintf(sound_log, "Sound buffer: overflows=%d underflows=%d\n", buffer_overflows, buffer_underflows);
-        fclose(sound_log);
-    }
+	if (LOG_SOUND)
+	{
+		fprintf(sound_log, "Sound buffer: overflows=%d underflows=%d\n", buffer_overflows, buffer_underflows);
+		fclose(sound_log);
+	}
 }
 
 
@@ -555,7 +555,7 @@ void sound_sdl::sdl_destroy_buffers(void)
 
 
 #else /* SDLMAME_UNIX */
-    MODULE_NOT_SUPPORTED(sound_sdl, OSD_SOUND_PROVIDER, "sdl")
+	MODULE_NOT_SUPPORTED(sound_sdl, OSD_SOUND_PROVIDER, "sdl")
 #endif
 
 MODULE_DEFINITION(SOUND_SDL, sound_sdl)

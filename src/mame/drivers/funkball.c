@@ -356,7 +356,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( flashbank_map, AS_PROGRAM, 32, funkball_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_DEVREADWRITE16("u29", intel_28f320j5_device, read, write, 0xffffffff ) // needed to boot
 	AM_RANGE(0x00400000, 0x007fffff) AM_DEVREADWRITE16("u30", intel_28f320j5_device, read, write, 0xffffffff ) // i assume it maps directly after
-//	AM_RANGE(0x02000000, 0x023fffff) AM_DEVREADWRITE16("u3", intel_28f320j5_device, read, write, 0xffffffff ) // sound program, don't think it matters where we map it, might not even be visible in this space
+//  AM_RANGE(0x02000000, 0x023fffff) AM_DEVREADWRITE16("u3", intel_28f320j5_device, read, write, 0xffffffff ) // sound program, don't think it matters where we map it, might not even be visible in this space
 	/* it checks for 64MBit chips at 0x80000000 the way things are set up, they must return an intel Flash ID of 0x15 */
 ADDRESS_MAP_END
 

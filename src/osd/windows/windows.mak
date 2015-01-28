@@ -313,7 +313,7 @@ LDFLAGS += -static-libgcc
 
 ifeq ($(CROSS_BUILD),1)
 	LDFLAGS += -static
-endif	
+endif
 
 # TODO: needs to use $(CC)
 TEST_GCC := $(shell gcc --version)

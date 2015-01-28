@@ -4378,7 +4378,7 @@ MACHINE_START_MEMBER(dynax_state,jantouki)
 
 	membank("bank1")->configure_entries(0, 0x10, &MAIN[0x8000],  0x8000);
 	membank("bank2")->configure_entries(0, 12,   &SOUND[0x8000], 0x8000);
-	
+
 	MACHINE_START_CALL_MEMBER(dynax);
 }
 

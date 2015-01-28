@@ -224,7 +224,7 @@ public:
 	DECLARE_WRITE32_MEMBER(copro_tgp_fifoout_push);
 	DECLARE_READ8_MEMBER(virtuacop_lightgun_r);
 	DECLARE_READ8_MEMBER(virtuacop_lightgun_offscreen_r);
-	
+
 	UINT16 crypt_read_callback(UINT32 addr);
 
 	bool copro_fifoin_pop(device_t *device, UINT32 *result,UINT32 offset, UINT32 mem_mask);

@@ -187,10 +187,10 @@ CUSTOM_INPUT_MEMBER(exidy_state::teetert_input_r)
 WRITE8_MEMBER(exidy_state::fax_bank_select_w)
 {
 	membank("bank1")->set_entry(data & 0x1f);
-	
+
 	if ((data & 0x1f) > 0x17)
 		logerror("Banking to unpopulated ROM bank %02X!\n", data & 0x1f);
-	
+
 }
 
 

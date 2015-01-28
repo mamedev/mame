@@ -27,22 +27,22 @@ public:
 	optional_device<qs1000_device> m_qs1000;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	optional_ioport m_in0; // klondkp doesn't have it
 	optional_ioport m_eepromoutport;
 	optional_ioport m_penx1port;
 	optional_ioport m_peny1port;
 	optional_ioport m_penx2port;
 	optional_ioport m_peny2port;
-	
+
 	optional_memory_bank m_sndbank;
-	
+
 	int m_coin_counter_bit;
 	int m_buffer;
 	UINT32 *m_vram;
 
 	UINT8 m_sound_data;
-	
+
 	// speedups - see machine/eolithsp.c
 	int m_speedup_address;
 	int m_speedup_address2;
@@ -66,18 +66,18 @@ public:
 	DECLARE_READ8_MEMBER(qs1000_p1_r);
 	DECLARE_WRITE8_MEMBER(qs1000_p1_w);
 	DECLARE_WRITE8_MEMBER(soundcpu_to_qs1000);
-	
+
 	DECLARE_DRIVER_INIT(eolith);
 	DECLARE_DRIVER_INIT(landbrk);
 	DECLARE_DRIVER_INIT(hidctch3);
 	DECLARE_DRIVER_INIT(hidctch2);
 	DECLARE_DRIVER_INIT(hidnc2k);
 	DECLARE_DRIVER_INIT(landbrka);
-	
+
 	DECLARE_MACHINE_RESET(eolith);
 	DECLARE_VIDEO_START(eolith);
-	
+
 	UINT32 screen_update_eolith(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(eolith_speedup);
 };

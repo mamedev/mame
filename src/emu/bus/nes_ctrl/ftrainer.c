@@ -119,7 +119,7 @@ void nes_ftrainer_device::device_reset()
 UINT8 nes_ftrainer_device::read_exp(offs_t offset)
 {
 	UINT8 ret = 0;
-	if (offset == 1)	//$4017
+	if (offset == 1)    //$4017
 	{
 		if (!BIT(m_row_scan, 0))
 		{

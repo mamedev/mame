@@ -26,22 +26,22 @@ class osd_module
 {
 public:
 
-    osd_module(const char *type, const char *name)
-    : m_name(name), m_type(type)
-    {}
-    virtual ~osd_module() { }
+	osd_module(const char *type, const char *name)
+	: m_name(name), m_type(type)
+	{}
+	virtual ~osd_module() { }
 
-    const char * name() const { return m_name; }
-    const char * type() const { return m_type; }
+	const char * name() const { return m_name; }
+	const char * type() const { return m_type; }
 
-    virtual bool probe() const { return true; }
+	virtual bool probe() const { return true; }
 
-    virtual int init() { return 0; }
-    virtual void exit() { }
+	virtual int init() { return 0; }
+	virtual void exit() { }
 
 private:
-    astring     m_name;
-    astring     m_type;
+	astring     m_name;
+	astring     m_type;
 };
 
 // a module_type is simply a pointer to its alloc function
@@ -51,56 +51,56 @@ typedef osd_module *(*module_type)();
 template<class _ModuleClass>
 osd_module *module_creator()
 {
-    void *p = osd_malloc(sizeof(_ModuleClass));
-    return new(p) _ModuleClass;
+	void *p = osd_malloc(sizeof(_ModuleClass));
+	return new(p) _ModuleClass;
 }
 
 class osd_module_manager
 {
 public:
 
-    static const int MAX_MODULES = 32;
+	static const int MAX_MODULES = 32;
 
-    osd_module_manager();
-    ~osd_module_manager();
+	osd_module_manager();
+	~osd_module_manager();
 
-    void register_module(const module_type &mod_type);
-    bool type_has_name(const char *type, const char *name);
+	void register_module(const module_type &mod_type);
+	bool type_has_name(const char *type, const char *name);
 
-    osd_module *get_module_generic(const char *type, const char *name);
+	osd_module *get_module_generic(const char *type, const char *name);
 
-    template<class C>
-    C select_module(const char *type, const char *name = "")
-    {
-        return dynamic_cast<C>(select_module(type, name));
-    }
+	template<class C>
+	C select_module(const char *type, const char *name = "")
+	{
+		return dynamic_cast<C>(select_module(type, name));
+	}
 
-    osd_module *select_module(const char *type, const char *name = "");
+	osd_module *select_module(const char *type, const char *name = "");
 
-    void get_module_names(const char *type, const int max, int *num, const char *names[]);
+	void get_module_names(const char *type, const int max, int *num, const char *names[]);
 
-    void init();
+	void init();
 
-    void exit();
+	void exit();
 
 private:
-    int get_module_index(const char *type, const char *name);
+	int get_module_index(const char *type, const char *name);
 
-    osd_module *m_modules[MAX_MODULES];
-    osd_module *m_selected[MAX_MODULES];
+	osd_module *m_modules[MAX_MODULES];
+	osd_module *m_selected[MAX_MODULES];
 };
 
 #define MODULE_DEFINITION(_id, _class) \
-    extern const module_type _id ;  \
-    const module_type _id = &module_creator< _class >;
+	extern const module_type _id ;  \
+	const module_type _id = &module_creator< _class >;
 
 
 #define MODULE_NOT_SUPPORTED(_mod, _type, _name) \
-    class _mod : public osd_module { \
-    public: \
-        _mod () \
-        : osd_module(_type, _name) {} \
-        bool probe() const { return false; } \
-    };
+	class _mod : public osd_module { \
+	public: \
+		_mod () \
+		: osd_module(_type, _name) {} \
+		bool probe() const { return false; } \
+	};
 
 #endif  /* __OSDMODULE_H__ */
