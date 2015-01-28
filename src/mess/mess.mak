@@ -1088,7 +1088,7 @@ $(MESSOBJ)/cbm.a:               \
 	$(MESS_DRIVERS)/c128.o      \
 	$(MESS_DRIVERS)/c64.o       \
 	$(MESS_DRIVERS)/c64dtv.o    \
-	$(MESS_DRIVERS)/c65.o $(MESS_MACHINE)/c65.o \
+	$(MESS_DRIVERS)/c65.o \
 	$(MESS_DRIVERS)/c900.o      \
 	$(MESS_DRIVERS)/cbm2.o      \
 	$(MESS_DRIVERS)/clcd.o      \
