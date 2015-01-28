@@ -148,7 +148,7 @@ internal block-cipher. So, at a given step, the internal block cipher will outpu
 given plaintext word, and the remaining 2 to the next plaintext word.
 
 The underlying block cipher consists of two 4-round Feistel Networks (FN): the first one takes the counter (16 bits),
-the game-key (>=29 bits; probably 64) and the sequence-key (16 bits) and output a middle result (16 bits) which will act
+the game-key (>=30 bits; probably 64) and the sequence-key (16 bits) and output a middle result (16 bits) which will act
 as another key for the second one. The second FN will take the encrypted word (16 bits), the game-key, the sequence-key
 and the result from the first FN and will output the decrypted word (16 bits).
 
@@ -199,7 +199,7 @@ that bit really represent various bits in the real key; see comments on the use 
 that the real key is 64 bits long, exactly as in the related CPS-2 scheme, and the designers tried to cover all 96 input bits with
 the bits provening from the game key, the sequence key and the result from the first feistel network (64+16+16=96). In the first
 Feistel Network, as only 80 bits are available, some bits would be used twice (as can be partially seen in the current implementation).
-The fact that only 29 bits out of the expected 64 have been observed till now would be due to the generation of the key by composing
+The fact that only 30 bits out of the expected 64 have been observed till now would be due to the generation of the key by composing
 low-entropy sources.
 
 ****************************************************************************************/
@@ -511,17 +511,17 @@ const sega_315_5881_crypt_device::sbox sega_315_5881_crypt_device::fn2_sboxes[4]
 
 const int sega_315_5881_crypt_device::fn1_game_key_scheduling[FN1GK][2] = {
 	{1,29},  {1,71},  {2,4},   {2,54},  {3,8},   {4,56},  {4,73},  {5,11},
-	{6,51},  {7,92},  {8,89},  {9,9},   {9,39},  {9,58},  {9,86},  {10,90},
-	{11,6},  {12,64}, {13,49}, {14,44}, {15,40}, {16,69}, {17,15}, {18,23},
-	{18,43}, {19,82}, {20,81}, {21,32}, {22,5},  {23,66}, {24,13}, {24,45},
-	{25,12}, {25,35}, {26,61}, {27,10}, {27,59}, {28,25}
+	{6,51},  {7,92},  {8,89},  {9,9},   {9,39},  {9,58},  {10,90}, {11,6},
+	{12,64}, {13,49}, {14,44}, {15,40}, {16,69}, {17,15}, {18,23}, {18,43},
+	{19,82}, {20,81}, {21,32}, {22,5},  {23,66}, {24,13}, {24,45}, {25,12},
+	{25,35}, {26,61}, {27,10}, {27,59}, {28,25}, {29,86}
 };
 
 const int sega_315_5881_crypt_device::fn2_game_key_scheduling[FN2GK][2] = {
 	{0,0},   {1,3},   {2,11},  {3,20},  {4,22},  {5,23},  {6,29},  {7,38},
-	{8,39},  {9,55},  {9,86},  {9,87},  {9,90},  {10,50}, {11,57}, {12,59},
-	{13,61}, {14,63}, {15,67}, {16,72}, {17,83}, {18,88}, {19,94}, {20,35},
-	{21,17}, {22,6},  {23,85}, {24,16}, {25,25}, {26,92}, {27,47}, {28,28}
+	{8,39},  {9,55},  {9,86},  {9,87},  {10,50}, {11,57}, {12,59}, {13,61},
+	{14,63}, {15,67}, {16,72}, {17,83}, {18,88}, {19,94}, {20,35}, {21,17},
+	{22,6},  {23,85}, {24,16}, {25,25}, {26,92}, {27,47}, {28,28}, {29,90}
 };
 
 const int sega_315_5881_crypt_device::fn1_sequence_key_scheduling[20][2] = {
