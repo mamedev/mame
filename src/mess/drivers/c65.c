@@ -7,7 +7,8 @@ C=65 / C=64DX (c) 1991 Commodore
 Attempt at rewriting the driver ...
 
 TODO:
-- Dies as soon as it enters into DOS ROM (bp 0x9d1a, it never returns due of a bad stack pointer read);
+- I need to subtract border color to -1 in order to get blue color (-> register is 6 and blue color is 5 in palette array).
+  Also top-left logo seems to draw wrong palette for entries 4,5,6,7. CPU core bug?
 
 Note:
 - VIC-4567 will be eventually be added via compile switch, once that I
@@ -80,7 +81,12 @@ protected:
 	virtual void video_start();
 private:
 	UINT8 m_VIC2_IRQPend, m_VIC2_IRQMask;
-	UINT8 m_VIC3_ControlA,m_VIC3_ControlB;
+	/* 0x20: border color (TODO: different thread?) */
+	UINT8 m_VIC2_EXTColor;
+	/* 0x30: banking + PAL + EXT SYNC */
+	UINT8 m_VIC3_ControlA;
+	/* 0x31: video modes */
+	UINT8 m_VIC3_ControlB;
 	void PalEntryFlush(UINT8 offset);
 	void DMAgicExecute(address_space &space,UINT32 address);
 	int inner_x_char(int xoffs);
@@ -105,7 +111,8 @@ int c65_state::inner_y_char(int yoffs)
 UINT32 c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int y,x;
-		
+	int border_color = (m_VIC2_EXTColor-1) & 0xf; // TODO: -1!?
+	
 	// TODO: border area
 	for(y=0;y<m_screen->height();y++)
 	{
@@ -122,7 +129,7 @@ UINT32 c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, co
 						
 			//if(cliprect.contains(x, y))
 						
-				bitmap.pix16(y, x) = m_palette->pen((enable_dot) ? attr & 0xf : 0);
+				bitmap.pix16(y, x) = m_palette->pen((enable_dot) ? attr & 0xf : border_color);
 
 			
 			//gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
@@ -145,6 +152,8 @@ READ8_MEMBER(c65_state::vic4567_dummy_r)
 		case 0x12:
 			res = (m_screen->vpos() & 0xff);
 			return res;
+		case 0x20:
+			return m_VIC2_EXTColor;
 		case 0x19:
 			return m_VIC2_IRQPend;
 		case 0x30:
@@ -167,6 +176,9 @@ WRITE8_MEMBER(c65_state::vic4567_dummy_w)
 			break;
 		case 0x1a:
 			m_VIC2_IRQMask = data & 0xf;
+			break;
+		case 0x20:
+			m_VIC2_EXTColor = data & 0xf;
 			break;
 		/* KEY register, handles vic-iii and vic-ii modes via two consecutive writes 
 		  0xa5 -> 0x96 vic-iii mode
