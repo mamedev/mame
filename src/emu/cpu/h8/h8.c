@@ -114,8 +114,14 @@ void h8_device::device_start()
 	save_item(NAME(EXR));
 	save_item(NAME(CCR));
 	save_item(NAME(TMP1));
+	save_item(NAME(TMP2));
 	save_item(NAME(inst_state));
 	save_item(NAME(inst_substate));
+	save_item(NAME(irq_vector));
+	save_item(NAME(taken_irq_vector));
+	save_item(NAME(irq_level));
+	save_item(NAME(taken_irq_level));
+	save_item(NAME(irq_nmi));
 
 	m_icountptr = &icount;
 
