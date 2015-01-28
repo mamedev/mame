@@ -91,11 +91,11 @@ UINT32 c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, co
 	int y,x;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 
-	for(y=0;y<30;y++)
+	for(y=0;y<25;y++)
 	{
-		for(x=0;x<40;x++)
+		for(x=0;x<80;x++)
 		{
-			UINT8 tile = m_workram[x+y*40+0x800];
+			UINT8 tile = m_workram[x+y*80+0x800];
 			gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
 		}
 	}
@@ -264,7 +264,7 @@ READ8_MEMBER(c65_state::CIASelect_r)
 		// CIA
 	}
 
-	return 0;
+	return 0xff;
 }
 
 WRITE8_MEMBER(c65_state::CIASelect_w)
@@ -417,7 +417,7 @@ static MACHINE_CONFIG_START( c65, c65_state )
 	MCFG_SCREEN_UPDATE_DRIVER(c65_state, screen_update)
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, 910, 0, 320, 525, 0, 240) // mods needed
+	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, 910, 0, 640, 525, 0, 200) // mods needed
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", c65)
