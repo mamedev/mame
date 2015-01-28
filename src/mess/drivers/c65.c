@@ -111,7 +111,7 @@ int c65_state::inner_y_char(int yoffs)
 UINT32 c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int y,x;
-	int border_color = (m_VIC2_EXTColor-1) & 0xf; // TODO: -1!?
+	int border_color = m_VIC2_EXTColor & 0xf;
 	
 	// TODO: border area
 	for(y=0;y<m_screen->height();y++)
@@ -215,13 +215,13 @@ WRITE8_MEMBER(c65_state::PalRed_w)
 
 WRITE8_MEMBER(c65_state::PalGreen_w)
 {
-	m_palblue[offset] = data;
+	m_palgreen[offset] = data;
 	PalEntryFlush(offset);
 }
 
 WRITE8_MEMBER(c65_state::PalBlue_w)
 {
-	m_palgreen[offset] = data;
+	m_palblue[offset] = data;
 	PalEntryFlush(offset);
 }
 
