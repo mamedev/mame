@@ -72,8 +72,8 @@ protected:
 
 	virtual void video_start();
 private:
-	UINT8 m_VIC2_IRQMask;
-	UINT8 m_VIC3_ControlA;
+	UINT8 m_VIC2_IRQPend, m_VIC2_IRQMask;
+	UINT8 m_VIC3_ControlA,m_VIC3_ControlB;
 	void PalEntryFlush(UINT8 offset);
 	void DMAgicExecute(address_space &space,UINT32 address);
 };
@@ -100,8 +100,12 @@ READ8_MEMBER(c65_state::vic4567_dummy_r)
 		case 0x12:
 			res = (m_screen->vpos() & 0xff);
 			return res;
+		case 0x19:
+			return m_VIC2_IRQPend;
 		case 0x30:
 			return m_VIC3_ControlA;
+		case 0x31:
+			return m_VIC3_ControlB;
 	}
 	
 	if(!space.debugger_access())
@@ -113,6 +117,9 @@ WRITE8_MEMBER(c65_state::vic4567_dummy_w)
 {
 	switch(offset)
 	{
+		case 0x19:
+			m_VIC2_IRQPend = data & 0x8f;
+			break;
 		case 0x1a:
 			m_VIC2_IRQMask = data & 0xf;
 			break;
@@ -122,8 +129,13 @@ WRITE8_MEMBER(c65_state::vic4567_dummy_w)
 		  */
 		//case 0x2f: break;
 		case 0x30: 
-			printf("CONTROL A %02x\n",data); 
+			if((data & 0xfe) != 0x64)
+				printf("CONTROL A %02x\n",data); 
 			m_VIC3_ControlA = data;
+			break;
+		case 0x31:
+			printf("CONTROL B %02x\n",data); 
+			m_VIC3_ControlB = data;
 			break;
 		default:
 			if(!space.debugger_access())
@@ -180,6 +192,24 @@ void c65_state::DMAgicExecute(address_space &space,UINT32 address)
 
 	switch(cmd & 3)
 	{
+		case 0: // copy - TODO: untested
+		{
+				if(length != 1)
+					printf("DMAgic %s %02x -> %08x %04x (CHAIN=%s)\n",dma_cmd_string[cmd & 3],src,dst,length,cmd & 4 ? "yes" : "no");
+				UINT32 SourceIndex;
+				UINT32 DestIndex;
+				UINT16 SizeIndex;
+				SourceIndex = src & 0xfffff;
+				DestIndex = dst & 0xfffff;
+				SizeIndex = length;
+				do
+				{
+					space.write_byte(DestIndex++,space.read_byte(SourceIndex++));
+					SizeIndex--;
+				}while(SizeIndex != 0);
+
+			return;
+		}
 		case 3: // fill
 			{
 				/* TODO: upper bits of source */
@@ -218,7 +248,7 @@ READ8_MEMBER(c65_state::CIASelect_r)
 		// CIA
 	}
 
-	return 0xff;
+	return 0;
 }
 
 WRITE8_MEMBER(c65_state::CIASelect_w)
@@ -238,7 +268,7 @@ READ8_MEMBER(c65_state::dummy_r)
 }
 
 static ADDRESS_MAP_START( c65_map, AS_PROGRAM, 8, c65_state )
-	AM_RANGE(0x00000, 0x01fff) AM_RAM // TODO: bank
+	AM_RANGE(0x00000, 0x07fff) AM_RAM // TODO: bank
 	AM_RANGE(0x0c800, 0x0cfff) AM_ROM AM_REGION("maincpu", 0xc800)
 	AM_RANGE(0x0d000, 0x0d07f) AM_READWRITE(vic4567_dummy_r,vic4567_dummy_w) // 0x0d000, 0x0d07f VIC-4567
 	AM_RANGE(0x0d080, 0x0d081) AM_READ(dummy_r) // 0x0d080, 0x0d09f FDC
@@ -353,8 +383,8 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(c65_state::vic3_vblank_irq)
 {
-	if(m_VIC2_IRQMask & 1)
-		m_maincpu->set_input_line(M4510_IRQ_LINE,HOLD_LINE);
+	//if(m_VIC2_IRQMask & 1)
+	//	m_maincpu->set_input_line(M4510_IRQ_LINE,HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( c65, c65_state )
