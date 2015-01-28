@@ -7,7 +7,8 @@ C=65 / C=64DX (c) 1991 Commodore
 Attempt at rewriting the driver ...
 
 TODO:
-- Dies as soon as it enters into DOS ROM (bp 0x9d1a, it never returns due of a bad stack pointer read);
+- I need to subtract border color to -1 in order to get blue color (-> register is 6 and blue color is 5 in palette array).
+  Also top-left logo seems to draw wrong palette for entries 4,5,6,7. CPU core bug?
 
 Note:
 - VIC-4567 will be eventually be added via compile switch, once that I
@@ -51,6 +52,9 @@ public:
 	required_shared_ptr<UINT8> m_cram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
+	UINT8 *m_iplrom;
+
+	
 	DECLARE_READ8_MEMBER(vic4567_dummy_r);
 	DECLARE_WRITE8_MEMBER(vic4567_dummy_w);
 	DECLARE_WRITE8_MEMBER(PalRed_w);
@@ -77,26 +81,58 @@ protected:
 	virtual void video_start();
 private:
 	UINT8 m_VIC2_IRQPend, m_VIC2_IRQMask;
-	UINT8 m_VIC3_ControlA,m_VIC3_ControlB;
+	/* 0x20: border color (TODO: different thread?) */
+	UINT8 m_VIC2_EXTColor;
+	/* 0x30: banking + PAL + EXT SYNC */
+	UINT8 m_VIC3_ControlA;
+	/* 0x31: video modes */
+	UINT8 m_VIC3_ControlB;
 	void PalEntryFlush(UINT8 offset);
 	void DMAgicExecute(address_space &space,UINT32 address);
+	int inner_x_char(int xoffs);
+	int inner_y_char(int yoffs);
 };
 
 void c65_state::video_start()
 {
 }
 
+// TODO: inline?
+int c65_state::inner_x_char(int xoffs)
+{
+	return xoffs>>3;
+}
+
+int c65_state::inner_y_char(int yoffs)
+{
+	return yoffs>>3;
+}
+
 UINT32 c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int y,x;
-	gfx_element *gfx = m_gfxdecode->gfx(0);
-
-	for(y=0;y<30;y++)
+	int border_color = m_VIC2_EXTColor & 0xf;
+	
+	// TODO: border area
+	for(y=0;y<m_screen->height();y++)
 	{
-		for(x=0;x<40;x++)
+		for(x=0;x<m_screen->width();x++)
 		{
-			UINT8 tile = m_workram[x+y*40+0x800];
-			gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
+			//int, xi,yi,xm,ym,dot_x;
+			int xi = inner_x_char(x);
+			int yi = inner_y_char(y);
+			int xm = 7 - (x & 7);
+			int ym = (y & 7);
+			UINT8 tile = m_workram[xi+yi*80+0x800];
+			UINT8 attr = m_cram[xi+yi*80];
+			int enable_dot = ((m_iplrom[(tile<<3)+ym+0xd000] >> xm) & 1);
+						
+			//if(cliprect.contains(x, y))
+						
+				bitmap.pix16(y, x) = m_palette->pen((enable_dot) ? attr & 0xf : border_color);
+
+			
+			//gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
 		}
 	}
 
@@ -116,6 +152,8 @@ READ8_MEMBER(c65_state::vic4567_dummy_r)
 		case 0x12:
 			res = (m_screen->vpos() & 0xff);
 			return res;
+		case 0x20:
+			return m_VIC2_EXTColor;
 		case 0x19:
 			return m_VIC2_IRQPend;
 		case 0x30:
@@ -138,6 +176,9 @@ WRITE8_MEMBER(c65_state::vic4567_dummy_w)
 			break;
 		case 0x1a:
 			m_VIC2_IRQMask = data & 0xf;
+			break;
+		case 0x20:
+			m_VIC2_EXTColor = data & 0xf;
 			break;
 		/* KEY register, handles vic-iii and vic-ii modes via two consecutive writes 
 		  0xa5 -> 0x96 vic-iii mode
@@ -174,13 +215,13 @@ WRITE8_MEMBER(c65_state::PalRed_w)
 
 WRITE8_MEMBER(c65_state::PalGreen_w)
 {
-	m_palblue[offset] = data;
+	m_palgreen[offset] = data;
 	PalEntryFlush(offset);
 }
 
 WRITE8_MEMBER(c65_state::PalBlue_w)
 {
-	m_palgreen[offset] = data;
+	m_palblue[offset] = data;
 	PalEntryFlush(offset);
 }
 
@@ -261,10 +302,10 @@ READ8_MEMBER(c65_state::CIASelect_r)
 		return m_cram[offset];
 	else
 	{
-		// CIA
+		// CIA at 0xdc00
 	}
 
-	return 0;
+	return 0xff;
 }
 
 WRITE8_MEMBER(c65_state::CIASelect_w)
@@ -273,7 +314,7 @@ WRITE8_MEMBER(c65_state::CIASelect_w)
 		m_cram[offset] = data;
 	else
 	{
-		// CIA
+		// CIA at 0xdc00
 	}
 	
 }
@@ -298,7 +339,7 @@ static ADDRESS_MAP_START( c65_map, AS_PROGRAM, 8, c65_state )
 	AM_RANGE(0x0d700, 0x0d702) AM_WRITE(DMAgic_w) AM_SHARE("dmalist") // 0x0d700, 0x0d7** DMAgic
 	//AM_RANGE(0x0d703, 0x0d703) AM_READ(DMAgic_r)
 	// 0x0d800, 0x0d8** Color matrix
-	AM_RANGE(0x0dc00, 0x0dfff) AM_READWRITE(CIASelect_r,CIASelect_w) AM_SHARE("cram")
+	AM_RANGE(0x0d800, 0x0dfff) AM_READWRITE(CIASelect_r,CIASelect_w) AM_SHARE("cram")
 	// 0x0dc00, 0x0dc** CIA-1
 	// 0x0dd00, 0x0dd** CIA-2
 	// 0x0de00, 0x0de** Ext I/O Select 1
@@ -370,6 +411,9 @@ INPUT_PORTS_END
 
 void c65_state::machine_start()
 {
+	m_iplrom = memregion("maincpu")->base();
+
+	save_pointer(NAME(m_cram.target()), 0x800);
 }
 
 void c65_state::machine_reset()
@@ -394,7 +438,7 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( c65 )
-	GFXDECODE_ENTRY( "maincpu", 0xd000, charlayout,     0, 1 ) // another identical copy is at 0x9000
+	GFXDECODE_ENTRY( "maincpu", 0xd000, charlayout,     0, 16 ) // another identical copy is at 0x9000
 GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(c65_state::vic3_vblank_irq)
@@ -417,7 +461,7 @@ static MACHINE_CONFIG_START( c65, c65_state )
 	MCFG_SCREEN_UPDATE_DRIVER(c65_state, screen_update)
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, 910, 0, 320, 525, 0, 240) // mods needed
+	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, 910, 0, 640, 525, 0, 200) // mods needed
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", c65)
