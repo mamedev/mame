@@ -579,7 +579,7 @@ offs_t m6502_device::disassemble_generic(char *buffer, offs_t pc, const UINT8 *o
 		break;
 
 	case DASM_rw2:
-		sprintf(buffer, " $%04x", (pc & 0xf0000) | UINT16(pc + 3 + INT16((opram[2] << 8) | opram[1])));
+		sprintf(buffer, " $%04x", (pc & 0xf0000) | UINT16(pc + 2 + INT16((opram[2] << 8) | opram[1])));
 		flags |= 3;
 		break;
 
