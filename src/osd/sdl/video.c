@@ -227,7 +227,7 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 			SDL_VideoDriverName(monitor->monitor_device, sizeof(monitor->monitor_device)-1);
 			if (first_call==0)
 			{
-				char *dimstr = osd_getenv(SDLENV_DESKTOPDIM);
+				const char *dimstr = osd_getenv(SDLENV_DESKTOPDIM);
 				const SDL_VideoInfo *sdl_vi;
 
 				sdl_vi = SDL_GetVideoInfo();
