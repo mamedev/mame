@@ -51,6 +51,9 @@ public:
 	required_shared_ptr<UINT8> m_cram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
+	UINT8 *m_iplrom;
+
+	
 	DECLARE_READ8_MEMBER(vic4567_dummy_r);
 	DECLARE_WRITE8_MEMBER(vic4567_dummy_w);
 	DECLARE_WRITE8_MEMBER(PalRed_w);
@@ -80,23 +83,49 @@ private:
 	UINT8 m_VIC3_ControlA,m_VIC3_ControlB;
 	void PalEntryFlush(UINT8 offset);
 	void DMAgicExecute(address_space &space,UINT32 address);
+	int inner_x_char(int xoffs);
+	int inner_y_char(int yoffs);
 };
 
 void c65_state::video_start()
 {
 }
 
+// TODO: inline?
+int c65_state::inner_x_char(int xoffs)
+{
+	return xoffs>>3;
+}
+
+int c65_state::inner_y_char(int yoffs)
+{
+	return yoffs>>3;
+}
+
 UINT32 c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int y,x;
-	gfx_element *gfx = m_gfxdecode->gfx(0);
-
-	for(y=0;y<25;y++)
+		
+	// TODO: border area
+	for(y=0;y<m_screen->height();y++)
 	{
-		for(x=0;x<80;x++)
+		for(x=0;x<m_screen->width();x++)
 		{
-			UINT8 tile = m_workram[x+y*80+0x800];
-			gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
+			//int, xi,yi,xm,ym,dot_x;
+			int xi = inner_x_char(x);
+			int yi = inner_y_char(y);
+			int xm = 7 - (x & 7);
+			int ym = (y & 7);
+			UINT8 tile = m_workram[xi+yi*80+0x800];
+			UINT8 attr = m_cram[xi+yi*80];
+			int enable_dot = ((m_iplrom[(tile<<3)+ym+0xd000] >> xm) & 1);
+						
+			//if(cliprect.contains(x, y))
+						
+				bitmap.pix16(y, x) = m_palette->pen((enable_dot) ? attr & 0xf : 0);
+
+			
+			//gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
 		}
 	}
 
@@ -261,7 +290,7 @@ READ8_MEMBER(c65_state::CIASelect_r)
 		return m_cram[offset];
 	else
 	{
-		// CIA
+		// CIA at 0xdc00
 	}
 
 	return 0xff;
@@ -273,7 +302,7 @@ WRITE8_MEMBER(c65_state::CIASelect_w)
 		m_cram[offset] = data;
 	else
 	{
-		// CIA
+		// CIA at 0xdc00
 	}
 	
 }
@@ -298,7 +327,7 @@ static ADDRESS_MAP_START( c65_map, AS_PROGRAM, 8, c65_state )
 	AM_RANGE(0x0d700, 0x0d702) AM_WRITE(DMAgic_w) AM_SHARE("dmalist") // 0x0d700, 0x0d7** DMAgic
 	//AM_RANGE(0x0d703, 0x0d703) AM_READ(DMAgic_r)
 	// 0x0d800, 0x0d8** Color matrix
-	AM_RANGE(0x0dc00, 0x0dfff) AM_READWRITE(CIASelect_r,CIASelect_w) AM_SHARE("cram")
+	AM_RANGE(0x0d800, 0x0dfff) AM_READWRITE(CIASelect_r,CIASelect_w) AM_SHARE("cram")
 	// 0x0dc00, 0x0dc** CIA-1
 	// 0x0dd00, 0x0dd** CIA-2
 	// 0x0de00, 0x0de** Ext I/O Select 1
@@ -370,6 +399,9 @@ INPUT_PORTS_END
 
 void c65_state::machine_start()
 {
+	m_iplrom = memregion("maincpu")->base();
+
+	save_pointer(NAME(m_cram.target()), 0x800);
 }
 
 void c65_state::machine_reset()
@@ -394,7 +426,7 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( c65 )
-	GFXDECODE_ENTRY( "maincpu", 0xd000, charlayout,     0, 1 ) // another identical copy is at 0x9000
+	GFXDECODE_ENTRY( "maincpu", 0xd000, charlayout,     0, 16 ) // another identical copy is at 0x9000
 GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(c65_state::vic3_vblank_irq)
