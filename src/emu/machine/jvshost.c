@@ -116,10 +116,13 @@ void jvs_host::encode(UINT8 *buffer, UINT32 &size)
 	if(!size)
 		return;
 	UINT32 add = 1;
+	UINT8 sum = 0;
+	for(UINT32 i=0; i<size; i++)
+		sum += buffer[i];
+	buffer[size++] = sum;
 	for(UINT32 i=0; i<size; i++)
 		if(buffer[i] == 0xd0 || buffer[i] == 0xe0)
 			add++;
-	UINT32 nsize = size+add;
 	for(UINT32 i=size; i; i--) {
 		UINT8 t = buffer[i-1];
 		if(t == 0xd0 || t == 0xe0) {
@@ -130,11 +133,7 @@ void jvs_host::encode(UINT8 *buffer, UINT32 &size)
 			buffer[i+add-1] = t;
 	}
 	buffer[0] = 0xe0;
-	UINT8 sum = 0;
-	for(UINT32 i=1; i<nsize; i++)
-		sum += buffer[i];
-	buffer[nsize++] = sum;
-	size = nsize;
+	size += add;
 }
 
 void jvs_host::decode(UINT8 *buffer, UINT32 &size)
