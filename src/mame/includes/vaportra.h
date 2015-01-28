@@ -44,13 +44,13 @@ public:
 	DECLARE_WRITE16_MEMBER(vaportra_priority_w);
 	DECLARE_WRITE16_MEMBER(vaportra_palette_24bit_rg_w);
 	DECLARE_WRITE16_MEMBER(vaportra_palette_24bit_b_w);
-	
+
 	DECLARE_DRIVER_INIT(vaportra);
 	virtual void machine_start();
 	virtual void machine_reset();
-	
+
 	UINT32 screen_update_vaportra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_24bitcol( int offset );
-	
+
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 };

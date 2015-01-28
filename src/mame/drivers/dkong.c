@@ -341,7 +341,7 @@ Donkey Kong Notes
 
     That kit included the following 4 EPROM's
 
-    USA (c) 1981 Nintendo of America set 
+    USA (c) 1981 Nintendo of America set
     ------------------------------------
 
     Filename Label Type Loc/PCB *Label *Loc/PCB CSum

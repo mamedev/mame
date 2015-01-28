@@ -105,9 +105,9 @@ UINT8 nes_vaus_device::read_bit34()
 UINT8 nes_vausfc_device::read_exp(offs_t offset)
 {
 	UINT8 ret = 0;
-	if (offset == 0)	//$4016
+	if (offset == 0)    //$4016
 		ret = m_button->read() << 1;
-	else	//$4017
+	else    //$4017
 	{
 		ret = (m_latch & 0x80) >> 6;
 		m_latch <<= 1;

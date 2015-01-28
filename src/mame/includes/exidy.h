@@ -57,7 +57,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_sprite1_xpos;
 	required_shared_ptr<UINT8> m_sprite1_ypos;
@@ -77,12 +77,12 @@ public:
 	bitmap_ind16 m_motion_object_1_vid;
 	bitmap_ind16 m_motion_object_2_vid;
 	bitmap_ind16 m_motion_object_2_clip;
-	
+
 	DECLARE_WRITE8_MEMBER(fax_bank_select_w);
 	DECLARE_READ8_MEMBER(exidy_interrupt_r);
-	
+
 	DECLARE_CUSTOM_INPUT_MEMBER(teetert_input_r);
-	
+
 	DECLARE_DRIVER_INIT(fax);
 	DECLARE_DRIVER_INIT(sidetrac);
 	DECLARE_DRIVER_INIT(pepper2);
@@ -93,14 +93,14 @@ public:
 	DECLARE_DRIVER_INIT(venture);
 	DECLARE_DRIVER_INIT(spectar);
 	DECLARE_DRIVER_INIT(phantoma);
-	
+
 	virtual void video_start();
 	DECLARE_MACHINE_START(teetert);
-	
+
 	UINT32 screen_update_exidy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	INTERRUPT_GEN_MEMBER(exidy_vblank_interrupt);
-	
+
 	void exidy_video_config(UINT8 _collision_mask, UINT8 _collision_invert, int _is_2bpp);
 	inline void latch_condition(int collision);
 	inline void set_1_color(int index, int which);

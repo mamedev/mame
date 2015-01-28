@@ -66,7 +66,6 @@ public:
 	UINT32 screen_update_wcvol95(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
 	void descramble_sound( const char *tag );
-	DECLARE_WRITE_LINE_MEMBER(sound_irq_gen);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 };
@@ -315,11 +314,6 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-WRITE_LINE_MEMBER(deco156_state::sound_irq_gen)
-{
-	logerror("sound irq\n");
-}
-
 INTERRUPT_GEN_MEMBER(deco156_state::deco32_vbl_interrupt)
 {
 	device.execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
@@ -441,7 +435,6 @@ static MACHINE_CONFIG_START( wcvol95, deco156_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, 28000000 / 2)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(deco156_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

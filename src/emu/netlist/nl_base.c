@@ -1001,4 +1001,3 @@ NETLIB_UPDATE(mainclock)
 	net.toggle_new_Q();
 	net.set_time(netlist().time() + m_inc);
 }
-

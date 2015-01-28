@@ -714,8 +714,8 @@ int lua_engine::lua_screen::l_draw_text(lua_State *L)
 	render_container &rc = sc->container();
 	ui_manager &ui = sc->machine().ui();
 	ui.draw_text_full(&rc, msg, x, y , (1.0f - x),
-					   JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR,
-					   UI_TEXT_BG_COLOR, NULL, NULL);
+						JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR,
+						UI_TEXT_BG_COLOR, NULL, NULL);
 
 	return 0;
 }

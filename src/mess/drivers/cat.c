@@ -223,7 +223,7 @@ J4: 18-pin sip header for keyboard ribbon cable; bottom edge of board is pin 1
     Pins:
     1: GND through 220k resistor r78
     2: ? phone hook related? anode of diode d7; one of the pins of relay k2; topmost (boardwise) pin of transistor Q10
-    3: 74HCT34 pin 
+    3: 74HCT34 pin
 
 J5: locking-tab-type "CONN HEADER VERT 4POS .100 TIN" connector for supplying power
     through a small cable with a berg connector at the other end, to the floppy drive
@@ -240,7 +240,7 @@ J9: unpopulated DIL 40-pin straight connector for a ROM debug/expansion/RAM-shad
     /HICE is !a15
     /ROM_OE comes from pin 14 of DECODE_E pal, and is shorted to /ROM_OE' by the cuttable jumper B1 which is not cut
     /ROM_OE' goes to the two EPROMS
-	DECODE_18 is DECODE_E pal pin 18
+    DECODE_18 is DECODE_E pal pin 18
     pin 1 (GND) is in the lower left and the pins count low-high then to the right
     (gnd N/C   E_CLK     R/W    /ROM_OE a17 vcc a14 a13 a8 a9 a11 /ROM_OE' a10 a15 d7 d6 d5 d4 d3 )
     (GND /IPL1 DECODE_18 /RESET gnd     a16 vcc a12 a7  a6 a5 a4  a3       a2  a1  a0 d0 d1 d2 gnd)
@@ -369,10 +369,10 @@ ToDo:
 // pin 13 (PB3) :
 // pin 14 (PB4) :
 // pin 15 (PB5) :
-// pin 16 (PB6) : 
+// pin 16 (PB6) :
 // pin 17 (PB7) :
-// pin 18 (CB1) : ?from/to? Floppy connector j3 pin 8 
-// pin 19 (CB2) : ?from/to? 6522 @ u35 pin 16 (PB6) 
+// pin 18 (CB1) : ?from/to? Floppy connector j3 pin 8
+// pin 19 (CB2) : ?from/to? 6522 @ u35 pin 16 (PB6)
 // pin 21 (/IRQ) : out to 68008 /IPL1 pin 41
 // pin 22 (R/W) : in from 68008 R/W pin 30
 // pin 23 (/CS2) : in from DECODE E pin 18
@@ -384,7 +384,7 @@ ToDo:
 // pin 39 (CA2) is through inductor L11 and resistor r128 to peripheral connector pin 35 <end minus 26>
 // pin 40 (CA1) is through inductor L30 and resistor r138 to peripheral connector pin 53 <end minus 8>
 
-// 6522 @ u35 
+// 6522 @ u35
 // pin 2 (PA0) :
 // pin 3 (PA1) :
 // pin 4 (PA2) :
@@ -421,9 +421,9 @@ ToDo:
 // pin 4 (Y2) : out to 6522 @u35 pin 11
 // pin 5 (A2) : in from 4N37 @ u48 pin 5 (output side emitter pin) (tied via R189 to gnd) <ring indicator?>
 // pin 6 (B2) : in from 4N37 @ u48 pin 5 (output side emitter pin) (tied via R189 to gnd) <ring indicator?>
-// pin 8 (B3) : 
-// pin 9 (A3) : 
-// pin 10 (Y3) : 
+// pin 8 (B3) :
+// pin 9 (A3) :
+// pin 10 (Y3) :
 // pin 11 (B4) : in from 68008 A15
 // pin 12 (A4) : in from 68008 A15
 // pin 13 (Y4) : out to EPROM @ U31 /CE
@@ -1743,7 +1743,7 @@ ROM_START( swyft )
 	 * ||||\-------------Q? ?
 	 * |||\--------------Q? ?
 	 * ||\---------------Q> output to decode pal pin 2
-	 * |\----------------->? output? to ram multiplexer 'A' pins 
+	 * |\----------------->? output? to ram multiplexer 'A' pins
 	 * \------------------< ?
 	 */
 	ROM_LOAD( "timing_b.ampal16r4a.u9.jed", 0x0000, 0xb08, CRC(643e6e83) SHA1(7db167883f9d6cf385ce496d08976dc16fc3e2c3))

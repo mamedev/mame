@@ -1696,11 +1696,11 @@ READ64_MEMBER(model3_state::model3_5881prot_r)
 		{
 			UINT8* base;
 			retvalue = m_cryptdevice->do_decrypt(base);
-			//	retvalue = ((retvalue & 0xff00) >> 8) | ((retvalue & 0x00ff) << 8); // don't endian swap the return value on this hardware
+			//  retvalue = ((retvalue & 0xff00) >> 8) | ((retvalue & 0x00ff) << 8); // don't endian swap the return value on this hardware
 			retvalue <<= 16;
 		}
 
-	//	printf("model3_5881prot_r offset %08x : %08x%08x (%08x%08x)\n", offset * 8, (UINT32)(retvalue >> 32), (UINT32)(retvalue & 0xffffffff), (UINT32)(mem_mask >> 32), (UINT32)(mem_mask & 0xffffffff));
+	//  printf("model3_5881prot_r offset %08x : %08x%08x (%08x%08x)\n", offset * 8, (UINT32)(retvalue >> 32), (UINT32)(retvalue & 0xffffffff), (UINT32)(mem_mask >> 32), (UINT32)(mem_mask & 0xffffffff));
 	}
 	else
 	{
@@ -5584,8 +5584,8 @@ UINT16 model3_state::crypt_read_callback(UINT32 addr)
 		dat = m_maincpu->space().read_word((0xf0180000 + 4 * addr)); // every other word is unused in this RAM, probably 32-bit ram on 64-bit bus?
 	}
 
-//	dat = ((dat & 0xff00) >> 8) | ((dat & 0x00ff) << 8);
-//	printf("reading %04x\n", dat);
+//  dat = ((dat & 0xff00) >> 8) | ((dat & 0x00ff) << 8);
+//  printf("reading %04x\n", dat);
 
 	return dat;
 }
@@ -5629,11 +5629,11 @@ static void interleave_vroms(running_machine &machine)
 
 DRIVER_INIT_MEMBER(model3_state, genprot)
 {
-//	astring key = parameter(":315_5881:key");
+//  astring key = parameter(":315_5881:key");
 
 	m_maincpu->space(AS_PROGRAM).install_ram(0xf0180000, 0xf019ffff, 0, 0x0e000000);
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf01a0000, 0xf01a003f, 0, 0x0e000000, read64_delegate(FUNC(model3_state::model3_5881prot_r), this), write64_delegate(FUNC(model3_state::model3_5881prot_w), this) );                    
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf01a0000, 0xf01a003f, 0, 0x0e000000, read64_delegate(FUNC(model3_state::model3_5881prot_r), this), write64_delegate(FUNC(model3_state::model3_5881prot_w), this) );
 
 }
 
@@ -5846,7 +5846,6 @@ DRIVER_INIT_MEMBER(model3_state,srally2)
 
 DRIVER_INIT_MEMBER(model3_state,swtrilgy)
 {
-
 	UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
@@ -5890,7 +5889,7 @@ DRIVER_INIT_MEMBER(model3_state,dirtdvls)
 
 DRIVER_INIT_MEMBER(model3_state,daytona2)
 {
-//	UINT32 *rom = (UINT32*)memregion("user1")->base();
+//  UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc3800000, 0xc3800007, write64_delegate(FUNC(model3_state::daytona2_rombank_w),this));
@@ -5906,17 +5905,17 @@ DRIVER_INIT_MEMBER(model3_state,daytona2)
 
 DRIVER_INIT_MEMBER(model3_state,dayto2pe)
 {
-//	UINT32 *rom = (UINT32*)memregion("user1")->base();
+//  UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc3800000, 0xc3800007, write64_delegate(FUNC(model3_state::daytona2_rombank_w),this));
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xc3000000, 0xc37fffff, "bank2" );
 
-//	rom[(0x606784^4)/4] = 0x60000000;
-//	rom[(0x69a3fc^4)/4] = 0x60000000;       // jump to encrypted code
-//	rom[(0x618b28^4)/4] = 0x60000000;       // jump to encrypted code
+//  rom[(0x606784^4)/4] = 0x60000000;
+//  rom[(0x69a3fc^4)/4] = 0x60000000;       // jump to encrypted code
+//  rom[(0x618b28^4)/4] = 0x60000000;       // jump to encrypted code
 
-//	rom[(0x64ca34^4)/4] = 0x60000000;       // dec
+//  rom[(0x64ca34^4)/4] = 0x60000000;       // dec
 
 	DRIVER_INIT_CALL(genprot);
 }

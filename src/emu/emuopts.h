@@ -318,11 +318,11 @@ public:
 	bool joystick_contradictory() const { return bool_value(OPTION_JOYSTICK_CONTRADICTORY); }
 	int coin_impulse() const { return int_value(OPTION_COIN_IMPULSE); }
 
-    // core debugging options
-    bool log() const { return bool_value(OPTION_LOG); }
-    bool debug() const { return bool_value(OPTION_DEBUG); }
-    bool verbose() const { return bool_value(OPTION_VERBOSE); }
-    bool oslog() const { return bool_value(OPTION_OSLOG); }
+	// core debugging options
+	bool log() const { return bool_value(OPTION_LOG); }
+	bool debug() const { return bool_value(OPTION_DEBUG); }
+	bool verbose() const { return bool_value(OPTION_VERBOSE); }
+	bool oslog() const { return bool_value(OPTION_OSLOG); }
 	const char *debug_script() const { return value(OPTION_DEBUGSCRIPT); }
 	bool update_in_pause() const { return bool_value(OPTION_UPDATEINPAUSE); }
 

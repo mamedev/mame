@@ -150,11 +150,11 @@ void init_pcap()
 	}
 
 #if 1
-    while(devs)
-    {
-        add_netdev(devs->name, devs->description, create_pcap);
-        devs = devs->next;
-    }
+	while(devs)
+	{
+		add_netdev(devs->name, devs->description, create_pcap);
+		devs = devs->next;
+	}
 #else
 	if (devs)
 	{

@@ -487,7 +487,7 @@ void ui_menu_settings::handle()
 	if (menu_event != NULL && menu_event->itemref != NULL)
 	{
 		// reset
-		if ((FPTR)menu_event->itemref == 1) 
+		if ((FPTR)menu_event->itemref == 1)
 		{
 			if (menu_event->iptkey == IPT_UI_SELECT)
 				machine().schedule_hard_reset();
@@ -498,7 +498,7 @@ void ui_menu_settings::handle()
 			ioport_field *field = (ioport_field *)menu_event->itemref;
 			ioport_field::user_settings settings;
 			int changed = false;
-			
+
 			switch (menu_event->iptkey)
 			{
 				/* if selected, reset to default value */
@@ -508,20 +508,20 @@ void ui_menu_settings::handle()
 					field->set_user_settings(settings);
 					changed = true;
 					break;
-					
+
 				/* left goes to previous setting */
 				case IPT_UI_LEFT:
 					field->select_previous_setting();
 					changed = true;
 					break;
-					
+
 				/* right goes to next setting */
 				case IPT_UI_RIGHT:
 					field->select_next_setting();
 					changed = true;
 					break;
 			}
-			
+
 			/* if anything changed, rebuild the menu, trying to stay on the same field */
 			if (changed)
 				reset(UI_MENU_RESET_REMEMBER_REF);
@@ -628,7 +628,7 @@ void ui_menu_settings::populate()
 			}
 	if (type == IPT_DIPSWITCH)
 		custombottom = dipcount ? dipcount * (DIP_SWITCH_HEIGHT + DIP_SWITCH_SPACING) + DIP_SWITCH_SPACING : 0;
-	
+
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 	item_append("Reset",  NULL, 0, (void *)1);
 }
@@ -661,18 +661,18 @@ void ui_menu_settings_dip_switches::custom_render(void *selectedref, float top, 
 	{
 		const ioport_diplocation *diploc;
 		UINT32 selectedmask = 0;
-		
+
 		// determine the mask of selected bits
 		if ((FPTR)selectedref != 1)
 		{
 			ioport_field *field = (ioport_field *)selectedref;
-			
+
 			if (field != NULL && field->first_diplocation() != NULL)
 				for (diploc = field->first_diplocation(); diploc != NULL; diploc = diploc->next())
 					if (strcmp(dip->name, diploc->name()) == 0)
 						selectedmask |= 1 << (diploc->number() - 1);
 		}
-		
+
 		// draw one switch
 		custom_render_one(x1, y1, x2, y1 + DIP_SWITCH_HEIGHT, dip, selectedmask);
 		y1 += (float)(DIP_SWITCH_SPACING + DIP_SWITCH_HEIGHT);
@@ -884,7 +884,7 @@ void ui_menu_analog::populate()
 						}
 
 						name.cpy(field->name());
-						
+
 						/* allocate a data item for tracking what this menu item refers to */
 						data = (analog_item_data *)m_pool_alloc(sizeof(*data));
 						data->field = field;

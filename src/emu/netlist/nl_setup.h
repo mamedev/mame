@@ -146,13 +146,13 @@ public:
 	void namespace_push(const pstring &aname);
 	void namespace_pop();
 
-    netlist_factory_t &factory() { return *m_factory; }
-    const netlist_factory_t &factory() const { return *m_factory; }
+	netlist_factory_t &factory() { return *m_factory; }
+	const netlist_factory_t &factory() const { return *m_factory; }
 
-    /* not ideal, but needed for save_state */
-    tagmap_terminal_t  m_terminals;
+	/* not ideal, but needed for save_state */
+	tagmap_terminal_t  m_terminals;
 
-    void print_stats() const;
+	void print_stats() const;
 
 protected:
 

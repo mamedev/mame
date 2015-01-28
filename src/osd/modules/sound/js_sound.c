@@ -19,36 +19,36 @@ class sound_js : public osd_module, public sound_module
 {
 public:
 
-    sound_js()
-    : osd_module(OSD_SOUND_PROVIDER, "js"), sound_module()
-    {
-    }
-    virtual ~sound_js() { }
+	sound_js()
+	: osd_module(OSD_SOUND_PROVIDER, "js"), sound_module()
+	{
+	}
+	virtual ~sound_js() { }
 
-    virtual int init();
-    virtual void exit();
+	virtual int init();
+	virtual void exit();
 
-    // sound_module
+	// sound_module
 
-    virtual void update_audio_stream(bool is_throttled, const INT16 *buffer, int samples_this_frame)
-    {
-        EM_ASM_ARGS({
-        // Forward audio stream update on to JS backend implementation.
-        jsmess_update_audio_stream($1, $2);
-        }, (unsigned int)buffer, samples_this_frame);
-    }
-    virtual void set_mastervolume(int attenuation)
-    {
-        EM_ASM_ARGS({
-        // Forward volume update on to JS backend implementation.
-        jsmess_set_mastervolume($0);
-        }, attenuation);
-    }
+	virtual void update_audio_stream(bool is_throttled, const INT16 *buffer, int samples_this_frame)
+	{
+		EM_ASM_ARGS({
+		// Forward audio stream update on to JS backend implementation.
+		jsmess_update_audio_stream($1, $2);
+		}, (unsigned int)buffer, samples_this_frame);
+	}
+	virtual void set_mastervolume(int attenuation)
+	{
+		EM_ASM_ARGS({
+		// Forward volume update on to JS backend implementation.
+		jsmess_set_mastervolume($0);
+		}, attenuation);
+	}
 
 };
 
 #else /* SDLMAME_UNIX */
-    MODULE_NOT_SUPPORTED(sound_js, OSD_SOUND_PROVIDER, "js")
+	MODULE_NOT_SUPPORTED(sound_js, OSD_SOUND_PROVIDER, "js")
 #endif
 
 MODULE_DEFINITION(SOUND_JS, sound_js)

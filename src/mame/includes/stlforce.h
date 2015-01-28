@@ -36,29 +36,29 @@ public:
 	required_shared_ptr<UINT16> m_mhigh_scrollram;
 	required_shared_ptr<UINT16> m_vidattrram;
 	required_shared_ptr<UINT16> m_spriteram;
-	
+
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_mlow_tilemap;
 	tilemap_t *m_mhigh_tilemap;
 	tilemap_t *m_tx_tilemap;
 
 	int m_sprxoffs;
-	
+
 	DECLARE_WRITE16_MEMBER(stlforce_bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(stlforce_mlow_videoram_w);
 	DECLARE_WRITE16_MEMBER(stlforce_mhigh_videoram_w);
 	DECLARE_WRITE16_MEMBER(stlforce_tx_videoram_w);
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 	DECLARE_WRITE16_MEMBER(oki_bank_w);
-	
+
 	DECLARE_DRIVER_INIT(twinbrat);
 	DECLARE_DRIVER_INIT(stlforce);
-	
+
 	TILE_GET_INFO_MEMBER(get_stlforce_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_stlforce_mlow_tile_info);
 	TILE_GET_INFO_MEMBER(get_stlforce_mhigh_tile_info);
 	TILE_GET_INFO_MEMBER(get_stlforce_tx_tile_info);
-	
+
 	virtual void video_start();
 	UINT32 screen_update_stlforce(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );

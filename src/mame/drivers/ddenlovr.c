@@ -154,8 +154,8 @@ public:
 		: dynax_state(mconfig, type, tag),
 		m_dsw_sel16(*this, "dsw_sel16"),
 		m_protection1(*this, "protection1"),
-		m_protection2(*this, "protection2")	{ }
-		
+		m_protection2(*this, "protection2") { }
+
 
 	optional_shared_ptr<UINT16> m_dsw_sel16;
 	optional_shared_ptr<UINT16> m_protection1;

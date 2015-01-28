@@ -57,6 +57,7 @@ enum
 	XTAL_2_5MHz         = 2500000,      /* Janken Man units */
 	XTAL_3MHz           = 3000000,      /* Probably only used to drive 68705 or similar MCUs on 80's Taito PCBs */
 	XTAL_3_12MHz        = 3120000,      /* SP0250 clock on Gottlieb games */
+	XTAL_3_5MHz			= 3500000,		/* Reported by Commodore 65 document, true xtal unchecked on PCB */
 	XTAL_3_52128MHz     = 3521280,      /* RCA COSMAC VIP */
 	XTAL_3_579545MHz    = 3579545,      /* NTSC color subcarrier, extremely common, used on 100's of PCBs (Keytronic custom part #48-300-010 is equivalent) */
 	XTAL_3_6864MHz      = 3686400,      /* CPS3 */

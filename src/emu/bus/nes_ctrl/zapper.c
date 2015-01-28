@@ -80,7 +80,7 @@ void nes_zapper_device::device_reset()
 UINT8 nes_zapper_device::read_bit34()
 {
 	UINT8 ret = m_trigger->read();
-	if (!m_port->m_brightpixel_cb.isnull() && 
+	if (!m_port->m_brightpixel_cb.isnull() &&
 		m_port->m_brightpixel_cb(m_lightx->read(), m_lighty->read()))
 		ret &= ~0x08; // sprite hit
 	else
@@ -91,7 +91,7 @@ UINT8 nes_zapper_device::read_bit34()
 UINT8 nes_zapper_device::read_exp(offs_t offset)
 {
 	UINT8 ret = 0;
-	if (offset == 1)	// $4017
+	if (offset == 1)    // $4017
 		ret |= nes_zapper_device::read_bit34();
 	return ret;
 }

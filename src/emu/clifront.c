@@ -36,27 +36,27 @@
 class media_identifier
 {
 public:
-    // construction/destruction
-    media_identifier(cli_options &options);
+	// construction/destruction
+	media_identifier(cli_options &options);
 
-    // getters
-    int total() const { return m_total; }
-    int matches() const { return m_matches; }
-    int nonroms() const { return m_nonroms; }
+	// getters
+	int total() const { return m_total; }
+	int matches() const { return m_matches; }
+	int nonroms() const { return m_nonroms; }
 
-    // operations
-    void reset() { m_total = m_matches = m_nonroms = 0; }
-    void identify(const char *name);
-    void identify_file(const char *name);
-    void identify_data(const char *name, const UINT8 *data, int length);
-    int find_by_hash(const hash_collection &hashes, int length);
+	// operations
+	void reset() { m_total = m_matches = m_nonroms = 0; }
+	void identify(const char *name);
+	void identify_file(const char *name);
+	void identify_data(const char *name, const UINT8 *data, int length);
+	int find_by_hash(const hash_collection &hashes, int length);
 
 private:
-    // internal state
-    driver_enumerator   m_drivlist;
-    int                 m_total;
-    int                 m_matches;
-    int                 m_nonroms;
+	// internal state
+	driver_enumerator   m_drivlist;
+	int                 m_total;
+	int                 m_matches;
+	int                 m_nonroms;
 };
 
 
@@ -1619,8 +1619,8 @@ void cli_frontend::execute_commands(const char *exename)
 		}
 
 	if (!m_osd.execute_command(m_options.command()))
-        // if we get here, we don't know what has been requested
-        throw emu_fatalerror(MAMERR_INVALID_CONFIG, "Unknown command '%s' specified", m_options.command());
+		// if we get here, we don't know what has been requested
+		throw emu_fatalerror(MAMERR_INVALID_CONFIG, "Unknown command '%s' specified", m_options.command());
 }
 
 

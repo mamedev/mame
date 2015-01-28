@@ -54,8 +54,8 @@ public:
 		m_discrete(*this, "discrete"),
 #else
 		m_audio_snd0(*this, "snd_nl:snd0"),
-        m_audio_snd7(*this, "snd_nl:snd7"),
-        m_audio_dac(*this, "snd_nl:dac"),
+		m_audio_snd7(*this, "snd_nl:snd7"),
+		m_audio_dac(*this, "snd_nl:dac"),
 #endif
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
@@ -71,8 +71,8 @@ public:
 	optional_device<discrete_device> m_discrete;
 #else
 	optional_device<netlist_mame_logic_input_t> m_audio_snd0;
-    optional_device<netlist_mame_logic_input_t> m_audio_snd7;
-    optional_device<netlist_mame_logic_input_t> m_audio_dac;
+	optional_device<netlist_mame_logic_input_t> m_audio_snd7;
+	optional_device<netlist_mame_logic_input_t> m_audio_dac;
 #endif
 
 	/* memory pointers */

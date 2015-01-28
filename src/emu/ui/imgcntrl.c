@@ -328,7 +328,7 @@ void ui_menu_control_device_image::handle()
 		state = create_ok ? CREATE_FILE : START_FILE;
 		handle();
 		break;
-			
+
 	case DO_CREATE: {
 		astring path;
 		zippath_combine(path, current_directory, current_file);

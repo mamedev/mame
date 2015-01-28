@@ -213,33 +213,33 @@ public:
 	DECLARE_WRITE8_MEMBER(jantouki_blitter2_rev2_w);
 	DECLARE_WRITE8_MEMBER(hanamai_priority_w);
 	DECLARE_WRITE8_MEMBER(tenkai_priority_w);
-	
+
 	DECLARE_DRIVER_INIT(mjelct3);
 	DECLARE_DRIVER_INIT(blktouch);
 	DECLARE_DRIVER_INIT(mjelct3a);
 	DECLARE_DRIVER_INIT(mjreach);
 	DECLARE_DRIVER_INIT(maya);
-	
+
 	UINT32 screen_update_hanamai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_hnoridur(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_sprtmtch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_mjdialq2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_jantouki_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_jantouki_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	INTERRUPT_GEN_MEMBER(sprtmtch_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(jantouki_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(jantouki_sound_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(yarunara_clock_interrupt);
 	INTERRUPT_GEN_MEMBER(mjelctrn_vblank_interrupt);
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(neruton_irq_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(majxtal7_vblank_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(tenkai_interrupt);
-	
+
 	void tenkai_update_rombank();
 	void gekisha_bank_postload();
-	
+
 	DECLARE_WRITE_LINE_MEMBER(sprtmtch_sound_callback);
 	DECLARE_WRITE_LINE_MEMBER(jantouki_sound_callback);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
@@ -268,7 +268,7 @@ public:
 	DECLARE_VIDEO_START(mcnpshnt);
 	DECLARE_PALETTE_INIT(janyuki);
 	DECLARE_VIDEO_START(neruton);
-	
+
 	inline void blitter_plot_pixel( int layer, int mask, int x, int y, int pen, int wrap, int flags );
 	int blitter_drawgfx( int layer, int mask, const char *gfx, int src, int pen, int x, int y, int wrap, int flags );
 	void dynax_blitter_start( int flags );

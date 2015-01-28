@@ -130,7 +130,7 @@ void nes_powerpad_device::write(UINT8 data)
 {
 	if (data & 0x01)
 		return;
-	
+
 	m_latch[0] = m_ipt1->read();
 	m_latch[1] = m_ipt2->read() | 0xf0;
 }

@@ -30,7 +30,7 @@
 
 const char *osd_getenv(const char *name)
 {
-    return getenv(name);
+	return getenv(name);
 }
 
 //============================================================
@@ -39,7 +39,7 @@ const char *osd_getenv(const char *name)
 
 int osd_setenv(const char *name, const char *value, int overwrite)
 {
-    return setenv(name, value, overwrite);
+	return setenv(name, value, overwrite);
 }
 
 //============================================================
@@ -48,7 +48,7 @@ int osd_setenv(const char *name, const char *value, int overwrite)
 
 void osd_process_kill(void)
 {
-    kill(getpid(), SIGKILL);
+	kill(getpid(), SIGKILL);
 }
 
 //============================================================
@@ -57,12 +57,12 @@ void osd_process_kill(void)
 
 int osd_get_num_processors(void)
 {
-    int processors = 1;
+	int processors = 1;
 
 #if defined(_SC_NPROCESSORS_ONLN)
-    processors = sysconf(_SC_NPROCESSORS_ONLN);
+	processors = sysconf(_SC_NPROCESSORS_ONLN);
 #endif
-    return processors;
+	return processors;
 }
 
 //============================================================
@@ -72,7 +72,7 @@ int osd_get_num_processors(void)
 void *osd_malloc(size_t size)
 {
 #ifndef MALLOC_DEBUG
-    return malloc(size);
+	return malloc(size);
 #else
 #error "MALLOC_DEBUG not yet supported"
 #endif
@@ -86,7 +86,7 @@ void *osd_malloc(size_t size)
 void *osd_malloc_array(size_t size)
 {
 #ifndef MALLOC_DEBUG
-    return malloc(size);
+	return malloc(size);
 #else
 #error "MALLOC_DEBUG not yet supported"
 #endif
@@ -100,7 +100,7 @@ void *osd_malloc_array(size_t size)
 void osd_free(void *ptr)
 {
 #ifndef MALLOC_DEBUG
-    free(ptr);
+	free(ptr);
 #else
 #error "MALLOC_DEBUG not yet supported"
 #endif
@@ -116,9 +116,9 @@ void osd_free(void *ptr)
 void *osd_alloc_executable(size_t size)
 {
 #if defined(SDLMAME_BSD) || defined(SDLMAME_MACOSX)
-    return (void *)mmap(0, size, PROT_EXEC|PROT_READ|PROT_WRITE, MAP_ANON|MAP_SHARED, -1, 0);
+	return (void *)mmap(0, size, PROT_EXEC|PROT_READ|PROT_WRITE, MAP_ANON|MAP_SHARED, -1, 0);
 #elif defined(SDLMAME_UNIX)
-    return (void *)mmap(0, size, PROT_EXEC|PROT_READ|PROT_WRITE, MAP_ANON|MAP_SHARED, 0, 0);
+	return (void *)mmap(0, size, PROT_EXEC|PROT_READ|PROT_WRITE, MAP_ANON|MAP_SHARED, 0, 0);
 #endif
 }
 
@@ -131,9 +131,9 @@ void *osd_alloc_executable(size_t size)
 void osd_free_executable(void *ptr, size_t size)
 {
 #ifdef SDLMAME_SOLARIS
-    munmap((char *)ptr, size);
+	munmap((char *)ptr, size);
 #else
-    munmap(ptr, size);
+	munmap(ptr, size);
 #endif
 }
 
@@ -143,13 +143,13 @@ void osd_free_executable(void *ptr, size_t size)
 
 void osd_break_into_debugger(const char *message)
 {
-    #ifdef MAME_DEBUG
-    printf("MAME exception: %s\n", message);
-    printf("Attempting to fall into debugger\n");
-    kill(getpid(), SIGTRAP);
-    #else
-    printf("Ignoring MAME exception: %s\n", message);
-    #endif
+	#ifdef MAME_DEBUG
+	printf("MAME exception: %s\n", message);
+	printf("Attempting to fall into debugger\n");
+	kill(getpid(), SIGTRAP);
+	#else
+	printf("Ignoring MAME exception: %s\n", message);
+	#endif
 }
 
 
@@ -160,15 +160,15 @@ void osd_break_into_debugger(const char *message)
 osd_ticks_t osd_ticks(void)
 {
 #ifdef SDLMAME_EMSCRIPTEN
-        return (osd_ticks_t)(emscripten_get_now() * 1000.0);
+		return (osd_ticks_t)(emscripten_get_now() * 1000.0);
 #else
-        struct timeval    tp;
-        static osd_ticks_t start_sec = 0;
+		struct timeval    tp;
+		static osd_ticks_t start_sec = 0;
 
-        gettimeofday(&tp, NULL);
-        if (start_sec==0)
-            start_sec = tp.tv_sec;
-        return (tp.tv_sec - start_sec) * (osd_ticks_t) 1000000 + tp.tv_usec;
+		gettimeofday(&tp, NULL);
+		if (start_sec==0)
+			start_sec = tp.tv_sec;
+		return (tp.tv_sec - start_sec) * (osd_ticks_t) 1000000 + tp.tv_usec;
 #endif
 }
 
@@ -179,7 +179,7 @@ osd_ticks_t osd_ticks(void)
 
 osd_ticks_t osd_ticks_per_second(void)
 {
-    return (osd_ticks_t) 1000000;
+	return (osd_ticks_t) 1000000;
 }
 
 //============================================================
@@ -188,16 +188,16 @@ osd_ticks_t osd_ticks_per_second(void)
 
 void osd_sleep(osd_ticks_t duration)
 {
-    UINT32 msec;
+	UINT32 msec;
 
-    // convert to milliseconds, rounding down
-    msec = (UINT32)(duration * 1000 / osd_ticks_per_second());
+	// convert to milliseconds, rounding down
+	msec = (UINT32)(duration * 1000 / osd_ticks_per_second());
 
-    // only sleep if at least 2 full milliseconds
-    if (msec >= 2)
-    {
-        // take a couple of msecs off the top for good measure
-        msec -= 2;
-        usleep(msec*1000);
-    }
+	// only sleep if at least 2 full milliseconds
+	if (msec >= 2)
+	{
+		// take a couple of msecs off the top for good measure
+		msec -= 2;
+		usleep(msec*1000);
+	}
 }

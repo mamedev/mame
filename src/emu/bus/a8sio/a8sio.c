@@ -217,4 +217,3 @@ WRITE_LINE_MEMBER( device_a8sio_card_interface::motor_w )
 SLOT_INTERFACE_START(a8sio_cards)
 	SLOT_INTERFACE("cassette", A8SIO_CASSETTE)
 SLOT_INTERFACE_END
-

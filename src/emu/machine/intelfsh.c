@@ -253,7 +253,7 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_size = 0x400000;
 		m_maker_id = MFG_INTEL;
 		m_device_id = 0x14;
-//		m_sector_is_4k = true; 128kb?
+//      m_sector_is_4k = true; 128kb?
 		map = ADDRESS_MAP_NAME( memory_map16_32Mb );
 		break;
 	case FLASH_SST_39VF020:

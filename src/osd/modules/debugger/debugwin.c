@@ -44,23 +44,23 @@
 class debugger_windows : public osd_module, public debug_module
 {
 public:
-    debugger_windows()
-    : osd_module(OSD_DEBUG_PROVIDER, "windows"), debug_module(),
-      m_machine(NULL)
-    {
-    }
+	debugger_windows()
+	: osd_module(OSD_DEBUG_PROVIDER, "windows"), debug_module(),
+		m_machine(NULL)
+	{
+	}
 
-    virtual ~debugger_windows() { }
+	virtual ~debugger_windows() { }
 
-    virtual int init() { return 0;}
-    virtual void exit();
+	virtual int init() { return 0;}
+	virtual void exit();
 
-    virtual void init_debugger(running_machine &machine);
-    virtual void wait_for_debugger(device_t &device, bool firststop);
-    virtual void debugger_update();
+	virtual void init_debugger(running_machine &machine);
+	virtual void wait_for_debugger(device_t &device, bool firststop);
+	virtual void debugger_update();
 
 private:
-    running_machine *m_machine;
+	running_machine *m_machine;
 };
 //============================================================
 //  PARAMETERS
@@ -3094,7 +3094,7 @@ static void smart_show_all(BOOL show)
 		smart_show_window(info->wnd, show);
 }
 #else /* not windows */
-    MODULE_NOT_SUPPORTED(debugger_windows, OSD_DEBUG_PROVIDER, "windows")
+	MODULE_NOT_SUPPORTED(debugger_windows, OSD_DEBUG_PROVIDER, "windows")
 #endif
 
 MODULE_DEFINITION(DEBUG_WINDOWS, debugger_windows)

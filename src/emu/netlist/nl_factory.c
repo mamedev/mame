@@ -56,18 +56,18 @@
 
 ATTR_COLD const nl_util::pstring_list net_device_t_base_factory::term_param_list()
 {
-    if (m_def_param.startsWith("+"))
-        return nl_util::split(m_def_param.substr(1), ",");
-    else
-        return nl_util::pstring_list();
+	if (m_def_param.startsWith("+"))
+		return nl_util::split(m_def_param.substr(1), ",");
+	else
+		return nl_util::pstring_list();
 }
 
 ATTR_COLD const nl_util::pstring_list net_device_t_base_factory::def_params()
 {
-    if (m_def_param.startsWith("+") || m_def_param.equals("-"))
-        return nl_util::pstring_list();
-    else
-        return nl_util::split(m_def_param, ",");
+	if (m_def_param.startsWith("+") || m_def_param.equals("-"))
+		return nl_util::pstring_list();
+	else
+		return nl_util::split(m_def_param, ",");
 }
 
 

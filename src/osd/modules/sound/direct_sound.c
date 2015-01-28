@@ -51,26 +51,26 @@ class sound_direct_sound : public osd_module, public sound_module
 {
 public:
 
-    sound_direct_sound()
-    : osd_module(OSD_SOUND_PROVIDER, "dsound"), sound_module()
-    {
-    }
-    virtual ~sound_direct_sound() { }
+	sound_direct_sound()
+	: osd_module(OSD_SOUND_PROVIDER, "dsound"), sound_module()
+	{
+	}
+	virtual ~sound_direct_sound() { }
 
-    virtual int init();
-    virtual void exit();
+	virtual int init();
+	virtual void exit();
 
-    // sound_module
+	// sound_module
 
-    virtual void update_audio_stream(bool is_throttled, const INT16 *buffer, int samples_this_frame);
-    virtual void set_mastervolume(int attenuation);
+	virtual void update_audio_stream(bool is_throttled, const INT16 *buffer, int samples_this_frame);
+	virtual void set_mastervolume(int attenuation);
 
 private:
-    HRESULT      dsound_init();
-    void         dsound_kill();
-    HRESULT      dsound_create_buffers();
-    void         dsound_destroy_buffers();
-    void         copy_sample_data(const INT16 *data, int bytes_to_copy);
+	HRESULT      dsound_init();
+	void         dsound_kill();
+	HRESULT      dsound_create_buffers();
+	void         dsound_destroy_buffers();
+	void         copy_sample_data(const INT16 *data, int bytes_to_copy);
 
 };
 
@@ -448,7 +448,7 @@ void sound_direct_sound::dsound_destroy_buffers(void)
 }
 
 #else /* SDLMAME_UNIX */
-    MODULE_NOT_SUPPORTED(sound_direct_sound, OSD_SOUND_PROVIDER, "dsound")
+	MODULE_NOT_SUPPORTED(sound_direct_sound, OSD_SOUND_PROVIDER, "dsound")
 #endif
 
 MODULE_DEFINITION(SOUND_DSOUND, sound_direct_sound)

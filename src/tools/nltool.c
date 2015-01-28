@@ -88,10 +88,10 @@ struct options_entry oplist[] =
 };
 
 NETLIST_START(dummy)
-    /* Standard stuff */
+	/* Standard stuff */
 
-    CLOCK(clk, 1000) // 1000 Hz
-    SOLVER(Solver, 48000)
+	CLOCK(clk, 1000) // 1000 Hz
+	SOLVER(Solver, 48000)
 
 NETLIST_END()
 
@@ -172,7 +172,7 @@ public:
 		nl_util::pstring_list ll = nl_util::split(m_logs, ":");
 		for (int i=0; i < ll.count(); i++)
 		{
-            pstring name = "log_" + ll[i];
+			pstring name = "log_" + ll[i];
 			/*netlist_device_t *nc = */ m_setup->register_dev("nld_log", name);
 			m_setup->register_link(name + ".I", ll[i]);
 		}
@@ -241,10 +241,10 @@ static void listdevices()
 	nt.init();
 	const netlist_factory_t::list_t &list = nt.setup().factory().list();
 
-    netlist_sources_t sources;
+	netlist_sources_t sources;
 
-    sources.add(netlist_source_t("dummy", &netlist_dummy));
-    sources.parse(nt.setup(),"dummy");
+	sources.add(netlist_source_t("dummy", &netlist_dummy));
+	sources.parse(nt.setup(),"dummy");
 
 	nt.setup().start_devices();
 	nt.setup().resolve_inputs();

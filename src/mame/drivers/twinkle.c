@@ -669,13 +669,13 @@ WRITE16_MEMBER(twinkle_state::serial_w)
 
 WRITE8_MEMBER(twinkle_state::shared_psx_w)
 {
-//	printf("shared_psx_w: %04x, %04x, %04x\n", offset, data, mem_mask);
+//  printf("shared_psx_w: %04x, %04x, %04x\n", offset, data, mem_mask);
 
 	m_spu_shared[offset] = data;
 
 	if (offset == 0x03fe && data == 0xff)
 	{
-//		printf("spu command %02x %02x\n", m_spu_shared[1], m_spu_shared[3]);
+//      printf("spu command %02x %02x\n", m_spu_shared[1], m_spu_shared[3]);
 
 		m_audiocpu->set_input_line(M68K_IRQ_4, HOLD_LINE);
 	}
@@ -785,7 +785,7 @@ WRITE_LINE_MEMBER(twinkle_state::spu_ata_dmarq)
 				//           work for us until we figure out what's actually going on.
 				if (m_spu_ata_dma < 0x200000)
 				{
-					m_waveram[m_spu_ata_dma++] = data; 
+					m_waveram[m_spu_ata_dma++] = data;
 				}
 			}
 
@@ -808,21 +808,21 @@ READ16_MEMBER(twinkle_state::shared_68k_r)
 {
 	UINT16 result = m_spu_shared[offset];
 
-//	printf("shared_68k_r: %04x, %04x, %04x\n", offset, result, mem_mask);
+//  printf("shared_68k_r: %04x, %04x, %04x\n", offset, result, mem_mask);
 
 	return result;
 }
 
 WRITE16_MEMBER(twinkle_state::shared_68k_w)
 {
-//	printf("shared_68k_w: %04x, %04x, %04x\n", offset, data, mem_mask);
+//  printf("shared_68k_w: %04x, %04x, %04x\n", offset, data, mem_mask);
 
 	m_spu_shared[offset] = data & 0xff;
 }
 
 READ16_MEMBER(twinkle_state::unk_68k_r)
 {
-	return 0xffff;	// must return 0xff for 68000 POST to complete properly
+	return 0xffff;  // must return 0xff for 68000 POST to complete properly
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, twinkle_state )
@@ -840,7 +840,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, twinkle_state )
 	AM_RANGE(0x34000e, 0x34000f) AM_WRITENOP
 	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE("rfsnd", rf5c400_device, rf5c400_r, rf5c400_w)
 	AM_RANGE(0x800000, 0xbfffff) AM_READWRITE(twinkle_waveram_r, twinkle_waveram_w )
-	AM_RANGE(0xfe0000, 0xffffff) AM_RAM	// ...and the RAM test checks this last 128k (mirror of the work RAM at 0x100000?)
+	AM_RANGE(0xfe0000, 0xffffff) AM_RAM // ...and the RAM test checks this last 128k (mirror of the work RAM at 0x100000?)
 ADDRESS_MAP_END
 
 /* SCSI */

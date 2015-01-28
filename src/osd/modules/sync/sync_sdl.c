@@ -326,9 +326,9 @@ osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam)
 	thread->callback = callback;
 	thread->param = cbparam;
 #ifdef SDLMAME_SDL2
-    thread->thread = SDL_CreateThread(worker_thread_entry, "Thread", thread);
+	thread->thread = SDL_CreateThread(worker_thread_entry, "Thread", thread);
 #else
-    thread->thread = SDL_CreateThread(worker_thread_entry, thread);
+	thread->thread = SDL_CreateThread(worker_thread_entry, thread);
 #endif
 	if ( thread->thread == NULL )
 	{
@@ -366,4 +366,3 @@ void osd_thread_wait_free(osd_thread *thread)
 	SDL_WaitThread(thread->thread, &status);
 	free(thread);
 }
-

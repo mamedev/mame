@@ -1,9 +1,8 @@
 /**********************************************************************
 
     Nintendo Entertainment System - Miracle Piano Keyboard
- 
-    TODO: basically everything, this is just a skeleton with no 
-    real MIDI handling at the moment.
+
+    TODO: MIDI input, output is now working.
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -43,6 +42,10 @@ void nes_miracle_device::device_timer(emu_timer &timer, device_timer_id id, int 
 	if (id == TIMER_STROBE_ON)
 	{
 		m_strobe_clock++;
+	}
+	else
+	{
+		device_serial_interface::device_timer(timer, id, param, ptr);
 	}
 }
 
@@ -157,7 +160,7 @@ void nes_miracle_device::write(UINT8 data)
 		m_strobe_on = 1;
 		return;
 	}
-	
+
 	if (m_strobe_on)
 	{
 		// was timer running?
@@ -204,7 +207,6 @@ void nes_miracle_device::rcv_complete()    // Rx completed receiving byte
 
 void nes_miracle_device::tra_complete()    // Tx completed sending byte
 {
-//  printf("Tx complete\n");
 	// is there more waiting to send?
 	if (m_xmit_read != m_xmit_write)
 	{
@@ -222,14 +224,14 @@ void nes_miracle_device::tra_complete()    // Tx completed sending byte
 
 void nes_miracle_device::tra_callback()    // Tx send bit
 {
+	UINT8 bit = transmit_register_get_data_bit();
+
 	// send this to midi out
-	m_midiout->write_txd(transmit_register_get_data_bit());
+	m_midiout->write_txd(bit);
 }
 
 void nes_miracle_device::xmit_char(UINT8 data)
 {
-//  printf("xmit %02x\n", data);
-
 	// if tx is busy it'll pick this up automatically when it completes
 	// if not, send now!
 	if (!m_tx_busy)

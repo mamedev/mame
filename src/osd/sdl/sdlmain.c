@@ -319,7 +319,7 @@ int main(int argc, char *argv[])
 #endif
 
 	{
-	    sdl_options options;
+		sdl_options options;
 		sdl_osd_interface osd(options);
 		osd.register_options();
 		cli_frontend frontend(options, osd);
@@ -688,5 +688,3 @@ char *utf8_from_wstring(const WCHAR *wstring)
 }
 
 #endif
-
-

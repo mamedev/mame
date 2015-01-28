@@ -4,7 +4,7 @@
 
   Parker Brothers Split Second
   * TMS1400NLL MP7314-N2 (die labeled MP7314)
-  
+
   This is an electronic handheld reflex gaming device, it's straightforward
   to use. The included mini-games are:
   1, 2, 3: Mad Maze*
@@ -12,7 +12,7 @@
   6: Auto Cross
   7: Stomp
   8: Speedball
-  
+
   *: higher number indicates higher difficulty
 
 
@@ -167,7 +167,7 @@ WRITE16_MEMBER(splitsec_state::write_r)
 {
 	// R8: speaker out
 	m_speaker->level_w(data >> 8 & 1);
-	
+
 	// R9,R10: input mux
 	// R0-R7: led columns
 	m_r = data;

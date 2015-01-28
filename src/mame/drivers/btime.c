@@ -1940,7 +1940,7 @@ ROM_START( discof )
 	ROM_LOAD( "w3-f.4a",     0xc000, 0x1000, CRC(9aadd252) SHA1(c6da7ef46333d525e676c59f03ccc908108b41ba) )
 	ROM_LOAD( "w2-f.6a",     0xd000, 0x1000, CRC(f131a5bb) SHA1(84b7dea112dce12e5cb235a13f6dc4edcfb18c06) )
 	ROM_LOAD( "w1-f.9a",     0xe000, 0x1000, CRC(a6ce9a19) SHA1(e8f380e17a21fb33504d6efe9d01d0f903fa25e1) )
-//	ROM_LOAD( "w1-f",        0xe000, 0x1000, CRC(c8ec57c5) SHA1(904a9ed0a7f1230c611bf473b9bc52e63eb56dbe) ) // 0x7d3 is 0x10 instead of 0x00, 1 bit different, looks out of place, bad?
+//  ROM_LOAD( "w1-f",        0xe000, 0x1000, CRC(c8ec57c5) SHA1(904a9ed0a7f1230c611bf473b9bc52e63eb56dbe) ) // 0x7d3 is 0x10 instead of 0x00, 1 bit different, looks out of place, bad?
 	ROM_LOAD( "w0-f.9a",     0xf000, 0x1000, CRC(b3787a92) SHA1(7f40621dc739c1108a5df43142ab04709a380219) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )

@@ -357,12 +357,6 @@ static INPUT_PORTS_START( bishi2p )
 INPUT_PORTS_END
 
 
-WRITE_LINE_MEMBER(bishi_state::sound_irq_gen)
-{
-	m_maincpu->set_input_line(M68K_IRQ_1, (state) ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
 void bishi_state::machine_start()
 {
 	save_item(NAME(m_cur_control));
@@ -413,7 +407,7 @@ static MACHINE_CONFIG_START( bishi, bishi_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, SOUND_CLOCK) /* 16.9344MHz */
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(bishi_state, sound_irq_gen))
+	MCFG_YMZ280B_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_1))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

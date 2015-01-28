@@ -4,15 +4,15 @@
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
- 
- 
- TODO: current implementation is a HACK, due to limitations of the 
+
+
+ TODO: current implementation is a HACK, due to limitations of the
  slot system!
  A real Four Score would be connected to both the controller ports of
  the NES, but current core cannot emulate something like this until
  devices can live their own life and being connected to other devices
  at request.
- In current implementation the device has to be mounted separately in 
+ In current implementation the device has to be mounted separately in
  the two ports and each enables 2 inputs (this is more or less as hacky
  as the non-slot previous one, where the 4 ports were always available
  to the emulated system, but it's not a great consolation :( )
@@ -22,7 +22,7 @@
  since we could at best have two switches to disable the second player
  inputs.
 
- Note: Two Pads are hardcoded in inputs below, instead of acting as 
+ Note: Two Pads are hardcoded in inputs below, instead of acting as
  passthrough for 2 standard joypad devices, in order to show in the
  internal UI that they belong to P1+P3 and P2+P4, otherwise they would
  be listed as P1+P2 and P3+P4 respectively. This *HAS* to be changed
@@ -171,10 +171,10 @@ void nes_4score_p1p3_device::write(UINT8 data)
 {
 	if (data & 0x01)
 		return;
-	
+
 	// P3 & P4 inputs in NES Four Score are read serially with P1 & P2
 	m_latch  = m_joypad1->read();
-	m_latch |= (m_joypad3->read() << 8); // pad 3 
+	m_latch |= (m_joypad3->read() << 8); // pad 3
 	m_latch |= (0x08 << 16); // signature
 }
 
@@ -182,9 +182,9 @@ void nes_4score_p2p4_device::write(UINT8 data)
 {
 	if (data & 0x01)
 		return;
-	
+
 	// P3 & P4 inputs in NES Four Score are read serially with P1 & P2
 	m_latch = m_joypad2->read();
-	m_latch |= (m_joypad4->read() << 8); // pad 4 
+	m_latch |= (m_joypad4->read() << 8); // pad 4
 	m_latch |= (0x04 << 16); // signature
 }

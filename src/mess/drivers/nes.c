@@ -214,7 +214,7 @@ MACHINE_START_MEMBER( nes_state, fds )
 {
 	m_ciram = auto_alloc_array(machine(), UINT8, 0x800);
 	setup_disk(m_disk);
-	
+
 	// register saves
 	save_item(NAME(m_last_frame_flip));
 	save_pointer(NAME(m_ciram), 0x800);

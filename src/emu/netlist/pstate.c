@@ -24,7 +24,7 @@ ATTR_COLD void pstate_manager_t::save_state_ptr(const pstring &stname, const pst
 			"DT_INT8",
 			"DT_INT",
 			"DT_BOOLEAN",
-            "DT_FLOAT"
+			"DT_FLOAT"
 	};
 
 	NL_VERBOSE_OUT(("SAVE: <%s> %s(%d) %p\n", fullname.cstr(), ts[dt].cstr(), size, ptr));
@@ -64,8 +64,8 @@ ATTR_COLD void pstate_manager_t::post_load()
 
 template<> ATTR_COLD void pstate_manager_t::save_item(pstate_callback_t &state, const void *owner, const pstring &stname)
 {
-    //save_state_ptr(stname, DT_CUSTOM, 0, 1, &state);
-    pstate_entry_t *p = nl_alloc(pstate_entry_t, stname, owner, &state);
-    m_save.add(p);
-    state.register_state(*this, stname);
+	//save_state_ptr(stname, DT_CUSTOM, 0, 1, &state);
+	pstate_entry_t *p = nl_alloc(pstate_entry_t, stname, owner, &state);
+	m_save.add(p);
+	state.register_state(*this, stname);
 }

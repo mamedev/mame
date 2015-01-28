@@ -75,8 +75,8 @@ void m4510_device::device_reset()
 	nomap = true;
 
 	// Wild guess, this setting makes the cpu start executing some code in the c65 driver
-	map_offset[1] = 0x30000;
-	map_enable = 0x80;
+	//map_offset[1] = 0x2e000;
+	//map_enable = 0x80;
 	m65ce02_device::device_reset();
 }
 
@@ -86,7 +86,7 @@ bool m4510_device::memory_translate(address_spacenum spacenum, int intention, of
 	{
 		address = map(address);
 	}
-
+	
 	return true;
 }
 

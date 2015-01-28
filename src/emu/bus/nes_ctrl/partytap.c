@@ -81,7 +81,7 @@ void nes_partytap_device::device_reset()
 UINT8 nes_partytap_device::read_exp(offs_t offset)
 {
 	UINT8 ret = 0;
-	if (offset == 1)	//$4017
+	if (offset == 1)    //$4017
 	{
 		ret |= m_latch & 0x1c;
 		m_latch >>= 3;

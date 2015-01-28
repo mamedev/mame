@@ -3658,7 +3658,7 @@ DRIVER_INIT_MEMBER(calomega_state,sys905)
 DRIVER_INIT_MEMBER(calomega_state,comg080)
 {
 	DRIVER_INIT_CALL(sys903);
-	
+
 	/* Injecting missing Start and NMI vectors...
 	   Start = $2042;  NMI = $26f8;
 	   Also a fake vector at $3ff8-$3ff9. The code checks these values to continue.

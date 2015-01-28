@@ -114,7 +114,7 @@ INLINE UINT32 pixel_ycc_to_rgb_pal(UINT16 *pixel, const rgb_t *palette)
 
 #define TEXCOPY_M( _name, _src_type, _dest_type,  _op, _len_div) \
 INLINE void texcopy_##_name (const texture_info *texture, const render_texinfo *texsource) { \
-    ATTR_UNUSED const rgb_t *palbase = texsource->palette(); \
+	ATTR_UNUSED const rgb_t *palbase = texsource->palette(); \
 	int x, y; \
 	/* loop over Y */ \
 	for (y = 0; y < texsource->height; y++) { \
@@ -134,7 +134,7 @@ INLINE void texcopy_##_name (const texture_info *texture, const render_texinfo *
 
 #define TEXROT( _name, _src_type, _dest_type, _op) \
 INLINE void texcopy_rot_##_name (const texture_info *texture, const render_texinfo *texsource) { \
-    ATTR_UNUSED const rgb_t *palbase = texsource->palette(); \
+	ATTR_UNUSED const rgb_t *palbase = texsource->palette(); \
 	int x, y; \
 	const quad_setup_data *setup = &texture->m_setup; \
 	int dudx = setup->dudx; \

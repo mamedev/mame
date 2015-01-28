@@ -81,7 +81,7 @@ void nes_konamihs_device::device_reset()
 UINT8 nes_konamihs_device::read_exp(offs_t offset)
 {
 	UINT8 ret = 0;
-	if (offset == 1)	//$4017
+	if (offset == 1)    //$4017
 	{
 		ret |= m_latch_p1 << 1;
 		ret |= m_latch_p2 << 3;

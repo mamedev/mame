@@ -738,7 +738,7 @@ DEBUGOBJS = \
 	$(OSDOBJ)/modules/debugger/qt/debugqtdeviceinformationwindow.moc.o
 
 DEFS += -DUSE_QTDEBUG=1
-	
+
 else
 DEFS += -DUSE_QTDEBUG=0
 endif

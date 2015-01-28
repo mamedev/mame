@@ -59,7 +59,7 @@ UINT32 banctec_state::screen_update_banctec(screen_device &screen, bitmap_ind16 
 
 MC6845_ON_UPDATE_ADDR_CHANGED(banctec_state::crtc_addr)
 {
-  /* What is this function meant to do ? */
+	/* What is this function meant to do ? */
 }
 
 /******************************
@@ -103,7 +103,7 @@ static MACHINE_CONFIG_START( banctec, banctec_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", banctec)
 	MCFG_PALETTE_ADD("palette", 2)
-//	MCFG_PALETTE_INIT_OWNER(banctec_state, banctec)
+//  MCFG_PALETTE_INIT_OWNER(banctec_state, banctec)
 
 	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL_20MHz) /* (?) */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)

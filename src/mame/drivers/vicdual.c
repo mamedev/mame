@@ -3535,4 +3535,3 @@ GAME( 1980, digger,     0,        digger,    digger,    driver_device, 0, ROT270
 GAME( 1981, pulsar,     0,        pulsar,    pulsar,    driver_device, 0, ROT270, "Sega", "Pulsar", GAME_IMPERFECT_SOUND )
 GAME( 1979, heiankyo,   0,        heiankyo,  heiankyo,  driver_device, 0, ROT270, "Denki Onkyo", "Heiankyo Alien", GAME_NO_SOUND )
 GAME( 19??, alphaho,    0,        alphaho,   alphaho,   driver_device, 0, ROT270, "Data East Corporation", "Alpha Fighter / Head On", GAME_WRONG_COLORS | GAME_NO_SOUND )
-

@@ -197,8 +197,8 @@ public:
 
 	enum eSolverType
 	{
-	    GAUSSIAN_ELIMINATION,
-	    GAUSS_SEIDEL
+		GAUSSIAN_ELIMINATION,
+		GAUSS_SEIDEL
 	};
 
 	ATTR_COLD netlist_matrix_solver_t(const eSolverType type, const netlist_solver_parameters_t &params);
@@ -243,9 +243,9 @@ protected:
 	plinearlist_t<netlist_analog_net_t *> m_nets;
 	plinearlist_t<netlist_analog_output_t *> m_inps;
 
-    int m_stat_calculations;
-    int m_stat_newton_raphson;
-    int m_stat_vsolver_calls;
+	int m_stat_calculations;
+	int m_stat_newton_raphson;
+	int m_stat_vsolver_calls;
 
 	const netlist_solver_parameters_t &m_params;
 
@@ -264,7 +264,7 @@ private:
 
 	ATTR_HOT void update_inputs();
 
-    const eSolverType m_type;
+	const eSolverType m_type;
 };
 
 

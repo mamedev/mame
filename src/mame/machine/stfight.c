@@ -63,7 +63,7 @@ DRIVER_INIT_MEMBER(stfight_state,empcity)
 				( ( ( src ^ A ) >> 1 ) & 0x08 ) |
 				( ~( ( src >> 6 ) ^ A ) & 0x01 );
 	}
-	
+
 }
 
 DRIVER_INIT_MEMBER(stfight_state,stfight)

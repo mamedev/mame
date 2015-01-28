@@ -34,7 +34,7 @@ public:
 	int m_palbank;
 	UINT8 *m_videoram;
 	int m_flipscreen_old;
-	
+
 	DECLARE_READ8_MEMBER(pastelg_sndrom_r);
 	DECLARE_READ8_MEMBER(pastelg_irq_ack_r);
 	DECLARE_READ8_MEMBER(threeds_inputport1_r);
@@ -45,13 +45,13 @@ public:
 	DECLARE_WRITE8_MEMBER(threeds_output_w);
 	DECLARE_READ8_MEMBER(threeds_rom_readback_r);
 	DECLARE_WRITE8_MEMBER(pastelg_romsel_w);
-	
+
 	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_hackbusyflag_r);
-	
+
 	virtual void machine_start();
 	virtual void video_start();
-	
+
 	DECLARE_PALETTE_INIT(pastelg);
 	UINT32 screen_update_pastelg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int pastelg_blitter_src_addr_r();
@@ -61,4 +61,3 @@ public:
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
-

@@ -57,7 +57,7 @@ protected:
 	void *find_memshare(UINT8 width, size_t &bytes, bool required);
 	bool report_missing(bool found, const char *objname, bool required);
 
-    void printf_warning(const char *format, ...) ATTR_PRINTF(2,3);
+	void printf_warning(const char *format, ...) ATTR_PRINTF(2,3);
 
 	// internal state
 	finder_base *m_next;

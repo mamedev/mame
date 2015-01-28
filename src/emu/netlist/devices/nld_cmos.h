@@ -21,11 +21,11 @@ class nld_vdd_vss : public netlist_device_t
 
 	protected:
 		ATTR_HOT void update() {};
-        ATTR_HOT void start()
-        {
-            register_input("VDD,", m_vdd);
-            register_input("VSS,", m_vss);
-        };
+		ATTR_HOT void start()
+		{
+			register_input("VDD,", m_vdd);
+			register_input("VSS,", m_vss);
+		};
 		ATTR_HOT void reset()  {};
 
 public:

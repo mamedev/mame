@@ -48,12 +48,12 @@ enum
 
 static inline bool is_opaque(const float &a)
 {
-    return (a >= 1.0f);
+	return (a >= 1.0f);
 }
 
 static inline bool is_transparent(const float &a)
 {
-    return (a <  0.0001f);
+	return (a <  0.0001f);
 }
 
 //============================================================
@@ -63,11 +63,11 @@ static inline bool is_transparent(const float &a)
 
 struct quad_setup_data
 {
-    quad_setup_data()
-    : dudx(0), dvdx(0), dudy(0), dvdy(0), startu(0), startv(0),
-      rotwidth(0), rotheight(0)
-    {}
-    void compute(const render_primitive &prim);
+	quad_setup_data()
+	: dudx(0), dvdx(0), dudy(0), dvdy(0), startu(0), startv(0),
+		rotwidth(0), rotheight(0)
+	{}
+	void compute(const render_primitive &prim);
 
 	INT32           dudx, dvdx, dudy, dvdy;
 	INT32           startu, startv;
@@ -105,16 +105,16 @@ struct sdl_info;
 /* texture_info holds information about a texture */
 class texture_info
 {
-    friend class simple_list<texture_info>;
+	friend class simple_list<texture_info>;
 public:
-    texture_info(SDL_Renderer *renderer, const render_texinfo &texsource, const quad_setup_data &setup, const UINT32 flags);
-    ~texture_info();
+	texture_info(SDL_Renderer *renderer, const render_texinfo &texsource, const quad_setup_data &setup, const UINT32 flags);
+	~texture_info();
 
-    void set_data(const render_texinfo &texsource, const UINT32 flags);
-    void render_quad(const render_primitive *prim, const int x, const int y);
-    bool matches(const render_primitive &prim, const quad_setup_data &setup);
+	void set_data(const render_texinfo &texsource, const UINT32 flags);
+	void render_quad(const render_primitive *prim, const int x, const int y);
+	bool matches(const render_primitive &prim, const quad_setup_data &setup);
 
-    copy_info_t *compute_size_type();
+	copy_info_t *compute_size_type();
 
 	void                *m_pixels;            // pixels for the texture
 	int                 m_pitch;
@@ -125,49 +125,49 @@ public:
 	osd_ticks_t         m_last_access;
 
 	int raw_width() const { return m_texinfo.width; }
-    int raw_height() const { return m_texinfo.height; }
+	int raw_height() const { return m_texinfo.height; }
 
-    texture_info *next() { return m_next; }
-    const render_texinfo &texinfo() const { return m_texinfo; }
-    render_texinfo &texinfo() { return m_texinfo; }
+	texture_info *next() { return m_next; }
+	const render_texinfo &texinfo() const { return m_texinfo; }
+	render_texinfo &texinfo() { return m_texinfo; }
 
-    const HashT hash() const { return m_hash; }
-    const UINT32 flags() const { return m_flags; }
-    const bool is_pixels_owned() const { // do we own / allocated it ?
-        return false && ((m_sdl_access == SDL_TEXTUREACCESS_STATIC)
-                && (m_copyinfo->func != NULL)) ;
-    }
+	const HashT hash() const { return m_hash; }
+	const UINT32 flags() const { return m_flags; }
+	const bool is_pixels_owned() const { // do we own / allocated it ?
+		return false && ((m_sdl_access == SDL_TEXTUREACCESS_STATIC)
+				&& (m_copyinfo->func != NULL)) ;
+	}
 
 private:
-    Uint32              m_sdl_access;
-    SDL_Renderer *      m_renderer;
-    render_texinfo      m_texinfo;            // copy of the texture info
-    HashT               m_hash;               // hash value for the texture (must be >= pointer size)
-    UINT32              m_flags;              // rendering flags
+	Uint32              m_sdl_access;
+	SDL_Renderer *      m_renderer;
+	render_texinfo      m_texinfo;            // copy of the texture info
+	HashT               m_hash;               // hash value for the texture (must be >= pointer size)
+	UINT32              m_flags;              // rendering flags
 
-    SDL_Texture *       m_texture_id;
-    int                 m_is_rotated;
+	SDL_Texture *       m_texture_id;
+	int                 m_is_rotated;
 
-    int                 m_format;             // texture format
-    SDL_BlendMode       m_sdl_blendmode;
+	int                 m_format;             // texture format
+	SDL_BlendMode       m_sdl_blendmode;
 
-    texture_info *      m_next;               // next texture in the list
+	texture_info *      m_next;               // next texture in the list
 };
 
 /* sdl_info is the information about SDL for the current screen */
 struct sdl_info
 {
-    sdl_info()
-    : m_blittimer(0), m_renderer(NULL),
-      m_hofs(0), m_vofs(0),
-      m_resize_pending(0), m_resize_width(0), m_resize_height(0),
-      m_last_blit_time(0), m_last_blit_pixels(0)
-    {}
+	sdl_info()
+	: m_blittimer(0), m_renderer(NULL),
+		m_hofs(0), m_vofs(0),
+		m_resize_pending(0), m_resize_width(0), m_resize_height(0),
+		m_last_blit_time(0), m_last_blit_pixels(0)
+	{}
 
-    void render_quad(texture_info *texture, const render_primitive *prim, const int x, const int y);
+	void render_quad(texture_info *texture, const render_primitive *prim, const int x, const int y);
 
-    texture_info *texture_find(const render_primitive &prim, const quad_setup_data &setup);
-    texture_info *texture_update(const render_primitive &prim);
+	texture_info *texture_find(const render_primitive &prim, const quad_setup_data &setup);
+	texture_info *texture_update(const render_primitive &prim);
 
 	INT32           m_blittimer;
 
@@ -389,46 +389,46 @@ void texture_info::render_quad(const render_primitive *prim, const int x, const 
 	target_rect.w = round_nearest(prim->bounds.x1 - prim->bounds.x0);
 	target_rect.h = round_nearest(prim->bounds.y1 - prim->bounds.y0);
 
-    SDL_SetTextureBlendMode(m_texture_id, m_sdl_blendmode);
-    set_coloralphamode(m_texture_id, &prim->color);
-    SDL_RenderCopy(m_renderer,  m_texture_id, NULL, &target_rect);
+	SDL_SetTextureBlendMode(m_texture_id, m_sdl_blendmode);
+	set_coloralphamode(m_texture_id, &prim->color);
+	SDL_RenderCopy(m_renderer,  m_texture_id, NULL, &target_rect);
 }
 
 void sdl_info::render_quad(texture_info *texture, const render_primitive *prim, const int x, const int y)
 {
-    SDL_Rect target_rect;
+	SDL_Rect target_rect;
 
-    target_rect.x = x;
-    target_rect.y = y;
-    target_rect.w = round_nearest(prim->bounds.x1 - prim->bounds.x0);
-    target_rect.h = round_nearest(prim->bounds.y1 - prim->bounds.y0);
+	target_rect.x = x;
+	target_rect.y = y;
+	target_rect.w = round_nearest(prim->bounds.x1 - prim->bounds.x0);
+	target_rect.h = round_nearest(prim->bounds.y1 - prim->bounds.y0);
 
-    if (texture)
-    {
-        copy_info_t *copyinfo = texture->m_copyinfo;
-        copyinfo->time -= osd_ticks();
-        texture->render_quad(prim, x, y);
-        copyinfo->time += osd_ticks();
+	if (texture)
+	{
+		copy_info_t *copyinfo = texture->m_copyinfo;
+		copyinfo->time -= osd_ticks();
+		texture->render_quad(prim, x, y);
+		copyinfo->time += osd_ticks();
 
-        copyinfo->pixel_count += MAX(STAT_PIXEL_THRESHOLD , (texture->raw_width() * texture->raw_height()));
-        if (m_last_blit_pixels)
-        {
-            copyinfo->time += (m_last_blit_time * (INT64) (texture->raw_width() * texture->raw_height())) / (INT64) m_last_blit_pixels;
-        }
-        copyinfo->samples++;
-        copyinfo->perf = ( texture->m_copyinfo->pixel_count * (osd_ticks_per_second()/1000)) / texture->m_copyinfo->time;
-    }
-    else
-    {
-        UINT32 sr = (UINT32)(255.0f * prim->color.r);
-        UINT32 sg = (UINT32)(255.0f * prim->color.g);
-        UINT32 sb = (UINT32)(255.0f * prim->color.b);
-        UINT32 sa = (UINT32)(255.0f * prim->color.a);
+		copyinfo->pixel_count += MAX(STAT_PIXEL_THRESHOLD , (texture->raw_width() * texture->raw_height()));
+		if (m_last_blit_pixels)
+		{
+			copyinfo->time += (m_last_blit_time * (INT64) (texture->raw_width() * texture->raw_height())) / (INT64) m_last_blit_pixels;
+		}
+		copyinfo->samples++;
+		copyinfo->perf = ( texture->m_copyinfo->pixel_count * (osd_ticks_per_second()/1000)) / texture->m_copyinfo->time;
+	}
+	else
+	{
+		UINT32 sr = (UINT32)(255.0f * prim->color.r);
+		UINT32 sg = (UINT32)(255.0f * prim->color.g);
+		UINT32 sb = (UINT32)(255.0f * prim->color.b);
+		UINT32 sa = (UINT32)(255.0f * prim->color.a);
 
-        SDL_SetRenderDrawBlendMode(m_renderer, map_blendmode(PRIMFLAG_GET_BLENDMODE(prim->flags)));
-        SDL_SetRenderDrawColor(m_renderer, sr, sg, sb, sa);
-        SDL_RenderFillRect(m_renderer, &target_rect);
-    }
+		SDL_SetRenderDrawBlendMode(m_renderer, map_blendmode(PRIMFLAG_GET_BLENDMODE(prim->flags)));
+		SDL_SetRenderDrawColor(m_renderer, sr, sg, sb, sa);
+		SDL_RenderFillRect(m_renderer, &target_rect);
+	}
 }
 
 static int RendererSupportsFormat(SDL_Renderer *renderer, Uint32 format, Uint32 access, const char *sformat)
@@ -518,18 +518,18 @@ int drawsdl2_init(running_machine &machine, sdl_draw_info *callbacks)
 	else
 		osd_printf_verbose("Loaded opengl shared library: %s\n", stemp ? stemp : "<default>");
 
-    /* Enable bilinear filtering in case it is supported.
-     * This applies to all texture operations. However, artwort is pre-scaled
-     * and thus shouldn't be affected.
-     */
-    if (video_config.filter)
-    {
-        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
-    }
-    else
-    {
-        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
-    }
+	/* Enable bilinear filtering in case it is supported.
+	 * This applies to all texture operations. However, artwort is pre-scaled
+	 * and thus shouldn't be affected.
+	 */
+	if (video_config.filter)
+	{
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+	}
+	else
+	{
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+	}
 
 	return 0;
 }
@@ -604,7 +604,7 @@ static int drawsdl2_window_create(sdl_window_info *window, int width, int height
 	{
 		SDL_DisplayMode mode;
 		//SDL_GetCurrentDisplayMode(window->monitor()->handle, &mode);
-        SDL_GetWindowDisplayMode(window->sdl_window, &mode);
+		SDL_GetWindowDisplayMode(window->sdl_window, &mode);
 		sdl->m_original_mode = mode;
 		mode.w = width;
 		mode.h = height;
@@ -630,13 +630,13 @@ static int drawsdl2_window_create(sdl_window_info *window, int width, int height
 				osd_printf_warning("Ignoring depth %d\n", window->depth);
 			}
 		}
-        SDL_SetWindowDisplayMode(window->sdl_window, &mode);    // Try to set mode
+		SDL_SetWindowDisplayMode(window->sdl_window, &mode);    // Try to set mode
 #ifndef SDLMAME_WIN32
-        /* FIXME: Warp the mouse to 0,0 in case a virtual desktop resolution
-         * is in place after the mode switch - which will most likely be the case
-         * This is a hack to work around a deficiency in SDL2
-         */
-        SDL_WarpMouseInWindow(window->sdl_window, 1, 1);
+		/* FIXME: Warp the mouse to 0,0 in case a virtual desktop resolution
+		 * is in place after the mode switch - which will most likely be the case
+		 * This is a hack to work around a deficiency in SDL2
+		 */
+		SDL_WarpMouseInWindow(window->sdl_window, 1, 1);
 #endif
 	}
 	else
@@ -736,7 +736,7 @@ static int drawsdl2_window_draw(sdl_window_info *window, UINT32 dc, int update)
 		SDL_GetWindowSize(window->sdl_window, &window->width, &window->height);
 		sdl->m_resize_pending = 0;
 		SDL_RenderSetViewport(sdl->m_renderer, NULL);
-	    //sdlvideo_monitor_refresh(window->monitor());
+		//sdlvideo_monitor_refresh(window->monitor());
 
 	}
 
@@ -855,14 +855,14 @@ static void drawsdl2_window_destroy(sdl_window_info *window)
 
 	drawsdl2_destroy_all_textures(window);
 
-    if (window->fullscreen() && video_config.switchres)
-    {
-        SDL_SetWindowFullscreen(window->sdl_window, 0);    // Try to set mode
-        SDL_SetWindowDisplayMode(window->sdl_window, &sdl->m_original_mode);    // Try to set mode
-        SDL_SetWindowFullscreen(window->sdl_window, SDL_WINDOW_FULLSCREEN);    // Try to set mode
-    }
+	if (window->fullscreen() && video_config.switchres)
+	{
+		SDL_SetWindowFullscreen(window->sdl_window, 0);    // Try to set mode
+		SDL_SetWindowDisplayMode(window->sdl_window, &sdl->m_original_mode);    // Try to set mode
+		SDL_SetWindowFullscreen(window->sdl_window, SDL_WINDOW_FULLSCREEN);    // Try to set mode
+	}
 
-    SDL_DestroyWindow(window->sdl_window);
+	SDL_DestroyWindow(window->sdl_window);
 
 	global_free(sdl);
 	window->dxdata = NULL;
@@ -889,7 +889,7 @@ copy_info_t *texture_info::compute_size_type()
 		{
 			if (RendererSupportsFormat(m_renderer, bi->dst_fmt, m_sdl_access, bi->dstname))
 			{
-			    int perf = bi->perf;
+				int perf = bi->perf;
 				if (perf == 0)
 					return bi;
 				else if (perf > (maxperf * 102) / 100)
@@ -920,15 +920,15 @@ copy_info_t *texture_info::compute_size_type()
 
 bool texture_info::matches(const render_primitive &prim, const quad_setup_data &setup)
 {
-    return  texinfo().base == prim.texture.base &&
-            texinfo().width == prim.texture.width &&
-            texinfo().height == prim.texture.height &&
-            texinfo().rowpixels == prim.texture.rowpixels &&
-            m_setup.dudx == setup.dudx &&
-            m_setup.dvdx == setup.dvdx &&
-            m_setup.dudy == setup.dudy &&
-            m_setup.dvdy == setup.dvdy &&
-            ((flags() ^ prim.flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0;
+	return  texinfo().base == prim.texture.base &&
+			texinfo().width == prim.texture.width &&
+			texinfo().height == prim.texture.height &&
+			texinfo().rowpixels == prim.texture.rowpixels &&
+			m_setup.dudx == setup.dudx &&
+			m_setup.dvdx == setup.dvdx &&
+			m_setup.dudy == setup.dudy &&
+			m_setup.dvdy == setup.dvdy &&
+			((flags() ^ prim.flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0;
 }
 
 //============================================================
@@ -937,9 +937,8 @@ bool texture_info::matches(const render_primitive &prim, const quad_setup_data &
 
 texture_info::texture_info(SDL_Renderer *renderer, const render_texinfo &texsource, const quad_setup_data &setup, UINT32 flags)
 {
-
 	// fill in the core data
-    m_renderer = renderer;
+	m_renderer = renderer;
 	m_hash = texture_compute_hash(texsource, flags);
 	m_flags = flags;
 	m_texinfo = texsource;
@@ -997,10 +996,10 @@ texture_info::texture_info(SDL_Renderer *renderer, const render_texinfo &texsour
 
 	if (m_sdl_access == SDL_TEXTUREACCESS_STATIC)
 	{
-	    if (m_copyinfo->func != NULL)
-	        m_pixels = malloc(m_setup.rotwidth * m_setup.rotheight * m_copyinfo->dst_bpp);
-	    else
-	        m_pixels = NULL;
+		if (m_copyinfo->func != NULL)
+			m_pixels = malloc(m_setup.rotwidth * m_setup.rotheight * m_copyinfo->dst_bpp);
+		else
+			m_pixels = NULL;
 	}
 	m_last_access = osd_ticks();
 
@@ -1008,9 +1007,9 @@ texture_info::texture_info(SDL_Renderer *renderer, const render_texinfo &texsour
 
 texture_info::~texture_info()
 {
-    if ( is_pixels_owned() && (m_pixels != NULL) )
-        free(m_pixels);
-    SDL_DestroyTexture(m_texture_id);
+	if ( is_pixels_owned() && (m_pixels != NULL) )
+		free(m_pixels);
+	SDL_DestroyTexture(m_texture_id);
 }
 
 //============================================================
@@ -1082,9 +1081,9 @@ void quad_setup_data::compute(const render_primitive &prim)
 
 #if 0
 	printf("tl.u %f tl.v %f\n", texcoords->tl.u, texcoords->tl.v);
-    printf("tr.u %f tr.v %f\n", texcoords->tr.u, texcoords->tr.v);
-    printf("bl.u %f bl.v %f\n", texcoords->bl.u, texcoords->bl.v);
-    printf("br.u %f br.v %f\n", texcoords->br.u, texcoords->br.v);
+	printf("tr.u %f tr.v %f\n", texcoords->tr.u, texcoords->tr.v);
+	printf("bl.u %f bl.v %f\n", texcoords->bl.u, texcoords->bl.v);
+	printf("br.u %f br.v %f\n", texcoords->br.u, texcoords->br.v);
 	/* compute start and delta U,V coordinates now */
 #endif
 
@@ -1162,7 +1161,7 @@ texture_info * sdl_info::texture_update(const render_primitive &prim)
 	if (texture == NULL && prim.texture.base != NULL)
 	{
 		texture = global_alloc(texture_info(m_renderer, prim.texture, setup, prim.flags));
-	    /* add us to the texture list */
+		/* add us to the texture list */
 		m_texlist.prepend(*texture);
 
 	}
@@ -1191,9 +1190,9 @@ static void drawsdl2_destroy_all_textures(sdl_window_info *window)
 	if(window->primlist)
 	{
 		window->primlist->acquire_lock();
-        sdl->m_texlist.reset();
-        window->primlist->release_lock();
+		sdl->m_texlist.reset();
+		window->primlist->release_lock();
 	}
 	else
-        sdl->m_texlist.reset();
+		sdl->m_texlist.reset();
 }

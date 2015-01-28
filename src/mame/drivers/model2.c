@@ -2491,7 +2491,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( model2a_0229, model2a )
 	MCFG_DEVICE_ADD("317_0229", SEGA315_5838_COMP, 0)
-//	MCFG_SET_5838_READ_CALLBACK(model2_state, crypt_read_callback)
+//  MCFG_SET_5838_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
 READ8_MEMBER(model2_state::driveio_port_r)
@@ -2599,7 +2599,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( model2b_0229, model2b )
 	MCFG_DEVICE_ADD("317_0229", SEGA315_5838_COMP, 0)
-//	MCFG_SET_5838_READ_CALLBACK(model2_state, crypt_read_callback)
+//  MCFG_SET_5838_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
 
@@ -5890,7 +5890,7 @@ ROM_START( desert ) /* Desert Tank, Model 2 */
 ROM_END
 
 DRIVER_INIT_MEMBER(model2_state,genprot)
-{	
+{
 	//astring key = parameter(":315_5881:key");
 	m_maincpu->space(AS_PROGRAM).install_ram(0x01d80000, 0x01d8ffff);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x01d90000, 0x01d9ffff, read32_delegate(FUNC(model2_state::model2_5881prot_r), this), write32_delegate(FUNC(model2_state::model2_5881prot_w), this));
@@ -5947,7 +5947,7 @@ WRITE32_MEMBER(model2_state::jaleco_network_w)
 
 DRIVER_INIT_MEMBER(model2_state,sgt24h)
 {
-//	DRIVER_INIT_CALL(genprot);
+//  DRIVER_INIT_CALL(genprot);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x01a10000, 0x01a1ffff, read32_delegate(FUNC(model2_state::jaleco_network_r),this), write32_delegate(FUNC(model2_state::jaleco_network_w),this));
 
@@ -5965,7 +5965,7 @@ DRIVER_INIT_MEMBER(model2_state,overrev)
 DRIVER_INIT_MEMBER(model2_state,doa)
 {
 	m_0229crypt->install_doa_protection();
-	
+
 	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
 	ROM[0x630/4] = 0x08000004;
 	ROM[0x808/4] = 0x08000004;

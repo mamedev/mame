@@ -388,7 +388,7 @@ int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 {
 	ULONG rc;
 	ULONG timeout_param;
-	
+
 	if (timeout == OSD_EVENT_WAIT_INFINITE)
 		timeout_param = SEM_INDEFINITE_WAIT;
 	else

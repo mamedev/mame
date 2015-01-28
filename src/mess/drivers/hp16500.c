@@ -19,7 +19,7 @@
     MC68000 @ 10 MHz
     MC68A45 CRTC
     Z0765A08PSC floppy controller (NEC765 type)
-	TMS9914A GPIB bus interface
+    TMS9914A GPIB bus interface
     SCN2661 DUART/timer
 
   16500b:
@@ -50,10 +50,10 @@
 #include "video/mc6845.h"
 #include "machine/mc68681.h"
 
-#define MAINCPU_TAG	"maincpu"
-#define CRTC_TAG	"crtc"
-#define SCREEN_TAG	"screen"
-#define DUART_TAG	"duart"
+#define MAINCPU_TAG "maincpu"
+#define CRTC_TAG    "crtc"
+#define SCREEN_TAG  "screen"
+#define DUART_TAG   "duart"
 
 class hp16500_state : public driver_device
 {

@@ -175,7 +175,7 @@ DEVICE_ADDRESS_MAP_START( map, 16, gp9001vdp_device )
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(gp9001_fg_tmap_w) AM_SHARE("vram_fg")
 	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(gp9001_top_tmap_w) AM_SHARE("vram_top")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("spriteram") AM_MIRROR(0x0800)
-//	AM_RANGE(0x3800, 0x3fff) AM_RAM // sprite mirror?
+//  AM_RANGE(0x3800, 0x3fff) AM_RAM // sprite mirror?
 ADDRESS_MAP_END
 
 

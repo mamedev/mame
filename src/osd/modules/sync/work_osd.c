@@ -70,22 +70,22 @@ typedef void *PVOID;
 template<typename _PtrType>
 static void spin_while(const volatile _PtrType * volatile ptr, const _PtrType val, const osd_ticks_t timeout, const int invert = 0)
 {
-    osd_ticks_t stopspin = osd_ticks() + timeout;
+	osd_ticks_t stopspin = osd_ticks() + timeout;
 
-    do {
-        int spin = 10000;
-        while (--spin)
-        {
-            if ((*ptr != val) ^ invert)
-                return;
-        }
-    } while (((*ptr == val) ^ invert) && osd_ticks() < stopspin);
+	do {
+		int spin = 10000;
+		while (--spin)
+		{
+			if ((*ptr != val) ^ invert)
+				return;
+		}
+	} while (((*ptr == val) ^ invert) && osd_ticks() < stopspin);
 }
 
 template<typename _PtrType>
 static void spin_while_not(const volatile _PtrType * volatile ptr, const _PtrType val, const osd_ticks_t timeout)
 {
-    spin_while(ptr, val, timeout, 1);
+	spin_while(ptr, val, timeout, 1);
 }
 
 
@@ -553,7 +553,7 @@ int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 	if (item->event == NULL)
 	{
 		// TODO: do we need to measure the spin time here as well? and how can we do it?
-        spin_while(&item->done, 0, timeout);
+		spin_while(&item->done, 0, timeout);
 	}
 
 	// otherwise, block on the event until done

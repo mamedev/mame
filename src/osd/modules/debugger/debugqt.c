@@ -37,23 +37,23 @@
 class debug_qt : public osd_module, public debug_module
 {
 public:
-    debug_qt()
-    : osd_module(OSD_DEBUG_PROVIDER, "qt"), debug_module(),
-      m_machine(NULL)
-    {
-    }
+	debug_qt()
+	: osd_module(OSD_DEBUG_PROVIDER, "qt"), debug_module(),
+		m_machine(NULL)
+	{
+	}
 
-    virtual ~debug_qt() { }
+	virtual ~debug_qt() { }
 
-    virtual int init() { return 0;}
-    virtual void exit() { }
+	virtual int init() { return 0;}
+	virtual void exit() { }
 
-    virtual void init_debugger(running_machine &machine);
-    virtual void wait_for_debugger(device_t &device, bool firststop);
-    virtual void debugger_update();
+	virtual void init_debugger(running_machine &machine);
+	virtual void wait_for_debugger(device_t &device, bool firststop);
+	virtual void debugger_update();
 
 private:
-    running_machine *m_machine;
+	running_machine *m_machine;
 };
 
 //============================================================
@@ -357,7 +357,7 @@ void debug_qt::debugger_update()
 }
 
 #else /* SDLMAME_UNIX */
-    MODULE_NOT_SUPPORTED(debug_qt, OSD_DEBUG_PROVIDER, "qt")
+	MODULE_NOT_SUPPORTED(debug_qt, OSD_DEBUG_PROVIDER, "qt")
 #endif
 
 MODULE_DEFINITION(DEBUG_QT, debug_qt)

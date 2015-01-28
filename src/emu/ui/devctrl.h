@@ -9,9 +9,9 @@
     printers)
     The base class contains calls to get the total number of devices of
     the same kind connected to the driver, and shortcuts to switch current
-    device to next one or previous one attached. This allows, for instance, 
-    users to pass from a device to another one by simply pressing left/right 
-    and the menu is rebuilt accordingly, without the need of a preliminary 
+    device to next one or previous one attached. This allows, for instance,
+    users to pass from a device to another one by simply pressing left/right
+    and the menu is rebuilt accordingly, without the need of a preliminary
     submenu listing available devices of the same kind.
 
     Copyright Nicola Salmoria and the MAME Team.

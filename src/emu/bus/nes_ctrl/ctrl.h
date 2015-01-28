@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    Nintendo Family Computer & Entertainment System controller port 
+    Nintendo Family Computer & Entertainment System controller port
     emulation
 
     Copyright MESS Team.
@@ -32,12 +32,12 @@ public:
 	// construction/destruction
 	device_nes_control_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_nes_control_port_interface();
-	
+
 	virtual UINT8 read_bit0() { return 0; };
 	virtual UINT8 read_bit34() { return 0; };
 	virtual UINT8 read_exp(offs_t offset) { return 0; };
 	virtual void write(UINT8 data) { };
-	
+
 protected:
 	nes_control_port_device *m_port;
 };

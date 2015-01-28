@@ -316,7 +316,7 @@ MACHINE_START_MEMBER(a2600_state,a2600)
 
 	/* Banks may have changed, reset the cpu so it uses the correct reset vector */
 	m_maincpu->reset();
-	
+
 	save_item(NAME(m_current_screen_height));
 }
 

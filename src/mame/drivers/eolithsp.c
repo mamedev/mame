@@ -84,7 +84,7 @@ void eolith_state::init_speedup()
 		}
 		n_game++;
 	}
-	
+
 	save_item(NAME(m_speedup_vblank));
 	save_item(NAME(m_speedup_scanline));
 }

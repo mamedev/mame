@@ -154,9 +154,9 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 
 	#if defined(SDLMAME_WIN32)
 	SDL_GetDesktopDisplayMode(monitor->handle, &dmode);
-    #else
-    SDL_GetCurrentDisplayMode(monitor->handle, &dmode);
-    #endif
+	#else
+	SDL_GetCurrentDisplayMode(monitor->handle, &dmode);
+	#endif
 	monitor->monitor_width = dmode.w;
 	monitor->monitor_height = dmode.h;
 	monitor->center_width = dmode.w;

@@ -24,7 +24,7 @@ public:
 		m_paletteram(*this, "palette"),
 		m_robocop_shared_ram(*this, "robocop_shared"),
 		m_hippodrm_shared_ram(*this, "hippodrm_shared") { }
-		
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_subcpu;
@@ -77,7 +77,7 @@ public:
 	DECLARE_READ16_MEMBER(ffantasybl_242024_r);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq2);
-	
+
 	DECLARE_DRIVER_INIT(robocop);
 	DECLARE_DRIVER_INIT(hippodrm);
 	DECLARE_DRIVER_INIT(hbarrel);
@@ -86,12 +86,12 @@ public:
 	DECLARE_DRIVER_INIT(baddudes);
 	DECLARE_DRIVER_INIT(midresb);
 	DECLARE_DRIVER_INIT(ffantasybl);
-	
+
 	virtual void machine_start();
 	DECLARE_MACHINE_RESET(slyspy);
 	DECLARE_VIDEO_START(dec0);
 	DECLARE_VIDEO_START(dec0_nodma);
-	
+
 	UINT32 screen_update_hbarrel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_baddudes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_birdtry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -99,7 +99,7 @@ public:
 	UINT32 screen_update_hippodrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_slyspy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_midres(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	void baddudes_i8751_write(int data);
 	void birdtry_i8751_write(int data);
 	void dec0_i8751_write(int data);
@@ -118,7 +118,7 @@ public:
 	UINT8 m_automat_adpcm_byte;
 	int m_automat_msm5205_vclk_toggle;
 	UINT16 m_automat_scroll_regs[4];
-	
+
 	DECLARE_WRITE16_MEMBER(automat_control_w);
 	DECLARE_WRITE8_MEMBER(automat_adpcm_w);
 	DECLARE_READ16_MEMBER( automat_palette_r );
@@ -128,9 +128,9 @@ public:
 		COMBINE_DATA(&m_automat_scroll_regs[offset]);
 	}
 	DECLARE_WRITE_LINE_MEMBER(automat_vclk_cb);
-	
+
 	virtual void machine_start();
-	
+
 	UINT32 screen_update_automat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_secretab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

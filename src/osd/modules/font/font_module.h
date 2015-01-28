@@ -18,8 +18,8 @@
 class font_module
 {
 public:
-    virtual ~font_module() { }
-    virtual osd_font *font_alloc() = 0;
+	virtual ~font_module() { }
+	virtual osd_font *font_alloc() = 0;
 };
 
 

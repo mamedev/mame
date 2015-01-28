@@ -60,7 +60,7 @@ public:
 	ATTR_COLD ~plinearlist_t()
 	{
 		if (m_list != NULL)
-		    nl_free_array(m_list);
+			nl_free_array(m_list);
 		m_list = NULL;
 	}
 
@@ -183,7 +183,7 @@ private:
 		else
 		{
 			if (m_list != NULL)
-			    nl_free_array(m_list);
+				nl_free_array(m_list);
 			m_list = NULL;
 			m_count = 0;
 		}

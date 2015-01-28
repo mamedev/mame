@@ -152,7 +152,6 @@ osd_directory *osd_opendir(const char *dirname)
 
 	if (tmpstr[0] == '$')
 	{
-
 		envstr = (char *) osd_malloc_array(strlen(tmpstr)+1);
 
 		strcpy(envstr, tmpstr);

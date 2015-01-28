@@ -1,8 +1,8 @@
 /**********************************************************************
 
     Nintendo Family Computer Hori Twin (and 4P?) adapters
- 
-    Emulation of the 4Players adapter is quite pointless: if 2P mode 
+
+    Emulation of the 4Players adapter is quite pointless: if 2P mode
     (default mode) it behaves like a Hori Twin adapter, in 4P mode
     it has P1 and P2 inputs overwriting the inputs coming from the
     main controllers (possibly creating a bit of confusion, since
@@ -117,9 +117,9 @@ nes_hori4p_device::nes_hori4p_device(const machine_config &mconfig, const char *
 UINT8 nes_horitwin_device::read_exp(offs_t offset)
 {
 	UINT8 ret = 0;
-	if (offset == 0)	//$4016
+	if (offset == 0)    //$4016
 		ret |= (m_port1->read_bit0() << 1);
-	else	//$4017
+	else    //$4017
 		ret |= (m_port2->read_bit0() << 1);
 	return ret;
 }
@@ -127,21 +127,21 @@ UINT8 nes_horitwin_device::read_exp(offs_t offset)
 UINT8 nes_hori4p_device::read_exp(offs_t offset)
 {
 	UINT8 ret = 0;
-	if (m_cfg->read() == 0)	// 2P
+	if (m_cfg->read() == 0) // 2P
 	{
-		if (offset == 0)	//$4016
+		if (offset == 0)    //$4016
 			ret |= (m_port1->read_bit0() << 1);
-		else	//$4017
+		else    //$4017
 			ret |= (m_port2->read_bit0() << 1);
 	}
-	else	// 4P
+	else    // 4P
 	{
-		if (offset == 0)	//$4016
+		if (offset == 0)    //$4016
 		{
 			ret |= (m_port1->read_bit0() << 0);
 			ret |= (m_port3->read_bit0() << 1);
 		}
-		else	//$4017
+		else    //$4017
 		{
 			ret |= (m_port2->read_bit0() << 0);
 			ret |= (m_port4->read_bit0() << 1);
