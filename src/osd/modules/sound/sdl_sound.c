@@ -12,7 +12,7 @@
 #include "sound_module.h"
 #include "modules/osdmodule.h"
 
-#if (!defined(SDLMAME_EMSCRIPTEN)) && (!defined(OSD_WINDOWS))
+#if (!defined(OSD_WINDOWS))
 
 // standard sdl header
 #include "../../sdl/sdlinc.h"
