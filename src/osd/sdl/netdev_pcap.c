@@ -3,18 +3,22 @@
 #else
 
 #include <pcap.h>
+
+static int (*pcap_compile_dl)(pcap_t *, struct bpf_program *, char *, int, bpf_u_int32) = NULL;
+static int (*pcap_findalldevs_dl)(pcap_if_t **, char *) = NULL;
+static pcap_t *(*pcap_open_live_dl)(const char *name, int, int, int, char *) = NULL;
+static int (*pcap_next_ex_dl)(pcap_t *, struct pcap_pkthdr **, const u_char **) = NULL;
+static void (*pcap_close_dl)(pcap_t *) = NULL;
+static int (*pcap_setfilter_dl)(pcap_t *, struct bpf_program *) = NULL;
+static int (*pcap_sendpacket_dl)(pcap_t *, u_char *, int) = NULL;
+static int (*pcap_set_datalink_dl)(pcap_t *, int) = NULL;
+
+#include <dlfcn.h>
+
 #include "emu.h"
 #include "osdnet.h"
 
-#define pcap_compile_dl pcap_compile
-#define pcap_findalldevs_dl pcap_findalldevs
-#define pcap_open_live_dl pcap_open_live
-#define pcap_next_ex_dl pcap_next_ex
-#define pcap_close_dl pcap_close
-#define pcap_setfilter_dl pcap_setfilter
-#define pcap_sendpacket_dl pcap_sendpacket
-#define pcap_set_datalink_dl pcap_set_datalink
-
+static void *handle = NULL;
 
 class netdev_pcap : public netdev
 {
@@ -92,8 +96,37 @@ void init_pcap()
 {
 	pcap_if_t *devs;
 	char errbuf[PCAP_ERRBUF_SIZE];
+	handle = NULL;
+
+	try
+	{
+		if(!(handle = dlopen("libpcap.so", RTLD_LAZY))) throw dlerror();
+		if(!(pcap_findalldevs_dl = (int (*)(pcap_if_t **, char *))dlsym(handle, "pcap_findalldevs")))
+			throw dlerror();
+		if(!(pcap_open_live_dl = (pcap_t* (*)(const char *, int, int, int, char *))dlsym(handle, "pcap_open_live")))
+			throw dlerror();
+		if(!(pcap_next_ex_dl = (int (*)(pcap_t *, struct pcap_pkthdr **, const u_char **))dlsym(handle, "pcap_next_ex")))
+			throw dlerror();
+		if(!(pcap_compile_dl = (int (*)(pcap_t *, struct bpf_program *, char *, int, bpf_u_int32))dlsym(handle, "pcap_compile")))
+			throw dlerror();
+		if(!(pcap_close_dl = (void (*)(pcap_t *))dlsym(handle, "pcap_close")))
+			throw dlerror();
+		if(!(pcap_setfilter_dl = (int (*)(pcap_t *, struct bpf_program *))dlsym(handle, "pcap_setfilter")))
+			throw dlerror();
+		if(!(pcap_sendpacket_dl = (int (*)(pcap_t *, u_char *, int))dlsym(handle, "pcap_sendpacket")))
+			throw dlerror();
+		if(!(pcap_set_datalink_dl = (int (*)(pcap_t *, int))dlsym(handle, "pcap_set_datalink")))
+			throw dlerror();
+	}
+	catch (const char *e)
+	{
+		dlclose(handle);
+		osd_printf_verbose("Unable to load winpcap: %s\n", e);
+		return;
+	}
 	if(pcap_findalldevs_dl(&devs, errbuf) == -1)
 	{
+		dlclose(handle);
 		osd_printf_verbose("Unable to get network devices: %s\n", errbuf);
 		return;
 	}
@@ -108,6 +141,8 @@ void init_pcap()
 void deinit_pcap()
 {
 	clear_netdev();
+	dlclose(handle);
+	handle = NULL;
 }
 
 #endif  // SDLMAME_WIN32
