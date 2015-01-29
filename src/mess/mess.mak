@@ -1499,6 +1499,7 @@ $(MESSOBJ)/parker.a:            \
 	$(MESS_DRIVERS)/merlin.o    \
 	$(MESS_DRIVERS)/splitsec.o  \
 	$(MESS_DRIVERS)/stopthie.o  \
+	$(MESS_DRIVERS)/wildfire.o  \
 
 $(MESSOBJ)/pitronic.a:          \
 	$(MESS_DRIVERS)/beta.o      \
@@ -2215,6 +2216,7 @@ $(MESS_DRIVERS)/votrtnt.o:  $(MESS_LAYOUT)/votrtnt.lh
 $(MESS_DRIVERS)/vk100.o:    $(MESS_LAYOUT)/vk100.lh
 $(MESS_DRIVERS)/vt100.o:    $(MESS_LAYOUT)/vt100.lh
 $(MESS_DRIVERS)/wicat.o:    $(MESS_LAYOUT)/wicat.lh
+$(MESS_DRIVERS)/wildfire.o: $(MESS_LAYOUT)/wildfire.lh
 $(MESS_DRIVERS)/wswan.o:    $(MESS_LAYOUT)/wswan.lh
 $(MESS_DRIVERS)/x68k.o:     $(MESS_LAYOUT)/x68000.lh
 $(MESS_DRIVERS)/z80dev.o:   $(MESS_LAYOUT)/z80dev.lh
