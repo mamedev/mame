@@ -12,6 +12,8 @@
 #ifndef __SDLVIDEO__
 #define __SDLVIDEO__
 
+#include "osdsdl.h"
+
 //============================================================
 //  CONSTANTS
 //============================================================
@@ -56,21 +58,41 @@ struct sdl_mode
 	int                 height;
 };
 
-struct sdl_monitor_info
+class sdl_monitor_info
 {
+public:
 	sdl_monitor_info  * next;                   // pointer to next monitor in list
-#ifdef PTR64
-	UINT64              handle;                 // handle to the monitor
-#else
-	UINT32              handle;                 // handle to the monitor
-#endif
-	int                 monitor_width;
-	int                 monitor_height;
-	char                monitor_device[64];
-	float               aspect;                 // computed/configured aspect ratio of the physical device
-	int                 center_width;           // width of first physical screen for centering
-	int                 center_height;          // height of first physical screen for centering
-	int                 monitor_x;              // X position of this monitor in virtual desktop space (SDL virtual space has them all horizontally stacked, not real geometry)
+
+	const UINT64 handle() { return m_handle; }
+	const SDL_Rect &position_size() { refresh(); return m_dimensions; }
+
+	const char *device() { return m_monitor_device; }
+
+	float aspect();
+	int	center_width() { refresh(); return m_center_width; }
+	int center_height() { refresh(); return m_center_height; }
+
+	void set_aspect(const float aspect) { m_aspect = aspect; }
+
+	// STATIC
+	static void	init();
+	static void exit();
+	static sdl_monitor_info *pick_monitor(sdl_options &options, int index);
+
+private:
+	void refresh();
+
+	UINT64              m_handle;                 // handle to the monitor
+	SDL_Rect			m_dimensions;
+	char                m_monitor_device[64];
+	float               m_aspect;                 // computed/configured aspect ratio of the physical device
+	int                 m_center_width;           // width of first physical screen for centering
+	int                 m_center_height;          // height of first physical screen for centering
+
+	// STATIC
+	static sdl_monitor_info *primary_monitor;
+	static sdl_monitor_info *list;
+
 };
 
 
@@ -136,13 +158,5 @@ struct sdl_video_config
 //============================================================
 
 extern sdl_video_config video_config;
-
-//============================================================
-//  PROTOTYPES
-//============================================================
-
-void sdlvideo_monitor_refresh(sdl_monitor_info *monitor);
-float sdlvideo_monitor_get_aspect(sdl_monitor_info *monitor);
-sdl_monitor_info *sdlvideo_monitor_from_handle(UINT32 monitor); //FIXME: Remove? not referenced
 
 #endif

@@ -558,7 +558,8 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 	//load_gl_lib(window->machine());
 
 	// create the SDL window
-	window->sdl_window = SDL_CreateWindow(window->title, window->monitor()->monitor_x, 0,
+	window->sdl_window = SDL_CreateWindow(window->title,
+			window->monitor()->position_size().x, window->monitor()->position_size().y,
 			width, height, sdl->extra_flags);
 
 	if  (!window->sdl_window )
@@ -570,7 +571,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 	if (window->fullscreen() && video_config.switchres)
 	{
 		SDL_DisplayMode mode;
-		SDL_GetCurrentDisplayMode(window->monitor()->handle, &mode);
+		SDL_GetCurrentDisplayMode(window->monitor()->handle(), &mode);
 		mode.w = width;
 		mode.h = height;
 		if (window->refresh)
@@ -842,7 +843,7 @@ static int drawogl_xy_to_render_target(sdl_window_info *window, int x, int y, in
 
 static void drawogl_set_target_bounds(sdl_window_info *window)
 {
-	window->target->set_bounds(window->blitwidth, window->blitheight, sdlvideo_monitor_get_aspect(window->monitor()));
+	window->target->set_bounds(window->blitwidth, window->blitheight, window->monitor()->aspect());
 }
 
 //============================================================
@@ -1312,8 +1313,8 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 
 		if ((window->fullscreen()) && (!video_config.switchres))
 		{
-			ch = window->monitor()->center_height;
-			cw = window->monitor()->center_width;
+			ch = window->monitor()->center_height();
+			cw = window->monitor()->center_width();
 		}
 		else
 		{

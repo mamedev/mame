@@ -593,7 +593,8 @@ static int drawsdl2_window_create(sdl_window_info *window, int width, int height
 	SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
 #endif
 	// create the SDL window
-	window->sdl_window = SDL_CreateWindow(window->title, window->monitor()->monitor_x, 0,
+	window->sdl_window = SDL_CreateWindow(window->title,
+			window->monitor()->position_size().x, window->monitor()->position_size().y,
 			width, height, extra_flags);
 
 	if (window->fullscreen() && video_config.switchres)
@@ -710,7 +711,7 @@ static int drawsdl2_xy_to_render_target(sdl_window_info *window, int x, int y, i
 
 static void drawsdl2_set_target_bounds(sdl_window_info *window)
 {
-	window->target->set_bounds(window->blitwidth, window->blitheight, sdlvideo_monitor_get_aspect(window->monitor()));
+	window->target->set_bounds(window->blitwidth, window->blitheight, window->monitor()->aspect());
 }
 
 //============================================================
@@ -761,8 +762,8 @@ static int drawsdl2_window_draw(sdl_window_info *window, UINT32 dc, int update)
 
 		if ((window->fullscreen()) && (!video_config.switchres))
 		{
-			ch = window->monitor()->center_height;
-			cw = window->monitor()->center_width;
+			ch = window->monitor()->center_height();
+			cw = window->monitor()->center_width();
 		}
 		else
 		{
