@@ -47,6 +47,7 @@ Notes:
 #include "sound/ymf278b.h"
 #include "includes/lordgun.h"
 
+
 /***************************************************************************
 
     Memory Maps - Main
@@ -59,15 +60,15 @@ WRITE16_MEMBER(lordgun_state::lordgun_protection_w)
 	{
 		case 0x00/2: // increment counter
 		{
-			m_lordgun_protection_data++;
-			m_lordgun_protection_data &= 0x1f;
+			m_protection_data++;
+			m_protection_data &= 0x1f;
 
 			return;
 		}
 
 		case 0xc0/2: // reset protection device
 		{
-			m_lordgun_protection_data = 0;
+			m_protection_data = 0;
 
 			return;
 		}
@@ -80,22 +81,22 @@ READ16_MEMBER(lordgun_state::lordgun_protection_r)
 	{
 		case 0x40/2: // bitswap and xor counter
 		{
-			UINT8 x = m_lordgun_protection_data;
+			UINT8 x = m_protection_data;
 
-			m_lordgun_protection_data  = ((( x >> 0) | ( x >> 1)) & 1) << 4;
-			m_lordgun_protection_data |=  ((~x >> 2) & 1) << 3;
-			m_lordgun_protection_data |= (((~x >> 4) | ( x >> 0)) & 1) << 2;
-			m_lordgun_protection_data |=  (( x >> 3) & 1) << 1;
-			m_lordgun_protection_data |= (((~x >> 0) | ( x >> 2)) & 1) << 0;
+			m_protection_data  = ((( x >> 0) | ( x >> 1)) & 1) << 4;
+			m_protection_data |=  ((~x >> 2) & 1) << 3;
+			m_protection_data |= (((~x >> 4) | ( x >> 0)) & 1) << 2;
+			m_protection_data |=  (( x >> 3) & 1) << 1;
+			m_protection_data |= (((~x >> 0) | ( x >> 2)) & 1) << 0;
 
 			return 0;
 		}
 
 		case 0x80/2: // return value if conditions are met
 		{
-			if ((m_lordgun_protection_data & 0x11) == 0x01) return 0x10;
-			if ((m_lordgun_protection_data & 0x06) == 0x02) return 0x10;
-			if ((m_lordgun_protection_data & 0x09) == 0x08) return 0x10;
+			if ((m_protection_data & 0x11) == 0x01) return 0x10;
+			if ((m_protection_data & 0x06) == 0x02) return 0x10;
+			if ((m_protection_data & 0x09) == 0x08) return 0x10;
 
 			return 0;
 		}
@@ -110,7 +111,7 @@ WRITE16_MEMBER(lordgun_state::aliencha_protection_w)
 	{
 		case 0xc0/2: // reset protection device
 		{
-			m_lordgun_protection_data = 0;
+			m_protection_data = 0;
 
 			return;
 		}
@@ -123,30 +124,30 @@ READ16_MEMBER(lordgun_state::aliencha_protection_r)
 	{
 		case 0x00/2: // de-increment counter
 		{
-			m_lordgun_protection_data--;
-			m_lordgun_protection_data &= 0x1f;
+			m_protection_data--;
+			m_protection_data &= 0x1f;
 
 			return 0;
 		}
 
 		case 0x40/2: // bitswap and xor counter
 		{
-			UINT8 x = m_lordgun_protection_data;
+			UINT8 x = m_protection_data;
 
-			m_lordgun_protection_data  = (((x >> 3) ^ (x >> 2)) & 1) << 4;
-			m_lordgun_protection_data |= (((x >> 2) ^ (x >> 1)) & 1) << 3;
-			m_lordgun_protection_data |= (((x >> 1) ^ (x >> 0)) & 1) << 2;
-			m_lordgun_protection_data |= (((x >> 4) ^ (x >> 0)) & 1) << 1;
-			m_lordgun_protection_data |= (((x >> 4) ^ (x >> 3)) & 1) << 0;
+			m_protection_data  = (((x >> 3) ^ (x >> 2)) & 1) << 4;
+			m_protection_data |= (((x >> 2) ^ (x >> 1)) & 1) << 3;
+			m_protection_data |= (((x >> 1) ^ (x >> 0)) & 1) << 2;
+			m_protection_data |= (((x >> 4) ^ (x >> 0)) & 1) << 1;
+			m_protection_data |= (((x >> 4) ^ (x >> 3)) & 1) << 0;
 
 			return 0;
 		}
 
 		case 0x80/2: // return value if conditions are met
 		{
-			if ((m_lordgun_protection_data & 0x11) == 0x00) return 0x20;
-			if ((m_lordgun_protection_data & 0x06) != 0x06) return 0x20;
-			if ((m_lordgun_protection_data & 0x18) == 0x00) return 0x20;
+			if ((m_protection_data & 0x11) == 0x00) return 0x20;
+			if ((m_protection_data & 0x06) != 0x06) return 0x20;
+			if ((m_protection_data & 0x18) == 0x00) return 0x20;
 
 			return 0;
 		}
@@ -622,6 +623,13 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
+void lordgun_state::machine_start()
+{
+	save_item(NAME(m_protection_data));
+	save_item(NAME(m_priority));
+	save_item(NAME(m_whitescreen));
+}
+
 static MACHINE_CONFIG_START( lordgun, lordgun_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(lordgun_map)
@@ -1027,13 +1035,12 @@ ROM_END
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(lordgun_state,lordgun)
+DRIVER_INIT_MEMBER(lordgun_state, lordgun)
 {
-	int i;
 	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 	int rom_size = 0x100000;
 
-	for(i = 0; i < rom_size/2; i++)
+	for(int i = 0; i < rom_size/2; i++)
 	{
 		UINT16 x = rom[i];
 
@@ -1042,6 +1049,21 @@ DRIVER_INIT_MEMBER(lordgun_state,lordgun)
 
 		rom[i] = x;
 	}
+	
+	save_item(NAME(m_old));
+	
+	for (int i = 0; i < 2; i++)
+	{
+		save_item(NAME(m_gun[i].scr_x), i);
+		save_item(NAME(m_gun[i].scr_y), i);
+		save_item(NAME(m_gun[i].hw_x), i);
+		save_item(NAME(m_gun[i].hw_y), i);
+	}
+}
+
+DRIVER_INIT_MEMBER(lordgun_state, aliencha)
+{
+	save_item(NAME(m_aliencha_dip_sel));
 }
 
 /***************************************************************************
@@ -1050,6 +1072,6 @@ DRIVER_INIT_MEMBER(lordgun_state,lordgun)
 
 ***************************************************************************/
 
-GAME( 1994, lordgun,   0,        lordgun,  lordgun,  lordgun_state, lordgun,  ROT0, "IGS", "Lord of Gun (USA)",       GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, aliencha,  0,        aliencha, aliencha, driver_device, 0,        ROT0, "IGS", "Alien Challenge (World)", 0 )
-GAME( 1994, alienchac, aliencha, aliencha, aliencha, driver_device, 0,        ROT0, "IGS", "Alien Challenge (China)", 0 )
+GAME( 1994, lordgun,   0,        lordgun,  lordgun,  lordgun_state, lordgun,  ROT0, "IGS", "Lord of Gun (USA)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1994, aliencha,  0,        aliencha, aliencha, driver_device, 0,        ROT0, "IGS", "Alien Challenge (World)", GAME_SUPPORTS_SAVE )
+GAME( 1994, alienchac, aliencha, aliencha, aliencha, driver_device, 0,        ROT0, "IGS", "Alien Challenge (China)", GAME_SUPPORTS_SAVE )
