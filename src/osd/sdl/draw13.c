@@ -24,6 +24,7 @@
 #include "osdsdl.h"
 #include "window.h"
 
+
 //============================================================
 //  DEBUGGING
 //============================================================
@@ -74,33 +75,12 @@ struct quad_setup_data
 	INT32           rotwidth, rotheight;
 };
 
-class texture_info;
-
-typedef void (*texture_copy_func)(const texture_info *texture, const render_texinfo *texsource);
-
-struct copy_info_t {
-	int                 src_fmt;
-	Uint32              dst_fmt;
-	int                 dst_bpp;
-	int                 rotate;
-	texture_copy_func   func;
-	Uint32              bm_mask;
-	const char          *srcname;
-	const char          *dstname;
-	/* Statistics */
-	UINT64              pixel_count;
-	INT64               time;
-	int                 samples;
-	int                 perf;
-	/* list */
-	copy_info_t           *next;
-};
-
 //============================================================
 //  Textures
 //============================================================
 
-struct sdl_info;
+struct sdl_info13;
+struct copy_info_t;
 
 /* texture_info holds information about a texture */
 class texture_info
@@ -134,10 +114,7 @@ public:
     const HashT hash() const { return m_hash; }
     const UINT32 flags() const { return m_flags; }
     // FIXME:
-    const bool is_pixels_owned() const { // do we own / allocated it ?
-        return false && ((m_sdl_access == SDL_TEXTUREACCESS_STATIC)
-                && (m_copyinfo->func != NULL)) ;
-    }
+    const bool is_pixels_owned() const;
 
 private:
     Uint32              m_sdl_access;
@@ -147,7 +124,7 @@ private:
     UINT32              m_flags;              // rendering flags
 
     SDL_Texture *       m_texture_id;
-    int                 m_is_rotated;
+    bool                m_is_rotated;
 
     int                 m_format;             // texture format
     SDL_BlendMode       m_sdl_blendmode;
@@ -155,10 +132,16 @@ private:
     texture_info *      m_next;               // next texture in the list
 };
 
+//============================================================
+//  TEXCOPY FUNCS
+//============================================================
+
+#include "blit13.h"
+
 /* sdl_info is the information about SDL for the current screen */
-struct sdl_info
+struct sdl_info13
 {
-    sdl_info()
+    sdl_info13()
     : m_blittimer(0), m_renderer(NULL),
       m_hofs(0), m_vofs(0),
       m_resize_pending(0), m_resize_width(0), m_resize_height(0),
@@ -192,6 +175,22 @@ struct sdl_info
 	SDL_DisplayMode m_original_mode;
 };
 
+struct copy_info_t {
+	int                 src_fmt;
+	Uint32              dst_fmt;
+	const blit_base	    *blitter;
+	Uint32              bm_mask;
+	const char          *srcname;
+	const char          *dstname;
+	/* Statistics */
+	UINT64              pixel_count;
+	INT64               time;
+	int                 samples;
+	int                 perf;
+	/* list */
+	copy_info_t           *next;
+};
+
 //============================================================
 //  PROTOTYPES
 //============================================================
@@ -210,12 +209,6 @@ static void drawsdl2_window_clear(sdl_window_info *window);
 static int drawsdl2_xy_to_render_target(sdl_window_info *window, int x, int y, int *xt, int *yt);
 
 //============================================================
-//  TEXCOPY FUNCS
-//============================================================
-
-#include "blit13.h"
-
-//============================================================
 //  STATIC VARIABLES
 //============================================================
 
@@ -223,87 +216,85 @@ static int drawsdl2_xy_to_render_target(sdl_window_info *window, int x, int y, i
 #define BM_ALL (-1)
 //( SDL_BLENDMODE_MASK | SDL_BLENDMODE_BLEND | SDL_BLENDMODE_ADD | SDL_BLENDMODE_MOD)
 
-#define texcopy_NULL NULL
-#define ENTRY(a,b,c,d,f) { SDL_TEXFORMAT_ ## a, SDL_PIXELFORMAT_ ## b, c, d, texcopy_ ## f, BM_ALL, #a, #b, 0, 0, 0, 0}
-#define ENTRY_BM(a,b,c,d,f,bm) { SDL_TEXFORMAT_ ## a, SDL_PIXELFORMAT_ ## b, c, d, texcopy_ ## f, bm, #a, #b, 0, 0, 0, 0}
-#define ENTRY_LR(a,b,c,d,f) { SDL_TEXFORMAT_ ## a, SDL_PIXELFORMAT_ ## b, c, d, texcopy_ ## f, BM_ALL, #a, #b, 0, 0, 0, -1}
-
+#define ENTRY(a,b,f) { SDL_TEXFORMAT_ ## a, SDL_PIXELFORMAT_ ## b, &texcopy_ ## f, BM_ALL, #a, #b, 0, 0, 0, 0}
+#define ENTRY_BM(a,b,f,bm) { SDL_TEXFORMAT_ ## a, SDL_PIXELFORMAT_ ## b, &texcopy_ ## f, bm, #a, #b, 0, 0, 0, 0}
+#define ENTRY_LR(a,b,f) { SDL_TEXFORMAT_ ## a, SDL_PIXELFORMAT_ ## b, &texcopy_ ## f, BM_ALL, #a, #b, 0, 0, 0, -1}
 
 static copy_info_t blit_info_default[] =
 {
 	/* no rotation */
-	ENTRY(ARGB32,           ARGB8888,   4, 0, NULL),
-	ENTRY_LR(ARGB32,        RGB888,     4, 0, argb32_rgb32),
+	ENTRY(ARGB32,      		ARGB8888,   argb32_argb32),
+	ENTRY_LR(ARGB32,        RGB888,     argb32_rgb32),
 	/* Entry primarily for directfb */
-	ENTRY_BM(ARGB32,        RGB888,     4, 0, argb32_rgb32, SDL_BLENDMODE_ADD),
-	ENTRY_BM(ARGB32,        RGB888,     4, 0, argb32_rgb32, SDL_BLENDMODE_MOD),
-	ENTRY_BM(ARGB32,        RGB888,     4, 0, argb32_rgb32, SDL_BLENDMODE_NONE),
+	ENTRY_BM(ARGB32,        RGB888,     argb32_rgb32, SDL_BLENDMODE_ADD),
+	ENTRY_BM(ARGB32,        RGB888,     argb32_rgb32, SDL_BLENDMODE_MOD),
+	ENTRY_BM(ARGB32,        RGB888,     argb32_rgb32, SDL_BLENDMODE_NONE),
 
-	ENTRY(RGB32,            ARGB8888,   4, 0, rgb32_argb32),
-	ENTRY(RGB32,            RGB888,     4, 0, NULL),
+	ENTRY(RGB32,            ARGB8888,   rgb32_argb32),
+	ENTRY(RGB32,       		RGB888,     rgb32_rgb32),
 
-	ENTRY(RGB32_PALETTED,   ARGB8888,   4, 0, rgb32pal_argb32),
-	ENTRY(RGB32_PALETTED,   RGB888,     4, 0, rgb32pal_argb32),
+	ENTRY(RGB32_PALETTED,   ARGB8888,   rgb32pal_argb32),
+	ENTRY(RGB32_PALETTED,   RGB888,     rgb32pal_argb32),
 
-	ENTRY(YUY16,            UYVY,       2, 0, NULL /* yuv16_uyvy*/),
-	ENTRY(YUY16,            YUY2,       2, 0, yuv16_yuy2),
-	ENTRY(YUY16,            YVYU,       2, 0, yuv16_yvyu),
-	ENTRY(YUY16,            ARGB8888,   4, 0, yuv16_argb32),
-	ENTRY(YUY16,            RGB888,     4, 0, yuv16_argb32),
+	ENTRY(YUY16,       		UYVY,       yuv16_uyvy),
+	ENTRY(YUY16,            YUY2,       yuv16_yuy2),
+	ENTRY(YUY16,            YVYU,       yuv16_yvyu),
+	ENTRY(YUY16,            ARGB8888,   yuv16_argb32),
+	ENTRY(YUY16,            RGB888,     yuv16_argb32),
 
-	ENTRY(YUY16_PALETTED,   UYVY,       2, 0, yuv16pal_uyvy),
-	ENTRY(YUY16_PALETTED,   YUY2,       2, 0, yuv16pal_yuy2),
-	ENTRY(YUY16_PALETTED,   YVYU,       2, 0, yuv16pal_yvyu),
-	ENTRY(YUY16_PALETTED,   ARGB8888,   4, 0, yuv16pal_argb32),
-	ENTRY(YUY16_PALETTED,   RGB888,     4, 0, yuv16pal_argb32),
+	ENTRY(YUY16_PALETTED,   UYVY,       yuv16pal_uyvy),
+	ENTRY(YUY16_PALETTED,   YUY2,       yuv16pal_yuy2),
+	ENTRY(YUY16_PALETTED,   YVYU,       yuv16pal_yvyu),
+	ENTRY(YUY16_PALETTED,   ARGB8888,   yuv16pal_argb32),
+	ENTRY(YUY16_PALETTED,   RGB888,     yuv16pal_argb32),
 
-	ENTRY(PALETTE16,        ARGB8888,   4, 0, pal16_argb32),
-	ENTRY(PALETTE16,        RGB888,     4, 0, pal16_argb32),
+	ENTRY(PALETTE16,        ARGB8888,   pal16_argb32),
+	ENTRY(PALETTE16,        RGB888,     pal16_argb32),
 
-	ENTRY(RGB15,            RGB555,     2, 0, NULL /* rgb15_argb1555 */),
-	ENTRY(RGB15,            ARGB1555,   2, 0, rgb15_argb1555),
-	ENTRY(RGB15,            ARGB8888,   4, 0, rgb15_argb32),
-	ENTRY(RGB15,            RGB888,     4, 0, rgb15_argb32),
+	ENTRY(RGB15,       		RGB555,     rgb15_rgb555),
+	ENTRY(RGB15,            ARGB1555,   rgb15_argb1555),
+	ENTRY(RGB15,            ARGB8888,   rgb15_argb32),
+	ENTRY(RGB15,            RGB888,     rgb15_argb32),
 
-	ENTRY(RGB15_PALETTED,   ARGB8888,   4, 0, rgb15pal_argb32),
-	ENTRY(RGB15_PALETTED,   RGB888,     4, 0, rgb15pal_argb32),
+	ENTRY(RGB15_PALETTED,   ARGB8888,   rgb15pal_argb32),
+	ENTRY(RGB15_PALETTED,   RGB888,     rgb15pal_argb32),
 
-	ENTRY(PALETTE16A,       ARGB8888,   4, 0, pal16a_argb32),
-	ENTRY(PALETTE16A,       RGB888,     4, 0, pal16a_rgb32),
+	ENTRY(PALETTE16A,       ARGB8888,   pal16a_argb32),
+	ENTRY(PALETTE16A,       RGB888,     pal16a_rgb32),
 
 	/* rotation */
-	ENTRY(ARGB32,           ARGB8888,   4, 1, rot_argb32_argb32),
-	ENTRY_LR(ARGB32,        RGB888,     4, 1, rot_argb32_rgb32),
+	ENTRY(ARGB32,           ARGB8888,   rot_argb32_argb32),
+	ENTRY_LR(ARGB32,        RGB888,     rot_argb32_rgb32),
 	/* Entry primarily for directfb */
-	ENTRY_BM(ARGB32,        RGB888,     4, 1, rot_argb32_rgb32, SDL_BLENDMODE_ADD),
-	ENTRY_BM(ARGB32,        RGB888,     4, 1, rot_argb32_rgb32, SDL_BLENDMODE_MOD),
-	ENTRY_BM(ARGB32,        RGB888,     4, 1, rot_argb32_rgb32, SDL_BLENDMODE_NONE),
+	ENTRY_BM(ARGB32,        RGB888,     rot_argb32_rgb32, SDL_BLENDMODE_ADD),
+	ENTRY_BM(ARGB32,        RGB888,     rot_argb32_rgb32, SDL_BLENDMODE_MOD),
+	ENTRY_BM(ARGB32,        RGB888,     rot_argb32_rgb32, SDL_BLENDMODE_NONE),
 
-	ENTRY(RGB32,            ARGB8888,   4, 1, rot_rgb32_argb32),
-	ENTRY(RGB32,            RGB888,     4, 1, rot_argb32_argb32),
+	ENTRY(RGB32,            ARGB8888,   rot_rgb32_argb32),
+	ENTRY(RGB32,            RGB888,     rot_argb32_argb32),
 
-	ENTRY(RGB32_PALETTED,   ARGB8888,   4, 1, rot_rgb32pal_argb32),
-	ENTRY(RGB32_PALETTED,   RGB888,     4, 1, rot_rgb32pal_argb32),
+	ENTRY(RGB32_PALETTED,   ARGB8888,   rot_rgb32pal_argb32),
+	ENTRY(RGB32_PALETTED,   RGB888,     rot_rgb32pal_argb32),
 
-	ENTRY(YUY16,            ARGB8888,   4, 1, rot_yuv16_argb32rot),
-	ENTRY(YUY16,            RGB888,     4, 1, rot_yuv16_argb32rot),
+	ENTRY(YUY16,            ARGB8888,   rot_yuv16_argb32rot),
+	ENTRY(YUY16,            RGB888,     rot_yuv16_argb32rot),
 
-	ENTRY(YUY16_PALETTED,   ARGB8888,   4, 1, rot_yuv16pal_argb32rot),
-	ENTRY(YUY16_PALETTED,   RGB888,     4, 1, rot_yuv16pal_argb32rot),
+	ENTRY(YUY16_PALETTED,   ARGB8888,   rot_yuv16pal_argb32rot),
+	ENTRY(YUY16_PALETTED,   RGB888,     rot_yuv16pal_argb32rot),
 
-	ENTRY(PALETTE16,        ARGB8888,   4, 1, rot_pal16_argb32),
-	ENTRY(PALETTE16,        RGB888,     4, 1, rot_pal16_argb32),
+	ENTRY(PALETTE16,        ARGB8888,   rot_pal16_argb32),
+	ENTRY(PALETTE16,        RGB888,     rot_pal16_argb32),
 
-	ENTRY(RGB15,            RGB555,     2, 1, rot_rgb15_argb1555),
-	ENTRY(RGB15,            ARGB1555,   2, 1, rot_rgb15_argb1555),
-	ENTRY(RGB15,            ARGB8888,   4, 1, rot_rgb15_argb32),
-	ENTRY(RGB15,            RGB888,     4, 1, rot_rgb15_argb32),
+	ENTRY(RGB15,            RGB555,     rot_rgb15_argb1555),
+	ENTRY(RGB15,            ARGB1555,   rot_rgb15_argb1555),
+	ENTRY(RGB15,            ARGB8888,   rot_rgb15_argb32),
+	ENTRY(RGB15,            RGB888,     rot_rgb15_argb32),
 
-	ENTRY(RGB15_PALETTED,   ARGB8888,   4, 1, rot_rgb15pal_argb32),
-	ENTRY(RGB15_PALETTED,   RGB888,     4, 1, rot_rgb15pal_argb32),
+	ENTRY(RGB15_PALETTED,   ARGB8888,   rot_rgb15pal_argb32),
+	ENTRY(RGB15_PALETTED,   RGB888,     rot_rgb15pal_argb32),
 
-	ENTRY(PALETTE16A,       ARGB8888,   4, 1, rot_pal16a_argb32),
-	ENTRY(PALETTE16A,       RGB888,     4, 1, rot_pal16a_rgb32),
+	ENTRY(PALETTE16A,       ARGB8888,   rot_pal16a_argb32),
+	ENTRY(PALETTE16A,       RGB888,     rot_pal16a_rgb32),
 
 { -1 },
 };
@@ -396,7 +387,7 @@ void texture_info::render_quad(const render_primitive *prim, const int x, const 
 	SDL_RenderCopy(m_renderer,  m_texture_id, NULL, &target_rect);
 }
 
-void sdl_info::render_quad(texture_info *texture, const render_primitive *prim, const int x, const int y)
+void sdl_info13::render_quad(texture_info *texture, const render_primitive *prim, const int x, const int y)
 {
 	SDL_Rect target_rect;
 
@@ -550,7 +541,7 @@ static void drawsdl2_exit(void)
 		{
 			if (bi->pixel_count)
 				osd_printf_verbose("%s -> %s %s blendmode 0x%02x, %d samples: %d KPixel/sec\n", bi->srcname, bi->dstname,
-						bi->rotate ? "rot" : "norot", bi->bm_mask, bi->samples,
+						bi->blitter->m_is_rot ? "rot" : "norot", bi->bm_mask, bi->samples,
 						(int) bi->perf);
 			freeme = bi;
 			bi = bi->next;
@@ -582,7 +573,7 @@ static void drawsdl2_attach(sdl_draw_info *info, sdl_window_info *window)
 static int drawsdl2_window_create(sdl_window_info *window, int width, int height)
 {
 	// allocate memory for our structures
-	sdl_info *sdl = global_alloc(sdl_info);
+	sdl_info13 *sdl = global_alloc(sdl_info13);
 
 	/* FIXME: On Ubuntu and potentially other Linux OS you should use
 	 * to disable panning. This has to be done before every invocation of mame.
@@ -598,6 +589,9 @@ static int drawsdl2_window_create(sdl_window_info *window, int width, int height
 	UINT32 extra_flags = (window->fullscreen() ?
 			SDL_WINDOW_BORDERLESS | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE);
 
+#if defined(SDLMAME_WIN32)
+	SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
+#endif
 	// create the SDL window
 	window->sdl_window = SDL_CreateWindow(window->title, window->monitor()->monitor_x, 0,
 			width, height, extra_flags);
@@ -612,6 +606,7 @@ static int drawsdl2_window_create(sdl_window_info *window, int width, int height
 		mode.h = height;
 		if (window->refresh)
 			mode.refresh_rate = window->refresh;
+#if 0
 		if (window->depth)
 		{
 			switch (window->depth)
@@ -632,6 +627,8 @@ static int drawsdl2_window_create(sdl_window_info *window, int width, int height
 				osd_printf_warning("Ignoring depth %d\n", window->depth);
 			}
 		}
+#endif
+
 		SDL_SetWindowDisplayMode(window->sdl_window, &mode);    // Try to set mode
 #ifndef SDLMAME_WIN32
 		/* FIXME: Warp the mouse to 0,0 in case a virtual desktop resolution
@@ -642,8 +639,9 @@ static int drawsdl2_window_create(sdl_window_info *window, int width, int height
 #endif
 	}
 	else
-		SDL_SetWindowDisplayMode(window->sdl_window, NULL); // Use desktop
-
+	{
+		//SDL_SetWindowDisplayMode(window->sdl_window, NULL); // Use desktop
+	}
 	// create renderer
 
 	if (video_config.waitvsync)
@@ -657,10 +655,10 @@ static int drawsdl2_window_create(sdl_window_info *window, int width, int height
 	}
 
 	//SDL_SelectRenderer(window->sdl_window);
-
 	SDL_ShowWindow(window->sdl_window);
 	//SDL_SetWindowFullscreen(window->window_id, window->fullscreen);
 	SDL_RaiseWindow(window->sdl_window);
+
 	SDL_GetWindowSize(window->sdl_window, &window->width, &window->height);
 
 	sdl->m_blittimer = 3;
@@ -676,7 +674,7 @@ static int drawsdl2_window_create(sdl_window_info *window, int width, int height
 
 static void drawsdl2_window_resize(sdl_window_info *window, int width, int height)
 {
-	sdl_info *sdl = (sdl_info *) window->dxdata;
+	sdl_info13 *sdl = (sdl_info13 *) window->dxdata;
 
 	sdl->m_resize_pending = 1;
 	sdl->m_resize_height = height;
@@ -695,7 +693,7 @@ static void drawsdl2_window_resize(sdl_window_info *window, int width, int heigh
 
 static int drawsdl2_xy_to_render_target(sdl_window_info *window, int x, int y, int *xt, int *yt)
 {
-	sdl_info *sdl = (sdl_info *) window->dxdata;
+	sdl_info13 *sdl = (sdl_info13 *) window->dxdata;
 
 	*xt = x - sdl->m_hofs;
 	*yt = y - sdl->m_vofs;
@@ -721,7 +719,7 @@ static void drawsdl2_set_target_bounds(sdl_window_info *window)
 
 static int drawsdl2_window_draw(sdl_window_info *window, UINT32 dc, int update)
 {
-	sdl_info *sdl = (sdl_info *) window->dxdata;
+	sdl_info13 *sdl = (sdl_info13 *) window->dxdata;
 	render_primitive *prim;
 	texture_info *texture=NULL;
 	float vofs, hofs;
@@ -835,7 +833,7 @@ static int drawsdl2_window_draw(sdl_window_info *window, UINT32 dc, int update)
 
 static void drawsdl2_window_clear(sdl_window_info *window)
 {
-	sdl_info *sdl = (sdl_info *) window->dxdata;
+	sdl_info13 *sdl = (sdl_info13 *) window->dxdata;
 
 	sdl->m_blittimer = 2;
 }
@@ -847,7 +845,7 @@ static void drawsdl2_window_clear(sdl_window_info *window)
 
 static void drawsdl2_window_destroy(sdl_window_info *window)
 {
-	sdl_info *sdl = (sdl_info *) window->dxdata;
+	sdl_info13 *sdl = (sdl_info13 *) window->dxdata;
 
 	// skip if nothing
 	if (sdl == NULL)
@@ -886,7 +884,7 @@ copy_info_t *texture_info::compute_size_type()
 
 	for (bi = blit_info[m_format]; bi != NULL; bi = bi->next)
 	{
-		if ((m_is_rotated == bi->rotate)
+		if ((m_is_rotated == bi->blitter->m_is_rot)
 				&& (m_sdl_blendmode == bi->bm_mask))
 		{
 			if (RendererSupportsFormat(m_renderer, bi->dst_fmt, m_sdl_access, bi->dstname))
@@ -907,13 +905,20 @@ copy_info_t *texture_info::compute_size_type()
 	/* try last resort handlers */
 	for (bi = blit_info[m_format]; bi != NULL; bi = bi->next)
 	{
-		if ((m_is_rotated == bi->rotate)
+		if ((m_is_rotated == bi->blitter->m_is_rot)
 			&& (m_sdl_blendmode == bi->bm_mask))
 			if (RendererSupportsFormat(m_renderer, bi->dst_fmt, m_sdl_access, bi->dstname))
 				return bi;
 	}
 	//FIXME: crash implement a -do nothing handler */
 	return NULL;
+}
+
+// FIXME:
+const bool texture_info::is_pixels_owned() const
+{ // do we own / allocated it ?
+    return ((m_sdl_access == SDL_TEXTUREACCESS_STATIC)
+            && (m_copyinfo->blitter->m_is_passthrough));
 }
 
 //============================================================
@@ -945,7 +950,7 @@ texture_info::texture_info(SDL_Renderer *renderer, const render_texinfo &texsour
 	m_flags = flags;
 	m_texinfo = texsource;
 	m_texinfo.seqid = -1; // force set data
-	m_is_rotated = FALSE;
+	m_is_rotated = false;
 	m_setup = setup;
 	m_sdl_blendmode = map_blendmode(PRIMFLAG_GET_BLENDMODE(flags));
 	m_pitch = 0;
@@ -974,9 +979,9 @@ texture_info::texture_info(SDL_Renderer *renderer, const render_texinfo &texsour
 
 	if (setup.rotwidth != m_texinfo.width || setup.rotheight != m_texinfo.height
 			|| setup.dudx < 0 || setup.dvdy < 0)
-		m_is_rotated = TRUE;
+		m_is_rotated = true;
 	else
-		m_is_rotated = FALSE;
+		m_is_rotated = false;
 
 	//m_sdl_access = SDL_TEXTUREACCESS_STATIC;
 	m_sdl_access = SDL_TEXTUREACCESS_STREAMING;
@@ -998,10 +1003,10 @@ texture_info::texture_info(SDL_Renderer *renderer, const render_texinfo &texsour
 
 	if (m_sdl_access == SDL_TEXTUREACCESS_STATIC)
 	{
-		if (m_copyinfo->func != NULL)
-			m_pixels = malloc(m_setup.rotwidth * m_setup.rotheight * m_copyinfo->dst_bpp);
-		else
+		if (m_copyinfo->blitter->m_is_passthrough)
 			m_pixels = NULL;
+		else
+			m_pixels = malloc(m_setup.rotwidth * m_setup.rotheight * m_copyinfo->blitter->m_dest_bpp);
 	}
 	m_last_access = osd_ticks();
 
@@ -1023,29 +1028,27 @@ void texture_info::set_data(const render_texinfo &texsource, const UINT32 flags)
 	m_copyinfo->time -= osd_ticks();
 	if (m_sdl_access == SDL_TEXTUREACCESS_STATIC)
 	{
-		if ( m_copyinfo->func )
+		if ( m_copyinfo->blitter->m_is_passthrough )
 		{
-			m_pitch = m_setup.rotwidth * m_copyinfo->dst_bpp;
-			m_copyinfo->func(this, &texsource);
+			m_pixels = texsource.base;
+			m_pitch = m_texinfo.rowpixels * m_copyinfo->blitter->m_dest_bpp;
 		}
 		else
 		{
-			m_pixels = texsource.base;
-			m_pitch = m_texinfo.rowpixels * m_copyinfo->dst_bpp;
+			m_pitch = m_setup.rotwidth * m_copyinfo->blitter->m_dest_bpp;
+			m_copyinfo->blitter->texop(this, &texsource);
 		}
 		SDL_UpdateTexture(m_texture_id, NULL, m_pixels, m_pitch);
 	}
 	else
 	{
 		SDL_LockTexture(m_texture_id, NULL, (void **) &m_pixels, &m_pitch);
-		if ( m_copyinfo->func )
-			m_copyinfo->func(this, &texsource);
-		else
+		if ( m_copyinfo->blitter->m_is_passthrough )
 		{
 			UINT8 *src = (UINT8 *) texsource.base;
 			UINT8 *dst = (UINT8 *) m_pixels;
-			int spitch = texsource.rowpixels * m_copyinfo->dst_bpp;
-			int num = texsource.width * m_copyinfo->dst_bpp;
+			int spitch = texsource.rowpixels * m_copyinfo->blitter->m_dest_bpp;
+			int num = texsource.width * m_copyinfo->blitter->m_dest_bpp;
 			int h = texsource.height;
 			while (h--) {
 				memcpy(dst, src, num);
@@ -1053,6 +1056,8 @@ void texture_info::set_data(const render_texinfo &texsource, const UINT32 flags)
 				dst += m_pitch;
 			}
 		}
+		else
+			m_copyinfo->blitter->texop(this, &texsource);
 		SDL_UnlockTexture(m_texture_id);
 	}
 	m_copyinfo->time += osd_ticks();
@@ -1113,7 +1118,7 @@ void quad_setup_data::compute(const render_primitive &prim)
 //  texture_find
 //============================================================
 
-texture_info *sdl_info::texture_find(const render_primitive &prim, const quad_setup_data &setup)
+texture_info *sdl_info13::texture_find(const render_primitive &prim, const quad_setup_data &setup)
 {
 	HashT texhash = texture_compute_hash(prim.texture, prim.flags);
 	texture_info *texture;
@@ -1150,7 +1155,7 @@ texture_info *sdl_info::texture_find(const render_primitive &prim, const quad_se
 //  texture_update
 //============================================================
 
-texture_info * sdl_info::texture_update(const render_primitive &prim)
+texture_info * sdl_info13::texture_update(const render_primitive &prim)
 {
 	quad_setup_data setup;
 	texture_info *texture;
@@ -1184,7 +1189,7 @@ texture_info * sdl_info::texture_update(const render_primitive &prim)
 
 static void drawsdl2_destroy_all_textures(sdl_window_info *window)
 {
-	sdl_info *sdl = (sdl_info *) window->dxdata;
+	sdl_info13 *sdl = (sdl_info13 *) window->dxdata;
 
 	if (sdl == NULL)
 		return;

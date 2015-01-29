@@ -564,11 +564,23 @@ void sdl_osd_interface::init(running_machine &machine)
 
 #if (SDLMAME_SDL2)
 		stemp = options().render_driver();
-		if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
+		if (stemp != NULL)
 		{
-			osd_printf_verbose("Setting SDL renderdriver '%s' ...\n", stemp);
-			//osd_setenv(SDLENV_RENDERDRIVER, stemp, 1);
-			SDL_SetHint(SDL_HINT_RENDER_DRIVER, stemp);
+			if (strcmp(stemp, SDLOPTVAL_AUTO) != 0)
+			{
+				osd_printf_verbose("Setting SDL renderdriver '%s' ...\n", stemp);
+				//osd_setenv(SDLENV_RENDERDRIVER, stemp, 1);
+				SDL_SetHint(SDL_HINT_RENDER_DRIVER, stemp);
+			}
+			else
+			{
+#if defined(SDLMAME_WIN32)
+				// OpenGL renderer has less issues with mode switching on windows
+				osd_printf_verbose("Setting SDL renderdriver '%s' ...\n", "opengl");
+				//osd_setenv(SDLENV_RENDERDRIVER, stemp, 1);
+				SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
+#endif
+			}
 		}
 #endif
 

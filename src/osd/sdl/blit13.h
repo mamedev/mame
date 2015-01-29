@@ -51,7 +51,7 @@ inline UINT32 pixel_ycc_to_rgb_pal(const UINT16 *pixel, const rgb_t *palette)
 //============================================================
 
 
-#define FUNC_DEF(source) op(const source &src, const rgb_t *palbase)
+#define FUNC_DEF(source) op(const source &src, const rgb_t *palbase) const
 #define FUNCTOR(name, x...) \
     template<typename _source, typename _dest> \
     struct name { _dest FUNC_DEF(_source) { x } };
@@ -120,59 +120,95 @@ FUNCTOR(op_yuv16pal_argb32rot, return pixel_ycc_to_rgb_pal(&src, palbase); )
 //  Copy and rotation
 //============================================================
 
+struct blit_base {
+
+	blit_base(int dest_bpp, bool is_rot, bool is_passthrough)
+	: m_dest_bpp(dest_bpp), m_is_rot(is_rot), m_is_passthrough(is_passthrough)
+	{ }
+	virtual ~blit_base() { }
+
+	virtual void texop(const texture_info *texture, const render_texinfo *texsource) const = 0;
+	int m_dest_bpp;
+	bool m_is_rot;
+	bool m_is_passthrough;
+};
+
 template<typename _src_type, typename _dest_type, typename _op, int _len_div>
-void texcopy(const texture_info *texture, const render_texinfo *texsource)
+struct blit_texcopy : public blit_base
 {
-	ATTR_UNUSED const rgb_t *palbase = texsource->palette();
-	int x, y;
-    _op op;
-	/* loop over Y */
-	for (y = 0; y < texsource->height; y++) {
-		_src_type *src = (_src_type *)texsource->base + y * texsource->rowpixels / (_len_div);
-		_dest_type *dst = (_dest_type *)((UINT8 *)texture->m_pixels + y * texture->m_pitch);
-		x = texsource->width / (_len_div);
-		while (x > 0) {
-			*dst++ = op.op(*src, palbase);
-			src++;
-			x--;
-		}
-	}
-}
+	blit_texcopy() : blit_base(sizeof(_dest_type) / _len_div, false, false) { }
+    void texop(const texture_info *texture, const render_texinfo *texsource) const
+    {
+    	ATTR_UNUSED const rgb_t *palbase = texsource->palette();
+    	int x, y;
+    	/* loop over Y */
+    	for (y = 0; y < texsource->height; y++) {
+    		_src_type *src = (_src_type *)texsource->base + y * texsource->rowpixels / (_len_div);
+    		_dest_type *dst = (_dest_type *)((UINT8 *)texture->m_pixels + y * texture->m_pitch);
+    		x = texsource->width / (_len_div);
+    		while (x > 0) {
+    			*dst++ = m_op.op(*src, palbase);
+    			src++;
+    			x--;
+    		}
+    	}
+    }
+private:
+    _op m_op;
+};
 
 #define TEXCOPYA(a, b, c, d) \
-inline void texcopy_ ## a(const texture_info *texture, const render_texinfo *texsource) \
-{ return texcopy<b, c, op_ ## a <b, c>, d>(texture, texsource); }
+		const struct blit_texcopy<b, c, op_ ## a <b, c>, d> texcopy_ ## a;
 
 template<typename _src_type, typename _dest_type, typename _op>
-void texcopy_rot(const texture_info *texture, const render_texinfo *texsource)
+struct blit_texrot : public blit_base
 {
-    ATTR_UNUSED const rgb_t *palbase = texsource->palette();
-    int x, y;
-    const quad_setup_data *setup = &texture->m_setup;
-    int dudx = setup->dudx;
-    int dvdx = setup->dvdx;
-    _op op;
-    /* loop over Y */
-    for (y = 0; y < setup->rotheight; y++) {
-        INT32 curu = setup->startu + y * setup->dudy;
-        INT32 curv = setup->startv + y * setup->dvdy;
-        _dest_type *dst = (_dest_type *)((UINT8 *)texture->m_pixels + y * texture->m_pitch);
-        x = setup->rotwidth;
-        while (x>0) {
-            _src_type *src = (_src_type *) texsource->base + (curv >> 16) * texsource->rowpixels + (curu >> 16);
-            *dst++ = op.op(*src, palbase);
-            curu += dudx;
-            curv += dvdx;
-            x--;
-        }
-    }
-}
+	blit_texrot() : blit_base(sizeof(_dest_type), true, false) { }
+	void texop(const texture_info *texture, const render_texinfo *texsource) const
+	{
+		ATTR_UNUSED const rgb_t *palbase = texsource->palette();
+		int x, y;
+		const quad_setup_data *setup = &texture->m_setup;
+		int dudx = setup->dudx;
+		int dvdx = setup->dvdx;
+		/* loop over Y */
+		for (y = 0; y < setup->rotheight; y++) {
+			INT32 curu = setup->startu + y * setup->dudy;
+			INT32 curv = setup->startv + y * setup->dvdy;
+			_dest_type *dst = (_dest_type *)((UINT8 *)texture->m_pixels + y * texture->m_pitch);
+			x = setup->rotwidth;
+			while (x>0) {
+				_src_type *src = (_src_type *) texsource->base + (curv >> 16) * texsource->rowpixels + (curu >> 16);
+				*dst++ = m_op.op(*src, palbase);
+				curu += dudx;
+				curv += dvdx;
+				x--;
+			}
+		}
+	}
+private:
+    _op m_op;
+};
 
 #define TEXROTA(a, b, c) \
-inline void texcopy_rot_ ## a(const texture_info *texture, const render_texinfo *texsource) \
-{ return texcopy_rot<b, c, op_ ## a <b, c> >(texture, texsource); }
+		const struct blit_texrot<b, c, op_ ## a <b, c> > texcopy_rot_ ## a;
+
+template<typename _src_type, typename _dest_type>
+struct blit_texpass : public blit_base
+{
+	blit_texpass() : blit_base(sizeof(_dest_type), false, true) { }
+	void texop(const texture_info *texture, const render_texinfo *texsource) const
+	{
+	}
+};
+
+#define TEXCOPYP(a, b, c) \
+		const struct blit_texpass<b, c> texcopy_ ## a;
+
 
 TEXCOPYA(rgb32_argb32,  UINT32, UINT32, 1)
+TEXCOPYP(rgb32_rgb32,   UINT32, UINT32)
+
 TEXCOPYA(rgb32pal_argb32,  UINT32, UINT32, 1)
 TEXCOPYA(pal16_argb32,  UINT16, UINT32, 1)
 TEXCOPYA(pal16a_argb32,  UINT16, UINT32, 1)
@@ -183,13 +219,15 @@ TEXCOPYA(pal16_argb1555,  UINT16, UINT16, 1)
 TEXCOPYA(rgb15_argb1555,  UINT16, UINT16, 1)
 TEXCOPYA(rgb15pal_argb1555,  UINT16, UINT16, 1)
 
+TEXCOPYP(argb32_argb32,  UINT32, UINT32)
 TEXCOPYA(argb32_rgb32, UINT32, UINT32, 1)
 TEXCOPYA(pal16a_rgb32,  UINT16, UINT32, 1)
 
 TEXCOPYA(yuv16_argb32, UINT32, UINT64, 2)
 TEXCOPYA(yuv16pal_argb32, UINT32, UINT64, 2)
 
-//TEXCOPYA(yuv16_uyvy, UINT16, UINT16, OP_YUV16_UYVY)
+TEXCOPYP(yuv16_uyvy, UINT16, UINT16)
+TEXCOPYP(rgb15_rgb555, UINT16, UINT16)
 
 TEXCOPYA(yuv16pal_uyvy, UINT16, UINT16, 1)
 
