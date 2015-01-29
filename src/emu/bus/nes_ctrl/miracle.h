@@ -29,6 +29,7 @@ class nes_miracle_device : public device_t,
 {
 public:
 	static const int XMIT_RING_SIZE = 64;
+	static const int RECV_RING_SIZE = 64;
 
 	// construction/destruction
 	nes_miracle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -59,9 +60,10 @@ protected:
 	int m_strobe_on, m_midi_mode, m_sent_bits;
 	UINT32 m_strobe_clock;
 	UINT8 m_data_sent;
-	UINT8 m_xmitring[XMIT_RING_SIZE];
+	UINT8 m_xmitring[XMIT_RING_SIZE], m_recvring[RECV_RING_SIZE];
 	int m_xmit_read, m_xmit_write;
-	bool m_tx_busy;
+	int m_recv_read, m_recv_write;
+	bool m_tx_busy, m_read_status, m_status_bit;
 };
 
 // device type definition
