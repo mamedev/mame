@@ -756,6 +756,7 @@ INCPATH += -I$(3RDPARTY)/zlib
 ZLIB = $(OBJ)/libz.a
 else
 LIBS += -lz
+BASELIBS += -lz
 ZLIB =
 endif
 
@@ -766,6 +767,7 @@ FLAC_LIB = $(OBJ)/libflac.a
 # $(OBJ)/libflac++.a
 else
 LIBS += -lFLAC
+BASELIBS += -lFLAC
 FLAC_LIB =
 endif
 

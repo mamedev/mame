@@ -24,6 +24,8 @@ const device_type NES_MIRACLE = &device_creator<nes_miracle_device>;
 
 MACHINE_CONFIG_FRAGMENT( nes_miracle )
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
+	MCFG_MIDI_RX_HANDLER(WRITELINE(nes_miracle_device, rx_w))
+
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 MACHINE_CONFIG_END
 
@@ -99,6 +101,8 @@ void nes_miracle_device::device_reset()
 	set_tra_rate(31250);
 
 	m_xmit_read = m_xmit_write = 0;
+	m_recv_read = m_recv_write = 0;
+	m_read_status = m_status_bit = false;
 	m_tx_busy = false;
 }
 
@@ -107,16 +111,22 @@ void nes_miracle_device::device_reset()
 //  read
 //-------------------------------------------------
 
-// TODO: here, reads from serial midi in bit0, when in MIDI_SEND mode
-
 UINT8 nes_miracle_device::read_bit0()
 {
 	UINT8 ret = 0;
 
 	if (m_midi_mode == MIRACLE_MIDI_RECEIVE)
 	{
-		//NES reads from Miracle Piano!
-		// ret |= ...
+		if (m_status_bit)
+		{
+			m_status_bit = false;
+			ret = (m_read_status) ? 1 : 0;
+		}
+		else
+		{
+			ret = (m_data_sent & 0x80) ? 0 : 1;
+			m_data_sent <<= 1;
+		}
 	}
 
 	return ret;
@@ -126,7 +136,6 @@ UINT8 nes_miracle_device::read_bit0()
 //  write
 //-------------------------------------------------
 
-// TODO: here, writes to serial midi in bit0, when in MIDI_RECEIVE mode
 // c4fc = start of recv routine
 // c53a = start of send routine
 
@@ -175,6 +184,23 @@ void nes_miracle_device::write(UINT8 data)
 				strobe_timer->reset();
 				m_strobe_on = 0;
 				m_strobe_clock = 0;
+
+				m_status_bit = true;
+				if (m_recv_read != m_recv_write)
+				{
+//					printf("Getting %02x from Miracle[%d]\n", m_recvring[m_recv_read], m_recv_read);
+					m_data_sent = m_recvring[m_recv_read++];
+					if (m_recv_read >= RECV_RING_SIZE)
+					{
+						m_recv_read = 0;
+					}
+					m_read_status = true;
+				}
+				else
+				{
+					m_read_status = false;
+//					printf("Miracle has no data\n");
+				}
 				return;
 			}
 			else if (m_strobe_clock >= 66)
@@ -202,7 +228,14 @@ void nes_miracle_device::write(UINT8 data)
 void nes_miracle_device::rcv_complete()    // Rx completed receiving byte
 {
 	receive_register_extract();
-//	UINT8 rcv = get_received_char();
+	UINT8 rcv = get_received_char();
+
+//	printf("Got %02x -> [%d]\n", rcv, m_recv_write);
+	m_recvring[m_recv_write++] = rcv;
+	if (m_recv_write >= RECV_RING_SIZE)
+	{
+		m_recv_write = 0;
+	}
 }
 
 void nes_miracle_device::tra_complete()    // Tx completed sending byte

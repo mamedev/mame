@@ -168,7 +168,7 @@ SLOT_INTERFACE_START( nes_control_port1_devices )
 	SLOT_INTERFACE("joypad", NES_JOYPAD)
 	SLOT_INTERFACE("zapper", NES_ZAPPER)
 	SLOT_INTERFACE("4score_p1p3", NES_4SCORE_P1P3)
-//  SLOT_INTERFACE("miracle_piano", NES_MIRACLE)
+	SLOT_INTERFACE("miracle_piano", NES_MIRACLE)
 SLOT_INTERFACE_END
 
 SLOT_INTERFACE_START( nes_control_port2_devices )
