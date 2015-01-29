@@ -134,6 +134,7 @@ CPUS += ALTO2
 #CPUS += W65816
 CPUS += ARC
 CPUS += ARCOMPACT
+CPUS += AMIS2000
 
 #-------------------------------------------------
 # specify available sound cores; some of these are

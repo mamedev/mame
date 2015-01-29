@@ -59,6 +59,7 @@ struct options
 CPU_DISASSEMBLE( adsp21xx );
 CPU_DISASSEMBLE( alpha8201 );
 CPU_DISASSEMBLE( am29000 );
+CPU_DISASSEMBLE( amis2000 );
 CPU_DISASSEMBLE( apexc );
 CPU_DISASSEMBLE( arm );
 CPU_DISASSEMBLE( arm_be );
@@ -203,6 +204,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "adsp21xx",   _24le, -2, CPU_DISASSEMBLE_NAME(adsp21xx) },
 	{ "alpha8201",  _8bit,  0, CPU_DISASSEMBLE_NAME(alpha8201) },
 	{ "am29000",    _32be,  0, CPU_DISASSEMBLE_NAME(am29000) },
+	{ "amis2000",   _8bit,  0, CPU_DISASSEMBLE_NAME(amis2000) },
 	{ "apexc",      _32be,  0, CPU_DISASSEMBLE_NAME(apexc) },
 	{ "arm",        _32le,  0, CPU_DISASSEMBLE_NAME(arm) },
 	{ "arm_be",     _32be,  0, CPU_DISASSEMBLE_NAME(arm_be) },
