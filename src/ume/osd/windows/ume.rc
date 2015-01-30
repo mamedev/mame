@@ -6,9 +6,7 @@
 //
 //============================================================
 
-#define NOWINRES
 #include <windows.h>
-#include <commctrl.h>
 #include "umevers.rc"
 
 1                       24      MOVEABLE PURE   "ume.man"
