@@ -200,10 +200,10 @@ $(CPUOBJ)/se3208/se3208.o:  $(CPUSRC)/se3208/se3208.c \
 
 #-------------------------------------------------
 # American Microsystems, Inc.(AMI) S2000 series
-#@src/emu/cpu/amis2000/amis2000.h,CPUS += AMI_S2000
+#@src/emu/cpu/amis2000/amis2000.h,CPUS += AMIS2000
 #-------------------------------------------------
 
-ifneq ($(filter AMI_S2000,$(CPUS)),)
+ifneq ($(filter AMIS2000,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/amis2000
 CPUOBJS += $(CPUOBJ)/amis2000/amis2000.o
 DASMOBJS += $(CPUOBJ)/amis2000/amis2000d.o
