@@ -661,7 +661,6 @@ ROM_START( podrace )
 	ROM_LOAD32_WORD("mpr-23116.ic67s" , 0xf000000, 0x0800000, CRC(9f567fce) SHA1(c35bcf968f139557e50ceafa9c6bad4deb87154f))
 	ROM_LOAD32_WORD("mpr-23117.ic68s" , 0xf000002, 0x0800000, CRC(9d4d3529) SHA1(66008445629681ebf2f26b3f181d8524a8576d2f))
 
-	// current 315-5881 decryption simulation code can't produce valid output data with any of keys
 	// 834-14002   2001     317-0277-COM   Hikaru
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "2903dad5" )
 ROM_END
@@ -707,7 +706,7 @@ ROM_START( braveff )
 	ROM_LOAD32_WORD( "mpr-22022.ic59s", 0xb000000, 0x800000, CRC(abd3d888) SHA1(9654c3a38feab46b4983a602831fb29cccdd0526) )
 	ROM_LOAD32_WORD( "mpr-22023.ic60s", 0xb000002, 0x800000, CRC(07f00869) SHA1(92282d09d72d3e65a91128e06bb0d4426bb90be5) )
 
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "0" ) // 315-5881 not populated
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1" ) // 315-5881 not populated
 ROM_END
 
 ROM_START( sgnascar )
