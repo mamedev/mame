@@ -156,12 +156,12 @@ void sdl_monitor_info::refresh()
 	#if defined(SDLMAME_WIN32)  // Win32 version
 	MONITORINFOEX info;
 	info.cbSize = sizeof(info);
-	GetMonitorInfo((HMONITOR)monitor->handle, (LPMONITORINFO)&info);
-	monitor->m_dimensions.x = monitor->m_dimensions.y = 0;
-	monitor->m_center_width = monitor->m_dimensions.w = info.rcMonitor.right - info.rcMonitor.left;
-	monitor->m_center_height = monitor->m_dimensions.h = info.rcMonitor.bottom - info.rcMonitor.top;
+	GetMonitorInfo((HMONITOR)m_handle, (LPMONITORINFO)&info);
+	m_dimensions.x = m_dimensions.y = 0;
+	m_center_width = m_dimensions.w = info.rcMonitor.right - info.rcMonitor.left;
+	m_center_height = m_dimensions.h = info.rcMonitor.bottom - info.rcMonitor.top;
 	char *temp = utf8_from_wstring(info.szDevice);
-	strcpy(monitor->monitor_device, temp);
+	strcpy(m_monitor_device, temp);
 	osd_free(temp);
 	#elif defined(SDLMAME_MACOSX)   // Mac OS X Core Imaging version
 	CGDirectDisplayID primary;
@@ -171,9 +171,10 @@ void sdl_monitor_info::refresh()
 	primary = CGMainDisplayID();
 	dbounds = CGDisplayBounds(primary);
 
-	monitor->center_width = monitor->monitor_width = dbounds.size.width - dbounds.origin.x;
-	monitor->center_height = monitor->monitor_height = dbounds.size.height - dbounds.origin.y;
-	strcpy(monitor->monitor_device, "Mac OS X display");
+	m_dimensions.x = m_dimensions.y = 0;
+	m_center_width = m_dimensions.w = dbounds.size.width - dbounds.origin.x;
+	m_center_height = m_dimensions.h = dbounds.size.height - dbounds.origin.y;
+	strcpy(m_monitor_device, "Mac OS X display");
 	#elif defined(SDLMAME_X11) || defined(SDLMAME_NO_X11)       // X11 version
 	{
 		#if defined(SDLMAME_X11)
@@ -185,9 +186,10 @@ void sdl_monitor_info::refresh()
 		if ( SDL_GetWMInfo(&info) && (info.subsystem == SDL_SYSWM_X11) )
 		{
 			screen = DefaultScreen(info.info.x11.display);
-			SDL_VideoDriverName(monitor->monitor_device, sizeof(monitor->monitor_device)-1);
-			monitor->monitor_width = DisplayWidth(info.info.x11.display, screen);
-			monitor->monitor_height = DisplayHeight(info.info.x11.display, screen);
+			SDL_VideoDriverName(m_monitor_device, sizeof(m_monitor_device)-1);
+			m_dimensions.x = m_dimensions.y = 0;
+			m_dimensions.w = DisplayWidth(info.info.x11.display, screen);
+			m_dimensions.h = DisplayHeight(info.info.x11.display, screen);
 
 			if ((XineramaIsActive(info.info.x11.display)) && video_config.restrictonemonitor)
 			{
@@ -196,15 +198,15 @@ void sdl_monitor_info::refresh()
 
 					xineinfo = XineramaQueryScreens(info.info.x11.display, &numscreens);
 
-				monitor->center_width = xineinfo[0].width;
-				monitor->center_height = xineinfo[0].height;
+				m_center_width = xineinfo[0].width;
+				m_center_height = xineinfo[0].height;
 
 				XFree(xineinfo);
 			}
 			else
 			{
-				monitor->center_width = monitor->monitor_width;
-				monitor->center_height = monitor->monitor_height;
+				m_center_width = m_dimensions.w;
+				m_center_height = m_dimensions.h;
 			}
 		}
 		else
@@ -213,7 +215,7 @@ void sdl_monitor_info::refresh()
 			static int first_call=0;
 			static int cw = 0, ch = 0;
 
-			SDL_VideoDriverName(monitor->monitor_device, sizeof(monitor->monitor_device)-1);
+			SDL_VideoDriverName(m_monitor_device, sizeof(m_monitor_device)-1);
 			if (first_call==0)
 			{
 				const char *dimstr = osd_getenv(SDLENV_DESKTOPDIM);
@@ -233,7 +235,7 @@ void sdl_monitor_info::refresh()
 					}
 					if ((cw==0) || (ch==0))
 					{
-						osd_printf_warning("WARNING: SDL_GetVideoInfo() for driver <%s> is broken.\n", monitor->monitor_device);
+						osd_printf_warning("WARNING: SDL_GetVideoInfo() for driver <%s> is broken.\n", m_monitor_device);
 						osd_printf_warning("         You should set SDLMAME_DESKTOPDIM to your desktop size.\n");
 						osd_printf_warning("            e.g. export SDLMAME_DESKTOPDIM=800x600\n");
 						osd_printf_warning("         Assuming 1024x768 now!\n");
@@ -242,16 +244,17 @@ void sdl_monitor_info::refresh()
 					}
 				}
 			}
-			monitor->monitor_width = cw;
-			monitor->monitor_height = ch;
-			monitor->center_width = cw;
-			monitor->center_height = ch;
+			m_dimensions.w = cw;
+			m_dimensions.h = ch;
+			m_center_width = cw;
+			m_center_height = ch;
 		}
 	}
 	#elif defined(SDLMAME_OS2)      // OS2 version
-	monitor->center_width = monitor->monitor_width = WinQuerySysValue( HWND_DESKTOP, SV_CXSCREEN );
-	monitor->center_height = monitor->monitor_height = WinQuerySysValue( HWND_DESKTOP, SV_CYSCREEN );
-	strcpy(monitor->monitor_device, "OS/2 display");
+	m_dimensions.x = m_dimensions.y = 0;
+	m_center_width = m_dimensions.w = WinQuerySysValue( HWND_DESKTOP, SV_CXSCREEN );
+	m_center_height = m_dimensions.h = WinQuerySysValue( HWND_DESKTOP, SV_CYSCREEN );
+	strcpy(m_monitor_device, "OS/2 display");
 	#else
 	#error Unknown SDLMAME_xx OS type!
 	#endif
@@ -260,8 +263,8 @@ void sdl_monitor_info::refresh()
 		static int info_shown=0;
 		if (!info_shown)
 		{
-			osd_printf_verbose("SDL Device Driver     : %s\n", monitor->monitor_device);
-			osd_printf_verbose("SDL Monitor Dimensions: %d x %d\n", monitor->monitor_width, monitor->monitor_height);
+			osd_printf_verbose("SDL Device Driver     : %s\n", m_monitor_device);
+			osd_printf_verbose("SDL Monitor Dimensions: %d x %d\n", m_dimensions.w, m_dimensions.h);
 			info_shown = 1;
 		}
 	}
@@ -323,7 +326,7 @@ void sdl_osd_interface::update(bool skip_redraw)
 //============================================================
 
 #if !defined(SDLMAME_WIN32) && !(SDLMAME_SDL2)
-static void add_primary_monitor(void *data)
+void sdl_monitor_info::add_primary_monitor(void *data)
 {
 	sdl_monitor_info ***tailptr = (sdl_monitor_info ***)data;
 	sdl_monitor_info *monitor;
@@ -332,19 +335,19 @@ static void add_primary_monitor(void *data)
 	monitor = global_alloc_clear(sdl_monitor_info);
 
 	// copy in the data
-	monitor->handle = 1;
+	monitor->m_handle = 1;
 
-	sdlvideo_monitor_refresh(monitor);
+	monitor->refresh();
 
 	// guess the aspect ratio assuming square pixels
-	monitor->aspect = (float)(monitor->monitor_width) / (float)(monitor->monitor_height);
+	monitor->m_aspect = (float)(monitor->m_dimensions.w) / (float)(monitor->m_dimensions.h);
 
 	// save the primary monitor handle
 	primary_monitor = monitor;
 
 	// hook us into the list
 	**tailptr = monitor;
-	*tailptr = &monitor->next;
+	*tailptr = &monitor->m_next;
 }
 #endif
 
@@ -367,34 +370,22 @@ static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect,
 	assert(result);
 	(void)result; // to silence gcc 4.6
 
-	// allocate a new monitor info
-	monitor = global_alloc_clear(sdl_monitor_info);
-
-	// copy in the data
-
-#ifdef PTR64
-	monitor->handle = (UINT64)handle;
-#else
-	monitor->handle = (UINT32)handle;
-#endif
-	monitor->monitor_width = info.rcMonitor.right - info.rcMonitor.left;
-	monitor->monitor_height = info.rcMonitor.bottom - info.rcMonitor.top;
-	monitor->center_width = monitor->monitor_width;
-	monitor->center_height = monitor->monitor_height;
-	char *temp = utf8_from_wstring(info.szDevice);
-	strcpy(monitor->monitor_device, temp);
-	osd_free(temp);
-
 	// guess the aspect ratio assuming square pixels
-	monitor->aspect = (float)(info.rcMonitor.right - info.rcMonitor.left) / (float)(info.rcMonitor.bottom - info.rcMonitor.top);
+	float aspect = (float)(info.rcMonitor.right - info.rcMonitor.left) / (float)(info.rcMonitor.bottom - info.rcMonitor.top);
+
+	// allocate a new monitor info
+	char *temp = utf8_from_wstring(info.szDevice);
+	// copy in the data
+	monitor = global_alloc(sdl_monitor_info((UINT64) handle, temp, aspect));
+	osd_free(temp);
 
 	// save the primary monitor handle
 	if (info.dwFlags & MONITORINFOF_PRIMARY)
-		primary_monitor = monitor;
+		sdl_monitor_info::primary_monitor = monitor;
 
 	// hook us into the list
 	**tailptr = monitor;
-	*tailptr = &monitor->next;
+	*tailptr = &monitor->m_next;
 
 	// enumerate all the available monitors so to list their names in verbose mode
 	return TRUE;
@@ -449,7 +440,7 @@ void sdl_monitor_info::init()
 
 			// hook us into the list
 			*tailptr = monitor;
-			tailptr = &monitor->next;
+			tailptr = &monitor->m_next;
 		}
 	}
 	osd_printf_verbose("Leave init_monitors\n");
@@ -466,7 +457,7 @@ void sdl_monitor_info::exit()
 	while (sdl_monitor_info::list != NULL)
 	{
 		sdl_monitor_info *temp = sdl_monitor_info::list;
-		sdl_monitor_info::list = temp->next;
+		sdl_monitor_info::list = temp->next();
 		global_free(temp);
 	}
 }
@@ -498,7 +489,7 @@ sdl_monitor_info *sdl_monitor_info::pick_monitor(sdl_options &options, int index
 	// look for a match in the name first
 	if (scrname != NULL)
 	{
-		for (monitor = sdl_monitor_info::list; monitor != NULL; monitor = monitor->next)
+		for (monitor = sdl_monitor_info::list; monitor != NULL; monitor = monitor->next())
 		{
 			moncount++;
 			if (strcmp(scrname, monitor->device()) == 0)
@@ -508,7 +499,7 @@ sdl_monitor_info *sdl_monitor_info::pick_monitor(sdl_options &options, int index
 
 	// didn't find it; alternate monitors until we hit the jackpot
 	index %= moncount;
-	for (monitor = sdl_monitor_info::list; monitor != NULL; monitor = monitor->next)
+	for (monitor = sdl_monitor_info::list; monitor != NULL; monitor = monitor->next())
 		if (index-- == 0)
 			goto finishit;
 
@@ -523,7 +514,7 @@ finishit:
 	return monitor;
 }
 #else
-static sdl_monitor_info *pick_monitor(sdl_options &options, int index)
+sdl_monitor_info *sdl_monitor_info::pick_monitor(sdl_options &options, int index)
 {
 	sdl_monitor_info *monitor;
 	float aspect;
@@ -536,7 +527,7 @@ static sdl_monitor_info *pick_monitor(sdl_options &options, int index)
 
 	if (aspect != 0)
 	{
-		monitor->aspect = aspect;
+		monitor->m_aspect = aspect;
 	}
 	return monitor;
 }
