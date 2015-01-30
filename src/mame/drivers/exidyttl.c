@@ -6,12 +6,11 @@ Exidy discrete hardware games
  Attack (1977)
  Death Race (1976)
  Destruction Derby (1975)
- Old Time Basketball (1976)
  Spiders From Space (1976)
  Score (1977)
  Super Death Chase (1977)
  Table Football (1975)
- Tv Pinball (1974)
+ TV Pinball (1974)
 
 ***************************************************************************/
 
