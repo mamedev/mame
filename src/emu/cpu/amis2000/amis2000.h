@@ -91,6 +91,8 @@ protected:
 	UINT8 m_e;                  // 4-bit generic register
 	UINT8 m_i;                  // 4-bit i-pins latch
 	UINT8 m_k;                  // 4-bit k-pins latch
+	UINT8 m_d;                  // 8-bit d-pins latch
+	UINT16 m_a;                 // 13-bit a-pins latch (master strobe latch)
 
 	devcb_read8 m_read_k;
 	devcb_read8 m_read_i;
