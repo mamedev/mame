@@ -34,7 +34,7 @@ public:
 	const char * name() const { return m_name; }
 	const char * type() const { return m_type; }
 
-	virtual bool probe() const { return true; }
+	virtual bool probe() { return true; }
 
 	virtual int init() { return 0; }
 	virtual void exit() { }
@@ -100,7 +100,7 @@ private:
 	public: \
 		_mod () \
 		: osd_module(_type, _name) {} \
-		bool probe() const { return false; } \
+		bool probe() { return false; } \
 	};
 
 #endif  /* __OSDMODULE_H__ */

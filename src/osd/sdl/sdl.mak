@@ -403,6 +403,7 @@ OBJDIRS += $(SDLOBJ) \
 	$(OSDOBJ)/modules/lib \
 	$(OSDOBJ)/modules/midi \
 	$(OSDOBJ)/modules/font \
+	$(OSDOBJ)/modules/netdev \
 
 #-------------------------------------------------
 # OSD core library
@@ -445,15 +446,13 @@ OSDOBJS = \
 	$(OSDOBJ)/modules/font/font_windows.o \
 	$(OSDOBJ)/modules/font/font_osx.o \
 	$(OSDOBJ)/modules/font/font_none.o \
+	$(OSDOBJ)/modules/netdev/taptun.o \
+	$(OSDOBJ)/modules/netdev/pcap.o \
 
 ifdef NO_USE_MIDI
 	OSDOBJS += $(OSDOBJ)/modules/midi/none.o
 else
 	OSDOBJS += $(OSDOBJ)/modules/midi/portmidi.o
-endif
-
-ifeq ($(BASE_TARGETOS),win32)
-	OSDOBJS += $(OSDOBJ)/modules/sound/direct_sound.o
 endif
 
 # Add SDL2.0 support
@@ -464,12 +463,6 @@ endif
 
 # add an ARCH define
 DEFS += -DSDLMAME_ARCH="$(ARCHOPTS)" -DSYNC_IMPLEMENTATION=$(SYNC_IMPLEMENTATION)
-
-# Add JavaScript sound module for Emscripten compiles
-
-ifeq ($(TARGETOS),emscripten)
-OSDOBJS += $(OSDOBJ)/modules/sound/js_sound.o
-endif
 
 #-------------------------------------------------
 # Generic defines and additions
@@ -828,29 +821,21 @@ endif # USE_XINPUT
 # Network (TAP/TUN)
 #-------------------------------------------------
 
-OSDOBJS += $(SDLOBJ)/netdev.o
-
 ifndef DONT_USE_NETWORK
 
 ifeq ($(SDL_NETWORK),taptun)
-OSDOBJS += $(SDLOBJ)/netdev_tap.o
 
-DEFS += -DSDLMAME_NETWORK -DSDLMAME_NET_TAPTUN
+DEFS += -DSDLMAME_NET_TAPTUN
 endif
 
 ifeq ($(SDL_NETWORK),pcap)
 
-ifeq ($(TARGETOS),macosx)
-OSDOBJS += $(SDLOBJ)/netdev_pcap_osx.o
-else
-OSDOBJS += $(SDLOBJ)/netdev_pcap.o
-endif
+DEFS += -DSDLMAME_NET_PCAP
 
-DEFS += -DSDLMAME_NETWORK -DSDLMAME_NET_PCAP
-
-ifneq ($(TARGETOS),win32)
-LIBS += -lpcap
-endif
+# dynamically linked ...
+#ifneq ($(TARGETOS),win32)
+#LIBS += -lpcap
+#endif
 
 endif # ifeq ($(SDL_NETWORK),pcap)
 

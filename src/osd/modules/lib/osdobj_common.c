@@ -128,6 +128,10 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, DEBUG_INTERNAL);
 	REGISTER_MODULE(m_mod_man, DEBUG_NONE);
 
+	REGISTER_MODULE(m_mod_man, NETDEV_TAPTUN);
+	REGISTER_MODULE(m_mod_man, NETDEV_PCAP);
+
+
 	// after initialization we know which modules are supported
 
 	const char *names[20];
@@ -399,9 +403,15 @@ bool osd_common_t::execute_command(const char *command)
 {
 	if (strcmp(command, OSDCOMMAND_LIST_NETWORK_ADAPTERS) == 0)
 	{
-		network_init();
-		osd_list_network_adapters();
-		network_exit();
+		osd_module *om = select_module_options(options(), OSD_NETDEV_PROVIDER);
+
+		if (om->probe())
+		{
+			om->init();
+			osd_list_network_adapters();
+			om->exit();
+		}
+
 		return true;
 	}
 	else if (strcmp(command, OSDCOMMAND_LIST_MIDI_DEVICES) == 0)
@@ -431,9 +441,6 @@ void osd_common_t::init_subsystems()
 	machine().add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(osd_common_t::input_resume), this));
 
 	output_init();
-#ifdef USE_NETWORK
-	network_init();
-#endif
 	midi_init();
 
 	m_font_module = select_module_options<font_module *>(options(), OSD_FONT_PROVIDER);
@@ -443,6 +450,8 @@ void osd_common_t::init_subsystems()
 	m_sound->m_audio_latency = options().audio_latency();
 
 	m_debugger = select_module_options<debug_module *>(options(), OSD_DEBUG_PROVIDER);
+
+	select_module_options<netdev_module *>(options(), OSD_NETDEV_PROVIDER);
 
 	m_mod_man.init();
 
@@ -485,19 +494,11 @@ bool osd_common_t::output_init()
 	return true;
 }
 
-bool osd_common_t::network_init()
-{
-	return true;
-}
-
 void osd_common_t::exit_subsystems()
 {
 	video_exit();
 	input_exit();
 	output_exit();
-	#ifdef USE_NETWORK
-	network_exit();
-	#endif
 	midi_exit();
 }
 
@@ -514,10 +515,6 @@ void osd_common_t::input_exit()
 }
 
 void osd_common_t::output_exit()
-{
-}
-
-void osd_common_t::network_exit()
 {
 }
 

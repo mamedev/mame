@@ -18,6 +18,7 @@
 #include "modules/font/font_module.h"
 #include "modules/sound/sound_module.h"
 #include "modules/debugger/debug_module.h"
+#include "modules/netdev/netdev_module.h"
 #include "cliopts.h"
 
 //============================================================
@@ -164,7 +165,6 @@ public:
 
 	virtual void input_resume();
 	virtual bool output_init();
-	virtual bool network_init();
 	virtual bool midi_init();
 
 	virtual void exit_subsystems();
@@ -172,7 +172,6 @@ public:
 	virtual void window_exit();
 	virtual void input_exit();
 	virtual void output_exit();
-	virtual void network_exit();
 	virtual void midi_exit();
 
 	virtual void osd_exit();

@@ -1,3 +1,5 @@
+#if defined(SDLMAME_NET_TAPTUN)
+
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
@@ -6,6 +8,8 @@
 
 #include "emu.h"
 #include "osdnet.h"
+#include "modules/osdmodule.h"
+#include "netdev_module.h"
 
 #ifdef __linux__
 #define IFF_TAP     0x0002
@@ -13,7 +17,25 @@
 #define TUNSETIFF     _IOW('T', 202, int)
 #endif
 
-class netdev_tap : public netdev
+class taptun_module : public osd_module, public netdev_module
+{
+public:
+
+	taptun_module()
+	: osd_module(OSD_NETDEV_PROVIDER, "taptun"), netdev_module()
+	{
+	}
+	virtual ~taptun_module() { }
+
+	virtual int init();
+	virtual void exit();
+
+	virtual bool probe() { return true; }
+};
+
+
+
+class netdev_tap : public osd_netdev
 {
 public:
 	netdev_tap(const char *name, class device_network_interface *ifdev, int rate);
@@ -31,7 +53,7 @@ private:
 };
 
 netdev_tap::netdev_tap(const char *name, class device_network_interface *ifdev, int rate)
-	: netdev(ifdev, rate)
+	: osd_netdev(ifdev, rate)
 {
 #ifdef __linux__
 	struct ifreq ifr;
@@ -93,15 +115,27 @@ int netdev_tap::recv_dev(UINT8 **buf)
 static CREATE_NETDEV(create_tap)
 {
 	class netdev_tap *dev = global_alloc(netdev_tap(ifname, ifdev, rate));
-	return dynamic_cast<netdev *>(dev);
+	return dynamic_cast<osd_netdev *>(dev);
 }
 
-void init_tap()
+int taptun_module::init()
 {
 	add_netdev("tap", "TAP/TUN Device", create_tap);
+	return 0;
 }
 
-void deinit_tap()
+void taptun_module::exit()
 {
 	clear_netdev();
 }
+
+
+#else
+	#include "modules/osdmodule.h"
+	#include "netdev_module.h"
+
+	MODULE_NOT_SUPPORTED(taptun_module, OSD_NETDEV_PROVIDER, "taptun")
+#endif
+
+
+MODULE_DEFINITION(NETDEV_TAPTUN, taptun_module)

@@ -159,7 +159,7 @@ void ui_menu_network_devices::populate()
 	{
 		int curr = network->get_interface();
 		const char *title = NULL;
-		const netdev_entry_t *entry = netdev_first();
+		const osd_netdev::entry_t *entry = netdev_first();
 		while(entry) {
 			if(entry->id==curr) {
 				title = entry->description;
