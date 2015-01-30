@@ -2,10 +2,16 @@
   (c) 2000 ExPotato Co. Ltd (Excellent Potato)
 
 TODO:
-can't be emulated without proper mb bios
+Can't be emulated without proper motherboard BIOS
 
-  There also appears to be a sequel which may be running on the same hardware
+  There also appears to be a sequel which may be running on the same hardware, which might not have been released.
   Come On Baby - Ballympic Heroes!  (c) 2001
+  
+  Other games in this series include:
+  Come On Baby 2 (c) 2002
+  Come On Baby Jr (c) 2003 (which seems to be otherwise identical to Come On Baby but in a smaller cabinet)
+  Come On Baby 2 Jr (c) 2003 (which seems to be otherwise identical to Come On Baby 2 but in a smaller cabinet)
+  These may or may not be on identical hardware.
 
   This is a Korean PC based board running Windows.  The game runs fully from
   the hard disk making these things rather fragile and prone to damage.
@@ -14,7 +20,7 @@ can't be emulated without proper mb bios
   just a skeleton placeholder for the CHD dump of the hard disk.
 
   The donor PC looks like a standard Windows98 setup.
-  The only exceptions I see are that there's a game logo.sys/logo.bmp in the
+  The only exceptions we see are that there's a game logo.sys/logo.bmp in the
   root directory to hide the Windows98 startup screen, and a shortcut to
   the game in the startup programs.
   Also of interest, Windows98 was installed from a setup folder on the HD.

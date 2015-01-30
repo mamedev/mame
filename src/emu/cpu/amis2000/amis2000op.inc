@@ -187,31 +187,83 @@ void amis2000_device::op_out()
 void amis2000_device::op_disb()
 {
 	// DISB: set D-latch to ACC and RAM directly
-	op_illegal();
+	m_d = m_acc | ram_r() << 4;
+	m_write_d(0, m_d, 0xff);
+	// TODO: exit from floating mode on D-pins
 }
 
 void amis2000_device::op_disn()
 {
-	// DISN: set D-latch to ACC+carry via segment decoder
-	op_illegal();
+	// DISN: set D-latch to ACC+carry via on-die segment decoder
+	static const UINT8 lut_segment_decoder[0x10] =
+	{
+		// 0-F digits in bit order [DP]abcdefg
+		0x7e, 0x30, 0x6d, 0x79, 0x33, 0x5b, 0x5f, 0x70, 0x7f, 0x7b, 0x77, 0x1f, 0x4e, 0x3d, 0x4f, 0x47
+	};
+	m_d = lut_segment_decoder[m_acc] | (m_carry ? 0x80 : 0x00);
+	m_write_d(0, m_d, 0xff);
+	// TODO: exit from floating mode on D-pins
 }
 
 void amis2000_device::op_mvs()
 {
 	// MVS: output master strobe latch to A-pins
-	op_illegal();
+	m_write_a(0, m_a, 0xffff);
+	// TODO: enter floating mode on D-pins
 }
 
 void amis2000_device::op_psh()
 {
 	// PSH: preset high(BL) master strobe latch
-	op_illegal();
+	switch (m_bl)
+	{
+		case 0xd:
+			// set multiplex operation
+			// ?
+			break;
+
+		case 0xe:
+			// exit from floating mode on D-pins
+			// ?
+			break;
+
+		case 0xf:
+			// set all latch bits high
+			m_a = 0x1fff;
+			break;
+
+		default:
+			// set selected latch bit high
+			m_a |= (1 << m_bl);
+			break;
+	}
 }
 
 void amis2000_device::op_psl()
 {
 	// PSL: preset low(BL) master strobe latch
-	op_illegal();
+	switch (m_bl)
+	{
+		case 0xd:
+			// set static operation
+			// ?
+			break;
+
+		case 0xe:
+			// enter floating mode on D-pins
+			// ?
+			break;
+
+		case 0xf:
+			// set all latch bits low
+			m_a = 0;
+			break;
+
+		default:
+			// set selected latch bit low
+			m_a &= ~(1 << m_bl);
+			break;
+	}
 }
 
 void amis2000_device::op_eur()

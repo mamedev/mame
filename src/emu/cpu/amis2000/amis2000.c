@@ -5,7 +5,9 @@
   American Microsystems, Inc.(AMI) S2000-family 4-bit MCU cores, introduced late 1970s
   
   TODO:
-  - x
+  - unemulated opcodes (need more testing material)
+  - support external program map
+  - add 50/60hz timer
   - add S2200/S2400
 
 */
@@ -147,6 +149,8 @@ void amis2000_device::device_start()
 	m_e = 0;
 	m_i = 0;
 	m_k = 0;
+	m_d = 0;
+	m_a = 0;
 
 	// register for savestates
 	save_item(NAME(m_callstack));
@@ -164,6 +168,8 @@ void amis2000_device::device_start()
 	save_item(NAME(m_e));
 	save_item(NAME(m_i));
 	save_item(NAME(m_k));
+	save_item(NAME(m_d));
+	save_item(NAME(m_a));
 
 	// register state for debugger
 	state_add(S2000_PC,     "PC",     m_pc    ).formatstr("%04X");
@@ -190,6 +196,12 @@ void amis2000_device::device_reset()
 	m_pc = 0;
 	m_skip = false;
 	m_op = 0;
+	
+	// clear i/o
+	m_i = 0;
+	m_k = 0;
+	m_d = 0; m_write_d(0, 0, 0xff);
+	m_a = 0; m_write_a(0, 0, 0xffff);
 }
 
 
