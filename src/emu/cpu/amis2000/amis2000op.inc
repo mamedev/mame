@@ -2,6 +2,18 @@
 
 // internal helpers
 
+UINT8 amis2000_device::ram_r()
+{
+	UINT16 address = m_bu << m_bu_bits | m_bl;
+	return m_data->read_byte(address) & 0xf;
+}
+
+void amis2000_device::ram_w(UINT8 data)
+{
+	UINT16 address = m_bu << m_bu_bits | m_bl;
+	m_data->write_byte(address, data & 0xf);
+}
+
 void amis2000_device::op_illegal()
 {
 	logerror("%s unknown opcode $%02X at $%04X\n", tag(), m_op, m_pc);
@@ -13,61 +25,78 @@ void amis2000_device::op_illegal()
 void amis2000_device::op_lai()
 {
 	// LAI X: load ACC with X, select I and K inputs
-	op_illegal();
+	UINT8 param = m_op & 0x0f;
+	m_acc = param;
+	m_i = m_read_i(0, 0xff) & param;
+	m_k = m_read_k(0, 0xff) & param;
 }
 
 void amis2000_device::op_lab()
 {
 	// LAB: load ACC with BL
-	op_illegal();
+	m_acc = m_bl;
 }
 
 void amis2000_device::op_lae()
 {
 	// LAE: load ACC with E
-	op_illegal();
+	m_acc = m_e;
 }
 
 void amis2000_device::op_xab()
 {
 	// XAB: exchange ACC with BL
-	op_illegal();
+	UINT8 old_acc = m_acc;
+	m_acc = m_bl;
+	m_bl = old_acc;
 }
 
 void amis2000_device::op_xabu()
 {
 	// XABU: exchange ACC with BU
-	op_illegal();
+	UINT8 old_acc = m_acc;
+	m_acc = (m_acc & ~m_bu_mask) | (m_bu & m_bu_mask);
+	m_bu = old_acc & m_bu_mask;
 }
 
 void amis2000_device::op_xae()
 {
 	// XAE: exchange ACC with E
-	op_illegal();
+	UINT8 old_acc = m_acc;
+	m_acc = m_e;
+	m_e = old_acc;
 }
 
 void amis2000_device::op_lbe()
 {
 	// LBE Y: load BU with Y, load BL with E
-	op_illegal();
+	UINT8 param = m_op & 0x03;
+	m_bu = param & m_bu_mask;
+	m_bl = m_e;
 }
 
 void amis2000_device::op_lbep()
 {
 	// LBEP Y: load BU with Y, load BL with E+1
-	op_illegal();
+	UINT8 param = m_op & 0x03;
+	m_bu = param & m_bu_mask;
+	m_bl = m_e + 1;
 }
 
 void amis2000_device::op_lbz()
 {
 	// LBZ Y: load BU with Y, load BL with 0
-	op_illegal();
+	UINT8 param = m_op & 0x03;
+	m_bu = param & m_bu_mask;
+	m_bl = 0;
 }
 
 void amis2000_device::op_lbf()
 {
 	// LBF Y: load BU with Y, load BL with 15
-	op_illegal();
+	UINT8 param = m_op & 0x03;
+	m_bu = param & m_bu_mask;
+	m_bl = 0xf;
 }
 
 
@@ -76,37 +105,49 @@ void amis2000_device::op_lbf()
 void amis2000_device::op_lam()
 {
 	// LAM _Y: load ACC with RAM, xor BU with _Y
-	op_illegal();
+	m_acc = ram_r();
+	UINT8 param = ~m_op & 0x03;
+	m_bu ^= param & m_bu_mask;
 }
 
 void amis2000_device::op_xc()
 {
 	// XC _Y: exchange ACC with RAM, xor BU with _Y
-	op_illegal();
+	UINT8 old_acc = m_acc;
+	m_acc = ram_r();
+	ram_w(old_acc);
+	UINT8 param = ~m_op & 0x03;
+	m_bu ^= param & m_bu_mask;
 }
 
 void amis2000_device::op_xci()
 {
 	// XCI _Y: exchange ACC with RAM, increment BL(skip next on carry), xor BU with _Y
-	op_illegal();
+	op_xc();
+	m_bl = (m_bl + 1) & 0xf;
+	m_skip = (m_bl == 0);
 }
 
 void amis2000_device::op_xcd()
 {
 	// XCD _Y: exchange ACC with RAM, decrement BL(skip next on carry), xor BU with _Y
-	op_illegal();
+	op_xc();
+	m_bl = (m_bl - 1) & 0xf;
+	m_skip = (m_bl == 0xf);
 }
 
 void amis2000_device::op_stm()
 {
 	// STM Z: set RAM bit Z
-	op_illegal();
+	UINT8 param = 1 << (m_op & 0x03);
+	ram_w(ram_r() | param);
 }
 
 void amis2000_device::op_rsm()
 {
 	// RSM Z: reset RAM bit Z
-	op_illegal();
+	UINT8 param = 1 << (m_op & 0x03);
+	ram_w(ram_r() & ~param);
 }
 
 
@@ -204,37 +245,38 @@ void amis2000_device::op_nop()
 void amis2000_device::op_szc()
 {
 	// SZC: skip next on zero(no) carry
-	op_illegal();
+	m_skip = !m_carry;
 }
 
 void amis2000_device::op_szm()
 {
 	// SZM Z: skip next on zero RAM bit Z
-	op_illegal();
+	UINT8 param = 1 << (m_op & 0x03);
+	m_skip = !(ram_r() & param);
 }
 
 void amis2000_device::op_szi()
 {
 	// SZI: skip next on zero I pin(s)
-	op_illegal();
+	m_skip = !m_i;
 }
 
 void amis2000_device::op_szk()
 {
 	// SZK: skip next on zero K pin(s)
-	op_illegal();
+	m_skip = !m_k;
 }
 
 void amis2000_device::op_sbe()
 {
 	// SBE: skip next on BL equ E
-	op_illegal();
+	m_skip = (m_bl == m_e);
 }
 
 void amis2000_device::op_sam()
 {
 	// SAM: skip next on ACC equ RAM
-	op_illegal();
+	m_skip = (m_acc == ram_r());
 }
 
 void amis2000_device::op_sos()
@@ -246,13 +288,13 @@ void amis2000_device::op_sos()
 void amis2000_device::op_tf1()
 {
 	// TF1: skip next on flag 1
-	op_illegal();
+	m_skip = (m_f & 0x01);
 }
 
 void amis2000_device::op_tf2()
 {
 	// TF2: skip next on flag 2
-	op_illegal();
+	m_skip = (m_f & 0x02);
 }
 
 
@@ -261,71 +303,77 @@ void amis2000_device::op_tf2()
 void amis2000_device::op_adcs()
 {
 	// ADCS: add RAM to ACC+carry, skip next on no carry
-	op_illegal();
+	m_acc += ram_r() + m_carry;
+	m_carry = m_acc >> 4 & 1;
+	m_skip = !m_carry;
+	m_acc &= 0xf;
 }
 
 void amis2000_device::op_adis()
 {
 	// ADIS X: add X to ACC, skip next on no carry
-	op_illegal();
+	UINT8 param = m_op & 0x0f;
+	m_acc += param;
+	m_skip = !(m_acc >> 4 & 1);
+	m_acc &= 0xf;
 }
 
 void amis2000_device::op_add()
 {
 	// ADD: add RAM to ACC
-	op_illegal();
+	m_acc = (m_acc + ram_r()) & 0xf;
 }
 
 void amis2000_device::op_and()
 {
 	// AND: and ACC with RAM
-	op_illegal();
+	m_acc &= ram_r();
 }
 
 void amis2000_device::op_xor()
 {
 	// XOR: xor ACC with RAM
-	op_illegal();
+	m_acc ^= ram_r();
 }
 
 void amis2000_device::op_stc()
 {
 	// STC: set carry
-	op_illegal();
+	m_carry = 1;
 }
 
 void amis2000_device::op_rsc()
 {
 	// RSC: reset carry
-	op_illegal();
+	m_carry = 0;
 }
 
 void amis2000_device::op_cma()
 {
 	// CMA: complement ACC
-	op_illegal();
+	m_acc ^= 0xf;
 }
 
 void amis2000_device::op_sf1()
 {
 	// SF1: set flag 1
-	op_illegal();
+	m_f |= 0x01;
 }
 
 void amis2000_device::op_rf1()
 {
 	// RF1: reset flag 1
-	op_illegal();
+	m_f &= ~0x01;
 }
 
 void amis2000_device::op_sf2()
 {
 	// SF2: set flag 2
-	op_illegal();
+	m_f |= 0x02;
 }
 
 void amis2000_device::op_rf2()
 {
 	// RF2: reset flag 2
-	op_illegal();
+	m_f &= ~0x02;
 }

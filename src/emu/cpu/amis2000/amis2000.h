@@ -78,12 +78,16 @@ protected:
 	UINT16 m_callstack[5];      // max 5
 
 	UINT16 m_pc;
+	bool m_skip;
 	UINT8 m_op;
 	UINT8 m_f;                  // generic flags: 2 on 2000/2150, 6 on 2200/2400
+	UINT8 m_carry;              // carry flag
 	UINT8 m_bl;                 // 4-bit ram index x
 	UINT8 m_bu;                 // 2/3-bit ram index y
-	UINT8 m_acc;
-	UINT8 m_e;
+	UINT8 m_acc;                // 4-bit accumulator
+	UINT8 m_e;                  // 4-bit generic register
+	UINT8 m_i;                  // 4-bit i-pins latch
+	UINT8 m_k;                  // 4-bit k-pins latch
 
 	devcb_read8 m_read_k;
 	devcb_read8 m_read_i;
@@ -93,6 +97,8 @@ protected:
 
 	int m_icount;
 	
+	UINT8 ram_r();
+	void ram_w(UINT8 data);
 	void op_illegal();
 	
 	void op_lai();

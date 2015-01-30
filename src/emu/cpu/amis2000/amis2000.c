@@ -114,7 +114,7 @@ offs_t amis2000_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 
 enum
 {
 	S2000_PC=1, S2000_BL, S2000_BU,
-	S2000_ACC, S2000_E
+	S2000_ACC, S2000_E, S2000_CARRY
 };
 
 void amis2000_device::device_start()
@@ -134,22 +134,30 @@ void amis2000_device::device_start()
 	// zerofill
 	memset(m_callstack, 0, sizeof(m_callstack));
 	m_pc = 0;
+	m_skip = false;
 	m_op = 0;
 	m_f = 0;
+	m_carry = 0;
 	m_bl = 0;
 	m_bu = 0;
 	m_acc = 0;
 	m_e = 0;
+	m_i = 0;
+	m_k = 0;
 
 	// register for savestates
 	save_item(NAME(m_callstack));
 	save_item(NAME(m_pc));
+	save_item(NAME(m_skip));
 	save_item(NAME(m_op));
 	save_item(NAME(m_f));
+	save_item(NAME(m_carry));
 	save_item(NAME(m_bl));
 	save_item(NAME(m_bu));
 	save_item(NAME(m_acc));
 	save_item(NAME(m_e));
+	save_item(NAME(m_i));
+	save_item(NAME(m_k));
 
 	// register state for debugger
 	state_add(S2000_PC,     "PC",     m_pc    ).formatstr("%04X");
@@ -157,6 +165,7 @@ void amis2000_device::device_start()
 	state_add(S2000_BU,     "BU",     m_bu    ).formatstr("%01X");
 	state_add(S2000_ACC,    "ACC",    m_acc   ).formatstr("%01X");
 	state_add(S2000_E,      "E",      m_e     ).formatstr("%01X");
+	state_add(S2000_CARRY,  "CARRY",  m_carry ).formatstr("%01X");
 
 	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_f).formatstr("%6s").noshow();
@@ -192,6 +201,13 @@ void amis2000_device::execute_run()
 		debugger_instruction_hook(this, m_pc);
 		m_op = m_program->read_byte(m_pc);
 		m_pc = (m_pc + 1) & 0x1fff;
+		
+		if (m_skip)
+		{
+			// always skip over PP prefix
+			m_skip = ((m_op & 0xf0) == 0x60);
+			continue;
+		}
 
 		switch (m_op & 0xf0)
 		{
