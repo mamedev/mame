@@ -23,12 +23,12 @@ const device_type AMI_S2150 = &device_creator<amis2150_device>;
 
 // internal memory maps
 static ADDRESS_MAP_START(program_1k, AS_PROGRAM, 8, amis2000_device)
-	AM_RANGE(0x000, 0x3ff) AM_ROM
+	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_MIRROR(0x1c00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(program_1_5k, AS_PROGRAM, 8, amis2000_device)
-	AM_RANGE(0x000, 0x3ff) AM_ROM
-	AM_RANGE(0x400, 0x5ff) AM_ROM AM_MIRROR(0x200)
+	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_MIRROR(0x1800)
+	AM_RANGE(0x0400, 0x05ff) AM_ROM AM_MIRROR(0x1a00)
 ADDRESS_MAP_END
 
 
