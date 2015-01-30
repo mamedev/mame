@@ -36,7 +36,7 @@ class amis2000_device : public cpu_device
 public:
 	// construction/destruction
 	amis2000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	amis2000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 bu_bits, UINT8 stack_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
+	amis2000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 bu_bits, UINT8 callstack_bits, UINT8 callstack_depth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_read_k_callback(device_t &device, _Object object) { return downcast<amis2000_device &>(device).m_read_k.set_callback(object); }
@@ -72,16 +72,17 @@ protected:
 	
 	UINT8 m_bu_bits;
 	UINT16 m_bu_mask;
-	UINT8 m_stack_bits;
-	UINT16 m_stack_mask;
-	UINT16 m_stack[3];
+	UINT8 m_callstack_bits;
+	UINT16 m_callstack_mask;
+	UINT8 m_callstack_depth;    // callstack levels: 3 on 2000/2150, 5 on 2200/2400
+	UINT16 m_callstack[5];      // max 5
 
 	UINT16 m_pc;
 	UINT8 m_op;
-	UINT8 m_f;
-	UINT8 m_bl;
-	UINT8 m_bu;
-	UINT8 m_a;
+	UINT8 m_f;                  // generic flags: 2 on 2000/2150, 6 on 2200/2400
+	UINT8 m_bl;                 // 4-bit ram index x
+	UINT8 m_bu;                 // 2/3-bit ram index y
+	UINT8 m_acc;
 	UINT8 m_e;
 
 	devcb_read8 m_read_k;
@@ -91,6 +92,65 @@ protected:
 	devcb_write16 m_write_a;
 
 	int m_icount;
+	
+	void op_illegal();
+	
+	void op_lai();
+	void op_lab();
+	void op_lae();
+	void op_xab();
+	void op_xabu();
+	void op_xae();
+	void op_lbe();
+	void op_lbep();
+	void op_lbz();
+	void op_lbf();
+
+	void op_lam();
+	void op_xc();
+	void op_xci();
+	void op_xcd();
+	void op_stm();
+	void op_rsm();
+
+	void op_inp();
+	void op_out();
+	void op_disb();
+	void op_disn();
+	void op_mvs();
+	void op_psh();
+	void op_psl();
+	void op_eur();
+
+	void op_pp();
+	void op_jmp();
+	void op_jms();
+	void op_rt();
+	void op_rts();
+	void op_nop();
+
+	void op_szc();
+	void op_szm();
+	void op_szi();
+	void op_szk();
+	void op_sbe();
+	void op_sam();
+	void op_sos();
+	void op_tf1();
+	void op_tf2();
+
+	void op_adcs();
+	void op_adis();
+	void op_add();
+	void op_and();
+	void op_xor();
+	void op_stc();
+	void op_rsc();
+	void op_cma();
+	void op_sf1();
+	void op_rf1();
+	void op_sf2();
+	void op_rf2();
 };
 
 

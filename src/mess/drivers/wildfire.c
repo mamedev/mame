@@ -14,7 +14,8 @@
 
 #include "wildfire.lh"
 
-// master clock is MCU internal, default frequency of 850kHz
+// master clock is a single stage RC oscillator: R=?K, C=?pf,
+// S2150 default frequency is 850kHz
 #define MASTER_CLOCK (850000)
 
 
