@@ -134,6 +134,9 @@ void amis2000_device::device_start()
 	// zerofill
 	memset(m_callstack, 0, sizeof(m_callstack));
 	m_pc = 0;
+	m_ppr = 0;
+	m_pbr = 0;
+	m_pp_index = 0;
 	m_skip = false;
 	m_op = 0;
 	m_f = 0;
@@ -148,6 +151,9 @@ void amis2000_device::device_start()
 	// register for savestates
 	save_item(NAME(m_callstack));
 	save_item(NAME(m_pc));
+	save_item(NAME(m_ppr));
+	save_item(NAME(m_pbr));
+	save_item(NAME(m_pp_index));
 	save_item(NAME(m_skip));
 	save_item(NAME(m_op));
 	save_item(NAME(m_f));
@@ -182,6 +188,8 @@ void amis2000_device::device_start()
 void amis2000_device::device_reset()
 {
 	m_pc = 0;
+	m_skip = false;
+	m_op = 0;
 }
 
 
@@ -197,6 +205,15 @@ void amis2000_device::execute_run()
 	while (m_icount > 0)
 	{
 		m_icount--;
+		
+		// increase PP prefix count
+		if ((m_op & 0xf0) == 0x60)
+		{
+			if (m_pp_index < 2)
+				m_pp_index++;
+		}
+		else
+			m_pp_index = 0;
 
 		debugger_instruction_hook(this, m_pc);
 		m_op = m_program->read_byte(m_pc);

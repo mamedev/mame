@@ -72,13 +72,16 @@ protected:
 	
 	UINT8 m_bu_bits;
 	UINT16 m_bu_mask;
-	UINT8 m_callstack_bits;
+	UINT8 m_callstack_bits;     // number of program counter bits held in callstack
 	UINT16 m_callstack_mask;
 	UINT8 m_callstack_depth;    // callstack levels: 3 on 2000/2150, 5 on 2200/2400
 	UINT16 m_callstack[5];      // max 5
 
-	UINT16 m_pc;
-	bool m_skip;
+	UINT16 m_pc;                // 13-bit program counter
+	UINT8 m_ppr;                // prepared page register (PP 1)
+	UINT8 m_pbr;                // prepared bank register (PP 2)
+	UINT8 m_pp_index;           // number of handled PP prefixes
+	bool m_skip;                // skip next opcode, including PP prefixes
 	UINT8 m_op;
 	UINT8 m_f;                  // generic flags: 2 on 2000/2150, 6 on 2200/2400
 	UINT8 m_carry;              // carry flag
@@ -99,6 +102,8 @@ protected:
 	
 	UINT8 ram_r();
 	void ram_w(UINT8 data);
+	void pop_callstack();
+	void push_callstack();
 	void op_illegal();
 	
 	void op_lai();
