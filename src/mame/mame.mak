@@ -148,7 +148,9 @@ CPUS += IE15
 CPUS += 8X300
 CPUS += ALTO2
 #CPUS += W65816
-#CPUS += AMIS2000
+CPUS += ARC
+CPUS += ARCOMPACT
+CPUS += AMIS2000
 
 #-------------------------------------------------
 # specify available sound cores
