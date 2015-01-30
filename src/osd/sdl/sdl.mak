@@ -209,8 +209,8 @@ endif
 ifeq ($(TARGETOS),linux)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = tc
-#SDL_NETWORK = taptun
-SDL_NETWORK = pcap
+SDL_NETWORK = taptun
+#SDL_NETWORK = pcap
 
 ifndef NO_USE_MIDI
 INCPATH += `pkg-config --cflags alsa`
