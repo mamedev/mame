@@ -14,6 +14,25 @@ void amis2000_device::ram_w(UINT8 data)
 	m_data->write_byte(address, data & 0xf);
 }
 
+void amis2000_device::pop_callstack()
+{
+	m_pc = (m_pc & ~m_callstack_mask) | (m_callstack[0] & m_callstack_mask);
+	for (int i = 0; i < m_callstack_depth-1; i++)
+	{
+		m_callstack[i] = m_callstack[i+1];
+		m_callstack[i+1] = 0;
+	}
+}
+
+void amis2000_device::push_callstack()
+{
+	for (int i = m_callstack_depth-1; i >= 1; i--)
+	{
+		m_callstack[i] = m_callstack[i-1];
+	}
+	m_callstack[0] = m_pc & m_callstack_mask;
+}
+
 void amis2000_device::op_illegal()
 {
 	logerror("%s unknown opcode $%02X at $%04X\n", tag(), m_op, m_pc);
@@ -207,31 +226,56 @@ void amis2000_device::op_eur()
 void amis2000_device::op_pp()
 {
 	// PP _X: prepare page/bank with _X
-	op_illegal();
+	UINT8 param = ~m_op & 0x0f;
+	if (m_pp_index == 0)
+		m_ppr = param;
+	else
+		m_pbr = param & 7;
 }
 
 void amis2000_device::op_jmp()
 {
 	// JMP X: jump to X(+PP)
-	op_illegal();
+	UINT16 mask = 0x3f;
+	UINT16 param = m_op & mask;
+	if (m_pp_index > 0)
+	{
+		param |= m_ppr << 6;
+		mask |= 0x3c0;
+	}
+	if (m_pp_index > 1)
+	{
+		param |= m_pbr << 10;
+		mask |= 0x1c00;
+	}
+	m_pc = (m_pc & ~mask) | param;
 }
 
 void amis2000_device::op_jms()
 {
 	// JMS X: call to X(+PP)
-	op_illegal();
+	m_icount--;
+	push_callstack();
+	if (m_pp_index == 0)
+	{
+		// subroutines default location is page 15
+		m_ppr = 0xf;
+		m_pp_index++;
+	}
+	op_jmp();
 }
 
 void amis2000_device::op_rt()
 {
 	// RT: return from subroutine
-	op_illegal();
+	pop_callstack();
 }
 
 void amis2000_device::op_rts()
 {
 	// RTS: return from subroutine and skip next
-	op_illegal();
+	op_rt();
+	m_skip = true;
 }
 
 void amis2000_device::op_nop()
