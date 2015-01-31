@@ -110,7 +110,7 @@ void amis2000_device::op_lbep()
 	{
 		UINT8 param = m_op & 0x03;
 		m_bu = param & m_bu_mask;
-		m_bl = m_e + 1;
+		m_bl = (m_e + 1) & 0xf;
 	}
 }
 
@@ -146,7 +146,7 @@ void amis2000_device::op_lam()
 	// LAM _Y: load ACC with RAM, xor BU with _Y
 	m_acc = ram_r();
 	UINT8 param = ~m_op & 0x03;
-	m_bu ^= param & m_bu_mask;
+	m_bu ^= (param & m_bu_mask);
 }
 
 void amis2000_device::op_xc()
@@ -156,7 +156,7 @@ void amis2000_device::op_xc()
 	m_acc = ram_r();
 	ram_w(old_acc);
 	UINT8 param = ~m_op & 0x03;
-	m_bu ^= param & m_bu_mask;
+	m_bu ^= (param & m_bu_mask);
 }
 
 void amis2000_device::op_xci()
