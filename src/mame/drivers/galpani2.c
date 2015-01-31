@@ -78,8 +78,6 @@ Notes:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/okim6295.h"
-#include "machine/eepromser.h"
 #include "includes/galpani2.h"
 
 /***************************************************************************
@@ -127,6 +125,10 @@ void galpani2_state::machine_start()
 	UINT8 *ROM = memregion("subdata")->base();
 	membank("subdatabank")->configure_entries(0, 0x2000000/0x0800000, ROM, 0x0800000);
 	membank("subdatabank")->set_entry(0);
+	
+	save_item(NAME(m_eeprom_word));
+	save_item(NAME(m_old_mcu_nmi1));
+	save_item(NAME(m_old_mcu_nmi2));
 
 }
 
@@ -1192,15 +1194,15 @@ ROM_START( gp2quiz )
 	ROM_LOAD( "gp2-101-0044.u60",  0x200000, 0x100000, CRC(3c45134f) SHA1(a5362bfcc6beb6e776c1bce4544475f8947fccea) )
 ROM_END
 
-GAME( 1993, galpani2,  0,        galpani2, galpani2, driver_device, 0, ROT90, "Kaneko", "Gals Panic II (Asia)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-GAME( 1993, galpani2e, galpani2, galpani2, galpani2, driver_device, 0, ROT90, "Kaneko", "Gals Panic II (English)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-GAME( 1993, galpani2e2,galpani2, galpani2, galpani2, driver_device, 0, ROT90, "Kaneko", "Gals Panic II (English, 2 PCB ver.)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-GAME( 1993, galpani2g, galpani2, galpani2, galpani2, driver_device, 0, ROT90, "Kaneko", "Gals Panic II (Germany, 2 PCB ver.)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-GAME( 1993, galpani2i, galpani2, galpani2, galpani2, driver_device, 0, ROT90, "Kaneko", "Gals Panic II (Italy, single PCB)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-GAME( 1993, galpani2gs,galpani2, galpani2, galpani2, driver_device, 0, ROT90, "Kaneko", "Gals Panic II (Germany, single PCB)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-GAME( 1993, galpani2t, galpani2, galpani2, galpani2, driver_device, 0, ROT90, "Kaneko", "Gals Panic II (Taiwan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-GAME( 1993, galpani2j, galpani2, galpani2, galpani2, driver_device, 0, ROT90, "Kaneko", "Gals Panic II (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION ) // it is a 'quiz edition' but the title screen doesn't say, maybe all Japanese versions have the Quiz
+GAME( 1993, galpani2,  0,        galpani2, galpani2, driver_device, 0, ROT90, "Kaneko", "Gals Panic II (Asia)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1993, galpani2e, galpani2, galpani2, galpani2, driver_device, 0, ROT90, "Kaneko", "Gals Panic II (English)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1993, galpani2e2,galpani2, galpani2, galpani2, driver_device, 0, ROT90, "Kaneko", "Gals Panic II (English, 2 PCB ver.)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1993, galpani2g, galpani2, galpani2, galpani2, driver_device, 0, ROT90, "Kaneko", "Gals Panic II (Germany, 2 PCB ver.)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1993, galpani2i, galpani2, galpani2, galpani2, driver_device, 0, ROT90, "Kaneko", "Gals Panic II (Italy, single PCB)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1993, galpani2gs,galpani2, galpani2, galpani2, driver_device, 0, ROT90, "Kaneko", "Gals Panic II (Germany, single PCB)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1993, galpani2t, galpani2, galpani2, galpani2, driver_device, 0, ROT90, "Kaneko", "Gals Panic II (Taiwan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1993, galpani2j, galpani2, galpani2, galpani2, driver_device, 0, ROT90, "Kaneko", "Gals Panic II (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) // it is a 'quiz edition' but the title screen doesn't say, maybe all Japanese versions have the Quiz
 
-GAME( 1993, gp2quiz,  0,        galpani2, galpani2, driver_device, 0, ROT90, "Kaneko", "Gals Panic II - Quiz Version", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION ) // this one has 'quiz edition' on the title screen
+GAME( 1993, gp2quiz,  0,        galpani2, galpani2, driver_device, 0, ROT90, "Kaneko", "Gals Panic II - Quiz Version", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) // this one has 'quiz edition' on the title screen
 
-GAME( 1994, gp2se,    0,        galpani2, gp2se, driver_device,    0, ROT90, "Kaneko", "Gals Panic II' - Special Edition (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
+GAME( 1994, gp2se,    0,        galpani2, gp2se, driver_device,    0, ROT90, "Kaneko", "Gals Panic II' - Special Edition (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )

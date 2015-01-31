@@ -14,6 +14,7 @@
 #include "machine/eepromser.h"
 #include "machine/kaneko_calc3.h"
 #include "machine/kaneko_toybox.h"
+#include "sound/2203intf.h"
 #include "sound/okim6295.h"
 
 
@@ -27,14 +28,16 @@ public:
 		m_oki(*this, "oki"),
 		m_oki1(*this, "oki1"),
 		m_oki2(*this, "oki2"),
-		m_spriteram(*this, "spriteram"),
-		m_mainram(*this, "mainram"),
+		m_ym2149_1(*this, "ym2149_1"),
+		m_ym2149_2(*this, "ym2149_2"),
 		m_view2_0(*this, "view2_0"),
 		m_view2_1(*this, "view2_1"),
 		m_kaneko_spr(*this, "kan_spr"),
 		m_pandora(*this, "pandora"),
 		m_palette(*this, "palette"),
-		m_eeprom(*this, "eeprom")
+		m_eeprom(*this, "eeprom"),
+		m_spriteram(*this, "spriteram"),
+		m_mainram(*this, "mainram")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -42,8 +45,8 @@ public:
 	optional_device<okim6295_device> m_oki;
 	optional_device<okim6295_device> m_oki1;
 	optional_device<okim6295_device> m_oki2;
-	optional_shared_ptr<UINT16> m_spriteram;
-	optional_shared_ptr<UINT16> m_mainram;
+	optional_device<ym2149_device> m_ym2149_1;
+	optional_device<ym2149_device> m_ym2149_2;
 	optional_device<kaneko_view2_tilemap_device> m_view2_0;
 	optional_device<kaneko_view2_tilemap_device> m_view2_1;
 	optional_device<kaneko16_sprite_device> m_kaneko_spr;
@@ -51,15 +54,17 @@ public:
 	required_device<palette_device> m_palette;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 
+	optional_shared_ptr<UINT16> m_spriteram;
+	optional_shared_ptr<UINT16> m_mainram;
+	
 	UINT16 m_disp_enable;
 
-	int VIEW2_2_pri;
+	int m_VIEW2_2_pri;
 
 
 	DECLARE_WRITE16_MEMBER(kaneko16_coin_lockout_w);
 	DECLARE_WRITE16_MEMBER(kaneko16_soundlatch_w);
 	DECLARE_WRITE16_MEMBER(kaneko16_eeprom_w);
-
 
 	DECLARE_WRITE16_MEMBER(kaneko16_display_enable);
 
@@ -84,14 +89,11 @@ public:
 	template<class _BitmapClass>
 	UINT32 screen_update_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect);
 
-
-
 	TIMER_DEVICE_CALLBACK_MEMBER(kaneko16_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(shogwarr_interrupt);
 
 	template<class _BitmapClass>
 	void kaneko16_fill_bitmap(palette_device* palette, _BitmapClass &bitmap, const rectangle &cliprect);
-
 
 	void kaneko16_common_oki_bank_w(  const char *bankname, const char* tag, int bank, size_t fixedsize, size_t bankedsize );
 	void kaneko16_unscramble_tiles(const char *region);
