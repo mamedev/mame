@@ -281,14 +281,14 @@ public:
 	optional_device<k001006_device> m_k001006_2;
 	optional_device<k001604_device> m_k001604_1;
 	optional_device<k001604_device> m_k001604_2;
-	
+
 	required_shared_ptr<UINT32> m_work_ram;
 	required_shared_ptr<UINT32> m_generic_paletteram_32;
-	
+
 	optional_ioport m_analog0, m_analog1, m_analog2, m_analog3;
-	
+
 	required_ioport_array<4> m_ports;
-	
+
 	DECLARE_IOPORT_ARRAY(ports);
 
 	DECLARE_WRITE32_MEMBER(paletteram32_w);

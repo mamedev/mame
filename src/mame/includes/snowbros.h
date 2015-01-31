@@ -69,5 +69,4 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(snowbros3_irq);
 	void sb3_play_music(int data);
 	void sb3_play_sound (okim6295_device *oki, int data);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

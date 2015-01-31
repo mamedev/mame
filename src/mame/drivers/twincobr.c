@@ -646,16 +646,6 @@ static GFXDECODE_START( twincobr )
 GFXDECODE_END
 
 
-
-
-/* handler called by the 3812 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(twincobr_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state);
-}
-
-
-
 static MACHINE_CONFIG_START( twincobr, twincobr_state )
 
 	/* basic machine hardware */
@@ -702,7 +692,7 @@ static MACHINE_CONFIG_START( twincobr, twincobr_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(twincobr_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

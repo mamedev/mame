@@ -1483,6 +1483,25 @@ static ADDRESS_MAP_START( anteateruk_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xc100, 0xc103) AM_MIRROR(0x3efc) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 ADDRESS_MAP_END
 
+// this is WRONG (a copy of the above) but set does appear to have a similar odd memory map with RAM aronud 0x400 and scrambled ROMs
+static ADDRESS_MAP_START( spactrai_map, AS_PROGRAM, 8, galaxian_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x03ff) AM_ROM
+	AM_RANGE(0x0400, 0x0bff) AM_RAM
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x1001, 0x1001) AM_MIRROR(0x01f8) AM_WRITE(irq_enable_w)
+	AM_RANGE(0x1002, 0x1002) AM_MIRROR(0x01f8) AM_WRITE(coin_count_0_w)
+	AM_RANGE(0x1003, 0x1003) AM_MIRROR(0x01f8) AM_WRITE(scramble_background_enable_w)
+	AM_RANGE(0x1004, 0x1004) AM_MIRROR(0x01f8) AM_WRITE(galaxian_stars_enable_w)
+	AM_RANGE(0x1005, 0x1005) AM_MIRROR(0x01f8) //POUT2
+	AM_RANGE(0x1006, 0x1006) AM_MIRROR(0x01f8) AM_WRITE(galaxian_flip_screen_x_w)
+	AM_RANGE(0x1007, 0x1007) AM_MIRROR(0x01f8) AM_WRITE(galaxian_flip_screen_y_w)
+	AM_RANGE(0x1200, 0x12ff) AM_MIRROR(0x0100) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
+	AM_RANGE(0x1400, 0x1400) AM_MIRROR(0x03ff) AM_READ(watchdog_reset_r)
+	AM_RANGE(0x4000, 0xbfff) AM_ROM
+//  AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x3efc) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+//  AM_RANGE(0xc100, 0xc103) AM_MIRROR(0x3efc) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( anteaterg_map, AS_PROGRAM, 8, galaxian_state )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -5111,6 +5130,13 @@ static MACHINE_CONFIG_DERIVED( galaxian, galaxian_base )
 	MCFG_FRAGMENT_ADD(galaxian_audio)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( spactrai, galaxian )
+
+	/* strange memory map, maybe a kind of protection */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(spactrai_map)
+MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_DERIVED( pacmanbl, galaxian )
 
@@ -7254,6 +7280,23 @@ ROM_START( warofbugg )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "warofbug.clr", 0x0000, 0x0020, CRC(8688e64b) SHA1(ed13414257f580b98b50c9892a14159c55e7838d) )
+ROM_END
+
+// has a large custom block on the ROM board
+ROM_START( spactrai )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1cen.bin",   0x0000, 0x1000, CRC(fabc7fd8) SHA1(88c42dda38cc79ab4f180c4818cfb928c1cc0661) )
+	ROM_LOAD( "2cen.bin",   0x1000, 0x1000, CRC(44ddacfa) SHA1(50a9f5f3e4ec12fd3742dcf7cf141e52300a10db) )
+	ROM_LOAD( "3cen.bin",   0x2000, 0x1000, CRC(822749cb) SHA1(92e617088d462911118842f3f68b7ff8ac77fcf5) )
+	ROM_LOAD( "4cen.bin",   0x3000, 0x1000, CRC(f9dda0ed) SHA1(a77f6d8ec7b3df7f308354489954c3d9b4f61b0d) )
+	ROM_LOAD( "5cen.bin",   0x4000, 0x1000, CRC(b8c76675) SHA1(acdda20adf62d1e2eadcc097ecde6a3126231415) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "6cen.bin",  0x0000, 0x0800, CRC(a59a9f3f) SHA1(9564f1d013d566dc0b19762aec66119e2ece0b49) ) // MK2716J
+	ROM_LOAD( "7cen.bin",  0x0800, 0x0400, CRC(16cf5a5b) SHA1(0369786902544d31e506fe1ba6a69aa6e8ba9b5c) ) // MM2758A
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "stk.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 
@@ -10696,6 +10739,7 @@ GAME( 1983, spcwarp,     0,        galaxian,   galaxian,   galaxian_state, galax
 GAME( 1981, warofbug,    0,        galaxian,   warofbug,   galaxian_state, nolock,     ROT90,  "Armenia / Food and Fun Corp", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze", GAME_SUPPORTS_SAVE )
 GAME( 1981, warofbugu,   warofbug, galaxian,   warofbug,   galaxian_state, nolock,     ROT90,  "Armenia / Super Video Games", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze (US)", GAME_SUPPORTS_SAVE )
 GAME( 1981, warofbugg,   warofbug, galaxian,   warofbug,   galaxian_state, nolock,     ROT90,  "Armenia", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze (German)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1981, spactrai,    warofbug, spactrai,   warofbug,   galaxian_state, nolock,     ROT90,  "Armenia / Adar", "Space Train", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1981, redufo,      0,        galaxian,   redufo,     galaxian_state, nolock,     ROT270, "Artic", "Defend the Terra Attack on the Red UFO", GAME_SUPPORTS_SAVE ) // is this the original?
 GAME( 1981, redufob,     redufo,   galaxian,   redufob,    galaxian_state, nolock,     ROT90,  "bootleg", "Defend the Terra Attack on the Red UFO (bootleg)", GAME_SUPPORTS_SAVE ) // rev A?
 GAME( 19??, exodus,      redufo,   galaxian,   redufo,     galaxian_state, nolock,     ROT90,  "bootleg? (Subelectro)", "Exodus (bootleg?)", GAME_SUPPORTS_SAVE )

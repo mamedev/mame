@@ -287,7 +287,6 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_nmg5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bitmap( bitmap_ind16 &bitmap );
-	DECLARE_WRITE_LINE_MEMBER(soundirq);
 };
 
 
@@ -952,11 +951,6 @@ static GFXDECODE_START( pclubys )
 GFXDECODE_END
 
 
-WRITE_LINE_MEMBER(nmg5_state::soundirq)
-{
-	m_soundcpu->set_input_line(0, state);
-}
-
 void nmg5_state::machine_start()
 {
 	save_item(NAME(m_gfx_bank));
@@ -1011,7 +1005,7 @@ static MACHINE_CONFIG_START( nmg5, nmg5_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000) /* 4MHz */
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(nmg5_state, soundirq))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki", 1000000 , OKIM6295_PIN7_HIGH)

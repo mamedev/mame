@@ -1087,6 +1087,31 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/nes_ctrl/ctrl.h,BUSES += NES_CTRL
+#-------------------------------------------------
+
+ifneq ($(filter NES_CTRL,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/nes_ctrl
+BUSOBJS += $(BUSOBJ)/nes_ctrl/ctrl.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/joypad.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/4score.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/arkpaddle.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/bcbattle.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/ftrainer.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/fckeybrd.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/hori.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/konamihs.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/miracle.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/mjpanel.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/pachinko.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/partytap.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/powerpad.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/suborkey.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/zapper.o
+endif
+
+#-------------------------------------------------
+#
 #@src/emu/bus/snes/snes_slot.h,BUSES += SNES
 #-------------------------------------------------
 
@@ -1266,12 +1291,12 @@ endif
 
 #-------------------------------------------------
 #
-#@src/emu/bus/gamegear/gear2gear.h,BUSES += GAMEGEAR
+#@src/emu/bus/gamegear/ggext.h,BUSES += GAMEGEAR
 #-------------------------------------------------
 
 ifneq ($(filter GAMEGEAR,$(BUSES)),)
 OBJDIRS += $(BUSOBJ)/gamegear
-BUSOBJS += $(BUSOBJ)/gamegear/gear2gear.o
+BUSOBJS += $(BUSOBJ)/gamegear/ggext.o
 BUSOBJS += $(BUSOBJ)/gamegear/smsctrladp.o
 endif
 

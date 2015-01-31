@@ -186,14 +186,6 @@ WRITE8_MEMBER( bfm_sc5_state::sc5_10202F0_w )
 }
 
 
-
-WRITE_LINE_MEMBER(bfm_sc5_state::bfm_sc5_ym_irqhandler)
-{
-	logerror("YMZ280 is generating an interrupt. State=%08x\n",state);
-}
-
-
-
 WRITE_LINE_MEMBER(bfm_sc5_state::bfm_sc5_duart_irq_handler)
 {
 	printf("bfm_sc5_duart_irq_handler\n");
@@ -235,6 +227,5 @@ MACHINE_CONFIG_START( bfm_sc5, bfm_sc5_state )
 	MCFG_DEFAULT_LAYOUT(layout_bfm_sc5)
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, 16000000) // ?? Mhz
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(bfm_sc5_state, bfm_sc5_ym_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

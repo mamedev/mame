@@ -57,7 +57,7 @@ extern offs_t ppc_dasm_one(char *buffer, UINT32 pc, UINT32 op);
 ***************************************************************************/
 
 #define R32(reg)                m_regmap[reg]
-#define R32Z(reg)               (((reg) == 0) ? parameter(0) : m_regmap[reg])
+#define R32Z(reg)               (((reg) == 0) ? uml::parameter(0) : m_regmap[reg])
 #define F64(reg)                m_fdregmap[reg]
 #define CR32(reg)               mem(&m_core->cr[reg])
 #define FPSCR32                 mem(&m_core->fpscr)
@@ -1549,7 +1549,7 @@ void ppc_device::generate_update_mode(drcuml_block *block)
     an exception if out
 -------------------------------------------------*/
 
-void ppc_device::generate_update_cycles(drcuml_block *block, compiler_state *compiler, parameter param, int allow_exception)
+void ppc_device::generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, int allow_exception)
 {
 	/* check full interrupts if pending */
 	if (compiler->checkints)

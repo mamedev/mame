@@ -157,5 +157,4 @@ public:
 	void draw_normal_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, int which);
 	void draw_text_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	UINT8 *brickzn_decrypt();
-	DECLARE_WRITE_LINE_MEMBER(soundirq);
 };

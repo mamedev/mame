@@ -20,9 +20,9 @@
 
 
 /**************************************************
- 
+
  BARCODE READER MENU
- 
+
  **************************************************/
 
 
@@ -51,7 +51,7 @@ ui_menu_barcode_reader::~ui_menu_barcode_reader()
 void ui_menu_barcode_reader::populate()
 {
 	if (current_device())
-	{		
+	{
 		astring buffer;
 		const char *new_barcode;
 
@@ -68,13 +68,13 @@ void ui_menu_barcode_reader::populate()
 		{
 			new_barcode = m_barcode_buffer;
 		}
-		
+
 		item_append("New Barcode:", new_barcode, 0, ITEMREF_NEW_BARCODE);
-		
+
 		// finish up the menu
 		item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 		item_append("Enter Code", NULL, 0, ITEMREF_ENTER_BARCODE);
-		
+
 		customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 	}
 }
@@ -103,7 +103,7 @@ void ui_menu_barcode_reader::handle()
 				if (event->itemref == ITEMREF_SELECT_READER)
 					previous();
 				break;
-				
+
 			case IPT_UI_RIGHT:
 				if (event->itemref == ITEMREF_SELECT_READER)
 					next();

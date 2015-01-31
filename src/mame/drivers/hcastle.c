@@ -152,11 +152,6 @@ GFXDECODE_END
 
 /*****************************************************************************/
 
-WRITE_LINE_MEMBER(hcastle_state::irqhandler)
-{
-//  m_audiocpu->set_input_line(state);
-}
-
 WRITE8_MEMBER(hcastle_state::volume_callback)
 {
 	m_k007232->set_volume(0, (data >> 4) * 0x11, 0);
@@ -229,7 +224,7 @@ static MACHINE_CONFIG_START( hcastle, hcastle_state )
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3579545)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(hcastle_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI)) /* from schematic; NMI handler is just a retn */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
 	MCFG_K051649_ADD("k051649", 3579545/2)

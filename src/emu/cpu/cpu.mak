@@ -79,6 +79,9 @@ endif
 
 $(CPUOBJ)/8x300/8x300.o:    $(CPUSRC)/8x300/8x300.c \
 							$(CPUSRC)/8x300/8x300.h
+
+
+
 #-------------------------------------------------
 # ARCangent A4
 #@src/emu/cpu/arc/arc.h,CPUS += ARC
@@ -92,6 +95,8 @@ endif
 
 $(CPUOBJ)/arc/arc.o:  $(CPUSRC)/arc/arc.c \
 			$(CPUSRC)/arc/arc.h
+
+
 
 #-------------------------------------------------
 # ARcompact (ARCtangent-A5, ARC 600, ARC 700)
@@ -129,6 +134,8 @@ $(CPUOBJ)/arcompact/arcompact_common.o:  $(CPUSRC)/arcompact/arcompact_common.c 
 $(CPUOBJ)/arcompact/arcompact.inc: $(CPUSRC)/arcompact/arcompact_make.py
 	@echo Generating arcompact source .inc files...
 	$(PYTHON) $(CPUSRC)/arcompact/arcompact_make.py $@
+
+
 
 #-------------------------------------------------
 # Acorn ARM series
@@ -173,6 +180,8 @@ $(CPUOBJ)/arm7/arm7thmb.o:  $(CPUSRC)/arm7/arm7thmb.c \
 						$(CPUSRC)/arm7/arm7help.h \
 						$(CPUSRC)/arm7/arm7core.h \
 
+
+
 #-------------------------------------------------
 # Advanced Digital Chips SE3208
 #@src/emu/cpu/se3208/se3208.h,CPUS += SE3208
@@ -186,6 +195,26 @@ endif
 
 $(CPUOBJ)/se3208/se3208.o:  $(CPUSRC)/se3208/se3208.c \
 							$(CPUSRC)/se3208/se3208.h
+
+
+
+#-------------------------------------------------
+# American Microsystems, Inc.(AMI) S2000 series
+#@src/emu/cpu/amis2000/amis2000.h,CPUS += AMIS2000
+#-------------------------------------------------
+
+ifneq ($(filter AMIS2000,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/amis2000
+CPUOBJS += $(CPUOBJ)/amis2000/amis2000.o
+DASMOBJS += $(CPUOBJ)/amis2000/amis2000d.o
+endif
+
+$(CPUOBJ)/amis2000/amis2000.o:  $(CPUSRC)/amis2000/amis2000.h \
+								$(CPUSRC)/amis2000/amis2000.c \
+								$(CPUSRC)/amis2000/amis2000op.inc
+
+$(CPUOBJ)/amis2000/amis2000d.o: $(CPUSRC)/amis2000/amis2000.h \
+								$(CPUSRC)/amis2000/amis2000d.c
 
 
 

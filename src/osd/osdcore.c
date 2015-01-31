@@ -54,9 +54,9 @@ static output_delegate output_cb[OSD_OUTPUT_CHANNEL_COUNT] =
 output_delegate osd_set_output_channel(output_channel channel, output_delegate callback)
 {
 	if (!(channel < OSD_OUTPUT_CHANNEL_COUNT) || callback.isnull())
-    {
-	    throw std::exception();
-    }
+	{
+		throw std::exception();
+	}
 
 	/* return the originals if requested */
 	output_delegate prevcb = output_cb[channel];
@@ -166,4 +166,3 @@ void CLIB_DECL osd_printf_log(const char *format, ...)
 	va_end(argptr);
 }
 #endif
-

@@ -91,6 +91,8 @@ OBJDIRS += $(WINOBJ) \
 	$(OSDOBJ)/modules/sync \
 	$(OSDOBJ)/modules/lib \
 	$(OSDOBJ)/modules/midi \
+	$(OSDOBJ)/modules/font \
+	$(OSDOBJ)/modules/netdev \
 
 ifdef USE_QTDEBUG
 OBJDIRS += $(OSDOBJ)/modules/debugger/qt
@@ -312,7 +314,7 @@ LDFLAGS += -static-libgcc
 
 ifeq ($(CROSS_BUILD),1)
 	LDFLAGS += -static
-endif	
+endif
 
 # TODO: needs to use $(CC)
 TEST_GCC := $(shell gcc --version)
@@ -348,7 +350,6 @@ OSDCOREOBJS = \
 	$(WINOBJ)/strconv.o \
 	$(WINOBJ)/windir.o \
 	$(WINOBJ)/winfile.o \
-	$(WINOBJ)/winmisc.o \
 	$(OSDOBJ)/modules/sync/sync_windows.o \
 	$(WINOBJ)/winutf8.o \
 	$(WINOBJ)/winutil.o \
@@ -356,6 +357,7 @@ OSDCOREOBJS = \
 	$(WINOBJ)/winsocket.o \
 	$(OSDOBJ)/modules/sync/work_osd.o \
 	$(OSDOBJ)/modules/lib/osdlib_win32.o \
+	$(OSDOBJ)/modules/osdmodule.o \
 	$(WINOBJ)/winptty.o \
 
 
@@ -372,13 +374,22 @@ OSDOBJS = \
 	$(WINOBJ)/drawnone.o \
 	$(WINOBJ)/input.o \
 	$(WINOBJ)/output.o \
-	$(OSDOBJ)/modules/sound/direct_sound.o \
+	$(OSDOBJ)/modules/sound/js_sound.o  \
+	$(OSDOBJ)/modules/sound/direct_sound.o  \
+	$(OSDOBJ)/modules/sound/sdl_sound.o  \
+	$(OSDOBJ)/modules/sound/none.o  \
 	$(WINOBJ)/video.o \
 	$(WINOBJ)/window.o \
 	$(WINOBJ)/winmenu.o \
 	$(WINOBJ)/winmain.o \
 	$(OSDOBJ)/modules/midi/portmidi.o \
 	$(OSDOBJ)/modules/lib/osdobj_common.o  \
+	$(OSDOBJ)/modules/font/font_sdl.o \
+	$(OSDOBJ)/modules/font/font_windows.o \
+	$(OSDOBJ)/modules/font/font_osx.o \
+	$(OSDOBJ)/modules/font/font_none.o \
+	$(OSDOBJ)/modules/netdev/pcap.o \
+	$(OSDOBJ)/modules/netdev/taptun.o \
 
 ifdef USE_SDL
 OSDOBJS += \
@@ -386,9 +397,7 @@ OSDOBJS += \
 endif
 
 ifndef DONT_USE_NETWORK
-OSDOBJS += \
-	$(WINOBJ)/netdev.o \
-	$(WINOBJ)/netdev_pcap.o
+DEFS +=	-DSDLMAME_NET_PCAP
 endif
 
 CCOMFLAGS += -DDIRECT3D_VERSION=0x0900
@@ -399,7 +408,10 @@ $(WINOBJ)/drawgdi.o :   $(SRC)/emu/rendersw.inc
 
 # add debug-specific files
 OSDOBJS += \
-	$(OSDOBJ)/modules/debugger/debugwin.o
+	$(OSDOBJ)/modules/debugger/debugwin.o \
+	$(OSDOBJ)/modules/debugger/debugint.o \
+	$(OSDOBJ)/modules/debugger/debugqt.o \
+	$(OSDOBJ)/modules/debugger/none.o \
 
 # add a stub resource file
 RESFILE = $(WINOBJ)/mame.res
@@ -412,14 +424,12 @@ QT_INSTALL_HEADERS := $(shell qmake -query QT_INSTALL_HEADERS)
 QT_LIBS := -L$(shell qmake -query QT_INSTALL_LIBS)
 LIBS += $(QT_LIBS) -lqtmain -lQtGui4 -lQtCore4
 INCPATH += -I$(QT_INSTALL_HEADERS)/QtCore -I$(QT_INSTALL_HEADERS)/QtGui -I$(QT_INSTALL_HEADERS)
-CFLAGS += -DUSE_QTDEBUG
 
 MOC = @moc
 $(OSDOBJ)/%.moc.c: $(OSDSRC)/%.h
 	$(MOC) $(INCPATH) $(DEFS) $< -o $@
 
 OSDOBJS += \
-	$(OSDOBJ)/modules/debugger/debugqt.o \
 	$(OSDOBJ)/modules/debugger/qt/debugqtview.o \
 	$(OSDOBJ)/modules/debugger/qt/debugqtwindow.o \
 	$(OSDOBJ)/modules/debugger/qt/debugqtlogwindow.o \

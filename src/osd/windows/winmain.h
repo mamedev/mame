@@ -252,14 +252,7 @@ public:
 	// input overridables
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist);
 
-	// font overridables
-	virtual osd_font *font_open(const char *name, int &height);
-	virtual void font_close(osd_font *font);
-	virtual bool font_get_bitmap(osd_font *font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs);
-
 	virtual void video_register();
-	virtual void sound_register();
-	virtual void debugger_register();
 
 	virtual bool video_init();
 	virtual bool window_init();
@@ -267,17 +260,11 @@ public:
 	virtual void input_pause();
 	virtual void input_resume();
 	virtual bool output_init();
-	#ifdef USE_NETWORK
-	virtual bool network_init();
-	#endif
 
 	virtual void video_exit();
 	virtual void window_exit();
 	virtual void input_exit();
 	virtual void output_exit();
-	#ifdef USE_NETWORK
-	virtual void network_exit();
-	#endif
 
 private:
 	void osd_exit();

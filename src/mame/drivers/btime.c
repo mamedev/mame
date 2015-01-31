@@ -1935,17 +1935,18 @@ ROM_END
 
 ROM_START( discof )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "w5-f",     0xa000, 0x1000, CRC(9d53c71c) SHA1(53c410cfa4fbbfd08e1c3cf7aeba1c9627171a71) )
-	ROM_LOAD( "w4-f",     0xb000, 0x1000, CRC(c1f8d747) SHA1(33f5fe73d1851ef4da670075d1aec1550e0417ce) )
-	ROM_LOAD( "w3-f",     0xc000, 0x1000, CRC(9aadd252) SHA1(c6da7ef46333d525e676c59f03ccc908108b41ba) )
-	ROM_LOAD( "w2-f",     0xd000, 0x1000, CRC(f131a5bb) SHA1(84b7dea112dce12e5cb235a13f6dc4edcfb18c06) )
-	ROM_LOAD( "w1-f",     0xe000, 0x1000, CRC(c8ec57c5) SHA1(904a9ed0a7f1230c611bf473b9bc52e63eb56dbe) )
-	ROM_LOAD( "w0-f",     0xf000, 0x1000, CRC(b3787a92) SHA1(7f40621dc739c1108a5df43142ab04709a380219) )
+	ROM_LOAD( "w5-f.1a",     0xa000, 0x1000, CRC(9d53c71c) SHA1(53c410cfa4fbbfd08e1c3cf7aeba1c9627171a71) )
+	ROM_LOAD( "w4-f.2a",     0xb000, 0x1000, CRC(c1f8d747) SHA1(33f5fe73d1851ef4da670075d1aec1550e0417ce) )
+	ROM_LOAD( "w3-f.4a",     0xc000, 0x1000, CRC(9aadd252) SHA1(c6da7ef46333d525e676c59f03ccc908108b41ba) )
+	ROM_LOAD( "w2-f.6a",     0xd000, 0x1000, CRC(f131a5bb) SHA1(84b7dea112dce12e5cb235a13f6dc4edcfb18c06) )
+	ROM_LOAD( "w1-f.9a",     0xe000, 0x1000, CRC(a6ce9a19) SHA1(e8f380e17a21fb33504d6efe9d01d0f903fa25e1) )
+//  ROM_LOAD( "w1-f",        0xe000, 0x1000, CRC(c8ec57c5) SHA1(904a9ed0a7f1230c611bf473b9bc52e63eb56dbe) ) // 0x7d3 is 0x10 instead of 0x00, 1 bit different, looks out of place, bad?
+	ROM_LOAD( "w0-f.9a",     0xf000, 0x1000, CRC(b3787a92) SHA1(7f40621dc739c1108a5df43142ab04709a380219) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "disco.w6",     0xf000, 0x1000, CRC(d81e781e) SHA1(bde510bfed06a13bd56bf7ddbf220e7cf82f79b6) )
+	ROM_LOAD( "w6-.1b",     0xf000, 0x1000, CRC(d81e781e) SHA1(bde510bfed06a13bd56bf7ddbf220e7cf82f79b6) )
 
-	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_REGION( 0x0020, "proms", 0 ) // board uses 2 proms, not 1
 	ROM_LOAD( "disco.clr",    0x0000, 0x0020, CRC(a393f913) SHA1(42dce159283427064b3f5ce3a6e2189744ecd943) )
 ROM_END
 

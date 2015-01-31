@@ -251,7 +251,7 @@ static void setup_texture(sdl_window_info *window, int tempwidth, int tempheight
 	UINT32 fmt;
 
 	// Determine preferred pixelformat and set up yuv if necessary
-	SDL_GetCurrentDisplayMode(window->monitor()->handle, &mode);
+	SDL_GetCurrentDisplayMode(window->monitor()->handle(), &mode);
 
 	if (sdl->yuv_bitmap)
 	{
@@ -412,7 +412,7 @@ static int drawsdl_window_create(sdl_window_info *window, int width, int height)
 	if (window->fullscreen() && video_config.switchres)
 	{
 		SDL_DisplayMode mode;
-		SDL_GetCurrentDisplayMode(window->monitor()->handle, &mode);
+		SDL_GetCurrentDisplayMode(window->monitor()->handle(), &mode);
 		mode.w = width;
 		mode.h = height;
 		if (window->refresh)
@@ -623,7 +623,7 @@ static void drawsdl_set_target_bounds(sdl_window_info *window)
 	const sdl_scale_mode *sm = &scale_modes[video_config.scale_mode];
 
 	if (!sm->is_scale)
-		window->target->set_bounds(window->blitwidth, window->blitheight, sdlvideo_monitor_get_aspect(window->monitor()));
+		window->target->set_bounds(window->blitwidth, window->blitheight, window->monitor()->aspect());
 	else
 		window->target->set_bounds(sdl->hw_scale_width, sdl->hw_scale_height);
 }
@@ -737,8 +737,8 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	// the first one only
 	if ((window->fullscreen()) && (!video_config.switchres))
 	{
-		ch = window->monitor()->center_height;
-		cw = window->monitor()->center_width;
+		ch = window->monitor()->center_height();
+		cw = window->monitor()->center_width();
 	}
 	else
 	{

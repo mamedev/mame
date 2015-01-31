@@ -27,16 +27,14 @@
 
 #if defined(__sun__) && defined(__svr4__)
 #define SDLMAME_SOLARIS 1
-#undef _XOPEN_SOURCE
-#undef _XOPEN_VERSION
-#undef _XOPEN_SOURCE_EXTENDED
-#undef _XPG6
-#undef _XPG5
-#undef _XPG4_2
-
-#define _XOPEN_SOURCE
-#define _XOPEN_VERSION 4
-
+//#undef _XOPEN_SOURCE
+//#undef _XOPEN_VERSION
+//#undef _XOPEN_SOURCE_EXTENDED
+//#undef _XPG6
+//#undef _XPG5
+//#undef _XPG4_2
+//#define _XOPEN_SOURCE
+//#define _XOPEN_VERSION 4
 #elif defined(__irix__) || defined(__sgi)
 #define SDLMAME_IRIX 1
 /* Large file support on IRIX needs _SGI_SOURCE */

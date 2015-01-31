@@ -3780,12 +3780,6 @@ static GFXDECODE_START( atombjt )
 GFXDECODE_END
 
 
-
-
-WRITE_LINE_MEMBER(nmk16_state::ym2203_irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
 /*
 ----
 
@@ -3894,7 +3888,7 @@ static MACHINE_CONFIG_START( tharrier, nmk16_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(nmk16_state, ym2203_irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
@@ -4421,7 +4415,7 @@ static MACHINE_CONFIG_START( macross2, nmk16_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(nmk16_state, ym2203_irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
@@ -4464,7 +4458,7 @@ static MACHINE_CONFIG_START( tdragon2, nmk16_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(nmk16_state, ym2203_irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
@@ -4506,7 +4500,7 @@ static MACHINE_CONFIG_START( raphero, nmk16_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(nmk16_state, ym2203_irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
@@ -4636,7 +4630,7 @@ static MACHINE_CONFIG_START( manybloc, nmk16_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(nmk16_state, ym2203_irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)

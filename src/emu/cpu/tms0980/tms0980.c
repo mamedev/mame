@@ -638,7 +638,6 @@ void tms1400_cpu_device::device_reset()
 	tms1100_cpu_device::device_reset();
 
 	// small differences in 00-3f area
-	m_fixed_decode[0x09] = F_COMX;
 	m_fixed_decode[0x0b] = F_TPC;
 }
 
@@ -1038,7 +1037,7 @@ void tms1400_cpu_device::op_call()
 
 		m_ps = m_ps << 4 | m_pa;
 		m_pa = m_pb;
-		
+
 		m_cs = m_cs << 2 | m_ca;
 		m_ca = m_cb;
 	}
@@ -1058,10 +1057,10 @@ void tms1400_cpu_device::op_retn()
 
 		m_pc = m_sr & m_pc_mask;
 		m_sr >>= m_pc_bits;
-		
+
 		m_pa = m_pb = m_ps & 0xf;
 		m_ps >>= 4;
-		
+
 		m_ca = m_cb = m_cs & 3;
 		m_cs >>= 2;
 	}

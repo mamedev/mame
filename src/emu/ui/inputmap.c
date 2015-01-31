@@ -73,7 +73,7 @@ void ui_menu_input_groups::handle()
 	/* process the menu */
 	const ui_menu_event *menu_event = process(0);
 	if (menu_event != NULL && menu_event->iptkey == IPT_UI_SELECT)
-		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_input_general(machine(), container, int((long long)(menu_event->itemref)-1))));
+		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_input_general(machine(), container, int((long long)((FPTR)menu_event->itemref)-1))));
 }
 
 
@@ -154,10 +154,9 @@ ui_menu_input_specific::ui_menu_input_specific(running_machine &machine, render_
 void ui_menu_input_specific::populate()
 {
 	input_item_data *itemlist = NULL;
-	ioport_field *field;
-	ioport_port *port;
 	int suborder[SEQ_TYPE_TOTAL];
 	astring tempstring;
+	int port_count = 0;
 
 	/* create a mini lookup table for sort order based on sequence type */
 	suborder[SEQ_TYPE_STANDARD] = 0;
@@ -165,8 +164,10 @@ void ui_menu_input_specific::populate()
 	suborder[SEQ_TYPE_INCREMENT] = 2;
 
 	/* iterate over the input ports and add menu items */
-	for (port = machine().ioport().first_port(); port != NULL; port = port->next())
-		for (field = port->first_field(); field != NULL; field = field->next())
+	for (ioport_port *port = machine().ioport().first_port(); port != NULL; port = port->next())
+	{
+		port_count++;
+		for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
 		{
 			const char *name = field->name();
 
@@ -182,7 +183,7 @@ void ui_menu_input_specific::populate()
 				{
 					sortorder = (field->type() << 2) | (field->player() << 12);
 					if (strcmp(field->device().tag(), ":"))
-						sortorder |= 0x10000;
+						sortorder |= (port_count & 0xfff) * 0x10000;
 				}
 				else
 					sortorder = field->type() | 0xf000;
@@ -212,6 +213,7 @@ void ui_menu_input_specific::populate()
 				}
 			}
 		}
+	}
 
 	/* sort and populate the menu in a standard fashion */
 	populate_and_sort(itemlist);
@@ -485,7 +487,7 @@ void ui_menu_settings::handle()
 	if (menu_event != NULL && menu_event->itemref != NULL)
 	{
 		// reset
-		if ((FPTR)menu_event->itemref == 1) 
+		if ((FPTR)menu_event->itemref == 1)
 		{
 			if (menu_event->iptkey == IPT_UI_SELECT)
 				machine().schedule_hard_reset();
@@ -496,7 +498,7 @@ void ui_menu_settings::handle()
 			ioport_field *field = (ioport_field *)menu_event->itemref;
 			ioport_field::user_settings settings;
 			int changed = false;
-			
+
 			switch (menu_event->iptkey)
 			{
 				/* if selected, reset to default value */
@@ -506,20 +508,20 @@ void ui_menu_settings::handle()
 					field->set_user_settings(settings);
 					changed = true;
 					break;
-					
+
 				/* left goes to previous setting */
 				case IPT_UI_LEFT:
 					field->select_previous_setting();
 					changed = true;
 					break;
-					
+
 				/* right goes to next setting */
 				case IPT_UI_RIGHT:
 					field->select_next_setting();
 					changed = true;
 					break;
 			}
-			
+
 			/* if anything changed, rebuild the menu, trying to stay on the same field */
 			if (changed)
 				reset(UI_MENU_RESET_REMEMBER_REF);
@@ -626,7 +628,7 @@ void ui_menu_settings::populate()
 			}
 	if (type == IPT_DIPSWITCH)
 		custombottom = dipcount ? dipcount * (DIP_SWITCH_HEIGHT + DIP_SWITCH_SPACING) + DIP_SWITCH_SPACING : 0;
-	
+
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 	item_append("Reset",  NULL, 0, (void *)1);
 }
@@ -659,18 +661,18 @@ void ui_menu_settings_dip_switches::custom_render(void *selectedref, float top, 
 	{
 		const ioport_diplocation *diploc;
 		UINT32 selectedmask = 0;
-		
+
 		// determine the mask of selected bits
 		if ((FPTR)selectedref != 1)
 		{
 			ioport_field *field = (ioport_field *)selectedref;
-			
+
 			if (field != NULL && field->first_diplocation() != NULL)
 				for (diploc = field->first_diplocation(); diploc != NULL; diploc = diploc->next())
 					if (strcmp(dip->name, diploc->name()) == 0)
 						selectedmask |= 1 << (diploc->number() - 1);
 		}
-		
+
 		// draw one switch
 		custom_render_one(x1, y1, x2, y1 + DIP_SWITCH_HEIGHT, dip, selectedmask);
 		y1 += (float)(DIP_SWITCH_SPACING + DIP_SWITCH_HEIGHT);
@@ -882,7 +884,7 @@ void ui_menu_analog::populate()
 						}
 
 						name.cpy(field->name());
-						
+
 						/* allocate a data item for tracking what this menu item refers to */
 						data = (analog_item_data *)m_pool_alloc(sizeof(*data));
 						data->field = field;

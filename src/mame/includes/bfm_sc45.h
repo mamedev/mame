@@ -592,7 +592,6 @@ public:
 	DECLARE_MACHINE_START(sc4);
 	DECLARE_MACHINE_RESET(sc4);
 
-	DECLARE_WRITE_LINE_MEMBER(bfm_sc4_irqhandler);
 
 	void bfm_sc4_68307_porta_w(address_space &space, bool dedicated, UINT8 data, UINT8 line_mask);
 	DECLARE_WRITE8_MEMBER( bfm_sc4_reel3_w );

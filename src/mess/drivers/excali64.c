@@ -19,7 +19,6 @@ Notes:
 
 ToDo:
 - Colours are approximate.
-- Disk controller, works with old wd17xx but crashes on new wd.
 - Hardware supports 20cm and 13cm floppies, but we only support 13cm as this
   is the only software that exists.
 - The schematic shows the audio counter connected to 2MHz, but this produces
@@ -29,7 +28,7 @@ ToDo:
 
 ****************************************************************************/
 
-#define NEWFDC 0
+#define NEWFDC 1
 
 
 #include "emu.h"
@@ -252,7 +251,8 @@ FLOPPY_FORMATS_MEMBER( excali64_state::floppy_formats )
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( excali64_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+	SLOT_INTERFACE( "drive0", FLOPPY_525_QD )
+	SLOT_INTERFACE( "drive1", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 #else
 static LEGACY_FLOPPY_OPTIONS_START(excali64)
@@ -654,8 +654,8 @@ static MACHINE_CONFIG_START( excali64, excali64_state )
 #if NEWFDC
 	MCFG_WD2793x_ADD("fdc", XTAL_16MHz / 16)
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", excali64_floppies, "525dd", excali64_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", excali64_floppies, "525dd", excali64_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", excali64_floppies, "drive0", excali64_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", excali64_floppies, "drive1", excali64_state::floppy_formats)
 #else
 	MCFG_DEVICE_ADD("fdc", WD2793, 0)
 	MCFG_WD17XX_DEFAULT_DRIVE2_TAGS
@@ -693,6 +693,8 @@ ROM_START( excali64 )
 	ROM_FILL(0x4ef, 1, 8)
 	ROM_FILL(0x4f6, 1, 0)
 	ROM_FILL(0x4f7, 1, 8)
+	// patch out the protection
+	ROM_FILL(0x3ce7, 1, 0)
 
 	ROM_REGION(0x10000, "rambank", ROMREGION_ERASE00)
 	ROM_REGION(0xA000, "videoram", ROMREGION_ERASE00)

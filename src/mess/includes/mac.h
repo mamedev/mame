@@ -291,9 +291,9 @@ public:
 	INT32 m_adb_linestate;
 	bool  m_adb_srqflag;
 #define kADBKeyBufSize 32
-        UINT8 m_adb_keybuf[kADBKeyBufSize];
-        UINT8 m_adb_keybuf_start;
-        UINT8 m_adb_keybuf_end;
+		UINT8 m_adb_keybuf[kADBKeyBufSize];
+		UINT8 m_adb_keybuf_start;
+		UINT8 m_adb_keybuf_end;
 
 	// Portable/PB100 Power Manager IC comms (chapter 4, "Guide to the Macintosh Family Hardware", second edition)
 	UINT8 m_pm_data_send, m_pm_data_recv, m_pm_ack, m_pm_req, m_pm_cmd[32], m_pm_out[32], m_pm_dptr, m_pm_sptr, m_pm_slen, m_pm_state;

@@ -458,11 +458,6 @@ WRITE8_MEMBER(spy_state::volume_callback1)
 	m_k007232_2->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
-WRITE_LINE_MEMBER(spy_state::irqhandler)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, state);
-}
-
 
 void spy_state::machine_start()
 {
@@ -528,7 +523,7 @@ static MACHINE_CONFIG_START( spy, spy_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3579545)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(spy_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("k007232_1", K007232, 3579545)

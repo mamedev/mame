@@ -154,10 +154,10 @@ const options_entry emu_options::s_option_entries[] =
 
 	// debugging options
 	{ NULL,                                              NULL,        OPTION_HEADER,     "CORE DEBUGGING OPTIONS" },
-    { OPTION_VERBOSE ";v",                               "0",         OPTION_BOOLEAN,    "display additional diagnostic information" },
-    { OPTION_LOG,                                        "0",         OPTION_BOOLEAN,    "generate an error.log file" },
-    { OPTION_OSLOG,                                      "0",         OPTION_BOOLEAN,    "output error.log data to the system debugger" },
-    { OPTION_DEBUG ";d",                                 "0",         OPTION_BOOLEAN,    "enable/disable debugger" },
+	{ OPTION_VERBOSE ";v",                               "0",         OPTION_BOOLEAN,    "display additional diagnostic information" },
+	{ OPTION_LOG,                                        "0",         OPTION_BOOLEAN,    "generate an error.log file" },
+	{ OPTION_OSLOG,                                      "0",         OPTION_BOOLEAN,    "output error.log data to the system debugger" },
+	{ OPTION_DEBUG ";d",                                 "0",         OPTION_BOOLEAN,    "enable/disable debugger" },
 	{ OPTION_UPDATEINPAUSE,                              "0",         OPTION_BOOLEAN,    "keep calling video updates while in pause" },
 	{ OPTION_DEBUGSCRIPT,                                NULL,        OPTION_STRING,     "script for debugger" },
 
@@ -287,6 +287,8 @@ void emu_options::update_slot_options()
 			}
 		}
 	}
+	while (add_slot_options(false));
+	add_device_options(false);
 }
 
 
@@ -374,8 +376,6 @@ bool emu_options::parse_slot_devices(int argc, char *argv[], astring &error_stri
 	do {
 		num = options_count();
 		update_slot_options();
-		while (add_slot_options(false));
-		add_device_options(false);
 		result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 	} while (num != options_count());
 
@@ -511,8 +511,6 @@ void emu_options::set_system_name(const char *name)
 		do {
 			num = options_count();
 			update_slot_options();
-			while (add_slot_options(false));
-			add_device_options(false);
 		} while(num != options_count());
 	}
 }

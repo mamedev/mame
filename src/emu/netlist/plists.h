@@ -60,7 +60,7 @@ public:
 	ATTR_COLD ~plinearlist_t()
 	{
 		if (m_list != NULL)
-		    nl_free_array(m_list);
+			nl_free_array(m_list);
 		m_list = NULL;
 	}
 
@@ -183,7 +183,7 @@ private:
 		else
 		{
 			if (m_list != NULL)
-			    nl_free_array(m_list);
+				nl_free_array(m_list);
 			m_list = NULL;
 			m_count = 0;
 		}
@@ -198,6 +198,10 @@ private:
 // ----------------------------------------------------------------------------------------
 // pnamedlist_t: a simple list
 // ----------------------------------------------------------------------------------------
+
+#ifdef SDLMAME_SOLARIS
+#undef _C
+#endif
 
 template <class _C>
 class pnamedlist_t : public plinearlist_t<_C>

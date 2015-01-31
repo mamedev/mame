@@ -1,16 +1,14 @@
-/*******************************************************************
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol, hap
+/*
 
-  TMS0980 disassembly
+  TMS0980/TMS1000-family disassembler
 
-*******************************************************************/
+*/
 
 #include "emu.h"
 #include "debugger.h"
 #include "tms0980.h"
-
-
-#define _OVER DASMFLAG_STEP_OVER
-#define _OUT  DASMFLAG_STEP_OUT
 
 
 enum e_mnemonics {
@@ -24,23 +22,20 @@ enum e_mnemonics {
 	zILL
 };
 
-
-enum e_addressing {
-	zB0=0, zI2, zI3, zI4, zB7
-};
-
-
 static const char *const s_mnemonic[] = {
-	"a10aac", "a6aac", "a8aac", "ac1ac", "acacc", "acnaa", "alec", "alem", "amaac", "branch", "call", "ccla",
-	"cla", "clo", "comc", "comx", "comx8", "cpaiz", "ctmdyn", "dan", "dman", "dmea", "dnaa",
-	"dyn", "ia", "imac", "iyc", "knez", "ldp", "ldx", "ldx", "ldx", "mnea", "mnez",
-	"ndmea", "off", "rbit", "reac", "retn", "rstr", "sal", "saman", "sbit",
-	"sbl", "seac", "setr", "tam", "tamacs", "tamdyn", "tamiy", "tamiyc", "tamza",
-	"tay", "tbit", "tcmiy", "tcy", "tdo", "tka", "tkm", "tma",
-	"tmy", "tya", "xda", "xma", "ymcy", "ynea", "ynec",
-	"illegal"
+	"A10AAC", "A6AAC", "A8AAC", "AC1AC", "ACACC", "ACNAA", "ALEC", "ALEM", "AMAAC", "BRANCH", "CALL", "CCLA",
+	"CLA", "CLO", "COMC", "COMX", "COMX8", "CPAIZ", "CTMDYN", "DAN", "DMAN", "DMEA", "DNAA",
+	"DYN", "IA", "IMAC", "IYC", "KNEZ", "LDP", "LDX", "LDX", "LDX", "MNEA", "MNEZ",
+	"NDMEA", "OFF", "RBIT", "REAC", "RETN", "RSTR", "SAL", "SAMAN", "SBIT",
+	"SBL", "SEAC", "SETR", "TAM", "TAMACS", "TAMDYN", "TAMIY", "TAMIYC", "TAMZA",
+	"TAY", "TBIT", "TCMIY", "TCY", "TDO", "TKA", "TKM", "TMA",
+	"TMY", "TYA", "XDA", "XMA", "YMCY", "YNEA", "YNEC",
+	"?"
 };
 
+
+#define _OVER DASMFLAG_STEP_OVER
+#define _OUT  DASMFLAG_STEP_OUT
 
 static const UINT32 s_flags[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _OVER, 0,
@@ -53,6 +48,10 @@ static const UINT32 s_flags[] = {
 	0
 };
 
+
+enum e_addressing {
+	zB0=0, zI2, zI3, zI4, zB7
+};
 
 static const UINT8 s_addressing[] = {
 	zB0, zB0, zB0, zI4, zI4, zI4, zI4, zB0, zB0, zB7, zB7, zB0,

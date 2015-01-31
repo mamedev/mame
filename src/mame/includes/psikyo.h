@@ -105,8 +105,6 @@ public:
 	void draw_sprites_bootleg( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int trans_pen );
 	int tilemap_width( int size );
 	void s1945_mcu_init(  );
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;

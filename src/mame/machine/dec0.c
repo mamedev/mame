@@ -364,7 +364,7 @@ DRIVER_INIT_MEMBER(dec0_state,hippodrm)
 	RAM[0x1af] = 0x60; /* RTS prot area */
 	RAM[0x1db] = 0x60; /* RTS prot area */
 	RAM[0x21a] = 0x60; /* RTS prot area */
-	
+
 	save_item(NAME(m_hippodrm_msb));
 	save_item(NAME(m_hippodrm_lsb));
 }
@@ -377,7 +377,7 @@ DRIVER_INIT_MEMBER(dec0_state,slyspy)
 	/* Slyspy sound cpu has some protection */
 	RAM[0xf2d] = 0xea;
 	RAM[0xf2e] = 0xea;
-	
+
 	save_item(NAME(m_slyspy_state));
 }
 

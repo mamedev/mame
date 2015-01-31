@@ -56,6 +56,9 @@ void fp_state::video_start()
 	m_video_ram.allocate(0x20000);
 }
 
+MC6845_UPDATE_ROW( fp_state::update_row )
+{
+}
 
 UINT32 fp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -504,6 +507,7 @@ static MACHINE_CONFIG_START( fp, fp_state )
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_CRT_TAG, 4000000)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(fp_state, update_row)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

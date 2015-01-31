@@ -4,6 +4,7 @@
 #include "audio/dsbz80.h"
 #include "machine/eepromser.h"
 #include "sound/scsp.h"
+#include "machine/315-5881_crypt.h"
 
 typedef float MATRIX[4][4];
 typedef float VECTOR[4];
@@ -77,7 +78,8 @@ public:
 		m_dsbz80(*this, DSBZ80_TAG),
 		m_soundram(*this, "soundram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_cryptdevice(*this, "315_5881")
 	{
 		m_step15_with_mpc106 = false;
 		m_step20_with_old_real3d = false;
@@ -97,6 +99,7 @@ public:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
 
 	tilemap_t *m_layer4[4];
 	tilemap_t *m_layer8[4];
@@ -227,11 +230,12 @@ public:
 	DECLARE_WRITE8_MEMBER(model3_sound_w);
 	DECLARE_READ64_MEMBER(network_r);
 	DECLARE_WRITE64_MEMBER(network_w);
-	DECLARE_READ64_MEMBER(model3_security_r);
+
 	DECLARE_WRITE64_MEMBER(daytona2_rombank_w);
 	DECLARE_WRITE16_MEMBER(model3snd_ctrl);
 	UINT32 pci_device_get_reg();
 	void pci_device_set_reg(UINT32 value);
+	DECLARE_DRIVER_INIT(genprot);
 	DECLARE_DRIVER_INIT(lemans24);
 	DECLARE_DRIVER_INIT(vs298);
 	DECLARE_DRIVER_INIT(vs299);
@@ -239,12 +243,10 @@ public:
 	DECLARE_DRIVER_INIT(scudplus);
 	DECLARE_DRIVER_INIT(model3_20);
 	DECLARE_DRIVER_INIT(bass);
-	DECLARE_DRIVER_INIT(vs2v991);
 	DECLARE_DRIVER_INIT(vs2);
 	DECLARE_DRIVER_INIT(daytona2);
 	DECLARE_DRIVER_INIT(eca);
 	DECLARE_DRIVER_INIT(srally2);
-	DECLARE_DRIVER_INIT(harleya);
 	DECLARE_DRIVER_INIT(skichamp);
 	DECLARE_DRIVER_INIT(spikeofe);
 	DECLARE_DRIVER_INIT(scud);
@@ -256,10 +258,8 @@ public:
 	DECLARE_DRIVER_INIT(getbass);
 	DECLARE_DRIVER_INIT(scudplusa);
 	DECLARE_DRIVER_INIT(dirtdvls);
-	DECLARE_DRIVER_INIT(vs299b);
 	DECLARE_DRIVER_INIT(vf3);
 	DECLARE_DRIVER_INIT(von2);
-	DECLARE_DRIVER_INIT(vs299a);
 	DECLARE_DRIVER_INIT(lostwsga);
 	DECLARE_DRIVER_INIT(oceanhun);
 	DECLARE_DRIVER_INIT(dayto2pe);
@@ -333,4 +333,10 @@ public:
 	void tap_write(int tck, int tms, int tdi, int trst);
 	void tap_reset();
 	void tap_set_asic_ids();
+
+	DECLARE_READ64_MEMBER(model3_5881prot_r);
+	DECLARE_WRITE64_MEMBER(model3_5881prot_w);
+	int first_read;
+	UINT16 crypt_read_callback(UINT32 addr);
+
 };

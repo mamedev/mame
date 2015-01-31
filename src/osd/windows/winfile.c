@@ -383,23 +383,6 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 
 
 //============================================================
-//  osd_uchar_from_osdchar
-//============================================================
-
-int osd_uchar_from_osdchar(UINT32 *uchar, const char *osdchar, size_t count)
-{
-	WCHAR wch;
-
-	count = MIN(count, IsDBCSLeadByte(*osdchar) ? 2 : 1);
-	if (MultiByteToWideChar(CP_ACP, 0, osdchar, (DWORD)count, &wch, 1) != 0)
-		*uchar = wch;
-	else
-		*uchar = 0;
-	return (int) count;
-}
-
-
-//============================================================
 //  create_path_recursive
 //============================================================
 

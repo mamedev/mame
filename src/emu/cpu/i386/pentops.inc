@@ -2249,26 +2249,30 @@ void i386_device::mmx_packuswb_r64_rm64() // Opcode 0f 67
 	MMXPROLOG();
 	UINT8 modrm = FETCH();
 	if( modrm >= 0xc0 ) {
+		MMX_REG ds, sd;
 		int s,d;
 		s=modrm & 0x7;
 		d=(modrm >> 3) & 0x7;
-		MMX(d).b[0]=SaturatedSignedWordToUnsignedByte(MMX(d).s[0]);
-		MMX(d).b[1]=SaturatedSignedWordToUnsignedByte(MMX(d).s[1]);
-		MMX(d).b[2]=SaturatedSignedWordToUnsignedByte(MMX(d).s[2]);
-		MMX(d).b[3]=SaturatedSignedWordToUnsignedByte(MMX(d).s[3]);
-		MMX(d).b[4]=SaturatedSignedWordToUnsignedByte(MMX(s).s[0]);
-		MMX(d).b[5]=SaturatedSignedWordToUnsignedByte(MMX(s).s[1]);
-		MMX(d).b[6]=SaturatedSignedWordToUnsignedByte(MMX(s).s[2]);
-		MMX(d).b[7]=SaturatedSignedWordToUnsignedByte(MMX(s).s[3]);
+		ds.q = MMX(d).q;
+		sd.q = MMX(s).q;
+		MMX(d).b[0]=SaturatedSignedWordToUnsignedByte(ds.s[0]);
+		MMX(d).b[1]=SaturatedSignedWordToUnsignedByte(ds.s[1]);
+		MMX(d).b[2]=SaturatedSignedWordToUnsignedByte(ds.s[2]);
+		MMX(d).b[3]=SaturatedSignedWordToUnsignedByte(ds.s[3]);
+		MMX(d).b[4]=SaturatedSignedWordToUnsignedByte(sd.s[0]);
+		MMX(d).b[5]=SaturatedSignedWordToUnsignedByte(sd.s[1]);
+		MMX(d).b[6]=SaturatedSignedWordToUnsignedByte(sd.s[2]);
+		MMX(d).b[7]=SaturatedSignedWordToUnsignedByte(sd.s[3]);
 	} else {
-		MMX_REG s;
+		MMX_REG s,t;
 		int d=(modrm >> 3) & 0x7;
 		UINT32 ea = GetEA(modrm, 0);
 		READMMX(ea, s);
-		MMX(d).b[0]=SaturatedSignedWordToUnsignedByte(MMX(d).s[0]);
-		MMX(d).b[1]=SaturatedSignedWordToUnsignedByte(MMX(d).s[1]);
-		MMX(d).b[2]=SaturatedSignedWordToUnsignedByte(MMX(d).s[2]);
-		MMX(d).b[3]=SaturatedSignedWordToUnsignedByte(MMX(d).s[3]);
+		t.q = MMX(d).q;
+		MMX(d).b[0]=SaturatedSignedWordToUnsignedByte(t.s[0]);
+		MMX(d).b[1]=SaturatedSignedWordToUnsignedByte(t.s[1]);
+		MMX(d).b[2]=SaturatedSignedWordToUnsignedByte(t.s[2]);
+		MMX(d).b[3]=SaturatedSignedWordToUnsignedByte(t.s[3]);
 		MMX(d).b[4]=SaturatedSignedWordToUnsignedByte(s.s[0]);
 		MMX(d).b[5]=SaturatedSignedWordToUnsignedByte(s.s[1]);
 		MMX(d).b[6]=SaturatedSignedWordToUnsignedByte(s.s[2]);
@@ -2362,21 +2366,30 @@ void i386_device::mmx_packssdw_r64_rm64() // Opcode 0f 6b
 	UINT8 modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int s,d;
+		INT32 t1, t2, t3, t4;
 		s=modrm & 0x7;
 		d=(modrm >> 3) & 0x7;
-		MMX(d).s[0]=SaturatedSignedDwordToSignedWord(MMX(d).i[0]);
-		MMX(d).s[1]=SaturatedSignedDwordToSignedWord(MMX(d).i[1]);
-		MMX(d).s[2]=SaturatedSignedDwordToSignedWord(MMX(s).i[0]);
-		MMX(d).s[3]=SaturatedSignedDwordToSignedWord(MMX(s).i[1]);
-	} else {
+		t1 = MMX(d).i[0];
+		t2 = MMX(d).i[1];
+		t3 = MMX(s).i[0];
+		t4 = MMX(s).i[1];
+		MMX(d).s[0] = SaturatedSignedDwordToSignedWord(t1);
+		MMX(d).s[1] = SaturatedSignedDwordToSignedWord(t2);
+		MMX(d).s[2] = SaturatedSignedDwordToSignedWord(t3);
+		MMX(d).s[3] = SaturatedSignedDwordToSignedWord(t4);
+	}
+	else {
 		MMX_REG s;
+		INT32 t1, t2;
 		int d=(modrm >> 3) & 0x7;
 		UINT32 ea = GetEA(modrm, 0);
 		READMMX(ea, s);
-		MMX(d).s[0]=SaturatedSignedDwordToSignedWord(MMX(d).i[0]);
-		MMX(d).s[1]=SaturatedSignedDwordToSignedWord(MMX(d).i[1]);
-		MMX(d).s[2]=SaturatedSignedDwordToSignedWord(s.i[0]);
-		MMX(d).s[3]=SaturatedSignedDwordToSignedWord(s.i[1]);
+		t1 = MMX(d).i[0];
+		t2 = MMX(d).i[1];
+		MMX(d).s[0] = SaturatedSignedDwordToSignedWord(t1);
+		MMX(d).s[1] = SaturatedSignedDwordToSignedWord(t2);
+		MMX(d).s[2] = SaturatedSignedDwordToSignedWord(s.i[0]);
+		MMX(d).s[3] = SaturatedSignedDwordToSignedWord(s.i[1]);
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
@@ -2711,9 +2724,11 @@ void i386_device::sse_movlps_r128_m64() // Opcode 0f 12
 {
 	UINT8 modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		// unsupported by cpu
+		// MOVHLPS opcode
+		XMM((modrm >> 3) & 0x7).q[0] = XMM(modrm & 0x7).q[1];
 		CYCLES(1);     // TODO: correct cycle count
 	} else {
+		// MOVLPS opcode
 		UINT32 ea = GetEA(modrm, 0);
 		READXMM_LO64(ea, XMM((modrm >> 3) & 0x7));
 		CYCLES(1);     // TODO: correct cycle count
@@ -2737,9 +2752,11 @@ void i386_device::sse_movhps_r128_m64() // Opcode 0f 16
 {
 	UINT8 modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		// unsupported by cpu
+		// MOVLHPS opcode
+		XMM((modrm >> 3) & 0x7).q[1] = XMM(modrm & 0x7).q[0];
 		CYCLES(1);     // TODO: correct cycle count
 	} else {
+		// MOVHPS opcode
 		UINT32 ea = GetEA(modrm, 0);
 		READXMM_HI64(ea, XMM((modrm >> 3) & 0x7));
 		CYCLES(1);     // TODO: correct cycle count
@@ -3367,7 +3384,7 @@ void i386_device::sse_ucomiss_r128_r128m32() // Opcode 0f 2e
 	CYCLES(1);     // TODO: correct cycle count
 }
 
-void i386_device::sse_shufps() // Opcode 0f 67
+void i386_device::sse_shufps() // Opcode 0f c6
 {
 	UINT8 modrm = FETCH();
 	UINT8 sel = FETCH();
@@ -3380,20 +3397,24 @@ void i386_device::sse_shufps() // Opcode 0f 67
 	s=modrm & 0x7;
 	d=(modrm >> 3) & 0x7;
 	if( modrm >= 0xc0 ) {
-		UINT32 t;
-		t=XMM(d).d[m1];
-		XMM(d).d[1]=XMM(d).d[m2];
-		XMM(d).d[0]=t;
-		XMM(d).d[2]=XMM(s).d[m3];
-		XMM(d).d[3]=XMM(s).d[m4];
+		UINT32 t1,t2,t3,t4;
+		t1=XMM(d).d[m1];
+		t2=XMM(d).d[m2];
+		t3=XMM(s).d[m3];
+		t4=XMM(s).d[m4];
+		XMM(d).d[0]=t1;
+		XMM(d).d[1]=t2;
+		XMM(d).d[2]=t3;
+		XMM(d).d[3]=t4;
 	} else {
-		UINT32 t;
+		UINT32 t1,t2;
 		XMM_REG src;
 		UINT32 ea = GetEA(modrm, 0);
 		READXMM(ea, src);
-		t=XMM(d).d[m1];
-		XMM(d).d[1]=XMM(d).d[m2];
-		XMM(d).d[0]=t;
+		t1=XMM(d).d[m1];
+		t2=XMM(d).d[m2];
+		XMM(d).d[0]=t1;
+		XMM(d).d[1]=t2;
 		XMM(d).d[2]=src.d[m3];
 		XMM(d).d[3]=src.d[m4];
 	}
@@ -3404,19 +3425,25 @@ void i386_device::sse_unpcklps_r128_rm128() // Opcode 0f 14
 {
 	UINT8 modrm = FETCH();
 	int s,d;
+	UINT32 t1, t2, t3, t4;
 	s=modrm & 0x7;
 	d=(modrm >> 3) & 0x7;
 	if( modrm >= 0xc0 ) {
-		XMM(d).d[3]=XMM(s).d[1];
-		XMM(d).d[2]=XMM(d).d[1];
-		XMM(d).d[1]=XMM(s).d[0];
-		//XMM(d).d[0]=XMM(d).d[0];
+		t1 = XMM(s).d[1];
+		t2 = XMM(d).d[1];
+		t3 = XMM(s).d[0];
+		t4 = XMM(d).d[0];
+		XMM(d).d[3]=t1;
+		XMM(d).d[2]=t2;
+		XMM(d).d[1]=t3;
+		XMM(d).d[0]=t4;
 	} else {
 		XMM_REG src;
 		UINT32 ea = GetEA(modrm, 0);
 		READXMM(ea, src);
+		t2 = XMM(d).d[1];
 		XMM(d).d[3]=src.d[1];
-		XMM(d).d[2]=XMM(d).d[1];
+		XMM(d).d[2]=t2;
 		XMM(d).d[1]=src.d[0];
 	}
 	CYCLES(1);     // TODO: correct cycle count
@@ -3426,20 +3453,27 @@ void i386_device::sse_unpckhps_r128_rm128() // Opcode 0f 15
 {
 	UINT8 modrm = FETCH();
 	int s,d;
+	UINT32 t1, t2, t3, t4;
 	s=modrm & 0x7;
 	d=(modrm >> 3) & 0x7;
 	if( modrm >= 0xc0 ) {
-		XMM(d).d[0]=XMM(d).d[2];
-		XMM(d).d[1]=XMM(s).d[2];
-		XMM(d).d[2]=XMM(d).d[3];
-		XMM(d).d[3]=XMM(s).d[3];
+		t1 = XMM(d).d[2];
+		t2 = XMM(s).d[2];
+		t3 = XMM(d).d[3];
+		t4 = XMM(s).d[3];
+		XMM(d).d[0]=t1;
+		XMM(d).d[1]=t2;
+		XMM(d).d[2]=t3;
+		XMM(d).d[3]=t4;
 	} else {
 		XMM_REG src;
 		UINT32 ea = GetEA(modrm, 0);
 		READXMM(ea, src);
-		XMM(d).d[0]=XMM(d).d[2];
+		t1 = XMM(d).d[2];
+		t3 = XMM(d).d[3];
+		XMM(d).d[0]=t1;
 		XMM(d).d[1]=src.d[2];
-		XMM(d).d[2]=XMM(d).d[3];
+		XMM(d).d[2]=t3;
 		XMM(d).d[3]=src.d[3];
 	}
 	CYCLES(1);     // TODO: correct cycle count

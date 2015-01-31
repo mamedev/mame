@@ -25,6 +25,7 @@
 #define VS2008  0x00090000
 #define VS2010  0x00100000
 #define VS2012  0x00110000
+#define VS2013  0x00120000
 
 
 
@@ -67,8 +68,42 @@ static const translation_info gcc_translate[] =
 	{ 0,        "-fno-omit-frame-pointer",  "" },
 	{ 0,        "-fomit-frame-pointer",     "" },
 	{ 0,        "-Werror",                  "/WX" },
-	//{ VS7,        "-Wall",                    "/Wall /W3 /wd4003 /wd4018 /wd4146 /wd4242 /wd4244 /wd4619 /wd4702 /wd4706 /wd4710 /wd4711 /wd4738 /wd4826" },
-	{ VS7,      "-Wall",                    "/Wall /W4 /wd4003 /wd4018 /wd4146 /wd4242 /wd4244 /wd4619 /wd4702 /wd4706 /wd4710 /wd4711 /wd4738 /wd4826 /wd4820 /wd4514 /wd4668 /wd4127 /wd4625 /wd4626 /wd4512 /wd4100 /wd4310 /wd4571 /wd4061 /wd4131 /wd4255 /wd4510 /wd4610 /wd4505 /wd4324 /wd4611 /wd4201 /wd4189 /wd4296 /wd4986 /wd4347 /wd4987 /wd4250 /wd4435 /wd4150 /wd4805 /wd4141" },
+	// warning C4003: not enough actual parameters for macro 'xxx'
+	// warning C4018: 'x' : signed/unsigned mismatch
+	// warning C4061: enumerator 'xxx' in switch of enum 'xxx' is not explicitly handled by a case label
+	// warning C4100: 'xxx' : unreferenced formal parameter
+	// warning C4127: conditional expression is constant
+	// warning C4131: 'xxx' : uses old-style declarator
+	// warning C4141: 'xxx' : used more than once
+	// warning C4146: unary minus operator applied to unsigned type, result still unsigned
+	// warning C4150: deletion of pointer to incomplete type 'xxx'; no destructor called
+	// warning C4189: 'xxx' : local variable is initialized but not referenced
+	// warning C4201: nonstandard extension used : nameless struct/union
+	// warning C4242: 'x' : conversion from 'xxx' to 'xxx', possible loss of data
+	// warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
+	// warning C4250: 'xxx' : inherits 'xxx' via dominance
+	// warning C4255: 'xxx' : no function prototype given: converting '()' to '(void)'
+	// warning C4296: 'x' : expression is always false
+	// warning C4310: cast truncates constant value
+	// warning C4324: 'xxx' : structure was padded due to __declspec(align())
+	// warning C4347: behavior change: 'xxx' is called instead of 'xxx' // obsolete VS2005 - VS2010 only
+	// warning C4435: 'xxx' : Object layout under /vd2 will change due to virtual base 'xxx'
+	// warning C4510: 'xxx' : default constructor could not be generated
+	// warning C4512: 'xxx' : assignment operator could not be generated
+	// warning C4514: 'xxx' : unreferenced inline function has been removed
+	// warning C4619: #pragma warning : there is no warning number 'xxx'
+	// warning C4571: Informational: catch(...) semantics changed since Visual C++ 7.1; structured exceptions (SEH) are no longer caught
+	// warning C4610: struct 'xxx' can never be instantiated - user defined constructor required
+	// warning C4625: 'xxx' : copy constructor could not be generated because a base class copy constructor is inaccessible or deleted
+	// warning C4626: 'xxx' : assignment operator could not be generated because a base class assignment operator is inaccessible or deleted
+	// warning C4668: 'xxx' is not defined as a preprocessor macro, replacing with '0' for '#if/#elif'
+	// warning C4702: unreachable code
+	// warning C4706: assignment within conditional expression
+	// warning C4710: 'xxx' : function not inlined
+	// warning C4711: function 'xxx' selected for automatic inline expansion // optimized only
+	// warning C4805: 'x' : unsafe mix of type 'xxx' and type 'xxx' in operation
+	// warning C4820: 'xxx' : 'x' bytes padding added after data member 'xxx'
+	{ VS7,      "-Wall",                    "/Wall /W4 /wd4003 /wd4018 /wd4061 /wd4100 /wd4127 /wd4131 /wd4141 /wd4146 /wd4150 /wd4189 /wd4201 /wd4242 /wd4244 /wd4250 /wd4255 /wd4296 /wd4310 /wd4324 /wd4347 /wd4435 /wd4510 /wd4512 /wd4514 /wd4571 /wd4610 /wd4619 /wd4625 /wd4626 /wd4668 /wd4702 /wd4706 /wd4710 /wd4711 /wd4805 /wd4820" },
 	{ 0,        "-Wall",                    "/W0" },
 	{ VS7,      "-Wno-unused",              "/wd4100 /wd4101 /wd4102 /wd4505" },
 	{ 0,        "-Wno-sign-compare",        "/wd4365 /wd4389 /wd4245 /wd4388" },

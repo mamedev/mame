@@ -9,6 +9,7 @@
 #include "nl_setup.h"
 #include "nl_parser.h"
 #include "nl_util.h"
+#include "nl_factory.h"
 #include "devices/net_lib.h"
 #include "devices/nld_system.h"
 #include "analog/nld_solver.h"
@@ -37,6 +38,7 @@ netlist_setup_t::netlist_setup_t(netlist_base_t &netlist)
 	, m_proxy_cnt(0)
 {
 	netlist.set_setup(this);
+	m_factory = nl_alloc(netlist_factory_t);
 }
 
 void netlist_setup_t::init()
@@ -55,6 +57,7 @@ netlist_setup_t::~netlist_setup_t()
 	m_params_temp.clear();
 
 	netlist().set_setup(NULL);
+	nl_free(m_factory);
 
 	pstring::resetmem();
 }
@@ -90,6 +93,14 @@ netlist_device_t *netlist_setup_t::register_dev(netlist_device_t *dev, const pst
 	if (!(netlist().m_devices.add(dev, false)==true))
 		netlist().error("Error adding %s to device list\n", name.cstr());
 	return dev;
+}
+
+netlist_device_t *netlist_setup_t::register_dev(const pstring &classname, const pstring &name)
+{
+	netlist_device_t *dev = factory().new_device_by_classname(classname);
+	if (dev == NULL)
+		netlist().error("Class %s not found!\n", classname.cstr());
+	return register_dev(dev, name);
 }
 
 template <class T>
@@ -686,7 +697,7 @@ void netlist_setup_t::resolve_inputs()
 
 void netlist_setup_t::start_devices()
 {
-    //FIXME: we need a nl_getenv
+	//FIXME: we need a nl_getenv
 	if (getenv("NL_LOGS"))
 	{
 		NL_VERBOSE_OUT(("Creating dynamic logs ...\n"));
@@ -695,7 +706,7 @@ void netlist_setup_t::start_devices()
 		{
 			NL_VERBOSE_OUT(("%d: <%s>\n",i, ll[i].cstr()));
 			NL_VERBOSE_OUT(("%d: <%s>\n",i, ll[i].cstr()));
-			netlist_device_t *nc = factory().new_device_by_classname("nld_log", *this);
+			netlist_device_t *nc = factory().new_device_by_classname("nld_log");
 			pstring name = "log_" + ll[i];
 			register_dev(nc, name);
 			register_link(name + ".I", ll[i]);

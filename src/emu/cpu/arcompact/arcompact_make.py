@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 import sys
-import re
 
 def EmitGroup04_Handle_NZ_Flags(f, funcname, opname):
         print >>f, "		if (result & 0x80000000) { STATUS32_SET_N; }"
@@ -353,7 +352,7 @@ def EmitGroup17(f,funcname, opname, opexecute):
 try:
     f = open(sys.argv[1], "w")
 except Exception, err:
-    logging.error("cannot write file %s [%s]", fname, err)
+    sys.stderr.write("cannot write file %s [%s]\n" % (sys.argv[1], err))
     sys.exit(1)
 
 

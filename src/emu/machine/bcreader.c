@@ -269,7 +269,7 @@ UINT8 barcode_reader_device::read_code()
 	{
 		if (m_byte_count < m_byte_length)
 		{
-			UINT8 val = m_pixel_data[m_byte_count];
+			UINT8 val = m_byte_data[m_byte_count];
 			m_byte_count++;
 			return val;
 		}

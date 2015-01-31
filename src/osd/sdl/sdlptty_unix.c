@@ -9,6 +9,8 @@
 //
 //============================================================
 
+#if (!defined(SDLMAME_SOLARIS) && !(defined(SDLMAME_OS2)))
+
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <unistd.h>
@@ -101,3 +103,29 @@ file_error sdl_close_ptty(osd_file *file)
 
 	return FILERR_NONE;
 }
+
+#else
+#include "sdlfile.h"
+
+const char *sdlfile_ptty_identifier  = "";
+
+file_error sdl_open_ptty(const char *path, UINT32 openflags, osd_file **file, UINT64 *filesize)
+{
+	return FILERR_ACCESS_DENIED;
+}
+
+file_error sdl_read_ptty(osd_file *file, void *buffer, UINT64 offset, UINT32 count, UINT32 *actual)
+{
+	return FILERR_ACCESS_DENIED;
+}
+
+file_error sdl_write_ptty(osd_file *file, const void *buffer, UINT64 offset, UINT32 count, UINT32 *actual)
+{
+	return FILERR_ACCESS_DENIED;
+}
+
+file_error sdl_close_ptty(osd_file *file)
+{
+	return FILERR_ACCESS_DENIED;
+}
+#endif

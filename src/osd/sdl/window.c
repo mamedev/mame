@@ -269,25 +269,36 @@ bool sdl_osd_interface::window_init()
 	/* We may want to set a number of the hints SDL2 provides.
 	 * The code below will document which hints were set.
 	 */
-    const char * hints[] = { SDL_HINT_RENDER_DRIVER,    SDL_HINT_RENDER_OPENGL_SHADERS,
-            SDL_HINT_RENDER_DIRECT3D_THREADSAFE, SDL_HINT_RENDER_SCALE_QUALITY,
-            SDL_HINT_RENDER_VSYNC, SDL_HINT_VIDEO_ALLOW_SCREENSAVER,
-            SDL_HINT_VIDEO_X11_XVIDMODE, SDL_HINT_VIDEO_X11_XINERAMA,
-            SDL_HINT_VIDEO_X11_XRANDR, SDL_HINT_GRAB_KEYBOARD,
-            SDL_HINT_MOUSE_RELATIVE_MODE_WARP,
-            SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, SDL_HINT_IDLE_TIMER_DISABLED,
-            SDL_HINT_ORIENTATIONS, SDL_HINT_ACCELEROMETER_AS_JOYSTICK,
-            SDL_HINT_XINPUT_ENABLED, SDL_HINT_GAMECONTROLLERCONFIG,
-            SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, SDL_HINT_ALLOW_TOPMOST,
-            SDL_HINT_TIMER_RESOLUTION, SDL_HINT_MAC_CTRL_CLICK_EMULATE_RIGHT_CLICK,
-            SDL_HINT_VIDEO_WIN_D3DCOMPILER, SDL_HINT_VIDEO_WINDOW_SHARE_PIXEL_FORMAT,
-            SDL_HINT_VIDEO_MAC_FULLSCREEN_SPACES,
-            NULL
-    };
+	const char * hints[] = { SDL_HINT_FRAMEBUFFER_ACCELERATION,
+			SDL_HINT_RENDER_DRIVER, SDL_HINT_RENDER_OPENGL_SHADERS,
+			SDL_HINT_RENDER_SCALE_QUALITY,
+			SDL_HINT_RENDER_VSYNC,
+			SDL_HINT_VIDEO_X11_XVIDMODE, SDL_HINT_VIDEO_X11_XINERAMA,
+			SDL_HINT_VIDEO_X11_XRANDR, SDL_HINT_GRAB_KEYBOARD,
+			SDL_HINT_MOUSE_RELATIVE_MODE_WARP,
+			SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, SDL_HINT_IDLE_TIMER_DISABLED,
+			SDL_HINT_ORIENTATIONS,
+			SDL_HINT_XINPUT_ENABLED, SDL_HINT_GAMECONTROLLERCONFIG,
+			SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, SDL_HINT_ALLOW_TOPMOST,
+			SDL_HINT_TIMER_RESOLUTION,
+#if SDL_VERSION_ATLEAST(2, 0, 2)
+			SDL_HINT_RENDER_DIRECT3D_THREADSAFE, SDL_HINT_VIDEO_ALLOW_SCREENSAVER,
+			SDL_HINT_ACCELEROMETER_AS_JOYSTICK, SDL_HINT_MAC_CTRL_CLICK_EMULATE_RIGHT_CLICK,
+			SDL_HINT_VIDEO_WIN_D3DCOMPILER, SDL_HINT_VIDEO_WINDOW_SHARE_PIXEL_FORMAT,
+			SDL_HINT_VIDEO_MAC_FULLSCREEN_SPACES,
+#endif
+#if SDL_VERSION_ATLEAST(2, 0, 3)
+			SDL_HINT_RENDER_DIRECT3D11_DEBUG, SDL_HINT_VIDEO_HIGHDPI_DISABLED,
+			SDL_HINT_WINRT_PRIVACY_POLICY_URL, SDL_HINT_WINRT_PRIVACY_POLICY_LABEL,
+			SDL_HINT_WINRT_HANDLE_BACK_BUTTON,
+#endif
+			NULL
+	};
 
-    osd_printf_verbose("\nHints:\n");
-    for (int i = 0; hints[i] != NULL; i++)
-        osd_printf_verbose("\t%-40s %s\n", hints[i], SDL_GetHint(hints[i]));
+
+	osd_printf_verbose("\nHints:\n");
+	for (int i = 0; hints[i] != NULL; i++)
+		osd_printf_verbose("\t%-40s %s\n", hints[i], SDL_GetHint(hints[i]));
 #endif
 
 	// set up the window list
@@ -396,8 +407,7 @@ void sdl_window_info::blit_surface_size(int window_width, int window_height)
 	if (video_config.keepaspect)
 	{
 		// make sure the monitor is up-to-date
-		sdlvideo_monitor_refresh(m_monitor);
-		target->compute_visible_area(target_width, target_height, sdlvideo_monitor_get_aspect(m_monitor), target->orientation(), target_width, target_height);
+		target->compute_visible_area(target_width, target_height, m_monitor->aspect(), target->orientation(), target_width, target_height);
 		desired_aspect = (float)target_width / (float)target_height;
 	}
 
@@ -838,7 +848,7 @@ void sdl_window_info::pick_best_mode(int *fswidth, int *fsheight)
 		minimum_height -= 4;
 	}
 
-	num = SDL_GetNumDisplayModes(m_monitor->handle);
+	num = SDL_GetNumDisplayModes(m_monitor->handle());
 
 	if (num == 0)
 	{
@@ -850,7 +860,7 @@ void sdl_window_info::pick_best_mode(int *fswidth, int *fsheight)
 		for (i = 0; i < num; ++i)
 		{
 			SDL_DisplayMode mode;
-			SDL_GetDisplayMode(m_monitor->handle, i, &mode);
+			SDL_GetDisplayMode(m_monitor->handle(), i, &mode);
 
 			// compute initial score based on difference between target and current
 			size_score = 1.0f / (1.0f + fabsf((INT32)mode.w - target_width) + fabsf((INT32)mode.h - target_height));
@@ -1007,17 +1017,17 @@ void sdl_window_info::video_window_update(running_machine &machine)
 
 		if (osd_event_wait(rendered_event, event_wait_ticks))
 		{
-		    if ((!fullscreen()) || (video_config.switchres))
-		    {
-		        blit_surface_size(width, height);
-		    }
-		    else
-		    {
-		        blit_surface_size(monitor()->center_width, monitor()->center_height);
-		    }
+			if ((!fullscreen()) || (video_config.switchres))
+			{
+				blit_surface_size(width, height);
+			}
+			else
+			{
+				blit_surface_size(monitor()->center_width(), monitor()->center_height());
+			}
 
 			// ensure the target bounds are up-to-date, and then get the primitives
-		    set_target_bounds(this);
+			set_target_bounds(this);
 
 			render_primitive_list &primlist = target->get_primitives();
 
@@ -1072,8 +1082,8 @@ static OSDWORK_CALLBACK( complete_create_wt )
 	if (window->fullscreen())
 	{
 		// default to the current mode exactly
-		tempwidth = window->monitor()->monitor_width;
-		tempheight = window->monitor()->monitor_height;
+		tempwidth = window->monitor()->position_size().w;
+		tempheight = window->monitor()->position_size().h;
 
 		// if we're allowed to switch resolutions, override with something better
 		if (video_config.switchres)
@@ -1214,11 +1224,8 @@ void sdl_window_info::constrain_to_aspect_ratio(int *window_width, int *window_h
 	INT32 viswidth, visheight;
 	float pixel_aspect;
 
-	// make sure the monitor is up-to-date
-	sdlvideo_monitor_refresh(m_monitor);
-
 	// get the pixel aspect ratio for the target monitor
-	pixel_aspect = sdlvideo_monitor_get_aspect(m_monitor);
+	pixel_aspect = m_monitor->aspect();
 
 	// determine the proposed width/height
 	propwidth = *window_width - extrawidth;
@@ -1257,13 +1264,13 @@ void sdl_window_info::constrain_to_aspect_ratio(int *window_width, int *window_h
 	// clamp against the maximum (fit on one screen for full screen mode)
 	if (this->m_fullscreen)
 	{
-		maxwidth = m_monitor->center_width - extrawidth;
-		maxheight = m_monitor->center_height - extraheight;
+		maxwidth = m_monitor->center_width() - extrawidth;
+		maxheight = m_monitor->center_height() - extraheight;
 	}
 	else
 	{
-		maxwidth = m_monitor->center_width - extrawidth;
-		maxheight = m_monitor->center_height - extraheight;
+		maxwidth = m_monitor->center_width() - extrawidth;
+		maxheight = m_monitor->center_height() - extraheight;
 
 		// further clamp to the maximum width/height in the window
 		if (this->m_maxwidth != 0)
@@ -1344,8 +1351,8 @@ void sdl_window_info::get_max_bounds(int *window_width, int *window_height, int 
 	INT32 maxwidth, maxheight;
 
 	// compute the maximum client area
-	maxwidth = m_monitor->center_width;
-	maxheight = m_monitor->center_height;
+	maxwidth = m_monitor->center_width();
+	maxheight = m_monitor->center_height();
 
 	// clamp to the window's max
 	if (this->m_maxwidth != 0)

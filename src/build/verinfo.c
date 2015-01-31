@@ -120,20 +120,20 @@ static void emit_version_info(const version_info *v)
 //  parse_version_digit
 //============================================================
 
-static int parse_version_digit(const char *str, int *position)
+static bool parse_version_digit(const char *str, int *position, int* value)
 {
-	int value = 0;
+	int res = 0;
 
 	while (str[*position] != 0 && !isspace((UINT8)str[*position]) && !isdigit((UINT8)str[*position]))
 		(*position)++;
 
 	if (str[*position] != 0 && isdigit((UINT8)str[*position]))
 	{
-		sscanf(&str[*position], "%d", &value);
+		res = sscanf(&str[*position], "%d", value);
 		while (isdigit((UINT8)str[*position]))
 			(*position)++;
 	}
-	return value;
+	return res == 1;
 }
 
 
@@ -142,27 +142,34 @@ static int parse_version_digit(const char *str, int *position)
 //  parse_version
 //============================================================
 
-static int parse_version(char *str, int *version_major, int *version_minor, int *version_micro, const char **version_string)
+static int parse_version(char *str, int *version_major, int *version_minor, const char **version_string)
 {
 	char *version;
 	int position = 0;
 
 	// find the version string
-	version = strstr(str, "build_version");
+	version = strstr(str, "BARE_BUILD_VERSION");
 	if (version != NULL)
 		version = strchr(version, '"');
-	if (version == NULL)
+	if (version == NULL || *version == '\0' || strchr(version, '.') == NULL)
 	{
-		fprintf(stderr, "Unable to find build_version string\n");
+		fprintf(stderr, "Unable to find version string\n");
 		return 1;
 	}
 	version++;
-	*strchr(version, ' ') = 0;
+	*strchr(version, '"') = 0;
 
 	*version_string = version;
-	*version_major = parse_version_digit(version, &position);
-	*version_minor = parse_version_digit(version, &position);
-	*version_micro = parse_version_digit(version, &position);
+	if (!parse_version_digit(version, &position, version_major))
+	{
+		fprintf(stderr, "Unable to parse major version\n");
+		return 1;
+	}
+	if (!parse_version_digit(version, &position, version_minor))
+	{
+		fprintf(stderr, "Unable to parse minor version\n");
+		return 1;
+	}
 	return 0;
 }
 
@@ -248,9 +255,9 @@ int main(int argc, char *argv[])
 	buffer[size] = 0;
 
 	// parse out version string
-	if (parse_version(buffer, &v.version_major, &v.version_minor, &v.version_build, &v.version_string))
+	if (parse_version(buffer, &v.version_major, &v.version_minor, &v.version_string))
 	{
-		fprintf(stderr, "Error parsing version from '%s'\n", buffer);
+		fprintf(stderr, "Error parsing version\n");
 		free(buffer);
 		return 1;
 	}

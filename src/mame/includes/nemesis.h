@@ -121,6 +121,5 @@ public:
 	void create_palette_lookups();
 	void nemesis_postload();
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	DECLARE_WRITE8_MEMBER(volume_callback);
 };

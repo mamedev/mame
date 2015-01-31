@@ -11,6 +11,11 @@
 
 #define NO_MEM_TRACKING
 
+#include "debug_module.h"
+#include "modules/osdmodule.h"
+
+#if (USE_QTDEBUG)
+
 #include <vector>
 
 #include <QtGui/QtGui>
@@ -28,14 +33,28 @@
 #include "qt/debugqtbreakpointswindow.h"
 #include "qt/debugqtdeviceswindow.h"
 #include "qt/debugqtdeviceinformationwindow.h"
-#include "debugqt.h"
 
-
-osd_debugger_interface *qt_osd_debugger_creator(const osd_interface &osd)
+class debug_qt : public osd_module, public debug_module
 {
-	return new debugger_qt(osd);
-}
-const osd_debugger_type OSD_DEBUGGER_QT = &qt_osd_debugger_creator;
+public:
+	debug_qt()
+	: osd_module(OSD_DEBUG_PROVIDER, "qt"), debug_module(),
+		m_machine(NULL)
+	{
+	}
+
+	virtual ~debug_qt() { }
+
+	virtual int init() { return 0;}
+	virtual void exit() { }
+
+	virtual void init_debugger(running_machine &machine);
+	virtual void wait_for_debugger(device_t &device, bool firststop);
+	virtual void debugger_update();
+
+private:
+	running_machine *m_machine;
+};
 
 //============================================================
 //  "Global" variables to make QT happy
@@ -46,18 +65,6 @@ char** qtArgv = NULL;
 
 bool oneShot = true;
 static MainWindow* mainQtWindow = NULL;
-
-//-------------------------------------------------
-//  debugger_qt - constructor
-//-------------------------------------------------
-debugger_qt::debugger_qt(const osd_interface &osd)
-	: osd_debugger_interface(osd), m_machine(NULL)
-{
-}
-
-debugger_qt::~debugger_qt()
-{
-}
 
 //============================================================
 //  XML configuration save/load
@@ -228,7 +235,7 @@ static void bring_main_window_to_front()
 bool winwindow_qt_filter(void *message);
 #endif
 
-void debugger_qt::init_debugger(running_machine &machine)
+void debug_qt::init_debugger(running_machine &machine)
 {
 	if (qApp == NULL)
 	{
@@ -269,7 +276,7 @@ extern int sdl_entered_debugger;
 void winwindow_update_cursor_state(running_machine &machine);
 #endif
 
-void debugger_qt::wait_for_debugger(device_t &device, bool firststop)
+void debug_qt::wait_for_debugger(device_t &device, bool firststop)
 {
 #if defined(SDLMAME_UNIX) || defined(SDLMAME_WIN32)
 	sdl_entered_debugger = 1;
@@ -344,11 +351,13 @@ void debugger_qt::wait_for_debugger(device_t &device, bool firststop)
 //  Available for video.*
 //============================================================
 
-void debugger_qt::debugger_update()
+void debug_qt::debugger_update()
 {
 	qApp->processEvents(QEventLoop::AllEvents, 1);
 }
 
-void debugger_qt::debugger_exit()
-{
-}
+#else /* SDLMAME_UNIX */
+	MODULE_NOT_SUPPORTED(debug_qt, OSD_DEBUG_PROVIDER, "qt")
+#endif
+
+MODULE_DEFINITION(DEBUG_QT, debug_qt)

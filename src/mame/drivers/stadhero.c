@@ -30,24 +30,6 @@
 
 /******************************************************************************/
 
-READ16_MEMBER(stadhero_state::stadhero_control_r)
-{
-	switch (offset<<1)
-	{
-		case 0:
-			return m_inputs->read();
-
-		case 2:
-			return m_coin->read();
-
-		case 4:
-			return m_dsw->read();
-	}
-
-	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n",space.device().safe_pc(),0x30c000+offset);
-	return ~0;
-}
-
 WRITE16_MEMBER(stadhero_state::stadhero_control_w)
 {
 	switch (offset<<1)
@@ -73,7 +55,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, stadhero_state )
 	AM_RANGE(0x240000, 0x240007) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control_0_w)                          /* text layer */
 	AM_RANGE(0x240010, 0x240017) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control_1_w)
 	AM_RANGE(0x260000, 0x261fff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_data_r, pf_data_w)
-	AM_RANGE(0x30c000, 0x30c00b) AM_READWRITE(stadhero_control_r, stadhero_control_w)
+	AM_RANGE(0x30c000, 0x30c001) AM_READ_PORT("INPUTS")
+	AM_RANGE(0x30c002, 0x30c003) AM_READ_PORT("COIN")
+	AM_RANGE(0x30c004, 0x30c005) AM_READ_PORT("DSW")
+	AM_RANGE(0x30c000, 0x30c00b) AM_WRITE(stadhero_control_w)
 	AM_RANGE(0x310000, 0x3107ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM /* Main ram */
 	AM_RANGE(0xffc000, 0xffc7ff) AM_MIRROR(0x000800) AM_RAM AM_SHARE("spriteram")
@@ -210,13 +195,6 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-WRITE_LINE_MEMBER(stadhero_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state);
-}
-
-/******************************************************************************/
-
 static MACHINE_CONFIG_START( stadhero, stadhero_state )
 
 	/* basic machine hardware */
@@ -260,7 +238,7 @@ static MACHINE_CONFIG_START( stadhero, stadhero_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 
 	MCFG_SOUND_ADD("ym2", YM3812, XTAL_24MHz/8)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(stadhero_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH)

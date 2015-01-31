@@ -37,11 +37,11 @@ class NETLIB_NAME(solver);
 
 struct netlist_solver_parameters_t
 {
-	double m_accuracy;
-	double m_lte;
-	double m_min_timestep;
-	double m_max_timestep;
-	double m_sor;
+	nl_double m_accuracy;
+	nl_double m_lte;
+	nl_double m_min_timestep;
+	nl_double m_max_timestep;
+	nl_double m_sor;
 	bool m_dynamic;
 	int m_gs_loops;
 	int m_nr_loops;
@@ -59,12 +59,12 @@ public:
 
 	virtual ~vector_ops_t() {}
 
-	virtual const double sum(const double * v) = 0;
-	virtual void sum2(const double * RESTRICT v1, const double * RESTRICT v2, double & RESTRICT  s1, double & RESTRICT s2) = 0;
-	virtual void addmult(double * RESTRICT v1, const double * RESTRICT v2, const double &mult) = 0;
-	virtual void sum2a(const double * RESTRICT v1, const double * RESTRICT v2, const double * RESTRICT v3abs, double & RESTRICT s1, double & RESTRICT s2, double & RESTRICT s3abs) = 0;
+	virtual const nl_double sum(const nl_double * v) = 0;
+	virtual void sum2(const nl_double * RESTRICT v1, const nl_double * RESTRICT v2, nl_double & RESTRICT  s1, nl_double & RESTRICT s2) = 0;
+	virtual void addmult(nl_double * RESTRICT v1, const nl_double * RESTRICT v2, const nl_double &mult) = 0;
+	virtual void sum2a(const nl_double * RESTRICT v1, const nl_double * RESTRICT v2, const nl_double * RESTRICT v3abs, nl_double & RESTRICT s1, nl_double & RESTRICT s2, nl_double & RESTRICT s3abs) = 0;
 
-	virtual const double sumabs(const double * v) = 0;
+	virtual const nl_double sumabs(const nl_double * v) = 0;
 
 	static vector_ops_t *create_ops(const int size);
 
@@ -95,19 +95,19 @@ public:
 
 	ATTR_HOT inline const int N() const { if (m_N == 0) return m_dim; else return m_N; }
 
-	const double sum(const double * v)
+	const nl_double sum(const nl_double * v)
 	{
-		const double *  RESTRICT vl = v;
-		double tmp = 0.0;
+		const nl_double *  RESTRICT vl = v;
+		nl_double tmp = 0.0;
 		for (int i=0; i < N(); i++)
 			tmp += vl[i];
 		return tmp;
 	}
 
-	void sum2(const double * RESTRICT v1, const double * RESTRICT v2, double & RESTRICT s1, double & RESTRICT s2)
+	void sum2(const nl_double * RESTRICT v1, const nl_double * RESTRICT v2, nl_double & RESTRICT s1, nl_double & RESTRICT s2)
 	{
-		const double * RESTRICT v1l = v1;
-		const double * RESTRICT v2l = v2;
+		const nl_double * RESTRICT v1l = v1;
+		const nl_double * RESTRICT v2l = v2;
 		for (int i=0; i < N(); i++)
 		{
 			s1 += v1l[i];
@@ -115,21 +115,21 @@ public:
 		}
 	}
 
-	void addmult(double * RESTRICT v1, const double * RESTRICT v2, const double &mult)
+	void addmult(nl_double * RESTRICT v1, const nl_double * RESTRICT v2, const nl_double &mult)
 	{
-		double * RESTRICT v1l = v1;
-		const double * RESTRICT v2l = v2;
+		nl_double * RESTRICT v1l = v1;
+		const nl_double * RESTRICT v2l = v2;
 		for (int i=0; i < N(); i++)
 		{
 			v1l[i] += v2l[i] * mult;
 		}
 	}
 
-	void sum2a(const double * RESTRICT v1, const double * RESTRICT v2, const double * RESTRICT v3abs, double & RESTRICT s1, double & RESTRICT s2, double & RESTRICT s3abs)
+	void sum2a(const nl_double * RESTRICT v1, const nl_double * RESTRICT v2, const nl_double * RESTRICT v3abs, nl_double & RESTRICT s1, nl_double & RESTRICT s2, nl_double & RESTRICT s3abs)
 	{
-		const double * RESTRICT v1l = v1;
-		const double * RESTRICT v2l = v2;
-		const double * RESTRICT v3l = v3abs;
+		const nl_double * RESTRICT v1l = v1;
+		const nl_double * RESTRICT v2l = v2;
+		const nl_double * RESTRICT v3l = v3abs;
 		for (int i=0; i < N(); i++)
 		{
 			s1 += v1l[i];
@@ -138,10 +138,10 @@ public:
 		}
 	}
 
-	const double sumabs(const double * v)
+	const nl_double sumabs(const nl_double * v)
 	{
-		const double * RESTRICT vl = v;
-		double tmp = 0.0;
+		const nl_double * RESTRICT vl = v;
+		nl_double tmp = 0.0;
 		for (int i=0; i < N(); i++)
 			tmp += fabs(vl[i]);
 		return tmp;
@@ -171,10 +171,10 @@ class ATTR_ALIGNED(64) terms_t
 
 	ATTR_HOT inline netlist_terminal_t **terms() { return m_term; }
 	ATTR_HOT inline int *net_other() { return m_net_other; }
-	ATTR_HOT inline double *gt() { return m_gt; }
-	ATTR_HOT inline double *go() { return m_go; }
-	ATTR_HOT inline double *Idr() { return m_Idr; }
-	ATTR_HOT inline double **other_curanalog() { return m_other_curanalog; }
+	ATTR_HOT inline nl_double *gt() { return m_gt; }
+	ATTR_HOT inline nl_double *go() { return m_go; }
+	ATTR_HOT inline nl_double *Idr() { return m_Idr; }
+	ATTR_HOT inline nl_double **other_curanalog() { return m_other_curanalog; }
 
 	ATTR_COLD void set_pointers();
 
@@ -183,10 +183,10 @@ class ATTR_ALIGNED(64) terms_t
 private:
 	plinearlist_t<netlist_terminal_t *> m_term;
 	plinearlist_t<int> m_net_other;
-	plinearlist_t<double> m_go;
-	plinearlist_t<double> m_gt;
-	plinearlist_t<double> m_Idr;
-	plinearlist_t<double *> m_other_curanalog;
+	plinearlist_t<nl_double> m_go;
+	plinearlist_t<nl_double> m_gt;
+	plinearlist_t<nl_double> m_Idr;
+	plinearlist_t<nl_double *> m_other_curanalog;
 };
 
 class netlist_matrix_solver_t : public netlist_device_t
@@ -197,8 +197,8 @@ public:
 
 	enum eSolverType
 	{
-	    GAUSSIAN_ELIMINATION,
-	    GAUSS_SEIDEL
+		GAUSSIAN_ELIMINATION,
+		GAUSS_SEIDEL
 	};
 
 	ATTR_COLD netlist_matrix_solver_t(const eSolverType type, const netlist_solver_parameters_t &params);
@@ -209,7 +209,7 @@ public:
 	template<class C>
 	void solve_base(C *p);
 
-	ATTR_HOT double solve();
+	ATTR_HOT nl_double solve();
 
 	ATTR_HOT inline bool is_dynamic() { return m_dynamic_devices.count() > 0; }
 	ATTR_HOT inline bool is_timestep() { return m_step_devices.count() > 0; }
@@ -236,24 +236,24 @@ protected:
 	ATTR_HOT void update_dynamic();
 
 	// should return next time step
-	ATTR_HOT virtual double vsolve() = 0;
+	ATTR_HOT virtual nl_double vsolve() = 0;
 
 	ATTR_COLD virtual void  add_term(int net_idx, netlist_terminal_t *term) = 0;
 
 	plinearlist_t<netlist_analog_net_t *> m_nets;
 	plinearlist_t<netlist_analog_output_t *> m_inps;
 
-    int m_stat_calculations;
-    int m_stat_newton_raphson;
-    int m_stat_vsolver_calls;
+	int m_stat_calculations;
+	int m_stat_newton_raphson;
+	int m_stat_vsolver_calls;
 
 	const netlist_solver_parameters_t &m_params;
 
-	ATTR_HOT inline const double current_timestep() { return m_cur_ts; }
+	ATTR_HOT inline const nl_double current_timestep() { return m_cur_ts; }
 private:
 
 	netlist_time m_last_step;
-	double m_cur_ts;
+	nl_double m_cur_ts;
 	dev_list_t m_step_devices;
 	dev_list_t m_dynamic_devices;
 
@@ -264,7 +264,7 @@ private:
 
 	ATTR_HOT void update_inputs();
 
-    const eSolverType m_type;
+	const eSolverType m_type;
 };
 
 
@@ -279,7 +279,7 @@ public:
 
 	ATTR_COLD void post_start();
 
-	ATTR_HOT inline double gmin() { return m_gmin.Value(); }
+	ATTR_HOT inline nl_double gmin() { return m_gmin.Value(); }
 
 protected:
 	ATTR_HOT void update();

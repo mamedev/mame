@@ -129,7 +129,7 @@ public:
 
 	// (static) configuration helpers
 	static void set_type(device_t &device, int type) { downcast<nb1413m3_device &>(device).m_nb1413m3_type = type; }
-	
+
 	enum
 	{
 		TIMER_CB
@@ -169,7 +169,7 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	
+
 private:
 
 	int m_74ls193_counter;

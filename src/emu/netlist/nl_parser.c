@@ -6,6 +6,7 @@
  */
 
 #include "nl_parser.h"
+#include "nl_factory.h"
 
 //#undef NL_VERBOSE_OUT
 //#define NL_VERBOSE_OUT(x) printf x
@@ -399,7 +400,7 @@ void netlist_parser::net_c()
 void netlist_parser::netdev_param()
 {
 	pstring param;
-	double val;
+	nl_double val;
 	param = get_identifier();
 	require_token(m_tok_comma);
 	val = eval_param(get_token());
@@ -439,7 +440,7 @@ void netlist_parser::device(const pstring &dev_type)
 		}
 		else
 		{
-			double val = eval_param(tok);
+			nl_double val = eval_param(tok);
 			m_setup.register_param(paramfq, val);
 		}
 		cnt++;
@@ -467,14 +468,14 @@ void netlist_parser::device(const pstring &dev_type)
 // ----------------------------------------------------------------------------------------
 
 
-double netlist_parser::eval_param(const token_t tok)
+nl_double netlist_parser::eval_param(const token_t tok)
 {
 	static const char *macs[6] = {"", "RES_K", "RES_M", "CAP_U", "CAP_N", "CAP_P"};
-	static double facs[6] = {1, 1e3, 1e6, 1e-6, 1e-9, 1e-12};
+	static nl_double facs[6] = {1, 1e3, 1e6, 1e-6, 1e-9, 1e-12};
 	int i;
 	int f=0;
 	bool e;
-	double ret;
+	nl_double ret;
 	pstring val;
 
 	//printf("param %s\n", tok.m_token.cstr());

@@ -38,8 +38,8 @@
 		<publisher>Texas Instruments</publisher>
 		<part name="cart" interface="lantutor">
 			<dataarea name="rom" size="0x10000">
-<!--			<rom name="cd2315.vsm" size="0x4000" crc="" sha1="" offset="0x0000" /> -->
-<!--			<rom name="cd2316.vsm" size="0x4000" crc="" sha1="" offset="0x4000" /> -->
+<!--            <rom name="cd2315.vsm" size="0x4000" crc="" sha1="" offset="0x0000" /> -->
+<!--            <rom name="cd2316.vsm" size="0x4000" crc="" sha1="" offset="0x4000" /> -->
 				<rom name="cd2317.vsm" size="0x4000" crc="53231c0b" sha1="472117c3d0e28437fa8faa054f98088e06efc2a1" offset="0x8000" />
 				<rom name="cd2318.vsm" size="0x4000" crc="6c0727bc" sha1="132e39755b122f2cbec6f3e767f5d256a9c1e7ae" offset="0xc000" />
 			</dataarea>

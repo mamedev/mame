@@ -49,6 +49,10 @@
 
 #define NETLIST_GMIN_DEFAULT    (1e-9)
 
+//typedef double   nl_double;
+
+#define nl_double double
+
 //============================================================
 //  DEBUGGING
 //============================================================
@@ -117,21 +121,21 @@
 class nl_fatalerror : public std::exception
 {
 public:
-    nl_fatalerror(const char *format, ...) ATTR_PRINTF(2,3)
-    {
-        char text[1024];
-        va_list ap;
-        va_start(ap, format);
-        vsprintf(text, format, ap);
-        va_end(ap);
-        osd_printf_error("%s\n", text);
-    }
-    nl_fatalerror(const char *format, va_list ap)
-    {
-        char text[1024];
-        vsprintf(text, format, ap);
-        osd_printf_error("%s\n", text);
-    }
+	nl_fatalerror(const char *format, ...) ATTR_PRINTF(2,3)
+	{
+		char text[1024];
+		va_list ap;
+		va_start(ap, format);
+		vsprintf(text, format, ap);
+		va_end(ap);
+		osd_printf_error("%s\n", text);
+	}
+	nl_fatalerror(const char *format, va_list ap)
+	{
+		char text[1024];
+		vsprintf(text, format, ap);
+		osd_printf_error("%s\n", text);
+	}
 };
 
 //============================================================
@@ -155,7 +159,7 @@ public:
 #else
 #define nl_assert(x)               do { } while (0)
 //#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s (%s:%d)", msg, __FILE__, __LINE__); } while (0)
-#define nl_assert_always(x, msg)   do { } while (0)
+#define nl_assert_always(x, msg)    do { if (!(x)) throw nl_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
 #endif
 
 //============================================================

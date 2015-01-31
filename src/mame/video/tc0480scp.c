@@ -717,7 +717,7 @@ void tc0480scp_device::bg01_draw( screen_device &screen, bitmap_ind16 &bitmap, c
 		bitmap_ind16 &srcbitmap = m_tilemap[layer][m_dblwidth]->pixmap();
 		bitmap_ind8 &flagsbitmap = m_tilemap[layer][m_dblwidth]->flagsmap();
 		int flip = m_pri_reg & 0x40;
-		int i, y, y_index, src_y_index, row_index;
+		int y_index, src_y_index, row_index;
 		int x_index, x_step;
 
 		UINT16 screen_width = 512; //cliprect.width();
@@ -745,9 +745,7 @@ void tc0480scp_device::bg01_draw( screen_device &screen, bitmap_ind16 &bitmap, c
 			y_index -= (m_y_offset - min_y) * zoomy;
 		}
 
-		y = min_y;
-
-		do
+		for (int y = min_y; y <= max_y; y++)
 		{
 			src_y_index = (y_index >> 16) & 0x1ff;
 
@@ -766,7 +764,7 @@ void tc0480scp_device::bg01_draw( screen_device &screen, bitmap_ind16 &bitmap, c
 
 			if (flags & TILEMAP_DRAW_OPAQUE)
 			{
-				for (i = 0; i < screen_width; i++)
+				for (int i = 0; i < screen_width; i++)
 				{
 					*dst16++ = src16[(x_index >> 16) & width_mask];
 					x_index += x_step;
@@ -774,7 +772,7 @@ void tc0480scp_device::bg01_draw( screen_device &screen, bitmap_ind16 &bitmap, c
 			}
 			else
 			{
-				for (i = 0; i < screen_width; i++)
+				for (int i = 0; i < screen_width; i++)
 				{
 					if (tsrc[(x_index >> 16) & width_mask])
 						*dst16++ = src16[(x_index >> 16) & width_mask];
@@ -787,10 +785,7 @@ void tc0480scp_device::bg01_draw( screen_device &screen, bitmap_ind16 &bitmap, c
 			taitoic_drawscanline(bitmap, cliprect, 0, y, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? 0 : 1, ROT0, screen.priority(), priority);
 
 			y_index += zoomy;
-			y++;
 		}
-		while (y <= max_y);
-
 	}
 }
 
@@ -838,7 +833,7 @@ void tc0480scp_device::bg23_draw(screen_device &screen, bitmap_ind16 &bitmap, co
 
 	UINT16 *dst16, *src16;
 	UINT8 *tsrc;
-	int i, y, y_index, src_y_index, row_index, row_zoom;
+	int y_index, src_y_index, row_index, row_zoom;
 	int sx, x_index, x_step;
 	UINT32 zoomx, zoomy;
 	UINT16 scanline[512];
@@ -876,9 +871,7 @@ void tc0480scp_device::bg23_draw(screen_device &screen, bitmap_ind16 &bitmap, co
 		y_index -= (m_y_offset - min_y) * zoomy;
 	}
 
-		y = min_y;
-
-	do
+	for (int y = min_y; y <= max_y; y++)
 	{
 		if (!flipscreen)
 			src_y_index = ((y_index>>16) + m_bgcolumn_ram[layer][(y - m_y_offset) & 0x1ff]) & 0x1ff;
@@ -917,7 +910,7 @@ void tc0480scp_device::bg23_draw(screen_device &screen, bitmap_ind16 &bitmap, co
 
 		if (flags & TILEMAP_DRAW_OPAQUE)
 		{
-			for (i = 0; i < screen_width; i++)
+			for (int i = 0; i < screen_width; i++)
 			{
 				*dst16++ = src16[(x_index >> 16) & width_mask];
 				x_index += x_step;
@@ -925,7 +918,7 @@ void tc0480scp_device::bg23_draw(screen_device &screen, bitmap_ind16 &bitmap, co
 		}
 		else
 		{
-			for (i = 0; i < screen_width; i++)
+			for (int i = 0; i < screen_width; i++)
 			{
 				if (tsrc[(x_index >> 16) & width_mask])
 					*dst16++ = src16[(x_index >> 16) & width_mask];
@@ -938,9 +931,7 @@ void tc0480scp_device::bg23_draw(screen_device &screen, bitmap_ind16 &bitmap, co
 		taitoic_drawscanline(bitmap, cliprect, 0, y, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? 0 : 1, ROT0, screen.priority(), priority);
 
 		y_index += zoomy;
-		y++;
 	}
-	while (y<=max_y);
 }
 
 

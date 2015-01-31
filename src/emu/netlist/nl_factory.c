@@ -50,6 +50,27 @@
 #include "nl_factory.h"
 #include "nl_setup.h"
 
+// ----------------------------------------------------------------------------------------
+// net_device_t_base_factory
+// ----------------------------------------------------------------------------------------
+
+ATTR_COLD const nl_util::pstring_list net_device_t_base_factory::term_param_list()
+{
+	if (m_def_param.startsWith("+"))
+		return nl_util::split(m_def_param.substr(1), ",");
+	else
+		return nl_util::pstring_list();
+}
+
+ATTR_COLD const nl_util::pstring_list net_device_t_base_factory::def_params()
+{
+	if (m_def_param.startsWith("+") || m_def_param.equals("-"))
+		return nl_util::pstring_list();
+	else
+		return nl_util::split(m_def_param, ",");
+}
+
+
 netlist_factory_t::netlist_factory_t()
 {
 }
@@ -64,7 +85,7 @@ netlist_factory_t::~netlist_factory_t()
 	m_list.clear();
 }
 
-netlist_device_t *netlist_factory_t::new_device_by_classname(const pstring &classname, netlist_setup_t &setup) const
+netlist_device_t *netlist_factory_t::new_device_by_classname(const pstring &classname) const
 {
 	for (net_device_t_base_factory * const *e = m_list.first(); e != NULL; e = m_list.next(e))
 	{
@@ -76,7 +97,6 @@ netlist_device_t *netlist_factory_t::new_device_by_classname(const pstring &clas
 		}
 		p++;
 	}
-	setup.netlist().error("Class %s not found!\n", classname.cstr());
 	return NULL; // appease code analysis
 }
 

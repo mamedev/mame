@@ -106,7 +106,6 @@ public:
 	required_ioport m_io_in3;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT32> m_generic_paletteram_32;
-	DECLARE_WRITE_LINE_MEMBER(sound_irq_gen);
 };
 
 //UINT32 *backfire_180010, *backfire_188010;
@@ -439,11 +438,6 @@ static GFXDECODE_START( backfire )
 GFXDECODE_END
 
 
-WRITE_LINE_MEMBER(backfire_state::sound_irq_gen)
-{
-	logerror("sound irq\n");
-}
-
 INTERRUPT_GEN_MEMBER(backfire_state::deco32_vbl_interrupt)
 {
 	device.execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
@@ -559,7 +553,6 @@ static MACHINE_CONFIG_START( backfire, backfire_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, 28000000 / 2)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(backfire_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

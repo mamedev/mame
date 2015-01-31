@@ -10,7 +10,6 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "debugint.h"
 #include "ui/ui.h"
 #include "rendfont.h"
 #include "uiinput.h"
@@ -22,12 +21,36 @@
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 
+#include "debug_module.h"
+#include "modules/osdmodule.h"
+
+class debug_internal : public osd_module, public debug_module
+{
+public:
+	debug_internal()
+	: osd_module(OSD_DEBUG_PROVIDER, "internal"), debug_module(),
+		m_machine(NULL)
+	{
+	}
+
+	virtual ~debug_internal() { }
+
+	virtual int init() { return 0;}
+	virtual void exit();
+
+	virtual void init_debugger(running_machine &machine);
+	virtual void wait_for_debugger(device_t &device, bool firststop);
+	virtual void debugger_update();
+
+private:
+	running_machine *m_machine;
+};
+
+
 
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
-
-const osd_debugger_type OSD_DEBUGGER_INTERNAL = &osd_debugger_creator<debugger_internal>;
 
 #define BORDER_YTHICKNESS 1
 #define BORDER_XTHICKNESS 1
@@ -239,11 +262,11 @@ INLINE void dview_set_state(DView *dv, int state, int onoff)
     LOCAL VARIABLES
 ***************************************************************************/
 
-static render_font *    debug_font;
+static render_font *    debug_font = NULL;
 static int              debug_font_width;
 static int              debug_font_height;
 static float            debug_font_aspect;
-static DView *          list;
+static DView *          list = NULL;
 static DView *          focus_view;
 
 static ui_menu *        menu;
@@ -841,7 +864,7 @@ static void dview_update(debug_view &dw, void *osdprivate)
 #endif
 }
 
-void debugger_internal::debugger_exit()
+void debug_internal::exit()
 {
 	for (DView *ndv = list; ndv != NULL; )
 	{
@@ -858,7 +881,7 @@ void debugger_internal::debugger_exit()
 		global_free(menu);
 }
 
-void debugger_internal::init_debugger(running_machine &machine)
+void debug_internal::init_debugger(running_machine &machine)
 {
 	unicode_char ch;
 	int chw;
@@ -1410,7 +1433,7 @@ static void update_views(void)
 }
 
 
-void debugger_internal::wait_for_debugger(device_t &device, bool firststop)
+void debug_internal::wait_for_debugger(device_t &device, bool firststop)
 {
 	if (firststop && list == NULL)
 	{
@@ -1443,18 +1466,12 @@ void debugger_internal::wait_for_debugger(device_t &device, bool firststop)
 
 }
 
-void debugger_internal::debugger_update()
+void debug_internal::debugger_update()
 {
-	if (!debug_cpu_is_stopped(*m_machine) && m_machine->phase() == MACHINE_PHASE_RUNNING)
+	if ((m_machine != NULL) && (!debug_cpu_is_stopped(*m_machine)) && (m_machine->phase() == MACHINE_PHASE_RUNNING))
 	{
 		update_views();
 	}
 }
 
-//-------------------------------------------------
-//  debugger_internal - constructor
-//-------------------------------------------------
-debugger_internal::debugger_internal(const osd_interface &osd)
-	: osd_debugger_interface(osd), m_machine(NULL)
-{
-}
+MODULE_DEFINITION(DEBUG_INTERNAL, debug_internal)

@@ -148,6 +148,9 @@ CPUS += IE15
 CPUS += 8X300
 CPUS += ALTO2
 #CPUS += W65816
+CPUS += ARC
+CPUS += ARCOMPACT
+CPUS += AMIS2000
 
 #-------------------------------------------------
 # specify available sound cores
@@ -1721,7 +1724,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/monacogp.o \
 	$(DRIVERS)/naomi.o $(MACHINE)/dc.o $(VIDEO)/powervr2.o $(MACHINE)/naomi.o \
 	$(MACHINE)/naomig1.o $(MACHINE)/naomibd.o $(MACHINE)/naomirom.o $(MACHINE)/naomigd.o \
-	$(MACHINE)/naomicrypt.o $(MACHINE)/naomim1.o $(MACHINE)/naomim2.o $(MACHINE)/naomim4.o \
+	$(MACHINE)/naomim1.o $(MACHINE)/naomim2.o $(MACHINE)/naomim4.o \
 	$(MACHINE)/315-5881_crypt.o \
 	$(MACHINE)/awboard.o \
 	$(MACHINE)/mie.o $(MACHINE)/maple-dc.o $(MACHINE)/mapledev.o $(MACHINE)/dc-ctrl.o $(MACHINE)/jvs13551.o \
@@ -1747,7 +1750,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/segaybd.o $(VIDEO)/segaybd.o \
 	$(DRIVERS)/sg1000a.o \
 	$(DRIVERS)/stactics.o $(VIDEO)/stactics.o \
-	$(DRIVERS)/stv.o $(MACHINE)/stvprot.o $(MACHINE)/decathlt.o \
+	$(DRIVERS)/stv.o $(MACHINE)/stvprot.o $(MACHINE)/315-5838_317-0229_comp.o \
 	$(DRIVERS)/suprloco.o $(VIDEO)/suprloco.o \
 	$(DRIVERS)/system1.o $(VIDEO)/system1.o \
 	$(DRIVERS)/system16.o $(VIDEO)/system16.o \

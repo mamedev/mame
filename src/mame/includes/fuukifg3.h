@@ -26,7 +26,6 @@ public:
 		m_priority(*this, "priority"),
 		m_tilebank(*this, "tilebank"),
 		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -51,7 +50,6 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -85,7 +83,6 @@ public:
 	inline void fuuki32_vram_w(offs_t offset, UINT32 data, UINT32 mem_mask, int _N_);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void fuuki32_draw_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri );
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

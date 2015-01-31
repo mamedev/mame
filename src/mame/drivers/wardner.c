@@ -146,7 +146,6 @@ public:
 
 	DECLARE_WRITE8_MEMBER(wardner_bank_w);
 	DECLARE_DRIVER_INIT(wardner);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 
 protected:
 	virtual void driver_start();
@@ -337,13 +336,6 @@ static const gfx_layout tilelayout =
 };
 
 
-/* handler called by the 3812 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(wardner_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state);
-}
-
-
 static GFXDECODE_START( wardner )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   1536, 32 )  /* colors 1536-1791 */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,   1280, 16 )  /* colors 1280-1535 */
@@ -419,7 +411,7 @@ static MACHINE_CONFIG_START( wardner, wardner_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_14MHz/4)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(wardner_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

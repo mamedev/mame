@@ -61,8 +61,8 @@ struct sdl_window_info
 		m_fullscreen = !video_config.windowed;
 		prescale = video_config.prescale;
 
-        windowed_width = config->width;
-        windowed_height = config->height;
+		windowed_width = config->width;
+		windowed_height = config->height;
 	}
 
 	void video_window_update(running_machine &machine);

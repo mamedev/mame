@@ -32,6 +32,11 @@ class m68000_base_device;
 
 #include <limits.h>
 
+#ifdef SDLMAME_SOLARIS
+#undef REG_SP
+#undef REG_PC
+#undef REG_FP
+#endif
 
 /* ======================================================================== */
 /* ==================== ARCHITECTURE-DEPENDANT DEFINES ==================== */

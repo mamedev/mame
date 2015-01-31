@@ -8,32 +8,47 @@
 
 *******************************************************************c********/
 
+#include "sound_module.h"
+#include "modules/osdmodule.h"
 
-#include "js_sound.h"
+#if (defined(SDLMAME_EMSCRIPTEN))
+
 #include "emscripten.h"
 
-//-------------------------------------------------
-//  sound_js - constructor
-//-------------------------------------------------
-sound_js::sound_js(const osd_interface &osd)
-	: osd_sound_interface(osd)
+class sound_js : public osd_module, public sound_module
 {
-}
+public:
 
-void sound_js::update_audio_stream(const INT16 *buffer, int samples_this_frame)
-{
-	EM_ASM_ARGS({
-	// Forward audio stream update on to JS backend implementation.
-	jsmess_update_audio_stream($0, $1);
-	}, (unsigned int)buffer, samples_this_frame);
-}
+	sound_js()
+	: osd_module(OSD_SOUND_PROVIDER, "js"), sound_module()
+	{
+	}
+	virtual ~sound_js() { }
 
-void sound_js::set_mastervolume(int attenuation)
-{
-	EM_ASM_ARGS({
-	// Forward volume update on to JS backend implementation.
-	jsmess_set_mastervolume($0);
-	}, attenuation);
-}
+	virtual int init();
+	virtual void exit();
 
-const osd_sound_type OSD_SOUND_JS = &osd_sound_creator<sound_js>;
+	// sound_module
+
+	virtual void update_audio_stream(bool is_throttled, const INT16 *buffer, int samples_this_frame)
+	{
+		EM_ASM_ARGS({
+		// Forward audio stream update on to JS backend implementation.
+		jsmess_update_audio_stream($1, $2);
+		}, (unsigned int)buffer, samples_this_frame);
+	}
+	virtual void set_mastervolume(int attenuation)
+	{
+		EM_ASM_ARGS({
+		// Forward volume update on to JS backend implementation.
+		jsmess_set_mastervolume($0);
+		}, attenuation);
+	}
+
+};
+
+#else /* SDLMAME_UNIX */
+	MODULE_NOT_SUPPORTED(sound_js, OSD_SOUND_PROVIDER, "js")
+#endif
+
+MODULE_DEFINITION(SOUND_JS, sound_js)

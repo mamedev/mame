@@ -1,7 +1,7 @@
 #ifndef __DINETWORK_H__
 #define __DINETWORK_H__
 
-class netdev;
+class osd_netdev;
 
 class device_network_interface : public device_interface
 {
@@ -24,7 +24,7 @@ protected:
 	bool m_promisc;
 	char m_mac[6];
 	float m_bandwidth;
-	auto_pointer<class netdev> m_dev;
+	auto_pointer<class osd_netdev> m_dev;
 	int m_intf;
 };
 

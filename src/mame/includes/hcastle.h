@@ -65,7 +65,6 @@ public:
 	DECLARE_PALETTE_INIT(hcastle);
 	UINT32 screen_update_hcastle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, UINT8 *sbank, int bank );
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE8_MEMBER(volume_callback);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

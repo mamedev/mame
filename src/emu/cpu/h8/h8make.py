@@ -139,7 +139,7 @@ class Opcode:
         for i in range(0, extra_words):
             self.source.append("\tfetch(%d);\n" % (i+base_offset));
 
-    def description():
+    def description(self):
         return "%s %s %s" % (self.name, self.am1, self.am2)
     
     def add_source_line(self, line):
@@ -451,7 +451,7 @@ def main(argv):
     try:
         f = open(argv[3], "w")
     except Exception, err:
-        logging.error("cannot write file %s [%s]", fname, err)
+        sys.stderr.write("cannot write file %s [%s]\n" % (argv[3], err))
         sys.exit(1)
 
     opcodes.build_dispatch()

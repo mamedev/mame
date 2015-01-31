@@ -1542,12 +1542,6 @@ static GFXDECODE_START( hyperpac )
 	GFXDECODE_ENTRY( "gfx1", 0, hyperpac_tilelayout,  0, 16 )
 GFXDECODE_END
 
-/* handler called by the 3812/2151 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(snowbros_state::irqhandler)
-{
-	m_soundcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 MACHINE_RESET_MEMBER(snowbros_state,semiprot)
 {
 	UINT16 *PROTDATA = (UINT16*)memregion("user1")->base();
@@ -1599,7 +1593,7 @@ static MACHINE_CONFIG_START( snowbros, snowbros_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3000000)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(snowbros_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1711,7 +1705,7 @@ static MACHINE_CONFIG_START( honeydol, snowbros_state )
 	/* sound hardware */
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3000000)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(snowbros_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 

@@ -6,7 +6,8 @@
 #include "watchdog.h"
 #include "clifront.h"
 #include "modules/lib/osdobj_common.h"
-#include "video.h"
+#include "modules/osdmodule.h"
+#include "modules/font/font_module.h"
 
 //============================================================
 //  System dependent defines
@@ -28,7 +29,7 @@
 		#define SDL13_COMBINE_RESIZE (0)
 	#endif
 #else
-    #define SDLMAME_INIT_IN_WORKER_THREAD   (0)
+	#define SDLMAME_INIT_IN_WORKER_THREAD   (0)
 	#define SDL13_COMBINE_RESIZE (0)
 #endif
 
@@ -186,14 +187,7 @@ public:
 	// input overridables
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist);
 
-	// font overridables
-	virtual osd_font *font_open(const char *name, int &height);
-	virtual void font_close(osd_font *font);
-	virtual bool font_get_bitmap(osd_font *font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs);
-
 	virtual void video_register();
-	virtual void sound_register();
-	virtual void debugger_register();
 
 	virtual bool video_init();
 	virtual bool window_init();
@@ -201,32 +195,23 @@ public:
 	virtual void input_pause();
 	virtual void input_resume();
 	virtual bool output_init();
-	#ifdef USE_NETWORK
-	virtual bool network_init();
-	#endif
-    //virtual bool midi_init();
+	//virtual bool midi_init();
 
 	virtual void video_exit();
 	virtual void window_exit();
 	virtual void input_exit();
 	virtual void output_exit();
-	#ifdef USE_NETWORK
-	virtual void network_exit();
-	#endif
-    //virtual void midi_exit();
+	//virtual void midi_exit();
 
-    sdl_options &options() { return m_options; }
+	sdl_options &options() { return m_options; }
 
 private:
 	virtual void osd_exit();
 
-	void extract_window_config(int index, sdl_window_config *conf);
-
 	// FIXME: remove machine usage
 	void extract_video_config(running_machine &machine);
 
-
-    sdl_options &m_options;
+	sdl_options &m_options;
 
 	watchdog *m_watchdog;
 

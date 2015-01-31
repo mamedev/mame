@@ -159,7 +159,7 @@ public:
 
 	// conversions
 
-	double as_double(bool *error = NULL) const;
+	nl_double as_double(bool *error = NULL) const;
 
 	long as_long(bool *error = NULL) const;
 

@@ -65,6 +65,9 @@
  *
  */
 
+// identify unknown devices in IDE
+
+//#define NETLIST_DEVELOPMENT 1
 
 #include "netlist/nl_dice_compat.h"
 #include "netlist/devices/net_lib.h"

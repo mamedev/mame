@@ -229,7 +229,7 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( gumbo, gumbo_state )
 
-	MCFG_CPU_ADD("maincpu", M68000, 14318180 /2)     // or 10mhz? ?
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_14_31818MHz/2)
 	MCFG_CPU_PROGRAM_MAP(gumbo_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gumbo_state,  irq1_line_hold) // all the same
 
@@ -248,7 +248,7 @@ static MACHINE_CONFIG_START( gumbo, gumbo_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1122000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_14_31818MHz/16, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END

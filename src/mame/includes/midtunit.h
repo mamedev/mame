@@ -24,8 +24,7 @@ public:
 		m_adpcm_sound(*this, "adpcm") ,
 		m_generic_paletteram_16(*this, "paletteram"),
 		m_nvram(*this, "nvram"),
-		m_gfxrom(*this, "gfxrom"),
-		m_ports(*this, tunit_ports) { }
+		m_gfxrom(*this, "gfxrom") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -37,9 +36,6 @@ public:
 	required_shared_ptr<UINT16> m_nvram;
 
 	required_memory_region m_gfxrom;
-
-	required_ioport_array<4> m_ports;
-	DECLARE_IOPORT_ARRAY(tunit_ports);
 
 	DECLARE_WRITE16_MEMBER(midtunit_cmos_enable_w);
 	DECLARE_WRITE16_MEMBER(midtunit_cmos_w);

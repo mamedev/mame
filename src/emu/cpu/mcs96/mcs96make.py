@@ -175,7 +175,7 @@ def main(argv):
     try:
         f = open(argv[3], "w")
     except Exception, err:
-        logging.error("cannot write file %s [%s]", fname, err)
+        sys.stderr.write("cannot write file %s [%s]\n" % (argv[3], err))
         sys.exit(1)
     
     if t != "mcs96":

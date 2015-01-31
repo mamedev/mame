@@ -190,13 +190,6 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-WRITE_LINE_MEMBER(prehisle_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-/******************************************************************************/
-
 static MACHINE_CONFIG_START( prehisle, prehisle_state )
 
 	/* basic machine hardware */
@@ -226,7 +219,7 @@ static MACHINE_CONFIG_START( prehisle, prehisle_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz)  /* verified on pcb */
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(prehisle_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)

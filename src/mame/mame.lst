@@ -209,6 +209,7 @@ batman2         // bootleg
 warofbug        // (c) 1981 Armenia
 warofbugu       // (c) 1981 Armenia
 warofbugg       // German Version
+spactrai        //
 redufo          // (c) Artic
 redufob         // bootleg
 exodus          // Subelectro - bootleg?
@@ -2678,7 +2679,7 @@ snowbrosj       // MIN16-02 (c) 1990 Toaplan
 snowbrosd       // MIN16-02 (c) 1990 Toaplan + Dooyong license
 wintbob         // bootleg
 snowbroswb      //
-toto			//
+toto            //
 // modified snowbros 'clone' hardware
 honeydol        // (c) 1995 Barko Corp
 twinadv         // (c) 1995 Barko Corp
@@ -3230,6 +3231,7 @@ sf2mdta         // bootleg
 sf2mdtb         // bootleg
 sf2b            // bootleg
 cworld2j        // 11/06/1992 (c) 1992 (Japan)
+cworld2ja       // 11/06/1992 (c) 1992 (Japan)
 varth           // 14/07/1992 (c) 1992 (World)
 varthr1         // 12/06/1992 (c) 1992 (World)
 varthu          // 12/06/1992 (c) 1992 (USA)
@@ -3412,7 +3414,7 @@ ddsomur1        // 09/02/1996 (c) 1996 (USA)
 ddsomjr1        // 06/02/1996 (c) 1996 (Japan)
 ddsomj          // 19/06/1996 (c) 1996 (Japan)
 ddsoma          // 19/06/1996 (c) 1996 (Asia)
-ddsomar1		// 08/02/1996 (c) 1996 (Asia)
+ddsomar1        // 08/02/1996 (c) 1996 (Asia)
 ddsomh          // 23/02/1996 (c) 1996 (Hispanic)
 ddsomb          // 23/02/1996 (c) 1996 (Brazil)
 sfa2            // 06/03/1996 (c) 1996 (Euro)
@@ -5108,7 +5110,7 @@ dayto2pe        // 1998.12 Daytone USA 2 Power Edition
 spikeofe        // 1999.01 Spikeout Final Edition
 magtruck        // 1999.03 Magical Truck Adventure (US)
 eca             // 1999.10 Kyukyuusya Emergency Call Ambulance
-ecax
+ecau
 ecap            // 1999.12 Emergency Call Ambulance - US proto or location test
 
 
@@ -5379,7 +5381,7 @@ wwfroyal        // 2000.11 WWF Royal Rumble
 sprtjam         // 2000.11.13 Sports Jam
 pjustic         // 2000.12 Moero Justice Gakuen / Project Justice
 samba2k         // 2000.12 Samba de Amigo Ver.2000
-shaktam	        // 2000.12.28 Shakatto Tambourine (Rev B)
+shaktam         // 2000.12.28 Shakatto Tambourine (Rev B)
 				// 2000.?? Boat Race Ocean Heats
 csmash          // 2000.?? Cosmic Smash
 csmasho         // 2000.?? Cosmic Smash (original)
@@ -5395,7 +5397,7 @@ monkeyba        // 2001.05 Monkey Ball
 zerogu2         // 2001.05 Zero Gunner 2
 cvsgd           // 2001.06 Capcom Vs. SNK Millennium Fight 2000 Pro
 crakndj2        // 2001.06 Crackin' DJ Part 2
-hmgeo           // 2001.06 Heavy Metal Geomatrix (Rev A)
+hmgeo           // 2001.06 Heavy Metal Geomatrix (Rev B)
 wsbbgd          // 2001.06 Super Major League / World Series Baseball
 starseek        // 2001.07 Dokidoki Idol Star Seeker
 gunsur2         // 2001.07 Gun Survivor 2 Biohazard Code: Veronica (BHF1)
@@ -6708,7 +6710,7 @@ bmfinal         // GXC01 (c) 2002 (Japan)
 popn1           // GX803 (c) 1998 (Asia)
 //popn1j        // GX803 (c) 1998 (Japan)
 popn2           // GX831 (c) 1998 (Japan)
-popn3         	// GX980 (c) 1999 (Japan)
+popn3           // GX980 (c) 1999 (Japan)
 //popnstex      // GX970 (c) 1999 (Japan)
 
 // Firebeat games
@@ -6962,7 +6964,7 @@ quantum         // 136016           (c) 1982        // made by Gencomp
 quantum1        // 136016           (c) 1982        // made by Gencomp
 quantump        // 136016           (c) 1982        // made by Gencomp
 bwidow          // 136017           (c) 1982
-bwidowp			// (proto)			(c) 1982
+bwidowp         // (proto)          (c) 1982
 starwars        // 136021           (c) 1983
 starwars1       // 136021           (c) 1983
 starwarso       // 136021           (c) 1983
@@ -11216,6 +11218,9 @@ peps0296        // (c) 1996 IGT - International Game Technology
 peps0298        // (c) 1996 IGT - International Game Technology
 peps0308        // (c) 1996 IGT - International Game Technology
 peps0364        // (c) 1996 IGT - International Game Technology
+peps0366        // (c) 1996 IGT - International Game Technology
+peps0372        // (c) 1996 IGT - International Game Technology
+peps0373        // (c) 1996 IGT - International Game Technology
 peps0426        // (c) 1996 IGT - International Game Technology
 peps0581        // (c) 1996 IGT - International Game Technology
 peps0615        // (c) 1996 IGT - International Game Technology
@@ -31143,7 +31148,7 @@ nineball
 orbitor1
 quicksil
 seawitch
-splitsec
+spltsecp
 stargzr
 viperp
 gamatron

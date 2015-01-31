@@ -650,8 +650,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<software name="barbie">
 		<description>Barbie Super Model (Prototype)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Hi Tech Expressions</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="barbie super model (unknown) (proto).bin" size="262144" crc="03a0ce9e" sha1="4fabaf794081074ac1a76eb0efc4262efb627610" offset="000000" />
@@ -1296,8 +1296,8 @@ a certain item) -->
 
 	<software name="carlicen">
 		<description>Car Licence (Jpn)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Mitsubishi Chemical</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="car licence (japan).bin" size="524288" crc="f6a697f8" sha1="0cf691dba7080a1f8d4a181563948b188115ec89" offset="000000" />
@@ -2358,7 +2358,7 @@ a certain item) -->
 		</part>
 	</software>
 
-	<software name="ecco" supported="no">
+	<software name="ecco">
 		<description>Ecco the Dolphin (Euro, USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -2705,8 +2705,8 @@ a certain item) -->
 
 	<software name="frogger">
 		<description>Frogger (USA, Prototype)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1991</year>
+		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="frogger (usa) (proto).bin" size="131072" crc="02bbf994" sha1="b917ac6fbd3e5d18c07246f1309d81943ee1dd47" offset="000000" />
@@ -3449,7 +3449,7 @@ a certain item) -->
 	<software name="jangpun2">
 		<description>Jang Pung II (Kor, SMS Mode)</description>
 		<year>1993</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sieco</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<feature name="slot" value="codemasters" />
 			<feature name="pin_42" value="sms_mode" />
@@ -4671,8 +4671,8 @@ a certain item) -->
 
 	<software name="mspacman">
 		<description>Ms. Pac-Man (USA)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year> <!-- re-released in 2000 my Majesco -->
+		<publisher>Namco</publisher>
 		<info name="serial" value="T-14048"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
@@ -5777,8 +5777,8 @@ a certain item) -->
 
 	<software name="pacintim">
 		<description>Pac-In-Time (Prototype)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Namco</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="pac-in-time (unknown) (proto).bin" size="262144" crc="64c28e20" sha1="bc956615da23f13bddc491377b29631f9c0a4d5a" offset="000000" />
@@ -7722,8 +7722,8 @@ a certain item) -->
 
 	<software name="spirou">
 		<description>Spirou (Euro, Prototype)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Infogrames</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="spirou (europe) (proto).bin" size="524288" crc="ab622adc" sha1="40359adbe9950b8e5e46158f519ad782757f0884" offset="000000" />
@@ -9855,8 +9855,8 @@ a certain item) -->
 
 	<software name="yogibear">
 		<description>Yogi Bear in Yogi Bear's Goldrush (Prototype)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>GameTek</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="yogi bear in yogi bear's goldrush (unknown) (proto).bin" size="262144" crc="e678f264" sha1="ea5f9ce4b3618565ea24a858f7efe3988b82eb8a" offset="000000" />
@@ -9972,8 +9972,8 @@ a certain item) -->
 
 	<software name="mgear">
 		<description>Master Gear Adapter</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1991</year>
+		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<feature name="slot" value="mgear" />
 			<feature name="pin_42" value="sms_mode" />

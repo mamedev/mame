@@ -5112,6 +5112,48 @@ ROM_START( peps0364 ) /* Normal board : Red White & Blue Slots (PS0364) - Payout
 	ROM_LOAD( "cap960.u50", 0x0000, 0x0100, CRC(00dd8d0a) SHA1(542763b12aeb0aec2b410f7c075c52907f45d171) )
 ROM_END
 
+ROM_START( peps0366 ) /* Normal board : Double Diamonds Deluxe Slots (PS0366) - Payout 94.99% */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ps0366_569-a2c.u68",   0x00000, 0x10000, CRC(32fd35c5) SHA1(8562608bc45328559b7c04ef4026384862bf2d51) ) /* 2 Coins Max / 1 Line */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg1303.u72",  0x00000, 0x8000, CRC(f5bcc47f) SHA1(b132960a095996d1790df4dcedf14a29169fe667) )
+	ROM_LOAD( "mgo-cg1303.u73",  0x08000, 0x8000, CRC(e16cc01b) SHA1(086f2ac533d868dbaa3852516b6fef344dddff13) )
+	ROM_LOAD( "mbo-cg1303.u74",  0x10000, 0x8000, CRC(2c1ffea2) SHA1(efc16869f994415a03663205ca2396e4c26e25a3) )
+	ROM_LOAD( "mxo-cg1303.u75",  0x18000, 0x8000, CRC(7c4578e0) SHA1(70b6cf02225a4804592f44c90365f370fb83281a) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap1303.u50", 0x0000, 0x0100, CRC(5341ea30) SHA1(63c8f7fa94dcb772c308b307f755a188b9b5e7eb) )
+ROM_END
+
+ROM_START( peps0372 ) /* Normal board : Double Diamonds Deluxe Slots (PS0372) - Payout 90.10% */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ps0372_569-a2c.u68",   0x00000, 0x10000, CRC(45573591) SHA1(0a15313af506817528eb7319a0994b6993412965) ) /* 3 Coins Max / 1 Line */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg1303.u72",  0x00000, 0x8000, CRC(f5bcc47f) SHA1(b132960a095996d1790df4dcedf14a29169fe667) )
+	ROM_LOAD( "mgo-cg1303.u73",  0x08000, 0x8000, CRC(e16cc01b) SHA1(086f2ac533d868dbaa3852516b6fef344dddff13) )
+	ROM_LOAD( "mbo-cg1303.u74",  0x10000, 0x8000, CRC(2c1ffea2) SHA1(efc16869f994415a03663205ca2396e4c26e25a3) )
+	ROM_LOAD( "mxo-cg1303.u75",  0x18000, 0x8000, CRC(7c4578e0) SHA1(70b6cf02225a4804592f44c90365f370fb83281a) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap1303.u50", 0x0000, 0x0100, CRC(5341ea30) SHA1(63c8f7fa94dcb772c308b307f755a188b9b5e7eb) )
+ROM_END
+
+ROM_START( peps0373 ) /* Normal board : Double Diamonds Deluxe Slots (PS0373) - Payout 87.56% */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ps0373_583-a6c.u68",   0x00000, 0x10000, CRC(085bed76) SHA1(8775f7c9654f92eab616cdda4505cbde30154889) ) /* 3 Coins Max / 1 Line */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg1303.u72",  0x00000, 0x8000, CRC(f5bcc47f) SHA1(b132960a095996d1790df4dcedf14a29169fe667) )
+	ROM_LOAD( "mgo-cg1303.u73",  0x08000, 0x8000, CRC(e16cc01b) SHA1(086f2ac533d868dbaa3852516b6fef344dddff13) )
+	ROM_LOAD( "mbo-cg1303.u74",  0x10000, 0x8000, CRC(2c1ffea2) SHA1(efc16869f994415a03663205ca2396e4c26e25a3) )
+	ROM_LOAD( "mxo-cg1303.u75",  0x18000, 0x8000, CRC(7c4578e0) SHA1(70b6cf02225a4804592f44c90365f370fb83281a) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap1303.u50", 0x0000, 0x0100, CRC(5341ea30) SHA1(63c8f7fa94dcb772c308b307f755a188b9b5e7eb) )
+ROM_END
+
 ROM_START( peps0426 ) /* Normal board : Sizzling Sevens Slots (PS0268) - Payout 90.35% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0426_571-a3h.u68",   0x00000, 0x10000, CRC(b53771c1) SHA1(23fccd5facb98fc83b8903946435be4f15199ff8) ) /* 3 Coins Max / 1 Lines */
@@ -9248,6 +9290,9 @@ GAMEL(1996, peps0296, 0,        peplus, peplus_slots,   peplus_state, peplus,   
 GAMEL(1996, peps0298, peps0042, peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0298) Double Diamond Slots",          0, layout_pe_slots )
 GAMEL(1996, peps0308, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0308) Double Jackpot Slots",          0, layout_pe_slots )
 GAMEL(1996, peps0364, peps0021, peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0364) Red White & Blue Slots",        0, layout_pe_slots )
+GAMEL(1996, peps0366, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0366) Double Diamond Deluxe Slots",   0, layout_pe_slots )
+GAMEL(1996, peps0372, peps0366, peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0372) Double Diamond Deluxe Slots",   0, layout_pe_slots )
+GAMEL(1996, peps0373, peps0366, peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0373) Double Diamond Deluxe Slots",   0, layout_pe_slots )
 GAMEL(1996, peps0426, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0426) Sizzling Sevens Slots",         0, layout_pe_slots )
 GAMEL(1996, peps0581, peps0021, peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0581) Red White & Blue Slots",        0, layout_pe_slots )
 GAMEL(1996, peps0615, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0615) Chaos Slots",                   0, layout_pe_slots )

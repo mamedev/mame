@@ -94,7 +94,7 @@ void sms_state::sms_get_inputs()
 		data1 = m_port_gg_dc->read();
 		m_port_dc_reg &= ~0x03f | data1;
 
-		data2 = m_port_gear2gear->port_r();
+		data2 = m_port_gg_ext->port_r();
 	}
 	else
 	{
@@ -207,7 +207,7 @@ WRITE8_MEMBER(sms_state::sms_io_control_w)
 		if (!m_is_gamegear)
 			m_port_ctrl2->port_w(ctrl2_port_data);
 		else
-			m_port_gear2gear->port_w(ctrl2_port_data); // not verified
+			m_port_gg_ext->port_w(ctrl2_port_data); // not verified
 	}
 	// check if TH is set to input (1).
 	if (data & 0x08)
@@ -215,7 +215,7 @@ WRITE8_MEMBER(sms_state::sms_io_control_w)
 		if (!m_is_gamegear)
 			ctrl2_port_data &= ~0x40 | m_port_ctrl2->port_r();
 		else
-			ctrl2_port_data &= ~0x40 | m_port_gear2gear->port_r(); // not verified
+			ctrl2_port_data &= ~0x40 | m_port_gg_ext->port_r(); // not verified
 
 		// check if TH input level is high (1) and was output/low (0)
 		if ((ctrl2_port_data & 0x40) && !(m_io_ctrl_reg & 0x88))

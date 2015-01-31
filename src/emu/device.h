@@ -130,6 +130,7 @@ public:
 	UINT8 default_bios() const { return m_default_bios; }
 	UINT8 system_bios() const { return m_system_bios; }
 	astring default_bios_tag() const { return m_default_bios_tag; }
+	astring parameter(const char *tag) const;
 
 	// interface helpers
 	device_interface *first_interface() const { return m_interface_list; }

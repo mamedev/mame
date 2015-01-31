@@ -213,6 +213,17 @@ save_error save_manager::check_file(running_machine &machine, emu_file &file, co
 	return validate_header(header, gamename, sig, errormsg, "");
 }
 
+//-------------------------------------------------
+//  dispatch_postload - invoke all registered
+//  postload callbacks for updates
+//-------------------------------------------------
+
+
+void save_manager::dispatch_postload()
+{
+	for (state_callback *func = m_postload_list.first(); func != NULL; func = func->next())
+		func->m_func();
+}
 
 //-------------------------------------------------
 //  read_file - read the data from a file
@@ -253,12 +264,22 @@ save_error save_manager::read_file(emu_file &file)
 	}
 
 	// call the post-load functions
-	for (state_callback *func = m_postload_list.first(); func != NULL; func = func->next())
-		func->m_func();
+	dispatch_postload();
 
 	return STATERR_NONE;
 }
 
+//-------------------------------------------------
+//  dispatch_presave - invoke all registered
+//  presave callbacks for updates
+//-------------------------------------------------
+
+
+void save_manager::dispatch_presave()
+{
+	for (state_callback *func = m_presave_list.first(); func != NULL; func = func->next())
+		func->m_func();
+}
 
 //-------------------------------------------------
 //  write_file - writes the data to a file
@@ -287,8 +308,7 @@ save_error save_manager::write_file(emu_file &file)
 	file.compress(FCOMPRESS_MEDIUM);
 
 	// call the pre-save functions
-	for (state_callback *func = m_presave_list.first(); func != NULL; func = func->next())
-		func->m_func();
+	dispatch_presave();
 
 	// then write all the data
 	for (state_entry *entry = m_entry_list.first(); entry != NULL; entry = entry->next())

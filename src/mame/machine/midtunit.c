@@ -73,22 +73,6 @@ READ16_MEMBER(midtunit_state::midtunit_cmos_r)
 }
 
 
-
-/*************************************
- *
- *  Generic input ports
- *
- *************************************/
-
-IOPORT_ARRAY_MEMBER(midtunit_state::tunit_ports) { "IN0", "IN1", "IN2", "DSW" };
-
-READ16_MEMBER(midtunit_state::midtunit_input_r)
-{
-	return m_ports[offset]->read();
-}
-
-
-
 /*************************************
  *
  *  Mortal Kombat (T-unit) protection

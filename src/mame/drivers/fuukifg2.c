@@ -381,11 +381,6 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(fuuki16_state::soundirq)
-{
-	m_audiocpu->set_input_line(0, state);
-}
-
 /*
     - Interrupts (pbancho) -
 
@@ -475,7 +470,7 @@ static MACHINE_CONFIG_START( fuuki16, fuuki16_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.15)
 
 	MCFG_SOUND_ADD("ym2", YM3812, XTAL_28_64MHz / 8) /* 3.58 MHz */
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(fuuki16_state, soundirq))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 

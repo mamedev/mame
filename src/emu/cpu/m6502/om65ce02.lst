@@ -245,7 +245,7 @@ bcc_rw2
 	TMP = read_pc();
 	TMP = set_h(TMP, read_pc());
 	if(!(P & F_C))
-		PC += TMP;
+		PC += TMP-1;
 	prefetch();
 
 bcs_ce_rel
@@ -258,7 +258,7 @@ bcs_rw2
 	TMP = read_pc();
 	TMP = set_h(TMP, read_pc());
 	if(P & F_C)
-		PC += TMP;
+		PC += TMP-1;
 	prefetch();
 
 beq_ce_rel
@@ -271,7 +271,7 @@ beq_rw2
 	TMP = read_pc();
 	TMP = set_h(TMP, read_pc());
 	if(P & F_Z)
-		PC += TMP;
+		PC += TMP-1;
 	prefetch();
 
 bit_ce_abx
@@ -307,7 +307,7 @@ bmi_rw2
 	TMP = read_pc();
 	TMP = set_h(TMP, read_pc());
 	if(P & F_N)
-		PC += TMP;
+		PC += TMP-1;
 	prefetch();
 
 bne_ce_rel
@@ -320,7 +320,7 @@ bne_rw2
 	TMP = read_pc();
 	TMP = set_h(TMP, read_pc());
 	if(!(P & F_Z))
-		PC += TMP;
+		PC += TMP-1;
 	prefetch();
 
 bpl_ce_rel
@@ -333,7 +333,7 @@ bpl_rw2
 	TMP = read_pc();
 	TMP = set_h(TMP, read_pc());
 	if(!(P & F_N))
-		PC += TMP;
+		PC += TMP-1;
 	prefetch();
 
 bra_ce_rel
@@ -344,7 +344,7 @@ bra_ce_rel
 bra_rw2
 	TMP = read_pc();
 	TMP = set_h(TMP, read_pc());
-	PC += TMP;
+	PC += TMP - 1;
 	prefetch();
 
 brk_ce_imp
@@ -379,7 +379,7 @@ bsr_rw2
 	write(SP, PC);
 	dec_SP_ce();
 	TMP = set_h(TMP, read_pc());
-	PC += TMP;
+	PC += TMP-1;
 	prefetch();
 
 bvc_ce_rel
@@ -392,7 +392,7 @@ bvc_rw2
 	TMP = read_pc();
 	TMP = set_h(TMP, read_pc());
 	if(!(P & F_V))
-		PC += TMP;
+		PC += TMP-1;
 	prefetch();
 
 bvs_ce_rel
@@ -405,7 +405,7 @@ bvs_rw2
 	TMP = read_pc();
 	TMP = set_h(TMP, read_pc());
 	if(P & F_V)
-		PC += TMP;
+		PC += TMP-1;
 	prefetch();
 
 clc_ce_imp
@@ -419,6 +419,7 @@ cld_ce_imp
 cle_imp
 	read_pc_noinc();
 	P &= ~F_E;
+	logerror("CLE\n");
 	prefetch();
 
 cli_ce_imp

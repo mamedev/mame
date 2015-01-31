@@ -74,22 +74,22 @@ typedef void *PVOID;
 template<typename _PtrType>
 static void spin_while(const volatile _PtrType * volatile ptr, const _PtrType val, const osd_ticks_t timeout, const int invert = 0)
 {
-    osd_ticks_t stopspin = osd_ticks() + timeout;
+	osd_ticks_t stopspin = osd_ticks() + timeout;
 
-    do {
-        int spin = 10000;
-        while (--spin)
-        {
-            if ((*ptr != val) ^ invert)
-                return;
-        }
-    } while (((*ptr == val) ^ invert) && osd_ticks() < stopspin);
+	do {
+		int spin = 10000;
+		while (--spin)
+		{
+			if ((*ptr != val) ^ invert)
+				return;
+		}
+	} while (((*ptr == val) ^ invert) && osd_ticks() < stopspin);
 }
 
 template<typename _PtrType>
 static void spin_while_not(const volatile _PtrType * volatile ptr, const _PtrType val, const osd_ticks_t timeout)
 {
-    spin_while(ptr, val, timeout, 1);
+	spin_while(ptr, val, timeout, 1);
 }
 
 
@@ -177,7 +177,7 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	osd_work_queue *queue;
 	int osdthreadnum = 0;
 	int allocthreadnum;
-	char *osdworkqueuemaxthreads = osd_getenv(ENV_WORKQUEUEMAXTHREADS);
+	const char *osdworkqueuemaxthreads = osd_getenv(ENV_WORKQUEUEMAXTHREADS);
 
 	// allocate a new queue
 	queue = (osd_work_queue *)osd_malloc(sizeof(*queue));
@@ -557,7 +557,7 @@ int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 	if (item->event == NULL)
 	{
 		// TODO: do we need to measure the spin time here as well? and how can we do it?
-        spin_while(&item->done, 0, timeout);
+		spin_while(&item->done, 0, timeout);
 	}
 
 	// otherwise, block on the event until done
@@ -616,12 +616,11 @@ static int effective_num_processors(void)
 	}
 	else
 	{
-		char *procsoverride;
 		int numprocs = 0;
 
 		// if the OSDPROCESSORS environment variable is set, use that value if valid
 		// note that we permit more than the real number of processors for testing
-		procsoverride = osd_getenv(ENV_PROCESSORS);
+		const char *procsoverride = osd_getenv(ENV_PROCESSORS);
 		if (procsoverride != NULL && sscanf(procsoverride, "%d", &numprocs) == 1 && numprocs > 0)
 			return MIN(4 * physprocs, numprocs);
 

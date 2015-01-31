@@ -14,6 +14,7 @@
 
  - SIO interface for Game Gear (needs netplay, I guess)
  - Sega Demo Unit II (kiosk expansion device)
+ - SMS 8 slot game changer (kiosk expansion device)
  - SMS Disk System (floppy disk drive expansion device) - unreleased
  - Rapid button of Japanese Master System
  - Keyboard support for Sega Mark III (sg1000m3 driver)
@@ -57,15 +58,15 @@ General compatibility issues on real hardware (not emulation bugs):
 - Few games of the ones with FM support need to detect the system region as
   Japanese to play FM sound;
 - The Light Phaser gun doesn't work with the Japanese SMS;
-- There are reports about Light Phaser working on the second Korean console
+- There are reports about Light Phaser working on the second Korean SMS
   version, and a Korean advert shows support on the first version (Gam*Boy I,
   although based on Japanese SMS);
 - The Korean SMS versions have Japanese-format cartridge slot, but only on the
   first (Gam*Boy I) the region is detected as Japanese;
 - Some SMS ROMs don't run when are plugged-in to SMS expansion slot, through
   the gender adapter;
-- Some SMS ROMs don't run when are plugged-in to a Game Gear, through the
-  Master Gear adapter;
+- Some SMS ROMs don't run or have issues when are plugged-in to a Game Gear,
+  through the Master Gear adapter;
 
 --------------------------------------------------------------------------------
 
@@ -405,6 +406,13 @@ static INPUT_PORTS_START( smsj )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( smssdisp )
+	// For each peripheral port (for controllers or 3-D glasses), there are sets
+	// of two connectors wired in parallel on the real hardware. This allows to
+	// have different controllers, like a pad and a Light Phaser, plugged together
+	// for a player input, what avoids having to re-plug them every time a game is
+	// changed to another that requires a different controller. Also, this allows
+	// 3-D games to be properly watched by two persons at same time.
+	// For now the driver just uses single input ports.
 	PORT_INCLUDE( sms1 )
 
 	PORT_START("DSW")
@@ -805,9 +813,9 @@ static MACHINE_CONFIG_START( gamegear, sms_state )
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "gamegear")
 
-	MCFG_GG_GEAR2GEAR_PORT_ADD("gear2gear", gg_gear2gear_port_devices, NULL)
-	MCFG_GG_GEAR2GEAR_PORT_TH_INPUT_HANDLER(WRITELINE(sms_state, sms_ctrl2_th_input)) // not verified
-	//MCFG_GG_GEAR2GEAR_PORT_PIXEL_HANDLER(READ32(sms_state, sms_pixel_color)) // only for GG-TV mod
+	MCFG_GG_EXT_PORT_ADD("ext", gg_ext_port_devices, NULL)
+	MCFG_GG_EXT_PORT_TH_INPUT_HANDLER(WRITELINE(sms_state, sms_ctrl2_th_input)) // not verified
+	//MCFG_GG_EXT_PORT_PIXEL_HANDLER(READ32(sms_state, sms_pixel_color)) // only for GG-TV mod
 MACHINE_CONFIG_END
 
 

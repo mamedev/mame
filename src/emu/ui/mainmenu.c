@@ -10,25 +10,27 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "audit.h"
+#include "crsshair.h"
 #include "osdnet.h"
 #include "emuopts.h"
-#include "ui/ui.h"
 #include "rendutil.h"
 #include "cheat.h"
 #include "uiinput.h"
+#include "ui/ui.h"
 #include "ui/filemngr.h"
 #include "ui/filesel.h"
 #include "ui/barcode.h"
+#include "ui/cheatopt.h"
 #include "ui/info.h"
 #include "ui/inputmap.h"
 #include "ui/mainmenu.h"
 #include "ui/miscmenu.h"
 #include "ui/selgame.h"
+#include "ui/sliders.h"
 #include "ui/slotopt.h"
 #include "ui/tapectrl.h"
-#include "audit.h"
-#include "crsshair.h"
-#include <ctype.h>
+#include "ui/videoopt.h"
 #include "imagedev/cassette.h"
 #include "imagedev/bitbngr.h"
 #include "machine/bcreader.h"
@@ -150,7 +152,7 @@ void ui_menu_main::handle()
 	/* process the menu */
 	const ui_menu_event *menu_event = process(0);
 	if (menu_event != NULL && menu_event->iptkey == IPT_UI_SELECT) {
-		switch((long long)(menu_event->itemref)) {
+		switch((long long)((FPTR) menu_event->itemref)) {
 		case INPUT_GROUPS:
 			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_input_groups(machine(), container)));
 			break;

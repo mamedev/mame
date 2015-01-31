@@ -14,7 +14,7 @@ class netlist_matrix_solver_direct_t: public netlist_matrix_solver_t
 public:
 
 	netlist_matrix_solver_direct_t(const netlist_solver_parameters_t &params, int size);
-    netlist_matrix_solver_direct_t(const eSolverType type, const netlist_solver_parameters_t &params, int size);
+	netlist_matrix_solver_direct_t(const eSolverType type, const netlist_solver_parameters_t &params, int size);
 
 	virtual ~netlist_matrix_solver_direct_t();
 
@@ -28,25 +28,25 @@ public:
 protected:
 	ATTR_COLD virtual void add_term(int net_idx, netlist_terminal_t *term);
 
-	ATTR_HOT virtual double vsolve();
+	ATTR_HOT virtual nl_double vsolve();
 
 	ATTR_HOT int solve_non_dynamic();
 	ATTR_HOT void build_LE();
-	ATTR_HOT void gauss_LE(double (* RESTRICT x));
-	ATTR_HOT double delta(const double (* RESTRICT V));
-	ATTR_HOT void store(const double (* RESTRICT V), const bool store_RHS);
+	ATTR_HOT void gauss_LE(nl_double (* RESTRICT x));
+	ATTR_HOT nl_double delta(const nl_double (* RESTRICT V));
+	ATTR_HOT void store(const nl_double (* RESTRICT V), const bool store_RHS);
 
 	/* bring the whole system to the current time
 	 * Don't schedule a new calculation time. The recalculation has to be
 	 * triggered by the caller after the netlist element was changed.
 	 */
-	ATTR_HOT double compute_next_timestep();
+	ATTR_HOT nl_double compute_next_timestep();
 
-	double m_A[_storage_N][((_storage_N + 7) / 8) * 8];
-	double m_RHS[_storage_N];
-	double m_last_RHS[_storage_N]; // right hand side - contains currents
-	double m_Vdelta[_storage_N];
-	double m_last_V[_storage_N];
+	nl_double m_A[_storage_N][((_storage_N + 7) / 8) * 8];
+	nl_double m_RHS[_storage_N];
+	nl_double m_last_RHS[_storage_N]; // right hand side - contains currents
+	nl_double m_Vdelta[_storage_N];
+	nl_double m_last_V[_storage_N];
 
 	terms_t **m_terms;
 	terms_t *m_rails_temp;
@@ -55,7 +55,7 @@ private:
 	vector_ops_t *m_row_ops[_storage_N + 1];
 
 	int m_dim;
-	double m_lp_fact;
+	nl_double m_lp_fact;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -69,13 +69,13 @@ netlist_matrix_solver_direct_t<m_N, _storage_N>::~netlist_matrix_solver_direct_t
 	{
 		//delete[] m_A[k];
 	}
-    for (int k = 0; k < N(); k++)
-    {
-        nl_free(m_terms[k]);
-        nl_free(m_row_ops[k]);
-    }
-    nl_free(m_row_ops[N()]);
-    //delete[] m_last_RHS;
+	for (int k = 0; k < N(); k++)
+	{
+		nl_free(m_terms[k]);
+		nl_free(m_row_ops[k]);
+	}
+	nl_free(m_row_ops[N()]);
+	//delete[] m_last_RHS;
 	//delete[] m_RHS;
 	nl_free_array(m_terms);
 	nl_free_array(m_rails_temp);
@@ -84,9 +84,9 @@ netlist_matrix_solver_direct_t<m_N, _storage_N>::~netlist_matrix_solver_direct_t
 }
 
 template <int m_N, int _storage_N>
-ATTR_HOT double netlist_matrix_solver_direct_t<m_N, _storage_N>::compute_next_timestep()
+ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::compute_next_timestep()
 {
-	double new_solver_timestep = m_params.m_max_timestep;
+	nl_double new_solver_timestep = m_params.m_max_timestep;
 
 	if (m_params.m_dynamic)
 	{
@@ -103,11 +103,11 @@ ATTR_HOT double netlist_matrix_solver_direct_t<m_N, _storage_N>::compute_next_ti
 		{
 			netlist_analog_net_t *n = m_nets[k];
 #endif
-			const double DD_n = (n->m_cur_Analog - m_last_V[k]);
-			const double hn = current_timestep();
+			const nl_double DD_n = (n->m_cur_Analog - m_last_V[k]);
+			const nl_double hn = current_timestep();
 
-			double DD2 = (DD_n / hn - n->m_DD_n_m_1 / n->m_h_n_m_1) / (hn + n->m_h_n_m_1);
-			double new_net_timestep;
+			nl_double DD2 = (DD_n / hn - n->m_DD_n_m_1 / n->m_h_n_m_1) / (hn + n->m_h_n_m_1);
+			nl_double new_net_timestep;
 
 			n->m_h_n_m_1 = hn;
 			n->m_DD_n_m_1 = DD_n;
@@ -193,17 +193,17 @@ ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::vsetup(netlist_a
 	 * Sorting as a general matrix pre-conditioning is mentioned in
 	 * literature but I have found no articles about Gauss Seidel.
 	 *
-     * For Gaussian Elimination however increasing order is better suited.
-     * FIXME: Even better would be to sort on elements right of the matrix diagonal.
-     *
+	 * For Gaussian Elimination however increasing order is better suited.
+	 * FIXME: Even better would be to sort on elements right of the matrix diagonal.
+	 *
 	 */
 
-    int sort_order = (type() == GAUSS_SEIDEL ? 1 : -1);
+	int sort_order = (type() == GAUSS_SEIDEL ? 1 : -1);
 
 	for (int k = 0; k < N() / 2; k++)
 		for (int i = 0; i < N() - 1; i++)
 		{
-            if ((m_terms[i]->m_railstart - m_terms[i+1]->m_railstart) * sort_order < 0)
+			if ((m_terms[i]->m_railstart - m_terms[i+1]->m_railstart) * sort_order < 0)
 			{
 				std::swap(m_terms[i],m_terms[i+1]);
 				m_nets.swap(i, i+1);
@@ -236,13 +236,13 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE()
 		for (int i=0; i < N(); i++)
 			m_A[k][i] = 0.0;
 
-		double rhsk = 0.0;
-		double akk  = 0.0;
+		nl_double rhsk = 0.0;
+		nl_double akk  = 0.0;
 		{
 			const int terms_count = m_terms[k]->count();
-			const double * RESTRICT gt = m_terms[k]->gt();
-			const double * RESTRICT go = m_terms[k]->go();
-			const double * RESTRICT Idr = m_terms[k]->Idr();
+			const nl_double * RESTRICT gt = m_terms[k]->gt();
+			const nl_double * RESTRICT go = m_terms[k]->go();
+			const nl_double * RESTRICT Idr = m_terms[k]->Idr();
 #if VECTALT
 
 			for (int i = 0; i < terms_count; i++)
@@ -253,7 +253,7 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE()
 #else
 			m_terms[k]->ops()->sum2(Idr, gt, rhsk, akk);
 #endif
-			double * const * RESTRICT other_cur_analog = m_terms[k]->other_curanalog();
+			nl_double * const * RESTRICT other_cur_analog = m_terms[k]->other_curanalog();
 			for (int i = m_terms[k]->m_railstart; i < terms_count; i++)
 			{
 				//rhsk = rhsk + go[i] * terms[i]->m_otherterm->net().as_analog().Q_Analog();
@@ -272,7 +272,7 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE()
 		m_A[k][k] += 1.0;
 		{
 			const int *net_other = m_terms[k]->net_other();
-			const double *go = m_terms[k]->go();
+			const nl_double *go = m_terms[k]->go();
 			const int railstart =  m_terms[k]->m_railstart;
 
 			for (int i = 0; i < railstart; i++)
@@ -285,7 +285,7 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE()
 		m_A[k][k] += akk;
 		{
 			const int * RESTRICT net_other = m_terms[k]->net_other();
-			const double * RESTRICT go = m_terms[k]->go();
+			const nl_double * RESTRICT go = m_terms[k]->go();
 			const int railstart =  m_terms[k]->m_railstart;
 
 			for (int i = 0; i < railstart; i++)
@@ -299,7 +299,7 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE()
 
 template <int m_N, int _storage_N>
 ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::gauss_LE(
-		double (* RESTRICT x))
+		nl_double (* RESTRICT x))
 {
 #if 0
 	for (int i = 0; i < N(); i++)
@@ -336,13 +336,13 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::gauss_LE(
 		}
 
 		/* FIXME: Singular matrix? */
-		const double f = 1.0 / m_A[i][i];
+		const nl_double f = 1.0 / m_A[i][i];
 
 		/* Eliminate column i from row j */
 
 		for (int j = i + 1; j < kN; j++)
 		{
-			const double f1 = - m_A[j][i] * f;
+			const nl_double f1 = - m_A[j][i] * f;
 			if (f1 != 0.0)
 			{
 #if 0 && VECTALT
@@ -359,7 +359,7 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::gauss_LE(
 	/* back substitution */
 	for (int j = kN - 1; j >= 0; j--)
 	{
-		double tmp = 0;
+		nl_double tmp = 0;
 
 		for (int k = j + 1; k < kN; k++)
 			tmp += m_A[j][k] * x[k];
@@ -380,15 +380,15 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::gauss_LE(
 }
 
 template <int m_N, int _storage_N>
-ATTR_HOT double netlist_matrix_solver_direct_t<m_N, _storage_N>::delta(
-		const double (* RESTRICT V))
+ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::delta(
+		const nl_double (* RESTRICT V))
 {
-	double cerr = 0;
-	double cerr2 = 0;
+	nl_double cerr = 0;
+	nl_double cerr2 = 0;
 	for (int i = 0; i < this->N(); i++)
 	{
-		const double e = (V[i] - this->m_nets[i]->m_cur_Analog);
-		const double e2 = (m_RHS[i] - this->m_last_RHS[i]);
+		const nl_double e = (V[i] - this->m_nets[i]->m_cur_Analog);
+		const nl_double e2 = (m_RHS[i] - this->m_last_RHS[i]);
 		cerr = (fabs(e) > cerr ? fabs(e) : cerr);
 		cerr2 = (fabs(e2) > cerr2 ? fabs(e2) : cerr2);
 	}
@@ -398,7 +398,7 @@ ATTR_HOT double netlist_matrix_solver_direct_t<m_N, _storage_N>::delta(
 
 template <int m_N, int _storage_N>
 ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::store(
-		const double (* RESTRICT V), const bool store_RHS)
+		const nl_double (* RESTRICT V), const bool store_RHS)
 {
 	for (int i = 0; i < this->N(); i++)
 	{
@@ -414,7 +414,7 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::store(
 }
 
 template <int m_N, int _storage_N>
-ATTR_HOT double netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve()
+ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve()
 {
 	solve_base<netlist_matrix_solver_direct_t>(this);
 	return this->compute_next_timestep();
@@ -424,13 +424,13 @@ ATTR_HOT double netlist_matrix_solver_direct_t<m_N, _storage_N>::vsolve()
 template <int m_N, int _storage_N>
 ATTR_HOT int netlist_matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic()
 {
-	double new_v[_storage_N] = { 0.0 };
+	nl_double new_v[_storage_N] = { 0.0 };
 
 	this->gauss_LE(new_v);
 
 	if (this->is_dynamic())
 	{
-		double err = delta(new_v);
+		nl_double err = delta(new_v);
 
 		store(new_v, true);
 
@@ -475,15 +475,15 @@ netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(
 , m_dim(size)
 , m_lp_fact(0)
 {
-    m_terms = nl_alloc_array(terms_t *, N());
-    m_rails_temp = nl_alloc_array(terms_t, N());
+	m_terms = nl_alloc_array(terms_t *, N());
+	m_rails_temp = nl_alloc_array(terms_t, N());
 
-    for (int k = 0; k < N(); k++)
-    {
-        m_terms[k] = nl_alloc(terms_t);
-        m_row_ops[k] = vector_ops_t::create_ops(k);
-    }
-    m_row_ops[N()] = vector_ops_t::create_ops(N());
+	for (int k = 0; k < N(); k++)
+	{
+		m_terms[k] = nl_alloc(terms_t);
+		m_row_ops[k] = vector_ops_t::create_ops(k);
+	}
+	m_row_ops[N()] = vector_ops_t::create_ops(N());
 }
 
 

@@ -8,16 +8,26 @@
 
 *******************************************************************c********/
 
+#include "sound_module.h"
+#include "modules/osdmodule.h"
 
-#include "none.h"
-
-//-------------------------------------------------
-//  sound_none - constructor
-//-------------------------------------------------
-sound_none::sound_none(const osd_interface &osd, running_machine &machine)
-	: osd_sound_interface(osd, machine)
+class sound_none : public osd_module, public sound_module
 {
-}
+public:
+	sound_none()
+	: osd_module(OSD_SOUND_PROVIDER, "none"), sound_module()
+	{
+	}
+	virtual ~sound_none() { }
 
+	virtual int init() { return 0; }
+	virtual void exit() { }
 
-const osd_sound_type OSD_SOUND_NONE = &osd_sound_creator<sound_none>;
+	// sound_module
+
+	virtual void update_audio_stream(bool is_throttled, const INT16 *buffer, int samples_this_frame) { }
+	virtual void set_mastervolume(int attenuation) { }
+
+};
+
+MODULE_DEFINITION(SOUND_NONE, sound_none)

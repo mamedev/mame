@@ -6,6 +6,11 @@
 //
 //============================================================
 
+#include "sound_module.h"
+#include "modules/osdmodule.h"
+
+#if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
+
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -20,9 +25,6 @@
 #include "emu.h"
 #include "osdepend.h"
 #include "emuopts.h"
-
-// MAMEOS headers
-#include "direct_sound.h"
 
 #ifdef SDLMAME_WIN32
 #include "../../sdl/osdsdl.h"
@@ -44,6 +46,34 @@
 #define LOG_SOUND               0
 
 #define LOG(x) do { if (LOG_SOUND) logerror x; } while(0)
+
+class sound_direct_sound : public osd_module, public sound_module
+{
+public:
+
+	sound_direct_sound()
+	: osd_module(OSD_SOUND_PROVIDER, "dsound"), sound_module()
+	{
+	}
+	virtual ~sound_direct_sound() { }
+
+	virtual int init();
+	virtual void exit();
+
+	// sound_module
+
+	virtual void update_audio_stream(bool is_throttled, const INT16 *buffer, int samples_this_frame);
+	virtual void set_mastervolume(int attenuation);
+
+private:
+	HRESULT      dsound_init();
+	void         dsound_kill();
+	HRESULT      dsound_create_buffers();
+	void         dsound_destroy_buffers();
+	void         copy_sample_data(const INT16 *data, int bytes_to_copy);
+
+};
+
 
 
 //============================================================
@@ -69,25 +99,25 @@ static WAVEFORMATEX         stream_format;
 // buffer over/underflow counts
 static int                  buffer_underflows;
 static int                  buffer_overflows;
+
 //============================================================
 //  PROTOTYPES
 //============================================================
 
-const osd_sound_type OSD_SOUND_DIRECT_SOUND = &osd_sound_creator<sound_direct_sound>;
-
 //-------------------------------------------------
 //  sound_direct_sound - constructor
 //-------------------------------------------------
-sound_direct_sound::sound_direct_sound(const osd_interface &osd, running_machine &machine)
-	: osd_sound_interface(osd, machine)
+
+int sound_direct_sound::init()
 {
 	// attempt to initialize directsound
 	// don't make it fatal if we can't -- we'll just run without sound
 	dsound_init();
+	return 0;
 }
 
 
-sound_direct_sound::~sound_direct_sound()
+void sound_direct_sound::exit()
 {
 	// kill the buffers and dsound
 	dsound_destroy_buffers();
@@ -149,7 +179,7 @@ void sound_direct_sound::copy_sample_data(const INT16 *data, int bytes_to_copy)
 //  update_audio_stream
 //============================================================
 
-void sound_direct_sound::update_audio_stream(const INT16 *buffer, int samples_this_frame)
+void sound_direct_sound::update_audio_stream(bool is_throttled, const INT16 *buffer, int samples_this_frame)
 {
 	int bytes_this_frame = samples_this_frame * stream_format.nBlockAlign;
 	DWORD play_position, write_position;
@@ -268,18 +298,15 @@ HRESULT sound_direct_sound::dsound_init()
 	stream_format.wBitsPerSample    = 16;
 	stream_format.wFormatTag        = WAVE_FORMAT_PCM;
 	stream_format.nChannels         = 2;
-	stream_format.nSamplesPerSec    = m_machine.sample_rate();
+	stream_format.nSamplesPerSec    = sample_rate();
 	stream_format.nBlockAlign       = stream_format.wBitsPerSample * stream_format.nChannels / 8;
 	stream_format.nAvgBytesPerSec   = stream_format.nSamplesPerSec * stream_format.nBlockAlign;
 
 
 	// compute the buffer size based on the output sample rate
 	int audio_latency;
-	#ifdef SDLMAME_WIN32
-	audio_latency = downcast<sdl_options &>(m_machine.options()).audio_latency();
-	#else
-	audio_latency = downcast<windows_options &>(m_machine.options()).audio_latency();
-	#endif
+	audio_latency = m_audio_latency;
+
 	stream_buffer_size = stream_format.nSamplesPerSec * stream_format.nBlockAlign * audio_latency / 10;
 	stream_buffer_size = (stream_buffer_size / 1024) * 1024;
 	if (stream_buffer_size < 1024)
@@ -419,3 +446,9 @@ void sound_direct_sound::dsound_destroy_buffers(void)
 		IDirectSoundBuffer_Release(primary_buffer);
 	primary_buffer = NULL;
 }
+
+#else /* SDLMAME_UNIX */
+	MODULE_NOT_SUPPORTED(sound_direct_sound, OSD_SOUND_PROVIDER, "dsound")
+#endif
+
+MODULE_DEFINITION(SOUND_DSOUND, sound_direct_sound)

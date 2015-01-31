@@ -210,6 +210,7 @@ ifeq ($(TARGETOS),linux)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = tc
 SDL_NETWORK = taptun
+#SDL_NETWORK = pcap
 
 ifndef NO_USE_MIDI
 INCPATH += `pkg-config --cflags alsa`
@@ -241,13 +242,16 @@ BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = ntc
 LIBS += -lutil
 NO_USE_MIDI = 1
+SDL_NETWORK = pcap
 endif
 
 ifeq ($(TARGETOS),solaris)
 BASE_TARGETOS = unix
-DEFS += -DNO_AFFINITY_NP -UHAVE_VSNPRINTF -DNO_vsnprintf
+#DEFS += -DNO_AFFINITY_NP -UHAVE_VSNPRINTF -DNO_vsnprintf
+DEFS += -DNO_AFFINITY_NP
 SYNC_IMPLEMENTATION = tc
 NO_USE_MIDI = 1
+NO_USE_QTDEBUG = 1
 endif
 
 ifeq ($(TARGETOS),haiku)
@@ -398,6 +402,8 @@ OBJDIRS += $(SDLOBJ) \
 	$(OSDOBJ)/modules/sync \
 	$(OSDOBJ)/modules/lib \
 	$(OSDOBJ)/modules/midi \
+	$(OSDOBJ)/modules/font \
+	$(OSDOBJ)/modules/netdev \
 
 #-------------------------------------------------
 # OSD core library
@@ -409,10 +415,10 @@ OSDCOREOBJS = \
 	$(SDLOBJ)/sdlfile.o     \
 	$(SDLOBJ)/sdlptty_$(BASE_TARGETOS).o    \
 	$(SDLOBJ)/sdlsocket.o   \
-	$(SDLOBJ)/sdlmisc_$(BASE_TARGETOS).o    \
 	$(SDLOBJ)/sdlos_$(SDLOS_TARGETOS).o \
 	$(OSDOBJ)/modules/lib/osdlib_$(SDLOS_TARGETOS).o \
-	$(OSDOBJ)/modules/sync/sync_$(SYNC_IMPLEMENTATION).o
+	$(OSDOBJ)/modules/sync/sync_$(SYNC_IMPLEMENTATION).o \
+	$(OSDOBJ)/modules/osdmodule.o \
 
 ifdef NOASM
 OSDCOREOBJS += $(OSDOBJ)/modules/sync/work_mini.o
@@ -426,22 +432,27 @@ OSDOBJS = \
 	$(SDLMAIN) \
 	$(SDLOBJ)/sdlmain.o \
 	$(SDLOBJ)/input.o \
+	$(OSDOBJ)/modules/sound/js_sound.o  \
+	$(OSDOBJ)/modules/sound/direct_sound.o  \
 	$(OSDOBJ)/modules/sound/sdl_sound.o  \
+	$(OSDOBJ)/modules/sound/none.o  \
 	$(SDLOBJ)/video.o \
 	$(SDLOBJ)/drawsdl.o \
 	$(SDLOBJ)/window.o \
 	$(SDLOBJ)/output.o \
 	$(SDLOBJ)/watchdog.o \
 	$(OSDOBJ)/modules/lib/osdobj_common.o  \
+	$(OSDOBJ)/modules/font/font_sdl.o \
+	$(OSDOBJ)/modules/font/font_windows.o \
+	$(OSDOBJ)/modules/font/font_osx.o \
+	$(OSDOBJ)/modules/font/font_none.o \
+	$(OSDOBJ)/modules/netdev/taptun.o \
+	$(OSDOBJ)/modules/netdev/pcap.o \
 
 ifdef NO_USE_MIDI
 	OSDOBJS += $(OSDOBJ)/modules/midi/none.o
 else
 	OSDOBJS += $(OSDOBJ)/modules/midi/portmidi.o
-endif
-
-ifeq ($(BASE_TARGETOS),win32)
-	OSDOBJS += $(OSDOBJ)/modules/sound/direct_sound.o
 endif
 
 # Add SDL2.0 support
@@ -452,12 +463,6 @@ endif
 
 # add an ARCH define
 DEFS += -DSDLMAME_ARCH="$(ARCHOPTS)" -DSYNC_IMPLEMENTATION=$(SYNC_IMPLEMENTATION)
-
-# Add JavaScript sound module for Emscripten compiles
-
-ifeq ($(TARGETOS),emscripten)
-OSDOBJS += $(OSDOBJ)/modules/sound/js_sound.o
-endif
 
 #-------------------------------------------------
 # Generic defines and additions
@@ -597,11 +602,21 @@ else
 LIBS += -lSDL_ttf
 endif
 
+# FIXME: should be dealt with elsewhere
 # libs that Haiku doesn't want but are mandatory on *IX
 ifneq ($(TARGETOS),haiku)
-BASELIBS += -lm -lutil -lpthread
-LIBS += -lm -lutil -lpthread
+BASELIBS += -lm -lpthread
+LIBS += -lm -lpthread
+ifneq ($(TARGETOS),solaris)
+BASELIBS += -lutil
+LIBS += -lutil
+else
+SUPPORTSM32M64 = 1
+BASELIBS += -lsocket -lnsl
+LIBS += -lsocket -lnsl
 endif
+endif
+
 
 endif # not Mac OS X
 
@@ -697,7 +712,6 @@ $(OSDOBJ)/%.moc.c: $(OSDSRC)/%.h
 	$(MOC) $(MOCINCPATH) $(DEFS) $< -o $@
 
 DEBUGOBJS = \
-	$(OSDOBJ)/modules/debugger/debugqt.o \
 	$(OSDOBJ)/modules/debugger/qt/debugqtview.o \
 	$(OSDOBJ)/modules/debugger/qt/debugqtwindow.o \
 	$(OSDOBJ)/modules/debugger/qt/debugqtlogwindow.o \
@@ -716,6 +730,11 @@ DEBUGOBJS = \
 	$(OSDOBJ)/modules/debugger/qt/debugqtbreakpointswindow.moc.o \
 	$(OSDOBJ)/modules/debugger/qt/debugqtdeviceswindow.moc.o \
 	$(OSDOBJ)/modules/debugger/qt/debugqtdeviceinformationwindow.moc.o
+
+DEFS += -DUSE_QTDEBUG=1
+
+else
+DEFS += -DUSE_QTDEBUG=0
 endif
 
 ifeq ($(NO_DEBUGGER),1)
@@ -723,6 +742,14 @@ DEFS += -DNO_DEBUGGER
 else
 OSDOBJS += $(DEBUGOBJS)
 endif # NO_DEBUGGER
+
+# Always add these
+OSDOBJS += \
+	$(OSDOBJ)/modules/debugger/none.o \
+	$(OSDOBJ)/modules/debugger/debugint.o \
+	$(OSDOBJ)/modules/debugger/debugwin.o \
+	$(OSDOBJ)/modules/debugger/debugqt.o \
+
 
 #-------------------------------------------------
 # OPENGL
@@ -794,29 +821,21 @@ endif # USE_XINPUT
 # Network (TAP/TUN)
 #-------------------------------------------------
 
-OSDOBJS += $(SDLOBJ)/netdev.o
-
 ifndef DONT_USE_NETWORK
 
 ifeq ($(SDL_NETWORK),taptun)
-OSDOBJS += $(SDLOBJ)/netdev_tap.o
 
-DEFS += -DSDLMAME_NETWORK -DSDLMAME_NET_TAPTUN
+DEFS += -DSDLMAME_NET_TAPTUN
 endif
 
 ifeq ($(SDL_NETWORK),pcap)
 
-ifeq ($(TARGETOS),macosx)
-OSDOBJS += $(SDLOBJ)/netdev_pcap_osx.o
-else
-OSDOBJS += $(SDLOBJ)/netdev_pcap.o
-endif
+DEFS += -DSDLMAME_NET_PCAP
 
-DEFS += -DSDLMAME_NETWORK -DSDLMAME_NET_PCAP
-
-ifneq ($(TARGETOS),win32)
-LIBS += -lpcap
-endif
+# dynamically linked ...
+#ifneq ($(TARGETOS),win32)
+#LIBS += -lpcap
+#endif
 
 endif # ifeq ($(SDL_NETWORK),pcap)
 

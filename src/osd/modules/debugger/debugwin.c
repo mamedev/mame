@@ -6,6 +6,11 @@
 //
 //============================================================
 
+#include "debug_module.h"
+#include "modules/osdmodule.h"
+
+#if defined(OSD_WINDOWS) /*|| defined(SDLMAME_WIN32)*/
+
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -36,10 +41,27 @@
 #include "strconv.h"
 #include "winutf8.h"
 
-#include "debugwin.h"
+class debugger_windows : public osd_module, public debug_module
+{
+public:
+	debugger_windows()
+	: osd_module(OSD_DEBUG_PROVIDER, "windows"), debug_module(),
+		m_machine(NULL)
+	{
+	}
 
-const osd_debugger_type OSD_DEBUGGER_WINDOWS = &osd_debugger_creator<debugger_windows>;
+	virtual ~debugger_windows() { }
 
+	virtual int init() { return 0;}
+	virtual void exit();
+
+	virtual void init_debugger(running_machine &machine);
+	virtual void wait_for_debugger(device_t &device, bool firststop);
+	virtual void debugger_update();
+
+private:
+	running_machine *m_machine;
+};
 //============================================================
 //  PARAMETERS
 //============================================================
@@ -174,7 +196,7 @@ private:
 //  LOCAL VARIABLES
 //============================================================
 
-static debugwin_info *window_list;
+static debugwin_info *window_list = NULL;
 static debugwin_info *main_console;
 static UINT32 main_console_regwidth;
 
@@ -238,14 +260,6 @@ static void smart_show_all(BOOL show);
 
 static void image_update_menu(debugwin_info *info);
 
-
-//-------------------------------------------------
-//  debugger_windows - constructor
-//-------------------------------------------------
-debugger_windows::debugger_windows(const osd_interface &osd)
-	: osd_debugger_interface(osd)
-{
-}
 
 //============================================================
 //  wait_for_debugger
@@ -453,7 +467,7 @@ void debugger_windows::init_debugger(running_machine &machine)
 //  debugwin_destroy_windows
 //============================================================
 
-void debugger_windows::debugger_exit()
+void debugger_windows::exit()
 {
 	// loop over windows and free them
 	while (window_list != NULL)
@@ -3079,3 +3093,8 @@ static void smart_show_all(BOOL show)
 	for (info = window_list; info != NULL; info = info->next)
 		smart_show_window(info->wnd, show);
 }
+#else /* not windows */
+	MODULE_NOT_SUPPORTED(debugger_windows, OSD_DEBUG_PROVIDER, "windows")
+#endif
+
+MODULE_DEFINITION(DEBUG_WINDOWS, debugger_windows)

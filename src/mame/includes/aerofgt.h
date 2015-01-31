@@ -123,7 +123,6 @@ public:
 	void spikes91_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void aerfboot_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void wbbc97_draw_bitmap( bitmap_rgb32 &bitmap );
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;

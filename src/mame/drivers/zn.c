@@ -83,13 +83,13 @@ public:
 	DECLARE_READ16_MEMBER(bam2_unk_r);
 	DECLARE_WRITE16_MEMBER(acpsx_00_w);
 	DECLARE_WRITE16_MEMBER(acpsx_10_w);
+	DECLARE_WRITE16_MEMBER(nbajamex_bank_w);
 	DECLARE_WRITE16_MEMBER(nbajamex_80_w);
 	DECLARE_READ16_MEMBER(nbajamex_08_r);
 	DECLARE_READ16_MEMBER(nbajamex_80_r);
 	DECLARE_WRITE8_MEMBER(coh1001l_bank_w);
 	DECLARE_WRITE16_MEMBER(coh1001l_latch_w);
 	DECLARE_WRITE16_MEMBER(coh1001l_sound_unk_w);
-	DECLARE_WRITE_LINE_MEMBER(coh1001l_ymz_irq);
 	DECLARE_WRITE8_MEMBER(coh1002v_bank_w);
 	DECLARE_WRITE8_MEMBER(coh1002m_bank_w);
 	DECLARE_READ8_MEMBER(cbaj_sound_main_status_r);
@@ -2034,17 +2034,55 @@ WRITE16_MEMBER(zn_state::acpsx_00_w)
 	verboselog(0, "acpsx_00_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 }
 
+WRITE16_MEMBER(zn_state::nbajamex_bank_w)
+{
+	UINT32 newbank = 0;
+
+	verboselog(0, "nbajamex_bank_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+
+	if (offset > 1)
+	{
+		logerror("Unknown banking offset %x!\n", offset);
+	}
+
+	if (offset == 1)
+	{
+		data -= 1;
+	}
+
+	if (data <= 1)
+	{
+		newbank = (data * 0x400000);
+	}
+	else if (data >= 0x10)
+	{
+		data -= 0x10;
+		newbank = (data * 0x400000);
+		newbank += 0x200000;
+	}
+
+	if (offset == 0)
+	{
+		membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() + newbank);
+	}
+	else if (offset == 1)
+	{
+		newbank += 0x200000;
+		membank( "bankedroms2" )->set_base( memregion( "bankedroms" )->base() + newbank);
+	}
+}
+
 WRITE16_MEMBER(zn_state::acpsx_10_w)
 {
 	verboselog(0, "acpsx_10_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 }
 
+// all 16 bits goes to the external soundboard's latch (see sound test menu)
 WRITE16_MEMBER(zn_state::nbajamex_80_w)
 {
 	verboselog(0, "nbajamex_80_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	psxirq_device *psxirq = (psxirq_device *) machine().device("maincpu:irq");
 	psxirq->intin10(1);
-	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() + (data ? 0xe00000 : 0));
 }
 
 READ16_MEMBER(zn_state::nbajamex_08_r)
@@ -2054,6 +2092,7 @@ READ16_MEMBER(zn_state::nbajamex_08_r)
 	return data;
 }
 
+// possibly a readback from the external soundboard?
 READ16_MEMBER(zn_state::nbajamex_80_r)
 {
 	UINT32 data = 0xffffffff;
@@ -2070,7 +2109,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(nbajamex_map, AS_PROGRAM, 32, zn_state)
 	AM_RANGE(0x1f000000, 0x1f1fffff) AM_ROMBANK("bankedroms")
-	AM_RANGE(0x1f200000, 0x1f207fff) AM_RAM AM_SHARE("eeprom")
+	AM_RANGE(0x1f200000, 0x1f7fffff) AM_ROMBANK("bankedroms2")
+	AM_RANGE(0x1fbfff00, 0x1fbfff07) AM_WRITE16(nbajamex_bank_w, 0xffffffff)
 	AM_RANGE(0x1fbfff08, 0x1fbfff0b) AM_READ16(nbajamex_08_r, 0xffff)
 	AM_RANGE(0x1fbfff80, 0x1fbfff83) AM_READWRITE16(nbajamex_80_r, nbajamex_80_w, 0xffff)
 
@@ -2080,6 +2120,7 @@ ADDRESS_MAP_END
 MACHINE_RESET_MEMBER(zn_state,nbajamex)
 {
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() );
+	membank( "bankedroms2" )->set_base( memregion( "bankedroms" )->base() + 0x200000 );
 }
 
 static ADDRESS_MAP_START(jdredd_map, AS_PROGRAM, 32, zn_state)
@@ -2231,11 +2272,6 @@ Notes:
       VSync        - 60Hz
 */
 
-WRITE_LINE_MEMBER(zn_state::coh1001l_ymz_irq)
-{
-	m_audiocpu->set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 WRITE16_MEMBER(zn_state::coh1001l_sound_unk_w)
 {
 	// irq ack maybe?
@@ -2284,7 +2320,7 @@ static MACHINE_CONFIG_DERIVED(coh1001l, zn1_2mb_vram)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1001l)
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(zn_state, coh1001l_ymz_irq))
+	MCFG_YMZ280B_IRQ_HANDLER(INPUTLINE("audiocpu", 2))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
 MACHINE_CONFIG_END
@@ -4825,7 +4861,7 @@ GAME( 1996, primrag2, atpsx,    coh1000w, primrag2, driver_device, 0, ROT0, "Ata
 /* it in every zip file */
 GAME( 1995, acpsx,    0,        coh1000a, zn,     driver_device, 0, ROT0, "Acclaim", "Acclaim PSX", GAME_IS_BIOS_ROOT )
 
-GAME( 1996, nbajamex, acpsx,    nbajamex, zn,     driver_device, 0, ROT0, "Acclaim", "NBA Jam Extreme", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1996, nbajamex, acpsx,    nbajamex, zn,     driver_device, 0, ROT0, "Acclaim", "NBA Jam Extreme", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, jdredd,   acpsx,    jdredd,   jdredd, driver_device, 0, ROT0, "Acclaim", "Judge Dredd (Rev C Dec. 17 1997)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, jdreddb,  jdredd,   jdredd,   jdredd, driver_device, 0, ROT0, "Acclaim", "Judge Dredd (Rev B Nov. 26 1997)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 

@@ -33,8 +33,9 @@ static ADDRESS_MAP_START( mie_port, AS_IO, 8, mie_device)
 	AM_RANGE(0x00, 0x07) AM_READWRITE(gpio_r, gpio_w)
 	AM_RANGE(0x08, 0x08) AM_READWRITE(gpiodir_r, gpiodir_w)
 	AM_RANGE(0x0f, 0x0f) AM_READWRITE(adc_r, adc_w)
-	AM_RANGE(0x10, 0x10) AM_READWRITE(jvs_r, jvs_w)
+	AM_RANGE(0x10, 0x10) AM_READWRITE(jvs_r, jvs_w)		// ports 1x and 2x is standard UARTs, TODO handle it properly
 	AM_RANGE(0x12, 0x12) AM_WRITE(jvs_dest_w)
+	AM_RANGE(0x13, 0x13) AM_WRITE(jvs_lcr_w)
 	AM_RANGE(0x15, 0x15) AM_READ(jvs_status_r)
 	AM_RANGE(0x30, 0x30) AM_READWRITE(irq_enable_r, irq_enable_w)
 	AM_RANGE(0x50, 0x50) AM_READWRITE(maple_irqlevel_r, maple_irqlevel_w)
@@ -103,6 +104,11 @@ void mie_device::device_start()
 	save_item(NAME(irq_enable));
 	save_item(NAME(irq_pending));
 	save_item(NAME(maple_irqlevel));
+
+	// patch out MIE RAM test
+	// TODO: figure out why SH4 code doesn't wait long enough for internal firmware's RAM test completed in the case of reset
+	UINT32 *rom = (UINT32*)memregion("mie")->base();
+	rom[0x144/4] = 0x0001d8c3;
 }
 
 void mie_device::device_reset()
@@ -164,13 +170,17 @@ void mie_device::device_timer(emu_timer &_timer, device_timer_id id, int param, 
 			control |= CTRL_TFB|CTRL_EMP;
 		}
 	}
+	if(control & CTRL_HRES) {
+		raise_irq(maple_irqlevel);
+	}
 }
 
 void mie_device::maple_w(const UINT32 *data, UINT32 in_size)
 {
 	memcpy(tbuf, data, in_size*4);
 	lreg = in_size-1;
-	control &= ~(CTRL_TXB|CTRL_TFB|CTRL_RFB|CTRL_BFOV);
+	// currently not known how/then CTRL_HRES is cleared after reset, lets clear it at packet receive
+	control &= ~(CTRL_HRES|CTRL_TXB|CTRL_TFB|CTRL_RFB|CTRL_BFOV);
 	control |= CTRL_RXB;
 
 	timer->adjust(attotime::from_usec(20));
@@ -310,6 +320,9 @@ WRITE8_MEMBER(mie_device::lreg_w)
 
 READ8_MEMBER(mie_device::jvs_r)
 {
+	if (jvs_lcr & 0x80)
+		return 0;
+
 	const UINT8 *buf;
 	UINT32 size;
 	jvs->get_encoded_reply(buf, size);
@@ -320,9 +333,10 @@ READ8_MEMBER(mie_device::jvs_r)
 
 WRITE8_MEMBER(mie_device::jvs_w)
 {
-	// Hack until the ports are better understood
-	if(jvs_dest == 2)
-		jvs->push(data);
+	if (jvs_lcr & 0x80)
+		return;
+
+	jvs->push(data);
 }
 
 WRITE8_MEMBER(mie_device::jvs_dest_w)
@@ -350,6 +364,11 @@ WRITE8_MEMBER(mie_device::jvs_control_w)
 	jvs_control = data;
 }
 
+WRITE8_MEMBER(mie_device::jvs_lcr_w)
+{
+	jvs_lcr = data;
+}
+
 READ8_MEMBER(mie_device::jvs_sense_r)
 {
 	return 0x8c | (jvs->get_address_set_line() ? 2 : 0) | (jvs->get_presence_line() ? 0 : 1);
@@ -357,8 +376,8 @@ READ8_MEMBER(mie_device::jvs_sense_r)
 
 void mie_device::maple_reset()
 {
-	// ignoring reset maple pattern is HUGE HACK
-	// current implementation works only because of in such case procedure of firmware upload by games will be skipped at all
-	// so in better case - inputs doesnt work if game uses very different firmware version than already uploaded by BIOS, in worst case - game hang/reboot
-	// TODO: figure out why game code doesn't wait long enough for internal firmware's RAM test completed in the case of proper reset
+	control &= ~(CTRL_RXB|CTRL_TXB|CTRL_TFB|CTRL_RFB|CTRL_BFOV);
+	control |= CTRL_HRES;
+
+	timer->adjust(attotime::from_usec(20));
 }

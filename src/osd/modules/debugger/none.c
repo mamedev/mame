@@ -4,33 +4,45 @@
 //
 //============================================================
 
-#include "none.h"
+#include "debug_module.h"
+#include "modules/osdmodule.h"
+
 #include "debug/debugcpu.h"
 
-const osd_debugger_type OSD_DEBUGGER_NONE = &osd_debugger_creator<debugger_none>;
-
-//-------------------------------------------------
-//  debugger_none - constructor
-//-------------------------------------------------
-debugger_none::debugger_none(const osd_interface &osd)
-	: osd_debugger_interface(osd), m_machine(NULL)
+class debug_none : public osd_module, public debug_module
 {
+public:
+	debug_none()
+	: osd_module(OSD_DEBUG_PROVIDER, "none"), debug_module(),
+		m_machine(NULL)
+	{
+	}
+
+	virtual ~debug_none() { }
+
+	virtual int init() { return 0;}
+	virtual void exit() { }
+
+	virtual void init_debugger(running_machine &machine);
+	virtual void wait_for_debugger(device_t &device, bool firststop);
+	virtual void debugger_update();
+
+private:
+	running_machine *m_machine;
+};
+
+void debug_none::init_debugger(running_machine &machine)
+{
+	m_machine = &machine;
 }
 
-void debugger_none::init_debugger(running_machine &machine)
-{
-    m_machine = &machine;
-}
-
-void debugger_none::wait_for_debugger(device_t &device, bool firststop)
+void debug_none::wait_for_debugger(device_t &device, bool firststop)
 {
 	debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
 }
 
-void debugger_none::debugger_update()
+void debug_none::debugger_update()
 {
 }
 
-void debugger_none::debugger_exit()
-{
-}
+MODULE_DEFINITION(DEBUG_NONE, debug_none)

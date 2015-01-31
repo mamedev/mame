@@ -134,6 +134,7 @@ CPUS += ALTO2
 #CPUS += W65816
 CPUS += ARC
 CPUS += ARCOMPACT
+CPUS += AMIS2000
 
 #-------------------------------------------------
 # specify available sound cores; some of these are
@@ -614,6 +615,7 @@ BUSES += MEGADRIVE
 BUSES += MSX_SLOT
 BUSES += NEOGEO
 BUSES += NES
+BUSES += NES_CTRL
 BUSES += NUBUS
 BUSES += O2
 BUSES += ORICEXT
@@ -678,6 +680,7 @@ DRVLIBS += \
 	$(MESSOBJ)/att.a \
 	$(MESSOBJ)/bally.a \
 	$(MESSOBJ)/bandai.a \
+	$(MESSOBJ)/banctec.a \
 	$(MESSOBJ)/be.a \
 	$(MESSOBJ)/bnpo.a \
 	$(MESSOBJ)/bondwell.a \
@@ -796,6 +799,7 @@ DRVLIBS += \
 	$(MESSOBJ)/siemens.a \
 	$(MESSOBJ)/sinclair.a \
 	$(MESSOBJ)/skeleton.a \
+	$(MESSOBJ)/slicer.a \
 	$(MESSOBJ)/snk.a \
 	$(MESSOBJ)/sony.a \
 	$(MESSOBJ)/sord.a \
@@ -1040,6 +1044,9 @@ $(MESSOBJ)/att.a:               \
 $(MESSOBJ)/bally.a:             \
 	$(MESS_DRIVERS)/astrocde.o  \
 
+$(MESSOBJ)/banctec.a:            \
+	$(MESS_DRIVERS)/banctec.o    \
+
 $(MESSOBJ)/bandai.a:            \
 	$(MESS_DRIVERS)/sv8000.o    \
 	$(MESS_DRIVERS)/rx78.o      \
@@ -1082,7 +1089,7 @@ $(MESSOBJ)/cbm.a:               \
 	$(MESS_DRIVERS)/c128.o      \
 	$(MESS_DRIVERS)/c64.o       \
 	$(MESS_DRIVERS)/c64dtv.o    \
-	$(MESS_DRIVERS)/c65.o $(MESS_MACHINE)/c65.o \
+	$(MESS_DRIVERS)/c65.o \
 	$(MESS_DRIVERS)/c900.o      \
 	$(MESS_DRIVERS)/cbm2.o      \
 	$(MESS_DRIVERS)/clcd.o      \
@@ -1492,6 +1499,7 @@ $(MESSOBJ)/parker.a:            \
 	$(MESS_DRIVERS)/merlin.o    \
 	$(MESS_DRIVERS)/splitsec.o  \
 	$(MESS_DRIVERS)/stopthie.o  \
+	$(MESS_DRIVERS)/wildfire.o  \
 
 $(MESSOBJ)/pitronic.a:          \
 	$(MESS_DRIVERS)/beta.o      \
@@ -1647,6 +1655,9 @@ $(MESSOBJ)/sinclair.a:          \
 
 $(MESSOBJ)/siemens.a:           \
 	$(MESS_DRIVERS)/pcd.o       \
+
+$(MESSOBJ)/slicer.a:           \
+	$(MESS_DRIVERS)/slicer.o   \
 
 $(MESSOBJ)/snk.a:               \
 	$(MESS_DRIVERS)/ng_aes.o    \
@@ -2205,6 +2216,7 @@ $(MESS_DRIVERS)/votrtnt.o:  $(MESS_LAYOUT)/votrtnt.lh
 $(MESS_DRIVERS)/vk100.o:    $(MESS_LAYOUT)/vk100.lh
 $(MESS_DRIVERS)/vt100.o:    $(MESS_LAYOUT)/vt100.lh
 $(MESS_DRIVERS)/wicat.o:    $(MESS_LAYOUT)/wicat.lh
+$(MESS_DRIVERS)/wildfire.o: $(MESS_LAYOUT)/wildfire.lh
 $(MESS_DRIVERS)/wswan.o:    $(MESS_LAYOUT)/wswan.lh
 $(MESS_DRIVERS)/x68k.o:     $(MESS_LAYOUT)/x68000.lh
 $(MESS_DRIVERS)/z80dev.o:   $(MESS_LAYOUT)/z80dev.lh

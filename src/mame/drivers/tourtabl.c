@@ -21,7 +21,7 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	required_device<cpu_device> m_maincpu;
-	
+
 	DECLARE_WRITE8_MEMBER(tourtabl_led_w);
 	DECLARE_READ16_MEMBER(tourtabl_read_input_port);
 	DECLARE_READ8_MEMBER(tourtabl_get_databus_contents);

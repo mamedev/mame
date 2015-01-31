@@ -34,18 +34,25 @@ class limenko_state : public driver_device
 public:
 	limenko_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_oki(*this, "oki"),
+		m_qs1000(*this, "qs1000"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
 		m_mainram(*this, "mainram"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_md_videoram(*this, "md_videoram"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2"),
-		m_videoreg(*this, "videoreg"),
-		m_maincpu(*this, "maincpu"),
-		m_oki(*this, "oki"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")   { }
+		m_videoreg(*this, "videoreg") { }
 
+	required_device<cpu_device> m_maincpu;
+	optional_device<okim6295_device> m_oki;
+	optional_device<qs1000_device> m_qs1000;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	
 	required_shared_ptr<UINT32> m_mainram;
 	required_shared_ptr<UINT32> m_fg_videoram;
 	required_shared_ptr<UINT32> m_md_videoram;
@@ -53,14 +60,17 @@ public:
 	required_shared_ptr<UINT32> m_spriteram;
 	required_shared_ptr<UINT32> m_spriteram2;
 	required_shared_ptr<UINT32> m_videoreg;
+	
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_md_tilemap;
 	tilemap_t *m_fg_tilemap;
+	
 	int m_spriteram_bit;
 	bitmap_ind16 m_sprites_bitmap;
 	bitmap_ind8 m_sprites_bitmap_pri;
 	int m_prev_sprites_count;
 	UINT8 m_spotty_sound_cmd;
+	
 	DECLARE_WRITE32_MEMBER(limenko_coincounter_w);
 	DECLARE_WRITE32_MEMBER(bg_videoram_w);
 	DECLARE_WRITE32_MEMBER(md_videoram_w);
@@ -75,29 +85,28 @@ public:
 	DECLARE_READ32_MEMBER(legendoh_speedup_r);
 	DECLARE_READ32_MEMBER(sb2003_speedup_r);
 	DECLARE_READ32_MEMBER(spotty_speedup_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(spriteram_bit_r);
-
 	DECLARE_READ8_MEMBER(qs1000_p1_r);
 	DECLARE_WRITE8_MEMBER(qs1000_p1_w);
 	DECLARE_WRITE8_MEMBER(qs1000_p2_w);
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
+	
+	DECLARE_CUSTOM_INPUT_MEMBER(spriteram_bit_r);
+
 	DECLARE_DRIVER_INIT(common);
 	DECLARE_DRIVER_INIT(sb2003);
 	DECLARE_DRIVER_INIT(dynabomb);
 	DECLARE_DRIVER_INIT(legendoh);
 	DECLARE_DRIVER_INIT(spotty);
+	
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_md_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	
 	virtual void video_start();
 	UINT32 screen_update_limenko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,int priority);
 	void draw_sprites(UINT32 *sprites, const rectangle &cliprect, int count);
 	void copy_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &sprites_bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	optional_device<okim6295_device> m_oki;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };
 
 /*****************************************************************************************************
@@ -165,10 +174,8 @@ WRITE32_MEMBER(limenko_state::spriteram_buffer_w)
 
 WRITE32_MEMBER(limenko_state::limenko_soundlatch_w)
 {
-	qs1000_device *qs1000 = machine().device<qs1000_device>("qs1000");
-
 	soundlatch_byte_w(space, 0, data >> 16);
-	qs1000->set_irq(ASSERT_LINE);
+	m_qs1000->set_irq(ASSERT_LINE);
 
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
@@ -198,12 +205,10 @@ WRITE8_MEMBER(limenko_state::qs1000_p3_w)
 	// ...x .... - ?
 	// ..x. .... - /IRQ clear
 
-	qs1000_device *qs1000 = machine().device<qs1000_device>("qs1000");
-
 	membank("qs1000:bank")->set_entry(data & 0x07);
 
 	if (!BIT(data, 5))
-		qs1000->set_irq(CLEAR_LINE);
+		m_qs1000->set_irq(CLEAR_LINE);
 }
 
 /*****************************************************************************************************
@@ -500,6 +505,9 @@ void limenko_state::video_start()
 
 	m_sprites_bitmap.allocate(384,240);
 	m_sprites_bitmap_pri.allocate(384,240);
+	
+	save_item(NAME(m_spriteram_bit));
+	save_item(NAME(m_prev_sprites_count));
 }
 
 UINT32 limenko_state::screen_update_limenko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -1138,12 +1146,14 @@ DRIVER_INIT_MEMBER(limenko_state,spotty)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6626c, 0x6626f, read32_delegate(FUNC(limenko_state::spotty_speedup_r), this));
 
 	m_spriteram_bit = 1;
+	
+	save_item(NAME(m_spotty_sound_cmd));
 }
 
-GAME( 2000, dynabomb, 0,      limenko, sb2003, limenko_state,   dynabomb, ROT0, "Limenko", "Dynamite Bomber (Korea, Rev 1.5)",   GAME_IMPERFECT_SOUND )
-GAME( 2000, legendoh, 0,      limenko, legendoh, limenko_state, legendoh, ROT0, "Limenko", "Legend of Heroes",                   GAME_IMPERFECT_SOUND )
-GAME( 2003, sb2003,   0,      limenko, sb2003, limenko_state,   sb2003,   ROT0, "Limenko", "Super Bubble 2003 (World, Ver 1.0)", GAME_IMPERFECT_SOUND )
-GAME( 2003, sb2003a,  sb2003, limenko, sb2003, limenko_state,   sb2003,   ROT0, "Limenko", "Super Bubble 2003 (Asia, Ver 1.0)",  GAME_IMPERFECT_SOUND )
+GAME( 2000, dynabomb, 0,      limenko, sb2003, limenko_state,   dynabomb, ROT0, "Limenko", "Dynamite Bomber (Korea, Rev 1.5)",   GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2000, legendoh, 0,      limenko, legendoh, limenko_state, legendoh, ROT0, "Limenko", "Legend of Heroes",                   GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2003, sb2003,   0,      limenko, sb2003, limenko_state,   sb2003,   ROT0, "Limenko", "Super Bubble 2003 (World, Ver 1.0)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2003, sb2003a,  sb2003, limenko, sb2003, limenko_state,   sb2003,   ROT0, "Limenko", "Super Bubble 2003 (Asia, Ver 1.0)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
-// this game only use the same graphics chip used in limenko's system
-GAME( 2001, spotty,   0,      spotty,  spotty, limenko_state,   spotty,   ROT0, "Prince Co.", "Spotty (Ver. 2.0.2)",             GAME_NO_SOUND )
+// this game only uses the same graphics chip used in Limenko's system
+GAME( 2001, spotty,   0,      spotty,  spotty, limenko_state,   spotty,   ROT0, "Prince Co.", "Spotty (Ver. 2.0.2)",             GAME_NO_SOUND | GAME_SUPPORTS_SAVE )

@@ -43,7 +43,7 @@ NETLIB_START(4020_sub)
 	register_output("Q5", m_Q[4]);
 	register_output("Q6", m_Q[5]);
 	register_output("Q7", m_Q[6]);
-    register_output("Q8", m_Q[7]);
+	register_output("Q8", m_Q[7]);
 	register_output("Q9", m_Q[8]);
 	register_output("Q10", m_Q[9]);
 	register_output("Q11", m_Q[10]);
@@ -125,7 +125,7 @@ NETLIB_START(4020_dip)
 	register_subalias("7", sub.m_Q[3]);
 	register_subalias("8", m_supply.m_vss);
 
-	register_subalias("9", sub.m_Q[1]);
+	register_subalias("9", sub.m_Q[0]);
 	register_subalias("10", sub.m_IP);
 	register_subalias("11", m_RESET);
 	register_subalias("12", sub.m_Q[8]);
