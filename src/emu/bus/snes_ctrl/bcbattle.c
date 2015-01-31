@@ -1,10 +1,10 @@
 /**********************************************************************
 
-    Nintendo Family Computer - Epoch Barcode Battler
+    Nintendo Super Famicom - Epoch Barcode Battler
 
     TODO: this should be actually emulated as a standalone system with
     a few 7segments LEDs, once we get a dump of its BIOS
-    At the moment we only emulated the connection with a Famicom
+    At the moment we only emulated the connection with a Super Famicom
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -17,16 +17,16 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type NES_BARCODE_BATTLER = &device_creator<nes_bcbattle_device>;
+const device_type SNES_BARCODE_BATTLER = &device_creator<snes_bcbattle_device>;
 
 
-MACHINE_CONFIG_FRAGMENT( nes_battler )
+MACHINE_CONFIG_FRAGMENT( snes_battler )
 	MCFG_BARCODE_READER_ADD("battler")
 MACHINE_CONFIG_END
 
-machine_config_constructor nes_bcbattle_device::device_mconfig_additions() const
+machine_config_constructor snes_bcbattle_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( nes_battler );
+	return MACHINE_CONFIG_NAME( snes_battler );
 }
 
 
@@ -34,16 +34,17 @@ machine_config_constructor nes_bcbattle_device::device_mconfig_additions() const
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-// This part is the hacky replacement for the real Barcode unit [shared with SNES implementation]:
+// This part is the hacky replacement for the real Barcode unit [shared with NES implementation]:
 // code periodically checks whether a new code has been scanned and it moves it to the 
 // m_current_barcode array
-void nes_bcbattle_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void snes_bcbattle_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id == TIMER_BATTLER)
 	{
 		int old = m_new_code;
+		m_new_code = m_reader->get_pending_code();
 		// has something new been scanned?
-		if (old < m_reader->get_pending_code())
+		if (old < m_new_code)
 		{
 			if (m_reader->get_byte_length() == 13)
 			{
@@ -70,7 +71,6 @@ void nes_bcbattle_device::device_timer(emu_timer &timer, device_timer_id id, int
 			m_current_barcode[19] = 0x0a;
 			m_pending_code = 1;
 		}
-		m_new_code = m_reader->get_pending_code();
 	}
 }
 
@@ -79,12 +79,12 @@ void nes_bcbattle_device::device_timer(emu_timer &timer, device_timer_id id, int
 //**************************************************************************
 
 //-------------------------------------------------
-//  nes_bcbattle_device - constructor
+//  snes_bcbattle_device - constructor
 //-------------------------------------------------
 
-nes_bcbattle_device::nes_bcbattle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-					device_t(mconfig, NES_BARCODE_BATTLER, "Epoch Barcode Battler (FC)", tag, owner, clock, "nes_bcbattle", __FILE__),
-					device_nes_control_port_interface(mconfig, *this),
+snes_bcbattle_device::snes_bcbattle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+					device_t(mconfig, SNES_BARCODE_BATTLER, "Epoch Barcode Battler (SFC)", tag, owner, clock, "snes_bcbattle", __FILE__),
+					device_snes_control_port_interface(mconfig, *this),
 					m_reader(*this, "battler")
 {
 }
@@ -94,7 +94,7 @@ nes_bcbattle_device::nes_bcbattle_device(const machine_config &mconfig, const ch
 //  device_start
 //-------------------------------------------------
 
-void nes_bcbattle_device::device_start()
+void snes_bcbattle_device::device_start()
 {
 	// lacking emulation of the standalone Barcode Battler, we refresh periodically the input from the reader
 	// proper emulation would have the standalone unit acknowledging that a new barcode has been scanned
@@ -115,7 +115,7 @@ void nes_bcbattle_device::device_start()
 //  device_reset
 //-------------------------------------------------
 
-void nes_bcbattle_device::device_reset()
+void snes_bcbattle_device::device_reset()
 {
 	m_pending_code = 0;
 	m_new_code = 0;
@@ -130,39 +130,24 @@ void nes_bcbattle_device::device_reset()
 //  read
 //-------------------------------------------------
 
-int nes_bcbattle_device::read_current_bit()
+int snes_bcbattle_device::read_current_bit()
 {
-	if (m_pending_code && !m_transmitting)
+	if (m_pending_code)
 	{
-		// we start with 1
-		m_transmitting = 1;
-		m_cur_byte = 0;
-		m_cur_bit = 0;
-		return 1;
-	}
-
-	if (m_transmitting)
-	{
-		if (m_cur_bit == 0)
+		if (m_cur_bit < 4)
 		{
-			m_cur_bit++;
-			return 1;
-		}
-		if (m_cur_bit < 9)
-		{
-			int bit = (BIT(m_current_barcode[m_cur_byte], m_cur_bit - 1)) ^ 1;
+			int bit = BIT(m_current_barcode[m_cur_byte], m_cur_bit - 1);
 			m_cur_bit++;
 			return bit;
 		}
-		if (m_cur_bit == 9)
+		if (m_cur_bit == 4)	// only the low nibble is transmitted (this is the main action of the BBII interface for SNES)
 		{
 			m_cur_bit = 0;
 			//printf("%X ", m_current_barcode[m_cur_byte]);
 			m_cur_byte++;
-			if (m_cur_byte == 20)
+			if (m_cur_byte == 13)
 			{
 				m_cur_byte = 0;
-				m_transmitting = 0;
 				m_pending_code = 0;
 			}
 			return 0;
@@ -172,13 +157,57 @@ int nes_bcbattle_device::read_current_bit()
 	return 0;
 }
 
-UINT8 nes_bcbattle_device::read_exp(offs_t offset)
+
+//-------------------------------------------------
+//  poll
+//-------------------------------------------------
+
+void snes_bcbattle_device::port_poll()
+{
+	m_idx = 0;
+}
+
+
+//-------------------------------------------------
+//  read
+//-------------------------------------------------
+
+UINT8 snes_bcbattle_device::read_pin4()
 {
 	UINT8 ret = 0;
-	if (offset == 1)    //$4017
+	
+	if (m_idx >= 80)
+		ret |= 0x00;
+	else if (m_idx >= 28)	// scan actual barcode
 	{
-		ret |= read_current_bit() << 2;
+		ret |= read_current_bit();	// if no code is pending transmission, the function returns 0
+		m_idx++;
 	}
-
+	else if (m_idx >= 25)	// unknown flags?
+		m_idx++;
+	else if (m_idx == 24)	// barcode present
+	{
+		ret |= m_pending_code;
+		m_idx++;
+	}
+	else if (m_idx >= 12)	// controller ID
+		ret |= BIT(0x7000, m_idx++);
+	else	// first 12 bytes are unknown and probably always 0
+		m_idx++;
+	
 	return ret;
+}
+
+
+//-------------------------------------------------
+//  write
+//-------------------------------------------------
+
+void snes_bcbattle_device::write_strobe(UINT8 data)
+{
+	int old = m_strobe;
+	m_strobe = data & 0x01;
+	
+	if (m_strobe < old)	// 1 -> 0 transition
+		port_poll();
 }

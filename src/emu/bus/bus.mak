@@ -1134,6 +1134,23 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/snes_ctrl/ctrl.h,BUSES += SNES_CTRL
+#-------------------------------------------------
+
+ifneq ($(filter SNES_CTRL,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/snes_ctrl
+BUSOBJS += $(BUSOBJ)/snes_ctrl/ctrl.o
+BUSOBJS += $(BUSOBJ)/snes_ctrl/bcbattle.o
+BUSOBJS += $(BUSOBJ)/snes_ctrl/joypad.o
+BUSOBJS += $(BUSOBJ)/snes_ctrl/mouse.o
+BUSOBJS += $(BUSOBJ)/snes_ctrl/multitap.o
+BUSOBJS += $(BUSOBJ)/snes_ctrl/pachinko.o
+BUSOBJS += $(BUSOBJ)/snes_ctrl/sscope.o
+BUSOBJS += $(BUSOBJ)/snes_ctrl/twintap.o
+endif
+
+#-------------------------------------------------
+#
 #@src/emu/bus/vboy/slot.h,BUSES += VBOY
 #-------------------------------------------------
 ifneq ($(filter VBOY,$(BUSES)),)
