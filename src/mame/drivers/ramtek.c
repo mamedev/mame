@@ -2,18 +2,19 @@
 
  Ramtek Discrete Games List
 
- Game Name                  DATA      Board #
- --------------------------------------------
- (Deluxe) Baseball (1974)   YES
- Clean Sweep (1974)         YES       501082
- Hockey (1973)              UNKNOWN
+ Game Name                  DATA      ASSY #         P/N
+ -------------------------------------------------------------------
+ Baseball (1974/10)         YES       550185/550186  0550228/0550229
+ Clean Sweep (1974/06)      YES       501082A/B/C/D  501083A/B/C/D
+ Deluxe Baseball (1975/06)  YES       550188
+ Hockey (1973/11)           UNKNOWN   500699         500629
  Horoscope (1976)           UNKNOWN
  Knockout (1974)            UNKNOWN
- Sea Battle (1976)          UNKNOWN
- Soccer (1973)              UNKNOWN
- Trivia (1975)              YES
- Volly/Volley (1973)        YES
- Wipe Out (1973)            YES
+ Sea Battle (1976/04)       UNKNOWN
+ Soccer (1973/11)           UNKNOWN   500880         500889
+ Trivia (1975/11)           YES
+ Volly/Volley (1973/03?)    YES       500378A        500322A
+ Wipe Out (1974/01)         YES       500986B/C      500963B/?
 
  ***************************************************************************/
 
@@ -217,7 +218,7 @@ ROM_END
 
 
 GAME( 1973, vollyrmt,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Volly (Ramtek) [TTL]", GAME_IS_SKELETON )
-GAME( 1973, wipeormt,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Wipeout (Ramtek) [TTL]", GAME_IS_SKELETON )
+GAME( 1974, wipeormt,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Wipeout (Ramtek) [TTL]", GAME_IS_SKELETON )
 GAME( 1974, bballrmt,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Baseball (Ramtek) [TTL]", GAME_IS_SKELETON )
 GAME( 1974, cleanswp,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Clean Sweep [TTL]", GAME_IS_SKELETON )
 GAME( 1975, trivia,    0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Trivia (Rev B) [TTL]", GAME_IS_SKELETON )
