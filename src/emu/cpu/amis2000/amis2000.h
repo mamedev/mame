@@ -80,9 +80,9 @@ protected:
 	UINT16 m_pc;                // 13-bit program counter
 	UINT8 m_ppr;                // prepared page register (PP 1)
 	UINT8 m_pbr;                // prepared bank register (PP 2)
-	UINT8 m_pp_index;           // number of handled PP prefixes
 	bool m_skip;                // skip next opcode, including PP prefixes
 	UINT8 m_op;
+	UINT8 m_prev_op;            // previous opcode, needed for PP, LAI, LB*
 	UINT8 m_f;                  // generic flags: 2 on 2000/2150, 6 on 2200/2400
 	UINT8 m_carry;              // carry flag
 	UINT8 m_bl;                 // 4-bit ram index x

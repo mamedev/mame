@@ -5,6 +5,7 @@
   American Microsystems, Inc.(AMI) S2000-family 4-bit MCU cores, introduced late 1970s
   
   TODO:
+  - bug(s)? - MESS wildfire.c doesn't work yet
   - unemulated opcodes (need more testing material)
   - support external program map
   - add 50/60hz timer
@@ -25,12 +26,12 @@ const device_type AMI_S2150 = &device_creator<amis2150_device>;
 
 // internal memory maps
 static ADDRESS_MAP_START(program_1k, AS_PROGRAM, 8, amis2000_device)
-	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_MIRROR(0x1c00)
+	AM_RANGE(0x0000, 0x03ff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(program_1_5k, AS_PROGRAM, 8, amis2000_device)
-	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_MIRROR(0x1800)
-	AM_RANGE(0x0400, 0x05ff) AM_ROM AM_MIRROR(0x1a00)
+	AM_RANGE(0x0000, 0x03ff) AM_ROM
+	AM_RANGE(0x0400, 0x05ff) AM_ROM AM_MIRROR(0x200)
 ADDRESS_MAP_END
 
 
@@ -116,7 +117,7 @@ offs_t amis2000_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 
 enum
 {
 	S2000_PC=1, S2000_BL, S2000_BU,
-	S2000_ACC, S2000_E, S2000_CARRY
+	S2000_ACC, S2000_E, S2000_CY
 };
 
 void amis2000_device::device_start()
@@ -138,9 +139,9 @@ void amis2000_device::device_start()
 	m_pc = 0;
 	m_ppr = 0;
 	m_pbr = 0;
-	m_pp_index = 0;
 	m_skip = false;
 	m_op = 0;
+	m_prev_op = 0;
 	m_f = 0;
 	m_carry = 0;
 	m_bl = 0;
@@ -157,9 +158,9 @@ void amis2000_device::device_start()
 	save_item(NAME(m_pc));
 	save_item(NAME(m_ppr));
 	save_item(NAME(m_pbr));
-	save_item(NAME(m_pp_index));
 	save_item(NAME(m_skip));
 	save_item(NAME(m_op));
+	save_item(NAME(m_prev_op));
 	save_item(NAME(m_f));
 	save_item(NAME(m_carry));
 	save_item(NAME(m_bl));
@@ -177,7 +178,7 @@ void amis2000_device::device_start()
 	state_add(S2000_BU,     "BU",     m_bu    ).formatstr("%01X");
 	state_add(S2000_ACC,    "ACC",    m_acc   ).formatstr("%01X");
 	state_add(S2000_E,      "E",      m_e     ).formatstr("%01X");
-	state_add(S2000_CARRY,  "CARRY",  m_carry ).formatstr("%01X");
+	state_add(S2000_CY,     "CY",     m_carry ).formatstr("%01X");
 
 	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_f).formatstr("%6s").noshow();
@@ -218,14 +219,8 @@ void amis2000_device::execute_run()
 	{
 		m_icount--;
 		
-		// increase PP prefix count
-		if ((m_op & 0xf0) == 0x60)
-		{
-			if (m_pp_index < 2)
-				m_pp_index++;
-		}
-		else
-			m_pp_index = 0;
+		// remember previous opcode
+		m_prev_op = m_op;
 
 		debugger_instruction_hook(this, m_pc);
 		m_op = m_program->read_byte(m_pc);

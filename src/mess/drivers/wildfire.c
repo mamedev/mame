@@ -31,6 +31,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 
+	DECLARE_WRITE8_MEMBER(write_d);
+	DECLARE_WRITE16_MEMBER(write_a);
+
 	virtual void machine_start();
 };
 
@@ -41,7 +44,13 @@ public:
 
 ***************************************************************************/
 
-//..
+WRITE8_MEMBER(wildfire_state::write_d)
+{
+}
+
+WRITE16_MEMBER(wildfire_state::write_a)
+{
+}
 
 
 
@@ -52,6 +61,11 @@ public:
 ***************************************************************************/
 
 static INPUT_PORTS_START( wildfire )
+	PORT_START("IN1") // I
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Shooter Button")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Left Flipper")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Right Flipper")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -71,6 +85,9 @@ static MACHINE_CONFIG_START( wildfire, wildfire_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", AMI_S2150, MASTER_CLOCK)
+	MCFG_AMI_S2000_READ_I_CB(IOPORT("IN1"))
+	MCFG_AMI_S2000_WRITE_D_CB(WRITE8(wildfire_state, write_d))
+	MCFG_AMI_S2000_WRITE_A_CB(WRITE16(wildfire_state, write_a))
 
 	MCFG_DEFAULT_LAYOUT(layout_wildfire)
 

@@ -4,13 +4,13 @@
 
 UINT8 amis2000_device::ram_r()
 {
-	UINT16 address = m_bu << m_bu_bits | m_bl;
+	UINT16 address = m_bu << 4 | m_bl;
 	return m_data->read_byte(address) & 0xf;
 }
 
 void amis2000_device::ram_w(UINT8 data)
 {
-	UINT16 address = m_bu << m_bu_bits | m_bl;
+	UINT16 address = m_bu << 4 | m_bl;
 	m_data->write_byte(address, data & 0xf);
 }
 
@@ -44,10 +44,14 @@ void amis2000_device::op_illegal()
 void amis2000_device::op_lai()
 {
 	// LAI X: load ACC with X, select I and K inputs
-	UINT8 param = m_op & 0x0f;
-	m_acc = param;
-	m_i = m_read_i(0, 0xff) & param;
-	m_k = m_read_k(0, 0xff) & param;
+	// note: only execute the first one in a sequence of LAI
+	if ((m_prev_op & 0xf0) != (m_op & 0xf0))
+	{
+		UINT8 param = m_op & 0x0f;
+		m_acc = param;
+		m_i = m_read_i(0, 0xff) & param;
+		m_k = m_read_k(0, 0xff) & param;
+	}
 }
 
 void amis2000_device::op_lab()
@@ -89,33 +93,49 @@ void amis2000_device::op_xae()
 void amis2000_device::op_lbe()
 {
 	// LBE Y: load BU with Y, load BL with E
-	UINT8 param = m_op & 0x03;
-	m_bu = param & m_bu_mask;
-	m_bl = m_e;
+	// note: only execute the first one in a sequence of LB*
+	if ((m_prev_op & 0xf0) != (m_op & 0xf0))
+	{
+		UINT8 param = m_op & 0x03;
+		m_bu = param & m_bu_mask;
+		m_bl = m_e;
+	}
 }
 
 void amis2000_device::op_lbep()
 {
 	// LBEP Y: load BU with Y, load BL with E+1
-	UINT8 param = m_op & 0x03;
-	m_bu = param & m_bu_mask;
-	m_bl = m_e + 1;
+	// note: only execute the first one in a sequence of LB*
+	if ((m_prev_op & 0xf0) != (m_op & 0xf0))
+	{
+		UINT8 param = m_op & 0x03;
+		m_bu = param & m_bu_mask;
+		m_bl = m_e + 1;
+	}
 }
 
 void amis2000_device::op_lbz()
 {
 	// LBZ Y: load BU with Y, load BL with 0
-	UINT8 param = m_op & 0x03;
-	m_bu = param & m_bu_mask;
-	m_bl = 0;
+	// note: only execute the first one in a sequence of LB*
+	if ((m_prev_op & 0xf0) != (m_op & 0xf0))
+	{
+		UINT8 param = m_op & 0x03;
+		m_bu = param & m_bu_mask;
+		m_bl = 0;
+	}
 }
 
 void amis2000_device::op_lbf()
 {
 	// LBF Y: load BU with Y, load BL with 15
-	UINT8 param = m_op & 0x03;
-	m_bu = param & m_bu_mask;
-	m_bl = 0xf;
+	// note: only execute the first one in a sequence of LB*
+	if ((m_prev_op & 0xf0) != (m_op & 0xf0))
+	{
+		UINT8 param = m_op & 0x03;
+		m_bu = param & m_bu_mask;
+		m_bl = 0xf;
+	}
 }
 
 
@@ -279,7 +299,7 @@ void amis2000_device::op_pp()
 {
 	// PP _X: prepare page/bank with _X
 	UINT8 param = ~m_op & 0x0f;
-	if (m_pp_index == 0)
+	if ((m_prev_op & 0xf0) != (m_op & 0xf0))
 		m_ppr = param;
 	else
 		m_pbr = param & 7;
@@ -290,15 +310,12 @@ void amis2000_device::op_jmp()
 	// JMP X: jump to X(+PP)
 	UINT16 mask = 0x3f;
 	UINT16 param = m_op & mask;
-	if (m_pp_index > 0)
+	
+	// if previous opcode was PP, change PC high bits too
+	if ((m_prev_op & 0xf0) == 0x60)
 	{
-		param |= m_ppr << 6;
-		mask |= 0x3c0;
-	}
-	if (m_pp_index > 1)
-	{
-		param |= m_pbr << 10;
-		mask |= 0x1c00;
+		param |= (m_ppr << 6) | (m_pbr << 10);
+		mask = 0x1fff;
 	}
 	m_pc = (m_pc & ~mask) | param;
 }
@@ -308,13 +325,11 @@ void amis2000_device::op_jms()
 	// JMS X: call to X(+PP)
 	m_icount--;
 	push_callstack();
-	if (m_pp_index == 0)
-	{
-		// subroutines default location is page 15
-		m_ppr = 0xf;
-		m_pp_index++;
-	}
 	op_jmp();
+
+	// subroutines default location is page 15
+	if ((m_prev_op & 0xf0) != 0x60)
+		m_pc |= 0x3c0;
 }
 
 void amis2000_device::op_rt()
@@ -384,13 +399,13 @@ void amis2000_device::op_sos()
 void amis2000_device::op_tf1()
 {
 	// TF1: skip next on flag 1
-	m_skip = (m_f & 0x01);
+	m_skip = (m_f & 0x01) ? true : false;
 }
 
 void amis2000_device::op_tf2()
 {
 	// TF2: skip next on flag 2
-	m_skip = (m_f & 0x02);
+	m_skip = (m_f & 0x02) ? true : false;
 }
 
 
