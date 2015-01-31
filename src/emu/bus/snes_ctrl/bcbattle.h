@@ -52,7 +52,7 @@ private:
 	int m_pending_code, m_new_code, m_transmitting, m_cur_bit, m_cur_byte;
 	emu_timer *battler_timer;
 
-	int m_strobe, m_on, m_idx;
+	int m_strobe, m_idx;
 };
 
 // device type definition
