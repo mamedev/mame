@@ -307,7 +307,7 @@ void sdl_osd_interface::update(bool skip_redraw)
 	if (!skip_redraw)
 	{
 //      profiler_mark(PROFILER_BLIT);
-		for (window = sdl_window_list; window != NULL; window = window->next)
+		for (window = sdl_window_list; window != NULL; window = window->m_next)
 			window->video_window_update(machine());
 //      profiler_mark(PROFILER_END);
 	}
@@ -550,7 +550,7 @@ static void check_osd_inputs(running_machine &machine)
 		while (curwin != (sdl_window_info *)NULL)
 		{
 			curwin->toggle_full_screen(machine);
-			curwin = curwin->next;
+			curwin = curwin->m_next;
 		}
 	}
 

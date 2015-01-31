@@ -354,7 +354,7 @@ void sdl_osd_interface::window_exit()
 	while (sdl_window_list != NULL)
 	{
 		sdl_window_info *temp = sdl_window_list;
-		sdl_window_list = temp->next;
+		sdl_window_list = temp->m_next;
 		temp->video_window_destroy(machine());
 		// free the window itself
 		global_free(temp);
@@ -720,7 +720,7 @@ int sdlwindow_video_window_create(running_machine &machine, int index, sdl_monit
 
 	// add us to the list
 	*last_window_ptr = window;
-	last_window_ptr = &window->next;
+	last_window_ptr = &window->m_next;
 
 	draw.attach(&draw, window);
 
@@ -804,10 +804,10 @@ void sdl_window_info::video_window_destroy(running_machine &machine)
 	//osd_event_wait(window->rendered_event, osd_ticks_per_second()*10);
 
 	// remove us from the list
-	for (prevptr = &sdl_window_list; *prevptr != NULL; prevptr = &(*prevptr)->next)
+	for (prevptr = &sdl_window_list; *prevptr != NULL; prevptr = &(*prevptr)->m_next)
 		if (*prevptr == this)
 		{
-			*prevptr = this->next;
+			*prevptr = this->m_next;
 			break;
 		}
 

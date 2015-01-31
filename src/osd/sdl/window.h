@@ -32,7 +32,7 @@ typedef UINT32 HashT;
 //  TYPE DEFINITIONS
 //============================================================
 
-struct sdl_window_info;
+class sdl_window_info;
 
 class osd_renderer
 {
@@ -55,11 +55,12 @@ private:
 	sdl_window_info *m_window;
 };
 
-struct sdl_window_info
+class sdl_window_info
 {
+public:
 	sdl_window_info(running_machine *a_machine, sdl_monitor_info *a_monitor,
 			int index, const sdl_window_config *config)
-	: next(NULL), m_minwidth(0), m_minheight(0),
+	: m_next(NULL), m_minwidth(0), m_minheight(0),
 		m_startmaximized(0),
 		m_rendered_event(0), m_target(0), m_primlist(NULL), m_dxdata(NULL),
 		m_width(0), m_height(0), m_blitwidth(0), m_blitheight(0),
@@ -89,26 +90,26 @@ struct sdl_window_info
 	}
 
 	void video_window_update(running_machine &machine);
-	void blit_surface_size(int window_width, int window_height);
+	//void blit_surface_size(int window_width, int window_height);
 	void toggle_full_screen(running_machine &machine);
 	void modify_prescale(running_machine &machine, int dir);
 	void window_resize(INT32 width, INT32 height);
 	void window_clear();
 
 	void video_window_destroy(running_machine &machine);
-	void pick_best_mode(int *fswidth, int *fsheight);
+	//void pick_best_mode(int *fswidth, int *fsheight);
 	void get_min_bounds(int *window_width, int *window_height, int constrain);
 	void get_max_bounds(int *window_width, int *window_height, int constrain);
-
-	// Pointer to next window
-	sdl_window_info *   next;
 
 	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
 	sdl_monitor_info *monitor() const { return m_monitor; }
 	int fullscreen() const { return m_fullscreen; }
-	int index() const { return m_index; }
 
 	void set_fullscreen(int afullscreen) { m_fullscreen = afullscreen; }
+
+	void blit_surface_size(int window_width, int window_height);
+	void pick_best_mode(int *fswidth, int *fsheight);
+	int index() const { return m_index; }
 
 #if 1
 	// Draw Callbacks
@@ -121,6 +122,9 @@ struct sdl_window_info
 	void (*destroy)(sdl_window_info *window);
 	void (*clear)(sdl_window_info *window);
 #endif
+
+	// Pointer to next window
+	sdl_window_info *   m_next;
 
 	// window handle and info
 	char                m_title[256];

@@ -1544,7 +1544,7 @@ INLINE sdl_window_info * window_from_id(Uint32 windowID)
 	sdl_window_info *w;
 	SDL_Window *window = SDL_GetWindowFromID(windowID);
 
-	for (w = sdl_window_list; w != NULL; w = w->next)
+	for (w = sdl_window_list; w != NULL; w = w->m_next)
 	{
 		//printf("w->window_id: %d\n", w->window_id);
 		if (w->m_sdl_window == window)
@@ -1562,7 +1562,7 @@ INLINE void resize_all_windows(void)
 
 	if (SDL13_COMBINE_RESIZE)
 	{
-		for (w = sdl_window_list; w != NULL; w = w->next)
+		for (w = sdl_window_list; w != NULL; w = w->m_next)
 		{
 			if (w->m_resize_width && w->m_resize_height && ((now - w->m_last_resize) > osd_ticks_per_second() / 10))
 			{
