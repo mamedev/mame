@@ -210,7 +210,6 @@ ifeq ($(TARGETOS),linux)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = tc
 SDL_NETWORK = taptun
-#SDL_NETWORK = pcap
 
 ifndef NO_USE_MIDI
 INCPATH += `pkg-config --cflags alsa`
@@ -448,11 +447,12 @@ OSDOBJS = \
 	$(OSDOBJ)/modules/font/font_none.o \
 	$(OSDOBJ)/modules/netdev/taptun.o \
 	$(OSDOBJ)/modules/netdev/pcap.o \
+	$(OSDOBJ)/modules/midi/portmidi.o \
+	$(OSDOBJ)/modules/midi/none.o \
 
 ifdef NO_USE_MIDI
-	OSDOBJS += $(OSDOBJ)/modules/midi/none.o
+	DEFS += -DNO_USE_MIDI
 else
-	OSDOBJS += $(OSDOBJ)/modules/midi/portmidi.o
 endif
 
 # Add SDL2.0 support

@@ -131,6 +131,8 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, NETDEV_TAPTUN);
 	REGISTER_MODULE(m_mod_man, NETDEV_PCAP);
 
+	REGISTER_MODULE(m_mod_man, MIDI_PM);
+	REGISTER_MODULE(m_mod_man, MIDI_NONE);
 
 	// after initialization we know which modules are supported
 
@@ -147,6 +149,15 @@ void osd_common_t::register_options()
 	for (int i = 0; i < num; i++)
 		dnames.append(names[i]);
 	update_option(OSD_SOUND_PROVIDER, dnames);
+
+#if 0
+	// Register midi options and update options
+	m_mod_man.get_module_names(OSD_DEBUG_PROVIDER, 20, &num, names);
+	dnames.reset();
+	for (int i = 0; i < num; i++)
+		dnames.append(names[i]);
+	update_option(OSD_DEBUG_PROVIDER, dnames);
+#endif
 
 	// Register debugger options and update options
 	m_mod_man.get_module_names(OSD_DEBUG_PROVIDER, 20, &num, names);
@@ -416,7 +427,15 @@ bool osd_common_t::execute_command(const char *command)
 	}
 	else if (strcmp(command, OSDCOMMAND_LIST_MIDI_DEVICES) == 0)
 	{
-		osd_list_midi_devices();
+		osd_module *om = select_module_options(options(), OSD_MIDI_PROVIDER);
+		midi_module *pm = select_module_options<midi_module *>(options(), OSD_MIDI_PROVIDER);
+
+		if (om->probe())
+		{
+			om->init();
+			pm->list_midi_devices();
+			om->exit();
+		}
 		return true;
 	}
 
@@ -441,7 +460,6 @@ void osd_common_t::init_subsystems()
 	machine().add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(osd_common_t::input_resume), this));
 
 	output_init();
-	midi_init();
 
 	m_font_module = select_module_options<font_module *>(options(), OSD_FONT_PROVIDER);
 
@@ -452,6 +470,8 @@ void osd_common_t::init_subsystems()
 	m_debugger = select_module_options<debug_module *>(options(), OSD_DEBUG_PROVIDER);
 
 	select_module_options<netdev_module *>(options(), OSD_NETDEV_PROVIDER);
+
+	m_midi = select_module_options<midi_module *>(options(), OSD_MIDI_PROVIDER);
 
 	m_mod_man.init();
 
@@ -499,7 +519,6 @@ void osd_common_t::exit_subsystems()
 	video_exit();
 	input_exit();
 	output_exit();
-	midi_exit();
 }
 
 void osd_common_t::video_exit()
@@ -529,15 +548,4 @@ void osd_common_t::video_options_add(const char *name, void *type)
 {
 	//m_video_options.add(name, type, false);
 	m_video_names.append(core_strdup(name));
-}
-
-bool osd_common_t::midi_init()
-{
-	// this should be done on the OS_level
-	return osd_midi_init();
-}
-
-void osd_common_t::midi_exit()
-{
-	osd_midi_exit();
 }

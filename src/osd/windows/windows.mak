@@ -383,6 +383,7 @@ OSDOBJS = \
 	$(WINOBJ)/winmenu.o \
 	$(WINOBJ)/winmain.o \
 	$(OSDOBJ)/modules/midi/portmidi.o \
+	$(OSDOBJ)/modules/midi/none.o \
 	$(OSDOBJ)/modules/lib/osdobj_common.o  \
 	$(OSDOBJ)/modules/font/font_sdl.o \
 	$(OSDOBJ)/modules/font/font_windows.o \
@@ -392,8 +393,7 @@ OSDOBJS = \
 	$(OSDOBJ)/modules/netdev/taptun.o \
 
 ifdef USE_SDL
-OSDOBJS += \
-	$(OSDOBJ)/modules/sound/sdl_sound.o
+DEFS += -DUSE_SDL_SOUND
 endif
 
 ifndef DONT_USE_NETWORK

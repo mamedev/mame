@@ -887,21 +887,22 @@ file_error osd_get_full_path(char **dst, const char *path);
 /***************************************************************************
     MIDI I/O INTERFACES
 ***************************************************************************/
-struct osd_midi_device;
 
-bool osd_midi_init();
-void osd_midi_exit();
-void osd_list_midi_devices(void);
-// free result with osd_close_midi_channel()
-osd_midi_device *osd_open_midi_input(const char *devname);
-// free result with osd_close_midi_channel()
-osd_midi_device *osd_open_midi_output(const char *devname);
-void osd_close_midi_channel(osd_midi_device *dev);
-bool osd_poll_midi_channel(osd_midi_device *dev);
-int osd_read_midi_channel(osd_midi_device *dev, UINT8 *pOut);
-void osd_write_midi_channel(osd_midi_device *dev, UINT8 data);
+class osd_midi_device
+{
+public:
+	virtual ~osd_midi_device() { }
+	// free result with osd_close_midi_channel()
+	virtual bool open_input(const char *devname) = 0;
+	// free result with osd_close_midi_channel()
+	virtual bool open_output(const char *devname) = 0;
+	virtual void close() = 0;
+	virtual bool poll() = 0;
+	virtual int read(UINT8 *pOut) = 0;
+	virtual void write(UINT8 data) = 0;
+};
 
-
+//FIXME: really needed here?
 void osd_list_network_adapters(void);
 
 /***************************************************************************

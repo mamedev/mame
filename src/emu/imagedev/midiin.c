@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "midiin.h"
+#include "osdepend.h"
 
 /***************************************************************************
     IMPLEMENTATION
@@ -77,9 +78,9 @@ void midiin_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		return;
 	}
 
-	while (osd_poll_midi_channel(m_midi))
+	while (m_midi->poll())
 	{
-		bytesRead = osd_read_midi_channel(m_midi, buf);
+		bytesRead = m_midi->read(buf);
 
 		if (bytesRead > 0)
 		{
@@ -97,10 +98,12 @@ void midiin_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 bool midiin_device::call_load(void)
 {
-	m_midi = osd_open_midi_input(filename());
+	m_midi = machine().osd().create_midi_device();
 
-	if (m_midi == NULL)
+	if (!m_midi->open_input(filename()))
 	{
+		global_free(m_midi);
+		m_midi = NULL;
 		return IMAGE_INIT_FAIL;
 	}
 
@@ -117,7 +120,8 @@ void midiin_device::call_unload(void)
 {
 	if (m_midi)
 	{
-		osd_close_midi_channel(m_midi);
+		m_midi->close();
+		global_free(m_midi);
 	}
 		m_timer->enable(false);
 		m_midi = NULL;
