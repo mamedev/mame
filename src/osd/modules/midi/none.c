@@ -41,7 +41,7 @@ public:
 	virtual void write(UINT8 data);
 
 private:
-	int dummy;
+	//int dummy;
 };
 
 osd_midi_device *none_module::create_midi_device()
