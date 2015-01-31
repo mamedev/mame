@@ -31,7 +31,6 @@
 #pragma warning (disable: 5025 5026 5027)
 #define _CRT_STDIO_LEGACY_WIDE_SPECIFIERS
 #endif
-#define strtoll _strtoi64
 #endif
 
 #ifdef __GNUC__

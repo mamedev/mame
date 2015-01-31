@@ -256,13 +256,6 @@ typedef struct sqlite3 sqlite3;
 typedef sqlite_int64 sqlite3_int64;
 typedef sqlite_uint64 sqlite3_uint64;
 
-/* pointer-sized values */
-#ifdef PTR64
-typedef sqlite3_uint64                      FPTR;
-#else
-typedef unsigned int                        FPTR;
-#endif
-
 /*
 ** If compiling for a processor that lacks floating point support,
 ** substitute integer for floating-point.
@@ -4389,7 +4382,7 @@ SQLITE_API void sqlite3_set_auxdata(sqlite3_context*, int N, void*, void (*)(voi
 */
 typedef void (*sqlite3_destructor_type)(void*);
 #define SQLITE_STATIC      ((sqlite3_destructor_type)0)
-#define SQLITE_TRANSIENT   ((sqlite3_destructor_type)(FPTR)-1)
+#define SQLITE_TRANSIENT   ((sqlite3_destructor_type)-1)
 
 /*
 ** CAPI3REF: Setting The Result Of An SQL Function
