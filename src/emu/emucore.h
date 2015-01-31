@@ -21,8 +21,6 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-#include <sstream>
-
 // some cleanups for Solaris for things defined in stdlib.h
 #ifdef SDLMAME_SOLARIS
 #undef si_status
