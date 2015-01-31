@@ -13,22 +13,18 @@
 #ifdef _MSC_VER
 #include <assert.h>
 #include <malloc.h>
-#if _MSC_VER < 1800
+#if _MSC_VER < 1500 // < VS2008
+#define vsnprintf _vsnprintf
+#elif _MSC_VER < 1800 // < VS2013
 #define alloca _alloca
 #define round(x) floor((x) + 0.5)
-#endif
-#if _MSC_VER < 1500
-#define vsnprintf _vsnprintf
-#endif
-#if _MSC_VER < 1800
+#define strtoll _strtoi64
 #define _USE_MATH_DEFINES
 #include <math.h>
 static __inline double fmin(double x, double y){ return (x < y) ? x : y; }
 static __inline double fmax(double x, double y){ return (x > y) ? x : y; }
 static __inline double log2(double x) { return log(x) * M_LOG2E; }
-#define strtoll _strtoi64
-#endif
-#if _MSC_VER < 1900
+#elif _MSC_VER < 1900 // < VS2015
 #define snprintf _snprintf
 #else
 #pragma warning (disable: 4091)
