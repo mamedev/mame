@@ -787,6 +787,7 @@ ifdef USE_BGFX
 DEFS += -DUSE_BGFX
 OSDOBJS += $(SDLOBJ)/drawbgfx.o 
 INCPATH += -I$(3RDPARTY)/bgfx/include -I$(3RDPARTY)/bx/include
+LIBS += $(LIBGL)
 endif
 
 #-------------------------------------------------
