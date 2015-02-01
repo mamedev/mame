@@ -636,10 +636,12 @@ void sdl_osd_interface::extract_video_config(running_machine &machine)
 	{
 		video_config.mode = VIDEO_MODE_SDL2ACCEL;
 	}
+#ifdef USE_BGFX
 	else if (strcmp(stemp, SDLOPTVAL_BGFX) == 0)
 	{
 		video_config.mode = VIDEO_MODE_BGFX;
 	}
+#endif
 	else
 	{
 		osd_printf_warning("Invalid video value %s; reverting to software\n", stemp);

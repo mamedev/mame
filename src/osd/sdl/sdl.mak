@@ -80,6 +80,10 @@ SDL_FRAMEWORK_PATH = /Library/Frameworks/
 # uncomment to use SDL1.2 (depracated)
 # SDL_LIBVER = sdl
 
+# uncomment to use BGFX
+
+# USE_BGFX = 1
+
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
 ###########################################################################
@@ -779,8 +783,11 @@ endif
 # BGFX
 #-------------------------------------------------
 
+ifdef USE_BGFX
+DEFS += -DUSE_BGFX
 OSDOBJS += $(SDLOBJ)/drawbgfx.o 
 INCPATH += -I$(3RDPARTY)/bgfx/include -I$(3RDPARTY)/bx/include
+endif
 
 #-------------------------------------------------
 # X11
