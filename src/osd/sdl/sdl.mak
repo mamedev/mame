@@ -754,7 +754,6 @@ OSDOBJS += \
 	$(OSDOBJ)/modules/debugger/debugwin.o \
 	$(OSDOBJ)/modules/debugger/debugqt.o \
 
-
 #-------------------------------------------------
 # BGFX
 #-------------------------------------------------
@@ -764,6 +763,7 @@ DEFS += -DUSE_BGFX
 OSDOBJS += $(SDLOBJ)/drawbgfx.o 
 INCPATH += -I$(3RDPARTY)/bgfx/include -I$(3RDPARTY)/bx/include
 USE_DISPATCH_GL = 0
+BGFX_LIB = $(OBJ)/libbgfx.a
 endif
 
 #-------------------------------------------------
@@ -789,7 +789,6 @@ LDFLAGS += -Wl,-rpath=$(MESA_INSTALL_ROOT)/lib
 INCPATH += -I$(MESA_INSTALL_ROOT)/include
 endif
 endif
-
 
 #-------------------------------------------------
 # X11

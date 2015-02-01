@@ -369,7 +369,6 @@ RM = @rm -f
 OBJDUMP = @objdump
 PYTHON = @python
 
-
 #-------------------------------------------------
 # form the name of the executable
 #-------------------------------------------------
@@ -415,7 +414,7 @@ NAME = $(TARGET)$(SUBTARGET)
 endif
 
 # fullname is prefix+name+suffix+suffix64+suffixdebug
-FULLNAME ?= $(PREFIX)$(PREFIXSDL)$(NAME)$(SUFFIX)$(SUFFIX64)$(SUFFIXDEBUG)$(SUFFIXPROFILE)
+FULLNAME ?= $(BIN)$(PREFIX)$(PREFIXSDL)$(NAME)$(SUFFIX)$(SUFFIX64)$(SUFFIXDEBUG)$(SUFFIXPROFILE)
 
 # add an EXE suffix to get the final emulator name
 EMULATOR = $(FULLNAME)$(EXE)
@@ -708,7 +707,7 @@ endif
 # this variable
 #-------------------------------------------------
 
-OBJDIRS = $(OBJ) $(OBJ)/$(TARGET)/$(SUBTARGET)
+OBJDIRS += $(OBJ) $(OBJ)/$(TARGET)/$(SUBTARGET)
 
 
 #-------------------------------------------------
@@ -797,8 +796,8 @@ LIBS += -lsqlite3
 SQLITE3_LIB =
 endif
 
-# add BGFX library
-BGFX_LIB = $(OBJ)/libbgfx.a
+# add BGFX library - this is one in sdl.mak / windows.mak
+# BGFX_LIB = $(OBJ)/libbgfx.a
 
 # add PortMidi MIDI library
 ifeq ($(BUILD_MIDILIB),1)

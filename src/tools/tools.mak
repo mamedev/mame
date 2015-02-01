@@ -51,18 +51,18 @@ OBJDIRS += \
 #-------------------------------------------------
 
 TOOLS += \
-	romcmp$(EXE) \
-	chdman$(EXE) \
-	jedutil$(EXE) \
-	unidasm$(EXE) \
-	ldresample$(EXE) \
-	ldverify$(EXE) \
-	regrep$(EXE) \
-	srcclean$(EXE) \
-	src2html$(EXE) \
-	split$(EXE) \
-	pngcmp$(EXE) \
-	nltool$(EXE) \
+	$(BIN)romcmp$(EXE) \
+	$(BIN)chdman$(EXE) \
+	$(BIN)jedutil$(EXE) \
+	$(BIN)unidasm$(EXE) \
+	$(BIN)ldresample$(EXE) \
+	$(BIN)ldverify$(EXE) \
+	$(BIN)regrep$(EXE) \
+	$(BIN)srcclean$(EXE) \
+	$(BIN)src2html$(EXE) \
+	$(BIN)split$(EXE) \
+	$(BIN)pngcmp$(EXE) \
+	$(BIN)nltool$(EXE) \
 
 
 #-------------------------------------------------
@@ -72,7 +72,7 @@ TOOLS += \
 ROMCMPOBJS = \
 	$(TOOLSOBJ)/romcmp.o \
 
-romcmp$(EXE): $(ROMCMPOBJS) $(LIBUTIL) $(ZLIB) $(EXPAT) $(LIBOCORE)
+$(BIN)romcmp$(EXE): $(ROMCMPOBJS) $(LIBUTIL) $(ZLIB) $(EXPAT) $(LIBOCORE)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(BASELIBS) -o $@
 
@@ -85,7 +85,7 @@ romcmp$(EXE): $(ROMCMPOBJS) $(LIBUTIL) $(ZLIB) $(EXPAT) $(LIBOCORE)
 CHDMANOBJS = \
 	$(TOOLSOBJ)/chdman.o \
 
-chdman$(EXE): $(CHDMANOBJS) $(LIBUTIL) $(ZLIB) $(EXPAT) $(FLAC_LIB) $(7Z_LIB) $(LIBOCORE)
+$(BIN)chdman$(EXE): $(CHDMANOBJS) $(LIBUTIL) $(ZLIB) $(EXPAT) $(FLAC_LIB) $(7Z_LIB) $(LIBOCORE)
 	$(CC) $(CDEFS) $(CFLAGS) -c $(SRC)/version.c -o $(VERSIONOBJ)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $(VERSIONOBJ) $^ $(BASELIBS) $(FLAC_LIB) -o $@
@@ -99,7 +99,7 @@ chdman$(EXE): $(CHDMANOBJS) $(LIBUTIL) $(ZLIB) $(EXPAT) $(FLAC_LIB) $(7Z_LIB) $(
 JEDUTILOBJS = \
 	$(TOOLSOBJ)/jedutil.o \
 
-jedutil$(EXE): $(JEDUTILOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
+$(BIN)jedutil$(EXE): $(JEDUTILOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(BASELIBS) -o $@
 
@@ -113,7 +113,7 @@ UNIDASMOBJS = \
 	$(TOOLSOBJ)/unidasm.o \
 
 # TODO: Visual Studio wants $(FLAC_LIB) and $(7Z_LIB) during linking...
-unidasm$(EXE): $(UNIDASMOBJS) $(LIBDASM) $(LIBEMU) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT) $(FLAC_LIB) $(7Z_LIB)
+$(BIN)unidasm$(EXE): $(UNIDASMOBJS) $(LIBDASM) $(LIBEMU) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT) $(FLAC_LIB) $(7Z_LIB)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(BASELIBS) -o $@
 
@@ -126,7 +126,7 @@ unidasm$(EXE): $(UNIDASMOBJS) $(LIBDASM) $(LIBEMU) $(LIBUTIL) $(LIBOCORE) $(ZLIB
 LDRESAMPLEOBJS = \
 	$(TOOLSOBJ)/ldresample.o \
 
-ldresample$(EXE): $(LDRESAMPLEOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB) $(7Z_LIB) $(EXPAT)
+$(BIN)ldresample$(EXE): $(LDRESAMPLEOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB) $(7Z_LIB) $(EXPAT)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(BASELIBS) $(FLAC_LIB) -o $@
 
@@ -139,7 +139,7 @@ ldresample$(EXE): $(LDRESAMPLEOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB) $
 LDVERIFYOBJS = \
 	$(TOOLSOBJ)/ldverify.o \
 
-ldverify$(EXE): $(LDVERIFYOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB) $(7Z_LIB) $(EXPAT)
+$(BIN)ldverify$(EXE): $(LDVERIFYOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB) $(7Z_LIB) $(EXPAT)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(BASELIBS) $(FLAC_LIB) -o $@
 
@@ -152,7 +152,7 @@ ldverify$(EXE): $(LDVERIFYOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB) $(7Z_
 REGREPOBJS = \
 	$(TOOLSOBJ)/regrep.o \
 
-regrep$(EXE): $(REGREPOBJS) $(LIBUTIL) $(FLAC_LIB) $(LIBOCORE) $(ZLIB) $(EXPAT)
+$(BIN)regrep$(EXE): $(REGREPOBJS) $(LIBUTIL) $(FLAC_LIB) $(LIBOCORE) $(ZLIB) $(EXPAT)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(BASELIBS) -o $@
 
@@ -165,7 +165,7 @@ regrep$(EXE): $(REGREPOBJS) $(LIBUTIL) $(FLAC_LIB) $(LIBOCORE) $(ZLIB) $(EXPAT)
 SRCCLEANOBJS = \
 	$(TOOLSOBJ)/srcclean.o \
 
-srcclean$(EXE): $(SRCCLEANOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
+$(BIN)srcclean$(EXE): $(SRCCLEANOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(BASELIBS) -o $@
 
@@ -178,7 +178,7 @@ srcclean$(EXE): $(SRCCLEANOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
 SRC2HTMLOBJS = \
 	$(TOOLSOBJ)/src2html.o \
 
-src2html$(EXE): $(SRC2HTMLOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
+$(BIN)src2html$(EXE): $(SRC2HTMLOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(BASELIBS) -o $@
 
@@ -192,7 +192,7 @@ SPLITOBJS = \
 	$(TOOLSOBJ)/split.o \
 
 # TODO: Visual Studio wants $(FLAC_LIB) and $(7Z_LIB) during linking...
-split$(EXE): $(SPLITOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT) $(FLAC_LIB) $(7Z_LIB)
+$(BIN)split$(EXE): $(SPLITOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT) $(FLAC_LIB) $(7Z_LIB)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(BASELIBS) -o $@
 
@@ -205,7 +205,7 @@ split$(EXE): $(SPLITOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT) $(FLAC_LIB) $(
 PNGCMPOBJS = \
 	$(TOOLSOBJ)/pngcmp.o \
 
-pngcmp$(EXE): $(PNGCMPOBJS) $(LIBUTIL) $(FLAC_LIB) $(LIBOCORE) $(ZLIB)
+$(BIN)pngcmp$(EXE): $(PNGCMPOBJS) $(LIBUTIL) $(FLAC_LIB) $(LIBOCORE) $(ZLIB)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(BASELIBS) -o $@
 
@@ -217,7 +217,7 @@ NLTOOLOBJS = \
 	$(TOOLSOBJ)/nltool.o \
 	$(NETLISTOBJS) \
 
-nltool$(EXE): $(NLTOOLOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
+$(BIN)nltool$(EXE): $(NLTOOLOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(BASELIBS) -o $@
 
