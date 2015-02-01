@@ -2462,7 +2462,7 @@ INLINE void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int width, co
 	int x;
 
 	assert(xborderpix == 0 || xborderpix == 2);
-	assert(m_width % 2 == 0);
+	assert(width % 2 == 0);
 
 	// palette (really RGB map) case
 	if (palette != NULL)
