@@ -14,6 +14,14 @@
 #include "sound/ay8910.h"
 
 
+void fastfred_state::machine_start()
+{
+	save_item(NAME(m_charbank));
+	save_item(NAME(m_colorbank));
+	save_item(NAME(m_nmi_mask));
+	save_item(NAME(m_sound_nmi_mask));
+}
+
 // This routine is a big hack, but the only way I can get the game working
 // without knowing anything about the way the protection chip works.
 // These values were derived based on disassembly of the code. Usually, it
@@ -124,6 +132,7 @@ READ8_MEMBER(fastfred_state::boggy84_custom_io_r)
 
 MACHINE_START_MEMBER(fastfred_state,imago)
 {
+	machine_start();
 	m_gfxdecode->gfx(1)->set_source(m_imago_sprites);
 }
 
@@ -1039,13 +1048,13 @@ DRIVER_INIT_MEMBER(fastfred_state,imago)
 	m_hardware_type = 3;
 }
 
-GAME( 1982, flyboy,   0,        fastfred, flyboy, fastfred_state,   flyboy,   ROT90, "Kaneko", "Fly-Boy", 0 )
-GAME( 1982, flyboyb,  flyboy,   fastfred, flyboy, fastfred_state,   flyboyb,  ROT90, "bootleg", "Fly-Boy (bootleg)", 0 )
-GAME( 1982, fastfred, flyboy,   fastfred, fastfred, fastfred_state, fastfred, ROT90, "Kaneko (Atari license)", "Fast Freddie", 0 )
-GAME( 1983, jumpcoas, 0,        jumpcoas, jumpcoas, fastfred_state, jumpcoas, ROT90, "Kaneko", "Jump Coaster", 0 )
-GAME( 1983, jumpcoast,jumpcoas, jumpcoas, jumpcoas, fastfred_state, jumpcoas, ROT90, "Kaneko (Taito license)", "Jump Coaster (Taito)", 0 )
-GAME( 1983, boggy84,  0,        jumpcoas, boggy84, fastfred_state,  boggy84,  ROT90, "Kaneko", "Boggy '84", 0 )
-GAME( 1983, boggy84b, boggy84,  jumpcoas, boggy84, fastfred_state,  boggy84b, ROT90, "bootleg (Eddie's Games)", "Boggy '84 (bootleg)", 0 )
-GAME( 1986, redrobin, 0,        fastfred, redrobin, fastfred_state, flyboyb,  ROT90, "Elettronolo", "Red Robin", 0 )
+GAME( 1982, flyboy,   0,        fastfred, flyboy, fastfred_state,   flyboy,   ROT90, "Kaneko", "Fly-Boy", GAME_SUPPORTS_SAVE )
+GAME( 1982, flyboyb,  flyboy,   fastfred, flyboy, fastfred_state,   flyboyb,  ROT90, "bootleg", "Fly-Boy (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1982, fastfred, flyboy,   fastfred, fastfred, fastfred_state, fastfred, ROT90, "Kaneko (Atari license)", "Fast Freddie", GAME_SUPPORTS_SAVE )
+GAME( 1983, jumpcoas, 0,        jumpcoas, jumpcoas, fastfred_state, jumpcoas, ROT90, "Kaneko", "Jump Coaster", GAME_SUPPORTS_SAVE )
+GAME( 1983, jumpcoast,jumpcoas, jumpcoas, jumpcoas, fastfred_state, jumpcoas, ROT90, "Kaneko (Taito license)", "Jump Coaster (Taito)", GAME_SUPPORTS_SAVE )
+GAME( 1983, boggy84,  0,        jumpcoas, boggy84, fastfred_state,  boggy84,  ROT90, "Kaneko", "Boggy '84", GAME_SUPPORTS_SAVE )
+GAME( 1983, boggy84b, boggy84,  jumpcoas, boggy84, fastfred_state,  boggy84b, ROT90, "bootleg (Eddie's Games)", "Boggy '84 (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1986, redrobin, 0,        fastfred, redrobin, fastfred_state, flyboyb,  ROT90, "Elettronolo", "Red Robin", GAME_SUPPORTS_SAVE )
 GAME( 1984, imago,    0,        imago,    imago, fastfred_state,    imago,    ROT90, "Acom", "Imago (cocktail set)", 0 )
 GAME( 1983, imagoa,   imago,    imago,    imagoa, fastfred_state,   imago,    ROT90, "Acom", "Imago (no cocktail set)", 0 )

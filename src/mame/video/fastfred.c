@@ -345,6 +345,24 @@ VIDEO_START_MEMBER(fastfred_state,imago)
 	/* web colors */
 	m_palette->set_pen_color(256+64+0,rgb_t(0x50,0x00,0x00));
 	m_palette->set_pen_color(256+64+1,rgb_t(0x00,0x00,0x00));
+	
+	save_item(NAME(m_imago_sprites));
+	save_item(NAME(m_imago_sprites_address));
+	save_item(NAME(m_imago_sprites_bank));
+
+	// galaxold starfield related save states. Something's still missing here.
+	save_item(NAME(m_stars_on));
+	save_item(NAME(m_stars_blink_state));
+	save_item(NAME(m_timer_adjusted));
+	save_item(NAME(m_stars_colors_start));
+	save_item(NAME(m_stars_scrollpos));
+	
+	for (int i = 0; i < STAR_COUNT; i++)
+	{
+		save_item(NAME(m_stars[i].x), i);
+		save_item(NAME(m_stars[i].y), i);
+		save_item(NAME(m_stars[i].color), i);
+	}
 }
 
 UINT32 fastfred_state::screen_update_imago(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
