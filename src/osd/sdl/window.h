@@ -40,13 +40,15 @@ public:
 	osd_renderer(sdl_window_info *window)
 	: m_window(window) { }
 
+	virtual ~osd_renderer() { }
+
 	sdl_window_info &window() { return *m_window; }
 
 	virtual int create(int width, int height) = 0;
 	virtual void resize(int width, int height) = 0;
 	virtual int draw(UINT32 dc, int update) = 0;
 	virtual void set_target_bounds() = 0;
-	virtual int y_to_render_target(int x, int y, int *xt, int *yt) = 0;
+	virtual int xy_to_render_target(int x, int y, int *xt, int *yt) = 0;
 	virtual void destroy_all_textures() = 0;
 	virtual void destroy() = 0;
 	virtual void clear() = 0;
@@ -62,7 +64,7 @@ public:
 			int index, const sdl_window_config *config)
 	: m_next(NULL), m_minwidth(0), m_minheight(0),
 		m_startmaximized(0),
-		m_rendered_event(0), m_target(0), m_primlist(NULL), m_dxdata(NULL),
+		m_rendered_event(0), m_target(0), m_primlist(NULL),
 		m_width(0), m_height(0), m_blitwidth(0), m_blitheight(0),
 		m_start_viewscreen(0),
 #if (SDLMAME_SDL2)
@@ -71,7 +73,7 @@ public:
 		m_resize_height(0),
 		m_last_resize(0),
 #else
-		screen_width(0), screen_height(0),
+		m_screen_width(0), m_screen_height(0),
 #endif
 		m_machine(a_machine), m_monitor(a_monitor), m_fullscreen(0), m_index(0)
 	{
@@ -89,15 +91,18 @@ public:
 		m_windowed_height = config->height;
 	}
 
+	~sdl_window_info()
+	{
+		global_free(m_renderer);
+	}
+
 	void video_window_update(running_machine &machine);
-	//void blit_surface_size(int window_width, int window_height);
 	void toggle_full_screen(running_machine &machine);
 	void modify_prescale(running_machine &machine, int dir);
 	void window_resize(INT32 width, INT32 height);
 	void window_clear();
 
 	void video_window_destroy(running_machine &machine);
-	//void pick_best_mode(int *fswidth, int *fsheight);
 	void get_min_bounds(int *window_width, int *window_height, int constrain);
 	void get_max_bounds(int *window_width, int *window_height, int constrain);
 
@@ -111,17 +116,7 @@ public:
 	void pick_best_mode(int *fswidth, int *fsheight);
 	int index() const { return m_index; }
 
-#if 1
-	// Draw Callbacks
-	int (*create)(sdl_window_info *window, int m_width, int m_height);
-	void (*resize)(sdl_window_info *window, int m_width, int m_height);
-	int (*draw)(sdl_window_info *window, UINT32 dc, int update);
-	void (*set_target_bounds)(sdl_window_info *window);
-	int (*xy_to_render_target)(sdl_window_info *window, int x, int y, int *xt, int *yt);
-	void (*destroy_all_textures)(sdl_window_info *window);
-	void (*destroy)(sdl_window_info *window);
-	void (*clear)(sdl_window_info *window);
-#endif
+	osd_renderer &renderer() { return *m_renderer; }
 
 	// Pointer to next window
 	sdl_window_info *   m_next;
@@ -142,9 +137,6 @@ public:
 	osd_event *         m_rendered_event;
 	render_target *     m_target;
 	render_primitive_list *m_primlist;
-
-	// drawing data
-	void *              m_dxdata;
 
 	// cache of physical m_width and m_height
 	int                 m_width;
@@ -171,6 +163,10 @@ public:
 	int                 m_screen_height;
 #endif
 
+	void set_renderer(osd_renderer *renderer)
+	{
+		m_renderer = renderer;
+	}
 private:
 	void constrain_to_aspect_ratio(int *window_width, int *window_height, int adjustment);
 
@@ -186,8 +182,8 @@ private:
 
 struct sdl_draw_info
 {
+	osd_renderer *(*create)(sdl_window_info *window);
 	void (*exit)(void);
-	void (*attach)(sdl_draw_info *info, sdl_window_info *window);
 };
 
 //============================================================

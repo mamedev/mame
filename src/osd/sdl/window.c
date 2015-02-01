@@ -483,8 +483,8 @@ static OSDWORK_CALLBACK( sdlwindow_resize_wt )
 
 	ASSERT_WINDOW_THREAD();
 
-	window->destroy_all_textures(window);
-	window->resize(window, wp->new_width(), wp->new_height());
+	window->renderer().destroy_all_textures();
+	window->renderer().resize(wp->new_width(), wp->new_height());
 
 	window->blit_surface_size(wp->new_width(), wp->new_height());
 
@@ -517,7 +517,7 @@ static OSDWORK_CALLBACK( sdlwindow_clear_surface_wt )
 
 	ASSERT_WINDOW_THREAD();
 
-	window->clear(window);
+	window->renderer().clear();
 	osd_free(wp);
 	return NULL;
 }
@@ -558,7 +558,7 @@ static OSDWORK_CALLBACK( sdlwindow_toggle_full_screen_wt )
 		window->m_windowed_height = window->m_height;
 	}
 
-	window->destroy(window);
+	window->renderer().destroy();
 	sdlinput_release_keys(wp->machine());
 
 	// toggle the window mode
@@ -582,7 +582,7 @@ static OSDWORK_CALLBACK( destroy_all_textures_wt )
 
 	sdl_window_info *window = wp->window();
 
-	window->destroy_all_textures(window);
+	window->renderer().destroy_all_textures();
 
 	osd_free(wp);
 	return NULL;
@@ -722,7 +722,7 @@ int sdlwindow_video_window_create(running_machine &machine, int index, sdl_monit
 	*last_window_ptr = window;
 	last_window_ptr = &window->m_next;
 
-	draw.attach(&draw, window);
+	window->set_renderer(draw.create(window));
 
 	// create an event that we can use to skip blitting
 	window->m_rendered_event = osd_event_alloc(FALSE, TRUE);
@@ -781,7 +781,7 @@ static OSDWORK_CALLBACK( sdlwindow_video_window_destroy_wt )
 	ASSERT_WINDOW_THREAD();
 
 	// free the textures etc
-	window->destroy(window);
+	window->renderer().destroy();
 
 	// release all keys ...
 	sdlinput_release_keys(wp->machine());
@@ -1027,7 +1027,7 @@ void sdl_window_info::video_window_update(running_machine &machine)
 			}
 
 			// ensure the target bounds are up-to-date, and then get the primitives
-			set_target_bounds(this);
+			renderer().set_target_bounds();
 
 			render_primitive_list &primlist = m_target->get_primitives();
 
@@ -1116,7 +1116,7 @@ static OSDWORK_CALLBACK( complete_create_wt )
 	}
 
 	// initialize the drawing backend
-	if (window->create(window, tempwidth, tempheight))
+	if (window->renderer().create(tempwidth, tempheight))
 		return (void *) &result[1];
 
 	// Make sure we have a consistent state
@@ -1147,7 +1147,7 @@ static void measure_fps(sdl_window_info *window, UINT32 dc, int update)
 
 	t0 = osd_ticks();
 
-	window->draw(window, dc, update);
+	window->renderer().draw(dc, update);
 
 	frames++;
 	currentTime = osd_ticks();
@@ -1198,7 +1198,7 @@ static OSDWORK_CALLBACK( draw_video_contents_wt )
 		if( video_config.perftest )
 			measure_fps(window, dc, update);
 		else
-			window->draw(window, dc, update);
+			window->renderer().draw(dc, update);
 	}
 
 	/* all done, ready for next */
