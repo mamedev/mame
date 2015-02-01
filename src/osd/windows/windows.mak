@@ -371,6 +371,7 @@ OSDOBJS = \
 	$(WINOBJ)/d3dhlsl.o \
 	$(WINOBJ)/drawdd.o \
 	$(WINOBJ)/drawgdi.o \
+	$(WINOBJ)/drawbgfx.o \
 	$(WINOBJ)/drawnone.o \
 	$(WINOBJ)/input.o \
 	$(WINOBJ)/output.o \
@@ -415,6 +416,8 @@ OSDOBJS += \
 
 # add a stub resource file
 RESFILE = $(WINOBJ)/mame.res
+
+INCPATH += -I$(3RDPARTY)/bgfx/include -I$(3RDPARTY)/bx/include
 
 #-------------------------------------------------
 # QT Debug library

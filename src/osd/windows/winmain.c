@@ -526,6 +526,7 @@ void windows_osd_interface::video_register()
 	video_options_add("gdi", NULL);
 	video_options_add("ddraw", NULL);
 	video_options_add("d3d", NULL);
+	video_options_add("bgfx", NULL);
 	//video_options_add("auto", NULL); // making d3d video default one
 }
 
