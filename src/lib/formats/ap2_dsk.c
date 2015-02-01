@@ -615,6 +615,7 @@ bool a2_16sect_format::load(io_generic *io, UINT32 form_factor, floppy_image *im
 		static const unsigned char dos33_block1[4] = { 0xa2, 0x02, 0x8e, 0x52 };
 		static const unsigned char sos_block1[4] = { 0xc9, 0x20, 0xf0, 0x3e };
 		static const unsigned char a3a2emul_block1[6] = { 0x8d, 0xd0, 0x03, 0x4c, 0xc7, 0xa4 };
+		static const unsigned char cpm22_block1[8] = { 0xa2, 0x55, 0xa9, 0x00, 0x9d, 0x00, 0x0d, 0xca };
 
 		io_generic_read(io, sector_data, fpos, 256*16);
 
@@ -656,6 +657,10 @@ bool a2_16sect_format::load(io_generic *io, UINT32 form_factor, floppy_image *im
 				m_prodos_order = true;
 			}   // check for a later version of the Pascal boot block
 			else if (!memcmp(pascal2_block1, &sector_data[0x100], 4))
+			{
+				m_prodos_order = true;
+			}	// check for CP/M disks in ProDOS order
+			else if (!memcmp(cpm22_block1, &sector_data[0x100], 8))
 			{
 				m_prodos_order = true;
 			}
