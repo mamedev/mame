@@ -108,8 +108,9 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( wildfire )
-	ROM_REGION( 0x0600, "maincpu", 0 )
-	ROM_LOAD( "us4341385", 0x0000, 0x0600, CRC(84ac0f1f) SHA1(1e00ddd402acfc2cc267c34eed4b89d863e2144f) ) // from patent US4334679, data should be correct (it included checksums)
+	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "us4341385", 0x0000, 0x0400, CRC(84ac0f1f) SHA1(1e00ddd402acfc2cc267c34eed4b89d863e2144f) ) // from patent US4334679, data should be correct (it included checksums)
+	ROM_CONTINUE(          0x0600, 0x0200 )
 ROM_END
 
 
