@@ -134,11 +134,6 @@ static int drawbgfx_window_draw(win_window_info *window, HDC dc, int update)
 	// if no other draw calls are submitted to view 0.
 	bgfx::submit(0);
 
-	// Use debug font to print information about this example.
-	//bgfx::dbgTextClear();
-	//bgfx::dbgTextPrintf(0, 1, 0x4f, "MAME BGFX test");
-	//bgfx::dbgTextPrintf(0, 2, 0x6f, "Description: Initialization and debug text.");
-
 	window->m_primlist->acquire_lock();
 
 	// now draw

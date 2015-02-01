@@ -520,6 +520,7 @@ void sdl_osd_interface::video_register()
 {
 	video_options_add("soft", NULL);
 	video_options_add("opengl", NULL);
+	video_options_add("bgfx", NULL);
 	//video_options_add("auto", NULL); // making d3d video default one
 }
 
