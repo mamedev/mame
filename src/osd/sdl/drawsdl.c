@@ -96,6 +96,9 @@ public:
 	UINT32              m_extra_flags;
 
 #if (SDLMAME_SDL2)
+	// Original display_mode
+	SDL_DisplayMode 	m_original_mode;
+
 	SDL_Renderer        *m_sdl_renderer;
 	SDL_Texture         *m_texture_id;
 #else
@@ -399,7 +402,33 @@ static void drawsdl_show_info(struct SDL_RendererInfo *render_info)
 #endif
 
 //============================================================
-//  drawsdl_window_create
+//  sdl_info::create
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
 //============================================================
 
 int sdl_info::create(int width, int height)
@@ -408,35 +437,66 @@ int sdl_info::create(int width, int height)
 
 #if (SDLMAME_SDL2)
 
-	/* set hints ... */
+	osd_printf_verbose("Enter sdl_info::create\n");
 
+	/* set hints ... */
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, sm->sdl_scale_mode);
 
+	// create the SDL window
+	// soft driver also used | SDL_WINDOW_INPUT_GRABBED | SDL_WINDOW_MOUSE_FOCUS
 	m_extra_flags = (window().fullscreen() ?
-			SDL_WINDOW_BORDERLESS | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS
-			| SDL_WINDOW_INPUT_GRABBED : SDL_WINDOW_RESIZABLE);
+			SDL_WINDOW_BORDERLESS | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE);
 
-	window().m_sdl_window = SDL_CreateWindow(window().m_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+#if defined(SDLMAME_WIN32)
+	SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
+#endif
+	window().m_sdl_window = SDL_CreateWindow(window().m_title,
+			window().monitor()->position_size().x, window().monitor()->position_size().y,
 			width, height, m_extra_flags);
+	//window().m_sdl_window = SDL_CreateWindow(window().m_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+	//		width, height, m_extra_flags);
+
+	if  (!window().m_sdl_window )
+	{
+		osd_printf_error("Unable to create window: %s\n", SDL_GetError());
+		return 1;
+	}
 
 	if (window().fullscreen() && video_config.switchres)
 	{
 		SDL_DisplayMode mode;
-		SDL_GetCurrentDisplayMode(window().monitor()->handle(), &mode);
+		//SDL_GetCurrentDisplayMode(window().monitor()->handle, &mode);
+		SDL_GetWindowDisplayMode(window().m_sdl_window, &mode);
+		m_original_mode = mode;
 		mode.w = width;
 		mode.h = height;
 		if (window().m_refresh)
 			mode.refresh_rate = window().m_refresh;
+
 		SDL_SetWindowDisplayMode(window().m_sdl_window, &mode);    // Try to set mode
+#ifndef SDLMAME_WIN32
+		/* FIXME: Warp the mouse to 0,0 in case a virtual desktop resolution
+		 * is in place after the mode switch - which will most likely be the case
+		 * This is a hack to work around a deficiency in SDL2
+		 */
+		SDL_WarpMouseInWindow(window().m_sdl_window, 1, 1);
+#endif
 	}
 	else
-		SDL_SetWindowDisplayMode(window().m_sdl_window, NULL); // Use desktop
+	{
+		//SDL_SetWindowDisplayMode(window().m_sdl_window, NULL); // Use desktop
+	}
+	// create renderer
+
+	//SDL_SelectRenderer(window().sdl_window);
+
+	// show window
 
 	SDL_ShowWindow(window().m_sdl_window);
-
-	SDL_SetWindowFullscreen(window().m_sdl_window, (SDL_bool) window().fullscreen());
-	SDL_GetWindowSize(window().m_sdl_window, &window().m_width, &window().m_height);
+	//SDL_SetWindowFullscreen(window().m_sdl_window, window().fullscreen);
 	SDL_RaiseWindow(window().m_sdl_window);
+
+	SDL_GetWindowSize(window().m_sdl_window, &window().m_width, &window().m_height);
 
 	/* FIXME: Bug in SDL 1.3 */
 	if (window().fullscreen())
@@ -495,16 +555,19 @@ int sdl_info::create(int width, int height)
 
 	// set the window title
 	SDL_WM_SetCaption(window().m_title, "SDLMAME");
+
 #endif
+
 	m_yuv_lookup = NULL;
 	m_blittimer = 0;
 
 	yuv_init();
+	osd_printf_verbose("Leave sdl_info::create\n");
 	return 0;
 }
 
 //============================================================
-//  drawsdl_window_resize
+//  sdl_info::resize
 //============================================================
 
 void sdl_info::resize(int width, int height)
@@ -523,8 +586,7 @@ void sdl_info::resize(int width, int height)
 		m_yuvsurf = NULL;
 	}
 	SDL_FreeSurface(m_sdlsurf);
-	//printf("SetVideoMode %d %d\n", wp->resize_new_width, wp->resize_new_height);
-
+	
 	m_sdlsurf = SDL_SetVideoMode(width, height, 0,
 			SDL_SWSURFACE | SDL_ANYFORMAT | m_extra_flags);
 	window().m_width = m_sdlsurf->w;
@@ -540,7 +602,7 @@ void sdl_info::resize(int width, int height)
 
 
 //============================================================
-//  drawsdl_window_destroy
+//  sdl_info::destroy
 //============================================================
 
 void sdl_info::destroy()
@@ -550,6 +612,13 @@ void sdl_info::destroy()
 	//SDL_SelectRenderer(window().sdl_window);
 	SDL_DestroyTexture(m_texture_id);
 	//SDL_DestroyRenderer(window().sdl_window);
+	if (window().fullscreen() && video_config.switchres)
+	{
+		SDL_SetWindowFullscreen(window().m_sdl_window, 0);    // Try to set mode
+		SDL_SetWindowDisplayMode(window().m_sdl_window, &m_original_mode);    // Try to set mode
+		SDL_SetWindowFullscreen(window().m_sdl_window, SDL_WINDOW_FULLSCREEN);    // Try to set mode
+	}
+
 	SDL_DestroyWindow(window().m_sdl_window);
 #else
 	if (m_yuvsurf != NULL)
@@ -579,7 +648,7 @@ void sdl_info::destroy()
 }
 
 //============================================================
-//  drawsdl_window_clear
+//  sdl_info::draw
 //============================================================
 
 void sdl_info::clear()

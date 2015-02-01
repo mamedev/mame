@@ -223,7 +223,7 @@ public:
 #if (SDLMAME_SDL2)
 		m_gl_context_id(0),
 #else
-		sdlsurf(NULL),
+		m_sdlsurf(NULL),
 #endif
 		m_initialized(0),
 		m_last_blendmode(0),
@@ -258,6 +258,7 @@ public:
 	/* virtual */ void clear();
 
 	void loadGLExtensions();
+	void initialize_gl();
 	void set_blendmode(int blendmode);
 	void texture_compute_type_subroutine(const render_texinfo *texsource, texture_info *texture, UINT32 flags);
 	void texture_compute_size_subroutine(texture_info *texture, UINT32 flags,
@@ -277,11 +278,15 @@ public:
 	INT32           m_blittimer;
 	UINT32          m_extra_flags;
 
+
 #if (SDLMAME_SDL2)
+	// Original display_mode
+	SDL_DisplayMode m_original_mode;
+
 	SDL_GLContext   m_gl_context_id;
 #else
 	// SDL surface
-	SDL_Surface         *sdlsurf;
+	SDL_Surface         *m_sdlsurf;
 #endif
 
 	int             m_initialized;        // is everything well initialized, i.e. all GL stuff etc.
@@ -464,10 +469,6 @@ int drawogl_init(running_machine &machine, sdl_draw_info *callbacks)
 
 
 //============================================================
-//  drawogl_attach
-//============================================================
-
-//============================================================
 // Load the OGL function addresses
 //============================================================
 
@@ -528,123 +529,12 @@ static void load_gl_lib(running_machine &machine)
 #endif
 }
 
-//============================================================
-//  sdl_info::create
-//============================================================
-
-int sdl_info_ogl::create(int width, int height)
+void sdl_info_ogl::initialize_gl()
 {
-	char *extstr;
-	char *vendor;
 	int has_and_allow_texturerect = 0;
 
-#if (SDLMAME_SDL2)
-	m_extra_flags = (window().fullscreen() ?
-			SDL_WINDOW_BORDERLESS | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE);
-	m_extra_flags |= SDL_WINDOW_OPENGL;
-
-	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-
-	/* FIXME: A reminder that gamma is wrong throughout MAME. Currently, SDL2.0 doesn't seem to
-	 * support the following attribute although my hardware lists GL_ARB_framebuffer_sRGB as an extension.
-	 *
-	 * SDL_GL_SetAttribute( SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, 1 );
-	 *
-	 */
-
-	//Moved into init
-	//load_gl_lib(window().machine());
-
-	// create the SDL window
-	window().m_sdl_window = SDL_CreateWindow(window().m_title,
-			window().monitor()->position_size().x, window().monitor()->position_size().y,
-			width, height, m_extra_flags);
-
-	if  (!window().m_sdl_window )
-	{
-		osd_printf_error("OpenGL not supported on this driver: %s\n", SDL_GetError());
-		return 1;
-	}
-
-	if (window().fullscreen() && video_config.switchres)
-	{
-		SDL_DisplayMode mode;
-		SDL_GetCurrentDisplayMode(window().monitor()->handle(), &mode);
-		mode.w = width;
-		mode.h = height;
-		if (window().m_refresh)
-			mode.refresh_rate = window().m_refresh;
-		SDL_SetWindowDisplayMode(window().m_sdl_window, &mode);    // Try to set mode
-	}
-	else
-		SDL_SetWindowDisplayMode(window().m_sdl_window, NULL); // Use desktop
-
-	SDL_ShowWindow(window().m_sdl_window);
-	//SDL_SetWindowFullscreen(window().sdl_window, window().fullscreen);
-	SDL_RaiseWindow(window().m_sdl_window);
-	SDL_GetWindowSize(window().m_sdl_window, &window().m_width, &window().m_height);
-
-	m_gl_context_id = SDL_GL_CreateContext(window().m_sdl_window);
-	if  (!m_gl_context_id)
-	{
-		osd_printf_error("OpenGL not supported on this driver: %s\n", SDL_GetError());
-		return 1;
-	}
-
-	SDL_GL_SetSwapInterval(video_config.waitvsync ? 2 : 0);
-
-#else
-	m_extra_flags = (window().fullscreen() ?  SDL_FULLSCREEN : SDL_RESIZABLE);
-	m_extra_flags |= SDL_OPENGL | SDL_DOUBLEBUF;
-
-	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-	#if (SDL_VERSION_ATLEAST(1,2,10)) && (!defined(SDLMAME_EMSCRIPTEN))
-	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, video_config.waitvsync ? 1 : 0);
-	#endif
-
-	load_gl_lib(window().machine());
-
-	// create the SDL surface (which creates the window in windowed mode)
-	sdlsurf = SDL_SetVideoMode(width, height,
-							0, SDL_SWSURFACE  | SDL_ANYFORMAT | m_extra_flags);
-
-	if (!sdlsurf)
-		return 1;
-
-	window().m_width = sdlsurf->w;
-	window().m_height = sdlsurf->h;
-
-	window().m_screen_width = 0;
-	window().m_screen_height = 0;
-
-	if ( (video_config.mode  == VIDEO_MODE_OPENGL) && !(sdlsurf->flags & SDL_OPENGL) )
-	{
-		osd_printf_error("OpenGL not supported on this driver!\n");
-		return 1;
-	}
-
-	// set the window title
-	SDL_WM_SetCaption(window().m_title, "SDLMAME");
-
-#endif
-	m_blittimer = 0;
-	m_surf_w = 0;
-	m_surf_h = 0;
-
-	m_initialized = 0;
-
-	// in case any textures try to come up before these are validated,
-	// OpenGL guarantees all implementations can handle something this size.
-	m_texture_max_width = 64;
-	m_texture_max_height = 64;
-
-	/* load any GL function addresses
-	 * this must be done here because we need a context
-	 */
-	loadgl_functions();
-
-	extstr = (char *)glGetString(GL_EXTENSIONS);
-	vendor = (char *)glGetString(GL_VENDOR);
+	char *extstr = (char *)glGetString(GL_EXTENSIONS);
+	char *vendor = (char *)glGetString(GL_VENDOR);
 
 	//printf("%s\n", extstr);
 
@@ -787,8 +677,178 @@ int sdl_info_ogl::create(int width, int height)
 
 	shown_video_info = 1;
 
+}
+//============================================================
+//  sdl_info::create
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+//============================================================
+
+int sdl_info_ogl::create(int width, int height)
+{
+#if (SDLMAME_SDL2)
+
+	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
+
+	/* FIXME: A reminder that gamma is wrong throughout MAME. Currently, SDL2.0 doesn't seem to
+	 * support the following attribute although my hardware lists GL_ARB_framebuffer_sRGB as an extension.
+	 *
+	 * SDL_GL_SetAttribute( SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, 1 );
+	 *
+	 */
+
+	osd_printf_verbose("Enter sdl_info_ogl::create\n");
+
+	// create the SDL window
+	// soft driver also used | SDL_WINDOW_INPUT_GRABBED | SDL_WINDOW_MOUSE_FOCUS
+	m_extra_flags = (window().fullscreen() ?
+			SDL_WINDOW_BORDERLESS | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE);
+
+	m_extra_flags |= SDL_WINDOW_OPENGL;
+
+
+#if defined(SDLMAME_WIN32)
+	SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
+#endif
+	// create the SDL window
+	window().m_sdl_window = SDL_CreateWindow(window().m_title,
+			window().monitor()->position_size().x, window().monitor()->position_size().y,
+			width, height, m_extra_flags);
+	//window().m_sdl_window = SDL_CreateWindow(window().m_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+	//		width, height, m_extra_flags);
+
+	if  (!window().m_sdl_window )
+	{
+		osd_printf_error("OpenGL not supported on this driver: %s\n", SDL_GetError());
+		return 1;
+	}
+
+	if (window().fullscreen() && video_config.switchres)
+	{
+		SDL_DisplayMode mode;
+		//SDL_GetCurrentDisplayMode(window().monitor()->handle, &mode);
+		SDL_GetWindowDisplayMode(window().m_sdl_window, &mode);
+		m_original_mode = mode;
+		mode.w = width;
+		mode.h = height;
+		if (window().m_refresh)
+			mode.refresh_rate = window().m_refresh;
+
+		SDL_SetWindowDisplayMode(window().m_sdl_window, &mode);    // Try to set mode
+#ifndef SDLMAME_WIN32
+		/* FIXME: Warp the mouse to 0,0 in case a virtual desktop resolution
+		 * is in place after the mode switch - which will most likely be the case
+		 * This is a hack to work around a deficiency in SDL2
+		 */
+		SDL_WarpMouseInWindow(window().m_sdl_window, 1, 1);
+#endif
+	}
+	else
+	{
+		//SDL_SetWindowDisplayMode(window().m_sdl_window, NULL); // Use desktop
+	}
+	// create renderer
+
+	//SDL_SelectRenderer(window().sdl_window);
+
+	// show window
+
+	SDL_ShowWindow(window().m_sdl_window);
+	//SDL_SetWindowFullscreen(window().m_sdl_window, window().fullscreen);
+	SDL_RaiseWindow(window().m_sdl_window);
+
+	SDL_GetWindowSize(window().m_sdl_window, &window().m_width, &window().m_height);
+
+
+	m_gl_context_id = SDL_GL_CreateContext(window().m_sdl_window);
+	if  (!m_gl_context_id)
+	{
+		osd_printf_error("OpenGL not supported on this driver: %s\n", SDL_GetError());
+		return 1;
+	}
+
+	SDL_GL_SetSwapInterval(video_config.waitvsync ? 2 : 0);
+
+#else
+	m_extra_flags = (window().fullscreen() ?  SDL_FULLSCREEN : SDL_RESIZABLE);
+	m_extra_flags |= SDL_OPENGL | SDL_DOUBLEBUF;
+
+	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
+	#if (SDL_VERSION_ATLEAST(1,2,10)) && (!defined(SDLMAME_EMSCRIPTEN))
+	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, video_config.waitvsync ? 1 : 0);
+	#endif
+
+	load_gl_lib(window().machine());
+
+	// create the SDL surface (which creates the window in windowed mode)
+	m_sdlsurf = SDL_SetVideoMode(width, height,
+							0, SDL_SWSURFACE  | SDL_ANYFORMAT | m_extra_flags);
+
+	if (!m_sdlsurf)
+		return 1;
+
+	window().m_width = m_sdlsurf->w;
+	window().m_height = m_sdlsurf->h;
+
+	window().m_screen_width = 0;
+	window().m_screen_height = 0;
+
+	if ( (video_config.mode  == VIDEO_MODE_OPENGL) && !(m_sdlsurf->flags & SDL_OPENGL) )
+	{
+		osd_printf_error("OpenGL not supported on this driver!\n");
+		return 1;
+	}
+
+	// set the window title
+	SDL_WM_SetCaption(window().m_title, "SDLMAME");
+
+#endif
+
+	m_blittimer = 0;
+	m_surf_w = 0;
+	m_surf_h = 0;
+
+	m_initialized = 0;
+
+	// in case any textures try to come up before these are validated,
+	// OpenGL guarantees all implementations can handle something this size.
+	m_texture_max_width = 64;
+	m_texture_max_height = 64;
+
+	/* load any GL function addresses
+	 * this must be done here because we need a context
+	 */
+	loadgl_functions();
+	initialize_gl();
+
+
 	m_init_context = 0;
 
+	osd_printf_verbose("Leave sdl_info_ogl::create\n");
 	return 0;
 }
 
@@ -804,13 +864,13 @@ void sdl_info_ogl::resize(int width, int height)
 	SDL_GetWindowSize(window().m_sdl_window, &window().m_width, &window().m_height);
 	m_blittimer = 3;
 #else
-	SDL_FreeSurface(sdlsurf);
+	SDL_FreeSurface(m_sdlsurf);
 
-	sdlsurf = SDL_SetVideoMode(width, height, 0,
+	m_sdlsurf = SDL_SetVideoMode(width, height, 0,
 			SDL_SWSURFACE | SDL_ANYFORMAT | m_extra_flags);
 
-	window().m_width = sdlsurf->w;
-	window().m_height = sdlsurf->h;
+	window().m_width = m_sdlsurf->w;
+	window().m_height = m_sdlsurf->h;
 #endif
 	m_init_context = 1;
 
@@ -1148,6 +1208,36 @@ void sdl_info_ogl::loadGLExtensions()
 	}
 
 	_once = 0;
+}
+
+//============================================================
+//  sdl_info::destroy
+//============================================================
+
+void sdl_info_ogl::destroy()
+{
+
+	// free the memory in the window
+
+	destroy_all_textures();
+
+#if (SDLMAME_SDL2)
+	SDL_GL_DeleteContext(m_gl_context_id);
+	if (window().fullscreen() && video_config.switchres)
+	{
+		SDL_SetWindowFullscreen(window().m_sdl_window, 0);    // Try to set mode
+		SDL_SetWindowDisplayMode(window().m_sdl_window, &m_original_mode);    // Try to set mode
+		SDL_SetWindowFullscreen(window().m_sdl_window, SDL_WINDOW_FULLSCREEN);    // Try to set mode
+	}
+
+	SDL_DestroyWindow(window().m_sdl_window);
+#else
+	if (m_sdlsurf)
+	{
+		SDL_FreeSurface(m_sdlsurf);
+		m_sdlsurf = NULL;
+	}
+#endif
 }
 
 //============================================================
@@ -1615,29 +1705,6 @@ static void drawogl_exit(void)
 			video_config.glsl_shader_scrn[i] = NULL;
 		}
 	}
-}
-
-//============================================================
-//  sdl_info::destroy
-//============================================================
-
-void sdl_info_ogl::destroy()
-{
-
-	// free the memory in the window
-
-	destroy_all_textures();
-
-#if (SDLMAME_SDL2)
-	SDL_GL_DeleteContext(m_gl_context_id);
-	SDL_DestroyWindow(window().m_sdl_window);
-#else
-	if (sdlsurf)
-	{
-		SDL_FreeSurface(sdlsurf);
-		sdlsurf = NULL;
-	}
-#endif
 }
 
 //============================================================

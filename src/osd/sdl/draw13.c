@@ -144,7 +144,7 @@ class sdl_info13 : public osd_renderer
 public:
     sdl_info13(sdl_window_info *w)
     : osd_renderer(w), m_blittimer(0), m_renderer(NULL),
-      m_hofs(0), m_vofs(0),
+      m_last_hofs(0), m_last_vofs(0),
       m_resize_pending(0), m_resize_width(0), m_resize_height(0),
       m_last_blit_time(0), m_last_blit_pixels(0)
     {}
@@ -164,12 +164,13 @@ public:
     texture_info *texture_update(const render_primitive &prim);
 
 	INT32           m_blittimer;
+	UINT32          m_extra_flags;
 
 	SDL_Renderer *  m_renderer;
 	simple_list<texture_info>  m_texlist;                // list of active textures
 
-	float           m_hofs;
-	float           m_vofs;
+	float           m_last_hofs;
+	float           m_last_vofs;
 
 	// resize information
 
@@ -556,7 +557,33 @@ static void drawsdl2_exit(void)
 }
 
 //============================================================
-//  sdl_info13::create
+//  sdl_info::create
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
 //============================================================
 
 int sdl_info13::create(int width, int height)
@@ -570,7 +597,8 @@ int sdl_info13::create(int width, int height)
 
 	osd_printf_verbose("Enter sdl_info13::create\n");
 
-	UINT32 extra_flags = (window().fullscreen() ?
+	// create the SDL window
+	m_extra_flags = (window().fullscreen() ?
 			SDL_WINDOW_BORDERLESS | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE);
 
 #if defined(SDLMAME_WIN32)
@@ -579,7 +607,13 @@ int sdl_info13::create(int width, int height)
 	// create the SDL window
 	window().m_sdl_window = SDL_CreateWindow(window().m_title,
 			window().monitor()->position_size().x, window().monitor()->position_size().y,
-			width, height, extra_flags);
+			width, height, m_extra_flags);
+
+	if  (!window().m_sdl_window )
+	{
+		osd_printf_error("Window creation failed: %s\n", SDL_GetError());
+		return 1;
+	}
 
 	if (window().fullscreen() && video_config.switchres)
 	{
@@ -591,28 +625,6 @@ int sdl_info13::create(int width, int height)
 		mode.h = height;
 		if (window().m_refresh)
 			mode.refresh_rate = window().m_refresh;
-#if 0
-		if (window().depth)
-		{
-			switch (window().depth)
-			{
-			case 15:
-				mode.format = SDL_PIXELFORMAT_RGB555;
-				break;
-			case 16:
-				mode.format = SDL_PIXELFORMAT_RGB565;
-				break;
-			case 24:
-				mode.format = SDL_PIXELFORMAT_RGB24;
-				break;
-			case 32:
-				mode.format = SDL_PIXELFORMAT_RGB888;
-				break;
-			default:
-				osd_printf_warning("Ignoring depth %d\n", window().depth);
-			}
-		}
-#endif
 
 		SDL_SetWindowDisplayMode(window().m_sdl_window, &mode);    // Try to set mode
 #ifndef SDLMAME_WIN32
@@ -625,7 +637,7 @@ int sdl_info13::create(int width, int height)
 	}
 	else
 	{
-		//SDL_SetWindowDisplayMode(window().sdl_window, NULL); // Use desktop
+		//SDL_SetWindowDisplayMode(window().m_sdl_window, NULL); // Use desktop
 	}
 	// create renderer
 
@@ -640,8 +652,11 @@ int sdl_info13::create(int width, int height)
 	}
 
 	//SDL_SelectRenderer(window().sdl_window);
+
+	// show window
+
 	SDL_ShowWindow(window().m_sdl_window);
-	//SDL_SetWindowFullscreen(window().window_id, window().fullscreen);
+	//SDL_SetWindowFullscreen(window().sdl_window, window().fullscreen);
 	SDL_RaiseWindow(window().m_sdl_window);
 
 	SDL_GetWindowSize(window().m_sdl_window, &window().m_width, &window().m_height);
@@ -654,7 +669,7 @@ int sdl_info13::create(int width, int height)
 }
 
 //============================================================
-//  sdl_info13::resize
+//  sdl_info::resize
 //============================================================
 
 void sdl_info13::resize(int width, int height)
@@ -677,8 +692,8 @@ void sdl_info13::resize(int width, int height)
 int sdl_info13::xy_to_render_target(int x, int y, int *xt, int *yt)
 {
 
-	*xt = x - m_hofs;
-	*yt = y - m_vofs;
+	*xt = x - m_last_hofs;
+	*yt = y - m_last_vofs;
 	if (*xt<0 || *xt >= window().m_blitwidth)
 		return 0;
 	if (*yt<0 || *yt >= window().m_blitheight)
@@ -687,7 +702,7 @@ int sdl_info13::xy_to_render_target(int x, int y, int *xt, int *yt)
 }
 
 //============================================================
-//  sdl_info13::get_primitives
+//  sdl_info::get_primitives
 //============================================================
 
 void sdl_info13::set_target_bounds()
@@ -696,7 +711,7 @@ void sdl_info13::set_target_bounds()
 }
 
 //============================================================
-//  sdl_info13::draw
+//  sdl_info::draw
 //============================================================
 
 int sdl_info13::draw(UINT32 dc, int update)
@@ -761,8 +776,8 @@ int sdl_info13::draw(UINT32 dc, int update)
 		}
 	}
 
-	m_hofs = hofs;
-	m_vofs = vofs;
+	m_last_hofs = hofs;
+	m_last_vofs = vofs;
 
 	window().m_primlist->acquire_lock();
 
