@@ -1142,6 +1142,7 @@ OBJDIRS += $(BUSOBJ)/snes_ctrl
 BUSOBJS += $(BUSOBJ)/snes_ctrl/ctrl.o
 BUSOBJS += $(BUSOBJ)/snes_ctrl/bcbattle.o
 BUSOBJS += $(BUSOBJ)/snes_ctrl/joypad.o
+BUSOBJS += $(BUSOBJ)/snes_ctrl/miracle.o
 BUSOBJS += $(BUSOBJ)/snes_ctrl/mouse.o
 BUSOBJS += $(BUSOBJ)/snes_ctrl/multitap.o
 BUSOBJS += $(BUSOBJ)/snes_ctrl/pachinko.o
