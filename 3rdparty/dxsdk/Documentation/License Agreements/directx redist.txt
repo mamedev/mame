@@ -1,0 +1,16 @@
+DirectX Software Development Kit Redistributable Code
+-------------------------------------------------------------
+Redistributable Code is identified as all of the files in the following 
+"Redist" directory on the DirectX SDK CD/Download:
+
+   redist/
+
+
+The following files in the above directory must be included in any distribution of 
+the DirectX Runtime.
+
+DSetup32.dll
+DSetup.dll
+DXSetup.exe
+DXupdate.cab
+dxdllreg_x86.cab

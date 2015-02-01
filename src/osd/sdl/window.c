@@ -259,6 +259,11 @@ bool sdl_osd_interface::window_init()
 			video_config.mode = VIDEO_MODE_SOFT;
 	}
 #endif
+	if (video_config.mode == VIDEO_MODE_BGFX)
+	{
+		if (drawbgfx_init(machine(), &draw))
+			video_config.mode = VIDEO_MODE_SOFT;
+	}
 	if (video_config.mode == VIDEO_MODE_SOFT)
 	{
 		if (drawsdl_init(&draw))

@@ -220,4 +220,10 @@ int drawogl_init(running_machine &machine, sdl_draw_info *callbacks);
 
 int drawsdl2_init(running_machine &machine, sdl_draw_info *callbacks);
 
+//============================================================
+// PROTOTYPES - drawbgfx.c
+//============================================================
+
+int drawbgfx_init(running_machine &machine, sdl_draw_info *callbacks);
+
 #endif /* __SDLWINDOW__ */

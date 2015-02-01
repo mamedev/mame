@@ -1,0 +1,18 @@
+#extension GL_EXT_shader_texture_lod : enable
+uniform sampler2D tex;
+varying highp vec4 xlv_TEXCOORD0;
+void main ()
+{
+  mediump vec4 tmpvar_1;
+  lowp vec4 tmpvar_2;
+  tmpvar_2 = texture2DLodEXT (tex, xlv_TEXCOORD0.xy, 0.0);
+  tmpvar_1 = tmpvar_2;
+  gl_FragData[0] = tmpvar_1;
+}
+
+
+// stats: 0 alu 1 tex 0 flow
+// inputs: 1
+//  #0: xlv_TEXCOORD0 (high float) 4x1 [-1]
+// textures: 1
+//  #0: tex (low 2d) 0x0 [-1]
