@@ -1,0 +1,7 @@
+.build
+.debug
+.DS_Store
+.git
+.svn
+tags
+src/renderer_d3d12.*
