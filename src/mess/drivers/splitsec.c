@@ -103,8 +103,7 @@ void splitsec_state::leds_update()
 	for (int i = 0; i < 0x10; i++)
 	{
 		// update current state
-		if (m_r >> i & 1)
-			m_leds_state[i] = m_o;
+		m_leds_state[i] = (m_r >> i & 1) ? m_o : 0;
 
 		active_state[i] = 0;
 

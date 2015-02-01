@@ -33,7 +33,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(program_1_5k, AS_PROGRAM, 8, amis2000_device)
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
-	AM_RANGE(0x0400, 0x05ff) AM_NOP
+	AM_RANGE(0x0400, 0x05ff) AM_NOP // 0x00
 	AM_RANGE(0x0600, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
@@ -128,8 +128,8 @@ void amis2000_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
 
-	m_read_k.resolve_safe(0);
-	m_read_i.resolve_safe(0);
+	m_read_k.resolve_safe(0xf);
+	m_read_i.resolve_safe(0xf);
 	m_read_d.resolve_safe(0);
 	m_write_d.resolve_safe();
 	m_write_a.resolve_safe();
@@ -209,8 +209,8 @@ void amis2000_device::device_reset()
 	m_d_polarity = 0;
 	m_d = 0; d_latch_out(false);
 	m_a = 0; m_write_a(0, 0, 0xffff);
-	m_i = 0;
-	m_k = 0;
+	m_i = 0xf;
+	m_k = 0xf;
 }
 
 

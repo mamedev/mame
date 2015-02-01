@@ -5,6 +5,10 @@
 
 	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
 
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.20" blue="0.22" /></led7seg>
+	</element>
+
 
 <!-- build screen -->
 
@@ -13,6 +17,10 @@
 		<bezel element="static_black">
 			<bounds left="0" right="100" top="0" bottom="100" />
 		</bezel>
+
+		<bezel name="digit0" element="digit"><bounds x="0" y="0" width="10" height="15" /></bezel>
+		<bezel name="digit1" element="digit"><bounds x="10" y="0" width="10" height="15" /></bezel>
+		<bezel name="digit2" element="digit"><bounds x="20" y="0" width="10" height="15" /></bezel>
 
 	</view>
 </mamelayout>

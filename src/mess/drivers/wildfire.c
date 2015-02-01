@@ -31,11 +31,94 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 
+	UINT8 m_d;
+	UINT16 m_a;
+
+	UINT16 m_leds_state[0x10];
+	UINT16 m_leds_cache[0x10];
+	UINT8 m_leds_decay[0x100];
+
 	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE16_MEMBER(write_a);
 
+	TIMER_DEVICE_CALLBACK_MEMBER(leds_decay_tick);
+	void leds_update();
+	bool index_is_7segled(int i);
+
 	virtual void machine_start();
 };
+
+
+
+/***************************************************************************
+
+  LEDs
+
+***************************************************************************/
+
+// The device strobes the outputs very fast, it is unnoticeable to the user.
+// To prevent flickering here, we need to simulate a decay.
+
+// decay time, in steps of 10ms
+#define LEDS_DECAY_TIME 4
+
+bool wildfire_state::index_is_7segled(int i)
+{
+	// first 3 A are 7segleds
+	return (i < 3);
+}
+
+void wildfire_state::leds_update()
+{
+	UINT16 active_state[0x10];
+
+	for (int i = 0; i < 0x10; i++)
+	{
+		// update current state
+		m_leds_state[i] = (~m_a >> i & 1) ? m_d : 0;
+		if (index_is_7segled(i))
+			m_leds_state[i] = BITSWAP8(m_leds_state[i],7,0,1,2,3,4,5,6);
+
+		active_state[i] = 0;
+
+		for (int j = 0; j < 0x10; j++)
+		{
+			int di = j << 4 | i;
+
+			// turn on powered leds
+			if (m_leds_state[i] >> j & 1)
+				m_leds_decay[di] = LEDS_DECAY_TIME;
+
+			// determine active state
+			int ds = (m_leds_decay[di] != 0) ? 1 : 0;
+			active_state[i] |= (ds << j);
+		}
+	}
+
+	// on difference, send to output
+	for (int i = 0; i < 0x10; i++)
+		if (m_leds_cache[i] != active_state[i])
+		{
+			if (index_is_7segled(i))
+				output_set_digit_value(i, active_state[i] & 0x7f);
+
+			for (int j = 0; j < 8; j++)
+				output_set_lamp_value(i*10 + j, active_state[i] >> j & 1);
+		}
+
+	memcpy(m_leds_cache, active_state, sizeof(m_leds_cache));
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(wildfire_state::leds_decay_tick)
+{
+	// slowly turn off unpowered leds
+	for (int i = 0; i < 0x100; i++)
+		if (!(m_leds_state[i & 0xf] >> (i>>4) & 1) && m_leds_decay[i])
+			m_leds_decay[i]--;
+
+	leds_update();
+}
+
 
 
 /***************************************************************************
@@ -46,10 +129,14 @@ public:
 
 WRITE8_MEMBER(wildfire_state::write_d)
 {
+	m_d = data;
+	leds_update();
 }
 
 WRITE16_MEMBER(wildfire_state::write_a)
 {
+	m_a = data;
+	leds_update();
 }
 
 
@@ -62,10 +149,10 @@ WRITE16_MEMBER(wildfire_state::write_a)
 
 static INPUT_PORTS_START( wildfire )
 	PORT_START("IN1") // I
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Shooter Button")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Left Flipper")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Right Flipper")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Shooter Button")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Flipper")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Flipper")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -78,6 +165,21 @@ INPUT_PORTS_END
 
 void wildfire_state::machine_start()
 {
+	// zerofill
+	memset(m_leds_state, 0, sizeof(m_leds_state));
+	memset(m_leds_cache, 0, sizeof(m_leds_cache));
+	memset(m_leds_decay, 0, sizeof(m_leds_decay));
+
+	m_d = 0;
+	m_a = 0;
+
+	// register for savestates
+	save_item(NAME(m_leds_state));
+	save_item(NAME(m_leds_cache));
+	save_item(NAME(m_leds_decay));
+
+	save_item(NAME(m_d));
+	save_item(NAME(m_a));
 }
 
 
@@ -88,6 +190,8 @@ static MACHINE_CONFIG_START( wildfire, wildfire_state )
 	MCFG_AMI_S2000_READ_I_CB(IOPORT("IN1"))
 	MCFG_AMI_S2000_WRITE_D_CB(WRITE8(wildfire_state, write_d))
 	MCFG_AMI_S2000_WRITE_A_CB(WRITE16(wildfire_state, write_a))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("leds_decay", wildfire_state, leds_decay_tick, attotime::from_msec(10))
 
 	MCFG_DEFAULT_LAYOUT(layout_wildfire)
 
