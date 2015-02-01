@@ -20,6 +20,8 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+class a2bus_mcms1_device;
+
 class mcms_device : public device_t, public device_sound_interface
 {
 public:
@@ -29,6 +31,8 @@ public:
 	DECLARE_WRITE8_MEMBER(voiceregs_w);
 	DECLARE_WRITE8_MEMBER(control_w);
 	UINT8 get_pen_rand(void) { m_stream->update(); return m_rand; }
+
+	void set_bus_device(a2bus_mcms1_device *pDev) { m_pBusDevice = pDev; }
 
 	template<class _Object> static devcb_base &set_irq_cb(device_t &device, _Object wr) { return downcast<mcms_device &>(device).m_write_irq.set_callback(wr); }
 	devcb_write_line m_write_irq;
@@ -43,8 +47,8 @@ protected:
 
 private:
 	sound_stream *m_stream;
-	address_space *m_6502space;
 	emu_timer *m_timer, *m_clrtimer;
+	a2bus_mcms1_device *m_pBusDevice;
 	bool m_enabled;
 	UINT8 m_vols[16];
 	UINT8 m_table[16];
