@@ -452,7 +452,7 @@ void osd_midi_device_pm::write(UINT8 data)
 }
 #else
 	#include "modules/osdmodule.h"
-	#include "netdev_module.h"
+	#include "midi_module.h"
 
 	MODULE_NOT_SUPPORTED(pm_module, OSD_MIDI_PROVIDER, "pm")
 #endif

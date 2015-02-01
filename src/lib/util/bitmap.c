@@ -49,7 +49,7 @@ inline INT32 bitmap_t::compute_rowpixels(int width, int xslop)
 inline void bitmap_t::compute_base(int xslop, int yslop)
 {
 	m_base = m_alloc + (m_rowpixels * yslop + xslop) * (m_bpp / 8);
-	UINT64 aligned_base = ((static_cast<UINT64>(reinterpret_cast<FPTR>(m_base)) + (BITMAP_OVERALL_ALIGN - 1)) / BITMAP_OVERALL_ALIGN) * BITMAP_OVERALL_ALIGN;
+	UINT64 aligned_base = ((reinterpret_cast<UINT64>(m_base) + (BITMAP_OVERALL_ALIGN - 1)) / BITMAP_OVERALL_ALIGN) * BITMAP_OVERALL_ALIGN;
 	m_base = reinterpret_cast<void *>(aligned_base);
 }
 

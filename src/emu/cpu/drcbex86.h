@@ -73,8 +73,8 @@ private:
 		static inline be_parameter make_ireg(int regnum) { assert(regnum >= 0 && regnum < x86emit::REG_MAX); return be_parameter(PTYPE_INT_REGISTER, regnum); }
 		static inline be_parameter make_freg(int regnum) { assert(regnum >= 0 && regnum < x86emit::REG_MAX); return be_parameter(PTYPE_FLOAT_REGISTER, regnum); }
 		static inline be_parameter make_vreg(int regnum) { assert(regnum >= 0 && regnum < x86emit::REG_MAX); return be_parameter(PTYPE_VECTOR_REGISTER, regnum); }
-		static inline be_parameter make_memory(void *base) { return be_parameter(PTYPE_MEMORY, static_cast<be_parameter_value>(reinterpret_cast<FPTR>(base))); }
-		static inline be_parameter make_memory(const void *base) { return be_parameter(PTYPE_MEMORY, static_cast<be_parameter_value>(reinterpret_cast<FPTR>(const_cast<void *>(base)))); }
+		static inline be_parameter make_memory(void *base) { return be_parameter(PTYPE_MEMORY, reinterpret_cast<be_parameter_value>(base)); }
+		static inline be_parameter make_memory(const void *base) { return be_parameter(PTYPE_MEMORY, reinterpret_cast<be_parameter_value>(const_cast<void *>(base))); }
 
 		// operators
 		bool operator==(const be_parameter &rhs) const { return (m_type == rhs.m_type && m_value == rhs.m_value); }

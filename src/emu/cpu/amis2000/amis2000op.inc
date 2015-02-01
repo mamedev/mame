@@ -4,13 +4,13 @@
 
 UINT8 amis2000_device::ram_r()
 {
-	UINT16 address = m_bu << m_bu_bits | m_bl;
+	UINT16 address = m_bu << 4 | m_bl;
 	return m_data->read_byte(address) & 0xf;
 }
 
 void amis2000_device::ram_w(UINT8 data)
 {
-	UINT16 address = m_bu << m_bu_bits | m_bl;
+	UINT16 address = m_bu << 4 | m_bl;
 	m_data->write_byte(address, data & 0xf);
 }
 
@@ -33,9 +33,10 @@ void amis2000_device::push_callstack()
 	m_callstack[0] = m_pc & m_callstack_mask;
 }
 
-void amis2000_device::op_illegal()
+void amis2000_device::d_latch_out(bool active)
 {
-	logerror("%s unknown opcode $%02X at $%04X\n", tag(), m_op, m_pc);
+	m_write_d(0, active ? (m_d ^ m_d_polarity) : 0, 0xff);
+	m_d_active = active;
 }
 
 
@@ -44,10 +45,14 @@ void amis2000_device::op_illegal()
 void amis2000_device::op_lai()
 {
 	// LAI X: load ACC with X, select I and K inputs
-	UINT8 param = m_op & 0x0f;
-	m_acc = param;
-	m_i = m_read_i(0, 0xff) & param;
-	m_k = m_read_k(0, 0xff) & param;
+	// note: only execute the first one in a sequence of LAI
+	if ((m_prev_op & 0xf0) != (m_op & 0xf0))
+	{
+		UINT8 param = m_op & 0x0f;
+		m_acc = param;
+		m_i = m_read_i(0, 0xff) & param;
+		m_k = m_read_k(0, 0xff) & param;
+	}
 }
 
 void amis2000_device::op_lab()
@@ -89,33 +94,49 @@ void amis2000_device::op_xae()
 void amis2000_device::op_lbe()
 {
 	// LBE Y: load BU with Y, load BL with E
-	UINT8 param = m_op & 0x03;
-	m_bu = param & m_bu_mask;
-	m_bl = m_e;
+	// note: only execute the first one in a sequence of LB*
+	if ((m_prev_op & 0xf0) != (m_op & 0xf0))
+	{
+		UINT8 param = m_op & 0x03;
+		m_bu = param & m_bu_mask;
+		m_bl = m_e;
+	}
 }
 
 void amis2000_device::op_lbep()
 {
 	// LBEP Y: load BU with Y, load BL with E+1
-	UINT8 param = m_op & 0x03;
-	m_bu = param & m_bu_mask;
-	m_bl = m_e + 1;
+	// note: only execute the first one in a sequence of LB*
+	if ((m_prev_op & 0xf0) != (m_op & 0xf0))
+	{
+		UINT8 param = m_op & 0x03;
+		m_bu = param & m_bu_mask;
+		m_bl = (m_e + 1) & 0xf;
+	}
 }
 
 void amis2000_device::op_lbz()
 {
 	// LBZ Y: load BU with Y, load BL with 0
-	UINT8 param = m_op & 0x03;
-	m_bu = param & m_bu_mask;
-	m_bl = 0;
+	// note: only execute the first one in a sequence of LB*
+	if ((m_prev_op & 0xf0) != (m_op & 0xf0))
+	{
+		UINT8 param = m_op & 0x03;
+		m_bu = param & m_bu_mask;
+		m_bl = 0;
+	}
 }
 
 void amis2000_device::op_lbf()
 {
 	// LBF Y: load BU with Y, load BL with 15
-	UINT8 param = m_op & 0x03;
-	m_bu = param & m_bu_mask;
-	m_bl = 0xf;
+	// note: only execute the first one in a sequence of LB*
+	if ((m_prev_op & 0xf0) != (m_op & 0xf0))
+	{
+		UINT8 param = m_op & 0x03;
+		m_bu = param & m_bu_mask;
+		m_bl = 0xf;
+	}
 }
 
 
@@ -126,7 +147,7 @@ void amis2000_device::op_lam()
 	// LAM _Y: load ACC with RAM, xor BU with _Y
 	m_acc = ram_r();
 	UINT8 param = ~m_op & 0x03;
-	m_bu ^= param & m_bu_mask;
+	m_bu ^= (param & m_bu_mask);
 }
 
 void amis2000_device::op_xc()
@@ -136,7 +157,7 @@ void amis2000_device::op_xc()
 	m_acc = ram_r();
 	ram_w(old_acc);
 	UINT8 param = ~m_op & 0x03;
-	m_bu ^= param & m_bu_mask;
+	m_bu ^= (param & m_bu_mask);
 }
 
 void amis2000_device::op_xci()
@@ -175,21 +196,22 @@ void amis2000_device::op_rsm()
 void amis2000_device::op_inp()
 {
 	// INP: input D-pins to ACC and RAM
-	op_illegal();
+	UINT8 in = m_d_active ? m_d : m_read_d(0, 0xff);
+	m_acc = in & 0xf;
+	ram_w(in >> 4 & 0xf);
 }
 
 void amis2000_device::op_out()
 {
 	// OUT: pulse output ACC and RAM to D-pins
-	op_illegal();
+	logerror("%s unknown opcode $%02X at $%04X\n", tag(), m_op, m_pc);
 }
 
 void amis2000_device::op_disb()
 {
 	// DISB: set D-latch to ACC and RAM directly
 	m_d = m_acc | ram_r() << 4;
-	m_write_d(0, m_d, 0xff);
-	// TODO: exit from floating mode on D-pins
+	d_latch_out(true);
 }
 
 void amis2000_device::op_disn()
@@ -201,15 +223,14 @@ void amis2000_device::op_disn()
 		0x7e, 0x30, 0x6d, 0x79, 0x33, 0x5b, 0x5f, 0x70, 0x7f, 0x7b, 0x77, 0x1f, 0x4e, 0x3d, 0x4f, 0x47
 	};
 	m_d = lut_segment_decoder[m_acc] | (m_carry ? 0x80 : 0x00);
-	m_write_d(0, m_d, 0xff);
-	// TODO: exit from floating mode on D-pins
+	d_latch_out(true);
 }
 
 void amis2000_device::op_mvs()
 {
 	// MVS: output master strobe latch to A-pins
+	d_latch_out(false);
 	m_write_a(0, m_a, 0xffff);
-	// TODO: enter floating mode on D-pins
 }
 
 void amis2000_device::op_psh()
@@ -224,7 +245,7 @@ void amis2000_device::op_psh()
 
 		case 0xe:
 			// exit from floating mode on D-pins
-			// ?
+			d_latch_out(true);
 			break;
 
 		case 0xf:
@@ -251,7 +272,7 @@ void amis2000_device::op_psl()
 
 		case 0xe:
 			// enter floating mode on D-pins
-			// ?
+			d_latch_out(false);
 			break;
 
 		case 0xf:
@@ -268,8 +289,9 @@ void amis2000_device::op_psl()
 
 void amis2000_device::op_eur()
 {
-	// EUR: set timer frequency(European) and D-latch polarity
-	op_illegal();
+	// EUR: set timer frequency(European) and D-latch polarity, via ACC
+	m_d_polarity = (m_acc & 1) ? 0x00 : 0xff;
+	d_latch_out(m_d_active); // refresh
 }
 
 
@@ -279,7 +301,7 @@ void amis2000_device::op_pp()
 {
 	// PP _X: prepare page/bank with _X
 	UINT8 param = ~m_op & 0x0f;
-	if (m_pp_index == 0)
+	if ((m_prev_op & 0xf0) != (m_op & 0xf0))
 		m_ppr = param;
 	else
 		m_pbr = param & 7;
@@ -290,15 +312,12 @@ void amis2000_device::op_jmp()
 	// JMP X: jump to X(+PP)
 	UINT16 mask = 0x3f;
 	UINT16 param = m_op & mask;
-	if (m_pp_index > 0)
+	
+	// if previous opcode was PP, change PC high bits too
+	if ((m_prev_op & 0xf0) == 0x60)
 	{
-		param |= m_ppr << 6;
-		mask |= 0x3c0;
-	}
-	if (m_pp_index > 1)
-	{
-		param |= m_pbr << 10;
-		mask |= 0x1c00;
+		param |= (m_ppr << 6) | (m_pbr << 10);
+		mask = 0x1fff;
 	}
 	m_pc = (m_pc & ~mask) | param;
 }
@@ -308,13 +327,11 @@ void amis2000_device::op_jms()
 	// JMS X: call to X(+PP)
 	m_icount--;
 	push_callstack();
-	if (m_pp_index == 0)
-	{
-		// subroutines default location is page 15
-		m_ppr = 0xf;
-		m_pp_index++;
-	}
 	op_jmp();
+
+	// subroutines default location is page 15
+	if ((m_prev_op & 0xf0) != 0x60)
+		m_pc |= 0x3c0;
 }
 
 void amis2000_device::op_rt()
@@ -333,6 +350,12 @@ void amis2000_device::op_rts()
 void amis2000_device::op_nop()
 {
 	// NOP: no operation
+}
+
+void amis2000_device::op_halt()
+{
+	// HALT: debugger breakpoint for devkit-use
+	logerror("%s unknown opcode $%02X at $%04X\n", tag(), m_op, m_pc);
 }
 
 
@@ -378,19 +401,19 @@ void amis2000_device::op_sam()
 void amis2000_device::op_sos()
 {
 	// SOS: skip next on SF(timer output), clear SF
-	op_illegal();
+	logerror("%s unknown opcode $%02X at $%04X\n", tag(), m_op, m_pc);
 }
 
 void amis2000_device::op_tf1()
 {
 	// TF1: skip next on flag 1
-	m_skip = (m_f & 0x01);
+	m_skip = (m_f & 0x01) ? true : false;
 }
 
 void amis2000_device::op_tf2()
 {
 	// TF2: skip next on flag 2
-	m_skip = (m_f & 0x02);
+	m_skip = (m_f & 0x02) ? true : false;
 }
 
 
