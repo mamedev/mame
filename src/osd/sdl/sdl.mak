@@ -756,6 +756,17 @@ OSDOBJS += \
 
 
 #-------------------------------------------------
+# BGFX
+#-------------------------------------------------
+
+ifdef USE_BGFX
+DEFS += -DUSE_BGFX
+OSDOBJS += $(SDLOBJ)/drawbgfx.o 
+INCPATH += -I$(3RDPARTY)/bgfx/include -I$(3RDPARTY)/bx/include
+USE_DISPATCH_GL = 0
+endif
+
+#-------------------------------------------------
 # OPENGL
 #-------------------------------------------------
 
@@ -779,15 +790,6 @@ INCPATH += -I$(MESA_INSTALL_ROOT)/include
 endif
 endif
 
-#-------------------------------------------------
-# BGFX
-#-------------------------------------------------
-
-ifdef USE_BGFX
-DEFS += -DUSE_BGFX
-OSDOBJS += $(SDLOBJ)/drawbgfx.o 
-INCPATH += -I$(3RDPARTY)/bgfx/include -I$(3RDPARTY)/bx/include
-endif
 
 #-------------------------------------------------
 # X11
