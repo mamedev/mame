@@ -5,9 +5,9 @@
   American Microsystems, Inc.(AMI) S2000-family 4-bit MCU cores, introduced late 1970s
   
   TODO:
-  - bug(s)? - MESS wildfire.c doesn't work yet
   - unemulated opcodes (need more testing material)
   - support external program map
+  - STATUS pin(wildfire.c sound?)
   - add 50/60hz timer
   - add S2200/S2400
 
@@ -15,6 +15,8 @@
 
 #include "amis2000.h"
 #include "debugger.h"
+
+#include "amis2000op.inc"
 
 
 // S2000 is the most basic one, 64 nibbles internal RAM and 1KB internal ROM
@@ -31,7 +33,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(program_1_5k, AS_PROGRAM, 8, amis2000_device)
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
-	AM_RANGE(0x0400, 0x05ff) AM_ROM AM_MIRROR(0x200)
+	AM_RANGE(0x0400, 0x05ff) AM_NOP
+	AM_RANGE(0x0600, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -151,6 +154,8 @@ void amis2000_device::device_start()
 	m_i = 0;
 	m_k = 0;
 	m_d = 0;
+	m_d_active = false;
+	m_d_polarity = 0;
 	m_a = 0;
 
 	// register for savestates
@@ -170,6 +175,8 @@ void amis2000_device::device_start()
 	save_item(NAME(m_i));
 	save_item(NAME(m_k));
 	save_item(NAME(m_d));
+	save_item(NAME(m_d_active));
+	save_item(NAME(m_d_polarity));
 	save_item(NAME(m_a));
 
 	// register state for debugger
@@ -199,10 +206,11 @@ void amis2000_device::device_reset()
 	m_op = 0;
 	
 	// clear i/o
+	m_d_polarity = 0;
+	m_d = 0; d_latch_out(false);
+	m_a = 0; m_write_a(0, 0, 0xffff);
 	m_i = 0;
 	m_k = 0;
-	m_d = 0; m_write_d(0, 0, 0xff);
-	m_a = 0; m_write_a(0, 0, 0xffff);
 }
 
 
@@ -210,8 +218,6 @@ void amis2000_device::device_reset()
 //-------------------------------------------------
 //  execute
 //-------------------------------------------------
-
-#include "amis2000op.inc"
 
 void amis2000_device::execute_run()
 {
@@ -246,7 +252,7 @@ void amis2000_device::execute_run()
 				switch (m_op)
 				{
 			case 0x00: op_nop(); break;
-			case 0x01: op_illegal(); break; // reserved for devkit-use
+			case 0x01: op_halt(); break;
 			case 0x02: op_rt(); break;
 			case 0x03: op_rts(); break;
 			case 0x04: op_psh(); break;

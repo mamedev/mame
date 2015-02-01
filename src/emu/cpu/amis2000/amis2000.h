@@ -92,6 +92,8 @@ protected:
 	UINT8 m_i;                  // 4-bit i-pins latch
 	UINT8 m_k;                  // 4-bit k-pins latch
 	UINT8 m_d;                  // 8-bit d-pins latch
+	bool m_d_active;            // d-pins available for direct i/o(floating), or outputting d-latch
+	UINT8 m_d_polarity;         // invert d-latch output
 	UINT16 m_a;                 // 13-bit a-pins latch (master strobe latch)
 
 	devcb_read8 m_read_k;
@@ -106,7 +108,7 @@ protected:
 	void ram_w(UINT8 data);
 	void pop_callstack();
 	void push_callstack();
-	void op_illegal();
+	void d_latch_out(bool active);
 	
 	void op_lai();
 	void op_lab();
@@ -141,6 +143,7 @@ protected:
 	void op_rt();
 	void op_rts();
 	void op_nop();
+	void op_halt();
 
 	void op_szc();
 	void op_szm();
