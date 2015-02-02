@@ -101,24 +101,19 @@ public:
 	required_shared_ptr<UINT16> m_sprregs;
 
 	bitmap_ind16 m_sprite_bitmap_1;
-
 	UINT16 m_priority_buffer_scrollx;
 	UINT16 m_priority_buffer_scrolly;
-
 	UINT32 m_spriteram32[0x4000/4];
 	UINT32 m_spc_regs[0x40/4];
 
 	DECLARE_WRITE16_MEMBER(galpani3_suprnova_sprite32_w);
 	DECLARE_WRITE16_MEMBER(galpani3_suprnova_sprite32regs_w);
-
 	DECLARE_WRITE16_MEMBER(galpani3_priority_buffer_scrollx_w);
 	DECLARE_WRITE16_MEMBER(galpani3_priority_buffer_scrolly_w);
 
 
-	DECLARE_DRIVER_INIT( galpani3 )
-	{
-	}
 	virtual void video_start();
+	
 	UINT32 screen_update_galpani3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani3_vblank);
 	int gp3_is_alpha_pen(int pen);
@@ -150,8 +145,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(galpani3_state::galpani3_vblank)// 2, 3, 5 ?
 
 void galpani3_state::video_start()
 {
-	/* so we can use suprnova.c */
+	/* so we can use video/sknsspr.c */
 	m_spritegen->skns_sprite_kludge(0,0);
+	
+	save_item(NAME(m_priority_buffer_scrollx));
+	save_item(NAME(m_priority_buffer_scrolly));
+	save_item(NAME(m_spriteram32));
+	save_item(NAME(m_spc_regs));
 }
 
 
@@ -640,7 +640,7 @@ ROM_END
 
 
 
-GAME( 1995, galpani3,  0,        galpani3, galpani3, galpani3_state, galpani3, ROT90, "Kaneko", "Gals Panic 3 (Euro)",  GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
-GAME( 1995, galpani3j, galpani3, galpani3, galpani3, galpani3_state, galpani3, ROT90, "Kaneko", "Gals Panic 3 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
-GAME( 1995, galpani3k, galpani3, galpani3, galpani3, galpani3_state, galpani3, ROT90, "Kaneko", "Gals Panic 3 (Korea)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
-GAME( 1995, galpani3hk,galpani3, galpani3, galpani3, galpani3_state, galpani3, ROT90, "Kaneko", "Gals Panic 3 (Hong Kong)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
+GAME( 1995, galpani3,  0,        galpani3, galpani3, driver_device, 0, ROT90, "Kaneko", "Gals Panic 3 (Euro)",  GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1995, galpani3j, galpani3, galpani3, galpani3, driver_device, 0, ROT90, "Kaneko", "Gals Panic 3 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1995, galpani3k, galpani3, galpani3, galpani3, driver_device, 0, ROT90, "Kaneko", "Gals Panic 3 (Korea)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1995, galpani3hk,galpani3, galpani3, galpani3, driver_device, 0, ROT90, "Kaneko", "Gals Panic 3 (Hong Kong)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
