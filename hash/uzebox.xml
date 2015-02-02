@@ -73,8 +73,7 @@
 		</part>
 	</software>
 
-	<software name="calc" supported="no">
-		<!-- required mouse emulation -->
+	<software name="calc">
 		<description>Calculator Demo</description>
 		<year>2010</year>
 		<publisher>Belogic</publisher>
