@@ -1758,7 +1758,10 @@ void sdlinput_poll(running_machine &machine)
 			devinfo = generic_device_find_index( keyboard_list, keyboard_map.logical[0]);
 #endif
 			devinfo->keyboard.state[OSD_SDL_INDEX_KEYSYM(&event.key.keysym)] = 0x80;
-#if (!SDLMAME_SDL2)
+#if (SDLMAME_SDL2)
+			if (event.key.keysym.sym < 0x20)
+				ui_input_push_char_event(machine, sdl_window_list->m_target, event.key.keysym.sym);
+#else
 			ui_input_push_char_event(machine, sdl_window_list->m_target, (unicode_char) event.key.keysym.unicode);
 #endif
 			break;
@@ -1859,7 +1862,7 @@ void sdlinput_poll(running_machine &machine)
 				int cx, cy;
 				osd_ticks_t click = osd_ticks() * 1000 / osd_ticks_per_second();
 				sdl_window_info *window = GET_FOCUS_WINDOW(&event.button);
-				if (window != NULL && window->renderer().xy_to_render_target(event.button.x,event.button.y, &cx, &cy) )
+				if (window != NULL && window->xy_to_render_target(event.button.x,event.button.y, &cx, &cy) )
 				{
 					ui_input_push_mouse_down_event(machine, window->m_target, cx, cy);
 					// FIXME Parameter ?
@@ -1893,7 +1896,7 @@ void sdlinput_poll(running_machine &machine)
 				int cx, cy;
 				sdl_window_info *window = GET_FOCUS_WINDOW(&event.button);
 
-				if (window != NULL && window->renderer().xy_to_render_target(event.button.x,event.button.y, &cx, &cy) )
+				if (window != NULL && window->xy_to_render_target(event.button.x,event.button.y, &cx, &cy) )
 				{
 					ui_input_push_mouse_up_event(machine, window->m_target, cx, cy);
 				}
@@ -1918,7 +1921,7 @@ void sdlinput_poll(running_machine &machine)
 				int cx=-1, cy=-1;
 				sdl_window_info *window = GET_FOCUS_WINDOW(&event.motion);
 
-				if (window != NULL && window->renderer().xy_to_render_target(event.motion.x, event.motion.y, &cx, &cy) )
+				if (window != NULL && window->xy_to_render_target(event.motion.x, event.motion.y, &cx, &cy) )
 					ui_input_push_mouse_move_event(machine, window->m_target, cx, cy);
 			}
 			break;
@@ -1947,6 +1950,7 @@ void sdlinput_poll(running_machine &machine)
 		case SDL_TEXTINPUT:
 			if (*event.text.text)
 			{
+				printf("char %c\n", *event.text.text);
 				sdl_window_info *window = GET_FOCUS_WINDOW(&event.text);
 				unicode_char result;
 				if (window != NULL )
