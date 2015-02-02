@@ -1003,6 +1003,7 @@ struct I386_CALL_GATE
 	void mmx_punpckhwd_r64_rm64();
 	void mmx_punpckhdq_r64_rm64();
 	void mmx_packssdw_r64_rm64();
+	void set_sse_flags();
 	void sse_sse_group0fae();
 	void sse_cvttps2dq_r128_rm128();
 	void sse_cvtss2sd_r128_r128m32();

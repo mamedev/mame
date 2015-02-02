@@ -2,7 +2,20 @@
 // copyright-holders:Ville Linde, Barry Rodewald, Carl, Phil Bennett
 // Pentium+ specific opcodes
 
+#include <fenv.h>
+
 extern flag float32_is_nan( float32 a ); // since its not defined in softfloat.h
+
+void i386_device::set_sse_flags()
+{
+	int excepts = fetestexcept(FE_ALL_EXCEPT);
+	if((fe & FE_INEXACT) && (m_mxcsr & 0x1000)) m_mxcsr |= 0x20;
+	if((fe & FE_UNDERFLOW) && (m_mxcsr & 0x800)) m_mxcsr |= 0x10;
+	if((fe & FE_OVERFLOW) && (m_mxcsr & 0x400)) m_mxcsr |= 0x8;
+	if((fe & FE_DIVBYZERO) && (m_mxcsr & 0x200)) m_mxcsr |= 0x4;
+	//TODO: Denormal detection doesn't come standard.
+	if((fe & FE_INVALID) && (m_mxcsr & 0x80)) m_mxcsr |= 0x1;
+}
 
 void i386_device::MMXPROLOG()
 {
@@ -2411,6 +2424,9 @@ void i386_device::sse_sse_group0fae()  // Opcode 0f ae
 			case 2: // ldmxcsr m32
 				ea = GetEA(modm, 0);
 				m_mxcsr = READ32(ea);
+				int rdirs[4] = {FE_TONEAREST, FE_DOWNWARD, FE_UPWARD, FE_TOWARDZERO};
+				int rdir = rdirs[(m_mxcsr >> 13) & 3];
+				fesetround(rdir);
 				break;
 			case 3: // stmxcsr m32
 				ea = GetEA(modm, 0);
@@ -2947,6 +2963,7 @@ void i386_device::sse_addps() // Opcode 0f 58
 		XMM((modrm >> 3) & 0x7).f[2] = XMM((modrm >> 3) & 0x7).f[2] + src.f[2];
 		XMM((modrm >> 3) & 0x7).f[3] = XMM((modrm >> 3) & 0x7).f[3] + src.f[3];
 	}
+	set_sse_flags();
 	CYCLES(1);     // TODO: correct cycle count
 }
 
@@ -2967,6 +2984,7 @@ void i386_device::sse_sqrtps_r128_rm128() // Opcode 0f 51
 		XMM((modrm >> 3) & 0x7).f[2] = sqrt(src.f[2]);
 		XMM((modrm >> 3) & 0x7).f[3] = sqrt(src.f[3]);
 	}
+	set_sse_flags();
 	CYCLES(1);     // TODO: correct cycle count
 }
 
@@ -2987,6 +3005,7 @@ void i386_device::sse_rsqrtps_r128_rm128() // Opcode 0f 52
 		XMM((modrm >> 3) & 0x7).f[2] = 1.0 / sqrt(src.f[2]);
 		XMM((modrm >> 3) & 0x7).f[3] = 1.0 / sqrt(src.f[3]);
 	}
+	set_sse_flags();
 	CYCLES(1);     // TODO: correct cycle count
 }
 
@@ -3007,6 +3026,7 @@ void i386_device::sse_rcpps_r128_rm128() // Opcode 0f 53
 		XMM((modrm >> 3) & 0x7).f[2] = 1.0 / src.f[2];
 		XMM((modrm >> 3) & 0x7).f[3] = 1.0 / src.f[3];
 	}
+	set_sse_flags();
 	CYCLES(1);     // TODO: correct cycle count
 }
 
@@ -3075,6 +3095,7 @@ void i386_device::sse_mulps() // Opcode 0f 59 ????
 		XMM((modrm >> 3) & 0x7).f[2] = XMM((modrm >> 3) & 0x7).f[2] * src.f[2];
 		XMM((modrm >> 3) & 0x7).f[3] = XMM((modrm >> 3) & 0x7).f[3] * src.f[3];
 	}
+	set_sse_flags();
 	CYCLES(1);     // TODO: correct cycle count
 }
 
@@ -3095,6 +3116,7 @@ void i386_device::sse_subps() // Opcode 0f 5c
 		XMM((modrm >> 3) & 0x7).f[2] = XMM((modrm >> 3) & 0x7).f[2] - src.f[2];
 		XMM((modrm >> 3) & 0x7).f[3] = XMM((modrm >> 3) & 0x7).f[3] - src.f[3];
 	}
+	set_sse_flags();
 	CYCLES(1);     // TODO: correct cycle count
 }
 
@@ -3148,6 +3170,7 @@ void i386_device::sse_divps() // Opcode 0f 5e
 		XMM((modrm >> 3) & 0x7).f[2] = XMM((modrm >> 3) & 0x7).f[2] / src.f[2];
 		XMM((modrm >> 3) & 0x7).f[3] = XMM((modrm >> 3) & 0x7).f[3] / src.f[3];
 	}
+	set_sse_flags();
 	CYCLES(1);     // TODO: correct cycle count
 }
 
@@ -3209,6 +3232,7 @@ void i386_device::sse_addss() // Opcode f3 0f 58
 		READXMM(ea, src);
 		XMM((modrm >> 3) & 0x7).f[0] = XMM((modrm >> 3) & 0x7).f[0] + src.f[0];
 	}
+	set_sse_flags();
 	CYCLES(1);     // TODO: correct cycle count
 }
 
@@ -3223,6 +3247,7 @@ void i386_device::sse_subss() // Opcode f3 0f 5c
 		READXMM(ea, src);
 		XMM((modrm >> 3) & 0x7).f[0] = XMM((modrm >> 3) & 0x7).f[0] - src.f[0];
 	}
+	set_sse_flags();
 	CYCLES(1);     // TODO: correct cycle count
 }
 
@@ -3237,6 +3262,7 @@ void i386_device::sse_mulss() // Opcode f3 0f 5e
 		READXMM(ea, src);
 		XMM((modrm >> 3) & 0x7).f[0] = XMM((modrm >> 3) & 0x7).f[0] * src.f[0];
 	}
+	set_sse_flags();
 	CYCLES(1);     // TODO: correct cycle count
 }
 
@@ -3251,6 +3277,7 @@ void i386_device::sse_divss() // Opcode 0f 59
 		READXMM(ea, src);
 		XMM((modrm >> 3) & 0x7).f[0] = XMM((modrm >> 3) & 0x7).f[0] / src.f[0];
 	}
+	set_sse_flags();
 	CYCLES(1);     // TODO: correct cycle count
 }
 
@@ -3265,6 +3292,7 @@ void i386_device::sse_rcpss_r128_r128m32() // Opcode f3 0f 53
 		s.d[0]=READ32(ea);
 		XMM((modrm >> 3) & 0x7).f[0] = 1.0 / s.f[0];
 	}
+	set_sse_flags();
 	CYCLES(1);     // TODO: correct cycle count
 }
 
@@ -3279,6 +3307,7 @@ void i386_device::sse_sqrtss_r128_r128m32() // Opcode f3 0f 51
 		s.d[0]=READ32(ea);
 		XMM((modrm >> 3) & 0x7).f[0] = sqrt(s.f[0]);
 	}
+	set_sse_flags();
 	CYCLES(1);     // TODO: correct cycle count
 }
 
@@ -3293,6 +3322,7 @@ void i386_device::sse_rsqrtss_r128_r128m32() // Opcode f3 0f 52
 		s.d[0]=READ32(ea);
 		XMM((modrm >> 3) & 0x7).f[0] = 1.0 / sqrt(s.f[0]);
 	}
+	set_sse_flags();
 	CYCLES(1);     // TODO: correct cycle count
 }
 
