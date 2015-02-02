@@ -666,14 +666,6 @@ void validity_checker::validate_roms()
 				last_name = ROM_GETNAME(romp);
 				total_files++;
 
-				// make sure it's all lowercase
-				for (const char *s = last_name; *s != 0; s++)
-					if (tolower((UINT8)*s) != *s)
-					{
-						osd_printf_error("ROM name '%s' contains upper case characters\n", last_name);
-						break;
-					}
-
 				// make sure the hash is valid
 				hash_collection hashes;
 				if (!hashes.from_internal_string(ROM_GETHASHDATA(romp)))
