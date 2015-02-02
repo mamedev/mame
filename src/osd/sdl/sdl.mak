@@ -215,8 +215,11 @@ SYNC_IMPLEMENTATION = tc
 SDL_NETWORK = taptun
 
 ifndef NO_USE_MIDI
-INCPATH += `pkg-config --cflags alsa`
-LIBS += `pkg-config --libs alsa`
+ALSACFLAGS := $(shell pkg-config --cflags alsa)
+ALSALIBS := $(shell pkg-config --libs alsa)
+
+INCPATH += $(ALSACFLAGS)
+LIBS += $(ALSALIBS)
 endif
 
 endif
@@ -537,10 +540,13 @@ else
 
 # files (header files are #include "SDL/something.h", so the extra "/SDL"
 # causes a significant problem)
-INCPATH += `$(SDL_CONFIG) --cflags | sed 's:/SDL::'`
-CCOMFLAGS += -DNO_SDL_GLEXT
+SDLCFLAGS := $(shell $(SDL_CONFIG) --cflags | sed 's:/SDL::')
 # Remove libSDLmain, as its symbols conflict with SDLMain_tmpl.m
-LIBS += `$(SDL_CONFIG) --libs | sed 's/-lSDLmain//'` -lpthread -framework Cocoa -framework OpenGL
+SDLLIBS := $(shell $(SDL_CONFIG) --libs | sed 's/-lSDLmain//')
+
+INCPATH += $(SDLCFLAGS)
+CCOMFLAGS += -DNO_SDL_GLEXT
+LIBS += $(SDLLIBS) -lpthread -framework Cocoa -framework OpenGL
 DEFS += -DMACOSX_USE_LIBSDL
 endif   # MACOSX_USE_LIBSDL
 
@@ -579,14 +585,18 @@ ifeq ($(NO_X11),1)
 NO_DEBUGGER = 1
 endif
 
+SDLINCLUDES := $(shell $(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-D[^ ]*\)::g')
+SDLDEFINES := $(shell $(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-I[^ ]*\)::g')
+SDLLIBS := $(shell $(SDL_CONFIG) --libs)
+
 # Don't pull in the system includes if we are compiling for Emscripten, which has its own headers
 ifneq ($(TARGETOS),emscripten)
-INCPATH += `$(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-D[^ ]*\)::g'`
+INCPATH += $(SDLINCLUDES)
 endif
-CCOMFLAGS += `$(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-I[^ ]*\)::g'`
+CCOMFLAGS += $(SDLDEFINES)
 
-BASELIBS += `$(SDL_CONFIG) --libs`
-LIBS += `$(SDL_CONFIG) --libs`
+BASELIBS += $(SDLLIBS)
+LIBS += $(SDLLIBS)
 
 ifeq ($(SDL_LIBVER),sdl2)
 ifdef SDL_INSTALL_ROOT
@@ -595,10 +605,13 @@ INCPATH += -I$(SDL_INSTALL_ROOT)/include/directfb
 endif
 endif
 
+FONTCONFIGCFLAGS := $(shell pkg-config --cflags fontconfig)
+FONTCONFIGLIBS := $(shell pkg-config --libs fontconfig)
+
 ifneq ($(TARGETOS),emscripten)
-INCPATH += `pkg-config --cflags fontconfig`
+INCPATH += $(FONTCONFIGCFLAGS)
 endif
-LIBS += `pkg-config --libs fontconfig`
+LIBS += $(FONTCONFIGLIBS)
 
 ifeq ($(SDL_LIBVER),sdl2)
 LIBS += -lSDL2_ttf
@@ -702,8 +715,11 @@ endif   # Win32
 
 ifeq ($(BASE_TARGETOS),os2)
 
-INCPATH += `sdl-config --cflags`
-LIBS += `sdl-config --libs` -lpthread
+SDLCFLAGS := $(shell sdl-config --cflags)
+SDLLIBS := $(shell sdl-config --libs)
+
+INCPATH += $(SDLCFLAGS)
+LIBS += $(SDLLIBS) -lpthread
 
 endif # OS2
 
@@ -806,8 +822,11 @@ endif
 
 # The newer debugger uses QT
 ifndef NO_USE_QTDEBUG
-INCPATH += `pkg-config QtGui --cflags`
-LIBS += `pkg-config QtGui --libs`
+QTCFLAGS := $(shell pkg-config --cflags QtGui)
+QTLIBS := $(shell pkg-config --libs QtGui)
+
+INCPATH += $(QTCFLAGS)
+LIBS += $(QTLIBS)
 endif
 
 # some systems still put important things in a different prefix
