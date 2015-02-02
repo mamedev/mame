@@ -81,7 +81,6 @@ SDL_FRAMEWORK_PATH = /Library/Frameworks/
 # SDL_LIBVER = sdl
 
 # uncomment to use BGFX
-
 # USE_BGFX = 1
 
 ###########################################################################
@@ -344,8 +343,8 @@ SDL_NETWORK = pcap
 INCPATH += -I$(3RDPARTY)/winpcap/Include
 
 # enable UNICODE
-DEFS += -Dmain=utf8_main -DUNICODE -D_UNICODE
-LDFLAGS += -municode
+DEFS += -Dmain=utf8_main -DUNICODE -D_UNICODE 
+LDFLAGS += -municode 
 
 # Qt
 ifndef NO_USE_QTDEBUG
@@ -451,6 +450,7 @@ OSDOBJS = \
 	$(OSDOBJ)/modules/font/font_none.o \
 	$(OSDOBJ)/modules/netdev/taptun.o \
 	$(OSDOBJ)/modules/netdev/pcap.o \
+	$(OSDOBJ)/modules/netdev/none.o \
 	$(OSDOBJ)/modules/midi/portmidi.o \
 	$(OSDOBJ)/modules/midi/none.o \
 

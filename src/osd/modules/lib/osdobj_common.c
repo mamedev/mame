@@ -130,6 +130,7 @@ void osd_common_t::register_options()
 
 	REGISTER_MODULE(m_mod_man, NETDEV_TAPTUN);
 	REGISTER_MODULE(m_mod_man, NETDEV_PCAP);
+	REGISTER_MODULE(m_mod_man, NETDEV_NONE);
 
 	REGISTER_MODULE(m_mod_man, MIDI_PM);
 	REGISTER_MODULE(m_mod_man, MIDI_NONE);
