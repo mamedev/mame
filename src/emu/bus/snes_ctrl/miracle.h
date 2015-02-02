@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    Nintendo Entertainment System - Miracle Piano Keyboard
+    Super Nintendo Entertainment System - Miracle Piano Keyboard
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -51,8 +51,9 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-	virtual UINT8 read_pin4();
-	virtual void write_strobe(UINT8 data);
+	UINT8 read_pin4();
+	void write_pin6(UINT8 data);
+	void write_strobe(UINT8 data);
 
 	static const device_timer_id TIMER_STROBE_ON = 0;
 	emu_timer *strobe_timer;

@@ -1,12 +1,13 @@
 /**********************************************************************
 
-    Nintendo SNES - Miracle Piano Keyboard
-
-    TODO: ???
+    Super Nintendo Entertainment System - Miracle Piano Keyboard
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
-
+ 
+    recv at PC = 008a4a
+    xmit at PC = 008adb
+ 
 **********************************************************************/
 
 #include "miracle.h"
@@ -60,7 +61,7 @@ void snes_miracle_device::device_timer(emu_timer &timer, device_timer_id id, int
 //-------------------------------------------------
 
 snes_miracle_device::snes_miracle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-					device_t(mconfig, SNES_MIRACLE, "Miracle Piano Controller (SNES)", tag, owner, clock, "snes_miracle", __FILE__),
+					device_t(mconfig, SNES_MIRACLE, "Miracle Piano SNES Cable", tag, owner, clock, "snes_miracle", __FILE__),
 					device_serial_interface(mconfig, *this),
 					device_snes_control_port_interface(mconfig, *this),
 					m_midiin(*this, "mdin"),
@@ -106,11 +107,6 @@ void snes_miracle_device::device_reset()
 	m_tx_busy = false;
 }
 
-
-//-------------------------------------------------
-//  read
-//-------------------------------------------------
-
 UINT8 snes_miracle_device::read_pin4()
 {
 	UINT8 ret = 0;
@@ -132,20 +128,18 @@ UINT8 snes_miracle_device::read_pin4()
 	return ret;
 }
 
-//-------------------------------------------------
-//  write
-//-------------------------------------------------
-
-// c4fc = start of recv routine
-// c53a = start of send routine
+void snes_miracle_device::write_pin6(UINT8 data)
+{
+//	printf("%02x to pin6\n", data);
+}
 
 void snes_miracle_device::write_strobe(UINT8 data)
 {
-//	printf("write: %d (%d %02x %d)\n", data & 1, m_sent_bits, m_data_sent, m_midi_mode);
+//	printf("%02x to strobe\n", data);
 
 	if (m_midi_mode == MIRACLE_MIDI_SEND)
 	{
-		//SNES writes (data & 1) to Miracle Piano!
+		// console writes (data & 1) to Miracle Piano.
 		// 1st write is data present flag (1=data present)
 		// next 8 writes are actual data bits (with ^1)
 		m_sent_bits++;
@@ -177,7 +171,7 @@ void snes_miracle_device::write_strobe(UINT8 data)
 		{
 //			printf("got strobe at %d clocks\n", m_strobe_clock);
 
-			if (m_strobe_clock < 528 && data == 0)
+			if (m_strobe_clock < 500 && data == 0)
 			{
 				// short delay is recieve mode
 				m_midi_mode = MIRACLE_MIDI_RECEIVE;
@@ -203,9 +197,10 @@ void snes_miracle_device::write_strobe(UINT8 data)
 				}
 				return;
 			}
-			else if (m_strobe_clock >= 528)
+			else if (m_strobe_clock >= 500)
 			{
-				// more than 528 clocks since strobe on write means send mode
+				// more than ~520 clocks since strobe on write means send mode
+				// (ranges from 522-528 have been seen)
 				m_midi_mode = MIRACLE_MIDI_SEND;
 				strobe_timer->reset();
 				m_strobe_on = 0;
