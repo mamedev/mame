@@ -894,7 +894,7 @@ $(LIBOSD): $(OSDOBJS)
 #-------------------------------------------------
 
 TOOLS += \
-	testkeys$(EXE)
+	$(BIN)testkeys$(EXE)
 
 $(SDLOBJ)/testkeys.o: $(SDLSRC)/testkeys.c
 	@echo Compiling $<...
@@ -903,7 +903,7 @@ $(SDLOBJ)/testkeys.o: $(SDLSRC)/testkeys.c
 TESTKEYSOBJS = \
 	$(SDLOBJ)/testkeys.o \
 
-testkeys$(EXE): $(TESTKEYSOBJS) $(LIBUTIL) $(LIBOCORE) $(SDLUTILMAIN)
+$(BIN)testkeys$(EXE): $(TESTKEYSOBJS) $(LIBUTIL) $(LIBOCORE) $(SDLUTILMAIN)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(BASELIBS) -o $@
 

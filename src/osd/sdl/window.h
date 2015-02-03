@@ -57,6 +57,8 @@ private:
 	sdl_window_info *m_window;
 };
 
+#define OSDWORK_CALLBACK(name)  void *name(void *param, ATTR_UNUSED int threadid)
+
 class sdl_window_info
 {
 public:
@@ -116,7 +118,7 @@ public:
 	void pick_best_mode(int *fswidth, int *fsheight);
 	int index() const { return m_index; }
 
-	osd_renderer &renderer() { return *m_renderer; }
+	int xy_to_render_target(int x, int y, int *xt, int *yt);
 
 	// Pointer to next window
 	sdl_window_info *   m_next;
@@ -167,6 +169,10 @@ public:
 	{
 		m_renderer = renderer;
 	}
+
+	static OSDWORK_CALLBACK( complete_create_wt );
+protected:
+	osd_renderer &renderer() { return *m_renderer; }
 private:
 	void constrain_to_aspect_ratio(int *window_width, int *window_height, int adjustment);
 
@@ -177,6 +183,17 @@ private:
 	int                 m_fullscreen;
 	int                 m_index;
 	osd_renderer *		m_renderer;
+
+	// static callbacks ...
+
+	static OSDWORK_CALLBACK( sdlwindow_resize_wt );
+	static OSDWORK_CALLBACK( draw_video_contents_wt );
+	static OSDWORK_CALLBACK( sdlwindow_video_window_destroy_wt );
+	static OSDWORK_CALLBACK( sdlwindow_toggle_full_screen_wt );
+	static OSDWORK_CALLBACK( sdlwindow_clear_surface_wt );
+	static OSDWORK_CALLBACK( destroy_all_textures_wt );
+
+	void measure_fps(UINT32 dc, int update);
 
 };
 

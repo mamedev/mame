@@ -150,6 +150,7 @@ decospr_device::decospr_device(const machine_config &mconfig, const char *tag, d
 		device_video_interface(mconfig, *this),
 		m_gfxregion(0),
 		m_is_bootleg(false),
+		m_bootleg_type(0),
 		m_x_offset(0),
 		m_y_offset(0),
 		m_flipallx(0),
@@ -232,7 +233,16 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 		{
 			sprite = spriteram[offs + 1];
 			y = spriteram[offs];
-			flash = y & 0x1000;
+			
+			if (m_is_bootleg && (m_bootleg_type == 1)) 
+			{
+				flash = y & 0x0400;
+			}
+			else
+			{
+				flash = y & 0x1000;
+			}
+
 			w = y & 0x0800;
 
 
@@ -258,7 +268,20 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 
 				fx = y & 0x2000;
 				fy = y & 0x4000;
-				multi = (1 << ((y & 0x0600) >> 9)) - 1; /* 1x, 2x, 4x, 8x height */
+
+				int tempwidth = 0;
+
+				if (m_is_bootleg && (m_bootleg_type==1))  // puzzlove
+				{
+					tempwidth = (y & 0x1000) >> 12;
+					tempwidth |= (y & 0x0200) >> 8;
+				}
+				else
+				{
+					tempwidth |= (y & 0x0600) >> 9;
+				}
+
+				multi = (1 << (tempwidth)) - 1; /* 1x, 2x, 4x, 8x height */
 
 				/* bootleg support (esd16.c) */
 				if (flipscreen) x = ((x&0x1ff) - m_x_offset)&0x1ff;

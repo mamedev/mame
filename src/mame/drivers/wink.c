@@ -22,15 +22,21 @@ class wink_state : public driver_device
 public:
 	wink_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_videoram(*this, "videoram") { }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	required_shared_ptr<UINT8> m_videoram;
+	
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_sound_flag;
 	UINT8 m_tile_bank;
+	
 	DECLARE_WRITE8_MEMBER(bgram_w);
 	DECLARE_WRITE8_MEMBER(player_mux_w);
 	DECLARE_WRITE8_MEMBER(tile_banking_w);
@@ -41,15 +47,17 @@ public:
 	DECLARE_READ8_MEMBER(prot_r);
 	DECLARE_WRITE8_MEMBER(prot_w);
 	DECLARE_READ8_MEMBER(sound_r);
-	DECLARE_DRIVER_INIT(wink);
+	
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	
+	DECLARE_DRIVER_INIT(wink);
+	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	
 	UINT32 screen_update_wink(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	
 	INTERRUPT_GEN_MEMBER(wink_sound);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -331,6 +339,12 @@ INTERRUPT_GEN_MEMBER(wink_state::wink_sound)
 	m_sound_flag ^= 0x80;
 }
 
+void wink_state::machine_start()
+{
+	save_item(NAME(m_sound_flag));
+	save_item(NAME(m_tile_bank));
+}
+
 void wink_state::machine_reset()
 {
 	m_sound_flag = 0;
@@ -431,5 +445,5 @@ DRIVER_INIT_MEMBER(wink_state,wink)
 		ROM[i] += BITSWAP8(i & 0xff, 7,5,3,1,6,4,2,0);
 }
 
-GAME( 1985, wink,  0,    wink, wink, wink_state, wink, ROT0, "Midcoin", "Wink (set 1)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1985, winka, wink, wink, wink, wink_state, wink, ROT0, "Midcoin", "Wink (set 2)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1985, wink,  0,    wink, wink, wink_state, wink, ROT0, "Midcoin", "Wink (set 1)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1985, winka, wink, wink, wink, wink_state, wink, ROT0, "Midcoin", "Wink (set 2)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
