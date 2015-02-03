@@ -313,10 +313,10 @@ static INPUT_PORTS_START( puzzlove )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0300, 0x0300, "Game Level" )      PORT_DIPLOCATION("SW1:1,2") /* Difficulty?? - Not sure how this works for Easy --> Very Hard */
-	PORT_DIPSETTING(      0x0300, "1" )
-	PORT_DIPSETTING(      0x0200, "2" )
-	PORT_DIPSETTING(      0x0100, "3" )
-	PORT_DIPSETTING(      0x0000, "4" )
+	PORT_DIPSETTING(      0x0300, "1" ) /* Initial start time 40 secs */
+	PORT_DIPSETTING(      0x0200, "2" ) /* Initial start time 30 secs - Other in game effects?? */
+	PORT_DIPSETTING(      0x0100, "3" ) /* Initial start time 30 secs - Other in game effects?? */
+	PORT_DIPSETTING(      0x0000, "4" ) /* Initial start time 30 secs - Other in game effects?? */
 	PORT_DIPNAME( 0x1c00, 0x1c00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:3,4,5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x1400, DEF_STR( 3C_1C ) )
