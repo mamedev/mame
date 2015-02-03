@@ -55,8 +55,6 @@
 #define ASSERT_WINDOW_THREAD()  ASSERT_USE(window_threadid)
 #define ASSERT_MAIN_THREAD()    ASSERT_USE(main_threadid)
 
-#define OSDWORK_CALLBACK(name)  void *name(void *param, ATTR_UNUSED int threadid)
-
 // minimum window dimension
 #define MIN_WINDOW_DIM                  200
 
@@ -141,14 +139,9 @@ private:
 //  PROTOTYPES
 //============================================================
 
-static OSDWORK_CALLBACK( draw_video_contents_wt );
-static OSDWORK_CALLBACK( sdlwindow_video_window_destroy_wt );
-static OSDWORK_CALLBACK( sdlwindow_resize_wt );
-static OSDWORK_CALLBACK( sdlwindow_toggle_full_screen_wt );
 static void sdlwindow_update_cursor_state(running_machine &machine, sdl_window_info *window);
 static void sdlwindow_sync(void);
 
-static void *complete_create_wt(void *param, int threadid);
 static void set_starting_view(running_machine &machine, int index, sdl_window_info *window, const char *defview, const char *view);
 
 //============================================================
@@ -483,7 +476,7 @@ void sdl_window_info::blit_surface_size(int window_width, int window_height)
 //  (main thread)
 //============================================================
 
-static OSDWORK_CALLBACK( sdlwindow_resize_wt )
+OSDWORK_CALLBACK( sdl_window_info::sdlwindow_resize_wt )
 {
 	worker_param *      wp = (worker_param *) param;
 	sdl_window_info *   window = wp->window();
@@ -517,7 +510,7 @@ void sdl_window_info::window_resize(INT32 width, INT32 height)
 //  (window thread)
 //============================================================
 
-static OSDWORK_CALLBACK( sdlwindow_clear_surface_wt )
+OSDWORK_CALLBACK( sdl_window_info::sdlwindow_clear_surface_wt )
 {
 	worker_param *wp = (worker_param *) param;
 	sdl_window_info *window = wp->window();
@@ -547,7 +540,7 @@ void sdl_window_info::window_clear()
 //  (main thread)
 //============================================================
 
-static OSDWORK_CALLBACK( sdlwindow_toggle_full_screen_wt )
+OSDWORK_CALLBACK( sdl_window_info::sdlwindow_toggle_full_screen_wt )
 {
 	worker_param *wp = (worker_param *) param;
 	sdl_window_info *window = wp->window();
@@ -583,7 +576,7 @@ void sdl_window_info::toggle_full_screen(running_machine &machine)
 	execute_async_wait(&sdlwindow_toggle_full_screen_wt, worker_param(machine, this));
 }
 
-static OSDWORK_CALLBACK( destroy_all_textures_wt )
+OSDWORK_CALLBACK( sdl_window_info::destroy_all_textures_wt )
 {
 	worker_param *wp = (worker_param *) param;
 
@@ -703,6 +696,10 @@ static OSDWORK_CALLBACK( sdlwindow_update_cursor_state_wt )
 	return NULL;
 }
 
+int sdl_window_info::xy_to_render_target(int x, int y, int *xt, int *yt)
+{
+	return renderer().xy_to_render_target(x, y, xt, yt);
+}
 
 //============================================================
 //  sdlwindow_video_window_create
@@ -753,13 +750,13 @@ int sdlwindow_video_window_create(running_machine &machine, int index, sdl_monit
 	{
 		osd_work_item *wi;
 
-		wi = osd_work_item_queue(work_queue, &complete_create_wt, (void *) wp, 0);
+		wi = osd_work_item_queue(work_queue, &sdl_window_info::complete_create_wt, (void *) wp, 0);
 		sdlwindow_sync();
 		result = *((int *) (osd_work_item_result)(wi));
 		osd_work_item_release(wi);
 	}
 	else
-		result = *((int *) complete_create_wt((void *) wp, 0));
+		result = *((int *) sdl_window_info::complete_create_wt((void *) wp, 0));
 
 	// handle error conditions
 	if (result == 1)
@@ -780,7 +777,7 @@ error:
 //  (main thread)
 //============================================================
 
-static OSDWORK_CALLBACK( sdlwindow_video_window_destroy_wt )
+OSDWORK_CALLBACK( sdl_window_info::sdlwindow_video_window_destroy_wt )
 {
 	worker_param *      wp = (worker_param *) param;
 	sdl_window_info *   window = wp->window();
@@ -1075,7 +1072,7 @@ static void set_starting_view(running_machine &machine, int index, sdl_window_in
 //  (window thread)
 //============================================================
 
-static OSDWORK_CALLBACK( complete_create_wt )
+OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 {
 	worker_param *      wp = (worker_param *) param;
 	sdl_window_info *   window = wp->window();
@@ -1139,7 +1136,7 @@ static OSDWORK_CALLBACK( complete_create_wt )
 //  (window thread)
 //============================================================
 
-static void measure_fps(sdl_window_info *window, UINT32 dc, int update)
+void sdl_window_info::measure_fps(UINT32 dc, int update)
 {
 	const unsigned long frames_skip4fps = 100;
 	static int64_t lastTime=0, sumdt=0, startTime=0;
@@ -1154,7 +1151,7 @@ static void measure_fps(sdl_window_info *window, UINT32 dc, int update)
 
 	t0 = osd_ticks();
 
-	window->renderer().draw(dc, update);
+	renderer().draw(dc, update);
 
 	frames++;
 	currentTime = osd_ticks();
@@ -1181,7 +1178,7 @@ static void measure_fps(sdl_window_info *window, UINT32 dc, int update)
 	}
 }
 
-static OSDWORK_CALLBACK( draw_video_contents_wt )
+OSDWORK_CALLBACK( sdl_window_info::draw_video_contents_wt )
 {
 	UINT32  dc =        0;
 	int     update =    1;
@@ -1203,7 +1200,7 @@ static OSDWORK_CALLBACK( draw_video_contents_wt )
 	else
 	{
 		if( video_config.perftest )
-			measure_fps(window, dc, update);
+			window->measure_fps(dc, update);
 		else
 			window->renderer().draw(dc, update);
 	}

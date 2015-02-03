@@ -1862,7 +1862,7 @@ void sdlinput_poll(running_machine &machine)
 				int cx, cy;
 				osd_ticks_t click = osd_ticks() * 1000 / osd_ticks_per_second();
 				sdl_window_info *window = GET_FOCUS_WINDOW(&event.button);
-				if (window != NULL && window->renderer().xy_to_render_target(event.button.x,event.button.y, &cx, &cy) )
+				if (window != NULL && window->xy_to_render_target(event.button.x,event.button.y, &cx, &cy) )
 				{
 					ui_input_push_mouse_down_event(machine, window->m_target, cx, cy);
 					// FIXME Parameter ?
@@ -1896,7 +1896,7 @@ void sdlinput_poll(running_machine &machine)
 				int cx, cy;
 				sdl_window_info *window = GET_FOCUS_WINDOW(&event.button);
 
-				if (window != NULL && window->renderer().xy_to_render_target(event.button.x,event.button.y, &cx, &cy) )
+				if (window != NULL && window->xy_to_render_target(event.button.x,event.button.y, &cx, &cy) )
 				{
 					ui_input_push_mouse_up_event(machine, window->m_target, cx, cy);
 				}
@@ -1921,7 +1921,7 @@ void sdlinput_poll(running_machine &machine)
 				int cx=-1, cy=-1;
 				sdl_window_info *window = GET_FOCUS_WINDOW(&event.motion);
 
-				if (window != NULL && window->renderer().xy_to_render_target(event.motion.x, event.motion.y, &cx, &cy) )
+				if (window != NULL && window->xy_to_render_target(event.motion.x, event.motion.y, &cx, &cy) )
 					ui_input_push_mouse_move_event(machine, window->m_target, cx, cy);
 			}
 			break;
