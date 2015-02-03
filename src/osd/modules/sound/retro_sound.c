@@ -1,52 +1,68 @@
+//============================================================
+//
+//  retro_sound.c - libretro implementation of MAME sound routines
+//
+//  Copyright (c) 1996-2010, Nicola Salmoria and the MAME Team.
+//  Visit http://mamedev.org for licensing and usage restrictions.
+//
+//  SDLMAME by Olivier Galibert and R. Belmont
+//
+//============================================================
 
-/***************************************************************************
+#include "sound_module.h"
+#include "modules/osdmodule.h"
 
-    retro_sound.c
-
-    Dummy sound interface.
-
-*******************************************************************c********/
-
-
-#include "retro_sound.h"
+// MAME headers
+#include "emu.h"
+#include "emuopts.h"
 
 #include "libretro.h"
-
-static int  attenuation = 0;
 
 extern int pauseg;
 extern retro_audio_sample_batch_t audio_batch_cb;
 
-const osd_sound_type OSD_SOUND_RETRO = &osd_sound_creator<sound_retro>;
+//============================================================
+//  DEBUGGING
+//============================================================
 
+#define LOG_SOUND       0
 
-//-------------------------------------------------
-//  sound_none - constructor
-//-------------------------------------------------
-sound_retro::sound_retro(const osd_interface &osd, running_machine &machine)
-	: osd_sound_interface(osd, machine)
+//  CLASS
+//============================================================
+
+class sound_retro : public osd_module, public sound_module
 {
-	set_mastervolume(attenuation);
-}
+public:
+	sound_retro()
+	: osd_module(OSD_SOUND_PROVIDER, "retro"), sound_module()
+	{
+	}
+	virtual ~sound_retro() { }
 
+	// sound_module
+
+	virtual void update_audio_stream(bool is_throttled, const INT16 *buffer, int samples_this_frame);
+	virtual void set_mastervolume(int attenuation);
+};
 
 //============================================================
 //  update_audio_stream
 //============================================================
-void sound_retro::update_audio_stream(const INT16 *buffer, int samples_this_frame)
-//void retro_osd_interface::update_audio_stream(const INT16 *buffer, int samples_this_frame) 
+
+void sound_retro::update_audio_stream(bool is_throttled, const INT16 *buffer, int samples_this_frame)
 {
-	if(pauseg!=-1)audio_batch_cb(buffer, samples_this_frame);
+   if (pauseg != -1)
+      audio_batch_cb(buffer, samples_this_frame);
 }
-  
+
+
 
 //============================================================
 //  set_mastervolume
 //============================================================
-void sound_retro::set_mastervolume(int attenuation)
-//void retro_osd_interface::set_mastervolume(int attenuation)
+
+void sound_retro::set_mastervolume(int _attenuation)
 {
-	// if we had actual sound output, we would adjust the global
-	// volume in response to this function
 }
 
+MODULE_DEFINITION(SOUND_RETRO, sound_retro)

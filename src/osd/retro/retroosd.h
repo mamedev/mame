@@ -18,11 +18,6 @@ public:
 	virtual void init(running_machine &machine);
 	virtual void update(bool skip_redraw);
 
-	// audio overridables
-//	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame);
-//	virtual void set_mastervolume(int attenuation);
-	virtual void sound_register();
-
 	// input overridables
 //	virtual void customize_input_type_list(input_type_desc *typelist);
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist);

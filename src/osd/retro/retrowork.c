@@ -43,13 +43,14 @@ static void spin_while(const volatile _PtrType * volatile ptr, const _PtrType va
 {
     osd_ticks_t stopspin = osd_ticks() + timeout;
 
-    do {
-        int spin = 10000;
-        while (--spin)
-        {
-            if ((*ptr != val) ^ invert)
-                return;
-        }
+    do
+    {
+       int spin = 10000;
+       while (--spin)
+       {
+          if ((*ptr != val) ^ invert)
+             return;
+       }
     } while (((*ptr == val) ^ invert) && osd_ticks() < stopspin);
 }
 

@@ -1,7 +1,5 @@
 #include "retroosd.h"
 #include "../../emu/drawgfx.h"
-#include "modules/sound/retro_sound.h"
-
 #include "osdepend.h"
 
 #ifndef M16B
@@ -125,14 +123,16 @@ void retro_osd_interface::update(bool skip_redraw)
       // get the minimum width/height for the current layout
       int minwidth, minheight;
 
-	if(alternate_renderer==false){	     
-		our_target->compute_minimum_size(minwidth, minheight);
-	}
-	else{
-     		 minwidth=1600;minheight=1200;
-        }
+      if (alternate_renderer==false)
+         our_target->compute_minimum_size(minwidth, minheight);
+      else
+      {
+         minwidth=1600;
+         minheight=1200;
+      }
 
-      if (FirstTimeUpdate == 1) {
+      if (FirstTimeUpdate == 1)
+      {
 
          FirstTimeUpdate++;			
          //write_log("game screen w=%i h=%i  rowPixels=%i\n", minwidth, minheight,minwidth );
@@ -153,16 +153,17 @@ void retro_osd_interface::update(bool skip_redraw)
 
       }
 
-      if (minwidth != rtwi || minheight != rthe || minwidth != topw ){
-         //write_log("Res change: old(%d,%d) new(%d,%d) %d\n",rtwi,rthe,minwidth,minheight,topw);
-         rtwi=minwidth;
-         rthe=minheight;
-         topw=minwidth;
+      if (minwidth != rtwi || minheight != rthe || minwidth != topw )
+      {
+         rtwi = minwidth;
+         rthe = minheight;
+         topw = minwidth;
       }
 
-      if(alternate_renderer){
-		rtwi=topw=1600;
-		rthe=1200;
+      if(alternate_renderer)
+      {
+         rtwi = topw = 1600;
+         rthe = 1200;
       }
 
       // make that the size of our target
@@ -174,13 +175,13 @@ void retro_osd_interface::update(bool skip_redraw)
       primlist.acquire_lock();
 
 #ifdef	HAVE_GL
-		gl_draw_primitives(primlist,rtwi,rthe);
+      gl_draw_primitives(primlist,rtwi,rthe);
 #else
-	  UINT8 *surfptr = (UINT8 *) videoBuffer;
+      UINT8 *surfptr = (UINT8 *) videoBuffer;
 #ifdef M16B
-software_renderer<UINT16, 3,2,3, 11,5,0>::draw_primitives(primlist, surfptr, minwidth, minheight,minwidth );
+      software_renderer<UINT16, 3,2,3, 11,5,0>::draw_primitives(primlist, surfptr, minwidth, minheight,minwidth );
 #else
-software_renderer<UINT32, 0,0,0, 16,8,0>::draw_primitives(primlist, surfptr, minwidth, minheight,minwidth );
+      software_renderer<UINT32, 0,0,0, 16,8,0>::draw_primitives(primlist, surfptr, minwidth, minheight,minwidth );
 #endif
 
 #endif    
@@ -190,7 +191,8 @@ software_renderer<UINT32, 0,0,0, 16,8,0>::draw_primitives(primlist, surfptr, min
 	else
     		draw_this_frame = false;
 
-	if(ui_ipt_pushchar!=-1){
+	if(ui_ipt_pushchar!=-1)
+   {
 		ui_input_push_char_event(machine(), our_target, (unicode_char)ui_ipt_pushchar);
 		ui_ipt_pushchar=-1;
 	}
@@ -198,18 +200,6 @@ software_renderer<UINT32, 0,0,0, 16,8,0>::draw_primitives(primlist, surfptr, min
    co_switch(mainThread);
 }  
  
-//============================================================
-// sound_register
-//============================================================
-
-void retro_osd_interface::sound_register()
-{
-	sound_options_add("retro", OSD_SOUND_RETRO);
-	sound_options_add("auto", OSD_SOUND_RETRO); // making RETRO audio default one
-}
-
-
-
 //============================================================
 //  customize_input_type_list
 //============================================================

@@ -56,47 +56,47 @@ struct osd_directory
 
 static char *build_full_path(const char *path, const char *file)
 {
-	char *ret = (char *) osd_malloc_array(strlen(path)+strlen(file)+2);
-	char *p = ret;
+   char *ret = (char *) osd_malloc_array(strlen(path)+strlen(file)+2);
+   char *p = ret;
 
-	strcpy(p, path);
-	p += strlen(path);
-	*p++ = PATHSEPCH;
-	strcpy(p, file);
-	return ret;
+   strcpy(p, path);
+   p += strlen(path);
+   *p++ = PATHSEPCH;
+   strcpy(p, file);
+   return ret;
 }
-
 
 #if HAS_DT_XXX
 static osd_dir_entry_type get_attributes_enttype(int attributes, char *path)
 {
-	switch ( attributes )
-	{
-		case DT_DIR:
-			return ENTTYPE_DIR;
+   switch (attributes)
+   {
+      case DT_DIR:
+         return ENTTYPE_DIR;
 
-		case DT_REG:
-			return ENTTYPE_FILE;
+      case DT_REG:
+         return ENTTYPE_FILE;
 
-		case DT_LNK:
-		{
-			struct stat s;
+      case DT_LNK:
+         {
+            struct stat s;
 
-			if ( stat(path, &s) != 0 )
-				return ENTTYPE_OTHER;
-			else
-				return S_ISDIR(s.st_mode) ? ENTTYPE_DIR : ENTTYPE_FILE;
-		}
+            if ( stat(path, &s) != 0 )
+               return ENTTYPE_OTHER;
+            else
+               return S_ISDIR(s.st_mode) ? ENTTYPE_DIR : ENTTYPE_FILE;
+         }
 
-		default:
-			return ENTTYPE_OTHER;
-	}
+      default:
+         return ENTTYPE_OTHER;
+   }
 }
 #else
 
 static osd_dir_entry_type get_attributes_stat(const char *file)
 {
 	sdl_stat st;
+
 	if(sdl_stat_fn(file, &st))
 		return (osd_dir_entry_type) 0;
 

@@ -69,8 +69,10 @@ OSDCOREOBJS := \
 	$(MINIOBJ)/retrofile.o \
 	$(MINIOBJ)/retromisc.o \
 	$(MINIOBJ)/retroos.o \
+	$(MINIOBJ)/font_retro.o \
 	$(MINIOBJ)/../modules/lib/osdlib_retro.o \
-	$(OSDOBJ)/modules/sync/sync_retro.o
+	$(OSDOBJ)/modules/sync/sync_retro.o \
+	$(OSDOBJ)/modules/osdmodule.o 
 
 ifdef NOASM
 OSDCOREOBJS += $(OSDOBJ)/modules/sync/work_mini.o
@@ -89,7 +91,8 @@ OSDOBJS = \
 	$(MINIOBJ)/../modules/sound/none.o \
 	$(MINIOBJ)/../modules/debugger/none.o \
 	$(MINIOBJ)/../modules/debugger/debugint.o \
-	$(OSDOBJ)/modules/lib/osdobj_common.o
+	$(MINIOBJ)/../modules/debugger/debugint.o \
+	$(OSDOBJ)/modules/lib/osdobj_common_libretro.o
 
 DISABLE_MIDI_ON = 1
 

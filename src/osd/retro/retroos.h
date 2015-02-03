@@ -25,7 +25,7 @@ int osd_get_num_processors(void);
 
         pointer to value
 -----------------------------------------------------------------------------*/
-char *osd_getenv(const char *name);
+const char *osd_getenv(const char *name);
 
 /*-----------------------------------------------------------------------------
     osd_setenv: set environment variable

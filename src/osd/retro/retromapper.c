@@ -53,7 +53,7 @@ retro_environment_t environ_cb = NULL;
 #endif
 
 static retro_input_state_t input_state_cb = NULL;
-/*static*/ retro_audio_sample_batch_t audio_batch_cb = NULL;
+retro_audio_sample_batch_t audio_batch_cb = NULL;
 
 void retro_set_audio_sample_batch(retro_audio_sample_batch_t cb) { audio_batch_cb = cb; }
 static retro_input_poll_t input_poll_cb;
