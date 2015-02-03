@@ -442,8 +442,6 @@ void Set_Path_Option(){
 
 }
 
-//#include "../portmedia/pmmidi.inc"
-
 //============================================================
 //  main
 //============================================================
@@ -482,8 +480,6 @@ int mmain(int argc, const char *argv)
         if (log_cb)
             log_cb(RETRO_LOG_DEBUG, " %s\n",XARGV[i]);
     }
-
-//    osd_init_midi();
 
     osd_options options;
     retro_osd_interface osd(options);

@@ -489,6 +489,11 @@ void seibu_adpcm_device::device_start()
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock());
 	m_base = machine().root_device().memregion(m_rom_tag)->base();
 	m_adpcm.reset();
+	
+	save_item(NAME(m_current));
+	save_item(NAME(m_end));
+	save_item(NAME(m_nibble));
+	save_item(NAME(m_playing));
 }
 
 // "decrypt" is a bit flowery here, as it's probably just line-swapping to

@@ -7,6 +7,7 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "osdepend.h"
 #include "midiout.h"
 
 /***************************************************************************
@@ -63,10 +64,12 @@ void midiout_device::device_config_complete(void)
 
 bool midiout_device::call_load(void)
 {
-	m_midi = osd_open_midi_output(filename());
+	m_midi = machine().osd().create_midi_device();
 
-	if (m_midi == NULL)
+	if (!m_midi->open_output(filename()))
 	{
+		global_free(m_midi);
+		m_midi = NULL;
 		return IMAGE_INIT_FAIL;
 	}
 
@@ -81,7 +84,9 @@ void midiout_device::call_unload(void)
 {
 	if (m_midi)
 	{
-		osd_close_midi_channel(m_midi);
+		m_midi->close();
+		global_free(m_midi);
+		m_midi = NULL;
 	}
 }
 
@@ -92,6 +97,6 @@ void midiout_device::rcv_complete()    // Rx completed receiving byte
 
 	if (m_midi)
 	{
-		osd_write_midi_channel(m_midi, data);
+		m_midi->write(data);
 	}
 }

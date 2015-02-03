@@ -80,6 +80,9 @@ SDL_FRAMEWORK_PATH = /Library/Frameworks/
 # uncomment to use SDL1.2 (depracated)
 # SDL_LIBVER = sdl
 
+# uncomment to use BGFX
+# USE_BGFX = 1
+
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
 ###########################################################################
@@ -210,7 +213,6 @@ ifeq ($(TARGETOS),linux)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = tc
 SDL_NETWORK = taptun
-#SDL_NETWORK = pcap
 
 ifndef NO_USE_MIDI
 INCPATH += `pkg-config --cflags alsa`
@@ -341,8 +343,8 @@ SDL_NETWORK = pcap
 INCPATH += -I$(3RDPARTY)/winpcap/Include
 
 # enable UNICODE
-DEFS += -Dmain=utf8_main -DUNICODE -D_UNICODE
-LDFLAGS += -municode
+DEFS += -Dmain=utf8_main -DUNICODE -D_UNICODE 
+LDFLAGS += -municode 
 
 # Qt
 ifndef NO_USE_QTDEBUG
@@ -448,11 +450,13 @@ OSDOBJS = \
 	$(OSDOBJ)/modules/font/font_none.o \
 	$(OSDOBJ)/modules/netdev/taptun.o \
 	$(OSDOBJ)/modules/netdev/pcap.o \
+	$(OSDOBJ)/modules/netdev/none.o \
+	$(OSDOBJ)/modules/midi/portmidi.o \
+	$(OSDOBJ)/modules/midi/none.o \
 
 ifdef NO_USE_MIDI
-	OSDOBJS += $(OSDOBJ)/modules/midi/none.o
+	DEFS += -DNO_USE_MIDI
 else
-	OSDOBJS += $(OSDOBJ)/modules/midi/portmidi.o
 endif
 
 # Add SDL2.0 support
@@ -750,6 +754,17 @@ OSDOBJS += \
 	$(OSDOBJ)/modules/debugger/debugwin.o \
 	$(OSDOBJ)/modules/debugger/debugqt.o \
 
+#-------------------------------------------------
+# BGFX
+#-------------------------------------------------
+
+ifdef USE_BGFX
+DEFS += -DUSE_BGFX
+OSDOBJS += $(SDLOBJ)/drawbgfx.o 
+INCPATH += -I$(3RDPARTY)/bgfx/include -I$(3RDPARTY)/bx/include
+USE_DISPATCH_GL = 0
+BGFX_LIB = $(OBJ)/libbgfx.a
+endif
 
 #-------------------------------------------------
 # OPENGL
@@ -879,7 +894,7 @@ $(LIBOSD): $(OSDOBJS)
 #-------------------------------------------------
 
 TOOLS += \
-	testkeys$(EXE)
+	$(BIN)testkeys$(EXE)
 
 $(SDLOBJ)/testkeys.o: $(SDLSRC)/testkeys.c
 	@echo Compiling $<...
@@ -888,7 +903,7 @@ $(SDLOBJ)/testkeys.o: $(SDLSRC)/testkeys.c
 TESTKEYSOBJS = \
 	$(SDLOBJ)/testkeys.o \
 
-testkeys$(EXE): $(TESTKEYSOBJS) $(LIBUTIL) $(LIBOCORE) $(SDLUTILMAIN)
+$(BIN)testkeys$(EXE): $(TESTKEYSOBJS) $(LIBUTIL) $(LIBOCORE) $(SDLUTILMAIN)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(BASELIBS) -o $@
 

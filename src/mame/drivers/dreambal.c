@@ -33,22 +33,22 @@ class dreambal_state : public driver_device
 public:
 	dreambal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_eeprom(*this, "eeprom"),
 		m_maincpu(*this, "maincpu"),
 		m_deco104(*this, "ioprot104"),
-		m_deco_tilegen1(*this, "tilegen1")
+		m_deco_tilegen1(*this, "tilegen1"),
+		m_eeprom(*this, "eeprom")
 	{ }
-
-	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<deco104_device> m_deco104;
 	required_device<deco16ic_device> m_deco_tilegen1;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
 	DECLARE_DRIVER_INIT(dreambal);
 	virtual void machine_start();
 	virtual void machine_reset();
+	
 	UINT32 screen_update_dreambal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 
@@ -367,4 +367,4 @@ DRIVER_INIT_MEMBER(dreambal_state,dreambal)
 }
 
 // Ver 2.4 JPN 93.12.02
-GAME( 1993, dreambal, 0,     dreambal, dreambal, dreambal_state,  dreambal,  ROT0, "NDK / Data East", "Dream Ball (Japan V2.4)", 0 ) // copyright shows NDK, board is Data East, code seems Data East-like too
+GAME( 1993, dreambal, 0,     dreambal, dreambal, dreambal_state,  dreambal,  ROT0, "NDK / Data East", "Dream Ball (Japan V2.4)", GAME_SUPPORTS_SAVE ) // copyright shows NDK, board is Data East, code seems Data East-like too

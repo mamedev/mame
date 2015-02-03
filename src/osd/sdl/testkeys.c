@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
 				printf("ITEM_ID_XY %s 0x%x 0x%x %s\n",
 					lookup_key_name(sdl_lookup, event.key.keysym.scancode),
 					(int) event.key.keysym.scancode,
-					0, //(int) event.key.keysym.unicode,
+					(int) event.key.keysym.sym,
 					"");
 				lasttext[0] = 0;
 #else
@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
 			printf("ITEM_ID_XY %s 0x%x 0x%x %s\n",
 					lookup_key_name(sdl_lookup, event.key.keysym.scancode),
 					(int) event.key.keysym.scancode,
-					0, //(int) event.key.keysym.unicode,
+					(int) event.key.keysym.sym,
 					lasttext);
 #else
 			memset(buf, 0, 19);

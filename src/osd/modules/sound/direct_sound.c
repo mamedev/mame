@@ -279,7 +279,7 @@ HRESULT sound_direct_sound::dsound_init()
 	SDL_SysWMinfo wminfo;
 	SDL_VERSION(&wminfo.version);
 #if (SDLMAME_SDL2)
-	SDL_GetWindowWMInfo(sdl_window_list->sdl_window, &wminfo);
+	SDL_GetWindowWMInfo(sdl_window_list->m_sdl_window, &wminfo);
 	result = IDirectSound_SetCooperativeLevel(dsound, wminfo.info.win.window, DSSCL_PRIORITY);
 #else
 	SDL_GetWMInfo(&wminfo);

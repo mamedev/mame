@@ -369,7 +369,6 @@ RM = @rm -f
 OBJDUMP = @objdump
 PYTHON = @python
 
-
 #-------------------------------------------------
 # form the name of the executable
 #-------------------------------------------------
@@ -415,7 +414,7 @@ NAME = $(TARGET)$(SUBTARGET)
 endif
 
 # fullname is prefix+name+suffix+suffix64+suffixdebug
-FULLNAME ?= $(PREFIX)$(PREFIXSDL)$(NAME)$(SUFFIX)$(SUFFIX64)$(SUFFIXDEBUG)$(SUFFIXPROFILE)
+FULLNAME ?= $(BIN)$(PREFIX)$(PREFIXSDL)$(NAME)$(SUFFIX)$(SUFFIX64)$(SUFFIXDEBUG)$(SUFFIXPROFILE)
 
 # add an EXE suffix to get the final emulator name
 EMULATOR = $(FULLNAME)$(EXE)
@@ -650,9 +649,6 @@ ifeq ($(COMMAND_MODE),"legacy")
 ARFLAGS = -crs
 endif
 endif
-ifeq ($(TARGETOS),emscripten)
-ARFLAGS = cr
-endif
 
 
 #-------------------------------------------------
@@ -711,7 +707,7 @@ endif
 # this variable
 #-------------------------------------------------
 
-OBJDIRS = $(OBJ) $(OBJ)/$(TARGET)/$(SUBTARGET)
+OBJDIRS += $(OBJ) $(OBJ)/$(TARGET)/$(SUBTARGET)
 
 
 #-------------------------------------------------
@@ -799,6 +795,9 @@ else
 LIBS += -lsqlite3
 SQLITE3_LIB =
 endif
+
+# add BGFX library - this is one in sdl.mak / windows.mak
+# BGFX_LIB = $(OBJ)/libbgfx.a
 
 # add PortMidi MIDI library
 ifeq ($(BUILD_MIDILIB),1)
@@ -929,11 +928,19 @@ $(sort $(OBJDIRS)):
 
 ifndef EXECUTABLE_DEFINED
 
-$(EMULATOR): $(EMUINFOOBJ) $(DRIVLISTOBJ) $(DRVLIBS) $(LIBOSD) $(LIBBUS) $(LIBOPTIONAL) $(LIBEMU) $(LIBDASM) $(LIBUTIL) $(EXPAT) $(SOFTFLOAT) $(JPEG_LIB) $(FLAC_LIB) $(7Z_LIB) $(FORMATS_LIB) $(LUA_LIB) $(SQLITE3_LIB) $(WEB_LIB) $(ZLIB) $(LIBOCORE) $(MIDI_LIB) $(RESFILE)
+EMULATOROBJLIST = $(EMUINFOOBJ) $(DRIVLISTOBJ) $(DRVLIBS) $(LIBOSD) $(LIBBUS) $(LIBOPTIONAL) $(LIBEMU) $(LIBDASM) $(LIBUTIL) $(EXPAT) $(SOFTFLOAT) $(JPEG_LIB) $(FLAC_LIB) $(7Z_LIB) $(FORMATS_LIB) $(LUA_LIB) $(SQLITE3_LIB) $(WEB_LIB) $(BGFX_LIB) $(ZLIB) $(LIBOCORE) $(MIDI_LIB) $(RESFILE)
+
+ifeq ($(TARGETOS),emscripten)
+EMULATOROBJ = $(EMULATOROBJLIST:.a=.bc)
+else
+EMULATOROBJ = $(EMULATOROBJLIST)
+endif
+
+$(EMULATOR): $(EMULATOROBJ)
 	$(CC) $(CDEFS) $(CFLAGS) -c $(SRC)/version.c -o $(VERSIONOBJ)
 	@echo Linking $@...
 ifeq ($(TARGETOS),emscripten)
-# Emscripten's linker seems to be stricter about the ordering of .a files
+# Emscripten's linker seems to be stricter about the ordering of files
 	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $(VERSIONOBJ) -Wl,--start-group $^ -Wl,--end-group $(LIBS) -o $@
 else
 	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $(VERSIONOBJ) $^ $(LIBS) -o $@
@@ -1002,10 +1009,20 @@ $(DRIVLISTSRC): $(SRC)/$(TARGET)/$(SUBTARGET).lst $(MAKELIST_TARGET)
 	@echo Building driver list $<...
 	@$(MAKELIST) $< >$@
 
+ifeq ($(TARGETOS),emscripten)
+# Avoid using .a files with Emscripten, link to bitcode instead
+$(OBJ)/%.a:
+	@echo Linking $@...
+	$(RM) $@
+	$(LD) $^ -o $@
+$(OBJ)/%.bc: $(OBJ)/%.a
+	@cp $< $@
+else
 $(OBJ)/%.a:
 	@echo Archiving $@...
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ $^
+endif
 
 ifeq ($(TARGETOS),macosx)
 $(OBJ)/%.o: $(SRC)/%.m | $(OSPREBUILD)

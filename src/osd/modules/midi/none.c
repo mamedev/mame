@@ -7,50 +7,89 @@
 *******************************************************************c********/
 
 #include "osdcore.h"
+#include "corealloc.h"
+#include "modules/osdmodule.h"
+#include "midi_module.h"
 
-struct osd_midi_device
+class none_module : public osd_module, public midi_module
 {
-	int dummy;
+public:
+
+	none_module()
+	: osd_module(OSD_MIDI_PROVIDER, "pm"), midi_module()
+	{
+	}
+	virtual ~none_module() { }
+
+	virtual int init();
+	virtual void exit();
+
+	osd_midi_device *create_midi_device();
+	void list_midi_devices(void);
 };
 
-bool osd_midi_init()
+
+class osd_midi_device_none : public osd_midi_device
 {
-	return true;
+public:
+	virtual ~osd_midi_device_none() { }
+	virtual bool open_input(const char *devname);
+	virtual bool open_output(const char *devname);
+	virtual void close();
+	virtual bool poll();
+	virtual int read(UINT8 *pOut);
+	virtual void write(UINT8 data);
+
+private:
+	//int dummy;
+};
+
+osd_midi_device *none_module::create_midi_device()
+{
+	return global_alloc(osd_midi_device_none());
 }
 
-void osd_midi_exit()
-{
-}
 
-void osd_list_midi_devices(void)
-{
-	osd_printf_warning("\nMIDI is not supported in this build\n");
-}
-
-osd_midi_device *osd_open_midi_input(const char *devname)
-{
-	return NULL;
-}
-
-osd_midi_device *osd_open_midi_output(const char *devname)
-{
-	return NULL;
-}
-
-void osd_close_midi_channel(osd_midi_device *dev)
-{
-}
-
-bool osd_poll_midi_channel(osd_midi_device *dev)
-{
-	return false;
-}
-
-int osd_read_midi_channel(osd_midi_device *dev, UINT8 *pOut)
+int none_module::init()
 {
 	return 0;
 }
 
-void osd_write_midi_channel(osd_midi_device *dev, UINT8 data)
+void none_module::exit()
 {
 }
+
+void none_module::list_midi_devices(void)
+{
+	osd_printf_warning("\nMIDI is not supported in this build\n");
+}
+
+bool osd_midi_device_none::open_input(const char *devname)
+{
+	return false;
+}
+
+bool osd_midi_device_none::open_output(const char *devname)
+{
+	return false;
+}
+
+void osd_midi_device_none::close()
+{
+}
+
+bool osd_midi_device_none::poll()
+{
+	return false;
+}
+
+int osd_midi_device_none::read(UINT8 *pOut)
+{
+	return 0;
+}
+
+void osd_midi_device_none::write(UINT8 data)
+{
+}
+
+MODULE_DEFINITION(MIDI_NONE, none_module)

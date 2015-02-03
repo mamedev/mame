@@ -20,18 +20,6 @@
 const device_type NES_BARCODE_BATTLER = &device_creator<nes_bcbattle_device>;
 
 
-static INPUT_PORTS_START( nes_battler )
-INPUT_PORTS_END
-
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
-
-ioport_constructor nes_bcbattle_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME( nes_battler );
-}
-
 MACHINE_CONFIG_FRAGMENT( nes_battler )
 	MCFG_BARCODE_READER_ADD("battler")
 MACHINE_CONFIG_END
@@ -46,6 +34,9 @@ machine_config_constructor nes_bcbattle_device::device_mconfig_additions() const
 //  device_timer - handler timer events
 //-------------------------------------------------
 
+// This part is the hacky replacement for the real Barcode unit [shared with SNES implementation]:
+// code periodically checks whether a new code has been scanned and it moves it to the 
+// m_current_barcode array
 void nes_bcbattle_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id == TIMER_BATTLER)
@@ -92,7 +83,7 @@ void nes_bcbattle_device::device_timer(emu_timer &timer, device_timer_id id, int
 //-------------------------------------------------
 
 nes_bcbattle_device::nes_bcbattle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-					device_t(mconfig, NES_BARCODE_BATTLER, "Epoch Barcode Battler", tag, owner, clock, "nes_bcbattle", __FILE__),
+					device_t(mconfig, NES_BARCODE_BATTLER, "Epoch Barcode Battler (FC)", tag, owner, clock, "nes_bcbattle", __FILE__),
 					device_nes_control_port_interface(mconfig, *this),
 					m_reader(*this, "battler")
 {

@@ -1,0 +1,260 @@
+<html>
+<head>
+	<title>UnitTest++ in brief</title>
+</head>
+<body>
+<h1>UnitTest++ in brief</h1>
+<h2>Introduction</h2>
+<p>This little document serves as bare-bones documentation for UnitTest++.</p>
+
+<p>For background, goals and license details, see:</p>
+
+<ul>
+  <li><a href="http://unittest-cpp.sourceforge.net/">The UnitTest++ home page</a></li>
+  <li><a href="http://gamesfromwithin.com/?p=51">Release announcement</a></li>
+</ul>
+
+<p>The documentation, while sparse, aims to be practical, so it should give you enough info to get started using UnitTest++ as fast as possible.</p>
+
+<h2>Building UnitTest++</h2>
+<p>Building UnitTest++ will be specific to each platform and build environment, but it should be straightforward.</p>
+
+<h3>Building with Visual Studio</h3>
+<p>If you are using Visual Studio, go for either of the provided .sln files, depending on version. There are no prefabricated solutions for versions earlier than VS.NET 2003, but we have had reports of people building UnitTest++ with at least VS.NET 2002.</p>
+
+<h3>Building with Make</h3>
+<p>The bundled makefile is written to build with g++. It also needs <code>sed</code> installed in the path, and to be able to use the <code>mv</code> and <code>rm</code> shell commands. The makefile should be usable on most Posix-like platforms.</p>
+
+<p>Do "make all" to generate a library and test executable. A final build step runs all unit tests to make sure that the result works as expected.</p>
+
+<h3>Packaging</h3>
+<p>You'll probably want to keep the generated library in a shared space in source control, so you can reuse it for multiple test projects. A redistributable package of UnitTest++ would consist of the generated library file, and all of the header files in <code>UnitTest++/src/</code> and its per-platform subfolders. The <code>tests</code> directory only contains the unit tests for the library, and need not be included.</p>
+
+<h2>Using UnitTest++</h2>
+<p>The source code for UnitTest++ comes with a full test suite written <em>using</em> UnitTest++. This is a great place to learn techniques for testing. There is one sample .cpp file: <code>UnitTest++/src/tests/TestUnitTest++.cpp</code>. It covers most of UnitTest++'s features in an easy-to-grasp context, so start there if you want a quick overview of typical usage.</p>
+
+<h3>Getting started</h3>
+<p>Listed below is a minimal C++ program to run a failing test through UnitTest++.</p>
+
+<pre>
+  // test.cpp
+  #include &lt;UnitTest++.h&gt;
+
+  TEST(FailSpectacularly)
+  {
+    CHECK(false);
+  }
+
+  int main()
+  {
+    return UnitTest::RunAllTests();
+  }
+</pre>
+
+<p><code>UnitTest++.h</code> is a facade header for UnitTest++, so including that should get you all features of the library. All classes and free functions are placed in namespace <code>UnitTest</code>, so you need to either qualify their full names (as with <code>RunAllTests()</code> in the example) or add a <code>using namespace UnitTest;</code> statement in your .cpp files. Note that any mention of UnitTest++ functions and classes in this document assume that the <code>UnitTest</code> namespace has been opened.</p>
+
+<p>Compiling and linking this program with UnitTest++'s static library into an executable, and running it, will produce the following output (details may vary):</p>
+
+<pre>
+  .\test.cpp(5): error: Failure in FailSpectacularly: false
+  FAILED: 1 out of 1 tests failed (1 failures).
+  Test time: 0.00 seconds.
+</pre>
+
+<p>UnitTest++ attempts to report every failure in an IDE-friendly format, depending on platform (e.g. you can double-click it in Visual Studio's error list.) The exit code will be the number of failed tests, so that a failed test run always returns a non-zero exit code.</p>
+
+<h3>Test macros</h3>
+<p>To add a test, simply put the following code in a .cpp file of your choice:</p>
+
+<pre>
+  TEST(YourTestName)
+  {
+  }
+</pre>
+
+<p>The <code>TEST</code> macro contains enough machinery to turn this slightly odd-looking syntax into legal C++, and automatically register the test in a global list. This test list forms the basis of what is executed by <code>RunAllTests()</code>.</p>
+
+<p>If you want to re-use a set of test data for more than one test, or provide setup/teardown for tests, you can use the <code>TEST_FIXTURE</code> macro instead. The macro requires that you pass it a class name that it will instantiate, so any setup and teardown code should be in its constructor and destructor.</p>
+
+<pre>
+  struct SomeFixture
+  {
+    SomeFixture() { /* some setup */ }
+    ~SomeFixture() { /* some teardown */ }
+
+    int testData;
+  };
+ 
+  TEST_FIXTURE(SomeFixture, YourTestName)
+  {
+    int temp = testData;
+  }
+</pre>
+
+<p>Note how members of the fixture are used as if they are a part of the test, since the macro-generated test class derives from the provided fixture class.</p>
+
+<h3>Suite macros</h3>
+<p>Tests can be grouped into suites, using the <code>SUITE</code> macro. A suite serves as a namespace for test names, so that the same test name can be used in two difference contexts.</p>
+
+<pre>
+  SUITE(YourSuiteName)
+  {
+    TEST(YourTestName)
+    {
+    }
+
+    TEST(YourOtherTestName)
+    {
+    }
+  }
+</pre>
+
+<p>This will place the tests into a C++ namespace called <code>YourSuiteName</code>, and make the suite name available to UnitTest++. <code>RunAllTests()</code> can be called for a specific suite name, so you can use this to build named groups of tests to be run together.</p>
+
+<h3>Simple check macros</h3>
+<p>In test cases, we want to check the results of our system under test. UnitTest++ provides a number of check macros that handle comparison and proper failure reporting.</p>
+
+<p>The most basic variety is the boolean <code>CHECK</code> macro:</p>
+
+<pre>
+  CHECK(false); // fails
+</pre>
+
+<p>It will fail if the boolean expression evaluates to false.</p>
+
+<p>For equality checks, it's generally better to use <code>CHECK_EQUAL</code>:</p>
+
+<pre>
+  CHECK_EQUAL(10, 20); // fails
+  CHECK_EQUAL("foo", "bar"); // fails
+</pre>
+
+<p>Note how <code>CHECK_EQUAL</code> is overloaded for C strings, so you don't have to resort to <code>strcmp</code> or similar. There is no facility for case-insensitive comparison or string searches, so you may have to drop down to a plain boolean <code>CHECK</code> with help from the CRT:</p>
+
+<pre>
+  CHECK(std::strstr("zaza", "az") != 0); // succeeds
+</pre>
+
+<p>For floating-point comparison, equality <a href="http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm">isn't necessarily well-defined</a>, so you should prefer the <code>CHECK_CLOSE</code> macro:</p>
+
+<pre>
+  CHECK_CLOSE(3.14, 3.1415, 0.01); // succeeds
+</pre>
+
+<p>All of the macros are tailored to avoid unintended side-effects, for example:</p>
+
+<pre>
+  TEST(CheckMacrosHaveNoSideEffects)
+  {
+    int i = 4;
+    CHECK_EQUAL(5, ++i); // succeeds
+    CHECK_EQUAL(5, i); // succeeds
+  }
+</pre>
+
+<p>The check macros guarantee that the <code>++i</code> expression isn't repeated internally, as demonstrated above.</p>
+
+<h3>Array check macros</h3>
+<p>There is a set of check macros for array comparison as well:</p>
+
+<pre>
+  const float oned[2] = { 10, 20 };
+  CHECK_ARRAY_EQUAL(oned, oned, 2); // succeeds
+  CHECK_ARRAY_CLOSE(oned, oned, 2, 0.00); // succeeds
+
+  const float twod[2][3] = { {0, 1, 2}, {2, 3, 4} };
+  CHECK_ARRAY2D_CLOSE(twod, twod, 2, 3, 0.00); // succeeds
+</pre>
+
+<p>The array equal macro compares elements using <code>operator==</code>, so <code>CHECK_ARRAY_EQUAL</code> won't work for an array of C strings, for example.</p>
+
+<p>The array close macros are similar to the regular CHECK_CLOSE macro, and are really only useful for scalar types, that can be compared in terms of a difference between two array elements.</p>
+
+<p>Note that the one-dimensional array macros work for <code>std::vector</code> as well, as it can be indexed just as a C array.</p>
+
+<h3>Exception check macros</h3>
+<p>Finally, there's a <code>CHECK_THROW</code> macro, which asserts that its enclosed expression throws the specified type:</p>
+
+<pre>
+  struct TestException {};
+  CHECK_THROW(throw TestException(), TestException); // succeeds
+</pre>
+
+<p>UnitTest++ natively catches exceptions if your test code doesn't. So if your code under test throws any exception UnitTest++ will fail the test and report either using the <code>what()</code> method for <code>std::exception</code> derivatives or just a plain message for unknown exception types.</p>
+
+<p>Should your test or code raise an irrecoverable error (an Access Violation on Win32, for example, or a signal on Linux), UnitTest++ will attempt to map them to an exception and fail the test, just as for other unhandled exceptions.</p>
+
+<h3>Time constraints</h3>
+<p>UnitTest++ can fail a test if it takes too long to complete, using so-called time constraints.</p>
+
+<p>They come in two flavors; <em>local</em> and <em>global</em> time constraints.</p>
+
+<p>Local time constraints are limited to the current scope, like so:</p>
+
+<pre>
+  TEST(YourTimedTest)
+  {
+     // Lengthy setup...
+
+     {
+        UNITTEST_TIME_CONSTRAINT(50);
+
+        // Do time-critical stuff
+     }
+
+     // Lengthy teardown...
+  }
+</pre>
+
+<p>The test will fail if the "Do time-critical stuff" block takes longer than 50 ms to complete. The time-consuming setup and teardown are not measured, since the time constraint is scope-bound. It's perfectly valid to have multiple local time constraints in the same test, as long as there is only one per block.</p>
+
+<p>A global time constraint, on the other hand, requires that all of the tests in a test run are faster than a specified amount of time. This allows you, when you run a suite of tests, to ask UnitTest++ to fail it entirely if any test exceeds the global constraint. The max time is passed as a parameter to an overload of <code>RunAllTests()</code>.</p>
+
+<p>If you want to use a global time constraint, but have one test that is notoriously slow, you can exempt it from inspection by using the <code>UNITTEST_TIME_CONSTRAINT_EXEMPT</code> macro anywhere inside the test body.</p>
+
+<pre>
+  TEST(NotoriouslySlowTest)
+  {
+     UNITTEST_TIME_CONSTRAINT_EXEMPT();
+
+     // Oh boy, this is going to take a while
+     ...
+  }
+</pre>
+
+<h3>Test runners</h3>
+<p>The <code>RunAllTests()</code> function has an overload that lets you customize the behavior of the runner, such as global time constraints, custom reporters, which suite to run, etc.</p>
+
+<pre>
+  int RunAllTests(TestReporter& reporter, TestList const& list, char const* suiteName, int const maxTestTimeInMs);
+</pre>
+
+<p>If you attempt to pass custom parameters to <code>RunAllTests()</code>, note that the <code>list</code> parameter should have the value <code>Test::GetTestList()</code>.</p>
+
+<p>The parameterless <code>RunAllTests()</code> is a simple wrapper for this one, with sensible defaults.</p>
+
+<h3>Example setup</h3>
+<p>How to create a new test project varies depending on your environment, but here are some directions on common file structure and usage.</p>
+
+<p>The general idea is that you keep one <code>Main.cpp</code> file with the entry-point which calls <code>RunAllTests()</code>.</p>
+
+<p>Then you can simply compile and link new .cpp files at will, typically one per test suite.</p>
+
+<pre>
+   + ShaverTests/
+   |
+   +- Main.cpp
+   |
+   +- TestBrush.cpp   
+   +- TestEngine.cpp
+   +- TestRazor.cpp   
+</pre>
+
+<p>Each of the <code>Test*.cpp</code> files will contain one or more <code>TEST</code> macro incantations with the associated test code. There are no source-level dependencies between <code>Main.cpp</code> and <code>Test*.cpp</code>, as the <code>TEST</code> macro handles the registration and setup necessary for <code>RunAllTests()</code> to find all tests compiled into the same final executable.</p>
+
+<p>UnitTest++ does not require this structure, even if this is how the library itself does it. As long as your test project contains one or more <code>TESTs</code> and calls <code>RunAllTests()</code> at one point or another, it will be handled by UnitTest++.</p>
+
+<p>It's common to make the generated executable start as a post-build step, so that merely building your test project will run the tests as well. Since the exit code is the count of failures, a failed test will generally break the build, as most build engines will fail a build if any step returns a non-zero exit code.</p>
+
+</body>
+</html>

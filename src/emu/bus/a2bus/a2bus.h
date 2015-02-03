@@ -106,6 +106,10 @@ public:
 	void set_nmi_line(int state, int slot);
 	void set_maincpu_halt(int state);
 	void recalc_inh(int slot);
+	UINT8 dma_r(address_space &space, UINT16 offset);
+	void dma_w(address_space &space, UINT16 offset, UINT8 data);
+	UINT8 dma_nospace_r(UINT16 offset);
+	void dma_nospace_w(UINT16 offset, UINT8 data);
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
@@ -117,6 +121,7 @@ protected:
 
 	// internal state
 	cpu_device   *m_maincpu;
+	address_space *m_maincpu_space;
 
 	devcb_write_line    m_out_irq_cb;
 	devcb_write_line    m_out_nmi_cb;
@@ -144,12 +149,12 @@ public:
 	device_a2bus_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_a2bus_card_interface();
 
-	virtual UINT8 read_c0nx(address_space &space, UINT8 offset) { printf("a2bus: unhandled read at C0n%x\n", offset); return 0; }       // C0nX - /DEVSEL
-	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data) { printf("a2bus: unhandled write %02x to C0n%x\n", data, offset); }
+	virtual UINT8 read_c0nx(address_space &space, UINT8 offset) { logerror("a2bus: unhandled read at C0n%x\n", offset); return 0; }       // C0nX - /DEVSEL
+	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data) { logerror("a2bus: unhandled write %02x to C0n%x\n", data, offset); }
 	virtual UINT8 read_cnxx(address_space &space, UINT8 offset) { return 0; }       // CnXX - /IOSEL
-	virtual void write_cnxx(address_space &space, UINT8 offset, UINT8 data) { printf("a2bus: unhandled write %02x to Cn%02x\n", data, offset); }
+	virtual void write_cnxx(address_space &space, UINT8 offset, UINT8 data) { logerror("a2bus: unhandled write %02x to Cn%02x\n", data, offset); }
 	virtual UINT8 read_c800(address_space &space, UINT16 offset) { return 0; }      // C800 - /IOSTB
-	virtual void write_c800(address_space &space, UINT16 offset, UINT8 data) { printf("a2bus: unhandled write %02x to %04x\n", data, offset + 0xc800); }
+	virtual void write_c800(address_space &space, UINT16 offset, UINT8 data) { logerror("a2bus: unhandled write %02x to %04x\n", data, offset + 0xc800); }
 	virtual bool take_c800() { return true; }   // override and return false if your card doesn't take over the c800 space
 	virtual UINT8 read_inh_rom(address_space &space, UINT16 offset) { return 0; }
 	virtual void write_inh_rom(address_space &space, UINT16 offset, UINT8 data) { }
@@ -170,6 +175,15 @@ public:
 	void lower_slot_nmi() { m_a2bus->set_nmi_line(CLEAR_LINE, m_slot); }
 	void recalc_slot_inh() { m_a2bus->recalc_inh(m_slot); }
 	void set_maincpu_halt(int state) { m_a2bus->set_maincpu_halt(state); }
+
+	// pass through the original address space if any for debugger protection 
+	// when debugging e.g. coprocessor cards (Z80 SoftCard etc).
+	UINT8 slot_dma_read(address_space &space, UINT16 offset) { return m_a2bus->dma_r(space, offset); }
+	void slot_dma_write(address_space &space, UINT16 offset, UINT8 data) { m_a2bus->dma_w(space, offset, data); }
+
+	// these versions forego that protection for when the DMA isn't coming from a debuggable CPU device
+	UINT8 slot_dma_read_no_space(UINT16 offset) { return m_a2bus->dma_nospace_r(offset); }
+	void slot_dma_write_no_space(UINT16 offset, UINT8 data) { m_a2bus->dma_nospace_w(offset, data); }
 
 	// inline configuration
 	static void static_set_a2bus_tag(device_t &device, const char *tag, const char *slottag);

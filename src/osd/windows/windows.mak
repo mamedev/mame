@@ -371,6 +371,7 @@ OSDOBJS = \
 	$(WINOBJ)/d3dhlsl.o \
 	$(WINOBJ)/drawdd.o \
 	$(WINOBJ)/drawgdi.o \
+	$(WINOBJ)/drawbgfx.o \
 	$(WINOBJ)/drawnone.o \
 	$(WINOBJ)/input.o \
 	$(WINOBJ)/output.o \
@@ -383,6 +384,7 @@ OSDOBJS = \
 	$(WINOBJ)/winmenu.o \
 	$(WINOBJ)/winmain.o \
 	$(OSDOBJ)/modules/midi/portmidi.o \
+	$(OSDOBJ)/modules/midi/none.o \
 	$(OSDOBJ)/modules/lib/osdobj_common.o  \
 	$(OSDOBJ)/modules/font/font_sdl.o \
 	$(OSDOBJ)/modules/font/font_windows.o \
@@ -390,10 +392,10 @@ OSDOBJS = \
 	$(OSDOBJ)/modules/font/font_none.o \
 	$(OSDOBJ)/modules/netdev/pcap.o \
 	$(OSDOBJ)/modules/netdev/taptun.o \
+	$(OSDOBJ)/modules/netdev/none.o \
 
 ifdef USE_SDL
-OSDOBJS += \
-	$(OSDOBJ)/modules/sound/sdl_sound.o
+DEFS += -DUSE_SDL_SOUND
 endif
 
 ifndef DONT_USE_NETWORK
@@ -415,6 +417,9 @@ OSDOBJS += \
 
 # add a stub resource file
 RESFILE = $(WINOBJ)/mame.res
+
+BGFX_LIB = $(OBJ)/libbgfx.a
+INCPATH += -I$(3RDPARTY)/bgfx/include -I$(3RDPARTY)/bx/include
 
 #-------------------------------------------------
 # QT Debug library
@@ -469,7 +474,7 @@ $(LIBOSD): $(OSDOBJS)
 # rule for making the ledutil sample
 #-------------------------------------------------
 
-LEDUTIL = ledutil$(EXE)
+LEDUTIL = $(BIN)ledutil$(EXE)
 TOOLS += $(LEDUTIL)
 
 LEDUTILOBJS = \

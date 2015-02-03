@@ -17,9 +17,8 @@ enum e_mnemonics
 	mLAM, mXC, mXCI, mXCD, mSTM, mRSM,
 	mADD, mADCS, mADIS, mAND, mXOR, mCMA, mSTC, mRSC, mSF1, mRF1, mSF2, mRF2,
 	mSAM, mSZM, mSBE, mSZC, mSOS, mSZK, mSZI, mTF1, mTF2,
-	mPP, mJMP, mJMS, mRT, mRTS, mNOP,
-	mINP, mOUT, mDISB, mDISN, mMVS, mPSH, mPSL, mEUR,
-	mILL
+	mPP, mJMP, mJMS, mRT, mRTS, mNOP, mHALT,
+	mINP, mOUT, mDISB, mDISN, mMVS, mPSH, mPSL, mEUR
 };
 
 static const char *const s_mnemonics[] =
@@ -28,9 +27,8 @@ static const char *const s_mnemonics[] =
 	"LAM", "XC", "XCI", "XCD", "STM", "RSM",
 	"ADD", "ADCS", "ADIS", "AND", "XOR", "CMA", "STC", "RSC", "SF1", "RF1", "SF2", "RF2",
 	"SAM", "SZM", "SBE", "SZC", "SOS", "SZK", "SZI", "TF1", "TF2",
-	"PP", "JMP", "JMS", "RT", "RTS", "NOP",
-	"INP", "OUT", "DISB", "DISN", "MVS", "PSH", "PSL", "EUR",
-	"?"
+	"PP", "JMP", "JMS", "RT", "RTS", "NOP", "HALT",
+	"INP", "OUT", "DISB", "DISN", "MVS", "PSH", "PSL", "EUR"
 };
 
 
@@ -43,9 +41,8 @@ static const UINT32 s_flags[] =
 	0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, _OVER, _OUT, _OUT, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0
+	0, 0, _OVER, _OUT, _OUT, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0
 };
 
 
@@ -55,16 +52,15 @@ static const int s_bits[] =
 	-2, -2, -2, -2, 2, 2,
 	0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 2, 0, 0, 0, 0, 0, 0, 0,
-	-4, 6, 6, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0
+	-4, 6, 6, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0
 };
 
 
 static const UINT8 s2000_mnemonic[0x100] =
 {
 	/* 0x00 */
-	mNOP, mILL, mRT, mRTS, mPSH, mPSL, mAND, mSOS,
+	mNOP, mHALT, mRT, mRTS, mPSH, mPSL, mAND, mSOS,
 	mSBE, mSZC, mSTC, mRSC, mLAE, mXAE, mINP, mEUR,
 	/* 0x10 */
 	mCMA, mXABU, mLAB, mXAB, mADCS, mXOR, mADD, mSAM,

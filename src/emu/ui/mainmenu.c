@@ -152,7 +152,7 @@ void ui_menu_main::handle()
 	/* process the menu */
 	const ui_menu_event *menu_event = process(0);
 	if (menu_event != NULL && menu_event->iptkey == IPT_UI_SELECT) {
-		switch((long long)((FPTR) menu_event->itemref)) {
+		switch((long long)(menu_event->itemref)) {
 		case INPUT_GROUPS:
 			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_input_groups(machine(), container)));
 			break;

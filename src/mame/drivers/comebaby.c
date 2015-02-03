@@ -39,7 +39,7 @@ Nearly everything.
   Features on-board include....
   super-I/O, Ultra DMA33 (Ultra DMA66 optional for VIA chipset), PCI bus master IDE, AGP Ver 1.0, PCI Ver 2.1 compliance,
   USB, VRM 8.4 compliance, ECC, ATX specification 2.01 compliance, hardware monitoring (optional), On-board PCI Sound
-  Sub-system(optional). Supports PC-100 DIMM Module.
+  Sub-system(optional, not populated). Supports PC-100 DIMM Module.
 
   Key Features:
   
@@ -112,7 +112,7 @@ Nearly everything.
   - Supports Wake on Ring for External Modem.
   - Supports ATX specification 2.01.
   
-  Creative PCI Sound (optional)
+  Creative PCI Sound (optional, not populated)
   - Full DOS game support (DDMA, PC/PCI, CLS).
   - PCI 2.1 Bus Master, hardware sound acceleration.
   - Direct sound and sound Blaster Compatible.
@@ -140,6 +140,9 @@ Nearly everything.
   It uses DirectSound and the Microsoft MCI interfaces and 3dfx Glide for video.
   The PC that the game was dumped from has Sound Blaster and Ensoniq drivers,
   but it works fine with some other sound configurations.
+  The sound chip on the motherboard is not populated. There is a cheap Korean 
+  sound card "CS-6500P Made In Korea OJU CTN CO LTD." plugged into one of the 
+  slots containing a CRYSTAL CS4281-CM chip.
   The donor PC has a "3dfxvoodoo3" driver installation directory, but it works
   fine with a Voodoo4 4500.
 

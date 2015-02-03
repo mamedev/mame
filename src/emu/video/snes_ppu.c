@@ -268,7 +268,6 @@ void snes_ppu_device::device_start()
 
 	save_item(NAME(m_beam.latch_horz));
 	save_item(NAME(m_beam.latch_vert));
-	save_item(NAME(m_beam.current_horz));
 	save_item(NAME(m_beam.current_vert));
 	save_item(NAME(m_beam.last_visible_line));
 	save_item(NAME(m_beam.interlace_count));
@@ -370,7 +369,6 @@ void snes_ppu_device::device_reset()
 	m_beam.latch_vert = 0;
 	m_beam.latch_horz = 0;
 	m_beam.current_vert = 0;
-	m_beam.current_horz = 0;
 	m_beam.last_visible_line = 225; /* TODO: PAL setting */
 	m_mode = 0;
 	m_ppu1_version = 1;  // 5C77 chip version number, read by STAT77, only '1' is known
@@ -1978,13 +1976,11 @@ static const UINT16 vram_fgr_inccnts[4] = { 0, 32, 64, 128 };
 static const UINT16 vram_fgr_shiftab[4] = { 0, 5, 6, 7 };
 
 // utility function - latches the H/V counters.  Used by IRQ, writes to WRIO, etc.
-void snes_ppu_device::latch_counters()
+void snes_ppu_device::set_latch_hv(INT16 x, INT16 y)
 {
-	m_beam.current_horz = m_screen->hpos() / m_htmult;
-	m_beam.latch_vert = m_screen->vpos();
-	m_beam.latch_horz = m_beam.current_horz;
+	m_beam.latch_vert = y;
+	m_beam.latch_horz = x;
 	m_stat78 |= 0x40;   // indicate we latched
-//  m_read_ophct = m_read_opvct = 0;    // clear read flags - 2009-08: I think we must clear these when STAT78 is read...
 
 //  printf("latched @ H %d V %d\n", m_beam.latch_horz, m_beam.latch_vert);
 }
@@ -2308,7 +2304,7 @@ UINT8 snes_ppu_device::read(address_space &space, UINT32 offset, UINT8 wrio_bit7
 				return m_ppu1_open_bus;
 			}
 		case SLHV:      /* Software latch for H/V counter */
-			latch_counters();
+			set_latch_hv(m_screen->hpos() / m_htmult, m_screen->vpos());
 			return m_openbus_cb(space, 0);       /* Return value is meaningless */
 
 		case ROAMDATA:  /* Read data from OAM (DR) */

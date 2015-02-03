@@ -6,16 +6,49 @@
 
 *******************************************************************c********/
 
+#ifndef NO_USE_MIDI
+
 #include "portmidi/pm_common/portmidi.h"
 #include "osdcore.h"
+#include "corealloc.h"
+#include "modules/osdmodule.h"
+#include "midi_module.h"
+
+class pm_module : public osd_module, public midi_module
+{
+public:
+
+	pm_module()
+	: osd_module(OSD_MIDI_PROVIDER, "pm"), midi_module()
+	{
+	}
+	virtual ~pm_module() { }
+
+	virtual int init();
+	virtual void exit();
+
+	osd_midi_device *create_midi_device();
+	void list_midi_devices(void);
+};
+
 
 static const int RX_EVENT_BUF_SIZE = 512;
 
 #define MIDI_SYSEX  0xf0
 #define MIDI_EOX    0xf7
 
-struct osd_midi_device
+class osd_midi_device_pm : public osd_midi_device
 {
+public:
+	virtual ~osd_midi_device_pm() { }
+	virtual bool open_input(const char *devname);
+	virtual bool open_output(const char *devname);
+	virtual void close();
+	virtual bool poll();
+	virtual int read(UINT8 *pOut);
+	virtual void write(UINT8 data);
+
+private:
 	PortMidiStream *pmStream;
 	PmEvent rx_evBuf[RX_EVENT_BUF_SIZE];
 	UINT8 xmit_in[4]; // Pm_Messages mean we can at most have 3 residue bytes
@@ -24,18 +57,24 @@ struct osd_midi_device
 	bool rx_sysex;
 };
 
-bool osd_midi_init()
+osd_midi_device *pm_module::create_midi_device()
 {
-	Pm_Initialize();
-	return true;
+	return global_alloc(osd_midi_device_pm());
 }
 
-void osd_midi_exit()
+
+int pm_module::init()
+{
+	Pm_Initialize();
+	return 0;
+}
+
+void pm_module::exit()
 {
 	Pm_Terminate();
 }
 
-void osd_list_midi_devices(void)
+void pm_module::list_midi_devices(void)
 {
 	int num_devs = Pm_CountDevices();
 	const PmDeviceInfo *pmInfo;
@@ -71,13 +110,12 @@ void osd_list_midi_devices(void)
 	}
 }
 
-osd_midi_device *osd_open_midi_input(const char *devname)
+bool osd_midi_device_pm::open_input(const char *devname)
 {
 	int num_devs = Pm_CountDevices();
 	int found_dev = -1;
 	const PmDeviceInfo *pmInfo;
 	PortMidiStream *stm;
-	osd_midi_device *ret;
 
 	if (!strcmp("default", devname))
 	{
@@ -104,30 +142,27 @@ osd_midi_device *osd_open_midi_input(const char *devname)
 	{
 		if (Pm_OpenInput(&stm, found_dev, NULL, RX_EVENT_BUF_SIZE, NULL, NULL) == pmNoError)
 		{
-			ret = (osd_midi_device *)osd_malloc(sizeof(osd_midi_device));
-			memset(ret, 0, sizeof(osd_midi_device));
-			ret->pmStream = stm;
-			return ret;
+			pmStream = stm;
+			return true;
 		}
 		else
 		{
 			printf("Couldn't open PM device\n");
-			return NULL;
+			return false;
 		}
 	}
 	else
 	{
-		return NULL;
+		return false;
 	}
 }
 
-osd_midi_device *osd_open_midi_output(const char *devname)
+bool osd_midi_device_pm::open_output(const char *devname)
 {
 	int num_devs = Pm_CountDevices();
 	int found_dev = -1;
 	const PmDeviceInfo *pmInfo;
 	PortMidiStream *stm;
-	osd_midi_device *ret;
 
 	if (!strcmp("default", devname))
 	{
@@ -154,40 +189,37 @@ osd_midi_device *osd_open_midi_output(const char *devname)
 	{
 		if (Pm_OpenOutput(&stm, found_dev, NULL, 100, NULL, NULL, 0) == pmNoError)
 		{
-			ret = (osd_midi_device *)osd_malloc(sizeof(osd_midi_device));
-			memset(ret, 0, sizeof(osd_midi_device));
-			ret->pmStream = stm;
-			return ret;
+			pmStream = stm;
+			return true;
 		}
 		else
 		{
 			printf("Couldn't open PM device\n");
-			return NULL;
+			return false;
 		}
 	}
 	else
 	{
-		return NULL;
+		return false;
 	}
-	return NULL;
+	return false;
 }
 
-void osd_close_midi_channel(osd_midi_device *dev)
+void osd_midi_device_pm::close()
 {
-	Pm_Close(dev->pmStream);
-	osd_free(dev);
+	Pm_Close(pmStream);
 }
 
-bool osd_poll_midi_channel(osd_midi_device *dev)
+bool osd_midi_device_pm::poll()
 {
-	PmError chk = Pm_Poll(dev->pmStream);
+	PmError chk = Pm_Poll(pmStream);
 
 	return (chk == pmGotData) ? true : false;
 }
 
-int osd_read_midi_channel(osd_midi_device *dev, UINT8 *pOut)
+int osd_midi_device_pm::read(UINT8 *pOut)
 {
-	int msgsRead = Pm_Read(dev->pmStream, dev->rx_evBuf, RX_EVENT_BUF_SIZE);
+	int msgsRead = Pm_Read(pmStream, rx_evBuf, RX_EVENT_BUF_SIZE);
 	int bytesOut = 0;
 
 	if (msgsRead <= 0)
@@ -197,17 +229,17 @@ int osd_read_midi_channel(osd_midi_device *dev, UINT8 *pOut)
 
 	for (int msg = 0; msg < msgsRead; msg++)
 	{
-		UINT8 status = Pm_MessageStatus(dev->rx_evBuf[msg].message);
+		UINT8 status = Pm_MessageStatus(rx_evBuf[msg].message);
 
-		if (dev->rx_sysex)
+		if (rx_sysex)
 		{
 			if (status & 0x80)  // sys real-time imposing on us?
 			{
 				if ((status == 0xf2) || (status == 0xf3))
 				{
 					*pOut++ = status;
-					*pOut++ = Pm_MessageData1(dev->rx_evBuf[msg].message);
-					*pOut++ = Pm_MessageData2(dev->rx_evBuf[msg].message);
+					*pOut++ = Pm_MessageData1(rx_evBuf[msg].message);
+					*pOut++ = Pm_MessageData2(rx_evBuf[msg].message);
 					bytesOut += 3;
 				}
 				else
@@ -216,7 +248,7 @@ int osd_read_midi_channel(osd_midi_device *dev, UINT8 *pOut)
 					bytesOut++;
 					if (status == MIDI_EOX)
 					{
-						dev->rx_sysex = false;
+						rx_sysex = false;
 					}
 				}
 			}
@@ -224,15 +256,15 @@ int osd_read_midi_channel(osd_midi_device *dev, UINT8 *pOut)
 			{
 				for (int i = 0; i < 4; i++)
 				{
-					UINT8 byte = dev->rx_evBuf[msg].message & 0xff;
+					UINT8 byte = rx_evBuf[msg].message & 0xff;
 					*pOut++ = byte;
 					bytesOut++;
 					if (byte == MIDI_EOX)
 					{
-						dev->rx_sysex = false;
+						rx_sysex = false;
 						break;
 					}
-					dev->rx_evBuf[msg].message >>= 8;
+					rx_evBuf[msg].message >>= 8;
 				}
 			}
 		}
@@ -243,7 +275,7 @@ int osd_read_midi_channel(osd_midi_device *dev, UINT8 *pOut)
 				case 0xc:   // 2-byte messages
 				case 0xd:
 					*pOut++ = status;
-					*pOut++ = Pm_MessageData1(dev->rx_evBuf[msg].message);
+					*pOut++ = Pm_MessageData1(rx_evBuf[msg].message);
 					bytesOut += 2;
 					break;
 
@@ -253,25 +285,25 @@ int osd_read_midi_channel(osd_midi_device *dev, UINT8 *pOut)
 						case 0: // System Exclusive
 						{
 							*pOut++ = status;   // this should be OK: the shortest legal sysex is F0 tt dd F7, I believe
-							*pOut++ = (dev->rx_evBuf[msg].message>>8) & 0xff;
-							*pOut++ = (dev->rx_evBuf[msg].message>>16) & 0xff;
-							UINT8 last = *pOut++ = (dev->rx_evBuf[msg].message>>24) & 0xff;
+							*pOut++ = (rx_evBuf[msg].message>>8) & 0xff;
+							*pOut++ = (rx_evBuf[msg].message>>16) & 0xff;
+							UINT8 last = *pOut++ = (rx_evBuf[msg].message>>24) & 0xff;
 							bytesOut += 4;
-							dev->rx_sysex = (last != MIDI_EOX);
+							rx_sysex = (last != MIDI_EOX);
 							break;
 						}
 
 						case 7: // End of System Exclusive
 							*pOut++ = status;
 							bytesOut += 1;
-							dev->rx_sysex = false;
+							rx_sysex = false;
 							break;
 
 						case 2: // song pos
 						case 3: // song select
 							*pOut++ = status;
-							*pOut++ = Pm_MessageData1(dev->rx_evBuf[msg].message);
-							*pOut++ = Pm_MessageData2(dev->rx_evBuf[msg].message);
+							*pOut++ = Pm_MessageData1(rx_evBuf[msg].message);
+							*pOut++ = Pm_MessageData2(rx_evBuf[msg].message);
 							bytesOut += 3;
 							break;
 
@@ -282,8 +314,8 @@ int osd_read_midi_channel(osd_midi_device *dev, UINT8 *pOut)
 
 				default:
 					*pOut++ = status;
-					*pOut++ = Pm_MessageData1(dev->rx_evBuf[msg].message);
-					*pOut++ = Pm_MessageData2(dev->rx_evBuf[msg].message);
+					*pOut++ = Pm_MessageData1(rx_evBuf[msg].message);
+					*pOut++ = Pm_MessageData2(rx_evBuf[msg].message);
 					bytesOut += 3;
 					break;
 			}
@@ -293,57 +325,57 @@ int osd_read_midi_channel(osd_midi_device *dev, UINT8 *pOut)
 	return bytesOut;
 }
 
-void osd_write_midi_channel(osd_midi_device *dev, UINT8 data)
+void osd_midi_device_pm::write(UINT8 data)
 {
 	int bytes_needed = 0;
 	PmEvent ev;
 	ev.timestamp = 0;   // use the current time
 
-//  printf("write: %02x (%d)\n", data, dev->xmit_cnt);
+//  printf("write: %02x (%d)\n", data, xmit_cnt);
 
 	// reject data bytes when no valid status exists
-	if ((dev->last_status == 0) && !(data & 0x80))
+	if ((last_status == 0) && !(data & 0x80))
 	{
-		dev->xmit_cnt = 0;
+		xmit_cnt = 0;
 		return;
 	}
 
-	if (dev->xmit_cnt >= 4)
+	if (xmit_cnt >= 4)
 	{
 		printf("MIDI out: packet assembly overflow, contact MAMEdev!\n");
 		return;
 	}
 
 	// handle sysex
-	if (dev->last_status == MIDI_SYSEX)
+	if (last_status == MIDI_SYSEX)
 	{
-//      printf("sysex: %02x (%d)\n", data, dev->xmit_cnt);
+//      printf("sysex: %02x (%d)\n", data, xmit_cnt);
 
 		// if we get a status that isn't sysex, assume it's system common
 		if ((data & 0x80) && (data != MIDI_EOX))
 		{
 //          printf("common during sysex!\n");
 			ev.message = Pm_Message(data, 0, 0);
-			Pm_Write(dev->pmStream, &ev, 1);
+			Pm_Write(pmStream, &ev, 1);
 			return;
 		}
 
-		dev->xmit_in[dev->xmit_cnt++] = data;
+		xmit_in[xmit_cnt++] = data;
 
 		// if EOX or 4 bytes filled, transmit 4 bytes
-		if ((dev->xmit_cnt == 4) || (data == MIDI_EOX))
+		if ((xmit_cnt == 4) || (data == MIDI_EOX))
 		{
-			ev.message = dev->xmit_in[0] | (dev->xmit_in[1]<<8) | (dev->xmit_in[2]<<16) | (dev->xmit_in[3]<<24);
-			Pm_Write(dev->pmStream, &ev, 1);
-			dev->xmit_in[0] = dev->xmit_in[1] = dev->xmit_in[2] = dev->xmit_in[3] = 0;
-			dev->xmit_cnt = 0;
+			ev.message = xmit_in[0] | (xmit_in[1]<<8) | (xmit_in[2]<<16) | (xmit_in[3]<<24);
+			Pm_Write(pmStream, &ev, 1);
+			xmit_in[0] = xmit_in[1] = xmit_in[2] = xmit_in[3] = 0;
+			xmit_cnt = 0;
 
 //          printf("SysEx packet: %08x\n", ev.message);
 
 			// if this is EOX, kill the running status
 			if (data == MIDI_EOX)
 			{
-				dev->last_status = 0;
+				last_status = 0;
 			}
 		}
 
@@ -351,33 +383,33 @@ void osd_write_midi_channel(osd_midi_device *dev, UINT8 data)
 	}
 
 	// handle running status.  don't allow system real-time messages to be considered as running status.
-	if ((dev->xmit_cnt == 0) && (data & 0x80) && (data < 0xf8))
+	if ((xmit_cnt == 0) && (data & 0x80) && (data < 0xf8))
 	{
-		dev->last_status = data;
+		last_status = data;
 	}
 
-	if ((dev->xmit_cnt == 0) && !(data & 0x80))
+	if ((xmit_cnt == 0) && !(data & 0x80))
 	{
-		dev->xmit_in[dev->xmit_cnt++] = dev->last_status;
-		dev->xmit_in[dev->xmit_cnt++] = data;
-//      printf("\trunning status: [%d] = %02x, [%d] = %02x, last_status = %02x\n", dev->xmit_cnt-2, dev->last_status, dev->xmit_cnt-1, data, dev->last_status);
+		xmit_in[xmit_cnt++] = last_status;
+		xmit_in[xmit_cnt++] = data;
+//      printf("\trunning status: [%d] = %02x, [%d] = %02x, last_status = %02x\n", xmit_cnt-2, last_status, xmit_cnt-1, data, last_status);
 	}
 	else
 	{
-		dev->xmit_in[dev->xmit_cnt++] = data;
-//      printf("\tNRS: [%d] = %02x\n", dev->xmit_cnt-1, data);
+		xmit_in[xmit_cnt++] = data;
+//      printf("\tNRS: [%d] = %02x\n", xmit_cnt-1, data);
 	}
 
-	if ((dev->xmit_cnt == 1) && (dev->xmit_in[0] == MIDI_SYSEX))
+	if ((xmit_cnt == 1) && (xmit_in[0] == MIDI_SYSEX))
 	{
 //      printf("Start SysEx!\n");
-		dev->last_status = MIDI_SYSEX;
+		last_status = MIDI_SYSEX;
 		return;
 	}
 
 	// are we there yet?
-//  printf("status check: %02x\n", dev->xmit_in[0]);
-	switch ((dev->xmit_in[0]>>4) & 0xf)
+//  printf("status check: %02x\n", xmit_in[0]);
+	switch ((xmit_in[0]>>4) & 0xf)
 	{
 		case 0xc:   // 2-byte messages
 		case 0xd:
@@ -385,7 +417,7 @@ void osd_write_midi_channel(osd_midi_device *dev, UINT8 data)
 			break;
 
 		case 0xf:   // system common
-			switch (dev->xmit_in[0] & 0xf)
+			switch (xmit_in[0] & 0xf)
 			{
 				case 0: // System Exclusive is handled above
 					break;
@@ -410,11 +442,20 @@ void osd_write_midi_channel(osd_midi_device *dev, UINT8 data)
 			break;
 	}
 
-	if (dev->xmit_cnt == bytes_needed)
+	if (xmit_cnt == bytes_needed)
 	{
-		ev.message = Pm_Message(dev->xmit_in[0], dev->xmit_in[1], dev->xmit_in[2]);
-		Pm_Write(dev->pmStream, &ev, 1);
-		dev->xmit_cnt = 0;
+		ev.message = Pm_Message(xmit_in[0], xmit_in[1], xmit_in[2]);
+		Pm_Write(pmStream, &ev, 1);
+		xmit_cnt = 0;
 	}
 
 }
+#else
+	#include "modules/osdmodule.h"
+	#include "midi_module.h"
+
+	MODULE_NOT_SUPPORTED(pm_module, OSD_MIDI_PROVIDER, "pm")
+#endif
+
+
+MODULE_DEFINITION(MIDI_PM, pm_module)

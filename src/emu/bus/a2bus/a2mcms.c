@@ -94,6 +94,7 @@ void a2bus_mcms1_device::device_start()
 
 void a2bus_mcms1_device::device_reset()
 {
+	m_mcms->set_bus_device(this);
 }
 
 // read once at c0n0 to disable 125 Hz IRQs
@@ -290,7 +291,7 @@ void mcms_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 				wptr = (m_table[v]<<8) | (m_acc[v]>>8);
 				m_rand = (m_acc[v]>>8) & 0x1f;
 
-				sample = (m_6502space->read_byte(wptr) ^ 0x80);
+				sample = (m_pBusDevice->slot_dma_read_no_space(wptr) ^ 0x80);
 				if (v & 1)
 				{
 					mixL += sample * m_vols[v];
@@ -355,9 +356,6 @@ WRITE8_MEMBER(mcms_device::voiceregs_w)
 
 WRITE8_MEMBER(mcms_device::control_w)
 {
-	// keep the space (TODO: we need to define a formal DMA mechanism from machine/apple2 out to the slots)
-	m_6502space = &space;
-
 	m_stream->update();
 
 	switch (offset)

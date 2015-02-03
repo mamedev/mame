@@ -87,6 +87,7 @@
 #define SDLOPTVAL_OPENGL                "opengl"
 #define SDLOPTVAL_SOFT                  "soft"
 #define SDLOPTVAL_SDL2ACCEL             "accel"
+#define SDLOPTVAL_BGFX                  "bgfx"
 
 #define SDLMAME_LED(x)                  "led" #x
 

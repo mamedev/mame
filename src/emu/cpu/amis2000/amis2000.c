@@ -7,6 +7,7 @@
   TODO:
   - unemulated opcodes (need more testing material)
   - support external program map
+  - STATUS pin(wildfire.c sound?)
   - add 50/60hz timer
   - add S2200/S2400
 
@@ -14,6 +15,8 @@
 
 #include "amis2000.h"
 #include "debugger.h"
+
+#include "amis2000op.inc"
 
 
 // S2000 is the most basic one, 64 nibbles internal RAM and 1KB internal ROM
@@ -25,12 +28,13 @@ const device_type AMI_S2150 = &device_creator<amis2150_device>;
 
 // internal memory maps
 static ADDRESS_MAP_START(program_1k, AS_PROGRAM, 8, amis2000_device)
-	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_MIRROR(0x1c00)
+	AM_RANGE(0x0000, 0x03ff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(program_1_5k, AS_PROGRAM, 8, amis2000_device)
-	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_MIRROR(0x1800)
-	AM_RANGE(0x0400, 0x05ff) AM_ROM AM_MIRROR(0x1a00)
+	AM_RANGE(0x0000, 0x03ff) AM_ROM
+	AM_RANGE(0x0400, 0x05ff) AM_NOP // 0x00
+	AM_RANGE(0x0600, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -116,7 +120,7 @@ offs_t amis2000_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 
 enum
 {
 	S2000_PC=1, S2000_BL, S2000_BU,
-	S2000_ACC, S2000_E, S2000_CARRY
+	S2000_ACC, S2000_E, S2000_CY
 };
 
 void amis2000_device::device_start()
@@ -124,8 +128,8 @@ void amis2000_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
 
-	m_read_k.resolve_safe(0);
-	m_read_i.resolve_safe(0);
+	m_read_k.resolve_safe(0xf);
+	m_read_i.resolve_safe(0xf);
 	m_read_d.resolve_safe(0);
 	m_write_d.resolve_safe();
 	m_write_a.resolve_safe();
@@ -138,9 +142,9 @@ void amis2000_device::device_start()
 	m_pc = 0;
 	m_ppr = 0;
 	m_pbr = 0;
-	m_pp_index = 0;
 	m_skip = false;
 	m_op = 0;
+	m_prev_op = 0;
 	m_f = 0;
 	m_carry = 0;
 	m_bl = 0;
@@ -150,6 +154,8 @@ void amis2000_device::device_start()
 	m_i = 0;
 	m_k = 0;
 	m_d = 0;
+	m_d_active = false;
+	m_d_polarity = 0;
 	m_a = 0;
 
 	// register for savestates
@@ -157,9 +163,9 @@ void amis2000_device::device_start()
 	save_item(NAME(m_pc));
 	save_item(NAME(m_ppr));
 	save_item(NAME(m_pbr));
-	save_item(NAME(m_pp_index));
 	save_item(NAME(m_skip));
 	save_item(NAME(m_op));
+	save_item(NAME(m_prev_op));
 	save_item(NAME(m_f));
 	save_item(NAME(m_carry));
 	save_item(NAME(m_bl));
@@ -169,6 +175,8 @@ void amis2000_device::device_start()
 	save_item(NAME(m_i));
 	save_item(NAME(m_k));
 	save_item(NAME(m_d));
+	save_item(NAME(m_d_active));
+	save_item(NAME(m_d_polarity));
 	save_item(NAME(m_a));
 
 	// register state for debugger
@@ -177,7 +185,7 @@ void amis2000_device::device_start()
 	state_add(S2000_BU,     "BU",     m_bu    ).formatstr("%01X");
 	state_add(S2000_ACC,    "ACC",    m_acc   ).formatstr("%01X");
 	state_add(S2000_E,      "E",      m_e     ).formatstr("%01X");
-	state_add(S2000_CARRY,  "CARRY",  m_carry ).formatstr("%01X");
+	state_add(S2000_CY,     "CY",     m_carry ).formatstr("%01X");
 
 	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_f).formatstr("%6s").noshow();
@@ -198,10 +206,11 @@ void amis2000_device::device_reset()
 	m_op = 0;
 	
 	// clear i/o
-	m_i = 0;
-	m_k = 0;
-	m_d = 0; m_write_d(0, 0, 0xff);
+	m_d_polarity = 0;
+	m_d = 0; d_latch_out(false);
 	m_a = 0; m_write_a(0, 0, 0xffff);
+	m_i = 0xf;
+	m_k = 0xf;
 }
 
 
@@ -210,22 +219,14 @@ void amis2000_device::device_reset()
 //  execute
 //-------------------------------------------------
 
-#include "amis2000op.inc"
-
 void amis2000_device::execute_run()
 {
 	while (m_icount > 0)
 	{
 		m_icount--;
 		
-		// increase PP prefix count
-		if ((m_op & 0xf0) == 0x60)
-		{
-			if (m_pp_index < 2)
-				m_pp_index++;
-		}
-		else
-			m_pp_index = 0;
+		// remember previous opcode
+		m_prev_op = m_op;
 
 		debugger_instruction_hook(this, m_pc);
 		m_op = m_program->read_byte(m_pc);
@@ -251,7 +252,7 @@ void amis2000_device::execute_run()
 				switch (m_op)
 				{
 			case 0x00: op_nop(); break;
-			case 0x01: op_illegal(); break; // reserved for devkit-use
+			case 0x01: op_halt(); break;
 			case 0x02: op_rt(); break;
 			case 0x03: op_rts(); break;
 			case 0x04: op_psh(); break;

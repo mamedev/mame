@@ -79,7 +79,7 @@ struct quad_setup_data
 //  Textures
 //============================================================
 
-struct sdl_info13;
+class sdl_info13;
 struct copy_info_t;
 
 /* texture_info holds information about a texture */
@@ -139,14 +139,24 @@ private:
 #include "blit13.h"
 
 /* sdl_info is the information about SDL for the current screen */
-struct sdl_info13
+class sdl_info13 : public osd_renderer
 {
-    sdl_info13()
-    : m_blittimer(0), m_renderer(NULL),
-      m_hofs(0), m_vofs(0),
+public:
+    sdl_info13(sdl_window_info *w)
+    : osd_renderer(w), m_blittimer(0), m_renderer(NULL),
+      m_last_hofs(0), m_last_vofs(0),
       m_resize_pending(0), m_resize_width(0), m_resize_height(0),
       m_last_blit_time(0), m_last_blit_pixels(0)
     {}
+
+	/* virtual */ int create(int width, int height);
+	/* virtual */ void resize(int width, int height);
+	/* virtual */ int draw(UINT32 dc, int update);
+	/* virtual */ void set_target_bounds();
+	/* virtual */ int xy_to_render_target(int x, int y, int *xt, int *yt);
+	/* virtual */ void destroy_all_textures();
+	/* virtual */ void destroy();
+	/* virtual */ void clear();
 
     void render_quad(texture_info *texture, const render_primitive *prim, const int x, const int y);
 
@@ -154,12 +164,13 @@ struct sdl_info13
     texture_info *texture_update(const render_primitive &prim);
 
 	INT32           m_blittimer;
+	UINT32          m_extra_flags;
 
 	SDL_Renderer *  m_renderer;
 	simple_list<texture_info>  m_texlist;                // list of active textures
 
-	float           m_hofs;
-	float           m_vofs;
+	float           m_last_hofs;
+	float           m_last_vofs;
 
 	// resize information
 
@@ -198,15 +209,6 @@ struct copy_info_t {
 // core functions
 
 static void drawsdl2_exit(void);
-static void drawsdl2_attach(sdl_draw_info *info, sdl_window_info *window);
-static int drawsdl2_window_create(sdl_window_info *window, int width, int height);
-static void drawsdl2_window_resize(sdl_window_info *window, int width, int height);
-static void drawsdl2_window_destroy(sdl_window_info *window);
-static int drawsdl2_window_draw(sdl_window_info *window, UINT32 dc, int update);
-static void drawsdl2_set_target_bounds(sdl_window_info *window);
-static void drawsdl2_destroy_all_textures(sdl_window_info *window);
-static void drawsdl2_window_clear(sdl_window_info *window);
-static int drawsdl2_xy_to_render_target(sdl_window_info *window, int x, int y, int *xt, int *yt);
 
 //============================================================
 //  STATIC VARIABLES
@@ -483,6 +485,11 @@ static void expand_copy_info(copy_info_t *list)
 	}
 }
 
+static osd_renderer *drawsdl2_create(sdl_window_info *window)
+{
+	return global_alloc(sdl_info13(window));
+}
+
 // FIXME: machine only used to access options.
 int drawsdl2_init(running_machine &machine, sdl_draw_info *callbacks)
 {
@@ -490,7 +497,7 @@ int drawsdl2_init(running_machine &machine, sdl_draw_info *callbacks)
 
 	// fill in the callbacks
 	callbacks->exit = drawsdl2_exit;
-	callbacks->attach = drawsdl2_attach;
+	callbacks->create = drawsdl2_create;
 
 	osd_printf_verbose("Using SDL native texturing driver (SDL 2.0+)\n");
 
@@ -550,31 +557,37 @@ static void drawsdl2_exit(void)
 }
 
 //============================================================
-//  drawsdl2_attach
+//  sdl_info::create
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
+// a
 //============================================================
 
-static void drawsdl2_attach(sdl_draw_info *info, sdl_window_info *window)
+int sdl_info13::create(int width, int height)
 {
-	// fill in the callbacks
-	window->create = drawsdl2_window_create;
-	window->resize = drawsdl2_window_resize;
-	window->set_target_bounds = drawsdl2_set_target_bounds;
-	window->draw = drawsdl2_window_draw;
-	window->destroy = drawsdl2_window_destroy;
-	window->destroy_all_textures = drawsdl2_destroy_all_textures;
-	window->clear = drawsdl2_window_clear;
-	window->xy_to_render_target = drawsdl2_xy_to_render_target;
-}
-
-//============================================================
-//  drawsdl2_window_create
-//============================================================
-
-static int drawsdl2_window_create(sdl_window_info *window, int width, int height)
-{
-	// allocate memory for our structures
-	sdl_info13 *sdl = global_alloc(sdl_info13);
-
 	/* FIXME: On Ubuntu and potentially other Linux OS you should use
 	 * to disable panning. This has to be done before every invocation of mame.
 	 *
@@ -582,109 +595,93 @@ static int drawsdl2_window_create(sdl_window_info *window, int width, int height
 	 *
 	 */
 
-	osd_printf_verbose("Enter drawsdl2_window_create\n");
+	osd_printf_verbose("Enter sdl_info13::create\n");
 
-	window->dxdata = sdl;
-
-	UINT32 extra_flags = (window->fullscreen() ?
+	// create the SDL window
+	m_extra_flags = (window().fullscreen() ?
 			SDL_WINDOW_BORDERLESS | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE);
 
 #if defined(SDLMAME_WIN32)
 	SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
 #endif
 	// create the SDL window
-	window->sdl_window = SDL_CreateWindow(window->title,
-			window->monitor()->position_size().x, window->monitor()->position_size().y,
-			width, height, extra_flags);
+	window().m_sdl_window = SDL_CreateWindow(window().m_title,
+			window().monitor()->position_size().x, window().monitor()->position_size().y,
+			width, height, m_extra_flags);
 
-	if (window->fullscreen() && video_config.switchres)
+	if  (!window().m_sdl_window )
+	{
+		osd_printf_error("Window creation failed: %s\n", SDL_GetError());
+		return 1;
+	}
+
+	if (window().fullscreen() && video_config.switchres)
 	{
 		SDL_DisplayMode mode;
-		//SDL_GetCurrentDisplayMode(window->monitor()->handle, &mode);
-		SDL_GetWindowDisplayMode(window->sdl_window, &mode);
-		sdl->m_original_mode = mode;
+		//SDL_GetCurrentDisplayMode(window().monitor()->handle, &mode);
+		SDL_GetWindowDisplayMode(window().m_sdl_window, &mode);
+		m_original_mode = mode;
 		mode.w = width;
 		mode.h = height;
-		if (window->refresh)
-			mode.refresh_rate = window->refresh;
-#if 0
-		if (window->depth)
-		{
-			switch (window->depth)
-			{
-			case 15:
-				mode.format = SDL_PIXELFORMAT_RGB555;
-				break;
-			case 16:
-				mode.format = SDL_PIXELFORMAT_RGB565;
-				break;
-			case 24:
-				mode.format = SDL_PIXELFORMAT_RGB24;
-				break;
-			case 32:
-				mode.format = SDL_PIXELFORMAT_RGB888;
-				break;
-			default:
-				osd_printf_warning("Ignoring depth %d\n", window->depth);
-			}
-		}
-#endif
+		if (window().m_refresh)
+			mode.refresh_rate = window().m_refresh;
 
-		SDL_SetWindowDisplayMode(window->sdl_window, &mode);    // Try to set mode
+		SDL_SetWindowDisplayMode(window().m_sdl_window, &mode);    // Try to set mode
 #ifndef SDLMAME_WIN32
 		/* FIXME: Warp the mouse to 0,0 in case a virtual desktop resolution
 		 * is in place after the mode switch - which will most likely be the case
 		 * This is a hack to work around a deficiency in SDL2
 		 */
-		SDL_WarpMouseInWindow(window->sdl_window, 1, 1);
+		SDL_WarpMouseInWindow(window().m_sdl_window, 1, 1);
 #endif
 	}
 	else
 	{
-		//SDL_SetWindowDisplayMode(window->sdl_window, NULL); // Use desktop
+		//SDL_SetWindowDisplayMode(window().m_sdl_window, NULL); // Use desktop
 	}
 	// create renderer
 
 	if (video_config.waitvsync)
-		sdl->m_renderer = SDL_CreateRenderer(window->sdl_window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
+		m_renderer = SDL_CreateRenderer(window().m_sdl_window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
 	else
-		sdl->m_renderer = SDL_CreateRenderer(window->sdl_window, -1, SDL_RENDERER_ACCELERATED);
+		m_renderer = SDL_CreateRenderer(window().m_sdl_window, -1, SDL_RENDERER_ACCELERATED);
 
-	if (!sdl->m_renderer)
+	if (!m_renderer)
 	{
 		fatalerror("Error on creating renderer: %s\n", SDL_GetError());
 	}
 
-	//SDL_SelectRenderer(window->sdl_window);
-	SDL_ShowWindow(window->sdl_window);
-	//SDL_SetWindowFullscreen(window->window_id, window->fullscreen);
-	SDL_RaiseWindow(window->sdl_window);
+	//SDL_SelectRenderer(window().sdl_window);
 
-	SDL_GetWindowSize(window->sdl_window, &window->width, &window->height);
+	// show window
 
-	sdl->m_blittimer = 3;
+	SDL_ShowWindow(window().m_sdl_window);
+	//SDL_SetWindowFullscreen(window().sdl_window, window().fullscreen);
+	SDL_RaiseWindow(window().m_sdl_window);
 
-	SDL_RenderPresent(sdl->m_renderer);
-	osd_printf_verbose("Leave drawsdl2_window_create\n");
+	SDL_GetWindowSize(window().m_sdl_window, &window().m_width, &window().m_height);
+
+	m_blittimer = 3;
+
+	SDL_RenderPresent(m_renderer);
+	osd_printf_verbose("Leave sdl_info13::create\n");
 	return 0;
 }
 
 //============================================================
-//  drawsdl2_window_resize
+//  sdl_info::resize
 //============================================================
 
-static void drawsdl2_window_resize(sdl_window_info *window, int width, int height)
+void sdl_info13::resize(int width, int height)
 {
-	sdl_info13 *sdl = (sdl_info13 *) window->dxdata;
+	m_resize_pending = 1;
+	m_resize_height = height;
+	m_resize_width = width;
 
-	sdl->m_resize_pending = 1;
-	sdl->m_resize_height = height;
-	sdl->m_resize_width = width;
+	window().m_width = width;
+	window().m_height = height;
 
-	window->width = width;
-	window->height = height;
-
-	sdl->m_blittimer = 3;
+	m_blittimer = 3;
 
 }
 
@@ -692,35 +689,33 @@ static void drawsdl2_window_resize(sdl_window_info *window, int width, int heigh
 //  drawsdl_xy_to_render_target
 //============================================================
 
-static int drawsdl2_xy_to_render_target(sdl_window_info *window, int x, int y, int *xt, int *yt)
+int sdl_info13::xy_to_render_target(int x, int y, int *xt, int *yt)
 {
-	sdl_info13 *sdl = (sdl_info13 *) window->dxdata;
 
-	*xt = x - sdl->m_hofs;
-	*yt = y - sdl->m_vofs;
-	if (*xt<0 || *xt >= window->blitwidth)
+	*xt = x - m_last_hofs;
+	*yt = y - m_last_vofs;
+	if (*xt<0 || *xt >= window().m_blitwidth)
 		return 0;
-	if (*yt<0 || *yt >= window->blitheight)
+	if (*yt<0 || *yt >= window().m_blitheight)
 		return 0;
 	return 1;
 }
 
 //============================================================
-//  drawsdl2_window_get_primitives
+//  sdl_info::get_primitives
 //============================================================
 
-static void drawsdl2_set_target_bounds(sdl_window_info *window)
+void sdl_info13::set_target_bounds()
 {
-	window->target->set_bounds(window->blitwidth, window->blitheight, window->monitor()->aspect());
+	window().m_target->set_bounds(window().m_blitwidth, window().m_blitheight, window().monitor()->aspect());
 }
 
 //============================================================
-//  drawsdl2_window_draw
+//  sdl_info::draw
 //============================================================
 
-static int drawsdl2_window_draw(sdl_window_info *window, UINT32 dc, int update)
+int sdl_info13::draw(UINT32 dc, int update)
 {
-	sdl_info13 *sdl = (sdl_info13 *) window->dxdata;
 	render_primitive *prim;
 	texture_info *texture=NULL;
 	float vofs, hofs;
@@ -731,26 +726,26 @@ static int drawsdl2_window_draw(sdl_window_info *window, UINT32 dc, int update)
 		return 0;
 	}
 
-	if (sdl->m_resize_pending)
+	if (m_resize_pending)
 	{
-		SDL_SetWindowSize(window->sdl_window, sdl->m_resize_width, sdl->m_resize_height);
-		SDL_GetWindowSize(window->sdl_window, &window->width, &window->height);
-		sdl->m_resize_pending = 0;
-		SDL_RenderSetViewport(sdl->m_renderer, NULL);
-		//sdlvideo_monitor_refresh(window->monitor());
+		SDL_SetWindowSize(window().m_sdl_window, m_resize_width, m_resize_height);
+		SDL_GetWindowSize(window().m_sdl_window, &window().m_width, &window().m_height);
+		m_resize_pending = 0;
+		SDL_RenderSetViewport(m_renderer, NULL);
+		//sdlvideo_monitor_refresh(window().monitor());
 
 	}
 
-	//SDL_SelectRenderer(window->sdl_window);
+	//SDL_SelectRenderer(window().sdl_window);
 
-	if (sdl->m_blittimer > 0)
+	if (m_blittimer > 0)
 	{
 		/* SDL Underlays need alpha = 0 ! */
-		SDL_SetRenderDrawBlendMode(sdl->m_renderer, SDL_BLENDMODE_NONE);
+		SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_NONE);
 		//SDL_SetRenderDrawColor(0,0,0,255);
-		SDL_SetRenderDrawColor(sdl->m_renderer, 0,0,0,0);
-		SDL_RenderFillRect(sdl->m_renderer, NULL);
-		sdl->m_blittimer--;
+		SDL_SetRenderDrawColor(m_renderer, 0,0,0,0);
+		SDL_RenderFillRect(m_renderer, NULL);
+		m_blittimer--;
 	}
 
 	// compute centering parameters
@@ -760,34 +755,34 @@ static int drawsdl2_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	{
 		int ch, cw;
 
-		if ((window->fullscreen()) && (!video_config.switchres))
+		if ((window().fullscreen()) && (!video_config.switchres))
 		{
-			ch = window->monitor()->center_height();
-			cw = window->monitor()->center_width();
+			ch = window().monitor()->center_height();
+			cw = window().monitor()->center_width();
 		}
 		else
 		{
-			ch = window->height;
-			cw = window->width;
+			ch = window().m_height;
+			cw = window().m_width;
 		}
 
 		if (video_config.centerv)
 		{
-			vofs = (ch - window->blitheight) / 2.0f;
+			vofs = (ch - window().m_blitheight) / 2.0f;
 		}
 		if (video_config.centerh)
 		{
-			hofs = (cw - window->blitwidth) / 2.0f;
+			hofs = (cw - window().m_blitwidth) / 2.0f;
 		}
 	}
 
-	sdl->m_hofs = hofs;
-	sdl->m_vofs = vofs;
+	m_last_hofs = hofs;
+	m_last_vofs = vofs;
 
-	window->primlist->acquire_lock();
+	window().m_primlist->acquire_lock();
 
 	// now draw
-	for (prim = window->primlist->first(); prim != NULL; prim = prim->next())
+	for (prim = window().m_primlist->first(); prim != NULL; prim = prim->next())
 	{
 		Uint8 sr, sg, sb, sa;
 
@@ -799,16 +794,16 @@ static int drawsdl2_window_draw(sdl_window_info *window, UINT32 dc, int update)
 				sb = (int)(255.0f * prim->color.b);
 				sa = (int)(255.0f * prim->color.a);
 
-				SDL_SetRenderDrawBlendMode(sdl->m_renderer, map_blendmode(PRIMFLAG_GET_BLENDMODE(prim->flags)));
-				SDL_SetRenderDrawColor(sdl->m_renderer, sr, sg, sb, sa);
-				SDL_RenderDrawLine(sdl->m_renderer, prim->bounds.x0 + hofs, prim->bounds.y0 + vofs,
+				SDL_SetRenderDrawBlendMode(m_renderer, map_blendmode(PRIMFLAG_GET_BLENDMODE(prim->flags)));
+				SDL_SetRenderDrawColor(m_renderer, sr, sg, sb, sa);
+				SDL_RenderDrawLine(m_renderer, prim->bounds.x0 + hofs, prim->bounds.y0 + vofs,
 						prim->bounds.x1 + hofs, prim->bounds.y1 + vofs);
 				break;
 			case render_primitive::QUAD:
-				texture = sdl->texture_update(*prim);
+				texture = texture_update(*prim);
 				if (texture)
 					blit_pixels += (texture->raw_height() * texture->raw_width());
-				sdl->render_quad(texture, prim,
+				render_quad(texture, prim,
 						round_nearest(hofs + prim->bounds.x0),
 						round_nearest(vofs + prim->bounds.y0));
 				break;
@@ -817,56 +812,46 @@ static int drawsdl2_window_draw(sdl_window_info *window, UINT32 dc, int update)
 		}
 	}
 
-	window->primlist->release_lock();
+	window().m_primlist->release_lock();
 
-	sdl->m_last_blit_pixels = blit_pixels;
-	sdl->m_last_blit_time = -osd_ticks();
-	SDL_RenderPresent(sdl->m_renderer);
-	sdl->m_last_blit_time += osd_ticks();
+	m_last_blit_pixels = blit_pixels;
+	m_last_blit_time = -osd_ticks();
+	SDL_RenderPresent(m_renderer);
+	m_last_blit_time += osd_ticks();
 
 	return 0;
 }
 
 
 //============================================================
-//  drawsdl2_window_clear
+//  sdl_info13::clear
 //============================================================
 
-static void drawsdl2_window_clear(sdl_window_info *window)
+void sdl_info13::clear()
 {
-	sdl_info13 *sdl = (sdl_info13 *) window->dxdata;
-
-	sdl->m_blittimer = 2;
+	m_blittimer = 2;
 }
 
 
 //============================================================
-//  drawsdl2_window_destroy
+//  sdl_info13::destroy
 //============================================================
 
-static void drawsdl2_window_destroy(sdl_window_info *window)
+void sdl_info13::destroy()
 {
-	sdl_info13 *sdl = (sdl_info13 *) window->dxdata;
-
-	// skip if nothing
-	if (sdl == NULL)
-		return;
-
 	// free the memory in the window
 
-	drawsdl2_destroy_all_textures(window);
+	destroy_all_textures();
 
-	if (window->fullscreen() && video_config.switchres)
+	if (window().fullscreen() && video_config.switchres)
 	{
-		SDL_SetWindowFullscreen(window->sdl_window, 0);    // Try to set mode
-		SDL_SetWindowDisplayMode(window->sdl_window, &sdl->m_original_mode);    // Try to set mode
-		SDL_SetWindowFullscreen(window->sdl_window, SDL_WINDOW_FULLSCREEN);    // Try to set mode
+		SDL_SetWindowFullscreen(window().m_sdl_window, 0);    // Try to set mode
+		SDL_SetWindowDisplayMode(window().m_sdl_window, &m_original_mode);    // Try to set mode
+		SDL_SetWindowFullscreen(window().m_sdl_window, SDL_WINDOW_FULLSCREEN);    // Try to set mode
 	}
 
-	SDL_DestroyWindow(window->sdl_window);
+	SDL_DestroyWindow(window().m_sdl_window);
 
-	global_free(sdl);
-	window->dxdata = NULL;
 }
 
 //============================================================
@@ -1188,19 +1173,14 @@ texture_info * sdl_info13::texture_update(const render_primitive &prim)
 }
 
 
-static void drawsdl2_destroy_all_textures(sdl_window_info *window)
+void sdl_info13::destroy_all_textures()
 {
-	sdl_info13 *sdl = (sdl_info13 *) window->dxdata;
-
-	if (sdl == NULL)
-		return;
-
-	if(window->primlist)
+	if(window().m_primlist)
 	{
-		window->primlist->acquire_lock();
-		sdl->m_texlist.reset();
-		window->primlist->release_lock();
+		window().m_primlist->acquire_lock();
+		m_texlist.reset();
+		window().m_primlist->release_lock();
 	}
 	else
-		sdl->m_texlist.reset();
+		m_texlist.reset();
 }

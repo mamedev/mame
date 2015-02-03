@@ -160,6 +160,7 @@ a2bus_device::a2bus_device(const machine_config &mconfig, device_type type, cons
 void a2bus_device::device_start()
 {
 	m_maincpu = machine().device<cpu_device>(m_cputag);
+	m_maincpu_space = &machine().device<cpu_device>(m_cputag)->space(AS_PROGRAM);
 
 	// resolve callbacks
 	m_out_irq_cb.resolve_safe();
@@ -244,6 +245,30 @@ void a2bus_device::set_nmi_line(int state, int slot)
 void a2bus_device::set_maincpu_halt(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
+}
+
+UINT8 a2bus_device::dma_r(address_space &space, UINT16 offset)
+{
+	m_maincpu_space->set_debugger_access(space.debugger_access());
+
+	return m_maincpu_space->read_byte(offset);
+}
+
+void a2bus_device::dma_w(address_space &space, UINT16 offset, UINT8 data)
+{
+	m_maincpu_space->set_debugger_access(space.debugger_access());
+
+	m_maincpu_space->write_byte(offset, data);
+}
+
+UINT8 a2bus_device::dma_nospace_r(UINT16 offset)
+{
+	return m_maincpu_space->read_byte(offset);
+}
+
+void a2bus_device::dma_nospace_w(UINT16 offset, UINT8 data)
+{
+	m_maincpu_space->write_byte(offset, data);
 }
 
 void a2bus_device::recalc_inh(int slot)

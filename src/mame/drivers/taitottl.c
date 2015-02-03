@@ -155,6 +155,8 @@ MACHINE_CONFIG_END
 
 /*
 
+ Gunman
+ 
  label  loc. Part #
  ==========================================================
  CR11   N5  74s287      yes, it says CRxx not GNxx
@@ -249,7 +251,6 @@ ROM_START( missilex )
 	ROM_LOAD( "ms02.12l",     0x0000, 0x0020, CRC(157b7e68) SHA1(d1a98267af1562e6126faaf0850906224f8a608d) )
 	ROM_LOAD( "ms01.8d",      0x0000, 0x0020, CRC(e89e76c3) SHA1(1149b5d1f93baa8aecd54a618083cc13b63a894d) )
 ROM_END
-
 
 ROM_START( ttblock )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )

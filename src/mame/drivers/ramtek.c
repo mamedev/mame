@@ -1,21 +1,38 @@
-/***************************************************************************
+/*********************************************************************************
 
  Ramtek Discrete Games List
 
- Game Name                  DATA      Board #
- --------------------------------------------
- (Deluxe) Baseball (1974)   YES
- Clean Sweep (1974)         YES       501082
- Hockey (1973)              UNKNOWN
+ Game Name                  DATA      ASSY #         P/N
+ -------------------------------------------------------------------
+ Baseball (1974/10)         YES       550185/550186  0550228/0550229
+ Clean Sweep (1974/06)      YES       501082A/B/C/D  501083A/B/C/D
+ Deluxe Baseball (1975/06)  YES       550188
+ Hockey (1973/11)           YES       500699         500629
  Horoscope (1976)           UNKNOWN
- Knockout (1974)            UNKNOWN
- Sea Battle (1976)          UNKNOWN
- Soccer (1973)              UNKNOWN
- Trivia (1975)              YES
- Volly/Volley (1973)        YES
- Wipe Out (1973)            YES
+ Knock Out (1974/09)?       UNKNOWN
+ Lie Detector (1976)        UNKNOWN   Unreleased     Unreleased
+ Sea Battle (1976/04)       UNKNOWN
+ Soccer (1973/11)           YES       500880         500889
+ Trivia (1975/11)           YES
+ Volly (1973/03?)           YES       500378A        500322A
+ Wipe Out (1974/01)         YES       500986B/C      500963B/?
+ 
+ Volly Industries Discrete Games List
+ (Volly was Ramtek's Canada-based affiliate and distributor.)
 
- ***************************************************************************/
+ Game Name                                       Clone Of                         
+ ---------------------------------------------------------------------------------
+ Batter Up (1974/??)                             Deluxe Baseball (Ramtek, 1975/06)
+ Crossfire (1974/01) (registered trademark?)     Knock Out (Ramtek, 1974/09)?
+ Countdown (1974/02)                             Wipe Out (Ramtek, 1974/01)
+ Elimination (1973/12?) (registered trademark?)  unknown
+ Flip-Out (1974/05?)                             Clean Sweep (Ramtek, 1974/06)
+ Hockey (1973/??)                                Hockey (Ramtek, 1973/11)
+ Hockey (Cocktail) (1973/??)                     Soccer (Ramtek, 1973/11)
+ Scoring (1973/11?)                              Soccer (Ramtek, 1973/11)?
+ Tennis (1973/??)                                Volly (Ramtek, 1973/03?)
+ 
+ *********************************************************************************/
 
 
 #include "emu.h"
@@ -25,7 +42,7 @@
 #include "video/fixfreq.h"
 #include "astring.h"
 
-// copied by Pong, not accurate for this driver!
+// copied from Pong, not accurate for this driver!
 // start
 #define MASTER_CLOCK    7159000
 #define V_TOTAL         (0x105+1)       // 262
@@ -217,7 +234,7 @@ ROM_END
 
 
 GAME( 1973, vollyrmt,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Volly (Ramtek) [TTL]", GAME_IS_SKELETON )
-GAME( 1973, wipeormt,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Wipeout (Ramtek) [TTL]", GAME_IS_SKELETON )
+GAME( 1974, wipeormt,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Wipeout (Ramtek) [TTL]", GAME_IS_SKELETON )
 GAME( 1974, bballrmt,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Baseball (Ramtek) [TTL]", GAME_IS_SKELETON )
 GAME( 1974, cleanswp,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Clean Sweep [TTL]", GAME_IS_SKELETON )
 GAME( 1975, trivia,    0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Trivia (Rev B) [TTL]", GAME_IS_SKELETON )

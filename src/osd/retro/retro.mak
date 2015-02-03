@@ -72,6 +72,7 @@ OSDCOREOBJS := \
 	$(MINIOBJ)/font_retro.o \
 	$(MINIOBJ)/../modules/lib/osdlib_retro.o \
 	$(OSDOBJ)/modules/sync/sync_retro.o \
+	$(MINIOBJ)/../modules/midi/none.o \
 	$(OSDOBJ)/modules/osdmodule.o 
 
 ifdef NOASM
@@ -92,15 +93,14 @@ OSDOBJS = \
 	$(MINIOBJ)/../modules/debugger/none.o \
 	$(MINIOBJ)/../modules/debugger/debugint.o \
 	$(MINIOBJ)/../modules/debugger/debugint.o \
-	$(OSDOBJ)/modules/lib/osdobj_common_libretro.o
+	$(OSDOBJ)/modules/lib/osdobj_common.o
 
 DISABLE_MIDI_ON = 1
 
-ifeq ($(DISABLE_MIDI_ON), 1)
-	OSDOBJS += $(OSDOBJ)/modules/midi/none.o
-else
+ifeq ($(DISABLE_MIDI_ON), 0)
 	OSDOBJS += $(OSDOBJ)/modules/midi/portmidi.o
 endif
+OSDOBJS += $(OSDOBJ)/modules/midi/none.o
 
 OSDOBJS += $(LIBCOOBJ)/libco.o 
 

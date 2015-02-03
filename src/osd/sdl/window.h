@@ -32,116 +32,141 @@ typedef UINT32 HashT;
 //  TYPE DEFINITIONS
 //============================================================
 
-struct sdl_window_info
+class sdl_window_info;
+
+class osd_renderer
 {
+public:
+	osd_renderer(sdl_window_info *window)
+	: m_window(window) { }
+
+	virtual ~osd_renderer() { }
+
+	sdl_window_info &window() { return *m_window; }
+
+	virtual int create(int width, int height) = 0;
+	virtual void resize(int width, int height) = 0;
+	virtual int draw(UINT32 dc, int update) = 0;
+	virtual void set_target_bounds() = 0;
+	virtual int xy_to_render_target(int x, int y, int *xt, int *yt) = 0;
+	virtual void destroy_all_textures() = 0;
+	virtual void destroy() = 0;
+	virtual void clear() = 0;
+
+private:
+	sdl_window_info *m_window;
+};
+
+class sdl_window_info
+{
+public:
 	sdl_window_info(running_machine *a_machine, sdl_monitor_info *a_monitor,
 			int index, const sdl_window_config *config)
-	: next(NULL), m_minwidth(0), m_minheight(0),
-		startmaximized(0),
-		rendered_event(0), target(0), primlist(NULL), dxdata(NULL),
-		width(0), height(0), blitwidth(0), blitheight(0),
-		start_viewscreen(0),
+	: m_next(NULL), m_minwidth(0), m_minheight(0),
+		m_startmaximized(0),
+		m_rendered_event(0), m_target(0), m_primlist(NULL),
+		m_width(0), m_height(0), m_blitwidth(0), m_blitheight(0),
+		m_start_viewscreen(0),
 #if (SDLMAME_SDL2)
-		sdl_window(NULL),
-		resize_width(0),
-		resize_height(0),
-		last_resize(0),
+		m_sdl_window(NULL),
+		m_resize_width(0),
+		m_resize_height(0),
+		m_last_resize(0),
 #else
-		screen_width(0), screen_height(0),
+		m_screen_width(0), m_screen_height(0),
 #endif
 		m_machine(a_machine), m_monitor(a_monitor), m_fullscreen(0), m_index(0)
 	{
 		m_maxwidth = config->width;
 		m_maxheight = config->height;
-		depth = config->depth;
-		refresh = config->refresh;
+		m_depth = config->depth;
+		m_refresh = config->refresh;
 		m_index = index;
 
 		//FIXME: these should be per_window in config-> or even better a bit set
 		m_fullscreen = !video_config.windowed;
-		prescale = video_config.prescale;
+		m_prescale = video_config.prescale;
 
-		windowed_width = config->width;
-		windowed_height = config->height;
+		m_windowed_width = config->width;
+		m_windowed_height = config->height;
+	}
+
+	~sdl_window_info()
+	{
+		global_free(m_renderer);
 	}
 
 	void video_window_update(running_machine &machine);
-	void blit_surface_size(int window_width, int window_height);
 	void toggle_full_screen(running_machine &machine);
 	void modify_prescale(running_machine &machine, int dir);
 	void window_resize(INT32 width, INT32 height);
 	void window_clear();
 
 	void video_window_destroy(running_machine &machine);
-	void pick_best_mode(int *fswidth, int *fsheight);
 	void get_min_bounds(int *window_width, int *window_height, int constrain);
 	void get_max_bounds(int *window_width, int *window_height, int constrain);
-
-	// Pointer to next window
-	sdl_window_info *   next;
 
 	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
 	sdl_monitor_info *monitor() const { return m_monitor; }
 	int fullscreen() const { return m_fullscreen; }
-	int index() const { return m_index; }
 
 	void set_fullscreen(int afullscreen) { m_fullscreen = afullscreen; }
 
-	// Draw Callbacks
-	int (*create)(sdl_window_info *window, int width, int height);
-	void (*resize)(sdl_window_info *window, int width, int height);
-	int (*draw)(sdl_window_info *window, UINT32 dc, int update);
-	void (*set_target_bounds)(sdl_window_info *window);
-	int (*xy_to_render_target)(sdl_window_info *window, int x, int y, int *xt, int *yt);
-	void (*destroy_all_textures)(sdl_window_info *window);
-	void (*destroy)(sdl_window_info *window);
-	void (*clear)(sdl_window_info *window);
+	void blit_surface_size(int window_width, int window_height);
+	void pick_best_mode(int *fswidth, int *fsheight);
+	int index() const { return m_index; }
+
+	osd_renderer &renderer() { return *m_renderer; }
+
+	// Pointer to next window
+	sdl_window_info *   m_next;
 
 	// window handle and info
-	char                title[256];
+	char                m_title[256];
 
 	// diverse flags
 	int                 m_minwidth, m_minheight;
 	int                 m_maxwidth, m_maxheight;
-	int                 depth;
-	int                 refresh;
-	int                 windowed_width;
-	int                 windowed_height;
-	int                 startmaximized;
+	int                 m_depth;
+	int                 m_refresh;
+	int                 m_windowed_width;
+	int                 m_windowed_height;
+	int                 m_startmaximized;
 
 	// rendering info
-	osd_event *         rendered_event;
-	render_target *     target;
-	render_primitive_list *primlist;
+	osd_event *         m_rendered_event;
+	render_target *     m_target;
+	render_primitive_list *m_primlist;
 
-	// drawing data
-	void *              dxdata;
+	// cache of physical m_width and m_height
+	int                 m_width;
+	int                 m_height;
 
-	// cache of physical width and height
-	int                 width;
-	int                 height;
+	// current m_blitwidth and m_height
+	int                 m_blitwidth;
+	int                 m_blitheight;
 
-	// current blitwidth and height
-	int                 blitwidth;
-	int                 blitheight;
-
-	int                 start_viewscreen;
+	int                 m_start_viewscreen;
 
 	// GL specific
-	int                 prescale;
+	int                 m_prescale;
 
 #if (SDLMAME_SDL2)
 	// Needs to be here as well so we can identify window
-	SDL_Window          *sdl_window;
+	SDL_Window          *m_sdl_window;
 	// These are used in combine resizing events ... #if SDL13_COMBINE_RESIZE
-	int                 resize_width;
-	int                 resize_height;
-	osd_ticks_t         last_resize;
+	int                 m_resize_width;
+	int                 m_resize_height;
+	osd_ticks_t         m_last_resize;
 #else
-	int                 screen_width;
-	int                 screen_height;
+	int                 m_screen_width;
+	int                 m_screen_height;
 #endif
 
+	void set_renderer(osd_renderer *renderer)
+	{
+		m_renderer = renderer;
+	}
 private:
 	void constrain_to_aspect_ratio(int *window_width, int *window_height, int adjustment);
 
@@ -151,13 +176,14 @@ private:
 	sdl_monitor_info *  m_monitor;
 	int                 m_fullscreen;
 	int                 m_index;
+	osd_renderer *		m_renderer;
 
 };
 
 struct sdl_draw_info
 {
+	osd_renderer *(*create)(sdl_window_info *window);
 	void (*exit)(void);
-	void (*attach)(sdl_draw_info *info, sdl_window_info *window);
 };
 
 //============================================================
@@ -193,5 +219,11 @@ int drawogl_init(running_machine &machine, sdl_draw_info *callbacks);
 //============================================================
 
 int drawsdl2_init(running_machine &machine, sdl_draw_info *callbacks);
+
+//============================================================
+// PROTOTYPES - drawbgfx.c
+//============================================================
+
+int drawbgfx_init(running_machine &machine, sdl_draw_info *callbacks);
 
 #endif /* __SDLWINDOW__ */
