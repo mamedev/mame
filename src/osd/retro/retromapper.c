@@ -350,11 +350,11 @@ void retro_get_system_info(struct retro_system_info *info)
    memset(info, 0, sizeof(*info));
 
 #if defined(WANT_MAME)
-   info->library_name = "MAME 2014";
+   info->library_name = "MAME 2015";
 #elif defined(WANT_MESS)
-   info->library_name = "MESS 2014";
+   info->library_name = "MESS 2015";
 #elif defined(WANT_UME)
-   info->library_name = "UME 2014";
+   info->library_name = "UME 2015";
 #else
    info->library_name = "N/D";
 #endif
