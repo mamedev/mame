@@ -16,7 +16,7 @@
 
 // master clock is a single stage RC oscillator: R=?K, C=?pf,
 // S2150 default frequency is 850kHz
-#define MASTER_CLOCK (850000)
+#define MASTER_CLOCK (850000/4)
 
 
 class wildfire_state : public driver_device
@@ -38,6 +38,7 @@ public:
 	UINT16 m_leds_cache[0x10];
 	UINT8 m_leds_decay[0x100];
 
+	DECLARE_READ8_MEMBER(read_k);
 	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE16_MEMBER(write_a);
 
@@ -127,6 +128,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(wildfire_state::leds_decay_tick)
 
 ***************************************************************************/
 
+READ8_MEMBER(wildfire_state::read_k)
+{
+	// ?
+	return 0xf;
+}
+
 WRITE8_MEMBER(wildfire_state::write_d)
 {
 	m_d = data;
@@ -188,6 +195,7 @@ static MACHINE_CONFIG_START( wildfire, wildfire_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", AMI_S2150, MASTER_CLOCK)
 	MCFG_AMI_S2000_READ_I_CB(IOPORT("IN1"))
+	MCFG_AMI_S2000_READ_K_CB(READ8(wildfire_state, read_k))
 	MCFG_AMI_S2000_WRITE_D_CB(WRITE8(wildfire_state, write_d))
 	MCFG_AMI_S2000_WRITE_A_CB(WRITE16(wildfire_state, write_a))
 
