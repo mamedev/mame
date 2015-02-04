@@ -165,6 +165,17 @@ public:
 	INT32           m_blittimer;
 	UINT32          m_extra_flags;
 
+
+#if (SDLMAME_SDL2)
+	// Original display_mode
+	SDL_DisplayMode m_original_mode;
+
+	SDL_GLContext   m_gl_context_id;
+#else
+	// SDL surface
+	SDL_Surface         *m_sdlsurf;
+#endif
+
 	SDL_Renderer *  m_renderer;
 	simple_list<texture_info>  m_texlist;                // list of active textures
 
@@ -180,9 +191,6 @@ public:
 	// Stats
 	INT64           m_last_blit_time;
 	INT64           m_last_blit_pixels;
-
-	// Original display_mode
-	SDL_DisplayMode m_original_mode;
 };
 
 struct copy_info_t {
@@ -200,6 +208,7 @@ struct copy_info_t {
 	/* list */
 	copy_info_t           *next;
 };
+
 
 //============================================================
 //  PROTOTYPES
@@ -453,7 +462,7 @@ static int RendererSupportsFormat(SDL_Renderer *renderer, Uint32 format, Uint32 
 }
 
 //============================================================
-//  drawsdl2_init
+//  drawsdl_init
 //============================================================
 
 static void add_list(copy_info_t **head, copy_info_t *element, Uint32 bm)
@@ -517,25 +526,12 @@ int drawsdl2_init(running_machine &machine, sdl_draw_info *callbacks)
 	else
 		osd_printf_verbose("Loaded opengl shared library: %s\n", stemp ? stemp : "<default>");
 
-	/* Enable bilinear filtering in case it is supported.
-	 * This applies to all texture operations. However, artwort is pre-scaled
-	 * and thus shouldn't be affected.
-	 */
-	if (video_config.filter)
-	{
-		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
-	}
-	else
-	{
-		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
-	}
-
 	return 0;
 }
 
 
 //============================================================
-//  drawsdl2_exit
+//  drawsdl_exit
 //============================================================
 
 static void drawsdl2_exit(void)
@@ -671,6 +667,19 @@ int sdl_info13::create(int width, int height)
 
 	// create renderer
 
+	/* Enable bilinear filtering in case it is supported.
+	 * This applies to all texture operations. However, artwort is pre-scaled
+	 * and thus shouldn't be affected.
+	 */
+	if (video_config.filter)
+	{
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+	}
+	else
+	{
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+	}
+
 	if (video_config.waitvsync)
 		m_renderer = SDL_CreateRenderer(window().m_sdl_window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
 	else
@@ -690,11 +699,15 @@ int sdl_info13::create(int width, int height)
 
 #else
 	m_extra_flags = (window().fullscreen() ?  SDL_FULLSCREEN : SDL_RESIZABLE);
-	m_extra_flags |= SDL_DOUBLEBUF;
 
-	if (check_flag(FLAG_NEEDS_OPENGL))
+	if (this->check_flag(FLAG_NEEDS_DOUBLEBUF))
+	m_extra_flags |= SDL_DOUBLEBUF;
+	if (this->check_flag(FLAG_NEEDS_ASYNCBLIT))
+		m_extra_flags |= SDL_ASYNCBLIT;
+
+	if (this->check_flag(FLAG_NEEDS_OPENGL))
  {
-		m_extra_flags |= SDL_OPENGL;
+		m_extra_flags |= SDL_DOUBLEBUF | SDL_OPENGL;
 		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 		#if (SDL_VERSION_ATLEAST(1,2,10)) && (!defined(SDLMAME_EMSCRIPTEN))
 		SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, video_config.waitvsync ? 1 : 0);
@@ -752,10 +765,14 @@ void sdl_info13::resize(int width, int height)
 
 void sdl_info13::destroy()
 {
+
 	// free the memory in the window
 
 	destroy_all_textures();
 
+#if (SDLMAME_SDL2)
+	if (check_flag(FLAG_NEEDS_OPENGL))
+		SDL_GL_DeleteContext(m_gl_context_id);
 	if (window().fullscreen() && video_config.switchres)
 	{
 		SDL_SetWindowFullscreen(window().m_sdl_window, 0);    // Try to set mode
@@ -764,7 +781,13 @@ void sdl_info13::destroy()
 	}
 
 	SDL_DestroyWindow(window().m_sdl_window);
-
+#else
+	if (m_sdlsurf)
+	{
+		SDL_FreeSurface(m_sdlsurf);
+		m_sdlsurf = NULL;
+	}
+#endif
 }
 
 //============================================================
@@ -791,6 +814,22 @@ int sdl_info13::xy_to_render_target(int x, int y, int *xt, int *yt)
 	if (*yt<0 || *yt >= window().m_blitheight)
 		return 0;
 	return 1;
+}
+
+//============================================================
+//  drawsdl_destroy_all_textures
+//============================================================
+
+void sdl_info13::destroy_all_textures()
+{
+	if(window().m_primlist)
+	{
+		window().m_primlist->acquire_lock();
+		m_texlist.reset();
+		window().m_primlist->release_lock();
+	}
+	else
+		m_texlist.reset();
 }
 
 //============================================================
@@ -1224,15 +1263,3 @@ texture_info * sdl_info13::texture_update(const render_primitive &prim)
 	return texture;
 }
 
-
-void sdl_info13::destroy_all_textures()
-{
-	if(window().m_primlist)
-	{
-		window().m_primlist->acquire_lock();
-		m_texlist.reset();
-		window().m_primlist->release_lock();
-	}
-	else
-		m_texlist.reset();
-}

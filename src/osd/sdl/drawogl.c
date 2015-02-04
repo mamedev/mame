@@ -811,11 +811,15 @@ int sdl_info_ogl::create(int width, int height)
 
 #else
 	m_extra_flags = (window().fullscreen() ?  SDL_FULLSCREEN : SDL_RESIZABLE);
-	m_extra_flags |= SDL_DOUBLEBUF;
 
-	if (check_flag(FLAG_NEEDS_OPENGL))
+	if (this->check_flag(FLAG_NEEDS_DOUBLEBUF))
+	m_extra_flags |= SDL_DOUBLEBUF;
+	if (this->check_flag(FLAG_NEEDS_ASYNCBLIT))
+		m_extra_flags |= SDL_ASYNCBLIT;
+
+	if (this->check_flag(FLAG_NEEDS_OPENGL))
 	{
-		m_extra_flags |= SDL_OPENGL;
+		m_extra_flags |= SDL_DOUBLEBUF | SDL_OPENGL;
 		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 		#if (SDL_VERSION_ATLEAST(1,2,10)) && (!defined(SDLMAME_EMSCRIPTEN))
 		SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, video_config.waitvsync ? 1 : 0);
@@ -908,7 +912,8 @@ void sdl_info_ogl::destroy()
 	destroy_all_textures();
 
 #if (SDLMAME_SDL2)
-	SDL_GL_DeleteContext(m_gl_context_id);
+	if (check_flag(FLAG_NEEDS_OPENGL))
+		SDL_GL_DeleteContext(m_gl_context_id);
 	if (window().fullscreen() && video_config.switchres)
 	{
 		SDL_SetWindowFullscreen(window().m_sdl_window, 0);    // Try to set mode
@@ -942,6 +947,7 @@ void sdl_info_ogl::clear()
 
 int sdl_info_ogl::xy_to_render_target(int x, int y, int *xt, int *yt)
 {
+
 	*xt = x - m_last_hofs;
 	*yt = y - m_last_vofs;
 	if (*xt<0 || *xt >= window().m_blitwidth)
@@ -951,6 +957,90 @@ int sdl_info_ogl::xy_to_render_target(int x, int y, int *xt, int *yt)
 	return 1;
 }
 
+//============================================================
+//  drawsdl_destroy_all_textures
+//============================================================
+
+void sdl_info_ogl::destroy_all_textures()
+{
+	texture_info *texture = NULL;
+	int lock=FALSE;
+	int i;
+
+	if ( !m_initialized )
+		return;
+
+#if (SDLMAME_SDL2)
+	SDL_GL_MakeCurrent(window().m_sdl_window, m_gl_context_id);
+#endif
+
+	if(window().m_primlist)
+	{
+		lock=TRUE;
+		window().m_primlist->acquire_lock();
+	}
+
+	glFinish();
+
+	texture_all_disable();
+	glFinish();
+	glDisableClientState(GL_VERTEX_ARRAY);
+
+	i=0;
+	while (i<HASH_SIZE+OVERFLOW_SIZE)
+	{
+		texture = m_texhash[i];
+		m_texhash[i] = NULL;
+		if (texture != NULL)
+		{
+			if(m_usevbo)
+			{
+				pfn_glDeleteBuffers( 1, &(texture->texCoordBufferName) );
+				texture->texCoordBufferName=0;
+			}
+
+			if(m_usepbo && texture->pbo)
+			{
+				pfn_glDeleteBuffers( 1, (GLuint *)&(texture->pbo) );
+				texture->pbo=0;
+			}
+
+			if( m_glsl_program_num > 1 )
+			{
+				assert(m_usefbo);
+				pfn_glDeleteFramebuffers(2, (GLuint *)&texture->mpass_fbo_mamebm[0]);
+				glDeleteTextures(2, (GLuint *)&texture->mpass_texture_mamebm[0]);
+			}
+
+			if ( m_glsl_program_mb2sc < m_glsl_program_num - 1 )
+			{
+				assert(m_usefbo);
+				pfn_glDeleteFramebuffers(2, (GLuint *)&texture->mpass_fbo_scrn[0]);
+				glDeleteTextures(2, (GLuint *)&texture->mpass_texture_scrn[0]);
+			}
+
+			glDeleteTextures(1, (GLuint *)&texture->texture);
+			if ( texture->data_own )
+			{
+				free(texture->data);
+				texture->data=NULL;
+				texture->data_own=FALSE;
+			}
+			global_free(texture);
+		}
+		i++;
+	}
+	if ( m_useglsl )
+	{
+		glsl_shader_free(m_glsl);
+		m_glsl = NULL;
+	}
+
+	m_initialized = 0;
+
+	if (lock)
+		window().m_primlist->release_lock();
+}
 //============================================================
 //  loadGLExtensions
 //============================================================
@@ -3107,84 +3197,5 @@ void sdl_info_ogl::texture_all_disable()
 	}
 }
 
-void sdl_info_ogl::destroy_all_textures()
-{
-	texture_info *texture = NULL;
-	int lock=FALSE;
-	int i;
 
-	if ( !m_initialized )
-		return;
-
-#if (SDLMAME_SDL2)
-	SDL_GL_MakeCurrent(window().m_sdl_window, m_gl_context_id);
-#endif
-
-	if(window().m_primlist)
-	{
-		lock=TRUE;
-		window().m_primlist->acquire_lock();
-	}
-
-	glFinish();
-
-	texture_all_disable();
-	glFinish();
-	glDisableClientState(GL_VERTEX_ARRAY);
-
-	i=0;
-	while (i<HASH_SIZE+OVERFLOW_SIZE)
-	{
-		texture = m_texhash[i];
-		m_texhash[i] = NULL;
-		if (texture != NULL)
-		{
-			if(m_usevbo)
-			{
-				pfn_glDeleteBuffers( 1, &(texture->texCoordBufferName) );
-				texture->texCoordBufferName=0;
-			}
-
-			if(m_usepbo && texture->pbo)
-			{
-				pfn_glDeleteBuffers( 1, (GLuint *)&(texture->pbo) );
-				texture->pbo=0;
-			}
-
-			if( m_glsl_program_num > 1 )
-			{
-				assert(m_usefbo);
-				pfn_glDeleteFramebuffers(2, (GLuint *)&texture->mpass_fbo_mamebm[0]);
-				glDeleteTextures(2, (GLuint *)&texture->mpass_texture_mamebm[0]);
-			}
-
-			if ( m_glsl_program_mb2sc < m_glsl_program_num - 1 )
-			{
-				assert(m_usefbo);
-				pfn_glDeleteFramebuffers(2, (GLuint *)&texture->mpass_fbo_scrn[0]);
-				glDeleteTextures(2, (GLuint *)&texture->mpass_texture_scrn[0]);
-			}
-
-			glDeleteTextures(1, (GLuint *)&texture->texture);
-			if ( texture->data_own )
-			{
-				free(texture->data);
-				texture->data=NULL;
-				texture->data_own=FALSE;
-			}
-			global_free(texture);
-		}
-		i++;
-	}
-	if ( m_useglsl )
-	{
-		glsl_shader_free(m_glsl);
-		m_glsl = NULL;
-	}
-
-	m_initialized = 0;
-
-	if (lock)
-		window().m_primlist->release_lock();
-}
 

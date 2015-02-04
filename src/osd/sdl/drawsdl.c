@@ -50,8 +50,8 @@ class sdl_info : public osd_renderer
 {
 public:
 
-	sdl_info(sdl_window_info *w)
-	: osd_renderer(w, FLAG_NONE),
+	sdl_info(sdl_window_info *w, int extra_flags)
+	: osd_renderer(w, extra_flags),
 	m_blittimer(0),
 	m_extra_flags(0),
 
@@ -164,8 +164,8 @@ static int shown_video_info = 0;
 
 static const sdl_scale_mode scale_modes[] =
 {
-		{ "none",    0, 0, 1, 1, SDL_DOUBLEBUF, 0, 0 },
-		{ "async",   0, 0, 1, 1, SDL_DOUBLEBUF | SDL_ASYNCBLIT, 0, 0 },
+		{ "none",    0, 0, 1, 1, osd_renderer::FLAG_NEEDS_DOUBLEBUF, 0, 0 },
+		{ "async",   0, 0, 1, 1, osd_renderer::FLAG_NEEDS_DOUBLEBUF | osd_renderer::FLAG_NEEDS_ASYNCBLIT, 0, 0 },
 		{ "yv12",    1, 1, 1, 1, 0,              SDL_YV12_OVERLAY, yuv_RGB_to_YV12 },
 		{ "yv12x2",  1, 1, 2, 2, 0,              SDL_YV12_OVERLAY, yuv_RGB_to_YV12X2 },
 		{ "yuy2",    1, 1, 1, 1, 0,              SDL_YUY2_OVERLAY, yuv_RGB_to_YUY2 },
@@ -178,10 +178,11 @@ static const sdl_scale_mode scale_modes[] =
 		{ "none",    0, 0, 1, 1, DRAW2_SCALEMODE_NEAREST, 0, 0 },
 		{ "hwblit",  1, 0, 1, 1, DRAW2_SCALEMODE_LINEAR, 0, 0 },
 		{ "hwbest",  1, 0, 1, 1, DRAW2_SCALEMODE_BEST, 0, 0 },
-		{ "yv12",    1, 1, 1, 1, DRAW2_SCALEMODE_NEAREST, SDL_PIXELFORMAT_YV12, yuv_RGB_to_YV12 },
-		{ "yv12x2",  1, 1, 2, 2, DRAW2_SCALEMODE_NEAREST, SDL_PIXELFORMAT_YV12, yuv_RGB_to_YV12X2 },
-		{ "yuy2",    1, 1, 1, 1, DRAW2_SCALEMODE_NEAREST, SDL_PIXELFORMAT_YUY2, yuv_RGB_to_YUY2 },
-		{ "yuy2x2",  1, 1, 2, 1, DRAW2_SCALEMODE_NEAREST, SDL_PIXELFORMAT_YUY2, yuv_RGB_to_YUY2X2 },
+		/* SDL1.2 uses interpolation as well */
+		{ "yv12",    1, 1, 1, 1, DRAW2_SCALEMODE_BEST, SDL_PIXELFORMAT_YV12, yuv_RGB_to_YV12 },
+		{ "yv12x2",  1, 1, 2, 2, DRAW2_SCALEMODE_BEST, SDL_PIXELFORMAT_YV12, yuv_RGB_to_YV12X2 },
+		{ "yuy2",    1, 1, 1, 1, DRAW2_SCALEMODE_BEST, SDL_PIXELFORMAT_YUY2, yuv_RGB_to_YUY2 },
+		{ "yuy2x2",  1, 1, 2, 1, DRAW2_SCALEMODE_BEST, SDL_PIXELFORMAT_YUY2, yuv_RGB_to_YUY2X2 },
 		{ NULL }
 };
 #endif
@@ -220,15 +221,22 @@ int drawsdl_scale_mode(const char *s)
 	return -1;
 }
 
-//============================================================
-//  drawsdl_init
-//============================================================
 
 static osd_renderer *drawsdl_create(sdl_window_info *window)
 {
-	return global_alloc(sdl_info(window));
+	const sdl_scale_mode *sm = &scale_modes[video_config.scale_mode];
+
+	// FIXME: QUALITY HINTS
+#if (SDLMAME_SDL2)
+	return global_alloc(sdl_info(window, osd_renderer::FLAG_NONE));
+#else
+	return global_alloc(sdl_info(window, sm->m_extra_flags));
+#endif
 }
 
+//============================================================
+//  drawsdl_init
+//============================================================
 
 int drawsdl_init(sdl_draw_info *callbacks)
 {
@@ -250,15 +258,6 @@ int drawsdl_init(sdl_draw_info *callbacks)
 
 static void drawsdl_exit(void)
 {
-}
-
-//============================================================
-//  drawsdl_destroy_all_textures
-//============================================================
-
-void sdl_info::destroy_all_textures()
-{
-	/* nothing to be done in soft mode */
 }
 
 //============================================================
@@ -457,9 +456,6 @@ int sdl_info::create(int width, int height)
 	else
 				m_extra_flags = 0;
 
-	/* set hints ... */
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, sm->sdl_scale_mode);
-
 	// create the SDL window
 	// soft driver also used | SDL_WINDOW_INPUT_GRABBED | SDL_WINDOW_MOUSE_FOCUS
 	m_extra_flags |= (window().fullscreen() ?
@@ -519,6 +515,10 @@ int sdl_info::create(int width, int height)
 
 	// create renderer 
 
+	/* set hints ... */
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, sm->sdl_scale_mode);
+
+
 	if (video_config.waitvsync)
 		m_sdl_renderer = SDL_CreateRenderer(window().m_sdl_window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
 	else
@@ -557,9 +557,12 @@ int sdl_info::create(int width, int height)
 #else
 	m_extra_flags = (window().fullscreen() ?  SDL_FULLSCREEN : SDL_RESIZABLE);
 
-	m_extra_flags |= sm->m_extra_flags;
+	if (this->check_flag(FLAG_NEEDS_DOUBLEBUF))
+		m_extra_flags |= SDL_DOUBLEBUF;
+	if (this->check_flag(FLAG_NEEDS_ASYNCBLIT))
+		m_extra_flags |= SDL_ASYNCBLIT;
 
-	if (check_flag(FLAG_NEEDS_OPENGL))
+	if (this->check_flag(FLAG_NEEDS_OPENGL))
 	{
 		m_extra_flags |= SDL_DOUBLEBUF | SDL_OPENGL;
 		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
@@ -705,6 +708,16 @@ int sdl_info::xy_to_render_target(int x, int y, int *xt, int *yt)
 		return 0;
 	return 1;
 }
+
+//============================================================
+//  drawsdl_destroy_all_textures
+//============================================================
+
+void sdl_info::destroy_all_textures()
+{
+	/* nothing to be done in soft mode */
+}
+
 
 //============================================================
 //  sdl_info::draw

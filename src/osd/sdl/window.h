@@ -38,8 +38,15 @@ class osd_renderer
 {
 public:
 
-	static const int FLAG_NONE = 0;
-	static const int FLAG_NEEDS_OPENGL = 1;
+	/* Generic flags */
+	static const int FLAG_NONE 					= 0x0000;
+	static const int FLAG_NEEDS_OPENGL 			= 0x0001;
+
+#if (!(SDLMAME_SDL2))
+	/* SDL 1.2 flags */
+	static const int FLAG_NEEDS_DOUBLEBUF 		= 0x0100;
+	static const int FLAG_NEEDS_ASYNCBLIT 		= 0x0200;
+#endif
 
 	osd_renderer(sdl_window_info *window, const int flags)
 	: m_window(window), m_flags(flags) { }
