@@ -89,12 +89,22 @@ READ8_MEMBER( mbee_state::pio_port_b_r )
 
 *************************************************************************************/
 
+WRITE_LINE_MEMBER( mbee_state::fdc_intrq_w )
+{
+	m_fdc_rq = (m_fdc_rq & 2) | state;
+}
+
+WRITE_LINE_MEMBER( mbee_state::fdc_drq_w )
+{
+	m_fdc_rq = (m_fdc_rq & 1) | (state << 1);
+}
+
 READ8_MEMBER( mbee_state::mbee_fdc_status_r )
 {
 /*  d7 indicate if IRQ or DRQ is occuring (1=happening)
     d6..d0 not used */
 
-	return 0x7f | ((m_fdc->intrq_r() || m_fdc->drq_r()) ? 0x80 : 0);
+	return m_fdc_rq ? 0xff : 0x7f;
 }
 
 WRITE8_MEMBER( mbee_state::mbee_fdc_motor_w )
@@ -131,7 +141,7 @@ WRITE8_MEMBER( mbee_state::mbee_fdc_motor_w )
 TIMER_CALLBACK_MEMBER(mbee_state::mbee256_kbd)
 {
 	/* Keyboard scanner is a Mostek M3870 chip. Its speed of operation is determined by a 15k resistor on
-	pin 2 (XTL2) and is therefore unknown. If a key change is detected (up or down), the /strobe
+	pin 2 (XTL2) and is therefore 2MHz. If a key change is detected (up or down), the /strobe
 	line activates, sending a high to bit 1 of port 2 (one of the pio input lines). The next read of
 	port 18 will clear this line, and read the key scancode. It will also signal the 3870 that the key
 	data has been read, on pin 38 (/extint). The 3870 can cache up to 9 keys. With no rom dump
@@ -256,83 +266,79 @@ TIMER_CALLBACK_MEMBER(mbee_state::mbee_rtc_irq)
 
     256TC Memory Banking
 
-    Bits 0, 1 and 5 select which bank goes into 0000-7FFF.
-    Bit 2 disables ROM, replacing it with RAM.
-    Bit 3 disables Video, replacing it with RAM.
-    Bit 4 switches the video circuits between F000-FFFF and
-          8000-8FFF.
-
-    In case of a clash, video overrides ROM which overrides RAM.
+    Selection of ROM, RAM, and video access by the CPU is controlled by U39,
+    a PAL14L8. When read as an ordinary rom it is 16k in size. The dumper has
+    arranged the pins as (bit0,1,..) (input = 1,23,2,3,4,5,6,7,8,9,10,11,14,13)
+    and (output = 22,21,20,19,18,17,16,15). The prom is also used to control
+    the refresh required by the dynamic rams, however we ignore this function.
 
 ************************************************************/
 
+void mbee_state::mbee256_setup_banks(UINT8 data)
+{
+	data &= 0x3f; // U28 (bits 0-5 are referred to as S0-S5)
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
+	UINT8 *prom = memregion("proms")->base();
+	UINT8 b_data = BITSWAP8(data, 7,5,3,2,4,6,1,0) & 0x3b; // arrange data bits to S0,S1,-,S4,S2,S3
+	UINT8 b_bank, b_byte, b_byte_t, b_addr;
+	UINT16 b_vid;
+	char banktag[10];
+
+	for (b_bank = 0; b_bank < 16; b_bank++)
+	{
+		b_vid = b_bank << 12;
+		mem.unmap_readwrite (b_vid, b_vid + 0xfff);
+		b_addr = BITSWAP8(b_bank, 7,4,5,3,1,2,6,0) & 0x1f; // arrange address bits to A12,-,A14,A13,A15
+
+		// Calculate read-bank
+		b_byte_t = prom[b_addr | (b_data << 8) | 0x82]; // read-bank (RDS and MREQ are low, RFSH is high)
+		b_byte = BITSWAP8(b_byte_t, 7,5,0,3,6,2,1,4); // rearrange so that bits 0-2 are rambank, bit 3 = rom select, bit 4 = video select, others not used
+		if (!BIT(data, 5))
+			b_byte &= 0xfb;  // U42/1 - S17 only valid if S5 is on
+		if (!BIT(b_byte, 4))
+		{
+			// select video
+			mem.install_read_handler (b_vid, b_vid + 0x7ff, read8_delegate(FUNC(mbee_state::mbeeppc_low_r), this));
+			mem.install_read_handler (b_vid + 0x800, b_vid + 0xfff, read8_delegate(FUNC(mbee_state::mbeeppc_high_r), this));
+		}
+		else
+		{
+			sprintf(banktag, "bankr%d", b_bank);
+			mem.install_read_bank( b_vid, b_vid+0xfff, banktag );
+
+			if (!BIT(b_byte, 3))
+				membank(banktag)->set_entry(64 + (b_bank & 3)); // read from rom
+			else
+				membank(banktag)->set_entry((b_bank & 7) | ((b_byte & 7) << 3)); // ram
+		}
+
+		// Calculate write-bank
+		b_byte_t = prom[b_addr | (b_data << 8) | 0xc0]; // write-bank (XWR and MREQ are low, RFSH is high)
+		b_byte = BITSWAP8(b_byte_t, 7,5,0,3,6,2,1,4); // rearrange so that bits 0-2 are rambank, bit 3 = rom select, bit 4 = video select, others not used
+		if (!BIT(data, 5))
+			b_byte &= 0xfb;  // U42/1 - S17 only valid if S5 is on
+		if (!BIT(b_byte, 4))
+		{
+			// select video
+			mem.install_write_handler (b_vid, b_vid + 0x7ff, write8_delegate(FUNC(mbee_state::mbeeppc_low_w), this));
+			mem.install_write_handler (b_vid + 0x800, b_vid + 0xfff, write8_delegate(FUNC(mbee_state::mbeeppc_high_w), this));
+		}
+		else
+		{
+			sprintf(banktag, "bankw%d", b_bank);
+			mem.install_write_bank( b_vid, b_vid+0xfff, banktag );
+
+			if (!BIT(b_byte, 3))
+				membank(banktag)->set_entry(64); // write to rom dummy area
+			else
+				membank(banktag)->set_entry((b_bank & 7) | ((b_byte & 7) << 3)); // ram
+		}
+	}
+}
+
 WRITE8_MEMBER( mbee_state::mbee256_50_w )
 {
-	address_space &mem = m_maincpu->space(AS_PROGRAM);
-
-	// primary low banks
-	m_boot->set_entry((data & 3) | ((data & 0x20) >> 3));
-	m_bank1->set_entry((data & 3) | ((data & 0x20) >> 3));
-
-	// 9000-EFFF
-	m_bank9->set_entry((data & 4) ? 1 : 0);
-
-	// 8000-8FFF, F000-FFFF
-	mem.unmap_readwrite (0x8000, 0x87ff);
-	mem.unmap_readwrite (0x8800, 0x8fff);
-	mem.unmap_readwrite (0xf000, 0xf7ff);
-	mem.unmap_readwrite (0xf800, 0xffff);
-
-	switch (data & 0x1c)
-	{
-		case 0x00:
-			mem.install_read_bank (0x8000, 0x87ff, "bank8l");
-			mem.install_read_bank (0x8800, 0x8fff, "bank8h");
-			mem.install_readwrite_handler (0xf000, 0xf7ff, read8_delegate(FUNC(mbee_state::mbeeppc_low_r), this), write8_delegate(FUNC(mbee_state::mbeeppc_low_w), this));
-			mem.install_readwrite_handler (0xf800, 0xffff, read8_delegate(FUNC(mbee_state::mbeeppc_high_r), this), write8_delegate(FUNC(mbee_state::mbeeppc_high_w), this));
-			m_bank8l->set_entry(0); // rom
-			m_bank8h->set_entry(0); // rom
-			break;
-		case 0x04:
-			mem.install_read_bank (0x8000, 0x87ff, "bank8l");
-			mem.install_read_bank (0x8800, 0x8fff, "bank8h");
-			mem.install_readwrite_handler (0xf000, 0xf7ff, read8_delegate(FUNC(mbee_state::mbeeppc_low_r), this), write8_delegate(FUNC(mbee_state::mbeeppc_low_w), this));
-			mem.install_readwrite_handler (0xf800, 0xffff, read8_delegate(FUNC(mbee_state::mbeeppc_high_r), this), write8_delegate(FUNC(mbee_state::mbeeppc_high_w), this));
-			m_bank8l->set_entry(1); // ram
-			m_bank8h->set_entry(1); // ram
-			break;
-		case 0x08:
-		case 0x18:
-			mem.install_read_bank (0x8000, 0x87ff, "bank8l");
-			mem.install_read_bank (0x8800, 0x8fff, "bank8h");
-			mem.install_read_bank (0xf000, 0xf7ff, "bankfl");
-			mem.install_read_bank (0xf800, 0xffff, "bankfh");
-			m_bank8l->set_entry(0); // rom
-			m_bank8h->set_entry(0); // rom
-			m_bankfl->set_entry(0); // ram
-			m_bankfh->set_entry(0); // ram
-			break;
-		case 0x0c:
-		case 0x1c:
-			mem.install_read_bank (0x8000, 0x87ff, "bank8l");
-			mem.install_read_bank (0x8800, 0x8fff, "bank8h");
-			mem.install_read_bank (0xf000, 0xf7ff, "bankfl");
-			mem.install_read_bank (0xf800, 0xffff, "bankfh");
-			m_bank8l->set_entry(1); // ram
-			m_bank8h->set_entry(1); // ram
-			m_bankfl->set_entry(0); // ram
-			m_bankfh->set_entry(0); // ram
-			break;
-		case 0x10:
-		case 0x14:
-			mem.install_readwrite_handler (0x8000, 0x87ff, read8_delegate(FUNC(mbee_state::mbeeppc_low_r), this), write8_delegate(FUNC(mbee_state::mbeeppc_low_w), this));
-			mem.install_readwrite_handler (0x8800, 0x8fff, read8_delegate(FUNC(mbee_state::mbeeppc_high_r), this), write8_delegate(FUNC(mbee_state::mbeeppc_high_w), this));
-			mem.install_read_bank (0xf000, 0xf7ff, "bankfl");
-			mem.install_read_bank (0xf800, 0xffff, "bankfh");
-			m_bankfl->set_entry(0); // ram
-			m_bankfh->set_entry(0); // ram
-			break;
-	}
+	mbee256_setup_banks(data);
 }
 
 /***********************************************************
@@ -508,6 +514,7 @@ TIMER_CALLBACK_MEMBER(mbee_state::mbee_reset)
 
 void mbee_state::machine_reset_common_disk()
 {
+	m_fdc_rq = 0;
 }
 
 MACHINE_RESET_MEMBER(mbee_state,mbee)
@@ -533,22 +540,20 @@ MACHINE_RESET_MEMBER(mbee_state,mbee64)
 
 MACHINE_RESET_MEMBER(mbee_state,mbee128)
 {
-	address_space &mem = m_maincpu->space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_IO);
 	machine_reset_common_disk();
 	mbee128_50_w(mem,0,0); // set banks to default
-	m_boot->set_entry(4); // boot time
+	m_boot->set_entry(8); // boot time
 }
 
 MACHINE_RESET_MEMBER(mbee_state,mbee256)
 {
 	UINT8 i;
-	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	machine_reset_common_disk();
 	for (i = 0; i < 15; i++) m_mbee256_was_pressed[i] = 0;
 	m_mbee256_q_pos = 0;
-	mbee256_50_w(mem,0,0); // set banks to default
-	m_boot->set_entry(8); // boot time
-	timer_set(attotime::from_usec(4), TIMER_MBEE_RESET);
+	mbee256_setup_banks(0); // set banks to default
+	m_maincpu->set_pc(0x8000);
 }
 
 MACHINE_RESET_MEMBER(mbee_state,mbeett)
@@ -690,7 +695,7 @@ DRIVER_INIT_MEMBER(mbee_state,mbee128)
 
 	RAM = memregion("bootrom")->base();
 	m_bank9->configure_entry(0, &RAM[0x1000]); // rom
-	m_boot->configure_entry(4, &RAM[0x0000]); // rom at boot for 4usec
+	m_boot->configure_entry(8, &RAM[0x0000]); // rom at boot for 4usec
 	m_bank8l->configure_entry(0, &RAM[0x0000]); // rom
 	m_bank8h->configure_entry(0, &RAM[0x0800]); // rom
 
@@ -699,23 +704,23 @@ DRIVER_INIT_MEMBER(mbee_state,mbee128)
 
 DRIVER_INIT_MEMBER(mbee_state,mbee256)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-	m_boot->configure_entries(0, 8, &RAM[0x0000], 0x8000); // standard banks 0000
-	m_bank1->configure_entries(0, 8, &RAM[0x1000], 0x8000); // standard banks 1000
-	m_bank8l->configure_entry(1, &RAM[0x0000]); // shadow ram
-	m_bank8h->configure_entry(1, &RAM[0x0800]); // shadow ram
-	m_bank9->configure_entry(1, &RAM[0x1000]); // shadow ram
-	m_bankfl->configure_entry(0, &RAM[0xf000]); // shadow ram
-	m_bankfh->configure_entry(0, &RAM[0xf800]); // shadow ram
+	UINT8 *RAM = memregion("rams")->base();
+	UINT8 *ROM = memregion("roms")->base();
+	char banktag[10];
 
-	RAM = memregion("bootrom")->base();
-	m_bank9->configure_entry(0, &RAM[0x1000]); // rom
-	m_boot->configure_entry(8, &RAM[0x0000]); // rom at boot for 4usec
-	m_bank8l->configure_entry(0, &RAM[0x0000]); // rom
-	m_bank8h->configure_entry(0, &RAM[0x0800]); // rom
+	for (UINT8 b_bank = 0; b_bank < 16; b_bank++)
+	{
+		sprintf(banktag, "bankr%d", b_bank);
+		membank(banktag)->configure_entries(0, 64, &RAM[0x0000], 0x1000); // RAM banks
+		membank(banktag)->configure_entries(64, 4, &ROM[0x0000], 0x1000); // rom
+
+		sprintf(banktag, "bankw%d", b_bank);
+		membank(banktag)->configure_entries(0, 64, &RAM[0x0000], 0x1000); // RAM banks
+		membank(banktag)->configure_entries(64, 1, &ROM[0x4000], 0x1000); // dummy rom
+	}
 
 	timer_set(attotime::from_hz(1), TIMER_MBEE_RTC_IRQ);   /* timer for rtc */
-	timer_set(attotime::from_hz(25), TIMER_MBEE256_KBD);   /* timer for kbd */
+	timer_set(attotime::from_hz(50), TIMER_MBEE256_KBD);   /* timer for kbd */
 
 	m_size = 0x8000;
 }
