@@ -78,12 +78,14 @@ static const translation_info gcc_translate[] =
 	// warning C4146: unary minus operator applied to unsigned type, result still unsigned
 	// warning C4150: deletion of pointer to incomplete type 'xxx'; no destructor called
 	// warning C4189: 'xxx' : local variable is initialized but not referenced
+	// warning C4191: 'type cast' : unsafe conversion from 'xxx' to 'xxx' // 64-bit only
 	// warning C4201: nonstandard extension used : nameless struct/union
 	// warning C4242: 'x' : conversion from 'xxx' to 'xxx', possible loss of data
 	// warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
 	// warning C4250: 'xxx' : inherits 'xxx' via dominance
 	// warning C4255: 'xxx' : no function prototype given: converting '()' to '(void)'
 	// warning C4296: 'x' : expression is always false
+	// warning C4306: 'xxx': conversion from 'type1' to 'type2' of greater size // 64-bit only
 	// warning C4310: cast truncates constant value
 	// warning C4324: 'xxx' : structure was padded due to __declspec(align())
 	// warning C4347: behavior change: 'xxx' is called instead of 'xxx' // obsolete VS2005 - VS2010 only
@@ -91,11 +93,13 @@ static const translation_info gcc_translate[] =
 	// warning C4510: 'xxx' : default constructor could not be generated
 	// warning C4512: 'xxx' : assignment operator could not be generated
 	// warning C4514: 'xxx' : unreferenced inline function has been removed
+	// warning C4611: interaction between '_setjmp' and C++ object destruction is non-portable
 	// warning C4619: #pragma warning : there is no warning number 'xxx'
 	// warning C4571: Informational: catch(...) semantics changed since Visual C++ 7.1; structured exceptions (SEH) are no longer caught
 	// warning C4610: struct 'xxx' can never be instantiated - user defined constructor required
 	// warning C4625: 'xxx' : copy constructor could not be generated because a base class copy constructor is inaccessible or deleted
 	// warning C4626: 'xxx' : assignment operator could not be generated because a base class assignment operator is inaccessible or deleted
+	// warning C4640: 'xxx' : construction of local static object is not thread-safe
 	// warning C4668: 'xxx' is not defined as a preprocessor macro, replacing with '0' for '#if/#elif'
 	// warning C4702: unreachable code
 	// warning C4706: assignment within conditional expression
@@ -104,7 +108,7 @@ static const translation_info gcc_translate[] =
 	// warning C4805: 'x' : unsafe mix of type 'xxx' and type 'xxx' in operation
 	// warning C4820: 'xxx' : 'x' bytes padding added after data member 'xxx'
 	// warning C4826: Conversion from 'type1 ' to 'type_2' is sign-extended. This may cause unexpected runtime behavior. // 32-bit only
-	{ VS7,      "-Wall",                    "/Wall /W4 /wd4003 /wd4018 /wd4061 /wd4100 /wd4127 /wd4131 /wd4141 /wd4146 /wd4150 /wd4189 /wd4201 /wd4242 /wd4244 /wd4250 /wd4255 /wd4296 /wd4310 /wd4324 /wd4347 /wd4435 /wd4510 /wd4512 /wd4514 /wd4571 /wd4610 /wd4619 /wd4625 /wd4626 /wd4668 /wd4702 /wd4706 /wd4710 /wd4711 /wd4805 /wd4820 /wd4826" },
+	{ VS7,      "-Wall",                    "/Wall /W4 /wd4003 /wd4018 /wd4061 /wd4100 /wd4127 /wd4131 /wd4141 /wd4146 /wd4150 /wd4189 /wd4191 /wd4201 /wd4242 /wd4244 /wd4250 /wd4255 /wd4296 /wd4306 /wd4310 /wd4324 /wd4347 /wd4435 /wd4510 /wd4512 /wd4514 /wd4571 /wd4610 /wd4611 /wd4619 /wd4625 /wd4626 /wd4640 /wd4668 /wd4702 /wd4706 /wd4710 /wd4711 /wd4805 /wd4820 /wd4826" },
 	{ 0,        "-Wall",                    "/W0" },
 	{ VS7,      "-Wno-unused",              "/wd4100 /wd4101 /wd4102 /wd4505" },
 	{ 0,        "-Wno-sign-compare",        "/wd4365 /wd4389 /wd4245 /wd4388" },
