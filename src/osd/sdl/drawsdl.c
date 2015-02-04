@@ -53,13 +53,11 @@ public:
 	sdl_info(sdl_window_info *w, int extra_flags)
 	: osd_renderer(w, extra_flags),
 	m_blittimer(0),
-	m_extra_flags(0),
 
 	#if (SDLMAME_SDL2)
 	m_sdl_renderer(NULL),
 	m_texture_id(NULL),
 	#else
-	m_sdlsurf(NULL),
 	m_yuvsurf(NULL),
 	#endif
 	m_yuv_lookup(NULL),
@@ -92,17 +90,11 @@ public:
 #endif
 
 	INT32               m_blittimer;
-	UINT32              m_extra_flags;
 
 #if (SDLMAME_SDL2)
-	// Original display_mode
-	SDL_DisplayMode 	m_original_mode;
-
 	SDL_Renderer        *m_sdl_renderer;
 	SDL_Texture         *m_texture_id;
 #else
-	// SDL surface
-	SDL_Surface         *m_sdlsurf;
 	SDL_Overlay         *m_yuvsurf;
 #endif
 
@@ -347,7 +339,7 @@ void sdl_info::yuv_overlay_init()
 	m_yuv_bitmap = global_alloc_array(UINT16, minimum_width*minimum_height);
 
 	m_yuvsurf = SDL_CreateYUVOverlay(minimum_width * sdl_sm->mult_w, minimum_height * sdl_sm->mult_h,
-			sdl_sm->pixel_format, m_sdlsurf);
+			sdl_sm->pixel_format, window().m_sdlsurf);
 
 	if ( m_yuvsurf == NULL ) {
 		osd_printf_error("SDL: Couldn't create SDL_yuv_overlay: %s\n", SDL_GetError());
@@ -429,89 +421,9 @@ static void drawsdl_show_info(struct SDL_RendererInfo *render_info)
 
 int sdl_info::create(int width, int height)
 {
-	/* FIXME: On Ubuntu and potentially other Linux OS you should use
-	 * to disable panning. This has to be done before every invocation of mame.
-	 *
-	 * xrandr --output HDMI-0 --panning 0x0+0+0 --fb 0x0
-	 *
-	 */
 	const sdl_scale_mode *sm = &scale_modes[video_config.scale_mode];
 
-	osd_printf_verbose("Enter sdl_info::create\n");
-
 #if (SDLMAME_SDL2)
-
-	if (check_flag(FLAG_NEEDS_OPENGL))
-	{
-		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-
-		/* FIXME: A reminder that gamma is wrong throughout MAME. Currently, SDL2.0 doesn't seem to
-			* support the following attribute although my hardware lists GL_ARB_framebuffer_sRGB as an extension.
-			*
-			* SDL_GL_SetAttribute( SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, 1 );
-			*
-			*/
-		m_extra_flags = SDL_WINDOW_OPENGL;
-	}
-	else
-				m_extra_flags = 0;
-
-	// create the SDL window
-	// soft driver also used | SDL_WINDOW_INPUT_GRABBED | SDL_WINDOW_MOUSE_FOCUS
-	m_extra_flags |= (window().fullscreen() ?
-			SDL_WINDOW_BORDERLESS | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE);
-
-#if defined(SDLMAME_WIN32)
-	SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
-#endif
-	// create the SDL window
-	window().m_sdl_window = SDL_CreateWindow(window().m_title,
-			window().monitor()->position_size().x, window().monitor()->position_size().y,
-			width, height, m_extra_flags);
-	//window().m_sdl_window = SDL_CreateWindow(window().m_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-	//		width, height, m_extra_flags);
-
-	if  (!window().m_sdl_window )
-	{
-		if (check_flag(FLAG_NEEDS_OPENGL))
-			osd_printf_error("OpenGL not supported on this driver: %s\n", SDL_GetError());
-		else
-		osd_printf_error("Window creation failed: %s\n", SDL_GetError());
-		return 1;
-	}
-
-	if (window().fullscreen() && video_config.switchres)
-	{
-		SDL_DisplayMode mode;
-		//SDL_GetCurrentDisplayMode(window().monitor()->handle, &mode);
-		SDL_GetWindowDisplayMode(window().m_sdl_window, &mode);
-		m_original_mode = mode;
-		mode.w = width;
-		mode.h = height;
-		if (window().m_refresh)
-			mode.refresh_rate = window().m_refresh;
-
-		SDL_SetWindowDisplayMode(window().m_sdl_window, &mode);    // Try to set mode
-#ifndef SDLMAME_WIN32
-		/* FIXME: Warp the mouse to 0,0 in case a virtual desktop resolution
-		 * is in place after the mode switch - which will most likely be the case
-		 * This is a hack to work around a deficiency in SDL2
-		 */
-		SDL_WarpMouseInWindow(window().m_sdl_window, 1, 1);
-#endif
-	}
-	else
-	{
-		//SDL_SetWindowDisplayMode(window().m_sdl_window, NULL); // Use desktop
-	}
-
-	// show window
-
-	SDL_ShowWindow(window().m_sdl_window);
-	//SDL_SetWindowFullscreen(window().m_sdl_window, window().fullscreen);
-	SDL_RaiseWindow(window().m_sdl_window);
-
-	SDL_GetWindowSize(window().m_sdl_window, &window().m_width, &window().m_height);
 
 	// create renderer 
 
@@ -555,43 +467,6 @@ int sdl_info::create(int width, int height)
 
 	setup_texture(width, height);
 #else
-	m_extra_flags = (window().fullscreen() ?  SDL_FULLSCREEN : SDL_RESIZABLE);
-
-	if (this->check_flag(FLAG_NEEDS_DOUBLEBUF))
-		m_extra_flags |= SDL_DOUBLEBUF;
-	if (this->check_flag(FLAG_NEEDS_ASYNCBLIT))
-		m_extra_flags |= SDL_ASYNCBLIT;
-
-	if (this->check_flag(FLAG_NEEDS_OPENGL))
-	{
-		m_extra_flags |= SDL_DOUBLEBUF | SDL_OPENGL;
-		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-		#if (SDL_VERSION_ATLEAST(1,2,10)) && (!defined(SDLMAME_EMSCRIPTEN))
-		SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, video_config.waitvsync ? 1 : 0);
-		#endif
-		//load_gl_lib(window().machine());
-	}
-
-	// create the SDL surface (which creates the window in windowed mode)
-	m_sdlsurf = SDL_SetVideoMode(width, height,
-					0, SDL_SWSURFACE | SDL_ANYFORMAT | m_extra_flags);
-
-	if (!m_sdlsurf)
-		return 1;
-	if ( (video_config.mode  == VIDEO_MODE_OPENGL) && !(m_sdlsurf->flags & SDL_OPENGL) )
-	{
-		osd_printf_error("OpenGL not supported on this driver!\n");
-		return 1;
-	}
-
-	window().m_width = m_sdlsurf->w;
-	window().m_height = m_sdlsurf->h;
-	if (sm->is_yuv)
-		yuv_overlay_init();
-
-	// set the window title
-	SDL_WM_SetCaption(window().m_title, "SDLMAME");
-
 #endif
 
 	m_yuv_lookup = NULL;
@@ -621,13 +496,13 @@ void sdl_info::resize(int width, int height)
 		SDL_FreeYUVOverlay(m_yuvsurf);
 		m_yuvsurf = NULL;
 	}
-	SDL_FreeSurface(m_sdlsurf);
+	SDL_FreeSurface(window().m_sdlsurf);
 	
-	m_sdlsurf = SDL_SetVideoMode(width, height, 0,
-			SDL_SWSURFACE | SDL_ANYFORMAT | m_extra_flags);
+	window().m_sdlsurf = SDL_SetVideoMode(width, height, 0,
+			SDL_SWSURFACE | SDL_ANYFORMAT | window().m_extra_flags);
 
-	window().m_width = m_sdlsurf->w;
-	window().m_height = m_sdlsurf->h;
+	window().m_width = window().m_sdlsurf->w;
+	window().m_height = window().m_sdlsurf->h;
 
 		if (sdl_sm->is_yuv)
 	{
@@ -652,7 +527,7 @@ void sdl_info::destroy()
 	if (window().fullscreen() && video_config.switchres)
 	{
 		SDL_SetWindowFullscreen(window().m_sdl_window, 0);    // Try to set mode
-		SDL_SetWindowDisplayMode(window().m_sdl_window, &m_original_mode);    // Try to set mode
+		SDL_SetWindowDisplayMode(window().m_sdl_window, &window().m_original_mode);    // Try to set mode
 		SDL_SetWindowFullscreen(window().m_sdl_window, SDL_WINDOW_FULLSCREEN);    // Try to set mode
 	}
 
@@ -664,10 +539,10 @@ void sdl_info::destroy()
 		m_yuvsurf = NULL;
 	}
 
-	if (m_sdlsurf)
+	if (window().m_sdlsurf)
 	{
-		SDL_FreeSurface(m_sdlsurf);
-		m_sdlsurf = NULL;
+		SDL_FreeSurface(window().m_sdlsurf);
+		window().m_sdlsurf = NULL;
 	}
 #endif
 	// free the memory in the window
@@ -743,11 +618,11 @@ int sdl_info::draw(UINT32 dc, int update)
 	// lock it if we need it
 #if (!SDLMAME_SDL2)
 
-	pitch = m_sdlsurf->pitch;
-	bpp = m_sdlsurf->format->BytesPerPixel;
-	rmask = m_sdlsurf->format->Rmask;
-	gmask = m_sdlsurf->format->Gmask;
-	bmask = m_sdlsurf->format->Bmask;
+	pitch = window().m_sdlsurf->pitch;
+	bpp = window().m_sdlsurf->format->BytesPerPixel;
+	rmask = window().m_sdlsurf->format->Rmask;
+	gmask = window().m_sdlsurf->format->Gmask;
+	bmask = window().m_sdlsurf->format->Bmask;
 //  amask = sdlsurf->format->Amask;
 
 	if (window().m_blitwidth != m_old_blitwidth || window().m_blitheight != m_old_blitheight)
@@ -759,13 +634,13 @@ int sdl_info::draw(UINT32 dc, int update)
 		m_blittimer = 3;
 	}
 
-	if (SDL_MUSTLOCK(m_sdlsurf))
-		SDL_LockSurface(m_sdlsurf);
+	if (SDL_MUSTLOCK(window().m_sdlsurf))
+		SDL_LockSurface(window().m_sdlsurf);
 
 	// Clear if necessary
 	if (m_blittimer > 0)
 	{
-		memset(m_sdlsurf->pixels, 0, window().m_height * m_sdlsurf->pitch);
+		memset(window().m_sdlsurf->pixels, 0, window().m_height * window().m_sdlsurf->pitch);
 		m_blittimer--;
 	}
 
@@ -783,7 +658,7 @@ int sdl_info::draw(UINT32 dc, int update)
 #endif
 	}
 	else
-		surfptr = (UINT8 *)m_sdlsurf->pixels;
+		surfptr = (UINT8 *)window().m_sdlsurf->pixels;
 #else
 	//SDL_SelectRenderer(window().sdl_window);
 
@@ -943,10 +818,10 @@ int sdl_info::draw(UINT32 dc, int update)
 
 	// unlock and flip
 #if (!SDLMAME_SDL2)
-	if (SDL_MUSTLOCK(m_sdlsurf)) SDL_UnlockSurface(m_sdlsurf);
+	if (SDL_MUSTLOCK(window().m_sdlsurf)) SDL_UnlockSurface(window().m_sdlsurf);
 	if (!sm->is_yuv)
 	{
-		SDL_Flip(m_sdlsurf);
+		SDL_Flip(window().m_sdlsurf);
 	}
 	else
 	{

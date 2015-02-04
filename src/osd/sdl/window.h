@@ -88,6 +88,7 @@ public:
 		m_resize_height(0),
 		m_last_resize(0),
 #else
+		m_sdlsurf(NULL),
 		m_screen_width(0), m_screen_height(0),
 #endif
 		m_machine(a_machine), m_monitor(a_monitor), m_fullscreen(0), m_index(0)
@@ -169,14 +170,20 @@ public:
 #if (SDLMAME_SDL2)
 	// Needs to be here as well so we can identify window
 	SDL_Window          *m_sdl_window;
+	// Original display_mode
+	SDL_DisplayMode m_original_mode;
 	// These are used in combine resizing events ... #if SDL13_COMBINE_RESIZE
 	int                 m_resize_width;
 	int                 m_resize_height;
 	osd_ticks_t         m_last_resize;
 #else
+	// SDL surface
+	SDL_Surface         *m_sdlsurf;
+
 	int                 m_screen_width;
 	int                 m_screen_height;
 #endif
+	int 				m_extra_flags;
 
 	void set_renderer(osd_renderer *renderer)
 	{
