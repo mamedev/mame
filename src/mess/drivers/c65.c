@@ -20,6 +20,7 @@ Note:
 
 #include "emu.h"
 #include "cpu/m6502/m4510.h"
+#include "machine/mos6526.h"
 
 #define MAIN_CLOCK XTAL_3_5MHz
 
@@ -29,6 +30,8 @@ public:
 	c65_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
+			m_cia0(*this, "cia_0"),
+			m_cia1(*this, "cia_1"),
 			m_screen(*this, "screen"),
 			m_palette(*this, "palette"),
 			m_workram(*this, "wram"),
@@ -42,6 +45,8 @@ public:
 
 	// devices
 	required_device<m4510_device> m_maincpu;
+	required_device<mos6526_device> m_cia0;
+	required_device<mos6526_device> m_cia1;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT8> m_workram;
@@ -154,10 +159,12 @@ READ8_MEMBER(c65_state::vic4567_dummy_r)
 		case 0x12:
 			res = (m_screen->vpos() & 0xff);
 			return res;
-		case 0x20:
-			return m_VIC2_EXTColor;
 		case 0x19:
 			return m_VIC2_IRQPend;
+			
+		case 0x20:
+			return m_VIC2_EXTColor;
+
 		case 0x30:
 			return m_VIC3_ControlA;
 		case 0x31:
@@ -307,6 +314,17 @@ READ8_MEMBER(c65_state::CIASelect_r)
 	else
 	{
 		// CIA at 0xdc00
+		switch((offset & 0x700) | 0x800)
+		{
+			case 0xc00:
+				return m_cia0->read(space,offset);
+			case 0xd00:
+				return m_cia1->read(space,offset);
+			default:
+				printf("Unknown I/O access read to offset %04x\n",offset);
+				break;
+		}
+
 	}
 
 	return 0xff;
@@ -319,6 +337,19 @@ WRITE8_MEMBER(c65_state::CIASelect_w)
 	else
 	{
 		// CIA at 0xdc00
+		switch((offset & 0x700) | 0x800)
+		{
+			case 0xc00:
+				m_cia0->write(space,offset,data);
+				break;
+
+			case 0xd00:
+				m_cia1->write(space,offset,data);
+				break;
+			default:
+				printf("Unknown I/O access write to offset %04x data = %02x\n",offset,data);
+				break;
+		}
 	}
 	
 }
@@ -458,6 +489,20 @@ static MACHINE_CONFIG_START( c65, c65_state )
 	MCFG_CPU_PROGRAM_MAP(c65_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen",c65_state,vic3_vblank_irq)
 
+	MCFG_DEVICE_ADD("cia_0", MOS6526, MAIN_CLOCK)
+	MCFG_MOS6526_TOD(60)
+//	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(c65_state, c65_cia0_interrupt))
+//	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(c65_state, c65_cia0_port_a_r))
+//	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(c65_state, c65_cia0_port_b_r))
+//	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(c65_state, c65_cia0_port_b_w))
+
+	MCFG_DEVICE_ADD("cia_1", MOS6526, MAIN_CLOCK)
+	MCFG_MOS6526_TOD(60)
+//	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(c65_state, c65_cia1_interrupt))
+//	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(c65_state, c65_cia1_port_a_r))
+//	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(c65_state, c65_cia1_port_a_w))
+
+	
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(60)
