@@ -66,50 +66,58 @@ class sengokmj_state : public driver_device
 public:
 	sengokmj_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
 		m_sc0_vram(*this, "sc0_vram"),
 		m_sc1_vram(*this, "sc1_vram"),
 		m_sc2_vram(*this, "sc2_vram"),
 		m_sc3_vram(*this, "sc3_vram"),
-		m_spriteram16(*this, "sprite_ram"),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_spriteram16(*this, "sprite_ram") { }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	required_shared_ptr<UINT16> m_sc0_vram;
 	required_shared_ptr<UINT16> m_sc1_vram;
 	required_shared_ptr<UINT16> m_sc2_vram;
 	required_shared_ptr<UINT16> m_sc3_vram;
 	required_shared_ptr<UINT16> m_spriteram16;
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+
 	tilemap_t *m_sc0_tilemap;
 	tilemap_t *m_sc1_tilemap;
 	tilemap_t *m_sc2_tilemap;
 	tilemap_t *m_sc3_tilemap;
-	UINT16 m_sengokumj_mux_data;
+	
+	UINT16 m_mux_data;
 	UINT8 m_hopper_io;
 	UINT16 m_layer_en;
 	UINT16 m_scrollram[6];
+	
 	DECLARE_READ16_MEMBER(mahjong_panel_r);
 	DECLARE_WRITE16_MEMBER(mahjong_panel_w);
-	DECLARE_WRITE16_MEMBER(sengokmj_out_w);
-	DECLARE_READ16_MEMBER(sengokmj_system_r);
+	DECLARE_WRITE16_MEMBER(out_w);
+	DECLARE_READ16_MEMBER(system_r);
 	DECLARE_WRITE16_MEMBER(seibucrtc_sc0vram_w);
 	DECLARE_WRITE16_MEMBER(seibucrtc_sc1vram_w);
 	DECLARE_WRITE16_MEMBER(seibucrtc_sc2vram_w);
 	DECLARE_WRITE16_MEMBER(seibucrtc_sc3vram_w);
+	DECLARE_WRITE16_MEMBER(layer_en_w);
+	DECLARE_WRITE16_MEMBER(layer_scroll_w);
+	
 	TILE_GET_INFO_MEMBER(seibucrtc_sc0_tile_info);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc1_tile_info);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc2_tile_info);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc3_tile_info);
-	INTERRUPT_GEN_MEMBER(sengokmj_interrupt);
-	DECLARE_WRITE16_MEMBER(layer_en_w);
-	DECLARE_WRITE16_MEMBER(layer_scroll_w);
+	
+	INTERRUPT_GEN_MEMBER(interrupt);
+
+	virtual void machine_start();
+	virtual void video_start();
 
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
-	virtual void video_start();
-	UINT32 screen_update_sengokmj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -294,9 +302,12 @@ void sengokmj_state::video_start()
 	m_sc2_tilemap->set_transparent_pen(15);
 	m_sc1_tilemap->set_transparent_pen(15);
 	m_sc3_tilemap->set_transparent_pen(15);
+
+	save_item(NAME(m_layer_en));
+	save_item(NAME(m_scrollram));
 }
 
-UINT32 sengokmj_state::screen_update_sengokmj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 sengokmj_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->pen(0x7ff), cliprect); //black pen
 
@@ -323,6 +334,11 @@ UINT32 sengokmj_state::screen_update_sengokmj(screen_device &screen, bitmap_ind1
 }
 
 
+void sengokmj_state::machine_start()
+{
+	save_item(NAME(m_mux_data));
+	save_item(NAME(m_hopper_io));
+}
 
 
 /* Multiplexer device for the mahjong panel */
@@ -334,7 +350,7 @@ READ16_MEMBER(sengokmj_state::mahjong_panel_r)
 
 	for(i=0;i<5;i++)
 	{
-		if(m_sengokumj_mux_data & 1 << i)
+		if(m_mux_data & 1 << i)
 			res = ioport(mpnames[i])->read();
 	}
 
@@ -343,13 +359,13 @@ READ16_MEMBER(sengokmj_state::mahjong_panel_r)
 
 WRITE16_MEMBER(sengokmj_state::mahjong_panel_w)
 {
-	m_sengokumj_mux_data = (data & 0x3f00) >> 8;
+	m_mux_data = (data & 0x3f00) >> 8;
 
 	if(data & 0xc0ff)
 		logerror("Write to mux %04x\n",data);
 }
 
-WRITE16_MEMBER(sengokmj_state::sengokmj_out_w)
+WRITE16_MEMBER(sengokmj_state::out_w)
 {
 	/* ---- ---- ---x ---- J.P. Signal (?)*/
 	/* ---- ---- ---- -x-- Coin counter (done AFTER you press start)*/
@@ -362,7 +378,7 @@ WRITE16_MEMBER(sengokmj_state::sengokmj_out_w)
 //  popmessage("%02x",m_hopper_io);
 }
 
-READ16_MEMBER(sengokmj_state::sengokmj_system_r)
+READ16_MEMBER(sengokmj_state::system_r)
 {
 	return (ioport("SYSTEM")->read() & 0xffbf) | m_hopper_io;
 }
@@ -387,11 +403,11 @@ static ADDRESS_MAP_START( sengokmj_io_map, AS_IO, 16, sengokmj_state )
 //  AM_RANGE(0x8080, 0x8081) CRTC extra register?
 //  AM_RANGE(0x80c0, 0x80c1) CRTC extra register?
 //  AM_RANGE(0x8100, 0x8101) AM_WRITENOP // always 0
-	AM_RANGE(0x8180, 0x8181) AM_WRITE(sengokmj_out_w)
+	AM_RANGE(0x8180, 0x8181) AM_WRITE(out_w)
 	AM_RANGE(0x8140, 0x8141) AM_WRITE(mahjong_panel_w)
 	AM_RANGE(0xc000, 0xc001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc002, 0xc003) AM_READ(mahjong_panel_r)
-	AM_RANGE(0xc004, 0xc005) AM_READ(sengokmj_system_r) //switches
+	AM_RANGE(0xc004, 0xc005) AM_READ(system_r) //switches
 ADDRESS_MAP_END
 
 
@@ -538,7 +554,7 @@ static GFXDECODE_START( sengokmj )
 	GFXDECODE_ENTRY( "tx_gfx", 0, charlayout, 0x700, 0x10 ) /* Text */
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(sengokmj_state::sengokmj_interrupt)
+INTERRUPT_GEN_MEMBER(sengokmj_state::interrupt)
 {
 	device.execute().set_input_line_and_vector(0,HOLD_LINE,0xc8/4);
 }
@@ -560,7 +576,7 @@ static MACHINE_CONFIG_START( sengokmj, sengokmj_state )
 	MCFG_CPU_ADD("maincpu", V30, 16000000/2) /* V30-8 */
 	MCFG_CPU_PROGRAM_MAP(sengokmj_map)
 	MCFG_CPU_IO_MAP(sengokmj_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sengokmj_state,  sengokmj_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sengokmj_state,  interrupt)
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 
@@ -572,7 +588,7 @@ static MACHINE_CONFIG_START( sengokmj, sengokmj_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1) //TODO: dynamic resolution
-	MCFG_SCREEN_UPDATE_DRIVER(sengokmj_state, screen_update_sengokmj)
+	MCFG_SCREEN_UPDATE_DRIVER(sengokmj_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
@@ -624,5 +640,5 @@ ROM_START( sengokmj )
 	ROM_LOAD( "rs006.89", 0x000, 0x200, CRC(96f7646e) SHA1(400a831b83d6ac4d2a46ef95b97b1ee237099e44) ) /* Priority */
 ROM_END
 
-GAME( 1991, sengokmj, 0, sengokmj, sengokmj, driver_device, 0, ROT0, "Sigma", "Sengoku Mahjong [BET] (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, sengokmj, 0, sengokmj, sengokmj, driver_device, 0, ROT0, "Sigma", "Sengoku Mahjong [BET] (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 /*Non-Bet Version?*/

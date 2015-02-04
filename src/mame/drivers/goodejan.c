@@ -78,49 +78,56 @@ class goodejan_state : public driver_device
 public:
 	goodejan_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
 		m_sc0_vram(*this, "sc0_vram"),
 		m_sc1_vram(*this, "sc1_vram"),
 		m_sc2_vram(*this, "sc2_vram"),
 		m_sc3_vram(*this, "sc3_vram"),
-		m_spriteram16(*this, "sprite_ram"),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_spriteram16(*this, "sprite_ram") { }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	required_shared_ptr<UINT16> m_sc0_vram;
 	required_shared_ptr<UINT16> m_sc1_vram;
 	required_shared_ptr<UINT16> m_sc2_vram;
 	required_shared_ptr<UINT16> m_sc3_vram;
 	required_shared_ptr<UINT16> m_spriteram16;
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+
 	tilemap_t *m_sc0_tilemap;
 	tilemap_t *m_sc1_tilemap;
 	tilemap_t *m_sc2_tilemap;
 	tilemap_t *m_sc3_tilemap;
+	
 	UINT16 m_mux_data;
 	UINT16 m_seibucrtc_sc0bank;
-	DECLARE_WRITE16_MEMBER(goodejan_gfxbank_w);
+	UINT16 m_layer_en;
+	UINT16 m_scrollram[6];
+	
+	DECLARE_WRITE16_MEMBER(gfxbank_w);
 	DECLARE_READ16_MEMBER(mahjong_panel_r);
 	DECLARE_WRITE16_MEMBER(mahjong_panel_w);
 	DECLARE_WRITE16_MEMBER(seibucrtc_sc0vram_w);
 	DECLARE_WRITE16_MEMBER(seibucrtc_sc1vram_w);
 	DECLARE_WRITE16_MEMBER(seibucrtc_sc2vram_w);
 	DECLARE_WRITE16_MEMBER(seibucrtc_sc3vram_w);
+	DECLARE_WRITE16_MEMBER(layer_en_w);
+	DECLARE_WRITE16_MEMBER(layer_scroll_w);
+	
 	TILE_GET_INFO_MEMBER(seibucrtc_sc0_tile_info);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc1_tile_info);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc2_tile_info);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc3_tile_info);
-	INTERRUPT_GEN_MEMBER(goodejan_irq);
-	DECLARE_WRITE16_MEMBER(layer_en_w);
-	DECLARE_WRITE16_MEMBER(layer_scroll_w);
-	UINT16 m_layer_en;
-	UINT16 m_scrollram[6];
+	
+	INTERRUPT_GEN_MEMBER(irq);
+	
 	void seibucrtc_sc0bank_w(UINT16 data);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 	virtual void video_start();
-	UINT32 screen_update_goodejan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*******************************
@@ -348,9 +355,14 @@ void goodejan_state::video_start()
 	m_sc3_tilemap->set_transparent_pen(15);
 
 	m_seibucrtc_sc0bank = 0;
+	
+	save_item(NAME(m_mux_data));
+	save_item(NAME(m_seibucrtc_sc0bank));
+	save_item(NAME(m_layer_en));
+	save_item(NAME(m_scrollram));
 }
 
-UINT32 goodejan_state::screen_update_goodejan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 goodejan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->pen(0x7ff), cliprect); //black pen
 
@@ -381,7 +393,7 @@ UINT32 goodejan_state::screen_update_goodejan(screen_device &screen, bitmap_ind1
 #define GOODEJAN_MHZ3 12000000
 
 
-WRITE16_MEMBER(goodejan_state::goodejan_gfxbank_w)
+WRITE16_MEMBER(goodejan_state::gfxbank_w)
 {
 	seibucrtc_sc0bank_w((data & 0x100)>>8);
 }
@@ -423,7 +435,7 @@ ADDRESS_MAP_END
 
 /* totmejan CRTC is at 8000-804f,goodejan is at 8000-807f */
 static ADDRESS_MAP_START( common_io_map, AS_IO, 16, goodejan_state )
-	AM_RANGE(0x9000, 0x9001) AM_WRITE(goodejan_gfxbank_w)
+	AM_RANGE(0x9000, 0x9001) AM_WRITE(gfxbank_w)
 	AM_RANGE(0xb000, 0xb003) AM_WRITENOP
 	AM_RANGE(0xb004, 0xb005) AM_WRITE(mahjong_panel_w)
 
@@ -592,7 +604,7 @@ static GFXDECODE_START( goodejan )
 	GFXDECODE_ENTRY( "tx_gfx", 0, charlayout, 0x100, 0x10 ) /* Text */
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(goodejan_state::goodejan_irq)
+INTERRUPT_GEN_MEMBER(goodejan_state::irq)
 {
 	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x208/4);
 /* vector 0x00c is just a reti */
@@ -616,7 +628,7 @@ static MACHINE_CONFIG_START( goodejan, goodejan_state )
 	MCFG_CPU_ADD("maincpu", V30, GOODEJAN_MHZ2/2)
 	MCFG_CPU_PROGRAM_MAP(goodejan_map)
 	MCFG_CPU_IO_MAP(goodejan_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goodejan_state, goodejan_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goodejan_state, irq)
 
 	SEIBU_SOUND_SYSTEM_CPU(GOODEJAN_MHZ1/2)
 
@@ -626,7 +638,7 @@ static MACHINE_CONFIG_START( goodejan, goodejan_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1) //TODO: dynamic resolution
-	MCFG_SCREEN_UPDATE_DRIVER(goodejan_state, screen_update_goodejan)
+	MCFG_SCREEN_UPDATE_DRIVER(goodejan_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
@@ -742,6 +754,6 @@ ROM_START( goodejana )
 	ROM_LOAD( "fmj08.083", 0x000, 0x100, CRC(9657b7ad) SHA1(e9b469c2b3534593f7fe0ea19cbbf93b55957e42) )
 ROM_END
 
-GAME( 1991, totmejan, 0,        totmejan, goodejan, driver_device, 0, ROT0, "Seibu Kaihatsu (Tecmo license)", "Tottemo E Jong", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, goodejan, 0,        goodejan, goodejan, driver_device, 0, ROT0, "Seibu Kaihatsu (Tecmo license)", "Good E Jong -Kachinuki Mahjong Syoukin Oh!!- (set 1)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, goodejana,goodejan, goodejan, goodejan, driver_device, 0, ROT0, "Seibu Kaihatsu (Tecmo license)", "Good E Jong -Kachinuki Mahjong Syoukin Oh!!- (set 2)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, totmejan, 0,        totmejan, goodejan, driver_device, 0, ROT0, "Seibu Kaihatsu (Tecmo license)", "Tottemo E Jong", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, goodejan, 0,        goodejan, goodejan, driver_device, 0, ROT0, "Seibu Kaihatsu (Tecmo license)", "Good E Jong -Kachinuki Mahjong Syoukin Oh!!- (set 1)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, goodejana,goodejan, goodejan, goodejan, driver_device, 0, ROT0, "Seibu Kaihatsu (Tecmo license)", "Good E Jong -Kachinuki Mahjong Syoukin Oh!!- (set 2)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
