@@ -39,6 +39,8 @@ VIDEO_START_MEMBER(spectrum_state,spectrum_128)
 
 	m_previous_border_x = 0; m_previous_border_y = 0;
 	machine().first_screen()->register_screen_bitmap(m_border_bitmap);
+
+	m_screen_location = m_ram->pointer() + (5 << 14);
 }
 
 
@@ -58,6 +60,8 @@ void spectrum_state::screen_eof_spectrum(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
+		spectrum_UpdateBorderBitmap();
+
 		m_frame_number++;
 
 		if (m_frame_number >= m_frame_invert_count)
@@ -65,9 +69,6 @@ void spectrum_state::screen_eof_spectrum(screen_device &screen, bool state)
 			m_frame_number = 0;
 			m_flash_invert = !m_flash_invert;
 		}
-
-
-		spectrum_UpdateBorderBitmap();
 	}
 }
 
@@ -103,6 +104,10 @@ inline void spectrum_state::spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int
 
 UINT32 spectrum_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	if (m_border_bitmap.valid())
+		copyscrollbitmap(bitmap, m_border_bitmap, 0, 0, 0, 0, cliprect);
+
+#if 0
 	// note, don't update borders in here, this can time travel w/regards to other timers and may end up giving you
 	// screen positions earlier than the last write handler gave you
 
@@ -111,9 +116,6 @@ UINT32 spectrum_state::screen_update_spectrum(screen_device &screen, bitmap_ind1
 	unsigned short ink, pap;
 	unsigned char *attr, *scr;
 	//  int full_refresh = 1;
-
-	if (m_border_bitmap.valid())
-		copyscrollbitmap(bitmap, m_border_bitmap, 0, 0, 0, 0, cliprect);
 
 	scr=m_screen_location;
 
@@ -149,6 +151,7 @@ UINT32 spectrum_state::screen_update_spectrum(screen_device &screen, bitmap_ind1
 			attr++;
 		}
 	}
+#endif
 
 	return 0;
 }
@@ -191,14 +194,33 @@ void spectrum_state::spectrum_UpdateBorderBitmap()
 
 	if (m_border_bitmap.valid())
 	{
-		int colour = m_port_fe_data & 0x07;
+		UINT16 border = m_port_fe_data & 0x07;
 
 		//printf("update border from %d,%d to %d,%d\n", m_previous_border_x, m_previous_border_y, x, y);
 
 		do
 		{
-			UINT16* bm = &m_border_bitmap.pix16(m_previous_border_y);
-			bm[m_previous_border_x] = colour;
+			UINT16 scrx = m_previous_border_x - SPEC_LEFT_BORDER;
+			UINT16 scry = m_previous_border_y - SPEC_TOP_BORDER;
+
+			if (scrx < SPEC_DISPLAY_XSIZE && scry < SPEC_DISPLAY_YSIZE)
+			{
+				// this can/must be optimised
+				if ((scrx & 7) == 0) {
+					UINT16 *bm = &m_border_bitmap.pix16(m_previous_border_y, m_previous_border_x);
+					UINT8 attr = *(m_screen_location + ((scry & 0xF8) << 2) + (scrx >> 3) + 0x1800);
+					UINT8 scr = *(m_screen_location + ((scry & 7) << 8) + ((scry & 0x38) << 2) + ((scry & 0xC0) << 5) + (scrx >> 3));
+					UINT16 ink = (attr & 0x07) + ((attr >> 3) & 0x08);
+					UINT16 pap = (attr >> 3) & 0x0f;
+
+					if (m_flash_invert && (attr & 0x80))
+						scr = ~scr;
+
+					for (UINT8 b = 0x80; b != 0; b >>= 1)
+						*bm++ = (scr & b) ? ink : pap;
+				}
+			} else
+				m_border_bitmap.pix16(m_previous_border_y, m_previous_border_x) = border;
 
 			m_previous_border_x += 1;
 

@@ -61,6 +61,9 @@ void bloodbro_state::video_start()
 
 	m_fg_tilemap->set_transparent_pen(15);
 	m_tx_tilemap->set_transparent_pen(15);
+	
+	save_item(NAME(m_scrollram));
+	save_item(NAME(m_layer_en));
 }
 
 
@@ -71,19 +74,19 @@ void bloodbro_state::video_start()
 
 ***************************************************************************/
 
-WRITE16_MEMBER(bloodbro_state::bloodbro_bgvideoram_w)
+WRITE16_MEMBER(bloodbro_state::bgvideoram_w)
 {
 	COMBINE_DATA(&m_bgvideoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(bloodbro_state::bloodbro_fgvideoram_w)
+WRITE16_MEMBER(bloodbro_state::fgvideoram_w)
 {
 	COMBINE_DATA(&m_fgvideoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(bloodbro_state::bloodbro_txvideoram_w)
+WRITE16_MEMBER(bloodbro_state::txvideoram_w)
 {
 	COMBINE_DATA(&m_txvideoram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
