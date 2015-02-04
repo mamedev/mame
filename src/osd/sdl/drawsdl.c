@@ -517,7 +517,7 @@ int sdl_info::create(int width, int height)
 
 	SDL_GetWindowSize(window().m_sdl_window, &window().m_width, &window().m_height);
 
-	// create renderer
+	// create renderer 
 
 	if (video_config.waitvsync)
 		m_sdl_renderer = SDL_CreateRenderer(window().m_sdl_window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);

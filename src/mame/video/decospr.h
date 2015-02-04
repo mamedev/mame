@@ -21,6 +21,7 @@ public:
 	static void set_pri_callback(device_t &device, decospr_pri_cb_delegate callback) { downcast<decospr_device &>(device).m_pri_cb = callback; }
 	static void set_col_callback(device_t &device, decospr_col_cb_delegate callback) { downcast<decospr_device &>(device).m_col_cb = callback; }
 	static void set_is_bootleg(device_t &device, bool is_bootleg) { downcast<decospr_device &>(device).m_is_bootleg = is_bootleg; }
+	static void set_bootleg_type(device_t &device, int bootleg_type) { downcast<decospr_device &>(device).m_bootleg_type = bootleg_type; }
 	static void set_flipallx(device_t &device, int flipallx) { downcast<decospr_device &>(device).m_flipallx = flipallx; }
 	static void set_transpen(device_t &device, int transpen) { downcast<decospr_device &>(device).m_transpen = transpen; }
 	static void set_offsets(device_t &device, int x_offset, int y_offset)
@@ -55,6 +56,7 @@ protected:
 
 	// used by various bootleg / clone chips.
 	bool m_is_bootleg; // used by various bootlegs (disables masking of sprite tile number when multi-sprite is used)
+	int m_bootleg_type; // for Puzzlove, has sprite bits moved around (probably to prevent board swaps)
 	int m_x_offset, m_y_offset; // used by various bootlegs
 	int m_flipallx; // used by esd16.c - hedpanio, multchmp , and nmg5.c
 	int m_transpen; // used by fncywld (tumbleb.c)
@@ -79,6 +81,9 @@ extern const device_type DECO_SPRITE;
 
 #define MCFG_DECO_SPRITE_ISBOOTLEG(_boot) \
 	decospr_device::set_is_bootleg(*device, _boot);
+
+#define MCFG_DECO_SPRITE_BOOTLEG_TYPE(_bootleg_type) \
+	decospr_device::set_bootleg_type(*device, _bootleg_type);
 
 #define MCFG_DECO_SPRITE_FLIPALLX(_flip) \
 	decospr_device::set_flipallx(*device, _flip);
