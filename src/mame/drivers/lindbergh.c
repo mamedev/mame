@@ -31,16 +31,22 @@ Security
 The security seems to work in multiple steps.  The information here
 is a combination of our research and things found on the internet.
 
-- At boot, the bios unlocks the CF card through an IDE 0x82 command
-  with a currently unknown key.  There is also a hardware heartbeat
-  signal on the IDE bus to avoid hotswapping.
+- At boot, the bios unlocks the CF card through an IDE command.  There
+  is also a hardware heartbeat signal on the IDE bus to avoid
+  hotswapping, and making it hard to dump the card outside of a Lindberg
+  motherboard.
 
 - The system boots on the CF which holds a customized Montavista linux.
 
-- The CF system can either install the game (from the DVD) or start it (on the HD)
+- The CF system can either install the game (from the DVD) or start it
+  (on the HD) through the "/usr/sbin/segaboot" executable in the second
+  partition.
 
-- The DVD is decrypted (probably on-the-fly with aesloop) using a
-  fixed system key (all the dvd images start identically).
+- The DVD includes an ISO-9660 filesystem at a (game-dependant)
+  offset. It has a handful of files, all encrypted.  Of specific
+  interest and the su[0-3].dat files which are system updates, and the
+  frontend file which handles the setup of all the other files for the
+  game.
 
 - The PIC includes an AES-CBC engine and has as data an IV, a key,
   some game-specific identification information, and two pre and
@@ -49,12 +55,16 @@ is a combination of our research and things found on the internet.
   decrypt very large amounts of data through it though, the bandwidth
   would be way too low.
 
-- The HD is probably unlocked by the CF and bootstrap code is
-  decrypted through the PIC.  That code in turn loop-decrypts/mounts all the
-  data needed from the partition (probably /usr, /X11R6 and /home).
+- The CF decrypts the dvd/hd files with a custom crypto system which
+  is keyed by the result of decrypting 16 times 0x00, 16 times 0x01,
+  ..., 16 times 0x0b through the PIC, giving a 176 bytes secondary key.
+  segaboot (in the second partition) and lxdecrypt_hard (in the first
+  partition's initrd) take care of that.
 
-Currently, we do not have access to the CF image, making it impossible
-to do a complete boot/install.
+- The HD is unlocked by the CF with lxunlock.hdb in the first
+  partition's initrd.  The method varies depending on the HD model.
+  That code is also capable of unlocking the CF (but don't forget
+  the hardware hearbeat there).
 
 
 Lindbergh Game List
@@ -386,7 +396,11 @@ MACHINE_CONFIG_END
 	ROM_LOAD("fpr-24370b.ic6", 0x000000, 0x400000, CRC(c3b021a4) SHA1(1b6938a50fe0e4ae813864649eb103838c399ac0)) \
 \
 	ROM_REGION32_LE(0x10000, ":pci:01.0:00.0", 0) /* Geforce bios extension (custom for the card) */ \
-	ROM_LOAD("vid_bios.u504", 0x00000, 0x10000, CRC(f78d14d7) SHA1(f129787e487984edd23bf344f2e9500c85052275))
+	ROM_LOAD("vid_bios.u504", 0x00000, 0x10000, CRC(f78d14d7) SHA1(f129787e487984edd23bf344f2e9500c85052275)) \
+	DISK_REGION("cf") \
+	DISK_IMAGE_READONLY("mda-c0004a_revb_lindyellow_v2.4.20_mvl31a_boot_2.01", 0, SHA1(e13da5f827df852e742b594729ee3f933b387410))
+
+
 ROM_START(lindbios)
 	LINDBERGH_BIOS
 ROM_END
