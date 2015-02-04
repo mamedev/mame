@@ -659,7 +659,7 @@ void sdl_info::clear()
 
 int sdl_info::xy_to_render_target(int x, int y, int *xt, int *yt)
 {
-	const sdl_scale_mode *sm = &scale_modes[video_config.scale_mode];
+//	const sdl_scale_mode *sm = &scale_modes[video_config.scale_mode];
 
 	*xt = x - m_last_hofs;
 	*yt = y - m_last_vofs;

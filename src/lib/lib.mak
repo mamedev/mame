@@ -620,7 +620,7 @@ $(OBJ)/libbgfx.a: $(BGFXOBJS)
 
 BGFXINC = -I$(3RDPARTY)/bgfx/include -I$(3RDPARTY)/bgfx/3rdparty -I$(3RDPARTY)/bx/include -I$(3RDPARTY)/bgfx/3rdparty/khronos
 ifdef MSVC_BUILD
-	BGFXINC += -I$(3RDPARTY)/bx/include/compat/msvc
+	BGFXINC += -I$(3RDPARTY)/bx/include/compat/msvc /EHsc
 else
 	ifeq ($(TARGETOS),win32)
 		BGFXINC += -I$(3RDPARTY)/bx/include/compat/mingw

@@ -22,11 +22,13 @@
     The unemulated Matilda is a IBM XT clone fitted with a NEC V40, and has the
     ability to emulate the 256TC as mentioned above.
 
-    Floppy Disk types (as used by ubee512)
-    - ss80 - single sided 80 track
-    - ds40 - double-sided 40 track - 400KB
-    - ds80, ds82, ds84 - double sided 80 track - 800KB
-    - dsk - various - 211KB, 421KB, 841KB
+    Floppy formats:
+    - All disks are the standard CPCEMU 'dsk' format.
+    - Types are 9cm 80 track, and 13cm 40 track (single or double sided)
+    - 13cm has been specified as QD to prevent a nasty crash if an 80-track disk was mounted
+    - The tracks/sector layout is the same regardless of size
+    - Although certain models came with particular drives as standard, users could add
+      the other size if they wished. We support both sizes on any model.
 
     Microbee Standard / Plus memory map
 
@@ -82,18 +84,24 @@
 
     - Fix Paste (it loses most of the characters)
 
-    - RTC for 256TC works, but it is supposed to be an option on other
-      models. It is being completely ignored.
+    - all except 256tc: RTC is optional, but it is being totally ignored.
 
     - Most early models have a clock in Telcom, and in the menu. It doesn't
       work.
 
-    - The Monitor program on 256TC crashes the system. This appears
-      to be a MAME core bug involving the z80pio.
-
-    - The 256TC corrupts itself when a floppy disk is detected.
-
-    - Disk system doesn't work because of fdc problems.
+    - various fdc issues:
+        - only some ds40 disks can be used. All 80-track disks fail.
+        - some disks show no or partial directory listing.
+        - some disks cause MESS to freeze.
+        - ENMF pin missing from wd_fdc.
+        - incorrect timing for track register causes 256tc failure to boot a disk.
+        - 56k model takes about 2 minutes to boot a disk if loaded via command line.
+    
+    - 256tc: At the menu, if F2 pressed to activate the Monitor, the emulated machine
+      crashes due to a bug in z80pio emulation.
+    
+    - 256tc: Keyboard ROM U60 needs to be dumped.
+    - 128k: PROM PAL needs to be dumped, so that the bankswitching can be fixed.
 
     - Teleterm: keyboard is problematic, and cursor doesn't show.
 
@@ -113,24 +121,10 @@
       in the emulator for some years. Conversion to the new modern
       implementation (2013-07-05) has not resolved the issue.
 
-      There are 3 types of microbee disks available in the wild.
-
-    - CPCEMU-format "dsk" disks, which has an already-working
-      format "dsk_dsk".
-
-    - ubee512-format disks, such as "ds80,ds82,ds84,ss80", etc.
-      These are described in "mbee_dsk", but it's not known if it
-      works as yet.
-
-    - There a "img" format for the 128k boot disk. The internal
-      layout is not known and no work has been done.
-
-
 ****************************************************************************/
 
 
 #include "includes/mbee.h"
-#include "formats/mbee_dsk.h"
 #include "formats/mbee_cas.h"
 
 
@@ -217,6 +211,25 @@ static ADDRESS_MAP_START(mbee128_mem, AS_PROGRAM, 8, mbee_state)
 	AM_RANGE(0x9000, 0xefff) AM_RAMBANK("bank9")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAMBANK("bankfl")
 	AM_RANGE(0xf800, 0xffff) AM_RAMBANK("bankfh")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(mbee256_mem, AS_PROGRAM, 8, mbee_state)
+	AM_RANGE(0x0000, 0x0fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
+	AM_RANGE(0x1000, 0x1fff) AM_READ_BANK("bankr1") AM_WRITE_BANK("bankw1")
+	AM_RANGE(0x2000, 0x2fff) AM_READ_BANK("bankr2") AM_WRITE_BANK("bankw2")
+	AM_RANGE(0x3000, 0x3fff) AM_READ_BANK("bankr3") AM_WRITE_BANK("bankw3")
+	AM_RANGE(0x4000, 0x4fff) AM_READ_BANK("bankr4") AM_WRITE_BANK("bankw4")
+	AM_RANGE(0x5000, 0x5fff) AM_READ_BANK("bankr5") AM_WRITE_BANK("bankw5")
+	AM_RANGE(0x6000, 0x6fff) AM_READ_BANK("bankr6") AM_WRITE_BANK("bankw6")
+	AM_RANGE(0x7000, 0x7fff) AM_READ_BANK("bankr7") AM_WRITE_BANK("bankw7")
+	AM_RANGE(0x8000, 0x8fff) AM_READ_BANK("bankr8") AM_WRITE_BANK("bankw8")
+	AM_RANGE(0x9000, 0x9fff) AM_READ_BANK("bankr9") AM_WRITE_BANK("bankw9")
+	AM_RANGE(0xa000, 0xafff) AM_READ_BANK("bankr10") AM_WRITE_BANK("bankw10")
+	AM_RANGE(0xb000, 0xbfff) AM_READ_BANK("bankr11") AM_WRITE_BANK("bankw11")
+	AM_RANGE(0xc000, 0xcfff) AM_READ_BANK("bankr12") AM_WRITE_BANK("bankw12")
+	AM_RANGE(0xd000, 0xdfff) AM_READ_BANK("bankr13") AM_WRITE_BANK("bankw13")
+	AM_RANGE(0xe000, 0xefff) AM_READ_BANK("bankr14") AM_WRITE_BANK("bankw14")
+	AM_RANGE(0xf000, 0xffff) AM_READ_BANK("bankr15") AM_WRITE_BANK("bankw15")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbeett_mem, AS_PROGRAM, 8, mbee_state)
@@ -614,49 +627,12 @@ GFXDECODE_END
 static GFXDECODE_START( mbeeppc )
 	GFXDECODE_ENTRY( "gfx", 0x0000, mbee_charlayout, 0, 8 )
 GFXDECODE_END
-#if 0
-static LEGACY_FLOPPY_OPTIONS_START(mbee)
-	LEGACY_FLOPPY_OPTION(ss80, "ss80", "SS80 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([80])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION(ds40, "ds40", "DS40 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([40])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION(ds80, "ds80", "DS80 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([21]))
-	LEGACY_FLOPPY_OPTION(ds84, "ds82,ds84", "DS84 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface mbee_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(mbee),
-	NULL
-};
-#endif
-
-FLOPPY_FORMATS_MEMBER( mbee_state::floppy_formats )
-	FLOPPY_MBEE_FORMAT
-FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( mbee_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_QD )
+	SLOT_INTERFACE( "drive3a", FLOPPY_35_DD )
+	SLOT_INTERFACE( "drive3b", FLOPPY_35_DD )
+	SLOT_INTERFACE( "drive5a", FLOPPY_525_QD )
+	SLOT_INTERFACE( "drive5b", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
 
@@ -686,7 +662,7 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mbee)
 	MCFG_PALETTE_ADD_MONOCHROME_AMBER("palette") // usually sold with amber or green monitor
 
-	MCFG_VIDEO_START_OVERRIDE(mbee_state,mbee)
+	MCFG_VIDEO_START_OVERRIDE(mbee_state, mbee)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -813,8 +789,10 @@ static MACHINE_CONFIG_DERIVED( mbee56, mbeeic )
 	MCFG_CPU_IO_MAP(mbee56_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee56 )
 	MCFG_WD2793x_ADD("fdc", XTAL_4MHz / 4) // divided by 2 externally, then divided by 2 internally (/ENMF pin not emulated)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbee_floppies, "525dd", mbee_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbee_floppies, "35dd", mbee_state::floppy_formats)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(mbee_state, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(mbee_state, fdc_drq_w))
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbee_floppies, "drive5a", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbee_floppies, "drive5b", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbee64, mbee56 )
@@ -830,12 +808,15 @@ static MACHINE_CONFIG_DERIVED( mbee128, mbeeppc )
 	MCFG_CPU_IO_MAP(mbee128_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee128 )
 	MCFG_WD2793x_ADD("fdc", XTAL_4MHz / 4)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbee_floppies, "35dd", mbee_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbee_floppies, "525dd", mbee_state::floppy_formats)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(mbee_state, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(mbee_state, fdc_drq_w))
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbee_floppies, "drive5a", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbee_floppies, "drive5b", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbee256, mbee128 )
 	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP(mbee256_mem)
 	MCFG_CPU_IO_MAP(mbee256_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee256 )
 	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
@@ -846,6 +827,10 @@ static MACHINE_CONFIG_DERIVED( mbee256, mbee128 )
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, mbeeppc_update_row)
 	MCFG_MC6845_ADDR_CHANGED_CB(mbee_state, mbee256_update_addr)
+	MCFG_DEVICE_REMOVE("fdc:0")
+	MCFG_DEVICE_REMOVE("fdc:1")
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbee_floppies, "drive3a", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbee_floppies, "drive3b", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbeett, mbeeppc )
@@ -1160,16 +1145,19 @@ ROM_START( mbee128 ) // 128K
 ROM_END
 
 ROM_START( mbee256 ) // 256tc
-	ROM_REGION(0x40000,"maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x40000, "rams", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x7000,"bootrom", ROMREGION_ERASEFF)
+	ROM_REGION(0x5000, "roms", 0) // rom plus dummy area
 	ROM_SYSTEM_BIOS( 0, "1.20", "Version 1.20" )
-	ROMX_LOAD("256tc_boot_1.20.rom", 0x0000,  0x4000, CRC(fe8d6a84) SHA1(a037a1b90b18a2180e9f5f216b829fcd480449a4), ROM_BIOS(1) )
+	ROMX_LOAD("256tc_boot_1.20.u38", 0x0000, 0x4000, CRC(fe8d6a84) SHA1(a037a1b90b18a2180e9f5f216b829fcd480449a4), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "1.15", "Version 1.15" )
-	ROMX_LOAD("256tc_boot_1.15.rom", 0x0000,  0x4000, CRC(1902062d) SHA1(e4a1c0b3f4996e313da0bac0edb6d34e3270723e), ROM_BIOS(2) )
+	ROMX_LOAD("256tc_boot_1.15.u38", 0x0000, 0x4000, CRC(1902062d) SHA1(e4a1c0b3f4996e313da0bac0edb6d34e3270723e), ROM_BIOS(2) )
+
+	ROM_REGION(0x4000, "proms", 0)
+	ROM_LOAD( "silver.u39", 0x0000, 0x4000, CRC(c34aab64) SHA1(781fe648488dec90185760f8e081e488b73b68bf) )
 
 	ROM_REGION(0x9800, "gfx", 0)
-	ROM_LOAD("char256.bin",           0x1000,  0x1000, CRC(9372af3c) SHA1(a63591822c0504de2fed52e88d64e1dbd6124b74) )
+	ROM_LOAD("char256.u53", 0x1000, 0x1000, CRC(9372af3c) SHA1(a63591822c0504de2fed52e88d64e1dbd6124b74) )
 	ROM_IGNORE( 0x1000 )    // throw away swedish characters for now
 	ROM_COPY( "gfx", 0x1000, 0x0000, 0x1000 )
 
@@ -1184,16 +1172,16 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT       COMPANY         FULLNAME */
-COMP( 1982, mbee,     0,    0,  mbee,     mbee, mbee_state,     mbee,           "Applied Technology",  "Microbee 16 Standard" , 0 )
-COMP( 1982, mbeeic,   mbee, 0,  mbeeic,   mbee, mbee_state,     mbeeic,         "Applied Technology",  "Microbee 32 IC" , 0 )
-COMP( 1982, mbeepc,   mbee, 0,  mbeepc,   mbee, mbee_state,     mbeepc,         "Applied Technology",  "Microbee Personal Communicator" , 0 )
-COMP( 1985, mbeepc85, mbee, 0,  mbeepc85, mbee, mbee_state,     mbeepc85,       "Applied Technology",  "Microbee PC85" , 0 )
-COMP( 1985, mbeepc85b,mbee, 0,  mbeepc85b,mbee, mbee_state,     mbeepc85,       "Applied Technology",  "Microbee PC85 (New version)" , 0 )
-COMP( 1985, mbeepc85s,mbee, 0,  mbeepc85, mbee, mbee_state,     mbeepc85,       "Applied Technology",  "Microbee PC85 (Swedish)" , 0 )
-COMP( 1986, mbeeppc,  mbee, 0,  mbeeppc,  mbee, mbee_state,     mbeeppc,        "Applied Technology",  "Microbee Premium PC85" , 0 )
-COMP( 1986, mbeett,   mbee, 0,  mbeett,   mbee256, mbee_state,  mbeett,     "Applied Technology",  "Microbee Teleterm" , GAME_NOT_WORKING )
-COMP( 1986, mbee56,   mbee, 0,  mbee56,   mbee, mbee_state,     mbee56,         "Applied Technology",  "Microbee 56k" , GAME_NOT_WORKING )
-COMP( 1986, mbee64,   mbee, 0,  mbee64,   mbee, mbee_state,     mbee64,         "Applied Technology",  "Microbee 64k" , GAME_NOT_WORKING )
-COMP( 1986, mbee128,  mbee, 0,  mbee128,  mbee, mbee_state,     mbee128,        "Applied Technology",  "Microbee 128k" , GAME_NOT_WORKING )
-COMP( 1987, mbee256,  mbee, 0,  mbee256,  mbee256, mbee_state,  mbee256,        "Applied Technology",  "Microbee 256TC" , GAME_NOT_WORKING )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS        INIT         COMPANY                   FULLNAME */
+COMP( 1982, mbee,     0,        0,      mbee,     mbee,     mbee_state,  mbee,       "Applied Technology",  "Microbee 16 Standard" , 0 )
+COMP( 1982, mbeeic,   mbee,     0,      mbeeic,   mbee,     mbee_state,  mbeeic,     "Applied Technology",  "Microbee 32 IC" , 0 )
+COMP( 1982, mbeepc,   mbee,     0,      mbeepc,   mbee,     mbee_state,  mbeepc,     "Applied Technology",  "Microbee Personal Communicator" , 0 )
+COMP( 1985, mbeepc85, mbee,     0,      mbeepc85, mbee,     mbee_state,  mbeepc85,   "Applied Technology",  "Microbee PC85" , 0 )
+COMP( 1985, mbeepc85b,mbee,     0,      mbeepc85b,mbee,     mbee_state,  mbeepc85,   "Applied Technology",  "Microbee PC85 (New version)" , 0 )
+COMP( 1985, mbeepc85s,mbee,     0,      mbeepc85, mbee,     mbee_state,  mbeepc85,   "Applied Technology",  "Microbee PC85 (Swedish)" , 0 )
+COMP( 1986, mbeeppc,  mbee,     0,      mbeeppc,  mbee,     mbee_state,  mbeeppc,    "Applied Technology",  "Microbee Premium PC85" , 0 )
+COMP( 1986, mbeett,   mbee,     0,      mbeett,   mbee256,  mbee_state,  mbeett,     "Applied Technology",  "Microbee Teleterm" , GAME_NOT_WORKING )
+COMP( 1986, mbee56,   mbee,     0,      mbee56,   mbee,     mbee_state,  mbee56,     "Applied Technology",  "Microbee 56k" , GAME_NOT_WORKING )
+COMP( 1986, mbee64,   mbee,     0,      mbee64,   mbee,     mbee_state,  mbee64,     "Applied Technology",  "Microbee 64k" , GAME_NOT_WORKING )
+COMP( 1986, mbee128,  mbee,     0,      mbee128,  mbee,     mbee_state,  mbee128,    "Applied Technology",  "Microbee 128k" , GAME_NOT_WORKING )
+COMP( 1987, mbee256,  mbee,     0,      mbee256,  mbee256,  mbee_state,  mbee256,    "Applied Technology",  "Microbee 256TC" , GAME_NOT_WORKING )
