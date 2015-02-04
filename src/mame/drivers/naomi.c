@@ -3466,6 +3466,17 @@ ROM_START( derbyoc )
 
 	// 840-0016    1999     317-0262-JPN   Naomi
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "280fee35" )
+/*
+	838-13661 RS422/RS232C BD DOC
+	IC1 - Toshiba TMPZ84C015BF-10 Z80-based MCU
+	IC6 - Toshiba TC551001CF-70L 128k x8 SRAM
+	IC8 - Sega 315-5338A
+	OSC1 - 19.680MHz OSC2 - 32.000MHz
+
+	connected between Naomi motherboard and card reader/printer, accessed via MIE MCU ports 0x09-0x0d
+*/
+	ROM_REGION( 0x10000, "rs422_io", 0 )
+	ROM_LOAD( "epr-22083.ic7",  0x0000, 0x10000, CRC(c70b0de9) SHA1(329c924b4d29017482b1ecca839fb610ca20b2af) )
 ROM_END
 
 ROM_START( derbyocw )
@@ -3933,6 +3944,7 @@ ROM_START( hotd2o )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
 ROM_END
 
+// IC22 shown in ROM TEST as BAD, but its byte summ matches written on label, verified on 2 cartridges
 ROM_START( hotd2p )
 	HOTD2_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -3964,7 +3976,8 @@ ROM_START( hotd2p )
 	ROM_LOAD( "mpr-21404.ic19s", 0x9800000, 0x800000, CRC(6cf6e705) SHA1(68d7e9becefe27b556e0c5d7ba00efd2d1fb71ca) )
 	ROM_LOAD( "mpr-21405.ic20s", 0xa000000, 0x800000, CRC(495e6265) SHA1(57936367fec0000691641525682fb8aefc4e4f56) )
 
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
+	// 315-5881 populated, have no 317-xxxx label, key unknown
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1")
 ROM_END
 
 /*
@@ -5157,6 +5170,7 @@ ROM_START( samba )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "280a8b5d" )
 ROM_END
 
+// !!! partial dump, only IC22 dumped. without correct flashroms contents game crashes at certain points.
 // prototype - only works with US BIOS
 ROM_START( sambap )
 	NAOMI_BIOS
@@ -7771,7 +7785,7 @@ ROM_START( ndcfboxa )
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	//PIC16C621A (317-0567-EXP)
 	//(sticker 253-5508-0567)
-	ROM_LOAD("317-0567-exp.pic", 0x00, 0x4000, NO_DUMP )
+	ROM_LOAD("317-0567-exp.pic", 0x00, 0x4000, CRC(cd1d2b2d) SHA1(78203ee0339f76eb76da08d7de43e7e44e4b7d32) )
 ROM_END
 
 
@@ -8557,12 +8571,12 @@ ROM_START( xtrmhnt2 )
 	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASE)
 	ROM_LOAD( "610-0752.u3",  0x0000000, 0x1000000, CRC(bab6182e) SHA1(4d25256c81941316887cbb4524a203922f5b7104) )
 	ROM_LOAD( "610-0752.u1",  0x1000000, 0x1000000, CRC(3086bc47) SHA1(eb7b04db90d296985528f0cfdd4545f184c40b64) )
-	ROM_LOAD( "610-0752.u2",  0x2000000, 0x1000000, CRC(d3a88b31) SHA1(ccf14367e4e7efbc2cc835f3b001fd6d64302a5e) )
-	ROM_LOAD( "610-0752.u4",  0x3000000, 0x1000000, CRC(9787f145) SHA1(8445ede0477f70fbdc113810b80356945ce498d2) )
-	ROM_LOAD( "610-0752.u14", 0x4000000, 0x1000000, CRC(ce83bcc7) SHA1(e2d324a5a7eacbec7b0df9a4b9e276521bb9ab80) )
-	ROM_LOAD( "610-0752.u15", 0x5000000, 0x1000000, CRC(864a6342) SHA1(fb97532d5dd00f8520fdaf68dfcd1ea627bdf90a) )
-	ROM_LOAD( "610-0752.u16", 0x6000000, 0x1000000, CRC(8ac71c76) SHA1(080e41e633bf082fc536781541c6031d1ac81939) )
-	ROM_LOAD( "610-0752.u17", 0x7000000, 0x1000000, CRC(a79fb1fa) SHA1(f75c5b574fd79677b926c595b369e95605a3c848) )
+	ROM_LOAD( "610-0752.u4",  0x2000000, 0x1000000, CRC(9787f145) SHA1(8445ede0477f70fbdc113810b80356945ce498d2) )
+	ROM_LOAD( "610-0752.u2",  0x3000000, 0x1000000, CRC(d3a88b31) SHA1(ccf14367e4e7efbc2cc835f3b001fd6d64302a5e) )
+	ROM_LOAD( "610-0752.u15", 0x4000000, 0x1000000, CRC(864a6342) SHA1(fb97532d5dd00f8520fdaf68dfcd1ea627bdf90a) )
+	ROM_LOAD( "610-0752.u17", 0x5000000, 0x1000000, CRC(a79fb1fa) SHA1(f75c5b574fd79677b926c595b369e95605a3c848) )
+	ROM_LOAD( "610-0752.u14", 0x6000000, 0x1000000, CRC(ce83bcc7) SHA1(e2d324a5a7eacbec7b0df9a4b9e276521bb9ab80) )
+	ROM_LOAD( "610-0752.u16", 0x7000000, 0x1000000, CRC(8ac71c76) SHA1(080e41e633bf082fc536781541c6031d1ac81939) )
 
 	ROM_REGION( 4, "rom_key", 0 )
 	ROM_LOAD( "315-6248.bin", 0, 4, CRC(553dd361) SHA1(a60a26b5ee786cf0bb3d09bb6f00374598fbd7cc) )
