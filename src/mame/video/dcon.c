@@ -10,7 +10,7 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(dcon_state::dcon_gfxbank_w)
+WRITE16_MEMBER(dcon_state::gfxbank_w)
 {
 	if (data&1)
 		m_gfx_bank_select=0x1000;
@@ -18,25 +18,25 @@ WRITE16_MEMBER(dcon_state::dcon_gfxbank_w)
 		m_gfx_bank_select=0;
 }
 
-WRITE16_MEMBER(dcon_state::dcon_background_w)
+WRITE16_MEMBER(dcon_state::background_w)
 {
 	COMBINE_DATA(&m_back_data[offset]);
 	m_background_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(dcon_state::dcon_foreground_w)
+WRITE16_MEMBER(dcon_state::foreground_w)
 {
 	COMBINE_DATA(&m_fore_data[offset]);
 	m_foreground_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(dcon_state::dcon_midground_w)
+WRITE16_MEMBER(dcon_state::midground_w)
 {
 	COMBINE_DATA(&m_mid_data[offset]);
 	m_midground_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(dcon_state::dcon_text_w)
+WRITE16_MEMBER(dcon_state::text_w)
 {
 	COMBINE_DATA(&m_textram[offset]);
 	m_text_layer->mark_tile_dirty(offset);
@@ -106,6 +106,11 @@ void dcon_state::video_start()
 	m_text_layer->set_transparent_pen(15);
 
 	m_gfx_bank_select = 0;
+	
+	save_item(NAME(m_gfx_bank_select));
+	save_item(NAME(m_last_gfx_bank));
+	save_item(NAME(m_scroll_ram));
+	save_item(NAME(m_layer_en));
 }
 
 void dcon_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)

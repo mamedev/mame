@@ -131,11 +131,11 @@ static ADDRESS_MAP_START( common_map, AS_PROGRAM, 16, bloodbro_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08afff) AM_RAM
 	AM_RANGE(0x08b000, 0x08bfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x08c000, 0x08c3ff) AM_RAM_WRITE(bloodbro_bgvideoram_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0x08c000, 0x08c3ff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
 	AM_RANGE(0x08c400, 0x08cfff) AM_RAM
-	AM_RANGE(0x08d000, 0x08d3ff) AM_RAM_WRITE(bloodbro_fgvideoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0x08d000, 0x08d3ff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0x08d400, 0x08d7ff) AM_RAM
-	AM_RANGE(0x08d800, 0x08dfff) AM_RAM_WRITE(bloodbro_txvideoram_w) AM_SHARE("txvideoram")
+	AM_RANGE(0x08d800, 0x08dfff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
 	AM_RANGE(0x08e000, 0x08e7ff) AM_RAM
 	AM_RANGE(0x08e800, 0x08f7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x08f800, 0x08ffff) AM_RAM
@@ -163,11 +163,11 @@ static ADDRESS_MAP_START( weststry_map, AS_PROGRAM, 16, bloodbro_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08afff) AM_RAM
 	AM_RANGE(0x08b000, 0x08bfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x08c000, 0x08c3ff) AM_RAM_WRITE(bloodbro_bgvideoram_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0x08c000, 0x08c3ff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
 	AM_RANGE(0x08c400, 0x08cfff) AM_RAM
-	AM_RANGE(0x08d000, 0x08d3ff) AM_RAM_WRITE(bloodbro_fgvideoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0x08d000, 0x08d3ff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0x08d400, 0x08d7ff) AM_RAM
-	AM_RANGE(0x08d800, 0x08dfff) AM_RAM_WRITE(bloodbro_txvideoram_w) AM_SHARE("txvideoram")
+	AM_RANGE(0x08d800, 0x08dfff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
 	AM_RANGE(0x08e000, 0x08ffff) AM_RAM
 	AM_RANGE(0x0c1000, 0x0c1001) AM_READ_PORT("DSW")
 	AM_RANGE(0x0c1002, 0x0c1003) AM_READ_PORT("IN0")
@@ -663,8 +663,8 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1990, bloodbro, 0,        bloodbro, bloodbro, driver_device, 0, ROT0,   "TAD Corporation", "Blood Bros. (set 1)", GAME_NO_COCKTAIL )
-GAME( 1990, bloodbroa,bloodbro, bloodbro, bloodbro, driver_device, 0, ROT0,   "TAD Corporation", "Blood Bros. (set 2)", GAME_NO_COCKTAIL )
-GAME( 1990, bloodbrob,bloodbro, bloodbro, bloodbro, driver_device, 0, ROT0,   "TAD Corporation", "Blood Bros. (set 3)", GAME_NO_COCKTAIL )
-GAME( 1990, weststry, bloodbro, weststry, weststry, driver_device, 0, ROT0,   "bootleg (Datsu)", "West Story (bootleg of Blood Bros.)", GAME_NO_COCKTAIL | GAME_NO_SOUND )
-GAME( 1990, skysmash, 0,        skysmash, skysmash, driver_device, 0, ROT270, "Nihon System",    "Sky Smasher", 0 )
+GAME( 1990, bloodbro, 0,        bloodbro, bloodbro, driver_device, 0, ROT0,   "TAD Corporation", "Blood Bros. (set 1)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1990, bloodbroa,bloodbro, bloodbro, bloodbro, driver_device, 0, ROT0,   "TAD Corporation", "Blood Bros. (set 2)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1990, bloodbrob,bloodbro, bloodbro, bloodbro, driver_device, 0, ROT0,   "TAD Corporation", "Blood Bros. (set 3)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1990, weststry, bloodbro, weststry, weststry, driver_device, 0, ROT0,   "bootleg (Datsu)", "West Story (bootleg of Blood Bros.)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1990, skysmash, 0,        skysmash, skysmash, driver_device, 0, ROT270, "Nihon System",    "Sky Smasher", 0 | GAME_SUPPORTS_SAVE )
