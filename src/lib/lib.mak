@@ -650,6 +650,11 @@ ifdef MSVC_BUILD
 else
 	ifeq ($(TARGETOS),win32)
 		BGFXINC += -I$(3RDPARTY)/bx/include/compat/mingw
+		ifeq ($(PTR64),1)
+		BGFXINC += -L$(3RDPARTY)/dxsdk/lib/x64 -D_WIN32_WINNT=0x601
+		else
+		BGFXINC += -L$(3RDPARTY)/dxsdk/lib/x86 -D_WIN32_WINNT=0x601
+		endif
 	endif
 	ifeq ($(TARGETOS),freebsd)
 		BGFXINC += -I$(3RDPARTY)/bx/include/compat/freebsd
@@ -661,11 +666,6 @@ endif
 
 ifeq ($(TARGETOS),win32)
 BGFXINC += -I$(3RDPARTY)/dxsdk/Include
-ifeq ($(PTR64),1)
-BGFXINC += -L$(3RDPARTY)/dxsdk/lib/x64 -D_WIN32_WINNT=0x601
-else
-BGFXINC += -L$(3RDPARTY)/dxsdk/lib/x86 -D_WIN32_WINNT=0x601
-endif
 endif
 
 $(LIBOBJ)/bgfx/%.o: $(3RDPARTY)/bgfx/src/%.cpp | $(OSPREBUILD)
