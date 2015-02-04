@@ -70,6 +70,7 @@ public:
 	DECLARE_WRITE8_MEMBER(CIASelect_w);
 	
 	DECLARE_READ8_MEMBER(dummy_r);
+	DECLARE_WRITE_LINE_MEMBER(cia0_irq);
 	
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -94,6 +95,7 @@ private:
 	UINT8 m_VIC3_ControlB;
 	void PalEntryFlush(UINT8 offset);
 	void DMAgicExecute(address_space &space,UINT32 address);
+	void IRQCheck(UINT8 irq_cause);
 	int inner_x_char(int xoffs);
 	int inner_y_char(int yoffs);
 };
@@ -161,6 +163,9 @@ READ8_MEMBER(c65_state::vic4567_dummy_r)
 			return res;
 		case 0x19:
 			return m_VIC2_IRQPend;
+		
+		case 0x1a:
+			return m_VIC2_IRQMask;
 			
 		case 0x20:
 			return m_VIC2_EXTColor;
@@ -181,10 +186,12 @@ WRITE8_MEMBER(c65_state::vic4567_dummy_w)
 	switch(offset)
 	{
 		case 0x19:
-			m_VIC2_IRQPend = data & 0x8f;
+			m_VIC2_IRQPend &= ~data;
+			IRQCheck(0);
 			break;
 		case 0x1a:
 			m_VIC2_IRQMask = data & 0xf;
+			IRQCheck(0);
 			break;
 		case 0x20:
 			m_VIC2_EXTColor = data & 0xf;
@@ -476,10 +483,26 @@ static GFXDECODE_START( c65 )
 	GFXDECODE_ENTRY( "maincpu", 0xd000, charlayout,     0, 16 ) // another identical copy is at 0x9000
 GFXDECODE_END
 
+void c65_state::IRQCheck(UINT8 irq_cause)
+{
+	m_VIC2_IRQPend |= (irq_cause != 0) ? 0x80 : 0x00;
+	m_VIC2_IRQPend |= irq_cause;
+	
+	m_maincpu->set_input_line(M4510_IRQ_LINE,m_VIC2_IRQMask & m_VIC2_IRQPend ? ASSERT_LINE : CLEAR_LINE);
+}
+
 INTERRUPT_GEN_MEMBER(c65_state::vic3_vblank_irq)
 {
+	IRQCheck(1);
 	//if(m_VIC2_IRQMask & 1)
 	//	m_maincpu->set_input_line(M4510_IRQ_LINE,HOLD_LINE);
+}
+
+WRITE_LINE_MEMBER(c65_state::cia0_irq)
+{
+	printf("%d\n",state);
+//	m_cia0_irq = state;
+//	c65_irq(state || m_vicirq);
 }
 
 static MACHINE_CONFIG_START( c65, c65_state )
@@ -491,7 +514,7 @@ static MACHINE_CONFIG_START( c65, c65_state )
 
 	MCFG_DEVICE_ADD("cia_0", MOS6526, MAIN_CLOCK)
 	MCFG_MOS6526_TOD(60)
-//	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(c65_state, c65_cia0_interrupt))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(c65_state, cia0_irq))
 //	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(c65_state, c65_cia0_port_a_r))
 //	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(c65_state, c65_cia0_port_b_r))
 //	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(c65_state, c65_cia0_port_b_w))
