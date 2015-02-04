@@ -74,17 +74,16 @@ class sdl_info_bgfx : public osd_renderer
 {
 public:
     sdl_info_bgfx(sdl_window_info *w)
-    : osd_renderer(w), m_blittimer(0), m_renderer(NULL),
+    : osd_renderer(w, FLAG_NONE), m_blittimer(0), m_renderer(NULL),
       m_last_hofs(0), m_last_vofs(0),
       m_resize_pending(0), m_resize_width(0), m_resize_height(0),
       m_last_blit_time(0), m_last_blit_pixels(0)
     {}
 
-	/* virtual */ int create(int width, int height);
-	/* virtual */ void resize(int width, int height);
-	/* virtual */ int draw(UINT32 dc, int update);
-	/* virtual */ void set_target_bounds();
-	/* virtual */ int xy_to_render_target(int x, int y, int *xt, int *yt);
+	/* virtual */ int create(const int width, const int height);
+	/* virtual */ void resize(const int width, const int height);
+	/* virtual */ int draw(const UINT32 dc, const int update);
+	/* virtual */ int xy_to_render_target(const int x, const int y, int *xt, int *yt);
 	/* virtual */ void destroy_all_textures();
 	/* virtual */ void destroy();
 	/* virtual */ void clear();
@@ -251,15 +250,6 @@ int sdl_info_bgfx::xy_to_render_target(int x, int y, int *xt, int *yt)
 	if (*yt<0 || *yt >= window().m_blitheight)
 		return 0;
 	return 1;
-}
-
-//============================================================
-//  sdl_info_bgfx::get_primitives
-//============================================================
-
-void sdl_info_bgfx::set_target_bounds()
-{
-	window().m_target->set_bounds(window().m_blitwidth, window().m_blitheight, window().monitor()->aspect());
 }
 
 //============================================================

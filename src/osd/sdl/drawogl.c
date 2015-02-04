@@ -156,11 +156,14 @@ enum
 //  TYPES
 //============================================================
 
-struct texture_info;
+//============================================================
+//  Textures
+//============================================================
 
 /* texture_info holds information about a texture */
-struct texture_info
+class texture_info
 {
+public:
 	texture_info()
 	: hash(0), flags(0), rawwidth(0), rawheight(0),
 		rawwidth_create(0), rawheight_create(0),
@@ -219,7 +222,7 @@ class sdl_info_ogl : public osd_renderer
 {
 public:
 	sdl_info_ogl(sdl_window_info *window)
-	: osd_renderer(window), m_blittimer(0), m_extra_flags(0),
+	: osd_renderer(window, FLAG_NEEDS_OPENGL), m_blittimer(0), m_extra_flags(0),
 #if (SDLMAME_SDL2)
 		m_gl_context_id(0),
 #else
@@ -248,11 +251,10 @@ public:
 			m_texVerticex[i] = 0.0f;
 	}
 
-	/* virtual */ int create(int width, int height);
-	/* virtual */ void resize(int width, int height);
-	/* virtual */ int draw(UINT32 dc, int update);
-	/* virtual */ void set_target_bounds();
-	/* virtual */ int xy_to_render_target(int x, int y, int *xt, int *yt);
+	/* virtual */ int create(const int width, const int height);
+	/* virtual */ void resize(const int width, int const height);
+	/* virtual */ int draw(const UINT32 dc, const int update);
+	/* virtual */ int xy_to_render_target(const int x, const int y, int *xt, int *yt);
 	/* virtual */ void destroy_all_textures();
 	/* virtual */ void destroy();
 	/* virtual */ void clear();
@@ -393,6 +395,10 @@ void sdl_info_ogl::set_blendmode(int blendmode)
 
 // core functions
 
+//============================================================
+//  STATIC VARIABLES
+//============================================================
+
 static void drawogl_exit(void);
 static void load_gl_lib(running_machine &machine);
 
@@ -440,7 +446,7 @@ static int shown_video_info = 0;
 static int dll_loaded = 0;
 
 //============================================================
-//  drawogl_init
+//  drawsdl_init
 //============================================================
 
 static osd_renderer *drawogl_create(sdl_window_info *window)
@@ -456,10 +462,10 @@ int drawogl_init(running_machine &machine, sdl_draw_info *callbacks)
 
 	dll_loaded = 0;
 
+	load_gl_lib(machine);
 	if (SDLMAME_SDL2)
 	{
 		osd_printf_verbose("Using SDL multi-window OpenGL driver (SDL 2.0+)\n");
-		load_gl_lib(machine);
 	}
 	else
 		osd_printf_verbose("Using SDL single-window OpenGL driver (SDL 1.2)\n");
@@ -710,26 +716,35 @@ void sdl_info_ogl::initialize_gl()
 
 int sdl_info_ogl::create(int width, int height)
 {
-#if (SDLMAME_SDL2)
-
-	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-
-	/* FIXME: A reminder that gamma is wrong throughout MAME. Currently, SDL2.0 doesn't seem to
-	 * support the following attribute although my hardware lists GL_ARB_framebuffer_sRGB as an extension.
+	/* FIXME: On Ubuntu and potentially other Linux OS you should use
+	 * to disable panning. This has to be done before every invocation of mame.
 	 *
-	 * SDL_GL_SetAttribute( SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, 1 );
+	 * xrandr --output HDMI-0 --panning 0x0+0+0 --fb 0x0
 	 *
 	 */
+	osd_printf_verbose("Enter sdl_info::create\n");
 
-	osd_printf_verbose("Enter sdl_info_ogl::create\n");
+#if (SDLMAME_SDL2)
+
+	if (check_flag(FLAG_NEEDS_OPENGL))
+	{
+		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
+
+		/* FIXME: A reminder that gamma is wrong throughout MAME. Currently, SDL2.0 doesn't seem to
+			* support the following attribute although my hardware lists GL_ARB_framebuffer_sRGB as an extension.
+			*
+			* SDL_GL_SetAttribute( SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, 1 );
+			*
+			*/
+		m_extra_flags = SDL_WINDOW_OPENGL;
+	}
+	else
+				m_extra_flags = 0;
 
 	// create the SDL window
 	// soft driver also used | SDL_WINDOW_INPUT_GRABBED | SDL_WINDOW_MOUSE_FOCUS
-	m_extra_flags = (window().fullscreen() ?
+	m_extra_flags |= (window().fullscreen() ?
 			SDL_WINDOW_BORDERLESS | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE);
-
-	m_extra_flags |= SDL_WINDOW_OPENGL;
-
 
 #if defined(SDLMAME_WIN32)
 	SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
@@ -743,7 +758,10 @@ int sdl_info_ogl::create(int width, int height)
 
 	if  (!window().m_sdl_window )
 	{
-		osd_printf_error("OpenGL not supported on this driver: %s\n", SDL_GetError());
+		if (check_flag(FLAG_NEEDS_OPENGL))
+			osd_printf_error("OpenGL not supported on this driver: %s\n", SDL_GetError());
+		else
+			osd_printf_error("Window creation failed: %s\n", SDL_GetError());
 		return 1;
 	}
 
@@ -771,9 +789,6 @@ int sdl_info_ogl::create(int width, int height)
 	{
 		//SDL_SetWindowDisplayMode(window().m_sdl_window, NULL); // Use desktop
 	}
-	// create renderer
-
-	//SDL_SelectRenderer(window().sdl_window);
 
 	// show window
 
@@ -783,6 +798,7 @@ int sdl_info_ogl::create(int width, int height)
 
 	SDL_GetWindowSize(window().m_sdl_window, &window().m_width, &window().m_height);
 
+	// create renderer
 
 	m_gl_context_id = SDL_GL_CreateContext(window().m_sdl_window);
 	if  (!m_gl_context_id)
@@ -795,14 +811,17 @@ int sdl_info_ogl::create(int width, int height)
 
 #else
 	m_extra_flags = (window().fullscreen() ?  SDL_FULLSCREEN : SDL_RESIZABLE);
-	m_extra_flags |= SDL_OPENGL | SDL_DOUBLEBUF;
+	m_extra_flags |= SDL_DOUBLEBUF;
 
-	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-	#if (SDL_VERSION_ATLEAST(1,2,10)) && (!defined(SDLMAME_EMSCRIPTEN))
-	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, video_config.waitvsync ? 1 : 0);
-	#endif
-
-	load_gl_lib(window().machine());
+	if (check_flag(FLAG_NEEDS_OPENGL))
+	{
+		m_extra_flags |= SDL_OPENGL;
+		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
+		#if (SDL_VERSION_ATLEAST(1,2,10)) && (!defined(SDLMAME_EMSCRIPTEN))
+		SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, video_config.waitvsync ? 1 : 0);
+		#endif
+			//load_gl_lib(window().machine());
+	}
 
 	// create the SDL surface (which creates the window in windowed mode)
 	m_sdlsurf = SDL_SetVideoMode(width, height,
@@ -810,6 +829,11 @@ int sdl_info_ogl::create(int width, int height)
 
 	if (!m_sdlsurf)
 		return 1;
+	if ( (video_config.mode  == VIDEO_MODE_OPENGL) && !(m_sdlsurf->flags & SDL_OPENGL) )
+	{
+		osd_printf_error("OpenGL not supported on this driver!\n");
+		return 1;
+	}
 
 	window().m_width = m_sdlsurf->w;
 	window().m_height = m_sdlsurf->h;
@@ -817,11 +841,6 @@ int sdl_info_ogl::create(int width, int height)
 	window().m_screen_width = 0;
 	window().m_screen_height = 0;
 
-	if ( (video_config.mode  == VIDEO_MODE_OPENGL) && !(m_sdlsurf->flags & SDL_OPENGL) )
-	{
-		osd_printf_error("OpenGL not supported on this driver!\n");
-		return 1;
-	}
 
 	// set the window title
 	SDL_WM_SetCaption(window().m_title, "SDLMAME");
@@ -876,6 +895,47 @@ void sdl_info_ogl::resize(int width, int height)
 
 }
 
+
+//============================================================
+//  sdl_info::destroy
+//============================================================
+
+void sdl_info_ogl::destroy()
+{
+
+	// free the memory in the window
+
+	destroy_all_textures();
+
+#if (SDLMAME_SDL2)
+	SDL_GL_DeleteContext(m_gl_context_id);
+	if (window().fullscreen() && video_config.switchres)
+	{
+		SDL_SetWindowFullscreen(window().m_sdl_window, 0);    // Try to set mode
+		SDL_SetWindowDisplayMode(window().m_sdl_window, &m_original_mode);    // Try to set mode
+		SDL_SetWindowFullscreen(window().m_sdl_window, SDL_WINDOW_FULLSCREEN);    // Try to set mode
+	}
+
+	SDL_DestroyWindow(window().m_sdl_window);
+#else
+	if (m_sdlsurf)
+	{
+		SDL_FreeSurface(m_sdlsurf);
+		m_sdlsurf = NULL;
+	}
+#endif
+}
+
+//============================================================
+//  sdl_info::clear
+//============================================================
+
+void sdl_info_ogl::clear()
+{
+	//FIXME: Handled in sdl_info::draw as well
+	m_blittimer = 3;
+}
+
 //============================================================
 //  drawsdl_xy_to_render_target
 //============================================================
@@ -889,15 +949,6 @@ int sdl_info_ogl::xy_to_render_target(int x, int y, int *xt, int *yt)
 	if (*yt<0 || *yt >= window().m_blitheight)
 		return 0;
 	return 1;
-}
-
-//============================================================
-//  sdl_info::get_primitives
-//============================================================
-
-void sdl_info_ogl::set_target_bounds()
-{
-	window().m_target->set_bounds(window().m_blitwidth, window().m_blitheight, window().monitor()->aspect());
 }
 
 //============================================================
@@ -1208,36 +1259,6 @@ void sdl_info_ogl::loadGLExtensions()
 	}
 
 	_once = 0;
-}
-
-//============================================================
-//  sdl_info::destroy
-//============================================================
-
-void sdl_info_ogl::destroy()
-{
-
-	// free the memory in the window
-
-	destroy_all_textures();
-
-#if (SDLMAME_SDL2)
-	SDL_GL_DeleteContext(m_gl_context_id);
-	if (window().fullscreen() && video_config.switchres)
-	{
-		SDL_SetWindowFullscreen(window().m_sdl_window, 0);    // Try to set mode
-		SDL_SetWindowDisplayMode(window().m_sdl_window, &m_original_mode);    // Try to set mode
-		SDL_SetWindowFullscreen(window().m_sdl_window, SDL_WINDOW_FULLSCREEN);    // Try to set mode
-	}
-
-	SDL_DestroyWindow(window().m_sdl_window);
-#else
-	if (m_sdlsurf)
-	{
-		SDL_FreeSurface(m_sdlsurf);
-		m_sdlsurf = NULL;
-	}
-#endif
 }
 
 //============================================================
@@ -3167,12 +3188,3 @@ void sdl_info_ogl::destroy_all_textures()
 		window().m_primlist->release_lock();
 }
 
-//============================================================
-//  TEXCOPY FUNCS
-//============================================================
-
-void sdl_info_ogl::clear()
-{
-	//FIXME: Handled in sdl_info::draw as well
-	m_blittimer = 3;
-}

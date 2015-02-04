@@ -1031,7 +1031,8 @@ void sdl_window_info::video_window_update(running_machine &machine)
 			}
 
 			// ensure the target bounds are up-to-date, and then get the primitives
-			renderer().set_target_bounds();
+
+			m_target->set_bounds(m_blitwidth, m_blitheight, monitor()->aspect());
 
 			render_primitive_list &primlist = m_target->get_primitives();
 

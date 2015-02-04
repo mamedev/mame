@@ -37,24 +37,30 @@ class sdl_window_info;
 class osd_renderer
 {
 public:
-	osd_renderer(sdl_window_info *window)
-	: m_window(window) { }
+
+	static const int FLAG_NONE = 0;
+	static const int FLAG_NEEDS_OPENGL = 1;
+
+	osd_renderer(sdl_window_info *window, const int flags)
+	: m_window(window), m_flags(flags) { }
 
 	virtual ~osd_renderer() { }
 
 	sdl_window_info &window() { return *m_window; }
+	int flags() const { return m_flags; }
+	bool check_flag(const int flag) { return ((m_flags & flag)) == flag; }
 
-	virtual int create(int width, int height) = 0;
-	virtual void resize(int width, int height) = 0;
-	virtual int draw(UINT32 dc, int update) = 0;
-	virtual void set_target_bounds() = 0;
-	virtual int xy_to_render_target(int x, int y, int *xt, int *yt) = 0;
+	virtual int create(const int width, const int height) = 0;
+	virtual void resize(const int width, const int height) = 0;
+	virtual int draw(const UINT32 dc, const int update) = 0;
+	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) = 0;
 	virtual void destroy_all_textures() = 0;
 	virtual void destroy() = 0;
 	virtual void clear() = 0;
 
 private:
 	sdl_window_info *m_window;
+	int m_flags;
 };
 
 #define OSDWORK_CALLBACK(name)  void *name(void *param, ATTR_UNUSED int threadid)
