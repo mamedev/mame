@@ -1547,7 +1547,7 @@ INLINE sdl_window_info * window_from_id(Uint32 windowID)
 	for (w = sdl_window_list; w != NULL; w = w->m_next)
 	{
 		//printf("w->window_id: %d\n", w->window_id);
-		if (w->m_sdl_window == window)
+		if (w->sdl_window() == window)
 		{
 			return w;
 		}
@@ -1760,9 +1760,9 @@ void sdlinput_poll(running_machine &machine)
 			devinfo->keyboard.state[OSD_SDL_INDEX_KEYSYM(&event.key.keysym)] = 0x80;
 #if (SDLMAME_SDL2)
 			if (event.key.keysym.sym < 0x20)
-				ui_input_push_char_event(machine, sdl_window_list->m_target, event.key.keysym.sym);
+				ui_input_push_char_event(machine, sdl_window_list->target(), event.key.keysym.sym);
 #else
-			ui_input_push_char_event(machine, sdl_window_list->m_target, (unicode_char) event.key.keysym.unicode);
+			ui_input_push_char_event(machine, sdl_window_list->target(), (unicode_char) event.key.keysym.unicode);
 #endif
 			break;
 		case SDL_KEYUP:
@@ -1864,14 +1864,14 @@ void sdlinput_poll(running_machine &machine)
 				sdl_window_info *window = GET_FOCUS_WINDOW(&event.button);
 				if (window != NULL && window->xy_to_render_target(event.button.x,event.button.y, &cx, &cy) )
 				{
-					ui_input_push_mouse_down_event(machine, window->m_target, cx, cy);
+					ui_input_push_mouse_down_event(machine, window->target(), cx, cy);
 					// FIXME Parameter ?
 					if ((click-last_click < 250)
 							&& (cx >= last_x - 4 && cx <= last_x  + 4)
 							&& (cy >= last_y - 4 && cy <= last_y  + 4) )
 					{
 						last_click = 0;
-						ui_input_push_mouse_double_click_event(machine, window->m_target, cx, cy);
+						ui_input_push_mouse_double_click_event(machine, window->target(), cx, cy);
 					}
 					else
 					{
@@ -1898,7 +1898,7 @@ void sdlinput_poll(running_machine &machine)
 
 				if (window != NULL && window->xy_to_render_target(event.button.x,event.button.y, &cx, &cy) )
 				{
-					ui_input_push_mouse_up_event(machine, window->m_target, cx, cy);
+					ui_input_push_mouse_up_event(machine, window->target(), cx, cy);
 				}
 			}
 			break;
@@ -1922,7 +1922,7 @@ void sdlinput_poll(running_machine &machine)
 				sdl_window_info *window = GET_FOCUS_WINDOW(&event.motion);
 
 				if (window != NULL && window->xy_to_render_target(event.motion.x, event.motion.y, &cx, &cy) )
-					ui_input_push_mouse_move_event(machine, window->m_target, cx, cy);
+					ui_input_push_mouse_move_event(machine, window->target(), cx, cy);
 			}
 			break;
 		case SDL_JOYBALLMOTION:
@@ -1937,7 +1937,7 @@ void sdlinput_poll(running_machine &machine)
 			if (!event.active.gain)
 			{
 				sdl_window_info *window = GET_FOCUS_WINDOW(&event.motion);
-				ui_input_push_mouse_leave_event(machine, window->m_target);
+				ui_input_push_mouse_leave_event(machine, window->target());
 			}
 			break;
 		case SDL_QUIT:
@@ -1956,7 +1956,7 @@ void sdlinput_poll(running_machine &machine)
 				if (window != NULL )
 				{
 					osd_uchar_from_osdchar(&result, event.text.text, 1);
-					ui_input_push_char_event(machine, window->m_target, result);
+					ui_input_push_char_event(machine, window->target(), result);
 				}
 			}
 			break;
@@ -1973,7 +1973,7 @@ void sdlinput_poll(running_machine &machine)
 				machine.schedule_exit();
 				break;
 			case  SDL_WINDOWEVENT_LEAVE:
-				ui_input_push_mouse_leave_event(machine, window->m_target);
+				ui_input_push_mouse_leave_event(machine, window->target());
 				app_has_mouse_focus = 0;
 				break;
 			case SDL_WINDOWEVENT_MOVED:
@@ -1997,7 +1997,7 @@ void sdlinput_poll(running_machine &machine)
 #endif
 					{
 						//printf("event data1,data2 %d x %d %ld\n", event.window.data1, event.window.data2, sizeof(SDL_Event));
-						if (event.window.data1 != window->m_width || event.window.data2 != window->m_height)
+						if (event.window.data1 != window->width() || event.window.data2 != window->height())
 							window->window_resize(event.window.data1, event.window.data2);
 					}
 				}

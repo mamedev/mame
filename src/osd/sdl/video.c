@@ -113,7 +113,11 @@ bool sdl_osd_interface::video_init()
 		sdl_window_config conf;
 		memset(&conf, 0, sizeof(conf));
 		get_resolution(options().resolution(), options().resolution(index), &conf, TRUE);
-		if (sdlwindow_video_window_create(machine(), index, sdl_monitor_info::pick_monitor(options(), index), &conf))
+
+		// create window ...
+		sdl_window_info *win = global_alloc(sdl_window_info(machine(), index, sdl_monitor_info::pick_monitor(options(), index), &conf));
+
+		if (win->window_init())
 			return false;
 	}
 

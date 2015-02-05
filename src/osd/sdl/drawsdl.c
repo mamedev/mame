@@ -52,8 +52,6 @@ public:
 
 	sdl_info(sdl_window_info *w, int extra_flags)
 	: osd_renderer(w, extra_flags),
-	m_blittimer(0),
-
 	#if (SDLMAME_SDL2)
 	m_sdl_renderer(NULL),
 	m_texture_id(NULL),
@@ -216,12 +214,11 @@ int drawsdl_scale_mode(const char *s)
 
 static osd_renderer *drawsdl_create(sdl_window_info *window)
 {
-	const sdl_scale_mode *sm = &scale_modes[video_config.scale_mode];
-
 	// FIXME: QUALITY HINTS
 #if (SDLMAME_SDL2)
 	return global_alloc(sdl_info(window, osd_renderer::FLAG_NONE));
 #else
+	const sdl_scale_mode *sm = &scale_modes[video_config.scale_mode];
 	return global_alloc(sdl_info(window, sm->m_extra_flags));
 #endif
 }
@@ -279,7 +276,7 @@ void sdl_info::setup_texture(int tempwidth, int tempheight)
 		int m_hw_scale_width =0;
 		int m_hw_scale_height = 0;
 
-		window().m_target->compute_minimum_size(m_hw_scale_width, m_hw_scale_height);
+		window().target()->compute_minimum_size(m_hw_scale_width, m_hw_scale_height);
 		if (video_config.prescale)
 		{
 			m_hw_scale_width *= video_config.prescale;
@@ -315,7 +312,7 @@ void sdl_info::yuv_overlay_init()
 	const sdl_scale_mode *sdl_sm = &scale_modes[video_config.scale_mode];
 	int minimum_width, minimum_height;
 
-	window().m_target->compute_minimum_size(minimum_width, minimum_height);
+	window().target()->compute_minimum_size(minimum_width, minimum_height);
 
 	if (video_config.prescale)
 	{
@@ -339,7 +336,7 @@ void sdl_info::yuv_overlay_init()
 	m_yuv_bitmap = global_alloc_array(UINT16, minimum_width*minimum_height);
 
 	m_yuvsurf = SDL_CreateYUVOverlay(minimum_width * sdl_sm->mult_w, minimum_height * sdl_sm->mult_h,
-			sdl_sm->pixel_format, window().m_sdlsurf);
+			sdl_sm->pixel_format, window().sdl_surface());
 
 	if ( m_yuvsurf == NULL ) {
 		osd_printf_error("SDL: Couldn't create SDL_yuv_overlay: %s\n", SDL_GetError());
@@ -421,9 +418,9 @@ static void drawsdl_show_info(struct SDL_RendererInfo *render_info)
 
 int sdl_info::create(int width, int height)
 {
-	const sdl_scale_mode *sm = &scale_modes[video_config.scale_mode];
 
 #if (SDLMAME_SDL2)
+	const sdl_scale_mode *sm = &scale_modes[video_config.scale_mode];
 
 	// create renderer 
 
@@ -432,9 +429,9 @@ int sdl_info::create(int width, int height)
 
 
 	if (video_config.waitvsync)
-		m_sdl_renderer = SDL_CreateRenderer(window().m_sdl_window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
+		m_sdl_renderer = SDL_CreateRenderer(window().sdl_window(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
 	else
-		m_sdl_renderer = SDL_CreateRenderer(window().m_sdl_window, -1, SDL_RENDERER_ACCELERATED);
+		m_sdl_renderer = SDL_CreateRenderer(window().sdl_window(), -1, SDL_RENDERER_ACCELERATED);
 
 	if (!m_sdl_renderer)
 	{
@@ -483,32 +480,14 @@ int sdl_info::create(int width, int height)
 
 void sdl_info::resize(int width, int height)
 {
-#if (!SDLMAME_SDL2)
-	const sdl_scale_mode *sdl_sm = &scale_modes[video_config.scale_mode];
-#endif
 #if (SDLMAME_SDL2)
-	SDL_SetWindowSize(window().m_sdl_window, width, height);
-	SDL_GetWindowSize(window().m_sdl_window, &window().m_width, &window().m_height);
-
+	SDL_RenderSetViewport(m_sdl_renderer, NULL);
 #else
-	if (m_yuvsurf != NULL)
-	{
-		SDL_FreeYUVOverlay(m_yuvsurf);
-		m_yuvsurf = NULL;
-	}
-	SDL_FreeSurface(window().m_sdlsurf);
-	
-	window().m_sdlsurf = SDL_SetVideoMode(width, height, 0,
-			SDL_SWSURFACE | SDL_ANYFORMAT | window().m_extra_flags);
-
-	window().m_width = window().m_sdlsurf->w;
-	window().m_height = window().m_sdlsurf->h;
-
-		if (sdl_sm->is_yuv)
+	const sdl_scale_mode *sdl_sm = &scale_modes[video_config.scale_mode];
+	if (sdl_sm->is_yuv)
 	{
 		yuv_overlay_init();
 	}
-
 #endif
 }
 
@@ -520,32 +499,9 @@ void sdl_info::resize(int width, int height)
 void sdl_info::destroy()
 {
 
-#if (SDLMAME_SDL2)
-	//SDL_SelectRenderer(window().sdl_window);
-	SDL_DestroyTexture(m_texture_id);
-	//SDL_DestroyRenderer(window().sdl_window);
-	if (window().fullscreen() && video_config.switchres)
-	{
-		SDL_SetWindowFullscreen(window().m_sdl_window, 0);    // Try to set mode
-		SDL_SetWindowDisplayMode(window().m_sdl_window, &window().m_original_mode);    // Try to set mode
-		SDL_SetWindowFullscreen(window().m_sdl_window, SDL_WINDOW_FULLSCREEN);    // Try to set mode
-	}
-
-	SDL_DestroyWindow(window().m_sdl_window);
-#else
-	if (m_yuvsurf != NULL)
-	{
-		SDL_FreeYUVOverlay(m_yuvsurf);
-		m_yuvsurf = NULL;
-	}
-
-	if (window().m_sdlsurf)
-	{
-		SDL_FreeSurface(window().m_sdlsurf);
-		window().m_sdlsurf = NULL;
-	}
-#endif
 	// free the memory in the window
+
+	destroy_all_textures();
 
 	if (m_yuv_lookup != NULL)
 	{
@@ -577,9 +533,9 @@ int sdl_info::xy_to_render_target(int x, int y, int *xt, int *yt)
 {
 	*xt = x - m_last_hofs;
 	*yt = y - m_last_vofs;
-	if (*xt<0 || *xt >= window().m_blitwidth)
+	if (*xt<0 || *xt >= window().blitwidth())
 		return 0;
-	if (*yt<0 || *yt >= window().m_blitheight)
+	if (*yt<0 || *yt >= window().blitheight())
 		return 0;
 	return 1;
 }
@@ -590,7 +546,16 @@ int sdl_info::xy_to_render_target(int x, int y, int *xt, int *yt)
 
 void sdl_info::destroy_all_textures()
 {
-	/* nothing to be done in soft mode */
+#if (SDLMAME_SDL2)
+	SDL_DestroyTexture(m_texture_id);
+	m_texture_id = NULL;
+#else
+	if (m_yuvsurf != NULL)
+	{
+		SDL_FreeYUVOverlay(m_yuvsurf);
+		m_yuvsurf = NULL;
+	}
+#endif
 }
 
 
@@ -618,29 +583,29 @@ int sdl_info::draw(UINT32 dc, int update)
 	// lock it if we need it
 #if (!SDLMAME_SDL2)
 
-	pitch = window().m_sdlsurf->pitch;
-	bpp = window().m_sdlsurf->format->BytesPerPixel;
-	rmask = window().m_sdlsurf->format->Rmask;
-	gmask = window().m_sdlsurf->format->Gmask;
-	bmask = window().m_sdlsurf->format->Bmask;
+	pitch = window().sdl_surface()->pitch;
+	bpp = window().sdl_surface()->format->BytesPerPixel;
+	rmask = window().sdl_surface()->format->Rmask;
+	gmask = window().sdl_surface()->format->Gmask;
+	bmask = window().sdl_surface()->format->Bmask;
 //  amask = sdlsurf->format->Amask;
 
-	if (window().m_blitwidth != m_old_blitwidth || window().m_blitheight != m_old_blitheight)
+	if (window().blitwidth() != m_old_blitwidth || window().blitheight() != m_old_blitheight)
 	{
 		if (sm->is_yuv)
 			yuv_overlay_init();
-		m_old_blitwidth = window().m_blitwidth;
-		m_old_blitheight = window().m_blitheight;
+		m_old_blitwidth = window().blitwidth();
+		m_old_blitheight = window().blitheight();
 		m_blittimer = 3;
 	}
 
-	if (SDL_MUSTLOCK(window().m_sdlsurf))
-		SDL_LockSurface(window().m_sdlsurf);
+	if (SDL_MUSTLOCK(window().sdl_surface()))
+		SDL_LockSurface(window().sdl_surface());
 
 	// Clear if necessary
 	if (m_blittimer > 0)
 	{
-		memset(window().m_sdlsurf->pixels, 0, window().m_height * window().m_sdlsurf->pitch);
+		memset(window().sdl_surface()->pixels, 0, window().height() * window().sdl_surface()->pitch);
 		m_blittimer--;
 	}
 
@@ -658,18 +623,19 @@ int sdl_info::draw(UINT32 dc, int update)
 #endif
 	}
 	else
-		surfptr = (UINT8 *)window().m_sdlsurf->pixels;
+		surfptr = (UINT8 *)window().sdl_surface()->pixels;
 #else
 	//SDL_SelectRenderer(window().sdl_window);
 
-	if (window().m_blitwidth != m_old_blitwidth || window().m_blitheight != m_old_blitheight)
+	if (window().blitwidth() != m_old_blitwidth || window().blitheight() != m_old_blitheight)
 	{
-		SDL_RenderSetViewport(m_sdl_renderer, NULL);
+		//SDL_RenderSetViewport(m_sdl_renderer, NULL);
 
-		SDL_DestroyTexture(m_texture_id);
-		setup_texture(window().m_blitwidth, window().m_blitheight);
-		m_old_blitwidth = window().m_blitwidth;
-		m_old_blitheight = window().m_blitheight;
+		if (m_texture_id != NULL)
+			SDL_DestroyTexture(m_texture_id);
+		setup_texture(window().blitwidth(), window().blitheight());
+		m_old_blitwidth = window().blitwidth();
+		m_old_blitheight = window().blitheight();
 		m_blittimer = 3;
 	}
 
@@ -697,8 +663,8 @@ int sdl_info::draw(UINT32 dc, int update)
 #endif
 	// get ready to center the image
 	vofs = hofs = 0;
-	blitwidth = window().m_blitwidth;
-	blitheight = window().m_blitheight;
+	blitwidth = window().blitwidth();
+	blitheight = window().blitheight();
 
 	// figure out what coordinate system to use for centering - in window mode it's always the
 	// SDL surface size.  in fullscreen the surface covers all monitors, so center according to
@@ -710,8 +676,8 @@ int sdl_info::draw(UINT32 dc, int update)
 	}
 	else
 	{
-		ch = window().m_height;
-		cw = window().m_width;
+		ch = window().height();
+		cw = window().width();
 	}
 
 	// do not crash if the window's smaller than the blit area
@@ -721,7 +687,7 @@ int sdl_info::draw(UINT32 dc, int update)
 	}
 	else if (video_config.centerv)
 	{
-		vofs = (ch - window().m_blitheight) / 2;
+		vofs = (ch - window().blitheight()) / 2;
 	}
 
 	if (blitwidth > cw)
@@ -730,7 +696,7 @@ int sdl_info::draw(UINT32 dc, int update)
 	}
 	else if (video_config.centerh)
 	{
-		hofs = (cw - window().m_blitwidth) / 2;
+		hofs = (cw - window().blitwidth()) / 2;
 	}
 
 	m_last_hofs = hofs;
@@ -744,8 +710,8 @@ int sdl_info::draw(UINT32 dc, int update)
 		if (!sm->is_yuv)
 		{
 			surfptr += ((vofs * pitch) + (hofs * bpp));
-			mamewidth = blitwidth; //m_sdlsurf->w;
-			mameheight = blitheight; //m_sdlsurf->h;
+			mamewidth = blitwidth; //sdl_surface()->w;
+			mameheight = blitheight; //sdl_surface()->h;
 		}
 		else
 		{
@@ -770,10 +736,10 @@ int sdl_info::draw(UINT32 dc, int update)
 
 	for (render_primitive *prim = window().m_primlist->first(); prim != NULL; prim = prim->next())
 	{
-		prim->bounds.x0 *= fw;
-		prim->bounds.x1 *= fw;
-		prim->bounds.y0 *= fh;
-		prim->bounds.y1 *= fh;
+		prim->bounds.x0 = floor(fw * prim->bounds.x0 + 0.5f);
+		prim->bounds.x1 = floor(fw * prim->bounds.x1 + 0.5f);
+		prim->bounds.y0 = floor(fh * prim->bounds.y0 + 0.5f);
+		prim->bounds.y1 = floor(fh * prim->bounds.y1 + 0.5f);
 	}
 
 	// render to it
@@ -818,10 +784,10 @@ int sdl_info::draw(UINT32 dc, int update)
 
 	// unlock and flip
 #if (!SDLMAME_SDL2)
-	if (SDL_MUSTLOCK(window().m_sdlsurf)) SDL_UnlockSurface(window().m_sdlsurf);
+	if (SDL_MUSTLOCK(window().sdl_surface())) SDL_UnlockSurface(window().sdl_surface());
 	if (!sm->is_yuv)
 	{
-		SDL_Flip(window().m_sdlsurf);
+		SDL_Flip(window().sdl_surface());
 	}
 	else
 	{
