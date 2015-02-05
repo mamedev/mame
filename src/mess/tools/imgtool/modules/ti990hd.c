@@ -417,7 +417,7 @@ OPTION_GUIDE_END
 
 #define symb2str2(a) #a
 #define symb2str(a) symb2str2(a)
-#define ti990_create_optionspecs "B1-[145]-"symb2str(MAX_CYLINDERS)";C1-[4]-"symb2str(MAX_HEADS)";D1-[32]-"symb2str(MAX_SECTORS_PER_TRACK)";E"symb2str(MIN_SECTOR_SIZE)"-[256]-"symb2str(MAX_SECTOR_SIZE)";"
+#define ti990_create_optionspecs "B1-[145]-" symb2str(MAX_CYLINDERS)";C1-[4]-" symb2str(MAX_HEADS)";D1-[32]-" symb2str(MAX_SECTORS_PER_TRACK)";E" symb2str(MIN_SECTOR_SIZE)"-[256]-" symb2str(MAX_SECTOR_SIZE)";"
 
 void ti990_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info)
 {

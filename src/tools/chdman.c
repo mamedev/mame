@@ -1698,7 +1698,7 @@ static void do_create_hd(parameters_t &params)
 		astring *size_str = params.find(OPTION_SIZE);
 		if (size_str != NULL)
 		{
-			if (sscanf(*size_str, "%"I64FMT"d", &filesize) != 1)
+			if (sscanf(*size_str, "%" I64FMT"d", &filesize) != 1)
 				report_error(1, "Invalid size string");
 		}
 	}
@@ -2588,7 +2588,10 @@ static void do_extract_ld(parameters_t &params)
 			// read the hunk into the buffers
 			chd_error err = input_chd.read_hunk(framenum, NULL);
 			if (err != CHDERR_NONE)
-				report_error(1, "Error reading hunk %" I64FMT "d from CHD file (%s): %s\n", framenum, params.find(OPTION_INPUT)->cstr(), chd_file::error_string(err));
+			{
+				UINT64 filepos = core_ftell(input_chd);
+				report_error(1, "Error reading hunk %" I64FMT "d at offset %" I64FMT "d from CHD file (%s): %s\n", framenum, filepos, params.find(OPTION_INPUT)->cstr(), chd_file::error_string(err));
+			}
 
 			// write audio
 			for (int chnum = 0; chnum < channels; chnum++)

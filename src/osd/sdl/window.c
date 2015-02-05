@@ -100,26 +100,21 @@ static sdl_draw_info draw;
 
 struct worker_param {
 	worker_param()
-	: m_window(NULL), m_list(NULL), m_machine(NULL), m_resize_new_width(0), m_resize_new_height(0)
+	: m_window(NULL), m_list(NULL), m_resize_new_width(0), m_resize_new_height(0)
 	{
 	}
-	worker_param(running_machine &amachine, sdl_window_info *awindow)
-	: m_window(awindow), m_list(NULL), m_machine(&amachine), m_resize_new_width(0), m_resize_new_height(0)
-	{
-	}
-	worker_param(running_machine &amachine, sdl_window_info *awindow, render_primitive_list &alist)
-	: m_window(awindow), m_list(&alist), m_machine(&amachine), m_resize_new_width(0), m_resize_new_height(0)
+	worker_param(sdl_window_info *awindow, render_primitive_list &alist)
+	: m_window(awindow), m_list(&alist), m_resize_new_width(0), m_resize_new_height(0)
 	{
 	}
 	worker_param(sdl_window_info *awindow, int anew_width, int anew_height)
-	: m_window(awindow), m_list(NULL), m_machine(NULL), m_resize_new_width(anew_width), m_resize_new_height(anew_height)
+	: m_window(awindow), m_list(NULL), m_resize_new_width(anew_width), m_resize_new_height(anew_height)
 	{
 	}
 	worker_param(sdl_window_info *awindow)
-	: m_window(awindow), m_list(NULL), m_machine(NULL), m_resize_new_width(0), m_resize_new_height(0)
+	: m_window(awindow), m_list(NULL), m_resize_new_width(0), m_resize_new_height(0)
 	{
 	}
-	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
 	sdl_window_info *window() const { assert(m_window != NULL); return m_window; }
 	render_primitive_list *list() const { return m_list; }
 	int new_width() const { return m_resize_new_width; }
@@ -129,7 +124,6 @@ struct worker_param {
 private:
 	sdl_window_info *m_window;
 	render_primitive_list *m_list;
-	running_machine *m_machine;
 	int m_resize_new_width;
 	int m_resize_new_height;
 };
@@ -139,10 +133,7 @@ private:
 //  PROTOTYPES
 //============================================================
 
-static void sdlwindow_update_cursor_state(running_machine &machine, sdl_window_info *window);
 static void sdlwindow_sync(void);
-
-static void set_starting_view(running_machine &machine, int index, sdl_window_info *window, const char *defview, const char *view);
 
 //============================================================
 //  execute_async
@@ -355,7 +346,7 @@ void sdl_osd_interface::window_exit()
 	{
 		sdl_window_info *temp = sdl_window_list;
 		sdl_window_list = temp->m_next;
-		temp->video_window_destroy(machine());
+		temp->destroy();
 		// free the window itself
 		global_free(temp);
 	}
@@ -464,7 +455,7 @@ void sdl_window_info::blit_surface_size(int window_width, int window_height)
 		newwidth = window_width;
 
 	if ((m_blitwidth != newwidth) || (m_blitheight != newheight))
-		window_clear();
+		clear();
 
 	m_blitwidth = newwidth;
 	m_blitheight = newheight;
@@ -480,25 +471,42 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_resize_wt )
 {
 	worker_param *      wp = (worker_param *) param;
 	sdl_window_info *   window = wp->window();
+	int width = wp->new_width();
+	int height = wp->new_height();
 
 	ASSERT_WINDOW_THREAD();
 
 	window->renderer().destroy_all_textures();
-	window->renderer().resize(wp->new_width(), wp->new_height());
 
-	window->blit_surface_size(wp->new_width(), wp->new_height());
+#if (SDLMAME_SDL2)
+	SDL_SetWindowSize(window->sdl_window(), width, height);
+	SDL_GetWindowSize(window->sdl_window(), &window->m_width, &window->m_height);
+#else
+	SDL_FreeSurface(window->m_sdlsurf);
 
-	window->window_clear();
+	window->m_sdlsurf = SDL_SetVideoMode(width, height, 0,
+			SDL_SWSURFACE | SDL_ANYFORMAT | window->m_extra_flags);
+
+	window->m_width = window->m_sdlsurf->w;
+	window->m_height = window->m_sdlsurf->h;
+#endif
+
+
+	window->renderer().resize(window->m_width, window->m_height);
+
+	window->blit_surface_size(window->m_width, window->m_height);
+
+	window->clear();
 
 	osd_free(wp);
 	return NULL;
 }
 
-void sdl_window_info::window_resize(INT32 width, INT32 height)
+void sdl_window_info::resize(INT32 width, INT32 height)
 {
 	ASSERT_MAIN_THREAD();
 
-	if (width == this->m_width && height == this->m_height)
+	if (width == this->width() && height == this->height())
 		return;
 
 	execute_async_wait(&sdlwindow_resize_wt, worker_param(this, width, height));
@@ -522,7 +530,7 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_clear_surface_wt )
 	return NULL;
 }
 
-void sdl_window_info::window_clear()
+void sdl_window_info::clear()
 {
 	worker_param wp;
 
@@ -554,12 +562,30 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_toggle_full_screen_wt )
 	// If we are going fullscreen (leaving windowed) remember our windowed size
 	if (!window->fullscreen())
 	{
-		window->m_windowed_width = window->m_width;
-		window->m_windowed_height = window->m_height;
+		window->m_windowed_width = window->width();
+		window->m_windowed_height = window->height();
 	}
 
 	window->renderer().destroy();
-	sdlinput_release_keys(wp->machine());
+
+#if (SDLMAME_SDL2)
+	if (window->fullscreen() && video_config.switchres)
+	{
+		SDL_SetWindowFullscreen(window->sdl_window(), 0);    // Try to set mode
+		SDL_SetWindowDisplayMode(window->sdl_window(), &window->m_original_mode);    // Try to set mode
+		SDL_SetWindowFullscreen(window->sdl_window(), SDL_WINDOW_FULLSCREEN);    // Try to set mode
+	}
+	SDL_DestroyWindow(window->sdl_window());
+#else
+	if (window->m_sdlsurf)
+	{
+		SDL_FreeSurface(window->m_sdlsurf);
+		window->m_sdlsurf = NULL;
+	}
+#endif
+
+
+	sdlinput_release_keys();
 
 	// toggle the window mode
 	window->set_fullscreen(!window->fullscreen());
@@ -569,11 +595,11 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_toggle_full_screen_wt )
 	return NULL;
 }
 
-void sdl_window_info::toggle_full_screen(running_machine &machine)
+void sdl_window_info::toggle_full_screen()
 {
 	ASSERT_MAIN_THREAD();
 
-	execute_async_wait(&sdlwindow_toggle_full_screen_wt, worker_param(machine, this));
+	execute_async_wait(&sdlwindow_toggle_full_screen_wt, worker_param(this));
 }
 
 OSDWORK_CALLBACK( sdl_window_info::destroy_all_textures_wt )
@@ -588,17 +614,17 @@ OSDWORK_CALLBACK( sdl_window_info::destroy_all_textures_wt )
 	return NULL;
 }
 
-void sdl_window_info::modify_prescale(running_machine &machine, int dir)
+void sdl_window_info::modify_prescale(int dir)
 {
-	worker_param wp = worker_param(machine, this);
-	int new_prescale = m_prescale;
+	worker_param wp = worker_param(this);
+	int new_prescale = prescale();
 
-	if (dir > 0 && m_prescale < 3)
-		new_prescale = m_prescale + 1;
-	if (dir < 0 && m_prescale > 1)
-		new_prescale = m_prescale - 1;
+	if (dir > 0 && prescale() < 3)
+		new_prescale = prescale() + 1;
+	if (dir < 0 && prescale() > 1)
+		new_prescale = prescale() - 1;
 
-	if (new_prescale != m_prescale)
+	if (new_prescale != prescale())
 	{
 		if (m_fullscreen && video_config.switchres)
 		{
@@ -614,7 +640,7 @@ void sdl_window_info::modify_prescale(running_machine &machine, int dir)
 			execute_async_wait(destroy_all_textures_wt, wp);
 			m_prescale = new_prescale;
 		}
-		machine.ui().popup_time(1, "Prescale %d", m_prescale);
+		machine().ui().popup_time(1, "Prescale %d", prescale());
 	}
 }
 
@@ -623,7 +649,7 @@ void sdl_window_info::modify_prescale(running_machine &machine, int dir)
 //  (main or window thread)
 //============================================================
 
-static void sdlwindow_update_cursor_state(running_machine &machine, sdl_window_info *window)
+void sdl_window_info::update_cursor_state()
 {
 #if (USE_XINPUT)
 	// Hack for wii-lightguns:
@@ -638,22 +664,22 @@ static void sdlwindow_update_cursor_state(running_machine &machine, sdl_window_i
 #if (SDLMAME_SDL2)
 	// do not do mouse capture if the debugger's enabled to avoid
 	// the possibility of losing control
-	if (!(machine.debug_flags & DEBUG_FLAG_OSD_ENABLED))
+	if (!(machine().debug_flags & DEBUG_FLAG_OSD_ENABLED))
 	{
 		//FIXME: SDL1.3: really broken: the whole SDL code
 		//       will only work correct with relative mouse movements ...
-		if (!window->fullscreen() && !sdlinput_should_hide_mouse(machine))
+		if (!fullscreen() && !sdlinput_should_hide_mouse())
 		{
 			SDL_ShowCursor(SDL_ENABLE);
-			if (SDL_GetWindowGrab(window->m_sdl_window ))
-				SDL_SetWindowGrab(window->m_sdl_window, SDL_FALSE);
+			if (SDL_GetWindowGrab(sdl_window() ))
+				SDL_SetWindowGrab(sdl_window(), SDL_FALSE);
 			SDL_SetRelativeMouseMode(SDL_FALSE);
 		}
 		else
 		{
 			SDL_ShowCursor(SDL_DISABLE);
-			if (!SDL_GetWindowGrab(window->m_sdl_window))
-				SDL_SetWindowGrab(window->m_sdl_window, SDL_TRUE);
+			if (!SDL_GetWindowGrab(sdl_window()))
+				SDL_SetWindowGrab(sdl_window(), SDL_TRUE);
 			SDL_SetRelativeMouseMode(SDL_TRUE);
 		}
 		SDL_SetCursor(NULL); // Force an update in case the underlying driver has changed visibility
@@ -662,9 +688,9 @@ static void sdlwindow_update_cursor_state(running_machine &machine, sdl_window_i
 #else
 	// do not do mouse capture if the debugger's enabled to avoid
 	// the possibility of losing control
-	if (!(machine.debug_flags & DEBUG_FLAG_OSD_ENABLED))
+	if (!(machine().debug_flags & DEBUG_FLAG_OSD_ENABLED))
 	{
-		if ( window->fullscreen() || sdlinput_should_hide_mouse(machine) )
+		if ( fullscreen() || sdlinput_should_hide_mouse() )
 		{
 			SDL_ShowCursor(SDL_DISABLE);
 			if (!SDL_WM_GrabInput(SDL_GRAB_QUERY))
@@ -688,9 +714,9 @@ static void sdlwindow_update_cursor_state(running_machine &machine, sdl_window_i
 static OSDWORK_CALLBACK( sdlwindow_update_cursor_state_wt )
 {
 	worker_param *      wp = (worker_param *) param;
-	//sdl_window_info *   window = wp->window;
+	sdl_window_info *   window = wp->window();
 
-	sdlwindow_update_cursor_state(wp->machine(), wp->window());
+	window->update_cursor_state();
 
 	osd_free(wp);
 	return NULL;
@@ -706,44 +732,40 @@ int sdl_window_info::xy_to_render_target(int x, int y, int *xt, int *yt)
 //  (main thread)
 //============================================================
 
-int sdlwindow_video_window_create(running_machine &machine, int index, sdl_monitor_info *monitor, const sdl_window_config *config)
+int sdl_window_info::window_init()
 {
-	sdl_window_info *window;
 	worker_param *wp = (worker_param *) osd_malloc(sizeof(worker_param));
 	int result;
 
 	ASSERT_MAIN_THREAD();
 
-	// allocate a new window object
-	window = global_alloc(sdl_window_info(&machine, monitor, index, config));
-
 	// set the initial maximized state
 	// FIXME: Does not belong here
-	sdl_options &options = downcast<sdl_options &>(machine.options());
-	window->m_startmaximized = options.maximize();
+	sdl_options &options = downcast<sdl_options &>(m_machine.options());
+	m_startmaximized = options.maximize();
 
 	// add us to the list
-	*last_window_ptr = window;
-	last_window_ptr = &window->m_next;
+	*last_window_ptr = this;
+	last_window_ptr = &this->m_next;
 
-	window->set_renderer(draw.create(window));
+	set_renderer(draw.create(this));
 
 	// create an event that we can use to skip blitting
-	window->m_rendered_event = osd_event_alloc(FALSE, TRUE);
+	m_rendered_event = osd_event_alloc(FALSE, TRUE);
 
 	// load the layout
-	window->m_target = machine.render().target_alloc();
+	m_target = m_machine.render().target_alloc();
 
 	// set the specific view
-	set_starting_view(machine, index, window, options.view(), options.view(index));
+	set_starting_view(m_machine, m_index, options.view(), options.view(m_index));
 
 	// make the window title
 	if (video_config.numscreens == 1)
-		sprintf(window->m_title, "%s: %s [%s]", emulator_info::get_appname(), machine.system().description, machine.system().name);
+		sprintf(m_title, "%s: %s [%s]", emulator_info::get_appname(), m_machine.system().description, m_machine.system().name);
 	else
-		sprintf(window->m_title, "%s: %s [%s] - Screen %d", emulator_info::get_appname(), machine.system().description, machine.system().name, index);
+		sprintf(m_title, "%s: %s [%s] - Screen %d", emulator_info::get_appname(), m_machine.system().description, m_machine.system().name, m_index);
 
-	wp->set_window(window);
+	wp->set_window(this);
 
 	// FIXME: pass error back in a different way
 	if (multithreading_enabled)
@@ -765,9 +787,7 @@ int sdlwindow_video_window_create(running_machine &machine, int index, sdl_monit
 	return 0;
 
 error:
-	window->video_window_destroy(machine);
-	// free the window itself
-	global_free(window);
+	destroy();
 	return 1;
 }
 
@@ -787,15 +807,31 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_video_window_destroy_wt )
 	// free the textures etc
 	window->renderer().destroy();
 
+#if (SDLMAME_SDL2)
+	if (window->fullscreen() && video_config.switchres)
+	{
+		SDL_SetWindowFullscreen(window->sdl_window(), 0);    // Try to set mode
+		SDL_SetWindowDisplayMode(window->sdl_window(), &window->m_original_mode);    // Try to set mode
+		SDL_SetWindowFullscreen(window->sdl_window(), SDL_WINDOW_FULLSCREEN);    // Try to set mode
+	}
+	SDL_DestroyWindow(window->sdl_window());
+#else
+	if (window->m_sdlsurf)
+	{
+		SDL_FreeSurface(window->m_sdlsurf);
+		window->m_sdlsurf = NULL;
+	}
+#endif
+
 	// release all keys ...
-	sdlinput_release_keys(wp->machine());
+	sdlinput_release_keys();
 
 
 	osd_free(wp);
 	return NULL;
 }
 
-void sdl_window_info::video_window_destroy(running_machine &machine)
+void sdl_window_info::destroy()
 {
 	sdl_window_info **prevptr;
 
@@ -816,7 +852,7 @@ void sdl_window_info::video_window_destroy(running_machine &machine)
 		}
 
 	// free the textures etc
-	execute_async_wait(&sdlwindow_video_window_destroy_wt, worker_param(machine, this));
+	execute_async_wait(&sdlwindow_video_window_destroy_wt, worker_param(this));
 
 	// free the render target, after the textures!
 	this->machine().render().target_free(m_target);
@@ -843,8 +879,8 @@ void sdl_window_info::pick_best_mode(int *fswidth, int *fsheight)
 	m_target->compute_minimum_size(minimum_width, minimum_height);
 
 	// use those as the target for now
-	target_width = minimum_width * MAX(1, m_prescale);
-	target_height = minimum_height * MAX(1, m_prescale);
+	target_width = minimum_width * MAX(1, prescale());
+	target_height = minimum_height * MAX(1, prescale());
 
 	// if we're not stretching, allow some slop on the minimum since we can handle it
 	{
@@ -910,8 +946,8 @@ void sdl_window_info::pick_best_mode(int *fswidth, int *fsheight)
 	m_target->compute_minimum_size(minimum_width, minimum_height);
 
 	// use those as the target for now
-	target_width = minimum_width * MAX(1, m_prescale);
-	target_height = minimum_height * MAX(1, m_prescale);
+	target_width = minimum_width * MAX(1, prescale());
+	target_height = minimum_height * MAX(1, prescale());
 
 	// if we're not stretching, allow some slop on the minimum since we can handle it
 	{
@@ -979,7 +1015,7 @@ void sdl_window_info::pick_best_mode(int *fswidth, int *fsheight)
 //  (main thread)
 //============================================================
 
-void sdl_window_info::video_window_update(running_machine &machine)
+void sdl_window_info::update()
 {
 	osd_ticks_t     event_wait_ticks;
 	ASSERT_MAIN_THREAD();
@@ -987,7 +1023,7 @@ void sdl_window_info::video_window_update(running_machine &machine)
 	// adjust the cursor state
 	//sdlwindow_update_cursor_state(machine, window);
 
-	execute_async(&sdlwindow_update_cursor_state_wt, worker_param(machine, this));
+	execute_async(&sdlwindow_update_cursor_state_wt, worker_param(this));
 
 	// if we're visible and running and not in the middle of a resize, draw
 	if (m_target != NULL)
@@ -1003,14 +1039,14 @@ void sdl_window_info::video_window_update(running_machine &machine)
 
 			if (!this->m_fullscreen)
 			{
-				blit_surface_size(m_width, m_height);
+				blit_surface_size(width(), height());
 				//Don't resize window without user interaction;
 				//window_resize(blitwidth, blitheight);
 			}
 			else if (video_config.switchres)
 			{
 				this->pick_best_mode(&tempwidth, &tempheight);
-				window_resize(tempwidth, tempheight);
+				resize(tempwidth, tempheight);
 			}
 		}
 
@@ -1031,13 +1067,14 @@ void sdl_window_info::video_window_update(running_machine &machine)
 			}
 
 			// ensure the target bounds are up-to-date, and then get the primitives
-			renderer().set_target_bounds();
+
+			m_target->set_bounds(m_blitwidth, m_blitheight, monitor()->aspect());
 
 			render_primitive_list &primlist = m_target->get_primitives();
 
 			// and redraw now
 
-			execute_async(&draw_video_contents_wt, worker_param(machine, this, primlist));
+			execute_async(&draw_video_contents_wt, worker_param(this, primlist));
 		}
 	}
 }
@@ -1048,7 +1085,7 @@ void sdl_window_info::video_window_update(running_machine &machine)
 //  (main thread)
 //============================================================
 
-static void set_starting_view(running_machine &machine, int index, sdl_window_info *window, const char *defview, const char *view)
+void sdl_window_info::set_starting_view(running_machine &machine, int index, const char *defview, const char *view)
 {
 	int viewindex;
 
@@ -1059,11 +1096,11 @@ static void set_starting_view(running_machine &machine, int index, sdl_window_in
 		view = defview;
 
 	// query the video system to help us pick a view
-	viewindex = window->m_target->configured_view(view, index, video_config.numscreens);
+	viewindex = target()->configured_view(view, index, video_config.numscreens);
 
 	// set the view
-	window->m_target->set_view(viewindex);
-	window->m_start_viewscreen=viewindex;
+	target()->set_view(viewindex);
+	m_start_viewscreen=viewindex;
 }
 
 
@@ -1119,8 +1156,130 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 		}
 	}
 
+
+	// create the window .....
+
+	/* FIXME: On Ubuntu and potentially other Linux OS you should use
+	 * to disable panning. This has to be done before every invocation of mame.
+	 *
+	 * xrandr --output HDMI-0 --panning 0x0+0+0 --fb 0x0
+	 *
+	 */
+	osd_printf_verbose("Enter sdl_info::create\n");
+
+#if (SDLMAME_SDL2)
+
+	if (window->renderer().check_flag(osd_renderer::FLAG_NEEDS_OPENGL))
+	{
+		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
+
+		/* FIXME: A reminder that gamma is wrong throughout MAME. Currently, SDL2.0 doesn't seem to
+			* support the following attribute although my hardware lists GL_ARB_framebuffer_sRGB as an extension.
+			*
+			* SDL_GL_SetAttribute( SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, 1 );
+			*
+			*/
+		window->m_extra_flags = SDL_WINDOW_OPENGL;
+	}
+	else
+		window->m_extra_flags = 0;
+
+	// create the SDL window
+	// soft driver also used | SDL_WINDOW_INPUT_GRABBED | SDL_WINDOW_MOUSE_FOCUS
+	window->m_extra_flags |= (window->fullscreen() ?
+			SDL_WINDOW_BORDERLESS | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE);
+
+#if defined(SDLMAME_WIN32)
+	SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
+#endif
+	// create the SDL window
+	window->m_sdl_window = SDL_CreateWindow(window->m_title,
+			window->monitor()->position_size().x, window->monitor()->position_size().y,
+			tempwidth, tempheight, window->m_extra_flags);
+	//window().sdl_window() = SDL_CreateWindow(window().m_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+	//		width, height, m_extra_flags);
+
+	if  ( window->m_sdl_window == NULL )
+	{
+		if (window->renderer().check_flag(osd_renderer::FLAG_NEEDS_OPENGL))
+			osd_printf_error("OpenGL not supported on this driver: %s\n", SDL_GetError());
+		else
+			osd_printf_error("Window creation failed: %s\n", SDL_GetError());
+		return (void *) &result[1];
+	}
+
+	if (window->fullscreen() && video_config.switchres)
+	{
+		SDL_DisplayMode mode;
+		//SDL_GetCurrentDisplayMode(window().monitor()->handle, &mode);
+		SDL_GetWindowDisplayMode(window->sdl_window(), &mode);
+		window->m_original_mode = mode;
+		mode.w = tempwidth;
+		mode.h = tempheight;
+		if (window->m_refresh)
+			mode.refresh_rate = window->m_refresh;
+
+		SDL_SetWindowDisplayMode(window->sdl_window(), &mode);    // Try to set mode
+#ifndef SDLMAME_WIN32
+		/* FIXME: Warp the mouse to 0,0 in case a virtual desktop resolution
+		 * is in place after the mode switch - which will most likely be the case
+		 * This is a hack to work around a deficiency in SDL2
+		 */
+		SDL_WarpMouseInWindow(window->sdl_window(), 1, 1);
+#endif
+	}
+	else
+	{
+		//SDL_SetWindowDisplayMode(window().sdl_window(), NULL); // Use desktop
+	}
+
+	// show window
+
+	SDL_ShowWindow(window->sdl_window());
+	//SDL_SetWindowFullscreen(window().sdl_window(), window().fullscreen);
+	SDL_RaiseWindow(window->sdl_window());
+
+	SDL_GetWindowSize(window->sdl_window(), &window->m_width, &window->m_height);
+
+#else
+	window->m_extra_flags = (window->fullscreen() ?  SDL_FULLSCREEN : SDL_RESIZABLE);
+
+	if (window->renderer().check_flag(osd_renderer::FLAG_NEEDS_DOUBLEBUF))
+		window->m_extra_flags |= SDL_DOUBLEBUF;
+	if (window->renderer().check_flag(osd_renderer::FLAG_NEEDS_ASYNCBLIT))
+		window->m_extra_flags |= SDL_ASYNCBLIT;
+
+	if (window->renderer().check_flag(osd_renderer::FLAG_NEEDS_OPENGL))
+ {
+		window->m_extra_flags |= SDL_DOUBLEBUF | SDL_OPENGL;
+		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
+		#if (SDL_VERSION_ATLEAST(1,2,10)) && (!defined(SDLMAME_EMSCRIPTEN))
+		SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, video_config.waitvsync ? 1 : 0);
+		#endif
+			//load_gl_lib(window->machine());
+ }
+
+	// create the SDL surface (which creates the window in windowed mode)
+	window->m_sdlsurf = SDL_SetVideoMode(tempwidth, tempheight,
+							0, SDL_SWSURFACE  | SDL_ANYFORMAT | window->m_extra_flags);
+
+	if (!window->m_sdlsurf)
+		return (void *) &result[1];
+	if ( (video_config.mode  == VIDEO_MODE_OPENGL) && !(window->m_sdlsurf->flags & SDL_OPENGL) )
+	{
+		osd_printf_error("OpenGL not supported on this driver!\n");
+		return (void *) &result[1];
+	}
+
+	window->m_width = window->m_sdlsurf->w;
+	window->m_height = window->m_sdlsurf->h;
+
+	// set the window title
+	SDL_WM_SetCaption(window->m_title, "SDLMAME");
+#endif
+
 	// initialize the drawing backend
-	if (window->renderer().create(tempwidth, tempheight))
+	if (window->renderer().create(window->width(), window->height()))
 		return (void *) &result[1];
 
 	// Make sure we have a consistent state
@@ -1188,7 +1347,7 @@ OSDWORK_CALLBACK( sdl_window_info::draw_video_contents_wt )
 	ASSERT_REDRAW_THREAD();
 
 	// Some configurations require events to be polled in the worker thread
-	sdlinput_process_events_buf(wp->machine());
+	sdlinput_process_events_buf();
 
 	window->m_primlist = wp->list();
 

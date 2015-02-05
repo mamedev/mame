@@ -305,21 +305,21 @@ public:
 #define ADDRESS_MAP_START(_name, _space, _bits, _class) \
 void ADDRESS_MAP_NAME(_name)(address_map &map, device_t &device) \
 { \
-	typedef read##_bits##_delegate read_delegate; \
-	typedef write##_bits##_delegate write_delegate; \
+	typedef read##_bits##_delegate read_delegate ATTR_UNUSED; \
+	typedef write##_bits##_delegate write_delegate ATTR_UNUSED; \
 	address_map_entry##_bits *curentry = NULL; \
 	(void)curentry; \
 	map.configure(_space, _bits); \
-	typedef _class drivdata_class;
+	typedef _class drivdata_class ATTR_UNUSED;
 #define DEVICE_ADDRESS_MAP_START(_name, _bits, _class) \
 void _class :: _name(::address_map &map, device_t &device) \
 { \
-	typedef read##_bits##_delegate read_delegate; \
-	typedef write##_bits##_delegate write_delegate; \
+	typedef read##_bits##_delegate read_delegate ATTR_UNUSED; \
+	typedef write##_bits##_delegate write_delegate ATTR_UNUSED; \
 	address_map_entry##_bits *curentry = NULL; \
 	(void)curentry; \
 	map.configure(AS_PROGRAM, _bits);  \
-	typedef _class drivdata_class;
+	typedef _class drivdata_class ATTR_UNUSED;
 #define ADDRESS_MAP_END \
 }
 

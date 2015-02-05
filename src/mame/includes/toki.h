@@ -41,15 +41,15 @@ public:
 	tilemap_t *m_foreground_layer;
 	tilemap_t *m_text_layer;
 
-	DECLARE_WRITE16_MEMBER(tokib_soundcommand16_w);
-	DECLARE_READ16_MEMBER(pip16_r);
+	DECLARE_WRITE16_MEMBER(tokib_soundcommand_w);
+	DECLARE_READ16_MEMBER(pip_r);
 	DECLARE_WRITE16_MEMBER(toki_control_w);
 	DECLARE_WRITE16_MEMBER(foreground_videoram_w);
 	DECLARE_WRITE16_MEMBER(background1_videoram_w);
 	DECLARE_WRITE16_MEMBER(background2_videoram_w);
-	DECLARE_WRITE8_MEMBER(toki_adpcm_control_w);
-	DECLARE_WRITE8_MEMBER(toki_adpcm_data_w);
-	DECLARE_WRITE_LINE_MEMBER(toki_adpcm_int);
+	DECLARE_WRITE8_MEMBER(tokib_adpcm_control_w);
+	DECLARE_WRITE8_MEMBER(tokib_adpcm_data_w);
+	DECLARE_WRITE_LINE_MEMBER(tokib_adpcm_int);
 
 	DECLARE_DRIVER_INIT(tokib);
 	DECLARE_DRIVER_INIT(jujuba);

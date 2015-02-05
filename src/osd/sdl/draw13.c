@@ -118,7 +118,7 @@ public:
 
 private:
     Uint32              m_sdl_access;
-    SDL_Renderer *      m_renderer;
+    SDL_Renderer *      m_sdl_renderer;
     render_texinfo      m_texinfo;            // copy of the texture info
     HashT               m_hash;               // hash value for the texture (must be >= pointer size)
     UINT32              m_flags;              // rendering flags
@@ -143,17 +143,16 @@ class sdl_info13 : public osd_renderer
 {
 public:
     sdl_info13(sdl_window_info *w)
-    : osd_renderer(w), m_blittimer(0), m_renderer(NULL),
+    : osd_renderer(w, FLAG_NONE), m_blittimer(0), m_sdl_renderer(NULL),
       m_last_hofs(0), m_last_vofs(0),
       m_resize_pending(0), m_resize_width(0), m_resize_height(0),
       m_last_blit_time(0), m_last_blit_pixels(0)
     {}
 
-	/* virtual */ int create(int width, int height);
-	/* virtual */ void resize(int width, int height);
-	/* virtual */ int draw(UINT32 dc, int update);
-	/* virtual */ void set_target_bounds();
-	/* virtual */ int xy_to_render_target(int x, int y, int *xt, int *yt);
+	/* virtual */ int create(const int width, const int height);
+	/* virtual */ void resize(const int width, const int height);
+	/* virtual */ int draw(const UINT32 dc, const int update);
+	/* virtual */ int xy_to_render_target(const int x, const int y, int *xt, int *yt);
 	/* virtual */ void destroy_all_textures();
 	/* virtual */ void destroy();
 	/* virtual */ void clear();
@@ -164,9 +163,15 @@ public:
     texture_info *texture_update(const render_primitive &prim);
 
 	INT32           m_blittimer;
-	UINT32          m_extra_flags;
 
-	SDL_Renderer *  m_renderer;
+#if (SDLMAME_SDL2)
+	SDL_GLContext   m_gl_context_id;
+#else
+	// SDL surface
+	SDL_Surface         *m_sdlsurf;
+#endif
+
+	SDL_Renderer *  m_sdl_renderer;
 	simple_list<texture_info>  m_texlist;                // list of active textures
 
 	float           m_last_hofs;
@@ -181,9 +186,6 @@ public:
 	// Stats
 	INT64           m_last_blit_time;
 	INT64           m_last_blit_pixels;
-
-	// Original display_mode
-	SDL_DisplayMode m_original_mode;
 };
 
 struct copy_info_t {
@@ -201,6 +203,7 @@ struct copy_info_t {
 	/* list */
 	copy_info_t           *next;
 };
+
 
 //============================================================
 //  PROTOTYPES
@@ -386,7 +389,7 @@ void texture_info::render_quad(const render_primitive *prim, const int x, const 
 
 	SDL_SetTextureBlendMode(m_texture_id, m_sdl_blendmode);
 	set_coloralphamode(m_texture_id, &prim->color);
-	SDL_RenderCopy(m_renderer,  m_texture_id, NULL, &target_rect);
+	SDL_RenderCopy(m_sdl_renderer,  m_texture_id, NULL, &target_rect);
 }
 
 void sdl_info13::render_quad(texture_info *texture, const render_primitive *prim, const int x, const int y)
@@ -420,9 +423,9 @@ void sdl_info13::render_quad(texture_info *texture, const render_primitive *prim
 		UINT32 sb = (UINT32)(255.0f * prim->color.b);
 		UINT32 sa = (UINT32)(255.0f * prim->color.a);
 
-		SDL_SetRenderDrawBlendMode(m_renderer, map_blendmode(PRIMFLAG_GET_BLENDMODE(prim->flags)));
-		SDL_SetRenderDrawColor(m_renderer, sr, sg, sb, sa);
-		SDL_RenderFillRect(m_renderer, &target_rect);
+		SDL_SetRenderDrawBlendMode(m_sdl_renderer, map_blendmode(PRIMFLAG_GET_BLENDMODE(prim->flags)));
+		SDL_SetRenderDrawColor(m_sdl_renderer, sr, sg, sb, sa);
+		SDL_RenderFillRect(m_sdl_renderer, &target_rect);
 	}
 }
 
@@ -454,7 +457,7 @@ static int RendererSupportsFormat(SDL_Renderer *renderer, Uint32 format, Uint32 
 }
 
 //============================================================
-//  drawsdl2_init
+//  drawsdl_init
 //============================================================
 
 static void add_list(copy_info_t **head, copy_info_t *element, Uint32 bm)
@@ -518,25 +521,12 @@ int drawsdl2_init(running_machine &machine, sdl_draw_info *callbacks)
 	else
 		osd_printf_verbose("Loaded opengl shared library: %s\n", stemp ? stemp : "<default>");
 
-	/* Enable bilinear filtering in case it is supported.
-	 * This applies to all texture operations. However, artwort is pre-scaled
-	 * and thus shouldn't be affected.
-	 */
-	if (video_config.filter)
-	{
-		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
-	}
-	else
-	{
-		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
-	}
-
 	return 0;
 }
 
 
 //============================================================
-//  drawsdl2_exit
+//  drawsdl_exit
 //============================================================
 
 static void drawsdl2_exit(void)
@@ -588,83 +578,42 @@ static void drawsdl2_exit(void)
 
 int sdl_info13::create(int width, int height)
 {
-	/* FIXME: On Ubuntu and potentially other Linux OS you should use
-	 * to disable panning. This has to be done before every invocation of mame.
-	 *
-	 * xrandr --output HDMI-0 --panning 0x0+0+0 --fb 0x0
-	 *
-	 */
-
-	osd_printf_verbose("Enter sdl_info13::create\n");
-
-	// create the SDL window
-	m_extra_flags = (window().fullscreen() ?
-			SDL_WINDOW_BORDERLESS | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE);
-
-#if defined(SDLMAME_WIN32)
-	SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
-#endif
-	// create the SDL window
-	window().m_sdl_window = SDL_CreateWindow(window().m_title,
-			window().monitor()->position_size().x, window().monitor()->position_size().y,
-			width, height, m_extra_flags);
-
-	if  (!window().m_sdl_window )
-	{
-		osd_printf_error("Window creation failed: %s\n", SDL_GetError());
-		return 1;
-	}
-
-	if (window().fullscreen() && video_config.switchres)
-	{
-		SDL_DisplayMode mode;
-		//SDL_GetCurrentDisplayMode(window().monitor()->handle, &mode);
-		SDL_GetWindowDisplayMode(window().m_sdl_window, &mode);
-		m_original_mode = mode;
-		mode.w = width;
-		mode.h = height;
-		if (window().m_refresh)
-			mode.refresh_rate = window().m_refresh;
-
-		SDL_SetWindowDisplayMode(window().m_sdl_window, &mode);    // Try to set mode
-#ifndef SDLMAME_WIN32
-		/* FIXME: Warp the mouse to 0,0 in case a virtual desktop resolution
-		 * is in place after the mode switch - which will most likely be the case
-		 * This is a hack to work around a deficiency in SDL2
-		 */
-		SDL_WarpMouseInWindow(window().m_sdl_window, 1, 1);
-#endif
-	}
-	else
-	{
-		//SDL_SetWindowDisplayMode(window().m_sdl_window, NULL); // Use desktop
-	}
+#if (SDLMAME_SDL2)
 	// create renderer
 
-	if (video_config.waitvsync)
-		m_renderer = SDL_CreateRenderer(window().m_sdl_window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
+	/* Enable bilinear filtering in case it is supported.
+	 * This applies to all texture operations. However, artwort is pre-scaled
+	 * and thus shouldn't be affected.
+	 */
+	if (video_config.filter)
+	{
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+	}
 	else
-		m_renderer = SDL_CreateRenderer(window().m_sdl_window, -1, SDL_RENDERER_ACCELERATED);
+	{
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+	}
 
-	if (!m_renderer)
+	if (video_config.waitvsync)
+		m_sdl_renderer = SDL_CreateRenderer(window().sdl_window(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
+	else
+		m_sdl_renderer = SDL_CreateRenderer(window().sdl_window(), -1, SDL_RENDERER_ACCELERATED);
+
+	if (!m_sdl_renderer)
 	{
 		fatalerror("Error on creating renderer: %s\n", SDL_GetError());
 	}
 
 	//SDL_SelectRenderer(window().sdl_window);
 
-	// show window
-
-	SDL_ShowWindow(window().m_sdl_window);
-	//SDL_SetWindowFullscreen(window().sdl_window, window().fullscreen);
-	SDL_RaiseWindow(window().m_sdl_window);
-
-	SDL_GetWindowSize(window().m_sdl_window, &window().m_width, &window().m_height);
-
 	m_blittimer = 3;
 
-	SDL_RenderPresent(m_renderer);
+	SDL_RenderPresent(m_sdl_renderer);
 	osd_printf_verbose("Leave sdl_info13::create\n");
+
+#else
+
+#endif
 	return 0;
 }
 
@@ -674,16 +623,29 @@ int sdl_info13::create(int width, int height)
 
 void sdl_info13::resize(int width, int height)
 {
-	m_resize_pending = 1;
-	m_resize_height = height;
-	m_resize_width = width;
-
-	window().m_width = width;
-	window().m_height = height;
-
+	SDL_RenderSetViewport(m_sdl_renderer, NULL);
 	m_blittimer = 3;
-
 }
+
+
+//============================================================
+//  sdl_info::destroy
+//============================================================
+
+void sdl_info13::destroy()
+{
+	destroy_all_textures();
+}
+
+//============================================================
+//  sdl_info::clear
+//============================================================
+
+void sdl_info13::clear()
+{
+	m_blittimer = 2;
+}
+
 
 //============================================================
 //  drawsdl_xy_to_render_target
@@ -694,20 +656,27 @@ int sdl_info13::xy_to_render_target(int x, int y, int *xt, int *yt)
 
 	*xt = x - m_last_hofs;
 	*yt = y - m_last_vofs;
-	if (*xt<0 || *xt >= window().m_blitwidth)
+	if (*xt<0 || *xt >= window().blitwidth())
 		return 0;
-	if (*yt<0 || *yt >= window().m_blitheight)
+	if (*yt<0 || *yt >= window().blitheight())
 		return 0;
 	return 1;
 }
 
 //============================================================
-//  sdl_info::get_primitives
+//  drawsdl_destroy_all_textures
 //============================================================
 
-void sdl_info13::set_target_bounds()
+void sdl_info13::destroy_all_textures()
 {
-	window().m_target->set_bounds(window().m_blitwidth, window().m_blitheight, window().monitor()->aspect());
+	if(window().m_primlist)
+	{
+		window().m_primlist->acquire_lock();
+		m_texlist.reset();
+		window().m_primlist->release_lock();
+	}
+	else
+		m_texlist.reset();
 }
 
 //============================================================
@@ -726,25 +695,26 @@ int sdl_info13::draw(UINT32 dc, int update)
 		return 0;
 	}
 
+#if 0
 	if (m_resize_pending)
 	{
 		SDL_SetWindowSize(window().m_sdl_window, m_resize_width, m_resize_height);
-		SDL_GetWindowSize(window().m_sdl_window, &window().m_width, &window().m_height);
+		SDL_GetWindowSize(window().m_sdl_window, &window().width(), &window().height());
 		m_resize_pending = 0;
-		SDL_RenderSetViewport(m_renderer, NULL);
+		SDL_RenderSetViewport(m_sdl_renderer, NULL);
 		//sdlvideo_monitor_refresh(window().monitor());
 
 	}
-
+#endif
 	//SDL_SelectRenderer(window().sdl_window);
 
 	if (m_blittimer > 0)
 	{
 		/* SDL Underlays need alpha = 0 ! */
-		SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_NONE);
+		SDL_SetRenderDrawBlendMode(m_sdl_renderer, SDL_BLENDMODE_NONE);
 		//SDL_SetRenderDrawColor(0,0,0,255);
-		SDL_SetRenderDrawColor(m_renderer, 0,0,0,0);
-		SDL_RenderFillRect(m_renderer, NULL);
+		SDL_SetRenderDrawColor(m_sdl_renderer, 0,0,0,0);
+		SDL_RenderFillRect(m_sdl_renderer, NULL);
 		m_blittimer--;
 	}
 
@@ -762,17 +732,17 @@ int sdl_info13::draw(UINT32 dc, int update)
 		}
 		else
 		{
-			ch = window().m_height;
-			cw = window().m_width;
+			ch = window().height();
+			cw = window().width();
 		}
 
 		if (video_config.centerv)
 		{
-			vofs = (ch - window().m_blitheight) / 2.0f;
+			vofs = (ch - window().blitheight()) / 2.0f;
 		}
 		if (video_config.centerh)
 		{
-			hofs = (cw - window().m_blitwidth) / 2.0f;
+			hofs = (cw - window().blitwidth()) / 2.0f;
 		}
 	}
 
@@ -794,9 +764,9 @@ int sdl_info13::draw(UINT32 dc, int update)
 				sb = (int)(255.0f * prim->color.b);
 				sa = (int)(255.0f * prim->color.a);
 
-				SDL_SetRenderDrawBlendMode(m_renderer, map_blendmode(PRIMFLAG_GET_BLENDMODE(prim->flags)));
-				SDL_SetRenderDrawColor(m_renderer, sr, sg, sb, sa);
-				SDL_RenderDrawLine(m_renderer, prim->bounds.x0 + hofs, prim->bounds.y0 + vofs,
+				SDL_SetRenderDrawBlendMode(m_sdl_renderer, map_blendmode(PRIMFLAG_GET_BLENDMODE(prim->flags)));
+				SDL_SetRenderDrawColor(m_sdl_renderer, sr, sg, sb, sa);
+				SDL_RenderDrawLine(m_sdl_renderer, prim->bounds.x0 + hofs, prim->bounds.y0 + vofs,
 						prim->bounds.x1 + hofs, prim->bounds.y1 + vofs);
 				break;
 			case render_primitive::QUAD:
@@ -816,43 +786,12 @@ int sdl_info13::draw(UINT32 dc, int update)
 
 	m_last_blit_pixels = blit_pixels;
 	m_last_blit_time = -osd_ticks();
-	SDL_RenderPresent(m_renderer);
+	SDL_RenderPresent(m_sdl_renderer);
 	m_last_blit_time += osd_ticks();
 
 	return 0;
 }
 
-
-//============================================================
-//  sdl_info13::clear
-//============================================================
-
-void sdl_info13::clear()
-{
-	m_blittimer = 2;
-}
-
-
-//============================================================
-//  sdl_info13::destroy
-//============================================================
-
-void sdl_info13::destroy()
-{
-	// free the memory in the window
-
-	destroy_all_textures();
-
-	if (window().fullscreen() && video_config.switchres)
-	{
-		SDL_SetWindowFullscreen(window().m_sdl_window, 0);    // Try to set mode
-		SDL_SetWindowDisplayMode(window().m_sdl_window, &m_original_mode);    // Try to set mode
-		SDL_SetWindowFullscreen(window().m_sdl_window, SDL_WINDOW_FULLSCREEN);    // Try to set mode
-	}
-
-	SDL_DestroyWindow(window().m_sdl_window);
-
-}
 
 //============================================================
 //  texture handling
@@ -873,7 +812,7 @@ copy_info_t *texture_info::compute_size_type()
 		if ((m_is_rotated == bi->blitter->m_is_rot)
 				&& (m_sdl_blendmode == bi->bm_mask))
 		{
-			if (RendererSupportsFormat(m_renderer, bi->dst_fmt, m_sdl_access, bi->dstname))
+			if (RendererSupportsFormat(m_sdl_renderer, bi->dst_fmt, m_sdl_access, bi->dstname))
 			{
 				int perf = bi->perf;
 				if (perf == 0)
@@ -893,7 +832,7 @@ copy_info_t *texture_info::compute_size_type()
 	{
 		if ((m_is_rotated == bi->blitter->m_is_rot)
 			&& (m_sdl_blendmode == bi->bm_mask))
-			if (RendererSupportsFormat(m_renderer, bi->dst_fmt, m_sdl_access, bi->dstname))
+			if (RendererSupportsFormat(m_sdl_renderer, bi->dst_fmt, m_sdl_access, bi->dstname))
 				return bi;
 	}
 	//FIXME: crash implement a -do nothing handler */
@@ -931,7 +870,7 @@ bool texture_info::matches(const render_primitive &prim, const quad_setup_data &
 texture_info::texture_info(SDL_Renderer *renderer, const render_texinfo &texsource, const quad_setup_data &setup, UINT32 flags)
 {
 	// fill in the core data
-	m_renderer = renderer;
+	m_sdl_renderer = renderer;
 	m_hash = texture_compute_hash(texsource, flags);
 	m_flags = flags;
 	m_texinfo = texsource;
@@ -980,7 +919,7 @@ texture_info::texture_info(SDL_Renderer *renderer, const render_texinfo &texsour
 
 	m_copyinfo = compute_size_type();
 
-	m_texture_id = SDL_CreateTexture(m_renderer, m_copyinfo->dst_fmt, m_sdl_access,
+	m_texture_id = SDL_CreateTexture(m_sdl_renderer, m_copyinfo->dst_fmt, m_sdl_access,
 			m_setup.rotwidth, m_setup.rotheight);
 
 	if (!m_texture_id)
@@ -1153,7 +1092,7 @@ texture_info * sdl_info13::texture_update(const render_primitive &prim)
 	// if we didn't find one, create a new texture
 	if (texture == NULL && prim.texture.base != NULL)
 	{
-		texture = global_alloc(texture_info(m_renderer, prim.texture, setup, prim.flags));
+		texture = global_alloc(texture_info(m_sdl_renderer, prim.texture, setup, prim.flags));
 		/* add us to the texture list */
 		m_texlist.prepend(*texture);
 
@@ -1172,15 +1111,3 @@ texture_info * sdl_info13::texture_update(const render_primitive &prim)
 	return texture;
 }
 
-
-void sdl_info13::destroy_all_textures()
-{
-	if(window().m_primlist)
-	{
-		window().m_primlist->acquire_lock();
-		m_texlist.reset();
-		window().m_primlist->release_lock();
-	}
-	else
-		m_texlist.reset();
-}
