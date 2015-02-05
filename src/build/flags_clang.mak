@@ -5,9 +5,6 @@ CCOMFLAGS += \
 # caused by obj/sdl64d/emu/cpu/tms57002/tms57002.inc
 CCOMFLAGS += -Wno-self-assign-field
 
-# caused by src/mame/video/jagblit.inc on older clang versions
-#CCOMFLAGS += -Wno-constant-logical-operand
-
 # caused by popmessage(NULL) on older clang versions
 #CCOMFLAGS += -Wno-format-security
 
@@ -32,6 +29,9 @@ TEST_CLANG := $(shell clang --version)
 
 ifeq ($(findstring 3.4,$(TEST_CLANG)),3.4)
 CCOMFLAGS += -Wno-inline-new-delete
+
+# caused by src/mame/video/jagblit.inc
+CCOMFLAGS += -Wno-constant-logical-operand
 endif
 
 ifeq ($(findstring 3.5,$(TEST_CLANG)),3.5)
