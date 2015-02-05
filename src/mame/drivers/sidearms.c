@@ -768,7 +768,52 @@ ROM_START( sidearms )
 	ROM_LOAD( "63s081.3j",    0x0300, 0x0020, CRC(c5817816) SHA1(cc642daafa0bcb160ee04e74e2d168fd44087608) )    // unknown
 ROM_END
 
-ROM_START( sidearmsr )
+ROM_START( sidearmsu )
+	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + banked ROMs images */
+	ROM_LOAD( "SAA_03.15E",   0x00000, 0x08000, CRC(32ef2739) SHA1(15e0535a6e3508c0d1ed73157a052c3716571000) )        /* CODE */
+	ROM_LOAD( "a_14e.rom",    0x10000, 0x08000, CRC(4925ed03) SHA1(b11dbd9889db89cff008ca21beb6b1b70d983e16) )        /* 0+1 */
+	ROM_LOAD( "a_12e.rom",    0x18000, 0x08000, CRC(81d0ece7) SHA1(5c1d154f9c1de6b5f5d7abf5d413e9c493461e6f) )        /* 2+3 */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "a_04k.rom",    0x0000, 0x8000, CRC(34efe2d2) SHA1(e1d8895c113e4dee1a132e2471d75dfa6c36b620) )
+
+	ROM_REGION( 0x08000, "user1", 0 )    /* starfield data */
+	ROM_LOAD( "b_11j.rom",    0x0000, 0x8000, CRC(134dc35b) SHA1(6360c1efa7c4e1d6d817a97ca43dd4af8ed6afe5) )
+
+	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_LOAD( "a_10j.rom",    0x00000, 0x4000, CRC(651fef75) SHA1(9c821a2ee30c222987f0d4192133776490d6a4e0) ) /* characters */
+
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD( "b_13d.rom",    0x00000, 0x8000, CRC(3c59afe1) SHA1(5459a5795cf13012674993aa55bbd39e9a5c2f1b) ) /* tiles */
+	ROM_LOAD( "b_13e.rom",    0x08000, 0x8000, CRC(64bc3b77) SHA1(54fe6f258fda509a92eb0f5aa238102efce729e0) )
+	ROM_LOAD( "b_13f.rom",    0x10000, 0x8000, CRC(e6bcea6f) SHA1(19477e284967beafc4e7cd0d0da3534eb6dec388) )
+	ROM_LOAD( "b_13g.rom",    0x18000, 0x8000, CRC(c71a3053) SHA1(963e105aa0b0174e8aa5e1f7676c5c604ca72d1c) )
+	ROM_LOAD( "b_14d.rom",    0x20000, 0x8000, CRC(826e8a97) SHA1(ad5ed9a81805dde54fb2703345b2ab7b56853ec6) )
+	ROM_LOAD( "b_14e.rom",    0x28000, 0x8000, CRC(6cfc02a4) SHA1(491e880e85d5256fa2eea6d0fb402f0a1176b675) )
+	ROM_LOAD( "b_14f.rom",    0x30000, 0x8000, CRC(9b9f6730) SHA1(0f8fe5dc32ee50ebb2051c0c0c4d635582416317) )
+	ROM_LOAD( "b_14g.rom",    0x38000, 0x8000, CRC(ef6af630) SHA1(499b17eeb5e7256ede477510b0547df520316996) )
+
+	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_LOAD( "b_11b.rom",    0x00000, 0x8000, CRC(eb6f278c) SHA1(15e250aa98ee69ac3983d4511976c35833b37cab) ) /* sprites */
+	ROM_LOAD( "b_13b.rom",    0x08000, 0x8000, CRC(e91b4014) SHA1(6557344ce8bc05309ab8ebe846871ed554b256b8) )
+	ROM_LOAD( "b_11a.rom",    0x10000, 0x8000, CRC(2822c522) SHA1(00b3cab899e5ac1af6300f2ec2a54303df9ab014) )
+	ROM_LOAD( "b_13a.rom",    0x18000, 0x8000, CRC(3e8a9f75) SHA1(b1bfb7604791950aa0454b68b24f6ad3b9131be8) )
+	ROM_LOAD( "b_12b.rom",    0x20000, 0x8000, CRC(86e43eda) SHA1(c33b0ab6f7f0f886410a3943988b737d175635be) )
+	ROM_LOAD( "b_14b.rom",    0x28000, 0x8000, CRC(076e92d1) SHA1(27144834b5b2849be8c46e97aaaeaa8b304ea810) )
+	ROM_LOAD( "b_12a.rom",    0x30000, 0x8000, CRC(ce107f3c) SHA1(2235281449247cb2446b008b36077788c5b15026) )
+	ROM_LOAD( "b_14a.rom",    0x38000, 0x8000, CRC(dba06076) SHA1(87b3b3437bc4bd727ce7e34dd914e6fe23bcac3d) )
+
+	ROM_REGION( 0x08000, "gfx4", 0 )    /* background tilemaps */
+	ROM_LOAD( "b_03d.rom",    0x0000, 0x8000, CRC(6f348008) SHA1(b500bc32ba47e9cc9dcf2254b9455ac4d61992db) )
+
+	ROM_REGION( 0x0320, "proms", 0 )
+	ROM_LOAD( "63s141.16h",   0x0000, 0x0100, CRC(75af3553) SHA1(14da009592877a6097b34ea844fa897ceda7465e) )    // timing
+	ROM_LOAD( "63s141.11h",   0x0100, 0x0100, CRC(a6e4d68f) SHA1(b9367e0c959cdf0397d33a49d778a66a407572b7) )    // color mixing
+	ROM_LOAD( "63s141.15h",   0x0200, 0x0100, CRC(c47c182a) SHA1(47d6139256e6838f633a04084bd0a7a84912f7fb) )    // timing
+	ROM_LOAD( "63s081.3j",    0x0300, 0x0020, CRC(c5817816) SHA1(cc642daafa0bcb160ee04e74e2d168fd44087608) )    // unknown
+ROM_END
+
+ROM_START( sidearmsur1 )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + banked ROMs images */
 	ROM_LOAD( "03",           0x00000, 0x08000, CRC(9a799c45) SHA1(cf6836108506929ee2449546a4867a7cbf00bcc8) )        /* CODE */
 	ROM_LOAD( "a_14e.rom",    0x10000, 0x08000, CRC(4925ed03) SHA1(b11dbd9889db89cff008ca21beb6b1b70d983e16) )        /* 0+1 */
@@ -1106,13 +1151,19 @@ DRIVER_INIT_MEMBER(sidearms_state,whizz)
 	m_gameid = 3;
 }
 
-GAME( 1986, sidearms, 0,        sidearms, sidearms, sidearms_state, sidearms, ROT0,   "Capcom", "Side Arms - Hyper Dyne (World)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1986, sidearmsr,sidearms, sidearms, sidearms, sidearms_state, sidearms, ROT0,   "Capcom (Romstar license)", "Side Arms - Hyper Dyne (US)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1986, sidearmsj,sidearms, sidearms, sidearms, sidearms_state, sidearms, ROT0,   "Capcom", "Side Arms - Hyper Dyne (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, turtship, 0,        turtship, turtship, sidearms_state, turtship, ROT0,   "Philko (Sharp Image license)", "Turtle Ship (North America)", 0 )
+// date string is at 0xaa2 in 'rom 03' it does not appear to be displayed
+
+GAME( 1986, sidearms,   0,        sidearms, sidearms, sidearms_state, sidearms, ROT0,   "Capcom",                   "Side Arms - Hyper Dyne (World, 861129)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1986, sidearmsu,  sidearms, sidearms, sidearms, sidearms_state, sidearms, ROT0,   "Capcom (Romstar license)", "Side Arms - Hyper Dyne (US, 861202)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1986, sidearmsur1,sidearms, sidearms, sidearms, sidearms_state, sidearms, ROT0,   "Capcom (Romstar license)", "Side Arms - Hyper Dyne (US, 861128)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1986, sidearmsj,  sidearms, sidearms, sidearms, sidearms_state, sidearms, ROT0,   "Capcom",                   "Side Arms - Hyper Dyne (Japan, 861128)", GAME_IMPERFECT_GRAPHICS )
+
+GAME( 1988, turtship, 0,        turtship, turtship, sidearms_state, turtship, ROT0,   "Philko (Sharp Image license)",   "Turtle Ship (North America)", 0 )
 GAME( 1988, turtshipj,turtship, turtship, turtship, sidearms_state, turtship, ROT0,   "Philko (Pacific Games license)", "Turtle Ship (Japan)", 0 )
-GAME( 1988, turtshipk,turtship, turtship, turtship, sidearms_state, turtship, ROT0,   "Philko", "Turtle Ship (Korea)", 0 )
+GAME( 1988, turtshipk,turtship, turtship, turtship, sidearms_state, turtship, ROT0,   "Philko",                         "Turtle Ship (Korea)", 0 )
+
 GAME( 1989, dyger,    0,        turtship, dyger, sidearms_state,    dyger,    ROT270, "Philko", "Dyger (Korea set 1)", 0 )
 GAME( 1989, dygera,   dyger,    turtship, dyger, sidearms_state,    dyger,    ROT270, "Philko", "Dyger (Korea set 2)", 0 )
+
 GAME( 1989, twinfalc, 0,        whizz,    whizz, sidearms_state,    whizz,    ROT0,   "Philko (Poara Enterprises license)", "Twin Falcons", 0 )
-GAME( 1989, whizz,    twinfalc, whizz,    whizz, sidearms_state,    whizz,    ROT0,   "Philko", "Whizz", 0 )
+GAME( 1989, whizz,    twinfalc, whizz,    whizz, sidearms_state,    whizz,    ROT0,   "Philko",                             "Whizz", 0 )
