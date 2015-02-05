@@ -62,8 +62,6 @@ endif
 
 ifeq ($(findstring 3.6,$(TEST_CLANG)),3.6)
 CCOMFLAGS += -Wno-inline-new-delete
-# caused by macros in src/emu/addrmap.h
-CCOMFLAGS += -Wno-unused-local-typedef
 
 # caused by src/mess/drivers/x07.c, src/osd/sdl/window.c, src/emu/sound/disc_mth.inc, src/mame/video/chihiro.c
 CCOMFLAGS += -Wno-absolute-value
