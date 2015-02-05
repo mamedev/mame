@@ -141,7 +141,7 @@ int sdl_info_bgfx::create(int width, int height)
 
 	m_blittimer = 3;
 
-	bgfx::sdlSetWindow(window().m_sdl_window);
+	bgfx::sdlSetWindow(window().sdl_window());
 	bgfx::init();
 	bgfx::reset(window().width(), window().height(), BGFX_RESET_VSYNC);
 	
