@@ -35,11 +35,11 @@
 #include "config.h"
 #include "winutf8.h"
 
-extern int drawnone_init(running_machine &machine, win_draw_callbacks *callbacks);
-extern int drawgdi_init(running_machine &machine, win_draw_callbacks *callbacks);
-extern int drawdd_init(running_machine &machine, win_draw_callbacks *callbacks);
-extern int drawd3d_init(running_machine &machine, win_draw_callbacks *callbacks);
-extern int drawbgfx_init(running_machine &machine, win_draw_callbacks *callbacks);
+extern int drawnone_init(running_machine &machine, osd_draw_callbacks *callbacks);
+extern int drawgdi_init(running_machine &machine, osd_draw_callbacks *callbacks);
+extern int drawdd_init(running_machine &machine, osd_draw_callbacks *callbacks);
+extern int drawd3d_init(running_machine &machine, osd_draw_callbacks *callbacks);
+extern int drawbgfx_init(running_machine &machine, osd_draw_callbacks *callbacks);
 
 
 //============================================================
@@ -107,7 +107,7 @@ static DWORD window_threadid;
 
 static DWORD last_update_time;
 
-static win_draw_callbacks draw;
+static osd_draw_callbacks draw;
 
 static HANDLE ui_pause_event;
 static HANDLE window_thread_ready_event;
@@ -320,7 +320,7 @@ win_window_info::win_window_info(running_machine &machine)
 		m_lastclicktime(0),
 		m_lastclickx(0),
 		m_lastclicky(0),
-		m_drawdata(NULL),
+		m_renderer(NULL),
 		m_machine(machine)
 {
 	memset(m_title,0,sizeof(m_title));
@@ -504,9 +504,6 @@ void winwindow_dispatch_message(running_machine &machine, MSG *message)
 
 void winwindow_take_snap(void)
 {
-	if (draw.window_record == NULL)
-		return;
-
 	win_window_info *window;
 
 	assert(GetCurrentThreadId() == main_threadid);
@@ -514,7 +511,7 @@ void winwindow_take_snap(void)
 	// iterate over windows and request a snap
 	for (window = win_window_list; window != NULL; window = window->m_next)
 	{
-		(*draw.window_save)(window);
+		window->m_renderer->save();
 	}
 }
 
@@ -527,9 +524,6 @@ void winwindow_take_snap(void)
 
 void winwindow_toggle_fsfx(void)
 {
-	if (draw.window_toggle_fsfx == NULL)
-		return;
-
 	win_window_info *window;
 
 	assert(GetCurrentThreadId() == main_threadid);
@@ -537,7 +531,7 @@ void winwindow_toggle_fsfx(void)
 	// iterate over windows and request a snap
 	for (window = win_window_list; window != NULL; window = window->m_next)
 	{
-		(*draw.window_toggle_fsfx)(window);
+		window->m_renderer->toggle_fsfx();
 	}
 }
 
@@ -550,9 +544,6 @@ void winwindow_toggle_fsfx(void)
 
 void winwindow_take_video(void)
 {
-	if (draw.window_record == NULL)
-		return;
-
 	win_window_info *window;
 
 	assert(GetCurrentThreadId() == main_threadid);
@@ -560,7 +551,7 @@ void winwindow_take_video(void)
 	// iterate over windows and request a snap
 	for (window = win_window_list; window != NULL; window = window->m_next)
 	{
-		(*draw.window_record)(window);
+		window->m_renderer->record();
 	}
 }
 
@@ -812,7 +803,7 @@ void win_window_info::update()
 	}
 
 	// if we're visible and running and not in the middle of a resize, draw
-	if (m_hwnd != NULL && m_target != NULL && m_drawdata != NULL)
+	if (m_hwnd != NULL && m_target != NULL)
 	{
 		int got_lock = TRUE;
 
@@ -835,7 +826,7 @@ void win_window_info::update()
 			osd_lock_release(m_render_lock);
 
 			// ensure the target bounds are up-to-date, and then get the primitives
-			primlist = (*draw.window_get_primitives)(this);
+			primlist = m_renderer->get_primitives();
 
 			// post a redraw request with the primitive list as a parameter
 			last_update_time = timeGetTime();
@@ -1241,7 +1232,8 @@ static int complete_create(win_window_info *window)
 	if (!window->m_fullscreen || window->m_fullscreen_safe)
 	{
 		// finish off by trying to initialize DirectX; if we fail, ignore it
-		if ((*draw.window_init)(window))
+		window->m_renderer = draw.create(window);
+		if (window->m_renderer->init())
 			return 1;
 		ShowWindow(window->m_hwnd, SW_SHOW);
 	}
@@ -1417,7 +1409,9 @@ LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wpar
 
 		// destroy: clean up all attached rendering bits and NULL out our hwnd
 		case WM_DESTROY:
-			(*draw.window_destroy)(window);
+			window->m_renderer->destroy();
+			global_free(window->m_renderer);
+			window->m_renderer = NULL;
 			window->m_hwnd = NULL;
 			return DefWindowProc(wnd, message, wparam, lparam);
 
@@ -1501,7 +1495,7 @@ static void draw_video_contents(win_window_info *window, HDC dc, int update)
 		// otherwise, render with our drawing system
 		else
 		{
-			(*draw.window_draw)(window, dc, update);
+			window->m_renderer->draw(dc, update);
 			mtlog_add("draw_video_contents: drawing finished");
 		}
 	}
@@ -1871,7 +1865,9 @@ static void set_fullscreen(win_window_info *window, int fullscreen)
 	window->m_fullscreen = fullscreen;
 
 	// kill off the drawers
-	(*draw.window_destroy)(window);
+	window->m_renderer->destroy();
+	global_free(window->m_renderer);
+	window->m_renderer = NULL;
 
 	// hide ourself
 	ShowWindow(window->m_hwnd, SW_HIDE);
@@ -1927,7 +1923,8 @@ static void set_fullscreen(win_window_info *window, int fullscreen)
 	{
 		if (video_config.mode != VIDEO_MODE_NONE)
 			ShowWindow(window->m_hwnd, SW_SHOW);
-		if ((*draw.window_init)(window))
+		window->m_renderer = draw.create(window);
+		if (window->m_renderer->init())
 			exit(1);
 	}
 
