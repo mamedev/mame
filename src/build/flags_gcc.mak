@@ -1,10 +1,6 @@
 # TODO: needs to use $(CC)
 TEST_GCC := $(shell gcc --version)
 
-ifdef CPP11
-	CPPONLYFLAGS += -Wno-literal-suffix
-endif
-
 ifeq ($(findstring 4.7.,$(TEST_GCC)),4.7.)
 	CCOMFLAGS += -Wno-narrowing -Wno-attributes
 endif

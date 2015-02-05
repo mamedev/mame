@@ -24,7 +24,7 @@ CCOMFLAGS += -fsanitize-memory-track-origins -fPIE
 endif
 
 ifdef CPP11
-CCOMFLAGS += -Wno-deprecated-register -Wno-reserved-user-defined-literal -Wno-c++11-narrowing
+CCOMFLAGS += -Wno-deprecated-register -Wno-c++11-narrowing
 endif
 
 # TODO: needs to use $(CC)
