@@ -23,6 +23,10 @@ ifneq (,$(findstring memory,$(SANITIZE)))
 CCOMFLAGS += -fsanitize-memory-track-origins -fPIE
 endif
 
+ifdef CPP11
+CCOMFLAGS += -Wno-deprecated-register -Wno-reserved-user-defined-literal -Wno-c++11-narrowing
+endif
+
 # TODO: needs to use $(CC)
 TEST_CLANG := $(shell clang --version)
 
@@ -32,8 +36,6 @@ endif
 
 ifeq ($(findstring 3.5,$(TEST_CLANG)),3.5)
 CCOMFLAGS += -Wno-inline-new-delete
-# these show up when compiling as c++11
-CCOMFLAGS += -Wno-deprecated-register -Wno-reserved-user-defined-literal -Wno-c++11-narrowing
 
 # caused by src/mess/drivers/x07.c, src/osd/sdl/window.c, src/emu/sound/disc_mth.inc, src/mame/video/chihiro.c
 CCOMFLAGS += -Wno-absolute-value
