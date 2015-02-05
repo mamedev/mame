@@ -1473,7 +1473,7 @@ void sdl_osd_interface::input_exit()
 //  sdlinput_get_focus_window
 //============================================================
 
-sdl_window_info *sdlinput_get_focus_window(running_machine &machine)
+sdl_window_info *sdlinput_get_focus_window()
 {
 	if (focus_window)  // only be set on SDL >= 1.3
 		return focus_window;
@@ -1566,7 +1566,7 @@ INLINE void resize_all_windows(void)
 		{
 			if (w->m_resize_width && w->m_resize_height && ((now - w->m_last_resize) > osd_ticks_per_second() / 10))
 			{
-				w->window_resize(w->m_resize_width, w->m_resize_height);
+				w->resize(w->m_resize_width, w->m_resize_height);
 				w->m_resize_width = 0;
 				w->m_resize_height = 0;
 			}
@@ -1576,7 +1576,7 @@ INLINE void resize_all_windows(void)
 
 #endif
 
-void sdlinput_process_events_buf(running_machine &machine)
+void sdlinput_process_events_buf()
 {
 	SDL_Event event;
 
@@ -1944,7 +1944,7 @@ void sdlinput_poll(running_machine &machine)
 			machine.schedule_exit();
 			break;
 		case SDL_VIDEORESIZE:
-			sdl_window_list->window_resize(event.resize.w, event.resize.h);
+			sdl_window_list->resize(event.resize.w, event.resize.h);
 			break;
 #else
 		case SDL_TEXTINPUT:
@@ -1977,7 +1977,7 @@ void sdlinput_poll(running_machine &machine)
 				app_has_mouse_focus = 0;
 				break;
 			case SDL_WINDOWEVENT_MOVED:
-				window->window_clear();
+				window->clear();
 				focus_window = window;
 				break;
 			case SDL_WINDOWEVENT_RESIZED:
@@ -1998,7 +1998,7 @@ void sdlinput_poll(running_machine &machine)
 					{
 						//printf("event data1,data2 %d x %d %ld\n", event.window.data1, event.window.data2, sizeof(SDL_Event));
 						if (event.window.data1 != window->width() || event.window.data2 != window->height())
-							window->window_resize(event.window.data1, event.window.data2);
+							window->resize(event.window.data1, event.window.data2);
 					}
 				}
 				focus_window = window;
@@ -2029,7 +2029,7 @@ void sdlinput_poll(running_machine &machine)
 //============================================================
 
 
-void  sdlinput_release_keys(running_machine &machine)
+void  sdlinput_release_keys()
 {
 	// FIXME: SDL >= 1.3 will nuke the window event buffer when
 	// a window is closed. This will leave keys in a pressed
@@ -2053,7 +2053,7 @@ void  sdlinput_release_keys(running_machine &machine)
 //  sdlinput_should_hide_mouse
 //============================================================
 
-int sdlinput_should_hide_mouse(running_machine &machine)
+int sdlinput_should_hide_mouse()
 {
 	// if we are paused, no
 	if (input_paused)

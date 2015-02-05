@@ -116,14 +116,15 @@ public:
 	}
 
 	int window_init();
+	void destroy();
 
-	void video_window_update(running_machine &machine);
-	void toggle_full_screen(running_machine &machine);
-	void modify_prescale(running_machine &machine, int dir);
-	void window_resize(INT32 width, INT32 height);
-	void window_clear();
+	void update();
+	void toggle_full_screen();
+	void modify_prescale(int dir);
+	void resize(INT32 width, INT32 height);
+	void clear();
+	int xy_to_render_target(int x, int y, int *xt, int *yt);
 
-	void video_window_destroy(running_machine &machine);
 	void get_min_bounds(int *window_width, int *window_height, int constrain);
 	void get_max_bounds(int *window_width, int *window_height, int constrain);
 
@@ -132,6 +133,7 @@ public:
 	int fullscreen() const { return m_fullscreen; }
 
 	void set_fullscreen(int afullscreen) { m_fullscreen = afullscreen; }
+	void update_cursor_state();
 
 	void blit_surface_size(int window_width, int window_height);
 	void pick_best_mode(int *fswidth, int *fsheight);
@@ -139,7 +141,6 @@ public:
 
 	int index() const { return m_index; }
 
-	int xy_to_render_target(int x, int y, int *xt, int *yt);
 
 
 	render_target *target() { return m_target; }

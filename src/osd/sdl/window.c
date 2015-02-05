@@ -100,26 +100,21 @@ static sdl_draw_info draw;
 
 struct worker_param {
 	worker_param()
-	: m_window(NULL), m_list(NULL), m_machine(NULL), m_resize_new_width(0), m_resize_new_height(0)
+	: m_window(NULL), m_list(NULL), m_resize_new_width(0), m_resize_new_height(0)
 	{
 	}
-	worker_param(running_machine &amachine, sdl_window_info *awindow)
-	: m_window(awindow), m_list(NULL), m_machine(&amachine), m_resize_new_width(0), m_resize_new_height(0)
-	{
-	}
-	worker_param(running_machine &amachine, sdl_window_info *awindow, render_primitive_list &alist)
-	: m_window(awindow), m_list(&alist), m_machine(&amachine), m_resize_new_width(0), m_resize_new_height(0)
+	worker_param(sdl_window_info *awindow, render_primitive_list &alist)
+	: m_window(awindow), m_list(&alist), m_resize_new_width(0), m_resize_new_height(0)
 	{
 	}
 	worker_param(sdl_window_info *awindow, int anew_width, int anew_height)
-	: m_window(awindow), m_list(NULL), m_machine(NULL), m_resize_new_width(anew_width), m_resize_new_height(anew_height)
+	: m_window(awindow), m_list(NULL), m_resize_new_width(anew_width), m_resize_new_height(anew_height)
 	{
 	}
 	worker_param(sdl_window_info *awindow)
-	: m_window(awindow), m_list(NULL), m_machine(NULL), m_resize_new_width(0), m_resize_new_height(0)
+	: m_window(awindow), m_list(NULL), m_resize_new_width(0), m_resize_new_height(0)
 	{
 	}
-	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
 	sdl_window_info *window() const { assert(m_window != NULL); return m_window; }
 	render_primitive_list *list() const { return m_list; }
 	int new_width() const { return m_resize_new_width; }
@@ -129,7 +124,6 @@ struct worker_param {
 private:
 	sdl_window_info *m_window;
 	render_primitive_list *m_list;
-	running_machine *m_machine;
 	int m_resize_new_width;
 	int m_resize_new_height;
 };
@@ -139,7 +133,6 @@ private:
 //  PROTOTYPES
 //============================================================
 
-static void sdlwindow_update_cursor_state(running_machine &machine, sdl_window_info *window);
 static void sdlwindow_sync(void);
 
 //============================================================
@@ -353,7 +346,7 @@ void sdl_osd_interface::window_exit()
 	{
 		sdl_window_info *temp = sdl_window_list;
 		sdl_window_list = temp->m_next;
-		temp->video_window_destroy(machine());
+		temp->destroy();
 		// free the window itself
 		global_free(temp);
 	}
@@ -462,7 +455,7 @@ void sdl_window_info::blit_surface_size(int window_width, int window_height)
 		newwidth = window_width;
 
 	if ((m_blitwidth != newwidth) || (m_blitheight != newheight))
-		window_clear();
+		clear();
 
 	m_blitwidth = newwidth;
 	m_blitheight = newheight;
@@ -503,13 +496,13 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_resize_wt )
 
 	window->blit_surface_size(window->m_width, window->m_height);
 
-	window->window_clear();
+	window->clear();
 
 	osd_free(wp);
 	return NULL;
 }
 
-void sdl_window_info::window_resize(INT32 width, INT32 height)
+void sdl_window_info::resize(INT32 width, INT32 height)
 {
 	ASSERT_MAIN_THREAD();
 
@@ -537,7 +530,7 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_clear_surface_wt )
 	return NULL;
 }
 
-void sdl_window_info::window_clear()
+void sdl_window_info::clear()
 {
 	worker_param wp;
 
@@ -592,7 +585,7 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_toggle_full_screen_wt )
 #endif
 
 
-	sdlinput_release_keys(wp->machine());
+	sdlinput_release_keys();
 
 	// toggle the window mode
 	window->set_fullscreen(!window->fullscreen());
@@ -602,11 +595,11 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_toggle_full_screen_wt )
 	return NULL;
 }
 
-void sdl_window_info::toggle_full_screen(running_machine &machine)
+void sdl_window_info::toggle_full_screen()
 {
 	ASSERT_MAIN_THREAD();
 
-	execute_async_wait(&sdlwindow_toggle_full_screen_wt, worker_param(machine, this));
+	execute_async_wait(&sdlwindow_toggle_full_screen_wt, worker_param(this));
 }
 
 OSDWORK_CALLBACK( sdl_window_info::destroy_all_textures_wt )
@@ -621,9 +614,9 @@ OSDWORK_CALLBACK( sdl_window_info::destroy_all_textures_wt )
 	return NULL;
 }
 
-void sdl_window_info::modify_prescale(running_machine &machine, int dir)
+void sdl_window_info::modify_prescale(int dir)
 {
-	worker_param wp = worker_param(machine, this);
+	worker_param wp = worker_param(this);
 	int new_prescale = prescale();
 
 	if (dir > 0 && prescale() < 3)
@@ -647,7 +640,7 @@ void sdl_window_info::modify_prescale(running_machine &machine, int dir)
 			execute_async_wait(destroy_all_textures_wt, wp);
 			m_prescale = new_prescale;
 		}
-		machine.ui().popup_time(1, "Prescale %d", prescale());
+		machine().ui().popup_time(1, "Prescale %d", prescale());
 	}
 }
 
@@ -656,7 +649,7 @@ void sdl_window_info::modify_prescale(running_machine &machine, int dir)
 //  (main or window thread)
 //============================================================
 
-static void sdlwindow_update_cursor_state(running_machine &machine, sdl_window_info *window)
+void sdl_window_info::update_cursor_state()
 {
 #if (USE_XINPUT)
 	// Hack for wii-lightguns:
@@ -671,22 +664,22 @@ static void sdlwindow_update_cursor_state(running_machine &machine, sdl_window_i
 #if (SDLMAME_SDL2)
 	// do not do mouse capture if the debugger's enabled to avoid
 	// the possibility of losing control
-	if (!(machine.debug_flags & DEBUG_FLAG_OSD_ENABLED))
+	if (!(machine().debug_flags & DEBUG_FLAG_OSD_ENABLED))
 	{
 		//FIXME: SDL1.3: really broken: the whole SDL code
 		//       will only work correct with relative mouse movements ...
-		if (!window->fullscreen() && !sdlinput_should_hide_mouse(machine))
+		if (!fullscreen() && !sdlinput_should_hide_mouse())
 		{
 			SDL_ShowCursor(SDL_ENABLE);
-			if (SDL_GetWindowGrab(window->sdl_window() ))
-				SDL_SetWindowGrab(window->sdl_window(), SDL_FALSE);
+			if (SDL_GetWindowGrab(sdl_window() ))
+				SDL_SetWindowGrab(sdl_window(), SDL_FALSE);
 			SDL_SetRelativeMouseMode(SDL_FALSE);
 		}
 		else
 		{
 			SDL_ShowCursor(SDL_DISABLE);
-			if (!SDL_GetWindowGrab(window->sdl_window()))
-				SDL_SetWindowGrab(window->sdl_window(), SDL_TRUE);
+			if (!SDL_GetWindowGrab(sdl_window()))
+				SDL_SetWindowGrab(sdl_window(), SDL_TRUE);
 			SDL_SetRelativeMouseMode(SDL_TRUE);
 		}
 		SDL_SetCursor(NULL); // Force an update in case the underlying driver has changed visibility
@@ -695,9 +688,9 @@ static void sdlwindow_update_cursor_state(running_machine &machine, sdl_window_i
 #else
 	// do not do mouse capture if the debugger's enabled to avoid
 	// the possibility of losing control
-	if (!(machine.debug_flags & DEBUG_FLAG_OSD_ENABLED))
+	if (!(machine().debug_flags & DEBUG_FLAG_OSD_ENABLED))
 	{
-		if ( window->fullscreen() || sdlinput_should_hide_mouse(machine) )
+		if ( fullscreen() || sdlinput_should_hide_mouse() )
 		{
 			SDL_ShowCursor(SDL_DISABLE);
 			if (!SDL_WM_GrabInput(SDL_GRAB_QUERY))
@@ -721,9 +714,9 @@ static void sdlwindow_update_cursor_state(running_machine &machine, sdl_window_i
 static OSDWORK_CALLBACK( sdlwindow_update_cursor_state_wt )
 {
 	worker_param *      wp = (worker_param *) param;
-	//sdl_window_info *   window = wp->window;
+	sdl_window_info *   window = wp->window();
 
-	sdlwindow_update_cursor_state(wp->machine(), wp->window());
+	window->update_cursor_state();
 
 	osd_free(wp);
 	return NULL;
@@ -794,8 +787,7 @@ int sdl_window_info::window_init()
 	return 0;
 
 error:
-	video_window_destroy(m_machine);
-	// free the window itself
+	destroy();
 	return 1;
 }
 
@@ -832,14 +824,14 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_video_window_destroy_wt )
 #endif
 
 	// release all keys ...
-	sdlinput_release_keys(wp->machine());
+	sdlinput_release_keys();
 
 
 	osd_free(wp);
 	return NULL;
 }
 
-void sdl_window_info::video_window_destroy(running_machine &machine)
+void sdl_window_info::destroy()
 {
 	sdl_window_info **prevptr;
 
@@ -860,7 +852,7 @@ void sdl_window_info::video_window_destroy(running_machine &machine)
 		}
 
 	// free the textures etc
-	execute_async_wait(&sdlwindow_video_window_destroy_wt, worker_param(machine, this));
+	execute_async_wait(&sdlwindow_video_window_destroy_wt, worker_param(this));
 
 	// free the render target, after the textures!
 	this->machine().render().target_free(m_target);
@@ -1023,7 +1015,7 @@ void sdl_window_info::pick_best_mode(int *fswidth, int *fsheight)
 //  (main thread)
 //============================================================
 
-void sdl_window_info::video_window_update(running_machine &machine)
+void sdl_window_info::update()
 {
 	osd_ticks_t     event_wait_ticks;
 	ASSERT_MAIN_THREAD();
@@ -1031,7 +1023,7 @@ void sdl_window_info::video_window_update(running_machine &machine)
 	// adjust the cursor state
 	//sdlwindow_update_cursor_state(machine, window);
 
-	execute_async(&sdlwindow_update_cursor_state_wt, worker_param(machine, this));
+	execute_async(&sdlwindow_update_cursor_state_wt, worker_param(this));
 
 	// if we're visible and running and not in the middle of a resize, draw
 	if (m_target != NULL)
@@ -1054,7 +1046,7 @@ void sdl_window_info::video_window_update(running_machine &machine)
 			else if (video_config.switchres)
 			{
 				this->pick_best_mode(&tempwidth, &tempheight);
-				window_resize(tempwidth, tempheight);
+				resize(tempwidth, tempheight);
 			}
 		}
 
@@ -1082,7 +1074,7 @@ void sdl_window_info::video_window_update(running_machine &machine)
 
 			// and redraw now
 
-			execute_async(&draw_video_contents_wt, worker_param(machine, this, primlist));
+			execute_async(&draw_video_contents_wt, worker_param(this, primlist));
 		}
 	}
 }
@@ -1355,7 +1347,7 @@ OSDWORK_CALLBACK( sdl_window_info::draw_video_contents_wt )
 	ASSERT_REDRAW_THREAD();
 
 	// Some configurations require events to be polled in the worker thread
-	sdlinput_process_events_buf(wp->machine());
+	sdlinput_process_events_buf();
 
 	window->m_primlist = wp->list();
 
