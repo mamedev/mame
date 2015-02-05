@@ -531,7 +531,7 @@ CONLYFLAGS += -std=gnu89
 ifdef CPP11
 CPPONLYFLAGS += -x c++ -std=gnu++11
 else
-CPPONLYFLAGS += -x c++ -std=gnu++89
+CPPONLYFLAGS += -x c++ -std=gnu++98
 endif
 COBJFLAGS += -x objective-c++
 
