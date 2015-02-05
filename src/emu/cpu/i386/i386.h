@@ -1187,6 +1187,14 @@ struct I386_CALL_GATE
 	void x87_fxtract(UINT8 modrm);
 	void x87_ftst(UINT8 modrm);
 	void x87_fxam(UINT8 modrm);
+	void x87_fcmovb_sti(UINT8 modrm);
+	void x87_fcmove_sti(UINT8 modrm);
+	void x87_fcmovbe_sti(UINT8 modrm);
+	void x87_fcmovu_sti(UINT8 modrm);
+	void x87_fcmovnb_sti(UINT8 modrm);
+	void x87_fcmovne_sti(UINT8 modrm);
+	void x87_fcmovnbe_sti(UINT8 modrm);
+	void x87_fcmovnu_sti(UINT8 modrm);
 	void x87_ficom_m16int(UINT8 modrm);
 	void x87_ficom_m32int(UINT8 modrm);
 	void x87_ficomp_m16int(UINT8 modrm);
@@ -1197,7 +1205,10 @@ struct I386_CALL_GATE
 	void x87_fcomp_m32real(UINT8 modrm);
 	void x87_fcomp_m64real(UINT8 modrm);
 	void x87_fcomp_sti(UINT8 modrm);
+	void x87_fcomi_sti(UINT8 modrm);
 	void x87_fcomip_sti(UINT8 modrm);
+	void x87_fucomi_sti(UINT8 modrm);
+	void x87_fucomip_sti(UINT8 modrm);
 	void x87_fcompp(UINT8 modrm);
 	void x87_fucom_sti(UINT8 modrm);
 	void x87_fucomp_sti(UINT8 modrm);
