@@ -803,7 +803,7 @@ void win_window_info::update()
 	}
 
 	// if we're visible and running and not in the middle of a resize, draw
-	if (m_hwnd != NULL && m_target != NULL)
+	if (m_hwnd != NULL && m_target != NULL && m_renderer != NULL)
 	{
 		int got_lock = TRUE;
 
