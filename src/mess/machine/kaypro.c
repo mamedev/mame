@@ -114,7 +114,7 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
 		m_floppy = m_floppy1->get_device();
 
 	m_fdc->set_floppy(m_floppy);
-	m_fdc->dden_w(BIT(data, 5)); // not connected
+	m_fdc->dden_w(BIT(data, 5));
 
 	if (m_floppy)
 	{
@@ -252,7 +252,7 @@ MACHINE_RESET_MEMBER( kaypro_state,kaypro )
 	m_system_port = 0x80;
 	m_fdc_rq = 0;
 	m_maincpu->reset();
-	timer_set(attotime::from_hz(1), TIMER_FLOPPY);   /* timer for rtc */
+	timer_set(attotime::from_hz(1), TIMER_FLOPPY);   /* kick-start the nmi timer */
 }
 
 
