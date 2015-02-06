@@ -37,6 +37,7 @@ private:
 		UINT8 last_sec;
 		UINT8 unused2[216];
 	} info;
+	static const format formats[];
 };
 
 extern const floppy_format_type FLOPPY_FLEX_FORMAT;
