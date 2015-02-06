@@ -186,7 +186,6 @@ MACHINE_RESET_MEMBER(pentagon_state,pentagon)
 	{
 		if (strcmp(machine().system().name, "pent1024")==0)
 			m_beta->enable();
-		m_beta->clear_status();
 	}
 	space.set_direct_update_handler(direct_update_delegate(FUNC(pentagon_state::pentagon_direct), this));
 

@@ -3022,7 +3022,8 @@ lwings2         // 11/1986 (c) 1986
 lwingsj         // 11/1986 (c) 1986
 lwingsb         // 11/1986 (c) 1986 (bootleg)
 sidearms        // 12/1986 (c) 1986 (World)
-sidearmsr       // 12/1986 (c) 1986 + Romstar license (US)
+sidearmsu       // 12/1986 (c) 1986 + Romstar license (US)
+sidearmsur1     // 12/1986 (c) 1986 + Romstar license (US)
 sidearmsj       // 12/1986 (c) 1986 (Japan)
 turtship        // (c) 1988 Philco (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
 turtshipj       // (c) 1988 Philco (NOT A CAPCOM GAME but runs on modified Sidearms hardware)
@@ -11211,6 +11212,7 @@ peps0042        // (c) 1996 IGT - International Game Technology
 peps0043        // (c) 1996 IGT - International Game Technology
 peps0045        // (c) 1996 IGT - International Game Technology
 peps0047        // (c) 1996 IGT - International Game Technology
+peps0090        // (c) 1996 IGT - International Game Technology
 peps0092        // (c) 1996 IGT - International Game Technology
 peps0206        // (c) 1996 IGT - International Game Technology
 peps0207        // (c) 1996 IGT - International Game Technology

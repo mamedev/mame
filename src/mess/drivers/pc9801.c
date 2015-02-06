@@ -13,7 +13,6 @@
     - Finish DIP-Switches support
     - text scrolling
     - GRCG+
-    - EGC
     - rewrite using slot devices
     - some later SWs put "Invalid command byte 05" (Absolutely Mahjong on Epson logo)
     - investigate on POR bit
@@ -78,7 +77,6 @@
     - Armored Flagship Atragon: needs HDD install
     - Arquephos: needs extra sound board(s)?
     - Asoko no Koufuku: black screen with BGM, waits at 0x225f6;
-    - Aura Battler Dumbine: upd7220: unimplemented FIGD, has layer clearance bugs on gameplay;
     - Band-Kun: (how to run this without installing?)
     - Battle Chess: wants some dip-switches to be on in DSW4, too slow during IA thinking?
     - Bishoujo Audition: Moans with a "(program) ended. remove the floppy disk and turn off the poewr."
@@ -106,6 +104,7 @@
     - Uchiyama Aki no Chou Bangai: keyboard irq is fussy (sometimes it doesn't register a key press);
     - Uno: uses EGC
     - Viper V16 Demo: moans with a JP message;
+    - Windows 2: EGC drawing issue (byte wide writes?)
 
     per-game TODO (PC-9821):
     - Battle Skin Panic: gfx bugs at the Gainax logo, it crashes after it;
@@ -115,6 +114,7 @@
     - Animahjong V3 makes advantage of the possibility of installing 2 sound boards, where SFX and BGMs are played on separate chips.
     - Apple Club 1/2 needs data disks to load properly;
     - Beast Lord: needs a titan.fnt, in MS-DOS
+    - To deprotect BASIC modules set 0xcd7 in ram to 0
 
 ========================================================================================
 
@@ -550,6 +550,7 @@ public:
 		INT16 count;
 		UINT16 leftover[4];
 		bool first;
+		bool init;
 	} m_egc;
 
 	/* PC9821 specific */
@@ -588,7 +589,6 @@ public:
 	DECLARE_WRITE16_MEMBER(upd7220_grcg_w);
 	void egc_blit_w(UINT32 offset, UINT16 data, UINT16 mem_mask);
 	UINT16 egc_blit_r(UINT32 offset, UINT16 mem_mask);
-	inline UINT16 egc_do_partial_op(int plane, UINT16 src, UINT16 pat, UINT16 dst);
 	UINT32 pc9801_286_a20(bool state);
 
 	DECLARE_READ8_MEMBER(ide_hack_r);
@@ -670,6 +670,8 @@ public:
 private:
 	UINT8 m_sdip_read(UINT16 port, UINT8 sdip_offset);
 	void m_sdip_write(UINT16 port, UINT8 sdip_offset,UINT8 data);
+	UINT16 egc_do_partial_op(int plane, UINT16 src, UINT16 pat, UINT16 dst);
+	UINT16 egc_shift(int plane, UINT16 val);
 public:
 	DECLARE_MACHINE_START(pc9801_common);
 	DECLARE_MACHINE_START(pc9801f);
@@ -1330,35 +1332,43 @@ WRITE8_MEMBER(pc9801_state::gvram_w)
 	m_video_ram_2[(offset>>1)+0x04000+m_vram_bank*0x10000] = (ram & (0xff00 >> mask)) | (data << mask);
 }
 
-inline UINT16 pc9801_state::egc_do_partial_op(int plane, UINT16 src, UINT16 pat, UINT16 dst)
+UINT16 pc9801_state::egc_shift(int plane, UINT16 val)
 {
-	UINT16 out = 0;
-	int src_off, dst_off;
-	UINT16 src_tmp = src;
-
+	int src_off = m_egc.regs[6] & 0xf, dst_off = (m_egc.regs[6] >> 4) & 0xf;
+	int left = src_off - dst_off, right = dst_off - src_off;
+	UINT16 out;
 	if(m_egc.regs[6] & 0x1000)
 	{
-		src_off = 15 - (m_egc.regs[6] & 0xf);
-		dst_off = 15 - ((m_egc.regs[6] >> 4) & 0xf);
+		if(right >= 0)
+		{
+			out = (val >> right) | m_egc.leftover[plane];
+			m_egc.leftover[plane] = val << (16 - right);
+		}
+		else
+		{
+			out = (val >> (16 - left)) | m_egc.leftover[plane];
+			m_egc.leftover[plane] = val << left;
+		}
 	}
 	else
 	{
-		src_off = m_egc.regs[6] & 0xf;
-		dst_off = (m_egc.regs[6] >> 4) & 0xf;
+		if(right >= 0)
+		{
+			out = (val << right) | m_egc.leftover[plane];
+			m_egc.leftover[plane] = val >> (16 - right);
+		}
+		else
+		{
+			out = (val << (16 - left)) | m_egc.leftover[plane];
+			m_egc.leftover[plane] = val >> left;
+		}
 	}
+	return out;
+}
 
-	if(src_off < dst_off)
-	{
-		src = src_tmp << (dst_off - src_off);
-		src |= m_egc.leftover[plane];
-		m_egc.leftover[plane] = src_tmp >> (16 - (dst_off - src_off));
-	}
-	else
-	{
-		src = src_tmp >> (src_off - dst_off);
-		src |= m_egc.leftover[plane];
-		m_egc.leftover[plane] = src_tmp << (16 - (src_off - dst_off));
-	}
+UINT16 pc9801_state::egc_do_partial_op(int plane, UINT16 src, UINT16 pat, UINT16 dst)
+{
+	UINT16 out = 0;
 
 	for(int i = 7; i >= 0; i--)
 	{
@@ -1375,33 +1385,43 @@ void pc9801_state::egc_blit_w(UINT32 offset, UINT16 data, UINT16 mem_mask)
 {
 	UINT16 mask = m_egc.regs[4] & mem_mask, out = 0;
 	bool dir = !(m_egc.regs[6] & 0x1000);
-	int dst_off = (m_egc.regs[6] >> 4) & 0xf;
+	int dst_off = (m_egc.regs[6] >> 4) & 0xf, src_off = m_egc.regs[6] & 0xf;
 	offset &= 0x13fff;
 
-	if((((m_egc.regs[2] >> 11) & 3) == 1) || ((((m_egc.regs[2] >> 11) & 3) == 2) && !BIT(m_egc.regs[2], 10)))
+	if(!m_egc.init && (src_off > dst_off))
 	{
-		UINT16 end_mask = 0xffff, start_mask = 0xffff;
-		// mask off the bits before the start
-		if(m_egc.first)
+		if(BIT(m_egc.regs[2], 10))
 		{
 			m_egc.leftover[0] = m_egc.leftover[1] = m_egc.leftover[2] = m_egc.leftover[3] = 0;
-			start_mask = dir ? ~((1 << dst_off) - 1) : ((1 << (15 - dst_off)) - 1);
+			egc_shift(0, data);
+			// leftover[0] is inited above, set others to same
+			m_egc.leftover[1] = m_egc.leftover[2] = m_egc.leftover[3] = m_egc.leftover[0];
 		}
+		m_egc.init = true;
+		return;
+	}
 
-		// mask off the bits past the end of the blit
-		if(m_egc.count < 16)
+	// mask off the bits before the start
+	if(m_egc.first)
+	{
+		mask &= dir ? ~((1 << dst_off) - 1) : ((1 << (dst_off + 1)) - 1);
+		if(!m_egc.init)
+			m_egc.leftover[0] = m_egc.leftover[1] = m_egc.leftover[2] = m_egc.leftover[3] = 0;
+	}
+
+	// mask off the bits past the end of the blit
+	if(m_egc.count < 16)
+	{
+		UINT16 end_mask = dir ? ((1 << m_egc.count) - 1) : ~((1 << (16 - m_egc.count)) - 1);
+		// if the blit is less than 16 bits, adjust the masks
+		if(m_egc.first)
 		{
-			end_mask = dir ? ((1 << m_egc.count) - 1) : ~((1 << (16 - m_egc.count)) - 1);
-			// if the blit is less than 16 bits, adjust the masks
-			if(start_mask != 0xffff)
-			{
-				if(dir)
-					end_mask <<= dst_off;
-				else
-					end_mask >>= (15 - dst_off);
-			}
+			if(dir)
+				end_mask <<= dst_off;
+			else
+				end_mask >>= dst_off;
 		}
-		mask &= end_mask & start_mask;
+		mask &= end_mask;
 	}
 
 	for(int i = 0; i < 4; i++)
@@ -1410,7 +1430,7 @@ void pc9801_state::egc_blit_w(UINT32 offset, UINT16 data, UINT16 mem_mask)
 		{
 			UINT16 src = m_egc.src[i] & mem_mask, pat = m_egc.pat[i];
 			if(BIT(m_egc.regs[2], 10))
-				src = data;
+				src = egc_shift(i, data);
 
 			if((m_egc.regs[2] & 0x300) == 0x200)
 				pat = m_video_ram_2[offset + (((i + 1) & 3) * 0x4000)];
@@ -1442,16 +1462,15 @@ void pc9801_state::egc_blit_w(UINT32 offset, UINT16 data, UINT16 mem_mask)
 	}
 	if(mem_mask != 0xffff)
 	{
-		dst_off &= 7;
 		if(m_egc.first)
-			m_egc.count -= dir ? 8 - dst_off : (dst_off + 1);
+			m_egc.count -= 8 - (dst_off & 7);
 		else
 			m_egc.count -= 8;
 	}
 	else
 	{
 		if(m_egc.first)
-			m_egc.count -= dir ? 16 - dst_off : (dst_off + 1);
+			m_egc.count -= 16 - dst_off;
 		else
 			m_egc.count -= 16;
 	}
@@ -1461,6 +1480,7 @@ void pc9801_state::egc_blit_w(UINT32 offset, UINT16 data, UINT16 mem_mask)
 	if(m_egc.count <= 0)
 	{
 		m_egc.first = true;
+		m_egc.init = false;
 		m_egc.count = (m_egc.regs[7] & 0xfff) + 1;
 	}
 }
@@ -1475,17 +1495,13 @@ UINT16 pc9801_state::egc_blit_r(UINT32 offset, UINT16 mem_mask)
 		m_egc.pat[2] = m_video_ram_2[plane_off + (0x4000 * 3)];
 		m_egc.pat[3] = m_video_ram_2[plane_off];
 	}
-	if(!BIT(m_egc.regs[2], 10))
-	{
-		m_egc.src[0] = m_video_ram_2[plane_off + 0x4000];
-		m_egc.src[1] = m_video_ram_2[plane_off + (0x4000 * 2)];
-		m_egc.src[2] = m_video_ram_2[plane_off + (0x4000 * 3)];
-		m_egc.src[3] = m_video_ram_2[plane_off];
-	}
+	for(int i = 0; i < 4; i++)
+		m_egc.src[i] = egc_shift(i, m_video_ram_2[plane_off + (((i + 1) & 3) * 0x4000)]);
+
 	if(BIT(m_egc.regs[2], 13))
 		return m_video_ram_2[offset];
 	else
-		return m_video_ram_2[plane_off + (((m_egc.regs[1] >> 8) + 1) & 3) * 0x4000];
+		return m_egc.src[(m_egc.regs[1] >> 8) & 3];
 }
 
 READ16_MEMBER(pc9801_state::upd7220_grcg_r)
@@ -1906,6 +1922,7 @@ WRITE16_MEMBER(pc9801_state::egc_w)
 		case 7:
 			m_egc.count = (m_egc.regs[7] & 0xfff) + 1;
 			m_egc.first = true;
+			m_egc.init = false;
 			break;
 	}
 }
@@ -2969,6 +2986,7 @@ MACHINE_START_MEMBER(pc9801_state,pc9801_common)
 	save_item(NAME(m_sasi_data));
 	save_item(NAME(m_sasi_data_enable));
 	save_item(NAME(m_sasi_ctrl));
+	save_item(NAME(m_vrtc_irq_mask));
 }
 
 MACHINE_START_MEMBER(pc9801_state,pc9801f)

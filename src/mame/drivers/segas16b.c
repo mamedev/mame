@@ -79,7 +79,7 @@
 Sega System 16B Hardware Overview
 ---------------------------------
 
-The games on this system include... (there may be more??) //todo
+The games on this system include...
 Ace Attacker               (C) Sega/Jaleco, 1989
 Alien Syndrome             (C) Sega, 1987
 Altered Beast / Jyuohki    (C) Sega, 1988
@@ -386,7 +386,7 @@ Games that use this ROM board...
 -----------------|--------------------------------------------------------------------------------------------------|
 Shinobi          |A1       A2       A3       A4       A5       A6       A7       A8       A9       A10      A11     |
 CPU  - 317-0049  |--------------------------------------------------------------------------------------------------|
-8751 -           |EPR11280 EPR11281 -        EPR11282 EPR11283 -        EPR11287 EPR11288 EPR11289 -        -       |
+8751 - n/a       |EPR11280 EPR11281 -        EPR11282 EPR11283 -        EPR11287 EPR11288 EPR11289 -        -       |
                  |--------------------------------------------------------------------------------------------------|
                  |                                                                                                  |
 J1 O O  J2 O-O   |B1       B2       B3       B4       B5       B6       B7       B8       B9       B10      B11     |
@@ -430,7 +430,7 @@ CPU  -           |--------------------------------------------------------------
 -----------------|--------------------------------------------------------------------------------------------------|
 Sonic Boom       |A1       A2       A3       A4       A5       A6       A7       A8       A9       A10      A11     |
 CPU  - 317-0053  |--------------------------------------------------------------------------------------------------|
-8751 -           |EPR11340 EPR11341 -        EPR11342 EPR11343 -        EPR11347 EPR11348 EPR11349 -        -       |
+8751 - n/a       |EPR11340 EPR11341 -        EPR11342 EPR11343 -        EPR11347 EPR11348 EPR11349 -        -       |
                  |--------------------------------------------------------------------------------------------------|
                  |                                                                                                  |
                  |B1       B2       B3       B4       B5       B6       B7       B8       B9       B10      B11     |
@@ -441,7 +441,7 @@ CPU  - 317-0053  |--------------------------------------------------------------
 -----------------|--------------------------------------------------------------------------------------------------|
 Passing Shot     |A1       A2       A3       A4       A5       A6       A7       A8       A9       A10      A11     |
 CPU  - 317-0080  |--------------------------------------------------------------------------------------------------|
-8751 -           |EPR11870 -        -        EPR11871 -        -        EPR11857 EPR11858 EPR11859 EPR11860 EPR11861|
+8751 - n/a       |EPR11870 -        -        EPR11871 -        -        EPR11857 EPR11858 EPR11859 EPR11860 EPR11861|
                  |--------------------------------------------------------------------------------------------------|
                  |                                                                                                  |
 J1 O O  J2 O-O   |B1       B2       B3       B4       B5       B6       B7       B8       B9       B10      B11     |
@@ -452,7 +452,7 @@ J5 512 J6 512    |OPR11862 OPR11863 OPR11864 -        OPR11865 OPR11866 OPR11867
 -----------------|--------------------------------------------------------------------------------------------------|
 Bullet           |A1       A2       A3       A4       A5       A6       A7       A8       A9       A10      A11     |
 CPU  - 317-0041  |--------------------------------------------------------------------------------------------------|
-8751 -           |EPR11007 EPR11008 EPR11009 EPR11010 EPR11011 EPR11012 EPR10997 EPR10998 -        -        -       |
+8751 - n/a       |EPR11007 EPR11008 EPR11009 EPR11010 EPR11011 EPR11012 EPR10997 EPR10998 -        -        -       |
                  |--------------------------------------------------------------------------------------------------|
                  |                                                                                                  |
 J1 O O  J2 O-O   |B1       B2       B3       B4       B5       B6       B7       B8       B9       B10      B11     |
@@ -463,7 +463,7 @@ J5 512 J6 256    |EPR10999 EPR11000 EPR11001 EPR11002 EPR11003 EPR11004 EPR11005
 -----------------|--------------------------------------------------------------------------------------------------|
 Tetris           |A1       A2       A3       A4       A5       A6       A7       A8       A9       A10      A11     |
 CPU  - 317-0091  |--------------------------------------------------------------------------------------------------|
-8751 -           |EPR12163 -        -        EPR12164 -        -        EPR12168 -        -        -        -       |
+8751 - n/a       |EPR12163 -        -        EPR12164 -        -        EPR12168 -        -        -        -       |
                  |--------------------------------------------------------------------------------------------------|
                  |                                                                                                  |
                  |B1       B2       B3       B4       B5       B6       B7       B8       B9       B10      B11     |
@@ -474,34 +474,34 @@ CPU  - 317-0091  |--------------------------------------------------------------
 -----------------|--------------------------------------------------------------------------------------------------|
 Wonder Boy III   |A1       A2       A3       A4       A5       A6       A7       A8       A9       A10      A11     |
 CPU  - 317-0085  |--------------------------------------------------------------------------------------------------|
-8751 -           |EPR12198 EPR12199 -        EPR12100 EPR12101 -        EPR12127 -        -        -        -       |
+8751 - n/a       |EPR12198 EPR12199 -        EPR12100 EPR12101 -        EPR12127 -        -        -        -       |
                  |--------------------------------------------------------------------------------------------------|
                  |                                                                                                  |
-                 |B1       B2       B3       B4       B5       B6       B7       B8       B9       B10      B11     |
-                 |--------------------------------------------------------------------------------------------------|
-                 |EPR12190 EPR12191 EPR12192 EPR12193 EPR12194 EPR12195 EPR12196 EPR12197 EPR12124 EPR12125 EPR12126|
+J1 O O  J2 O-O   |B1       B2       B3       B4       B5       B6       B7       B8       B9       B10      B11     |
+J3 512 J4 256    |--------------------------------------------------------------------------------------------------|
+J5 512 J6 512    |EPR12190 EPR12191 EPR12192 EPR12193 EPR12194 EPR12195 EPR12196 EPR12197 EPR12124 EPR12125 EPR12126|
 -----------------|--------------------------------------------------------------------------------------------------|
 
 -----------------|--------------------------------------------------------------------------------------------------|
 Excite League    |A1       A2       A3       A4       A5       A6       A7       A8       A9       A10      A11     |
-CPU  - 317-0079? |--------------------------------------------------------------------------------------------------|
+CPU  - 317-0079  |--------------------------------------------------------------------------------------------------|
 8751 -           |EPR11936 EPR11937 EPR11938 EPR11939 EPR11940 EPR11941 EPR11945 EPR11140 EPR11141 EPR11142 EPR11143|
                  |--------------------------------------------------------------------------------------------------|
                  |                                                                                                  |
-                 |B1       B2       B3       B4       B5       B6       B7       B8       B9       B10      B11     |
-                 |--------------------------------------------------------------------------------------------------|
-                 |EPR11950 EPR11951 EPR11952 EPR11953 EPR11954 EPR11955 EPR11956 EPR11957 EPR11942 EPR11943 EPR11944|
+J1 O O  J2 O-O   |B1       B2       B3       B4       B5       B6       B7       B8       B9       B10      B11     |
+J3 512 J4 256    |--------------------------------------------------------------------------------------------------|
+J5 512 J6 256/512|EPR11950 EPR11951 EPR11952 EPR11953 EPR11954 EPR11955 EPR11956 EPR11957 EPR11942 EPR11943 EPR11944|
 -----------------|--------------------------------------------------------------------------------------------------|
-
+                  J6 jumper tied from lower left side of 256 jumper to upper right side of 512 jumper like this: /
 -----------------|--------------------------------------------------------------------------------------------------|
 Super League     |A1       A2       A3       A4       A5       A6       A7       A8       A9       A10      A11     |
-CPU  - 317-0045? |--------------------------------------------------------------------------------------------------|
+CPU  - 317-0045  |--------------------------------------------------------------------------------------------------|
 8751 -           |EPR11130 EPR11131 EPR11132 EPR11133 EPR11134 EPR11135 EPR11139 EPR11140 EPR11141 EPR11142 EPR11143|
                  |--------------------------------------------------------------------------------------------------|
                  |                                                                                                  |
-                 |B1       B2       B3       B4       B5       B6       B7       B8       B9       B10      B11     |
-                 |--------------------------------------------------------------------------------------------------|
-                 |EPR11144 EPR11145 EPR11146 EPR11147 EPR11148 EPR11149 EPR11150 EPR11151 EPR11136 EPR11137 EPR11138|
+J1 O O  J2 O-O   |B1       B2       B3       B4       B5       B6       B7       B8       B9       B10      B11     |
+J3 512 J4 256    |--------------------------------------------------------------------------------------------------|
+J5 512 J6 512    |EPR11144 EPR11145 EPR11146 EPR11147 EPR11148 EPR11149 EPR11150 EPR11151 EPR11136 EPR11137 EPR11138|
 -----------------|--------------------------------------------------------------------------------------------------|
 
 -----------------|--------------------------------------------------------------------------------------------------|
@@ -592,7 +592,7 @@ Notes:
 315-5298 - Signetics PLS153F Field Programmable Logic Array stamped '315-5298' (DIP20)
 315-5248 - Custom Sega IC (QFP100)
 315-5250 - Custom Sega IC (QFP120)
-  S1-S16 - Jumpers to configure ROM sizes               //usage TODO
+  S1-S16 - Jumpers to configure ROM sizes
            Jumpers are either shorted or not shorted.
            In the tables below, the listed jumpers per game are the shorted ones, the unlisted ones are not shorted.
 
@@ -714,7 +714,7 @@ CPU  - 317-0143  |--------------------------------------------------------------
 Notes:
        * - Empty position, no socket
 315-5298 - Signetics PLS153F Field Programmable Logic Array stamped '315-5298' (DIP20)
-  S1-S18 - Jumpers to configure ROM sizes                                               //usage TODO
+  S1-S18 - Jumpers to configure ROM sizes
            Jumpers are either shorted or not shorted.
            In the tables below, the listed jumpers per game are the shorted ones, the unlisted ones are not shorted.
            S1/S2 - Jumpers to configure 68k program ROM size
@@ -737,7 +737,7 @@ S11 S13 S15 S17  |MPR12465 MPR12466 -        -        MPR12467 MPR12468 -       
 -----------------|--------------------------------------------------------------------------------------------------------------------------------------|
 Golden Axe       |A1       A2       A3       A4       A5       A6       A7       A8       A10      A11      A12               A14      A15      A16     |
 CPU  - 317-0121  |--------------------------------------------------------------------------------------------------------------------------------------|
-8751 -           |-        -        -        -        EPR12539 EPR12519 EPR12540 EPR12521 EPR12390 MPR12384 -                 EPR12385 EPR12386 EPR12387|
+8751 - n/a       |-        -        -        -        EPR12539 EPR12519 EPR12540 EPR12521 EPR12390 MPR12384 -                 EPR12385 EPR12386 EPR12387|
                  |--------------------------------------------------------------------------------------------------------------------------------------|
                  |                                                                                                                                      |
                  |B1       B2       B3       B4       B5       B6       B7       B8       B10      B11      B12      B13      B14      B15      B16     |
@@ -814,7 +814,7 @@ S11 S13 S15 S17  |EPR12090 EPR12091 EPR12092 EPR12093 EPR12094 EPR12095 EPR12096
 -----------------|--------------------------------------------------------------------------------------------------------------------------------------|
 Altered Beast    |A1       A2       A3       A4       A5       A6       A7       A8       A10      A11      A12               A14      A15      A16     |
 CPU  - 68000     |--------------------------------------------------------------------------------------------------------------------------------------|
-8751 - 317-0078? |EPR11717 EPR11718 EPR11719 -        EPR11884 -        EPR11885 -        EPR11671 EPR11672 EPR11673          EPR11722 EPR11723 EPR11724|
+8751 - 317-0078  |EPR11717 EPR11718 EPR11719 -        EPR11884 -        EPR11885 -        EPR11671 EPR11672 EPR11673          EPR11722 EPR11723 EPR11724|
                  |--------------------------------------------------------------------------------------------------------------------------------------|
                  |                                                                                                                                      |
                  |B1       B2       B3       B4       B5       B6       B7       B8       B10      B11      B12      B13      B14      B15      B16     |
@@ -858,14 +858,13 @@ CPU  - 68000     |--------------------------------------------------------------
 -----------------|--------------------------------------------------------------------------------------------------------------------------------------|
 Tetris           |A1       A2       A3       A4       A5       A6       A7       A8       A10      A11      A12               A14      A15      A16     |
 CPU  - 317-0092  |--------------------------------------------------------------------------------------------------------------------------------------|
-8751 -           |-        -        -        -        EPR12192 -        EPR12193 -        EPR12168 -        -                 EPR12165 EPR12166 EPR12167|
+8751 - n/a       |-        -        -        -        EPR12192 -        EPR12193 -        EPR12168 -        -                 EPR12165 EPR12166 EPR12167|
                  |--------------------------------------------------------------------------------------------------------------------------------------|
                  |                                                                                                                                      |
                  |B1       B2       B3       B4       B5       B6       B7       B8       B10      B11      B12      B13      B14      B15      B16     |
-                 |--------------------------------------------------------------------------------------------------------------------------------------|
-                 |EPR      -        -        -        EPR      -        -        -        -        -        -        -        -        -        -       |
+S2 S3 S6 S7 S9   |--------------------------------------------------------------------------------------------------------------------------------------|
+S11 S13 S15 S17  |EPR12194 -        -        -        EPR12195 -        -        -        -        -        -        -        -        -        -       |
 -----------------|--------------------------------------------------------------------------------------------------------------------------------------|
-                  Sega part number for B1 & B5 unknown
 
 ***************************************************************************/
 
@@ -3646,7 +3645,7 @@ ROM_START( altbeast )
 	ROM_LOAD( "opr-11673.a12", 0x30000, 0x20000, CRC(400c4a36) SHA1(de4bdfa91734410e0a7f6a16bf8336db172f458a) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
-	ROM_LOAD( "317-0078.mcu", 0x00000, 0x1000, NO_DUMP )
+	ROM_LOAD( "317-0078.c2", 0x00000, 0x1000, NO_DUMP )
 ROM_END
 
 //*************************************************************************************************************************
@@ -3689,7 +3688,7 @@ ROM_START( altbeastj )
 	ROM_LOAD( "opr-11673.a12", 0x30000, 0x20000, CRC(400c4a36) SHA1(de4bdfa91734410e0a7f6a16bf8336db172f458a) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
-	ROM_LOAD( "317-0077.mcu", 0x00000, 0x1000, NO_DUMP )
+	ROM_LOAD( "317-0077.c2", 0x00000, 0x1000, NO_DUMP )
 ROM_END
 
 //*************************************************************************************************************************
@@ -3732,7 +3731,7 @@ ROM_START( altbeast6 )
 	ROM_LOAD( "opr-11673.a12", 0x30000, 0x20000, CRC(400c4a36) SHA1(de4bdfa91734410e0a7f6a16bf8336db172f458a) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
-	ROM_LOAD( "317-0076.mcu", 0x00000, 0x1000, NO_DUMP )
+	ROM_LOAD( "317-0076.c2", 0x00000, 0x1000, NO_DUMP )
 ROM_END
 
 //*************************************************************************************************************************
@@ -4695,8 +4694,8 @@ ROM_START( ddux1 )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-11916.a10", 0x0000, 0x8000, CRC(7ab541cf) SHA1(feb88022ca1796d020e53e95ad345159bd415530) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )  // protection MCU
-	ROM_LOAD( "317-0095.bin", 0x00000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
+	ROM_LOAD( "317-0095.c2", 0x00000, 0x1000, NO_DUMP )
 ROM_END
 
 
@@ -4854,7 +4853,6 @@ ROM_START( eswatj1 )
 	ROM_LOAD16_BYTE( "epr-12680.a3", 0x180001, 0x20000, CRC(f321452c) SHA1(cdccd8facc2941745f05fba25ad7d76b445eb873) )
 	ROM_LOAD16_BYTE( "epr-12699.b12",0x180000, 0x20000, CRC(ac329586) SHA1(98994f41ee2f0fa5cd800f565b277ba21f2bb0c3) )
 
-
 	ROM_REGION( 0x90000, "soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12685.a10", 0x00000, 0x08000, CRC(5d0c16d7) SHA1(7ab13376c2a1da0566689ccbc258f94d1f4de487) )
 	ROM_LOAD( "mpr-12686.a11", 0x10000, 0x20000, CRC(f451705e) SHA1(2b3d1b3ffbc6ba2285c4141e6fd3447252a31c8b) )
@@ -4871,12 +4869,12 @@ ROM_END
 //
 ROM_START( exctleag )
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_BYTE( "epr-11939.a04", 0x00000, 0x10000, CRC(117dd98f) SHA1(0234c2cf3421849854bec3711ab64f50f12cc5dd) )
-	ROM_LOAD16_BYTE( "epr-11936.a01", 0x00001, 0x10000, CRC(0863de60) SHA1(540a5cae2623bce296c07603239f737a782e3b0b) )
-	ROM_LOAD16_BYTE( "epr-11940.a05", 0x20000, 0x10000, CRC(dec83274) SHA1(85919bcd372fbfb9f06c34897b4d28d08ef3c9d1) )
-	ROM_LOAD16_BYTE( "epr-11937.a02", 0x20001, 0x10000, CRC(4ebda367) SHA1(ab4db50eb0d2e10a3b4b7fc0f4bdc82412379809) )
-	ROM_LOAD16_BYTE( "epr-11941.a06", 0x40000, 0x10000, CRC(4df2d451) SHA1(644541b20e034a0149117874021c158bd3759e35) )
-	ROM_LOAD16_BYTE( "epr-11938.a03", 0x40001, 0x10000, CRC(07c08d47) SHA1(47d3445cfa2514918206cd29a203837a9f434b42) )
+	ROM_LOAD16_BYTE( "epr-11939.a4", 0x00000, 0x10000, CRC(117dd98f) SHA1(0234c2cf3421849854bec3711ab64f50f12cc5dd) )
+	ROM_LOAD16_BYTE( "epr-11936.a1", 0x00001, 0x10000, CRC(0863de60) SHA1(540a5cae2623bce296c07603239f737a782e3b0b) )
+	ROM_LOAD16_BYTE( "epr-11940.a5", 0x20000, 0x10000, CRC(dec83274) SHA1(85919bcd372fbfb9f06c34897b4d28d08ef3c9d1) )
+	ROM_LOAD16_BYTE( "epr-11937.a2", 0x20001, 0x10000, CRC(4ebda367) SHA1(ab4db50eb0d2e10a3b4b7fc0f4bdc82412379809) )
+	ROM_LOAD16_BYTE( "epr-11941.a6", 0x40000, 0x10000, CRC(4df2d451) SHA1(644541b20e034a0149117874021c158bd3759e35) )
+	ROM_LOAD16_BYTE( "epr-11938.a3", 0x40001, 0x10000, CRC(07c08d47) SHA1(47d3445cfa2514918206cd29a203837a9f434b42) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
 	ROM_LOAD( "317-0079.key", 0x0000, 0x2000, CRC(effefa1c) SHA1(f42e87f60c9589862ea2c05a29b1b15dc7194051) )
@@ -4887,19 +4885,19 @@ ROM_START( exctleag )
 	ROM_LOAD( "epr-11944.b11", 0x20000, 0x10000, CRC(a75cae80) SHA1(17c148a33b09b5403e68f5d96e506545c2ced206) )
 
 	ROM_REGION16_BE( 0x80000, "sprites", 0 ) // sprites
-	ROM_LOAD16_BYTE( "epr-11950.b01", 0x00001, 0x10000, CRC(af497849) SHA1(c5fdca8d3b1d83e3d377a49ecdc0fc53714afc09) )
-	ROM_LOAD16_BYTE( "epr-11954.b05", 0x00000, 0x10000, CRC(5fa2106c) SHA1(2f2620fa52d07667dff4720fea32a6615d99e522) )
-	ROM_LOAD16_BYTE( "epr-11951.b02", 0x20001, 0x10000, CRC(c04fa974) SHA1(b1a4fb8522126113d7857d559f169f09c5f51a13) )
-	ROM_LOAD16_BYTE( "epr-11955.b06", 0x20000, 0x10000, CRC(86a0c368) SHA1(ab8d6ab5c571121bf9c5d40727b1ef385a033845) )
-	ROM_LOAD16_BYTE( "epr-11952.b03", 0x40001, 0x10000, CRC(e64a9761) SHA1(e16b3a30165710abc11ab0f358cb7ef875cc672c) )
-	ROM_LOAD16_BYTE( "epr-11956.b07", 0x40000, 0x10000, CRC(aff5c2fa) SHA1(1ec76193f2abf3547fa610761147436548beccbc) )
-	ROM_LOAD16_BYTE( "epr-11953.b04", 0x60001, 0x10000, CRC(4cae3999) SHA1(22089e43a5e2e4fe672015366154e24ad38d3c19) )
-	ROM_LOAD16_BYTE( "epr-11957.b08", 0x60000, 0x10000, CRC(218f835b) SHA1(bfef3ec45665a5921c095da34701528d4d4e0e3a) )
+	ROM_LOAD16_BYTE( "epr-11950.b1", 0x00001, 0x10000, CRC(af497849) SHA1(c5fdca8d3b1d83e3d377a49ecdc0fc53714afc09) )
+	ROM_LOAD16_BYTE( "epr-11954.b5", 0x00000, 0x10000, CRC(5fa2106c) SHA1(2f2620fa52d07667dff4720fea32a6615d99e522) )
+	ROM_LOAD16_BYTE( "epr-11951.b2", 0x20001, 0x10000, CRC(c04fa974) SHA1(b1a4fb8522126113d7857d559f169f09c5f51a13) )
+	ROM_LOAD16_BYTE( "epr-11955.b6", 0x20000, 0x10000, CRC(86a0c368) SHA1(ab8d6ab5c571121bf9c5d40727b1ef385a033845) )
+	ROM_LOAD16_BYTE( "epr-11952.b3", 0x40001, 0x10000, CRC(e64a9761) SHA1(e16b3a30165710abc11ab0f358cb7ef875cc672c) )
+	ROM_LOAD16_BYTE( "epr-11956.b7", 0x40000, 0x10000, CRC(aff5c2fa) SHA1(1ec76193f2abf3547fa610761147436548beccbc) )
+	ROM_LOAD16_BYTE( "epr-11953.b4", 0x60001, 0x10000, CRC(4cae3999) SHA1(22089e43a5e2e4fe672015366154e24ad38d3c19) )
+	ROM_LOAD16_BYTE( "epr-11957.b8", 0x60000, 0x10000, CRC(218f835b) SHA1(bfef3ec45665a5921c095da34701528d4d4e0e3a) )
 
 	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
-	ROM_LOAD( "epr-11945.a07", 0x00000, 0x8000, CRC(c2a83012) SHA1(b3de8af803497438aa3e110a9c608ac290f7d1e8) )
-	ROM_LOAD( "epr-11140.a08", 0x10000, 0x8000, CRC(b297371b) SHA1(4e787aa9ee2aeab4da30237644421df407b684a5) )
-	ROM_LOAD( "epr-11141.a09", 0x20000, 0x8000, CRC(19756aa6) SHA1(81597e17b848f6a41f5fb117296e7508297815e4) )
+	ROM_LOAD( "epr-11945.a7", 0x00000, 0x8000, CRC(c2a83012) SHA1(b3de8af803497438aa3e110a9c608ac290f7d1e8) )
+	ROM_LOAD( "epr-11140.a8", 0x10000, 0x8000, CRC(b297371b) SHA1(4e787aa9ee2aeab4da30237644421df407b684a5) )
+	ROM_LOAD( "epr-11141.a9", 0x20000, 0x8000, CRC(19756aa6) SHA1(81597e17b848f6a41f5fb117296e7508297815e4) )
 	ROM_LOAD( "epr-11142.a10", 0x30000, 0x8000, CRC(25d26c66) SHA1(2485afb859f84a9cc90b2091e9ae4eef263f42b3) )
 	ROM_LOAD( "epr-11143.a11", 0x40000, 0x8000, CRC(848b7b77) SHA1(8903a39f8f0ffb4ce32117d33282876196516c30) )
 ROM_END
@@ -5041,8 +5039,8 @@ ROM_START( goldnaxe )
 	ROM_LOAD( "epr-12390.ic8", 0x00000, 0x08000, CRC(399fc5f5) SHA1(6f290b36dc71ff4759598e2a9c185a8945a3c9e7) )
 	ROM_LOAD( "mpr-12384.ic6", 0x10000, 0x20000, CRC(6218d8e7) SHA1(5a745c750efb4a61716f99befb7ed14cc84e9973) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )  // protection MCU
-	ROM_LOAD( "317-0123a.bin", 0x00000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
+	ROM_LOAD( "317-0123a.c2", 0x00000, 0x1000, NO_DUMP )
 ROM_END
 
 //*************************************************************************************************************************
@@ -5201,8 +5199,8 @@ ROM_START( goldnaxe2 )
 	ROM_LOAD( "epr-12390.a10", 0x00000, 0x08000, CRC(399fc5f5) SHA1(6f290b36dc71ff4759598e2a9c185a8945a3c9e7) )
 	ROM_LOAD( "mpr-12384.a11", 0x10000, 0x20000, CRC(6218d8e7) SHA1(5a745c750efb4a61716f99befb7ed14cc84e9973) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )  // protection MCU
-	ROM_LOAD( "317-0112.bin", 0x00000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
+	ROM_LOAD( "317-0112.c2", 0x00000, 0x1000, NO_DUMP )
 ROM_END
 
 //*************************************************************************************************************************
@@ -6016,35 +6014,35 @@ ROM_END
 //
 ROM_START( suprleag )
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_BYTE( "epr-11133.a04", 0x00000, 0x10000, CRC(eed72f37) SHA1(80b68abdb90a63b30754dd031e85b1020dcc0cc4) )
-	ROM_LOAD16_BYTE( "epr-11130.a01", 0x00001, 0x10000, CRC(e2451676) SHA1(d2f71d9fca933e63e2bd5ee48217801ab0cb049c) )
-	ROM_LOAD16_BYTE( "epr-11134.a05", 0x20000, 0x10000, CRC(ccd857f5) SHA1(2566bb458bdd365db403e8229ecdad79e23076a1) )
-	ROM_LOAD16_BYTE( "epr-11131.a02", 0x20001, 0x10000, CRC(9b78c2cc) SHA1(9a453dd999120590c52b17f8ff2b49fd2fde0b35) )
-	ROM_LOAD16_BYTE( "epr-11135.a06", 0x40000, 0x10000, CRC(3735e0e1) SHA1(ae2910099909245993ee29e5a03a5591f20962c7) )
-	ROM_LOAD16_BYTE( "epr-11132.a03", 0x40001, 0x10000, CRC(ff199325) SHA1(2ece15b6b79ec3f948f7bec623e1df281cf89382) )
+	ROM_LOAD16_BYTE( "epr-11133.a4", 0x00000, 0x10000, CRC(eed72f37) SHA1(80b68abdb90a63b30754dd031e85b1020dcc0cc4) )
+	ROM_LOAD16_BYTE( "epr-11130.a1", 0x00001, 0x10000, CRC(e2451676) SHA1(d2f71d9fca933e63e2bd5ee48217801ab0cb049c) )
+	ROM_LOAD16_BYTE( "epr-11134.a5", 0x20000, 0x10000, CRC(ccd857f5) SHA1(2566bb458bdd365db403e8229ecdad79e23076a1) )
+	ROM_LOAD16_BYTE( "epr-11131.a2", 0x20001, 0x10000, CRC(9b78c2cc) SHA1(9a453dd999120590c52b17f8ff2b49fd2fde0b35) )
+	ROM_LOAD16_BYTE( "epr-11135.a6", 0x40000, 0x10000, CRC(3735e0e1) SHA1(ae2910099909245993ee29e5a03a5591f20962c7) )
+	ROM_LOAD16_BYTE( "epr-11132.a3", 0x40001, 0x10000, CRC(ff199325) SHA1(2ece15b6b79ec3f948f7bec623e1df281cf89382) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
 	ROM_LOAD( "317-0045.key", 0x0000, 0x2000, CRC(0594cc2e) SHA1(8aec3fffd00cbfd50d7cfb92e4748e2653fbb504) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
-	ROM_LOAD( "epr-11136.b09", 0x00000, 0x10000, CRC(c3860ce4) SHA1(af7618f3b5a0e8d6374877c7815ba69fff218a45) )
+	ROM_LOAD( "epr-11136.b9", 0x00000, 0x10000, CRC(c3860ce4) SHA1(af7618f3b5a0e8d6374877c7815ba69fff218a45) )
 	ROM_LOAD( "epr-11137.b10", 0x10000, 0x10000, CRC(92d96187) SHA1(45138795992b9842d5b0c86a96b300445bf12060) )
 	ROM_LOAD( "epr-11138.b11", 0x20000, 0x10000, CRC(c01dc773) SHA1(b27da906186e1272cdd6f8d5e5a979f6623255ac) )
 
 	ROM_REGION16_BE( 0x80000, "sprites", 0 ) // sprites
-	ROM_LOAD16_BYTE( "epr-11144.b01", 0x00001, 0x10000, CRC(b31de51c) SHA1(011a79a37d32ab4545187e28e61f27aa0601f686) )
-	ROM_LOAD16_BYTE( "epr-11148.b05", 0x00000, 0x10000, CRC(126e1309) SHA1(7386ac5ac57325d8f661caf8cab0b19a42c0309d) )
-	ROM_LOAD16_BYTE( "epr-11145.b02", 0x20001, 0x10000, CRC(4223d2c3) SHA1(310d5c411eeaf69fe0dc9350e6bfe6dfe950b373) )
-	ROM_LOAD16_BYTE( "epr-11149.b06", 0x20000, 0x10000, CRC(694d3765) SHA1(4aa8590648d5b8eb5db489edefb1326ecd01ea2c) )
-	ROM_LOAD16_BYTE( "epr-11146.b03", 0x40001, 0x10000, CRC(bf0359b6) SHA1(6cd5e6b685e53f062d5b04888f225c808aab3c4c) )
-	ROM_LOAD16_BYTE( "epr-11150.b07", 0x40000, 0x10000, CRC(9fc0aded) SHA1(7ad9e8fe79a0a07c748b0c20ad46c0e00de8a23a) )
-	ROM_LOAD16_BYTE( "epr-11147.b04", 0x60001, 0x10000, CRC(3e592772) SHA1(b0fe2c680871dcdbe655c0b1b98bcf8118fb3a50) )
-	ROM_LOAD16_BYTE( "epr-11151.b08", 0x60000, 0x10000, CRC(9de95169) SHA1(1a2801ecd9dece3dae7ceab3b793d5005caa4614) )
+	ROM_LOAD16_BYTE( "epr-11144.b1", 0x00001, 0x10000, CRC(b31de51c) SHA1(011a79a37d32ab4545187e28e61f27aa0601f686) )
+	ROM_LOAD16_BYTE( "epr-11148.b5", 0x00000, 0x10000, CRC(126e1309) SHA1(7386ac5ac57325d8f661caf8cab0b19a42c0309d) )
+	ROM_LOAD16_BYTE( "epr-11145.b2", 0x20001, 0x10000, CRC(4223d2c3) SHA1(310d5c411eeaf69fe0dc9350e6bfe6dfe950b373) )
+	ROM_LOAD16_BYTE( "epr-11149.b6", 0x20000, 0x10000, CRC(694d3765) SHA1(4aa8590648d5b8eb5db489edefb1326ecd01ea2c) )
+	ROM_LOAD16_BYTE( "epr-11146.b3", 0x40001, 0x10000, CRC(bf0359b6) SHA1(6cd5e6b685e53f062d5b04888f225c808aab3c4c) )
+	ROM_LOAD16_BYTE( "epr-11150.b7", 0x40000, 0x10000, CRC(9fc0aded) SHA1(7ad9e8fe79a0a07c748b0c20ad46c0e00de8a23a) )
+	ROM_LOAD16_BYTE( "epr-11147.b4", 0x60001, 0x10000, CRC(3e592772) SHA1(b0fe2c680871dcdbe655c0b1b98bcf8118fb3a50) )
+	ROM_LOAD16_BYTE( "epr-11151.b8", 0x60000, 0x10000, CRC(9de95169) SHA1(1a2801ecd9dece3dae7ceab3b793d5005caa4614) )
 
 	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
-	ROM_LOAD( "epr-11139.a07", 0x00000, 0x08000, CRC(9cbd99da) SHA1(55960b68b23a4f89ec810e1d31f22ba60cda0cfe) )
-	ROM_LOAD( "epr-11140.a08", 0x10000, 0x08000, CRC(b297371b) SHA1(4e787aa9ee2aeab4da30237644421df407b684a5) )
-	ROM_LOAD( "epr-11141.a09", 0x20000, 0x08000, CRC(19756aa6) SHA1(81597e17b848f6a41f5fb117296e7508297815e4) )
+	ROM_LOAD( "epr-11139.a7", 0x00000, 0x08000, CRC(9cbd99da) SHA1(55960b68b23a4f89ec810e1d31f22ba60cda0cfe) )
+	ROM_LOAD( "epr-11140.a8", 0x10000, 0x08000, CRC(b297371b) SHA1(4e787aa9ee2aeab4da30237644421df407b684a5) )
+	ROM_LOAD( "epr-11141.a9", 0x20000, 0x08000, CRC(19756aa6) SHA1(81597e17b848f6a41f5fb117296e7508297815e4) )
 	ROM_LOAD( "epr-11142.a10", 0x30000, 0x08000, CRC(25d26c66) SHA1(2485afb859f84a9cc90b2091e9ae4eef263f42b3) )
 	ROM_LOAD( "epr-11143.a11", 0x40000, 0x08000, CRC(848b7b77) SHA1(8903a39f8f0ffb4ce32117d33282876196516c30) )
 ROM_END
@@ -6222,8 +6220,8 @@ ROM_START( tturf )
 	ROM_LOAD( "opr-12329.a11", 0x10000, 0x10000, CRC(ed9a686d) SHA1(da433033d501ee871429ee676b3972b14179df9f) )     // speech
 	ROM_LOAD( "opr-12330.a12", 0x20000, 0x10000, CRC(fb762bca) SHA1(ff9191c5ec38c711ebb7c2ad043f62b6d7e2203c) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )  // protection MCU
-	ROM_LOAD( "317-0104.bin", 0x00000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
+	ROM_LOAD( "317-0104.c2", 0x00000, 0x1000, NO_DUMP )
 ROM_END
 
 //*************************************************************************************************************************
@@ -6234,10 +6232,10 @@ ROM_END
 //
 ROM_START( tturfu )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_BYTE( "epr-12266.bin",  0x00000, 0x10000, CRC(f549def8) SHA1(9e913509d46274bd192455321904ec9884b5f629) )
-	ROM_LOAD16_BYTE( "epr-12264.bin",  0x00001, 0x10000, CRC(f7cdb289) SHA1(9c386cf33a96a977c623c2f243db38fda2c41ba4) )
-	ROM_LOAD16_BYTE( "epr-12267.bin",  0x20000, 0x10000, CRC(3c3ce191) SHA1(036ece2be585a85e05c047fe4a1ab3b6814c3490) )
-	ROM_LOAD16_BYTE( "epr-12265.bin",  0x20001, 0x10000, CRC(8cdadd9a) SHA1(a17852f0eb8f63a82ff44cbeb100da72fe5890e0) )
+	ROM_LOAD16_BYTE( "epr-12266.a1",  0x00000, 0x10000, CRC(f549def8) SHA1(9e913509d46274bd192455321904ec9884b5f629) )
+	ROM_LOAD16_BYTE( "epr-12264.a4",  0x00001, 0x10000, CRC(f7cdb289) SHA1(9c386cf33a96a977c623c2f243db38fda2c41ba4) )
+	ROM_LOAD16_BYTE( "epr-12267.a2",  0x20000, 0x10000, CRC(3c3ce191) SHA1(036ece2be585a85e05c047fe4a1ab3b6814c3490) )
+	ROM_LOAD16_BYTE( "epr-12265.a5",  0x20001, 0x10000, CRC(8cdadd9a) SHA1(a17852f0eb8f63a82ff44cbeb100da72fe5890e0) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
 	ROM_LOAD( "epr-12268.a14", 0x00000, 0x10000, CRC(e0dac07f) SHA1(c7f6de42eb93a8f34afdc300628735b5f40a34c2) )
@@ -6261,8 +6259,8 @@ ROM_START( tturfu )
 	ROM_LOAD( "epr-12274.a10", 0x30000, 0x8000, CRC(8207f0c4) SHA1(169914861a52fa731a305e1ee2d230aa0d0d97fe) )
 	ROM_LOAD( "epr-12275.a11", 0x40000, 0x8000, CRC(182f3c3d) SHA1(1482fe08a05a721e315b1a3aa5bef4dddc72e26e) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )  // protection MCU
-	ROM_LOAD( "317-0099.bin", 0x00000, 0x1000, CRC(f676e3e4) SHA1(b71bad46c8b5f7328fd8d48f18624a620f0d34ce) )
+	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
+	ROM_LOAD( "317-0099.c2", 0x00000, 0x1000, CRC(f676e3e4) SHA1(b71bad46c8b5f7328fd8d48f18624a620f0d34ce) )
 ROM_END
 
 
@@ -6296,8 +6294,8 @@ ROM_START( wb3 )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-12127.a10", 0x0000, 0x8000, CRC(0bb901bb) SHA1(c81b198df8e3b0ec568032c76addf0d1a1711194) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )  // protection MCU
-	ROM_LOAD( "317-0098.bin", 0x00000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
+	ROM_LOAD( "317-0098.c2", 0x00000, 0x1000, NO_DUMP )
 ROM_END
 
 
@@ -6386,7 +6384,7 @@ ROM_END
 ROM_START( wb32 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr-12098.a1", 0x000001, 0x10000, CRC(d998e5e5) SHA1(a7398b7338a33451a650c2f1d382dad2e5130528) )
-	ROM_LOAD16_BYTE( "epr-12100.a6", 0x000000, 0x10000, CRC(f5ca4abc) SHA1(1331db10cf99905fb13c1606a3f4d8bbf3d681b6) )
+	ROM_LOAD16_BYTE( "epr-12100.a4", 0x000000, 0x10000, CRC(f5ca4abc) SHA1(1331db10cf99905fb13c1606a3f4d8bbf3d681b6) )
 	ROM_LOAD16_BYTE( "epr-12099.a2", 0x020001, 0x10000, CRC(3e243b45) SHA1(2a079553d1b61aaf18025847570003b79c8d6edf) )
 	ROM_LOAD16_BYTE( "epr-12101.a5", 0x020000, 0x10000, CRC(6146492b) SHA1(93515578a6ccf770944fea86d2f3200fa08f5075) )
 
@@ -6470,8 +6468,8 @@ ROM_START( wrestwar )
 	ROM_LOAD( "mpr-12148.a11", 0x10000, 0x20000, CRC(fb9a7f29) SHA1(7ba79c18ab4e586be2deccd78e4479d55eb75a7e) )
 	ROM_LOAD( "mpr-12149.a12", 0x30000, 0x20000, CRC(d6617b19) SHA1(aa36d257eaa52c8c871a39aaa2f29c203525dbaf) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )  // protection MCU
-	ROM_LOAD( "317-0103.bin", 0x00000, 0x1000, CRC(aa0710f5) SHA1(61ba8d23d045806b0a7b75184766be00f872cc72) )
+	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
+	ROM_LOAD( "317-0103.c2", 0x00000, 0x1000, CRC(aa0710f5) SHA1(61ba8d23d045806b0a7b75184766be00f872cc72) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -6565,7 +6563,7 @@ ROM_END
 //  Sega operated this game on actual System 16 PCBs for various events,
 //  it was also included in the PS2 Sega Ages collection Vol 33.
 //  Various bootlegs were sourced from this version. The dump will have to
-//  be verified if the official PCB ever gets into MAME friendly hands.
+//  be verified if the official PCB ever gets into MAME-friendly hands.
 //
 //  There is also a demo version of the game available on the PC, but
 //  attempting to use those ROMs on a real PCB / emulator will result

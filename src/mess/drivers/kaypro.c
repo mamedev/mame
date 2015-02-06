@@ -9,14 +9,15 @@
     telephone cord, complete with modular plug on each end. The keyboard carries
     its own Intel 87C51 processor and is an intelligent device.
 
-    Things that need doing:
+    ToDo:
 
     - See about getting keyboard to work as a serial device.
     - Need dump of 87C51 cpu in the keyboard.
 
-    - Only kayproii boots up, the remainder have floppy-disk problems.
-
-    - The DSK format needs to be supported. It is commented out until the code gets written.
+    - Kaypro 2x, 4a: floppy not working "No operating system present on this disk"
+    - Kaypro 10: Boots from floppy, but B drive not working "Bdos Err on B: Bad Sector"
+    - Kaypro 4p88: works as a normal Kaypro 4, extra hardware not done
+    - Kaypro Robie: has twin 2.6MB 5.25 floppy drives which we don't support, no software available
 
     - Hard Disk not emulated.
       The controller is a WD1002 (original version, for Winchester drives).
@@ -162,16 +163,17 @@ static const z80_daisy_config kaypro2x_daisy_chain[] =
 
 ************************************************************/
 
-//FLOPPY_FORMATS_MEMBER( kaypro_state::kayproii_floppy_formats )
-//  FLOPPY_KAYPROII_FORMAT
-//FLOPPY_FORMATS_END
+FLOPPY_FORMATS_MEMBER( kaypro_state::kayproii_floppy_formats )
+	FLOPPY_KAYPROII_FORMAT
+FLOPPY_FORMATS_END
 
-//FLOPPY_FORMATS_MEMBER( kaypro_state::kaypro2x_floppy_formats )
-//  FLOPPY_KAYPRO2X_FORMAT
-//FLOPPY_FORMATS_END
+FLOPPY_FORMATS_MEMBER( kaypro_state::kaypro2x_floppy_formats )
+	FLOPPY_KAYPRO2X_FORMAT
+FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( kaypro_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+	SLOT_INTERFACE( "drive0", FLOPPY_525_DD )
+	SLOT_INTERFACE( "drive1", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
 
@@ -180,7 +182,7 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(kaypro_map)
 	MCFG_CPU_IO_MAP(kayproii_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kaypro_state,  kay_kbd_interrupt)  /* this doesn't actually exist, it is to run the keyboard */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", kaypro_state, kay_kbd_interrupt)  /* this doesn't actually exist, it is to run the keyboard */
 	MCFG_CPU_CONFIG(kayproii_daisy_chain)
 
 	MCFG_MACHINE_START_OVERRIDE(kaypro_state, kayproii )
@@ -230,10 +232,8 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(kaypro_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(kaypro_state, fdc_drq_w))
 	MCFG_WD_FDC_FORCE_READY
-	//MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525dd", kaypro_state::kayproii_floppy_formats)
-	//MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525dd", kaypro_state::kayproii_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "drive0", kaypro_state::kayproii_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "drive1", kaypro_state::kayproii_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","kayproii")
 MACHINE_CONFIG_END
 
@@ -250,7 +250,7 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(kaypro_map)
 	MCFG_CPU_IO_MAP(kaypro2x_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kaypro_state,  kay_kbd_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", kaypro_state, kay_kbd_interrupt)
 	MCFG_CPU_CONFIG(kaypro2x_daisy_chain)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaypro_state, kaypro )
@@ -266,7 +266,7 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kaypro2x)
 	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(kaypro_state,kaypro)
+	MCFG_PALETTE_INIT_OWNER(kaypro_state, kaypro)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -295,10 +295,8 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(kaypro_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(kaypro_state, fdc_drq_w))
 	MCFG_WD_FDC_FORCE_READY
-	//MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525dd", kaypro_state::kaypro2x_floppy_formats)
-	//MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525dd", kaypro_state::kaypro2x_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "drive0", kaypro_state::kaypro2x_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "drive1", kaypro_state::kaypro2x_floppy_formats)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( omni2, kaypro4 )
@@ -431,9 +429,9 @@ ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    CLASS         INIT         COMPANY                 FULLNAME */
 COMP( 1982, kayproii,   0,        0,    kayproii, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro II - 2/83" , 0 )
-COMP( 1983, kaypro4,    kayproii, 0,    kaypro4,  kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4 - 4/83" , GAME_NOT_WORKING ) // model 81-004
+COMP( 1983, kaypro4,    kayproii, 0,    kaypro4,  kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4 - 4/83" , 0 ) // model 81-004
 COMP( 1983, kaypro4p88, kayproii, 0,    kaypro4,  kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4 plus88 - 4/83" , GAME_NOT_WORKING ) // model 81-004 with an added 8088 daughterboard and rom
-COMP( 198?, omni2,      kayproii, 0,    omni2,    kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Omni II" , GAME_NOT_WORKING )
+COMP( 198?, omni2,      kayproii, 0,    omni2,    kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Omni II Logic Analyzer" , 0 )
 COMP( 1984, kaypro2x,   0,        0,    kaypro2x, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 2x" , GAME_NOT_WORKING ) // model 81-025
 COMP( 1984, kaypro4a,   kaypro2x, 0,    kaypro2x, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4 - 4/84" , GAME_NOT_WORKING ) // model 81-015
 // Kaypro 4/84 plus 88 goes here, model 81-015 with an added 8088 daughterboard and rom

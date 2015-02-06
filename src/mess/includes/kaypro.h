@@ -21,19 +21,19 @@ public:
 	};
 
 	kaypro_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_pio_g(*this, "z80pio_g"),
-		m_pio_s(*this, "z80pio_s"),
-		m_sio(*this, "z80sio"),
-		m_sio2x(*this, "z80sio_2x"),
-		m_centronics(*this, "centronics"),
-		m_fdc(*this, "fdc"),
-		m_floppy0(*this, "fdc:0"),
-		m_floppy1(*this, "fdc:1"),
-		m_crtc(*this, "crtc"),
-		m_beep(*this, "beeper"),
-		m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_palette(*this, "palette")
+		, m_maincpu(*this, "maincpu")
+		, m_pio_g(*this, "z80pio_g")
+		, m_pio_s(*this, "z80pio_s")
+		, m_sio(*this, "z80sio")
+		, m_sio2x(*this, "z80sio_2x")
+		, m_centronics(*this, "centronics")
+		, m_fdc(*this, "fdc")
+		, m_floppy0(*this, "fdc:0")
+		, m_floppy1(*this, "fdc:1")
+		, m_crtc(*this, "crtc")
+		, m_beep(*this, "beeper")
 	{}
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
@@ -65,7 +65,6 @@ public:
 	UINT32 screen_update_kaypro2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_omni2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(kay_kbd_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(kaypro_interrupt);
 	DECLARE_READ8_MEMBER(kaypro_sio_r);
 	DECLARE_WRITE8_MEMBER(kaypro_sio_w);
 	MC6845_UPDATE_ROW(kaypro2x_update_row);
@@ -78,16 +77,17 @@ public:
 	UINT8 *m_p_videoram;
 	kay_kbd_t *m_kbd;
 	int m_centronics_busy;
-
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	required_device<palette_device> m_palette;
 
 private:
+	bool m_is_motor_off;
+	UINT8 m_fdc_rq;
 	UINT8 m_system_port;
 	UINT16 m_mc6845_video_address;
 	floppy_image_device *m_floppy;
 	void mc6845_cursor_configure();
 	void mc6845_screen_configure();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	required_device<cpu_device> m_maincpu;
 	optional_device<z80pio_device> m_pio_g;
 	optional_device<z80pio_device> m_pio_s;
@@ -99,8 +99,6 @@ private:
 	required_device<floppy_connector> m_floppy1;
 	optional_device<mc6845_device> m_crtc;
 	required_device<beep_device> m_beep;
-public:
-	required_device<palette_device> m_palette;
 };
 
 

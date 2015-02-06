@@ -13,11 +13,6 @@
 
 ************************************************************/
 
-WRITE_LINE_MEMBER(kaypro_state::kaypro_interrupt)
-{
-	m_maincpu->set_input_line(0, state);
-}
-
 WRITE_LINE_MEMBER( kaypro_state::write_centronics_busy )
 {
 	m_centronics_busy = state;
@@ -48,6 +43,7 @@ WRITE8_MEMBER( kaypro_state::kayproii_pio_system_w )
 
 	membank("bankr0")->set_entry(BIT(data, 7));
 	membank("bank3")->set_entry(BIT(data, 7));
+	m_is_motor_off = BIT(data, 6);
 
 	m_floppy = NULL;
 	if (BIT(data, 0))
@@ -62,6 +58,7 @@ WRITE8_MEMBER( kaypro_state::kayproii_pio_system_w )
 	if (m_floppy)
 	{
 		m_floppy->mon_w(BIT(data, 6)); // motor on
+		m_floppy->ss_w(!BIT(data, 2)); // signal exists even though drives are single sided
 	}
 
 	output_set_value("ledA", BIT(data, 0));     /* LEDs in artwork */
@@ -107,6 +104,7 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
 
 	membank("bankr0")->set_entry(BIT(data, 7));
 	membank("bank3")->set_entry(BIT(data, 7));
+	m_is_motor_off = !BIT(data, 4);
 
 	m_floppy = NULL;
 	if (!BIT(data, 0))
@@ -116,7 +114,7 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
 		m_floppy = m_floppy1->get_device();
 
 	m_fdc->set_floppy(m_floppy);
-	//m_fdc->dden_w(BIT(data, 5)); // not connected
+	m_fdc->dden_w(BIT(data, 5));
 
 	if (m_floppy)
 	{
@@ -195,11 +193,29 @@ WRITE8_MEMBER(kaypro_state::kaypro_sio_w)
 
 void kaypro_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
+	bool halt;
 	switch (id)
 	{
 	case TIMER_FLOPPY:
-		if (m_maincpu->state_int(Z80_HALT))
+		halt = (bool)m_maincpu->state_int(Z80_HALT);
+		if (m_is_motor_off)
+		{
+			timer_set(attotime::from_hz(10), TIMER_FLOPPY);
+			break;
+		}
+		if ((halt) && (m_fdc_rq & 3) && (m_fdc_rq < 0x80))
+		{
 			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+			m_fdc_rq |= 0x80;
+		}
+		else
+		if ((m_fdc_rq == 0x80) || ((!halt) && BIT(m_fdc_rq, 7)))
+		{
+			m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+			m_fdc_rq &= 0x7f;
+		}
+		timer_set(attotime::from_hz(1e5), TIMER_FLOPPY);
+
 		break;
 	default:
 		assert_always(FALSE, "Unknown id in kaypro_state::device_timer");
@@ -208,19 +224,12 @@ void kaypro_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 WRITE_LINE_MEMBER( kaypro_state::fdc_intrq_w )
 {
-	if (state)
-		timer_set(attotime::zero, TIMER_FLOPPY);
-	else
-		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_fdc_rq = (m_fdc_rq & 0x82) | state;
 }
 
 WRITE_LINE_MEMBER( kaypro_state::fdc_drq_w )
 {
-	if (state)
-		timer_set(attotime::zero, TIMER_FLOPPY);
-	else
-		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-
+	m_fdc_rq = (m_fdc_rq & 0x81) | (state << 1);
 }
 
 
@@ -241,7 +250,9 @@ MACHINE_RESET_MEMBER( kaypro_state,kaypro )
 	membank("bankw0")->set_entry(0); // always write to ram
 	membank("bank3")->set_entry(1); // point at video ram
 	m_system_port = 0x80;
+	m_fdc_rq = 0;
 	m_maincpu->reset();
+	timer_set(attotime::from_hz(1), TIMER_FLOPPY);   /* kick-start the nmi timer */
 }
 
 

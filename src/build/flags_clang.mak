@@ -1,13 +1,12 @@
 CCOMFLAGS += \
 	-Wno-cast-align \
-	-Wno-tautological-compare \
-	-Wno-format-security
+	-Wno-tautological-compare
 
 # caused by obj/sdl64d/emu/cpu/tms57002/tms57002.inc
 CCOMFLAGS += -Wno-self-assign-field
 
-# caused by src/mame/video/jagblit.inc on older clang versions
-CCOMFLAGS += -Wno-constant-logical-operand
+# caused by popmessage(NULL) on older clang versions
+#CCOMFLAGS += -Wno-format-security
 
 ifneq (,$(findstring undefined,$(SANITIZE)))
 # TODO: check if linker is clang++
@@ -21,21 +20,26 @@ ifneq (,$(findstring memory,$(SANITIZE)))
 CCOMFLAGS += -fsanitize-memory-track-origins -fPIE
 endif
 
+ifdef CPP11
+CCOMFLAGS += -Wno-deprecated-register -Wno-c++11-narrowing
+endif
+
 # TODO: needs to use $(CC)
 TEST_CLANG := $(shell clang --version)
 
 ifeq ($(findstring 3.4,$(TEST_CLANG)),3.4)
 CCOMFLAGS += -Wno-inline-new-delete
+
+# caused by src/mame/video/jagblit.inc
+CCOMFLAGS += -Wno-constant-logical-operand
 endif
 
 ifeq ($(findstring 3.5,$(TEST_CLANG)),3.5)
 CCOMFLAGS += -Wno-inline-new-delete
-# caused by src/mess/drivers/x07.c, src/osd/sdl/window.c, src/emu/sound/disc_mth.inc
+
+# caused by src/mess/drivers/x07.c, src/osd/sdl/window.c, src/emu/sound/disc_mth.inc, src/mame/video/chihiro.c
 CCOMFLAGS += -Wno-absolute-value
-# these were disabled because of bugs in older clang versions
-CCOMFLAGS += -Wformat-security -Wconstant-logical-operand
-# these show up when compiling as c++11
-CCOMFLAGS += -Wno-deprecated-register -Wno-reserved-user-defined-literal -Wno-c++11-narrowing
+
 # TODO: add proper detection of XCode 6.0.1
 # XCode 6.0.1 is built on a pre-release SVN version of clang 3.5, that doesn't support -Wno-absolute-value yet
 CCOMFLAGS += -Wno-unknown-warning-option
@@ -54,6 +58,13 @@ CCOMFLAGS += -fno-sanitize=null
 # clang takes forever to compile src/emu/cpu/tms57002/tms57002.c when this isn't disabled
 CCOMFLAGS += -fno-sanitize=signed-integer-overflow
 endif
+endif
+
+ifeq ($(findstring 3.6,$(TEST_CLANG)),3.6)
+CCOMFLAGS += -Wno-inline-new-delete
+
+# caused by src/mess/drivers/x07.c, src/osd/sdl/window.c, src/emu/sound/disc_mth.inc, src/mame/video/chihiro.c
+CCOMFLAGS += -Wno-absolute-value
 endif
 
 ifeq ($(TARGETOS),emscripten)

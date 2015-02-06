@@ -19,7 +19,7 @@ extern const device_type SEGA315_5881_CRYPT = &device_creator<sega_315_5881_cryp
 
 
 sega_315_5881_crypt_device::sega_315_5881_crypt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SEGA315_5881_CRYPT, "Sega 315-5881 Encryption", tag, owner, clock, "SEGA315_5881", __FILE__)
+	: device_t(mconfig, SEGA315_5881_CRYPT, "Sega 315-5881 Encryption", tag, owner, clock, "sega315_5881", __FILE__)
 {
 }
 

@@ -115,6 +115,19 @@ static const int x87_to_sf_rc[4] =
 
 extern flag floatx80_is_nan( floatx80 a );
 
+extern flag floatx80_is_signaling_nan(floatx80 a);
+
+INLINE flag floatx80_is_quiet_nan(floatx80 a)
+{
+	bits64 aLow;
+
+	aLow = a.low & ~LIT64(0x4000000000000000);
+	return
+		((a.high & 0x7FFF) == 0x7FFF)
+		&& (bits64)(aLow << 1)
+		&& (a.low != aLow);
+}
+
 INLINE int floatx80_is_zero(floatx80 fx)
 {
 	return (((fx.high & 0x7fff) == 0) && ((fx.low << 1) == 0));
@@ -1957,6 +1970,203 @@ void i386_device::x87_fimul_m16int(UINT8 modrm)
 	CYCLES(22);
 }
 
+/*************************************
+*
+* Conditional Move
+*
+*************************************/
+
+void i386_device::x87_fcmovb_sti(UINT8 modrm)
+{
+	floatx80 result;
+	int i = modrm & 7;
+
+	if (m_CF == 1)
+	{
+		if (X87_IS_ST_EMPTY(i))
+		{
+			x87_set_stack_underflow();
+			result = fx80_inan;
+		}
+		else
+			result = ST(i);
+
+		if (x87_check_exceptions())
+		{
+			ST(0) = result;
+		}
+	}
+
+	CYCLES(4);
+}
+
+void i386_device::x87_fcmove_sti(UINT8 modrm)
+{
+	floatx80 result;
+	int i = modrm & 7;
+
+	if (m_ZF == 1)
+	{
+		if (X87_IS_ST_EMPTY(i))
+		{
+			x87_set_stack_underflow();
+			result = fx80_inan;
+		}
+		else
+			result = ST(i);
+
+		if (x87_check_exceptions())
+		{
+			ST(0) = result;
+		}
+	}
+
+	CYCLES(4);
+}
+
+void i386_device::x87_fcmovbe_sti(UINT8 modrm)
+{
+	floatx80 result;
+	int i = modrm & 7;
+
+	if ((m_CF | m_ZF) == 1)
+	{
+		if (X87_IS_ST_EMPTY(i))
+		{
+			x87_set_stack_underflow();
+			result = fx80_inan;
+		}
+		else
+			result = ST(i);
+
+		if (x87_check_exceptions())
+		{
+			ST(0) = result;
+		}
+	}
+
+	CYCLES(4);
+}
+
+void i386_device::x87_fcmovu_sti(UINT8 modrm)
+{
+	floatx80 result;
+	int i = modrm & 7;
+
+	if (m_PF == 1)
+	{
+		if (X87_IS_ST_EMPTY(i))
+		{
+			x87_set_stack_underflow();
+			result = fx80_inan;
+		}
+		else
+			result = ST(i);
+
+		if (x87_check_exceptions())
+		{
+			ST(0) = result;
+		}
+	}
+
+	CYCLES(4);
+}
+
+void i386_device::x87_fcmovnb_sti(UINT8 modrm)
+{
+	floatx80 result;
+	int i = modrm & 7;
+
+	if (m_CF == 0)
+	{
+		if (X87_IS_ST_EMPTY(i))
+		{
+			x87_set_stack_underflow();
+			result = fx80_inan;
+		}
+		else
+			result = ST(i);
+
+		if (x87_check_exceptions())
+		{
+			ST(0) = result;
+		}
+	}
+
+	CYCLES(4);
+}
+
+void i386_device::x87_fcmovne_sti(UINT8 modrm)
+{
+	floatx80 result;
+	int i = modrm & 7;
+
+	if (m_ZF == 0)
+	{
+		if (X87_IS_ST_EMPTY(i))
+		{
+			x87_set_stack_underflow();
+			result = fx80_inan;
+		}
+		else
+			result = ST(i);
+
+		if (x87_check_exceptions())
+		{
+			ST(0) = result;
+		}
+	}
+
+	CYCLES(4);
+}
+
+void i386_device::x87_fcmovnbe_sti(UINT8 modrm)
+{
+	floatx80 result;
+	int i = modrm & 7;
+
+	if ((m_CF == 0) && (m_ZF == 0))
+	{
+		if (X87_IS_ST_EMPTY(i))
+		{
+			x87_set_stack_underflow();
+			result = fx80_inan;
+		}
+		else
+			result = ST(i);
+
+		if (x87_check_exceptions())
+		{
+			ST(0) = result;
+		}
+	}
+
+	CYCLES(4);
+}
+
+void i386_device::x87_fcmovnu_sti(UINT8 modrm)
+{
+	floatx80 result;
+	int i = modrm & 7;
+
+	if (m_PF == 0)
+	{
+		if (X87_IS_ST_EMPTY(i))
+		{
+			x87_set_stack_underflow();
+			result = fx80_inan;
+		}
+		else
+			result = ST(i);
+
+		if (x87_check_exceptions())
+		{
+			ST(0) = result;
+		}
+	}
+
+	CYCLES(4);
+}
 
 /*************************************
  *
@@ -3764,6 +3974,50 @@ void i386_device::x87_fcomp_sti(UINT8 modrm)
 	CYCLES(4);
 }
 
+void i386_device::x87_fcomi_sti(UINT8 modrm)
+{
+	int i = modrm & 7;
+
+	if (X87_IS_ST_EMPTY(0) || X87_IS_ST_EMPTY(i))
+	{
+		x87_set_stack_underflow();
+		m_ZF = 1;
+		m_PF = 1;
+		m_CF = 1;
+	}
+	else
+	{
+		m_x87_sw &= ~X87_SW_C1;
+
+		floatx80 a = ST(0);
+		floatx80 b = ST(i);
+
+		if (floatx80_is_nan(a) || floatx80_is_nan(b))
+		{
+			m_ZF = 1;
+			m_PF = 1;
+			m_CF = 1;
+			m_x87_sw |= X87_SW_IE;
+		}
+		else
+		{
+			m_ZF = 0;
+			m_PF = 0;
+			m_CF = 0;
+
+			if (floatx80_eq(a, b))
+				m_ZF = 1;
+
+			if (floatx80_lt(a, b))
+				m_CF = 1;
+		}
+	}
+
+	x87_check_exceptions();
+
+	CYCLES(4); // TODO: correct cycle count
+}
+
 void i386_device::x87_fcomip_sti(UINT8 modrm)
 {
 	int i = modrm & 7;
@@ -3783,6 +4037,107 @@ void i386_device::x87_fcomip_sti(UINT8 modrm)
 		floatx80 b = ST(i);
 
 		if (floatx80_is_nan(a) || floatx80_is_nan(b))
+		{
+			m_ZF = 1;
+			m_PF = 1;
+			m_CF = 1;
+			m_x87_sw |= X87_SW_IE;
+		}
+		else
+		{
+			m_ZF = 0;
+			m_PF = 0;
+			m_CF = 0;
+
+			if (floatx80_eq(a, b))
+				m_ZF = 1;
+
+			if (floatx80_lt(a, b))
+				m_CF = 1;
+		}
+	}
+
+	if (x87_check_exceptions())
+		x87_inc_stack();
+
+	CYCLES(4); // TODO: correct cycle count
+}
+
+void i386_device::x87_fucomi_sti(UINT8 modrm)
+{
+	int i = modrm & 7;
+
+	if (X87_IS_ST_EMPTY(0) || X87_IS_ST_EMPTY(i))
+	{
+		x87_set_stack_underflow();
+		m_ZF = 1;
+		m_PF = 1;
+		m_CF = 1;
+	}
+	else
+	{
+		m_x87_sw &= ~X87_SW_C1;
+
+		floatx80 a = ST(0);
+		floatx80 b = ST(i);
+
+		if (floatx80_is_quiet_nan(a) || floatx80_is_quiet_nan(b))
+		{
+			m_ZF = 1;
+			m_PF = 1;
+			m_CF = 1;
+		}
+		else if (floatx80_is_nan(a) || floatx80_is_nan(b))
+		{
+			m_ZF = 1;
+			m_PF = 1;
+			m_CF = 1;
+			m_x87_sw |= X87_SW_IE;
+		}
+		else
+		{
+			m_ZF = 0;
+			m_PF = 0;
+			m_CF = 0;
+
+			if (floatx80_eq(a, b))
+				m_ZF = 1;
+
+			if (floatx80_lt(a, b))
+				m_CF = 1;
+		}
+	}
+
+	x87_check_exceptions();
+
+	CYCLES(4); // TODO: correct cycle count
+}
+
+void i386_device::x87_fucomip_sti(UINT8 modrm)
+{
+	int i = modrm & 7;
+
+	if (X87_IS_ST_EMPTY(0) || X87_IS_ST_EMPTY(i))
+	{
+		x87_set_stack_underflow();
+		m_ZF = 1;
+		m_PF = 1;
+		m_CF = 1;
+	}
+	else
+	{
+		m_x87_sw &= ~X87_SW_C1;
+
+		floatx80 a = ST(0);
+		floatx80 b = ST(i);
+
+		if (floatx80_is_quiet_nan(a) || floatx80_is_quiet_nan(b))
+		{
+			m_ZF = 1;
+			m_PF = 1;
+			m_CF = 1;
+		}
+		else if (floatx80_is_nan(a) || floatx80_is_nan(b))
 		{
 			m_ZF = 1;
 			m_PF = 1;
@@ -4508,7 +4863,11 @@ void i386_device::build_x87_opcode_table_da()
 		{
 			switch (modrm)
 			{
-				case 0xe9: ptr = &i386_device::x87_fucompp;       break;
+			case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7: ptr = &i386_device::x87_fcmovb_sti;  break;
+			case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf: ptr = &i386_device::x87_fcmove_sti;  break;
+			case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7: ptr = &i386_device::x87_fcmovbe_sti; break;
+			case 0xd8: case 0xd9: case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde: case 0xdf: ptr = &i386_device::x87_fcmovu_sti;  break;
+			case 0xe9: ptr = &i386_device::x87_fucompp;       break;
 			}
 		}
 
@@ -4540,11 +4899,17 @@ void i386_device::build_x87_opcode_table_db()
 		{
 			switch (modrm)
 			{
+				case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7: ptr = &i386_device::x87_fcmovnb_sti;  break;
+				case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf: ptr = &i386_device::x87_fcmovne_sti;  break;
+				case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7: ptr = &i386_device::x87_fcmovnbe_sti; break;
+				case 0xd8: case 0xd9: case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde: case 0xdf: ptr = &i386_device::x87_fcmovnu_sti;  break;
 				case 0xe0: ptr = &i386_device::x87_fnop;          break; /* FENI */
 				case 0xe1: ptr = &i386_device::x87_fnop;          break; /* FDISI */
 				case 0xe2: ptr = &i386_device::x87_fclex;         break;
 				case 0xe3: ptr = &i386_device::x87_finit;         break;
 				case 0xe4: ptr = &i386_device::x87_fnop;          break; /* FSETPM */
+				case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef: ptr = &i386_device::x87_fucomi_sti;  break;
+				case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7: ptr = &i386_device::x87_fcomi_sti; break;
 			}
 		}
 
@@ -4698,6 +5063,7 @@ void i386_device::build_x87_opcode_table_df()
 			switch (modrm)
 			{
 				case 0xe0: ptr = &i386_device::x87_fstsw_ax;      break;
+				case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef: ptr = &i386_device::x87_fucomip_sti;    break;
 				case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7: ptr = &i386_device::x87_fcomip_sti;    break;
 			}
 		}

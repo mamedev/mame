@@ -7,7 +7,7 @@
     driver by Angelo Salese & David Haywood
 
     TODO:
-    - Don't know where the ES8712 & RTC62421b chips routes;
+    - Don't know where the ES8712 & RTC62421b chips route;
     - A bunch of missing port outputs;
     - screen disable? Start-up fading looks horrible;
     - Game looks IGS-esque, is there any correlation?
@@ -31,27 +31,33 @@ class d9final_state : public driver_device
 public:
 	d9final_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_lo_vram(*this, "lo_vram"),
 		m_hi_vram(*this, "hi_vram"),
-		m_cram(*this, "cram"),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_cram(*this, "cram") { }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	required_shared_ptr<UINT8> m_lo_vram;
 	required_shared_ptr<UINT8> m_hi_vram;
 	required_shared_ptr<UINT8> m_cram;
+	
 	tilemap_t *m_sc0_tilemap;
+	
 	DECLARE_WRITE8_MEMBER(sc0_lovram);
 	DECLARE_WRITE8_MEMBER(sc0_hivram);
 	DECLARE_WRITE8_MEMBER(sc0_cram);
-	DECLARE_WRITE8_MEMBER(d9final_bank_w);
+	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_READ8_MEMBER(prot_latch_r);
+	
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
-	virtual void machine_reset();
+	
+	virtual void machine_start();
 	virtual void video_start();
-	UINT32 screen_update_d9final(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
+	
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -72,7 +78,7 @@ void d9final_state::video_start()
 	m_sc0_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(d9final_state::get_sc0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 }
 
-UINT32 d9final_state::screen_update_d9final(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 d9final_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_sc0_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
@@ -96,13 +102,9 @@ WRITE8_MEMBER(d9final_state::sc0_cram)
 	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(d9final_state::d9final_bank_w)
+WRITE8_MEMBER(d9final_state::bank_w)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
-	UINT32 bankaddress;
-
-	bankaddress = 0x10000+(0x4000 * (data & 0x7));
-	membank("bank1")->set_base(&ROM[bankaddress]);
+	membank("bank1")->set_entry(data & 0x7);
 }
 
 /* game checks this after three attract cycles, otherwise coin inputs stop to work. */
@@ -135,7 +137,7 @@ static ADDRESS_MAP_START( d9final_io, AS_IO, 8, d9final_state )
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ymsnd", ym2413_device, write)
 	AM_RANGE(0x60, 0x60) AM_READ_PORT("DSWD")
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("IN0")
-	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("IN1") AM_WRITE(d9final_bank_w)
+	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("IN1") AM_WRITE(bank_w)
 	AM_RANGE(0xe0, 0xe0) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
@@ -277,11 +279,9 @@ static GFXDECODE_START( d9final )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x8_layout, 0, 16*4 )
 GFXDECODE_END
 
-void d9final_state::machine_reset()
+void d9final_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
-
-	membank("bank1")->set_base(&ROM[0x10000]);
+	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 static MACHINE_CONFIG_START( d9final, d9final_state )
@@ -298,7 +298,7 @@ static MACHINE_CONFIG_START( d9final, d9final_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(d9final_state, screen_update_d9final)
+	MCFG_SCREEN_UPDATE_DRIVER(d9final_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", d9final)
@@ -326,4 +326,4 @@ ROM_END
 
 
 
-GAME( 1992, d9final, 0, d9final, d9final, driver_device, 0, ROT0, "Excellent System", "Dream 9 Final (v2.24)", 0 )
+GAME( 1992, d9final, 0, d9final, d9final, driver_device, 0, ROT0, "Excellent System", "Dream 9 Final (v2.24)", GAME_SUPPORTS_SAVE )

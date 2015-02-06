@@ -113,7 +113,11 @@ bool sdl_osd_interface::video_init()
 		sdl_window_config conf;
 		memset(&conf, 0, sizeof(conf));
 		get_resolution(options().resolution(), options().resolution(index), &conf, TRUE);
-		if (sdlwindow_video_window_create(machine(), index, sdl_monitor_info::pick_monitor(options(), index), &conf))
+
+		// create window ...
+		sdl_window_info *win = global_alloc(sdl_window_info(machine(), index, sdl_monitor_info::pick_monitor(options(), index), &conf));
+
+		if (win->window_init())
 			return false;
 	}
 
@@ -308,7 +312,7 @@ void sdl_osd_interface::update(bool skip_redraw)
 	{
 //      profiler_mark(PROFILER_BLIT);
 		for (window = sdl_window_list; window != NULL; window = window->m_next)
-			window->video_window_update(machine());
+			window->update();
 //      profiler_mark(PROFILER_END);
 	}
 
@@ -540,7 +544,7 @@ sdl_monitor_info *sdl_monitor_info::pick_monitor(sdl_options &options, int index
 
 static void check_osd_inputs(running_machine &machine)
 {
-	sdl_window_info *window = sdlinput_get_focus_window(machine);
+	sdl_window_info *window = sdlinput_get_focus_window();
 
 	// check for toggling fullscreen mode
 	if (ui_input_pressed(machine, IPT_OSD_1))
@@ -549,7 +553,7 @@ static void check_osd_inputs(running_machine &machine)
 
 		while (curwin != (sdl_window_info *)NULL)
 		{
-			curwin->toggle_full_screen(machine);
+			curwin->toggle_full_screen();
 			curwin = curwin->m_next;
 		}
 	}
@@ -578,10 +582,10 @@ static void check_osd_inputs(running_machine &machine)
 	#endif
 
 	if (ui_input_pressed(machine, IPT_OSD_6))
-		window->modify_prescale(machine, -1);
+		window->modify_prescale(-1);
 
 	if (ui_input_pressed(machine, IPT_OSD_7))
-		window->modify_prescale(machine, 1);
+		window->modify_prescale(1);
 }
 
 //============================================================

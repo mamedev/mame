@@ -336,7 +336,6 @@ MACHINE_RESET_MEMBER(scorpion_state,scorpion)
 	space.install_write_handler(0x0000, 0x3fff, write8_delegate(FUNC(scorpion_state::scorpion_0000_w),this));
 
 	m_beta->disable();
-	m_beta->clear_status();
 	space.set_direct_update_handler(direct_update_delegate(FUNC(scorpion_state::scorpion_direct), this));
 
 	memset(messram,0,256*1024);
