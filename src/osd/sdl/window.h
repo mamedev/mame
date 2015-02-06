@@ -58,7 +58,6 @@ public:
 	bool check_flag(const int flag) { return ((m_flags & flag)) == flag; }
 
 	virtual int create(const int width, const int height) = 0;
-	virtual void resize(const int width, const int height) = 0;
 	virtual int draw(const UINT32 dc, const int update) = 0;
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) = 0;
 	virtual void destroy_all_textures() = 0;

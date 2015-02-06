@@ -491,9 +491,6 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_resize_wt )
 	window->m_height = window->m_sdlsurf->h;
 #endif
 
-
-	window->renderer().resize(window->m_width, window->m_height);
-
 	window->blit_surface_size(window->m_width, window->m_height);
 
 	window->clear();
