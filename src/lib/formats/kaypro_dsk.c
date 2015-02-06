@@ -9,18 +9,17 @@
     There is no inter-sector info on these disks. It is simply a
     dump of the 512 bytes from each sector and track in order.
     It is just like a headerless quickload.
-    No idea about how to calculate the gaps. Used the ones recommended
-    in the wd177x_dsk notes, works for most disks. Please note that
-    these disks usually have DSK extension, but that conflicts with
-    the CPCEMU DSK format. You need to rename your Kaypro DSK disks
-    to KAY extension.
+    Base class and gaps verified by OG. Please note that these
+    disks usually have DSK extension, but that conflicts with
+    the CPCEMU DSK format. You need to rename your Kaypro DSK
+    disks to KAY extension.
 
 *********************************************************************/
 
 #include "emu.h"
 #include "formats/kaypro_dsk.h"
 
-kayproii_format::kayproii_format() : wd177x_format(formats)
+kayproii_format::kayproii_format() : upd765_format(formats)
 {
 }
 
@@ -43,12 +42,12 @@ const char *kayproii_format::extensions() const
 const kayproii_format::format kayproii_format::formats[] = {
 	{   /*  191K 13cm double density single sided */
 		floppy_image::FF_525,  floppy_image::SSDD, floppy_image::MFM,
-		2000, 10, 40, 1, 512, {}, 0, {}, 80, 22, 24
+		2000, 10, 40, 1, 512, {}, 0, {}, 80, 16, 22, 26
 	},
 	{}
 };
 
-kaypro2x_format::kaypro2x_format() : wd177x_format(formats)
+kaypro2x_format::kaypro2x_format() : upd765_format(formats)
 {
 }
 
@@ -71,7 +70,7 @@ const char *kaypro2x_format::extensions() const
 const kaypro2x_format::format kaypro2x_format::formats[] = {
 	{   /*  382K 13cm double density double sided */
 		floppy_image::FF_525,  floppy_image::DSDD, floppy_image::MFM,
-		2000, 10, 40, 2, 512, {}, 0, {}, 80, 22, 24
+		2000, 10, 40, 2, 512, {}, 0, {}, 80, 16, 22, 26
 	},
 	{}
 };
