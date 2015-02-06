@@ -14,7 +14,6 @@ goto TR-DOS, CAT -> files will be shown, CAT again -> NO DISK mesage as result o
 
 */
 #include "emu.h"
-#include "imagedev/flopdrv.h"
 #include "formats/trd_dsk.h"
 #include "machine/beta.h"
 
@@ -27,9 +26,13 @@ goto TR-DOS, CAT -> files will be shown, CAT again -> NO DISK mesage as result o
 const device_type BETA_DISK = &device_creator<beta_disk_device>;
 
 beta_disk_device::beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, BETA_DISK, "Beta Disk Interface", tag, owner, clock, "betadisk", __FILE__),
-	m_betadisk_status(0),
-	m_betadisk_active(0)
+	: device_t(mconfig, BETA_DISK, "Beta Disk Interface", tag, owner, clock, "betadisk", __FILE__)
+	, m_betadisk_active(0)
+	, m_wd179x(*this, "wd179x")
+	, m_floppy0(*this, "wd179x:0")
+	, m_floppy1(*this, "wd179x:1")
+	, m_floppy2(*this, "wd179x:2")
+	, m_floppy3(*this, "wd179x:3")
 {
 }
 
@@ -39,14 +42,6 @@ beta_disk_device::beta_disk_device(const machine_config &mconfig, const char *ta
 
 void beta_disk_device::device_start()
 {
-	astring tempstring;
-
-	/* validate arguments */
-	assert(tag() != NULL);
-
-	/* find our WD179x */
-	tempstring.printf("%s:%s", tag(), "wd179x");
-	m_wd179x = machine().device<wd2793_device>(tempstring);
 }
 
 //-------------------------------------------------
@@ -72,31 +67,10 @@ void beta_disk_device::disable()
 	m_betadisk_active = 0;
 }
 
-void beta_disk_device::clear_status()
-{
-	m_betadisk_status = 0;
-}
-
-WRITE_LINE_MEMBER(beta_disk_device::wd179x_intrq_w)
-{
-	if (state)
-		m_betadisk_status |= (1<<7);
-	else
-		m_betadisk_status &=~(1<<7);
-}
-
-WRITE_LINE_MEMBER(beta_disk_device::wd179x_drq_w)
-{
-	if (state)
-		m_betadisk_status |= (1<<6);
-	else
-		m_betadisk_status &=~(1<<6);
-}
-
 READ8_MEMBER(beta_disk_device::status_r)
 {
 	if (m_betadisk_active==1) {
-		return m_wd179x->status_r(space, offset);
+		return m_wd179x->status_r(space, 0);
 	} else {
 		return 0xff;
 	}
@@ -105,7 +79,7 @@ READ8_MEMBER(beta_disk_device::status_r)
 READ8_MEMBER(beta_disk_device::track_r)
 {
 	if (m_betadisk_active==1) {
-		return m_wd179x->track_r(space, offset);
+		return m_wd179x->track_r(space, 0);
 	} else {
 		return 0xff;
 	}
@@ -114,7 +88,7 @@ READ8_MEMBER(beta_disk_device::track_r)
 READ8_MEMBER(beta_disk_device::sector_r)
 {
 	if (m_betadisk_active==1) {
-		return m_wd179x->sector_r(space, offset);
+		return m_wd179x->sector_r(space, 0);
 	} else {
 		return 0xff;
 	}
@@ -123,7 +97,7 @@ READ8_MEMBER(beta_disk_device::sector_r)
 READ8_MEMBER(beta_disk_device::data_r)
 {
 	if (m_betadisk_active==1) {
-		return m_wd179x->data_r(space, offset);
+		return m_wd179x->data_r(space, 0);
 	} else {
 		return 0xff;
 	}
@@ -132,7 +106,10 @@ READ8_MEMBER(beta_disk_device::data_r)
 READ8_MEMBER(beta_disk_device::state_r)
 {
 	if (m_betadisk_active==1) {
-		return m_betadisk_status;
+		UINT8 result = 0x3F;		// actually open bus
+		result |= m_wd179x->drq_r() ? 0x40 : 0;
+		result |= m_wd179x->intrq_r() ? 0x80 : 0;
+		return result;
 	} else {
 		return 0xff;
 	}
@@ -140,66 +117,75 @@ READ8_MEMBER(beta_disk_device::state_r)
 
 WRITE8_MEMBER(beta_disk_device::param_w)
 {
-	const char *floppy_tags[4] = { FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3 };
-
 	if (m_betadisk_active == 1)
 	{
-		m_wd179x->set_drive(data & 3);
-		m_wd179x->set_side ((data & 0x10) ? 0 : 1 );
-		m_wd179x->dden_w(!BIT(data, 6));
-		if ((data & 0x04) == 0) // reset
-			m_wd179x->reset();
+		floppy_connector* connectors[] = { m_floppy0, m_floppy1, m_floppy2, m_floppy3 };
 
-		// bit 3 connected to pin 23 "HRDY" of FDC
-		// TEMP HACK, FDD motor and RDY FDC pin controlled by HLD pin of FDC
-		legacy_floppy_image_device *flop = subdevice<legacy_floppy_image_device>(floppy_tags[data & 3]);
-		flop->floppy_mon_w(CLEAR_LINE);
-		flop->floppy_drive_set_ready_state(1, 0);
+		floppy_image_device* floppy = connectors[data & 3]->get_device();
+
+		m_wd179x->set_floppy(floppy);
+		floppy->ss_w(BIT(data, 4) ? 0 : 1);
+		m_wd179x->dden_w(BIT(data, 6));
+
+		// bit 3 connected to pin 23 "HLT" of FDC and via diode to INDEX
+		//m_wd179x->hlt_w(BIT(data, 3)); // not handled in current wd_fdc
+
+		if (BIT(data, 2) == 0) // reset
+		{
+			m_wd179x->reset();
+			floppy->mon_w(ASSERT_LINE);
+		} else {
+			// HACK, FDD motor and RDY FDC pin controlled by HLD pin of FDC
+			floppy->mon_w(CLEAR_LINE);
+		}
 	}
 }
 
 WRITE8_MEMBER(beta_disk_device::command_w)
 {
 	if (m_betadisk_active==1) {
-		m_wd179x->command_w(space, offset, data);
+		m_wd179x->cmd_w(space, 0, data);
 	}
 }
 
 WRITE8_MEMBER(beta_disk_device::track_w)
 {
 	if (m_betadisk_active==1) {
-		m_wd179x->track_w(space, offset, data);
+		m_wd179x->track_w(space, 0, data);
 	}
 }
 
 WRITE8_MEMBER(beta_disk_device::sector_w)
 {
 	if (m_betadisk_active==1) {
-		m_wd179x->sector_w(space, offset, data);
+		m_wd179x->sector_w(space, 0, data);
 	}
 }
 
 WRITE8_MEMBER(beta_disk_device::data_w)
 {
 	if (m_betadisk_active==1) {
-		m_wd179x->data_w(space, offset, data);
+		m_wd179x->data_w(space, 0, data);
 	}
 }
 
-static const floppy_interface beta_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(trd),
-	NULL
-};
+FLOPPY_FORMATS_MEMBER(beta_disk_device::floppy_formats)
+	FLOPPY_TRD_FORMAT
+FLOPPY_FORMATS_END
+
+static SLOT_INTERFACE_START( beta_disk_floppies )
+	SLOT_INTERFACE( "drive0", FLOPPY_525_QD )
+	SLOT_INTERFACE( "drive1", FLOPPY_525_QD )
+	SLOT_INTERFACE( "drive2", FLOPPY_525_QD )
+	SLOT_INTERFACE( "drive3", FLOPPY_525_QD )
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( beta_disk )
-	MCFG_DEVICE_ADD("wd179x", WD2793, 0) // KR1818VG93 clone of WD1793
-	MCFG_WD17XX_DEFAULT_DRIVE4_TAGS
-	MCFG_WD17XX_INTRQ_CALLBACK(WRITELINE(beta_disk_device, wd179x_intrq_w))
-	MCFG_WD17XX_DRQ_CALLBACK(WRITELINE(beta_disk_device, wd179x_drq_w))
-
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(beta_floppy_interface)
+	MCFG_WD2793x_ADD("wd179x", XTAL_8MHz / 8)	// KR1818VG93 clone of WD1793
+	MCFG_FLOPPY_DRIVE_ADD("wd179x:0", beta_disk_floppies, "drive0", beta_disk_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd179x:1", beta_disk_floppies, "drive1", beta_disk_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd179x:2", beta_disk_floppies, "drive2", beta_disk_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd179x:3", beta_disk_floppies, "drive3", beta_disk_device::floppy_formats)
 MACHINE_CONFIG_END
 
 ROM_START( beta_disk )

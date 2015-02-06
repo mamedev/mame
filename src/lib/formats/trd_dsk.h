@@ -9,10 +9,20 @@
 #ifndef TRD_DSK_H
 #define TRD_DSK_H
 
-#include "flopimg.h"
+#include "wd177x_dsk.h"
 
-/**************************************************************************/
+class trd_format : public wd177x_format {
+public:
+	trd_format();
 
-LEGACY_FLOPPY_OPTIONS_EXTERN(trd);
+	virtual const char *name() const;
+	virtual const char *description() const;
+	virtual const char *extensions() const;
+
+private:
+	static const format formats[];
+};
+
+extern const floppy_format_type FLOPPY_TRD_FORMAT;
 
 #endif /* TRD_DSK_H */
