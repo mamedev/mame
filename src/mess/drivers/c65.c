@@ -400,6 +400,7 @@ WRITE8_MEMBER(c65_state::cia0_porta_w)
 
 WRITE8_MEMBER(c65_state::cia0_portb_w)
 {
+
 }
 
 READ8_MEMBER(c65_state::dummy_r)
@@ -418,7 +419,7 @@ static ADDRESS_MAP_START( c65_map, AS_PROGRAM, 8, c65_state )
 	AM_RANGE(0x0d300, 0x0d3ff) AM_RAM_WRITE(PalBlue_w) AM_SHARE("bluepal") // 0x0d300, 0x0d3ff Blue Palette
 	// 0x0d400, 0x0d4*f Right SID
 	// 0x0d440, 0x0d4*f Left  SID
-	// 0x0d600, 0x0d6** UART
+	AM_RANGE(0x0d600, 0x0d6ff) AM_RAM // 0x0d600, 0x0d6** UART
 	AM_RANGE(0x0d700, 0x0d702) AM_WRITE(DMAgic_w) AM_SHARE("dmalist") // 0x0d700, 0x0d7** DMAgic
 	//AM_RANGE(0x0d703, 0x0d703) AM_READ(DMAgic_r)
 	// 0x0d800, 0x0d8** Color matrix

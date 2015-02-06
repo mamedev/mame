@@ -412,7 +412,7 @@ static ADDRESS_MAP_START( kozure_map, AS_PROGRAM, 16, armedf_state )
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
 //  AM_RANGE(0x07c000, 0x07c001) AM_WRITE(kozure_io_w)
 //  AM_RANGE(0x0c0000, 0x0c0001) AM_WRITENOP /* watchdog? */
-//  AM_RANGE(0xffd000, 0xffd001) AM_WRITENOP /* ? */
+//  AM_RANGE(0xffd000, 0xffd001) AM_WRITENOP /* passes crc ROM information to MCU, I guess */
 	AM_IMPORT_FROM( terraf_map )
 ADDRESS_MAP_END
 
