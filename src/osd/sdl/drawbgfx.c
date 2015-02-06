@@ -79,8 +79,7 @@ public:
       m_last_blit_time(0), m_last_blit_pixels(0)
     {}
 
-	/* virtual */ int create(const int width, const int height);
-	/* virtual */ void resize(const int width, const int height);
+	/* virtual */ int create();
 	/* virtual */ int draw(const UINT32 dc, const int update);
 	/* virtual */ int xy_to_render_target(const int x, const int y, int *xt, int *yt);
 	/* virtual */ void destroy_all_textures();
@@ -135,7 +134,7 @@ int drawbgfx_init(running_machine &machine, sdl_draw_info *callbacks)
 //  sdl_info_bgfx::create
 //============================================================
 
-int sdl_info_bgfx::create(int width, int height)
+int sdl_info_bgfx::create()
 {
 	// create renderer
 
@@ -149,15 +148,6 @@ int sdl_info_bgfx::create(int width, int height)
 	bgfx::setDebug(BGFX_DEBUG_STATS);// BGFX_DEBUG_TEXT);
 	osd_printf_verbose("Leave drawsdl2_window_create\n");
 	return 0;
-}
-
-//============================================================
-//  sdl_info_bgfx::resize
-//============================================================
-
-void sdl_info_bgfx::resize(int width, int height)
-{
-	m_blittimer = 3;
 }
 
 //============================================================

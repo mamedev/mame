@@ -163,6 +163,14 @@ static const z80_daisy_config kaypro2x_daisy_chain[] =
 
 ************************************************************/
 
+FLOPPY_FORMATS_MEMBER( kaypro_state::kayproii_floppy_formats )
+	FLOPPY_KAYPROII_FORMAT
+FLOPPY_FORMATS_END
+
+FLOPPY_FORMATS_MEMBER( kaypro_state::kaypro2x_floppy_formats )
+	FLOPPY_KAYPRO2X_FORMAT
+FLOPPY_FORMATS_END
+
 static SLOT_INTERFACE_START( kaypro_floppies )
 	SLOT_INTERFACE( "drive0", FLOPPY_525_DD )
 	SLOT_INTERFACE( "drive1", FLOPPY_525_DD )
@@ -224,8 +232,8 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(kaypro_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(kaypro_state, fdc_drq_w))
 	MCFG_WD_FDC_FORCE_READY
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "drive0", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "drive1", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "drive0", kaypro_state::kayproii_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "drive1", kaypro_state::kayproii_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","kayproii")
 MACHINE_CONFIG_END
 
@@ -287,8 +295,8 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(kaypro_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(kaypro_state, fdc_drq_w))
 	MCFG_WD_FDC_FORCE_READY
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "drive0", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "drive1", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "drive0", kaypro_state::kaypro2x_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "drive1", kaypro_state::kaypro2x_floppy_formats)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( omni2, kaypro4 )

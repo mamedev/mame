@@ -95,12 +95,20 @@ public:
 };
 
 /* renderer is the information about Direct3D for the current screen */
-class renderer
+class renderer : public osd_renderer
 {
 public:
-	renderer() { }
+	//renderer() { }
 	renderer(win_window_info *window);
-	~renderer();
+	virtual ~renderer();
+
+	virtual int init();
+	virtual render_primitive_list *get_primitives();
+	virtual int draw(HDC dc, int update);
+	virtual void save();
+	virtual void record();
+	virtual void toggle_fsfx();
+	virtual void destroy();
 
 	int                     initialize();
 
@@ -148,8 +156,6 @@ public:
 	int                     get_height() { return m_height; }
 	int                     get_refresh() { return m_refresh; }
 
-	win_window_info *       get_window() { return m_window; }
-
 	device *                get_device() { return m_device; }
 	present_parameters *    get_presentation() { return &m_presentation; }
 
@@ -180,8 +186,6 @@ private:
 	int                     m_height;                   // current height
 	int                     m_refresh;                  // current refresh rate
 	int                     m_create_error_count;       // number of consecutive create errors
-
-	win_window_info *       m_window;                     // current window info
 
 	device *                m_device;                   // pointer to the Direct3DDevice object
 	int                     m_gamma_supported;          // is full screen gamma supported?

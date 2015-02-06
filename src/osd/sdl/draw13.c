@@ -145,12 +145,11 @@ public:
     sdl_info13(sdl_window_info *w)
     : osd_renderer(w, FLAG_NONE), m_blittimer(0), m_sdl_renderer(NULL),
       m_last_hofs(0), m_last_vofs(0),
-      m_resize_pending(0), m_resize_width(0), m_resize_height(0),
+      m_last_width(0), m_last_height(0),
       m_last_blit_time(0), m_last_blit_pixels(0)
     {}
 
-	/* virtual */ int create(const int width, const int height);
-	/* virtual */ void resize(const int width, const int height);
+	/* virtual */ int create();
 	/* virtual */ int draw(const UINT32 dc, const int update);
 	/* virtual */ int xy_to_render_target(const int x, const int y, int *xt, int *yt);
 	/* virtual */ void destroy_all_textures();
@@ -177,11 +176,8 @@ public:
 	float           m_last_hofs;
 	float           m_last_vofs;
 
-	// resize information
-
-	UINT8           m_resize_pending;
-	UINT32          m_resize_width;
-	UINT32          m_resize_height;
+	int				m_last_width;
+	int				m_last_height;
 
 	// Stats
 	INT64           m_last_blit_time;
@@ -576,7 +572,7 @@ static void drawsdl2_exit(void)
 // a
 //============================================================
 
-int sdl_info13::create(int width, int height)
+int sdl_info13::create()
 {
 #if (SDLMAME_SDL2)
 	// create renderer
@@ -615,16 +611,6 @@ int sdl_info13::create(int width, int height)
 
 #endif
 	return 0;
-}
-
-//============================================================
-//  sdl_info::resize
-//============================================================
-
-void sdl_info13::resize(int width, int height)
-{
-	SDL_RenderSetViewport(m_sdl_renderer, NULL);
-	m_blittimer = 3;
 }
 
 
@@ -695,17 +681,13 @@ int sdl_info13::draw(UINT32 dc, int update)
 		return 0;
 	}
 
-#if 0
-	if (m_resize_pending)
+	if ((window().width() != m_last_width) || (window().height() != m_last_height))
 	{
-		SDL_SetWindowSize(window().m_sdl_window, m_resize_width, m_resize_height);
-		SDL_GetWindowSize(window().m_sdl_window, &window().width(), &window().height());
-		m_resize_pending = 0;
+		m_last_width = window().width();
+		m_last_height = window().height();
 		SDL_RenderSetViewport(m_sdl_renderer, NULL);
-		//sdlvideo_monitor_refresh(window().monitor());
-
+		m_blittimer = 3;
 	}
-#endif
 	//SDL_SelectRenderer(window().sdl_window);
 
 	if (m_blittimer > 0)

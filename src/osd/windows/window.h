@@ -32,6 +32,42 @@
 //  TYPE DEFINITIONS
 //============================================================
 
+class win_window_info;
+
+class osd_renderer
+{
+public:
+
+	/* Generic flags */
+	static const int FLAG_NONE 					= 0x0000;
+	static const int FLAG_NEEDS_OPENGL 			= 0x0001;
+
+	/* SDL 1.2 flags */
+	static const int FLAG_NEEDS_DOUBLEBUF 		= 0x0100;
+	static const int FLAG_NEEDS_ASYNCBLIT 		= 0x0200;
+
+	osd_renderer(win_window_info *window, const int flags)
+	: m_window(window), m_flags(flags) { }
+
+	virtual ~osd_renderer() { }
+
+	win_window_info &window() { return *m_window; }
+	int flags() const { return m_flags; }
+	bool check_flag(const int flag) { return ((m_flags & flag)) == flag; }
+
+	virtual int init() = 0;
+	virtual render_primitive_list *get_primitives() = 0;
+	virtual int draw(HDC dc, int update) = 0;
+	virtual void save() = 0;
+	virtual void record() = 0;
+	virtual void toggle_fsfx() = 0;
+	virtual void destroy() = 0;
+
+private:
+	win_window_info *m_window;
+	int m_flags;
+};
+
 class win_window_info
 {
 public:
@@ -77,24 +113,16 @@ public:
 	int                 m_lastclicky;
 
 	// drawing data
-	void *              m_drawdata;
+	osd_renderer *      m_renderer;
 
 private:
 	running_machine &   m_machine;
 };
 
-
-struct win_draw_callbacks
+struct osd_draw_callbacks
 {
+	osd_renderer *(*create)(win_window_info *window);
 	void (*exit)(void);
-
-	int (*window_init)(win_window_info *window);
-	render_primitive_list *(*window_get_primitives)(win_window_info *window);
-	int (*window_draw)(win_window_info *window, HDC dc, int update);
-	void (*window_save)(win_window_info *window);
-	void (*window_record)(win_window_info *window);
-	void (*window_toggle_fsfx)(win_window_info *window);
-	void (*window_destroy)(win_window_info *window);
 };
 
 
