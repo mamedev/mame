@@ -578,8 +578,14 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1985, gunsmoke,   0,        gunsmoke, gunsmoke,   driver_device, 0, ROT270, "Capcom", "Gun.Smoke (World)", GAME_SUPPORTS_SAVE )
-GAME( 1985, gunsmokeb,  gunsmoke, gunsmoke, gunsmoke,   driver_device, 0, ROT270, "bootleg", "Gun.Smoke (bootleg)", GAME_SUPPORTS_SAVE ) // based on world version, warning message patched out
-GAME( 1985, gunsmokej,  gunsmoke, gunsmoke, gunsmoke,   driver_device, 0, ROT270, "Capcom", "Gun.Smoke (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1985, gunsmokeu,  gunsmoke, gunsmoke, gunsmoke,   driver_device, 0, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1986, gunsmokeua, gunsmoke, gunsmoke, gunsmokeua, driver_device, 0, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US set 2)", GAME_SUPPORTS_SAVE )
+// at 0x7E50 in the first rom is 85113 (project ident code?) and the project codename 'Gunman' both stored as ASCII.
+// Following that at (stored as raw data) is the build date in yyyymmdd format.  After that a ROM identification string(?) which I've
+// left in the comment after each set.
+
+// this information is not displayed onscreen
+
+GAME( 1985, gunsmoke,   0,        gunsmoke, gunsmoke,   driver_device, 0, ROT270, "Capcom",                   "Gun.Smoke (World, 851115)", GAME_SUPPORTS_SAVE ) // GSE_03
+GAME( 1985, gunsmokeb,  gunsmoke, gunsmoke, gunsmoke,   driver_device, 0, ROT270, "bootleg",                  "Gun.Smoke (World, 851115) (bootleg)", GAME_SUPPORTS_SAVE ) // based  on above version, warning message patched out
+GAME( 1985, gunsmokej,  gunsmoke, gunsmoke, gunsmoke,   driver_device, 0, ROT270, "Capcom",                   "Gun.Smoke (Japan, 851115)", GAME_SUPPORTS_SAVE ) // GSJ_03
+GAME( 1985, gunsmokeu,  gunsmoke, gunsmoke, gunsmoke,   driver_device, 0, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US, 851115)", GAME_SUPPORTS_SAVE ) // GSR_03 
+GAME( 1986, gunsmokeua, gunsmoke, gunsmoke, gunsmokeua, driver_device, 0, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US, 860408)", GAME_SUPPORTS_SAVE ) // GSA_03
