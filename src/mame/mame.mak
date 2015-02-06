@@ -151,6 +151,7 @@ CPUS += ALTO2
 CPUS += ARC
 CPUS += ARCOMPACT
 CPUS += AMIS2000
+CPUS += UCOM4
 
 #-------------------------------------------------
 # specify available sound cores

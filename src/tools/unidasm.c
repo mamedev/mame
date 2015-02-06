@@ -179,6 +179,7 @@ CPU_DISASSEMBLE( tms9980 );
 CPU_DISASSEMBLE( tms9995 );
 CPU_DISASSEMBLE( tx0_64kw );
 CPU_DISASSEMBLE( tx0_8kw );
+CPU_DISASSEMBLE( ucom4 );
 CPU_DISASSEMBLE( unsp );
 CPU_DISASSEMBLE( upd7725 );
 CPU_DISASSEMBLE( upd7801 );
@@ -326,6 +327,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "tms9995",    _8bit,  0, CPU_DISASSEMBLE_NAME(tms9995) },
 	{ "tx0_64kw",   _32be, -2, CPU_DISASSEMBLE_NAME(tx0_64kw) },
 	{ "tx0_8kw",    _32be, -2, CPU_DISASSEMBLE_NAME(tx0_8kw) },
+	{ "ucom4",      _8bit,  0, CPU_DISASSEMBLE_NAME(ucom4) },
 	{ "unsp",       _16be,  0, CPU_DISASSEMBLE_NAME(unsp) },
 	{ "upd7725",    _32be,  0, CPU_DISASSEMBLE_NAME(unsp) },
 	{ "upd7801",    _8bit,  0, CPU_DISASSEMBLE_NAME(upd7801) },

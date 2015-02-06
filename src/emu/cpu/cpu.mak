@@ -1867,6 +1867,25 @@ $(CPUOBJ)/upd7810/upd7810.o:    $(CPUSRC)/upd7810/upd7810.c \
 
 
 #-------------------------------------------------
+# NEC uCOM-4 series
+#@src/emu/cpu/ucom4/ucom4.h,CPUS += UCOM4
+#-------------------------------------------------
+
+ifneq ($(filter UCOM4,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/ucom4
+CPUOBJS += $(CPUOBJ)/ucom4/ucom4.o
+DASMOBJS += $(CPUOBJ)/ucom4/ucom4d.o
+endif
+
+$(CPUOBJ)/ucom4/ucom4.o:        $(CPUSRC)/ucom4/ucom4.h \
+								$(CPUSRC)/ucom4/ucom4.c \
+								$(CPUSRC)/ucom4/ucom4op.inc
+
+$(CPUOBJ)/ucom4/ucom4d.o:       $(CPUSRC)/ucom4/ucom4.h \
+								$(CPUSRC)/ucom4/ucom4d.c
+
+
+#-------------------------------------------------
 # Nintendo Minx
 #@src/emu/cpu/minx/minx.h,CPUS += MINX
 #-------------------------------------------------
