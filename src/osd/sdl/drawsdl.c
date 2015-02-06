@@ -70,7 +70,7 @@ public:
 	m_last_height(0)
 	{ }
 
-	/* virtual */ int create(const int width, const int height);
+	/* virtual */ int create();
 	/* virtual */ int draw(const UINT32 dc, const int update);
 	/* virtual */ int xy_to_render_target(const int x, const int y, int *xt, int *yt);
 	/* virtual */ void destroy_all_textures();
@@ -419,7 +419,7 @@ static void drawsdl_show_info(struct SDL_RendererInfo *render_info)
 // a
 //============================================================
 
-int sdl_info::create(int width, int height)
+int sdl_info::create()
 {
 
 #if (SDLMAME_SDL2)
@@ -465,7 +465,7 @@ int sdl_info::create(int width, int height)
 		}
 	}
 
-	setup_texture(width, height);
+	setup_texture(window().width(), window().height());
 #else
 #endif
 

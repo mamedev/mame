@@ -149,7 +149,7 @@ public:
       m_last_blit_time(0), m_last_blit_pixels(0)
     {}
 
-	/* virtual */ int create(const int width, const int height);
+	/* virtual */ int create();
 	/* virtual */ int draw(const UINT32 dc, const int update);
 	/* virtual */ int xy_to_render_target(const int x, const int y, int *xt, int *yt);
 	/* virtual */ void destroy_all_textures();
@@ -572,7 +572,7 @@ static void drawsdl2_exit(void)
 // a
 //============================================================
 
-int sdl_info13::create(int width, int height)
+int sdl_info13::create()
 {
 #if (SDLMAME_SDL2)
 	// create renderer

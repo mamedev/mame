@@ -252,7 +252,7 @@ public:
 			m_texVerticex[i] = 0.0f;
 	}
 
-	/* virtual */ int create(const int width, const int height);
+	/* virtual */ int create();
 	/* virtual */ int draw(const UINT32 dc, const int update);
 	/* virtual */ int xy_to_render_target(const int x, const int y, int *xt, int *yt);
 	/* virtual */ void destroy_all_textures();
@@ -711,7 +711,7 @@ void sdl_info_ogl::initialize_gl()
 // a
 //============================================================
 
-int sdl_info_ogl::create(int width, int height)
+int sdl_info_ogl::create()
 {
 
 #if (SDLMAME_SDL2)

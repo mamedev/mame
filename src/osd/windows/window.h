@@ -32,7 +32,41 @@
 //  TYPE DEFINITIONS
 //============================================================
 
-class osd_renderer;
+class win_window_info;
+
+class osd_renderer
+{
+public:
+
+	/* Generic flags */
+	static const int FLAG_NONE 					= 0x0000;
+	static const int FLAG_NEEDS_OPENGL 			= 0x0001;
+
+	/* SDL 1.2 flags */
+	static const int FLAG_NEEDS_DOUBLEBUF 		= 0x0100;
+	static const int FLAG_NEEDS_ASYNCBLIT 		= 0x0200;
+
+	osd_renderer(win_window_info *window, const int flags)
+	: m_window(window), m_flags(flags) { }
+
+	virtual ~osd_renderer() { }
+
+	win_window_info &window() { return *m_window; }
+	int flags() const { return m_flags; }
+	bool check_flag(const int flag) { return ((m_flags & flag)) == flag; }
+
+	virtual int init() = 0;
+	virtual render_primitive_list *get_primitives() = 0;
+	virtual int draw(HDC dc, int update) = 0;
+	virtual void save() = 0;
+	virtual void record() = 0;
+	virtual void toggle_fsfx() = 0;
+	virtual void destroy() = 0;
+
+private:
+	win_window_info *m_window;
+	int m_flags;
+};
 
 class win_window_info
 {
@@ -83,40 +117,6 @@ public:
 
 private:
 	running_machine &   m_machine;
-};
-
-class osd_renderer
-{
-public:
-
-	/* Generic flags */
-	static const int FLAG_NONE 					= 0x0000;
-	static const int FLAG_NEEDS_OPENGL 			= 0x0001;
-
-	/* SDL 1.2 flags */
-	static const int FLAG_NEEDS_DOUBLEBUF 		= 0x0100;
-	static const int FLAG_NEEDS_ASYNCBLIT 		= 0x0200;
-
-	osd_renderer(win_window_info *window, const int flags)
-	: m_window(window), m_flags(flags) { }
-
-	virtual ~osd_renderer() { }
-
-	win_window_info &window() { return *m_window; }
-	int flags() const { return m_flags; }
-	bool check_flag(const int flag) { return ((m_flags & flag)) == flag; }
-
-	virtual int init() = 0;
-	virtual render_primitive_list *get_primitives() = 0;
-	virtual int draw(HDC dc, int update) = 0;
-	virtual void save() = 0;
-	virtual void record() = 0;
-	virtual void toggle_fsfx() = 0;
-	virtual void destroy() = 0;
-
-private:
-	win_window_info *m_window;
-	int m_flags;
 };
 
 struct osd_draw_callbacks
