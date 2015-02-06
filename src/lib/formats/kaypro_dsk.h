@@ -9,9 +9,9 @@
 #ifndef KAYPRO_DSK_H_
 #define KAYPRO_DSK_H_
 
-#include "wd177x_dsk.h"
+#include "upd765_dsk.h"
 
-class kayproii_format : public wd177x_format {
+class kayproii_format : public upd765_format {
 public:
 	kayproii_format();
 
@@ -23,7 +23,7 @@ private:
 	static const format formats[];
 };
 
-class kaypro2x_format : public wd177x_format {
+class kaypro2x_format : public upd765_format {
 public:
 	kaypro2x_format();
 

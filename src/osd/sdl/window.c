@@ -491,9 +491,6 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_resize_wt )
 	window->m_height = window->m_sdlsurf->h;
 #endif
 
-
-	window->renderer().resize(window->m_width, window->m_height);
-
 	window->blit_surface_size(window->m_width, window->m_height);
 
 	window->clear();
@@ -711,7 +708,7 @@ void sdl_window_info::update_cursor_state()
 #endif
 }
 
-static OSDWORK_CALLBACK( sdlwindow_update_cursor_state_wt )
+OSDWORK_CALLBACK( sdl_window_info::update_cursor_state_wt )
 {
 	worker_param *      wp = (worker_param *) param;
 	sdl_window_info *   window = wp->window();
@@ -1023,7 +1020,7 @@ void sdl_window_info::update()
 	// adjust the cursor state
 	//sdlwindow_update_cursor_state(machine, window);
 
-	execute_async(&sdlwindow_update_cursor_state_wt, worker_param(this));
+	execute_async(&update_cursor_state_wt, worker_param(this));
 
 	// if we're visible and running and not in the middle of a resize, draw
 	if (m_target != NULL)
@@ -1279,7 +1276,7 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 #endif
 
 	// initialize the drawing backend
-	if (window->renderer().create(window->width(), window->height()))
+	if (window->renderer().create())
 		return (void *) &result[1];
 
 	// Make sure we have a consistent state

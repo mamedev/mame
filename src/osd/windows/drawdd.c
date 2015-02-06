@@ -36,12 +36,73 @@ typedef HRESULT (WINAPI *directdrawenumerateex_ptr)(LPDDENUMCALLBACKEXA lpCallba
 
 
 /* dd_info is the information about DirectDraw for the current screen */
-struct dd_info
+class renderer_dd : public osd_renderer
 {
-	GUID                    adapter;                    // current display adapter
-	GUID *                  adapter_ptr;                // pointer to current display adapter
+public:
+	renderer_dd(win_window_info *window)
+	: osd_renderer(window, FLAG_NONE),
+		//adapter(0),
+		adapter_ptr(NULL),
+		clearouter(0),
+		blitwidth(0), blitheight(0),
+		//lastdest
+		ddraw(NULL),
+		primary(NULL),
+		back(NULL),
+		blit(NULL),
+		clipper(NULL),
+		gamma(NULL),
+		//DDSURFACEDESC2          primarydesc;
+		//DDSURFACEDESC2          blitdesc;
+		//DDSURFACEDESC2          origmode;
+		//ddcaps(0),
+		//helcaps(0),
+		membuffer(NULL),
+		membuffersize(NULL)
+	{ }
+
+	virtual ~renderer_dd() { }
+
+	virtual int init();
+	virtual render_primitive_list *get_primitives();
+	virtual int draw(HDC dc, int update);
+	virtual void save() {};
+	virtual void record() {};
+	virtual void toggle_fsfx() {};
+	virtual void destroy();
+
 	int                     width, height;              // current width, height
 	int                     refresh;                    // current refresh rate
+
+private:
+
+	inline void update_outer_rects();
+
+	// surface management
+	int ddraw_create();
+	int ddraw_create_surfaces();
+	void ddraw_delete();
+	void ddraw_delete_surfaces();
+	int ddraw_verify_caps();
+	int ddraw_test_cooperative();
+	HRESULT create_surface(DDSURFACEDESC2 *desc, IDirectDrawSurface7 **surface, const char *type);
+	int create_clipper();
+
+	// drawing helpers
+	void compute_blit_surface_size();
+	void blit_to_primary(int srcwidth, int srcheight);
+
+	// video modes
+	int config_adapter_mode();
+	void get_adapter_for_monitor(win_monitor_info *monitor);
+	void pick_best_mode();
+
+	// various
+	void calc_fullscreen_margins(DWORD desc_width, DWORD desc_height, RECT *margins);
+
+
+	GUID                    adapter;                    // current display adapter
+	GUID *                  adapter_ptr;                // pointer to current display adapter
 	int                     clearouter;                 // clear the outer areas?
 
 	INT32                   blitwidth, blitheight;      // current blit width/height values
@@ -79,7 +140,7 @@ struct monitor_enum_info
 /* mode_enum_info holds information during a display mode enumeration */
 struct mode_enum_info
 {
-	win_window_info *       window;
+	win_window_info *		window;
 	INT32                   minimum_width, minimum_height;
 	INT32                   target_width, target_height;
 	double                  target_refresh;
@@ -102,9 +163,9 @@ static directdrawenumerateex_ptr directdrawenumerateex;
 //  INLINES
 //============================================================
 
-INLINE void update_outer_rects(dd_info *dd)
+inline void renderer_dd::update_outer_rects()
 {
-	dd->clearouter = (dd->back != NULL) ? 3 : 1;
+	clearouter = (back != NULL) ? 3 : 1;
 }
 
 
@@ -123,37 +184,24 @@ INLINE int better_mode(int width0, int height0, int width1, int height1, float d
 
 // core functions
 static void drawdd_exit(void);
-static int drawdd_window_init(win_window_info *window);
-static void drawdd_window_destroy(win_window_info *window);
-static render_primitive_list *drawdd_window_get_primitives(win_window_info *window);
-static int drawdd_window_draw(win_window_info *window, HDC dc, int update);
 
-// surface management
-static int ddraw_create(win_window_info *window);
-static int ddraw_create_surfaces(win_window_info *window);
-static void ddraw_delete(win_window_info *window);
-static void ddraw_delete_surfaces(win_window_info *window);
-static int ddraw_verify_caps(dd_info *dd);
-static int ddraw_test_cooperative(win_window_info *window);
-static HRESULT create_surface(dd_info *dd, DDSURFACEDESC2 *desc, IDirectDrawSurface7 **surface, const char *type);
-static int create_clipper(win_window_info *window);
 
-// drawing helpers
-static void compute_blit_surface_size(win_window_info *window);
-static void blit_to_primary(win_window_info *window, int srcwidth, int srcheight);
 
-// video modes
-static int config_adapter_mode(win_window_info *window);
-static void get_adapter_for_monitor(dd_info *dd, win_monitor_info *monitor);
-static void pick_best_mode(win_window_info *window);
+//============================================================
+//  drawnone_create
+//============================================================
 
+static osd_renderer *drawdd_create(win_window_info *window)
+{
+	return global_alloc(renderer_dd(window));
+}
 
 
 //============================================================
 //  drawdd_init
 //============================================================
 
-int drawdd_init(running_machine &machine, win_draw_callbacks *callbacks)
+int drawdd_init(running_machine &machine, osd_draw_callbacks *callbacks)
 {
 	// dynamically grab the create function from ddraw.dll
 	dllhandle = LoadLibrary(TEXT("ddraw.dll"));
@@ -186,10 +234,7 @@ int drawdd_init(running_machine &machine, win_draw_callbacks *callbacks)
 	// fill in the callbacks
 	memset(callbacks, 0, sizeof(*callbacks));
 	callbacks->exit = drawdd_exit;
-	callbacks->window_init = drawdd_window_init;
-	callbacks->window_get_primitives = drawdd_window_get_primitives;
-	callbacks->window_draw = drawdd_window_draw;
-	callbacks->window_destroy = drawdd_window_destroy;
+	callbacks->create = drawdd_create;
 
 	osd_printf_verbose("DirectDraw: Using DirectDraw 7\n");
 	return 0;
@@ -213,26 +258,20 @@ static void drawdd_exit(void)
 //  drawdd_window_init
 //============================================================
 
-static int drawdd_window_init(win_window_info *window)
+int renderer_dd::init()
 {
-	dd_info *dd;
-
-	// allocate memory for our structures
-	dd = global_alloc_clear(dd_info);
-	window->m_drawdata = dd;
-
 	// configure the adapter for the mode we want
-	if (config_adapter_mode(window))
+	if (config_adapter_mode())
 		goto error;
 
 	// create the ddraw object
-	if (ddraw_create(window))
+	if (ddraw_create())
 		goto error;
 
 	return 0;
 
 error:
-	drawdd_window_destroy(window);
+	destroy();
 	osd_printf_error("Unable to initialize DirectDraw.\n");
 	return 1;
 }
@@ -243,20 +282,10 @@ error:
 //  drawdd_window_destroy
 //============================================================
 
-static void drawdd_window_destroy(win_window_info *window)
+void renderer_dd::destroy()
 {
-	dd_info *dd = (dd_info *)window->m_drawdata;
-
-	// skip if nothing
-	if (dd == NULL)
-		return;
-
 	// delete the ddraw object
-	ddraw_delete(window);
-
-	// free the memory in the window
-	global_free(dd);
-	window->m_drawdata = NULL;
+	ddraw_delete();
 }
 
 
@@ -265,15 +294,13 @@ static void drawdd_window_destroy(win_window_info *window)
 //  drawdd_window_get_primitives
 //============================================================
 
-static render_primitive_list *drawdd_window_get_primitives(win_window_info *window)
+render_primitive_list *renderer_dd::get_primitives()
 {
-	dd_info *dd = (dd_info *)window->m_drawdata;
+	compute_blit_surface_size();
+	window().m_target->set_bounds(blitwidth, blitheight, 0);
+	window().m_target->set_max_update_rate((refresh == 0) ? origmode.dwRefreshRate : refresh);
 
-	compute_blit_surface_size(window);
-	window->m_target->set_bounds(dd->blitwidth, dd->blitheight, 0);
-	window->m_target->set_max_update_rate((dd->refresh == 0) ? dd->origmode.dwRefreshRate : dd->refresh);
-
-	return &window->m_target->get_primitives();
+	return &window().m_target->get_primitives();
 }
 
 
@@ -282,39 +309,34 @@ static render_primitive_list *drawdd_window_get_primitives(win_window_info *wind
 //  drawdd_window_draw
 //============================================================
 
-static int drawdd_window_draw(win_window_info *window, HDC dc, int update)
+int renderer_dd::draw(HDC dc, int update)
 {
-	dd_info *dd = (dd_info *)window->m_drawdata;
 	render_primitive *prim;
 	int usemembuffer = FALSE;
 	HRESULT result;
 
-	// if we haven't been created, just punt
-	if (dd == NULL)
-		return 1;
-
 	// if we're updating, remember to erase the outer stuff
 	if (update)
-		update_outer_rects(dd);
+		update_outer_rects();
 
 	// if we have a ddraw object, check the cooperative level
-	if (ddraw_test_cooperative(window))
+	if (ddraw_test_cooperative())
 		return 1;
 
 	// get the size; if we're too small, delete the existing surfaces
-	if (dd->blitwidth > dd->blitdesc.dwWidth || dd->blitheight > dd->blitdesc.dwHeight)
-		ddraw_delete_surfaces(window);
+	if (blitwidth > blitdesc.dwWidth || blitheight > blitdesc.dwHeight)
+		ddraw_delete_surfaces();
 
 	// if we need to create surfaces, do it now
-	if (dd->blit == NULL && ddraw_create_surfaces(window) != 0)
+	if (blit == NULL && ddraw_create_surfaces() != 0)
 		return 1;
 
 	// select our surface and lock it
-	result = IDirectDrawSurface7_Lock(dd->blit, NULL, &dd->blitdesc, DDLOCK_WAIT, NULL);
+	result = IDirectDrawSurface7_Lock(blit, NULL, &blitdesc, DDLOCK_WAIT, NULL);
 	if (result == DDERR_SURFACELOST)
 	{
 		osd_printf_verbose("DirectDraw: Lost surfaces; deleting and retrying next frame\n");
-		ddraw_delete_surfaces(window);
+		ddraw_delete_surfaces();
 		return 1;
 	}
 	if (result != DD_OK)
@@ -324,10 +346,10 @@ static int drawdd_window_draw(win_window_info *window, HDC dc, int update)
 	}
 
 	// render to it
-	window->m_primlist->acquire_lock();
+	window().m_primlist->acquire_lock();
 
 	// scan the list of primitives for tricky stuff
-	for (prim = window->m_primlist->first(); prim != NULL; prim = prim->next())
+	for (prim = window().m_primlist->first(); prim != NULL; prim = prim->next())
 		if (PRIMFLAG_GET_BLENDMODE(prim->flags) != BLENDMODE_NONE ||
 			(prim->texture.base != NULL && PRIMFLAG_GET_TEXFORMAT(prim->flags) == TEXFORMAT_ARGB32))
 		{
@@ -341,32 +363,32 @@ static int drawdd_window_draw(win_window_info *window, HDC dc, int update)
 		int x, y;
 
 		// based on the target format, use one of our standard renderers
-		switch (dd->blitdesc.ddpfPixelFormat.dwRBitMask)
+		switch (blitdesc.ddpfPixelFormat.dwRBitMask)
 		{
-			case 0x00ff0000:    software_renderer<UINT32, 0,0,0, 16,8,0>::draw_primitives(*window->m_primlist, dd->membuffer, dd->blitwidth, dd->blitheight, dd->blitwidth);  break;
-			case 0x000000ff:    software_renderer<UINT32, 0,0,0, 0,8,16>::draw_primitives(*window->m_primlist, dd->membuffer, dd->blitwidth, dd->blitheight, dd->blitwidth);  break;
-			case 0xf800:        software_renderer<UINT16, 3,2,3, 11,5,0>::draw_primitives(*window->m_primlist, dd->membuffer, dd->blitwidth, dd->blitheight, dd->blitwidth);  break;
-			case 0x7c00:        software_renderer<UINT16, 3,3,3, 10,5,0>::draw_primitives(*window->m_primlist, dd->membuffer, dd->blitwidth, dd->blitheight, dd->blitwidth);  break;
+			case 0x00ff0000:    software_renderer<UINT32, 0,0,0, 16,8,0>::draw_primitives(*window().m_primlist, membuffer, blitwidth, blitheight, blitwidth);  break;
+			case 0x000000ff:    software_renderer<UINT32, 0,0,0, 0,8,16>::draw_primitives(*window().m_primlist, membuffer, blitwidth, blitheight, blitwidth);  break;
+			case 0xf800:        software_renderer<UINT16, 3,2,3, 11,5,0>::draw_primitives(*window().m_primlist, membuffer, blitwidth, blitheight, blitwidth);  break;
+			case 0x7c00:        software_renderer<UINT16, 3,3,3, 10,5,0>::draw_primitives(*window().m_primlist, membuffer, blitwidth, blitheight, blitwidth);  break;
 			default:
-				osd_printf_verbose("DirectDraw: Unknown target mode: R=%08X G=%08X B=%08X\n", (int)dd->blitdesc.ddpfPixelFormat.dwRBitMask, (int)dd->blitdesc.ddpfPixelFormat.dwGBitMask, (int)dd->blitdesc.ddpfPixelFormat.dwBBitMask);
+				osd_printf_verbose("DirectDraw: Unknown target mode: R=%08X G=%08X B=%08X\n", (int)blitdesc.ddpfPixelFormat.dwRBitMask, (int)blitdesc.ddpfPixelFormat.dwGBitMask, (int)blitdesc.ddpfPixelFormat.dwBBitMask);
 				break;
 		}
 
 		// handle copying to both 16bpp and 32bpp destinations
-		for (y = 0; y < dd->blitheight; y++)
+		for (y = 0; y < blitheight; y++)
 		{
-			if (dd->blitdesc.ddpfPixelFormat.dwRGBBitCount == 32)
+			if (blitdesc.ddpfPixelFormat.dwRGBBitCount == 32)
 			{
-				UINT32 *src = (UINT32 *)dd->membuffer + y * dd->blitwidth;
-				UINT32 *dst = (UINT32 *)((UINT8 *)dd->blitdesc.lpSurface + y * dd->blitdesc.lPitch);
-				for (x = 0; x < dd->blitwidth; x++)
+				UINT32 *src = (UINT32 *)membuffer + y * blitwidth;
+				UINT32 *dst = (UINT32 *)((UINT8 *)blitdesc.lpSurface + y * blitdesc.lPitch);
+				for (x = 0; x < blitwidth; x++)
 					*dst++ = *src++;
 			}
-			else if (dd->blitdesc.ddpfPixelFormat.dwRGBBitCount == 16)
+			else if (blitdesc.ddpfPixelFormat.dwRGBBitCount == 16)
 			{
-				UINT16 *src = (UINT16 *)dd->membuffer + y * dd->blitwidth;
-				UINT16 *dst = (UINT16 *)((UINT8 *)dd->blitdesc.lpSurface + y * dd->blitdesc.lPitch);
-				for (x = 0; x < dd->blitwidth; x++)
+				UINT16 *src = (UINT16 *)membuffer + y * blitwidth;
+				UINT16 *dst = (UINT16 *)((UINT8 *)blitdesc.lpSurface + y * blitdesc.lPitch);
+				for (x = 0; x < blitwidth; x++)
 					*dst++ = *src++;
 			}
 		}
@@ -377,32 +399,32 @@ static int drawdd_window_draw(win_window_info *window, HDC dc, int update)
 	else
 	{
 		// based on the target format, use one of our standard renderers
-		switch (dd->blitdesc.ddpfPixelFormat.dwRBitMask)
+		switch (blitdesc.ddpfPixelFormat.dwRBitMask)
 		{
-			case 0x00ff0000:    software_renderer<UINT32, 0,0,0, 16,8,0, true>::draw_primitives(*window->m_primlist, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 4); break;
-			case 0x000000ff:    software_renderer<UINT32, 0,0,0, 0,8,16, true>::draw_primitives(*window->m_primlist, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 4); break;
-			case 0xf800:        software_renderer<UINT16, 3,2,3, 11,5,0, true>::draw_primitives(*window->m_primlist, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 2); break;
-			case 0x7c00:        software_renderer<UINT16, 3,3,3, 10,5,0, true>::draw_primitives(*window->m_primlist, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 2); break;
+			case 0x00ff0000:    software_renderer<UINT32, 0,0,0, 16,8,0, true>::draw_primitives(*window().m_primlist, blitdesc.lpSurface, blitwidth, blitheight, blitdesc.lPitch / 4); break;
+			case 0x000000ff:    software_renderer<UINT32, 0,0,0, 0,8,16, true>::draw_primitives(*window().m_primlist, blitdesc.lpSurface, blitwidth, blitheight, blitdesc.lPitch / 4); break;
+			case 0xf800:        software_renderer<UINT16, 3,2,3, 11,5,0, true>::draw_primitives(*window().m_primlist, blitdesc.lpSurface, blitwidth, blitheight, blitdesc.lPitch / 2); break;
+			case 0x7c00:        software_renderer<UINT16, 3,3,3, 10,5,0, true>::draw_primitives(*window().m_primlist, blitdesc.lpSurface, blitwidth, blitheight, blitdesc.lPitch / 2); break;
 			default:
-				osd_printf_verbose("DirectDraw: Unknown target mode: R=%08X G=%08X B=%08X\n", (int)dd->blitdesc.ddpfPixelFormat.dwRBitMask, (int)dd->blitdesc.ddpfPixelFormat.dwGBitMask, (int)dd->blitdesc.ddpfPixelFormat.dwBBitMask);
+				osd_printf_verbose("DirectDraw: Unknown target mode: R=%08X G=%08X B=%08X\n", (int)blitdesc.ddpfPixelFormat.dwRBitMask, (int)blitdesc.ddpfPixelFormat.dwGBitMask, (int)blitdesc.ddpfPixelFormat.dwBBitMask);
 				break;
 		}
 	}
-	window->m_primlist->release_lock();
+	window().m_primlist->release_lock();
 
 	// unlock and blit
-	result = IDirectDrawSurface7_Unlock(dd->blit, NULL);
+	result = IDirectDrawSurface7_Unlock(blit, NULL);
 	if (result != DD_OK) osd_printf_verbose("DirectDraw: Error %08X unlocking blit surface\n", (int)result);
 
 	// sync to VBLANK
-	if ((video_config.waitvsync || video_config.syncrefresh) && window->machine().video().throttled() && (!window->m_fullscreen || dd->back == NULL))
+	if ((video_config.waitvsync || video_config.syncrefresh) && window().machine().video().throttled() && (!window().m_fullscreen || back == NULL))
 	{
-		result = IDirectDraw7_WaitForVerticalBlank(dd->ddraw, DDWAITVB_BLOCKBEGIN, NULL);
+		result = IDirectDraw7_WaitForVerticalBlank(ddraw, DDWAITVB_BLOCKBEGIN, NULL);
 		if (result != DD_OK) osd_printf_verbose("DirectDraw: Error %08X waiting for VBLANK\n", (int)result);
 	}
 
 	// complete the blitting
-	blit_to_primary(window, dd->blitwidth, dd->blitheight);
+	blit_to_primary(blitwidth, blitheight);
 	return 0;
 }
 
@@ -412,18 +434,17 @@ static int drawdd_window_draw(win_window_info *window, HDC dc, int update)
 //  ddraw_create
 //============================================================
 
-static int ddraw_create(win_window_info *window)
+int renderer_dd::ddraw_create()
 {
-	dd_info *dd = (dd_info *)window->m_drawdata;
 	HRESULT result;
 	int verify;
 
 	// if a device exists, free it
-	if (dd->ddraw != NULL)
-		ddraw_delete(window);
+	if (ddraw != NULL)
+		ddraw_delete();
 
 	// create the DirectDraw object
-	result = (*directdrawcreateex)(dd->adapter_ptr, (LPVOID *)&dd->ddraw, WRAP_REFIID(IID_IDirectDraw7), NULL);
+	result = (*directdrawcreateex)(adapter_ptr, (LPVOID *)&ddraw, WRAP_REFIID(IID_IDirectDraw7), NULL);
 	if (result != DD_OK)
 	{
 		osd_printf_verbose("DirectDraw: Error %08X during DirectDrawCreateEx call\n", (int)result);
@@ -431,7 +452,7 @@ static int ddraw_create(win_window_info *window)
 	}
 
 	// verify the caps
-	verify = ddraw_verify_caps(dd);
+	verify = ddraw_verify_caps();
 	if (verify == 2)
 	{
 		osd_printf_error("DirectDraw: Error - Device does not meet minimum requirements for DirectDraw rendering\n");
@@ -442,13 +463,13 @@ static int ddraw_create(win_window_info *window)
 
 	// set the cooperative level
 	// for non-window modes, we will use full screen here
-	result = IDirectDraw7_SetCooperativeLevel(dd->ddraw, win_window_list->m_hwnd, DDSCL_SETFOCUSWINDOW);
+	result = IDirectDraw7_SetCooperativeLevel(ddraw, win_window_list->m_hwnd, DDSCL_SETFOCUSWINDOW);
 	if (result != DD_OK)
 	{
 		osd_printf_verbose("DirectDraw: Error %08X during IDirectDraw7_SetCooperativeLevel(FOCUSWINDOW) call\n", (int)result);
 		goto error;
 	}
-	result = IDirectDraw7_SetCooperativeLevel(dd->ddraw, window->m_hwnd, DDSCL_SETDEVICEWINDOW | (window->m_fullscreen ? DDSCL_FULLSCREEN | DDSCL_EXCLUSIVE : DDSCL_NORMAL));
+	result = IDirectDraw7_SetCooperativeLevel(ddraw, window().m_hwnd, DDSCL_SETDEVICEWINDOW | (window().m_fullscreen ? DDSCL_FULLSCREEN | DDSCL_EXCLUSIVE : DDSCL_NORMAL));
 	if (result != DD_OK)
 	{
 		osd_printf_verbose("DirectDraw: Error %08X during IDirectDraw7_SetCooperativeLevel(DEVICEWINDOW) call\n", (int)result);
@@ -456,20 +477,20 @@ static int ddraw_create(win_window_info *window)
 	}
 
 	// full screen mode: set the resolution
-	if (window->m_fullscreen && video_config.switchres)
+	if (window().m_fullscreen && video_config.switchres)
 	{
-		result = IDirectDraw7_SetDisplayMode(dd->ddraw, dd->width, dd->height, 32, dd->refresh, 0);
+		result = IDirectDraw7_SetDisplayMode(ddraw, width, height, 32, refresh, 0);
 		if (result != DD_OK)
 		{
-			osd_printf_verbose("DirectDraw: Error %08X attempting to set video mode %dx%d@%d call\n", (int)result, dd->width, dd->height, dd->refresh);
+			osd_printf_verbose("DirectDraw: Error %08X attempting to set video mode %dx%d@%d call\n", (int)result, width, height, refresh);
 			goto error;
 		}
 	}
 
-	return ddraw_create_surfaces(window);
+	return ddraw_create_surfaces();
 
 error:
-	ddraw_delete(window);
+	ddraw_delete();
 	return 1;
 }
 
@@ -479,35 +500,34 @@ error:
 //  ddraw_create_surfaces
 //============================================================
 
-static int ddraw_create_surfaces(win_window_info *window)
+int renderer_dd::ddraw_create_surfaces()
 {
-	dd_info *dd = (dd_info *)window->m_drawdata;
 	HRESULT result;
 
 	// make a description of the primary surface
-	memset(&dd->primarydesc, 0, sizeof(dd->primarydesc));
-	dd->primarydesc.dwSize = sizeof(dd->primarydesc);
-	dd->primarydesc.dwFlags = DDSD_CAPS;
-	dd->primarydesc.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
+	memset(&primarydesc, 0, sizeof(primarydesc));
+	primarydesc.dwSize = sizeof(primarydesc);
+	primarydesc.dwFlags = DDSD_CAPS;
+	primarydesc.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
 
 	// for triple-buffered full screen mode, allocate flipping surfaces
-	if (window->m_fullscreen && video_config.triplebuf)
+	if (window().m_fullscreen && video_config.triplebuf)
 	{
-		dd->primarydesc.dwFlags |= DDSD_BACKBUFFERCOUNT;
-		dd->primarydesc.ddsCaps.dwCaps |= DDSCAPS_FLIP | DDSCAPS_COMPLEX;
-		dd->primarydesc.dwBackBufferCount = 2;
+		primarydesc.dwFlags |= DDSD_BACKBUFFERCOUNT;
+		primarydesc.ddsCaps.dwCaps |= DDSCAPS_FLIP | DDSCAPS_COMPLEX;
+		primarydesc.dwBackBufferCount = 2;
 	}
 
 	// create the primary surface and report errors
-	result = create_surface(dd, &dd->primarydesc, &dd->primary, "primary");
+	result = create_surface(&primarydesc, &primary, "primary");
 	if (result != DD_OK) goto error;
 
 	// full screen mode: get the back surface
-	dd->back = NULL;
-	if (window->m_fullscreen && video_config.triplebuf)
+	back = NULL;
+	if (window().m_fullscreen && video_config.triplebuf)
 	{
 		DDSCAPS2 caps = { DDSCAPS_BACKBUFFER };
-		result = IDirectDrawSurface7_GetAttachedSurface(dd->primary, &caps, &dd->back);
+		result = IDirectDrawSurface7_GetAttachedSurface(primary, &caps, &back);
 		if (result != DD_OK)
 		{
 			osd_printf_verbose("DirectDraw: Error %08X getting attached back surface\n", (int)result);
@@ -516,67 +536,67 @@ static int ddraw_create_surfaces(win_window_info *window)
 	}
 
 	// now make a description of our blit surface, based on the primary surface
-	if (dd->blitwidth == 0 || dd->blitheight == 0)
-		compute_blit_surface_size(window);
-	dd->blitdesc = dd->primarydesc;
-	dd->blitdesc.dwFlags = DDSD_WIDTH | DDSD_HEIGHT | DDSD_PIXELFORMAT | DDSD_CAPS;
-	dd->blitdesc.dwWidth = dd->blitwidth;
-	dd->blitdesc.dwHeight = dd->blitheight;
-	dd->blitdesc.ddsCaps.dwCaps = DDSCAPS_VIDEOMEMORY;
+	if (blitwidth == 0 || blitheight == 0)
+		compute_blit_surface_size();
+	blitdesc = primarydesc;
+	blitdesc.dwFlags = DDSD_WIDTH | DDSD_HEIGHT | DDSD_PIXELFORMAT | DDSD_CAPS;
+	blitdesc.dwWidth = blitwidth;
+	blitdesc.dwHeight = blitheight;
+	blitdesc.ddsCaps.dwCaps = DDSCAPS_VIDEOMEMORY;
 
 	// then create the blit surface, fall back to system memory if video mem doesn't work
-	result = create_surface(dd, &dd->blitdesc, &dd->blit, "blit");
+	result = create_surface(&blitdesc, &blit, "blit");
 	if (result != DD_OK)
 	{
-		dd->blitdesc.ddsCaps.dwCaps = DDSCAPS_SYSTEMMEMORY;
-		result = create_surface(dd, &dd->blitdesc, &dd->blit, "blit");
+		blitdesc.ddsCaps.dwCaps = DDSCAPS_SYSTEMMEMORY;
+		result = create_surface(&blitdesc, &blit, "blit");
 	}
 	if (result != DD_OK) goto error;
 
 	// create a memory buffer for offscreen drawing
-	if (dd->membuffersize < dd->blitwidth * dd->blitheight * 4)
+	if (membuffersize < blitwidth * blitheight * 4)
 	{
-		dd->membuffersize = dd->blitwidth * dd->blitheight * 4;
-		global_free_array(dd->membuffer);
-		dd->membuffer = global_alloc_array(UINT8, dd->membuffersize);
+		membuffersize = blitwidth * blitheight * 4;
+		global_free_array(membuffer);
+		membuffer = global_alloc_array(UINT8, membuffersize);
 	}
-	if (dd->membuffer == NULL)
+	if (membuffer == NULL)
 		goto error;
 
 	// create a clipper for windowed mode
-	if (!window->m_fullscreen && create_clipper(window))
+	if (!window().m_fullscreen && create_clipper())
 		goto error;
 
 	// full screen mode: set the gamma
-	if (window->m_fullscreen)
+	if (window().m_fullscreen)
 	{
 		// only set the gamma if it's not 1.0f
-		windows_options &options = downcast<windows_options &>(window->machine().options());
+		windows_options &options = downcast<windows_options &>(window().machine().options());
 		float brightness = options.full_screen_brightness();
 		float contrast = options.full_screen_contrast();
-		float gamma = options.full_screen_gamma();
-		if (brightness != 1.0f || contrast != 1.0f || gamma != 1.0f)
+		float fgamma = options.full_screen_gamma();
+		if (brightness != 1.0f || contrast != 1.0f || fgamma != 1.0f)
 		{
 			// see if we can get a GammaControl object
-			result = IDirectDrawSurface_QueryInterface(dd->primary, WRAP_REFIID(IID_IDirectDrawGammaControl), (void **)&dd->gamma);
+			result = IDirectDrawSurface_QueryInterface(primary, WRAP_REFIID(IID_IDirectDrawGammaControl), (void **)&gamma);
 			if (result != DD_OK)
 			{
 				osd_printf_warning("DirectDraw: Warning - device does not support full screen gamma correction.\n");
-				dd->gamma = NULL;
+				this->gamma = NULL;
 			}
 
 			// proceed if we can
-			if (dd->gamma != NULL)
+			if (this->gamma != NULL)
 			{
 				DDGAMMARAMP ramp;
 				int i;
 
 				// create a standard ramp and set it
 				for (i = 0; i < 256; i++)
-					ramp.red[i] = ramp.green[i] = ramp.blue[i] = apply_brightness_contrast_gamma(i, brightness, contrast, gamma) << 8;
+					ramp.red[i] = ramp.green[i] = ramp.blue[i] = apply_brightness_contrast_gamma(i, brightness, contrast, fgamma) << 8;
 
 				// attempt to set it
-				result = IDirectDrawGammaControl_SetGammaRamp(dd->gamma, 0, &ramp);
+				result = IDirectDrawGammaControl_SetGammaRamp(this->gamma, 0, &ramp);
 				if (result != DD_OK)
 					osd_printf_verbose("DirectDraw: Error %08X attempting to set gamma correction.\n", (int)result);
 			}
@@ -584,11 +604,11 @@ static int ddraw_create_surfaces(win_window_info *window)
 	}
 
 	// force some updates
-	update_outer_rects(dd);
+	update_outer_rects();
 	return 0;
 
 error:
-	ddraw_delete_surfaces(window);
+	ddraw_delete_surfaces();
 	return 1;
 }
 
@@ -598,25 +618,23 @@ error:
 //  ddraw_delete
 //============================================================
 
-static void ddraw_delete(win_window_info *window)
+void renderer_dd::ddraw_delete()
 {
-	dd_info *dd = (dd_info *)window->m_drawdata;
-
 	// free surfaces
-	ddraw_delete_surfaces(window);
+	ddraw_delete_surfaces();
 
 	// restore resolutions
-	if (dd->ddraw != NULL)
-		IDirectDraw7_RestoreDisplayMode(dd->ddraw);
+	if (ddraw != NULL)
+		IDirectDraw7_RestoreDisplayMode(ddraw);
 
 	// reset cooperative level
-	if (dd->ddraw != NULL && window->m_hwnd != NULL)
-		IDirectDraw7_SetCooperativeLevel(dd->ddraw, window->m_hwnd, DDSCL_NORMAL);
+	if (ddraw != NULL && window().m_hwnd != NULL)
+		IDirectDraw7_SetCooperativeLevel(ddraw, window().m_hwnd, DDSCL_NORMAL);
 
 	// release the DirectDraw object itself
-	if (dd->ddraw != NULL)
-		IDirectDraw7_Release(dd->ddraw);
-	dd->ddraw = NULL;
+	if (ddraw != NULL)
+		IDirectDraw7_Release(ddraw);
+	ddraw = NULL;
 }
 
 
@@ -625,39 +643,37 @@ static void ddraw_delete(win_window_info *window)
 //  ddraw_delete_surfaces
 //============================================================
 
-static void ddraw_delete_surfaces(win_window_info *window)
+void renderer_dd::ddraw_delete_surfaces()
 {
-	dd_info *dd = (dd_info *)window->m_drawdata;
-
 	// release the gamma control
-	if (dd->gamma != NULL)
-		IDirectDrawGammaControl_Release(dd->gamma);
-	dd->gamma = NULL;
+	if (gamma != NULL)
+		IDirectDrawGammaControl_Release(gamma);
+	gamma = NULL;
 
 	// release the clipper
-	if (dd->clipper != NULL)
-		IDirectDrawClipper_Release(dd->clipper);
-	dd->clipper = NULL;
+	if (clipper != NULL)
+		IDirectDrawClipper_Release(clipper);
+	clipper = NULL;
 
 	// free the memory buffer
-	global_free_array(dd->membuffer);
-	dd->membuffer = NULL;
-	dd->membuffersize = 0;
+	global_free_array(membuffer);
+	membuffer = NULL;
+	membuffersize = 0;
 
 	// release the blit surface
-	if (dd->blit != NULL)
-		IDirectDrawSurface7_Release(dd->blit);
-	dd->blit = NULL;
+	if (blit != NULL)
+		IDirectDrawSurface7_Release(blit);
+	blit = NULL;
 
 	// release the back surface
-	if (dd->back != NULL)
-		IDirectDrawSurface7_Release(dd->back);
-	dd->back = NULL;
+	if (back != NULL)
+		IDirectDrawSurface7_Release(back);
+	back = NULL;
 
 	// release the primary surface
-	if (dd->primary != NULL)
-		IDirectDrawSurface7_Release(dd->primary);
-	dd->primary = NULL;
+	if (primary != NULL)
+		IDirectDrawSurface7_Release(primary);
+	primary = NULL;
 }
 
 
@@ -666,15 +682,15 @@ static void ddraw_delete_surfaces(win_window_info *window)
 //  ddraw_verify_caps
 //============================================================
 
-static int ddraw_verify_caps(dd_info *dd)
+int renderer_dd::ddraw_verify_caps()
 {
 	int retval = 0;
 	HRESULT result;
 
 	// get the capabilities
-	dd->ddcaps.dwSize = sizeof(dd->ddcaps);
-	dd->helcaps.dwSize = sizeof(dd->helcaps);
-	result = IDirectDraw7_GetCaps(dd->ddraw, &dd->ddcaps, &dd->helcaps);
+	ddcaps.dwSize = sizeof(ddcaps);
+	helcaps.dwSize = sizeof(helcaps);
+	result = IDirectDraw7_GetCaps(ddraw, &ddcaps, &helcaps);
 	if (result != DD_OK)
 	{
 		osd_printf_verbose("DirectDraw: Error %08X during IDirectDraw7_GetCaps call\n", (int)result);
@@ -682,7 +698,7 @@ static int ddraw_verify_caps(dd_info *dd)
 	}
 
 	// determine if hardware stretching is available
-	if ((dd->ddcaps.dwCaps & DDCAPS_BLTSTRETCH) == 0)
+	if ((ddcaps.dwCaps & DDCAPS_BLTSTRETCH) == 0)
 	{
 		osd_printf_verbose("DirectDraw: Warning - Device does not support hardware stretching\n");
 		retval = 1;
@@ -697,26 +713,25 @@ static int ddraw_verify_caps(dd_info *dd)
 //  ddraw_test_cooperative
 //============================================================
 
-static int ddraw_test_cooperative(win_window_info *window)
+int renderer_dd::ddraw_test_cooperative()
 {
-	dd_info *dd = (dd_info *)window->m_drawdata;
 	HRESULT result;
 
 	// check our current status; if we lost the device, punt to GDI
-	result = IDirectDraw7_TestCooperativeLevel(dd->ddraw);
+	result = IDirectDraw7_TestCooperativeLevel(ddraw);
 	switch (result)
 	{
 		// punt to GDI if someone else has exclusive mode
 		case DDERR_NOEXCLUSIVEMODE:
 		case DDERR_EXCLUSIVEMODEALREADYSET:
-			ddraw_delete_surfaces(window);
+			ddraw_delete_surfaces();
 			return 1;
 
 		// if we're ok, but we don't have a primary surface, create one
 		default:
 		case DD_OK:
-			if (dd->primary == NULL)
-				return ddraw_create_surfaces(window);
+			if (primary == NULL)
+				return ddraw_create_surfaces();
 			return 0;
 	}
 }
@@ -727,12 +742,12 @@ static int ddraw_test_cooperative(win_window_info *window)
 //  create_surface
 //============================================================
 
-static HRESULT create_surface(dd_info *dd, DDSURFACEDESC2 *desc, IDirectDrawSurface7 **surface, const char *type)
+HRESULT renderer_dd::create_surface(DDSURFACEDESC2 *desc, IDirectDrawSurface7 **surface, const char *type)
 {
 	HRESULT result;
 
 	// create the surface as requested
-	result = IDirectDraw7_CreateSurface(dd->ddraw, desc, surface, NULL);
+	result = IDirectDraw7_CreateSurface(ddraw, desc, surface, NULL);
 	if (result != DD_OK)
 	{
 		osd_printf_verbose("DirectDraw: Error %08X creating %s surface\n", (int)result, type);
@@ -767,13 +782,12 @@ static HRESULT create_surface(dd_info *dd, DDSURFACEDESC2 *desc, IDirectDrawSurf
 //  create_clipper
 //============================================================
 
-static int create_clipper(win_window_info *window)
+int renderer_dd::create_clipper()
 {
-	dd_info *dd = (dd_info *)window->m_drawdata;
 	HRESULT result;
 
 	// create a clipper for the primary surface
-	result = IDirectDraw7_CreateClipper(dd->ddraw, 0, &dd->clipper, NULL);
+	result = IDirectDraw7_CreateClipper(ddraw, 0, &clipper, NULL);
 	if (result != DD_OK)
 	{
 		osd_printf_verbose("DirectDraw: Error %08X creating clipper\n", (int)result);
@@ -781,7 +795,7 @@ static int create_clipper(win_window_info *window)
 	}
 
 	// set the clipper's hwnd
-	result = IDirectDrawClipper_SetHWnd(dd->clipper, 0, window->m_hwnd);
+	result = IDirectDrawClipper_SetHWnd(clipper, 0, window().m_hwnd);
 	if (result != DD_OK)
 	{
 		osd_printf_verbose("DirectDraw: Error %08X setting clipper hwnd\n", (int)result);
@@ -789,7 +803,7 @@ static int create_clipper(win_window_info *window)
 	}
 
 	// set the clipper on the primary surface
-	result = IDirectDrawSurface7_SetClipper(dd->primary, dd->clipper);
+	result = IDirectDrawSurface7_SetClipper(primary, clipper);
 	if (result != DD_OK)
 	{
 		osd_printf_verbose("DirectDraw: Error %08X setting clipper on primary surface\n", (int)result);
@@ -804,18 +818,17 @@ static int create_clipper(win_window_info *window)
 //  compute_blit_surface_size
 //============================================================
 
-static void compute_blit_surface_size(win_window_info *window)
+void renderer_dd::compute_blit_surface_size()
 {
-	dd_info *dd = (dd_info *)window->m_drawdata;
 	INT32 newwidth, newheight;
 	int xscale, yscale;
 	RECT client;
 
 	// start with the minimum size
-	window->m_target->compute_minimum_size(newwidth, newheight);
+	window().m_target->compute_minimum_size(newwidth, newheight);
 
 	// get the window's client rectangle
-	GetClientRect(window->m_hwnd, &client);
+	GetClientRect(window().m_hwnd, &client);
 
 	// hardware stretch case: apply prescale
 	if (video_config.hwstretch)
@@ -841,8 +854,8 @@ static void compute_blit_surface_size(win_window_info *window)
 		// compute the appropriate visible area if we're trying to keepaspect
 		if (video_config.keepaspect)
 		{
-			win_monitor_info *monitor = winwindow_video_window_monitor(window, NULL);
-			window->m_target->compute_visible_area(target_width, target_height, monitor->get_aspect(), window->m_target->orientation(), target_width, target_height);
+			win_monitor_info *monitor = winwindow_video_window_monitor(&window(), NULL);
+			window().m_target->compute_visible_area(target_width, target_height, monitor->get_aspect(), window().m_target->orientation(), target_width, target_height);
 			desired_aspect = (float)target_width / (float)target_height;
 		}
 
@@ -884,14 +897,14 @@ static void compute_blit_surface_size(win_window_info *window)
 	// apply the final scale
 	newwidth *= xscale;
 	newheight *= yscale;
-	if (newwidth != dd->blitwidth || newheight != dd->blitheight)
+	if (newwidth != blitwidth || newheight != blitheight)
 	{
 		// force some updates
-		update_outer_rects(dd);
+		update_outer_rects();
 		osd_printf_verbose("DirectDraw: New blit size = %dx%d\n", newwidth, newheight);
 	}
-	dd->blitwidth = newwidth;
-	dd->blitheight = newheight;
+	blitwidth = newwidth;
+	blitheight = newheight;
 }
 
 
@@ -900,14 +913,14 @@ static void compute_blit_surface_size(win_window_info *window)
 //  calc_fullscreen_margins
 //============================================================
 
-static void calc_fullscreen_margins(win_window_info *window, DWORD desc_width, DWORD desc_height, RECT *margins)
+void renderer_dd::calc_fullscreen_margins(DWORD desc_width, DWORD desc_height, RECT *margins)
 {
 	margins->left = 0;
 	margins->top = 0;
 	margins->right = desc_width;
 	margins->bottom = desc_height;
 
-	if (win_has_menu(window))
+	if (win_has_menu(&window()))
 	{
 		static int height_with_menubar = 0;
 		if (height_with_menubar == 0)
@@ -928,11 +941,10 @@ static void calc_fullscreen_margins(win_window_info *window, DWORD desc_width, D
 //  blit_to_primary
 //============================================================
 
-static void blit_to_primary(win_window_info *window, int srcwidth, int srcheight)
+void renderer_dd::blit_to_primary(int srcwidth, int srcheight)
 {
-	dd_info *dd = (dd_info *)window->m_drawdata;
-	IDirectDrawSurface7 *target = (dd->back != NULL) ? dd->back : dd->primary;
-	win_monitor_info *monitor = winwindow_video_window_monitor(window, NULL);
+	IDirectDrawSurface7 *target = (back != NULL) ? back : primary;
+	win_monitor_info *monitor = winwindow_video_window_monitor(&window(), NULL);
 	DDBLTFX blitfx = { sizeof(DDBLTFX) };
 	RECT clear, outer, dest, source;
 	INT32 dstwidth, dstheight;
@@ -944,11 +956,11 @@ static void blit_to_primary(win_window_info *window, int srcwidth, int srcheight
 	source.bottom = srcheight;
 
 	// compute outer rect -- windowed version
-	if (!window->m_fullscreen)
+	if (!window().m_fullscreen)
 	{
-		GetClientRect(window->m_hwnd, &outer);
-		ClientToScreen(window->m_hwnd, &((LPPOINT)&outer)[0]);
-		ClientToScreen(window->m_hwnd, &((LPPOINT)&outer)[1]);
+		GetClientRect(window().m_hwnd, &outer);
+		ClientToScreen(window().m_hwnd, &((LPPOINT)&outer)[0]);
+		ClientToScreen(window().m_hwnd, &((LPPOINT)&outer)[1]);
 
 		// adjust to be relative to the monitor
 		outer.left -= monitor->info.rcMonitor.left;
@@ -960,7 +972,7 @@ static void blit_to_primary(win_window_info *window, int srcwidth, int srcheight
 	// compute outer rect -- full screen version
 	else
 	{
-		calc_fullscreen_margins(window, dd->primarydesc.dwWidth, dd->primarydesc.dwHeight, &outer);
+		calc_fullscreen_margins(primarydesc.dwWidth, primarydesc.dwHeight, &outer);
 	}
 
 	// if we're respecting the aspect ratio, we need to adjust to fit
@@ -987,7 +999,7 @@ static void blit_to_primary(win_window_info *window, int srcwidth, int srcheight
 	else if (video_config.keepaspect)
 	{
 		// compute the appropriate visible area
-		window->m_target->compute_visible_area(rect_width(&outer), rect_height(&outer), monitor->get_aspect(), window->m_target->orientation(), dstwidth, dstheight);
+		window().m_target->compute_visible_area(rect_width(&outer), rect_height(&outer), monitor->get_aspect(), window().m_target->orientation(), dstwidth, dstheight);
 	}
 
 	// center within
@@ -997,16 +1009,16 @@ static void blit_to_primary(win_window_info *window, int srcwidth, int srcheight
 	dest.bottom = dest.top + dstheight;
 
 	// compare against last destination; if different, force a redraw
-	if (dest.left != dd->lastdest.left || dest.right != dd->lastdest.right || dest.top != dd->lastdest.top || dest.bottom != dd->lastdest.bottom)
+	if (dest.left != lastdest.left || dest.right != lastdest.right || dest.top != lastdest.top || dest.bottom != lastdest.bottom)
 	{
-		dd->lastdest = dest;
-		update_outer_rects(dd);
+		lastdest = dest;
+		update_outer_rects();
 	}
 
 	// clear outer rects if we need to
-	if (dd->clearouter != 0)
+	if (clearouter != 0)
 	{
-		dd->clearouter--;
+		clearouter--;
 
 		// clear the left edge
 		if (dest.left > outer.left)
@@ -1046,13 +1058,13 @@ static void blit_to_primary(win_window_info *window, int srcwidth, int srcheight
 	}
 
 	// do the blit
-	result = IDirectDrawSurface7_Blt(target, &dest, dd->blit, &source, DDBLT_WAIT, NULL);
+	result = IDirectDrawSurface7_Blt(target, &dest, blit, &source, DDBLT_WAIT, NULL);
 	if (result != DD_OK) osd_printf_verbose("DirectDraw: Error %08X blitting to the screen\n", (int)result);
 
 	// page flip if triple buffered
-	if (window->m_fullscreen && dd->back != NULL)
+	if (window().m_fullscreen && back != NULL)
 	{
-		result = IDirectDrawSurface7_Flip(dd->primary, NULL, DDFLIP_WAIT);
+		result = IDirectDrawSurface7_Flip(primary, NULL, DDFLIP_WAIT);
 		if (result != DD_OK) osd_printf_verbose("DirectDraw: Error %08X waiting for VBLANK\n", (int)result);
 	}
 }
@@ -1063,17 +1075,16 @@ static void blit_to_primary(win_window_info *window, int srcwidth, int srcheight
 //  config_adapter_mode
 //============================================================
 
-static int config_adapter_mode(win_window_info *window)
+int renderer_dd::config_adapter_mode()
 {
 	DDDEVICEIDENTIFIER2 identifier;
-	dd_info *dd = (dd_info *)window->m_drawdata;
 	HRESULT result;
 
 	// choose the monitor number
-	get_adapter_for_monitor(dd, window->m_monitor);
+	get_adapter_for_monitor(window().m_monitor);
 
 	// create a temporary DirectDraw object
-	result = (*directdrawcreateex)(dd->adapter_ptr, (LPVOID *)&dd->ddraw, WRAP_REFIID(IID_IDirectDraw7), NULL);
+	result = (*directdrawcreateex)(adapter_ptr, (LPVOID *)&ddraw, WRAP_REFIID(IID_IDirectDraw7), NULL);
 	if (result != DD_OK)
 	{
 		osd_printf_verbose("DirectDraw: Error %08X during DirectDrawCreateEx call\n", (int)result);
@@ -1081,7 +1092,7 @@ static int config_adapter_mode(win_window_info *window)
 	}
 
 	// get the identifier
-	result = IDirectDraw7_GetDeviceIdentifier(dd->ddraw, &identifier, 0);
+	result = IDirectDraw7_GetDeviceIdentifier(ddraw, &identifier, 0);
 	if (result != DD_OK)
 	{
 		osd_printf_error("Error getting identifier for device\n");
@@ -1090,37 +1101,37 @@ static int config_adapter_mode(win_window_info *window)
 	osd_printf_verbose("DirectDraw: Configuring device %s\n", identifier.szDescription);
 
 	// get the current display mode
-	memset(&dd->origmode, 0, sizeof(dd->origmode));
-	dd->origmode.dwSize = sizeof(dd->origmode);
-	result = IDirectDraw7_GetDisplayMode(dd->ddraw, &dd->origmode);
+	memset(&origmode, 0, sizeof(origmode));
+	origmode.dwSize = sizeof(origmode);
+	result = IDirectDraw7_GetDisplayMode(ddraw, &origmode);
 	if (result != DD_OK)
 	{
 		osd_printf_verbose("DirectDraw: Error %08X getting current display mode\n", (int)result);
-		IDirectDraw7_Release(dd->ddraw);
+		IDirectDraw7_Release(ddraw);
 		return 1;
 	}
 
 	// choose a resolution: full screen mode case
-	if (window->m_fullscreen)
+	if (window().m_fullscreen)
 	{
 		// default to the current mode exactly
-		dd->width = dd->origmode.dwWidth;
-		dd->height = dd->origmode.dwHeight;
-		dd->refresh = dd->origmode.dwRefreshRate;
+		width = origmode.dwWidth;
+		height = origmode.dwHeight;
+		refresh = origmode.dwRefreshRate;
 
 		// if we're allowed to switch resolutions, override with something better
 		if (video_config.switchres)
-			pick_best_mode(window);
+			pick_best_mode();
 	}
 
 	// release the DirectDraw object
-	IDirectDraw7_Release(dd->ddraw);
-	dd->ddraw = NULL;
+	IDirectDraw7_Release(ddraw);
+	ddraw = NULL;
 
 	// if we're not changing resolutions, make sure we have a resolution we can handle
-	if (!window->m_fullscreen || !video_config.switchres)
+	if (!window().m_fullscreen || !video_config.switchres)
 	{
-		switch (dd->origmode.ddpfPixelFormat.dwRBitMask)
+		switch (origmode.ddpfPixelFormat.dwRBitMask)
 		{
 			case 0x00ff0000:
 			case 0x000000ff:
@@ -1129,7 +1140,7 @@ static int config_adapter_mode(win_window_info *window)
 				break;
 
 			default:
-				osd_printf_verbose("DirectDraw: Unknown target mode: R=%08X G=%08X B=%08X\n", (int)dd->origmode.ddpfPixelFormat.dwRBitMask, (int)dd->origmode.ddpfPixelFormat.dwGBitMask, (int)dd->origmode.ddpfPixelFormat.dwBBitMask);
+				osd_printf_verbose("DirectDraw: Unknown target mode: R=%08X G=%08X B=%08X\n", (int)origmode.ddpfPixelFormat.dwRBitMask, (int)origmode.ddpfPixelFormat.dwGBitMask, (int)origmode.ddpfPixelFormat.dwBBitMask);
 				return 1;
 		}
 	}
@@ -1164,7 +1175,7 @@ static BOOL WINAPI monitor_enum_callback(GUID FAR *guid, LPSTR description, LPST
 //  get_adapter_for_monitor
 //============================================================
 
-static void get_adapter_for_monitor(dd_info *dd, win_monitor_info *monitor)
+void renderer_dd::get_adapter_for_monitor(win_monitor_info *monitor)
 {
 	monitor_enum_info einfo;
 	HRESULT result;
@@ -1178,11 +1189,11 @@ static void get_adapter_for_monitor(dd_info *dd, win_monitor_info *monitor)
 	// set up the adapter
 	if (einfo.foundit && einfo.guid_ptr != NULL)
 	{
-		dd->adapter = einfo.guid;
-		dd->adapter_ptr = &dd->adapter;
+		adapter = einfo.guid;
+		adapter_ptr = &adapter;
 	}
 	else
-		dd->adapter_ptr = NULL;
+		adapter_ptr = NULL;
 }
 
 
@@ -1195,7 +1206,7 @@ static HRESULT WINAPI enum_modes_callback(LPDDSURFACEDESC2 desc, LPVOID context)
 {
 	float size_score, refresh_score, final_score;
 	mode_enum_info *einfo = (mode_enum_info *)context;
-	dd_info *dd = (dd_info *)einfo->window->m_drawdata;
+	renderer_dd *dd = dynamic_cast<renderer_dd *>(einfo->window->m_renderer);
 
 	// skip non-32 bit modes
 	if (desc->ddpfPixelFormat.dwRGBBitCount != 32)
@@ -1248,9 +1259,8 @@ static HRESULT WINAPI enum_modes_callback(LPDDSURFACEDESC2 desc, LPVOID context)
 //  pick_best_mode
 //============================================================
 
-static void pick_best_mode(win_window_info *window)
+void renderer_dd::pick_best_mode()
 {
-	dd_info *dd = (dd_info *)window->m_drawdata;
 	mode_enum_info einfo;
 	HRESULT result;
 
@@ -1258,7 +1268,7 @@ static void pick_best_mode(win_window_info *window)
 	// note: technically we should not be calling this from an alternate window
 	// thread; however, it is only done during init time, and the init code on
 	// the main thread is waiting for us to finish, so it is safe to do so here
-	window->m_target->compute_minimum_size(einfo.minimum_width, einfo.minimum_height);
+	window().m_target->compute_minimum_size(einfo.minimum_width, einfo.minimum_height);
 
 	// use those as the target for now
 	einfo.target_width = einfo.minimum_width * MAX(1, video_config.prescale);
@@ -1266,7 +1276,7 @@ static void pick_best_mode(win_window_info *window)
 
 	// determine the refresh rate of the primary screen
 	einfo.target_refresh = 60.0;
-	const screen_device *primary_screen = window->machine().config().first_screen();
+	const screen_device *primary_screen = window().machine().config().first_screen();
 	if (primary_screen != NULL)
 		einfo.target_refresh = ATTOSECONDS_TO_HZ(primary_screen->refresh_attoseconds());
 	printf("Target refresh = %f\n", einfo.target_refresh);
@@ -1286,12 +1296,12 @@ static void pick_best_mode(win_window_info *window)
 	}
 
 	// fill in the rest of the data
-	einfo.window = window;
+	einfo.window = &window();
 	einfo.best_score = 0.0f;
 
 	// enumerate the modes
 	osd_printf_verbose("DirectDraw: Selecting video mode...\n");
-	result = IDirectDraw7_EnumDisplayModes(dd->ddraw, DDEDM_REFRESHRATES, NULL, &einfo, enum_modes_callback);
+	result = IDirectDraw7_EnumDisplayModes(ddraw, DDEDM_REFRESHRATES, NULL, &einfo, enum_modes_callback);
 	if (result != DD_OK) osd_printf_verbose("DirectDraw: Error %08X during EnumDisplayModes call\n", (int)result);
-	osd_printf_verbose("DirectDraw: Mode selected = %4dx%4d@%3dHz\n", dd->width, dd->height, dd->refresh);
+	osd_printf_verbose("DirectDraw: Mode selected = %4dx%4d@%3dHz\n", width, height, refresh);
 }

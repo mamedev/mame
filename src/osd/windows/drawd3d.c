@@ -179,28 +179,16 @@ static d3d::base *               d3dintf; // FIX ME
 
 // core functions
 static void drawd3d_exit(void);
-static int drawd3d_window_init(win_window_info *window);
-static void drawd3d_window_destroy(win_window_info *window);
-static render_primitive_list *drawd3d_window_get_primitives(win_window_info *window);
-static void drawd3d_window_save(win_window_info *window);
-static void drawd3d_window_record(win_window_info *window);
-static void drawd3d_window_toggle_fsfx(win_window_info *window);
-static int drawd3d_window_draw(win_window_info *window, HDC dc, int update);
-
 
 //============================================================
 //  drawd3d_window_init
 //============================================================
 
-static int drawd3d_window_init(win_window_info *window)
+int d3d::renderer::init()
 {
-	// allocate memory for our structures
-	d3d::renderer *d3d = global_alloc(d3d::renderer(window));
-	window->m_drawdata = d3d;
-
-	if (!d3d->initialize())
+	if (!initialize())
 	{
-		drawd3d_window_destroy(window);
+		destroy();
 		osd_printf_error("Unable to initialize Direct3D.\n");
 		return 1;
 	}
@@ -218,22 +206,19 @@ static void drawd3d_exit(void)
 		(*d3dintf->d3d.release)(d3dintf);
 }
 
-static void drawd3d_window_toggle_fsfx(win_window_info *window)
+void d3d::renderer::toggle_fsfx()
 {
-	d3d::renderer *d3d = (d3d::renderer *)window->m_drawdata;
-	d3d->set_restarting(true);
+	set_restarting(true);
 }
 
-static void drawd3d_window_record(win_window_info *window)
+void d3d::renderer::record()
 {
-	d3d::renderer *d3d = (d3d::renderer *)window->m_drawdata;
-	d3d->get_shaders()->window_record();
+	get_shaders()->window_record();
 }
 
-static void drawd3d_window_save(win_window_info *window)
+void d3d::renderer::save()
 {
-	d3d::renderer *d3d = (d3d::renderer *)window->m_drawdata;
-	d3d->get_shaders()->window_save();
+	get_shaders()->window_save();
 }
 
 
@@ -242,20 +227,11 @@ static void drawd3d_window_save(win_window_info *window)
 //  drawd3d_window_destroy
 //============================================================
 
-static void drawd3d_window_destroy(win_window_info *window)
+void d3d::renderer::destroy()
 {
-	d3d::renderer *d3d = (d3d::renderer *)window->m_drawdata;
+	if (get_shaders() != NULL && get_shaders()->recording())
+		get_shaders()->window_record();
 
-	// skip if nothing
-	if (d3d == NULL)
-		return;
-
-	if (d3d->get_shaders() != NULL && d3d->get_shaders()->recording())
-		d3d->get_shaders()->window_record();
-
-	// free the memory in the window
-	global_free(d3d);
-	window->m_drawdata = NULL;
 }
 
 
@@ -264,21 +240,29 @@ static void drawd3d_window_destroy(win_window_info *window)
 //  drawd3d_window_get_primitives
 //============================================================
 
-static render_primitive_list *drawd3d_window_get_primitives(win_window_info *window)
+render_primitive_list *d3d::renderer::get_primitives()
 {
-	d3d::renderer *d3d = (d3d::renderer *)window->m_drawdata;
 	RECT client;
 
-	GetClientRectExceptMenu(window->m_hwnd, &client, window->m_fullscreen);
+	GetClientRectExceptMenu(window().m_hwnd, &client, window().m_fullscreen);
 	if (rect_width(&client) > 0 && rect_height(&client) > 0)
 	{
-		window->m_target->set_bounds(rect_width(&client), rect_height(&client), window->m_monitor->get_aspect());
-		window->m_target->set_max_update_rate((d3d->get_refresh() == 0) ? d3d->get_origmode().RefreshRate : d3d->get_refresh());
+		window().m_target->set_bounds(rect_width(&client), rect_height(&client), window().m_monitor->get_aspect());
+		window().m_target->set_max_update_rate((get_refresh() == 0) ? get_origmode().RefreshRate : get_refresh());
 	}
-	return &window->m_target->get_primitives();
+	return &window().m_target->get_primitives();
 }
 
-int drawd3d_init(running_machine &machine, win_draw_callbacks *callbacks)
+//============================================================
+//  drawnone_create
+//============================================================
+
+static osd_renderer *drawd3d_create(win_window_info *window)
+{
+	return global_alloc(d3d::renderer(window));
+}
+
+int drawd3d_init(running_machine &machine, osd_draw_callbacks *callbacks)
 {
 	d3dintf = NULL;
 
@@ -295,13 +279,7 @@ int drawd3d_init(running_machine &machine, win_draw_callbacks *callbacks)
 	// fill in the callbacks
 	memset(callbacks, 0, sizeof(*callbacks));
 	callbacks->exit = drawd3d_exit;
-	callbacks->window_init = drawd3d_window_init;
-	callbacks->window_get_primitives = drawd3d_window_get_primitives;
-	callbacks->window_draw = drawd3d_window_draw;
-	callbacks->window_save = drawd3d_window_save;
-	callbacks->window_record = drawd3d_window_record;
-	callbacks->window_toggle_fsfx = drawd3d_window_toggle_fsfx;
-	callbacks->window_destroy = drawd3d_window_destroy;
+	callbacks->create = drawd3d_create;
 	return 0;
 }
 
@@ -309,21 +287,15 @@ int drawd3d_init(running_machine &machine, win_draw_callbacks *callbacks)
 //  drawd3d_window_draw
 //============================================================
 
-static int drawd3d_window_draw(win_window_info *window, HDC dc, int update)
+int d3d::renderer::draw(HDC dc, int update)
 {
-	d3d::renderer *d3d = (d3d::renderer *)window->m_drawdata;
-
-	// if we haven't been created, just punt
-	if (d3d == NULL)
-		return 1;
-
-	int check = d3d->pre_window_draw_check();
+	int check = pre_window_draw_check();
 	if (check >= 0)
 		return check;
 
-	d3d->begin_frame();
-	d3d->process_primitives();
-	d3d->end_frame();
+	begin_frame();
+	process_primitives();
+	end_frame();
 
 	return 0;
 }
@@ -496,7 +468,7 @@ texture_manager::texture_manager(renderer *d3d)
 	osd_printf_verbose("Direct3D: YUV format = %s\n", (m_yuv_format == D3DFMT_YUY2) ? "YUY2" : (m_yuv_format == D3DFMT_UYVY) ? "UYVY" : "RGB");
 
 	// set the max texture size
-	d3d->get_window()->m_target->set_max_texture_size(m_texture_max_width, m_texture_max_height);
+	d3d->window().m_target->set_max_texture_size(m_texture_max_width, m_texture_max_height);
 	osd_printf_verbose("Direct3D: Max texture size = %dx%d\n", (int)m_texture_max_width, (int)m_texture_max_height);
 }
 
@@ -508,7 +480,7 @@ void texture_manager::create_resources()
 {
 	// experimental: load a PNG to use for vector rendering; it is treated
 	// as a brightness map
-	emu_file file(m_renderer->get_window()->machine().options().art_path(), OPEN_FLAG_READ);
+	emu_file file(m_renderer->window().machine().options().art_path(), OPEN_FLAG_READ);
 	render_load_png(m_vector_bitmap, file, NULL, "vector.png");
 	if (m_vector_bitmap.valid())
 	{
@@ -650,10 +622,10 @@ texture_info *texture_manager::find_texinfo(const render_texinfo *texinfo, UINT3
 }
 
 renderer::renderer(win_window_info *window)
+	: osd_renderer(window, FLAG_NONE)
 {
 	m_device = NULL;
 	m_restarting = false;
-	m_window = window;
 	m_shaders = NULL;
 	m_numverts = 0;
 	m_numpolys = 0;
@@ -672,7 +644,7 @@ int renderer::initialize()
 		return false;
 
 	// create the device immediately for the full screen case (defer for window mode)
-	if (m_window->m_fullscreen && device_create())
+	if (window().m_fullscreen && device_create())
 		return false;
 
 	return true;
@@ -681,7 +653,7 @@ int renderer::initialize()
 int renderer::pre_window_draw_check()
 {
 	// if we're in the middle of resizing, leave things alone
-	if (m_window->m_resize_state == RESIZE_STATE_RESIZING)
+	if (window().m_resize_state == RESIZE_STATE_RESIZING)
 		return 0;
 
 	// if we're restarting the renderer, leave things alone
@@ -706,7 +678,7 @@ int renderer::pre_window_draw_check()
 	}
 
 	// in window mode, we need to track the window size
-	if (!m_window->m_fullscreen || m_device == NULL)
+	if (!window().m_fullscreen || m_device == NULL)
 	{
 		// if the size changes, skip this update since the render target will be out of date
 		if (update_window_size())
@@ -722,7 +694,7 @@ int renderer::pre_window_draw_check()
 
 void texture_manager::update_textures()
 {
-	for (render_primitive *prim = m_renderer->get_window()->m_primlist->first(); prim != NULL; prim = prim->next())
+	for (render_primitive *prim = m_renderer->window().m_primlist->first(); prim != NULL; prim = prim->next())
 	{
 		if (prim->texture.base != NULL)
 		{
@@ -759,7 +731,7 @@ void renderer::begin_frame()
 
 	m_shaders->begin_frame();
 
-	m_window->m_primlist->acquire_lock();
+	window().m_primlist->acquire_lock();
 
 	// first update any textures
 	m_texture_manager->update_textures();
@@ -780,7 +752,7 @@ mtlog_add("drawd3d_window_draw: begin_scene");
 	m_line_count = 0;
 
 	// loop over primitives
-	for (render_primitive *prim = m_window->m_primlist->first(); prim != NULL; prim = prim->next())
+	for (render_primitive *prim = window().m_primlist->first(); prim != NULL; prim = prim->next())
 		if (prim->type == render_primitive::LINE && PRIMFLAG_GET_VECTOR(prim->flags))
 			m_line_count++;
 }
@@ -788,7 +760,7 @@ mtlog_add("drawd3d_window_draw: begin_scene");
 void renderer::process_primitives()
 {
 	// Rotating index for vector time offsets
-	for (render_primitive *prim = m_window->m_primlist->first(); prim != NULL; prim = prim->next())
+	for (render_primitive *prim = window().m_primlist->first(); prim != NULL; prim = prim->next())
 	{
 		switch (prim->type)
 		{
@@ -818,7 +790,7 @@ void renderer::process_primitives()
 
 void renderer::end_frame()
 {
-	m_window->m_primlist->release_lock();
+	window().m_primlist->release_lock();
 
 	// flush any pending polygons
 	primitive_flush_pending();
@@ -893,18 +865,18 @@ try_again:
 	m_presentation.BackBufferCount               = video_config.triplebuf ? 2 : 1;
 	m_presentation.MultiSampleType               = D3DMULTISAMPLE_NONE;
 	m_presentation.SwapEffect                    = D3DSWAPEFFECT_DISCARD;
-	m_presentation.hDeviceWindow                 = m_window->m_hwnd;
-	m_presentation.Windowed                      = !m_window->m_fullscreen || win_has_menu(m_window);
+	m_presentation.hDeviceWindow                 = window().m_hwnd;
+	m_presentation.Windowed                      = !window().m_fullscreen || win_has_menu(&window());
 	m_presentation.EnableAutoDepthStencil        = FALSE;
 	m_presentation.AutoDepthStencilFormat        = D3DFMT_D16;
 	m_presentation.Flags                         = 0;
 	m_presentation.FullScreen_RefreshRateInHz    = m_refresh;
-	m_presentation.PresentationInterval          = ((video_config.triplebuf && m_window->m_fullscreen) ||
+	m_presentation.PresentationInterval          = ((video_config.triplebuf && window().m_fullscreen) ||
 													video_config.waitvsync || video_config.syncrefresh) ?
 													D3DPRESENT_INTERVAL_ONE : D3DPRESENT_INTERVAL_IMMEDIATE;
 
 	// create the D3D device
-	result = (*d3dintf->d3d.create_device)(d3dintf, m_adapter, D3DDEVTYPE_HAL, m_window->m_focus_hwnd,
+	result = (*d3dintf->d3d.create_device)(d3dintf, m_adapter, D3DDEVTYPE_HAL, window().m_focus_hwnd,
 					D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE, &m_presentation, &m_device);
 	if (result != D3D_OK)
 	{
@@ -927,10 +899,10 @@ try_again:
 	osd_printf_verbose("Direct3D: Device created at %dx%d\n", m_width, m_height);
 
 	// set the gamma if we need to
-	if (m_window->m_fullscreen)
+	if (window().m_fullscreen)
 	{
 		// only set the gamma if it's not 1.0f
-		windows_options &options = downcast<windows_options &>(m_window->machine().options());
+		windows_options &options = downcast<windows_options &>(window().machine().options());
 		float brightness = options.full_screen_brightness();
 		float contrast = options.full_screen_contrast();
 		float gamma = options.full_screen_gamma();
@@ -1092,7 +1064,7 @@ int renderer::device_verify_caps()
 	int retval = 0;
 
 	m_shaders = global_alloc_clear(shaders);
-	m_shaders->init(d3dintf, m_window);
+	m_shaders->init(d3dintf, &window());
 
 	DWORD tempcaps;
 	HRESULT result = (*d3dintf->d3d.get_caps_dword)(d3dintf, m_adapter, D3DDEVTYPE_HAL, CAPS_MAX_PS30_INSN_SLOTS, &tempcaps);
@@ -1231,12 +1203,12 @@ int renderer::config_adapter_mode()
 	}
 
 	// choose a resolution: window mode case
-	if (!m_window->m_fullscreen || !video_config.switchres || win_has_menu(m_window))
+	if (!window().m_fullscreen || !video_config.switchres || win_has_menu(&window()))
 	{
 		RECT client;
 
 		// bounds are from the window client rect
-		GetClientRectExceptMenu(m_window->m_hwnd, &client, m_window->m_fullscreen);
+		GetClientRectExceptMenu(window().m_hwnd, &client, window().m_fullscreen);
 		m_width = client.right - client.left;
 		m_height = client.bottom - client.top;
 
@@ -1247,7 +1219,7 @@ int renderer::config_adapter_mode()
 		// make sure it's a pixel format we can get behind
 		if (m_pixformat != D3DFMT_X1R5G5B5 && m_pixformat != D3DFMT_R5G6B5 && m_pixformat != D3DFMT_X8R8G8B8)
 		{
-			char *utf8_device = utf8_from_tstring(m_window->m_monitor->info.szDevice);
+			char *utf8_device = utf8_from_tstring(window().m_monitor->info.szDevice);
 			if (utf8_device != NULL)
 			{
 				osd_printf_error("Device %s currently in an unsupported mode\n", utf8_device);
@@ -1272,10 +1244,10 @@ int renderer::config_adapter_mode()
 	}
 
 	// see if we can handle the device type
-	result = (*d3dintf->d3d.check_device_type)(d3dintf, m_adapter, D3DDEVTYPE_HAL, m_pixformat, m_pixformat, !m_window->m_fullscreen);
+	result = (*d3dintf->d3d.check_device_type)(d3dintf, m_adapter, D3DDEVTYPE_HAL, m_pixformat, m_pixformat, !window().m_fullscreen);
 	if (result != D3D_OK)
 	{
-		char *utf8_device = utf8_from_tstring(m_window->m_monitor->info.szDevice);
+		char *utf8_device = utf8_from_tstring(window().m_monitor->info.szDevice);
 		if (utf8_device != NULL)
 		{
 			osd_printf_error("Proposed video mode not supported on device %s\n", utf8_device);
@@ -1303,7 +1275,7 @@ int renderer::get_adapter_for_monitor()
 		HMONITOR curmonitor = (*d3dintf->d3d.get_adapter_monitor)(d3dintf, adapternum);
 
 		// if we match the proposed monitor, this is it
-		if (curmonitor == m_window->m_monitor->handle)
+		if (curmonitor == window().m_monitor->handle)
 		{
 			return adapternum;
 		}
@@ -1326,7 +1298,7 @@ void renderer::pick_best_mode()
 	float best_score = 0.0f;
 
 	// determine the refresh rate of the primary screen
-	const screen_device *primary_screen = m_window->machine().config().first_screen();
+	const screen_device *primary_screen = window().machine().config().first_screen();
 	if (primary_screen != NULL)
 	{
 		target_refresh = ATTOSECONDS_TO_HZ(primary_screen->refresh_attoseconds());
@@ -1336,7 +1308,7 @@ void renderer::pick_best_mode()
 	// note: technically we should not be calling this from an alternate window
 	// thread; however, it is only done during init time, and the init code on
 	// the main thread is waiting for us to finish, so it is safe to do so here
-	m_window->m_target->compute_minimum_size(minwidth, minheight);
+	window().m_target->compute_minimum_size(minwidth, minheight);
 
 	// use those as the target for now
 	INT32 target_width = minwidth;
@@ -1371,7 +1343,7 @@ void renderer::pick_best_mode()
 			size_score *= 0.1f;
 
 		// if we're looking for a particular mode, that's a winner
-		if (mode.Width == m_window->m_maxwidth && mode.Height == m_window->m_maxheight)
+		if (mode.Width == window().m_maxwidth && mode.Height == window().m_maxheight)
 			size_score = 2.0f;
 
 		// compute refresh score
@@ -1382,7 +1354,7 @@ void renderer::pick_best_mode()
 			refresh_score *= 0.1f;
 
 		// if we're looking for a particular refresh, make sure it matches
-		if (mode.RefreshRate == m_window->m_refresh)
+		if (mode.RefreshRate == window().m_refresh)
 			refresh_score = 2.0f;
 
 		// weight size and refresh equally
@@ -1412,19 +1384,19 @@ int renderer::update_window_size()
 {
 	// get the current window bounds
 	RECT client;
-	GetClientRectExceptMenu(m_window->m_hwnd, &client, m_window->m_fullscreen);
+	GetClientRectExceptMenu(window().m_hwnd, &client, window().m_fullscreen);
 
 	// if we have a device and matching width/height, nothing to do
 	if (m_device != NULL && rect_width(&client) == m_width && rect_height(&client) == m_height)
 	{
 		// clear out any pending resizing if the area didn't change
-		if (m_window->m_resize_state == RESIZE_STATE_PENDING)
-			m_window->m_resize_state = RESIZE_STATE_NORMAL;
+		if (window().m_resize_state == RESIZE_STATE_PENDING)
+			window().m_resize_state = RESIZE_STATE_NORMAL;
 		return FALSE;
 	}
 
 	// if we're in the middle of resizing, leave it alone as well
-	if (m_window->m_resize_state == RESIZE_STATE_RESIZING)
+	if (window().m_resize_state == RESIZE_STATE_RESIZING)
 		return FALSE;
 
 	// set the new bounds and create the device again
@@ -1434,7 +1406,7 @@ int renderer::update_window_size()
 		return FALSE;
 
 	// reset the resize state to normal, and indicate we made a change
-	m_window->m_resize_state = RESIZE_STATE_NORMAL;
+	window().m_resize_state = RESIZE_STATE_NORMAL;
 	return TRUE;
 }
 
@@ -1444,7 +1416,7 @@ int renderer::update_window_size()
 
 void renderer::batch_vectors()
 {
-	windows_options &options = downcast<windows_options &>(m_window->machine().options());
+	windows_options &options = downcast<windows_options &>(window().machine().options());
 
 	int vector_size = (options.antialias() ? 24 : 6);
 	m_vectorbatch = mesh_alloc(m_line_count * vector_size);
@@ -1454,7 +1426,7 @@ void renderer::batch_vectors()
 	int line_index = 0;
 	float period = options.screen_vector_time_period();
 	UINT32 cached_flags = 0;
-	for (render_primitive *prim = m_window->m_primlist->first(); prim != NULL; prim = prim->next())
+	for (render_primitive *prim = window().m_primlist->first(); prim != NULL; prim = prim->next())
 	{
 		switch (prim->type)
 		{

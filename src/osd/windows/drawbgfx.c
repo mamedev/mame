@@ -22,32 +22,52 @@
 #include <bgfxplatform.h> 
 #include <bgfx.h>
 
+class renderer_bgfx : public osd_renderer
+{
+public:
+	renderer_bgfx(win_window_info *window)
+	: osd_renderer(window, FLAG_NONE) { }
+
+	virtual ~renderer_bgfx() { }
+
+	virtual int init();
+	virtual render_primitive_list *get_primitives();
+	virtual int draw(HDC dc, int update);
+	virtual void save() {};
+	virtual void record() {};
+	virtual void toggle_fsfx() {};
+	virtual void destroy();
+
+private:
+};
+
+
 //============================================================
 //  PROTOTYPES
 //============================================================
 
 // core functions
 static void drawbgfx_exit(void);
-static int drawbgfx_window_init(win_window_info *window);
-static void drawbgfx_window_destroy(win_window_info *window);
-static render_primitive_list *drawbgfx_window_get_primitives(win_window_info *window);
-static int drawbgfx_window_draw(win_window_info *window, HDC dc, int update);
 
+//============================================================
+//  drawnone_create
+//============================================================
 
+osd_renderer *drawbgfx_create(win_window_info *window)
+{
+	return global_alloc(renderer_bgfx(window));
+}
 
 //============================================================
 //  drawbgfx_init
 //============================================================
 
-int drawbgfx_init(running_machine &machine, win_draw_callbacks *callbacks)
+int drawbgfx_init(running_machine &machine, osd_draw_callbacks *callbacks)
 {
 	// fill in the callbacks
 	memset(callbacks, 0, sizeof(*callbacks));
 	callbacks->exit = drawbgfx_exit;
-	callbacks->window_init = drawbgfx_window_init;
-	callbacks->window_get_primitives = drawbgfx_window_get_primitives;
-	callbacks->window_draw = drawbgfx_window_draw;
-	callbacks->window_destroy = drawbgfx_window_destroy;
+	callbacks->create = drawbgfx_create;
 	return 0;
 }
 
@@ -67,19 +87,18 @@ static void drawbgfx_exit(void)
 //  drawbgfx_window_init
 //============================================================
 
-static int drawbgfx_window_init(win_window_info *window)
+int renderer_bgfx::init()
 {
 	RECT client;
-	GetClientRect(window->m_hwnd, &client);
+	GetClientRect(window().m_hwnd, &client);
 
-	bgfx::winSetHwnd(window->m_hwnd);
+	bgfx::winSetHwnd(window().m_hwnd);
 	bgfx::init();
 	bgfx::reset(rect_width(&client), rect_height(&client), BGFX_RESET_VSYNC);
 	
 	// Enable debug text.
 	bgfx::setDebug(BGFX_DEBUG_STATS);// BGFX_DEBUG_TEXT);
 
-	window->m_drawdata = window->m_hwnd;
 	return 0;
 }
 
@@ -89,11 +108,10 @@ static int drawbgfx_window_init(win_window_info *window)
 //  drawbgfx_window_destroy
 //============================================================
 
-static void drawbgfx_window_destroy(win_window_info *window)
+void renderer_bgfx::destroy()
 {
 	// Shutdown bgfx.
 	bgfx::shutdown();
-	window->m_drawdata = NULL;
 }
 
 
@@ -102,12 +120,12 @@ static void drawbgfx_window_destroy(win_window_info *window)
 //  drawbgfx_window_get_primitives
 //============================================================
 
-static render_primitive_list *drawbgfx_window_get_primitives(win_window_info *window)
+render_primitive_list *renderer_bgfx::get_primitives()
 {
 	RECT client;
-	GetClientRect(window->m_hwnd, &client);
-	window->m_target->set_bounds(rect_width(&client), rect_height(&client), window->m_monitor->get_aspect());
-	return &window->m_target->get_primitives();	
+	GetClientRect(window().m_hwnd, &client);
+	window().m_target->set_bounds(rect_width(&client), rect_height(&client), window().m_monitor->get_aspect());
+	return &window().m_target->get_primitives();
 }
 
 
@@ -116,10 +134,10 @@ static render_primitive_list *drawbgfx_window_get_primitives(win_window_info *wi
 //  drawbgfx_window_draw
 //============================================================
 
-static int drawbgfx_window_draw(win_window_info *window, HDC dc, int update)
+int renderer_bgfx::draw(HDC dc, int update)
 {
 	RECT client;
-	GetClientRect(window->m_hwnd, &client);
+	GetClientRect(window().m_hwnd, &client);
 
 	bgfx::setViewClear(0
 		, BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
@@ -134,10 +152,10 @@ static int drawbgfx_window_draw(win_window_info *window, HDC dc, int update)
 	// if no other draw calls are submitted to view 0.
 	bgfx::submit(0);
 
-	window->m_primlist->acquire_lock();
+	window().m_primlist->acquire_lock();
 
 	// now draw
-	for (render_primitive *prim = window->m_primlist->first(); prim != NULL; prim = prim->next())
+	for (render_primitive *prim = window().m_primlist->first(); prim != NULL; prim = prim->next())
 	{
 		switch (prim->type)
 		{
@@ -219,7 +237,7 @@ static int drawbgfx_window_draw(win_window_info *window, HDC dc, int update)
 		}
 	}
 
-	window->m_primlist->release_lock();	
+	window().m_primlist->release_lock();
 	// Advance to next frame. Rendering thread will be kicked to 
 	// process submitted rendering primitives.
 	bgfx::frame();

@@ -224,6 +224,7 @@ public:
 	sdl_info_ogl(sdl_window_info *window)
 	: osd_renderer(window, FLAG_NEEDS_OPENGL), m_blittimer(0),
 		m_screen_width(0), m_screen_height(0),
+		m_last_width(0), m_last_height(0),
 #if (SDLMAME_SDL2)
 		m_gl_context_id(0),
 #else
@@ -251,8 +252,7 @@ public:
 			m_texVerticex[i] = 0.0f;
 	}
 
-	/* virtual */ int create(const int width, const int height);
-	/* virtual */ void resize(const int width, int const height);
+	/* virtual */ int create();
 	/* virtual */ int draw(const UINT32 dc, const int update);
 	/* virtual */ int xy_to_render_target(const int x, const int y, int *xt, int *yt);
 	/* virtual */ void destroy_all_textures();
@@ -280,6 +280,8 @@ public:
 	INT32           m_blittimer;
 	int             m_screen_width;
 	int             m_screen_height;
+	int				m_last_width;
+	int				m_last_height;
 
 #if (SDLMAME_SDL2)
 	SDL_GLContext   m_gl_context_id;
@@ -709,7 +711,7 @@ void sdl_info_ogl::initialize_gl()
 // a
 //============================================================
 
-int sdl_info_ogl::create(int width, int height)
+int sdl_info_ogl::create()
 {
 
 #if (SDLMAME_SDL2)
@@ -752,18 +754,6 @@ int sdl_info_ogl::create(int width, int height)
 
 	osd_printf_verbose("Leave sdl_info_ogl::create\n");
 	return 0;
-}
-
-//============================================================
-//  sdl_info::resize
-//============================================================
-
-void sdl_info_ogl::resize(int width, int height)
-{
-#if (SDLMAME_SDL2)
-	m_blittimer = 3;
-#endif
-	m_init_context = 1;
 }
 
 
@@ -1219,6 +1209,16 @@ int sdl_info_ogl::draw(UINT32 dc, int update)
 	if (video_config.novideo)
 	{
 		return 0;
+	}
+
+	if ((window().width() != m_last_width) || (window().height() != m_last_height))
+	{
+		m_last_width = window().width();
+		m_last_height = window().height();
+#if (SDLMAME_SDL2)
+		m_blittimer = 3;
+#endif
+		m_init_context = 1;
 	}
 
 #if (SDLMAME_SDL2)

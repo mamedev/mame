@@ -57,8 +57,7 @@ public:
 	int flags() const { return m_flags; }
 	bool check_flag(const int flag) { return ((m_flags & flag)) == flag; }
 
-	virtual int create(const int width, const int height) = 0;
-	virtual void resize(const int width, const int height) = 0;
+	virtual int create() = 0;
 	virtual int draw(const UINT32 dc, const int update) = 0;
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) = 0;
 	virtual void destroy_all_textures() = 0;
@@ -116,32 +115,20 @@ public:
 	}
 
 	int window_init();
-	void destroy();
 
 	void update();
 	void toggle_full_screen();
 	void modify_prescale(int dir);
 	void resize(INT32 width, INT32 height);
+	void destroy();
 	void clear();
 	int xy_to_render_target(int x, int y, int *xt, int *yt);
-
-	void get_min_bounds(int *window_width, int *window_height, int constrain);
-	void get_max_bounds(int *window_width, int *window_height, int constrain);
 
 	running_machine &machine() const { return m_machine; }
 	sdl_monitor_info *monitor() const { return m_monitor; }
 	int fullscreen() const { return m_fullscreen; }
 
-	void set_fullscreen(int afullscreen) { m_fullscreen = afullscreen; }
-	void update_cursor_state();
-
-	void blit_surface_size(int window_width, int window_height);
-	void pick_best_mode(int *fswidth, int *fsheight);
-	void set_starting_view(running_machine &machine, int index, const char *defview, const char *view);
-
 	int index() const { return m_index; }
-
-
 
 	render_target *target() { return m_target; }
 #if (SDLMAME_SDL2)
@@ -172,15 +159,15 @@ public:
 private:
 	// window handle and info
 	char                m_title[256];
+	int                 m_startmaximized;
 
 	// diverse flags
 	int                 m_minwidth, m_minheight;
 	int                 m_maxwidth, m_maxheight;
-	int                 m_depth;
 	int                 m_refresh;
+	int                 m_depth;
 	int                 m_windowed_width;
 	int                 m_windowed_height;
-	int                 m_startmaximized;
 
 	// rendering info
 	osd_event *         m_rendered_event;
@@ -219,6 +206,16 @@ protected:
 	osd_renderer &renderer() { return *m_renderer; }
 private:
 	void constrain_to_aspect_ratio(int *window_width, int *window_height, int adjustment);
+	void update_cursor_state();
+	void blit_surface_size(int window_width, int window_height);
+	void pick_best_mode(int *fswidth, int *fsheight);
+	void set_starting_view(running_machine &machine, int index, const char *defview, const char *view);
+	void get_min_bounds(int *window_width, int *window_height, int constrain);
+	void get_max_bounds(int *window_width, int *window_height, int constrain);
+	void set_fullscreen(int afullscreen) { m_fullscreen = afullscreen; }
+
+
+
 
 	// Pointer to machine
 	running_machine &   m_machine;
@@ -236,6 +233,7 @@ private:
 	static OSDWORK_CALLBACK( sdlwindow_toggle_full_screen_wt );
 	static OSDWORK_CALLBACK( sdlwindow_clear_surface_wt );
 	static OSDWORK_CALLBACK( destroy_all_textures_wt );
+	static OSDWORK_CALLBACK( update_cursor_state_wt );
 
 	void measure_fps(UINT32 dc, int update);
 
