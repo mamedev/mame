@@ -1369,8 +1369,6 @@ UINT16 pc9801_state::egc_shift(int plane, UINT16 val)
 UINT16 pc9801_state::egc_do_partial_op(int plane, UINT16 src, UINT16 pat, UINT16 dst)
 {
 	UINT16 out = 0;
-	int dst_off = (m_egc.regs[6] >> 4) & 0xf;
-	UINT16 src_tmp = src;
 
 	for(int i = 7; i >= 0; i--)
 	{
