@@ -1950,7 +1950,6 @@ void sdlinput_poll(running_machine &machine)
 		case SDL_TEXTINPUT:
 			if (*event.text.text)
 			{
-				printf("char %c\n", *event.text.text);
 				sdl_window_info *window = GET_FOCUS_WINDOW(&event.text);
 				unicode_char result;
 				if (window != NULL )
