@@ -2,7 +2,7 @@
 
 Toshiba T5182 die map, by Jonathan Gevaryahu AKA Lord Nightmare,
 with assistance from Kevin Horton.
-T5182 supplied by Tomasz 'Dox' Slanina
+T5182 supplied by Tomasz 'Dox' Slanina which came from a Dark Mist PCB bought by Guru
 
 Die Diagram:
 |------------------------|
@@ -284,7 +284,7 @@ READ8_MEMBER(t5182_device::sharedram_semaphore_main_r)
 	return m_semaphore_main | (m_irqstate & 2);
 }
 
-// ROM definition for the QS1000 internal program ROM
+// ROM definition for the Toshiba T5182 Custom CPU internal program ROM
 ROM_START( t5182 )
 	ROM_REGION( 0x2000, "cpu", 0 )
 	ROM_LOAD( "t5182.rom",   0x0000, 0x2000, CRC(d354c8fc) SHA1(a1c9e1ac293f107f69cc5788cf6abc3db1646e33) )
