@@ -7,9 +7,9 @@
 #ifndef FLEX_DSK_H_
 #define FLEX_DSK_H_
 
-#include "wd177x_dsk.h"
+#include "flopimg.h"
 
-class flex_format : public wd177x_format {
+class flex_format : public floppy_image_format_t {
 public:
 	flex_format();
 
@@ -18,6 +18,8 @@ public:
 	virtual const char *extensions() const;
 	virtual int identify(io_generic *io, UINT32 form_factor);
 	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image);
+	virtual bool supports_save() const;
+
 private:
 	struct sysinfo_sector
 	{
@@ -37,7 +39,6 @@ private:
 		UINT8 last_sec;
 		UINT8 unused2[216];
 	} info;
-	static const format formats[];
 };
 
 extern const floppy_format_type FLOPPY_FLEX_FORMAT;

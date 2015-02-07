@@ -1788,6 +1788,7 @@ $(MESSOBJ)/tiki.a:              \
 	$(MESS_DRIVERS)/tiki100.o   \
 
 $(MESSOBJ)/tomy.a:              \
+	$(MESS_DRIVERS)/tmtennis.o  \
 	$(MESS_DRIVERS)/tutor.o     \
 
 $(MESSOBJ)/toshiba.a:           \
@@ -2208,6 +2209,7 @@ $(MESS_DRIVERS)/tispeak.o:  $(MESS_LAYOUT)/lantutor.lh \
 $(MESS_DRIVERS)/tk80.o:     $(MESS_LAYOUT)/tk80.lh
 $(MESS_DRIVERS)/tm990189.o: $(MESS_LAYOUT)/tm990189.lh \
 							$(MESS_LAYOUT)/tm990189v.lh
+$(MESS_DRIVERS)/tmtennis.o: $(MESS_LAYOUT)/tmtennis.lh
 $(MESS_DRIVERS)/unixpc.o:   $(MESS_LAYOUT)/unixpc.lh
 $(MESS_DRIVERS)/ut88.o:     $(MESS_LAYOUT)/ut88mini.lh
 $(MESS_DRIVERS)/vboy.o:     $(MESS_LAYOUT)/vboy.lh

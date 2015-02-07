@@ -142,7 +142,7 @@ void ucom4_cpu_device::device_start()
 	state_add(UCOM4_ACC, "ACC", m_acc).formatstr("%01X");
 
 	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%04X").noshow();
-//	state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).formatstr("%4s").noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_carry_f).formatstr("%4s").noshow(); // dummy
 
 	m_icountptr = &m_icount;
 }

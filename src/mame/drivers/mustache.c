@@ -43,7 +43,7 @@ YM2151:
 static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, mustache_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(mustache_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("t5182", t5182_device, sound_irq_w)
 	AM_RANGE(0xd001, 0xd001) AM_DEVREAD("t5182", t5182_device, sharedram_semaphore_snd_r)
 	AM_RANGE(0xd002, 0xd002) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_acquire_w)
@@ -54,8 +54,8 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, mustache_state )
 	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("START")
 	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("DSWA")
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("DSWB")
-	AM_RANGE(0xd806, 0xd806) AM_WRITE(mustache_scroll_w)
-	AM_RANGE(0xd807, 0xd807) AM_WRITE(mustache_video_control_w)
+	AM_RANGE(0xd806, 0xd806) AM_WRITE(scroll_w)
+	AM_RANGE(0xd807, 0xd807) AM_WRITE(video_control_w)
 	AM_RANGE(0xe800, 0xefff) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -123,9 +123,6 @@ static INPUT_PORTS_START( mustache )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 // There is an 8th dipswitch here, which controls screen flip, but the operator sheet implies it does it via hardware, i.e. not readable by cpu. May need further investigation.
 
-	PORT_START(T5182COINPORT)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(2)
 INPUT_PORTS_END
 
 
@@ -155,7 +152,7 @@ static GFXDECODE_START( mustache )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x80, 8 )
 GFXDECODE_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(mustache_state::mustache_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(mustache_state::scanline)
 {
 	int scanline = param;
 
@@ -173,10 +170,10 @@ static MACHINE_CONFIG_START( mustache, mustache_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(memmap)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mustache_state, mustache_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mustache_state, scanline, "screen", 0, 1)
 
-	MCFG_T5182_ADD("t5182")
-	MCFG_FRAGMENT_ADD(t5182)
+	MCFG_DEVICE_ADD("t5182", T5182, 0)
+
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -184,7 +181,7 @@ static MACHINE_CONFIG_START( mustache, mustache_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mustache_state, screen_update_mustache)
+	MCFG_SCREEN_UPDATE_DRIVER(mustache_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mustache)
@@ -207,9 +204,8 @@ ROM_START( mustache )
 	ROM_LOAD( "mustache.h18", 0x0000, 0x8000, CRC(123bd9b8) SHA1(33a7cba5c3a54b0b1a15dd1e24d298b6f7274321) )
 	ROM_LOAD( "mustache.h16", 0x8000, 0x4000, CRC(62552beb) SHA1(ee10991d7de0596608fa1db48805781cbfbbdb9f) )
 
-	ROM_REGION( 0x10000, "t5182_z80", 0 ) /* Toshiba T5182 module */
-	ROM_LOAD( "t5182.rom",   0x0000, 0x2000, CRC(d354c8fc) SHA1(a1c9e1ac293f107f69cc5788cf6abc3db1646e33) )
-	ROM_LOAD( "mustache.e5", 0x8000, 0x8000, CRC(efbb1943) SHA1(3320e9eaeb776d09ed63f7dedc79e720674e6718) )
+	ROM_REGION( 0x8000, "t5182_z80", 0 ) /* Toshiba T5182 external ROM */
+	ROM_LOAD( "mustache.e5", 0x0000, 0x8000, CRC(efbb1943) SHA1(3320e9eaeb776d09ed63f7dedc79e720674e6718) )
 
 	ROM_REGION( 0x0c000, "gfx1",0)  /* BG tiles  */
 	ROM_LOAD( "mustache.a13", 0x0000,  0x4000, CRC(9baee4a7) SHA1(31bcec838789462e67e54ebe7256db9fc4e51b69) )
@@ -278,4 +274,4 @@ DRIVER_INIT_MEMBER(mustache_state,mustache)
 }
 
 
-GAME( 1987, mustache, 0, mustache, mustache, mustache_state, mustache, ROT90, "Seibu Kaihatsu (March license)", "Mustache Boy", 0 )
+GAME( 1987, mustache, 0, mustache, mustache, mustache_state, mustache, ROT90, "Seibu Kaihatsu (March license)", "Mustache Boy", GAME_SUPPORTS_SAVE )

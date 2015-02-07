@@ -48,11 +48,10 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_fgtile_info)
 
 TILE_GET_INFO_MEMBER(darkmist_state::get_txttile_info)
 {
-	UINT8 *videoram = m_videoram;
 	int code,attr,pal;
 
-	code=videoram[tile_index];
-	attr=videoram[tile_index+0x400];
+	code=m_videoram[tile_index];
+	attr=m_videoram[tile_index+0x400];
 	pal=(attr>>1);
 
 	code+=(attr&1)<<8;
@@ -102,12 +101,13 @@ void darkmist_state::video_start()
 	m_txtilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(darkmist_state::get_txttile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
 	m_fgtilemap->set_transparent_pen(0);
 	m_txtilemap->set_transparent_pen(0);
+	
+	save_item(NAME(m_hw));
 }
 
-UINT32 darkmist_state::screen_update_darkmist(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 darkmist_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
-
+	
 #define DM_GETSCROLL(n) (((m_scroll[(n)]<<1)&0xff) + ((m_scroll[(n)]&0x80)?1:0) +( ((m_scroll[(n)-1]<<4) | (m_scroll[(n)-1]<<12) )&0xff00))
 
 	m_bgtilemap->set_scrollx(0, DM_GETSCROLL(0x2));
@@ -139,17 +139,17 @@ UINT32 darkmist_state::screen_update_darkmist(screen_device &screen, bitmap_ind1
 		int i,fx,fy,tile,palette;
 		for(i=0;i<m_spriteram.bytes();i+=32)
 		{
-			fy=spriteram[i+1]&0x40;
-			fx=spriteram[i+1]&0x80;
+			fy=m_spriteram[i+1]&0x40;
+			fx=m_spriteram[i+1]&0x80;
 
-			tile=spriteram[i+0];
+			tile=m_spriteram[i+0];
 
-			if(spriteram[i+1]&0x20)
+			if(m_spriteram[i+1]&0x20)
 				tile += (*m_spritebank << 8);
 
-			palette=((spriteram[i+1])>>1)&0xf;
+			palette=((m_spriteram[i+1])>>1)&0xf;
 
-			if(spriteram[i+1]&0x1)
+			if(m_spriteram[i+1]&0x1)
 				palette=machine().rand()&15;
 
 			palette+=32;
@@ -160,7 +160,7 @@ UINT32 darkmist_state::screen_update_darkmist(screen_device &screen, bitmap_ind1
 				tile,
 				palette,
 				fx,fy,
-				spriteram[i+3],spriteram[i+2],0 );
+				m_spriteram[i+3],m_spriteram[i+2],0 );
 		}
 	}
 
