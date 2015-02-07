@@ -44,14 +44,13 @@ PALETTE_INIT_MEMBER(mustache_state, mustache)
 	}
 }
 
-WRITE8_MEMBER(mustache_state::mustache_videoram_w)
+WRITE8_MEMBER(mustache_state::videoram_w)
 {
-	UINT8 *videoram = m_videoram;
-	videoram[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(mustache_state::mustache_video_control_w)
+WRITE8_MEMBER(mustache_state::video_control_w)
 {
 	if (flip_screen() != (data & 0x01))
 	{
@@ -68,7 +67,7 @@ WRITE8_MEMBER(mustache_state::mustache_video_control_w)
 	}
 }
 
-WRITE8_MEMBER(mustache_state::mustache_scroll_w)
+WRITE8_MEMBER(mustache_state::scroll_w)
 {
 	m_bg_tilemap->set_scrollx(0, 0x100 - data);
 	m_bg_tilemap->set_scrollx(1, 0x100 - data);
@@ -78,9 +77,8 @@ WRITE8_MEMBER(mustache_state::mustache_scroll_w)
 
 TILE_GET_INFO_MEMBER(mustache_state::get_bg_tile_info)
 {
-	UINT8 *videoram = m_videoram;
-	int attr = videoram[2 * tile_index + 1];
-	int code = videoram[2 * tile_index] + ((attr & 0x60) << 3) + ((m_control_byte & 0x08) << 7);
+	int attr = m_videoram[2 * tile_index + 1];
+	int code = m_videoram[2 * tile_index] + ((attr & 0x60) << 3) + ((m_control_byte & 0x08) << 7);
 	int color = attr & 0x0f;
 
 	SET_TILE_INFO_MEMBER(0, code, color, ((attr & 0x10) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0)   );
@@ -94,6 +92,8 @@ void mustache_state::video_start()
 			8, 8, 64, 32);
 
 	m_bg_tilemap->set_scroll_rows(4);
+	
+	save_item(NAME(m_control_byte));
 }
 
 void mustache_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -101,15 +101,14 @@ void mustache_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	rectangle clip = cliprect;
 	gfx_element *gfx = m_gfxdecode->gfx(1);
 	const rectangle &visarea = m_screen->visible_area();
-	UINT8 *spriteram = m_spriteram;
 	int offs;
 
 	for (offs = 0;offs < m_spriteram.bytes();offs += 4)
 	{
-		int sy = 240-spriteram[offs];
-		int sx = 240-spriteram[offs+3];
-		int code = spriteram[offs+2];
-		int attr = spriteram[offs+1];
+		int sy = 240-m_spriteram[offs];
+		int sx = 240-m_spriteram[offs+3];
+		int code = m_spriteram[offs+2];
+		int attr = m_spriteram[offs+1];
 		int color = (attr & 0xe0)>>5;
 
 		if (sy == 240) continue;
@@ -138,7 +137,7 @@ void mustache_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 mustache_state::screen_update_mustache(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 mustache_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);

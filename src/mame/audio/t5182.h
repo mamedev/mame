@@ -1,8 +1,6 @@
 #include "sound/2151intf.h"
 #include "cpu/z80/z80.h"
 
-#define T5182COINPORT "T5182_COIN"
-
 class t5182_device : public device_t
 
 {
@@ -20,6 +18,11 @@ public:
 		CPU_CLEAR
 	};
 
+	enum
+	{
+		SETIRQ_CB
+	};
+	
 	DECLARE_WRITE8_MEMBER(sound_irq_w );
 	DECLARE_READ8_MEMBER(sharedram_semaphore_snd_r);
 	DECLARE_WRITE8_MEMBER(sharedram_semaphore_main_acquire_w);
@@ -35,26 +38,21 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual const rom_entry *device_rom_region() const;
+	virtual ioport_constructor device_input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
 
 private:
 	// internal state
-	cpu_device *m_ourcpu;
-	UINT8 *m_t5182_sharedram;
+	required_device<cpu_device> m_ourcpu;
+	required_shared_ptr<UINT8> m_sharedram;
 	int m_irqstate;
 	int m_semaphore_main;
 	int m_semaphore_snd;
-
+	emu_timer *m_setirq_cb;
 	TIMER_CALLBACK_MEMBER( setirq_callback );
 };
 
 extern const device_type T5182;
-
-ADDRESS_MAP_EXTERN( t5182_map, 8 );
-ADDRESS_MAP_EXTERN( t5182_io, 8 );
-
-MACHINE_CONFIG_EXTERN( t5182 );
-
-#define MCFG_T5182_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, T5182, 0)
