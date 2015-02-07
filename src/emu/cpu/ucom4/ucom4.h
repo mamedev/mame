@@ -125,6 +125,7 @@ protected:
 	UINT8 m_dpl;        // 4-bit data pointer low (RAM x)
 	UINT8 m_dph;        // 1/2/3-bit data pointer high (RAM y)
 	UINT8 m_carry_f;    // carry flag
+	UINT8 m_carry_s;    // carry save
 	UINT8 m_timer_f;    // timer out flag
 	UINT8 m_int_f;      // interrupt flag
 	UINT8 m_inte_f;     // interrupt enable flag

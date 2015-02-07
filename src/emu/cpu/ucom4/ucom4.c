@@ -3,6 +3,9 @@
 /*
 
   NEC uCOM-4 MCU family cores
+  
+  reference: 1981 NEC Microcomputers Catalog (later editions may have errors!)
+  also looked at asterick's JavaScript D553 emulator for verification, with permission
 
 */
 
@@ -58,11 +61,13 @@ void ucom4_cpu_device::state_string_export(const device_state_entry &entry, astr
 {
 	switch (entry.index())
 	{
+		// obviously not from a single flags register
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c",
+			string.printf("%c%c%c%c%c",
 				m_inte_f  ? 'E':'e',
 				m_int_f   ? 'I':'i',
 				m_timer_f ? 'T':'t',
+				m_carry_s ? 'S':'s',
 				m_carry_f ? 'C':'c'
 			);
 			break;
@@ -118,6 +123,7 @@ void ucom4_cpu_device::device_start()
 	m_dpl = 0;
 	m_dph = 0;
 	m_carry_f = 0;
+	m_carry_s = 0;
 	m_timer_f = 0;
 	m_int_f = 0;
 	m_inte_f = 0;
@@ -131,6 +137,7 @@ void ucom4_cpu_device::device_start()
 	save_item(NAME(m_dpl));
 	save_item(NAME(m_dph));
 	save_item(NAME(m_carry_f));
+	save_item(NAME(m_carry_s));
 	save_item(NAME(m_timer_f));
 	save_item(NAME(m_int_f));
 	save_item(NAME(m_inte_f));
@@ -142,7 +149,7 @@ void ucom4_cpu_device::device_start()
 	state_add(UCOM4_ACC, "ACC", m_acc).formatstr("%01X");
 
 	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%04X").noshow();
-	state_add(STATE_GENFLAGS, "GENFLAGS", m_carry_f).formatstr("%4s").noshow(); // dummy
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_carry_f).formatstr("%5s").noshow(); // dummy
 
 	m_icountptr = &m_icount;
 }
@@ -155,6 +162,7 @@ void ucom4_cpu_device::device_start()
 
 void ucom4_cpu_device::device_reset()
 {
+	m_inte_f = 1;
 	m_pc = 0;
 	m_op = 0;
 }
