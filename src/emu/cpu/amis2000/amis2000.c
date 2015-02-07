@@ -306,10 +306,11 @@ void amis2000_device::execute_run()
 			case 0x48: op_lbe(); break;
 			case 0x4c: op_lbep(); break;
 				}
-				break;
+				break; // 0xfc
 
 				}
-				break;
+				break; // 0xff
+
 		} // big switch
 	}
 }

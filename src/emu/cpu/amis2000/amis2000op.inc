@@ -388,13 +388,13 @@ void amis2000_device::op_szk()
 
 void amis2000_device::op_sbe()
 {
-	// SBE: skip next on BL equ E
+	// SBE: skip next on BL equals E
 	m_skip = (m_bl == m_e);
 }
 
 void amis2000_device::op_sam()
 {
-	// SAM: skip next on ACC equ RAM
+	// SAM: skip next on ACC equals RAM
 	m_skip = (m_acc == ram_r());
 }
 
@@ -421,7 +421,7 @@ void amis2000_device::op_tf2()
 
 void amis2000_device::op_adcs()
 {
-	// ADCS: add RAM to ACC+carry, skip next on no carry
+	// ADCS: add RAM to ACC+carry, skip next on not carry
 	m_acc += ram_r() + m_carry;
 	m_carry = m_acc >> 4 & 1;
 	m_skip = !m_carry;
@@ -430,7 +430,7 @@ void amis2000_device::op_adcs()
 
 void amis2000_device::op_adis()
 {
-	// ADIS X: add X to ACC, skip next on no carry
+	// ADIS X: add X to ACC, skip next on not carry
 	UINT8 param = m_op & 0x0f;
 	m_acc += param;
 	m_skip = !(m_acc >> 4 & 1);

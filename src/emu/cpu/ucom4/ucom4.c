@@ -7,7 +7,17 @@
   reference: 1981 NEC Microcomputers Catalog (later editions may have errors!)
   also looked at asterick's JavaScript D553 emulator for verification, with permission
 
+  TODO:
+  - what happens with uCOM-43 opcodes on an uCOM-44/45 MCU?
+
 */
+
+enum
+{
+	NEC_UCOM43 = 0,
+	NEC_UCOM44,
+	NEC_UCOM45
+};	
 
 #include "ucom4.h"
 #include "debugger.h"
@@ -15,12 +25,16 @@
 #include "ucom4op.inc"
 
 
-// uCOM-43 products
-const device_type NEC_D553 = &device_creator<upd553_cpu_device>; // 42-pin PMOS, 35 pins for I/O, Open Drain output, 2000x8 ROM, 96x4 RAM
-const device_type NEC_D650 = &device_creator<upd650_cpu_device>; // 42-pin CMOS, 35 pins for I/O, push-pull output, 2000x8 ROM, 96x4 RAM
+// uCOM-43 products: 2000x8 ROM, RAM size custom, supports full instruction set
+const device_type NEC_D553 = &device_creator<upd553_cpu_device>; // 42-pin PMOS, 35 pins for I/O, Open Drain output, 96x4 RAM
+const device_type NEC_D650 = &device_creator<upd650_cpu_device>; // 42-pin CMOS, 35 pins for I/O, push-pull output, 96x4 RAM
 
-// uCOM-44 products
-const device_type NEC_D552 = &device_creator<upd552_cpu_device>; // 42-pin PMOS, 35 pins for I/O, Open Drain output, 1000x8 ROM, 64x4 RAM
+// uCOM-44 products: 1000x8 ROM, 64x4 RAM, does not support external interrupt
+const device_type NEC_D552 = &device_creator<upd552_cpu_device>; // 42-pin PMOS, 35 pins for I/O, Open Drain output
+
+// uCOM-45 products: ROM size custom, 32x4 RAM
+//..
+
 
 // internal memory maps
 static ADDRESS_MAP_START(program_1k, AS_PROGRAM, 8, ucom4_cpu_device)
@@ -44,15 +58,15 @@ ADDRESS_MAP_END
 
 // device definitions
 upd553_cpu_device::upd553_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ucom4_cpu_device(mconfig, NEC_D553, "uPD553", tag, owner, clock, 3, 11, ADDRESS_MAP_NAME(program_2k), 7, ADDRESS_MAP_NAME(data_96x4), "upd553", __FILE__)
+	: ucom4_cpu_device(mconfig, NEC_D553, "uPD553", tag, owner, clock, NEC_UCOM43, 3, 11, ADDRESS_MAP_NAME(program_2k), 7, ADDRESS_MAP_NAME(data_96x4), "upd553", __FILE__)
 { }
 
 upd650_cpu_device::upd650_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ucom4_cpu_device(mconfig, NEC_D650, "uPD650", tag, owner, clock, 3, 11, ADDRESS_MAP_NAME(program_2k), 7, ADDRESS_MAP_NAME(data_96x4), "upd650", __FILE__)
+	: ucom4_cpu_device(mconfig, NEC_D650, "uPD650", tag, owner, clock, NEC_UCOM43, 3, 11, ADDRESS_MAP_NAME(program_2k), 7, ADDRESS_MAP_NAME(data_96x4), "upd650", __FILE__)
 { }
 
 upd552_cpu_device::upd552_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ucom4_cpu_device(mconfig, NEC_D552, "uPD552", tag, owner, clock, 1, 10, ADDRESS_MAP_NAME(program_1k), 6, ADDRESS_MAP_NAME(data_64x4), "upd552", __FILE__)
+	: ucom4_cpu_device(mconfig, NEC_D552, "uPD552", tag, owner, clock, NEC_UCOM44, 1, 10, ADDRESS_MAP_NAME(program_1k), 6, ADDRESS_MAP_NAME(data_64x4), "upd552", __FILE__)
 { }
 
 
@@ -64,11 +78,11 @@ void ucom4_cpu_device::state_string_export(const device_state_entry &entry, astr
 		// obviously not from a single flags register
 		case STATE_GENFLAGS:
 			string.printf("%c%c%c%c%c",
-				m_inte_f  ? 'E':'e',
-				m_int_f   ? 'I':'i',
-				m_timer_f ? 'T':'t',
-				m_carry_s ? 'S':'s',
-				m_carry_f ? 'C':'c'
+				m_inte_f    ? 'E':'e',
+				m_int_f     ? 'I':'i',
+				m_timer_f   ? 'T':'t',
+				m_carry_s_f ? 'S':'s',
+				m_carry_f   ? 'C':'c'
 			);
 			break;
 
@@ -118,12 +132,14 @@ void ucom4_cpu_device::device_start()
 	memset(m_stack, 0, sizeof(m_stack));
 	m_op = 0;
 	m_prev_op = 0;
+	m_arg = 0;
+	m_skip = false;
 	m_pc = 0;
 	m_acc = 0;
 	m_dpl = 0;
 	m_dph = 0;
 	m_carry_f = 0;
-	m_carry_s = 0;
+	m_carry_s_f = 0;
 	m_timer_f = 0;
 	m_int_f = 0;
 	m_inte_f = 0;
@@ -132,12 +148,14 @@ void ucom4_cpu_device::device_start()
 	save_item(NAME(m_stack));
 	save_item(NAME(m_op));
 	save_item(NAME(m_prev_op));
+	save_item(NAME(m_arg));
+	save_item(NAME(m_skip));
 	save_item(NAME(m_pc));
 	save_item(NAME(m_acc));
 	save_item(NAME(m_dpl));
 	save_item(NAME(m_dph));
 	save_item(NAME(m_carry_f));
-	save_item(NAME(m_carry_s));
+	save_item(NAME(m_carry_s_f));
 	save_item(NAME(m_timer_f));
 	save_item(NAME(m_int_f));
 	save_item(NAME(m_inte_f));
@@ -165,6 +183,7 @@ void ucom4_cpu_device::device_reset()
 	m_inte_f = 1;
 	m_pc = 0;
 	m_op = 0;
+	m_skip = false;
 }
 
 
@@ -173,17 +192,134 @@ void ucom4_cpu_device::device_reset()
 //  execute
 //-------------------------------------------------
 
+void ucom4_cpu_device::fetch_arg()
+{
+	// 2-byte opcodes: STM/LDI/CLI/CI, JMP/CAL, OCD
+	if ((m_op & 0xfc) == 0x14 || (m_op & 0xf0) == 0xa0 || m_op == 0x1e)
+	{
+		m_icount--;
+		m_arg = m_program->read_byte(m_pc);
+		m_pc = (m_pc + 1) & m_prgmask;
+	}
+}
+
 void ucom4_cpu_device::execute_run()
 {
 	while (m_icount > 0)
 	{
 		m_icount--;
-		
+
 		// remember previous opcode
 		m_prev_op = m_op;
 
 		debugger_instruction_hook(this, m_pc);
 		m_op = m_program->read_byte(m_pc);
 		m_pc = (m_pc + 1) & m_prgmask;
+		fetch_arg();
+		
+		if (m_skip)
+		{
+			m_skip = false;
+			continue;
+		}
+		
+		switch (m_op & 0xf0)
+		{
+			case 0x80: op_ldz(); break;
+			case 0x90: op_li(); break;
+			case 0xa0: op_jmpcal(); break;
+			case 0xb0: op_czp(); break;
+			
+			case 0xc0: case 0xd0: case 0xe0: case 0xf0: op_jcp(); break;
+			
+			default:
+				switch (m_op)
+				{
+			case 0x00: op_nop(); break;
+			case 0x01: op_di(); break;
+			case 0x02: op_s(); break;
+			case 0x03: op_tit(); break;
+			case 0x04: op_tc(); break;
+			case 0x05: op_ttm(); break;
+			case 0x06: op_daa(); break;
+			case 0x07: op_tal(); break;
+			case 0x08: op_ad(); break;
+			case 0x09: op_ads(); break;
+			case 0x0a: op_das(); break;
+			case 0x0b: op_clc(); break;
+			case 0x0c: op_cm(); break;
+			case 0x0d: op_inc(); break;
+			case 0x0e: op_op(); break;
+			case 0x0f: op_dec(); break;
+			case 0x10: op_cma(); break;
+			case 0x11: op_cia(); break;
+			case 0x12: op_tla(); break;
+			case 0x13: op_ded(); break;
+			case 0x14: op_stm(); break;
+			case 0x15: op_ldi(); break;
+			case 0x16: op_cli(); break;
+			case 0x17: op_ci(); break;
+			case 0x18: op_exl(); break;
+			case 0x19: op_adc(); break;
+			case 0x1a: op_xc(); break;
+			case 0x1b: op_stc(); break;
+			case 0x1c: op_illegal(); break;
+			case 0x1d: op_inm(); break;
+			case 0x1e: op_ocd(); break;
+			case 0x1f: op_dem(); break;
+
+			case 0x30: op_rar(); break;
+			case 0x31: op_ei(); break;
+			case 0x32: op_ip(); break;
+			case 0x33: op_ind(); break;
+
+			case 0x40: op_ia(); break;
+			case 0x41: op_jpa(); break;
+			case 0x42: op_taz(); break;
+			case 0x43: op_taw(); break;
+			case 0x44: op_oe(); break;
+			case 0x45: op_illegal(); break;
+			case 0x46: op_tly(); break;
+			case 0x47: op_thx(); break;
+			case 0x48: op_rt(); break;
+			case 0x49: op_rts(); break;
+			case 0x4a: op_xaz(); break;
+			case 0x4b: op_xaw(); break;
+			case 0x4c: op_xls(); break;
+			case 0x4d: op_xhr(); break;
+			case 0x4e: op_xly(); break;
+			case 0x4f: op_xhx(); break;
+
+			default:
+				switch (m_op & 0xfc)
+				{
+			case 0x20: op_fbf(); break;
+			case 0x24: op_tab(); break;
+			case 0x28: op_xm(); break;
+			case 0x2c: op_xmd(); break;
+
+			case 0x34: op_cmb(); break;
+			case 0x38: op_lm(); break;
+			case 0x3c: op_xmi(); break;
+
+			case 0x50: op_tpb(); break;
+			case 0x54: op_tpa(); break;
+			case 0x58: op_tmb(); break;
+			case 0x5c: op_fbt(); break;
+			case 0x60: op_rpb(); break;
+			case 0x64: op_reb(); break;
+			case 0x68: op_rmb(); break;
+			case 0x6c: op_rfb(); break;
+			case 0x70: op_spb(); break;
+			case 0x74: op_seb(); break;
+			case 0x78: op_smb(); break;
+			case 0x7c: op_sfb(); break;
+				}
+				break; // 0xfc
+				
+				}
+				break; // 0xff
+
+		} // big switch
 	}
 }
