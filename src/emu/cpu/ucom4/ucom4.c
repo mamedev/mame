@@ -114,6 +114,7 @@ void ucom4_cpu_device::device_start()
 	m_data = &space(AS_DATA);
 	m_prgmask = (1 << m_prgwidth) - 1;
 	m_datamask = (1 << m_datawidth) - 1;
+	m_dph_mask = m_datamask >> 4;
 
 	m_read_a.resolve_safe(0);
 	m_read_b.resolve_safe(0);

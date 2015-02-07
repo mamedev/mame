@@ -2,6 +2,35 @@
 
 // internal helpers
 
+inline UINT8 ucom4_cpu_device::ram_r()
+{
+	UINT16 address = m_dph << 4 | m_dpl;
+	return m_data->read_byte(address & m_datamask) & 0xf;
+}
+
+inline void ucom4_cpu_device::ram_w(UINT8 data)
+{
+	UINT16 address = m_dph << 4 | m_dpl;
+	m_data->write_byte(address & m_datamask, data & 0xf);
+}
+
+void ucom4_cpu_device::pop_stack()
+{
+	m_pc = m_stack[0] & m_prgmask;
+	for (int i = 0; i < m_stack_levels; i++)
+	{
+		m_stack[i] = m_stack[i+1];
+		m_stack[i+1] = 0;
+	}
+}
+
+void ucom4_cpu_device::push_stack()
+{
+	for (int i = m_stack_levels-1; i >= 1; i--)
+		m_stack[i] = m_stack[i-1];
+	m_stack[0] = m_pc;
+}
+
 void ucom4_cpu_device::op_illegal()
 {
 	logerror("%s unknown opcode $%02X at $%03X\n", tag(), m_op, m_pc);
@@ -16,7 +45,7 @@ void ucom4_cpu_device::op_illegal()
 void ucom4_cpu_device::op_li()
 {
 	// LI X: Load ACC with X
-	// note: only execute the first one in a sequence of LAI
+	// note: only execute the first one in a sequence of LI
 	if ((m_prev_op & 0xf0) != (m_op & 0xf0))
 		m_acc = m_op & 0x0f;
 }
@@ -24,19 +53,22 @@ void ucom4_cpu_device::op_li()
 void ucom4_cpu_device::op_lm()
 {
 	// LM X: Load ACC with RAM, xor DPh with X
-	op_illegal();
+	m_acc = ram_r();
+	m_dph ^= (m_op & 0x03);
 }
 
 void ucom4_cpu_device::op_ldi()
 {
 	// LDI X: Load DP with X
-	op_illegal();
+	m_dph = m_arg >> 4 & 0xf;
+	m_dpl = m_arg & 0x0f;
 }
 
 void ucom4_cpu_device::op_ldz()
 {
 	// LDZ X: Load DPh with 0, Load DPl with X
-	op_illegal();
+	m_dph = 0;
+	m_dpl = m_op & 0x0f;
 }
 
 
@@ -45,7 +77,7 @@ void ucom4_cpu_device::op_ldz()
 void ucom4_cpu_device::op_s()
 {
 	// S: Store ACC into RAM
-	op_illegal();
+	ram_w(m_acc);
 }
 
 
@@ -54,13 +86,13 @@ void ucom4_cpu_device::op_s()
 void ucom4_cpu_device::op_tal()
 {
 	// TAL: Transfer ACC to DPl
-	op_illegal();
+	m_dpl = m_acc;
 }
 
 void ucom4_cpu_device::op_tla()
 {
-	// TLA: Transfer 
-	op_illegal();
+	// TLA: Transfer DPl to ACC
+	m_acc = m_dpl;
 }
 
 
@@ -69,19 +101,26 @@ void ucom4_cpu_device::op_tla()
 void ucom4_cpu_device::op_xm()
 {
 	// XM X: Exchange ACC with RAM, xor DPh with X
-	op_illegal();
+	UINT8 old_acc = m_acc;
+	m_acc = ram_r();
+	ram_w(old_acc);
+	m_dph ^= (m_op & 0x03);
 }
 
 void ucom4_cpu_device::op_xmi()
 {
 	// XMI X: Exchange ACC with RAM, xor DPh with X, Increment DPl, skip next on carry
-	op_illegal();
+	op_xm();
+	m_dpl = (m_dpl + 1) & 0xf;
+	m_skip = (m_dpl == 0);
 }
 
 void ucom4_cpu_device::op_xmd()
 {
 	// XMD X: Exchange ACC with RAM, xor DPh with X, Decrement DPl, skip next on carry
-	op_illegal();
+	op_xm();
+	m_dpl = (m_dpl - 1) & 0xf;
+	m_skip = (m_dpl == 0xf);
 }
 
 
@@ -89,32 +128,34 @@ void ucom4_cpu_device::op_xmd()
 
 void ucom4_cpu_device::op_ad()
 {
-	// AD: Add RAM to Acc, skip next on carry
-	op_illegal();
+	// AD: Add RAM to ACC, skip next on carry
+	m_acc += ram_r();
+	m_skip = ((m_acc & 0x10) != 0);
+	m_acc &= 0xf;
 }
 
 void ucom4_cpu_device::op_adc()
 {
-	// ADC: Add RAM and carry to Acc, store Carry F/F
+	// ADC: Add RAM and carry to ACC, store Carry F/F
 	op_illegal();
 }
 
 void ucom4_cpu_device::op_ads()
 {
-	// ADS: Add RAM and carry to Acc, store Carry F/F, skip next on carry
+	// ADS: Add RAM and carry to ACC, store Carry F/F, skip next on carry
 	op_illegal();
 }
 
 void ucom4_cpu_device::op_daa()
 {
 	// DAA: Add 6 to ACC to adjust decimal for BCD Addition
-	op_illegal();
+	m_acc = (m_acc + 6) & 0xf;
 }
 
 void ucom4_cpu_device::op_das()
 {
 	// DAS: Add 10 to ACC to adjust decimal for BCD Subtraction
-	op_illegal();
+	m_acc = (m_acc + 10) & 0xf;
 }
 
 
@@ -123,7 +164,7 @@ void ucom4_cpu_device::op_das()
 void ucom4_cpu_device::op_exl()
 {
 	// EXL: Xor ACC with RAM
-	op_illegal();
+	m_acc ^= ram_r();
 }
 
 
@@ -132,13 +173,13 @@ void ucom4_cpu_device::op_exl()
 void ucom4_cpu_device::op_cma()
 {
 	// CMA: Complement ACC
-	op_illegal();
+	m_acc ^= 0xf;
 }
 
 void ucom4_cpu_device::op_cia()
 {
 	// CIA: Complement ACC, Increment ACC
-	op_illegal();
+	m_acc = ((m_acc ^ 0xf) + 1) & 0xf;
 }
 
 
@@ -147,19 +188,19 @@ void ucom4_cpu_device::op_cia()
 void ucom4_cpu_device::op_clc()
 {
 	// CLC: Reset Carry F/F
-	op_illegal();
+	m_carry_f = 0;
 }
 
 void ucom4_cpu_device::op_stc()
 {
 	// STC: Set Carry F/F
-	op_illegal();
+	m_carry_f = 1;
 }
 
 void ucom4_cpu_device::op_tc()
 {
 	// TC: skip next on Carry F/F
-	op_illegal();
+	m_skip = (m_carry_f != 0);
 }
 
 
@@ -168,25 +209,29 @@ void ucom4_cpu_device::op_tc()
 void ucom4_cpu_device::op_inc()
 {
 	// INC: Increment ACC, skip next on carry
-	op_illegal();
+	m_acc = (m_acc + 1) & 0xf;
+	m_skip = (m_acc == 0);
 }
 
 void ucom4_cpu_device::op_dec()
 {
 	// DEC: Decrement ACC, skip next on carry
-	op_illegal();
+	m_acc = (m_acc - 1) & 0xf;
+	m_skip = (m_acc == 0xf);
 }
 
 void ucom4_cpu_device::op_ind()
 {
 	// IND: Increment DPl, skip next on carry
-	op_illegal();
+	m_dpl = (m_dpl + 1) & 0xf;
+	m_skip = (m_dpl == 0);
 }
 
 void ucom4_cpu_device::op_ded()
 {
 	// DED: Decrement DPl, skip next on carry
-	op_illegal();
+	m_dpl = (m_dpl - 1) & 0xf;
+	m_skip = (m_dpl == 0xf);
 }
 
 
@@ -195,24 +240,26 @@ void ucom4_cpu_device::op_ded()
 void ucom4_cpu_device::op_rmb()
 {
 	// RMB B: Reset a single bit of RAM
-	op_illegal();
+	ram_w(ram_r() & ~(1 << (m_op & 0x03)));
 }
 
 void ucom4_cpu_device::op_smb()
 {
 	// SMB B: Set a single bit of RAM
-	op_illegal();
+	ram_w(ram_r() | (1 << (m_op & 0x03)));
 }
 
 void ucom4_cpu_device::op_reb()
 {
 	// REB B: Reset a single bit of output port E
+	m_icount--;
 	op_illegal();
 }
 
 void ucom4_cpu_device::op_seb()
 {
 	// SEB B: Set a single bit of output port E
+	m_icount--;
 	op_illegal();
 }
 
@@ -234,37 +281,41 @@ void ucom4_cpu_device::op_spb()
 void ucom4_cpu_device::op_jmpcal()
 {
 	// JMP A: Jump to Address / CAL A: Call Address
-	op_illegal();
+	if (m_op & 0x08)
+		push_stack();
+	m_pc = (m_op & 0x07) << 8 | m_arg;
 }
 
 void ucom4_cpu_device::op_jcp()
 {
 	// JCP A: Jump to Address in current page
-	op_illegal();
+	m_pc = (m_pc & ~0x3f) | (m_op & 0x3f);
 }
 
 void ucom4_cpu_device::op_jpa()
 {
-	// JPA: Jump to (ACC)
-	op_illegal();
+	// JPA: Jump to (ACC) in current page
+	m_pc = (m_pc & ~0x3f) | (m_acc << 2);
 }
 
 void ucom4_cpu_device::op_czp()
 {
-	// CZP A: Call (Address)
-	op_illegal();
+	// CZP A: Call Address (short)
+	push_stack();
+	m_pc = (m_op & 0x0f) << 2;
 }
 
 void ucom4_cpu_device::op_rt()
 {
 	// RT: Return from subroutine
-	op_illegal();
+	m_icount--;
+	pop_stack();
 }
 
 void ucom4_cpu_device::op_rts()
 {
 	// RTS: Return from subroutine, skip next
-	op_rt();
+	pop_stack();
 	m_skip = true;
 }
 
@@ -274,37 +325,44 @@ void ucom4_cpu_device::op_rts()
 void ucom4_cpu_device::op_ci()
 {
 	// CI X: skip next on ACC equals X
-	op_illegal();
+	m_skip = (m_acc == (m_arg & 0x0f));
+	
+	if ((m_arg & 0xf0) != 0xc0)
+		logerror("%s CI opcode unexpected upper arg $%02X at $%03X\n", tag(), m_arg & 0xf0, m_pc);
 }
 
 void ucom4_cpu_device::op_cm()
 {
 	// CM: skip next on ACC equals RAM
-	op_illegal();
+	m_skip = (m_acc == ram_r());
 }
 
 void ucom4_cpu_device::op_cmb()
 {
 	// CMB B: skip next on bit(ACC) equals bit(RAM)
-	op_illegal();
+	UINT8 mask = 1 << (m_op & 0x03);
+	m_skip = ((m_acc & mask) == (ram_r() & mask));
 }
 
 void ucom4_cpu_device::op_tab()
 {
 	// TAB B: skip next on bit(ACC)
-	op_illegal();
+	m_skip = ((m_acc & (1 << (m_op & 0x03))) != 0);
 }
 
 void ucom4_cpu_device::op_cli()
 {
 	// CLI X: skip next on DPl equals X
-	op_illegal();
+	m_skip = (m_dpl == (m_arg & 0x0f));
+	
+	if ((m_arg & 0xf0) != 0xe0)
+		logerror("%s CLI opcode unexpected upper arg $%02X at $%03X\n", tag(), m_arg & 0xf0, m_pc);
 }
 
 void ucom4_cpu_device::op_tmb()
 {
 	// TMB B: skip next on bit(RAM)
-	op_illegal();
+	m_skip = ((ram_r() & (1 << (m_op & 0x03))) != 0);
 }
 
 void ucom4_cpu_device::op_tpa()
@@ -333,31 +391,31 @@ void ucom4_cpu_device::op_tit()
 
 void ucom4_cpu_device::op_ia()
 {
-	// IA: x
+	// IA: Input port A to ACC
 	op_illegal();
 }
 
 void ucom4_cpu_device::op_ip()
 {
-	// IP: x
+	// IP: Input port (DPl) to ACC
 	op_illegal();
 }
 
 void ucom4_cpu_device::op_oe()
 {
-	// OE: x
-	op_illegal();
+	// OE: Output ACC to port E
+	m_write_e(0, m_acc, 0xff);
 }
 
 void ucom4_cpu_device::op_op()
 {
-	// OP: x
+	// OP: Output ACC to port (DPl)
 	op_illegal();
 }
 
 void ucom4_cpu_device::op_ocd()
 {
-	// OCD X: x
+	// OCD X: Output X to ports C and D
 	op_illegal();
 }
 

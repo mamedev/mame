@@ -119,7 +119,7 @@ protected:
 	int m_datamask;
 	int m_family;       // MCU family (43/44/45)
 	int m_stack_levels; // number of callstack levels
-	UINT16 m_stack[3];  // max 3
+	UINT16 m_stack[3+1]; // max 3
 	UINT8 m_op;
 	UINT8 m_prev_op;    // previous opcode
 	UINT8 m_arg;        // opcode argument for 2-byte opcodes
@@ -129,7 +129,8 @@ protected:
 	UINT16 m_pc;        // program counter
 	UINT8 m_acc;        // 4-bit accumulator
 	UINT8 m_dpl;        // 4-bit data pointer low (RAM x)
-	UINT8 m_dph;        // 1/2/3-bit data pointer high (RAM y)
+	UINT8 m_dph;        // 4-bit(?) data pointer high (RAM y)
+	UINT8 m_dph_mask;
 	UINT8 m_carry_f;    // carry flag
 	UINT8 m_carry_s_f;  // carry save flag
 	UINT8 m_timer_f;    // timer out flag
@@ -151,6 +152,10 @@ protected:
 	devcb_write8 m_write_i;
 	
 	// opcode handlers
+	UINT8 ram_r();
+	void ram_w(UINT8 data);
+	void pop_stack();
+	void push_stack();
 	void op_illegal();
 	bool check_op_43();
 
