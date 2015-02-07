@@ -90,6 +90,7 @@
       work.
 
     - various fdc issues:
+        - B drive doesn't work.
         - some disks cause MESS to freeze.
         - ENMF pin missing from wd_fdc.
         - incorrect timing for track register causes 256tc failure to boot a disk.

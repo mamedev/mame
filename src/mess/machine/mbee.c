@@ -274,71 +274,95 @@ TIMER_CALLBACK_MEMBER(mbee_state::mbee_rtc_irq)
 
 ************************************************************/
 
-void mbee_state::mbee256_setup_banks(UINT8 data)
+void mbee_state::mbee256_setup_banks(UINT8 data, bool first_time)
 {
 	// (bits 0-5 are referred to as S0-S5)
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	UINT8 *prom = memregion("proms")->base();
 	UINT8 b_data = BITSWAP8(data, 7,5,3,2,4,6,1,0) & 0x3b; // arrange data bits to S0,S1,-,S4,S2,S3
-	UINT8 b_bank, b_byte, b_byte_t, b_addr;
+	UINT8 b_bank, b_byte, b_byte_t, b_addr, p_bank = 1;
 	UINT16 b_vid;
 	char banktag[10];
 
-	for (b_bank = 0; b_bank < 16; b_bank++)
+	if (first_time || (b_data != m_bank_array[0]))
 	{
-		b_vid = b_bank << 12;
-		mem.unmap_readwrite (b_vid, b_vid + 0xfff);
-		b_addr = BITSWAP8(b_bank, 7,4,5,3,1,2,6,0) & 0x1f; // arrange address bits to A12,-,A14,A13,A15
+		m_bank_array[0] = b_data;
 
-		// Calculate read-bank
-		b_byte_t = prom[b_addr | (b_data << 8) | 0x82]; // read-bank (RDS and MREQ are low, RFSH is high)
-		b_byte = BITSWAP8(b_byte_t, 7,5,0,3,6,2,1,4); // rearrange so that bits 0-2 are rambank, bit 3 = rom select, bit 4 = video select, others not used
-		if (!BIT(data, 5))
-			b_byte &= 0xfb;  // U42/1 - S17 only valid if S5 is on
-		if (!BIT(b_byte, 4))
+		for (b_bank = 0; b_bank < 16; b_bank++)
 		{
-			// select video
-			mem.install_read_handler (b_vid, b_vid + 0x7ff, read8_delegate(FUNC(mbee_state::mbeeppc_low_r), this));
-			mem.install_read_handler (b_vid + 0x800, b_vid + 0xfff, read8_delegate(FUNC(mbee_state::mbeeppc_high_r), this));
-		}
-		else
-		{
-			sprintf(banktag, "bankr%d", b_bank);
-			mem.install_read_bank( b_vid, b_vid+0xfff, banktag );
+			b_vid = b_bank << 12;
+			b_addr = BITSWAP8(b_bank, 7,4,5,3,1,2,6,0) & 0x1f; // arrange address bits to A12,-,A14,A13,A15
 
-			if (!BIT(b_byte, 3))
-				membank(banktag)->set_entry(64 + (b_bank & 3)); // read from rom
-			else
-				membank(banktag)->set_entry((b_bank & 7) | ((b_byte & 7) << 3)); // ram
-		}
+			// Calculate read-bank
+			b_byte_t = prom[b_addr | (b_data << 8) | 0x82]; // read-bank (RDS and MREQ are low, RFSH is high)
+			b_byte = BITSWAP8(b_byte_t, 7,5,0,3,6,2,1,4); // rearrange so that bits 0-2 are rambank, bit 3 = rom select, bit 4 = video select, others not used
 
-		// Calculate write-bank
-		b_byte_t = prom[b_addr | (b_data << 8) | 0xc0]; // write-bank (XWR and MREQ are low, RFSH is high)
-		b_byte = BITSWAP8(b_byte_t, 7,5,0,3,6,2,1,4); // rearrange so that bits 0-2 are rambank, bit 3 = rom select, bit 4 = video select, others not used
-		if (!BIT(data, 5))
-			b_byte &= 0xfb;  // U42/1 - S17 only valid if S5 is on
-		if (!BIT(b_byte, 4))
-		{
-			// select video
-			mem.install_write_handler (b_vid, b_vid + 0x7ff, write8_delegate(FUNC(mbee_state::mbeeppc_low_w), this));
-			mem.install_write_handler (b_vid + 0x800, b_vid + 0xfff, write8_delegate(FUNC(mbee_state::mbeeppc_high_w), this));
-		}
-		else
-		{
-			sprintf(banktag, "bankw%d", b_bank);
-			mem.install_write_bank( b_vid, b_vid+0xfff, banktag );
+			if (first_time || (b_byte != m_bank_array[p_bank]))
+			{
+				m_bank_array[p_bank] = b_byte;
 
-			if (!BIT(b_byte, 3))
-				membank(banktag)->set_entry(64); // write to rom dummy area
-			else
-				membank(banktag)->set_entry((b_bank & 7) | ((b_byte & 7) << 3)); // ram
+				if (!BIT(data, 5))
+					b_byte &= 0xfb;  // U42/1 - S17 only valid if S5 is on
+
+				mem.unmap_read (b_vid, b_vid + 0xfff);
+
+				if (!BIT(b_byte, 4))
+				{
+					// select video
+					mem.install_read_handler (b_vid, b_vid + 0x7ff, read8_delegate(FUNC(mbee_state::mbeeppc_low_r), this));
+					mem.install_read_handler (b_vid + 0x800, b_vid + 0xfff, read8_delegate(FUNC(mbee_state::mbeeppc_high_r), this));
+				}
+				else
+				{
+					sprintf(banktag, "bankr%d", b_bank);
+					mem.install_read_bank( b_vid, b_vid+0xfff, banktag );
+
+					if (!BIT(b_byte, 3))
+						membank(banktag)->set_entry(64 + (b_bank & 3)); // read from rom
+					else
+						membank(banktag)->set_entry((b_bank & 7) | ((b_byte & 7) << 3)); // ram
+				}
+			}
+			p_bank++;
+
+			// Calculate write-bank
+			b_byte_t = prom[b_addr | (b_data << 8) | 0xc0]; // write-bank (XWR and MREQ are low, RFSH is high)
+			b_byte = BITSWAP8(b_byte_t, 7,5,0,3,6,2,1,4); // rearrange so that bits 0-2 are rambank, bit 3 = rom select, bit 4 = video select, others not used
+
+			if (first_time || (b_byte != m_bank_array[p_bank]))
+			{
+				m_bank_array[p_bank] = b_byte;
+
+				if (!BIT(data, 5))
+					b_byte &= 0xfb;  // U42/1 - S17 only valid if S5 is on
+
+				mem.unmap_write (b_vid, b_vid + 0xfff);
+
+				if (!BIT(b_byte, 4))
+				{
+					// select video
+					mem.install_write_handler (b_vid, b_vid + 0x7ff, write8_delegate(FUNC(mbee_state::mbeeppc_low_w), this));
+					mem.install_write_handler (b_vid + 0x800, b_vid + 0xfff, write8_delegate(FUNC(mbee_state::mbeeppc_high_w), this));
+				}
+				else
+				{
+					sprintf(banktag, "bankw%d", b_bank);
+					mem.install_write_bank( b_vid, b_vid+0xfff, banktag );
+
+					if (!BIT(b_byte, 3))
+						membank(banktag)->set_entry(64); // write to rom dummy area
+					else
+						membank(banktag)->set_entry((b_bank & 7) | ((b_byte & 7) << 3)); // ram
+				}
+			}
+			p_bank++;
 		}
 	}
 }
 
 WRITE8_MEMBER( mbee_state::mbee256_50_w )
 {
-	mbee256_setup_banks(data & 0x3f);
+	mbee256_setup_banks(data & 0x3f, 0);
 }
 
 /***********************************************************
@@ -356,7 +380,7 @@ WRITE8_MEMBER( mbee_state::mbee256_50_w )
 
 WRITE8_MEMBER( mbee_state::mbee128_50_w )
 {
-	mbee256_setup_banks(data & 0x1f); // S5 not used
+	mbee256_setup_banks(data & 0x1f, 0); // S5 not used
 }
 
 
@@ -476,7 +500,7 @@ MACHINE_RESET_MEMBER( mbee_state, mbee64 )
 MACHINE_RESET_MEMBER( mbee_state, mbee128 )
 {
 	machine_reset_common_disk();
-	mbee256_setup_banks(0); // set banks to default
+	mbee256_setup_banks(0, 1); // set banks to default
 	m_maincpu->set_pc(0x8000);
 }
 
@@ -486,7 +510,7 @@ MACHINE_RESET_MEMBER( mbee_state, mbee256 )
 	for (i = 0; i < 15; i++) m_mbee256_was_pressed[i] = 0;
 	m_mbee256_q_pos = 0;
 	machine_reset_common_disk();
-	mbee256_setup_banks(0); // set banks to default
+	mbee256_setup_banks(0, 1); // set banks to default
 	m_maincpu->set_pc(0x8000);
 }
 
