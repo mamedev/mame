@@ -13,7 +13,7 @@
 
 CPU_DISASSEMBLE(ucom4)
 {
-	int pos = 0;
+	int pos = 1;//0;
 //	UINT8 op = oprom[pos++];
 //	UINT8 instr = ucom4_mnemonic[op];
 
