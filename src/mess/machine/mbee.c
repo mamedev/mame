@@ -276,7 +276,7 @@ TIMER_CALLBACK_MEMBER(mbee_state::mbee_rtc_irq)
 
 void mbee_state::mbee256_setup_banks(UINT8 data)
 {
-	data &= 0x3f; // U28 (bits 0-5 are referred to as S0-S5)
+	// (bits 0-5 are referred to as S0-S5)
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	UINT8 *prom = memregion("proms")->base();
 	UINT8 b_data = BITSWAP8(data, 7,5,3,2,4,6,1,0) & 0x3b; // arrange data bits to S0,S1,-,S4,S2,S3
@@ -338,7 +338,7 @@ void mbee_state::mbee256_setup_banks(UINT8 data)
 
 WRITE8_MEMBER( mbee_state::mbee256_50_w )
 {
-	mbee256_setup_banks(data);
+	mbee256_setup_banks(data & 0x3f);
 }
 
 /***********************************************************
@@ -356,72 +356,7 @@ WRITE8_MEMBER( mbee_state::mbee256_50_w )
 
 WRITE8_MEMBER( mbee_state::mbee128_50_w )
 {
-	address_space &mem = m_maincpu->space(AS_PROGRAM);
-
-	// primary low banks
-	m_boot->set_entry((data & 3));
-	m_bank1->set_entry((data & 3));
-
-	// 9000-EFFF
-	m_bank9->set_entry((data & 4) ? 1 : 0);
-
-	// 8000-8FFF, F000-FFFF
-	mem.unmap_readwrite (0x8000, 0x87ff);
-	mem.unmap_readwrite (0x8800, 0x8fff);
-	mem.unmap_readwrite (0xf000, 0xf7ff);
-	mem.unmap_readwrite (0xf800, 0xffff);
-
-	switch (data & 0x1c)
-	{
-		case 0x00:
-			mem.install_read_bank (0x8000, 0x87ff, "bank8l");
-			mem.install_read_bank (0x8800, 0x8fff, "bank8h");
-			mem.install_readwrite_handler (0xf000, 0xf7ff, read8_delegate(FUNC(mbee_state::mbeeppc_low_r),this), write8_delegate(FUNC(mbee_state::mbeeppc_low_w),this));
-			mem.install_readwrite_handler (0xf800, 0xffff, read8_delegate(FUNC(mbee_state::mbeeppc_high_r),this), write8_delegate(FUNC(mbee_state::mbeeppc_high_w),this));
-			m_bank8l->set_entry(0); // rom
-			m_bank8h->set_entry(0); // rom
-			break;
-		case 0x04:
-			// these 2 lines were read_bank but readwrite is needed for bios 2,3,4,5 to boot
-			mem.install_readwrite_bank (0x8000, 0x87ff, "bank8l");
-			mem.install_readwrite_bank (0x8800, 0x8fff, "bank8h");
-			mem.install_readwrite_handler (0xf000, 0xf7ff, read8_delegate(FUNC(mbee_state::mbeeppc_low_r),this), write8_delegate(FUNC(mbee_state::mbeeppc_low_w),this));
-			mem.install_readwrite_handler (0xf800, 0xffff, read8_delegate(FUNC(mbee_state::mbeeppc_high_r),this), write8_delegate(FUNC(mbee_state::mbeeppc_high_w),this));
-			m_bank8l->set_entry(1); // ram
-			m_bank8h->set_entry(1); // ram
-			break;
-		case 0x08:
-		case 0x18:
-			mem.install_read_bank (0x8000, 0x87ff, "bank8l");
-			mem.install_read_bank (0x8800, 0x8fff, "bank8h");
-			mem.install_read_bank (0xf000, 0xf7ff, "bankfl");
-			mem.install_read_bank (0xf800, 0xffff, "bankfh");
-			m_bank8l->set_entry(0); // rom
-			m_bank8h->set_entry(0); // rom
-			m_bankfl->set_entry(0); // ram
-			m_bankfh->set_entry(0); // ram
-			break;
-		case 0x0c:
-		case 0x1c:
-			mem.install_read_bank (0x8000, 0x87ff, "bank8l");
-			mem.install_read_bank (0x8800, 0x8fff, "bank8h");
-			mem.install_read_bank (0xf000, 0xf7ff, "bankfl");
-			mem.install_read_bank (0xf800, 0xffff, "bankfh");
-			m_bank8l->set_entry(1); // ram
-			m_bank8h->set_entry(1); // ram
-			m_bankfl->set_entry(0); // ram
-			m_bankfh->set_entry(0); // ram
-			break;
-		case 0x10:
-		case 0x14:
-			mem.install_readwrite_handler (0x8000, 0x87ff, read8_delegate(FUNC(mbee_state::mbeeppc_low_r),this), write8_delegate(FUNC(mbee_state::mbeeppc_low_w),this));
-			mem.install_readwrite_handler (0x8800, 0x8fff, read8_delegate(FUNC(mbee_state::mbeeppc_high_r),this), write8_delegate(FUNC(mbee_state::mbeeppc_high_w),this));
-			mem.install_read_bank (0xf000, 0xf7ff, "bankfl");
-			mem.install_read_bank (0xf800, 0xffff, "bankfh");
-			m_bankfl->set_entry(0); // ram
-			m_bankfh->set_entry(0); // ram
-			break;
-	}
+	mbee256_setup_banks(data & 0x1f); // S5 not used
 }
 
 
@@ -507,7 +442,7 @@ READ8_MEMBER( mbee_state::mbeepc_telcom_high_r )
 
 
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
-TIMER_CALLBACK_MEMBER(mbee_state::mbee_reset)
+TIMER_CALLBACK_MEMBER( mbee_state::mbee_reset )
 {
 	m_boot->set_entry(0);
 }
@@ -517,20 +452,20 @@ void mbee_state::machine_reset_common_disk()
 	m_fdc_rq = 0;
 }
 
-MACHINE_RESET_MEMBER(mbee_state,mbee)
+MACHINE_RESET_MEMBER( mbee_state, mbee )
 {
 	m_boot->set_entry(1);
 	timer_set(attotime::from_usec(4), TIMER_MBEE_RESET);
 }
 
-MACHINE_RESET_MEMBER(mbee_state,mbee56)
+MACHINE_RESET_MEMBER( mbee_state, mbee56 )
 {
 	machine_reset_common_disk();
 	m_boot->set_entry(1);
 	timer_set(attotime::from_usec(4), TIMER_MBEE_RESET);
 }
 
-MACHINE_RESET_MEMBER(mbee_state,mbee64)
+MACHINE_RESET_MEMBER( mbee_state, mbee64 )
 {
 	machine_reset_common_disk();
 	m_boot->set_entry(1);
@@ -538,25 +473,24 @@ MACHINE_RESET_MEMBER(mbee_state,mbee64)
 	m_bankh->set_entry(1);
 }
 
-MACHINE_RESET_MEMBER(mbee_state,mbee128)
+MACHINE_RESET_MEMBER( mbee_state, mbee128 )
 {
-	address_space &mem = m_maincpu->space(AS_IO);
 	machine_reset_common_disk();
-	mbee128_50_w(mem,0,0); // set banks to default
-	m_boot->set_entry(8); // boot time
-}
-
-MACHINE_RESET_MEMBER(mbee_state,mbee256)
-{
-	UINT8 i;
-	machine_reset_common_disk();
-	for (i = 0; i < 15; i++) m_mbee256_was_pressed[i] = 0;
-	m_mbee256_q_pos = 0;
 	mbee256_setup_banks(0); // set banks to default
 	m_maincpu->set_pc(0x8000);
 }
 
-MACHINE_RESET_MEMBER(mbee_state,mbeett)
+MACHINE_RESET_MEMBER( mbee_state, mbee256 )
+{
+	UINT8 i;
+	for (i = 0; i < 15; i++) m_mbee256_was_pressed[i] = 0;
+	m_mbee256_q_pos = 0;
+	machine_reset_common_disk();
+	mbee256_setup_banks(0); // set banks to default
+	m_maincpu->set_pc(0x8000);
+}
+
+MACHINE_RESET_MEMBER( mbee_state, mbeett )
 {
 	UINT8 i;
 	for (i = 0; i < 15; i++) m_mbee256_was_pressed[i] = 0;
@@ -565,7 +499,7 @@ MACHINE_RESET_MEMBER(mbee_state,mbeett)
 	timer_set(attotime::from_usec(4), TIMER_MBEE_RESET);
 }
 
-INTERRUPT_GEN_MEMBER(mbee_state::mbee_interrupt)
+INTERRUPT_GEN_MEMBER( mbee_state::mbee_interrupt )
 {
 // Due to the uncertainly and hackage here, this is commented out for now - Robbbert - 05-Oct-2010
 #if 0
@@ -588,14 +522,14 @@ INTERRUPT_GEN_MEMBER(mbee_state::mbee_interrupt)
 #endif
 }
 
-DRIVER_INIT_MEMBER(mbee_state,mbee)
+DRIVER_INIT_MEMBER( mbee_state, mbee )
 {
 	UINT8 *RAM = memregion("maincpu")->base();
 	m_boot->configure_entries(0, 2, &RAM[0x0000], 0x8000);
 	m_size = 0x4000;
 }
 
-DRIVER_INIT_MEMBER(mbee_state,mbeeic)
+DRIVER_INIT_MEMBER( mbee_state, mbeeic )
 {
 	UINT8 *RAM = memregion("maincpu")->base();
 	m_boot->configure_entries(0, 2, &RAM[0x0000], 0x8000);
@@ -607,7 +541,7 @@ DRIVER_INIT_MEMBER(mbee_state,mbeeic)
 	m_size = 0x8000;
 }
 
-DRIVER_INIT_MEMBER(mbee_state,mbeepc)
+DRIVER_INIT_MEMBER( mbee_state, mbeepc )
 {
 	UINT8 *RAM = memregion("maincpu")->base();
 	m_boot->configure_entries(0, 2, &RAM[0x0000], 0x8000);
@@ -623,7 +557,7 @@ DRIVER_INIT_MEMBER(mbee_state,mbeepc)
 	m_size = 0x8000;
 }
 
-DRIVER_INIT_MEMBER(mbee_state,mbeepc85)
+DRIVER_INIT_MEMBER( mbee_state, mbeepc85 )
 {
 	UINT8 *RAM = memregion("maincpu")->base();
 	m_boot->configure_entries(0, 2, &RAM[0x0000], 0x8000);
@@ -639,7 +573,7 @@ DRIVER_INIT_MEMBER(mbee_state,mbeepc85)
 	m_size = 0x8000;
 }
 
-DRIVER_INIT_MEMBER(mbee_state,mbeeppc)
+DRIVER_INIT_MEMBER( mbee_state, mbeeppc )
 {
 	UINT8 *RAM = memregion("maincpu")->base();
 	m_boot->configure_entry(0, &RAM[0x0000]);
@@ -660,14 +594,14 @@ DRIVER_INIT_MEMBER(mbee_state,mbeeppc)
 	m_size = 0x8000;
 }
 
-DRIVER_INIT_MEMBER(mbee_state,mbee56)
+DRIVER_INIT_MEMBER( mbee_state, mbee56 )
 {
 	UINT8 *RAM = memregion("maincpu")->base();
 	m_boot->configure_entries(0, 2, &RAM[0x0000], 0xe000);
 	m_size = 0xe000;
 }
 
-DRIVER_INIT_MEMBER(mbee_state,mbee64)
+DRIVER_INIT_MEMBER( mbee_state, mbee64 )
 {
 	UINT8 *RAM = memregion("maincpu")->base();
 	m_boot->configure_entry(0, &RAM[0x0000]);
@@ -682,27 +616,27 @@ DRIVER_INIT_MEMBER(mbee_state,mbee64)
 	m_size = 0xf000;
 }
 
-DRIVER_INIT_MEMBER(mbee_state,mbee128)
+DRIVER_INIT_MEMBER( mbee_state, mbee128 )
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-	m_boot->configure_entries(0, 4, &RAM[0x0000], 0x8000); // standard banks 0000
-	m_bank1->configure_entries(0, 4, &RAM[0x1000], 0x8000); // standard banks 1000
-	m_bank8l->configure_entry(1, &RAM[0x0000]); // shadow ram
-	m_bank8h->configure_entry(1, &RAM[0x0800]); // shadow ram
-	m_bank9->configure_entry(1, &RAM[0x1000]); // shadow ram
-	m_bankfl->configure_entry(0, &RAM[0xf000]); // shadow ram
-	m_bankfh->configure_entry(0, &RAM[0xf800]); // shadow ram
+	UINT8 *RAM = memregion("rams")->base();
+	UINT8 *ROM = memregion("roms")->base();
+	char banktag[10];
 
-	RAM = memregion("bootrom")->base();
-	m_bank9->configure_entry(0, &RAM[0x1000]); // rom
-	m_boot->configure_entry(8, &RAM[0x0000]); // rom at boot for 4usec
-	m_bank8l->configure_entry(0, &RAM[0x0000]); // rom
-	m_bank8h->configure_entry(0, &RAM[0x0800]); // rom
+	for (UINT8 b_bank = 0; b_bank < 16; b_bank++)
+	{
+		sprintf(banktag, "bankr%d", b_bank);
+		membank(banktag)->configure_entries(0, 32, &RAM[0x0000], 0x1000); // RAM banks
+		membank(banktag)->configure_entries(64, 4, &ROM[0x0000], 0x1000); // rom
+
+		sprintf(banktag, "bankw%d", b_bank);
+		membank(banktag)->configure_entries(0, 32, &RAM[0x0000], 0x1000); // RAM banks
+		membank(banktag)->configure_entries(64, 1, &ROM[0x4000], 0x1000); // dummy rom
+	}
 
 	m_size = 0x8000;
 }
 
-DRIVER_INIT_MEMBER(mbee_state,mbee256)
+DRIVER_INIT_MEMBER( mbee_state, mbee256 )
 {
 	UINT8 *RAM = memregion("rams")->base();
 	UINT8 *ROM = memregion("roms")->base();
@@ -725,7 +659,7 @@ DRIVER_INIT_MEMBER(mbee_state,mbee256)
 	m_size = 0x8000;
 }
 
-DRIVER_INIT_MEMBER(mbee_state,mbeett)
+DRIVER_INIT_MEMBER( mbee_state, mbeett )
 {
 	UINT8 *RAM = memregion("maincpu")->base();
 	m_boot->configure_entries(0, 2, &RAM[0x0000], 0x8000);

@@ -90,8 +90,6 @@
       work.
 
     - various fdc issues:
-        - only some ds40 disks can be used. All 80-track disks fail.
-        - some disks show no or partial directory listing.
         - some disks cause MESS to freeze.
         - ENMF pin missing from wd_fdc.
         - incorrect timing for track register causes 256tc failure to boot a disk.
@@ -101,7 +99,7 @@
       crashes due to a bug in z80pio emulation.
     
     - 256tc: Keyboard ROM U60 needs to be dumped.
-    - 128k: PROM PAL needs to be dumped, so that the bankswitching can be fixed.
+    - 128k: PROM PAL needs to be dumped for the bankswitching.
 
     - Teleterm: keyboard is problematic, and cursor doesn't show.
 
@@ -115,11 +113,7 @@
               and intrq/drq on read.
       intrq and drq are OR'd together, then gated to bit 7 of the
       data bus whenever port 48 is activated on read. There are
-      no interrupts used in the disk system.
-
-      Despite the simplicity of this design, disks have not worked
-      in the emulator for some years. Conversion to the new modern
-      implementation (2013-07-05) has not resolved the issue.
+      no interrupts used.
 
 ****************************************************************************/
 
@@ -201,16 +195,6 @@ static ADDRESS_MAP_START(mbee64_mem, AS_PROGRAM, 8, mbee_state)
 	AM_RANGE(0x8000, 0xefff) AM_RAMBANK("bankh")
 	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(mbee_low_r, mbee_low_w)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(mbeeic_high_r, mbeeic_high_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(mbee128_mem, AS_PROGRAM, 8, mbee_state)
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
-	AM_RANGE(0x1000, 0x7fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x8000, 0x87ff) AM_RAMBANK("bank8l")
-	AM_RANGE(0x8800, 0x8fff) AM_RAMBANK("bank8h")
-	AM_RANGE(0x9000, 0xefff) AM_RAMBANK("bank9")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAMBANK("bankfl")
-	AM_RANGE(0xf800, 0xffff) AM_RAMBANK("bankfh")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbee256_mem, AS_PROGRAM, 8, mbee_state)
@@ -535,7 +519,7 @@ static INPUT_PORTS_START( mbee256 )
 	PORT_START("X6") /* IN6 KEY ROW 6 [+30] */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F7") PORT_CODE(KEYCODE_F7)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("6 &") PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('u') PORT_CHAR('Y') PORT_CHAR(0x19)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y') PORT_CHAR(0x19)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("H") PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H') PORT_CHAR(0x08)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("/ (num)") PORT_CODE(KEYCODE_SLASH_PAD)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("(Down)") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
@@ -587,10 +571,10 @@ static INPUT_PORTS_START( mbee256 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("/ ?") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
 
 	PORT_START("X12") /* IN4 KEY ROW 4 [+60] */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 
 	PORT_START("X13") /* IN5 KEY ROW 5 [+68] */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 
 	PORT_START("X14") /* IN6 KEY ROW 6 [+70] */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Alt") PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT)
@@ -643,7 +627,7 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 	MCFG_CPU_IO_MAP(mbee_io)
 	MCFG_CPU_CONFIG(mbee_daisy_chain)
 
-	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee )
+	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee)
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_12MHz / 6)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -699,7 +683,7 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 	MCFG_CPU_CONFIG(mbee_daisy_chain)
 	//MCFG_CPU_VBLANK_INT_DRIVER("screen", mbee_state,  mbee_interrupt)
 
-	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee )
+	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee)
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, 3375000)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -787,7 +771,7 @@ static MACHINE_CONFIG_DERIVED( mbee56, mbeeic )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbee56_mem)
 	MCFG_CPU_IO_MAP(mbee56_io)
-	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee56 )
+	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee56)
 	MCFG_WD2793x_ADD("fdc", XTAL_4MHz / 4) // divided by 2 externally, then divided by 2 internally (/ENMF pin not emulated)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(mbee_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(mbee_state, fdc_drq_w))
@@ -799,14 +783,14 @@ static MACHINE_CONFIG_DERIVED( mbee64, mbee56 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbee64_mem)
 	MCFG_CPU_IO_MAP(mbee64_io)
-	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee64 )
+	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee64)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbee128, mbeeppc )
 	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(mbee128_mem)
+	MCFG_CPU_PROGRAM_MAP(mbee256_mem)
 	MCFG_CPU_IO_MAP(mbee128_io)
-	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee128 )
+	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee128)
 	MCFG_WD2793x_ADD("fdc", XTAL_4MHz / 4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(mbee_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(mbee_state, fdc_drq_w))
@@ -818,7 +802,7 @@ static MACHINE_CONFIG_DERIVED( mbee256, mbee128 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbee256_mem)
 	MCFG_CPU_IO_MAP(mbee256_io)
-	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee256 )
+	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee256)
 	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
 
 	MCFG_DEVICE_REMOVE("crtc")
@@ -892,7 +876,6 @@ ROM_START( mbeeic )
 	ROM_REGION(0x10000,"maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("bas522a.rom",           0x8000,  0x2000, CRC(7896a696) SHA1(a158f7803296766160e1f258dfc46134735a9477) )
 	ROM_LOAD("bas522b.rom",           0xa000,  0x2000, CRC(b21d9679) SHA1(332844433763331e9483409cd7da3f90ac58259d) )
-
 	ROM_LOAD_OPTIONAL("telcom12.rom", 0xe000,  0x1000, CRC(0231bda3) SHA1(be7b32499034f985cc8f7865f2bc2b78c485585c) )
 
 	/* PAK option roms */
@@ -1119,9 +1102,9 @@ ROM_START( mbee64 ) // CIAB (Computer-In-A-Book)
 ROM_END
 
 ROM_START( mbee128 ) // 128K
-	ROM_REGION(0x20000,"maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x20000, "rams", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x7000,"bootrom", ROMREGION_ERASEFF)
+	ROM_REGION(0x8000, "roms", 0) // rom plus optional undumped roms plus dummy area
 	ROM_SYSTEM_BIOS( 0, "bn60", "Version 2.03" )
 	ROMX_LOAD("bn60.rom",     0x0000, 0x2000, CRC(ed15d4ee) SHA1(3ea42b63d42b9a4c5402676dee8912ad1f906bda), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "bn59", "Version 2.02" )
@@ -1134,6 +1117,9 @@ ROM_START( mbee128 ) // 128K
 	ROMX_LOAD("bn54.rom",     0x0000, 0x2000, CRC(995c53db) SHA1(46e1a5cfd5795b8cf528bacf9dc79398ff7d64af), ROM_BIOS(5) )
 	ROM_SYSTEM_BIOS( 5, "hd18", "Hard Disk System" )
 	ROMX_LOAD("hd18.rom",     0x0000, 0x2000, CRC(ed53ace7) SHA1(534e2e00cc527197c76b3c106b3c9ff7f1328487), ROM_BIOS(6) )
+
+	ROM_REGION(0x4000, "proms", 0) // undumped; using prom from 256tc for now
+	ROM_LOAD( "silver.u39", 0x0000, 0x4000, BAD_DUMP CRC(c34aab64) SHA1(781fe648488dec90185760f8e081e488b73b68bf) )
 
 	ROM_REGION(0x9800, "gfx", 0)
 	ROM_LOAD("charrom.bin",           0x1000,  0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
