@@ -41,12 +41,6 @@
 #undef DELETE
 #endif
 
-// Emscripten requires the SDL2 API for keyboard inputs, but nothing else
-#ifdef SDLMAME_EMSCRIPTEN
-#undef SDLMAME_SDL2
-#define SDLMAME_SDL2 1
-#endif
-
 //============================================================
 //  PARAMETERS
 //============================================================
@@ -498,13 +492,6 @@ static kt_table sdl_key_trans_table[] =
 };
 #endif
 
-#if defined(SDLMAME_EMSCRIPTEN)
-#undef GET_WINDOW
-#undef GET_FOCUS_WINDOW
-#define GET_WINDOW(ev) sdl_window_list
-#define GET_FOCUS_WINDOW(ev) sdl_window_list
-#endif
-
 struct key_lookup_table
 {
 	int code;
@@ -731,7 +718,7 @@ static void sdlinput_register_joysticks(running_machine &machine)
 	{
 		char *joy_name;
 
-#if (SDLMAME_SDL2) && (!defined(SDLMAME_EMSCRIPTEN))
+#if (SDLMAME_SDL2)
 		joy = SDL_JoystickOpen(physical_stick);
 		joy_name = remove_spaces(machine, SDL_JoystickName(joy));
 		SDL_JoystickClose(joy);
@@ -1538,7 +1525,7 @@ INT32 normalize_absolute_axis(INT32 raw, INT32 rawmin, INT32 rawmax)
 //  sdlinput_poll
 //============================================================
 
-#if (SDLMAME_SDL2) && (!defined(SDLMAME_EMSCRIPTEN))
+#if (SDLMAME_SDL2)
 INLINE sdl_window_info * window_from_id(Uint32 windowID)
 {
 	sdl_window_info *w;
@@ -1931,7 +1918,7 @@ void sdlinput_poll(running_machine &machine)
 			devinfo->joystick.balls[event.jball.ball * 2] = event.jball.xrel * INPUT_RELATIVE_PER_PIXEL;
 			devinfo->joystick.balls[event.jball.ball * 2 + 1] = event.jball.yrel * INPUT_RELATIVE_PER_PIXEL;
 			break;
-#if (!SDLMAME_SDL2) || defined(SDLMAME_EMSCRIPTEN)
+#if (!SDLMAME_SDL2)
 		case SDL_APPMOUSEFOCUS:
 			app_has_mouse_focus = event.active.gain;
 			if (!event.active.gain)
@@ -2017,7 +2004,7 @@ void sdlinput_poll(running_machine &machine)
 #endif
 		}
 	}
-#if (SDLMAME_SDL2) && (!defined(SDLMAME_EMSCRIPTEN))
+#if (SDLMAME_SDL2)
 	resize_all_windows();
 #endif
 }
