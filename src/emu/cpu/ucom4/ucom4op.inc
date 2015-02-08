@@ -38,17 +38,17 @@ UINT8 ucom4_cpu_device::input_r(int index)
 	
 	switch (index)
 	{
-		case NEC_UCOM4_PORTA: inp = m_read_a(index, 0xff) & 0xf; break;
-		case NEC_UCOM4_PORTB: inp = m_read_b(index, 0xff) & 0xf; break;
-		case NEC_UCOM4_PORTC: inp = m_read_c(index, 0xff) & 0xf; break;
-		case NEC_UCOM4_PORTD: inp = m_read_d(index, 0xff) & 0xf; break;
+		case NEC_UCOM4_PORTA: inp = m_read_a(index, 0xff); break;
+		case NEC_UCOM4_PORTB: inp = m_read_b(index, 0xff); break;
+		case NEC_UCOM4_PORTC: inp = m_read_c(index, 0xff); break;
+		case NEC_UCOM4_PORTD: inp = m_read_d(index, 0xff); break;
 
 		default:
 			logerror("%s read from unknown port %c at $%03X\n", tag(), 'A' + index, m_pc);
 			break;
 	}
 
-	return inp;
+	return inp & 0xf;
 }
 
 void ucom4_cpu_device::output_w(int index, UINT8 data)

@@ -110,6 +110,8 @@ enum
 
 void ucom4_cpu_device::device_start()
 {
+	assert(NEC_UCOM4_PORTA == 0);
+	
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
 	m_prgmask = (1 << m_prgwidth) - 1;
