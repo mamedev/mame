@@ -150,7 +150,7 @@ osd_directory *osd_opendir(const char *dirname)
 
 		envstr[i] = '\0';
 
-		envval = osd_getenv(&envstr[1]);
+		envval = (char*)osd_getenv(&envstr[1]);
 		if (envval != NULL)
 		{
 			j = strlen(envval) + strlen(tmpstr) + 1;
