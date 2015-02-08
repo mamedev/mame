@@ -1229,6 +1229,7 @@ $(MESSOBJ)/entex.a:             \
 	$(MESS_DRIVERS)/advision.o $(MESS_MACHINE)/advision.o $(MESS_VIDEO)/advision.o \
 
 $(MESSOBJ)/epoch.a:             \
+	$(MESS_DRIVERS)/edracula.o  \
 	$(MESS_DRIVERS)/gamepock.o $(MESS_MACHINE)/gamepock.o \
 	$(MESS_DRIVERS)/scv.o $(MESS_AUDIO)/upd1771.o \
 
@@ -2126,6 +2127,7 @@ $(MESS_DRIVERS)/digel804.o: $(MESS_LAYOUT)/digel804.lh
 $(MESS_DRIVERS)/dmv.o:      $(MESS_LAYOUT)/dmv.lh
 $(MESS_DRIVERS)/dolphunk.o: $(MESS_LAYOUT)/dolphunk.lh
 $(MESS_DRIVERS)/eacc.o:     $(MESS_LAYOUT)/eacc.lh
+$(MESS_DRIVERS)/edracula.o: $(MESS_LAYOUT)/edracula.lh
 $(MESS_DRIVERS)/elecdet.o:  $(MESS_LAYOUT)/elecdet.lh
 $(MESS_DRIVERS)/elekscmp.o: $(MESS_LAYOUT)/elekscmp.lh
 $(MESS_DRIVERS)/elf.o:      $(MESS_LAYOUT)/elf2.lh
