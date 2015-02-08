@@ -145,21 +145,35 @@ public:
     sdl_info13(sdl_window_info *w)
     : osd_renderer(w, FLAG_NONE), m_blittimer(0), m_sdl_renderer(NULL),
       m_last_hofs(0), m_last_vofs(0),
-      m_last_width(0), m_last_height(0),
+      m_width(0), m_height(0),
+      m_blitwidth(0), m_blitheight(0),
       m_last_blit_time(0), m_last_blit_pixels(0)
     {}
 
 	/* virtual */ int create();
 	/* virtual */ int draw(const UINT32 dc, const int update);
 	/* virtual */ int xy_to_render_target(const int x, const int y, int *xt, int *yt);
-	/* virtual */ void destroy_all_textures();
 	/* virtual */ void destroy();
-	/* virtual */ void clear();
+	/* virtual */ render_primitive_list *get_primitives()
+	{
+		int nw = 0; int nh = 0;
+		window().blit_surface_size(nw, nh);
+		if (nw != m_blitwidth || nh != m_blitheight)
+		{
+			m_blitwidth = nw; m_blitheight = nh;
+			notify_changed();
+		}
+		window().target()->set_bounds(m_blitwidth, m_blitheight, window().monitor()->aspect());
+		return &window().target()->get_primitives();
+	}
 
+private:
     void render_quad(texture_info *texture, const render_primitive *prim, const int x, const int y);
 
     texture_info *texture_find(const render_primitive &prim, const quad_setup_data &setup);
     texture_info *texture_update(const render_primitive &prim);
+
+    void destroy_all_textures();
 
 	INT32           m_blittimer;
 
@@ -176,8 +190,11 @@ public:
 	float           m_last_hofs;
 	float           m_last_vofs;
 
-	int				m_last_width;
-	int				m_last_height;
+	int				m_width;
+	int				m_height;
+
+	int				m_blitwidth;
+	int				m_blitheight;
 
 	// Stats
 	INT64           m_last_blit_time;
@@ -490,7 +507,7 @@ static osd_renderer *drawsdl2_create(sdl_window_info *window)
 }
 
 // FIXME: machine only used to access options.
-int drawsdl2_init(running_machine &machine, sdl_draw_info *callbacks)
+int drawsdl2_init(running_machine &machine, osd_draw_callbacks *callbacks)
 {
 	const char *stemp;
 
@@ -623,15 +640,6 @@ void sdl_info13::destroy()
 	destroy_all_textures();
 }
 
-//============================================================
-//  sdl_info::clear
-//============================================================
-
-void sdl_info13::clear()
-{
-	m_blittimer = 2;
-}
-
 
 //============================================================
 //  drawsdl_xy_to_render_target
@@ -642,9 +650,9 @@ int sdl_info13::xy_to_render_target(int x, int y, int *xt, int *yt)
 
 	*xt = x - m_last_hofs;
 	*yt = y - m_last_vofs;
-	if (*xt<0 || *xt >= window().blitwidth())
+	if (*xt<0 || *xt >= m_blitwidth)
 		return 0;
-	if (*yt<0 || *yt >= window().blitheight())
+	if (*yt<0 || *yt >= m_blitheight)
 		return 0;
 	return 1;
 }
@@ -681,13 +689,19 @@ int sdl_info13::draw(UINT32 dc, int update)
 		return 0;
 	}
 
-	if ((window().width() != m_last_width) || (window().height() != m_last_height))
+	int width = 0; int height = 0;
+	window().get_size(width,height);
+
+	if (has_flags(FI_CHANGED) || (width != m_width) || (height != m_height))
 	{
-		m_last_width = window().width();
-		m_last_height = window().height();
+		destroy_all_textures();
+		m_width = width;
+		m_height = height;
 		SDL_RenderSetViewport(m_sdl_renderer, NULL);
 		m_blittimer = 3;
+		clear_flags(FI_CHANGED);
 	}
+
 	//SDL_SelectRenderer(window().sdl_window);
 
 	if (m_blittimer > 0)
@@ -714,17 +728,17 @@ int sdl_info13::draw(UINT32 dc, int update)
 		}
 		else
 		{
-			ch = window().height();
-			cw = window().width();
+			ch = height;
+			cw = width;
 		}
 
 		if (video_config.centerv)
 		{
-			vofs = (ch - window().blitheight()) / 2.0f;
+			vofs = (ch - m_blitheight) / 2.0f;
 		}
 		if (video_config.centerh)
 		{
-			hofs = (cw - window().blitwidth()) / 2.0f;
+			hofs = (cw - m_blitwidth) / 2.0f;
 		}
 	}
 

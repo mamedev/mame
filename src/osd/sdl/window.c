@@ -96,7 +96,7 @@ static SDL_threadID window_threadid;
 // debugger
 //static int in_background;
 
-static sdl_draw_info draw;
+static osd_draw_callbacks draw;
 
 struct worker_param {
 	worker_param()
@@ -382,8 +382,20 @@ INLINE int better_mode(int width0, int height0, int width1, int height1, float d
 	return (fabs(desired_aspect - aspect0) < fabs(desired_aspect - aspect1)) ? 0 : 1;
 }
 
-void sdl_window_info::blit_surface_size(int window_width, int window_height)
+void sdl_window_info::blit_surface_size(int &blitwidth, int &blitheight)
 {
+	int window_width, window_height;
+	if ((!fullscreen()) || (video_config.switchres))
+	{
+		get_size(window_width, window_height);
+	}
+	else
+	{
+		window_width = monitor()->center_width();
+		window_height = monitor()->center_height();
+	}
+
+
 	INT32 newwidth, newheight;
 	int xscale = 1, yscale = 1;
 	float desired_aspect = 1.0f;
@@ -453,11 +465,13 @@ void sdl_window_info::blit_surface_size(int window_width, int window_height)
 		&& (video_config.scale_mode == VIDEO_SCALE_MODE_NONE ))
 		newwidth = window_width;
 
-	if ((m_blitwidth != newwidth) || (m_blitheight != newheight))
-		clear();
-
-	m_blitwidth = newwidth;
-	m_blitheight = newheight;
+#if 0
+	// Fixme: notify_changed really necessary ?
+	if ((blitwidth != newwidth) || (blitheight != newheight))
+		notify_changed();
+#endif
+	blitwidth = newwidth;
+	blitheight = newheight;
 }
 
 
@@ -475,24 +489,15 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_resize_wt )
 
 	ASSERT_WINDOW_THREAD();
 
-	window->renderer().destroy_all_textures();
-
 #if (SDLMAME_SDL2)
 	SDL_SetWindowSize(window->sdl_window(), width, height);
-	SDL_GetWindowSize(window->sdl_window(), &window->m_width, &window->m_height);
 #else
 	SDL_FreeSurface(window->m_sdlsurf);
 
 	window->m_sdlsurf = SDL_SetVideoMode(width, height, 0,
 			SDL_SWSURFACE | SDL_ANYFORMAT | window->m_extra_flags);
-
-	window->m_width = window->m_sdlsurf->w;
-	window->m_height = window->m_sdlsurf->h;
 #endif
-
-	window->blit_surface_size(window->m_width, window->m_height);
-
-	window->clear();
+	window->renderer().notify_changed();
 
 	osd_free(wp);
 	return NULL;
@@ -502,10 +507,11 @@ void sdl_window_info::resize(INT32 width, INT32 height)
 {
 	ASSERT_MAIN_THREAD();
 
-	if (width == this->width() && height == this->height())
-		return;
+	int cw=0; int ch=0;
+	get_size(cw, ch);
 
-	execute_async_wait(&sdlwindow_resize_wt, worker_param(this, width, height));
+	if (width != cw || height != ch)
+		execute_async_wait(&sdlwindow_resize_wt, worker_param(this, width, height));
 }
 
 
@@ -514,28 +520,28 @@ void sdl_window_info::resize(INT32 width, INT32 height)
 //  (window thread)
 //============================================================
 
-OSDWORK_CALLBACK( sdl_window_info::sdlwindow_clear_surface_wt )
+OSDWORK_CALLBACK( sdl_window_info::notify_changed_wt )
 {
 	worker_param *wp = (worker_param *) param;
 	sdl_window_info *window = wp->window();
 
 	ASSERT_WINDOW_THREAD();
 
-	window->renderer().clear();
+	window->renderer().notify_changed();
 	osd_free(wp);
 	return NULL;
 }
 
-void sdl_window_info::clear()
+void sdl_window_info::notify_changed()
 {
 	worker_param wp;
 
 	if (SDL_ThreadID() == main_threadid)
 	{
-		execute_async_wait(&sdlwindow_clear_surface_wt, worker_param(this));
+		execute_async_wait(&notify_changed_wt, worker_param(this));
 	}
 	else
-		execute_sync(&sdlwindow_clear_surface_wt, worker_param(this));
+		execute_sync(&notify_changed_wt, worker_param(this));
 }
 
 
@@ -558,8 +564,7 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_toggle_full_screen_wt )
 	// If we are going fullscreen (leaving windowed) remember our windowed size
 	if (!window->fullscreen())
 	{
-		window->m_windowed_width = window->width();
-		window->m_windowed_height = window->height();
+		window->get_size(window->m_windowed_width, window->m_windowed_height);
 	}
 
 	window->renderer().destroy();
@@ -598,18 +603,6 @@ void sdl_window_info::toggle_full_screen()
 	execute_async_wait(&sdlwindow_toggle_full_screen_wt, worker_param(this));
 }
 
-OSDWORK_CALLBACK( sdl_window_info::destroy_all_textures_wt )
-{
-	worker_param *wp = (worker_param *) param;
-
-	sdl_window_info *window = wp->window();
-
-	window->renderer().destroy_all_textures();
-
-	osd_free(wp);
-	return NULL;
-}
-
 void sdl_window_info::modify_prescale(int dir)
 {
 	worker_param wp = worker_param(this);
@@ -633,7 +626,7 @@ void sdl_window_info::modify_prescale(int dir)
 		}
 		else
 		{
-			execute_async_wait(destroy_all_textures_wt, wp);
+			notify_changed();
 			m_prescale = new_prescale;
 		}
 		machine().ui().popup_time(1, "Prescale %d", prescale());
@@ -1035,7 +1028,6 @@ void sdl_window_info::update()
 
 			if (!this->m_fullscreen)
 			{
-				blit_surface_size(width(), height());
 				//Don't resize window without user interaction;
 				//window_resize(blitwidth, blitheight);
 			}
@@ -1053,20 +1045,10 @@ void sdl_window_info::update()
 
 		if (osd_event_wait(m_rendered_event, event_wait_ticks))
 		{
-			if ((!fullscreen()) || (video_config.switchres))
-			{
-				blit_surface_size(m_width, m_height);
-			}
-			else
-			{
-				blit_surface_size(monitor()->center_width(), monitor()->center_height());
-			}
 
 			// ensure the target bounds are up-to-date, and then get the primitives
 
-			m_target->set_bounds(m_blitwidth, m_blitheight, monitor()->aspect());
-
-			render_primitive_list &primlist = m_target->get_primitives();
+			render_primitive_list &primlist = *m_renderer->get_primitives();
 
 			// and redraw now
 
@@ -1165,7 +1147,7 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 
 #if (SDLMAME_SDL2)
 
-	if (window->renderer().check_flag(osd_renderer::FLAG_NEEDS_OPENGL))
+	if (window->renderer().has_flags(osd_renderer::FLAG_NEEDS_OPENGL))
 	{
 		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 
@@ -1197,7 +1179,7 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 
 	if  ( window->m_sdl_window == NULL )
 	{
-		if (window->renderer().check_flag(osd_renderer::FLAG_NEEDS_OPENGL))
+		if (window->renderer().has_flags(osd_renderer::FLAG_NEEDS_OPENGL))
 			osd_printf_error("OpenGL not supported on this driver: %s\n", SDL_GetError());
 		else
 			osd_printf_error("Window creation failed: %s\n", SDL_GetError());
@@ -1235,17 +1217,20 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 	//SDL_SetWindowFullscreen(window().sdl_window(), window().fullscreen);
 	SDL_RaiseWindow(window->sdl_window());
 
-	SDL_GetWindowSize(window->sdl_window(), &window->m_width, &window->m_height);
+#ifdef SDLMAME_WIN32
+	if (window->fullscreen())
+		SDL_SetWindowGrab(window->sdl_window(), SDL_TRUE);
+#endif
 
 #else
 	window->m_extra_flags = (window->fullscreen() ?  SDL_FULLSCREEN : SDL_RESIZABLE);
 
-	if (window->renderer().check_flag(osd_renderer::FLAG_NEEDS_DOUBLEBUF))
+	if (window->renderer().has_flags(osd_renderer::FLAG_NEEDS_DOUBLEBUF))
 		window->m_extra_flags |= SDL_DOUBLEBUF;
-	if (window->renderer().check_flag(osd_renderer::FLAG_NEEDS_ASYNCBLIT))
+	if (window->renderer().has_flags(osd_renderer::FLAG_NEEDS_ASYNCBLIT))
 		window->m_extra_flags |= SDL_ASYNCBLIT;
 
-	if (window->renderer().check_flag(osd_renderer::FLAG_NEEDS_OPENGL))
+	if (window->renderer().has_flags(osd_renderer::FLAG_NEEDS_OPENGL))
  {
 		window->m_extra_flags |= SDL_DOUBLEBUF | SDL_OPENGL;
 		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
@@ -1266,9 +1251,6 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 		osd_printf_error("OpenGL not supported on this driver!\n");
 		return (void *) &result[1];
 	}
-
-	window->m_width = window->m_sdlsurf->w;
-	window->m_height = window->m_sdlsurf->h;
 
 	// set the window title
 	SDL_WM_SetCaption(window->m_title, "SDLMAME");

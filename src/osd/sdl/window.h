@@ -55,16 +55,27 @@ public:
 
 	sdl_window_info &window() { return *m_window; }
 	int flags() const { return m_flags; }
-	bool check_flag(const int flag) { return ((m_flags & flag)) == flag; }
+	bool has_flags(const int flag) { return ((m_flags & flag)) == flag; }
+
+	void notify_changed() { set_flags(FI_CHANGED); }
+
+	/* Interface to be implemented by render code */
 
 	virtual int create() = 0;
 	virtual int draw(const UINT32 dc, const int update) = 0;
+	virtual render_primitive_list *get_primitives() = 0;
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) = 0;
-	virtual void destroy_all_textures() = 0;
 	virtual void destroy() = 0;
-	virtual void clear() = 0;
+
+protected:
+	/* Internal flags */
+	static const int FI_CHANGED	 				= 0x010000;
+
+	void set_flags(int aflag) { m_flags |= aflag; }
+	void clear_flags(int aflag) { m_flags &= ~aflag; }
 
 private:
+
 	sdl_window_info *m_window;
 	int m_flags;
 };
@@ -86,7 +97,6 @@ public:
 #endif
 		 m_minwidth(0), m_minheight(0),
 		m_rendered_event(0), m_target(0),
-		m_width(0), m_height(0), m_blitwidth(0), m_blitheight(0),
 #if (SDLMAME_SDL2)
 		m_sdl_window(NULL),
 
@@ -121,7 +131,18 @@ public:
 	void modify_prescale(int dir);
 	void resize(INT32 width, INT32 height);
 	void destroy();
-	void clear();
+
+	void notify_changed();
+
+	void get_size(int &w, int &h)
+	{
+#if (SDLMAME_SDL2)
+		SDL_GetWindowSize(m_sdl_window, &w, &h);
+#else
+		w = m_sdlsurf->w; h = m_sdlsurf->h;
+#endif
+	}
+
 	int xy_to_render_target(int x, int y, int *xt, int *yt);
 
 	running_machine &machine() const { return m_machine; }
@@ -136,11 +157,8 @@ public:
 #else
 	SDL_Surface *sdl_surface() { return m_sdlsurf; }
 #endif
-	int	width() const { return m_width; }
-	int height() const { return m_height; }
 
-	int	blitwidth() const { return m_blitwidth; }
-	int blitheight() const { return m_blitheight; }
+	void blit_surface_size(int &blitwidth, int &blitheight);
 	int prescale() const { return m_prescale; }
 
 	// Pointer to next window
@@ -173,15 +191,6 @@ private:
 	osd_event *         m_rendered_event;
 	render_target *     m_target;
 
-	// cache of physical width() and height()
-	int                 m_width;
-	int                 m_height;
-
-	// current m_blitwidth and height()
-	int                 m_blitwidth;
-	int                 m_blitheight;
-
-
 	int                 m_prescale;
 
 #if (SDLMAME_SDL2)
@@ -207,15 +216,11 @@ protected:
 private:
 	void constrain_to_aspect_ratio(int *window_width, int *window_height, int adjustment);
 	void update_cursor_state();
-	void blit_surface_size(int window_width, int window_height);
 	void pick_best_mode(int *fswidth, int *fsheight);
 	void set_starting_view(running_machine &machine, int index, const char *defview, const char *view);
 	void get_min_bounds(int *window_width, int *window_height, int constrain);
 	void get_max_bounds(int *window_width, int *window_height, int constrain);
 	void set_fullscreen(int afullscreen) { m_fullscreen = afullscreen; }
-
-
-
 
 	// Pointer to machine
 	running_machine &   m_machine;
@@ -231,15 +236,14 @@ private:
 	static OSDWORK_CALLBACK( draw_video_contents_wt );
 	static OSDWORK_CALLBACK( sdlwindow_video_window_destroy_wt );
 	static OSDWORK_CALLBACK( sdlwindow_toggle_full_screen_wt );
-	static OSDWORK_CALLBACK( sdlwindow_clear_surface_wt );
-	static OSDWORK_CALLBACK( destroy_all_textures_wt );
+	static OSDWORK_CALLBACK( notify_changed_wt );
 	static OSDWORK_CALLBACK( update_cursor_state_wt );
 
 	void measure_fps(UINT32 dc, int update);
 
 };
 
-struct sdl_draw_info
+struct osd_draw_callbacks
 {
 	osd_renderer *(*create)(sdl_window_info *window);
 	void (*exit)(void);
@@ -260,7 +264,7 @@ extern sdl_window_info *sdl_window_list;
 // PROTOTYPES - drawsdl.c
 //============================================================
 
-int drawsdl_init(sdl_draw_info *callbacks);
+int drawsdl_init(osd_draw_callbacks *callbacks);
 const char *drawsdl_scale_mode_str(int index);
 int drawsdl_scale_mode(const char *s);
 
@@ -268,18 +272,18 @@ int drawsdl_scale_mode(const char *s);
 // PROTOTYPES - drawogl.c
 //============================================================
 
-int drawogl_init(running_machine &machine, sdl_draw_info *callbacks);
+int drawogl_init(running_machine &machine, osd_draw_callbacks *callbacks);
 
 //============================================================
 // PROTOTYPES - draw13.c
 //============================================================
 
-int drawsdl2_init(running_machine &machine, sdl_draw_info *callbacks);
+int drawsdl2_init(running_machine &machine, osd_draw_callbacks *callbacks);
 
 //============================================================
 // PROTOTYPES - drawbgfx.c
 //============================================================
 
-int drawbgfx_init(running_machine &machine, sdl_draw_info *callbacks);
+int drawbgfx_init(running_machine &machine, osd_draw_callbacks *callbacks);
 
 #endif /* __SDLWINDOW__ */
