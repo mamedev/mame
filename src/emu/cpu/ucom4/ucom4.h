@@ -45,6 +45,20 @@
 	ucom4_cpu_device::set_write_i_callback(*device, DEVCB_##_devcb);
 
 
+enum
+{
+	NEC_UCOM4_PORTA = 0,
+	NEC_UCOM4_PORTB,
+	NEC_UCOM4_PORTC,
+	NEC_UCOM4_PORTD,
+	NEC_UCOM4_PORTE,
+	NEC_UCOM4_PORTF,
+	NEC_UCOM4_PORTG,
+	NEC_UCOM4_PORTH,
+	NEC_UCOM4_PORTI
+};
+
+
 
 class ucom4_cpu_device : public cpu_device
 {
@@ -117,25 +131,27 @@ protected:
 	int m_datawidth;
 	int m_prgmask;
 	int m_datamask;
-	int m_family;       // MCU family (43/44/45)
-	int m_stack_levels; // number of callstack levels
-	UINT16 m_stack[3+1]; // max 3
+	int m_family;           // MCU family (43/44/45)
+	int m_stack_levels;     // number of callstack levels
+	UINT16 m_stack[3+1];    // max 3
+	UINT8 m_port_out[0x10]; // last value written to output port
 	UINT8 m_op;
-	UINT8 m_prev_op;    // previous opcode
-	UINT8 m_arg;        // opcode argument for 2-byte opcodes
-	bool m_skip;        // skip next opcode
+	UINT8 m_prev_op;        // previous opcode
+	UINT8 m_arg;            // opcode argument for 2-byte opcodes
+	UINT8 m_bitmask;        // opcode bit argument
+	bool m_skip;            // skip next opcode
 	int m_icount;
 	
-	UINT16 m_pc;        // program counter
-	UINT8 m_acc;        // 4-bit accumulator
-	UINT8 m_dpl;        // 4-bit data pointer low (RAM x)
-	UINT8 m_dph;        // 4-bit(?) data pointer high (RAM y)
+	UINT16 m_pc;            // program counter
+	UINT8 m_acc;            // 4-bit accumulator
+	UINT8 m_dpl;            // 4-bit data pointer low (RAM x)
+	UINT8 m_dph;            // 4-bit(?) data pointer high (RAM y)
 	UINT8 m_dph_mask;
-	UINT8 m_carry_f;    // carry flag
-	UINT8 m_carry_s_f;  // carry save flag
-	UINT8 m_timer_f;    // timer out flag
-	UINT8 m_int_f;      // interrupt flag
-	UINT8 m_inte_f;     // interrupt enable flag
+	UINT8 m_carry_f;        // carry flag
+	UINT8 m_carry_s_f;      // carry save flag
+	UINT8 m_timer_f;        // timer out flag
+	UINT8 m_int_f;          // interrupt flag
+	UINT8 m_inte_f;         // interrupt enable flag
 
 	// i/o handlers
 	devcb_read8 m_read_a;
@@ -156,6 +172,8 @@ protected:
 	void ram_w(UINT8 data);
 	void pop_stack();
 	void push_stack();
+	UINT8 input_r(int index);
+	void output_w(int index, UINT8 data);
 	void op_illegal();
 	bool check_op_43();
 

@@ -31,6 +31,49 @@ void ucom4_cpu_device::push_stack()
 	m_stack[0] = m_pc;
 }
 
+UINT8 ucom4_cpu_device::input_r(int index)
+{
+	index &= 0xf;
+	UINT8 inp = 0xf;
+	
+	switch (index)
+	{
+		case NEC_UCOM4_PORTA: inp = m_read_a(index, 0xff) & 0xf; break;
+		case NEC_UCOM4_PORTB: inp = m_read_b(index, 0xff) & 0xf; break;
+		case NEC_UCOM4_PORTC: inp = m_read_c(index, 0xff) & 0xf; break;
+		case NEC_UCOM4_PORTD: inp = m_read_d(index, 0xff) & 0xf; break;
+
+		default:
+			logerror("%s read from unknown port %c at $%03X\n", tag(), 'A' + index, m_pc);
+			break;
+	}
+
+	return inp;
+}
+
+void ucom4_cpu_device::output_w(int index, UINT8 data)
+{
+	index &= 0xf;
+	data &= 0xf;
+
+	switch (index)
+	{
+		case NEC_UCOM4_PORTC: m_write_c(index, data, 0xff); break;
+		case NEC_UCOM4_PORTD: m_write_d(index, data, 0xff); break;
+		case NEC_UCOM4_PORTE: m_write_e(index, data, 0xff); break;
+		case NEC_UCOM4_PORTF: m_write_f(index, data, 0xff); break;
+		case NEC_UCOM4_PORTG: m_write_g(index, data, 0xff); break;
+		case NEC_UCOM4_PORTH: m_write_h(index, data, 0xff); break;
+		case NEC_UCOM4_PORTI: m_write_i(index, data & 7, 0xff); break;
+		
+		default:
+			logerror("%s write to unknown port %c = $%X at $%03X\n", tag(), 'A' + index, data & 0xf, m_pc);
+			break;
+	}
+
+	m_port_out[index] = data;
+}
+
 void ucom4_cpu_device::op_illegal()
 {
 	logerror("%s unknown opcode $%02X at $%03X\n", tag(), m_op, m_pc);
@@ -240,39 +283,39 @@ void ucom4_cpu_device::op_ded()
 void ucom4_cpu_device::op_rmb()
 {
 	// RMB B: Reset a single bit of RAM
-	ram_w(ram_r() & ~(1 << (m_op & 0x03)));
+	ram_w(ram_r() & ~m_bitmask);
 }
 
 void ucom4_cpu_device::op_smb()
 {
 	// SMB B: Set a single bit of RAM
-	ram_w(ram_r() | (1 << (m_op & 0x03)));
+	ram_w(ram_r() | m_bitmask);
 }
 
 void ucom4_cpu_device::op_reb()
 {
 	// REB B: Reset a single bit of output port E
 	m_icount--;
-	op_illegal();
+	output_w(NEC_UCOM4_PORTE, m_port_out[NEC_UCOM4_PORTE] & ~m_bitmask);
 }
 
 void ucom4_cpu_device::op_seb()
 {
 	// SEB B: Set a single bit of output port E
 	m_icount--;
-	op_illegal();
+	output_w(NEC_UCOM4_PORTE, m_port_out[NEC_UCOM4_PORTE] | m_bitmask);
 }
 
 void ucom4_cpu_device::op_rpb()
 {
 	// RPB B: Reset a single bit of output port (DPl)
-	op_illegal();
+	output_w(m_dpl, m_port_out[m_dpl] & ~m_bitmask);
 }
 
 void ucom4_cpu_device::op_spb()
 {
 	// SPB B: Set a single bit of output port (DPl)
-	op_illegal();
+	output_w(m_dpl, m_port_out[m_dpl] | m_bitmask);
 }
 
 
@@ -340,14 +383,13 @@ void ucom4_cpu_device::op_cm()
 void ucom4_cpu_device::op_cmb()
 {
 	// CMB B: skip next on bit(ACC) equals bit(RAM)
-	UINT8 mask = 1 << (m_op & 0x03);
-	m_skip = ((m_acc & mask) == (ram_r() & mask));
+	m_skip = ((m_acc & m_bitmask) == (ram_r() & m_bitmask));
 }
 
 void ucom4_cpu_device::op_tab()
 {
 	// TAB B: skip next on bit(ACC)
-	m_skip = ((m_acc & (1 << (m_op & 0x03))) != 0);
+	m_skip = ((m_acc & m_bitmask) != 0);
 }
 
 void ucom4_cpu_device::op_cli()
@@ -362,19 +404,19 @@ void ucom4_cpu_device::op_cli()
 void ucom4_cpu_device::op_tmb()
 {
 	// TMB B: skip next on bit(RAM)
-	m_skip = ((ram_r() & (1 << (m_op & 0x03))) != 0);
+	m_skip = ((ram_r() & m_bitmask) != 0);
 }
 
 void ucom4_cpu_device::op_tpa()
 {
 	// TPA B: skip next on bit(input port A)
-	op_illegal();
+	m_skip = ((input_r(NEC_UCOM4_PORTA) & m_bitmask) != 0);
 }
 
 void ucom4_cpu_device::op_tpb()
 {
 	// TPB B: skip next on bit(input port (DPl))
-	op_illegal();
+	m_skip = ((input_r(m_dpl) & m_bitmask) != 0);
 }
 
 
@@ -392,31 +434,32 @@ void ucom4_cpu_device::op_tit()
 void ucom4_cpu_device::op_ia()
 {
 	// IA: Input port A to ACC
-	op_illegal();
+	m_acc = input_r(NEC_UCOM4_PORTA);
 }
 
 void ucom4_cpu_device::op_ip()
 {
 	// IP: Input port (DPl) to ACC
-	op_illegal();
+	m_acc = input_r(m_dpl);
 }
 
 void ucom4_cpu_device::op_oe()
 {
 	// OE: Output ACC to port E
-	m_write_e(0, m_acc, 0xff);
+	output_w(NEC_UCOM4_PORTE, m_acc);
 }
 
 void ucom4_cpu_device::op_op()
 {
 	// OP: Output ACC to port (DPl)
-	op_illegal();
+	output_w(m_dpl, m_acc);
 }
 
 void ucom4_cpu_device::op_ocd()
 {
 	// OCD X: Output X to ports C and D
-	op_illegal();
+	output_w(NEC_UCOM4_PORTD, m_arg >> 4);
+	output_w(NEC_UCOM4_PORTC, m_arg & 0xf);
 }
 
 

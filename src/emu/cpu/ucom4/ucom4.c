@@ -116,10 +116,10 @@ void ucom4_cpu_device::device_start()
 	m_datamask = (1 << m_datawidth) - 1;
 	m_dph_mask = m_datamask >> 4;
 
-	m_read_a.resolve_safe(0);
-	m_read_b.resolve_safe(0);
-	m_read_c.resolve_safe(0);
-	m_read_d.resolve_safe(0);
+	m_read_a.resolve_safe(0xf);
+	m_read_b.resolve_safe(0xf);
+	m_read_c.resolve_safe(0xf);
+	m_read_d.resolve_safe(0xf);
 
 	m_write_c.resolve_safe();
 	m_write_d.resolve_safe();
@@ -131,9 +131,9 @@ void ucom4_cpu_device::device_start()
 
 	// zerofill
 	memset(m_stack, 0, sizeof(m_stack));
+	memset(m_port_out, 0, sizeof(m_port_out));
 	m_op = 0;
 	m_prev_op = 0;
-	m_arg = 0;
 	m_skip = false;
 	m_pc = 0;
 	m_acc = 0;
@@ -147,9 +147,9 @@ void ucom4_cpu_device::device_start()
 
 	// register for savestates
 	save_item(NAME(m_stack));
+	save_item(NAME(m_port_out));
 	save_item(NAME(m_op));
 	save_item(NAME(m_prev_op));
-	save_item(NAME(m_arg));
 	save_item(NAME(m_skip));
 	save_item(NAME(m_pc));
 	save_item(NAME(m_acc));
@@ -185,6 +185,10 @@ void ucom4_cpu_device::device_reset()
 	m_pc = 0;
 	m_op = 0;
 	m_skip = false;
+
+	// clear i/o
+	for (int i = NEC_UCOM4_PORTC; i <= NEC_UCOM4_PORTI; i++)
+		output_w(i, 0xf);
 }
 
 
@@ -215,6 +219,7 @@ void ucom4_cpu_device::execute_run()
 
 		debugger_instruction_hook(this, m_pc);
 		m_op = m_program->read_byte(m_pc);
+		m_bitmask = 1 << (m_op & 0x03);
 		m_pc = (m_pc + 1) & m_prgmask;
 		fetch_arg();
 		
