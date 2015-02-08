@@ -16,16 +16,27 @@ OTHER: 5 * M5L8255AP
 #include "sound/ay8910.h"
 
 
+void taxidriv_state::machine_start()
+{
+	save_item(NAME(m_s1));
+	save_item(NAME(m_s2));
+	save_item(NAME(m_s3));
+	save_item(NAME(m_s4));
+	save_item(NAME(m_latchA));
+	save_item(NAME(m_latchB));
+	save_item(NAME(m_bghide));
+	save_item(NAME(m_spritectrl));
+}
 
-WRITE8_MEMBER(taxidriv_state::p2a_w){ taxidriv_spritectrl_w(space,0,data); }
-WRITE8_MEMBER(taxidriv_state::p2b_w){ taxidriv_spritectrl_w(space,1,data); }
-WRITE8_MEMBER(taxidriv_state::p2c_w){ taxidriv_spritectrl_w(space,2,data); }
-WRITE8_MEMBER(taxidriv_state::p3a_w){ taxidriv_spritectrl_w(space,3,data); }
-WRITE8_MEMBER(taxidriv_state::p3b_w){ taxidriv_spritectrl_w(space,4,data); }
-WRITE8_MEMBER(taxidriv_state::p3c_w){ taxidriv_spritectrl_w(space,5,data); }
-WRITE8_MEMBER(taxidriv_state::p4a_w){ taxidriv_spritectrl_w(space,6,data); }
-WRITE8_MEMBER(taxidriv_state::p4b_w){ taxidriv_spritectrl_w(space,7,data); }
-WRITE8_MEMBER(taxidriv_state::p4c_w){ taxidriv_spritectrl_w(space,8,data); }
+WRITE8_MEMBER(taxidriv_state::p2a_w){ spritectrl_w(space,0,data); }
+WRITE8_MEMBER(taxidriv_state::p2b_w){ spritectrl_w(space,1,data); }
+WRITE8_MEMBER(taxidriv_state::p2c_w){ spritectrl_w(space,2,data); }
+WRITE8_MEMBER(taxidriv_state::p3a_w){ spritectrl_w(space,3,data); }
+WRITE8_MEMBER(taxidriv_state::p3b_w){ spritectrl_w(space,4,data); }
+WRITE8_MEMBER(taxidriv_state::p3c_w){ spritectrl_w(space,5,data); }
+WRITE8_MEMBER(taxidriv_state::p4a_w){ spritectrl_w(space,6,data); }
+WRITE8_MEMBER(taxidriv_state::p4b_w){ spritectrl_w(space,7,data); }
+WRITE8_MEMBER(taxidriv_state::p4c_w){ spritectrl_w(space,8,data); }
 
 
 READ8_MEMBER(taxidriv_state::p0a_r)
@@ -366,7 +377,7 @@ static MACHINE_CONFIG_START( taxidriv, taxidriv_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 27*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taxidriv_state, screen_update_taxidriv)
+	MCFG_SCREEN_UPDATE_DRIVER(taxidriv_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taxidriv)
@@ -432,4 +443,4 @@ ROM_START( taxidriv )
 ROM_END
 
 
-GAME( 1984, taxidriv,  0,        taxidriv, taxidriv, driver_device, 0, ROT90, "Graphic Techno", "Taxi Driver", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
+GAME( 1984, taxidriv,  0,        taxidriv, taxidriv, driver_device, 0, ROT90, "Graphic Techno", "Taxi Driver", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
