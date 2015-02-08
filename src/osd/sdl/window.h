@@ -32,7 +32,35 @@ typedef UINT32 HashT;
 //  TYPE DEFINITIONS
 //============================================================
 
-class sdl_window_info;
+class osd_window
+{
+public:
+	osd_window()
+	: 	  m_primlist(NULL),
+		m_start_viewscreen(0)
+  	  {}
+	virtual ~osd_window() { }
+#ifdef OSD_SDL
+	virtual void blit_surface_size(int &blitwidth, int &blitheight) = 0;
+	virtual sdl_monitor_info *monitor() const = 0;
+	virtual render_target *target() = 0;
+	virtual void get_size(int &w, int &h) = 0;
+	virtual int fullscreen() const = 0;
+	virtual int index() const = 0;
+	virtual int prescale() const = 0;
+#if (SDLMAME_SDL2)
+	virtual SDL_Window *sdl_window() = 0;
+#else
+	virtual SDL_Surface *sdl_surface() = 0;
+#endif
+
+	virtual running_machine &machine() const = 0;
+
+	render_primitive_list *m_primlist;
+	int                 m_start_viewscreen;
+
+#endif
+};
 
 class osd_renderer
 {
@@ -48,12 +76,12 @@ public:
 	static const int FLAG_NEEDS_ASYNCBLIT 		= 0x0200;
 #endif
 
-	osd_renderer(sdl_window_info *window, const int flags)
+	osd_renderer(osd_window *window, const int flags)
 	: m_window(window), m_flags(flags) { }
 
 	virtual ~osd_renderer() { }
 
-	sdl_window_info &window() { return *m_window; }
+	osd_window &window() { return *m_window; }
 	int flags() const { return m_flags; }
 	bool has_flags(const int flag) { return ((m_flags & flag)) == flag; }
 
@@ -62,9 +90,18 @@ public:
 	/* Interface to be implemented by render code */
 
 	virtual int create() = 0;
-	virtual int draw(const UINT32 dc, const int update) = 0;
 	virtual render_primitive_list *get_primitives() = 0;
+
+#ifdef OSD_SDL
+	virtual int draw(const UINT32 dc, const int update) = 0;
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) = 0;
+#else
+	virtual int draw(HDC dc, int update) = 0;
+	virtual void save() = 0;
+	virtual void record() = 0;
+	virtual void toggle_fsfx() = 0;
+#endif
+
 	virtual void destroy() = 0;
 
 protected:
@@ -76,19 +113,18 @@ protected:
 
 private:
 
-	sdl_window_info *m_window;
+	osd_window		*m_window;
 	int m_flags;
 };
 
 #define OSDWORK_CALLBACK(name)  void *name(void *param, ATTR_UNUSED int threadid)
 
-class sdl_window_info
+class sdl_window_info : public osd_window
 {
 public:
 	sdl_window_info(running_machine &a_machine, int index, sdl_monitor_info *a_monitor,
 			const sdl_window_config *config)
-	: m_next(NULL), m_primlist(NULL),
-		m_start_viewscreen(0),
+	: osd_window(), m_next(NULL),
 		// Following three are used by input code to defer resizes
 #if (SDLMAME_SDL2)
 		m_resize_width(0),
@@ -164,9 +200,6 @@ public:
 	// Pointer to next window
 	sdl_window_info *   m_next;
 
-	// FIXME: renderer should deal with this
-	render_primitive_list *m_primlist;
-	int                 m_start_viewscreen;
 #if (SDLMAME_SDL2)
 	// These are used in combine resizing events ... #if SDL13_COMBINE_RESIZE
 	int                 m_resize_width;

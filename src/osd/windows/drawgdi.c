@@ -30,7 +30,7 @@ public:
 
 	virtual ~renderer_gdi() { }
 
-	virtual int init();
+	virtual int create();
 	virtual render_primitive_list *get_primitives();
 	virtual int draw(HDC dc, int update);
 	virtual void save() {};
@@ -92,7 +92,7 @@ static void drawgdi_exit(void)
 //  drawgdi_window_init
 //============================================================
 
-int renderer_gdi::init()
+int renderer_gdi::create()
 {
 
 	// fill in the bitmap info header
@@ -133,8 +133,8 @@ render_primitive_list *renderer_gdi::get_primitives()
 {
 	RECT client;
 	GetClientRect(window().m_hwnd, &client);
-	window().m_target->set_bounds(rect_width(&client), rect_height(&client), window().m_monitor->get_aspect());
-	return &window().m_target->get_primitives();
+	window().target()->set_bounds(rect_width(&client), rect_height(&client), window().m_monitor->get_aspect());
+	return &window().target()->get_primitives();
 }
 
 

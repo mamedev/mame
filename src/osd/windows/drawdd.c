@@ -63,7 +63,7 @@ public:
 
 	virtual ~renderer_dd() { }
 
-	virtual int init();
+	virtual int create();
 	virtual render_primitive_list *get_primitives();
 	virtual int draw(HDC dc, int update);
 	virtual void save() {};
@@ -258,7 +258,7 @@ static void drawdd_exit(void)
 //  drawdd_window_init
 //============================================================
 
-int renderer_dd::init()
+int renderer_dd::create()
 {
 	// configure the adapter for the mode we want
 	if (config_adapter_mode())
@@ -297,10 +297,10 @@ void renderer_dd::destroy()
 render_primitive_list *renderer_dd::get_primitives()
 {
 	compute_blit_surface_size();
-	window().m_target->set_bounds(blitwidth, blitheight, 0);
-	window().m_target->set_max_update_rate((refresh == 0) ? origmode.dwRefreshRate : refresh);
+	window().target()->set_bounds(blitwidth, blitheight, 0);
+	window().target()->set_max_update_rate((refresh == 0) ? origmode.dwRefreshRate : refresh);
 
-	return &window().m_target->get_primitives();
+	return &window().target()->get_primitives();
 }
 
 
@@ -417,7 +417,7 @@ int renderer_dd::draw(HDC dc, int update)
 	if (result != DD_OK) osd_printf_verbose("DirectDraw: Error %08X unlocking blit surface\n", (int)result);
 
 	// sync to VBLANK
-	if ((video_config.waitvsync || video_config.syncrefresh) && window().machine().video().throttled() && (!window().m_fullscreen || back == NULL))
+	if ((video_config.waitvsync || video_config.syncrefresh) && window().machine().video().throttled() && (!window().fullscreen() || back == NULL))
 	{
 		result = IDirectDraw7_WaitForVerticalBlank(ddraw, DDWAITVB_BLOCKBEGIN, NULL);
 		if (result != DD_OK) osd_printf_verbose("DirectDraw: Error %08X waiting for VBLANK\n", (int)result);
@@ -469,7 +469,7 @@ int renderer_dd::ddraw_create()
 		osd_printf_verbose("DirectDraw: Error %08X during IDirectDraw7_SetCooperativeLevel(FOCUSWINDOW) call\n", (int)result);
 		goto error;
 	}
-	result = IDirectDraw7_SetCooperativeLevel(ddraw, window().m_hwnd, DDSCL_SETDEVICEWINDOW | (window().m_fullscreen ? DDSCL_FULLSCREEN | DDSCL_EXCLUSIVE : DDSCL_NORMAL));
+	result = IDirectDraw7_SetCooperativeLevel(ddraw, window().m_hwnd, DDSCL_SETDEVICEWINDOW | (window().fullscreen() ? DDSCL_FULLSCREEN | DDSCL_EXCLUSIVE : DDSCL_NORMAL));
 	if (result != DD_OK)
 	{
 		osd_printf_verbose("DirectDraw: Error %08X during IDirectDraw7_SetCooperativeLevel(DEVICEWINDOW) call\n", (int)result);
@@ -477,7 +477,7 @@ int renderer_dd::ddraw_create()
 	}
 
 	// full screen mode: set the resolution
-	if (window().m_fullscreen && video_config.switchres)
+	if (window().fullscreen() && video_config.switchres)
 	{
 		result = IDirectDraw7_SetDisplayMode(ddraw, width, height, 32, refresh, 0);
 		if (result != DD_OK)
@@ -511,7 +511,7 @@ int renderer_dd::ddraw_create_surfaces()
 	primarydesc.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
 
 	// for triple-buffered full screen mode, allocate flipping surfaces
-	if (window().m_fullscreen && video_config.triplebuf)
+	if (window().fullscreen() && video_config.triplebuf)
 	{
 		primarydesc.dwFlags |= DDSD_BACKBUFFERCOUNT;
 		primarydesc.ddsCaps.dwCaps |= DDSCAPS_FLIP | DDSCAPS_COMPLEX;
@@ -524,7 +524,7 @@ int renderer_dd::ddraw_create_surfaces()
 
 	// full screen mode: get the back surface
 	back = NULL;
-	if (window().m_fullscreen && video_config.triplebuf)
+	if (window().fullscreen() && video_config.triplebuf)
 	{
 		DDSCAPS2 caps = { DDSCAPS_BACKBUFFER };
 		result = IDirectDrawSurface7_GetAttachedSurface(primary, &caps, &back);
@@ -564,11 +564,11 @@ int renderer_dd::ddraw_create_surfaces()
 		goto error;
 
 	// create a clipper for windowed mode
-	if (!window().m_fullscreen && create_clipper())
+	if (!window().fullscreen() && create_clipper())
 		goto error;
 
 	// full screen mode: set the gamma
-	if (window().m_fullscreen)
+	if (window().fullscreen())
 	{
 		// only set the gamma if it's not 1.0f
 		windows_options &options = downcast<windows_options &>(window().machine().options());
@@ -825,7 +825,7 @@ void renderer_dd::compute_blit_surface_size()
 	RECT client;
 
 	// start with the minimum size
-	window().m_target->compute_minimum_size(newwidth, newheight);
+	window().target()->compute_minimum_size(newwidth, newheight);
 
 	// get the window's client rectangle
 	GetClientRect(window().m_hwnd, &client);
@@ -854,8 +854,8 @@ void renderer_dd::compute_blit_surface_size()
 		// compute the appropriate visible area if we're trying to keepaspect
 		if (video_config.keepaspect)
 		{
-			win_monitor_info *monitor = winwindow_video_window_monitor(&window(), NULL);
-			window().m_target->compute_visible_area(target_width, target_height, monitor->get_aspect(), window().m_target->orientation(), target_width, target_height);
+			win_monitor_info *monitor = window().winwindow_video_window_monitor(NULL);
+			window().target()->compute_visible_area(target_width, target_height, monitor->get_aspect(), window().target()->orientation(), target_width, target_height);
 			desired_aspect = (float)target_width / (float)target_height;
 		}
 
@@ -920,7 +920,7 @@ void renderer_dd::calc_fullscreen_margins(DWORD desc_width, DWORD desc_height, R
 	margins->right = desc_width;
 	margins->bottom = desc_height;
 
-	if (win_has_menu(&window()))
+	if (window().win_has_menu())
 	{
 		static int height_with_menubar = 0;
 		if (height_with_menubar == 0)
@@ -944,7 +944,7 @@ void renderer_dd::calc_fullscreen_margins(DWORD desc_width, DWORD desc_height, R
 void renderer_dd::blit_to_primary(int srcwidth, int srcheight)
 {
 	IDirectDrawSurface7 *target = (back != NULL) ? back : primary;
-	win_monitor_info *monitor = winwindow_video_window_monitor(&window(), NULL);
+	win_monitor_info *monitor = window().winwindow_video_window_monitor(NULL);
 	DDBLTFX blitfx = { sizeof(DDBLTFX) };
 	RECT clear, outer, dest, source;
 	INT32 dstwidth, dstheight;
@@ -956,7 +956,7 @@ void renderer_dd::blit_to_primary(int srcwidth, int srcheight)
 	source.bottom = srcheight;
 
 	// compute outer rect -- windowed version
-	if (!window().m_fullscreen)
+	if (!window().fullscreen())
 	{
 		GetClientRect(window().m_hwnd, &outer);
 		ClientToScreen(window().m_hwnd, &((LPPOINT)&outer)[0]);
@@ -999,7 +999,7 @@ void renderer_dd::blit_to_primary(int srcwidth, int srcheight)
 	else if (video_config.keepaspect)
 	{
 		// compute the appropriate visible area
-		window().m_target->compute_visible_area(rect_width(&outer), rect_height(&outer), monitor->get_aspect(), window().m_target->orientation(), dstwidth, dstheight);
+		window().target()->compute_visible_area(rect_width(&outer), rect_height(&outer), monitor->get_aspect(), window().target()->orientation(), dstwidth, dstheight);
 	}
 
 	// center within
@@ -1062,7 +1062,7 @@ void renderer_dd::blit_to_primary(int srcwidth, int srcheight)
 	if (result != DD_OK) osd_printf_verbose("DirectDraw: Error %08X blitting to the screen\n", (int)result);
 
 	// page flip if triple buffered
-	if (window().m_fullscreen && back != NULL)
+	if (window().fullscreen() && back != NULL)
 	{
 		result = IDirectDrawSurface7_Flip(primary, NULL, DDFLIP_WAIT);
 		if (result != DD_OK) osd_printf_verbose("DirectDraw: Error %08X waiting for VBLANK\n", (int)result);
@@ -1112,7 +1112,7 @@ int renderer_dd::config_adapter_mode()
 	}
 
 	// choose a resolution: full screen mode case
-	if (window().m_fullscreen)
+	if (window().fullscreen())
 	{
 		// default to the current mode exactly
 		width = origmode.dwWidth;
@@ -1129,7 +1129,7 @@ int renderer_dd::config_adapter_mode()
 	ddraw = NULL;
 
 	// if we're not changing resolutions, make sure we have a resolution we can handle
-	if (!window().m_fullscreen || !video_config.switchres)
+	if (!window().fullscreen() || !video_config.switchres)
 	{
 		switch (origmode.ddpfPixelFormat.dwRBitMask)
 		{
@@ -1268,7 +1268,7 @@ void renderer_dd::pick_best_mode()
 	// note: technically we should not be calling this from an alternate window
 	// thread; however, it is only done during init time, and the init code on
 	// the main thread is waiting for us to finish, so it is safe to do so here
-	window().m_target->compute_minimum_size(einfo.minimum_width, einfo.minimum_height);
+	window().target()->compute_minimum_size(einfo.minimum_width, einfo.minimum_height);
 
 	// use those as the target for now
 	einfo.target_width = einfo.minimum_width * MAX(1, video_config.prescale);
@@ -1296,7 +1296,7 @@ void renderer_dd::pick_best_mode()
 	}
 
 	// fill in the rest of the data
-	einfo.window = &window();
+	einfo.window = dynamic_cast<win_window_info *>(&window());
 	einfo.best_score = 0.0f;
 
 	// enumerate the modes

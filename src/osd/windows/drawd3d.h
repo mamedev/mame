@@ -102,7 +102,7 @@ public:
 	renderer(win_window_info *window);
 	virtual ~renderer();
 
-	virtual int init();
+	virtual int create();
 	virtual render_primitive_list *get_primitives();
 	virtual int draw(HDC dc, int update);
 	virtual void save();
