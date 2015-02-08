@@ -496,7 +496,14 @@ public:
 
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
+	enum
+	{
+		TIMER_VBIRQ
+	};
+
+	emu_timer *m_vbirq;
 	UINT8 *m_ipl_rom;
 	UINT8 *m_char_rom;
 	UINT8 *m_kanji_rom;
@@ -504,7 +511,6 @@ public:
 	UINT8 m_dma_offset[4];
 	int m_dack;
 
-	UINT8 m_vrtc_irq_mask;
 	UINT8 m_video_ff[8],m_gfx_ff;
 	UINT8 m_txt_scroll_reg[8];
 	UINT8 m_pal_clut[4];
@@ -562,7 +568,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_uart_clock );
 	DECLARE_WRITE8_MEMBER(rtc_dmapg_w);
 	DECLARE_WRITE8_MEMBER(nmi_ctrl_w);
-	DECLARE_WRITE8_MEMBER(vrtc_mask_w);
+	DECLARE_WRITE8_MEMBER(vrtc_clear_w);
 	DECLARE_WRITE8_MEMBER(pc9801_video_ff_w);
 	DECLARE_READ8_MEMBER(txt_scrl_r);
 	DECLARE_WRITE8_MEMBER(txt_scrl_w);
@@ -730,6 +736,15 @@ public:
 
 #define ANALOG_16_MODE 0
 #define ANALOG_256_MODE 0x10
+
+void pc9801_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch(id)
+	{
+		case TIMER_VBIRQ:
+			m_pic1->ir2_w(0);
+	}
+}
 
 void pc9801_state::video_start()
 {
@@ -988,9 +1003,9 @@ WRITE8_MEMBER(pc9801_state::nmi_ctrl_w)
 	m_nmi_ff = (offset & 2) >> 1;
 }
 
-WRITE8_MEMBER(pc9801_state::vrtc_mask_w)
+WRITE8_MEMBER(pc9801_state::vrtc_clear_w)
 {
-	m_vrtc_irq_mask = 1;
+	m_pic1->ir2_w(0);
 }
 
 WRITE8_MEMBER(pc9801_state::pc9801_video_ff_w)
@@ -1723,7 +1738,7 @@ static ADDRESS_MAP_START( pc9801_io, AS_IO, 16, pc9801_state )
 	AM_RANGE(0x0050, 0x0057) AM_DEVREADWRITE8("ppi8255_fdd", i8255_device, read, write, 0xff00)
 	AM_RANGE(0x0050, 0x0053) AM_WRITE8(nmi_ctrl_w,0x00ff) // NMI FF / i8255 floppy port (2d?)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("upd7220_chr", upd7220_device, read, write, 0x00ff) //upd7220 character ports / <undefined>
-	AM_RANGE(0x0064, 0x0065) AM_WRITE8(vrtc_mask_w,0x00ff)
+	AM_RANGE(0x0064, 0x0065) AM_WRITE8(vrtc_clear_w,0x00ff)
 	AM_RANGE(0x0068, 0x0069) AM_WRITE8(pc9801_video_ff_w,0x00ff) //mode FF / <undefined>
 //  AM_RANGE(0x006c, 0x006f) border color / <undefined>
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0xff00)
@@ -2417,7 +2432,7 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x0050, 0x0053) AM_WRITE8(pc9801rs_nmi_w, 0xffffffff)
 	AM_RANGE(0x005c, 0x005f) AM_READ16(pc9821_timestamp_r,0xffffffff) AM_WRITENOP // artic
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("upd7220_chr", upd7220_device, read, write, 0x00ff00ff) //upd7220 character ports / <undefined>
-	AM_RANGE(0x0064, 0x0067) AM_WRITE8(vrtc_mask_w, 0x000000ff)
+	AM_RANGE(0x0064, 0x0067) AM_WRITE8(vrtc_clear_w, 0x000000ff)
 	AM_RANGE(0x0068, 0x006b) AM_WRITE8(pc9821_video_ff_w,  0x00ff00ff) //mode FF / <undefined>
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0xff00ff00)
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE8(grcg_r,      grcg_w,      0x00ff00ff) //display registers "GRCG" / i8253 pit
@@ -2982,11 +2997,11 @@ MACHINE_START_MEMBER(pc9801_state,pc9801_common)
 	m_rtc->oe_w(1);
 
 	m_ipl_rom = memregion("ipl")->base();
+	m_vbirq = timer_alloc(TIMER_VBIRQ);
 
 	save_item(NAME(m_sasi_data));
 	save_item(NAME(m_sasi_data_enable));
 	save_item(NAME(m_sasi_ctrl));
-	save_item(NAME(m_vrtc_irq_mask));
 }
 
 MACHINE_START_MEMBER(pc9801_state,pc9801f)
@@ -3116,14 +3131,8 @@ void pc9801_state::device_reset_after_children()
 
 INTERRUPT_GEN_MEMBER(pc9801_state::pc9801_vrtc_irq)
 {
-	if(m_vrtc_irq_mask)
-	{
-		m_pic1->ir2_w(0);
-		m_pic1->ir2_w(1);
-		m_vrtc_irq_mask = 0; // TODO: this irq auto-masks?
-	}
-//  else
-//      pic8259_ir2_w(machine().device("pic8259_master"), 0);
+	m_pic1->ir2_w(1);
+	m_vbirq->adjust(m_screen->time_until_vblank_end());
 }
 
 

@@ -28,11 +28,22 @@ public:
 	tmtennis_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_button_matrix(*this, "IN"),
 		m_speaker(*this, "speaker")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_ioport_array<2> m_button_matrix;
 	required_device<speaker_sound_device> m_speaker;
+	
+	UINT8 m_input_mux;
+	UINT16 m_plate;
+	UINT16 m_grid;
+
+	DECLARE_READ8_MEMBER(input_r);
+	DECLARE_WRITE8_MEMBER(port_e_w);
+	DECLARE_WRITE8_MEMBER(plate_w);
+	DECLARE_WRITE8_MEMBER(grid_w);
 
 	virtual void machine_start();
 };
@@ -45,6 +56,42 @@ public:
 
 ***************************************************************************/
 
+READ8_MEMBER(tmtennis_state::input_r)
+{
+	// port A/B: buttons
+	UINT8 inp = 0xff;
+
+	// read selected button rows
+	for (int i = 0; i < 2; i++)
+		if (~m_input_mux & (1 << i))
+			inp &= m_button_matrix[i]->read();
+
+	return inp >> (offset*4);
+}
+
+WRITE8_MEMBER(tmtennis_state::port_e_w)
+{
+	// E0/E1: input mux
+	// E2: speaker out
+	// E3: N/C
+	m_input_mux = data & 3;
+	m_speaker->level_w(data >> 2 & 1);
+}
+
+WRITE8_MEMBER(tmtennis_state::plate_w)
+{
+	// port C/D/F: vfd matrix plate
+	if (offset == NEC_UCOM4_PORTF) offset--;
+	int shift = (offset - NEC_UCOM4_PORTC) * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+}
+
+WRITE8_MEMBER(tmtennis_state::grid_w)
+{
+	// port G/H/I: vfd matrix grid
+	int shift = (offset - NEC_UCOM4_PORTG) * 4;
+	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
+}
 
 
 /***************************************************************************
@@ -54,6 +101,25 @@ public:
 ***************************************************************************/
 
 static INPUT_PORTS_START( tmtennis )
+	PORT_START("IN.0") // E0 port A/B
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(2)
+
+	PORT_START("IN.1") // E1 port A/B
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 )
 INPUT_PORTS_END
 
 
@@ -66,6 +132,15 @@ INPUT_PORTS_END
 
 void tmtennis_state::machine_start()
 {
+	// zerofill
+	m_input_mux = 0;
+	m_plate = 0;
+	m_grid = 0;
+
+	// register for savestates
+	save_item(NAME(m_input_mux));
+	save_item(NAME(m_plate));
+	save_item(NAME(m_grid));
 }
 
 
@@ -73,6 +148,15 @@ static MACHINE_CONFIG_START( tmtennis, tmtennis_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D552, MASTER_CLOCK_PRO2)
+	MCFG_UCOM4_READ_A_CB(READ8(tmtennis_state, input_r))
+	MCFG_UCOM4_READ_B_CB(READ8(tmtennis_state, input_r))
+	MCFG_UCOM4_WRITE_C_CB(WRITE8(tmtennis_state, plate_w))
+	MCFG_UCOM4_WRITE_D_CB(WRITE8(tmtennis_state, plate_w))
+	MCFG_UCOM4_WRITE_E_CB(WRITE8(tmtennis_state, port_e_w))
+	MCFG_UCOM4_WRITE_F_CB(WRITE8(tmtennis_state, plate_w))
+	MCFG_UCOM4_WRITE_G_CB(WRITE8(tmtennis_state, grid_w))
+	MCFG_UCOM4_WRITE_H_CB(WRITE8(tmtennis_state, grid_w))
+	MCFG_UCOM4_WRITE_I_CB(WRITE8(tmtennis_state, grid_w))
 
 	MCFG_DEFAULT_LAYOUT(layout_tmtennis)
 
