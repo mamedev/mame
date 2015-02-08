@@ -4,8 +4,10 @@
 
   NEC uCOM-4 MCU family cores
   
-  reference: 1981 NEC Microcomputers Catalog (later editions may have errors!)
-  also looked at asterick's JavaScript D553 emulator for verification, with permission
+  References:
+  - 1981 NEC Microcomputers Catalog (later editions may have errors!)
+  - Supplement to uCOM-43 Single Chip Microcomputer Users' Manual
+  I've also looked at asterick's JavaScript D553 emulator for verification, with permission.
 
   TODO:
   - what happens with uCOM-43 opcodes on an uCOM-44/45 MCU?
@@ -52,7 +54,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(data_96x4, AS_DATA, 8, ucom4_cpu_device)
 	AM_RANGE(0x00, 0x3f) AM_RAM
-	AM_RANGE(0x40, 0x5f) AM_RAM AM_MIRROR(0x20)
+	AM_RANGE(0x40, 0x4f) AM_RAM
+	AM_RANGE(0x70, 0x7f) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -199,6 +202,12 @@ void ucom4_cpu_device::device_reset()
 //  execute
 //-------------------------------------------------
 
+void ucom4_cpu_device::increment_pc()
+{
+	// upper bits (field register) don't auto-increment
+	m_pc = (m_pc & ~0xff) | ((m_pc + 1) & 0xff);
+}
+
 void ucom4_cpu_device::fetch_arg()
 {
 	// 2-byte opcodes: STM/LDI/CLI/CI, JMP/CAL, OCD
@@ -206,7 +215,7 @@ void ucom4_cpu_device::fetch_arg()
 	{
 		m_icount--;
 		m_arg = m_program->read_byte(m_pc);
-		m_pc = (m_pc + 1) & m_prgmask;
+		increment_pc();
 	}
 }
 
@@ -222,7 +231,7 @@ void ucom4_cpu_device::execute_run()
 		debugger_instruction_hook(this, m_pc);
 		m_op = m_program->read_byte(m_pc);
 		m_bitmask = 1 << (m_op & 0x03);
-		m_pc = (m_pc + 1) & m_prgmask;
+		increment_pc();
 		fetch_arg();
 		
 		if (m_skip)

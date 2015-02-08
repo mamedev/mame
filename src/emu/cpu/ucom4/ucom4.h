@@ -110,8 +110,6 @@ protected:
 	virtual UINT32 execute_input_lines() const { return 1; }
 	virtual void execute_run();
 	
-	void fetch_arg();
-
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return(spacenum == AS_PROGRAM) ? &m_program_config :((spacenum == AS_DATA) ? &m_data_config : NULL); }
 
@@ -167,15 +165,23 @@ protected:
 	devcb_write8 m_write_h;
 	devcb_write8 m_write_i;
 	
-	// opcode handlers
+	// misc internal helpers
+	void increment_pc();
+	void fetch_arg();
+
 	UINT8 ram_r();
 	void ram_w(UINT8 data);
 	void pop_stack();
 	void push_stack();
 	UINT8 input_r(int index);
 	void output_w(int index, UINT8 data);
-	void op_illegal();
+
 	bool check_op_43();
+	UINT8 ucom43_reg_r(int index);
+	void ucom43_reg_w(int index, UINT8 data);
+
+	// opcode handlers
+	void op_illegal();
 
 	void op_li();
 	void op_lm();
