@@ -14,7 +14,7 @@
 #include "cpu/ucom4/ucom4.h"
 #include "sound/speaker.h"
 
-#include "tmtennis.lh"
+#include "tmtennis.lh" // this is a test layout, external artwork is necessary
 
 // master clock is from an LC circuit oscillating by default at 360kHz,
 // the difficulty switch puts a capacitor across it to slow it down to 260kHz

@@ -11,6 +11,7 @@
 
   TODO:
   - what happens with uCOM-43 opcodes on an uCOM-44/45 MCU?
+  - what's the data after the ROM data for? (eg. 2000-2047, official ROM size is 2000)
 
 */
 
