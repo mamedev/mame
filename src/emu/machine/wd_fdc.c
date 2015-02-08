@@ -887,7 +887,7 @@ void wd_fdc_t::interrupt_start()
 	if(!(command & 0x0f)) {
 		intrq_cond = 0;
 	} else {
-		intrq_cond = (intrq_cond & I_IMM) | (command & 0x07);
+		intrq_cond = (intrq_cond & I_IMM) | (command & 0x0f);
 	}
 
 	if(intrq_cond & I_IMM) {
