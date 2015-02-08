@@ -45,8 +45,32 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE8_MEMBER(grid_w);
 
+	UINT16 m_vfd_state[0x10];
+	void update_vfd();
+
 	virtual void machine_start();
 };
+
+
+
+/***************************************************************************
+
+  Display
+
+***************************************************************************/
+
+void tmtennis_state::update_vfd()
+{
+	for (int i = 0; i < 12; i++)
+		if (m_grid & (1 << i) && m_vfd_state[i] != m_plate)
+		{
+			// on difference, send to output
+			for (int j = 0; j < 12; j++)
+				output_set_lamp_value(i*100 + j, m_plate >> j & 1);
+			
+			m_vfd_state[i] = m_plate;
+		}
+}
 
 
 
@@ -84,6 +108,8 @@ WRITE8_MEMBER(tmtennis_state::plate_w)
 	if (offset == NEC_UCOM4_PORTF) offset--;
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	
+	update_vfd();
 }
 
 WRITE8_MEMBER(tmtennis_state::grid_w)
@@ -91,6 +117,8 @@ WRITE8_MEMBER(tmtennis_state::grid_w)
 	// port G/H/I: vfd matrix grid
 	int shift = (offset - NEC_UCOM4_PORTG) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
+	
+	update_vfd();
 }
 
 
@@ -133,11 +161,13 @@ INPUT_PORTS_END
 void tmtennis_state::machine_start()
 {
 	// zerofill
+	memset(m_vfd_state, 0, sizeof(m_vfd_state));
 	m_input_mux = 0;
 	m_plate = 0;
 	m_grid = 0;
 
 	// register for savestates
+	save_item(NAME(m_vfd_state));
 	save_item(NAME(m_input_mux));
 	save_item(NAME(m_plate));
 	save_item(NAME(m_grid));
