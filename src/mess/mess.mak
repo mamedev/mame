@@ -1229,6 +1229,7 @@ $(MESSOBJ)/entex.a:             \
 	$(MESS_DRIVERS)/advision.o $(MESS_MACHINE)/advision.o $(MESS_VIDEO)/advision.o \
 
 $(MESSOBJ)/epoch.a:             \
+	$(MESS_DRIVERS)/edracula.o  \
 	$(MESS_DRIVERS)/gamepock.o $(MESS_MACHINE)/gamepock.o \
 	$(MESS_DRIVERS)/scv.o $(MESS_AUDIO)/upd1771.o \
 
@@ -1788,6 +1789,7 @@ $(MESSOBJ)/tiki.a:              \
 	$(MESS_DRIVERS)/tiki100.o   \
 
 $(MESSOBJ)/tomy.a:              \
+	$(MESS_DRIVERS)/alnchase.o  \
 	$(MESS_DRIVERS)/tmtennis.o  \
 	$(MESS_DRIVERS)/tutor.o     \
 
@@ -2095,6 +2097,7 @@ $(MESS_DRIVERS)/acrnsys1.o: $(MESS_LAYOUT)/acrnsys1.lh
 $(MESS_DRIVERS)/aim65.o:    $(MESS_LAYOUT)/aim65.lh
 $(MESS_DRIVERS)/aim65_40.o: $(MESS_LAYOUT)/aim65_40.lh
 $(MESS_DRIVERS)/alesis.o:   $(MESS_LAYOUT)/sr16.lh
+$(MESS_DRIVERS)/alnchase.o: $(MESS_LAYOUT)/alnchase.lh
 $(MESS_DRIVERS)/amaztron.o: $(MESS_LAYOUT)/amaztron.lh
 $(MESS_DRIVERS)/amico2k.o:  $(MESS_LAYOUT)/amico2k.lh
 $(MESS_DRIVERS)/amiga.o:    $(MESS_LAYOUT)/amiga.lh
@@ -2124,6 +2127,7 @@ $(MESS_DRIVERS)/digel804.o: $(MESS_LAYOUT)/digel804.lh
 $(MESS_DRIVERS)/dmv.o:      $(MESS_LAYOUT)/dmv.lh
 $(MESS_DRIVERS)/dolphunk.o: $(MESS_LAYOUT)/dolphunk.lh
 $(MESS_DRIVERS)/eacc.o:     $(MESS_LAYOUT)/eacc.lh
+$(MESS_DRIVERS)/edracula.o: $(MESS_LAYOUT)/edracula.lh
 $(MESS_DRIVERS)/elecdet.o:  $(MESS_LAYOUT)/elecdet.lh
 $(MESS_DRIVERS)/elekscmp.o: $(MESS_LAYOUT)/elekscmp.lh
 $(MESS_DRIVERS)/elf.o:      $(MESS_LAYOUT)/elf2.lh
@@ -2186,7 +2190,8 @@ $(MESS_DRIVERS)/simon.o:    $(MESS_LAYOUT)/simon.lh
 $(MESS_DRIVERS)/sitcom.o:   $(MESS_LAYOUT)/sitcom.lh
 $(MESS_DRIVERS)/slc1.o:     $(MESS_LAYOUT)/slc1.lh
 $(MESS_DRIVERS)/sms.o:      $(MESS_LAYOUT)/sms1.lh
-$(MESS_DRIVERS)/splitsec.o: $(MESS_LAYOUT)/splitsec.lh
+$(MESS_DRIVERS)/splitsec.o: $(MESS_LAYOUT)/bankshot.lh \
+							$(MESS_LAYOUT)/splitsec.lh
 $(MESS_DRIVERS)/starwbc.o:  $(MESS_LAYOUT)/starwbc.lh
 $(MESS_DRIVERS)/stopthie.o: $(MESS_LAYOUT)/stopthie.lh
 $(MESS_DRIVERS)/super80.o:  $(MESS_LAYOUT)/super80.lh

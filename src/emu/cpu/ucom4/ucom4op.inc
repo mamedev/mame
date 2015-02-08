@@ -326,7 +326,7 @@ void ucom4_cpu_device::op_jmpcal()
 	// JMP A: Jump to Address / CAL A: Call Address
 	if (m_op & 0x08)
 		push_stack();
-	m_pc = (m_op & 0x07) << 8 | m_arg;
+	m_pc = ((m_op & 0x07) << 8 | m_arg) & m_prgmask;
 }
 
 void ucom4_cpu_device::op_jcp()
@@ -338,6 +338,7 @@ void ucom4_cpu_device::op_jcp()
 void ucom4_cpu_device::op_jpa()
 {
 	// JPA: Jump to (ACC) in current page
+	m_icount--;
 	m_pc = (m_pc & ~0x3f) | (m_acc << 2);
 }
 
@@ -358,7 +359,7 @@ void ucom4_cpu_device::op_rt()
 void ucom4_cpu_device::op_rts()
 {
 	// RTS: Return from subroutine, skip next
-	pop_stack();
+	op_rt();
 	m_skip = true;
 }
 
@@ -434,6 +435,7 @@ void ucom4_cpu_device::op_tit()
 void ucom4_cpu_device::op_ia()
 {
 	// IA: Input port A to ACC
+	m_icount--;
 	m_acc = input_r(NEC_UCOM4_PORTA);
 }
 
@@ -446,6 +448,7 @@ void ucom4_cpu_device::op_ip()
 void ucom4_cpu_device::op_oe()
 {
 	// OE: Output ACC to port E
+	m_icount--;
 	output_w(NEC_UCOM4_PORTE, m_acc);
 }
 
@@ -482,6 +485,29 @@ inline bool ucom4_cpu_device::check_op_43()
 
 	return (m_family == NEC_UCOM43);
 }
+
+// extra registers reside in RAM
+enum
+{
+	UCOM43_X = 0,
+	UCOM43_Y,
+	UCOM43_R,
+	UCOM43_S,
+	UCOM43_W,
+	UCOM43_Z,
+	UCOM43_F
+};
+
+inline UINT8 ucom4_cpu_device::ucom43_reg_r(int index)
+{
+	return m_data->read_byte(m_datamask - index) & 0xf;
+}
+
+inline void ucom4_cpu_device::ucom43_reg_w(int index, UINT8 data)
+{
+	m_data->write_byte(m_datamask - index, data & 0xf);
+}
+
 
 // Transfer
 
