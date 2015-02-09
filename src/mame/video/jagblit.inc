@@ -344,7 +344,7 @@ void jaguar_state::FUNCNAME(UINT32 command, UINT32 a1flags, UINT32 a2flags)
 	}
 
 	/* check for unhandled command bits */
-	if (LOG_UNHANDLED_BLITS && (COMMAND & 0x24003000))
+	if ((COMMAND & 0x24003000) && LOG_UNHANDLED_BLITS)
 		logerror("Blitter unhandled: these command bits: %08X\n", COMMAND & 0x24003000);
 
 	/* top of the outer loop */

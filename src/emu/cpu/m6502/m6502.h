@@ -220,8 +220,8 @@ protected:
 
 	// inline helpers
 	static inline bool page_changing(UINT16 base, int delta) { return ((base + delta) ^ base) & 0xff00; }
-	static inline UINT16 set_l(UINT16 base, UINT16 val) { return (base & 0xff00) | val; }
-	static inline UINT16 set_h(UINT16 base, UINT16 val) { return (base & 0x00ff) | (val << 8); }
+	static inline UINT16 set_l(UINT16 base, UINT8 val) { return (base & 0xff00) | val; }
+	static inline UINT16 set_h(UINT16 base, UINT8 val) { return (base & 0x00ff) | (val << 8); }
 
 	inline void dec_SP() { SP = set_l(SP, SP-1); }
 	inline void inc_SP() { SP = set_l(SP, SP+1); }

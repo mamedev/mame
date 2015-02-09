@@ -338,18 +338,19 @@ public:
 		m_gn680(*this, "gn680"),
 		m_dsp(*this, "dsp"),
 		m_dsp2(*this, "dsp2"),
-		m_eeprom(*this, "eeprom"),
 		m_k037122_1(*this, "k037122_1"),
 		m_k037122_2(*this, "k037122_2" ),
 		m_adc12138(*this, "adc12138"),
+		m_konppc(*this, "konppc"),
+		m_lan_eeprom(*this, "lan_eeprom"),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
 		m_in2(*this, "IN2"),
 		m_dsw(*this, "DSW"),
 		m_eepromout(*this, "EEPROMOUT"),
 		m_analog1(*this, "ANALOG1"),
-		m_analog2(*this, "ANALOG2"),
-		m_konppc(*this, "konppc"){ }
+		m_analog2(*this, "ANALOG2")
+	{ }
 
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2800;
@@ -363,13 +364,13 @@ public:
 	optional_device<cpu_device> m_gn680;
 	required_device<cpu_device> m_dsp;
 	optional_device<cpu_device> m_dsp2;
-	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<k037122_device> m_k037122_1;
 	optional_device<k037122_device> m_k037122_2;
 	required_device<adc12138_device> m_adc12138;
-	required_ioport m_in0, m_in1, m_in2, m_dsw, m_eepromout;
-	optional_ioport m_analog1, m_analog2;
 	required_device<konppc_device> m_konppc;
+	optional_device<eeprom_serial_93cxx_device> m_lan_eeprom;
+	required_ioport m_in0, m_in1, m_in2, m_dsw;
+	optional_ioport m_eepromout, m_analog1, m_analog2;
 
 	emu_timer *m_sound_irq_timer;
 	UINT8 m_led_reg0;
@@ -534,7 +535,9 @@ READ8_MEMBER(hornet_state::sysreg_r)
 			    0x02 = ADDOR (ADC DOR)
 			    0x01 = ADDO (ADC DO)
 			*/
-			r = 0xf0 | (m_eeprom->do_read() << 3);
+			r = 0xf0; 
+			if (m_lan_eeprom)
+				r |= m_lan_eeprom->do_read() << 3;
 			r |= m_adc12138->do_r(space, 0) | (m_adc12138->eoc_r(space, 0) << 2);
 			break;
 
@@ -572,7 +575,8 @@ WRITE8_MEMBER(hornet_state::sysreg_w)
 			    0x02 = LAMP1
 			    0x01 = LAMP0
 			*/
-			m_eepromout->write(data, 0xff);
+			if (m_eepromout)
+				m_eepromout->write(data, 0xff);
 			osd_printf_debug("System register 0 = %02X\n", data);
 			break;
 
@@ -877,11 +881,6 @@ static INPUT_PORTS_START( hornet )
 	PORT_DIPNAME( 0x01, 0x01, "Monitor Type" ) PORT_DIPLOCATION("SW:8")
 	PORT_DIPSETTING( 0x01, "24KHz" )
 	PORT_DIPSETTING( 0x00, "15KHz" )
-
-	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sscope )
@@ -900,6 +899,16 @@ static INPUT_PORTS_START( sscope )
 
 	PORT_START("ANALOG2") // Gun Pitch
 	PORT_BIT( 0x7ff, 0x3ff, IPT_AD_STICK_Y ) PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_INVERT
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( sscope2 )
+	PORT_INCLUDE( sscope )
+
+	// LAN board EEPROM
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("lan_eeprom", eeprom_serial_93cxx_device, di_write)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("lan_eeprom", eeprom_serial_93cxx_device, clk_write)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("lan_eeprom", eeprom_serial_93cxx_device, cs_write)
 INPUT_PORTS_END
 
 
@@ -977,8 +986,8 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+//  PCB description at top doesn't mention any EEPROM on the base board...
+//	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_DEVICE_ADD("voodoo0", VOODOO_1, STD_VOODOO_1_CLOCK)
 	MCFG_VOODOO_FBMEM(2)
@@ -1528,17 +1537,17 @@ ROM_END
 
 /*************************************************************************/
 
-GAME(  1998, gradius4,  0,        hornet,           hornet, hornet_state, hornet,        ROT0, "Konami", "Gradius 4: Fukkatsu", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME(  1998, nbapbp,    0,        hornet,           hornet, hornet_state, hornet,        ROT0, "Konami", "NBA Play By Play", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAMEL( 1998, terabrst,  0,        terabrst,         hornet, hornet_state, hornet_2board, ROT0, "Konami", "Teraburst (1998/07/17 ver UEL)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 1998, terabrsta, terabrst, terabrst,         hornet, hornet_state, hornet_2board, ROT0, "Konami", "Teraburst (1998/02/25 ver AAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_dualhsxs )
+GAME(  1998, gradius4,  0,        hornet,           hornet,  hornet_state, hornet,        ROT0, "Konami", "Gradius 4: Fukkatsu", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME(  1998, nbapbp,    0,        hornet,           hornet,  hornet_state, hornet,        ROT0, "Konami", "NBA Play By Play", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAMEL( 1998, terabrst,  0,        terabrst,         hornet,  hornet_state, hornet_2board, ROT0, "Konami", "Teraburst (1998/07/17 ver UEL)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 1998, terabrsta, terabrst, terabrst,         hornet,  hornet_state, hornet_2board, ROT0, "Konami", "Teraburst (1998/02/25 ver AAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_dualhsxs )
 
 // The region comes from the Timekeeper NVRAM, without a valid default all sets except 'xxD, Ver 1.33' will init their NVRAM to UAx versions, the xxD set seems to incorrectly init it to JXD, which isn't a valid
 // version, and thus can't be booted.  If you copy the NVRAM from another already initialized set, it will boot as UAD.
 // to get the actual game to boot you must calibrate the guns etc.
-GAMEL( 2000, sscope,    0,        hornet_2board,    sscope, hornet_state, hornet_2board, ROT0, "Konami", "Silent Scope (ver xxD, Ver 1.33)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 2000, sscopec,   sscope,   hornet_2board,    sscope, hornet_state, hornet_2board, ROT0, "Konami", "Silent Scope (ver xxC, Ver 1.30)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 2000, sscopeb,   sscope,   hornet_2board,    sscope, hornet_state, hornet_2board, ROT0, "Konami", "Silent Scope (ver xxB, Ver 1.20)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 2000, sscopea,   sscope,   hornet_2board,    sscope, hornet_state, hornet_2board, ROT0, "Konami", "Silent Scope (ver xxA, Ver 1.00)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscope,    0,        hornet_2board,    sscope,  hornet_state, hornet_2board, ROT0, "Konami", "Silent Scope (ver xxD, Ver 1.33)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscopec,   sscope,   hornet_2board,    sscope,  hornet_state, hornet_2board, ROT0, "Konami", "Silent Scope (ver xxC, Ver 1.30)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscopeb,   sscope,   hornet_2board,    sscope,  hornet_state, hornet_2board, ROT0, "Konami", "Silent Scope (ver xxB, Ver 1.20)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscopea,   sscope,   hornet_2board,    sscope,  hornet_state, hornet_2board, ROT0, "Konami", "Silent Scope (ver xxA, Ver 1.00)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
 
-GAMEL( 2000, sscope2,   0,        sscope2,          sscope, hornet_state, hornet_2board, ROT0, "Konami", "Silent Scope 2", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscope2,   0,        sscope2,          sscope2, hornet_state, hornet_2board, ROT0, "Konami", "Silent Scope 2", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )

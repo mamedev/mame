@@ -69,58 +69,58 @@ class panicr_state : public driver_device
 public:
 	panicr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_mainram(*this, "mainram"),
-		m_spriteram(*this, "spriteram"),
-		m_textram(*this, "textram"),
-		m_spritebank(*this, "spritebank"),
 		m_maincpu(*this, "maincpu"),
 		m_t5182(*this, "t5182"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
-
-	required_shared_ptr<UINT8> m_mainram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_textram;
-	required_shared_ptr<UINT8> m_spritebank;
+		m_palette(*this, "palette"),
+		m_mainram(*this, "mainram"),
+		m_spriteram(*this, "spriteram"),
+		m_textram(*this, "textram"),
+		m_spritebank(*this, "spritebank") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<t5182_device> m_t5182;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	
+	required_shared_ptr<UINT8> m_mainram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_textram;
+	required_shared_ptr<UINT8> m_spritebank;
 
 	tilemap_t *m_bgtilemap;
 	tilemap_t *m_infotilemap_2;
-
 	tilemap_t *m_txttilemap;
-	int m_scrollx;
 
-	DECLARE_READ8_MEMBER(panicr_collision_r);
-	DECLARE_WRITE8_MEMBER(panicr_scrollx_lo_w);
-	DECLARE_WRITE8_MEMBER(panicr_scrollx_hi_w);
-	DECLARE_WRITE8_MEMBER(panicr_output_w);
+	int m_scrollx;
+	bitmap_ind16 *m_temprender;
+	bitmap_ind16 *m_tempbitmap_1;
+	rectangle m_tempbitmap_clip;
+
+	DECLARE_READ8_MEMBER(collision_r);
+	DECLARE_WRITE8_MEMBER(scrollx_lo_w);
+	DECLARE_WRITE8_MEMBER(scrollx_hi_w);
+	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_READ8_MEMBER(t5182shared_r);
 	DECLARE_WRITE8_MEMBER(t5182shared_w);
 
-	DECLARE_DRIVER_INIT(panicr);
 	TILE_GET_INFO_MEMBER(get_bgtile_info);
 	TILE_GET_INFO_MEMBER(get_infotile_info);
 	TILE_GET_INFO_MEMBER(get_infotile_info_2);
 	TILE_GET_INFO_MEMBER(get_infotile_info_3);
 	TILE_GET_INFO_MEMBER(get_infotile_info_4);
-
 	TILE_GET_INFO_MEMBER(get_txttile_info);
+	
+	DECLARE_DRIVER_INIT(panicr);
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(panicr);
-	UINT32 screen_update_panicr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(panicr_scanline);
+	
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect );
-
-	bitmap_ind16 *m_temprender;
-
-	bitmap_ind16 *m_tempbitmap_1;
-	rectangle m_tempbitmap_clip;
+	
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 };
 
 
@@ -243,11 +243,12 @@ void panicr_state::video_start()
 
 	m_txttilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(panicr_state::get_txttile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
 	m_txttilemap->configure_groups(*m_gfxdecode->gfx(0), 0);
+	
+	save_item(NAME(m_scrollx));
 }
 
 void panicr_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
 	int offs,flipx,flipy,x,y,color,sprite;
 
 
@@ -256,24 +257,24 @@ void panicr_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect )
 	for (offs = m_spriteram.bytes() - 16; offs>=0; offs-=16)
 	{
 		flipx = 0;
-		flipy = spriteram[offs+1] & 0x80;
-		y = spriteram[offs+2];
-		x = spriteram[offs+3];
-		if (spriteram[offs+1] & 0x40) x -= 0x100;
+		flipy = m_spriteram[offs+1] & 0x80;
+		y = m_spriteram[offs+2];
+		x = m_spriteram[offs+3];
+		if (m_spriteram[offs+1] & 0x40) x -= 0x100;
 
-		if (spriteram[offs+1] & 0x20)
+		if (m_spriteram[offs+1] & 0x20)
 		{
 			// often set
 		}
 
-		if (spriteram[offs+1] & 0x10)
+		if (m_spriteram[offs+1] & 0x10)
 		{
-			popmessage("(spriteram[offs+1] & 0x10) %02x\n", (spriteram[offs+1] & 0x10));
+			popmessage("(spriteram[offs+1] & 0x10) %02x\n", (m_spriteram[offs+1] & 0x10));
 		}
 
 
-		color = spriteram[offs+1] & 0x0f;
-		sprite = spriteram[offs+0] | (*m_spritebank << 8);
+		color = m_spriteram[offs+1] & 0x0f;
+		sprite = m_spriteram[offs+0] | (*m_spritebank << 8);
 
 		m_gfxdecode->gfx(2)->transmask(bitmap,cliprect,
 				sprite,
@@ -282,7 +283,7 @@ void panicr_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect )
 	}
 }
 
-UINT32 panicr_state::screen_update_panicr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 panicr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bgtilemap->set_scrollx(0, m_scrollx);
 	m_bgtilemap->draw(screen, *m_temprender, m_tempbitmap_clip, 0,0);
@@ -341,7 +342,7 @@ UINT32 panicr_state::screen_update_panicr(screen_device &screen, bitmap_ind16 &b
 
 ***************************************************************************/
 
-READ8_MEMBER(panicr_state::panicr_collision_r)
+READ8_MEMBER(panicr_state::collision_r)
 {
 	// re-render the collision data here
 	// collisions are based on 2 bits from the tile data, relative to a page of tiles
@@ -384,25 +385,25 @@ READ8_MEMBER(panicr_state::panicr_collision_r)
 }
 
 
-WRITE8_MEMBER(panicr_state::panicr_scrollx_lo_w)
+WRITE8_MEMBER(panicr_state::scrollx_lo_w)
 {
-	logerror("panicr_scrollx_lo_w %02x\n", data);
+	logerror("scrollx_lo_w %02x\n", data);
 	m_scrollx = (m_scrollx & 0xff00) | (data << 1 & 0xfe) | (data >> 7 & 0x01);
 }
 
-WRITE8_MEMBER(panicr_state::panicr_scrollx_hi_w)
+WRITE8_MEMBER(panicr_state::scrollx_hi_w)
 {
-	logerror("panicr_scrollx_hi_w %02x\n", data);
+	logerror("scrollx_hi_w %02x\n", data);
 	m_scrollx = (m_scrollx & 0xff) | ((data &0xf0) << 4) | ((data & 0x0f) << 12);
 }
 
-WRITE8_MEMBER(panicr_state::panicr_output_w)
+WRITE8_MEMBER(panicr_state::output_w)
 {
 	// d6, d7: play counter? (it only triggers on 1st coin)
 	coin_counter_w(machine(), 0, (data & 0x40) ? 1 : 0);
 	coin_counter_w(machine(), 1, (data & 0x80) ? 1 : 0);
 
-	logerror("panicr_output_w %02x\n", data);
+	logerror("output_w %02x\n", data);
 
 	// other bits: ?
 }
@@ -426,7 +427,7 @@ static ADDRESS_MAP_START( panicr_map, AS_PROGRAM, 8, panicr_state )
 	AM_RANGE(0x00000, 0x01fff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x02000, 0x03cff) AM_RAM AM_SHARE("spriteram") // how big is sprite ram, some places definitely have sprites at 3000+
 	AM_RANGE(0x03d00, 0x03fff) AM_RAM
-	AM_RANGE(0x08000, 0x0bfff) AM_READ(panicr_collision_r)
+	AM_RANGE(0x08000, 0x0bfff) AM_READ(collision_r)
 	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_SHARE("textram")
 	AM_RANGE(0x0d000, 0x0d000) AM_DEVWRITE("t5182", t5182_device, sound_irq_w)
 	AM_RANGE(0x0d002, 0x0d002) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_acquire_w)
@@ -438,9 +439,9 @@ static ADDRESS_MAP_START( panicr_map, AS_PROGRAM, 8, panicr_state )
 	AM_RANGE(0x0d404, 0x0d404) AM_READ_PORT("START")
 	AM_RANGE(0x0d406, 0x0d406) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0d407, 0x0d407) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0d802, 0x0d802) AM_WRITE(panicr_scrollx_hi_w)
-	AM_RANGE(0x0d804, 0x0d804) AM_WRITE(panicr_scrollx_lo_w)
-	AM_RANGE(0x0d80a, 0x0d80a) AM_WRITE(panicr_output_w)
+	AM_RANGE(0x0d802, 0x0d802) AM_WRITE(scrollx_hi_w)
+	AM_RANGE(0x0d804, 0x0d804) AM_WRITE(scrollx_lo_w)
+	AM_RANGE(0x0d80a, 0x0d80a) AM_WRITE(output_w)
 	AM_RANGE(0x0d80c, 0x0d80c) AM_WRITEONLY AM_SHARE("spritebank")
 	AM_RANGE(0x0d818, 0x0d818) AM_WRITENOP // watchdog?
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
@@ -519,9 +520,6 @@ static INPUT_PORTS_START( panicr )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
-	PORT_START(T5182COINPORT)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(2)
 INPUT_PORTS_END
 
 
@@ -594,7 +592,7 @@ static GFXDECODE_START( panicr )
 GFXDECODE_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(panicr_state::panicr_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(panicr_state::scanline)
 {
 	int scanline = param;
 
@@ -608,10 +606,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(panicr_state::panicr_scanline)
 static MACHINE_CONFIG_START( panicr, panicr_state )
 	MCFG_CPU_ADD("maincpu", V20,MASTER_CLOCK/2) /* Sony 8623h9 CXQ70116D-8 (V20 compatible) */
 	MCFG_CPU_PROGRAM_MAP(panicr_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", panicr_state, panicr_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", panicr_state, scanline, "screen", 0, 1)
 
-	MCFG_T5182_ADD("t5182")
-	MCFG_FRAGMENT_ADD(t5182)
+	MCFG_DEVICE_ADD("t5182", T5182, 0)
+	
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -619,7 +617,7 @@ static MACHINE_CONFIG_START( panicr, panicr_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(panicr_state, screen_update_panicr)
+	MCFG_SCREEN_UPDATE_DRIVER(panicr_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", panicr)
@@ -643,9 +641,8 @@ ROM_START( panicr )
 	ROM_LOAD16_BYTE("2.19m",   0x0f0000, 0x08000, CRC(3d48b0b5) SHA1(a6e8b38971a8964af463c16f32bb7dbd301dd314) )
 	ROM_LOAD16_BYTE("1.19n",   0x0f0001, 0x08000, CRC(674131b9) SHA1(63499cd5ad39e79e70f3ba7060680f0aa133f095) )
 
-	ROM_REGION( 0x10000, "t5182_z80", 0 ) /* Toshiba T5182 module */
-	ROM_LOAD( "t5182.rom", 0x0000, 0x2000, CRC(d354c8fc) SHA1(a1c9e1ac293f107f69cc5788cf6abc3db1646e33) )
-	ROM_LOAD( "22d.bin",   0x8000, 0x8000, CRC(eb1a46e1) SHA1(278859ae4bca9f421247e646d789fa1206dcd8fc) )
+	ROM_REGION( 0x8000, "t5182_z80", 0 ) /* Toshiba T5182 external ROM */
+	ROM_LOAD( "22d.bin",   0x0000, 0x8000, CRC(eb1a46e1) SHA1(278859ae4bca9f421247e646d789fa1206dcd8fc) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
 	ROM_LOAD( "13f.bin", 0x000000, 0x2000, CRC(4e6b3c04) SHA1(f388969d5d822df0eaa4d8300cbf9cee47468360) )
@@ -682,9 +679,8 @@ ROM_START( panicrg ) /* Distributed by TV-Tuning Videospiele GMBH */
 	ROM_LOAD16_BYTE("2g.19m",   0x0f0000, 0x08000, CRC(cf759403) SHA1(1a0911c943ecc752e46873c9a5da981745f7562d) )
 	ROM_LOAD16_BYTE("1g.19n",   0x0f0001, 0x08000, CRC(06877f9b) SHA1(8b92209d6422ff2b1f3cb66bd39a3ff84e399eec) )
 
-	ROM_REGION( 0x10000, "t5182_z80", 0 ) /* Toshiba T5182 module */
-	ROM_LOAD( "t5182.rom", 0x0000, 0x2000, CRC(d354c8fc) SHA1(a1c9e1ac293f107f69cc5788cf6abc3db1646e33) )
-	ROM_LOAD( "22d.bin",   0x8000, 0x8000, CRC(eb1a46e1) SHA1(278859ae4bca9f421247e646d789fa1206dcd8fc) )
+	ROM_REGION( 0x10000, "t5182_z80", 0 ) /* Toshiba T5182 external ROM */
+	ROM_LOAD( "22d.bin",   0x0000, 0x8000, CRC(eb1a46e1) SHA1(278859ae4bca9f421247e646d789fa1206dcd8fc) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
 	ROM_LOAD( "13f.bin", 0x000000, 0x2000, CRC(4e6b3c04) SHA1(f388969d5d822df0eaa4d8300cbf9cee47468360) )
@@ -832,5 +828,5 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 }
 
 
-GAME( 1986, panicr,  0,      panicr,  panicr, panicr_state,  panicr, ROT270, "Seibu Kaihatsu (Taito license)", "Panic Road (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1986, panicrg, panicr, panicr,  panicr, panicr_state,  panicr, ROT270, "Seibu Kaihatsu (Tuning license)", "Panic Road (Germany)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1986, panicr,  0,      panicr,  panicr, panicr_state,  panicr, ROT270, "Seibu Kaihatsu (Taito license)", "Panic Road (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1986, panicrg, panicr, panicr,  panicr, panicr_state,  panicr, ROT270, "Seibu Kaihatsu (Tuning license)", "Panic Road (Germany)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

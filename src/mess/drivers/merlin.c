@@ -2,7 +2,7 @@
 // copyright-holders:Wilbert Pol, hap
 /***************************************************************************
 
-  Parker Bros Merlin handheld computer game
+  Parker Bros Merlin handheld computer game, by Bob Doyle
   * TMS1100NLL MP3404A-N2 (has internal ROM)
 
   To start a game, press NEW GAME, followed by a number:

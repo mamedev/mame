@@ -35,6 +35,7 @@ Notes:
   - ship rays on Armed F title screen;
   - gameplay in Armed F abuses of this effect (shots, player ship lights etc.);
   - Terra Force helmet during the intro;
+  - Invincibility flickering of main character in Kozure Ookami;
 - (1) Kozure Ookami timer over bug:
       010118: lea     $63510.l, A0
       01011E: tst.w   (A0) ;check time variable, in BCD format
@@ -48,7 +49,8 @@ Notes:
       01016E: btst    #$7, $60621.l ;check dsw2 ram copy bit 15 (debug feature?)
       010176: bne     $1017e
       010178: bra     $f9f0 ;timer over event occurs
-  btanb perhaps?
+  btanb perhaps? Currently patched to work, might also be that DSW2 bit 7 is actually a MCU bit ready flag, so it 
+  definitely needs PCB tests.
 
 
 Stephh's notes (based on the games M68000 code and some tests) :
@@ -412,7 +414,7 @@ static ADDRESS_MAP_START( kozure_map, AS_PROGRAM, 16, armedf_state )
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
 //  AM_RANGE(0x07c000, 0x07c001) AM_WRITE(kozure_io_w)
 //  AM_RANGE(0x0c0000, 0x0c0001) AM_WRITENOP /* watchdog? */
-//  AM_RANGE(0xffd000, 0xffd001) AM_WRITENOP /* ? */
+//  AM_RANGE(0xffd000, 0xffd001) AM_WRITENOP /* passes crc ROM information to MCU, I guess */
 	AM_IMPORT_FROM( terraf_map )
 ADDRESS_MAP_END
 
@@ -943,7 +945,9 @@ static INPUT_PORTS_START( kozure )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )       PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
+	PORT_DIPNAME( 0x80, 0x80, "Infinite Timer (Cheat)" )       PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cclimbr2 )
@@ -2075,6 +2079,12 @@ DRIVER_INIT_MEMBER(armedf_state,armedf)
 
 DRIVER_INIT_MEMBER(armedf_state,kozure)
 {
+	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
+
+	/* patch "time over" bug, see notes on top. */
+	ROM[0x1016c/2] = 0x4e71;
+	/* ROM check at POST. */
+	ROM[0x04fc6/2] = 0x4e71;
 	m_scroll_type = 0;
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
@@ -2086,7 +2096,7 @@ DRIVER_INIT_MEMBER(armedf_state,legion)
 #if LEGION_HACK
 	/* This is a hack to allow you to use the extra features
 	     of 3 of the "Unused" Dip Switches (see notes above). */
-	UINT16 *RAM = (UINT16 *)memregion("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
 	RAM[0x0001d6 / 2] = 0x0001;
 	/* To avoid checksum error */
 	RAM[0x000488 / 2] = 0x4e71;
@@ -2138,7 +2148,7 @@ GAME( 1987, terrafu,  terraf,   terraf,   terraf,   armedf_state,   terrafu,  RO
 GAME( 1987, terrafj,  terraf,   terraf,   terraf,   armedf_state,   terrafu,  ROT0,   "Nichibutsu Japan",              "Terra Force (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1987, terrafjb, terraf,   terrafjb, terraf,   armedf_state,   terrafjb, ROT0,   "bootleg",                       "Terra Force (Japan bootleg with additional Z80)", GAME_SUPPORTS_SAVE )
 GAME( 1987, terrafb,  terraf,   terraf,   terraf,   armedf_state,   terraf,   ROT0,   "bootleg",                       "Terra Force (Japan bootleg set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1987, kozure,   0,        kozure,   kozure,   armedf_state,   kozure,   ROT0,   "Nichibutsu",                    "Kozure Ookami (Japan)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1987, kozure,   0,        kozure,   kozure,   armedf_state,   kozure,   ROT0,   "Nichibutsu",                    "Kozure Ookami (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1988, cclimbr2, 0,        cclimbr2, cclimbr2, armedf_state,   cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1988, cclimbr2a,cclimbr2, cclimbr2, cclimbr2, armedf_state,   cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan, Harder)", GAME_SUPPORTS_SAVE  )
 GAME( 1988, armedf,   0,        armedf,   armedf,   armedf_state,   armedf,   ROT270, "Nichibutsu",                    "Armed Formation", GAME_SUPPORTS_SAVE )

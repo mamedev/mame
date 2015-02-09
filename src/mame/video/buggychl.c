@@ -4,10 +4,8 @@
 
 PALETTE_INIT_MEMBER(buggychl_state, buggychl)
 {
-	int i;
-
 	/* arbitrary blue shading for the sky, estimation */
-	for (i = 0; i < 128; i++)
+	for (int i = 0; i < 128; i++)
 		palette.set_pen_color(i + 128, rgb_t(0, 240-i, 255));
 }
 
@@ -75,10 +73,8 @@ WRITE8_MEMBER(buggychl_state::buggychl_bg_scrollx_w)
 
 void buggychl_state::draw_sky( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	int x, y;
-
-	for (y = 0; y < 256; y++)
-		for (x = 0; x < 256; x++)
+	for (int y = 0; y < 256; y++)
+		for (int x = 0; x < 256; x++)
 			bitmap.pix16(y, x) = 128 + x / 2;
 }
 
@@ -156,7 +152,6 @@ void buggychl_state::draw_fg( bitmap_ind16 &bitmap, const rectangle &cliprect )
 
 void buggychl_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
 	int offs;
 	const UINT8 *gfx;
 
@@ -169,14 +164,14 @@ void buggychl_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		const UINT8 *lookup;
 		const UINT8 *zoomx_rom, *zoomy_rom;
 
-		sx = spriteram[offs + 3] - ((spriteram[offs + 2] & 0x80) << 1);
-		sy = 256 - 64 - spriteram[offs] + ((spriteram[offs + 1] & 0x80) << 1);
-		flipy = spriteram[offs + 1] & 0x40;
-		zoom = spriteram[offs + 1] & 0x3f;
+		sx = m_spriteram[offs + 3] - ((m_spriteram[offs + 2] & 0x80) << 1);
+		sy = 256 - 64 - m_spriteram[offs] + ((m_spriteram[offs + 1] & 0x80) << 1);
+		flipy = m_spriteram[offs + 1] & 0x40;
+		zoom = m_spriteram[offs + 1] & 0x3f;
 		zoomy_rom = gfx + (zoom << 6);
 		zoomx_rom = gfx + 0x2000 + (zoom << 3);
 
-		lookup = m_sprite_lookup + ((spriteram[offs + 2] & 0x7f) << 6);
+		lookup = m_sprite_lookup + ((m_spriteram[offs + 2] & 0x7f) << 6);
 
 		for (y = 0; y < 64; y++)
 		{

@@ -7,7 +7,7 @@
 
     PCB Notes:
 
-    Top board notable:
+    Top board notable (video)
 
     - Hitachi HD68HC000-12 68000 CPU (24 MHz crystal)
     - Hitachi HD46505SP-2 CRTC
@@ -17,7 +17,7 @@
     - rom0.u3 / rom1.u12 - 68000 program
     - rom2.u4 / rom3.u13 / rom4.u5 / rom5.u14 - graphics
 
-    Bottom board notable:
+    Bottom board notable (main / sound / io)
 
     - Zilog Z0840006PSC Z80 CPU (24 MHz crystal)
     - BSMT2000 custom audio IC
@@ -28,7 +28,7 @@
     - many connectors for I/O
 
     The sound and I/O board is used by other redemption games such as
-    Colorama and Wheel 'Em In
+    Colorama and Wheel 'Em In, Super Rock and Bowl
 
 ****************************************************************************/
 
@@ -52,15 +52,15 @@ class tapatune_state : public driver_device
 public:
 	tapatune_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_videocpu(*this, "videocpu"),
 		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu"),
 		m_bsmt(*this, "bsmt"),
 		m_videoram(*this, "videoram") {}
 
+	optional_device<cpu_device> m_videocpu;
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
 	required_device<bsmt2000_device> m_bsmt;
-	required_shared_ptr<UINT16> m_videoram;
+	optional_shared_ptr<UINT16> m_videoram;
 
 	UINT8   m_paletteram[0x300];
 	UINT16  m_palette_write_addr;
@@ -196,7 +196,7 @@ WRITE16_MEMBER(tapatune_state::palette_w)
 
 WRITE_LINE_MEMBER(tapatune_state::crtc_vsync)
 {
-	m_maincpu->set_input_line(2, state ? HOLD_LINE : CLEAR_LINE);
+	m_videocpu->set_input_line(2, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 
@@ -240,9 +240,13 @@ WRITE8_MEMBER(tapatune_state::write_index_to_68k)
 
 WRITE8_MEMBER(tapatune_state::write_data_to_68k)
 {
-	m_z80_to_68k_data = data;
-	m_z80_data_available = 1;
-	m_maincpu->set_input_line(1, HOLD_LINE);
+	// todo, use callback as this will hook up elsewhere on non-video games
+	if (m_videocpu)
+	{
+		m_z80_to_68k_data = data;
+		m_z80_data_available = 1;
+		m_videocpu->set_input_line(1, HOLD_LINE);
+	}
 }
 
 
@@ -266,7 +270,7 @@ READ8_MEMBER(tapatune_state::read_data_from_68k)
  *
  *************************************/
 
-static ADDRESS_MAP_START( tapatune_map, AS_PROGRAM, 16, tapatune_state )
+static ADDRESS_MAP_START( video_map, AS_PROGRAM, 16, tapatune_state )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM
 	AM_RANGE(0x300000, 0x31ffff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x320000, 0x33ffff) AM_RAM
@@ -278,13 +282,13 @@ static ADDRESS_MAP_START( tapatune_map, AS_PROGRAM, 16, tapatune_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tapatune_state )
+static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, tapatune_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START ( sound_io_map, AS_IO, 8, tapatune_state )
+static ADDRESS_MAP_START ( maincpu_io_map, AS_IO, 8, tapatune_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(bsmt_data_lo_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(bsmt_data_hi_w)
@@ -311,7 +315,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(tapatune_state::sound_irq_clear)
 {
-	m_soundcpu->set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0;
 }
 
@@ -500,33 +504,16 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tapatune, tapatune_state )
+static MACHINE_CONFIG_START( tapatune_base, tapatune_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
-	MCFG_CPU_PROGRAM_MAP(tapatune_map)
-
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_24MHz / 4)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz / 4)
+	MCFG_CPU_PROGRAM_MAP(maincpu_map)
+	MCFG_CPU_IO_MAP(maincpu_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(tapatune_state, irq0_line_assert, XTAL_24MHz / 4 / 4 / 4096)
-
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_24MHz / 16)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(5)
-	MCFG_MC6845_BEGIN_UPDATE_CB(tapatune_state, crtc_begin_update)
-	MCFG_MC6845_UPDATE_ROW_CB(tapatune_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(tapatune_state, crtc_vsync))
-
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz / 16 * 5, 500, 0, 320, 250, 0, 240)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -536,6 +523,24 @@ static MACHINE_CONFIG_START( tapatune, tapatune_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( tapatune, tapatune_base )
+	MCFG_CPU_ADD("videocpu", M68000, XTAL_24MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(video_map)
+
+	MCFG_QUANTUM_PERFECT_CPU("videocpu")
+
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_24MHz / 16)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(5)
+	MCFG_MC6845_BEGIN_UPDATE_CB(tapatune_state, crtc_begin_update)
+	MCFG_MC6845_UPDATE_ROW_CB(tapatune_state, crtc_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(tapatune_state, crtc_vsync))
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz / 16 * 5, 500, 0, 320, 250, 0, 240)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
+MACHINE_CONFIG_END
 
 /*************************************
  *
@@ -544,7 +549,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( tapatune )
-	ROM_REGION( 0x300000, "maincpu", 0 )
+	ROM_REGION( 0x300000, "videocpu", 0 )
 	ROM_LOAD16_BYTE("rom1.u12", 0x000000, 0x80000, CRC(1d3ed3f9) SHA1(a42997dffcd4a3e83a5cec75d5bb0c295bd18a8d) )
 	ROM_LOAD16_BYTE("rom0.u3",  0x000001, 0x80000, CRC(d76e5dec) SHA1(11b5fa6019e8b891550d37667aa156b113266b9b) )
 	ROM_LOAD16_BYTE("rom3.u13", 0x100000, 0x80000, CRC(798e004a) SHA1(8e40ea7bf6e9a67d1c182c3b132a71d1334e1ae8) )
@@ -552,11 +557,23 @@ ROM_START( tapatune )
 	ROM_LOAD16_BYTE("rom5.u14", 0x280000, 0x40000, CRC(5d3b8765) SHA1(049a115eb28554cc3f5ca813441c42d6b834fc6f) )
 	ROM_LOAD16_BYTE("rom4.u5",  0x280001, 0x40000, CRC(2a2eda6a) SHA1(ce86f0da2a41e23a842b3aa1659aad4817de333f) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom.u8", 0x0000, 0x10000, CRC(f5c571d7) SHA1(cb5ef3b2bce9a579b54678962082d0e2fc0f1cd9) )
 
 	ROM_REGION( 0x1000000, "bsmt", 0 )
 	ROM_LOAD( "arom1.u16",  0x000000, 0x20000, CRC(e51696bc) SHA1(b002f8705ad1877f91a860dddb0ae16b2e73dd15) )
+	ROM_CONTINUE(           0x040000, 0x20000 )
+	ROM_CONTINUE(           0x080000, 0x20000 )
+	ROM_CONTINUE(           0x0c0000, 0x20000 )
+	// U21 is not populated
+ROM_END
+
+ROM_START( srockbwl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "super_rnb.u8", 0x0000, 0x10000, CRC(ad264e73) SHA1(9f950e7e8ac02619d86d6144e187eddbe299580d) )
+
+	ROM_REGION( 0x1000000, "bsmt", 0 )
+	ROM_LOAD( "super_rnb_v1.1_4-7-94.u16",  0x000000, 0x20000, CRC(2fe5d1e2) SHA1(5ca18bf369a3021d84a776ce62db44c498119fc9) )
 	ROM_CONTINUE(           0x040000, 0x20000 )
 	ROM_CONTINUE(           0x080000, 0x20000 )
 	ROM_CONTINUE(           0x0c0000, 0x20000 )
@@ -570,4 +587,5 @@ ROM_END
  *
  *************************************/
 
-GAME(1994, tapatune, 0, tapatune, tapatune, driver_device, 0, ROT0, "Moloney Manufacturing Inc. / Creative Electronics and Software", "Tap a Tune", 0 )
+GAME(1994, tapatune, 0, tapatune,      tapatune, driver_device, 0, ROT0, "Moloney Manufacturing Inc. / Creative Electronics and Software", "Tap a Tune", 0 )
+GAME(1994, srockbwl, 0, tapatune_base, tapatune, driver_device, 0, ROT0, "Bromley", "Super Rock and Bowl (V1.1)", GAME_IS_SKELETON_MECHANICAL )

@@ -92,14 +92,10 @@ OSDOBJ = $(OBJ)/osd
 # add a define identifying the target osd
 DEFS += -DOSD_SDL
 
-# default to SDL2 for non-OS/2, non-Emscripten builds now
+# default to SDL2 for non-OS/2 builds now
 ifndef SDL_LIBVER
 ifneq ($(TARGETOS),os2)
-ifneq ($(TARGETOS),emscripten)
 SDL_LIBVER = sdl2
-else
-SDL_LIBVER = sdl
-endif
 else
 SDL_LIBVER = sdl
 endif
@@ -579,10 +575,7 @@ ifeq ($(NO_X11),1)
 NO_DEBUGGER = 1
 endif
 
-# Don't pull in the system includes if we are compiling for Emscripten, which has its own headers
-ifneq ($(TARGETOS),emscripten)
 INCPATH += `$(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-D[^ ]*\)::g'`
-endif
 CCOMFLAGS += `$(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-I[^ ]*\)::g'`
 
 BASELIBS += `$(SDL_CONFIG) --libs`
@@ -663,9 +656,7 @@ ifeq ($(BASE_TARGETOS),win32)
 OSDCOREOBJS += $(SDLMAIN)
 
 ifdef SDL_INSTALL_ROOT
-ifneq ($(TARGETOS),emscripten)
 INCPATH += -I$(SDL_INSTALL_ROOT)/include
-endif
 LIBS += -L$(SDL_INSTALL_ROOT)/lib
 #-Wl,-rpath,$(SDL_INSTALL_ROOT)/lib
 endif

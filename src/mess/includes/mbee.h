@@ -151,7 +151,6 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER( mbee_z80bin );
 	WRITE_LINE_MEMBER(fdc_intrq_w);
 	WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	UINT8 *m_p_videoram;
 	UINT8 *m_p_gfxram;
 	UINT8 *m_p_colorram;
@@ -183,7 +182,8 @@ private:
 	UINT8 m_sy6545_reg[32];
 	UINT8 m_sy6545_ind;
 	UINT8 m_fdc_rq;
-	void mbee256_setup_banks(UINT8 data);
+	UINT8 m_bank_array[33];
+	void mbee256_setup_banks(UINT8 data, bool first_time);
 	void sy6545_cursor_configure();
 	void keyboard_matrix_r(int offs);
 	void machine_reset_common_disk();

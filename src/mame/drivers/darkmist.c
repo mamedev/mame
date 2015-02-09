@@ -28,7 +28,7 @@ TODO:
 #include "includes/darkmist.h"
 
 
-WRITE8_MEMBER(darkmist_state::darkmist_hw_w)
+WRITE8_MEMBER(darkmist_state::hw_w)
 {
 	m_hw=data;
 	membank("bank1")->set_base(&memregion("maincpu")->base()[0x010000+((data&0x80)?0x4000:0)]);
@@ -40,7 +40,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, darkmist_state )
 	AM_RANGE(0xc801, 0xc801) AM_READ_PORT("P1")
 	AM_RANGE(0xc802, 0xc802) AM_READ_PORT("P2")
 	AM_RANGE(0xc803, 0xc803) AM_READ_PORT("START")
-	AM_RANGE(0xc804, 0xc804) AM_WRITE(darkmist_hw_w)
+	AM_RANGE(0xc804, 0xc804) AM_WRITE(hw_w)
 	AM_RANGE(0xc805, 0xc805) AM_WRITEONLY AM_SHARE("spritebank")
 	AM_RANGE(0xc806, 0xc806) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc807, 0xc807) AM_READ_PORT("DSW2")
@@ -173,10 +173,6 @@ static INPUT_PORTS_START( darkmist )
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
-	PORT_START(T5182COINPORT)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(2)
-
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -213,7 +209,7 @@ static GFXDECODE_START( darkmist )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,  0, 16*4 )
 GFXDECODE_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(darkmist_state::darkmist_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(darkmist_state::scanline)
 {
 	int scanline = param;
 
@@ -230,10 +226,10 @@ static MACHINE_CONFIG_START( darkmist, darkmist_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(memmap)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", darkmist_state, darkmist_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", darkmist_state, scanline, "screen", 0, 1)
 
-	MCFG_T5182_ADD("t5182")
-	MCFG_FRAGMENT_ADD(t5182)
+	MCFG_DEVICE_ADD("t5182", T5182, 0)
+	
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -241,7 +237,7 @@ static MACHINE_CONFIG_START( darkmist, darkmist_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(darkmist_state, screen_update_darkmist)
+	MCFG_SCREEN_UPDATE_DRIVER(darkmist_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", darkmist)
@@ -266,9 +262,8 @@ ROM_START( darkmist )
 
 	ROM_LOAD( "dm_16.rom", 0x10000, 0x08000, CRC(094579d9) SHA1(2449bc9ba38396912ee9b72dd870ea9fcff95776) )
 
-	ROM_REGION( 0x10000, "t5182_z80", 0 ) /* Toshiba T5182 module */
-	ROM_LOAD( "t5182.rom", 0x0000, 0x2000, CRC(d354c8fc) SHA1(a1c9e1ac293f107f69cc5788cf6abc3db1646e33) )
-	ROM_LOAD( "dm_17.rom", 0x8000, 0x8000, CRC(7723dcae) SHA1(a0c69e7a7b6fd74f7ed6b9c6419aed94aabcd4b0) )
+	ROM_REGION( 0x8000, "t5182_z80", 0 ) /* Toshiba T5182 external ROM */
+	ROM_LOAD( "dm_17.rom", 0x0000, 0x8000, CRC(7723dcae) SHA1(a0c69e7a7b6fd74f7ed6b9c6419aed94aabcd4b0) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "dm_13.rom", 0x00000, 0x02000, CRC(38bb38d9) SHA1(d751990166dd3d503c5de7667679b96210061cd1) )
@@ -395,7 +390,7 @@ void darkmist_state::decrypt_snd()
 	int i;
 	UINT8 *ROM = memregion("t5182_z80")->base();
 
-	for(i=0x8000;i<0x10000;i++)
+	for(i=0x0000;i<0x2000;i++)
 		ROM[i] = BITSWAP8(ROM[i], 7,1,2,3,4,5,6,0);
 }
 
@@ -473,4 +468,4 @@ DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 	}
 }
 
-GAME( 1986, darkmist, 0, darkmist, darkmist, darkmist_state, darkmist, ROT270, "Taito Corporation", "The Lost Castle In Darkmist", GAME_IMPERFECT_GRAPHICS|GAME_NO_COCKTAIL )
+GAME( 1986, darkmist, 0, darkmist, darkmist, darkmist_state, darkmist, ROT270, "Taito Corporation", "The Lost Castle In Darkmist", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

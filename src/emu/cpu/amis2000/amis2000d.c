@@ -31,6 +31,16 @@ static const char *const s_mnemonics[] =
 	"INP", "OUT", "DISB", "DISN", "MVS", "PSH", "PSL", "EUR"
 };
 
+// number of bits per opcode parameter, negative indicates complement
+static const INT8 s_bits[] =
+{
+	0, 0, 4, 2, 2, 2, 2, 0, 0, 0,
+	-2, -2, -2, -2, 2, 2,
+	0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 2, 0, 0, 0, 0, 0, 0, 0,
+	-4, 6, 6, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0
+};
 
 #define _OVER DASMFLAG_STEP_OVER
 #define _OUT  DASMFLAG_STEP_OUT
@@ -42,17 +52,6 @@ static const UINT32 s_flags[] =
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, _OVER, _OUT, _OUT, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0
-};
-
-
-static const int s_bits[] =
-{
-	0, 0, 4, 2, 2, 2, 2, 0, 0, 0,
-	-2, -2, -2, -2, 2, 2,
-	0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 2, 0, 0, 0, 0, 0, 0, 0,
-	-4, 6, 6, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0
 };
 

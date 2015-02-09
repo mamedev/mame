@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /***************************************************************************
 
-  Parker Brothers Wildfire
+  Parker Brothers Wildfire, by Bob and Holly Doyle (prototype), and Garry Kitchen
   * AMI S2150, labeled C10641
 
 
@@ -12,7 +12,7 @@
 #include "cpu/amis2000/amis2000.h"
 #include "sound/speaker.h"
 
-#include "wildfire.lh"
+#include "wildfire.lh" // this is a test layout, external artwork is necessary
 
 // master clock is a single stage RC oscillator: R=?K, C=?pf,
 // S2150 default frequency is 850kHz
@@ -44,7 +44,7 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(leds_decay_tick);
 	void leds_update();
-	bool index_is_7segled(int i);
+	bool index_is_7segled(int index);
 
 	virtual void machine_start();
 };
@@ -63,10 +63,10 @@ public:
 // decay time, in steps of 10ms
 #define LEDS_DECAY_TIME 4
 
-bool wildfire_state::index_is_7segled(int i)
+inline bool wildfire_state::index_is_7segled(int index)
 {
 	// first 3 A are 7segleds
-	return (i < 3);
+	return (index < 3);
 }
 
 void wildfire_state::leds_update()
@@ -77,8 +77,6 @@ void wildfire_state::leds_update()
 	{
 		// update current state
 		m_leds_state[i] = (~m_a >> i & 1) ? m_d : 0;
-		if (index_is_7segled(i))
-			m_leds_state[i] = BITSWAP8(m_leds_state[i],7,0,1,2,3,4,5,6);
 
 		active_state[i] = 0;
 
@@ -101,7 +99,7 @@ void wildfire_state::leds_update()
 		if (m_leds_cache[i] != active_state[i])
 		{
 			if (index_is_7segled(i))
-				output_set_digit_value(i, active_state[i] & 0x7f);
+				output_set_digit_value(i, BITSWAP8(active_state[i],7,0,1,2,3,4,5,6) & 0x7f);
 
 			for (int j = 0; j < 8; j++)
 				output_set_lamp_value(i*10 + j, active_state[i] >> j & 1);
@@ -226,4 +224,4 @@ ROM_START( wildfire )
 ROM_END
 
 
-CONS( 1979, wildfire, 0, 0, wildfire, wildfire, driver_device, 0, "Parker Brothers", "Wildfire (prototype)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+CONS( 1979, wildfire, 0, 0, wildfire, wildfire, driver_device, 0, "Parker Brothers", "Wildfire (prototype)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )

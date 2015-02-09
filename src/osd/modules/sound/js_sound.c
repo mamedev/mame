@@ -25,8 +25,8 @@ public:
 	}
 	virtual ~sound_js() { }
 
-	virtual int init();
-	virtual void exit();
+	virtual int init() { }
+	virtual void exit() { }
 
 	// sound_module
 
@@ -34,7 +34,7 @@ public:
 	{
 		EM_ASM_ARGS({
 		// Forward audio stream update on to JS backend implementation.
-		jsmess_update_audio_stream($1, $2);
+		jsmess_update_audio_stream($0, $1);
 		}, (unsigned int)buffer, samples_this_frame);
 	}
 	virtual void set_mastervolume(int attenuation)

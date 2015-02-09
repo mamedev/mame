@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /***************************************************************************
 
-  Parker Brothers Stop Thief
+  Parker Brothers Stop Thief, by Bob Doyle
   * TMS0980NLL MP6101B (die labeled 0980B-01A)
 
   Stop Thief is actually a board game, the electronic device emulated here

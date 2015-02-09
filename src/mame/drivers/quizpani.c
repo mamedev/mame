@@ -58,15 +58,15 @@ static ADDRESS_MAP_START( quizpani_map, AS_PROGRAM, 16, quizpani_state )
 	AM_RANGE(0x10000a, 0x10000b) AM_READ_PORT("DSW2")
 	AM_RANGE(0x100014, 0x100015) AM_WRITENOP /* screen flipping? */
 	AM_RANGE(0x100016, 0x100017) AM_WRITENOP /* IRQ enable? */
-	AM_RANGE(0x100018, 0x100019) AM_WRITE(quizpani_tilesbank_w)
+	AM_RANGE(0x100018, 0x100019) AM_WRITE(tilesbank_w)
 	AM_RANGE(0x104000, 0x104001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x104020, 0x104027) AM_DEVWRITE8("nmk112", nmk112_device, okibank_w, 0x00ff)
 	AM_RANGE(0x108000, 0x1083ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x108400, 0x1085ff) AM_WRITENOP
 	AM_RANGE(0x10c000, 0x10c007) AM_RAM AM_SHARE("scrollreg")
 	AM_RANGE(0x10c008, 0x10c403) AM_WRITENOP
-	AM_RANGE(0x110000, 0x113fff) AM_RAM_WRITE(quizpani_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x11c000, 0x11ffff) AM_RAM_WRITE(quizpani_txt_videoram_w) AM_SHARE("txt_videoram")
+	AM_RANGE(0x110000, 0x113fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
+	AM_RANGE(0x11c000, 0x11ffff) AM_RAM_WRITE(txt_videoram_w) AM_SHARE("txt_videoram")
 	AM_RANGE(0x180000, 0x18ffff) AM_RAM
 	AM_RANGE(0x200000, 0x33ffff) AM_ROM
 ADDRESS_MAP_END
@@ -202,7 +202,7 @@ static MACHINE_CONFIG_START( quizpani, quizpani_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(quizpani_state, screen_update_quizpani)
+	MCFG_SCREEN_UPDATE_DRIVER(quizpani_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 
@@ -242,4 +242,4 @@ ROM_START( quizpani )
 	ROM_LOAD( "qz8.121", 0x200, 0x100, CRC(b4c19741) SHA1(a6d3686bad6ef2336463b89bc2d249003d9b4bcc) ) /* unknown */
 ROM_END
 
-GAME( 1993, quizpani, 0, quizpani, quizpani, driver_device, 0, ROT0, "NMK", "Quiz Panicuru Fantasy", 0 )
+GAME( 1993, quizpani, 0, quizpani, quizpani, driver_device, 0, ROT0, "NMK", "Quiz Panicuru Fantasy", GAME_SUPPORTS_SAVE )

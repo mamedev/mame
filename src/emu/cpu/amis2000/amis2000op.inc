@@ -2,13 +2,13 @@
 
 // internal helpers
 
-UINT8 amis2000_device::ram_r()
+inline UINT8 amis2000_device::ram_r()
 {
 	UINT16 address = m_bu << 4 | m_bl;
 	return m_data->read_byte(address) & 0xf;
 }
 
-void amis2000_device::ram_w(UINT8 data)
+inline void amis2000_device::ram_w(UINT8 data)
 {
 	UINT16 address = m_bu << 4 | m_bl;
 	m_data->write_byte(address, data & 0xf);
@@ -17,7 +17,7 @@ void amis2000_device::ram_w(UINT8 data)
 void amis2000_device::pop_callstack()
 {
 	m_pc = (m_pc & ~m_callstack_mask) | (m_callstack[0] & m_callstack_mask);
-	for (int i = 0; i < m_callstack_depth-1; i++)
+	for (int i = 0; i < m_callstack_depth; i++)
 	{
 		m_callstack[i] = m_callstack[i+1];
 		m_callstack[i+1] = 0;
@@ -27,9 +27,7 @@ void amis2000_device::pop_callstack()
 void amis2000_device::push_callstack()
 {
 	for (int i = m_callstack_depth-1; i >= 1; i--)
-	{
 		m_callstack[i] = m_callstack[i-1];
-	}
 	m_callstack[0] = m_pc & m_callstack_mask;
 }
 
@@ -388,13 +386,13 @@ void amis2000_device::op_szk()
 
 void amis2000_device::op_sbe()
 {
-	// SBE: skip next on BL equ E
+	// SBE: skip next on BL equals E
 	m_skip = (m_bl == m_e);
 }
 
 void amis2000_device::op_sam()
 {
-	// SAM: skip next on ACC equ RAM
+	// SAM: skip next on ACC equals RAM
 	m_skip = (m_acc == ram_r());
 }
 
@@ -407,13 +405,13 @@ void amis2000_device::op_sos()
 void amis2000_device::op_tf1()
 {
 	// TF1: skip next on flag 1
-	m_skip = (m_f & 0x01) ? true : false;
+	m_skip = ((m_f & 0x01) != 0);
 }
 
 void amis2000_device::op_tf2()
 {
 	// TF2: skip next on flag 2
-	m_skip = (m_f & 0x02) ? true : false;
+	m_skip = ((m_f & 0x02) != 0);
 }
 
 
@@ -421,7 +419,7 @@ void amis2000_device::op_tf2()
 
 void amis2000_device::op_adcs()
 {
-	// ADCS: add RAM to ACC+carry, skip next on no carry
+	// ADCS: add RAM to ACC+carry, skip next on not carry
 	m_acc += ram_r() + m_carry;
 	m_carry = m_acc >> 4 & 1;
 	m_skip = !m_carry;
@@ -430,10 +428,10 @@ void amis2000_device::op_adcs()
 
 void amis2000_device::op_adis()
 {
-	// ADIS X: add X to ACC, skip next on no carry
+	// ADIS X: add X to ACC, skip next on not carry
 	UINT8 param = m_op & 0x0f;
 	m_acc += param;
-	m_skip = !(m_acc >> 4 & 1);
+	m_skip = !(m_acc & 0x10);
 	m_acc &= 0xf;
 }
 
