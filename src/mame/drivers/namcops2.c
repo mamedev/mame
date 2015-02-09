@@ -563,6 +563,18 @@ ROM_START( wanganmd )
 	DISK_IMAGE_READONLY( "wmn1", 0, SHA1(4254e987e71d0d4038a87f11dc1a304396b3dffc) )
 ROM_END
 
+ROM_START( vnight )
+	ROM_REGION(0x200000, "bios", 0)
+	SYSTEM246_BIOS
+
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+	ROM_LOAD( "vpn3verb.ic002", 0x000000, 0x800000, CRC(d0011dc6) SHA1(d01a418b4b83057708e8f0ac4b271112b4a24d15) )
+	ROM_LOAD( "vpn3verb_spr.ic002", 0x800000, 0x040000, CRC(41169c24) SHA1(40bffbe93da65fe5512be9f80254b034a071c38b) )
+
+	DISK_REGION("dvd")	// actually single-track CD-ROM
+	DISK_IMAGE_READONLY( "vpn1cd0", 0, SHA1(714bd19eee3b31a060223003e4567e405ce04cd7) )
+ROM_END
+
 ROM_START( bldyr3b )
 	ROM_REGION(0x200000, "bios", 0)
 	SYSTEM246_BIOS
@@ -658,6 +670,7 @@ ROM_END
 
 // System 246
 GAME(2001, sys246,          0, system246, system246, driver_device, 0, ROT0, "Namco", "System 246 BIOS", GAME_IS_SKELETON|GAME_IS_BIOS_ROOT)
+GAME(2001, vnight,     sys246, system246, system246, driver_device, 0, ROT0, "Sega / Namco", "Vampire Night (VPN3 Ver. B)", GAME_IS_SKELETON)
 GAME(2001, bldyr3b,    sys246, system246, system246, driver_device, 0, ROT0, "bootleg", "Bloody Roar 3 (bootleg)", GAME_IS_SKELETON)
 GAME(2001, rrvac,      sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV3 Ver. A)", GAME_IS_SKELETON)
 GAME(2001, rrvac2,      rrvac, system246, system246, driver_device, 0, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV2 Ver. A)", GAME_IS_SKELETON)
