@@ -50,8 +50,8 @@ public:
 	DECLARE_WRITE8_MEMBER( charram_w );
 	DECLARE_READ16_MEMBER( nmi_io_r );
 	DECLARE_WRITE16_MEMBER( nmi_io_w );
-	DECLARE_READ16_MEMBER( unk_r );
-	DECLARE_WRITE16_MEMBER( unk_w );
+	DECLARE_READ8_MEMBER( rtc_r );
+	DECLARE_WRITE8_MEMBER( rtc_w );
 	DECLARE_READ8_MEMBER( stat_r );
 	DECLARE_WRITE8_MEMBER( stat_w );
 	DECLARE_READ8_MEMBER( led_r );
@@ -150,13 +150,16 @@ WRITE16_MEMBER( pcd_state::nmi_io_w )
 	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-READ16_MEMBER( pcd_state::unk_r )
+READ8_MEMBER( pcd_state::rtc_r )
 {
-	return 0;
+	m_rtc->write(space, 0, offset);
+	return m_rtc->read(space, 1);
 }
 
-WRITE16_MEMBER( pcd_state::unk_w )
+WRITE8_MEMBER( pcd_state::rtc_w )
 {
+	m_rtc->write(space, 0, offset);
+	m_rtc->write(space, 1, data);
 }
 
 READ8_MEMBER( pcd_state::stat_r )
@@ -208,7 +211,7 @@ static ADDRESS_MAP_START( pcd_io, AS_IO, 16, pcd_state )
 	AM_RANGE(0xf820, 0xf821) AM_DEVREADWRITE8("pic2", pic8259_device, read, write, 0xffff)
 	AM_RANGE(0xf840, 0xf841) AM_READWRITE8(stat_r, stat_w, 0x00ff)
 	AM_RANGE(0xf840, 0xf841) AM_READWRITE8(led_r, led_w, 0xff00)
-	AM_RANGE(0xf880, 0xf88f) AM_READWRITE(unk_r, unk_w) // mmu?
+	AM_RANGE(0xf880, 0xf8bf) AM_READWRITE8(rtc_r, rtc_w, 0xffff)
 	AM_RANGE(0xf900, 0xf907) AM_DEVREADWRITE8("fdc", wd2793_t, read, write, 0xffff)
 	//AM_RANGE(0xf940, 0xf943) scsi
 	AM_RANGE(0xf9c0, 0xf9c3) AM_DEVREADWRITE8("usart1",mc2661_device,read,write,0xffff)  // UARTs
