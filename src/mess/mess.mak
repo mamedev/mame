@@ -940,6 +940,7 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_VIDEO)/vectrex.o     \
 	$(MAME_DRIVERS)/cps1.o      \
 	$(MAME_VIDEO)/cps1.o        \
+	$(MAME_VIDEO)/scn2674.o     \
 
 
 #-------------------------------------------------
