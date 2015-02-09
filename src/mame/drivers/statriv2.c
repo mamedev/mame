@@ -979,7 +979,7 @@ ROM_START( cstripxi )
 	ROM_LOAD( "prom.u22", 0x0040, 0x0100, NO_DUMP ) /* Soldered in */
 	
 	DISK_REGION( "laserdisc")
-	DISK_IMAGE_READONLY("cstripxi")
+	DISK_IMAGE_READONLY("cstripxi", 0, NO_DUMP )
 ROM_END
 
 
