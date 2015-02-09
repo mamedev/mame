@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /***************************************************************************
 
-  Parker Brothers Wildfire
+  Parker Brothers Wildfire, by Bob and Holly Doyle (prototype), and Garry Kitchen
   * AMI S2150, labeled C10641
 
 

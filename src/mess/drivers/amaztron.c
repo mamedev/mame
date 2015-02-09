@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /***************************************************************************
 
-  Coleco Amaze-A-Tron
+  Coleco Amaze-A-Tron, by Ralph Baer
   * TMS1100 MCU, labeled MP3405(die label too)
 
   This is an electronic board game with a selection of 8 maze games,

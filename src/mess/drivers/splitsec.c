@@ -16,13 +16,25 @@
   *: higher number indicates higher difficulty
 
 
-****************************************************************************
+----------------------------------------------------------------------------
 
-  Parker Brothers Bank Shot (also released in other regions as Cue Ball)
+  Parker Brothers Bank Shot (known as Cue Ball in the UK), by Garry Kitchen
   * TMS1400NLL MP7313-N2 (die labeled MP7313)
-  
-  x
 
+  Bank Shot is an electronic pool game. To select a game, repeatedly press
+  the [SELECT] button, then press [CUE UP] to start. Refer to the official
+  manual for more information. The game selections are:
+  1: Straight Pool (1 player)
+  2: Straight Pool (2 players)
+  3: Poison Pool
+  4: Trick Shots
+
+
+  TODO:
+  - bankshot: the cue ball led is strobed more often than other leds,
+    making it look brighter. We need more accurate led decay simulation
+    for this to work.
+  - MCU clock is unknown
 
 ***************************************************************************/
 
@@ -106,9 +118,7 @@ public:
        70    72    74
 
 
-  Bank Shot:
-
-x
+  Bank Shot: pretty much linear, see bankshot.lay
 
 */
 
@@ -234,17 +244,29 @@ static INPUT_PORTS_START( splitsec )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+
+/* bankshot physical button layout and labels is like this:
+
+    [SELECT  [BALL UP] [BALL OVER]
+     SCORE]
+
+    ------  led display  ------
+    
+    [ANGLE]  [AIM]     [CUE UP
+                        SHOOT]
+*/
+
 static INPUT_PORTS_START( bankshot )
 	PORT_START("IN.0") // R2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Angle")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Aim")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Cue Up / Shoot")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // R3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Select / Score")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Ball Up")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Ball Over")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -337,4 +359,4 @@ ROM_END
 
 
 CONS( 1980, splitsec, 0, 0, splitsec, splitsec, driver_device, 0, "Parker Brothers", "Split Second", GAME_SUPPORTS_SAVE )
-CONS( 1980, bankshot, 0, 0, bankshot, bankshot, driver_device, 0, "Parker Brothers", "Bank Shot - Electronic Pool", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1980, bankshot, 0, 0, bankshot, bankshot, driver_device, 0, "Parker Brothers", "Bank Shot - Electronic Pool", GAME_SUPPORTS_SAVE )
