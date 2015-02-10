@@ -190,6 +190,7 @@ void ucom4_cpu_device::device_reset()
 	m_inte_f = 1;
 	m_pc = 0;
 	m_op = 0;
+	m_prev_op = m_op;
 	m_skip = false;
 
 	// clear i/o
@@ -225,9 +226,6 @@ void ucom4_cpu_device::execute_run()
 	while (m_icount > 0)
 	{
 		m_icount--;
-
-		// remember previous opcode
-		m_prev_op = m_op;
 
 		debugger_instruction_hook(this, m_pc);
 		m_op = m_program->read_byte(m_pc);
@@ -339,5 +337,8 @@ void ucom4_cpu_device::execute_run()
 				break; // 0xff
 
 		} // big switch
+
+		// remember previous opcode
+		m_prev_op = m_op;
 	}
 }
