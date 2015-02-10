@@ -208,7 +208,6 @@ void amis2000_device::device_reset()
 {
 	m_pc = 0;
 	m_op = 0;
-	m_prev_op = m_op;
 	m_skip = false;
 	
 	// clear i/o
@@ -231,6 +230,9 @@ void amis2000_device::execute_run()
 	{
 		m_icount--;
 		
+		// remember previous opcode
+		m_prev_op = m_op;
+
 		debugger_instruction_hook(this, m_pc);
 		m_op = m_program->read_byte(m_pc);
 		m_pc = (m_pc + 1) & 0x1fff;
@@ -239,7 +241,7 @@ void amis2000_device::execute_run()
 		{
 			// always skip over PP prefix
 			m_skip = ((m_op & 0xf0) == 0x60);
-			continue;
+			m_op = 0; // nop
 		}
 
 		switch (m_op & 0xf0)
@@ -314,8 +316,5 @@ void amis2000_device::execute_run()
 				break; // 0xff
 
 		} // big switch
-
-		// remember previous opcode
-		m_prev_op = m_op;
 	}
 }
