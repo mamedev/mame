@@ -5,6 +5,14 @@
   Parker Brothers Wildfire, by Bob and Holly Doyle (prototype), and Garry Kitchen
   * AMI S2150, labeled C10641
 
+  x
+
+
+  TODO:
+  - no sound
+  - flipper buttons aren't working correctly
+  - some 7segs digits are wrong (mcu on-die decoder is customizable?)
+  - MCU clock is unknown
 
 ***************************************************************************/
 
@@ -16,7 +24,7 @@
 
 // master clock is a single stage RC oscillator: R=?K, C=?pf,
 // S2150 default frequency is 850kHz
-#define MASTER_CLOCK (850000/4)
+#define MASTER_CLOCK (850000)
 
 
 class wildfire_state : public driver_device
