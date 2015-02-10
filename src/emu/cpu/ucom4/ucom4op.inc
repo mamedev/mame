@@ -180,13 +180,16 @@ void ucom4_cpu_device::op_ad()
 void ucom4_cpu_device::op_adc()
 {
 	// ADC: Add RAM and carry to ACC, store Carry F/F
-	op_illegal();
+	m_acc += ram_r() + m_carry_f;
+	m_carry_f = m_acc >> 4 & 1;
+	m_acc &= 0xf;
 }
 
 void ucom4_cpu_device::op_ads()
 {
 	// ADS: Add RAM and carry to ACC, store Carry F/F, skip next on carry
-	op_illegal();
+	op_adc();
+	m_skip = (m_carry_f != 0);
 }
 
 void ucom4_cpu_device::op_daa()
@@ -673,7 +676,9 @@ void ucom4_cpu_device::op_rar()
 	if (!check_op_43()) return;
 	
 	// RAR: Rotate ACC Right through Carry F/F
-	op_illegal();
+	UINT8 c = m_acc & 1;
+	m_acc = m_acc >> 1 | m_carry_f << 3;
+	m_carry_f = c;
 }
 
 
