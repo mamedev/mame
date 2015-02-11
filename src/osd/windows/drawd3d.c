@@ -257,7 +257,7 @@ render_primitive_list *d3d::renderer::get_primitives()
 //  drawnone_create
 //============================================================
 
-static osd_renderer *drawd3d_create(win_window_info *window)
+static osd_renderer *drawd3d_create(osd_window *window)
 {
 	return global_alloc(d3d::renderer(window));
 }
@@ -504,7 +504,7 @@ void texture_manager::create_resources()
 		texture.seqid = 0;
 
 		// now create it
-		m_default_texture = global_alloc(texture_info(this, &texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32)));
+		m_default_texture = global_alloc(texture_info(this, &texture, m_renderer->window().prescale(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32)));
 	}
 
 	// experimental: if we have a vector bitmap, create a texture for it
@@ -521,7 +521,7 @@ void texture_manager::create_resources()
 		texture.seqid = 0;
 
 		// now create it
-		m_vector_texture = global_alloc(texture_info(this, &texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32)));
+		m_vector_texture = global_alloc(texture_info(this, &texture, m_renderer->window().prescale(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32)));
 	}
 }
 
@@ -621,7 +621,7 @@ texture_info *texture_manager::find_texinfo(const render_texinfo *texinfo, UINT3
 	return NULL;
 }
 
-renderer::renderer(win_window_info *window)
+renderer::renderer(osd_window *window)
 	: osd_renderer(window, FLAG_NONE)
 {
 	m_device = NULL;
@@ -644,7 +644,7 @@ int renderer::initialize()
 		return false;
 
 	// create the device immediately for the full screen case (defer for window mode)
-	if (window().fullscreen() && device_create())
+	if (window().fullscreen() && device_create(window().m_focus_hwnd))
 		return false;
 
 	return true;
@@ -702,7 +702,7 @@ void texture_manager::update_textures()
 			if (texture == NULL)
 			{
 				// if there isn't one, create a new texture
-				global_alloc(texture_info(this, &prim->texture, prim->flags));
+				global_alloc(texture_info(this, &prim->texture, m_renderer->window().prescale(), prim->flags));
 			}
 			else
 			{
@@ -810,7 +810,7 @@ void renderer::end_frame()
 //  device_create
 //============================================================
 
-int renderer::device_create()
+int renderer::device_create(HWND device_hwnd)
 {
 	// if a device exists, free it
 	if (m_device != NULL)
@@ -876,7 +876,7 @@ try_again:
 													D3DPRESENT_INTERVAL_ONE : D3DPRESENT_INTERVAL_IMMEDIATE;
 
 	// create the D3D device
-	result = (*d3dintf->d3d.create_device)(d3dintf, m_adapter, D3DDEVTYPE_HAL, window().m_focus_hwnd,
+	result = (*d3dintf->d3d.create_device)(d3dintf, m_adapter, D3DDEVTYPE_HAL, device_hwnd,
 					D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE, &m_presentation, &m_device);
 	if (result != D3D_OK)
 	{
@@ -1065,12 +1065,12 @@ int renderer::device_verify_caps()
 
 	m_shaders = global_alloc_clear(shaders);
 	// FIXME: Dynamic cast
-	m_shaders->init(d3dintf, dynamic_cast<win_window_info *>(&window()));
+	m_shaders->init(d3dintf, &window().machine(), this);
 
 	DWORD tempcaps;
 	HRESULT result = (*d3dintf->d3d.get_caps_dword)(d3dintf, m_adapter, D3DDEVTYPE_HAL, CAPS_MAX_PS30_INSN_SLOTS, &tempcaps);
 	if (result != D3D_OK) osd_printf_verbose("Direct3D Error %08X during get_caps_dword call\n", (int)result);
-	if(tempcaps < 512)
+	if (tempcaps < 512)
 	{
 		osd_printf_verbose("Direct3D: Warning - Device does not support Pixel Shader 3.0, falling back to non-PS rendering\n");
 		d3dintf->post_fx_available = false;
@@ -1403,7 +1403,7 @@ int renderer::update_window_size()
 	// set the new bounds and create the device again
 	m_width = rect_width(&client);
 	m_height = rect_height(&client);
-	if (device_create())
+	if (device_create(window().m_focus_hwnd))
 		return FALSE;
 
 	// reset the resize state to normal, and indicate we made a change
@@ -1916,7 +1916,7 @@ texture_info::~texture_info()
 //  texture_info constructor
 //============================================================
 
-texture_info::texture_info(texture_manager *manager, const render_texinfo* texsource, UINT32 flags)
+texture_info::texture_info(texture_manager *manager, const render_texinfo* texsource, int prescale, UINT32 flags)
 {
 	HRESULT result;
 
@@ -1926,8 +1926,8 @@ texture_info::texture_info(texture_manager *manager, const render_texinfo* texso
 	m_hash = m_texture_manager->texture_compute_hash(texsource, flags);
 	m_flags = flags;
 	m_texinfo = *texsource;
-	m_xprescale = video_config.prescale;
-	m_yprescale = video_config.prescale;
+	m_xprescale = prescale;
+	m_yprescale = prescale;
 
 	m_d3dtex = NULL;
 	m_d3dsurface = NULL;
@@ -1986,9 +1986,11 @@ texture_info::texture_info(texture_manager *manager, const render_texinfo* texso
 		{
 			m_yprescale--;
 		}
-		if (m_xprescale != video_config.prescale || m_yprescale != video_config.prescale)
+
+		int prescale = m_renderer->window().prescale();
+		if (m_xprescale != prescale || m_yprescale != prescale)
 		{
-			osd_printf_verbose("Direct3D: adjusting prescale from %dx%d to %dx%d\n", video_config.prescale, video_config.prescale, m_xprescale, m_yprescale);
+			osd_printf_verbose("Direct3D: adjusting prescale from %dx%d to %dx%d\n", prescale, prescale, m_xprescale, m_yprescale);
 		}
 
 		// loop until we allocate something or error
@@ -2008,7 +2010,6 @@ texture_info::texture_info(texture_manager *manager, const render_texinfo* texso
 				{
 					m_d3dfinaltex = m_d3dtex;
 					m_type = m_texture_manager->is_dynamic_supported() ? TEXTURE_TYPE_DYNAMIC : TEXTURE_TYPE_PLAIN;
-
 					if (m_renderer->get_shaders()->enabled() && !m_renderer->get_shaders()->register_texture(this))
 					{
 						goto error;

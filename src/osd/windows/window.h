@@ -32,6 +32,14 @@
 //  TYPE DEFINITIONS
 //============================================================
 
+/* ------------------------------------------------------
+ *
+ * All types named osd_* will ultimately be located in
+ * the modules tree. They are temporarily maintained in
+ * window.h until basic code simplification is finished.
+ *
+ */
+
 class win_window_info;
 
 class osd_window
@@ -46,6 +54,7 @@ public:
 		m_maxwidth(0), m_maxheight(0),
 		m_refresh(0),
 #endif
+		m_prescale(1),
 		m_primlist(NULL)
   	  {}
 	virtual ~osd_window() { }
@@ -54,12 +63,12 @@ public:
 	virtual int fullscreen() const = 0;
 	virtual running_machine &machine() const = 0;
 
+	int prescale() const { return m_prescale; };
+
 #ifdef OSD_SDL
 	virtual void blit_surface_size(int &blitwidth, int &blitheight) = 0;
 	virtual sdl_monitor_info *monitor() const = 0;
 	virtual void get_size(int &w, int &h) = 0;
-	virtual int index() const = 0;
-	virtual int prescale() const = 0;
 #if (SDLMAME_SDL2)
 	virtual SDL_Window *sdl_window() = 0;
 #else
@@ -74,6 +83,8 @@ public:
 
 	// window handle and info
 	HWND					m_hwnd;
+	// FIXME: this is the same as win_window_list->m_hwnd, i.e. first window.
+	// During modularization, this should be passed in differently
 	HWND         	 		m_focus_hwnd;
 
 	// monitor info
@@ -83,8 +94,8 @@ public:
 	int                 	m_refresh;
 #endif
 
+	int						m_prescale;
 	render_primitive_list *	m_primlist;
-
 };
 
 class osd_renderer
@@ -94,6 +105,7 @@ public:
 	/* Generic flags */
 	static const int FLAG_NONE 					= 0x0000;
 	static const int FLAG_NEEDS_OPENGL 			= 0x0001;
+	static const int FLAG_HAS_VECTOR_SCREEN		= 0x0002;
 
 	/* SDL 1.2 flags */
 	static const int FLAG_NEEDS_DOUBLEBUF 		= 0x0100;
@@ -105,8 +117,10 @@ public:
 	virtual ~osd_renderer() { }
 
 	osd_window &window() { return *m_window; }
-	int flags() const { return m_flags; }
 	bool has_flags(const int flag) { return ((m_flags & flag)) == flag; }
+	void set_flags(int aflag) { m_flags |= aflag; }
+	void clear_flags(int aflag) { m_flags &= ~aflag; }
+
 
 	void notify_changed() { set_flags(FI_CHANGED); }
 
@@ -130,9 +144,6 @@ public:
 protected:
 	/* Internal flags */
 	static const int FI_CHANGED	 				= 0x010000;
-
-	void set_flags(int aflag) { m_flags |= aflag; }
-	void clear_flags(int aflag) { m_flags &= ~aflag; }
 
 private:
 
@@ -196,7 +207,7 @@ private:
 
 struct osd_draw_callbacks
 {
-	osd_renderer *(*create)(win_window_info *window);
+	osd_renderer *(*create)(osd_window *window);
 	void (*exit)(void);
 };
 

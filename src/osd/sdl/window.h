@@ -36,30 +36,54 @@ class osd_window
 {
 public:
 	osd_window()
-	: 	  m_primlist(NULL),
-		m_start_viewscreen(0)
+	:
+#ifdef OSD_SDL
+		m_start_viewscreen(0),
+#else
+		m_hwnd(0), m_focus_hwnd(0), m_monitor(NULL), m_resize_state(0),
+		m_maxwidth(0), m_maxheight(0),
+		m_refresh(0),
+#endif
+		m_prescale(1),
+		m_primlist(NULL)
   	  {}
 	virtual ~osd_window() { }
+
+	virtual render_target *target() = 0;
+	virtual int fullscreen() const = 0;
+	virtual running_machine &machine() const = 0;
+
+	int prescale() const { return m_prescale; };
+
 #ifdef OSD_SDL
 	virtual void blit_surface_size(int &blitwidth, int &blitheight) = 0;
 	virtual sdl_monitor_info *monitor() const = 0;
-	virtual render_target *target() = 0;
 	virtual void get_size(int &w, int &h) = 0;
-	virtual int fullscreen() const = 0;
-	virtual int index() const = 0;
-	virtual int prescale() const = 0;
 #if (SDLMAME_SDL2)
 	virtual SDL_Window *sdl_window() = 0;
 #else
 	virtual SDL_Surface *sdl_surface() = 0;
 #endif
 
-	virtual running_machine &machine() const = 0;
+	int                 	m_start_viewscreen;
 
-	render_primitive_list *m_primlist;
-	int                 m_start_viewscreen;
+#else
+	virtual bool win_has_menu() = 0;
+	virtual win_monitor_info *winwindow_video_window_monitor(const RECT *proposed) = 0;
 
+	// window handle and info
+	HWND					m_hwnd;
+	HWND         	 		m_focus_hwnd;
+
+	// monitor info
+	win_monitor_info *  	m_monitor;
+	int                 	m_resize_state;
+	int                 	m_maxwidth, m_maxheight;
+	int                 	m_refresh;
 #endif
+
+	int						m_prescale;
+	render_primitive_list 	*m_primlist;
 };
 
 class osd_renderer
@@ -69,6 +93,7 @@ public:
 	/* Generic flags */
 	static const int FLAG_NONE 					= 0x0000;
 	static const int FLAG_NEEDS_OPENGL 			= 0x0001;
+	static const int FLAG_HAS_VECTOR_SCREEN		= 0x0002;
 
 #if (!(SDLMAME_SDL2))
 	/* SDL 1.2 flags */
@@ -82,8 +107,10 @@ public:
 	virtual ~osd_renderer() { }
 
 	osd_window &window() { return *m_window; }
-	int flags() const { return m_flags; }
 	bool has_flags(const int flag) { return ((m_flags & flag)) == flag; }
+	void set_flags(int aflag) { m_flags |= aflag; }
+	void clear_flags(int aflag) { m_flags &= ~aflag; }
+
 
 	void notify_changed() { set_flags(FI_CHANGED); }
 
@@ -107,9 +134,6 @@ public:
 protected:
 	/* Internal flags */
 	static const int FI_CHANGED	 				= 0x010000;
-
-	void set_flags(int aflag) { m_flags |= aflag; }
-	void clear_flags(int aflag) { m_flags &= ~aflag; }
 
 private:
 
@@ -185,8 +209,6 @@ public:
 	sdl_monitor_info *monitor() const { return m_monitor; }
 	int fullscreen() const { return m_fullscreen; }
 
-	int index() const { return m_index; }
-
 	render_target *target() { return m_target; }
 #if (SDLMAME_SDL2)
 	SDL_Window *sdl_window() { return m_sdl_window; }
@@ -223,8 +245,6 @@ private:
 	// rendering info
 	osd_event *         m_rendered_event;
 	render_target *     m_target;
-
-	int                 m_prescale;
 
 #if (SDLMAME_SDL2)
 	// Needs to be here as well so we can identify window
@@ -278,7 +298,7 @@ private:
 
 struct osd_draw_callbacks
 {
-	osd_renderer *(*create)(sdl_window_info *window);
+	osd_renderer *(*create)(osd_window *window);
 	void (*exit)(void);
 };
 

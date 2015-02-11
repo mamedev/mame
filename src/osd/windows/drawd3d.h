@@ -99,7 +99,7 @@ class renderer : public osd_renderer
 {
 public:
 	//renderer() { }
-	renderer(win_window_info *window);
+	renderer(osd_window *window);
 	virtual ~renderer();
 
 	virtual int create();
@@ -112,7 +112,7 @@ public:
 
 	int                     initialize();
 
-	int                     device_create();
+	int                     device_create(HWND device_HWND);
 	int                     device_create_resources();
 	void                    device_delete();
 	void                    device_delete_resources();

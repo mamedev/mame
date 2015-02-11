@@ -20,7 +20,7 @@
 class renderer_none : public osd_renderer
 {
 public:
-	renderer_none(win_window_info *window)
+	renderer_none(osd_window *window)
 	: osd_renderer(window, FLAG_NONE) { }
 
 	virtual ~renderer_none() { }
@@ -47,7 +47,7 @@ static void drawnone_exit(void);
 //  drawnone_create
 //============================================================
 
-osd_renderer *drawnone_create(win_window_info *window)
+osd_renderer *drawnone_create(osd_window *window)
 {
 	return global_alloc(renderer_none(window));
 }

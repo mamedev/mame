@@ -224,8 +224,6 @@ void shaders::window_save()
 	if (!master_enable || !d3dintf->post_fx_available)
 		return;
 
-	renderer *d3d = dynamic_cast<renderer *>(window->m_renderer);
-
 	HRESULT result = (*d3dintf->device.create_texture)(d3d->get_device(), snap_width, snap_height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &snap_copy_texture);
 	if (result != D3D_OK)
 	{
@@ -257,7 +255,7 @@ void shaders::window_record()
 	if (!master_enable || !d3dintf->post_fx_available)
 		return;
 
-	windows_options &options = downcast<windows_options &>(window->machine().options());
+	windows_options &options = downcast<windows_options &>(machine->options());
 	const char *filename = options.d3d_hlsl_write();
 
 	if (avi_output_file != NULL)
@@ -275,8 +273,6 @@ void shaders::avi_update_snap(surface *surface)
 {
 	if (!master_enable || !d3dintf->post_fx_available)
 		return;
-
-	renderer *d3d = dynamic_cast<renderer *>(window->m_renderer);
 
 	D3DLOCKED_RECT rect;
 
@@ -326,8 +322,6 @@ void shaders::render_snapshot(surface *surface)
 	if (!master_enable || !d3dintf->post_fx_available)
 		return;
 
-	renderer *d3d = dynamic_cast<renderer *>(window->m_renderer);
-
 	D3DLOCKED_RECT rect;
 
 	render_snap = false;
@@ -370,14 +364,14 @@ void shaders::render_snapshot(surface *surface)
 
 			int idx = cy * 2 + cx;
 
-			emu_file file(window->machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			emu_file file(machine->options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 			file_error filerr = open_next(d3d, file, NULL, "png", idx);
 			if (filerr != FILERR_NONE)
 				return;
 
 			// add two text entries describing the image
 			astring text1(emulator_info::get_appname(), " ", build_version);
-			astring text2(window->machine().system().manufacturer, " ", window->machine().system().description);
+			astring text2(machine->system().manufacturer, " ", machine->system().description);
 			png_info pnginfo = { 0 };
 			png_add_text(&pnginfo, "Software", text1);
 			png_add_text(&pnginfo, "System", text2);
@@ -438,7 +432,7 @@ void shaders::record_texture()
 		return;
 
 	// get the current time
-	attotime curtime = window->machine().time();
+	attotime curtime = machine->time();
 
 	avi_update_snap(surface);
 
@@ -519,19 +513,17 @@ void shaders::begin_avi_recording(const char *name)
 	if (!master_enable || !d3dintf->post_fx_available)
 		return;
 
-	renderer *d3d = dynamic_cast<renderer *>(window->m_renderer);
-
 	// stop any existing recording
 	end_avi_recording();
 
 	// reset the state
 	avi_frame = 0;
-	avi_next_frame_time = window->machine().time();
+	avi_next_frame_time = machine->time();
 
 	// build up information about this new movie
 	avi_movie_info info;
 	info.video_format = 0;
-	info.video_timescale = 1000 * ((window->machine().first_screen() != NULL) ? ATTOSECONDS_TO_HZ(window->machine().first_screen()->frame_period().attoseconds) : screen_device::DEFAULT_FRAME_RATE);
+	info.video_timescale = 1000 * ((machine->first_screen() != NULL) ? ATTOSECONDS_TO_HZ(machine->first_screen()->frame_period().attoseconds) : screen_device::DEFAULT_FRAME_RATE);
 	info.video_sampletime = 1000;
 	info.video_numsamples = 0;
 	info.video_width = snap_width;
@@ -539,18 +531,18 @@ void shaders::begin_avi_recording(const char *name)
 	info.video_depth = 24;
 
 	info.audio_format = 0;
-	info.audio_timescale = window->machine().sample_rate();
+	info.audio_timescale = machine->sample_rate();
 	info.audio_sampletime = 1;
 	info.audio_numsamples = 0;
 	info.audio_channels = 2;
 	info.audio_samplebits = 16;
-	info.audio_samplerate = window->machine().sample_rate();
+	info.audio_samplerate = machine->sample_rate();
 
 	// create a new temporary movie file
 	file_error filerr;
 	astring fullpath;
 	{
-		emu_file tempfile(window->machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+		emu_file tempfile(machine->options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 		if (name != NULL)
 		{
 			filerr = tempfile.open(name);
@@ -678,8 +670,6 @@ void shaders::set_texture(texture_info *texture)
 	if (!master_enable || !d3dintf->post_fx_available)
 		return;
 
-	renderer *d3d = dynamic_cast<renderer *>(window->m_renderer);
-
 	if(texture != NULL)
 	{
 		paused = texture->paused();
@@ -699,7 +689,7 @@ void shaders::set_texture(texture_info *texture)
 //  shaders::init
 //============================================================
 
-void shaders::init(base *d3dintf, win_window_info *window)
+void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *renderer)
 {
 	if (!d3dintf->post_fx_available)
 		return;
@@ -713,28 +703,29 @@ void shaders::init(base *d3dintf, win_window_info *window)
 	}
 
 	this->d3dintf = d3dintf;
-	this->window = window;
+	this->machine = machine;
+	this->d3d = renderer;
 
-	master_enable = downcast<windows_options &>(window->machine().options()).d3d_hlsl_enable();
+	master_enable = downcast<windows_options &>(machine->options()).d3d_hlsl_enable();
 	prescale_size_x = 1;
 	prescale_size_y = 1;
-	preset = downcast<windows_options &>(window->machine().options()).d3d_hlsl_preset();
+	preset = downcast<windows_options &>(machine->options()).d3d_hlsl_preset();
 	if (preset < -1 || preset > 3)
 	{
 		preset = -1;
 	}
 
-	snap_width = downcast<windows_options &>(window->machine().options()).d3d_snap_width();
-	snap_height = downcast<windows_options &>(window->machine().options()).d3d_snap_height();
+	snap_width = downcast<windows_options &>(machine->options()).d3d_snap_width();
+	snap_height = downcast<windows_options &>(machine->options()).d3d_snap_height();
 	prescale_force_x = 0;
 	prescale_force_y = 0;
 
-	windows_options &winoptions = downcast<windows_options &>(window->machine().options());
+	windows_options &winoptions = downcast<windows_options &>(machine->options());
 
 	options = (hlsl_options*)global_alloc_clear(hlsl_options);
 
 	options->params_dirty = true;
-	strcpy(options->shadow_mask_texture, downcast<windows_options &>(window->machine().options()).screen_shadow_mask_texture()); // unsafe
+	strcpy(options->shadow_mask_texture, downcast<windows_options &>(machine->options()).screen_shadow_mask_texture()); // unsafe
 
 	prescale_force_x = winoptions.d3d_hlsl_prescale_x();
 	prescale_force_y = winoptions.d3d_hlsl_prescale_y();
@@ -820,8 +811,6 @@ void shaders::init_fsfx_quad(void *vertbuf)
 	if (!master_enable || !d3dintf->post_fx_available)
 		return;
 
-	renderer *d3d = dynamic_cast<renderer *>(window->m_renderer);
-
 	// get a pointer to the vertex buffer
 	fsfx_vertices = (vertex *)vertbuf;
 	if (fsfx_vertices == NULL)
@@ -892,8 +881,6 @@ int shaders::create_resources(bool reset)
 	if (!master_enable || !d3dintf->post_fx_available)
 		return 0;
 
-	renderer *d3d = dynamic_cast<renderer *>(window->m_renderer);
-
 	HRESULT result = (*d3dintf->device.get_render_target)(d3d->get_device(), 0, &backbuffer);
 	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device get_render_target call\n", (int)result);
 
@@ -927,7 +914,7 @@ int shaders::create_resources(bool reset)
 	}
 	(*d3dintf->texture.get_surface_level)(avi_final_texture, 0, &avi_final_target);
 
-	emu_file file(window->machine().options().art_path(), OPEN_FLAG_READ);
+	emu_file file(machine->options().art_path(), OPEN_FLAG_READ);
 	render_load_png(shadow_bitmap, file, NULL, options->shadow_mask_texture);
 
 	// experimental: if we have a shadow bitmap, create a texture for it
@@ -943,11 +930,12 @@ int shaders::create_resources(bool reset)
 		texture.set_palette(NULL);
 		texture.seqid = 0;
 
+		// FIXME: should shadow bitmap really use prescale?
 		// now create it
-		shadow_texture = new texture_info(d3d->get_texture_manager(), &texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
+		shadow_texture = new texture_info(d3d->get_texture_manager(), &texture, video_config.prescale, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
 	}
 
-	const char *fx_dir = downcast<windows_options &>(window->machine().options()).screen_post_fx_dir();
+	const char *fx_dir = downcast<windows_options &>(machine->options()).screen_post_fx_dir();
 
 	default_effect = new effect(this, d3d->get_device(), "primary.fx", fx_dir);
 	post_effect = new effect(this, d3d->get_device(), "post.fx", fx_dir);
@@ -1066,8 +1054,6 @@ void shaders::begin_draw()
 	if (!master_enable || !d3dintf->post_fx_available)
 		return;
 
-	renderer *d3d = dynamic_cast<renderer *>(window->m_renderer);
-
 	curr_effect = default_effect;
 
 	default_effect->set_technique("TestTechnique");
@@ -1101,8 +1087,6 @@ void shaders::begin_frame()
 void shaders::blit(surface *dst, texture *src, surface *new_dst, D3DPRIMITIVETYPE prim_type,
 						UINT32 prim_index, UINT32 prim_count, int dstw, int dsth)
 {
-	renderer *d3d = dynamic_cast<renderer *>(window->m_renderer);
-
 	HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, dst);
 	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
 
@@ -1146,8 +1130,6 @@ void shaders::blit(surface *dst, texture *src, surface *new_dst, D3DPRIMITIVETYP
 void shaders::blit(surface *dst, texture *src, surface *new_dst, D3DPRIMITIVETYPE prim_type,
 						UINT32 prim_index, UINT32 prim_count)
 {
-	renderer *d3d = dynamic_cast<renderer *>(window->m_renderer);
-
 	HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, dst);
 	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
 	result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(1,0,0,0), 0, 0);
@@ -1231,7 +1213,6 @@ void shaders::init_effect_info(poly_info *poly)
 	if (!master_enable || !d3dintf->post_fx_available)
 		return;
 
-	renderer *d3d = dynamic_cast<renderer *>(window->m_renderer);
 	texture_info *texture = poly->get_texture();
 
 	if(PRIMFLAG_GET_SCREENTEX(d3d->get_last_texture_flags()) && texture != NULL)
@@ -1308,7 +1289,6 @@ cache_target* shaders::find_cache_target(UINT32 screen_index, int width, int hei
 
 void shaders::ntsc_pass(render_target *rt, vec2f &sourcedims, vec2f &delta)
 {
-	renderer *d3d = dynamic_cast<renderer *>(window->m_renderer);
 	UINT num_passes = 0;
 
 	if(options->yiq_enable)
@@ -1370,7 +1350,6 @@ void shaders::ntsc_pass(render_target *rt, vec2f &sourcedims, vec2f &delta)
 
 void shaders::color_convolution_pass(render_target *rt, vec2f &texsize, vec2f &sourcedims)
 {
-	renderer *d3d = dynamic_cast<renderer *>(window->m_renderer);
 	UINT num_passes = 0;
 
 	curr_effect = color_effect;
@@ -1398,7 +1377,6 @@ void shaders::color_convolution_pass(render_target *rt, vec2f &texsize, vec2f &s
 
 void shaders::prescale_pass(render_target *rt, vec2f &texsize, vec2f &sourcedims)
 {
-	renderer *d3d = dynamic_cast<renderer *>(window->m_renderer);
 	UINT num_passes = 0;
 
 	curr_effect = prescale_effect;
@@ -1426,7 +1404,6 @@ void shaders::prescale_pass(render_target *rt, vec2f &texsize, vec2f &sourcedims
 
 void shaders::deconverge_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &sourcedims)
 {
-	renderer *d3d = dynamic_cast<renderer *>(window->m_renderer);
 	UINT num_passes = 0;
 
 	curr_effect = deconverge_effect;
@@ -1454,7 +1431,6 @@ void shaders::deconverge_pass(render_target *rt, vec2f &texsize, vec2f &delta, v
 
 void shaders::defocus_pass(render_target *rt, vec2f &texsize)
 {
-	renderer *d3d = dynamic_cast<renderer *>(window->m_renderer);
 	UINT num_passes = 0;
 
 	// Defocus pass 1
@@ -1503,7 +1479,6 @@ void shaders::defocus_pass(render_target *rt, vec2f &texsize)
 
 void shaders::phosphor_pass(render_target *rt, cache_target *ct, vec2f &texsize, bool focus_enable)
 {
-	renderer *d3d = dynamic_cast<renderer *>(window->m_renderer);
 	UINT num_passes = 0;
 
 	curr_effect = phosphor_effect;
@@ -1561,7 +1536,6 @@ void shaders::phosphor_pass(render_target *rt, cache_target *ct, vec2f &texsize,
 
 void shaders::avi_post_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &sourcedims, poly_info *poly, int vertnum)
 {
-	renderer *d3d = dynamic_cast<renderer *>(window->m_renderer);
 	UINT num_passes = 0;
 
 	curr_effect = post_effect;
@@ -1616,7 +1590,6 @@ void shaders::avi_post_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec
 
 void shaders::screen_post_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &sourcedims, poly_info *poly, int vertnum)
 {
-	renderer *d3d = dynamic_cast<renderer *>(window->m_renderer);
 	UINT num_passes = 0;
 
 	curr_effect = post_effect;
@@ -1650,7 +1623,6 @@ void shaders::screen_post_pass(render_target *rt, vec2f &texsize, vec2f &delta, 
 
 void shaders::raster_bloom_pass(render_target *rt, vec2f &texsize, vec2f &delta, poly_info *poly, int vertnum)
 {
-	renderer *d3d = dynamic_cast<renderer *>(window->m_renderer);
 	UINT num_passes = 0;
 
 	curr_effect = downsample_effect;
@@ -1755,7 +1727,6 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		return;
 
 	UINT num_passes = 0;
-	renderer *d3d = dynamic_cast<renderer *>(window->m_renderer);
 	curr_texture = poly->get_texture();
 
 	if(PRIMFLAG_GET_SCREENTEX(d3d->get_last_texture_flags()) && curr_texture != NULL)
@@ -2080,14 +2051,11 @@ render_target* shaders::get_vector_target()
 		return NULL;
 	}
 
-	renderer *d3d = dynamic_cast<renderer *>(window->m_renderer);
-
 	return find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
 }
 
 void shaders::create_vector_target(render_primitive *prim)
 {
-	renderer *d3d = dynamic_cast<renderer *>(window->m_renderer);
 	if (!add_render_target(d3d, NULL, d3d->get_width(), d3d->get_height(), 1, 1))
 	{
 		vector_enable = false;
@@ -2179,7 +2147,7 @@ bool shaders::add_render_target(renderer* d3d, texture_info* info, int width, in
 //============================================================
 void shaders::enumerate_screens()
 {
-	screen_device_iterator iter(window->machine().root_device());
+	screen_device_iterator iter(machine->root_device());
 	num_screens = iter.count();
 }
 
@@ -2201,8 +2169,6 @@ bool shaders::register_texture(texture_info *texture)
 	}
 
 	enumerate_screens();
-
-	renderer *d3d = dynamic_cast<renderer *>(window->m_renderer);
 
 	int hlsl_prescale_x = prescale_force_x;
 	int hlsl_prescale_y = prescale_force_y;
@@ -2935,7 +2901,7 @@ slider_state *shaders::init_slider_list()
 	for (int index = 0; s_sliders[index].name != NULL; index++)
 	{
 		slider_desc *slider = &s_sliders[index];
-		*tailptr = slider_alloc(window->machine(), slider->name, slider->minval, slider->defval, slider->maxval, slider->step, slider->adjustor, (void*)options);
+		*tailptr = slider_alloc(*machine, slider->name, slider->minval, slider->defval, slider->maxval, slider->step, slider->adjustor, (void*)options);
 		tailptr = &(*tailptr)->next;
 	}
 
@@ -2994,8 +2960,9 @@ void uniform::update()
 	}
 
 	shaders *shadersys = m_shader->m_shaders;
-	renderer *d3d = dynamic_cast<renderer *>(shadersys->window->m_renderer);
 	hlsl_options *options = shadersys->options;
+	renderer *d3d = shadersys->d3d;
+
 
 	switch(m_id)
 	{

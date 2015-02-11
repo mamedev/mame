@@ -68,7 +68,7 @@ struct quad_setup_data
     : dudx(0), dvdx(0), dudy(0), dvdy(0), startu(0), startv(0),
       rotwidth(0), rotheight(0)
     {}
-    void compute(const render_primitive &prim);
+    void compute(const render_primitive &prim, const int prescale);
 
 	INT32           dudx, dvdx, dudy, dvdy;
 	INT32           startu, startv;
@@ -142,7 +142,7 @@ private:
 class sdl_info13 : public osd_renderer
 {
 public:
-    sdl_info13(sdl_window_info *w)
+    sdl_info13(osd_window *w)
     : osd_renderer(w, FLAG_NONE), m_blittimer(0), m_sdl_renderer(NULL),
       m_last_hofs(0), m_last_vofs(0),
       m_width(0), m_height(0),
@@ -501,7 +501,7 @@ static void expand_copy_info(copy_info_t *list)
 	}
 }
 
-static osd_renderer *drawsdl2_create(sdl_window_info *window)
+static osd_renderer *drawsdl2_create(osd_window *window)
 {
 	return global_alloc(sdl_info13(window));
 }
@@ -988,7 +988,7 @@ void texture_info::set_data(const render_texinfo &texsource, const UINT32 flags)
 //  compute rotation setup
 //============================================================
 
-void quad_setup_data::compute(const render_primitive &prim)
+void quad_setup_data::compute(const render_primitive &prim, const int prescale)
 {
 	const render_quad_texuv *texcoords = &prim.texcoords;
 	int texwidth = prim.texture.width;
@@ -998,7 +998,7 @@ void quad_setup_data::compute(const render_primitive &prim)
 	float fscale;
 	/* determine U/V deltas */
 	if ((PRIMFLAG_GET_SCREENTEX(prim.flags)))
-		fscale = (float) video_config.prescale;
+		fscale = (float) prescale;
 	else
 		fscale = 1.0f;
 
@@ -1081,7 +1081,7 @@ texture_info * sdl_info13::texture_update(const render_primitive &prim)
 	quad_setup_data setup;
 	texture_info *texture;
 
-	setup.compute(prim);
+	setup.compute(prim, window().prescale());
 
 	texture = texture_find(prim, setup);
 

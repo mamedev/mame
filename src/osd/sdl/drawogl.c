@@ -221,9 +221,8 @@ public:
 class sdl_info_ogl : public osd_renderer
 {
 public:
-	sdl_info_ogl(sdl_window_info *window)
+	sdl_info_ogl(osd_window *window)
 	: osd_renderer(window, FLAG_NEEDS_OPENGL), m_blittimer(0),
-		m_screen_width(0), m_screen_height(0),
 		m_width(0), m_height(0),
 		m_blitwidth(0), m_blitheight(0),
 #if (SDLMAME_SDL2)
@@ -292,8 +291,6 @@ private:
 	void texture_all_disable();
 
 	INT32           m_blittimer;
-	int             m_screen_width;
-	int             m_screen_height;
 	int				m_width;
 	int				m_height;
 	int				m_blitwidth;
@@ -462,7 +459,7 @@ static int dll_loaded = 0;
 //  drawsdl_init
 //============================================================
 
-static osd_renderer *drawogl_create(sdl_window_info *window)
+static osd_renderer *drawogl_create(osd_window *window)
 {
 	return global_alloc(sdl_info_ogl(window));
 }
@@ -744,9 +741,6 @@ int sdl_info_ogl::create()
 
 #else
 #endif
-
-	m_screen_width = 0;
-	m_screen_height = 0;
 
 	m_blittimer = 0;
 	m_surf_w = 0;
@@ -1210,8 +1204,7 @@ int sdl_info_ogl::draw(UINT32 dc, int update)
 	render_primitive *prim;
 	texture_info *texture=NULL;
 	float vofs, hofs;
-	int  pendingPrimitive=GL_NO_PRIMITIVE, curPrimitive=GL_NO_PRIMITIVE, scrnum, is_vector;
-	const screen_device *screen;
+	int  pendingPrimitive=GL_NO_PRIMITIVE, curPrimitive=GL_NO_PRIMITIVE;
 	int width = 0; int height = 0;
 
 	if (video_config.novideo)
@@ -1233,26 +1226,6 @@ int sdl_info_ogl::draw(UINT32 dc, int update)
 
 #if (SDLMAME_SDL2)
 	SDL_GL_MakeCurrent(window().sdl_window(), m_gl_context_id);
-#else
-	if (!m_init_context)
-	{
-		screen_device_iterator myiter(window().machine().root_device());
-		for (screen = myiter.first(); screen != NULL; screen = myiter.next())
-		{
-			if (window().index() == 0)
-			{
-				if ((screen->width() != m_screen_width) || (screen->height() != m_screen_height))
-				{
-					m_screen_width = screen->width();
-					m_screen_height = screen->height();
-
-					// force all textures to be regenerated
-					destroy_all_textures();
-				}
-				break;
-			}
-		}
-	}
 #endif
 
 	if (m_init_context)
@@ -1271,24 +1244,8 @@ int sdl_info_ogl::draw(UINT32 dc, int update)
 		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	}
 
-	// figure out if we're vector
-	scrnum = is_vector = 0;
-	screen_device_iterator iter(window().machine().root_device());
-	for (screen = iter.first(); screen != NULL; screen = iter.next())
-	{
-		if (scrnum == window().index())
-		{
-			is_vector = (screen->screen_type() == SCREEN_TYPE_VECTOR) ? 1 : 0;
-			break;
-		}
-		else
-		{
-			scrnum++;
-		}
-	}
-
 	// only clear if the geometry changes (and for 2 frames afterward to clear double and triple buffers)
-	if ((m_blittimer > 0) || (is_vector))
+	if ((m_blittimer > 0) || has_flags(FLAG_HAS_VECTOR_SCREEN))
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
 		m_blittimer--;
@@ -1303,6 +1260,11 @@ int sdl_info_ogl::draw(UINT32 dc, int update)
 		{
 			loadGLExtensions();
 		}
+
+#if (!SDLMAME_SDL2)
+		// force all textures to be regenerated
+		destroy_all_textures();
+#endif
 
 		m_surf_w = m_width;
 		m_surf_h = m_height;

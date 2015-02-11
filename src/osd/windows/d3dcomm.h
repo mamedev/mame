@@ -108,7 +108,7 @@ private:
 class texture_info
 {
 public:
-	texture_info(texture_manager *manager, const render_texinfo *texsource, UINT32 flags);
+	texture_info(texture_manager *manager, const render_texinfo *texsource, int prescale, UINT32 flags);
 	~texture_info();
 
 	render_texinfo &        get_texinfo() { return m_texinfo; }

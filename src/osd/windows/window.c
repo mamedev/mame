@@ -297,7 +297,7 @@ void windows_osd_interface::window_exit()
 
 
 win_window_info::win_window_info(running_machine &machine)
-		: m_next(NULL),
+		: osd_window(), m_next(NULL),
 		m_init_state(0),
 		m_startmaximized(0),
 		m_isminimized(0),
@@ -320,6 +320,7 @@ win_window_info::win_window_info(running_machine &machine)
 	m_non_fullscreen_bounds.top = 0;
 	m_non_fullscreen_bounds.right  = 0;
 	m_non_fullscreen_bounds.bottom = 0;
+	m_prescale = video_config.prescale;
 }
 
 win_window_info::~win_window_info()

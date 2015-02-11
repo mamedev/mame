@@ -50,7 +50,7 @@ class sdl_info : public osd_renderer
 {
 public:
 
-	sdl_info(sdl_window_info *w, int extra_flags)
+	sdl_info(osd_window *w, int extra_flags)
 	: osd_renderer(w, extra_flags),
 	#if (SDLMAME_SDL2)
 	m_sdl_renderer(NULL),
@@ -227,7 +227,7 @@ int drawsdl_scale_mode(const char *s)
 }
 
 
-static osd_renderer *drawsdl_create(sdl_window_info *window)
+static osd_renderer *drawsdl_create(osd_window *window)
 {
 	// FIXME: QUALITY HINTS
 #if (SDLMAME_SDL2)
@@ -292,10 +292,10 @@ void sdl_info::setup_texture(int tempwidth, int tempheight)
 		int m_hw_scale_height = 0;
 
 		window().target()->compute_minimum_size(m_hw_scale_width, m_hw_scale_height);
-		if (video_config.prescale)
+		if (window().prescale())
 		{
-			m_hw_scale_width *= video_config.prescale;
-			m_hw_scale_height *= video_config.prescale;
+			m_hw_scale_width *= window().prescale();
+			m_hw_scale_height *= window().prescale();
 
 			/* This must be a multiple of 2 */
 			m_hw_scale_width = (m_hw_scale_width + 1) & ~1;
@@ -329,10 +329,10 @@ void sdl_info::yuv_overlay_init()
 
 	window().target()->compute_minimum_size(minimum_width, minimum_height);
 
-	if (video_config.prescale)
+	if (window().prescale())
 	{
-		minimum_width *= video_config.prescale;
-		minimum_height *= video_config.prescale;
+		minimum_width *= window().prescale();
+		minimum_height *= window().prescale();
 	}
 
 	if (m_yuvsurf != NULL)

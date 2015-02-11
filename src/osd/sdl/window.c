@@ -1017,6 +1017,9 @@ void sdl_window_info::update()
 	// if we're visible and running and not in the middle of a resize, draw
 	if (m_target != NULL)
 	{
+
+
+
 		int tempwidth, tempheight;
 
 		// see if the games video mode has changed
@@ -1326,6 +1329,33 @@ OSDWORK_CALLBACK( sdl_window_info::draw_video_contents_wt )
 
 	// Some configurations require events to be polled in the worker thread
 	sdlinput_process_events_buf();
+
+	// Check whether window has vector screens
+
+	{
+#if 1
+		int scrnum = 0;
+		int is_vector = 0;
+		screen_device_iterator iter(window->machine().root_device());
+		for (const screen_device *screen = iter.first(); screen != NULL; screen = iter.next())
+		{
+			if (scrnum == window->m_index)
+			{
+				is_vector = (screen->screen_type() == SCREEN_TYPE_VECTOR) ? 1 : 0;
+				break;
+			}
+			else
+			{
+				scrnum++;
+			}
+		}
+		if (is_vector)
+			window->renderer().set_flags(osd_renderer::FLAG_HAS_VECTOR_SCREEN);
+		else
+			window->renderer().clear_flags(osd_renderer::FLAG_HAS_VECTOR_SCREEN);
+#endif
+	}
+
 
 	window->m_primlist = wp->list();
 

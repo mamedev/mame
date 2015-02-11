@@ -25,7 +25,7 @@
 class renderer_gdi : public osd_renderer
 {
 public:
-	renderer_gdi(win_window_info *window)
+	renderer_gdi(osd_window *window)
 	: osd_renderer(window, FLAG_NONE), bmdata(NULL), bmsize(0) { }
 
 	virtual ~renderer_gdi() { }
@@ -57,7 +57,7 @@ static void drawgdi_exit(void);
 //  drawnone_create
 //============================================================
 
-static osd_renderer *drawgdi_create(win_window_info *window)
+static osd_renderer *drawgdi_create(osd_window *window)
 {
 	return global_alloc(renderer_gdi(window));
 }

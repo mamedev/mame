@@ -25,7 +25,7 @@
 class renderer_bgfx : public osd_renderer
 {
 public:
-	renderer_bgfx(win_window_info *window)
+	renderer_bgfx(osd_window *window)
 	: osd_renderer(window, FLAG_NONE) { }
 
 	virtual ~renderer_bgfx() { }
@@ -53,7 +53,7 @@ static void drawbgfx_exit(void);
 //  drawnone_create
 //============================================================
 
-osd_renderer *drawbgfx_create(win_window_info *window)
+osd_renderer *drawbgfx_create(osd_window *window)
 {
 	return global_alloc(renderer_bgfx(window));
 }

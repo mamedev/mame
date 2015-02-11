@@ -39,7 +39,7 @@ typedef HRESULT (WINAPI *directdrawenumerateex_ptr)(LPDDENUMCALLBACKEXA lpCallba
 class renderer_dd : public osd_renderer
 {
 public:
-	renderer_dd(win_window_info *window)
+	renderer_dd(osd_window *window)
 	: osd_renderer(window, FLAG_NONE),
 		//adapter(0),
 		adapter_ptr(NULL),
@@ -140,7 +140,8 @@ struct monitor_enum_info
 /* mode_enum_info holds information during a display mode enumeration */
 struct mode_enum_info
 {
-	win_window_info *		window;
+	renderer_dd *			renderer;
+	osd_window  *			window;
 	INT32                   minimum_width, minimum_height;
 	INT32                   target_width, target_height;
 	double                  target_refresh;
@@ -191,7 +192,7 @@ static void drawdd_exit(void);
 //  drawnone_create
 //============================================================
 
-static osd_renderer *drawdd_create(win_window_info *window)
+static osd_renderer *drawdd_create(osd_window *window)
 {
 	return global_alloc(renderer_dd(window));
 }
@@ -833,7 +834,7 @@ void renderer_dd::compute_blit_surface_size()
 	// hardware stretch case: apply prescale
 	if (video_config.hwstretch)
 	{
-		int prescale = (video_config.prescale < 1) ? 1 : video_config.prescale;
+		int prescale = (window().prescale() < 1) ? 1 : window().prescale();
 
 		// clamp the prescale to something smaller than the target bounds
 		xscale = prescale;
@@ -1206,7 +1207,7 @@ static HRESULT WINAPI enum_modes_callback(LPDDSURFACEDESC2 desc, LPVOID context)
 {
 	float size_score, refresh_score, final_score;
 	mode_enum_info *einfo = (mode_enum_info *)context;
-	renderer_dd *dd = dynamic_cast<renderer_dd *>(einfo->window->m_renderer);
+	renderer_dd *dd = einfo->renderer;
 
 	// skip non-32 bit modes
 	if (desc->ddpfPixelFormat.dwRGBBitCount != 32)
@@ -1271,8 +1272,8 @@ void renderer_dd::pick_best_mode()
 	window().target()->compute_minimum_size(einfo.minimum_width, einfo.minimum_height);
 
 	// use those as the target for now
-	einfo.target_width = einfo.minimum_width * MAX(1, video_config.prescale);
-	einfo.target_height = einfo.minimum_height * MAX(1, video_config.prescale);
+	einfo.target_width = einfo.minimum_width * MAX(1, window().prescale());
+	einfo.target_height = einfo.minimum_height * MAX(1, window().prescale());
 
 	// determine the refresh rate of the primary screen
 	einfo.target_refresh = 60.0;
@@ -1289,14 +1290,15 @@ void renderer_dd::pick_best_mode()
 	}
 
 	// if we are stretching, aim for a mode approximately 2x the game's resolution
-	else if (video_config.prescale <= 1)
+	else if (window().prescale() <= 1)
 	{
 		einfo.target_width *= 2;
 		einfo.target_height *= 2;
 	}
 
 	// fill in the rest of the data
-	einfo.window = dynamic_cast<win_window_info *>(&window());
+	einfo.window = &window();
+	einfo.renderer = this;
 	einfo.best_score = 0.0f;
 
 	// enumerate the modes
