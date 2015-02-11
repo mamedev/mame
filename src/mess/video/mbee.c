@@ -346,8 +346,8 @@ WRITE8_MEMBER ( mbee_state::m6545_data_w )
 			memcpy(m_p_gfxram, memregion("gfx")->base() + (((data & 0x30) == 0x20) << 11), 0x800);
 		break;
 	case 31:
-				/* This firstly pushes the contents of the transparent registers onto the MA lines,
-				then increments the address, then sets update strobe on. */
+		/* This firstly pushes the contents of the transparent registers onto the MA lines,
+		then increments the address, then sets update strobe on. */
 		addr = (m_sy6545_reg[18] << 8) | m_sy6545_reg[19];
 		keyboard_matrix_r(addr);
 		m_sy6545_reg[19]++;

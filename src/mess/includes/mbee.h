@@ -52,14 +52,6 @@ public:
 		, m_pak(*this, "pak")
 		, m_telcom(*this, "telcom")
 		, m_basic(*this, "basic")
-		, m_bankl(*this, "bankl")
-		, m_bankh(*this, "bankh")
-		, m_bank1(*this, "bank1")
-		, m_bank8l(*this, "bank8l")
-		, m_bank8h(*this, "bank8h")
-		, m_bank9(*this, "bank9")
-		, m_bankfl(*this, "bankfl")
-		, m_bankfh(*this, "bankfh")
 		, m_io_x0(*this, "X0")
 		, m_io_x1(*this, "X1")
 		, m_io_x2(*this, "X2")
@@ -129,7 +121,6 @@ public:
 	DECLARE_DRIVER_INIT(mbeepc);
 	DECLARE_DRIVER_INIT(mbeeic);
 	DECLARE_DRIVER_INIT(mbee128);
-	DECLARE_DRIVER_INIT(mbee64);
 	DECLARE_MACHINE_RESET(mbee);
 	DECLARE_VIDEO_START(mbee);
 	DECLARE_VIDEO_START(mbeeic);
@@ -138,7 +129,6 @@ public:
 	DECLARE_VIDEO_START(mbeeppc);
 	DECLARE_PALETTE_INIT(mbeeppc);
 	DECLARE_MACHINE_RESET(mbee56);
-	DECLARE_MACHINE_RESET(mbee64);
 	DECLARE_MACHINE_RESET(mbee128);
 	DECLARE_MACHINE_RESET(mbee256);
 	DECLARE_MACHINE_RESET(mbeett);
@@ -147,8 +137,8 @@ public:
 	TIMER_CALLBACK_MEMBER(mbee256_kbd);
 	TIMER_CALLBACK_MEMBER(mbee_rtc_irq);
 	TIMER_CALLBACK_MEMBER(mbee_reset);
-	DECLARE_QUICKLOAD_LOAD_MEMBER( mbee );
-	DECLARE_QUICKLOAD_LOAD_MEMBER( mbee_z80bin );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(mbee);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(mbee_z80bin);
 	WRITE_LINE_MEMBER(fdc_intrq_w);
 	WRITE_LINE_MEMBER(fdc_drq_w);
 	UINT8 *m_p_videoram;
@@ -169,6 +159,7 @@ public:
 
 	required_device<palette_device> m_palette;
 private:
+	bool m_is_premium;
 	size_t m_size;
 	UINT8 m_clock_pulse;
 	UINT8 m_mbee256_key_available;
@@ -177,13 +168,12 @@ private:
 	UINT8 m_mbee256_q_pos;
 	UINT8 m_0a;
 	UINT8 m_0b;
-	UINT8 m_is_premium;
 	UINT8 m_sy6545_status;
 	UINT8 m_sy6545_reg[32];
 	UINT8 m_sy6545_ind;
 	UINT8 m_fdc_rq;
 	UINT8 m_bank_array[33];
-	void mbee256_setup_banks(UINT8 data, bool first_time);
+	void setup_banks(UINT8 data, bool first_time, UINT8 b_mask);
 	void sy6545_cursor_configure();
 	void keyboard_matrix_r(int offs);
 	void machine_reset_common_disk();
@@ -204,14 +194,6 @@ private:
 	optional_memory_bank m_pak;
 	optional_memory_bank m_telcom;
 	optional_memory_bank m_basic;
-	optional_memory_bank m_bankl;
-	optional_memory_bank m_bankh;
-	optional_memory_bank m_bank1;
-	optional_memory_bank m_bank8l;
-	optional_memory_bank m_bank8h;
-	optional_memory_bank m_bank9;
-	optional_memory_bank m_bankfl;
-	optional_memory_bank m_bankfh;
 	required_ioport m_io_x0;
 	required_ioport m_io_x1;
 	required_ioport m_io_x2;

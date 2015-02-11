@@ -55,11 +55,21 @@
         F000-F7FF Video RAM
         F800-FFFF PCG RAM (graphics), Colour RAM (banked)
 
+    Early machines have 'standard' video (128 hires characters).
+    Later machines had the option of 'premium' video which
+    provides thousands of hires characters, enough to simulate
+    bit-mapped graphics.
+
     Commands to call up built-in roms (depends on the model):
     NET - Jump to E000, usually the Telcom communications program.
           This rom can be replaced with the Dreamdisk Chip-8 rom.
         Note that Telcom 3.21 is 8k, it uses a rombank switch
         (by reading port 0A) to swap between the two halves.
+        Most parts of NET can be called up from Basic, e.g.
+        NET CLOCK will turn on the clock, NET CLOCKD will remove
+        the resultant status bar, NET TIME hhmm to set the time, etc.
+        Further, after doing a NET command, the 80x24 mode becomes
+        available to Basic. OUT#7 to turn it on, OUT#0 for 64x16.
 
     EDASM - Jump to C000, usually the editor/Assembler package.
 
@@ -100,10 +110,16 @@
       crashes due to a bug in z80pio emulation.
     
     - 256tc: Keyboard ROM U60 needs to be dumped.
-    - 128k: PROM PAL needs to be dumped for the bankswitching.
+    - 128k: GOLD PAL needs to be dumped for the bankswitching.
+    - 64k: RED PAL needs to be dumped for the bankswitching.
 
-    - Teleterm: keyboard is problematic, and cursor doesn't show.
+    - Teleterm: keyboard is problematic, and cursor doesn't show. Also, the
+                schematic shows it using the old-style keyboard, however this
+                must be wrong since the computer has function keys, which are
+                only available on the new keyboard.
 
+    - Mouse: a few programs support the use of a serial mouse which interfaced
+             directly to the Z80PIO. However there's little info to be found.
 
 ***************************************************************************
 
@@ -186,14 +202,6 @@ static ADDRESS_MAP_START(mbee56_mem, AS_PROGRAM, 8, mbee_state)
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
 	AM_RANGE(0x1000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(mbee_low_r, mbee_low_w)
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(mbeeic_high_r, mbeeic_high_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(mbee64_mem, AS_PROGRAM, 8, mbee_state)
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
-	AM_RANGE(0x1000, 0x7fff) AM_RAMBANK("bankl")
-	AM_RANGE(0x8000, 0xefff) AM_RAMBANK("bankh")
 	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(mbee_low_r, mbee_low_w)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(mbeeic_high_r, mbeeic_high_w)
 ADDRESS_MAP_END
@@ -293,19 +301,6 @@ static ADDRESS_MAP_START(mbee56_io, AS_IO, 8, mbee_state)
 	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
 	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("fdc", wd2793_t, read, write)
 	AM_RANGE(0x48, 0x4f) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(mbee64_io, AS_IO, 8, mbee_state)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x10) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0x10) AM_READWRITE(mbeeic_08_r, mbeeic_08_w)
-	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0x10) AM_READWRITE(mbee_0b_r, mbee_0b_w)
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
-	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
-	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("fdc", wd2793_t, read, write)
-	AM_RANGE(0x48, 0x4f) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
-	AM_RANGE(0x50, 0x57) AM_WRITE(mbee64_50_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbee128_io, AS_IO, 8, mbee_state)
@@ -780,14 +775,7 @@ static MACHINE_CONFIG_DERIVED( mbee56, mbeeic )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbee_floppies, "drive5b", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mbee64, mbee56 )
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(mbee64_mem)
-	MCFG_CPU_IO_MAP(mbee64_io)
-	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee64)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( mbee128, mbeeppc )
+static MACHINE_CONFIG_DERIVED( mbee128p, mbeeppc )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbee256_mem)
 	MCFG_CPU_IO_MAP(mbee128_io)
@@ -799,7 +787,11 @@ static MACHINE_CONFIG_DERIVED( mbee128, mbeeppc )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbee_floppies, "drive5b", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mbee256, mbee128 )
+static MACHINE_CONFIG_DERIVED( mbee128, mbee128p )
+	MCFG_VIDEO_START_OVERRIDE(mbee_state,mbeeic)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( mbee256, mbee128p )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbee256_mem)
 	MCFG_CPU_IO_MAP(mbee256_io)
@@ -1084,15 +1076,18 @@ ROM_START( mbee56 )
 	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START( mbee64 ) // CIAB (Computer-In-A-Book)
-	ROM_REGION(0x10000,"maincpu", ROMREGION_ERASEFF)
+ROM_START( mbee128 ) // Standard 128k (CIAB is the same thing with half the ram)
+	ROM_REGION(0x10000, "rams", ROMREGION_ERASEFF)
 
-	ROM_REGION(0x7000,"bootrom", ROMREGION_ERASEFF)
+	ROM_REGION(0x7000, "roms", ROMREGION_ERASEFF)
 	ROM_LOAD("bn54.bin",              0x0000,  0x2000, CRC(995c53db) SHA1(46e1a5cfd5795b8cf528bacf9dc79398ff7d64af) )
 
 	ROM_REGION(0x2000, "gfx", 0)
 	ROM_LOAD("charrom.bin",           0x1000,  0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )
 	ROM_RELOAD( 0x0000, 0x1000 )
+
+	ROM_REGION(0x4000, "pals", 0) // undumped; using prom from 256tc for now
+	ROM_LOAD( "silver.u39", 0x0000, 0x4000, BAD_DUMP CRC(c34aab64) SHA1(781fe648488dec90185760f8e081e488b73b68bf) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
@@ -1102,16 +1097,16 @@ ROM_START( mbee64 ) // CIAB (Computer-In-A-Book)
 	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START( mbee128 ) // 128K
+ROM_START( mbee128p ) // Premium 128K
 	ROM_REGION(0x20000, "rams", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x8000, "roms", 0) // rom plus optional undumped roms plus dummy area
-	ROM_SYSTEM_BIOS( 0, "bn60", "Version 2.03" )
-	ROMX_LOAD("bn60.rom",     0x0000, 0x2000, CRC(ed15d4ee) SHA1(3ea42b63d42b9a4c5402676dee8912ad1f906bda), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 0, "bn56", "bn56" )
+	ROMX_LOAD("bn56.rom",     0x0000, 0x2000, CRC(3f76769d) SHA1(cfae2069d739c26fe39f734d9f705a3c965d1e6f), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "bn59", "Version 2.02" )
 	ROMX_LOAD("bn59.rom",     0x0000, 0x2000, CRC(97384116) SHA1(87f2c4ab1a1f2964ba4f2bb60e62dc9c163831ba), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 2, "bn56", "bn56" )
-	ROMX_LOAD("bn56.rom",     0x0000, 0x2000, CRC(3f76769d) SHA1(cfae2069d739c26fe39f734d9f705a3c965d1e6f), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 2, "bn60", "Version 2.03" )
+	ROMX_LOAD("bn60.rom",     0x0000, 0x2000, CRC(ed15d4ee) SHA1(3ea42b63d42b9a4c5402676dee8912ad1f906bda), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 3, "bn55", "bn55" )
 	ROMX_LOAD("bn55.rom",     0x0000, 0x2000, CRC(ca2c1073) SHA1(355d90d181de899cc7af892df96305fead9c81b4), ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS( 4, "bn54", "bn54" )
@@ -1119,7 +1114,7 @@ ROM_START( mbee128 ) // 128K
 	ROM_SYSTEM_BIOS( 5, "hd18", "Hard Disk System" )
 	ROMX_LOAD("hd18.rom",     0x0000, 0x2000, CRC(ed53ace7) SHA1(534e2e00cc527197c76b3c106b3c9ff7f1328487), ROM_BIOS(6) )
 
-	ROM_REGION(0x4000, "proms", 0) // undumped; using prom from 256tc for now
+	ROM_REGION(0x4000, "pals", 0) // undumped; using prom from 256tc for now
 	ROM_LOAD( "silver.u39", 0x0000, 0x4000, BAD_DUMP CRC(c34aab64) SHA1(781fe648488dec90185760f8e081e488b73b68bf) )
 
 	ROM_REGION(0x9800, "gfx", 0)
@@ -1140,7 +1135,7 @@ ROM_START( mbee256 ) // 256tc
 	ROM_SYSTEM_BIOS( 1, "1.15", "Version 1.15" )
 	ROMX_LOAD("256tc_boot_1.15.u38", 0x0000, 0x4000, CRC(1902062d) SHA1(e4a1c0b3f4996e313da0bac0edb6d34e3270723e), ROM_BIOS(2) )
 
-	ROM_REGION(0x4000, "proms", 0)
+	ROM_REGION(0x4000, "pals", 0)
 	ROM_LOAD( "silver.u39", 0x0000, 0x4000, CRC(c34aab64) SHA1(781fe648488dec90185760f8e081e488b73b68bf) )
 
 	ROM_REGION(0x9800, "gfx", 0)
@@ -1169,6 +1164,6 @@ COMP( 1985, mbeepc85s,mbee,     0,      mbeepc85, mbee,     mbee_state,  mbeepc8
 COMP( 1986, mbeeppc,  mbee,     0,      mbeeppc,  mbee,     mbee_state,  mbeeppc,    "Applied Technology",  "Microbee Premium PC85" , 0 )
 COMP( 1986, mbeett,   mbee,     0,      mbeett,   mbee256,  mbee_state,  mbeett,     "Applied Technology",  "Microbee Teleterm" , GAME_NOT_WORKING )
 COMP( 1986, mbee56,   mbee,     0,      mbee56,   mbee,     mbee_state,  mbee56,     "Applied Technology",  "Microbee 56k" , GAME_NOT_WORKING )
-COMP( 1986, mbee64,   mbee,     0,      mbee64,   mbee,     mbee_state,  mbee64,     "Applied Technology",  "Microbee 64k" , GAME_NOT_WORKING )
-COMP( 1986, mbee128,  mbee,     0,      mbee128,  mbee,     mbee_state,  mbee128,    "Applied Technology",  "Microbee 128k" , GAME_NOT_WORKING )
+COMP( 1986, mbee128,  mbee,     0,      mbee128,  mbee,     mbee_state,  mbee128,    "Applied Technology",  "Microbee 128k Standard" , GAME_NOT_WORKING )
+COMP( 1986, mbee128p, mbee,     0,      mbee128p, mbee,     mbee_state,  mbee128,    "Applied Technology",  "Microbee 128k Premium" , GAME_NOT_WORKING )
 COMP( 1987, mbee256,  mbee,     0,      mbee256,  mbee256,  mbee_state,  mbee256,    "Applied Technology",  "Microbee 256TC" , GAME_NOT_WORKING )
