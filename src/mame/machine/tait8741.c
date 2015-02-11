@@ -371,7 +371,7 @@ void josvolly8741_4pack_device::device_start()
 		save_item(NAME(m_i8741[i].rst), i);
 	};
 	
-	//save_item(NAME(m_nmi_enable)); //never changes from 0?
+	save_item(NAME(m_nmi_enable));
 }
 
 
