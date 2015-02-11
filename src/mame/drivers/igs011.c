@@ -233,6 +233,7 @@ public:
 	void ryukobou_decrypt();
 	void lhb2_decrypt_gfx();
 	void drgnwrld_gfx_decrypt();
+	void prot_mem_range_set();
 };
 
 
@@ -1102,7 +1103,14 @@ WRITE16_MEMBER(igs011_state::igs011_prot_addr_w)
 	sp.install_rom(m_prot1_addr + 0, m_prot1_addr + 9, rom + m_prot1_addr);
 
 	m_prot1_addr = (data << 4) ^ 0x8340;
+	
+	prot_mem_range_set();
+}
 
+void igs011_state::prot_mem_range_set()
+{	
+	address_space &sp = m_maincpu->space(AS_PROGRAM);
+	
 	// Add protection memory range
 	sp.install_write_handler(m_prot1_addr + 0, m_prot1_addr + 7, write16_delegate(FUNC(igs011_state::igs011_prot1_w), this));
 	sp.install_read_handler (m_prot1_addr + 8, m_prot1_addr + 9, read16_delegate(FUNC(igs011_state::igs011_prot1_r), this));
@@ -2284,6 +2292,7 @@ DRIVER_INIT_MEMBER(igs011_state,vbowl)
     rom[0x1e6e6/2] = 0x600c;    // 01E6E6: 670C      beq     $1e6f4
     rom[0x1f7ce/2] = 0x600c;    // 01F7CE: 670C      beq     $1f7dc
 */
+	machine().save().register_postload(save_prepost_delegate(FUNC(igs011_state::prot_mem_range_set), this));
 }
 
 
@@ -2307,6 +2316,7 @@ DRIVER_INIT_MEMBER(igs011_state,vbowlj)
     rom[0x1e6e6/2] = 0x600c;    // 01E6E6: 670C      beq     $1e6f4
     rom[0x1f7c8/2] = 0x600c;    // 01F7C8: 670C      beq     1f7d6
 */
+	machine().save().register_postload(save_prepost_delegate(FUNC(igs011_state::prot_mem_range_set), this));
 }
 
 
