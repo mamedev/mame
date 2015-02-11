@@ -285,7 +285,7 @@ private:
 	texture_info *texture_find(const render_primitive *prim);
 	void texture_coord_update(texture_info *texture, const render_primitive *prim, int shaderIdx);
 	void texture_mpass_flip(texture_info *texture, int shaderIdx);
-	void texture_shader_update(texture_info *texture, int shaderIdx);
+	void texture_shader_update(texture_info *texture, render_container *container,  int shaderIdx);
 	texture_info * texture_update(const render_primitive *prim, int shaderIdx);
 	void texture_disable(texture_info * texture);
 	void texture_all_disable();
@@ -2852,30 +2852,19 @@ void sdl_info_ogl::texture_mpass_flip(texture_info *texture, int shaderIdx)
 	}
 }
 
-void sdl_info_ogl::texture_shader_update(texture_info *texture, int shaderIdx)
+void sdl_info_ogl::texture_shader_update(texture_info *texture, render_container *container, int shaderIdx)
 {
-	int uniform_location, scrnum;
-	render_container *container;
+	int uniform_location;
 	GLfloat vid_attributes[4];
-
-	scrnum = 0;
-	container = (render_container *)NULL;
-	screen_device_iterator iter(window().machine().root_device());
-	for (screen_device *screen = iter.first(); screen != NULL; screen = iter.next())
-	{
-		if (scrnum == window().m_start_viewscreen)
-		{
-			container = &screen->container();
-		}
-
-		scrnum++;
-	}
 
 	if (container!=NULL)
 	{
 		render_container::user_settings settings;
 		container->get_user_settings(settings);
-		//FIXME: Intended behaviour
+		/* FIXME: the code below is in just for illustration issue on
+		 * how to set shader variables. gamma, contrast and brightness are
+		 * handled already by the core
+		 */
 #if 1
 		vid_attributes[0] = window().machine().options().gamma();
 		vid_attributes[1] = window().machine().options().contrast();
@@ -2891,10 +2880,6 @@ void sdl_info_ogl::texture_shader_update(texture_info *texture, int shaderIdx)
 		if ( GL_CHECK_ERROR_QUIET() ) {
 			osd_printf_verbose("GLSL: could not set 'vid_attributes' for shader prog idx %d\n", shaderIdx);
 		}
-	}
-	else
-	{
-		osd_printf_verbose("GLSL: could not get render container for screen %d\n", window().m_start_viewscreen);
 	}
 }
 
@@ -2930,7 +2915,7 @@ texture_info * sdl_info_ogl::texture_update(const render_primitive *prim, int sh
 	{
 		if ( texture->type == TEXTURE_TYPE_SHADER )
 		{
-			texture_shader_update(texture, shaderIdx);
+			texture_shader_update(texture, prim->container, shaderIdx);
 			if ( m_glsl_program_num>1 )
 			{
 				texture_mpass_flip(texture, shaderIdx);
