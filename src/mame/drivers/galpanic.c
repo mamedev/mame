@@ -354,6 +354,29 @@ static ADDRESS_MAP_START( supmodel_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0xf80000, 0xf80001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00) /* fantasia, missw96 */
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( smissw_map, AS_PROGRAM, 16, galpanic_state )
+	AM_RANGE(0x000000, 0x4fffff) AM_ROM
+	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fgvideoram")
+    AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE(galpanic_bgvideoram_w) AM_SHARE("bgvideoram")
+    AM_RANGE(0x580000, 0x583fff) AM_RAM //_WRITE(galpanic_bgvideoram_mirror_w) // can't be right, causes half the display to vanish at times!
+	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE(galpanic_paletteram_w) AM_SHARE("paletteram")  /* 1024 colors, but only 512 seem to be used */
+	AM_RANGE(0x680000, 0x68001f) AM_RAM
+	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x780000, 0x78001f) AM_RAM
+	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
+	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
+	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x800006, 0x800007) AM_READ(comad_timer_r)
+	AM_RANGE(0x80000e, 0x80000f) AM_READ(comad_timer_r)
+	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)  /* not sure */
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP
+	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM
+	AM_RANGE(0xd80000, 0xd80001) AM_WRITENOP
+	AM_RANGE(0xe00012, 0xe00013) AM_WRITENOP
+	AM_RANGE(0xe80000, 0xe80001) AM_WRITENOP
+	AM_RANGE(0xf00000, 0xf00001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00) /* fantasia, missw96 */
+ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( galpanic )
 	PORT_START("DSW1")
@@ -615,15 +638,22 @@ static MACHINE_CONFIG_DERIVED( supmodel, comad )
 	MCFG_CPU_PROGRAM_MAP(supmodel_map)
 	//MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galpanic_state, galpanic_scanline, "screen", 0, 1)
 
-	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(galpanic_state, screen_update_comad)
-	MCFG_SCREEN_VBLANK_NONE()
-
 	/* sound hardware */
 	MCFG_OKIM6295_REPLACE("oki", 1584000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( smissw, comad ) // 951127 PCB, 12 & 16 clocks
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(12000000)
+	MCFG_CPU_PROGRAM_MAP(smissw_map)
+	MCFG_TIMER_MODIFY("scantimer")
+	MCFG_TIMER_DRIVER_CALLBACK(galpanic_state, galhustl_scanline)
+
+MACHINE_CONFIG_END
+
 
 
 static MACHINE_CONFIG_DERIVED( fantsia2, comad )
@@ -933,6 +963,28 @@ ROM_START( missmw96 )
 	ROM_LOAD( "mw96_02.bin",  0xc0000, 0x80000, CRC(60fa0c00) SHA1(391aa31e61663cc083a8a2320ba48a9859f3fd4e) )
 ROM_END
 
+ROM_START( smissw )
+	ROM_REGION( 0x500000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "10_PROG2.UE17",  0x000000, 0x80000, CRC(e99e520f) SHA1(edd06a3b0f8d30a4020e6ea452abb0afd79d426a) )
+	ROM_LOAD16_BYTE( "6_PROG1.UD17",   0x000001, 0x80000, CRC(22831657) SHA1(eeabcdef543048ccceabc4c3b4b288aec959a14f) )
+	ROM_LOAD16_BYTE( "9_IM1-B.UE16B",  0x100000, 0x80000, CRC(fff1eee4) SHA1(1b88d45b5cc0b5a03296d4dc950e570fa4dc19c2) )
+	ROM_LOAD16_BYTE( "5_IM1-A.UE16A",  0x100001, 0x80000, CRC(2134a72d) SHA1(f907ec8a1d6e5755a821e69564074ff05e426bb1) )
+	ROM_LOAD16_BYTE( "8_IM2-B.UE15B",  0x200000, 0x80000, CRC(cf44b638) SHA1(0fe5bdb62492c31c3efffa6d85f5d6a3b4ddb2e0) )
+	ROM_LOAD16_BYTE( "4_IM2-A.UE15A",  0x200001, 0x80000, CRC(d22b270f) SHA1(21bd2ced1b5fb3c08687addaa890ee621a56fff0) )
+	ROM_LOAD16_BYTE( "7_IM3-B.UE14B",  0x300000, 0x80000, CRC(12a9441d) SHA1(d9cd51e0c3ffac5fc561e0927c419bce0157337e) )
+	ROM_LOAD16_BYTE( "3_IM3-A.UE14A",  0x300001, 0x80000, CRC(8c656fc9) SHA1(c3fe5de7cd6cd520bbd205ec62ac0dda51f71eeb) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
+	ROM_LOAD( "15_OBJ11.U5",  0x00000, 0x80000, CRC(3983152f) SHA1(6308e936ba54e88b34253f1d4fbd44725e9d88ae) )
+
+	ROM_REGION( 0x140000, "oki", 0 )    /* OKIM6295 samples */
+	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
+	ROM_LOAD( "1_MUSIC1.UB6",  0x00000, 0x80000, CRC(e78a659e) SHA1(d209184c70e0d7e6d17034c6f536535cda782d42) )
+	ROM_RELOAD(               0x40000, 0x80000 )
+	ROM_LOAD( "2_MUSIC2.UC6",  0xc0000, 0x80000, CRC(60fa0c00) SHA1(391aa31e61663cc083a8a2320ba48a9859f3fd4e) )
+ROM_END
+
+
 ROM_START( fantsia2 )
 	ROM_REGION( 0x500000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "prog2.g17",    0x000000, 0x80000, CRC(57c59972) SHA1(4b1da928b537cf340a67026d07bc3dfc078b0d0f) )
@@ -1133,6 +1185,8 @@ GAME( 1996, missw96,  0,        comad,    missw96,   driver_device, 0, ROT0,  "C
 GAME( 1996, missw96a, missw96,  comad,    missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude) (set 2)", GAME_NO_COCKTAIL )
 GAME( 1996, missw96b, missw96,  comad,    missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude) (set 3)", GAME_NO_COCKTAIL )
 GAME( 1996, missmw96, missw96,  comad,    missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss Mister World '96 (Nude)", GAME_NO_COCKTAIL )
+
+GAME( 1996, smissw,   0,        smissw,   missw96,   driver_device, 0, ROT0,  "Comad",                    "Super Miss World", GAME_NO_COCKTAIL ) // 951127 PCB
 
 GAME( 1997, fantsia2, 0,        fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (Explicit)", GAME_NO_COCKTAIL )
 GAME( 1997, fantsia2a,fantsia2, fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (Less Explicit)", GAME_NO_COCKTAIL )

@@ -6,7 +6,15 @@
   * board labeled TOMY TN-04 TENNIS
   * NEC uCOM-44 MCU, labeled D552C 048
   * VFD display NEC FIP11AM15T (FIP=fluorescent indicator panel)
+  
+  The initial release of this game was in 1979, known as Pro-Tennis,
+  it is unknown if the hardware and/or ROM contents differ.
+  
 
+  TODO:
+  - 2-player mode doesn't work: the guys auto-serve and the left player
+    always hits the net, mcu emulation bug?
+  - difficulty switch changes mcu freq
 
 ***************************************************************************/
 
@@ -87,7 +95,7 @@ READ8_MEMBER(tmtennis_state::input_r)
 
 	// read selected button rows
 	for (int i = 0; i < 2; i++)
-		if (~m_input_mux & (1 << i))
+		if (~m_input_mux >> i & 1)
 			inp &= m_button_matrix[i]->read();
 
 	return inp >> (offset*4);
@@ -122,32 +130,46 @@ WRITE8_MEMBER(tmtennis_state::grid_w)
 }
 
 
+
 /***************************************************************************
 
   Inputs
 
 ***************************************************************************/
 
-static INPUT_PORTS_START( tmtennis )
-	PORT_START("IN.0") // E0 port A/B
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(2)
+/* Pro-Tennis physical button layout and labels is like this:
 
-	PORT_START("IN.1") // E1 port A/B
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
+    [SERVE] [1] [2] [3]       [3] [2] [1] [SERVE]
+            [4] [5] [6]       [6] [5] [4]
+
+    PRACTICE<--PRO1-->PRO2    1PLAYER<--OFF-->2PLAYER
+*/
+
+static INPUT_PORTS_START( tmtennis )
+	PORT_START("IN.0") // E0 port A/B (left side)
+	PORT_CONFNAME( 0x101, 0x001, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(     0x000, "Practice" )
+	PORT_CONFSETTING(     0x001, "Pro 1" )
+	PORT_CONFSETTING(     0x101, "Pro 2" )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 ) // P2 serve
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
+
+	PORT_START("IN.1") // E1 port A/B (right side)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // P1 serve
+	PORT_CONFNAME( 0x02, 0x02, "Players" )
+	PORT_CONFSETTING(    0x02, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON6 )
 INPUT_PORTS_END
 
 
@@ -212,4 +234,4 @@ ROM_START( tmtennis )
 ROM_END
 
 
-CONS( 1980, tmtennis, 0, 0, tmtennis, tmtennis, driver_device, 0, "Tomy", "Tomytronic Tennis", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+CONS( 1980, tmtennis, 0, 0, tmtennis, tmtennis, driver_device, 0, "Tomy", "Tennis (Tomytronic)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
