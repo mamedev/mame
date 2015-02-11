@@ -33,8 +33,8 @@ WRITE8_MEMBER( isa8_gblaster_device::saa1099_1_16_w )
 {
 	switch(offset)
 	{
-		case 0 : m_saa1099_1->saa1099_control_w( space, offset, data ); break;
-		case 1 : m_saa1099_1->saa1099_data_w( space, offset, data ); break;
+		case 0 : m_saa1099_1->control_w( space, offset, data ); break;
+		case 1 : m_saa1099_1->data_w( space, offset, data ); break;
 	}
 }
 
@@ -42,8 +42,8 @@ WRITE8_MEMBER( isa8_gblaster_device::saa1099_2_16_w )
 {
 	switch(offset)
 	{
-		case 0 : m_saa1099_2->saa1099_control_w( space, offset, data ); break;
-		case 1 : m_saa1099_2->saa1099_data_w( space, offset, data ); break;
+		case 0 : m_saa1099_2->control_w( space, offset, data ); break;
+		case 1 : m_saa1099_2->data_w( space, offset, data ); break;
 	}
 }
 

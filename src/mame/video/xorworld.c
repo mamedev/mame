@@ -49,10 +49,9 @@ PALETTE_INIT_MEMBER(xorworld_state, xorworld)
 	}
 }
 
-WRITE16_MEMBER(xorworld_state::xorworld_videoram16_w)
+WRITE16_MEMBER(xorworld_state::videoram_w)
 {
-	UINT16 *videoram = m_videoram;
-	COMBINE_DATA(&videoram[offset]);
+	COMBINE_DATA(&m_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
@@ -68,8 +67,7 @@ WRITE16_MEMBER(xorworld_state::xorworld_videoram16_w)
 
 TILE_GET_INFO_MEMBER(xorworld_state::get_bg_tile_info)
 {
-	UINT16 *videoram = m_videoram;
-	int data = videoram[tile_index];
+	int data = m_videoram[tile_index];
 	int code = data & 0x0fff;
 
 	SET_TILE_INFO_MEMBER(0, code, data >> 12, 0);
@@ -96,21 +94,18 @@ void xorworld_state::video_start()
 
 void xorworld_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT16 *spriteram16 = m_spriteram;
-	int i;
-
-	for (i = 0; i < 0x40; i += 2)
+	for (int i = 0; i < 0x40; i += 2)
 	{
-		int sx = spriteram16[i] & 0x00ff;
-		int sy = 240 - (((spriteram16[i] & 0xff00) >> 8) & 0xff);
-		int code = (spriteram16[i+1] & 0x0ffc) >> 2;
-		int color = (spriteram16[i+1] & 0xf000) >> 12;
+		int sx = m_spriteram[i] & 0x00ff;
+		int sy = 240 - (((m_spriteram[i] & 0xff00) >> 8) & 0xff);
+		int code = (m_spriteram[i+1] & 0x0ffc) >> 2;
+		int color = (m_spriteram[i+1] & 0xf000) >> 12;
 
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, 0, 0, sx, sy, 0);
 	}
 }
 
-UINT32 xorworld_state::screen_update_xorworld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 xorworld_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
