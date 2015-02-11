@@ -87,14 +87,13 @@ PALETTE_INIT_MEMBER(gsword_state,gsword)
 	}
 }
 
-WRITE8_MEMBER(gsword_state::gsword_videoram_w)
+WRITE8_MEMBER(gsword_state::videoram_w)
 {
-	UINT8 *videoram = m_videoram;
-	videoram[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gsword_state::gsword_charbank_w)
+WRITE8_MEMBER(gsword_state::charbank_w)
 {
 	if (m_charbank != data)
 	{
@@ -103,7 +102,7 @@ WRITE8_MEMBER(gsword_state::gsword_charbank_w)
 	}
 }
 
-WRITE8_MEMBER(gsword_state::gsword_videoctrl_w)
+WRITE8_MEMBER(gsword_state::videoctrl_w)
 {
 	if (data & 0x8f)
 	{
@@ -131,15 +130,14 @@ WRITE8_MEMBER(gsword_state::gsword_videoctrl_w)
 	/* other bits unused */
 }
 
-WRITE8_MEMBER(gsword_state::gsword_scroll_w)
+WRITE8_MEMBER(gsword_state::scroll_w)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }
 
 TILE_GET_INFO_MEMBER(gsword_state::get_bg_tile_info)
 {
-	UINT8 *videoram = m_videoram;
-	int code = videoram[tile_index] + ((m_charbank & 0x03) << 8);
+	int code = m_videoram[tile_index] + ((m_charbank & 0x03) << 8);
 	int color = ((code & 0x3c0) >> 6) + 16 * m_charpalbank;
 	int flags = m_flipscreen ? (TILE_FLIPX | TILE_FLIPY) : 0;
 
@@ -150,13 +148,15 @@ void gsword_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gsword_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 64);
+	
+	save_item(NAME(m_charbank));
+	save_item(NAME(m_charpalbank));
+	save_item(NAME(m_flipscreen));
 }
 
 void gsword_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs;
-
-	for (offs = 0; offs < m_spritexy_ram.bytes() - 1; offs+=2)
+	for (int offs = 0; offs < m_spritexy_ram.bytes() - 1; offs+=2)
 	{
 		int sx,sy,flipx,flipy,spritebank,tile,color;
 

@@ -207,8 +207,8 @@ void amis2000_device::device_start()
 void amis2000_device::device_reset()
 {
 	m_pc = 0;
-	m_skip = false;
 	m_op = 0;
+	m_skip = false;
 	
 	// clear i/o
 	m_d_polarity = 0;
@@ -241,7 +241,7 @@ void amis2000_device::execute_run()
 		{
 			// always skip over PP prefix
 			m_skip = ((m_op & 0xf0) == 0x60);
-			continue;
+			m_op = 0; // nop
 		}
 
 		switch (m_op & 0xf0)

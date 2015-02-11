@@ -203,13 +203,13 @@ void ucom4_cpu_device::device_reset()
 //  execute
 //-------------------------------------------------
 
-void ucom4_cpu_device::increment_pc()
+inline void ucom4_cpu_device::increment_pc()
 {
 	// upper bits (field register) don't auto-increment
 	m_pc = (m_pc & ~0xff) | ((m_pc + 1) & 0xff);
 }
 
-void ucom4_cpu_device::fetch_arg()
+inline void ucom4_cpu_device::fetch_arg()
 {
 	// 2-byte opcodes: STM/LDI/CLI/CI, JMP/CAL, OCD
 	if ((m_op & 0xfc) == 0x14 || (m_op & 0xf0) == 0xa0 || m_op == 0x1e)
@@ -238,7 +238,7 @@ void ucom4_cpu_device::execute_run()
 		if (m_skip)
 		{
 			m_skip = false;
-			continue;
+			m_op = 0; // nop
 		}
 		
 		switch (m_op & 0xf0)

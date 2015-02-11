@@ -272,13 +272,15 @@ TIMER_CALLBACK_MEMBER(mbee_state::mbee_rtc_irq)
     and (output = 22,21,20,19,18,17,16,15). The prom is also used to control
     the refresh required by the dynamic rams, however we ignore this function.
 
+    b_mask = total dynamic ram (1=64k; 3=128k; 7=256k)
+
 ************************************************************/
 
-void mbee_state::mbee256_setup_banks(UINT8 data, bool first_time)
+void mbee_state::setup_banks(UINT8 data, bool first_time, UINT8 b_mask)
 {
-	// (bits 0-5 are referred to as S0-S5)
+	data &= 0x3f; // (bits 0-5 are referred to as S0-S5)
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
-	UINT8 *prom = memregion("proms")->base();
+	UINT8 *prom = memregion("pals")->base();
 	UINT8 b_data = BITSWAP8(data, 7,5,3,2,4,6,1,0) & 0x3b; // arrange data bits to S0,S1,-,S4,S2,S3
 	UINT8 b_bank, b_byte, b_byte_t, b_addr, p_bank = 1;
 	UINT16 b_vid;
@@ -309,8 +311,16 @@ void mbee_state::mbee256_setup_banks(UINT8 data, bool first_time)
 				if (!BIT(b_byte, 4))
 				{
 					// select video
-					mem.install_read_handler (b_vid, b_vid + 0x7ff, read8_delegate(FUNC(mbee_state::mbeeppc_low_r), this));
-					mem.install_read_handler (b_vid + 0x800, b_vid + 0xfff, read8_delegate(FUNC(mbee_state::mbeeppc_high_r), this));
+					if (m_is_premium)
+					{
+						mem.install_read_handler (b_vid, b_vid + 0x7ff, read8_delegate(FUNC(mbee_state::mbeeppc_low_r), this));
+						mem.install_read_handler (b_vid + 0x800, b_vid + 0xfff, read8_delegate(FUNC(mbee_state::mbeeppc_high_r), this));
+					}
+					else
+					{
+						mem.install_read_handler (b_vid, b_vid + 0x7ff, read8_delegate(FUNC(mbee_state::mbee_low_r), this));
+						mem.install_read_handler (b_vid + 0x800, b_vid + 0xfff, read8_delegate(FUNC(mbee_state::mbeeic_high_r), this));
+					}
 				}
 				else
 				{
@@ -320,7 +330,7 @@ void mbee_state::mbee256_setup_banks(UINT8 data, bool first_time)
 					if (!BIT(b_byte, 3))
 						membank(banktag)->set_entry(64 + (b_bank & 3)); // read from rom
 					else
-						membank(banktag)->set_entry((b_bank & 7) | ((b_byte & 7) << 3)); // ram
+						membank(banktag)->set_entry((b_bank & 7) | ((b_byte & b_mask) << 3)); // ram
 				}
 			}
 			p_bank++;
@@ -341,8 +351,16 @@ void mbee_state::mbee256_setup_banks(UINT8 data, bool first_time)
 				if (!BIT(b_byte, 4))
 				{
 					// select video
-					mem.install_write_handler (b_vid, b_vid + 0x7ff, write8_delegate(FUNC(mbee_state::mbeeppc_low_w), this));
-					mem.install_write_handler (b_vid + 0x800, b_vid + 0xfff, write8_delegate(FUNC(mbee_state::mbeeppc_high_w), this));
+					if (m_is_premium)
+					{
+						mem.install_write_handler (b_vid, b_vid + 0x7ff, write8_delegate(FUNC(mbee_state::mbeeppc_low_w), this));
+						mem.install_write_handler (b_vid + 0x800, b_vid + 0xfff, write8_delegate(FUNC(mbee_state::mbeeppc_high_w), this));
+					}
+					else
+					{
+						mem.install_write_handler (b_vid, b_vid + 0x7ff, write8_delegate(FUNC(mbee_state::mbee_low_w), this));
+						mem.install_write_handler (b_vid + 0x800, b_vid + 0xfff, write8_delegate(FUNC(mbee_state::mbeeic_high_w), this));
+					}
 				}
 				else
 				{
@@ -352,7 +370,7 @@ void mbee_state::mbee256_setup_banks(UINT8 data, bool first_time)
 					if (!BIT(b_byte, 3))
 						membank(banktag)->set_entry(64); // write to rom dummy area
 					else
-						membank(banktag)->set_entry((b_bank & 7) | ((b_byte & 7) << 3)); // ram
+						membank(banktag)->set_entry((b_bank & 7) | ((b_byte & b_mask) << 3)); // ram
 				}
 			}
 			p_bank++;
@@ -362,7 +380,7 @@ void mbee_state::mbee256_setup_banks(UINT8 data, bool first_time)
 
 WRITE8_MEMBER( mbee_state::mbee256_50_w )
 {
-	mbee256_setup_banks(data & 0x3f, 0);
+	setup_banks(data, 0, 7);
 }
 
 /***********************************************************
@@ -380,36 +398,8 @@ WRITE8_MEMBER( mbee_state::mbee256_50_w )
 
 WRITE8_MEMBER( mbee_state::mbee128_50_w )
 {
-	mbee256_setup_banks(data & 0x1f, 0); // S5 not used
+	setup_banks(data, 0, 3);
 }
-
-
-/***********************************************************
-
-    64k Memory Banking
-
-    Bit 2 disables ROM, replacing it with RAM.
-
-    Due to lack of documentation, it is not possible to know
-    if other bits are used.
-
-************************************************************/
-
-WRITE8_MEMBER( mbee_state::mbee64_50_w )
-{
-	if BIT(data, 2)
-	{
-		m_boot->set_entry(0);
-		m_bankl->set_entry(0);
-		m_bankh->set_entry(0);
-	}
-	else
-	{
-		m_bankl->set_entry(1);
-		m_bankh->set_entry(1);
-	}
-}
-
 
 /***********************************************************
 
@@ -489,18 +479,10 @@ MACHINE_RESET_MEMBER( mbee_state, mbee56 )
 	timer_set(attotime::from_usec(4), TIMER_MBEE_RESET);
 }
 
-MACHINE_RESET_MEMBER( mbee_state, mbee64 )
-{
-	machine_reset_common_disk();
-	m_boot->set_entry(1);
-	m_bankl->set_entry(1);
-	m_bankh->set_entry(1);
-}
-
 MACHINE_RESET_MEMBER( mbee_state, mbee128 )
 {
 	machine_reset_common_disk();
-	mbee256_setup_banks(0, 1); // set banks to default
+	setup_banks(0, 1, 3); // set banks to default
 	m_maincpu->set_pc(0x8000);
 }
 
@@ -510,7 +492,7 @@ MACHINE_RESET_MEMBER( mbee_state, mbee256 )
 	for (i = 0; i < 15; i++) m_mbee256_was_pressed[i] = 0;
 	m_mbee256_q_pos = 0;
 	machine_reset_common_disk();
-	mbee256_setup_banks(0, 1); // set banks to default
+	setup_banks(0, 1, 7); // set banks to default
 	m_maincpu->set_pc(0x8000);
 }
 
@@ -625,21 +607,6 @@ DRIVER_INIT_MEMBER( mbee_state, mbee56 )
 	m_size = 0xe000;
 }
 
-DRIVER_INIT_MEMBER( mbee_state, mbee64 )
-{
-	UINT8 *RAM = memregion("maincpu")->base();
-	m_boot->configure_entry(0, &RAM[0x0000]);
-	m_bankl->configure_entry(0, &RAM[0x1000]);
-	m_bankl->configure_entry(1, &RAM[0x9000]);
-	m_bankh->configure_entry(0, &RAM[0x8000]);
-
-	RAM = memregion("bootrom")->base();
-	m_bankh->configure_entry(1, &RAM[0x0000]);
-	m_boot->configure_entry(1, &RAM[0x0000]);
-
-	m_size = 0xf000;
-}
-
 DRIVER_INIT_MEMBER( mbee_state, mbee128 )
 {
 	UINT8 *RAM = memregion("rams")->base();
@@ -656,8 +623,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbee128 )
 		membank(banktag)->configure_entries(0, 32, &RAM[0x0000], 0x1000); // RAM banks
 		membank(banktag)->configure_entries(64, 1, &ROM[0x4000], 0x1000); // dummy rom
 	}
-
-	m_size = 0x8000;
+	m_size = 0xf000;
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbee256 )

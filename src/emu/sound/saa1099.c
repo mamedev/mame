@@ -161,6 +161,37 @@ void saa1099_device::device_start()
 
 	/* for each chip allocate one stream */
 	m_stream = stream_alloc(0, 2, m_sample_rate);
+	
+	save_item(NAME(m_noise_params));
+	save_item(NAME(m_env_enable));
+	save_item(NAME(m_env_reverse_right));
+	save_item(NAME(m_env_mode));
+	save_item(NAME(m_env_bits));
+	save_item(NAME(m_env_clock));
+	save_item(NAME(m_env_step));
+	save_item(NAME(m_all_ch_enable));
+	save_item(NAME(m_sync_state));
+	save_item(NAME(m_selected_reg));
+	
+	for (int i = 0; i < 6; i++)
+	{
+		save_item(NAME(m_channels[i].frequency), i);
+		save_item(NAME(m_channels[i].freq_enable), i);
+		save_item(NAME(m_channels[i].noise_enable), i);
+		save_item(NAME(m_channels[i].octave), i);
+		save_item(NAME(m_channels[i].amplitude), i);
+		save_item(NAME(m_channels[i].envelope), i);
+		save_item(NAME(m_channels[i].counter), i);
+		save_item(NAME(m_channels[i].freq), i);
+		save_item(NAME(m_channels[i].level), i);
+	}
+	
+	for (int i = 0; i < 2; i++)
+	{
+		save_item(NAME(m_noise[i].counter), i);
+		save_item(NAME(m_noise[i].freq), i);
+		save_item(NAME(m_noise[i].level), i);
+	}
 }
 
 
@@ -217,9 +248,9 @@ void saa1099_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 				/* eventually clock the envelope counters */
 				if (ch == 1 && m_env_clock[0] == 0)
-					saa1099_envelope(0);
+					envelope_w(0);
 				if (ch == 4 && m_env_clock[1] == 0)
-					saa1099_envelope(1);
+					envelope_w(1);
 			}
 
 			/* if the noise is enabled */
@@ -266,7 +297,7 @@ void saa1099_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 }
 
 
-void saa1099_device::saa1099_envelope(int ch)
+void saa1099_device::envelope_w(int ch)
 {
 	if (m_env_enable[ch])
 	{
@@ -309,7 +340,7 @@ void saa1099_device::saa1099_envelope(int ch)
 }
 
 
-WRITE8_MEMBER( saa1099_device::saa1099_control_w )
+WRITE8_MEMBER( saa1099_device::control_w )
 {
 	if ((data & 0xff) > 0x1c)
 	{
@@ -322,14 +353,14 @@ WRITE8_MEMBER( saa1099_device::saa1099_control_w )
 	{
 		/* clock the envelope channels */
 		if (m_env_clock[0])
-			saa1099_envelope(0);
+			envelope_w(0);
 		if (m_env_clock[1])
-			saa1099_envelope(1);
+			envelope_w(1);
 	}
 }
 
 
-WRITE8_MEMBER( saa1099_device::saa1099_data_w )
+WRITE8_MEMBER( saa1099_device::data_w )
 {
 	int reg = m_selected_reg;
 	int ch;

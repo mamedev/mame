@@ -62,12 +62,12 @@ WRITE16_MEMBER(xorworld_state::eeprom_data_w)
 	m_eeprom->di_write(data & 0x01);
 }
 
-WRITE16_MEMBER(xorworld_state::xorworld_irq2_ack_w)
+WRITE16_MEMBER(xorworld_state::irq2_ack_w)
 {
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(xorworld_state::xorworld_irq6_ack_w)
+WRITE16_MEMBER(xorworld_state::irq6_ack_w)
 {
 	m_maincpu->set_input_line(6, CLEAR_LINE);
 }
@@ -77,15 +77,15 @@ static ADDRESS_MAP_START( xorworld_map, AS_PROGRAM, 16, xorworld_state )
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1")
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P2")
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW")
-	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8("saa", saa1099_device, saa1099_data_w, 0x00ff)
-	AM_RANGE(0x800002, 0x800003) AM_DEVWRITE8("saa", saa1099_device, saa1099_control_w, 0x00ff)
+	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8("saa", saa1099_device, data_w, 0x00ff)
+	AM_RANGE(0x800002, 0x800003) AM_DEVWRITE8("saa", saa1099_device, control_w, 0x00ff)
 	AM_RANGE(0xa00008, 0xa00009) AM_WRITE(eeprom_chip_select_w)
 	AM_RANGE(0xa0000a, 0xa0000b) AM_WRITE(eeprom_serial_clock_w)
 	AM_RANGE(0xa0000c, 0xa0000d) AM_WRITE(eeprom_data_w)
-	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM_WRITE(xorworld_videoram16_w) AM_SHARE("videoram")
+	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xffc800, 0xffc87f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xffc880, 0xffc881) AM_WRITE(xorworld_irq2_ack_w)
-	AM_RANGE(0xffc882, 0xffc883) AM_WRITE(xorworld_irq6_ack_w)
+	AM_RANGE(0xffc880, 0xffc881) AM_WRITE(irq2_ack_w)
+	AM_RANGE(0xffc882, 0xffc883) AM_WRITE(irq6_ack_w)
 	AM_RANGE(0xffc884, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -182,7 +182,7 @@ static MACHINE_CONFIG_START( xorworld, xorworld_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(xorworld_state, screen_update_xorworld)
+	MCFG_SCREEN_UPDATE_DRIVER(xorworld_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xorworld)
@@ -235,4 +235,4 @@ DRIVER_INIT_MEMBER(xorworld_state,xorworld)
 }
 
 
-GAME( 1990, xorworld, 0, xorworld, xorworld, xorworld_state, xorworld, ROT0, "Gaelco", "Xor World (prototype)", 0 )
+GAME( 1990, xorworld, 0, xorworld, xorworld, xorworld_state, xorworld, ROT0, "Gaelco", "Xor World (prototype)", GAME_SUPPORTS_SAVE )

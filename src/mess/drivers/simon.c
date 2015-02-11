@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /***************************************************************************
 
-  Milton Bradley Simon
+  Milton Bradley Simon, created by Ralph Baer
 
   Revision A hardware:
   * TMS1000 (has internal ROM), DS75494 lamp driver

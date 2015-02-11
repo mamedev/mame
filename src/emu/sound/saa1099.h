@@ -80,11 +80,11 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 public:
-	DECLARE_WRITE8_MEMBER( saa1099_control_w );
-	DECLARE_WRITE8_MEMBER( saa1099_data_w );
+	DECLARE_WRITE8_MEMBER( control_w );
+	DECLARE_WRITE8_MEMBER( data_w );
 
 private:
-	void saa1099_envelope(int ch);
+	void envelope_w(int ch);
 
 private:
 	sound_stream *m_stream;          /* our stream */

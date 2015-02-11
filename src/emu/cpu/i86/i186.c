@@ -1035,11 +1035,14 @@ void i80186_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int p
 				count = count ? count : 0x10000;
 				if(!(t->control & 4))
 					t->int_timer->adjust((attotime::from_hz(clock()/8) * count), which);
-				t->count = 0;
 				if (LOG_TIMER) logerror("  Repriming interrupt\n");
 			}
 			else
+			{
 				t->int_timer->adjust(attotime::never, which);
+				t->control &= ~0x8000;
+			}
+			t->count = 0;
 			break;
 		}
 
@@ -1245,8 +1248,8 @@ void i80186_cpu_device::drq_callback(int which)
 	// Do the transfer, 80188 is incapable of word transfers
 	if ((dma->control & BYTE_WORD) && (m_program->data_width() == 16))
 	{
-		dma_word = src_space->read_word(dma->source);
-		dest_space->write_word(dma->dest, dma_word);
+		dma_word = src_space->read_word_unaligned(dma->source);
+		dest_space->write_word_unaligned(dma->dest, dma_word);
 		incdec_size = 2;
 	}
 	else
@@ -1675,6 +1678,12 @@ WRITE16_MEMBER(i80186_cpu_device::internal_port_w)
 			if (LOG_PORTS) logerror("%05X:80186 DMA%d control = %04X\n", pc(), (offset - 0x65) / 8, data);
 			which = (offset - 0x65) / 8;
 			update_dma_control(which, data);
+			if((m_dma[which].control & (SYNC_MASK | ST_STOP | TIMER_DRQ)) == ST_STOP)
+			{
+				// TODO: don't do this
+				while(m_dma[which].control & ST_STOP)
+					drq_callback(which);
+			}
 			break;
 
 		case 0x7f:

@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /***************************************************************************
 
-  Parker Brothers Code Name: Sector
+  Parker Brothers Code Name: Sector, by Bob Doyle
   * MP0905BNL ZA0379 (die labeled 0970F-05B)
 
   This is a tabletop submarine pursuit game. A grid board and small toy

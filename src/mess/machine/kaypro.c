@@ -110,7 +110,7 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
 	if (!BIT(data, 0))
 		m_floppy = m_floppy0->get_device();
 	else
-	if (!BIT(data, 1))
+	if (m_floppy1 && (!BIT(data, 1)))
 		m_floppy = m_floppy1->get_device();
 
 	m_fdc->set_floppy(m_floppy);
