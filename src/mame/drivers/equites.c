@@ -3,6 +3,7 @@
 Equites           (c) 1984 Alpha Denshi Co./Sega   8303
 Bull Fighter      (c) 1984 Alpha Denshi Co./Sega   8303
 Gekisou           (c) 1985 Eastern Corp.           8304
+Violent Run       (c) 1985 Eastern Corp.           8304? (probably on Equites HW)
 The Koukouyakyuh  (c) 1985 Alpha Denshi Co.        8304
 Splendor Blast    (c) 1985 Alpha Denshi Co.        8303
 High Voltage      (c) 1985 Alpha Denshi Co.        8304 (POST says 8404)
