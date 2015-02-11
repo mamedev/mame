@@ -713,6 +713,9 @@ void ucom4_cpu_device::op_stm()
 	
 	// STM X: Reset Timer F/F, Start Timer with X
 	op_illegal();
+
+	if ((m_arg & 0xc0) != 0x80)
+		logerror("%s STM opcode unexpected upper arg $%02X at $%03X\n", tag(), m_arg & 0xc0, m_pc);
 }
 
 void ucom4_cpu_device::op_ttm()
