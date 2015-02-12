@@ -17,11 +17,8 @@ inline void ucom4_cpu_device::ram_w(UINT8 data)
 void ucom4_cpu_device::pop_stack()
 {
 	m_pc = m_stack[0] & m_prgmask;
-	for (int i = 0; i < m_stack_levels; i++)
-	{
+	for (int i = 0; i < m_stack_levels-1; i++)
 		m_stack[i] = m_stack[i+1];
-		m_stack[i+1] = 0;
-	}
 }
 
 void ucom4_cpu_device::push_stack()
