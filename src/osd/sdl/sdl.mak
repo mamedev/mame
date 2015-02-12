@@ -71,7 +71,7 @@ USE_DISPATCH_GL = 1
 # uncomment to disable MIDI
 # NO_USE_MIDI = 1
 
-# uncomment to disable implementations based on assembler chttp://list.iblocklist.com/?list=bt_level1&fileformat=p2p&archiveformat=gzode
+# uncomment to disable implementations based on assembler code
 # NOASM = 1
 
 # change for custom OS X installations
