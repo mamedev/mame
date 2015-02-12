@@ -429,7 +429,8 @@ void ucom4_cpu_device::op_tpb()
 void ucom4_cpu_device::op_tit()
 {
 	// TIT: skip next on Interrupt F/F, reset Interrupt F/F
-	op_illegal();
+	m_skip = (m_int_f != 0);
+	m_int_f = 0;
 }
 
 
@@ -489,6 +490,11 @@ inline bool ucom4_cpu_device::check_op_43()
 	return (m_family == NEC_UCOM43);
 }
 
+TIMER_CALLBACK_MEMBER( ucom4_cpu_device::simple_timer_cb )
+{
+	m_timer_f = 1;
+}
+
 // extra registers reside in RAM
 enum
 {
@@ -510,6 +516,7 @@ inline void ucom4_cpu_device::ucom43_reg_w(int index, UINT8 data)
 {
 	m_data->write_byte(m_datamask - index, data & 0xf);
 }
+
 
 
 // Transfer
@@ -712,7 +719,12 @@ void ucom4_cpu_device::op_stm()
 	if (!check_op_43()) return;
 	
 	// STM X: Reset Timer F/F, Start Timer with X
-	op_illegal();
+	m_timer_f = 0;
+
+	// on the default clockrate of 400kHz, the minimum time interval is
+	// 630usec and the maximum interval is 40320usec(630*64)
+	attotime base = attotime::from_hz(unscaled_clock() / 4 / 63);
+	m_timer->adjust(base * ((m_arg & 0x3f) + 1));
 
 	if ((m_arg & 0xc0) != 0x80)
 		logerror("%s STM opcode unexpected upper arg $%02X at $%03X\n", tag(), m_arg & 0xc0, m_pc);
@@ -723,7 +735,7 @@ void ucom4_cpu_device::op_ttm()
 	if (!check_op_43()) return;
 	
 	// TTM: skip next on Timer F/F
-	op_illegal();
+	m_skip = (m_timer_f != 0);
 }
 
 
@@ -734,7 +746,7 @@ void ucom4_cpu_device::op_ei()
 	if (!check_op_43()) return;
 	
 	// EI: Set Interrupt Enable F/F
-	op_illegal();
+	m_inte_f = 1;
 }
 
 void ucom4_cpu_device::op_di()
@@ -742,5 +754,5 @@ void ucom4_cpu_device::op_di()
 	if (!check_op_43()) return;
 	
 	// DI: Reset Interrupt Enable F/F
-	op_illegal();
+	m_inte_f = 0;
 }

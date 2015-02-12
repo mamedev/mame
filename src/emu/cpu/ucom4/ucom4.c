@@ -10,6 +10,7 @@
   I've also looked at asterick's JavaScript D553 emulator for verification, with permission.
 
   TODO:
+  - add external interrupt
   - what happens with uCOM-43 opcodes on an uCOM-44/45 MCU?
   - what's the data after the ROM data for? (eg. 2000-2047, official ROM size is 2000)
 
@@ -122,6 +123,8 @@ void ucom4_cpu_device::device_start()
 	m_datamask = (1 << m_datawidth) - 1;
 	m_dph_mask = m_datamask >> 4;
 
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ucom4_cpu_device::simple_timer_cb), this));
+
 	m_read_a.resolve_safe(0xf);
 	m_read_b.resolve_safe(0xf);
 	m_read_c.resolve_safe(0xf);
@@ -187,10 +190,11 @@ void ucom4_cpu_device::device_start()
 
 void ucom4_cpu_device::device_reset()
 {
-	m_inte_f = 1;
 	m_pc = 0;
 	m_op = 0;
 	m_skip = false;
+
+	m_timer->adjust(attotime::never);
 
 	// clear i/o
 	for (int i = NEC_UCOM4_PORTC; i <= NEC_UCOM4_PORTI; i++)

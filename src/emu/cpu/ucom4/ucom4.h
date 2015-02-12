@@ -141,6 +141,7 @@ protected:
 	UINT8 m_bitmask;        // opcode bit argument
 	bool m_skip;            // skip next opcode
 	int m_icount;
+	emu_timer *m_timer;
 	
 	UINT16 m_pc;            // program counter
 	UINT8 m_acc;            // 4-bit accumulator
@@ -179,6 +180,7 @@ protected:
 	void output_w(int index, UINT8 data);
 
 	bool check_op_43();
+	TIMER_CALLBACK_MEMBER( simple_timer_cb );
 	UINT8 ucom43_reg_r(int index);
 	void ucom43_reg_w(int index, UINT8 data);
 
