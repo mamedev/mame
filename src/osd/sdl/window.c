@@ -1072,7 +1072,6 @@ void sdl_window_info::set_starting_view(running_machine &machine, int index, con
 
 	// set the view
 	target()->set_view(viewindex);
-	m_start_viewscreen=viewindex;
 }
 
 

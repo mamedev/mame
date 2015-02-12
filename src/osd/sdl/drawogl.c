@@ -2729,6 +2729,7 @@ void sdl_info_ogl::texture_coord_update(texture_info *texture, const render_prim
 
 		ustop  = (float)(m_width) / (float)surf_w_pow2;
 		vstop  = (float)(m_height) / (float)surf_h_pow2;
+
 	}
 	else
 	{

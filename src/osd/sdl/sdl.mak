@@ -82,7 +82,7 @@ SDL_FRAMEWORK_PATH = /Library/Frameworks/
 
 # uncomment to use BGFX
 
-USE_BGFX = 1
+# USE_BGFX = 1
 
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################

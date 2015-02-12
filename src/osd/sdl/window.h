@@ -32,13 +32,22 @@ typedef UINT32 HashT;
 //  TYPE DEFINITIONS
 //============================================================
 
+/* ------------------------------------------------------
+ *
+ * All types named osd_* will ultimately be located in
+ * the modules tree. They are temporarily maintained in
+ * window.h until basic code simplification is finished.
+ *
+ */
+
+class win_window_info;
+
 class osd_window
 {
 public:
 	osd_window()
 	:
 #ifdef OSD_SDL
-		m_start_viewscreen(0),
 #else
 		m_hwnd(0), m_focus_hwnd(0), m_monitor(NULL), m_resize_state(0),
 		m_maxwidth(0), m_maxheight(0),
@@ -64,15 +73,14 @@ public:
 #else
 	virtual SDL_Surface *sdl_surface() = 0;
 #endif
-
-	int                 	m_start_viewscreen;
-
 #else
 	virtual bool win_has_menu() = 0;
 	virtual win_monitor_info *winwindow_video_window_monitor(const RECT *proposed) = 0;
 
 	// window handle and info
 	HWND					m_hwnd;
+	// FIXME: this is the same as win_window_list->m_hwnd, i.e. first window.
+	// During modularization, this should be passed in differently
 	HWND         	 		m_focus_hwnd;
 
 	// monitor info

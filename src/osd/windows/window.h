@@ -74,9 +74,6 @@ public:
 #else
 	virtual SDL_Surface *sdl_surface() = 0;
 #endif
-
-	int                 	m_start_viewscreen;
-
 #else
 	virtual bool win_has_menu() = 0;
 	virtual win_monitor_info *winwindow_video_window_monitor(const RECT *proposed) = 0;
