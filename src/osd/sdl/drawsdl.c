@@ -671,19 +671,8 @@ int sdl_info::draw(UINT32 dc, int update)
 	blitwidth = m_blitwidth;
 	blitheight = m_blitheight;
 
-	// figure out what coordinate system to use for centering - in window mode it's always the
-	// SDL surface size.  in fullscreen the surface covers all monitors, so center according to
-	// the first one only
-	if ((window().fullscreen()) && (!video_config.switchres))
-	{
-		ch = window().monitor()->center_height();
-		cw = window().monitor()->center_width();
-	}
-	else
-	{
-		ch = height;
-		cw = width;
-	}
+	ch = height;
+	cw = width;
 
 	// do not crash if the window's smaller than the blit area
 	if (blitheight > ch)

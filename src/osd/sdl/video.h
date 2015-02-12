@@ -65,12 +65,10 @@ class sdl_monitor_info
 public:
 
 	sdl_monitor_info()
-	: m_next(NULL), m_handle(0), m_aspect(0.0f),
-	  m_center_width(0), m_center_height(0)
+	: m_next(NULL), m_handle(0), m_aspect(0.0f)
 	  {}
 	sdl_monitor_info(const UINT64 handle, const char *monitor_device, float aspect)
-	: m_next(NULL), m_handle(handle), m_aspect(aspect),
-	  m_center_width(0), m_center_height(0)
+	: m_next(NULL), m_handle(handle), m_aspect(aspect)
 	{
 		strncpy(m_monitor_device, monitor_device, 64);
 		refresh();
@@ -82,9 +80,6 @@ public:
 	const char *device() { return m_monitor_device; }
 
 	float aspect();
-
-	int	center_width() { refresh(); return m_center_width; }
-	int center_height() { refresh(); return m_center_height; }
 
 	void set_aspect(const float aspect) { m_aspect = aspect; }
 
@@ -111,10 +106,6 @@ private:
 	SDL_Rect			m_dimensions;
 	char                m_monitor_device[64];
 	float               m_aspect;                 // computed/configured aspect ratio of the physical device
-	int                 m_center_width;           // width of first physical screen for centering
-	int                 m_center_height;          // height of first physical screen for centering
-
-
 };
 
 

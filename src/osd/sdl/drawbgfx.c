@@ -73,7 +73,7 @@ static void drawbgfx_exit(void);
 class sdl_info_bgfx : public osd_renderer
 {
 public:
-    sdl_info_bgfx(sdl_window_info *w)
+    sdl_info_bgfx(osd_window *w)
     : osd_renderer(w, FLAG_NONE), m_blittimer(0), m_renderer(NULL),
       m_blitwidth(0), m_blitheight(0),
       m_last_hofs(0), m_last_vofs(0),
@@ -128,7 +128,7 @@ public:
 //  drawbgfx_init
 //============================================================
 
-static osd_renderer *drawbgfx_create(sdl_window_info *window)
+static osd_renderer *drawbgfx_create(osd_window *window)
 {
 	return global_alloc(sdl_info_bgfx(window));
 }

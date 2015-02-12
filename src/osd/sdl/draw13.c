@@ -721,16 +721,8 @@ int sdl_info13::draw(UINT32 dc, int update)
 	{
 		int ch, cw;
 
-		if ((window().fullscreen()) && (!video_config.switchres))
-		{
-			ch = window().monitor()->center_height();
-			cw = window().monitor()->center_width();
-		}
-		else
-		{
-			ch = height;
-			cw = width;
-		}
+		ch = height;
+		cw = width;
 
 		if (video_config.centerv)
 		{

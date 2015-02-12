@@ -385,16 +385,7 @@ INLINE int better_mode(int width0, int height0, int width1, int height1, float d
 void sdl_window_info::blit_surface_size(int &blitwidth, int &blitheight)
 {
 	int window_width, window_height;
-	if ((!fullscreen()) || (video_config.switchres))
-	{
-		get_size(window_width, window_height);
-	}
-	else
-	{
-		window_width = monitor()->center_width();
-		window_height = monitor()->center_height();
-	}
-
+	get_size(window_width, window_height);
 
 	INT32 newwidth, newheight;
 	int xscale = 1, yscale = 1;
@@ -1433,16 +1424,14 @@ void sdl_window_info::constrain_to_aspect_ratio(int *window_width, int *window_h
 	propheight = MAX(propheight, minheight);
 
 	// clamp against the maximum (fit on one screen for full screen mode)
+	maxwidth = m_monitor->position_size().w - extrawidth;
+	maxheight = m_monitor->position_size().h - extraheight;
 	if (this->m_fullscreen)
 	{
-		maxwidth = m_monitor->center_width() - extrawidth;
-		maxheight = m_monitor->center_height() - extraheight;
+		// nothing
 	}
 	else
 	{
-		maxwidth = m_monitor->center_width() - extrawidth;
-		maxheight = m_monitor->center_height() - extraheight;
-
 		// further clamp to the maximum width/height in the window
 		if (this->m_maxwidth != 0)
 			maxwidth = MIN(maxwidth, this->m_maxwidth + extrawidth);
@@ -1522,8 +1511,8 @@ void sdl_window_info::get_max_bounds(int *window_width, int *window_height, int 
 	INT32 maxwidth, maxheight;
 
 	// compute the maximum client area
-	maxwidth = m_monitor->center_width();
-	maxheight = m_monitor->center_height();
+	maxwidth = m_monitor->position_size().w;
+	maxheight = m_monitor->position_size().h;
 
 	// clamp to the window's max
 	if (this->m_maxwidth != 0)

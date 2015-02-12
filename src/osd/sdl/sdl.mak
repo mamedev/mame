@@ -71,7 +71,7 @@ USE_DISPATCH_GL = 1
 # uncomment to disable MIDI
 # NO_USE_MIDI = 1
 
-# uncomment to disable implementations based on assembler code
+# uncomment to disable implementations based on assembler chttp://list.iblocklist.com/?list=bt_level1&fileformat=p2p&archiveformat=gzode
 # NOASM = 1
 
 # change for custom OS X installations
@@ -81,7 +81,8 @@ SDL_FRAMEWORK_PATH = /Library/Frameworks/
 # SDL_LIBVER = sdl
 
 # uncomment to use BGFX
-# USE_BGFX = 1
+
+USE_BGFX = 1
 
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################

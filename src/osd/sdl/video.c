@@ -151,8 +151,6 @@ void sdl_monitor_info::refresh()
 	SDL_GetCurrentDisplayMode(m_handle, &dmode);
 	#endif
 	SDL_GetDisplayBounds(m_handle, &m_dimensions);
-	m_center_width = m_dimensions.w;
-	m_center_height = m_dimensions.h;
 
 	// FIXME: Use SDL_GetDisplayBounds(monitor->handle, &tt) to update monitor_x
 	// SDL_Rect tt;
@@ -195,22 +193,21 @@ void sdl_monitor_info::refresh()
 			m_dimensions.w = DisplayWidth(info.info.x11.display, screen);
 			m_dimensions.h = DisplayHeight(info.info.x11.display, screen);
 
+			/* FIXME: If Xinerame is used we should compile a list of monitors
+			 * like we do for other targets and ignore SDL.
+			 */
 			if ((XineramaIsActive(info.info.x11.display)) && video_config.restrictonemonitor)
 			{
 				XineramaScreenInfo *xineinfo;
 				int numscreens;
 
-					xineinfo = XineramaQueryScreens(info.info.x11.display, &numscreens);
+				xineinfo = XineramaQueryScreens(info.info.x11.display, &numscreens);
 
-				m_center_width = xineinfo[0].width;
-				m_center_height = xineinfo[0].height;
+				m_dimensions.w = xineinfo[0].width;
+				m_dimensions.h = xineinfo[0].height;
 
 				XFree(xineinfo);
-			}
-			else
-			{
-				m_center_width = m_dimensions.w;
-				m_center_height = m_dimensions.h;
+				printf("XineneraActive\n");
 			}
 		}
 		else
@@ -250,8 +247,6 @@ void sdl_monitor_info::refresh()
 			}
 			m_dimensions.w = cw;
 			m_dimensions.h = ch;
-			m_center_width = cw;
-			m_center_height = ch;
 		}
 	}
 	#elif defined(SDLMAME_OS2)      // OS2 version
@@ -428,8 +423,6 @@ void sdl_monitor_info::init()
 
 			SDL_GetDesktopDisplayMode(i, &dmode);
 			SDL_GetDisplayBounds(i, &monitor->m_dimensions);
-			monitor->m_center_width = monitor->m_dimensions.w;
-			monitor->m_center_height = monitor->m_dimensions.h;
 
 			// guess the aspect ratio assuming square pixels
 			monitor->m_aspect = (float)(dmode.w) / (float)(dmode.h);
