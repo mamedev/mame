@@ -744,7 +744,7 @@ public:
 	// UI targets
 	render_target &ui_target() const { assert(m_ui_target != NULL); return *m_ui_target; }
 	void set_ui_target(render_target &target) { m_ui_target = &target; }
-	float ui_aspect();
+	float ui_aspect(render_container *rc = NULL);
 
 	// UI containers
 	render_container &ui_container() const { assert(m_ui_container != NULL); return *m_ui_container; }

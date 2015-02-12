@@ -456,7 +456,7 @@ void ui_manager::update_and_render(render_container *container)
 		{
 			float mouse_y=-1,mouse_x=-1;
 			if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, *container, mouse_x, mouse_y)) {
-				container->add_quad(mouse_x,mouse_y,mouse_x + 0.05*container->manager().ui_aspect(),mouse_y + 0.05,UI_TEXT_COLOR,m_mouse_arrow_texture,PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				container->add_quad(mouse_x,mouse_y,mouse_x + 0.05*container->manager().ui_aspect(container),mouse_y + 0.05,UI_TEXT_COLOR,m_mouse_arrow_texture,PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 			}
 		}
 	}
@@ -600,7 +600,7 @@ void ui_manager::draw_text_full(render_container *container, const char *origs, 
 	const char *linestart;
 	float cury = y;
 	float maxwidth = 0;
-	float aspect = machine().render().ui_aspect();
+	float aspect = machine().render().ui_aspect(container);
 
 	// if we don't want wrapping, guarantee a huge wrapwidth
 	if (wrap == WRAP_NEVER)
