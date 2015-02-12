@@ -61,7 +61,7 @@ public:
 	DECLARE_DRIVER_INIT(gonefsh2);
 	DECLARE_DRIVER_INIT(sddz);
 	DECLARE_DRIVER_INIT(hauntedh);
-	DECLARE_DRIVER_INIT(bigd2);
+	DECLARE_DRIVER_INIT(zhongguo);
 	DECLARE_DRIVER_INIT(klxyj);
 	DECLARE_DRIVER_INIT(fearless);
 	TILE_GET_INFO_MEMBER(get_tx_tilemap_tile_info);
@@ -569,7 +569,7 @@ ROM_END
 
 /*
 
-Big D2
+Zhong Guo Chu Da D
 IGS, 2000
 
 PCB Layout
@@ -612,10 +612,10 @@ Notes:
 
 */
 
-ROM_START( bigd2 )
+ROM_START( zhongguo )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	/* Internal rom of IGS027A ARM based MCU */
-	ROM_LOAD( "bigd2_igs027a", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "zhongguo_igs027a", 0x00000, 0x4000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "p2600.u10", 0x000000, 0x80000, CRC(9ad34135) SHA1(54717753d1296efe49946369fd4a27181f19dbc0) )
@@ -953,9 +953,9 @@ DRIVER_INIT_MEMBER(igs_m027_state,gonefsh2)
 	pgm_create_dummy_internal_arm_region();
 }
 
-DRIVER_INIT_MEMBER(igs_m027_state,bigd2)
+DRIVER_INIT_MEMBER(igs_m027_state,zhongguo)
 {
-	big2_decrypt(machine());
+	zhongguo_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
@@ -968,7 +968,7 @@ DRIVER_INIT_MEMBER(igs_m027_state,bigd2)
 
 GAME( 2002,  sdwx,      0, igs_majhong, sdwx, igs_m027_state, sdwx,        ROT0, "IGS", "Sheng Dan Wu Xian", GAME_IS_SKELETON ) // aka Christmas 5 Line?
 GAME( 200?,  sddz,      0, igs_majhong, sdwx, igs_m027_state, sddz,        ROT0, "IGS", "Super Dou Di Zhu",  GAME_IS_SKELETON )
-GAME( 2000,  bigd2,     0, igs_majhong, sdwx, igs_m027_state, bigd2,       ROT0, "IGS", "Big D2",  GAME_IS_SKELETON )
+GAME( 2000,  zhongguo,  0, igs_majhong, sdwx, igs_m027_state, zhongguo,    ROT0, "IGS", "Zhong Guo Chu Da D",  GAME_IS_SKELETON )
 GAME( 200?,  lhzb3,     0, igs_majhong, sdwx, igs_m027_state, lhzb3,       ROT0, "IGS", "Long Hu Zheng Ba 3", GAME_IS_SKELETON )
 GAME( 200?,  lhzb4,     0, igs_majhong, sdwx, igs_m027_state, lhzb4,       ROT0, "IGS", "Long Hu Zheng Ba 4", GAME_IS_SKELETON )
 GAME( 200?,  klxyj,     0, igs_majhong, sdwx, igs_m027_state, klxyj,       ROT0, "IGS", "Kuai Le Xi You Ji",  GAME_IS_SKELETON )
