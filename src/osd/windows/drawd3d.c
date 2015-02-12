@@ -247,7 +247,7 @@ render_primitive_list *d3d::renderer::get_primitives()
 	GetClientRectExceptMenu(window().m_hwnd, &client, window().fullscreen());
 	if (rect_width(&client) > 0 && rect_height(&client) > 0)
 	{
-		window().target()->set_bounds(rect_width(&client), rect_height(&client), window().m_monitor->get_aspect());
+		window().target()->set_bounds(rect_width(&client), rect_height(&client), window().aspect());
 		window().target()->set_max_update_rate((get_refresh() == 0) ? get_origmode().RefreshRate : get_refresh());
 	}
 	return &window().target()->get_primitives();
@@ -1220,12 +1220,7 @@ int renderer::config_adapter_mode()
 		// make sure it's a pixel format we can get behind
 		if (m_pixformat != D3DFMT_X1R5G5B5 && m_pixformat != D3DFMT_R5G6B5 && m_pixformat != D3DFMT_X8R8G8B8)
 		{
-			char *utf8_device = utf8_from_tstring(window().m_monitor->info.szDevice);
-			if (utf8_device != NULL)
-			{
-				osd_printf_error("Device %s currently in an unsupported mode\n", utf8_device);
-				osd_free(utf8_device);
-			}
+			osd_printf_error("Device %s currently in an unsupported mode\n", window().monitor()->devicename());
 			return 1;
 		}
 	}
@@ -1248,12 +1243,7 @@ int renderer::config_adapter_mode()
 	result = (*d3dintf->d3d.check_device_type)(d3dintf, m_adapter, D3DDEVTYPE_HAL, m_pixformat, m_pixformat, !window().fullscreen());
 	if (result != D3D_OK)
 	{
-		char *utf8_device = utf8_from_tstring(window().m_monitor->info.szDevice);
-		if (utf8_device != NULL)
-		{
-			osd_printf_error("Proposed video mode not supported on device %s\n", utf8_device);
-			osd_free(utf8_device);
-		}
+		osd_printf_error("Proposed video mode not supported on device %s\n", window().monitor()->devicename());
 		return 1;
 	}
 	return 0;
@@ -1276,7 +1266,7 @@ int renderer::get_adapter_for_monitor()
 		HMONITOR curmonitor = (*d3dintf->d3d.get_adapter_monitor)(d3dintf, adapternum);
 
 		// if we match the proposed monitor, this is it
-		if (curmonitor == window().m_monitor->handle)
+		if (curmonitor == window().monitor()->handle)
 		{
 			return adapternum;
 		}

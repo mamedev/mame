@@ -124,7 +124,7 @@ render_primitive_list *renderer_bgfx::get_primitives()
 {
 	RECT client;
 	GetClientRect(window().m_hwnd, &client);
-	window().target()->set_bounds(rect_width(&client), rect_height(&client), window().m_monitor->get_aspect());
+	window().target()->set_bounds(rect_width(&client), rect_height(&client), window().aspect());
 	return &window().target()->get_primitives();
 }
 

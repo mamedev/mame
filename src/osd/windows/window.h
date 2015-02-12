@@ -48,9 +48,8 @@ public:
 	osd_window()
 	:
 #ifdef OSD_SDL
-		m_start_viewscreen(0),
 #else
-		m_hwnd(0), m_focus_hwnd(0), m_monitor(NULL), m_resize_state(0),
+		m_hwnd(0), m_focus_hwnd(0), m_resize_state(0),
 		m_maxwidth(0), m_maxheight(0),
 		m_refresh(0),
 #endif
@@ -65,6 +64,8 @@ public:
 
 	int prescale() const { return m_prescale; };
 
+	float aspect() const { return monitor()->aspect(); }
+
 #ifdef OSD_SDL
 	virtual void blit_surface_size(int &blitwidth, int &blitheight) = 0;
 	virtual sdl_monitor_info *monitor() const = 0;
@@ -75,7 +76,9 @@ public:
 	virtual SDL_Surface *sdl_surface() = 0;
 #endif
 #else
+	virtual win_monitor_info *monitor() const = 0;
 	virtual bool win_has_menu() = 0;
+	// FIXME: cann we replace winwindow_video_window_monitor(NULL) with monitor() ?
 	virtual win_monitor_info *winwindow_video_window_monitor(const RECT *proposed) = 0;
 
 	// window handle and info
@@ -84,8 +87,6 @@ public:
 	// During modularization, this should be passed in differently
 	HWND         	 		m_focus_hwnd;
 
-	// monitor info
-	win_monitor_info *  	m_monitor;
 	int                 	m_resize_state;
 	int                 	m_maxwidth, m_maxheight;
 	int                 	m_refresh;
@@ -168,6 +169,8 @@ public:
 		return GetMenu(m_hwnd) ? true : false;
 	}
 
+	win_monitor_info *monitor() const { return m_monitor; }
+
 	win_window_info *   m_next;
 	volatile int        m_init_state;
 
@@ -179,6 +182,7 @@ public:
 	int                 m_ismaximized;
 
 	// monitor info
+	win_monitor_info *  m_monitor;
 	int                 m_fullscreen;
 	int                 m_fullscreen_safe;
 	float               m_aspect;

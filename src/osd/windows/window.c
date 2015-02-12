@@ -302,6 +302,7 @@ win_window_info::win_window_info(running_machine &machine)
 		m_startmaximized(0),
 		m_isminimized(0),
 		m_ismaximized(0),
+		m_monitor(NULL),
 		m_fullscreen(0),
 		m_fullscreen_safe(0),
 		m_aspect(0),
@@ -1521,7 +1522,7 @@ static void constrain_to_aspect_ratio(win_window_info *window, RECT *rect, int a
 	assert(GetCurrentThreadId() == window_threadid);
 
 	// get the pixel aspect ratio for the target monitor
-	pixel_aspect = monitor->get_aspect();
+	pixel_aspect = monitor->aspect();
 
 	// determine the proposed width/height
 	propwidth = rect_width(rect) - extrawidth;

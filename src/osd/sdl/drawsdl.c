@@ -83,7 +83,7 @@ public:
 			m_blitwidth = nw; m_blitheight = nh;
 			notify_changed();
 		}
-		window().target()->set_bounds(m_blitwidth, m_blitheight, window().monitor()->aspect());
+		window().target()->set_bounds(m_blitwidth, m_blitheight, window().aspect());
 		return &window().target()->get_primitives();
 	}
 

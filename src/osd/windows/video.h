@@ -37,22 +37,24 @@ public:
 	virtual ~win_monitor_info();
 
 	void refresh();
-	float get_aspect();
-	void set_aspect(float a) { aspect = a; }
+	float aspect();
+	void set_aspect(float a) { m_aspect = a; }
+	const char *devicename() { refresh(); return (m_name != NULL) ? m_name : "UNKNOWN"; }
 
 	win_monitor_info  * next;                   // pointer to next monitor in list
 	HMONITOR            handle;                 // handle to the monitor
 	MONITORINFOEX       info;                   // most recently retrieved info
 private:
-	float               aspect;                 // computed/configured aspect ratio of the physical device
+	float               m_aspect;               // computed/configured aspect ratio of the physical device
 	int                 reqwidth;               // requested width for this monitor
 	int                 reqheight;              // requested height for this monitor
+	char * 				m_name;
 };
 
 
 struct win_window_config
 {
-	float               aspect;                     // decoded aspect ratio
+	float               aspect;                     // decoded aspect ratio FIXME:Not used!
 	int                 width;                      // decoded width
 	int                 height;                     // decoded height
 	int                 refresh;                    // decoded refresh

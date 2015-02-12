@@ -856,7 +856,7 @@ void renderer_dd::compute_blit_surface_size()
 		if (video_config.keepaspect)
 		{
 			win_monitor_info *monitor = window().winwindow_video_window_monitor(NULL);
-			window().target()->compute_visible_area(target_width, target_height, monitor->get_aspect(), window().target()->orientation(), target_width, target_height);
+			window().target()->compute_visible_area(target_width, target_height, monitor->aspect(), window().target()->orientation(), target_width, target_height);
 			desired_aspect = (float)target_width / (float)target_height;
 		}
 
@@ -1000,7 +1000,7 @@ void renderer_dd::blit_to_primary(int srcwidth, int srcheight)
 	else if (video_config.keepaspect)
 	{
 		// compute the appropriate visible area
-		window().target()->compute_visible_area(rect_width(&outer), rect_height(&outer), monitor->get_aspect(), window().target()->orientation(), dstwidth, dstheight);
+		window().target()->compute_visible_area(rect_width(&outer), rect_height(&outer), monitor->aspect(), window().target()->orientation(), dstwidth, dstheight);
 	}
 
 	// center within
@@ -1082,7 +1082,7 @@ int renderer_dd::config_adapter_mode()
 	HRESULT result;
 
 	// choose the monitor number
-	get_adapter_for_monitor(window().m_monitor);
+	get_adapter_for_monitor(window().monitor());
 
 	// create a temporary DirectDraw object
 	result = (*directdrawcreateex)(adapter_ptr, (LPVOID *)&ddraw, WRAP_REFIID(IID_IDirectDraw7), NULL);

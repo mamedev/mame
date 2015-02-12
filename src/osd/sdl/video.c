@@ -207,7 +207,6 @@ void sdl_monitor_info::refresh()
 				m_dimensions.h = xineinfo[0].height;
 
 				XFree(xineinfo);
-				printf("XineneraActive\n");
 			}
 		}
 		else
