@@ -72,10 +72,23 @@ READ8_MEMBER( mbee_state::pio_port_b_r )
 
 	if (m_cassette->input() > 0.03) data |= 1;
 
-	data |= m_clock_pulse;
-	data |= m_mbee256_key_available;
+	switch (m_io_config->read() & 0xc0)
+	{
+		case 0x00:
+			data |= (UINT8)m_b7_vs << 7;
+			break;
+		case 0x40:
+			data |= (UINT8)m_b7_rtc << 7;
+			break;
+		case 0x80:
+			data |= 0x80;
+			break;
+		case 0xc0:
+			data |= 0x80; // centronics busy line - FIXME
+			break;
+	}
 
-	m_clock_pulse = 0;
+	data |= m_mbee256_key_available;
 
 	return data;
 };
@@ -254,11 +267,16 @@ READ8_MEMBER( mbee_state::mbee_07_r )   // read
 	return m_rtc->read(space, 1);
 }
 
-TIMER_CALLBACK_MEMBER(mbee_state::mbee_rtc_irq)
+// This doesn't seem to do anything; the time works without it.
+TIMER_CALLBACK_MEMBER( mbee_state::mbee_rtc_irq )
 {
-	UINT8 data = m_rtc->read(m_maincpu->space(AS_PROGRAM), 12);
-	if (data) m_clock_pulse = 0x80;
-	timer_set(attotime::from_hz(1), TIMER_MBEE_RTC_IRQ);
+	UINT8 data = m_rtc->read(m_maincpu->space(AS_IO), 12);
+	m_b7_rtc = (data) ? 1 : 0;
+
+	if ((m_io_config->read() & 0xc0) == 0x40) // RTC selected in config menu
+		m_pio->port_b_write(pio_port_b_r(generic_space(),0,0xff));
+
+	timer_set(attotime::from_hz(10), TIMER_MBEE_RTC_IRQ);
 }
 
 
@@ -522,7 +540,7 @@ INTERRUPT_GEN_MEMBER( mbee_state::mbee_interrupt )
 
 	/* once per frame, pulse the PIO B bit 7 - it is in the schematic as an option,
 	but need to find out what it does */
-	m_clock_pulse = 0x80;
+	m_b7_busy = 0x80;
 	irq0_line_hold(device);
 
 #endif
@@ -623,7 +641,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbee128 )
 		membank(banktag)->configure_entries(0, 32, &RAM[0x0000], 0x1000); // RAM banks
 		membank(banktag)->configure_entries(64, 1, &ROM[0x4000], 0x1000); // dummy rom
 	}
-	m_size = 0xf000;
+	m_size = 0x8000;
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbee256 )
@@ -683,7 +701,7 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT16 i, j;
-	UINT8 data, sw = ioport("CONFIG")->read() & 1;   /* reading the dipswitch: 1 = autorun */
+	UINT8 data, sw = m_io_config->read() & 1;   /* reading the config switch: 1 = autorun */
 
 	if (!core_stricmp(image.filetype(), "mwb"))
 	{
@@ -784,8 +802,8 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee_z80bin )
 	/* is this file executable? */
 	if (execute_address != 0xffff)
 	{
-		/* check to see if autorun is on (I hate how this works) */
-		autorun = ioport("CONFIG")->read_safe(0xFF) & 1;
+		/* check to see if autorun is on */
+		autorun = m_io_config->read_safe(0xFF) & 1;
 
 		address_space &space = m_maincpu->space(AS_PROGRAM);
 

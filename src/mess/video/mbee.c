@@ -28,6 +28,12 @@
 
 #include "includes/mbee.h"
 
+WRITE_LINE_MEMBER( mbee_state::crtc_vs )
+{
+	m_b7_vs = state;
+	if ((m_io_config->read() & 0xc0) == 0) // VS selected in config menu
+		m_pio->port_b_write(pio_port_b_r(generic_space(),0,0xff));
+}
 
 /***********************************************************
 
@@ -314,8 +320,8 @@ READ8_MEMBER( mbee_state::m6545_data_r )
 		m_sy6545_status &= 0x80; // turn off lpen_strobe
 		break;
 	case 31:
-				/* This firstly pushes the contents of the transparent registers onto the MA lines,
-				then increments the address, then sets update strobe on. */
+		// This firstly pushes the contents of the transparent registers onto the MA lines,
+		// then increments the address, then sets update strobe on.
 		addr = (m_sy6545_reg[18] << 8) | m_sy6545_reg[19];
 		keyboard_matrix_r(addr);
 		m_sy6545_reg[19]++;
@@ -346,8 +352,8 @@ WRITE8_MEMBER ( mbee_state::m6545_data_w )
 			memcpy(m_p_gfxram, memregion("gfx")->base() + (((data & 0x30) == 0x20) << 11), 0x800);
 		break;
 	case 31:
-		/* This firstly pushes the contents of the transparent registers onto the MA lines,
-		then increments the address, then sets update strobe on. */
+		// This firstly pushes the contents of the transparent registers onto the MA lines,
+		// then increments the address, then sets update strobe on.
 		addr = (m_sy6545_reg[18] << 8) | m_sy6545_reg[19];
 		keyboard_matrix_r(addr);
 		m_sy6545_reg[19]++;
@@ -369,14 +375,14 @@ WRITE8_MEMBER ( mbee_state::m6545_data_w )
 
 ************************************************************/
 
-VIDEO_START_MEMBER(mbee_state,mbee)
+VIDEO_START_MEMBER( mbee_state, mbee )
 {
 	m_p_videoram = memregion("videoram")->base();
 	m_p_gfxram = memregion("gfx")->base()+0x1000;
 	m_is_premium = 0;
 }
 
-VIDEO_START_MEMBER(mbee_state,mbeeic)
+VIDEO_START_MEMBER( mbee_state, mbeeic )
 {
 	m_p_videoram = memregion("videoram")->base();
 	m_p_colorram = memregion("colorram")->base();
@@ -384,7 +390,7 @@ VIDEO_START_MEMBER(mbee_state,mbeeic)
 	m_is_premium = 0;
 }
 
-VIDEO_START_MEMBER(mbee_state,mbeeppc)
+VIDEO_START_MEMBER( mbee_state, mbeeppc )
 {
 	m_p_videoram = memregion("videoram")->base();
 	m_p_colorram = memregion("colorram")->base();
@@ -546,7 +552,7 @@ MC6845_UPDATE_ROW( mbee_state::mbeeppc_update_row )
 
 ************************************************************/
 
-PALETTE_INIT_MEMBER(mbee_state,mbeeic)
+PALETTE_INIT_MEMBER( mbee_state, mbeeic )
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	UINT16 i;
@@ -574,7 +580,7 @@ PALETTE_INIT_MEMBER(mbee_state,mbeeic)
 }
 
 
-PALETTE_INIT_MEMBER(mbee_state,mbeepc85b)
+PALETTE_INIT_MEMBER( mbee_state, mbeepc85b )
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	UINT16 i;
@@ -604,7 +610,7 @@ PALETTE_INIT_MEMBER(mbee_state,mbeepc85b)
 }
 
 
-PALETTE_INIT_MEMBER(mbee_state,mbeeppc)
+PALETTE_INIT_MEMBER( mbee_state, mbeeppc )
 {
 	UINT16 i;
 	UINT8 r, b, g;
