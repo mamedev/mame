@@ -58,16 +58,64 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 - (debug_view_xy)convertLocation:(NSPoint)location {
 	debug_view_xy position;
-	position.x = lround(floor(location.x / fontWidth));
+
 	position.y = lround(floor(location.y / fontHeight));
-	if (position.x < 0)
-		position.x = 0;
-	else if (position.x >= totalWidth)
-		position.x = totalWidth - 1;
 	if (position.y < 0)
 		position.y = 0;
 	else if (position.y >= totalHeight)
 		position.y = totalHeight - 1;
+
+	debug_view_xy const origin = view->visible_position();
+	debug_view_xy const size = view->visible_size();
+	debug_view_char const *data = view->viewdata();
+	if (!data || (position.y < origin.y) || (position.y >= origin.y + size.y))
+	{
+		// y coordinate outside visible area, x will be a guess
+		position.x = lround(floor(location.x / fontWidth));
+	}
+	else
+	{
+		data += ((position.y - view->visible_position().y) * view->visible_size().x);
+		int			attr = -1;
+		NSUInteger	start = 0, length = 0;
+		for (UINT32 col = origin.x; col < origin.x + size.x; col++)
+		{
+			[[text mutableString] appendFormat:@"%c", data[col - origin.x].byte];
+			if ((start < length) && (attr != data[col - origin.x].attrib))
+			{
+				NSRange const run = NSMakeRange(start, length - start);
+				[text addAttribute:NSFontAttributeName
+							 value:font
+							 range:NSMakeRange(0, length)];
+				[text addAttribute:NSForegroundColorAttributeName
+							 value:[self foregroundForAttribute:attr]
+							 range:run];
+				start = length;
+			}
+			attr = data[col - origin.x].attrib;
+			length = [text length];
+		}
+		if (start < length)
+		{
+			NSRange const run = NSMakeRange(start, length - start);
+			[text addAttribute:NSFontAttributeName
+						 value:font
+						 range:NSMakeRange(0, length)];
+			[text addAttribute:NSForegroundColorAttributeName
+						 value:[self foregroundForAttribute:attr]
+						 range:run];
+		}
+		CGFloat fraction;
+		NSUInteger const glyph = [layoutManager glyphIndexForPoint:NSMakePoint(location.x, fontHeight / 2)
+												   inTextContainer:textContainer
+									fractionOfDistanceThroughGlyph:&fraction];
+		position.x = [layoutManager characterIndexForGlyphAtIndex:glyph]; // FIXME: assumes 1:1 character mapping
+	}
+	if (position.x < 0)
+		position.x = 0;
+	else if (position.x >= totalWidth)
+		position.x = totalWidth - 1;
+
 	return position;
 }
 
@@ -75,6 +123,8 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 - (void)convertBounds:(NSRect)b toPosition:(debug_view_xy *)origin size:(debug_view_xy *)size {
 	origin->x = lround(floor(b.origin.x / fontWidth));
 	origin->y = lround(floor(b.origin.y / fontHeight));
+
+	// FIXME: this is not using proper font metrics horizontally
 	size->x = lround(ceil((b.origin.x + b.size.width) / fontWidth)) - origin->x;
 	size->y = lround(ceil((b.origin.y + b.size.height) / fontHeight)) - origin->y;
 }
@@ -107,7 +157,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 		{
 			debug_view_xy newPos = view->cursor_position();
 			if ((newPos.x != oldPos.x) || (newPos.y != oldPos.y)) {
-				[self scrollRectToVisible:NSMakeRect(newPos.x * fontWidth,
+				[self scrollRectToVisible:NSMakeRect(newPos.x * fontWidth, // FIXME - use proper metrics
 													 newPos.y * fontHeight,
 													 fontWidth,
 													 fontHeight)];
@@ -120,8 +170,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 + (NSFont *)defaultFont {
-	// maybe we should get the configured system fixed-width font...
-	return [NSFont fontWithName:@"Monaco" size:10];
+	return [NSFont userFixedPitchFontOfSize:0];
 }
 
 
@@ -138,14 +187,21 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	totalWidth = totalHeight = 0;
 	originLeft = originTop = 0;
 	[self setFont:[[self class] defaultFont]];
+	text = [[NSTextStorage alloc] init];
+	textContainer = [[NSTextContainer alloc] init];
+	layoutManager = [[NSLayoutManager alloc] init];
+	[layoutManager addTextContainer:textContainer];
+	[text addLayoutManager:layoutManager];
 	return self;
 }
 
 
 - (void)dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	if (font != nil)
-		[font release];
+	if (font != nil) [font release];
+	if (text != nil) [text release];
+	if (textContainer != nil) [textContainer release];
+	if (layoutManager != nil) [layoutManager release];
 	[super dealloc];
 }
 
@@ -156,7 +212,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	// resize our frame if the total size has changed
 	newSize = view->total_size();
 	if ((newSize.x != totalWidth) || (newSize.y != totalHeight)) {
-		[self setFrameSize:NSMakeSize(fontWidth * newSize.x, fontHeight * newSize.y)];
+		[self setFrameSize:NSMakeSize(fontWidth * newSize.x, fontHeight * newSize.y)]; // FIXME: metrics
 		totalWidth = newSize.x;
 		totalHeight = newSize.y;
 	}
@@ -221,7 +277,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 		debug_view_xy pos;
 		view->set_cursor_visible(true);
 		pos = view->cursor_position();
-		[self scrollRectToVisible:NSMakeRect(pos.x * fontWidth, pos.y * fontHeight, fontWidth, fontHeight)];
+		[self scrollRectToVisible:NSMakeRect(pos.x * fontWidth, pos.y * fontHeight, fontWidth, fontHeight)]; // FIXME: metrics
 		[self setNeedsDisplay:YES];
 		return [super becomeFirstResponder];
 	} else {
@@ -266,73 +322,77 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (void)drawRect:(NSRect)dirtyRect {
-	const debug_view_char	*base;
-	debug_view_xy			origin, size;
-	debug_view_xy			position, clip;
-	NSMutableString			*text;
-	NSMutableDictionary		*attributes;
-	UINT32					pass, row, col;
+	debug_view_xy position, clip;
 
 	// work out how much we need to draw
 	[self recomputeVisible];
-	origin = view->visible_position();
-	size = view->visible_size();
+	debug_view_xy const origin = view->visible_position();
+	debug_view_xy const size = view->visible_size();
 	[self convertBounds:dirtyRect toPosition:&position size:&clip];
 
 	// this gets the text for the whole visible area
-	base = view->viewdata();
-	if (!base)
+	debug_view_char const *data = view->viewdata();
+	if (!data)
 		return;
 
-	text = [[NSMutableString alloc] initWithCapacity:clip.x];
-	attributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:font, NSFontAttributeName, nil];
-	for (pass = 0; pass < 2; pass++) {
-		const debug_view_char *data = base + ((position.y - origin.y) * size.x);
-		for (row = position.y; row < position.y + clip.y; row++, data += size.x) {
-			int attr = -1;
+	data += ((position.y - origin.y) * size.x);
+	for (UINT32 row = position.y; row < position.y + clip.y; row++, data += size.x)
+	{
+		if ((row < origin.y) || (row >= origin.y + size.y))
+			continue;
 
-			if ((row < origin.y) || (row >= origin.y + size.y))
-				continue;
-
-			// render entire lines to get character alignment right
-			for (col = origin.x; col < origin.x + size.x; col++) {
-				if ((attr != data[col - origin.x].attrib) && ([text length] > 0)) {
-					if (pass == 0) {
-						[[self backgroundForAttribute:attr] set];
-						[NSBezierPath fillRect:NSMakeRect((col - [text length]) * fontWidth,
-														  row * fontHeight,
-														  [text length] * fontWidth,
-														  fontHeight)];
-					} else {
-						[attributes setObject:[self foregroundForAttribute:attr]
-									   forKey:NSForegroundColorAttributeName];
-						[text drawAtPoint:NSMakePoint((col - [text length]) * fontWidth, row * fontHeight)
-						   withAttributes:attributes];
-					}
-					[text setString:@""];
-				}
-				attr = data[col - origin.x].attrib;
-				[text appendFormat:@"%c", data[col - origin.x].byte];
+		// render entire lines to get character alignment right
+		int			attr = -1;
+		NSUInteger	start = 0, length = 0;
+		for (UINT32 col = origin.x; col < origin.x + size.x; col++)
+		{
+			[[text mutableString] appendFormat:@"%c", data[col - origin.x].byte];
+			if ((start < length) && (attr != data[col - origin.x].attrib))
+			{
+				NSRange const run = NSMakeRange(start, length - start);
+				[text addAttribute:NSFontAttributeName
+							 value:font
+							 range:NSMakeRange(0, length)];
+				[text addAttribute:NSForegroundColorAttributeName
+							 value:[self foregroundForAttribute:attr]
+							 range:run];
+				NSRange const glyphs = [layoutManager glyphRangeForCharacterRange:run
+															 actualCharacterRange:NULL];
+				NSRect const box = [layoutManager boundingRectForGlyphRange:glyphs
+															inTextContainer:textContainer];
+				[[self backgroundForAttribute:attr] set];
+				[NSBezierPath fillRect:NSMakeRect(box.origin.x,
+												  row * fontHeight,
+												  box.size.width,
+												  fontHeight)];
+				start = length;
 			}
-			if ([text length] > 0) {
-				if (pass == 0) {
-					[[self backgroundForAttribute:attr] set];
-					[NSBezierPath fillRect:NSMakeRect((col - [text length]) * fontWidth,
-													  row * fontHeight,
-													  [text length] * fontWidth,
-													  fontHeight)];
-				} else {
-					[attributes setObject:[self foregroundForAttribute:attr]
-								   forKey:NSForegroundColorAttributeName];
-					[text drawAtPoint:NSMakePoint((col - [text length]) * fontWidth, row * fontHeight)
-					   withAttributes:attributes];
-				}
-				[text setString:@""];
-			}
+			attr = data[col - origin.x].attrib;
+			length = [text length];
 		}
+		if (start < length)
+		{
+			NSRange const run = NSMakeRange(start, length - start);
+			[text addAttribute:NSFontAttributeName
+						 value:font
+						 range:NSMakeRange(0, length)];
+			[text addAttribute:NSForegroundColorAttributeName
+						 value:[self foregroundForAttribute:attr]
+						 range:run];
+			NSRange const glyphs = [layoutManager glyphRangeForCharacterRange:run
+														 actualCharacterRange:NULL];
+			NSRect const box = [layoutManager boundingRectForGlyphRange:glyphs
+														inTextContainer:textContainer];
+			[[self backgroundForAttribute:attr] set];
+			[NSBezierPath fillRect:NSMakeRect(box.origin.x,
+											  row * fontHeight,
+											  box.size.width,
+											  fontHeight)];
+		}
+		[layoutManager drawGlyphsForGlyphRange:[layoutManager glyphRangeForTextContainer:textContainer]
+									   atPoint:NSMakePoint(0, row * fontHeight)];
+		[text deleteCharactersInRange:NSMakeRange(0, length)];
 	}
-	[attributes release];
-	[text release];
 }
 
 

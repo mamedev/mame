@@ -11,7 +11,6 @@
 
 #import "debugosxdisassemblyview.h"
 
-#include "emucore.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 #include "debug/debugvw.h"

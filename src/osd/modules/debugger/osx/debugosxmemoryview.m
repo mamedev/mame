@@ -11,7 +11,6 @@
 
 #import "debugosxmemoryview.h"
 
-#include "emucore.h"
 #include "debug/debugcpu.h"
 #include "debug/debugvw.h"
 #include "debug/dvmemory.h"

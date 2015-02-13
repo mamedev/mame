@@ -45,6 +45,10 @@
 
 	NSFont			*font;
 	CGFloat			fontWidth, fontHeight, fontAscent;
+
+	NSTextStorage	*text;
+	NSTextContainer	*textContainer;
+	NSLayoutManager	*layoutManager;
 }
 
 + (NSFont *)defaultFont;
