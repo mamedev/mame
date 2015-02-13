@@ -4,24 +4,7 @@
     video hardware
     Juergen Buchmueller <pullmoll@t-online.de>, Dec 1999
 
-    Tests of keyboard. Start mbeeic.
-
-    1. Load ASTEROIDS PLUS, stay in attract mode, hold down spacebar,
-        it should only fire bullets. If it sometimes starts turning,
-        thrusting or using the shield, then there is a problem.
-
-    2. Load SCAVENGER and make sure it doesn't go to the next level
-        until you find the Exit.
-
-    3. At the Basic prompt, type in EDASM press enter. At the memory size
-        prompt press enter. Now, make sure the keyboard works properly.
-
-
-
-    TODO:
-
-    1. mbeeppc keyboard response is quite slow. You need to hold each
-    key until it responds. It works much better if you overclock the cpu.
+    Rewritten by Robbbert
 
 ****************************************************************************/
 
@@ -214,65 +197,36 @@ WRITE8_MEMBER ( mbee_state::mbeeppc_high_w )
 ************************************************************/
 
 
-/* The direction keys are used by the pc85 menu. Do not know what uses the "insert" key. */
 void mbee_state::keyboard_matrix_r(int offs)
 {
 	UINT8 port = (offs >> 7) & 7;
 	UINT8 bit = (offs >> 4) & 7;
-	UINT8 data = 0;
+	UINT8 data = m_io_oldkb[port]->read();
+	bool keydown  = ( data >> bit ) & 1;
 
-	switch ( port )
-	{
-		case 0: data = m_io_x0->read(); break;
-		case 1: data = m_io_x1->read(); break;
-		case 2: data = m_io_x2->read(); break;
-		case 3: data = m_io_x3->read(); break;
-		case 4: data = m_io_x4->read(); break;
-		case 5: data = m_io_x5->read(); break;
-		case 6: data = m_io_x6->read(); break;
-		case 7: data = m_io_x7->read(); break;
-	}
-	data  = ( data >> bit ) & 1;
-
-	if ((data | m_is_premium) == 0)
+	// This adds premium-style cursor keys to the old keyboard
+	// They are used by the pc85 & ppc menu, and the 128k shell.
+	if (!keydown)
 	{
 		UINT8 extra = m_io_extra->read();
 
-		if( extra & 0x01 )  /* extra: cursor up */
-		{
-			if( port == 7 && bit == 1 ) data = 1;   /* Control */
-			if( port == 0 && bit == 5 ) data = 1;   /* E */
-		}
+		if (extra && port == 7 && bit == 1) keydown = 1;   /* Control */
+
+		if (BIT(extra, 0) && ( port == 0 && bit == 5 )) keydown = 1; // cursor up = ^E
 		else
-		if( extra & 0x02 )  /* extra: cursor down */
-		{
-			if( port == 7 && bit == 1 ) data = 1;   /* Control */
-			if( port == 3 && bit == 0 ) data = 1;   /* X */
-		}
+		if (BIT(extra, 1) && ( port == 3 && bit == 0 )) keydown = 1; // cursor down = ^X
 		else
-		if( extra & 0x04 )  /* extra: cursor left */
-		{
-			if( port == 7 && bit == 1 ) data = 1;   /* Control */
-			if( port == 2 && bit == 3 ) data = 1;   /* S */
-		}
+		if (BIT(extra, 2) && ( port == 2 && bit == 3 )) keydown = 1; // cursor left = ^S
 		else
-		if( extra & 0x08 )  /* extra: cursor right */
-		{
-			if( port == 7 && bit == 1 ) data = 1;   /* Control */
-			if( port == 0 && bit == 4 ) data = 1;   /* D */
-		}
+		if (BIT(extra, 3) && ( port == 0 && bit == 4 )) keydown = 1; // cursor right = ^D
 #if 0
-		// this key doesn't appear on any keyboard afaik
+		// this key doesn't appear on any keyboard afaik. It is a Wordbee function.
 		else
-		if( extra & 0x10 )  /* extra: insert */
-		{
-			if( port == 7 && bit == 1 ) data = 1;   /* Control */
-			if( port == 2 && bit == 6 ) data = 1;   /* V */
-		}
+		if (BIT(extra, 4) && ( port == 2 && bit == 6 )) keydown = 1;  // insert = ^V
 #endif
 	}
 
-	if( data )
+	if( keydown )
 	{
 		m_sy6545_reg[17] = offs;
 		m_sy6545_reg[16] = (offs >> 8) & 0x3f;
@@ -283,8 +237,8 @@ void mbee_state::keyboard_matrix_r(int offs)
 
 void mbee_state::mbee_video_kbd_scan( int param )
 {
-	if (m_0b) return;
-
+	if (m_0b) return; // can't remember why this is here
+	if (param & 15) return; // only scan once per row instead of 16 times
 	keyboard_matrix_r(param);
 }
 
@@ -375,14 +329,14 @@ WRITE8_MEMBER ( mbee_state::m6545_data_w )
 
 ************************************************************/
 
-VIDEO_START_MEMBER( mbee_state, mbee )
+VIDEO_START_MEMBER( mbee_state, mono )
 {
 	m_p_videoram = memregion("videoram")->base();
 	m_p_gfxram = memregion("gfx")->base()+0x1000;
 	m_is_premium = 0;
 }
 
-VIDEO_START_MEMBER( mbee_state, mbeeic )
+VIDEO_START_MEMBER( mbee_state, standard )
 {
 	m_p_videoram = memregion("videoram")->base();
 	m_p_colorram = memregion("colorram")->base();
@@ -390,7 +344,7 @@ VIDEO_START_MEMBER( mbee_state, mbeeic )
 	m_is_premium = 0;
 }
 
-VIDEO_START_MEMBER( mbee_state, mbeeppc )
+VIDEO_START_MEMBER( mbee_state, premium )
 {
 	m_p_videoram = memregion("videoram")->base();
 	m_p_colorram = memregion("colorram")->base();
@@ -407,19 +361,15 @@ UINT32 mbee_state::screen_update_mbee(screen_device &screen, bitmap_rgb32 &bitma
 }
 
 
-MC6845_ON_UPDATE_ADDR_CHANGED( mbee_state::mbee_update_addr )
+MC6845_ON_UPDATE_ADDR_CHANGED( mbee_state::crtc_update_addr )
 {
-/* not sure what goes in here - parameters passed are device, address, strobe */
-}
-
-MC6845_ON_UPDATE_ADDR_CHANGED( mbee_state::mbee256_update_addr )
-{
-/* not used on 256TC */
+// not sure what goes in here - parameters passed are device, address, strobe
+// not used on 256TC
 }
 
 
 /* monochrome bee */
-MC6845_UPDATE_ROW( mbee_state::mbee_update_row )
+MC6845_UPDATE_ROW( mbee_state::mono_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT8 chr,gfx;
@@ -453,76 +403,43 @@ MC6845_UPDATE_ROW( mbee_state::mbee_update_row )
 	}
 }
 
-/* prom-based colours */
-MC6845_UPDATE_ROW( mbee_state::mbeeic_update_row )
+/* colour bee */
+MC6845_UPDATE_ROW( mbee_state::colour_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 chr,gfx,fg,bg;
-	UINT16 mem,x,col;
+	UINT8 inv,attr,gfx,fg,bg;
+	UINT16 mem,x,col,chr;
 	UINT16 colourm = (m_08 & 0x0e) << 7;
 	UINT32 *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)           // for each character
 	{
-		UINT8 inv=0;
-		mem = (ma + x) & 0x7ff;
-		chr = m_p_videoram[mem];
-		col = m_p_colorram[mem] | colourm;                   // read a byte of colour
-
-		mbee_video_kbd_scan(x+ma);
-
-		/* process cursor */
-		if (x == cursor_x)
-			inv ^= m_sy6545_cursor[ra];          // cursor scan row
-
-		/* get pattern of pixels for that character scanline */
-		gfx = m_p_gfxram[(chr<<4) | ra] ^ inv;
-		fg = (col & 0x001f) | 64;                   // map to foreground palette
-		bg = (col & 0x07e0) >> 5;                   // and background palette
-
-		/* Display a scanline of a character (8 pixels) */
-		*p++ = palette[BIT(gfx, 7) ? fg : bg];
-		*p++ = palette[BIT(gfx, 6) ? fg : bg];
-		*p++ = palette[BIT(gfx, 5) ? fg : bg];
-		*p++ = palette[BIT(gfx, 4) ? fg : bg];
-		*p++ = palette[BIT(gfx, 3) ? fg : bg];
-		*p++ = palette[BIT(gfx, 2) ? fg : bg];
-		*p++ = palette[BIT(gfx, 1) ? fg : bg];
-		*p++ = palette[BIT(gfx, 0) ? fg : bg];
-	}
-}
-
-
-/* new colours & hires2 */
-MC6845_UPDATE_ROW( mbee_state::mbeeppc_update_row )
-{
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 gfx,fg,bg;
-	UINT16 mem,x,col,chr;
-	UINT32 *p = &bitmap.pix32(y);
-
-	for (x = 0; x < x_count; x++)           // for each character
-	{
-		UINT8 inv=0;
+		inv = 0;
 		mem = (ma + x) & 0x7ff;
 		chr = m_p_videoram[mem];
 		col = m_p_colorram[mem];                     // read a byte of colour
 
-		if (m_1c & 0x80)                     // are extended features enabled?
+		if (m_is_premium)
 		{
-			UINT8 attr = m_p_attribram[mem];
+			if (m_1c & 0x80)                     // are extended features enabled?
+			{
+				attr = m_p_attribram[mem];
 
-			if (chr & 0x80)
-				chr += ((attr & 15) << 7);          // bump chr to its particular pcg definition
+				if (chr & 0x80)
+					chr += ((attr & 15) << 7);          // bump chr to its particular pcg definition
 
-			if (attr & 0x40)
-				inv ^= 0xff;                    // inverse attribute
+				if (attr & 0x40)
+					inv ^= 0xff;                    // inverse attribute
 
-			if ((attr & 0x80) && (m_framecnt & 0x10))            // flashing attribute
-				chr = 0x20;
+				if ((attr & 0x80) && (m_framecnt & 0x10))            // flashing attribute
+					chr = 0x20;
+			}
 		}
+		else
+			col |= colourm;
 
-		mbee_video_kbd_scan(x+ma);
+		if (m_has_oldkb)
+			mbee_video_kbd_scan(x+ma);
 
 		/* process cursor */
 		if (x == cursor_x)
@@ -530,8 +447,18 @@ MC6845_UPDATE_ROW( mbee_state::mbeeppc_update_row )
 
 		/* get pattern of pixels for that character scanline */
 		gfx = m_p_gfxram[(chr<<4) | ra] ^ inv;
-		fg = col & 15;                          // map to foreground palette
-		bg = (col & 0xf0) >> 4;                     // and background palette
+
+		// get colours
+		if (m_is_premium)
+		{
+			fg = col & 15;
+			bg = (col & 0xf0) >> 4;
+		}
+		else
+		{
+			fg = (col & 0x001f) | 64;
+			bg = (col & 0x07e0) >> 5;
+		}
 
 		/* Display a scanline of a character (8 pixels) */
 		*p++ = palette[BIT(gfx, 7) ? fg : bg];
@@ -552,7 +479,7 @@ MC6845_UPDATE_ROW( mbee_state::mbeeppc_update_row )
 
 ************************************************************/
 
-PALETTE_INIT_MEMBER( mbee_state, mbeeic )
+PALETTE_INIT_MEMBER( mbee_state, standard )
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	UINT16 i;
@@ -610,7 +537,7 @@ PALETTE_INIT_MEMBER( mbee_state, mbeepc85b )
 }
 
 
-PALETTE_INIT_MEMBER( mbee_state, mbeeppc )
+PALETTE_INIT_MEMBER( mbee_state, premium )
 {
 	UINT16 i;
 	UINT8 r, b, g;

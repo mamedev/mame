@@ -88,7 +88,8 @@ READ8_MEMBER( mbee_state::pio_port_b_r )
 			break;
 	}
 
-	data |= m_mbee256_key_available;
+	data |= (UINT8)m_b2 << 1; // key pressed on new keyboard
+	data |= 8; // CTS held high via resistor. If low, the disk-based models think a mouse is plugged in.
 
 	return data;
 };
@@ -114,7 +115,7 @@ WRITE_LINE_MEMBER( mbee_state::fdc_drq_w )
 
 READ8_MEMBER( mbee_state::mbee_fdc_status_r )
 {
-/*  d7 indicate if IRQ or DRQ is occuring (1=happening)
+/*  d7 indicate if IRQ or DRQ is occurring (1=happening)
     d6..d0 not used */
 
 	return m_fdc_rq ? 0xff : 0x7f;
@@ -164,49 +165,34 @@ TIMER_CALLBACK_MEMBER(mbee_state::mbee256_kbd)
 	It includes up to 4 KB of mask-programmable ROM, 64 bytes of scratchpad RAM and up to 64 bytes
 	of executable RAM. The MCU also integrates 32-bit I/O and a programmable timer. */
 
-	UINT8 i, j;
-	UINT8 pressed[15];
+	UINT8 i, j, pressed;
 
-
-	/* see what is pressed */
-	pressed[0] = m_io_x0->read();
-	pressed[1] = m_io_x1->read();
-	pressed[2] = m_io_x2->read();
-	pressed[3] = m_io_x3->read();
-	pressed[4] = m_io_x4->read();
-	pressed[5] = m_io_x5->read();
-	pressed[6] = m_io_x6->read();
-	pressed[7] = m_io_x7->read();
-	pressed[8] = m_io_x8->read();
-	pressed[9] = m_io_x9->read();
-	pressed[10] = m_io_x10->read();
-	pressed[11] = m_io_x11->read();
-	pressed[12] = m_io_x12->read();
-	pressed[13] = m_io_x13->read();
-	pressed[14] = m_io_x14->read();
-
-	/* find what has changed */
+	// find what has changed
 	for (i = 0; i < 15; i++)
 	{
-		if (pressed[i] != m_mbee256_was_pressed[i])
+		pressed = m_io_newkb[i]->read();
+		if (pressed != m_mbee256_was_pressed[i])
 		{
-			/* get scankey value */
+			// get scankey value
 			for (j = 0; j < 8; j++)
 			{
-				if (BIT(pressed[i]^m_mbee256_was_pressed[i], j))
+				if (BIT(pressed^m_mbee256_was_pressed[i], j))
 				{
-					/* put it in the queue */
-					m_mbee256_q[m_mbee256_q_pos] = (i << 3) | j | (BIT(pressed[i], j) ? 0x80 : 0);
+					// put it in the queue
+					m_mbee256_q[m_mbee256_q_pos] = (i << 3) | j | (BIT(pressed, j) ? 0x80 : 0);
 					if (m_mbee256_q_pos < 19) m_mbee256_q_pos++;
 				}
 			}
-			m_mbee256_was_pressed[i] = pressed[i];
+			m_mbee256_was_pressed[i] = pressed;
 		}
 	}
 
-	/* if anything queued, cause an interrupt */
+	// if anything queued, cause an interrupt
 	if (m_mbee256_q_pos)
-		m_mbee256_key_available = 2; // set irq
+	{
+		m_b2 = 1; // set irq
+		//breaks keyboard m_pio->port_b_write(pio_port_b_r(generic_space(),0,0xff));
+	}
 
 	timer_set(attotime::from_hz(25), TIMER_MBEE256_KBD);
 }
@@ -221,7 +207,7 @@ READ8_MEMBER( mbee_state::mbee256_18_r )
 		for (i = 0; i < m_mbee256_q_pos; i++) m_mbee256_q[i] = m_mbee256_q[i+1]; // ripple queue
 	}
 
-	m_mbee256_key_available = 0; // clear irq
+	m_b2 = 0; // clear irq
 	return data;
 }
 
@@ -270,6 +256,9 @@ READ8_MEMBER( mbee_state::mbee_07_r )   // read
 // This doesn't seem to do anything; the time works without it.
 TIMER_CALLBACK_MEMBER( mbee_state::mbee_rtc_irq )
 {
+	if (!m_rtc)
+		return;
+
 	UINT8 data = m_rtc->read(m_maincpu->space(AS_IO), 12);
 	m_b7_rtc = (data) ? 1 : 0;
 
@@ -292,6 +281,10 @@ TIMER_CALLBACK_MEMBER( mbee_state::mbee_rtc_irq )
 
     b_mask = total dynamic ram (1=64k; 3=128k; 7=256k)
 
+    Certain software (such as the PJB system) constantly switch banks around,
+    causing slowness. Therefore this function only changes the banks that need
+    changing, leaving the others as is.
+
 ************************************************************/
 
 void mbee_state::setup_banks(UINT8 data, bool first_time, UINT8 b_mask)
@@ -304,7 +297,7 @@ void mbee_state::setup_banks(UINT8 data, bool first_time, UINT8 b_mask)
 	UINT16 b_vid;
 	char banktag[10];
 
-	if (first_time || (b_data != m_bank_array[0]))
+	if (first_time || (b_data != m_bank_array[0])) // if same data as last time, leave now
 	{
 		m_bank_array[0] = b_data;
 
@@ -551,6 +544,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbee )
 	UINT8 *RAM = memregion("maincpu")->base();
 	m_boot->configure_entries(0, 2, &RAM[0x0000], 0x8000);
 	m_size = 0x4000;
+	m_has_oldkb = 1;
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbeeic )
@@ -563,6 +557,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbeeic )
 
 	m_pak->set_entry(0);
 	m_size = 0x8000;
+	m_has_oldkb = 1;
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbeepc )
@@ -579,6 +574,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbeepc )
 	m_pak->set_entry(0);
 	m_telcom->set_entry(0);
 	m_size = 0x8000;
+	m_has_oldkb = 1;
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbeepc85 )
@@ -595,6 +591,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbeepc85 )
 	m_pak->set_entry(5);
 	m_telcom->set_entry(0);
 	m_size = 0x8000;
+	m_has_oldkb = 1;
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbeeppc )
@@ -616,6 +613,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbeeppc )
 	m_telcom->set_entry(0);
 	m_basic->set_entry(0);
 	m_size = 0x8000;
+	m_has_oldkb = 1;
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbee56 )
@@ -623,6 +621,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbee56 )
 	UINT8 *RAM = memregion("maincpu")->base();
 	m_boot->configure_entries(0, 2, &RAM[0x0000], 0xe000);
 	m_size = 0xe000;
+	m_has_oldkb = 1;
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbee128 )
@@ -641,7 +640,11 @@ DRIVER_INIT_MEMBER( mbee_state, mbee128 )
 		membank(banktag)->configure_entries(0, 32, &RAM[0x0000], 0x1000); // RAM banks
 		membank(banktag)->configure_entries(64, 1, &ROM[0x4000], 0x1000); // dummy rom
 	}
+
+	timer_set(attotime::from_hz(1), TIMER_MBEE_RTC_IRQ);   /* timer for rtc */
+
 	m_size = 0x8000;
+	m_has_oldkb = 1;
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbee256 )
@@ -665,6 +668,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbee256 )
 	timer_set(attotime::from_hz(50), TIMER_MBEE256_KBD);   /* timer for kbd */
 
 	m_size = 0x8000;
+	m_has_oldkb = 0;
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbeett )
@@ -685,6 +689,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbeett )
 	timer_set(attotime::from_hz(25), TIMER_MBEE256_KBD);   /* timer for kbd */
 
 	m_size = 0x8000;
+	m_has_oldkb = 0;
 }
 
 

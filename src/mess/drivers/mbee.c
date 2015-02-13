@@ -30,31 +30,6 @@
     - Although certain models came with particular drives as standard, users could add
       the other size if they wished. We support both sizes on any model.
 
-    Microbee Standard / Plus memory map
-
-        0000-7FFF RAM
-        8000-BFFF SYSTEM roms
-        C000-DFFF Edasm or WBee (edasm.rom or wbeee12.rom, optional)
-        E000-EFFF Telcom 1.2 (netrom.ic34; optional)
-        F000-F7FF Video RAM
-        F800-FFFF PCG RAM (graphics)
-
-    Microbee IC memory map (preliminary)
-
-        0000-7FFF RAM
-        8000-BFFF SYSTEM roms (bas522a.rom, bas522b.rom)
-        C000-DFFF Edasm or WBee (edasm.rom or wbeee12.rom, optional)
-        E000-EFFF Telcom (optional)
-        F000-F7FF Video RAM
-        F800-FFFF PCG RAM (graphics), Colour RAM (banked)
-
-    Microbee 56KB ROM memory map (preliminary)
-
-        0000-DFFF RAM
-        E000-EFFF ROM 56kb.rom CP/M bootstrap loader
-        F000-F7FF Video RAM
-        F800-FFFF PCG RAM (graphics), Colour RAM (banked)
-
     Early machines have 'standard' video (128 hires characters).
     Later machines had the option of 'premium' video which
     provides thousands of hires characters, enough to simulate
@@ -65,7 +40,7 @@
           This rom can be replaced with the Dreamdisk Chip-8 rom.
         Note that Telcom 3.21 is 8k, it uses a rombank switch
         (by reading port 0A) to swap between the two halves.
-	See Telcom notes below.
+        See Telcom notes below.
 
     EDASM - Jump to C000, usually the Editor/Assembler package.
 
@@ -74,7 +49,6 @@
     PAK n - Do a rombank switch (write to port 0A) to bank "n" and jump to C000.
 
     These early colour computers have a PROM to create the foreground palette.
-
 
     Notes about the printer:
     - When computer turned on, defaults to 1200 baud serial printer
@@ -96,24 +70,44 @@
     - Telcom 1.2 (used in mbeeic) has a bug. If you enter NET CLOCK, the status line is
       filled with inverse K. You can fix this from Basic by doing NET CLOCK 3 times.
 
+    Notes about Disk System
+    - Ports 44 to 47 are for standard connection to FD2793.
+    - Port 48 is used for drive/side/density select on write, and intrq/drq on read.
+      intrq and drq are OR'd together, then gated to bit 7 of the data bus whenever
+      port 48 is activated on read. There are no interrupts used.
+
+    Tests of old keyboard. Start mbeeic.
+    1. Load ASTEROIDS PLUS, stay in attract mode, hold down spacebar,
+       it should only fire bullets. If it sometimes starts turning,
+       thrusting or using the shield, then there is a problem.
+
+    2. Load SCAVENGER and make sure it doesn't go to the next level
+       until you find the Exit.
+
+    3. At the Basic prompt, type in EDASM press enter. At the memory size
+       prompt press enter. Now, make sure the keyboard works properly.
+
 ***************************************************************************
 
     TODO/not working:
 
     - Printer needs to be understood and fixed.
-    - Keyboard loses characters if you type at a normal rate.
-    - Fix Paste (it loses most of the characters)
+
+    - 256tc: Paste ignores shift key
+    - All others: Paste drops most characters, shift operates randomly.
 
     - various fdc issues:
         - B drive doesn't work.
         - some disks cause MESS to freeze.
         - ENMF pin missing from wd_fdc.
         - incorrect timing for track register causes 256tc failure to boot a disk.
-        - 56k model takes about 2 minutes to boot a disk if loaded via command line.
-    
+        - 56k model takes 120 seconds to boot a disk if loaded via command line.
+
+    - mbeeppc, mbee128p: In Basic, keyboard loses characters. Works fine in Wordbee.
+
     - 256tc: At the menu, if F2 pressed to activate the Monitor, the emulated machine
       crashes due to a bug in z80pio emulation.
-    
+
     - 256tc: Keyboard ROM U60 needs to be dumped.
     - 128k: GOLD PAL needs to be dumped for the bankswitching.
     - 64k: RED PAL needs to be dumped for the bankswitching.
@@ -125,24 +119,12 @@
 
     - Mouse: a few programs support the use of a serial mouse which interfaced
              directly to the Z80PIO. However there's little info to be found.
+             PIO B3 to ground activates the mouse pointer in Shell v3.01.
 
-***************************************************************************
-
-    Description of Disk System
-
-    - Ports 44 to 47 are for standard connection to FD2793.
-    - Port 48 is used for drive/side/density select on write,
-              and intrq/drq on read.
-      intrq and drq are OR'd together, then gated to bit 7 of the
-      data bus whenever port 48 is activated on read. There are
-      no interrupts used.
-
-****************************************************************************/
-
+*******************************************************************************/
 
 #include "includes/mbee.h"
 #include "formats/mbee_cas.h"
-
 
 #define XTAL_13_5MHz 13500000
 
@@ -156,7 +138,7 @@ static ADDRESS_MAP_START(mbee_mem, AS_PROGRAM, 8, mbee_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
 	AM_RANGE(0x1000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_WRITENOP    /* Needed because quickload to here will crash MESS otherwise */
+	AM_RANGE(0x4000, 0x7fff) AM_WRITENOP    // Needed because quickload to here will crash MESS
 	AM_RANGE(0x8000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(mbee_low_r, mbee_low_w)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(mbee_high_r, mbee_high_w)
@@ -312,6 +294,9 @@ static ADDRESS_MAP_START(mbee128_io, AS_IO, 8, mbee_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
+	AM_RANGE(0x04, 0x04) AM_WRITE(mbee_04_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(mbee_06_w)
+	AM_RANGE(0x07, 0x07) AM_READ(mbee_07_r)
 	AM_RANGE(0x08, 0x08) AM_READWRITE(mbeeic_08_r, mbeeic_08_w)
 	AM_RANGE(0x0b, 0x0b) AM_READWRITE(mbee_0b_r, mbee_0b_w)
 	AM_RANGE(0x0c, 0x0c) AM_READWRITE(m6545_status_r, m6545_index_w)
@@ -363,7 +348,7 @@ static ADDRESS_MAP_START(mbeett_io, AS_IO, 8, mbee_state)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mbee )
-	PORT_START("X0") /* IN0 KEY ROW 0 [000] */
+	PORT_START("X.0") /* IN0 KEY ROW 0 [000] */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("@") PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR('@') PORT_CHAR('`')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("A") PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A') PORT_CHAR(0x01)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B') PORT_CHAR(0x02)
@@ -373,7 +358,7 @@ static INPUT_PORTS_START( mbee )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F') PORT_CHAR(0x06)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("G") PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G') PORT_CHAR(0x07)
 
-	PORT_START("X1") /* IN1 KEY ROW 1 [080] */
+	PORT_START("X.1") /* IN1 KEY ROW 1 [080] */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("H") PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H') PORT_CHAR(0x08)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("I") PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I') PORT_CHAR(0x09)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("J") PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J') PORT_CHAR(0x0a)
@@ -383,7 +368,7 @@ static INPUT_PORTS_START( mbee )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("N") PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N') PORT_CHAR(0x0e)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("O") PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O') PORT_CHAR(0x0f)
 
-	PORT_START("X2") /* IN2 KEY ROW 2 [100] */
+	PORT_START("X.2") /* IN2 KEY ROW 2 [100] */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("P") PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P') PORT_CHAR(0x10)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Q") PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q') PORT_CHAR(0x11)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R') PORT_CHAR(0x12)
@@ -393,7 +378,7 @@ static INPUT_PORTS_START( mbee )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("V") PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V') PORT_CHAR(0x16)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("W") PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W') PORT_CHAR(0x17)
 
-	PORT_START("X3") /* IN3 KEY ROW 3 [180] */
+	PORT_START("X.3") /* IN3 KEY ROW 3 [180] */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("X") PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR(0x18)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('u') PORT_CHAR('Y') PORT_CHAR(0x19)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z') PORT_CHAR(0x1a)
@@ -403,7 +388,7 @@ static INPUT_PORTS_START( mbee )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("^") PORT_CODE(KEYCODE_TILDE) PORT_CHAR('^') PORT_CHAR('~') PORT_CHAR(0x1e)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Delete") PORT_CODE(KEYCODE_DEL) PORT_CHAR(8) PORT_CHAR(0x5f) PORT_CHAR(0x1f)  // port_char not working - hijacked
 
-	PORT_START("X4") /* IN4 KEY ROW 4 [200] */
+	PORT_START("X.4") /* IN4 KEY ROW 4 [200] */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("1 !") PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("2 \"") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('\"')
@@ -413,7 +398,7 @@ static INPUT_PORTS_START( mbee )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("6 &") PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("7 '") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
 
-	PORT_START("X5") /* IN5 KEY ROW 5 [280] */
+	PORT_START("X.5") /* IN5 KEY ROW 5 [280] */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("8 (") PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("9 )") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("; +") PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
@@ -423,7 +408,7 @@ static INPUT_PORTS_START( mbee )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(". >") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("/ ?") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
 
-	PORT_START("X6") /* IN6 KEY ROW 6 [300] */
+	PORT_START("X.6") /* IN6 KEY ROW 6 [300] */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Escape") PORT_CODE(KEYCODE_ESC) PORT_CHAR(27)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB) PORT_CHAR(9)
@@ -433,7 +418,7 @@ static INPUT_PORTS_START( mbee )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CODE(KEYCODE_END) PORT_CHAR(3)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 
-	PORT_START("X7") /* IN7 KEY ROW 7 [380] */
+	PORT_START("X.7") /* IN7 KEY ROW 7 [380] */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("(Up)") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("(Down)") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
@@ -465,7 +450,7 @@ static INPUT_PORTS_START( mbee )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mbee256 )
-	PORT_START("X0") /* IN0 KEY ROW 0 [+00] */
+	PORT_START("Y.0") /* IN0 KEY ROW 0 [+00] */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Escape") PORT_CODE(KEYCODE_ESC) PORT_CHAR(27)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB) PORT_CHAR(9)
@@ -474,7 +459,7 @@ static INPUT_PORTS_START( mbee256 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("DEL (num)") PORT_CODE(KEYCODE_DEL_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 
-	PORT_START("X1") /* IN1 KEY ROW 1 [+08] */
+	PORT_START("Y.1") /* IN1 KEY ROW 1 [+08] */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F2") PORT_CODE(KEYCODE_F2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("1 !") PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Q") PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q') PORT_CHAR(0x11)
@@ -483,7 +468,7 @@ static INPUT_PORTS_START( mbee256 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Linefeed") PORT_CODE(KEYCODE_HOME) PORT_CHAR(10)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Insert") PORT_CODE(KEYCODE_INSERT)
 
-	PORT_START("X2") /* IN2 KEY ROW 2 [+10] */
+	PORT_START("Y.2") /* IN2 KEY ROW 2 [+10] */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F3") PORT_CODE(KEYCODE_F3)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("2 @") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("W") PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W') PORT_CHAR(0x17)
@@ -493,7 +478,7 @@ static INPUT_PORTS_START( mbee256 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("3 (num)") PORT_CODE(KEYCODE_3_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z') PORT_CHAR(0x1a)
 
-	PORT_START("X3") /* IN3 KEY ROW 3 [+18] */
+	PORT_START("Y.3") /* IN3 KEY ROW 3 [+18] */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F4") PORT_CODE(KEYCODE_F4)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("3 #") PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("E") PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E') PORT_CHAR(0x05)
@@ -503,7 +488,7 @@ static INPUT_PORTS_START( mbee256 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("6 (num)") PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("X") PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR(0x18)
 
-	PORT_START("X4") /* IN4 KEY ROW 4 [+20] */
+	PORT_START("Y.4") /* IN4 KEY ROW 4 [+20] */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F5") PORT_CODE(KEYCODE_F5)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("4 $") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R') PORT_CHAR(0x12)
@@ -513,7 +498,7 @@ static INPUT_PORTS_START( mbee256 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("9 (num)") PORT_CODE(KEYCODE_9_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C') PORT_CHAR(0x03)
 
-	PORT_START("X5") /* IN5 KEY ROW 5 [+28] */
+	PORT_START("Y.5") /* IN5 KEY ROW 5 [+28] */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F6") PORT_CODE(KEYCODE_F6)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("5 %") PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("T") PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T') PORT_CHAR(0x14)
@@ -523,7 +508,7 @@ static INPUT_PORTS_START( mbee256 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("4 (num)") PORT_CODE(KEYCODE_4_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("V") PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V') PORT_CHAR(0x16)
 
-	PORT_START("X6") /* IN6 KEY ROW 6 [+30] */
+	PORT_START("Y.6") /* IN6 KEY ROW 6 [+30] */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F7") PORT_CODE(KEYCODE_F7)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("6 &") PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y') PORT_CHAR(0x19)
@@ -533,7 +518,7 @@ static INPUT_PORTS_START( mbee256 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("(Right)") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B') PORT_CHAR(0x02)
 
-	PORT_START("X7") /* IN7 KEY ROW 7 [+38] */
+	PORT_START("Y.7") /* IN7 KEY ROW 7 [+38] */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F8") PORT_CODE(KEYCODE_F8)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("7 &") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("U") PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U') PORT_CHAR(0x15)
@@ -541,7 +526,7 @@ static INPUT_PORTS_START( mbee256 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("(Left)") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("N") PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N') PORT_CHAR(0x0e)
 
-	PORT_START("X8") /* IN0 KEY ROW 0 [+40] */
+	PORT_START("Y.8") /* IN0 KEY ROW 0 [+40] */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F9") PORT_CODE(KEYCODE_F9)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("8 *") PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('*')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("I") PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I') PORT_CHAR(0x09)
@@ -549,7 +534,7 @@ static INPUT_PORTS_START( mbee256 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("(Up)") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("M") PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M') PORT_CHAR(0x0d)
 
-	PORT_START("X9") /* IN1 KEY ROW 1 [+48] */
+	PORT_START("Y.9") /* IN1 KEY ROW 1 [+48] */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F10") PORT_CODE(KEYCODE_F10)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("9 (") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("O") PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O') PORT_CHAR(0x0f)
@@ -558,7 +543,7 @@ static INPUT_PORTS_START( mbee256 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(13)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(", <") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
 
-	PORT_START("X10") /* IN2 KEY ROW 2 [+50] */
+	PORT_START("Y.10") /* IN2 KEY ROW 2 [+50] */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F11") PORT_CODE(KEYCODE_F11)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("0 )") PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("P") PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P') PORT_CHAR(0x10)
@@ -568,7 +553,7 @@ static INPUT_PORTS_START( mbee256 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\\ |") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|') PORT_CHAR(0x1c)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(". >") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
 
-	PORT_START("X11") /* IN3 KEY ROW 3 [+58] */
+	PORT_START("Y.11") /* IN3 KEY ROW 3 [+58] */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F12") PORT_CODE(KEYCODE_F12)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("[ {") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{') PORT_CHAR(0x1b)
@@ -577,13 +562,13 @@ static INPUT_PORTS_START( mbee256 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("] }") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}') PORT_CHAR(0x1d)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("/ ?") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
 
-	PORT_START("X12") /* IN4 KEY ROW 4 [+60] */
+	PORT_START("Y.12") /* IN4 KEY ROW 4 [+60] */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 
-	PORT_START("X13") /* IN5 KEY ROW 5 [+68] */
+	PORT_START("Y.13") /* IN5 KEY ROW 5 [+68] */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 
-	PORT_START("X14") /* IN6 KEY ROW 6 [+70] */
+	PORT_START("Y.14") /* IN6 KEY ROW 6 [+70] */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Alt") PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT)
 
 	// Autorun on quickload
@@ -619,15 +604,15 @@ static const gfx_layout mbee_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( mbee )
+static GFXDECODE_START( mono )
 	GFXDECODE_ENTRY( "gfx", 0x0000, mbee_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( mbeeic )
+static GFXDECODE_START( standard )
 	GFXDECODE_ENTRY( "gfx", 0x0000, mbee_charlayout, 0, 48 )
 GFXDECODE_END
 
-static GFXDECODE_START( mbeeppc )
+static GFXDECODE_START( premium )
 	GFXDECODE_ENTRY( "gfx", 0x0000, mbee_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -662,10 +647,10 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 19*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mbee_state, screen_update_mbee)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mbee)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mono)
 	MCFG_PALETTE_ADD_MONOCHROME_AMBER("palette") // usually sold with amber or green monitor
 
-	MCFG_VIDEO_START_OVERRIDE(mbee_state, mbee)
+	MCFG_VIDEO_START_OVERRIDE(mbee_state, mono)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -678,8 +663,8 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_12MHz / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, mbee_update_row)
-	MCFG_MC6845_ADDR_CHANGED_CB(mbee_state, mbee_update_addr)
+	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, mono_update_row)
+	MCFG_MC6845_ADDR_CHANGED_CB(mbee_state, crtc_update_addr)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(mbee_state, crtc_vs))
 
 	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com,bee", 2)
@@ -718,12 +703,12 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 19*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mbee_state, screen_update_mbee)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mbeeic)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", standard)
 
 	MCFG_PALETTE_ADD("palette", 96)
-	MCFG_PALETTE_INIT_OWNER(mbee_state, mbeeic)
+	MCFG_PALETTE_INIT_OWNER(mbee_state, standard)
 
-	MCFG_VIDEO_START_OVERRIDE(mbee_state, mbeeic)
+	MCFG_VIDEO_START_OVERRIDE(mbee_state, standard)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -736,8 +721,8 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_13_5MHz / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, mbeeic_update_row)
-	MCFG_MC6845_ADDR_CHANGED_CB(mbee_state, mbee_update_addr)
+	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, colour_update_row)
+	MCFG_MC6845_ADDR_CHANGED_CB(mbee_state, crtc_update_addr)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(mbee_state, crtc_vs))
 
 	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com,bee", 2)
@@ -773,19 +758,11 @@ static MACHINE_CONFIG_DERIVED( mbeeppc, mbeeic )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbeeppc_mem)
 	MCFG_CPU_IO_MAP(mbeeppc_io)
-	MCFG_VIDEO_START_OVERRIDE(mbee_state, mbeeppc)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", mbeeppc)
+	MCFG_VIDEO_START_OVERRIDE(mbee_state, premium)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", premium)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(16)
-	MCFG_PALETTE_INIT_OWNER(mbee_state, mbeeppc)
-
-	MCFG_DEVICE_REMOVE("crtc")
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_13_5MHz / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, mbeeppc_update_row)
-	MCFG_MC6845_ADDR_CHANGED_CB(mbee_state, mbee_update_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(mbee_state, crtc_vs))
+	MCFG_PALETTE_INIT_OWNER(mbee_state, premium)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbee56, mbeeic )
@@ -805,6 +782,7 @@ static MACHINE_CONFIG_DERIVED( mbee128, mbee56 )
 	MCFG_CPU_PROGRAM_MAP(mbee256_mem)
 	MCFG_CPU_IO_MAP(mbee128_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee128)
+	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbee128p, mbeeppc )
@@ -812,6 +790,7 @@ static MACHINE_CONFIG_DERIVED( mbee128p, mbeeppc )
 	MCFG_CPU_PROGRAM_MAP(mbee256_mem)
 	MCFG_CPU_IO_MAP(mbee128_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee128)
+	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
 	MCFG_WD2793x_ADD("fdc", XTAL_4MHz / 4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(mbee_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(mbee_state, fdc_drq_w))
@@ -824,14 +803,7 @@ static MACHINE_CONFIG_DERIVED( mbee256, mbee128p )
 	MCFG_CPU_PROGRAM_MAP(mbee256_mem)
 	MCFG_CPU_IO_MAP(mbee256_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee256)
-	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
 
-	MCFG_DEVICE_REMOVE("crtc")
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_13_5MHz / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, mbeeppc_update_row)
-	MCFG_MC6845_ADDR_CHANGED_CB(mbee_state, mbee256_update_addr)
 	MCFG_DEVICE_REMOVE("fdc:0")
 	MCFG_DEVICE_REMOVE("fdc:1")
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbee_floppies, "drive3a", floppy_image_device::default_floppy_formats)
@@ -842,15 +814,8 @@ static MACHINE_CONFIG_DERIVED( mbeett, mbeeppc )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbeett_mem)
 	MCFG_CPU_IO_MAP(mbeett_io)
-	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbeett )
+	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbeett)
 	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
-
-	MCFG_DEVICE_REMOVE("crtc")
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_13_5MHz / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, mbeeppc_update_row)
-	MCFG_MC6845_ADDR_CHANGED_CB(mbee_state, mbee256_update_addr)
 MACHINE_CONFIG_END
 
 /* Unused roms:
