@@ -5,7 +5,11 @@
   Parker Brothers Wildfire, by Bob and Holly Doyle (prototype), and Garry Kitchen
   * AMI S2150, labeled C10641
 
-  x
+  This is an electronic handheld pinball game. It has dozens of small leds
+  to create the illusion of a moving ball, and even the flippers are leds.
+  A drawing of a pinball table is added as overlay.
+
+  NOTE!: MESS external artwork is required to be able to play
 
 
   TODO:
