@@ -52,23 +52,10 @@ public:
 		, m_pak(*this, "pak")
 		, m_telcom(*this, "telcom")
 		, m_basic(*this, "basic")
-		, m_io_x0(*this, "X0")
-		, m_io_x1(*this, "X1")
-		, m_io_x2(*this, "X2")
-		, m_io_x3(*this, "X3")
-		, m_io_x4(*this, "X4")
-		, m_io_x5(*this, "X5")
-		, m_io_x6(*this, "X6")
-		, m_io_x7(*this, "X7")
 		, m_io_extra(*this, "EXTRA")
 		, m_io_config(*this, "CONFIG")
-		, m_io_x8(*this, "X8")
-		, m_io_x9(*this, "X9")
-		, m_io_x10(*this, "X10")
-		, m_io_x11(*this, "X11")
-		, m_io_x12(*this, "X12")
-		, m_io_x13(*this, "X13")
-		, m_io_x14(*this, "X14")
+		, m_io_oldkb(*this, "X")
+		, m_io_newkb(*this, "Y")
 		, m_screen(*this, "screen")
 	{ }
 
@@ -123,12 +110,12 @@ public:
 	DECLARE_DRIVER_INIT(mbeeic);
 	DECLARE_DRIVER_INIT(mbee128);
 	DECLARE_MACHINE_RESET(mbee);
-	DECLARE_VIDEO_START(mbee);
-	DECLARE_VIDEO_START(mbeeic);
-	DECLARE_PALETTE_INIT(mbeeic);
+	DECLARE_VIDEO_START(mono);
+	DECLARE_VIDEO_START(standard);
+	DECLARE_VIDEO_START(premium);
+	DECLARE_PALETTE_INIT(standard);
 	DECLARE_PALETTE_INIT(mbeepc85b);
-	DECLARE_VIDEO_START(mbeeppc);
-	DECLARE_PALETTE_INIT(mbeeppc);
+	DECLARE_PALETTE_INIT(premium);
 	DECLARE_MACHINE_RESET(mbee56);
 	DECLARE_MACHINE_RESET(mbee128);
 	DECLARE_MACHINE_RESET(mbee256);
@@ -152,19 +139,18 @@ public:
 	void mbee_video_kbd_scan(int param);
 	UINT8 m_sy6545_cursor[16];
 
-	MC6845_UPDATE_ROW(mbee_update_row);
-	MC6845_UPDATE_ROW(mbeeic_update_row);
-	MC6845_UPDATE_ROW(mbeeppc_update_row);
-	MC6845_ON_UPDATE_ADDR_CHANGED(mbee_update_addr);
-	MC6845_ON_UPDATE_ADDR_CHANGED(mbee256_update_addr);
+	MC6845_UPDATE_ROW(mono_update_row);
+	MC6845_UPDATE_ROW(colour_update_row);
+	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
 	required_device<palette_device> m_palette;
 private:
 	bool m_is_premium;
+	bool m_has_oldkb;
 	size_t m_size;
 	bool m_b7_rtc;
 	bool m_b7_vs;
-	UINT8 m_mbee256_key_available;
+	bool m_b2;
 	UINT8 m_mbee256_was_pressed[15];
 	UINT8 m_mbee256_q[20];
 	UINT8 m_mbee256_q_pos;
@@ -196,23 +182,10 @@ private:
 	optional_memory_bank m_pak;
 	optional_memory_bank m_telcom;
 	optional_memory_bank m_basic;
-	required_ioport m_io_x0;
-	required_ioport m_io_x1;
-	required_ioport m_io_x2;
-	required_ioport m_io_x3;
-	required_ioport m_io_x4;
-	required_ioport m_io_x5;
-	required_ioport m_io_x6;
-	required_ioport m_io_x7;
 	optional_ioport m_io_extra;
-	optional_ioport m_io_config;
-	optional_ioport m_io_x8;
-	optional_ioport m_io_x9;
-	optional_ioport m_io_x10;
-	optional_ioport m_io_x11;
-	optional_ioport m_io_x12;
-	optional_ioport m_io_x13;
-	optional_ioport m_io_x14;
+	required_ioport m_io_config;
+	optional_ioport_array<8> m_io_oldkb;
+	optional_ioport_array<15> m_io_newkb;
 	required_device<screen_device> m_screen;
 };
 

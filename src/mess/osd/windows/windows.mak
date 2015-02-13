@@ -36,6 +36,6 @@ $(MESS_WINOBJ)/%.res: $(MESS_WINSRC)/%.rc
 
 $(RESFILE): $(MESS_WINSRC)/mess.rc $(MESS_WINOBJ)/messvers.rc
 
-$(MESS_WINOBJ)/messvers.rc: $(BUILDOUT)/verinfo$(BUILD_EXE) $(SRC)/version.c
+$(MESS_WINOBJ)/messvers.rc: $(SRC)/build/verinfo.py $(SRC)/version.c
 	@echo Emitting $@...
-	@"$(BUILDOUT)/verinfo$(BUILD_EXE)" -b mess $(SRC)/version.c > $@
+	$(PYTHON) $(SRC)/build/verinfo.py -b mess $(SRC)/version.c > $@

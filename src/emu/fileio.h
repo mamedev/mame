@@ -97,10 +97,13 @@ public:
 	const char *fullpath() const { return m_fullpath; }
 	UINT32 openflags() const { return m_openflags; }
 	hash_collection &hashes(const char *types);
+	bool restrict_to_mediapath() { return m_restrict_to_mediapath; }
+	bool part_of_mediapath(astring path);
 
 	// setters
 	void remove_on_close() { m_remove_on_close = true; }
 	void set_openflags(UINT32 openflags) { assert(m_file == NULL); m_openflags = openflags; }
+	void set_restrict_to_mediapath(bool rtmp = true) { m_restrict_to_mediapath = rtmp; }
 
 	// open/close
 	file_error open(const char *name);
@@ -151,7 +154,8 @@ private:
 	astring         m_fullpath;                     // full filename
 	core_file *     m_file;                         // core file pointer
 	path_iterator   m_iterator;                     // iterator for paths
-	UINT32          m_crc;                          // iterator for paths
+	path_iterator   m_mediapaths;			// media-path iterator
+	UINT32          m_crc;                          // file's CRC
 	UINT32          m_openflags;                    // flags we used for the open
 	hash_collection m_hashes;                       // collection of hashes
 
@@ -164,6 +168,7 @@ private:
 	UINT64          m__7zlength;                    // 7Z file length
 
 	bool            m_remove_on_close;              // flag: remove the file when closing
+	bool		m_restrict_to_mediapath;	// flag: restrict to paths inside the media-path
 };
 
 

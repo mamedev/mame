@@ -1012,9 +1012,9 @@ ifdef CPPCHECK
 	@$(CPPCHECK) $(CPPCHECKFLAGS) $<
 endif
 
-$(DRIVLISTSRC): $(SRC)/$(TARGET)/$(SUBTARGET).lst $(MAKELIST_TARGET)
+$(DRIVLISTSRC): $(SRC)/$(TARGET)/$(SUBTARGET).lst $(SRC)/build/makelist.py
 	@echo Building driver list $<...
-	@$(MAKELIST) $< >$@
+	$(PYTHON) $(SRC)/build/makelist.py $< >$@
 
 ifeq ($(TARGETOS),emscripten)
 # Avoid using .a files with Emscripten, link to bitcode instead

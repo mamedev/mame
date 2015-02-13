@@ -77,7 +77,7 @@ protected:
 	UINT8 m_callstack_bits;     // number of program counter bits held in callstack
 	UINT16 m_callstack_mask;
 	UINT8 m_callstack_depth;    // callstack levels: 3 on 2000/2150, 5 on 2200/2400
-	UINT16 m_callstack[5+1];    // max 5
+	UINT16 m_callstack[5];      // max 5
 	int m_icount;
 	UINT16 m_pc;                // 13-bit program counter
 	UINT8 m_ppr;                // prepared page register (PP 1)

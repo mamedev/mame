@@ -9,12 +9,12 @@
   
   The initial release of this game was in 1979, known as Pro-Tennis,
   it is unknown if the hardware and/or ROM contents differ.
-  
 
-  TODO:
-  - 2-player mode doesn't work: the guys auto-serve and the left player
-    always hits the net, mcu emulation bug?
-  - difficulty switch changes mcu freq
+  This is an early VFD simple electronic tennis game. Player 1 is on the right
+  side, player 2 or CPU on the left. Each player has six possible positions
+  where to hit the ball. A backdrop behind the VFD shows a tennis court.
+  
+  NOTE!: MESS external artwork is required to be able to play
 
 ***************************************************************************/
 
@@ -23,11 +23,6 @@
 #include "sound/speaker.h"
 
 #include "tmtennis.lh" // this is a test layout, external artwork is necessary
-
-// master clock is from an LC circuit oscillating by default at 360kHz,
-// the difficulty switch puts a capacitor across it to slow it down to 260kHz
-#define MASTER_CLOCK_PRO1 (260000)
-#define MASTER_CLOCK_PRO2 (360000)
 
 
 class tmtennis_state : public driver_device
@@ -53,11 +48,25 @@ public:
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE8_MEMBER(grid_w);
 
+	DECLARE_INPUT_CHANGED_MEMBER(difficulty_switch);
+	void update_clock();
+
 	UINT16 m_vfd_state[0x10];
 	void update_vfd();
 
+	virtual void machine_reset();
 	virtual void machine_start();
 };
+
+// master clock is from an LC circuit oscillating by default at 360kHz, but...
+#define MASTER_CLOCK (360000)
+
+void tmtennis_state::update_clock()
+{
+	// ...on PRO1, the difficulty switch puts a capacitor across the LC circuit
+	// to slow it down to approx. 260kHz (28%)
+	m_maincpu->set_clock_scale(m_button_matrix[1]->read() & 0x100 ? 0.72 : 1);
+}
 
 
 
@@ -95,7 +104,7 @@ READ8_MEMBER(tmtennis_state::input_r)
 
 	// read selected button rows
 	for (int i = 0; i < 2; i++)
-		if (~m_input_mux >> i & 1)
+		if (m_input_mux >> i & 1)
 			inp &= m_button_matrix[i]->read();
 
 	return inp >> (offset*4);
@@ -137,6 +146,11 @@ WRITE8_MEMBER(tmtennis_state::grid_w)
 
 ***************************************************************************/
 
+INPUT_CHANGED_MEMBER(tmtennis_state::difficulty_switch)
+{
+	update_clock();
+}
+
 /* Pro-Tennis physical button layout and labels is like this:
 
     [SERVE] [1] [2] [3]       [3] [2] [1] [SERVE]
@@ -146,30 +160,30 @@ WRITE8_MEMBER(tmtennis_state::grid_w)
 */
 
 static INPUT_PORTS_START( tmtennis )
-	PORT_START("IN.0") // E0 port A/B (left side)
-	PORT_CONFNAME( 0x101, 0x001, DEF_STR( Difficulty ) )
-	PORT_CONFSETTING(     0x000, "Practice" )
-	PORT_CONFSETTING(     0x001, "Pro 1" )
-	PORT_CONFSETTING(     0x101, "Pro 2" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 ) // P2 serve
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
-
-	PORT_START("IN.1") // E1 port A/B (right side)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // P1 serve
-	PORT_CONFNAME( 0x02, 0x02, "Players" )
-	PORT_CONFSETTING(    0x02, "1" )
-	PORT_CONFSETTING(    0x00, "2" )
+	PORT_START("IN.0") // E0 port A/B
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("P1 Serve")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("P2 Serve")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON6 )
+
+	PORT_START("IN.1") // E1 port A/B
+	PORT_CONFNAME( 0x101, 0x101, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, tmtennis_state, difficulty_switch, NULL)
+	PORT_CONFSETTING(     0x000, "Practice" )
+	PORT_CONFSETTING(     0x101, "Pro 1" ) // -> difficulty_switch
+	PORT_CONFSETTING(     0x001, "Pro 2" )
+	PORT_CONFNAME( 0x02, 0x02, "Players" )
+	PORT_CONFSETTING(    0x02, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
@@ -179,6 +193,11 @@ INPUT_PORTS_END
   Machine Config
 
 ***************************************************************************/
+
+void tmtennis_state::machine_reset()
+{
+	update_clock();
+}
 
 void tmtennis_state::machine_start()
 {
@@ -199,7 +218,7 @@ void tmtennis_state::machine_start()
 static MACHINE_CONFIG_START( tmtennis, tmtennis_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D552, MASTER_CLOCK_PRO2)
+	MCFG_CPU_ADD("maincpu", NEC_D552, MASTER_CLOCK)
 	MCFG_UCOM4_READ_A_CB(READ8(tmtennis_state, input_r))
 	MCFG_UCOM4_READ_B_CB(READ8(tmtennis_state, input_r))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(tmtennis_state, plate_w))
@@ -234,4 +253,4 @@ ROM_START( tmtennis )
 ROM_END
 
 
-CONS( 1980, tmtennis, 0, 0, tmtennis, tmtennis, driver_device, 0, "Tomy", "Tennis (Tomytronic)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+CONS( 1980, tmtennis, 0, 0, tmtennis, tmtennis, driver_device, 0, "Tomy", "Tennis (Tomytronic)", GAME_SUPPORTS_SAVE )

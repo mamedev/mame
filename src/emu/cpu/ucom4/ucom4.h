@@ -133,7 +133,7 @@ protected:
 	int m_datamask;
 	int m_family;           // MCU family (43/44/45)
 	int m_stack_levels;     // number of callstack levels
-	UINT16 m_stack[3+1];    // max 3
+	UINT16 m_stack[3];      // max 3
 	UINT8 m_port_out[0x10]; // last value written to output port
 	UINT8 m_op;
 	UINT8 m_prev_op;        // previous opcode
@@ -141,6 +141,7 @@ protected:
 	UINT8 m_bitmask;        // opcode bit argument
 	bool m_skip;            // skip next opcode
 	int m_icount;
+	emu_timer *m_timer;
 	
 	UINT16 m_pc;            // program counter
 	UINT8 m_acc;            // 4-bit accumulator
@@ -179,6 +180,7 @@ protected:
 	void output_w(int index, UINT8 data);
 
 	bool check_op_43();
+	TIMER_CALLBACK_MEMBER( simple_timer_cb );
 	UINT8 ucom43_reg_r(int index);
 	void ucom43_reg_w(int index, UINT8 data);
 

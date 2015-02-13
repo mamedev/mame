@@ -143,19 +143,19 @@ WRITE8_MEMBER(chaknpop_state::coinlock_w)
 static ADDRESS_MAP_START( chaknpop_map, AS_PROGRAM, 8, chaknpop_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("mcu_ram")
-	AM_RANGE(0x8800, 0x8800) AM_READWRITE(chaknpop_mcu_port_a_r, chaknpop_mcu_port_a_w)
-	AM_RANGE(0x8801, 0x8801) AM_READWRITE(chaknpop_mcu_port_b_r, chaknpop_mcu_port_b_w)
-	AM_RANGE(0x8802, 0x8802) AM_READWRITE(chaknpop_mcu_port_c_r, chaknpop_mcu_port_c_w)
+	AM_RANGE(0x8800, 0x8800) AM_READWRITE(mcu_port_a_r, mcu_port_a_w)
+	AM_RANGE(0x8801, 0x8801) AM_READWRITE(mcu_port_b_r, mcu_port_b_w)
+	AM_RANGE(0x8802, 0x8802) AM_READWRITE(mcu_port_c_r, mcu_port_c_w)
 	AM_RANGE(0x8804, 0x8805) AM_DEVREADWRITE("ay1", ay8910_device, data_r, address_data_w)
 	AM_RANGE(0x8806, 0x8807) AM_DEVREADWRITE("ay2", ay8910_device, data_r, address_data_w)
 	AM_RANGE(0x8808, 0x8808) AM_READ_PORT("DSWC")
 	AM_RANGE(0x8809, 0x8809) AM_READ_PORT("P1")
 	AM_RANGE(0x880a, 0x880a) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x880b, 0x880b) AM_READ_PORT("P2")
-	AM_RANGE(0x880c, 0x880c) AM_READWRITE(chaknpop_gfxmode_r, chaknpop_gfxmode_w)
+	AM_RANGE(0x880c, 0x880c) AM_READWRITE(gfxmode_r, gfxmode_w)
 	AM_RANGE(0x880d, 0x880d) AM_WRITE(coinlock_w)                                               // coin lock out
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(chaknpop_txram_w) AM_SHARE("tx_ram")          // TX tilemap
-	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(chaknpop_attrram_w) AM_SHARE("attr_ram")      // Color attribute
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(txram_w) AM_SHARE("tx_ram")          // TX tilemap
+	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(attrram_w) AM_SHARE("attr_ram")      // Color attribute
 	AM_RANGE(0x9840, 0x98ff) AM_RAM AM_SHARE("spr_ram") // sprite
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank1")                                                        // bitmap plane 1-4
@@ -362,7 +362,7 @@ static MACHINE_CONFIG_START( chaknpop, chaknpop_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(chaknpop_state, screen_update_chaknpop)
+	MCFG_SCREEN_UPDATE_DRIVER(chaknpop_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chaknpop)
@@ -416,4 +416,4 @@ ROM_END
 
 
 /*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR  COMPANY              FULLNAME ) */
-GAME( 1983, chaknpop, 0,        chaknpop, chaknpop, driver_device, 0,        ROT0,    "Taito Corporation", "Chack'n Pop", 0 )
+GAME( 1983, chaknpop, 0,        chaknpop, chaknpop, driver_device, 0,        ROT0,    "Taito Corporation", "Chack'n Pop", GAME_SUPPORTS_SAVE )

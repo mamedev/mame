@@ -17,11 +17,8 @@ inline void amis2000_device::ram_w(UINT8 data)
 void amis2000_device::pop_callstack()
 {
 	m_pc = (m_pc & ~m_callstack_mask) | (m_callstack[0] & m_callstack_mask);
-	for (int i = 0; i < m_callstack_depth; i++)
-	{
+	for (int i = 0; i < m_callstack_depth-1; i++)
 		m_callstack[i] = m_callstack[i+1];
-		m_callstack[i+1] = 0;
-	}
 }
 
 void amis2000_device::push_callstack()
