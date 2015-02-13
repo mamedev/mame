@@ -43,7 +43,7 @@ version_major = version_string[0:version_string.find('.')]
 version_minor = version_string[version_string.find('.')+1:]
 version_build = "0"
 version_subbuild = "0"
-if (build == "mame") :
+if (build == "mess") :
     # MESS
     author = "MESS Team";
     comments = "Multi Emulation Super System";
@@ -52,7 +52,7 @@ if (build == "mame") :
     internal_name = "MESS";
     original_filename = "MESS";
     product_name = "MESS";
-elif (build == "mess") :
+elif (build == "ume") :
     # UME
     author = "MAME and MESS Team"
     comments = "Universal Machine Emulator"
@@ -61,7 +61,7 @@ elif (build == "mess") :
     internal_name = "UME"
     original_filename = "UME"
     product_name = "UME"
-else :
+else : 
     # MAME
     author = "Nicola Salmoria and the MAME Team"
     comments = "Multiple Arcade Machine Emulator"
