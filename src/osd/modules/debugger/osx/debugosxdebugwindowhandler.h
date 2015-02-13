@@ -91,6 +91,7 @@ extern NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification;
 
 - (IBAction)doExpression:(id)sender;
 
+- (BOOL)control:(NSControl *)control textShouldBeginEditing:(NSText *)fieldEditor;
 - (BOOL)control:(NSControl *)control textView:(NSTextView *)textView doCommandBySelector:(SEL)command;
 
 @end

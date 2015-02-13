@@ -17,24 +17,6 @@
 #import <Cocoa/Cocoa.h>
 
 
-@protocol MAMEDebugViewSubviewSupport <NSObject>
-
-- (NSString *)selectedSubviewName;
-- (int)selectedSubviewIndex;
-- (void)selectSubviewAtIndex:(int)index;
-- (void)selectSubviewForCPU:(device_t *)device;
-
-@end
-
-
-@protocol MAMEDebugViewExpressionSupport <NSObject>
-
-- (NSString *)expression;
-- (void)setExpression:(NSString *)exp;
-
-@end
-
-
 @interface MAMEDebugView : NSView
 {
 	int				type;
@@ -64,5 +46,23 @@
 
 - (void)windowDidBecomeKey:(NSNotification *)notification;
 - (void)windowDidResignKey:(NSNotification *)notification;
+
+@end
+
+
+@protocol MAMEDebugViewSubviewSupport <NSObject>
+
+- (NSString *)selectedSubviewName;
+- (int)selectedSubviewIndex;
+- (void)selectSubviewAtIndex:(int)index;
+- (void)selectSubviewForCPU:(device_t *)device;
+
+@end
+
+
+@protocol MAMEDebugViewExpressionSupport <NSObject>
+
+- (NSString *)expression;
+- (void)setExpression:(NSString *)exp;
 
 @end

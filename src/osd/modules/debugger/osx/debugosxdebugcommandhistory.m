@@ -50,8 +50,8 @@
 
 - (void)setLength:(NSInteger)l {
 	length = l;
-	while ([history count] > length)
-		[history removeLastObject];
+	if ([history count] > length)
+		[history removeObjectsInRange:NSMakeRange(length, [history count] - length)];
 }
 
 
@@ -61,7 +61,7 @@
 		while ([history count] > length)
 			[history removeLastObject];
 	}
-	position = -1;
+	position = 0;
 }
 
 
@@ -81,7 +81,7 @@
 - (NSString *)next:(NSString *)cur {
 	if (position > 0) {
 		return [history objectAtIndex:--position];
-	} else if (position == 0) {
+	} else if ((position == 0) && (current != nil) && ![current isEqualToString:[history objectAtIndex:0]]) {
 		position--;
 		return [[current retain] autorelease];
 	} else {
@@ -89,6 +89,11 @@
 	}
 }
 
+
+- (void)edit {
+	if (position == 0)
+		position--;
+}
 
 - (void)reset {
 	position = -1;

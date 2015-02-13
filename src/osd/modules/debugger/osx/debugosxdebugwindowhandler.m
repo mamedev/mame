@@ -357,6 +357,13 @@ NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification = @"MAMEAuxiliaryD
 }
 
 
+- (BOOL)control:(NSControl *)control textShouldBeginEditing:(NSText *)fieldEditor
+{
+	[history edit];
+	return YES;
+}
+
+
 - (BOOL)control:(NSControl *)control textView:(NSTextView *)textView doCommandBySelector:(SEL)command {
 	if (control == expressionField) {
 		if (command == @selector(cancelOperation:)) {

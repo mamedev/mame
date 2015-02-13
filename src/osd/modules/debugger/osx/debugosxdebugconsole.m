@@ -218,9 +218,11 @@
 	NSString *command = [sender stringValue];
 	if ([command length] == 0) {
 		debug_cpu_get_visible_cpu(*machine)->debug()->single_step();
+		[history reset];
 	} else {
 		debug_console_execute_command(*machine, [command UTF8String], 1);
 		[history add:command];
+		[history edit];
 	}
 	[sender setStringValue:@""];
 }
@@ -261,6 +263,14 @@
 
 - (void)auxiliaryWindowWillClose:(NSNotification *)notification {
 	[auxiliaryWindows removeObjectIdenticalTo:[notification object]];
+}
+
+
+- (BOOL)control:(NSControl *)control textShouldBeginEditing:(NSText *)fieldEditor {
+	if (control == commandField)
+		[history edit];
+
+	return YES;
 }
 
 

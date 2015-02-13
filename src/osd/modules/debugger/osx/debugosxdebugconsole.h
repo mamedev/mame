@@ -12,7 +12,6 @@
 #import "debugosx.h"
 #import "debugosxdebugwindowhandler.h"
 
-#include "device.h"
 #include "emu.h"
 
 #import <Cocoa/Cocoa.h>
@@ -44,6 +43,7 @@
 - (void)showDebugger:(NSNotification *)notification;
 - (void)auxiliaryWindowWillClose:(NSNotification *)notification;
 
+- (BOOL)control:(NSControl *)control textShouldBeginEditing:(NSText *)fieldEditor;
 - (BOOL)control:(NSControl *)control textView:(NSTextView *)textView doCommandBySelector:(SEL)command;
 
 - (void)windowWillClose:(NSNotification *)notification;

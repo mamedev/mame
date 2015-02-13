@@ -42,32 +42,34 @@
 class debugger_osx : public osd_module, public debug_module
 {
 public:
-    debugger_osx()
-    : osd_module(OSD_DEBUG_PROVIDER, "osx"), debug_module(),
-      m_machine(NULL),
-      m_console(nil)
-    {
-    }
+	debugger_osx()
+	: osd_module(OSD_DEBUG_PROVIDER, "osx"), debug_module(),
+	  m_machine(NULL),
+	  m_console(nil)
+	{
+	}
 
-    virtual ~debugger_osx()
-    {
-    }
+	virtual ~debugger_osx()
+	{
+		if (m_console != nil)
+			[m_console release];
+	}
 
-    virtual int init()
-    {
-    	return 0;
-    }
+	virtual int init()
+	{
+		return 0;
+	}
 
-    virtual void exit() 
-    { 
-    }
+	virtual void exit()
+	{
+	}
 
-    virtual void init_debugger(running_machine &machine);
-    virtual void wait_for_debugger(device_t &device, bool firststop);
-    virtual void debugger_update();
+	virtual void init_debugger(running_machine &machine);
+	virtual void wait_for_debugger(device_t &device, bool firststop);
+	virtual void debugger_update();
 
 private:
-    running_machine *m_machine;
+	running_machine *m_machine;
 	MAMEDebugConsole *m_console;
 };
 

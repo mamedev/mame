@@ -31,6 +31,7 @@
 - (void)add:(NSString *)entry;
 - (NSString *)previous:(NSString *)cur;
 - (NSString *)next:(NSString *)cur;
+- (void)edit;
 - (void)reset;
 - (void)clear;
 
