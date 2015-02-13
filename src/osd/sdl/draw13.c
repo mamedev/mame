@@ -178,7 +178,7 @@ private:
 	INT32           m_blittimer;
 
 #if (SDLMAME_SDL2)
-	SDL_GLContext   m_gl_context_id;
+	//SDL_GLContext   m_gl_context_id;
 #else
 	// SDL surface
 	SDL_Surface         *m_sdlsurf;
