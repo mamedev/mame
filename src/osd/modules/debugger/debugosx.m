@@ -30,8 +30,8 @@
 #include "osdsdl.h"
 #include "debug_module.h"
 
-#import "osx/debugosxdebugconsole.h"
-#import "osx/debugosxdebugwindowhandler.h"
+#import "osx/debugconsole.h"
+#import "osx/debugwindowhandler.h"
 
 
 //============================================================

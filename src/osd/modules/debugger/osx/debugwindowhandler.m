@@ -9,10 +9,10 @@
 //
 //============================================================
 
-#import "debugosxdebugwindowhandler.h"
+#import "debugwindowhandler.h"
 
-#import "debugosxdebugcommandhistory.h"
-#import "debugosxdebugview.h"
+#import "debugcommandhistory.h"
+#import "debugview.h"
 
 #include "debug/debugcpu.h"
 

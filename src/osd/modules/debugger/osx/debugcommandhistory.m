@@ -13,7 +13,7 @@
 //  MAMEDebugView class
 //============================================================
 
-#import "debugosxdebugcommandhistory.h"
+#import "debugcommandhistory.h"
 
 
 @implementation MAMEDebugCommandHistory

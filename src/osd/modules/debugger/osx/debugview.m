@@ -9,7 +9,7 @@
 //
 //============================================================
 
-#import "debugosxdebugview.h"
+#import "debugview.h"
 
 #include "debug/debugcpu.h"
 

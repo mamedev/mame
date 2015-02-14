@@ -10,7 +10,8 @@
 //============================================================
 
 #import "debugosx.h"
-#import "debugosxdebugwindowhandler.h"
+
+#import "debugwindowhandler.h"
 
 #include "emu.h"
 

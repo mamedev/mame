@@ -9,7 +9,7 @@
 //
 //============================================================
 
-#import "debugosxregistersview.h"
+#import "registersview.h"
 
 #include "debug/debugcpu.h"
 #include "debug/debugvw.h"

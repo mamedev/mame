@@ -10,7 +10,8 @@
 //============================================================
 
 #import "debugosx.h"
-#import "debugosxdebugview.h"
+
+#import "debugview.h"
 
 #include "emu.h"
 

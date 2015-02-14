@@ -2,7 +2,7 @@
 // copyright-holders:Vas Crabb
 //============================================================
 //
-//  debugosxregistersview.h - MacOS X Cocoa debug window handling
+//  debugosxconsoleview.h - MacOS X Cocoa debug window handling
 //
 //  Copyright (c) 1996-2015, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
@@ -10,24 +10,18 @@
 //============================================================
 
 #import "debugosx.h"
-#import "debugosxdebugview.h"
+
+#import "debugview.h"
 
 #include "emu.h"
 
 #import <Cocoa/Cocoa.h>
 
 
-@interface MAMERegistersView : MAMEDebugView <MAMEDebugViewSubviewSupport>
+@interface MAMEConsoleView : MAMEDebugView
 {
 }
 
 - (id)initWithFrame:(NSRect)f machine:(running_machine &)m;
-
-- (NSSize)maximumFrameSize;
-
-- (NSString *)selectedSubviewName;
-- (int)selectedSubviewIndex;
-- (void)selectSubviewAtIndex:(int)index;
-- (void)selectSubviewForCPU:(device_t *)device;
 
 @end

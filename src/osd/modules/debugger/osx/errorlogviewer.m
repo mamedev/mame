@@ -9,9 +9,9 @@
 //
 //============================================================
 
-#import "debugosxerrorlogviewer.h"
+#import "errorlogviewer.h"
 
-#import "debugosxerrorlogview.h"
+#import "errorlogview.h"
 
 
 @implementation MAMEErrorLogViewer

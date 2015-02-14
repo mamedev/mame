@@ -9,10 +9,10 @@
 //
 //============================================================
 
-#import "debugosxpointsviewer.h"
+#import "pointsviewer.h"
 
-#import "debugosxbreakpointsview.h"
-#import "debugosxwatchpointsview.h"
+#import "breakpointsview.h"
+#import "watchpointsview.h"
 
 
 @implementation MAMEPointsViewer

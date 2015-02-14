@@ -2,7 +2,7 @@
 // copyright-holders:Vas Crabb
 //============================================================
 //
-//  debugosxerrorlogview.h - MacOS X Cocoa debug window handling
+//  debugosxerrorlogviewer.h - MacOS X Cocoa debug window handling
 //
 //  Copyright (c) 1996-2015, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
@@ -10,17 +10,21 @@
 //============================================================
 
 #import "debugosx.h"
-#import "debugosxdebugview.h"
+
+#import "debugwindowhandler.h"
 
 #include "emu.h"
 
 #import <Cocoa/Cocoa.h>
 
 
-@interface MAMEErrorLogView : MAMEDebugView
+@class MAMEDebugConsole, MAMEErrorLogView;
+
+@interface MAMEErrorLogViewer : MAMEAuxiliaryDebugWindowHandler
 {
+	MAMEErrorLogView	*logView;
 }
 
-- (id)initWithFrame:(NSRect)f machine:(running_machine &)m;
+- (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c;
 
 @end

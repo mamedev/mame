@@ -289,21 +289,21 @@ OBJDIRS += $(OSDOBJ)/modules/debugger/osx
 
 DEBUGOBJS = \
 	$(OSDOBJ)/modules/debugger/debugosx.o \
-	$(OSDOBJ)/modules/debugger/osx/debugosxbreakpointsview.o \
-	$(OSDOBJ)/modules/debugger/osx/debugosxconsoleview.o \
-	$(OSDOBJ)/modules/debugger/osx/debugosxdebugcommandhistory.o \
-	$(OSDOBJ)/modules/debugger/osx/debugosxdebugconsole.o \
-	$(OSDOBJ)/modules/debugger/osx/debugosxdebugview.o \
-	$(OSDOBJ)/modules/debugger/osx/debugosxdebugwindowhandler.o \
-	$(OSDOBJ)/modules/debugger/osx/debugosxdisassemblyview.o \
-	$(OSDOBJ)/modules/debugger/osx/debugosxdisassemblyviewer.o \
-	$(OSDOBJ)/modules/debugger/osx/debugosxerrorlogview.o \
-	$(OSDOBJ)/modules/debugger/osx/debugosxerrorlogviewer.o \
-	$(OSDOBJ)/modules/debugger/osx/debugosxmemoryview.o \
-	$(OSDOBJ)/modules/debugger/osx/debugosxmemoryviewer.o \
-	$(OSDOBJ)/modules/debugger/osx/debugosxpointsviewer.o \
-	$(OSDOBJ)/modules/debugger/osx/debugosxregistersview.o \
-	$(OSDOBJ)/modules/debugger/osx/debugosxwatchpointsview.o
+	$(OSDOBJ)/modules/debugger/osx/breakpointsview.o \
+	$(OSDOBJ)/modules/debugger/osx/consoleview.o \
+	$(OSDOBJ)/modules/debugger/osx/debugcommandhistory.o \
+	$(OSDOBJ)/modules/debugger/osx/debugconsole.o \
+	$(OSDOBJ)/modules/debugger/osx/debugview.o \
+	$(OSDOBJ)/modules/debugger/osx/debugwindowhandler.o \
+	$(OSDOBJ)/modules/debugger/osx/disassemblyview.o \
+	$(OSDOBJ)/modules/debugger/osx/disassemblyviewer.o \
+	$(OSDOBJ)/modules/debugger/osx/errorlogview.o \
+	$(OSDOBJ)/modules/debugger/osx/errorlogviewer.o \
+	$(OSDOBJ)/modules/debugger/osx/memoryview.o \
+	$(OSDOBJ)/modules/debugger/osx/memoryviewer.o \
+	$(OSDOBJ)/modules/debugger/osx/pointsviewer.o \
+	$(OSDOBJ)/modules/debugger/osx/registersview.o \
+	$(OSDOBJ)/modules/debugger/osx/watchpointsview.o
 
 endif
 

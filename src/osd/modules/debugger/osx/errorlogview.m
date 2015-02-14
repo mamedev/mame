@@ -2,22 +2,22 @@
 // copyright-holders:Vas Crabb
 //============================================================
 //
-//  debugosxconsoleview.m - MacOS X Cocoa debug window handling
+//  debugosxerrorlogview.m - MacOS X Cocoa debug window handling
 //
 //  Copyright (c) 1996-2015, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //============================================================
 
-#import "debugosxconsoleview.h"
+#import "errorlogview.h"
 
 #include "debug/debugvw.h"
 
 
-@implementation MAMEConsoleView
+@implementation MAMEErrorLogView
 
 - (id)initWithFrame:(NSRect)f machine:(running_machine &)m {
-	if (!(self = [super initWithFrame:f type:DVT_CONSOLE machine:m]))
+	if (!(self = [super initWithFrame:f type:DVT_LOG machine:m]))
 		return nil;
 	return self;
 }

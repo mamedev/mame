@@ -9,17 +9,17 @@
 //
 //============================================================
 
-#import "debugosxdebugconsole.h"
+#import "debugconsole.h"
 
-#import "debugosxdebugcommandhistory.h"
-#import "debugosxconsoleview.h"
-#import "debugosxdebugview.h"
-#import "debugosxdisassemblyview.h"
-#import "debugosxdisassemblyviewer.h"
-#import "debugosxerrorlogviewer.h"
-#import "debugosxmemoryviewer.h"
-#import "debugosxpointsviewer.h"
-#import "debugosxregistersview.h"
+#import "debugcommandhistory.h"
+#import "consoleview.h"
+#import "debugview.h"
+#import "disassemblyview.h"
+#import "disassemblyviewer.h"
+#import "errorlogviewer.h"
+#import "memoryviewer.h"
+#import "pointsviewer.h"
+#import "registersview.h"
 
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"

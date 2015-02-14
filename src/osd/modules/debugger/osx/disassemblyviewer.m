@@ -2,30 +2,30 @@
 // copyright-holders:Vas Crabb
 //============================================================
 //
-//  debugosxmemoryviewer.m - MacOS X Cocoa debug window handling
+//  debugosxdisassemblyviewer.m - MacOS X Cocoa debug window handling
 //
 //  Copyright (c) 1996-2015, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //============================================================
 
-#import "debugosxmemoryviewer.h"
+#import "disassemblyviewer.h"
 
-#import "debugosxdebugview.h"
-#import "debugosxmemoryview.h"
+#import "debugview.h"
+#import "disassemblyview.h"
 
 #include "debug/debugcpu.h"
 
 
-@implementation MAMEMemoryViewer
+@implementation MAMEDisassemblyViewer
 
 - (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c {
-	NSScrollView	*memoryScroll;
+	NSScrollView	*dasmScroll;
 	NSView			*expressionContainer;
 	NSPopUpButton	*actionButton, *subviewButton;
 	NSRect			contentBounds, expressionFrame;
 
-	if (!(self = [super initWithMachine:m title:@"Memory" console:c]))
+	if (!(self = [super initWithMachine:m title:@"Disassembly" console:c]))
 		return nil;
 	contentBounds = [[window contentView] bounds];
 
@@ -67,24 +67,25 @@
 	[[window contentView] addSubview:expressionContainer];
 	[expressionContainer release];
 
-	// create the memory view
-	memoryView = [[MAMEMemoryView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100)
-											   machine:*machine];
-	[memoryView insertSubviewItemsInMenu:[subviewButton menu] atIndex:0];
-	memoryScroll = [[NSScrollView alloc] initWithFrame:NSMakeRect(0,
-																  0,
-																  contentBounds.size.width,
-																  expressionFrame.origin.y)];
-	[memoryScroll setDrawsBackground:YES];
-	[memoryScroll setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
-	[memoryScroll setHasHorizontalScroller:YES];
-	[memoryScroll setHasVerticalScroller:YES];
-	[memoryScroll setAutohidesScrollers:YES];
-	[memoryScroll setBorderType:NSNoBorder];
-	[memoryScroll setDocumentView:memoryView];
-	[memoryView release];
-	[[window contentView] addSubview:memoryScroll];
-	[memoryScroll release];
+	// create the disassembly view
+	dasmView = [[MAMEDisassemblyView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100)
+												  machine:*machine
+											   useConsole:NO];
+	[dasmView insertSubviewItemsInMenu:[subviewButton menu] atIndex:0];
+	dasmScroll = [[NSScrollView alloc] initWithFrame:NSMakeRect(0,
+																0,
+																contentBounds.size.width,
+																expressionFrame.origin.y)];
+	[dasmScroll setDrawsBackground:YES];
+	[dasmScroll setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
+	[dasmScroll setHasHorizontalScroller:YES];
+	[dasmScroll setHasVerticalScroller:YES];
+	[dasmScroll setAutohidesScrollers:YES];
+	[dasmScroll setBorderType:NSNoBorder];
+	[dasmScroll setDocumentView:dasmView];
+	[dasmView release];
+	[[window contentView] addSubview:dasmScroll];
+	[dasmScroll release];
 
 	// create the action popup
 	actionButton = [[self class] newActionButtonWithFrame:NSMakeRect(0,
@@ -92,25 +93,27 @@
 																	 expressionFrame.size.height,
 																	 expressionFrame.size.height)];
 	[actionButton setAutoresizingMask:(NSViewMaxXMargin | NSViewMinYMargin)];
-	[memoryView insertActionItemsInMenu:[actionButton menu] atIndex:1];
+	[dasmView insertActionItemsInMenu:[actionButton menu] atIndex:1];
 	[[window contentView] addSubview:actionButton];
 	[actionButton release];
 
 	// set default state
-	[memoryView selectSubviewForCPU:debug_cpu_get_visible_cpu(*machine)];
-	[memoryView setExpression:@"0"];
-	[expressionField setStringValue:@"0"];
+	[dasmView selectSubviewForCPU:debug_cpu_get_visible_cpu(*machine)];
+	[dasmView setExpression:@"curpc"];
+	[expressionField setStringValue:@"curpc"];
 	[expressionField selectText:self];
-	[subviewButton selectItemAtIndex:[subviewButton indexOfItemWithTag:[memoryView selectedSubviewIndex]]];
+	[subviewButton selectItemAtIndex:[subviewButton indexOfItemWithTag:[dasmView selectedSubviewIndex]]];
 	[window makeFirstResponder:expressionField];
-	[window setTitle:[NSString stringWithFormat:@"Memory: %@", [memoryView selectedSubviewName]]];
+	[window setTitle:[NSString stringWithFormat:@"Disassembly: %@", [dasmView selectedSubviewName]]];
 
 	// calculate the optimal size for everything
-	NSSize const desired = [NSScrollView frameSizeForContentSize:[memoryView maximumFrameSize]
-										   hasHorizontalScroller:YES
-											 hasVerticalScroller:YES
-													  borderType:[memoryScroll borderType]];
-	[self cascadeWindowWithDesiredSize:desired forView:memoryScroll];
+	{
+		NSSize	desired = [NSScrollView frameSizeForContentSize:[dasmView maximumFrameSize]
+										  hasHorizontalScroller:YES
+											hasVerticalScroller:YES
+													 borderType:[dasmScroll borderType]];
+		[self cascadeWindowWithDesiredSize:desired forView:dasmScroll];
+	}
 
 	// don't forget the result
 	return self;
@@ -123,13 +126,13 @@
 
 
 - (id <MAMEDebugViewExpressionSupport>)documentView {
-	return memoryView;
+	return dasmView;
 }
 
 
 - (IBAction)changeSubview:(id)sender {
-	[memoryView selectSubviewAtIndex:[[sender selectedItem] tag]];
-	[window setTitle:[NSString stringWithFormat:@"Memory: %@", [memoryView selectedSubviewName]]];
+	[dasmView selectSubviewAtIndex:[[sender selectedItem] tag]];
+	[window setTitle:[NSString stringWithFormat:@"Disassembly: %@", [dasmView selectedSubviewName]]];
 }
 
 @end

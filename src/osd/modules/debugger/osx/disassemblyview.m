@@ -9,7 +9,7 @@
 //
 //============================================================
 
-#import "debugosxdisassemblyview.h"
+#import "disassemblyview.h"
 
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"

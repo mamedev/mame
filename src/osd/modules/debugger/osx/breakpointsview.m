@@ -9,7 +9,7 @@
 //
 //============================================================
 
-#import "debugosxbreakpointsview.h"
+#import "breakpointsview.h"
 
 #include "debug/debugvw.h"
 
