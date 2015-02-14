@@ -105,6 +105,9 @@ NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification = @"MAMEAuxiliaryD
 		[newMenu addItemWithTitle:@"Error Log Window"
 						   action:@selector(debugNewErrorLogWindow:)
 					keyEquivalent:@"l"];
+		[newMenu addItemWithTitle:@"(Break|Watch)points Window"
+						   action:@selector(debugNewPointsWindow:)
+					keyEquivalent:@"b"];
 	}
 	[menu addItem:[NSMenuItem separatorItem]];
 	[menu addItemWithTitle:@"Close Window" action:@selector(performClose:) keyEquivalent:@"w"];
@@ -284,6 +287,11 @@ NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification = @"MAMEAuxiliaryD
 
 - (IBAction)debugNewErrorLogWindow:(id)sender {
 	[console debugNewErrorLogWindow:sender];
+}
+
+
+- (IBAction)debugNewPointsWindow:(id)sender {
+	[console debugNewPointsWindow:sender];
 }
 
 

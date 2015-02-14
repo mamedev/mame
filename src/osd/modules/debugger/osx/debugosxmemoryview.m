@@ -148,44 +148,64 @@
 }
 
 
+- (IBAction)changeBytesPerLine:(id)sender {
+	debug_view_memory *const memView = downcast<debug_view_memory *>(view);
+	memView->set_chunks_per_row(memView->chunks_per_row() + [sender tag]);
+}
+
+
 - (void)insertActionItemsInMenu:(NSMenu *)menu atIndex:(NSInteger)index {
-	{
-		NSInteger tag;
-		for (tag = 1; tag <= 8; tag <<= 1) {
-			NSString	*title = [NSString stringWithFormat:@"%ld-byte Chunks", (long)tag];
-			NSMenuItem	*chunkItem = [menu insertItemWithTitle:title
-														action:@selector(showChunkSize:)
-												 keyEquivalent:[NSString stringWithFormat:@"%ld", (long)tag]
-													   atIndex:index++];
-			[chunkItem setTarget:self];
-			[chunkItem setTag:tag];
-		}
+	NSInteger tag;
+	for (tag = 1; tag <= 8; tag <<= 1) {
+		NSString	*title = [NSString stringWithFormat:@"%ld-byte Chunks", (long)tag];
+		NSMenuItem	*chunkItem = [menu insertItemWithTitle:title
+													action:@selector(showChunkSize:)
+											 keyEquivalent:[NSString stringWithFormat:@"%ld", (long)tag]
+												   atIndex:index++];
+		[chunkItem setTarget:self];
+		[chunkItem setTag:tag];
 	}
+
 	[menu insertItem:[NSMenuItem separatorItem] atIndex:index++];
-	{
-		NSMenuItem *logicalItem = [menu insertItemWithTitle:@"Logical Addresses"
-													 action:@selector(showPhysicalAddresses:)
-											  keyEquivalent:@"v"
-													atIndex:index++];
-		[logicalItem setTarget:self];
-		[logicalItem setTag:FALSE];
-	}
-	{
-		NSMenuItem *physicalItem = [menu insertItemWithTitle:@"Physical Addresses"
-													  action:@selector(showPhysicalAddresses:)
-											   keyEquivalent:@"y"
-													 atIndex:index++];
-		[physicalItem setTarget:self];
-		[physicalItem setTag:TRUE];
-	}
+
+	NSMenuItem *logicalItem = [menu insertItemWithTitle:@"Logical Addresses"
+												 action:@selector(showPhysicalAddresses:)
+										  keyEquivalent:@"v"
+												atIndex:index++];
+	[logicalItem setTarget:self];
+	[logicalItem setTag:FALSE];
+
+	NSMenuItem *physicalItem = [menu insertItemWithTitle:@"Physical Addresses"
+												  action:@selector(showPhysicalAddresses:)
+										   keyEquivalent:@"y"
+												 atIndex:index++];
+	[physicalItem setTarget:self];
+	[physicalItem setTag:TRUE];
+
 	[menu insertItem:[NSMenuItem separatorItem] atIndex:index++];
-	{
-		NSMenuItem *reverseItem = [menu insertItemWithTitle:@"Reverse View"
-													 action:@selector(showReverseViewToggle:)
-											  keyEquivalent:@"r"
-													atIndex:index++];
-		[reverseItem setTarget:self];
-	}
+
+	NSMenuItem *reverseItem = [menu insertItemWithTitle:@"Reverse View"
+												 action:@selector(showReverseViewToggle:)
+										  keyEquivalent:@"r"
+												atIndex:index++];
+	[reverseItem setTarget:self];
+
+	[menu insertItem:[NSMenuItem separatorItem] atIndex:index++];
+
+	NSMenuItem *increaseItem = [menu insertItemWithTitle:@"Increase Bytes Per Line"
+												  action:@selector(changeBytesPerLine:)
+										   keyEquivalent:@"p"
+												 atIndex:index++];
+	[increaseItem setTarget:self];
+	[increaseItem setTag:1];
+
+	NSMenuItem *decreaseItem = [menu insertItemWithTitle:@"Decrease Bytes Per Line"
+												  action:@selector(changeBytesPerLine:)
+										   keyEquivalent:@"o"
+												 atIndex:index++];
+	[decreaseItem setTarget:self];
+	[decreaseItem setTag:-1];
+
 	if (index < [menu numberOfItems])
 		[menu insertItem:[NSMenuItem separatorItem] atIndex:index++];
 }

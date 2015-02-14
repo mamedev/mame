@@ -187,12 +187,17 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	}
 	totalWidth = totalHeight = 0;
 	originLeft = originTop = 0;
-	[self setFont:[[self class] defaultFont]];
+
 	text = [[NSTextStorage alloc] init];
 	textContainer = [[NSTextContainer alloc] init];
 	layoutManager = [[NSLayoutManager alloc] init];
 	[layoutManager addTextContainer:textContainer];
+	[textContainer release];
 	[text addLayoutManager:layoutManager];
+	[layoutManager release];
+
+	[self setFont:[[self class] defaultFont]];
+
 	return self;
 }
 
@@ -201,8 +206,6 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	if (font != nil) [font release];
 	if (text != nil) [text release];
-	if (textContainer != nil) [textContainer release];
-	if (layoutManager != nil) [layoutManager release];
 	[super dealloc];
 }
 

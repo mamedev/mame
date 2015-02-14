@@ -106,13 +106,11 @@
 	[window setTitle:[NSString stringWithFormat:@"Memory: %@", [memoryView selectedSubviewName]]];
 
 	// calculate the optimal size for everything
-	{
-		NSSize	desired = [NSScrollView frameSizeForContentSize:[memoryView maximumFrameSize]
-										  hasHorizontalScroller:YES
-											hasVerticalScroller:YES
-													 borderType:[memoryScroll borderType]];
-		[self cascadeWindowWithDesiredSize:desired forView:memoryScroll];
-	}
+	NSSize const desired = [NSScrollView frameSizeForContentSize:[memoryView maximumFrameSize]
+										   hasHorizontalScroller:YES
+											 hasVerticalScroller:YES
+													  borderType:[memoryScroll borderType]];
+	[self cascadeWindowWithDesiredSize:desired forView:memoryScroll];
 
 	// don't forget the result
 	return self;

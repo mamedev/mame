@@ -37,6 +37,7 @@
 - (IBAction)showPhysicalAddresses:(id)sender;
 - (IBAction)showReverseView:(id)sender;
 - (IBAction)showReverseViewToggle:(id)sender;
+- (IBAction)changeBytesPerLine:(id)sender;
 
 - (void)insertActionItemsInMenu:(NSMenu *)menu atIndex:(NSInteger)index;
 - (void)insertSubviewItemsInMenu:(NSMenu *)menu atIndex:(NSInteger)index;

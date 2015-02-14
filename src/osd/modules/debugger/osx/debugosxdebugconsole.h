@@ -39,6 +39,7 @@
 - (IBAction)debugNewMemoryWindow:(id)sender;
 - (IBAction)debugNewDisassemblyWindow:(id)sender;
 - (IBAction)debugNewErrorLogWindow:(id)sender;
+- (IBAction)debugNewPointsWindow:(id)sender;
 
 - (void)showDebugger:(NSNotification *)notification;
 - (void)auxiliaryWindowWillClose:(NSNotification *)notification;

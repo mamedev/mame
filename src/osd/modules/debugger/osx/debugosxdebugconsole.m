@@ -18,6 +18,7 @@
 #import "debugosxdisassemblyviewer.h"
 #import "debugosxerrorlogviewer.h"
 #import "debugosxmemoryviewer.h"
+#import "debugosxpointsviewer.h"
 #import "debugosxregistersview.h"
 
 #include "debug/debugcon.h"
@@ -246,6 +247,14 @@
 
 - (IBAction)debugNewErrorLogWindow:(id)sender {
 	MAMEErrorLogViewer *win = [[MAMEErrorLogViewer alloc] initWithMachine:*machine console:self];
+	[auxiliaryWindows addObject:win];
+	[win release];
+	[win activate];
+}
+
+
+- (IBAction)debugNewPointsWindow:(id)sender{
+	MAMEPointsViewer *win = [[MAMEPointsViewer alloc] initWithMachine:*machine console:self];
 	[auxiliaryWindows addObject:win];
 	[win release];
 	[win activate];

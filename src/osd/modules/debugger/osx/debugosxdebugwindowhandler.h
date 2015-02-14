@@ -71,6 +71,7 @@ extern NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification;
 - (IBAction)debugNewMemoryWindow:(id)sender;
 - (IBAction)debugNewDisassemblyWindow:(id)sender;
 - (IBAction)debugNewErrorLogWindow:(id)sender;
+- (IBAction)debugNewPointsWindow:(id)sender;
 
 - (void)windowWillClose:(NSNotification *)notification;
 
