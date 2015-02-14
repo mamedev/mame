@@ -185,14 +185,12 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(cchance_state,cchance)
 {
-	save_item(NAME(m_screenflip));
 	save_item(NAME(m_hop_io));
 	save_item(NAME(m_bell_io));
 }
 
 MACHINE_RESET_MEMBER(cchance_state,cchance)
 {
-	m_screenflip = 0;
 	m_mcu_type = -1;
 	m_hop_io = 0;
 	m_bell_io = 0;

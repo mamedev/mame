@@ -624,7 +624,6 @@ MACHINE_RESET_MEMBER(tnzs_state,tnzs)
 			break;
 	}
 
-	m_screenflip = 0;
 	m_kageki_csport_sel = 0;
 	m_input_select = 0;
 	m_mcu_readcredits = 0;  // this might belong to mcu_reset
@@ -633,31 +632,21 @@ MACHINE_RESET_MEMBER(tnzs_state,tnzs)
 
 MACHINE_RESET_MEMBER(tnzs_state,jpopnics)
 {
-	m_screenflip = 0;
 	m_mcu_type = -1;
-}
-
-void tnzs_state::tnzs_postload()
-{
-	membank("subbank")->set_entry(m_bank2);
 }
 
 
 MACHINE_START_MEMBER(tnzs_state,tnzs_common)
 {
 	UINT8 *SUB = memregion("sub")->base();
-	m_ROM = memregion("maincpu")->base();
-
+	
 	membank("subbank")->configure_entries(0, 4, &SUB[0x08000], 0x2000);
 	membank("subbank")->set_entry(m_bank2);
 
 	m_bank2 = 0;
 	m_mainbank->set_bank(2);
 
-	save_item(NAME(m_screenflip));
 	save_item(NAME(m_bank2));
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(tnzs_state::tnzs_postload), this));
 }
 
 MACHINE_START_MEMBER(tnzs_state,tnzs)
