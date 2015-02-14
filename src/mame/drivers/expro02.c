@@ -71,7 +71,7 @@ EXPRO-02
                  clock input on any of the pins of these chips. They're not ROMs either
                  because the pinout doesn't match any known EPROMs.
                  There are no markings on the chips other than 'GP-U27' & 'GP-U41'
-                 If GP-U41 is removed, on bootup the PCB gives an error 'fg_ind8 ERROR' and
+                 If GP-U41 is removed, on bootup the PCB gives an error 'BG ERROR' and
                  a memory address. If GP-U27 is removed, the PCB works but there are no
                  background graphics.
 
@@ -255,7 +255,6 @@ public:
 	READ16_MEMBER(comad_timer_r);
 	READ8_MEMBER(comad_okim6295_r);
 	WRITE16_MEMBER(galpanica_6295_bankswitch_w);
-	WRITE16_MEMBER(clear_bg_w);
 };
 
 
@@ -286,7 +285,19 @@ UINT32 expro02_state::screen_update_backgrounds(screen_device &screen, bitmap_in
 		{
 			UINT16 dat = (m_expro02_bg_rgb555_pixram[count] & 0xfffe)>>1;
 			dat+=2048;
-			dest[x] = dat;
+
+			// never seen to test
+			//if (!(m_expro02_bg_rgb555_pixram[count] & 0x0001))
+			{
+				dest[x] = dat;
+			}
+			/*
+			else
+			{
+				dest[x] = 0x0000;
+			}
+			*/
+
 			count++;
 		}
 	}
@@ -730,21 +741,11 @@ static ADDRESS_MAP_START( fantsia2_map, AS_PROGRAM, 16, expro02_state )
 ADDRESS_MAP_END
 
 
-WRITE16_MEMBER(expro02_state::clear_bg_w)
-{
-    int i;
-    for(i = 0; i < 8; i++)
-    {
-        m_expro02_bg_rgb555_pixram[offset * 8 + i] = 0x0000;
-    }
-}
 
 
 static ADDRESS_MAP_START( galhustl_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x2fffff) AM_ROM AM_REGION("maincpudata", 0)
-
-    AM_RANGE(0x580000, 0x583fff) AM_RAM_WRITE(clear_bg_w) // I don't think this is correct, it would be associated with the unused VIEW02 tilemap, although this hardware could have implemented things differently as it's an original game, not a GP hack
 
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
