@@ -390,7 +390,7 @@ WRITE_LINE_MEMBER( acia6850_device::write_rxc )
 						m_rx_parity ^= m_rxd;
 
 						if ((m_rx_bits == m_bits && m_parity == PARITY_NONE) ||
-							(m_rx_bits == (m_bits + 1) && m_parity == PARITY_NONE))
+							(m_rx_bits == (m_bits + 1) && m_parity != PARITY_NONE))
 						{
 							if (m_status & SR_RDRF)
 							{
@@ -404,7 +404,7 @@ WRITE_LINE_MEMBER( acia6850_device::write_rxc )
 									m_rx_parity = !m_rx_parity;
 								}
 
-								if (m_parity != PARITY_NONE && !m_rx_parity)
+								if (m_parity != PARITY_NONE && m_rx_parity)
 								{
 									m_status |= SR_PE;
 								}
