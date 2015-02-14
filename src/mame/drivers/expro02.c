@@ -299,8 +299,8 @@ UINT32 expro02_state::screen_update_backgrounds(screen_device &screen, bitmap_in
 		for (x=0;x<256;x++)
 		{
 			UINT16 dat = (m_expro02_fg_ind8_pixram[count]);
-			//dat &=0x3ff;
-			if (dat)
+			dat &=0x7ff;
+			if (!(m_generic_paletteram_16[(dat&0x7ff)] & 0x0001))
 				dest[x] = dat;
 
 			count++;
