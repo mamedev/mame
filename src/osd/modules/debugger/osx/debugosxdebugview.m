@@ -110,6 +110,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 												   inTextContainer:textContainer
 									fractionOfDistanceThroughGlyph:&fraction];
 		position.x = [layoutManager characterIndexForGlyphAtIndex:glyph]; // FIXME: assumes 1:1 character mapping
+		[text deleteCharactersInRange:NSMakeRange(0, length)];
 	}
 	if (position.x < 0)
 		position.x = 0;
@@ -397,32 +398,14 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (void)mouseDown:(NSEvent *)event {
-	NSPoint	location = [self convertPoint:[event locationInWindow] fromView:nil];
-	if (view->cursor_supported()) {
-		view->set_cursor_position([self convertLocation:location]);
-		view->set_cursor_visible(true);
-		[self setNeedsDisplay:YES];
-	}
-}
-
-
-- (void)mouseDragged:(NSEvent *)event {
-	NSPoint	location = [self convertPoint:[event locationInWindow] fromView:nil];
-	if (view->cursor_supported()) {
-		[self autoscroll:event];
-		view->set_cursor_position([self convertLocation:location]);
-		[self setNeedsDisplay:YES];
-	}
+	NSPoint const location = [self convertPoint:[event locationInWindow] fromView:nil];
+	view->process_click(DCK_LEFT_CLICK, [self convertLocation:location]);
 }
 
 
 - (void)rightMouseDown:(NSEvent *)event {
-	NSPoint	location = [self convertPoint:[event locationInWindow] fromView:nil];
-	if (view->cursor_supported()) {
-		view->set_cursor_position([self convertLocation:location]);
-		view->set_cursor_visible(true);
-		[self setNeedsDisplay:YES];
-	}
+	NSPoint const location = [self convertPoint:[event locationInWindow] fromView:nil];
+	view->process_click(DCK_RIGHT_CLICK, [self convertLocation:location]);
 	[super rightMouseDown:event];
 }
 

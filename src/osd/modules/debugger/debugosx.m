@@ -14,7 +14,6 @@
 //  * Automatic scrolling for console and log views
 //  * Using alpha for disabled foreground colours doesn't really work
 //  * New windows created from auxiliary windows should inherit focus rather than pointing at current CPU
-//  * Improve behaviour of expression history in memory and disassembly windows - the double tap is annoying
 //  * Keyboard shortcuts in error log windows
 //  * Don't accept keyboard input while the game is running
 //  * Interior focus rings - standard/exterior focus rings look really ugly here
