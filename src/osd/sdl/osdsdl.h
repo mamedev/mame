@@ -14,7 +14,7 @@
 //============================================================
 
 // Process events in worker thread
-#if defined(SDLMAME_WIN32) || ((SDLMAME_SDL2) && (!defined(SDLMAME_EMSCRIPTEN)))
+#if defined(SDLMAME_WIN32) || ((SDLMAME_SDL2) && (!defined(SDLMAME_EMSCRIPTEN)) && (!defined(SDLMAME_MACOSX)))
 #define SDLMAME_EVENTS_IN_WORKER_THREAD (1)
 #else
 #define SDLMAME_EVENTS_IN_WORKER_THREAD (0)
