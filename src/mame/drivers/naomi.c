@@ -632,7 +632,7 @@ Notes:
  Game                                Type  on cart   FLASHROM  # of SOP48  IC @ 1F      IC @ 1H   IC @ 2K   IC @ 1M       code (1)    Notes
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 /Gun Survivor 2 Biohazard
-\Code: Veronica                      F1X   25709801  1 (64Mb)  14 (128Mb)  not present  NAODEC2A  NAODEC1B  317-5075-COM  BHF1        uses Namco FCA JVS I/O, will crash if COMM.BOARD not present
+\Code: Veronica                      F1X   25709801  1 (64Mb)  14 (128Mb)  not present  NAODEC2A  NAODEC1B  317-5075-COM  BHF1        uses Namco FCA JVS I/O (not dumped), will crash if COMM.BOARD not present
 /Gun Survivor 2 Biohazard
 \Code: Veronica (Ver. E)             F1X   25709801  1 (64Mb)  14 (128Mb)  not present  NAODEC2A  NAODEC1B  317-5075-COM  BHF2
 /Shin Nihon Prowrestling Toukon                                                                                                       /FL0 & FL1 have pin55 raised from PCB.
@@ -687,7 +687,7 @@ Notes:
 --------------------------------------------------------------------------------------------------------------------------------
 Mazan: Flash of the Blade (Ver. A)  F1X   25869812  1 (64Mb)   8 (128Mb)  present  NAODEC3  317-0266-COM  MAZ2        uses 2x Namco FCB JVS I/O (not dumped)
 Mazan: Flash of the Blade (Ver. A)  F1X   25869812  1 (64Mb)   8 (128Mb)  present  NAODEC3  317-0266-COM  MAZ3
-Ninja Assault (Ver. A)              F3    25469801  3 (64Mb)   9 (128Mb)  present  NAODEC3  317-5068-COM  NJA1        uses Namco JYU JVS I/O (not dumped)
+Ninja Assault (Ver. A)              F3    25469801  3 (64Mb)   9 (128Mb)  present  NAODEC3  317-5068-COM  NJA1        uses Namco JYU JVS I/O
 Ninja Assault (Ver. A)              F3    25469801  3 (64Mb)   9 (128Mb)  present  NAODEC3  317-5068-COM  NJA2
 Ninja Assault (Ver. A)              F3    25469801  3 (64Mb)   9 (128Mb)  present  NAODEC3  317-5068-COM  NJA3
 Ninja Assault (Ver. A)              F3    25469801  3 (64Mb)   9 (128Mb)  present  NAODEC3  317-5068-COM  NJA4
