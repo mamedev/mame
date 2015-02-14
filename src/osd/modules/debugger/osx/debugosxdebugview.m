@@ -403,12 +403,14 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 - (void)mouseDown:(NSEvent *)event {
 	NSPoint const location = [self convertPoint:[event locationInWindow] fromView:nil];
 	view->process_click(DCK_LEFT_CLICK, [self convertLocation:location]);
+	[self setNeedsDisplay:YES];
 }
 
 
 - (void)rightMouseDown:(NSEvent *)event {
 	NSPoint const location = [self convertPoint:[event locationInWindow] fromView:nil];
 	view->process_click(DCK_RIGHT_CLICK, [self convertLocation:location]);
+	[self setNeedsDisplay:YES];
 	[super rightMouseDown:event];
 }
 
