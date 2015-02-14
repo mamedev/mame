@@ -24,9 +24,6 @@ public:
 	required_shared_ptr<UINT8> m_objectram0;
 	required_shared_ptr<UINT8> m_videoram0;
 
-	int m_cpua_bank;
-	int m_cpub_bank;
-
 	DECLARE_WRITE8_MEMBER(cpua_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(cpub_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(coincounter_w);

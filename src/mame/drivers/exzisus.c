@@ -48,29 +48,13 @@ TODO:
 
 WRITE8_MEMBER(exzisus_state::cpua_bankswitch_w)
 {
-	if ( (data & 0x0f) != m_cpua_bank )
-	{
-		m_cpua_bank = data & 0x0f;
-		if (m_cpua_bank >= 2)
-		{
-			membank("bank2")->set_entry(m_cpua_bank - 2);
-		}
-	}
-
+	membank("cpuabank")->set_entry(data & 0x0f);
 	flip_screen_set(data & 0x40);
 }
 
 WRITE8_MEMBER(exzisus_state::cpub_bankswitch_w)
 {
-	if ( (data & 0x0f) != m_cpub_bank )
-	{
-		m_cpub_bank = data & 0x0f;
-		if (m_cpub_bank >= 2)
-		{
-			membank("bank1")->set_entry(m_cpub_bank - 2);
-		}
-	}
-
+	membank("cpubbank")->set_entry(data & 0x0f);
 	flip_screen_set(data & 0x40);
 }
 
@@ -112,7 +96,7 @@ DRIVER_INIT_MEMBER(exzisus_state,exzisus)
 
 static ADDRESS_MAP_START( cpua_map, AS_PROGRAM, 8, exzisus_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("cpuabank")
 	AM_RANGE(0xc000, 0xc5ff) AM_RAM AM_SHARE("objectram1")
 	AM_RANGE(0xc600, 0xdfff) AM_RAM AM_SHARE("videoram1")
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("sharedram_ac")
@@ -123,7 +107,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpub_map, AS_PROGRAM, 8, exzisus_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("cpubbank")
 	AM_RANGE(0xc000, 0xc5ff) AM_RAM AM_SHARE("objectram0")
 	AM_RANGE(0xc600, 0xdfff) AM_RAM AM_SHARE("videoram0")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
@@ -212,19 +196,16 @@ INPUT_PORTS_END
 
 void exzisus_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 16, memregion("cpub")->base() + 0x10000, 0x4000);
-	membank("bank2")->configure_entries(0, 16, memregion("cpua")->base() + 0x10000, 0x4000);
-	
-	save_item(NAME(m_cpua_bank));
-	save_item(NAME(m_cpub_bank));
+	membank("cpuabank")->configure_entries(0, 16, memregion("cpua")->base(), 0x4000);
+	membank("cpubbank")->configure_entries(0, 16, memregion("cpub")->base(), 0x4000);
 }
 
 static const gfx_layout charlayout =
 {
 	8, 8,
-	8*2048,
+	RGN_FRAC(1,2),
 	4,
-	{ 0x40000*8, 0x40000*8+4, 0, 4 },
+	{ RGN_FRAC(1,2), RGN_FRAC(1,2)+4, 0, 4 },
 	{ 3, 2, 1, 0, 8+3, 8+2, 8+1, 8+0 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
 	16*8
@@ -291,16 +272,14 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( exzisus )
-	ROM_REGION( 0x48000, "cpua", 0 )
-	ROM_LOAD( "b12-09.7d",  0x00000, 0x08000, CRC(e80f49a9) SHA1(3995d52195cdadfa82ff992ec0456fce09e75132) )
-	ROM_CONTINUE(           0x10000, 0x08000 )
-	ROM_LOAD( "b12-11.9d",  0x18000, 0x10000, CRC(11fcda2c) SHA1(4f8d1dff339d96ffadde2cc7eec23cfeb42481f2) )
+	ROM_REGION( 0x40000, "cpua", 0 )
+	ROM_LOAD( "b12-09.7d",  0x00000, 0x10000, CRC(e80f49a9) SHA1(3995d52195cdadfa82ff992ec0456fce09e75132) )
+	ROM_LOAD( "b12-11.9d",  0x10000, 0x10000, CRC(11fcda2c) SHA1(4f8d1dff339d96ffadde2cc7eec23cfeb42481f2) )
 
-	ROM_REGION( 0x48000, "cpub", 0 )
-	ROM_LOAD( "b12-10.7f",  0x00000, 0x08000, CRC(a60227f1) SHA1(1e0d09f6b77794095092316fe8bf823d4c7775bb) )
-	ROM_CONTINUE(           0x10000, 0x08000 )
-	ROM_LOAD( "b12-12.8f",  0x18000, 0x10000, CRC(a662be67) SHA1(0643480d56d8ac020288db800a705dd5d0d3ad9f) )
-	ROM_LOAD( "b12-13.10f", 0x28000, 0x10000, CRC(04a29633) SHA1(39476365241718f01f9630c12467cb24791a67e1) )
+	ROM_REGION( 0x40000, "cpub", 0 )
+	ROM_LOAD( "b12-10.7f",  0x00000, 0x10000, CRC(a60227f1) SHA1(1e0d09f6b77794095092316fe8bf823d4c7775bb) )
+	ROM_LOAD( "b12-12.8f",  0x10000, 0x10000, CRC(a662be67) SHA1(0643480d56d8ac020288db800a705dd5d0d3ad9f) )
+	ROM_LOAD( "b12-13.10f", 0x20000, 0x10000, CRC(04a29633) SHA1(39476365241718f01f9630c12467cb24791a67e1) )
 
 	ROM_REGION( 0x10000, "cpuc", 0 )
 	ROM_LOAD( "b12-14.12c", 0x00000, 0x08000, CRC(b5ce5e75) SHA1(6d5ec788684e1be4c727ac02b9fa313a42985b40) )
@@ -332,16 +311,14 @@ ROM_START( exzisus )
 ROM_END
 
 ROM_START( exzisusa )
-	ROM_REGION( 0x48000, "cpua", 0 )
-	ROM_LOAD( "b23-10.7d",  0x00000, 0x08000, CRC(c80216fc) SHA1(7b952779c420be08573768f09bd65d0a188df024) )
-	ROM_CONTINUE(           0x10000, 0x08000 )
-	ROM_LOAD( "b23-12.9d",  0x18000, 0x10000, CRC(13637f54) SHA1(c175bc60120e32eec6ccca822fa497a42dd59823) )
+	ROM_REGION( 0x40000, "cpua", 0 )
+	ROM_LOAD( "b23-10.7d",  0x00000, 0x10000, CRC(c80216fc) SHA1(7b952779c420be08573768f09bd65d0a188df024) )
+	ROM_LOAD( "b23-12.9d",  0x10000, 0x10000, CRC(13637f54) SHA1(c175bc60120e32eec6ccca822fa497a42dd59823) )
 
-	ROM_REGION( 0x48000, "cpub", 0 )
-	ROM_LOAD( "b23-11.7f",  0x00000, 0x08000, CRC(d6a79cef) SHA1(e2b56aa38c017b24b50f304b9fe49ee14006f9a4) )
-	ROM_CONTINUE(           0x10000, 0x08000 )
-	ROM_LOAD( "b12-12.8f",  0x18000, 0x10000, CRC(a662be67) SHA1(0643480d56d8ac020288db800a705dd5d0d3ad9f) )
-	ROM_LOAD( "b12-13.10f", 0x28000, 0x10000, CRC(04a29633) SHA1(39476365241718f01f9630c12467cb24791a67e1) )
+	ROM_REGION( 0x40000, "cpub", 0 )
+	ROM_LOAD( "b23-11.7f",  0x00000, 0x10000, CRC(d6a79cef) SHA1(e2b56aa38c017b24b50f304b9fe49ee14006f9a4) )
+	ROM_LOAD( "b12-12.8f",  0x10000, 0x10000, CRC(a662be67) SHA1(0643480d56d8ac020288db800a705dd5d0d3ad9f) )
+	ROM_LOAD( "b12-13.10f", 0x20000, 0x10000, CRC(04a29633) SHA1(39476365241718f01f9630c12467cb24791a67e1) )
 
 	ROM_REGION( 0x10000, "cpuc", 0 )
 	ROM_LOAD( "b23-13.12c", 0x00000, 0x08000, CRC(51110aa1) SHA1(34c2701625eb1987affad1efd19ff8c9971456ae) )
@@ -371,16 +348,14 @@ ROM_START( exzisusa )
 ROM_END
 
 ROM_START( exzisust )
-	ROM_REGION( 0x48000, "cpua", 0 )
-	ROM_LOAD( "b23-10.7d",  0x00000, 0x08000, CRC(c80216fc) SHA1(7b952779c420be08573768f09bd65d0a188df024) )
-	ROM_CONTINUE(           0x10000, 0x08000 )
-	ROM_LOAD( "b23-12.9d",  0x18000, 0x10000, CRC(13637f54) SHA1(c175bc60120e32eec6ccca822fa497a42dd59823) )
+	ROM_REGION( 0x40000, "cpua", 0 )
+	ROM_LOAD( "b23-10.7d",  0x00000, 0x10000, CRC(c80216fc) SHA1(7b952779c420be08573768f09bd65d0a188df024) )
+	ROM_LOAD( "b23-12.9d",  0x10000, 0x10000, CRC(13637f54) SHA1(c175bc60120e32eec6ccca822fa497a42dd59823) )
 
-	ROM_REGION( 0x48000, "cpub", 0 )
-	ROM_LOAD( "b23-15.7f",  0x00000, 0x08000, CRC(2f8b3752) SHA1(acfbb8aa20e6b031b9543e1e56268f3f5c7f7f07) )
-	ROM_CONTINUE(           0x10000, 0x08000 )
-	ROM_LOAD( "b12-12.8f",  0x18000, 0x10000, CRC(a662be67) SHA1(0643480d56d8ac020288db800a705dd5d0d3ad9f) )
-	ROM_LOAD( "b12-13.10f", 0x28000, 0x10000, CRC(04a29633) SHA1(39476365241718f01f9630c12467cb24791a67e1) )
+	ROM_REGION( 0x40000, "cpub", 0 )
+	ROM_LOAD( "b23-15.7f",  0x00000, 0x10000, CRC(2f8b3752) SHA1(acfbb8aa20e6b031b9543e1e56268f3f5c7f7f07) )
+	ROM_LOAD( "b12-12.8f",  0x10000, 0x10000, CRC(a662be67) SHA1(0643480d56d8ac020288db800a705dd5d0d3ad9f) )
+	ROM_LOAD( "b12-13.10f", 0x20000, 0x10000, CRC(04a29633) SHA1(39476365241718f01f9630c12467cb24791a67e1) )
 
 	ROM_REGION( 0x10000, "cpuc", 0 )
 	ROM_LOAD( "b23-13.12c", 0x00000, 0x08000, CRC(51110aa1) SHA1(34c2701625eb1987affad1efd19ff8c9971456ae) )
