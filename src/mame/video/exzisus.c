@@ -13,62 +13,10 @@ Functions to emulate the video hardware of the machine.
 
 
 /***************************************************************************
-  Memory handlers
-***************************************************************************/
-
-READ8_MEMBER(exzisus_state::exzisus_videoram_0_r)
-{
-	return m_videoram0[offset];
-}
-
-
-READ8_MEMBER(exzisus_state::exzisus_videoram_1_r)
-{
-	return m_videoram1[offset];
-}
-
-
-READ8_MEMBER(exzisus_state::exzisus_objectram_0_r)
-{
-	return m_objectram0[offset];
-}
-
-
-READ8_MEMBER(exzisus_state::exzisus_objectram_1_r)
-{
-	return m_objectram1[offset];
-}
-
-
-WRITE8_MEMBER(exzisus_state::exzisus_videoram_0_w)
-{
-	m_videoram0[offset] = data;
-}
-
-
-WRITE8_MEMBER(exzisus_state::exzisus_videoram_1_w)
-{
-	m_videoram1[offset] = data;
-}
-
-
-WRITE8_MEMBER(exzisus_state::exzisus_objectram_0_w)
-{
-	m_objectram0[offset] = data;
-}
-
-
-WRITE8_MEMBER(exzisus_state::exzisus_objectram_1_w)
-{
-	m_objectram1[offset] = data;
-}
-
-
-/***************************************************************************
   Screen refresh
 ***************************************************************************/
 
-UINT32 exzisus_state::screen_update_exzisus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 exzisus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 	int sx, sy, xc, yc;
