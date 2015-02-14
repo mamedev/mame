@@ -315,7 +315,7 @@ static ADDRESS_MAP_START( zipzap_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fgvideoram")
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE(galpanic_bgvideoram_w) AM_SHARE("bgvideoram")
 	AM_RANGE(0x580000, 0x583fff) AM_RAM_WRITE(galpanic_bgvideoram_mirror_w)
-	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE(galpanic_paletteram_w) AM_SHARE("paletteram")  /* 1024 colors, but only 512 seem to be used */
+	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE(galpanic_paletteram_w) AM_SHARE("paletteram")  /* 1024 colors, but only 512 seem to be used */
 	AM_RANGE(0x680000, 0x68001f) AM_RAM
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x701000, 0x71ffff) AM_RAM
@@ -336,7 +336,7 @@ static ADDRESS_MAP_START( supmodel_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fgvideoram")
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE(galpanic_bgvideoram_w) AM_SHARE("bgvideoram")
 //  AM_RANGE(0x580000, 0x583fff) AM_RAM_WRITE(galpanic_bgvideoram_mirror_w) // can't be right, causes half the display to vanish at times!
-	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE(galpanic_paletteram_w) AM_SHARE("paletteram")  /* 1024 colors, but only 512 seem to be used */
+	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE(galpanic_paletteram_w) AM_SHARE("paletteram")  /* 1024 colors, but only 512 seem to be used */
 	AM_RANGE(0x680000, 0x68001f) AM_RAM
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x780000, 0x78001f) AM_RAM
@@ -359,7 +359,7 @@ static ADDRESS_MAP_START( smissw_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fgvideoram")
     AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE(galpanic_bgvideoram_w) AM_SHARE("bgvideoram")
     AM_RANGE(0x580000, 0x583fff) AM_RAM //_WRITE(galpanic_bgvideoram_mirror_w) // can't be right, causes half the display to vanish at times!
-	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE(galpanic_paletteram_w) AM_SHARE("paletteram")  /* 1024 colors, but only 512 seem to be used */
+	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE(galpanic_paletteram_w) AM_SHARE("paletteram")  /* 1024 colors, but only 512 seem to be used */
 	AM_RANGE(0x680000, 0x68001f) AM_RAM
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x780000, 0x78001f) AM_RAM

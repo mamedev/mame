@@ -1563,6 +1563,7 @@ $(MESSOBJ)/roland.a:            \
 	$(MESS_DRIVERS)/rmt32.o     \
 	$(MESS_DRIVERS)/rd110.o     \
 	$(MESS_DRIVERS)/rsc55.o     \
+	$(MESS_DRIVERS)/tb303.o     \
 
 $(MESSOBJ)/rockwell.a:          \
 	$(MESS_DRIVERS)/aim65.o $(MESS_MACHINE)/aim65.o \
@@ -2202,6 +2203,7 @@ $(MESS_DRIVERS)/svmu.o:     $(MESS_LAYOUT)/svmu.lh
 $(MESS_DRIVERS)/sym1.o:     $(MESS_LAYOUT)/sym1.lh
 $(MESS_DRIVERS)/tandy12.o:  $(MESS_LAYOUT)/tandy12.lh
 $(MESS_DRIVERS)/tavernie.o: $(MESS_LAYOUT)/tavernie.lh
+$(MESS_DRIVERS)/tb303.o:    $(MESS_LAYOUT)/tb303.lh
 $(MESS_DRIVERS)/tec1.o:     $(MESS_LAYOUT)/tec1.lh
 $(MESS_DRIVERS)/tecnbras.o: $(MESS_LAYOUT)/tecnbras.lh
 $(MESS_DRIVERS)/ti74.o:     $(MESS_LAYOUT)/ti74.lh \
