@@ -79,8 +79,8 @@ public:
 // Devices with TMS09x0 strobe the outputs very fast, it is unnoticeable to the user.
 // To prevent flickering here, we need to simulate a decay.
 
-// decay time, in steps of 10ms
-#define DISPLAY_DECAY_TIME 5
+// decay time, in steps of 1ms
+#define DISPLAY_DECAY_TIME 50
 
 void ticalc1x_state::display_update()
 {
@@ -688,7 +688,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( t9base, ticalc1x_state )
 
 	/* basic machine hardware */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", ticalc1x_state, display_decay_tick, attotime::from_msec(10))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", ticalc1x_state, display_decay_tick, attotime::from_msec(1))
 
 	/* no video! */
 

@@ -73,8 +73,8 @@ public:
 // The device strobes the outputs very fast, it is unnoticeable to the user.
 // To prevent flickering here, we need to simulate a decay.
 
-// decay time, in steps of 10ms
-#define DISPLAY_DECAY_TIME 4
+// decay time, in steps of 1ms
+#define DISPLAY_DECAY_TIME 40
 
 void elecdet_state::display_update()
 {
@@ -275,7 +275,7 @@ static MACHINE_CONFIG_START( elecdet, elecdet_state )
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(elecdet_state, write_r))
 	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(elecdet_state, auto_power_off))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", elecdet_state, display_decay_tick, attotime::from_msec(10))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", elecdet_state, display_decay_tick, attotime::from_msec(1))
 
 	MCFG_DEFAULT_LAYOUT(layout_elecdet)
 

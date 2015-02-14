@@ -127,8 +127,8 @@ DRIVER_INIT_MEMBER(tispeak_state, lantutor)
 // The device strobes the filament-enable very fast, it is unnoticeable to the user.
 // To prevent flickering here, we need to simulate a decay.
 
-// decay time, in steps of 10ms
-#define DISPLAY_DECAY_TIME 4
+// decay time, in steps of 1ms
+#define DISPLAY_DECAY_TIME 40
 
 void tispeak_state::display_update()
 {
@@ -482,7 +482,7 @@ static MACHINE_CONFIG_START( snmath, tispeak_state )
 	MCFG_TMS0270_WRITE_CTL_CB(DEVWRITE8("tms5100", tms5100_device, ctl_w))
 	MCFG_TMS0270_WRITE_PDC_CB(DEVWRITELINE("tms5100", tms5100_device, pdc_w))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", tispeak_state, display_decay_tick, attotime::from_msec(10))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", tispeak_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_snspell) // max 9 digits
 
 	/* no video! */

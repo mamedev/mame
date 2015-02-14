@@ -72,8 +72,8 @@ public:
 // The device strobes the outputs very fast, it is unnoticeable to the user.
 // To prevent flickering here, we need to simulate a decay.
 
-// decay time, in steps of 10ms
-#define DISPLAY_DECAY_TIME 4
+// decay time, in steps of 1ms
+#define DISPLAY_DECAY_TIME 40
 
 inline bool wildfire_state::index_is_7segled(int index)
 {
@@ -209,7 +209,7 @@ static MACHINE_CONFIG_START( wildfire, wildfire_state )
 	MCFG_AMI_S2000_WRITE_D_CB(WRITE8(wildfire_state, write_d))
 	MCFG_AMI_S2000_WRITE_A_CB(WRITE16(wildfire_state, write_a))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", wildfire_state, display_decay_tick, attotime::from_msec(10))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", wildfire_state, display_decay_tick, attotime::from_msec(1))
 
 	MCFG_DEFAULT_LAYOUT(layout_wildfire)
 
