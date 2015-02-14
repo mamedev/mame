@@ -7,11 +7,14 @@
 #include <stdint.h>
 #include <stdlib.h> // size_t
 #include <string.h> // strlen
+
+#include <bx/allocator.h>
 #include <bx/hash.h>
 #include <bx/tokenizecmd.h>
 
 #include "dbg.h"
 #include "cmd.h"
+#include "entry_p.h"
 
 #include <tinystl/allocator.h>
 #include <tinystl/string.h>
@@ -89,14 +92,24 @@ struct CmdContext
 	CmdLookup m_lookup;
 };
 
-static CmdContext s_cmdContext;
+static CmdContext* s_cmdContext;
+
+void cmdInit()
+{
+	s_cmdContext = BX_NEW(entry::getAllocator(), CmdContext);
+}
+
+void cmdShutdown()
+{
+	BX_DELETE(entry::getAllocator(), s_cmdContext);
+}
 
 void cmdAdd(const char* _name, ConsoleFn _fn, void* _userData)
 {
-	s_cmdContext.add(_name, _fn, _userData);
+	s_cmdContext->add(_name, _fn, _userData);
 }
 
 void cmdExec(const char* _cmd)
 {
-	s_cmdContext.exec(_cmd);
+	s_cmdContext->exec(_cmd);
 }

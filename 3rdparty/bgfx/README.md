@@ -52,11 +52,9 @@ Who is using it?
 http://airmech.com/ AirMech is a free-to-play futuristic action real-time
 strategy video game developed and published by Carbon Games.
 
-http://theengine.co/ Loom Game Engine developed by The Engine Company. Loom
+http://loomsdk.com/ Loom Game Engine developed by The Engine Company. Loom
 is a powerful 2D game engine with live reloading of code and assets, a friendly
-scripting language, and an efficient command-line workflow. Here is video where
-they explain why they choose bgfx over alternatives:  
-<a href="https://www.youtube.com/watch?feature=player_embedded&v=PHY_XHkMGIM&t=1m53s" target="_blank"><img src="https://img.youtube.com/vi/PHY_XHkMGIM/0.jpg" alt="Why did you choose bgfx?" width="240" height="180" border="10" /></a>
+scripting language, and an efficient command-line workflow.
 
 https://github.com/dariomanesku/cmftStudio cmftStudio - cubemap filtering tool.  
 ![cmftStudio](https://github.com/dariomanesku/cmftStudio/raw/master/screenshots/cmftStudio_small.jpg)
@@ -70,6 +68,10 @@ that will support a variety of targets and operating systems. Currently it's in
 very early development and primary focusing on Mac as primary target. This is
 how it currently looks.  
 ![mac_screenshot](https://raw.githubusercontent.com/emoon/ProDBG/master/data/screens/mac_screenshot.png)
+
+
+http://www.dogbytegames.com/ Dogbyte Games is an indie mobile developer studio
+focusing on racing games.
 
 Examples
 --------
@@ -305,6 +307,9 @@ Dependencies
 
 Building
 --------
+
+Steps bellow are for default build system inside bgfx repository. There is
+alterative way to build bgfx and examples with [fips](https://github.com/floooh/fips-bgfx/#fips-bgfx).
 
 ### Prerequisites
 
@@ -741,7 +746,9 @@ language API bindings, WinRT/WinPhone support.
 Kai Jourdan ([@questor](https://github.com/questor)) - 23-vectordisplay example  
 Stanlo Slasinski ([@stanlo](https://github.com/stanlo)) - 24-nbody example  
 Daniel Collin ([@emoon](https://github.com/emoon)) - Port of Ocornut's ImGui
-  to bgfx.
+  to bgfx.  
+Andre Weissflog ([@floooh](https://github.com/floooh)) - Alternative build
+system fips.
 
 [License (BSD 2-clause)](https://github.com/bkaradzic/bgfx/blob/master/LICENSE)
 -------------------------------------------------------------------------------

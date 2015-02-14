@@ -21,20 +21,9 @@
 
 		for _, platform in ipairs(platforms) do
 			for cfg in premake.eachconfig(prj, platform) do
-				premake.gmake_cpp_config(cfg, cc)
+				premake.gmake_cpp_config(prj, cfg, cc)
 			end
 		end
-
-		-- list intermediate files
-		_p('OBJECTS := \\')
-		for _, file in ipairs(prj.files) do
-			if path.iscppfile(file) then
-				_p('\t$(OBJDIR)/%s.o \\'
-					, _MAKE.esc(path.trimdots(path.removeext(file)))
-					)
-			end
-		end
-		_p('')
 
 		-- list object directories
 		local objdirs = {}
@@ -228,7 +217,7 @@
 -- Write a block of configuration settings.
 --
 
-	function premake.gmake_cpp_config(cfg, cc)
+	function premake.gmake_cpp_config(prj, cfg, cc)
 
 		_p('ifeq ($(config),%s)', _MAKE.esc(cfg.shortname))
 
@@ -249,6 +238,27 @@
 
 		-- write out libraries, linker flags, and the link command
 		cpp.linker(cfg, cc)
+
+		-- add objects for compilation, and remove any that are excluded per config.
+		_p('  OBJECTS := \\')
+		for _, file in ipairs(prj.files) do
+			if path.iscppfile(file) then
+				-- check if file is excluded.
+				local excluded = false
+				for _, exclude in ipairs(cfg.excludes) do
+					excluded = (exclude == file)
+					if (excluded) then break end
+				end
+				
+				-- if not excluded, add it.
+				if excluded == false then
+					_p('\t$(OBJDIR)/%s.o \\'
+						, _MAKE.esc(path.trimdots(path.removeext(file)))
+						)
+				end
+			end
+		end
+		_p('')
 
 		_p('  define PREBUILDCMDS')
 		if #cfg.prebuildcommands > 0 then

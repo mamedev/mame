@@ -134,8 +134,8 @@ OBJECTS := \
 
 OBJDIRS := \
 	$(OBJDIR) \
-	$(OBJDIR)/src/host/lua-5.2.3/src \
 	$(OBJDIR)/src/host \
+	$(OBJDIR)/src/host/lua-5.2.3/src \
 
 RESOURCES := \
 
@@ -156,8 +156,8 @@ $(TARGETDIR):
 $(OBJDIRS):
 	@echo Creating $(OBJDIR)
 	-$(call MKDIR,$(OBJDIR))
-	-$(call MKDIR,$(OBJDIR)/src/host/lua-5.2.3/src)
 	-$(call MKDIR,$(OBJDIR)/src/host)
+	-$(call MKDIR,$(OBJDIR)/src/host/lua-5.2.3/src)
 
 clean:
 	@echo Cleaning genie

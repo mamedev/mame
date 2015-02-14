@@ -34,10 +34,10 @@ namespace bgfx
 		g_bgfxEaglLayer = _layer;
 	}
 #elif BX_PLATFORM_LINUX
-	::Display* g_bgfxX11Display;
-	::Window   g_bgfxX11Window;
+	void*    g_bgfxX11Display;
+	uint32_t g_bgfxX11Window;
 
-	void x11SetDisplayWindow(::Display* _display, ::Window _window)
+	void x11SetDisplayWindow(void* _display, uint32_t _window)
 	{
 		g_bgfxX11Display = _display;
 		g_bgfxX11Window  = _window;
@@ -2309,27 +2309,33 @@ again:
 		s_ctx->destroyProgram(_handle);
 	}
 
-	void calcTextureSize(TextureInfo& _info, uint16_t _width, uint16_t _height, uint16_t _depth, uint8_t _numMips, TextureFormat::Enum _format)
+	void calcTextureSize(TextureInfo& _info, uint16_t _width, uint16_t _height, uint16_t _depth, bool _cubeMap, uint8_t _numMips, TextureFormat::Enum _format)
 	{
-		_width   = bx::uint32_max(1, _width);
-		_height  = bx::uint32_max(1, _height);
+		const ImageBlockInfo& blockInfo = getBlockInfo(_format);
+		const uint8_t  bpp         = blockInfo.bitsPerPixel;
+		const uint32_t blockWidth  = blockInfo.blockWidth;
+		const uint32_t blockHeight = blockInfo.blockHeight;
+		const uint32_t minBlockX   = blockInfo.minBlockX;
+		const uint32_t minBlockY   = blockInfo.minBlockY;
+
+		_width   = bx::uint32_max(blockWidth  * minBlockX, ( (_width  + blockWidth  - 1) / blockWidth)*blockWidth);
+		_height  = bx::uint32_max(blockHeight * minBlockY, ( (_height + blockHeight - 1) / blockHeight)*blockHeight);
 		_depth   = bx::uint32_max(1, _depth);
 		_numMips = bx::uint32_max(1, _numMips);
 
 		uint32_t width  = _width;
 		uint32_t height = _height;
 		uint32_t depth  = _depth;
-
-		uint32_t bpp = getBitsPerPixel(_format);
-		uint32_t size = 0;
+		uint32_t sides  = _cubeMap ? 6 : 1;
+		uint32_t size   = 0;
 
 		for (uint32_t lod = 0; lod < _numMips; ++lod)
 		{
-			width  = bx::uint32_max(1, width);
-			height = bx::uint32_max(1, height);
+			width  = bx::uint32_max(blockWidth  * minBlockX, ( (width  + blockWidth  - 1) / blockWidth )*blockWidth);
+			height = bx::uint32_max(blockHeight * minBlockY, ( (height + blockHeight - 1) / blockHeight)*blockHeight);
 			depth  = bx::uint32_max(1, depth);
 
-			size += width*height*depth*bpp/8;
+			size += width*height*depth*bpp/8 * sides;
 
 			width  >>= 1;
 			height >>= 1;
@@ -2341,6 +2347,7 @@ again:
 		_info.height  = _height;
 		_info.depth   = _depth;
 		_info.numMips = _numMips;
+		_info.cubeMap = _cubeMap;
 		_info.storageSize  = size;
 		_info.bitsPerPixel = bpp;
 	}
@@ -2362,7 +2369,7 @@ again:
 		&&  NULL != _mem)
 		{
 			TextureInfo ti;
-			calcTextureSize(ti, _width, _height, 1, _numMips, _format);
+			calcTextureSize(ti, _width, _height, 1, false, _numMips, _format);
 			BX_CHECK(ti.storageSize == _mem->size
 				, "createTexture2D: Texture storage size doesn't match passed memory size (storage size: %d, memory size: %d)"
 				, ti.storageSize
@@ -2403,7 +2410,7 @@ again:
 		&&  NULL != _mem)
 		{
 			TextureInfo ti;
-			calcTextureSize(ti, _width, _height, _depth, _numMips, _format);
+			calcTextureSize(ti, _width, _height, _depth, false, _numMips, _format);
 			BX_CHECK(ti.storageSize == _mem->size
 				, "createTexture3D: Texture storage size doesn't match passed memory size (storage size: %d, memory size: %d)"
 				, ti.storageSize
@@ -2443,10 +2450,10 @@ again:
 		&&  NULL != _mem)
 		{
 			TextureInfo ti;
-			calcTextureSize(ti, _size, _size, 1, _numMips, _format);
-			BX_CHECK(ti.storageSize*6 == _mem->size
+			calcTextureSize(ti, _size, _size, 1, true, _numMips, _format);
+			BX_CHECK(ti.storageSize == _mem->size
 				, "createTextureCube: Texture storage size doesn't match passed memory size (storage size: %d, memory size: %d)"
-				, ti.storageSize*6
+				, ti.storageSize
 				, _mem->size
 				);
 		}
@@ -2459,15 +2466,15 @@ again:
 		bx::write(&writer, magic);
 
 		TextureCreate tc;
-		tc.m_flags = _flags;
-		tc.m_width = _size;
-		tc.m_height = _size;
-		tc.m_sides = 6;
-		tc.m_depth = 0;
+		tc.m_flags   = _flags;
+		tc.m_width   = _size;
+		tc.m_height  = _size;
+		tc.m_sides   = 6;
+		tc.m_depth   = 0;
 		tc.m_numMips = _numMips;
-		tc.m_format = uint8_t(_format);
+		tc.m_format  = uint8_t(_format);
 		tc.m_cubeMap = true;
-		tc.m_mem = _mem;
+		tc.m_mem     = _mem;
 		bx::write(&writer, tc);
 
 		return s_ctx->createTexture(mem, _flags, 0, NULL);
@@ -3194,10 +3201,10 @@ BGFX_C_API void bgfx_destroy_program(bgfx_program_handle_t _handle)
 	bgfx::destroyProgram(handle.cpp);
 }
 
-BGFX_C_API void bgfx_calc_texture_size(bgfx_texture_info_t* _info, uint16_t _width, uint16_t _height, uint16_t _depth, uint8_t _numMips, bgfx_texture_format_t _format)
+BGFX_C_API void bgfx_calc_texture_size(bgfx_texture_info_t* _info, uint16_t _width, uint16_t _height, uint16_t _depth, bool _cubeMap, uint8_t _numMips, bgfx_texture_format_t _format)
 {
 	bgfx::TextureInfo& info = *(bgfx::TextureInfo*)_info;
-	bgfx::calcTextureSize(info, _width, _height, _depth, _numMips, bgfx::TextureFormat::Enum(_format) );
+	bgfx::calcTextureSize(info, _width, _height, _depth, _cubeMap, _numMips, bgfx::TextureFormat::Enum(_format) );
 }
 
 BGFX_C_API bgfx_texture_handle_t bgfx_create_texture(const bgfx_memory_t* _mem, uint32_t _flags, uint8_t _skip, bgfx_texture_info_t* _info)

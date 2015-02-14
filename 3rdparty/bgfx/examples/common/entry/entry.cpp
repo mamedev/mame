@@ -22,7 +22,17 @@ namespace entry
 	static bool s_exit = false;
 	static bx::FileReaderI* s_fileReader = NULL;
 	static bx::FileWriterI* s_fileWriter = NULL;
-	static bx::CrtAllocator s_allocator;
+
+	extern bx::ReallocatorI* getDefaultAllocator();
+	static bx::ReallocatorI* s_allocator = getDefaultAllocator();
+
+#if ENTRY_CONFIG_IMPLEMENT_DEFAULT_ALLOCATOR
+	bx::ReallocatorI* getDefaultAllocator()
+	{
+		static bx::CrtAllocator s_allocator;
+		return &s_allocator;
+	}
+#endif // ENTRY_CONFIG_IMPLEMENT_DEFAULT_ALLOCATOR
 
 	bool setOrToggle(uint32_t& _flags, const char* _name, uint32_t _bit, int _first, int _argc, char const* const* _argv)
 	{
@@ -137,16 +147,23 @@ namespace entry
 		s_fileWriter = new bx::CrtFileWriter;
 #endif // BX_CONFIG_CRT_FILE_READER_WRITER
 
+		cmdInit();
 		cmdAdd("mouselock", cmdMouseLock);
 		cmdAdd("graphics",  cmdGraphics );
 		cmdAdd("exit",      cmdExit     );
 
+		inputInit();
 		inputAddBindings("bindings", s_bindings);
 
 		entry::WindowHandle defaultWindow = { 0 };
 		entry::setWindowTitle(defaultWindow, bx::baseName(_argv[0]));
 
 		int32_t result = ::_main_(_argc, _argv);
+
+		inputRemoveBindings("bindings");
+		inputShutdown();
+
+		cmdShutdown();
 
 #if BX_CONFIG_CRT_FILE_READER_WRITER
 		delete s_fileReader;
@@ -448,7 +465,20 @@ namespace entry
 
 	bx::ReallocatorI* getAllocator()
 	{
-		return &s_allocator;
+		return s_allocator;
+	}
+
+	void* TinyStlAllocator::static_allocate(size_t _bytes)
+	{
+		return BX_ALLOC(getAllocator(), _bytes);
+	}
+
+	void TinyStlAllocator::static_deallocate(void* _ptr, size_t /*_bytes*/)
+	{
+		if (NULL != _ptr)
+		{
+			BX_FREE(getAllocator(), _ptr);
+		}
 	}
 
 } // namespace entry
