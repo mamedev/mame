@@ -358,12 +358,12 @@ static ADDRESS_MAP_START( galpani2_mem1, AS_PROGRAM, 16, galpani2_state )
 //  AM_RANGE(0x390000, 0x3901ff) AM_WRITENOP                                        // ? at startup of service mode
 
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_SHARE("bg8.0")    // Background 0
-	AM_RANGE(0x440000, 0x440001) AM_RAM AM_SHARE("bg8_scrollx.0")           // Background 0 Scroll X
-	AM_RANGE(0x480000, 0x480001) AM_RAM AM_SHARE("bg8_scrolly.0")           // Background 0 Scroll Y
+	AM_RANGE(0x440000, 0x440001) AM_RAM AM_SHARE("bg8_scrolly.0")           // Background 0 Scroll Y
+	AM_RANGE(0x480000, 0x480001) AM_RAM AM_SHARE("bg8_scrollx.0")           // Background 0 Scroll X
 //  AM_RANGE(0x4c0000, 0x4c0001) AM_WRITENOP                                        // ? 0 at startup only
 	AM_RANGE(0x500000, 0x53ffff) AM_RAM AM_SHARE("bg8.1")    // Background 1
-	AM_RANGE(0x540000, 0x540001) AM_RAM AM_SHARE("bg8_scrollx.1")           // Background 1 Scroll X
-	AM_RANGE(0x580000, 0x580001) AM_RAM AM_SHARE("bg8_scrolly.1")           // Background 1 Scroll Y
+	AM_RANGE(0x540000, 0x540001) AM_RAM AM_SHARE("bg8_scrolly.1")           // Background 1 Scroll Y
+	AM_RANGE(0x580000, 0x580001) AM_RAM AM_SHARE("bg8_scrollx.1")           // Background 1 Scroll X
 //  AM_RANGE(0x5c0000, 0x5c0001) AM_WRITENOP                                        // ? 0 at startup only
 
 	AM_RANGE(0x540572, 0x540573) AM_READNOP                                         // ? galpani2 at F0A4
