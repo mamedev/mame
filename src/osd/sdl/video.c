@@ -160,8 +160,8 @@ void sdl_monitor_info::refresh()
 	info.cbSize = sizeof(info);
 	GetMonitorInfo((HMONITOR)m_handle, (LPMONITORINFO)&info);
 	m_dimensions.x = m_dimensions.y = 0;
-	m_center_width = m_dimensions.w = info.rcMonitor.right - info.rcMonitor.left;
-	m_center_height = m_dimensions.h = info.rcMonitor.bottom - info.rcMonitor.top;
+	m_dimensions.w = info.rcMonitor.right - info.rcMonitor.left;
+	m_dimensions.h = info.rcMonitor.bottom - info.rcMonitor.top;
 	char *temp = utf8_from_wstring(info.szDevice);
 	strcpy(m_monitor_device, temp);
 	osd_free(temp);
@@ -174,8 +174,8 @@ void sdl_monitor_info::refresh()
 	dbounds = CGDisplayBounds(primary);
 
 	m_dimensions.x = m_dimensions.y = 0;
-	m_center_width = m_dimensions.w = dbounds.size.width - dbounds.origin.x;
-	m_center_height = m_dimensions.h = dbounds.size.height - dbounds.origin.y;
+	m_dimensions.w = dbounds.size.width - dbounds.origin.x;
+	m_dimensions.h = dbounds.size.height - dbounds.origin.y;
 	strcpy(m_monitor_device, "Mac OS X display");
 	#elif defined(SDLMAME_X11) || defined(SDLMAME_NO_X11)       // X11 version
 	{
