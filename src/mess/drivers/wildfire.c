@@ -81,6 +81,21 @@ inline bool wildfire_state::index_is_7segled(int index)
 	return (index < 3);
 }
 
+// lamp translation table: Lzz from patent US4334679 FIG.4 = MESS lampxxy,
+// where xx is led column and y is led row, eg. lamp103 is output A10 D3
+/*
+    L0  = -         L10 = lamp60    L20 = lamp41    L30 = lamp53    L40 = lamp57    L50 = lamp110  
+    L1  = lamp107   L11 = lamp50    L21 = lamp42    L31 = lamp43    L41 = lamp66    L51 = lamp111  
+    L2  = lamp106   L12 = lamp61    L22 = lamp52    L32 = lamp54    L42 = lamp76    L52 = lamp112  
+    L3  = lamp105   L13 = lamp71    L23 = lamp63    L33 = lamp55    L43 = lamp86    L53 = lamp113  
+    L4  = lamp104   L14 = lamp81    L24 = lamp73    L34 = lamp117   L44 = lamp96    L60 = lamp30   
+    L5  = lamp103   L15 = lamp92    L25 = lamp115   L35 = lamp75    L45 = lamp67    L61 = lamp30(!)
+    L6  = lamp102   L16 = lamp82    L26 = lamp93    L36 = lamp95    L46 = lamp77    L62 = lamp31   
+    L7  = lamp101   L17 = lamp72    L27 = lamp94    L37 = lamp56    L47 = lamp87    L63 = lamp31(!)
+    L8  = lamp80    L18 = lamp114   L28 = lamp84    L38 = lamp65    L48 = lamp97    L70 = lamp33   
+    L9  = lamp70    L19 = lamp51    L29 = lamp116   L39 = lamp85    L49 = -     
+*/
+
 void wildfire_state::display_update()
 {
 	UINT16 active_state[0x10];

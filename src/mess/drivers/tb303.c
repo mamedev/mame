@@ -2,8 +2,10 @@
 // copyright-holders:hap
 /***************************************************************************
 
-  Roland TB-303
+  Roland TB-303 Bass Line, 1982, designed by Tadao Kikumoto
   * NEC uCOM-43 MCU, labeled D650C 133
+  * 3*uPD444C 1024x4 Static CMOS SRAM
+  * board is packed with discrete components
   
   x
 
@@ -49,7 +51,7 @@ void tb303_state::machine_start()
 static MACHINE_CONFIG_START( tb303, tb303_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D650, 454545) // LC circuit, 2.2us pulse
+	MCFG_CPU_ADD("maincpu", NEC_D650, 454545) // LC circuit, 2.2us pulse interval
 
 	MCFG_DEFAULT_LAYOUT(layout_tb303)
 
