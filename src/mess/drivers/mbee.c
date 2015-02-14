@@ -51,9 +51,10 @@
     These early colour computers have a PROM to create the foreground palette.
 
     Notes about the printer:
-    - When computer turned on, defaults to 1200 baud serial printer
-    - Change it to parallel by entering OUTL#1
-    - After you mount/create a printfile, you can LPRINT and LLIST.
+    - Older models default to a 1200 baud serial printer, which we do not support.
+    - You need to change it to parallel by entering OUTL#1 while in Basic.
+    - After you mount/create a printfile, you can LPRINT and LLIST in Basic,
+      or by using the printing option in other apps.
 
     Notes about Telcom:
     - On the older models, Telcom is called up by entering NET from within Basic. Models
@@ -91,13 +92,11 @@
 
     TODO/not working:
 
-    - Printer needs to be understood and fixed.
-
     - 256tc: Paste ignores shift key
     - All others: Paste drops most characters, shift operates randomly.
 
     - various fdc issues:
-        - B drive doesn't work.
+        - B drive doesn't work with most disks.
         - some disks cause MESS to freeze.
         - ENMF pin missing from wd_fdc.
         - incorrect timing for track register causes 256tc failure to boot a disk.
@@ -287,7 +286,7 @@ static ADDRESS_MAP_START(mbee56_io, AS_IO, 8, mbee_state)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
 	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
 	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("fdc", wd2793_t, read, write)
-	AM_RANGE(0x48, 0x4f) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
+	AM_RANGE(0x48, 0x4f) AM_READWRITE(fdc_status_r, fdc_motor_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbee128_io, AS_IO, 8, mbee_state)
@@ -303,7 +302,7 @@ static ADDRESS_MAP_START(mbee128_io, AS_IO, 8, mbee_state)
 	AM_RANGE(0x0d, 0x0d) AM_READWRITE(m6545_data_r, m6545_data_w)
 	AM_RANGE(0x1c, 0x1f) AM_READWRITE(mbeeppc_1c_r, mbee256_1c_w)
 	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("fdc", wd2793_t, read, write)
-	AM_RANGE(0x48, 0x4f) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
+	AM_RANGE(0x48, 0x4f) AM_READWRITE(fdc_status_r, fdc_motor_w)
 	AM_RANGE(0x50, 0x57) AM_WRITE(mbee128_50_w)
 ADDRESS_MAP_END
 
@@ -323,7 +322,7 @@ static ADDRESS_MAP_START(mbee256_io, AS_IO, 8, mbee_state)
 	AM_RANGE(0x0018, 0x001b) AM_MIRROR(0xff00) AM_READ(mbee256_18_r)
 	AM_RANGE(0x001c, 0x001f) AM_MIRROR(0xff00) AM_READWRITE(mbeeppc_1c_r, mbee256_1c_w)
 	AM_RANGE(0x0044, 0x0047) AM_MIRROR(0xff00) AM_DEVREADWRITE("fdc", wd2793_t, read, write)
-	AM_RANGE(0x0048, 0x004f) AM_MIRROR(0xff00) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
+	AM_RANGE(0x0048, 0x004f) AM_MIRROR(0xff00) AM_READWRITE(fdc_status_r, fdc_motor_w)
 	AM_RANGE(0x0050, 0x0057) AM_MIRROR(0xff00) AM_WRITE(mbee256_50_w)
 	// AM_RANGE(0x0058, 0x005f) AM_MIRROR(0xff00) External options: floppy drive, hard drive and keyboard
 	// AM_RANGE(0x0060, 0x0067) AM_MIRROR(0xff00) Reserved for file server selection (unused)
@@ -635,7 +634,7 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_12MHz / 6)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(mbee_state, pio_port_a_w))
+	MCFG_Z80PIO_OUT_PA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(mbee_state, pio_ardy))
 	MCFG_Z80PIO_IN_PB_CB(READ8(mbee_state, pio_port_b_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(mbee_state, pio_port_b_w))
@@ -671,6 +670,7 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", 2)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("z80pio", z80pio_device, strobe_a))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -691,7 +691,7 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, 3375000)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(mbee_state, pio_port_a_w))
+	MCFG_Z80PIO_OUT_PA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(mbee_state, pio_ardy))
 	MCFG_Z80PIO_IN_PB_CB(READ8(mbee_state, pio_port_b_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(mbee_state, pio_port_b_w))
@@ -729,6 +729,7 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", 2)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("z80pio", z80pio_device, strobe_a))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 

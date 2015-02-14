@@ -18,7 +18,6 @@
 #include "sound/speaker.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "machine/mc146818.h"
 #include "sound/wave.h"
 #include "machine/wd_fdc.h"
 
@@ -28,9 +27,9 @@ class mbee_state : public driver_device
 public:
 	enum
 	{
-		TIMER_MBEE256_KBD,
+		TIMER_MBEE_NEWKB,
 		TIMER_MBEE_RTC_IRQ,
-		TIMER_MBEE_RESET
+		TIMER_MBEE_BOOT
 	};
 
 	mbee_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -69,7 +68,6 @@ public:
 	DECLARE_READ8_MEMBER(mbee256_speed_low_r);
 	DECLARE_READ8_MEMBER(mbee256_speed_high_r);
 	DECLARE_READ8_MEMBER(mbee256_18_r);
-	DECLARE_WRITE8_MEMBER(mbee64_50_w);
 	DECLARE_WRITE8_MEMBER(mbee128_50_w);
 	DECLARE_WRITE8_MEMBER(mbee256_50_w);
 	DECLARE_READ8_MEMBER(m6545_status_r);
@@ -93,13 +91,12 @@ public:
 	DECLARE_READ8_MEMBER(mbeeppc_high_r);
 	DECLARE_WRITE8_MEMBER(mbeeppc_high_w);
 	DECLARE_WRITE8_MEMBER(mbeeppc_low_w);
-	DECLARE_WRITE8_MEMBER(pio_port_a_w);
 	DECLARE_WRITE8_MEMBER(pio_port_b_w);
 	DECLARE_READ8_MEMBER(pio_port_b_r);
 	DECLARE_WRITE_LINE_MEMBER(pio_ardy);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vs);
-	DECLARE_READ8_MEMBER(mbee_fdc_status_r);
-	DECLARE_WRITE8_MEMBER(mbee_fdc_motor_w);
+	DECLARE_READ8_MEMBER(fdc_status_r);
+	DECLARE_WRITE8_MEMBER(fdc_motor_w);
 	DECLARE_DRIVER_INIT(mbeepc85);
 	DECLARE_DRIVER_INIT(mbee256);
 	DECLARE_DRIVER_INIT(mbee56);
@@ -121,10 +118,9 @@ public:
 	DECLARE_MACHINE_RESET(mbee256);
 	DECLARE_MACHINE_RESET(mbeett);
 	UINT32 screen_update_mbee(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(mbee_interrupt);
-	TIMER_CALLBACK_MEMBER(mbee256_kbd);
-	TIMER_CALLBACK_MEMBER(mbee_rtc_irq);
-	TIMER_CALLBACK_MEMBER(mbee_reset);
+	TIMER_CALLBACK_MEMBER(timer_newkb);
+	TIMER_CALLBACK_MEMBER(timer_rtc_irq);
+	TIMER_CALLBACK_MEMBER(timer_boot);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(mbee);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(mbee_z80bin);
 	WRITE_LINE_MEMBER(fdc_intrq_w);
@@ -151,6 +147,7 @@ private:
 	bool m_b7_rtc;
 	bool m_b7_vs;
 	bool m_b2;
+	bool m_is_mbeett;
 	UINT8 m_mbee256_was_pressed[15];
 	UINT8 m_mbee256_q[20];
 	UINT8 m_mbee256_q_pos;

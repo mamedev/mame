@@ -5,6 +5,7 @@
     machine driver
     Juergen Buchmueller <pullmoll@t-online.de>, Jan 2000
 
+    Rewritten by Robbbert
 
 ****************************************************************************/
 
@@ -16,14 +17,14 @@ void mbee_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 {
 	switch (id)
 	{
-	case TIMER_MBEE256_KBD:
-		mbee256_kbd(ptr, param);
+	case TIMER_MBEE_NEWKB:
+		timer_newkb(ptr, param);
 		break;
 	case TIMER_MBEE_RTC_IRQ:
-		mbee_rtc_irq(ptr, param);
+		timer_rtc_irq(ptr, param);
 		break;
-	case TIMER_MBEE_RESET:
-		mbee_reset(ptr, param);
+	case TIMER_MBEE_BOOT:
+		timer_boot(ptr, param);
 		break;
 	default:
 		assert_always(FALSE, "Unknown id in mbee_state::device_timer");
@@ -41,13 +42,6 @@ WRITE_LINE_MEMBER( mbee_state::pio_ardy )
 {
 	m_centronics->write_strobe((state) ? 0 : 1);
 }
-
-WRITE8_MEMBER( mbee_state::pio_port_a_w )
-{
-	/* hardware strobe driven by PIO ARDY, bit 7..0 = data */
-	m_pio->strobe_a(1); /* needed - otherwise nothing prints */
-	m_cent_data_out->write(space, 0, data);
-};
 
 WRITE8_MEMBER( mbee_state::pio_port_b_w )
 {
@@ -72,27 +66,37 @@ READ8_MEMBER( mbee_state::pio_port_b_r )
 
 	if (m_cassette->input() > 0.03) data |= 1;
 
-	switch (m_io_config->read() & 0xc0)
-	{
-		case 0x00:
-			data |= (UINT8)m_b7_vs << 7;
-			break;
-		case 0x40:
-			data |= (UINT8)m_b7_rtc << 7;
-			break;
-		case 0x80:
-			data |= 0x80;
-			break;
-		case 0xc0:
-			data |= 0x80; // centronics busy line - FIXME
-			break;
-	}
-
-	data |= (UINT8)m_b2 << 1; // key pressed on new keyboard
 	data |= 8; // CTS held high via resistor. If low, the disk-based models think a mouse is plugged in.
 
+	if (m_is_mbeett)
+	{
+		if (m_b2)
+			data |= 0x82;
+		else
+			data |= 0x80;
+	}
+	else
+	{
+		switch (m_io_config->read() & 0xc0)
+		{
+			case 0x00:
+				data |= (UINT8)m_b7_vs << 7;
+				break;
+			case 0x40:
+				data |= (UINT8)m_b7_rtc << 7;
+				break;
+			case 0x80:
+				data |= 0x80;
+				break;
+			case 0xc0:
+				data |= 0x80; // centronics busy line - FIXME
+				break;
+		}
+		data |= (UINT8)m_b2 << 1; // key pressed on new keyboard
+	}
+
 	return data;
-};
+}
 
 /*************************************************************************************
 
@@ -113,7 +117,7 @@ WRITE_LINE_MEMBER( mbee_state::fdc_drq_w )
 	m_fdc_rq = (m_fdc_rq & 1) | (state << 1);
 }
 
-READ8_MEMBER( mbee_state::mbee_fdc_status_r )
+READ8_MEMBER( mbee_state::fdc_status_r )
 {
 /*  d7 indicate if IRQ or DRQ is occurring (1=happening)
     d6..d0 not used */
@@ -121,7 +125,7 @@ READ8_MEMBER( mbee_state::mbee_fdc_status_r )
 	return m_fdc_rq ? 0xff : 0x7f;
 }
 
-WRITE8_MEMBER( mbee_state::mbee_fdc_motor_w )
+WRITE8_MEMBER( mbee_state::fdc_motor_w )
 {
 /*  d7..d4 not used
     d3 density (1=MFM)
@@ -152,7 +156,7 @@ WRITE8_MEMBER( mbee_state::mbee_fdc_motor_w )
 ************************************************************/
 
 
-TIMER_CALLBACK_MEMBER(mbee_state::mbee256_kbd)
+TIMER_CALLBACK_MEMBER( mbee_state::timer_newkb )
 {
 	/* Keyboard scanner is a Mostek M3870 chip. Its speed of operation is determined by a 15k resistor on
 	pin 2 (XTL2) and is therefore 2MHz. If a key change is detected (up or down), the /strobe
@@ -179,7 +183,8 @@ TIMER_CALLBACK_MEMBER(mbee_state::mbee256_kbd)
 				if (BIT(pressed^m_mbee256_was_pressed[i], j))
 				{
 					// put it in the queue
-					m_mbee256_q[m_mbee256_q_pos] = (i << 3) | j | (BIT(pressed, j) ? 0x80 : 0);
+					UINT8 code = (i << 3) | j | (BIT(pressed, j) ? 0x80 : 0);
+					m_mbee256_q[m_mbee256_q_pos] = code;
 					if (m_mbee256_q_pos < 19) m_mbee256_q_pos++;
 				}
 			}
@@ -194,7 +199,7 @@ TIMER_CALLBACK_MEMBER(mbee_state::mbee256_kbd)
 		//breaks keyboard m_pio->port_b_write(pio_port_b_r(generic_space(),0,0xff));
 	}
 
-	timer_set(attotime::from_hz(25), TIMER_MBEE256_KBD);
+	timer_set(attotime::from_hz(25), TIMER_MBEE_NEWKB);
 }
 
 READ8_MEMBER( mbee_state::mbee256_18_r )
@@ -254,7 +259,7 @@ READ8_MEMBER( mbee_state::mbee_07_r )   // read
 }
 
 // This doesn't seem to do anything; the time works without it.
-TIMER_CALLBACK_MEMBER( mbee_state::mbee_rtc_irq )
+TIMER_CALLBACK_MEMBER( mbee_state::timer_rtc_irq )
 {
 	if (!m_rtc)
 		return;
@@ -467,7 +472,7 @@ READ8_MEMBER( mbee_state::mbeepc_telcom_high_r )
 
 
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
-TIMER_CALLBACK_MEMBER( mbee_state::mbee_reset )
+TIMER_CALLBACK_MEMBER( mbee_state::timer_boot )
 {
 	m_boot->set_entry(0);
 }
@@ -480,14 +485,14 @@ void mbee_state::machine_reset_common_disk()
 MACHINE_RESET_MEMBER( mbee_state, mbee )
 {
 	m_boot->set_entry(1);
-	timer_set(attotime::from_usec(4), TIMER_MBEE_RESET);
+	timer_set(attotime::from_usec(4), TIMER_MBEE_BOOT);
 }
 
 MACHINE_RESET_MEMBER( mbee_state, mbee56 )
 {
 	machine_reset_common_disk();
 	m_boot->set_entry(1);
-	timer_set(attotime::from_usec(4), TIMER_MBEE_RESET);
+	timer_set(attotime::from_usec(4), TIMER_MBEE_BOOT);
 }
 
 MACHINE_RESET_MEMBER( mbee_state, mbee128 )
@@ -513,30 +518,7 @@ MACHINE_RESET_MEMBER( mbee_state, mbeett )
 	for (i = 0; i < 15; i++) m_mbee256_was_pressed[i] = 0;
 	m_mbee256_q_pos = 0;
 	m_boot->set_entry(1);
-	timer_set(attotime::from_usec(4), TIMER_MBEE_RESET);
-}
-
-INTERRUPT_GEN_MEMBER( mbee_state::mbee_interrupt )
-{
-// Due to the uncertainly and hackage here, this is commented out for now - Robbbert - 05-Oct-2010
-#if 0
-
-	//address_space &space = m_maincpu->space(AS_PROGRAM);
-	/* The printer status connects to the pio ASTB pin, and the printer changing to not
-	    busy should signal an interrupt routine at B61C, (next line) but this doesn't work.
-	    The line below does what the interrupt should be doing. */
-	/* But it would break any program loaded to that area of memory, such as CP/M programs */
-
-	//m_z80pio->strobe_a(centronics_busy_r(m_centronics)); /* signal int when not busy (L->H) */
-	//space.write_byte(0x109, centronics_busy_r(m_centronics));
-
-
-	/* once per frame, pulse the PIO B bit 7 - it is in the schematic as an option,
-	but need to find out what it does */
-	m_b7_busy = 0x80;
-	irq0_line_hold(device);
-
-#endif
+	timer_set(attotime::from_usec(4), TIMER_MBEE_BOOT);
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbee )
@@ -545,6 +527,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbee )
 	m_boot->configure_entries(0, 2, &RAM[0x0000], 0x8000);
 	m_size = 0x4000;
 	m_has_oldkb = 1;
+	m_is_mbeett = 0;
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbeeic )
@@ -558,6 +541,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbeeic )
 	m_pak->set_entry(0);
 	m_size = 0x8000;
 	m_has_oldkb = 1;
+	m_is_mbeett = 0;
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbeepc )
@@ -575,6 +559,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbeepc )
 	m_telcom->set_entry(0);
 	m_size = 0x8000;
 	m_has_oldkb = 1;
+	m_is_mbeett = 0;
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbeepc85 )
@@ -592,6 +577,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbeepc85 )
 	m_telcom->set_entry(0);
 	m_size = 0x8000;
 	m_has_oldkb = 1;
+	m_is_mbeett = 0;
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbeeppc )
@@ -614,6 +600,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbeeppc )
 	m_basic->set_entry(0);
 	m_size = 0x8000;
 	m_has_oldkb = 1;
+	m_is_mbeett = 0;
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbee56 )
@@ -622,6 +609,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbee56 )
 	m_boot->configure_entries(0, 2, &RAM[0x0000], 0xe000);
 	m_size = 0xe000;
 	m_has_oldkb = 1;
+	m_is_mbeett = 0;
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbee128 )
@@ -645,6 +633,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbee128 )
 
 	m_size = 0x8000;
 	m_has_oldkb = 1;
+	m_is_mbeett = 0;
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbee256 )
@@ -665,10 +654,11 @@ DRIVER_INIT_MEMBER( mbee_state, mbee256 )
 	}
 
 	timer_set(attotime::from_hz(1), TIMER_MBEE_RTC_IRQ);   /* timer for rtc */
-	timer_set(attotime::from_hz(50), TIMER_MBEE256_KBD);   /* timer for kbd */
+	timer_set(attotime::from_hz(25), TIMER_MBEE_NEWKB);   /* timer for kbd */
 
 	m_size = 0x8000;
 	m_has_oldkb = 0;
+	m_is_mbeett = 0;
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbeett )
@@ -686,10 +676,11 @@ DRIVER_INIT_MEMBER( mbee_state, mbeett )
 	m_telcom->set_entry(0);
 
 	timer_set(attotime::from_hz(1), TIMER_MBEE_RTC_IRQ);   /* timer for rtc */
-	timer_set(attotime::from_hz(25), TIMER_MBEE256_KBD);   /* timer for kbd */
+	timer_set(attotime::from_hz(25), TIMER_MBEE_NEWKB);   /* timer for kbd */
 
 	m_size = 0x8000;
 	m_has_oldkb = 0;
+	m_is_mbeett = 1;
 }
 
 
