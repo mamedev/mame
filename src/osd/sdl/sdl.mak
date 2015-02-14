@@ -284,7 +284,27 @@ LIBS += -framework CoreAudio -framework CoreMIDI
 endif
 
 ifdef NO_USE_QTDEBUG
-DEBUGOBJS = $(OSDOBJ)/modules/debugger/debugosx.o
+
+OBJDIRS += $(OSDOBJ)/modules/debugger/osx
+
+DEBUGOBJS = \
+	$(OSDOBJ)/modules/debugger/debugosx.o \
+	$(OSDOBJ)/modules/debugger/osx/debugosxbreakpointsview.o \
+	$(OSDOBJ)/modules/debugger/osx/debugosxconsoleview.o \
+	$(OSDOBJ)/modules/debugger/osx/debugosxdebugcommandhistory.o \
+	$(OSDOBJ)/modules/debugger/osx/debugosxdebugconsole.o \
+	$(OSDOBJ)/modules/debugger/osx/debugosxdebugview.o \
+	$(OSDOBJ)/modules/debugger/osx/debugosxdebugwindowhandler.o \
+	$(OSDOBJ)/modules/debugger/osx/debugosxdisassemblyview.o \
+	$(OSDOBJ)/modules/debugger/osx/debugosxdisassemblyviewer.o \
+	$(OSDOBJ)/modules/debugger/osx/debugosxerrorlogview.o \
+	$(OSDOBJ)/modules/debugger/osx/debugosxerrorlogviewer.o \
+	$(OSDOBJ)/modules/debugger/osx/debugosxmemoryview.o \
+	$(OSDOBJ)/modules/debugger/osx/debugosxmemoryviewer.o \
+	$(OSDOBJ)/modules/debugger/osx/debugosxpointsviewer.o \
+	$(OSDOBJ)/modules/debugger/osx/debugosxregistersview.o \
+	$(OSDOBJ)/modules/debugger/osx/debugosxwatchpointsview.o
+
 endif
 
 SYNC_IMPLEMENTATION = ntc

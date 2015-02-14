@@ -250,8 +250,8 @@ void sdl_monitor_info::refresh()
 	}
 	#elif defined(SDLMAME_OS2)      // OS2 version
 	m_dimensions.x = m_dimensions.y = 0;
-	m_center_width = m_dimensions.w = WinQuerySysValue( HWND_DESKTOP, SV_CXSCREEN );
-	m_center_height = m_dimensions.h = WinQuerySysValue( HWND_DESKTOP, SV_CYSCREEN );
+	m_dimensions.w = WinQuerySysValue( HWND_DESKTOP, SV_CXSCREEN );
+	m_dimensions.h = WinQuerySysValue( HWND_DESKTOP, SV_CYSCREEN );
 	strcpy(m_monitor_device, "OS/2 display");
 	#else
 	#error Unknown SDLMAME_xx OS type!
