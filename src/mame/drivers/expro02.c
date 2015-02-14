@@ -415,7 +415,7 @@ static INPUT_PORTS_START( expro02 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW3")
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
@@ -675,7 +675,7 @@ static ADDRESS_MAP_START( expro02_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("DSW3")
+	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(expro02_6295_bankswitch_w)
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP    /* ??? */
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM
@@ -689,7 +689,7 @@ static ADDRESS_MAP_START( fantasia_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x000000, 0x4fffff) AM_ROM
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("DSW3")
+	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x800006, 0x800007) AM_NOP // ? used ?
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(expro02_6295_bankswitch_w)
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP    /* ??? */
@@ -1807,11 +1807,11 @@ GAME( 1990, galsnewa,  galsnew,  expro02,  galsnewa, expro02_state, expro02, ROT
 GAME( 1990, galsnewj,  galsnew,  expro02,  galsnewj, expro02_state, expro02, ROT90, "Kaneko (Taito license)",  "Gals Panic (Japan, EXPRO-02 PCB)", GAME_NO_COCKTAIL )
 GAME( 1990, galsnewk,  galsnew,  expro02,  galsnewj, expro02_state, expro02, ROT90, "Kaneko (Inter license)",  "Gals Panic (Korea, EXPRO-02 PCB)", GAME_NO_COCKTAIL )
 /* the first version of Fantasia clones the EXPRO02 almost exactly, including the encrypted tiles*/
-GAME( 1994, fantasia,  0,        fantasia,    fantasia, expro02_state, expro02, ROT90, "Comad & New Japan System", "Fantasia (940429 PCB, set 1)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, fantasiab, fantasia, fantasia,    fantasia, expro02_state, expro02, ROT90, "Comad & New Japan System", "Fantasia (940429 PCB, set 2)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, fantasiaa, fantasia, fantasia,    fantasia, expro02_state, expro02, ROT90, "Comad & New Japan System", "Fantasia (940307 PCB)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, fantasia,  0,        comad,    fantasia, expro02_state, expro02, ROT90, "Comad & New Japan System", "Fantasia (940429 PCB, set 1)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, fantasiab, fantasia, comad,    fantasia, expro02_state, expro02, ROT90, "Comad & New Japan System", "Fantasia (940429 PCB, set 2)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, fantasiaa, fantasia, comad,    fantasia, expro02_state, expro02, ROT90, "Comad & New Japan System", "Fantasia (940307 PCB)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 /* subsequent releases remove the encrypted tile (View2 layer) but leave the unused writes to it in the program code */
-GAME( 1994, fantasian,fantasia, fantasia, fantasiaa, driver_device, 0, ROT90, "Comad & New Japan System", "Fantasia (940803 PCB)", GAME_NO_COCKTAIL )
+GAME( 1994, fantasian,fantasia, fantasia,  fantasiaa, driver_device, 0, ROT90, "Comad & New Japan System", "Fantasia (940803 PCB)", GAME_NO_COCKTAIL )
 
 GAME( 1994, supmodel, 0,        supmodel, fantasiaa, driver_device, 0, ROT90, "Comad & New Japan System", "Super Model",GAME_NO_COCKTAIL )
 
