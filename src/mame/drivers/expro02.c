@@ -13,8 +13,13 @@
 	Miss World '96   1996 Comad
 	Ms/Mr World '96  1996 Comad
 	Fantasia II      1997 Comad
-	Gals Hustler     1997 Ace International
+	
+  The following seem similar but could have other changes
 
+	Pocket Gal VIP /
+	Gals Hustler     1997 Ace International
+	Zip & Zap        1995 Barko Corp
+	
  Notes:
   - In gfx data banking function, some strange gfx are shown. Timing issue?
 
@@ -250,6 +255,7 @@ public:
 	READ16_MEMBER(comad_timer_r);
 	READ8_MEMBER(comad_okim6295_r);
 	WRITE16_MEMBER(galpanica_6295_bankswitch_w);
+	WRITE16_MEMBER(clear_bg_w);
 };
 
 
@@ -724,11 +730,22 @@ static ADDRESS_MAP_START( fantsia2_map, AS_PROGRAM, 16, expro02_state )
 ADDRESS_MAP_END
 
 
+WRITE16_MEMBER(expro02_state::clear_bg_w)
+{
+    int i;
+    for(i = 0; i < 8; i++)
+    {
+        m_expro02_bg_rgb555_pixram[offset * 8 + i] = 0x0000;
+    }
+}
+
+
 static ADDRESS_MAP_START( galhustl_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x2fffff) AM_ROM AM_REGION("maincpudata", 0)
 
-	AM_RANGE(0x600800, 0x600fff) AM_RAM // writes only 1?
+    AM_RANGE(0x580000, 0x583fff) AM_RAM_WRITE(clear_bg_w) // I don't think this is correct, it would be associated with the unused VIEW02 tilemap, although this hardware could have implemented things differently as it's an original game, not a GP hack
+
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
