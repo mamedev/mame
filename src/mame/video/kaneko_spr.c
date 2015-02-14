@@ -624,3 +624,42 @@ kaneko_kc002_sprite_device::kaneko_kc002_sprite_device(const machine_config &mco
 	: kaneko16_sprite_device(mconfig, tag, owner, clock, KANEKO_KC002_SPRITE)
 {
 }
+
+// this is a bootleg implementation, used by Gals Hustler and Zip Zap, the latter not really working at all well with the original
+// link features (assuming the bad program roms aren't the cause)  it's clearly derived from this sprite system tho.
+void kaneko16_sprite_device::bootleg_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram16, int spriteram16_bytes)
+{
+//	UINT16 *spriteram16 = m_spriteram;
+	int offs;
+	int sx=0, sy=0;
+
+	for (offs = 0;offs < spriteram16_bytes/2;offs += 4)
+	{
+		int code,color,flipx,flipy;
+
+		code = spriteram16[offs + 1] & 0x1fff;
+		color = (spriteram16[offs] & 0x003c) >> 2;
+		flipx = spriteram16[offs] & 0x0002;
+		flipy = spriteram16[offs] & 0x0001;
+
+		if((spriteram16[offs] & 0x6000) == 0x6000) /* Link bits */
+		{
+			sx += spriteram16[offs + 2] >> 6;
+			sy += spriteram16[offs + 3] >> 6;
+		}
+		else
+		{
+			sx = spriteram16[offs + 2] >> 6;
+			sy = spriteram16[offs + 3] >> 6;
+		}
+
+		sx = (sx&0x1ff) - (sx&0x200);
+		sy = (sy&0x1ff) - (sy&0x200);
+
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+				code,
+				color,
+				flipx,flipy,
+				sx,sy,0);
+	}
+}

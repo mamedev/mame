@@ -47,6 +47,8 @@ public:
 	template<class _BitmapClass>
 	void kaneko16_render_sprites_common(_BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, UINT16* spriteram16, int spriteram16_bytes);
 
+	void bootleg_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram16, int spriteram16_bytes);
+
 
 	DECLARE_READ16_MEMBER(kaneko16_sprites_regs_r);
 	DECLARE_WRITE16_MEMBER(kaneko16_sprites_regs_w);
