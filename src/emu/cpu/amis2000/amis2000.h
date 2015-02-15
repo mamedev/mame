@@ -91,8 +91,7 @@ protected:
 	UINT8 m_bu;                 // 2/3-bit ram index y
 	UINT8 m_acc;                // 4-bit accumulator
 	UINT8 m_e;                  // 4-bit generic register
-	UINT8 m_i;                  // 4-bit i-pins latch
-	UINT8 m_k;                  // 4-bit k-pins latch
+	UINT8 m_ki_mask;            // 4-bit k/i-pins select latch
 	UINT8 m_d;                  // 8-bit d-pins latch
 	bool m_d_active;            // d-pins available for direct i/o(floating), or outputting d-latch
 	UINT8 m_d_polarity;         // invert d-latch output

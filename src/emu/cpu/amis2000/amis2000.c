@@ -156,8 +156,7 @@ void amis2000_device::device_start()
 	m_bu = 0;
 	m_acc = 0;
 	m_e = 0;
-	m_i = 0;
-	m_k = 0;
+	m_ki_mask = 0;
 	m_d = 0;
 	m_d_active = false;
 	m_d_polarity = 0;
@@ -177,8 +176,7 @@ void amis2000_device::device_start()
 	save_item(NAME(m_bu));
 	save_item(NAME(m_acc));
 	save_item(NAME(m_e));
-	save_item(NAME(m_i));
-	save_item(NAME(m_k));
+	save_item(NAME(m_ki_mask));
 	save_item(NAME(m_d));
 	save_item(NAME(m_d_active));
 	save_item(NAME(m_d_polarity));
@@ -214,8 +212,7 @@ void amis2000_device::device_reset()
 	m_d_polarity = 0;
 	m_d = 0; d_latch_out(false);
 	m_a = 0; m_write_a(0, 0, 0xffff);
-	m_i = 0xf;
-	m_k = 0xf;
+	m_ki_mask = 0xf;
 }
 
 

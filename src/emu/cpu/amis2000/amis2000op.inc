@@ -45,8 +45,7 @@ void amis2000_device::op_lai()
 	{
 		UINT8 param = m_op & 0x0f;
 		m_acc = param;
-		m_i = m_read_i(0, 0xff) & param;
-		m_k = m_read_k(0, 0xff) & param;
+		m_ki_mask = param;
 	}
 }
 
@@ -371,14 +370,16 @@ void amis2000_device::op_szm()
 
 void amis2000_device::op_szi()
 {
-	// SZI: skip next on zero I pin(s)
-	m_skip = !m_i;
+	// SZI: skip next on I pin(s)
+	// note: AMI's manual is ambiguous here
+	m_skip = ((m_read_i(0, 0xff) & m_ki_mask) != 0);
 }
 
 void amis2000_device::op_szk()
 {
-	// SZK: skip next on zero K pin(s)
-	m_skip = !m_k;
+	// SZK: skip next on K pin(s)
+	// note: AMI's manual is ambiguous here
+	m_skip = ((m_read_k(0, 0xff) & m_ki_mask) != 0);
 }
 
 void amis2000_device::op_sbe()
