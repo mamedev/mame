@@ -5207,6 +5207,7 @@ ROM_START( peps0615 ) /* Normal board : Chaos Slots (PS0615) - Payout 90.02% */
 	ROM_LOAD( "mxo-cg2246.u75",  0x18000, 0x8000, CRC(f0f4a27d) SHA1(3a10ab196aeaa5b50d47b9d3c5b378cfadd6fe96) )
 
 	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap2246.u50", 0x0000, 0x0100, NO_DUMP )
 	ROM_LOAD( "cap960.u50", 0x0000, 0x0100, CRC(00dd8d0a) SHA1(542763b12aeb0aec2b410f7c075c52907f45d171) ) /* WRONG!! - Should be CAP2246 here */
 ROM_END
 
@@ -9310,7 +9311,7 @@ GAMEL(1996, peps0372, peps0366, peplus, peplus_slots,   peplus_state, peplus,   
 GAMEL(1996, peps0373, peps0366, peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0373) Double Diamond Deluxe Slots",   0, layout_pe_slots )
 GAMEL(1996, peps0426, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0426) Sizzling Sevens Slots",         0, layout_pe_slots )
 GAMEL(1996, peps0581, peps0021, peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0581) Red White & Blue Slots",        0, layout_pe_slots )
-GAMEL(1996, peps0615, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0615) Chaos Slots",                   0, layout_pe_slots )
+GAMEL(1996, peps0615, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0615) Chaos Slots",                   GAME_WRONG_COLORS, layout_pe_slots ) /* CAP2246 not dumped */
 GAMEL(1996, peps0631, peps0021, peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0631) Red White & Blue Slots",        0, layout_pe_slots )
 GAMEL(1996, peps0716, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0716) River Gambler Slots",           0, layout_pe_slots )
 
@@ -9471,4 +9472,4 @@ GAMEL(1995, pexmp030,  0,        peplus,  peplus_poker, peplus_state, peplussbw,
 GAMEL(1997, pex0838s, 0,        peplus,  peplus_slots, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000838S+XS000002) Five Times Pay Slots",        0, layout_pe_slots )
 GAMEL(1997, pex0841s, pex0838s, peplus,  peplus_slots, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000841S+XS000002) Five Times Pay Slots",        0, layout_pe_slots )
 GAMEL(1997, pex0998s, 0,        peplus,  peplus_slots, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000998S+XS000006) Triple Triple Diamond Slots", 0, layout_pe_slots )
-GAMEL(1997, pex1087s, 0,        peplus,  peplus_slots, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X001087S+XS000006) Double Double Diamond Slots", GAME_IMPERFECT_GRAPHICS, layout_pe_slots ) /* CAPX2415 not dumped */
+GAMEL(1997, pex1087s, 0,        peplus,  peplus_slots, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X001087S+XS000006) Double Double Diamond Slots", GAME_WRONG_COLORS, layout_pe_slots ) /* CAPX2415 not dumped */
