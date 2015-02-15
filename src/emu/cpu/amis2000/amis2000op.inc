@@ -371,15 +371,13 @@ void amis2000_device::op_szm()
 void amis2000_device::op_szi()
 {
 	// SZI: skip next on I pin(s)
-	// note: AMI's manual is ambiguous here
-	m_skip = ((m_read_i(0, 0xff) & m_ki_mask) != 0);
+	m_skip = ((~m_read_i(0, 0xff) & m_ki_mask) != 0);
 }
 
 void amis2000_device::op_szk()
 {
 	// SZK: skip next on K pin(s)
-	// note: AMI's manual is ambiguous here
-	m_skip = ((m_read_k(0, 0xff) & m_ki_mask) != 0);
+	m_skip = ((~m_read_k(0, 0xff) & m_ki_mask) != 0);
 }
 
 void amis2000_device::op_sbe()

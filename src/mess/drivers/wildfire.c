@@ -13,7 +13,7 @@
 
 
   TODO:
-  - no sound
+  - bad sound (probably MCU related)
   - when the game strobes a led faster, it should appear brighter, for example when
     the ball hits one of the bumpers
   - some 7segs digits are wrong (mcu on-die decoder is customizable?)
@@ -51,7 +51,6 @@ public:
 	UINT16 m_display_cache[0x10];
 	UINT8 m_display_decay[0x100];
 
-	DECLARE_READ8_MEMBER(read_k);
 	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE16_MEMBER(write_a);
 
@@ -155,20 +154,21 @@ TIMER_DEVICE_CALLBACK_MEMBER(wildfire_state::display_decay_tick)
 
 ***************************************************************************/
 
-READ8_MEMBER(wildfire_state::read_k)
-{
-	// ?
-	return 0;
-}
-
 WRITE8_MEMBER(wildfire_state::write_d)
 {
+	// D0-D7: leds out
 	m_d = data;
 	display_update();
 }
 
 WRITE16_MEMBER(wildfire_state::write_a)
 {
+	// A12: enable speaker out
+	// this is in combination with the (not yet emulated) MCU F-pin
+	m_speaker->level_w(data >> 12 & 1);
+
+	// A0-A2: select 7segleds
+	// A3-A11: select other leds
 	m_a = data;
 	display_update();
 }
@@ -183,10 +183,10 @@ WRITE16_MEMBER(wildfire_state::write_a)
 
 static INPUT_PORTS_START( wildfire )
 	PORT_START("IN1") // I
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Shooter Button")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Left Flipper")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Right Flipper")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Shooter Button")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Flipper")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Flipper")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -222,7 +222,6 @@ static MACHINE_CONFIG_START( wildfire, wildfire_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", AMI_S2150, MASTER_CLOCK)
 	MCFG_AMI_S2000_READ_I_CB(IOPORT("IN1"))
-	MCFG_AMI_S2000_READ_K_CB(READ8(wildfire_state, read_k))
 	MCFG_AMI_S2000_WRITE_D_CB(WRITE8(wildfire_state, write_d))
 	MCFG_AMI_S2000_WRITE_A_CB(WRITE16(wildfire_state, write_a))
 
@@ -253,4 +252,4 @@ ROM_START( wildfire )
 ROM_END
 
 
-CONS( 1979, wildfire, 0, 0, wildfire, wildfire, driver_device, 0, "Parker Brothers", "Wildfire (prototype)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+CONS( 1979, wildfire, 0, 0, wildfire, wildfire, driver_device, 0, "Parker Brothers", "Wildfire (prototype)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

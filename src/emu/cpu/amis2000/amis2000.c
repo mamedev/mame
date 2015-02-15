@@ -11,6 +11,7 @@
 
   TODO:
   - unemulated opcodes (need more testing material)
+  - is K/I input handling correct?
   - support external program map
   - STATUS pin(wildfire.c sound?)
   - add 50/60hz timer
@@ -212,7 +213,6 @@ void amis2000_device::device_reset()
 	m_d_polarity = 0;
 	m_d = 0; d_latch_out(false);
 	m_a = 0; m_write_a(0, 0, 0xffff);
-	m_ki_mask = 0xf;
 }
 
 
