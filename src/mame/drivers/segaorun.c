@@ -2530,4 +2530,4 @@ GAMEL(1989, toutrunj,  toutrun, outrun_fd1094,   toutrun,  segaorun_state,outrun
 GAMEL(1989, toutrun3,  toutrun, outrun_fd1094,   toutrunc, segaorun_state,outrun,  ROT0,   "Sega",    "Turbo Out Run (cockpit, FD1094 317-0107)", 0,                layout_outrun )
 GAMEL(1989, toutrun2,  toutrun, outrun_fd1094,   toutrunct,segaorun_state,outrun,  ROT0,   "Sega",    "Turbo Out Run (cockpit, FD1094 317-0106)", 0,                layout_outrun )
 GAMEL(1989, toutrun1,  toutrun, outrun_fd1094,   toutrunm, segaorun_state,outrun,  ROT0,   "Sega",    "Turbo Out Run (deluxe cockpit, FD1094 317-0109)", 0,         layout_outrun )
-GAMEL(1989, toutrunj1, toutrun, outrun_fd1094,   toutrunct,segaorun_state,outrun,  ROT0,   "Sega",    "Turbo Out Run (Japan, deluxe cockpit, FD1094 317-0101)", 0,  layout_outrun )
+GAMEL(1989, toutrunj1, toutrun, outrun_fd1094,   toutrunct,segaorun_state,outrun,  ROT0,   "Sega",    "Turbo Out Run (Japan, cockpit, FD1094 317-0101)", 0,  layout_outrun )
