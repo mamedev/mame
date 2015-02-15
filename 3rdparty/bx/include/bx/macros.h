@@ -138,7 +138,7 @@
 #	define BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG(_x)
 #endif // BX_COMPILER_CLANG
 
-#if BX_COMPILER_GCC && (__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)
+#if BX_COMPILER_GCC && BX_COMPILER_GCC >= 40600
 #	define BX_PRAGMA_DIAGNOSTIC_PUSH_GCC()        _Pragma("GCC diagnostic push")
 #	define BX_PRAGMA_DIAGNOSTIC_POP_GCC()         _Pragma("GCC diagnostic pop")
 #	define BX_PRAGMA_DIAGNOSTIC_IGNORED_GCC(_x)   _Pragma(BX_STRINGIZE(GCC diagnostic ignored _x) )
@@ -173,9 +173,9 @@
 #endif // BX_COMPILER_
 
 ///
-#if defined(__GNUC__) && defined(__is_pod)
+#if BX_COMPILER_GCC && defined(__is_pod)
 #	define BX_TYPE_IS_POD(t) __is_pod(t)
-#elif defined(_MSC_VER)
+#elif BX_COMPILER_MSVC
 #	define BX_TYPE_IS_POD(t) (!__is_class(t) || __is_pod(t))
 #else
 #	define BX_TYPE_IS_POD(t) false
