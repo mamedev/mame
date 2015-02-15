@@ -320,11 +320,9 @@ TODO:
 
 
 
-WRITE8_MEMBER(welltris_state::welltris_sh_bankswitch_w)
+WRITE8_MEMBER(welltris_state::sound_bankswitch_w)
 {
-	UINT8 *rom = memregion("audiocpu")->base() + 0x10000;
-
-	membank("bank1")->set_base(rom + (data & 0x03) * 0x8000);
+	membank("soundbank")->set_entry(data & 0x03);
 }
 
 
@@ -355,14 +353,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, welltris_state )
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_SHARE("pixelram")    /* Graph_1 & 2*/
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM                             /* work */
 	AM_RANGE(0xffc000, 0xffc3ff) AM_RAM AM_SHARE("spriteram")           /* Sprite */
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(welltris_charvideoram_w) AM_SHARE("charvideoram")     /* Char */
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(charvideoram_w) AM_SHARE("charvideoram")     /* Char */
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    /* Palette */
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1")                 /* Bottom Controls */
-	AM_RANGE(0xfff000, 0xfff001) AM_WRITE(welltris_palette_bank_w)
+	AM_RANGE(0xfff000, 0xfff001) AM_WRITE(palette_bank_w)
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("P2")                 /* Top Controls */
-	AM_RANGE(0xfff002, 0xfff003) AM_WRITE(welltris_gfxbank_w)
+	AM_RANGE(0xfff002, 0xfff003) AM_WRITE(gfxbank_w)
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("P3")                 /* Left Side Ctrls */
-	AM_RANGE(0xfff004, 0xfff007) AM_WRITE(welltris_scrollreg_w)
+	AM_RANGE(0xfff004, 0xfff007) AM_WRITE(scrollreg_w)
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("P4")                 /* Right Side Ctrls */
 	AM_RANGE(0xfff008, 0xfff009) AM_READ_PORT("SYSTEM")             /* Bit 5 Tested at start of irq 1 */
 	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)
@@ -376,12 +374,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, welltris_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("soundbank")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, welltris_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(welltris_sh_bankswitch_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bankswitch_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0x10, 0x10) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x18, 0x18) AM_WRITE(pending_command_clear_w)
@@ -640,7 +638,7 @@ INPUT_PORTS_END
 
 
 
-static const gfx_layout welltris_charlayout =
+static const gfx_layout charlayout =
 {
 	8,8,
 	RGN_FRAC(1,1),
@@ -651,7 +649,7 @@ static const gfx_layout welltris_charlayout =
 	32*8
 };
 
-static const gfx_layout welltris_spritelayout =
+static const gfx_layout spritelayout =
 {
 	16,16,
 	RGN_FRAC(1,2),
@@ -665,8 +663,8 @@ static const gfx_layout welltris_spritelayout =
 };
 
 static GFXDECODE_START( welltris )
-	GFXDECODE_ENTRY( "gfx1", 0, welltris_charlayout,   16* 0, 4*16 )
-	GFXDECODE_ENTRY( "gfx2", 0, welltris_spritelayout, 16*96, 2*16 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   16* 0, 4*16 )
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*96, 2*16 )
 GFXDECODE_END
 
 
@@ -688,11 +686,12 @@ DRIVER_INIT_MEMBER(welltris_state,welltris)
 #endif
 }
 
-DRIVER_INIT_MEMBER(welltris_state,quiz18k)
+void welltris_state::machine_start()
 {
+	membank("soundbank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x8000);
+	
+	save_item(NAME(m_pending_command));
 }
-
-
 
 static MACHINE_CONFIG_START( welltris, welltris_state )
 
@@ -711,7 +710,7 @@ static MACHINE_CONFIG_START( welltris, welltris_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(15, 367-1, 8, 248-1)
-	MCFG_SCREEN_UPDATE_DRIVER(welltris_state, screen_update_welltris)
+	MCFG_SCREEN_UPDATE_DRIVER(welltris_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", welltris)
@@ -755,9 +754,8 @@ ROM_START( welltris )
 	ROM_LOAD16_BYTE( "lh532j10.10", 0x100000, 0x40000, CRC(1187c665) SHA1(c6c55016e46805694348b386e521a3ef1a443621) )
 	ROM_LOAD16_BYTE( "lh532j11.9",  0x100001, 0x40000, CRC(18eda9e5) SHA1(c01d1dc6bfde29797918490947c89440b58d5372) )
 
-	ROM_REGION( 0x30000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 128k for the audio CPU + banks */
 	ROM_LOAD( "3.144", 0x00000, 0x20000, CRC(ae8f763e) SHA1(255419e02189c2e156c1fbcb0cd4aedd14ed8ffa) )
-	ROM_RELOAD(        0x10000, 0x20000 )
 
 	ROM_REGION( 0x0a0000, "gfx1", 0 ) /* CHAR Tiles */
 	ROM_LOAD( "lh534j12.77", 0x000000, 0x80000, CRC(b61a8b74) SHA1(e17f7355375bdc166ef8131f7de9dbda5453f570) )
@@ -782,9 +780,8 @@ ROM_START( welltrisj )
 	ROM_LOAD16_BYTE( "lh532j10.10", 0x100000, 0x40000, CRC(1187c665) SHA1(c6c55016e46805694348b386e521a3ef1a443621) )
 	ROM_LOAD16_BYTE( "lh532j11.9",  0x100001, 0x40000, CRC(18eda9e5) SHA1(c01d1dc6bfde29797918490947c89440b58d5372) )
 
-	ROM_REGION( 0x30000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 128k for the audio CPU + banks */
 	ROM_LOAD( "3.144", 0x00000, 0x20000, CRC(ae8f763e) SHA1(255419e02189c2e156c1fbcb0cd4aedd14ed8ffa) )
-	ROM_RELOAD(        0x10000, 0x20000 )
 
 	ROM_REGION( 0x0a0000, "gfx1", 0 ) /* CHAR Tiles */
 	ROM_LOAD( "lh534j12.77", 0x000000, 0x80000, CRC(b61a8b74) SHA1(e17f7355375bdc166ef8131f7de9dbda5453f570) )
@@ -809,9 +806,8 @@ ROM_START( quiz18k )
 	ROM_LOAD16_BYTE( "ic10.bin", 0x100000, 0x40000, CRC(501453a3) SHA1(d127f417f1c52333e478ac397fbe8a2f223b1ce7) )
 	ROM_LOAD16_BYTE( "ic9.bin",  0x100001, 0x40000, CRC(99b6840f) SHA1(8409a33c64729066bfed6e49dcd84f30906274cb) )
 
-	ROM_REGION( 0x30000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 128k for the audio CPU + banks */
 	ROM_LOAD( "3-ic144.bin", 0x00000, 0x20000, CRC(72d372e3) SHA1(d077e34947de1050b68d76506cc8926b06a94a76) )
-	ROM_RELOAD(              0x10000, 0x20000 )
 
 	ROM_REGION( 0x180000, "gfx1", 0 ) /* CHAR Tiles */
 	ROM_LOAD( "ic77.bin", 0x000000, 0x80000, CRC(af3b6fd1) SHA1(d22f7cf62a94ae3a2dcb0236630e9ac88d5e528b) )
@@ -832,6 +828,6 @@ ROM_END
 
 
 
-GAME( 1991, welltris, 0,        welltris, welltris, welltris_state, welltris, ROT0,   "Video System Co.", "Welltris (World?, 2 players)", GAME_NO_COCKTAIL )
-GAME( 1991, welltrisj,welltris, welltris, welltris, welltris_state, welltris, ROT0,   "Video System Co.", "Welltris (Japan, 2 players)", GAME_NO_COCKTAIL )
-GAME( 1992, quiz18k,  0,        quiz18k,  quiz18k, welltris_state,  quiz18k,  ROT0,   "EIM", "Miyasu Nonki no Quiz 18-Kin", GAME_NO_COCKTAIL )
+GAME( 1991, welltris, 0,        welltris, welltris, welltris_state, welltris, ROT0,   "Video System Co.", "Welltris (World?, 2 players)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1991, welltrisj,welltris, welltris, welltris, welltris_state, welltris, ROT0,   "Video System Co.", "Welltris (Japan, 2 players)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1992, quiz18k,  0,        quiz18k,  quiz18k,  driver_device,  0,        ROT0,   "EIM", "Miyasu Nonki no Quiz 18-Kin", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
