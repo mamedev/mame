@@ -14,7 +14,8 @@
 
   TODO:
   - no sound
-  - flipper buttons aren't working correctly
+  - when the game strobes a led faster, it should appear brighter, for example when
+    the ball hits one of the bumpers
   - some 7segs digits are wrong (mcu on-die decoder is customizable?)
   - MCU clock is unknown
 
@@ -83,6 +84,7 @@ inline bool wildfire_state::index_is_7segled(int index)
 
 // lamp translation table: Lzz from patent US4334679 FIG.4 = MESS lampxxy,
 // where xx is led column and y is led row, eg. lamp103 is output A10 D3
+// (note: 2 mistakes in the patent: the L19 between L12 and L14 should be L13, and L84 should of course be L48)
 /*
     L0  = -         L10 = lamp60    L20 = lamp41    L30 = lamp53    L40 = lamp57    L50 = lamp110  
     L1  = lamp107   L11 = lamp50    L21 = lamp42    L31 = lamp43    L41 = lamp66    L51 = lamp111  
@@ -156,7 +158,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(wildfire_state::display_decay_tick)
 READ8_MEMBER(wildfire_state::read_k)
 {
 	// ?
-	return 0xf;
+	return 0;
 }
 
 WRITE8_MEMBER(wildfire_state::write_d)
@@ -181,10 +183,10 @@ WRITE16_MEMBER(wildfire_state::write_a)
 
 static INPUT_PORTS_START( wildfire )
 	PORT_START("IN1") // I
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Shooter Button")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Flipper")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Flipper")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Shooter Button")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Left Flipper")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Right Flipper")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -251,4 +253,4 @@ ROM_START( wildfire )
 ROM_END
 
 
-CONS( 1979, wildfire, 0, 0, wildfire, wildfire, driver_device, 0, "Parker Brothers", "Wildfire (prototype)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+CONS( 1979, wildfire, 0, 0, wildfire, wildfire, driver_device, 0, "Parker Brothers", "Wildfire (prototype)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
