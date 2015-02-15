@@ -16,6 +16,10 @@
 
   NOTE!: MESS external artwork is required to be able to play
 
+
+  TODO:
+  - display should go off when sound is played, needs decay simulation?
+
 ***************************************************************************/
 
 #include "emu.h"
