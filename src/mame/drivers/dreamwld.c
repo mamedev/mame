@@ -751,13 +751,13 @@ PCB Layout
 ----------
 
 |-------------------------------------------------|
-|           ROM1   62256   ACTEL            ROM2  |
+|        1SEMICOM  62256   ACTEL        8SEMICOM  |
 |VOL        M6295  62256   A1020B                 |
 |    PAL  PAL              32MHz                  |
-| 62256  62256                PAL                 |
-| ROM3 ROM4         68EC020   PAL    PAL          |
-| ROM5 ROM6                   PAL    PAL          |
-|J 62256 62256                PAL                 |
+|    62256  62256             PAL                 |
+| 2SEMICOM 4SEMICOM 68EC020   PAL    PAL          |
+| 3SEMICOM 5SEMICOM           PAL    PAL          |
+|J   62256  62256             PAL                 |
 |A                            PAL    27MHz        |
 |M                                 PAL            |
 |M                         ACTEL    M5M44260      |
@@ -766,9 +766,9 @@ PCB Layout
 |                          PAL                    |
 |              6264        PAL                    |
 | DSW1         6264                               |
-| DSW2  P87C52              ROM7                  |
-|                    ROM8   ROM9    27C160*       |
-|3* 4*               ROM10  ROM11   27C160*       |
+| DSW2  P87C52                9SEMICOM            |
+|                 6SEMICOM   10SEMICOM   27C160*  |
+|3* 4*            7SEMICOM   11SEMICOM   27C160*  |
 |-------------------------------------------------|
 
 The PCB used for Baryon is an earlier version with a single OKI sound chip
@@ -778,7 +778,38 @@ The PCB used for Baryon is an earlier version with a single OKI sound chip
 
 */
 
-ROM_START( baryon ) // replacment labels? no SemiCom logo
+ROM_START( baryon ) // this set had original SemiCom labels
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD32_BYTE( "4_semicom", 0x000000, 0x040000, CRC(6c1cdad0) SHA1(40c437507076ce52ec2240049d6b4bef180b104a) ) //  eprom type 27C020
+	ROM_LOAD32_BYTE( "5_semicom", 0x000001, 0x040000, CRC(15917c9d) SHA1(6444be93e6a997070820e3c5a2e2e703e22883d9) )
+	ROM_LOAD32_BYTE( "2_semicom", 0x000002, 0x040000, CRC(42b14a6c) SHA1(37e772a673732ef16767c14ad77a4faaa06d675a) )
+	ROM_LOAD32_BYTE( "3_semicom", 0x000003, 0x040000, CRC(0ae6d86e) SHA1(410ad161688ec8516fe5ac7160a4a228dbb01936) )
+
+	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
+
+	ROM_REGION( 0x6bd, "user1", 0 ) /* Protection data - from baryona set, assumed to be the same */
+	ROM_LOAD( "protdata.bin", 0x000, 0x6bd, CRC(117f32a8) SHA1(837bea09d3e59ab9e13bd1103b1fc988edb361c0) ) /* extracted */
+
+	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples */
+	ROM_LOAD( "1_semicom", 0x000000, 0x80000, CRC(e0349074) SHA1(f3d53d96dff586a0ad1632f52e5559cdce5ed0d8) ) //  eprom type 27C040
+
+	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprite Tiles - decoded */
+	ROM_LOAD16_WORD_SWAP( "10_semicom", 0x000000, 0x200000, CRC(28bf828f) SHA1(271390cc4f4015a3b69976f0d0527947f13c971b) ) //  eprom type 27C160
+	ROM_LOAD16_WORD_SWAP( "11_semicom", 0x200000, 0x200000, CRC(d0ff1bc6) SHA1(4aeb795222eedeeba770cf725122e989f97119b2) ) //  eprom type 27C160
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* BG Tiles - decoded */
+	ROM_LOAD16_WORD_SWAP( "8_semicom",0x000000, 0x200000, CRC(684012e6) SHA1(4cb60907184b67be130b8385e4336320c0f6e4a7) ) //  eprom type 27C160
+
+	ROM_REGION( 0x040000, "spritelut", 0 ) /* Sprite Code Lookup ... */
+	ROM_LOAD16_BYTE( "6_semicom", 0x000000, 0x020000, CRC(fdbb08b0) SHA1(4b3ac56c4c8370b1434fb6a481fce0d9c52313e0) ) //  eprom type 27C010
+	ROM_LOAD16_BYTE( "7_semicom", 0x000001, 0x020000, CRC(c9d20480) SHA1(3f6170e8e08fb7508bd13c23f243ec6888a91f5e) ) //  eprom type 27C010
+
+	ROM_REGION( 0x10000, "unknown", 0 )
+	ROM_LOAD( "9_semicom", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) ) //  eprom type 27C512
+ROM_END
+
+ROM_START( baryona ) // replacment labels? no SemiCom logo
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD32_BYTE( "4.bin", 0x000000, 0x040000, CRC(59e0df20) SHA1(ff12f4adcf731f6984db7d0fbdd7fcc71ce66aa4) )
 	ROM_LOAD32_BYTE( "6.bin", 0x000001, 0x040000, CRC(abccbb3d) SHA1(01524f094543d872d775306024f51258a11e9240) )
@@ -807,37 +838,6 @@ ROM_START( baryon ) // replacment labels? no SemiCom logo
 
 	ROM_REGION( 0x10000, "unknown", 0 )
 	ROM_LOAD( "7.bin", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
-ROM_END
-
-ROM_START( baryona ) // this set had original SemiCom labels
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD32_BYTE( "rom_4_27c020.bin", 0x000000, 0x040000, CRC(6c1cdad0) SHA1(40c437507076ce52ec2240049d6b4bef180b104a) )
-	ROM_LOAD32_BYTE( "rom_5_27c020.bin", 0x000001, 0x040000, CRC(15917c9d) SHA1(6444be93e6a997070820e3c5a2e2e703e22883d9) )
-	ROM_LOAD32_BYTE( "rom_2_27c020.bin", 0x000002, 0x040000, CRC(42b14a6c) SHA1(37e772a673732ef16767c14ad77a4faaa06d675a) )
-	ROM_LOAD32_BYTE( "rom_3_27c020.bin", 0x000003, 0x040000, CRC(0ae6d86e) SHA1(410ad161688ec8516fe5ac7160a4a228dbb01936) )
-
-	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
-
-	ROM_REGION( 0x6bd, "user1", 0 ) /* Protection data - from baryon set, assumed to be the same */
-	ROM_LOAD( "protdata.bin", 0x000, 0x6bd, CRC(117f32a8) SHA1(837bea09d3e59ab9e13bd1103b1fc988edb361c0) ) /* extracted */
-
-	ROM_REGION( 0x80000, "oki1", 0 ) /* OKI Samples */
-	ROM_LOAD( "rom_1_27c040.bin", 0x000000, 0x80000, CRC(e0349074) SHA1(f3d53d96dff586a0ad1632f52e5559cdce5ed0d8) )
-
-	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprite Tiles - decoded */
-	ROM_LOAD16_WORD_SWAP( "rom_10_27c160.bin", 0x000000, 0x200000, CRC(28bf828f) SHA1(271390cc4f4015a3b69976f0d0527947f13c971b) )
-	ROM_LOAD16_WORD_SWAP( "rom_11_27c160.bom", 0x200000, 0x200000, CRC(d0ff1bc6) SHA1(4aeb795222eedeeba770cf725122e989f97119b2) )
-
-	ROM_REGION( 0x200000, "gfx2", 0 ) /* BG Tiles - decoded */
-	ROM_LOAD16_WORD_SWAP( "rom_8_27c160.bin",0x000000, 0x200000, CRC(684012e6) SHA1(4cb60907184b67be130b8385e4336320c0f6e4a7) )
-
-	ROM_REGION( 0x040000, "spritelut", 0 ) /* Sprite Code Lookup ... */
-	ROM_LOAD16_BYTE( "rom6", 0x000000, 0x020000, CRC(fdbb08b0) SHA1(4b3ac56c4c8370b1434fb6a481fce0d9c52313e0) )
-	ROM_LOAD16_BYTE( "rom7", 0x000001, 0x020000, CRC(c9d20480) SHA1(3f6170e8e08fb7508bd13c23f243ec6888a91f5e) )
-
-	ROM_REGION( 0x10000, "unknown", 0 )
-	ROM_LOAD( "rom_9_27c512.bin", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
 ROM_END
 
 /*
