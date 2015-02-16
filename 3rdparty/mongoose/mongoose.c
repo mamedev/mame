@@ -48,7 +48,7 @@
 #define _INTEGRAL_MAX_BITS 64   // Enable _stati64() on Windows
 #define _CRT_SECURE_NO_WARNINGS // Disable deprecation warning in VS2005+
 #undef WIN32_LEAN_AND_MEAN      // Let windows.h always include winsock2.h
-#ifdef __Linux__
+#if defined(__Linux__) || defined(_WIN32)
 #define _XOPEN_SOURCE 600       // For flockfile() on Linux
 #endif
 #define __STDC_FORMAT_MACROS    // <inttypes.h> wants this for C++
@@ -346,6 +346,11 @@ size_t iobuf_append(struct iobuf *io, const void *buf, size_t len) {
 
   assert(io != NULL);
   assert(io->len <= io->size);
+
+  /* check overflow */
+  if (len > ~(size_t)0 - (size_t)(io->buf + io->len)) {
+    return 0;
+  }
 
   if (len <= 0) {
   } else if (io->len + len <= io->size) {
@@ -2893,7 +2898,7 @@ static void send_websocket_handshake(struct mg_connection *conn,
 static int deliver_websocket_frame(struct connection *conn) {
   // Having buf unsigned char * is important, as it is used below in arithmetic
   unsigned char *buf = (unsigned char *) conn->ns_conn->recv_iobuf.buf;
-  int i, len, buf_len = conn->ns_conn->recv_iobuf.len, frame_len = 0,
+  size_t i, len, buf_len = conn->ns_conn->recv_iobuf.len, frame_len = 0,
       mask_len = 0, header_len = 0, data_len = 0, buffered = 0;
 
   if (buf_len >= 2) {
@@ -2904,10 +2909,10 @@ static int deliver_websocket_frame(struct connection *conn) {
       header_len = 2 + mask_len;
     } else if (len == 126 && buf_len >= 4 + mask_len) {
       header_len = 4 + mask_len;
-      data_len = ((((int) buf[2]) << 8) + buf[3]);
+      data_len = ((((size_t) buf[2]) << 8) + buf[3]);
     } else if (buf_len >= 10 + mask_len) {
       header_len = 10 + mask_len;
-      data_len = (int) (((uint64_t) htonl(* (uint32_t *) &buf[2])) << 32) +
+      data_len = (size_t) (((uint64_t) htonl(* (uint32_t *) &buf[2])) << 32) +
         htonl(* (uint32_t *) &buf[6]);
     }
   }
@@ -2938,9 +2943,14 @@ static int deliver_websocket_frame(struct connection *conn) {
 }
 
 size_t mg_websocket_write(struct mg_connection *conn, int opcode,
-                       const char *data, size_t data_len) {
+                          const char *data, size_t data_len) {
     unsigned char mem[4192], *copy = mem;
     size_t copy_len = 0;
+
+    /* Check overflow */
+    if (data_len > ~(size_t)0 - (size_t)10) {
+      return 0;
+    }
 
     if (data_len + 10 > sizeof(mem) &&
         (copy = (unsigned char *) NS_MALLOC(data_len + 10)) == NULL) {
