@@ -10,7 +10,7 @@ class ngen_keyboard_device : public serial_keyboard_device
 public:
 	ngen_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ioport_constructor device_input_ports() const;
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) {/* printf("TX: %i\n",state);*/ device_serial_interface::rx_w(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) { device_serial_interface::rx_w(state); }
 
 protected:
 	virtual void device_start();
@@ -23,6 +23,7 @@ private:
 	void write(UINT8 data);
 
 	bool m_keys_down;
+	bool m_last_reset;
 };
 
 extern const device_type NGEN_KEYBOARD;

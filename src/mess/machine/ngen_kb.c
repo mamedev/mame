@@ -17,6 +17,12 @@ void ngen_keyboard_device::write(UINT8 data)
 	// When setting an error code via the LEDs, 0xB0 then 0xAE is sent (presumably for error code 0xE0),
 	// so that means that 0xAx controls the Overtype, Lock, F1 and F2 LEDs, and 0xBx controls the F3, F8, F9 and F10 LEDs.
 	logerror("KB: received character %02x\n",data);
+	switch(data)
+	{
+		case 0x92:  // reset(?)
+			m_last_reset = true;
+			break;
+	}
 }
 
 UINT8 ngen_keyboard_device::row_number(UINT8 code)
@@ -37,7 +43,7 @@ UINT8 ngen_keyboard_device::keyboard_handler(UINT8 last_code, UINT8 *scan_line)
 	int i;
 	UINT8 code = 0;
 	UINT8 key_code = 0;
-	UINT8 retVal = 0;
+	UINT8 retVal = 0x00;
 	UINT8 shift = BIT(m_io_kbdc->read(), 1);
 	UINT8 caps  = BIT(m_io_kbdc->read(), 2);
 	UINT8 ctrl  = BIT(m_io_kbdc->read(), 0);
@@ -153,6 +159,7 @@ UINT8 ngen_keyboard_device::keyboard_handler(UINT8 last_code, UINT8 *scan_line)
 				if (shift) key_code+=0x20;
 			}
 			m_keys_down = true;
+			m_last_reset = false;
 			retVal = key_code;
 		}
 		else
@@ -167,7 +174,6 @@ UINT8 ngen_keyboard_device::keyboard_handler(UINT8 last_code, UINT8 *scan_line)
 			}
 		}
 	}
-	// TODO: add scan code 0xc0 (all keys up)
 	return retVal;
 }
 
@@ -211,6 +217,7 @@ void ngen_keyboard_device::device_reset()
 {
 	serial_keyboard_device::device_reset();
 	m_keys_down = false;
+	m_last_reset = true;
 }
 
 void ngen_keyboard_device::rcv_complete()
