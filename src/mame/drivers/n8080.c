@@ -3,7 +3,7 @@
   Nintendo 8080 hardware
 
     - Space Fever
-    - Space Fever High highspltter (aka SF-Hihighspltter)
+    - Space Fever High Splitter (aka SF-Hisplitter)
     - Space Launcher
     - Sheriff / Bandido / Western Gun 2
     - Helifire
