@@ -135,50 +135,47 @@
 	[window makeFirstResponder:commandField];
 
 	// calculate the optimal size for everything
-	{
-		NSRect	available = [[NSScreen mainScreen] visibleFrame];
-		NSRect	windowFrame = [window frame];
-		NSSize	regCurrent = [regScroll frame].size;
-		NSSize	regSize = [NSScrollView frameSizeForContentSize:[regView maximumFrameSize]
-										 hasHorizontalScroller:YES
-										   hasVerticalScroller:YES
-													borderType:[regScroll borderType]];
-		NSSize	dasmCurrent = [dasmScroll frame].size;
-		NSSize	dasmSize = [NSScrollView frameSizeForContentSize:[dasmView maximumFrameSize]
+	NSRect	available = [[NSScreen mainScreen] visibleFrame];
+	NSRect	windowFrame = [window frame];
+	NSSize	regCurrent = [regScroll frame].size;
+	NSSize	regSize = [NSScrollView frameSizeForContentSize:[regView maximumFrameSize]
+									  hasHorizontalScroller:YES
+										hasVerticalScroller:YES
+												 borderType:[regScroll borderType]];
+	NSSize	dasmCurrent = [dasmScroll frame].size;
+	NSSize	dasmSize = [NSScrollView frameSizeForContentSize:[dasmView maximumFrameSize]
+									  hasHorizontalScroller:YES
+										hasVerticalScroller:YES
+												 borderType:[dasmScroll borderType]];
+	NSSize	consoleCurrent = [consoleContainer frame].size;
+	NSSize	consoleSize = [NSScrollView frameSizeForContentSize:[consoleView maximumFrameSize]
 										  hasHorizontalScroller:YES
 											hasVerticalScroller:YES
-													 borderType:[dasmScroll borderType]];
-		NSSize	consoleCurrent = [consoleContainer frame].size;
-		NSSize	consoleSize = [NSScrollView frameSizeForContentSize:[consoleView maximumFrameSize]
-											 hasHorizontalScroller:YES
-											   hasVerticalScroller:YES
-														borderType:[consoleScroll borderType]];
-		NSSize	adjustment;
-		NSRect	lhsFrame, rhsFrame;
+													 borderType:[consoleScroll borderType]];
+	NSSize	adjustment;
 
-		consoleSize.width += consoleCurrent.width - [consoleScroll frame].size.width;
-		consoleSize.height += consoleCurrent.height - [consoleScroll frame].size.height;
-		adjustment.width = regSize.width - regCurrent.width;
-		adjustment.height = regSize.height - regCurrent.height;
-		adjustment.width += MAX(dasmSize.width - dasmCurrent.width, consoleSize.width - consoleCurrent.width);
+	consoleSize.width += consoleCurrent.width - [consoleScroll frame].size.width;
+	consoleSize.height += consoleCurrent.height - [consoleScroll frame].size.height;
+	adjustment.width = regSize.width - regCurrent.width;
+	adjustment.height = regSize.height - regCurrent.height;
+	adjustment.width += MAX(dasmSize.width - dasmCurrent.width, consoleSize.width - consoleCurrent.width);
 
-		windowFrame.size.width += adjustment.width;
-		windowFrame.size.height += adjustment.height; // not used - better to go for fixed height
-		windowFrame.size.height = MIN(512.0, available.size.height);
-		windowFrame.size.width = MIN(windowFrame.size.width, available.size.width);
-		windowFrame.origin.x = available.origin.x + available.size.width - windowFrame.size.width;
-		windowFrame.origin.y = available.origin.y;
-		[window setFrame:windowFrame display:YES];
+	windowFrame.size.width += adjustment.width;
+	windowFrame.size.height += adjustment.height; // not used - better to go for fixed height
+	windowFrame.size.height = MIN(512.0, available.size.height);
+	windowFrame.size.width = MIN(windowFrame.size.width, available.size.width);
+	windowFrame.origin.x = available.origin.x + available.size.width - windowFrame.size.width;
+	windowFrame.origin.y = available.origin.y;
+	[window setFrame:windowFrame display:YES];
 
-		lhsFrame = [regScroll frame];
-		rhsFrame = [dasmSplit frame];
-		adjustment.width = MIN(regSize.width, ([regSplit frame].size.width - [regSplit dividerThickness]) / 2);
-		rhsFrame.origin.x -= lhsFrame.size.width - adjustment.width;
-		rhsFrame.size.width += lhsFrame.size.width - adjustment.width;
-		lhsFrame.size.width = adjustment.width;
-		[regScroll setFrame:lhsFrame];
-		[dasmSplit setFrame:rhsFrame];
-	}
+	NSRect lhsFrame = [regScroll frame];
+	NSRect rhsFrame = [dasmSplit frame];
+	adjustment.width = MIN(regSize.width, ([regSplit frame].size.width - [regSplit dividerThickness]) / 2);
+	rhsFrame.origin.x -= lhsFrame.size.width - adjustment.width;
+	rhsFrame.size.width += lhsFrame.size.width - adjustment.width;
+	lhsFrame.size.width = adjustment.width;
+	[regScroll setFrame:lhsFrame];
+	[dasmSplit setFrame:rhsFrame];
 
 	// select the current processor
 	[self setCPU:machine->firstcpu];
@@ -206,8 +203,8 @@
 
 
 - (void)setCPU:(device_t *)device {
-	[regView selectSubviewForCPU:device];
-	[dasmView selectSubviewForCPU:device];
+	[regView selectSubviewForDevice:device];
+	[dasmView selectSubviewForDevice:device];
 	[window setTitle:[NSString stringWithFormat:@"Debug: %s - %s '%s'",
 												device->machine().system().name,
 												device->name(),
@@ -261,9 +258,44 @@
 }
 
 
+- (void)debugNewMemoryWindowForSpace:(address_space *)space device:(device_t *)device expression:(NSString *)expression {
+	MAMEMemoryViewer *win = [[MAMEMemoryViewer alloc] initWithMachine:*machine console:self];
+	[auxiliaryWindows addObject:win];
+	[win release];
+	if ([win selectSubviewForSpace:space])
+	{
+		if (expression != nil)
+			[win setExpression:expression];
+	}
+	else
+	{
+		[win selectSubviewForDevice:device];
+	}
+	[win activate];
+}
+
+
+- (void)debugNewDisassemblyWindowForSpace:(address_space *)space device:(device_t *)device expression:(NSString *)expression {
+	MAMEDisassemblyViewer *win = [[MAMEDisassemblyViewer alloc] initWithMachine:*machine console:self];
+	[auxiliaryWindows addObject:win];
+	[win release];
+	if ([win selectSubviewForSpace:space])
+	{
+		if (expression != nil)
+			[win setExpression:expression];
+	}
+	else
+	{
+		[win selectSubviewForDevice:device];
+	}
+	[win activate];
+}
+
+
 - (void)showDebugger:(NSNotification *)notification {
 	device_t *device = (device_t * )[[[notification userInfo] objectForKey:@"MAMEDebugDevice"] pointerValue];
-	if (&device->machine() == machine) {
+	if (&device->machine() == machine)
+	{
 		[self setCPU:device];
 		[window makeKeyAndOrderFront:self];
 	}
@@ -312,10 +344,16 @@
 
 
 - (void)windowWillClose:(NSNotification *)notification {
-	if ([notification object] != window)
-		return;
-	[[NSNotificationCenter defaultCenter] postNotificationName:MAMEHideDebuggerNotification object:self];
-	debug_cpu_get_visible_cpu(*machine)->debug()->go();
+	if ([notification object] == window)
+	{
+		NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithPointer:machine],
+																		@"MAMEDebugMachine",
+																		nil];
+		[[NSNotificationCenter defaultCenter] postNotificationName:MAMEHideDebuggerNotification
+															object:self
+														  userInfo:info];
+		debug_cpu_get_visible_cpu(*machine)->debug()->go();
+	}
 }
 
 

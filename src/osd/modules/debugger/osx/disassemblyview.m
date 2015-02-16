@@ -11,10 +11,10 @@
 
 #import "disassemblyview.h"
 
+#include "debugger.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 #include "debug/debugvw.h"
-#include "debug/dvdisasm.h"
 
 
 @implementation MAMEDisassemblyView
@@ -199,13 +199,43 @@
 }
 
 
-- (void)selectSubviewForCPU:(device_t *)device {
-	const debug_view_source     *selected = view->source();
-	const debug_view_source     *source = view->source_for_device(device);
-	if ( selected != source ) {
-		view->set_source(*source);
-		if ([[self window] firstResponder] != self)
-			view->set_cursor_visible(false);
+- (BOOL)selectSubviewForDevice:(device_t *)device {
+	debug_view_source const *const source = view->source_for_device(device);
+	if (source != NULL)
+	{
+		if (view->source() != source)
+		{
+			view->set_source(*source);
+			if ([[self window] firstResponder] != self)
+				view->set_cursor_visible(false);
+		}
+		return YES;
+	}
+	else
+	{
+		return NO;
+	}
+}
+
+
+- (BOOL)selectSubviewForSpace:(address_space *)space {
+	if (space == NULL) return NO;
+	debug_view_disasm_source const *source = downcast<debug_view_disasm_source const *>(view->first_source());
+	while ((source != NULL) && (&source->space() != space))
+		source = downcast<debug_view_disasm_source *>(source->next());
+	if (source != NULL)
+	{
+		if (view->source() != source)
+		{
+			view->set_source(*source);
+			if ([[self window] firstResponder] != self)
+				view->set_cursor_visible(false);
+		}
+		return YES;
+	}
+	else
+	{
+		return NO;
 	}
 }
 
@@ -220,50 +250,82 @@
 }
 
 
+- (debug_view_disasm_source const *)source {
+	return downcast<debug_view_disasm_source const *>(view->source());
+}
+
+
 - (IBAction)debugToggleBreakpoint:(id)sender {
-	if (view->cursor_visible()) {
+	if (view->cursor_visible())
+	{
 		address_space &space = downcast<const debug_view_disasm_source *>(view->source())->space();
-		if (!useConsole || (debug_cpu_get_visible_cpu(*machine) == &space.device())) {
-			offs_t				address = downcast<debug_view_disasm *>(view)->selected_address();
+		if (!useConsole || (debug_cpu_get_visible_cpu(*machine) == &space.device()))
+		{
+			offs_t const address = downcast<debug_view_disasm *>(view)->selected_address();
 			device_debug::breakpoint *bp = [self findBreakpointAtAddress:address inAddressSpace:space];
 
 			// if it doesn't exist, add a new one
-			if (useConsole) {
+			if (useConsole)
+			{
 				NSString *command;
 				if (bp == NULL)
 					command = [NSString stringWithFormat:@"bpset %lX", (unsigned long)address];
 				else
 					command = [NSString stringWithFormat:@"bpclear %X", (unsigned)bp->index()];
 				debug_console_execute_command(*machine, [command UTF8String], 1);
-			} else {
-				if (bp == NULL)
-					space.device().debug()->breakpoint_set(address, NULL, NULL);
-				else
-					space.device().debug()->breakpoint_clear(bp->index());
 			}
+			else
+			{
+				if (bp == NULL)
+				{
+					UINT32 const bpnum = space.device().debug()->breakpoint_set(address, NULL, NULL);
+					debug_console_printf(*machine, "Breakpoint %X set\n", bpnum);
+				}
+				else
+				{
+					int const bpnum = bp->index();
+					space.device().debug()->breakpoint_clear(bpnum);
+					debug_console_printf(*machine, "Breakpoint %X cleared\n", (UINT32)bpnum);
+				}
+			}
+
+			// fail to do this and the display doesn't update
+			machine->debug_view().update_all();
+			debugger_refresh_display(*machine);
 		}
 	}
 }
 
 
 - (IBAction)debugToggleBreakpointEnable:(id)sender {
-	if (view->cursor_visible()) {
+	if (view->cursor_visible())
+	{
 		address_space &space = downcast<const debug_view_disasm_source *>(view->source())->space();
-		if (!useConsole || (debug_cpu_get_visible_cpu(*machine) == &space.device())) {
-			offs_t				address = downcast<debug_view_disasm *>(view)->selected_address();
+		if (!useConsole || (debug_cpu_get_visible_cpu(*machine) == &space.device()))
+		{
+			offs_t const address = downcast<debug_view_disasm *>(view)->selected_address();
 			device_debug::breakpoint *bp = [self findBreakpointAtAddress:address inAddressSpace:space];
-
-			if (bp != NULL) {
-				NSString *command;
-				if (useConsole) {
+			if (bp != NULL)
+			{
+				if (useConsole)
+				{
+					NSString *command;
 					if (bp->enabled())
 						command = [NSString stringWithFormat:@"bpdisable %X", (unsigned)bp->index()];
 					else
 						command = [NSString stringWithFormat:@"bpenable %X", (unsigned)bp->index()];
 					debug_console_execute_command(*machine, [command UTF8String], 1);
-				} else {
-					space.device().debug()->breakpoint_enable(bp->index(), !bp->enabled());
 				}
+				else
+				{
+					space.device().debug()->breakpoint_enable(bp->index(), !bp->enabled());
+					debug_console_printf(*machine,
+										 "Breakpoint %X %s\n",
+										 (UINT32)bp->index(),
+										 bp->enabled() ? "enabled" : "disabled");
+				}
+				machine->debug_view().update_all();
+				debugger_refresh_display(*machine);
 			}
 		}
 	}

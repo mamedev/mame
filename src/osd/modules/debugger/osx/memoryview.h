@@ -14,6 +14,7 @@
 #import "debugview.h"
 
 #include "emu.h"
+#include "debug/dvmemory.h"
 
 #import <Cocoa/Cocoa.h>
 
@@ -29,10 +30,13 @@
 - (NSString *)selectedSubviewName;
 - (int)selectedSubviewIndex;
 - (void)selectSubviewAtIndex:(int)index;
-- (void)selectSubviewForCPU:(device_t *)device;
+- (BOOL)selectSubviewForDevice:(device_t *)device;
+- (BOOL)selectSubviewForSpace:(address_space *)space;
 
 - (NSString *)expression;
 - (void)setExpression:(NSString *)exp;
+
+- (debug_view_memory_source const *)source;
 
 - (IBAction)showChunkSize:(id)sender;
 - (IBAction)showPhysicalAddresses:(id)sender;

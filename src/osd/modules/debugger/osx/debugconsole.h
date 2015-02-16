@@ -42,6 +42,9 @@
 - (IBAction)debugNewErrorLogWindow:(id)sender;
 - (IBAction)debugNewPointsWindow:(id)sender;
 
+- (void)debugNewMemoryWindowForSpace:(address_space *)space device:(device_t *)device expression:(NSString *)expression;
+- (void)debugNewDisassemblyWindowForSpace:(address_space *)space device:(device_t *)device expression:(NSString *)expression;
+
 - (void)showDebugger:(NSNotification *)notification;
 - (void)auxiliaryWindowWillClose:(NSNotification *)notification;
 

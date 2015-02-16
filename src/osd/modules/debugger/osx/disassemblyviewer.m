@@ -11,6 +11,7 @@
 
 #import "disassemblyviewer.h"
 
+#import "debugconsole.h"
 #import "debugview.h"
 #import "disassemblyview.h"
 
@@ -22,7 +23,7 @@
 - (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c {
 	NSScrollView	*dasmScroll;
 	NSView			*expressionContainer;
-	NSPopUpButton	*actionButton, *subviewButton;
+	NSPopUpButton	*actionButton;
 	NSRect			contentBounds, expressionFrame;
 
 	if (!(self = [super initWithMachine:m title:@"Disassembly" console:c]))
@@ -98,7 +99,7 @@
 	[actionButton release];
 
 	// set default state
-	[dasmView selectSubviewForCPU:debug_cpu_get_visible_cpu(*machine)];
+	[dasmView selectSubviewForDevice:debug_cpu_get_visible_cpu(*machine)];
 	[dasmView setExpression:@"curpc"];
 	[expressionField setStringValue:@"curpc"];
 	[expressionField selectText:self];
@@ -127,6 +128,38 @@
 
 - (id <MAMEDebugViewExpressionSupport>)documentView {
 	return dasmView;
+}
+
+
+- (IBAction)debugNewMemoryWindow:(id)sender {
+	debug_view_disasm_source const *source = [dasmView source];
+	[console debugNewMemoryWindowForSpace:&source->space()
+								   device:&source->device()
+							   expression:nil];
+}
+
+
+- (IBAction)debugNewDisassemblyWindow:(id)sender {
+	debug_view_disasm_source const *source = [dasmView source];
+	[console debugNewDisassemblyWindowForSpace:&source->space()
+										device:&source->device()
+									expression:[dasmView expression]];
+}
+
+
+- (BOOL)selectSubviewForDevice:(device_t *)device {
+	BOOL const result = [dasmView selectSubviewForDevice:device];
+	[subviewButton selectItemAtIndex:[subviewButton indexOfItemWithTag:[dasmView selectedSubviewIndex]]];
+	[window setTitle:[NSString stringWithFormat:@"Disassembly: %@", [dasmView selectedSubviewName]]];
+	return result;
+}
+
+
+- (BOOL)selectSubviewForSpace:(address_space *)space {
+	BOOL const result = [dasmView selectSubviewForSpace:space];
+	[subviewButton selectItemAtIndex:[subviewButton indexOfItemWithTag:[dasmView selectedSubviewIndex]]];
+	[window setTitle:[NSString stringWithFormat:@"Disassembly: %@", [dasmView selectedSubviewName]]];
+	return result;
 }
 
 

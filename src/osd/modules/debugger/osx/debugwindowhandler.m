@@ -231,8 +231,9 @@ NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification = @"MAMEAuxiliaryD
 
 
 - (void)showDebugger:(NSNotification *)notification {
-	device_t *device = (device_t *) [[[notification userInfo] objectForKey:@"MAMEDebugDevice"] pointerValue];
-	if (&device->machine() == machine) {
+	running_machine *m = (running_machine *)[[[notification userInfo] objectForKey:@"MAMEDebugMachine"] pointerValue];
+	if (m == machine)
+	{
 		if (![window isVisible] && ![window isMiniaturized])
 			[window orderFront:self];
 	}
@@ -240,7 +241,9 @@ NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification = @"MAMEAuxiliaryD
 
 
 - (void)hideDebugger:(NSNotification *)notification {
-	[window orderOut:self];
+	running_machine *m = (running_machine *)[[[notification userInfo] objectForKey:@"MAMEDebugMachine"] pointerValue];
+	if (m == machine)
+		[window orderOut:self];
 }
 
 @end
@@ -309,9 +312,9 @@ NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification = @"MAMEAuxiliaryD
 	desired.height -= current.height;
 
 	windowFrame.size.width += desired.width;
+	windowFrame.size.width = MIN(windowFrame.size.width, available.size.width);
 	windowFrame.size.height += desired.height;
 	windowFrame.size.height = MIN(MIN(windowFrame.size.height, 240), available.size.height);
-	windowFrame.size.width = MIN(windowFrame.size.width, available.size.width);
 	windowFrame.origin.x = available.origin.x + available.size.width - windowFrame.size.width;
 	windowFrame.origin.y = available.origin.y;
 	[window setFrame:windowFrame display:YES];
@@ -349,6 +352,18 @@ NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification = @"MAMEAuxiliaryD
 
 - (id <MAMEDebugViewExpressionSupport>)documentView {
 	return nil;
+}
+
+
+- (NSString *)expression {
+	return [[self documentView] expression];
+}
+
+- (void)setExpression:(NSString *)expression {
+	[history add:expression];
+	[[self documentView] setExpression:expression];
+	[expressionField setStringValue:expression];
+	[expressionField selectText:self];
 }
 
 

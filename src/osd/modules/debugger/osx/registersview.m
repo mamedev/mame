@@ -64,7 +64,7 @@
 }
 
 
-- (void)selectSubviewForCPU:(device_t *)device {
+- (void)selectSubviewForDevice:(device_t *)device {
 	view->set_source(*view->source_for_device(device));
 }
 

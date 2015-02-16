@@ -13,7 +13,6 @@
 
 #include "debug/debugcpu.h"
 #include "debug/debugvw.h"
-#include "debug/dvmemory.h"
 
 
 @implementation MAMEMemoryView
@@ -107,13 +106,43 @@
 }
 
 
-- (void)selectSubviewForCPU:(device_t *)device {
-	debug_view_source const		*selected = view->source();
-	debug_view_source const		*source = view->source_for_device(device);
-	if ( selected != source ) {
-		view->set_source(*source);
-		if ([[self window] firstResponder] != self)
-			view->set_cursor_visible(false);
+- (BOOL)selectSubviewForDevice:(device_t *)device {
+	debug_view_source const *const source = view->source_for_device(device);
+	if (source != NULL)
+	{
+		if (view->source() != source)
+		{
+			view->set_source(*source);
+			if ([[self window] firstResponder] != self)
+				view->set_cursor_visible(false);
+		}
+		return YES;
+	}
+	else
+	{
+		return NO;
+	}
+}
+
+
+- (BOOL)selectSubviewForSpace:(address_space *)space {
+	if (space == NULL) return NO;
+	debug_view_memory_source const *source = downcast<debug_view_memory_source const *>(view->first_source());
+	while ((source != NULL) && (source->space() != space))
+		source = downcast<debug_view_memory_source *>(source->next());
+	if (source != NULL)
+	{
+		if (view->source() != source)
+		{
+			view->set_source(*source);
+			if ([[self window] firstResponder] != self)
+				view->set_cursor_visible(false);
+		}
+		return YES;
+	}
+	else
+	{
+		return NO;
 	}
 }
 
@@ -125,6 +154,11 @@
 
 - (void)setExpression:(NSString *)exp {
 	downcast<debug_view_memory *>(view)->set_expression([exp UTF8String]);
+}
+
+
+- (debug_view_memory_source const *)source {
+	return downcast<debug_view_memory_source const *>(view->source());
 }
 
 

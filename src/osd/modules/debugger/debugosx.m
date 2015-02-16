@@ -12,11 +12,11 @@
 
 // TODO:
 //  * Automatic scrolling for console and log views
-//  * Using alpha for disabled foreground colours doesn't really work
-//  * New windows created from auxiliary windows should inherit focus rather than pointing at current CPU
 //  * Keyboard shortcuts in error log windows
 //  * Don't accept keyboard input while the game is running
 //  * Interior focus rings - standard/exterior focus rings look really ugly here
+//  * Improve automatic window sizing - it isn't working all that well
+//  * Updates causing debug views' widths to change are sometimes obscured by the scroll views' opaque backgrounds
 //  * Scroll views with content narrower than clipping area are flaky under Tiger - nothing I can do about this
 
 
@@ -97,6 +97,8 @@ void debugger_osx::wait_for_debugger(device_t &device, bool firststop)
 	if (firststop) {
 		NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithPointer:&device],
 																		@"MAMEDebugDevice",
+																		[NSValue valueWithPointer:m_machine],
+																		@"MAMEDebugMachine",
 																		nil];
 		[[NSNotificationCenter defaultCenter] postNotificationName:MAMEShowDebuggerNotification
 															object:m_console

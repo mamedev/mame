@@ -11,10 +11,12 @@
 
 #import "memoryviewer.h"
 
+#import "debugconsole.h"
 #import "debugview.h"
 #import "memoryview.h"
 
 #include "debug/debugcpu.h"
+#include "debug/dvmemory.h"
 
 
 @implementation MAMEMemoryViewer
@@ -22,7 +24,7 @@
 - (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c {
 	NSScrollView	*memoryScroll;
 	NSView			*expressionContainer;
-	NSPopUpButton	*actionButton, *subviewButton;
+	NSPopUpButton	*actionButton;
 	NSRect			contentBounds, expressionFrame;
 
 	if (!(self = [super initWithMachine:m title:@"Memory" console:c]))
@@ -97,7 +99,7 @@
 	[actionButton release];
 
 	// set default state
-	[memoryView selectSubviewForCPU:debug_cpu_get_visible_cpu(*machine)];
+	[memoryView selectSubviewForDevice:debug_cpu_get_visible_cpu(*machine)];
 	[memoryView setExpression:@"0"];
 	[expressionField setStringValue:@"0"];
 	[expressionField selectText:self];
@@ -124,6 +126,38 @@
 
 - (id <MAMEDebugViewExpressionSupport>)documentView {
 	return memoryView;
+}
+
+
+- (IBAction)debugNewMemoryWindow:(id)sender {
+	debug_view_memory_source const *source = [memoryView source];
+	[console debugNewMemoryWindowForSpace:source->space()
+								   device:source->device()
+							   expression:[memoryView expression]];
+}
+
+
+- (IBAction)debugNewDisassemblyWindow:(id)sender {
+	debug_view_memory_source const *source = [memoryView source];
+	[console debugNewDisassemblyWindowForSpace:source->space()
+										device:source->device()
+									expression:[memoryView expression]];
+}
+
+
+- (BOOL)selectSubviewForDevice:(device_t *)device {	
+	BOOL const result = [memoryView selectSubviewForDevice:device];
+	[subviewButton selectItemAtIndex:[subviewButton indexOfItemWithTag:[memoryView selectedSubviewIndex]]];
+	[window setTitle:[NSString stringWithFormat:@"Memory: %@", [memoryView selectedSubviewName]]];
+	return result;
+}
+
+
+- (BOOL)selectSubviewForSpace:(address_space *)space {
+	BOOL const result = [memoryView selectSubviewForSpace:space];
+	[subviewButton selectItemAtIndex:[subviewButton indexOfItemWithTag:[memoryView selectedSubviewIndex]]];
+	[window setTitle:[NSString stringWithFormat:@"Memory: %@", [memoryView selectedSubviewName]]];
+	return result;
 }
 
 

@@ -23,9 +23,13 @@
 @interface MAMEMemoryViewer : MAMEExpressionAuxiliaryDebugWindowHandler
 {
 	MAMEMemoryView	*memoryView;
+	NSPopUpButton	*subviewButton;
 }
 
 - (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c;
+
+- (BOOL)selectSubviewForDevice:(device_t *)device;
+- (BOOL)selectSubviewForSpace:(address_space *)space;
 
 - (IBAction)changeSubview:(id)sender;
 

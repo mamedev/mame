@@ -29,6 +29,6 @@
 - (NSString *)selectedSubviewName;
 - (int)selectedSubviewIndex;
 - (void)selectSubviewAtIndex:(int)index;
-- (void)selectSubviewForCPU:(device_t *)device;
+- (void)selectSubviewForDevice:(device_t *)device;
 
 @end

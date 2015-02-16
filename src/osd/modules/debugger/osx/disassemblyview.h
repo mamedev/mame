@@ -14,6 +14,7 @@
 #import "debugview.h"
 
 #include "emu.h"
+#include "debug/dvdisasm.h"
 
 #import <Cocoa/Cocoa.h>
 
@@ -30,10 +31,13 @@
 - (NSString *)selectedSubviewName;
 - (int)selectedSubviewIndex;
 - (void)selectSubviewAtIndex:(int)index;
-- (void)selectSubviewForCPU:(device_t *)device;
+- (BOOL)selectSubviewForDevice:(device_t *)device;
+- (BOOL)selectSubviewForSpace:(address_space *)space;
 
 - (NSString *)expression;
 - (void)setExpression:(NSString *)exp;
+
+- (debug_view_disasm_source const *)source;
 
 - (IBAction)debugToggleBreakpoint:(id)sender;
 - (IBAction)debugToggleBreakpointEnable:(id)sender;

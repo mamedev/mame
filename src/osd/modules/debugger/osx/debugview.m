@@ -14,6 +14,24 @@
 #include "debug/debugcpu.h"
 
 
+static NSColor *DefaultForeground;
+static NSColor *ChangedForeground;
+static NSColor *InvalidForeground;
+static NSColor *CommentForeground;
+static NSColor *DisabledChangedForeground;
+static NSColor *DisabledInvalidForeground;
+static NSColor *DisabledCommentForeground;
+
+static NSColor *DefaultBackground;
+static NSColor *VisitedBackground;
+static NSColor *AncillaryBackground;
+static NSColor *SelectedBackground;
+static NSColor *CurrentBackground;
+static NSColor *SelectedCurrentBackground;
+static NSColor *InactiveSelectedBackground;
+static NSColor *InactiveSelectedCurrentBackground;
+
+
 static void debugwin_view_update(debug_view &view, void *osdprivate)
 {
 	[(MAMEDebugView *)osdprivate update];
@@ -22,37 +40,52 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 @implementation MAMEDebugView
 
++ (void)initialize {
+	DefaultForeground = [[NSColor colorWithCalibratedWhite:0.0 alpha:1.0] retain];
+	ChangedForeground = [[NSColor colorWithCalibratedRed:0.875 green:0.0 blue:0.0 alpha:1.0] retain];
+	InvalidForeground = [[NSColor colorWithCalibratedRed:0.0 green:0.0 blue:1.0 alpha:1.0] retain];
+	CommentForeground = [[NSColor colorWithCalibratedRed:0.0 green:0.375 blue:0.0 alpha:1.0] retain];
+	DisabledChangedForeground = [[NSColor colorWithCalibratedRed:0.5 green:0.125 blue:0.125 alpha:1.0] retain];
+	DisabledInvalidForeground = [[NSColor colorWithCalibratedRed:0.0 green:0.0 blue:0.5 alpha:1.0] retain];
+	DisabledCommentForeground = [[NSColor colorWithCalibratedRed:0.0 green:0.25 blue:0.0 alpha:1.0] retain];
+
+	DefaultBackground = [[NSColor colorWithCalibratedWhite:1.0 alpha:1.0] retain];
+	VisitedBackground = [[NSColor colorWithCalibratedRed:0.75 green:1.0 blue:0.75 alpha:1.0] retain];
+	AncillaryBackground = [[NSColor colorWithCalibratedWhite:0.75 alpha:1.0] retain];
+	SelectedBackground = [[NSColor colorWithCalibratedRed:0.75 green:0.875 blue:1.0 alpha:1.0] retain];
+	CurrentBackground = [[NSColor colorWithCalibratedRed:1.0 green:0.75 blue:0.75 alpha:1.0] retain];
+	SelectedCurrentBackground = [[NSColor colorWithCalibratedRed:0.875 green:0.625 blue:0.875 alpha:1.0] retain];
+	InactiveSelectedBackground = [[NSColor colorWithCalibratedWhite:0.875 alpha:1.0] retain];
+	InactiveSelectedCurrentBackground = [[NSColor colorWithCalibratedRed:0.875 green:0.5 blue:0.625 alpha:1.0] retain];
+}
+
+
 - (NSColor *)foregroundForAttribute:(UINT8)attrib {
-	const CGFloat alpha = (attrib & DCA_DISABLED) ? 0.5 : 1.0;
 	if (attrib & DCA_COMMENT)
-		return [NSColor colorWithCalibratedRed:0.0 green:0.375 blue:0.0 alpha:1.0];
+		return (attrib & DCA_DISABLED) ? DisabledCommentForeground : CommentForeground;
 	else if (attrib & DCA_INVALID)
-		return [NSColor colorWithCalibratedRed:0.0 green:0.0 blue:1.0 alpha:alpha];
+		return (attrib & DCA_DISABLED) ? DisabledInvalidForeground : InvalidForeground;
 	else if (attrib & DCA_CHANGED)
-		return [NSColor colorWithCalibratedRed:0.875 green:0.0 blue:0.0 alpha:alpha];
+		return (attrib & DCA_DISABLED) ? DisabledChangedForeground : ChangedForeground;
 	else
-		return [NSColor colorWithCalibratedWhite:0.0 alpha:alpha];
+		return DefaultForeground;
 }
 
 
 - (NSColor *)backgroundForAttribute:(UINT8)attrib {
-	if ((attrib & DCA_SELECTED) && (attrib & DCA_CURRENT)) {
-		if ([[self window] isKeyWindow] && ([[self window] firstResponder] == self))
-			return [NSColor colorWithCalibratedRed:0.875 green:0.625 blue:0.875 alpha:1.0];
-		else
-			return [NSColor colorWithCalibratedRed:0.875 green:0.5 blue:0.625 alpha:1.0];
-	} else if (attrib & DCA_CURRENT) {
-		return [NSColor colorWithCalibratedRed:1.0 green:0.625 blue:0.625 alpha:1.0];
-	} else if (attrib & DCA_SELECTED) {
-		if ([[self window] isKeyWindow] && ([[self window] firstResponder] == self))
-			return [NSColor colorWithCalibratedRed:0.75 green:0.875 blue:1.0 alpha:1.0];
-		else
-			return [NSColor colorWithCalibratedWhite:0.875 alpha:1.0];
-	} else if (attrib & DCA_ANCILLARY) {
-		return [NSColor colorWithCalibratedWhite:0.75 alpha:1.0];
-	} else {
-		return [NSColor colorWithCalibratedWhite:1.0 alpha:1.0];
-	}
+	BOOL const active = [[self window] isKeyWindow] && ([[self window] firstResponder] == self);
+	if ((attrib & DCA_SELECTED) && (attrib & DCA_CURRENT))
+		return active ? SelectedCurrentBackground : InactiveSelectedCurrentBackground;
+	else if (attrib & DCA_CURRENT)
+		return CurrentBackground;
+	else if (attrib & DCA_SELECTED)
+		return active ? SelectedBackground : InactiveSelectedBackground;
+	else if (attrib & DCA_ANCILLARY)
+		return AncillaryBackground;
+	else if (attrib & DCA_VISITED)
+		return VisitedBackground;
+	else
+		return DefaultBackground;
 }
 
 
@@ -71,7 +104,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	if (!data || (position.y < origin.y) || (position.y >= origin.y + size.y))
 	{
 		// y coordinate outside visible area, x will be a guess
-		position.x = lround(floor(location.x / fontWidth));
+		position.x = lround(floor((location.x - [textContainer lineFragmentPadding]) / fontWidth));
 	}
 	else
 	{
@@ -121,26 +154,18 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 }
 
 
-- (void)convertBounds:(NSRect)b toPosition:(debug_view_xy *)origin size:(debug_view_xy *)size {
-	origin->x = lround(floor(b.origin.x / fontWidth));
-	origin->y = lround(floor(b.origin.y / fontHeight));
-
-	// FIXME: this is not using proper font metrics horizontally
-	size->x = lround(ceil((b.origin.x + b.size.width) / fontWidth)) - origin->x;
-	size->y = lround(ceil((b.origin.y + b.size.height) / fontHeight)) - origin->y;
+- (void)convertBounds:(NSRect)b toFirstAffectedLine:(INT32 *)f count:(INT32 *)c {
+	*f = lround(floor(b.origin.y / fontHeight));
+	*c = lround(ceil((b.origin.y + b.size.height) / fontHeight)) - *f;
 }
 
 
 - (void)recomputeVisible {
-	if ([self window] != nil) {
-		debug_view_xy	origin, size;
-
-		// this gets all the characters that are at least paritally visible
-		[self convertBounds:[self visibleRect] toPosition:&origin size:&size];
-
-		// need to render entire lines or we get screwed up characters when widening views
-		origin.x = 0;
-		size.x = totalWidth;
+	if ([self window] != nil)
+	{
+		// this gets all the lines that are at least partially visible
+		debug_view_xy origin(0, 0), size(totalWidth, totalHeight);
+		[self convertBounds:[self visibleRect] toFirstAffectedLine:&origin.y count:&size.y];
 
 		// tell them what we think
 		view->set_visible_size(size);
@@ -152,17 +177,18 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (void)typeCharacterAndScrollToCursor:(char)ch {
-	if (view->cursor_supported()) {
-		debug_view_xy oldPos = view->cursor_position();
+	if (view->cursor_supported())
+	{
+		debug_view_xy const oldPos = view->cursor_position();
 		view->process_char(ch);
+		debug_view_xy const newPos = view->cursor_position();
+		if ((newPos.x != oldPos.x) || (newPos.y != oldPos.y))
 		{
-			debug_view_xy newPos = view->cursor_position();
-			if ((newPos.x != oldPos.x) || (newPos.y != oldPos.y)) {
-				[self scrollRectToVisible:NSMakeRect(newPos.x * fontWidth, // FIXME - use proper metrics
-													 newPos.y * fontHeight,
-													 fontWidth,
-													 fontHeight)];
-			}
+			// FIXME - use proper font metrics
+			[self scrollRectToVisible:NSMakeRect((newPos.x * fontWidth) + [textContainer lineFragmentPadding],
+												 newPos.y * fontHeight,
+												 fontWidth,
+												 fontHeight)];
 		}
 	} else {
 		view->process_char(ch);
@@ -211,19 +237,21 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (void)update {
-	debug_view_xy	newSize, newOrigin;
-
 	// resize our frame if the total size has changed
-	newSize = view->total_size();
-	if ((newSize.x != totalWidth) || (newSize.y != totalHeight)) {
-		[self setFrameSize:NSMakeSize(fontWidth * newSize.x, fontHeight * newSize.y)]; // FIXME: metrics
+	debug_view_xy const newSize = view->total_size();
+	BOOL const resized = (newSize.x != totalWidth) || (newSize.y != totalHeight);
+	if (resized)
+	{
+		[self setFrameSize:NSMakeSize((fontWidth * newSize.x) + (2 * [textContainer lineFragmentPadding]),
+									  fontHeight * newSize.y)];
 		totalWidth = newSize.x;
 		totalHeight = newSize.y;
 	}
 
 	// scroll the view if we're being told to
-	newOrigin = view->visible_position();
-	if (newOrigin.y != originTop) {
+	debug_view_xy const newOrigin = view->visible_position();
+	if (newOrigin.y != originTop)
+	{
 		[self scrollPoint:NSMakePoint([self visibleRect].origin.x, newOrigin.y * fontHeight)];
 		originTop = newOrigin.y;
 	}
@@ -235,8 +263,9 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (NSSize)maximumFrameSize {
-	debug_view_xy max = view->total_size();
-	return NSMakeSize(max.x * fontWidth, max.y * fontHeight);
+	debug_view_xy const max = view->total_size();
+	return NSMakeSize((max.x * fontWidth) + (2 * [textContainer lineFragmentPadding]),
+					   max.y * fontHeight);
 }
 
 
@@ -281,7 +310,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 		debug_view_xy pos;
 		view->set_cursor_visible(true);
 		pos = view->cursor_position();
-		[self scrollRectToVisible:NSMakeRect(pos.x * fontWidth, pos.y * fontHeight, fontWidth, fontHeight)]; // FIXME: metrics
+		[self scrollRectToVisible:NSMakeRect((pos.x * fontWidth) + [textContainer lineFragmentPadding], pos.y * fontHeight, fontWidth, fontHeight)]; // FIXME: metrics
 		[self setNeedsDisplay:YES];
 		return [super becomeFirstResponder];
 	} else {
@@ -326,21 +355,21 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (void)drawRect:(NSRect)dirtyRect {
-	debug_view_xy position, clip;
+	INT32 position, clip;
 
 	// work out how much we need to draw
 	[self recomputeVisible];
 	debug_view_xy const origin = view->visible_position();
 	debug_view_xy const size = view->visible_size();
-	[self convertBounds:dirtyRect toPosition:&position size:&clip];
+	[self convertBounds:dirtyRect toFirstAffectedLine:&position count:&clip];
 
 	// this gets the text for the whole visible area
 	debug_view_char const *data = view->viewdata();
 	if (!data)
 		return;
 
-	data += ((position.y - origin.y) * size.x);
-	for (UINT32 row = position.y; row < position.y + clip.y; row++, data += size.x)
+	data += ((position - origin.y) * size.x);
+	for (UINT32 row = position; row < position + clip; row++, data += size.x)
 	{
 		if ((row < origin.y) || (row >= origin.y + size.y))
 			continue;
@@ -402,15 +431,23 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 - (void)mouseDown:(NSEvent *)event {
 	NSPoint const location = [self convertPoint:[event locationInWindow] fromView:nil];
-	view->process_click(DCK_LEFT_CLICK, [self convertLocation:location]);
+	NSUInteger const modifiers = [event modifierFlags];
+	view->process_click((modifiers & NSCommandKeyMask) ? DCK_RIGHT_CLICK
+					  : (modifiers & NSAlternateKeyMask) ? DCK_MIDDLE_CLICK
+					  : DCK_LEFT_CLICK,
+						[self convertLocation:location]);
 	[self setNeedsDisplay:YES];
 }
 
 
 - (void)rightMouseDown:(NSEvent *)event {
 	NSPoint const location = [self convertPoint:[event locationInWindow] fromView:nil];
-	view->process_click(DCK_RIGHT_CLICK, [self convertLocation:location]);
-	[self setNeedsDisplay:YES];
+	if (view->cursor_supported())
+	{
+		view->set_cursor_position([self convertLocation:location]);
+		view->set_cursor_visible(true);
+		[self setNeedsDisplay:YES];
+	}
 	[super rightMouseDown:event];
 }
 
@@ -419,50 +456,58 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	NSUInteger	modifiers = [event modifierFlags];
 	NSString	*str = [event charactersIgnoringModifiers];
 
-	if ([str length] == 1) {
-		if (modifiers & NSNumericPadKeyMask) {
-			switch ([str characterAtIndex:0]) {
-				case NSUpArrowFunctionKey:
-					if (modifiers & NSCommandKeyMask)
-						view->process_char(DCH_CTRLHOME);
-					else
-						view->process_char(DCH_UP);
-					return;
-				case NSDownArrowFunctionKey:
-					if (modifiers & NSCommandKeyMask)
-						view->process_char(DCH_CTRLEND);
-					else
-						view->process_char(DCH_DOWN);
-					return;
-				case NSLeftArrowFunctionKey:
-					if (modifiers & NSCommandKeyMask)
-						[self typeCharacterAndScrollToCursor:DCH_HOME];
-					else if (modifiers & NSAlternateKeyMask)
-						[self typeCharacterAndScrollToCursor:DCH_CTRLLEFT];
-					else
-						[self typeCharacterAndScrollToCursor:DCH_LEFT];
-					return;
-				case NSRightArrowFunctionKey:
-					if (modifiers & NSCommandKeyMask)
-						[self typeCharacterAndScrollToCursor:DCH_END];
-					else if (modifiers & NSAlternateKeyMask)
-						[self typeCharacterAndScrollToCursor:DCH_CTRLRIGHT];
-					else
-						[self typeCharacterAndScrollToCursor:DCH_RIGHT];
-					return;
-				default:
-					[self interpretKeyEvents:[NSArray arrayWithObject:event]];
-					return;
+	if ([str length] == 1)
+	{
+		if (modifiers & NSNumericPadKeyMask)
+		{
+			switch ([str characterAtIndex:0])
+			{
+			case NSUpArrowFunctionKey:
+				if (modifiers & NSCommandKeyMask)
+					view->process_char(DCH_CTRLHOME);
+				else
+					view->process_char(DCH_UP);
+				return;
+			case NSDownArrowFunctionKey:
+				if (modifiers & NSCommandKeyMask)
+					view->process_char(DCH_CTRLEND);
+				else
+					view->process_char(DCH_DOWN);
+				return;
+			case NSLeftArrowFunctionKey:
+				if (modifiers & NSCommandKeyMask)
+					[self typeCharacterAndScrollToCursor:DCH_HOME];
+				else if (modifiers & NSAlternateKeyMask)
+					[self typeCharacterAndScrollToCursor:DCH_CTRLLEFT];
+				else
+					[self typeCharacterAndScrollToCursor:DCH_LEFT];
+				return;
+			case NSRightArrowFunctionKey:
+				if (modifiers & NSCommandKeyMask)
+					[self typeCharacterAndScrollToCursor:DCH_END];
+				else if (modifiers & NSAlternateKeyMask)
+					[self typeCharacterAndScrollToCursor:DCH_CTRLRIGHT];
+				else
+					[self typeCharacterAndScrollToCursor:DCH_RIGHT];
+				return;
+			default:
+				[self interpretKeyEvents:[NSArray arrayWithObject:event]];
+				return;
 			}
-		} else if (modifiers & NSFunctionKeyMask) {
-			switch ([str characterAtIndex:0]) {
+		}
+		else if (modifiers & NSFunctionKeyMask)
+		{
+			switch ([str characterAtIndex:0])
+			{
 				case NSPageUpFunctionKey:
-					if (modifiers & NSAlternateKeyMask) {
+					if (modifiers & NSAlternateKeyMask)
+					{
 						view->process_char(DCH_PUP);
 						return;
 					}
 				case NSPageDownFunctionKey:
-					if (modifiers & NSAlternateKeyMask) {
+					if (modifiers & NSAlternateKeyMask)
+					{
 						view->process_char(DCH_PDOWN);
 						return;
 					}
