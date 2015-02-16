@@ -121,7 +121,7 @@ Notes:
  04 Mar 2002 | Fixed Dip Switches and Inputs    (Steph)
              | Fixed screen flipping by using similar routine to the one
              | in src/video/wwfwfest.c        (Steph)
- 18 Jun 2001 | Changed Interrupt Function .. its not fully understood whats
+ 18 Jun 2001 | Changed Interrupt Function .. it's not fully understood what
              | is meant to be going on ..
  15 Jun 2001 | Cleaned up Sprite Drawing a bit, correcting some clipping probs,
              | mapped DSW's
@@ -170,19 +170,19 @@ Notes:
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wwfsstar_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(wwfsstar_fg0_videoram_w) AM_SHARE("fg0_videoram") /* FG0 Ram */
-	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE(wwfsstar_bg0_videoram_w) AM_SHARE("bg0_videoram") /* BG0 Ram */
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(fg0_videoram_w) AM_SHARE("fg0_videoram") /* FG0 Ram */
+	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE(bg0_videoram_w) AM_SHARE("bg0_videoram") /* BG0 Ram */
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM AM_SHARE("spriteram")       /* SPR Ram */
 	AM_RANGE(0x140000, 0x140fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x180000, 0x180003) AM_WRITE(wwfsstar_irqack_w)
+	AM_RANGE(0x180000, 0x180003) AM_WRITE(irqack_w)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("P1")
-	AM_RANGE(0x180004, 0x180007) AM_WRITE(wwfsstar_scrollwrite)
+	AM_RANGE(0x180004, 0x180007) AM_WRITE(scroll_w)
 	AM_RANGE(0x180006, 0x180007) AM_READ_PORT("P2")
 	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x180008, 0x180009) AM_WRITE(wwfsstar_soundwrite)
-	AM_RANGE(0x18000a, 0x18000b) AM_WRITE(wwfsstar_flipscreen_w)
+	AM_RANGE(0x180008, 0x180009) AM_WRITE(sound_w)
+	AM_RANGE(0x18000a, 0x18000b) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM                             /* Work Ram */
 ADDRESS_MAP_END
 
@@ -201,7 +201,7 @@ ADDRESS_MAP_END
  as used by the above memory map
 *******************************************************************************/
 
-WRITE16_MEMBER(wwfsstar_state::wwfsstar_scrollwrite)
+WRITE16_MEMBER(wwfsstar_state::scroll_w)
 {
 	switch (offset)
 	{
@@ -214,18 +214,18 @@ WRITE16_MEMBER(wwfsstar_state::wwfsstar_scrollwrite)
 	}
 }
 
-WRITE16_MEMBER(wwfsstar_state::wwfsstar_soundwrite)
+WRITE16_MEMBER(wwfsstar_state::sound_w)
 {
 	soundlatch_byte_w(space, 1, data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
-WRITE16_MEMBER(wwfsstar_state::wwfsstar_flipscreen_w)
+WRITE16_MEMBER(wwfsstar_state::flipscreen_w)
 {
 	flip_screen_set(data & 1);
 }
 
-WRITE16_MEMBER(wwfsstar_state::wwfsstar_irqack_w)
+WRITE16_MEMBER(wwfsstar_state::irqack_w)
 {
 	if (offset == 0)
 		m_maincpu->set_input_line(6, CLEAR_LINE);
@@ -247,7 +247,7 @@ WRITE16_MEMBER(wwfsstar_state::wwfsstar_irqack_w)
     A hack is required: raise the vblank bit a scanline early.
 */
 
-TIMER_DEVICE_CALLBACK_MEMBER(wwfsstar_state::wwfsstar_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(wwfsstar_state::scanline)
 {
 	int scanline = param;
 
@@ -278,7 +278,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(wwfsstar_state::wwfsstar_scanline)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(wwfsstar_state::wwfsstar_vblank_r)
+CUSTOM_INPUT_MEMBER(wwfsstar_state::vblank_r)
 {
 	return m_vblank;
 }
@@ -313,7 +313,7 @@ static INPUT_PORTS_START( wwfsstar )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Button B (1P VS 2P - Buy-in)")
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wwfsstar_state,wwfsstar_vblank_r, NULL) /* VBlank */
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wwfsstar_state, vblank_r, NULL) /* VBlank */
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -416,7 +416,7 @@ static MACHINE_CONFIG_START( wwfsstar, wwfsstar_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", wwfsstar_state, wwfsstar_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", wwfsstar_state, scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -424,7 +424,7 @@ static MACHINE_CONFIG_START( wwfsstar, wwfsstar_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 320, 0, 256, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
-	MCFG_SCREEN_UPDATE_DRIVER(wwfsstar_state, screen_update_wwfsstar)
+	MCFG_SCREEN_UPDATE_DRIVER(wwfsstar_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wwfsstar)
@@ -627,8 +627,8 @@ ROM_END
 
 
 
-GAME( 1989, wwfsstar,   0,        wwfsstar, wwfsstar, driver_device,  0, ROT0, "Technos Japan", "WWF Superstars (Europe)", 0 )
-GAME( 1989, wwfsstaru,  wwfsstar, wwfsstar, wwfsstar, driver_device,  0, ROT0, "Technos Japan", "WWF Superstars (US, Newer)", 0 )
-GAME( 1989, wwfsstarua, wwfsstar, wwfsstar, wwfsstar, driver_device,  0, ROT0, "Technos Japan", "WWF Superstars (US)", 0 )
-GAME( 1989, wwfsstarj,  wwfsstar, wwfsstar, wwfsstar, driver_device,  0, ROT0, "Technos Japan", "WWF Superstars (Japan)", 0 )
-GAME( 1989, wwfsstarb,  wwfsstar, wwfsstar, wwfsstar, driver_device,  0, ROT0, "bootleg",       "WWF Superstars (bootleg)", 0 )
+GAME( 1989, wwfsstar,   0,        wwfsstar, wwfsstar, driver_device,  0, ROT0, "Technos Japan", "WWF Superstars (Europe)", GAME_SUPPORTS_SAVE )
+GAME( 1989, wwfsstaru,  wwfsstar, wwfsstar, wwfsstar, driver_device,  0, ROT0, "Technos Japan", "WWF Superstars (US, Newer)", GAME_SUPPORTS_SAVE )
+GAME( 1989, wwfsstarua, wwfsstar, wwfsstar, wwfsstar, driver_device,  0, ROT0, "Technos Japan", "WWF Superstars (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, wwfsstarj,  wwfsstar, wwfsstar, wwfsstar, driver_device,  0, ROT0, "Technos Japan", "WWF Superstars (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, wwfsstarb,  wwfsstar, wwfsstar, wwfsstar, driver_device,  0, ROT0, "bootleg",       "WWF Superstars (bootleg)", GAME_SUPPORTS_SAVE )
