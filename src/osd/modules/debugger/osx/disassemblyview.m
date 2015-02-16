@@ -19,10 +19,10 @@
 
 @implementation MAMEDisassemblyView
 
-- (device_debug::breakpoint *)findBreakpointAtAddress:(offs_t)address inAddressSpace:(address_space &)space {
-	device_debug				*cpuinfo = space.device().debug();
+- (device_debug::breakpoint *)findBreakpointAtAddress:(offs_t)address forDevice:(device_t &)device {
+	device_debug				*cpuinfo = device.debug();
 	device_debug::breakpoint	*bp;
-	for (bp = cpuinfo->breakpoint_first(); (bp != NULL) && (address != bp->address()); bp = bp->next()) {}
+	for (bp = cpuinfo->breakpoint_first(); (bp != NULL) && (address != bp->address()); bp = bp->next()) { }
 	return bp;
 }
 
@@ -90,75 +90,87 @@
 
 
 - (BOOL)validateMenuItem:(NSMenuItem *)item {
-	SEL							action = [item action];
-	BOOL						inContextMenu = ([item menu] == [self menu]);
-	BOOL						haveCursor = NO, isCurrent = NO;
-	device_debug::breakpoint	*breakpoint = NULL;
+	SEL const action = [item action];
+	BOOL const inContextMenu = ([item menu] == [self menu]);
+	BOOL haveCursor = view->cursor_visible();
+	BOOL const isCurrent = (debug_cpu_get_visible_cpu(*machine) == view->source()->device());
 
-	if (view->cursor_visible()) {
-		if (debug_cpu_get_visible_cpu(*machine) == view->source()->device()) {
-			isCurrent = YES;
-			if (!useConsole || isCurrent) {
-				offs_t address = downcast<debug_view_disasm *>(view)->selected_address();
-				haveCursor = YES;
-				breakpoint = [self findBreakpointAtAddress:address inAddressSpace:downcast<const debug_view_disasm_source *>(view->source())->space()];
-			}
-		}
+	device_debug::breakpoint *breakpoint = NULL;
+	if (haveCursor)
+	{
+		offs_t const address = downcast<debug_view_disasm *>(view)->selected_address();
+		breakpoint = [self findBreakpointAtAddress:address forDevice:[self source]->device()];
 	}
 
-	if (action == @selector(debugToggleBreakpoint:)) {
-		if (haveCursor) {
-			if (breakpoint != NULL) {
+	if (action == @selector(debugToggleBreakpoint:))
+	{
+		if (haveCursor)
+		{
+			if (breakpoint != NULL)
+			{
 				if (inContextMenu)
 					[item setTitle:@"Clear Breakpoint"];
 				else
 					[item setTitle:@"Clear Breakpoint at Cursor"];
-			} else {
+			}
+			else
+			{
 				if (inContextMenu)
 					[item setTitle:@"Set Breakpoint"];
 				else
 					[item setTitle:@"Set Breakpoint at Cursor"];
 			}
-		} else {
+		}
+		else
+		{
 			if (inContextMenu)
 				[item setTitle:@"Toggle Breakpoint"];
 			else
 				[item setTitle:@"Toggle Breakpoint at Cursor"];
 		}
-		return haveCursor;
-	} else if (action == @selector(debugToggleBreakpointEnable:)) {
-		if ((breakpoint != NULL) && !breakpoint->enabled()) {
+		return haveCursor && (!useConsole || isCurrent);
+	}
+	else if (action == @selector(debugToggleBreakpointEnable:))
+	{
+		if ((breakpoint != NULL) && !breakpoint->enabled())
+		{
 			if (inContextMenu)
 				[item setTitle:@"Enable Breakpoint"];
 			else
 				[item setTitle:@"Enable Breakpoint at Cursor"];
-		} else {
+		}
+		else
+		{
 			if (inContextMenu)
 				[item setTitle:@"Disable Breakpoint"];
 			else
 				[item setTitle:@"Disable Breakpoint at Cursor"];
 		}
-		return (breakpoint != NULL);
-	} else if (action == @selector(debugRunToCursor:)) {
-		return isCurrent;
-	} else if (action == @selector(showRightColumn:)) {
+		return (breakpoint != NULL) && (!useConsole || isCurrent);
+	}
+	else if (action == @selector(debugRunToCursor:))
+	{
+		return !useConsole || isCurrent;
+	}
+	else if (action == @selector(showRightColumn:))
+	{
 		[item setState:((downcast<debug_view_disasm *>(view)->right_column() == [item tag]) ? NSOnState : NSOffState)];
 		return YES;
-	} else {
+	}
+	else
+	{
 		return YES;
 	}
 }
 
 
 - (NSSize)maximumFrameSize {
-	debug_view_xy			max;
-	device_t				*curcpu = debug_cpu_get_visible_cpu(*machine);
-	const debug_view_source	*source = view->source_for_device(curcpu);
+	debug_view_xy			max(0, 0);
+	const debug_view_source	*source = view->source();
 
-	max.x = max.y = 0;
 	for (const debug_view_source *source = view->source_list().first(); source != NULL; source = source->next())
 	{
-		debug_view_xy   current;
+		debug_view_xy current;
 		view->set_source(*source);
 		current = view->total_size();
 		if (current.x > max.x)
@@ -258,11 +270,11 @@
 - (IBAction)debugToggleBreakpoint:(id)sender {
 	if (view->cursor_visible())
 	{
-		address_space &space = downcast<const debug_view_disasm_source *>(view->source())->space();
-		if (!useConsole || (debug_cpu_get_visible_cpu(*machine) == &space.device()))
+		device_t &device = [self source]->device();
+		if (!useConsole || (debug_cpu_get_visible_cpu(*machine) == &device))
 		{
 			offs_t const address = downcast<debug_view_disasm *>(view)->selected_address();
-			device_debug::breakpoint *bp = [self findBreakpointAtAddress:address inAddressSpace:space];
+			device_debug::breakpoint *bp = [self findBreakpointAtAddress:address forDevice:device];
 
 			// if it doesn't exist, add a new one
 			if (useConsole)
@@ -278,13 +290,13 @@
 			{
 				if (bp == NULL)
 				{
-					UINT32 const bpnum = space.device().debug()->breakpoint_set(address, NULL, NULL);
+					UINT32 const bpnum = device.debug()->breakpoint_set(address, NULL, NULL);
 					debug_console_printf(*machine, "Breakpoint %X set\n", bpnum);
 				}
 				else
 				{
 					int const bpnum = bp->index();
-					space.device().debug()->breakpoint_clear(bpnum);
+					device.debug()->breakpoint_clear(bpnum);
 					debug_console_printf(*machine, "Breakpoint %X cleared\n", (UINT32)bpnum);
 				}
 			}
@@ -300,11 +312,11 @@
 - (IBAction)debugToggleBreakpointEnable:(id)sender {
 	if (view->cursor_visible())
 	{
-		address_space &space = downcast<const debug_view_disasm_source *>(view->source())->space();
-		if (!useConsole || (debug_cpu_get_visible_cpu(*machine) == &space.device()))
+		device_t &device = [self source]->device();
+		if (!useConsole || (debug_cpu_get_visible_cpu(*machine) == &device))
 		{
 			offs_t const address = downcast<debug_view_disasm *>(view)->selected_address();
-			device_debug::breakpoint *bp = [self findBreakpointAtAddress:address inAddressSpace:space];
+			device_debug::breakpoint *bp = [self findBreakpointAtAddress:address forDevice:device];
 			if (bp != NULL)
 			{
 				if (useConsole)
@@ -318,7 +330,7 @@
 				}
 				else
 				{
-					space.device().debug()->breakpoint_enable(bp->index(), !bp->enabled());
+					device.debug()->breakpoint_enable(bp->index(), !bp->enabled());
 					debug_console_printf(*machine,
 										 "Breakpoint %X %s\n",
 										 (UINT32)bp->index(),
@@ -333,15 +345,20 @@
 
 
 - (IBAction)debugRunToCursor:(id)sender {
-	if (view->cursor_visible()) {
-		address_space &space = downcast<const debug_view_disasm_source *>(view->source())->space();
-		if (debug_cpu_get_visible_cpu(*machine) == &space.device()) {
-			offs_t address = downcast<debug_view_disasm *>(view)->selected_address();
-			if (useConsole) {
+	if (view->cursor_visible())
+	{
+		device_t &device = [self source]->device();
+		if (!useConsole || (debug_cpu_get_visible_cpu(*machine) == &device))
+		{
+			offs_t const address = downcast<debug_view_disasm *>(view)->selected_address();
+			if (useConsole)
+			{
 				NSString *command = [NSString stringWithFormat:@"go 0x%lX", (unsigned long)address];
 				debug_console_execute_command(*machine, [command UTF8String], 1);
-			} else {
-				debug_cpu_get_visible_cpu(*machine)->debug()->go(address);
+			}
+			else
+			{
+				device.debug()->go(address);
 			}
 		}
 	}
