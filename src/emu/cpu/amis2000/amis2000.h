@@ -14,36 +14,53 @@
 
 // generic input pins (4 bits each)
 #define MCFG_AMI_S2000_READ_K_CB(_devcb) \
-	amis2000_device::set_read_k_callback(*device, DEVCB_##_devcb);
+	amis2000_base_device::set_read_k_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_AMI_S2000_READ_I_CB(_devcb) \
-	amis2000_device::set_read_i_callback(*device, DEVCB_##_devcb);
+	amis2000_base_device::set_read_i_callback(*device, DEVCB_##_devcb);
 
 // 8-bit external databus coupled as input/output pins
 #define MCFG_AMI_S2000_READ_D_CB(_devcb) \
-	amis2000_device::set_read_d_callback(*device, DEVCB_##_devcb);
+	amis2000_base_device::set_read_d_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_AMI_S2000_WRITE_D_CB(_devcb) \
-	amis2000_device::set_write_d_callback(*device, DEVCB_##_devcb);
+	amis2000_base_device::set_write_d_callback(*device, DEVCB_##_devcb);
 
 // 13-bit external addressbus coupled as output pins
 #define MCFG_AMI_S2000_WRITE_A_CB(_devcb) \
-	amis2000_device::set_write_a_callback(*device, DEVCB_##_devcb);
+	amis2000_base_device::set_write_a_callback(*device, DEVCB_##_devcb);
+
+// F_out pin (only for S2152)
+#define MCFG_AMI_S2152_FOUT_CB(_devcb) \
+	amis2000_base_device::set_write_f_callback(*device, DEVCB_##_devcb);
 
 
-class amis2000_device : public cpu_device
+class amis2000_base_device : public cpu_device
 {
 public:
 	// construction/destruction
-	amis2000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	amis2000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 bu_bits, UINT8 callstack_bits, UINT8 callstack_depth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
+	amis2000_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 bu_bits, UINT8 callstack_bits, UINT8 callstack_depth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
+		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+		, m_program_config("program", ENDIANNESS_BIG, 8, prgwidth, 0, program)
+		, m_data_config("data", ENDIANNESS_BIG, 8, datawidth, 0, data)
+		, m_bu_bits(bu_bits)
+		, m_callstack_bits(callstack_bits)
+		, m_callstack_depth(callstack_depth)
+		, m_read_k(*this)
+		, m_read_i(*this)
+		, m_read_d(*this)
+		, m_write_d(*this)
+		, m_write_a(*this)
+		, m_write_f(*this)
+	{ }
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_read_k_callback(device_t &device, _Object object) { return downcast<amis2000_device &>(device).m_read_k.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_i_callback(device_t &device, _Object object) { return downcast<amis2000_device &>(device).m_read_i.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_d_callback(device_t &device, _Object object) { return downcast<amis2000_device &>(device).m_read_d.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_d_callback(device_t &device, _Object object) { return downcast<amis2000_device &>(device).m_write_d.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_a_callback(device_t &device, _Object object) { return downcast<amis2000_device &>(device).m_write_a.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_k_callback(device_t &device, _Object object) { return downcast<amis2000_base_device &>(device).m_read_k.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_i_callback(device_t &device, _Object object) { return downcast<amis2000_base_device &>(device).m_read_i.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_d_callback(device_t &device, _Object object) { return downcast<amis2000_base_device &>(device).m_read_d.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_d_callback(device_t &device, _Object object) { return downcast<amis2000_base_device &>(device).m_write_d.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_a_callback(device_t &device, _Object object) { return downcast<amis2000_base_device &>(device).m_write_a.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_f_callback(device_t &device, _Object object) { return downcast<amis2000_base_device &>(device).m_write_f.set_callback(object); }
 
 protected:
 	// device-level overrides
@@ -103,6 +120,7 @@ protected:
 	devcb_read8 m_read_d;
 	devcb_write8 m_write_d;
 	devcb_write16 m_write_a;
+	devcb_write_line m_write_f;
 	
 	// misc internal helpers
 	UINT8 ram_r();
@@ -112,76 +130,91 @@ protected:
 	void d_latch_out(bool active);
 	
 	// opcode handlers
-	void op_lai();
-	void op_lab();
-	void op_lae();
-	void op_xab();
-	void op_xabu();
-	void op_xae();
-	void op_lbe();
-	void op_lbep();
-	void op_lbz();
-	void op_lbf();
+	virtual void op_lai();
+	virtual void op_lab();
+	virtual void op_lae();
+	virtual void op_xab();
+	virtual void op_xabu();
+	virtual void op_xae();
+	virtual void op_lbe();
+	virtual void op_lbep();
+	virtual void op_lbz();
+	virtual void op_lbf();
 
-	void op_lam();
-	void op_xc();
-	void op_xci();
-	void op_xcd();
-	void op_stm();
-	void op_rsm();
+	virtual void op_lam();
+	virtual void op_xc();
+	virtual void op_xci();
+	virtual void op_xcd();
+	virtual void op_stm();
+	virtual void op_rsm();
 
-	void op_inp();
-	void op_out();
-	void op_disb();
-	void op_disn();
-	void op_mvs();
-	void op_psh();
-	void op_psl();
-	void op_eur();
+	virtual void op_inp();
+	virtual void op_out();
+	virtual void op_disb();
+	virtual void op_disn();
+	virtual void op_mvs();
+	virtual void op_psh();
+	virtual void op_psl();
+	virtual void op_eur();
 
-	void op_pp();
-	void op_jmp();
-	void op_jms();
-	void op_rt();
-	void op_rts();
-	void op_nop();
-	void op_halt();
+	virtual void op_pp();
+	virtual void op_jmp();
+	virtual void op_jms();
+	virtual void op_rt();
+	virtual void op_rts();
+	virtual void op_nop();
+	virtual void op_halt();
 
-	void op_szc();
-	void op_szm();
-	void op_szi();
-	void op_szk();
-	void op_sbe();
-	void op_sam();
-	void op_sos();
-	void op_tf1();
-	void op_tf2();
+	virtual void op_szc();
+	virtual void op_szm();
+	virtual void op_szi();
+	virtual void op_szk();
+	virtual void op_sbe();
+	virtual void op_sam();
+	virtual void op_sos();
+	virtual void op_tf1();
+	virtual void op_tf2();
 
-	void op_adcs();
-	void op_adis();
-	void op_add();
-	void op_and();
-	void op_xor();
-	void op_stc();
-	void op_rsc();
-	void op_cma();
-	void op_sf1();
-	void op_rf1();
-	void op_sf2();
-	void op_rf2();
+	virtual void op_adcs();
+	virtual void op_adis();
+	virtual void op_add();
+	virtual void op_and();
+	virtual void op_xor();
+	virtual void op_stc();
+	virtual void op_rsc();
+	virtual void op_cma();
+	virtual void op_sf1();
+	virtual void op_rf1();
+	virtual void op_sf2();
+	virtual void op_rf2();
 };
 
 
-class amis2150_device : public amis2000_device
+class amis2000_cpu_device : public amis2000_base_device
 {
 public:
-	amis2150_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	amis2000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
+class amis2150_cpu_device : public amis2000_base_device
+{
+public:
+	amis2150_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
+class amis2152_cpu_device : public amis2000_base_device
+{
+public:
+	amis2152_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
 
 extern const device_type AMI_S2000;
 extern const device_type AMI_S2150;
+extern const device_type AMI_S2152;
 
 
 #endif /* _AMIS2000_H_ */

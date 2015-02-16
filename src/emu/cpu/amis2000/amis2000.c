@@ -6,7 +6,7 @@
   Overall functionality is similar to (and probably derived from) NEC uCOM-4.
 
   References:
-  - AMI MOS Products Catalog Winter 1979
+  - AMI MOS Products Catalog 1979/1980
   - AMI S2000 Programming Manual (rev. 2)
 
   TODO:
@@ -27,71 +27,52 @@
 // S2000 is the most basic one, 64 nibbles internal RAM and 1KB internal ROM
 // S2150 increased RAM to 80 nibbles and ROM to 1.5KB
 // high-voltage output versions of these chips (S2000A and S2150A) are identical overall
-const device_type AMI_S2000 = &device_creator<amis2000_device>;
-const device_type AMI_S2150 = &device_creator<amis2150_device>;
+const device_type AMI_S2000 = &device_creator<amis2000_cpu_device>;
+const device_type AMI_S2150 = &device_creator<amis2150_cpu_device>;
+
+// S2152 is an extension to S2150, removing the K pins and adding a better timer
+const device_type AMI_S2152 = &device_creator<amis2152_cpu_device>;
 
 
 // internal memory maps
-static ADDRESS_MAP_START(program_1k, AS_PROGRAM, 8, amis2000_device)
+static ADDRESS_MAP_START(program_1k, AS_PROGRAM, 8, amis2000_base_device)
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(program_1_5k, AS_PROGRAM, 8, amis2000_device)
+static ADDRESS_MAP_START(program_1_5k, AS_PROGRAM, 8, amis2000_base_device)
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 	AM_RANGE(0x0400, 0x05ff) AM_NOP // 0x00
 	AM_RANGE(0x0600, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(data_64x4, AS_DATA, 8, amis2000_device)
+static ADDRESS_MAP_START(data_64x4, AS_DATA, 8, amis2000_base_device)
 	AM_RANGE(0x00, 0x3f) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_80x4, AS_DATA, 8, amis2000_device)
+static ADDRESS_MAP_START(data_80x4, AS_DATA, 8, amis2000_base_device)
 	AM_RANGE(0x00, 0x3f) AM_RAM
 	AM_RANGE(0x40, 0x4f) AM_RAM
 ADDRESS_MAP_END
 
 
 // device definitions
-amis2000_device::amis2000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, AMI_S2000, "AMI S2000", tag, owner, clock, "amis2000", __FILE__),
-	m_program_config("program", ENDIANNESS_BIG, 8, 13, 0, ADDRESS_MAP_NAME(program_1k)),
-	m_data_config("data", ENDIANNESS_BIG, 8, 6, 0, ADDRESS_MAP_NAME(data_64x4)),
-	m_bu_bits(2),
-	m_callstack_bits(10),
-	m_callstack_depth(3),
-	m_read_k(*this),
-	m_read_i(*this),
-	m_read_d(*this),
-	m_write_d(*this),
-	m_write_a(*this)
-{
-}
+amis2000_cpu_device::amis2000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: amis2000_base_device(mconfig, AMI_S2000, "AMI S2000", tag, owner, clock, 2, 10, 3, 13, ADDRESS_MAP_NAME(program_1k), 6, ADDRESS_MAP_NAME(data_64x4), "amis2000", __FILE__)
+{ }
 
-amis2000_device::amis2000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 bu_bits, UINT8 callstack_bits, UINT8 callstack_depth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_program_config("program", ENDIANNESS_BIG, 8, prgwidth, 0, program),
-	m_data_config("data", ENDIANNESS_BIG, 8, datawidth, 0, data),
-	m_bu_bits(bu_bits),
-	m_callstack_bits(callstack_bits),
-	m_callstack_depth(callstack_depth),
-	m_read_k(*this),
-	m_read_i(*this),
-	m_read_d(*this),
-	m_write_d(*this),
-	m_write_a(*this)
-{
-}
+amis2150_cpu_device::amis2150_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: amis2000_base_device(mconfig, AMI_S2150, "AMI S2150", tag, owner, clock, 3, 11, 3, 13, ADDRESS_MAP_NAME(program_1_5k), 7, ADDRESS_MAP_NAME(data_80x4), "amis2150", __FILE__)
+{ }
 
-amis2150_device::amis2150_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: amis2000_device(mconfig, AMI_S2150, "AMI S2150", tag, owner, clock, 3, 11, 3, 13, ADDRESS_MAP_NAME(program_1_5k), 7, ADDRESS_MAP_NAME(data_80x4), "amis2150", __FILE__)
-{
-}
+amis2152_cpu_device::amis2152_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: amis2000_base_device(mconfig, AMI_S2152, "AMI S2152", tag, owner, clock, 3, 11, 3, 13, ADDRESS_MAP_NAME(program_1_5k), 7, ADDRESS_MAP_NAME(data_80x4), "amis2152", __FILE__)
+{ }
+
 
 
 // disasm
-void amis2000_device::state_string_export(const device_state_entry &entry, astring &string)
+void amis2000_base_device::state_string_export(const device_state_entry &entry, astring &string)
 {
 	switch (entry.index())
 	{
@@ -110,7 +91,7 @@ void amis2000_device::state_string_export(const device_state_entry &entry, astri
 	}
 }
 
-offs_t amis2000_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t amis2000_base_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
 	extern CPU_DISASSEMBLE(amis2000);
 	return CPU_DISASSEMBLE_NAME(amis2000)(this, buffer, pc, oprom, opram, options);
@@ -128,7 +109,7 @@ enum
 	S2000_ACC, S2000_E, S2000_CY
 };
 
-void amis2000_device::device_start()
+void amis2000_base_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
@@ -138,6 +119,7 @@ void amis2000_device::device_start()
 	m_read_d.resolve_safe(0);
 	m_write_d.resolve_safe();
 	m_write_a.resolve_safe();
+	m_write_f.resolve_safe();
 
 	m_bu_mask = (1 << m_bu_bits) - 1;
 	m_callstack_mask = (1 << m_callstack_bits) - 1;
@@ -202,7 +184,7 @@ void amis2000_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void amis2000_device::device_reset()
+void amis2000_base_device::device_reset()
 {
 	m_pc = 0;
 	m_op = 0;
@@ -220,7 +202,7 @@ void amis2000_device::device_reset()
 //  execute
 //-------------------------------------------------
 
-void amis2000_device::execute_run()
+void amis2000_base_device::execute_run()
 {
 	while (m_icount > 0)
 	{
