@@ -94,19 +94,19 @@ VIDEO_START_MEMBER(wc90_state,wc90t)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(wc90_state::wc90_bgvideoram_w)
+WRITE8_MEMBER(wc90_state::bgvideoram_w)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE8_MEMBER(wc90_state::wc90_fgvideoram_w)
+WRITE8_MEMBER(wc90_state::fgvideoram_w)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE8_MEMBER(wc90_state::wc90_txvideoram_w)
+WRITE8_MEMBER(wc90_state::txvideoram_w)
 {
 	m_txvideoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
@@ -121,7 +121,7 @@ WRITE8_MEMBER(wc90_state::wc90_txvideoram_w)
 ***************************************************************************/
 
 
-UINT32 wc90_state::screen_update_wc90(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 wc90_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0,m_scroll2xlo[0] + 256 * m_scroll2xhi[0]);
 	m_bg_tilemap->set_scrolly(0,m_scroll2ylo[0] + 256 * m_scroll2yhi[0]);
