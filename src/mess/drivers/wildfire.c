@@ -13,7 +13,7 @@
 
 
   TODO:
-  - bad sound (probably MCU related)
+  - bad sound, A12 seems to strobe too fast
   - when the game strobes a led faster, it should appear brighter, for example when
     the ball hits one of the bumpers
   - some 7segs digits are wrong (mcu on-die decoder is customizable?)
@@ -46,6 +46,7 @@ public:
 
 	UINT8 m_d;
 	UINT16 m_a;
+	UINT8 m_f;
 
 	UINT16 m_display_state[0x10];
 	UINT16 m_display_cache[0x10];
@@ -53,10 +54,12 @@ public:
 
 	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE16_MEMBER(write_a);
+	DECLARE_WRITE_LINE_MEMBER(write_f);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
-	void display_update();
 	bool index_is_7segled(int index);
+	void display_update();
+	void sound_update();
 
 	virtual void machine_start();
 };
@@ -104,7 +107,7 @@ void wildfire_state::display_update()
 	for (int i = 0; i < 0x10; i++)
 	{
 		// update current state
-		m_display_state[i] = (~m_a >> i & 1) ? m_d : 0;
+		m_display_state[i] = (m_a >> i & 1) ? m_d : 0;
 
 		active_state[i] = 0;
 
@@ -163,14 +166,24 @@ WRITE8_MEMBER(wildfire_state::write_d)
 
 WRITE16_MEMBER(wildfire_state::write_a)
 {
-	// A12: enable speaker out
-	// this is in combination with the MCU K4-pin, how?
-	m_speaker->level_w(data >> 12 & 1);
-
 	// A0-A2: select 7segleds
 	// A3-A11: select other leds
-	m_a = data;
+	m_a = data ^ 0x1fff; // active-low
 	display_update();
+
+	// A12: enable speaker
+	sound_update();
+}
+
+WRITE_LINE_MEMBER(wildfire_state::write_f)
+{
+	m_f = (state) ? 1 : 0;
+	sound_update();
+}
+
+void wildfire_state::sound_update()
+{
+	m_speaker->level_w(m_a >> 12 & m_f);
 }
 
 
@@ -206,6 +219,7 @@ void wildfire_state::machine_start()
 
 	m_d = 0;
 	m_a = 0;
+	m_f = 0;
 
 	// register for savestates
 	save_item(NAME(m_display_state));
@@ -214,16 +228,18 @@ void wildfire_state::machine_start()
 
 	save_item(NAME(m_d));
 	save_item(NAME(m_a));
+	save_item(NAME(m_f));
 }
 
 
 static MACHINE_CONFIG_START( wildfire, wildfire_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", AMI_S2150, MASTER_CLOCK)
+	MCFG_CPU_ADD("maincpu", AMI_S2152, MASTER_CLOCK)
 	MCFG_AMI_S2000_READ_I_CB(IOPORT("IN1"))
 	MCFG_AMI_S2000_WRITE_D_CB(WRITE8(wildfire_state, write_d))
 	MCFG_AMI_S2000_WRITE_A_CB(WRITE16(wildfire_state, write_a))
+	MCFG_AMI_S2152_FOUT_CB(WRITELINE(wildfire_state, write_f))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", wildfire_state, display_decay_tick, attotime::from_msec(1))
 

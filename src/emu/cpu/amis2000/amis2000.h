@@ -208,6 +208,22 @@ class amis2152_cpu_device : public amis2000_base_device
 {
 public:
 	amis2152_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+	
+	// digital-to-frequency converter
+	UINT8 m_d2f_latch;
+	emu_timer *m_d2f_timer;
+	int m_fout_state;
+
+	void d2f_timer_clock();
+	TIMER_CALLBACK_MEMBER(d2f_timer_cb);
+	
+	// opcode handlers
+	virtual void op_szk();
 };
 
 

@@ -490,3 +490,28 @@ void amis2000_base_device::op_rf2()
 	// RF2: reset flag 2
 	m_f &= ~0x02;
 }
+
+
+
+// AMI S2152 specific handlers
+
+void amis2152_cpu_device::d2f_timer_clock()
+{
+	// schedule next timeout (frequency is guessed)
+	attotime base = attotime::from_hz(unscaled_clock() / 4 / 64);
+	m_d2f_timer->adjust(base * (0x10 - m_d2f_latch));
+}
+
+TIMER_CALLBACK_MEMBER(amis2152_cpu_device::d2f_timer_cb)
+{
+	m_write_f(m_fout_state);
+	m_fout_state ^= 1;
+	
+	d2f_timer_clock();
+}
+
+void amis2152_cpu_device::op_szk()
+{
+	// instead of SZK: ???: load d2f latch with ACC(?)
+	m_d2f_latch = m_acc;
+}

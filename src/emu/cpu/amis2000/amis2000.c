@@ -179,6 +179,22 @@ void amis2000_base_device::device_start()
 }
 
 
+void amis2152_cpu_device::device_start()
+{
+	amis2000_base_device::device_start();
+
+	m_d2f_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(amis2152_cpu_device::d2f_timer_cb), this));
+	
+	// zerofill
+	m_d2f_latch = 0;
+	m_fout_state = 0;
+
+	// register for savestates
+	save_item(NAME(m_d2f_latch));
+	save_item(NAME(m_fout_state));
+}
+
+
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -191,9 +207,21 @@ void amis2000_base_device::device_reset()
 	m_skip = false;
 	
 	// clear i/o
+	m_a = 0x1fff;
+	m_write_a(0, m_a, 0xffff);
 	m_d_polarity = 0;
-	m_d = 0; d_latch_out(false);
-	m_a = 0; m_write_a(0, 0, 0xffff);
+	m_d = 0;
+	d_latch_out(false);
+}
+
+
+void amis2152_cpu_device::device_reset()
+{
+	amis2000_base_device::device_reset();
+
+	// start d2f timer
+	m_write_f(0);
+	d2f_timer_clock();
 }
 
 
