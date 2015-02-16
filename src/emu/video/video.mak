@@ -455,6 +455,14 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/video/scn2674.h,VIDEOS += SCN2674
+#-------------------------------------------------
+ifneq ($(filter SCN2674,$(VIDEOS)),)
+VIDEOOBJS+= $(VIDEOOBJ)/scn2674.o
+endif
+
+#-------------------------------------------------
+#
 #@src/emu/video/snes_ppu.h,VIDEOS += SNES_PPU
 #-------------------------------------------------
 ifneq ($(filter SNES_PPU,$(VIDEOS)),)

@@ -327,6 +327,7 @@ VIDEOS += UPD7227
 VIDEOS += V9938
 VIDEOS += VIC4567
 #VIDEOS += VOODOO
+VIDEOS += SCN2674
 
 #-------------------------------------------------
 # specify available machine cores
@@ -940,7 +941,6 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_VIDEO)/vectrex.o     \
 	$(MAME_DRIVERS)/cps1.o      \
 	$(MAME_VIDEO)/cps1.o        \
-	$(MAME_VIDEO)/scn2674.o     \
 
 
 #-------------------------------------------------
