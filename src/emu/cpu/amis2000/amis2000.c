@@ -13,7 +13,6 @@
   - unemulated opcodes (need more testing material)
   - is K/I input handling correct?
   - support external program map
-  - STATUS pin(wildfire.c sound?)
   - add 50/60hz timer
   - add S2200/S2400
 

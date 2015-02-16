@@ -164,7 +164,7 @@ WRITE8_MEMBER(wildfire_state::write_d)
 WRITE16_MEMBER(wildfire_state::write_a)
 {
 	// A12: enable speaker out
-	// this is in combination with the (not yet emulated) MCU F-pin
+	// this is in combination with the MCU K4-pin, how?
 	m_speaker->level_w(data >> 12 & 1);
 
 	// A0-A2: select 7segleds
