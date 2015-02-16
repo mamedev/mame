@@ -13,7 +13,7 @@
 
 
   TODO:
-  - bad sound, A12 seems to strobe too fast
+  - sound emulation could still be improved
   - when the game strobes a led faster, it should appear brighter, for example when
     the ball hits one of the bumpers
   - some 7segs digits are wrong (mcu on-die decoder is customizable?)
@@ -28,7 +28,7 @@
 #include "wildfire.lh" // this is a test layout, external artwork is necessary
 
 // master clock is a single stage RC oscillator: R=?K, C=?pf,
-// S2150 default frequency is 850kHz
+// S2000 default frequency is 850kHz
 #define MASTER_CLOCK (850000)
 
 
@@ -38,15 +38,18 @@ public:
 	wildfire_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_speaker(*this, "speaker")
+		m_speaker(*this, "speaker"),
+		m_a12_decay_timer(*this, "a12_decay")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<timer_device> m_a12_decay_timer;
 
 	UINT8 m_d;
 	UINT16 m_a;
-	UINT8 m_f;
+	UINT8 m_q2;
+	UINT8 m_q3;
 
 	UINT16 m_display_state[0x10];
 	UINT16 m_display_cache[0x10];
@@ -59,6 +62,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	bool index_is_7segled(int index);
 	void display_update();
+	
+	TIMER_DEVICE_CALLBACK_MEMBER(reset_q2);
+	void write_a12(int state);
 	void sound_update();
 
 	virtual void machine_start();
@@ -153,6 +159,54 @@ TIMER_DEVICE_CALLBACK_MEMBER(wildfire_state::display_decay_tick)
 
 /***************************************************************************
 
+  Sound
+
+***************************************************************************/
+
+// Sound output is via a speaker between transistors Q2(from A12) and Q3(from F_out)
+// A12 to Q2 has a little electronic circuit going, causing a slight delay.
+// (see patent US4334679 FIG.5, the 2 resistors are 10K and the cap is a 4.7uF electrolytic)
+
+// decay time, in steps of 1ms
+#define A12_DECAY_TIME 5 /* a complete guess */
+
+void wildfire_state::sound_update()
+{
+	m_speaker->level_w(m_q2 & m_q3);
+}
+
+WRITE_LINE_MEMBER(wildfire_state::write_f)
+{
+	// F_out pin: speaker out
+	m_q3 = (state) ? 1 : 0;
+	sound_update();
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(wildfire_state::reset_q2)
+{
+	m_q2 = 0;
+	sound_update();
+}
+
+void wildfire_state::write_a12(int state)
+{
+	if (state)
+	{
+		m_a12_decay_timer->adjust(attotime::never);
+		m_q2 = state;
+		sound_update();
+	}
+	else if (m_a >> 12 & 1)
+	{
+		// falling edge
+		m_a12_decay_timer->adjust(attotime::from_msec(A12_DECAY_TIME));
+	}
+}
+
+
+
+/***************************************************************************
+
   I/O
 
 ***************************************************************************/
@@ -166,24 +220,15 @@ WRITE8_MEMBER(wildfire_state::write_d)
 
 WRITE16_MEMBER(wildfire_state::write_a)
 {
+	data ^= 0x1fff; // active-low
+	
+	// A12: enable speaker
+	write_a12(data >> 12 & 1);
+
 	// A0-A2: select 7segleds
 	// A3-A11: select other leds
-	m_a = data ^ 0x1fff; // active-low
+	m_a = data;
 	display_update();
-
-	// A12: enable speaker
-	sound_update();
-}
-
-WRITE_LINE_MEMBER(wildfire_state::write_f)
-{
-	m_f = (state) ? 1 : 0;
-	sound_update();
-}
-
-void wildfire_state::sound_update()
-{
-	m_speaker->level_w(m_a >> 12 & m_f);
 }
 
 
@@ -219,7 +264,8 @@ void wildfire_state::machine_start()
 
 	m_d = 0;
 	m_a = 0;
-	m_f = 0;
+	m_q2 = 0;
+	m_q3 = 0;
 
 	// register for savestates
 	save_item(NAME(m_display_state));
@@ -228,7 +274,8 @@ void wildfire_state::machine_start()
 
 	save_item(NAME(m_d));
 	save_item(NAME(m_a));
-	save_item(NAME(m_f));
+	save_item(NAME(m_q2));
+	save_item(NAME(m_q3));
 }
 
 
@@ -242,6 +289,7 @@ static MACHINE_CONFIG_START( wildfire, wildfire_state )
 	MCFG_AMI_S2152_FOUT_CB(WRITELINE(wildfire_state, write_f))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", wildfire_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD("a12_decay", wildfire_state, reset_q2)
 
 	MCFG_DEFAULT_LAYOUT(layout_wildfire)
 
