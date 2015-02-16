@@ -13,7 +13,6 @@
 
 #include "emu.h"
 #include "cpu/ucom4/ucom4.h"
-#include "sound/speaker.h"
 
 #include "tb303.lh"
 
@@ -23,13 +22,39 @@ class tb303_state : public driver_device
 public:
 	tb303_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_t3_off_timer(*this, "t3_off")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<timer_device> m_t3_off_timer;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(t3_clock);
+	TIMER_DEVICE_CALLBACK_MEMBER(t3_off);
 
 	virtual void machine_start();
 };
+
+
+// T2 to MCU CLK: LC circuit, stable sine wave, 2.2us interval
+#define TB303_T2_CLOCK_HZ   454545 /* in hz */
+
+// T3 to MCU _INT: square wave, 1.8ms interval, short duty cycle
+#define TB303_T3_CLOCK      attotime::from_usec(1800)
+#define TB303_T3_OFF        (TB303_T3_CLOCK / 8)
+
+TIMER_DEVICE_CALLBACK_MEMBER(tb303_state::t3_off)
+{
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(tb303_state::t3_clock)
+{
+	m_maincpu->set_input_line(0, ASSERT_LINE);
+	m_t3_off_timer->adjust(TB303_T3_OFF);
+}
+
+
 
 
 static INPUT_PORTS_START( tb303 )
@@ -51,7 +76,10 @@ void tb303_state::machine_start()
 static MACHINE_CONFIG_START( tb303, tb303_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D650, 454545) // LC circuit, 2.2us pulse interval
+	MCFG_CPU_ADD("maincpu", NEC_D650, TB303_T2_CLOCK_HZ)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("t3_clock", tb303_state, t3_clock, TB303_T3_CLOCK)
+	MCFG_TIMER_DRIVER_ADD("t3_off", tb303_state, t3_off)
 
 	MCFG_DEFAULT_LAYOUT(layout_tb303)
 
