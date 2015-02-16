@@ -10,7 +10,6 @@
   I've also looked at asterick's JavaScript D553 emulator for verification, with permission.
 
   TODO:
-  - add external interrupt
   - what happens with uCOM-43 opcodes on an uCOM-44/45 MCU?
   - what's the data after the ROM data for? (eg. 2000-2047, official ROM size is 2000)
 
@@ -153,6 +152,7 @@ void ucom4_cpu_device::device_start()
 	m_timer_f = 0;
 	m_int_f = 0;
 	m_inte_f = 0;
+	m_int_line = CLEAR_LINE;
 
 	// register for savestates
 	save_item(NAME(m_stack));
@@ -168,7 +168,7 @@ void ucom4_cpu_device::device_start()
 	save_item(NAME(m_carry_s_f));
 	save_item(NAME(m_timer_f));
 	save_item(NAME(m_int_f));
-	save_item(NAME(m_inte_f));
+	save_item(NAME(m_int_line));
 
 	// register state for debugger
 	state_add(UCOM4_PC, "PC",  m_pc).formatstr("%04X");
@@ -195,7 +195,12 @@ void ucom4_cpu_device::device_reset()
 	m_skip = false;
 
 	m_timer->adjust(attotime::never);
-
+	
+	// clear interrupt
+	m_int_line = CLEAR_LINE;
+	m_int_f = 0;
+	m_inte_f = (m_family == NEC_UCOM43) ? 0 : 1;
+	
 	// clear i/o
 	for (int i = NEC_UCOM4_PORTC; i <= NEC_UCOM4_PORTI; i++)
 		output_w(i, 0xf);
@@ -206,6 +211,23 @@ void ucom4_cpu_device::device_reset()
 //-------------------------------------------------
 //  execute
 //-------------------------------------------------
+
+void ucom4_cpu_device::execute_set_input(int line, int state)
+{
+	switch (line)
+	{
+		case 0:
+			// edge triggered
+			if (m_int_line == CLEAR_LINE && state)
+				m_int_f = 1;
+			m_int_line = state;
+			
+			break;
+		
+		default:
+			break;
+	}
+}
 
 inline void ucom4_cpu_device::increment_pc()
 {
@@ -233,6 +255,19 @@ void ucom4_cpu_device::execute_run()
 		// remember previous opcode
 		m_prev_op = m_op;
 
+		// handle interrupt - it not accepted during LI($9x) or EI($31), or while skipping
+		if (m_int_f && m_inte_f && (m_prev_op & 0xf0) != 0x90 && m_prev_op != 0x31 && !m_skip)
+		{
+			m_icount--;
+			push_stack();
+			m_pc = 0xf << 2;
+			m_int_f = 0;
+			m_inte_f = (m_family == NEC_UCOM43) ? 0 : 1;
+
+			standard_irq_callback(0);
+		}
+
+		// fetch next opcode
 		debugger_instruction_hook(this, m_pc);
 		m_op = m_program->read_byte(m_pc);
 		m_bitmask = 1 << (m_op & 0x03);
@@ -245,6 +280,7 @@ void ucom4_cpu_device::execute_run()
 			m_op = 0; // nop
 		}
 		
+		// handle opcode
 		switch (m_op & 0xf0)
 		{
 			case 0x80: op_ldz(); break;

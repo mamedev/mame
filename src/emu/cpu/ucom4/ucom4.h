@@ -110,8 +110,9 @@ protected:
 	virtual UINT32 execute_min_cycles() const { return 1; }
 	virtual UINT32 execute_max_cycles() const { return 2; }
 	virtual UINT32 execute_input_lines() const { return 1; }
+	virtual void execute_set_input(int line, int state);
 	virtual void execute_run();
-	
+
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return(spacenum == AS_PROGRAM) ? &m_program_config :((spacenum == AS_DATA) ? &m_data_config : NULL); }
 
@@ -153,6 +154,7 @@ protected:
 	UINT8 m_timer_f;        // timer out flag
 	UINT8 m_int_f;          // interrupt flag
 	UINT8 m_inte_f;         // interrupt enable flag
+	int m_int_line;         // interrupt pin state
 
 	// i/o handlers
 	devcb_read8 m_read_a;
