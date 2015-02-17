@@ -3,8 +3,8 @@
 
 #include <QtGui/QtGui>
 
-#include "debugqtview.h"
-#include "debugqtwindow.h"
+#include "debuggerview.h"
+#include "windowqt.h"
 
 
 //============================================================

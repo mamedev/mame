@@ -3,7 +3,7 @@
 
 #include <QtGui/QtGui>
 
-#include "debugqtwindow.h"
+#include "windowqt.h"
 
 //============================================================
 //  The Device Information Window.

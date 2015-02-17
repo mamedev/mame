@@ -1,6 +1,6 @@
 #define NO_MEM_TRACKING
 
-#include "debugqtbreakpointswindow.h"
+#include "breakpointswindow.h"
 
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"

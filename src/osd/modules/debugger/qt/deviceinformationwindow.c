@@ -1,6 +1,6 @@
 #define NO_MEM_TRACKING
 
-#include "debugqtdeviceinformationwindow.h"
+#include "deviceinformationwindow.h"
 
 
 DeviceInformationWindow::DeviceInformationWindow(running_machine* machine, device_t* device, QWidget* parent) :

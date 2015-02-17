@@ -6,8 +6,8 @@
 
 #include "debug/dvdisasm.h"
 
-#include "debugqtview.h"
-#include "debugqtwindow.h"
+#include "debuggerview.h"
+#include "windowqt.h"
 
 class DasmDockWidget;
 class ProcessorDockWidget;

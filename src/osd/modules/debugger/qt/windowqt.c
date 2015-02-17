@@ -1,11 +1,11 @@
 #define NO_MEM_TRACKING
 
-#include "debugqtwindow.h"
-#include "debugqtlogwindow.h"
-#include "debugqtdasmwindow.h"
-#include "debugqtmemorywindow.h"
-#include "debugqtbreakpointswindow.h"
-#include "debugqtdeviceswindow.h"
+#include "windowqt.h"
+#include "logwindow.h"
+#include "dasmwindow.h"
+#include "memorywindow.h"
+#include "breakpointswindow.h"
+#include "deviceswindow.h"
 
 bool WindowQt::s_refreshAll = false;
 bool WindowQt::s_hideAll = false;

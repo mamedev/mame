@@ -1,50 +1,42 @@
-#ifndef __DEBUG_QT_BREAK_POINTS_WINDOW_H__
-#define __DEBUG_QT_BREAK_POINTS_WINDOW_H__
+#ifndef __DEBUG_QT_LOG_WINDOW_H__
+#define __DEBUG_QT_LOG_WINDOW_H__
 
 #include <QtGui/QtGui>
 
-#include "debugqtview.h"
-#include "debugqtwindow.h"
+#include "debuggerview.h"
+#include "windowqt.h"
 
 
 //============================================================
-//  The Breakpoints Window.
+//  The Log Window.
 //============================================================
-class BreakpointsWindow : public WindowQt
+class LogWindow : public WindowQt
 {
 	Q_OBJECT
 
 public:
-	BreakpointsWindow(running_machine* machine, QWidget* parent=NULL);
-	virtual ~BreakpointsWindow();
-
-
-private slots:
-	void typeChanged(QAction* changedTo);
+	LogWindow(running_machine* machine, QWidget* parent=NULL);
+	virtual ~LogWindow();
 
 
 private:
 	// Widgets
-	DebuggerView* m_breakpointsView;
+	DebuggerView* m_logView;
 };
 
 
 //=========================================================================
 //  A way to store the configuration of a window long enough to read/write.
 //=========================================================================
-class BreakpointsWindowQtConfig : public WindowQtConfig
+class LogWindowQtConfig : public WindowQtConfig
 {
 public:
-	BreakpointsWindowQtConfig() :
-		WindowQtConfig(WIN_TYPE_BREAK_POINTS),
-		m_bwType(0)
+	LogWindowQtConfig() :
+		WindowQtConfig(WIN_TYPE_LOG)
 	{
 	}
 
-	~BreakpointsWindowQtConfig() {}
-
-	// Settings
-	int m_bwType;
+	~LogWindowQtConfig() {}
 
 	void buildFromQWidget(QWidget* widget);
 	void applyToQWidget(QWidget* widget);

@@ -1,6 +1,6 @@
 #define NO_MEM_TRACKING
 
-#include "debugqtdasmwindow.h"
+#include "dasmwindow.h"
 
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"

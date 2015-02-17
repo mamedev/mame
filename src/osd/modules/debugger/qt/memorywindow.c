@@ -1,6 +1,6 @@
 #define NO_MEM_TRACKING
 
-#include "debugqtmemorywindow.h"
+#include "memorywindow.h"
 
 #include "debug/dvmemory.h"
 #include "debug/debugcon.h"

@@ -1,7 +1,7 @@
 #define NO_MEM_TRACKING
 
-#include "debugqtdeviceswindow.h"
-#include "debugqtdeviceinformationwindow.h"
+#include "deviceswindow.h"
+#include "deviceinformationwindow.h"
 
 DevicesWindowModel::DevicesWindowModel(running_machine *machine, QObject *parent)
 {

@@ -1,5 +1,5 @@
-#ifndef __DEBUG_QT_VIEW_H__
-#define __DEBUG_QT_VIEW_H__
+#ifndef __DEBUG_QT_DEBUGGER_VIEW_H__
+#define __DEBUG_QT_DEBUGGER_VIEW_H__
 
 #include <QtGui/QtGui>
 

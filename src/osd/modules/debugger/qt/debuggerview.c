@@ -1,6 +1,6 @@
 #define NO_MEM_TRACKING
 
-#include "debugqtview.h"
+#include "debuggerview.h"
 
 DebuggerView::DebuggerView(const debug_view_type& type,
 							running_machine* machine,
