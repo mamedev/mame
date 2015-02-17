@@ -432,11 +432,25 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 - (void)mouseDown:(NSEvent *)event {
 	NSPoint const location = [self convertPoint:[event locationInWindow] fromView:nil];
 	NSUInteger const modifiers = [event modifierFlags];
-	view->process_click((modifiers & NSCommandKeyMask) ? DCK_RIGHT_CLICK
+	view->process_click(((modifiers & NSCommandKeyMask) && [[self window] isMainWindow]) ? DCK_RIGHT_CLICK
 					  : (modifiers & NSAlternateKeyMask) ? DCK_MIDDLE_CLICK
 					  : DCK_LEFT_CLICK,
 						[self convertLocation:location]);
 	[self setNeedsDisplay:YES];
+}
+
+
+- (void)mouseDragged:(NSEvent *)event {
+	NSPoint const location = [self convertPoint:[event locationInWindow] fromView:nil];
+	NSUInteger const modifiers = [event modifierFlags];
+	if (view->cursor_supported()
+	 && !(modifiers & NSAlternateKeyMask)
+	 && (!(modifiers & NSCommandKeyMask) || ![[self window] isMainWindow]))
+	{
+		view->set_cursor_position([self convertLocation:location]);
+		view->set_cursor_visible(true);
+		[self setNeedsDisplay:YES];
+	}
 }
 
 
