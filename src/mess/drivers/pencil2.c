@@ -17,10 +17,17 @@
     - ???     : Floppy Disk Drive (5.25)
     - ???     : Floppy Disk Controller
     - ???     : RS-232C Serial Interface
+    - ???     : Coleco Adapter*
     - PEN-8xx : Various software on Cassette or Floppy Disk
     - ???     : Game Controller (joystick and 14 buttons)
     - PEN-7xx : Various software in Cartridge format
     - PEN-430 : Modem
+    - PEN-902 : Computer power supply
+    - PEN-962 : Monitor cable
+
+    * The cart slot is the same as that found on the Colecovision console. By plugging the
+      Coleco Adapter into the expansion slot, Colecovision cartridges can be plugged into the
+      cart slot and played.
 
 Information found by looking inside the computer
 ------------------------------------------------
@@ -313,6 +320,7 @@ static MACHINE_CONFIG_START( pencil2, pencil2_state )
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pencil2_cart")
