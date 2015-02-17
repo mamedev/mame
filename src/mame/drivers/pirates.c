@@ -8,7 +8,7 @@ TODO:
 - EEPROM doesn't work. I'm not sure what the program is trying to do.
   The EEPROM handling might actually be related to the protection which
   makes the game hang.
-  See pirates_in1_r() for code which would work around the protection,
+  See prot_r() for code which would work around the protection,
   but makes the game periodically hang for a couple of seconds; therefore,
   for now I'm just patching out the protection check.
 
@@ -48,7 +48,7 @@ lev 7 : 0x7c : 0000 3c32 -
 Inputs mapped by Stephh
 
 The game hanging is an interesting issue, the board owner has 2 copies of this game, one a prototype,
-on the final released version.  The roms on both boards are the same, however the prototype locks up
+one the final released version.  The roms on both boards are the same, however the prototype locks up
 just as it does in Mame at the moment.  The final board does not.  It would appear the prototype
 board does not have the protection hardware correctly in place
 
@@ -94,7 +94,7 @@ Notes:
 #include "includes/pirates.h"
 
 
-WRITE16_MEMBER(pirates_state::pirates_out_w)
+WRITE16_MEMBER(pirates_state::out_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -121,7 +121,7 @@ CUSTOM_INPUT_MEMBER(pirates_state::prot_r)
 //  logerror("%s: IN1_r\n",machine().describe_context());
 
 #if 0
-	/* Pirates protection workaround. It more complicated than this... see code at
+	/* Pirates protection workaround. It's more complicated than this... see code at
 	   602e and 62a6 */
 	/* For Genix, see 6576 for setting values and 67c2,d3b4 and dbc2 for tests. */
 
@@ -156,14 +156,14 @@ static ADDRESS_MAP_START( pirates_map, AS_PROGRAM, 16, pirates_state )
 //  AM_RANGE(0x500000, 0x5007ff) AM_RAM
 	AM_RANGE(0x500000, 0x5007ff) AM_WRITEONLY AM_SHARE("spriteram")
 //  AM_RANGE(0x500800, 0x50080f) AM_WRITENOP
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(pirates_out_w)
+	AM_RANGE(0x600000, 0x600001) AM_WRITE(out_w)
 	AM_RANGE(0x700000, 0x700001) AM_WRITEONLY AM_SHARE("scroll")    // scroll reg
 	AM_RANGE(0x800000, 0x803fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x900000, 0x90017f) AM_RAM  // more of tilemaps ?
-	AM_RANGE(0x900180, 0x90137f) AM_RAM_WRITE(pirates_tx_tileram_w) AM_SHARE("tx_tileram")
-	AM_RANGE(0x901380, 0x902a7f) AM_RAM_WRITE(pirates_fg_tileram_w) AM_SHARE("fg_tileram")
+	AM_RANGE(0x900180, 0x90137f) AM_RAM_WRITE(tx_tileram_w) AM_SHARE("tx_tileram")
+	AM_RANGE(0x901380, 0x902a7f) AM_RAM_WRITE(fg_tileram_w) AM_SHARE("fg_tileram")
 //  AM_RANGE(0x902580, 0x902a7f) AM_RAM  // more of tilemaps ?
-	AM_RANGE(0x902a80, 0x904187) AM_RAM_WRITE(pirates_bg_tileram_w) AM_SHARE("bg_tileram")
+	AM_RANGE(0x902a80, 0x904187) AM_RAM_WRITE(bg_tileram_w) AM_SHARE("bg_tileram")
 //  AM_RANGE(0x903c80, 0x904187) AM_RAM  // more of tilemaps ?
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 ADDRESS_MAP_END
@@ -261,7 +261,7 @@ static MACHINE_CONFIG_START( pirates, pirates_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(36*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pirates_state, screen_update_pirates)
+	MCFG_SCREEN_UPDATE_DRIVER(pirates_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
@@ -323,7 +323,7 @@ ROM_END
 
 /* Init */
 
-void pirates_state::pirates_decrypt_68k()
+void pirates_state::decrypt_68k()
 {
 	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 	size_t rom_size = memregion("maincpu")->bytes();
@@ -346,7 +346,7 @@ void pirates_state::pirates_decrypt_68k()
 	}
 }
 
-void pirates_state::pirates_decrypt_p()
+void pirates_state::decrypt_p()
 {
 	int rom_size;
 	UINT8 *rom;
@@ -369,7 +369,7 @@ void pirates_state::pirates_decrypt_p()
 	}
 }
 
-void pirates_state::pirates_decrypt_s()
+void pirates_state::decrypt_s()
 {
 	int rom_size;
 	UINT8 *rom;
@@ -393,7 +393,7 @@ void pirates_state::pirates_decrypt_s()
 }
 
 
-void pirates_state::pirates_decrypt_oki()
+void pirates_state::decrypt_oki()
 {
 	int rom_size;
 	UINT8 *rom;
@@ -418,10 +418,10 @@ DRIVER_INIT_MEMBER(pirates_state,pirates)
 {
 	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 
-	pirates_decrypt_68k();
-	pirates_decrypt_p();
-	pirates_decrypt_s();
-	pirates_decrypt_oki();
+	decrypt_68k();
+	decrypt_p();
+	decrypt_s();
+	decrypt_oki();
 
 	/* patch out protection check */
 	rom[0x62c0/2] = 0x6006; // beq -> bra
@@ -431,10 +431,10 @@ READ16_MEMBER(pirates_state::genix_prot_r){ if(!offset) return 0x0004; else retu
 
 DRIVER_INIT_MEMBER(pirates_state,genix)
 {
-	pirates_decrypt_68k();
-	pirates_decrypt_p();
-	pirates_decrypt_s();
-	pirates_decrypt_oki();
+	decrypt_68k();
+	decrypt_p();
+	decrypt_s();
+	decrypt_oki();
 
 	/* If this value is increased then something has gone wrong and the protection failed */
 	/* Write-protect it for now */
@@ -444,5 +444,5 @@ DRIVER_INIT_MEMBER(pirates_state,genix)
 
 /* GAME */
 
-GAME( 1994, pirates, 0, pirates, pirates, pirates_state, pirates, 0, "NIX", "Pirates", 0 )
-GAME( 1994, genix,   0, pirates, pirates, pirates_state, genix,   0, "NIX", "Genix Family", 0 )
+GAME( 1994, pirates, 0, pirates, pirates, pirates_state, pirates, 0, "NIX", "Pirates", GAME_SUPPORTS_SAVE )
+GAME( 1994, genix,   0, pirates, pirates, pirates_state, genix,   0, "NIX", "Genix Family", GAME_SUPPORTS_SAVE )
