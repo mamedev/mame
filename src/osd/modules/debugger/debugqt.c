@@ -26,13 +26,13 @@
 #include "debugger.h"
 #include "modules/lib/osdobj_common.h"
 
-#include "qt/debugqtlogwindow.h"
-#include "qt/debugqtmainwindow.h"
-#include "qt/debugqtdasmwindow.h"
-#include "qt/debugqtmemorywindow.h"
-#include "qt/debugqtbreakpointswindow.h"
-#include "qt/debugqtdeviceswindow.h"
-#include "qt/debugqtdeviceinformationwindow.h"
+#include "qt/logwindow.h"
+#include "qt/mainwindow.h"
+#include "qt/dasmwindow.h"
+#include "qt/memorywindow.h"
+#include "qt/breakpointswindow.h"
+#include "qt/deviceswindow.h"
+#include "qt/deviceinformationwindow.h"
 
 class debug_qt : public osd_module, public debug_module
 {
