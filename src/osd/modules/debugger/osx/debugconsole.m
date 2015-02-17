@@ -2,7 +2,7 @@
 // copyright-holders:Vas Crabb
 //============================================================
 //
-//  debugosxdebugconsole.m - MacOS X Cocoa debug window handling
+//  debugconsole.m - MacOS X Cocoa debug window handling
 //
 //  Copyright (c) 1996-2015, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
@@ -14,6 +14,7 @@
 #import "debugcommandhistory.h"
 #import "consoleview.h"
 #import "debugview.h"
+#import "devicesviewer.h"
 #import "disassemblyview.h"
 #import "disassemblyviewer.h"
 #import "errorlogviewer.h"
@@ -252,6 +253,14 @@
 
 - (IBAction)debugNewPointsWindow:(id)sender{
 	MAMEPointsViewer *win = [[MAMEPointsViewer alloc] initWithMachine:*machine console:self];
+	[auxiliaryWindows addObject:win];
+	[win release];
+	[win activate];
+}
+
+
+- (IBAction)debugNewDevicesWindow:(id)sender {
+	MAMEDevicesViewer *win = [[MAMEDevicesViewer alloc] initWithMachine:*machine console:self];
 	[auxiliaryWindows addObject:win];
 	[win release];
 	[win activate];

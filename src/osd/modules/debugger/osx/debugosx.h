@@ -46,6 +46,9 @@ typedef float CGFloat;
 @protocol NSTextFieldDelegate <NSControlTextEditingDelegate>
 @end
 
+@protocol NSOutlineViewDataSource <NSObject>
+@end
+
 #endif // MAC_OS_X_VERSION_MAX_ALLOWED < 1060
 
 #endif // MAC_OS_X_VERSION_MAX_ALLOWED

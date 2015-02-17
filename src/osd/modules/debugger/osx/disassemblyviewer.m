@@ -2,7 +2,7 @@
 // copyright-holders:Vas Crabb
 //============================================================
 //
-//  debugosxdisassemblyviewer.m - MacOS X Cocoa debug window handling
+//  disassemblyviewer.m - MacOS X Cocoa debug window handling
 //
 //  Copyright (c) 1996-2015, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
@@ -24,11 +24,11 @@
 	NSScrollView	*dasmScroll;
 	NSView			*expressionContainer;
 	NSPopUpButton	*actionButton;
-	NSRect			contentBounds, expressionFrame;
+	NSRect			expressionFrame;
 
 	if (!(self = [super initWithMachine:m title:@"Disassembly" console:c]))
 		return nil;
-	contentBounds = [[window contentView] bounds];
+	NSRect const contentBounds = [[window contentView] bounds];
 
 	// create the expression field
 	expressionField = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 100, 19)];
@@ -108,13 +108,11 @@
 	[window setTitle:[NSString stringWithFormat:@"Disassembly: %@", [dasmView selectedSubviewName]]];
 
 	// calculate the optimal size for everything
-	{
-		NSSize	desired = [NSScrollView frameSizeForContentSize:[dasmView maximumFrameSize]
-										  hasHorizontalScroller:YES
-											hasVerticalScroller:YES
-													 borderType:[dasmScroll borderType]];
-		[self cascadeWindowWithDesiredSize:desired forView:dasmScroll];
-	}
+	NSSize const desired = [NSScrollView frameSizeForContentSize:[dasmView maximumFrameSize]
+										   hasHorizontalScroller:YES
+											 hasVerticalScroller:YES
+													  borderType:[dasmScroll borderType]];
+	[self cascadeWindowWithDesiredSize:desired forView:dasmScroll];
 
 	// don't forget the result
 	return self;

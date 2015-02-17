@@ -2,7 +2,7 @@
 // copyright-holders:Vas Crabb
 //============================================================
 //
-//  debugosxdebugconsole.h - MacOS X Cocoa debug window handling
+//  debugconsole.h - MacOS X Cocoa debug window handling
 //
 //  Copyright (c) 1996-2015, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
@@ -41,6 +41,7 @@
 - (IBAction)debugNewDisassemblyWindow:(id)sender;
 - (IBAction)debugNewErrorLogWindow:(id)sender;
 - (IBAction)debugNewPointsWindow:(id)sender;
+- (IBAction)debugNewDevicesWindow:(id)sender;
 
 - (void)debugNewMemoryWindowForSpace:(address_space *)space device:(device_t *)device expression:(NSString *)expression;
 - (void)debugNewDisassemblyWindowForSpace:(address_space *)space device:(device_t *)device expression:(NSString *)expression;

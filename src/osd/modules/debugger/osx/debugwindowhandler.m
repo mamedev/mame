@@ -2,7 +2,7 @@
 // copyright-holders:Vas Crabb
 //============================================================
 //
-//  debugosxdebugwindowhandler.m - MacOS X Cocoa debug window handling
+//  debugwindowhandler.m - MacOS X Cocoa debug window handling
 //
 //  Copyright (c) 1996-2015, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
@@ -33,85 +33,86 @@ NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification = @"MAMEAuxiliaryD
 @implementation MAMEDebugWindowHandler
 
 + (void)addCommonActionItems:(NSMenu *)menu {
-	{
-		NSMenuItem *runParentItem = [menu addItemWithTitle:@"Run"
-													action:@selector(debugRun:)
-											 keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF5FunctionKey]];
-		NSMenu *runMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"Run"];
-		[runParentItem setSubmenu:runMenu];
-		[runMenu release];
-		[runParentItem setKeyEquivalentModifierMask:0];
-		[[runMenu addItemWithTitle:@"and Hide Debugger"
-							action:@selector(debugRunAndHide:)
-					 keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF12FunctionKey]]
-		 setKeyEquivalentModifierMask:0];
-		[[runMenu addItemWithTitle:@"to Next CPU"
-							action:@selector(debugRunToNextCPU:)
-					 keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF6FunctionKey]]
-		 setKeyEquivalentModifierMask:0];
-		[[runMenu addItemWithTitle:@"until Next Interrupt on Current CPU"
-							action:@selector(debugRunToNextInterrupt:)
-					 keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF7FunctionKey]]
-		 setKeyEquivalentModifierMask:0];
-		[[runMenu addItemWithTitle:@"until Next VBLANK"
-							action:@selector(debugRunToNextVBLANK:)
-					 keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF8FunctionKey]]
-		 setKeyEquivalentModifierMask:0];
-	}
-	{
-		NSMenuItem *stepParentItem = [menu addItemWithTitle:@"Step" action:NULL keyEquivalent:@""];
-		NSMenu *stepMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"Step"];
-		[stepParentItem setSubmenu:stepMenu];
-		[stepMenu release];
-		[[stepMenu addItemWithTitle:@"Into"
-							 action:@selector(debugStepInto:)
-					  keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF11FunctionKey]]
-		 setKeyEquivalentModifierMask:0];
-		[[stepMenu addItemWithTitle:@"Over"
-							 action:@selector(debugStepOver:)
-					  keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF10FunctionKey]]
-		 setKeyEquivalentModifierMask:0];
-		[[stepMenu addItemWithTitle:@"Out"
-							 action:@selector(debugStepOut:)
-					  keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF10FunctionKey]]
-		 setKeyEquivalentModifierMask:NSShiftKeyMask];
-	}
-	{
-		NSMenuItem *resetParentItem = [menu addItemWithTitle:@"Reset" action:NULL keyEquivalent:@""];
-		NSMenu *resetMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"Reset"];
-		[resetParentItem setSubmenu:resetMenu];
-		[resetMenu release];
-		[[resetMenu addItemWithTitle:@"Soft"
-							  action:@selector(debugSoftReset:)
-					   keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF3FunctionKey]]
-		 setKeyEquivalentModifierMask:0];
-		[[resetMenu addItemWithTitle:@"Hard"
-							  action:@selector(debugHardReset:)
-					   keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF3FunctionKey]]
-		 setKeyEquivalentModifierMask:NSShiftKeyMask];
-	}
+	NSMenuItem *runParentItem = [menu addItemWithTitle:@"Run"
+												action:@selector(debugRun:)
+										 keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF5FunctionKey]];
+	NSMenu *runMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"Run"];
+	[runParentItem setSubmenu:runMenu];
+	[runMenu release];
+	[runParentItem setKeyEquivalentModifierMask:0];
+	[[runMenu addItemWithTitle:@"and Hide Debugger"
+						action:@selector(debugRunAndHide:)
+				 keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF12FunctionKey]]
+	 setKeyEquivalentModifierMask:0];
+	[[runMenu addItemWithTitle:@"to Next CPU"
+						action:@selector(debugRunToNextCPU:)
+				 keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF6FunctionKey]]
+	 setKeyEquivalentModifierMask:0];
+	[[runMenu addItemWithTitle:@"until Next Interrupt on Current CPU"
+						action:@selector(debugRunToNextInterrupt:)
+				 keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF7FunctionKey]]
+	 setKeyEquivalentModifierMask:0];
+	[[runMenu addItemWithTitle:@"until Next VBLANK"
+						action:@selector(debugRunToNextVBLANK:)
+				 keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF8FunctionKey]]
+	 setKeyEquivalentModifierMask:0];
+
+	NSMenuItem *stepParentItem = [menu addItemWithTitle:@"Step" action:NULL keyEquivalent:@""];
+	NSMenu *stepMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"Step"];
+	[stepParentItem setSubmenu:stepMenu];
+	[stepMenu release];
+	[[stepMenu addItemWithTitle:@"Into"
+						 action:@selector(debugStepInto:)
+				  keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF11FunctionKey]]
+	 setKeyEquivalentModifierMask:0];
+	[[stepMenu addItemWithTitle:@"Over"
+						 action:@selector(debugStepOver:)
+				  keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF10FunctionKey]]
+	 setKeyEquivalentModifierMask:0];
+	[[stepMenu addItemWithTitle:@"Out"
+						 action:@selector(debugStepOut:)
+				  keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF10FunctionKey]]
+	 setKeyEquivalentModifierMask:NSShiftKeyMask];
+
+	NSMenuItem *resetParentItem = [menu addItemWithTitle:@"Reset" action:NULL keyEquivalent:@""];
+	NSMenu *resetMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"Reset"];
+	[resetParentItem setSubmenu:resetMenu];
+	[resetMenu release];
+	[[resetMenu addItemWithTitle:@"Soft"
+						  action:@selector(debugSoftReset:)
+				   keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF3FunctionKey]]
+	 setKeyEquivalentModifierMask:0];
+	[[resetMenu addItemWithTitle:@"Hard"
+						  action:@selector(debugHardReset:)
+				   keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF3FunctionKey]]
+	 setKeyEquivalentModifierMask:NSShiftKeyMask];
+
 	[menu addItem:[NSMenuItem separatorItem]];
-	{
-		NSMenuItem *newParentItem = [menu addItemWithTitle:@"New" action:NULL keyEquivalent:@""];
-		NSMenu *newMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"New"];
-		[newParentItem setSubmenu:newMenu];
-		[newMenu release];
-		[newMenu addItemWithTitle:@"Memory Window"
-						   action:@selector(debugNewMemoryWindow:)
-					keyEquivalent:@"d"];
-		[newMenu addItemWithTitle:@"Disassembly Window"
-						   action:@selector(debugNewDisassemblyWindow:)
-					keyEquivalent:@"a"];
-		[newMenu addItemWithTitle:@"Error Log Window"
-						   action:@selector(debugNewErrorLogWindow:)
-					keyEquivalent:@"l"];
-		[newMenu addItemWithTitle:@"(Break|Watch)points Window"
-						   action:@selector(debugNewPointsWindow:)
-					keyEquivalent:@"b"];
-	}
+
+	NSMenuItem *newParentItem = [menu addItemWithTitle:@"New" action:NULL keyEquivalent:@""];
+	NSMenu *newMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"New"];
+	[newParentItem setSubmenu:newMenu];
+	[newMenu release];
+	[newMenu addItemWithTitle:@"Memory Window"
+					   action:@selector(debugNewMemoryWindow:)
+				keyEquivalent:@"d"];
+	[newMenu addItemWithTitle:@"Disassembly Window"
+					   action:@selector(debugNewDisassemblyWindow:)
+				keyEquivalent:@"a"];
+	[newMenu addItemWithTitle:@"Error Log Window"
+					   action:@selector(debugNewErrorLogWindow:)
+				keyEquivalent:@"l"];
+	[newMenu addItemWithTitle:@"(Break|Watch)points Window"
+					   action:@selector(debugNewPointsWindow:)
+				keyEquivalent:@"b"];
+	[newMenu addItemWithTitle:@"Devices Window"
+					   action:@selector(debugNewDevicesWindow:)
+				keyEquivalent:@"D"];
+
 	[menu addItem:[NSMenuItem separatorItem]];
+
 	[menu addItemWithTitle:@"Close Window" action:@selector(performClose:) keyEquivalent:@"w"];
-	[menu addItemWithTitle:@"Exit" action:@selector(debugExit:) keyEquivalent:@""];
+	[menu addItemWithTitle:@"Quit" action:@selector(debugExit:) keyEquivalent:@"q"];
 }
 
 
@@ -298,6 +299,11 @@ NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification = @"MAMEAuxiliaryD
 }
 
 
+- (IBAction)debugNewDevicesWindow:(id)sender {
+	[console debugNewDevicesWindow:sender];
+}
+
+
 - (void)windowWillClose:(NSNotification *)notification {
 	[[NSNotificationCenter defaultCenter] postNotificationName:MAMEAuxiliaryDebugWindowWillCloseNotification
 														object:self];
@@ -314,7 +320,7 @@ NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification = @"MAMEAuxiliaryD
 	windowFrame.size.width += desired.width;
 	windowFrame.size.width = MIN(windowFrame.size.width, available.size.width);
 	windowFrame.size.height += desired.height;
-	windowFrame.size.height = MIN(MIN(windowFrame.size.height, 240), available.size.height);
+	windowFrame.size.height = MIN(MIN(windowFrame.size.height, 320), available.size.height);
 	windowFrame.origin.x = available.origin.x + available.size.width - windowFrame.size.width;
 	windowFrame.origin.y = available.origin.y;
 	[window setFrame:windowFrame display:YES];
