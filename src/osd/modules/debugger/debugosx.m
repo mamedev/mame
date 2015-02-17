@@ -12,11 +12,11 @@
 
 // TODO:
 //  * Automatic scrolling for console and log views
-//  * Using alpha for disabled foreground colours doesn't really work
-//  * New windows created from auxiliary windows should inherit focus rather than pointing at current CPU
-//  * Keyboard shortcuts in error log windows
+//  * Keyboard shortcuts in error log and devices windows
 //  * Don't accept keyboard input while the game is running
 //  * Interior focus rings - standard/exterior focus rings look really ugly here
+//  * Improve automatic window sizing - it isn't working all that well
+//  * Updates causing debug views' widths to change are sometimes obscured by the scroll views' opaque backgrounds
 //  * Scroll views with content narrower than clipping area are flaky under Tiger - nothing I can do about this
 
 
@@ -30,8 +30,8 @@
 #include "osdsdl.h"
 #include "debug_module.h"
 
-#import "osx/debugosxdebugconsole.h"
-#import "osx/debugosxdebugwindowhandler.h"
+#import "osx/debugconsole.h"
+#import "osx/debugwindowhandler.h"
 
 
 //============================================================
@@ -54,14 +54,8 @@ public:
 			[m_console release];
 	}
 
-	virtual int init()
-	{
-		return 0;
-	}
-
-	virtual void exit()
-	{
-	}
+	virtual int init();
+	virtual void exit();
 
 	virtual void init_debugger(running_machine &machine);
 	virtual void wait_for_debugger(device_t &device, bool firststop);
@@ -75,12 +69,40 @@ private:
 MODULE_DEFINITION(DEBUG_OSX, debugger_osx)
 
 //============================================================
+//  debugger_osx::init
+//============================================================
+
+int debugger_osx::init()
+{
+	return 0;
+}
+
+//============================================================
+//  debugger_osx::exit
+//============================================================
+
+void debugger_osx::exit()
+{
+	if (m_console)
+	{
+		NSDictionary *info = [NSDictionary dictionaryWithObject:[NSValue valueWithPointer:m_machine]
+														forKey:@"MAMEDebugMachine"];
+		[[NSNotificationCenter defaultCenter] postNotificationName:MAMEHideDebuggerNotification
+															object:m_console
+														  userInfo:info];
+		[m_console release];
+		m_console = nil;
+		m_machine = NULL;
+	}
+}
+
+//============================================================
 //  debugger_osx::init_debugger
 //============================================================
 
 void debugger_osx::init_debugger(running_machine &machine)
 {
-    m_machine = &machine;
+	m_machine = &machine;
 }
 
 //============================================================
@@ -94,9 +116,12 @@ void debugger_osx::wait_for_debugger(device_t &device, bool firststop)
 		m_console = [[MAMEDebugConsole alloc] initWithMachine:*m_machine];
 
 	// make sure the debug windows are visible
-	if (firststop) {
+	if (firststop)
+	{
 		NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithPointer:&device],
 																		@"MAMEDebugDevice",
+																		[NSValue valueWithPointer:m_machine],
+																		@"MAMEDebugMachine",
 																		nil];
 		[[NSNotificationCenter defaultCenter] postNotificationName:MAMEShowDebuggerNotification
 															object:m_console
