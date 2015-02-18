@@ -12,11 +12,48 @@
 #import "deviceinfoviewer.h"
 
 
+@interface MAMEDeviceInfoView : NSView
+{
+	CGFloat	minWidth;
+}
+
+- (id)initWithFrame:(NSRect)frame;
+
+- (void)setMinWidth:(CGFloat)aWidth;
+
+@end
+
+
+@implementation MAMEDeviceInfoView
+
+- (id)initWithFrame:(NSRect)frame {
+	if (!(self = [super initWithFrame:frame]))
+		return nil;
+	minWidth = 0;
+	return self;
+}
+
+- (void)setMinWidth:(CGFloat)aWidth {
+	minWidth = aWidth;
+}
+
+- (BOOL)isFlipped {
+	return YES;
+}
+
+- (void)resizeWithOldSuperviewSize:(NSSize)oldBoundsSize {
+	NSSize const newBoundsSize = [[self superview] bounds].size;
+	[self setFrameSize:NSMakeSize(MAX(newBoundsSize.width, minWidth), [self frame].size.height)];
+}
+
+@end
+
+
 @implementation MAMEDeviceInfoViewer
 
 - (NSTextField *)makeLabel:(NSString *)text {
 	NSTextField *const result = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 100, 14)];
-	[result setAutoresizingMask:NSViewMinYMargin];
+	[result setAutoresizingMask:(NSViewMaxYMargin | NSViewMaxXMargin)];
 	[[result cell] setControlSize:NSSmallControlSize];
 	[result setEditable:NO];
 	[result setSelectable:NO];
@@ -33,7 +70,7 @@
 
 - (NSTextField *)makeField:(NSString *)text {
 	NSTextField *const result = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 100, 14)];
-	[result setAutoresizingMask:(NSViewWidthSizable | NSViewMinYMargin)];
+	[result setAutoresizingMask:(NSViewWidthSizable | NSViewMaxYMargin)];
 	[[result cell] setControlSize:NSSmallControlSize];
 	[result setEditable:NO];
 	[result setSelectable:YES];
@@ -50,7 +87,7 @@
 
 - (NSBox *)makeBox:(NSString *)t toFit:(NSView *)v {
 	NSBox *const result = [[NSBox alloc] initWithFrame:NSMakeRect(0, 0, [v frame].size.width - 34, 32)];
-	[result setAutoresizingMask:(NSViewWidthSizable | NSViewMinYMargin)];
+	[result setAutoresizingMask:(NSViewWidthSizable | NSViewMaxYMargin)];
 	[result setTitle:t];
 	[result setBoxType:NSBoxPrimary];
 	[result setBorderType:NSLineBorder];
@@ -67,8 +104,8 @@
 	NSSize space = [v bounds].size;
 	space.width = MAX(space.width, [field frame].size.width + w + 52);
 	space.height += height + 8;
-	[label setFrame:NSMakeRect(25, 20, w, height)];
-	[field setFrame:NSMakeRect(w + 27, 20, space.width - w - 52, height)];
+	[label setFrame:NSMakeRect(25, space.height - height - 20, w, height)];
+	[field setFrame:NSMakeRect(w + 27, space.height - height - 20, space.width - w - 52, height)];
 	[v setFrameSize:space];
 	[v addSubview:label];
 	[v addSubview:field];
@@ -79,6 +116,7 @@
 
 - (void)addField:(NSString *)f toBox:(NSBox *)b {
 	NSTextField *const field = [self makeField:f];
+	[field setAutoresizingMask:(NSViewWidthSizable | NSViewMinYMargin)];
 	NSSize space = [b frame].size;
 	space.width = MAX(space.width, [field frame].size.width + 32);
 	space.height += [field frame].size.height + 8;
@@ -90,18 +128,18 @@
 
 
 - (void)addBox:(NSBox *)b toView:(NSView *)v {
-	[b setFrameOrigin:NSMakePoint(17, 16)];
 	NSSize space = [v frame].size;
 	space.width = MAX(space.width, [b frame].size.width + 34);
 	space.height += [b frame].size.height + 4;
+	[b setFrameOrigin:NSMakePoint(17, space.height - [b frame].size.height - 16)];
 	[v setFrameSize:space];
 	[v addSubview:b];
 }
 
 
 - (id)initWithDevice:(device_t &)d machine:(running_machine &)m console:(MAMEDebugConsole *)c {
-	NSView			*contentView;
-	NSScrollView	*contentScroll;
+	MAMEDeviceInfoView	*contentView;
+	NSScrollView		*contentScroll;
 
 	if (!(self = [super initWithMachine:m
 								  title:[NSString stringWithFormat:@"Device %s", d.tag()]
@@ -112,8 +150,7 @@
 	device = &d;
 
 	// Create a view to hold everything
-	contentView = [[NSView alloc] initWithFrame:NSMakeRect(0, 0, 320, 32)];
-	[contentView setAutoresizingMask:(NSViewMaxXMargin | NSViewMinYMargin)];
+	contentView = [[MAMEDeviceInfoView alloc] initWithFrame:NSMakeRect(0, 0, 320, 32)];
 	[contentView setAutoresizesSubviews:YES];
 
 	// add the stuff that's always present
@@ -167,6 +204,10 @@
 		}
 	}
 
+	// lock minimum content size
+	[contentView setMinWidth:[contentView frame].size.width];
+	[contentView setAutoresizingMask:NSViewWidthSizable];
+
 	// create a scroll view for holding everything
 	NSSize desired = [NSScrollView frameSizeForContentSize:[contentView frame].size
 									 hasHorizontalScroller:YES
@@ -186,7 +227,7 @@
 	[contentScroll release];
 
 	// calculate the optimal size for everything
-	[self cascadeWindowWithDesiredSize:NSMakeSize(320, 240) forView:contentScroll];
+	[self cascadeWindowWithDesiredSize:[contentScroll frame].size forView:contentScroll];
 
 	// don't forget the result
 	return self;
