@@ -48,7 +48,7 @@
 #define _INTEGRAL_MAX_BITS 64   // Enable _stati64() on Windows
 #define _CRT_SECURE_NO_WARNINGS // Disable deprecation warning in VS2005+
 #undef WIN32_LEAN_AND_MEAN      // Let windows.h always include winsock2.h
-#if defined(__Linux__) || defined(_WIN32)
+#ifdef __Linux__
 #define _XOPEN_SOURCE 600       // For flockfile() on Linux
 #endif
 #define __STDC_FORMAT_MACROS    // <inttypes.h> wants this for C++
@@ -377,7 +377,8 @@ void iobuf_remove(struct iobuf *io, size_t n) {
 
 static size_t ns_out(struct ns_connection *nc, const void *buf, size_t len) {
   if (nc->flags & NSF_UDP) {
-    long n = sendto(nc->sock, (const char*)buf, len, 0, &nc->sa.sa, sizeof(nc->sa.sin));
+    long n = sendto(nc->sock, (const char *) buf, len, 0, &nc->sa.sa,
+                    sizeof(nc->sa.sin));
     DBG(("%p %d send %ld (%d %s)", nc, nc->sock, n, errno, strerror(errno)));
     return n < 0 ? 0 : n;
   } else {
@@ -900,6 +901,7 @@ static void ns_read_from_socket(struct ns_connection *conn) {
       } else {
         ok = 1;
       }
+      conn->flags &= ~(NSF_WANT_READ | NSF_WANT_WRITE);
     }
 #endif
     conn->flags &= ~NSF_CONNECTING;
@@ -928,6 +930,7 @@ static void ns_read_from_socket(struct ns_connection *conn) {
       int ssl_err = ns_ssl_err(conn, res);
       if (res == 1) {
         conn->flags |= NSF_SSL_HANDSHAKE_DONE;
+        conn->flags &= ~(NSF_WANT_READ | NSF_WANT_WRITE);
       } else if (ssl_err == SSL_ERROR_WANT_READ ||
                  ssl_err == SSL_ERROR_WANT_WRITE) {
         return; // Call us again
@@ -965,6 +968,8 @@ static void ns_write_to_socket(struct ns_connection *conn) {
       } else {
         conn->flags |= NSF_CLOSE_IMMEDIATELY;
       }
+    } else {
+      conn->flags &= ~(NSF_WANT_READ | NSF_WANT_WRITE);
     }
   } else
 #endif
@@ -1273,12 +1278,7 @@ void ns_mgr_free(struct ns_mgr *s) {
 #define STR(x) STRX(x)
 #define __func__ __FILE__ ":" STR(__LINE__)
 #endif
-/* MINGW has adopted the MSVC formatting for 64-bit ints as of gcc 4.4 till 4.8*/
-#if (defined(__MINGW32__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4 && __GNUC_MINOR__ < 8))) || defined(_MSC_VER)
 #define INT64_FMT   "I64d"
-#else
-#define INT64_FMT   "lld"
-#endif
 #define flockfile(x)      ((void) (x))
 #define funlockfile(x)    ((void) (x))
 typedef struct _stati64 file_stat_t;
