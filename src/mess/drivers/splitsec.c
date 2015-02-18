@@ -190,7 +190,7 @@ READ8_MEMBER(splitsec_state::read_k)
 
 WRITE16_MEMBER(splitsec_state::write_o)
 {
-	// O0-O6: led rows
+	// O0-O6: led columns
 	// O7: N/C
 	m_o = data;
 	display_update();
@@ -204,7 +204,7 @@ WRITE16_MEMBER(splitsec_state::splitsec_write_r)
 	// R9,R10: input mux
 	m_input_mux = data >> 9 & 3;
 	
-	// R0-R7: led columns
+	// R0-R7: led rows
 	m_r = data & 0xff;
 	display_update();
 }
@@ -217,7 +217,7 @@ WRITE16_MEMBER(splitsec_state::bankshot_write_r)
 	// R2,R3: input mux
 	m_input_mux = data >> 2 & 3;
 	
-	// R2-R10: led columns
+	// R2-R10: led rows
 	m_r = data & ~3;
 	display_update();
 }
@@ -246,6 +246,7 @@ INPUT_PORTS_END
 
 
 /* bankshot physical button layout and labels is like this:
+  (note: remember that you can rotate the display in MESS)
 
     [SELECT  [BALL UP] [BALL OVER]
      SCORE]

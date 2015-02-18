@@ -18,8 +18,8 @@
 
 #include "tc4.lh"
 
-// The master clock is a single stage RC oscillator: R=27.3K, C=100pf,
-//..
+// The master clock is a single stage RC oscillator: R=27.3K, C=100pf.
+// TMS1400 RC curve is unknown, so let's do an approximation until it is.
 #define MASTER_CLOCK (475000)
 
 
@@ -29,12 +29,12 @@ public:
 	tc4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-//		m_button_matrix(*this, "IN"),
+		m_button_matrix(*this, "IN"),
 		m_speaker(*this, "speaker")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-//	required_ioport_array<2> m_button_matrix;
+	required_ioport_array<6> m_button_matrix;
 	required_device<speaker_sound_device> m_speaker;
 
 	UINT16 m_r;
@@ -49,6 +49,7 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
+	bool index_is_7segled(int index);
 	void display_update();
 
 	virtual void machine_start();
@@ -67,6 +68,12 @@ public:
 
 // decay time, in steps of 1ms
 #define DISPLAY_DECAY_TIME 40
+
+inline bool tc4_state::index_is_7segled(int index)
+{
+	// R5,7,8,9 are 7segs
+	return (index >= 5 && index <= 9 && index != 6);
+}
 
 
 void tc4_state::display_update()
@@ -98,8 +105,8 @@ void tc4_state::display_update()
 	for (int i = 0; i < 0x10; i++)
 		if (m_display_cache[i] != active_state[i])
 		{
-//			if (index_is_7segled(i))
-//				output_set_digit_value(i, BITSWAP8(active_state[i],7,0,1,2,3,4,5,6) & 0x7f);
+			if (index_is_7segled(i))
+				output_set_digit_value(i, active_state[i] & 0x7f);
 
 			for (int j = 0; j < 9; j++)
 				output_set_lamp_value(i*10 + j, active_state[i] >> j & 1);
@@ -130,15 +137,36 @@ READ8_MEMBER(tc4_state::read_k)
 {
 	UINT8 k = 0;
 
+	// read selected button rows
+	for (int i = 0; i < 6; i++)
+		if (m_r >> i & 1)
+			k |= m_button_matrix[i]->read();
+	
+	// read from cartridge
+	if (m_r & 0x200)
+		k |= ioport("CART")->read();
+	
 	return k;
 }
 
 WRITE16_MEMBER(tc4_state::write_o)
 {
+	// O0-O7: leds/7segment
+	m_o = data;
+	display_update();
 }
 
 WRITE16_MEMBER(tc4_state::write_r)
 {
+	// R10: speaker out
+	m_speaker->level_w(data >> 10 & 1);
+
+	// R0-R5: input mux
+	// R6: led column 8
+	// R9: to cartridge slot
+	// +other: select leds
+	m_r = data & 0x3ff;
+	display_update();
 }
 
 
@@ -151,6 +179,47 @@ WRITE16_MEMBER(tc4_state::write_r)
 ***************************************************************************/
 
 static INPUT_PORTS_START( tc4 )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN )
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN )
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_PLAYER(2)
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_PLAYER(2)
+
+	PORT_START("IN.5") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2)
+
+	PORT_START("CART")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "R9:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "R9:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "R9:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "R9:4" )
 INPUT_PORTS_END
 
 
