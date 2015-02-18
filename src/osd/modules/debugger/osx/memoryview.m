@@ -37,20 +37,31 @@
 	if (action == @selector(showChunkSize:))
 	{
 		[item setState:((tag == memview->bytes_per_chunk()) ? NSOnState : NSOffState)];
+		return YES;
 	}
 	else if (action == @selector(showPhysicalAddresses:))
 	{
 		[item setState:((tag == memview->physical()) ? NSOnState : NSOffState)];
+		return YES;
 	}
 	else if (action == @selector(showReverseView:))
 	{
 		[item setState:((tag == memview->reverse()) ? NSOnState : NSOffState)];
+		return YES;
 	}
 	else if (action == @selector(showReverseViewToggle:))
 	{
 		[item setState:(memview->reverse() ? NSOnState : NSOffState)];
+		return YES;
 	}
-	return [super validateMenuItem:item];
+	else if (action == @selector(changeBytesPerLine:))
+	{
+		return (memview->chunks_per_row() + [item tag]) > 0;
+	}
+	else
+	{
+		return [super validateMenuItem:item];
+	}
 }
 
 
