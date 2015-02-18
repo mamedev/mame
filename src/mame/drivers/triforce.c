@@ -818,29 +818,20 @@ Version           V1.003
 Release Date      20060131
 Manufacturer ID
 Ring Code
-BIN               BLL.BIN
-KEY               ABFBD902FBD980E5
-GDI Structure     3
-1     0 4 2352 track01.bin 0
-2   450 0 2352 track02.raw 0
-3 45000 4 2352 track03.bin 0
 
-Files Infos :
-disc.gdi    - size         87 - md5 b3ecdf113fd42344dd84142679e4cb36 - sha1 9d50b816d3f69ad192f5986ab487769965c2e082
-track01.bin - size     705600 - md5 0fa0aff28e75130cc9364e11755d0881 - sha1 647ff196eff7c220e1aa7829f87494d557c90be4
-track02.raw - size    3179904 - md5 32a6bba6f49385515c6649bb78f8e9c4 - sha1 27c8184e6d40c48fe6466bfb4171969eaf6baab3
-track03.bin - size 1185760800 - md5 8b67fe537a66fa849686df074531cb30 - sha1 153f638f5b67741687186835573ab485400f91bf
-
-ROM_START( vs42k6ex )
-    TRIFORCE_BIOS
-
-    DISK_REGION( "gdrom" )
-    DISK_IMAGE_READONLY( "gdt-0021", 0, NO_DUMP ) disc.gdi is missing from available romset, it is impossible to create CHD with CHDMAN
-
-    ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-    ROM_LOAD("gdt-0021.data", 0x00, 0x50, NO_DUMP )
-ROM_END
+PIC
+253-5598-0433E
+317-0433-EXP
 */
+ROM_START( vs42k6ex )
+	TRIFORCE_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdt-0021", 0, SHA1(fa1511d3a0f7755df77ec535f78beff0c5a7fcbe) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD("317-0433-exp.pic", 0x00, 0x4000, CRC(9e52aba5) SHA1(40eff0ed8c801644849bbadada871f2abb1d95a0) )
+ROM_END
 
 /*
 Title          BOX GDROM CF-BOX FIRM
@@ -849,20 +840,16 @@ Hardware       Tri-Force
 Sec Key        253-5508-0567
 Pic            317-0567-COM
 Ver            0001
-Boot File      BRN.BIN
-GD Unlock      70 1F 71 1F
-DES Key        D96446469BDCE9C1
-
-ROM_START( tcfboxa )
-    TRIFORCE_BIOS
-
-    DISK_REGION( "gdrom" )
-    DISK_IMAGE_READONLY( "gdt-0022", 0, NO_DUMP ) disc.gdi is missing from available romset, it is impossible to create CHD with CHDMAN
-
-    ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-    ROM_LOAD("317-0567-com.data", 0x00, 0x50, NO_DUMP )
-ROM_END
 */
+ROM_START( tcfboxa )
+	TRIFORCE_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdt-0022a", 0, SHA1(14973058d87eff93782f59878ec856a7be994b6e) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD("317-0567-com.pic", 0x00, 0x4000, CRC(cd1d2b2d) SHA1(78203ee0339f76eb76da08d7de43e7e44e4b7d32) )
+ROM_END
 
 // This dump is tested good on h/w: was flashed to a dead cart and it then ran fine
 ROM_START( mkartagp )
@@ -966,9 +953,9 @@ ROM_END
 // 0020B    GAME( 2006, vs42k6b,  vs42006,  triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Virtua Striker 4 Ver.2006 (Japan) (Rev B) (GDT-0020B)", GAME_IS_SKELETON )
 // 0020C    GAME( 2006, vs42k6c,  vs42006,  triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Virtua Striker 4 Ver.2006 (Japan) (Rev C) (GDT-0020C)", GAME_IS_SKELETON )
 /* 0020D */ GAME( 2006, vs42006,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Virtua Striker 4 Ver.2006 (Japan) (Rev D) (GDT-0020D)", GAME_IS_SKELETON )
-// 0021     GAME( 2006, vs42k6ex, triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Virtua Striker 4 Ver.2006 (export) (GDT-0021)", GAME_IS_SKELETON )
+/* 0021  */ GAME( 2006, vs42k6ex, triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Virtua Striker 4 Ver.2006 (Export) (GDT-0021)", GAME_IS_SKELETON )
 // 0022     GAME( 2006, tcfboxo,  tcfboxa,  triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Triforce Firmware Update For Compact Flash Box (GDT-0022)", GAME_IS_SKELETON )
-// 0022A    GAME( 2006, tcfboxa,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Triforce Firmware Update For Compact Flash Box (Rev A) (GDT-0022A)", GAME_IS_SKELETON )
+/* 0022A */ GAME( 2006, tcfboxa,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",                               "Triforce Firmware Update For Compact Flash Box (Rev A) (GDT-0022A)", GAME_IS_SKELETON )
 
 // 837-xxxxx (Sega cart games)
 /* 14343-4T1  */ GAME( 2005, mkartagp, triforce, triforce_base, triforce, driver_device, 0, ROT0, "Namco / Nintendo", "Mario Kart Arcade GP (MKA2 Ver.B)", GAME_IS_SKELETON )
