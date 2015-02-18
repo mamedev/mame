@@ -44,8 +44,17 @@
 - (NSFont *)font;
 - (void)setFont:(NSFont *)f;
 
+- (BOOL)cursorSupported;
+- (BOOL)cursorVisible;
+- (debug_view_xy)cursorPosition;
+
+- (IBAction)copyVisible:(id)sender;
+- (IBAction)paste:(id)sender;
+
 - (void)windowDidBecomeKey:(NSNotification *)notification;
 - (void)windowDidResignKey:(NSNotification *)notification;
+
+- (void)addContextMenuItemsToMenu:(NSMenu *)menu;
 
 @end
 

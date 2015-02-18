@@ -12,6 +12,7 @@
 #import "debugosx.h"
 
 #include "emu.h"
+#include "debug/debugcpu.h"
 
 #import <Cocoa/Cocoa.h>
 
@@ -33,6 +34,8 @@ extern NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification;
 
 + (void)addCommonActionItems:(NSMenu *)menu;
 + (NSPopUpButton *)newActionButtonWithFrame:(NSRect)frame;
+
++ (device_debug::breakpoint *)findBreakpointAtAddress:(offs_t)address forDevice:(device_t &)device;
 
 - (id)initWithMachine:(running_machine &)m title:(NSString *)t;
 

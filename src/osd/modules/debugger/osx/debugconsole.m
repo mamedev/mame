@@ -14,6 +14,7 @@
 #import "debugcommandhistory.h"
 #import "consoleview.h"
 #import "debugview.h"
+#import "deviceinfoviewer.h"
 #import "devicesviewer.h"
 #import "disassemblyview.h"
 #import "disassemblyviewer.h"
@@ -53,9 +54,7 @@
 	[regView release];
 
 	// create the disassembly view
-	dasmView = [[MAMEDisassemblyView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100)
-												  machine:*machine
-											   useConsole:YES];
+	dasmView = [[MAMEDisassemblyView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100) machine:*machine];
 	[dasmView setExpression:@"curpc"];
 	dasmScroll = [[NSScrollView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100)];
 	[dasmScroll setDrawsBackground:YES];
@@ -215,15 +214,66 @@
 
 - (IBAction)doCommand:(id)sender {
 	NSString *command = [sender stringValue];
-	if ([command length] == 0) {
+	if ([command length] == 0)
+	{
 		debug_cpu_get_visible_cpu(*machine)->debug()->single_step();
 		[history reset];
-	} else {
+	}
+	else
+	{
 		debug_console_execute_command(*machine, [command UTF8String], 1);
 		[history add:command];
 		[history edit];
 	}
 	[sender setStringValue:@""];
+}
+
+
+- (IBAction)debugToggleBreakpoint:(id)sender {
+	device_t &device = [dasmView source]->device();
+	if ([dasmView cursorVisible] && (debug_cpu_get_visible_cpu(*machine) == &device))
+	{
+		offs_t const address = [dasmView selectedAddress];
+		device_debug::breakpoint *bp = [[self class] findBreakpointAtAddress:address
+																   forDevice:device];
+
+		// if it doesn't exist, add a new one
+		NSString *command;
+		if (bp == NULL)
+			command = [NSString stringWithFormat:@"bpset %lX", (unsigned long)address];
+		else
+			command = [NSString stringWithFormat:@"bpclear %X", (unsigned)bp->index()];
+		debug_console_execute_command(*machine, [command UTF8String], 1);
+	}
+}
+
+
+- (IBAction)debugToggleBreakpointEnable:(id)sender {
+	device_t &device = [dasmView source]->device();
+	if ([dasmView cursorVisible] && (debug_cpu_get_visible_cpu(*machine) == &device))
+	{
+		device_debug::breakpoint *bp = [[self class] findBreakpointAtAddress:[dasmView selectedAddress]
+																   forDevice:device];
+		if (bp != NULL)
+		{
+			NSString *command;
+			if (bp->enabled())
+				command = [NSString stringWithFormat:@"bpdisable %X", (unsigned)bp->index()];
+			else
+				command = [NSString stringWithFormat:@"bpenable %X", (unsigned)bp->index()];
+			debug_console_execute_command(*machine, [command UTF8String], 1);
+		}
+	}
+}
+
+
+- (IBAction)debugRunToCursor:(id)sender {
+	device_t &device = [dasmView source]->device();
+	if ([dasmView cursorVisible] && (debug_cpu_get_visible_cpu(*machine) == &device))
+	{
+		NSString *command = [NSString stringWithFormat:@"go 0x%lX", (unsigned long)[dasmView selectedAddress]];
+		debug_console_execute_command(*machine, [command UTF8String], 1);
+	}
 }
 
 
@@ -297,6 +347,16 @@
 	{
 		[win selectSubviewForDevice:device];
 	}
+	[win activate];
+}
+
+
+- (void)debugNewInfoWindowForDevice:(device_t &)device {
+	MAMEDeviceInfoViewer *win = [[MAMEDeviceInfoViewer alloc] initWithDevice:device
+																	 machine:*machine
+																	 console:self];
+	[auxiliaryWindows addObject:win];
+	[win release];
 	[win activate];
 }
 
@@ -417,6 +477,76 @@
 	}
 	[[[sender subviews] objectAtIndex:0] setFrame:first];
 	[[[sender subviews] objectAtIndex:1] setFrame:second];
+}
+
+
+- (BOOL)validateMenuItem:(NSMenuItem *)item {
+	SEL const action = [item action];
+	BOOL const inContextMenu = ([item menu] == [dasmView menu]);
+	BOOL const haveCursor = [dasmView cursorVisible];
+	BOOL const isCurrent = (debug_cpu_get_visible_cpu(*machine) == &[dasmView source]->device());
+
+	device_debug::breakpoint *breakpoint = NULL;
+	if (haveCursor)
+	{
+		breakpoint = [[self class] findBreakpointAtAddress:[dasmView selectedAddress]
+												 forDevice:[dasmView source]->device()];
+	}
+
+	if (action == @selector(debugToggleBreakpoint:))
+	{
+		if (haveCursor)
+		{
+			if (breakpoint != NULL)
+			{
+				if (inContextMenu)
+					[item setTitle:@"Clear Breakpoint"];
+				else
+					[item setTitle:@"Clear Breakpoint at Cursor"];
+			}
+			else
+			{
+				if (inContextMenu)
+					[item setTitle:@"Set Breakpoint"];
+				else
+					[item setTitle:@"Set Breakpoint at Cursor"];
+			}
+		}
+		else
+		{
+			if (inContextMenu)
+				[item setTitle:@"Toggle Breakpoint"];
+			else
+				[item setTitle:@"Toggle Breakpoint at Cursor"];
+		}
+		return haveCursor && isCurrent;
+	}
+	else if (action == @selector(debugToggleBreakpointEnable:))
+	{
+		if ((breakpoint != NULL) && !breakpoint->enabled())
+		{
+			if (inContextMenu)
+				[item setTitle:@"Enable Breakpoint"];
+			else
+				[item setTitle:@"Enable Breakpoint at Cursor"];
+		}
+		else
+		{
+			if (inContextMenu)
+				[item setTitle:@"Disable Breakpoint"];
+			else
+				[item setTitle:@"Disable Breakpoint at Cursor"];
+		}
+		return (breakpoint != NULL) && isCurrent;
+	}
+	else if (action == @selector(debugRunToCursor:))
+	{
+		return isCurrent;
+	}
+	else
+	{
+		return YES;
+	}
 }
 
 @end
