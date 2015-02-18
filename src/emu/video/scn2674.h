@@ -1,5 +1,5 @@
 #ifndef SCN2674_H
-#define SCN2674_h
+#define SCN2674_H
 
 #include "emu.h"
 
