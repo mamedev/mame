@@ -214,6 +214,49 @@ void i386_device::pentium_prefetch_m8()    // Opcode 0x0f 18
 	CYCLES(1+(ea & 1)); // TODO: correct cycle count
 }
 
+void i386_device::pentium_sysenter() // Opcode 0x0f 34
+{
+	// TODO: add exception checks
+	REG32(ESP) = sysenter_esp;
+	m_eip = sysenter_eip;
+
+	m_sreg[CS].selector = sysenter_cs & 0xFFFC;
+	m_sreg[CS].base = 0;
+	m_sreg[CS].limit = 0xffffffff;
+	m_sreg[CS].d = 1;
+	m_sreg[CS].flags = 0xc09b;
+
+	m_sreg[SS].selector = (sysenter_cs + 8) & 0xFFFC;
+	m_sreg[SS].base = 0;
+	m_sreg[SS].limit = 0xffffffff;
+	m_sreg[SS].d = 1;
+	m_sreg[SS].flags = 0xc093;
+
+	m_CPL = 0;
+
+	CYCLES(1); // TODO: correct cycle count
+}
+
+void i386_device::pentium_sysexit() // Opcode 0x0f 34
+{
+	REG32(ESP) = REG32(RCX);
+	REG32(EIP) = REG32(RDX);
+
+	m_sreg[CS].selector |= 3;
+	m_sreg[CS].base = 0;
+	m_sreg[CS].limit = 0xffffffff;
+	m_sreg[CS].d = 1;
+	m_sreg[CS].flags = 0xc0fb;
+
+	m_sreg[SS].selector |= 3;
+	m_sreg[SS].base = 0;
+	m_sreg[SS].limit = 0xffffffff;
+	m_sreg[SS].d = 1;
+	m_sreg[SS].flags = 0xc0f3;
+
+	CYCLES(1); // TODO: correct cycle count
+}
+
 void i386_device::pentium_cmovo_r16_rm16()    // Opcode 0x0f 40
 {
 	UINT16 src;

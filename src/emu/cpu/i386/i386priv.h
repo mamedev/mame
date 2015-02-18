@@ -1303,6 +1303,15 @@ UINT64 i386_device::p6_msr_read(UINT32 offset,UINT8 *valid_msr)
 	case 0xc2:  // PerfCtr1
 		*valid_msr = 1;
 		return m_perfctr[1];
+	case 0x174: // SYSENTER CS
+		*valid_msr = 1;
+		return sysenter_cs;
+	case 0x175: // SYSENTER ESP
+		*valid_msr = 1;
+		return sysenter_esp;
+	case 0x176: // SYSENTER EIP
+		*valid_msr = 1;
+		return sysenter_eip;
 	default:
 		logerror("RDMSR: unimplemented register called %08x at %08x\n",offset,m_pc-2);
 		*valid_msr = 1;
@@ -1328,6 +1337,18 @@ void i386_device::p6_msr_write(UINT32 offset, UINT64 data, UINT8 *valid_msr)
 		break;
 	case 0xc2:  // PerfCtr1
 		m_perfctr[1] = data;
+		*valid_msr = 1;
+		break;
+	case 0x174:  // SYSENTER CS
+		sysenter_cs = data;
+		*valid_msr = 1;
+		break;
+	case 0x175:  // SYSENTER ESP
+		sysenter_esp = data;
+		*valid_msr = 1;
+		break;
+	case 0x176:  // SYSENTER EIP
+		sysenter_eip = data;
 		*valid_msr = 1;
 		break;
 	default:

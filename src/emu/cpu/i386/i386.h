@@ -211,6 +211,10 @@ struct I386_CALL_GATE
 	UINT32 m_feature_flags;
 	UINT64 m_tsc;
 	UINT64 m_perfctr[2];
+	
+	UINT16 sysenter_cs;
+	UINT32 sysenter_esp;
+	UINT32 sysenter_eip;
 
 	// FPU
 	floatx80 m_x87_reg[8];
@@ -907,6 +911,8 @@ struct I386_CALL_GATE
 	void pentium_ud2();
 	void pentium_rsm();
 	void pentium_prefetch_m8();
+	void pentium_sysenter();
+	void pentium_sysexit();
 	void pentium_cmovo_r16_rm16();
 	void pentium_cmovo_r32_rm32();
 	void pentium_cmovno_r16_rm16();
