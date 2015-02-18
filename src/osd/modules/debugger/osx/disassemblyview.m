@@ -16,56 +16,9 @@
 
 @implementation MAMEDisassemblyView
 
-- (void)createContextMenu {
-	NSMenu		*contextMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"Disassembly"];
-	NSMenuItem	*item;
-
-	item = [contextMenu addItemWithTitle:@"Toggle Breakpoint"
-								  action:@selector(debugToggleBreakpoint:)
-						   keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF9FunctionKey]];
-	[item setKeyEquivalentModifierMask:0];
-
-	item = [contextMenu addItemWithTitle:@"Disable Breakpoint"
-								  action:@selector(debugToggleBreakpointEnable:)
-						   keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF9FunctionKey]];
-	[item setKeyEquivalentModifierMask:NSShiftKeyMask];
-
-	[contextMenu addItem:[NSMenuItem separatorItem]];
-
-	item = [contextMenu addItemWithTitle:@"Run to Cursor"
-								  action:@selector(debugRunToCursor:)
-						   keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF4FunctionKey]];
-	[item setKeyEquivalentModifierMask:0];
-
-	[contextMenu addItem:[NSMenuItem separatorItem]];
-
-	item = [contextMenu addItemWithTitle:@"Raw Opcodes"
-								  action:@selector(showRightColumn:)
-						   keyEquivalent:@"r"];
-	[item setTarget:self];
-	[item setTag:DASM_RIGHTCOL_RAW];
-
-	item = [contextMenu addItemWithTitle:@"Encrypted Opcodes"
-								  action:@selector(showRightColumn:)
-						   keyEquivalent:@"e"];
-	[item setTarget:self];
-	[item setTag:DASM_RIGHTCOL_ENCRYPTED];
-
-	item = [contextMenu addItemWithTitle:@"Comments"
-								  action:@selector(showRightColumn:)
-						   keyEquivalent:@"n"];
-	[item setTarget:self];
-	[item setTag:DASM_RIGHTCOL_COMMENTS];
-
-	[self setMenu:contextMenu];
-	[contextMenu release];
-}
-
-
 - (id)initWithFrame:(NSRect)f machine:(running_machine &)m {
 	if (!(self = [super initWithFrame:f type:DVT_DISASSEMBLY machine:m]))
 		return nil;
-	[self createContextMenu];
 	return self;
 }
 
@@ -103,6 +56,53 @@
 	view->set_source(*source);
 	return NSMakeSize(ceil((max.x * fontWidth) + (2 * [textContainer lineFragmentPadding])),
 					  ceil(max.y * fontHeight));
+}
+
+
+- (void)addContextMenuItemsToMenu:(NSMenu *)menu {
+	NSMenuItem	*item;
+
+	[super addContextMenuItemsToMenu:menu];
+
+	if ([menu numberOfItems] > 0)
+		[menu addItem:[NSMenuItem separatorItem]];
+
+	item = [menu addItemWithTitle:@"Toggle Breakpoint"
+						   action:@selector(debugToggleBreakpoint:)
+					keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF9FunctionKey]];
+	[item setKeyEquivalentModifierMask:0];
+
+	item = [menu addItemWithTitle:@"Disable Breakpoint"
+						   action:@selector(debugToggleBreakpointEnable:)
+					keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF9FunctionKey]];
+	[item setKeyEquivalentModifierMask:NSShiftKeyMask];
+
+	[menu addItem:[NSMenuItem separatorItem]];
+
+	item = [menu addItemWithTitle:@"Run to Cursor"
+						   action:@selector(debugRunToCursor:)
+					keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF4FunctionKey]];
+	[item setKeyEquivalentModifierMask:0];
+
+	[menu addItem:[NSMenuItem separatorItem]];
+
+	item = [menu addItemWithTitle:@"Raw Opcodes"
+						   action:@selector(showRightColumn:)
+					keyEquivalent:@"r"];
+	[item setTarget:self];
+	[item setTag:DASM_RIGHTCOL_RAW];
+
+	item = [menu addItemWithTitle:@"Encrypted Opcodes"
+						   action:@selector(showRightColumn:)
+					keyEquivalent:@"e"];
+	[item setTarget:self];
+	[item setTag:DASM_RIGHTCOL_ENCRYPTED];
+
+	item = [menu addItemWithTitle:@"Comments"
+						   action:@selector(showRightColumn:)
+					keyEquivalent:@"n"];
+	[item setTarget:self];
+	[item setTag:DASM_RIGHTCOL_COMMENTS];
 }
 
 

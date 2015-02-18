@@ -18,16 +18,8 @@
 @implementation MAMEMemoryView
 
 - (id)initWithFrame:(NSRect)f machine:(running_machine &)m {
-	NSMenu	*contextMenu;
-
 	if (!(self = [super initWithFrame:f type:DVT_MEMORY machine:m]))
 		return nil;
-
-	contextMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"Memory"];
-	[self insertActionItemsInMenu:contextMenu atIndex:0];
-	[self setMenu:contextMenu];
-	[contextMenu release];
-
 	return self;
 }
 
@@ -68,6 +60,14 @@
 	view->set_source(*source);
 	return NSMakeSize(ceil((max.x * fontWidth) + (2 * [textContainer lineFragmentPadding])),
 					  ceil(max.y * fontHeight));
+}
+
+
+- (void)addContextMenuItemsToMenu:(NSMenu *)menu {
+	[super addContextMenuItemsToMenu:menu];
+	if ([menu numberOfItems] > 0)
+		[menu addItem:[NSMenuItem separatorItem]];
+	[self insertActionItemsInMenu:menu atIndex:[menu numberOfItems]];
 }
 
 

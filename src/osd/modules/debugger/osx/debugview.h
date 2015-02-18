@@ -48,8 +48,12 @@
 - (BOOL)cursorVisible;
 - (debug_view_xy)cursorPosition;
 
+- (IBAction)copyVisible:(id)sender;
+
 - (void)windowDidBecomeKey:(NSNotification *)notification;
 - (void)windowDidResignKey:(NSNotification *)notification;
+
+- (void)addContextMenuItemsToMenu:(NSMenu *)menu;
 
 @end
 

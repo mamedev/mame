@@ -224,6 +224,11 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 	[self setFont:[[self class] defaultFont]];
 
+	NSMenu *contextMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"Context"];
+	[self addContextMenuItemsToMenu:contextMenu];
+	[self setMenu:contextMenu];
+	[contextMenu release];
+
 	return self;
 }
 
@@ -301,6 +306,58 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 }
 
 
+- (IBAction)copyVisible:(id)sender {
+	debug_view_xy const size = view->visible_size();
+	debug_view_char const *data = view->viewdata();
+	if (!data)
+	{
+		NSBeep();
+		return;
+	}
+
+	for (UINT32 row = 0; row < size.y; row++, data += size.x)
+	{
+		int			attr = -1;
+		NSUInteger	start = [text length], length = 0;
+		for (UINT32 col = 0; col < size.x; col++)
+		{
+			[[text mutableString] appendFormat:@"%c", data[col].byte];
+			if ((start < length) && (attr != (data[col].attrib & ~DCA_SELECTED)))
+			{
+				NSRange const run = NSMakeRange(start, length - start);
+				[text addAttribute:NSForegroundColorAttributeName
+							 value:[self foregroundForAttribute:attr]
+							 range:run];
+				[text addAttribute:NSBackgroundColorAttributeName
+							 value:[self backgroundForAttribute:attr]
+							 range:run];
+				start = length;
+			}
+			attr = data[col].attrib & ~DCA_SELECTED;
+			length = [text length];
+		}
+		if (start < length)
+		{
+			NSRange const run = NSMakeRange(start, length - start);
+			[text addAttribute:NSForegroundColorAttributeName
+						 value:[self foregroundForAttribute:attr]
+						 range:run];
+			[text addAttribute:NSBackgroundColorAttributeName
+						 value:[self backgroundForAttribute:attr]
+						 range:run];
+		}
+		[[text mutableString] appendString:@"\n"];
+	}
+
+	NSRange const run = NSMakeRange(0, [text length]);
+	[text addAttribute:NSFontAttributeName value:font range:run];
+	NSPasteboard *const board = [NSPasteboard generalPasteboard];
+	[board declareTypes:[NSArray arrayWithObject:NSRTFPboardType] owner:nil];
+	[board setData:[text RTFFromRange:run documentAttributes:nil] forType:NSRTFPboardType];
+	[text deleteCharactersInRange:run];
+}
+
+
 - (void)windowDidBecomeKey:(NSNotification *)notification {
 	NSWindow *win = [notification object];
 	if ((win == [self window]) && ([win firstResponder] == self) && view->cursor_supported())
@@ -312,6 +369,16 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	NSWindow *win = [notification object];
 	if ((win == [self window]) && ([win firstResponder] == self) && view->cursor_supported())
 		[self setNeedsDisplay:YES];
+}
+
+
+- (void)addContextMenuItemsToMenu:(NSMenu *)menu {
+	NSMenuItem	*item;
+
+	item = [menu addItemWithTitle:@"Copy Visible"
+						   action:@selector(copyVisible:)
+					keyEquivalent:@""];
+	[item setTarget:self];
 }
 
 
