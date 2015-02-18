@@ -286,6 +286,21 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 }
 
 
+- (BOOL)cursorSupported {
+	return view->cursor_supported();
+}
+
+
+- (BOOL)cursorVisible {
+	return view->cursor_visible();
+}
+
+
+- (debug_view_xy)cursorPosition {
+	return view->cursor_position();
+}
+
+
 - (void)windowDidBecomeKey:(NSNotification *)notification {
 	NSWindow *win = [notification object];
 	if ((win == [self window]) && ([win firstResponder] == self) && view->cursor_supported())

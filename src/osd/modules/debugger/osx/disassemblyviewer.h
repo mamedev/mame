@@ -31,6 +31,10 @@
 - (BOOL)selectSubviewForDevice:(device_t *)device;
 - (BOOL)selectSubviewForSpace:(address_space *)space;
 
+- (IBAction)debugToggleBreakpoint:(id)sender;
+- (IBAction)debugToggleBreakpointEnable:(id)sender;
+- (IBAction)debugRunToCursor:(id)sender;
+
 - (IBAction)changeSubview:(id)sender;
 
 @end

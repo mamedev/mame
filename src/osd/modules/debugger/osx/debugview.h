@@ -44,6 +44,10 @@
 - (NSFont *)font;
 - (void)setFont:(NSFont *)f;
 
+- (BOOL)cursorSupported;
+- (BOOL)cursorVisible;
+- (debug_view_xy)cursorPosition;
+
 - (void)windowDidBecomeKey:(NSNotification *)notification;
 - (void)windowDidResignKey:(NSNotification *)notification;
 

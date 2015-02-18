@@ -56,22 +56,14 @@
 
 
 - (NSSize)maximumFrameSize {
-	debug_view_xy			max;
-	device_t				*curcpu = debug_cpu_get_visible_cpu(*machine);
-	debug_view_source const	*source = view->source_for_device(curcpu);
-
-	max.x = max.y = 0;
-	for (const debug_view_source *source = view->source_list().first();
-		 source != NULL;
-		 source = source->next())
+	debug_view_xy			max(0, 0);
+	debug_view_source const	*source = view->source();
+	for (debug_view_source const *source = view->first_source(); source != NULL; source = source->next())
 	{
-		debug_view_xy	current;
 		view->set_source(*source);
-		current = view->total_size();
-		if (current.x > max.x)
-			max.x = current.x;
-		if (current.y > max.y)
-			max.y = current.y;
+		debug_view_xy const current = view->total_size();
+		max.x = MAX(max.x, current.x);
+		max.y = MAX(max.y, current.y);
 	}
 	view->set_source(*source);
 	return NSMakeSize(max.x * fontWidth, max.y * fontHeight);

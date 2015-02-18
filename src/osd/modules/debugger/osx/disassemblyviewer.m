@@ -15,6 +15,8 @@
 #import "debugview.h"
 #import "disassemblyview.h"
 
+#include "debugger.h"
+#include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 
 
@@ -69,9 +71,7 @@
 	[expressionContainer release];
 
 	// create the disassembly view
-	dasmView = [[MAMEDisassemblyView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100)
-												  machine:*machine
-											   useConsole:NO];
+	dasmView = [[MAMEDisassemblyView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100) machine:*machine];
 	[dasmView insertSubviewItemsInMenu:[subviewButton menu] atIndex:0];
 	dasmScroll = [[NSScrollView alloc] initWithFrame:NSMakeRect(0,
 																0,
@@ -161,9 +161,127 @@
 }
 
 
+- (IBAction)debugToggleBreakpoint:(id)sender {
+	if ([dasmView cursorVisible])
+	{
+		device_t &device = [dasmView source]->device();
+		offs_t const address = [dasmView selectedAddress];
+		device_debug::breakpoint *bp = [[self class] findBreakpointAtAddress:address forDevice:device];
+
+		// if it doesn't exist, add a new one
+		if (bp == NULL)
+		{
+			UINT32 const bpnum = device.debug()->breakpoint_set(address, NULL, NULL);
+			debug_console_printf(*machine, "Breakpoint %X set\n", bpnum);
+		}
+		else
+		{
+			int const bpnum = bp->index();
+			device.debug()->breakpoint_clear(bpnum);
+			debug_console_printf(*machine, "Breakpoint %X cleared\n", (UINT32)bpnum);
+		}
+
+		// fail to do this and the display doesn't update
+		machine->debug_view().update_all();
+		debugger_refresh_display(*machine);
+	}
+}
+
+
+- (IBAction)debugToggleBreakpointEnable:(id)sender {
+	if ([dasmView cursorVisible])
+	{
+		device_t &device = [dasmView source]->device();
+		offs_t const address = [dasmView selectedAddress];
+		device_debug::breakpoint *bp = [[self class] findBreakpointAtAddress:address forDevice:device];
+		if (bp != NULL)
+		{
+			device.debug()->breakpoint_enable(bp->index(), !bp->enabled());
+			debug_console_printf(*machine,
+								 "Breakpoint %X %s\n",
+								 (UINT32)bp->index(),
+								 bp->enabled() ? "enabled" : "disabled");
+			machine->debug_view().update_all();
+			debugger_refresh_display(*machine);
+		}
+	}
+}
+
+
+- (IBAction)debugRunToCursor:(id)sender {
+	if ([dasmView cursorVisible])
+		[dasmView source]->device().debug()->go([dasmView selectedAddress]);
+}
+
+
 - (IBAction)changeSubview:(id)sender {
 	[dasmView selectSubviewAtIndex:[[sender selectedItem] tag]];
 	[window setTitle:[NSString stringWithFormat:@"Disassembly: %@", [dasmView selectedSubviewName]]];
+}
+
+
+- (BOOL)validateMenuItem:(NSMenuItem *)item {
+	SEL const action = [item action];
+	BOOL const inContextMenu = ([item menu] == [dasmView menu]);
+	BOOL const haveCursor = [dasmView cursorVisible];
+
+	device_debug::breakpoint *breakpoint = NULL;
+	if (haveCursor)
+	{
+		breakpoint = [[self class] findBreakpointAtAddress:[dasmView selectedAddress]
+												 forDevice:[dasmView source]->device()];
+	}
+
+	if (action == @selector(debugToggleBreakpoint:))
+	{
+		if (haveCursor)
+		{
+			if (breakpoint != NULL)
+			{
+				if (inContextMenu)
+					[item setTitle:@"Clear Breakpoint"];
+				else
+					[item setTitle:@"Clear Breakpoint at Cursor"];
+			}
+			else
+			{
+				if (inContextMenu)
+					[item setTitle:@"Set Breakpoint"];
+				else
+					[item setTitle:@"Set Breakpoint at Cursor"];
+			}
+		}
+		else
+		{
+			if (inContextMenu)
+				[item setTitle:@"Toggle Breakpoint"];
+			else
+				[item setTitle:@"Toggle Breakpoint at Cursor"];
+		}
+		return haveCursor;
+	}
+	else if (action == @selector(debugToggleBreakpointEnable:))
+	{
+		if ((breakpoint != NULL) && !breakpoint->enabled())
+		{
+			if (inContextMenu)
+				[item setTitle:@"Enable Breakpoint"];
+			else
+				[item setTitle:@"Enable Breakpoint at Cursor"];
+		}
+		else
+		{
+			if (inContextMenu)
+				[item setTitle:@"Disable Breakpoint"];
+			else
+				[item setTitle:@"Disable Breakpoint at Cursor"];
+		}
+		return breakpoint != NULL;
+	}
+	else
+	{
+		return YES;
+	}
 }
 
 @end

@@ -37,6 +37,10 @@
 
 - (IBAction)doCommand:(id)sender;
 
+- (IBAction)debugToggleBreakpoint:(id)sender;
+- (IBAction)debugToggleBreakpointEnable:(id)sender;
+- (IBAction)debugRunToCursor:(id)sender;
+
 - (IBAction)debugNewMemoryWindow:(id)sender;
 - (IBAction)debugNewDisassemblyWindow:(id)sender;
 - (IBAction)debugNewErrorLogWindow:(id)sender;
