@@ -456,6 +456,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (void)mouseDragged:(NSEvent *)event {
+	[self autoscroll:event];
 	NSPoint const location = [self convertPoint:[event locationInWindow] fromView:nil];
 	NSUInteger const modifiers = [event modifierFlags];
 	if (view->cursor_supported()

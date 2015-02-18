@@ -11,6 +11,8 @@
 
 #import "devicesviewer.h"
 
+#import "debugconsole.h"
+
 
 @interface MAMEDeviceWrapper : NSObject
 {
@@ -138,9 +140,9 @@
 	[nameColumn release];
 	[devicesView setOutlineTableColumn:tagColumn];
 	[devicesView setAutoresizesOutlineColumn:YES];
+	[devicesView setDoubleAction:@selector(showDeviceDetail:)];
 	[devicesView setDataSource:self];
 	devicesScroll = [[NSScrollView alloc] initWithFrame:[[window contentView] bounds]];
-	[devicesScroll setDrawsBackground:YES];
 	[devicesScroll setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
 	[devicesScroll setHasHorizontalScroller:YES];
 	[devicesScroll setHasVerticalScroller:YES];
@@ -172,6 +174,11 @@
 	if (root != nil)
 		[root release];
 	[super dealloc];
+}
+
+
+- (IBAction)showDeviceDetail:(id)sender {
+	[console debugNewInfoWindowForDevice:[(MAMEDeviceWrapper *)[sender itemAtRow:[sender clickedRow]] device]];
 }
 
 

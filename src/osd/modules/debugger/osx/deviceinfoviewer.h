@@ -2,7 +2,7 @@
 // copyright-holders:Vas Crabb
 //============================================================
 //
-//  devicesviewer.h - MacOS X Cocoa debug window handling
+//  deviceinfoviewer.h - MacOS X Cocoa debug window handling
 //
 //  Copyright (c) 1996-2015, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
@@ -20,14 +20,11 @@
 
 @class MAMEDebugConsole, MAMEDeviceWrapper;
 
-@interface MAMEDevicesViewer : MAMEAuxiliaryDebugWindowHandler <NSOutlineViewDataSource>
+@interface MAMEDeviceInfoViewer : MAMEAuxiliaryDebugWindowHandler
 {
-	MAMEDeviceWrapper	*root;
-	NSOutlineView		*devicesView;
+	device_t	*device;
 }
 
-- (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c;
-
-- (IBAction)showDeviceDetail:(id)sender;
+- (id)initWithDevice:(device_t &)d machine:(running_machine &)m console:(MAMEDebugConsole *)c;
 
 @end

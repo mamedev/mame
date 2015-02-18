@@ -14,6 +14,7 @@
 #import "debugcommandhistory.h"
 #import "consoleview.h"
 #import "debugview.h"
+#import "deviceinfoviewer.h"
 #import "devicesviewer.h"
 #import "disassemblyview.h"
 #import "disassemblyviewer.h"
@@ -346,6 +347,16 @@
 	{
 		[win selectSubviewForDevice:device];
 	}
+	[win activate];
+}
+
+
+- (void)debugNewInfoWindowForDevice:(device_t &)device {
+	MAMEDeviceInfoViewer *win = [[MAMEDeviceInfoViewer alloc] initWithDevice:device
+																	 machine:*machine
+																	 console:self];
+	[auxiliaryWindows addObject:win];
+	[win release];
 	[win activate];
 }
 
