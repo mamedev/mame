@@ -1565,10 +1565,11 @@ WRITE16_MEMBER(pc9801_state::upd7220_grcg_w)
 			{
 				if((m_grcg.mode & (1 << i)) == 0)
 				{
+
 					if(mem_mask & 0xff)
 					{
-						vram[offset | (((i + 1) & 3) * 0x8000)] &= ~data;
-						vram[offset | (((i + 1) & 3) * 0x8000)] |= m_grcg.tile[i] & data;
+						vram[offset | (((i + 1) & 3) * 0x8000)] &= ~(data >> 0);
+						vram[offset | (((i + 1) & 3) * 0x8000)] |= m_grcg.tile[i] & (data >> 0);
 					}
 					if(mem_mask & 0xff00)
 					{
@@ -1892,7 +1893,7 @@ WRITE8_MEMBER(pc9801_state::grcg_w)
 	else if(offset == 7)
 	{
 //      logerror("%02x GRCG TILE %02x\n",data,m_grcg.tile_index);
-		m_grcg.tile[m_grcg.tile_index] = data;
+		m_grcg.tile[m_grcg.tile_index] = BITSWAP16(data,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 		m_grcg.tile_index ++;
 		m_grcg.tile_index &= 3;
 		return;
