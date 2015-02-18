@@ -615,6 +615,11 @@ BGFXOBJS = \
 #	$(LIBOBJ)/bgfx/common/entry/entry_windows.o \
 #	$(LIBOBJ)/bgfx/common/entry/input.o \
 
+ifeq ($(TARGETOS),macosx)
+	BGFXOBJS += $(LIBOBJ)/bgfx/glcontext_eagl.o
+	BGFXOBJS += $(LIBOBJ)/bgfx/glcontext_nsgl.o
+endif
+
 $(OBJ)/libbgfx.a: $(BGFXOBJS)
 
 BGFXINC = -I$(3RDPARTY)/bgfx/include -I$(3RDPARTY)/bgfx/3rdparty -I$(3RDPARTY)/bx/include -I$(3RDPARTY)/bgfx/3rdparty/khronos
@@ -648,3 +653,10 @@ $(LIBOBJ)/bgfx/%.o: $(3RDPARTY)/bgfx/src/%.cpp | $(OSPREBUILD)
 $(LIBOBJ)/bgfx/common/%.o: $(3RDPARTY)/bgfx/examples/common/%.cpp | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC_AS) $(CDEFS) $(CCOMFLAGS) $(BGFXINC) -D__STDC_LIMIT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_CONSTANT_MACROS -c $< -o $@
+
+ifeq ($(TARGETOS),macosx)
+$(LIBOBJ)/bgfx/%.o: $(3RDPARTY)/bgfx/src/%.mm | $(OSPREBUILD)
+	@echo Objective-C compiling $<...
+	$(CC_AS) $(CDEFS) $(COBJFLAGS) $(CCOMFLAGS) $(BGFXINC) -D__STDC_LIMIT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_CONSTANT_MACROS -c $< -o $@
+
+endif

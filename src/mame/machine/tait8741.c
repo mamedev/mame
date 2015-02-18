@@ -250,6 +250,22 @@ void taito8741_4pack_device::device_start()
 	m_port_handler_1_r.resolve_safe(0);
 	m_port_handler_2_r.resolve_safe(0);
 	m_port_handler_3_r.resolve_safe(0);
+	
+	for (int i = 0; i < 4; i++)
+	{
+		save_item(NAME(m_taito8741[i].toData), i);
+		save_item(NAME(m_taito8741[i].fromData), i);
+		save_item(NAME(m_taito8741[i].fromCmd), i);
+		save_item(NAME(m_taito8741[i].status), i);
+		save_item(NAME(m_taito8741[i].phase), i);
+		save_item(NAME(m_taito8741[i].txd), i);
+		save_item(NAME(m_taito8741[i].rxd), i);
+		save_item(NAME(m_taito8741[i].parallelselect), i);
+		save_item(NAME(m_taito8741[i].txpoint), i);
+		//save_item(NAME(m_taito8741[i].pending4a), i); //currently initialized to 0, never changes
+		save_item(NAME(m_taito8741[i].serial_out), i);
+		//save_item(NAME(m_taito8741[i].coins), i); // currently initialized but otherwise unused
+	};
 }
 
 /* read status port */
@@ -344,6 +360,18 @@ void josvolly8741_4pack_device::device_start()
 	m_port_handler_1_r.resolve_safe(0);
 	m_port_handler_2_r.resolve_safe(0);
 	m_port_handler_3_r.resolve_safe(0);
+	
+	for (int i = 0; i < 4; i++)
+	{
+		save_item(NAME(m_i8741[i].cmd), i);
+		save_item(NAME(m_i8741[i].sts), i);
+		save_item(NAME(m_i8741[i].txd), i);
+		//save_item(NAME(m_i8741[i].outport), i); //currently initialized to 0xff, never changed
+		save_item(NAME(m_i8741[i].rxd), i);
+		save_item(NAME(m_i8741[i].rst), i);
+	};
+	
+	save_item(NAME(m_nmi_enable));
 }
 
 

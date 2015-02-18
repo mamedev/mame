@@ -683,31 +683,47 @@ INLINE void m68ki_ic_clear(m68000_base_device *m68k)
 
 INLINE UINT32 m68ki_ic_readimm16(m68000_base_device *m68k, UINT32 address)
 {
-/*  if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type) && (m68k->cacr & M68K_CACR_EI))
-    {
-        UINT32 ic_offset = (address >> 1) % M68K_IC_SIZE;
-        if (m68k->ic_address[ic_offset] == address)
-        {
-            return m68k->ic_data[ic_offset];
-        }
-        else
-        {
-            UINT32 data = m68k->memory.readimm16(address);
-            if (!m68k->mmu_tmp_buserror_occurred)
-            {
-                m68k->ic_data[ic_offset] = data;
-                m68k->ic_address[ic_offset] = address;
-            }
-            return data;
-        }
-    }
-    else*/
+	if (m68k->cacr & M68K_CACR_EI)
 	{
-		return m68k->/*memory.*/readimm16(address);
+		// 68020 series I-cache (MC68020 User's Manual, Section 4 - On-Chip Cache Memory)
+		if (m68k->cpu_type & (CPU_TYPE_EC020 | CPU_TYPE_020))
+		{
+			UINT32 tag = (address >> 8) | (m68k->s_flag ? 0x1000000 : 0);
+			int idx = (address >> 2) & 0x3f;	// 1-of-64 select
+
+			// do a cache fill if the line is invalid or the tags don't match
+			if ((!m68k->ic_valid[idx]) || (m68k->ic_address[idx] != tag))
+			{
+				m68k->ic_data[idx] = m68k->read32(address & ~3);
+
+//				printf("m68k: doing cache fill at %08x (tag %08x idx %d)\n", address, tag, idx);
+
+				// if no buserror occured, validate the tag
+				if (!m68k->mmu_tmp_buserror_occurred)
+				{
+					m68k->ic_address[idx] = tag;
+					m68k->ic_valid[idx] = true;
+				}
+				else
+				{
+					return m68k->readimm16(address);
+				}
+			}
+
+			// at this point, the cache is guaranteed to be valid, either as
+			// a hit or because we just filled it.
+			if (address & 2)
+			{
+				return m68k->ic_data[idx] & 0xffff;
+			}
+			else
+			{
+				return m68k->ic_data[idx] >> 16;
+			}
+		}
 	}
 
-	// this can't happen, but Apple GCC insists
-//  return 0;
+	return m68k->readimm16(address);
 }
 
 /* Handles all immediate reads, does address error check, function code setting,

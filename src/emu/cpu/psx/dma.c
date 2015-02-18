@@ -66,11 +66,11 @@ void psxdma_device::device_start()
 
 		dma->timer = timer_alloc(index);
 
-		machine().save().save_item( "psxdma", tag(), index, NAME( dma->n_base ) );
-		machine().save().save_item( "psxdma", tag(), index, NAME( dma->n_blockcontrol ) );
-		machine().save().save_item( "psxdma", tag(), index, NAME( dma->n_channelcontrol ) );
-		machine().save().save_item( "psxdma", tag(), index, NAME( dma->n_ticks ) );
-		machine().save().save_item( "psxdma", tag(), index, NAME( dma->b_running ) );
+		save_item( NAME( dma->n_base ), index );
+		save_item( NAME( dma->n_blockcontrol ), index );
+		save_item( NAME( dma->n_channelcontrol ), index );
+		save_item( NAME( dma->n_ticks ), index );
+		save_item( NAME( dma->b_running ), index );
 	}
 
 	save_item( NAME(m_dpcp) );

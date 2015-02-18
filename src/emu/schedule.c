@@ -260,11 +260,11 @@ void emu_timer::register_save()
 	}
 
 	// save the bits
-	machine().save().save_item("timer", name, index, NAME(m_param));
-	machine().save().save_item("timer", name, index, NAME(m_enabled));
-	machine().save().save_item("timer", name, index, NAME(m_period));
-	machine().save().save_item("timer", name, index, NAME(m_start));
-	machine().save().save_item("timer", name, index, NAME(m_expire));
+	machine().save().save_item(m_device, "timer", name, index, NAME(m_param));
+	machine().save().save_item(m_device, "timer", name, index, NAME(m_enabled));
+	machine().save().save_item(m_device, "timer", name, index, NAME(m_period));
+	machine().save().save_item(m_device, "timer", name, index, NAME(m_start));
+	machine().save().save_item(m_device, "timer", name, index, NAME(m_expire));
 }
 
 

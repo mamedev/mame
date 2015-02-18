@@ -73,8 +73,9 @@ static void drawbgfx_exit(void);
 class sdl_info_bgfx : public osd_renderer
 {
 public:
-    sdl_info_bgfx(sdl_window_info *w)
+    sdl_info_bgfx(osd_window *w)
     : osd_renderer(w, FLAG_NONE), m_blittimer(0), m_renderer(NULL),
+      m_blitwidth(0), m_blitheight(0),
       m_last_hofs(0), m_last_vofs(0),
       m_last_blit_time(0), m_last_blit_pixels(0)
     {}
@@ -82,9 +83,19 @@ public:
 	/* virtual */ int create();
 	/* virtual */ int draw(const UINT32 dc, const int update);
 	/* virtual */ int xy_to_render_target(const int x, const int y, int *xt, int *yt);
-	/* virtual */ void destroy_all_textures();
 	/* virtual */ void destroy();
-	/* virtual */ void clear();
+	/* virtual */ render_primitive_list *get_primitives()
+	{
+		int nw = 0; int nh = 0;
+		window().blit_surface_size(nw, nh);
+		if (nw != m_blitwidth || nh != m_blitheight)
+		{
+			m_blitwidth = nw; m_blitheight = nh;
+			notify_changed();
+		}
+		window().target()->set_bounds(m_blitwidth, m_blitheight, window().aspect());
+		return &window().target()->get_primitives();
+	}
 
    // void render_quad(texture_info *texture, const render_primitive *prim, const int x, const int y);
 
@@ -96,6 +107,8 @@ public:
 	SDL_Renderer *  m_renderer;
 	//simple_list<texture_info>  m_texlist;                // list of active textures
 
+	int				m_blitwidth;
+	int				m_blitheight;
 	float           m_last_hofs;
 	float           m_last_vofs;
 
@@ -115,13 +128,13 @@ public:
 //  drawbgfx_init
 //============================================================
 
-static osd_renderer *drawbgfx_create(sdl_window_info *window)
+static osd_renderer *drawbgfx_create(osd_window *window)
 {
 	return global_alloc(sdl_info_bgfx(window));
 }
 
 
-int drawbgfx_init(running_machine &machine, sdl_draw_info *callbacks)
+int drawbgfx_init(running_machine &machine, osd_draw_callbacks *callbacks)
 {
 	// fill in the callbacks
 	callbacks->exit = drawbgfx_exit;
@@ -138,11 +151,14 @@ int sdl_info_bgfx::create()
 {
 	// create renderer
 
+	int width = 0; int height = 0;
+
+	window().get_size(width, height);
 	m_blittimer = 3;
 
 	bgfx::sdlSetWindow(window().sdl_window());
 	bgfx::init();
-	bgfx::reset(window().width(), window().height(), BGFX_RESET_VSYNC);
+	bgfx::reset(width, height, BGFX_RESET_VSYNC);
 	
 	// Enable debug text.
 	bgfx::setDebug(BGFX_DEBUG_STATS);// BGFX_DEBUG_TEXT);
@@ -158,9 +174,9 @@ int sdl_info_bgfx::xy_to_render_target(int x, int y, int *xt, int *yt)
 {
 	*xt = x - m_last_hofs;
 	*yt = y - m_last_vofs;
-	if (*xt<0 || *xt >= window().blitwidth())
+	if (*xt<0 || *xt >= m_blitwidth)
 		return 0;
-	if (*yt<0 || *yt >= window().blitheight())
+	if (*yt<0 || *yt >= m_blitheight)
 		return 0;
 	return 1;
 }
@@ -171,6 +187,11 @@ int sdl_info_bgfx::xy_to_render_target(int x, int y, int *xt, int *yt)
 
 int sdl_info_bgfx::draw(UINT32 dc, int update)
 {
+
+	//if (has_flags(FI_CHANGED) || (window().width() != m_last_width) || (window().height() != m_last_height))
+		// do something
+	//clear_flags(FI_CHANGED);
+
 	bgfx::setViewClear(0
 		, BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
 		, 0x000000ff
@@ -178,7 +199,7 @@ int sdl_info_bgfx::draw(UINT32 dc, int update)
 		, 0
 		);
 	// Set view 0 default viewport.
-	bgfx::setViewRect(0, 0, 0, window().blitwidth(), window().blitheight());
+	bgfx::setViewRect(0, 0, 0, m_blitwidth, m_blitheight);
 
 	// This dummy draw call is here to make sure that view 0 is cleared
 	// if no other draw calls are submitted to view 0.
@@ -209,21 +230,8 @@ void sdl_info_bgfx::destroy()
 {
 	// free the memory in the window
 
-	destroy_all_textures();
+	// destroy_all_textures();
 
 	// Shutdown bgfx.
 	bgfx::shutdown();
-}
-
-void sdl_info_bgfx::destroy_all_textures()
-{
-}
-
-//============================================================
-//  TEXCOPY FUNCS
-//============================================================
-
-void sdl_info_bgfx::clear()
-{
-	m_blittimer = 2;
 }

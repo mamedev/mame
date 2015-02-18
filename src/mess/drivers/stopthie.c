@@ -43,9 +43,9 @@ public:
 	UINT16 m_o;
 	bool m_power_on;
 
-	UINT16 m_leds_state[0x10];
-	UINT16 m_leds_cache[0x10];
-	UINT8 m_leds_decay[0x100];
+	UINT16 m_display_state[0x10];
+	UINT16 m_display_cache[0x10];
+	UINT8 m_display_decay[0x100];
 
 	DECLARE_READ8_MEMBER(read_k);
 	DECLARE_WRITE16_MEMBER(write_o);
@@ -54,8 +54,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_button);
 	DECLARE_WRITE_LINE_MEMBER(auto_power_off);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(leds_decay_tick);
-	void leds_update();
+	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
+	void display_update();
 
 	virtual void machine_reset();
 	virtual void machine_start();
@@ -65,17 +65,17 @@ public:
 
 /***************************************************************************
 
-  LEDs
+  LED Display
 
 ***************************************************************************/
 
 // The device strobes the outputs very fast, it is unnoticeable to the user.
 // To prevent flickering here, we need to simulate a decay.
 
-// decay time, in steps of 10ms
-#define LEDS_DECAY_TIME 4
+// decay time, in steps of 1ms
+#define DISPLAY_DECAY_TIME 40
 
-void stopthief_state::leds_update()
+void stopthief_state::display_update()
 {
 	UINT16 active_state[0x10];
 
@@ -87,32 +87,32 @@ void stopthief_state::leds_update()
 		{
 			int di = j << 4 | i;
 
-			// turn on powered leds
-			if (m_power_on && m_leds_state[i] >> j & 1)
-				m_leds_decay[di] = LEDS_DECAY_TIME;
+			// turn on powered segments
+			if (m_power_on && m_display_state[i] >> j & 1)
+				m_display_decay[di] = DISPLAY_DECAY_TIME;
 
 			// determine active state
-			int ds = (m_leds_decay[di] != 0) ? 1 : 0;
+			int ds = (m_display_decay[di] != 0) ? 1 : 0;
 			active_state[i] |= (ds << j);
 		}
 	}
 
 	// on difference, send to output
 	for (int i = 0; i < 0x10; i++)
-		if (m_leds_cache[i] != active_state[i])
+		if (m_display_cache[i] != active_state[i])
 			output_set_digit_value(i, active_state[i]);
 
-	memcpy(m_leds_cache, active_state, sizeof(m_leds_cache));
+	memcpy(m_display_cache, active_state, sizeof(m_display_cache));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(stopthief_state::leds_decay_tick)
+TIMER_DEVICE_CALLBACK_MEMBER(stopthief_state::display_decay_tick)
 {
-	// slowly turn off unpowered leds
+	// slowly turn off unpowered segments
 	for (int i = 0; i < 0x100; i++)
-		if (!(m_leds_state[i & 0xf] >> (i>>4) & 1) && m_leds_decay[i])
-			m_leds_decay[i]--;
+		if (!(m_display_state[i & 0xf] >> (i>>4) & 1) && m_display_decay[i])
+			m_display_decay[i]--;
 
-	leds_update();
+	display_update();
 }
 
 
@@ -144,9 +144,9 @@ WRITE16_MEMBER(stopthief_state::write_r)
 	// R0-R2: select digit
 	UINT8 o = BITSWAP8(m_o,3,5,2,1,4,0,6,7) & 0x7f;
 	for (int i = 0; i < 3; i++)
-		m_leds_state[i] = (data >> i & 1) ? o : 0;
+		m_display_state[i] = (data >> i & 1) ? o : 0;
 
-	leds_update();
+	display_update();
 
 	// R3-R8: speaker on
 	m_speaker->level_w((data & 0x1f8 && m_o & 8) ? 1 : 0);
@@ -234,17 +234,17 @@ void stopthief_state::machine_reset()
 void stopthief_state::machine_start()
 {
 	// zerofill
-	memset(m_leds_state, 0, sizeof(m_leds_state));
-	memset(m_leds_cache, 0, sizeof(m_leds_cache));
-	memset(m_leds_decay, 0, sizeof(m_leds_decay));
+	memset(m_display_state, 0, sizeof(m_display_state));
+	memset(m_display_cache, 0, sizeof(m_display_cache));
+	memset(m_display_decay, 0, sizeof(m_display_decay));
 
 	m_o = 0;
 	m_power_on = false;
 
 	// register for savestates
-	save_item(NAME(m_leds_state));
-	save_item(NAME(m_leds_cache));
-	save_item(NAME(m_leds_decay));
+	save_item(NAME(m_display_state));
+	save_item(NAME(m_display_cache));
+	save_item(NAME(m_display_decay));
 
 	save_item(NAME(m_o));
 	save_item(NAME(m_power_on));
@@ -260,7 +260,7 @@ static MACHINE_CONFIG_START( stopthief, stopthief_state )
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(stopthief_state, write_r))
 	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(stopthief_state, auto_power_off))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("leds_decay", stopthief_state, leds_decay_tick, attotime::from_msec(10))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", stopthief_state, display_decay_tick, attotime::from_msec(1))
 
 	MCFG_DEFAULT_LAYOUT(layout_stopthie)
 

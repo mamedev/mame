@@ -369,6 +369,7 @@ public:
 	float               width;              // width (for line primitives)
 	render_texinfo      texture;            // texture info (for quad primitives)
 	render_quad_texuv   texcoords;          // texture coordinates (for quad primitives)
+	render_container *	container;			// the render container we belong to
 
 private:
 	// internal state

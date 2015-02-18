@@ -356,8 +356,8 @@ public:
 	UINT16 mmu_tmp_buserror_rw;   /* temporary hack: (first) bus error rw */
 
 	UINT32 ic_address[M68K_IC_SIZE];   /* instruction cache address data */
-	UINT16 ic_data[M68K_IC_SIZE];      /* instruction cache content data */
-
+	UINT32 ic_data[M68K_IC_SIZE];      /* instruction cache content data */
+	bool   ic_valid[M68K_IC_SIZE];	   /* instruction cache valid flags */
 
 
 

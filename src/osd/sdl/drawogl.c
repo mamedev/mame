@@ -221,10 +221,10 @@ public:
 class sdl_info_ogl : public osd_renderer
 {
 public:
-	sdl_info_ogl(sdl_window_info *window)
+	sdl_info_ogl(osd_window *window)
 	: osd_renderer(window, FLAG_NEEDS_OPENGL), m_blittimer(0),
-		m_screen_width(0), m_screen_height(0),
-		m_last_width(0), m_last_height(0),
+		m_width(0), m_height(0),
+		m_blitwidth(0), m_blitheight(0),
 #if (SDLMAME_SDL2)
 		m_gl_context_id(0),
 #else
@@ -255,9 +255,22 @@ public:
 	/* virtual */ int create();
 	/* virtual */ int draw(const UINT32 dc, const int update);
 	/* virtual */ int xy_to_render_target(const int x, const int y, int *xt, int *yt);
-	/* virtual */ void destroy_all_textures();
 	/* virtual */ void destroy();
-	/* virtual */ void clear();
+	/* virtual */ render_primitive_list *get_primitives()
+	{
+		int nw = 0; int nh = 0;
+		window().blit_surface_size(nw, nh);
+		if (nw != m_blitwidth || nh != m_blitheight)
+		{
+			m_blitwidth = nw; m_blitheight = nh;
+			notify_changed();
+		}
+		window().target()->set_bounds(m_blitwidth, m_blitheight, window().aspect());
+		return &window().target()->get_primitives();
+	}
+
+private:
+	void destroy_all_textures();
 
 	void loadGLExtensions();
 	void initialize_gl();
@@ -272,16 +285,16 @@ public:
 	texture_info *texture_find(const render_primitive *prim);
 	void texture_coord_update(texture_info *texture, const render_primitive *prim, int shaderIdx);
 	void texture_mpass_flip(texture_info *texture, int shaderIdx);
-	void texture_shader_update(texture_info *texture, int shaderIdx);
+	void texture_shader_update(texture_info *texture, render_container *container,  int shaderIdx);
 	texture_info * texture_update(const render_primitive *prim, int shaderIdx);
 	void texture_disable(texture_info * texture);
 	void texture_all_disable();
 
 	INT32           m_blittimer;
-	int             m_screen_width;
-	int             m_screen_height;
-	int				m_last_width;
-	int				m_last_height;
+	int				m_width;
+	int				m_height;
+	int				m_blitwidth;
+	int				m_blitheight;
 
 #if (SDLMAME_SDL2)
 	SDL_GLContext   m_gl_context_id;
@@ -446,12 +459,12 @@ static int dll_loaded = 0;
 //  drawsdl_init
 //============================================================
 
-static osd_renderer *drawogl_create(sdl_window_info *window)
+static osd_renderer *drawogl_create(osd_window *window)
 {
 	return global_alloc(sdl_info_ogl(window));
 }
 
-int drawogl_init(running_machine &machine, sdl_draw_info *callbacks)
+int drawogl_init(running_machine &machine, osd_draw_callbacks *callbacks)
 {
 	// fill in the callbacks
 	callbacks->exit = drawogl_exit;
@@ -729,9 +742,6 @@ int sdl_info_ogl::create()
 #else
 #endif
 
-	m_screen_width = 0;
-	m_screen_height = 0;
-
 	m_blittimer = 0;
 	m_surf_w = 0;
 	m_surf_h = 0;
@@ -774,15 +784,6 @@ void sdl_info_ogl::destroy()
 
 }
 
-//============================================================
-//  sdl_info::clear
-//============================================================
-
-void sdl_info_ogl::clear()
-{
-	//FIXME: Handled in sdl_info::draw as well
-	m_blittimer = 3;
-}
 
 //============================================================
 //  drawsdl_xy_to_render_target
@@ -793,9 +794,9 @@ int sdl_info_ogl::xy_to_render_target(int x, int y, int *xt, int *yt)
 
 	*xt = x - m_last_hofs;
 	*yt = y - m_last_vofs;
-	if (*xt<0 || *xt >= window().blitwidth())
+	if (*xt<0 || *xt >= m_blitwidth)
 		return 0;
-	if (*yt<0 || *yt >= window().blitheight())
+	if (*yt<0 || *yt >= m_blitheight)
 		return 0;
 	return 1;
 }
@@ -1203,46 +1204,28 @@ int sdl_info_ogl::draw(UINT32 dc, int update)
 	render_primitive *prim;
 	texture_info *texture=NULL;
 	float vofs, hofs;
-	int  pendingPrimitive=GL_NO_PRIMITIVE, curPrimitive=GL_NO_PRIMITIVE, scrnum, is_vector;
-	const screen_device *screen;
+	int  pendingPrimitive=GL_NO_PRIMITIVE, curPrimitive=GL_NO_PRIMITIVE;
+	int width = 0; int height = 0;
 
 	if (video_config.novideo)
 	{
 		return 0;
 	}
 
-	if ((window().width() != m_last_width) || (window().height() != m_last_height))
+	window().get_size(width, height);
+
+	if (has_flags(FI_CHANGED) || (width != m_width) || (height != m_height))
 	{
-		m_last_width = window().width();
-		m_last_height = window().height();
-#if (SDLMAME_SDL2)
+		destroy_all_textures();
+		m_width = width;
+		m_height = height;
 		m_blittimer = 3;
-#endif
 		m_init_context = 1;
+		clear_flags(FI_CHANGED);
 	}
 
 #if (SDLMAME_SDL2)
 	SDL_GL_MakeCurrent(window().sdl_window(), m_gl_context_id);
-#else
-	if (!m_init_context)
-	{
-		screen_device_iterator myiter(window().machine().root_device());
-		for (screen = myiter.first(); screen != NULL; screen = myiter.next())
-		{
-			if (window().index() == 0)
-			{
-				if ((screen->width() != m_screen_width) || (screen->height() != m_screen_height))
-				{
-					m_screen_width = screen->width();
-					m_screen_height = screen->height();
-
-					// force all textures to be regenerated
-					destroy_all_textures();
-				}
-				break;
-			}
-		}
-	}
 #endif
 
 	if (m_init_context)
@@ -1261,39 +1244,30 @@ int sdl_info_ogl::draw(UINT32 dc, int update)
 		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	}
 
-	// figure out if we're vector
-	scrnum = is_vector = 0;
-	screen_device_iterator iter(window().machine().root_device());
-	for (screen = iter.first(); screen != NULL; screen = iter.next())
-	{
-		if (scrnum == window().index())
-		{
-			is_vector = (screen->screen_type() == SCREEN_TYPE_VECTOR) ? 1 : 0;
-			break;
-		}
-		else
-		{
-			scrnum++;
-		}
-	}
-
 	// only clear if the geometry changes (and for 2 frames afterward to clear double and triple buffers)
-	if ((m_blittimer > 0) || (is_vector))
+	if ((m_blittimer > 0) || has_flags(FLAG_HAS_VECTOR_SCREEN))
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
 		m_blittimer--;
 	}
 
+	// FIXME: remove m_surf_w and m_surf_h
 	if ( !m_initialized ||
-			window().width()!= m_surf_w || window().height()!= m_surf_h )
+			m_width != m_surf_w || m_height != m_surf_h )
 	{
+		// FIXME:: this can be done in create!
 		if ( !m_initialized )
 		{
 			loadGLExtensions();
 		}
 
-		m_surf_w=window().width();
-		m_surf_h=window().height();
+#if (!SDLMAME_SDL2)
+		// force all textures to be regenerated
+		destroy_all_textures();
+#endif
+
+		m_surf_w = m_width;
+		m_surf_h = m_height;
 
 		// we're doing nothing 3d, so the Z-buffer is currently not interesting
 		glDisable(GL_DEPTH_TEST);
@@ -1334,10 +1308,10 @@ int sdl_info_ogl::draw(UINT32 dc, int update)
 		//   |_________|
 		// (0,h)     (w,h)
 
-		glViewport(0.0, 0.0, (GLsizei)window().width(), (GLsizei)window().height());
+		glViewport(0.0, 0.0, (GLsizei) m_width, (GLsizei) m_height);
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glOrtho(0.0, (GLdouble)window().width(), (GLdouble)window().height(), 0.0, 0.0, -1.0);
+		glOrtho(0.0, (GLdouble) m_width, (GLdouble) m_height, 0.0, 0.0, -1.0);
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 
@@ -1357,24 +1331,16 @@ int sdl_info_ogl::draw(UINT32 dc, int update)
 	{
 		int ch, cw;
 
-		if ((window().fullscreen()) && (!video_config.switchres))
-		{
-			ch = window().monitor()->center_height();
-			cw = window().monitor()->center_width();
-		}
-		else
-		{
-			ch = window().height();
-			cw = window().width();
-		}
+		ch = m_height;
+		cw = m_width;
 
 		if (video_config.centerv)
 		{
-			vofs = (ch - window().blitheight()) / 2.0f;
+			vofs = (ch - m_blitheight) / 2.0f;
 		}
 		if (video_config.centerh)
 		{
-			hofs = (cw - window().blitwidth()) / 2.0f;
+			hofs = (cw - m_blitwidth) / 2.0f;
 		}
 	}
 
@@ -1555,12 +1521,12 @@ int sdl_info_ogl::draw(UINT32 dc, int update)
 							// 1:1 tex coord CCW (0/0) (1/0) (1/1) (0/1) on texture dimensions
 							m_texVerticex[0]=(GLfloat)0.0;
 							m_texVerticex[1]=(GLfloat)0.0;
-							m_texVerticex[2]=(GLfloat)window().width();
+							m_texVerticex[2]=(GLfloat)m_width;
 							m_texVerticex[3]=(GLfloat)0.0;
-							m_texVerticex[4]=(GLfloat)window().width();
-							m_texVerticex[5]=(GLfloat)window().height();
+							m_texVerticex[4]=(GLfloat)m_width;
+							m_texVerticex[5]=(GLfloat)m_height;
 							m_texVerticex[6]=(GLfloat)0.0;
-							m_texVerticex[7]=(GLfloat)window().height();
+							m_texVerticex[7]=(GLfloat)m_height;
 						}
 
 						if(i>0) // first fetch already done
@@ -1944,8 +1910,8 @@ int sdl_info_ogl::texture_shader_create(const render_texinfo *texsource, texture
 {
 	int uniform_location;
 	int i;
-	int surf_w_pow2  = get_valid_pow2_value (window().blitwidth(), texture->texpow2);
-	int surf_h_pow2  = get_valid_pow2_value (window().blitheight(), texture->texpow2);
+	int surf_w_pow2  = get_valid_pow2_value (m_blitwidth, texture->texpow2);
+	int surf_h_pow2  = get_valid_pow2_value (m_blitheight, texture->texpow2);
 
 	assert ( texture->type==TEXTURE_TYPE_SHADER );
 
@@ -1992,7 +1958,7 @@ int sdl_info_ogl::texture_shader_create(const render_texinfo *texsource, texture
 		pfn_glUniform2fvARB(uniform_location, 1, &(color_texture_pow2_sz[0]));
 		GL_CHECK_ERROR_NORMAL();
 
-		GLfloat screen_texture_sz[2] = { (GLfloat)window().blitwidth(), (GLfloat)window().blitheight() };
+		GLfloat screen_texture_sz[2] = { (GLfloat) m_blitwidth, (GLfloat) m_blitheight };
 		uniform_location = pfn_glGetUniformLocationARB(m_glsl_program[i], "screen_texture_sz");
 		pfn_glUniform2fvARB(uniform_location, 1, &(screen_texture_sz[0]));
 		GL_CHECK_ERROR_NORMAL();
@@ -2048,7 +2014,7 @@ int sdl_info_ogl::texture_shader_create(const render_texinfo *texsource, texture
 		}
 
 		osd_printf_verbose("GL texture: mpass screen-bmp 2x %dx%d (pow2 %dx%d)\n",
-			window().width(), window().height(), surf_w_pow2, surf_h_pow2);
+			m_width, m_height, surf_w_pow2, surf_h_pow2);
 	}
 
 	// GL_TEXTURE0
@@ -2758,11 +2724,12 @@ void sdl_info_ogl::texture_coord_update(texture_info *texture, const render_prim
 	}
 	else if ( texture->type == TEXTURE_TYPE_SHADER && shaderIdx>m_glsl_program_mb2sc )
 	{
-		int surf_w_pow2  = get_valid_pow2_value (window().width(), texture->texpow2);
-		int surf_h_pow2  = get_valid_pow2_value (window().height(), texture->texpow2);
+		int surf_w_pow2  = get_valid_pow2_value (m_width, texture->texpow2);
+		int surf_h_pow2  = get_valid_pow2_value (m_height, texture->texpow2);
 
-		ustop  = (float)(window().width()) / (float)surf_w_pow2;
-		vstop  = (float)(window().height()) / (float)surf_h_pow2;
+		ustop  = (float)(m_width) / (float)surf_w_pow2;
+		vstop  = (float)(m_height) / (float)surf_h_pow2;
+
 	}
 	else
 	{
@@ -2878,49 +2845,28 @@ void sdl_info_ogl::texture_mpass_flip(texture_info *texture, int shaderIdx)
 	}
 }
 
-void sdl_info_ogl::texture_shader_update(texture_info *texture, int shaderIdx)
+void sdl_info_ogl::texture_shader_update(texture_info *texture, render_container *container, int shaderIdx)
 {
-	int uniform_location, scrnum;
-	render_container *container;
+	int uniform_location;
 	GLfloat vid_attributes[4];
-
-	scrnum = 0;
-	container = (render_container *)NULL;
-	screen_device_iterator iter(window().machine().root_device());
-	for (screen_device *screen = iter.first(); screen != NULL; screen = iter.next())
-	{
-		if (scrnum == window().m_start_viewscreen)
-		{
-			container = &screen->container();
-		}
-
-		scrnum++;
-	}
 
 	if (container!=NULL)
 	{
 		render_container::user_settings settings;
 		container->get_user_settings(settings);
-		//FIXME: Intended behaviour
-#if 1
-		vid_attributes[0] = window().machine().options().gamma();
-		vid_attributes[1] = window().machine().options().contrast();
-		vid_attributes[2] = window().machine().options().brightness();
-#else
-		vid_attributes[0] = settings.gamma;
-		vid_attributes[1] = settings.contrast;
-		vid_attributes[2] = settings.brightness;
-#endif
+		/* FIXME: the code below is in just for illustration issue on
+		 * how to set shader variables. gamma, contrast and brightness are
+		 * handled already by the core
+		 */
+		vid_attributes[0] = settings.m_gamma;
+		vid_attributes[1] = settings.m_contrast;
+		vid_attributes[2] = settings.m_brightness;
 		vid_attributes[3] = 0.0f;
 		uniform_location = pfn_glGetUniformLocationARB(m_glsl_program[shaderIdx], "vid_attributes");
 		pfn_glUniform4fvARB(uniform_location, 1, &(vid_attributes[shaderIdx]));
 		if ( GL_CHECK_ERROR_QUIET() ) {
 			osd_printf_verbose("GLSL: could not set 'vid_attributes' for shader prog idx %d\n", shaderIdx);
 		}
-	}
-	else
-	{
-		osd_printf_verbose("GLSL: could not get render container for screen %d\n", window().m_start_viewscreen);
 	}
 }
 
@@ -2956,7 +2902,7 @@ texture_info * sdl_info_ogl::texture_update(const render_primitive *prim, int sh
 	{
 		if ( texture->type == TEXTURE_TYPE_SHADER )
 		{
-			texture_shader_update(texture, shaderIdx);
+			texture_shader_update(texture, prim->container, shaderIdx);
 			if ( m_glsl_program_num>1 )
 			{
 				texture_mpass_flip(texture, shaderIdx);

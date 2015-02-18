@@ -9,7 +9,7 @@ Credits:
           input port patches, panning fix, sprite banking,
           Golden Castle Rom Set Support
 - Phil Stroffolino: palette, sprites, misc video driver fixes
-- Tatsuyuki Satoh: YM2203 sound improvements, NEC 8741 simulation,ADPCM with MC6809
+- Tatsuyuki Satoh: YM2203 sound improvements, NEC 8741 simulation, ADPCM with MC6809
 - Tomasz Slanina   preliminary Ping Pong King driver
 - Nicola Salmoria  clean up
 
@@ -17,7 +17,7 @@ special thanks to:
 - Camilty for precious hardware information and screenshots
 - Jason Richmond for hardware information and misc. notes
 - Joe Rounceville for schematics
-- and everyone else who'se offered support along the way!
+- and everyone else who's offered support along the way!
 
 
 ***************************************************************************
@@ -268,7 +268,7 @@ WRITE_LINE_MEMBER(gladiatr_state::gladiator_ym_irq)
 }
 
 /*Sound Functions*/
-WRITE8_MEMBER(gladiatr_state::glad_adpcm_w)
+WRITE8_MEMBER(gladiatr_state::gladiator_adpcm_w)
 {
 	UINT8 *rom = memregion("audiocpu")->base() + 0x10000;
 
@@ -280,13 +280,13 @@ WRITE8_MEMBER(gladiatr_state::glad_adpcm_w)
 	m_msm->vclk_w (BIT(data, 4)); /* bit4     */
 }
 
-WRITE8_MEMBER(gladiatr_state::glad_cpu_sound_command_w)
+WRITE8_MEMBER(gladiatr_state::gladiator_cpu_sound_command_w)
 {
 	soundlatch_byte_w(space,0,data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-READ8_MEMBER(gladiatr_state::glad_cpu_sound_command_r)
+READ8_MEMBER(gladiatr_state::gladiator_cpu_sound_command_r)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_byte_r(space,0);
@@ -299,7 +299,7 @@ WRITE8_MEMBER(gladiatr_state::gladiatr_flipscreen_w)
 
 
 #if 1
-/* !!!!! patch to IRQ timming for 2nd CPU !!!!! */
+/* !!!!! patch to IRQ timing for 2nd CPU !!!!! */
 WRITE8_MEMBER(gladiatr_state::gladiatr_irq_patch_w)
 {
 	m_subcpu->set_input_line(0, HOLD_LINE);
@@ -312,7 +312,7 @@ WRITE8_MEMBER(gladiatr_state::gladiatr_irq_patch_w)
 
 
 
-WRITE8_MEMBER(gladiatr_state::qx0_w)
+WRITE8_MEMBER(gladiatr_state::ppking_qx0_w)
 {
 	if(!offset)
 	{
@@ -321,7 +321,7 @@ WRITE8_MEMBER(gladiatr_state::qx0_w)
 	}
 }
 
-WRITE8_MEMBER(gladiatr_state::qx1_w)
+WRITE8_MEMBER(gladiatr_state::ppking_qx1_w)
 {
 	if(!offset)
 	{
@@ -330,15 +330,15 @@ WRITE8_MEMBER(gladiatr_state::qx1_w)
 	}
 }
 
-WRITE8_MEMBER(gladiatr_state::qx2_w){ }
+WRITE8_MEMBER(gladiatr_state::ppking_qx2_w){ }
 
-WRITE8_MEMBER(gladiatr_state::qx3_w){ }
+WRITE8_MEMBER(gladiatr_state::ppking_qx3_w){ }
 
-READ8_MEMBER(gladiatr_state::qx2_r){ return machine().rand(); }
+READ8_MEMBER(gladiatr_state::ppking_qx2_r){ return machine().rand(); }
 
-READ8_MEMBER(gladiatr_state::qx3_r){ return machine().rand()&0xf; }
+READ8_MEMBER(gladiatr_state::ppking_qx3_r){ return machine().rand()&0xf; }
 
-READ8_MEMBER(gladiatr_state::qx0_r)
+READ8_MEMBER(gladiatr_state::ppking_qx0_r)
 {
 	if(!offset)
 			return m_data1;
@@ -346,7 +346,7 @@ READ8_MEMBER(gladiatr_state::qx0_r)
 		return m_flag2;
 }
 
-READ8_MEMBER(gladiatr_state::qx1_r)
+READ8_MEMBER(gladiatr_state::ppking_qx1_r)
 {
 	if(!offset)
 		return m_data2;
@@ -364,10 +364,10 @@ static ADDRESS_MAP_START( ppking_cpu1_map, AS_PROGRAM, 8, gladiatr_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcbff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(ppking_video_registers_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(gladiatr_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(gladiatr_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(gladiatr_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(gladiatr_textram_w) AM_SHARE("textram")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(textram_w) AM_SHARE("textram")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram") /* battery backed RAM */
 ADDRESS_MAP_END
 
@@ -379,19 +379,19 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppking_cpu1_io, AS_IO, 8, gladiatr_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(gladiatr_spritebuffer_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(spritebuffer_w)
 	AM_RANGE(0xc004, 0xc004) AM_NOP // WRITE(ppking_irq_patch_w)
-	AM_RANGE(0xc09e, 0xc09f) AM_READ(qx0_r) AM_WRITE(qx0_w)
+	AM_RANGE(0xc09e, 0xc09f) AM_READ(ppking_qx0_r) AM_WRITE(ppking_qx0_w)
 	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppking_cpu2_io, AS_IO, 8, gladiatr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x20, 0x21) AM_READ(qx1_r) AM_WRITE(qx1_w)
+	AM_RANGE(0x20, 0x21) AM_READ(ppking_qx1_r) AM_WRITE(ppking_qx1_w)
 	AM_RANGE(0x40, 0x40) AM_READNOP
-	AM_RANGE(0x60, 0x61) AM_READWRITE(qx2_r,qx2_w)
-	AM_RANGE(0x80, 0x81) AM_READWRITE(qx3_r,qx3_w)
+	AM_RANGE(0x60, 0x61) AM_READWRITE(ppking_qx2_r,ppking_qx2_w)
+	AM_RANGE(0x80, 0x81) AM_READWRITE(ppking_qx3_r,ppking_qx3_w)
 ADDRESS_MAP_END
 
 
@@ -402,10 +402,10 @@ static ADDRESS_MAP_START( gladiatr_cpu1_map, AS_PROGRAM, 8, gladiatr_state )
 	AM_RANGE(0x6000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcbff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(gladiatr_video_registers_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(gladiatr_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(gladiatr_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(gladiatr_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(gladiatr_textram_w) AM_SHARE("textram")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(textram_w) AM_SHARE("textram")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram") /* battery backed RAM */
 ADDRESS_MAP_END
 
@@ -415,15 +415,15 @@ static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, gladiatr_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gladiatr_cpu3_map, AS_PROGRAM, 8, gladiatr_state )
-	AM_RANGE(0x1000, 0x1fff) AM_WRITE(glad_adpcm_w)
-	AM_RANGE(0x2000, 0x2fff) AM_READ(glad_cpu_sound_command_r)
+	AM_RANGE(0x1000, 0x1fff) AM_WRITE(gladiator_adpcm_w)
+	AM_RANGE(0x2000, 0x2fff) AM_READ(gladiator_cpu_sound_command_r)
 	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( gladiatr_cpu1_io, AS_IO, 8, gladiatr_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(gladiatr_spritebuffer_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(spritebuffer_w)
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(gladiatr_spritebank_w)
 	AM_RANGE(0xc002, 0xc002) AM_WRITE(gladiatr_bankswitch_w)
 	AM_RANGE(0xc004, 0xc004) AM_WRITE(gladiatr_irq_patch_w) /* !!! patch to 2nd CPU IRQ !!! */
@@ -440,7 +440,7 @@ static ADDRESS_MAP_START( gladiatr_cpu2_io, AS_IO, 8, gladiatr_state )
 	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("taito8741", taito8741_4pack_device, read_2, write_2)
 	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("taito8741", taito8741_4pack_device, read_3, write_3)
 	AM_RANGE(0xa0, 0xa7) AM_NOP // filters on sound output
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(glad_cpu_sound_command_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(gladiator_cpu_sound_command_w)
 ADDRESS_MAP_END
 
 
@@ -611,7 +611,7 @@ GFXDECODE_END
 
 
 
-READ8_MEMBER(gladiatr_state::f1_r)
+READ8_MEMBER(gladiatr_state::ppking_f1_r)
 {
 	return machine().rand();
 }
@@ -655,8 +655,8 @@ static MACHINE_CONFIG_START( ppking, gladiatr_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(gladiatr_state, f1_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(gladiatr_state, f1_r))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(gladiatr_state, ppking_f1_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(gladiatr_state, ppking_f1_r))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 	MCFG_SOUND_ROUTE(2, "mono", 0.60)
@@ -1001,7 +1001,7 @@ DRIVER_INIT_MEMBER(gladiatr_state,gladiatr)
 }
 
 
-READ8_MEMBER(gladiatr_state::f6a3_r)
+READ8_MEMBER(gladiatr_state::ppking_f6a3_r)
 {
 	if(space.device().safe_pcbase()==0x8e)
 		m_nvram[0x6a3]=1;
@@ -1031,13 +1031,16 @@ DRIVER_INIT_MEMBER(gladiatr_state,ppking)
 			rom[i+2*j*0x2000] = rom[i+j*0x2000];
 		}
 	}
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf6a3,0xf6a3,read8_delegate(FUNC(gladiatr_state::f6a3_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf6a3,0xf6a3,read8_delegate(FUNC(gladiatr_state::ppking_f6a3_r),this));
+	
+	save_item(NAME(m_data1));
+	save_item(NAME(m_data2));
 }
 
 
 
-GAME( 1985, ppking,   0,        ppking,   0,        gladiatr_state, ppking,   ROT90, "Taito America Corporation", "Ping-Pong King", GAME_NOT_WORKING)
-GAME( 1986, gladiatr, 0,        gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito America Corporation", "Gladiator (US)", 0 )
-GAME( 1986, ogonsiro, gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Ougon no Shiro (Japan)", 0 )
-GAME( 1986, greatgur, gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Great Gurianos (Japan?)", 0 )
-GAME( 1986, gcastle,  gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Golden Castle (prototype?)", 0 ) // incomplete dump
+GAME( 1985, ppking,   0,        ppking,   0,        gladiatr_state, ppking,   ROT90, "Taito America Corporation", "Ping-Pong King", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1986, gladiatr, 0,        gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito America Corporation", "Gladiator (US)", GAME_SUPPORTS_SAVE )
+GAME( 1986, ogonsiro, gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Ougon no Shiro (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1986, greatgur, gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Great Gurianos (Japan?)", GAME_SUPPORTS_SAVE )
+GAME( 1986, gcastle,  gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Golden Castle (prototype?)", GAME_SUPPORTS_SAVE ) // incomplete dump

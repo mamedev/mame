@@ -55,7 +55,7 @@ Press one of the start buttons to exit.
 *                           *
 *****************************
 
-There is known to be a Pacman hack running on this hardware.  It was done by Mike C. and isn't ment
+There is known to be a Pacman hack running on this hardware.  It was done by Mike C. and isn't meant
 for inclusion in MAME.  However the roms with checksums are listed below to prevent it being added
 as a newly "found" game:
 
@@ -79,7 +79,7 @@ voice.ic82     CRC32 abc61f3d   SHA1 c6f123d16a26c4d77c635617dd97bb4b906c463a
 #include "includes/wc90.h"
 
 
-WRITE8_MEMBER(wc90_state::wc90_bankswitch_w)
+WRITE8_MEMBER(wc90_state::bankswitch_w)
 {
 	int bankaddress;
 	UINT8 *RAM = memregion("maincpu")->base();
@@ -89,7 +89,7 @@ WRITE8_MEMBER(wc90_state::wc90_bankswitch_w)
 	membank("bank1")->set_base(&RAM[bankaddress] );
 }
 
-WRITE8_MEMBER(wc90_state::wc90_bankswitch1_w)
+WRITE8_MEMBER(wc90_state::bankswitch1_w)
 {
 	int bankaddress;
 	UINT8 *RAM = memregion("sub")->base();
@@ -99,7 +99,7 @@ WRITE8_MEMBER(wc90_state::wc90_bankswitch1_w)
 	membank("bank2")->set_base(&RAM[bankaddress] );
 }
 
-WRITE8_MEMBER(wc90_state::wc90_sound_command_w)
+WRITE8_MEMBER(wc90_state::sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -110,11 +110,11 @@ WRITE8_MEMBER(wc90_state::wc90_sound_command_w)
 static ADDRESS_MAP_START( wc90_map_1, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM     /* Main RAM */
-	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(wc90_fgvideoram_w) AM_SHARE("fgvideoram") /* fg video ram */
+	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram") /* fg video ram */
 	AM_RANGE(0xb000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(wc90_bgvideoram_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(wc90_txvideoram_w) AM_SHARE("txvideoram") /* tx video ram */
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram") /* tx video ram */
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xfc00, 0xfc00) AM_READ_PORT("P1")
@@ -134,9 +134,9 @@ static ADDRESS_MAP_START( wc90_map_1, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0xfc43, 0xfc43) AM_WRITEONLY AM_SHARE("scroll2yhi")
 	AM_RANGE(0xfc46, 0xfc46) AM_WRITEONLY AM_SHARE("scroll2xlo")
 	AM_RANGE(0xfc47, 0xfc47) AM_WRITEONLY AM_SHARE("scroll2xhi")
-	AM_RANGE(0xfcc0, 0xfcc0) AM_WRITE(wc90_sound_command_w)
+	AM_RANGE(0xfcc0, 0xfcc0) AM_WRITE(sound_command_w)
 	AM_RANGE(0xfcd0, 0xfcd0) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xfce0, 0xfce0) AM_WRITE(wc90_bankswitch_w)
+	AM_RANGE(0xfce0, 0xfce0) AM_WRITE(bankswitch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wc90_map_2, AS_PROGRAM, 8, wc90_state )
@@ -147,7 +147,7 @@ static ADDRESS_MAP_START( wc90_map_2, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank2")
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(wc90_bankswitch1_w)
+	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(bankswitch1_w)
 	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
@@ -316,7 +316,7 @@ static MACHINE_CONFIG_START( wc90, wc90_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(wc90_state, screen_update_wc90)
+	MCFG_SCREEN_UPDATE_DRIVER(wc90_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wc90)
@@ -472,7 +472,7 @@ ROM_START( wc90t )
 	ROM_LOAD( "ic82_06.bin",  0x00000, 0x20000, CRC(2fd692ed) SHA1(0273dc39181504320bec0187d074b2f86c821508) )
 ROM_END
 
-GAME( 1989, wc90,  0,    wc90, wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (World)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
-GAME( 1989, wc90a, wc90, wc90, wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (Euro set 1)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
-GAME( 1989, wc90b, wc90, wc90, wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (Euro set 2)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
-GAME( 1989, wc90t, wc90, wc90t,wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (trackball set 1)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
+GAME( 1989, wc90,  0,    wc90, wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (World)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1989, wc90a, wc90, wc90, wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (Euro set 1)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1989, wc90b, wc90, wc90, wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (Euro set 2)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1989, wc90t, wc90, wc90t,wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (trackball set 1)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

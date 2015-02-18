@@ -1938,6 +1938,7 @@ void sdlinput_poll(running_machine &machine)
 			if (*event.text.text)
 			{
 				sdl_window_info *window = GET_FOCUS_WINDOW(&event.text);
+				//printf("Focus window is %p - wl %p\n", window, sdl_window_list);
 				unicode_char result;
 				if (window != NULL )
 				{
@@ -1963,7 +1964,7 @@ void sdlinput_poll(running_machine &machine)
 				app_has_mouse_focus = 0;
 				break;
 			case SDL_WINDOWEVENT_MOVED:
-				window->clear();
+				window->notify_changed();
 				focus_window = window;
 				break;
 			case SDL_WINDOWEVENT_RESIZED:
@@ -1983,8 +1984,7 @@ void sdlinput_poll(running_machine &machine)
 #endif
 					{
 						//printf("event data1,data2 %d x %d %ld\n", event.window.data1, event.window.data2, sizeof(SDL_Event));
-						if (event.window.data1 != window->width() || event.window.data2 != window->height())
-							window->resize(event.window.data1, event.window.data2);
+						window->resize(event.window.data1, event.window.data2);
 					}
 				}
 				focus_window = window;

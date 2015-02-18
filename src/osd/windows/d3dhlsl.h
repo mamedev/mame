@@ -251,7 +251,7 @@ public:
 	shaders();
 	~shaders();
 
-	void init(base *d3dintf, win_window_info *window);
+	void init(base *d3dintf, running_machine *machine, d3d::renderer *renderer);
 
 	bool enabled() { return master_enable; }
 	void toggle();
@@ -334,7 +334,9 @@ private:
 	void                    raster_bloom_pass(render_target *rt, vec2f &texsize, vec2f &delta, poly_info *poly, int vertnum);
 
 	base *                  d3dintf;                    // D3D interface
-	win_window_info *       window;                     // D3D window info
+
+	running_machine * 		machine;
+	d3d::renderer *			d3d;						// D3D renderer
 
 	bool                    master_enable;              // overall enable flag
 	bool                    vector_enable;              // vector post-processing enable flag

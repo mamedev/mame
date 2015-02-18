@@ -151,8 +151,6 @@ void sdl_monitor_info::refresh()
 	SDL_GetCurrentDisplayMode(m_handle, &dmode);
 	#endif
 	SDL_GetDisplayBounds(m_handle, &m_dimensions);
-	m_center_width = m_dimensions.w;
-	m_center_height = m_dimensions.h;
 
 	// FIXME: Use SDL_GetDisplayBounds(monitor->handle, &tt) to update monitor_x
 	// SDL_Rect tt;
@@ -162,8 +160,8 @@ void sdl_monitor_info::refresh()
 	info.cbSize = sizeof(info);
 	GetMonitorInfo((HMONITOR)m_handle, (LPMONITORINFO)&info);
 	m_dimensions.x = m_dimensions.y = 0;
-	m_center_width = m_dimensions.w = info.rcMonitor.right - info.rcMonitor.left;
-	m_center_height = m_dimensions.h = info.rcMonitor.bottom - info.rcMonitor.top;
+	m_dimensions.w = info.rcMonitor.right - info.rcMonitor.left;
+	m_dimensions.h = info.rcMonitor.bottom - info.rcMonitor.top;
 	char *temp = utf8_from_wstring(info.szDevice);
 	strcpy(m_monitor_device, temp);
 	osd_free(temp);
@@ -176,8 +174,8 @@ void sdl_monitor_info::refresh()
 	dbounds = CGDisplayBounds(primary);
 
 	m_dimensions.x = m_dimensions.y = 0;
-	m_center_width = m_dimensions.w = dbounds.size.width - dbounds.origin.x;
-	m_center_height = m_dimensions.h = dbounds.size.height - dbounds.origin.y;
+	m_dimensions.w = dbounds.size.width - dbounds.origin.x;
+	m_dimensions.h = dbounds.size.height - dbounds.origin.y;
 	strcpy(m_monitor_device, "Mac OS X display");
 	#elif defined(SDLMAME_X11) || defined(SDLMAME_NO_X11)       // X11 version
 	{
@@ -195,22 +193,20 @@ void sdl_monitor_info::refresh()
 			m_dimensions.w = DisplayWidth(info.info.x11.display, screen);
 			m_dimensions.h = DisplayHeight(info.info.x11.display, screen);
 
+			/* FIXME: If Xinerame is used we should compile a list of monitors
+			 * like we do for other targets and ignore SDL.
+			 */
 			if ((XineramaIsActive(info.info.x11.display)) && video_config.restrictonemonitor)
 			{
 				XineramaScreenInfo *xineinfo;
 				int numscreens;
 
-					xineinfo = XineramaQueryScreens(info.info.x11.display, &numscreens);
+				xineinfo = XineramaQueryScreens(info.info.x11.display, &numscreens);
 
-				m_center_width = xineinfo[0].width;
-				m_center_height = xineinfo[0].height;
+				m_dimensions.w = xineinfo[0].width;
+				m_dimensions.h = xineinfo[0].height;
 
 				XFree(xineinfo);
-			}
-			else
-			{
-				m_center_width = m_dimensions.w;
-				m_center_height = m_dimensions.h;
 			}
 		}
 		else
@@ -250,14 +246,12 @@ void sdl_monitor_info::refresh()
 			}
 			m_dimensions.w = cw;
 			m_dimensions.h = ch;
-			m_center_width = cw;
-			m_center_height = ch;
 		}
 	}
 	#elif defined(SDLMAME_OS2)      // OS2 version
 	m_dimensions.x = m_dimensions.y = 0;
-	m_center_width = m_dimensions.w = WinQuerySysValue( HWND_DESKTOP, SV_CXSCREEN );
-	m_center_height = m_dimensions.h = WinQuerySysValue( HWND_DESKTOP, SV_CYSCREEN );
+	m_dimensions.w = WinQuerySysValue( HWND_DESKTOP, SV_CXSCREEN );
+	m_dimensions.h = WinQuerySysValue( HWND_DESKTOP, SV_CYSCREEN );
 	strcpy(m_monitor_device, "OS/2 display");
 	#else
 	#error Unknown SDLMAME_xx OS type!
@@ -428,8 +422,6 @@ void sdl_monitor_info::init()
 
 			SDL_GetDesktopDisplayMode(i, &dmode);
 			SDL_GetDisplayBounds(i, &monitor->m_dimensions);
-			monitor->m_center_width = monitor->m_dimensions.w;
-			monitor->m_center_height = monitor->m_dimensions.h;
 
 			// guess the aspect ratio assuming square pixels
 			monitor->m_aspect = (float)(dmode.w) / (float)(dmode.h);

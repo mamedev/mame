@@ -41,15 +41,15 @@ public:
 
 	UINT16 m_o;
 
-	UINT16 m_leds_state;
-	UINT8 m_leds_decay[0x10];
+	UINT16 m_display_state;
+	UINT8 m_display_decay[0x10];
 
 	DECLARE_READ8_MEMBER(read_k);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_WRITE16_MEMBER(write_r);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(leds_decay_tick);
-	void leds_update();
+	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
+	void display_update();
 
 	virtual void machine_start();
 };
@@ -57,37 +57,37 @@ public:
 
 /***************************************************************************
 
-  LEDs
+  LED Display
 
 ***************************************************************************/
 
 // The device strobes the outputs very fast, it is unnoticeable to the user.
 // To prevent flickering here, we need to simulate a decay.
 
-// decay time, in steps of 10ms
-#define LEDS_DECAY_TIME 2
+// decay time, in steps of 1ms
+#define DISPLAY_DECAY_TIME 25
 
-void comp4_state::leds_update()
+void comp4_state::display_update()
 {
 	for (int i = 0; i < 0x10; i++)
 	{
-		// turn on powered leds
-		if (m_leds_state >> i & 1)
-			m_leds_decay[i] = LEDS_DECAY_TIME;
+		// turn on powered segments
+		if (m_display_state >> i & 1)
+			m_display_decay[i] = DISPLAY_DECAY_TIME;
 
 		// send to output
-		output_set_lamp_value(i, (m_leds_decay[i] != 0) ? 1 : 0);
+		output_set_lamp_value(i, (m_display_decay[i] != 0) ? 1 : 0);
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(comp4_state::leds_decay_tick)
+TIMER_DEVICE_CALLBACK_MEMBER(comp4_state::display_decay_tick)
 {
-	// slowly turn off unpowered leds
+	// slowly turn off unpowered segments
 	for (int i = 0; i < 0x10; i++)
-		if (!(m_leds_state >> i & 1) && m_leds_decay[i])
-			m_leds_decay[i]--;
+		if (!(m_display_state >> i & 1) && m_display_decay[i])
+			m_display_decay[i]--;
 
-	leds_update();
+	display_update();
 }
 
 
@@ -118,8 +118,8 @@ WRITE16_MEMBER(comp4_state::write_r)
 	// R2    R7
 	// R1    R6
 	// R0    R5
-	m_leds_state = data;
-	leds_update();
+	m_display_state = data;
+	display_update();
 }
 
 WRITE16_MEMBER(comp4_state::write_o)
@@ -169,14 +169,14 @@ INPUT_PORTS_END
 void comp4_state::machine_start()
 {
 	// zerofill
-	m_leds_state = 0;
-	memset(m_leds_decay, 0, sizeof(m_leds_decay));
+	m_display_state = 0;
+	memset(m_display_decay, 0, sizeof(m_display_decay));
 
 	m_o = 0;
 
 	// register for savestates
-	save_item(NAME(m_leds_state));
-	save_item(NAME(m_leds_decay));
+	save_item(NAME(m_display_state));
+	save_item(NAME(m_display_decay));
 
 	save_item(NAME(m_o));
 }
@@ -190,7 +190,7 @@ static MACHINE_CONFIG_START( comp4, comp4_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(comp4_state, write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(comp4_state, write_r))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("leds_decay", comp4_state, leds_decay_tick, attotime::from_msec(10))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", comp4_state, display_decay_tick, attotime::from_msec(1))
 
 	MCFG_DEFAULT_LAYOUT(layout_comp4)
 

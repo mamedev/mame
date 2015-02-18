@@ -279,6 +279,7 @@ void render_primitive::reset()
 {
 	// public state
 	type = INVALID;
+	container = NULL;
 	bounds.x0 = 0;
 	bounds.y0 = 0;
 	bounds.x1 = 0;
@@ -1754,6 +1755,9 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 
 		// allocate the primitive and set the transformed bounds/color data
 		render_primitive *prim = list.alloc(render_primitive::INVALID);
+
+		prim->container = &container; /* pass the container along for access to user_settings */
+
 		prim->bounds.x0 = render_round_nearest(container_xform.xoffs + bounds.x0 * container_xform.xscale);
 		prim->bounds.y0 = render_round_nearest(container_xform.yoffs + bounds.y0 * container_xform.yscale);
 		if (curitem->internal() & INTERNAL_FLAG_CHAR)

@@ -25,12 +25,12 @@
 class renderer_gdi : public osd_renderer
 {
 public:
-	renderer_gdi(win_window_info *window)
+	renderer_gdi(osd_window *window)
 	: osd_renderer(window, FLAG_NONE), bmdata(NULL), bmsize(0) { }
 
 	virtual ~renderer_gdi() { }
 
-	virtual int init();
+	virtual int create();
 	virtual render_primitive_list *get_primitives();
 	virtual int draw(HDC dc, int update);
 	virtual void save() {};
@@ -57,7 +57,7 @@ static void drawgdi_exit(void);
 //  drawnone_create
 //============================================================
 
-static osd_renderer *drawgdi_create(win_window_info *window)
+static osd_renderer *drawgdi_create(osd_window *window)
 {
 	return global_alloc(renderer_gdi(window));
 }
@@ -92,7 +92,7 @@ static void drawgdi_exit(void)
 //  drawgdi_window_init
 //============================================================
 
-int renderer_gdi::init()
+int renderer_gdi::create()
 {
 
 	// fill in the bitmap info header
@@ -133,8 +133,8 @@ render_primitive_list *renderer_gdi::get_primitives()
 {
 	RECT client;
 	GetClientRect(window().m_hwnd, &client);
-	window().m_target->set_bounds(rect_width(&client), rect_height(&client), window().m_monitor->get_aspect());
-	return &window().m_target->get_primitives();
+	window().target()->set_bounds(rect_width(&client), rect_height(&client), window().aspect());
+	return &window().target()->get_primitives();
 }
 
 

@@ -17,11 +17,8 @@ inline void ucom4_cpu_device::ram_w(UINT8 data)
 void ucom4_cpu_device::pop_stack()
 {
 	m_pc = m_stack[0] & m_prgmask;
-	for (int i = 0; i < m_stack_levels; i++)
-	{
+	for (int i = 0; i < m_stack_levels-1; i++)
 		m_stack[i] = m_stack[i+1];
-		m_stack[i+1] = 0;
-	}
 }
 
 void ucom4_cpu_device::push_stack()
@@ -180,13 +177,16 @@ void ucom4_cpu_device::op_ad()
 void ucom4_cpu_device::op_adc()
 {
 	// ADC: Add RAM and carry to ACC, store Carry F/F
-	op_illegal();
+	m_acc += ram_r() + m_carry_f;
+	m_carry_f = m_acc >> 4 & 1;
+	m_acc &= 0xf;
 }
 
 void ucom4_cpu_device::op_ads()
 {
 	// ADS: Add RAM and carry to ACC, store Carry F/F, skip next on carry
-	op_illegal();
+	op_adc();
+	m_skip = (m_carry_f != 0);
 }
 
 void ucom4_cpu_device::op_daa()
@@ -426,7 +426,8 @@ void ucom4_cpu_device::op_tpb()
 void ucom4_cpu_device::op_tit()
 {
 	// TIT: skip next on Interrupt F/F, reset Interrupt F/F
-	op_illegal();
+	m_skip = (m_int_f != 0);
+	m_int_f = 0;
 }
 
 
@@ -486,6 +487,11 @@ inline bool ucom4_cpu_device::check_op_43()
 	return (m_family == NEC_UCOM43);
 }
 
+TIMER_CALLBACK_MEMBER( ucom4_cpu_device::simple_timer_cb )
+{
+	m_timer_f = 1;
+}
+
 // extra registers reside in RAM
 enum
 {
@@ -509,6 +515,7 @@ inline void ucom4_cpu_device::ucom43_reg_w(int index, UINT8 data)
 }
 
 
+
 // Transfer
 
 void ucom4_cpu_device::op_taw()
@@ -516,7 +523,8 @@ void ucom4_cpu_device::op_taw()
 	if (!check_op_43()) return;
 
 	// TAW: Transfer ACC to W
-	op_illegal();
+	m_icount--;
+	ucom43_reg_w(UCOM43_W, m_acc);
 }
 
 void ucom4_cpu_device::op_taz()
@@ -524,7 +532,8 @@ void ucom4_cpu_device::op_taz()
 	if (!check_op_43()) return;
 	
 	// TAZ: Transfer ACC to Z
-	op_illegal();
+	m_icount--;
+	ucom43_reg_w(UCOM43_Z, m_acc);
 }
 
 void ucom4_cpu_device::op_thx()
@@ -532,7 +541,8 @@ void ucom4_cpu_device::op_thx()
 	if (!check_op_43()) return;
 	
 	// THX: Transfer DPh to X
-	op_illegal();
+	m_icount--;
+	ucom43_reg_w(UCOM43_X, m_dph);
 }
 
 void ucom4_cpu_device::op_tly()
@@ -540,7 +550,8 @@ void ucom4_cpu_device::op_tly()
 	if (!check_op_43()) return;
 	
 	// TLY: Transfer DPl to Y
-	op_illegal();
+	m_icount--;
+	ucom43_reg_w(UCOM43_Y, m_dpl);
 }
 
 
@@ -551,7 +562,10 @@ void ucom4_cpu_device::op_xaw()
 	if (!check_op_43()) return;
 	
 	// XAW: Exchange ACC with W
-	op_illegal();
+	m_icount--;
+	UINT8 old_acc = m_acc;
+	m_acc = ucom43_reg_r(UCOM43_W);
+	ucom43_reg_w(UCOM43_W, old_acc);
 }
 
 void ucom4_cpu_device::op_xaz()
@@ -559,7 +573,10 @@ void ucom4_cpu_device::op_xaz()
 	if (!check_op_43()) return;
 	
 	// XAZ: Exchange ACC with Z
-	op_illegal();
+	m_icount--;
+	UINT8 old_acc = m_acc;
+	m_acc = ucom43_reg_r(UCOM43_Z);
+	ucom43_reg_w(UCOM43_Z, old_acc);
 }
 
 void ucom4_cpu_device::op_xhr()
@@ -567,7 +584,10 @@ void ucom4_cpu_device::op_xhr()
 	if (!check_op_43()) return;
 	
 	// XHR: Exchange DPh with R
-	op_illegal();
+	m_icount--;
+	UINT8 old_dph = m_dph;
+	m_dph = ucom43_reg_r(UCOM43_R);
+	ucom43_reg_w(UCOM43_R, old_dph);
 }
 
 void ucom4_cpu_device::op_xhx()
@@ -575,7 +595,10 @@ void ucom4_cpu_device::op_xhx()
 	if (!check_op_43()) return;
 	
 	// XHX: Exchange DPh with X
-	op_illegal();
+	m_icount--;
+	UINT8 old_dph = m_dph;
+	m_dph = ucom43_reg_r(UCOM43_X);
+	ucom43_reg_w(UCOM43_X, old_dph);
 }
 
 void ucom4_cpu_device::op_xls()
@@ -583,7 +606,10 @@ void ucom4_cpu_device::op_xls()
 	if (!check_op_43()) return;
 	
 	// XLS: Exchange DPl with S
-	op_illegal();
+	m_icount--;
+	UINT8 old_dpl = m_dpl;
+	m_dpl = ucom43_reg_r(UCOM43_S);
+	ucom43_reg_w(UCOM43_S, old_dpl);
 }
 
 void ucom4_cpu_device::op_xly()
@@ -591,7 +617,10 @@ void ucom4_cpu_device::op_xly()
 	if (!check_op_43()) return;
 	
 	// XLY: Exchange DPl with Y
-	op_illegal();
+	m_icount--;
+	UINT8 old_dpl = m_dpl;
+	m_dpl = ucom43_reg_r(UCOM43_Y);
+	ucom43_reg_w(UCOM43_Y, old_dpl);
 }
 
 void ucom4_cpu_device::op_xc()
@@ -599,7 +628,9 @@ void ucom4_cpu_device::op_xc()
 	if (!check_op_43()) return;
 	
 	// XC: Exchange Carry F/F with Carry Save F/F
-	op_illegal();
+	UINT8 c = m_carry_f;
+	m_carry_f = m_carry_s_f;
+	m_carry_s_f = c;
 }
 
 
@@ -610,7 +641,8 @@ void ucom4_cpu_device::op_sfb()
 	if (!check_op_43()) return;
 	
 	// SFB B: Set a single bit of FLAG
-	op_illegal();
+	m_icount--;
+	ucom43_reg_w(UCOM43_F, ucom43_reg_r(UCOM43_F) | m_bitmask);
 }
 
 void ucom4_cpu_device::op_rfb()
@@ -618,7 +650,8 @@ void ucom4_cpu_device::op_rfb()
 	if (!check_op_43()) return;
 	
 	// RFB B: Reset a single bit of FLAG
-	op_illegal();
+	m_icount--;
+	ucom43_reg_w(UCOM43_F, ucom43_reg_r(UCOM43_F) & ~m_bitmask);
 }
 
 void ucom4_cpu_device::op_fbt()
@@ -626,7 +659,8 @@ void ucom4_cpu_device::op_fbt()
 	if (!check_op_43()) return;
 	
 	// FBT B: skip next on bit(FLAG)
-	op_illegal();
+	m_icount--;
+	m_skip = ((ucom43_reg_r(UCOM43_F) & m_bitmask) != 0);
 }
 
 void ucom4_cpu_device::op_fbf()
@@ -634,7 +668,8 @@ void ucom4_cpu_device::op_fbf()
 	if (!check_op_43()) return;
 	
 	// FBF B: skip next on not bit(FLAG)
-	op_illegal();
+	m_icount--;
+	m_skip = ((ucom43_reg_r(UCOM43_F) & m_bitmask) == 0);
 }
 
 
@@ -645,7 +680,9 @@ void ucom4_cpu_device::op_rar()
 	if (!check_op_43()) return;
 	
 	// RAR: Rotate ACC Right through Carry F/F
-	op_illegal();
+	UINT8 c = m_acc & 1;
+	m_acc = m_acc >> 1 | m_carry_f << 3;
+	m_carry_f = c;
 }
 
 
@@ -656,7 +693,9 @@ void ucom4_cpu_device::op_inm()
 	if (!check_op_43()) return;
 	
 	// INM: Increment RAM, skip next on carry
-	op_illegal();
+	UINT8 val = (ram_r() + 1) & 0xf;
+	ram_w(val);
+	m_skip = (val == 0);
 }
 
 void ucom4_cpu_device::op_dem()
@@ -664,7 +703,9 @@ void ucom4_cpu_device::op_dem()
 	if (!check_op_43()) return;
 	
 	// DEM: Decrement RAM, skip next on carry
-	op_illegal();
+	UINT8 val = (ram_r() - 1) & 0xf;
+	ram_w(val);
+	m_skip = (val == 0xf);
 }
 
 
@@ -675,7 +716,15 @@ void ucom4_cpu_device::op_stm()
 	if (!check_op_43()) return;
 	
 	// STM X: Reset Timer F/F, Start Timer with X
-	op_illegal();
+	m_timer_f = 0;
+
+	// on the default clockrate of 400kHz, the minimum time interval is
+	// 630usec and the maximum interval is 40320usec(630*64)
+	attotime base = attotime::from_hz(unscaled_clock() / 4 / 63);
+	m_timer->adjust(base * ((m_arg & 0x3f) + 1));
+
+	if ((m_arg & 0xc0) != 0x80)
+		logerror("%s STM opcode unexpected upper arg $%02X at $%03X\n", tag(), m_arg & 0xc0, m_pc);
 }
 
 void ucom4_cpu_device::op_ttm()
@@ -683,7 +732,7 @@ void ucom4_cpu_device::op_ttm()
 	if (!check_op_43()) return;
 	
 	// TTM: skip next on Timer F/F
-	op_illegal();
+	m_skip = (m_timer_f != 0);
 }
 
 
@@ -694,7 +743,7 @@ void ucom4_cpu_device::op_ei()
 	if (!check_op_43()) return;
 	
 	// EI: Set Interrupt Enable F/F
-	op_illegal();
+	m_inte_f = 1;
 }
 
 void ucom4_cpu_device::op_di()
@@ -702,5 +751,5 @@ void ucom4_cpu_device::op_di()
 	if (!check_op_43()) return;
 	
 	// DI: Reset Interrupt Enable F/F
-	op_illegal();
+	m_inte_f = 0;
 }

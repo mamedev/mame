@@ -201,8 +201,8 @@ namespace bgfx
 #elif BX_PLATFORM_IOS
 	extern void* g_bgfxEaglLayer;
 #elif BX_PLATFORM_LINUX
-	extern ::Display* g_bgfxX11Display;
-	extern ::Window   g_bgfxX11Window;
+	extern void*    g_bgfxX11Display;
+	extern uint32_t g_bgfxX11Window;
 #elif BX_PLATFORM_OSX
 	extern void* g_bgfxNSWindow;
 #elif BX_PLATFORM_WINDOWS
@@ -2178,7 +2178,7 @@ namespace bgfx
 			return ptr;
 		}
 
-		BGFX_API_FUNC(DynamicVertexBufferHandle createDynamicVertexBuffer(uint16_t _num, const VertexDecl& _decl, uint8_t _flags) )
+		BGFX_API_FUNC(DynamicVertexBufferHandle createDynamicVertexBuffer(uint32_t _num, const VertexDecl& _decl, uint8_t _flags) )
 		{
 			DynamicVertexBufferHandle handle = BGFX_INVALID_HANDLE;
 			uint32_t size = strideAlign16( (_num+1)*_decl.m_stride, _decl.m_stride);
@@ -2681,6 +2681,7 @@ namespace bgfx
 						, (uint16_t)imageContainer.m_width
 						, (uint16_t)imageContainer.m_height
 						, (uint16_t)imageContainer.m_depth
+						, imageContainer.m_cubeMap
 						, imageContainer.m_numMips
 						, TextureFormat::Enum(imageContainer.m_format)
 						);
@@ -2689,11 +2690,12 @@ namespace bgfx
 				{
 					_info->format = TextureFormat::Unknown;
 					_info->storageSize = 0;
-					_info->width = 0;
-					_info->height = 0;
-					_info->depth = 0;
+					_info->width   = 0;
+					_info->height  = 0;
+					_info->depth   = 0;
 					_info->numMips = 0;
 					_info->bitsPerPixel = 0;
+					_info->cubeMap = false;
 				}
 			}
 
@@ -2904,6 +2906,15 @@ namespace bgfx
 
 			if (0 == refs)
 			{
+				for (UniformHashMap::iterator it = m_uniformHashMap.begin(), itEnd = m_uniformHashMap.end(); it != itEnd; ++it)
+				{
+					if (it->second.idx == _handle.idx)
+					{
+						m_uniformHashMap.erase(it);
+						break;
+					}
+				}
+
 				CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::DestroyUniform);
 				cmdbuf.write(_handle);
 				m_submit->free(_handle);

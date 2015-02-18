@@ -2478,10 +2478,11 @@ void m68000_base_device::clear_all()
 	mmu_tmp_buserror_rw = 0;
 
 	for (int i=0;i<M68K_IC_SIZE;i++)
+	{
 		ic_address[i] = 0;
-
-	for (int i=0;i<M68K_IC_SIZE;i++)
 		ic_data[i] = 0;
+		ic_valid[i] = false;
+	}
 
 	internal = 0;
 }

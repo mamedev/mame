@@ -77,7 +77,7 @@ void i8251_device::device_start()
 	save_item(NAME(m_data));
 	save_item(NAME(m_tx_busy));
 	save_item(NAME(m_disable_tx_pending));
-	device_serial_interface::register_save_state(machine().save(), name(), tag());
+	device_serial_interface::register_save_state(machine().save(), this);
 }
 
 

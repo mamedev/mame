@@ -46,39 +46,19 @@ TODO:
 
 ***************************************************************************/
 
-WRITE8_MEMBER(exzisus_state::exzisus_cpua_bankswitch_w)
+WRITE8_MEMBER(exzisus_state::cpua_bankswitch_w)
 {
-	UINT8 *RAM = memregion("cpua")->base();
-
-	if ( (data & 0x0f) != m_cpua_bank )
-	{
-		m_cpua_bank = data & 0x0f;
-		if (m_cpua_bank >= 2)
-		{
-			membank("bank2")->set_base(&RAM[ 0x10000 + ( (m_cpua_bank - 2) * 0x4000 ) ] );
-		}
-	}
-
+	membank("cpuabank")->set_entry(data & 0x0f);
 	flip_screen_set(data & 0x40);
 }
 
-WRITE8_MEMBER(exzisus_state::exzisus_cpub_bankswitch_w)
+WRITE8_MEMBER(exzisus_state::cpub_bankswitch_w)
 {
-	UINT8 *RAM = memregion("cpub")->base();
-
-	if ( (data & 0x0f) != m_cpub_bank )
-	{
-		m_cpub_bank = data & 0x0f;
-		if (m_cpub_bank >= 2)
-		{
-			membank("bank1")->set_base(&RAM[ 0x10000 + ( (m_cpub_bank - 2) * 0x4000 ) ] );
-		}
-	}
-
+	membank("cpubbank")->set_entry(data & 0x0f);
 	flip_screen_set(data & 0x40);
 }
 
-WRITE8_MEMBER(exzisus_state::exzisus_coincounter_w)
+WRITE8_MEMBER(exzisus_state::coincounter_w)
 {
 	coin_lockout_w(machine(), 0,~data & 0x01);
 	coin_lockout_w(machine(), 1,~data & 0x02);
@@ -86,34 +66,14 @@ WRITE8_MEMBER(exzisus_state::exzisus_coincounter_w)
 	coin_counter_w(machine(), 1,data & 0x08);
 }
 
-READ8_MEMBER(exzisus_state::exzisus_sharedram_ab_r)
-{
-	return m_sharedram_ab[offset];
-}
-
-READ8_MEMBER(exzisus_state::exzisus_sharedram_ac_r)
-{
-	return m_sharedram_ac[offset];
-}
-
-WRITE8_MEMBER(exzisus_state::exzisus_sharedram_ab_w)
-{
-	m_sharedram_ab[offset] = data;
-}
-
-WRITE8_MEMBER(exzisus_state::exzisus_sharedram_ac_w)
-{
-	m_sharedram_ac[offset] = data;
-}
-
 // is it ok that cpub_reset refers to cpuc?
-WRITE8_MEMBER(exzisus_state::exzisus_cpub_reset_w)
+WRITE8_MEMBER(exzisus_state::cpub_reset_w)
 {
 	m_cpuc->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
 #if 0
-// without exzisus_cpub_reset_w, the following patch would be needed for
+// without cpub_reset_w, the following patch would be needed for
 // the RAM check to work
 DRIVER_INIT_MEMBER(exzisus_state,exzisus)
 {
@@ -136,39 +96,39 @@ DRIVER_INIT_MEMBER(exzisus_state,exzisus)
 
 static ADDRESS_MAP_START( cpua_map, AS_PROGRAM, 8, exzisus_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xc000, 0xc5ff) AM_READWRITE(exzisus_objectram_1_r, exzisus_objectram_1_w) AM_SHARE("objectram1")
-	AM_RANGE(0xc600, 0xdfff) AM_READWRITE(exzisus_videoram_1_r, exzisus_videoram_1_w) AM_SHARE("videoram1")
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(exzisus_sharedram_ac_r, exzisus_sharedram_ac_w) AM_SHARE("sharedram_ac")
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(exzisus_cpua_bankswitch_w)
-	AM_RANGE(0xf404, 0xf404) AM_WRITE(exzisus_cpub_reset_w) // ??
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(exzisus_sharedram_ab_r, exzisus_sharedram_ab_w) AM_SHARE("sharedram_ab")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("cpuabank")
+	AM_RANGE(0xc000, 0xc5ff) AM_RAM AM_SHARE("objectram1")
+	AM_RANGE(0xc600, 0xdfff) AM_RAM AM_SHARE("videoram1")
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("sharedram_ac")
+	AM_RANGE(0xf400, 0xf400) AM_WRITE(cpua_bankswitch_w)
+	AM_RANGE(0xf404, 0xf404) AM_WRITE(cpub_reset_w) // ??
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("sharedram_ab")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpub_map, AS_PROGRAM, 8, exzisus_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc5ff) AM_READWRITE(exzisus_objectram_0_r, exzisus_objectram_0_w) AM_SHARE("objectram0")
-	AM_RANGE(0xc600, 0xdfff) AM_READWRITE(exzisus_videoram_0_r, exzisus_videoram_0_w) AM_SHARE("videoram0")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("cpubbank")
+	AM_RANGE(0xc000, 0xc5ff) AM_RAM AM_SHARE("objectram0")
+	AM_RANGE(0xc600, 0xdfff) AM_RAM AM_SHARE("videoram0")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, master_port_w)
 	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w)
 	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("P1")
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(exzisus_cpub_bankswitch_w)
+	AM_RANGE(0xf400, 0xf400) AM_WRITE(cpub_bankswitch_w)
 	AM_RANGE(0xf401, 0xf401) AM_READ_PORT("P2")
 	AM_RANGE(0xf402, 0xf402) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf402, 0xf402) AM_WRITE(exzisus_coincounter_w)
+	AM_RANGE(0xf402, 0xf402) AM_WRITE(coincounter_w)
 	AM_RANGE(0xf404, 0xf404) AM_READ_PORT("DSWA")
 	AM_RANGE(0xf404, 0xf404) AM_WRITENOP // ??
 	AM_RANGE(0xf405, 0xf405) AM_READ_PORT("DSWB")
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(exzisus_sharedram_ab_r, exzisus_sharedram_ab_w)
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("sharedram_ab")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpuc_map, AS_PROGRAM, 8, exzisus_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x85ff) AM_READWRITE(exzisus_objectram_1_r, exzisus_objectram_1_w)
-	AM_RANGE(0x8600, 0x9fff) AM_READWRITE(exzisus_videoram_1_r, exzisus_videoram_1_w)
-	AM_RANGE(0xa000, 0xafff) AM_READWRITE(exzisus_sharedram_ac_r, exzisus_sharedram_ac_w)
+	AM_RANGE(0x8000, 0x85ff) AM_RAM AM_SHARE("objectram1")
+	AM_RANGE(0x8600, 0x9fff) AM_RAM AM_SHARE("videoram1")
+	AM_RANGE(0xa000, 0xafff) AM_RAM AM_SHARE("sharedram_ac")
 	AM_RANGE(0xb000, 0xbfff) AM_RAM
 ADDRESS_MAP_END
 
@@ -234,12 +194,18 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
+void exzisus_state::machine_start()
+{
+	membank("cpuabank")->configure_entries(0, 16, memregion("cpua")->base(), 0x4000);
+	membank("cpubbank")->configure_entries(0, 16, memregion("cpub")->base(), 0x4000);
+}
+
 static const gfx_layout charlayout =
 {
 	8, 8,
-	8*2048,
+	RGN_FRAC(1,2),
 	4,
-	{ 0x40000*8, 0x40000*8+4, 0, 4 },
+	{ RGN_FRAC(1,2), RGN_FRAC(1,2)+4, 0, 4 },
 	{ 3, 2, 1, 0, 8+3, 8+2, 8+1, 8+0 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
 	16*8
@@ -279,7 +245,7 @@ static MACHINE_CONFIG_START( exzisus, exzisus_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(exzisus_state, screen_update_exzisus)
+	MCFG_SCREEN_UPDATE_DRIVER(exzisus_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exzisus)
@@ -306,16 +272,14 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( exzisus )
-	ROM_REGION( 0x48000, "cpua", 0 )
-	ROM_LOAD( "b12-09.7d",  0x00000, 0x08000, CRC(e80f49a9) SHA1(3995d52195cdadfa82ff992ec0456fce09e75132) )
-	ROM_CONTINUE(           0x10000, 0x08000 )
-	ROM_LOAD( "b12-11.9d",  0x18000, 0x10000, CRC(11fcda2c) SHA1(4f8d1dff339d96ffadde2cc7eec23cfeb42481f2) )
+	ROM_REGION( 0x40000, "cpua", 0 )
+	ROM_LOAD( "b12-09.7d",  0x00000, 0x10000, CRC(e80f49a9) SHA1(3995d52195cdadfa82ff992ec0456fce09e75132) )
+	ROM_LOAD( "b12-11.9d",  0x10000, 0x10000, CRC(11fcda2c) SHA1(4f8d1dff339d96ffadde2cc7eec23cfeb42481f2) )
 
-	ROM_REGION( 0x48000, "cpub", 0 )
-	ROM_LOAD( "b12-10.7f",  0x00000, 0x08000, CRC(a60227f1) SHA1(1e0d09f6b77794095092316fe8bf823d4c7775bb) )
-	ROM_CONTINUE(           0x10000, 0x08000 )
-	ROM_LOAD( "b12-12.8f",  0x18000, 0x10000, CRC(a662be67) SHA1(0643480d56d8ac020288db800a705dd5d0d3ad9f) )
-	ROM_LOAD( "b12-13.10f", 0x28000, 0x10000, CRC(04a29633) SHA1(39476365241718f01f9630c12467cb24791a67e1) )
+	ROM_REGION( 0x40000, "cpub", 0 )
+	ROM_LOAD( "b12-10.7f",  0x00000, 0x10000, CRC(a60227f1) SHA1(1e0d09f6b77794095092316fe8bf823d4c7775bb) )
+	ROM_LOAD( "b12-12.8f",  0x10000, 0x10000, CRC(a662be67) SHA1(0643480d56d8ac020288db800a705dd5d0d3ad9f) )
+	ROM_LOAD( "b12-13.10f", 0x20000, 0x10000, CRC(04a29633) SHA1(39476365241718f01f9630c12467cb24791a67e1) )
 
 	ROM_REGION( 0x10000, "cpuc", 0 )
 	ROM_LOAD( "b12-14.12c", 0x00000, 0x08000, CRC(b5ce5e75) SHA1(6d5ec788684e1be4c727ac02b9fa313a42985b40) )
@@ -347,16 +311,14 @@ ROM_START( exzisus )
 ROM_END
 
 ROM_START( exzisusa )
-	ROM_REGION( 0x48000, "cpua", 0 )
-	ROM_LOAD( "b23-10.7d",  0x00000, 0x08000, CRC(c80216fc) SHA1(7b952779c420be08573768f09bd65d0a188df024) )
-	ROM_CONTINUE(           0x10000, 0x08000 )
-	ROM_LOAD( "b23-12.9d",  0x18000, 0x10000, CRC(13637f54) SHA1(c175bc60120e32eec6ccca822fa497a42dd59823) )
+	ROM_REGION( 0x40000, "cpua", 0 )
+	ROM_LOAD( "b23-10.7d",  0x00000, 0x10000, CRC(c80216fc) SHA1(7b952779c420be08573768f09bd65d0a188df024) )
+	ROM_LOAD( "b23-12.9d",  0x10000, 0x10000, CRC(13637f54) SHA1(c175bc60120e32eec6ccca822fa497a42dd59823) )
 
-	ROM_REGION( 0x48000, "cpub", 0 )
-	ROM_LOAD( "b23-11.7f",  0x00000, 0x08000, CRC(d6a79cef) SHA1(e2b56aa38c017b24b50f304b9fe49ee14006f9a4) )
-	ROM_CONTINUE(           0x10000, 0x08000 )
-	ROM_LOAD( "b12-12.8f",  0x18000, 0x10000, CRC(a662be67) SHA1(0643480d56d8ac020288db800a705dd5d0d3ad9f) )
-	ROM_LOAD( "b12-13.10f", 0x28000, 0x10000, CRC(04a29633) SHA1(39476365241718f01f9630c12467cb24791a67e1) )
+	ROM_REGION( 0x40000, "cpub", 0 )
+	ROM_LOAD( "b23-11.7f",  0x00000, 0x10000, CRC(d6a79cef) SHA1(e2b56aa38c017b24b50f304b9fe49ee14006f9a4) )
+	ROM_LOAD( "b12-12.8f",  0x10000, 0x10000, CRC(a662be67) SHA1(0643480d56d8ac020288db800a705dd5d0d3ad9f) )
+	ROM_LOAD( "b12-13.10f", 0x20000, 0x10000, CRC(04a29633) SHA1(39476365241718f01f9630c12467cb24791a67e1) )
 
 	ROM_REGION( 0x10000, "cpuc", 0 )
 	ROM_LOAD( "b23-13.12c", 0x00000, 0x08000, CRC(51110aa1) SHA1(34c2701625eb1987affad1efd19ff8c9971456ae) )
@@ -386,16 +348,14 @@ ROM_START( exzisusa )
 ROM_END
 
 ROM_START( exzisust )
-	ROM_REGION( 0x48000, "cpua", 0 )
-	ROM_LOAD( "b23-10.7d",  0x00000, 0x08000, CRC(c80216fc) SHA1(7b952779c420be08573768f09bd65d0a188df024) )
-	ROM_CONTINUE(           0x10000, 0x08000 )
-	ROM_LOAD( "b23-12.9d",  0x18000, 0x10000, CRC(13637f54) SHA1(c175bc60120e32eec6ccca822fa497a42dd59823) )
+	ROM_REGION( 0x40000, "cpua", 0 )
+	ROM_LOAD( "b23-10.7d",  0x00000, 0x10000, CRC(c80216fc) SHA1(7b952779c420be08573768f09bd65d0a188df024) )
+	ROM_LOAD( "b23-12.9d",  0x10000, 0x10000, CRC(13637f54) SHA1(c175bc60120e32eec6ccca822fa497a42dd59823) )
 
-	ROM_REGION( 0x48000, "cpub", 0 )
-	ROM_LOAD( "b23-15.7f",  0x00000, 0x08000, CRC(2f8b3752) SHA1(acfbb8aa20e6b031b9543e1e56268f3f5c7f7f07) )
-	ROM_CONTINUE(           0x10000, 0x08000 )
-	ROM_LOAD( "b12-12.8f",  0x18000, 0x10000, CRC(a662be67) SHA1(0643480d56d8ac020288db800a705dd5d0d3ad9f) )
-	ROM_LOAD( "b12-13.10f", 0x28000, 0x10000, CRC(04a29633) SHA1(39476365241718f01f9630c12467cb24791a67e1) )
+	ROM_REGION( 0x40000, "cpub", 0 )
+	ROM_LOAD( "b23-15.7f",  0x00000, 0x10000, CRC(2f8b3752) SHA1(acfbb8aa20e6b031b9543e1e56268f3f5c7f7f07) )
+	ROM_LOAD( "b12-12.8f",  0x10000, 0x10000, CRC(a662be67) SHA1(0643480d56d8ac020288db800a705dd5d0d3ad9f) )
+	ROM_LOAD( "b12-13.10f", 0x20000, 0x10000, CRC(04a29633) SHA1(39476365241718f01f9630c12467cb24791a67e1) )
 
 	ROM_REGION( 0x10000, "cpuc", 0 )
 	ROM_LOAD( "b23-13.12c", 0x00000, 0x08000, CRC(51110aa1) SHA1(34c2701625eb1987affad1efd19ff8c9971456ae) )
@@ -424,6 +384,6 @@ ROM_START( exzisust )
 	ROM_LOAD( "b23-05.16l", 0x00800, 0x00400, CRC(87f0f69a) SHA1(37df6fd56245fab9beaabfd86fd8f95d7c42c2a5) )
 ROM_END
 
-GAME( 1987, exzisus,  0,       exzisus, exzisus, driver_device, 0, ROT0, "Taito Corporation", "Exzisus (Japan, dedicated)",  0 )
-GAME( 1987, exzisusa, exzisus, exzisus, exzisus, driver_device, 0, ROT0, "Taito Corporation", "Exzisus (Japan, conversion)", 0 )
-GAME( 1987, exzisust, exzisus, exzisus, exzisus, driver_device, 0, ROT0, "Taito Corporation (TAD license)", "Exzisus (TAD license)", 0 )
+GAME( 1987, exzisus,  0,       exzisus, exzisus, driver_device, 0, ROT0, "Taito Corporation", "Exzisus (Japan, dedicated)",  GAME_SUPPORTS_SAVE )
+GAME( 1987, exzisusa, exzisus, exzisus, exzisus, driver_device, 0, ROT0, "Taito Corporation", "Exzisus (Japan, conversion)", GAME_SUPPORTS_SAVE )
+GAME( 1987, exzisust, exzisus, exzisus, exzisus, driver_device, 0, ROT0, "Taito Corporation (TAD license)", "Exzisus (TAD license)", GAME_SUPPORTS_SAVE )

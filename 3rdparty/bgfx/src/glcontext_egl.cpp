@@ -185,8 +185,8 @@ EGL_IMPORT
 		ndt = GetDC(g_bgfxHwnd);
 		nwh = g_bgfxHwnd;
 #	elif BX_PLATFORM_LINUX
-		ndt = g_bgfxX11Display;
-		nwh = g_bgfxX11Window;
+		ndt = (EGLNativeDisplayType)g_bgfxX11Display;
+		nwh = (EGLNativeWindowType)g_bgfxX11Window;
 #	endif // BX_PLATFORM_
 		m_display = eglGetDisplay(ndt);
 		BGFX_FATAL(m_display != EGL_NO_DISPLAY, Fatal::UnableToInitialize, "Failed to create display %p", m_display);
@@ -254,6 +254,7 @@ EGL_IMPORT
 
 		success = eglMakeCurrent(m_display, m_surface, m_surface, m_context);
 		BGFX_FATAL(success, Fatal::UnableToInitialize, "Failed to set context.");
+		m_current = NULL;
 
 		eglSwapInterval(m_display, 0);
 
@@ -311,27 +312,32 @@ EGL_IMPORT
 
 	void GlContext::swap(SwapChainGL* _swapChain)
 	{
+		makeCurrent(_swapChain);
+
 		if (NULL == _swapChain)
 		{
-			eglMakeCurrent(m_display, m_surface, m_surface, m_context);
 			eglSwapBuffers(m_display, m_surface);
 		}
 		else
 		{
-			_swapChain->makeCurrent();
 			_swapChain->swapBuffers();
 		}
 	}
 
 	void GlContext::makeCurrent(SwapChainGL* _swapChain)
 	{
-		if (NULL == _swapChain)
+		if (m_current != _swapChain)
 		{
-			eglMakeCurrent(m_display, m_surface, m_surface, m_context);
-		}
-		else
-		{
-			_swapChain->makeCurrent();
+			m_current = _swapChain;
+
+			if (NULL == _swapChain)
+			{
+				eglMakeCurrent(m_display, m_surface, m_surface, m_context);
+			}
+			else
+			{
+				_swapChain->makeCurrent();
+			}
 		}
 	}
 

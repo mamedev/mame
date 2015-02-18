@@ -362,6 +362,7 @@ mu100r  // 1997 MU-100 Rackable version
 fb01    // 1986 FB-01
 
 // Roland
+tb303
 mt32
 cm32l
 d110
@@ -1216,8 +1217,8 @@ mbeepc85s   // Microbee 32 PC85 (Swedish)
 mbeeppc // Microbee 32 PPC85
 mbeett  // Microbee Teleterm
 mbee56  // Microbee 56K (CP/M)
-mbee64  // Microbee 64K (CP/M)
-mbee128 // Microbee 128K (CP/M)
+mbee128 // Microbee 128K standard (CP/M)
+mbee128p // Microbee 128K premium (CP/M)
 mbee256 // Microbee 256TC (CP/M)
 
 // Tandy / Radio Shack
@@ -2390,6 +2391,7 @@ dm500
 cgc7900
 hr16
 hr16b
+mmt8
 sr16
 vidbrain
 cd2650
@@ -2613,3 +2615,4 @@ wildfire
 tmtennis
 alnchase
 edracula
+tc4

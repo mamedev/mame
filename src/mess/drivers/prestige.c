@@ -874,4 +874,8 @@ COMP( 1996, gjrstar,   0,       0,  prestige,   prestige, driver_device,     0, 
 COMP( 1996, gjrstar2,  gjrstar, 0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior Redstar 2 (Germany)", GAME_IS_SKELETON)
 COMP( 1998, gjrstar3,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior Redstar 3 (Germany)", GAME_IS_SKELETON)
 COMP( 1998, gj5000,    0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Junior 5000 (Germany)", GAME_IS_SKELETON)
+
+
+// gl6600cx use a NSC1028 system-on-a-chip designed by National Semiconductor specifically for VTech
+// http://web.archive.org/web/19991127134657/http://www.national.com/news/item/0,1735,425,00.html
 COMP( 1999, gl6600cx,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Leader 6600CX (Germany)", GAME_IS_SKELETON)

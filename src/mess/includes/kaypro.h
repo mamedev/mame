@@ -96,7 +96,7 @@ private:
 	required_device<centronics_device> m_centronics;
 	required_device<fd1793_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	optional_device<floppy_connector> m_floppy1;
 	optional_device<mc6845_device> m_crtc;
 	required_device<beep_device> m_beep;
 };

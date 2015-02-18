@@ -81,6 +81,7 @@ SDL_FRAMEWORK_PATH = /Library/Frameworks/
 # SDL_LIBVER = sdl
 
 # uncomment to use BGFX
+
 # USE_BGFX = 1
 
 ###########################################################################
@@ -283,7 +284,28 @@ LIBS += -framework CoreAudio -framework CoreMIDI
 endif
 
 ifdef NO_USE_QTDEBUG
-DEBUGOBJS = $(OSDOBJ)/modules/debugger/debugosx.o
+
+OBJDIRS += $(OSDOBJ)/modules/debugger/osx
+
+DEBUGOBJS = \
+	$(OSDOBJ)/modules/debugger/debugosx.o \
+	$(OSDOBJ)/modules/debugger/osx/breakpointsview.o \
+	$(OSDOBJ)/modules/debugger/osx/consoleview.o \
+	$(OSDOBJ)/modules/debugger/osx/debugcommandhistory.o \
+	$(OSDOBJ)/modules/debugger/osx/debugconsole.o \
+	$(OSDOBJ)/modules/debugger/osx/debugview.o \
+	$(OSDOBJ)/modules/debugger/osx/debugwindowhandler.o \
+	$(OSDOBJ)/modules/debugger/osx/devicesviewer.o \
+	$(OSDOBJ)/modules/debugger/osx/disassemblyview.o \
+	$(OSDOBJ)/modules/debugger/osx/disassemblyviewer.o \
+	$(OSDOBJ)/modules/debugger/osx/errorlogview.o \
+	$(OSDOBJ)/modules/debugger/osx/errorlogviewer.o \
+	$(OSDOBJ)/modules/debugger/osx/memoryview.o \
+	$(OSDOBJ)/modules/debugger/osx/memoryviewer.o \
+	$(OSDOBJ)/modules/debugger/osx/pointsviewer.o \
+	$(OSDOBJ)/modules/debugger/osx/registersview.o \
+	$(OSDOBJ)/modules/debugger/osx/watchpointsview.o
+
 endif
 
 SYNC_IMPLEMENTATION = ntc
@@ -537,6 +559,7 @@ INCPATH += `$(SDL_CONFIG) --cflags | sed 's:/SDL::'`
 CCOMFLAGS += -DNO_SDL_GLEXT
 # Remove libSDLmain, as its symbols conflict with SDLMain_tmpl.m
 LIBS += `$(SDL_CONFIG) --libs | sed 's/-lSDLmain//'` -lpthread -framework Cocoa -framework OpenGL
+BASELIBS += `$(SDL_CONFIG) --libs | sed 's/-lSDLmain//'` -lpthread -framework Cocoa -framework OpenGL
 DEFS += -DMACOSX_USE_LIBSDL
 endif   # MACOSX_USE_LIBSDL
 
@@ -707,24 +730,24 @@ $(OSDOBJ)/%.moc.c: $(OSDSRC)/%.h
 	$(MOC) $(MOCINCPATH) $(DEFS) $< -o $@
 
 DEBUGOBJS = \
-	$(OSDOBJ)/modules/debugger/qt/debugqtview.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtwindow.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtlogwindow.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtdasmwindow.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtmainwindow.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtmemorywindow.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtbreakpointswindow.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtdeviceswindow.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtdeviceinformationwindow.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtview.moc.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtwindow.moc.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtlogwindow.moc.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtdasmwindow.moc.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtmainwindow.moc.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtmemorywindow.moc.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtbreakpointswindow.moc.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtdeviceswindow.moc.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtdeviceinformationwindow.moc.o
+	$(OSDOBJ)/modules/debugger/qt/debuggerview.o \
+	$(OSDOBJ)/modules/debugger/qt/windowqt.o \
+	$(OSDOBJ)/modules/debugger/qt/logwindow.o \
+	$(OSDOBJ)/modules/debugger/qt/dasmwindow.o \
+	$(OSDOBJ)/modules/debugger/qt/mainwindow.o \
+	$(OSDOBJ)/modules/debugger/qt/memorywindow.o \
+	$(OSDOBJ)/modules/debugger/qt/breakpointswindow.o \
+	$(OSDOBJ)/modules/debugger/qt/deviceswindow.o \
+	$(OSDOBJ)/modules/debugger/qt/deviceinformationwindow.o \
+	$(OSDOBJ)/modules/debugger/qt/debuggerview.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/windowqt.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/logwindow.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/dasmwindow.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/mainwindow.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/memorywindow.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/breakpointswindow.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/deviceswindow.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/deviceinformationwindow.moc.o
 
 DEFS += -DUSE_QTDEBUG=1
 

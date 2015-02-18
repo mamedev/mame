@@ -61,7 +61,11 @@
 #	if BX_COMPILER_CLANG && (BX_PLATFORM_OSX || BX_PLATFORM_IOS)
 #		define BX_THREAD /* not supported right now */
 #	else
-#		define BX_THREAD __thread
+#		if (__GNUC__ == 4) && (__GNUC_MINOR__ <= 2)
+#			define BX_THREAD /* not supported right now */	
+#		else
+#			define BX_THREAD __thread
+#		endif // __GNUC__ <= 4.2
 #	endif // BX_COMPILER_CLANG
 #	define BX_ATTRIBUTE(_x) __attribute__( (_x) )
 #	if BX_COMPILER_MSVC_COMPATIBLE
@@ -134,7 +138,7 @@
 #	define BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG(_x)
 #endif // BX_COMPILER_CLANG
 
-#if BX_COMPILER_GCC
+#if BX_COMPILER_GCC && BX_COMPILER_GCC >= 40600
 #	define BX_PRAGMA_DIAGNOSTIC_PUSH_GCC()        _Pragma("GCC diagnostic push")
 #	define BX_PRAGMA_DIAGNOSTIC_POP_GCC()         _Pragma("GCC diagnostic pop")
 #	define BX_PRAGMA_DIAGNOSTIC_IGNORED_GCC(_x)   _Pragma(BX_STRINGIZE(GCC diagnostic ignored _x) )
@@ -169,8 +173,13 @@
 #endif // BX_COMPILER_
 
 ///
-#define BX_TYPE_IS_POD(_type) (!__is_class(_type) || __is_pod(_type) )
-
+#if BX_COMPILER_GCC && defined(__is_pod)
+#	define BX_TYPE_IS_POD(t) __is_pod(t)
+#elif BX_COMPILER_MSVC
+#	define BX_TYPE_IS_POD(t) (!__is_class(t) || __is_pod(t))
+#else
+#	define BX_TYPE_IS_POD(t) false
+#endif 
 ///
 #define BX_CLASS_NO_DEFAULT_CTOR(_class) \
 			private: _class()

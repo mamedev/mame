@@ -50,6 +50,11 @@ VIDEO_START_MEMBER(gladiatr_state,ppking)
 	m_bg_tilemap->set_scroll_cols(0x10);
 
 	m_sprite_bank = 1;
+	
+	save_item(NAME(m_video_attributes));
+	save_item(NAME(m_fg_scrolly));
+	save_item(NAME(m_sprite_buffer));
+	save_item(NAME(m_fg_tile_bank));
 }
 
 VIDEO_START_MEMBER(gladiatr_state,gladiatr)
@@ -63,6 +68,16 @@ VIDEO_START_MEMBER(gladiatr_state,gladiatr)
 	m_fg_tilemap->set_scrolldx(-0x30, 0x12f);
 
 	m_sprite_bank = 2;
+	
+	save_item(NAME(m_video_attributes));
+	save_item(NAME(m_fg_scrollx));
+	save_item(NAME(m_fg_scrolly));
+	save_item(NAME(m_bg_scrollx));
+	save_item(NAME(m_bg_scrolly));
+	save_item(NAME(m_sprite_bank));
+	save_item(NAME(m_sprite_buffer));
+	save_item(NAME(m_fg_tile_bank));
+	save_item(NAME(m_bg_tile_bank));
 }
 
 
@@ -73,25 +88,25 @@ VIDEO_START_MEMBER(gladiatr_state,gladiatr)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(gladiatr_state::gladiatr_videoram_w)
+WRITE8_MEMBER(gladiatr_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gladiatr_state::gladiatr_colorram_w)
+WRITE8_MEMBER(gladiatr_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gladiatr_state::gladiatr_textram_w)
+WRITE8_MEMBER(gladiatr_state::textram_w)
 {
 	m_textram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gladiatr_state::gladiatr_paletteram_w)
+WRITE8_MEMBER(gladiatr_state::paletteram_w)
 {
 	int r,g,b;
 
@@ -110,7 +125,7 @@ WRITE8_MEMBER(gladiatr_state::gladiatr_paletteram_w)
 }
 
 
-WRITE8_MEMBER(gladiatr_state::gladiatr_spritebuffer_w)
+WRITE8_MEMBER(gladiatr_state::spritebuffer_w)
 {
 	m_sprite_buffer = data & 1;
 }

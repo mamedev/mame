@@ -84,24 +84,25 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
 		m_vram(*this, "vram"),
 		m_cram(*this, "cram"),
 		m_obj1_ram(*this, "obj1_ram"),
 		m_obj2_ram(*this, "obj2_ram"),
-		m_obj3_ram(*this, "obj3_ram"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_obj3_ram(*this, "obj3_ram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	
 	required_shared_ptr<UINT8> m_vram;
 	required_shared_ptr<UINT8> m_cram;
 	required_shared_ptr<UINT8> m_obj1_ram;
 	required_shared_ptr<UINT8> m_obj2_ram;
 	required_shared_ptr<UINT8> m_obj3_ram;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 
 	struct
 	{
@@ -120,11 +121,13 @@ public:
 	DECLARE_WRITE8_MEMBER(cyclemb_flip_w);
 	DECLARE_READ8_MEMBER(skydest_i8741_0_r);
 	DECLARE_WRITE8_MEMBER(skydest_i8741_0_w);
+	
 	DECLARE_DRIVER_INIT(skydest);
 	DECLARE_DRIVER_INIT(cyclemb);
+	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void video_start();
 	DECLARE_PALETTE_INIT(cyclemb);
+	
 	UINT32 screen_update_cyclemb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_skydest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cyclemb_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -163,10 +166,6 @@ PALETTE_INIT_MEMBER(cyclemb_state, cyclemb)
 	}
 }
 
-
-void cyclemb_state::video_start()
-{
-}
 
 void cyclemb_state::cyclemb_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -592,6 +591,19 @@ static ADDRESS_MAP_START( cyclemb_sound_io, AS_IO, 8, cyclemb_state )
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_byte_r) AM_WRITE(soundlatch2_byte_w)
 ADDRESS_MAP_END
+
+
+void cyclemb_state::machine_start()
+{
+	for (int i = 0; i < 2; i++)
+	{
+		save_item(NAME(m_mcu[i].rxd), i);
+		save_item(NAME(m_mcu[i].txd), i);
+		save_item(NAME(m_mcu[i].rst), i);
+		save_item(NAME(m_mcu[i].state), i);
+		save_item(NAME(m_mcu[i].packet_type), i);
+	}
+}
 
 void cyclemb_state::machine_reset()
 {
@@ -1030,5 +1042,5 @@ DRIVER_INIT_MEMBER(cyclemb_state,skydest)
 	m_dsw_pc_hack = 0x554;
 }
 
-GAME( 1984, cyclemb,  0,   cyclemb,  cyclemb, cyclemb_state,  cyclemb, ROT0, "Taito Corporation", "Cycle Maabou (Japan)", GAME_NO_COCKTAIL | GAME_NO_SOUND )
-GAME( 1985, skydest,  0,   skydest,  skydest, cyclemb_state,  skydest, ROT0, "Taito Corporation", "Sky Destroyer (Japan)", GAME_NO_COCKTAIL | GAME_NO_SOUND )
+GAME( 1984, cyclemb,  0,   cyclemb,  cyclemb, cyclemb_state,  cyclemb, ROT0, "Taito Corporation", "Cycle Maabou (Japan)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1985, skydest,  0,   skydest,  skydest, cyclemb_state,  skydest, ROT0, "Taito Corporation", "Sky Destroyer (Japan)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )

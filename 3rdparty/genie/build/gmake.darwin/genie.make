@@ -19,7 +19,7 @@ ifeq (posix,$(SHELLTYPE))
   MKDIR = $(SILENT) mkdir -p "$(1)"
   COPY  = $(SILENT) cp -fR "$(1)" "$(2)"
 else
-  MKDIR = $(SILENT) mkdir "$(subst /,\\,$(1))" 2> nul || true
+  MKDIR = $(SILENT) mkdir "$(subst /,\\,$(1))" 2> nul || exit 0
   COPY  = $(SILENT) copy /Y "$(subst /,\\,$(1))" "$(subst /,\\,$(2))"
 endif
 
@@ -49,81 +49,7 @@ ifeq ($(config),release)
   LDDEPS    +=
   LIBS      += $(LDDEPS) -framework CoreServices
   LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(RESOURCES) $(ARCH) $(ALL_LDFLAGS) $(LIBS)
-  define PREBUILDCMDS
-  endef
-  define PRELINKCMDS
-  endef
-  define POSTBUILDCMDS
-  endef
-endif
-
-ifeq ($(config),debug)
-  OBJDIR     = obj/Debug
-  TARGETDIR  = ../../bin/darwin
-  TARGET     = $(TARGETDIR)/genie
-  DEFINES   += -D_DEBUG -DLUA_COMPAT_MODULE -DLUA_USE_MACOSX
-  INCLUDES  += -I../../src/host/lua-5.2.3/src
-  ALL_CPPFLAGS  += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS    += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -g -mmacosx-version-min=10.4
-  ALL_CXXFLAGS  += $(CXXFLAGS) $(ALL_CFLAGS)
-  ALL_RESFLAGS  += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  ALL_LDFLAGS   += $(LDFLAGS) -L. -mmacosx-version-min=10.4
-  LDDEPS    +=
-  LIBS      += $(LDDEPS) -framework CoreServices
-  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(RESOURCES) $(ARCH) $(ALL_LDFLAGS) $(LIBS)
-  define PREBUILDCMDS
-  endef
-  define PRELINKCMDS
-  endef
-  define POSTBUILDCMDS
-  endef
-endif
-
-ifeq ($(config),releaseuniv32)
-  OBJDIR     = obj/Universal32/Release
-  TARGETDIR  = ../../bin/darwin
-  TARGET     = $(TARGETDIR)/genie
-  DEFINES   += -DNDEBUG -DLUA_COMPAT_MODULE -DLUA_USE_MACOSX
-  INCLUDES  += -I../../src/host/lua-5.2.3/src
-  ALL_CPPFLAGS  += $(CPPFLAGS)  $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS    += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -Os -arch i386 -arch ppc -mmacosx-version-min=10.4
-  ALL_CXXFLAGS  += $(CXXFLAGS) $(ALL_CFLAGS)
-  ALL_RESFLAGS  += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  ALL_LDFLAGS   += $(LDFLAGS) -L. -Wl,-x -arch i386 -arch ppc -mmacosx-version-min=10.4
-  LDDEPS    +=
-  LIBS      += $(LDDEPS) -framework CoreServices
-  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(RESOURCES) $(ARCH) $(ALL_LDFLAGS) $(LIBS)
-  define PREBUILDCMDS
-  endef
-  define PRELINKCMDS
-  endef
-  define POSTBUILDCMDS
-  endef
-endif
-
-ifeq ($(config),debuguniv32)
-  OBJDIR     = obj/Universal32/Debug
-  TARGETDIR  = ../../bin/darwin
-  TARGET     = $(TARGETDIR)/genie
-  DEFINES   += -D_DEBUG -DLUA_COMPAT_MODULE -DLUA_USE_MACOSX
-  INCLUDES  += -I../../src/host/lua-5.2.3/src
-  ALL_CPPFLAGS  += $(CPPFLAGS)  $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS    += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -g -arch i386 -arch ppc -mmacosx-version-min=10.4
-  ALL_CXXFLAGS  += $(CXXFLAGS) $(ALL_CFLAGS)
-  ALL_RESFLAGS  += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  ALL_LDFLAGS   += $(LDFLAGS) -L. -arch i386 -arch ppc -mmacosx-version-min=10.4
-  LDDEPS    +=
-  LIBS      += $(LDDEPS) -framework CoreServices
-  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(RESOURCES) $(ARCH) $(ALL_LDFLAGS) $(LIBS)
-  define PREBUILDCMDS
-  endef
-  define PRELINKCMDS
-  endef
-  define POSTBUILDCMDS
-  endef
-endif
-
-OBJECTS := \
+  OBJECTS := \
 	$(OBJDIR)/src/host/os_isfile.o \
 	$(OBJDIR)/src/host/os_stat.o \
 	$(OBJDIR)/src/host/os_rmdir.o \
@@ -175,6 +101,239 @@ OBJECTS := \
 	$(OBJDIR)/src/host/lua-5.2.3/src/lctype.o \
 	$(OBJDIR)/src/host/lua-5.2.3/src/lstring.o \
 	$(OBJDIR)/src/host/lua-5.2.3/src/ldebug.o \
+
+  define PREBUILDCMDS
+  endef
+  define PRELINKCMDS
+  endef
+  define POSTBUILDCMDS
+  endef
+endif
+
+ifeq ($(config),debug)
+  OBJDIR     = obj/Debug
+  TARGETDIR  = ../../bin/darwin
+  TARGET     = $(TARGETDIR)/genie
+  DEFINES   += -D_DEBUG -DLUA_COMPAT_MODULE -DLUA_USE_MACOSX
+  INCLUDES  += -I../../src/host/lua-5.2.3/src
+  ALL_CPPFLAGS  += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
+  ALL_CFLAGS    += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -g -mmacosx-version-min=10.4
+  ALL_CXXFLAGS  += $(CXXFLAGS) $(ALL_CFLAGS)
+  ALL_RESFLAGS  += $(RESFLAGS) $(DEFINES) $(INCLUDES)
+  ALL_LDFLAGS   += $(LDFLAGS) -L. -mmacosx-version-min=10.4
+  LDDEPS    +=
+  LIBS      += $(LDDEPS) -framework CoreServices
+  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(RESOURCES) $(ARCH) $(ALL_LDFLAGS) $(LIBS)
+  OBJECTS := \
+	$(OBJDIR)/src/host/os_isfile.o \
+	$(OBJDIR)/src/host/os_stat.o \
+	$(OBJDIR)/src/host/os_rmdir.o \
+	$(OBJDIR)/src/host/os_copyfile.o \
+	$(OBJDIR)/src/host/string_hash.o \
+	$(OBJDIR)/src/host/os_chdir.o \
+	$(OBJDIR)/src/host/os_is64bit.o \
+	$(OBJDIR)/src/host/os_match.o \
+	$(OBJDIR)/src/host/scripts.o \
+	$(OBJDIR)/src/host/string_endswith.o \
+	$(OBJDIR)/src/host/os_mkdir.o \
+	$(OBJDIR)/src/host/os_getversion.o \
+	$(OBJDIR)/src/host/premake_main.o \
+	$(OBJDIR)/src/host/path_isabsolute.o \
+	$(OBJDIR)/src/host/premake.o \
+	$(OBJDIR)/src/host/os_isdir.o \
+	$(OBJDIR)/src/host/os_uuid.o \
+	$(OBJDIR)/src/host/os_pathsearch.o \
+	$(OBJDIR)/src/host/os_getcwd.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lbaselib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lvm.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lcorolib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/ltablib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lobject.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lcode.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/ldo.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/liolib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/ltable.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/loadlib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lundump.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/loslib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lfunc.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/linit.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lstate.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/llex.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/ldump.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lstrlib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lmathlib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lauxlib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lopcodes.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lparser.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lapi.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/ldblib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lbitlib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lgc.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/ltm.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lzio.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lmem.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lctype.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lstring.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/ldebug.o \
+
+  define PREBUILDCMDS
+  endef
+  define PRELINKCMDS
+  endef
+  define POSTBUILDCMDS
+  endef
+endif
+
+ifeq ($(config),releaseuniv32)
+  OBJDIR     = obj/Universal32/Release
+  TARGETDIR  = ../../bin/darwin
+  TARGET     = $(TARGETDIR)/genie
+  DEFINES   += -DNDEBUG -DLUA_COMPAT_MODULE -DLUA_USE_MACOSX
+  INCLUDES  += -I../../src/host/lua-5.2.3/src
+  ALL_CPPFLAGS  += $(CPPFLAGS)  $(DEFINES) $(INCLUDES)
+  ALL_CFLAGS    += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -Os -arch i386 -arch ppc -mmacosx-version-min=10.4
+  ALL_CXXFLAGS  += $(CXXFLAGS) $(ALL_CFLAGS)
+  ALL_RESFLAGS  += $(RESFLAGS) $(DEFINES) $(INCLUDES)
+  ALL_LDFLAGS   += $(LDFLAGS) -L. -Wl,-x -arch i386 -arch ppc -mmacosx-version-min=10.4
+  LDDEPS    +=
+  LIBS      += $(LDDEPS) -framework CoreServices
+  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(RESOURCES) $(ARCH) $(ALL_LDFLAGS) $(LIBS)
+  OBJECTS := \
+	$(OBJDIR)/src/host/os_isfile.o \
+	$(OBJDIR)/src/host/os_stat.o \
+	$(OBJDIR)/src/host/os_rmdir.o \
+	$(OBJDIR)/src/host/os_copyfile.o \
+	$(OBJDIR)/src/host/string_hash.o \
+	$(OBJDIR)/src/host/os_chdir.o \
+	$(OBJDIR)/src/host/os_is64bit.o \
+	$(OBJDIR)/src/host/os_match.o \
+	$(OBJDIR)/src/host/scripts.o \
+	$(OBJDIR)/src/host/string_endswith.o \
+	$(OBJDIR)/src/host/os_mkdir.o \
+	$(OBJDIR)/src/host/os_getversion.o \
+	$(OBJDIR)/src/host/premake_main.o \
+	$(OBJDIR)/src/host/path_isabsolute.o \
+	$(OBJDIR)/src/host/premake.o \
+	$(OBJDIR)/src/host/os_isdir.o \
+	$(OBJDIR)/src/host/os_uuid.o \
+	$(OBJDIR)/src/host/os_pathsearch.o \
+	$(OBJDIR)/src/host/os_getcwd.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lbaselib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lvm.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lcorolib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/ltablib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lobject.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lcode.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/ldo.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/liolib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/ltable.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/loadlib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lundump.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/loslib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lfunc.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/linit.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lstate.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/llex.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/ldump.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lstrlib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lmathlib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lauxlib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lopcodes.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lparser.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lapi.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/ldblib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lbitlib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lgc.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/ltm.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lzio.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lmem.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lctype.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lstring.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/ldebug.o \
+
+  define PREBUILDCMDS
+  endef
+  define PRELINKCMDS
+  endef
+  define POSTBUILDCMDS
+  endef
+endif
+
+ifeq ($(config),debuguniv32)
+  OBJDIR     = obj/Universal32/Debug
+  TARGETDIR  = ../../bin/darwin
+  TARGET     = $(TARGETDIR)/genie
+  DEFINES   += -D_DEBUG -DLUA_COMPAT_MODULE -DLUA_USE_MACOSX
+  INCLUDES  += -I../../src/host/lua-5.2.3/src
+  ALL_CPPFLAGS  += $(CPPFLAGS)  $(DEFINES) $(INCLUDES)
+  ALL_CFLAGS    += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -g -arch i386 -arch ppc -mmacosx-version-min=10.4
+  ALL_CXXFLAGS  += $(CXXFLAGS) $(ALL_CFLAGS)
+  ALL_RESFLAGS  += $(RESFLAGS) $(DEFINES) $(INCLUDES)
+  ALL_LDFLAGS   += $(LDFLAGS) -L. -arch i386 -arch ppc -mmacosx-version-min=10.4
+  LDDEPS    +=
+  LIBS      += $(LDDEPS) -framework CoreServices
+  LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(RESOURCES) $(ARCH) $(ALL_LDFLAGS) $(LIBS)
+  OBJECTS := \
+	$(OBJDIR)/src/host/os_isfile.o \
+	$(OBJDIR)/src/host/os_stat.o \
+	$(OBJDIR)/src/host/os_rmdir.o \
+	$(OBJDIR)/src/host/os_copyfile.o \
+	$(OBJDIR)/src/host/string_hash.o \
+	$(OBJDIR)/src/host/os_chdir.o \
+	$(OBJDIR)/src/host/os_is64bit.o \
+	$(OBJDIR)/src/host/os_match.o \
+	$(OBJDIR)/src/host/scripts.o \
+	$(OBJDIR)/src/host/string_endswith.o \
+	$(OBJDIR)/src/host/os_mkdir.o \
+	$(OBJDIR)/src/host/os_getversion.o \
+	$(OBJDIR)/src/host/premake_main.o \
+	$(OBJDIR)/src/host/path_isabsolute.o \
+	$(OBJDIR)/src/host/premake.o \
+	$(OBJDIR)/src/host/os_isdir.o \
+	$(OBJDIR)/src/host/os_uuid.o \
+	$(OBJDIR)/src/host/os_pathsearch.o \
+	$(OBJDIR)/src/host/os_getcwd.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lbaselib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lvm.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lcorolib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/ltablib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lobject.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lcode.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/ldo.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/liolib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/ltable.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/loadlib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lundump.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/loslib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lfunc.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/linit.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lstate.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/llex.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/ldump.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lstrlib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lmathlib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lauxlib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lopcodes.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lparser.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lapi.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/ldblib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lbitlib.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lgc.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/ltm.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lzio.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lmem.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lctype.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/lstring.o \
+	$(OBJDIR)/src/host/lua-5.2.3/src/ldebug.o \
+
+  define PREBUILDCMDS
+  endef
+  define PRELINKCMDS
+  endef
+  define POSTBUILDCMDS
+  endef
+endif
 
 OBJDIRS := \
 	$(OBJDIR) \

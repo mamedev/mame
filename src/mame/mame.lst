@@ -4747,6 +4747,7 @@ toutrunj        // 1989.02 Turbo Outrun (Japan, FD1094)
 toutrun3        // 1987 (FD1094)
 toutrun2        // 1987 (FD1094)
 toutrun1        // 1987 (FD1094)
+toutrunj1		// 1987 (FD1094)
 
 // X Board
 aburner         // 1987.07 After Burner (Japan)
@@ -5313,10 +5314,10 @@ ggram2          // 1999.04 Giant Gram: All Japan Pro Wrestling 2
 				// 1999.05 Taisen Puzzle Kurutto Stone
 ringout         // 1999.06 Ring Out 4x4
 f355dlx         // 1999.07 F355 Challenge Deluxe (BIOS)
-f355bios        // 1999.08 F355 Challenge Twin (BIOS)
 f355            // 1999.07 F355 Challenge Deluxe
 f355twin        // 1999.07 F355 Challenge Twin
 shangril        // 1999.08 Dengen Tenshi Taisen Janshi Shangri-la
+f355bios        // 1999.08 F355 Challenge Twin (BIOS)
 tduno           // 1999.08 Touch de UNO! / Unou Nouryoku Check Machine
 vs2_2k          // 1999.08 Virtua Striker 2 version 2000 (Rev C)
 suchie3         // 1999.09 Idol Janshi Su-Chi-Pi 3
@@ -5332,13 +5333,13 @@ marstv          // 1999.12 Mars TV
 puyoda          // 1999.12 Puyo Puyo Da!
 samba           // 1999.12 Samba de Amigo (Rev B)
 vtennis         // 1999.12 Virtua Tennis / Power Smash (cartridge)
-sambap          // 1999.?? Samba de Amigo (prototype)
-vtennisg        // 1999.?? Virtua Tennis / Power Smash (GD-ROM)
 alpiltdx        // 1999.?? Airline Pilots Deluxe (Rev B)
 				// 1999.?? Charge'N'Blast
 				// 1999.?? Mayjinsen (Formation Battle in May) (prototype)
 				// 1999.?? Pocket Shooting
+sambap          // 1999.?? Samba de Amigo (prototype)
 spawn           // 1999.?? Spawn In the Demon's Hand
+vtennisg        // 1999.?? Virtua Tennis / Power Smash (GD-ROM)
 18wheelr        // 2000.01 18 Wheeler Deluxe (Rev A)
 18wheels        // 2000.01 18 Wheeler (Standard)
 18wheelu        // 2000.01 18 Wheeler (Upright)
@@ -5357,9 +5358,6 @@ pstone2         // 2000.04 Power Stone 2
 toukon4         // 2000.04 Shin Nihon Prowrestling Toukon Retsuden 4 Arcade Edition (TRF1 Ver. A)
 qmegamis        // 2000.05 Quiz Ah Megamisama
 derbyo2k        // 2000.06 Derby Owners Club 2000 Ver.2 (Rev A)
-starhrse        // 2000.?? Star Horse (big screens)
-starhrct        // 2000.12 Star Horse (server)
-starhrcl        // 2000.11.28 Star Horse (satellite)
 vonot           // 2000.06 Virtual-on Oratorio Tangram M.S.B.S. Ver.5.66 2000 Edition
 ggx             // 2000.07 Guilty Gear X
 slasho          // 2000.07 Slashout
@@ -5381,7 +5379,10 @@ ninjaslt        // 2000.11 Ninja Assault (NJA3 Ver. A)
 ninjaslt4       // 2000.11 Ninja Assault (NJA4 Ver. A)
 wwfroyal        // 2000.11 WWF Royal Rumble
 sprtjam         // 2000.11.13 Sports Jam
-pjustic         // 2000.12 Moero Justice Gakuen / Project Justice
+starhrcl        // 2000.11.28 Star Horse (satellite)
+starhrct        // 2000.12 Star Horse (server)
+starhrse        // 2000.?? Star Horse (big screens)
+pjustic         // 2000.12 Moero! Justice Gakuen / Project Justice
 samba2k         // 2000.12 Samba de Amigo Ver.2000
 shaktam         // 2000.12.28 Shakatto Tambourine (Rev B)
 				// 2000.?? Boat Race Ocean Heats
@@ -5413,7 +5414,7 @@ alienfnta       // 2001.09 Alien Front (Rev A)
 gundmxgd        // 2001.09 Mobile Suit Gundam: Federation Vs. Zeon DX
 derbyoc2        // 2001.10 Derby Owners Club II (Rev B)
 inunoos         // 2001.10 Inu No Osanpo / Dog Walking (Rev A)
-vtenis2c        // 2001.10 Virtua Tennis 2 / Power Smash 2 (cartridge)
+vtenis2c        // 2001.10 Virtua Tennis 2 / Power Smash 2 (Rev A) (cart)
 shaktamb        // 2001.10.17 Shakatto Tambourine Cho Powerup Chu (2K1 AUT)
 keyboard        // 2001.11 La Keyboard
 ikaruga         // 2001.12 Ikaruga
@@ -5421,7 +5422,6 @@ lupinsho        // 2001.12 Lupin the Third: the Shooting
 drbyocwc        // 2001.?? Derby Owners Club World Edition (Rev. C)
 derbyocw        // 2001.?? Derby Owners Club World Edition (Rev. D)
 				// 2001.?? Star Horse 2001
-hopper          // 2002.?? SWP Hopper Board
 vathlete        // 2002.03 Virtua Athletics / Virtua Athlete
 mok             // 2002.03.06 The Maze of the Kings
 luptype         // 2002.04 Lupin The Third - The Typing (Rev A)
@@ -5436,27 +5436,28 @@ moeru           // 2002.12 Moeru Casinyo
 				// 2002.?? Pochinya
 quizqgd         // 2002.?? Quiz Keitai Q mode
 shootopl        // 2002.?? Shootout Pool
-shootpl         // 2003.?? Shootout Pool The Medal / Shootout Pool Prize (Rev A)
+hopper          // 2002.?? SWP Hopper Board
 mtkob2          // 2003.02 MushiKing The King Of Beetle
-				// 2003.03 Sega Network Taisen Mahjong MJ
 ggxxrlo         // 2003.02 Guilty Gear XX # Reload
 ggxxrl          // 2003.03 Guilty Gear XX # Reload (Rev A)
-shikgam2        // 2003.04 Shikigami No Shiro II / The Castle of Shikigami II
+				// 2003.03 Sega Network Taisen Mahjong MJ
 bdrdown         // 2003.04 Border Down (Rev A)
+shikgam2        // 2003.04 Shikigami No Shiro II / The Castle of Shikigami II
 usagiym         // 2003.06 Usagi Yamashiro Mahjong Hen
 				// 2003.07 Sega Network Taisen Mahjong MJ (Rev A)
 oinori          // 2003.08 Oinori-daimyoujin Matsuri
 psyvar2         // 2003.11 Psyvariar 2 - The Will To Fabricate
 puyofev         // 2003.11 Puyo Puyo Fever
 starhrsp        // 2003.12.01 Star Horse Progress (satellite) (Rev A)
-puyofevp        // 2003.?? Puyo Puyo Fever (prototype)
 				// 2003.?? Dragon Treasure
+puyofevp        // 2003.?? Puyo Puyo Fever (prototype)
+shootpl         // 2003.?? Shootout Pool The Medal / Shootout Pool Prize (Rev A)
 cfield          // 2004.06 Chaos Field
 tetkiwam        // 2004.06 Tetris Kiwamemichi (Arcade TV Game List - P.88, Right, 11 from bottom)
 trizeal         // 2004.09 Trizeal
 				// 2004.?? Dragon Treasure 2
-shootplm        // 2004.?? Shootout Pool The Medal Ver. B / Shootout Pool Prize Ver. B
 kick4csh        // 2004.?? Kick '4' Cash
+shootplm        // 2004.?? Shootout Pool The Medal Ver. B / Shootout Pool Prize Ver. B
 				// 2004.?? The Quiz Show
 meltyblo        // 2005.03 Melty Blood Act Cadenza
 ss2005          // 2005.03 Super Shanghai 2005
@@ -5522,12 +5523,12 @@ vstrik3cb       // 2001.04 Virtua Striker 3 (Rev B) (cartridge)
 vstrik3         // 2001.04.06 Virtua Striker 3 Ver. 2002
 wldrider        // 2001.05 Wild Riders
 clubkrte        // 2001.06 Club Kart: European Session
-clubkrtc        // 2001.?? Club Kart: European Session (Rev C)
 clubkrtd        // 2001.06 Club Kart: European Session (Rev D)
 beachspi        // 2001.07 Beach Spikers
 vf4cart         // 2001.08.02 Virtua Fighter 4 (cartridge)
 vf4             // 2001.08.02 Virtua Fighter 4 (GD-ROM)
 vf4b            // 2001.08.20 Virtua Fighter 4 (Rev B) (cartridge)
+clubkrtc        // 2001.?? Club Kart: European Session (Rev C)
 vf4c            // 2002.01.31 Virtua Fighter 4 (Rev C) (cartridge)
 kingrt66        // 2002.02 The King of Route 66 (Rev A)
 				// 2002.02.14 Initial D Arcade Stage (Japan)
@@ -5542,8 +5543,6 @@ vf4evoa         // 2002.08 Virtua Fighter 4 Evolution
 initdv2jo       // 2002.12 Initial D Arcade Stage Ver. 2 (Japan)
 initdv2e        // 2002.12 Initial D Arcade Stage Ver. 2 (export)
 vf4evo          // 2002.12 Virtua Fighter 4 Evolution Ver.B
-clubk2k3        // 2003.?? Club Kart: European Session (2003, Rev A)
-clubk2kp        // 2003.?? Club Kart: European Session (2003, prototype)
 initdexpo       // 2002.?? Initial D Arcade Stage (Export)
 				// 2002.?? Sega Driving Simulator
 				// 2003.03 World Club Champion Football Serie A 2001-2002 Ver.2
@@ -5551,10 +5550,12 @@ initdexpo       // 2002.?? Initial D Arcade Stage (Export)
 initdv2j        // 2003.05.27 Initial D Arcade Stage Ver. 2 (Japan) (Rev B)
 				// 2003.09 World Club Champion Football Serie A 2002-2003
 				// 2003.?? Club Kart Cycraft Edition
+clubk2k3        // 2003.?? Club Kart: European Session (2003, Rev A)
+clubk2kp        // 2003.?? Club Kart: European Session (2003, prototype)
 clubkprz        // 2003.?? Club Kart Prize
+clubkpzb        // 2004.01.23 Club Kart Prize Ver. B (strings in the EPROM indicate a build date of Jan. 23, 2004 for the game's program)
 initdv3j        // 2004.01.30 Initial D Arcade Stage Ver. 3 (Japan) (Rev C)
 initdv3jb       // 2004.01 Initial D Arcade Stage Ver. 3 (Japan) (Rev B)
-clubkpzb        // 2004.01 Club Kart Prize Ver. B (strings in the EPROM indicate a build date of Jan. 23, 2004 for the game's program)
 initdv3e        // 2004.05.18 Initial D Arcade Stage Ver. 3 (Export)
 				// 2004.06 World Club Champion Football Serie A 2002-2003 Ver.2
 				// 2004.07 Virtua Fighter 4 Final Tuned
@@ -5626,8 +5627,8 @@ vs2002ex        // 2002.07.30 Virtua Striker 2002 (Export)
 vs2002j         // 2002.10 Virtua Striker 2002 (Japan)
 fzeroaxc        // 2003.06.11 F-Zero AX (Rev. C)
 avalons         // 2003.07 The Key Of Avalon: The Wizard Master (server) (Rev C)
-				// 2003.10 The Key Of Avalon 1.01
 gekpurya        // 2003.10 Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu (Rev C)
+				// 2003.10 The Key Of Avalon 1.01
 fzeroax         // 2003.12 F-Zero AX (Rev. E)
 				// 2003.12 The Key Of Avalon 1.10
 				// 2004.04 The Key Of Avalon 1.20 - Summon The New Monsters
@@ -5638,21 +5639,21 @@ vs4             // 2004.12.02 Virtua Striker 4 (export)
 				// 2004.?? F-Zero AX - Monster Ride Cycraft Edition
 tfupdate        // 2004.?? Triforce GDROM Boot Update
 				// 2005.08 Avalon no Kagi Ver.2.5 Kagi Seisen
-mkartagp        // 2005.12 Mario Kart Arcade Grand Prix
+mkartagp        // 2005.12 Mario Kart Arcade GP (MKA2 Ver.B)
 				// 2005.?? Donkey Kong Jungle Fever
 				// 2006.01.31 Virtua Striker 4 Ver.2006 (export)
 vs42006         // 2006.05 Virtua Striker 4 Ver.2006 (Japan) (Rev D)
 				// 2006.?? Firmware Update For Compact Flash Box (Rev A)
-mkartag2        // 2007.03 Mario Kart Arcade Grand Prix 2
-mkartag2a       // 2007.03 Mario Kart Arcade Grand Prix 2
+mkartag2        // 2007.03 Mario Kart Arcade GP 2 (MK21 Ver.A)
+mkartag2a       // 2007.03 Mario Kart Arcade GP 2 (MK21 Ver.A, alt dump)
 
 // Chihiro (X-Box based)
 chihiro         // 2002.?? Chihiro BIOS
 hotd3           // 2002.10.29 The House of the Dead III
 				// 2003.02 Crazy Taxi High Roller
 				// 2003.02 Crazy Taxi High Roller (Rev A)
-crtaxihr        // 2003.02.24 Crazy Taxi High Roller (Rev B)
 				// 2003.02 Virtua Cop 3
+crtaxihr        // 2003.02.24 Crazy Taxi High Roller (Rev B)
 vcop3           // 2003.02.26 Virtua Cop 3 (Rev A)
 				// 2003.12 Outrun 2 Prototype (Rev P)
 				// 2003.12 Outrun 2
@@ -5670,7 +5671,6 @@ wangmid         // 2004.07 Wangan Midnight Maximum Tune (export) (Rev B)
 				// 2004.09 Quest of D
 				// 2004.11 Sega Golf Club Network Pro Tour
 				// 2004.12 Ghost Squad
-ghostsqu        // 2004.12.09 Ghost Squad (Rev A)
 				// 2004.12 Quest of D Ver.1.01C
 				// 2004.12 Quest of D Ver.1.02
 				// 2004.12 Quest of D Ver.1.10
@@ -5680,6 +5680,7 @@ ghostsqu        // 2004.12.09 Ghost Squad (Rev A)
 outr2st         // 2004.12 Outrun 2 Special Tours (Rev A)
 mj2c            // 2004.12 Sega Network Taisen Mahjong MJ 2 (Rev C)
 				// 2004.12 Sega Network Taisen Mahjong MJ 2 (Rev D)
+ghostsqu        // 2004.12.09 Ghost Squad (Rev A)
 				// 2005.02 Sega Network Taisen Mahjong MJ 2 (Rev E)
 				// 2005.02 Sega Network Taisen Mahjong MJ 2 (Rev F)
 mj2             // 2005.02.02 Sega Network Taisen Mahjong MJ 2 (Rev G)
@@ -5899,6 +5900,7 @@ pcktgalb        // bootleg
 pcktgal2        // (c) 1989 Data East Corporation (World?)
 pcktgal2j       // (c) 1989 Data East Corporation (World?)
 pokechmp        // Korean hack of Pocket Gal
+pokechmpa		//
 billlist        //
 spool3          // (c) 1989 Data East Corporation (World?)
 spool3i         // (c) 1990 Data East Corporation + I-Vics license
@@ -9312,6 +9314,7 @@ missw96         // (c) 1996 Comad
 missw96a        // (c) 1996 Comad
 missw96b        // (c) 1996 Comad
 missmw96        // (c) 1996 Comad
+smissw			//
 fantsia2        // (c) 1997 Comad
 fantsia2a       // (c) 1997 Comad
 wownfant        // (c) 2002 Comad
@@ -9765,7 +9768,7 @@ tarzana         // (c) 1999?
 starzan         // (c) 2000?
 
 // IGS027A Cpu Games
-bigd2           // (c) 2000
+zhongguo        // (c) 2000
 sdwx            // (c) 2002
 sddz            // (c) 200?
 lhzb3           // (c) 200?
@@ -10431,7 +10434,7 @@ toyland         // (c) 2001 Semicom
 misncrft        // (c) 2000 Sun
 misncrfta       // (c) 2000 Sun
 mrdig           // (c) 2000 Sun
-yorizori        // (c)
+yorijori        // (c)
 
 hidnctch        // (c) 1998 Eolith
 linkypip        // (c) 1998 Eolith

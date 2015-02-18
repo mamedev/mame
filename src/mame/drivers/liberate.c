@@ -128,8 +128,6 @@ READ8_MEMBER(liberate_state::prosoccr_charram_r)
 
 WRITE8_MEMBER(liberate_state::prosoccr_charram_w)
 {
-	UINT8 *FG_GFX = memregion("fg_gfx")->base();
-
 	if (m_bank)
 	{
 		prosoccr_io_w(space, offset & 0x0f, data);
@@ -142,16 +140,16 @@ WRITE8_MEMBER(liberate_state::prosoccr_charram_w)
 		switch (offset & 0x1800)
 		{
 			case 0x0000:
-				FG_GFX[(offset & 0x7ff) + (0x0000) + 0x0000] = data;
-				//FG_GFX[(offset & 0x7ff) + (0x1800) + 0x0000] = data;
+				m_fg_gfx[(offset & 0x7ff) + (0x0000) + 0x0000] = data;
+				//m_fg_gfx[(offset & 0x7ff) + (0x1800) + 0x0000] = data;
 				break;
 			case 0x0800:
-				FG_GFX[(offset & 0x7ff) + (0x0000) + 0x2000] = data;
-				//FG_GFX[(offset & 0x7ff) + (0x1800) + 0x2000] = data;
+				m_fg_gfx[(offset & 0x7ff) + (0x0000) + 0x2000] = data;
+				//m_fg_gfx[(offset & 0x7ff) + (0x1800) + 0x2000] = data;
 				break;
 			case 0x1000:
-				FG_GFX[(offset & 0x7ff) + (0x0000) + 0x4000] = data;
-				//FG_GFX[(offset & 0x7ff) + (0x1800) + 0x4000] = data;
+				m_fg_gfx[(offset & 0x7ff) + (0x0000) + 0x4000] = data;
+				//m_fg_gfx[(offset & 0x7ff) + (0x1800) + 0x4000] = data;
 				break;
 		}
 	}

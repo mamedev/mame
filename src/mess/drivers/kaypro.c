@@ -9,13 +9,26 @@
     telephone cord, complete with modular plug on each end. The keyboard carries
     its own Intel 87C51 processor and is an intelligent device.
 
+    Kaypro 10 notes:
+    - This machine comes with a 10MB hard drive, split into 2 5MB partitions. It also
+      has one floppy drive. The drive letters change depending on what drive it was booted
+      from. The boot drive is always A:.
+      If booted from floppy:
+      A: floppy
+      B: HD partition 1
+      C: HD partition 2
+      If booted from HD (presumably partition 1)
+      A: HD partition 1
+      B: HD partition 2
+      C: floppy
+
     ToDo:
 
     - See about getting keyboard to work as a serial device.
     - Need dump of 87C51 cpu in the keyboard.
 
     - Kaypro 2x, 4a: floppy not working "No operating system present on this disk"
-    - Kaypro 10: Boots from floppy, but B drive not working "Bdos Err on B: Bad Sector"
+    - Kaypro 10: Boots from floppy, but needs hard drive added.
     - Kaypro 4p88: works as a normal Kaypro 4, extra hardware not done
     - Kaypro Robie: has twin 2.6MB 5.25 floppy drives which we don't support, no software available
 
@@ -299,6 +312,11 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "drive1", kaypro_state::kaypro2x_floppy_formats)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( kaypro10, kaypro2x )
+	MCFG_DEVICE_REMOVE("fdc:1")  // only has 1 floppy drive
+	// need to add hard drive & controller
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( omni2, kaypro4 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(kaypro_state, screen_update_omni2)
@@ -435,5 +453,5 @@ COMP( 198?, omni2,      kayproii, 0,    omni2,    kay_kbd, kaypro_state, kaypro,
 COMP( 1984, kaypro2x,   0,        0,    kaypro2x, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 2x" , GAME_NOT_WORKING ) // model 81-025
 COMP( 1984, kaypro4a,   kaypro2x, 0,    kaypro2x, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 4 - 4/84" , GAME_NOT_WORKING ) // model 81-015
 // Kaypro 4/84 plus 88 goes here, model 81-015 with an added 8088 daughterboard and rom
-COMP( 1983, kaypro10,   0,        0,    kaypro2x, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 10" , GAME_NOT_WORKING ) // model 81-005
+COMP( 1983, kaypro10,   0,        0,    kaypro10, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro 10" , GAME_NOT_WORKING ) // model 81-005
 COMP( 1984, robie,      0,        0,    kaypro2x, kay_kbd, kaypro_state, kaypro, "Non Linear Systems",  "Kaypro Robie" , GAME_NOT_WORKING ) // model 81-005

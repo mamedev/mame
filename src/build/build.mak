@@ -20,20 +20,21 @@ OBJDIRS += \
 
 MAKEDEP_TARGET = $(BUILDOUT)/makedep$(BUILD_EXE)
 MAKEMAK_TARGET = $(BUILDOUT)/makemak$(BUILD_EXE)
-MAKELIST_TARGET = $(BUILDOUT)/makelist$(BUILD_EXE)
-VERINFO_TARGET = $(BUILDOUT)/verinfo$(BUILD_EXE)
 
 MAKEDEP = $(MAKEDEP_TARGET)
 MAKEMAK = $(MAKEMAK_TARGET)
-MAKELIST = $(MAKELIST_TARGET)
-VERINFO = $(VERINFO_TARGET)
+
+ifneq ($(TERM),cygwin)
+ifeq ($(OS),Windows_NT)
+MAKEDEP = $(subst /,\,$(MAKEDEP_TARGET))
+MAKEMAK = $(subst /,\,$(MAKEMAK_TARGET))
+endif
+endif
 
 ifneq ($(CROSS_BUILD),1)
 BUILD += \
 	$(MAKEDEP_TARGET) \
 	$(MAKEMAK_TARGET) \
-	$(MAKELIST_TARGET) \
-	$(VERINFO_TARGET) \
 
 # makedep
 #-------------------------------------------------
@@ -58,13 +59,12 @@ $(MAKEDEP_TARGET): $(MAKEDEPOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB)
 
 MAKEMAKOBJS = \
 	$(BUILDOBJ)/makemak.o \
-#	$(OBJ)/lib/util/astring.o \
-#	$(OBJ)/lib/util/corealloc.o \
-#	$(OBJ)/lib/util/corefile.o \
-#	$(OBJ)/lib/util/corestr.o \
-#	$(OBJ)/lib/util/unicode.o \
-#	$(OBJ)/lib/util/tagmap.o \
-#	$(OBJ)/lib/util/options.o \
+	$(OBJ)/lib/util/astring.o \
+	$(OBJ)/lib/util/corealloc.o \
+	$(OBJ)/lib/util/corefile.o \
+	$(OBJ)/lib/util/corestr.o \
+	$(OBJ)/lib/util/unicode.o \
+	$(OBJ)/lib/util/tagmap.o
 
 
 $(MAKEMAK_TARGET): $(MAKEMAKOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB) $(7Z_LIB)
@@ -72,33 +72,11 @@ $(MAKEMAK_TARGET): $(MAKEMAKOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB) $(7
 	$(NATIVELD) $(NATIVELDFLAGS) $^ $(LIBS) -o $@
 
 
-
+else
 #-------------------------------------------------
-# makelist
+# It's a CROSS_BUILD. Ensure the targets exist.
 #-------------------------------------------------
-
-MAKELISTOBJS = \
-	$(BUILDOBJ)/makelist.o \
-	$(OBJ)/lib/util/astring.o \
-	$(OBJ)/lib/util/corealloc.o \
-	$(OBJ)/lib/util/cstrpool.o \
-	$(OBJ)/lib/util/corefile.o \
-	$(OBJ)/lib/util/unicode.o \
-	$(OBJ)/lib/util/tagmap.o \
-
-$(MAKELIST_TARGET): $(MAKELISTOBJS) $(LIBOCORE) $(ZLIB) 
-	@echo Linking $@...
-	$(NATIVELD) $(NATIVELDFLAGS) $^ $(LIBS) -o $@
-
-#-------------------------------------------------
-# verinfo
-#-------------------------------------------------
-
-VERINFOOBJS = \
-	$(BUILDOBJ)/verinfo.o
-
-$(VERINFO_TARGET): $(VERINFOOBJS) $(LIBOCORE) $(FLAC_LIB) $(7Z_LIB)
-	@echo Linking $@...
-	$(NATIVELD) $(NATIVELDFLAGS) $^ $(LIBS) -o $@
+$(MAKEDEP_TARGET):
+	@echo $@ should be built natively. Nothing to do.
 
 endif # CROSS_BUILD

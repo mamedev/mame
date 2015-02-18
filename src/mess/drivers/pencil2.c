@@ -9,6 +9,26 @@
 
     Computer kindly donated for MESS by Ian Farquhar.
 
+    Accessories:
+    - PEN-216 : 16k RAM expansion
+    - PEN-264 : 64k RAM expansion
+    - PEN-511 : Data Cassette Recorder
+    - ???     : Printer
+    - ???     : Floppy Disk Drive (5.25)
+    - ???     : Floppy Disk Controller
+    - ???     : RS-232C Serial Interface
+    - ???     : Coleco Adapter*
+    - PEN-8xx : Various software on Cassette or Floppy Disk
+    - ???     : Game Controller (joystick and 14 buttons)
+    - PEN-7xx : Various software in Cartridge format
+    - PEN-430 : Modem
+    - PEN-902 : Computer power supply
+    - PEN-962 : Monitor cable
+
+    * The cart slot is the same as that found on the Colecovision console. By plugging the
+      Coleco Adapter into the expansion slot, Colecovision cartridges can be plugged into the
+      cart slot and played.
+
 Information found by looking inside the computer
 ------------------------------------------------
 Main Board PEN-002 11-50332-10
@@ -56,7 +76,6 @@ but is banked out of view of a BASIC program.
 
 
 ToDo:
-- Cassette isn't working
 - Joysticks (no info)
 
 ****************************************************************************/
@@ -96,6 +115,7 @@ private:
 	virtual void machine_start();
 	int m_centronics_busy;
 	int m_centronics_ack;
+	bool m_cass_state;
 	required_device<cpu_device> m_maincpu;
 	required_device<centronics_device> m_centronics;
 	required_device<cassette_image_device> m_cass;
@@ -135,7 +155,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER( pencil2_state::porte2_r)
 {
-	return (m_cass->input() > 0.1);
+	return (m_cass->input() > 0.1) ? 0xff : 0x7f;
 }
 
 WRITE8_MEMBER( pencil2_state::port10_w )
@@ -145,7 +165,8 @@ WRITE8_MEMBER( pencil2_state::port10_w )
 
 WRITE8_MEMBER( pencil2_state::port30_w )
 {
-	m_cass->output( BIT(data, 0) ? -1.0 : +1.0);
+	m_cass_state ^= 1;
+	m_cass->output( m_cass_state ? -1.0 : +1.0);
 }
 
 WRITE8_MEMBER( pencil2_state::port80_w )
@@ -299,6 +320,7 @@ static MACHINE_CONFIG_START( pencil2, pencil2_state )
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pencil2_cart")
@@ -323,4 +345,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT     STATE         INIT  COMPANY    FULLNAME       FLAGS */
-COMP( 1983, pencil2,   0,     0,     pencil2,   pencil2, driver_device,  0,  "Hanimex", "Pencil II", GAME_NOT_WORKING )
+COMP( 1983, pencil2,   0,     0,     pencil2,   pencil2, driver_device,  0,  "Hanimex", "Pencil II", 0 )

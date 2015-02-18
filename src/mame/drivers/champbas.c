@@ -801,7 +801,7 @@ ROM_START( talbot )
 	ROM_LOAD( "16.11i", 0x5000, 0x1000, CRC(1612adf5) SHA1(9adeb21d5d1692f6e31460062f03f2008076b307) )
 
 	ROM_REGION( 0x2000, "mcu", 0 )
-	ROM_LOAD( "8201.bin", 0x0000, 0x2000, CRC(b77931ac) SHA1(405b02585e80d95a2821455538c5c2c31ce262d1) )
+	ROM_LOAD( "alpha-8201__44801a75__2f25.bin", 0x0000, 0x2000, CRC(b77931ac) SHA1(405b02585e80d95a2821455538c5c2c31ce262d1) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 ) // chars
 	ROM_LOAD( "7.6a", 0x0000, 0x1000, CRC(bde14194) SHA1(f8f569342a3094eb5450a30b8ab87901b98e6061) )
@@ -848,7 +848,7 @@ ROM_START( champbasj )
 	ROM_LOAD( "18.2n", 0x4000, 0x2000, CRC(2dc484dd) SHA1(28bd68c787d7e6989849ca52009948dbd5cdcc79) )
 
 	ROM_REGION( 0x2000, "mcu", 0 )
-	ROM_LOAD( "8201.bin", 0x0000, 0x2000, CRC(b77931ac) SHA1(405b02585e80d95a2821455538c5c2c31ce262d1) )
+	ROM_LOAD( "alpha-8201__44801a75__2f25.bin", 0x0000, 0x2000, CRC(b77931ac) SHA1(405b02585e80d95a2821455538c5c2c31ce262d1) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 ) // chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "14.5e", 0x0000, 0x2000, CRC(1b8202b3) SHA1(889b77fc3d0cb029baf8c47be260f513f3ed59bd) )
@@ -897,7 +897,7 @@ ROM_START( champbb2 )
 
 	// the pcb has a 8302 on it, though only the 8201 instructions are used
 	ROM_REGION( 0x2000, "mcu", 0 )
-	ROM_LOAD( "8302.bin", 0x0000, 0x2000, CRC(edabac6c) SHA1(eaf1c51b63023256df526b0d3fd53cffc919c901) )
+	ROM_LOAD( "alpha-8302__44801b35.bin", 0x0000, 0x2000, CRC(edabac6c) SHA1(eaf1c51b63023256df526b0d3fd53cffc919c901) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 ) // chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "epr5936", 0x0000, 0x2000, CRC(c4a4df75) SHA1(7b85dbf405697b0b8881f910c08f6db6c828b19a) )
@@ -925,7 +925,7 @@ ROM_START( champbb2a )
 
 	// the pcb has a 8302 on it, though only the 8201 instructions are used
 	ROM_REGION( 0x2000, "mcu", 0 )
-	ROM_LOAD( "8302.bin", 0x0000, 0x2000, CRC(edabac6c) SHA1(eaf1c51b63023256df526b0d3fd53cffc919c901) )
+	ROM_LOAD( "alpha-8302__44801b35.bin", 0x0000, 0x2000, CRC(edabac6c) SHA1(eaf1c51b63023256df526b0d3fd53cffc919c901) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 ) // chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "epr5936", 0x0000, 0x2000, CRC(c4a4df75) SHA1(7b85dbf405697b0b8881f910c08f6db6c828b19a) )
@@ -953,7 +953,7 @@ ROM_START( champbb2j )
 
 	// the pcb has a 8302 on it, though only the 8201 instructions are used
 	ROM_REGION( 0x2000, "mcu", 0 )
-	ROM_LOAD( "8302.bin", 0x0000, 0x2000, CRC(edabac6c) SHA1(eaf1c51b63023256df526b0d3fd53cffc919c901) )
+	ROM_LOAD( "alpha-8302__44801b35.bin", 0x0000, 0x2000, CRC(edabac6c) SHA1(eaf1c51b63023256df526b0d3fd53cffc919c901) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 ) // chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "4.6a", 0x0000, 0x2000, CRC(c4a4df75) SHA1(7b85dbf405697b0b8881f910c08f6db6c828b19a) )

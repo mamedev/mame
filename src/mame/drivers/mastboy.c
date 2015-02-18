@@ -445,19 +445,25 @@ class mastboy_state : public driver_device
 public:
 	mastboy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_nvram(*this, "nvram") ,
-		m_workram(*this, "workram"),
-		m_tileram(*this, "tileram"),
-		m_colram(*this, "colram"),
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_nvram(*this, "nvram") ,
+		m_workram(*this, "workram"),
+		m_tileram(*this, "tileram"),
+		m_colram(*this, "colram") { }
 
-	required_shared_ptr<UINT8>  m_nvram;
+	required_device<cpu_device> m_maincpu;
+	required_device<msm5205_device> m_msm;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	
+	required_shared_ptr<UINT8> m_nvram;
 	required_shared_ptr<UINT8> m_workram;
 	required_shared_ptr<UINT8> m_tileram;
 	required_shared_ptr<UINT8> m_colram;
+	
 	UINT8* m_vram;
 	UINT8 m_bank;
 	int m_irq0_ack;
@@ -466,29 +472,29 @@ public:
 	int m_m5205_part;
 	int m_m5205_sambit0;
 	int m_m5205_sambit1;
+
 	DECLARE_READ8_MEMBER(banked_ram_r);
 	DECLARE_WRITE8_MEMBER(banked_ram_w);
-	DECLARE_WRITE8_MEMBER(mastboy_bank_w);
-	DECLARE_READ8_MEMBER(mastboy_backupram_r);
-	DECLARE_WRITE8_MEMBER(mastboy_backupram_w);
+	DECLARE_WRITE8_MEMBER(bank_w);
+	DECLARE_READ8_MEMBER(backupram_r);
+	DECLARE_WRITE8_MEMBER(backupram_w);
 	DECLARE_WRITE8_MEMBER(backupram_enable_w);
-	DECLARE_WRITE8_MEMBER(msm5205_mastboy_m5205_sambit0_w);
-	DECLARE_WRITE8_MEMBER(msm5205_mastboy_m5205_sambit1_w);
-	DECLARE_WRITE8_MEMBER(mastboy_msm5205_data_w);
-	DECLARE_WRITE8_MEMBER(mastboy_irq0_ack_w);
-	DECLARE_READ8_MEMBER(mastboy_port_38_read);
-	DECLARE_READ8_MEMBER(mastboy_nmi_read);
-	DECLARE_WRITE8_MEMBER(mastboy_msm5205_reset_w);
-	DECLARE_DRIVER_INIT(mastboy);
+	DECLARE_WRITE8_MEMBER(msm5205_sambit0_w);
+	DECLARE_WRITE8_MEMBER(msm5205_sambit1_w);
+	DECLARE_WRITE8_MEMBER(msm5205_data_w);
+	DECLARE_WRITE8_MEMBER(irq0_ack_w);
+	DECLARE_READ8_MEMBER(port_38_read);
+	DECLARE_READ8_MEMBER(nmi_read);
+	DECLARE_WRITE8_MEMBER(msm5205_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+
+	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	UINT32 screen_update_mastboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(mastboy_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(mastboy_adpcm_int);
-	required_device<cpu_device> m_maincpu;
-	required_device<msm5205_device> m_msm;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	INTERRUPT_GEN_MEMBER(interrupt);
 };
 
 
@@ -497,9 +503,11 @@ public:
 void mastboy_state::video_start()
 {
 	m_gfxdecode->gfx(0)->set_source(m_vram);
+	
+	save_pointer(NAME(m_vram), 0x10000);
 }
 
-UINT32 mastboy_state::screen_update_mastboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 mastboy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y,x,i;
 	int count = 0x000;
@@ -609,7 +617,7 @@ WRITE8_MEMBER(mastboy_state::banked_ram_w)
 	}
 }
 
-WRITE8_MEMBER(mastboy_state::mastboy_bank_w)
+WRITE8_MEMBER(mastboy_state::bank_w)
 {
 	// controls access to banked ram / rom
 	m_bank = data;
@@ -617,12 +625,12 @@ WRITE8_MEMBER(mastboy_state::mastboy_bank_w)
 
 /* Backup RAM access */
 
-READ8_MEMBER(mastboy_state::mastboy_backupram_r)
+READ8_MEMBER(mastboy_state::backupram_r)
 {
 	return m_nvram[offset];
 }
 
-WRITE8_MEMBER(mastboy_state::mastboy_backupram_w)
+WRITE8_MEMBER(mastboy_state::backupram_w)
 {
 //  if (m_backupram_enabled)
 //  {
@@ -643,7 +651,7 @@ WRITE8_MEMBER(mastboy_state::backupram_enable_w)
 
 /* MSM5205 Related */
 
-WRITE8_MEMBER(mastboy_state::msm5205_mastboy_m5205_sambit0_w)
+WRITE8_MEMBER(mastboy_state::msm5205_sambit0_w)
 {
 	m_m5205_sambit0 = data & 1;
 	m_msm->playmode_w((1 << 2) | (m_m5205_sambit1 << 1) | (m_m5205_sambit0) );
@@ -651,7 +659,7 @@ WRITE8_MEMBER(mastboy_state::msm5205_mastboy_m5205_sambit0_w)
 	logerror("msm5205 samplerate bit 0, set to %02x\n",data);
 }
 
-WRITE8_MEMBER(mastboy_state::msm5205_mastboy_m5205_sambit1_w)
+WRITE8_MEMBER(mastboy_state::msm5205_sambit1_w)
 {
 	m_m5205_sambit1 = data & 1;
 
@@ -660,18 +668,18 @@ WRITE8_MEMBER(mastboy_state::msm5205_mastboy_m5205_sambit1_w)
 	logerror("msm5205 samplerate bit 0, set to %02x\n",data);
 }
 
-WRITE8_MEMBER(mastboy_state::mastboy_msm5205_reset_w)
+WRITE8_MEMBER(mastboy_state::msm5205_reset_w)
 {
 	m_m5205_part = 0;
 	m_msm->reset_w(data & 1);
 }
 
-WRITE8_MEMBER(mastboy_state::mastboy_msm5205_data_w)
+WRITE8_MEMBER(mastboy_state::msm5205_data_w)
 {
 	m_m5205_next = data;
 }
 
-WRITE_LINE_MEMBER(mastboy_state::mastboy_adpcm_int)
+WRITE_LINE_MEMBER(mastboy_state::adpcm_int)
 {
 	m_msm->data_w(m_m5205_next);
 	m_m5205_next >>= 4;
@@ -684,14 +692,14 @@ WRITE_LINE_MEMBER(mastboy_state::mastboy_adpcm_int)
 
 /* Interrupt Handling */
 
-WRITE8_MEMBER(mastboy_state::mastboy_irq0_ack_w)
+WRITE8_MEMBER(mastboy_state::irq0_ack_w)
 {
 	m_irq0_ack = data;
 	if ((data & 1) == 1)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(mastboy_state::mastboy_interrupt)
+INTERRUPT_GEN_MEMBER(mastboy_state::interrupt)
 {
 	if ((m_irq0_ack & 1) == 1)
 	{
@@ -711,21 +719,21 @@ static ADDRESS_MAP_START( mastboy_map, AS_PROGRAM, 8, mastboy_state )
 
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE(banked_ram_r,banked_ram_w) // mastboy bank area read / write
 
-	AM_RANGE(0xff000, 0xff7ff) AM_READWRITE(mastboy_backupram_r,mastboy_backupram_w) AM_SHARE("nvram")
+	AM_RANGE(0xff000, 0xff7ff) AM_READWRITE(backupram_r,backupram_w) AM_SHARE("nvram")
 
 	AM_RANGE(0xff800, 0xff807) AM_READ_PORT("P1")
 	AM_RANGE(0xff808, 0xff80f) AM_READ_PORT("P2")
 	AM_RANGE(0xff810, 0xff817) AM_READ_PORT("DSW1")
 	AM_RANGE(0xff818, 0xff81f) AM_READ_PORT("DSW2")
 
-	AM_RANGE(0xff820, 0xff827) AM_WRITE(mastboy_bank_w)
-	AM_RANGE(0xff828, 0xff828) AM_DEVWRITE("saa", saa1099_device, saa1099_data_w)
-	AM_RANGE(0xff829, 0xff829) AM_DEVWRITE("saa", saa1099_device, saa1099_control_w)
-	AM_RANGE(0xff830, 0xff830) AM_WRITE(mastboy_msm5205_data_w)
-	AM_RANGE(0xff838, 0xff838) AM_WRITE(mastboy_irq0_ack_w)
-	AM_RANGE(0xff839, 0xff839) AM_WRITE(msm5205_mastboy_m5205_sambit0_w)
-	AM_RANGE(0xff83a, 0xff83a) AM_WRITE(msm5205_mastboy_m5205_sambit1_w)
-	AM_RANGE(0xff83b, 0xff83b) AM_WRITE(mastboy_msm5205_reset_w)
+	AM_RANGE(0xff820, 0xff827) AM_WRITE(bank_w)
+	AM_RANGE(0xff828, 0xff828) AM_DEVWRITE("saa", saa1099_device, data_w)
+	AM_RANGE(0xff829, 0xff829) AM_DEVWRITE("saa", saa1099_device, control_w)
+	AM_RANGE(0xff830, 0xff830) AM_WRITE(msm5205_data_w)
+	AM_RANGE(0xff838, 0xff838) AM_WRITE(irq0_ack_w)
+	AM_RANGE(0xff839, 0xff839) AM_WRITE(msm5205_sambit0_w)
+	AM_RANGE(0xff83a, 0xff83a) AM_WRITE(msm5205_sambit1_w)
+	AM_RANGE(0xff83b, 0xff83b) AM_WRITE(msm5205_reset_w)
 	AM_RANGE(0xff83c, 0xff83c) AM_WRITE(backupram_enable_w)
 
 	AM_RANGE(0xffc00, 0xfffff) AM_RAM // Internal RAM
@@ -733,20 +741,20 @@ ADDRESS_MAP_END
 
 /* Ports */
 
-READ8_MEMBER(mastboy_state::mastboy_port_38_read)
+READ8_MEMBER(mastboy_state::port_38_read)
 {
 	return 0x00;
 }
 
-READ8_MEMBER(mastboy_state::mastboy_nmi_read)
+READ8_MEMBER(mastboy_state::nmi_read)
 {
 	// this is read in the NMI, it's related to the Z180 MMU I think, must return right value or game jumps to 0000
 	return 0x00;
 }
 
 static ADDRESS_MAP_START( mastboy_io_map, AS_IO, 8, mastboy_state )
-	AM_RANGE(0x38, 0x38) AM_READ(mastboy_port_38_read)
-	AM_RANGE(0x39, 0x39) AM_READ(mastboy_nmi_read)
+	AM_RANGE(0x38, 0x38) AM_READ(port_38_read)
+	AM_RANGE(0x39, 0x39) AM_READ(nmi_read)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -866,6 +874,19 @@ GFXDECODE_END
 
 /* Machine Functions / Driver */
 
+void mastboy_state::machine_start()
+{
+	m_vram = memregion( "gfx1" )->base(); // makes decoding the RAM based tiles easier this way
+	
+	save_item(NAME(m_bank));
+	save_item(NAME(m_irq0_ack));
+	save_item(NAME(m_backupram_enabled));
+	save_item(NAME(m_m5205_next));
+	save_item(NAME(m_m5205_part));
+	save_item(NAME(m_m5205_sambit0));
+	save_item(NAME(m_m5205_sambit1));
+}
+
 void mastboy_state::machine_reset()
 {
 	/* clear some ram */
@@ -885,7 +906,7 @@ static MACHINE_CONFIG_START( mastboy, mastboy_state )
 	MCFG_CPU_ADD("maincpu", Z180, 12000000/2)   /* HD647180X0CP6-1M1R */
 	MCFG_CPU_PROGRAM_MAP(mastboy_map)
 	MCFG_CPU_IO_MAP(mastboy_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mastboy_state,  mastboy_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mastboy_state,  interrupt)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -896,7 +917,7 @@ static MACHINE_CONFIG_START( mastboy, mastboy_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mastboy_state, screen_update_mastboy)
+	MCFG_SCREEN_UPDATE_DRIVER(mastboy_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mastboy)
@@ -909,7 +930,7 @@ static MACHINE_CONFIG_START( mastboy, mastboy_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(mastboy_state, mastboy_adpcm_int))  /* interrupt function */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(mastboy_state, adpcm_int))  /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -993,10 +1014,6 @@ ROM_START( mastboyi )
 	/*                  0x1c0000 to 0x1fffff EMPTY */
 ROM_END
 
-DRIVER_INIT_MEMBER(mastboy_state,mastboy)
-{
-	m_vram = memregion( "gfx1" )->base(); // makes decoding the RAM based tiles easier this way
-}
 
-GAME( 1991, mastboy,  0,          mastboy, mastboy, mastboy_state, mastboy, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A)", 0 )
-GAME( 1991, mastboyi, mastboy,    mastboy, mastboy, mastboy_state, mastboy, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A)", 0 )
+GAME( 1991, mastboy,  0,          mastboy, mastboy, driver_device, 0, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A)", GAME_SUPPORTS_SAVE )
+GAME( 1991, mastboyi, mastboy,    mastboy, mastboy, driver_device, 0, ROT0, "Gaelco", "Master Boy (Italian, PCB Rev A)", GAME_SUPPORTS_SAVE )

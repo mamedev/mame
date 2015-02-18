@@ -44,7 +44,7 @@ ioport_constructor serial_keyboard_device::device_input_ports() const
 void serial_keyboard_device::device_start()
 {
 	generic_keyboard_device::device_start();
-	device_serial_interface::register_save_state(machine().save(), name(), tag());
+	device_serial_interface::register_save_state(machine().save(), this);
 	save_item(NAME(m_curr_key));
 	save_item(NAME(m_key_valid));
 }

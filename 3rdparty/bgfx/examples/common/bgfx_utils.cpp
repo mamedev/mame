@@ -5,6 +5,8 @@
 
 #include <string.h> // strlen
 
+#include "common.h"
+
 #include <tinystl/allocator.h>
 #include <tinystl/vector.h>
 #include <tinystl/string.h>
@@ -69,6 +71,7 @@ static bgfx::ShaderHandle loadShader(bx::FileReaderI* _reader, const char* _name
 	switch (bgfx::getRendererType() )
 	{
 	case bgfx::RendererType::Direct3D11:
+	case bgfx::RendererType::Direct3D12:
 		shaderPath = "shaders/dx11/";
 		break;
 

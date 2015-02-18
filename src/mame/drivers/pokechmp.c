@@ -286,13 +286,39 @@ ROM_START( pokechmp )
 	ROM_LOAD( "pokechamp_10_27c040.bin",       0x00000, 0x80000, CRC(b54806ed) SHA1(c6e1485c263ebd9102ff1e8c09b4c4ca5f63c3da) )
 ROM_END
 
+// only the 'maincpu' and 'bgs' regions were dumped for this set, others assumed to be the same
+ROM_START( pokechmpa )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "1", 0x00000, 0x20000, CRC(7d051c36) SHA1(8c2329f863ad677f4398a7dab7476c9492ad4f24) )
 
+	ROM_REGION( 0x18000, "audiocpu", 0 )     /* 96k for code + 96k for decrypted opcodes */
+	ROM_LOAD("pokechamp_09_27c512.bin", 0x10000, 0x8000, CRC(c78f6483) SHA1(a0d063effd8d1850f674edccb6e7a285b2311d21))
+	ROM_CONTINUE(              0x08000, 0x8000 )
+
+	ROM_REGION( 0x100000, "bgs", 0 )
+	ROM_LOAD( "6",       0x00000, 0x40000, CRC(1aec1de2) SHA1(f42db2445dcf1fb0957bf8a4414c3266ae47fae1) )
+	ROM_LOAD( "5",       0x40000, 0x40000, CRC(79823f7a) SHA1(1059b4baf4d4d3c49d4de4194f29f8601e75972b) )
+	ROM_LOAD( "4",       0x80000, 0x40000, CRC(e76f7596) SHA1(bb4c55bad2693da3f76d33fdf0f7f32c44dfd3e0) )
+	ROM_LOAD( "3",       0xc0000, 0x40000, CRC(a22946b8) SHA1(d77fb5bfe00349753a9e6ea9de82c1eefca090f7) )
+
+	ROM_REGION( 0x20000, "sprites", 0 )
+	/* the first half of all these roms is identical.  For rom 3 both halves match.  Correct decode is to ignore the first half */
+	ROM_LOAD( "pokechamp_02_27c512.bin",       0x00000, 0x08000, CRC(1ff44545) SHA1(2eee44484accce7b0ba21babf6e8344b234a4e87) ) ROM_CONTINUE( 0x00000, 0x8000 )
+	ROM_LOAD( "pokechamp_01_27c512.bin",       0x08000, 0x08000, CRC(338fc412) SHA1(bb8ae99ee6a399a8c67bedb88d0837fd0a4a426c) ) ROM_CONTINUE( 0x08000, 0x8000 )
+	ROM_LOAD( "pokechamp_04_27c512.bin",       0x10000, 0x08000, CRC(ee6991af) SHA1(8eca3cdfd2eb74257253957a87b245b7f85bd038) ) ROM_CONTINUE( 0x10000, 0x8000 )
+	ROM_LOAD( "pokechamp_03_27c512.bin",       0x18000, 0x08000, CRC(99f9884a) SHA1(096d6ce70dc51fb9142e80e1ec45d6d7225481f5) ) ROM_CONTINUE( 0x18000, 0x8000 )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "pokechamp_10_27c040.bin",       0x00000, 0x80000, CRC(b54806ed) SHA1(c6e1485c263ebd9102ff1e8c09b4c4ca5f63c3da) )
+ROM_END
+
+// only the 'maincpu' and 'bgs' and 'oki' regions were dumped for this set, others assumed to be the same
 ROM_START(billlist)
 	ROM_REGION(0x20000, "maincpu", 0)
 	ROM_LOAD("billiard_list.1", 0x00000, 0x20000, CRC(4ef416f7) SHA1(e995410e2c79a3fbd2ac76a80dc6c412eb454e52) )
 
 	ROM_REGION(0x18000, "audiocpu", 0)     /* 96k for code + 96k for decrypted opcodes */
-	ROM_LOAD("pokechamp_09_27c512.bin", 0x10000, 0x8000, BAD_DUMP CRC(c78f6483) SHA1(a0d063effd8d1850f674edccb6e7a285b2311d21)) // wasn't dumped from this set
+	ROM_LOAD("pokechamp_09_27c512.bin", 0x10000, 0x8000, CRC(c78f6483) SHA1(a0d063effd8d1850f674edccb6e7a285b2311d21))
 	ROM_CONTINUE(0x08000, 0x8000)
 
 	ROM_REGION(0x100000, "bgs", 0)
@@ -303,14 +329,15 @@ ROM_START(billlist)
 
 	ROM_REGION(0x20000, "sprites", 0)
 	/* the first half of all these roms is identical.  For rom 3 both halves match.  Correct decode is to ignore the first half */
-	ROM_LOAD("pokechamp_02_27c512.bin", 0x00000, 0x08000, BAD_DUMP CRC(1ff44545) SHA1(2eee44484accce7b0ba21babf6e8344b234a4e87)) ROM_CONTINUE(0x00000, 0x8000) // wasn't dumped from this set
-	ROM_LOAD("pokechamp_01_27c512.bin", 0x08000, 0x08000, BAD_DUMP CRC(338fc412) SHA1(bb8ae99ee6a399a8c67bedb88d0837fd0a4a426c)) ROM_CONTINUE(0x08000, 0x8000) // ""
-	ROM_LOAD("pokechamp_04_27c512.bin", 0x10000, 0x08000, BAD_DUMP CRC(ee6991af) SHA1(8eca3cdfd2eb74257253957a87b245b7f85bd038)) ROM_CONTINUE(0x10000, 0x8000) // ""
-	ROM_LOAD("pokechamp_03_27c512.bin", 0x18000, 0x08000, BAD_DUMP CRC(99f9884a) SHA1(096d6ce70dc51fb9142e80e1ec45d6d7225481f5)) ROM_CONTINUE(0x18000, 0x8000) // ""
+	ROM_LOAD("pokechamp_02_27c512.bin", 0x00000, 0x08000, CRC(1ff44545) SHA1(2eee44484accce7b0ba21babf6e8344b234a4e87)) ROM_CONTINUE(0x00000, 0x8000)
+	ROM_LOAD("pokechamp_01_27c512.bin", 0x08000, 0x08000, CRC(338fc412) SHA1(bb8ae99ee6a399a8c67bedb88d0837fd0a4a426c)) ROM_CONTINUE(0x08000, 0x8000)
+	ROM_LOAD("pokechamp_04_27c512.bin", 0x10000, 0x08000, CRC(ee6991af) SHA1(8eca3cdfd2eb74257253957a87b245b7f85bd038)) ROM_CONTINUE(0x10000, 0x8000)
+	ROM_LOAD("pokechamp_03_27c512.bin", 0x18000, 0x08000, CRC(99f9884a) SHA1(096d6ce70dc51fb9142e80e1ec45d6d7225481f5)) ROM_CONTINUE(0x18000, 0x8000)
 
 	ROM_REGION(0x80000, "oki", 0)
 	ROM_LOAD("billiard_list.x", 0x00000, 0x80000, CRC(b54806ed) SHA1(c6e1485c263ebd9102ff1e8c09b4c4ca5f63c3da) )
 ROM_END
 
-GAME( 1995, pokechmp, 0,        pokechmp, pokechmp, pokechmp_state, pokechmp, ROT0, "D.G.R.M.", "Poke Champ", 0 )
+GAME( 1995, pokechmp, 0,        pokechmp, pokechmp, pokechmp_state, pokechmp, ROT0, "D.G.R.M.", "Poke Champ (set 1)", 0 )
+GAME( 1995, pokechmpa,pokechmp, pokechmp, pokechmp, pokechmp_state, pokechmp, ROT0, "D.G.R.M.", "Poke Champ (set 2)", 0 )
 GAME( 1995, billlist, pokechmp, pokechmp, pokechmp, pokechmp_state, pokechmp, ROT0, "D.G.R.M.", "Billard List", 0)

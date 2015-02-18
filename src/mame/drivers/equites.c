@@ -3,6 +3,7 @@
 Equites           (c) 1984 Alpha Denshi Co./Sega   8303
 Bull Fighter      (c) 1984 Alpha Denshi Co./Sega   8303
 Gekisou           (c) 1985 Eastern Corp.           8304
+Violent Run       (c) 1985 Eastern Corp.           8304? (probably on Equites HW)
 The Koukouyakyuh  (c) 1985 Alpha Denshi Co.        8304
 Splendor Blast    (c) 1985 Alpha Denshi Co.        8303
 High Voltage      (c) 1985 Alpha Denshi Co.        8304 (POST says 8404)
@@ -1284,7 +1285,7 @@ Note: CPU - Main PCB
 
 Main processor   - 68000 2.988MHz
 
-Video processor  - ALPHA-8303 custom
+Protection processor  - ALPHA-8303 custom
 
 Sound processor  - 8085 3.073MHz
                  - TMP8155 RIOTs    (RAM & I/O Timers)
@@ -1309,7 +1310,7 @@ ROM_START( equites )
 	ROM_LOAD( "ev4.1h", 0x06000, 0x2000, CRC(b7917264) SHA1(e58345fda088b171fd348959de15082f3cb42514) )
 
 	ROM_REGION( 0x2000, "mcu", 0 )
-	ROM_LOAD( "8303.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
+	ROM_LOAD( "alpha-8303__44801b42.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 ) // chars
 	ROM_LOAD( "ep9",  0x00000, 0x1000, CRC(0325be11) SHA1(d95667b439e3d97b08efeaf08022348546a4f385) )
@@ -1373,7 +1374,7 @@ ROM_START( equitess )
 	ROM_LOAD( "ev4.1h", 0x06000, 0x2000, CRC(b7917264) SHA1(e58345fda088b171fd348959de15082f3cb42514) )
 
 	ROM_REGION( 0x2000, "mcu", 0 )
-	ROM_LOAD( "8303.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
+	ROM_LOAD( "alpha-8303__44801b42.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 ) // chars
 	ROM_LOAD( "epr-ep0.3e",  0x00000, 0x1000, CRC(3f5a81c3) SHA1(8fd5bc621f483bfa46be7e40e6480b25243bdf70) )
@@ -1431,7 +1432,7 @@ ROM_START( bullfgtr )
 	ROM_LOAD( "hv4vr.bin", 0x06000, 0x2000, CRC(62c7a25b) SHA1(237d3cbdfbf45b33c2f65d30faba151380866a93) )
 
 	ROM_REGION( 0x2000, "mcu", 0 )
-	ROM_LOAD( "8303.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
+	ROM_LOAD( "alpha-8303__44801b42.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 ) // chars
 	ROM_LOAD( "h.bin", 0x000000, 0x1000, CRC(c6894c9a) SHA1(0d5a55cded4fd833211bdc733a78c6c8423897de) )
@@ -1513,7 +1514,7 @@ ROM_START( bullfgtrs )
 	ROM_LOAD( "hv4vr.bin", 0x06000, 0x2000, CRC(62c7a25b) SHA1(237d3cbdfbf45b33c2f65d30faba151380866a93) )
 
 	ROM_REGION( 0x2000, "mcu", 0 )
-	ROM_LOAD( "8303.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
+	ROM_LOAD( "alpha-8303__44801b42.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 ) // chars
 	ROM_LOAD( "h.bin", 0x000000, 0x1000, CRC(c6894c9a) SHA1(0d5a55cded4fd833211bdc733a78c6c8423897de) )
@@ -1711,7 +1712,7 @@ ROM_START( splndrbt )
 	ROM_LOAD( "4_v.1h", 0x06000, 0x2000, CRC(10f45af4) SHA1(00fa599bad8bf3ba6deee54165f381403096e8f9) )
 
 	ROM_REGION( 0x2000, "mcu", 0 )
-	ROM_LOAD( "8303.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
+	ROM_LOAD( "alpha-8303__44801b42.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 ) // chars
 	ROM_LOAD( "10.8c",  0x00000, 0x2000, CRC(501887d4) SHA1(3cf4401d6fddff1500066219a71ac3b30ecbdd28) )
@@ -1775,6 +1776,9 @@ ROM_START( hvoltage )
 	ROM_LOAD( "5_v.1l", 0x00000, 0x4000, CRC(ed9bb6ea) SHA1(73b0251b86835368ec2a4e98a5f61e28e58fd234) )
 	ROM_LOAD( "6_v.1h", 0x04000, 0x4000, CRC(e9542211) SHA1(482f2c90e842fe5cc31cc6a39025adf65ba47ce9) )
 	ROM_LOAD( "7_v.1e", 0x08000, 0x4000, CRC(44d38554) SHA1(6765971376eafa218fda1accb1e173a7c1850cc8) )
+
+	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_LOAD( "alpha-8304__44801bxx.bin", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x2000, "gfx1", 0 ) // chars
 	ROM_LOAD( "5.8c",   0x00000, 0x2000, CRC(656d53cd) SHA1(9971ed7e7da0e8bf46e97e8f75a2c2201b33fc2f) )

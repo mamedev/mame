@@ -407,17 +407,17 @@ tilemap_t &tilemap_t::init(tilemap_manager &manager, device_gfx_interface &decod
 
 	// save relevant state
 	int instance = manager.alloc_instance();
-	machine().save().save_item("tilemap", NULL, instance, NAME(m_enable));
-	machine().save().save_item("tilemap", NULL, instance, NAME(m_attributes));
-	machine().save().save_item("tilemap", NULL, instance, NAME(m_palette_offset));
-	machine().save().save_item("tilemap", NULL, instance, NAME(m_scrollrows));
-	machine().save().save_item("tilemap", NULL, instance, NAME(m_scrollcols));
-	machine().save().save_item("tilemap", NULL, instance, NAME(m_rowscroll));
-	machine().save().save_item("tilemap", NULL, instance, NAME(m_colscroll));
-	machine().save().save_item("tilemap", NULL, instance, NAME(m_dx));
-	machine().save().save_item("tilemap", NULL, instance, NAME(m_dx_flipped));
-	machine().save().save_item("tilemap", NULL, instance, NAME(m_dy));
-	machine().save().save_item("tilemap", NULL, instance, NAME(m_dy_flipped));
+	machine().save().save_item(m_device, "tilemap", NULL, instance, NAME(m_enable));
+	machine().save().save_item(m_device, "tilemap", NULL, instance, NAME(m_attributes));
+	machine().save().save_item(m_device, "tilemap", NULL, instance, NAME(m_palette_offset));
+	machine().save().save_item(m_device, "tilemap", NULL, instance, NAME(m_scrollrows));
+	machine().save().save_item(m_device, "tilemap", NULL, instance, NAME(m_scrollcols));
+	machine().save().save_item(m_device, "tilemap", NULL, instance, NAME(m_rowscroll));
+	machine().save().save_item(m_device, "tilemap", NULL, instance, NAME(m_colscroll));
+	machine().save().save_item(m_device, "tilemap", NULL, instance, NAME(m_dx));
+	machine().save().save_item(m_device, "tilemap", NULL, instance, NAME(m_dx_flipped));
+	machine().save().save_item(m_device, "tilemap", NULL, instance, NAME(m_dy));
+	machine().save().save_item(m_device, "tilemap", NULL, instance, NAME(m_dy_flipped));
 
 	// reset everything after a load
 	machine().save().register_postload(save_prepost_delegate(FUNC(tilemap_t::postload), this));

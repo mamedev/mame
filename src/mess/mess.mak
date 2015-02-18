@@ -327,6 +327,7 @@ VIDEOS += UPD7227
 VIDEOS += V9938
 VIDEOS += VIC4567
 #VIDEOS += VOODOO
+VIDEOS += SCN2674
 
 #-------------------------------------------------
 # specify available machine cores
@@ -940,7 +941,6 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_VIDEO)/vectrex.o     \
 	$(MAME_DRIVERS)/cps1.o      \
 	$(MAME_VIDEO)/cps1.o        \
-	$(MAME_VIDEO)/scn2674.o     \
 
 
 #-------------------------------------------------
@@ -1132,6 +1132,7 @@ $(MESSOBJ)/coleco.a:            \
 	$(MESS_DRIVERS)/coleco.o    \
 	$(MESS_MACHINE)/coleco.o    \
 	$(MESS_DRIVERS)/amaztron.o  \
+	$(MESS_DRIVERS)/tc4.o       \
 
 $(MESSOBJ)/cromemco.a:          \
 	$(MESS_DRIVERS)/c10.o       \
@@ -1563,6 +1564,7 @@ $(MESSOBJ)/roland.a:            \
 	$(MESS_DRIVERS)/rmt32.o     \
 	$(MESS_DRIVERS)/rd110.o     \
 	$(MESS_DRIVERS)/rsc55.o     \
+	$(MESS_DRIVERS)/tb303.o     \
 
 $(MESSOBJ)/rockwell.a:          \
 	$(MESS_DRIVERS)/aim65.o $(MESS_MACHINE)/aim65.o \
@@ -2202,6 +2204,8 @@ $(MESS_DRIVERS)/svmu.o:     $(MESS_LAYOUT)/svmu.lh
 $(MESS_DRIVERS)/sym1.o:     $(MESS_LAYOUT)/sym1.lh
 $(MESS_DRIVERS)/tandy12.o:  $(MESS_LAYOUT)/tandy12.lh
 $(MESS_DRIVERS)/tavernie.o: $(MESS_LAYOUT)/tavernie.lh
+$(MESS_DRIVERS)/tb303.o:    $(MESS_LAYOUT)/tb303.lh
+$(MESS_DRIVERS)/tc4.o:      $(MESS_LAYOUT)/tc4.lh
 $(MESS_DRIVERS)/tec1.o:     $(MESS_LAYOUT)/tec1.lh
 $(MESS_DRIVERS)/tecnbras.o: $(MESS_LAYOUT)/tecnbras.lh
 $(MESS_DRIVERS)/ti74.o:     $(MESS_LAYOUT)/ti74.lh \

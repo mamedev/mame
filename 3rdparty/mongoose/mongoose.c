@@ -48,7 +48,9 @@
 #define _INTEGRAL_MAX_BITS 64   // Enable _stati64() on Windows
 #define _CRT_SECURE_NO_WARNINGS // Disable deprecation warning in VS2005+
 #undef WIN32_LEAN_AND_MEAN      // Let windows.h always include winsock2.h
+#ifdef __Linux__
 #define _XOPEN_SOURCE 600       // For flockfile() on Linux
+#endif
 #define __STDC_FORMAT_MACROS    // <inttypes.h> wants this for C++
 #define __STDC_LIMIT_MACROS     // C++ wants that for INT64_MAX
 #ifndef _LARGEFILE_SOURCE
@@ -345,6 +347,11 @@ size_t iobuf_append(struct iobuf *io, const void *buf, size_t len) {
   assert(io != NULL);
   assert(io->len <= io->size);
 
+  /* check overflow */
+  if (len > ~(size_t)0 - (size_t)(io->buf + io->len)) {
+    return 0;
+  }
+
   if (len <= 0) {
   } else if (io->len + len <= io->size) {
     memcpy(io->buf + io->len, buf, len);
@@ -370,7 +377,8 @@ void iobuf_remove(struct iobuf *io, size_t n) {
 
 static size_t ns_out(struct ns_connection *nc, const void *buf, size_t len) {
   if (nc->flags & NSF_UDP) {
-    long n = sendto(nc->sock, (const char*)buf, len, 0, &nc->sa.sa, sizeof(nc->sa.sin));
+    long n = sendto(nc->sock, (const char *) buf, len, 0, &nc->sa.sa,
+                    sizeof(nc->sa.sin));
     DBG(("%p %d send %ld (%d %s)", nc, nc->sock, n, errno, strerror(errno)));
     return n < 0 ? 0 : n;
   } else {
@@ -893,6 +901,7 @@ static void ns_read_from_socket(struct ns_connection *conn) {
       } else {
         ok = 1;
       }
+      conn->flags &= ~(NSF_WANT_READ | NSF_WANT_WRITE);
     }
 #endif
     conn->flags &= ~NSF_CONNECTING;
@@ -921,6 +930,7 @@ static void ns_read_from_socket(struct ns_connection *conn) {
       int ssl_err = ns_ssl_err(conn, res);
       if (res == 1) {
         conn->flags |= NSF_SSL_HANDSHAKE_DONE;
+        conn->flags &= ~(NSF_WANT_READ | NSF_WANT_WRITE);
       } else if (ssl_err == SSL_ERROR_WANT_READ ||
                  ssl_err == SSL_ERROR_WANT_WRITE) {
         return; // Call us again
@@ -958,6 +968,8 @@ static void ns_write_to_socket(struct ns_connection *conn) {
       } else {
         conn->flags |= NSF_CLOSE_IMMEDIATELY;
       }
+    } else {
+      conn->flags &= ~(NSF_WANT_READ | NSF_WANT_WRITE);
     }
   } else
 #endif
@@ -1266,12 +1278,7 @@ void ns_mgr_free(struct ns_mgr *s) {
 #define STR(x) STRX(x)
 #define __func__ __FILE__ ":" STR(__LINE__)
 #endif
-/* MINGW has adopted the MSVC formatting for 64-bit ints as of gcc 4.4 till 4.8*/
-#if (defined(__MINGW32__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4 && __GNUC_MINOR__ < 8))) || defined(_MSC_VER)
 #define INT64_FMT   "I64d"
-#else
-#define INT64_FMT   "lld"
-#endif
 #define flockfile(x)      ((void) (x))
 #define funlockfile(x)    ((void) (x))
 typedef struct _stati64 file_stat_t;
@@ -2891,7 +2898,7 @@ static void send_websocket_handshake(struct mg_connection *conn,
 static int deliver_websocket_frame(struct connection *conn) {
   // Having buf unsigned char * is important, as it is used below in arithmetic
   unsigned char *buf = (unsigned char *) conn->ns_conn->recv_iobuf.buf;
-  int i, len, buf_len = conn->ns_conn->recv_iobuf.len, frame_len = 0,
+  size_t i, len, buf_len = conn->ns_conn->recv_iobuf.len, frame_len = 0,
       mask_len = 0, header_len = 0, data_len = 0, buffered = 0;
 
   if (buf_len >= 2) {
@@ -2902,10 +2909,10 @@ static int deliver_websocket_frame(struct connection *conn) {
       header_len = 2 + mask_len;
     } else if (len == 126 && buf_len >= 4 + mask_len) {
       header_len = 4 + mask_len;
-      data_len = ((((int) buf[2]) << 8) + buf[3]);
+      data_len = ((((size_t) buf[2]) << 8) + buf[3]);
     } else if (buf_len >= 10 + mask_len) {
       header_len = 10 + mask_len;
-      data_len = (int) (((uint64_t) htonl(* (uint32_t *) &buf[2])) << 32) +
+      data_len = (size_t) (((uint64_t) htonl(* (uint32_t *) &buf[2])) << 32) +
         htonl(* (uint32_t *) &buf[6]);
     }
   }
@@ -2936,9 +2943,14 @@ static int deliver_websocket_frame(struct connection *conn) {
 }
 
 size_t mg_websocket_write(struct mg_connection *conn, int opcode,
-                       const char *data, size_t data_len) {
+                          const char *data, size_t data_len) {
     unsigned char mem[4192], *copy = mem;
     size_t copy_len = 0;
+
+    /* Check overflow */
+    if (data_len > ~(size_t)0 - (size_t)10) {
+      return 0;
+    }
 
     if (data_len + 10 > sizeof(mem) &&
         (copy = (unsigned char *) NS_MALLOC(data_len + 10)) == NULL) {

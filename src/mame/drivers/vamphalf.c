@@ -163,9 +163,9 @@ public:
 	DECLARE_WRITE32_MEMBER(wyvernwg_snd_w);
 	DECLARE_WRITE16_MEMBER(misncrft_snd_w);
 
-	DECLARE_READ32_MEMBER(yorizori_1c_r);
-	DECLARE_WRITE32_MEMBER(yorizori_1c_w);
-	DECLARE_READ32_MEMBER(yorizori_10_r);
+	DECLARE_READ32_MEMBER(yorijori_1c_r);
+	DECLARE_WRITE32_MEMBER(yorijori_1c_w);
+	DECLARE_READ32_MEMBER(yorijori_10_r);
 
 	DECLARE_READ8_MEMBER(qs1000_p1_r);
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
@@ -187,7 +187,7 @@ public:
 	DECLARE_DRIVER_INIT(misncrft);
 	DECLARE_DRIVER_INIT(boonggab);
 	DECLARE_DRIVER_INIT(wyvernwg);
-	DECLARE_DRIVER_INIT(yorizori);
+	DECLARE_DRIVER_INIT(yorijori);
 	UINT32 screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_aoh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap);
@@ -377,19 +377,19 @@ WRITE16_MEMBER(vamphalf_state::boonggab_lamps_w)
 	}
 }
 
-READ32_MEMBER(vamphalf_state::yorizori_10_r)
+READ32_MEMBER(vamphalf_state::yorijori_10_r)
 {
-	printf("yorizori_10_r %08x\n", space.device().safe_pc());
+	printf("yorijori_10_r %08x\n", space.device().safe_pc());
 	return 0xffffffff;
 }
-READ32_MEMBER(vamphalf_state::yorizori_1c_r)
+READ32_MEMBER(vamphalf_state::yorijori_1c_r)
 {
-//  printf("yorizori_1c_r %08x\n", space.device().safe_pc());
+//  printf("yorijori_1c_r %08x\n", space.device().safe_pc());
 	return 0x00;// 0xaa;
 }
-WRITE32_MEMBER(vamphalf_state::yorizori_1c_w)
+WRITE32_MEMBER(vamphalf_state::yorijori_1c_w)
 {
-//  printf("yorizori_1c_w %08x %08x\n", space.device().safe_pc(), data);
+//  printf("yorijori_1c_w %08x %08x\n", space.device().safe_pc(), data);
 }
 
 WRITE32_MEMBER( vamphalf_state::wyvernwg_snd_w )
@@ -434,7 +434,7 @@ static ADDRESS_MAP_START( common_32bit_map, AS_PROGRAM, 32, vamphalf_state )
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( yorizori_32bit_map, AS_PROGRAM, 32, vamphalf_state )
+static ADDRESS_MAP_START( yorijori_32bit_map, AS_PROGRAM, 32, vamphalf_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("wram32")
 	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("tiles32")
 	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -584,9 +584,9 @@ static ADDRESS_MAP_START( boonggab_io, AS_IO, 16, vamphalf_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( yorizori_io, AS_IO, 32, vamphalf_state )
-	AM_RANGE(0x010, 0x013) AM_READ(yorizori_10_r)
-	AM_RANGE(0x01c, 0x01f) AM_READWRITE(yorizori_1c_r,yorizori_1c_w)
+static ADDRESS_MAP_START( yorijori_io, AS_IO, 32, vamphalf_state )
+	AM_RANGE(0x010, 0x013) AM_READ(yorijori_10_r)
+	AM_RANGE(0x01c, 0x01f) AM_READWRITE(yorijori_1c_r,yorijori_1c_w)
 ADDRESS_MAP_END
 
 /*
@@ -1160,10 +1160,10 @@ static MACHINE_CONFIG_DERIVED( boonggab, common )
 	MCFG_FRAGMENT_ADD(sound_ym_oki)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( yorizori, common )
+static MACHINE_CONFIG_DERIVED( yorijori, common )
 	MCFG_CPU_REPLACE("maincpu", E132T, XTAL_50MHz)    /* 50 MHz */
-	MCFG_CPU_PROGRAM_MAP(yorizori_32bit_map)
-	MCFG_CPU_IO_MAP(yorizori_io)
+	MCFG_CPU_PROGRAM_MAP(yorijori_32bit_map)
+	MCFG_CPU_IO_MAP(yorijori_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
 	MCFG_FRAGMENT_ADD(sound_qs1000)
@@ -2001,7 +2001,7 @@ ROM_END
 
 /*
 
-Yori Zori Kuk Kuk
+Yori Jori Kuk Kuk
 
 
 PCB Layout
@@ -2073,7 +2073,7 @@ ROMs:
 
 */
 
-ROM_START( yorizori )
+ROM_START( yorijori )
 	ROM_REGION32_BE( 0x200000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "prg1", 0x000000, 0x200000, CRC(0e04eb40) SHA1(0cec9dc91aaf9cf7c459c7baac200cf0fcfddc18) )
 
@@ -2762,7 +2762,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,wyvernwg)
 	membank("qs1000:data")->configure_entries(0, 16, memregion("qs1000:cpu")->base()+0x100, 0x8000-0x100);
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,yorizori)
+DRIVER_INIT_MEMBER(vamphalf_state,yorijori)
 {
 	// seesm close to Final Godori in terms of port mappings, possibly a SemiCom game?
 
@@ -2895,4 +2895,4 @@ GAME( 2001, wyvernwg,  wivernwg, wyvernwg, common,   vamphalf_state, wyvernwg, R
 GAME( 2001, wyvernwga, wivernwg, wyvernwg, common,   vamphalf_state, wyvernwg, ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 2)", GAME_IMPERFECT_SOUND )
 GAME( 2001, aoh,       0,        aoh,      aoh,      vamphalf_state, aoh,      ROT0,   "Unico",             "Age Of Heroes - Silkroad 2 (v0.63 - 2001/02/07)", 0 )
 GAME( 2001, boonggab,  0,        boonggab, boonggab, vamphalf_state, boonggab, ROT270, "Taff System",       "Boong-Ga Boong-Ga (Spank'em!)", 0 )
-GAME( 199?, yorizori,  0,        yorizori, common,   vamphalf_state, yorizori, ROT0,   "<unknown>",         "Yori Zori Kuk Kuk", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 199?, yorijori,  0,        yorijori, common,   vamphalf_state, yorijori, ROT0,   "Golden Bell Entertainment",         "Yori Jori Kuk Kuk", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )

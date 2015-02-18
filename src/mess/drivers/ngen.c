@@ -15,6 +15,8 @@
     channel 1 - X-Bus expansion modules (except disk and graphics)
     channel 2 - graphics?
     channel 3 - hard disk
+    On the CP-001/B26 channels 4 on are handled by the 80186.
+    channel 4 - floppy disk
 
     To get to "menu mode", press Space quickly after reset (might need good timing)
     The bootstrap ROM version number is displayed, along with "B,D,L,M,P,T:"
@@ -79,6 +81,7 @@ public:
 	ngen_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
+		m_i386cpu(*this,"i386cpu"),
 		m_crtc(*this,"crtc"),
 		m_viduart(*this,"videouart"),
 		m_iouart(*this,"iouart"),
@@ -141,7 +144,8 @@ protected:
 	virtual void machine_start();
 
 private:
-	required_device<i80186_cpu_device> m_maincpu;
+	optional_device<i80186_cpu_device> m_maincpu;
+	optional_device<i386_device> m_i386cpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<i8251_device> m_viduart;
 	required_device<upd7201_device> m_iouart;
@@ -175,17 +179,13 @@ private:
 	UINT8 m_disk_page;
 };
 
-class ngen386_state : public driver_device
+class ngen386_state : public ngen_state
 {
 public:
 	ngen386_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_pic(*this,"pic")
+		: ngen_state(mconfig, type, tag)
 		{}
 private:
-	required_device<i386_device> m_maincpu;
-	required_device<pic8259_device> m_pic;
 };
 
 WRITE_LINE_MEMBER(ngen_state::pit_out0_w)
@@ -210,13 +210,21 @@ WRITE_LINE_MEMBER(ngen_state::pit_out2_w)
 
 WRITE_LINE_MEMBER(ngen_state::cpu_timer_w)
 {
-	logerror("80186 Timer 1 state %i\n",state);
+	if(state != 0)
+		popmessage("80186 Timer 0 state %i\n",state);
+	m_pic->ir5_w(state);
 }
 
 WRITE_LINE_MEMBER(ngen_state::timer_clk_out)
 {
 	m_viduart->write_rxc(state);  // Keyboard UART Rx/Tx clocks
 	m_viduart->write_txc(state);
+	// 80186 timer pins also?  EXT bit is enabled for BTOS PIT test.
+	if(m_maincpu)
+	{
+		m_maincpu->tmrin0_w(state);
+		//m_maincpu->tmrin1_w(state);
+	}
 }
 
 WRITE16_MEMBER(ngen_state::cpu_peripheral_cb)
@@ -273,7 +281,6 @@ WRITE16_MEMBER(ngen_state::peripheral_w)
 	case 0x0f:
 		if(mem_mask & 0x00ff)
 			m_dmac->write(space,offset,data & 0xff);
-		logerror("(PC=%06x) DMA write offset %04x data %04x mask %04x\n",m_maincpu->device_t::safe_pc(),offset,data,mem_mask);
 		break;
 	case 0x80: // DMA page offset?
 	case 0x81:
@@ -321,10 +328,10 @@ WRITE16_MEMBER(ngen_state::peripheral_w)
 			m_viduart->control_w(space,0,data & 0xff);
 		break;
 	case 0x1a0:  // serial?
-		logerror("(PC=%06x) Serial(?) 0x1a0 write offset %04x data %04x mask %04x\n",m_maincpu->device_t::safe_pc(),offset,data,mem_mask);
+		logerror("Serial(?) 0x1a0 write offset %04x data %04x mask %04x\n",offset,data,mem_mask);
 		break;
 	default:
-		logerror("(PC=%06x) Unknown 80186 peripheral write offset %04x data %04x mask %04x\n",m_maincpu->device_t::safe_pc(),offset,data,mem_mask);
+		logerror("Unknown 80186 peripheral write offset %04x data %04x mask %04x\n",offset,data,mem_mask);
 	}
 }
 
@@ -351,7 +358,7 @@ READ16_MEMBER(ngen_state::peripheral_r)
 	case 0x0f:
 		if(mem_mask & 0x00ff)
 			ret = m_dmac->read(space,offset);
-		logerror("(PC=%06x) DMA read offset %04x mask %04x returning %04x\n",m_maincpu->device_t::safe_pc(),offset,mem_mask,ret);
+		logerror("DMA read offset %04x mask %04x returning %04x\n",offset,mem_mask,ret);
 		break;
 	case 0x80: // DMA page offset?
 	case 0x81:
@@ -398,8 +405,8 @@ READ16_MEMBER(ngen_state::peripheral_r)
 	case 0x1a0:  // I/O control register?
 		ret = m_control;  // end of DMA transfer? (maybe a per-channel EOP?) Bit 6 is set during a transfer?
 		break;
-	default:
-		logerror("(PC=%06x) Unknown 80186 peripheral read offset %04x mask %04x returning %04x\n",m_maincpu->device_t::safe_pc(),offset,mem_mask,ret);
+//	default:
+//		logerror("Unknown 80186 peripheral read offset %04x mask %04x returning %04x\n",offset,mem_mask,ret);
 	}
 	return ret;
 }
@@ -412,14 +419,20 @@ READ16_MEMBER(ngen_state::peripheral_r)
 WRITE16_MEMBER(ngen_state::xbus_w)
 {
 	UINT16 addr = (data & 0x00ff) << 8;
-	address_space& io = m_maincpu->device_t::memory().space(AS_IO);
+	cpu_device* cpu;
+	
+	if(m_maincpu)
+		cpu = m_maincpu;
+	else
+		cpu = m_i386cpu;
+	address_space& io = cpu->device_t::memory().space(AS_IO);
 	switch(m_xbus_current)
 	{
 		case 0x00:  // Floppy/Hard disk module
 			io.install_readwrite_handler(addr,addr+0xff,0,0,read16_delegate(FUNC(ngen_state::fhd_r),this),write16_delegate(FUNC(ngen_state::hfd_w),this));
 			break;
 		default:
-			m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);  // reached end of the modules
+			cpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);  // reached end of the modules
 			break;
 	}
 	if(addr != 0)
@@ -442,7 +455,10 @@ READ16_MEMBER(ngen_state::xbus_r)
 			ret = 0x1070;  // Floppy/Hard disk module
 			break;
 		default:
-			m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);  // reached the end of the modules
+			if(m_maincpu)
+				m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);  // reached the end of the modules
+			else
+				m_i386cpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 			ret = 0x0080;
 			break;
 	}
@@ -458,21 +474,28 @@ WRITE16_MEMBER(ngen_state::hfd_w)
 		case 0x00:
 		case 0x01:
 		case 0x02:
-		case 0x03:
 			if(mem_mask & 0x00ff)
 				m_fdc->write(space,offset,data & 0xff);
 			break;
+		case 0x03:
+			if(mem_mask & 0x00ff)
+			{
+				m_fdc->write(space,offset,data & 0xff);
+				m_fdc_timer->write_clk0(1);
+				m_fdc_timer->write_clk0(0);  // Data register access clocks the FDC's PIT channel 0
+			}
+			break;
 		case 0x04:
 			if(mem_mask & 0x00ff)
-				fdc_control_w(space,offset,data & 0xff);
+				fdc_control_w(space,0,data & 0xff);
 			break;
 		case 0x05:
 			if(mem_mask & 0x00ff)
-				hdc_control_w(space,offset,data & 0xff);
+				hdc_control_w(space,0,data & 0xff);
 			break;
 		case 0x07:
 			if(mem_mask & 0x00ff)
-				disk_addr_ext(space,offset,data & 0xff);
+				disk_addr_ext(space,0,data & 0xff);
 			break;
 		case 0x08:
 		case 0x09:
@@ -512,9 +535,16 @@ READ16_MEMBER(ngen_state::fhd_r)
 		case 0x00:
 		case 0x01:
 		case 0x02:
-		case 0x03:
 			if(mem_mask & 0x00ff)
 				ret = m_fdc->read(space,offset);
+			break;
+		case 0x03:
+			if(mem_mask & 0x00ff)
+			{
+				ret = m_fdc->read(space,offset);
+				m_fdc_timer->write_clk0(1);
+				m_fdc_timer->write_clk0(0);  // Data register access clocks the FDC's PIT channel 0
+			}	
 			break;
 		case 0x08:
 		case 0x09:
@@ -610,7 +640,10 @@ WRITE8_MEMBER(ngen_state::hd_buffer_w)
 
 WRITE_LINE_MEMBER( ngen_state::dma_hrq_changed )
 {
-	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	if(m_maincpu)
+		m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	else
+		m_i386cpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( ngen_state::dma_eop_changed )
@@ -665,8 +698,15 @@ READ8_MEMBER(ngen_state::dma_3_dack_r)
 
 READ8_MEMBER(ngen_state::dma_read_word)
 {
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
+	cpu_device* cpu;
 	UINT16 result;
+
+	if(m_maincpu)
+		cpu = m_maincpu;
+	else
+		cpu = m_i386cpu;
+	address_space& prog_space = cpu->space(AS_PROGRAM); // get the right address space
+	
 	if(m_dma_channel == -1)
 		return 0xff;
 	offs_t page_offset = (((offs_t) m_dma_offset[m_dma_channel]) << 16) & 0xFE0000;
@@ -680,7 +720,14 @@ READ8_MEMBER(ngen_state::dma_read_word)
 
 WRITE8_MEMBER(ngen_state::dma_write_word)
 {
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
+	cpu_device* cpu;
+
+	if(m_maincpu)
+		cpu = m_maincpu;
+	else
+		cpu = m_i386cpu;
+	address_space& prog_space = cpu->space(AS_PROGRAM); // get the right address space
+		
 	if(m_dma_channel == -1)
 		return;
 	offs_t page_offset = (((offs_t) m_dma_offset[m_dma_channel]) << 16) & 0xFE0000;
@@ -727,11 +774,12 @@ void ngen_state::machine_reset()
 	m_fd0->get_device()->set_rpm(300);
 }
 
+// boot ROMs from modules are not mapped anywhere, instead, they have to send the code from the boot ROM via DMA
 static ADDRESS_MAP_START( ngen_mem, AS_PROGRAM, 16, ngen_state )
 	AM_RANGE(0x00000, 0xf7fff) AM_RAM
 	AM_RANGE(0xf8000, 0xf9fff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0xfa000, 0xfbfff) AM_RAM AM_SHARE("fontram")
-	AM_RANGE(0xfc000, 0xfcfff) AM_ROM AM_REGION("disk",0)
+	AM_RANGE(0xfc000, 0xfcfff) AM_RAM
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("bios",0)
 ADDRESS_MAP_END
 
@@ -751,18 +799,24 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ngen386_mem, AS_PROGRAM, 32, ngen_state )
 	AM_RANGE(0x00000000, 0x000fdfff) AM_RAM
+	AM_RANGE(0x000f8000, 0x000f9fff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0x000fa000, 0x000fbfff) AM_RAM AM_SHARE("fontram")
+	AM_RANGE(0x000fc000, 0x000fcfff) AM_RAM
 	AM_RANGE(0x000fe000, 0x000fffff) AM_ROM AM_REGION("bios",0)
 	AM_RANGE(0xffffe000, 0xffffffff) AM_ROM AM_REGION("bios",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ngen386i_mem, AS_PROGRAM, 32, ngen_state )
 	AM_RANGE(0x00000000, 0x000fbfff) AM_RAM
+	AM_RANGE(0x000f8000, 0x000f9fff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0x000fa000, 0x000fbfff) AM_RAM AM_SHARE("fontram")
 	AM_RANGE(0x000fc000, 0x000fffff) AM_ROM AM_REGION("bios",0)
 	AM_RANGE(0xffffc000, 0xffffffff) AM_ROM AM_REGION("bios",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ngen386_io, AS_IO, 32, ngen_state )
-	AM_RANGE(0xfd0c, 0xfd0f) AM_DEVREADWRITE8("pic",pic8259_device,read,write,0xffffffff)
+	AM_RANGE(0x0000, 0x0003) AM_READWRITE16(xbus_r, xbus_w, 0x0000ffff)
+	AM_RANGE(0xf800, 0xfeff) AM_READWRITE16(peripheral_r, peripheral_w,0xffffffff)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ngen )
@@ -782,7 +836,7 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	MCFG_CPU_PROGRAM_MAP(ngen_mem)
 	MCFG_CPU_IO_MAP(ngen_io)
 	MCFG_80186_CHIP_SELECT_CB(WRITE16(ngen_state, cpu_peripheral_cb))
-	MCFG_80186_TMROUT1_HANDLER(WRITELINE(ngen_state, cpu_timer_w))
+	MCFG_80186_TMROUT0_HANDLER(WRITELINE(ngen_state, cpu_timer_w))
 	MCFG_80186_IRQ_SLAVE_ACK(READ8(ngen_state, irq_cb))
 
 	MCFG_PIC8259_ADD( "pic", DEVWRITELINE("maincpu",i80186_cpu_device,int0_w), VCC, NULL )
@@ -851,7 +905,7 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 
 	// keyboard UART (patent says i8251 is used for keyboard communications, it is located on the video board)
 	MCFG_DEVICE_ADD("videouart", I8251, 0)  // main clock unknown, Rx/Tx clocks are 19.53kHz
-//  MCFG_I8251_TXEMPTY_HANDLER(DEVWRITELINE("pic",pic8259_device,ir4_w))
+//	MCFG_I8251_TXEMPTY_HANDLER(DEVWRITELINE("pic",pic8259_device,ir4_w))
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("keyboard", rs232_port_device, write_txd))
 	MCFG_RS232_PORT_ADD("keyboard", keyboard, "ngen")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("videouart", i8251_device, write_rxd))
@@ -865,14 +919,16 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("maincpu",i80186_cpu_device,drq1_w))
 	MCFG_WD_FDC_FORCE_READY
 	MCFG_DEVICE_ADD("fdc_timer", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_20MHz / 20)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic",pic8259_device,ir7_w))  // clocked on FDC data register access
+	MCFG_PIT8253_CLK0(0)  
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic",pic8259_device,ir5_w))  // clocked on FDC data register access
 	MCFG_PIT8253_CLK1(XTAL_20MHz / 20)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pic",pic8259_device,ir7_w))  // 1MHz
-	MCFG_PIT8253_CLK2(XTAL_20MHz / 10)
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pic",pic8259_device,ir7_w))
+//	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pic",pic8259_device,ir5_w))  // 1MHz
+	MCFG_PIT8253_CLK2(XTAL_20MHz / 20)
+//	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pic",pic8259_device,ir5_w))  
+
 	// TODO: WD1010 HDC (not implemented), use WD2010 for now
 	MCFG_DEVICE_ADD("hdc", WD2010, XTAL_20MHz / 4)
+	MCFG_WD2010_OUT_INTRQ_CB(DEVWRITELINE("pic",pic8259_device,ir2_w))
 	MCFG_WD2010_IN_BCS_CB(READ8(ngen_state,hd_buffer_r))
 	MCFG_WD2010_OUT_BCS_CB(WRITE8(ngen_state,hd_buffer_w))
 	MCFG_WD2010_IN_DRDY_CB(VCC)
@@ -888,14 +944,116 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ngen386, ngen386_state )
-	MCFG_CPU_ADD("maincpu", I386, XTAL_50MHz / 2)
+	MCFG_CPU_ADD("i386cpu", I386, XTAL_50MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(ngen386_mem)
 	MCFG_CPU_IO_MAP(ngen386_io)
-	MCFG_PIC8259_ADD( "pic", INPUTLINE("maincpu", 0), VCC, NULL )
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
+
+	MCFG_PIC8259_ADD( "pic", INPUTLINE("i386cpu",0), VCC, NULL )
+
+	MCFG_DEVICE_ADD("pit", PIT8254, 0)
+	MCFG_PIT8253_CLK0(78120/4)  // 19.53kHz, /4 of the CPU timer output?
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(ngen_state, pit_out0_w))  // RS232 channel B baud rate
+	MCFG_PIT8253_CLK1(XTAL_14_7456MHz/12)  // correct? - based on patent
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(ngen_state, pit_out1_w))  // RS232 channel A baud rate
+	MCFG_PIT8253_CLK2(XTAL_14_7456MHz/12)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(ngen_state, pit_out2_w))
+
+	MCFG_DEVICE_ADD("dmac", AM9517A, XTAL_14_7456MHz / 3)  // NEC D8237A, divisor unknown
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(ngen_state, dma_hrq_changed))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(ngen_state, dma_eop_changed))
+	MCFG_I8237_IN_MEMR_CB(READ8(ngen_state, dma_read_word))  // DMA is always 16-bit
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(ngen_state, dma_write_word))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(ngen_state, dack0_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(ngen_state, dack1_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(ngen_state, dack2_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(ngen_state, dack3_w))
+	MCFG_I8237_IN_IOR_0_CB(READ8(ngen_state, dma_0_dack_r))
+	MCFG_I8237_IN_IOR_1_CB(READ8(ngen_state, dma_1_dack_r))
+	MCFG_I8237_IN_IOR_2_CB(READ8(ngen_state, dma_2_dack_r))
+	MCFG_I8237_IN_IOR_3_CB(READ8(ngen_state, dma_3_dack_r))
+	MCFG_I8237_OUT_IOW_0_CB(WRITE8(ngen_state, dma_0_dack_w))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(ngen_state, dma_1_dack_w))
+	MCFG_I8237_OUT_IOW_2_CB(WRITE8(ngen_state, dma_2_dack_w))
+	MCFG_I8237_OUT_IOW_3_CB(WRITE8(ngen_state, dma_3_dack_w))
+
+	// I/O board
+	MCFG_UPD7201_ADD("iouart",0,0,0,0,0) // clocked by PIT channel 2?
+	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("rs232_a", default_rs232_devices, NULL)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("iouart", upd7201_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("iouart", upd7201_device, ctsa_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("iouart", upd7201_device, dcda_w))
+	MCFG_RS232_RI_HANDLER(DEVWRITELINE("iouart", upd7201_device, ria_w))
+
+	MCFG_RS232_PORT_ADD("rs232_b", default_rs232_devices, NULL)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("iouart", upd7201_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("iouart", upd7201_device, ctsb_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("iouart", upd7201_device, dcdb_w))
+	MCFG_RS232_RI_HANDLER(DEVWRITELINE("iouart", upd7201_device, rib_w))
+
+	// TODO: SCN2652 MPCC (not implemented), used for RS-422 cluster communications?
+
+	// video board
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_SIZE(720,348)
+	MCFG_SCREEN_VISIBLE_AREA(0,719,0,347)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc",mc6845_device, screen_update)
+
+	MCFG_MC6845_ADD("crtc", MC6845, NULL, 19980000 / 9)  // divisor unknown -- /9 gives 60Hz output, so likely correct
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(9)
+	MCFG_MC6845_UPDATE_ROW_CB(ngen_state, crtc_update_row)
+	MCFG_VIDEO_SET_SCREEN("screen")
+
+	// keyboard UART (patent says i8251 is used for keyboard communications, it is located on the video board)
+	MCFG_DEVICE_ADD("videouart", I8251, 0)  // main clock unknown, Rx/Tx clocks are 19.53kHz
+//	MCFG_I8251_TXEMPTY_HANDLER(DEVWRITELINE("pic",pic8259_device,ir4_w))
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("keyboard", rs232_port_device, write_txd))
+	MCFG_RS232_PORT_ADD("keyboard", keyboard, "ngen")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("videouart", i8251_device, write_rxd))
+
+	MCFG_DEVICE_ADD("refresh_clock", CLOCK, 19200*16)  // should be 19530Hz
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(ngen_state,timer_clk_out))
+
+	// floppy disk / hard disk module (WD2797 FDC, WD1010 HDC, plus an 8253 timer for each)
+	MCFG_WD2797x_ADD("fdc", XTAL_20MHz / 20)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(ngen_state,fdc_irq_w))
+//	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("i386cpu",i80186_cpu_device,drq1_w))
+	MCFG_WD_FDC_FORCE_READY
+	MCFG_DEVICE_ADD("fdc_timer", PIT8253, 0)
+	MCFG_PIT8253_CLK0(0)  
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic",pic8259_device,ir5_w))  // clocked on FDC data register access
+	MCFG_PIT8253_CLK1(XTAL_20MHz / 20)
+//	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pic",pic8259_device,ir5_w))  // 1MHz
+	MCFG_PIT8253_CLK2(XTAL_20MHz / 20)
+//	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pic",pic8259_device,ir5_w))  
+
+	// TODO: WD1010 HDC (not implemented), use WD2010 for now
+	MCFG_DEVICE_ADD("hdc", WD2010, XTAL_20MHz / 4)
+	MCFG_WD2010_OUT_INTRQ_CB(DEVWRITELINE("pic",pic8259_device,ir2_w))
+	MCFG_WD2010_IN_BCS_CB(READ8(ngen_state,hd_buffer_r))
+	MCFG_WD2010_OUT_BCS_CB(WRITE8(ngen_state,hd_buffer_w))
+	MCFG_WD2010_IN_DRDY_CB(VCC)
+	MCFG_WD2010_IN_INDEX_CB(VCC)
+	MCFG_WD2010_IN_WF_CB(VCC)
+	MCFG_WD2010_IN_TK000_CB(VCC)
+	MCFG_WD2010_IN_SC_CB(VCC)
+	MCFG_DEVICE_ADD("hdc_timer", PIT8253, 0)
+	MCFG_PIT8253_CLK2(XTAL_20MHz / 10)  // 2MHz
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ngen_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_HARDDISK_ADD("hard0")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( 386i, ngen386 )
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_MODIFY("i386cpu")
 	MCFG_CPU_PROGRAM_MAP(ngen386i_mem)
 MACHINE_CONFIG_END
 

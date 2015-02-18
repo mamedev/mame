@@ -105,11 +105,14 @@ protected:
 	virtual void device_reset();
 
 	// device_execute_interface overrides
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks + 4 - 1) / 4; } // 4 cycles per machine cycle
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 4); } // "
 	virtual UINT32 execute_min_cycles() const { return 1; }
 	virtual UINT32 execute_max_cycles() const { return 2; }
 	virtual UINT32 execute_input_lines() const { return 1; }
+	virtual void execute_set_input(int line, int state);
 	virtual void execute_run();
-	
+
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return(spacenum == AS_PROGRAM) ? &m_program_config :((spacenum == AS_DATA) ? &m_data_config : NULL); }
 
@@ -131,7 +134,7 @@ protected:
 	int m_datamask;
 	int m_family;           // MCU family (43/44/45)
 	int m_stack_levels;     // number of callstack levels
-	UINT16 m_stack[3+1];    // max 3
+	UINT16 m_stack[3];      // max 3
 	UINT8 m_port_out[0x10]; // last value written to output port
 	UINT8 m_op;
 	UINT8 m_prev_op;        // previous opcode
@@ -139,6 +142,7 @@ protected:
 	UINT8 m_bitmask;        // opcode bit argument
 	bool m_skip;            // skip next opcode
 	int m_icount;
+	emu_timer *m_timer;
 	
 	UINT16 m_pc;            // program counter
 	UINT8 m_acc;            // 4-bit accumulator
@@ -150,6 +154,7 @@ protected:
 	UINT8 m_timer_f;        // timer out flag
 	UINT8 m_int_f;          // interrupt flag
 	UINT8 m_inte_f;         // interrupt enable flag
+	int m_int_line;         // interrupt pin state
 
 	// i/o handlers
 	devcb_read8 m_read_a;
@@ -177,6 +182,7 @@ protected:
 	void output_w(int index, UINT8 data);
 
 	bool check_op_43();
+	TIMER_CALLBACK_MEMBER( simple_timer_cb );
 	UINT8 ucom43_reg_r(int index);
 	void ucom43_reg_w(int index, UINT8 data);
 

@@ -12,7 +12,7 @@
 #include "sound_module.h"
 #include "modules/osdmodule.h"
 
-#if (!defined(OSD_WINDOWS) || defined(USE_SDL_SOUND))
+#if (defined(OSD_SDL) || defined(USE_SDL_SOUND))
 
 // standard sdl header
 #include "../../sdl/sdlinc.h"

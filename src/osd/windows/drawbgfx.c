@@ -25,12 +25,12 @@
 class renderer_bgfx : public osd_renderer
 {
 public:
-	renderer_bgfx(win_window_info *window)
+	renderer_bgfx(osd_window *window)
 	: osd_renderer(window, FLAG_NONE) { }
 
 	virtual ~renderer_bgfx() { }
 
-	virtual int init();
+	virtual int create();
 	virtual render_primitive_list *get_primitives();
 	virtual int draw(HDC dc, int update);
 	virtual void save() {};
@@ -53,7 +53,7 @@ static void drawbgfx_exit(void);
 //  drawnone_create
 //============================================================
 
-osd_renderer *drawbgfx_create(win_window_info *window)
+osd_renderer *drawbgfx_create(osd_window *window)
 {
 	return global_alloc(renderer_bgfx(window));
 }
@@ -87,7 +87,7 @@ static void drawbgfx_exit(void)
 //  drawbgfx_window_init
 //============================================================
 
-int renderer_bgfx::init()
+int renderer_bgfx::create()
 {
 	RECT client;
 	GetClientRect(window().m_hwnd, &client);
@@ -124,8 +124,8 @@ render_primitive_list *renderer_bgfx::get_primitives()
 {
 	RECT client;
 	GetClientRect(window().m_hwnd, &client);
-	window().m_target->set_bounds(rect_width(&client), rect_height(&client), window().m_monitor->get_aspect());
-	return &window().m_target->get_primitives();
+	window().target()->set_bounds(rect_width(&client), rect_height(&client), window().aspect());
+	return &window().target()->get_primitives();
 }
 
 

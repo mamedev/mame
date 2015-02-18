@@ -265,6 +265,7 @@ typedef struct bgfx_texture_info
     uint16_t depth;
     uint8_t numMips;
     uint8_t bitsPerPixel;
+    bool    cubeMap;
 
 } bgfx_texture_info_t;
 
@@ -724,7 +725,7 @@ BGFX_C_API void bgfx_destroy_dynamic_index_buffer(bgfx_dynamic_index_buffer_hand
  *  @param _num Number of vertices.
  *  @param _decl Vertex declaration.
  */
-BGFX_C_API bgfx_dynamic_vertex_buffer_handle_t bgfx_create_dynamic_vertex_buffer(uint16_t _num, const bgfx_vertex_decl_t* _decl, uint8_t _flags);
+BGFX_C_API bgfx_dynamic_vertex_buffer_handle_t bgfx_create_dynamic_vertex_buffer(uint32_t _num, const bgfx_vertex_decl_t* _decl, uint8_t _flags);
 
 /**
  *  Create dynamic vertex buffer and initialize it.
@@ -815,7 +816,7 @@ BGFX_C_API void bgfx_alloc_transient_vertex_buffer(bgfx_transient_vertex_buffer_
  *  NOTE:
  *    Only 16-bit index buffer is supported.
  */
-BGFX_C_API bool bgfx_alloc_transient_buffers(bgfx_transient_vertex_buffer_t* _tvb, const bgfx_vertex_decl_t* _decl, uint16_t _numVertices, bgfx_transient_index_buffer_t* _tib, uint16_t _numIndices);
+BGFX_C_API bool bgfx_alloc_transient_buffers(bgfx_transient_vertex_buffer_t* _tvb, const bgfx_vertex_decl_t* _decl, uint32_t _numVertices, bgfx_transient_index_buffer_t* _tib, uint32_t _numIndices);
 
 /**
  *  Allocate instance data buffer.
@@ -870,7 +871,7 @@ BGFX_C_API void bgfx_destroy_program(bgfx_program_handle_t _handle);
 /**
  *  Calculate amount of memory required for texture.
  */
-BGFX_C_API void bgfx_calc_texture_size(bgfx_texture_info_t* _info, uint16_t _width, uint16_t _height, uint16_t _depth, uint8_t _numMips, bgfx_texture_format_t _format);
+BGFX_C_API void bgfx_calc_texture_size(bgfx_texture_info_t* _info, uint16_t _width, uint16_t _height, uint16_t _depth, bool _cubeMap, uint8_t _numMips, bgfx_texture_format_t _format);
 
 /**
  *  Create texture from memory buffer.
