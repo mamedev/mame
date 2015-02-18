@@ -264,8 +264,8 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 - (NSSize)maximumFrameSize {
 	debug_view_xy const max = view->total_size();
-	return NSMakeSize((max.x * fontWidth) + (2 * [textContainer lineFragmentPadding]),
-					   max.y * fontHeight);
+	return NSMakeSize(ceil((max.x * fontWidth) + (2 * [textContainer lineFragmentPadding])),
+					  ceil(max.y * fontHeight));
 }
 
 

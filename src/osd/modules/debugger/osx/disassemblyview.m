@@ -101,7 +101,8 @@
 		max.y = MAX(max.y, current.y);
 	}
 	view->set_source(*source);
-	return NSMakeSize(max.x * fontWidth, max.y * fontHeight);
+	return NSMakeSize(ceil((max.x * fontWidth) + (2 * [textContainer lineFragmentPadding])),
+					  ceil(max.y * fontHeight));
 }
 
 

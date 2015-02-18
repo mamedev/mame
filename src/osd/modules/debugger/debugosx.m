@@ -12,10 +12,9 @@
 
 // TODO:
 //  * Automatic scrolling for console and log views
-//  * Keyboard shortcuts in error log and devices windows
+//  * Keyboard shortcuts in error log and device windows
 //  * Don't accept keyboard input while the game is running
 //  * Interior focus rings - standard/exterior focus rings look really ugly here
-//  * Improve automatic window sizing - it isn't working all that well
 //  * Updates causing debug views' widths to change are sometimes obscured by the scroll views' opaque backgrounds
 //  * Scroll views with content narrower than clipping area are flaky under Tiger - nothing I can do about this
 
