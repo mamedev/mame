@@ -45,31 +45,31 @@ WRITE8_MEMBER(scotrsht_state::ctrl_w)
 	flip_screen_set(data & 0x08);
 }
 
-INTERRUPT_GEN_MEMBER(scotrsht_state::scotrsht_interrupt)
+INTERRUPT_GEN_MEMBER(scotrsht_state::interrupt)
 {
 	if (m_irq_enable)
-		device.execute().set_input_line(0, HOLD_LINE);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(scotrsht_state::scotrsht_soundlatch_w)
+WRITE8_MEMBER(scotrsht_state::soundlatch_w)
 {
 	soundlatch_byte_w(space, 0, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( scotrsht_map, AS_PROGRAM, 8, scotrsht_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(scotrsht_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(scotrsht_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_SHARE("spriteram") /* sprites */
 	AM_RANGE(0x10c0, 0x1fff) AM_RAM /* work ram */
 	AM_RANGE(0x2000, 0x201f) AM_RAM AM_SHARE("scroll") /* scroll registers */
 	AM_RANGE(0x2040, 0x2040) AM_WRITENOP
 	AM_RANGE(0x2041, 0x2041) AM_WRITENOP
 	AM_RANGE(0x2042, 0x2042) AM_WRITENOP  /* it should be -> bit 2 = scroll direction like in jailbrek, but it's not used */
-	AM_RANGE(0x2043, 0x2043) AM_WRITE(scotrsht_charbank_w)
+	AM_RANGE(0x2043, 0x2043) AM_WRITE(charbank_w)
 	AM_RANGE(0x2044, 0x2044) AM_WRITE(ctrl_w)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(scotrsht_palettebank_w)
-	AM_RANGE(0x3100, 0x3100) AM_WRITE(scotrsht_soundlatch_w)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(palettebank_w)
+	AM_RANGE(0x3100, 0x3100) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x3200, 0x3200) AM_WRITENOP /* it writes 0, 1 */
 	AM_RANGE(0x3100, 0x3100) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3200, 0x3200) AM_READ_PORT("DSW3")
@@ -182,7 +182,7 @@ static MACHINE_CONFIG_START( scotrsht, scotrsht_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 18432000/6)        /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(scotrsht_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", scotrsht_state,  scotrsht_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", scotrsht_state, interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 18432000/6)        /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(scotrsht_sound_map)
@@ -194,7 +194,7 @@ static MACHINE_CONFIG_START( scotrsht, scotrsht_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(scotrsht_state, screen_update_scotrsht)
+	MCFG_SCREEN_UPDATE_DRIVER(scotrsht_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scotrsht)
@@ -240,4 +240,4 @@ ROM_START( scotrsht )
 	ROM_LOAD( "gx545_6301_8f.bin", 0x0400, 0x0100, CRC(c1c7cf58) SHA1(08452228bf13e43ce4a05806f79e9cd1542416f1) ) /* sprites lookup */
 ROM_END
 
-GAME( 1985, scotrsht, 0, scotrsht, scotrsht, driver_device, 0, ROT90,"Konami", "Scooter Shooter", 0 )
+GAME( 1985, scotrsht, 0, scotrsht, scotrsht, driver_device, 0, ROT90,"Konami", "Scooter Shooter", GAME_SUPPORTS_SAVE )
