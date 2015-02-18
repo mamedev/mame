@@ -358,6 +358,23 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 }
 
 
+- (IBAction)paste:(id)sender {
+	NSPasteboard *const board = [NSPasteboard generalPasteboard];
+	NSString *const avail = [board availableTypeFromArray:[NSArray arrayWithObject:NSStringPboardType]];
+	if (avail == nil)
+	{
+		NSBeep();
+		return;
+	}
+
+	NSData *const data = [[board stringForType:avail] dataUsingEncoding:NSASCIIStringEncoding
+												   allowLossyConversion:YES];
+	char const *const bytes = (char const *)[data bytes];
+	for (NSUInteger i = 0, l = [data length]; i < l; i++)
+		view->process_char(bytes[i]);
+}
+
+
 - (void)windowDidBecomeKey:(NSNotification *)notification {
 	NSWindow *win = [notification object];
 	if ((win == [self window]) && ([win firstResponder] == self) && view->cursor_supported())
@@ -377,6 +394,11 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 	item = [menu addItemWithTitle:@"Copy Visible"
 						   action:@selector(copyVisible:)
+					keyEquivalent:@""];
+	[item setTarget:self];
+
+	item = [menu addItemWithTitle:@"Paste"
+						   action:@selector(paste:)
 					keyEquivalent:@""];
 	[item setTarget:self];
 }
@@ -650,6 +672,21 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 			if ((ch >= 32) && (ch < 127))
 				[self typeCharacterAndScrollToCursor:ch];
 		}
+	}
+}
+
+
+- (BOOL)validateMenuItem:(NSMenuItem *)item {
+	SEL	action = [item action];
+
+	if (action == @selector(paste:))
+	{
+		NSPasteboard *const board = [NSPasteboard generalPasteboard];
+		return [board availableTypeFromArray:[NSArray arrayWithObject:NSStringPboardType]] != nil;
+	}
+	else
+	{
+		return YES;
 	}
 }
 

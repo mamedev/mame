@@ -38,7 +38,7 @@
 	}
 	else
 	{
-		return YES;
+		return [super validateMenuItem:item];
 	}
 }
 

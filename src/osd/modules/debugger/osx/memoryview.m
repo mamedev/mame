@@ -34,16 +34,23 @@
 	NSInteger			tag = [item tag];
 	debug_view_memory	*memview = downcast<debug_view_memory *>(view);
 
-	if (action == @selector(showChunkSize:)) {
+	if (action == @selector(showChunkSize:))
+	{
 		[item setState:((tag == memview->bytes_per_chunk()) ? NSOnState : NSOffState)];
-	} else if (action == @selector(showPhysicalAddresses:)) {
+	}
+	else if (action == @selector(showPhysicalAddresses:))
+	{
 		[item setState:((tag == memview->physical()) ? NSOnState : NSOffState)];
-	} else if (action == @selector(showReverseView:)) {
+	}
+	else if (action == @selector(showReverseView:))
+	{
 		[item setState:((tag == memview->reverse()) ? NSOnState : NSOffState)];
-	} else if (action == @selector(showReverseViewToggle:)) {
+	}
+	else if (action == @selector(showReverseViewToggle:))
+	{
 		[item setState:(memview->reverse() ? NSOnState : NSOffState)];
 	}
-	return YES;
+	return [super validateMenuItem:item];
 }
 
 
