@@ -54,34 +54,34 @@
 
 	<!-- score panel -->
 
-		<bezel element="static_white"><bounds x="0" y="0.9" width="5" height="0.1" /></bezel>
+		<bezel element="static_white"><bounds x="0" y="0.9" width="4" height="0.1" /></bezel>
 		<bezel element="static_white"><bounds x="0" y="2" width="11" height="0.1" /></bezel>
 		<bezel element="static_white"><bounds x="0" y="4.4" width="11" height="0.1" /></bezel>
 
+		<bezel element="static_white"><bounds x="0.95" y="0.95" width="0.1" height="1.1" /></bezel>
 		<bezel element="static_white"><bounds x="1.95" y="0.95" width="0.1" height="1.1" /></bezel>
 		<bezel element="static_white"><bounds x="2.95" y="0.95" width="0.1" height="1.1" /></bezel>
-		<bezel element="static_white"><bounds x="3.95" y="0.95" width="0.1" height="1.1" /></bezel>
-		<bezel element="static_white"><bounds x="4.95" y="0" width="0.1" height="2.05" /></bezel>
-		<bezel element="static_white"><bounds x="7.95" y="0" width="0.1" height="2.05" /></bezel>
+		<bezel element="static_white"><bounds x="3.95" y="0" width="0.1" height="2.05" /></bezel>
+		<bezel element="static_white"><bounds x="6.95" y="0" width="0.1" height="2.05" /></bezel>
 
-		<bezel element="text_1"><bounds x="1" y="1" width="1" height="1" /></bezel>
-		<bezel element="text_2"><bounds x="2" y="1" width="1" height="1" /></bezel>
-		<bezel element="text_3"><bounds x="3" y="1" width="1" height="1" /></bezel>
-		<bezel element="text_4"><bounds x="4" y="1" width="1" height="1" /></bezel>
+		<bezel element="text_1"><bounds x="0" y="1" width="1" height="1" /></bezel>
+		<bezel element="text_2"><bounds x="1" y="1" width="1" height="1" /></bezel>
+		<bezel element="text_3"><bounds x="2" y="1" width="1" height="1" /></bezel>
+		<bezel element="text_4"><bounds x="3" y="1" width="1" height="1" /></bezel>
 
-		<bezel element="text_home"><bounds x="5" y="1" width="3" height="1" /></bezel>
-		<bezel element="text_visitor"><bounds x="8" y="1" width="3" height="1" /></bezel>
+		<bezel element="text_home"><bounds x="4" y="1" width="3" height="1" /></bezel>
+		<bezel element="text_visitor"><bounds x="7" y="1" width="4" height="1" /></bezel>
 
 
-		<bezel name="lamp77" element="led"><bounds x="1" y="3" width="1" height="1" /></bezel>
-		<bezel name="lamp87" element="led"><bounds x="2" y="3" width="1" height="1" /></bezel>
-		<bezel name="lamp97" element="led"><bounds x="3" y="3" width="1" height="1" /></bezel>
-		<bezel name="lamp57" element="led"><bounds x="4" y="3" width="1" height="1" /></bezel>
+		<bezel name="lamp77" element="led"><bounds x="0" y="3" width="1" height="1" /></bezel>
+		<bezel name="lamp87" element="led"><bounds x="1" y="3" width="1" height="1" /></bezel>
+		<bezel name="lamp97" element="led"><bounds x="2" y="3" width="1" height="1" /></bezel>
+		<bezel name="lamp57" element="led"><bounds x="3" y="3" width="1" height="1" /></bezel>
 
-		<bezel name="digit5" element="digit"><bounds x="5.5" y="2.5" width="1" height="1.5" /></bezel>
-		<bezel name="digit9" element="digit"><bounds x="6.5" y="2.5" width="1" height="1.5" /></bezel>
-		<bezel name="digit8" element="digit"><bounds x="8.5" y="2.5" width="1" height="1.5" /></bezel>
-		<bezel name="digit7" element="digit"><bounds x="9.5" y="2.5" width="1" height="1.5" /></bezel>
+		<bezel name="digit5" element="digit"><bounds x="4.5" y="2.5" width="1" height="1.5" /></bezel>
+		<bezel name="digit9" element="digit"><bounds x="5.5" y="2.5" width="1" height="1.5" /></bezel>
+		<bezel name="digit8" element="digit"><bounds x="7.5" y="2.5" width="1" height="1.5" /></bezel>
+		<bezel name="digit7" element="digit"><bounds x="8.5" y="2.5" width="1" height="1.5" /></bezel>
 
 
 
