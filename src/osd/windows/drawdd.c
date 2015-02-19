@@ -58,7 +58,7 @@ public:
 		//ddcaps(0),
 		//helcaps(0),
 		membuffer(NULL),
-		membuffersize(NULL)
+		membuffersize(0)
 	{ }
 
 	virtual ~renderer_dd() { }
