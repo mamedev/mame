@@ -8,14 +8,9 @@
   This is a head to head electronic tabletop LED-display sports console.
   One cartridge(Football) was included with the console, the other three were
   sold separately. Gameplay has emphasis on strategy, read the official manual
-  on how to play. Remember that you can rotate the view in MESS.
+  on how to play. Remember that you can rotate the view in MESS: rotate left
+  for Home(P1) orientation, rotate right for Visitor(P2) orientation.
   
-  Available cartridges:
-  - Football
-  - Basketball
-  - Hockey
-  - Soccer
-
   Cartridge socket:
   1 N/C
   2 9V+
@@ -26,11 +21,18 @@
   7 K1
   8 R9
   
-  Football cartridge connects pins 4 and 8
+  The cartridge connects pin 8 with one of the K-pins.
+
+  Available cartridges:
+  - Football    (K8, confirmed)
+  - Hockey      (K4?)
+  - Soccer      (K2?)
+  - Basketball  (K1?)
 
 
   TODO:
   - pin configuration of other carts is guessed
+  - softlist for the cartridges?
   - offsensive players leds are supposed to look brighter
   - MCU clock is unknown
 
@@ -238,10 +240,11 @@ static INPUT_PORTS_START( tc4 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 D/K Button")
 
 	PORT_START("IN.6") // R9
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "R9:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "R9:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "R9:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "R9:4" )
+	PORT_CONFNAME( 0x0f, 0x08, "Cartridge")
+	PORT_CONFSETTING(    0x01, "Basketball" )
+	PORT_CONFSETTING(    0x02, "Soccer" )
+	PORT_CONFSETTING(    0x04, "Hockey" )
+	PORT_CONFSETTING(    0x08, "Football" )
 INPUT_PORTS_END
 
 
@@ -311,4 +314,4 @@ ROM_START( tc4 )
 ROM_END
 
 
-CONS( 1981, tc4, 0, 0, tc4, tc4, driver_device, 0, "Coleco", "Total Control 4", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+CONS( 1981, tc4, 0, 0, tc4, tc4, driver_device, 0, "Coleco", "Total Control 4", GAME_SUPPORTS_SAVE )
