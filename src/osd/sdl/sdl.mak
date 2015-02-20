@@ -728,7 +728,7 @@ endif # OS2
 
 ifndef NO_USE_QTDEBUG
 $(OSDOBJ)/%.moc.c: $(OSDSRC)/%.h
-	$(MOC) $(MOCINCPATH) $(DEFS) $< -o $@
+	$(MOC) $(MOCINCPATH) $< -o $@
 
 DEBUGOBJS = \
 	$(OSDOBJ)/modules/debugger/qt/debuggerview.o \

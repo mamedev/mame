@@ -432,7 +432,7 @@ INCPATH += -I$(QT_INSTALL_HEADERS)/QtCore -I$(QT_INSTALL_HEADERS)/QtGui -I$(QT_I
 
 MOC = @moc
 $(OSDOBJ)/%.moc.c: $(OSDSRC)/%.h
-	$(MOC) $(INCPATH) $(DEFS) $< -o $@
+	$(MOC) $(INCPATH) $< -o $@
 
 OSDOBJS += \
 	$(OSDOBJ)/modules/debugger/qt/debugqtview.o \
