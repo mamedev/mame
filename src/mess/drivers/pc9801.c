@@ -1896,7 +1896,7 @@ WRITE8_MEMBER(pc9801_state::grcg_w)
 	else if(offset == 7)
 	{
 //      logerror("%02x GRCG TILE %02x\n",data,m_grcg.tile_index);
-		m_grcg.tile[m_grcg.tile_index] = BITSWAP16(data,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
+		m_grcg.tile[m_grcg.tile_index] = BITSWAP16((UINT16) data,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 		m_grcg.tile_index ++;
 		m_grcg.tile_index &= 3;
 		return;
