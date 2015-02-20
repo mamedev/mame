@@ -51,11 +51,10 @@ f80b      ????
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
-#include "sound/msm5205.h"
 #include "includes/tecmo.h"
 
 
-WRITE8_MEMBER(tecmo_state::tecmo_bankswitch_w)
+WRITE8_MEMBER(tecmo_state::bankswitch_w)
 {
 	int bankaddress;
 	UINT8 *RAM = memregion("maincpu")->base();
@@ -65,34 +64,34 @@ WRITE8_MEMBER(tecmo_state::tecmo_bankswitch_w)
 	membank("bank1")->set_base(&RAM[bankaddress]);
 }
 
-WRITE8_MEMBER(tecmo_state::tecmo_sound_command_w)
+WRITE8_MEMBER(tecmo_state::sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
 	m_soundcpu->set_input_line(INPUT_LINE_NMI,ASSERT_LINE);
 }
 
-WRITE8_MEMBER(tecmo_state::tecmo_nmi_ack_w)
+WRITE8_MEMBER(tecmo_state::nmi_ack_w)
 {
 	m_soundcpu->set_input_line(INPUT_LINE_NMI,CLEAR_LINE);
 }
 
-WRITE8_MEMBER(tecmo_state::tecmo_adpcm_start_w)
+WRITE8_MEMBER(tecmo_state::adpcm_start_w)
 {
 	m_adpcm_pos = data << 8;
 	m_msm->reset_w(0);
 }
 
-WRITE8_MEMBER(tecmo_state::tecmo_adpcm_end_w)
+WRITE8_MEMBER(tecmo_state::adpcm_end_w)
 {
 	m_adpcm_end = (data + 1) << 8;
 }
 
-WRITE8_MEMBER(tecmo_state::tecmo_adpcm_vol_w)
+WRITE8_MEMBER(tecmo_state::adpcm_vol_w)
 {
 	m_msm->set_volume((data & 0x0f) * 100 / 15);
 }
 
-WRITE_LINE_MEMBER(tecmo_state::tecmo_adpcm_int)
+WRITE_LINE_MEMBER(tecmo_state::adpcm_int)
 {
 	if (m_adpcm_pos >= m_adpcm_end ||
 				m_adpcm_pos >= memregion("adpcm")->bytes())
@@ -112,28 +111,28 @@ WRITE_LINE_MEMBER(tecmo_state::tecmo_adpcm_int)
 }
 
 /* the 8-bit dipswitches are split across addresses */
-READ8_MEMBER(tecmo_state::tecmo_dswa_l_r)
+READ8_MEMBER(tecmo_state::dswa_l_r)
 {
 	UINT8 port = ioport("DSWA")->read();
 	port &= 0x0f;
 	return port;
 }
 
-READ8_MEMBER(tecmo_state::tecmo_dswa_h_r)
+READ8_MEMBER(tecmo_state::dswa_h_r)
 {
 	UINT8 port = ioport("DSWA")->read();
 	port &= 0xf0;
 	return port>>4;
 }
 
-READ8_MEMBER(tecmo_state::tecmo_dswb_l_r)
+READ8_MEMBER(tecmo_state::dswb_l_r)
 {
 	UINT8 port = ioport("DSWB")->read();
 	port &= 0x0f;
 	return port;
 }
 
-READ8_MEMBER(tecmo_state::tecmo_dswb_h_r)
+READ8_MEMBER(tecmo_state::dswb_h_r)
 {
 	UINT8 port = ioport("DSWB")->read();
 	port &= 0xf0;
@@ -144,9 +143,9 @@ READ8_MEMBER(tecmo_state::tecmo_dswb_h_r)
 static ADDRESS_MAP_START( rygar_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(tecmo_txvideoram_w) AM_SHARE("txvideoram")
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(tecmo_fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(tecmo_bgvideoram_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
@@ -156,25 +155,25 @@ static ADDRESS_MAP_START( rygar_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xf803, 0xf803) AM_READ_PORT("BUTTONS2")
 	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("SYS_0")
 	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("SYS_1")
-	AM_RANGE(0xf806, 0xf806) AM_READ(tecmo_dswa_l_r)
-	AM_RANGE(0xf807, 0xf807) AM_READ(tecmo_dswa_h_r)
-	AM_RANGE(0xf808, 0xf808) AM_READ(tecmo_dswb_l_r)
-	AM_RANGE(0xf809, 0xf809) AM_READ(tecmo_dswb_h_r)
+	AM_RANGE(0xf806, 0xf806) AM_READ(dswa_l_r)
+	AM_RANGE(0xf807, 0xf807) AM_READ(dswa_h_r)
+	AM_RANGE(0xf808, 0xf808) AM_READ(dswb_l_r)
+	AM_RANGE(0xf809, 0xf809) AM_READ(dswb_h_r)
 	AM_RANGE(0xf80f, 0xf80f) AM_READ_PORT("SYS_2")
-	AM_RANGE(0xf800, 0xf802) AM_WRITE(tecmo_fgscroll_w)
-	AM_RANGE(0xf803, 0xf805) AM_WRITE(tecmo_bgscroll_w)
-	AM_RANGE(0xf806, 0xf806) AM_WRITE(tecmo_sound_command_w)
-	AM_RANGE(0xf807, 0xf807) AM_WRITE(tecmo_flipscreen_w)
-	AM_RANGE(0xf808, 0xf808) AM_WRITE(tecmo_bankswitch_w)
+	AM_RANGE(0xf800, 0xf802) AM_WRITE(fgscroll_w)
+	AM_RANGE(0xf803, 0xf805) AM_WRITE(bgscroll_w)
+	AM_RANGE(0xf806, 0xf806) AM_WRITE(sound_command_w)
+	AM_RANGE(0xf807, 0xf807) AM_WRITE(flipscreen_w)
+	AM_RANGE(0xf808, 0xf808) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xf80b, 0xf80b) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gemini_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(tecmo_txvideoram_w) AM_SHARE("txvideoram")
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(tecmo_fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(tecmo_bgvideoram_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
@@ -184,24 +183,24 @@ static ADDRESS_MAP_START( gemini_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xf803, 0xf803) AM_READ_PORT("BUTTONS2")
 	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("SYS_0")
 	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("SYS_1")
-	AM_RANGE(0xf806, 0xf806) AM_READ(tecmo_dswa_l_r)
-	AM_RANGE(0xf807, 0xf807) AM_READ(tecmo_dswa_h_r)
-	AM_RANGE(0xf808, 0xf808) AM_READ(tecmo_dswb_l_r)
-	AM_RANGE(0xf809, 0xf809) AM_READ(tecmo_dswb_h_r)
+	AM_RANGE(0xf806, 0xf806) AM_READ(dswa_l_r)
+	AM_RANGE(0xf807, 0xf807) AM_READ(dswa_h_r)
+	AM_RANGE(0xf808, 0xf808) AM_READ(dswb_l_r)
+	AM_RANGE(0xf809, 0xf809) AM_READ(dswb_h_r)
 	AM_RANGE(0xf80f, 0xf80f) AM_READ_PORT("SYS_2")
-	AM_RANGE(0xf800, 0xf802) AM_WRITE(tecmo_fgscroll_w)
-	AM_RANGE(0xf803, 0xf805) AM_WRITE(tecmo_bgscroll_w)
-	AM_RANGE(0xf806, 0xf806) AM_WRITE(tecmo_sound_command_w)
-	AM_RANGE(0xf807, 0xf807) AM_WRITE(tecmo_flipscreen_w)
-	AM_RANGE(0xf808, 0xf808) AM_WRITE(tecmo_bankswitch_w)
+	AM_RANGE(0xf800, 0xf802) AM_WRITE(fgscroll_w)
+	AM_RANGE(0xf803, 0xf805) AM_WRITE(bgscroll_w)
+	AM_RANGE(0xf806, 0xf806) AM_WRITE(sound_command_w)
+	AM_RANGE(0xf807, 0xf807) AM_WRITE(flipscreen_w)
+	AM_RANGE(0xf808, 0xf808) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xf80b, 0xf80b) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( silkworm_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(tecmo_bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(tecmo_fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(tecmo_txvideoram_w) AM_SHARE("txvideoram")
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -212,16 +211,16 @@ static ADDRESS_MAP_START( silkworm_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xf803, 0xf803) AM_READ_PORT("BUTTONS2")
 	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("SYS_0")
 	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("SYS_1")
-	AM_RANGE(0xf806, 0xf806) AM_READ(tecmo_dswa_l_r)
-	AM_RANGE(0xf807, 0xf807) AM_READ(tecmo_dswa_h_r)
-	AM_RANGE(0xf808, 0xf808) AM_READ(tecmo_dswb_l_r)
-	AM_RANGE(0xf809, 0xf809) AM_READ(tecmo_dswb_h_r)
+	AM_RANGE(0xf806, 0xf806) AM_READ(dswa_l_r)
+	AM_RANGE(0xf807, 0xf807) AM_READ(dswa_h_r)
+	AM_RANGE(0xf808, 0xf808) AM_READ(dswb_l_r)
+	AM_RANGE(0xf809, 0xf809) AM_READ(dswb_h_r)
 	AM_RANGE(0xf80f, 0xf80f) AM_READ_PORT("SYS_2")
-	AM_RANGE(0xf800, 0xf802) AM_WRITE(tecmo_fgscroll_w)
-	AM_RANGE(0xf803, 0xf805) AM_WRITE(tecmo_bgscroll_w)
-	AM_RANGE(0xf806, 0xf806) AM_WRITE(tecmo_sound_command_w)
-	AM_RANGE(0xf807, 0xf807) AM_WRITE(tecmo_flipscreen_w)
-	AM_RANGE(0xf808, 0xf808) AM_WRITE(tecmo_bankswitch_w)
+	AM_RANGE(0xf800, 0xf802) AM_WRITE(fgscroll_w)
+	AM_RANGE(0xf803, 0xf805) AM_WRITE(bgscroll_w)
+	AM_RANGE(0xf806, 0xf806) AM_WRITE(sound_command_w)
+	AM_RANGE(0xf807, 0xf807) AM_WRITE(flipscreen_w)
+	AM_RANGE(0xf808, 0xf808) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xf809, 0xf809) AM_WRITENOP    /* ? */
 	AM_RANGE(0xf80b, 0xf80b) AM_WRITENOP    /* ? if mapped to watchdog like in the others, causes reset */
 ADDRESS_MAP_END
@@ -230,10 +229,10 @@ static ADDRESS_MAP_START( rygar_sound_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ymsnd", ym3812_device, write)
-	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r) AM_WRITE(tecmo_adpcm_start_w)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(tecmo_adpcm_end_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(tecmo_adpcm_vol_w)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(tecmo_nmi_ack_w)
+	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r) AM_WRITE(adpcm_start_w)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(adpcm_end_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(adpcm_vol_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(nmi_ack_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tecmo_sound_map, AS_PROGRAM, 8, tecmo_state )
@@ -242,10 +241,10 @@ static ADDRESS_MAP_START( tecmo_sound_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ymsnd", ym3812_device, write)
-	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r) AM_WRITE(tecmo_adpcm_start_w)
-	AM_RANGE(0xc400, 0xc400) AM_WRITE(tecmo_adpcm_end_w)
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(tecmo_adpcm_vol_w)
-	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(tecmo_nmi_ack_w)
+	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r) AM_WRITE(adpcm_start_w)
+	AM_RANGE(0xc400, 0xc400) AM_WRITE(adpcm_end_w)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(adpcm_vol_w)
+	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(nmi_ack_w)
 ADDRESS_MAP_END
 
 
@@ -600,7 +599,14 @@ static GFXDECODE_START( tecmo )
 GFXDECODE_END
 
 
-MACHINE_RESET_MEMBER(tecmo_state,rygar)
+void tecmo_state::machine_start()
+{
+	save_item(NAME(m_adpcm_pos));
+	save_item(NAME(m_adpcm_end));
+	save_item(NAME(m_adpcm_data));
+}
+
+void tecmo_state::machine_reset()
 {
 	m_adpcm_pos = 0;
 	m_adpcm_end = 0;
@@ -623,7 +629,7 @@ static MACHINE_CONFIG_START( rygar, tecmo_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)  /* frames per second, vblank duration */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tecmo_state, screen_update_tecmo)
+	MCFG_SCREEN_UPDATE_DRIVER(tecmo_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tecmo)
@@ -633,10 +639,6 @@ static MACHINE_CONFIG_START( rygar, tecmo_state )
 
 	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
 
-	MCFG_VIDEO_START_OVERRIDE(tecmo_state,tecmo)
-
-	MCFG_MACHINE_RESET_OVERRIDE(tecmo_state, rygar )
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -645,7 +647,7 @@ static MACHINE_CONFIG_START( rygar, tecmo_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb, even if schematics shows a 384khz resonator */
-	MCFG_MSM5205_VCLK_CB(WRITELINE(tecmo_state, tecmo_adpcm_int))    /* interrupt function */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(tecmo_state, adpcm_int))    /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -671,47 +673,11 @@ static MACHINE_CONFIG_DERIVED( silkworm, gemini )
 	MCFG_CPU_PROGRAM_MAP(silkworm_map)
 MACHINE_CONFIG_END
 
-#ifdef UNUSED_CODE
-static MACHINE_CONFIG_START( backfirt, tecmo_state )
+static MACHINE_CONFIG_DERIVED( backfirt, gemini )
 
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)
-	MCFG_CPU_PROGRAM_MAP(rygar_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tecmo_state,  irq0_line_hold)
-
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_8MHz/2)
-	MCFG_CPU_PROGRAM_MAP(rygar_sound_map)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)  /* frames per second, vblank duration */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tecmo_state, screen_update_tecmo)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tecmo)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
-
-	MCFG_VIDEO_START_OVERRIDE(tecmo_state,tecmo)
-
-	MCFG_MACHINE_RESET_OVERRIDE(tecmo_state, rygar )
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz) /* verified on pcb */
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	/* no MSM on this PCB */
-
+	/* this pcb has no MSM5205 */
+	MCFG_DEVICE_REMOVE("msm")
 MACHINE_CONFIG_END
-#endif
-
 /***************************************************************************
 
   Game driver(s)
@@ -1065,9 +1031,6 @@ ROM_START( backfirt )
 	ROM_LOAD( "b16-s2.bin",  0x10000, 0x10000, CRC(6e4052c9) SHA1(e2e3d7221b75cb044449a25a076a93c3def1f11b) )   /* tiles #2 */
 	ROM_LOAD( "b15-s2.bin",  0x20000, 0x10000, CRC(2b6cc20e) SHA1(4815819288753400935836cc1b0b69f4c4b43ddc) )   /* tiles #2 */
 	ROM_LOAD( "b14-s3.bin",  0x30000, 0x08000, CRC(4d29637a) SHA1(28e85925138256b8ce5a1c4a5df5b219b1b6b197) )   /* tiles #2 */ // half size is correct, rom type 27256
-
-	ROM_REGION( 0x8000, "adpcm", ROMREGION_ERASE00 )    /* ADPCM samples */
-//  ROM_LOAD( "silkworm.1",   0x0000, 0x8000, CRC(5b553644) SHA1(5d39d2251094c17f7b732b4861401b3516fce9b1) )
 ROM_END
 
 ROM_START( gemini )
@@ -1138,11 +1101,11 @@ DRIVER_INIT_MEMBER(tecmo_state,backfirt)
 
 
 
-GAME( 1986, rygar,     0,        rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Rygar (US set 1)", 0 )
-GAME( 1986, rygar2,    rygar,    rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Rygar (US set 2)", 0 )
-GAME( 1986, rygar3,    rygar,    rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Rygar (US set 3 Old Version)", 0 )
-GAME( 1986, rygarj,    rygar,    rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Argus no Senshi (Japan)", 0 )
-GAME( 1987, gemini,    0,        gemini,   gemini, tecmo_state,   gemini,   ROT90, "Tecmo", "Gemini Wing (Japan)", 0 ) /* Japan regional warning screen */
-GAME( 1988, silkworm,  0,        silkworm, silkworm, tecmo_state, silkworm, ROT0,  "Tecmo", "Silk Worm (World)", 0 )   /* No regional "Warning, if you are playing ..." screen */
-GAME( 1988, silkwormj, silkworm, silkworm, silkworm, tecmo_state, silkworm, ROT0,  "Tecmo", "Silk Worm (Japan)", 0 )   /* Japan regional warning screen */
-GAME( 1988, backfirt,  0,        gemini,   backfirt, tecmo_state, backfirt, ROT0,  "Tecmo", "Back Fire (Tecmo, bootleg)", 0 )
+GAME( 1986, rygar,     0,        rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Rygar (US set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, rygar2,    rygar,    rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Rygar (US set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, rygar3,    rygar,    rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Rygar (US set 3 Old Version)", GAME_SUPPORTS_SAVE )
+GAME( 1986, rygarj,    rygar,    rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Argus no Senshi (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, gemini,    0,        gemini,   gemini, tecmo_state,   gemini,   ROT90, "Tecmo", "Gemini Wing (Japan)", GAME_SUPPORTS_SAVE ) /* Japan regional warning screen */
+GAME( 1988, silkworm,  0,        silkworm, silkworm, tecmo_state, silkworm, ROT0,  "Tecmo", "Silk Worm (World)", GAME_SUPPORTS_SAVE )   /* No regional "Warning, if you are playing ..." screen */
+GAME( 1988, silkwormj, silkworm, silkworm, silkworm, tecmo_state, silkworm, ROT0,  "Tecmo", "Silk Worm (Japan)", GAME_SUPPORTS_SAVE )   /* Japan regional warning screen */
+GAME( 1988, backfirt,  0,        backfirt, backfirt, tecmo_state, backfirt, ROT0,  "Tecmo", "Back Fire (Tecmo, bootleg)", GAME_SUPPORTS_SAVE )

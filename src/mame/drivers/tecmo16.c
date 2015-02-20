@@ -32,7 +32,7 @@ Notes:
 
 /******************************************************************************/
 
-WRITE16_MEMBER(tecmo16_state::tecmo16_sound_command_w)
+WRITE16_MEMBER(tecmo16_state::sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -46,49 +46,49 @@ WRITE16_MEMBER(tecmo16_state::tecmo16_sound_command_w)
 static ADDRESS_MAP_START( fstarfrc_map, AS_PROGRAM, 16, tecmo16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM /* Main RAM */
-	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(tecmo16_charram_w) AM_SHARE("charram")
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(tecmo16_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x120800, 0x120fff) AM_RAM_WRITE(tecmo16_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x121000, 0x1217ff) AM_RAM_WRITE(tecmo16_videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x121800, 0x121fff) AM_RAM_WRITE(tecmo16_colorram2_w) AM_SHARE("colorram2")
+	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(charram_w) AM_SHARE("charram")
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x120800, 0x120fff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x121000, 0x1217ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0x121800, 0x121fff) AM_RAM_WRITE(colorram2_w) AM_SHARE("colorram2")
 	AM_RANGE(0x122000, 0x127fff) AM_RAM /* work area */
 	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x140000, 0x141fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x150000, 0x150001) AM_WRITE(tecmo16_flipscreen_w)
-	AM_RANGE(0x150010, 0x150011) AM_WRITE(tecmo16_sound_command_w)
+	AM_RANGE(0x150000, 0x150001) AM_WRITE(flipscreen_w)
+	AM_RANGE(0x150010, 0x150011) AM_WRITE(sound_command_w)
 	AM_RANGE(0x150030, 0x150031) AM_READ_PORT("DSW2") AM_WRITENOP   /* ??? */
 	AM_RANGE(0x150040, 0x150041) AM_READ_PORT("DSW1")
 	AM_RANGE(0x150050, 0x150051) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x160000, 0x160001) AM_WRITE(tecmo16_scroll_char_x_w)
-	AM_RANGE(0x16000c, 0x16000d) AM_WRITE(tecmo16_scroll_x_w)
-	AM_RANGE(0x160012, 0x160013) AM_WRITE(tecmo16_scroll_y_w)
-	AM_RANGE(0x160018, 0x160019) AM_WRITE(tecmo16_scroll2_x_w)
-	AM_RANGE(0x16001e, 0x16001f) AM_WRITE(tecmo16_scroll2_y_w)
+	AM_RANGE(0x160000, 0x160001) AM_WRITE(scroll_char_x_w)
+	AM_RANGE(0x16000c, 0x16000d) AM_WRITE(scroll_x_w)
+	AM_RANGE(0x160012, 0x160013) AM_WRITE(scroll_y_w)
+	AM_RANGE(0x160018, 0x160019) AM_WRITE(scroll2_x_w)
+	AM_RANGE(0x16001e, 0x16001f) AM_WRITE(scroll2_y_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ginkun_map, AS_PROGRAM, 16, tecmo16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM /* Main RAM */
-	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(tecmo16_charram_w) AM_SHARE("charram")
-	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE(tecmo16_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x121000, 0x121fff) AM_RAM_WRITE(tecmo16_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x122000, 0x122fff) AM_RAM_WRITE(tecmo16_videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x123000, 0x123fff) AM_RAM_WRITE(tecmo16_colorram2_w) AM_SHARE("colorram2")
+	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(charram_w) AM_SHARE("charram")
+	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x121000, 0x121fff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x122000, 0x122fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0x123000, 0x123fff) AM_RAM_WRITE(colorram2_w) AM_SHARE("colorram2")
 	AM_RANGE(0x124000, 0x124fff) AM_RAM /* extra RAM for Riot */
 	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x140000, 0x141fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x150000, 0x150001) AM_WRITE(tecmo16_flipscreen_w)
-	AM_RANGE(0x150010, 0x150011) AM_WRITE(tecmo16_sound_command_w)
+	AM_RANGE(0x150000, 0x150001) AM_WRITE(flipscreen_w)
+	AM_RANGE(0x150010, 0x150011) AM_WRITE(sound_command_w)
 	AM_RANGE(0x150020, 0x150021) AM_READ_PORT("EXTRA") AM_WRITENOP  /* ??? */
 	AM_RANGE(0x150030, 0x150031) AM_READ_PORT("DSW2") AM_WRITENOP   /* ??? */
 	AM_RANGE(0x150040, 0x150041) AM_READ_PORT("DSW1")
 	AM_RANGE(0x150050, 0x150051) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x160000, 0x160001) AM_WRITE(tecmo16_scroll_char_x_w)
-	AM_RANGE(0x160006, 0x160007) AM_WRITE(tecmo16_scroll_char_y_w)
-	AM_RANGE(0x16000c, 0x16000d) AM_WRITE(tecmo16_scroll_x_w)
-	AM_RANGE(0x160012, 0x160013) AM_WRITE(tecmo16_scroll_y_w)
-	AM_RANGE(0x160018, 0x160019) AM_WRITE(tecmo16_scroll2_x_w)
-	AM_RANGE(0x16001e, 0x16001f) AM_WRITE(tecmo16_scroll2_y_w)
+	AM_RANGE(0x160000, 0x160001) AM_WRITE(scroll_char_x_w)
+	AM_RANGE(0x160006, 0x160007) AM_WRITE(scroll_char_y_w)
+	AM_RANGE(0x16000c, 0x16000d) AM_WRITE(scroll_x_w)
+	AM_RANGE(0x160012, 0x160013) AM_WRITE(scroll_y_w)
+	AM_RANGE(0x160018, 0x160019) AM_WRITE(scroll2_x_w)
+	AM_RANGE(0x16001e, 0x16001f) AM_WRITE(scroll2_y_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tecmo16_state )
@@ -382,7 +382,7 @@ static MACHINE_CONFIG_START( fstarfrc, tecmo16_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tecmo16_state, screen_update_tecmo16)
+	MCFG_SCREEN_UPDATE_DRIVER(tecmo16_state, screen_update)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tecmo16)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 4096)
@@ -629,7 +629,7 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1992, fstarfrc,  0,        fstarfrc, fstarfrc, driver_device, 0, ROT90, "Tecmo", "Final Star Force (US)", 0 )
-GAME( 1992, fstarfrcj, fstarfrc, fstarfrc, fstarfrc, driver_device, 0, ROT90, "Tecmo", "Final Star Force (Japan)", 0 )
-GAME( 1992, riot,      0,        riot,     riot, driver_device,     0, ROT0,  "NMK",   "Riot", 0 )
-GAME( 1995, ginkun,    0,        ginkun,   ginkun, driver_device,   0, ROT0,  "Tecmo", "Ganbare Ginkun", 0 )
+GAME( 1992, fstarfrc,  0,        fstarfrc, fstarfrc, driver_device, 0, ROT90, "Tecmo", "Final Star Force (US)", GAME_SUPPORTS_SAVE )
+GAME( 1992, fstarfrcj, fstarfrc, fstarfrc, fstarfrc, driver_device, 0, ROT90, "Tecmo", "Final Star Force (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, riot,      0,        riot,     riot, driver_device,     0, ROT0,  "NMK",   "Riot", GAME_SUPPORTS_SAVE )
+GAME( 1995, ginkun,    0,        ginkun,   ginkun, driver_device,   0, ROT0,  "Tecmo", "Ganbare Ginkun", GAME_SUPPORTS_SAVE )
