@@ -27,7 +27,7 @@ logwin_info::logwin_info(debugger_windows_interface &debugger) :
 	// compute a client rect
 	RECT bounds;
 	bounds.top = bounds.left = 0;
-	bounds.right = m_views[0]->prefwidth() + (2 * EDGE_WIDTH);
+	bounds.right = m_views[0]->maxwidth() + (2 * EDGE_WIDTH);
 	bounds.bottom = 200;
 	AdjustWindowRectEx(&bounds, DEBUG_WINDOW_STYLE, FALSE, DEBUG_WINDOW_STYLE_EX);
 
@@ -44,26 +44,4 @@ logwin_info::logwin_info(debugger_windows_interface &debugger) :
 
 logwin_info::~logwin_info()
 {
-}
-
-
-void logwin_info::recompute_children()
-{
-	// compute a client rect
-	RECT bounds;
-	bounds.top = bounds.left = 0;
-	bounds.right = m_views[0]->maxwidth() + (2 * EDGE_WIDTH);
-	bounds.bottom = 200;
-	AdjustWindowRectEx(&bounds, DEBUG_WINDOW_STYLE, FALSE, DEBUG_WINDOW_STYLE_EX);
-
-	// clamp the min/max size
-	set_maxwidth(bounds.right - bounds.left);
-
-	// get the parent's dimensions
-	RECT parent;
-	GetClientRect(window(), &parent);
-
-	// view gets the remaining space
-	InflateRect(&parent, -EDGE_WIDTH, -EDGE_WIDTH);
-	m_views[0]->set_bounds(parent);
 }

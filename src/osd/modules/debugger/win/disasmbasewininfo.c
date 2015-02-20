@@ -60,15 +60,15 @@ bool disasmbasewin_info::handle_key(WPARAM wparam, LPARAM lparam)
 		{
 		case 'R':
 			SendMessage(window(), WM_COMMAND, ID_SHOW_RAW, 0);
-			return 1;
+			return true;
 
 		case 'E':
 			SendMessage(window(), WM_COMMAND, ID_SHOW_ENCRYPTED, 0);
-			return 1;
+			return true;
 
 		case 'N':
 			SendMessage(window(), WM_COMMAND, ID_SHOW_COMMENTS, 0);
-			return 1;
+			return true;
 		}
 	}
 
@@ -77,17 +77,17 @@ bool disasmbasewin_info::handle_key(WPARAM wparam, LPARAM lparam)
 	/* ajg - steals the F4 from the global key handler - but ALT+F4 didn't work anyways ;) */
 	case VK_F4:
 		SendMessage(window(), WM_COMMAND, ID_RUN_TO_CURSOR, 0);
-		return 1;
+		return true;
 
 	case VK_F9:
 		SendMessage(window(), WM_COMMAND, ID_TOGGLE_BREAKPOINT, 0);
-		return 1;
+		return true;
 
 	case VK_RETURN:
 		if (m_views[0]->cursor_visible())
 		{
 			SendMessage(window(), WM_COMMAND, ID_STEP, 0);
-			return 1;
+			return true;
 		}
 		break;
 	}
@@ -100,13 +100,39 @@ void disasmbasewin_info::update_menu()
 {
 	editwin_info::update_menu();
 
+	disasmview_info *const dasmview = downcast<disasmview_info *>(m_views[0].get());
 	HMENU const menu = GetMenu(window());
 
-	bool const disasm_cursor_visible = m_views[0]->cursor_visible();
+	bool const disasm_cursor_visible = dasmview->cursor_visible();
+	if (disasm_cursor_visible)
+	{
+		offs_t const address = dasmview->selected_address();
+		device_debug *const debug = dasmview->source_device()->debug();
+		INT32 bpindex = -1;
+
+		// first find an existing breakpoint at this address
+		for (device_debug::breakpoint *bp = debug->breakpoint_first(); bp != NULL; bp = bp->next())
+		{
+			if (address == bp->address())
+			{
+				bpindex = bp->index();
+				break;
+			}
+		}
+
+		if (bpindex == -1)
+			ModifyMenu(menu, ID_TOGGLE_BREAKPOINT, MF_BYCOMMAND, ID_TOGGLE_BREAKPOINT, TEXT("Set breakpoint at cursor\tF9"));
+		else
+			ModifyMenu(menu, ID_TOGGLE_BREAKPOINT, MF_BYCOMMAND, ID_TOGGLE_BREAKPOINT, TEXT("Clear breakpoint at cursor\tF9"));
+	}
+	else
+	{
+		ModifyMenu(menu, ID_TOGGLE_BREAKPOINT, MF_BYCOMMAND, ID_TOGGLE_BREAKPOINT, TEXT("Toggle breakpoint at cursor\tF9"));
+	}
 	EnableMenuItem(menu, ID_TOGGLE_BREAKPOINT, MF_BYCOMMAND | (disasm_cursor_visible ? MF_ENABLED : MF_GRAYED));
 	EnableMenuItem(menu, ID_RUN_TO_CURSOR, MF_BYCOMMAND | (disasm_cursor_visible ? MF_ENABLED : MF_GRAYED));
 
-	disasm_right_column const rightcol = downcast<disasmview_info *>(m_views[0].get())->right_column();
+	disasm_right_column const rightcol = dasmview->right_column();
 	CheckMenuItem(menu, ID_SHOW_RAW, MF_BYCOMMAND | (rightcol == DASM_RIGHTCOL_RAW ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(menu, ID_SHOW_ENCRYPTED, MF_BYCOMMAND | (rightcol == DASM_RIGHTCOL_ENCRYPTED ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(menu, ID_SHOW_COMMENTS, MF_BYCOMMAND | (rightcol == DASM_RIGHTCOL_COMMENTS ? MF_CHECKED : MF_UNCHECKED));
@@ -123,38 +149,6 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 	case 0:
 		switch (LOWORD(wparam))
 		{
-		case ID_SHOW_RAW:
-			dasmview->set_right_column(DASM_RIGHTCOL_RAW);
-			recompute_children();
-			return true;
-
-		case ID_SHOW_ENCRYPTED:
-			dasmview->set_right_column(DASM_RIGHTCOL_ENCRYPTED);
-			recompute_children();
-			return true;
-
-		case ID_SHOW_COMMENTS:
-			dasmview->set_right_column(DASM_RIGHTCOL_COMMENTS);
-			recompute_children();
-			return true;
-
-		case ID_RUN_TO_CURSOR:
-			if (dasmview->cursor_visible())
-			{
-				offs_t const address = dasmview->selected_address();
-				if (dasmview->source_is_visible_cpu())
-				{
-					astring command;
-					command.printf("go 0x%X", address);
-					debug_console_execute_command(machine(), command, 1);
-				}
-				else
-				{
-					dasmview->source_device()->debug()->go(address);
-				}
-			}
-			return true;
-
 		case ID_TOGGLE_BREAKPOINT:
 			if (dasmview->cursor_visible())
 			{
@@ -162,7 +156,7 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 				device_debug *const debug = dasmview->source_device()->debug();
 				INT32 bpindex = -1;
 
-				/* first find an existing breakpoint at this address */
+				// first find an existing breakpoint at this address
 				for (device_debug::breakpoint *bp = debug->breakpoint_first(); bp != NULL; bp = bp->next())
 				{
 					if (address == bp->address())
@@ -172,7 +166,7 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 					}
 				}
 
-				/* if it doesn't exist, add a new one */
+				// if it doesn't exist, add a new one
 				if (dasmview->source_is_visible_cpu())
 				{
 					astring command;
@@ -198,6 +192,38 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 					debugger_refresh_display(machine());
 				}
 			}
+			return true;
+
+		case ID_RUN_TO_CURSOR:
+			if (dasmview->cursor_visible())
+			{
+				offs_t const address = dasmview->selected_address();
+				if (dasmview->source_is_visible_cpu())
+				{
+					astring command;
+					command.printf("go 0x%X", address);
+					debug_console_execute_command(machine(), command, 1);
+				}
+				else
+				{
+					dasmview->source_device()->debug()->go(address);
+				}
+			}
+			return true;
+
+		case ID_SHOW_RAW:
+			dasmview->set_right_column(DASM_RIGHTCOL_RAW);
+			recompute_children();
+			return true;
+
+		case ID_SHOW_ENCRYPTED:
+			dasmview->set_right_column(DASM_RIGHTCOL_ENCRYPTED);
+			recompute_children();
+			return true;
+
+		case ID_SHOW_COMMENTS:
+			dasmview->set_right_column(DASM_RIGHTCOL_COMMENTS);
+			recompute_children();
 			return true;
 		}
 		break;

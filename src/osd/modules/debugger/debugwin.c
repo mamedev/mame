@@ -18,6 +18,7 @@
 #include "win/disasmwininfo.h"
 #include "win/logwininfo.h"
 #include "win/memorywininfo.h"
+#include "win/pointswininfo.h"
 #include "win/uimetrics.h"
 
 #include "emu.h"
@@ -63,6 +64,7 @@ protected:
 	virtual void create_memory_window() { create_window<memorywin_info>(); }
 	virtual void create_disasm_window() { create_window<disasmwin_info>(); }
 	virtual void create_log_window() { create_window<logwin_info>(); }
+	virtual void create_points_window() { create_window<pointswin_info>(); }
 	virtual void remove_window(debugwin_info &info);
 
 	virtual void show_all();

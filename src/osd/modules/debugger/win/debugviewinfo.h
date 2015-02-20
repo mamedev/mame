@@ -37,6 +37,7 @@ public:
 	void send_pagedown();
 	void set_focus() { SetFocus(m_wnd); }
 
+	debug_view_type type() const { return m_view->type(); }
 	debug_view_xy total_size() const { return m_view->total_size(); }
 	bool cursor_supported() const { return m_view->cursor_supported(); }
 	bool cursor_visible() const { return m_view->cursor_visible(); }

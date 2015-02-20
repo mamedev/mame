@@ -233,9 +233,42 @@ bool debugwin_info::handle_key(WPARAM wparam, LPARAM lparam)
 			return true;
 		}
 		break;
+
+	case 'B':
+		if (GetAsyncKeyState(VK_CONTROL) & 0x8000)
+		{
+			SendMessage(m_wnd, WM_COMMAND, ID_NEW_POINTS_WND, 0);
+			return true;
+		}
+		break;
 	}
 
 	return false;
+}
+
+
+void debugwin_info::recompute_children()
+{
+	if (m_views[0] != NULL)
+	{
+		// compute a client rect
+		RECT bounds;
+		bounds.top = bounds.left = 0;
+		bounds.right = m_views[0]->prefwidth() + (2 * EDGE_WIDTH);
+		bounds.bottom = 200;
+		AdjustWindowRectEx(&bounds, DEBUG_WINDOW_STYLE, FALSE, DEBUG_WINDOW_STYLE_EX);
+
+		// clamp the min/max size
+		set_maxwidth(bounds.right - bounds.left);
+
+		// get the parent's dimensions
+		RECT parent;
+		GetClientRect(window(), &parent);
+
+		// view gets the remaining space
+		InflateRect(&parent, -EDGE_WIDTH, -EDGE_WIDTH);
+		m_views[0]->set_bounds(parent);
+	}
 }
 
 
@@ -255,6 +288,10 @@ bool debugwin_info::handle_command(WPARAM wparam, LPARAM lparam)
 
 		case ID_NEW_LOG_WND:
 			debugger().create_log_window();
+			return true;
+
+		case ID_NEW_POINTS_WND:
+			debugger().create_points_window();
 			return true;
 
 		case ID_RUN_AND_HIDE:
@@ -484,6 +521,7 @@ HMENU debugwin_info::create_standard_menubar()
 	AppendMenu(debugmenu, MF_ENABLED, ID_NEW_MEMORY_WND, TEXT("New Memory Window\tCtrl+M"));
 	AppendMenu(debugmenu, MF_ENABLED, ID_NEW_DISASM_WND, TEXT("New Disassembly Window\tCtrl+D"));
 	AppendMenu(debugmenu, MF_ENABLED, ID_NEW_LOG_WND, TEXT("New Error Log Window\tCtrl+L"));
+	AppendMenu(debugmenu, MF_ENABLED, ID_NEW_POINTS_WND, TEXT("New (Break|Watch)points Window\tCtrl+B"));
 	AppendMenu(debugmenu, MF_DISABLED | MF_SEPARATOR, 0, TEXT(""));
 	AppendMenu(debugmenu, MF_ENABLED, ID_RUN, TEXT("Run\tF5"));
 	AppendMenu(debugmenu, MF_ENABLED, ID_RUN_AND_HIDE, TEXT("Run and Hide Debugger\tF12"));

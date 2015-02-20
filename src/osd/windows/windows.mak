@@ -423,6 +423,7 @@ OSDOBJS += \
 	$(OSDOBJ)/modules/debugger/win/logwininfo.o \
 	$(OSDOBJ)/modules/debugger/win/memoryviewinfo.o \
 	$(OSDOBJ)/modules/debugger/win/memorywininfo.o \
+	$(OSDOBJ)/modules/debugger/win/pointswininfo.o \
 	$(OSDOBJ)/modules/debugger/win/uimetrics.o \
 	$(OSDOBJ)/modules/debugger/debugint.o \
 	$(OSDOBJ)/modules/debugger/debugqt.o \

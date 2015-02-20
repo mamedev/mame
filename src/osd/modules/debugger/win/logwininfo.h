@@ -19,9 +19,6 @@ class logwin_info : public debugwin_info
 public:
 	logwin_info(debugger_windows_interface &debugger);
 	virtual ~logwin_info();
-
-private:
-	virtual void recompute_children();
 };
 
 #endif
