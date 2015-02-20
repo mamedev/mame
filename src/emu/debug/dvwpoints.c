@@ -72,26 +72,6 @@ void debug_view_watchpoints::enumerate_sources()
 
 
 //-------------------------------------------------
-//  view_notify - handle notification of updates
-//  to cursor changes
-//-------------------------------------------------
-
-void debug_view_watchpoints::view_notify(debug_view_notification type)
-{
-}
-
-
-//-------------------------------------------------
-//  view_char - handle a character typed within
-//  the current view
-//-------------------------------------------------
-
-void debug_view_watchpoints::view_char(int chval)
-{
-}
-
-
-//-------------------------------------------------
 //  view_click - handle a mouse click within the
 //  current view
 //-------------------------------------------------
@@ -141,7 +121,7 @@ void debug_view_watchpoints::view_click(const int button, const debug_view_xy& p
 		device_debug::watchpoint** wpList = NULL;
 		const int numWPs = watchpoints(SORT_NONE, wpList);
 
-		const int wpIndex = pos.y-1;
+		const int wpIndex = pos.y - 1;
 		if (wpIndex > numWPs || wpIndex < 0)
 			return;
 
@@ -154,7 +134,9 @@ void debug_view_watchpoints::view_click(const int button, const debug_view_xy& p
 		delete[] wpList;
 	}
 
-	view_update();
+	begin_update();
+	m_update_pending = true;
+	end_update();
 }
 
 
@@ -387,7 +369,7 @@ int debug_view_watchpoints::watchpoints(SortMode sort, device_debug::watchpoint*
 
 //-------------------------------------------------
 //  view_update - update the contents of the
-//  disassembly view
+//  watchpoints view
 //-------------------------------------------------
 
 void debug_view_watchpoints::view_update()
