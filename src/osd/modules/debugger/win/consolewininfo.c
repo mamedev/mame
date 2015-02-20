@@ -21,7 +21,8 @@
 
 
 consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
-	disasmbasewin_info(debugger, true, "Debug", NULL)
+	disasmbasewin_info(debugger, true, "Debug", NULL),
+	m_devices_menu(NULL)
 {
 	if ((window() == NULL) || (m_views[0] == NULL))
 		goto cleanup;
@@ -37,10 +38,22 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 	{
 		// Add image menu only if image devices exist
 		image_interface_iterator iter(machine().root_device());
-		if (iter.first() != NULL)
+		device_image_interface *img = iter.first();
+		if (img != NULL)
 		{
-			//info->update_menu = image_update_menu;
-			//image_update_menu(info);
+			m_devices_menu = CreatePopupMenu();
+			for ( ; img != NULL; img = iter.next())
+			{
+				astring temp;
+				temp.format("%s : %s", img->device().name(), img->exists() ? img->filename() : "[no image]");
+				TCHAR *tc_buf = tstring_from_utf8(temp);
+				if (tc_buf != NULL)
+				{
+					AppendMenu(m_devices_menu, MF_ENABLED, 0, tc_buf);
+					osd_free(tc_buf);
+				}
+			}
+			AppendMenu(GetMenu(window()), MF_ENABLED | MF_POPUP, (UINT_PTR)m_devices_menu, TEXT("Images"));
 		}
 
 		// get the work bounds
@@ -151,13 +164,10 @@ void consolewin_info::update_menu()
 {
 	disasmbasewin_info::update_menu();
 
-	image_interface_iterator iter(machine().root_device());
-	if (iter.first() != NULL)
+	if (m_devices_menu != NULL)
 	{
-		DeleteMenu(GetMenu(window()), 2, MF_BYPOSITION);
-
 		// create the image menu
-		HMENU const devicesmenu = CreatePopupMenu();
+		image_interface_iterator iter(machine().root_device());
 		device_image_interface *img;
 		UINT32 cnt;
 		for (img = iter.first(), cnt = 0; img != NULL; img = iter.next(), cnt++)
@@ -196,11 +206,10 @@ void consolewin_info::update_menu()
 			TCHAR *tc_buf = tstring_from_utf8(temp);
 			if (tc_buf != NULL)
 			{
-				AppendMenu(devicesmenu, MF_ENABLED | MF_POPUP, (UINT_PTR)devicesubmenu, tc_buf);
+				ModifyMenu(m_devices_menu, cnt, MF_BYPOSITION | MF_POPUP, (UINT_PTR)devicesubmenu, tc_buf);
 				osd_free(tc_buf);
 			}
 		}
-		AppendMenu(GetMenu(window()), MF_ENABLED | MF_POPUP, (UINT_PTR)devicesmenu, TEXT("Images"));
 	}
 }
 
