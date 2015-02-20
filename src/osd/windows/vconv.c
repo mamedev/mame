@@ -80,6 +80,7 @@ static const translation_info gcc_translate[] =
 	// warning C4189: 'xxx' : local variable is initialized but not referenced
 	// warning C4191: 'type cast' : unsafe conversion from 'xxx' to 'xxx' // 64-bit only
 	// warning C4201: nonstandard extension used : nameless struct/union
+	// warning C4232: nonstandard extension used : 'xxx' : address of dllimport 'xxx' is not static, identity not guaranteed
 	// warning C4242: 'x' : conversion from 'xxx' to 'xxx', possible loss of data
 	// warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
 	// warning C4250: 'xxx' : inherits 'xxx' via dominance
@@ -108,7 +109,7 @@ static const translation_info gcc_translate[] =
 	// warning C4805: 'x' : unsafe mix of type 'xxx' and type 'xxx' in operation
 	// warning C4820: 'xxx' : 'x' bytes padding added after data member 'xxx'
 	// warning C4826: Conversion from 'type1 ' to 'type_2' is sign-extended. This may cause unexpected runtime behavior. // 32-bit only
-	{ VS7,      "-Wall",                    "/Wall /W4 /wd4003 /wd4018 /wd4061 /wd4100 /wd4127 /wd4131 /wd4141 /wd4146 /wd4150 /wd4189 /wd4191 /wd4201 /wd4242 /wd4244 /wd4250 /wd4255 /wd4296 /wd4306 /wd4310 /wd4324 /wd4347 /wd4435 /wd4510 /wd4512 /wd4514 /wd4571 /wd4610 /wd4611 /wd4619 /wd4625 /wd4626 /wd4640 /wd4668 /wd4702 /wd4706 /wd4710 /wd4711 /wd4805 /wd4820 /wd4826" },
+	{ VS7,      "-Wall",                    "/Wall /W4 /wd4003 /wd4018 /wd4061 /wd4100 /wd4127 /wd4131 /wd4141 /wd4146 /wd4150 /wd4189 /wd4191 /wd4201 /wd4232 /wd4242 /wd4244 /wd4250 /wd4255 /wd4296 /wd4306 /wd4310 /wd4324 /wd4347 /wd4435 /wd4510 /wd4512 /wd4514 /wd4571 /wd4610 /wd4611 /wd4619 /wd4625 /wd4626 /wd4640 /wd4668 /wd4702 /wd4706 /wd4710 /wd4711 /wd4805 /wd4820 /wd4826" },
 	{ 0,        "-Wall",                    "/W0" },
 	{ VS7,      "-Wno-unused",              "/wd4100 /wd4101 /wd4102 /wd4505" },
 	{ 0,        "-Wno-sign-compare",        "/wd4365 /wd4389 /wd4245 /wd4388" },
