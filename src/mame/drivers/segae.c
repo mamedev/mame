@@ -302,7 +302,6 @@ covert megatech / megaplay drivers to use new code etc. etc.
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
-#include "sound/2413intf.h"
 #include "machine/mc8123.h"
 #include "machine/segacrp2.h"
 #include "video/315_5124.h"
@@ -328,8 +327,6 @@ public:
 	DECLARE_WRITE8_MEMBER( ridleofp_port_fa_write );
 	DECLARE_READ8_MEMBER( hangonjr_port_f8_read );
 	DECLARE_WRITE8_MEMBER( hangonjr_port_fa_write );
-	DECLARE_WRITE8_MEMBER( ym2413_reg_w );
-	DECLARE_WRITE8_MEMBER( ym2413_data_w );
 
 	DECLARE_DRIVER_INIT( hangonjr );
 	DECLARE_DRIVER_INIT( astrofl );
@@ -385,8 +382,6 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, systeme_state )
 	AM_RANGE(0xe0, 0xe0) AM_READ_PORT( "e0" )
 	AM_RANGE(0xe1, 0xe1) AM_READ_PORT( "e1" )
 	AM_RANGE(0xe2, 0xe2) AM_READ_PORT( "e2" )
-    AM_RANGE(0xf0, 0xf0) AM_WRITE( ym2413_reg_w )
-    AM_RANGE(0xf1, 0xf1) AM_WRITE( ym2413_data_w )
 	AM_RANGE(0xf2, 0xf2) AM_READ_PORT( "f2" )
 	AM_RANGE(0xf3, 0xf3) AM_READ_PORT( "f3" )
 	AM_RANGE(0xf7, 0xf7) AM_WRITE( bank_write )
@@ -411,24 +406,6 @@ WRITE8_MEMBER( systeme_state::bank_write )
 	membank("bank1")->set_entry(data & 0x0f);
 }
 
-WRITE8_MEMBER( systeme_state::ym2413_reg_w )
-{
-	ym2413_device *ym = machine().device<ym2413_device>("ym2");
-
-	if( (machine().device<z80_device>("maincpu")->space(AS_IO).read_byte(0xf3)&0x01) == 1)
-	{
-		machine().device<z80_device>("maincpu")->space(AS_PROGRAM).write_byte(0xde00,1);
-	}
-	//ym2413_w(ym, space, 0, data & 0xff, data & 0xff);
-	ym->write(space,0, data&0xff);
-}
-
-WRITE8_MEMBER( systeme_state::ym2413_data_w )
-{
-	ym2413_device *ym = machine().device<ym2413_device>("ym2");
-	//ym2413_w(ym, space, 1, data & 0xff, data & 0xff);
-	ym->write(space,1, data&0xff);
-}
 
 void systeme_state::machine_start()
 {
@@ -762,9 +739,7 @@ static INPUT_PORTS_START( fantzn2 ) /* Used By Fantasy Zone 2 */
 	PORT_INCLUDE( segae_joy1_generic )
 
 	PORT_MODIFY("f3")   /* Read from Port 0xf3 */
-	PORT_DIPNAME( 0x01, 0x00, "FM_Sounds" ) PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	//"SW2:1" unused
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1013,13 +988,10 @@ static MACHINE_CONFIG_START( systeme, systeme_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("sn1", SEGAPSG, XTAL_10_738635MHz/3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("sn2", SEGAPSG, XTAL_10_738635MHz/3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-
-	MCFG_SOUND_ADD("ym2", YM2413, XTAL_10_738635MHz/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
