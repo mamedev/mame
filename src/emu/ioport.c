@@ -2519,14 +2519,14 @@ time_t ioport_manager::initialize()
 	init_autoselect_devices(IPT_TRACKBALL_X, IPT_TRACKBALL_Y,  0,              OPTION_TRACKBALL_DEVICE,  "trackball");
 	init_autoselect_devices(IPT_MOUSE_X,     IPT_MOUSE_Y,      0,              OPTION_MOUSE_DEVICE,      "mouse");
 
-	// look for 4-way joysticks and change the default map if we find any
+	// look for 4-way diagonal joysticks and change the default map if we find any
 	const char *joystick_map_default = machine().options().joystick_map();
 	if (joystick_map_default[0] == 0 || strcmp(joystick_map_default, "auto") == 0)
 		for (ioport_port *port = first_port(); port != NULL; port = port->next())
 			for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
-				if (field->live().joystick != NULL && field->way() == 4)
+				if (field->live().joystick != NULL && field->rotated())
 				{
-					machine().input().set_global_joystick_map(field->rotated() ? joystick_map_4way_diagonal : joystick_map_4way_sticky);
+					machine().input().set_global_joystick_map(joystick_map_4way_diagonal);
 					break;
 				}
 

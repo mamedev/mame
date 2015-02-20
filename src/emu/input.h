@@ -1135,7 +1135,6 @@ private:
 
 // joystick maps
 extern const char joystick_map_8way[];
-extern const char joystick_map_4way_sticky[];
 extern const char joystick_map_4way_diagonal[];
 
 
