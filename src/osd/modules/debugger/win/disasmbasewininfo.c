@@ -34,6 +34,7 @@ disasmbasewin_info::disasmbasewin_info(debugger_windows_interface &debugger, boo
 	// create the options menu
 	HMENU const optionsmenu = CreatePopupMenu();
 	AppendMenu(optionsmenu, MF_ENABLED, ID_TOGGLE_BREAKPOINT, TEXT("Toggle breakpoint at cursor\tF9"));
+	AppendMenu(optionsmenu, MF_ENABLED, ID_DISABLE_BREAKPOINT, TEXT("Disable breakpoint at cursor\tShift+F9"));
 	AppendMenu(optionsmenu, MF_ENABLED, ID_RUN_TO_CURSOR, TEXT("Run to cursor\tF4"));
 	AppendMenu(optionsmenu, MF_DISABLED | MF_SEPARATOR, 0, TEXT(""));
 	AppendMenu(optionsmenu, MF_ENABLED, ID_SHOW_RAW, TEXT("Raw opcodes\tCtrl+R"));
@@ -74,17 +75,20 @@ bool disasmbasewin_info::handle_key(WPARAM wparam, LPARAM lparam)
 
 	switch (wparam)
 	{
-	/* ajg - steals the F4 from the global key handler - but ALT+F4 didn't work anyways ;) */
+	// ajg - steals the F4 from the global key handler - but ALT+F4 didn't work anyways ;)
 	case VK_F4:
 		SendMessage(window(), WM_COMMAND, ID_RUN_TO_CURSOR, 0);
 		return true;
 
 	case VK_F9:
-		SendMessage(window(), WM_COMMAND, ID_TOGGLE_BREAKPOINT, 0);
+		if (GetAsyncKeyState(VK_SHIFT) & 0x8000)
+			SendMessage(window(), WM_COMMAND, ID_DISABLE_BREAKPOINT, 0);
+		else
+			SendMessage(window(), WM_COMMAND, ID_TOGGLE_BREAKPOINT, 0);
 		return true;
 
 	case VK_RETURN:
-		if (m_views[0]->cursor_visible())
+		if (m_views[0]->cursor_visible() && m_views[0]->source_is_visible_cpu())
 		{
 			SendMessage(window(), WM_COMMAND, ID_STEP, 0);
 			return true;
@@ -108,26 +112,32 @@ void disasmbasewin_info::update_menu()
 	{
 		offs_t const address = dasmview->selected_address();
 		device_debug *const debug = dasmview->source_device()->debug();
-		INT32 bpindex = -1;
 
 		// first find an existing breakpoint at this address
-		for (device_debug::breakpoint *bp = debug->breakpoint_first(); bp != NULL; bp = bp->next())
-		{
-			if (address == bp->address())
-			{
-				bpindex = bp->index();
-				break;
-			}
-		}
+		device_debug::breakpoint *bp = debug->breakpoint_first();
+		while ((bp != NULL) && (bp->address() != address))
+			bp = bp->next();
 
-		if (bpindex == -1)
+		if (bp == NULL)
+		{
 			ModifyMenu(menu, ID_TOGGLE_BREAKPOINT, MF_BYCOMMAND, ID_TOGGLE_BREAKPOINT, TEXT("Set breakpoint at cursor\tF9"));
+			ModifyMenu(menu, ID_DISABLE_BREAKPOINT, MF_BYCOMMAND, ID_DISABLE_BREAKPOINT, TEXT("Disable breakpoint at cursor\tShift+F9"));
+		}
 		else
+		{
 			ModifyMenu(menu, ID_TOGGLE_BREAKPOINT, MF_BYCOMMAND, ID_TOGGLE_BREAKPOINT, TEXT("Clear breakpoint at cursor\tF9"));
+			if (bp->enabled())
+				ModifyMenu(menu, ID_DISABLE_BREAKPOINT, MF_BYCOMMAND, ID_DISABLE_BREAKPOINT, TEXT("Disable breakpoint at cursor\tShift+F9"));
+			else
+				ModifyMenu(menu, ID_DISABLE_BREAKPOINT, MF_BYCOMMAND, ID_DISABLE_BREAKPOINT, TEXT("Enable breakpoint at cursor\tShift+F9"));
+		}
+		EnableMenuItem(menu, ID_DISABLE_BREAKPOINT, MF_BYCOMMAND | (bp != NULL ? MF_ENABLED : MF_GRAYED));
 	}
 	else
 	{
 		ModifyMenu(menu, ID_TOGGLE_BREAKPOINT, MF_BYCOMMAND, ID_TOGGLE_BREAKPOINT, TEXT("Toggle breakpoint at cursor\tF9"));
+		ModifyMenu(menu, ID_DISABLE_BREAKPOINT, MF_BYCOMMAND, ID_DISABLE_BREAKPOINT, TEXT("Disable breakpoint at cursor\tShift+F9"));
+		EnableMenuItem(menu, ID_DISABLE_BREAKPOINT, MF_BYCOMMAND | MF_GRAYED);
 	}
 	EnableMenuItem(menu, ID_TOGGLE_BREAKPOINT, MF_BYCOMMAND | (disasm_cursor_visible ? MF_ENABLED : MF_GRAYED));
 	EnableMenuItem(menu, ID_RUN_TO_CURSOR, MF_BYCOMMAND | (disasm_cursor_visible ? MF_ENABLED : MF_GRAYED));
@@ -190,6 +200,37 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 					}
 					machine().debug_view().update_all();
 					debugger_refresh_display(machine());
+				}
+			}
+			return true;
+
+		case ID_DISABLE_BREAKPOINT:
+			if (dasmview->cursor_visible())
+			{
+				offs_t const address = dasmview->selected_address();
+				device_debug *const debug = dasmview->source_device()->debug();
+
+				// first find an existing breakpoint at this address
+				device_debug::breakpoint *bp = debug->breakpoint_first();
+				while ((bp != NULL) && (bp->address() != address))
+					bp = bp->next();
+
+				// if it doesn't exist, add a new one
+				if (bp != NULL)
+				{
+					if (dasmview->source_is_visible_cpu())
+					{
+						astring command;
+						command.printf(bp->enabled() ? "bpdisable 0x%X" : "bpenable 0x%X", (UINT32)bp->index());
+						debug_console_execute_command(machine(), command, 1);
+					}
+					else
+					{
+						debug->breakpoint_enable(bp->index(), !bp->enabled());
+						debug_console_printf(machine(), "Breakpoint %X %s\n", (UINT32)bp->index(), bp->enabled() ? "enabled" : "disabled");
+						machine().debug_view().update_all();
+						debugger_refresh_display(machine());
+					}
 				}
 			}
 			return true;
