@@ -24,19 +24,26 @@ private slots:
 	void expressionSubmitted();
 
 	void toggleBreakpointAtCursor(bool changedTo);
+	void enableBreakpointAtCursor(bool changedTo);
 	void runToCursor(bool changedTo);
 	void rightBarChanged(QAction* changedTo);
+
+	void dasmViewUpdated();
 
 
 private:
 	void populateComboBox();
 
 
-private:
 	// Widgets
 	QLineEdit* m_inputEdit;
 	QComboBox* m_cpuComboBox;
 	DebuggerView* m_dasmView;
+
+	// Menu items
+	QAction* m_breakpointToggleAct;
+	QAction* m_breakpointEnableAct;
+	QAction* m_runToCursorAct;
 };
 
 

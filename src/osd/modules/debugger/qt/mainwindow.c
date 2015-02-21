@@ -43,13 +43,16 @@ MainWindow::MainWindow(running_machine* machine, QWidget* parent) :
 	//
 	// Options Menu
 	//
-	// Create two commands
-	QAction* breakpointSetAct = new QAction("Toggle Breakpoint At Cursor", this);
-	QAction* runToCursorAct = new QAction("Run To Cursor", this);
-	breakpointSetAct->setShortcut(Qt::Key_F9);
-	runToCursorAct->setShortcut(Qt::Key_F4);
-	connect(breakpointSetAct, SIGNAL(triggered(bool)), this, SLOT(toggleBreakpointAtCursor(bool)));
-	connect(runToCursorAct, SIGNAL(triggered(bool)), this, SLOT(runToCursor(bool)));
+	// Create three commands
+	m_breakpointToggleAct = new QAction("Toggle Breakpoint at Cursor", this);
+	m_breakpointEnableAct = new QAction("Disable Breakpoint at Cursor", this);
+	m_runToCursorAct = new QAction("Run to Cursor", this);
+	m_breakpointToggleAct->setShortcut(Qt::Key_F9);
+	m_breakpointEnableAct->setShortcut(Qt::SHIFT + Qt::Key_F9);
+	m_runToCursorAct->setShortcut(Qt::Key_F4);
+	connect(m_breakpointToggleAct, SIGNAL(triggered(bool)), this, SLOT(toggleBreakpointAtCursor(bool)));
+	connect(m_breakpointEnableAct, SIGNAL(triggered(bool)), this, SLOT(enableBreakpointAtCursor(bool)));
+	connect(m_runToCursorAct, SIGNAL(triggered(bool)), this, SLOT(runToCursor(bool)));
 
 	// Right bar options
 	QActionGroup* rightBarGroup = new QActionGroup(this);
@@ -71,8 +74,9 @@ MainWindow::MainWindow(running_machine* machine, QWidget* parent) :
 
 	// Assemble the options menu
 	QMenu* optionsMenu = menuBar()->addMenu("&Options");
-	optionsMenu->addAction(breakpointSetAct);
-	optionsMenu->addAction(runToCursorAct);
+	optionsMenu->addAction(m_breakpointToggleAct);
+	optionsMenu->addAction(m_breakpointEnableAct);
+	optionsMenu->addAction(m_runToCursorAct);
 	optionsMenu->addSeparator();
 	optionsMenu->addActions(rightBarGroup->actions());
 
@@ -109,6 +113,7 @@ MainWindow::MainWindow(running_machine* machine, QWidget* parent) :
 	dasmDock->setAllowedAreas(Qt::TopDockWidgetArea);
 	m_dasmFrame = new DasmDockWidget(m_machine, dasmDock);
 	dasmDock->setWidget(m_dasmFrame);
+	connect(m_dasmFrame->view(), SIGNAL(updated()), this, SLOT(dasmViewUpdated()));
 
 	addDockWidget(Qt::TopDockWidgetArea, dasmDock);
 	dockMenu->addAction(dasmDock->toggleViewAction());
@@ -200,37 +205,60 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event)
 
 void MainWindow::toggleBreakpointAtCursor(bool changedTo)
 {
-	debug_view_disasm* dasmView = downcast<debug_view_disasm*>(m_dasmFrame->view()->view());
-	if (dasmView->cursor_visible())
+	debug_view_disasm *const dasmView = downcast<debug_view_disasm*>(m_dasmFrame->view()->view());
+	if (dasmView->cursor_visible() && (debug_cpu_get_visible_cpu(*m_machine) == dasmView->source()->device()))
 	{
-		if (debug_cpu_get_visible_cpu(*m_machine) == dasmView->source()->device())
+		offs_t const address = downcast<debug_view_disasm *>(dasmView)->selected_address();
+		device_debug *const cpuinfo = dasmView->source()->device()->debug();
+
+		// Find an existing breakpoint at this address
+		INT32 bpindex = -1;
+		for (device_debug::breakpoint* bp = cpuinfo->breakpoint_first();
+				bp != NULL;
+				bp = bp->next())
 		{
-			offs_t address = downcast<debug_view_disasm *>(dasmView)->selected_address();
-			device_debug *cpuinfo = dasmView->source()->device()->debug();
-
-			// Find an existing breakpoint at this address
-			INT32 bpindex = -1;
-			for (device_debug::breakpoint* bp = cpuinfo->breakpoint_first();
-					bp != NULL;
-					bp = bp->next())
+			if (address == bp->address())
 			{
-				if (address == bp->address())
-				{
-					bpindex = bp->index();
-					break;
-				}
+				bpindex = bp->index();
+				break;
 			}
+		}
 
-			// If none exists, add a new one
+		// If none exists, add a new one
+		astring command;
+		if (bpindex == -1)
+		{
+			command.printf("bpset 0x%X", address);
+		}
+		else
+		{
+			command.printf("bpclear 0x%X", bpindex);
+		}
+		debug_console_execute_command(*m_machine, command, 1);
+	}
+
+	refreshAll();
+}
+
+
+void MainWindow::enableBreakpointAtCursor(bool changedTo)
+{
+	debug_view_disasm *const dasmView = downcast<debug_view_disasm*>(m_dasmFrame->view()->view());
+	if (dasmView->cursor_visible() && (debug_cpu_get_visible_cpu(*m_machine) == dasmView->source()->device()))
+	{
+		offs_t const address = dasmView->selected_address();
+		device_debug *const cpuinfo = dasmView->source()->device()->debug();
+
+		// Find an existing breakpoint at this address
+		device_debug::breakpoint* bp = cpuinfo->breakpoint_first();
+		while ((bp != NULL) && (bp->address() != address))
+			bp = bp->next();
+
+		if (bp != NULL)
+		{
+			INT32 const bpindex = bp->index();
 			astring command;
-			if (bpindex == -1)
-			{
-				command.printf("bpset 0x%X", address);
-			}
-			else
-			{
-				command.printf("bpclear 0x%X", bpindex);
-			}
+			command.printf(bp->enabled() ? "bpdisable 0x%X" : "bpenable 0x%X", bpindex);
 			debug_console_execute_command(*m_machine, command, 1);
 		}
 	}
@@ -242,15 +270,12 @@ void MainWindow::toggleBreakpointAtCursor(bool changedTo)
 void MainWindow::runToCursor(bool changedTo)
 {
 	debug_view_disasm* dasmView = downcast<debug_view_disasm*>(m_dasmFrame->view()->view());
-	if (dasmView->cursor_visible())
+	if (dasmView->cursor_visible() && (debug_cpu_get_visible_cpu(*m_machine) == dasmView->source()->device()))
 	{
-		if (debug_cpu_get_visible_cpu(*m_machine) == dasmView->source()->device())
-		{
-			offs_t address = downcast<debug_view_disasm*>(dasmView)->selected_address();
-			astring command;
-			command.printf("go 0x%X", address);
-			debug_console_execute_command(*m_machine, command, 1);
-		}
+		offs_t address = downcast<debug_view_disasm*>(dasmView)->selected_address();
+		astring command;
+		command.printf("go 0x%X", address);
+		debug_console_execute_command(*m_machine, command, 1);
 	}
 }
 
@@ -369,6 +394,38 @@ void MainWindow::unmountImage(bool changedTo)
 
 	debug_console_printf(*m_machine, "Image successfully unmounted.\n");
 	refreshAll();
+}
+
+
+void MainWindow::dasmViewUpdated()
+{
+	debug_view_disasm *const dasmView = downcast<debug_view_disasm*>(m_dasmFrame->view()->view());
+	bool const haveCursor = dasmView->cursor_visible() && (debug_cpu_get_visible_cpu(*m_machine) == dasmView->source()->device());
+	bool haveBreakpoint = false;
+	bool breakpointEnabled = false;
+	if (haveCursor)
+	{
+		offs_t const address = dasmView->selected_address();
+		device_t *const device = dasmView->source()->device();
+		device_debug *const cpuinfo = device->debug();
+
+		// Find an existing breakpoint at this address
+		device_debug::breakpoint* bp = cpuinfo->breakpoint_first();
+		while ((bp != NULL) && (bp->address() != address))
+			bp = bp->next();
+
+		if (bp != NULL)
+		{
+			haveBreakpoint = true;
+			breakpointEnabled = bp->enabled();
+		}
+	}
+
+	m_breakpointToggleAct->setText(haveBreakpoint ? "Clear Breakpoint at Cursor" : haveCursor ? "Set Breakpoint at Cursor" : "Toggle Breakpoint at Cursor");
+	m_breakpointEnableAct->setText((!haveBreakpoint || breakpointEnabled) ? "Disable Breakpoint at Cursor" : "Enable Breakpoint at Cursor");
+	m_breakpointToggleAct->setEnabled(haveCursor);
+	m_breakpointEnableAct->setEnabled(haveBreakpoint);
+	m_runToCursorAct->setEnabled(haveCursor);
 }
 
 

@@ -18,13 +18,12 @@ public:
 
 	void paintEvent(QPaintEvent* event);
 
-	// Callback to allow MAME to refresh the view
-	static void debuggerViewUpdate(debug_view& debugView, void* osdPrivate);
-
 	// Setters and accessors
 	void setPreferBottom(bool pb) { m_preferBottom = pb; }
 	debug_view* view() { return m_view; }
 
+signals:
+	void updated();
 
 protected:
 	void keyPressEvent(QKeyEvent* event);
@@ -36,6 +35,9 @@ private slots:
 
 
 private:
+	// Callback to allow MAME to refresh the view
+	static void debuggerViewUpdate(debug_view& debugView, void* osdPrivate);
+
 	bool m_preferBottom;
 
 	debug_view* m_view;
