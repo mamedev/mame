@@ -21,7 +21,7 @@ class debugwin_info : protected debugbase_info
 public:
 	template<class U> friend class simple_list;
 
-	debugwin_info(debugger_windows_interface &debugger, bool main_console, LPCSTR title, WNDPROC handler);
+	debugwin_info(debugger_windows_interface &debugger, bool is_main_console, LPCSTR title, WNDPROC handler);
 	virtual ~debugwin_info();
 
 	bool is_valid() const { return m_wnd != NULL; }
@@ -101,6 +101,7 @@ protected:
 		ID_DEVICE_OPTIONS	// always keep this at the end
 	};
 
+	bool is_main_console() const { return m_is_main_console; }
 	HWND window() const { return m_wnd; }
 	UINT32 minwidth() const { return m_minwidth; }
 	UINT32 maxwidth() const { return m_maxwidth; }
