@@ -58,14 +58,11 @@ public:
 protected:
 	// view overrides
 	virtual void view_update();
-	virtual void view_notify(debug_view_notification type);
-	virtual void view_char(int chval);
 	virtual void view_click(const int button, const debug_view_xy& pos);
 
 private:
 	// internal helpers
 	void enumerate_sources();
-	bool recompute(offs_t pc, int startline, int lines);
 	void pad_astring_to_length(astring& str, int len);
 	int breakpoints(SortMode sort, device_debug::breakpoint**& bpList);
 

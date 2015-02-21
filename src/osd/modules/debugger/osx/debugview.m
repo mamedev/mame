@@ -540,7 +540,6 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 					  : (modifiers & NSAlternateKeyMask) ? DCK_MIDDLE_CLICK
 					  : DCK_LEFT_CLICK,
 						[self convertLocation:location]);
-	[self setNeedsDisplay:YES];
 }
 
 

@@ -93,6 +93,7 @@ OBJDIRS += $(WINOBJ) \
 	$(OSDOBJ)/modules/midi \
 	$(OSDOBJ)/modules/font \
 	$(OSDOBJ)/modules/netdev \
+	$(OSDOBJ)/modules/debugger/win
 
 ifdef USE_QTDEBUG
 OBJDIRS += $(OSDOBJ)/modules/debugger/qt
@@ -411,9 +412,22 @@ $(WINOBJ)/drawgdi.o :   $(SRC)/emu/rendersw.inc
 # add debug-specific files
 OSDOBJS += \
 	$(OSDOBJ)/modules/debugger/debugwin.o \
+	$(OSDOBJ)/modules/debugger/win/consolewininfo.o \
+	$(OSDOBJ)/modules/debugger/win/debugbaseinfo.o \
+	$(OSDOBJ)/modules/debugger/win/debugviewinfo.o \
+	$(OSDOBJ)/modules/debugger/win/debugwininfo.o \
+	$(OSDOBJ)/modules/debugger/win/disasmbasewininfo.o \
+	$(OSDOBJ)/modules/debugger/win/disasmviewinfo.o \
+	$(OSDOBJ)/modules/debugger/win/disasmwininfo.o \
+	$(OSDOBJ)/modules/debugger/win/editwininfo.o \
+	$(OSDOBJ)/modules/debugger/win/logwininfo.o \
+	$(OSDOBJ)/modules/debugger/win/memoryviewinfo.o \
+	$(OSDOBJ)/modules/debugger/win/memorywininfo.o \
+	$(OSDOBJ)/modules/debugger/win/pointswininfo.o \
+	$(OSDOBJ)/modules/debugger/win/uimetrics.o \
 	$(OSDOBJ)/modules/debugger/debugint.o \
 	$(OSDOBJ)/modules/debugger/debugqt.o \
-	$(OSDOBJ)/modules/debugger/none.o \
+	$(OSDOBJ)/modules/debugger/none.o
 
 # add a stub resource file
 RESFILE = $(WINOBJ)/mame.res

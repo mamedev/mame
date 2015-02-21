@@ -767,7 +767,7 @@ OSDOBJS += \
 	$(OSDOBJ)/modules/debugger/none.o \
 	$(OSDOBJ)/modules/debugger/debugint.o \
 	$(OSDOBJ)/modules/debugger/debugwin.o \
-	$(OSDOBJ)/modules/debugger/debugqt.o \
+	$(OSDOBJ)/modules/debugger/debugqt.o
 
 #-------------------------------------------------
 # BGFX
