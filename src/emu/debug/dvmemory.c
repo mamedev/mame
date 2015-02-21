@@ -749,6 +749,8 @@ void debug_view_memory::set_bytes_per_chunk(UINT8 chunkbytes)
 
 	m_bytes_per_chunk = chunkbytes;
 	m_chunks_per_row = m_bytes_per_row / chunkbytes;
+	if (m_chunks_per_row < 1)
+		m_chunks_per_row = 1;
 	m_recompute = m_update_pending = true;
 
 	pos.m_shift += 8 * ((pos.m_address % m_bytes_per_chunk) ^ ((source.m_endianness == ENDIANNESS_LITTLE) ? 0 : (m_bytes_per_chunk - 1)));

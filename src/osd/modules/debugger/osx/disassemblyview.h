@@ -21,10 +21,9 @@
 
 @interface MAMEDisassemblyView : MAMEDebugView <MAMEDebugViewSubviewSupport, MAMEDebugViewExpressionSupport>
 {
-	BOOL	useConsole;
 }
 
-- (id)initWithFrame:(NSRect)f machine:(running_machine &)m useConsole:(BOOL)uc;
+- (id)initWithFrame:(NSRect)f machine:(running_machine &)m;
 
 - (NSSize)maximumFrameSize;
 
@@ -38,10 +37,7 @@
 - (void)setExpression:(NSString *)exp;
 
 - (debug_view_disasm_source const *)source;
-
-- (IBAction)debugToggleBreakpoint:(id)sender;
-- (IBAction)debugToggleBreakpointEnable:(id)sender;
-- (IBAction)debugRunToCursor:(id)sender;
+- (offs_t)selectedAddress;
 
 - (IBAction)showRightColumn:(id)sender;
 

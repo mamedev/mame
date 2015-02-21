@@ -5626,24 +5626,34 @@ triforce        // 2002.?? Triforce BIOS
 vs2002ex        // 2002.07.30 Virtua Striker 2002 (Export)
 vs2002j         // 2002.10 Virtua Striker 2002 (Japan)
 fzeroaxc        // 2003.06.11 F-Zero AX (Rev. C)
-avalons         // 2003.07 The Key Of Avalon: The Wizard Master (server) (Rev C)
+avalonsc        // 2003.07 The Key Of Avalon: The Wizard Master (server) (Rev C)
+avalonse        // 2003.08 The Key Of Avalon: The Wizard Master (server) (Rev E)
+avalonce        // 2003.08 The Key Of Avalon: The Wizard Master (client) (Rev E)
+avalonsf        // 2003.09 The Key Of Avalon: The Wizard Master (server) (Rev F)
+avaloncf        // 2003.09 The Key Of Avalon: The Wizard Master (client) (Rev F)
+gekpuryb        // 2003.10 Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu (Rev B)
 gekpurya        // 2003.10 Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu (Rev C)
 				// 2003.10 The Key Of Avalon 1.01
+avalons         // 2003.11 The Key Of Avalon: The Wizard Master (server) (Rev G)
+avalonc         // 2003.11 The Key Of Avalon: The Wizard Master (client) (Rev G)
 fzeroax         // 2003.12 F-Zero AX (Rev. E)
 				// 2003.12 The Key Of Avalon 1.10
+avalns12        // 2004.03 The Key Of Avalon 1.20 - Summon The New Monsters (server) (Rev A)
+avalnc12        // 2004.03 The Key Of Avalon 1.20 - Summon The New Monsters (client) (Rev A)
 				// 2004.04 The Key Of Avalon 1.20 - Summon The New Monsters
-avalon13        // 2004.06.08 The Key Of Avalon 1.30 - Chaotic Sabbat (client) (Rev C)
+avalns13        // 2004.06.08 The Key Of Avalon 1.30 - Chaotic Sabbat (server) (Rev C)
+avalnc13        // 2004.06.08 The Key Of Avalon 1.30 - Chaotic Sabbat (client) (Rev C)
 vs4j            // 2004.10 Virtua Striker 4 (Japan) (Rev E)
 avalon20        // 2004.11.02 The Key Of Avalon 2 - Eutaxy Commandment (client) (Rev B)
-vs4             // 2004.12.02 Virtua Striker 4 (export)
+vs4             // 2004.12.02 Virtua Striker 4 (Export)
 				// 2004.?? F-Zero AX - Monster Ride Cycraft Edition
 tfupdate        // 2004.?? Triforce GDROM Boot Update
 				// 2005.08 Avalon no Kagi Ver.2.5 Kagi Seisen
 mkartagp        // 2005.12 Mario Kart Arcade GP (MKA2 Ver.B)
 				// 2005.?? Donkey Kong Jungle Fever
-				// 2006.01.31 Virtua Striker 4 Ver.2006 (export)
+vs42k6ex        // 2006.01.31 Virtua Striker 4 Ver.2006 (Export)
 vs42006         // 2006.05 Virtua Striker 4 Ver.2006 (Japan) (Rev D)
-				// 2006.?? Firmware Update For Compact Flash Box (Rev A)
+tcfboxa         // 2006.?? Firmware Update For Compact Flash Box (Rev A)
 mkartag2        // 2007.03 Mario Kart Arcade GP 2 (MK21 Ver.A)
 mkartag2a       // 2007.03 Mario Kart Arcade GP 2 (MK21 Ver.A, alt dump)
 

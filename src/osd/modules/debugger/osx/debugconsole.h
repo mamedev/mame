@@ -37,6 +37,10 @@
 
 - (IBAction)doCommand:(id)sender;
 
+- (IBAction)debugToggleBreakpoint:(id)sender;
+- (IBAction)debugToggleBreakpointEnable:(id)sender;
+- (IBAction)debugRunToCursor:(id)sender;
+
 - (IBAction)debugNewMemoryWindow:(id)sender;
 - (IBAction)debugNewDisassemblyWindow:(id)sender;
 - (IBAction)debugNewErrorLogWindow:(id)sender;
@@ -45,6 +49,7 @@
 
 - (void)debugNewMemoryWindowForSpace:(address_space *)space device:(device_t *)device expression:(NSString *)expression;
 - (void)debugNewDisassemblyWindowForSpace:(address_space *)space device:(device_t *)device expression:(NSString *)expression;
+- (void)debugNewInfoWindowForDevice:(device_t &)device;
 
 - (void)showDebugger:(NSNotification *)notification;
 - (void)auxiliaryWindowWillClose:(NSNotification *)notification;

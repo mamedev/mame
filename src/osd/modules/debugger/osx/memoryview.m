@@ -18,16 +18,8 @@
 @implementation MAMEMemoryView
 
 - (id)initWithFrame:(NSRect)f machine:(running_machine &)m {
-	NSMenu	*contextMenu;
-
 	if (!(self = [super initWithFrame:f type:DVT_MEMORY machine:m]))
 		return nil;
-
-	contextMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"Memory"];
-	[self insertActionItemsInMenu:contextMenu atIndex:0];
-	[self setMenu:contextMenu];
-	[contextMenu release];
-
 	return self;
 }
 
@@ -42,39 +34,58 @@
 	NSInteger			tag = [item tag];
 	debug_view_memory	*memview = downcast<debug_view_memory *>(view);
 
-	if (action == @selector(showChunkSize:)) {
+	if (action == @selector(showChunkSize:))
+	{
 		[item setState:((tag == memview->bytes_per_chunk()) ? NSOnState : NSOffState)];
-	} else if (action == @selector(showPhysicalAddresses:)) {
-		[item setState:((tag == memview->physical()) ? NSOnState : NSOffState)];
-	} else if (action == @selector(showReverseView:)) {
-		[item setState:((tag == memview->reverse()) ? NSOnState : NSOffState)];
-	} else if (action == @selector(showReverseViewToggle:)) {
-		[item setState:(memview->reverse() ? NSOnState : NSOffState)];
+		return YES;
 	}
-	return YES;
+	else if (action == @selector(showPhysicalAddresses:))
+	{
+		[item setState:((tag == memview->physical()) ? NSOnState : NSOffState)];
+		return YES;
+	}
+	else if (action == @selector(showReverseView:))
+	{
+		[item setState:((tag == memview->reverse()) ? NSOnState : NSOffState)];
+		return YES;
+	}
+	else if (action == @selector(showReverseViewToggle:))
+	{
+		[item setState:(memview->reverse() ? NSOnState : NSOffState)];
+		return YES;
+	}
+	else if (action == @selector(changeBytesPerLine:))
+	{
+		return (memview->chunks_per_row() + [item tag]) > 0;
+	}
+	else
+	{
+		return [super validateMenuItem:item];
+	}
 }
 
 
 - (NSSize)maximumFrameSize {
-	debug_view_xy			max;
-	device_t				*curcpu = debug_cpu_get_visible_cpu(*machine);
-	debug_view_source const	*source = view->source_for_device(curcpu);
-
-	max.x = max.y = 0;
-	for (const debug_view_source *source = view->source_list().first();
-		 source != NULL;
-		 source = source->next())
+	debug_view_xy			max(0, 0);
+	debug_view_source const	*source = view->source();
+	for (debug_view_source const *source = view->first_source(); source != NULL; source = source->next())
 	{
-		debug_view_xy	current;
 		view->set_source(*source);
-		current = view->total_size();
-		if (current.x > max.x)
-			max.x = current.x;
-		if (current.y > max.y)
-			max.y = current.y;
+		debug_view_xy const current = view->total_size();
+		max.x = MAX(max.x, current.x);
+		max.y = MAX(max.y, current.y);
 	}
 	view->set_source(*source);
-	return NSMakeSize(max.x * fontWidth, max.y * fontHeight);
+	return NSMakeSize(ceil((max.x * fontWidth) + (2 * [textContainer lineFragmentPadding])),
+					  ceil(max.y * fontHeight));
+}
+
+
+- (void)addContextMenuItemsToMenu:(NSMenu *)menu {
+	[super addContextMenuItemsToMenu:menu];
+	if ([menu numberOfItems] > 0)
+		[menu addItem:[NSMenuItem separatorItem]];
+	[self insertActionItemsInMenu:menu atIndex:[menu numberOfItems]];
 }
 
 

@@ -31,7 +31,7 @@ VBlank = 58Hz
  -2) X Line Scrolling doesn't work 100% when Flip Screen Dip is set
  -3) 2 Player Version - Dips for difficulty don't seem to work or just need more testing
 
- -4) 2 Player Version - sound ROM is different and the adpmc chip is addressed differently
+ -4) 2 Player Version - sound ROM is different and the adpcm chip is addressed differently
                         Changed it to use a rom that was dumped from original PCB (readme below),
                         this makes the non-working ROM not used - i don't know where it come from.
 
@@ -131,11 +131,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(vball_state::vball_scanline)
 	/* Save the scroll x register value */
 	if (scanline < 256)
 	{
-		m_vb_scrollx[255 - scanline] = (m_vb_scrollx_hi + m_vb_scrollx_lo + 4);
+		m_scrollx[255 - scanline] = (m_scrollx_hi + m_scrollx_lo + 4);
 	}
 }
 
-WRITE8_MEMBER(vball_state::vball_irq_ack_w)
+WRITE8_MEMBER(vball_state::irq_ack_w)
 {
 	if (offset == 0)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -154,17 +154,16 @@ WRITE8_MEMBER(vball_state::vball_irq_ack_w)
    bit 6 = scroll y hi
    bit 7 = ?
 */
-WRITE8_MEMBER(vball_state::vb_bankswitch_w)
+WRITE8_MEMBER(vball_state::bankswitch_w)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-	membank("bank1")->set_base(&RAM[0x10000 + (0x4000 * (data & 1))]);
+	membank("mainbank")->set_entry(data & 1);
 
 	if (m_gfxset != ((data  & 0x20) ^ 0x20))
 	{
 		m_gfxset = (data  & 0x20) ^ 0x20;
-			vb_mark_all_dirty();
+			m_bg_tilemap->mark_all_dirty();
 	}
-	m_vb_scrolly_hi = (data & 0x40) << 2;
+	m_scrolly_hi = (data & 0x40) << 2;
 }
 
 /* The sound system comes all but verbatim from Double Dragon */
@@ -184,19 +183,19 @@ WRITE8_MEMBER(vball_state::cpu_sound_command_w)
    bit 6 = sp prom bank
    bit 7 = sp prom bank
 */
-WRITE8_MEMBER(vball_state::vb_scrollx_hi_w)
+WRITE8_MEMBER(vball_state::scrollx_hi_w)
 {
 	flip_screen_set(~data&1);
-	m_vb_scrollx_hi = (data & 0x02) << 7;
-	vb_bgprombank_w((data >> 2) & 0x07);
-	vb_spprombank_w((data >> 5) & 0x07);
-	//logerror("%04x: vb_scrollx_hi = %d\n", space.device().safe_pcbase(), m_vb_scrollx_hi);
+	m_scrollx_hi = (data & 0x02) << 7;
+	bgprombank_w((data >> 2) & 0x07);
+	spprombank_w((data >> 5) & 0x07);
+	//logerror("%04x: scrollx_hi = %d\n", space.device().safe_pcbase(), m_scrollx_hi);
 }
 
-WRITE8_MEMBER(vball_state::vb_scrollx_lo_w)
+WRITE8_MEMBER(vball_state::scrollx_lo_w)
 {
-	m_vb_scrollx_lo = data;
-	//logerror("%04x: vb_scrollx_lo =%d\n", space.device().safe_pcbase(), m_vb_scrollx_lo);
+	m_scrollx_lo = data;
+	//logerror("%04x: scrollx_lo =%d\n", space.device().safe_pcbase(), m_scrollx_lo);
 }
 
 
@@ -211,15 +210,15 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vball_state )
 	AM_RANGE(0x1004, 0x1004) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1005, 0x1005) AM_READ_PORT("P3")
 	AM_RANGE(0x1006, 0x1006) AM_READ_PORT("P4")
-	AM_RANGE(0x1008, 0x1008) AM_WRITE(vb_scrollx_hi_w)
-	AM_RANGE(0x1009, 0x1009) AM_WRITE(vb_bankswitch_w)
-	AM_RANGE(0x100a, 0x100b) AM_WRITE(vball_irq_ack_w)  /* is there a scanline counter here? */
-	AM_RANGE(0x100c, 0x100c) AM_WRITE(vb_scrollx_lo_w)
+	AM_RANGE(0x1008, 0x1008) AM_WRITE(scrollx_hi_w)
+	AM_RANGE(0x1009, 0x1009) AM_WRITE(bankswitch_w)
+	AM_RANGE(0x100a, 0x100b) AM_WRITE(irq_ack_w)  /* is there a scanline counter here? */
+	AM_RANGE(0x100c, 0x100c) AM_WRITE(scrollx_lo_w)
 	AM_RANGE(0x100d, 0x100d) AM_WRITE(cpu_sound_command_w)
-	AM_RANGE(0x100e, 0x100e) AM_WRITEONLY AM_SHARE("vb_scrolly_lo")
-	AM_RANGE(0x2000, 0x2fff) AM_WRITE(vb_videoram_w) AM_SHARE("vb_videoram")
-	AM_RANGE(0x3000, 0x3fff) AM_WRITE(vb_attrib_w) AM_SHARE("vb_attribram")
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x100e, 0x100e) AM_WRITEONLY AM_SHARE("scrolly_lo")
+	AM_RANGE(0x2000, 0x2fff) AM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x3000, 0x3fff) AM_WRITE(attrib_w) AM_SHARE("attribram")
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("mainbank")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -361,6 +360,11 @@ static INPUT_PORTS_START (vball2pj)
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED ) /* Used in 4 player mode, not supported in 2 player set */
 INPUT_PORTS_END
 
+void vball_state::machine_start()
+{
+	membank("mainbank")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
+}
+
 
 static const gfx_layout charlayout =
 {
@@ -407,7 +411,7 @@ static MACHINE_CONFIG_START( vball, vball_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 8, 248)   /* based on ddragon driver */
-	MCFG_SCREEN_UPDATE_DRIVER(vball_state, screen_update_vb)
+	MCFG_SCREEN_UPDATE_DRIVER(vball_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vb)
@@ -557,7 +561,7 @@ ROM_START( vball2pjb ) /* bootleg of the Japan set with unmoddified program rom 
 ROM_END
 
 
-GAME( 1988, vball,    0,     vball,    vball, driver_device,    0, ROT0, "Technos Japan", "U.S. Championship V'ball (US)", 0 )
-GAME( 1988, vball2pj, vball, vball,    vball2pj, driver_device, 0, ROT0, "Technos Japan", "U.S. Championship V'ball (Japan)", 0 )
-GAME( 1988, vballb,   vball, vball,    vball, driver_device,    0, ROT0, "bootleg", "U.S. Championship V'ball (bootleg of US set)", 0 )
-GAME( 1988, vball2pjb,vball, vball,    vball, driver_device,    0, ROT0, "bootleg", "U.S. Championship V'ball (bootleg of Japan set)", 0 )
+GAME( 1988, vball,    0,     vball,    vball, driver_device,    0, ROT0, "Technos Japan", "U.S. Championship V'ball (US)", GAME_SUPPORTS_SAVE )
+GAME( 1988, vball2pj, vball, vball,    vball2pj, driver_device, 0, ROT0, "Technos Japan", "U.S. Championship V'ball (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, vballb,   vball, vball,    vball, driver_device,    0, ROT0, "bootleg", "U.S. Championship V'ball (bootleg of US set)", GAME_SUPPORTS_SAVE )
+GAME( 1988, vball2pjb,vball, vball,    vball, driver_device,    0, ROT0, "bootleg", "U.S. Championship V'ball (bootleg of Japan set)", GAME_SUPPORTS_SAVE )

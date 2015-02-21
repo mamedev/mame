@@ -295,6 +295,7 @@ DEBUGOBJS = \
 	$(OSDOBJ)/modules/debugger/osx/debugconsole.o \
 	$(OSDOBJ)/modules/debugger/osx/debugview.o \
 	$(OSDOBJ)/modules/debugger/osx/debugwindowhandler.o \
+	$(OSDOBJ)/modules/debugger/osx/deviceinfoviewer.o \
 	$(OSDOBJ)/modules/debugger/osx/devicesviewer.o \
 	$(OSDOBJ)/modules/debugger/osx/disassemblyview.o \
 	$(OSDOBJ)/modules/debugger/osx/disassemblyviewer.o \
@@ -727,7 +728,7 @@ endif # OS2
 
 ifndef NO_USE_QTDEBUG
 $(OSDOBJ)/%.moc.c: $(OSDSRC)/%.h
-	$(MOC) $(MOCINCPATH) $(DEFS) $< -o $@
+	$(MOC) $(MOCINCPATH) $< -o $@
 
 DEBUGOBJS = \
 	$(OSDOBJ)/modules/debugger/qt/debuggerview.o \

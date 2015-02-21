@@ -572,7 +572,7 @@ $(OBJ)/libsqlite3.a: $(SQLITEOBJS)
 
 $(LIBOBJ)/sqlite3/sqlite3.o: $(3RDPARTY)/sqlite3/sqlite3.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC_AS) $(CDEFS) -fPIC $(CONLYFLAGS) -Wno-bad-function-cast -I$(3RDPARTY)/sqlite3 -c $< -o $@
+	$(CC_AS) $(CDEFS) -fPIC $(CCOMFLAGS) $(CONLYFLAGS) -Wno-bad-function-cast -Wno-undef -I$(3RDPARTY)/sqlite3 $(SQLITE3_FLAGS) -c $< -o $@
 
 #-------------------------------------------------
 # BGFX library objects

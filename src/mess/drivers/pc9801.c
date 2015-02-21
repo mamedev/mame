@@ -102,8 +102,7 @@
     - Sorcerian, Twilight Zone 3: Fails initial booting, issue with 2dd irq?
     - The Incredible Machine: hangs at main menu (YM mis-fires irq?)
     - Uchiyama Aki no Chou Bangai: keyboard irq is fussy (sometimes it doesn't register a key press);
-    - Uno: uses EGC
-    - Viper V16 Demo: moans with a JP message;
+    - Uno: has minor EGC gfx bugs;
     - Windows 2: EGC drawing issue (byte wide writes?)
 
     per-game TODO (PC-9821):
@@ -882,18 +881,22 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 		else
 			x_step = 1;
 
-		attr = (m_video_ram_1[(tile_addr & 0xfff) | 0x1000] & 0xff);
 
-		secret = (attr & 1) ^ 1;
-		blink = attr & 2;
-		reverse = attr & 4;
-		u_line = attr & 8;
-		v_line = (m_video_ff[ATTRSEL_REG]) ? 0 : attr & 0x10;
-		gfx_mode = (m_video_ff[ATTRSEL_REG]) ? attr & 0x10 : 0;
-		color = (attr & 0xe0) >> 5;
 
 		for(kanji_lr=0;kanji_lr<x_step;kanji_lr++)
 		{
+			/* Rori Rori Rolling definitely uses different colors for brake stop PCG elements,
+  			   assume that all attributes are recalculated on different strips */
+			attr = (m_video_ram_1[((tile_addr+kanji_lr) & 0xfff) | 0x1000] & 0xff);
+
+			secret = (attr & 1) ^ 1;
+			blink = attr & 2;
+			reverse = attr & 4;
+			u_line = attr & 8;
+			v_line = (m_video_ff[ATTRSEL_REG]) ? 0 : attr & 0x10;
+			gfx_mode = (m_video_ff[ATTRSEL_REG]) ? attr & 0x10 : 0;
+			color = (attr & 0xe0) >> 5;
+		
 			for(yi=0;yi<lr;yi++)
 			{
 				for(xi=0;xi<8;xi++)
@@ -1407,7 +1410,7 @@ void pc9801_state::egc_blit_w(UINT32 offset, UINT16 data, UINT16 mem_mask)
 	{
 		if(BIT(m_egc.regs[2], 10))
 		{
-			m_egc.leftover[0] = m_egc.leftover[1] = m_egc.leftover[2] = m_egc.leftover[3] = 0;
+			m_egc.leftover[0] = 0;
 			egc_shift(0, data);
 			// leftover[0] is inited above, set others to same
 			m_egc.leftover[1] = m_egc.leftover[2] = m_egc.leftover[3] = m_egc.leftover[0];
@@ -1419,8 +1422,8 @@ void pc9801_state::egc_blit_w(UINT32 offset, UINT16 data, UINT16 mem_mask)
 	// mask off the bits before the start
 	if(m_egc.first)
 	{
-		mask &= dir ? ~((1 << dst_off) - 1) : ((1 << (dst_off + 1)) - 1);
-		if(!m_egc.init)
+		mask &= dir ? ~((1 << dst_off) - 1) : ((1 << (16 - dst_off)) - 1);
+		if(BIT(m_egc.regs[2], 10) && !m_egc.init)
 			m_egc.leftover[0] = m_egc.leftover[1] = m_egc.leftover[2] = m_egc.leftover[3] = 0;
 	}
 
@@ -1510,6 +1513,11 @@ UINT16 pc9801_state::egc_blit_r(UINT32 offset, UINT16 mem_mask)
 		m_egc.pat[2] = m_video_ram_2[plane_off + (0x4000 * 3)];
 		m_egc.pat[3] = m_video_ram_2[plane_off];
 	}
+	if(m_egc.first && !m_egc.init)
+	{
+		m_egc.leftover[0] = m_egc.leftover[1] = m_egc.leftover[2] = m_egc.leftover[3] = 0;
+		m_egc.init = true;
+	}
 	for(int i = 0; i < 4; i++)
 		m_egc.src[i] = egc_shift(i, m_video_ram_2[plane_off + (((i + 1) & 3) * 0x4000)]);
 
@@ -1567,8 +1575,8 @@ WRITE16_MEMBER(pc9801_state::upd7220_grcg_w)
 				{
 					if(mem_mask & 0xff)
 					{
-						vram[offset | (((i + 1) & 3) * 0x8000)] &= ~data;
-						vram[offset | (((i + 1) & 3) * 0x8000)] |= m_grcg.tile[i] & data;
+						vram[offset | (((i + 1) & 3) * 0x8000)] &= ~(data >> 0);
+						vram[offset | (((i + 1) & 3) * 0x8000)] |= m_grcg.tile[i] & (data >> 0);
 					}
 					if(mem_mask & 0xff00)
 					{
@@ -1892,7 +1900,7 @@ WRITE8_MEMBER(pc9801_state::grcg_w)
 	else if(offset == 7)
 	{
 //      logerror("%02x GRCG TILE %02x\n",data,m_grcg.tile_index);
-		m_grcg.tile[m_grcg.tile_index] = data;
+		m_grcg.tile[m_grcg.tile_index] = BITSWAP8(data,0,1,2,3,4,5,6,7);
 		m_grcg.tile_index ++;
 		m_grcg.tile_index &= 3;
 		return;
@@ -1906,7 +1914,8 @@ WRITE16_MEMBER(pc9801_state::egc_w)
 	if(!m_ex_video_ff[2])
 		return;
 
-	COMBINE_DATA(&m_egc.regs[offset]);
+	if(!(m_egc.regs[1] & 0x6000) || (offset != 4)) // why?
+		COMBINE_DATA(&m_egc.regs[offset]);
 	switch(offset)
 	{
 		case 1:

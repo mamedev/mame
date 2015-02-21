@@ -128,25 +128,26 @@ void DasmWindow::toggleBreakpointAtCursor(bool changedTo)
 {
 	if (m_dasmView->view()->cursor_visible())
 	{
-		if (debug_cpu_get_visible_cpu(*m_machine) == m_dasmView->view()->source()->device())
+		offs_t address = downcast<debug_view_disasm *>(m_dasmView->view())->selected_address();
+		device_t *device = m_dasmView->view()->source()->device();
+		device_debug *cpuinfo = device->debug();
+
+		// Find an existing breakpoint at this address
+		INT32 bpindex = -1;
+		for (device_debug::breakpoint* bp = cpuinfo->breakpoint_first();
+				bp != NULL;
+				bp = bp->next())
 		{
-			offs_t address = downcast<debug_view_disasm *>(m_dasmView->view())->selected_address();
-			device_debug *cpuinfo = m_dasmView->view()->source()->device()->debug();
-
-			// Find an existing breakpoint at this address
-			INT32 bpindex = -1;
-			for (device_debug::breakpoint* bp = cpuinfo->breakpoint_first();
-					bp != NULL;
-					bp = bp->next())
+			if (address == bp->address())
 			{
-				if (address == bp->address())
-				{
-					bpindex = bp->index();
-					break;
-				}
+				bpindex = bp->index();
+				break;
 			}
+		}
 
-			// If none exists, add a new one
+		// If none exists, add a new one
+		if (debug_cpu_get_visible_cpu(*m_machine) == device)
+		{
 			astring command;
 			if (bpindex == -1)
 			{
@@ -158,6 +159,21 @@ void DasmWindow::toggleBreakpointAtCursor(bool changedTo)
 			}
 			debug_console_execute_command(*m_machine, command, 1);
 		}
+		else
+		{
+			if (bpindex == -1)
+			{
+				bpindex = cpuinfo->breakpoint_set(address, NULL, NULL);
+				debug_console_printf(*m_machine, "Breakpoint %X set\n", bpindex);
+			}
+			else
+			{
+				cpuinfo->breakpoint_clear(bpindex);
+				debug_console_printf(*m_machine, "Breakpoint %X cleared\n", bpindex);
+			}
+			m_machine->debug_view().update_all();
+			debugger_refresh_display(*m_machine);
+		}
 	}
 
 	refreshAll();
@@ -168,12 +184,18 @@ void DasmWindow::runToCursor(bool changedTo)
 {
 	if (m_dasmView->view()->cursor_visible())
 	{
-		if (debug_cpu_get_visible_cpu(*m_machine) == m_dasmView->view()->source()->device())
+		offs_t address = downcast<debug_view_disasm*>(m_dasmView->view())->selected_address();
+		device_t *device = m_dasmView->view()->source()->device();
+
+		if (debug_cpu_get_visible_cpu(*m_machine) == device)
 		{
-			offs_t address = downcast<debug_view_disasm*>(m_dasmView->view())->selected_address();
 			astring command;
 			command.printf("go 0x%X", address);
 			debug_console_execute_command(*m_machine, command, 1);
+		}
+		else
+		{
+			device->debug()->go(address);
 		}
 	}
 }

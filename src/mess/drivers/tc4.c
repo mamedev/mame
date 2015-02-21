@@ -4,10 +4,36 @@
 
   Coleco Total Control 4
   * TMS1400NLL MP7334-N2 (die labeled MP7334)
+  
+  This is a head to head electronic tabletop LED-display sports console.
+  One cartridge(Football) was included with the console, the other three were
+  sold separately. Gameplay has emphasis on strategy, read the official manual
+  on how to play. Remember that you can rotate the view in MESS: rotate left
+  for Home(P1) orientation, rotate right for Visitor(P2) orientation.
+  
+  Cartridge socket:
+  1 N/C
+  2 9V+
+  3 power switch
+  4 K8
+  5 K4
+  6 K2
+  7 K1
+  8 R9
+  
+  The cartridge connects pin 8 with one of the K-pins.
 
+  Available cartridges:
+  - Football    (K8, confirmed)
+  - Hockey      (K4?)
+  - Soccer      (K2?)
+  - Basketball  (K1?)
 
 
   TODO:
+  - pin configuration of other carts is guessed
+  - softlist for the cartridges?
+  - offsensive players leds are supposed to look brighter
   - MCU clock is unknown
 
 ***************************************************************************/
@@ -20,7 +46,7 @@
 
 // The master clock is a single stage RC oscillator: R=27.3K, C=100pf.
 // TMS1400 RC curve is unknown, so let's do an approximation until it is.
-#define MASTER_CLOCK (475000)
+#define MASTER_CLOCK (450000)
 
 
 class tc4_state : public driver_device
@@ -34,7 +60,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_ioport_array<6> m_button_matrix;
+	required_ioport_array<7> m_button_matrix;
 	required_device<speaker_sound_device> m_speaker;
 
 	UINT16 m_r;
@@ -67,14 +93,13 @@ public:
 // To prevent flickering here, we need to simulate a decay.
 
 // decay time, in steps of 1ms
-#define DISPLAY_DECAY_TIME 40
+#define DISPLAY_DECAY_TIME 50
 
 inline bool tc4_state::index_is_7segled(int index)
 {
 	// R5,7,8,9 are 7segs
 	return (index >= 5 && index <= 9 && index != 6);
 }
-
 
 void tc4_state::display_update()
 {
@@ -144,7 +169,7 @@ READ8_MEMBER(tc4_state::read_k)
 	
 	// read from cartridge
 	if (m_r & 0x200)
-		k |= ioport("CART")->read();
+		k |= m_button_matrix[6]->read();
 	
 	return k;
 }
@@ -171,7 +196,6 @@ WRITE16_MEMBER(tc4_state::write_r)
 
 
 
-
 /***************************************************************************
 
   Inputs
@@ -180,10 +204,10 @@ WRITE16_MEMBER(tc4_state::write_r)
 
 static INPUT_PORTS_START( tc4 )
 	PORT_START("IN.0") // R0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Pass/Shoot Button 3") // right
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Pass/Shoot Button 1") // left
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Pass/Shoot Button 2") // middle
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 D/K Button")
 
 	PORT_START("IN.1") // R1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT )
@@ -210,18 +234,18 @@ static INPUT_PORTS_START( tc4 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_PLAYER(2)
 
 	PORT_START("IN.5") // R5
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Pass/Shoot Button 3") // right
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Pass/Shoot Button 1") // left
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Pass/Shoot Button 2") // middle
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 D/K Button")
 
-	PORT_START("CART")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "R9:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "R9:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "R9:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "R9:4" )
+	PORT_START("IN.6") // R9
+	PORT_CONFNAME( 0x0f, 0x08, "Cartridge")
+	PORT_CONFSETTING(    0x01, "Basketball" )
+	PORT_CONFSETTING(    0x02, "Soccer" )
+	PORT_CONFSETTING(    0x04, "Hockey" )
+	PORT_CONFSETTING(    0x08, "Football" )
 INPUT_PORTS_END
-
 
 
 
@@ -290,5 +314,4 @@ ROM_START( tc4 )
 ROM_END
 
 
-
-CONS( 1981, tc4, 0, 0, tc4, tc4, driver_device, 0, "Coleco", "Total Control 4", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+CONS( 1981, tc4, 0, 0, tc4, tc4, driver_device, 0, "Coleco", "Total Control 4", GAME_SUPPORTS_SAVE )

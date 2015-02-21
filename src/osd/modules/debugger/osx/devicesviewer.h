@@ -28,4 +28,6 @@
 
 - (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c;
 
+- (IBAction)showDeviceDetail:(id)sender;
+
 @end

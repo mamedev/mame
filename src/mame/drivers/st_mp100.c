@@ -858,7 +858,7 @@ GAME(1978,  memlane,    0,      st_mp100,   mp100, driver_device, 0,   ROT0,   "
 GAME(1978,  lectrono,   0,      st_mp100,   mp100, driver_device, 0,   ROT0,   "Stern", "Lectronamo", GAME_MECHANICAL | GAME_NO_SOUND )
 GAME(1978,  wildfyre,   0,      st_mp100,   mp100, driver_device, 0,   ROT0,   "Stern", "Wildfyre", GAME_MECHANICAL | GAME_NO_SOUND )
 GAME(1978,  nugent,     0,      st_mp100,   mp100, driver_device, 0,   ROT0,   "Stern", "Nugent", GAME_MECHANICAL | GAME_NO_SOUND )
-GAME(1979,  dracula,    0,      st_mp100,   mp100, driver_device, 0,   ROT0,   "Stern", "Dracula", GAME_MECHANICAL | GAME_NO_SOUND )
+GAME(1979,  dracula,    0,      st_mp100,   mp100, driver_device, 0,   ROT0,   "Stern", "Dracula (Pinball)", GAME_MECHANICAL | GAME_NO_SOUND )
 
 // different inputs
 GAME(1979,  trident,    0,      st_mp100,   mp200, driver_device, 0,   ROT0,   "Stern", "Trident", GAME_MECHANICAL | GAME_NO_SOUND )

@@ -1,18 +1,19 @@
-// license:?
+// license:? (pending decision)
 // copyright-holders:Olivier Galibert, Angelo Salese, David Haywood, Tomasz Slanina
 /********************************************************************************************************
 
     Seibu Protected 1993-94 era hardware, V30 based (sequel to the 68k based hardware)
-    TODO: figure out the rest of the protection
-    TODO: Zero Team presumably needs additive blending on the character screen
 
-    TODO:
-    - Zero Team currently crashes due of an unknown check with collision detection.
-    Additionally:
-    8E377: C7 06 00 05 80 A9         mov     word ptr [500h],0A980h
-    8E37D: C7 06 00 05 00 B9         mov     word ptr [500h],0B900h
-    8E383: F7 06 88 05 FF FF         test    word ptr [588h],0FFFFh ;checks unknown collision detection port with 0xffff?
-    8E389: 75 0A                     bne     8E395h
+	TODO:
+	* zeroteam - sort-DMA doesn't seem to work too well, sprite-sprite priorities are broken as per now
+
+	* xsedae - it does an "8-liner"-style scroll during attract, doesn't work too well.
+
+	* sprite chip is the same as seibuspi.c and feversoc.c, needs device-ification and merging.
+
+	* sprite chip also uses first entry for "something" that isn't sprite, some of them looks clipping
+	  regions (150 - ff in zeroteam, 150 - 0 and 150 - 80 in raiden2). Latter probably do double buffering
+	  on odd/even frames, by updating only top or bottom part of screen.
 
 ===========================================================================================================
 
@@ -24,7 +25,6 @@ raiden 2 board test note 17/04/08 (based on test by dox)
   value of 0x80 puts 0x00000-0x1ffff at 0x20000 - 0x3ffff
   value of 0x00 puts 0x20000-0x3ffff at 0x20000 - 0x3ffff
 
-===
 
 ===========================================================================================================
 
@@ -129,29 +129,6 @@ Protection Notes:
  customs.
 
  The games in legionna.c use (almost?) the same protection chips.
-
-Current Problem(s) - in order of priority
-
- High Priority
-
- Protection
- - zeroteam has bogus collision detection;
- - raiden2 has a weird movement after that the ship completes animation from the aircraft. Probably 42c2 should be floating point rounded ...
- - (and probably more)
-
- Unemulated 0-0x3ffff ROM banking for raidendx, but it's unknown if/where it's used (hopefully NOT on getting perfect on Alpha course).
-
- zeroteam - sort-DMA doesn't seem to work too well, sprite-sprite priorities are broken as per now
-
- xsedae - do an "8-liner"-style scroll during attract, doesn't work too well.
-
- sprite chip is the same as seibuspi.c and feversoc.c, needs device-ification and merging.
-
- sprite chip also uses first entry for "something" that isn't sprite, some of them looks clipping
- regions (150 - ff in zeroteam, 150 - 0 and 150 - 80 in raiden2). Latter probably do double buffering
- on odd/even frames, by updating only top or bottom part of screen.
-
- Low Priority
 
 ********************************************************************************************************/
 
@@ -1367,15 +1344,8 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-#if 1
-	MCFG_SCREEN_REFRESH_RATE(55.47) /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(500) /* not accurate */)
-	MCFG_SCREEN_SIZE(44*8, 34*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 30*8-1)
-#else // this should be correct but currently causes sprite flickering, visible from the very start of the intro
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_32MHz/4,512,0,40*8,282,0,30*8) /* hand-tuned to match ~55.47 */
-#endif
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiden2)
