@@ -125,6 +125,8 @@ void debug_view_breakpoints::view_click(const int button, const debug_view_xy& p
 			bpList[bpIndex]->setEnabled(true);
 
 		delete[] bpList;
+
+		machine().debug_view().update_all(DVT_DISASSEMBLY);
 	}
 
 	begin_update();
@@ -376,7 +378,7 @@ void debug_view_breakpoints::view_update()
 			device_debug::breakpoint* bp = bpList[bpi];
 
 			astring buffer;
-			buffer.printf("%x", bp->index());
+			buffer.printf("%X", bp->index());
 			pad_astring_to_length(buffer, tableBreaks[0]);
 			buffer.catprintf("%c", bp->enabled() ? 'X' : 'O');
 			pad_astring_to_length(buffer, tableBreaks[1]);

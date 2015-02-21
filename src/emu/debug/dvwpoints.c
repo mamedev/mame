@@ -441,7 +441,7 @@ void debug_view_watchpoints::view_update()
 			device_debug::watchpoint* wp = wpList[wpi];
 
 			astring buffer;
-			buffer.printf("%x", wp->index());
+			buffer.printf("%X", wp->index());
 			pad_astring_to_length(buffer, tableBreaks[0]);
 			buffer.catprintf("%c", wp->enabled() ? 'X' : 'O');
 			pad_astring_to_length(buffer, tableBreaks[1]);
