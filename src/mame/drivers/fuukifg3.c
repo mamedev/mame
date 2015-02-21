@@ -191,7 +191,7 @@ WRITE32_MEMBER(fuuki32_state::snd_020_w)
 		m_shared_ram[(offset * 2) + 1] = data & 0xff;
 }
 
-WRITE32_MEMBER(fuuki32_state::fuuki32_vregs_w)
+WRITE32_MEMBER(fuuki32_state::vregs_w)
 {
 	if (m_vregs[offset] != data)
 	{
@@ -210,10 +210,10 @@ static ADDRESS_MAP_START( fuuki32_map, AS_PROGRAM, 32, fuuki32_state )
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM                                                                     // Work RAM
 	AM_RANGE(0x410000, 0x41ffff) AM_RAM                                                                     // Work RAM (used by asurabus)
 
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(fuuki32_vram_0_w) AM_SHARE("vram.0")  // Tilemap 1
-	AM_RANGE(0x502000, 0x503fff) AM_RAM_WRITE(fuuki32_vram_1_w) AM_SHARE("vram.1")  // Tilemap 2
-	AM_RANGE(0x504000, 0x505fff) AM_RAM_WRITE(fuuki32_vram_2_w) AM_SHARE("vram.2")  // Tilemap bg
-	AM_RANGE(0x506000, 0x507fff) AM_RAM_WRITE(fuuki32_vram_3_w) AM_SHARE("vram.3")  // Tilemap bg2
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram.0")  // Tilemap 1
+	AM_RANGE(0x502000, 0x503fff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram.1")  // Tilemap 2
+	AM_RANGE(0x504000, 0x505fff) AM_RAM_WRITE(vram_2_w) AM_SHARE("vram.2")  // Tilemap bg
+	AM_RANGE(0x506000, 0x507fff) AM_RAM_WRITE(vram_3_w) AM_SHARE("vram.3")  // Tilemap bg2
 	AM_RANGE(0x508000, 0x517fff) AM_RAM                                                                     // More tilemap, or linescroll? Seems to be empty all of the time
 	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_DEVREADWRITE16("fuukivid", fuukivid_device, fuuki_sprram_r, fuuki_sprram_w, 0xffffffff) // Sprites
 	AM_RANGE(0x700000, 0x703fff) AM_RAM_DEVWRITE("palette",  palette_device, write) AM_SHARE("palette") // Palette
@@ -223,7 +223,7 @@ static ADDRESS_MAP_START( fuuki32_map, AS_PROGRAM, 32, fuuki32_state )
 	AM_RANGE(0x880000, 0x880003) AM_READ_PORT("880000")                                                     // Service + DIPS
 	AM_RANGE(0x890000, 0x890003) AM_READ_PORT("890000")                                                     // More DIPS
 
-	AM_RANGE(0x8c0000, 0x8c001f) AM_RAM_WRITE(fuuki32_vregs_w) AM_SHARE("vregs")        // Video Registers
+	AM_RANGE(0x8c0000, 0x8c001f) AM_RAM_WRITE(vregs_w) AM_SHARE("vregs")        // Video Registers
 	AM_RANGE(0x8d0000, 0x8d0003) AM_RAM                                                                     // Flipscreen Related
 	AM_RANGE(0x8e0000, 0x8e0003) AM_RAM AM_SHARE("priority")                            // Controls layer order
 	AM_RANGE(0x903fe0, 0x903fff) AM_READWRITE(snd_020_r, snd_020_w)                                         // Shared with Z80
@@ -237,7 +237,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-WRITE8_MEMBER(fuuki32_state::fuuki32_sound_bw_w)
+WRITE8_MEMBER(fuuki32_state::sound_bw_w)
 {
 	membank("bank1")->set_entry(data);
 }
@@ -271,7 +271,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fuuki32_sound_io_map, AS_IO, 8, fuuki32_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(fuuki32_sound_bw_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bw_w)
 	AM_RANGE(0x30, 0x30) AM_WRITENOP // leftover/unused nmi handler related
 	AM_RANGE(0x40, 0x45) AM_DEVREAD("ymf1", ymf278b_device, read) AM_WRITE(snd_ymf278b_w)
 ADDRESS_MAP_END
@@ -507,11 +507,11 @@ void fuuki32_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	{
 	case TIMER_LEVEL_1_INTERRUPT:
 		m_maincpu->set_input_line(1, HOLD_LINE);
-		timer_set(m_screen->time_until_pos(248), TIMER_LEVEL_1_INTERRUPT);
+		m_level_1_interrupt_timer->adjust(m_screen->time_until_pos(248));
 		break;
 	case TIMER_VBLANK_INTERRUPT:
 		m_maincpu->set_input_line(3, HOLD_LINE);    // VBlank IRQ
-		timer_set(m_screen->time_until_vblank_start(), TIMER_VBLANK_INTERRUPT);
+		m_vblank_interrupt_timer->adjust(m_screen->time_until_vblank_start());
 		break;
 	case TIMER_RASTER_INTERRUPT:
 		m_maincpu->set_input_line(5, HOLD_LINE);    // Raster Line IRQ
@@ -530,6 +530,8 @@ void fuuki32_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
 
+	m_level_1_interrupt_timer = timer_alloc(TIMER_LEVEL_1_INTERRUPT);
+	m_vblank_interrupt_timer = timer_alloc(TIMER_VBLANK_INTERRUPT);
 	m_raster_interrupt_timer = timer_alloc(TIMER_RASTER_INTERRUPT);
 
 	save_item(NAME(m_spr_buffered_tilebank));
@@ -541,8 +543,8 @@ void fuuki32_state::machine_reset()
 {
 	const rectangle &visarea = m_screen->visible_area();
 
-	timer_set(m_screen->time_until_pos(248), TIMER_LEVEL_1_INTERRUPT);
-	timer_set(m_screen->time_until_vblank_start(), TIMER_VBLANK_INTERRUPT);
+	m_level_1_interrupt_timer->adjust(m_screen->time_until_pos(248));
+	m_vblank_interrupt_timer->adjust(m_screen->time_until_vblank_start());
 	m_raster_interrupt_timer->adjust(m_screen->time_until_pos(0, visarea.max_x + 1));
 }
 
@@ -562,8 +564,8 @@ static MACHINE_CONFIG_START(fuuki32, fuuki32_state)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(64 * 8, 32 * 8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 8 - 1, 0, 30 * 8 - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(fuuki32_state, screen_update_fuuki32)
-	MCFG_SCREEN_VBLANK_DRIVER(fuuki32_state, screen_eof_fuuki32)
+	MCFG_SCREEN_UPDATE_DRIVER(fuuki32_state, screen_update)
+	MCFG_SCREEN_VBLANK_DRIVER(fuuki32_state, screen_eof)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fuuki32)
@@ -728,7 +730,7 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1998, asurabld,   0, fuuki32, asurabld, driver_device, 0, ROT0, "Fuuki", "Asura Blade - Sword of Dynasty (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)
+GAME( 1998, asurabld,   0, fuuki32, asurabld, driver_device, 0, ROT0, "Fuuki", "Asura Blade - Sword of Dynasty (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
-GAME( 2000, asurabus,   0,        fuuki32, asurabus, driver_device, 0, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)
-GAME( 2000, asurabusa,  asurabus, fuuki32, asurabusa,driver_device, 0, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan) (ARCADIA review build)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND) // has pause function on P1 button 4
+GAME( 2000, asurabus,   0,        fuuki32, asurabus, driver_device, 0, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2000, asurabusa,  asurabus, fuuki32, asurabusa,driver_device, 0, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan) (ARCADIA review build)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // has pause function on P1 button 4

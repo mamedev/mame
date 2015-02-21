@@ -68,16 +68,16 @@ inline void fuuki32_state::get_tile_info4bpp(tile_data &tileinfo, tilemap_memory
 TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_2){ get_tile_info4bpp(tileinfo, tile_index, 2); }
 TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_3){ get_tile_info4bpp(tileinfo, tile_index, 3); }
 
-inline void fuuki32_state::fuuki32_vram_w(offs_t offset, UINT32 data, UINT32 mem_mask, int _N_)
+inline void fuuki32_state::vram_w(offs_t offset, UINT32 data, UINT32 mem_mask, int _N_)
 {
 	COMBINE_DATA(&m_vram[_N_][offset]);
 	m_tilemap[_N_]->mark_tile_dirty(offset);
 }
 
-WRITE32_MEMBER(fuuki32_state::fuuki32_vram_0_w){ fuuki32_vram_w(offset, data, mem_mask, 0); }
-WRITE32_MEMBER(fuuki32_state::fuuki32_vram_1_w){ fuuki32_vram_w(offset, data, mem_mask, 1); }
-WRITE32_MEMBER(fuuki32_state::fuuki32_vram_2_w){ fuuki32_vram_w(offset, data, mem_mask, 2); }
-WRITE32_MEMBER(fuuki32_state::fuuki32_vram_3_w){ fuuki32_vram_w(offset, data, mem_mask, 3); }
+WRITE32_MEMBER(fuuki32_state::vram_0_w){ vram_w(offset, data, mem_mask, 0); }
+WRITE32_MEMBER(fuuki32_state::vram_1_w){ vram_w(offset, data, mem_mask, 1); }
+WRITE32_MEMBER(fuuki32_state::vram_2_w){ vram_w(offset, data, mem_mask, 2); }
+WRITE32_MEMBER(fuuki32_state::vram_3_w){ vram_w(offset, data, mem_mask, 3); }
 
 
 /***************************************************************************
@@ -116,7 +116,7 @@ void fuuki32_state::video_start()
 
                                 Screen Drawing
 
-    Video Registers (fuuki32_vregs):
+    Video Registers (vregs):
 
         00.w        Layer 0 Scroll Y
         02.w        Layer 0 Scroll X
@@ -131,7 +131,7 @@ void fuuki32_state::video_start()
         1c.w        Trigger a level 5 irq on this raster line
         1e.w        ? $3390/$3393 (Flip Screen Off/On), $0040 is buffer for tilemap 2 or 3
 
-    Priority Register (fuuki32_priority):
+    Priority Register (priority):
 
         fedc ba98 7654 3---
         ---- ---- ---- -210     Layer Order
@@ -145,7 +145,7 @@ void fuuki32_state::video_start()
 ***************************************************************************/
 
 /* Wrapper to handle bg and bg2 ttogether */
-void fuuki32_state::fuuki32_draw_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri )
+void fuuki32_state::draw_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri )
 {
 	int buffer = ((m_vregs[0x1e / 4] & 0x0000ffff) & 0x40);
 
@@ -161,7 +161,7 @@ void fuuki32_state::fuuki32_draw_layer( screen_device &screen, bitmap_ind16 &bit
 	}
 }
 
-UINT32 fuuki32_state::screen_update_fuuki32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 fuuki32_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT16 layer0_scrollx, layer0_scrolly;
 	UINT16 layer1_scrollx, layer1_scrolly;
@@ -213,15 +213,15 @@ UINT32 fuuki32_state::screen_update_fuuki32(screen_device &screen, bitmap_ind16 
 	bitmap.fill((0x800 * 4) - 1, cliprect);
 	screen.priority().fill(0, cliprect);
 
-	fuuki32_draw_layer(screen, bitmap, cliprect, tm_back,   0, 1);
-	fuuki32_draw_layer(screen, bitmap, cliprect, tm_middle, 0, 2);
-	fuuki32_draw_layer(screen, bitmap, cliprect, tm_front,  0, 4);
+	draw_layer(screen, bitmap, cliprect, tm_back,   0, 1);
+	draw_layer(screen, bitmap, cliprect, tm_middle, 0, 2);
+	draw_layer(screen, bitmap, cliprect, tm_front,  0, 4);
 
 	m_fuukivid->draw_sprites(screen, bitmap, cliprect, flip_screen(), m_spr_buffered_tilebank);
 	return 0;
 }
 
-void fuuki32_state::screen_eof_fuuki32(screen_device &screen, bool state)
+void fuuki32_state::screen_eof(screen_device &screen, bool state)
 {
 	// rising edge
 	if (state)
