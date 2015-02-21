@@ -31,6 +31,8 @@ static NSColor *SelectedCurrentBackground;
 static NSColor *InactiveSelectedBackground;
 static NSColor *InactiveSelectedCurrentBackground;
 
+static NSCharacterSet *NonWhiteCharacters;
+
 
 static void debugwin_view_update(debug_view &view, void *osdprivate)
 {
@@ -57,6 +59,8 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	SelectedCurrentBackground = [[NSColor colorWithCalibratedRed:0.875 green:0.625 blue:0.875 alpha:1.0] retain];
 	InactiveSelectedBackground = [[NSColor colorWithCalibratedWhite:0.875 alpha:1.0] retain];
 	InactiveSelectedCurrentBackground = [[NSColor colorWithCalibratedRed:0.875 green:0.5 blue:0.625 alpha:1.0] retain];
+
+	NonWhiteCharacters = [[NSCharacterSet whitespaceAndNewlineCharacterSet] invertedSet];
 }
 
 
@@ -317,8 +321,9 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 	for (UINT32 row = 0; row < size.y; row++, data += size.x)
 	{
+		// add content for the line and set colours
 		int			attr = -1;
-		NSUInteger	start = [text length], length = 0;
+		NSUInteger	start = [text length], length = start;
 		for (UINT32 col = 0; col < size.x; col++)
 		{
 			[[text mutableString] appendFormat:@"%c", data[col].byte];
@@ -336,19 +341,33 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 			attr = data[col].attrib & ~DCA_SELECTED;
 			length = [text length];
 		}
-		if (start < length)
-		{
-			NSRange const run = NSMakeRange(start, length - start);
-			[text addAttribute:NSForegroundColorAttributeName
-						 value:[self foregroundForAttribute:attr]
-						 range:run];
-			[text addAttribute:NSBackgroundColorAttributeName
-						 value:[self backgroundForAttribute:attr]
-						 range:run];
-		}
+
+		// clean up trailing whitespace
+		NSRange trim = [[text string] rangeOfCharacterFromSet:NonWhiteCharacters
+													  options:NSBackwardsSearch
+														range:NSMakeRange(start, length - start)];
+		if (trim.location != NSNotFound)
+			trim = [[text string] rangeOfComposedCharacterSequenceAtIndex:(trim.location + trim.length - 1)];
+		else if (start > 0)
+			trim = [[text string] rangeOfComposedCharacterSequenceAtIndex:(start - 1)];
+		else
+			trim = NSMakeRange(start, 0);
+		trim.location += trim.length;
+		trim.length = length - trim.location;
+		[text deleteCharactersInRange:trim];
+
+		// add the line ending and set colours
 		[[text mutableString] appendString:@"\n"];
+		NSRange const run = NSMakeRange(start, [text length] - start);
+		[text addAttribute:NSForegroundColorAttributeName
+					 value:[self foregroundForAttribute:attr]
+					 range:run];
+		[text addAttribute:NSBackgroundColorAttributeName
+					 value:[self backgroundForAttribute:attr]
+					 range:run];
 	}
 
+	// set the font and send it to the pasteboard
 	NSRange const run = NSMakeRange(0, [text length]);
 	[text addAttribute:NSFontAttributeName value:font range:run];
 	NSPasteboard *const board = [NSPasteboard generalPasteboard];
@@ -458,6 +477,11 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 }
 
 
+- (BOOL)isOpaque {
+	return YES;
+}
+
+
 - (void)drawRect:(NSRect)dirtyRect {
 	INT32 position, clip;
 
@@ -495,8 +519,13 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 							 range:run];
 				NSRange const glyphs = [layoutManager glyphRangeForCharacterRange:run
 															 actualCharacterRange:NULL];
-				NSRect const box = [layoutManager boundingRectForGlyphRange:glyphs
-															inTextContainer:textContainer];
+				NSRect box = [layoutManager boundingRectForGlyphRange:glyphs
+													  inTextContainer:textContainer];
+				if (start == 0)
+				{
+					box.size.width += box.origin.x;
+					box.origin.x = 0;
+				}
 				[[self backgroundForAttribute:attr] set];
 				[NSBezierPath fillRect:NSMakeRect(box.origin.x,
 												  row * fontHeight,
@@ -507,25 +536,25 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 			attr = data[col - origin.x].attrib;
 			length = [text length];
 		}
-		if (start < length)
-		{
-			NSRange const run = NSMakeRange(start, length - start);
-			[text addAttribute:NSFontAttributeName
-						 value:font
-						 range:NSMakeRange(0, length)];
-			[text addAttribute:NSForegroundColorAttributeName
-						 value:[self foregroundForAttribute:attr]
-						 range:run];
-			NSRange const glyphs = [layoutManager glyphRangeForCharacterRange:run
-														 actualCharacterRange:NULL];
-			NSRect const box = [layoutManager boundingRectForGlyphRange:glyphs
-														inTextContainer:textContainer];
-			[[self backgroundForAttribute:attr] set];
-			[NSBezierPath fillRect:NSMakeRect(box.origin.x,
-											  row * fontHeight,
-											  box.size.width,
-											  fontHeight)];
-		}
+		NSRange const run = NSMakeRange(start, length - start);
+		[text addAttribute:NSFontAttributeName
+					 value:font
+					 range:NSMakeRange(0, length)];
+		[text addAttribute:NSForegroundColorAttributeName
+					 value:[self foregroundForAttribute:attr]
+					 range:run];
+		NSRange const glyphs = [layoutManager glyphRangeForCharacterRange:run
+													 actualCharacterRange:NULL];
+		NSRect box = [layoutManager boundingRectForGlyphRange:glyphs
+											  inTextContainer:textContainer];
+		if (start == 0)
+			box.origin.x = 0;
+		box.size.width = [self bounds].size.width - box.origin.x;
+		[[self backgroundForAttribute:attr] set];
+		[NSBezierPath fillRect:NSMakeRect(box.origin.x,
+										  row * fontHeight,
+										  box.size.width,
+										  fontHeight)];
 		[layoutManager drawGlyphsForGlyphRange:[layoutManager glyphRangeForTextContainer:textContainer]
 									   atPoint:NSMakePoint(0, row * fontHeight)];
 		[text deleteCharactersInRange:NSMakeRange(0, length)];
