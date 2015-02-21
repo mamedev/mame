@@ -240,9 +240,9 @@
 		// if it doesn't exist, add a new one
 		NSString *command;
 		if (bp == NULL)
-			command = [NSString stringWithFormat:@"bpset %lX", (unsigned long)address];
+			command = [NSString stringWithFormat:@"bpset 0x%lX", (unsigned long)address];
 		else
-			command = [NSString stringWithFormat:@"bpclear %X", (unsigned)bp->index()];
+			command = [NSString stringWithFormat:@"bpclear 0x%X", (unsigned)bp->index()];
 		debug_console_execute_command(*machine, [command UTF8String], 1);
 	}
 }
@@ -258,9 +258,9 @@
 		{
 			NSString *command;
 			if (bp->enabled())
-				command = [NSString stringWithFormat:@"bpdisable %X", (unsigned)bp->index()];
+				command = [NSString stringWithFormat:@"bpdisable 0x%X", (unsigned)bp->index()];
 			else
-				command = [NSString stringWithFormat:@"bpenable %X", (unsigned)bp->index()];
+				command = [NSString stringWithFormat:@"bpenable 0x%X", (unsigned)bp->index()];
 			debug_console_execute_command(*machine, [command UTF8String], 1);
 		}
 	}
