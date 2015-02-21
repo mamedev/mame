@@ -1,3 +1,4 @@
+			SKIP_UNCHANGED=1 
 ###########################################################################
 #
 #   makefile
@@ -810,17 +811,10 @@ clean: $(OSDCLEAN)
 ifeq ($(PARTIAL),1)	
 		@echo Deleting object tree $(OBJ)...
 		$(RM) -r obj/osd/*
-		@echo Deleting $(EMULATOR)...
-		$(RM) $(EMULATOR)
-		@echo Deleting $(TOOLS)...
-		$(RM) $(TOOLS)
-		@echo Deleting dependencies...
-		$(RM) depend_mame.mak
-		$(RM) depend_mess.mak
-		$(RM) depend_ume.mak
 else	
 		@echo Deleting object tree $(OBJ)...
 		$(RM) -r obj/*
+endif
 		@echo Deleting $(EMULATOR)...
 		$(RM) $(EMULATOR)
 		@echo Deleting $(TOOLS)...
@@ -829,7 +823,8 @@ else
 		$(RM) depend_mame.mak
 		$(RM) depend_mess.mak
 		$(RM) depend_ume.mak
-endif
+		@echo Deleting build targets...
+		$(RM) *_libretro.so
 
 checkautodetect:
 	@echo TARGETOS=$(TARGETOS)
@@ -924,7 +919,7 @@ $(DRIVLISTOBJ): $(DRIVLISTSRC)
 
 $(DRIVLISTSRC): $(SRC)/$(TARGET)/$(SUBTARGET).lst $(MAKELIST_TARGET)
 	@echo Building driver list $<...
-	@$(MAKELIST) $< >$@
+	$(PYTHON) $(SRC)/build/makelist.py $< >$@
 
 $(OBJ)/%.a:
 	@echo Archiving $@...
