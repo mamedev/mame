@@ -91,9 +91,17 @@ TO DO :
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "sound/msm5205.h"
 #include "gridiron.lh"
 #include "includes/tehkanwc.h"
+
+
+void tehkanwc_state::machine_start()
+{
+	save_item(NAME(m_track0));
+	save_item(NAME(m_track1));
+	save_item(NAME(m_msm_data_offs));
+	save_item(NAME(m_toggle));
+}
 
 WRITE8_MEMBER(tehkanwc_state::sub_cpu_halt_w)
 {
@@ -104,7 +112,7 @@ WRITE8_MEMBER(tehkanwc_state::sub_cpu_halt_w)
 }
 
 
-READ8_MEMBER(tehkanwc_state::tehkanwc_track_0_r)
+READ8_MEMBER(tehkanwc_state::track_0_r)
 {
 	int joy;
 
@@ -114,7 +122,7 @@ READ8_MEMBER(tehkanwc_state::tehkanwc_track_0_r)
 	return ioport(offset ? "P1Y" : "P1X")->read() - m_track0[offset];
 }
 
-READ8_MEMBER(tehkanwc_state::tehkanwc_track_1_r)
+READ8_MEMBER(tehkanwc_state::track_1_r)
 {
 	int joy;
 
@@ -124,13 +132,13 @@ READ8_MEMBER(tehkanwc_state::tehkanwc_track_1_r)
 	return ioport(offset ? "P2Y" : "P2X")->read() - m_track1[offset];
 }
 
-WRITE8_MEMBER(tehkanwc_state::tehkanwc_track_0_reset_w)
+WRITE8_MEMBER(tehkanwc_state::track_0_reset_w)
 {
 	/* reset the trackball counters */
 	m_track0[offset] = ioport(offset ? "P1Y" : "P1X")->read() + data;
 }
 
-WRITE8_MEMBER(tehkanwc_state::tehkanwc_track_1_reset_w)
+WRITE8_MEMBER(tehkanwc_state::track_1_reset_w)
 {
 	/* reset the trackball counters */
 	m_track1[offset] = ioport(offset ? "P2Y" : "P2X")->read() + data;
@@ -169,22 +177,22 @@ WRITE8_MEMBER(tehkanwc_state::sound_answer_w)
 /* Emulate MSM sound samples with counters */
 
 
-READ8_MEMBER(tehkanwc_state::tehkanwc_portA_r)
+READ8_MEMBER(tehkanwc_state::portA_r)
 {
 	return m_msm_data_offs & 0xff;
 }
 
-READ8_MEMBER(tehkanwc_state::tehkanwc_portB_r)
+READ8_MEMBER(tehkanwc_state::portB_r)
 {
 	return (m_msm_data_offs >> 8) & 0xff;
 }
 
-WRITE8_MEMBER(tehkanwc_state::tehkanwc_portA_w)
+WRITE8_MEMBER(tehkanwc_state::portA_w)
 {
 	m_msm_data_offs = (m_msm_data_offs & 0xff00) | data;
 }
 
-WRITE8_MEMBER(tehkanwc_state::tehkanwc_portB_w)
+WRITE8_MEMBER(tehkanwc_state::portB_w)
 {
 	m_msm_data_offs = (m_msm_data_offs & 0x00ff) | (data << 8);
 }
@@ -194,7 +202,7 @@ WRITE8_MEMBER(tehkanwc_state::msm_reset_w)
 	m_msm->reset_w(data ? 0 : 1);
 }
 
-WRITE_LINE_MEMBER(tehkanwc_state::tehkanwc_adpcm_int)
+WRITE_LINE_MEMBER(tehkanwc_state::adpcm_int)
 {
 	UINT8 *SAMPLES = memregion("adpcm")->base();
 	int msm_data = SAMPLES[m_msm_data_offs & 0x7fff];
@@ -218,40 +226,40 @@ static ADDRESS_MAP_START( main_mem, AS_PROGRAM, 8, tehkanwc_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(tehkanwc_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(tehkanwc_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xd800, 0xddff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xde00, 0xdfff) AM_RAM AM_SHARE("share5") /* unused part of the palette RAM, I think? Gridiron uses it */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(tehkanwc_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0xe800, 0xebff) AM_RAM AM_SHARE("spriteram") /* sprites */
-	AM_RANGE(0xec00, 0xec01) AM_RAM_WRITE(tehkanwc_scroll_x_w)
-	AM_RANGE(0xec02, 0xec02) AM_RAM_WRITE(tehkanwc_scroll_y_w)
-	AM_RANGE(0xf800, 0xf801) AM_READWRITE(tehkanwc_track_0_r, tehkanwc_track_0_reset_w) /* track 0 x/y */
+	AM_RANGE(0xec00, 0xec01) AM_RAM_WRITE(scroll_x_w)
+	AM_RANGE(0xec02, 0xec02) AM_RAM_WRITE(scroll_y_w)
+	AM_RANGE(0xf800, 0xf801) AM_READWRITE(track_0_r, track_0_reset_w) /* track 0 x/y */
 	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("SYSTEM") AM_WRITE(gridiron_led0_w)
 	AM_RANGE(0xf803, 0xf803) AM_READ_PORT("P1BUT")
 	AM_RANGE(0xf806, 0xf806) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf810, 0xf811) AM_READWRITE(tehkanwc_track_1_r, tehkanwc_track_1_reset_w) /* track 1 x/y */
+	AM_RANGE(0xf810, 0xf811) AM_READWRITE(track_1_r, track_1_reset_w) /* track 1 x/y */
 	AM_RANGE(0xf812, 0xf812) AM_WRITE(gridiron_led1_w)
 	AM_RANGE(0xf813, 0xf813) AM_READ_PORT("P2BUT")
 	AM_RANGE(0xf820, 0xf820) AM_READ(soundlatch2_byte_r) AM_WRITE(sound_command_w)  /* answer from the sound CPU */
 	AM_RANGE(0xf840, 0xf840) AM_READ_PORT("DSW1") AM_WRITE(sub_cpu_halt_w)
 	AM_RANGE(0xf850, 0xf850) AM_READ_PORT("DSW2") AM_WRITENOP           /* ?? writes 0x00 or 0xff */
-	AM_RANGE(0xf860, 0xf860) AM_READ(watchdog_reset_r) AM_WRITE(tehkanwc_flipscreen_x_w)
-	AM_RANGE(0xf870, 0xf870) AM_READ_PORT("DSW3") AM_WRITE(tehkanwc_flipscreen_y_w)
+	AM_RANGE(0xf860, 0xf860) AM_READ(watchdog_reset_r) AM_WRITE(flipscreen_x_w)
+	AM_RANGE(0xf870, 0xf870) AM_READ_PORT("DSW3") AM_WRITE(flipscreen_y_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_mem, AS_PROGRAM, 8, tehkanwc_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(tehkanwc_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(tehkanwc_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xd800, 0xddff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xde00, 0xdfff) AM_RAM AM_SHARE("share5") /* unused part of the palette RAM, I think? Gridiron uses it */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(tehkanwc_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0xe800, 0xebff) AM_RAM AM_SHARE("spriteram") /* sprites */
-	AM_RANGE(0xec00, 0xec01) AM_RAM_WRITE(tehkanwc_scroll_x_w)
-	AM_RANGE(0xec02, 0xec02) AM_RAM_WRITE(tehkanwc_scroll_y_w)
+	AM_RANGE(0xec00, 0xec01) AM_RAM_WRITE(scroll_x_w)
+	AM_RANGE(0xec02, 0xec02) AM_RAM_WRITE(scroll_y_w)
 	AM_RANGE(0xf860, 0xf860) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
@@ -638,7 +646,7 @@ static MACHINE_CONFIG_START( tehkanwc, tehkanwc_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tehkanwc_state, screen_update_tehkanwc)
+	MCFG_SCREEN_UPDATE_DRIVER(tehkanwc_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tehkanwc)
@@ -650,17 +658,17 @@ static MACHINE_CONFIG_START( tehkanwc, tehkanwc_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 1536000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tehkanwc_state, tehkanwc_portA_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tehkanwc_state, tehkanwc_portB_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tehkanwc_state, portA_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tehkanwc_state, portB_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 1536000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(tehkanwc_state, tehkanwc_portA_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(tehkanwc_state, tehkanwc_portB_r))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(tehkanwc_state, portA_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(tehkanwc_state, portB_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(tehkanwc_state, tehkanwc_adpcm_int)) /* interrupt function */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(tehkanwc_state, adpcm_int)) /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
@@ -882,8 +890,8 @@ ROM_END
 
 
 
-GAME( 1985, tehkanwc,  0,        tehkanwc, tehkanwc, driver_device, 0,        ROT0,  "Tehkan", "Tehkan World Cup (set 1)", 0 )
-GAME( 1985, tehkanwcb, tehkanwc, tehkanwc, tehkanwc, driver_device, 0,        ROT0,  "Tehkan", "Tehkan World Cup (set 2, bootleg?)", 0 )
-GAME( 1985, tehkanwcc, tehkanwc, tehkanwc, tehkanwc, driver_device, 0,        ROT0,  "bootleg", "Tehkan World Cup (set 3, bootleg)", GAME_NOT_WORKING ) // aka 'World Cup 85', different inputs?
-GAMEL(1985, gridiron,  0,        tehkanwc, gridiron, driver_device, 0,        ROT0,  "Tehkan", "Gridiron Fight", 0, layout_gridiron )
-GAME( 1986, teedoff,   0,        tehkanwc, teedoff, tehkanwc_state,  teedoff,  ROT90, "Tecmo", "Tee'd Off (Japan)", 0 )
+GAME( 1985, tehkanwc,  0,        tehkanwc, tehkanwc, driver_device, 0,        ROT0,  "Tehkan", "Tehkan World Cup (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1985, tehkanwcb, tehkanwc, tehkanwc, tehkanwc, driver_device, 0,        ROT0,  "Tehkan", "Tehkan World Cup (set 2, bootleg?)", GAME_SUPPORTS_SAVE )
+GAME( 1985, tehkanwcc, tehkanwc, tehkanwc, tehkanwc, driver_device, 0,        ROT0,  "bootleg", "Tehkan World Cup (set 3, bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // aka 'World Cup 85', different inputs?
+GAMEL(1985, gridiron,  0,        tehkanwc, gridiron, driver_device, 0,        ROT0,  "Tehkan", "Gridiron Fight", GAME_SUPPORTS_SAVE, layout_gridiron )
+GAME( 1986, teedoff,   0,        tehkanwc, teedoff, tehkanwc_state,  teedoff,  ROT90, "Tecmo", "Tee'd Off (Japan)", GAME_SUPPORTS_SAVE )
