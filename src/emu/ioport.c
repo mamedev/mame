@@ -785,7 +785,7 @@ void digital_joystick::frame_update()
 		//
 		//  If joystick is pointing at a diagonal, acknowledge that the player moved
 		//  the joystick by favoring a direction change.  This minimizes frustration
-		//  when using a keyboard for input, and maximizes responsiveness.
+		//  and maximizes responsiveness.
 		//
 		//  For example, if you are holding "left" then switch to "up" (where both left
 		//  and up are briefly pressed at the same time), we'll transition immediately
