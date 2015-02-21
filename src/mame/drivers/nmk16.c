@@ -6255,6 +6255,35 @@ ROM_START( macross2 )
 	ROM_LOAD( "mcrs2bpr.10", 0x0100, 0x0100, CRC(e6ead349) SHA1(6d81b1c0233580aa48f9718bade42d640e5ef3dd) ) /* unknown */
 ROM_END
 
+ROM_START( macross2g )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "3.u11",      0x00000, 0x80000, CRC(151f9d39) SHA1(d0454627f019c60615cc8bd11e6cbec1f885cf13) )
+
+	ROM_REGION( 0x30000, "audiocpu", 0 )        /* Z80 code */
+	ROM_LOAD( "mcrs2j.2",    0x00000, 0x20000, CRC(b4aa8ac7) SHA1(73a6de56cbfb468450d9b39fcbae0362f242f37b) )
+	ROM_RELOAD(              0x10000, 0x20000 )             /* banked */
+
+	ROM_REGION( 0x020000, "fgtile", 0 )
+	ROM_LOAD( "mcrs2j.1",    0x000000, 0x020000, CRC(c7417410) SHA1(41431d8f1ff4d66baf1a8518a0b0c0125d1d71d4) ) /* 8x8 tiles */
+
+	ROM_REGION( 0x200000, "bgtile", 0 )
+	ROM_LOAD( "bp932an.a04", 0x000000, 0x200000, CRC(c4d77ff0) SHA1(aca60a3f5f89265e7e3799e5d80ea8196fb11ff3) ) /* 16x16 tiles */
+
+	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_LOAD16_WORD_SWAP( "bp932an.a07", 0x000000, 0x200000, CRC(aa1b21b9) SHA1(133822e3d8628aa4eb3e62fbd054956799423b98) ) /* Sprites */
+	ROM_LOAD16_WORD_SWAP( "bp932an.a08", 0x200000, 0x200000, CRC(67eb2901) SHA1(25e0f9fda1a8c0c2b59616dd153cb6dcb459d2d9) )
+
+	ROM_REGION( 0x240000, "oki1", 0 )   /* OKIM6295 samples */
+	ROM_LOAD( "bp932an.a06", 0x040000, 0x200000, CRC(ef0ffec0) SHA1(fd72cc77e02d1a00bf27e77a33d7dab5f6ba1cb4) ) /* all banked */
+
+	ROM_REGION( 0x140000, "oki2", 0 )   /* OKIM6295 samples */
+	ROM_LOAD( "bp932an.a05", 0x040000, 0x100000, CRC(b5335abb) SHA1(f4eaf4e465eeca31741d432ee46ed39ffcd92cca) ) /* all banked */
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "mcrs2bpr.9",  0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) /* unknown */
+	ROM_LOAD( "mcrs2bpr.10", 0x0100, 0x0100, CRC(e6ead349) SHA1(6d81b1c0233580aa48f9718bade42d640e5ef3dd) ) /* unknown */
+ROM_END
+
 ROM_START( tdragon2 )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "6.rom",      0x00000, 0x80000, CRC(ca348caf) SHA1(7c5b0b92560baf413591230e061d2d57b25deafe) )
@@ -7732,6 +7761,7 @@ GAME( 1993, gunnail,  0,        gunnail,  gunnail, nmk16_state,    nmk,      ROT
 // a 1992 version of Gunnail exists, see https://www.youtube.com/watch?v=tf15Wz0zUiA  3:10
 
 GAME( 1993, macross2, 0,        macross2, macross2, driver_device, 0,        ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II", GAME_NO_COCKTAIL )
+GAME( 1993, macross2g, macross2,macross2, macross2, driver_device, 0,        ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II (GAMEST review build)", GAME_NO_COCKTAIL ) // Service switch pauses game
 
 GAME( 1993, tdragon2, 0,        tdragon2, tdragon2, driver_device, 0,        ROT270, "NMK",                          "Thunder Dragon 2 (9th Nov. 1993)", GAME_NO_COCKTAIL )
 GAME( 1993, tdragon2a,tdragon2, tdragon2, tdragon2, driver_device, 0,        ROT270, "NMK",                          "Thunder Dragon 2 (1st Oct. 1993)", GAME_NO_COCKTAIL )
