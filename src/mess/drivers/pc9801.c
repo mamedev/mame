@@ -1410,7 +1410,7 @@ void pc9801_state::egc_blit_w(UINT32 offset, UINT16 data, UINT16 mem_mask)
 	{
 		if(BIT(m_egc.regs[2], 10))
 		{
-			m_egc.leftover[0] = m_egc.leftover[1] = m_egc.leftover[2] = m_egc.leftover[3] = 0;
+			m_egc.leftover[0] = 0;
 			egc_shift(0, data);
 			// leftover[0] is inited above, set others to same
 			m_egc.leftover[1] = m_egc.leftover[2] = m_egc.leftover[3] = m_egc.leftover[0];
@@ -1422,8 +1422,8 @@ void pc9801_state::egc_blit_w(UINT32 offset, UINT16 data, UINT16 mem_mask)
 	// mask off the bits before the start
 	if(m_egc.first)
 	{
-		mask &= dir ? ~((1 << dst_off) - 1) : ((1 << (dst_off + 1)) - 1);
-		if(!m_egc.init)
+		mask &= dir ? ~((1 << dst_off) - 1) : ((1 << (16 - dst_off)) - 1);
+		if(BIT(m_egc.regs[2], 10) && !m_egc.init)
 			m_egc.leftover[0] = m_egc.leftover[1] = m_egc.leftover[2] = m_egc.leftover[3] = 0;
 	}
 
@@ -1513,6 +1513,11 @@ UINT16 pc9801_state::egc_blit_r(UINT32 offset, UINT16 mem_mask)
 		m_egc.pat[2] = m_video_ram_2[plane_off + (0x4000 * 3)];
 		m_egc.pat[3] = m_video_ram_2[plane_off];
 	}
+	if(m_egc.first && !m_egc.init)
+	{
+		m_egc.leftover[0] = m_egc.leftover[1] = m_egc.leftover[2] = m_egc.leftover[3] = 0;
+		m_egc.init = true;
+	}
 	for(int i = 0; i < 4; i++)
 		m_egc.src[i] = egc_shift(i, m_video_ram_2[plane_off + (((i + 1) & 3) * 0x4000)]);
 
@@ -1568,7 +1573,6 @@ WRITE16_MEMBER(pc9801_state::upd7220_grcg_w)
 			{
 				if((m_grcg.mode & (1 << i)) == 0)
 				{
-
 					if(mem_mask & 0xff)
 					{
 						vram[offset | (((i + 1) & 3) * 0x8000)] &= ~(data >> 0);
@@ -1896,7 +1900,7 @@ WRITE8_MEMBER(pc9801_state::grcg_w)
 	else if(offset == 7)
 	{
 //      logerror("%02x GRCG TILE %02x\n",data,m_grcg.tile_index);
-		m_grcg.tile[m_grcg.tile_index] = BITSWAP16((UINT16) data,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
+		m_grcg.tile[m_grcg.tile_index] = BITSWAP8(data,0,1,2,3,4,5,6,7);
 		m_grcg.tile_index ++;
 		m_grcg.tile_index &= 3;
 		return;
@@ -1910,7 +1914,8 @@ WRITE16_MEMBER(pc9801_state::egc_w)
 	if(!m_ex_video_ff[2])
 		return;
 
-	COMBINE_DATA(&m_egc.regs[offset]);
+	if(!(m_egc.regs[1] & 0x6000) || (offset != 4)) // why?
+		COMBINE_DATA(&m_egc.regs[offset]);
 	switch(offset)
 	{
 		case 1:
