@@ -774,10 +774,10 @@ LRESULT CALLBACK debugview_info::static_view_proc(HWND wnd, UINT message, WPARAM
 	}
 
 	debugview_info *const info = (debugview_info *)(FPTR)GetWindowLongPtr(wnd, GWLP_USERDATA);
-	if (!info)
+	if (info == NULL)
 		return DefWindowProc(wnd, message, wparam, lparam);
 
-	assert(info->m_wnd == wnd);
+	assert((info->m_wnd == wnd) || (info->m_wnd == NULL));
 	return info->view_proc(message, wparam, lparam);
 }
 

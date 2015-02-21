@@ -564,10 +564,10 @@ LRESULT CALLBACK debugwin_info::static_window_proc(HWND wnd, UINT message, WPARA
 	}
 
 	debugwin_info *const info = (debugwin_info *)(FPTR)GetWindowLongPtr(wnd, GWLP_USERDATA);
-	if (!info)
+	if (info == NULL)
 		return DefWindowProc(wnd, message, wparam, lparam);
 
-	assert(info->m_wnd == wnd);
+	assert((info->m_wnd == wnd) || (info->m_wnd == NULL));
 	return info->window_proc(message, wparam, lparam);
 }
 

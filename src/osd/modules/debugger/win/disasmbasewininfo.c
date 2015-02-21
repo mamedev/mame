@@ -131,7 +131,8 @@ void disasmbasewin_info::update_menu()
 			else
 				ModifyMenu(menu, ID_DISABLE_BREAKPOINT, MF_BYCOMMAND, ID_DISABLE_BREAKPOINT, TEXT("Enable breakpoint at cursor\tShift+F9"));
 		}
-		EnableMenuItem(menu, ID_DISABLE_BREAKPOINT, MF_BYCOMMAND | (bp != NULL ? MF_ENABLED : MF_GRAYED));
+		bool const available = (bp != NULL) && (!is_main_console() || dasmview->source_is_visible_cpu());
+		EnableMenuItem(menu, ID_DISABLE_BREAKPOINT, MF_BYCOMMAND | (available ? MF_ENABLED : MF_GRAYED));
 	}
 	else
 	{
@@ -177,16 +178,7 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 				}
 
 				// if it doesn't exist, add a new one
-				if (dasmview->source_is_visible_cpu())
-				{
-					astring command;
-					if (bpindex == -1)
-						command.printf("bpset 0x%X", address);
-					else
-						command.printf("bpclear 0x%X", bpindex);
-					debug_console_execute_command(machine(), command, 1);
-				}
-				else
+				if (!is_main_console())
 				{
 					if (bpindex == -1)
 					{
@@ -200,6 +192,15 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 					}
 					machine().debug_view().update_all();
 					debugger_refresh_display(machine());
+				}
+				else if (dasmview->source_is_visible_cpu())
+				{
+					astring command;
+					if (bpindex == -1)
+						command.printf("bpset 0x%X", address);
+					else
+						command.printf("bpclear 0x%X", bpindex);
+					debug_console_execute_command(machine(), command, 1);
 				}
 			}
 			return true;
@@ -218,18 +219,18 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 				// if it doesn't exist, add a new one
 				if (bp != NULL)
 				{
-					if (dasmview->source_is_visible_cpu())
-					{
-						astring command;
-						command.printf(bp->enabled() ? "bpdisable 0x%X" : "bpenable 0x%X", (UINT32)bp->index());
-						debug_console_execute_command(machine(), command, 1);
-					}
-					else
+					if (!is_main_console())
 					{
 						debug->breakpoint_enable(bp->index(), !bp->enabled());
 						debug_console_printf(machine(), "Breakpoint %X %s\n", (UINT32)bp->index(), bp->enabled() ? "enabled" : "disabled");
 						machine().debug_view().update_all();
 						debugger_refresh_display(machine());
+					}
+					else if (dasmview->source_is_visible_cpu())
+					{
+						astring command;
+						command.printf(bp->enabled() ? "bpdisable 0x%X" : "bpenable 0x%X", (UINT32)bp->index());
+						debug_console_execute_command(machine(), command, 1);
 					}
 				}
 			}
