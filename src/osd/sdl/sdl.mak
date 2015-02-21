@@ -539,6 +539,24 @@ ifeq ($(TARGETOS),macosx)
 OSDCOREOBJS += $(SDLOBJ)/osxutils.o
 SDLOS_TARGETOS = macosx
 
+ifeq ($(TARGET),mame)
+MACOSX_EMBED_INFO_PLIST = 1
+endif
+ifeq ($(TARGET),mess)
+MACOSX_EMBED_INFO_PLIST = 1
+endif
+ifeq ($(TARGET),ume)
+MACOSX_EMBED_INFO_PLIST = 1
+endif
+ifdef MACOSX_EMBED_INFO_PLIST
+INFOPLIST = $(SDLOBJ)/$(TARGET)-Info.plist
+LDFLAGSEMULATOR += -sectcreate __TEXT __info_plist $(INFOPLIST)
+$(EMULATOR): $(INFOPLIST)
+$(INFOPLIST): $(SRC)/build/verinfo.py $(SRC)/version.c
+	@echo Emitting $@...
+	$(PYTHON) $(SRC)/build/verinfo.py -b $(TARGET) -p $(SRC)/version.c > $@
+endif
+
 ifndef MACOSX_USE_LIBSDL
 # Compile using framework (compile using libSDL is the exception)
 ifeq ($(SDL_LIBVER),sdl2)
