@@ -13,12 +13,19 @@ Because it doesn't use the standard Z80 peripherals, it uses a homebrew interrup
 The keyboard is an intelligent serial device like the Kaypro's keyboard. They even have the same plug,
 and might be swappable. Need a schematic.
 
+Instead of using a daisy chain, the IM2 vectors are calculated by a prom (u77). Unfortunately, the prom
+contents make no sense at all (mostly FF), so the vectors for IRQ0 and IRQ2 are hard-coded. Other IRQ
+vectors are not used as yet.
+
+Status:
+- Boots up, and the keyboard works
+
 ToDo:
-- Add interrupt vector hardware and masking feature
+- Need software that does more than plain text (such as games)
+- Add masking feature (only used for the UARTs)
 - Connect devices to the above hardware
 - Fix the display
-- Fix floppy-disk
-- Connect up the PIT
+- Connect the PIT to the UARTs
 - Replace the ascii keyboard with the real one, if possible
 - Probably lots of other things
 
@@ -38,7 +45,6 @@ ToDo:
 #include "machine/keyboard.h"
 #include "machine/wd_fdc.h"
 
-#define KEYBOARD_TAG "keyboard"
 
 class zorba_state : public driver_device
 {
@@ -77,11 +83,15 @@ public:
 	DECLARE_WRITE8_MEMBER(pia0_porta_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(keyboard_r);
-	I8275_DRAW_CHARACTER_MEMBER( zorba_update_chr );
+	DECLARE_WRITE_LINE_MEMBER(irq0_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
+	I8275_DRAW_CHARACTER_MEMBER(zorba_update_chr);
 	required_device<palette_device> m_palette;
 
 private:
 	UINT8 m_term_data;
+	UINT8 m_fdc_rq;
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beep;
 	required_device<z80dma_device> m_dma;
@@ -149,6 +159,43 @@ WRITE8_MEMBER( zorba_state::rom_w )
 	membank("bankr0")->set_entry(1);
 }
 
+WRITE_LINE_MEMBER( zorba_state::irq0_w )
+{
+	if (state)
+	{
+		m_maincpu->set_input_line_vector(0, 0x88);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+	}
+	else
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER( zorba_state::fdc_intrq_w )
+{
+	m_fdc_rq = (m_fdc_rq & 2) | state;
+	if (m_fdc_rq == 1)
+	{
+		m_maincpu->set_input_line_vector(0, 0x80);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+	}
+	else
+	if (m_fdc_rq == 0)
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER( zorba_state::fdc_drq_w )
+{
+	m_fdc_rq = (m_fdc_rq & 1) | (state << 1);
+	if (m_fdc_rq == 2)
+	{
+		m_maincpu->set_input_line_vector(0, 0x80);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+	}
+	else
+	if (m_fdc_rq == 0)
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+}
+
 WRITE8_MEMBER( zorba_state::intmask_w )
 {
 }
@@ -173,7 +220,6 @@ WRITE_LINE_MEMBER( zorba_state::busreq_w )
 {
 // since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
-	m_maincpu->set_input_line(INPUT_LINE_HALT, state); // do we need this?
 	m_dma->bai_w(state); // tell dma that bus has been granted
 }
 
@@ -226,9 +272,7 @@ WRITE8_MEMBER( zorba_state::pia0_porta_w )
 	m_fdc->set_floppy(floppy);
 
 	if (floppy)
-	{
-		floppy->ss_w(!BIT(data, 5)); // might need inverting
-	}
+		floppy->ss_w(!BIT(data, 5));
 
 	m_floppy0->get_device()->mon_w(BIT(data, 4));
 	m_floppy1->get_device()->mon_w(BIT(data, 4));
@@ -275,10 +319,12 @@ GFXDECODE_END
 
 MACHINE_RESET_MEMBER( zorba_state, zorba )
 {
+	m_fdc_rq = 0;
 	m_beep->set_frequency(800);
 	m_p_chargen = memregion("chargen")->base();
 	membank("bankr0")->set_entry(1); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
+	m_maincpu->reset();
 }
 
 READ8_MEMBER( zorba_state::keyboard_r )
@@ -323,46 +369,46 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL_24MHz/6)
 	// busack on cpu connects to bai pin
 	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(zorba_state, busreq_w))  //connects to busreq on cpu
-	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))   // connects to IRQ0 on cpu
+	MCFG_Z80DMA_OUT_INT_CB(WRITELINE(zorba_state, irq0_w))   // connects to IRQ0 on IM2 controller
 	//ba0 - not connected
 	MCFG_Z80DMA_IN_MREQ_CB(READ8(zorba_state, memory_read_byte))
 	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(zorba_state, memory_write_byte))
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(zorba_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(zorba_state, io_write_byte))
 
-	MCFG_DEVICE_ADD("uart0", I8251, 0)
-	// COM port
+	MCFG_DEVICE_ADD("uart0", I8251, 0) // U32 COM port J2
 
-	MCFG_DEVICE_ADD("uart1", I8251, 0)
-	// printer port
+	MCFG_DEVICE_ADD("uart1", I8251, 0) // U31 printer port J3
 
-	MCFG_DEVICE_ADD("uart2", I8251, 0)
-	// keyboard
+	MCFG_DEVICE_ADD("uart2", I8251, 0) // U30 serial keyboard J6
 
-// port A - disk select etc, beeper
-// port B - parallel interface
+	// port A - disk select etc, beeper
+	// port B - parallel interface
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(zorba_state, pia0_porta_w))
 
-// IEEE488 interface
+	// IEEE488 interface
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
-	MCFG_PIT8253_CLK0(XTAL_24MHz / 3) /* Timer 0: ? */
-	MCFG_PIT8253_CLK1(XTAL_24MHz / 3) /* Timer 1: ? */
-	MCFG_PIT8253_CLK2(XTAL_24MHz / 3) /* Timer 2: ? */
+	MCFG_PIT8253_CLK0(XTAL_24MHz / 3) /* Timer 0: clock to J2 comm port */
+	MCFG_PIT8253_CLK1(XTAL_24MHz / 3) /* Timer 1: clock to U31 */
+	MCFG_PIT8253_CLK2(XTAL_24MHz / 3) /* Timer 2: clock to U30 */
 
 	MCFG_DEVICE_ADD("crtc", I8275, XTAL_14_31818MHz/7)
 	MCFG_I8275_CHARACTER_WIDTH(8)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(zorba_state, zorba_update_chr)
 	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))
-	MCFG_I8275_IRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_I8275_IRQ_CALLBACK(WRITELINE(zorba_state, irq0_w))
 	MCFG_FD1793x_ADD("fdc", XTAL_24MHz / 24)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(zorba_state, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(zorba_state, fdc_drq_w))
+	//MCFG_WD_FDC_FORCE_READY
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	/* Keyboard */
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(zorba_state, kbd_put))
 MACHINE_CONFIG_END
 
@@ -379,7 +425,7 @@ ROM_START( zorba )
 	ROM_REGION( 0x60, "proms", 0 )
 	ROM_LOAD( "74ls288.u37", 0x0000, 0x0020, CRC(0a67edd6) SHA1(c1ece8978a3a061e0130d43907fa63a71e75e75d) )
 	ROM_LOAD( "74ls288.u38", 0x0020, 0x0020, CRC(5ec93ea7) SHA1(3a84c098474b05d5cbe1939a3e15f66d06470581) )
-	ROM_LOAD( "74ls288.u77", 0x0040, 0x0020, CRC(946e03b0) SHA1(24240bdd7bdf507a5b51628fb36ad1266fc53a28) )
+	ROM_LOAD( "74ls288.u77", 0x0040, 0x0020, CRC(946e03b0) SHA1(24240bdd7bdf507a5b51628fb36ad1266fc53a28) ) // suspected bad dump
 ROM_END
 
 COMP( 1982, zorba, 0, 0, zorba, zorba, zorba_state, zorba, "Telcon Industries", "Zorba", GAME_NOT_WORKING )
