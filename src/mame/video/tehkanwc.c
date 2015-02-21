@@ -117,7 +117,7 @@ void tehkanwc_state::video_start()
    bit 7 = enable (0 = display off)
  */
 
-void tehkanwc_state::draw_led(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 led,int player)
+void tehkanwc_state::gridiron_draw_led(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 led,int player)
 {
 	if (led&0x80)
 		output_set_digit_value(player, led&0x7f);
@@ -161,7 +161,7 @@ UINT32 tehkanwc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 1, 0);
-	draw_led(bitmap, cliprect, m_led0, 0);
-	draw_led(bitmap, cliprect, m_led1, 1);
+	gridiron_draw_led(bitmap, cliprect, m_led0, 0);
+	gridiron_draw_led(bitmap, cliprect, m_led1, 1);
 	return 0;
 }

@@ -74,7 +74,7 @@ public:
 	virtual void video_start();
 	
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_led(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 led,int player);
+	void gridiron_draw_led(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 led,int player);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
