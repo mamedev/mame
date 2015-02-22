@@ -320,6 +320,8 @@ const i386_device::X86_OPCODE i386_device::s_x86_opcode_table[] =
 	{ 0x30,     OP_2BYTE|OP_PENTIUM,        &i386_device::pentium_wrmsr,               &i386_device::pentium_wrmsr,           false},
 	{ 0x31,     OP_2BYTE|OP_PENTIUM,        &i386_device::pentium_rdtsc,               &i386_device::pentium_rdtsc,           false},
 	{ 0x32,     OP_2BYTE|OP_PENTIUM,        &i386_device::pentium_rdmsr,               &i386_device::pentium_rdmsr,           false},
+	{ 0x34,     OP_2BYTE|OP_PPRO,           &i386_device::pentium_sysenter,            &i386_device::pentium_sysenter,        false},
+	{ 0x35,     OP_2BYTE|OP_PPRO,           &i386_device::pentium_sysexit,             &i386_device::pentium_sysexit,         false},
 	{ 0x40,     OP_2BYTE|OP_PENTIUM,        &i386_device::pentium_cmovo_r16_rm16,      &i386_device::pentium_cmovo_r32_rm32,  false},
 	{ 0x41,     OP_2BYTE|OP_PENTIUM,        &i386_device::pentium_cmovno_r16_rm16,     &i386_device::pentium_cmovno_r32_rm32, false},
 	{ 0x42,     OP_2BYTE|OP_PENTIUM,        &i386_device::pentium_cmovb_r16_rm16,      &i386_device::pentium_cmovb_r32_rm32,  false},
