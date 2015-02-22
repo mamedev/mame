@@ -45,7 +45,6 @@
 	// create the register view
 	regView = [[MAMERegistersView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100) machine:*machine];
 	regScroll = [[NSScrollView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100)];
-	[regScroll setDrawsBackground:YES];
 	[regScroll setHasHorizontalScroller:YES];
 	[regScroll setHasVerticalScroller:YES];
 	[regScroll setAutohidesScrollers:YES];
@@ -57,7 +56,6 @@
 	dasmView = [[MAMEDisassemblyView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100) machine:*machine];
 	[dasmView setExpression:@"curpc"];
 	dasmScroll = [[NSScrollView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100)];
-	[dasmScroll setDrawsBackground:YES];
 	[dasmScroll setHasHorizontalScroller:YES];
 	[dasmScroll setHasVerticalScroller:YES];
 	[dasmScroll setAutohidesScrollers:YES];
@@ -68,7 +66,6 @@
 	// create the console view
 	consoleView = [[MAMEConsoleView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100) machine:*machine];
 	consoleScroll = [[NSScrollView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100)];
-	[consoleScroll setDrawsBackground:YES];
 	[consoleScroll setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
 	[consoleScroll setHasHorizontalScroller:YES];
 	[consoleScroll setHasVerticalScroller:YES];

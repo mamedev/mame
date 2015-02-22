@@ -52,6 +52,7 @@
 - (IBAction)paste:(id)sender;
 
 - (void)viewBoundsDidChange:(NSNotification *)notification;
+- (void)viewFrameDidChange:(NSNotification *)notification;
 
 - (void)windowDidBecomeKey:(NSNotification *)notification;
 - (void)windowDidResignKey:(NSNotification *)notification;

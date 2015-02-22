@@ -77,7 +77,6 @@
 																  0,
 																  contentBounds.size.width,
 																  expressionFrame.origin.y)];
-	[memoryScroll setDrawsBackground:YES];
 	[memoryScroll setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
 	[memoryScroll setHasHorizontalScroller:YES];
 	[memoryScroll setHasVerticalScroller:YES];

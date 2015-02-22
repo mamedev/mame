@@ -326,7 +326,7 @@ NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification = @"MAMEAuxiliaryD
 	windowFrame.size.width += desired.width;
 	windowFrame.size.width = MIN(windowFrame.size.width, available.size.width);
 	windowFrame.size.height += desired.height;
-	windowFrame.size.height = MIN(MIN(windowFrame.size.height, 320), available.size.height);
+	windowFrame.size.height = MIN(MIN(MAX(windowFrame.size.height, 120), 320), available.size.height);
 	windowFrame.origin.x = available.origin.x + available.size.width - windowFrame.size.width;
 	windowFrame.origin.y = available.origin.y;
 	[window setFrame:windowFrame display:YES];

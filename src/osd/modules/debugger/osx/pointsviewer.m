@@ -65,7 +65,6 @@
 																 0,
 																 contentBounds.size.width,
 																 contentBounds.size.height - 19)];
-	[breakScroll setDrawsBackground:YES];
 	[breakScroll setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
 	[breakScroll setHasHorizontalScroller:YES];
 	[breakScroll setHasVerticalScroller:YES];
@@ -84,7 +83,6 @@
 																 0,
 																 contentBounds.size.width,
 																 contentBounds.size.height - 19)];
-	[watchScroll setDrawsBackground:YES];
 	[watchScroll setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
 	[watchScroll setHasHorizontalScroller:YES];
 	[watchScroll setHasVerticalScroller:YES];

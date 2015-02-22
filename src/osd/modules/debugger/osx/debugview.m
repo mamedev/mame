@@ -194,6 +194,15 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 }
 
 
+- (void)adjustSizeAndRecomputeVisible {
+	NSSize const clip = [[[self enclosingScrollView] contentView] bounds].size;
+	NSSize const content = NSMakeSize((fontWidth * totalWidth) + (2 * [textContainer lineFragmentPadding]),
+									  fontHeight * totalHeight);
+	[self setFrameSize:NSMakeSize(MAX(clip.width, content.width), MAX(clip.height, content.height))];
+	[self recomputeVisible];
+}
+
+
 + (NSFont *)defaultFont {
 	return [NSFont userFixedPitchFontOfSize:0];
 }
@@ -245,8 +254,15 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	BOOL const resized = (newSize.x != totalWidth) || (newSize.y != totalHeight);
 	if (resized)
 	{
-		[self setFrameSize:NSMakeSize((fontWidth * newSize.x) + (2 * [textContainer lineFragmentPadding]),
-									  fontHeight * newSize.y)];
+		NSScrollView *const scroller = [self enclosingScrollView];
+		if (scroller)
+		{
+			NSSize const clip = [[scroller contentView] bounds].size;
+			NSSize const content = NSMakeSize((fontWidth * newSize.x) + (2 * [textContainer lineFragmentPadding]),
+											  fontHeight * newSize.y);
+			[self setFrameSize:NSMakeSize(MAX(clip.width, content.width), MAX(clip.height, content.height))];
+			[self recomputeVisible];
+		}
 		totalWidth = newSize.x;
 		totalHeight = newSize.y;
 	}
@@ -407,7 +423,14 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 - (void)viewBoundsDidChange:(NSNotification *)notification {
 	NSView *const changed = [notification object];
 	if (changed == [[self enclosingScrollView] contentView])
-		[self recomputeVisible];
+		[self adjustSizeAndRecomputeVisible];
+}
+
+
+- (void)viewFrameDidChange:(NSNotification *)notification {
+	NSView *const changed = [notification object];
+	if (changed == [[self enclosingScrollView] contentView])
+		[self adjustSizeAndRecomputeVisible];
 }
 
 
@@ -451,7 +474,10 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 		debug_view_xy pos;
 		view->set_cursor_visible(true);
 		pos = view->cursor_position();
-		[self scrollRectToVisible:NSMakeRect((pos.x * fontWidth) + [textContainer lineFragmentPadding], pos.y * fontHeight, fontWidth, fontHeight)]; // FIXME: metrics
+		[self scrollRectToVisible:NSMakeRect((pos.x * fontWidth) + [textContainer lineFragmentPadding],
+											 pos.y * fontHeight,
+											 fontWidth,
+											 fontHeight)]; // FIXME: metrics
 		[self setNeedsDisplay:YES];
 		return [super becomeFirstResponder];
 	}
@@ -475,15 +501,23 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	[[NSNotificationCenter defaultCenter] removeObserver:self
 													name:NSViewBoundsDidChangeNotification
 												  object:nil];
+	[[NSNotificationCenter defaultCenter] removeObserver:self
+													name:NSViewFrameDidChangeNotification
+												  object:nil];
 
 	NSScrollView *const scroller = [self enclosingScrollView];
 	if (scroller != nil)
 	{
 		[scroller setLineScroll:fontHeight];
 		[[scroller contentView] setPostsBoundsChangedNotifications:YES];
+		[[scroller contentView] setPostsFrameChangedNotifications:YES];
 		[[NSNotificationCenter defaultCenter] addObserver:self
 												 selector:@selector(viewBoundsDidChange:)
 													 name:NSViewBoundsDidChangeNotification
+												   object:[scroller contentView]];
+		[[NSNotificationCenter defaultCenter] addObserver:self
+												 selector:@selector(viewFrameDidChange:)
+													 name:NSViewFrameDidChangeNotification
 												   object:[scroller contentView]];
 	}
 }
@@ -531,28 +565,31 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	debug_view_xy const size = view->visible_size();
 
 	// work out how much we need to draw
-	INT32 position, clip;
-	[self convertBounds:dirtyRect toFirstAffectedLine:&position count:&clip];
+	INT32 row, clip;
+	[self convertBounds:dirtyRect toFirstAffectedLine:&row count:&clip];
+	clip += row;
+	row = MAX(row, origin.y);
+	clip = MIN(clip, origin.y + size.y);
 
 	// this gets the text for the whole visible area
 	debug_view_char const *data = view->viewdata();
 	if (!data)
 		return;
 
-	data += ((position - origin.y) * size.x);
-	for (UINT32 row = position; row < position + clip; row++, data += size.x)
+	// clear any space above the available content
+	data += ((row - origin.y) * size.x);
+	if (dirtyRect.origin.y < (row * fontHeight))
 	{
-		if ((row < origin.y) || (row >= origin.y + size.y))
-		{
-			[DefaultBackground set];
-			[NSBezierPath fillRect:NSMakeRect(0,
-											  row * fontHeight,
-											  [self bounds].size.width,
-											  fontHeight)];
-			continue;
-		}
+		[DefaultBackground set];
+		[NSBezierPath fillRect:NSMakeRect(0,
+										  dirtyRect.origin.y,
+										  [self bounds].size.width,
+										  (row * fontHeight) - dirtyRect.origin.y)];
+	}
 
-		// render entire lines to get character alignment right
+	// render entire lines to get character alignment right
+	for ( ; row < clip; row++, data += size.x)
+	{
 		int			attr = -1;
 		NSUInteger	start = 0, length = 0;
 		for (UINT32 col = origin.x; col < origin.x + size.x; col++)
@@ -599,7 +636,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 											  inTextContainer:textContainer];
 		if (start == 0)
 			box.origin.x = 0;
-		box.size.width = [self bounds].size.width - box.origin.x;
+		box.size.width = MAX([self bounds].size.width - box.origin.x, 0);
 		[[self backgroundForAttribute:attr] set];
 		[NSBezierPath fillRect:NSMakeRect(box.origin.x,
 										  row * fontHeight,
@@ -608,6 +645,16 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 		[layoutManager drawGlyphsForGlyphRange:[layoutManager glyphRangeForTextContainer:textContainer]
 									   atPoint:NSMakePoint(0, row * fontHeight)];
 		[text deleteCharactersInRange:NSMakeRange(0, length)];
+	}
+
+	// clear any space below the available content
+	if ((dirtyRect.origin.y + dirtyRect.size.height) > (row * fontHeight))
+	{
+		[DefaultBackground set];
+		[NSBezierPath fillRect:NSMakeRect(0,
+										  row * fontHeight,
+										  [self bounds].size.width,
+										  (dirtyRect.origin.y + dirtyRect.size.height) - (row * fontHeight))];
 	}
 }
 

@@ -29,7 +29,6 @@
 	// create the error log view
 	logView = [[MAMEErrorLogView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100) machine:*machine];
 	logScroll = [[NSScrollView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100)];
-	[logScroll setDrawsBackground:YES];
 	[logScroll setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
 	[logScroll setHasHorizontalScroller:YES];
 	[logScroll setHasVerticalScroller:YES];
