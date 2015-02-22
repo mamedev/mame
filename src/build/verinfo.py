@@ -9,25 +9,32 @@ import sys
 
 def parse_args():
     def usage():
-        sys.stderr.write('Usage: verinfo.py [-b mame|mess|ume] [-r|-p] <filename>\n')
+        sys.stderr.write('Usage: verinfo.py [-b mame|mess|ume] [-r|-p] [-o <outfile>] <srcfile>\n')
         sys.exit(1)
 
     flags = True
     target = 'mame'
+    format = 'rc'
     input = None
-    output = 'rc'
+    output = None
     i = 1
     while i < len(sys.argv):
         if flags and (sys.argv[i] == '-r'):
-            output = 'rc'
+            format = 'rc'
         elif flags and (sys.argv[i] == '-p'):
-            output = 'plist'
+            format = 'plist'
         elif flags and (sys.argv[i] == '-b'):
             i += 1;
             if (i >= len(sys.argv)) or (sys.argv[i] not in ('mame', 'mess', 'ume')):
                 usage()
             else:
                 target = sys.argv[i]
+        elif flags and (sys.argv[i] == '-o'):
+            i += 1;
+            if (i >= len(sys.argv)) or (output is not None):
+                usage()
+            else:
+                output = sys.argv[i]
         elif flags and (sys.argv[i] == '--'):
             flags = False
         elif flags and sys.argv[i].startswith('-'):
@@ -39,7 +46,7 @@ def parse_args():
         i += 1
     if input is None:
         usage()
-    return target, input, output
+    return target, format, input, output
 
 
 def extract_version(input):
@@ -51,10 +58,10 @@ def extract_version(input):
     return None, None, None
 
 
-build, srcfile, outfmt = parse_args()
+build, outfmt, srcfile, dstfile = parse_args()
 
 try:
-    fp = open(srcfile, 'rb')
+    fp = open(srcfile, 'rU')
 except IOError:
     sys.stderr.write("Unable to open source file '%s'\n" % srcfile)
     sys.exit(1)
@@ -65,6 +72,16 @@ version_subbuild = "0"
 if not version_string:
     sys.stderr.write("Unable to extract version from source file '%s'\n" % srcfile)
     sys.exit(1)
+fp.close()
+
+if dstfile is not None:
+    try:
+        fp = open(dstfile, 'w')
+    except IOError:
+        sys.stderr.write("Unable to open output file '%s'\n" % dstfile)
+        sys.exit(1)
+else:
+    fp = sys.stdout
 
 if build == "mess":
     # MESS
@@ -100,61 +117,62 @@ else:
 legal_copyright = "Copyright Nicola Salmoria and the MAME team"
 
 if outfmt == 'rc':
-    print("VS_VERSION_INFO VERSIONINFO")
-    print("\tFILEVERSION %s,%s,%s,%s" % (version_major, version_minor, version_build, version_subbuild))
-    print("\tPRODUCTVERSION %s,%s,%s,%s" % (version_major, version_minor, version_build, version_subbuild))
-    print("\tFILEFLAGSMASK 0x3fL")
-    if (version_build == 0) :
-        print("\tFILEFLAGS 0x0L")
-    else :
-        print("\tFILEFLAGS VS_FF_PRERELEASE")
-    print("\tFILEOS VOS_NT_WINDOWS32")
-    print("\tFILETYPE VFT_APP")
-    print("\tFILESUBTYPE VFT2_UNKNOWN")
-    print("BEGIN")
-    print("\tBLOCK \"StringFileInfo\"")
-    print("\tBEGIN")
-    print("#ifdef UNICODE")
-    print("\t\tBLOCK \"040904b0\"")
-    print("#else")
-    print("\t\tBLOCK \"040904E4\"")
-    print("#endif")
-    print("\t\tBEGIN")
-    print("\t\t\tVALUE \"Author\", \"%s\\0\"" % author)
-    print("\t\t\tVALUE \"Comments\", \"%s\\0\"" % comments)
-    print("\t\t\tVALUE \"CompanyName\", \"%s\\0\"" % company_name)
-    print("\t\t\tVALUE \"FileDescription\", \"%s\\0\"" % file_description)
-    print("\t\t\tVALUE \"FileVersion\", \"%s, %s, %s, %s\\0\"" % (version_major, version_minor, version_build, version_subbuild))
-    print("\t\t\tVALUE \"InternalName\", \"%s\\0\"" % internal_name)
-    print("\t\t\tVALUE \"LegalCopyright\", \"%s\\0\"" % legal_copyright)
-    print("\t\t\tVALUE \"OriginalFilename\", \"%s\\0\"" % original_filename)
-    print("\t\t\tVALUE \"ProductName\", \"%s\\0\"" % product_name)
-    print("\t\t\tVALUE \"ProductVersion\", \"%s\\0\"" % version_string)
-    print("\t\tEND")
-    print("\tEND")
-    print("\tBLOCK \"VarFileInfo\"")
-    print("\tBEGIN")
-    print("#ifdef UNICODE")
-    print("\t\tVALUE \"Translation\", 0x409, 1200")
-    print("#else")
-    print("\t\tVALUE \"Translation\", 0x409, 1252")
-    print("#endif")
-    print("\tEND")
-    print("END")
+    fp.write('VS_VERSION_INFO VERSIONINFO\n')
+    fp.write('\tFILEVERSION %s,%s,%s,%s\n' % (version_major, version_minor, version_build, version_subbuild))
+    fp.write('\tPRODUCTVERSION %s,%s,%s,%s\n' % (version_major, version_minor, version_build, version_subbuild))
+    fp.write('\tFILEFLAGSMASK 0x3fL\n')
+    if (version_build == 0):
+        fp.write('\tFILEFLAGS 0x0L\n')
+    else:
+        fp.write('\tFILEFLAGS VS_FF_PRERELEASE\n')
+    fp.write('\tFILEOS VOS_NT_WINDOWS32\n')
+    fp.write('\tFILETYPE VFT_APP\n')
+    fp.write('\tFILESUBTYPE VFT2_UNKNOWN\n')
+    fp.write('BEGIN\n')
+    fp.write('\tBLOCK "StringFileInfo"\n')
+    fp.write('\tBEGIN\n')
+    fp.write('#ifdef UNICODE\n')
+    fp.write('\t\tBLOCK "040904b0"\n')
+    fp.write('#else\n')
+    fp.write('\t\tBLOCK "040904E4"\n')
+    fp.write('#endif\n')
+    fp.write('\t\tBEGIN\n')
+    fp.write('\t\t\tVALUE "Author", "%s\\0"\n' % author)
+    fp.write('\t\t\tVALUE "Comments", "%s\\0"\n' % comments)
+    fp.write('\t\t\tVALUE "CompanyName", "%s\\0"\n' % company_name)
+    fp.write('\t\t\tVALUE "FileDescription", "%s\\0"\n' % file_description)
+    fp.write('\t\t\tVALUE "FileVersion", "%s, %s, %s, %s\\0"\n' % (version_major, version_minor, version_build, version_subbuild))
+    fp.write('\t\t\tVALUE "InternalName", "%s\\0"\n' % internal_name)
+    fp.write('\t\t\tVALUE "LegalCopyright", "%s\\0"\n' % legal_copyright)
+    fp.write('\t\t\tVALUE "OriginalFilename", "%s\\0"\n' % original_filename)
+    fp.write('\t\t\tVALUE "ProductName", "%s\\0"\n' % product_name)
+    fp.write('\t\t\tVALUE "ProductVersion", "%s\\0"\n' % version_string)
+    fp.write('\t\tEND\n')
+    fp.write('\tEND\n')
+    fp.write('\tBLOCK "VarFileInfo"\n')
+    fp.write('\tBEGIN\n')
+    fp.write('#ifdef UNICODE\n')
+    fp.write('\t\tVALUE "Translation", 0x409, 1200\n')
+    fp.write('#else\n')
+    fp.write('\t\tVALUE "Translation", 0x409, 1252\n')
+    fp.write('#endif\n')
+    fp.write('\tEND\n')
+    fp.write('END\n')
 elif outfmt == 'plist':
-    print('<?xml version="1.0" encoding="UTF-8"?>')
-    print('<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">')
-    print('<plist version="1.0">')
-    print('<dict>')
-    print('\t<key>CFBundleDisplayName</key>')
-    print('\t<string>%s</string>' % product_name)
-    print('\t<key>CFBundleIdentifier</key>')
-    print('\t<string>%s</string>' % bundle_identifier)
-    print('\t<key>CFBundleInfoDictionaryVersion</key>')
-    print('\t<string>6.0</string>')
-    print('\t<key>CFBundleName</key>')
-    print('\t<string>%s</string>' % product_name)
-    print('\t<key>CFBundleShortVersionString</key>')
-    print('\t<string>%s.%s.%s</string>' % (version_major, version_minor, version_build))
-    print('</dict>')
-    print('</plist>')
+    fp.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+    fp.write('<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n')
+    fp.write('<plist version="1.0">\n')
+    fp.write('<dict>\n')
+    fp.write('\t<key>CFBundleDisplayName</key>\n')
+    fp.write('\t<string>%s</string>\n' % product_name)
+    fp.write('\t<key>CFBundleIdentifier</key>\n')
+    fp.write('\t<string>%s</string>\n' % bundle_identifier)
+    fp.write('\t<key>CFBundleInfoDictionaryVersion</key>\n')
+    fp.write('\t<string>6.0</string>\n')
+    fp.write('\t<key>CFBundleName</key>\n')
+    fp.write('\t<string>%s</string>\n' % product_name)
+    fp.write('\t<key>CFBundleShortVersionString</key>\n')
+    fp.write('\t<string>%s.%s.%s</string>\n' % (version_major, version_minor, version_build))
+    fp.write('</dict>\n')
+    fp.write('</plist>\n')
+fp.flush()

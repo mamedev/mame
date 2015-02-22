@@ -38,4 +38,4 @@ $(RESFILE): $(MESS_WINSRC)/mess.rc $(MESS_WINOBJ)/messvers.rc
 
 $(MESS_WINOBJ)/messvers.rc: $(SRC)/build/verinfo.py $(SRC)/version.c
 	@echo Emitting $@...
-	$(PYTHON) $(SRC)/build/verinfo.py -b mess $(SRC)/version.c > $@
+	$(PYTHON) $(SRC)/build/verinfo.py -b mess -o $@ $(SRC)/version.c

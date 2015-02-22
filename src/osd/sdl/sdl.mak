@@ -557,7 +557,7 @@ LDFLAGSEMULATOR += -sectcreate __TEXT __info_plist $(INFOPLIST)
 $(EMULATOR): $(INFOPLIST)
 $(INFOPLIST): $(SRC)/build/verinfo.py $(SRC)/version.c
 	@echo Emitting $@...
-	$(PYTHON) $(SRC)/build/verinfo.py -b $(TARGET) -p $(SRC)/version.c > $@
+	$(PYTHON) $(SRC)/build/verinfo.py -b $(TARGET) -p -o $@ $(SRC)/version.c
 endif
 
 ifndef MACOSX_USE_LIBSDL
