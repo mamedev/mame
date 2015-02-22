@@ -240,18 +240,32 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 			result = 0x00;
 			break;
 
-		case 0xd9:
-			popmessage("Smooth scroll enabled, contact MESSdev");
+		case 0xd8: case 0xd9:
+			m_smoothscr = offset & 1;
 			break;
 
 		case 0xDB:
 			apple3_write_charmem();
 			break;
 
-		case 0xE0: case 0xE1: case 0xE2: case 0xE3:
-		case 0xE4: case 0xE5: case 0xE6: case 0xE7:
-		case 0xE8: case 0xE9: case 0xEA: case 0xEB:
-		case 0xEC: case 0xED: case 0xEE: case 0xEF:
+		case 0xE0: case 0xE1: 
+			result = m_fdc->read(space, offset&0xf);
+			m_va = offset & 1;
+			break;
+
+		case 0xE2: case 0xE3:
+			result = m_fdc->read(space, offset&0xf);
+			m_vb = offset & 1;
+			break;
+
+		case 0xE4: case 0xE5: 
+			result = m_fdc->read(space, offset&0xf);
+			m_vc = offset & 1;
+			break;
+
+		case 0xE6: case 0xE7: case 0xE8: case 0xE9: 
+		case 0xEA: case 0xEB: case 0xEC: case 0xED: 
+		case 0xEE: case 0xEF:
 			result = m_fdc->read(space, offset&0xf);
 			break;
 
@@ -659,6 +673,10 @@ DRIVER_INIT_MEMBER(apple3_state,apple3)
 	m_via_1_a = ~0;
 	m_via_0_irq = 0;
 	m_via_1_irq = 0;
+	m_va = 0;
+	m_vb = 0;
+	m_vc = 0;
+	m_smoothscr = 0;
 
 	// kludge round +12v pull up resistors, which after conversion will bring this low when nothing is plugged in. issue also affects dcd/dsr but those don't affect booting.
 	m_acia->write_cts(0);
@@ -707,6 +725,10 @@ DRIVER_INIT_MEMBER(apple3_state,apple3)
 	save_item(NAME(m_analog_sel));
 	save_item(NAME(m_ramp_active));
 	save_item(NAME(m_pdl_charge));
+	save_item(NAME(m_va));
+	save_item(NAME(m_vb));
+	save_item(NAME(m_vc));
+	save_item(NAME(m_smoothscr));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(apple3_state::apple3_postload), this));
 }
@@ -1275,3 +1297,4 @@ WRITE_LINE_MEMBER(apple3_state::a2bus_nmi_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 	}
 }
+
