@@ -8,7 +8,7 @@
 
 
 # castool executable name
-CASTOOL = castool$(EXE)
+CASTOOL = $(BIN)castool$(EXE)
 
 # add path to castool headers
 INCPATH += -I$(SRC)/$(TARGET)/tools/castool
