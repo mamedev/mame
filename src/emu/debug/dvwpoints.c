@@ -31,10 +31,6 @@ debug_view_watchpoints::debug_view_watchpoints(running_machine &machine, debug_v
 	enumerate_sources();
 	if (m_source_list.count() == 0)
 		throw std::bad_alloc();
-
-	// configure the view
-	m_total.y = 10;
-	m_supports_cursor = false;
 }
 
 
@@ -379,7 +375,9 @@ void debug_view_watchpoints::view_update()
 	const int numWPs = watchpoints(SORT_NONE, wpList);
 
 	// Set the view region so the scroll bars update
-	m_total.y = numWPs+1;
+	m_total.y = numWPs + 1;
+	if (m_total.y < 10)
+		m_total.y = 10;
 
 	// Draw
 	debug_view_char *dest = m_viewdata;
