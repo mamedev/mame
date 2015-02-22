@@ -66,6 +66,9 @@
 # uncomment next line to use SDL library for sound and video output
 # USE_SDL = 1
 
+# uncomment next line to compile OpenGL video renderer
+# USE_OPENGL = 1
+
 # uncomment next line to use QT debugger
 # USE_QTDEBUG = 1
 
@@ -394,6 +397,17 @@ OSDOBJS = \
 	$(OSDOBJ)/modules/netdev/pcap.o \
 	$(OSDOBJ)/modules/netdev/taptun.o \
 	$(OSDOBJ)/modules/netdev/none.o \
+
+ifdef USE_OPENGL
+OSDOBJS += 	$(WINOBJ)/../sdl/drawogl.o $(WINOBJ)/../sdl/gl_shader_tool.o $(WINOBJ)/../sdl/gl_shader_mgr.o
+OBJDIRS += $(WINOBJ)/../sdl
+
+DEFS += -DUSE_OPENGL=1
+LIBS += -lopengl32
+
+else
+DEFS += -DUSE_OPENGL=0
+endif
 
 ifdef USE_SDL
 DEFS += -DUSE_SDL_SOUND

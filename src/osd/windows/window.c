@@ -40,7 +40,9 @@ extern int drawgdi_init(running_machine &machine, osd_draw_callbacks *callbacks)
 extern int drawdd_init(running_machine &machine, osd_draw_callbacks *callbacks);
 extern int drawd3d_init(running_machine &machine, osd_draw_callbacks *callbacks);
 extern int drawbgfx_init(running_machine &machine, osd_draw_callbacks *callbacks);
-
+#if (USE_OPENGL)
+extern int drawogl_init(running_machine &machine, osd_draw_callbacks *callbacks);
+#endif
 
 //============================================================
 //  PARAMETERS
@@ -245,7 +247,10 @@ bool windows_osd_interface::window_init()
 		drawbgfx_init(machine(), &draw);
 	if (video_config.mode == VIDEO_MODE_NONE)
 		drawnone_init(machine(), &draw);
-
+#if (USE_OPENGL)
+	if (video_config.mode == VIDEO_MODE_OPENGL)
+		drawogl_init(machine(), &draw);
+#endif
 	// set up the window list
 	last_window_ptr = &win_window_list;
 
@@ -1173,7 +1178,7 @@ static int complete_create(win_window_info *window)
 	assert(GetCurrentThreadId() == window_threadid);
 
 	// get the monitor bounds
-	monitorbounds = window->m_monitor->info.rcMonitor;
+	monitorbounds = window->m_monitor->position_size();
 
 	// create the window menu if needed
 	if (downcast<windows_options &>(window->machine().options()).menu())
@@ -1561,13 +1566,13 @@ static void constrain_to_aspect_ratio(win_window_info *window, RECT *rect, int a
 	// clamp against the maximum (fit on one screen for full screen mode)
 	if (window->m_fullscreen)
 	{
-		maxwidth = rect_width(&monitor->info.rcMonitor) - extrawidth;
-		maxheight = rect_height(&monitor->info.rcMonitor) - extraheight;
+		maxwidth = rect_width(&monitor->position_size()) - extrawidth;
+		maxheight = rect_height(&monitor->position_size()) - extraheight;
 	}
 	else
 	{
-		maxwidth = rect_width(&monitor->info.rcWork) - extrawidth;
-		maxheight = rect_height(&monitor->info.rcWork) - extraheight;
+		maxwidth = rect_width(&monitor->usuable_position_size()) - extrawidth;
+		maxheight = rect_height(&monitor->usuable_position_size()) - extraheight;
 
 		// further clamp to the maximum width/height in the window
 		if (window->m_maxwidth != 0)
@@ -1695,7 +1700,7 @@ static void get_max_bounds(win_window_info *window, RECT *bounds, int constrain)
 
 	// compute the maximum client area
 	window->m_monitor->refresh();
-	maximum = window->m_monitor->info.rcWork;
+	maximum = window->m_monitor->usuable_position_size();
 
 	// clamp to the window's max
 	if (window->m_maxwidth != 0)
@@ -1721,8 +1726,9 @@ static void get_max_bounds(win_window_info *window, RECT *bounds, int constrain)
 	}
 
 	// center within the work area
-	bounds->left = window->m_monitor->info.rcWork.left + (rect_width(&window->m_monitor->info.rcWork) - rect_width(&maximum)) / 2;
-	bounds->top = window->m_monitor->info.rcWork.top + (rect_height(&window->m_monitor->info.rcWork) - rect_height(&maximum)) / 2;
+	RECT work = window->m_monitor->usuable_position_size();
+	bounds->left = work.left + (rect_width(&work) - rect_width(&maximum)) / 2;
+	bounds->top = work.top + (rect_height(&work) - rect_height(&maximum)) / 2;
 	bounds->right = bounds->left + rect_width(&maximum);
 	bounds->bottom = bounds->top + rect_height(&maximum);
 }
@@ -1823,7 +1829,7 @@ static void adjust_window_position_after_major_change(win_window_info *window)
 	else
 	{
 		win_monitor_info *monitor = window->winwindow_video_window_monitor(NULL);
-		newrect = monitor->info.rcMonitor;
+		newrect = monitor->position_size();
 	}
 
 	// adjust the position if different

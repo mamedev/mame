@@ -81,9 +81,6 @@
 #define SDLOPTION_RENDERDRIVER          "renderdriver"
 #define SDLOPTION_GL_LIB                "gl_lib"
 
-#define SDLOPTVAL_NONE                  "none"
-#define SDLOPTVAL_AUTO                  "auto"
-
 #define SDLOPTVAL_OPENGL                "opengl"
 #define SDLOPTVAL_SOFT                  "soft"
 #define SDLOPTVAL_SDL2ACCEL             "accel"
@@ -109,7 +106,7 @@
 /* Vas Crabb: Default GL-lib for MACOSX */
 #define SDLOPTVAL_GLLIB                 "/System/Library/Frameworks/OpenGL.framework/Libraries/libGL.dylib"
 #else
-#define SDLOPTVAL_GLLIB                 SDLOPTVAL_AUTO
+#define SDLOPTVAL_GLLIB                 OSDOPTVAL_AUTO
 #endif
 
 
@@ -209,8 +206,7 @@ public:
 private:
 	virtual void osd_exit();
 
-	// FIXME: remove machine usage
-	void extract_video_config(running_machine &machine);
+	void extract_video_config();
 
 	sdl_options &m_options;
 

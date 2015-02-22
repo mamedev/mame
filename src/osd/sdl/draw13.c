@@ -525,7 +525,7 @@ int drawsdl2_init(running_machine &machine, osd_draw_callbacks *callbacks)
 #else
 	stemp = NULL;
 #endif
-	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) == 0)
+	if (stemp != NULL && strcmp(stemp, OSDOPTVAL_AUTO) == 0)
 		stemp = NULL;
 
 	// No fatalerror here since not all video drivers support GL !

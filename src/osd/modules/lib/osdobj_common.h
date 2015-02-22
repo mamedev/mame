@@ -56,6 +56,9 @@
 #define OSDOPTION_AUDIO_LATENCY         "audio_latency"
 
 #define OSDOPTVAL_AUTO                  "auto"
+#define OSDOPTVAL_NONE                  "none"
+
+
 
 //============================================================
 //  TYPE DEFINITIONS

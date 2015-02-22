@@ -95,7 +95,7 @@ bool sdl_osd_interface::video_init()
 	int index;
 
 	// extract data from the options
-	extract_video_config(machine());
+	extract_video_config();
 
 	// set up monitors first
 	sdl_monitor_info::init();
@@ -418,7 +418,7 @@ void sdl_monitor_info::init()
 			monitor = global_alloc_clear(sdl_monitor_info);
 			monitor->m_handle = i;
 
-			snprintf(monitor->m_monitor_device, sizeof(monitor->m_monitor_device)-1, "%s%d", OSDOPTION_SCREEN,i);
+			snprintf(monitor->m_name, sizeof(monitor->m_name)-1, "%s%d", OSDOPTION_SCREEN,i);
 
 			SDL_GetDesktopDisplayMode(i, &dmode);
 			SDL_GetDisplayBounds(i, &monitor->m_dimensions);
@@ -426,7 +426,7 @@ void sdl_monitor_info::init()
 			// guess the aspect ratio assuming square pixels
 			monitor->m_aspect = (float)(dmode.w) / (float)(dmode.h);
 
-			osd_printf_verbose("Adding monitor %s (%d x %d)\n", monitor->m_monitor_device, dmode.w, dmode.h);
+			osd_printf_verbose("Adding monitor %s (%d x %d)\n", monitor->m_name, dmode.w, dmode.h);
 
 			monx += dmode.w;
 
@@ -488,7 +488,7 @@ sdl_monitor_info *sdl_monitor_info::pick_monitor(sdl_options &options, int index
 		for (monitor = sdl_monitor_info::list; monitor != NULL; monitor = monitor->next())
 		{
 			moncount++;
-			if (strcmp(scrname, monitor->device()) == 0)
+			if (strcmp(scrname, monitor->devicename()) == 0)
 				goto finishit;
 		}
 	}
@@ -584,7 +584,7 @@ static void check_osd_inputs(running_machine &machine)
 //  extract_video_config
 //============================================================
 
-void sdl_osd_interface::extract_video_config(running_machine &machine)
+void sdl_osd_interface::extract_video_config()
 {
 	const char *stemp;
 
@@ -592,6 +592,7 @@ void sdl_osd_interface::extract_video_config(running_machine &machine)
 
 	// global options: extract the data
 	video_config.windowed      = options().window();
+	video_config.prescale      = options().prescale();
 	video_config.keepaspect    = options().keep_aspect();
 	video_config.numscreens    = options().numscreens();
 	video_config.fullstretch   = options().uneven_stretch();
@@ -599,8 +600,8 @@ void sdl_osd_interface::extract_video_config(running_machine &machine)
 	video_config.restrictonemonitor = !options().use_all_heads();
 	#endif
 
-
-	if (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
+	// if we are in debug mode, never go full screen
+	if (machine().debug_flags & DEBUG_FLAG_OSD_ENABLED)
 		video_config.windowed = TRUE;
 
 	// default to working video please
@@ -618,7 +619,7 @@ void sdl_osd_interface::extract_video_config(running_machine &machine)
 	}
 	if (strcmp(stemp, SDLOPTVAL_SOFT) == 0)
 		video_config.mode = VIDEO_MODE_SOFT;
-	else if (strcmp(stemp, SDLOPTVAL_NONE) == 0)
+	else if (strcmp(stemp, OSDOPTVAL_NONE) == 0)
 	{
 		video_config.mode = VIDEO_MODE_SOFT;
 		video_config.novideo = 1;
@@ -656,11 +657,10 @@ void sdl_osd_interface::extract_video_config(running_machine &machine)
 	}
 
 	#if (USE_OPENGL || SDLMAME_SDL2)
-		video_config.filter        = options().filter();
+	video_config.filter        = options().filter();
 	#endif
 
 	#if (USE_OPENGL)
-		video_config.prescale      = options().prescale();
 		if (video_config.prescale < 1 || video_config.prescale > 3)
 		{
 			osd_printf_warning("Invalid prescale option, reverting to '1'\n");
@@ -683,7 +683,7 @@ void sdl_osd_interface::extract_video_config(running_machine &machine)
 			for(i=0; i<GLSL_SHADER_MAX; i++)
 			{
 				stemp = options().shader_mame(i);
-				if (stemp && strcmp(stemp, SDLOPTVAL_NONE) != 0 && strlen(stemp)>0)
+				if (stemp && strcmp(stemp, OSDOPTVAL_NONE) != 0 && strlen(stemp)>0)
 				{
 					video_config.glsl_shader_mamebm[i] = (char *) malloc(strlen(stemp)+1);
 					strcpy(video_config.glsl_shader_mamebm[i], stemp);
@@ -698,7 +698,7 @@ void sdl_osd_interface::extract_video_config(running_machine &machine)
 			for(i=0; i<GLSL_SHADER_MAX; i++)
 			{
 				stemp = options().shader_screen(i);
-				if (stemp && strcmp(stemp, SDLOPTVAL_NONE) != 0 && strlen(stemp)>0)
+				if (stemp && strcmp(stemp, OSDOPTVAL_NONE) != 0 && strlen(stemp)>0)
 				{
 					video_config.glsl_shader_scrn[i] = (char *) malloc(strlen(stemp)+1);
 					strcpy(video_config.glsl_shader_scrn[i], stemp);
@@ -763,9 +763,9 @@ static float get_aspect(const char *defdata, const char *data, int report_error)
 {
 	int num = 0, den = 1;
 
-	if (strcmp(data, SDLOPTVAL_AUTO) == 0)
+	if (strcmp(data, OSDOPTVAL_AUTO) == 0)
 	{
-		if (strcmp(defdata,SDLOPTVAL_AUTO) == 0)
+		if (strcmp(defdata,OSDOPTVAL_AUTO) == 0)
 			return 0;
 		data = defdata;
 	}
@@ -782,13 +782,10 @@ static float get_aspect(const char *defdata, const char *data, int report_error)
 static void get_resolution(const char *defdata, const char *data, sdl_window_config *config, int report_error)
 {
 	config->width = config->height = config->depth = config->refresh = 0;
-	if (strcmp(data, SDLOPTVAL_AUTO) == 0)
+	if (strcmp(data, OSDOPTVAL_AUTO) == 0)
 	{
-		if (strcmp(defdata, SDLOPTVAL_AUTO) == 0)
-		{
+		if (strcmp(defdata, OSDOPTVAL_AUTO) == 0)
 			return;
-		}
-
 		data = defdata;
 	}
 

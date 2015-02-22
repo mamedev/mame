@@ -18,13 +18,18 @@
 
 #define MAX_WINDOWS         4
 
-#define VIDEO_MODE_NONE     0
-#define VIDEO_MODE_GDI      1
-#define VIDEO_MODE_DDRAW    2
-#define VIDEO_MODE_D3D      3
-#define VIDEO_MODE_BGFX     4
+enum {
+	VIDEO_MODE_NONE,
+	VIDEO_MODE_GDI,
+	VIDEO_MODE_DDRAW,
+	VIDEO_MODE_D3D,
+	VIDEO_MODE_BGFX,
+#if (USE_OPENGL)
+	VIDEO_MODE_OPENGL,
+#endif
+};
 
-
+#define GLSL_SHADER_MAX 10
 
 //============================================================
 //  TYPE DEFINITIONS
@@ -37,17 +42,28 @@ public:
 	virtual ~win_monitor_info();
 
 	void refresh();
-	float aspect();
-	void set_aspect(float a) { m_aspect = a; }
+
+	const HMONITOR handle() { return m_handle; }
+	const RECT &position_size() { refresh(); return m_info.rcMonitor; }
+	const RECT &usuable_position_size() { refresh(); return m_info.rcWork; }
+	bool is_primary() { return (m_info.dwFlags & MONITORINFOF_PRIMARY) != 0; }
 	const char *devicename() { refresh(); return (m_name != NULL) ? m_name : "UNKNOWN"; }
 
-	win_monitor_info  * next;                   // pointer to next monitor in list
-	HMONITOR            handle;                 // handle to the monitor
-	MONITORINFOEX       info;                   // most recently retrieved info
+	float aspect();
+
+	void set_aspect(const float a) { m_aspect = a; }
+
+	win_monitor_info  * m_next;                   // pointer to next monitor in list
+
+	// static
+
+	static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data);
+
 private:
+	HMONITOR            m_handle;                 // handle to the monitor
+	MONITORINFOEX       m_info;                   // most recently retrieved info
+
 	float               m_aspect;               // computed/configured aspect ratio of the physical device
-	int                 reqwidth;               // requested width for this monitor
-	int                 reqheight;              // requested height for this monitor
 	char * 				m_name;
 };
 
@@ -85,6 +101,19 @@ struct win_video_config
 
 	// d3d options
 	int                 filter;                     // enable filtering
+
+	// OpenGL options
+	//int                 filter;         // enable filtering, disabled if glsl_filter>0
+	int                 glsl;
+	int                 glsl_filter;        // glsl filtering, >0 disables filter
+	char *              glsl_shader_mamebm[GLSL_SHADER_MAX]; // custom glsl shader set, mame bitmap
+	int                 glsl_shader_mamebm_num; // custom glsl shader set number, mame bitmap
+	char *              glsl_shader_scrn[GLSL_SHADER_MAX]; // custom glsl shader set, screen bitmap
+	int                 glsl_shader_scrn_num; // custom glsl shader number, screen bitmap
+	int                 pbo;
+	int                 vbo;
+	int                 allowtexturerect;   // allow GL_ARB_texture_rectangle, default: no
+	int                 forcepow2texture;   // force power of two textures, default: no
 };
 
 

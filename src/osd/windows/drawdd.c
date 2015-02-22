@@ -964,10 +964,11 @@ void renderer_dd::blit_to_primary(int srcwidth, int srcheight)
 		ClientToScreen(window().m_hwnd, &((LPPOINT)&outer)[1]);
 
 		// adjust to be relative to the monitor
-		outer.left -= monitor->info.rcMonitor.left;
-		outer.right -= monitor->info.rcMonitor.left;
-		outer.top -= monitor->info.rcMonitor.top;
-		outer.bottom -= monitor->info.rcMonitor.top;
+		RECT pos = monitor->position_size();
+		outer.left -= pos.left;
+		outer.right -= pos.left;
+		outer.top -= pos.top;
+		outer.bottom -= pos.top;
 	}
 
 	// compute outer rect -- full screen version
@@ -1160,7 +1161,7 @@ static BOOL WINAPI monitor_enum_callback(GUID FAR *guid, LPSTR description, LPST
 	monitor_enum_info *einfo = (monitor_enum_info *)context;
 
 	// do we match the desired monitor?
-	if (hmonitor == einfo->monitor->handle || (hmonitor == NULL && (einfo->monitor->info.dwFlags & MONITORINFOF_PRIMARY) != 0))
+	if (hmonitor == einfo->monitor->handle() || (hmonitor == NULL && einfo->monitor->is_primary()))
 	{
 		einfo->guid_ptr = (guid != NULL) ? &einfo->guid : NULL;
 		if (guid != NULL)

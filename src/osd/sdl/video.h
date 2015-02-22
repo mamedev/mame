@@ -70,14 +70,14 @@ public:
 	sdl_monitor_info(const UINT64 handle, const char *monitor_device, float aspect)
 	: m_next(NULL), m_handle(handle), m_aspect(aspect)
 	{
-		strncpy(m_monitor_device, monitor_device, 64);
+		strncpy(m_name, monitor_device, 64);
 		refresh();
 	}
 
 	const UINT64 handle() { return m_handle; }
 	const SDL_Rect &position_size() { refresh(); return m_dimensions; }
 
-	const char *device() { return m_monitor_device; }
+	const char *devicename() { refresh(); return (m_name != NULL) ? m_name : "UNKNOWN"; }
 
 	float aspect();
 
@@ -97,14 +97,13 @@ public:
 	static sdl_monitor_info *primary_monitor;
 	static sdl_monitor_info *list;
 
-	// FIXME: shouldn't be here - see windows enumeration callback
 	sdl_monitor_info  	* m_next;                   // pointer to next monitor in list
 private:
 	void refresh();
 
 	UINT64              m_handle;                 // handle to the monitor
 	SDL_Rect			m_dimensions;
-	char                m_monitor_device[64];
+	char                m_name[64];
 	float               m_aspect;                 // computed/configured aspect ratio of the physical device
 };
 
@@ -126,8 +125,8 @@ struct sdl_video_config
 
 	// global configuration
 	int                 windowed;               // start windowed?
-	int                 prescale;               // prescale factor (supported by accel driver)
-	int                 keepaspect;             // keep aspect ratio?
+	int                 prescale;                   // prescale factor
+	int                 keepaspect;                 // keep aspect ratio
 	int                 numscreens;             // number of screens
 	int                 centerh;
 	int                 centerv;

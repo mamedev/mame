@@ -66,10 +66,11 @@ public:
 
 	float aspect() const { return monitor()->aspect(); }
 
+	virtual void get_size(int &w, int &h) = 0;
+
 #ifdef OSD_SDL
 	virtual void blit_surface_size(int &blitwidth, int &blitheight) = 0;
 	virtual sdl_monitor_info *monitor() const = 0;
-	virtual void get_size(int &w, int &h) = 0;
 #if (SDLMAME_SDL2)
 	virtual SDL_Window *sdl_window() = 0;
 #else

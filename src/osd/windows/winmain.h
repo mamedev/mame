@@ -269,8 +269,13 @@ public:
 	virtual void input_exit();
 	virtual void output_exit();
 
+	void extract_video_config();
+
+	windows_options &options() { return m_options; }
+
 private:
 	void osd_exit();
+	windows_options &m_options;
 
 	static const int DEFAULT_FONT_HEIGHT = 200;
 };
