@@ -949,7 +949,7 @@ ifeq ($(TARGETOS),emscripten)
 # Emscripten's linker seems to be stricter about the ordering of files
 	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $(VERSIONOBJ) -Wl,--start-group $(EMULATOROBJ) -Wl,--end-group $(LIBS) -o $@
 else
-	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $^ $(LIBS) -o $@
+	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $(VERSIONOBJ) $(EMULATOROBJ) $(LIBS) -o $@
 endif
 ifeq ($(TARGETOS),win32)
 ifdef SYMBOLS
