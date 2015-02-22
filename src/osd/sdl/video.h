@@ -70,14 +70,14 @@ public:
 	sdl_monitor_info(const UINT64 handle, const char *monitor_device, float aspect)
 	: m_next(NULL), m_handle(handle), m_aspect(aspect)
 	{
-		strncpy(m_name, monitor_device, 64);
+		strncpy(m_name, monitor_device, ARRAY_LENGTH(m_name) - 1);
 		refresh();
 	}
 
 	const UINT64 handle() { return m_handle; }
 	const SDL_Rect &position_size() { refresh(); return m_dimensions; }
 
-	const char *devicename() { refresh(); return (m_name != NULL) ? m_name : "UNKNOWN"; }
+	const char *devicename() { refresh(); return m_name[0] ? m_name : "UNKNOWN"; }
 
 	float aspect();
 

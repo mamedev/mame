@@ -163,7 +163,7 @@ void sdl_monitor_info::refresh()
 	m_dimensions.w = info.rcMonitor.right - info.rcMonitor.left;
 	m_dimensions.h = info.rcMonitor.bottom - info.rcMonitor.top;
 	char *temp = utf8_from_wstring(info.szDevice);
-	strcpy(m_monitor_device, temp);
+	strncpy(m_name, temp, ARRAY_LENGTH(m_name) - 1);
 	osd_free(temp);
 	#elif defined(SDLMAME_MACOSX)   // Mac OS X Core Imaging version
 	CGDirectDisplayID primary;
@@ -176,7 +176,7 @@ void sdl_monitor_info::refresh()
 	m_dimensions.x = m_dimensions.y = 0;
 	m_dimensions.w = dbounds.size.width - dbounds.origin.x;
 	m_dimensions.h = dbounds.size.height - dbounds.origin.y;
-	strcpy(m_monitor_device, "Mac OS X display");
+	strncpy(m_name, "Mac OS X display", ARRAY_LENGTH(m_name) - 1);
 	#elif defined(SDLMAME_X11) || defined(SDLMAME_NO_X11)       // X11 version
 	{
 		#if defined(SDLMAME_X11)
@@ -188,7 +188,7 @@ void sdl_monitor_info::refresh()
 		if ( SDL_GetWMInfo(&info) && (info.subsystem == SDL_SYSWM_X11) )
 		{
 			screen = DefaultScreen(info.info.x11.display);
-			SDL_VideoDriverName(m_monitor_device, sizeof(m_monitor_device)-1);
+			SDL_VideoDriverName(m_name, ARRAY_LENGTH(m_name) - 1);
 			m_dimensions.x = m_dimensions.y = 0;
 			m_dimensions.w = DisplayWidth(info.info.x11.display, screen);
 			m_dimensions.h = DisplayHeight(info.info.x11.display, screen);
@@ -215,7 +215,7 @@ void sdl_monitor_info::refresh()
 			static int first_call=0;
 			static int cw = 0, ch = 0;
 
-			SDL_VideoDriverName(m_monitor_device, sizeof(m_monitor_device)-1);
+			SDL_VideoDriverName(m_monitor_device, ARRAY_LENGTH(m_name) - 1);
 			if (first_call==0)
 			{
 				const char *dimstr = osd_getenv(SDLENV_DESKTOPDIM);
@@ -235,7 +235,7 @@ void sdl_monitor_info::refresh()
 					}
 					if ((cw==0) || (ch==0))
 					{
-						osd_printf_warning("WARNING: SDL_GetVideoInfo() for driver <%s> is broken.\n", m_monitor_device);
+						osd_printf_warning("WARNING: SDL_GetVideoInfo() for driver <%s> is broken.\n", m_name);
 						osd_printf_warning("         You should set SDLMAME_DESKTOPDIM to your desktop size.\n");
 						osd_printf_warning("            e.g. export SDLMAME_DESKTOPDIM=800x600\n");
 						osd_printf_warning("         Assuming 1024x768 now!\n");
@@ -252,7 +252,7 @@ void sdl_monitor_info::refresh()
 	m_dimensions.x = m_dimensions.y = 0;
 	m_dimensions.w = WinQuerySysValue( HWND_DESKTOP, SV_CXSCREEN );
 	m_dimensions.h = WinQuerySysValue( HWND_DESKTOP, SV_CYSCREEN );
-	strcpy(m_monitor_device, "OS/2 display");
+	strncpy(m_name, "OS/2 display", ARRAY_LENGTH(m_name) - 1);
 	#else
 	#error Unknown SDLMAME_xx OS type!
 	#endif
@@ -261,7 +261,7 @@ void sdl_monitor_info::refresh()
 		static int info_shown=0;
 		if (!info_shown)
 		{
-			osd_printf_verbose("SDL Device Driver     : %s\n", m_monitor_device);
+			osd_printf_verbose("SDL Device Driver     : %s\n", m_name);
 			osd_printf_verbose("SDL Monitor Dimensions: %d x %d\n", m_dimensions.w, m_dimensions.h);
 			info_shown = 1;
 		}
