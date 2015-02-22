@@ -17,7 +17,7 @@
 @implementation MAMEBreakpointsView
 
 - (id)initWithFrame:(NSRect)f machine:(running_machine &)m {
-	if (!(self = [super initWithFrame:f type:DVT_BREAK_POINTS machine:m]))
+	if (!(self = [super initWithFrame:f type:DVT_BREAK_POINTS machine:m wholeLineScroll:YES]))
 		return nil;
 	return self;
 }

@@ -168,6 +168,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	// this gets all the lines that are at least partially visible
 	debug_view_xy origin(0, 0), size(totalWidth, totalHeight);
 	[self convertBounds:[self visibleRect] toFirstAffectedLine:&origin.y count:&size.y];
+	size.y = MIN(size.y, totalHeight - origin.y);
 
 	// tell the underlying view how much real estate is available
 	view->set_visible_size(size);
@@ -196,9 +197,12 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 - (void)adjustSizeAndRecomputeVisible {
 	NSSize const clip = [[[self enclosingScrollView] contentView] bounds].size;
-	NSSize const content = NSMakeSize((fontWidth * totalWidth) + (2 * [textContainer lineFragmentPadding]),
-									  fontHeight * totalHeight);
-	[self setFrameSize:NSMakeSize(MAX(clip.width, content.width), MAX(clip.height, content.height))];
+	NSSize content = NSMakeSize((fontWidth * totalWidth) + (2 * [textContainer lineFragmentPadding]),
+								fontHeight * totalHeight);
+	if (wholeLineScroll)
+		content.height += (fontHeight * 2) - 1;
+	[self setFrameSize:NSMakeSize(ceil(MAX(clip.width, content.width)),
+								  ceil(MAX(clip.height, content.height)))];
 	[self recomputeVisible];
 }
 
@@ -208,7 +212,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 }
 
 
-- (id)initWithFrame:(NSRect)f type:(debug_view_type)t machine:(running_machine &)m {
+- (id)initWithFrame:(NSRect)f type:(debug_view_type)t machine:(running_machine &)m wholeLineScroll:(BOOL)w {
 	if (!(self = [super initWithFrame:f]))
 		return nil;
 	type = t;
@@ -218,7 +222,10 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 		[self release];
 		return nil;
 	}
-	totalWidth = totalHeight = 0;
+	wholeLineScroll = w;
+	debug_view_xy const size = view->total_size();
+	totalWidth = size.x;
+	totalHeight = size.y;
 	originTop = 0;
 
 	text = [[NSTextStorage alloc] init];
@@ -258,10 +265,12 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 		if (scroller)
 		{
 			NSSize const clip = [[scroller contentView] bounds].size;
-			NSSize const content = NSMakeSize((fontWidth * newSize.x) + (2 * [textContainer lineFragmentPadding]),
-											  fontHeight * newSize.y);
-			[self setFrameSize:NSMakeSize(MAX(clip.width, content.width), MAX(clip.height, content.height))];
-			[self recomputeVisible];
+			NSSize content = NSMakeSize((fontWidth * newSize.x) + (2 * [textContainer lineFragmentPadding]),
+										fontHeight * newSize.y);
+			if (wholeLineScroll)
+				content.height += (fontHeight * 2) - 1;
+			[self setFrameSize:NSMakeSize(ceil(MAX(clip.width, content.width)),
+										  ceil(MAX(clip.height, content.height)))];
 		}
 		totalWidth = newSize.x;
 		totalHeight = newSize.y;
@@ -273,8 +282,6 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	{
 		NSRect const visible = [self visibleRect];
 		NSPoint scroll = NSMakePoint(visible.origin.x, newOrigin.y * fontHeight);
-		if ((newOrigin.y + view->visible_size().y) == totalHeight)
-			scroll.y += (view->visible_size().y * fontHeight) - visible.size.height;
 		[self scrollPoint:scroll];
 		originTop = newOrigin.y;
 	}
@@ -287,7 +294,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 - (NSSize)maximumFrameSize {
 	debug_view_xy const max = view->total_size();
 	return NSMakeSize(ceil((max.x * fontWidth) + (2 * [textContainer lineFragmentPadding])),
-					  ceil(max.y * fontHeight));
+					  ceil((max.y + (wholeLineScroll ? 1 : 0)) * fontHeight));
 }
 
 
@@ -519,6 +526,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 												 selector:@selector(viewFrameDidChange:)
 													 name:NSViewFrameDidChangeNotification
 												   object:[scroller contentView]];
+		[self adjustSizeAndRecomputeVisible];
 	}
 }
 
@@ -555,6 +563,17 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 - (BOOL)isOpaque {
 	return YES;
+}
+
+
+- (NSRect)adjustScroll:(NSRect)proposedVisibleRect {
+	if (wholeLineScroll)
+	{
+		CGFloat const clamp = [self bounds].size.height - fontHeight - proposedVisibleRect.size.height;
+		proposedVisibleRect.origin.y = MIN(proposedVisibleRect.origin.y, MAX(clamp, 0));
+		proposedVisibleRect.origin.y -= fmod(proposedVisibleRect.origin.y, fontHeight);
+	}
+	return proposedVisibleRect;
 }
 
 
