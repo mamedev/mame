@@ -165,26 +165,22 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (void)recomputeVisible {
-	if ([self window] != nil)
-	{
-		// this gets all the lines that are at least partially visible
-		debug_view_xy origin(0, 0), size(totalWidth, totalHeight);
-		[self convertBounds:[self visibleRect] toFirstAffectedLine:&origin.y count:&size.y];
+	// this gets all the lines that are at least partially visible
+	debug_view_xy origin(0, 0), size(totalWidth, totalHeight);
+	[self convertBounds:[self visibleRect] toFirstAffectedLine:&origin.y count:&size.y];
 
-		// tell them what we think
-		view->set_visible_size(size);
-		view->set_visible_position(origin);
-		originLeft = origin.x;
-		originTop = origin.y;
-	}
+	// tell the underlying view how much real estate is available
+	view->set_visible_size(size);
+	view->set_visible_position(origin);
+	originTop = origin.y;
 }
 
 
 - (void)typeCharacterAndScrollToCursor:(char)ch {
-	if (view->cursor_supported())
+	debug_view_xy const oldPos = view->cursor_position();
+	view->process_char(ch);
+	if (view->cursor_supported() && view->cursor_visible())
 	{
-		debug_view_xy const oldPos = view->cursor_position();
-		view->process_char(ch);
 		debug_view_xy const newPos = view->cursor_position();
 		if ((newPos.x != oldPos.x) || (newPos.y != oldPos.y))
 		{
@@ -194,8 +190,6 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 												 fontWidth,
 												 fontHeight)];
 		}
-	} else {
-		view->process_char(ch);
 	}
 }
 
@@ -216,7 +210,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 		return nil;
 	}
 	totalWidth = totalHeight = 0;
-	originLeft = originTop = 0;
+	originTop = 0;
 
 	text = [[NSTextStorage alloc] init];
 	textContainer = [[NSTextContainer alloc] init];
@@ -261,12 +255,15 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	debug_view_xy const newOrigin = view->visible_position();
 	if (newOrigin.y != originTop)
 	{
-		[self scrollPoint:NSMakePoint([self visibleRect].origin.x, newOrigin.y * fontHeight)];
+		NSRect const visible = [self visibleRect];
+		NSPoint scroll = NSMakePoint(visible.origin.x, newOrigin.y * fontHeight);
+		if ((newOrigin.y + view->visible_size().y) == totalHeight)
+			scroll.y += (view->visible_size().y * fontHeight) - visible.size.height;
+		[self scrollPoint:scroll];
 		originTop = newOrigin.y;
 	}
 
-	// recompute the visible area and mark as dirty
-	[self recomputeVisible];
+	// mark as dirty
 	[self setNeedsDisplay:YES];
 }
 
@@ -389,20 +386,40 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	NSData *const data = [[board stringForType:avail] dataUsingEncoding:NSASCIIStringEncoding
 												   allowLossyConversion:YES];
 	char const *const bytes = (char const *)[data bytes];
+	debug_view_xy const oldPos = view->cursor_position();
 	for (NSUInteger i = 0, l = [data length]; i < l; i++)
 		view->process_char(bytes[i]);
+	if (view->cursor_supported() && view->cursor_visible())
+	{
+		debug_view_xy const newPos = view->cursor_position();
+		if ((newPos.x != oldPos.x) || (newPos.y != oldPos.y))
+		{
+			// FIXME - use proper font metrics
+			[self scrollRectToVisible:NSMakeRect((newPos.x * fontWidth) + [textContainer lineFragmentPadding],
+												 newPos.y * fontHeight,
+												 fontWidth,
+												 fontHeight)];
+		}
+	}
+}
+
+
+- (void)viewBoundsDidChange:(NSNotification *)notification {
+	NSView *const changed = [notification object];
+	if (changed == [[self enclosingScrollView] contentView])
+		[self recomputeVisible];
 }
 
 
 - (void)windowDidBecomeKey:(NSNotification *)notification {
-	NSWindow *win = [notification object];
+	NSWindow *const win = [notification object];
 	if ((win == [self window]) && ([win firstResponder] == self) && view->cursor_supported())
 		[self setNeedsDisplay:YES];
 }
 
 
 - (void)windowDidResignKey:(NSNotification *)notification {
-	NSWindow *win = [notification object];
+	NSWindow *const win = [notification object];
 	if ((win == [self window]) && ([win firstResponder] == self) && view->cursor_supported())
 		[self setNeedsDisplay:YES];
 }
@@ -429,14 +446,17 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (BOOL)becomeFirstResponder {
-	if (view->cursor_supported()) {
+	if (view->cursor_supported())
+	{
 		debug_view_xy pos;
 		view->set_cursor_visible(true);
 		pos = view->cursor_position();
 		[self scrollRectToVisible:NSMakeRect((pos.x * fontWidth) + [textContainer lineFragmentPadding], pos.y * fontHeight, fontWidth, fontHeight)]; // FIXME: metrics
 		[self setNeedsDisplay:YES];
 		return [super becomeFirstResponder];
-	} else {
+	}
+	else
+	{
 		return NO;
 	}
 }
@@ -450,15 +470,37 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (void)viewDidMoveToSuperview {
-	[[self enclosingScrollView] setLineScroll:fontHeight];
 	[super viewDidMoveToSuperview];
+
+	[[NSNotificationCenter defaultCenter] removeObserver:self
+													name:NSViewBoundsDidChangeNotification
+												  object:nil];
+
+	NSScrollView *const scroller = [self enclosingScrollView];
+	if (scroller != nil)
+	{
+		[scroller setLineScroll:fontHeight];
+		[[scroller contentView] setPostsBoundsChangedNotifications:YES];
+		[[NSNotificationCenter defaultCenter] addObserver:self
+												 selector:@selector(viewBoundsDidChange:)
+													 name:NSViewBoundsDidChangeNotification
+												   object:[scroller contentView]];
+	}
 }
 
 
 - (void)viewDidMoveToWindow {
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSWindowDidBecomeKeyNotification object:nil];
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSWindowDidResignKeyNotification object:nil];
-	if ([self window] != nil) {
+	[super viewDidMoveToWindow];
+
+	[[NSNotificationCenter defaultCenter] removeObserver:self
+													name:NSWindowDidBecomeKeyNotification
+												  object:nil];
+	[[NSNotificationCenter defaultCenter] removeObserver:self
+													name:NSWindowDidResignKeyNotification
+												  object:nil];
+
+	if ([self window] != nil)
+	{
 		[[NSNotificationCenter defaultCenter] addObserver:self
 												 selector:@selector(windowDidBecomeKey:)
 													 name:NSWindowDidBecomeKeyNotification
@@ -467,7 +509,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 												 selector:@selector(windowDidResignKey:)
 													 name:NSWindowDidResignKeyNotification
 												   object:[self window]];
-		[self recomputeVisible];
+		[self setNeedsDisplay:YES];
 	}
 }
 
@@ -483,12 +525,13 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (void)drawRect:(NSRect)dirtyRect {
-	INT32 position, clip;
-
-	// work out how much we need to draw
+	// work out what's available
 	[self recomputeVisible];
 	debug_view_xy const origin = view->visible_position();
 	debug_view_xy const size = view->visible_size();
+
+	// work out how much we need to draw
+	INT32 position, clip;
 	[self convertBounds:dirtyRect toFirstAffectedLine:&position count:&clip];
 
 	// this gets the text for the whole visible area
@@ -500,7 +543,14 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	for (UINT32 row = position; row < position + clip; row++, data += size.x)
 	{
 		if ((row < origin.y) || (row >= origin.y + size.y))
+		{
+			[DefaultBackground set];
+			[NSBezierPath fillRect:NSMakeRect(0,
+											  row * fontHeight,
+											  [self bounds].size.width,
+											  fontHeight)];
 			continue;
+		}
 
 		// render entire lines to get character alignment right
 		int			attr = -1;

@@ -23,7 +23,7 @@
 	running_machine	*machine;
 	debug_view		*view;
 
-	INT32			totalWidth, totalHeight, originLeft, originTop;
+	INT32			totalWidth, totalHeight, originTop;
 
 	NSFont			*font;
 	CGFloat			fontWidth, fontHeight, fontAscent;
@@ -50,6 +50,8 @@
 
 - (IBAction)copyVisible:(id)sender;
 - (IBAction)paste:(id)sender;
+
+- (void)viewBoundsDidChange:(NSNotification *)notification;
 
 - (void)windowDidBecomeKey:(NSNotification *)notification;
 - (void)windowDidResignKey:(NSNotification *)notification;
