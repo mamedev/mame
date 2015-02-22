@@ -35,23 +35,6 @@ class debug_view_breakpoints : public debug_view
 	virtual ~debug_view_breakpoints();
 
 public:
-	enum SortMode
-	{
-		SORT_NONE,
-		SORT_INDEX_ASCENDING,
-		SORT_INDEX_DESCENDING,
-		SORT_ENABLED_ASCENDING,
-		SORT_ENABLED_DESCENDING,
-		SORT_CPU_ASCENDING,
-		SORT_CPU_DESCENDING,
-		SORT_ADDRESS_ASCENDING,
-		SORT_ADDRESS_DESCENDING,
-		SORT_CONDITION_ASCENDING,
-		SORT_CONDITION_DESCENDING,
-		SORT_ACTION_ASCENDING,
-		SORT_ACTION_DESCENDING
-	};
-
 	// getters
 	// setters
 
@@ -64,11 +47,12 @@ private:
 	// internal helpers
 	void enumerate_sources();
 	void pad_astring_to_length(astring& str, int len);
-	int breakpoints(SortMode sort, device_debug::breakpoint**& bpList);
+	void gather_breakpoints();
 
 
 	// internal state
-	SortMode m_sortType;
+	int (*m_sortType)(void const *, void const *);
+	dynamic_array<device_debug::breakpoint *> m_buffer;
 };
 
 

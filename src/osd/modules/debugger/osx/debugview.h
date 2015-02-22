@@ -22,6 +22,7 @@
 	int				type;
 	running_machine	*machine;
 	debug_view		*view;
+	BOOL			wholeLineScroll;
 
 	INT32			totalWidth, totalHeight, originTop;
 
@@ -35,7 +36,7 @@
 
 + (NSFont *)defaultFont;
 
-- (id)initWithFrame:(NSRect)f type:(debug_view_type)t machine:(running_machine &)m;
+- (id)initWithFrame:(NSRect)f type:(debug_view_type)t machine:(running_machine &)m wholeLineScroll:(BOOL)w;
 
 - (void)update;
 

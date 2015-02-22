@@ -254,21 +254,27 @@ void sega315_5124_device::set_display_settings()
 		}
 	}
 
+	set_frame_timing();
+	m_cram_dirty = 1;
+}
+
+
+void sega315_5124_device::set_frame_timing()
+{
 	switch (m_y_pixels)
 	{
-	case 192:
-		m_frame_timing = (m_is_pal) ? pal_192 : ntsc_192;
-		break;
+		case 192:
+			m_frame_timing = (m_is_pal) ? pal_192 : ntsc_192;
+			break;
 
-	case 224:
-		m_frame_timing = (m_is_pal) ? pal_224 : ntsc_224;
-		break;
+		case 224:
+			m_frame_timing = (m_is_pal) ? pal_224 : ntsc_224;
+			break;
 
-	case 240:
-		m_frame_timing = (m_is_pal) ? pal_240 : ntsc_240;
-		break;
+		case 240:
+			m_frame_timing = (m_is_pal) ? pal_240 : ntsc_240;
+			break;
 	}
-	m_cram_dirty = 1;
 }
 
 
@@ -675,7 +681,7 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 		case 2:     /* VDP register write */
 			reg_num = data & 0x0f;
 			m_reg[reg_num] = m_addr & 0xff;
-			//logerror("%s: %s: setting register %x to %02x\n", machine().describe_context(), tag(), reg_num, m_addr & 0xf );
+			//logerror("%s: %s: setting register %x to %02x\n", machine().describe_context(), tag(), reg_num, m_addr & 0xff);
 
 			switch (reg_num)
 			{
@@ -1441,7 +1447,7 @@ void sega315_5124_device::update_palette()
 {
 	int i;
 
-	/* Exit if palette is has no changes */
+	/* Exit if palette has no changes */
 	if (m_cram_dirty == 0)
 	{
 		return;
@@ -1468,7 +1474,7 @@ void sega315_5378_device::update_palette()
 {
 	int i;
 
-	/* Exit if palette is has no changes */
+	/* Exit if palette has no changes */
 	if (m_cram_dirty == 0)
 	{
 		return;
@@ -1557,20 +1563,7 @@ void sega315_5124_device::stop_timers()
 
 void sega315_5124_device::vdp_postload()
 {
-	switch (m_y_pixels)
-	{
-		case 192:
-			m_frame_timing = (m_is_pal) ? pal_192 : ntsc_192;
-			break;
-
-		case 224:
-			m_frame_timing = (m_is_pal) ? pal_224 : ntsc_224;
-			break;
-
-		case 240:
-			m_frame_timing = (m_is_pal) ? pal_240 : ntsc_240;
-			break;
-	}
+	set_frame_timing();
 }
 
 void sega315_5124_device::device_start()
