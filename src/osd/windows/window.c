@@ -1405,9 +1405,12 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 
 		// destroy: clean up all attached rendering bits and NULL out our hwnd
 		case WM_DESTROY:
-			window->m_renderer->destroy();
-			global_free(window->m_renderer);
-			window->m_renderer = NULL;
+			if (!(window->m_renderer == NULL))
+			{
+				window->m_renderer->destroy();
+				global_free(window->m_renderer);
+				window->m_renderer = NULL;
+			}
 			window->m_hwnd = NULL;
 			return DefWindowProc(wnd, message, wparam, lparam);
 
