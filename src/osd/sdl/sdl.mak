@@ -734,8 +734,8 @@ ifeq ($(SDL_LIBVER),sdl2)
 LIBS += -lSDL2 -limm32 -lversion -lole32 -loleaut32 -lws2_32 -static
 BASELIBS += -lSDL2 -limm32 -lversion -lole32 -loleaut32 -lws2_32 -static
 else
-LIBS += -lSDL -static
-BASELIBS += -lSDL -static
+LIBS += -lSDL -lws2_32 -static 
+BASELIBS += -lSDL -lws2_32 -static
 endif
 LIBS += -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi
 BASELIBS += -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi
