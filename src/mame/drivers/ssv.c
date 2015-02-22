@@ -4424,10 +4424,10 @@ ROM_END
 
 ROM_START( ultraxg )
 	ROM_REGION( 0x200000, "maincpu", 0 )  /* V60 Code */
-	ROM_LOAD16_BYTE( "sx010-11.5h", 0x000000, 0x080000, CRC(58554bdd) SHA1(4b35fbaca0cb458e3b21c43e4b4dfd708a7b9397) )
-	ROM_LOAD16_BYTE( "sx010-09.5c", 0x000001, 0x080000, CRC(153e79b2) SHA1(e0278267e345ebd81f66fbb9d262cbd78df2d01b) )
-	ROM_LOAD16_BYTE( "sx010-12.5k", 0x100000, 0x080000, CRC(14ad58c9) SHA1(d6be82044a22eb21cac8f7e961a198e369743962) )
-	ROM_LOAD16_BYTE( "sx010-10.5d", 0x100001, 0x080000, CRC(7e64473e) SHA1(2444ac4d95563b18c8aec077e742b0f84fd38f43) )
+	ROM_LOAD16_BYTE( "sx010-11.5h", 0x000000, 0x080000, CRC(58554bdd) SHA1(4b35fbaca0cb458e3b21c43e4b4dfd708a7b9397) ) /* hand written label with date 2/27 & checksum "44B4" */
+	ROM_LOAD16_BYTE( "sx010-09.5c", 0x000001, 0x080000, CRC(153e79b2) SHA1(e0278267e345ebd81f66fbb9d262cbd78df2d01b) ) /* hand written label with date 2/27 & checksum "449B" */
+	ROM_LOAD16_BYTE( "sx010-12.5k", 0x100000, 0x080000, CRC(14ad58c9) SHA1(d6be82044a22eb21cac8f7e961a198e369743962) ) /* hand written label with date 2/27 & checksum "3CCF" */
+	ROM_LOAD16_BYTE( "sx010-10.5d", 0x100001, 0x080000, CRC(7e64473e) SHA1(2444ac4d95563b18c8aec077e742b0f84fd38f43) ) /* hand written label with date 2/27 & checksum "0CC5" */
 
 	ROM_REGION( 0xc00000, "gfx1", 0 ) /* Sprites */
 	ROM_LOAD( "71047-01.u73", 0x0000000, 0x200000, CRC(66662b08) SHA1(0cb683e5f85ffe21bd3367af4d3e48a484dbd4c3) )
