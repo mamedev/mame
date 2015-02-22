@@ -83,7 +83,7 @@ sdl_monitor_info *sdl_monitor_info::list = NULL;
 static void check_osd_inputs(running_machine &machine);
 
 static float get_aspect(const char *defdata, const char *data, int report_error);
-static void get_resolution(const char *defdata, const char *data, sdl_window_config *config, int report_error);
+static void get_resolution(const char *defdata, const char *data, osd_window_config *config, int report_error);
 
 
 //============================================================
@@ -110,7 +110,7 @@ bool sdl_osd_interface::video_init()
 	// create the windows
 	for (index = 0; index < video_config.numscreens; index++)
 	{
-		sdl_window_config conf;
+		osd_window_config conf;
 		memset(&conf, 0, sizeof(conf));
 		get_resolution(options().resolution(), options().resolution(index), &conf, TRUE);
 
@@ -215,7 +215,7 @@ void sdl_monitor_info::refresh()
 			static int first_call=0;
 			static int cw = 0, ch = 0;
 
-			SDL_VideoDriverName(m_monitor_device, ARRAY_LENGTH(m_name) - 1);
+			SDL_VideoDriverName(m_name, ARRAY_LENGTH(m_name) - 1);
 			if (first_call==0)
 			{
 				const char *dimstr = osd_getenv(SDLENV_DESKTOPDIM);
@@ -779,7 +779,7 @@ static float get_aspect(const char *defdata, const char *data, int report_error)
 //  get_resolution
 //============================================================
 
-static void get_resolution(const char *defdata, const char *data, sdl_window_config *config, int report_error)
+static void get_resolution(const char *defdata, const char *data, osd_window_config *config, int report_error)
 {
 	config->width = config->height = config->depth = config->refresh = 0;
 	if (strcmp(data, OSDOPTVAL_AUTO) == 0)

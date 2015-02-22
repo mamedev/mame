@@ -71,7 +71,7 @@ public:
 	{ }
 
 	/* virtual */ int create();
-	/* virtual */ int draw(const UINT32 dc, const int update);
+	/* virtual */ int draw(const int update);
 	/* virtual */ int xy_to_render_target(const int x, const int y, int *xt, int *yt);
 	/* virtual */ void destroy();
 	/* virtual */ render_primitive_list *get_primitives()
@@ -555,7 +555,7 @@ void sdl_info::destroy_all_textures()
 //  sdl_info::draw
 //============================================================
 
-int sdl_info::draw(UINT32 dc, int update)
+int sdl_info::draw(int update)
 {
 	const sdl_scale_mode *sm = &scale_modes[video_config.scale_mode];
 	UINT8 *surfptr;

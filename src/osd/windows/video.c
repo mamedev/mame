@@ -56,7 +56,7 @@ static win_monitor_info *pick_monitor(windows_options &options, int index);
 static void check_osd_inputs(running_machine &machine);
 
 static float get_aspect(const char *defdata, const char *data, int report_error);
-static void get_resolution(const char *defdata, const char *data, win_window_config *config, int report_error);
+static void get_resolution(const char *defdata, const char *data, osd_window_config *config, int report_error);
 
 
 
@@ -443,7 +443,7 @@ static float get_aspect(const char *defdata, const char *data, int report_error)
 //  get_resolution
 //============================================================
 
-static void get_resolution(const char *defdata, const char *data, win_window_config *config, int report_error)
+static void get_resolution(const char *defdata, const char *data, osd_window_config *config, int report_error)
 {
 	config->width = config->height = config->refresh = 0;
 	if (strcmp(data, OSDOPTVAL_AUTO) == 0)

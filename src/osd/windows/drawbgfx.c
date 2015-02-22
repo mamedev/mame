@@ -32,7 +32,7 @@ public:
 
 	virtual int create();
 	virtual render_primitive_list *get_primitives();
-	virtual int draw(HDC dc, int update);
+	virtual int draw(int update);
 	virtual void save() {};
 	virtual void record() {};
 	virtual void toggle_fsfx() {};
@@ -134,7 +134,7 @@ render_primitive_list *renderer_bgfx::get_primitives()
 //  drawbgfx_window_draw
 //============================================================
 
-int renderer_bgfx::draw(HDC dc, int update)
+int renderer_bgfx::draw(int update)
 {
 	RECT client;
 	GetClientRect(window().m_hwnd, &client);

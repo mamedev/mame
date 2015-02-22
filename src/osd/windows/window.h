@@ -49,9 +49,7 @@ public:
 	:
 #ifdef OSD_SDL
 #else
-		m_hwnd(0), m_focus_hwnd(0), m_resize_state(0),
-		m_maxwidth(0), m_maxheight(0),
-		m_refresh(0),
+		m_hwnd(0), m_dc(0), m_focus_hwnd(0), m_resize_state(0),
 #endif
 		m_prescale(1),
 		m_primlist(NULL)
@@ -84,15 +82,15 @@ public:
 
 	// window handle and info
 	HWND					m_hwnd;
+	HDC						m_dc;		// only used by GDI renderer!
 	// FIXME: this is the same as win_window_list->m_hwnd, i.e. first window.
 	// During modularization, this should be passed in differently
 	HWND         	 		m_focus_hwnd;
 
 	int                 	m_resize_state;
-	int                 	m_maxwidth, m_maxheight;
-	int                 	m_refresh;
 #endif
 
+	osd_window_config		m_win_config;
 	int						m_prescale;
 	render_primitive_list *	m_primlist;
 };
@@ -128,11 +126,10 @@ public:
 	virtual int create() = 0;
 	virtual render_primitive_list *get_primitives() = 0;
 
+	virtual int draw(const int update) = 0;
 #ifdef OSD_SDL
-	virtual int draw(const UINT32 dc, const int update) = 0;
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) = 0;
 #else
-	virtual int draw(HDC dc, int update) = 0;
 	virtual void save() = 0;
 	virtual void record() = 0;
 	virtual void toggle_fsfx() = 0;
@@ -180,6 +177,12 @@ public:
 
 	win_monitor_info *monitor() const { return m_monitor; }
 
+	// static callbacks
+
+	static LRESULT CALLBACK video_window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
+
+	// member variables
+
 	win_window_info *   m_next;
 	volatile int        m_init_state;
 
@@ -212,6 +215,8 @@ public:
 	osd_renderer *      m_renderer;
 
 private:
+	void draw_video_contents(HDC dc, int update);
+
 	running_machine &   m_machine;
 };
 
@@ -237,12 +242,11 @@ extern win_window_info *win_window_list;
 //============================================================
 
 // creation/deletion of windows
-void winwindow_video_window_create(running_machine &machine, int index, win_monitor_info *monitor, const win_window_config *config);
+void winwindow_video_window_create(running_machine &machine, int index, win_monitor_info *monitor, const osd_window_config *config);
 
 BOOL winwindow_has_focus(void);
 void winwindow_update_cursor_state(running_machine &machine);
 
-LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
 extern LRESULT CALLBACK winwindow_video_window_proc_ui(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
 
 void winwindow_toggle_full_screen(void);

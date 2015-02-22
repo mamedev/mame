@@ -65,7 +65,7 @@ public:
 
 	virtual int create();
 	virtual render_primitive_list *get_primitives();
-	virtual int draw(HDC dc, int update);
+	virtual int draw(const int update);
 	virtual void save() {};
 	virtual void record() {};
 	virtual void toggle_fsfx() {};
@@ -310,7 +310,7 @@ render_primitive_list *renderer_dd::get_primitives()
 //  drawdd_window_draw
 //============================================================
 
-int renderer_dd::draw(HDC dc, int update)
+int renderer_dd::draw(const int update)
 {
 	render_primitive *prim;
 	int usemembuffer = FALSE;
@@ -1226,7 +1226,7 @@ static HRESULT WINAPI enum_modes_callback(LPDDSURFACEDESC2 desc, LPVOID context)
 		size_score *= 0.1f;
 
 	// if we're looking for a particular mode, that's a winner
-	if (desc->dwWidth == einfo->window->m_maxwidth && desc->dwHeight == einfo->window->m_maxheight)
+	if (desc->dwWidth == einfo->window->m_win_config.width && desc->dwHeight == einfo->window->m_win_config.height)
 		size_score = 2.0f;
 
 	// compute refresh score
@@ -1237,7 +1237,7 @@ static HRESULT WINAPI enum_modes_callback(LPDDSURFACEDESC2 desc, LPVOID context)
 		refresh_score *= 0.1f;
 
 	// if we're looking for a particular refresh, make sure it matches
-	if (desc->dwRefreshRate == einfo->window->m_refresh)
+	if (desc->dwRefreshRate == einfo->window->m_win_config.refresh)
 		refresh_score = 2.0f;
 
 	// weight size and refresh equally

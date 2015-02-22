@@ -151,7 +151,7 @@ public:
     {}
 
 	/* virtual */ int create();
-	/* virtual */ int draw(const UINT32 dc, const int update);
+	/* virtual */ int draw(const int update);
 	/* virtual */ int xy_to_render_target(const int x, const int y, int *xt, int *yt);
 	/* virtual */ void destroy();
 	/* virtual */ render_primitive_list *get_primitives()
@@ -677,7 +677,7 @@ void sdl_info13::destroy_all_textures()
 //  sdl_info::draw
 //============================================================
 
-int sdl_info13::draw(UINT32 dc, int update)
+int sdl_info13::draw(int update)
 {
 	render_primitive *prim;
 	texture_info *texture=NULL;

@@ -290,11 +290,8 @@ public:
 	}
 
 	/* virtual */ int create();
-#ifdef OSD_WINDOWS
-	/* virtual */ int draw(const HDC dc, const int update);
-#else
-	/* virtual */ int draw(const UINT32 dc, const int update);
-#endif
+	/* virtual */ int draw(const int update);
+
 	/* virtual */ int xy_to_render_target(const int x, const int y, int *xt, int *yt);
 	/* virtual */ void destroy();
 	/* virtual */ render_primitive_list *get_primitives()
@@ -1327,11 +1324,7 @@ void sdl_info_ogl::loadGLExtensions()
 //  sdl_info::draw
 //============================================================
 
-#ifdef OSD_WINDOWS
-int sdl_info_ogl::draw(const HDC dc, const int update)
-#else
-int sdl_info_ogl::draw(const UINT32 dc, const int update)
-#endif
+int sdl_info_ogl::draw(const int update)
 {
 	render_primitive *prim;
 	texture_info *texture=NULL;

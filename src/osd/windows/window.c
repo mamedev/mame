@@ -121,7 +121,6 @@ static HANDLE window_thread_ready_event;
 //============================================================
 
 static void winwindow_video_window_destroy(win_window_info *window);
-static void draw_video_contents(win_window_info *window, HDC dc, int update);
 
 static unsigned __stdcall thread_entry(void *param);
 static int complete_create(win_window_info *window);
@@ -660,7 +659,7 @@ void winwindow_update_cursor_state(running_machine &machine)
 //  (main thread)
 //============================================================
 
-void winwindow_video_window_create(running_machine &machine, int index, win_monitor_info *monitor, const win_window_config *config)
+void winwindow_video_window_create(running_machine &machine, int index, win_monitor_info *monitor, const osd_window_config *config)
 {
 	win_window_info *window, *win;
 
@@ -669,9 +668,7 @@ void winwindow_video_window_create(running_machine &machine, int index, win_moni
 	// allocate a new window object
 	window = global_alloc(win_window_info(machine));
 	//printf("%d, %d\n", config->width, config->height);
-	window->m_maxwidth = config->width;
-	window->m_maxheight = config->height;
-	window->m_refresh = config->refresh;
+	window->m_win_config = *config;
 	window->m_monitor = monitor;
 	window->m_fullscreen = !video_config.windowed;
 
@@ -1213,8 +1210,8 @@ static int complete_create(win_window_info *window)
 		return 0;
 
 	// adjust the window position to the initial width/height
-	tempwidth = (window->m_maxwidth != 0) ? window->m_maxwidth : 640;
-	tempheight = (window->m_maxheight != 0) ? window->m_maxheight : 480;
+	tempwidth = (window->m_win_config.width != 0) ? window->m_win_config.width : 640;
+	tempheight = (window->m_win_config.height != 0) ? window->m_win_config.height : 480;
 	SetWindowPos(window->m_hwnd, NULL, monitorbounds.left + 20, monitorbounds.top + 20,
 			monitorbounds.left + tempwidth + wnd_extra_width(window),
 			monitorbounds.top + tempheight + wnd_extra_height(window),
@@ -1252,7 +1249,7 @@ static int complete_create(win_window_info *window)
 //  (window thread)
 //============================================================
 
-LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam)
+LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
 	LONG_PTR ptr = GetWindowLongPtr(wnd, GWLP_USERDATA);
 	win_window_info *window = (win_window_info *)ptr;
@@ -1272,7 +1269,7 @@ LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wpar
 		{
 			PAINTSTRUCT pstruct;
 			HDC hdc = BeginPaint(wnd, &pstruct);
-			draw_video_contents(window, hdc, TRUE);
+			window->draw_video_contents(hdc, TRUE);
 			if (window->win_has_menu())
 				DrawMenuBar(window->m_hwnd);
 			EndPaint(wnd, &pstruct);
@@ -1421,7 +1418,7 @@ LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wpar
 
 			mtlog_add("winwindow_video_window_proc: WM_USER_REDRAW begin");
 			window->m_primlist = (render_primitive_list *)lparam;
-			draw_video_contents(window, hdc, FALSE);
+			window->draw_video_contents(hdc, FALSE);
 			mtlog_add("winwindow_video_window_proc: WM_USER_REDRAW end");
 
 			ReleaseDC(wnd, hdc);
@@ -1470,36 +1467,38 @@ LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wpar
 //  (window thread)
 //============================================================
 
-static void draw_video_contents(win_window_info *window, HDC dc, int update)
+void win_window_info::draw_video_contents(HDC dc, int update)
 {
 	assert(GetCurrentThreadId() == window_threadid);
 
 	mtlog_add("draw_video_contents: begin");
 
 	mtlog_add("draw_video_contents: render lock acquire");
-	osd_lock_acquire(window->m_render_lock);
+	osd_lock_acquire(m_render_lock);
 	mtlog_add("draw_video_contents: render lock acquired");
 
 	// if we're iconic, don't bother
-	if (window->m_hwnd != NULL && !IsIconic(window->m_hwnd))
+	if (m_hwnd != NULL && !IsIconic(m_hwnd))
 	{
 		// if no bitmap, just fill
-		if (window->m_primlist == NULL)
+		if (m_primlist == NULL)
 		{
 			RECT fill;
-			GetClientRect(window->m_hwnd, &fill);
+			GetClientRect(m_hwnd, &fill);
 			FillRect(dc, &fill, (HBRUSH)GetStockObject(BLACK_BRUSH));
 		}
 
 		// otherwise, render with our drawing system
 		else
 		{
-			window->m_renderer->draw(dc, update);
+			// update DC
+			m_dc = dc;
+			m_renderer->draw(update);
 			mtlog_add("draw_video_contents: drawing finished");
 		}
 	}
 
-	osd_lock_release(window->m_render_lock);
+	osd_lock_release(m_render_lock);
 	mtlog_add("draw_video_contents: render lock released");
 
 	mtlog_add("draw_video_contents: end");
@@ -1575,10 +1574,10 @@ static void constrain_to_aspect_ratio(win_window_info *window, RECT *rect, int a
 		maxheight = rect_height(&monitor->usuable_position_size()) - extraheight;
 
 		// further clamp to the maximum width/height in the window
-		if (window->m_maxwidth != 0)
-			maxwidth = MIN(maxwidth, window->m_maxwidth + extrawidth);
-		if (window->m_maxheight != 0)
-			maxheight = MIN(maxheight, window->m_maxheight + extraheight);
+		if (window->m_win_config.width != 0)
+			maxwidth = MIN(maxwidth, window->m_win_config.width + extrawidth);
+		if (window->m_win_config.height != 0)
+			maxheight = MIN(maxheight, window->m_win_config.height + extraheight);
 	}
 
 	// clamp to the maximum
@@ -1703,15 +1702,15 @@ static void get_max_bounds(win_window_info *window, RECT *bounds, int constrain)
 	maximum = window->m_monitor->usuable_position_size();
 
 	// clamp to the window's max
-	if (window->m_maxwidth != 0)
+	if (window->m_win_config.width != 0)
 	{
-		int temp = window->m_maxwidth + wnd_extra_width(window);
+		int temp = window->m_win_config.width + wnd_extra_width(window);
 		if (temp < rect_width(&maximum))
 			maximum.right = maximum.left + temp;
 	}
-	if (window->m_maxheight != 0)
+	if (window->m_win_config.height != 0)
 	{
-		int temp = window->m_maxheight + wnd_extra_height(window);
+		int temp = window->m_win_config.height + wnd_extra_height(window);
 		if (temp < rect_height(&maximum))
 			maximum.bottom = maximum.top + temp;
 	}
