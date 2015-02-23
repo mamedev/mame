@@ -32,7 +32,7 @@ public:
 
 	virtual int create();
 	virtual render_primitive_list *get_primitives();
-	virtual int draw(int update);
+	virtual int draw(const int update);
 	virtual void save() {};
 	virtual void record() {};
 	virtual void toggle_fsfx() {};
