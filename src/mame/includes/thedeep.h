@@ -31,7 +31,6 @@ public:
 	UINT8 m_protection_data;
 	int m_protection_index;
 	int m_protection_irq;
-	int m_rombank;
 	tilemap_t *m_tilemap_0;
 	tilemap_t *m_tilemap_1;
 	UINT8 m_mcu_p3_reg;
@@ -62,7 +61,6 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	
-	void maincpu_bankswitch(UINT8 bank_trig);
 	INTERRUPT_GEN_MEMBER(mcu_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 };

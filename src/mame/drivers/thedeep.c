@@ -51,18 +51,18 @@ WRITE8_MEMBER(thedeep_state::sound_w)
 
 void thedeep_state::machine_start()
 {
+	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_protection_command));
 	save_item(NAME(m_protection_data));
 	save_item(NAME(m_protection_index));
 	save_item(NAME(m_protection_irq));
-	save_item(NAME(m_rombank));
 	save_item(NAME(m_mcu_p3_reg));
 }
 
 void thedeep_state::machine_reset()
 {
-	membank("bank1")->set_base(memregion("maincpu")->base() + 0x10000 + 0 * 0x4000);
+	membank("bank1")->set_entry(0);
 	m_scroll[0] = 0;
 	m_scroll[1] = 0;
 	m_scroll[2] = 0;
@@ -70,7 +70,6 @@ void thedeep_state::machine_reset()
 	m_protection_command = 0;
 	m_protection_index = -1;
 	m_protection_irq = 0;
-	m_rombank = -1;
 }
 
 WRITE8_MEMBER(thedeep_state::protection_w)
@@ -90,15 +89,7 @@ WRITE8_MEMBER(thedeep_state::protection_w)
 		case 0x31:
 		case 0x32:
 		case 0x33:
-		{
-			UINT8 *rom;
-			int new_rombank = m_protection_command & 3;
-			if (m_rombank == new_rombank)   break;
-			m_rombank = new_rombank;
-			rom = memregion("maincpu")->base();
-			membank("bank1")->set_base(rom + 0x10000 + m_rombank * 0x4000);
-
-		}
+			membank("bank1")->set_entry(m_protection_command & 3);
 		break;
 
 		case 0x59:
@@ -195,23 +186,10 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-void thedeep_state::maincpu_bankswitch(UINT8 bank_trig)
-{
-	UINT8 *rom;
-	int new_rombank = bank_trig & 3;
-
-	if (m_rombank == new_rombank)
-		return;
-	m_rombank = new_rombank;
-	rom = memregion("maincpu")->base();
-	membank("bank1")->set_base(rom + 0x10000 + m_rombank * 0x4000);
-
-}
-
 WRITE8_MEMBER(thedeep_state::p1_w)
 {
 	flip_screen_set((data & 1) ^ 1);
-	maincpu_bankswitch((data & 6) >> 1);
+	membank("bank1")->set_entry((data & 6) >> 1);
 	logerror("P1 %02x\n",data);
 }
 
