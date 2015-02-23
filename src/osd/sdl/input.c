@@ -1583,6 +1583,8 @@ void sdlinput_process_events_buf()
 		}
 		osd_lock_release(input_lock);
 	}
+	else
+		SDL_PumpEvents();
 }
 
 

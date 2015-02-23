@@ -561,7 +561,12 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_toggle_full_screen_wt )
 	window->renderer().destroy();
 
 #if (SDLMAME_SDL2)
-	if (window->fullscreen() && video_config.switchres)
+	bool is_osx = false;
+#ifdef SDLMAME_MACOSX
+	// FIXME: This is weird behaviour and certainly a bug in SDL
+	is_osx = true;
+#endif
+	if (window->fullscreen() && (video_config.switchres || is_osx))
 	{
 		SDL_SetWindowFullscreen(window->sdl_window(), 0);    // Try to set mode
 		SDL_SetWindowDisplayMode(window->sdl_window(), &window->m_original_mode);    // Try to set mode
@@ -1224,27 +1229,35 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 		window->m_extra_flags |= SDL_ASYNCBLIT;
 
 	if (window->renderer().has_flags(osd_renderer::FLAG_NEEDS_OPENGL))
- {
+	{
 		window->m_extra_flags |= SDL_DOUBLEBUF | SDL_OPENGL;
 		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 		#if (SDL_VERSION_ATLEAST(1,2,10)) && (!defined(SDLMAME_EMSCRIPTEN))
 		SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, video_config.waitvsync ? 1 : 0);
 		#endif
-			//load_gl_lib(window->machine());
- }
+		//	load_gl_lib(window->machine());
+	}
 
 	// create the SDL surface (which creates the window in windowed mode)
+#if 0
+	window->m_sdlsurf = SDL_SetVideoMode(tempwidth, tempheight,
+							0, SDL_OPENGL | SDL_FULLSCREEN);// | window->m_extra_flags);
+	if (!window->m_sdlsurf)
+		printf("completely failed\n");
+#endif
 	window->m_sdlsurf = SDL_SetVideoMode(tempwidth, tempheight,
 							0, SDL_SWSURFACE  | SDL_ANYFORMAT | window->m_extra_flags);
 
 	if (!window->m_sdlsurf)
+	{
+		osd_printf_error("SDL Error: %s\n", SDL_GetError());
 		return (void *) &result[1];
+	}
 	if ( (video_config.mode  == VIDEO_MODE_OPENGL) && !(window->m_sdlsurf->flags & SDL_OPENGL) )
 	{
 		osd_printf_error("OpenGL not supported on this driver!\n");
 		return (void *) &result[1];
 	}
-
 	// set the window title
 	SDL_WM_SetCaption(window->m_title, "SDLMAME");
 #endif

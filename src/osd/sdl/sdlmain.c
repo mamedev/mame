@@ -263,6 +263,10 @@ int main(int argc, char *argv[])
 {
 	int res = 0;
 
+#if defined(SDLMAME_X11) && !(SDLMAME_SDL2)
+	XInitThreads();
+#endif
+
 #if defined(SDLMAME_WIN32)
 #if !(SDLMAME_SDL2)
 	/* Load SDL dynamic link library */

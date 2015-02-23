@@ -13,22 +13,19 @@
 //  System dependent defines
 //============================================================
 
-// Process events in worker thread
-#if defined(SDLMAME_WIN32) || ((SDLMAME_SDL2) && (!defined(SDLMAME_EMSCRIPTEN)) && (!defined(SDLMAME_MACOSX)))
-#define SDLMAME_EVENTS_IN_WORKER_THREAD (1)
-#else
-#define SDLMAME_EVENTS_IN_WORKER_THREAD (0)
-#endif
 
 #if defined(SDLMAME_WIN32)
 	#if (SDLMAME_SDL2)
-		#define SDLMAME_INIT_IN_WORKER_THREAD   (0) //FIXME: breaks mt
-		#define SDL13_COMBINE_RESIZE (1)
+		#define SDLMAME_EVENTS_IN_WORKER_THREAD (0)
+		#define SDLMAME_INIT_IN_WORKER_THREAD   (0)
+		#define SDL13_COMBINE_RESIZE (0) //(1) no longer needed
 	#else
+		#define SDLMAME_EVENTS_IN_WORKER_THREAD (0)
 		#define SDLMAME_INIT_IN_WORKER_THREAD   (1)
 		#define SDL13_COMBINE_RESIZE (0)
 	#endif
 #else
+	#define SDLMAME_EVENTS_IN_WORKER_THREAD (0)
 	#define SDLMAME_INIT_IN_WORKER_THREAD   (0)
 	#define SDL13_COMBINE_RESIZE (0)
 #endif
