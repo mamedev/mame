@@ -482,7 +482,7 @@ CAPCOM CPB-001A
 |                    |
 |      IC1           |
 |                    |
-| IC2      IC3       |
+| IC3      IC2       |
 |                    |
 |                    |
 |                    |
