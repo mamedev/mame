@@ -500,7 +500,7 @@ void texture_manager::create_resources()
 		texture.rowpixels = m_default_bitmap.rowpixels();
 		texture.width = m_default_bitmap.width();
 		texture.height = m_default_bitmap.height();
-		texture.set_palette(NULL);
+		texture.palette = NULL;
 		texture.seqid = 0;
 
 		// now create it
@@ -517,7 +517,7 @@ void texture_manager::create_resources()
 		texture.rowpixels = m_vector_bitmap.rowpixels();
 		texture.width = m_vector_bitmap.width();
 		texture.height = m_vector_bitmap.height();
-		texture.set_palette(NULL);
+		texture.palette = NULL;
 		texture.seqid = 0;
 
 		// now create it
