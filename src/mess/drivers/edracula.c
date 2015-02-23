@@ -188,4 +188,4 @@ ROM_START( edracula )
 ROM_END
 
 
-CONS( 1982, edracula, 0, 0, edracula, edracula, driver_device, 0, "Epoch", "Dracula", GAME_SUPPORTS_SAVE )
+CONS( 1982, edracula, 0, 0, edracula, edracula, driver_device, 0, "Epoch", "Dracula (Epoch)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
