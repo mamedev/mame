@@ -15,7 +15,7 @@ Japanese Releases - Pyuuta
 005E Frogger ~ フロッガー    [dumped]
 006E Scramble ~ スクランブル  [dumped]
 007E NightFlight ~ ナイトフライト  [dumped]
-008E Marine Adventure ~ マリン アドベンチャー
+008E Marine Adventure ~ マリン アドベンチャー    [dumped]
 009E Mission Attack ~ ミッション アタック    [dumped]
 010E Traffic Jam ~ トラフィック ジャム
 011E Mystery Gold ~ ミステリー ゴールド
@@ -131,8 +131,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		</part>
 	</software>
 
-	<software name="deepsix">
-	<!-- Stock No: 8106, Clone of Marine Adventure (Japanese 008E)-->
+	<software name="deepsix" cloneof="marinadv">
 		<description>Deep Six (USA)</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
@@ -203,6 +202,19 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 		<part name="cart" interface="tutor_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="lmotion.bin" size="8192" crc="1f652f42" sha1="fa2e6129d29f9d38f1102da3678659d845daec5b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marinadv">
+		<description>Marine Adventure (Jpn)</description>
+		<year>1982</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="マリン アドベンチャー"/>
+		<info name="serial" value="008E"/>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="tomy 32.2.u1" size="8192" crc="90f6a3d9" sha1="9e7007b97ec2c1cf865b2f55989bb616af14a6e6" offset="0" />
 			</dataarea>
 		</part>
 	</software>

@@ -14,7 +14,6 @@ with a lot of tweaks)
 Published by Sega/Sega Toys (HPC-6*** serial codes)
 
 * 超光戦士 シャンゼリオン  - Chou Hikari Senshi Shanzerion (Sega - 1996xxxx - HPC-6038)
-* パケット2 ゆかいな仲間とゲームで数遊び  - Paketto 2 Yukai na Nakama to Game de Kazu Asobi (Sega - ???? - HPC-6048)
 * さわってみよう! よいこのはじめてキーボード - Sawattemiyou! Yoiko no Hajimete Keyboard (Sega - 199712xx - HPC-6053)
 * プーさんとたのしいなかまたち - Pooh-san to Tanoshii na Kamatachi (Sega - ???? - HPC-6054)
 * はじめまシリーズ5 けろけろけろっぴのハリキリうんどうかい - Hajimema Series 5 - Kerokero Keroppi no Harikiri Undoukai (Sega - 1998xxxx - HPC-6059) [reprint HPC-6006]
@@ -45,7 +44,6 @@ Published by Sega/Sega Toys (HPC-6*** serial codes)
 * ディズニープリンセス 白雪姫 ～しらゆきひめ～ <Best> - Disney Princesses - Shirayukihime Best Selection (Sega Toys - 20040426 - HPC-6139)
 * 七田 眞 監修 右脳イメージトレーニング さんすう・えいごでモジャーズに挑戦 THE ARITHMETIC & ABC FIGHT VS MOJARS <Best Selection> - Shichida Makoto Kanshuu Unou Image Training Sansuu - Eigo de Mojaazu ni Chousen THE ARITHMETIC & ABC FIGHT VS MOJARS Best Selection (Sega Toys - 2004xxxx - HPC-????)
 * 七田 眞 監修 右脳イメージトレーニング ひらがな・カタカナ カジノでモジャベガスドリーム <Best Selection> - Shichida Makoto Kanshuu Unou Image Training Hiragana - Katakana Kajino de Moja Vegas Dream Best Selection (Sega Toys - 2004xxxx - HPC-????)
-* ディズニープリンセス すてきにレッスン! ひらがな･カタカナ - Disney Princess Suteki ni Ressun! Hiragana-Katakana (Sega Toys - 20041018 - HPC-6145)
 
 to be verified
 * アンパンマンのもしもしピコ セット それいけ!アンパンマン アンパンマンとでんわであそぼう!<同梱> - Anpanman no Moshimoshi Pico Set with Soreike! Anpanman - Anpanman to Denwa de Asobou! (Sega - 199712xx - HPC-6050) [is the serial correct, or is it 6051 like reported for the single cart?]
@@ -59,8 +57,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * ウルトラマンピコ ウルトラファイティングベース - Ultraman Pico Ultraman Fighting Best (Bandai - 200009xx - T-133???)
 * アンパンマンピコ わくわくパン工場 - Anpanman Pico Wakuwaku Pan Koujou (Bandai - 200106xx - T-133350)
 * おジャ魔女どれみ ドッカ～ン! - Ojamajo Doremi Dokka~n! (Bandai - 200205xx - T-133410)
-* それいけ!アンパンマンの メダリンピックワールド2 <Best Selection> - Soreike! Anpanman no Medarin Pikku World 2 Best Selection (Bandai - 20040713 - T-133460) [reprint T-133300]
-* 特捜戦隊デカレンジャー - Tokusou Sentai Dekaranger (Bandai - 200406xx - T-133470)
 * いっしょにはしろうきかんしゃトーマス <Best Selection> - Issho ni Hashirou Kikansha Thomas Best Selection (Bandai - 20040713 - T-133490) [reprint T-133140]
 * 学研のおべんきょうソフト たしざん ひきざん - Gakken no Obenkyou Soft - Tashizan Hikizan (Gakken - 1995xxxx - T-169030)
 * はじめまシリーズ4 学研のおべんきょうソフト たしざん ひきざん - Hajimema Series 4 - Gakken no Obenkyou Soft - Tashizan Hikizan (Gakken - 1998xxxx - T-169070)
@@ -790,6 +786,22 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		</part>
 	</software>
 
+	<software name="princehk">
+		<description>Disney Princess Suteki ni Lesson! Hiragana-Katakana (Jpn)</description>
+		<year>2004</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6145" />
+		<info name="release" value="20041018"/>
+		<info name="alt_title" value="ディズニープリンセス すてきにレッスン! ひらがな･カタカナ"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="EPOXY BLOCK IC1" />
+			<dataarea name="rom" size="2097152">
+				<rom name="epoxy block ic1.ic1" size="2097152" crc="761e7d3c" sha1="f7e35cb1084130b95ca5add40e263d15dc54b6a5" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ariel">
 		<description>Disney Princess Ariel (Jpn)</description>
 		<year>2004</year>
@@ -1190,13 +1202,15 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		</part>
 	</software>
 
-	<software name="eccojrg" cloneof="eccojr">
-		<description>Ecco Jr. und die große Schatzsuche im Ozean! (Ger)</description>
+	<software name="eccojrb" cloneof="eccojr">
+		<description>Ecco Jr. - No fundo do mar! (Bra)</description>
 		<year>19??</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18318-U" />
 			<dataarea name="rom" size="524288">
-				<rom name="ecco jr. und die grosse schatzsuche im ozean! (germany).bin" size="524288" crc="470af94e" sha1="f57b18e13d44eb1a1dc85701757e5cdafcf43faa" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-18318-u.ic1" size="524288" crc="557670cf" sha1="fc8936611b4fb868838fd1ad60fba4944e4f8822" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1211,6 +1225,17 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 			<feature name="ic1" value="MPR-17736-MX" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-17736-mx.ic1" size="524288" crc="1b7b3825" sha1="64706b5f1240941a4989db96dab432aed6009e0a" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eccojrg" cloneof="eccojr">
+		<description>Ecco Jr. und die große Schatzsuche im Ozean! (Ger)</description>
+		<year>19??</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="ecco jr. und die grosse schatzsuche im ozean! (germany).bin" size="524288" crc="470af94e" sha1="f57b18e13d44eb1a1dc85701757e5cdafcf43faa" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2394,6 +2419,19 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+	<software name="magiccrab" cloneof="magiccra">
+		<description>Cores Mágicas (Bra)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18319-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-18319-t.ic1" size="524288" crc="81046d4d" sha1="ca2ffba211e088a9b1f0047e86013e65e2948b04" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="magiccraf" cloneof="magiccra">
 		<description>Crayons Magiques (Fra)</description>
 		<year>1994</year>
@@ -2612,6 +2650,19 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="ic1" value="MPR-17782-H" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-17782-h.ic1" size="524288" crc="28d87851" sha1="82482636109e42135ae7db677d92ff814a684633" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickblstb" cloneof="mickblst" supported="no">
+		<description>Mickey Viajando no Tempo (Bra)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18315-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-18315-t.ic1" size="524288" crc="a1d63b9a" sha1="b1912dd0ddd19c38cc5dfeb92e669535b2e1619f" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -3103,6 +3154,22 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="ic1" value="MPR-18889 J49" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-18889 j49.ic1" size="1048576" crc="ac96a86d" sha1="58a8f00c0156271c5de7fa890c88a3aeaef6397e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="paketto2">
+		<description>Paketto 2 - Yukai na Nakama to Game de Kazu Asobi (Jpn)</description>
+		<year>199?</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6048"/>
+		<info name="alt_title" value="パケット2 ゆかいな仲間とゲームで数遊び"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7505A" />
+			<feature name="ic1" value="MPR-20212 E61" />
+			<feature name="ic2" value="315-6120" />
+			<dataarea name="rom" size="2097152">
+				<rom name="mpr-20212 e61.ic1" size="2097152" crc="6dd450f5" sha1="56579b02774ec28521e1b25f16debe43bc43149f" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -4007,6 +4074,22 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 	</software>
 
 	<software name="anpanmm2">
+		<description>Soreike! Anpanman no Medalympic World 2 (Jpn, Best Selection)</description>
+		<year>2004</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133460"/>
+		<info name="release" value="20040713"/>
+		<info name="alt_title" value="それいけ!アンパンマンのメダリンピックワールド2 (Best Selection)"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="EPOXY BLOCK IC1" />
+			<dataarea name="rom" size="524288">
+				<rom name="epoxy block ic1.ic1" size="524288" crc="8dab2ec3" sha1="6ee0ce5db07c4f3feba319f77f714a399176e72e" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anpanmm2a" cloneof="anpanmm2">
 		<description>Soreike! Anpanman no Medalympic World 2 (Jpn)</description>
 		<year>199?</year>
 		<publisher>Bandai</publisher>
@@ -4206,6 +4289,22 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="ic1" value="1262413" />
 			<dataarea name="flop" size="1048576">
 				<rom name="1262413.ic1" size="1048576" crc="9cb9d32b" sha1="e6022562d2b1c7448835d47b749ed57144397c9a" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dekrangr">
+		<description>Tokusou Sentai Dekaranger (Jpn)</description>
+		<year>2004</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133470" />
+		<info name="release" value="200406xx"/>
+		<info name="alt_title" value="特捜戦隊デカレンジャー"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="EPOXY BLOCK IC1" />
+			<dataarea name="rom" size="2097152">
+				<rom name="epoxy block ic1.ic1" size="2097152" crc="9d5067a3" sha1="79a09c334b518357d380d09350bc31f0df0ae243" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -4462,7 +4561,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 	</software>
 
 	<software name="yukaimp">
-		<description>Yukai na Mori no Packet (Jpn)</description>
+		<description>Yukai na Mori no Paketto (Jpn)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="HPC-6034"/>
