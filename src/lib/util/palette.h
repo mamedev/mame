@@ -170,7 +170,6 @@ public:
 
 	// entry list getters
 	const rgb_t *entry_list_raw() const { return m_entry_color; }
-	const dynamic_array<rgb_t> *entry_list_adjusted_darray() const { return &m_adjusted_color; }
 	const rgb_t *entry_list_adjusted() const { return m_adjusted_color; }
 	const rgb_t *entry_list_adjusted_rgb15() const { return m_adjusted_rgb15; }
 

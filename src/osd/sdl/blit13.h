@@ -139,7 +139,7 @@ struct blit_texcopy : public blit_base
 	blit_texcopy() : blit_base(sizeof(_dest_type) / _len_div, false, false) { }
     void texop(const texture_info *texture, const render_texinfo *texsource) const
     {
-    	ATTR_UNUSED const rgb_t *palbase = texsource->palette();
+    	ATTR_UNUSED const rgb_t *palbase = texsource->palette;
     	int x, y;
     	/* loop over Y */
     	for (y = 0; y < texsource->height; y++) {
@@ -166,7 +166,7 @@ struct blit_texrot : public blit_base
 	blit_texrot() : blit_base(sizeof(_dest_type), true, false) { }
 	void texop(const texture_info *texture, const render_texinfo *texsource) const
 	{
-		ATTR_UNUSED const rgb_t *palbase = texsource->palette();
+		ATTR_UNUSED const rgb_t *palbase = texsource->palette;
 		int x, y;
 		const quad_setup_data *setup = &texture->m_setup;
 		int dudx = setup->dudx;
