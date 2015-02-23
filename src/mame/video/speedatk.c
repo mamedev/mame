@@ -5,7 +5,6 @@
 *****************************************************************************************/
 #include "emu.h"
 #include "includes/speedatk.h"
-#include "video/mc6845.h"
 
 
 PALETTE_INIT_MEMBER(speedatk_state, speedatk)
@@ -50,35 +49,28 @@ PALETTE_INIT_MEMBER(speedatk_state, speedatk)
 	}
 }
 
-WRITE8_MEMBER(speedatk_state::speedatk_videoram_w)
-{
-	m_videoram[offset] = data;
-}
-
-WRITE8_MEMBER(speedatk_state::speedatk_colorram_w)
-{
-	m_colorram[offset] = data;
-}
-
 void speedatk_state::video_start()
 {
+	save_item(NAME(m_crtc_vreg));
+	save_item(NAME(m_crtc_index));
+	save_item(NAME(m_flip_scr));
 }
 
-WRITE8_MEMBER(speedatk_state::speedatk_6845_w)
+WRITE8_MEMBER(speedatk_state::m6845_w)
 {
 	if(offset == 0)
 	{
 		m_crtc_index = data;
-		machine().device<mc6845_device>("crtc")->address_w(space,0,data);
+		m_crtc->address_w(space,0,data);
 	}
 	else
 	{
 		m_crtc_vreg[m_crtc_index] = data;
-		machine().device<mc6845_device>("crtc")->register_w(space,0,data);
+		m_crtc->register_w(space,0,data);
 	}
 }
 
-UINT32 speedatk_state::screen_update_speedatk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 speedatk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int count;
