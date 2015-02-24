@@ -37135,7 +37135,22 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 	</software>
 
 	<software name="wannyan">
-		<description>Wan Nyan Doubutsu Byouin (Jpn)</description>
+		<description>Wannyan Doubutsu Byouin (Jpn, Rev. 1)</description>
+		<year>2003</year>
+		<publisher>TDK Core</publisher>
+		<info name="serial" value="AGB-BWDJ-JPN"/>
+		<info name="release" value="20030725"/>
+		<info name="alt_title" value="わんニャンどうぶつ病院 動物のお医者さん育成ゲーム"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_eeprom_64k" />
+			<dataarea name="rom" size="4194304">
+				<rom name="2822 - wannyan doubutsu byouin (japan) (rev 1).bin" size="4194304" crc="b12d2724" sha1="d146e7d83965b8f05cd5c18c2b297a1b376aaf16" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wannyana" cloneof="wannyan">
+		<description>Wannyan Doubutsu Byouin (Jpn)</description>
 		<year>2003</year>
 		<publisher>TDK Core</publisher>
 		<info name="serial" value="AGB-BWDJ-JPN"/>

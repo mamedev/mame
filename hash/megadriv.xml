@@ -1188,6 +1188,8 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="buck rodgers buc05.u1" size="1048576" crc="44e3bfff" sha1="89c39f00745f2a8798fe985ad8ce28411b977f9e" offset="0x000000"/>
 			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
 		</part>
 	</software>
 
@@ -2855,6 +2857,8 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="lh5370hd.u1" size="2097152" crc="012591f9" sha1="ad1202a2e4166f8266d5633b8c5beb59c6cbd005" offset="0x000000"/>
 			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
 		</part>
 	</software>
 
@@ -2897,6 +2901,8 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="(batt)" value="(Lithium Cell)"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="fifa 97 b1.u1" size="2097152" crc="2bedb061" sha1="9337ad0318061e70e235a5bfba4504c738d7870c" offset="0x000000" loadflag="load16_word_swap"/>
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 <!-- LABEL(S)
@@ -5355,6 +5361,8 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="lh5370hc.bin" size="2097152" crc="779c1244" sha1="115c2e8cfa6bc45767ba47efc00aede424a6de66" offset="0x000000"/>
 			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
 		</part>
 	</software>
 
@@ -5496,6 +5504,8 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="mpr-16052-u.ic1" size="2097152" crc="0d486ed5" sha1="ad0150d0c0cabe1ab05e3d6ac4eb7aa4b38a467c" offset="0x000000"/>
 			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
 		</part>
 	</software>
 
@@ -5605,6 +5615,8 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="batt?" value="(Lithium Cell)"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="nhl 96 (euro, usa).bin" size="2097152" crc="8135702c" sha1="7204633fbb9966ac637e7966d02ba15c5acdee6b" offset="0x000000"/>
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -5966,6 +5978,8 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="pga i u1 pga09.u1" size="524288" crc="c1f0b4e1" sha1="1b173a1b674a6d5bdcd539c4fe8fe984586c3a8a" offset="0x000000"/>
 			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
 		</part>
 	</software>
 
@@ -5984,6 +5998,8 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="(batt)" value="(Lithium Cell)"/>
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="pga i u1 pga07.u1" size="524288" crc="0489ff8e" sha1="73935bfbdf63d3400284a16e464286b7630964aa" offset="0x000000"/>
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -10819,6 +10835,18 @@ but dumps still have to be confirmed.
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="ballz 3d - fighting at its ballziest (euro, usa).bin" size="2097152" crc="b362b705" sha1="4825cb9245a701cc59900c57a7a5fa70edc160f0" offset="0x000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baoxiao">
+		<description>Bao Xiao San Guo (Chi)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="爆笑三国"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="bao.bin" size="1048576" crc="496eb1d1" sha1="eb2363c83a0b76b7825320dcf332779b534a1d89" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18437,6 +18465,8 @@ but dumps still have to be confirmed.
 			<dataarea name="rom" width="16" endianness="big" size="786432">
 				<rom name="might and magic - gates to another world (euro, usa).bin" size="786432" crc="f509145f" sha1="52e7ade244d48bc282db003d87c408e96dcb3d85" offset="0x000000"/>
 			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
 		</part>
 	</software>
 
@@ -24636,6 +24666,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="starflight (euro, usa) (v1.1).bin" size="1048576" crc="1217dbea" sha1="41722d8c0b4865ca8044fb53a818b13eded758fc" offset="0x000000"/>
 			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
 		</part>
 	</software>
 
@@ -24646,6 +24678,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="starflight (euro, usa).bin" size="1048576" crc="d550c928" sha1="24252ca934be3f005436cdb85671413a9e6b0489" offset="0x000000"/>
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
