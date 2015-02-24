@@ -1545,7 +1545,7 @@ bool a2_edd_format::supports_save() const
 
 int a2_edd_format::identify(io_generic *io, UINT32 form_factor)
 {
-	return io_generic_size(io) == 2244608 ? 50 : 0;
+	return ((io_generic_size(io) == 2244608) || (io_generic_size(io) == 2310144)) ? 50 : 0;
 }
 
 UINT8 a2_edd_format::pick(const UINT8 *data, int pos)
