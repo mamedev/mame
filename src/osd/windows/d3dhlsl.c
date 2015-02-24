@@ -927,7 +927,7 @@ int shaders::create_resources(bool reset)
 		texture.rowpixels = shadow_bitmap.rowpixels();
 		texture.width = shadow_bitmap.width();
 		texture.height = shadow_bitmap.height();
-		texture.set_palette(NULL);
+		texture.palette = NULL;
 		texture.seqid = 0;
 
 		// FIXME: should shadow bitmap really use prescale?

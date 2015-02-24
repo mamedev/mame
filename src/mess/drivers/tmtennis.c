@@ -257,4 +257,4 @@ ROM_START( tmtennis )
 ROM_END
 
 
-CONS( 1980, tmtennis, 0, 0, tmtennis, tmtennis, driver_device, 0, "Tomy", "Tennis (Tomytronic)", GAME_SUPPORTS_SAVE )
+CONS( 1980, tmtennis, 0, 0, tmtennis, tmtennis, driver_device, 0, "Tomy", "Tennis (Tomy)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )

@@ -10,19 +10,19 @@
 ***************************************************************************/
 
 
-READ8_MEMBER(retofinv_state::retofinv_68705_portA_r)
+READ8_MEMBER(retofinv_state::mcu_portA_r)
 {
 //logerror("%04x: 68705 port A read %02x\n",space.device().safe_pc(),m_portA_in);
 	return (m_portA_out & m_ddrA) | (m_portA_in & ~m_ddrA);
 }
 
-WRITE8_MEMBER(retofinv_state::retofinv_68705_portA_w)
+WRITE8_MEMBER(retofinv_state::mcu_portA_w)
 {
 //logerror("%04x: 68705 port A write %02x\n",space.device().safe_pc(),data);
 	m_portA_out = data;
 }
 
-WRITE8_MEMBER(retofinv_state::retofinv_68705_ddrA_w)
+WRITE8_MEMBER(retofinv_state::mcu_ddrA_w)
 {
 	m_ddrA = data;
 }
@@ -39,12 +39,12 @@ WRITE8_MEMBER(retofinv_state::retofinv_68705_ddrA_w)
  */
 
 
-READ8_MEMBER(retofinv_state::retofinv_68705_portB_r)
+READ8_MEMBER(retofinv_state::mcu_portB_r)
 {
 	return (m_portB_out & m_ddrB) | (m_portB_in & ~m_ddrB);
 }
 
-WRITE8_MEMBER(retofinv_state::retofinv_68705_portB_w)
+WRITE8_MEMBER(retofinv_state::mcu_portB_w)
 {
 //logerror("%04x: 68705 port B write %02x\n",space.device().safe_pc(),data);
 
@@ -65,7 +65,7 @@ WRITE8_MEMBER(retofinv_state::retofinv_68705_portB_w)
 	m_portB_out = data;
 }
 
-WRITE8_MEMBER(retofinv_state::retofinv_68705_ddrB_w)
+WRITE8_MEMBER(retofinv_state::mcu_ddrB_w)
 {
 	m_ddrB = data;
 }
@@ -81,7 +81,7 @@ WRITE8_MEMBER(retofinv_state::retofinv_68705_ddrB_w)
  */
 
 
-READ8_MEMBER(retofinv_state::retofinv_68705_portC_r)
+READ8_MEMBER(retofinv_state::mcu_portC_r)
 {
 	m_portC_in = 0;
 	if (m_main_sent) m_portC_in |= 0x01;
@@ -90,19 +90,19 @@ READ8_MEMBER(retofinv_state::retofinv_68705_portC_r)
 	return (m_portC_out & m_ddrC) | (m_portC_in & ~m_ddrC);
 }
 
-WRITE8_MEMBER(retofinv_state::retofinv_68705_portC_w)
+WRITE8_MEMBER(retofinv_state::mcu_portC_w)
 {
 logerror("%04x: 68705 port C write %02x\n",space.device().safe_pc(),data);
 	m_portC_out = data;
 }
 
-WRITE8_MEMBER(retofinv_state::retofinv_68705_ddrC_w)
+WRITE8_MEMBER(retofinv_state::mcu_ddrC_w)
 {
 	m_ddrC = data;
 }
 
 
-WRITE8_MEMBER(retofinv_state::retofinv_mcu_w)
+WRITE8_MEMBER(retofinv_state::mcu_w)
 {
 logerror("%04x: mcu_w %02x\n",space.device().safe_pc(),data);
 	m_from_main = data;
@@ -110,14 +110,14 @@ logerror("%04x: mcu_w %02x\n",space.device().safe_pc(),data);
 	m_68705->set_input_line(0, ASSERT_LINE);
 }
 
-READ8_MEMBER(retofinv_state::retofinv_mcu_r)
+READ8_MEMBER(retofinv_state::mcu_r)
 {
 logerror("%04x: mcu_r %02x\n",space.device().safe_pc(),m_from_mcu);
 	m_mcu_sent = 0;
 	return m_from_mcu;
 }
 
-READ8_MEMBER(retofinv_state::retofinv_mcu_status_r)
+READ8_MEMBER(retofinv_state::mcu_status_r)
 {
 	int res = 0;
 

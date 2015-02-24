@@ -2918,7 +2918,7 @@ void amstrad_state::enumerate_roms()
 
 void amstrad_state::amstrad_common_init()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
+//	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	m_aleste_mode = 0;
 
@@ -2928,7 +2928,7 @@ void amstrad_state::amstrad_common_init()
 	m_GateArray_RamConfiguration = 0;
 	m_gate_array.hsync_counter = 2;
 
-	space.install_read_bank(0x0000, 0x1fff, "bank1");
+/*	space.install_read_bank(0x0000, 0x1fff, "bank1");
 	space.install_read_bank(0x2000, 0x3fff, "bank2");
 
 	space.install_read_bank(0x4000, 0x5fff, "bank3");
@@ -2951,7 +2951,7 @@ void amstrad_state::amstrad_common_init()
 
 	space.install_write_bank(0xc000, 0xdfff, "bank15");
 	space.install_write_bank(0xe000, 0xffff, "bank16");
-
+*/
 	enumerate_roms();
 
 	m_maincpu->reset();

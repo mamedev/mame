@@ -238,4 +238,4 @@ ROM_START( alnchase )
 ROM_END
 
 
-CONS( 1984, alnchase, 0, 0, alnchase, alnchase, driver_device, 0, "Tomy", "Alien Chase", GAME_NOT_WORKING )
+CONS( 1984, alnchase, 0, 0, alnchase, alnchase, driver_device, 0, "Tomy", "Alien Chase", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )

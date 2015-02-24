@@ -874,7 +874,7 @@ texture_info::texture_info(SDL_Renderer *renderer, const render_texinfo &texsour
 			m_format = SDL_TEXFORMAT_ARGB32;
 			break;
 		case TEXFORMAT_RGB32:
-			m_format = texsource.palette() ? SDL_TEXFORMAT_RGB32_PALETTED : SDL_TEXFORMAT_RGB32;
+			m_format = texsource.palette ? SDL_TEXFORMAT_RGB32_PALETTED : SDL_TEXFORMAT_RGB32;
 			break;
 		case TEXFORMAT_PALETTE16:
 			m_format = SDL_TEXFORMAT_PALETTE16;
@@ -883,7 +883,7 @@ texture_info::texture_info(SDL_Renderer *renderer, const render_texinfo &texsour
 			m_format = SDL_TEXFORMAT_PALETTE16A;
 			break;
 		case TEXFORMAT_YUY16:
-			m_format = texsource.palette() ? SDL_TEXFORMAT_YUY16_PALETTED : SDL_TEXFORMAT_YUY16;
+			m_format = texsource.palette ? SDL_TEXFORMAT_YUY16_PALETTED : SDL_TEXFORMAT_YUY16;
 			break;
 
 		default:

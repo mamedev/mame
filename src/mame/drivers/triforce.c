@@ -58,12 +58,14 @@ Games on this system include....
 | | 2004 | The Key Of Avalon 1.??: ??? (client) (Rev B)                    | Sega / Hitmaker                     | GDROM | GDT-0010B      |              |               |
 |*| 2004 | The Key Of Avalon 1.30: Chaotic Sabbat (client) (Rev C)         | Sega / Hitmaker                     | GDROM | GDT-0010C      |              |               |
 |*| 2004 | Firmware Update                                                 | Sega                                | GDROM | GDT-0011       | 317-0371-JPN |               |
+| | 2004 | Virtua Striker 2002 (Export)                                    | Sega                                | GDROM | GDT-0012       |              |               |
 | | 2004 | Virtua Striker 4 (Japan)                                        | Sega                                | GDROM | GDT-0013       | 317-0391-JPN |               |
 | | 2004 | Virtua Striker 4 (Japan) (Rev A)                                | Sega                                | GDROM | GDT-0013A      | 317-0391-JPN |               |
 | | 2004 | Virtua Striker 4 (Japan) (Rev B)                                | Sega                                | GDROM | GDT-0013B      | 317-0391-JPN |               |
 | | 2004 | Virtua Striker 4 (Japan) (Rev C)                                | Sega                                | GDROM | GDT-0013C      | 317-0391-JPN |               |
 | | 2004 | Virtua Striker 4 (Japan) (Rev D)                                | Sega                                | GDROM | GDT-0013D      | 317-0391-JPN |               |
 |*| 2004 | Virtua Striker 4 (Japan) (Rev E)                                | Sega                                | GDROM | GDT-0013E      | 317-0391-JPN |               |
+| | 2004 | Virtua Striker 4 (Export)                                       | Sega                                | GDROM | GDT-0014       |              |               |
 |*| 2004 | Virtua Striker 4 (Export)                                       | Sega                                | GDROM | GDT-0015       | 317-0393-EXP |               |
 | | 2004 | The Key Of Avalon 2: Eutaxy Commandment (server)                | Sega / Hitmaker                     | GDROM | GDT-0016       |              |               |
 | | 2004 | The Key Of Avalon 2: Eutaxy Commandment (client)                | Sega / Hitmaker                     | GDROM | GDT-0017       |              |               |
@@ -73,7 +75,8 @@ Games on this system include....
 | | 2005 | Donkey Kong Jungle Fever                                        | Namco / Nintendo                    | Cart  |                |              |               |
 |*| 2005 | Mario Kart Arcade GP (MKA1 Ver.A1)                              | Namco / Nintendo                    | Cart  | 837-14343-4T1  | 317-5109-COM | 253-5509-5109 |
 |*| 2005 | Mario Kart Arcade GP (MKA2 Ver.B)                               | Namco / Nintendo                    | Cart  | 837-14343-R4S0 | 317-5109-COM | 253-5509-5109 |
-| | 2005 | The Key Of Avalon 2.5: War of the Key                           | Sega / Hitmaker                     | GDROM |                |              |               |
+| | 2005 | The Key Of Avalon 2.5: War of the Key (server)                  | Sega / Hitmaker                     | GDROM | GDT-0019B      |              |               |
+| | 2005 | The Key Of Avalon 2.5: War of the Key (client)                  | Sega / Hitmaker                     | GDROM |                |              |               |
 | | 2006 | Virtua Striker 4 Ver.2006 (Japan)                               | Sega                                | GDROM | GDT-0020       |              |               |
 | | 2006 | Virtua Striker 4 Ver.2006 (Japan) (Rev A)                       | Sega                                | GDROM | GDT-0020A      |              |               |
 | | 2006 | Virtua Striker 4 Ver.2006 (Japan) (Rev B)                       | Sega                                | GDROM | GDT-0020B      |              |               |

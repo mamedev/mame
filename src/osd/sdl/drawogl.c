@@ -1816,7 +1816,7 @@ void sdl_info_ogl::texture_compute_type_subroutine(const render_texinfo *texsour
 	if    ( texture_copy_properties[texture->format][SDL_TEXFORMAT_SRC_EQUALS_DEST] &&
 			!texture_copy_properties[texture->format][SDL_TEXFORMAT_SRC_HAS_PALETTE] &&
 			texture->xprescale == 1 && texture->yprescale == 1 &&
-			!texture->borderpix && !texsource->palette() &&
+			!texture->borderpix && !texsource->palette &&
 			texsource->rowpixels <= m_texture_max_width )
 	{
 		texture->nocopy = TRUE;
@@ -2263,7 +2263,7 @@ texture_info *sdl_info_ogl::texture_create(const render_texinfo *texsource, UINT
 			texture->format = SDL_TEXFORMAT_ARGB32;
 			break;
 		case TEXFORMAT_RGB32:
-			if (texsource->palette() != NULL)
+			if (texsource->palette != NULL)
 				texture->format = SDL_TEXFORMAT_RGB32_PALETTED;
 			else
 				texture->format = SDL_TEXFORMAT_RGB32;
@@ -2275,7 +2275,7 @@ texture_info *sdl_info_ogl::texture_create(const render_texinfo *texsource, UINT
 			texture->format = SDL_TEXFORMAT_PALETTE16A;
 			break;
 		case TEXFORMAT_YUY16:
-			if (texsource->palette() != NULL)
+			if (texsource->palette != NULL)
 				texture->format = SDL_TEXFORMAT_YUY16_PALETTED;
 			else
 				texture->format = SDL_TEXFORMAT_YUY16;
@@ -2717,23 +2717,23 @@ static void texture_set_data(texture_info *texture, const render_texinfo *texsou
 				switch (PRIMFLAG_GET_TEXFORMAT(flags))
 				{
 					case TEXFORMAT_PALETTE16:
-						copyline_palette16((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette(), texture->borderpix, texture->xprescale);
+						copyline_palette16((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
 						break;
 
 					case TEXFORMAT_PALETTEA16:
-						copyline_palettea16((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette(), texture->borderpix, texture->xprescale);
+						copyline_palettea16((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
 						break;
 
 					case TEXFORMAT_RGB32:
-						copyline_rgb32((UINT32 *)dst, (UINT32 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette(), texture->borderpix, texture->xprescale);
+						copyline_rgb32((UINT32 *)dst, (UINT32 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
 						break;
 
 					case TEXFORMAT_ARGB32:
-						copyline_argb32((UINT32 *)dst, (UINT32 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette(), texture->borderpix, texture->xprescale);
+						copyline_argb32((UINT32 *)dst, (UINT32 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
 						break;
 
 					case TEXFORMAT_YUY16:
-						copyline_yuy16_to_argb((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette(), texture->borderpix, texture->xprescale);
+						copyline_yuy16_to_argb((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
 						break;
 
 					default:
@@ -2806,7 +2806,7 @@ static int compare_texture_primitive(const texture_info *texture, const render_p
 		texture->texinfo.width == prim->texture.width &&
 		texture->texinfo.height == prim->texture.height &&
 		texture->texinfo.rowpixels == prim->texture.rowpixels &&
-		/* texture->texinfo.palette() == prim->texture.palette() && */
+		/* texture->texinfo.palette == prim->texture.palette && */
 		((texture->flags ^ prim->flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0)
 		return 1;
 	else

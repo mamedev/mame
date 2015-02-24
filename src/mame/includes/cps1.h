@@ -17,6 +17,14 @@
 // measured clocks:
 // CPS2(Guru): V = 59.6376Hz, H = 15,4445kHz *H is probably measured too low!
 // CPS1 GNG: V = 59.61Hz
+/* CPS1(Charles MacDonald):
+    Pixel clock: 8.00 MHz
+    Total pixel clocks per scanline: 512 clocks
+    Horizontal sync pulse width : 36 clocks
+    Horizontal display and blanking period: 476 clocks
+    Frame size: 262 scanlines
+    Refresh rate: 59.63 MHz.
+*/
 #define CPS_PIXEL_CLOCK  (XTAL_16MHz/2)
 
 #define CPS_HTOTAL       (512)
