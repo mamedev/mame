@@ -2,14 +2,275 @@
 // copyright-holders:hap, Lord Nightmare
 /***************************************************************************
 
-  Texas Instruments Speak & Spell hardware
+  Texas Instruments 1st-gen. handheld speech devices,
+  
+  These devices, mostly edu-toys, are based around an MCU(TMS0270/TMS1100),
+  TMS51xx speech, and VSM ROM(s). Newer devices, such as Speak & Music,
+  are based around the TMP50C40 and belong in another driver, probably.
 
-  (still need to write notes here..)
 
-  Other stuff on similar hardware:
-  - Touch & Tell, but it runs on a TMS1100!
-  - Speak & Spell Compact, Speak & Write (UK version), TMS1100? TMS0980?
-  - Speak & Read
+----------------------------------------------------------------------------
+
+Known devices on this hardware: (* denotes not dumped, ** denotes pending dump)
+
+
+ROM (and/or source) code obtained from patents:
+Some of these may have pre-release bugs.
+
+    Speak & Spell: US4189779
+    Speak & Math: US4946391
+    Touch & Tell: US4403965** (patent calls it "Speak & Seek")
+    Language Translator: US4631748
+
+
+Speak & Spell:
+
+This is the original Speak & Spell. TI had done educational toys before, like
+Wiz-A-Tron or Little Professor. But the popularity of this product was much
+above expectations. TI continued to manufacture many products for this line.
+
+    Speak & Spell (US), 1978
+    - MCU: TMC0271*
+    - TMS51xx(1/2): 16KB TMC0351NL
+    - TMS51xx(2/2): 16KB TMC0352NL
+    - notes: keyboard has buttons instead of cheap membrane
+
+    Speak & Spell (US), 1979
+    - MCU: TMC0271* (different from 1978 version)
+    - TMS51xx(1/2): 16KB TMC0351N2L
+    - TMS51xx(2/2): 16KB TMC0352N2L
+    - notes: fixed a funny bug with gibberish-talk when Module button is pressed
+      with no module inserted
+
+    Speak & Spell (US), 1980
+    - MCU: TMC0271* (same as 1979 version)
+    - TMS51xx: 16KB CD2350 (rev.A)
+    - notes: only 1 VSM, meaning much smaller internal vocabulary
+
+    Speak & Spell (Japan), 1980
+    - MCU: TMC0271* (assume same as US 1978 version)
+    - TMS51xx(1/2): 16KB CD2321
+    - TMS51xx(2/2): 16KB CD2322
+    - notes: no local name for the product, words are in English but very low difficulty
+
+    Speak & Spell (UK), 1978
+    - MCU: TMC0271* (assume same as US 1978 version)
+    - TMS51xx(1/2): 16KB CD2303
+    - TMS51xx(2/2): 16KB CD2304
+    - notes: voice data was manually altered to give it a UK accent,
+      here's a small anecdote from developer:
+          "(...) I cannot bear to listen the product even now. I remember the
+           word 'butcher' took 3 days - I still don't know if it sounds right."
+
+    Speak & Spell (UK), 1981
+    - MCU: TMC0271* (assume same as US 1979 version)
+    - TMS51xx: 16KB CD62175
+    - notes: this one has a dedicated voice actor
+
+    Speak & Spell (France) "La Dictee Magique", 1980
+    - MCU: CD2702*
+    - TMS51xx: 16KB CD2352
+
+    Speak & Spell (Germany) "Buddy", 1980
+    - MCU: CD2702* (same as French 1980 version)
+    - TMS51xx(1/2): 16KB CD2345*
+    - TMS51xx(2/2): 16KB CD2346*
+
+    Speak & Spell (Italy) "Grillo Parlante", 1982
+    - MCU: CD2702* (same as French 1980 version)
+    - TMS51xx: 16KB? CD62190*
+
+    Speak & Spell Compact (US), 1981
+    - MCU: CD8011*
+    - TMS51xx: 16KB CD2354
+    - TMS51xx: 16KB CD2354A (rev.A)
+    - notes: no display, MCU is TMS1100 instead of TMS0270
+
+    Speak & Spell Compact (UK) "Speak & Write", 1981
+    - MCU: CD8011* (same as US 1981 version)
+    - TMS51xx: 16KB CD62174 (rev.A)
+    - notes: anecdotes from the developer, the same person working on the original UK version:
+          "We included a pencil and writing pad - it was now about 'writing'.",
+      and one about the welcome message:
+          "I had to manually create a sentence of digital speech from thin air.
+           I had to write down a 20 character code which would create each 10/s
+           sound bite that made up the phrase "Welcome to Speak and Write".
+           It took me 1 week. (...) Even Larry Brantingham was amazed."
+
+Speak & Spell modules:
+Note that they are interchangeable, eg. you can use a French module on a US Speak & Spell.
+
+    English:
+    - Vowel Power: TMS51xx: 16KB CD2302
+    - Number Stumpers 4-6: TMS51xx: 16KB CD2305
+    - Number Stumpers 7-8: TMS51xx: 16KB CD2307 (rev.A)
+    - Basic Builders: TMS51xx: 16KB CD2308
+    - Mighty Verbs: TMS51xx: 16KB CD2309 (rev.B)
+    - Homonym Heroes: TMS51xx: 16KB CD2310
+    - Vowel Ventures: TMS51xx: 16KB CD2347 (rev.C)
+    - Noun Endings: TMS51xx: 16KB CD2348
+    - Magnificent Modifiers: TMS51xx: 16KB CD2349
+    - E.T. Fantasy: TMS51xx: 16KB CD2360
+
+    French:
+    - No.1: Les Mots de Base: TMS51xx: 16KB CD2353 (1st release was called "Module No. 1 de Jacques Capelovici")
+    - No.2: Les Mots Difficilies: TMS51xx: 16KB? CD62177*
+    - No.3: Les Animaux Familiers: TMS51xx: 16KB? CD62047
+    - No.4: Les Magasins De La Rue: TMS51xx: 16KB CD62048
+    - No.5: Les Extra-Terrestres: TMS51xx: 16KB? CD62178*
+
+    Italian:
+    - Super Modulo: TMS51xx: 16KB? CD62313*
+
+
+Speak & Math:
+
+    Speak & Math (US), 1980 (renamed to "Speak & Maths" in UK, but is the same product)
+    - MCU: CD2704*
+    - TMS51xx(1/2): 16KB CD2392
+    - TMS51xx(2/2): 16KB CD2393
+    - notes: As with the Speak & Spell, the voice actor was a radio announcer.
+      However, the phrase "is greater than or less than" had to be added in a
+      hurry by one of the TI employees in a hurry, the day before a demo.
+      Apparently QA never found out and it ended up in the final product.
+
+    Speak & Math (US), 1986
+    - MCU: CD2708
+    - TMS51xx(1/2): 16KB CD2381
+    - TMS51xx(2/2): 4KB CD2614
+
+    Speak & Math 'Compact' (France) "Les Maths Magiques", 1986?
+    - MCU: CP3447-NL* (TMS1100?)
+    - CD2801: 16KB? CD62173*
+    - notes: this is not the same as "Le Calcul Magique", that's from a
+      series centered around a TMS50C40 instead of MCU+TMS51xx
+
+
+Speak & Read:
+
+    Speak & Read (US), 1980
+    - MCU: CD2705*
+    - TMS51xx(1/2): 16KB CD2394 (rev.A)
+    - TMS51xx(2/2): 16KB CD2395 (rev.A)
+
+Speak & Read modules:
+
+    English:
+    - Sea Sights: TMS51xx: 16KB CD2396 (rev.A)
+    - Who's Who at the Zoo: TMS51xx: 16KB CD2397
+    - A Dog on a Log: TMS51xx: 16KB CD3534 (rev.A)
+    - The Seal That Could Fly: TMS51xx: 16KB CD3535*
+    - A Ghost in the House: TMS51xx: 16KB CD3536*
+    - On the Track: TMS51xx: 16KB CD3538
+    - The Third Circle: TMS51xx: 16KB CD3539*
+    - The Millionth Knight: TMS51xx: 16KB CD3540*
+
+
+Touch & Tell:
+
+    Touch & Tell (US), 1981
+    - MCU: CD8012*
+    - TMS51xx: 4KB CD2610
+    - notes: MCU is TMS1100 instead of TMS0270
+
+    Touch & Tell (UK), 1981
+    - MCU: ?* (assume same as US version)
+    - TMS51xx: ?KB CD62170*
+
+    Touch & Tell (France) "Le Livre Magique", 1981
+    - MCU: ?* (assume same as US version)
+    - TMS51xx: ?KB CD62171*
+
+    Touch & Tell (Germany) "Tipp & Sprich", 1981
+    - MCU: ?* (assume same as US version)
+    - TMS51xx: ?KB CD62172*
+
+    Touch & Tell (Italy) "Libro Parlante", 1982
+    - MCU: ?* (assume same as US version)
+    - TMS51xx: ?KB CD62176*
+
+
+Touch & Tell modules:
+
+    English:
+    - Animal Friends: CD2802: 16KB CD2355
+    - World of Transportation: CD2802: 16KB CD2361
+    - Little Creatures: CD2802: 16KB CD2362
+    - E.T.: CD2802: 16KB CD2363**
+    - Alphabet Fun: TMS51xx: 4KB CD2611
+    - Number Fun: TMS51xx: 4KB CD2612
+    - All About Me: TMS51xx: 4KB CD2613
+
+
+Language Tutor/Translator:
+
+A later device, called Language Teacher, was released without speech hardware.
+
+    Language Tutor (US), 1978
+    - MCU: TMC0275*
+    - notes: external module is required (see below)
+
+Language Tutor modules:
+
+    - Ingles(1/4): TMS51xx: 16KB CD2311*
+    - Ingles(2/4): TMS51xx: 16KB CD2312*
+    - Ingles(3/4): TMS51xx: 16KB CD2313*
+    - Ingles(4/4): TMS51xx: 16KB CD2314*
+
+    - Spanish(1/4): TMS51xx: 16KB CD2315*
+    - Spanish(2/4): TMS51xx: 16KB CD2316*
+    - Spanish(3/4): TMS51xx: 16KB CD2317
+    - Spanish(4/4): TMS51xx: 16KB CD2318
+
+    - French(1/4): TMS51xx: 16KB CD2327
+    - French(2/4): TMS51xx: 16KB CD2328
+    - French(3/4): TMS51xx: 16KB CD2329
+    - French(4/4): TMS51xx: 16KB CD2330
+
+    - German(1/4): TMS51xx: 16KB CD2331
+    - German(2/4): TMS51xx: 16KB CD2332
+    - German(3/4): TMS51xx: 16KB CD2333
+    - German(4/4): TMS51xx: 16KB CD2334
+
+    - English(1/4): TMC0280: 16KB CD3526**
+    - English(2/4): TMC0280: 16KB CD3527**
+    - English(3/4): TMC0280: 16KB CD3528**
+    - English(4/4): TMC0280: 16KB CD3529**
+
+
+Other devices:
+
+    Vocaid (US), 1982
+    - MCU: CD8012*
+    - CD2802: 16KB CD2357
+    - notes: MCU is the same as in Touch & Tell, but instead of a toddler's toy,
+      you get a serious medical aid device for the voice-impaired.
+    
+    Spelling B (US), 1978
+    - MCU: TMC0272*
+    - ?: TMC1984* (what is this?)
+    - notes: this line of toys (Spelling B, Mr. Challenger, Math Marvel) is calculator-sized,
+      might have been aimed for older kids. Note that Math Marvel is a TMC1986, no speech.
+    
+    Spelling B (US), newer
+    - MCU: TMC0274*
+    - TMS51xx: ?KB TMC0355 CD2602*
+    
+    Spelling B (Germany) "Spelling ABC", 198?
+    - MCU: TMC0274* (assume same as US version)
+    - TMS51xx: ?KB TMC0355 CD2607*
+    
+    Mr. Challenger (US), 1980
+    - MCU: TMC0273*
+    - TMS51xx: ?KB TMC0355 CD2601*
+
+
+----------------------------------------------------------------------------
+
+  TODO:
+  - why doesn't lantutor work?
+  - emulate other known devices
+
 
 ***************************************************************************/
 
@@ -692,9 +953,9 @@ ROM_END
 COMP( 1978, snspell,    0,       0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US prototype)", GAME_IMPERFECT_SOUND ) // also US set 1
 COMP( 1980, snspella,   snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 COMP( 1978, snspelluk,  snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK set 1)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-COMP( 1981, snspelluka, snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // different voice actor
-COMP( 1979, snspelljp,  snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (Japan)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // English words, but very low difficulty
-COMP( 1980, ladictee,   snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "La Dictee Magique (France)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // doesn't work due to missing CD2702 MCU dump, German version has CD2702 too
+COMP( 1981, snspelluka, snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+COMP( 1979, snspelljp,  snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (Japan)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+COMP( 1980, ladictee,   snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "La Dictee Magique (France)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // doesn't work due to missing CD2702 MCU dump, German/Italian version has CD2702 too
 
 COMP( 1980, snmath,     0,       0, snmath,   snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US prototype)", GAME_IMPERFECT_SOUND ) // also US set 1
 COMP( 1986, snmatha,    snmath,  0, snmath,   snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US set 2)", GAME_IMPERFECT_SOUND )
