@@ -507,13 +507,13 @@ osd_directory_entry *osd_stat(const char *path)
 {
 	int err;
 	osd_directory_entry *result = NULL;
-	#if defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_DARWIN)
+	#if defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_DARWIN) || defined(SDLMAME_OS2)
 	struct stat st;
 	#else
 	struct stat64 st;
 	#endif
 
-	#if defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_DARWIN)
+	#if defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_DARWIN) || defined(SDLMAME_OS2)
 	err = stat(path, &st);
 	#else
 	err = stat64(path, &st);

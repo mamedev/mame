@@ -49,7 +49,10 @@ int osd_setenv(const char *name, const char *value, int overwrite)
 
 void osd_process_kill(void)
 {
-	fprintf(stderr,"osd_process_kill missing in OS/2 build\n");
+	PPIB ppib;
+
+	DosGetInfoBlocks(NULL, &ppib);
+	DosKillProcess(DKP_PROCESSTREE, ppib->pib_ulpid);
 }
 
 //============================================================

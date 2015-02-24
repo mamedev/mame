@@ -752,6 +752,7 @@ SDLLIBS := $(shell sdl-config --libs)
 
 INCPATH += $(SDLCFLAGS)
 LIBS += $(SDLLIBS) -lpthread
+BASELIBS += += $(SDLLIBS) -lpthread
 
 endif # OS2
 
