@@ -81,7 +81,7 @@ public:
     {}
 
 	/* virtual */ int create();
-	/* virtual */ int draw(const UINT32 dc, const int update);
+	/* virtual */ int draw(const int update);
 	/* virtual */ int xy_to_render_target(const int x, const int y, int *xt, int *yt);
 	/* virtual */ void destroy();
 	/* virtual */ render_primitive_list *get_primitives()
@@ -185,7 +185,7 @@ int sdl_info_bgfx::xy_to_render_target(int x, int y, int *xt, int *yt)
 //  sdl_info_bgfx::draw
 //============================================================
 
-int sdl_info_bgfx::draw(UINT32 dc, int update)
+int sdl_info_bgfx::draw(int update)
 {
 
 	//if (has_flags(FI_CHANGED) || (window().width() != m_last_width) || (window().height() != m_last_height))
