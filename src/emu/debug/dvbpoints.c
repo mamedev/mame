@@ -213,7 +213,8 @@ void debug_view_breakpoints::gather_breakpoints()
 	}
 
 	// And now for the sort
-	qsort(&m_buffer[0], m_buffer.count(), sizeof(device_debug::breakpoint *), m_sortType);
+	if (m_buffer.count() > 0)
+		qsort(&m_buffer[0], m_buffer.count(), sizeof(device_debug::breakpoint *), m_sortType);
 }
 
 
