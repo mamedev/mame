@@ -48,8 +48,7 @@ NO_USE_XINPUT = 1
 # this will also add a rpath to the executable
 # MESA_INSTALL_ROOT = /usr/local/dfb_GL
 
-# uncomment the next line to build a binary using
-# GL-dispatching.
+# uncomment the next line to build a binary using GL-dispatching.
 # This option takes precedence over MESA_INSTALL_ROOT
 
 USE_DISPATCH_GL = 1

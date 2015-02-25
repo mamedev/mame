@@ -54,30 +54,30 @@ PFNGLUNIFORM3IVARBPROC pfn_glUniform3ivARB=NULL;
 PFNGLUNIFORM4IVARBPROC pfn_glUniform4ivARB=NULL;
 
 
-int gl_shader_loadExtention(PFNGLGETPROCADDRESSOS GetProcAddress)
+int gl_shader_loadExtention(osd_gl_context *gl_ctx)
 {
-	pfn_glGetObjectParameterivARB = (PFNGLGETOBJECTPARAMETERIVARBPROC) GetProcAddress("glGetObjectParameterivARB");
-	pfn_glGetInfoLogARB           = (PFNGLGETINFOLOGARBPROC) GetProcAddress ("glGetInfoLogARB");
-	pfn_glDeleteObjectARB         = (PFNGLDELETEOBJECTARBPROC) GetProcAddress ("glDeleteObjectARB");
-	pfn_glCreateShaderObjectARB   = (PFNGLCREATESHADEROBJECTARBPROC) GetProcAddress ("glCreateShaderObjectARB");
-	pfn_glShaderSourceARB         = (PFNGLSHADERSOURCEARBPROC) GetProcAddress ("glShaderSourceARB");
-	pfn_glCompileShaderARB        = (PFNGLCOMPILESHADERARBPROC) GetProcAddress ("glCompileShaderARB");
-	pfn_glCreateProgramObjectARB  = (PFNGLCREATEPROGRAMOBJECTARBPROC) GetProcAddress ("glCreateProgramObjectARB");
-	pfn_glAttachObjectARB         = (PFNGLATTACHOBJECTARBPROC) GetProcAddress ("glAttachObjectARB");
-	pfn_glLinkProgramARB          = (PFNGLLINKPROGRAMARBPROC) GetProcAddress ("glLinkProgramARB");
-	pfn_glValidateProgramARB      = (PFNGLVALIDATEPROGRAMARBPROC) GetProcAddress ("glValidateProgramARB");
-	pfn_glUseProgramObjectARB     = (PFNGLUSEPROGRAMOBJECTARBPROC) GetProcAddress ("glUseProgramObjectARB");
-	pfn_glGetUniformLocationARB   = (PFNGLGETUNIFORMLOCATIONARBPROC) GetProcAddress ("glGetUniformLocationARB");
-	pfn_glUniform1fARB            = (PFNGLUNIFORM1FARBPROC) GetProcAddress ("glUniform1fARB");
-	pfn_glUniform1iARB            = (PFNGLUNIFORM1IARBPROC) GetProcAddress ("glUniform1iARB");
-	pfn_glUniform1fvARB           = (PFNGLUNIFORM1FVARBPROC) GetProcAddress ("glUniform1fvARB");
-	pfn_glUniform2fvARB           = (PFNGLUNIFORM2FVARBPROC) GetProcAddress ("glUniform2fvARB");
-	pfn_glUniform3fvARB           = (PFNGLUNIFORM3FVARBPROC) GetProcAddress ("glUniform3fvARB");
-	pfn_glUniform4fvARB           = (PFNGLUNIFORM4FVARBPROC) GetProcAddress ("glUniform4fvARB");
-	pfn_glUniform1ivARB           = (PFNGLUNIFORM1IVARBPROC) GetProcAddress ("glUniform1ivARB");
-	pfn_glUniform2ivARB           = (PFNGLUNIFORM2IVARBPROC) GetProcAddress ("glUniform2ivARB");
-	pfn_glUniform3ivARB           = (PFNGLUNIFORM3IVARBPROC) GetProcAddress ("glUniform3ivARB");
-	pfn_glUniform4ivARB           = (PFNGLUNIFORM4IVARBPROC) GetProcAddress ("glUniform4ivARB");
+	pfn_glGetObjectParameterivARB = (PFNGLGETOBJECTPARAMETERIVARBPROC) gl_ctx->getProcAddress("glGetObjectParameterivARB");
+	pfn_glGetInfoLogARB           = (PFNGLGETINFOLOGARBPROC) gl_ctx->getProcAddress ("glGetInfoLogARB");
+	pfn_glDeleteObjectARB         = (PFNGLDELETEOBJECTARBPROC) gl_ctx->getProcAddress ("glDeleteObjectARB");
+	pfn_glCreateShaderObjectARB   = (PFNGLCREATESHADEROBJECTARBPROC) gl_ctx->getProcAddress ("glCreateShaderObjectARB");
+	pfn_glShaderSourceARB         = (PFNGLSHADERSOURCEARBPROC) gl_ctx->getProcAddress ("glShaderSourceARB");
+	pfn_glCompileShaderARB        = (PFNGLCOMPILESHADERARBPROC) gl_ctx->getProcAddress ("glCompileShaderARB");
+	pfn_glCreateProgramObjectARB  = (PFNGLCREATEPROGRAMOBJECTARBPROC) gl_ctx->getProcAddress ("glCreateProgramObjectARB");
+	pfn_glAttachObjectARB         = (PFNGLATTACHOBJECTARBPROC) gl_ctx->getProcAddress ("glAttachObjectARB");
+	pfn_glLinkProgramARB          = (PFNGLLINKPROGRAMARBPROC) gl_ctx->getProcAddress ("glLinkProgramARB");
+	pfn_glValidateProgramARB      = (PFNGLVALIDATEPROGRAMARBPROC) gl_ctx->getProcAddress ("glValidateProgramARB");
+	pfn_glUseProgramObjectARB     = (PFNGLUSEPROGRAMOBJECTARBPROC) gl_ctx->getProcAddress ("glUseProgramObjectARB");
+	pfn_glGetUniformLocationARB   = (PFNGLGETUNIFORMLOCATIONARBPROC) gl_ctx->getProcAddress ("glGetUniformLocationARB");
+	pfn_glUniform1fARB            = (PFNGLUNIFORM1FARBPROC) gl_ctx->getProcAddress ("glUniform1fARB");
+	pfn_glUniform1iARB            = (PFNGLUNIFORM1IARBPROC) gl_ctx->getProcAddress ("glUniform1iARB");
+	pfn_glUniform1fvARB           = (PFNGLUNIFORM1FVARBPROC) gl_ctx->getProcAddress ("glUniform1fvARB");
+	pfn_glUniform2fvARB           = (PFNGLUNIFORM2FVARBPROC) gl_ctx->getProcAddress ("glUniform2fvARB");
+	pfn_glUniform3fvARB           = (PFNGLUNIFORM3FVARBPROC) gl_ctx->getProcAddress ("glUniform3fvARB");
+	pfn_glUniform4fvARB           = (PFNGLUNIFORM4FVARBPROC) gl_ctx->getProcAddress ("glUniform4fvARB");
+	pfn_glUniform1ivARB           = (PFNGLUNIFORM1IVARBPROC) gl_ctx->getProcAddress ("glUniform1ivARB");
+	pfn_glUniform2ivARB           = (PFNGLUNIFORM2IVARBPROC) gl_ctx->getProcAddress ("glUniform2ivARB");
+	pfn_glUniform3ivARB           = (PFNGLUNIFORM3IVARBPROC) gl_ctx->getProcAddress ("glUniform3ivARB");
+	pfn_glUniform4ivARB           = (PFNGLUNIFORM4IVARBPROC) gl_ctx->getProcAddress ("glUniform4ivARB");
 
 	if ( pfn_glGetObjectParameterivARB && pfn_glGetInfoLogARB && pfn_glDeleteObjectARB && pfn_glCreateShaderObjectARB &&
 			pfn_glShaderSourceARB && pfn_glCompileShaderARB && pfn_glCreateProgramObjectARB && pfn_glAttachObjectARB &&

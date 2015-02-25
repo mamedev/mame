@@ -24,7 +24,7 @@ struct glsl_shader_info
 /**
  * returns pointer if ok, otherwise NULL
  */
-glsl_shader_info *glsl_shader_init(void);
+glsl_shader_info *glsl_shader_init(osd_gl_context *gl_ctx);
 
 /**
  * returns 0 if ok, otherwise an error value

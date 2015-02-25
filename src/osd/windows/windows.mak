@@ -67,7 +67,10 @@
 # USE_SDL = 1
 
 # uncomment next line to compile OpenGL video renderer
-# USE_OPENGL = 1
+USE_OPENGL = 1
+
+# uncomment the next line to build a binary using GL-dispatching.
+USE_DISPATCH_GL = 1
 
 # uncomment next line to use QT debugger
 # USE_QTDEBUG = 1
@@ -403,7 +406,12 @@ OSDOBJS +=  $(WINOBJ)/../sdl/drawogl.o $(WINOBJ)/../sdl/gl_shader_tool.o $(WINOB
 OBJDIRS += $(WINOBJ)/../sdl
 
 DEFS += -DUSE_OPENGL=1
+
+ifdef USE_DISPATCH_GL
+DEFS += -DUSE_DISPATCH_GL=1
+else
 LIBS += -lopengl32
+endif
 
 else
 DEFS += -DUSE_OPENGL=0

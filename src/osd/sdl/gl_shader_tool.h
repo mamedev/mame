@@ -51,12 +51,7 @@ extern "C" {
 #define GL_GLEXT_PROTOTYPES 1
 #endif
 
-#ifdef OSD_WINDOWS
-#include "GL/gl.h"
-#include "GL/glext.h"
-#else
 #include "osd_opengl.h"
-#endif
 
 #if defined(SDLMAME_MACOSX)
 
@@ -76,7 +71,7 @@ typedef void * (APIENTRYP PFNGLGETPROCADDRESSOS)(const char *procName);
  * @return 0 - ok .. all shader ARB functions loaded
  *         otherwise !=0
  */
-int gl_shader_loadExtention(PFNGLGETPROCADDRESSOS GetProcAddress);
+int gl_shader_loadExtention(osd_gl_context *gl_ctx);
 
 enum GLSLCheckMode {
 		CHECK_QUIET,         /* just return 0, if no error, otherwise the GL error code, no stderr output */
