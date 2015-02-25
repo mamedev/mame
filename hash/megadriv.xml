@@ -1179,6 +1179,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="PWB 4/8M REV B"/>
 			<feature name="u1" value="Buck Rodgers BUC05"/>
 			<feature name="u2" value="UM6264AK-10L"/>
@@ -2893,6 +2894,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1996</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="PWA P10002 REV M"/>
 			<feature name="u1" value="FIFA97B1"/>
 			<feature name="u2" value="GM76C88ALK-15"/>
@@ -5495,6 +5497,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="171-6278A"/>
 			<feature name="ic1" value="MPR-16052-U"/>
 			<feature name="ic2" value="D4364CX"/>
@@ -5607,6 +5610,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="PWA P10002 REV M"/>
 			<feature name="u1?" value="NHL96 NHL9602"/>
 			<feature name="u2?" value="LH5168D"/>
@@ -5969,6 +5973,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<!-- Dump To Be Confirmed -->
+			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="PWB 4/8M REV B"/>
 			<feature name="u1" value="PGA I U1 PGA09"/>   <!-- location not really marked on PCB, using u1 for consistency -->
 			<feature name="u2" value="LH5160D-10L"/>
@@ -5990,6 +5995,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="PWB SC40x1B REV A1"/>
 			<feature name="u1" value="PGA I U1 PGA07"/>
 			<feature name="u2" value="CXK5864BP-12LL"/>
@@ -18462,6 +18468,7 @@ but dumps still have to be confirmed.
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="786432">
 				<rom name="might and magic - gates to another world (euro, usa).bin" size="786432" crc="f509145f" sha1="52e7ade244d48bc282db003d87c408e96dcb3d85" offset="0x000000"/>
 			</dataarea>
@@ -24663,6 +24670,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="starflight (euro, usa) (v1.1).bin" size="1048576" crc="1217dbea" sha1="41722d8c0b4865ca8044fb53a818b13eded758fc" offset="0x000000"/>
 			</dataarea>
@@ -24676,6 +24684,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="starflight (euro, usa).bin" size="1048576" crc="d550c928" sha1="24252ca934be3f005436cdb85671413a9e6b0489" offset="0x000000"/>
 			</dataarea>
