@@ -30,6 +30,12 @@ TODO:
 #include "sound/dac.h"
 #include "includes/tagteam.h"
 
+
+void tagteam_state::machine_start()
+{
+	save_item(NAME(m_sound_nmi_mask));
+}
+
 WRITE8_MEMBER(tagteam_state::sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
@@ -43,15 +49,15 @@ WRITE8_MEMBER(tagteam_state::irq_clear_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tagteam_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("P2") AM_WRITE(tagteam_flipscreen_w)
-	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("P1") AM_WRITE(tagteam_control_w)
+	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("P2") AM_WRITE(flipscreen_w)
+	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("P1") AM_WRITE(control_w)
 	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("DSW1") AM_WRITE(sound_command_w)
 	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("DSW2") AM_WRITE(irq_clear_w)
-	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(tagteam_mirrorvideoram_r, tagteam_mirrorvideoram_w)
-	AM_RANGE(0x4400, 0x47ff) AM_READWRITE(tagteam_mirrorcolorram_r, tagteam_mirrorcolorram_w)
+	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(mirrorvideoram_r, mirrorvideoram_w)
+	AM_RANGE(0x4400, 0x47ff) AM_READWRITE(mirrorcolorram_r, mirrorcolorram_w)
 	AM_RANGE(0x4800, 0x4fff) AM_READONLY
-	AM_RANGE(0x4800, 0x4bff) AM_WRITE(tagteam_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4c00, 0x4fff) AM_WRITE(tagteam_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x4800, 0x4bff) AM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x4c00, 0x4fff) AM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -218,7 +224,7 @@ static MACHINE_CONFIG_START( tagteam, tagteam_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3072))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tagteam_state, screen_update_tagteam)
+	MCFG_SCREEN_UPDATE_DRIVER(tagteam_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tagteam)
@@ -304,5 +310,5 @@ ROM_END
 
 
 
-GAME( 1983, bigprowr, 0,        tagteam, bigprowr, driver_device, 0, ROT270, "Technos Japan", "The Big Pro Wrestling!", 0 )
-GAME( 1983, tagteam,  bigprowr, tagteam, tagteam, driver_device,  0, ROT270, "Technos Japan (Data East license)", "Tag Team Wrestling", 0 )
+GAME( 1983, bigprowr, 0,        tagteam, bigprowr, driver_device, 0, ROT270, "Technos Japan", "The Big Pro Wrestling!", GAME_SUPPORTS_SAVE )
+GAME( 1983, tagteam,  bigprowr, tagteam, tagteam, driver_device,  0, ROT270, "Technos Japan (Data East license)", "Tag Team Wrestling", GAME_SUPPORTS_SAVE )
