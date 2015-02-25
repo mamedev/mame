@@ -15,12 +15,13 @@
 #include "machine/nvram.h"
 #include "machine/pic8259.h"
 #include "machine/mc2661.h"
-#include "machine/omti5100.h"
 #include "machine/wd_fdc.h"
 #include "machine/mc146818.h"
+#include "machine/pcd_kbd.h"
 #include "sound/speaker.h"
 #include "video/scn2674.h"
 #include "formats/pc_dsk.h"
+#include "bus/scsi/omti5100.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -35,12 +36,14 @@ public:
 	m_pic1(*this, "pic1"),
 	m_pic2(*this, "pic2"),
 	m_speaker(*this, "speaker"),
-	m_sasi(*this, "sasi"),
 	m_fdc(*this, "fdc"),
 	m_rtc(*this, "rtc"),
 	m_crtc(*this, "crtc"),
 	m_palette(*this, "palette"),
 	m_gfxdecode(*this, "gfxdecode"),
+	m_scsi(*this, "scsi"),
+	m_scsi_data_out(*this, "scsi_data_out"),
+	m_scsi_data_in(*this, "scsi_data_in"),
 	m_vram(*this, "vram"),
 	m_charram(8*1024)
 	{ }
@@ -59,35 +62,47 @@ public:
 	DECLARE_WRITE8_MEMBER( led_w );
 	DECLARE_READ8_MEMBER( detect_r );
 	DECLARE_WRITE8_MEMBER( detect_w );
-	DECLARE_READ8_MEMBER( dskctl_r );
-	DECLARE_WRITE8_MEMBER( dskctl_w );
+	DECLARE_READ16_MEMBER( dskctl_r );
+	DECLARE_WRITE16_MEMBER( dskctl_w );
 	DECLARE_READ8_MEMBER( mcu_r );
 	DECLARE_WRITE8_MEMBER( mcu_w );
+	DECLARE_READ8_MEMBER( scsi_r );
+	DECLARE_WRITE8_MEMBER( scsi_w );
 	DECLARE_WRITE8_MEMBER( vram_sw_w );
-	DECLARE_READ16_MEMBER( vram_r );
 	DECLARE_WRITE16_MEMBER( vram_w );
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	DECLARE_WRITE_LINE_MEMBER(write_scsi_bsy);
+	DECLARE_WRITE_LINE_MEMBER(write_scsi_cd);
+	DECLARE_WRITE_LINE_MEMBER(write_scsi_io);
+	DECLARE_WRITE_LINE_MEMBER(write_scsi_msg);
+	DECLARE_WRITE_LINE_MEMBER(write_scsi_req);
 
 protected:
 	// driver_device overrides
 	virtual void machine_start();
 	virtual void machine_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<omti5100_device> m_sasi;
 	required_device<wd2793_t> m_fdc;
 	required_device<mc146818_device> m_rtc;
 	required_device<scn2674_device> m_crtc;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<SCSI_PORT_DEVICE> m_scsi;
+	required_device<output_latch_device> m_scsi_data_out;
+	required_device<input_buffer_device> m_scsi_data_in;
 	required_shared_ptr<UINT16> m_vram;
 	dynamic_buffer m_charram;
-	UINT8 m_stat, m_led, m_dskctl, m_vram_sw;
+	UINT8 m_stat, m_led, m_vram_sw;
+	int m_msg, m_bsy, m_io, m_cd, m_req, m_rst;
+	emu_timer *m_req_hack;
+	UINT16 m_dskctl;
 };
 
 
@@ -107,9 +122,18 @@ static const gfx_layout pcd_charlayout =
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8 },
 	8*16
 };
+
+void pcd_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	// TODO: remove this hack
+	if(m_req)
+		m_maincpu->drq0_w(1);
+}
+
 void pcd_state::machine_start()
 {
 	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(machine().device<palette_device>("palette"), pcd_charlayout, m_charram, 0, 1, 0)));
+	m_req_hack = timer_alloc();
 }
 
 void pcd_state::machine_reset()
@@ -118,6 +142,7 @@ void pcd_state::machine_reset()
 	m_led = 0;
 	m_dskctl = 0;
 	m_vram_sw = 1;
+	m_rst = 0;
 }
 
 READ8_MEMBER( pcd_state::irq_callback )
@@ -134,11 +159,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( pcd_state::timer0_tick )
 WRITE_LINE_MEMBER( pcd_state::i186_timer1_w )
 {
 	m_speaker->level_w(state);
-}
-
-READ16_MEMBER( pcd_state::vram_r )
-{
-	return m_vram[offset];
 }
 
 WRITE16_MEMBER( pcd_state::vram_w )
@@ -216,30 +236,31 @@ WRITE8_MEMBER( pcd_state::mcu_w )
 {
 }
 
-READ8_MEMBER( pcd_state::dskctl_r )
+READ16_MEMBER( pcd_state::dskctl_r )
 {
 	return m_dskctl;
 }
 
-WRITE8_MEMBER( pcd_state::dskctl_w )
+WRITE16_MEMBER( pcd_state::dskctl_w )
 {
 	floppy_image_device *floppy0 = m_fdc->subdevice<floppy_connector>("0")->get_device();
 	floppy_image_device *floppy1 = m_fdc->subdevice<floppy_connector>("1")->get_device();
 
-	if((data & 1) && floppy0)
+	COMBINE_DATA(&m_dskctl);
+
+	if((m_dskctl & 1) && floppy0)
 		m_fdc->set_floppy(floppy0);
 
 	if(floppy0)
 	{
-		floppy0->mon_w(!(data & 4));
-		floppy0->ss_w((data & 8) != 0);
+		floppy0->mon_w(!(m_dskctl & 4));
+		floppy0->ss_w((m_dskctl & 8) != 0);
 	}
 	if(floppy1)
 	{
-		floppy1->mon_w(!(data & 4));
-		floppy1->ss_w((data & 8) != 0);
+		floppy1->mon_w(!(m_dskctl & 4));
+		floppy1->ss_w((m_dskctl & 8) != 0);
 	}
-	m_dskctl = data;
 }
 
 READ8_MEMBER( pcd_state::led_r )
@@ -266,23 +287,118 @@ SCN2674_DRAW_CHARACTER_MEMBER(pcd_state::display_pixels)
 		UINT16 data = m_vram[address];
 		data = (data >> 8) | (data << 8);
 		for(int i = 0; i < 16; i++)
-			bitmap.pix32(y, x + i) = m_palette->pen((data & (1 << (16 - i))) ? 1 : 0);
+			bitmap.pix32(y, x + i) = m_palette->pen((data & (1 << (15 - i))) ? 1 : 0);
 	}
 	else
 	{
 		UINT8 data = m_charram[(m_vram[address] & 0xff) * 16 + linecount];
 		for(int i = 0; i < 8; i++)
-			bitmap.pix32(y, x + i) = m_palette->pen((data & (1 << (8 - i))) ? 1 : 0);
+			bitmap.pix32(y, x + i) = m_palette->pen((data & (1 << (7 - i))) ? 1 : 0);
 	}
 }
 
+READ8_MEMBER(pcd_state::scsi_r)
+{
+	UINT8 ret = 0;
+
+	switch(offset)
+	{
+		case 0:
+		case 2:
+			ret = m_scsi_data_in->read();
+			m_scsi->write_ack(1);
+			if(!offset)
+				m_maincpu->drq0_w(0);
+			break;
+
+		case 1:
+			ret = (m_cd << 7) | (m_req << 5) | (m_bsy << 4);
+			break;
+	}
+
+	return ret;
+}
+
+WRITE8_MEMBER(pcd_state::scsi_w)
+{
+	switch(offset)
+	{
+		case 0:
+			m_scsi_data_out->write(data);
+			m_scsi->write_ack(1);
+			if(m_cd)
+			{
+				m_maincpu->drq0_w(0);
+				m_req_hack->adjust(attotime::never);
+			}
+			break;
+		case 1:
+			if(data & 4)
+			{
+				m_rst = 1;
+				m_scsi->write_rst(1);
+				break;
+			}
+			if(m_rst)
+			{
+				m_rst = 0;
+				m_scsi->write_rst(0);
+				break;
+			}
+
+			if(!m_bsy)
+			{
+				m_scsi_data_out->write(0);
+				m_scsi->write_sel(1);
+			}
+			break;
+	}
+}
+
+WRITE_LINE_MEMBER(pcd_state::write_scsi_bsy)
+{
+	m_bsy = state ? 1 : 0;
+	m_scsi->write_sel(0);
+}
+WRITE_LINE_MEMBER(pcd_state::write_scsi_cd)
+{
+	m_cd = state ? 1 : 0;
+}
+WRITE_LINE_MEMBER(pcd_state::write_scsi_io)
+{
+	m_io = state ? 1 : 0;
+}
+WRITE_LINE_MEMBER(pcd_state::write_scsi_msg)
+{
+	m_msg = state ? 1 : 0;
+}
+
+WRITE_LINE_MEMBER(pcd_state::write_scsi_req)
+{
+	m_req = state ? 1 : 0;
+	if(state)
+	{
+		if(!m_cd)
+		{
+			m_maincpu->drq0_w(1);
+			m_req_hack->adjust(attotime::from_msec(10)); // poke the dmac
+		}
+		else if(m_msg)
+		{
+			m_scsi_data_in->read();
+			m_scsi->write_ack(1);
+		}
+	}
+	else
+		m_scsi->write_ack(0);
+}
 //**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
 
 static ADDRESS_MAP_START( pcd_map, AS_PROGRAM, 16, pcd_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM // fixed 256k for now
-	AM_RANGE(0xf0000, 0xf7fff) AM_READWRITE(vram_r, vram_w) AM_SHARE("vram")
+	AM_RANGE(0xf0000, 0xf7fff) AM_READONLY AM_WRITE(vram_w) AM_SHARE("vram")
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 	AM_RANGE(0x00000, 0xfffff) AM_READWRITE8(nmi_io_r, nmi_io_w, 0xffff)
 ADDRESS_MAP_END
@@ -297,8 +413,8 @@ static ADDRESS_MAP_START( pcd_io, AS_IO, 16, pcd_state )
 	AM_RANGE(0xf840, 0xf841) AM_READWRITE8(led_r, led_w, 0xff00)
 	AM_RANGE(0xf880, 0xf8bf) AM_READWRITE8(rtc_r, rtc_w, 0xffff)
 	AM_RANGE(0xf900, 0xf903) AM_DEVREADWRITE8("fdc", wd2793_t, read, write, 0xffff)
-	AM_RANGE(0xf904, 0xf905) AM_READWRITE8(dskctl_r, dskctl_w, 0x00ff)
-	//AM_RANGE(0xf940, 0xf943) scsi
+	AM_RANGE(0xf904, 0xf905) AM_READWRITE(dskctl_r, dskctl_w)
+	AM_RANGE(0xf940, 0xf943) AM_READWRITE8(scsi_r, scsi_w, 0xffff)
 	AM_RANGE(0xf980, 0xf98f) AM_DEVWRITE8("crtc", scn2674_device, write, 0x00ff)
 	AM_RANGE(0xf980, 0xf98f) AM_DEVREAD8("crtc", scn2674_device, read, 0xff00)
 	AM_RANGE(0xf9a0, 0xf9a1) AM_WRITE8(vram_sw_w, 0x00ff)
@@ -347,9 +463,6 @@ static MACHINE_CONFIG_START( pcd, pcd_state )
 	// nvram
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	// sasi controller
-	MCFG_OMTI5100_ADD("sasi")
-
 	// floppy disk controller
 	MCFG_WD2793x_ADD("fdc", XTAL_16MHz/8/2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("pic1", pic8259_device, ir6_w))
@@ -361,11 +474,15 @@ static MACHINE_CONFIG_START( pcd, pcd_state )
 
 	// usart
 	MCFG_DEVICE_ADD("usart1", MC2661, XTAL_4_9152MHz)
-	MCFG_MC2661_TXEMT_DSCHG_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir2_w))
+	MCFG_MC2661_RXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir3_w))
+	MCFG_MC2661_TXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir3_w))
 	MCFG_DEVICE_ADD("usart2", MC2661, XTAL_4_9152MHz)
-	MCFG_MC2661_TXEMT_DSCHG_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir3_w))
+	MCFG_MC2661_RXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir2_w))
+	//MCFG_MC2661_TXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir2_w)) // this gets stuck high causing the keyboard to not work
+	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("keyboard", pcd_keyboard_device, t0_w))
 	MCFG_DEVICE_ADD("usart3", MC2661, XTAL_4_9152MHz)
-	MCFG_MC2661_TXEMT_DSCHG_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir4_w))
+	MCFG_MC2661_RXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir4_w))
+	MCFG_MC2661_TXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir4_w))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -390,6 +507,21 @@ static MACHINE_CONFIG_START( pcd, pcd_state )
 	// rtc
 	MCFG_MC146818_ADD("rtc", XTAL_32_768kHz)
 	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir7_w))
+
+	MCFG_DEVICE_ADD("keyboard", PCD_KEYBOARD, 0)
+	MCFG_PCD_KEYBOARD_OUT_TX_HANDLER(DEVWRITELINE("usart2", mc2661_device, rx_w))
+
+	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
+	MCFG_SCSI_DATA_INPUT_BUFFER("scsi_data_in")
+	MCFG_SCSI_MSG_HANDLER(WRITELINE(pcd_state, write_scsi_msg))
+	MCFG_SCSI_BSY_HANDLER(WRITELINE(pcd_state, write_scsi_bsy))
+	MCFG_SCSI_IO_HANDLER(WRITELINE(pcd_state, write_scsi_io))
+	MCFG_SCSI_CD_HANDLER(WRITELINE(pcd_state, write_scsi_cd))
+	MCFG_SCSI_REQ_HANDLER(WRITELINE(pcd_state, write_scsi_req))
+
+	MCFG_SCSI_OUTPUT_LATCH_ADD("scsi_data_out", "scsi")
+	MCFG_DEVICE_ADD("scsi_data_in", INPUT_BUFFER, 0)
+	MCFG_SCSIDEV_ADD("scsi:1", "harddisk", OMTI5100, SCSI_ID_0)
 MACHINE_CONFIG_END
 
 
@@ -411,10 +543,6 @@ ROM_START( pcd )
 	// gfx card (scn2674 with 8741), to be moved
 	ROM_REGION(0x400, "graphics", 0)
 	ROM_LOAD("s36361-d321-v1.bin", 0x000, 0x400, CRC(69baeb2a) SHA1(98b9cd0f38c51b4988a3aed0efcf004bedd115ff))
-
-	// keyboard (8035), to be moved
-	ROM_REGION(0x1000, "keyboard", 0)
-	ROM_LOAD("pcd_keyboard.bin", 0x0000, 0x1000, CRC(d227d6cb) SHA1(3d6140764d3d043428c941826370ebf1597c63bd))
 ROM_END
 
 

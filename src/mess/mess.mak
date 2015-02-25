@@ -1661,6 +1661,7 @@ $(MESSOBJ)/sinclair.a:          \
 
 $(MESSOBJ)/siemens.a:           \
 	$(MESS_DRIVERS)/pcd.o       \
+	$(MESS_MACHINE)/pcd_kbd.o       \
 
 $(MESSOBJ)/slicer.a:           \
 	$(MESS_DRIVERS)/slicer.o   \
