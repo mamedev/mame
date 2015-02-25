@@ -171,7 +171,8 @@ Touch & Tell:
     Touch & Tell (US), 1981
     - MCU: CD8012*
     - TMS51xx: 4KB CD2610
-    - notes: MCU is TMS1100 instead of TMS0270
+    - notes: MCU is TMS1100 instead of TMS0270. CD8010 is seen in some devices
+      too, maybe an earlier version?
 
     Touch & Tell (UK), 1981
     - MCU: ?* (assume same as US version)

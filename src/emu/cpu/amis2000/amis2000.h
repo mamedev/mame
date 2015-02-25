@@ -34,6 +34,11 @@
 #define MCFG_AMI_S2152_FOUT_CB(_devcb) \
 	amis2000_base_device::set_write_f_callback(*device, DEVCB_##_devcb);
 
+// S2000 has a hardcoded 7seg table, that (unlike S2200) is officially
+// uncustomizable, but wildfire proves to be an exception to that rule.
+#define MCFG_AMI_S2000_7SEG_DECODER(_pla) \
+	amis2000_base_device::set_7seg_table(*device, _ptr);
+
 
 class amis2000_base_device : public cpu_device
 {
@@ -46,6 +51,7 @@ public:
 		, m_bu_bits(bu_bits)
 		, m_callstack_bits(callstack_bits)
 		, m_callstack_depth(callstack_depth)
+		, m_7seg_table(NULL)
 		, m_read_k(*this)
 		, m_read_i(*this)
 		, m_read_d(*this)
@@ -61,6 +67,7 @@ public:
 	template<class _Object> static devcb_base &set_write_d_callback(device_t &device, _Object object) { return downcast<amis2000_base_device &>(device).m_write_d.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_a_callback(device_t &device, _Object object) { return downcast<amis2000_base_device &>(device).m_write_a.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_f_callback(device_t &device, _Object object) { return downcast<amis2000_base_device &>(device).m_write_f.set_callback(object); }
+	static void set_7seg_table(device_t &device, const UINT8 *ptr) { downcast<amis2000_base_device &>(device).m_7seg_table = ptr; }
 
 protected:
 	// device-level overrides
@@ -115,6 +122,7 @@ protected:
 	UINT16 m_a;                 // 13-bit a-pins latch (master strobe latch)
 
 	// i/o handlers
+	const UINT8 *m_7seg_table;
 	devcb_read8 m_read_k;
 	devcb_read8 m_read_i;
 	devcb_read8 m_read_d;

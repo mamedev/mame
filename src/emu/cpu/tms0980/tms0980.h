@@ -64,7 +64,7 @@ public:
 		, m_pc_bits(pc_bits)
 		, m_byte_bits(byte_bits)
 		, m_x_bits(x_bits)
-		, c_output_pla(NULL)
+		, m_output_pla_table(NULL)
 		, m_read_k(*this)
 		, m_write_o(*this)
 		, m_write_r(*this)
@@ -76,7 +76,7 @@ public:
 	template<class _Object> static devcb_base &set_write_o_callback(device_t &device, _Object object) { return downcast<tms1xxx_cpu_device &>(device).m_write_o.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_r_callback(device_t &device, _Object object) { return downcast<tms1xxx_cpu_device &>(device).m_write_r.set_callback(object); }
 	template<class _Object> static devcb_base &set_power_off_callback(device_t &device, _Object object) { return downcast<tms1xxx_cpu_device &>(device).m_power_off.set_callback(object); }
-	static void set_output_pla(device_t &device, const UINT16 *output_pla) { downcast<tms1xxx_cpu_device &>(device).c_output_pla = output_pla; }
+	static void set_output_pla(device_t &device, const UINT16 *output_pla) { downcast<tms1xxx_cpu_device &>(device).m_output_pla_table = output_pla; }
 
 protected:
 	// device-level overrides
@@ -185,7 +185,7 @@ protected:
 	address_space *m_program;
 	address_space *m_data;
 
-	const UINT16 *c_output_pla;
+	const UINT16 *m_output_pla_table;
 	devcb_read8 m_read_k;
 	devcb_write16 m_write_o;
 	devcb_write16 m_write_r;
