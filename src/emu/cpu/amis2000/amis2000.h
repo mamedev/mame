@@ -36,7 +36,7 @@
 
 // S2000 has a hardcoded 7seg table, that (unlike S2200) is officially
 // uncustomizable, but wildfire proves to be an exception to that rule.
-#define MCFG_AMI_S2000_7SEG_DECODER(_pla) \
+#define MCFG_AMI_S2000_7SEG_DECODER(_ptr) \
 	amis2000_base_device::set_7seg_table(*device, _ptr);
 
 

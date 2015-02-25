@@ -16,7 +16,7 @@
   - sound emulation could still be improved
   - when the game strobes a led faster, it should appear brighter, for example when
     the ball hits one of the bumpers
-  - some 7segs digits are wrong (mcu on-die decoder is customizable?)
+  - 7seg decoder is guessed
   - MCU clock is unknown
 
 ***************************************************************************/
@@ -278,11 +278,35 @@ void wildfire_state::machine_start()
 	save_item(NAME(m_q3));
 }
 
+// LED segments A-G
+enum
+{
+	lA = 0x40,
+	lB = 0x20,
+	lC = 0x10,
+	lD = 0x08,
+	lE = 0x04,
+	lF = 0x02,
+	lG = 0x01
+};
+
+static const UINT8 wildfire_7seg_table[0x10] =
+{
+	0x7e, 0x30, 0x6d, 0x79, 0x33, 0x5b, 0x5f, 0x70, 0x7f, 0x7b, // 0-9 unaltered
+	0x77,           // A -> unused?
+	lA+lB+lE+lF+lG, // b -> P
+	0x4e,           // C -> unused?
+	lD+lE+lF,       // d -> L
+	0x4f,           // E -> unused?
+	lG              // F -> -
+};
+
 
 static MACHINE_CONFIG_START( wildfire, wildfire_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", AMI_S2152, MASTER_CLOCK)
+	MCFG_AMI_S2000_7SEG_DECODER(wildfire_7seg_table)
 	MCFG_AMI_S2000_READ_I_CB(IOPORT("IN1"))
 	MCFG_AMI_S2000_WRITE_D_CB(WRITE8(wildfire_state, write_d))
 	MCFG_AMI_S2000_WRITE_A_CB(WRITE16(wildfire_state, write_a))
