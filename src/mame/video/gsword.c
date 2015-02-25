@@ -148,7 +148,7 @@ void gsword_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gsword_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 64);
-	
+
 	save_item(NAME(m_charbank));
 	save_item(NAME(m_charpalbank));
 	save_item(NAME(m_flipscreen));

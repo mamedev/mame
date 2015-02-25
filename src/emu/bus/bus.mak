@@ -1371,6 +1371,7 @@ BUSOBJS += $(BUSOBJ)/cpc/mface2.o
 BUSOBJS += $(BUSOBJ)/cpc/symbfac2.o
 BUSOBJS += $(BUSOBJ)/cpc/amdrum.o
 BUSOBJS += $(BUSOBJ)/cpc/playcity.o
+BUSOBJS += $(BUSOBJ)/cpc/smartwatch.o
 endif
 
 #-------------------------------------------------

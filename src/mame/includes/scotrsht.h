@@ -36,7 +36,7 @@ public:
 	DECLARE_WRITE8_MEMBER(palettebank_w);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	
+
 	INTERRUPT_GEN_MEMBER(interrupt);
 
 	virtual void video_start();

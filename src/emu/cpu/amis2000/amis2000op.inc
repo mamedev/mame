@@ -216,7 +216,8 @@ void amis2000_base_device::op_disn()
 		// 0-F digits in bit order [DP]abcdefg
 		0x7e, 0x30, 0x6d, 0x79, 0x33, 0x5b, 0x5f, 0x70, 0x7f, 0x7b, 0x77, 0x1f, 0x4e, 0x3d, 0x4f, 0x47
 	};
-	m_d = lut_segment_decoder[m_acc] | (m_carry ? 0x80 : 0x00);
+	const UINT8 *ptr = (m_7seg_table != NULL) ? m_7seg_table : lut_segment_decoder;
+	m_d = ptr[m_acc] | (m_carry ? 0x80 : 0x00);
 	d_latch_out(true);
 }
 
@@ -306,7 +307,7 @@ void amis2000_base_device::op_jmp()
 	// JMP X: jump to X(+PP)
 	UINT16 mask = 0x3f;
 	UINT16 param = m_op & mask;
-	
+
 	// if previous opcode was PP, change PC high bits too
 	if ((m_prev_op & 0xf0) == 0x60)
 	{
@@ -506,7 +507,7 @@ TIMER_CALLBACK_MEMBER(amis2152_cpu_device::d2f_timer_cb)
 {
 	m_write_f(m_fout_state);
 	m_fout_state ^= 1;
-	
+
 	d2f_timer_clock();
 }
 

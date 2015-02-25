@@ -22,7 +22,7 @@ public:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_attributesram;
@@ -37,7 +37,7 @@ public:
 	UINT8 m_imago_sprites[0x800*3];
 	UINT16 m_imago_sprites_address;
 	UINT8 m_imago_sprites_bank;
-	
+
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_web_tilemap;
@@ -76,7 +76,7 @@ public:
 	TILE_GET_INFO_MEMBER(imago_get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(imago_get_tile_info_fg);
 	TILE_GET_INFO_MEMBER(imago_get_tile_info_web);
-	
+
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
 

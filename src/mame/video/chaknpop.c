@@ -25,7 +25,7 @@
 PALETTE_INIT_MEMBER(chaknpop_state, chaknpop)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	
+
 	for (int i = 0; i < 1024; i++)
 	{
 		int col, r, g, b;

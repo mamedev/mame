@@ -203,7 +203,7 @@ WRITE16_MEMBER(splitsec_state::splitsec_write_r)
 
 	// R9,R10: input mux
 	m_input_mux = data >> 9 & 3;
-	
+
 	// R0-R7: led rows
 	m_r = data & 0xff;
 	display_update();
@@ -216,7 +216,7 @@ WRITE16_MEMBER(splitsec_state::bankshot_write_r)
 
 	// R2,R3: input mux
 	m_input_mux = data >> 2 & 3;
-	
+
 	// R2-R10: led rows
 	m_r = data & ~3;
 	display_update();
@@ -252,7 +252,7 @@ INPUT_PORTS_END
      SCORE]
 
     ------  led display  ------
-    
+
     [ANGLE]  [AIM]     [CUE UP
                         SHOOT]
 */

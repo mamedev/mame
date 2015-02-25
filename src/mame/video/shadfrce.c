@@ -1,7 +1,7 @@
 #include "emu.h"
 #include "includes/shadfrce.h"
 
-TILE_GET_INFO_MEMBER(shadfrce_state::get_shadfrce_fgtile_info)
+TILE_GET_INFO_MEMBER(shadfrce_state::get_fgtile_info)
 {
 	/* ---- ----  tttt tttt  ---- ----  pppp TTTT */
 	int tileno, colour;
@@ -12,13 +12,13 @@ TILE_GET_INFO_MEMBER(shadfrce_state::get_shadfrce_fgtile_info)
 	SET_TILE_INFO_MEMBER(0,tileno,colour*4,0);
 }
 
-WRITE16_MEMBER(shadfrce_state::shadfrce_fgvideoram_w)
+WRITE16_MEMBER(shadfrce_state::fgvideoram_w)
 {
 	m_fgvideoram[offset] = data;
 	m_fgtilemap->mark_tile_dirty(offset/2);
 }
 
-TILE_GET_INFO_MEMBER(shadfrce_state::get_shadfrce_bg0tile_info)
+TILE_GET_INFO_MEMBER(shadfrce_state::get_bg0tile_info)
 {
 	/* ---- ----  ---- cccc  --TT TTTT TTTT TTTT */
 	int tileno, colour,fyx;
@@ -31,13 +31,13 @@ TILE_GET_INFO_MEMBER(shadfrce_state::get_shadfrce_bg0tile_info)
 	SET_TILE_INFO_MEMBER(2,tileno,colour,TILE_FLIPYX(fyx));
 }
 
-WRITE16_MEMBER(shadfrce_state::shadfrce_bg0videoram_w)
+WRITE16_MEMBER(shadfrce_state::bg0videoram_w)
 {
 	m_bg0videoram[offset] = data;
 	m_bg0tilemap->mark_tile_dirty(offset/2);
 }
 
-TILE_GET_INFO_MEMBER(shadfrce_state::get_shadfrce_bg1tile_info)
+TILE_GET_INFO_MEMBER(shadfrce_state::get_bg1tile_info)
 {
 	int tileno, colour;
 
@@ -47,7 +47,7 @@ TILE_GET_INFO_MEMBER(shadfrce_state::get_shadfrce_bg1tile_info)
 	SET_TILE_INFO_MEMBER(2,tileno,colour+64,0);
 }
 
-WRITE16_MEMBER(shadfrce_state::shadfrce_bg1videoram_w)
+WRITE16_MEMBER(shadfrce_state::bg1videoram_w)
 {
 	m_bg1videoram[offset] = data;
 	m_bg1tilemap->mark_tile_dirty(offset);
@@ -58,33 +58,40 @@ WRITE16_MEMBER(shadfrce_state::shadfrce_bg1videoram_w)
 
 void shadfrce_state::video_start()
 {
-	m_fgtilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(shadfrce_state::get_shadfrce_fgtile_info),this),TILEMAP_SCAN_ROWS,    8,  8,64,32);
+	m_fgtilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(shadfrce_state::get_fgtile_info),this),TILEMAP_SCAN_ROWS,    8,  8,64,32);
 	m_fgtilemap->set_transparent_pen(0);
 
-	m_bg0tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(shadfrce_state::get_shadfrce_bg0tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,32,32);
+	m_bg0tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(shadfrce_state::get_bg0tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,32,32);
 	m_bg0tilemap->set_transparent_pen(0);
 
-	m_bg1tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(shadfrce_state::get_shadfrce_bg1tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,32,32);
+	m_bg1tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(shadfrce_state::get_bg1tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,32,32);
 
 	m_spvideoram_old = auto_alloc_array(machine(), UINT16, m_spvideoram.bytes()/2);
+
+	save_item(NAME(m_video_enable));
+	save_item(NAME(m_irqs_enable));
+	save_item(NAME(m_raster_scanline));
+	save_item(NAME(m_raster_irq_enable));
+	save_item(NAME(m_vblank));
+	save_item(NAME(m_prev_value));
 }
 
-WRITE16_MEMBER(shadfrce_state::shadfrce_bg0scrollx_w)
+WRITE16_MEMBER(shadfrce_state::bg0scrollx_w)
 {
 	m_bg0tilemap->set_scrollx(0, data & 0x1ff );
 }
 
-WRITE16_MEMBER(shadfrce_state::shadfrce_bg0scrolly_w)
+WRITE16_MEMBER(shadfrce_state::bg0scrolly_w)
 {
 	m_bg0tilemap->set_scrolly(0, data  & 0x1ff );
 }
 
-WRITE16_MEMBER(shadfrce_state::shadfrce_bg1scrollx_w)
+WRITE16_MEMBER(shadfrce_state::bg1scrollx_w)
 {
 	m_bg1tilemap->set_scrollx(0, data  & 0x1ff );
 }
 
-WRITE16_MEMBER(shadfrce_state::shadfrce_bg1scrolly_w)
+WRITE16_MEMBER(shadfrce_state::bg1scrolly_w)
 {
 	m_bg1tilemap->set_scrolly(0, data & 0x1ff );
 }
@@ -139,7 +146,7 @@ void shadfrce_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 	}
 }
 
-UINT32 shadfrce_state::screen_update_shadfrce(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 shadfrce_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 
@@ -158,7 +165,7 @@ UINT32 shadfrce_state::screen_update_shadfrce(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-void shadfrce_state::screen_eof_shadfrce(screen_device &screen, bool state)
+void shadfrce_state::screen_eof(screen_device &screen, bool state)
 {
 	// rising edge
 	if (state)

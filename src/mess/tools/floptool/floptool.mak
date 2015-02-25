@@ -8,7 +8,7 @@
 
 
 # floptool executable name
-FLOPTOOL = floptool$(EXE)
+FLOPTOOL = $(BIN)floptool$(EXE)
 
 # add path to floptool headers
 INCPATH += -I$(SRC)/$(TARGET)/tools/floptool

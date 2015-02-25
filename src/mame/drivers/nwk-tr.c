@@ -48,7 +48,7 @@ DIPSW are present on the main board (instead of on the filter board) and the
 SOIC8 chip (a secured PIC?) is not populated (the solder pads are there though).
 There's an extra sound IC AN7395S (it's not populated on Hornet).
 The PALs/PLDs are the same on NWK-TR and Hornet.
-Both Racing JAM/Chapter 2 and Thrill Drive use two video boards. 
+Both Racing JAM/Chapter 2 and Thrill Drive use two video boards.
 The top video board is set to MASTER/TWIN, lower video board is set to SLAVE
 They are otherwise identical.
 
@@ -91,7 +91,7 @@ Notes:
 	  DRM1M4SJ8 - Fujitsu 81C4256 256kx4 DRAM (SOJ24)
 	   SRAM256K - Cypress CY7C199 32kx8 SRAM (SOJ28)
 	  DRAM16X16 - Fujitsu 8118160A-60 16megx16 DRAM (SOJ42)
-      M48T58Y-70PC1 - ST Timekeeper RAM
+	  M48T58Y-70PC1 - ST Timekeeper RAM
 	    RF5C400 - Ricoh RF5C400 PCM 32Ch, 44.1 kHz Stereo, 3D Effect Spatializer, clock input 16.9344MHz
 	     056800 - Konami Custom (QFP80)
 	     058232 - Konami Custom Ceramic Package (SIL14)
@@ -130,7 +130,7 @@ Notes:
 	        CN6 - DIN96 joining connector to lower PCB
 	        CN7 - Multi-pin connector (pads only, not used)
 	CN9 to CN13 - Power Connectors
-       CN14 to CN17 - RCA Stereo Audio OUT
+	   CN14 to CN17 - RCA Stereo Audio OUT
 	       CN18 - RCA Mono Audio OUT
 	       CN19 - USB Connector
 
@@ -161,20 +161,20 @@ sticker - GC713AC
 |         CN1            |
 |------------------------|
 Notes:
-      CN1      - Connector joining to CPU board CN4
-      CN2/3    - RCA jacks for network cable
-      2G       - Small SOIC8 chip with number 0038323 at location 2G. An identical chip is present on 
-                 *some* Hornet games on the GN715 CPU board at location 30C. It may be a PIC or EEPROM.
-                 On Hornet, the chip seems to refresh the data in the Timekeeper RAM when the battery 
-                 dies and keeps the game working. It's purpose on the network board is unknown but it may
-                 'upgrade' the data in the NVRAM to the network version of the game for a twin cabinet set-up.
-      HYC2485S - Hybrid ceramic module for RS485
-      CY7C199  - 32k x8 SRAM
-      XC5204   - Xilinx XC5204 FPGA
-      XC5210   - Xilink XC5210 FPGA
-      N676H1   - PALCE16V8Q-15 stamped 'N676H1'
+	  CN1      - Connector joining to CPU board CN4
+	  CN2/3    - RCA jacks for network cable
+	  2G       - Small SOIC8 chip with number 0038323 at location 2G. An identical chip is present on
+	             *some* Hornet games on the GN715 CPU board at location 30C. It may be a PIC or EEPROM.
+	             On Hornet, the chip seems to refresh the data in the Timekeeper RAM when the battery
+	             dies and keeps the game working. It's purpose on the network board is unknown but it may
+	             'upgrade' the data in the NVRAM to the network version of the game for a twin cabinet set-up.
+	  HYC2485S - Hybrid ceramic module for RS485
+	  CY7C199  - 32k x8 SRAM
+	  XC5204   - Xilinx XC5204 FPGA
+	  XC5210   - Xilink XC5210 FPGA
+	  N676H1   - PALCE16V8Q-15 stamped 'N676H1'
 
-      
+
 Bottom Board (VIDEO PCB)
 GN676 PWB(B)B
 |-------------------------------------------------------------------------------------------|
@@ -215,9 +215,9 @@ Notes:
 	 TEXELFX - 3DFX 500-0004-02 BD0665.1 TMU (QFP208)
 	 PIXELFX - 3DFX 500-0003-03 F001701.1 FBI (QFP240)
 	  001604 - Konami Custom (QFP208)
-       MC44200FT - Motorola MC44200FT 3 Channel Video D/A Converter (QFP44)
+	   MC44200FT - Motorola MC44200FT 3 Channel Video D/A Converter (QFP44)
 	 MACH111 - AMD MACH111 CPLD (Stamped '03161A', PLCC44)
-   PLCC44_SOCKET - empty PLCC44 socket
+	PLCC44_SOCKET - empty PLCC44 socket
 	  AV9170 - Integrated Circuit Systems Inc. Clock Multiplier (SOIC8)
 	  AM7201 - AMD AM7201 FIFO (PLCC32)
 	    PAL1 - AMD PALCE16V8 (stamped 'N676B4', DIP20)

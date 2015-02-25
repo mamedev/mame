@@ -19,23 +19,24 @@
 
 @interface MAMEDebugView : NSView
 {
-	int				type;
-	running_machine	*machine;
-	debug_view		*view;
+	int             type;
+	running_machine *machine;
+	debug_view      *view;
+	BOOL            wholeLineScroll;
 
-	INT32			totalWidth, totalHeight, originLeft, originTop;
+	INT32           totalWidth, totalHeight, originTop;
 
-	NSFont			*font;
-	CGFloat			fontWidth, fontHeight, fontAscent;
+	NSFont          *font;
+	CGFloat         fontWidth, fontHeight, fontAscent;
 
-	NSTextStorage	*text;
-	NSTextContainer	*textContainer;
-	NSLayoutManager	*layoutManager;
+	NSTextStorage   *text;
+	NSTextContainer *textContainer;
+	NSLayoutManager *layoutManager;
 }
 
 + (NSFont *)defaultFont;
 
-- (id)initWithFrame:(NSRect)f type:(debug_view_type)t machine:(running_machine &)m;
+- (id)initWithFrame:(NSRect)f type:(debug_view_type)t machine:(running_machine &)m wholeLineScroll:(BOOL)w;
 
 - (void)update;
 
@@ -50,6 +51,9 @@
 
 - (IBAction)copyVisible:(id)sender;
 - (IBAction)paste:(id)sender;
+
+- (void)viewBoundsDidChange:(NSNotification *)notification;
+- (void)viewFrameDidChange:(NSNotification *)notification;
 
 - (void)windowDidBecomeKey:(NSNotification *)notification;
 - (void)windowDidResignKey:(NSNotification *)notification;

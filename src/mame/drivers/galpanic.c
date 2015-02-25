@@ -314,4 +314,3 @@ ROM_END
 
 GAME( 1990, galpanic, 0,        galpanic, galpanic,  driver_device, 0, ROT90, "Kaneko",                   "Gals Panic (Unprotected)", GAME_NO_COCKTAIL )
 GAME( 1990, galpanica,galpanic, galpanica,galpanica, driver_device, 0, ROT90, "Kaneko",                   "Gals Panic (MCU Protected)", GAME_NO_COCKTAIL )
-

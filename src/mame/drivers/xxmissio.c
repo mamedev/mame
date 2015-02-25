@@ -79,7 +79,7 @@ void xxmissio_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 8, memregion("user1")->base(), 0x4000);
 	membank("bank1")->set_entry(0);
-	
+
 	save_item(NAME(m_status));
 }
 

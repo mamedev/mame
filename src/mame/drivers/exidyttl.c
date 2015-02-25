@@ -141,7 +141,7 @@ ROM_START( attckexd )
 	ROM_LOAD( "attack.k6",     0x0000, 0x0100, CRC(e120839f) SHA1(74dc19a732238d35e467d814ead581a60463aaa2) )
 ROM_END
 
-ROM_START( attckexd2 )	//  These are likely an overdump, but we are waiting for confirmation before removing the files
+ROM_START( attckexd2 )  //  These are likely an overdump, but we are waiting for confirmation before removing the files
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x0400, "roms", ROMREGION_ERASE00 )

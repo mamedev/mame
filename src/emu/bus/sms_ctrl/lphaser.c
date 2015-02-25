@@ -137,26 +137,27 @@ int sms_light_phaser_device::bright_aim_area( emu_timer *timer, int lgun_x, int 
 {
 	const int r_x_r = LGUN_RADIUS * LGUN_RADIUS;
 	const rectangle &visarea = m_screen->visible_area();
+	rectangle aim_area;
 	int beam_x = m_screen->hpos();
 	int beam_y = m_screen->vpos();
-	int dx, dy;
-	int result = 1;
-	int pos_changed = 0;
+	int beam_x_orig = beam_x;
+	int beam_y_orig = beam_y;
+	int dy, result = 1;
 	double dx_radius;
+	bool new_check_point = false;
 
-	while (1)
+	aim_area.min_y = MAX(lgun_y - LGUN_RADIUS, visarea.min_y);
+	aim_area.max_y = MIN(lgun_y + LGUN_RADIUS, visarea.max_y);
+
+	while (!new_check_point)
 	{
-		/* If beam's y isn't at a line where the aim area is, change it
-		   the next line it enters that area. */
-		dy = abs(beam_y - lgun_y);
-		if (dy > LGUN_RADIUS || beam_y < visarea.min_y || beam_y > visarea.max_y)
+		/* If beam's y doesn't point to a line where the aim area is,
+		   change it to the first line where the beam enters that area. */
+		if (beam_y < aim_area.min_y || beam_y > aim_area.max_y)
 		{
-			beam_y = lgun_y - LGUN_RADIUS;
-			if (beam_y < visarea.min_y)
-				beam_y = visarea.min_y;
-			dy = abs(beam_y - lgun_y);
-			pos_changed = 1;
+			beam_y = aim_area.min_y;
 		}
+		dy = abs(beam_y - lgun_y);
 
 		/* Caculate distance in x of the radius, relative to beam's y distance.
 		   First try some shortcuts. */
@@ -175,66 +176,73 @@ int sms_light_phaser_device::bright_aim_area( emu_timer *timer, int lgun_x, int 
 			dx_radius = ceil((float) sqrt((float) (r_x_r - (dy * dy))));
 		}
 
-		/* If beam's x isn't in the circular aim area, change it
-		   to the next point it enters that area. */
-		dx = abs(beam_x - lgun_x);
-		if (dx > dx_radius || beam_x < visarea.min_x || beam_x > visarea.max_x)
+		aim_area.min_x = MAX(lgun_x - dx_radius, visarea.min_x);
+		aim_area.max_x = MIN(lgun_x + dx_radius, visarea.max_x);
+
+		while (!new_check_point)
 		{
-			/* If beam's x has passed the aim area, advance to
-			   next line and recheck y/x coordinates. */
-			if (beam_x > lgun_x)
+			/* If beam's x has passed the aim area, change it to the
+			   next line and go back to recheck y/x coordinates. */
+			if (beam_x > aim_area.max_x)
 			{
-				beam_x = 0;
-				beam_y++;
-				continue;
-			}
-			beam_x = lgun_x - dx_radius;
-			if (beam_x < visarea.min_x)
 				beam_x = visarea.min_x;
-			pos_changed = 1;
-		}
+				beam_y++;
+				break;
+			}
 
-		if (pos_changed)
-			break;
+			/* If beam's x isn't in the aim area, change it to the
+			   next point where the beam enters that area. */
+			if (beam_x < aim_area.min_x)
+			{
+				beam_x = aim_area.min_x;
+			}
 
-		if (m_sensor_last_state == 0) /* sensor is on */
-		{
-			/* keep sensor on until out of the aim area */
-			result = 0;
-		}
-		else
-		{
-			rgb_t color;
-			UINT8 brightness;
-			/* brightness of the lightgray color in the frame drawn by Light Phaser games */
-			const UINT8 sensor_min_brightness = 0x7f;
+			if (beam_x_orig != beam_x || beam_y_orig != beam_y)
+			{
+				/* adopt the new coordinates to adjust the timer */
+				new_check_point = true;
+				break;
+			}
 
-			color = m_port->pixel_r();
+			if (m_sensor_last_state == 0)
+			{
+				/* sensor is already on */
+				/* keep sensor on until out of the aim area */
+				result = 0;
+			}
+			else
+			{
+				rgb_t color;
+				UINT8 brightness;
+				/* brightness of the lightgray color in the frame drawn by Light Phaser games */
+				const UINT8 sensor_min_brightness = 0x7f;
 
-			/* reference: http://www.w3.org/TR/AERT#color-contrast */
-			brightness = (color.r() * 0.299) + (color.g() * 0.587) + (color.b() * 0.114);
-			//printf ("color brightness: %2X for x %d y %d\n", brightness, beam_x, beam_y);
+				color = m_port->pixel_r();
 
-			result = (brightness >= sensor_min_brightness) ? 0 : 1;
-		}
+				/* reference: http://www.w3.org/TR/AERT#color-contrast */
+				brightness = (color.r() * 0.299) + (color.g() * 0.587) + (color.b() * 0.114);
+				//printf ("color brightness: %2X for x %d y %d\n", brightness, beam_x, beam_y);
 
-		if (result == 0)
-		{
-			/* Set next check for when sensor will be off */
-			beam_x = lgun_x + dx_radius + 1;
-			if (beam_x > visarea.max_x)
-				beam_x = visarea.max_x + 1;
-			break;
-		}
-		else
-		{
-			/* Next check after the minimum interval */
-			beam_x += LGUN_X_INTERVAL;
-			pos_changed = 1;
+				result = (brightness >= sensor_min_brightness) ? 0 : 1;
+			}
+
+			if (result == 0) /* sensor on */
+			{
+				/* Set next check for when sensor will be off */
+				beam_x = aim_area.max_x + 1;
+
+				/* adopt the new coordinates to adjust the timer */
+				new_check_point = true;
+			}
+			else
+			{
+				/* Next check will happen after the minimum interval */
+				beam_x += LGUN_X_INTERVAL;
+			}
 		}
 	}
-	timer->adjust(m_screen->time_until_pos(beam_y, beam_x));
 
+	timer->adjust(m_screen->time_until_pos(beam_y, beam_x));
 	return result;
 }
 

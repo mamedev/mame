@@ -63,13 +63,13 @@ TILE_GET_INFO_MEMBER(thedeep_state::get_tile_info_1)
 			0);
 }
 
-WRITE8_MEMBER(thedeep_state::thedeep_vram_0_w)
+WRITE8_MEMBER(thedeep_state::vram_0_w)
 {
 	m_vram_0[offset] = data;
 	m_tilemap_0->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(thedeep_state::thedeep_vram_1_w)
+WRITE8_MEMBER(thedeep_state::vram_1_w)
 {
 	m_vram_1[offset] = data;
 	m_tilemap_1->mark_tile_dirty(offset / 2);
@@ -202,7 +202,7 @@ void thedeep_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 ***************************************************************************/
 
-UINT32 thedeep_state::screen_update_thedeep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 thedeep_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int scrollx = m_scroll[0] + (m_scroll[1]<<8);
 	int scrolly = m_scroll[2] + (m_scroll[3]<<8);

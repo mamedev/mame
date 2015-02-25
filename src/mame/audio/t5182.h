@@ -22,7 +22,7 @@ public:
 	{
 		SETIRQ_CB
 	};
-	
+
 	DECLARE_WRITE8_MEMBER(sound_irq_w );
 	DECLARE_READ8_MEMBER(sharedram_semaphore_snd_r);
 	DECLARE_WRITE8_MEMBER(sharedram_semaphore_main_acquire_w);

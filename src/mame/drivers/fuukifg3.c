@@ -191,7 +191,7 @@ WRITE32_MEMBER(fuuki32_state::snd_020_w)
 		m_shared_ram[(offset * 2) + 1] = data & 0xff;
 }
 
-WRITE32_MEMBER(fuuki32_state::fuuki32_vregs_w)
+WRITE32_MEMBER(fuuki32_state::vregs_w)
 {
 	if (m_vregs[offset] != data)
 	{
@@ -210,10 +210,10 @@ static ADDRESS_MAP_START( fuuki32_map, AS_PROGRAM, 32, fuuki32_state )
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM                                                                     // Work RAM
 	AM_RANGE(0x410000, 0x41ffff) AM_RAM                                                                     // Work RAM (used by asurabus)
 
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(fuuki32_vram_0_w) AM_SHARE("vram.0")  // Tilemap 1
-	AM_RANGE(0x502000, 0x503fff) AM_RAM_WRITE(fuuki32_vram_1_w) AM_SHARE("vram.1")  // Tilemap 2
-	AM_RANGE(0x504000, 0x505fff) AM_RAM_WRITE(fuuki32_vram_2_w) AM_SHARE("vram.2")  // Tilemap bg
-	AM_RANGE(0x506000, 0x507fff) AM_RAM_WRITE(fuuki32_vram_3_w) AM_SHARE("vram.3")  // Tilemap bg2
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram.0")  // Tilemap 1
+	AM_RANGE(0x502000, 0x503fff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram.1")  // Tilemap 2
+	AM_RANGE(0x504000, 0x505fff) AM_RAM_WRITE(vram_2_w) AM_SHARE("vram.2")  // Tilemap bg
+	AM_RANGE(0x506000, 0x507fff) AM_RAM_WRITE(vram_3_w) AM_SHARE("vram.3")  // Tilemap bg2
 	AM_RANGE(0x508000, 0x517fff) AM_RAM                                                                     // More tilemap, or linescroll? Seems to be empty all of the time
 	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_DEVREADWRITE16("fuukivid", fuukivid_device, fuuki_sprram_r, fuuki_sprram_w, 0xffffffff) // Sprites
 	AM_RANGE(0x700000, 0x703fff) AM_RAM_DEVWRITE("palette",  palette_device, write) AM_SHARE("palette") // Palette
@@ -223,7 +223,7 @@ static ADDRESS_MAP_START( fuuki32_map, AS_PROGRAM, 32, fuuki32_state )
 	AM_RANGE(0x880000, 0x880003) AM_READ_PORT("880000")                                                     // Service + DIPS
 	AM_RANGE(0x890000, 0x890003) AM_READ_PORT("890000")                                                     // More DIPS
 
-	AM_RANGE(0x8c0000, 0x8c001f) AM_RAM_WRITE(fuuki32_vregs_w) AM_SHARE("vregs")        // Video Registers
+	AM_RANGE(0x8c0000, 0x8c001f) AM_RAM_WRITE(vregs_w) AM_SHARE("vregs")        // Video Registers
 	AM_RANGE(0x8d0000, 0x8d0003) AM_RAM                                                                     // Flipscreen Related
 	AM_RANGE(0x8e0000, 0x8e0003) AM_RAM AM_SHARE("priority")                            // Controls layer order
 	AM_RANGE(0x903fe0, 0x903fff) AM_READWRITE(snd_020_r, snd_020_w)                                         // Shared with Z80
@@ -237,7 +237,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-WRITE8_MEMBER(fuuki32_state::fuuki32_sound_bw_w)
+WRITE8_MEMBER(fuuki32_state::sound_bw_w)
 {
 	membank("bank1")->set_entry(data);
 }
@@ -271,7 +271,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fuuki32_sound_io_map, AS_IO, 8, fuuki32_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(fuuki32_sound_bw_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bw_w)
 	AM_RANGE(0x30, 0x30) AM_WRITENOP // leftover/unused nmi handler related
 	AM_RANGE(0x40, 0x45) AM_DEVREAD("ymf1", ymf278b_device, read) AM_WRITE(snd_ymf278b_w)
 ADDRESS_MAP_END
@@ -430,6 +430,13 @@ static INPUT_PORTS_START( asurabus )
 	PORT_DIPSETTING(      0x0000, "Both Off" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( asurabusa )
+	PORT_INCLUDE(asurabld)
+
+	PORT_MODIFY("INPUTS")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+INPUT_PORTS_END
 
 /***************************************************************************
 
@@ -500,11 +507,11 @@ void fuuki32_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	{
 	case TIMER_LEVEL_1_INTERRUPT:
 		m_maincpu->set_input_line(1, HOLD_LINE);
-		timer_set(m_screen->time_until_pos(248), TIMER_LEVEL_1_INTERRUPT);
+		m_level_1_interrupt_timer->adjust(m_screen->time_until_pos(248));
 		break;
 	case TIMER_VBLANK_INTERRUPT:
 		m_maincpu->set_input_line(3, HOLD_LINE);    // VBlank IRQ
-		timer_set(m_screen->time_until_vblank_start(), TIMER_VBLANK_INTERRUPT);
+		m_vblank_interrupt_timer->adjust(m_screen->time_until_vblank_start());
 		break;
 	case TIMER_RASTER_INTERRUPT:
 		m_maincpu->set_input_line(5, HOLD_LINE);    // Raster Line IRQ
@@ -523,6 +530,8 @@ void fuuki32_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
 
+	m_level_1_interrupt_timer = timer_alloc(TIMER_LEVEL_1_INTERRUPT);
+	m_vblank_interrupt_timer = timer_alloc(TIMER_VBLANK_INTERRUPT);
 	m_raster_interrupt_timer = timer_alloc(TIMER_RASTER_INTERRUPT);
 
 	save_item(NAME(m_spr_buffered_tilebank));
@@ -534,8 +543,8 @@ void fuuki32_state::machine_reset()
 {
 	const rectangle &visarea = m_screen->visible_area();
 
-	timer_set(m_screen->time_until_pos(248), TIMER_LEVEL_1_INTERRUPT);
-	timer_set(m_screen->time_until_vblank_start(), TIMER_VBLANK_INTERRUPT);
+	m_level_1_interrupt_timer->adjust(m_screen->time_until_pos(248));
+	m_vblank_interrupt_timer->adjust(m_screen->time_until_vblank_start());
 	m_raster_interrupt_timer->adjust(m_screen->time_until_pos(0, visarea.max_x + 1));
 }
 
@@ -555,8 +564,8 @@ static MACHINE_CONFIG_START(fuuki32, fuuki32_state)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(64 * 8, 32 * 8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 8 - 1, 0, 30 * 8 - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(fuuki32_state, screen_update_fuuki32)
-	MCFG_SCREEN_VBLANK_DRIVER(fuuki32_state, screen_eof_fuuki32)
+	MCFG_SCREEN_UPDATE_DRIVER(fuuki32_state, screen_update)
+	MCFG_SCREEN_VBLANK_DRIVER(fuuki32_state, screen_eof)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fuuki32)
@@ -677,7 +686,41 @@ ROM_START( asurabus )
 	ROM_LOAD( "opm.u6", 0x00000, 0x400000, CRC(31b05be4) SHA1(d0f4f387f84a74591224b0f42b7f5c538a3dc498) )
 ROM_END
 
+ROM_START( asurabusa )
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* M68020 */
+	ROM_LOAD32_BYTE( "24-31.pgm3", 0x000000, 0x80000, CRC(cfcb9c75) SHA1(51e325d5e60d5bb058429f04a5170dcc17986b7d) )
+	ROM_LOAD32_BYTE( "16-23.pgm2", 0x000001, 0x80000, CRC(e4d07738) SHA1(c6c949c5b0cbc129917bb8c93707539adabbd336) )
+	ROM_LOAD32_BYTE( "8-15.pgm1",  0x000002, 0x80000, CRC(1dd67fe7) SHA1(3fd340ccd4a306783ba0ccd3343ae505c9de3a73) )
+	ROM_LOAD32_BYTE( "0-7.pgm0",   0x000003, 0x80000, CRC(3af08de3) SHA1(1ecc69804693cab6c2c36120acfc6ced094a16e4) )
 
+	ROM_REGION( 0x090000, "soundcpu", 0 ) /* Z80 */
+	ROM_LOAD( "srom.u7", 0x00000, 0x80000, CRC(368da389) SHA1(1423b709da40bf3033c9032c4bd07658f1a969de) )
+	ROM_RELOAD(          0x10000, 0x80000) /* for banks */
+
+	ROM_REGION( 0x2000000, "gfx1", 0 )
+	ROM_LOAD( "sp01.u13", 0x0000000, 0x400000, CRC(5edea463) SHA1(22a780912f060bae0c9a403a7bfd4d27f25b76e3) )
+	ROM_LOAD( "sp23.u14", 0x0400000, 0x400000, CRC(91b1b0de) SHA1(341367966559ef2027415b673eb0db704680c81f) )
+	ROM_LOAD( "sp45.u15", 0x0800000, 0x400000, CRC(96c69aac) SHA1(cf053523026651427f884b9dd7c095af362dd24e) )
+	ROM_LOAD( "sp67.u16", 0x0c00000, 0x400000, CRC(7c3d83bf) SHA1(7188dd923c6c7eb6aee3323e7ab54aa240c35ea3) )
+	ROM_LOAD( "sp89.u17", 0x1000000, 0x400000, CRC(cb1e14f8) SHA1(941cea1887d7ceb52222adcf1d6913969e6163aa) )
+	ROM_LOAD( "spab.u18", 0x1400000, 0x400000, CRC(e5a4608d) SHA1(b8e39f53e0b7ad1e16ae9c3726597776b404be1c) )
+	ROM_LOAD( "spcd.u19", 0x1800000, 0x400000, CRC(99bfbe32) SHA1(926a8afc4a175874f22f53300e76f59331d3b9ba) )
+	ROM_LOAD( "spef.u20", 0x1c00000, 0x400000, CRC(c9c799cc) SHA1(01373316700d8688deeea2e9e8f831d5f86c7f17) )
+
+	ROM_REGION( 0x0800000, "gfx2", 0 )
+	ROM_LOAD( "bg1012.u22", 0x0000000, 0x400000, CRC(e3fb9af0) SHA1(11900cc2873337692f66fb4f1eb9c574e5a967de) )
+	ROM_LOAD( "bg1113.u23", 0x0400000, 0x400000, CRC(5f8657e6) SHA1(7c2854dc5d2d4efe55bda01e329da051350e0031) )
+
+	ROM_REGION( 0x0800000, "gfx3", 0 )
+	ROM_LOAD( "bg2022.u25", 0x0000000, 0x400000, CRC(f46eda52) SHA1(46530016b32a164bd76c4f53e7b53b2beb28db06) )
+	ROM_LOAD( "bg2123.u24", 0x0400000, 0x400000, CRC(c4ebb86b) SHA1(a7093e6e02b64566d277cbbd5fa90cd430e7c8a0) )
+
+	ROM_REGION( 0x200000, "gfx4", 0 ) // background tiles
+	ROM_LOAD( "map.u5", 0x00000, 0x200000, CRC(bd179dc5) SHA1(ce3fcac573b14fd5365eb5dcec3257e439d2c129) )
+
+	ROM_REGION( 0x400000, "ymf1", 0 ) // OPL4 samples
+	ROM_LOAD( "opm.u6", 0x00000, 0x400000, CRC(31b05be4) SHA1(d0f4f387f84a74591224b0f42b7f5c538a3dc498) )
+ROM_END
 
 /***************************************************************************
 
@@ -687,5 +730,7 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1998, asurabld,   0, fuuki32, asurabld, driver_device, 0, ROT0, "Fuuki", "Asura Blade - Sword of Dynasty (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)
-GAME( 2000, asurabus,   0, fuuki32, asurabus, driver_device, 0, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)
+GAME( 1998, asurabld,   0, fuuki32, asurabld, driver_device, 0, ROT0, "Fuuki", "Asura Blade - Sword of Dynasty (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+
+GAME( 2000, asurabus,   0,        fuuki32, asurabus, driver_device, 0, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2000, asurabusa,  asurabus, fuuki32, asurabusa,driver_device, 0, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan) (ARCADIA review build)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // has pause function on P1 button 4

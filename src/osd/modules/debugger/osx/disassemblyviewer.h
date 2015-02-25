@@ -22,8 +22,8 @@
 
 @interface MAMEDisassemblyViewer : MAMEExpressionAuxiliaryDebugWindowHandler
 {
-	MAMEDisassemblyView	*dasmView;
-	NSPopUpButton		*subviewButton;
+	MAMEDisassemblyView *dasmView;
+	NSPopUpButton       *subviewButton;
 }
 
 - (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c;

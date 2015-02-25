@@ -2853,7 +2853,7 @@ DRIVER_INIT_MEMBER(snowbros_state,snowbro3)
 			buffer[i] = src[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,3,4,1,2,0)];
 		memcpy(src,buffer,len);
 	}
-	
+
 	save_item(NAME(m_sb3_music_is_playing));
 	save_item(NAME(m_sb3_music));
 }

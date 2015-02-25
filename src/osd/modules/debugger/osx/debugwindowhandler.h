@@ -28,8 +28,8 @@ extern NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification;
 
 @interface MAMEDebugWindowHandler : NSObject <NSWindowDelegate>
 {
-	NSWindow		*window;
-	running_machine	*machine;
+	NSWindow        *window;
+	running_machine *machine;
 }
 
 + (void)addCommonActionItems:(NSMenu *)menu;
@@ -64,7 +64,7 @@ extern NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification;
 
 @interface MAMEAuxiliaryDebugWindowHandler : MAMEDebugWindowHandler
 {
-	MAMEDebugConsole	*console;
+	MAMEDebugConsole    *console;
 }
 
 + (void)cascadeWindow:(NSWindow *)window;
@@ -86,8 +86,8 @@ extern NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification;
 
 @interface MAMEExpressionAuxiliaryDebugWindowHandler : MAMEAuxiliaryDebugWindowHandler <NSTextFieldDelegate>
 {
-	MAMEDebugCommandHistory	*history;
-	NSTextField				*expressionField;
+	MAMEDebugCommandHistory *history;
+	NSTextField             *expressionField;
 }
 
 - (id)initWithMachine:(running_machine &)m title:(NSString *)t console:(MAMEDebugConsole *)c;

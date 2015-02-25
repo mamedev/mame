@@ -16,9 +16,9 @@
 
 @interface MAMEDebugCommandHistory : NSObject
 {
-	NSInteger		length, position;
-	NSString		*current;
-	NSMutableArray	*history;
+	NSInteger       length, position;
+	NSString        *current;
+	NSMutableArray  *history;
 }
 
 + (NSInteger)defaultLength;

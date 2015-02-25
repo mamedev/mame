@@ -659,7 +659,7 @@ bool a2_16sect_format::load(io_generic *io, UINT32 form_factor, floppy_image *im
 			else if (!memcmp(pascal2_block1, &sector_data[0x100], 4))
 			{
 				m_prodos_order = true;
-			}	// check for CP/M disks in ProDOS order
+			}   // check for CP/M disks in ProDOS order
 			else if (!memcmp(cpm22_block1, &sector_data[0x100], 8))
 			{
 				m_prodos_order = true;
@@ -1545,7 +1545,7 @@ bool a2_edd_format::supports_save() const
 
 int a2_edd_format::identify(io_generic *io, UINT32 form_factor)
 {
-	return io_generic_size(io) == 2244608 ? 50 : 0;
+	return ((io_generic_size(io) == 2244608) || (io_generic_size(io) == 2310144)) ? 50 : 0;
 }
 
 UINT8 a2_edd_format::pick(const UINT8 *data, int pos)

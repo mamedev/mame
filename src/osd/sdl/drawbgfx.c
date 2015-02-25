@@ -33,7 +33,7 @@
 #include "osdsdl.h"
 #include "window.h"
 
-#include <bgfxplatform.h> 
+#include <bgfxplatform.h>
 #include <bgfx.h>
 
 //============================================================
@@ -73,15 +73,15 @@ static void drawbgfx_exit(void);
 class sdl_info_bgfx : public osd_renderer
 {
 public:
-    sdl_info_bgfx(osd_window *w)
-    : osd_renderer(w, FLAG_NONE), m_blittimer(0), m_renderer(NULL),
-      m_blitwidth(0), m_blitheight(0),
-      m_last_hofs(0), m_last_vofs(0),
-      m_last_blit_time(0), m_last_blit_pixels(0)
-    {}
+	sdl_info_bgfx(osd_window *w)
+	: osd_renderer(w, FLAG_NONE), m_blittimer(0), m_renderer(NULL),
+		m_blitwidth(0), m_blitheight(0),
+		m_last_hofs(0), m_last_vofs(0),
+		m_last_blit_time(0), m_last_blit_pixels(0)
+	{}
 
 	/* virtual */ int create();
-	/* virtual */ int draw(const UINT32 dc, const int update);
+	/* virtual */ int draw(const int update);
 	/* virtual */ int xy_to_render_target(const int x, const int y, int *xt, int *yt);
 	/* virtual */ void destroy();
 	/* virtual */ render_primitive_list *get_primitives()
@@ -97,18 +97,18 @@ public:
 		return &window().target()->get_primitives();
 	}
 
-   // void render_quad(texture_info *texture, const render_primitive *prim, const int x, const int y);
+	// void render_quad(texture_info *texture, const render_primitive *prim, const int x, const int y);
 
-    //texture_info *texture_find(const render_primitive &prim, const quad_setup_data &setup);
-    //texture_info *texture_update(const render_primitive &prim);
+	//texture_info *texture_find(const render_primitive &prim, const quad_setup_data &setup);
+	//texture_info *texture_update(const render_primitive &prim);
 
 	INT32           m_blittimer;
 
 	SDL_Renderer *  m_renderer;
 	//simple_list<texture_info>  m_texlist;                // list of active textures
 
-	int				m_blitwidth;
-	int				m_blitheight;
+	int             m_blitwidth;
+	int             m_blitheight;
 	float           m_last_hofs;
 	float           m_last_vofs;
 
@@ -139,7 +139,7 @@ int drawbgfx_init(running_machine &machine, osd_draw_callbacks *callbacks)
 	// fill in the callbacks
 	callbacks->exit = drawbgfx_exit;
 	callbacks->create = drawbgfx_create;
-		
+
 	return 0;
 }
 
@@ -159,7 +159,7 @@ int sdl_info_bgfx::create()
 	bgfx::sdlSetWindow(window().sdl_window());
 	bgfx::init();
 	bgfx::reset(width, height, BGFX_RESET_VSYNC);
-	
+
 	// Enable debug text.
 	bgfx::setDebug(BGFX_DEBUG_STATS);// BGFX_DEBUG_TEXT);
 	osd_printf_verbose("Leave drawsdl2_window_create\n");
@@ -185,9 +185,8 @@ int sdl_info_bgfx::xy_to_render_target(int x, int y, int *xt, int *yt)
 //  sdl_info_bgfx::draw
 //============================================================
 
-int sdl_info_bgfx::draw(UINT32 dc, int update)
+int sdl_info_bgfx::draw(int update)
 {
-
 	//if (has_flags(FI_CHANGED) || (window().width() != m_last_width) || (window().height() != m_last_height))
 		// do something
 	//clear_flags(FI_CHANGED);
@@ -207,10 +206,10 @@ int sdl_info_bgfx::draw(UINT32 dc, int update)
 
 	window().m_primlist->acquire_lock();
 	window().m_primlist->release_lock();
-	// Advance to next frame. Rendering thread will be kicked to 
+	// Advance to next frame. Rendering thread will be kicked to
 	// process submitted rendering primitives.
 	bgfx::frame();
-	
+
 	return 0;
 }
 

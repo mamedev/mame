@@ -112,11 +112,11 @@ void snes_sscope_device::port_poll()
 	// then start elaborating input bits
 	// 1. only keep old turbo value
 	m_latch &= 0x04;
-	
+
 	// 2. set onscreen/offscreen
 	if (!m_port->m_onscreen_cb.isnull())
 		m_latch |= (m_port->m_onscreen_cb(m_x, m_y) ? 0x00 : 0x40);
-	
+
 	// 3. pause is a button that is always edge sensitive
 	if (BIT(input, 3) && !m_pause_lock)
 	{
@@ -134,11 +134,11 @@ void snes_sscope_device::port_poll()
 	}
 	else if (!BIT(input, 2))
 		m_turbo_lock = 0;
-	
+
 	// 5. cursor is a button that is always level sensitive
 	m_latch |= BIT(input, 1);
-	
-	// 6. fire is a button with two behaviors: if turbo is active, trigger is level sensitive; 
+
+	// 6. fire is a button with two behaviors: if turbo is active, trigger is level sensitive;
 	//    otherwise it is edge sensitive
 	if (BIT(input, 0) && (BIT(m_latch, 2) || !m_fire_lock))
 	{
@@ -147,7 +147,7 @@ void snes_sscope_device::port_poll()
 	}
 	else if (!BIT(input, 0))
 		m_fire_lock = 0;
-	
+
 	// If we have pressed fire or cursor and we are on-screen and SuperScope is in Port2, then latch video signal.
 	// Notice that this only works in Port2 because its IOBit pin is connected to bit7 of the IO Port, while Port1
 	// has IOBit pin connected to bit6 of the IO Port, and the latter is not detected by the H/V Counters. In other
@@ -163,12 +163,12 @@ void snes_sscope_device::port_poll()
 UINT8 snes_sscope_device::read_pin4()
 {
 	UINT8 res = 0;
-	
-	if (m_idx >= 8)	// bits 8-15 = ID = all 1s; bits >= 16 all 1s
+
+	if (m_idx >= 8) // bits 8-15 = ID = all 1s; bits >= 16 all 1s
 		res |= 0x01;
 	else
 		res |= BIT(m_latch, m_idx++);
-	
+
 	return res;
 }
 
@@ -181,7 +181,6 @@ void snes_sscope_device::write_strobe(UINT8 data)
 	int old = m_strobe;
 	m_strobe = data & 0x01;
 
-	if (m_strobe < old)	// 1 -> 0 transition
+	if (m_strobe < old) // 1 -> 0 transition
 		port_poll();
 }
-

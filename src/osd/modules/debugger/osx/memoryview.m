@@ -18,7 +18,7 @@
 @implementation MAMEMemoryView
 
 - (id)initWithFrame:(NSRect)f machine:(running_machine &)m {
-	if (!(self = [super initWithFrame:f type:DVT_MEMORY machine:m]))
+	if (!(self = [super initWithFrame:f type:DVT_MEMORY machine:m wholeLineScroll:NO]))
 		return nil;
 	return self;
 }

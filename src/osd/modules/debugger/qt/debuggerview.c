@@ -379,4 +379,5 @@ void DebuggerView::debuggerViewUpdate(debug_view& debugView, void* osdPrivate)
 	dView->horizontalScrollBar()->setValue(dView->view()->visible_position().x);
 	dView->viewport()->update();
 	dView->update();
+	emit dView->updated();
 }

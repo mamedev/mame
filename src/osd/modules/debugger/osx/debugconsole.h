@@ -22,13 +22,13 @@
 
 @interface MAMEDebugConsole : MAMEDebugWindowHandler <NSTextFieldDelegate, NSSplitViewDelegate>
 {
-	MAMEDebugCommandHistory	*history;
-	NSMutableArray			*auxiliaryWindows;
+	MAMEDebugCommandHistory *history;
+	NSMutableArray          *auxiliaryWindows;
 
-	MAMERegistersView		*regView;
-	MAMEDisassemblyView		*dasmView;
-	MAMEDebugView			*consoleView;
-	NSTextField				*commandField;
+	MAMERegistersView       *regView;
+	MAMEDisassemblyView     *dasmView;
+	MAMEDebugView           *consoleView;
+	NSTextField             *commandField;
 }
 
 - (id)initWithMachine:(running_machine &)m;

@@ -52,7 +52,7 @@ public:
 	optional_device<qs1000_device> m_qs1000;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	required_shared_ptr<UINT32> m_mainram;
 	required_shared_ptr<UINT32> m_fg_videoram;
 	required_shared_ptr<UINT32> m_md_videoram;
@@ -60,17 +60,17 @@ public:
 	required_shared_ptr<UINT32> m_spriteram;
 	required_shared_ptr<UINT32> m_spriteram2;
 	required_shared_ptr<UINT32> m_videoreg;
-	
+
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_md_tilemap;
 	tilemap_t *m_fg_tilemap;
-	
+
 	int m_spriteram_bit;
 	bitmap_ind16 m_sprites_bitmap;
 	bitmap_ind8 m_sprites_bitmap_pri;
 	int m_prev_sprites_count;
 	UINT8 m_spotty_sound_cmd;
-	
+
 	DECLARE_WRITE32_MEMBER(limenko_coincounter_w);
 	DECLARE_WRITE32_MEMBER(bg_videoram_w);
 	DECLARE_WRITE32_MEMBER(md_videoram_w);
@@ -89,7 +89,7 @@ public:
 	DECLARE_WRITE8_MEMBER(qs1000_p1_w);
 	DECLARE_WRITE8_MEMBER(qs1000_p2_w);
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
-	
+
 	DECLARE_CUSTOM_INPUT_MEMBER(spriteram_bit_r);
 
 	DECLARE_DRIVER_INIT(common);
@@ -97,11 +97,11 @@ public:
 	DECLARE_DRIVER_INIT(dynabomb);
 	DECLARE_DRIVER_INIT(legendoh);
 	DECLARE_DRIVER_INIT(spotty);
-	
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_md_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	
+
 	virtual void video_start();
 	UINT32 screen_update_limenko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,int priority);
@@ -505,7 +505,7 @@ void limenko_state::video_start()
 
 	m_sprites_bitmap.allocate(384,240);
 	m_sprites_bitmap_pri.allocate(384,240);
-	
+
 	save_item(NAME(m_spriteram_bit));
 	save_item(NAME(m_prev_sprites_count));
 }
@@ -1146,7 +1146,7 @@ DRIVER_INIT_MEMBER(limenko_state,spotty)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6626c, 0x6626f, read32_delegate(FUNC(limenko_state::spotty_speedup_r), this));
 
 	m_spriteram_bit = 1;
-	
+
 	save_item(NAME(m_spotty_sound_cmd));
 }
 

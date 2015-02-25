@@ -23,11 +23,23 @@
 #include "options.h"
 #include "emuopts.h"
 
+#ifndef OSD_WINDOWS
 // standard SDL headers
+#define TOBEMIGRATED 1
 #include "sdlinc.h"
+#else
+#define SDLMAME_SDL2 1
+#include "GL/gl.h"
+#include "GL/glext.h"
+#include "GL/wglext.h"
+
+typedef HGLRC SDL_GLContext;
+#endif
 
 // OpenGL headers
+#ifndef OSD_WINDOWS
 #include "osd_opengl.h"
+#endif
 #include "modules/lib/osdlib.h"
 
 
@@ -121,8 +133,13 @@ typedef void (APIENTRYP PFNGLDELETERENDERBUFFERSEXTPROC) (GLsizei n, const GLuin
 #define OVERFLOW_SIZE   (1<<10)
 
 // OSD headers
+#ifndef OSD_WINDOWS
 #include "osdsdl.h"
 #include "window.h"
+#else
+#include "../windows/window.h"
+typedef UINT64 HashT;
+#endif
 
 //============================================================
 //  DEBUGGING
@@ -149,6 +166,26 @@ enum
 //  MACROS
 //============================================================
 
+#ifdef OSD_WINDOWS
+// texture formats
+// This used to be an enum, but these are now defines so we can use them as
+// preprocessor conditionals
+#define SDL_TEXFORMAT_ARGB32            (0) // non-16-bit textures or specials
+#define SDL_TEXFORMAT_RGB32             (1)
+#define SDL_TEXFORMAT_RGB32_PALETTED    (2)
+#define SDL_TEXFORMAT_YUY16             (3)
+#define SDL_TEXFORMAT_YUY16_PALETTED    (4)
+#define SDL_TEXFORMAT_PALETTE16         (5)
+#define SDL_TEXFORMAT_RGB15             (6)
+#define SDL_TEXFORMAT_RGB15_PALETTED    (7)
+#define SDL_TEXFORMAT_PALETTE16A        (8)
+// special texture formats for 16bpp texture destination support, do not use
+// to address the tex properties / tex functions arrays!
+#define SDL_TEXFORMAT_PALETTE16_ARGB1555    (16)
+#define SDL_TEXFORMAT_RGB15_ARGB1555        (17)
+#define SDL_TEXFORMAT_RGB15_PALETTED_ARGB1555   (18)
+#endif
+
 #define FSWAP(var1, var2) do { float temp = var1; var1 = var2; var2 = temp; } while (0)
 #define GL_NO_PRIMITIVE -1
 
@@ -165,7 +202,7 @@ class texture_info
 {
 public:
 	texture_info()
-	: 	hash(0), flags(0), rawwidth(0), rawheight(0),
+	:   hash(0), flags(0), rawwidth(0), rawheight(0),
 		rawwidth_create(0), rawheight_create(0),
 		type(0), format(0), borderpix(0), xprescale(0), yprescale(0), nocopy(0),
 		texture(0), texTarget(0), texpow2(0), mpass_dest_idx(0), pbo(0), data(NULL),
@@ -253,13 +290,18 @@ public:
 	}
 
 	/* virtual */ int create();
-	/* virtual */ int draw(const UINT32 dc, const int update);
+	/* virtual */ int draw(const int update);
+
 	/* virtual */ int xy_to_render_target(const int x, const int y, int *xt, int *yt);
 	/* virtual */ void destroy();
 	/* virtual */ render_primitive_list *get_primitives()
 	{
 		int nw = 0; int nh = 0;
+#ifdef OSD_WINDOWS
+		window().get_size(nw, nh);
+#else
 		window().blit_surface_size(nw, nh);
+#endif
 		if (nw != m_blitwidth || nh != m_blitheight)
 		{
 			m_blitwidth = nw; m_blitheight = nh;
@@ -268,6 +310,10 @@ public:
 		window().target()->set_bounds(m_blitwidth, m_blitheight, window().aspect());
 		return &window().target()->get_primitives();
 	}
+
+	/* virtual */ void save() { }
+	/* virtual */ void record() { }
+	/* virtual */ void toggle_fsfx() { }
 
 private:
 	void destroy_all_textures();
@@ -291,13 +337,16 @@ private:
 	void texture_all_disable();
 
 	INT32           m_blittimer;
-	int				m_width;
-	int				m_height;
-	int				m_blitwidth;
-	int				m_blitheight;
+	int             m_width;
+	int             m_height;
+	int             m_blitwidth;
+	int             m_blitheight;
 
 #if (SDLMAME_SDL2)
 	SDL_GLContext   m_gl_context_id;
+#ifdef OSD_WINDOWS
+	HDC             m_hdc;
+#endif
 #else
 #endif
 
@@ -483,6 +532,16 @@ int drawogl_init(running_machine &machine, osd_draw_callbacks *callbacks)
 	return 0;
 }
 
+//============================================================
+// Windows Compatibility
+//============================================================
+
+#ifdef OSD_WINDOWS
+PROC SDL_GL_GetProcAddress(const char *procname)
+{
+	return wglGetProcAddress(procname);
+}
+#endif
 
 //============================================================
 // Load the OGL function addresses
@@ -530,7 +589,7 @@ static void load_gl_lib(running_machine &machine)
 		const char *stemp;
 
 		stemp = downcast<sdl_options &>(machine.options()).gl_lib();
-		if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) == 0)
+		if (stemp != NULL && strcmp(stemp, OSDOPTVAL_AUTO) == 0)
 			stemp = NULL;
 
 		if (SDL_GL_LoadLibrary(stemp) != 0) // Load library (default for e==NULL
@@ -552,8 +611,11 @@ void sdl_info_ogl::initialize_gl()
 	char *extstr = (char *)glGetString(GL_EXTENSIONS);
 	char *vendor = (char *)glGetString(GL_VENDOR);
 
-	//printf("%s\n", extstr);
-
+	//printf("%p\n", extstr);
+#ifdef OSD_WINDOWS
+	if (!extstr)
+		extstr = (char *)"";
+#endif
 	// print out the driver info for debugging
 	if (!shown_video_info)
 	{
@@ -679,11 +741,13 @@ void sdl_info_ogl::initialize_gl()
 		}
 	}
 
+#ifdef TOBEMIGRATED
 	if (osd_getenv(SDLENV_VMWARE) != NULL)
 	{
 		m_usetexturerect = 1;
 		m_texpoweroftwo = 1;
 	}
+#endif
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, (GLint *)&m_texture_max_width);
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, (GLint *)&m_texture_max_height);
 	if (!shown_video_info)
@@ -724,21 +788,72 @@ void sdl_info_ogl::initialize_gl()
 // a
 //============================================================
 
+#ifdef OSD_WINDOWS
+void
+setupPixelFormat(HDC hDC)
+{
+	PIXELFORMATDESCRIPTOR pfd = {
+		sizeof(PIXELFORMATDESCRIPTOR),  /* size */
+		1,                              /* version */
+		PFD_SUPPORT_OPENGL |
+		PFD_DRAW_TO_WINDOW |
+		PFD_DOUBLEBUFFER,               /* support double-buffering */
+		PFD_TYPE_RGBA,                  /* color type */
+		32,                             /* prefered color depth */
+		0, 0, 0, 0, 0, 0,               /* color bits (ignored) */
+		0,                              /* no alpha buffer */
+		0,                              /* alpha bits (ignored) */
+		0,                              /* no accumulation buffer */
+		0, 0, 0, 0,                     /* accum bits (ignored) */
+		16,                             /* depth buffer */
+		0,                              /* no stencil buffer */
+		0,                              /* no auxiliary buffers */
+		PFD_MAIN_PLANE,                 /* main layer */
+		0,                              /* reserved */
+		0, 0, 0,                        /* no layer, visible, damage masks */
+	};
+	int pixelFormat;
+
+	pixelFormat = ChoosePixelFormat(hDC, &pfd);
+	if (pixelFormat == 0) {
+		osd_printf_error("ChoosePixelFormat failed.\n");
+		exit(1);
+	}
+
+	if (SetPixelFormat(hDC, pixelFormat, &pfd) != TRUE) {
+		osd_printf_error("SetPixelFormat failed.\n");
+		exit(1);
+	}
+}
+#endif
 int sdl_info_ogl::create()
 {
-
 #if (SDLMAME_SDL2)
 	// create renderer
-
+#ifdef OSD_WINDOWS
+	m_hdc = GetDC(window().m_hwnd);
+	setupPixelFormat(m_hdc);
+	m_gl_context_id = wglCreateContext(m_hdc);
+	if  (!m_gl_context_id)
+	{
+		char errorStr[1024];
+		FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, GetLastError(), 0, errorStr, 255, NULL);
+		osd_printf_error("OpenGL not supported on this driver %s\n", errorStr);
+		return 1;
+	}
+	wglMakeCurrent(m_hdc, m_gl_context_id);
+#else
 	m_gl_context_id = SDL_GL_CreateContext(window().sdl_window());
 	if  (!m_gl_context_id)
 	{
 		osd_printf_error("OpenGL not supported on this driver: %s\n", SDL_GetError());
 		return 1;
 	}
+#endif
 
+#ifndef OSD_WINDOWS
 	SDL_GL_SetSwapInterval(video_config.waitvsync ? 2 : 0);
-
+#endif
 #else
 #endif
 
@@ -773,13 +888,17 @@ int sdl_info_ogl::create()
 
 void sdl_info_ogl::destroy()
 {
-
 	// free the memory in the window
 
 	destroy_all_textures();
 
 #if (SDLMAME_SDL2)
+#ifdef OSD_WINDOWS
+	wglDeleteContext(m_gl_context_id);
+	ReleaseDC(window().m_hwnd, m_hdc);
+#else
 	SDL_GL_DeleteContext(m_gl_context_id);
+#endif
 #endif
 
 }
@@ -791,7 +910,6 @@ void sdl_info_ogl::destroy()
 
 int sdl_info_ogl::xy_to_render_target(int x, int y, int *xt, int *yt)
 {
-
 	*xt = x - m_last_hofs;
 	*yt = y - m_last_vofs;
 	if (*xt<0 || *xt >= m_blitwidth)
@@ -815,7 +933,11 @@ void sdl_info_ogl::destroy_all_textures()
 		return;
 
 #if (SDLMAME_SDL2)
+#ifdef OSD_WINDOWS
+	wglMakeCurrent(m_hdc, m_gl_context_id);
+#else
 	SDL_GL_MakeCurrent(window().sdl_window(), m_gl_context_id);
+#endif
 #endif
 
 	if(window().m_primlist)
@@ -1199,7 +1321,7 @@ void sdl_info_ogl::loadGLExtensions()
 //  sdl_info::draw
 //============================================================
 
-int sdl_info_ogl::draw(UINT32 dc, int update)
+int sdl_info_ogl::draw(const int update)
 {
 	render_primitive *prim;
 	texture_info *texture=NULL;
@@ -1207,10 +1329,12 @@ int sdl_info_ogl::draw(UINT32 dc, int update)
 	int  pendingPrimitive=GL_NO_PRIMITIVE, curPrimitive=GL_NO_PRIMITIVE;
 	int width = 0; int height = 0;
 
+#ifdef TOBEMIGRATED
 	if (video_config.novideo)
 	{
 		return 0;
 	}
+#endif
 
 	window().get_size(width, height);
 
@@ -1225,7 +1349,11 @@ int sdl_info_ogl::draw(UINT32 dc, int update)
 	}
 
 #if (SDLMAME_SDL2)
+#ifdef OSD_WINDOWS
+	wglMakeCurrent(m_hdc, m_gl_context_id);
+#else
 	SDL_GL_MakeCurrent(window().sdl_window(), m_gl_context_id);
+#endif
 #endif
 
 	if (m_init_context)
@@ -1294,9 +1422,11 @@ int sdl_info_ogl::draw(UINT32 dc, int update)
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		m_last_blendmode = BLENDMODE_ALPHA;
 
+#ifdef TOBEMIGRATED
 		// set lines and points just barely above normal size to get proper results
 		glLineWidth(video_config.beamwidth);
 		glPointSize(video_config.beamwidth);
+#endif
 
 		// set up a nice simple 2D coordinate system, so GL behaves exactly how we'd like.
 		//
@@ -1327,6 +1457,7 @@ int sdl_info_ogl::draw(UINT32 dc, int update)
 	// compute centering parameters
 	vofs = hofs = 0.0f;
 
+#ifdef TOBEMIGRATED
 	if (video_config.centerv || video_config.centerh)
 	{
 		int ch, cw;
@@ -1343,6 +1474,8 @@ int sdl_info_ogl::draw(UINT32 dc, int update)
 			hofs = (cw - m_blitwidth) / 2.0f;
 		}
 	}
+#else
+#endif
 
 	m_last_hofs = hofs;
 	m_last_vofs = vofs;
@@ -1572,7 +1705,12 @@ int sdl_info_ogl::draw(UINT32 dc, int update)
 #if (!SDLMAME_SDL2)
 	SDL_GL_SwapBuffers();
 #else
+#ifdef OSD_WINDOWS
+	SwapBuffers(m_hdc);
+	//wglSwapLayerBuffers(GetDC(window().m_hwnd), WGL_SWAP_MAIN_PLANE);
+#else
 	SDL_GL_SwapWindow(window().sdl_window());
+#endif
 #endif
 	return 0;
 }
@@ -1675,7 +1813,7 @@ void sdl_info_ogl::texture_compute_type_subroutine(const render_texinfo *texsour
 	if    ( texture_copy_properties[texture->format][SDL_TEXFORMAT_SRC_EQUALS_DEST] &&
 			!texture_copy_properties[texture->format][SDL_TEXFORMAT_SRC_HAS_PALETTE] &&
 			texture->xprescale == 1 && texture->yprescale == 1 &&
-			!texture->borderpix && !texsource->palette() &&
+			!texture->borderpix && !texsource->palette &&
 			texsource->rowpixels <= m_texture_max_width )
 	{
 		texture->nocopy = TRUE;
@@ -2122,7 +2260,7 @@ texture_info *sdl_info_ogl::texture_create(const render_texinfo *texsource, UINT
 			texture->format = SDL_TEXFORMAT_ARGB32;
 			break;
 		case TEXFORMAT_RGB32:
-			if (texsource->palette() != NULL)
+			if (texsource->palette != NULL)
 				texture->format = SDL_TEXFORMAT_RGB32_PALETTED;
 			else
 				texture->format = SDL_TEXFORMAT_RGB32;
@@ -2134,7 +2272,7 @@ texture_info *sdl_info_ogl::texture_create(const render_texinfo *texsource, UINT
 			texture->format = SDL_TEXFORMAT_PALETTE16A;
 			break;
 		case TEXFORMAT_YUY16:
-			if (texsource->palette() != NULL)
+			if (texsource->palette != NULL)
 				texture->format = SDL_TEXFORMAT_YUY16_PALETTED;
 			else
 				texture->format = SDL_TEXFORMAT_YUY16;
@@ -2576,23 +2714,23 @@ static void texture_set_data(texture_info *texture, const render_texinfo *texsou
 				switch (PRIMFLAG_GET_TEXFORMAT(flags))
 				{
 					case TEXFORMAT_PALETTE16:
-						copyline_palette16((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette(), texture->borderpix, texture->xprescale);
+						copyline_palette16((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
 						break;
 
 					case TEXFORMAT_PALETTEA16:
-						copyline_palettea16((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette(), texture->borderpix, texture->xprescale);
+						copyline_palettea16((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
 						break;
 
 					case TEXFORMAT_RGB32:
-						copyline_rgb32((UINT32 *)dst, (UINT32 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette(), texture->borderpix, texture->xprescale);
+						copyline_rgb32((UINT32 *)dst, (UINT32 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
 						break;
 
 					case TEXFORMAT_ARGB32:
-						copyline_argb32((UINT32 *)dst, (UINT32 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette(), texture->borderpix, texture->xprescale);
+						copyline_argb32((UINT32 *)dst, (UINT32 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
 						break;
 
 					case TEXFORMAT_YUY16:
-						copyline_yuy16_to_argb((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette(), texture->borderpix, texture->xprescale);
+						copyline_yuy16_to_argb((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
 						break;
 
 					default:
@@ -2665,7 +2803,7 @@ static int compare_texture_primitive(const texture_info *texture, const render_p
 		texture->texinfo.width == prim->texture.width &&
 		texture->texinfo.height == prim->texture.height &&
 		texture->texinfo.rowpixels == prim->texture.rowpixels &&
-		/* texture->texinfo.palette() == prim->texture.palette() && */
+		/* texture->texinfo.palette == prim->texture.palette && */
 		((texture->flags ^ prim->flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0)
 		return 1;
 	else
@@ -2995,6 +3133,3 @@ void sdl_info_ogl::texture_all_disable()
 		pfn_glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, 0);
 	}
 }
-
-
-

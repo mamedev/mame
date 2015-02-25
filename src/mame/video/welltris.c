@@ -71,7 +71,7 @@ void welltris_state::video_start()
 	m_char_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(welltris_state::get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
 	m_char_tilemap->set_transparent_pen(15);
-	
+
 	save_item(NAME(m_gfxbank));
 	save_item(NAME(m_charpalettebank));
 	save_item(NAME(m_spritepalettebank));

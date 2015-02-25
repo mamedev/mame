@@ -31,6 +31,8 @@ static NSColor *SelectedCurrentBackground;
 static NSColor *InactiveSelectedBackground;
 static NSColor *InactiveSelectedCurrentBackground;
 
+static NSCharacterSet *NonWhiteCharacters;
+
 
 static void debugwin_view_update(debug_view &view, void *osdprivate)
 {
@@ -57,6 +59,8 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	SelectedCurrentBackground = [[NSColor colorWithCalibratedRed:0.875 green:0.625 blue:0.875 alpha:1.0] retain];
 	InactiveSelectedBackground = [[NSColor colorWithCalibratedWhite:0.875 alpha:1.0] retain];
 	InactiveSelectedCurrentBackground = [[NSColor colorWithCalibratedRed:0.875 green:0.5 blue:0.625 alpha:1.0] retain];
+
+	NonWhiteCharacters = [[NSCharacterSet whitespaceAndNewlineCharacterSet] invertedSet];
 }
 
 
@@ -161,26 +165,23 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (void)recomputeVisible {
-	if ([self window] != nil)
-	{
-		// this gets all the lines that are at least partially visible
-		debug_view_xy origin(0, 0), size(totalWidth, totalHeight);
-		[self convertBounds:[self visibleRect] toFirstAffectedLine:&origin.y count:&size.y];
+	// this gets all the lines that are at least partially visible
+	debug_view_xy origin(0, 0), size(totalWidth, totalHeight);
+	[self convertBounds:[self visibleRect] toFirstAffectedLine:&origin.y count:&size.y];
+	size.y = MIN(size.y, totalHeight - origin.y);
 
-		// tell them what we think
-		view->set_visible_size(size);
-		view->set_visible_position(origin);
-		originLeft = origin.x;
-		originTop = origin.y;
-	}
+	// tell the underlying view how much real estate is available
+	view->set_visible_size(size);
+	view->set_visible_position(origin);
+	originTop = origin.y;
 }
 
 
 - (void)typeCharacterAndScrollToCursor:(char)ch {
-	if (view->cursor_supported())
+	debug_view_xy const oldPos = view->cursor_position();
+	view->process_char(ch);
+	if (view->cursor_supported() && view->cursor_visible())
 	{
-		debug_view_xy const oldPos = view->cursor_position();
-		view->process_char(ch);
 		debug_view_xy const newPos = view->cursor_position();
 		if ((newPos.x != oldPos.x) || (newPos.y != oldPos.y))
 		{
@@ -190,9 +191,19 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 												 fontWidth,
 												 fontHeight)];
 		}
-	} else {
-		view->process_char(ch);
 	}
+}
+
+
+- (void)adjustSizeAndRecomputeVisible {
+	NSSize const clip = [[[self enclosingScrollView] contentView] bounds].size;
+	NSSize content = NSMakeSize((fontWidth * totalWidth) + (2 * [textContainer lineFragmentPadding]),
+								fontHeight * totalHeight);
+	if (wholeLineScroll)
+		content.height += (fontHeight * 2) - 1;
+	[self setFrameSize:NSMakeSize(ceil(MAX(clip.width, content.width)),
+								  ceil(MAX(clip.height, content.height)))];
+	[self recomputeVisible];
 }
 
 
@@ -201,7 +212,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 }
 
 
-- (id)initWithFrame:(NSRect)f type:(debug_view_type)t machine:(running_machine &)m {
+- (id)initWithFrame:(NSRect)f type:(debug_view_type)t machine:(running_machine &)m wholeLineScroll:(BOOL)w {
 	if (!(self = [super initWithFrame:f]))
 		return nil;
 	type = t;
@@ -211,8 +222,11 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 		[self release];
 		return nil;
 	}
-	totalWidth = totalHeight = 0;
-	originLeft = originTop = 0;
+	wholeLineScroll = w;
+	debug_view_xy const size = view->total_size();
+	totalWidth = size.x;
+	totalHeight = size.y;
+	originTop = 0;
 
 	text = [[NSTextStorage alloc] init];
 	textContainer = [[NSTextContainer alloc] init];
@@ -247,8 +261,17 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	BOOL const resized = (newSize.x != totalWidth) || (newSize.y != totalHeight);
 	if (resized)
 	{
-		[self setFrameSize:NSMakeSize((fontWidth * newSize.x) + (2 * [textContainer lineFragmentPadding]),
-									  fontHeight * newSize.y)];
+		NSScrollView *const scroller = [self enclosingScrollView];
+		if (scroller)
+		{
+			NSSize const clip = [[scroller contentView] bounds].size;
+			NSSize content = NSMakeSize((fontWidth * newSize.x) + (2 * [textContainer lineFragmentPadding]),
+										fontHeight * newSize.y);
+			if (wholeLineScroll)
+				content.height += (fontHeight * 2) - 1;
+			[self setFrameSize:NSMakeSize(ceil(MAX(clip.width, content.width)),
+										  ceil(MAX(clip.height, content.height)))];
+		}
 		totalWidth = newSize.x;
 		totalHeight = newSize.y;
 	}
@@ -257,12 +280,13 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	debug_view_xy const newOrigin = view->visible_position();
 	if (newOrigin.y != originTop)
 	{
-		[self scrollPoint:NSMakePoint([self visibleRect].origin.x, newOrigin.y * fontHeight)];
+		NSRect const visible = [self visibleRect];
+		NSPoint scroll = NSMakePoint(visible.origin.x, newOrigin.y * fontHeight);
+		[self scrollPoint:scroll];
 		originTop = newOrigin.y;
 	}
 
-	// recompute the visible area and mark as dirty
-	[self recomputeVisible];
+	// mark as dirty
 	[self setNeedsDisplay:YES];
 }
 
@@ -270,7 +294,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 - (NSSize)maximumFrameSize {
 	debug_view_xy const max = view->total_size();
 	return NSMakeSize(ceil((max.x * fontWidth) + (2 * [textContainer lineFragmentPadding])),
-					  ceil(max.y * fontHeight));
+					  ceil((max.y + (wholeLineScroll ? 1 : 0)) * fontHeight));
 }
 
 
@@ -317,8 +341,9 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 	for (UINT32 row = 0; row < size.y; row++, data += size.x)
 	{
+		// add content for the line and set colours
 		int			attr = -1;
-		NSUInteger	start = [text length], length = 0;
+		NSUInteger	start = [text length], length = start;
 		for (UINT32 col = 0; col < size.x; col++)
 		{
 			[[text mutableString] appendFormat:@"%c", data[col].byte];
@@ -336,19 +361,33 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 			attr = data[col].attrib & ~DCA_SELECTED;
 			length = [text length];
 		}
-		if (start < length)
-		{
-			NSRange const run = NSMakeRange(start, length - start);
-			[text addAttribute:NSForegroundColorAttributeName
-						 value:[self foregroundForAttribute:attr]
-						 range:run];
-			[text addAttribute:NSBackgroundColorAttributeName
-						 value:[self backgroundForAttribute:attr]
-						 range:run];
-		}
+
+		// clean up trailing whitespace
+		NSRange trim = [[text string] rangeOfCharacterFromSet:NonWhiteCharacters
+													  options:NSBackwardsSearch
+														range:NSMakeRange(start, length - start)];
+		if (trim.location != NSNotFound)
+			trim = [[text string] rangeOfComposedCharacterSequenceAtIndex:(trim.location + trim.length - 1)];
+		else if (start > 0)
+			trim = [[text string] rangeOfComposedCharacterSequenceAtIndex:(start - 1)];
+		else
+			trim = NSMakeRange(start, 0);
+		trim.location += trim.length;
+		trim.length = length - trim.location;
+		[text deleteCharactersInRange:trim];
+
+		// add the line ending and set colours
 		[[text mutableString] appendString:@"\n"];
+		NSRange const run = NSMakeRange(start, [text length] - start);
+		[text addAttribute:NSForegroundColorAttributeName
+					 value:[self foregroundForAttribute:attr]
+					 range:run];
+		[text addAttribute:NSBackgroundColorAttributeName
+					 value:[self backgroundForAttribute:attr]
+					 range:run];
 	}
 
+	// set the font and send it to the pasteboard
 	NSRange const run = NSMakeRange(0, [text length]);
 	[text addAttribute:NSFontAttributeName value:font range:run];
 	NSPasteboard *const board = [NSPasteboard generalPasteboard];
@@ -370,20 +409,47 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	NSData *const data = [[board stringForType:avail] dataUsingEncoding:NSASCIIStringEncoding
 												   allowLossyConversion:YES];
 	char const *const bytes = (char const *)[data bytes];
+	debug_view_xy const oldPos = view->cursor_position();
 	for (NSUInteger i = 0, l = [data length]; i < l; i++)
 		view->process_char(bytes[i]);
+	if (view->cursor_supported() && view->cursor_visible())
+	{
+		debug_view_xy const newPos = view->cursor_position();
+		if ((newPos.x != oldPos.x) || (newPos.y != oldPos.y))
+		{
+			// FIXME - use proper font metrics
+			[self scrollRectToVisible:NSMakeRect((newPos.x * fontWidth) + [textContainer lineFragmentPadding],
+												 newPos.y * fontHeight,
+												 fontWidth,
+												 fontHeight)];
+		}
+	}
+}
+
+
+- (void)viewBoundsDidChange:(NSNotification *)notification {
+	NSView *const changed = [notification object];
+	if (changed == [[self enclosingScrollView] contentView])
+		[self adjustSizeAndRecomputeVisible];
+}
+
+
+- (void)viewFrameDidChange:(NSNotification *)notification {
+	NSView *const changed = [notification object];
+	if (changed == [[self enclosingScrollView] contentView])
+		[self adjustSizeAndRecomputeVisible];
 }
 
 
 - (void)windowDidBecomeKey:(NSNotification *)notification {
-	NSWindow *win = [notification object];
+	NSWindow *const win = [notification object];
 	if ((win == [self window]) && ([win firstResponder] == self) && view->cursor_supported())
 		[self setNeedsDisplay:YES];
 }
 
 
 - (void)windowDidResignKey:(NSNotification *)notification {
-	NSWindow *win = [notification object];
+	NSWindow *const win = [notification object];
 	if ((win == [self window]) && ([win firstResponder] == self) && view->cursor_supported())
 		[self setNeedsDisplay:YES];
 }
@@ -410,14 +476,20 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (BOOL)becomeFirstResponder {
-	if (view->cursor_supported()) {
+	if (view->cursor_supported())
+	{
 		debug_view_xy pos;
 		view->set_cursor_visible(true);
 		pos = view->cursor_position();
-		[self scrollRectToVisible:NSMakeRect((pos.x * fontWidth) + [textContainer lineFragmentPadding], pos.y * fontHeight, fontWidth, fontHeight)]; // FIXME: metrics
+		[self scrollRectToVisible:NSMakeRect((pos.x * fontWidth) + [textContainer lineFragmentPadding],
+											 pos.y * fontHeight,
+											 fontWidth,
+											 fontHeight)]; // FIXME: metrics
 		[self setNeedsDisplay:YES];
 		return [super becomeFirstResponder];
-	} else {
+	}
+	else
+	{
 		return NO;
 	}
 }
@@ -431,15 +503,46 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (void)viewDidMoveToSuperview {
-	[[self enclosingScrollView] setLineScroll:fontHeight];
 	[super viewDidMoveToSuperview];
+
+	[[NSNotificationCenter defaultCenter] removeObserver:self
+													name:NSViewBoundsDidChangeNotification
+												  object:nil];
+	[[NSNotificationCenter defaultCenter] removeObserver:self
+													name:NSViewFrameDidChangeNotification
+												  object:nil];
+
+	NSScrollView *const scroller = [self enclosingScrollView];
+	if (scroller != nil)
+	{
+		[scroller setLineScroll:fontHeight];
+		[[scroller contentView] setPostsBoundsChangedNotifications:YES];
+		[[scroller contentView] setPostsFrameChangedNotifications:YES];
+		[[NSNotificationCenter defaultCenter] addObserver:self
+												 selector:@selector(viewBoundsDidChange:)
+													 name:NSViewBoundsDidChangeNotification
+												   object:[scroller contentView]];
+		[[NSNotificationCenter defaultCenter] addObserver:self
+												 selector:@selector(viewFrameDidChange:)
+													 name:NSViewFrameDidChangeNotification
+												   object:[scroller contentView]];
+		[self adjustSizeAndRecomputeVisible];
+	}
 }
 
 
 - (void)viewDidMoveToWindow {
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSWindowDidBecomeKeyNotification object:nil];
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSWindowDidResignKeyNotification object:nil];
-	if ([self window] != nil) {
+	[super viewDidMoveToWindow];
+
+	[[NSNotificationCenter defaultCenter] removeObserver:self
+													name:NSWindowDidBecomeKeyNotification
+												  object:nil];
+	[[NSNotificationCenter defaultCenter] removeObserver:self
+													name:NSWindowDidResignKeyNotification
+												  object:nil];
+
+	if ([self window] != nil)
+	{
 		[[NSNotificationCenter defaultCenter] addObserver:self
 												 selector:@selector(windowDidBecomeKey:)
 													 name:NSWindowDidBecomeKeyNotification
@@ -448,7 +551,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 												 selector:@selector(windowDidResignKey:)
 													 name:NSWindowDidResignKeyNotification
 												   object:[self window]];
-		[self recomputeVisible];
+		[self setNeedsDisplay:YES];
 	}
 }
 
@@ -458,27 +561,54 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 }
 
 
-- (void)drawRect:(NSRect)dirtyRect {
-	INT32 position, clip;
+- (BOOL)isOpaque {
+	return YES;
+}
 
-	// work out how much we need to draw
+
+- (NSRect)adjustScroll:(NSRect)proposedVisibleRect {
+	if (wholeLineScroll)
+	{
+		CGFloat const clamp = [self bounds].size.height - fontHeight - proposedVisibleRect.size.height;
+		proposedVisibleRect.origin.y = MIN(proposedVisibleRect.origin.y, MAX(clamp, 0));
+		proposedVisibleRect.origin.y -= fmod(proposedVisibleRect.origin.y, fontHeight);
+	}
+	return proposedVisibleRect;
+}
+
+
+- (void)drawRect:(NSRect)dirtyRect {
+	// work out what's available
 	[self recomputeVisible];
 	debug_view_xy const origin = view->visible_position();
 	debug_view_xy const size = view->visible_size();
-	[self convertBounds:dirtyRect toFirstAffectedLine:&position count:&clip];
+
+	// work out how much we need to draw
+	INT32 row, clip;
+	[self convertBounds:dirtyRect toFirstAffectedLine:&row count:&clip];
+	clip += row;
+	row = MAX(row, origin.y);
+	clip = MIN(clip, origin.y + size.y);
 
 	// this gets the text for the whole visible area
 	debug_view_char const *data = view->viewdata();
 	if (!data)
 		return;
 
-	data += ((position - origin.y) * size.x);
-	for (UINT32 row = position; row < position + clip; row++, data += size.x)
+	// clear any space above the available content
+	data += ((row - origin.y) * size.x);
+	if (dirtyRect.origin.y < (row * fontHeight))
 	{
-		if ((row < origin.y) || (row >= origin.y + size.y))
-			continue;
+		[DefaultBackground set];
+		[NSBezierPath fillRect:NSMakeRect(0,
+										  dirtyRect.origin.y,
+										  [self bounds].size.width,
+										  (row * fontHeight) - dirtyRect.origin.y)];
+	}
 
-		// render entire lines to get character alignment right
+	// render entire lines to get character alignment right
+	for ( ; row < clip; row++, data += size.x)
+	{
 		int			attr = -1;
 		NSUInteger	start = 0, length = 0;
 		for (UINT32 col = origin.x; col < origin.x + size.x; col++)
@@ -495,8 +625,13 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 							 range:run];
 				NSRange const glyphs = [layoutManager glyphRangeForCharacterRange:run
 															 actualCharacterRange:NULL];
-				NSRect const box = [layoutManager boundingRectForGlyphRange:glyphs
-															inTextContainer:textContainer];
+				NSRect box = [layoutManager boundingRectForGlyphRange:glyphs
+													  inTextContainer:textContainer];
+				if (start == 0)
+				{
+					box.size.width += box.origin.x;
+					box.origin.x = 0;
+				}
 				[[self backgroundForAttribute:attr] set];
 				[NSBezierPath fillRect:NSMakeRect(box.origin.x,
 												  row * fontHeight,
@@ -507,28 +642,38 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 			attr = data[col - origin.x].attrib;
 			length = [text length];
 		}
-		if (start < length)
-		{
-			NSRange const run = NSMakeRange(start, length - start);
-			[text addAttribute:NSFontAttributeName
-						 value:font
-						 range:NSMakeRange(0, length)];
-			[text addAttribute:NSForegroundColorAttributeName
-						 value:[self foregroundForAttribute:attr]
-						 range:run];
-			NSRange const glyphs = [layoutManager glyphRangeForCharacterRange:run
-														 actualCharacterRange:NULL];
-			NSRect const box = [layoutManager boundingRectForGlyphRange:glyphs
-														inTextContainer:textContainer];
-			[[self backgroundForAttribute:attr] set];
-			[NSBezierPath fillRect:NSMakeRect(box.origin.x,
-											  row * fontHeight,
-											  box.size.width,
-											  fontHeight)];
-		}
+		NSRange const run = NSMakeRange(start, length - start);
+		[text addAttribute:NSFontAttributeName
+					 value:font
+					 range:NSMakeRange(0, length)];
+		[text addAttribute:NSForegroundColorAttributeName
+					 value:[self foregroundForAttribute:attr]
+					 range:run];
+		NSRange const glyphs = [layoutManager glyphRangeForCharacterRange:run
+													 actualCharacterRange:NULL];
+		NSRect box = [layoutManager boundingRectForGlyphRange:glyphs
+											  inTextContainer:textContainer];
+		if (start == 0)
+			box.origin.x = 0;
+		box.size.width = MAX([self bounds].size.width - box.origin.x, 0);
+		[[self backgroundForAttribute:attr] set];
+		[NSBezierPath fillRect:NSMakeRect(box.origin.x,
+										  row * fontHeight,
+										  box.size.width,
+										  fontHeight)];
 		[layoutManager drawGlyphsForGlyphRange:[layoutManager glyphRangeForTextContainer:textContainer]
 									   atPoint:NSMakePoint(0, row * fontHeight)];
 		[text deleteCharactersInRange:NSMakeRange(0, length)];
+	}
+
+	// clear any space below the available content
+	if ((dirtyRect.origin.y + dirtyRect.size.height) > (row * fontHeight))
+	{
+		[DefaultBackground set];
+		[NSBezierPath fillRect:NSMakeRect(0,
+										  row * fontHeight,
+										  [self bounds].size.width,
+										  (dirtyRect.origin.y + dirtyRect.size.height) - (row * fontHeight))];
 	}
 }
 
@@ -540,7 +685,6 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 					  : (modifiers & NSAlternateKeyMask) ? DCK_MIDDLE_CLICK
 					  : DCK_LEFT_CLICK,
 						[self convertLocation:location]);
-	[self setNeedsDisplay:YES];
 }
 
 

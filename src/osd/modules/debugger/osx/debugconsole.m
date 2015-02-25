@@ -45,7 +45,6 @@
 	// create the register view
 	regView = [[MAMERegistersView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100) machine:*machine];
 	regScroll = [[NSScrollView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100)];
-	[regScroll setDrawsBackground:YES];
 	[regScroll setHasHorizontalScroller:YES];
 	[regScroll setHasVerticalScroller:YES];
 	[regScroll setAutohidesScrollers:YES];
@@ -57,7 +56,6 @@
 	dasmView = [[MAMEDisassemblyView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100) machine:*machine];
 	[dasmView setExpression:@"curpc"];
 	dasmScroll = [[NSScrollView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100)];
-	[dasmScroll setDrawsBackground:YES];
 	[dasmScroll setHasHorizontalScroller:YES];
 	[dasmScroll setHasVerticalScroller:YES];
 	[dasmScroll setAutohidesScrollers:YES];
@@ -68,7 +66,6 @@
 	// create the console view
 	consoleView = [[MAMEConsoleView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100) machine:*machine];
 	consoleScroll = [[NSScrollView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100)];
-	[consoleScroll setDrawsBackground:YES];
 	[consoleScroll setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
 	[consoleScroll setHasHorizontalScroller:YES];
 	[consoleScroll setHasVerticalScroller:YES];
@@ -240,9 +237,9 @@
 		// if it doesn't exist, add a new one
 		NSString *command;
 		if (bp == NULL)
-			command = [NSString stringWithFormat:@"bpset %lX", (unsigned long)address];
+			command = [NSString stringWithFormat:@"bpset 0x%lX", (unsigned long)address];
 		else
-			command = [NSString stringWithFormat:@"bpclear %X", (unsigned)bp->index()];
+			command = [NSString stringWithFormat:@"bpclear 0x%X", (unsigned)bp->index()];
 		debug_console_execute_command(*machine, [command UTF8String], 1);
 	}
 }
@@ -258,9 +255,9 @@
 		{
 			NSString *command;
 			if (bp->enabled())
-				command = [NSString stringWithFormat:@"bpdisable %X", (unsigned)bp->index()];
+				command = [NSString stringWithFormat:@"bpdisable 0x%X", (unsigned)bp->index()];
 			else
-				command = [NSString stringWithFormat:@"bpenable %X", (unsigned)bp->index()];
+				command = [NSString stringWithFormat:@"bpenable 0x%X", (unsigned)bp->index()];
 			debug_console_execute_command(*machine, [command UTF8String], 1);
 		}
 	}

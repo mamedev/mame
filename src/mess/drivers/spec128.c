@@ -173,7 +173,7 @@ WRITE8_MEMBER(spectrum_state::spectrum_128_port_7ffd_w)
 			return;
 
 	if ((m_port_7ffd_data ^ data) & 0x08)
-		spectrum_UpdateBorderBitmap();
+		spectrum_UpdateScreenBitmap();
 
 	/* store new state */
 	m_port_7ffd_data = data;

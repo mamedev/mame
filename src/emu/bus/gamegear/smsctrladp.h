@@ -16,7 +16,7 @@
 
 #include "emu.h"
 #include "ggext.h"
-#include "../sms_ctrl/smsctrl.h"
+#include "bus/sms_ctrl/smsctrl.h"
 
 
 

@@ -108,21 +108,21 @@ CPU_DISASSEMBLE( amis2000 )
 
 	char *dst = buffer;
 	dst += sprintf(dst, "%-5s ", s_mnemonics[instr]);
-	
+
 	// opcode parameter
 	int mask = s_bits[instr];
 	bool complement = (mask < 0);
 	if (mask < 0)
 		mask = -mask;
 	mask = (1 << mask) - 1;
-	
+
 	if (mask != 0)
 	{
 		UINT8 param = op;
 		if (complement)
 			param = ~param;
 		param &= mask;
-		
+
 		if (mask < 0x10)
 			dst += sprintf(dst, "%d", param);
 		else

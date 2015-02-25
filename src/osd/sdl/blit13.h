@@ -35,7 +35,6 @@ inline UINT32 ycc_to_rgb(const UINT8 y, const UINT8 cb, const UINT8 cr)
 
 inline UINT32 pixel_ycc_to_rgb(const UINT16 *pixel)
 {
-
 	const UINT32 p = *(UINT32 *)((FPTR) pixel & ~3);
 	return ycc_to_rgb((*pixel >> 8) & 0xff, (p) & 0xff, (p>>16) & 0xff);
 }
@@ -53,17 +52,17 @@ inline UINT32 pixel_ycc_to_rgb_pal(const UINT16 *pixel, const rgb_t *palette)
 
 #define FUNC_DEF(source) op(const source &src, const rgb_t *palbase) const
 #define FUNCTOR(name, x...) \
-    template<typename _source, typename _dest> \
-    struct name { _dest FUNC_DEF(_source) { x } };
+	template<typename _source, typename _dest> \
+	struct name { _dest FUNC_DEF(_source) { x } };
 
 FUNCTOR(op_argb32_argb32, return src; )
 FUNCTOR(op_rgb32_argb32,  return src | 0xff000000; )
 FUNCTOR(op_pal16_argb32,  return 0xff000000 |palbase[src]; )
 FUNCTOR(op_pal16_rgb32,   return palbase[src]; )
 FUNCTOR(op_rgb32pal_argb32,
-    return palbase[0x200 + (((src) >> 16) & 0xff) ] |
-        palbase[0x100 + (((src) >> 8) & 0xff) ] |
-        palbase[((src) & 0xff) ] | 0xff000000; )
+	return palbase[0x200 + (((src) >> 16) & 0xff) ] |
+		palbase[0x100 + (((src) >> 8) & 0xff) ] |
+		palbase[((src) & 0xff) ] | 0xff000000; )
 
 FUNCTOR(op_pal16a_argb32, return palbase[src]; )
 
@@ -74,21 +73,21 @@ FUNCTOR(op_rgb15_argb32,
 
 FUNCTOR(op_rgb15pal_argb32,
 		return 0xff000000 | palbase[0x40 + ((src >> 10) & 0x1f)] |
-        palbase[0x20 + ((src >> 5) & 0x1f)] | palbase[0x00 + ((src >> 0) & 0x1f)]; )
+		palbase[0x20 + ((src >> 5) & 0x1f)] | palbase[0x00 + ((src >> 0) & 0x1f)]; )
 
 FUNCTOR(op_argb32_rgb32, return premult32(src); )
 FUNCTOR(op_pal16a_rgb32, return premult32(palbase[src]); )
 FUNCTOR(op_pal16_argb1555,
 		return (palbase[src]&0xf80000) >> 9 |
-            (palbase[src]&0x00f800) >> 6 |
-            (palbase[src]&0x0000f8) >> 3 | 0x8000; )
+			(palbase[src]&0x00f800) >> 6 |
+			(palbase[src]&0x0000f8) >> 3 | 0x8000; )
 
 FUNCTOR(op_rgb15_argb1555, return src | 0x8000; )
 
 FUNCTOR(op_rgb15pal_argb1555,
 		return (palbase[src >> 10] & 0xf8) << 7 |
-            (palbase[(src >> 5) & 0x1f] & 0xf8) << 2 |
-            (palbase[src & 0x1f] & 0xf8) >> 3 | 0x8000; )
+			(palbase[(src >> 5) & 0x1f] & 0xf8) << 2 |
+			(palbase[src & 0x1f] & 0xf8) >> 3 | 0x8000; )
 
 FUNCTOR(op_yuv16_uyvy, return src; )
 FUNCTOR(op_yuv16pal_uyvy, return (palbase[(src >> 8) & 0xff] << 8) | (src & 0x00ff); )
@@ -106,11 +105,11 @@ FUNCTOR(op_yuv16pal_yuy2,
 
 FUNCTOR(op_yuv16_argb32,
 		return (UINT64) ycc_to_rgb((src >>  8) & 0xff, src & 0xff , (src>>16) & 0xff)
-    | ((UINT64)ycc_to_rgb((src >> 24) & 0xff, src & 0xff , (src>>16) & 0xff) << 32); )
+	| ((UINT64)ycc_to_rgb((src >> 24) & 0xff, src & 0xff , (src>>16) & 0xff) << 32); )
 
 FUNCTOR(op_yuv16pal_argb32,
 		return (UINT64)ycc_to_rgb(palbase[(src >>  8) & 0xff], src & 0xff , (src>>16) & 0xff)
-    | ((UINT64)ycc_to_rgb(palbase[(src >> 24) & 0xff], src & 0xff , (src>>16) & 0xff) << 32);)
+	| ((UINT64)ycc_to_rgb(palbase[(src >> 24) & 0xff], src & 0xff , (src>>16) & 0xff) << 32);)
 
 FUNCTOR(op_yuv16_argb32rot, return pixel_ycc_to_rgb(&src) ; )
 
@@ -121,7 +120,6 @@ FUNCTOR(op_yuv16pal_argb32rot, return pixel_ycc_to_rgb_pal(&src, palbase); )
 //============================================================
 
 struct blit_base {
-
 	blit_base(int dest_bpp, bool is_rot, bool is_passthrough)
 	: m_dest_bpp(dest_bpp), m_is_rot(is_rot), m_is_passthrough(is_passthrough)
 	{ }
@@ -137,24 +135,24 @@ template<typename _src_type, typename _dest_type, typename _op, int _len_div>
 struct blit_texcopy : public blit_base
 {
 	blit_texcopy() : blit_base(sizeof(_dest_type) / _len_div, false, false) { }
-    void texop(const texture_info *texture, const render_texinfo *texsource) const
-    {
-    	ATTR_UNUSED const rgb_t *palbase = texsource->palette();
-    	int x, y;
-    	/* loop over Y */
-    	for (y = 0; y < texsource->height; y++) {
-    		_src_type *src = (_src_type *)texsource->base + y * texsource->rowpixels / (_len_div);
-    		_dest_type *dst = (_dest_type *)((UINT8 *)texture->m_pixels + y * texture->m_pitch);
-    		x = texsource->width / (_len_div);
-    		while (x > 0) {
-    			*dst++ = m_op.op(*src, palbase);
-    			src++;
-    			x--;
-    		}
-    	}
-    }
+	void texop(const texture_info *texture, const render_texinfo *texsource) const
+	{
+		ATTR_UNUSED const rgb_t *palbase = texsource->palette;
+		int x, y;
+		/* loop over Y */
+		for (y = 0; y < texsource->height; y++) {
+			_src_type *src = (_src_type *)texsource->base + y * texsource->rowpixels / (_len_div);
+			_dest_type *dst = (_dest_type *)((UINT8 *)texture->m_pixels + y * texture->m_pitch);
+			x = texsource->width / (_len_div);
+			while (x > 0) {
+				*dst++ = m_op.op(*src, palbase);
+				src++;
+				x--;
+			}
+		}
+	}
 private:
-    _op m_op;
+	_op m_op;
 };
 
 #define TEXCOPYA(a, b, c, d) \
@@ -166,7 +164,7 @@ struct blit_texrot : public blit_base
 	blit_texrot() : blit_base(sizeof(_dest_type), true, false) { }
 	void texop(const texture_info *texture, const render_texinfo *texsource) const
 	{
-		ATTR_UNUSED const rgb_t *palbase = texsource->palette();
+		ATTR_UNUSED const rgb_t *palbase = texsource->palette;
 		int x, y;
 		const quad_setup_data *setup = &texture->m_setup;
 		int dudx = setup->dudx;
@@ -187,7 +185,7 @@ struct blit_texrot : public blit_base
 		}
 	}
 private:
-    _op m_op;
+	_op m_op;
 };
 
 #define TEXROTA(a, b, c) \

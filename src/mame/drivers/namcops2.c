@@ -571,7 +571,7 @@ ROM_START( vnight )
 	ROM_LOAD( "vpn3verb.ic002", 0x000000, 0x800000, CRC(d0011dc6) SHA1(d01a418b4b83057708e8f0ac4b271112b4a24d15) )
 	ROM_LOAD( "vpn3verb_spr.ic002", 0x800000, 0x040000, CRC(41169c24) SHA1(40bffbe93da65fe5512be9f80254b034a071c38b) )
 
-	DISK_REGION("dvd")	// actually single-track CD-ROM
+	DISK_REGION("dvd")  // actually single-track CD-ROM
 	DISK_IMAGE_READONLY( "vpn1cd0", 0, SHA1(714bd19eee3b31a060223003e4567e405ce04cd7) )
 ROM_END
 

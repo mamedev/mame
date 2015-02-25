@@ -50,7 +50,7 @@ VIDEO_START_MEMBER(gladiatr_state,ppking)
 	m_bg_tilemap->set_scroll_cols(0x10);
 
 	m_sprite_bank = 1;
-	
+
 	save_item(NAME(m_video_attributes));
 	save_item(NAME(m_fg_scrolly));
 	save_item(NAME(m_sprite_buffer));
@@ -68,7 +68,7 @@ VIDEO_START_MEMBER(gladiatr_state,gladiatr)
 	m_fg_tilemap->set_scrolldx(-0x30, 0x12f);
 
 	m_sprite_bank = 2;
-	
+
 	save_item(NAME(m_video_attributes));
 	save_item(NAME(m_fg_scrollx));
 	save_item(NAME(m_fg_scrolly));

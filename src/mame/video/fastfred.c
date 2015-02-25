@@ -345,7 +345,7 @@ VIDEO_START_MEMBER(fastfred_state,imago)
 	/* web colors */
 	m_palette->set_pen_color(256+64+0,rgb_t(0x50,0x00,0x00));
 	m_palette->set_pen_color(256+64+1,rgb_t(0x00,0x00,0x00));
-	
+
 	save_item(NAME(m_imago_sprites));
 	save_item(NAME(m_imago_sprites_address));
 	save_item(NAME(m_imago_sprites_bank));
@@ -356,7 +356,7 @@ VIDEO_START_MEMBER(fastfred_state,imago)
 	save_item(NAME(m_timer_adjusted));
 	save_item(NAME(m_stars_colors_start));
 	save_item(NAME(m_stars_scrollpos));
-	
+
 	for (int i = 0; i < STAR_COUNT; i++)
 	{
 		save_item(NAME(m_stars[i].x), i);

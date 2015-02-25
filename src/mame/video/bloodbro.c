@@ -61,7 +61,7 @@ void bloodbro_state::video_start()
 
 	m_fg_tilemap->set_transparent_pen(15);
 	m_tx_tilemap->set_transparent_pen(15);
-	
+
 	save_item(NAME(m_scrollram));
 	save_item(NAME(m_layer_en));
 }

@@ -306,7 +306,7 @@ static ADDRESS_MAP_START( pcd_io, AS_IO, 16, pcd_state )
 	AM_RANGE(0xf9c0, 0xf9c3) AM_DEVREADWRITE8("usart1",mc2661_device,read,write,0xffff)  // UARTs
 	AM_RANGE(0xf9d0, 0xf9d3) AM_DEVREADWRITE8("usart2",mc2661_device,read,write,0xffff)
 	AM_RANGE(0xf9e0, 0xf9e3) AM_DEVREADWRITE8("usart3",mc2661_device,read,write,0xffff)
-//	AM_RANGE(0xfa00, 0xfa7f) // pcs4-n (peripheral chip select)
+//  AM_RANGE(0xfa00, 0xfa7f) // pcs4-n (peripheral chip select)
 	AM_RANGE(0xfb00, 0xfb01) AM_READWRITE8(detect_r, detect_w, 0xff00) // expansion card detection?
 	AM_RANGE(0xfb00, 0xffff) AM_READWRITE8(nmi_io_r, nmi_io_w, 0xffff)
 ADDRESS_MAP_END

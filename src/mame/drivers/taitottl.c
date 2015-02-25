@@ -156,7 +156,7 @@ MACHINE_CONFIG_END
 /*
 
  Gunman
- 
+
  label  loc. Part #
  ==========================================================
  CR11   N5  74s287      yes, it says CRxx not GNxx

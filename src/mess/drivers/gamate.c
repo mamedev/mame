@@ -10,8 +10,8 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "rendlay.h"
-
-//#define USE_GFX
+#include "includes/gamate.h"
+#include "ui/ui.h"
 
 class gamate_state : public driver_device
 {
@@ -19,10 +19,8 @@ public:
 	gamate_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_sound(*this, "custom")
 		, m_cart(*this, "cartslot")
-#ifdef USE_GFX
-		, m_gfxdecode(*this, "gfxdecode")
-#endif
 		, m_io_joy(*this, "JOY")
 		, m_palette(*this, "palette")
 		, m_bios(*this, "bios")
@@ -75,17 +73,14 @@ private:
 	} card_protection;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<gamate_sound_device> m_sound;
 	required_device<generic_slot_device> m_cart;
-#ifdef USE_GFX
-	required_device<gfxdecode_device> m_gfxdecode;
-#endif
 	required_ioport m_io_joy;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT8> m_bios;
 	emu_timer *timer1;
 	emu_timer *timer2;
 	UINT8 bank_multi;
-	UINT8 *m_cart_ptr;
 };
 
 WRITE8_MEMBER( gamate_state::gamate_cart_protection_w )
@@ -97,7 +92,7 @@ WRITE8_MEMBER( gamate_state::gamate_cart_protection_w )
 		card_protection.failed= card_protection.failed || ((card_protection.cartridge_byte&0x80)!=0) != ((data&4)!=0);
 		card_protection.bit_shifter++;
 		if (card_protection.bit_shifter>=8) {
-			card_protection.cartridge_byte=m_cart_ptr[card_protection.address++];
+			card_protection.cartridge_byte=m_cart->get_rom_base()[card_protection.address++];
 			card_protection.bit_shifter=0;
 		}
 		break;
@@ -107,7 +102,7 @@ READ8_MEMBER( gamate_state::gamate_cart_protection_r )
 {
 	UINT8 ret=1;
 	if (card_protection.bit_shifter==7 && card_protection.unprotected) {
-	ret=m_cart_ptr[bank_multi*0x4000];
+	ret=m_cart->get_rom_base()[bank_multi*0x4000];
 	} else {
 	card_protection.bit_shifter++;
 	if (card_protection.bit_shifter==8) {
@@ -132,7 +127,7 @@ WRITE8_MEMBER( gamate_state::protection_reset )
 	// writes 0x20
 	card_protection.address=0x6005-0x6001;
 	card_protection.bit_shifter=0;
-	card_protection.cartridge_byte=m_cart_ptr[card_protection.address++];//m_cart_rom[card_protection.address++];
+	card_protection.cartridge_byte=m_cart->get_rom_base()[card_protection.address++];//m_cart_rom[card_protection.address++];
 	card_protection.failed=false;
 	card_protection.unprotected=false;
 }
@@ -148,19 +143,23 @@ WRITE8_MEMBER( gamate_state::gamate_video_w )
 {
 	video.reg[offset]=data;
 	switch (offset) {
-	case 1: video.bitmap.write=data&0xc0; // more addressing mode
+	case 1:
+		if (data&0xf) printf("lcd mode %x\n", data);
+		video.bitmap.write=data&0xc0; // more addressing mode
 		video.y_increment=data&0x40;
 		break;
-	case 2: video.bitmap.xpos=data;break; // at least 7 bits
-	case 3: video.bitmap.ypos=data;break; // at least 7 bits
+	case 2: video.bitmap.xpos=data;break;
+	case 3:
+		if (data>=200) printf("lcd ypos: %x\n", data);
+		video.bitmap.ypos=data;
+		break;
 	case 4: video.bitmap.page2=data&0x80;video.x=data&0x7f;break;
 	case 5: video.y=data;break;
 	case 7:
+	if (video.y>=200)
+	machine().ui().popup_time(2, "bitmap write to x:%x y:%x mode:%x data:%x\n", video.x, video.y, video.reg[1], data);
 	if (video.bitmap.write) {
-		if (video.x<ARRAY_LENGTH(video.bitmap.data[0][0]) /*&& video.y<ARRAY_LENGTH(video.bitmap.data[0])*/)
 		video.bitmap.data[video.bitmap.page2][video.y][video.x]=data;
-		else
-		logerror("%.6f %04x video bitmap x %x invalid\n",machine().time().as_double(), m_maincpu->pc(), video.x);
 	} else {
 		video.bitmap.data[0][video.y][video.x&(ARRAY_LENGTH(video.bitmap.data[0][0])-1)]=data;
 	}
@@ -172,12 +171,12 @@ WRITE8_MEMBER( gamate_state::gamate_video_w )
 WRITE8_MEMBER( gamate_state::cart_bankswitchmulti_w )
 {
 	bank_multi=data;
-	membank("bankmulti")->set_base(m_cart_ptr+0x4000*data+1);
+	membank("bankmulti")->set_base(m_cart->get_rom_base()+0x4000*data+1);
 }
 
 WRITE8_MEMBER( gamate_state::cart_bankswitch_w )
 {
-	membank("bank")->set_base(m_cart_ptr+0x4000*data);
+	membank("bank")->set_base(m_cart->get_rom_base()+0x4000*data);
 }
 
 READ8_MEMBER( gamate_state::gamate_video_r )
@@ -185,26 +184,25 @@ READ8_MEMBER( gamate_state::gamate_video_r )
 	if (offset!=6) return 0;
 	UINT8 data=0;
 	if (video.bitmap.write) {
-		if (video.x<ARRAY_LENGTH(video.bitmap.data[0][0]) /*&& video.y<ARRAY_LENGTH(video.bitmap.data[0])*/)
-		data=video.bitmap.data[video.bitmap.page2][video.y][video.x];
-		else
-		logerror("%.6f video bitmap x %x invalid\n",machine().time().as_double(),video.x);
+	data=video.bitmap.data[video.bitmap.page2][video.y][video.x];
 	} else {
 	data=video.bitmap.data[0][video.y][video.x&(ARRAY_LENGTH(video.bitmap.data[0][0])-1)];
 	}
-	if (m_maincpu->pc()<0xf000)
-	logerror("%.6f video read %04x %02x\n",machine().time().as_double(),offset, data);
+//  if (m_maincpu->pc()<0xf000)
+//    machine().ui().popup_time(2, "lcd read x:%x y:%x mode:%x data:%x\n", video.x, video.y, video.reg[1], data);
 	return data;
 }
 
 WRITE8_MEMBER( gamate_state::gamate_audio_w )
 {
-	logerror("%.6f %04x audio write %04x %02x\n",machine().time().as_double(),m_maincpu->pc(),offset,data);
+//  printf("audio write %x:%x\n", offset, data);//logerror("%.6f %04x audio write %04x %02x\n",machine().time().as_double(),m_maincpu->pc(),offset,data);
+	m_sound->device_w(space, offset, data);
 }
 
 READ8_MEMBER( gamate_state::gamate_audio_r )
 {
-	logerror("%.6f %04x audio read %04x \n",machine().time().as_double(),m_maincpu->pc(),offset);
+// legend of dragon knight
+//  machine().ui().popup_time(2, "%.6f %04x audio read %04x \n",machine().time().as_double(),m_maincpu->pc(),offset);
 	return 0;
 }
 
@@ -247,25 +245,11 @@ static INPUT_PORTS_START( gamate )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("Select")
 INPUT_PORTS_END
 
-#ifdef USE_GFX
-static const struct gfx_layout gamate_charlayout =
+ATTR_UNUSED static const unsigned short gamate_palette[4] =
 {
-		4,      /* width of object */
-		1,      /* height of object */
-		256,/* 256 characters */
-		2,      /* bits per pixel */
-		{ 0,4 }, /* no bitplanes */
-		/* x offsets */
-		{ 0,1,2,3 },
-		/* y offsets */
-		{ 0 },
-		8*1 /* size of 1 object in bits */
+	0,1,2,3
 };
 
-static GFXDECODE_START( gamate )
-		GFXDECODE_ENTRY( "gfx1", 0x0000, gamate_charlayout, 0, 0x100 )
-GFXDECODE_END
-#endif
 
 /* palette in red, green, blue tribles */
 static const unsigned char gamate_colors[4][3] =
@@ -286,7 +270,6 @@ PALETTE_INIT_MEMBER(gamate_state, gamate)
 	}
 }
 
-#ifndef USE_GFX
 static void BlitPlane(UINT16* line, UINT8 plane1, UINT8 plane2)
 {
 	line[3]=(plane1&1)|((plane2<<1)&2);
@@ -294,22 +277,27 @@ static void BlitPlane(UINT16* line, UINT8 plane1, UINT8 plane2)
 	line[1]=((plane1>>2)&1)|((plane2>>1)&2);
 	line[0]=((plane1>>3)&1)|((plane2>>2)&2);
 }
-#endif
 
 UINT32 gamate_state::screen_update_gamate(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y, j;
 	for (y=0;y<152;y++) {
 	for (x=-(video.bitmap.xpos&7), j=0;x<160;x+=8, j++) {
-		UINT8 d1=video.bitmap.data[0][(y+video.bitmap.ypos)&0xff][(j+video.bitmap.xpos/8)&0x1f];
-		UINT8 d2=video.bitmap.data[1][(y+video.bitmap.ypos)&0xff][(j+video.bitmap.xpos/8)&0x1f];
-#ifdef USE_GFX
-		m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, (d1&0xf)|((d2&0xf)<<4), 0,0,0,x+4,y);
-	m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, (d1>>4)|(d2&0xf0),0,0,0,x,y);
-#else
+		UINT8 d1, d2;
+		if (video.bitmap.ypos<200) {
+	d1=video.bitmap.data[0][(y+video.bitmap.ypos)%200][(j+video.bitmap.xpos/8)&0x1f];
+	d2=video.bitmap.data[1][(y+video.bitmap.ypos)%200][(j+video.bitmap.xpos/8)&0x1f];
+		} else if ((video.bitmap.ypos&0xf)<8) { // lcdtest, of course still some registers not known, my gamate doesn't display bottom lines
+	int yi=(y+(video.bitmap.ypos&0xf)-8);
+	if (yi<0) yi=video.bitmap.ypos+y; // in this case only 2nd plane used!?, source of first plane?
+	d1=video.bitmap.data[0][yi][(j+video.bitmap.xpos/8)&0x1f]; // value of lines bevor 0 chaos
+	d2=video.bitmap.data[1][yi][(j+video.bitmap.xpos/8)&0x1f];
+		} else {
+	d1=video.bitmap.data[0][y][(j+video.bitmap.xpos/8)&0x1f];
+	d2=video.bitmap.data[1][y][(j+video.bitmap.xpos/8)&0x1f];
+		}
 		BlitPlane(&bitmap.pix16(y, x+4), d1, d2);
 		BlitPlane(&bitmap.pix16(y, x), d1>>4, d2>>4);
-#endif
 	}
 	}
 	return 0;
@@ -318,10 +306,6 @@ UINT32 gamate_state::screen_update_gamate(screen_device &screen, bitmap_ind16 &b
 DRIVER_INIT_MEMBER(gamate_state,gamate)
 {
 	memset(&video, 0, sizeof(video));/* memset(m_ram, 0, sizeof(m_ram));*/
-#ifdef USE_GFX
-	UINT8 *gfx=memregion("gfx1")->base();
-	for (int i=0; i<256; i++) gfx[i]=i;
-#endif
 	timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamate_state::gamate_timer),this));
 	timer2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamate_state::gamate_timer2),this));
 }
@@ -329,10 +313,8 @@ DRIVER_INIT_MEMBER(gamate_state,gamate)
 
 void gamate_state::machine_start()
 {
-	m_cart_ptr = memregion("maincpu")->base() + 0x6000;
 	if (m_cart->exists()) {
 //      m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x6000, READ8_DELEGATE(gamate_state, gamate_cart_protection_r));
-		m_cart_ptr = m_cart->get_rom_base();
 		membank("bankmulti")->set_base(m_cart->get_rom_base()+1);
 		membank("bank")->set_base(m_cart->get_rom_base()+0x4000); // bankswitched games in reality no offset
 	}
@@ -367,7 +349,7 @@ TIMER_CALLBACK_MEMBER(gamate_state::gamate_timer2)
 	timer1->enable(TRUE);
 	timer1->reset(m_maincpu->cycles_to_attotime(10/* cycles short enought to clear irq line early enough*/));
 	timer2->enable(TRUE);
-	timer2->reset(m_maincpu->cycles_to_attotime(40000));
+	timer2->reset(m_maincpu->cycles_to_attotime(32768/2));
 }
 
 
@@ -376,7 +358,7 @@ INTERRUPT_GEN_MEMBER(gamate_state::gamate_interrupt)
 }
 
 static MACHINE_CONFIG_START( gamate, gamate_state )
-	MCFG_CPU_ADD("maincpu", M6502, 4433000)
+	MCFG_CPU_ADD("maincpu", M6502, 4433000/2)
 	MCFG_CPU_PROGRAM_MAP(gamate_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gamate_state,  gamate_interrupt)
 
@@ -387,12 +369,15 @@ static MACHINE_CONFIG_START( gamate, gamate_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gamate_state, screen_update_gamate)
 	MCFG_SCREEN_PALETTE("palette")
 
-#ifdef USE_GFX
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gamate )
-#endif
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(gamate_colors))
 	MCFG_PALETTE_INIT_OWNER(gamate_state, gamate)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("custom", GAMATE_SND, 0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "gamate_cart")
 	MCFG_GENERIC_MANDATORY
@@ -407,11 +392,8 @@ ROM_START(gamate)
 	ROMX_LOAD("gamate_bios_umc.bin", 0xf000, 0x1000, CRC(07090415) SHA1(ea449dc607601f9a68d855ad6ab53800d2e99297), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "newer", "NEWER")
 	ROMX_LOAD("gamate_bios_9130__unknown__bit_icasc00001_9130-bs_r32261.bin", 0xf000, 0x1000, CRC(03a5f3a7) SHA1(4e9dfbfe916ca485530ef4221593ab68738e2217), ROM_BIOS(2) )
-#ifdef USE_GFX
-	ROM_REGION(0x100,"gfx1", ROMREGION_ERASEFF)
-#endif
 ROM_END
 
 
 /*    YEAR  NAME      PARENT  COMPAT    MACHINE   INPUT    CLASS          INIT      COMPANY    FULLNAME */
-CONS( 19??, gamate,  0,      0,        gamate,  gamate, gamate_state, gamate, "Bit Corp", "Gamate", GAME_NO_SOUND)
+CONS( 19??, gamate,  0,      0,        gamate,  gamate, gamate_state, gamate, "Bit Corp", "Gamate", GAME_IMPERFECT_SOUND)

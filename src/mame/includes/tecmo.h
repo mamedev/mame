@@ -15,7 +15,7 @@ public:
 		m_txvideoram(*this, "txvideoram"),
 		m_fgvideoram(*this, "fgvideoram"),
 		m_bgvideoram(*this, "bgvideoram"),
-		m_spriteram(*this, "spriteram")	{ }
+		m_spriteram(*this, "spriteram") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -56,22 +56,22 @@ public:
 	DECLARE_WRITE8_MEMBER(adpcm_start_w);
 	DECLARE_WRITE8_MEMBER(adpcm_vol_w);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
-	
+
 	DECLARE_DRIVER_INIT(silkworm);
 	DECLARE_DRIVER_INIT(rygar);
 	DECLARE_DRIVER_INIT(backfirt);
 	DECLARE_DRIVER_INIT(gemini);
-	
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(gemini_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(gemini_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 };

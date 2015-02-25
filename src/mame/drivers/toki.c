@@ -67,13 +67,8 @@ WRITE_LINE_MEMBER(toki_state::tokib_adpcm_int)
 
 WRITE8_MEMBER(toki_state::tokib_adpcm_control_w)
 {
-	int bankaddress;
-	UINT8 *RAM = memregion("audiocpu")->base();
-
-
 	/* the code writes either 2 or 3 in the bottom two bits */
-	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
-	membank("bank1")->set_base(&RAM[bankaddress]);
+	membank("bank1")->set_entry(data & 1);
 
 	m_msm->reset_w(data & 0x08);
 }
@@ -312,9 +307,9 @@ INPUT_PORTS_END
 static const gfx_layout toki_charlayout =
 {
 	8,8,
-	4096,
+	RGN_FRAC(1,2),
 	4,
-	{ 4096*16*8+0, 4096*16*8+4, 0, 4 },
+	{ RGN_FRAC(1,2), RGN_FRAC(1,2)+4, 0, 4 },
 	{ 3, 2, 1, 0, 8+3, 8+2, 8+1, 8+0 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
 	16*8
@@ -323,20 +318,7 @@ static const gfx_layout toki_charlayout =
 static const gfx_layout toki_tilelayout =
 {
 	16,16,
-	4096,
-	4,
-	{ 2*4, 3*4, 0*4, 1*4 },
-	{ 3, 2, 1, 0, 16+3, 16+2, 16+1, 16+0,
-			64*8+3, 64*8+2, 64*8+1, 64*8+0, 64*8+16+3, 64*8+16+2, 64*8+16+1, 64*8+16+0 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
-	128*8
-};
-
-static const gfx_layout toki_spritelayout =
-{
-	16,16,
-	8192,
+	RGN_FRAC(1,1),
 	4,
 	{ 2*4, 3*4, 0*4, 1*4 },
 	{ 3, 2, 1, 0, 16+3, 16+2, 16+1, 16+0,
@@ -347,22 +329,11 @@ static const gfx_layout toki_spritelayout =
 };
 
 static GFXDECODE_START( toki )
-	GFXDECODE_ENTRY( "gfx1", 0, toki_charlayout,  16*16, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, toki_spritelayout, 0*16, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, toki_tilelayout,  32*16, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, toki_tilelayout,  48*16, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, toki_charlayout, 16*16, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, toki_tilelayout,  0*16, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, toki_tilelayout, 32*16, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0, toki_tilelayout, 48*16, 16 )
 GFXDECODE_END
-
-static const gfx_layout tokib_charlayout =
-{
-	8,8,    /* 8 by 8 */
-	4096,   /* 4096 characters */
-	4,  /* 4 bits per pixel */
-	{4096*8*8*3,4096*8*8*2,4096*8*8*1,4096*8*8*0 }, /* planes */
-	{ 0, 1,  2,  3,  4,  5,  6,  7},        /* x bit */
-	{ 0, 8, 16, 24, 32, 40, 48, 56},        /* y bit */
-	8*8
-};
 
 static const gfx_layout tokib_tilelayout =
 {
@@ -382,18 +353,18 @@ static const gfx_layout tokib_tilelayout =
 
 static const gfx_layout tokib_spriteslayout =
 {
-	16,16,  /* 16 by 16 */
-	8192,   /* 8192 sprites */
-	4,  /* 4 bits per pixel */
-	{ 8192*16*16*3,8192*16*16*2,8192*16*16*1,8192*16*16*0 },    /* planes */
+	16,16,
+	RGN_FRAC(1,4),
+	4,
+	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
 	{    0,     1,     2,     3,     4,     5,     6,     7,
-		128+0, 128+1, 128+2, 128+3, 128+4, 128+5, 128+6, 128+7 },   /* x bit */
-	{ 0,8,16,24,32,40,48,56,64,72,80,88,96,104,112,120 },       /* y bit */
+		128+0, 128+1, 128+2, 128+3, 128+4, 128+5, 128+6, 128+7 },
+	{ 0,8,16,24,32,40,48,56,64,72,80,88,96,104,112,120 },
 	16*16
 };
 
 static GFXDECODE_START( tokib )
-	GFXDECODE_ENTRY( "gfx1", 0, tokib_charlayout,   16*16, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_planar,   16*16, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tokib_spriteslayout,  0*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tokib_tilelayout,   32*16, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0, tokib_tilelayout,   48*16, 16 )
@@ -683,9 +654,8 @@ ROM_START( tokib )
 	ROM_LOAD16_BYTE( "tokijp.005",   0x40000, 0x10000, CRC(d6a82808) SHA1(9fcd3e97f7eaada5374347383dc8a6cea2378f7f) )
 	ROM_LOAD16_BYTE( "tokijp.003",   0x40001, 0x10000, CRC(a01a5b10) SHA1(76d6da114105402aab9dd5167c0c00a0bddc3bba) )
 
-	ROM_REGION( 0x18000, "audiocpu", 0 )    /* 64k for code + 32k for banked data */
-	ROM_LOAD( "toki.e1",      0x00000, 0x8000, CRC(2832ef75) SHA1(c15dc67a1251230fe79625b582c255678f3714d8) )
-	ROM_CONTINUE(             0x10000, 0x8000 ) /* banked at 8000-bfff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for code + banked data */
+	ROM_LOAD( "toki.e1",      0x00000, 0x10000, CRC(2832ef75) SHA1(c15dc67a1251230fe79625b582c255678f3714d8) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "toki.e21",     0x000000, 0x08000, CRC(bb8cacbd) SHA1(05cdd2efe63de30dec2e5d2948567cee22e82a63) )   /* chars */
@@ -732,9 +702,8 @@ ROM_START( jujub )
 	ROM_LOAD16_BYTE( "tokijp.005",   0x40000, 0x10000, CRC(d6a82808) SHA1(9fcd3e97f7eaada5374347383dc8a6cea2378f7f) )
 	ROM_LOAD16_BYTE( "tokijp.003",   0x40001, 0x10000, CRC(a01a5b10) SHA1(76d6da114105402aab9dd5167c0c00a0bddc3bba) )
 
-	ROM_REGION( 0x18000, "audiocpu", 0 )    /* 64k for code + 32k for banked data */
-	ROM_LOAD( "toki.e1",      0x00000, 0x8000, CRC(2832ef75) SHA1(c15dc67a1251230fe79625b582c255678f3714d8) )
-	ROM_CONTINUE(             0x10000, 0x8000 ) /* banked at 8000-bfff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for code + banked data */
+	ROM_LOAD( "toki.e1",      0x00000, 0x10000, CRC(2832ef75) SHA1(c15dc67a1251230fe79625b582c255678f3714d8) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "toki.e21",     0x000000, 0x08000, CRC(bb8cacbd) SHA1(05cdd2efe63de30dec2e5d2948567cee22e82a63) )   /* chars */
@@ -826,7 +795,8 @@ DRIVER_INIT_MEMBER(toki_state,tokib)
 			memcpy (&base[0x18000 + i * 0x800], &temp[0x1800 + i * 0x2000], 0x800);
 		}
 	}
-	
+
+	membank("bank1")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x8000, 0x4000);
 	save_item(NAME(m_msm5205next));
 	save_item(NAME(m_toggle));
 }

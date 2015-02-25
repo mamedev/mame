@@ -32,7 +32,7 @@ public:
 
 	virtual int create();
 	virtual render_primitive_list *get_primitives();
-	virtual int draw(HDC dc, int update);
+	virtual int draw(const int update);
 	virtual void save() {};
 	virtual void record() {};
 	virtual void toggle_fsfx() {};
@@ -94,7 +94,6 @@ static void drawgdi_exit(void)
 
 int renderer_gdi::create()
 {
-
 	// fill in the bitmap info header
 	bminfo.bmiHeader.biSize            = sizeof(bminfo.bmiHeader);
 	bminfo.bmiHeader.biPlanes          = 1;
@@ -117,7 +116,6 @@ int renderer_gdi::create()
 
 void renderer_gdi::destroy()
 {
-
 	// free the bitmap memory
 	if (bmdata != NULL)
 		global_free_array(bmdata);
@@ -143,7 +141,7 @@ render_primitive_list *renderer_gdi::get_primitives()
 //  drawgdi_window_draw
 //============================================================
 
-int renderer_gdi::draw(HDC dc, int update)
+int renderer_gdi::draw(const int update)
 {
 	int width, height, pitch;
 	RECT bounds;
@@ -178,7 +176,7 @@ int renderer_gdi::draw(HDC dc, int update)
 	bminfo.bmiHeader.biHeight = -height;
 
 	// blit to the screen
-	StretchDIBits(dc, 0, 0, width, height,
+	StretchDIBits(window().m_dc, 0, 0, width, height,
 				0, 0, width, height,
 				bmdata, &bminfo, DIB_RGB_COLORS, SRCCOPY);
 	return 0;

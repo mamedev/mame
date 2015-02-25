@@ -4,13 +4,13 @@
 
   Coleco Total Control 4
   * TMS1400NLL MP7334-N2 (die labeled MP7334)
-  
+
   This is a head to head electronic tabletop LED-display sports console.
   One cartridge(Football) was included with the console, the other three were
   sold separately. Gameplay has emphasis on strategy, read the official manual
   on how to play. Remember that you can rotate the view in MESS: rotate left
   for Home(P1) orientation, rotate right for Visitor(P2) orientation.
-  
+
   Cartridge socket:
   1 N/C
   2 9V+
@@ -20,7 +20,7 @@
   6 K2
   7 K1
   8 R9
-  
+
   The cartridge connects pin 8 with one of the K-pins.
 
   Available cartridges:
@@ -166,11 +166,11 @@ READ8_MEMBER(tc4_state::read_k)
 	for (int i = 0; i < 6; i++)
 		if (m_r >> i & 1)
 			k |= m_button_matrix[i]->read();
-	
+
 	// read from cartridge
 	if (m_r & 0x200)
 		k |= m_button_matrix[6]->read();
-	
+
 	return k;
 }
 

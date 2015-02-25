@@ -3,12 +3,12 @@
     Nintendo Super Famicom - Yonezawa / PartyRoom 21 Twin Tap Controller
 
     This controller consists of two 1-button small units attached to a
-    single 7pin connector. You plug the connector to Port2 and two 
+    single 7pin connector. You plug the connector to Port2 and two
     players can compete on the quiz game (Port1 should have a joypad
     plugged in, to start the game and browse the menus). By plugging
     a multitap adapter to Port2, up to 4 Twin Tap controllers can be
     attached at the same time, allowing for 8 players quiz sessions.
- 
+
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
@@ -28,7 +28,7 @@ static INPUT_PORTS_START( snes_twintap )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Button 2")
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Button 1")
 	PORT_BIT( 0x8ffc, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x7000, IP_ACTIVE_LOW, IPT_UNUSED )	// controller ID unknown
+	PORT_BIT( 0x7000, IP_ACTIVE_LOW, IPT_UNUSED )   // controller ID unknown
 INPUT_PORTS_END
 
 
@@ -108,7 +108,7 @@ void snes_twintap_device::write_strobe(UINT8 data)
 {
 	int old = m_strobe;
 	m_strobe = data & 0x01;
-	
-	if (m_strobe < old)	// 1 -> 0 transition
+
+	if (m_strobe < old) // 1 -> 0 transition
 		port_poll();
 }

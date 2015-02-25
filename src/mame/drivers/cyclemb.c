@@ -97,7 +97,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	required_shared_ptr<UINT8> m_vram;
 	required_shared_ptr<UINT8> m_cram;
 	required_shared_ptr<UINT8> m_obj1_ram;
@@ -121,13 +121,13 @@ public:
 	DECLARE_WRITE8_MEMBER(cyclemb_flip_w);
 	DECLARE_READ8_MEMBER(skydest_i8741_0_r);
 	DECLARE_WRITE8_MEMBER(skydest_i8741_0_w);
-	
+
 	DECLARE_DRIVER_INIT(skydest);
 	DECLARE_DRIVER_INIT(cyclemb);
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_PALETTE_INIT(cyclemb);
-	
+
 	UINT32 screen_update_cyclemb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_skydest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cyclemb_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

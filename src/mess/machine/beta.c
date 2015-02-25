@@ -106,7 +106,7 @@ READ8_MEMBER(beta_disk_device::data_r)
 READ8_MEMBER(beta_disk_device::state_r)
 {
 	if (m_betadisk_active==1) {
-		UINT8 result = 0x3F;		// actually open bus
+		UINT8 result = 0x3F;        // actually open bus
 		result |= m_wd179x->drq_r() ? 0x40 : 0;
 		result |= m_wd179x->intrq_r() ? 0x80 : 0;
 		return result;
@@ -181,7 +181,7 @@ static SLOT_INTERFACE_START( beta_disk_floppies )
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( beta_disk )
-	MCFG_WD2793x_ADD("wd179x", XTAL_8MHz / 8)	// KR1818VG93 clone of WD1793
+	MCFG_WD2793x_ADD("wd179x", XTAL_8MHz / 8)   // KR1818VG93 clone of WD1793
 	MCFG_FLOPPY_DRIVE_ADD("wd179x:0", beta_disk_floppies, "drive0", beta_disk_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd179x:1", beta_disk_floppies, "drive1", beta_disk_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd179x:2", beta_disk_floppies, "drive2", beta_disk_device::floppy_formats)

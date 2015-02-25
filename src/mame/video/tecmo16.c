@@ -82,7 +82,7 @@ void tecmo16_state::video_start()
 	m_tx_tilemap->set_scrolly(0,-16);
 	m_flipscreen = 0;
 	m_game_is_riot = 0;
-	
+
 	save_state();
 }
 
@@ -104,7 +104,7 @@ VIDEO_START_MEMBER(tecmo16_state,ginkun)
 	m_tx_tilemap->set_transparent_pen(0);
 	m_flipscreen = 0;
 	m_game_is_riot = 0;
-	
+
 	save_state();
 }
 
@@ -127,7 +127,7 @@ VIDEO_START_MEMBER(tecmo16_state,riot)
 	m_tx_tilemap->set_scrolldy(-16,-16);
 	m_flipscreen = 0;
 	m_game_is_riot = 1;
-	
+
 	save_state();
 }
 

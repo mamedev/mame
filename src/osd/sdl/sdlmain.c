@@ -103,9 +103,9 @@ const options_entry sdl_options::s_option_entries[] =
 	{ SDLOPTION_CENTERH,                      "1",        OPTION_BOOLEAN,    "center horizontally within the view area" },
 	{ SDLOPTION_CENTERV,                      "1",        OPTION_BOOLEAN,    "center vertically within the view area" },
 #if (SDLMAME_SDL2)
-	{ SDLOPTION_SCALEMODE ";sm",         SDLOPTVAL_NONE,  OPTION_STRING,     "Scale mode: none, hwblit, hwbest, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)" },
+	{ SDLOPTION_SCALEMODE ";sm",         OSDOPTVAL_NONE,  OPTION_STRING,     "Scale mode: none, hwblit, hwbest, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)" },
 #else
-	{ SDLOPTION_SCALEMODE ";sm",         SDLOPTVAL_NONE,  OPTION_STRING,     "Scale mode: none, async, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)" },
+	{ SDLOPTION_SCALEMODE ";sm",         OSDOPTVAL_NONE,  OPTION_STRING,     "Scale mode: none, async, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)" },
 #endif
 #if USE_OPENGL
 	// OpenGL specific options
@@ -118,26 +118,26 @@ const options_entry sdl_options::s_option_entries[] =
 	{ SDLOPTION_GL_PBO,                       "1",    OPTION_BOOLEAN, "enable OpenGL PBO,  if available (default on)" },
 	{ SDLOPTION_GL_GLSL,                      "0",    OPTION_BOOLEAN, "enable OpenGL GLSL, if available (default off)" },
 	{ SDLOPTION_GLSL_FILTER,                  "1",    OPTION_STRING,  "enable OpenGL GLSL filtering instead of FF filtering 0-plain, 1-bilinear (default)" },
-	{ SDLOPTION_SHADER_MAME "0",     SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 0" },
-	{ SDLOPTION_SHADER_MAME "1",     SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 1" },
-	{ SDLOPTION_SHADER_MAME "2",     SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 2" },
-	{ SDLOPTION_SHADER_MAME "3",     SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 3" },
-	{ SDLOPTION_SHADER_MAME "4",     SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 4" },
-	{ SDLOPTION_SHADER_MAME "5",     SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 5" },
-	{ SDLOPTION_SHADER_MAME "6",     SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 6" },
-	{ SDLOPTION_SHADER_MAME "7",     SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 7" },
-	{ SDLOPTION_SHADER_MAME "8",     SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 8" },
-	{ SDLOPTION_SHADER_MAME "9",     SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 9" },
-	{ SDLOPTION_SHADER_SCREEN "0",   SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 0" },
-	{ SDLOPTION_SHADER_SCREEN "1",   SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 1" },
-	{ SDLOPTION_SHADER_SCREEN "2",   SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 2" },
-	{ SDLOPTION_SHADER_SCREEN "3",   SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 3" },
-	{ SDLOPTION_SHADER_SCREEN "4",   SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 4" },
-	{ SDLOPTION_SHADER_SCREEN "5",   SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 5" },
-	{ SDLOPTION_SHADER_SCREEN "6",   SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 6" },
-	{ SDLOPTION_SHADER_SCREEN "7",   SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 7" },
-	{ SDLOPTION_SHADER_SCREEN "8",   SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 8" },
-	{ SDLOPTION_SHADER_SCREEN "9",   SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 9" },
+	{ SDLOPTION_SHADER_MAME "0",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 0" },
+	{ SDLOPTION_SHADER_MAME "1",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 1" },
+	{ SDLOPTION_SHADER_MAME "2",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 2" },
+	{ SDLOPTION_SHADER_MAME "3",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 3" },
+	{ SDLOPTION_SHADER_MAME "4",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 4" },
+	{ SDLOPTION_SHADER_MAME "5",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 5" },
+	{ SDLOPTION_SHADER_MAME "6",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 6" },
+	{ SDLOPTION_SHADER_MAME "7",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 7" },
+	{ SDLOPTION_SHADER_MAME "8",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 8" },
+	{ SDLOPTION_SHADER_MAME "9",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 9" },
+	{ SDLOPTION_SHADER_SCREEN "0",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 0" },
+	{ SDLOPTION_SHADER_SCREEN "1",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 1" },
+	{ SDLOPTION_SHADER_SCREEN "2",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 2" },
+	{ SDLOPTION_SHADER_SCREEN "3",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 3" },
+	{ SDLOPTION_SHADER_SCREEN "4",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 4" },
+	{ SDLOPTION_SHADER_SCREEN "5",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 5" },
+	{ SDLOPTION_SHADER_SCREEN "6",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 6" },
+	{ SDLOPTION_SHADER_SCREEN "7",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 7" },
+	{ SDLOPTION_SHADER_SCREEN "8",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 8" },
+	{ SDLOPTION_SHADER_SCREEN "9",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 9" },
 #endif
 
 	// full screen options
@@ -158,57 +158,57 @@ const options_entry sdl_options::s_option_entries[] =
 
 	// joystick mapping
 	{ NULL,                                  NULL,   OPTION_HEADER,     "SDL JOYSTICK MAPPING" },
-	{ SDLOPTION_JOYINDEX "1",                SDLOPTVAL_AUTO, OPTION_STRING,         "name of joystick mapped to joystick #1" },
-	{ SDLOPTION_JOYINDEX "2",                SDLOPTVAL_AUTO, OPTION_STRING,         "name of joystick mapped to joystick #2" },
-	{ SDLOPTION_JOYINDEX "3",                SDLOPTVAL_AUTO, OPTION_STRING,         "name of joystick mapped to joystick #3" },
-	{ SDLOPTION_JOYINDEX "4",                SDLOPTVAL_AUTO, OPTION_STRING,         "name of joystick mapped to joystick #4" },
-	{ SDLOPTION_JOYINDEX "5",                SDLOPTVAL_AUTO, OPTION_STRING,         "name of joystick mapped to joystick #5" },
-	{ SDLOPTION_JOYINDEX "6",                SDLOPTVAL_AUTO, OPTION_STRING,         "name of joystick mapped to joystick #6" },
-	{ SDLOPTION_JOYINDEX "7",                SDLOPTVAL_AUTO, OPTION_STRING,         "name of joystick mapped to joystick #7" },
-	{ SDLOPTION_JOYINDEX "8",                SDLOPTVAL_AUTO, OPTION_STRING,         "name of joystick mapped to joystick #8" },
+	{ SDLOPTION_JOYINDEX "1",                OSDOPTVAL_AUTO, OPTION_STRING,         "name of joystick mapped to joystick #1" },
+	{ SDLOPTION_JOYINDEX "2",                OSDOPTVAL_AUTO, OPTION_STRING,         "name of joystick mapped to joystick #2" },
+	{ SDLOPTION_JOYINDEX "3",                OSDOPTVAL_AUTO, OPTION_STRING,         "name of joystick mapped to joystick #3" },
+	{ SDLOPTION_JOYINDEX "4",                OSDOPTVAL_AUTO, OPTION_STRING,         "name of joystick mapped to joystick #4" },
+	{ SDLOPTION_JOYINDEX "5",                OSDOPTVAL_AUTO, OPTION_STRING,         "name of joystick mapped to joystick #5" },
+	{ SDLOPTION_JOYINDEX "6",                OSDOPTVAL_AUTO, OPTION_STRING,         "name of joystick mapped to joystick #6" },
+	{ SDLOPTION_JOYINDEX "7",                OSDOPTVAL_AUTO, OPTION_STRING,         "name of joystick mapped to joystick #7" },
+	{ SDLOPTION_JOYINDEX "8",                OSDOPTVAL_AUTO, OPTION_STRING,         "name of joystick mapped to joystick #8" },
 	{ SDLOPTION_SIXAXIS,                     "0",    OPTION_BOOLEAN,    "Use special handling for PS3 Sixaxis controllers" },
 
 #if (USE_XINPUT)
 	// lightgun mapping
 	{ NULL,                                  NULL,   OPTION_HEADER,     "SDL LIGHTGUN MAPPING" },
-	{ SDLOPTION_LIGHTGUNINDEX "1",           SDLOPTVAL_AUTO, OPTION_STRING,         "name of lightgun mapped to lightgun #1" },
-	{ SDLOPTION_LIGHTGUNINDEX "2",           SDLOPTVAL_AUTO, OPTION_STRING,         "name of lightgun mapped to lightgun #2" },
-	{ SDLOPTION_LIGHTGUNINDEX "3",           SDLOPTVAL_AUTO, OPTION_STRING,         "name of lightgun mapped to lightgun #3" },
-	{ SDLOPTION_LIGHTGUNINDEX "4",           SDLOPTVAL_AUTO, OPTION_STRING,         "name of lightgun mapped to lightgun #4" },
-	{ SDLOPTION_LIGHTGUNINDEX "5",           SDLOPTVAL_AUTO, OPTION_STRING,         "name of lightgun mapped to lightgun #5" },
-	{ SDLOPTION_LIGHTGUNINDEX "6",           SDLOPTVAL_AUTO, OPTION_STRING,         "name of lightgun mapped to lightgun #6" },
-	{ SDLOPTION_LIGHTGUNINDEX "7",           SDLOPTVAL_AUTO, OPTION_STRING,         "name of lightgun mapped to lightgun #7" },
-	{ SDLOPTION_LIGHTGUNINDEX "8",           SDLOPTVAL_AUTO, OPTION_STRING,         "name of lightgun mapped to lightgun #8" },
+	{ SDLOPTION_LIGHTGUNINDEX "1",           OSDOPTVAL_AUTO, OPTION_STRING,         "name of lightgun mapped to lightgun #1" },
+	{ SDLOPTION_LIGHTGUNINDEX "2",           OSDOPTVAL_AUTO, OPTION_STRING,         "name of lightgun mapped to lightgun #2" },
+	{ SDLOPTION_LIGHTGUNINDEX "3",           OSDOPTVAL_AUTO, OPTION_STRING,         "name of lightgun mapped to lightgun #3" },
+	{ SDLOPTION_LIGHTGUNINDEX "4",           OSDOPTVAL_AUTO, OPTION_STRING,         "name of lightgun mapped to lightgun #4" },
+	{ SDLOPTION_LIGHTGUNINDEX "5",           OSDOPTVAL_AUTO, OPTION_STRING,         "name of lightgun mapped to lightgun #5" },
+	{ SDLOPTION_LIGHTGUNINDEX "6",           OSDOPTVAL_AUTO, OPTION_STRING,         "name of lightgun mapped to lightgun #6" },
+	{ SDLOPTION_LIGHTGUNINDEX "7",           OSDOPTVAL_AUTO, OPTION_STRING,         "name of lightgun mapped to lightgun #7" },
+	{ SDLOPTION_LIGHTGUNINDEX "8",           OSDOPTVAL_AUTO, OPTION_STRING,         "name of lightgun mapped to lightgun #8" },
 #endif
 
 #if (SDLMAME_SDL2)
 	{ NULL,                                  NULL,   OPTION_HEADER,     "SDL MOUSE MAPPING" },
-	{ SDLOPTION_MOUSEINDEX "1",              SDLOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #1" },
-	{ SDLOPTION_MOUSEINDEX "2",              SDLOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #2" },
-	{ SDLOPTION_MOUSEINDEX "3",              SDLOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #3" },
-	{ SDLOPTION_MOUSEINDEX "4",              SDLOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #4" },
-	{ SDLOPTION_MOUSEINDEX "5",              SDLOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #5" },
-	{ SDLOPTION_MOUSEINDEX "6",              SDLOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #6" },
-	{ SDLOPTION_MOUSEINDEX "7",              SDLOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #7" },
-	{ SDLOPTION_MOUSEINDEX "8",              SDLOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #8" },
+	{ SDLOPTION_MOUSEINDEX "1",              OSDOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #1" },
+	{ SDLOPTION_MOUSEINDEX "2",              OSDOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #2" },
+	{ SDLOPTION_MOUSEINDEX "3",              OSDOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #3" },
+	{ SDLOPTION_MOUSEINDEX "4",              OSDOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #4" },
+	{ SDLOPTION_MOUSEINDEX "5",              OSDOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #5" },
+	{ SDLOPTION_MOUSEINDEX "6",              OSDOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #6" },
+	{ SDLOPTION_MOUSEINDEX "7",              OSDOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #7" },
+	{ SDLOPTION_MOUSEINDEX "8",              OSDOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #8" },
 
 	{ NULL,                                  NULL,   OPTION_HEADER,     "SDL KEYBOARD MAPPING" },
-	{ SDLOPTION_KEYBINDEX "1",               SDLOPTVAL_AUTO, OPTION_STRING,         "name of keyboard mapped to keyboard #1" },
-	{ SDLOPTION_KEYBINDEX "2",               SDLOPTVAL_AUTO, OPTION_STRING,         "name of keyboard mapped to keyboard #2" },
-	{ SDLOPTION_KEYBINDEX "3",               SDLOPTVAL_AUTO, OPTION_STRING,         "name of keyboard mapped to keyboard #3" },
-	{ SDLOPTION_KEYBINDEX "4",               SDLOPTVAL_AUTO, OPTION_STRING,         "name of keyboard mapped to keyboard #4" },
-	{ SDLOPTION_KEYBINDEX "5",               SDLOPTVAL_AUTO, OPTION_STRING,         "name of keyboard mapped to keyboard #5" },
-	{ SDLOPTION_KEYBINDEX "6",               SDLOPTVAL_AUTO, OPTION_STRING,         "name of keyboard mapped to keyboard #6" },
-	{ SDLOPTION_KEYBINDEX "7",               SDLOPTVAL_AUTO, OPTION_STRING,         "name of keyboard mapped to keyboard #7" },
-	{ SDLOPTION_KEYBINDEX "8",               SDLOPTVAL_AUTO, OPTION_STRING,         "name of keyboard mapped to keyboard #8" },
+	{ SDLOPTION_KEYBINDEX "1",               OSDOPTVAL_AUTO, OPTION_STRING,         "name of keyboard mapped to keyboard #1" },
+	{ SDLOPTION_KEYBINDEX "2",               OSDOPTVAL_AUTO, OPTION_STRING,         "name of keyboard mapped to keyboard #2" },
+	{ SDLOPTION_KEYBINDEX "3",               OSDOPTVAL_AUTO, OPTION_STRING,         "name of keyboard mapped to keyboard #3" },
+	{ SDLOPTION_KEYBINDEX "4",               OSDOPTVAL_AUTO, OPTION_STRING,         "name of keyboard mapped to keyboard #4" },
+	{ SDLOPTION_KEYBINDEX "5",               OSDOPTVAL_AUTO, OPTION_STRING,         "name of keyboard mapped to keyboard #5" },
+	{ SDLOPTION_KEYBINDEX "6",               OSDOPTVAL_AUTO, OPTION_STRING,         "name of keyboard mapped to keyboard #6" },
+	{ SDLOPTION_KEYBINDEX "7",               OSDOPTVAL_AUTO, OPTION_STRING,         "name of keyboard mapped to keyboard #7" },
+	{ SDLOPTION_KEYBINDEX "8",               OSDOPTVAL_AUTO, OPTION_STRING,         "name of keyboard mapped to keyboard #8" },
 #endif
 	// SDL low level driver options
 	{ NULL,                                  NULL,   OPTION_HEADER,     "SDL LOWLEVEL DRIVER OPTIONS" },
-	{ SDLOPTION_VIDEODRIVER ";vd",           SDLOPTVAL_AUTO,  OPTION_STRING,        "sdl video driver to use ('x11', 'directfb', ... or 'auto' for SDL default" },
+	{ SDLOPTION_VIDEODRIVER ";vd",           OSDOPTVAL_AUTO,  OPTION_STRING,        "sdl video driver to use ('x11', 'directfb', ... or 'auto' for SDL default" },
 #if (SDLMAME_SDL2)
-	{ SDLOPTION_RENDERDRIVER ";rd",          SDLOPTVAL_AUTO,  OPTION_STRING,        "sdl render driver to use ('software', 'opengl', 'directfb' ... or 'auto' for SDL default" },
+	{ SDLOPTION_RENDERDRIVER ";rd",          OSDOPTVAL_AUTO,  OPTION_STRING,        "sdl render driver to use ('software', 'opengl', 'directfb' ... or 'auto' for SDL default" },
 #endif
-	{ SDLOPTION_AUDIODRIVER ";ad",           SDLOPTVAL_AUTO,  OPTION_STRING,        "sdl audio driver to use ('alsa', 'arts', ... or 'auto' for SDL default" },
+	{ SDLOPTION_AUDIODRIVER ";ad",           OSDOPTVAL_AUTO,  OPTION_STRING,        "sdl audio driver to use ('alsa', 'arts', ... or 'auto' for SDL default" },
 #if USE_OPENGL
 	{ SDLOPTION_GL_LIB,                      SDLOPTVAL_GLLIB, OPTION_STRING,        "alternative libGL.so to use; 'auto' for system default" },
 #endif
@@ -262,6 +262,10 @@ extern "C" DECLSPEC void SDLCALL SDL_SetModuleHandle(void *hInst);
 int main(int argc, char *argv[])
 {
 	int res = 0;
+
+#if defined(SDLMAME_X11) && !(SDLMAME_SDL2)
+	XInitThreads();
+#endif
 
 #if defined(SDLMAME_WIN32)
 #if !(SDLMAME_SDL2)
@@ -542,14 +546,14 @@ void sdl_osd_interface::init(running_machine &machine)
 
 	// Some driver options - must be before audio init!
 	stemp = options().audio_driver();
-	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
+	if (stemp != NULL && strcmp(stemp, OSDOPTVAL_AUTO) != 0)
 	{
 		osd_printf_verbose("Setting SDL audiodriver '%s' ...\n", stemp);
 		osd_setenv(SDLENV_AUDIODRIVER, stemp, 1);
 	}
 
 	stemp = options().video_driver();
-	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
+	if (stemp != NULL && strcmp(stemp, OSDOPTVAL_AUTO) != 0)
 	{
 		osd_printf_verbose("Setting SDL videodriver '%s' ...\n", stemp);
 		osd_setenv(SDLENV_VIDEODRIVER, stemp, 1);
@@ -559,7 +563,7 @@ void sdl_osd_interface::init(running_machine &machine)
 		stemp = options().render_driver();
 		if (stemp != NULL)
 		{
-			if (strcmp(stemp, SDLOPTVAL_AUTO) != 0)
+			if (strcmp(stemp, OSDOPTVAL_AUTO) != 0)
 			{
 				osd_printf_verbose("Setting SDL renderdriver '%s' ...\n", stemp);
 				//osd_setenv(SDLENV_RENDERDRIVER, stemp, 1);
@@ -584,7 +588,7 @@ void sdl_osd_interface::init(running_machine &machine)
 	/* FIXME: move lib loading code from drawogl.c here */
 
 	stemp = options().gl_lib();
-	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
+	if (stemp != NULL && strcmp(stemp, OSDOPTVAL_AUTO) != 0)
 	{
 		osd_setenv("SDL_VIDEO_GL_DRIVER", stemp, 1);
 		osd_printf_verbose("Setting SDL_VIDEO_GL_DRIVER = '%s' ...\n", stemp);

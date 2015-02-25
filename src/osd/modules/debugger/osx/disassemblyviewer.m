@@ -77,7 +77,6 @@
 																0,
 																contentBounds.size.width,
 																expressionFrame.origin.y)];
-	[dasmScroll setDrawsBackground:YES];
 	[dasmScroll setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
 	[dasmScroll setHasHorizontalScroller:YES];
 	[dasmScroll setHasVerticalScroller:YES];

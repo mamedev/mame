@@ -5,21 +5,21 @@
   Used by the newer (or possibly older/original) revisions of Gals Panic
   also the basis of the various Comad clones
 
-	Fantasia         1994 Comad
-	Super Model      1994 Comad
-	New Fantasia     1994 Comad
-	New Fantasia     1995 Comad (set 2)
-	Fantasy '95      1995 Hi-max Technology Inc. (Running on a Comad PCB)
-	Miss World '96   1996 Comad
-	Ms/Mr World '96  1996 Comad
-	Fantasia II      1997 Comad
-	
+    Fantasia         1994 Comad
+    Super Model      1994 Comad
+    New Fantasia     1994 Comad
+    New Fantasia     1995 Comad (set 2)
+    Fantasy '95      1995 Hi-max Technology Inc. (Running on a Comad PCB)
+    Miss World '96   1996 Comad
+    Ms/Mr World '96  1996 Comad
+    Fantasia II      1997 Comad
+
   The following seem similar but could have other changes
 
-	Pocket Gal VIP /
-	Gals Hustler     1997 Ace International
-	Zip & Zap        1995 Barko Corp
-	
+    Pocket Gal VIP /
+    Gals Hustler     1997 Ace International
+    Zip & Zap        1995 Barko Corp
+
  Notes:
   - In gfx data banking function, some strange gfx are shown. Timing issue?
 
@@ -294,7 +294,7 @@ UINT32 expro02_state::screen_update_backgrounds(screen_device &screen, bitmap_in
 			/*
 			else
 			{
-				dest[x] = 0x0000;
+			    dest[x] = 0x0000;
 			}
 			*/
 
@@ -967,7 +967,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( comad_noview2, comad )
 	MCFG_DEVICE_REMOVE("view2_0")
-	
+
 	MCFG_GFXDECODE_MODIFY("gfxdecode", expro02_noview2)
 MACHINE_CONFIG_END
 
@@ -1001,8 +1001,8 @@ static MACHINE_CONFIG_DERIVED( galhustl, comad_noview2 )
 	MCFG_OKIM6295_REPLACE("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-    MCFG_SCREEN_MODIFY("screen")
-    MCFG_SCREEN_UPDATE_DRIVER(expro02_state, screen_update_zipzap)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(expro02_state, screen_update_zipzap)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( zipzap, comad_noview2 )
@@ -1012,8 +1012,8 @@ static MACHINE_CONFIG_DERIVED( zipzap, comad_noview2 )
 	MCFG_OKIM6295_REPLACE("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-    MCFG_SCREEN_MODIFY("screen") // doesn't work with original kaneko_spr implementation
-    MCFG_SCREEN_UPDATE_DRIVER(expro02_state, screen_update_zipzap)
+	MCFG_SCREEN_MODIFY("screen") // doesn't work with original kaneko_spr implementation
+	MCFG_SCREEN_UPDATE_DRIVER(expro02_state, screen_update_zipzap)
 MACHINE_CONFIG_END
 
 /*************************************
@@ -1764,7 +1764,7 @@ ROM_END
  *************************************/
 
 DRIVER_INIT_MEMBER(expro02_state,expro02)
-{	
+{
 	UINT32 *src = (UINT32 *)memregion("gfx3" )->base();
 	UINT32 *dst = (UINT32 *)memregion("gfx2" )->base();
 	int x, offset;

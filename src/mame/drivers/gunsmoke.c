@@ -587,5 +587,5 @@ ROM_END
 GAME( 1985, gunsmoke,   0,        gunsmoke, gunsmoke,   driver_device, 0, ROT270, "Capcom",                   "Gun.Smoke (World, 851115)", GAME_SUPPORTS_SAVE ) // GSE_03
 GAME( 1985, gunsmokeb,  gunsmoke, gunsmoke, gunsmoke,   driver_device, 0, ROT270, "bootleg",                  "Gun.Smoke (World, 851115) (bootleg)", GAME_SUPPORTS_SAVE ) // based  on above version, warning message patched out
 GAME( 1985, gunsmokej,  gunsmoke, gunsmoke, gunsmoke,   driver_device, 0, ROT270, "Capcom",                   "Gun.Smoke (Japan, 851115)", GAME_SUPPORTS_SAVE ) // GSJ_03
-GAME( 1985, gunsmokeu,  gunsmoke, gunsmoke, gunsmoke,   driver_device, 0, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US, 851115)", GAME_SUPPORTS_SAVE ) // GSR_03 
+GAME( 1985, gunsmokeu,  gunsmoke, gunsmoke, gunsmoke,   driver_device, 0, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US, 851115)", GAME_SUPPORTS_SAVE ) // GSR_03
 GAME( 1986, gunsmokeua, gunsmoke, gunsmoke, gunsmokeua, driver_device, 0, ROT270, "Capcom (Romstar license)", "Gun.Smoke (US, 860408)", GAME_SUPPORTS_SAVE ) // GSA_03

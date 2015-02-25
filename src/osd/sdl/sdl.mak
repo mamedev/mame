@@ -212,8 +212,11 @@ SYNC_IMPLEMENTATION = tc
 SDL_NETWORK = taptun
 
 ifndef NO_USE_MIDI
-INCPATH += `pkg-config --cflags alsa`
-LIBS += `pkg-config --libs alsa`
+ALSACFLAGS := $(shell pkg-config --cflags alsa)
+ALSALIBS := $(shell pkg-config --libs alsa)
+
+INCPATH += $(ALSACFLAGS)
+LIBS += $(ALSALIBS)
 endif
 
 endif
@@ -362,8 +365,8 @@ SDL_NETWORK = pcap
 INCPATH += -I$(3RDPARTY)/winpcap/Include
 
 # enable UNICODE
-DEFS += -Dmain=utf8_main -DUNICODE -D_UNICODE 
-LDFLAGS += -municode 
+DEFS += -Dmain=utf8_main -DUNICODE -D_UNICODE
+LDFLAGS += -municode
 
 # Qt
 ifndef NO_USE_QTDEBUG
@@ -539,6 +542,24 @@ ifeq ($(TARGETOS),macosx)
 OSDCOREOBJS += $(SDLOBJ)/osxutils.o
 SDLOS_TARGETOS = macosx
 
+ifeq ($(TARGET),mame)
+MACOSX_EMBED_INFO_PLIST = 1
+endif
+ifeq ($(TARGET),mess)
+MACOSX_EMBED_INFO_PLIST = 1
+endif
+ifeq ($(TARGET),ume)
+MACOSX_EMBED_INFO_PLIST = 1
+endif
+ifdef MACOSX_EMBED_INFO_PLIST
+INFOPLIST = $(SDLOBJ)/$(TARGET)-Info.plist
+LDFLAGSEMULATOR += -sectcreate __TEXT __info_plist $(INFOPLIST)
+$(EMULATOR): $(INFOPLIST)
+$(INFOPLIST): $(SRC)/build/verinfo.py $(SRC)/version.c
+	@echo Emitting $@...
+	$(PYTHON) $(SRC)/build/verinfo.py -b $(TARGET) -p -o $@ $(SRC)/version.c
+endif
+
 ifndef MACOSX_USE_LIBSDL
 # Compile using framework (compile using libSDL is the exception)
 ifeq ($(SDL_LIBVER),sdl2)
@@ -556,11 +577,14 @@ else
 
 # files (header files are #include "SDL/something.h", so the extra "/SDL"
 # causes a significant problem)
-INCPATH += `$(SDL_CONFIG) --cflags | sed 's:/SDL::'`
-CCOMFLAGS += -DNO_SDL_GLEXT
+SDLCFLAGS := $(shell $(SDL_CONFIG) --cflags | sed 's:/SDL::')
 # Remove libSDLmain, as its symbols conflict with SDLMain_tmpl.m
-LIBS += `$(SDL_CONFIG) --libs | sed 's/-lSDLmain//'` -lpthread -framework Cocoa -framework OpenGL
-BASELIBS += `$(SDL_CONFIG) --libs | sed 's/-lSDLmain//'` -lpthread -framework Cocoa -framework OpenGL
+SDLLIBS := $(shell $(SDL_CONFIG) --libs | sed 's/-lSDLmain//')
+
+INCPATH += $(SDLCFLAGS)
+CCOMFLAGS += -DNO_SDL_GLEXT
+LIBS += $(SDLLIBS) -lpthread -framework Cocoa -framework OpenGL
+BASELIBS += $(SDLLIBS) -lpthread -framework Cocoa -framework OpenGL
 DEFS += -DMACOSX_USE_LIBSDL
 endif   # MACOSX_USE_LIBSDL
 
@@ -599,11 +623,14 @@ ifeq ($(NO_X11),1)
 NO_DEBUGGER = 1
 endif
 
-INCPATH += `$(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-D[^ ]*\)::g'`
-CCOMFLAGS += `$(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-I[^ ]*\)::g'`
+SDLINCLUDES := $(shell $(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-D[^ ]*\)::g')
+SDLDEFINES := $(shell $(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-I[^ ]*\)::g')
+SDLLIBS := $(shell $(SDL_CONFIG) --libs)
 
-BASELIBS += `$(SDL_CONFIG) --libs`
-LIBS += `$(SDL_CONFIG) --libs`
+INCPATH += $(SDLINCLUDES)
+CCOMFLAGS += $(SDLDEFINES)
+BASELIBS += $(SDLLIBS)
+LIBS += $(SDLLIBS)
 
 ifeq ($(SDL_LIBVER),sdl2)
 ifdef SDL_INSTALL_ROOT
@@ -612,10 +639,13 @@ INCPATH += -I$(SDL_INSTALL_ROOT)/include/directfb
 endif
 endif
 
+FONTCONFIGCFLAGS := $(shell pkg-config --cflags fontconfig)
+FONTCONFIGLIBS := $(shell pkg-config --libs fontconfig)
+
 ifneq ($(TARGETOS),emscripten)
-INCPATH += `pkg-config --cflags fontconfig`
+INCPATH += $(FONTCONFIGCFLAGS)
 endif
-LIBS += `pkg-config --libs fontconfig`
+LIBS += $(FONTCONFIGLIBS)
 
 ifeq ($(SDL_LIBVER),sdl2)
 LIBS += -lSDL2_ttf
@@ -704,8 +734,8 @@ ifeq ($(SDL_LIBVER),sdl2)
 LIBS += -lSDL2 -limm32 -lversion -lole32 -loleaut32 -lws2_32 -static
 BASELIBS += -lSDL2 -limm32 -lversion -lole32 -loleaut32 -lws2_32 -static
 else
-LIBS += -lSDL -static
-BASELIBS += -lSDL -static
+LIBS += -lSDL -lws2_32 -static
+BASELIBS += -lSDL -lws2_32 -static
 endif
 LIBS += -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi
 BASELIBS += -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi
@@ -717,8 +747,12 @@ endif   # Win32
 
 ifeq ($(BASE_TARGETOS),os2)
 
-INCPATH += `sdl-config --cflags`
-LIBS += `sdl-config --libs` -lpthread
+SDLCFLAGS := $(shell sdl-config --cflags)
+SDLLIBS := $(shell sdl-config --libs)
+
+INCPATH += $(SDLCFLAGS)
+LIBS += $(SDLLIBS) -lpthread
+BASELIBS += += $(SDLLIBS) -lpthread
 
 endif # OS2
 
@@ -767,7 +801,7 @@ OSDOBJS += \
 	$(OSDOBJ)/modules/debugger/none.o \
 	$(OSDOBJ)/modules/debugger/debugint.o \
 	$(OSDOBJ)/modules/debugger/debugwin.o \
-	$(OSDOBJ)/modules/debugger/debugqt.o \
+	$(OSDOBJ)/modules/debugger/debugqt.o
 
 #-------------------------------------------------
 # BGFX
@@ -775,7 +809,7 @@ OSDOBJS += \
 
 ifdef USE_BGFX
 DEFS += -DUSE_BGFX
-OSDOBJS += $(SDLOBJ)/drawbgfx.o 
+OSDOBJS += $(SDLOBJ)/drawbgfx.o
 INCPATH += -I$(3RDPARTY)/bgfx/include -I$(3RDPARTY)/bx/include
 USE_DISPATCH_GL = 0
 BGFX_LIB = $(OBJ)/libbgfx.a
@@ -821,8 +855,11 @@ endif
 
 # The newer debugger uses QT
 ifndef NO_USE_QTDEBUG
-INCPATH += `pkg-config QtGui --cflags`
-LIBS += `pkg-config QtGui --libs`
+QTCFLAGS := $(shell pkg-config --cflags QtGui)
+QTLIBS := $(shell pkg-config --libs QtGui)
+
+INCPATH += $(QTCFLAGS)
+LIBS += $(QTLIBS)
 endif
 
 # some systems still put important things in a different prefix

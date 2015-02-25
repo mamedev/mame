@@ -209,46 +209,15 @@ struct render_quad_texuv
 
 
 // render_texinfo - texture information
-
-
-struct render_palette_copy
+struct render_texinfo
 {
-	int ref_count;
-	dynamic_array<rgb_t> palette;
-};
-
-class render_texinfo
-{
-public:
-	render_texinfo()
-	: base(NULL), rowpixels(0), width(0), height(0),
-		seqid(0), osddata(0), m_palette(NULL)
-	{}
-
-	render_texinfo(const render_texinfo &src);
-
-	~render_texinfo()
-	{
-		free_palette();
-	}
-
-	render_texinfo &operator=(const render_texinfo &src);
-
 	void *              base;               // base of the data
 	UINT32              rowpixels;          // pixels per row
 	UINT32              width;              // width of the image
 	UINT32              height;             // height of the image
 	UINT32              seqid;              // sequence ID
 	UINT64              osddata;            // aux data to pass to osd
-
-	const rgb_t *       palette() const { return ((m_palette == NULL) ? NULL : &m_palette->palette[0]); }
-
-	void set_palette(const dynamic_array<rgb_t> *source);
-
-private:
-	void free_palette();
-
-	render_palette_copy *m_palette;     // palette for PALETTE16 textures, LUTs for RGB15/RGB32
+	const rgb_t *       palette;            // palette for PALETTE16 textures, bcg lookup table for RGB32/YUY16
 };
 
 
@@ -369,7 +338,7 @@ public:
 	float               width;              // width (for line primitives)
 	render_texinfo      texture;            // texture info (for quad primitives)
 	render_quad_texuv   texcoords;          // texture coordinates (for quad primitives)
-	render_container *	container;			// the render container we belong to
+	render_container *  container;          // the render container we belong to
 
 private:
 	// internal state
@@ -465,7 +434,7 @@ public:
 private:
 	// internal helpers
 	void get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &texinfo, render_primitive_list &primlist);
-	const dynamic_array<rgb_t> *get_adjusted_palette(render_container &container);
+	const rgb_t *get_adjusted_palette(render_container &container);
 
 	static const int MAX_TEXTURE_SCALES = 8;
 
@@ -555,7 +524,7 @@ public:
 	bool has_brightness_contrast_gamma_changes() const { return (m_user.m_brightness != 1.0f || m_user.m_contrast != 1.0f || m_user.m_gamma != 1.0f); }
 	UINT8 apply_brightness_contrast_gamma(UINT8 value);
 	float apply_brightness_contrast_gamma_fp(float value);
-	const dynamic_array<rgb_t> *bcg_lookup_table(int texformat, palette_t *palette = NULL);
+	const rgb_t *bcg_lookup_table(int texformat, palette_t *palette = NULL);
 
 private:
 	// an item describes a high level primitive that is added to a container
@@ -606,8 +575,8 @@ private:
 	bitmap_argb32 *         m_overlaybitmap;        // overlay bitmap
 	render_texture *        m_overlaytexture;       // overlay texture
 	auto_pointer<palette_client> m_palclient;       // client to the screen palette
-	dynamic_array<rgb_t>    m_bcglookup;            // full palette lookup with bcg adjustments
-	dynamic_array<rgb_t>    m_bcglookup256;         // lookup table for brightness/contrast/gamma
+	dynamic_array<rgb_t>    m_bcglookup;            // copy of screen palette with bcg adjustment
+	rgb_t                   m_bcglookup256[0x400];  // lookup table for brightness/contrast/gamma
 };
 
 

@@ -3,7 +3,7 @@
 /*
 
   NEC uCOM-4 MCU family cores
-  
+
   References:
   - 1981 NEC Microcomputers Catalog (later editions may have errors!)
   - Supplement to uCOM-43 Single Chip Microcomputer Users' Manual
@@ -20,7 +20,7 @@ enum
 	NEC_UCOM43 = 0,
 	NEC_UCOM44,
 	NEC_UCOM45
-};	
+};
 
 #include "ucom4.h"
 #include "debugger.h"
@@ -115,7 +115,7 @@ enum
 void ucom4_cpu_device::device_start()
 {
 	assert(NEC_UCOM4_PORTA == 0);
-	
+
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
 	m_prgmask = (1 << m_prgwidth) - 1;
@@ -195,12 +195,12 @@ void ucom4_cpu_device::device_reset()
 	m_skip = false;
 
 	m_timer->adjust(attotime::never);
-	
+
 	// clear interrupt
 	m_int_line = CLEAR_LINE;
 	m_int_f = 0;
 	m_inte_f = (m_family == NEC_UCOM43) ? 0 : 1;
-	
+
 	// clear i/o
 	for (int i = NEC_UCOM4_PORTC; i <= NEC_UCOM4_PORTI; i++)
 		output_w(i, 0xf);
@@ -221,9 +221,9 @@ void ucom4_cpu_device::execute_set_input(int line, int state)
 			if (m_int_line == CLEAR_LINE && state)
 				m_int_f = 1;
 			m_int_line = state;
-			
+
 			break;
-		
+
 		default:
 			break;
 	}
@@ -273,13 +273,13 @@ void ucom4_cpu_device::execute_run()
 		m_bitmask = 1 << (m_op & 0x03);
 		increment_pc();
 		fetch_arg();
-		
+
 		if (m_skip)
 		{
 			m_skip = false;
 			m_op = 0; // nop
 		}
-		
+
 		// handle opcode
 		switch (m_op & 0xf0)
 		{
@@ -287,9 +287,9 @@ void ucom4_cpu_device::execute_run()
 			case 0x90: op_li(); break;
 			case 0xa0: op_jmpcal(); break;
 			case 0xb0: op_czp(); break;
-			
+
 			case 0xc0: case 0xd0: case 0xe0: case 0xf0: op_jcp(); break;
-			
+
 			default:
 				switch (m_op)
 				{
@@ -374,7 +374,7 @@ void ucom4_cpu_device::execute_run()
 			case 0x7c: op_sfb(); break;
 				}
 				break; // 0xfc
-				
+
 				}
 				break; // 0xff
 

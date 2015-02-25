@@ -2670,8 +2670,8 @@ MACHINE_CONFIG_END
  */
 /*
 static MACHINE_CONFIG_DERIVED( naomi2, naomi )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(naomi2_map)
+    MCFG_CPU_MODIFY("maincpu")
+    MCFG_CPU_PROGRAM_MAP(naomi2_map)
 MACHINE_CONFIG_END
 */
 /*
@@ -3467,13 +3467,13 @@ ROM_START( derbyoc )
 	// 840-0016    1999     317-0262-JPN   Naomi
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "280fee35" )
 /*
-	838-13661 RS422/RS232C BD DOC
-	IC1 - Toshiba TMPZ84C015BF-10 Z80-based MCU
-	IC6 - Toshiba TC551001CF-70L 128k x8 SRAM
-	IC8 - Sega 315-5338A
-	OSC1 - 19.680MHz OSC2 - 32.000MHz
+    838-13661 RS422/RS232C BD DOC
+    IC1 - Toshiba TMPZ84C015BF-10 Z80-based MCU
+    IC6 - Toshiba TC551001CF-70L 128k x8 SRAM
+    IC8 - Sega 315-5338A
+    OSC1 - 19.680MHz OSC2 - 32.000MHz
 
-	connected between Naomi motherboard and card reader/printer, accessed via MIE MCU ports 0x09-0x0d
+    connected between Naomi motherboard and card reader/printer, accessed via MIE MCU ports 0x09-0x0d
 */
 	ROM_REGION( 0x10000, "rs422_io", 0 )
 	ROM_LOAD( "epr-22083.ic7",  0x0000, 0x10000, CRC(c70b0de9) SHA1(329c924b4d29017482b1ecca839fb610ca20b2af) )

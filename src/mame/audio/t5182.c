@@ -169,7 +169,7 @@ t5182_device::t5182_device(const machine_config &mconfig, const char *tag, devic
 void t5182_device::device_start()
 {
 	m_setirq_cb = timer_alloc(SETIRQ_CB);
-	
+
 	save_item(NAME(m_irqstate));
 	save_item(NAME(m_semaphore_main));
 	save_item(NAME(m_semaphore_snd));
@@ -314,7 +314,7 @@ ioport_constructor t5182_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(t5182);
 }
-	
+
 
 	// 4000-407F    RAM shared with main CPU
 	// 4000 output queue length

@@ -21,12 +21,6 @@
     let's assume for now that the ROM contents is identical)
   - Master Merlin
 
-  Another sequel, called Split Second, looks like different hardware.
-
-
-  TODO:
-  - accurate speaker levels (tone pitch sounds good though)
-  - is the rom dump good?
 
 ***************************************************************************/
 
@@ -161,24 +155,13 @@ void merlin_state::machine_start()
 	save_item(NAME(m_o));
 }
 
-
-static const UINT16 merlin_output_pla[0x20] =
-{
-	/* O output PLA configuration currently unknown */
-	0x01, 0x10, 0x30, 0x70, 0x02, 0x12, 0x32, 0x72,
-	0x04, 0x14, 0x34, 0x74, 0x08, 0x18, 0x38, 0x78,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-};
-
-static const INT16 speaker_levels[] = { 0, 32767, 0, 32767 }; // unknown too, due to output_pla being unknown
+static const INT16 speaker_levels[] = { 0, 10922, 21845, 32767 };
 
 
 static MACHINE_CONFIG_START( merlin, merlin_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1100, MASTER_CLOCK)
-	MCFG_TMS1XXX_OUTPUT_PLA(merlin_output_pla)
 	MCFG_TMS1XXX_READ_K_CB(READ8(merlin_state, read_k))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(merlin_state, write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(merlin_state, write_r))
@@ -204,16 +187,12 @@ MACHINE_CONFIG_END
 
 ROM_START( merlin )
 	ROM_REGION( 0x800, "maincpu", 0 )
-	// This rom needs verification, that's why it is marked as a bad dump
-	// We had to change one byte in the original dump at offset 0x096 from
-	// 0x5E to 0x1E to make 'Music Machine' working.
-	// The hashes below are from the manually changed dump
-	ROM_LOAD( "mp3404", 0x0000, 0x800, BAD_DUMP CRC(7515a75d) SHA1(76ca3605d3fde1df62f79b9bb1f534c2a2ae0229) )
+	ROM_LOAD( "mp3404", 0x0000, 0x800, CRC(7515a75d) SHA1(76ca3605d3fde1df62f79b9bb1f534c2a2ae0229) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_default_mpla.pla", 0, 867, BAD_DUMP CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) ) // not verified
+	ROM_LOAD( "tms1100_merlin_mpla.pla", 0, 867, CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_merlin_opla.pla", 0, 365, NO_DUMP )
+	ROM_LOAD( "tms1100_merlin_opla.pla", 0, 365, CRC(3921b074) SHA1(12bd58e4d6676eb8c7059ef53598279e4f1a32ea) )
 ROM_END
 
 

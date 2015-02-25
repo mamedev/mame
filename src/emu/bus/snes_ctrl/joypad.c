@@ -97,7 +97,7 @@ void snes_joypad_device::port_poll()
 	// if up, no down
 	if (temp & 0x10)
 		temp &= ~0x20;
-	
+
 	m_latch = temp | 0xffff0000;
 }
 
@@ -121,7 +121,6 @@ void snes_joypad_device::write_strobe(UINT8 data)
 	int old = m_strobe;
 	m_strobe = data & 0x01;
 
-	if (m_strobe < old)	// 1 -> 0 transition
+	if (m_strobe < old) // 1 -> 0 transition
 		port_poll();
 }
-

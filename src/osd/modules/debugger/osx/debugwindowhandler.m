@@ -316,26 +316,32 @@ NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification = @"MAMEAuxiliaryD
 }
 
 - (void)cascadeWindowWithDesiredSize:(NSSize)desired forView:(NSView *)view {
-	NSRect	available = [[NSScreen mainScreen] visibleFrame];
-	NSRect	windowFrame = [window frame];
-	NSSize	current = [view frame].size;
-
+	// convert desired size to an adjustment and apply it to the current window frame
+	NSSize const current = [view frame].size;
 	desired.width -= current.width;
 	desired.height -= current.height;
-
+	NSRect windowFrame = [window frame];
 	windowFrame.size.width += desired.width;
-	windowFrame.size.width = MIN(windowFrame.size.width, available.size.width);
 	windowFrame.size.height += desired.height;
-	windowFrame.size.height = MIN(MIN(windowFrame.size.height, 320), available.size.height);
+
+	// limit the size to the minimum size
+	NSSize const minimum = [window minSize];
+	windowFrame.size.width = MAX(windowFrame.size.width, minimum.width);
+	windowFrame.size.height = MAX(windowFrame.size.height, minimum.height);
+
+	// limit the size to the main screen size
+	NSRect const available = [[NSScreen mainScreen] visibleFrame];
+	windowFrame.size.width = MIN(windowFrame.size.width, available.size.width);
+	windowFrame.size.height = MIN(windowFrame.size.height, available.size.height);
+
+	// arbitrary additional height limit
+	windowFrame.size.height = MIN(windowFrame.size.height, 320);
+
+	// place it in the bottom right corner and apply
 	windowFrame.origin.x = available.origin.x + available.size.width - windowFrame.size.width;
 	windowFrame.origin.y = available.origin.y;
 	[window setFrame:windowFrame display:YES];
 	[[self class] cascadeWindow:window];
-
-	windowFrame = [[window contentView] frame];
-	desired = [window contentMinSize];
-	[window setContentMinSize:NSMakeSize(MIN(windowFrame.size.width, desired.width),
-										 MIN(windowFrame.size.height, desired.height))];
 }
 
 @end

@@ -1098,7 +1098,7 @@ WRITE8_MEMBER(snes_console_state::io_read)
 		UINT16 joy1 = 0, joy2 = 0, joy3 = 0, joy4 = 0;
 		m_ctrl1->port_poll();
 		m_ctrl2->port_poll();
-		
+
 		for (int i = 0; i < 16; i++)
 		{
 			joy1 |= ((m_ctrl1->read_pin4() & 1) << (15 - i));
@@ -1115,7 +1115,7 @@ WRITE8_MEMBER(snes_console_state::io_read)
 		SNES_CPU_REG(JOY3H) = (joy3 & 0xff00) >> 8;
 		SNES_CPU_REG(JOY4L) = (joy4 & 0x00ff) >> 0;
 		SNES_CPU_REG(JOY4H) = (joy4 & 0xff00) >> 8;
-	}		
+	}
 }
 
 UINT8 snes_console_state::oldjoy1_read(int latched)
@@ -1160,13 +1160,13 @@ SNESCTRL_GUNLATCH_CB(snes_console_state::gun_latch_cb)
 		x = 0;
 	if (x > (SNES_SCR_WIDTH - 1))
 		x = SNES_SCR_WIDTH - 1;
-	
+
 	if (y < 0)
 		y = 0;
 	if (y > (m_ppu->m_beam.last_visible_line - 1))
 		y = m_ppu->m_beam.last_visible_line - 1;
 
-//	m_ppu->set_latch_hv(x, y);	// it would be more accurate to write twice to WRIO register, first with bit7 = 0 and then with bit7 = 1
+//  m_ppu->set_latch_hv(x, y);  // it would be more accurate to write twice to WRIO register, first with bit7 = 0 and then with bit7 = 1
 	m_ppu->set_latch_hv(m_ppu->current_x(), m_ppu->current_y());
 }
 

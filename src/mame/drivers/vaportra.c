@@ -215,11 +215,11 @@ void vaportra_state::machine_reset()
 static MACHINE_CONFIG_START( vaportra, vaportra_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,12000000) /* Custom chip 59 */
+	MCFG_CPU_ADD("maincpu", M68000,XTAL_24MHz/2) /* Custom chip 59 */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vaportra_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", H6280, 32220000/4) /* Custom chip 45; Audio section crystal is 32.220 MHz */
+	MCFG_CPU_ADD("audiocpu", H6280, XTAL_24MHz/4) /* Custom chip 45; Audio section crystal is 32.220 MHz but CPU clock is confirmed as coming from the 24MHz crystal (6Mhz exactly on the CPU) */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 
@@ -278,18 +278,18 @@ static MACHINE_CONFIG_START( vaportra, vaportra_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 32220000/8)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_32_22MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_YM2151_ADD("ym2", 32220000/9)
+	MCFG_YM2151_ADD("ym2", XTAL_32_22MHz/9) // uses a preset LS163 to force the odd speed
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ 2 */
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki1", 32220000/32, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", XTAL_32_22MHz/32, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", XTAL_32_22MHz/16, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -840,7 +840,7 @@ DRIVER_INIT_MEMBER(vaportra_state,vaportra)
 	int i;
 
 	for (i = 0x00000; i < 0x80000; i++)
-		RAM[i] = (RAM[i] & 0x7e) | ((RAM[i] & 0x01) << 7) | ((RAM[i] & 0x80) >> 7);
+		RAM[i] = BITSWAP8(RAM[i],0,6,5,4,3,2,1,7);
 }
 
 /******************************************************************************/

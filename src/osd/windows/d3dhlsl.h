@@ -335,8 +335,8 @@ private:
 
 	base *                  d3dintf;                    // D3D interface
 
-	running_machine * 		machine;
-	d3d::renderer *			d3d;						// D3D renderer
+	running_machine *       machine;
+	d3d::renderer *         d3d;                        // D3D renderer
 
 	bool                    master_enable;              // overall enable flag
 	bool                    vector_enable;              // vector post-processing enable flag

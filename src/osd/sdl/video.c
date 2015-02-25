@@ -83,7 +83,7 @@ sdl_monitor_info *sdl_monitor_info::list = NULL;
 static void check_osd_inputs(running_machine &machine);
 
 static float get_aspect(const char *defdata, const char *data, int report_error);
-static void get_resolution(const char *defdata, const char *data, sdl_window_config *config, int report_error);
+static void get_resolution(const char *defdata, const char *data, osd_window_config *config, int report_error);
 
 
 //============================================================
@@ -95,7 +95,7 @@ bool sdl_osd_interface::video_init()
 	int index;
 
 	// extract data from the options
-	extract_video_config(machine());
+	extract_video_config();
 
 	// set up monitors first
 	sdl_monitor_info::init();
@@ -110,7 +110,7 @@ bool sdl_osd_interface::video_init()
 	// create the windows
 	for (index = 0; index < video_config.numscreens; index++)
 	{
-		sdl_window_config conf;
+		osd_window_config conf;
 		memset(&conf, 0, sizeof(conf));
 		get_resolution(options().resolution(), options().resolution(index), &conf, TRUE);
 
@@ -163,7 +163,7 @@ void sdl_monitor_info::refresh()
 	m_dimensions.w = info.rcMonitor.right - info.rcMonitor.left;
 	m_dimensions.h = info.rcMonitor.bottom - info.rcMonitor.top;
 	char *temp = utf8_from_wstring(info.szDevice);
-	strcpy(m_monitor_device, temp);
+	strncpy(m_name, temp, ARRAY_LENGTH(m_name) - 1);
 	osd_free(temp);
 	#elif defined(SDLMAME_MACOSX)   // Mac OS X Core Imaging version
 	CGDirectDisplayID primary;
@@ -176,7 +176,7 @@ void sdl_monitor_info::refresh()
 	m_dimensions.x = m_dimensions.y = 0;
 	m_dimensions.w = dbounds.size.width - dbounds.origin.x;
 	m_dimensions.h = dbounds.size.height - dbounds.origin.y;
-	strcpy(m_monitor_device, "Mac OS X display");
+	strncpy(m_name, "Mac OS X display", ARRAY_LENGTH(m_name) - 1);
 	#elif defined(SDLMAME_X11) || defined(SDLMAME_NO_X11)       // X11 version
 	{
 		#if defined(SDLMAME_X11)
@@ -188,7 +188,7 @@ void sdl_monitor_info::refresh()
 		if ( SDL_GetWMInfo(&info) && (info.subsystem == SDL_SYSWM_X11) )
 		{
 			screen = DefaultScreen(info.info.x11.display);
-			SDL_VideoDriverName(m_monitor_device, sizeof(m_monitor_device)-1);
+			SDL_VideoDriverName(m_name, ARRAY_LENGTH(m_name) - 1);
 			m_dimensions.x = m_dimensions.y = 0;
 			m_dimensions.w = DisplayWidth(info.info.x11.display, screen);
 			m_dimensions.h = DisplayHeight(info.info.x11.display, screen);
@@ -215,7 +215,7 @@ void sdl_monitor_info::refresh()
 			static int first_call=0;
 			static int cw = 0, ch = 0;
 
-			SDL_VideoDriverName(m_monitor_device, sizeof(m_monitor_device)-1);
+			SDL_VideoDriverName(m_name, ARRAY_LENGTH(m_name) - 1);
 			if (first_call==0)
 			{
 				const char *dimstr = osd_getenv(SDLENV_DESKTOPDIM);
@@ -235,7 +235,7 @@ void sdl_monitor_info::refresh()
 					}
 					if ((cw==0) || (ch==0))
 					{
-						osd_printf_warning("WARNING: SDL_GetVideoInfo() for driver <%s> is broken.\n", m_monitor_device);
+						osd_printf_warning("WARNING: SDL_GetVideoInfo() for driver <%s> is broken.\n", m_name);
 						osd_printf_warning("         You should set SDLMAME_DESKTOPDIM to your desktop size.\n");
 						osd_printf_warning("            e.g. export SDLMAME_DESKTOPDIM=800x600\n");
 						osd_printf_warning("         Assuming 1024x768 now!\n");
@@ -252,7 +252,7 @@ void sdl_monitor_info::refresh()
 	m_dimensions.x = m_dimensions.y = 0;
 	m_dimensions.w = WinQuerySysValue( HWND_DESKTOP, SV_CXSCREEN );
 	m_dimensions.h = WinQuerySysValue( HWND_DESKTOP, SV_CYSCREEN );
-	strcpy(m_monitor_device, "OS/2 display");
+	strncpy(m_name, "OS/2 display", ARRAY_LENGTH(m_name) - 1);
 	#else
 	#error Unknown SDLMAME_xx OS type!
 	#endif
@@ -261,7 +261,7 @@ void sdl_monitor_info::refresh()
 		static int info_shown=0;
 		if (!info_shown)
 		{
-			osd_printf_verbose("SDL Device Driver     : %s\n", m_monitor_device);
+			osd_printf_verbose("SDL Device Driver     : %s\n", m_name);
 			osd_printf_verbose("SDL Monitor Dimensions: %d x %d\n", m_dimensions.w, m_dimensions.h);
 			info_shown = 1;
 		}
@@ -418,7 +418,7 @@ void sdl_monitor_info::init()
 			monitor = global_alloc_clear(sdl_monitor_info);
 			monitor->m_handle = i;
 
-			snprintf(monitor->m_monitor_device, sizeof(monitor->m_monitor_device)-1, "%s%d", OSDOPTION_SCREEN,i);
+			snprintf(monitor->m_name, sizeof(monitor->m_name)-1, "%s%d", OSDOPTION_SCREEN,i);
 
 			SDL_GetDesktopDisplayMode(i, &dmode);
 			SDL_GetDisplayBounds(i, &monitor->m_dimensions);
@@ -426,7 +426,7 @@ void sdl_monitor_info::init()
 			// guess the aspect ratio assuming square pixels
 			monitor->m_aspect = (float)(dmode.w) / (float)(dmode.h);
 
-			osd_printf_verbose("Adding monitor %s (%d x %d)\n", monitor->m_monitor_device, dmode.w, dmode.h);
+			osd_printf_verbose("Adding monitor %s (%d x %d)\n", monitor->m_name, dmode.w, dmode.h);
 
 			monx += dmode.w;
 
@@ -488,7 +488,7 @@ sdl_monitor_info *sdl_monitor_info::pick_monitor(sdl_options &options, int index
 		for (monitor = sdl_monitor_info::list; monitor != NULL; monitor = monitor->next())
 		{
 			moncount++;
-			if (strcmp(scrname, monitor->device()) == 0)
+			if (strcmp(scrname, monitor->devicename()) == 0)
 				goto finishit;
 		}
 	}
@@ -584,7 +584,7 @@ static void check_osd_inputs(running_machine &machine)
 //  extract_video_config
 //============================================================
 
-void sdl_osd_interface::extract_video_config(running_machine &machine)
+void sdl_osd_interface::extract_video_config()
 {
 	const char *stemp;
 
@@ -592,6 +592,7 @@ void sdl_osd_interface::extract_video_config(running_machine &machine)
 
 	// global options: extract the data
 	video_config.windowed      = options().window();
+	video_config.prescale      = options().prescale();
 	video_config.keepaspect    = options().keep_aspect();
 	video_config.numscreens    = options().numscreens();
 	video_config.fullstretch   = options().uneven_stretch();
@@ -599,8 +600,8 @@ void sdl_osd_interface::extract_video_config(running_machine &machine)
 	video_config.restrictonemonitor = !options().use_all_heads();
 	#endif
 
-
-	if (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
+	// if we are in debug mode, never go full screen
+	if (machine().debug_flags & DEBUG_FLAG_OSD_ENABLED)
 		video_config.windowed = TRUE;
 
 	// default to working video please
@@ -618,7 +619,7 @@ void sdl_osd_interface::extract_video_config(running_machine &machine)
 	}
 	if (strcmp(stemp, SDLOPTVAL_SOFT) == 0)
 		video_config.mode = VIDEO_MODE_SOFT;
-	else if (strcmp(stemp, SDLOPTVAL_NONE) == 0)
+	else if (strcmp(stemp, OSDOPTVAL_NONE) == 0)
 	{
 		video_config.mode = VIDEO_MODE_SOFT;
 		video_config.novideo = 1;
@@ -656,11 +657,10 @@ void sdl_osd_interface::extract_video_config(running_machine &machine)
 	}
 
 	#if (USE_OPENGL || SDLMAME_SDL2)
-		video_config.filter        = options().filter();
+	video_config.filter        = options().filter();
 	#endif
 
 	#if (USE_OPENGL)
-		video_config.prescale      = options().prescale();
 		if (video_config.prescale < 1 || video_config.prescale > 3)
 		{
 			osd_printf_warning("Invalid prescale option, reverting to '1'\n");
@@ -683,7 +683,7 @@ void sdl_osd_interface::extract_video_config(running_machine &machine)
 			for(i=0; i<GLSL_SHADER_MAX; i++)
 			{
 				stemp = options().shader_mame(i);
-				if (stemp && strcmp(stemp, SDLOPTVAL_NONE) != 0 && strlen(stemp)>0)
+				if (stemp && strcmp(stemp, OSDOPTVAL_NONE) != 0 && strlen(stemp)>0)
 				{
 					video_config.glsl_shader_mamebm[i] = (char *) malloc(strlen(stemp)+1);
 					strcpy(video_config.glsl_shader_mamebm[i], stemp);
@@ -698,7 +698,7 @@ void sdl_osd_interface::extract_video_config(running_machine &machine)
 			for(i=0; i<GLSL_SHADER_MAX; i++)
 			{
 				stemp = options().shader_screen(i);
-				if (stemp && strcmp(stemp, SDLOPTVAL_NONE) != 0 && strlen(stemp)>0)
+				if (stemp && strcmp(stemp, OSDOPTVAL_NONE) != 0 && strlen(stemp)>0)
 				{
 					video_config.glsl_shader_scrn[i] = (char *) malloc(strlen(stemp)+1);
 					strcpy(video_config.glsl_shader_scrn[i], stemp);
@@ -763,9 +763,9 @@ static float get_aspect(const char *defdata, const char *data, int report_error)
 {
 	int num = 0, den = 1;
 
-	if (strcmp(data, SDLOPTVAL_AUTO) == 0)
+	if (strcmp(data, OSDOPTVAL_AUTO) == 0)
 	{
-		if (strcmp(defdata,SDLOPTVAL_AUTO) == 0)
+		if (strcmp(defdata,OSDOPTVAL_AUTO) == 0)
 			return 0;
 		data = defdata;
 	}
@@ -779,16 +779,13 @@ static float get_aspect(const char *defdata, const char *data, int report_error)
 //  get_resolution
 //============================================================
 
-static void get_resolution(const char *defdata, const char *data, sdl_window_config *config, int report_error)
+static void get_resolution(const char *defdata, const char *data, osd_window_config *config, int report_error)
 {
 	config->width = config->height = config->depth = config->refresh = 0;
-	if (strcmp(data, SDLOPTVAL_AUTO) == 0)
+	if (strcmp(data, OSDOPTVAL_AUTO) == 0)
 	{
-		if (strcmp(defdata, SDLOPTVAL_AUTO) == 0)
-		{
+		if (strcmp(defdata, OSDOPTVAL_AUTO) == 0)
 			return;
-		}
-
 		data = defdata;
 	}
 

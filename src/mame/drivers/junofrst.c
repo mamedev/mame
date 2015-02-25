@@ -95,32 +95,37 @@ public:
 	junofrst_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tutankhm_state(mconfig, type, tag),
 			m_audiocpu(*this, "audiocpu"),
-			m_i8039(*this, "mcu") { }
-
-	UINT8    m_blitterdata[4];
-	int      m_i8039_status;
-	int      m_last_irq;
+			m_i8039(*this, "mcu"),
+			m_filter_0_0(*this, "filter.0.0"),
+			m_filter_0_1(*this, "filter.0.1"),
+			m_filter_0_2(*this, "filter.0.2") { }
 
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_i8039;
-
-	device_t *m_filter_0_0;
-	device_t *m_filter_0_1;
-	device_t *m_filter_0_2;
-	DECLARE_WRITE8_MEMBER(junofrst_blitter_w);
-	DECLARE_WRITE8_MEMBER(junofrst_bankselect_w);
-	DECLARE_WRITE8_MEMBER(junofrst_sh_irqtrigger_w);
-	DECLARE_WRITE8_MEMBER(junofrst_i8039_irq_w);
+	required_device<filter_rc_device> m_filter_0_0;
+	required_device<filter_rc_device> m_filter_0_1;
+	required_device<filter_rc_device> m_filter_0_2;
+	
+	UINT8    m_blitterdata[4];
+	int      m_i8039_status;
+	int      m_last_irq;
+	
+	DECLARE_WRITE8_MEMBER(blitter_w);
+	DECLARE_WRITE8_MEMBER(bankselect_w);
+	DECLARE_WRITE8_MEMBER(sh_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(i8039_irq_w);
 	DECLARE_WRITE8_MEMBER(i8039_irqen_and_status_w);
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	DECLARE_WRITE8_MEMBER(junofrst_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(junofrst_irq_enable_w);
-	DECLARE_READ8_MEMBER(junofrst_portA_r);
-	DECLARE_WRITE8_MEMBER(junofrst_portB_w);
+	DECLARE_WRITE8_MEMBER(coincounter_w);
+	DECLARE_WRITE8_MEMBER(irq_enable_w);
+	DECLARE_READ8_MEMBER(portA_r);
+	DECLARE_WRITE8_MEMBER(portB_w);
+
 	DECLARE_DRIVER_INIT(junofrst);
 	DECLARE_MACHINE_START(junofrst);
 	DECLARE_MACHINE_RESET(junofrst);
-	INTERRUPT_GEN_MEMBER(junofrst_30hz_irq);
+
+	INTERRUPT_GEN_MEMBER(_30hz_irq);
 };
 
 
@@ -142,7 +147,7 @@ public:
           We have to mask it off otherwise the "Juno First" logo on the title screen is wrong.
 */
 
-WRITE8_MEMBER(junofrst_state::junofrst_blitter_w)
+WRITE8_MEMBER(junofrst_state::blitter_w)
 {
 	m_blitterdata[offset] = data;
 
@@ -195,13 +200,13 @@ WRITE8_MEMBER(junofrst_state::junofrst_blitter_w)
 }
 
 
-WRITE8_MEMBER(junofrst_state::junofrst_bankselect_w)
+WRITE8_MEMBER(junofrst_state::bankselect_w)
 {
 	membank("bank1")->set_entry(data & 0x0f);
 }
 
 
-READ8_MEMBER(junofrst_state::junofrst_portA_r)
+READ8_MEMBER(junofrst_state::portA_r)
 {
 	int timer;
 
@@ -217,9 +222,9 @@ READ8_MEMBER(junofrst_state::junofrst_portA_r)
 }
 
 
-WRITE8_MEMBER(junofrst_state::junofrst_portB_w)
+WRITE8_MEMBER(junofrst_state::portB_w)
 {
-	device_t *filter[3] = { m_filter_0_0, m_filter_0_1, m_filter_0_2 };
+	filter_rc_device *filter[3] = { m_filter_0_0, m_filter_0_1, m_filter_0_2 };
 	int i;
 
 	for (i = 0; i < 3; i++)
@@ -232,12 +237,12 @@ WRITE8_MEMBER(junofrst_state::junofrst_portB_w)
 			C += 220000;    /* 220000pF = 0.22uF */
 
 		data >>= 2;
-		dynamic_cast<filter_rc_device*>(filter[i])->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 200, CAP_P(C));
+		filter[i]->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 200, CAP_P(C));
 	}
 }
 
 
-WRITE8_MEMBER(junofrst_state::junofrst_sh_irqtrigger_w)
+WRITE8_MEMBER(junofrst_state::sh_irqtrigger_w)
 {
 	if (m_last_irq == 0 && data == 1)
 	{
@@ -249,7 +254,7 @@ WRITE8_MEMBER(junofrst_state::junofrst_sh_irqtrigger_w)
 }
 
 
-WRITE8_MEMBER(junofrst_state::junofrst_i8039_irq_w)
+WRITE8_MEMBER(junofrst_state::i8039_irq_w)
 {
 	m_i8039->set_input_line(0, ASSERT_LINE);
 }
@@ -270,12 +275,12 @@ WRITE8_MEMBER(junofrst_state::flip_screen_w)
 }
 
 
-WRITE8_MEMBER(junofrst_state::junofrst_coin_counter_w)
+WRITE8_MEMBER(junofrst_state::coincounter_w)
 {
 	coin_counter_w(machine(), offset, data);
 }
 
-WRITE8_MEMBER(junofrst_state::junofrst_irq_enable_w)
+WRITE8_MEMBER(junofrst_state::irq_enable_w)
 {
 	m_irq_enable = data & 1;
 	if (!m_irq_enable)
@@ -291,14 +296,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, junofrst_state )
 	AM_RANGE(0x8024, 0x8024) AM_READ_PORT("P1")
 	AM_RANGE(0x8028, 0x8028) AM_READ_PORT("P2")
 	AM_RANGE(0x802c, 0x802c) AM_READ_PORT("DSW1")
-	AM_RANGE(0x8030, 0x8030) AM_WRITE(junofrst_irq_enable_w)
-	AM_RANGE(0x8031, 0x8032) AM_WRITE(junofrst_coin_counter_w)
+	AM_RANGE(0x8030, 0x8030) AM_WRITE(irq_enable_w)
+	AM_RANGE(0x8031, 0x8032) AM_WRITE(coincounter_w)
 	AM_RANGE(0x8033, 0x8033) AM_WRITEONLY AM_SHARE("scroll")  /* not used in Juno */
 	AM_RANGE(0x8034, 0x8035) AM_WRITE(flip_screen_w)
-	AM_RANGE(0x8040, 0x8040) AM_WRITE(junofrst_sh_irqtrigger_w)
+	AM_RANGE(0x8040, 0x8040) AM_WRITE(sh_irqtrigger_w)
 	AM_RANGE(0x8050, 0x8050) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0x8060, 0x8060) AM_WRITE(junofrst_bankselect_w)
-	AM_RANGE(0x8070, 0x8073) AM_WRITE(junofrst_blitter_w)
+	AM_RANGE(0x8060, 0x8060) AM_WRITE(bankselect_w)
+	AM_RANGE(0x8070, 0x8073) AM_WRITE(blitter_w)
 	AM_RANGE(0x8100, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xffff) AM_ROM
@@ -313,7 +318,7 @@ static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, junofrst_state )
 	AM_RANGE(0x4001, 0x4001) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(soundlatch2_byte_w)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(junofrst_i8039_irq_w)
+	AM_RANGE(0x6000, 0x6000) AM_WRITE(i8039_irq_w)
 ADDRESS_MAP_END
 
 
@@ -370,10 +375,6 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(junofrst_state,junofrst)
 {
-	m_filter_0_0 = machine().device("filter.0.0");
-	m_filter_0_1 = machine().device("filter.0.1");
-	m_filter_0_2 = machine().device("filter.0.2");
-
 	save_item(NAME(m_i8039_status));
 	save_item(NAME(m_last_irq));
 	save_item(NAME(m_irq_toggle));
@@ -395,7 +396,7 @@ MACHINE_RESET_MEMBER(junofrst_state,junofrst)
 	m_blitterdata[3] = 0;
 }
 
-INTERRUPT_GEN_MEMBER(junofrst_state::junofrst_30hz_irq)
+INTERRUPT_GEN_MEMBER(junofrst_state::_30hz_irq)
 {
 	/* flip flops cause the interrupt to be signalled every other frame */
 	m_irq_toggle ^= 1;
@@ -408,7 +409,7 @@ static MACHINE_CONFIG_START( junofrst, junofrst_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 1500000)         /* 1.5 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", junofrst_state,  junofrst_30hz_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", junofrst_state,  _30hz_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80,14318000/8)    /* 1.78975 MHz */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
@@ -432,8 +433,8 @@ static MACHINE_CONFIG_START( junofrst, junofrst_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 14318000/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(junofrst_state, junofrst_portA_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(junofrst_state, junofrst_portB_w))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(junofrst_state, portA_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(junofrst_state, portB_w))
 	MCFG_SOUND_ROUTE(0, "filter.0.0", 0.30)
 	MCFG_SOUND_ROUTE(1, "filter.0.1", 0.30)
 	MCFG_SOUND_ROUTE(2, "filter.0.2", 0.30)
@@ -511,5 +512,5 @@ DRIVER_INIT_MEMBER(junofrst_state,junofrst)
 }
 
 
-GAME( 1983, junofrst, 0,        junofrst, junofrst, junofrst_state, junofrst, ROT90, "Konami", "Juno First", 0 )
-GAME( 1983, junofrstg,junofrst, junofrst, junofrst, junofrst_state, junofrst, ROT90, "Konami (Gottlieb license)", "Juno First (Gottlieb)", 0 )
+GAME( 1983, junofrst, 0,        junofrst, junofrst, junofrst_state, junofrst, ROT90, "Konami", "Juno First", GAME_SUPPORTS_SAVE )
+GAME( 1983, junofrstg,junofrst, junofrst, junofrst, junofrst_state, junofrst, ROT90, "Konami (Gottlieb license)", "Juno First (Gottlieb)", GAME_SUPPORTS_SAVE )

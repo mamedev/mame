@@ -6,7 +6,7 @@ Nearly everything.
 
   There also appears to be a sequel which may be running on the same hardware, but which does not seem to have been released.
   Come On Baby - Ballympic Heroes!  (c) 2001
-  
+
   Other games in this series include:
   Come On Baby 2 (c) 2002
   Come On Baby Jr (c) 2003 (which seems to be otherwise identical to Come On Baby but in a smaller cabinet)
@@ -20,29 +20,29 @@ Nearly everything.
   BIOS String: 07/03/2000-440BX-ITE8671-2A69KV3IC-00
   aka. BIOS-I-2M
   Award BIOS
-  B1120IAG.BIN	For Super IO = ITE 8671
-  		Clock Gen IC : Winbond-39A
-  		(Nov/2000 built)
-  		
+  B1120IAG.BIN  For Super IO = ITE 8671
+        Clock Gen IC : Winbond-39A
+        (Nov/2000 built)
+
   CPU - Slot 1 Celeron 633MHz (66x9.5)
   Memory - 65536k SDRAM PC100
 
   Brief motherboard overview (from PC Partner BXAS1-928 motherboard manual)
   --
-  
+
   HARDWARE CONFIGURATION
-  This motherboard is based on Intel 82440BX chipset. The chipset is a 
-  highly integrated solution for a cost-effective and compact motherboard. 
-  The motherboard supports standard DIMM module, PC-100 DIMM module or 
-  Registered DIMM Module. 
-  
+  This motherboard is based on Intel 82440BX chipset. The chipset is a
+  highly integrated solution for a cost-effective and compact motherboard.
+  The motherboard supports standard DIMM module, PC-100 DIMM module or
+  Registered DIMM Module.
+
   Features on-board include....
   super-I/O, Ultra DMA33 (Ultra DMA66 optional for VIA chipset), PCI bus master IDE, AGP Ver 1.0, PCI Ver 2.1 compliance,
   USB, VRM 8.4 compliance, ECC, ATX specification 2.01 compliance, hardware monitoring (optional), On-board PCI Sound
   Sub-system(optional, not populated). Supports PC-100 DIMM Module.
 
   Key Features:
-  
+
   Processor
   - Full support for the Intel Pentium II & Intel Pentium III, Intel Celeron and Deschutes processors using Slot 1 connector.
   - Slot 1 connector for Intel Pentium II & Intel Pentium III microprocessors.
@@ -50,33 +50,33 @@ Nearly everything.
 
   CPU Speed Setting
   - Jumper setting or no jumper is needed to set for various speed of CPU (Factory optional).
-  
+
   VRM (Voltage Regulator Modules) on Board
   - Flexible motherboard design with on-board VRM 8.4, easy to upgrade with
   Future Intel Pentium II & Pentium III processors.
-  
+
   Cache
   - Pentium II & Pentium III Processor built-in L2 cache.
-  
+
   System Memory
   - Up to 384MB (SDRAM) or 768MB (Registered SDRAM) - for 440BX.
   - A total of three 168-pin DIMM sockets for 440BX.
   - Supports SDRAM (only for 66MHz bus speed).
   - Supports PC-100.
-  
+
   Memory Organization
   - Supports single-density DIMMs of 1MB, 2MB, 4MB, 8MB and 16MB depth (x64 or 72).
   - Supports double-density DIMMs of 2MB, 4MB, 8MB, 16MB and 32MB depth
   (x64 or 72).
   - Supports error checking correction (ECC) using parity DRAM modules (for 440BX).
   - Banks of different DRAM types depths can be mixed.
-  
+
   Expansion Slots
   - Supports SB-LINK Port for Creative Sound PCI Card.
   - 1 AGP slot (ver. 1.0, 1x/2x mode supported).
   - 5 PCI bus master slots (rev. 2.1 compliant, with 1 PCI slot sharing with 1 ISA slot)
   - 2 ISA slots (1 ISA slot sharing with 1 PCI slot).
-  
+
   On-Board I/O
   - Two PCI fast IDE ports supporting up to 4 ATA2, Ultra DMA33 IDE HDDs, Ultra DMA66 (optional only for VIA Chipset)
   IDE HDDs, CD-Roms, ZIP devices and LS-120 drives as boot drive.
@@ -91,19 +91,19 @@ Nearly everything.
   - PS/2 mouse port.
   - Infrared (IrDA) support (via a header).
   - One Line / Speaker out, one Mic in, one Line in and MIDI / Gameport
-  
+
   System BIOS
   - 2MB flash BIOS supporting PnP, APM, ATAPI, ACPI and DMI;
   - Jumper selection for 5V or 12V flash memory voltage.
   - Auto detects and supports LBA hard disks with formatted capacities over
   8.4GB.
   - Easily upgradable by end-user.
-  
+
   Plug-and-Play
   - Supports Plug-and-Play Specification 1.1.
   - Plug-and-play for DOS, Windows 3.X, Windows 95 as well as Windows 98.
   - Fully steerable PCI interrupts.
-  
+
   Power Management
   - Supports SMM, APM and ACPI.
   - Break switch for instant suspend/resume on system operation.
@@ -111,7 +111,7 @@ Nearly everything.
   - Supports WAKE-ON-LAN (WOL).
   - Supports Wake on Ring for External Modem.
   - Supports ATX specification 2.01.
-  
+
   Creative PCI Sound (optional, not populated)
   - Full DOS game support (DDMA, PC/PCI, CLS).
   - PCI 2.1 Bus Master, hardware sound acceleration.
@@ -119,13 +119,13 @@ Nearly everything.
   - Full Duplex, 3D Enhancement, Software wavetable.
   - PNP and APM 1.2 support.
   - Win95/98, NT drivers ready.
-  
+
   Keyboard Password Turn ON
   - Special feature for system security.
-  
+
   System monitoring (optional)
   - Hardware monitoring circuitry is supported, provides voltages, temperature, fan speeds etc. monitoring.
-  
+
   --
 
   The donor PC looks like a standard Windows 98 setup.
@@ -140,8 +140,8 @@ Nearly everything.
   It uses DirectSound and the Microsoft MCI interfaces and 3dfx Glide for video.
   The PC that the game was dumped from has Sound Blaster and Ensoniq drivers,
   but it works fine with some other sound configurations.
-  The sound chip on the motherboard is not populated. There is a cheap Korean 
-  sound card "CS-6500P Made In Korea OJU CTN CO LTD." plugged into one of the 
+  The sound chip on the motherboard is not populated. There is a cheap Korean
+  sound card "CS-6500P Made In Korea OJU CTN CO LTD." plugged into one of the
   slots containing a CRYSTAL CS4281-CM chip.
   The donor PC has a "3dfxvoodoo3" driver installation directory, but it works
   fine with a Voodoo4 4500.

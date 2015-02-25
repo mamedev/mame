@@ -202,71 +202,6 @@ inline item_layer get_layer_and_blendmode(const layout_view &view, int index, in
 }
 
 //**************************************************************************
-//  render_texinfo
-//**************************************************************************
-
-render_texinfo &render_texinfo::operator=(const render_texinfo &src)
-{
-	free_palette();
-	base = src.base;
-	rowpixels = src.rowpixels;
-	width = src.width;
-	height = src.height;
-	seqid = src.seqid;
-	osddata = src.osddata;
-	m_palette = src.m_palette;
-	if (m_palette != NULL)
-	{
-		m_palette->ref_count++;
-	}
-	return *this;
-}
-
-render_texinfo::render_texinfo(const render_texinfo &src)
-{
-	base = src.base;
-	rowpixels = src.rowpixels;
-	width = src.width;
-	height = src.height;
-	seqid = src.seqid;
-	osddata = src.osddata;
-	m_palette = src.m_palette;
-	if (m_palette != NULL)
-	{
-		m_palette->ref_count++;
-	}
-}
-
-void render_texinfo::set_palette(const dynamic_array<rgb_t> *source)
-{
-	free_palette();
-	if (source != NULL)
-	{
-		m_palette = global_alloc(render_palette_copy);
-		m_palette->palette.copyfrom(*source);
-		m_palette->ref_count = 1;
-	}
-	else
-	{
-		m_palette = NULL;
-	}
-}
-
-void render_texinfo::free_palette()
-{
-	if (m_palette != NULL)
-	{
-		m_palette->ref_count--;
-		if (m_palette->ref_count == 0)
-		{
-			global_free(m_palette);
-		}
-	}
-	m_palette = NULL;
-}
-
-
-//**************************************************************************
 //  RENDER PRIMITIVE
 //**************************************************************************
 
@@ -277,32 +212,8 @@ void render_texinfo::free_palette()
 
 void render_primitive::reset()
 {
-	// public state
-	type = INVALID;
-	container = NULL;
-	bounds.x0 = 0;
-	bounds.y0 = 0;
-	bounds.x1 = 0;
-	bounds.y1 = 0;
-	color.a = 0;
-	color.r = 0;
-	color.g = 0;
-	color.b = 0;
-	flags = 0;
-	width = 0.0f;
-	texture.set_palette(NULL);
-	texture = render_texinfo();
-	texcoords.bl.u = 0.0f;
-	texcoords.bl.v = 0.0f;
-	texcoords.br.u = 0.0f;
-	texcoords.br.v = 0.0f;
-	texcoords.tl.u = 0.0f;
-	texcoords.tl.v = 0.0f;
-	texcoords.tr.u = 0.0f;
-	texcoords.tr.v = 0.0f;
-
 	// do not clear m_next!
-	// memset(&type, 0, FPTR(&texcoords + 1) - FPTR(&type));
+	memset(&type, 0, FPTR(&texcoords + 1) - FPTR(&type));
 }
 
 
@@ -556,8 +467,7 @@ void render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &t
 		texinfo.rowpixels = m_bitmap->rowpixels();
 		texinfo.width = swidth;
 		texinfo.height = sheight;
-		// will be set later
-		texinfo.set_palette(NULL);
+		// palette will be set later
 		texinfo.seqid = ++m_curseq;
 	}
 	else
@@ -611,8 +521,7 @@ void render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &t
 		texinfo.rowpixels = scaled->bitmap->rowpixels();
 		texinfo.width = dwidth;
 		texinfo.height = dheight;
-		// will be set later
-		texinfo.set_palette(NULL);
+		// palette will be set later
 		texinfo.seqid = scaled->seqid;
 	}
 }
@@ -623,7 +532,7 @@ void render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &t
 //  palette for a texture
 //-------------------------------------------------
 
-const dynamic_array<rgb_t> *render_texture::get_adjusted_palette(render_container &container)
+const rgb_t *render_texture::get_adjusted_palette(render_container &container)
 {
 	// override the palette with our adjusted palette
 	switch (m_format)
@@ -633,11 +542,7 @@ const dynamic_array<rgb_t> *render_texture::get_adjusted_palette(render_containe
 
 			assert(m_bitmap->palette() != NULL);
 
-			// if no adjustment necessary, return the raw palette
-			if (!container.has_brightness_contrast_gamma_changes())
-				return m_bitmap->palette()->entry_list_adjusted_darray();
-
-			// otherwise, return our adjusted palette
+			// return our adjusted palette
 			return container.bcg_lookup_table(m_format, m_bitmap->palette());
 
 		case TEXFORMAT_RGB32:
@@ -671,8 +576,7 @@ render_container::render_container(render_manager &manager, screen_device *scree
 		m_manager(manager),
 		m_screen(screen),
 		m_overlaybitmap(NULL),
-		m_overlaytexture(NULL),
-		m_bcglookup256(0x400)
+		m_overlaytexture(NULL)
 {
 	// make sure it is empty
 	empty();
@@ -685,7 +589,7 @@ render_container::render_container(render_manager &manager, screen_device *scree
 		m_user.m_brightness = manager.machine().options().brightness();
 		m_user.m_contrast = manager.machine().options().contrast();
 		m_user.m_gamma = manager.machine().options().gamma();
-		// can't allocate palette client yet since palette and screen devices aren't started yet
+		// palette client will be allocated later
 	}
 
 	recompute_lookups();
@@ -812,7 +716,7 @@ float render_container::apply_brightness_contrast_gamma_fp(float value)
 //  given texture mode
 //-------------------------------------------------
 
-const dynamic_array<rgb_t> *render_container::bcg_lookup_table(int texformat, palette_t *palette)
+const rgb_t *render_container::bcg_lookup_table(int texformat, palette_t *palette)
 {
 	switch (texformat)
 	{
@@ -820,18 +724,17 @@ const dynamic_array<rgb_t> *render_container::bcg_lookup_table(int texformat, pa
 		case TEXFORMAT_PALETTEA16:
 			if (m_palclient == NULL) // if adjusted palette hasn't been created yet, create it
 			{
-				assert(palette == m_screen->palette()->palette());
 				m_palclient.reset(global_alloc(palette_client(*palette)));
 				m_bcglookup.resize(palette->max_index());
 				recompute_lookups();
 			}
 			assert (palette == &m_palclient->palette());
-			return &m_bcglookup;
+			return m_bcglookup;
 
 		case TEXFORMAT_RGB32:
 		case TEXFORMAT_ARGB32:
 		case TEXFORMAT_YUY16:
-			return &m_bcglookup256;
+			return m_bcglookup256;
 
 		default:
 			return NULL;
@@ -916,14 +819,19 @@ void render_container::recompute_lookups()
 		const rgb_t *adjusted_palette = palette.entry_list_adjusted();
 		int colors = palette.max_index();
 
-		for (int i = 0; i < colors; i++)
+		if (has_brightness_contrast_gamma_changes())
 		{
-			rgb_t newval = adjusted_palette[i];
-			m_bcglookup[i] = (newval & 0xff000000) |
+			for (int i = 0; i < colors; i++)
+			{
+				rgb_t newval = adjusted_palette[i];
+				m_bcglookup[i] = (newval & 0xff000000) |
 										m_bcglookup256[0x200 + newval.r()] |
 										m_bcglookup256[0x100 + newval.g()] |
 										m_bcglookup256[0x000 + newval.b()];
+			}
 		}
+		else
+			memcpy(&m_bcglookup[0], adjusted_palette, colors * sizeof(rgb_t));
 	}
 }
 
@@ -949,24 +857,29 @@ void render_container::update_palette()
 		palette_t &palette = m_palclient->palette();
 		const rgb_t *adjusted_palette = palette.entry_list_adjusted();
 
-		// loop over chunks of 32 entries, since we can quickly examine 32 at a time
-		for (UINT32 entry32 = mindirty / 32; entry32 <= maxdirty / 32; entry32++)
+		if (has_brightness_contrast_gamma_changes())
 		{
-			UINT32 dirtybits = dirty[entry32];
-			if (dirtybits != 0)
+			// loop over chunks of 32 entries, since we can quickly examine 32 at a time
+			for (UINT32 entry32 = mindirty / 32; entry32 <= maxdirty / 32; entry32++)
+			{
+				UINT32 dirtybits = dirty[entry32];
+				if (dirtybits != 0)
 
-				// this chunk of 32 has dirty entries; fix them up
-				for (UINT32 entry = 0; entry < 32; entry++)
-					if (dirtybits & (1 << entry))
-					{
-						UINT32 finalentry = entry32 * 32 + entry;
-						rgb_t newval = adjusted_palette[finalentry];
-						m_bcglookup[finalentry] = (newval & 0xff000000) |
+					// this chunk of 32 has dirty entries; fix them up
+					for (UINT32 entry = 0; entry < 32; entry++)
+						if (dirtybits & (1 << entry))
+						{
+							UINT32 finalentry = entry32 * 32 + entry;
+							rgb_t newval = adjusted_palette[finalentry];
+							m_bcglookup[finalentry] = (newval & 0xff000000) |
 														m_bcglookup256[0x200 + newval.r()] |
 														m_bcglookup256[0x100 + newval.g()] |
 														m_bcglookup256[0x000 + newval.b()];
-					}
+						}
+			}
 		}
+		else
+			memcpy(&m_bcglookup[mindirty], &adjusted_palette[mindirty], (maxdirty - mindirty + 1) * sizeof(rgb_t));
 	}
 }
 
@@ -1821,13 +1734,9 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 					height = MIN(height, m_maxtexheight);
 
 					curitem->texture()->get_scaled(width, height, prim->texture, list);
+
 					// set the palette
-#if 1
-					const dynamic_array<rgb_t> *adjusted_pal = curitem->texture()->get_adjusted_palette(container);
-					prim->texture.set_palette(adjusted_pal);
-#else
 					prim->texture.palette = curitem->texture()->get_adjusted_palette(container);
-#endif
 
 					// determine UV coordinates and apply clipping
 					prim->texcoords = oriented_texcoords[finalorient];

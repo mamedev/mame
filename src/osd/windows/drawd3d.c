@@ -287,7 +287,7 @@ int drawd3d_init(running_machine &machine, osd_draw_callbacks *callbacks)
 //  drawd3d_window_draw
 //============================================================
 
-int d3d::renderer::draw(HDC dc, int update)
+int d3d::renderer::draw(const int update)
 {
 	int check = pre_window_draw_check();
 	if (check >= 0)
@@ -500,7 +500,7 @@ void texture_manager::create_resources()
 		texture.rowpixels = m_default_bitmap.rowpixels();
 		texture.width = m_default_bitmap.width();
 		texture.height = m_default_bitmap.height();
-		texture.set_palette(NULL);
+		texture.palette = NULL;
 		texture.seqid = 0;
 
 		// now create it
@@ -517,7 +517,7 @@ void texture_manager::create_resources()
 		texture.rowpixels = m_vector_bitmap.rowpixels();
 		texture.width = m_vector_bitmap.width();
 		texture.height = m_vector_bitmap.height();
-		texture.set_palette(NULL);
+		texture.palette = NULL;
 		texture.seqid = 0;
 
 		// now create it
@@ -1266,7 +1266,7 @@ int renderer::get_adapter_for_monitor()
 		HMONITOR curmonitor = (*d3dintf->d3d.get_adapter_monitor)(d3dintf, adapternum);
 
 		// if we match the proposed monitor, this is it
-		if (curmonitor == window().monitor()->handle)
+		if (curmonitor == window().monitor()->handle())
 		{
 			return adapternum;
 		}
@@ -1334,7 +1334,7 @@ void renderer::pick_best_mode()
 			size_score *= 0.1f;
 
 		// if we're looking for a particular mode, that's a winner
-		if (mode.Width == window().m_maxwidth && mode.Height == window().m_maxheight)
+		if (mode.Width == window().m_win_config.width && mode.Height == window().m_win_config.height)
 			size_score = 2.0f;
 
 		// compute refresh score
@@ -1345,7 +1345,7 @@ void renderer::pick_best_mode()
 			refresh_score *= 0.1f;
 
 		// if we're looking for a particular refresh, make sure it matches
-		if (mode.RefreshRate == window().m_refresh)
+		if (mode.RefreshRate == window().m_win_config.refresh)
 			refresh_score = 2.0f;
 
 		// weight size and refresh equally
@@ -2544,28 +2544,28 @@ void texture_info::set_data(const render_texinfo *texsource, UINT32 flags)
 		switch (PRIMFLAG_GET_TEXFORMAT(flags))
 		{
 			case TEXFORMAT_PALETTE16:
-				copyline_palette16((UINT32 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette(), m_xborderpix);
+				copyline_palette16((UINT32 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
 				break;
 
 			case TEXFORMAT_PALETTEA16:
-				copyline_palettea16((UINT32 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette(), m_xborderpix);
+				copyline_palettea16((UINT32 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
 				break;
 
 			case TEXFORMAT_RGB32:
-				copyline_rgb32((UINT32 *)dst, (UINT32 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette(), m_xborderpix);
+				copyline_rgb32((UINT32 *)dst, (UINT32 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
 				break;
 
 			case TEXFORMAT_ARGB32:
-				copyline_argb32((UINT32 *)dst, (UINT32 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette(), m_xborderpix);
+				copyline_argb32((UINT32 *)dst, (UINT32 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
 				break;
 
 			case TEXFORMAT_YUY16:
 				if (m_texture_manager->get_yuv_format() == D3DFMT_YUY2)
-					copyline_yuy16_to_yuy2((UINT16 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette(), m_xborderpix);
+					copyline_yuy16_to_yuy2((UINT16 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
 				else if (m_texture_manager->get_yuv_format() == D3DFMT_UYVY)
-					copyline_yuy16_to_uyvy((UINT16 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette(), m_xborderpix);
+					copyline_yuy16_to_uyvy((UINT16 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
 				else
-					copyline_yuy16_to_argb((UINT32 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette(), m_xborderpix);
+					copyline_yuy16_to_argb((UINT32 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
 				break;
 
 			default:

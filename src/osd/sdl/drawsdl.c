@@ -71,7 +71,7 @@ public:
 	{ }
 
 	/* virtual */ int create();
-	/* virtual */ int draw(const UINT32 dc, const int update);
+	/* virtual */ int draw(const int update);
 	/* virtual */ int xy_to_render_target(const int x, const int y, int *xt, int *yt);
 	/* virtual */ void destroy();
 	/* virtual */ render_primitive_list *get_primitives()
@@ -434,11 +434,10 @@ static void drawsdl_show_info(struct SDL_RendererInfo *render_info)
 
 int sdl_info::create()
 {
-
 #if (SDLMAME_SDL2)
 	const sdl_scale_mode *sm = &scale_modes[video_config.scale_mode];
 
-	// create renderer 
+	// create renderer
 
 	/* set hints ... */
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, sm->sdl_scale_mode);
@@ -500,7 +499,6 @@ int sdl_info::create()
 
 void sdl_info::destroy()
 {
-
 	// free the memory in the window
 
 	destroy_all_textures();
@@ -555,7 +553,7 @@ void sdl_info::destroy_all_textures()
 //  sdl_info::draw
 //============================================================
 
-int sdl_info::draw(UINT32 dc, int update)
+int sdl_info::draw(int update)
 {
 	const sdl_scale_mode *sm = &scale_modes[video_config.scale_mode];
 	UINT8 *surfptr;
@@ -726,7 +724,7 @@ int sdl_info::draw(UINT32 dc, int update)
 	float fh = (float) mameheight / (float) blitheight;
 
 	// FIXME: this could be a lot easier if we get the primlist here!
-	//			Bounds would be set fit for purpose and done!
+	//          Bounds would be set fit for purpose and done!
 
 	for (render_primitive *prim = window().m_primlist->first(); prim != NULL; prim = prim->next())
 	{

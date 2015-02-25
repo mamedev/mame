@@ -71,7 +71,7 @@ void kaneko16_sprite_device::device_start()
 	m_first_sprite = auto_alloc_array(machine(), struct tempsprite, 0x400);
 	m_sprites_regs = auto_alloc_array_clear(machine(), UINT16, 0x20/2);
 	m_screen->register_screen_bitmap(m_sprites_bitmap);
-	
+
 	save_item(NAME(m_sprite_flipx));
 	save_item(NAME(m_sprite_flipy));
 	save_pointer(NAME(m_sprites_regs), 0x20/2);
@@ -629,7 +629,7 @@ kaneko_kc002_sprite_device::kaneko_kc002_sprite_device(const machine_config &mco
 // link features (assuming the bad program roms aren't the cause)  it's clearly derived from this sprite system tho.
 void kaneko16_sprite_device::bootleg_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram16, int spriteram16_bytes)
 {
-//	UINT16 *spriteram16 = m_spriteram;
+//  UINT16 *spriteram16 = m_spriteram;
 	int offs;
 	int sx=0, sy=0;
 

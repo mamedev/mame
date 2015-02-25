@@ -535,7 +535,7 @@ READ8_MEMBER(hornet_state::sysreg_r)
 			    0x02 = ADDOR (ADC DOR)
 			    0x01 = ADDO (ADC DO)
 			*/
-			r = 0xf0; 
+			r = 0xf0;
 			if (m_lan_eeprom)
 				r |= m_lan_eeprom->do_read() << 3;
 			r |= m_adc12138->do_r(space, 0) | (m_adc12138->eoc_r(space, 0) << 2);
@@ -987,7 +987,7 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 //  PCB description at top doesn't mention any EEPROM on the base board...
-//	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+//  MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_DEVICE_ADD("voodoo0", VOODOO_1, STD_VOODOO_1_CLOCK)
 	MCFG_VOODOO_FBMEM(2)

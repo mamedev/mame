@@ -16,8 +16,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_textram(*this, "textram"),
-		m_generic_paletteram_8(*this, "paletteram")	{ }
-	
+		m_generic_paletteram_8(*this, "paletteram") { }
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
@@ -70,7 +70,7 @@ public:
 	DECLARE_WRITE8_MEMBER(gladiator_int_control_w);
 	DECLARE_WRITE8_MEMBER(gladiator_adpcm_w);
 	DECLARE_WRITE_LINE_MEMBER(gladiator_ym_irq);
-	
+
 	// ppking specific
 	DECLARE_READ8_MEMBER(ppking_f1_r);
 	DECLARE_READ8_MEMBER(ppking_f6a3_r);
@@ -83,10 +83,10 @@ public:
 	DECLARE_READ8_MEMBER(ppking_qx0_r);
 	DECLARE_READ8_MEMBER(ppking_qx1_r);
 	DECLARE_WRITE8_MEMBER(ppking_video_registers_w);
-	
+
 	DECLARE_DRIVER_INIT(gladiatr);
 	DECLARE_DRIVER_INIT(ppking);
-	
+
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 
@@ -94,7 +94,7 @@ public:
 	DECLARE_VIDEO_START(ppking);
 	DECLARE_MACHINE_RESET(gladiator);
 	DECLARE_VIDEO_START(gladiatr);
-	
+
 	UINT32 screen_update_ppking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_gladiatr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

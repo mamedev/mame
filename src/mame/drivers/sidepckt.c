@@ -488,7 +488,7 @@ DRIVER_INIT_MEMBER(sidepckt_state,sidepckt)
 	m_prot_table[0] = sidepckt_prot_table_1;
 	m_prot_table[1] = sidepckt_prot_table_2;
 	m_prot_table[2] = sidepckt_prot_table_3;
-	
+
 	save_item(NAME(m_i8751_return));
 	save_item(NAME(m_current_ptr));
 	save_item(NAME(m_current_table));
@@ -501,7 +501,7 @@ DRIVER_INIT_MEMBER(sidepckt_state,sidepcktj)
 	m_prot_table[0] = sidepcktj_prot_table_1;
 	m_prot_table[1] = sidepcktj_prot_table_2;
 	m_prot_table[2] = sidepcktj_prot_table_3;
-	
+
 	save_item(NAME(m_i8751_return));
 	save_item(NAME(m_current_ptr));
 	save_item(NAME(m_current_table));

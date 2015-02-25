@@ -8,7 +8,7 @@ Stephh's notes :
 
   - As for some other M68000 Technos games (or games running on similar hardware
     such as 'mugsmash'), the Inputs and the Dip Switches are mangled, so you need
-    a specific read handler so end-uers can see them in a "standard" order.
+    a specific read handler so end-users can see them in a "standard" order.
 
  01-Sept-2008 - Pierpaolo Prazzoli
  - Added irqs ack
@@ -141,7 +141,6 @@ lev 7 : 0x7c : 0000 11d0 - just rte
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2151intf.h"
-#include "sound/okim6295.h"
 #include "includes/shadfrce.h"
 
 
@@ -149,7 +148,7 @@ lev 7 : 0x7c : 0000 11d0 - just rte
 #define CPU_CLOCK           MASTER_CLOCK / 2
 #define PIXEL_CLOCK     MASTER_CLOCK / 4
 
-WRITE16_MEMBER(shadfrce_state::shadfrce_flip_screen)
+WRITE16_MEMBER(shadfrce_state::flip_screen)
 {
 	flip_screen_set(data & 0x01);
 }
@@ -234,7 +233,7 @@ WRITE16_MEMBER(shadfrce_state::shadfrce_flip_screen)
 */
 
 
-READ16_MEMBER(shadfrce_state::shadfrce_input_ports_r)
+READ16_MEMBER(shadfrce_state::input_ports_r)
 {
 	UINT16 data = 0xffff;
 
@@ -258,7 +257,7 @@ READ16_MEMBER(shadfrce_state::shadfrce_input_ports_r)
 }
 
 
-WRITE16_MEMBER(shadfrce_state::shadfrce_sound_brt_w)
+WRITE16_MEMBER(shadfrce_state::sound_brt_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -275,12 +274,12 @@ WRITE16_MEMBER(shadfrce_state::shadfrce_sound_brt_w)
 	}
 }
 
-WRITE16_MEMBER(shadfrce_state::shadfrce_irq_ack_w)
+WRITE16_MEMBER(shadfrce_state::irq_ack_w)
 {
 	m_maincpu->set_input_line(offset ^ 3, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(shadfrce_state::shadfrce_irq_w)
+WRITE16_MEMBER(shadfrce_state::irq_w)
 {
 	m_irqs_enable = data & 1;   /* maybe, it's set/unset inside every trap instruction which is executed */
 	m_video_enable = data & 8;  /* probably */
@@ -300,12 +299,12 @@ WRITE16_MEMBER(shadfrce_state::shadfrce_irq_w)
 	m_prev_value = data;
 }
 
-WRITE16_MEMBER(shadfrce_state::shadfrce_scanline_w)
+WRITE16_MEMBER(shadfrce_state::scanline_w)
 {
 	m_raster_scanline = data;   /* guess, 0 is always written */
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(shadfrce_state::shadfrce_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(shadfrce_state::scanline)
 {
 	int scanline = param;
 
@@ -360,29 +359,29 @@ TIMER_DEVICE_CALLBACK_MEMBER(shadfrce_state::shadfrce_scanline)
 
 static ADDRESS_MAP_START( shadfrce_map, AS_PROGRAM, 16, shadfrce_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(shadfrce_bg0videoram_w) AM_SHARE("bg0videoram") /* video */
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(bg0videoram_w) AM_SHARE("bg0videoram") /* video */
 	AM_RANGE(0x101000, 0x101fff) AM_RAM
-	AM_RANGE(0x102000, 0x1027ff) AM_RAM_WRITE(shadfrce_bg1videoram_w) AM_SHARE("bg1videoram") /* bg 2 */
+	AM_RANGE(0x102000, 0x1027ff) AM_RAM_WRITE(bg1videoram_w) AM_SHARE("bg1videoram") /* bg 2 */
 	AM_RANGE(0x102800, 0x103fff) AM_RAM
-	AM_RANGE(0x140000, 0x141fff) AM_RAM_WRITE(shadfrce_fgvideoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0x140000, 0x141fff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0x142000, 0x143fff) AM_RAM AM_SHARE("spvideoram") /* sprites */
 	AM_RANGE(0x180000, 0x187fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(shadfrce_bg0scrollx_w) /* SCROLL X */
-	AM_RANGE(0x1c0002, 0x1c0003) AM_WRITE(shadfrce_bg0scrolly_w) /* SCROLL Y */
-	AM_RANGE(0x1c0004, 0x1c0005) AM_WRITE(shadfrce_bg1scrollx_w) /* SCROLL X */
-	AM_RANGE(0x1c0006, 0x1c0007) AM_WRITE(shadfrce_bg1scrolly_w) /* SCROLL Y */
+	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(bg0scrollx_w) /* SCROLL X */
+	AM_RANGE(0x1c0002, 0x1c0003) AM_WRITE(bg0scrolly_w) /* SCROLL Y */
+	AM_RANGE(0x1c0004, 0x1c0005) AM_WRITE(bg1scrollx_w) /* SCROLL X */
+	AM_RANGE(0x1c0006, 0x1c0007) AM_WRITE(bg1scrolly_w) /* SCROLL Y */
 	AM_RANGE(0x1c0008, 0x1c0009) AM_WRITENOP /* ?? */
-	AM_RANGE(0x1c000a, 0x1c000b) AM_READNOP AM_WRITE(shadfrce_flip_screen)
+	AM_RANGE(0x1c000a, 0x1c000b) AM_READNOP AM_WRITE(flip_screen)
 	AM_RANGE(0x1c000c, 0x1c000d) AM_WRITENOP /* ?? */
-	AM_RANGE(0x1d0000, 0x1d0005) AM_WRITE(shadfrce_irq_ack_w)
-	AM_RANGE(0x1d0006, 0x1d0007) AM_WRITE(shadfrce_irq_w)
-	AM_RANGE(0x1d0008, 0x1d0009) AM_WRITE(shadfrce_scanline_w)
-	AM_RANGE(0x1d000c, 0x1d000d) AM_READNOP AM_WRITE(shadfrce_sound_brt_w)  /* sound command + screen brightness */
+	AM_RANGE(0x1d0000, 0x1d0005) AM_WRITE(irq_ack_w)
+	AM_RANGE(0x1d0006, 0x1d0007) AM_WRITE(irq_w)
+	AM_RANGE(0x1d0008, 0x1d0009) AM_WRITE(scanline_w)
+	AM_RANGE(0x1d000c, 0x1d000d) AM_READNOP AM_WRITE(sound_brt_w)  /* sound command + screen brightness */
 	AM_RANGE(0x1d0010, 0x1d0011) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1d0012, 0x1d0013) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1d0014, 0x1d0015) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1d0016, 0x1d0017) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x1d0020, 0x1d0027) AM_READ(shadfrce_input_ports_r)
+	AM_RANGE(0x1d0020, 0x1d0027) AM_READ(input_ports_r)
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -544,15 +543,15 @@ static MACHINE_CONFIG_START( shadfrce, shadfrce_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)          /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(shadfrce_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", shadfrce_state, shadfrce_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", shadfrce_state, scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)         /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(shadfrce_sound_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 432, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
-	MCFG_SCREEN_UPDATE_DRIVER(shadfrce_state, screen_update_shadfrce)
-	MCFG_SCREEN_VBLANK_DRIVER(shadfrce_state, screen_eof_shadfrce)
+	MCFG_SCREEN_UPDATE_DRIVER(shadfrce_state, screen_update)
+	MCFG_SCREEN_VBLANK_DRIVER(shadfrce_state, screen_eof)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shadfrce)
@@ -662,6 +661,6 @@ ROM_START( shadfrcejv2 )
 ROM_END
 
 
-GAME( 1993, shadfrce,    0,        shadfrce, shadfrce, driver_device, 0, ROT0, "Technos Japan", "Shadow Force (US Version 2)", GAME_NO_COCKTAIL )
-GAME( 1993, shadfrcej,   shadfrce, shadfrce, shadfrce, driver_device, 0, ROT0, "Technos Japan", "Shadow Force (Japan Version 3)", GAME_NO_COCKTAIL )
-GAME( 1993, shadfrcejv2, shadfrce, shadfrce, shadfrce, driver_device, 0, ROT0, "Technos Japan", "Shadow Force (Japan Version 2)", GAME_NO_COCKTAIL )
+GAME( 1993, shadfrce,    0,        shadfrce, shadfrce, driver_device, 0, ROT0, "Technos Japan", "Shadow Force (US Version 2)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1993, shadfrcej,   shadfrce, shadfrce, shadfrce, driver_device, 0, ROT0, "Technos Japan", "Shadow Force (Japan Version 3)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1993, shadfrcejv2, shadfrce, shadfrce, shadfrce, driver_device, 0, ROT0, "Technos Japan", "Shadow Force (Japan Version 2)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

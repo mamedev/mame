@@ -22,7 +22,7 @@
 
 @interface MAMEDeviceInfoViewer : MAMEAuxiliaryDebugWindowHandler
 {
-	device_t	*device;
+	device_t    *device;
 }
 
 - (id)initWithDevice:(device_t &)d machine:(running_machine &)m console:(MAMEDebugConsole *)c;

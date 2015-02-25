@@ -309,25 +309,25 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tecmosys_state )
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(eeprom_w  )
 	AM_RANGE(0xa80000, 0xa80005) AM_WRITEONLY AM_SHARE("a80000regs")    // a80000-3 scroll? a80004 inverted ? 3 : 0
 	AM_RANGE(0xb00000, 0xb00005) AM_WRITEONLY AM_SHARE("b00000regs")    // b00000-3 scrool?, b00004 inverted ? 3 : 0
-	AM_RANGE(0xb80000, 0xb80001) AM_READWRITE(tecmosys_prot_status_r, tecmosys_prot_status_w)
+	AM_RANGE(0xb80000, 0xb80001) AM_READWRITE(prot_status_r, prot_status_w)
 	AM_RANGE(0xc00000, 0xc00005) AM_WRITEONLY AM_SHARE("c00000regs")    // c00000-3 scroll? c00004 inverted ? 13 : 10
 	AM_RANGE(0xc80000, 0xc80005) AM_WRITEONLY AM_SHARE("c80000regs")    // c80000-3 scrool? c80004 inverted ? 3 : 0
 	AM_RANGE(0xd00000, 0xd00001) AM_READ_PORT("P1")
 	AM_RANGE(0xd00002, 0xd00003) AM_READ_PORT("P2")
 	AM_RANGE(0xd80000, 0xd80001) AM_READ(eeprom_r)
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(sound_w )
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(tecmosys_prot_data_w)
+	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(prot_data_w)
 	AM_RANGE(0xf00000, 0xf00001) AM_READ(sound_r)
-	AM_RANGE(0xf80000, 0xf80001) AM_READ(tecmosys_prot_data_r)
+	AM_RANGE(0xf80000, 0xf80001) AM_READ(prot_data_r)
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(tecmosys_state::tecmosys_z80_bank_w)
+WRITE8_MEMBER(tecmosys_state::z80_bank_w)
 {
 	membank("bank1")->set_entry(data);
 }
 
-WRITE8_MEMBER(tecmosys_state::tecmosys_oki_bank_w)
+WRITE8_MEMBER(tecmosys_state::oki_bank_w)
 {
 	UINT8 upperbank = (data & 0x30) >> 4;
 	UINT8 lowerbank = (data & 0x03) >> 0;
@@ -347,8 +347,8 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, tecmosys_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymf", ymf262_device, read, write)
 	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x20, 0x20) AM_WRITE(tecmosys_oki_bank_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE(tecmosys_z80_bank_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE(oki_bank_w)
+	AM_RANGE(0x30, 0x30) AM_WRITE(z80_bank_w)
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x50, 0x50) AM_WRITE(soundlatch2_byte_w)
 	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("ymz", ymz280b_device, read, write)
@@ -441,6 +441,10 @@ WRITE_LINE_MEMBER(tecmosys_state::sound_irq)
 void tecmosys_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 16, memregion("audiocpu")->base(), 0x4000);
+
+	save_item(NAME(m_device_read_ptr));
+	save_item(NAME(m_device_status));
+	save_item(NAME(m_device_value));
 }
 
 static MACHINE_CONFIG_START( deroon, tecmosys_state )
@@ -465,7 +469,7 @@ static MACHINE_CONFIG_START( deroon, tecmosys_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3000))
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tecmosys_state, screen_update_tecmosys)
+	MCFG_SCREEN_UPDATE_DRIVER(tecmosys_state, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 0x4000+0x800)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
@@ -620,7 +624,7 @@ ROM_START( tkdenshoa )
 	ROM_LOAD( "ae500w07.ad1", 0x080000, 0x080000, CRC(3734f92c) SHA1(048555b5aa89eaf983305c439ba08d32b4a1bb80) )
 ROM_END
 
-void tecmosys_state::tecmosys_descramble()
+void tecmosys_state::descramble()
 {
 	UINT8 *gfxsrc  = memregion( "gfx1" )->base();
 	size_t srcsize = memregion( "gfx1" )->bytes();
@@ -644,22 +648,22 @@ void tecmosys_state::tecmosys_descramble()
 
 DRIVER_INIT_MEMBER(tecmosys_state,deroon)
 {
-	tecmosys_descramble();
-	tecmosys_prot_init(0); // machine/tecmosys.c
+	descramble();
+	prot_init(0); // machine/tecmosys.c
 }
 
 DRIVER_INIT_MEMBER(tecmosys_state,tkdensho)
 {
-	tecmosys_descramble();
-	tecmosys_prot_init(1);
+	descramble();
+	prot_init(1);
 }
 
 DRIVER_INIT_MEMBER(tecmosys_state,tkdensha)
 {
-	tecmosys_descramble();
-	tecmosys_prot_init(2);
+	descramble();
+	prot_init(2);
 }
 
-GAME( 1995, deroon,           0, deroon, deroon, tecmosys_state, deroon,     ROT0, "Tecmo", "Deroon DeroDero", 0 )
-GAME( 1996, tkdensho,         0, deroon, deroon, tecmosys_state, tkdensho,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960614)", 0 )
-GAME( 1996, tkdenshoa, tkdensho, deroon, deroon, tecmosys_state, tkdensha,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960427)", 0 )
+GAME( 1995, deroon,           0, deroon, deroon, tecmosys_state, deroon,     ROT0, "Tecmo", "Deroon DeroDero", GAME_SUPPORTS_SAVE )
+GAME( 1996, tkdensho,         0, deroon, deroon, tecmosys_state, tkdensho,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960614)", GAME_SUPPORTS_SAVE )
+GAME( 1996, tkdenshoa, tkdensho, deroon, deroon, tecmosys_state, tkdensha,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960427)", GAME_SUPPORTS_SAVE )

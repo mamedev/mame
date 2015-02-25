@@ -1,9 +1,13 @@
 #include <stdio.h>   /* snprintf */
 #include <stdlib.h>  /* malloc */
 
+#ifdef OSD_WINDOWS
+#include "GL/gl.h"
+#include "GL/glext.h"
+#else
 #include "sdlinc.h"
-
 #include "osd_opengl.h"
+#endif
 
 #include "gl_shader_mgr.h"
 #include "gl_shader_tool.h"
@@ -120,7 +124,11 @@ glsl_shader_info *glsl_shader_init(void)
 {
 	int i,j, err;
 
-		err = gl_shader_loadExtention((PFNGLGETPROCADDRESSOS)SDL_GL_GetProcAddress);
+#ifdef OSD_WINDOWS
+	err = gl_shader_loadExtention((PFNGLGETPROCADDRESSOS)wglGetProcAddress);
+#else
+	err = gl_shader_loadExtention((PFNGLGETPROCADDRESSOS)SDL_GL_GetProcAddress);
+#endif
 	if(err) return NULL;
 
 	for (i=0; !err && i<GLSL_VERTEX_SHADER_INT_NUMBER; i++)

@@ -16,7 +16,7 @@
   - sound emulation could still be improved
   - when the game strobes a led faster, it should appear brighter, for example when
     the ball hits one of the bumpers
-  - some 7segs digits are wrong (mcu on-die decoder is customizable?)
+  - 7seg decoder is guessed
   - MCU clock is unknown
 
 ***************************************************************************/
@@ -62,7 +62,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	bool index_is_7segled(int index);
 	void display_update();
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(reset_q2);
 	void write_a12(int state);
 	void sound_update();
@@ -94,16 +94,16 @@ inline bool wildfire_state::index_is_7segled(int index)
 // where xx is led column and y is led row, eg. lamp103 is output A10 D3
 // (note: 2 mistakes in the patent: the L19 between L12 and L14 should be L13, and L84 should of course be L48)
 /*
-    L0  = -         L10 = lamp60    L20 = lamp41    L30 = lamp53    L40 = lamp57    L50 = lamp110  
-    L1  = lamp107   L11 = lamp50    L21 = lamp42    L31 = lamp43    L41 = lamp66    L51 = lamp111  
-    L2  = lamp106   L12 = lamp61    L22 = lamp52    L32 = lamp54    L42 = lamp76    L52 = lamp112  
-    L3  = lamp105   L13 = lamp71    L23 = lamp63    L33 = lamp55    L43 = lamp86    L53 = lamp113  
-    L4  = lamp104   L14 = lamp81    L24 = lamp73    L34 = lamp117   L44 = lamp96    L60 = lamp30   
+    L0  = -         L10 = lamp60    L20 = lamp41    L30 = lamp53    L40 = lamp57    L50 = lamp110
+    L1  = lamp107   L11 = lamp50    L21 = lamp42    L31 = lamp43    L41 = lamp66    L51 = lamp111
+    L2  = lamp106   L12 = lamp61    L22 = lamp52    L32 = lamp54    L42 = lamp76    L52 = lamp112
+    L3  = lamp105   L13 = lamp71    L23 = lamp63    L33 = lamp55    L43 = lamp86    L53 = lamp113
+    L4  = lamp104   L14 = lamp81    L24 = lamp73    L34 = lamp117   L44 = lamp96    L60 = lamp30
     L5  = lamp103   L15 = lamp92    L25 = lamp115   L35 = lamp75    L45 = lamp67    L61 = lamp30(!)
-    L6  = lamp102   L16 = lamp82    L26 = lamp93    L36 = lamp95    L46 = lamp77    L62 = lamp31   
+    L6  = lamp102   L16 = lamp82    L26 = lamp93    L36 = lamp95    L46 = lamp77    L62 = lamp31
     L7  = lamp101   L17 = lamp72    L27 = lamp94    L37 = lamp56    L47 = lamp87    L63 = lamp31(!)
-    L8  = lamp80    L18 = lamp114   L28 = lamp84    L38 = lamp65    L48 = lamp97    L70 = lamp33   
-    L9  = lamp70    L19 = lamp51    L29 = lamp116   L39 = lamp85    L49 = -     
+    L8  = lamp80    L18 = lamp114   L28 = lamp84    L38 = lamp65    L48 = lamp97    L70 = lamp33
+    L9  = lamp70    L19 = lamp51    L29 = lamp116   L39 = lamp85    L49 = -
 */
 
 void wildfire_state::display_update()
@@ -221,7 +221,7 @@ WRITE8_MEMBER(wildfire_state::write_d)
 WRITE16_MEMBER(wildfire_state::write_a)
 {
 	data ^= 0x1fff; // active-low
-	
+
 	// A12: enable speaker
 	write_a12(data >> 12 & 1);
 
@@ -278,11 +278,35 @@ void wildfire_state::machine_start()
 	save_item(NAME(m_q3));
 }
 
+// LED segments A-G
+enum
+{
+	lA = 0x40,
+	lB = 0x20,
+	lC = 0x10,
+	lD = 0x08,
+	lE = 0x04,
+	lF = 0x02,
+	lG = 0x01
+};
+
+static const UINT8 wildfire_7seg_table[0x10] =
+{
+	0x7e, 0x30, 0x6d, 0x79, 0x33, 0x5b, 0x5f, 0x70, 0x7f, 0x7b, // 0-9 unaltered
+	0x77,           // A -> unused?
+	lA+lB+lE+lF+lG, // b -> P
+	0x4e,           // C -> unused?
+	lD+lE+lF,       // d -> L
+	0x4f,           // E -> unused?
+	lG              // F -> -
+};
+
 
 static MACHINE_CONFIG_START( wildfire, wildfire_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", AMI_S2152, MASTER_CLOCK)
+	MCFG_AMI_S2000_7SEG_DECODER(wildfire_7seg_table)
 	MCFG_AMI_S2000_READ_I_CB(IOPORT("IN1"))
 	MCFG_AMI_S2000_WRITE_D_CB(WRITE8(wildfire_state, write_d))
 	MCFG_AMI_S2000_WRITE_A_CB(WRITE16(wildfire_state, write_a))
@@ -316,4 +340,4 @@ ROM_START( wildfire )
 ROM_END
 
 
-CONS( 1979, wildfire, 0, 0, wildfire, wildfire, driver_device, 0, "Parker Brothers", "Wildfire (prototype)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+CONS( 1979, wildfire, 0, 0, wildfire, wildfire, driver_device, 0, "Parker Brothers", "Wildfire (prototype)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK ) // note: pretty sure that it matches the commercial release

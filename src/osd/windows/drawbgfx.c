@@ -19,7 +19,7 @@
 // MAMEOS headers
 #include "window.h"
 
-#include <bgfxplatform.h> 
+#include <bgfxplatform.h>
 #include <bgfx.h>
 
 class renderer_bgfx : public osd_renderer
@@ -32,7 +32,7 @@ public:
 
 	virtual int create();
 	virtual render_primitive_list *get_primitives();
-	virtual int draw(HDC dc, int update);
+	virtual int draw(const int update);
 	virtual void save() {};
 	virtual void record() {};
 	virtual void toggle_fsfx() {};
@@ -95,7 +95,7 @@ int renderer_bgfx::create()
 	bgfx::winSetHwnd(window().m_hwnd);
 	bgfx::init();
 	bgfx::reset(rect_width(&client), rect_height(&client), BGFX_RESET_VSYNC);
-	
+
 	// Enable debug text.
 	bgfx::setDebug(BGFX_DEBUG_STATS);// BGFX_DEBUG_TEXT);
 
@@ -134,7 +134,7 @@ render_primitive_list *renderer_bgfx::get_primitives()
 //  drawbgfx_window_draw
 //============================================================
 
-int renderer_bgfx::draw(HDC dc, int update)
+int renderer_bgfx::draw(int update)
 {
 	RECT client;
 	GetClientRect(window().m_hwnd, &client);
@@ -165,70 +165,70 @@ int renderer_bgfx::draw(HDC dc, int update)
 			 */
 			case render_primitive::LINE:
 				// check if it's really a point
-/*				
-				if (((prim->bounds.x1 - prim->bounds.x0) == 0) && ((prim->bounds.y1 - prim->bounds.y0) == 0))
-				{
-					curPrimitive=GL_POINTS;
-				} else {
-					curPrimitive=GL_LINES;
-				}
+/*
+                if (((prim->bounds.x1 - prim->bounds.x0) == 0) && ((prim->bounds.y1 - prim->bounds.y0) == 0))
+                {
+                    curPrimitive=GL_POINTS;
+                } else {
+                    curPrimitive=GL_LINES;
+                }
 
-				if(pendingPrimitive!=GL_NO_PRIMITIVE && pendingPrimitive!=curPrimitive)
-				{
-					glEnd();
-					pendingPrimitive=GL_NO_PRIMITIVE;
-				}
+                if(pendingPrimitive!=GL_NO_PRIMITIVE && pendingPrimitive!=curPrimitive)
+                {
+                    glEnd();
+                    pendingPrimitive=GL_NO_PRIMITIVE;
+                }
 
-				if ( pendingPrimitive==GL_NO_PRIMITIVE )
-				{
-							set_blendmode(sdl, PRIMFLAG_GET_BLENDMODE(prim->flags));
-				}
+                if ( pendingPrimitive==GL_NO_PRIMITIVE )
+                {
+                            set_blendmode(sdl, PRIMFLAG_GET_BLENDMODE(prim->flags));
+                }
 
-				glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
+                glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
 
-				if(pendingPrimitive!=curPrimitive)
-				{
-					glBegin(curPrimitive);
-					pendingPrimitive=curPrimitive;
-				}
+                if(pendingPrimitive!=curPrimitive)
+                {
+                    glBegin(curPrimitive);
+                    pendingPrimitive=curPrimitive;
+                }
 
-				// check if it's really a point
-				if (curPrimitive==GL_POINTS)
-				{
-					glVertex2f(prim->bounds.x0+hofs, prim->bounds.y0+vofs);
-				}
-				else
-				{
-					glVertex2f(prim->bounds.x0+hofs, prim->bounds.y0+vofs);
-					glVertex2f(prim->bounds.x1+hofs, prim->bounds.y1+vofs);
-				}*/
+                // check if it's really a point
+                if (curPrimitive==GL_POINTS)
+                {
+                    glVertex2f(prim->bounds.x0+hofs, prim->bounds.y0+vofs);
+                }
+                else
+                {
+                    glVertex2f(prim->bounds.x0+hofs, prim->bounds.y0+vofs);
+                    glVertex2f(prim->bounds.x1+hofs, prim->bounds.y1+vofs);
+                }*/
 				break;
 
 			case render_primitive::QUAD:
 /*
-				if(pendingPrimitive!=GL_NO_PRIMITIVE)
-				{
-					glEnd();
-					pendingPrimitive=GL_NO_PRIMITIVE;
-				}
+                if(pendingPrimitive!=GL_NO_PRIMITIVE)
+                {
+                    glEnd();
+                    pendingPrimitive=GL_NO_PRIMITIVE;
+                }
 
-				glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
+                glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
 
-				set_blendmode(sdl, PRIMFLAG_GET_BLENDMODE(prim->flags));
+                set_blendmode(sdl, PRIMFLAG_GET_BLENDMODE(prim->flags));
 
-				texture = texture_update(window, prim, 0);
+                texture = texture_update(window, prim, 0);
 
-				
-				sdl->texVerticex[0]=prim->bounds.x0 + hofs;
-				sdl->texVerticex[1]=prim->bounds.y0 + vofs;
-				sdl->texVerticex[2]=prim->bounds.x1 + hofs;
-				sdl->texVerticex[3]=prim->bounds.y0 + vofs;
-				sdl->texVerticex[4]=prim->bounds.x1 + hofs;
-				sdl->texVerticex[5]=prim->bounds.y1 + vofs;
-				sdl->texVerticex[6]=prim->bounds.x0 + hofs;
-				sdl->texVerticex[7]=prim->bounds.y1 + vofs;
 
-				glDrawArrays(GL_QUADS, 0, 4);
+                sdl->texVerticex[0]=prim->bounds.x0 + hofs;
+                sdl->texVerticex[1]=prim->bounds.y0 + vofs;
+                sdl->texVerticex[2]=prim->bounds.x1 + hofs;
+                sdl->texVerticex[3]=prim->bounds.y0 + vofs;
+                sdl->texVerticex[4]=prim->bounds.x1 + hofs;
+                sdl->texVerticex[5]=prim->bounds.y1 + vofs;
+                sdl->texVerticex[6]=prim->bounds.x0 + hofs;
+                sdl->texVerticex[7]=prim->bounds.y1 + vofs;
+
+                glDrawArrays(GL_QUADS, 0, 4);
 */
 				break;
 
@@ -238,7 +238,7 @@ int renderer_bgfx::draw(HDC dc, int update)
 	}
 
 	window().m_primlist->release_lock();
-	// Advance to next frame. Rendering thread will be kicked to 
+	// Advance to next frame. Rendering thread will be kicked to
 	// process submitted rendering primitives.
 	bgfx::frame();
 

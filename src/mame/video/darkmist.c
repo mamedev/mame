@@ -101,13 +101,12 @@ void darkmist_state::video_start()
 	m_txtilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(darkmist_state::get_txttile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
 	m_fgtilemap->set_transparent_pen(0);
 	m_txtilemap->set_transparent_pen(0);
-	
+
 	save_item(NAME(m_hw));
 }
 
 UINT32 darkmist_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	
 #define DM_GETSCROLL(n) (((m_scroll[(n)]<<1)&0xff) + ((m_scroll[(n)]&0x80)?1:0) +( ((m_scroll[(n)-1]<<4) | (m_scroll[(n)-1]<<12) )&0xff00))
 
 	m_bgtilemap->set_scrollx(0, DM_GETSCROLL(0x2));

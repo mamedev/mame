@@ -13,22 +13,19 @@
 //  System dependent defines
 //============================================================
 
-// Process events in worker thread
-#if defined(SDLMAME_WIN32) || ((SDLMAME_SDL2) && (!defined(SDLMAME_EMSCRIPTEN)) && (!defined(SDLMAME_MACOSX)))
-#define SDLMAME_EVENTS_IN_WORKER_THREAD (1)
-#else
-#define SDLMAME_EVENTS_IN_WORKER_THREAD (0)
-#endif
 
 #if defined(SDLMAME_WIN32)
 	#if (SDLMAME_SDL2)
-		#define SDLMAME_INIT_IN_WORKER_THREAD   (0) //FIXME: breaks mt
-		#define SDL13_COMBINE_RESIZE (1)
+		#define SDLMAME_EVENTS_IN_WORKER_THREAD (0)
+		#define SDLMAME_INIT_IN_WORKER_THREAD   (0)
+		#define SDL13_COMBINE_RESIZE (0) //(1) no longer needed
 	#else
+		#define SDLMAME_EVENTS_IN_WORKER_THREAD (0)
 		#define SDLMAME_INIT_IN_WORKER_THREAD   (1)
 		#define SDL13_COMBINE_RESIZE (0)
 	#endif
 #else
+	#define SDLMAME_EVENTS_IN_WORKER_THREAD (0)
 	#define SDLMAME_INIT_IN_WORKER_THREAD   (0)
 	#define SDL13_COMBINE_RESIZE (0)
 #endif
@@ -81,9 +78,6 @@
 #define SDLOPTION_RENDERDRIVER          "renderdriver"
 #define SDLOPTION_GL_LIB                "gl_lib"
 
-#define SDLOPTVAL_NONE                  "none"
-#define SDLOPTVAL_AUTO                  "auto"
-
 #define SDLOPTVAL_OPENGL                "opengl"
 #define SDLOPTVAL_SOFT                  "soft"
 #define SDLOPTVAL_SDL2ACCEL             "accel"
@@ -109,7 +103,7 @@
 /* Vas Crabb: Default GL-lib for MACOSX */
 #define SDLOPTVAL_GLLIB                 "/System/Library/Frameworks/OpenGL.framework/Libraries/libGL.dylib"
 #else
-#define SDLOPTVAL_GLLIB                 SDLOPTVAL_AUTO
+#define SDLOPTVAL_GLLIB                 OSDOPTVAL_AUTO
 #endif
 
 
@@ -209,8 +203,7 @@ public:
 private:
 	virtual void osd_exit();
 
-	// FIXME: remove machine usage
-	void extract_video_config(running_machine &machine);
+	void extract_video_config();
 
 	sdl_options &m_options;
 

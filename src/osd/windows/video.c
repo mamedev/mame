@@ -51,14 +51,12 @@ static win_monitor_info *primary_monitor;
 //============================================================
 
 static void init_monitors(void);
-static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data);
 static win_monitor_info *pick_monitor(windows_options &options, int index);
 
 static void check_osd_inputs(running_machine &machine);
 
-static void extract_video_config(running_machine &machine);
 static float get_aspect(const char *defdata, const char *data, int report_error);
-static void get_resolution(const char *defdata, const char *data, win_window_config *config, int report_error);
+static void get_resolution(const char *defdata, const char *data, osd_window_config *config, int report_error);
 
 
 
@@ -71,7 +69,7 @@ bool windows_osd_interface::video_init()
 	int index;
 
 	// extract data from the options
-	extract_video_config(machine());
+	extract_video_config();
 
 	// set up monitors first
 	init_monitors();
@@ -102,7 +100,7 @@ void windows_osd_interface::video_exit()
 	while (win_monitor_list != NULL)
 	{
 		win_monitor_info *temp = win_monitor_list;
-		win_monitor_list = temp->next;
+		win_monitor_list = temp->m_next;
 		global_free(temp);
 	}
 }
@@ -110,11 +108,9 @@ void windows_osd_interface::video_exit()
 
 
 win_monitor_info::win_monitor_info()
-	: next(NULL),
-		handle(NULL),
+	: m_next(NULL),
+		m_handle(NULL),
 		m_aspect(0.0f),
-		reqwidth(0),
-		reqheight(0),
 		m_name(NULL)
 {
 }
@@ -134,12 +130,12 @@ void win_monitor_info::refresh()
 	BOOL result;
 
 	// fetch the latest info about the monitor
-	info.cbSize = sizeof(info);
-	result = GetMonitorInfo(handle, (LPMONITORINFO)&info);
+	m_info.cbSize = sizeof(m_info);
+	result = GetMonitorInfo(m_handle, (LPMONITORINFO)&m_info);
 	assert(result);
 	if (m_name != NULL)
 		osd_free(m_name);
-	m_name = utf8_from_tstring(info.szDevice);
+	m_name = utf8_from_tstring(m_info.szDevice);
 	(void)result; // to silence gcc 4.6
 }
 
@@ -152,12 +148,14 @@ void win_monitor_info::refresh()
 float win_monitor_info::aspect()
 {
 	// refresh the monitor information and compute the aspect
+	refresh();
+	// FIXME: returning 0 looks odd, video_config is bad
 	if (video_config.keepaspect)
 	{
 		int width, height;
 		refresh();
-		width = rect_width(&info.rcMonitor);
-		height = rect_height(&info.rcMonitor);
+		width = rect_width(&m_info.rcMonitor);
+		height = rect_height(&m_info.rcMonitor);
 		return m_aspect / ((float)width / (float)height);
 	}
 	return 0.0f;
@@ -174,8 +172,8 @@ win_monitor_info *winvideo_monitor_from_handle(HMONITOR hmonitor)
 	win_monitor_info *monitor;
 
 	// find the matching monitor
-	for (monitor = win_monitor_list; monitor != NULL; monitor = monitor->next)
-		if (monitor->handle == hmonitor)
+	for (monitor = win_monitor_list; monitor != NULL; monitor = monitor->m_next)
+		if (monitor->handle() == hmonitor)
 			return monitor;
 	return NULL;
 }
@@ -218,14 +216,14 @@ static void init_monitors(void)
 	// make a list of monitors
 	win_monitor_list = NULL;
 	tailptr = &win_monitor_list;
-	EnumDisplayMonitors(NULL, NULL, monitor_enum_callback, (LPARAM)&tailptr);
+	EnumDisplayMonitors(NULL, NULL, win_monitor_info::monitor_enum_callback, (LPARAM)&tailptr);
 
 	// if we're verbose, print the list of monitors
 	{
 		win_monitor_info *monitor;
-		for (monitor = win_monitor_list; monitor != NULL; monitor = monitor->next)
+		for (monitor = win_monitor_list; monitor != NULL; monitor = monitor->m_next)
 		{
-			osd_printf_verbose("Video: Monitor %p = \"%s\" %s\n", monitor->handle, monitor->devicename(), (monitor == primary_monitor) ? "(primary)" : "");
+			osd_printf_verbose("Video: Monitor %p = \"%s\" %s\n", monitor->handle(), monitor->devicename(), (monitor == primary_monitor) ? "(primary)" : "");
 		}
 	}
 }
@@ -236,7 +234,7 @@ static void init_monitors(void)
 //  monitor_enum_callback
 //============================================================
 
-static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data)
+BOOL CALLBACK win_monitor_info::monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data)
 {
 	win_monitor_info ***tailptr = (win_monitor_info ***)data;
 	win_monitor_info *monitor;
@@ -253,19 +251,19 @@ static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect,
 	monitor = global_alloc(win_monitor_info);
 
 	// copy in the data
-	monitor->handle = handle;
-	monitor->info = info;
+	monitor->m_handle = handle;
+	monitor->m_info = info;
 
 	// guess the aspect ratio assuming square pixels
 	monitor->set_aspect((float)(info.rcMonitor.right - info.rcMonitor.left) / (float)(info.rcMonitor.bottom - info.rcMonitor.top));
 
 	// save the primary monitor handle
-	if (monitor->info.dwFlags & MONITORINFOF_PRIMARY)
+	if (monitor->m_info.dwFlags & MONITORINFOF_PRIMARY)
 		primary_monitor = monitor;
 
 	// hook us into the list
 	**tailptr = monitor;
-	*tailptr = &monitor->next;
+	*tailptr = &monitor->m_next;
 
 	// enumerate all the available monitors so to list their names in verbose mode
 	return TRUE;
@@ -297,7 +295,7 @@ static win_monitor_info *pick_monitor(windows_options &options, int index)
 
 	// look for a match in the name first
 	if (scrname[0] != 0)
-		for (monitor = win_monitor_list; monitor != NULL; monitor = monitor->next)
+		for (monitor = win_monitor_list; monitor != NULL; monitor = monitor->m_next)
 		{
 			int rc = 1;
 
@@ -311,7 +309,7 @@ static win_monitor_info *pick_monitor(windows_options &options, int index)
 
 	// didn't find it; alternate monitors until we hit the jackpot
 	index %= moncount;
-	for (monitor = win_monitor_list; monitor != NULL; monitor = monitor->next)
+	for (monitor = win_monitor_list; monitor != NULL; monitor = monitor->m_next)
 		if (index-- == 0)
 			goto finishit;
 
@@ -320,7 +318,9 @@ static win_monitor_info *pick_monitor(windows_options &options, int index)
 
 finishit:
 	if (aspect != 0)
+	{
 		monitor->set_aspect(aspect);
+	}
 	return monitor;
 }
 
@@ -355,30 +355,29 @@ static void check_osd_inputs(running_machine &machine)
 //  extract_video_config
 //============================================================
 
-static void extract_video_config(running_machine &machine)
+void windows_osd_interface::extract_video_config()
 {
-	windows_options &options = downcast<windows_options &>(machine.options());
 	const char *stemp;
 
 	// global options: extract the data
-	video_config.windowed      = options.window();
-	video_config.prescale      = options.prescale();
-	video_config.keepaspect    = options.keep_aspect();
-	video_config.numscreens    = options.numscreens();
+	video_config.windowed      = options().window();
+	video_config.prescale      = options().prescale();
+	video_config.keepaspect    = options().keep_aspect();
+	video_config.numscreens    = options().numscreens();
 
 	// if we are in debug mode, never go full screen
-	if (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
+	if (machine().debug_flags & DEBUG_FLAG_OSD_ENABLED)
 		video_config.windowed = TRUE;
 
 	// per-window options: extract the data
-	const char *default_resolution = options.resolution();
-	get_resolution(default_resolution, options.resolution(0), &video_config.window[0], TRUE);
-	get_resolution(default_resolution, options.resolution(1), &video_config.window[1], TRUE);
-	get_resolution(default_resolution, options.resolution(2), &video_config.window[2], TRUE);
-	get_resolution(default_resolution, options.resolution(3), &video_config.window[3], TRUE);
+	const char *default_resolution = options().resolution();
+	get_resolution(default_resolution, options().resolution(0), &video_config.window[0], TRUE);
+	get_resolution(default_resolution, options().resolution(1), &video_config.window[1], TRUE);
+	get_resolution(default_resolution, options().resolution(2), &video_config.window[2], TRUE);
+	get_resolution(default_resolution, options().resolution(3), &video_config.window[3], TRUE);
 
 	// video options: extract the data
-	stemp = options.video();
+	stemp = options().video();
 	if (strcmp(stemp, "d3d") == 0)
 		video_config.mode = VIDEO_MODE_D3D;
 	else if (strcmp(stemp, "auto") == 0)
@@ -392,24 +391,28 @@ static void extract_video_config(running_machine &machine)
 	else if (strcmp(stemp, "none") == 0)
 	{
 		video_config.mode = VIDEO_MODE_NONE;
-		if (options.seconds_to_run() == 0)
+		if (options().seconds_to_run() == 0)
 			osd_printf_warning("Warning: -video none doesn't make much sense without -seconds_to_run\n");
 	}
+#if (USE_OPENGL)
+	else if (strcmp(stemp, "opengl") == 0)
+		video_config.mode = VIDEO_MODE_OPENGL;
+#endif
 	else
 	{
 		osd_printf_warning("Invalid video value %s; reverting to gdi\n", stemp);
 		video_config.mode = VIDEO_MODE_GDI;
 	}
-	video_config.waitvsync     = options.wait_vsync();
-	video_config.syncrefresh   = options.sync_refresh();
-	video_config.triplebuf     = options.triple_buffer();
-	video_config.switchres     = options.switch_res();
+	video_config.waitvsync     = options().wait_vsync();
+	video_config.syncrefresh   = options().sync_refresh();
+	video_config.triplebuf     = options().triple_buffer();
+	video_config.switchres     = options().switch_res();
 
 	// ddraw options: extract the data
-	video_config.hwstretch     = options.hwstretch();
+	video_config.hwstretch     = options().hwstretch();
 
 	// d3d options: extract the data
-	video_config.filter        = options.filter();
+	video_config.filter        = options().filter();
 	if (video_config.prescale == 0)
 		video_config.prescale = 1;
 }
@@ -424,9 +427,9 @@ static float get_aspect(const char *defdata, const char *data, int report_error)
 {
 	int num = 0, den = 1;
 
-	if (strcmp(data, "auto") == 0)
+	if (strcmp(data, OSDOPTVAL_AUTO) == 0)
 	{
-		if (strcmp(defdata, "auto") == 0)
+		if (strcmp(defdata,OSDOPTVAL_AUTO) == 0)
 			return 0;
 		data = defdata;
 	}
@@ -436,17 +439,16 @@ static float get_aspect(const char *defdata, const char *data, int report_error)
 }
 
 
-
 //============================================================
 //  get_resolution
 //============================================================
 
-static void get_resolution(const char *defdata, const char *data, win_window_config *config, int report_error)
+static void get_resolution(const char *defdata, const char *data, osd_window_config *config, int report_error)
 {
 	config->width = config->height = config->refresh = 0;
-	if (strcmp(data, "auto") == 0)
+	if (strcmp(data, OSDOPTVAL_AUTO) == 0)
 	{
-		if (strcmp(defdata, "auto") == 0)
+		if (strcmp(defdata, OSDOPTVAL_AUTO) == 0)
 			return;
 		data = defdata;
 	}

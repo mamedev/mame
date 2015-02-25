@@ -121,14 +121,14 @@ UINT8 snes_multitap_device::read_pin4()
 		ret |= m_select ? m_port1->read_pin4() : m_port3->read_pin4();
 	else    // 1P
 		ret |= m_select ? m_port1->read_pin4() : 0;
-	
+
 	return ret;
 }
 
 UINT8 snes_multitap_device::read_pin5()
 {
 	UINT8 ret = 0;
-	
+
 	if (m_cfg->read() == 0) // 4P
 		ret |= m_select ? m_port2->read_pin4() : m_port4->read_pin4();
 	return ret;

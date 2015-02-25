@@ -15,8 +15,8 @@
 
 #if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
 
-#define LIB_NAME		L"wpcap.dll"
-#define LIB_ERROR_STR 	"Unable to load winpcap: %lx\n"
+#define LIB_NAME        L"wpcap.dll"
+#define LIB_ERROR_STR   "Unable to load winpcap: %lx\n"
 typedef DWORD except_type;
 
 #else
@@ -28,11 +28,11 @@ typedef DWORD except_type;
 #endif
 
 #ifdef SDLMAME_MACOSX
-#define LIB_NAME	"libpcap.dylib"
+#define LIB_NAME    "libpcap.dylib"
 #else
-#define LIB_NAME	"libpcap.so"
+#define LIB_NAME    "libpcap.so"
 #endif
-#define LIB_ERROR_STR 	"Unable to load pcap: %s\n"
+#define LIB_ERROR_STR   "Unable to load pcap: %s\n"
 
 typedef void *HMODULE;
 typedef const char *except_type;
@@ -178,7 +178,7 @@ void netdev_pcap::set_mac(const char *mac)
 	sprintf(filter, "not ether src %.2X:%.2X:%.2X:%.2X:%.2X:%.2X and (ether dst %.2X:%.2X:%.2X:%.2X:%.2X:%.2X or ether multicast or ether broadcast or ether dst 09:00:07:ff:ff:ff)", (unsigned char)mac[0], (unsigned char)mac[1], (unsigned char)mac[2],(unsigned char)mac[3], (unsigned char)mac[4], (unsigned char)mac[5], (unsigned char)mac[0], (unsigned char)mac[1], (unsigned char)mac[2],(unsigned char)mac[3], (unsigned char)mac[4], (unsigned char)mac[5]);
 #else
 	sprintf(filter, "ether dst %.2X:%.2X:%.2X:%.2X:%.2X:%.2X or ether multicast or ether broadcast", (unsigned char)mac[0], (unsigned char)mac[1], (unsigned char)mac[2],(unsigned char)mac[3], (unsigned char)mac[4], (unsigned char)mac[5]);
-#endif	
+#endif
 	if(pcap_compile_dl(m_p, &fp, filter, 1, 0) == -1) {
 		logerror("Error with pcap_compile\n");
 	}
@@ -300,4 +300,3 @@ void pcap_module::exit()
 
 
 MODULE_DEFINITION(NETDEV_PCAP, pcap_module)
-

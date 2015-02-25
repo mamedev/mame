@@ -143,7 +143,7 @@ protected:
 	bool m_skip;            // skip next opcode
 	int m_icount;
 	emu_timer *m_timer;
-	
+
 	UINT16 m_pc;            // program counter
 	UINT8 m_acc;            // 4-bit accumulator
 	UINT8 m_dpl;            // 4-bit data pointer low (RAM x)
@@ -169,7 +169,7 @@ protected:
 	devcb_write8 m_write_g;
 	devcb_write8 m_write_h;
 	devcb_write8 m_write_i;
-	
+
 	// misc internal helpers
 	void increment_pc();
 	void fetch_arg();

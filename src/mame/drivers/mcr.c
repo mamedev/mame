@@ -2699,9 +2699,9 @@ ROM_START( nflfoot )
 	ROM_LOAD( "nflvidfg.cp7", 0x0a000, 0x2000, CRC(73f62392) SHA1(18f28be7264f8edff38f8a6aa067eeb1970f544c) )
 	ROM_LOAD( "nflvidfg.c10", 0x0c000, 0x2000, CRC(1766dcc7) SHA1(df499e3c66ae702d2d56e6cd095a754665569fcd) )
 	ROM_LOAD( "nflvidfg.cp9", 0x0e000, 0x2000, CRC(46558146) SHA1(4bedfae8cf0fcb9d837706ee13fbe3944ab47216) )
-	
+
 	DISK_REGION( "ced_videodisc" )
-        DISK_IMAGE_READONLY( "nflfoot", 0, NO_DUMP )
+		DISK_IMAGE_READONLY( "nflfoot", 0, NO_DUMP )
 ROM_END
 
 

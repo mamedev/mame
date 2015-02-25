@@ -4,7 +4,7 @@
 
     Notes:
         Pop Shot is a prototype sequel (or upgrade) to Skeet Shot
-        
+
         Supposedly Skeet Shot used a laserdisc to supply video for eight
         different background "scenes". Pop Shot probably did too, in that case.
 
@@ -266,9 +266,9 @@ ROM_START( skeetsht )
 	ROM_REGION16_LE( 0x200000, "tms", 0 )
 	ROM_LOAD16_BYTE( "even_v1.2.u14", 0x000000, 0x40000, CRC(c7c9515e) SHA1(ce3e813c15085790d5335d9fc751b3cc5b617b20) )
 	ROM_LOAD16_BYTE( "odd_v1.2.u13",  0x000001, 0x40000, CRC(ea4402fb) SHA1(b0b6b191a8b48bead660a385c638363943a6ffe2) )
-	
+
 	DISK_REGION( "laserdisc" )
-        DISK_IMAGE_READONLY( "skeetsht", 0, NO_DUMP ) // unknown disc label?
+		DISK_IMAGE_READONLY( "skeetsht", 0, NO_DUMP ) // unknown disc label?
 ROM_END
 
 ROM_START( popshot )
@@ -281,7 +281,7 @@ ROM_START( popshot )
 	ROM_LOAD16_BYTE( "popshot_tms34_odd.u13",  0x000001, 0x80000, CRC(82d616d8) SHA1(83ab33727ebab882b79c9ebd3557e2c319b3387a) )
 
 	DISK_REGION( "laserdisc" )
-        DISK_IMAGE_READONLY( "popshot", 0, NO_DUMP ) // unknown disc label?
+		DISK_IMAGE_READONLY( "popshot", 0, NO_DUMP ) // unknown disc label?
 ROM_END
 
 

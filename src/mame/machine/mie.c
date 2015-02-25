@@ -33,7 +33,7 @@ static ADDRESS_MAP_START( mie_port, AS_IO, 8, mie_device)
 	AM_RANGE(0x00, 0x07) AM_READWRITE(gpio_r, gpio_w)
 	AM_RANGE(0x08, 0x08) AM_READWRITE(gpiodir_r, gpiodir_w)
 	AM_RANGE(0x0f, 0x0f) AM_READWRITE(adc_r, adc_w)
-	AM_RANGE(0x10, 0x10) AM_READWRITE(jvs_r, jvs_w)		// ports 1x and 2x is standard UARTs, TODO handle it properly
+	AM_RANGE(0x10, 0x10) AM_READWRITE(jvs_r, jvs_w)     // ports 1x and 2x is standard UARTs, TODO handle it properly
 	AM_RANGE(0x12, 0x12) AM_WRITE(jvs_dest_w)
 	AM_RANGE(0x13, 0x13) AM_WRITE(jvs_lcr_w)
 	AM_RANGE(0x15, 0x15) AM_READ(jvs_status_r)

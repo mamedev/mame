@@ -119,7 +119,7 @@ void scotrsht_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(scotrsht_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
 	m_bg_tilemap->set_scroll_cols(64);
-	
+
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_charbank));
 	save_item(NAME(m_palette_bank));

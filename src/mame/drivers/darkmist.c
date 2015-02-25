@@ -229,7 +229,7 @@ static MACHINE_CONFIG_START( darkmist, darkmist_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", darkmist_state, scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("t5182", T5182, 0)
-	
+
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

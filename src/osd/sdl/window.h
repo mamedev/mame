@@ -49,13 +49,11 @@ public:
 	:
 #ifdef OSD_SDL
 #else
-		m_hwnd(0), m_focus_hwnd(0), m_resize_state(0),
-		m_maxwidth(0), m_maxheight(0),
-		m_refresh(0),
+		m_hwnd(0), m_dc(0), m_focus_hwnd(0), m_resize_state(0),
 #endif
 		m_prescale(1),
 		m_primlist(NULL)
-  	  {}
+		{}
 	virtual ~osd_window() { }
 
 	virtual render_target *target() = 0;
@@ -66,10 +64,11 @@ public:
 
 	float aspect() const { return monitor()->aspect(); }
 
+	virtual void get_size(int &w, int &h) = 0;
+
 #ifdef OSD_SDL
 	virtual void blit_surface_size(int &blitwidth, int &blitheight) = 0;
 	virtual sdl_monitor_info *monitor() const = 0;
-	virtual void get_size(int &w, int &h) = 0;
 #if (SDLMAME_SDL2)
 	virtual SDL_Window *sdl_window() = 0;
 #else
@@ -82,18 +81,18 @@ public:
 	virtual win_monitor_info *winwindow_video_window_monitor(const RECT *proposed) = 0;
 
 	// window handle and info
-	HWND					m_hwnd;
+	HWND                    m_hwnd;
+	HDC                     m_dc;       // only used by GDI renderer!
 	// FIXME: this is the same as win_window_list->m_hwnd, i.e. first window.
 	// During modularization, this should be passed in differently
-	HWND         	 		m_focus_hwnd;
+	HWND                    m_focus_hwnd;
 
-	int                 	m_resize_state;
-	int                 	m_maxwidth, m_maxheight;
-	int                 	m_refresh;
+	int                     m_resize_state;
 #endif
 
-	int						m_prescale;
-	render_primitive_list 	*m_primlist;
+	osd_window_config       m_win_config;
+	int                     m_prescale;
+	render_primitive_list   *m_primlist;
 };
 
 class osd_renderer
@@ -101,15 +100,13 @@ class osd_renderer
 public:
 
 	/* Generic flags */
-	static const int FLAG_NONE 					= 0x0000;
-	static const int FLAG_NEEDS_OPENGL 			= 0x0001;
-	static const int FLAG_HAS_VECTOR_SCREEN		= 0x0002;
+	static const int FLAG_NONE                  = 0x0000;
+	static const int FLAG_NEEDS_OPENGL          = 0x0001;
+	static const int FLAG_HAS_VECTOR_SCREEN     = 0x0002;
 
-#if (!(SDLMAME_SDL2))
 	/* SDL 1.2 flags */
-	static const int FLAG_NEEDS_DOUBLEBUF 		= 0x0100;
-	static const int FLAG_NEEDS_ASYNCBLIT 		= 0x0200;
-#endif
+	static const int FLAG_NEEDS_DOUBLEBUF       = 0x0100;
+	static const int FLAG_NEEDS_ASYNCBLIT       = 0x0200;
 
 	osd_renderer(osd_window *window, const int flags)
 	: m_window(window), m_flags(flags) { }
@@ -129,11 +126,10 @@ public:
 	virtual int create() = 0;
 	virtual render_primitive_list *get_primitives() = 0;
 
+	virtual int draw(const int update) = 0;
 #ifdef OSD_SDL
-	virtual int draw(const UINT32 dc, const int update) = 0;
 	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) = 0;
 #else
-	virtual int draw(HDC dc, int update) = 0;
 	virtual void save() = 0;
 	virtual void record() = 0;
 	virtual void toggle_fsfx() = 0;
@@ -143,11 +139,11 @@ public:
 
 protected:
 	/* Internal flags */
-	static const int FI_CHANGED	 				= 0x010000;
+	static const int FI_CHANGED                 = 0x010000;
 
 private:
 
-	osd_window		*m_window;
+	osd_window      *m_window;
 	int m_flags;
 };
 
@@ -157,7 +153,7 @@ class sdl_window_info : public osd_window
 {
 public:
 	sdl_window_info(running_machine &a_machine, int index, sdl_monitor_info *a_monitor,
-			const sdl_window_config *config)
+			const osd_window_config *config)
 	: osd_window(), m_next(NULL),
 		// Following three are used by input code to defer resizes
 #if (SDLMAME_SDL2)
@@ -165,7 +161,7 @@ public:
 		m_resize_height(0),
 		m_last_resize(0),
 #endif
-		 m_minwidth(0), m_minheight(0),
+			m_minwidth(0), m_minheight(0),
 		m_rendered_event(0), m_target(0),
 #if (SDLMAME_SDL2)
 		m_sdl_window(NULL),
@@ -175,10 +171,7 @@ public:
 #endif
 		m_machine(a_machine), m_monitor(a_monitor), m_fullscreen(0), m_index(0)
 	{
-		m_maxwidth = config->width;
-		m_maxheight = config->height;
-		m_depth = config->depth;
-		m_refresh = config->refresh;
+		m_win_config = *config;
 		m_index = index;
 
 		//FIXME: these should be per_window in config-> or even better a bit set
@@ -246,9 +239,6 @@ private:
 
 	// diverse flags
 	int                 m_minwidth, m_minheight;
-	int                 m_maxwidth, m_maxheight;
-	int                 m_refresh;
-	int                 m_depth;
 	int                 m_windowed_width;
 	int                 m_windowed_height;
 
@@ -266,7 +256,7 @@ private:
 	SDL_Surface         *m_sdlsurf;
 #endif
 
-	int 				m_extra_flags;
+	int                 m_extra_flags;
 
 	void set_renderer(osd_renderer *renderer)
 	{
@@ -291,7 +281,7 @@ private:
 	sdl_monitor_info *  m_monitor;
 	int                 m_fullscreen;
 	int                 m_index;
-	osd_renderer *		m_renderer;
+	osd_renderer *      m_renderer;
 
 	// static callbacks ...
 
@@ -302,7 +292,7 @@ private:
 	static OSDWORK_CALLBACK( notify_changed_wt );
 	static OSDWORK_CALLBACK( update_cursor_state_wt );
 
-	void measure_fps(UINT32 dc, int update);
+	void measure_fps(int update);
 
 };
 

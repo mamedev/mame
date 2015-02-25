@@ -44,6 +44,6 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void decrypt_gfx();
 	void decrypt_snd();
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 };

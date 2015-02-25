@@ -1,6 +1,7 @@
 /**********************************************************************
 
     Sega Game Gear EXT port emulation
+    Also known as Gear-to-Gear (or VS, in Japan) cable connector
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.

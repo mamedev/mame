@@ -125,7 +125,7 @@ void galpani2_state::machine_start()
 	UINT8 *ROM = memregion("subdata")->base();
 	membank("subdatabank")->configure_entries(0, 0x2000000/0x0800000, ROM, 0x0800000);
 	membank("subdatabank")->set_entry(0);
-	
+
 	save_item(NAME(m_eeprom_word));
 	save_item(NAME(m_old_mcu_nmi1));
 	save_item(NAME(m_old_mcu_nmi2));

@@ -154,7 +154,7 @@ private:
 	astring         m_fullpath;                     // full filename
 	core_file *     m_file;                         // core file pointer
 	path_iterator   m_iterator;                     // iterator for paths
-	path_iterator   m_mediapaths;			// media-path iterator
+	path_iterator   m_mediapaths;           // media-path iterator
 	UINT32          m_crc;                          // file's CRC
 	UINT32          m_openflags;                    // flags we used for the open
 	hash_collection m_hashes;                       // collection of hashes
@@ -168,7 +168,7 @@ private:
 	UINT64          m__7zlength;                    // 7Z file length
 
 	bool            m_remove_on_close;              // flag: remove the file when closing
-	bool		m_restrict_to_mediapath;	// flag: restrict to paths inside the media-path
+	bool        m_restrict_to_mediapath;    // flag: restrict to paths inside the media-path
 };
 
 

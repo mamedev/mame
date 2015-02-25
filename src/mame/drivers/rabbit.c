@@ -114,7 +114,7 @@ public:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	required_shared_ptr<UINT32> m_viewregs0;
 	required_shared_ptr<UINT32> m_viewregs6;
 	required_shared_ptr<UINT32> m_viewregs7;
@@ -124,7 +124,7 @@ public:
 	required_shared_ptr<UINT32> m_spriteregs;
 	required_shared_ptr<UINT32> m_blitterregs;
 	required_shared_ptr<UINT32> m_spriteram;
-	
+
 	bitmap_ind16 *m_sprite_bitmap;
 	rectangle m_sprite_clip;
 	int m_vblirqlevel;
@@ -132,7 +132,7 @@ public:
 	int m_banking;
 	UINT32 *m_tilemap_ram[4];
 	tilemap_t *m_tilemap[4];
-	
+
 	DECLARE_WRITE32_MEMBER(tilemap0_w);
 	DECLARE_WRITE32_MEMBER(tilemap1_w);
 	DECLARE_WRITE32_MEMBER(tilemap2_w);
@@ -145,18 +145,18 @@ public:
 	DECLARE_WRITE32_MEMBER(rombank_w);
 	DECLARE_WRITE32_MEMBER(blitter_w);
 	DECLARE_WRITE32_MEMBER(eeprom_write);
-	
+
 	DECLARE_DRIVER_INIT(rabbit);
-	
+
 	TILE_GET_INFO_MEMBER(get_tilemap0_tile_info);
 	TILE_GET_INFO_MEMBER(get_tilemap1_tile_info);
 	TILE_GET_INFO_MEMBER(get_tilemap2_tile_info);
 	TILE_GET_INFO_MEMBER(get_tilemap3_tile_info);
-	
+
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
-	
+
 	virtual void video_start();
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void get_tilemap_info(tile_data &tileinfo, int tile_index, int whichtilemap, int tilesize);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
@@ -437,7 +437,7 @@ void rabbit_state::video_start()
 
 	m_sprite_bitmap = auto_bitmap_ind16_alloc(machine(),0x1000,0x1000);
 	m_sprite_clip.set(0, 0x1000-1, 0, 0x1000-1);
-	
+
 	save_pointer(NAME(m_tilemap_ram[0]), 0x20000/4);
 	save_pointer(NAME(m_tilemap_ram[1]), 0x20000/4);
 	save_pointer(NAME(m_tilemap_ram[2]), 0x20000/4);

@@ -665,7 +665,7 @@ static void devmap_init(running_machine &machine, device_map_t *devmap, const ch
 		sprintf(defname, "%s%d", opt, dev + 1);
 
 		dev_name = machine.options().value(defname);
-		if (dev_name && *dev_name && strcmp(dev_name,SDLOPTVAL_AUTO))
+		if (dev_name && *dev_name && strcmp(dev_name,OSDOPTVAL_AUTO))
 		{
 			devmap->map[dev].name = remove_spaces(machine, dev_name);
 			osd_printf_verbose("%s: Logical id %d: %s\n", label, dev + 1, devmap->map[dev].name);
@@ -1583,6 +1583,8 @@ void sdlinput_process_events_buf()
 		}
 		osd_lock_release(input_lock);
 	}
+	else
+		SDL_PumpEvents();
 }
 
 

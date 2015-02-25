@@ -39,24 +39,24 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	
+
 	required_shared_ptr<UINT8> m_lo_vram;
 	required_shared_ptr<UINT8> m_hi_vram;
 	required_shared_ptr<UINT8> m_cram;
-	
+
 	tilemap_t *m_sc0_tilemap;
-	
+
 	DECLARE_WRITE8_MEMBER(sc0_lovram);
 	DECLARE_WRITE8_MEMBER(sc0_hivram);
 	DECLARE_WRITE8_MEMBER(sc0_cram);
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_READ8_MEMBER(prot_latch_r);
-	
+
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
-	
+
 	virtual void machine_start();
 	virtual void video_start();
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 

@@ -30,13 +30,13 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	
+
 	required_shared_ptr<UINT8> m_videoram;
-	
+
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_sound_flag;
 	UINT8 m_tile_bank;
-	
+
 	DECLARE_WRITE8_MEMBER(bgram_w);
 	DECLARE_WRITE8_MEMBER(player_mux_w);
 	DECLARE_WRITE8_MEMBER(tile_banking_w);
@@ -47,16 +47,16 @@ public:
 	DECLARE_READ8_MEMBER(prot_r);
 	DECLARE_WRITE8_MEMBER(prot_w);
 	DECLARE_READ8_MEMBER(sound_r);
-	
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	
+
 	DECLARE_DRIVER_INIT(wink);
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	
+
 	UINT32 screen_update_wink(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	INTERRUPT_GEN_MEMBER(wink_sound);
 };
 

@@ -869,8 +869,9 @@ MACHINE_START_MEMBER(sms_state,sms)
 		// a bug in the program code. The only way this cartridge could have run
 		// successfully on a real unit is if the RAM would be initialized with
 		// a F0 pattern on power up; F0 = RET P.
-		// This initialization breaks the some Game Gear games though (e.g.
+		// This initialization breaks some Game Gear games though (e.g.
 		// tempojr), suggesting that not all systems had the same initialization.
+		// This also breaks some homebrew software (e.g. Nine Pixels).
 		// For the moment we apply this to systems that have the Japanese SMS
 		// cartridge slot.
 		if (m_has_jpn_sms_cart_slot)

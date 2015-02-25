@@ -4,16 +4,16 @@
 
     Seibu Protected 1993-94 era hardware, V30 based (sequel to the 68k based hardware)
 
-	TODO:
-	* zeroteam - sort-DMA doesn't seem to work too well, sprite-sprite priorities are broken as per now
+    TODO:
+    * zeroteam - sort-DMA doesn't seem to work too well, sprite-sprite priorities are broken as per now
 
-	* xsedae - it does an "8-liner"-style scroll during attract, doesn't work too well.
+    * xsedae - it does an "8-liner"-style scroll during attract, doesn't work too well.
 
-	* sprite chip is the same as seibuspi.c and feversoc.c, needs device-ification and merging.
+    * sprite chip is the same as seibuspi.c and feversoc.c, needs device-ification and merging.
 
-	* sprite chip also uses first entry for "something" that isn't sprite, some of them looks clipping
-	  regions (150 - ff in zeroteam, 150 - 0 and 150 - 80 in raiden2). Latter probably do double buffering
-	  on odd/even frames, by updating only top or bottom part of screen.
+    * sprite chip also uses first entry for "something" that isn't sprite, some of them looks clipping
+      regions (150 - ff in zeroteam, 150 - 0 and 150 - 80 in raiden2). Latter probably do double buffering
+      on odd/even frames, by updating only top or bottom part of screen.
 
 ===========================================================================================================
 

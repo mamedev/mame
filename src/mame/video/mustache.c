@@ -92,7 +92,7 @@ void mustache_state::video_start()
 			8, 8, 64, 32);
 
 	m_bg_tilemap->set_scroll_rows(4);
-	
+
 	save_item(NAME(m_control_byte));
 }
 

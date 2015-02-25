@@ -38,4 +38,4 @@ $(RESFILE): $(UME_WINSRC)/ume.rc $(UME_WINOBJ)/umevers.rc
 
 $(UME_WINOBJ)/umevers.rc: $(SRC)/build/verinfo.py $(SRC)/version.c
 	@echo Emitting $@...
-	$(PYTHON) $(SRC)/build/verinfo.py -b ume $(SRC)/version.c > $@
+	$(PYTHON) $(SRC)/build/verinfo.py -b ume -o $@ $(SRC)/version.c

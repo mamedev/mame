@@ -48,7 +48,7 @@ public:
 	DECLARE_DRIVER_INIT(dreambal);
 	virtual void machine_start();
 	virtual void machine_reset();
-	
+
 	UINT32 screen_update_dreambal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 

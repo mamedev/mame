@@ -184,7 +184,7 @@ void amis2152_cpu_device::device_start()
 	amis2000_base_device::device_start();
 
 	m_d2f_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(amis2152_cpu_device::d2f_timer_cb), this));
-	
+
 	// zerofill
 	m_d2f_latch = 0;
 	m_fout_state = 0;
@@ -205,7 +205,7 @@ void amis2000_base_device::device_reset()
 	m_pc = 0;
 	m_op = 0;
 	m_skip = false;
-	
+
 	// clear i/o
 	m_a = 0x1fff;
 	m_write_a(0, m_a, 0xffff);
@@ -235,14 +235,14 @@ void amis2000_base_device::execute_run()
 	while (m_icount > 0)
 	{
 		m_icount--;
-		
+
 		// remember previous opcode
 		m_prev_op = m_op;
 
 		debugger_instruction_hook(this, m_pc);
 		m_op = m_program->read_byte(m_pc);
 		m_pc = (m_pc + 1) & 0x1fff;
-		
+
 		if (m_skip)
 		{
 			// always skip over PP prefix
@@ -299,7 +299,7 @@ void amis2000_base_device::execute_run()
 			case 0x2d: op_sf2(); break;
 			case 0x2e: op_tf1(); break;
 			case 0x2f: op_tf2(); break;
-			
+
 			default:
 				switch (m_op & 0xfc)
 				{
