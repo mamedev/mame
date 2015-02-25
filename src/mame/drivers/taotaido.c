@@ -75,6 +75,8 @@ zooming might be wrong
 
 void taotaido_state::machine_start()
 {
+	membank("soundbank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x8000);
+	
 	save_item(NAME(m_pending_command));
 }
 
@@ -130,15 +132,13 @@ WRITE8_MEMBER(taotaido_state::pending_command_clear_w)
 
 WRITE8_MEMBER(taotaido_state::sh_bankswitch_w)
 {
-	UINT8 *rom = memregion("audiocpu")->base() + 0x10000;
-
-	membank("bank1")->set_base(rom + (data & 0x03) * 0x8000);
+	membank("soundbank")->set_entry(data & 0x03);
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, taotaido_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("soundbank")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, taotaido_state )
@@ -404,9 +404,8 @@ ROM_START( taotaido )
 	ROM_LOAD16_WORD_SWAP( "1-u90.bin", 0x00000, 0x80000, CRC(a3ee30da) SHA1(920a83ce9192bf785bffdc041e280f1a420de4c9) )
 	ROM_LOAD16_WORD_SWAP( "2-u91.bin", 0x80000, 0x80000, CRC(30b7e4fb) SHA1(15e1f6d252c736fdee33b691a0a1a45f0307bffb) )
 
-	ROM_REGION( 0x30000, "audiocpu", 0 ) /* z80 Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* z80 Code */
 	ROM_LOAD( "3-u113.bin", 0x000000, 0x20000, CRC(a167c4e4) SHA1(d32184e7040935cd440d4d82c66491b710ec87a8) )
-	ROM_RELOAD ( 0x10000, 0x20000 )
 
 	ROM_REGION( 0x100000, "ymsnd.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "u104.bin",     0x000000, 0x100000, CRC(e89387a9) SHA1(1deeee056af367d1a5aa0722dd3d6c68a82d0489) )
@@ -428,9 +427,8 @@ ROM_START( taotaidoa )
 	ROM_LOAD16_WORD_SWAP( "tt0-u90.bin", 0x00000, 0x80000, CRC(69d4cca7) SHA1(f1aba74fef8fe4271d19763f428fc0e2674d08b3) )
 	ROM_LOAD16_WORD_SWAP( "tt1-u91.bin", 0x80000, 0x80000, CRC(41025469) SHA1(fa3a424ca3ecb513f418e436e4191ff76f6a0de1) )
 
-	ROM_REGION( 0x30000, "audiocpu", 0 ) /* z80 Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* z80 Code */
 	ROM_LOAD( "3-u113.bin", 0x000000, 0x20000, CRC(a167c4e4) SHA1(d32184e7040935cd440d4d82c66491b710ec87a8) )
-	ROM_RELOAD ( 0x10000, 0x20000 )
 
 	ROM_REGION( 0x100000, "ymsnd.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "u104.bin",     0x000000, 0x100000, CRC(e89387a9) SHA1(1deeee056af367d1a5aa0722dd3d6c68a82d0489) )
@@ -452,9 +450,8 @@ ROM_START( taotaido3 )
 	ROM_LOAD16_WORD_SWAP( "1.u90", 0x00000, 0x80000, CRC(27c5c626) SHA1(f2aea45a15db24c914aa889be21cd8994d138a59) )
 	ROM_LOAD16_WORD_SWAP( "2.u91", 0x80000, 0x80000, CRC(71a4e538) SHA1(608c2d77aa8c1c4bb39a419bdfdf73a2fd587403) )
 
-	ROM_REGION( 0x30000, "audiocpu", 0 ) /* z80 Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* z80 Code */
 	ROM_LOAD( "3-u113.bin", 0x000000, 0x20000, CRC(a167c4e4) SHA1(d32184e7040935cd440d4d82c66491b710ec87a8) )
-	ROM_RELOAD ( 0x10000, 0x20000 )
 
 	ROM_REGION( 0x100000, "ymsnd.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "u104.bin",     0x000000, 0x100000, CRC(e89387a9) SHA1(1deeee056af367d1a5aa0722dd3d6c68a82d0489) )
