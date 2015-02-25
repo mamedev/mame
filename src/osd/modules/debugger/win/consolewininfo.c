@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//	consolewininfo.c - Win32 debug window handling
+//  consolewininfo.c - Win32 debug window handling
 //
 //============================================================
 
@@ -304,9 +304,9 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 
 void consolewin_info::process_string(char const *string)
 {
-	if (string[0] == 0)	// an empty string is a single step
+	if (string[0] == 0) // an empty string is a single step
 		debug_cpu_get_visible_cpu(machine())->debug()->single_step();
-	else				// otherwise, just process the command
+	else                // otherwise, just process the command
 		debug_console_execute_command(machine(), string, 1);
 
 	// clear the edit text box

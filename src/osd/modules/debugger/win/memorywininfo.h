@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//	memorywininfo.h - Win32 debug window handling
+//  memorywininfo.h - Win32 debug window handling
 //
 //============================================================
 
@@ -33,7 +33,7 @@ private:
 
 	void update_caption();
 
-	HWND	m_combownd;
+	HWND    m_combownd;
 };
 
 #endif

@@ -101,12 +101,12 @@ public:
 	tilemap_t *m_sc1_tilemap;
 	tilemap_t *m_sc2_tilemap;
 	tilemap_t *m_sc3_tilemap;
-	
+
 	UINT16 m_mux_data;
 	UINT16 m_seibucrtc_sc0bank;
 	UINT16 m_layer_en;
 	UINT16 m_scrollram[6];
-	
+
 	DECLARE_WRITE16_MEMBER(gfxbank_w);
 	DECLARE_READ16_MEMBER(mahjong_panel_r);
 	DECLARE_WRITE16_MEMBER(mahjong_panel_w);
@@ -116,14 +116,14 @@ public:
 	DECLARE_WRITE16_MEMBER(seibucrtc_sc3vram_w);
 	DECLARE_WRITE16_MEMBER(layer_en_w);
 	DECLARE_WRITE16_MEMBER(layer_scroll_w);
-	
+
 	TILE_GET_INFO_MEMBER(seibucrtc_sc0_tile_info);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc1_tile_info);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc2_tile_info);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc3_tile_info);
-	
+
 	INTERRUPT_GEN_MEMBER(irq);
-	
+
 	void seibucrtc_sc0bank_w(UINT16 data);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 	virtual void video_start();
@@ -355,7 +355,7 @@ void goodejan_state::video_start()
 	m_sc3_tilemap->set_transparent_pen(15);
 
 	m_seibucrtc_sc0bank = 0;
-	
+
 	save_item(NAME(m_mux_data));
 	save_item(NAME(m_seibucrtc_sc0bank));
 	save_item(NAME(m_layer_en));

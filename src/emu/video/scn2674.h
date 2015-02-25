@@ -19,8 +19,8 @@
 #define SCN2674_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int x, int y, UINT8 linecount, UINT8 charcode, UINT16 address, UINT8 cursor, UINT8 dw, UINT8 lg, UINT8 ul, UINT8 blink)
 
 class scn2674_device : public device_t,
-					   public device_video_interface,
-					   public device_memory_interface
+						public device_video_interface,
+						public device_memory_interface
 {
 public:
 	scn2674_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

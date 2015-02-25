@@ -140,8 +140,8 @@ struct monitor_enum_info
 /* mode_enum_info holds information during a display mode enumeration */
 struct mode_enum_info
 {
-	renderer_dd *			renderer;
-	osd_window  *			window;
+	renderer_dd *           renderer;
+	osd_window  *           window;
 	INT32                   minimum_width, minimum_height;
 	INT32                   target_width, target_height;
 	double                  target_refresh;

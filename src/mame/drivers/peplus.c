@@ -5017,7 +5017,7 @@ ROM_END
 ROM_START( peps0090 ) /* Normal board : Gold, Silver & Bronze (PS0090) - Payout 90.19% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0090_569-a2c.u68",   0x00000, 0x10000, CRC(5a727ff0) SHA1(6eed9d85620eff751c598d56807470f8753e8dd5) ) /* 3 Coins Max / 1 Line */
-	
+
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg1059.u72",   0x00000, 0x8000, CRC(96210de3) SHA1(10daa358f1fc507e9f4c788265c0acc57678fa40) ) /* Also contains graphics for Double Diamonds, use CAP1003 */
 	ROM_LOAD( "mgo-cg1059.u73",   0x08000, 0x8000, CRC(cfb9a357) SHA1(a390bed240960efd8da6e7815a0b0d272133f20f) )

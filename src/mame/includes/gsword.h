@@ -56,7 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ay8910_control_port_1_w);
 	DECLARE_READ8_MEMBER(fake_0_r);
 	DECLARE_READ8_MEMBER(fake_1_r);
-	
+
 	// gsword specific
 	DECLARE_READ8_MEMBER(gsword_hack_r);
 	DECLARE_WRITE8_MEMBER(gsword_adpcm_data_w);
@@ -76,5 +76,5 @@ public:
 	UINT32 screen_update_gsword(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(gsword_snd_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	int coins_in(void); //if 0'd 
+	int coins_in(void); //if 0'd
 };

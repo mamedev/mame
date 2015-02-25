@@ -28,7 +28,7 @@ $(LIBOCORE_NOMAIN): $(OSDCOREOBJS:$(WINOBJ)/main.o=)
 $(MESS_WINOBJ)/%.res: $(MESS_WINSRC)/%.rc
 	@echo Compiling resources $<...
 	$(RC) $(RCDEFS) $(RCFLAGS) --include-dir $(MESS_WINOBJ) -o $@ -i $<
-	
+
 
 #-------------------------------------------------
 # rules for resource file

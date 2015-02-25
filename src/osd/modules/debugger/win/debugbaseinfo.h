@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//	debugbaseinfo.h - Win32 debug window handling
+//  debugbaseinfo.h - Win32 debug window handling
 //
 //============================================================
 
@@ -30,10 +30,10 @@ protected:
 	static void smart_show_window(HWND wnd, bool show);
 
 private:
-	debugger_windows_interface	&m_debugger;
-	running_machine				&m_machine;
-	ui_metrics const			&m_metrics;
-	bool const					&m_waiting_for_debugger;
+	debugger_windows_interface  &m_debugger;
+	running_machine             &m_machine;
+	ui_metrics const            &m_metrics;
+	bool const                  &m_waiting_for_debugger;
 };
 
 

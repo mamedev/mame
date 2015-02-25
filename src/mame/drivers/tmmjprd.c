@@ -366,13 +366,13 @@ void tmmjprd_state::video_start()
 	m_tilemap_ram[1] = auto_alloc_array_clear(machine(), UINT32, 0x8000);
 	m_tilemap_ram[2] = auto_alloc_array_clear(machine(), UINT32, 0x8000);
 	m_tilemap_ram[3] = auto_alloc_array_clear(machine(), UINT32, 0x8000);
-	
-	
+
+
 	save_pointer(NAME(m_tilemap_ram[0]), 0x8000);
 	save_pointer(NAME(m_tilemap_ram[1]), 0x8000);
 	save_pointer(NAME(m_tilemap_ram[2]), 0x8000);
 	save_pointer(NAME(m_tilemap_ram[3]), 0x8000);
-	
+
 	save_item(NAME(m_old_brt1));
 	save_item(NAME(m_old_brt2));
 }

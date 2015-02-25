@@ -5,7 +5,7 @@
   Epoch Dracula (manufactured in Japan)
   * NEC uCOM-43 MCU, labeled D553C 206
   * cyan/red/green VFD display NEC FIP8BM20T
-  
+
   known releases:
   - Japan: Dracula House, yellow case
   - USA: Dracula, red case
@@ -47,7 +47,7 @@ public:
 
 	UINT32 m_vfd_state[0x10];
 	void update_vfd();
-	
+
 	virtual void machine_start();
 };
 
@@ -67,7 +67,7 @@ void edracula_state::update_vfd()
 			// on difference, send to output
 			for (int j = 0; j < 18; j++)
 				output_set_lamp_value(i*100 + j, m_plate >> j & 1);
-			
+
 			m_vfd_state[i] = m_plate;
 		}
 }
@@ -85,7 +85,7 @@ WRITE8_MEMBER(edracula_state::grid_w)
 	// port C/D: vfd matrix grid
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	
+
 	update_vfd();
 }
 
@@ -94,7 +94,7 @@ WRITE8_MEMBER(edracula_state::plate_w)
 	// port E/F/G/H/I01: vfd matrix plate
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	
+
 	update_vfd();
 }
 

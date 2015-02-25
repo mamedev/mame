@@ -1,10 +1,10 @@
 /*
-	Dobbertin Smartwatch
-	
-	Dallas DS1216 Smartwatch + DS1315 Phantom Time chip
-	
-	Further info at: http://www.cpcwiki.eu/index.php/Dobbertin_Smart_Watch
-	
+    Dobbertin Smartwatch
+
+    Dallas DS1216 Smartwatch + DS1315 Phantom Time chip
+
+    Further info at: http://www.cpcwiki.eu/index.php/Dobbertin_Smart_Watch
+
 */
 
 #ifndef SMARTWATCH_H_

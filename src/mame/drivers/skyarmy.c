@@ -50,24 +50,24 @@ public:
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_scrollram;
-	
+
 	tilemap_t* m_tilemap;
 	int m_nmi;
-	
+
 	DECLARE_WRITE8_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE8_MEMBER(flip_screen_y_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(colorram_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	
+
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	
+
 	virtual void machine_start();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(skyarmy);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	INTERRUPT_GEN_MEMBER(nmi_source);
 };
 

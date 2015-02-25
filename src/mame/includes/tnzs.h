@@ -35,7 +35,7 @@ public:
 		m_palette(*this, "palette"),
 		m_mainbank(*this, "mainbank")
 		{ }
-	
+
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -107,13 +107,13 @@ public:
 	DECLARE_PALETTE_INIT(arknoid2);
 	DECLARE_MACHINE_START(tnzs_common);
 	DECLARE_MACHINE_RESET(jpopnics);
-	
+
 	UINT32 screen_update_tnzs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_tnzs(screen_device &screen, bool state);
-	
+
 	INTERRUPT_GEN_MEMBER(arknoid2_interrupt);
 	TIMER_CALLBACK_MEMBER(kludge_callback);
-	
+
 	void tnzs_postload();
 	void mcu_reset();
 	void mcu_handle_coins(int coin);

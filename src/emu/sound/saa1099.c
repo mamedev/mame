@@ -161,7 +161,7 @@ void saa1099_device::device_start()
 
 	/* for each chip allocate one stream */
 	m_stream = stream_alloc(0, 2, m_sample_rate);
-	
+
 	save_item(NAME(m_noise_params));
 	save_item(NAME(m_env_enable));
 	save_item(NAME(m_env_reverse_right));
@@ -172,7 +172,7 @@ void saa1099_device::device_start()
 	save_item(NAME(m_all_ch_enable));
 	save_item(NAME(m_sync_state));
 	save_item(NAME(m_selected_reg));
-	
+
 	for (int i = 0; i < 6; i++)
 	{
 		save_item(NAME(m_channels[i].frequency), i);
@@ -185,7 +185,7 @@ void saa1099_device::device_start()
 		save_item(NAME(m_channels[i].freq), i);
 		save_item(NAME(m_channels[i].level), i);
 	}
-	
+
 	for (int i = 0; i < 2; i++)
 	{
 		save_item(NAME(m_noise[i].counter), i);

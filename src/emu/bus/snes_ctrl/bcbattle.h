@@ -45,7 +45,7 @@ protected:
 	int read_current_bit();
 
 private:
-	
+
 	static const device_timer_id TIMER_BATTLER = 1;
 	required_device<barcode_reader_device> m_reader;
 	UINT8 m_current_barcode[20];

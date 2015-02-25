@@ -19,7 +19,7 @@ public:
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
-	
+
 	UINT8 m_crtc_vreg[0x100];
 	UINT8 m_crtc_index;
 	UINT8 m_flip_scr;
@@ -27,7 +27,7 @@ public:
 	UINT8 m_km_status;
 	UINT8 m_coin_settings;
 	UINT8 m_coin_impulse;
-	
+
 	DECLARE_READ8_MEMBER(key_matrix_r);
 	DECLARE_WRITE8_MEMBER(key_matrix_w);
 	DECLARE_READ8_MEMBER(key_matrix_status_r);
@@ -40,8 +40,8 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(speedatk);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	UINT8 iox_key_matrix_calc(UINT8 p_side);
 };

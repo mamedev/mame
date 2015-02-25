@@ -405,8 +405,8 @@ READ16_MEMBER(ngen_state::peripheral_r)
 	case 0x1a0:  // I/O control register?
 		ret = m_control;  // end of DMA transfer? (maybe a per-channel EOP?) Bit 6 is set during a transfer?
 		break;
-//	default:
-//		logerror("Unknown 80186 peripheral read offset %04x mask %04x returning %04x\n",offset,mem_mask,ret);
+//  default:
+//      logerror("Unknown 80186 peripheral read offset %04x mask %04x returning %04x\n",offset,mem_mask,ret);
 	}
 	return ret;
 }
@@ -420,7 +420,7 @@ WRITE16_MEMBER(ngen_state::xbus_w)
 {
 	UINT16 addr = (data & 0x00ff) << 8;
 	cpu_device* cpu;
-	
+
 	if(m_maincpu)
 		cpu = m_maincpu;
 	else
@@ -544,7 +544,7 @@ READ16_MEMBER(ngen_state::fhd_r)
 				ret = m_fdc->read(space,offset);
 				m_fdc_timer->write_clk0(1);
 				m_fdc_timer->write_clk0(0);  // Data register access clocks the FDC's PIT channel 0
-			}	
+			}
 			break;
 		case 0x08:
 		case 0x09:
@@ -706,7 +706,7 @@ READ8_MEMBER(ngen_state::dma_read_word)
 	else
 		cpu = m_i386cpu;
 	address_space& prog_space = cpu->space(AS_PROGRAM); // get the right address space
-	
+
 	if(m_dma_channel == -1)
 		return 0xff;
 	offs_t page_offset = (((offs_t) m_dma_offset[m_dma_channel]) << 16) & 0xFE0000;
@@ -727,7 +727,7 @@ WRITE8_MEMBER(ngen_state::dma_write_word)
 	else
 		cpu = m_i386cpu;
 	address_space& prog_space = cpu->space(AS_PROGRAM); // get the right address space
-		
+
 	if(m_dma_channel == -1)
 		return;
 	offs_t page_offset = (((offs_t) m_dma_offset[m_dma_channel]) << 16) & 0xFE0000;
@@ -905,7 +905,7 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 
 	// keyboard UART (patent says i8251 is used for keyboard communications, it is located on the video board)
 	MCFG_DEVICE_ADD("videouart", I8251, 0)  // main clock unknown, Rx/Tx clocks are 19.53kHz
-//	MCFG_I8251_TXEMPTY_HANDLER(DEVWRITELINE("pic",pic8259_device,ir4_w))
+//  MCFG_I8251_TXEMPTY_HANDLER(DEVWRITELINE("pic",pic8259_device,ir4_w))
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("keyboard", rs232_port_device, write_txd))
 	MCFG_RS232_PORT_ADD("keyboard", keyboard, "ngen")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("videouart", i8251_device, write_rxd))
@@ -919,12 +919,12 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("maincpu",i80186_cpu_device,drq1_w))
 	MCFG_WD_FDC_FORCE_READY
 	MCFG_DEVICE_ADD("fdc_timer", PIT8253, 0)
-	MCFG_PIT8253_CLK0(0)  
+	MCFG_PIT8253_CLK0(0)
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic",pic8259_device,ir5_w))  // clocked on FDC data register access
 	MCFG_PIT8253_CLK1(XTAL_20MHz / 20)
-//	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pic",pic8259_device,ir5_w))  // 1MHz
+//  MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pic",pic8259_device,ir5_w))  // 1MHz
 	MCFG_PIT8253_CLK2(XTAL_20MHz / 20)
-//	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pic",pic8259_device,ir5_w))  
+//  MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pic",pic8259_device,ir5_w))
 
 	// TODO: WD1010 HDC (not implemented), use WD2010 for now
 	MCFG_DEVICE_ADD("hdc", WD2010, XTAL_20MHz / 4)
@@ -1015,7 +1015,7 @@ static MACHINE_CONFIG_START( ngen386, ngen386_state )
 
 	// keyboard UART (patent says i8251 is used for keyboard communications, it is located on the video board)
 	MCFG_DEVICE_ADD("videouart", I8251, 0)  // main clock unknown, Rx/Tx clocks are 19.53kHz
-//	MCFG_I8251_TXEMPTY_HANDLER(DEVWRITELINE("pic",pic8259_device,ir4_w))
+//  MCFG_I8251_TXEMPTY_HANDLER(DEVWRITELINE("pic",pic8259_device,ir4_w))
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("keyboard", rs232_port_device, write_txd))
 	MCFG_RS232_PORT_ADD("keyboard", keyboard, "ngen")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("videouart", i8251_device, write_rxd))
@@ -1026,15 +1026,15 @@ static MACHINE_CONFIG_START( ngen386, ngen386_state )
 	// floppy disk / hard disk module (WD2797 FDC, WD1010 HDC, plus an 8253 timer for each)
 	MCFG_WD2797x_ADD("fdc", XTAL_20MHz / 20)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(ngen_state,fdc_irq_w))
-//	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("i386cpu",i80186_cpu_device,drq1_w))
+//  MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("i386cpu",i80186_cpu_device,drq1_w))
 	MCFG_WD_FDC_FORCE_READY
 	MCFG_DEVICE_ADD("fdc_timer", PIT8253, 0)
-	MCFG_PIT8253_CLK0(0)  
+	MCFG_PIT8253_CLK0(0)
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic",pic8259_device,ir5_w))  // clocked on FDC data register access
 	MCFG_PIT8253_CLK1(XTAL_20MHz / 20)
-//	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pic",pic8259_device,ir5_w))  // 1MHz
+//  MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pic",pic8259_device,ir5_w))  // 1MHz
 	MCFG_PIT8253_CLK2(XTAL_20MHz / 20)
-//	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pic",pic8259_device,ir5_w))  
+//  MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pic",pic8259_device,ir5_w))
 
 	// TODO: WD1010 HDC (not implemented), use WD2010 for now
 	MCFG_DEVICE_ADD("hdc", WD2010, XTAL_20MHz / 4)

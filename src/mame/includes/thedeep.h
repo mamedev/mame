@@ -25,7 +25,7 @@ public:
 	required_shared_ptr<UINT8> m_vram_1;
 	required_shared_ptr<UINT8> m_scroll;
 	required_shared_ptr<UINT8> m_scroll2;
-	
+
 	int m_nmi_enable;
 	UINT8 m_protection_command;
 	UINT8 m_protection_data;
@@ -48,7 +48,7 @@ public:
 	DECLARE_READ8_MEMBER(p0_r);
 	DECLARE_WRITE8_MEMBER(vram_0_w);
 	DECLARE_WRITE8_MEMBER(vram_1_w);
-	
+
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_rows_back);
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
@@ -60,7 +60,7 @@ public:
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	INTERRUPT_GEN_MEMBER(mcu_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 };

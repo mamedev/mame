@@ -699,16 +699,16 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 				if (!m_display_cb.isnull())
 					m_display_cb(m_bitmap,
-					             i * m_hpixels_per_column,
-					             m_linecounter,
-					             tilerow,
-					             space().read_byte(address),
-					             address,
-					             (charrow >= m_IR6_cursor_first_scanline) && m_cursor_on,
-					             dw != 0,
-					             m_gfx_enabled != 0,
-					             charrow == m_IR7_cursor_underline_position,
-					             m_IR7_cursor_blink && (m_screen->frame_number() & (m_IR7_cursor_rate_divisor ? 0x40 : 0x20)));
+									i * m_hpixels_per_column,
+									m_linecounter,
+									tilerow,
+									space().read_byte(address),
+									address,
+									(charrow >= m_IR6_cursor_first_scanline) && m_cursor_on,
+									dw != 0,
+									m_gfx_enabled != 0,
+									charrow == m_IR7_cursor_underline_position,
+									m_IR7_cursor_blink && (m_screen->frame_number() & (m_IR7_cursor_rate_divisor ? 0x40 : 0x20)));
 				address = (address + 1) & 0xffff;
 
 				if(address > ((m_IR9_display_buffer_last_address << 10) | 0x3ff))

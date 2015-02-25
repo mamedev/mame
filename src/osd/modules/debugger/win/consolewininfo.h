@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//	consolewininfo.h - Win32 debug window handling
+//  consolewininfo.h - Win32 debug window handling
 //
 //============================================================
 
@@ -47,7 +47,7 @@ private:
 	static void add_filter_entry(astring &dest, char const *description, char const *extensions);
 	static void copy_extension_list(astring &dest, char const *extensions);
 
-	HMENU	m_devices_menu;
+	HMENU   m_devices_menu;
 };
 
 #endif

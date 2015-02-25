@@ -639,7 +639,7 @@ MACHINE_RESET_MEMBER(tnzs_state,jpopnics)
 MACHINE_START_MEMBER(tnzs_state,tnzs_common)
 {
 	UINT8 *SUB = memregion("sub")->base();
-	
+
 	membank("subbank")->configure_entries(0, 4, &SUB[0x08000], 0x2000);
 	membank("subbank")->set_entry(m_bank2);
 

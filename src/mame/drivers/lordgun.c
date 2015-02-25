@@ -1049,9 +1049,9 @@ DRIVER_INIT_MEMBER(lordgun_state, lordgun)
 
 		rom[i] = x;
 	}
-	
+
 	save_item(NAME(m_old));
-	
+
 	for (int i = 0; i < 2; i++)
 	{
 		save_item(NAME(m_gun[i].scr_x), i);

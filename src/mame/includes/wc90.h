@@ -28,7 +28,7 @@ public:
 		m_spriteram(*this, "spriteram")
 	{ }
 
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -51,7 +51,7 @@ public:
 	required_shared_ptr<UINT8> m_scroll2ylo;
 	required_shared_ptr<UINT8> m_scroll2yhi;
 	required_shared_ptr<UINT8> m_spriteram;
-	
+
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
@@ -63,15 +63,15 @@ public:
 	DECLARE_WRITE8_MEMBER(fgvideoram_w);
 	DECLARE_WRITE8_MEMBER(txvideoram_w);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(track_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(track_get_fg_tile_info);
-	
+
 	virtual void video_start();
 	DECLARE_VIDEO_START(wc90t);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

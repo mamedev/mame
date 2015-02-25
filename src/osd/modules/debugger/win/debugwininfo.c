@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//	debugwininfo.c - Win32 debug window handling
+//  debugwininfo.c - Win32 debug window handling
 //
 //============================================================
 
@@ -579,16 +579,16 @@ void debugwin_info::register_window_class()
 		WNDCLASS wc = { 0 };
 
 		// initialize the description of the window class
-		wc.lpszClassName	= TEXT("MAMEDebugWindow");
-		wc.hInstance		= GetModuleHandle(NULL);
-		wc.lpfnWndProc		= &debugwin_info::static_window_proc;
-		wc.hCursor			= LoadCursor(NULL, IDC_ARROW);
-		wc.hIcon			= LoadIcon(wc.hInstance, MAKEINTRESOURCE(2));
-		wc.lpszMenuName		= NULL;
-		wc.hbrBackground	= NULL;
-		wc.style			= 0;
-		wc.cbClsExtra		= 0;
-		wc.cbWndExtra		= 0;
+		wc.lpszClassName    = TEXT("MAMEDebugWindow");
+		wc.hInstance        = GetModuleHandle(NULL);
+		wc.lpfnWndProc      = &debugwin_info::static_window_proc;
+		wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
+		wc.hIcon            = LoadIcon(wc.hInstance, MAKEINTRESOURCE(2));
+		wc.lpszMenuName     = NULL;
+		wc.hbrBackground    = NULL;
+		wc.style            = 0;
+		wc.cbClsExtra       = 0;
+		wc.cbWndExtra       = 0;
 
 		// register the class; fail if we can't
 		if (!RegisterClass(&wc))

@@ -357,7 +357,7 @@ public:
 
 	UINT32 ic_address[M68K_IC_SIZE];   /* instruction cache address data */
 	UINT32 ic_data[M68K_IC_SIZE];      /* instruction cache content data */
-	bool   ic_valid[M68K_IC_SIZE];	   /* instruction cache valid flags */
+	bool   ic_valid[M68K_IC_SIZE];     /* instruction cache valid flags */
 
 
 

@@ -64,7 +64,7 @@ private:
 	MONITORINFOEX       m_info;                   // most recently retrieved info
 
 	float               m_aspect;               // computed/configured aspect ratio of the physical device
-	char * 				m_name;
+	char *              m_name;
 };
 
 

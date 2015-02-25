@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//	memoryviewinfo.h - Win32 debug window handling
+//  memoryviewinfo.h - Win32 debug window handling
 //
 //============================================================
 

@@ -399,7 +399,7 @@ OSDOBJS = \
 	$(OSDOBJ)/modules/netdev/none.o \
 
 ifdef USE_OPENGL
-OSDOBJS += 	$(WINOBJ)/../sdl/drawogl.o $(WINOBJ)/../sdl/gl_shader_tool.o $(WINOBJ)/../sdl/gl_shader_mgr.o
+OSDOBJS +=  $(WINOBJ)/../sdl/drawogl.o $(WINOBJ)/../sdl/gl_shader_tool.o $(WINOBJ)/../sdl/gl_shader_mgr.o
 OBJDIRS += $(WINOBJ)/../sdl
 
 DEFS += -DUSE_OPENGL=1
@@ -414,7 +414,7 @@ DEFS += -DUSE_SDL_SOUND
 endif
 
 ifndef DONT_USE_NETWORK
-DEFS +=	-DSDLMAME_NET_PCAP
+DEFS += -DSDLMAME_NET_PCAP
 endif
 
 CCOMFLAGS += -DDIRECT3D_VERSION=0x0900

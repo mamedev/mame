@@ -41,7 +41,7 @@ protected:
 	virtual UINT8 read_pin4();
 	virtual void write_strobe(UINT8 data);
 	virtual void port_poll();
-	
+
 private:
 	required_ioport m_joypad;
 	int m_strobe;

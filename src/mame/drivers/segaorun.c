@@ -2373,7 +2373,7 @@ ROM_END
 //   VIDEO BD 837-6906
 //
 // NOTE: This PCB set used EPROMs instead of the OPR (One time PRogram) used by other sets.
-//       Same data so the rom numbers are the same, just labeled EPR-xxxxx versus OPR-xxxxx 
+//       Same data so the rom numbers are the same, just labeled EPR-xxxxx versus OPR-xxxxx
 //
 ROM_START( toutrunj1 )
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code

@@ -42,7 +42,7 @@ public:
 	UINT8    m_gfxmode;
 	UINT8    m_flip_x;
 	UINT8    m_flip_y;
-	
+
 	DECLARE_WRITE8_MEMBER(coinlock_w);
 	DECLARE_READ8_MEMBER(mcu_port_a_r);
 	DECLARE_READ8_MEMBER(mcu_port_b_r);
@@ -57,16 +57,16 @@ public:
 	DECLARE_WRITE8_MEMBER(unknown_port_1_w);
 	DECLARE_WRITE8_MEMBER(unknown_port_2_w);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(chaknpop);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tx_tilemap_mark_all_dirty();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	void mcu_update_seed(UINT8 data);
 };

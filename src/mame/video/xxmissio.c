@@ -69,7 +69,7 @@ void xxmissio_state::video_start()
 	m_bg_tilemap->set_scrolldx(2, 12);
 
 	m_fg_tilemap->set_transparent_pen(0);
-	
+
 	save_item(NAME(m_xscroll));
 	save_item(NAME(m_yscroll));
 	save_item(NAME(m_flipscreen));

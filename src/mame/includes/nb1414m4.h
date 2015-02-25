@@ -4,7 +4,7 @@ class nb1414m4_device : public device_t,
 public:
 	nb1414m4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~nb1414m4_device() {}
-	
+
 	void exec(UINT16 mcu_cmd, UINT8 *vram, UINT16 &scrollx, UINT16 &scrolly, tilemap_t *tilemap);
 
 protected:
@@ -21,7 +21,7 @@ private:
 	void _0200(UINT16 mcu_cmd, UINT8 *vram);
 	void _0600(UINT8 is2p, UINT8 *vram);
 	void _0e00(UINT16 mcu_cmd, UINT8 *vram);
-	
+
 	UINT8 *m_data;
 
 };

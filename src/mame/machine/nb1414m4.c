@@ -55,7 +55,6 @@ void nb1414m4_device::device_start()
 
 void nb1414m4_device::device_reset()
 {
-
 }
 
 /*****************************************************************************
@@ -142,7 +141,7 @@ void nb1414m4_device::kozure_score_msg(UINT16 dst, UINT8 src_base, UINT8 *vram)
 	int i;
 	UINT8 first_digit;
 	UINT8 res;
-	
+
 	first_digit = 0;
 
 	for(i=0;i<6;i++)

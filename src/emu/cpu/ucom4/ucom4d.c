@@ -121,7 +121,7 @@ CPU_DISASSEMBLE(ucom4)
 
 	char *dst = buffer;
 	dst += sprintf(dst, "%-4s ", s_mnemonics[instr]);
-	
+
 	// opcode parameter
 	int bits = s_bits[instr];
 	if (bits)
@@ -133,7 +133,7 @@ CPU_DISASSEMBLE(ucom4)
 			param = (param << (bits / 10)) | (op2 & ((1 << (bits / 10)) - 1));
 			bits = (bits % 10) + (bits / 10);
 		}
-		
+
 		// special case for CZP
 		if (instr == mCZP)
 		{

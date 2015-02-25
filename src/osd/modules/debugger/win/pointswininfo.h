@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//	pointswininfo.h - Win32 debug window handling
+//  pointswininfo.h - Win32 debug window handling
 //
 //============================================================
 

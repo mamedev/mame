@@ -31,7 +31,7 @@ public:
 	UINT16 m_pixelpalettebank;
 	int m_scrollx;
 	int m_scrolly;
-	
+
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
@@ -40,14 +40,14 @@ public:
 	DECLARE_WRITE16_MEMBER(scrollreg_w);
 	DECLARE_WRITE16_MEMBER(charvideoram_w);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	
+
 	DECLARE_CUSTOM_INPUT_MEMBER(pending_sound_r);
-	
+
 	DECLARE_DRIVER_INIT(quiz18k);
 	DECLARE_DRIVER_INIT(welltris);
 	virtual void machine_start();
 	virtual void video_start();
-	
+
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);

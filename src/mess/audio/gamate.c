@@ -35,7 +35,7 @@ gamate_sound_device::gamate_sound_device(const machine_config &mconfig, const ch
 void gamate_sound_device::device_start()
 {
 	// bind callbacks
-//	m_irq_cb.bind_relative_to(*owner());
+//  m_irq_cb.bind_relative_to(*owner());
 
 	memset(m_channels, 0, sizeof(m_channels));
 	memset(reg, 0, sizeof(reg));
@@ -93,7 +93,7 @@ WRITE8_MEMBER( gamate_sound_device::device_w )
 	m_mixer_channel->update();
 	reg[offset] = data;
 	int chan=-1;
-	
+
 	switch (offset)
 	{
 		case 0:
@@ -102,7 +102,7 @@ WRITE8_MEMBER( gamate_sound_device::device_w )
 		case 3:
 		case 4:
 		case 5:
-		  chan=offset/2;
+			chan=offset/2;
 			size = reg[chan*2] | ((reg[chan*2+1] & 0xf) << 8);
 			if (size)
 			{
@@ -117,11 +117,11 @@ WRITE8_MEMBER( gamate_sound_device::device_w )
 		case 6:
 		case 7:
 		case 8:
-		  chan=offset-6;
-//			m_channels[chan]->on = data & 0x40;
-//			channel->waveform = (data & 0x30) >> 4;
+			chan=offset-6;
+//          m_channels[chan]->on = data & 0x40;
+//          channel->waveform = (data & 0x30) >> 4;
 			m_channels[chan].volume = data & 0xf;
 			break;
 	}
-  if (chan!=-1) m_channels[chan].on=m_channels[chan].volume!=0 && m_channels[chan].size>3/* avoid speed loss for unhearable >=23khz*/;  
+	if (chan!=-1) m_channels[chan].on=m_channels[chan].volume!=0 && m_channels[chan].size>3/* avoid speed loss for unhearable >=23khz*/;
 }

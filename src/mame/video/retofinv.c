@@ -103,7 +103,7 @@ void retofinv_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(retofinv_state::fg_get_tile_info),this),tilemap_mapper_delegate(FUNC(retofinv_state::tilemap_scan),this),8,8,36,28);
 
 	m_fg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0);
-	
+
 	save_item(NAME(m_fg_bank));
 	save_item(NAME(m_bg_bank));
 }

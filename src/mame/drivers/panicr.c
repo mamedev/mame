@@ -84,7 +84,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	required_shared_ptr<UINT8> m_mainram;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_textram;
@@ -112,14 +112,14 @@ public:
 	TILE_GET_INFO_MEMBER(get_infotile_info_3);
 	TILE_GET_INFO_MEMBER(get_infotile_info_4);
 	TILE_GET_INFO_MEMBER(get_txttile_info);
-	
+
 	DECLARE_DRIVER_INIT(panicr);
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(panicr);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect );
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 };
 
@@ -243,7 +243,7 @@ void panicr_state::video_start()
 
 	m_txttilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(panicr_state::get_txttile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
 	m_txttilemap->configure_groups(*m_gfxdecode->gfx(0), 0);
-	
+
 	save_item(NAME(m_scrollx));
 }
 
@@ -609,7 +609,7 @@ static MACHINE_CONFIG_START( panicr, panicr_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", panicr_state, scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("t5182", T5182, 0)
-	
+
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

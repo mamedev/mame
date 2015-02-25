@@ -24,7 +24,7 @@ public:
 		m_ram2(*this, "ram2"),
 		m_spriteram(*this, "spriteram")
 	{ }
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	optional_device<kaneko16_sprite_device> m_kaneko_spr;
@@ -42,7 +42,7 @@ public:
 	required_shared_ptr<UINT16> m_ram;
 	required_shared_ptr<UINT16> m_ram2;
 	optional_shared_ptr<UINT16> m_spriteram;
-	
+
 	UINT16 m_eeprom_word;
 	UINT16 m_old_mcu_nmi1;
 	UINT16 m_old_mcu_nmi2;

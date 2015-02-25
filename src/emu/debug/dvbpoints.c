@@ -234,8 +234,8 @@ void debug_view_breakpoints::view_update()
 		m_total.y = 10;
 
 	// Draw
-	debug_view_char	*dest = m_viewdata;
-	astring			linebuf;
+	debug_view_char *dest = m_viewdata;
+	astring         linebuf;
 
 	// Header
 	if (m_visible.y > 0)

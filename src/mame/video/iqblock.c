@@ -41,7 +41,7 @@ void iqblock_state::video_start()
 
 	m_bg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_scroll_cols(64);
-	
+
 	save_item(NAME(m_videoenable));
 }
 

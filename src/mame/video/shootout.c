@@ -80,7 +80,7 @@ void shootout_state::video_start()
 	m_background = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(shootout_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_foreground = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(shootout_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_foreground->set_transparent_pen(0 );
-	
+
 	save_item(NAME(m_bFlicker));
 }
 

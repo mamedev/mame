@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//	uimetrics.c - Win32 debug window handling
+//  uimetrics.c - Win32 debug window handling
 //
 //============================================================
 

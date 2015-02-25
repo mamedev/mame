@@ -32,7 +32,7 @@ public:
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_videoram2;
 	required_shared_ptr<UINT8> m_spriteram;
-	
+
 	int m_track0[2];
 	int m_track1[2];
 	int m_msm_data_offs;
@@ -42,7 +42,7 @@ public:
 	UINT8 m_led1;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-	
+
 	DECLARE_WRITE8_MEMBER(sub_cpu_halt_w);
 	DECLARE_READ8_MEMBER(track_0_r);
 	DECLARE_READ8_MEMBER(track_1_r);
@@ -72,7 +72,7 @@ public:
 	DECLARE_DRIVER_INIT(teedoff);
 	virtual void machine_start();
 	virtual void video_start();
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void gridiron_draw_led(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 led,int player);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

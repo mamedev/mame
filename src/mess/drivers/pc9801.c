@@ -886,7 +886,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 		for(kanji_lr=0;kanji_lr<x_step;kanji_lr++)
 		{
 			/* Rori Rori Rolling definitely uses different colors for brake stop PCG elements,
-  			   assume that all attributes are recalculated on different strips */
+			   assume that all attributes are recalculated on different strips */
 			attr = (m_video_ram_1[((tile_addr+kanji_lr) & 0xfff) | 0x1000] & 0xff);
 
 			secret = (attr & 1) ^ 1;
@@ -896,7 +896,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 			v_line = (m_video_ff[ATTRSEL_REG]) ? 0 : attr & 0x10;
 			gfx_mode = (m_video_ff[ATTRSEL_REG]) ? attr & 0x10 : 0;
 			color = (attr & 0xe0) >> 5;
-		
+
 			for(yi=0;yi<lr;yi++)
 			{
 				for(xi=0;xi<8;xi++)

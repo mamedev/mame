@@ -176,7 +176,7 @@ public:
 	void recalc_slot_inh() { m_a2bus->recalc_inh(m_slot); }
 	void set_maincpu_halt(int state) { m_a2bus->set_maincpu_halt(state); }
 
-	// pass through the original address space if any for debugger protection 
+	// pass through the original address space if any for debugger protection
 	// when debugging e.g. coprocessor cards (Z80 SoftCard etc).
 	UINT8 slot_dma_read(address_space &space, UINT16 offset) { return m_a2bus->dma_r(space, offset); }
 	void slot_dma_write(address_space &space, UINT16 offset, UINT8 data) { m_a2bus->dma_w(space, offset, data); }

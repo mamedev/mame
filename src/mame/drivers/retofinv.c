@@ -40,7 +40,7 @@ void retofinv_state::machine_start()
 	save_item(NAME(m_main_irq_mask));
 	save_item(NAME(m_sub_irq_mask));
 	save_item(NAME(m_cpu2_m6000));
-	
+
 	if (m_68705 != NULL) // only for the parent (with MCU)
 	{
 		save_item(NAME(m_from_main));

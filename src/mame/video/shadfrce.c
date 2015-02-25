@@ -67,7 +67,7 @@ void shadfrce_state::video_start()
 	m_bg1tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(shadfrce_state::get_bg1tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,32,32);
 
 	m_spvideoram_old = auto_alloc_array(machine(), UINT16, m_spvideoram.bytes()/2);
-	
+
 	save_item(NAME(m_video_enable));
 	save_item(NAME(m_irqs_enable));
 	save_item(NAME(m_raster_scanline));

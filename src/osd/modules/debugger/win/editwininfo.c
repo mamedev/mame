@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//	editwininfo.c - Win32 debug window handling
+//  editwininfo.c - Win32 debug window handling
 //
 //============================================================
 
@@ -15,8 +15,8 @@
 
 
 // edit box styles
-#define	EDIT_BOX_STYLE		WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL
-#define	EDIT_BOX_STYLE_EX	0
+#define EDIT_BOX_STYLE      WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL
+#define EDIT_BOX_STYLE_EX   0
 
 
 editwin_info::editwin_info(debugger_windows_interface &debugger, bool is_main_console, LPCSTR title, WNDPROC handler) :

@@ -471,7 +471,7 @@ static MACHINE_CONFIG_START( ninjemak, galivan_state )
 
 	MCFG_MACHINE_START_OVERRIDE(galivan_state,ninjemak)
 	MCFG_MACHINE_RESET_OVERRIDE(galivan_state,ninjemak)
-	
+
 	MCFG_DEVICE_ADD("nb1414m4", NB1414M4, 0)
 
 	/* video hardware */
@@ -507,7 +507,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_DERIVED(youmab, ninjemak)
-	
+
 	MCFG_DEVICE_REMOVE("nb1414m4")
 MACHINE_CONFIG_END
 /***************************************************************************

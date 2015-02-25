@@ -441,7 +441,7 @@ WRITE_LINE_MEMBER(tecmosys_state::sound_irq)
 void tecmosys_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 16, memregion("audiocpu")->base(), 0x4000);
-	
+
 	save_item(NAME(m_device_read_ptr));
 	save_item(NAME(m_device_status));
 	save_item(NAME(m_device_value));

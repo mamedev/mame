@@ -86,7 +86,7 @@ bool m4510_device::memory_translate(address_spacenum spacenum, int intention, of
 	{
 		address = map(address);
 	}
-	
+
 	return true;
 }
 

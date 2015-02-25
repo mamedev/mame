@@ -38,7 +38,7 @@ public:
 	DECLARE_WRITE16_MEMBER(fg_tileram_w);
 	DECLARE_WRITE16_MEMBER(bg_tileram_w);
 	DECLARE_READ16_MEMBER(genix_prot_r);
-	
+
 	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
 
 	DECLARE_DRIVER_INIT(pirates);

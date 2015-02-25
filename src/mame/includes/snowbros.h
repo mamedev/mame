@@ -26,7 +26,7 @@ public:
 	optional_device<kaneko_pandora_device> m_pandora;
 	optional_shared_ptr<UINT16> m_hyperpac_ram;
 	optional_shared_ptr<UINT16> m_bootleg_spriteram16;
-	
+
 	int m_sb3_music_is_playing;
 	int m_sb3_music;
 	UINT8 m_semicom_prot_offset;
@@ -49,7 +49,7 @@ public:
 	DECLARE_WRITE8_MEMBER(twinadv_oki_bank_w);
 	DECLARE_WRITE16_MEMBER(sb3_sound_w);
 	DECLARE_READ16_MEMBER(toto_read);
-	
+
 	DECLARE_DRIVER_INIT(pzlbreak);
 	DECLARE_DRIVER_INIT(moremorp);
 	DECLARE_DRIVER_INIT(snowbro3);
@@ -61,17 +61,17 @@ public:
 	DECLARE_DRIVER_INIT(hyperpac);
 	DECLARE_MACHINE_RESET(semiprot);
 	DECLARE_MACHINE_RESET(finalttr);
-	
+
 	UINT32 screen_update_snowbros(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_honeydol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_twinadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_snowbro3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_wintbob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_snowbros(screen_device &screen, bool state);
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(snowbros_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(snowbros3_irq);
-	
+
 	void sb3_play_music(int data);
 	void sb3_play_sound(int data);
 };

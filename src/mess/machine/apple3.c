@@ -248,7 +248,7 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 			apple3_write_charmem();
 			break;
 
-		case 0xE0: case 0xE1: 
+		case 0xE0: case 0xE1:
 			result = m_fdc->read(space, offset&0xf);
 			m_va = offset & 1;
 			break;
@@ -258,13 +258,13 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 			m_vb = offset & 1;
 			break;
 
-		case 0xE4: case 0xE5: 
+		case 0xE4: case 0xE5:
 			result = m_fdc->read(space, offset&0xf);
 			m_vc = offset & 1;
 			break;
 
-		case 0xE6: case 0xE7: case 0xE8: case 0xE9: 
-		case 0xEA: case 0xEB: case 0xEC: case 0xED: 
+		case 0xE6: case 0xE7: case 0xE8: case 0xE9:
+		case 0xEA: case 0xEB: case 0xEC: case 0xED:
 		case 0xEE: case 0xEF:
 			result = m_fdc->read(space, offset&0xf);
 			break;
@@ -1297,4 +1297,3 @@ WRITE_LINE_MEMBER(apple3_state::a2bus_nmi_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 	}
 }
-

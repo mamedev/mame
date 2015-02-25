@@ -458,12 +458,12 @@ public:
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	required_shared_ptr<UINT8> m_nvram;
 	required_shared_ptr<UINT8> m_workram;
 	required_shared_ptr<UINT8> m_tileram;
 	required_shared_ptr<UINT8> m_colram;
-	
+
 	UINT8* m_vram;
 	UINT8 m_bank;
 	int m_irq0_ack;
@@ -503,7 +503,7 @@ public:
 void mastboy_state::video_start()
 {
 	m_gfxdecode->gfx(0)->set_source(m_vram);
-	
+
 	save_pointer(NAME(m_vram), 0x10000);
 }
 
@@ -877,7 +877,7 @@ GFXDECODE_END
 void mastboy_state::machine_start()
 {
 	m_vram = memregion( "gfx1" )->base(); // makes decoding the RAM based tiles easier this way
-	
+
 	save_item(NAME(m_bank));
 	save_item(NAME(m_irq0_ack));
 	save_item(NAME(m_backupram_enabled));

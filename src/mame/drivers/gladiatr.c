@@ -1032,7 +1032,7 @@ DRIVER_INIT_MEMBER(gladiatr_state,ppking)
 		}
 	}
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf6a3,0xf6a3,read8_delegate(FUNC(gladiatr_state::ppking_f6a3_r),this));
-	
+
 	save_item(NAME(m_data1));
 	save_item(NAME(m_data2));
 }

@@ -365,8 +365,8 @@ SDL_NETWORK = pcap
 INCPATH += -I$(3RDPARTY)/winpcap/Include
 
 # enable UNICODE
-DEFS += -Dmain=utf8_main -DUNICODE -D_UNICODE 
-LDFLAGS += -municode 
+DEFS += -Dmain=utf8_main -DUNICODE -D_UNICODE
+LDFLAGS += -municode
 
 # Qt
 ifndef NO_USE_QTDEBUG
@@ -734,7 +734,7 @@ ifeq ($(SDL_LIBVER),sdl2)
 LIBS += -lSDL2 -limm32 -lversion -lole32 -loleaut32 -lws2_32 -static
 BASELIBS += -lSDL2 -limm32 -lversion -lole32 -loleaut32 -lws2_32 -static
 else
-LIBS += -lSDL -lws2_32 -static 
+LIBS += -lSDL -lws2_32 -static
 BASELIBS += -lSDL -lws2_32 -static
 endif
 LIBS += -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi
@@ -809,7 +809,7 @@ OSDOBJS += \
 
 ifdef USE_BGFX
 DEFS += -DUSE_BGFX
-OSDOBJS += $(SDLOBJ)/drawbgfx.o 
+OSDOBJS += $(SDLOBJ)/drawbgfx.o
 INCPATH += -I$(3RDPARTY)/bgfx/include -I$(3RDPARTY)/bx/include
 USE_DISPATCH_GL = 0
 BGFX_LIB = $(OBJ)/libbgfx.a

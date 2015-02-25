@@ -94,7 +94,7 @@ void tehkanwc_state::video_start()
 			8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
-	
+
 	save_item(NAME(m_scroll_x));
 	save_item(NAME(m_led0));
 	save_item(NAME(m_led1));

@@ -26,7 +26,7 @@ public:
 	UINT8 m_xscroll;
 	UINT8 m_yscroll;
 	UINT8 m_flipscreen;
-	
+
 	DECLARE_WRITE8_MEMBER(bank_sel_w);
 	DECLARE_WRITE8_MEMBER(status_m_w);
 	DECLARE_WRITE8_MEMBER(status_s_w);
@@ -35,18 +35,18 @@ public:
 	DECLARE_READ8_MEMBER(bgram_r);
 	DECLARE_WRITE8_MEMBER(scroll_x_w);
 	DECLARE_WRITE8_MEMBER(scroll_y_w);
-	
+
 	DECLARE_CUSTOM_INPUT_MEMBER(status_r);
-	
+
 	INTERRUPT_GEN_MEMBER(interrupt_m);
 	INTERRUPT_GEN_MEMBER(interrupt_s);
-	
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	
+
 	virtual void machine_start();
 	virtual void video_start();
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
 };

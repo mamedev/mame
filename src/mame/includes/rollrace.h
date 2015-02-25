@@ -16,7 +16,7 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_spriteram;
-	
+
 	int m_charbank[2];
 	int m_bkgpage;
 	int m_bkgflip;
@@ -29,7 +29,7 @@ public:
 
 	UINT8 m_nmi_mask;
 	UINT8 m_sound_nmi_mask;
-	
+
 	DECLARE_READ8_MEMBER(fake_d800_r);
 	DECLARE_WRITE8_MEMBER(fake_d800_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
@@ -41,12 +41,12 @@ public:
 	DECLARE_WRITE8_MEMBER(backgroundcolor_w);
 	DECLARE_WRITE8_MEMBER(flipy_w);
 	DECLARE_WRITE8_MEMBER(flipx_w);
-	
+
 	DECLARE_PALETTE_INIT(rollrace);
 	virtual void machine_start();
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
 };

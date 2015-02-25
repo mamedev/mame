@@ -66,7 +66,7 @@ public:
 
 	sdl_monitor_info()
 	: m_next(NULL), m_handle(0), m_aspect(0.0f)
-	  {}
+		{}
 	sdl_monitor_info(const UINT64 handle, const char *monitor_device, float aspect)
 	: m_next(NULL), m_handle(handle), m_aspect(aspect)
 	{
@@ -84,25 +84,25 @@ public:
 	void set_aspect(const float aspect) { m_aspect = aspect; }
 
 	// STATIC
-	static void	init();
+	static void init();
 	static void exit();
 	static sdl_monitor_info *pick_monitor(sdl_options &options, int index);
 #if !defined(SDLMAME_WIN32) && !(SDLMAME_SDL2)
 	static void add_primary_monitor(void *data);
 #endif
 
-	sdl_monitor_info  	* next() { return m_next; }   // pointer to next monitor in list
+	sdl_monitor_info    * next() { return m_next; }   // pointer to next monitor in list
 
 	// STATIC
 	static sdl_monitor_info *primary_monitor;
 	static sdl_monitor_info *list;
 
-	sdl_monitor_info  	* m_next;                   // pointer to next monitor in list
+	sdl_monitor_info    * m_next;                   // pointer to next monitor in list
 private:
 	void refresh();
 
 	UINT64              m_handle;                 // handle to the monitor
-	SDL_Rect			m_dimensions;
+	SDL_Rect            m_dimensions;
 	char                m_name[64];
 	float               m_aspect;                 // computed/configured aspect ratio of the physical device
 };

@@ -250,7 +250,7 @@ void taito8741_4pack_device::device_start()
 	m_port_handler_1_r.resolve_safe(0);
 	m_port_handler_2_r.resolve_safe(0);
 	m_port_handler_3_r.resolve_safe(0);
-	
+
 	for (int i = 0; i < 4; i++)
 	{
 		save_item(NAME(m_taito8741[i].toData), i);
@@ -360,7 +360,7 @@ void josvolly8741_4pack_device::device_start()
 	m_port_handler_1_r.resolve_safe(0);
 	m_port_handler_2_r.resolve_safe(0);
 	m_port_handler_3_r.resolve_safe(0);
-	
+
 	for (int i = 0; i < 4; i++)
 	{
 		save_item(NAME(m_i8741[i].cmd), i);
@@ -370,7 +370,7 @@ void josvolly8741_4pack_device::device_start()
 		save_item(NAME(m_i8741[i].rxd), i);
 		save_item(NAME(m_i8741[i].rst), i);
 	};
-	
+
 	save_item(NAME(m_nmi_enable));
 }
 

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//	debugwininfo.h - Win32 debug window handling
+//  debugwininfo.h - Win32 debug window handling
 //
 //============================================================
 
@@ -54,11 +54,11 @@ public:
 	virtual bool handle_key(WPARAM wparam, LPARAM lparam);
 
 protected:
-	static DWORD const	DEBUG_WINDOW_STYLE = (WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN) & (~WS_MINIMIZEBOX & ~WS_MAXIMIZEBOX);
-	static DWORD const	DEBUG_WINDOW_STYLE_EX = 0;
+	static DWORD const  DEBUG_WINDOW_STYLE = (WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN) & (~WS_MINIMIZEBOX & ~WS_MAXIMIZEBOX);
+	static DWORD const  DEBUG_WINDOW_STYLE_EX = 0;
 
-	static int const	MAX_VIEWS = 4;
-	static int const	EDGE_WIDTH = 3;
+	static int const    MAX_VIEWS = 4;
+	static int const    EDGE_WIDTH = 3;
 
 	enum
 	{
@@ -98,7 +98,7 @@ protected:
 		ID_SHOW_BREAKPOINTS,
 		ID_SHOW_WATCHPOINTS,
 
-		ID_DEVICE_OPTIONS	// always keep this at the end
+		ID_DEVICE_OPTIONS   // always keep this at the end
 	};
 
 	bool is_main_console() const { return m_is_main_console; }
@@ -115,7 +115,7 @@ protected:
 	void draw_border(HDC dc, RECT &bounds);
 	void draw_border(HDC dc, HWND child);
 
-	auto_pointer<debugview_info>	m_views[MAX_VIEWS];
+	auto_pointer<debugview_info>    m_views[MAX_VIEWS];
 
 private:
 	LRESULT window_proc(UINT message, WPARAM wparam, LPARAM lparam);
@@ -126,18 +126,18 @@ private:
 
 	static void register_window_class();
 
-	bool const		m_is_main_console;
+	bool const      m_is_main_console;
 
-	debugwin_info	*m_next;
-	HWND			m_wnd;
-	WNDPROC const	m_handler;
+	debugwin_info   *m_next;
+	HWND            m_wnd;
+	WNDPROC const   m_handler;
 
-	UINT32			m_minwidth, m_maxwidth;
-	UINT32			m_minheight, m_maxheight;
+	UINT32          m_minwidth, m_maxwidth;
+	UINT32          m_minheight, m_maxheight;
 
-	UINT16			m_ignore_char_lparam;
+	UINT16          m_ignore_char_lparam;
 
-	static bool		s_window_class_registered;
+	static bool     s_window_class_registered;
 };
 
 #endif

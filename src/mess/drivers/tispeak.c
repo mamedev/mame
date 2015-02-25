@@ -3,7 +3,7 @@
 /***************************************************************************
 
   Texas Instruments 1st-gen. handheld speech devices,
-  
+
   These devices, mostly edu-toys, are based around an MCU(TMS0270/TMS1100),
   TMS51xx speech, and VSM ROM(s). Newer devices, such as Speak & Music,
   are based around the TMP50C40 and belong in another driver, probably.
@@ -246,21 +246,21 @@ Other devices:
     - CD2802: 16KB CD2357
     - notes: MCU is the same as in Touch & Tell, but instead of a toddler's toy,
       you get a serious medical aid device for the voice-impaired.
-    
+
     Spelling B (US), 1978
     - MCU: TMC0272*
     - ?: TMC1984* (what is this?)
     - notes: this line of toys (Spelling B, Mr. Challenger, Math Marvel) is calculator-sized,
       might have been aimed for older kids. Note that Math Marvel is a TMC1986, no speech.
-    
+
     Spelling B (US), newer
     - MCU: TMC0274*
     - TMS51xx: ?KB TMC0355 CD2602*
-    
+
     Spelling B (Germany) "Spelling ABC", 198?
     - MCU: TMC0274* (assume same as US version)
     - TMS51xx: ?KB TMC0355 CD2607*
-    
+
     Mr. Challenger (US), 1980
     - MCU: TMC0273*
     - TMS51xx: ?KB TMC0355 CD2601*

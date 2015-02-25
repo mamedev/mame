@@ -23,7 +23,7 @@ public:
 	tilemap_t *m_background;
 	tilemap_t *m_foreground;
 	int m_bFlicker;
-	
+
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(sound_cpu_command_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
@@ -32,14 +32,14 @@ public:
 	DECLARE_WRITE8_MEMBER(textram_w);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	
+
 	DECLARE_DRIVER_INIT(shootout);
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(shootout);
-	
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	
+
 	UINT32 screen_update_shootout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_shootouj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_bits );

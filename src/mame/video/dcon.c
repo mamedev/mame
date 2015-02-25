@@ -106,7 +106,7 @@ void dcon_state::video_start()
 	m_text_layer->set_transparent_pen(15);
 
 	m_gfx_bank_select = 0;
-	
+
 	save_item(NAME(m_gfx_bank_select));
 	save_item(NAME(m_last_gfx_bank));
 	save_item(NAME(m_scroll_ram));

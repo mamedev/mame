@@ -19,19 +19,19 @@
 
 @interface MAMEDebugView : NSView
 {
-	int				type;
-	running_machine	*machine;
-	debug_view		*view;
-	BOOL			wholeLineScroll;
+	int             type;
+	running_machine *machine;
+	debug_view      *view;
+	BOOL            wholeLineScroll;
 
-	INT32			totalWidth, totalHeight, originTop;
+	INT32           totalWidth, totalHeight, originTop;
 
-	NSFont			*font;
-	CGFloat			fontWidth, fontHeight, fontAscent;
+	NSFont          *font;
+	CGFloat         fontWidth, fontHeight, fontAscent;
 
-	NSTextStorage	*text;
-	NSTextContainer	*textContainer;
-	NSLayoutManager	*layoutManager;
+	NSTextStorage   *text;
+	NSTextContainer *textContainer;
+	NSLayoutManager *layoutManager;
 }
 
 + (NSFont *)defaultFont;

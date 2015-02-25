@@ -36,7 +36,7 @@ public:
 	required_device<palette_device> m_palette;
 
 	required_shared_ptr<UINT8> m_videoram;
-	
+
 	int m_nmion;
 	tilemap_t *m_bg_tilemap;
 	int m_width;
@@ -56,16 +56,16 @@ public:
 	DECLARE_WRITE8_MEMBER(_2000_201F_w);
 	DECLARE_WRITE8_MEMBER(sound_enable_w);
 	DECLARE_WRITE8_MEMBER(whistle_w);
-	
+
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	
+
 	virtual void machine_reset();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(skydiver);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	INTERRUPT_GEN_MEMBER(interrupt);
 };
 

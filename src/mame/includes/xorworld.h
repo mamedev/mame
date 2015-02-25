@@ -16,25 +16,25 @@ public:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	required_shared_ptr<UINT16> m_videoram;
 	required_shared_ptr<UINT16> m_spriteram;
-	
+
 	tilemap_t *m_bg_tilemap;
-	
+
 	DECLARE_WRITE16_MEMBER(irq2_ack_w);
 	DECLARE_WRITE16_MEMBER(irq6_ack_w);
 	DECLARE_WRITE16_MEMBER(videoram_w);
 	DECLARE_WRITE16_MEMBER(eeprom_chip_select_w);
 	DECLARE_WRITE16_MEMBER(eeprom_serial_clock_w);
 	DECLARE_WRITE16_MEMBER(eeprom_data_w);
-	
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	
+
 	DECLARE_DRIVER_INIT(xorworld);
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(xorworld);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

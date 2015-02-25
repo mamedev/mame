@@ -707,7 +707,7 @@ GFXDECODE_END
 CUSTOM_INPUT_MEMBER(bnstars_state::mahjong_ctrl_r)
 {
 	required_ioport_array<4> &keys = (param == 0) ? m_p1_keys : m_p2_keys;
-	
+
 	switch (m_bnstars1_mahjong_select & 0x2080)
 	{
 		default:

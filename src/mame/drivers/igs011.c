@@ -1103,14 +1103,14 @@ WRITE16_MEMBER(igs011_state::igs011_prot_addr_w)
 	sp.install_rom(m_prot1_addr + 0, m_prot1_addr + 9, rom + m_prot1_addr);
 
 	m_prot1_addr = (data << 4) ^ 0x8340;
-	
+
 	prot_mem_range_set();
 }
 
 void igs011_state::prot_mem_range_set()
-{	
+{
 	address_space &sp = m_maincpu->space(AS_PROGRAM);
-	
+
 	// Add protection memory range
 	sp.install_write_handler(m_prot1_addr + 0, m_prot1_addr + 7, write16_delegate(FUNC(igs011_state::igs011_prot1_w), this));
 	sp.install_read_handler (m_prot1_addr + 8, m_prot1_addr + 9, read16_delegate(FUNC(igs011_state::igs011_prot1_r), this));

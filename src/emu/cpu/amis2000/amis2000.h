@@ -95,7 +95,7 @@ protected:
 	address_space_config m_data_config;
 	address_space *m_program;
 	address_space *m_data;
-	
+
 	UINT8 m_bu_bits;
 	UINT16 m_bu_mask;
 	UINT8 m_callstack_bits;     // number of program counter bits held in callstack
@@ -129,14 +129,14 @@ protected:
 	devcb_write8 m_write_d;
 	devcb_write16 m_write_a;
 	devcb_write_line m_write_f;
-	
+
 	// misc internal helpers
 	UINT8 ram_r();
 	void ram_w(UINT8 data);
 	void pop_callstack();
 	void push_callstack();
 	void d_latch_out(bool active);
-	
+
 	// opcode handlers
 	virtual void op_lai();
 	virtual void op_lab();
@@ -221,7 +221,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	// digital-to-frequency converter
 	UINT8 m_d2f_latch;
 	emu_timer *m_d2f_timer;
@@ -229,7 +229,7 @@ protected:
 
 	void d2f_timer_clock();
 	TIMER_CALLBACK_MEMBER(d2f_timer_cb);
-	
+
 	// opcode handlers
 	virtual void op_szk();
 };

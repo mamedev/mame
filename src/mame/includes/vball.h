@@ -23,7 +23,7 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_scrolly_lo;
 	required_shared_ptr<UINT8> m_spriteram;
-	
+
 	int m_scrollx_hi;
 	int m_scrolly_hi;
 	int m_scrollx_lo;
@@ -32,7 +32,7 @@ public:
 	int m_bgprombank;
 	int m_spprombank;
 	tilemap_t *m_bg_tilemap;
-	
+
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(cpu_sound_command_w);
@@ -40,13 +40,13 @@ public:
 	DECLARE_WRITE8_MEMBER(scrollx_lo_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(attrib_w);
-	
+
 	TILEMAP_MAPPER_MEMBER(background_scan);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	
+
 	virtual void machine_start();
 	virtual void video_start();
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(vball_scanline);
 	void bgprombank_w(int bank);

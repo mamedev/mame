@@ -16,7 +16,7 @@ public:
 	required_device<cpu_device> m_cpuc;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	required_shared_ptr<UINT8> m_objectram1;
 	required_shared_ptr<UINT8> m_videoram1;
 	required_shared_ptr<UINT8> m_sharedram_ac;
@@ -28,8 +28,8 @@ public:
 	DECLARE_WRITE8_MEMBER(cpub_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(coincounter_w);
 	DECLARE_WRITE8_MEMBER(cpub_reset_w);
-	
+
 	virtual void machine_start();
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

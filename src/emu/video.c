@@ -1048,7 +1048,7 @@ void video_manager::recompute_speed(const attotime &emutime)
 			if (filerr == FILERR_NONE)
 				save_snapshot(machine().first_screen(), file);
 		}
-        //printf("Scheduled exit at %f\n", emutime.as_double());
+		//printf("Scheduled exit at %f\n", emutime.as_double());
 		// schedule our demise
 		machine().schedule_exit();
 	}

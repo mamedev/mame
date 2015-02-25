@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//	disasmviewinfo.c - Win32 debug window handling
+//  disasmviewinfo.c - Win32 debug window handling
 //
 //============================================================
 

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//	editwininfo.h - Win32 debug window handling
+//  editwininfo.h - Win32 debug window handling
 //
 //============================================================
 
@@ -25,8 +25,8 @@ public:
 	virtual bool set_default_focus();
 
 protected:
-	static DWORD const	COMBO_BOX_STYLE		= WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_VSCROLL;
-	static DWORD const	COMBO_BOX_STYLE_EX	= 0;
+	static DWORD const  COMBO_BOX_STYLE     = WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_VSCROLL;
+	static DWORD const  COMBO_BOX_STYLE_EX  = 0;
 
 	void set_editwnd_bounds(RECT const &bounds);
 	void set_editwnd_text(char const *text);
@@ -42,15 +42,15 @@ private:
 
 	static LRESULT CALLBACK static_edit_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
 
-	static int const	MAX_EDIT_STRING = 256;
-	static int const	HISTORY_LENGTH = 20;
+	static int const    MAX_EDIT_STRING = 256;
+	static int const    HISTORY_LENGTH = 20;
 
-	HWND				m_editwnd;
-	astring				m_edit_defstr;
-	WNDPROC				m_original_editproc;
-	TCHAR				m_history[HISTORY_LENGTH][MAX_EDIT_STRING];
-	int					m_history_count;
-	int					m_last_history;
+	HWND                m_editwnd;
+	astring             m_edit_defstr;
+	WNDPROC             m_original_editproc;
+	TCHAR               m_history[HISTORY_LENGTH][MAX_EDIT_STRING];
+	int                 m_history_count;
+	int                 m_last_history;
 };
 
 #endif

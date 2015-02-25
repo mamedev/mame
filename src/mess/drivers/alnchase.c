@@ -6,11 +6,11 @@
   * boards are labeled TN-16
   * NEC uCOM-43 MCU, labeled D553C 258
   * red/green VFD display with color overlay, 2-sided*
-  
+
   *Player one views the VFD from the front (grid+filament side) while the
   opposite player views it from the back side (through the conductive traces),
   basically a mirror-image.
-  
+
   This is a space-themed tabletop VFD electronic game. To start, simply
   press [UP]. Hold a joystick direction to move around.
 
@@ -42,7 +42,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<2> m_button_matrix;
 	required_device<speaker_sound_device> m_speaker;
-	
+
 	UINT8 m_input_mux;
 	UINT32 m_plate;
 	UINT16 m_grid;
@@ -73,7 +73,7 @@ void alnchase_state::update_vfd()
 			// on difference, send to output
 			for (int j = 0; j < 17; j++)
 				output_set_lamp_value(i*100 + j, m_plate >> j & 1);
-			
+
 			m_vfd_state[i] = m_plate;
 		}
 }
@@ -101,25 +101,25 @@ READ8_MEMBER(alnchase_state::input_r)
 WRITE8_MEMBER(alnchase_state::display_w)
 {
 	int shift;
-	
+
 	if (offset <= NEC_UCOM4_PORTE)
 	{
 		// C/D/E0: vfd matrix grid
 		shift = (offset - NEC_UCOM4_PORTC) * 4;
 		m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-		
+
 		// C0(grid 0): input enable PL1
 		// D0(grid 4): input enable PL2
 		m_input_mux = (m_grid & 1) | (m_grid >> 3 & 2);
 	}
-	
+
 	if (offset >= NEC_UCOM4_PORTE)
 	{
 		// E23/F/G/H/I: vfd matrix plate
 		shift = (offset - NEC_UCOM4_PORTE) * 4;
 		m_plate = ((m_plate << 2 & ~(0xf << shift)) | (data << shift)) >> 2;
 	}
-	
+
 	update_vfd();
 }
 
@@ -143,13 +143,13 @@ WRITE8_MEMBER(alnchase_state::port_e_w)
 
     POWER SOUND LEVEL PLAYER
      ON    ON    PRO   TWO        START
-      o     o     |     |    
+      o     o     |     |
       |     |     |     |       [joystick]
       |     |     o     o
      OFF   OFF   AMA   ONE     GAME 0,1,2,3
-    
+
     1 PLAYER SIDE
-    
+
     other player side only has a joystick
 */
 

@@ -22,7 +22,7 @@
 
 @interface MAMEErrorLogViewer : MAMEAuxiliaryDebugWindowHandler
 {
-	MAMEErrorLogView	*logView;
+	MAMEErrorLogView    *logView;
 }
 
 - (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c;

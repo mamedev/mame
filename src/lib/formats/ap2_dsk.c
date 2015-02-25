@@ -659,7 +659,7 @@ bool a2_16sect_format::load(io_generic *io, UINT32 form_factor, floppy_image *im
 			else if (!memcmp(pascal2_block1, &sector_data[0x100], 4))
 			{
 				m_prodos_order = true;
-			}	// check for CP/M disks in ProDOS order
+			}   // check for CP/M disks in ProDOS order
 			else if (!memcmp(cpm22_block1, &sector_data[0x100], 8))
 			{
 				m_prodos_order = true;

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//	debugview.c - Win32 debug window handling
+//  debugview.c - Win32 debug window handling
 //
 //============================================================
 
@@ -17,20 +17,20 @@
 
 
 // debugger view styles
-#define	DEBUG_VIEW_STYLE	WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN
-#define	DEBUG_VIEW_STYLE_EX	0
+#define DEBUG_VIEW_STYLE    WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN
+#define DEBUG_VIEW_STYLE_EX 0
 
 // combo box styles
-#define	COMBO_BOX_STYLE		WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_VSCROLL
-#define	COMBO_BOX_STYLE_EX	0
+#define COMBO_BOX_STYLE     WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_VSCROLL
+#define COMBO_BOX_STYLE_EX  0
 
 // horizontal scroll bar styles
-#define	HSCROLL_STYLE		WS_CHILD | WS_VISIBLE | SBS_HORZ
-#define	HSCROLL_STYLE_EX	0
+#define HSCROLL_STYLE       WS_CHILD | WS_VISIBLE | SBS_HORZ
+#define HSCROLL_STYLE_EX    0
 
 // vertical scroll bar styles
-#define	VSCROLL_STYLE		WS_CHILD | WS_VISIBLE | SBS_VERT
-#define	VSCROLL_STYLE_EX	0
+#define VSCROLL_STYLE       WS_CHILD | WS_VISIBLE | SBS_VERT
+#define VSCROLL_STYLE_EX    0
 
 
 bool debugview_info::s_window_class_registered = false;
@@ -310,7 +310,6 @@ void debugview_info::draw_contents(HDC windc)
 	// iterate over rows and columns
 	for (UINT32 row = 0; row < visarea.y; row++)
 	{
-
 		// loop twice; once to fill the background and once to draw the text
 		for (int iter = 0; iter < 2; iter++)
 		{
@@ -789,16 +788,16 @@ void debugview_info::register_window_class()
 		WNDCLASS wc = { 0 };
 
 		// initialize the description of the window class
-		wc.lpszClassName	= TEXT("MAMEDebugView");
-		wc.hInstance		= GetModuleHandle(NULL);
-		wc.lpfnWndProc		= &debugview_info::static_view_proc;
-		wc.hCursor			= LoadCursor(NULL, IDC_ARROW);
-		wc.hIcon			= LoadIcon(wc.hInstance, MAKEINTRESOURCE(2));
-		wc.lpszMenuName		= NULL;
-		wc.hbrBackground	= NULL;
-		wc.style			= 0;
-		wc.cbClsExtra		= 0;
-		wc.cbWndExtra		= 0;
+		wc.lpszClassName    = TEXT("MAMEDebugView");
+		wc.hInstance        = GetModuleHandle(NULL);
+		wc.lpfnWndProc      = &debugview_info::static_view_proc;
+		wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
+		wc.hIcon            = LoadIcon(wc.hInstance, MAKEINTRESOURCE(2));
+		wc.lpszMenuName     = NULL;
+		wc.hbrBackground    = NULL;
+		wc.style            = 0;
+		wc.cbClsExtra       = 0;
+		wc.cbWndExtra       = 0;
 
 		// register the class; fail if we can't
 		if (!RegisterClass(&wc))

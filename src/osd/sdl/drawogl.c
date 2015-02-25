@@ -202,7 +202,7 @@ class texture_info
 {
 public:
 	texture_info()
-	: 	hash(0), flags(0), rawwidth(0), rawheight(0),
+	:   hash(0), flags(0), rawwidth(0), rawheight(0),
 		rawwidth_create(0), rawheight_create(0),
 		type(0), format(0), borderpix(0), xprescale(0), yprescale(0), nocopy(0),
 		texture(0), texTarget(0), texpow2(0), mpass_dest_idx(0), pbo(0), data(NULL),
@@ -337,15 +337,15 @@ private:
 	void texture_all_disable();
 
 	INT32           m_blittimer;
-	int				m_width;
-	int				m_height;
-	int				m_blitwidth;
-	int				m_blitheight;
+	int             m_width;
+	int             m_height;
+	int             m_blitwidth;
+	int             m_blitheight;
 
 #if (SDLMAME_SDL2)
 	SDL_GLContext   m_gl_context_id;
 #ifdef OSD_WINDOWS
-	HDC				m_hdc;
+	HDC             m_hdc;
 #endif
 #else
 #endif
@@ -792,43 +792,42 @@ void sdl_info_ogl::initialize_gl()
 void
 setupPixelFormat(HDC hDC)
 {
-    PIXELFORMATDESCRIPTOR pfd = {
-        sizeof(PIXELFORMATDESCRIPTOR),  /* size */
-        1,                              /* version */
-        PFD_SUPPORT_OPENGL |
-        PFD_DRAW_TO_WINDOW |
-        PFD_DOUBLEBUFFER,               /* support double-buffering */
-        PFD_TYPE_RGBA,                  /* color type */
-        32,                             /* prefered color depth */
-        0, 0, 0, 0, 0, 0,               /* color bits (ignored) */
-        0,                              /* no alpha buffer */
-        0,                              /* alpha bits (ignored) */
-        0,                              /* no accumulation buffer */
-        0, 0, 0, 0,                     /* accum bits (ignored) */
-        16,                             /* depth buffer */
-        0,                              /* no stencil buffer */
-        0,                              /* no auxiliary buffers */
-        PFD_MAIN_PLANE,                 /* main layer */
-        0,                              /* reserved */
-        0, 0, 0,                        /* no layer, visible, damage masks */
-    };
-    int pixelFormat;
+	PIXELFORMATDESCRIPTOR pfd = {
+		sizeof(PIXELFORMATDESCRIPTOR),  /* size */
+		1,                              /* version */
+		PFD_SUPPORT_OPENGL |
+		PFD_DRAW_TO_WINDOW |
+		PFD_DOUBLEBUFFER,               /* support double-buffering */
+		PFD_TYPE_RGBA,                  /* color type */
+		32,                             /* prefered color depth */
+		0, 0, 0, 0, 0, 0,               /* color bits (ignored) */
+		0,                              /* no alpha buffer */
+		0,                              /* alpha bits (ignored) */
+		0,                              /* no accumulation buffer */
+		0, 0, 0, 0,                     /* accum bits (ignored) */
+		16,                             /* depth buffer */
+		0,                              /* no stencil buffer */
+		0,                              /* no auxiliary buffers */
+		PFD_MAIN_PLANE,                 /* main layer */
+		0,                              /* reserved */
+		0, 0, 0,                        /* no layer, visible, damage masks */
+	};
+	int pixelFormat;
 
-    pixelFormat = ChoosePixelFormat(hDC, &pfd);
-    if (pixelFormat == 0) {
-        osd_printf_error("ChoosePixelFormat failed.\n");
-        exit(1);
-    }
+	pixelFormat = ChoosePixelFormat(hDC, &pfd);
+	if (pixelFormat == 0) {
+		osd_printf_error("ChoosePixelFormat failed.\n");
+		exit(1);
+	}
 
-    if (SetPixelFormat(hDC, pixelFormat, &pfd) != TRUE) {
-        osd_printf_error("SetPixelFormat failed.\n");
-        exit(1);
-    }
+	if (SetPixelFormat(hDC, pixelFormat, &pfd) != TRUE) {
+		osd_printf_error("SetPixelFormat failed.\n");
+		exit(1);
+	}
 }
 #endif
 int sdl_info_ogl::create()
 {
-
 #if (SDLMAME_SDL2)
 	// create renderer
 #ifdef OSD_WINDOWS
@@ -889,7 +888,6 @@ int sdl_info_ogl::create()
 
 void sdl_info_ogl::destroy()
 {
-
 	// free the memory in the window
 
 	destroy_all_textures();
@@ -912,7 +910,6 @@ void sdl_info_ogl::destroy()
 
 int sdl_info_ogl::xy_to_render_target(int x, int y, int *xt, int *yt)
 {
-
 	*xt = x - m_last_hofs;
 	*yt = y - m_last_vofs;
 	if (*xt<0 || *xt >= m_blitwidth)
@@ -3136,6 +3133,3 @@ void sdl_info_ogl::texture_all_disable()
 		pfn_glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, 0);
 	}
 }
-
-
-

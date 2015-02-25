@@ -73,11 +73,11 @@ protected:
 private:
 	template <typename T> T *create_window();
 
-	running_machine				*m_machine;
-	auto_pointer<ui_metrics>	m_metrics;
-	bool						m_waiting_for_debugger;
-	simple_list<debugwin_info>	m_window_list;
-	consolewin_info				*m_main_console;
+	running_machine             *m_machine;
+	auto_pointer<ui_metrics>    m_metrics;
+	bool                        m_waiting_for_debugger;
+	simple_list<debugwin_info>  m_window_list;
+	consolewin_info             *m_main_console;
 };
 
 
@@ -207,9 +207,9 @@ bool debugger_windows::seq_pressed() const
 			int const vkey = wininput_vkey_for_mame_code(code);
 			bool const pressed = (vkey != 0) && ((GetAsyncKeyState(vkey) & 0x8000) != 0);
 
-			if (first)			// if this is the first in the sequence, result is set equal
+			if (first)          // if this is the first in the sequence, result is set equal
 				result = pressed ^ invert;
-			else if (result)	// further values are ANDed
+			else if (result)    // further values are ANDed
 				result = result && (pressed ^ invert);
 
 			// no longer first, and clear the invert flag

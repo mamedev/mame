@@ -268,7 +268,7 @@ DRIVER_INIT_MEMBER(quizo_state,quizo)
 {
 	m_videoram=auto_alloc_array(machine(), UINT8, 0x4000*2);
 	membank("bank1")->configure_entries(0, 6, memregion("user1")->base(), 0x4000);
-	
+
 	save_pointer(NAME(m_videoram), 0x4000*2);
 	//save_item(NAME(m_port60));
 	save_item(NAME(m_port70));

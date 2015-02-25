@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//	debugviewinfo.h - Win32 debug window handling
+//  debugviewinfo.h - Win32 debug window handling
 //
 //============================================================
 
@@ -65,13 +65,13 @@ private:
 
 	static void register_window_class();
 
-	debugwin_info	&m_owner;
-	debug_view		*m_view;
-	HWND			m_wnd;
-	HWND			m_hscroll;
-	HWND			m_vscroll;
+	debugwin_info   &m_owner;
+	debug_view      *m_view;
+	HWND            m_wnd;
+	HWND            m_hscroll;
+	HWND            m_vscroll;
 
-	static bool		s_window_class_registered;
+	static bool     s_window_class_registered;
 };
 
 #endif

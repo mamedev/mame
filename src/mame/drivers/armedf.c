@@ -49,7 +49,7 @@ Notes:
       01016E: btst    #$7, $60621.l ;check dsw2 ram copy bit 15 (debug feature?)
       010176: bne     $1017e
       010178: bra     $f9f0 ;timer over event occurs
-  btanb perhaps? Currently patched to work, might also be that DSW2 bit 7 is actually a MCU bit ready flag, so it 
+  btanb perhaps? Currently patched to work, might also be that DSW2 bit 7 is actually a MCU bit ready flag, so it
   definitely needs PCB tests.
 
 
@@ -1178,7 +1178,7 @@ static MACHINE_CONFIG_START( terraf, armedf_state )
 
 	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
 	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
-	
+
 	MCFG_DEVICE_ADD("nb1414m4", NB1414M4, 0)
 
 	/* video hardware */
@@ -1277,7 +1277,7 @@ static MACHINE_CONFIG_START( kozure, armedf_state )
 
 	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
 	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
-	
+
 	MCFG_DEVICE_ADD("nb1414m4", NB1414M4, 0)
 
 	/* video hardware */
@@ -1371,7 +1371,7 @@ static MACHINE_CONFIG_START( cclimbr2, armedf_state )
 
 	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
 	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
-	
+
 	MCFG_DEVICE_ADD("nb1414m4", NB1414M4, 0)
 
 	/* video hardware */
@@ -1419,7 +1419,7 @@ static MACHINE_CONFIG_START( legion, armedf_state )
 
 	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
 	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
-	
+
 	MCFG_DEVICE_ADD("nb1414m4", NB1414M4, 0)
 
 	/* video hardware */
@@ -2128,7 +2128,7 @@ DRIVER_INIT_MEMBER(armedf_state,legiono)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::bootleg_io_w),this));
 
 	m_scroll_type = 2;
-	
+
 	save_item(NAME(m_legion_cmd));
 }
 

@@ -339,6 +339,6 @@ void tecmosys_state::video_start()
 
 	m_bg2tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmosys_state::get_bg2tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_bg2tilemap->set_transparent_pen(0);
-	
+
 	save_item(NAME(m_spritelist));
 }

@@ -12,7 +12,7 @@ TODO:
 
 Note:
 - VIC-4567 will be eventually be added via compile switch, once that I
-  get the hang of the system (and checking where the old code fails 
+  get the hang of the system (and checking where the old code fails
   eventually)
 
 ***************************************************************************/
@@ -60,7 +60,7 @@ public:
 	UINT8 *m_iplrom;
 	UINT8 m_keyb_input[10];
 	UINT8 m_keyb_mux;
-	
+
 	DECLARE_READ8_MEMBER(vic4567_dummy_r);
 	DECLARE_WRITE8_MEMBER(vic4567_dummy_w);
 	DECLARE_WRITE8_MEMBER(PalRed_w);
@@ -74,7 +74,7 @@ public:
 	DECLARE_READ8_MEMBER(cia0_portb_r);
 	DECLARE_WRITE8_MEMBER(cia0_portb_w);
 	DECLARE_WRITE_LINE_MEMBER(cia0_irq);
-	
+
 	DECLARE_READ8_MEMBER(dummy_r);
 
 	// screen updates
@@ -82,7 +82,7 @@ public:
 	DECLARE_PALETTE_INIT(c65);
 	DECLARE_DRIVER_INIT(c65);
 	DECLARE_DRIVER_INIT(c65pal);
-	
+
 	INTERRUPT_GEN_MEMBER(vic3_vblank_irq);
 protected:
 	// driver_device overrides
@@ -124,7 +124,7 @@ UINT32 c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, co
 {
 	int y,x;
 	int border_color = m_VIC2_EXTColor & 0xf;
-	
+
 	// TODO: border area
 	for(y=0;y<m_screen->height();y++)
 	{
@@ -139,13 +139,13 @@ UINT32 c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, co
 			UINT8 attr = m_cram[xi+yi*80];
 			if(attr & 0xf0)
 				attr = machine().rand() & 0xf;
-			
+
 			int enable_dot = ((m_iplrom[(tile<<3)+ym+0xd000] >> xm) & 1);
-						
+
 			//if(cliprect.contains(x, y))
 			bitmap.pix16(y, x) = m_palette->pen((enable_dot) ? attr & 0xf : border_color);
 
-			
+
 			//gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
 		}
 	}
@@ -170,10 +170,10 @@ READ8_MEMBER(c65_state::vic4567_dummy_r)
 			return 0xff; // silence log for now
 		case 0x19:
 			return m_VIC2_IRQPend;
-		
+
 		case 0x1a:
 			return m_VIC2_IRQMask;
-			
+
 		case 0x20:
 			return m_VIC2_EXTColor;
 
@@ -182,7 +182,7 @@ READ8_MEMBER(c65_state::vic4567_dummy_r)
 		case 0x31:
 			return m_VIC3_ControlB;
 	}
-	
+
 	if(!space.debugger_access())
 		printf("%02x\n",offset); // TODO: PC
 	return res;
@@ -203,23 +203,23 @@ WRITE8_MEMBER(c65_state::vic4567_dummy_w)
 		case 0x20:
 			m_VIC2_EXTColor = data & 0xf;
 			break;
-		/* KEY register, handles vic-iii and vic-ii modes via two consecutive writes 
+		/* KEY register, handles vic-iii and vic-ii modes via two consecutive writes
 		  0xa5 -> 0x96 vic-iii mode
-          any other write vic-ii mode
+		  any other write vic-ii mode
 		  */
 		//case 0x2f: break;
-		case 0x30: 
+		case 0x30:
 			if((data & 0xfe) != 0x64)
-				printf("CONTROL A %02x\n",data); 
+				printf("CONTROL A %02x\n",data);
 			m_VIC3_ControlA = data;
 			break;
 		case 0x31:
-			printf("CONTROL B %02x\n",data); 
+			printf("CONTROL B %02x\n",data);
 			m_VIC3_ControlB = data;
 			break;
 		default:
 			if(!space.debugger_access())
-				printf("%02x %02x\n",offset,data); 
+				printf("%02x %02x\n",offset,data);
 			break;
 	}
 
@@ -365,12 +365,11 @@ WRITE8_MEMBER(c65_state::CIASelect_w)
 				break;
 		}
 	}
-	
+
 }
 
 READ8_MEMBER(c65_state::cia0_porta_r)
 {
-
 	return 0xff;
 }
 
@@ -378,11 +377,10 @@ READ8_MEMBER(c65_state::cia0_portb_r)
 {
 	static const char *const c64ports[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
 	UINT8 res;
-	
+
 	res = 0xff;
 	for(int i=0;i<8;i++)
 	{
-		
 		m_keyb_input[i] = machine().root_device().ioport(c64ports[i])->read();
 
 		if(m_keyb_mux & 1 << (i))
@@ -400,7 +398,6 @@ WRITE8_MEMBER(c65_state::cia0_porta_w)
 
 WRITE8_MEMBER(c65_state::cia0_portb_w)
 {
-
 }
 
 READ8_MEMBER(c65_state::dummy_r)
@@ -429,7 +426,7 @@ static ADDRESS_MAP_START( c65_map, AS_PROGRAM, 8, c65_state )
 	// 0x0de00, 0x0de** Ext I/O Select 1
 	// 0x0df00, 0x0df** Ext I/O Select 2 (RAM window?)
 	AM_RANGE(0x0e000, 0x0ffff) AM_ROM AM_REGION("maincpu",0x0e000)
-	AM_RANGE(0x10000, 0x1f7ff) AM_RAM 
+	AM_RANGE(0x10000, 0x1f7ff) AM_RAM
 	AM_RANGE(0x1f800, 0x1ffff) AM_RAM // VRAM attributes
 	AM_RANGE(0x20000, 0x3ffff) AM_ROM AM_REGION("maincpu",0)
 ADDRESS_MAP_END
@@ -534,7 +531,7 @@ void c65_state::machine_reset()
 
 PALETTE_INIT_MEMBER(c65_state, c65)
 {
-	// TODO: initial state? 
+	// TODO: initial state?
 }
 
 static const gfx_layout charlayout =
@@ -556,7 +553,7 @@ void c65_state::IRQCheck(UINT8 irq_cause)
 {
 	m_VIC2_IRQPend |= (irq_cause != 0) ? 0x80 : 0x00;
 	m_VIC2_IRQPend |= irq_cause;
-	
+
 	m_maincpu->set_input_line(M4510_IRQ_LINE,m_VIC2_IRQMask & m_VIC2_IRQPend ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -564,7 +561,7 @@ INTERRUPT_GEN_MEMBER(c65_state::vic3_vblank_irq)
 {
 	IRQCheck(1);
 	//if(m_VIC2_IRQMask & 1)
-	//	m_maincpu->set_input_line(M4510_IRQ_LINE,HOLD_LINE);
+	//  m_maincpu->set_input_line(M4510_IRQ_LINE,HOLD_LINE);
 }
 
 WRITE_LINE_MEMBER(c65_state::cia0_irq)
@@ -577,10 +574,10 @@ WRITE_LINE_MEMBER(c65_state::cia0_irq)
 		static const char *const c64ports[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
 		for(int i=0;i<8;i++)
 			m_keyb_input[i] = machine().root_device().ioport(c64ports[i])->read();
-	}	
+	}
 #endif
-//	m_cia0_irq = state;
-//	c65_irq(state || m_vicirq);
+//  m_cia0_irq = state;
+//  c65_irq(state || m_vicirq);
 }
 
 static MACHINE_CONFIG_START( c65, c65_state )
@@ -600,11 +597,11 @@ static MACHINE_CONFIG_START( c65, c65_state )
 
 	MCFG_DEVICE_ADD("cia_1", MOS6526, MAIN_CLOCK)
 	MCFG_MOS6526_TOD(60)
-//	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(c65_state, c65_cia1_interrupt))
-//	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(c65_state, c65_cia1_port_a_r))
-//	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(c65_state, c65_cia1_port_a_w))
+//  MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(c65_state, c65_cia1_interrupt))
+//  MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(c65_state, c65_cia1_port_a_r))
+//  MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(c65_state, c65_cia1_port_a_w))
 
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(60)
@@ -654,15 +651,15 @@ ROM_END
 
 DRIVER_INIT_MEMBER(c65_state,c65)
 {
-//	m_dma.version = 2;
-//	c65_common_driver_init();
+//  m_dma.version = 2;
+//  c65_common_driver_init();
 }
 
 DRIVER_INIT_MEMBER(c65_state,c65pal)
 {
-//	m_dma.version = 1;
-//	c65_common_driver_init();
-//	m_pal = 1;
+//  m_dma.version = 1;
+//  c65_common_driver_init();
+//  m_pal = 1;
 }
 
 COMP( 1991, c65,    0,      0,      c65,    c65, c65_state, c65,    "Commodore Business Machines",  "Commodore 65 Development System (Prototype, NTSC)", GAME_NOT_WORKING )

@@ -2918,7 +2918,7 @@ void amstrad_state::enumerate_roms()
 
 void amstrad_state::amstrad_common_init()
 {
-//	address_space &space = m_maincpu->space(AS_PROGRAM);
+//  address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	m_aleste_mode = 0;
 
@@ -2928,29 +2928,29 @@ void amstrad_state::amstrad_common_init()
 	m_GateArray_RamConfiguration = 0;
 	m_gate_array.hsync_counter = 2;
 
-/*	space.install_read_bank(0x0000, 0x1fff, "bank1");
-	space.install_read_bank(0x2000, 0x3fff, "bank2");
+/*  space.install_read_bank(0x0000, 0x1fff, "bank1");
+    space.install_read_bank(0x2000, 0x3fff, "bank2");
 
-	space.install_read_bank(0x4000, 0x5fff, "bank3");
-	space.install_read_bank(0x6000, 0x7fff, "bank4");
+    space.install_read_bank(0x4000, 0x5fff, "bank3");
+    space.install_read_bank(0x6000, 0x7fff, "bank4");
 
-	space.install_read_bank(0x8000, 0x9fff, "bank5");
-	space.install_read_bank(0xa000, 0xbfff, "bank6");
+    space.install_read_bank(0x8000, 0x9fff, "bank5");
+    space.install_read_bank(0xa000, 0xbfff, "bank6");
 
-	space.install_read_bank(0xc000, 0xdfff, "bank7");
-	space.install_read_bank(0xe000, 0xffff, "bank8");
+    space.install_read_bank(0xc000, 0xdfff, "bank7");
+    space.install_read_bank(0xe000, 0xffff, "bank8");
 
-	space.install_write_bank(0x0000, 0x1fff, "bank9");
-	space.install_write_bank(0x2000, 0x3fff, "bank10");
+    space.install_write_bank(0x0000, 0x1fff, "bank9");
+    space.install_write_bank(0x2000, 0x3fff, "bank10");
 
-	space.install_write_bank(0x4000, 0x5fff, "bank11");
-	space.install_write_bank(0x6000, 0x7fff, "bank12");
+    space.install_write_bank(0x4000, 0x5fff, "bank11");
+    space.install_write_bank(0x6000, 0x7fff, "bank12");
 
-	space.install_write_bank(0x8000, 0x9fff, "bank13");
-	space.install_write_bank(0xa000, 0xbfff, "bank14");
+    space.install_write_bank(0x8000, 0x9fff, "bank13");
+    space.install_write_bank(0xa000, 0xbfff, "bank14");
 
-	space.install_write_bank(0xc000, 0xdfff, "bank15");
-	space.install_write_bank(0xe000, 0xffff, "bank16");
+    space.install_write_bank(0xc000, 0xdfff, "bank15");
+    space.install_write_bank(0xe000, 0xffff, "bank16");
 */
 	enumerate_roms();
 

@@ -22,7 +22,7 @@
 
 @interface MAMEPointsViewer : MAMEAuxiliaryDebugWindowHandler
 {
-	NSTabView	*tabs;
+	NSTabView   *tabs;
 }
 
 - (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c;

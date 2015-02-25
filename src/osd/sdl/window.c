@@ -1013,9 +1013,6 @@ void sdl_window_info::update()
 	// if we're visible and running and not in the middle of a resize, draw
 	if (m_target != NULL)
 	{
-
-
-
 		int tempwidth, tempheight;
 
 		// see if the games video mode has changed
@@ -1044,7 +1041,6 @@ void sdl_window_info::update()
 
 		if (osd_event_wait(m_rendered_event, event_wait_ticks))
 		{
-
 			// ensure the target bounds are up-to-date, and then get the primitives
 
 			render_primitive_list &primlist = *m_renderer->get_primitives();
@@ -1150,11 +1146,11 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 
 		/* FIXME: A reminder that gamma is wrong throughout MAME. Currently, SDL2.0 doesn't seem to
-			* support the following attribute although my hardware lists GL_ARB_framebuffer_sRGB as an extension.
-			*
-			* SDL_GL_SetAttribute( SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, 1 );
-			*
-			*/
+		    * support the following attribute although my hardware lists GL_ARB_framebuffer_sRGB as an extension.
+		    *
+		    * SDL_GL_SetAttribute( SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, 1 );
+		    *
+		    */
 		window->m_extra_flags = SDL_WINDOW_OPENGL;
 	}
 	else
@@ -1173,7 +1169,7 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 			window->monitor()->position_size().x, window->monitor()->position_size().y,
 			tempwidth, tempheight, window->m_extra_flags);
 	//window().sdl_window() = SDL_CreateWindow(window().m_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-	//		width, height, m_extra_flags);
+	//      width, height, m_extra_flags);
 
 	if  ( window->m_sdl_window == NULL )
 	{
@@ -1235,7 +1231,7 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 		#if (SDL_VERSION_ATLEAST(1,2,10)) && (!defined(SDLMAME_EMSCRIPTEN))
 		SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, video_config.waitvsync ? 1 : 0);
 		#endif
-		//	load_gl_lib(window->machine());
+		//  load_gl_lib(window->machine());
 	}
 
 	// create the SDL surface (which creates the window in windowed mode)

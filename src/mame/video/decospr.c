@@ -233,8 +233,8 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 		{
 			sprite = spriteram[offs + 1];
 			y = spriteram[offs];
-			
-			if (m_is_bootleg && (m_bootleg_type == 1)) 
+
+			if (m_is_bootleg && (m_bootleg_type == 1))
 			{
 				flash = y & 0x0400;
 			}

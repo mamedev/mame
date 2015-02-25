@@ -6,7 +6,7 @@
   * NEC uCOM-43 MCU, labeled D650C 133
   * 3*uPD444C 1024x4 Static CMOS SRAM
   * board is packed with discrete components
-  
+
   x
 
 ***************************************************************************/

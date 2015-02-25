@@ -89,12 +89,12 @@ public:
 	tilemap_t *m_sc1_tilemap;
 	tilemap_t *m_sc2_tilemap;
 	tilemap_t *m_sc3_tilemap;
-	
+
 	UINT16 m_mux_data;
 	UINT8 m_hopper_io;
 	UINT16 m_layer_en;
 	UINT16 m_scrollram[6];
-	
+
 	DECLARE_READ16_MEMBER(mahjong_panel_r);
 	DECLARE_WRITE16_MEMBER(mahjong_panel_w);
 	DECLARE_WRITE16_MEMBER(out_w);
@@ -105,12 +105,12 @@ public:
 	DECLARE_WRITE16_MEMBER(seibucrtc_sc3vram_w);
 	DECLARE_WRITE16_MEMBER(layer_en_w);
 	DECLARE_WRITE16_MEMBER(layer_scroll_w);
-	
+
 	TILE_GET_INFO_MEMBER(seibucrtc_sc0_tile_info);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc1_tile_info);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc2_tile_info);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc3_tile_info);
-	
+
 	INTERRUPT_GEN_MEMBER(interrupt);
 
 	virtual void machine_start();

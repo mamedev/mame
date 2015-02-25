@@ -38,7 +38,7 @@ public:
 	DECLARE_WRITE8_MEMBER(portB_w);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	
+
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
 	virtual void machine_start();
@@ -46,9 +46,9 @@ public:
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(seicross);
 	DECLARE_DRIVER_INIT(friskytb);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
-	
+
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 };

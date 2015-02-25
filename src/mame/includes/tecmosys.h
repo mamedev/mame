@@ -52,7 +52,7 @@ public:
 	required_shared_ptr<UINT16> m_c00000regs;
 	required_shared_ptr<UINT16> m_c80000regs;
 	required_shared_ptr<UINT16> m_880000regs;
-	
+
 	int m_spritelist;
 	bitmap_ind16 m_sprite_bitmap;
 	bitmap_ind16 m_tmp_tilemap_composebitmap;
@@ -65,7 +65,7 @@ public:
 	UINT8 m_device_status;
 	const struct prot_data* m_device_data;
 	UINT8 m_device_value;
-	
+
 	DECLARE_READ16_MEMBER(sound_r);
 	DECLARE_WRITE16_MEMBER(sound_w);
 	DECLARE_WRITE16_MEMBER(unk880000_w);
@@ -87,13 +87,13 @@ public:
 	DECLARE_READ16_MEMBER(eeprom_r);
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
-	
+
 	DECLARE_DRIVER_INIT(tkdensha);
 	DECLARE_DRIVER_INIT(deroon);
 	DECLARE_DRIVER_INIT(tkdensho);
 	virtual void machine_start();
 	virtual void video_start();
-	
+
 	TILE_GET_INFO_MEMBER(get_bg0tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2tile_info);

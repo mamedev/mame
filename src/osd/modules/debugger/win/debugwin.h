@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//	debugwin.h - Win32 debug window handling
+//  debugwin.h - Win32 debug window handling
 //
 //============================================================
 

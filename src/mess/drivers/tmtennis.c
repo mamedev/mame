@@ -6,14 +6,14 @@
   * board labeled TOMY TN-04 TENNIS
   * NEC uCOM-44 MCU, labeled D552C 048
   * VFD display NEC FIP11AM15T (FIP=fluorescent indicator panel)
-  
+
   The initial release of this game was in 1979, known as Pro-Tennis,
   it is unknown if the hardware and/or ROM contents differ.
 
   This is an early VFD simple electronic tennis game. Player 1 is on the right
   side, player 2 or CPU on the left. Each player has six possible positions
   where to hit the ball. A backdrop behind the VFD shows a tennis court.
-  
+
   NOTE!: MESS external artwork is required to be able to play
 
 
@@ -42,7 +42,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<2> m_button_matrix;
 	required_device<speaker_sound_device> m_speaker;
-	
+
 	UINT8 m_input_mux;
 	UINT16 m_plate;
 	UINT16 m_grid;
@@ -88,7 +88,7 @@ void tmtennis_state::update_vfd()
 			// on difference, send to output
 			for (int j = 0; j < 12; j++)
 				output_set_lamp_value(i*100 + j, m_plate >> j & 1);
-			
+
 			m_vfd_state[i] = m_plate;
 		}
 }
@@ -129,7 +129,7 @@ WRITE8_MEMBER(tmtennis_state::plate_w)
 	if (offset == NEC_UCOM4_PORTF) offset--;
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	
+
 	update_vfd();
 }
 
@@ -138,7 +138,7 @@ WRITE8_MEMBER(tmtennis_state::grid_w)
 	// port G/H/I: vfd matrix grid
 	int shift = (offset - NEC_UCOM4_PORTG) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	
+
 	update_vfd();
 }
 

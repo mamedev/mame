@@ -1,10 +1,10 @@
 /*
-	Dobbertin Smartwatch
-	
-	Created: 23/2/2015
-	
-	TODO: setting the time (requires the DS1315 core to be able to do this,
-	      at the moment it just reads the current time)
+    Dobbertin Smartwatch
+
+    Created: 23/2/2015
+
+    TODO: setting the time (requires the DS1315 core to be able to do this,
+          at the moment it just reads the current time)
 */
 
 #include "emu.h"

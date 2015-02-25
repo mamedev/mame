@@ -38,7 +38,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<fuukivid_device> m_fuukivid;
-	
+
 	/* memory pointers */
 	required_shared_ptr_array<UINT32,4> m_vram;
 	required_shared_ptr<UINT32> m_vregs;
@@ -68,16 +68,16 @@ public:
 	DECLARE_WRITE32_MEMBER(vram_1_w);
 	DECLARE_WRITE32_MEMBER(vram_2_w);
 	DECLARE_WRITE32_MEMBER(vram_3_w);
-	
+
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 	TILE_GET_INFO_MEMBER(get_tile_info_2);
 	TILE_GET_INFO_MEMBER(get_tile_info_3);
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
 	inline void get_tile_info8bpp(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_);

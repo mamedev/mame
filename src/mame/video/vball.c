@@ -44,7 +44,7 @@ void vball_state::video_start()
 	m_gfxset=0;
 	m_bgprombank=0xff;
 	m_spprombank=0xff;
-	
+
 	save_item(NAME(m_scrollx_hi));
 	save_item(NAME(m_scrolly_hi));
 	save_item(NAME(m_scrollx_lo));

@@ -1,7 +1,7 @@
 /**********************************************************************
 
     Nintendo Super Famicom & SNES Mouse
- 
+
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
@@ -32,11 +32,11 @@ static INPUT_PORTS_START( snes_mouse )
 	// detect a sudden jump in the wrong direction, making the usage unfriendly...
 	PORT_START("MOUSE_X")
 	PORT_BIT( 0x1ff, 0x100, IPT_LIGHTGUN_X ) PORT_NAME("Superscope X Axis") PORT_SENSITIVITY(30) PORT_KEYDELTA(5)
-//	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(30) PORT_KEYDELTA(5)
+//  PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(30) PORT_KEYDELTA(5)
 
 	PORT_START("MOUSE_Y")
 	PORT_BIT( 0x1ff, 0x100, IPT_LIGHTGUN_Y) PORT_NAME("Superscope Y Axis") PORT_SENSITIVITY(30) PORT_KEYDELTA(5)
-//	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(30) PORT_KEYDELTA(5)
+//  PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(30) PORT_KEYDELTA(5)
 INPUT_PORTS_END
 
 
@@ -155,7 +155,7 @@ void snes_mouse_device::port_poll()
 		m_deltax = var;
 		m_oldx = m_x;
 	}
-	
+
 	var = m_y - m_oldy;
 	if (var)
 	{
@@ -163,7 +163,7 @@ void snes_mouse_device::port_poll()
 		if (m_diry != new_dir)
 			m_diry = new_dir;
 	}
-	
+
 	if (var < -127)
 	{
 		m_deltay = 0x7f;
@@ -196,14 +196,14 @@ void snes_mouse_device::port_poll()
 UINT8 snes_mouse_device::read_pin4()
 {
 	UINT8 res = 0;
-	
+
 	if (m_strobe == 1)
 	{
 		// reading with strobe 1, changes mouse speed
 		m_speed = (m_speed + 1) % 3;
 		return res;
 	}
-	
+
 	if (m_idx >= 32)
 		res |= 0x01;
 	else if (m_idx >= 24)
@@ -222,7 +222,7 @@ UINT8 snes_mouse_device::read_pin4()
 	}
 	else
 		res |= BIT(m_latch, m_idx++);
-	
+
 	return res;
 }
 
@@ -235,7 +235,6 @@ void snes_mouse_device::write_strobe(UINT8 data)
 	int old = m_strobe;
 	m_strobe = data & 0x01;
 
-	if (m_strobe < old)	// 1 -> 0 transition
+	if (m_strobe < old) // 1 -> 0 transition
 		port_poll();
 }
-

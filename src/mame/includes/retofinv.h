@@ -19,11 +19,11 @@ public:
 	optional_device<cpu_device> m_68705;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	required_shared_ptr<UINT8> m_fg_videoram;
 	required_shared_ptr<UINT8> m_sharedram;
 	required_shared_ptr<UINT8> m_bg_videoram;
-	
+
 	UINT8 m_main_irq_mask;
 	UINT8 m_sub_irq_mask;
 	UINT8 m_cpu2_m6000;
@@ -78,10 +78,10 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(retofinv);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap);
-	
+
 	INTERRUPT_GEN_MEMBER(main_vblank_irq);
 	INTERRUPT_GEN_MEMBER(sub_vblank_irq);
 };

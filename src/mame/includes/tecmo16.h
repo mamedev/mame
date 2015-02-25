@@ -74,6 +74,6 @@ public:
 	DECLARE_VIDEO_START(riot);
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	
+
 	void save_state();
 };

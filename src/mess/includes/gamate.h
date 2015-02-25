@@ -14,12 +14,12 @@
 struct GAMATE_CHANNEL
 {
 	GAMATE_CHANNEL() :
-//		on(0),
-//		waveform(0),
+//      on(0),
+//      waveform(0),
 		volume(0),
 		pos(0),
 		size(0)
-//		count(0)
+//      count(0)
 	{
 	}
 
@@ -27,7 +27,7 @@ struct GAMATE_CHANNEL
 	int /*waveform,*/ volume;
 	int pos;
 	int size;
-//	int count;
+//  int count;
 };
 
 
@@ -51,7 +51,7 @@ public:
 	DECLARE_WRITE8_MEMBER( device_w );
 
 private:
-  
+
 	sound_stream *m_mixer_channel;
 	GAMATE_CHANNEL m_channels[3];
 	UINT8 reg[14];

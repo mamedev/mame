@@ -113,7 +113,7 @@ public:
 
 
 	virtual void video_start();
-	
+
 	UINT32 screen_update_galpani3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani3_vblank);
 	int gp3_is_alpha_pen(int pen);
@@ -147,7 +147,7 @@ void galpani3_state::video_start()
 {
 	/* so we can use video/sknsspr.c */
 	m_spritegen->skns_sprite_kludge(0,0);
-	
+
 	save_item(NAME(m_priority_buffer_scrollx));
 	save_item(NAME(m_priority_buffer_scrolly));
 	save_item(NAME(m_spriteram32));

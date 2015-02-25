@@ -16,11 +16,11 @@
  Trivia (1975/11)           YES
  Volly (1973/03?)           YES       500378A        500322A
  Wipe Out (1974/01)         YES       500986B/C      500963B/?
- 
+
  Volly Industries Discrete Games List
  (Volly was Ramtek's Canada-based affiliate and distributor.)
 
- Game Name                                       Clone Of                         
+ Game Name                                       Clone Of
  ---------------------------------------------------------------------------------
  Batter Up (1974/??)                             Deluxe Baseball (Ramtek, 1975/06)
  Crossfire (1974/01) (registered trademark?)     Knock Out (Ramtek, 1974/09)?
@@ -31,7 +31,7 @@
  Hockey (Cocktail) (1973/??)                     Soccer (Ramtek, 1973/11)
  Scoring (1973/11?)                              Soccer (Ramtek, 1973/11)?
  Tennis (1973/??)                                Volly (Ramtek, 1973/03?)
- 
+
  *********************************************************************************/
 
 

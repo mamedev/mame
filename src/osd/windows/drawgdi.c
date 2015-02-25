@@ -94,7 +94,6 @@ static void drawgdi_exit(void)
 
 int renderer_gdi::create()
 {
-
 	// fill in the bitmap info header
 	bminfo.bmiHeader.biSize            = sizeof(bminfo.bmiHeader);
 	bminfo.bmiHeader.biPlanes          = 1;
@@ -117,7 +116,6 @@ int renderer_gdi::create()
 
 void renderer_gdi::destroy()
 {
-
 	// free the bitmap memory
 	if (bmdata != NULL)
 		global_free_array(bmdata);
