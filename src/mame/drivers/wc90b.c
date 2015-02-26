@@ -96,17 +96,17 @@ Noted added by ClawGrip 28-Mar-2008:
 #define MSM5205_CLOCK XTAL_384kHz
 
 
-WRITE8_MEMBER(wc90b_state::wc90b_bankswitch_w)
+WRITE8_MEMBER(wc90b_state::bankswitch_w)
 {
 	membank("mainbank")->set_entry(data >> 3);
 }
 
-WRITE8_MEMBER(wc90b_state::wc90b_bankswitch1_w)
+WRITE8_MEMBER(wc90b_state::bankswitch1_w)
 {
 	membank("subbank")->set_entry(data >> 3);
 }
 
-WRITE8_MEMBER(wc90b_state::wc90b_sound_command_w)
+WRITE8_MEMBER(wc90b_state::sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
@@ -127,13 +127,13 @@ WRITE8_MEMBER(wc90b_state::adpcm_data_w)
 static ADDRESS_MAP_START( wc90b_map1, AS_PROGRAM, 8, wc90b_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM /* Main RAM */
-	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(wc90b_fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(wc90b_bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(wc90b_txvideoram_w) AM_SHARE("txvideoram")
+	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("mainbank")
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(wc90b_bankswitch_w)
-	AM_RANGE(0xfd00, 0xfd00) AM_WRITE(wc90b_sound_command_w)
+	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(bankswitch_w)
+	AM_RANGE(0xfd00, 0xfd00) AM_WRITE(sound_command_w)
 	AM_RANGE(0xfd04, 0xfd04) AM_WRITEONLY AM_SHARE("scroll1y")
 	AM_RANGE(0xfd06, 0xfd06) AM_WRITEONLY AM_SHARE("scroll1x")
 	AM_RANGE(0xfd08, 0xfd08) AM_WRITEONLY AM_SHARE("scroll2y")
@@ -154,7 +154,7 @@ static ADDRESS_MAP_START( wc90b_map2, AS_PROGRAM, 8, wc90b_state )
 	AM_RANGE(0xe800, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("subbank")
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(wc90b_bankswitch1_w)
+	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(bankswitch1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, wc90b_state )
@@ -325,6 +325,9 @@ void wc90b_state::machine_start()
 	membank("mainbank")->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x800);
 	membank("subbank")->configure_entries(0, 32, memregion("sub")->base() + 0x10000, 0x800);
 	membank("audiobank")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x8000, 0x4000);
+	
+	save_item(NAME(m_msm5205next));
+	save_item(NAME(m_toggle));
 }
 
 
@@ -349,7 +352,7 @@ static MACHINE_CONFIG_START( wc90b, wc90b_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(wc90b_state, screen_update_wc90b)
+	MCFG_SCREEN_UPDATE_DRIVER(wc90b_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wc90b)
@@ -507,6 +510,6 @@ ROM_START( wc90ba )
 ROM_END
 
 
-GAME( 1989, wc90b1, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
-GAME( 1989, wc90b2, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Worldcup '90", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
-GAME( 1989, wc90ba, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Euro League (Italian hack of Temco World Cup '90 - alt version)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
+GAME( 1989, wc90b1, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1989, wc90b2, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Worldcup '90", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1989, wc90ba, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Euro League (Italian hack of Temco World Cup '90 - alt version)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
