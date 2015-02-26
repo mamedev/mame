@@ -1131,7 +1131,6 @@ $(MESSOBJ)/coleco.a:            \
 	$(MESS_DRIVERS)/adam.o      \
 	$(MESS_DRIVERS)/coleco.o    \
 	$(MESS_MACHINE)/coleco.o    \
-	$(MESS_DRIVERS)/amaztron.o  \
 
 $(MESSOBJ)/cromemco.a:          \
 	$(MESS_DRIVERS)/c10.o       \
@@ -1384,9 +1383,7 @@ $(MESSOBJ)/matsushi.a:          \
 	$(MESS_DRIVERS)/myb3k.o     \
 
 $(MESSOBJ)/mb.a:                \
-	$(MESS_DRIVERS)/comp4.o     \
 	$(MESS_DRIVERS)/microvsn.o  \
-	$(MESS_DRIVERS)/simon.o     \
 
 $(MESSOBJ)/mchester.a:          \
 	$(MESS_DRIVERS)/ssem.o      \
@@ -2145,8 +2142,11 @@ $(MESS_DRIVERS)/fidelz80.o: $(MESS_LAYOUT)/fidelz80.lh \
 $(MESS_DRIVERS)/gamecom.o:  $(MESS_LAYOUT)/gamecom.lh
 $(MESS_DRIVERS)/glasgow.o:  $(MESS_LAYOUT)/glasgow.lh
 $(MESS_DRIVERS)/h8.o:       $(MESS_LAYOUT)/h8.lh
-$(MESS_DRIVERS)/hh_tms1k.o: $(MESS_LAYOUT)/tc4.lh \
-                            $(MESS_LAYOUT)/ebball.lh
+$(MESS_DRIVERS)/hh_tms1k.o: $(MESS_LAYOUT)/amaztron.lh \
+                            $(MESS_LAYOUT)/comp4.lh \
+                            $(MESS_LAYOUT)/ebball.lh \
+                            $(MESS_LAYOUT)/simon.lh \
+                            $(MESS_LAYOUT)/tc4.lh
 $(MESS_DRIVERS)/ie15.o:     $(MESS_LAYOUT)/ie15.lh
 $(MESS_DRIVERS)/instruct.o: $(MESS_LAYOUT)/instruct.lh
 $(MESS_DRIVERS)/k1003.o:    $(MESS_LAYOUT)/k1003.lh
