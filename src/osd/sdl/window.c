@@ -58,7 +58,7 @@
 // minimum window dimension
 #define MIN_WINDOW_DIM                  200
 
-#ifndef SDLMAME_WIN32
+//#ifndef SDLMAME_WIN32
 #define WMSZ_TOP        (0)
 #define WMSZ_BOTTOM     (1)
 #define WMSZ_BOTTOMLEFT     (2)
@@ -67,7 +67,7 @@
 #define WMSZ_TOPLEFT        (5)
 #define WMSZ_TOPRIGHT       (6)
 #define WMSZ_RIGHT      (7)
-#endif
+//#endif
 
 //============================================================
 //  GLOBAL VARIABLES
