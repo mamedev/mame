@@ -27,24 +27,24 @@
 // standard SDL headers
 #define TOBEMIGRATED 1
 #include "sdlinc.h"
-#else
-#define SDLMAME_SDL2 1
-#include "GL/gl.h"
-#include "GL/glext.h"
-#include "GL/wglext.h"
-
-typedef HGLRC SDL_GLContext;
 #endif
 
 // OpenGL headers
-#ifndef OSD_WINDOWS
-#include "osd_opengl.h"
+#include "modules/opengl/osd_opengl.h"
+
+#ifdef OSD_WINDOWS
+#define SDLMAME_SDL2 1
+#ifndef USE_DISPATCH_GL
+#include "GL/wglext.h"
 #endif
+#endif
+
 #include "modules/lib/osdlib.h"
+#include "modules/lib/osdobj_common.h"
 
 
-#include "gl_shader_tool.h"
-#include "gl_shader_mgr.h"
+#include "modules/opengl/gl_shader_tool.h"
+#include "modules/opengl/gl_shader_mgr.h"
 
 #if defined(SDLMAME_MACOSX)
 #ifndef APIENTRY
@@ -193,6 +193,232 @@ enum
 //  TYPES
 //============================================================
 
+#if (SDLMAME_SDL2)
+
+#ifdef OSD_WINDOWS
+class win_gl_context : public osd_gl_context
+{
+public:
+	win_gl_context(HWND window) : osd_gl_context(), m_context(0), m_window(NULL), m_hdc(0)
+	{
+		m_error[0] = 0;
+
+		this->wglGetProcAddress = (PROC WINAPI (*)(LPCSTR lpszProc)) GetProcAddress(m_module, "wglGetProcAddress");
+		this->wglCreateContext = (HGLRC WINAPI (*)(HDC hdc)) GetProcAddress(m_module, "wglCreateContext");
+		this->wglDeleteContext = (BOOL WINAPI (*)(HGLRC hglrc)) GetProcAddress(m_module, "wglDeleteContext");
+		this->wglMakeCurrent = (BOOL WINAPI (*)(HDC hdc, HGLRC hglrc)) GetProcAddress(m_module, "wglMakeCurrent");
+
+		m_hdc = GetDC(window);
+		if (!setupPixelFormat(m_hdc))
+		{
+			m_context = wglCreateContext(m_hdc);
+			if  (!m_context)
+			{
+				FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, GetLastError(), 0, m_error, 255, NULL);
+				return;
+			}
+			wglMakeCurrent(m_hdc, m_context);
+		}
+	}
+
+	virtual ~win_gl_context()
+	{
+		wglDeleteContext(m_context);
+		ReleaseDC(m_window, m_hdc);
+	}
+
+	virtual void MakeCurrent()
+	{
+		wglMakeCurrent(m_hdc, m_context);
+	}
+
+	virtual const char *LastErrorMsg()
+	{
+		if (m_error[0] == 0)
+			return NULL;
+		else
+			return m_error;
+	}
+
+	virtual void *getProcAddress(const char *proc)
+	{
+		void *ret = (void *) GetProcAddress(m_module, proc);
+		if (ret == NULL)
+			ret = (void *) wglGetProcAddress(proc);
+		return ret;
+	}
+
+	virtual int SetSwapInterval(const int swap)
+	{
+		// FIXME: Missing!
+		return 0;
+	}
+
+	virtual void SwapBuffer()
+	{
+		SwapBuffers(m_hdc);
+		//wglSwapLayerBuffers(GetDC(window().m_hwnd), WGL_SWAP_MAIN_PLANE);
+	}
+
+	static void load_library()
+	{
+		m_module = LoadLibraryA("opengl32.dll");
+	}
+
+private:
+
+	int setupPixelFormat(HDC hDC)
+	{
+	    PIXELFORMATDESCRIPTOR pfd = {
+	        sizeof(PIXELFORMATDESCRIPTOR),  /* size */
+	        1,                              /* version */
+	        PFD_SUPPORT_OPENGL |
+	        PFD_DRAW_TO_WINDOW |
+	        PFD_DOUBLEBUFFER,               /* support double-buffering */
+	        PFD_TYPE_RGBA,                  /* color type */
+	        32,                             /* prefered color depth */
+	        0, 0, 0, 0, 0, 0,               /* color bits (ignored) */
+	        0,                              /* no alpha buffer */
+	        0,                              /* alpha bits (ignored) */
+	        0,                              /* no accumulation buffer */
+	        0, 0, 0, 0,                     /* accum bits (ignored) */
+	        16,                             /* depth buffer */
+	        0,                              /* no stencil buffer */
+	        0,                              /* no auxiliary buffers */
+	        PFD_MAIN_PLANE,                 /* main layer */
+	        0,                              /* reserved */
+	        0, 0, 0,                        /* no layer, visible, damage masks */
+	    };
+	    int pixelFormat;
+
+	    pixelFormat = ChoosePixelFormat(hDC, &pfd);
+	    if (pixelFormat == 0) {
+	        strcpy(m_error, "ChoosePixelFormat failed");
+	        return 1;
+	    }
+
+	    if (SetPixelFormat(hDC, pixelFormat, &pfd) != TRUE) {
+	        strcpy(m_error, "SetPixelFormat failed.");
+	        return 1;
+	    }
+	    return 0;
+	}
+
+
+	HGLRC m_context;
+	HWND m_window;
+	HDC m_hdc;
+	char m_error[256];
+
+	PROC WINAPI (*wglGetProcAddress)(LPCSTR lpszProc);
+	HGLRC WINAPI (*wglCreateContext)(HDC hdc);
+	BOOL WINAPI (*wglDeleteContext)(HGLRC hglrc);
+	BOOL WINAPI (*wglMakeCurrent)(HDC hdc, HGLRC hglrc);
+
+	static HMODULE m_module;
+};
+
+HMODULE win_gl_context::m_module;
+
+
+#else
+class sdl_gl_context : public osd_gl_context
+{
+public:
+	sdl_gl_context(SDL_Window *window) : osd_gl_context(), m_context(0), m_window(window)
+	{
+		m_error[0] = 0;
+		m_context = SDL_GL_CreateContext(window);
+		if  (!m_context)
+		{
+			snprintf(m_error,255, "OpenGL not supported on this driver: %s", SDL_GetError());
+		}
+	}
+	virtual ~sdl_gl_context()
+	{
+		SDL_GL_DeleteContext(m_context);
+	}
+	virtual void MakeCurrent()
+	{
+		SDL_GL_MakeCurrent(m_window, m_context);
+	}
+
+	virtual int SetSwapInterval(const int swap)
+	{
+		return SDL_GL_SetSwapInterval(swap);
+	}
+
+	virtual const char *LastErrorMsg()
+	{
+		if (m_error[0] == 0)
+			return NULL;
+		else
+			return m_error;
+	}
+	virtual void *getProcAddress(const char *proc)
+	{
+		return SDL_GL_GetProcAddress(proc);
+	}
+
+	virtual void SwapBuffer()
+	{
+		SDL_GL_SwapWindow(m_window);
+	}
+
+private:
+	SDL_GLContext m_context;
+	SDL_Window *m_window;
+	char m_error[256];
+};
+#endif
+#else
+// SDL 1.2
+class sdl12_gl_context : public osd_gl_context
+{
+public:
+	sdl12_gl_context(SDL_Surface *window) : osd_gl_context(), m_window(window)
+	{
+		m_error[0] = 0;
+	}
+	virtual ~sdl12_gl_context()
+	{
+	}
+	virtual void MakeCurrent()
+	{
+	}
+
+	virtual int SetSwapInterval(const int swap)
+	{
+		// Not supported on 1.2
+		return 0;
+	}
+
+	virtual const char *LastErrorMsg()
+	{
+		if (m_error[0] == 0)
+			return NULL;
+		else
+			return m_error;
+	}
+
+	virtual void *getProcAddress(const char *proc)
+	{
+		return SDL_GL_GetProcAddress(proc);
+	}
+
+	virtual void SwapBuffer()
+	{
+		SDL_GL_SwapBuffers();
+	}
+
+private:
+	SDL_Surface *m_window;
+	char m_error[256];
+};
+
+
+#endif
+
 //============================================================
 //  Textures
 //============================================================
@@ -262,10 +488,7 @@ public:
 	: osd_renderer(window, FLAG_NEEDS_OPENGL), m_blittimer(0),
 		m_width(0), m_height(0),
 		m_blitwidth(0), m_blitheight(0),
-#if (SDLMAME_SDL2)
-		m_gl_context_id(0),
-#else
-#endif
+		m_gl_context(NULL),
 		m_initialized(0),
 		m_last_blendmode(0),
 		m_texture_max_width(0),
@@ -342,13 +565,7 @@ private:
 	int             m_blitwidth;
 	int             m_blitheight;
 
-#if (SDLMAME_SDL2)
-	SDL_GLContext   m_gl_context_id;
-#ifdef OSD_WINDOWS
-	HDC             m_hdc;
-#endif
-#else
-#endif
+	osd_gl_context	*m_gl_context;
 
 	int             m_initialized;        // is everything well initialized, i.e. all GL stuff etc.
 	// 3D info (GL mode only)
@@ -533,21 +750,10 @@ int drawogl_init(running_machine &machine, osd_draw_callbacks *callbacks)
 }
 
 //============================================================
-// Windows Compatibility
-//============================================================
-
-#ifdef OSD_WINDOWS
-PROC SDL_GL_GetProcAddress(const char *procname)
-{
-	return wglGetProcAddress(procname);
-}
-#endif
-
-//============================================================
 // Load the OGL function addresses
 //============================================================
 
-static void loadgl_functions(void)
+static void loadgl_functions(osd_gl_context *context)
 {
 #ifdef USE_DISPATCH_GL
 
@@ -558,13 +764,13 @@ static void loadgl_functions(void)
 	 */
 
 	#define OSD_GL(ret,func,params) \
-	if (!( func = (ret (APIENTRY *)params) SDL_GL_GetProcAddress( #func ) )) \
+	if (!( func = (ret (APIENTRY *)params) context->getProcAddress( #func ) )) \
 		{ err_count++; osd_printf_error("GL function %s not found!\n", #func ); }
 
 	#define OSD_GL_UNUSED(ret,func,params)
 
 	#define GET_GLFUNC 1
-	#include "osd_opengl.h"
+	#include "modules/opengl/osd_opengl.h"
 	#undef GET_GLFUNC
 
 	if (err_count)
@@ -577,11 +783,18 @@ static void loadgl_functions(void)
 // Load GL library
 //============================================================
 
+#ifdef USE_DISPATCH_GL
+osd_gl_dispatch *gl_dispatch;
+#endif
+
 static void load_gl_lib(running_machine &machine)
 {
-#ifdef USE_DISPATCH_GL
 	if (!dll_loaded)
 	{
+#ifdef OSD_WINDOWS
+		win_gl_context::load_library();
+#else
+#ifdef USE_DISPATCH_GL
 		/*
 		 *  directfb and and x11 use this env var
 		 *   SDL_VIDEO_GL_DRIVER
@@ -598,10 +811,11 @@ static void load_gl_lib(running_machine &machine)
 		}
 		osd_printf_verbose("Loaded opengl shared library: %s\n", stemp ? stemp : "<default>");
 		/* FIXME: must be freed as well */
+#endif
+#endif
 		gl_dispatch = (osd_gl_dispatch *) osd_malloc(sizeof(osd_gl_dispatch));
 		dll_loaded=1;
 	}
-#endif
 }
 
 void sdl_info_ogl::initialize_gl()
@@ -788,74 +1002,25 @@ void sdl_info_ogl::initialize_gl()
 // a
 //============================================================
 
-#ifdef OSD_WINDOWS
-void
-setupPixelFormat(HDC hDC)
-{
-	PIXELFORMATDESCRIPTOR pfd = {
-		sizeof(PIXELFORMATDESCRIPTOR),  /* size */
-		1,                              /* version */
-		PFD_SUPPORT_OPENGL |
-		PFD_DRAW_TO_WINDOW |
-		PFD_DOUBLEBUFFER,               /* support double-buffering */
-		PFD_TYPE_RGBA,                  /* color type */
-		32,                             /* prefered color depth */
-		0, 0, 0, 0, 0, 0,               /* color bits (ignored) */
-		0,                              /* no alpha buffer */
-		0,                              /* alpha bits (ignored) */
-		0,                              /* no accumulation buffer */
-		0, 0, 0, 0,                     /* accum bits (ignored) */
-		16,                             /* depth buffer */
-		0,                              /* no stencil buffer */
-		0,                              /* no auxiliary buffers */
-		PFD_MAIN_PLANE,                 /* main layer */
-		0,                              /* reserved */
-		0, 0, 0,                        /* no layer, visible, damage masks */
-	};
-	int pixelFormat;
-
-	pixelFormat = ChoosePixelFormat(hDC, &pfd);
-	if (pixelFormat == 0) {
-		osd_printf_error("ChoosePixelFormat failed.\n");
-		exit(1);
-	}
-
-	if (SetPixelFormat(hDC, pixelFormat, &pfd) != TRUE) {
-		osd_printf_error("SetPixelFormat failed.\n");
-		exit(1);
-	}
-}
-#endif
 int sdl_info_ogl::create()
 {
 #if (SDLMAME_SDL2)
 	// create renderer
 #ifdef OSD_WINDOWS
-	m_hdc = GetDC(window().m_hwnd);
-	setupPixelFormat(m_hdc);
-	m_gl_context_id = wglCreateContext(m_hdc);
-	if  (!m_gl_context_id)
-	{
-		char errorStr[1024];
-		FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, GetLastError(), 0, errorStr, 255, NULL);
-		osd_printf_error("OpenGL not supported on this driver %s\n", errorStr);
-		return 1;
-	}
-	wglMakeCurrent(m_hdc, m_gl_context_id);
+	m_gl_context = global_alloc(win_gl_context(window().m_hwnd));
 #else
-	m_gl_context_id = SDL_GL_CreateContext(window().sdl_window());
-	if  (!m_gl_context_id)
+	m_gl_context = global_alloc(sdl_gl_context(window().sdl_window()));
+#endif
+#else
+	m_gl_context = global_alloc(sdl12_gl_context(window().sdl_surface()));
+#endif
+	if  (m_gl_context->LastErrorMsg() != NULL)
 	{
-		osd_printf_error("OpenGL not supported on this driver: %s\n", SDL_GetError());
+		osd_printf_error("%s\n", m_gl_context->LastErrorMsg());
 		return 1;
 	}
-#endif
+	m_gl_context->SetSwapInterval(video_config.waitvsync ? 1 : 0);
 
-#ifndef OSD_WINDOWS
-	SDL_GL_SetSwapInterval(video_config.waitvsync ? 2 : 0);
-#endif
-#else
-#endif
 
 	m_blittimer = 0;
 	m_surf_w = 0;
@@ -871,7 +1036,7 @@ int sdl_info_ogl::create()
 	/* load any GL function addresses
 	 * this must be done here because we need a context
 	 */
-	loadgl_functions();
+	loadgl_functions(m_gl_context);
 	initialize_gl();
 
 
@@ -892,15 +1057,8 @@ void sdl_info_ogl::destroy()
 
 	destroy_all_textures();
 
-#if (SDLMAME_SDL2)
-#ifdef OSD_WINDOWS
-	wglDeleteContext(m_gl_context_id);
-	ReleaseDC(window().m_hwnd, m_hdc);
-#else
-	SDL_GL_DeleteContext(m_gl_context_id);
-#endif
-#endif
-
+	global_free(m_gl_context);
+	m_gl_context = NULL;
 }
 
 
@@ -932,13 +1090,7 @@ void sdl_info_ogl::destroy_all_textures()
 	if ( !m_initialized )
 		return;
 
-#if (SDLMAME_SDL2)
-#ifdef OSD_WINDOWS
-	wglMakeCurrent(m_hdc, m_gl_context_id);
-#else
-	SDL_GL_MakeCurrent(window().sdl_window(), m_gl_context_id);
-#endif
-#endif
+	m_gl_context->MakeCurrent();
 
 	if(window().m_primlist)
 	{
@@ -1043,27 +1195,27 @@ void sdl_info_ogl::loadGLExtensions()
 	// VBO:
 	if( m_usevbo )
 	{
-		pfn_glGenBuffers = (PFNGLGENBUFFERSPROC) SDL_GL_GetProcAddress("glGenBuffers");
-		pfn_glDeleteBuffers = (PFNGLDELETEBUFFERSPROC) SDL_GL_GetProcAddress("glDeleteBuffers");
-		pfn_glBindBuffer = (PFNGLBINDBUFFERPROC) SDL_GL_GetProcAddress("glBindBuffer");
-		pfn_glBufferData = (PFNGLBUFFERDATAPROC) SDL_GL_GetProcAddress("glBufferData");
-		pfn_glBufferSubData = (PFNGLBUFFERSUBDATAPROC) SDL_GL_GetProcAddress("glBufferSubData");
+		pfn_glGenBuffers = (PFNGLGENBUFFERSPROC) m_gl_context->getProcAddress("glGenBuffers");
+		pfn_glDeleteBuffers = (PFNGLDELETEBUFFERSPROC) m_gl_context->getProcAddress("glDeleteBuffers");
+		pfn_glBindBuffer = (PFNGLBINDBUFFERPROC) m_gl_context->getProcAddress("glBindBuffer");
+		pfn_glBufferData = (PFNGLBUFFERDATAPROC) m_gl_context->getProcAddress("glBufferData");
+		pfn_glBufferSubData = (PFNGLBUFFERSUBDATAPROC) m_gl_context->getProcAddress("glBufferSubData");
 	}
 	// PBO:
 	if ( m_usepbo )
 	{
-		pfn_glMapBuffer  = (PFNGLMAPBUFFERPROC) SDL_GL_GetProcAddress("glMapBuffer");
-		pfn_glUnmapBuffer= (PFNGLUNMAPBUFFERPROC) SDL_GL_GetProcAddress("glUnmapBuffer");
+		pfn_glMapBuffer  = (PFNGLMAPBUFFERPROC) m_gl_context->getProcAddress("glMapBuffer");
+		pfn_glUnmapBuffer= (PFNGLUNMAPBUFFERPROC) m_gl_context->getProcAddress("glUnmapBuffer");
 	}
 	// FBO:
 	if ( m_usefbo )
 	{
-		pfn_glIsFramebuffer = (PFNGLISFRAMEBUFFEREXTPROC) SDL_GL_GetProcAddress("glIsFramebufferEXT");
-		pfn_glBindFramebuffer = (PFNGLBINDFRAMEBUFFEREXTPROC) SDL_GL_GetProcAddress("glBindFramebufferEXT");
-		pfn_glDeleteFramebuffers = (PFNGLDELETEFRAMEBUFFERSEXTPROC) SDL_GL_GetProcAddress("glDeleteFramebuffersEXT");
-		pfn_glGenFramebuffers = (PFNGLGENFRAMEBUFFERSEXTPROC) SDL_GL_GetProcAddress("glGenFramebuffersEXT");
-		pfn_glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC) SDL_GL_GetProcAddress("glCheckFramebufferStatusEXT");
-		pfn_glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DEXTPROC) SDL_GL_GetProcAddress("glFramebufferTexture2DEXT");
+		pfn_glIsFramebuffer = (PFNGLISFRAMEBUFFEREXTPROC) m_gl_context->getProcAddress("glIsFramebufferEXT");
+		pfn_glBindFramebuffer = (PFNGLBINDFRAMEBUFFEREXTPROC) m_gl_context->getProcAddress("glBindFramebufferEXT");
+		pfn_glDeleteFramebuffers = (PFNGLDELETEFRAMEBUFFERSEXTPROC) m_gl_context->getProcAddress("glDeleteFramebuffersEXT");
+		pfn_glGenFramebuffers = (PFNGLGENFRAMEBUFFERSEXTPROC) m_gl_context->getProcAddress("glGenFramebuffersEXT");
+		pfn_glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC) m_gl_context->getProcAddress("glCheckFramebufferStatusEXT");
+		pfn_glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DEXTPROC) m_gl_context->getProcAddress("glFramebufferTexture2DEXT");
 	}
 
 	if ( m_usevbo &&
@@ -1195,9 +1347,9 @@ void sdl_info_ogl::loadGLExtensions()
 	if ( m_useglsl )
 	{
 		#ifdef GL_ARB_multitexture
-		pfn_glActiveTexture = (PFNGLACTIVETEXTUREARBPROC) SDL_GL_GetProcAddress("glActiveTextureARB");
+		pfn_glActiveTexture = (PFNGLACTIVETEXTUREARBPROC) m_gl_context->getProcAddress("glActiveTextureARB");
 		#else
-		pfn_glActiveTexture = (PFNGLACTIVETEXTUREPROC) SDL_GL_GetProcAddress("glActiveTexture");
+		pfn_glActiveTexture = (PFNGLACTIVETEXTUREPROC) m_gl_context->getProcAddress("glActiveTexture");
 		#endif
 		if (!pfn_glActiveTexture)
 		{
@@ -1211,7 +1363,7 @@ void sdl_info_ogl::loadGLExtensions()
 
 	if ( m_useglsl )
 	{
-		m_glsl = glsl_shader_init();
+		m_glsl = glsl_shader_init(m_gl_context);
 		m_useglsl = (m_glsl != NULL ? 1 : 0);
 
 		if ( ! m_useglsl )
@@ -1348,13 +1500,7 @@ int sdl_info_ogl::draw(const int update)
 		clear_flags(FI_CHANGED);
 	}
 
-#if (SDLMAME_SDL2)
-#ifdef OSD_WINDOWS
-	wglMakeCurrent(m_hdc, m_gl_context_id);
-#else
-	SDL_GL_MakeCurrent(window().sdl_window(), m_gl_context_id);
-#endif
-#endif
+	m_gl_context->MakeCurrent();
 
 	if (m_init_context)
 	{
@@ -1702,16 +1848,8 @@ int sdl_info_ogl::draw(const int update)
 	window().m_primlist->release_lock();
 	m_init_context = 0;
 
-#if (!SDLMAME_SDL2)
-	SDL_GL_SwapBuffers();
-#else
-#ifdef OSD_WINDOWS
-	SwapBuffers(m_hdc);
-	//wglSwapLayerBuffers(GetDC(window().m_hwnd), WGL_SWAP_MAIN_PLANE);
-#else
-	SDL_GL_SwapWindow(window().sdl_window());
-#endif
-#endif
+	m_gl_context->SwapBuffer();
+
 	return 0;
 }
 

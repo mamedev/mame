@@ -1549,6 +1549,7 @@ ROM_START( darkseal2 )
 	ROM_LOAD( "mb7122h.16l", 0x00000,  0x400,  CRC(2bee57cc) SHA1(bc48670aa7c39f6ff7fae4c819eab22ed2db875b) )   /* Priority (unused) */
 ROM_END
 
+
 ROM_START( nitrobal )
 	ROM_REGION(0x200000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "jl01-4.d3",   0x000000, 0x20000, CRC(0414e409) SHA1(bc19e7d2d9e768ce4052511043867c0ef9b0b61b) )
@@ -1557,6 +1558,51 @@ ROM_START( nitrobal )
 	ROM_LOAD16_BYTE( "jl02-4.b5",   0x040001, 0x20000, CRC(74047997) SHA1(bfd2f24889250e06945bb4798b40a56f832a9b19) )
 	ROM_LOAD16_BYTE( "jl05-2.d6",   0x080000, 0x40000, CRC(b820fa20) SHA1(8509567cf988fe27552d37241b25b66a6e1a9c39) )
 	ROM_LOAD16_BYTE( "jl04-2.b6",   0x080001, 0x40000, CRC(1fd8995b) SHA1(75d77835500e4b7caca92ba634859d7a2ad9b84c) )
+	/* Two empty rom slots at d7, b7 */
+
+	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
+	ROM_LOAD( "jl08.r20",  0x00000,  0x10000,  CRC(93d93fe1) SHA1(efc618724251d23a23b3019d475f7739a7e88751) )
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "jl06.d10",  0x00000,  0x10000,  CRC(91cf668e) SHA1(fc153eaa09777f79369037a139470ad1118e8d7e) ) /* Chars */
+	ROM_LOAD16_BYTE( "jl07.d12",  0x00001,  0x10000,  CRC(e61d0e42) SHA1(80d6ada356c721b0be826554ec6731dbbc19e0ab) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD( "mav00.b10", 0x00000, 0x80000,  CRC(34785d97) SHA1(094f881cd699d1b9fd079778f20f8c9d83283e6e) ) /* Tiles */
+	ROM_LOAD( "mav01.b12", 0x80000, 0x80000,  CRC(8b531b16) SHA1(f734286f4510b2c09dc2d6d2b8c8da9dc4424287) )
+
+	ROM_REGION( 0x200000, "gfx3", 0 )
+	ROM_LOAD( "mav02.b16", 0x000000, 0x100000,  CRC(20723bf7) SHA1(b3491d98ff415701fec2b58d85f99c743d71b013) ) /* Tiles */
+	ROM_LOAD( "mav03.e16", 0x100000, 0x100000,  CRC(ef6195f0) SHA1(491bc030519c78b84396f7f8a21df9daf8acc140) )
+
+	ROM_REGION( 0x300000, "gfx4", 0 )
+	ROM_LOAD16_BYTE( "mav05.e19", 0x000000, 0x100000,  CRC(d92d769c) SHA1(8012e7f2b9a7cbccde8da90025647443beb6c47c) ) /* Sprites #1 */
+	ROM_LOAD16_BYTE( "mav04.b19", 0x000001, 0x100000,  CRC(8ba48385) SHA1(926ae1e0e99b8e022b6798ceb29dd080cfc1bada) )
+	ROM_LOAD16_BYTE( "mav07.e20", 0x200000, 0x080000,  CRC(5fc10ccd) SHA1(7debcf223802d5c2ea3d29d39850c8756c863b31) )
+	ROM_LOAD16_BYTE( "mav06.b20", 0x200001, 0x080000,  CRC(ae6201a5) SHA1(c0ae87fa96d12377c5522cb8adfed03373ab3757) )
+
+	ROM_REGION( 0x80000, "gfx5", 0 )
+	ROM_LOAD16_BYTE( "mav09.e23", 0x000000, 0x040000,  CRC(1ce7b51a) SHA1(17ed8f34bf6d057e0504e72e95f448d5923aa82e) ) /* Sprites #2 */
+	ROM_LOAD16_BYTE( "mav08.b23", 0x000001, 0x040000,  CRC(64966576) SHA1(40c14c0f62eef0317abfb7192505e0337fb5cde5) )
+
+	ROM_REGION(0x80000, "oki1", 0 ) /* Oki samples */
+	ROM_LOAD( "mav10.r17",  0x00000,  0x80000,  CRC(8ad734b0) SHA1(768b9f54bbf4b54591cafecb7a27960da919ce84) )
+
+	ROM_REGION(0x80000, "oki2", 0 ) /* Oki samples */
+	ROM_LOAD( "mav11.r19",  0x00000,  0x80000,  CRC(ef513908) SHA1(72db6c704071d7a784b3768c256fc51087e9e93c) )
+
+	ROM_REGION( 1024, "proms", 0 )
+	ROM_LOAD( "jn-00.17l", 0x00000,  0x400,  CRC(6ac77b84) SHA1(9e1e2cabdb20b819e592a0f07d15658062227fa4) ) /* Priority (unused) */
+ROM_END
+
+ROM_START( nitrobala )
+	ROM_REGION(0x200000, "maincpu", 0 ) /* 68000 code */ // roms had no labels
+	ROM_LOAD16_BYTE( "3d",   0x000000, 0x20000, CRC(48f77c19) SHA1(d6d4f10246c6f098503a0c126c1d8e3155063c32) )
+	ROM_LOAD16_BYTE( "3b",   0x000001, 0x20000, CRC(fb1284e9) SHA1(13e9852011965b1cf12d8568d043aec92f6df2cd) )
+	ROM_LOAD16_BYTE( "5d",   0x040000, 0x20000, CRC(ac47367a) SHA1(f0efe6860ca83e7506491b62bc0ad62fa4c2ed1c) )
+	ROM_LOAD16_BYTE( "5b",   0x040001, 0x20000, CRC(a8e9d7dd) SHA1(19b4ed6501c44c9ac0fdbbfe4dec65efec4b700f) )
+	ROM_LOAD16_BYTE( "6d",   0x080000, 0x40000, CRC(59e620cc) SHA1(60d4e9622008a32c2addf12a266817cc723635ab) ) // 7ee3 - 7f06 are 0xff instead of 0x00 in the nitrobal set, why?
+	ROM_LOAD16_BYTE( "6b",   0x080001, 0x40000, CRC(1fd8995b) SHA1(75d77835500e4b7caca92ba634859d7a2ad9b84c) ) // this half of the pair matches
 	/* Two empty rom slots at d7, b7 */
 
 	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
@@ -1714,9 +1760,13 @@ GAME( 1991, rohga2,    rohga,    rohga,    rohga, rohga_state,    rohga,    ROT0
 GAME( 1991, rohgah,    rohga,    rohga,    rohga, rohga_state,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Hong Kong v3.0)", GAME_SUPPORTS_SAVE )
 GAME( 1991, rohgau,    rohga,    rohga,    rohga, rohga_state,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (US v1.0)", GAME_SUPPORTS_SAVE )
 GAME( 1991, wolffang,  rohga,    rohga,    rohga, rohga_state,    rohga,    ROT0,   "Data East Corporation", "Wolf Fang -Kuhga 2001- (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1992, wizdfire,  0,        wizdfire, wizdfire, rohga_state, wizdfire, ROT0,   "Data East Corporation", "Wizard Fire (Over Sea v2.1)", GAME_SUPPORTS_SAVE )
 GAME( 1992, wizdfireu, wizdfire, wizdfire, wizdfire, rohga_state, wizdfire, ROT0,   "Data East Corporation", "Wizard Fire (US v1.1)", GAME_SUPPORTS_SAVE )
 GAME( 1992, darkseal2, wizdfire, wizdfire, wizdfire, rohga_state, wizdfire, ROT0,   "Data East Corporation", "Dark Seal 2 (Japan v2.1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1992, nitrobal,  0,        nitrobal, nitrobal, rohga_state, nitrobal, ROT270, "Data East Corporation", "Nitro Ball (US)", GAME_SUPPORTS_SAVE )
+
+GAME( 1992, nitrobal,  0,        nitrobal, nitrobal, rohga_state, nitrobal, ROT270, "Data East Corporation", "Nitro Ball (World, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1992, nitrobala, nitrobal, nitrobal, nitrobal, rohga_state, nitrobal, ROT270, "Data East Corporation", "Nitro Ball (World, set 2)", GAME_SUPPORTS_SAVE ) // was marked 'US' but doesn't seem to have a 'Winners Don't Use Drugs' screen, so unlikely
 GAME( 1992, gunball,   nitrobal, nitrobal, nitrobal, rohga_state, nitrobal, ROT270, "Data East Corporation", "Gun Ball (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1993, schmeisr,  0,        schmeisr, schmeisr, rohga_state, schmeisr, ROT0,   "Hot-B",                 "Schmeiser Robo (Japan)", GAME_SUPPORTS_SAVE )

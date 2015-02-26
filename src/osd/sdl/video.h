@@ -107,19 +107,6 @@ private:
 	float               m_aspect;                 // computed/configured aspect ratio of the physical device
 };
 
-
-struct osd_window_config
-{
-	osd_window_config() : aspect(0.0f), width(0), height(0), depth(0), refresh(0) {}
-
-	float               aspect;                     // decoded aspect ratio FIXME: not used on windows
-	int                 width;                      // decoded width
-	int                 height;                     // decoded height
-	int                 depth;                      // decoded depth - only SDL
-	int                 refresh;                    // decoded refresh
-};
-
-
 struct sdl_video_config
 {
 	// performance options

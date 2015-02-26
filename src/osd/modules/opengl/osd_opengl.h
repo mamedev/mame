@@ -15,13 +15,17 @@
 	/* equivalent to #include <GL/gl.h>
 	 * #include <GL/glext.h>
 	 */
+	#ifdef OSD_WINDOWS
+	#include "GL/gl.h"
+	#include "GL/glext.h"
+	#else
 	#if (SDLMAME_SDL2)
 	#include <SDL2/SDL_version.h>
 	#else
 	#include <SDL/SDL_version.h>
 	#endif
 
-#if (SDL_VERSION_ATLEAST(1,2,10))
+	#if (SDL_VERSION_ATLEAST(1,2,10))
 	#if defined(SDLMAME_WIN32)
 		// Avoid that winnt.h (included via sdl_opengl.h, windows.h, windef.h includes intrin.h
 		#define __INTRIN_H_
@@ -31,13 +35,36 @@
 	#else
 	#include <SDL/SDL_opengl.h>
 	#endif
-#else
+	#else
 	/*
 	 * SDL 1.2.9 does not provide everything we need
 	 * We therefore distribute it ourselves
 	 */
 	#include "SDL1211_opengl.h"
-#endif
+	#endif
+	#endif
+
+	class osd_gl_context
+	{
+	public:
+		osd_gl_context() { }
+		virtual ~osd_gl_context() { }
+		virtual void MakeCurrent() = 0;
+		virtual const char *LastErrorMsg() = 0;
+		virtual void *getProcAddress(const char *proc) = 0;
+		/*
+		 * 	0 for immediate updates,
+		 * 	1 for updates synchronized with the vertical retrace,
+		 * 	-1 for late swap tearing
+		 *
+		 * 	returns -1 if swap interval is not supported
+		 *
+		 */
+		virtual int SetSwapInterval(const int swap) = 0;
+		virtual void SwapBuffer() = 0;
+	};
+
+
 	#ifdef USE_DISPATCH_GL
 
 #ifdef MACOSX_USE_LIBSDL

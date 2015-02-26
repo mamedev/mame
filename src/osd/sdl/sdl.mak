@@ -48,8 +48,7 @@ NO_USE_XINPUT = 1
 # this will also add a rpath to the executable
 # MESA_INSTALL_ROOT = /usr/local/dfb_GL
 
-# uncomment the next line to build a binary using
-# GL-dispatching.
+# uncomment the next line to build a binary using GL-dispatching.
 # This option takes precedence over MESA_INSTALL_ROOT
 
 USE_DISPATCH_GL = 1
@@ -428,6 +427,7 @@ OBJDIRS += $(SDLOBJ) \
 	$(OSDOBJ)/modules/midi \
 	$(OSDOBJ)/modules/font \
 	$(OSDOBJ)/modules/netdev \
+	$(OSDOBJ)/modules/opengl \
 
 #-------------------------------------------------
 # OSD core library
@@ -822,7 +822,11 @@ endif
 ifeq ($(NO_OPENGL),1)
 DEFS += -DUSE_OPENGL=0
 else
-OSDOBJS += $(SDLOBJ)/drawogl.o $(SDLOBJ)/gl_shader_tool.o $(SDLOBJ)/gl_shader_mgr.o
+OSDOBJS += \
+	$(SDLOBJ)/drawogl.o \
+	$(OSDOBJ)/modules/opengl/gl_shader_tool.o \
+	$(OSDOBJ)/modules/opengl/gl_shader_mgr.o
+	
 DEFS += -DUSE_OPENGL=1
 ifeq ($(USE_DISPATCH_GL),1)
 DEFS += -DUSE_DISPATCH_GL=1

@@ -63,12 +63,6 @@
 
 sdl_video_config video_config;
 
-#ifndef NO_OPENGL
-#ifdef USE_DISPATCH_GL
-osd_gl_dispatch *gl_dispatch;
-#endif
-#endif
-
 sdl_monitor_info *sdl_monitor_info::primary_monitor = NULL;
 sdl_monitor_info *sdl_monitor_info::list = NULL;
 
