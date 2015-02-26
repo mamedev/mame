@@ -964,11 +964,11 @@ void renderer_dd::blit_to_primary(int srcwidth, int srcheight)
 		ClientToScreen(window().m_hwnd, &((LPPOINT)&outer)[1]);
 
 		// adjust to be relative to the monitor
-		RECT pos = monitor->position_size();
-		outer.left -= pos.left;
-		outer.right -= pos.left;
-		outer.top -= pos.top;
-		outer.bottom -= pos.top;
+		osd_rect pos = monitor->position_size();
+		outer.left -= pos.left();
+		outer.right -= pos.left();
+		outer.top -= pos.top();
+		outer.bottom -= pos.top();
 	}
 
 	// compute outer rect -- full screen version

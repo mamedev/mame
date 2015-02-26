@@ -559,7 +559,6 @@ int sdl_info::draw(int update)
 	UINT8 *surfptr;
 	INT32 pitch;
 	Uint32 rmask, gmask, bmask;
-	int width = 0; int height = 0;
 #if (SDLMAME_SDL2)
 	Uint32 amask;
 #endif
@@ -571,14 +570,14 @@ int sdl_info::draw(int update)
 		return 0;
 	}
 
-	window().get_size(width, height);
-	if (has_flags(FI_CHANGED) || (width != m_last_width) || (height != m_last_height))
+	osd_dim wdim = window().get_size();
+	if (has_flags(FI_CHANGED) || (wdim.width() != m_last_width) || (wdim.height() != m_last_height))
 	{
 		destroy_all_textures();
 		clear_flags(FI_CHANGED);
 		m_blittimer = 3;
-		m_last_width = width;
-		m_last_height = height;
+		m_last_width = wdim.width();
+		m_last_height = wdim.height();
 #if (SDLMAME_SDL2)
 		SDL_RenderSetViewport(m_sdl_renderer, NULL);
 		if (m_texture_id != NULL)
@@ -619,7 +618,7 @@ int sdl_info::draw(int update)
 	// Clear if necessary
 	if (m_blittimer > 0)
 	{
-		memset(window().sdl_surface()->pixels, 0, height * window().sdl_surface()->pitch);
+		memset(window().sdl_surface()->pixels, 0, wdim.height() * window().sdl_surface()->pitch);
 		m_blittimer--;
 	}
 
@@ -669,8 +668,8 @@ int sdl_info::draw(int update)
 	blitwidth = m_blitwidth;
 	blitheight = m_blitheight;
 
-	ch = height;
-	cw = width;
+	ch = wdim.height();
+	cw = wdim.width();
 
 	// do not crash if the window's smaller than the blit area
 	if (blitheight > ch)

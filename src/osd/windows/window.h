@@ -46,7 +46,7 @@ public:
 
 	void update();
 
-	win_monitor_info *winwindow_video_window_monitor(const RECT *proposed);
+	win_monitor_info *winwindow_video_window_monitor(const osd_rect *proposed);
 
 	bool win_has_menu()
 	{
@@ -109,13 +109,13 @@ public:
 
 private:
 	void draw_video_contents(HDC dc, int update);
+	int complete_create();
 	void set_starting_view(int index, const char *view);
 	int wnd_extra_width();
 	int wnd_extra_height();
-	int complete_create();
-	void constrain_to_aspect_ratio(RECT *rect, int adjustment);
-	void get_min_bounds(RECT *bounds, int constrain);
-	void get_max_bounds(RECT *bounds, int constrain);
+	osd_rect constrain_to_aspect_ratio(const osd_rect &rect, int adjustment);
+	osd_dim get_min_bounds(int constrain);
+	osd_dim get_max_bounds(int constrain);
 	void update_minmax_state();
 	void minimize_window();
 	void maximize_window();

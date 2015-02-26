@@ -1479,7 +1479,6 @@ int sdl_info_ogl::draw(const int update)
 	texture_info *texture=NULL;
 	float vofs, hofs;
 	int  pendingPrimitive=GL_NO_PRIMITIVE, curPrimitive=GL_NO_PRIMITIVE;
-	int width = 0; int height = 0;
 
 #ifdef TOBEMIGRATED
 	if (video_config.novideo)
@@ -1488,13 +1487,13 @@ int sdl_info_ogl::draw(const int update)
 	}
 #endif
 
-	window().get_size(width, height);
+	osd_dim wdim = window().get_size();
 
-	if (has_flags(FI_CHANGED) || (width != m_width) || (height != m_height))
+	if (has_flags(FI_CHANGED) || (wdim.width() != m_width) || (wdim.height() != m_height))
 	{
 		destroy_all_textures();
-		m_width = width;
-		m_height = height;
+		m_width = wdim.width();
+		m_height = wdim.height();
 		m_blittimer = 3;
 		m_init_context = 1;
 		clear_flags(FI_CHANGED);

@@ -688,14 +688,13 @@ int sdl_info13::draw(int update)
 		return 0;
 	}
 
-	int width = 0; int height = 0;
-	window().get_size(width,height);
+	osd_dim wdim = window().get_size();
 
-	if (has_flags(FI_CHANGED) || (width != m_width) || (height != m_height))
+	if (has_flags(FI_CHANGED) || (wdim.width() != m_width) || (wdim.height() != m_height))
 	{
 		destroy_all_textures();
-		m_width = width;
-		m_height = height;
+		m_width = wdim.width();
+		m_height = wdim.height();
 		SDL_RenderSetViewport(m_sdl_renderer, NULL);
 		m_blittimer = 3;
 		clear_flags(FI_CHANGED);
@@ -720,8 +719,8 @@ int sdl_info13::draw(int update)
 	{
 		int ch, cw;
 
-		ch = height;
-		cw = width;
+		ch = wdim.height();
+		cw = wdim.width();
 
 		if (video_config.centerv)
 		{

@@ -51,7 +51,7 @@ public:
 
 	float aspect() const { return monitor()->aspect(); }
 
-	virtual void get_size(int &w, int &h) = 0;
+	virtual osd_dim get_size() = 0;
 
 #ifdef OSD_SDL
 	virtual void blit_surface_size(int &blitwidth, int &blitheight) = 0;
@@ -65,7 +65,7 @@ public:
 	virtual win_monitor_info *monitor() const = 0;
 	virtual bool win_has_menu() = 0;
 	// FIXME: cann we replace winwindow_video_window_monitor(NULL) with monitor() ?
-	virtual win_monitor_info *winwindow_video_window_monitor(const RECT *proposed) = 0;
+	virtual win_monitor_info *winwindow_video_window_monitor(const osd_rect *proposed) = 0;
 
 	// window handle and info
 	HWND                    m_hwnd;

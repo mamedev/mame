@@ -831,7 +831,7 @@ void win_window_info::update()
 //  (window thread)
 //============================================================
 
-win_monitor_info *win_window_info::winwindow_video_window_monitor(const RECT *proposed)
+win_monitor_info *win_window_info::winwindow_video_window_monitor(const osd_rect *proposed)
 {
 	win_monitor_info *monitor;
 
@@ -839,7 +839,14 @@ win_monitor_info *win_window_info::winwindow_video_window_monitor(const RECT *pr
 	if (!m_fullscreen)
 	{
 		if (proposed != NULL)
-			monitor = winvideo_monitor_from_handle(MonitorFromRect(proposed, MONITOR_DEFAULTTONEAREST));
+		{
+			RECT p;
+			p.top = proposed->top();
+			p.left = proposed->left();
+			p.bottom = proposed->bottom();
+			p.right = proposed->right();
+			monitor = winvideo_monitor_from_handle(MonitorFromRect(&p, MONITOR_DEFAULTTONEAREST));
+		}
 		else
 			monitor = winvideo_monitor_from_handle(MonitorFromWindow(m_hwnd, MONITOR_DEFAULTTONEAREST));
 	}
@@ -1153,7 +1160,7 @@ unsigned __stdcall win_window_info::thread_entry(void *param)
 
 int win_window_info::complete_create()
 {
-	RECT monitorbounds, client;
+	RECT client;
 	int tempwidth, tempheight;
 	HMENU menu = NULL;
 	HDC dc;
@@ -1161,7 +1168,7 @@ int win_window_info::complete_create()
 	assert(GetCurrentThreadId() == window_threadid);
 
 	// get the monitor bounds
-	monitorbounds = m_monitor->position_size();
+	osd_rect monitorbounds = m_monitor->position_size();
 
 	// create the window menu if needed
 	if (downcast<windows_options &>(machine().options()).menu())
@@ -1176,8 +1183,8 @@ int win_window_info::complete_create()
 						"MAME",
 						m_title,
 						m_fullscreen ? FULLSCREEN_STYLE : WINDOW_STYLE,
-						monitorbounds.left + 20, monitorbounds.top + 20,
-						monitorbounds.left + 100, monitorbounds.top + 100,
+						monitorbounds.left() + 20, monitorbounds.top() + 20,
+						monitorbounds.left() + 100, monitorbounds.top() + 100,
 						NULL,//(win_window_list != NULL) ? win_window_list->m_hwnd : NULL,
 						menu,
 						GetModuleHandle(NULL),
@@ -1198,9 +1205,9 @@ int win_window_info::complete_create()
 	// adjust the window position to the initial width/height
 	tempwidth = (m_win_config.width != 0) ? m_win_config.width : 640;
 	tempheight = (m_win_config.height != 0) ? m_win_config.height : 480;
-	SetWindowPos(m_hwnd, NULL, monitorbounds.left + 20, monitorbounds.top + 20,
-			monitorbounds.left + tempwidth + wnd_extra_width(),
-			monitorbounds.top + tempheight + wnd_extra_height(),
+	SetWindowPos(m_hwnd, NULL, monitorbounds.left() + 20, monitorbounds.top() + 20,
+			monitorbounds.left() + tempwidth + wnd_extra_width(),
+			monitorbounds.top() + tempheight + wnd_extra_height(),
 			SWP_NOZORDER);
 
 	// maximum or minimize as appropriate
@@ -1346,7 +1353,13 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 		{
 			RECT *rect = (RECT *)lparam;
 			if (video_config.keepaspect && !(GetAsyncKeyState(VK_CONTROL) & 0x8000))
-				window->constrain_to_aspect_ratio(rect, wparam);
+			{
+				osd_rect r = window->constrain_to_aspect_ratio(RECT_to_osd_rect(*rect), wparam);
+				rect->top = r.top();
+				rect->left = r.left();
+				rect->bottom = r.bottom();
+				rect->right = r.right();
+			}
 			InvalidateRect(wnd, NULL, FALSE);
 			break;
 		}
@@ -1500,9 +1513,9 @@ void win_window_info::draw_video_contents(HDC dc, int update)
 //  (window thread)
 //============================================================
 
-void win_window_info::constrain_to_aspect_ratio(RECT *rect, int adjustment)
+osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int adjustment)
 {
-	win_monitor_info *monitor = winwindow_video_window_monitor(rect);
+	win_monitor_info *monitor = winwindow_video_window_monitor(&rect);
 	INT32 extrawidth = wnd_extra_width();
 	INT32 extraheight = wnd_extra_height();
 	INT32 propwidth, propheight;
@@ -1518,8 +1531,8 @@ void win_window_info::constrain_to_aspect_ratio(RECT *rect, int adjustment)
 	pixel_aspect = monitor->aspect();
 
 	// determine the proposed width/height
-	propwidth = rect_width(rect) - extrawidth;
-	propheight = rect_height(rect) - extraheight;
+	propwidth = rect.width() - extrawidth;
+	propheight = rect.height() - extraheight;
 
 	// based on which edge we are adjusting, take either the width, height, or both as gospel
 	// and scale to fit using that as our parameter
@@ -1554,13 +1567,13 @@ void win_window_info::constrain_to_aspect_ratio(RECT *rect, int adjustment)
 	// clamp against the maximum (fit on one screen for full screen mode)
 	if (m_fullscreen)
 	{
-		maxwidth = rect_width(&monitor->position_size()) - extrawidth;
-		maxheight = rect_height(&monitor->position_size()) - extraheight;
+		maxwidth = monitor->position_size().width() - extrawidth;
+		maxheight = monitor->position_size().height() - extraheight;
 	}
 	else
 	{
-		maxwidth = rect_width(&monitor->usuable_position_size()) - extrawidth;
-		maxheight = rect_height(&monitor->usuable_position_size()) - extraheight;
+		maxwidth = monitor->usuable_position_size().width() - extrawidth;
+		maxheight = monitor->usuable_position_size().height() - extraheight;
 
 		// further clamp to the maximum width/height in the window
 		if (m_win_config.width != 0)
@@ -1577,36 +1590,35 @@ void win_window_info::constrain_to_aspect_ratio(RECT *rect, int adjustment)
 	m_target->compute_visible_area(propwidth, propheight, pixel_aspect, m_target->orientation(), viswidth, visheight);
 
 	// compute the adjustments we need to make
-	adjwidth = (viswidth + extrawidth) - rect_width(rect);
-	adjheight = (visheight + extraheight) - rect_height(rect);
+	adjwidth = (viswidth + extrawidth) - rect.width();
+	adjheight = (visheight + extraheight) - rect.height();
 
 	// based on which corner we're adjusting, constrain in different ways
+	osd_rect ret(rect);
+
 	switch (adjustment)
 	{
 		case WMSZ_BOTTOM:
 		case WMSZ_BOTTOMRIGHT:
 		case WMSZ_RIGHT:
-			rect->right += adjwidth;
-			rect->bottom += adjheight;
+			ret = rect.resize(rect.width() + adjwidth, rect.height() + adjheight);
 			break;
 
 		case WMSZ_BOTTOMLEFT:
-			rect->left -= adjwidth;
-			rect->bottom += adjheight;
+			ret = rect.move_by(-adjwidth, 0).resize(rect.width(), rect.height() + adjheight);
 			break;
 
 		case WMSZ_LEFT:
 		case WMSZ_TOPLEFT:
 		case WMSZ_TOP:
-			rect->left -= adjwidth;
-			rect->top -= adjheight;
+			ret = rect.move_by(-adjwidth, -adjheight);
 			break;
 
 		case WMSZ_TOPRIGHT:
-			rect->right += adjwidth;
-			rect->top -= adjheight;
+			ret = rect.move_by(0, -adjheight).resize(rect.width() + adjwidth, rect.height());
 			break;
 	}
+	return ret;
 }
 
 
@@ -1616,7 +1628,7 @@ void win_window_info::constrain_to_aspect_ratio(RECT *rect, int adjustment)
 //  (window thread)
 //============================================================
 
-void win_window_info::get_min_bounds(RECT *bounds, int constrain)
+osd_dim win_window_info::get_min_bounds(int constrain)
 {
 	INT32 minwidth, minheight;
 
@@ -1638,39 +1650,28 @@ void win_window_info::get_min_bounds(RECT *bounds, int constrain)
 	// if we want it constrained, figure out which one is larger
 	if (constrain)
 	{
-		RECT test1, test2;
-
 		// first constrain with no height limit
-		test1.top = test1.left = 0;
-		test1.right = minwidth;
-		test1.bottom = 10000;
-		constrain_to_aspect_ratio(&test1, WMSZ_BOTTOMRIGHT);
+		osd_rect test1(0,0,minwidth,10000);
+		test1 = constrain_to_aspect_ratio(test1, WMSZ_BOTTOMRIGHT);
 
 		// then constrain with no width limit
-		test2.top = test2.left = 0;
-		test2.right = 10000;
-		test2.bottom = minheight;
-		constrain_to_aspect_ratio(&test2, WMSZ_BOTTOMRIGHT);
+		osd_rect test2(0,0,10000,minheight);
+		test2 = constrain_to_aspect_ratio(test2, WMSZ_BOTTOMRIGHT);
 
 		// pick the larger
-		if (rect_width(&test1) > rect_width(&test2))
+		if (test1.width() > test2.width())
 		{
-			minwidth = rect_width(&test1);
-			minheight = rect_height(&test1);
+			minwidth = test1.width();
+			minheight = test1.height();
 		}
 		else
 		{
-			minwidth = rect_width(&test2);
-			minheight = rect_height(&test2);
+			minwidth = test2.width();
+			minheight = test2.height();
 		}
 	}
 
-	// get the window rect
-	GetWindowRect(m_hwnd, bounds);
-
-	// now adjust
-	bounds->right = bounds->left + minwidth;
-	bounds->bottom = bounds->top + minheight;
+	return osd_dim(minwidth, minheight);
 }
 
 
@@ -1680,45 +1681,40 @@ void win_window_info::get_min_bounds(RECT *bounds, int constrain)
 //  (window thread)
 //============================================================
 
-void win_window_info::get_max_bounds(RECT *bounds, int constrain)
+osd_dim win_window_info::get_max_bounds(int constrain)
 {
-	RECT maximum;
-
 	assert(GetCurrentThreadId() == window_threadid);
 
 	// compute the maximum client area
 	m_monitor->refresh();
-	maximum = m_monitor->usuable_position_size();
+	osd_rect maximum = m_monitor->usuable_position_size();
 
 	// clamp to the window's max
+	int tempw = maximum.width();
+	int temph = maximum.height();
 	if (m_win_config.width != 0)
 	{
 		int temp = m_win_config.width + wnd_extra_width();
-		if (temp < rect_width(&maximum))
-			maximum.right = maximum.left + temp;
+		if (temp < maximum.width())
+			tempw = temp;
 	}
 	if (m_win_config.height != 0)
 	{
 		int temp = m_win_config.height + wnd_extra_height();
-		if (temp < rect_height(&maximum))
-			maximum.bottom = maximum.top + temp;
+		if (temp < maximum.height())
+			temph = temp;
 	}
+
+	maximum = maximum.resize(tempw, temph);
 
 	// constrain to fit
 	if (constrain)
-		constrain_to_aspect_ratio(&maximum, WMSZ_BOTTOMRIGHT);
+		maximum = constrain_to_aspect_ratio(maximum, WMSZ_BOTTOMRIGHT);
 	else
 	{
-		maximum.right -= wnd_extra_width();
-		maximum.bottom -= wnd_extra_height();
+		maximum = maximum.resize(maximum.width() - wnd_extra_width(), maximum.height() - wnd_extra_height());
 	}
-
-	// center within the work area
-	RECT work = m_monitor->usuable_position_size();
-	bounds->left = work.left + (rect_width(&work) - rect_width(&maximum)) / 2;
-	bounds->top = work.top + (rect_height(&work) - rect_height(&maximum)) / 2;
-	bounds->right = bounds->left + rect_width(&maximum);
-	bounds->bottom = bounds->top + rect_height(&maximum);
+	return maximum.dim();
 }
 
 
@@ -1734,18 +1730,18 @@ void win_window_info::update_minmax_state()
 
 	if (!m_fullscreen)
 	{
-		RECT bounds, minbounds, maxbounds;
+		RECT bounds;
 
 		// compare the maximum bounds versus the current bounds
-		get_min_bounds(&minbounds, video_config.keepaspect);
-		get_max_bounds(&maxbounds, video_config.keepaspect);
+		osd_dim minbounds = get_min_bounds(video_config.keepaspect);
+		osd_dim maxbounds = get_max_bounds(video_config.keepaspect);
 		GetWindowRect(m_hwnd, &bounds);
 
 		// if either the width or height matches, we were maximized
-		m_isminimized = (rect_width(&bounds) == rect_width(&minbounds) ||
-								rect_height(&bounds) == rect_height(&minbounds));
-		m_ismaximized = (rect_width(&bounds) == rect_width(&maxbounds) ||
-								rect_height(&bounds) == rect_height(&maxbounds));
+		m_isminimized = (rect_width(&bounds) == minbounds.width()) ||
+								(rect_height(&bounds) == minbounds.height());
+		m_ismaximized = (rect_width(&bounds) == maxbounds.width()) ||
+								(rect_height(&bounds) == maxbounds.height());
 	}
 	else
 	{
@@ -1763,12 +1759,18 @@ void win_window_info::update_minmax_state()
 
 void win_window_info::minimize_window()
 {
-	RECT newsize;
-
 	assert(GetCurrentThreadId() == window_threadid);
 
-	get_min_bounds(&newsize, video_config.keepaspect);
-	SetWindowPos(m_hwnd, NULL, newsize.left, newsize.top, rect_width(&newsize), rect_height(&newsize), SWP_NOZORDER);
+	osd_dim newsize = get_min_bounds(video_config.keepaspect);
+
+	// get the window rect
+	RECT bounds;
+	GetWindowRect(m_hwnd, &bounds);
+
+	osd_rect newrect(bounds.left, bounds.top, newsize );
+
+
+	SetWindowPos(m_hwnd, NULL, newrect.left(), newrect.top(), newrect.width(), newrect.height(), SWP_NOZORDER);
 }
 
 
@@ -1780,12 +1782,17 @@ void win_window_info::minimize_window()
 
 void win_window_info::maximize_window()
 {
-	RECT newsize;
-
 	assert(GetCurrentThreadId() == window_threadid);
 
-	get_max_bounds(&newsize, video_config.keepaspect);
-	SetWindowPos(m_hwnd, NULL, newsize.left, newsize.top, rect_width(&newsize), rect_height(&newsize), SWP_NOZORDER);
+	osd_dim newsize = get_max_bounds(video_config.keepaspect);
+
+	// center within the work area
+	osd_rect work = m_monitor->usuable_position_size();
+	osd_rect newrect = osd_rect(work.left() + (work.width() - newsize.width()) / 2,
+			work.top() + (work.height() - newsize.height()) / 2,
+			newsize);
+
+	SetWindowPos(m_hwnd, NULL, newrect.left(), newrect.top(), newrect.width(), newrect.height(), SWP_NOZORDER);
 }
 
 
@@ -1797,20 +1804,20 @@ void win_window_info::maximize_window()
 
 void win_window_info::adjust_window_position_after_major_change()
 {
-	RECT oldrect, newrect;
+	RECT oldrect;
 
 	assert(GetCurrentThreadId() == window_threadid);
 
 	// get the current size
 	GetWindowRect(m_hwnd, &oldrect);
+	osd_rect newrect = RECT_to_osd_rect(oldrect);
 
 	// adjust the window size so the client area is what we want
 	if (!m_fullscreen)
 	{
 		// constrain the existing size to the aspect ratio
-		newrect = oldrect;
 		if (video_config.keepaspect)
-			constrain_to_aspect_ratio(&newrect, WMSZ_BOTTOMRIGHT);
+			newrect = constrain_to_aspect_ratio(newrect, WMSZ_BOTTOMRIGHT);
 	}
 
 	// in full screen, make sure it covers the primary display
@@ -1821,17 +1828,17 @@ void win_window_info::adjust_window_position_after_major_change()
 	}
 
 	// adjust the position if different
-	if (oldrect.left != newrect.left || oldrect.top != newrect.top ||
-		oldrect.right != newrect.right || oldrect.bottom != newrect.bottom)
+	if (oldrect.left != newrect.left() || oldrect.top != newrect.top() ||
+		oldrect.right != newrect.right() || oldrect.bottom != newrect.bottom())
 		SetWindowPos(m_hwnd, m_fullscreen ? HWND_TOPMOST : HWND_TOP,
-				newrect.left, newrect.top,
-				rect_width(&newrect), rect_height(&newrect), 0);
+				newrect.left(), newrect.top(),
+				newrect.width(), newrect.height(), 0);
 
 	// take note of physical window size (used for lightgun coordinate calculation)
 	if (this == win_window_list)
 	{
-		win_physical_width = rect_width(&newrect);
-		win_physical_height = rect_height(&newrect);
+		win_physical_width = newrect.width();
+		win_physical_height = newrect.height();
 		logerror("Physical width %d, height %d\n",win_physical_width,win_physical_height);
 	}
 }
