@@ -68,26 +68,26 @@ above expectations. TI continued to manufacture many products for this line.
     - notes: this one has a dedicated voice actor
 
     Speak & Spell (France) "La Dictee Magique", 1980
-    - MCU: CD2702*
+    - MCU: CD2702**
     - TMS51xx: 16KB CD2352
 
     Speak & Spell (Germany) "Buddy", 1980
-    - MCU: CD2702* (same as French 1980 version)
+    - MCU: CD2702** (same as French 1980 version)
     - TMS51xx(1/2): 16KB CD2345*
     - TMS51xx(2/2): 16KB CD2346*
 
     Speak & Spell (Italy) "Grillo Parlante", 1982
-    - MCU: CD2702* (same as French 1980 version)
-    - TMS51xx: 16KB? CD62190*
+    - MCU: CD2702** (same as French 1980 version)
+    - TMS51xx: 16KB? CD62190**
 
     Speak & Spell Compact (US), 1981
-    - MCU: CD8011*
+    - MCU: CD8011**
     - TMS51xx: 16KB CD2354
     - TMS51xx: 16KB CD2354A (rev.A)
     - notes: no display, MCU is TMS1100 instead of TMS0270
 
     Speak & Spell Compact (UK) "Speak & Write", 1981
-    - MCU: CD8011* (same as US 1981 version)
+    - MCU: CD8011** (same as US 1981 version)
     - TMS51xx: 16KB CD62174 (rev.A)
     - notes: anecdotes from the developer, the same person working on the original UK version:
           "We included a pencil and writing pad - it was now about 'writing'.",
@@ -169,7 +169,7 @@ Speak & Read modules:
 Touch & Tell:
 
     Touch & Tell (US), 1981
-    - MCU: CD8012*
+    - MCU: CD8012**
     - TMS51xx: 4KB CD2610
     - notes: MCU is TMS1100 instead of TMS0270. CD8010 is seen in some devices
       too, maybe an earlier version?
@@ -242,7 +242,7 @@ Language Tutor modules:
 Other devices:
 
     Vocaid (US), 1982
-    - MCU: CD8012*
+    - MCU: CD8012**
     - CD2802: 16KB CD2357
     - notes: MCU is the same as in Touch & Tell, but instead of a toddler's toy,
       you get a serious medical aid device for the voice-impaired.

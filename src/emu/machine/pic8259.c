@@ -44,20 +44,14 @@ void pic8259_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			{
 				logerror("pic8259_timerproc() %s: PIC triggering IRQ #%d\n", tag(), irq);
 			}
-			if (!BIT(m_ocw3, 2))
-			{
-				m_out_int_func(1);
-			}
+			m_out_int_func(1);
 			return;
 		}
 		// if sfnm and in-service don't continue
 		if((m_isr & mask) && m_master && m_cascade && m_nested && (m_slave & mask))
 			break;
 	}
-	if (!BIT(m_ocw3, 2))
-	{
-		m_out_int_func(0);
-	}
+	m_out_int_func(0);
 }
 
 

@@ -273,7 +273,8 @@ void wd_fdc_t::seek_continue()
 			}
 
 			if(main_state == SEEK && track == data) {
-				sub_state = SEEK_DONE;
+				sub_state = SEEK_WAIT_STABILIZATION_TIME;
+				delay_cycles(t_gen, 30000);
 			}
 
 			if(sub_state == SPINUP_DONE) {
