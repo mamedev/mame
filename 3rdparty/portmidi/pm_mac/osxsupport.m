@@ -20,12 +20,17 @@ static char *StringToChar(NSString *str)
 char *FindPrefsDir(void)
 {
 	char *resstr = NULL;
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
 	NSArray *paths = NSSearchPathForDirectoriesInDomains(NSPreferencePanesDirectory, NSUserDomainMask, YES);
 
 	if ([paths count] > 0)
 	{
 		resstr = StringToChar([paths objectAtIndex:0]) ;
 	}
+
+	[pool release];
+	
 	return resstr;
 }
 #endif
