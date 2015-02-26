@@ -19,7 +19,7 @@
   Palette color
 ***************************************************************************/
 
-void psychic5_state::psychic5_change_palette(int offset, UINT8* palram, int palbase)
+void psychic5_state::change_palette(int offset, UINT8* palram, int palbase)
 {
 	UINT8 lo = palram[(offset) & ~1];
 	UINT8 hi = palram[(offset) | 1];
@@ -30,7 +30,7 @@ void psychic5_state::psychic5_change_palette(int offset, UINT8* palram, int palb
 	m_palette->set_pen_color(palbase + color, pal4bit(lo >> 4), pal4bit(lo), pal4bit(hi >> 4));
 }
 
-void psychic5_state::psychic5_change_bg_palette(int color, int lo_offs, int hi_offs)
+void psychic5_state::change_bg_palette(int color, int lo_offs, int hi_offs)
 {
 	UINT8 r,g,b,lo,hi,ir,ig,ib,ix;
 	rgb_t irgb;
@@ -77,7 +77,7 @@ void psychic5_state::set_background_palette_intensity()
 
 	/* for all of the background palette */
 	for (i = 0; i < 0x100; i++)
-		psychic5_change_bg_palette(i+0x100,i*2,i*2+1);
+		change_bg_palette(i+0x100,i*2,i*2+1);
 }
 
 
@@ -85,12 +85,12 @@ void psychic5_state::set_background_palette_intensity()
   Memory handler
 ***************************************************************************/
 
-READ8_MEMBER(psychic5_state::psychic5_vram_page_select_r)
+READ8_MEMBER(psychic5_state::vram_page_select_r)
 {
 	return m_ps5_vram_page;
 }
 
-WRITE8_MEMBER(psychic5_state::psychic5_vram_page_select_w)
+WRITE8_MEMBER(psychic5_state::vram_page_select_w)
 {
 	m_ps5_vram_page = data & 1;
 	m_vrambank->set_bank(data);
@@ -106,19 +106,19 @@ WRITE8_MEMBER(psychic5_state::psychic5_title_screen_w)
 WRITE8_MEMBER(psychic5_state::sprite_col_w)
 {
 	m_ps5_palette_ram_sp[offset] = data;
-	psychic5_change_palette(offset,m_ps5_palette_ram_sp, 0x000);
+	change_palette(offset,m_ps5_palette_ram_sp, 0x000);
 }
 
 WRITE8_MEMBER(psychic5_state::bg_col_w)
 {
 	m_ps5_palette_ram_bg[offset] = data;
-	psychic5_change_palette(offset,m_ps5_palette_ram_bg, 0x100);
+	change_palette(offset,m_ps5_palette_ram_bg, 0x100);
 }
 
 WRITE8_MEMBER(psychic5_state::tx_col_w)
 {
 	m_ps5_palette_ram_tx[offset] = data;
-	psychic5_change_palette(offset,m_ps5_palette_ram_tx, 0x200);
+	change_palette(offset,m_ps5_palette_ram_tx, 0x200);
 }
 
 
@@ -173,21 +173,40 @@ TILE_GET_INFO_MEMBER(psychic5_state::get_fg_tile_info)
   Initialize and destroy video hardware emulation
 ***************************************************************************/
 
+void psychic5_state::video_start()
+{
+	save_item(NAME(m_ps5_vram_page));
+	save_item(NAME(m_bg_clip_mode));
+	save_item(NAME(m_palette_intensity));
+	save_item(NAME(m_sx1));
+	save_item(NAME(m_sy1));
+	save_item(NAME(m_sy2));
+}
+
+
 VIDEO_START_MEMBER(psychic5_state,psychic5)
 {
+	video_start();
+	
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(psychic5_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(psychic5_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,  8,  8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(15);
 	jal_blend_init(machine(), 1);
+	
+	save_item(NAME(m_title_screen));
 
 }
 
 VIDEO_START_MEMBER(psychic5_state,bombsa)
 {
+	video_start();
+	
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(psychic5_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 128, 32);
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(psychic5_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,  8,  8,  32, 32);
 	m_fg_tilemap->set_transparent_pen(15);
 	jal_blend_init(machine(), 0);
+	
+	save_item(NAME(m_bombsa_unknown));
 }
 
 VIDEO_RESET_MEMBER(psychic5_state,psychic5)
@@ -208,19 +227,16 @@ VIDEO_RESET_MEMBER(psychic5_state,psychic5)
 
 void psychic5_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
-	int offs;
-
 	/* Draw the sprites */
-	for (offs = 0; offs < m_spriteram.bytes(); offs += 16)
+	for (int offs = 0; offs < m_spriteram.bytes(); offs += 16)
 	{
-		int attr  = spriteram[offs + 13];
-		int code  = spriteram[offs + 14] | ((attr & 0xc0) << 2);
-		int color = spriteram[offs + 15] & 0x0f;
+		int attr  = m_spriteram[offs + 13];
+		int code  = m_spriteram[offs + 14] | ((attr & 0xc0) << 2);
+		int color = m_spriteram[offs + 15] & 0x0f;
 		int flipx = attr & 0x10;
 		int flipy = attr & 0x20;
-		int sx = spriteram[offs + 12];
-		int sy = spriteram[offs + 11];
+		int sx = m_spriteram[offs + 12];
+		int sy = m_spriteram[offs + 11];
 		int size = (attr & 0x08) ? 32:16;
 
 		if (attr & 0x01) sx -= 256;
@@ -261,8 +277,6 @@ void psychic5_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 
 void psychic5_state::draw_background(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
-
 	rectangle clip = cliprect;
 
 	set_background_palette_intensity();
@@ -278,9 +292,9 @@ void psychic5_state::draw_background(screen_device &screen, bitmap_rgb32 &bitmap
 		int sx1_old = m_sx1;
 		int sy2_old = m_sy2;
 
-		m_sy1 = spriteram[11];       /* sprite 0 */
-		m_sx1 = spriteram[12];
-		m_sy2 = spriteram[11+128];   /* sprite 8 */
+		m_sy1 = m_spriteram[11];       /* sprite 0 */
+		m_sx1 = m_spriteram[12];
+		m_sy2 = m_spriteram[11+128];   /* sprite 8 */
 
 		switch (m_bg_clip_mode)
 		{
