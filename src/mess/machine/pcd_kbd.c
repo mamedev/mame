@@ -219,7 +219,6 @@ ioport_constructor pcd_keyboard_device::device_input_ports() const
 pcd_keyboard_device::pcd_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PCD_KEYBOARD, "PC-D Keyboard", tag, owner, clock, "pcd_kbd", __FILE__),
 		m_rows(*this, "ROW"),
-		m_data(0),
 		m_p1(0),
 		m_out_tx_handler(*this)
 {

@@ -28,7 +28,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( t0_w );
 private:
 	required_ioport_array<17> m_rows;
-	UINT8 m_data, m_p1;
+	UINT8 m_p1;
 	bool m_t0;
 	devcb_write_line m_out_tx_handler;
 };
