@@ -64,6 +64,9 @@ static void get_resolution(const char *defdata, const char *data, osd_window_con
 //  video_init
 //============================================================
 
+// FIXME: Temporary workaround
+static osd_window_config   windows[MAX_WINDOWS];        // configuration data per-window
+
 bool windows_osd_interface::video_init()
 {
 	int index;
@@ -80,7 +83,7 @@ bool windows_osd_interface::video_init()
 	// create the windows
 	windows_options &options = downcast<windows_options &>(machine().options());
 	for (index = 0; index < video_config.numscreens; index++)
-		winwindow_video_window_create(machine(), index, pick_monitor(options, index), &video_config.window[index]);
+		winwindow_video_window_create(machine(), index, pick_monitor(options, index), &windows[index]);
 	if (video_config.mode != VIDEO_MODE_NONE)
 		SetForegroundWindow(win_window_list->m_hwnd);
 
@@ -371,10 +374,10 @@ void windows_osd_interface::extract_video_config()
 
 	// per-window options: extract the data
 	const char *default_resolution = options().resolution();
-	get_resolution(default_resolution, options().resolution(0), &video_config.window[0], TRUE);
-	get_resolution(default_resolution, options().resolution(1), &video_config.window[1], TRUE);
-	get_resolution(default_resolution, options().resolution(2), &video_config.window[2], TRUE);
-	get_resolution(default_resolution, options().resolution(3), &video_config.window[3], TRUE);
+	get_resolution(default_resolution, options().resolution(0), &windows[0], TRUE);
+	get_resolution(default_resolution, options().resolution(1), &windows[1], TRUE);
+	get_resolution(default_resolution, options().resolution(2), &windows[2], TRUE);
+	get_resolution(default_resolution, options().resolution(3), &windows[3], TRUE);
 
 	// video options: extract the data
 	stemp = options().video();

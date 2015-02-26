@@ -402,8 +402,14 @@ OSDOBJS = \
 	$(OSDOBJ)/modules/netdev/none.o \
 
 ifdef USE_OPENGL
-OSDOBJS +=  $(WINOBJ)/../sdl/drawogl.o $(WINOBJ)/../sdl/gl_shader_tool.o $(WINOBJ)/../sdl/gl_shader_mgr.o
-OBJDIRS += $(WINOBJ)/../sdl
+OSDOBJS += \
+	$(WINOBJ)/../sdl/drawogl.o \
+	$(OSDOBJ)/modules/opengl/gl_shader_tool.o \
+	$(OSDOBJ)/modules/opengl/gl_shader_mgr.o
+	
+OBJDIRS += \
+	$(OSDOBJ)/modules/opengl \
+	$(WINOBJ)/../sdl
 
 DEFS += -DUSE_OPENGL=1
 

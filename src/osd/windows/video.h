@@ -10,7 +10,7 @@
 #define __WIN_VIDEO__
 
 #include "render.h"
-
+//#include "modules/osdwindow.h"
 
 //============================================================
 //  CONSTANTS
@@ -67,19 +67,6 @@ private:
 	char *              m_name;
 };
 
-
-struct osd_window_config
-{
-	osd_window_config() : aspect(0.0f), width(0), height(0), depth(0), refresh(0) {}
-
-	float               aspect;                     // decoded aspect ratio FIXME: not used on windows
-	int                 width;                      // decoded width
-	int                 height;                     // decoded height
-	int                 depth;                      // decoded depth - only SDL
-	int                 refresh;                    // decoded refresh
-};
-
-
 struct win_video_config
 {
 	// global configuration
@@ -90,7 +77,7 @@ struct win_video_config
 	render_layer_config layerconfig;                // default configuration of layers
 
 	// per-window configuration
-	osd_window_config   window[MAX_WINDOWS];        // configuration data per-window
+	//osd_window_config   window[MAX_WINDOWS];        // configuration data per-window
 
 	// hardware options
 	int                 mode;                       // output mode

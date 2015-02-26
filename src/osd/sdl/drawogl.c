@@ -30,7 +30,7 @@
 #endif
 
 // OpenGL headers
-#include "osd_opengl.h"
+#include "modules/opengl/osd_opengl.h"
 
 #ifdef OSD_WINDOWS
 #define SDLMAME_SDL2 1
@@ -43,8 +43,8 @@
 #include "modules/lib/osdobj_common.h"
 
 
-#include "gl_shader_tool.h"
-#include "gl_shader_mgr.h"
+#include "modules/opengl/gl_shader_tool.h"
+#include "modules/opengl/gl_shader_mgr.h"
 
 #if defined(SDLMAME_MACOSX)
 #ifndef APIENTRY
@@ -770,7 +770,7 @@ static void loadgl_functions(osd_gl_context *context)
 	#define OSD_GL_UNUSED(ret,func,params)
 
 	#define GET_GLFUNC 1
-	#include "osd_opengl.h"
+	#include "modules/opengl/osd_opengl.h"
 	#undef GET_GLFUNC
 
 	if (err_count)

@@ -427,6 +427,7 @@ OBJDIRS += $(SDLOBJ) \
 	$(OSDOBJ)/modules/midi \
 	$(OSDOBJ)/modules/font \
 	$(OSDOBJ)/modules/netdev \
+	$(OSDOBJ)/modules/opengl \
 
 #-------------------------------------------------
 # OSD core library
@@ -821,7 +822,11 @@ endif
 ifeq ($(NO_OPENGL),1)
 DEFS += -DUSE_OPENGL=0
 else
-OSDOBJS += $(SDLOBJ)/drawogl.o $(SDLOBJ)/gl_shader_tool.o $(SDLOBJ)/gl_shader_mgr.o
+OSDOBJS += \
+	$(SDLOBJ)/drawogl.o \
+	$(OSDOBJ)/modules/opengl/gl_shader_tool.o \
+	$(OSDOBJ)/modules/opengl/gl_shader_mgr.o
+	
 DEFS += -DUSE_OPENGL=1
 ifeq ($(USE_DISPATCH_GL),1)
 DEFS += -DUSE_DISPATCH_GL=1
