@@ -33,39 +33,17 @@ note: check this, its borrowed from tecmo.c / wc90.c at the moment and could wel
 
 WRITE8_MEMBER(tbowl_state::tbowlb_bankswitch_w)
 {
-	int bankaddress;
-	UINT8 *RAM = memregion("maincpu")->base();
-
-
-	bankaddress = 0x10000 + ((data & 0xf8) << 8);
-	membank("bank1")->set_base(&RAM[bankaddress]);
+	membank("mainbank")->set_entry(data >> 3);
 }
 
 WRITE8_MEMBER(tbowl_state::tbowlc_bankswitch_w)
 {
-	int bankaddress;
-	UINT8 *RAM = memregion("sub")->base();
-
-
-	bankaddress = 0x10000 + ((data & 0xf8) << 8);
-
-
-	membank("bank2")->set_base(&RAM[bankaddress]);
+	membank("subbank")->set_entry(data >> 3);
 }
 
 /*** Shared Ram Handlers
 
 ***/
-
-READ8_MEMBER(tbowl_state::shared_r)
-{
-	return m_shared_ram[offset];
-}
-
-WRITE8_MEMBER(tbowl_state::shared_w)
-{
-	m_shared_ram[offset] = data;
-}
 
 WRITE8_MEMBER(tbowl_state::tbowl_sound_command_w)
 {
@@ -92,8 +70,8 @@ static ADDRESS_MAP_START( 6206B_map, AS_PROGRAM, 8, tbowl_state )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(tbowl_bgvideoram_w) AM_SHARE("bgvideoram")
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(tbowl_txvideoram_w) AM_SHARE("txvideoram")
 //  AM_RANGE(0xf000, 0xf000) AM_WRITE(unknown_write) * written during start-up, not again */
-	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(shared_r, shared_w) AM_SHARE("shared_ram") /* check */
+	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("mainbank")
+	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("shared_ram") /* check */
 	AM_RANGE(0xfc00, 0xfc00) AM_READ_PORT("P1") AM_WRITE(tbowlb_bankswitch_w)
 	AM_RANGE(0xfc01, 0xfc01) AM_READ_PORT("P2")
 //  AM_RANGE(0xfc01, 0xfc01) AM_WRITE(unknown_write) /* written during start-up, not again */
@@ -132,8 +110,8 @@ static ADDRESS_MAP_START( 6206C_map, AS_PROGRAM, 8, tbowl_state )
 	AM_RANGE(0xc000, 0xd7ff) AM_WRITEONLY
 	AM_RANGE(0xd800, 0xdfff) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0xe000, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // 2x palettes, one for each monitor?
-	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank2")
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(shared_r, shared_w)
+	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("subbank")
+	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(tbowlc_bankswitch_w)
 	AM_RANGE(0xfc01, 0xfc01) AM_WRITENOP /* ? */
 	AM_RANGE(0xfc02, 0xfc02) AM_WRITE(tbowl_trigger_nmi) /* ? */
@@ -435,6 +413,12 @@ Sound Hardware should be 2 YM3812's + 2 MSM5205's
 The game is displayed on 2 monitors
 
 ***/
+
+void tbowl_state::machine_start()
+{
+	membank("mainbank")->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x800);
+	membank("subbank")->configure_entries(0, 32, memregion("sub")->base() + 0x10000, 0x800);
+}
 
 void tbowl_state::machine_reset()
 {

@@ -62,7 +62,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bgvideoram_w);
 	DECLARE_WRITE8_MEMBER(fgvideoram_w);
 	DECLARE_WRITE8_MEMBER(txvideoram_w);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -70,6 +69,7 @@ public:
 	TILE_GET_INFO_MEMBER(track_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(track_get_fg_tile_info);
 
+	virtual void machine_start();
 	virtual void video_start();
 	DECLARE_VIDEO_START(wc90t);
 

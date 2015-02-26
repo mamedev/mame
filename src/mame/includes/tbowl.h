@@ -6,7 +6,6 @@ class tbowl_state : public driver_device
 public:
 	tbowl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_shared_ram(*this, "shared_ram"),
 		m_txvideoram(*this, "txvideoram"),
 		m_bgvideoram(*this, "bgvideoram"),
 		m_bg2videoram(*this, "bg2videoram"),
@@ -23,7 +22,6 @@ public:
 	int m_adpcm_pos[2];
 	int m_adpcm_end[2];
 	int m_adpcm_data[2];
-	required_shared_ptr<UINT8> m_shared_ram;
 	required_shared_ptr<UINT8> m_txvideoram;
 	required_shared_ptr<UINT8> m_bgvideoram;
 	required_shared_ptr<UINT8> m_bg2videoram;
@@ -38,8 +36,6 @@ public:
 	DECLARE_WRITE8_MEMBER(tbowl_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(tbowlb_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(tbowlc_bankswitch_w);
-	DECLARE_READ8_MEMBER(shared_r);
-	DECLARE_WRITE8_MEMBER(shared_w);
 	DECLARE_WRITE8_MEMBER(tbowl_sound_command_w);
 	DECLARE_WRITE8_MEMBER(tbowl_trigger_nmi);
 	DECLARE_WRITE8_MEMBER(tbowl_adpcm_start_w);
@@ -59,6 +55,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_tbowl_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

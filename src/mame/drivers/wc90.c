@@ -81,22 +81,12 @@ voice.ic82     CRC32 abc61f3d   SHA1 c6f123d16a26c4d77c635617dd97bb4b906c463a
 
 WRITE8_MEMBER(wc90_state::bankswitch_w)
 {
-	int bankaddress;
-	UINT8 *RAM = memregion("maincpu")->base();
-
-
-	bankaddress = 0x10000 + ( ( data & 0xf8 ) << 8 );
-	membank("bank1")->set_base(&RAM[bankaddress] );
+	membank("mainbank")->set_entry(data >> 3);
 }
 
 WRITE8_MEMBER(wc90_state::bankswitch1_w)
 {
-	int bankaddress;
-	UINT8 *RAM = memregion("sub")->base();
-
-
-	bankaddress = 0x10000 + ( ( data & 0xf8 ) << 8 );
-	membank("bank2")->set_base(&RAM[bankaddress] );
+	membank("subbank")->set_entry(data >> 3);
 }
 
 WRITE8_MEMBER(wc90_state::sound_command_w)
@@ -115,7 +105,7 @@ static ADDRESS_MAP_START( wc90_map_1, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram") /* tx video ram */
-	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
+	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("mainbank")
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xfc00, 0xfc00) AM_READ_PORT("P1")
 	AM_RANGE(0xfc02, 0xfc02) AM_READ_PORT("P2")
@@ -145,7 +135,7 @@ static ADDRESS_MAP_START( wc90_map_2, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank2")
+	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("subbank")
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(bankswitch1_w)
 	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(watchdog_reset_w)
@@ -288,12 +278,12 @@ static GFXDECODE_START( wc90 )
 GFXDECODE_END
 
 
-
-/* handler called by the 2608 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(wc90_state::irqhandler)
+void wc90_state::machine_start()
 {
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+	membank("mainbank")->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x800);
+	membank("subbank")->configure_entries(0, 32, memregion("sub")->base() + 0x10000, 0x800);
 }
+
 
 static MACHINE_CONFIG_START( wc90, wc90_state )
 
@@ -330,7 +320,7 @@ static MACHINE_CONFIG_START( wc90, wc90_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2608, XTAL_8MHz)  /* verified on pcb */
-	MCFG_YM2608_IRQ_HANDLER(WRITELINE(wc90_state, irqhandler))
+	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)

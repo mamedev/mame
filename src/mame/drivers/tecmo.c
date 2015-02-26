@@ -56,12 +56,7 @@ f80b      ????
 
 WRITE8_MEMBER(tecmo_state::bankswitch_w)
 {
-	int bankaddress;
-	UINT8 *RAM = memregion("maincpu")->base();
-
-
-	bankaddress = 0x10000 + ((data & 0xf8) << 8);
-	membank("bank1")->set_base(&RAM[bankaddress]);
+	membank("bank1")->set_entry(data >> 3);
 }
 
 WRITE8_MEMBER(tecmo_state::sound_command_w)
@@ -601,6 +596,8 @@ GFXDECODE_END
 
 void tecmo_state::machine_start()
 {
+	membank("bank1")->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x800);
+
 	save_item(NAME(m_adpcm_pos));
 	save_item(NAME(m_adpcm_end));
 	save_item(NAME(m_adpcm_data));
@@ -769,7 +766,7 @@ Notes:
 */
 
 ROM_START( rygar )
-	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "5.5p",         0x00000, 0x08000, CRC(062cd55d) SHA1(656e29c890f5de964920b7841b3e11469cd20051) ) /* code */
 	ROM_LOAD( "cpu_5m.bin",   0x08000, 0x04000, CRC(7ac5191b) SHA1(305f39d974f906f9bc24e9fe2ca58e647925ab63) ) /* code */
 	ROM_LOAD( "cpu_5j.bin",   0x10000, 0x08000, CRC(ed76d606) SHA1(39c8a07e9a1f218ad088d00a2c9dfc993efafb6b) ) /* banked at f000-f7ff */
@@ -803,7 +800,7 @@ ROM_START( rygar )
 ROM_END
 
 ROM_START( rygar2 )
-	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "5p.bin",       0x00000, 0x08000, CRC(151ffc0b) SHA1(0eb877f2c68d3d1f52d7b12d0a8ad08c9932c054) ) /* code */
 	ROM_LOAD( "cpu_5m.bin",   0x08000, 0x04000, CRC(7ac5191b) SHA1(305f39d974f906f9bc24e9fe2ca58e647925ab63) ) /* code */
 	ROM_LOAD( "cpu_5j.bin",   0x10000, 0x08000, CRC(ed76d606) SHA1(39c8a07e9a1f218ad088d00a2c9dfc993efafb6b) ) /* banked at f000-f7ff */
@@ -838,7 +835,7 @@ ROM_END
 
 /* There is a known bootleg board which uses U locations but without Tecmo etchings which is a match for rygar3 */
 ROM_START( rygar3 )
-	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "cpu_5p.bin",   0x00000, 0x08000, CRC(e79c054a) SHA1(1aaffa53d121d5c55899bf18e85c42333fe0df54) ) /* code */
 	ROM_LOAD( "cpu_5m.bin",   0x08000, 0x04000, CRC(7ac5191b) SHA1(305f39d974f906f9bc24e9fe2ca58e647925ab63) ) /* code */
 	ROM_LOAD( "cpu_5j.bin",   0x10000, 0x08000, CRC(ed76d606) SHA1(39c8a07e9a1f218ad088d00a2c9dfc993efafb6b) ) /* banked at f000-f7ff */
@@ -872,7 +869,7 @@ ROM_START( rygar3 )
 ROM_END
 
 ROM_START( rygarj )
-	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 
 	ROM_LOAD( "cpuj_5p.bin",  0x00000, 0x08000, CRC(b39698ba) SHA1(01a5a12a71973ad117b0bbd763e470f89c439e45) ) /* code */
 	ROM_LOAD( "cpuj_5m.bin",  0x08000, 0x04000, CRC(3f180979) SHA1(c4c2e9f83b06b8677978800bfcc39f4ba3b344ab) ) /* code */
