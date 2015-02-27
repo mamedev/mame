@@ -35,12 +35,12 @@
 #include "png.h"
 
 // MAMEOS headers
-#include "d3dintf.h"
+#include "modules/render/d3d/d3dintf.h"
 #include "winmain.h"
 #include "window.h"
 #include "config.h"
 #include "strconv.h"
-#include "d3dcomm.h"
+#include "modules/render/d3d/d3dcomm.h"
 #include "drawd3d.h"
 
 

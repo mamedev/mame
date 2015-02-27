@@ -10,7 +10,7 @@
 #define __WIN_DRAWD3D__
 
 
-#include "d3dhlsl.h"
+#include "modules/render/d3d/d3dhlsl.h"
 
 
 //============================================================

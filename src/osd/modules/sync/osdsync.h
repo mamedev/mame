@@ -10,6 +10,9 @@
 #ifndef __OSDSYNC__
 #define __OSDSYNC__
 
+#include "osdcomm.h"
+#include "osdcore.h"
+
 /***************************************************************************
     SYNCHRONIZATION INTERFACES - Events
 ***************************************************************************/
