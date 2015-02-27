@@ -2,7 +2,6 @@
 
 from __future__ import with_statement
 
-import os
 import re
 import sys
 
@@ -85,13 +84,13 @@ else:
 
 if build == "mess":
     # MESS
-    author = "MESS Team";
-    comments = "Multi Emulation Super System";
-    company_name = "MESS Team";
-    file_description = "Multi Emulation Super System";
-    internal_name = "MESS";
-    original_filename = "MESS";
-    product_name = "MESS";
+    author = "MESS Team"
+    comments = "Multi Emulation Super System"
+    company_name = "MESS Team"
+    file_description = "Multi Emulation Super System"
+    internal_name = "MESS"
+    original_filename = "MESS"
+    product_name = "MESS"
     bundle_identifier = "org.mamedev.mess"
 elif build == "ume":
     # UME

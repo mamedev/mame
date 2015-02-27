@@ -233,6 +233,7 @@ enum
 
 	XTAL_384kHz         = 384000,       /* Commonly used for driving OKI MSM5205 */
 	XTAL_400kHz         = 400000,       /* OKI MSM5205 on Great Swordman h/w */
+	XTAL_430kHz         = 430000,
 	XTAL_455kHz         = 455000,       /* OKI MSM5205 on Gladiator h/w */
 	XTAL_512kHz         = 512000,       /* Toshiba TC8830F */
 	XTAL_640kHz         = 640000,       /* NEC UPD7759, Texas Instruments Speech Chips @ 8khz */

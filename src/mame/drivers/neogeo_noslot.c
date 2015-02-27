@@ -679,6 +679,7 @@ ROM_END
  NEO-MVS PROG42G / NEO-MVS CHA42G
  . NGH-007
  NEO-AEG PROG42G / NEO-AEG CHA42G
+ NEO-AEG PROG42G / NEO-AEG CHA-8M
 ****************************************/
 
 ROM_START( alpham2 ) /* MVS AND AES VERSION */
@@ -734,7 +735,7 @@ ROM_END
 
 /****************************************
  ID-0008
- Sunshine (prototype) 1990 SNK
+ Sun Shine (prototype) 1990 SNK / Alpha
 ****************************************/
 
 /****************************************
@@ -770,7 +771,7 @@ ROM_START( ncombat ) /* MVS VERSION */
 	ROM_LOAD16_BYTE( "009-c6.c6", 0x200001, 0x80000, CRC(2eca8b19) SHA1(16764ef10e404325ba0a1a2ad3a4c0af287be21f) ) /* Plane 2,3 */ /* TC534200 */
 ROM_END
 
-ROM_START( ncombath ) /* AES VERSION */
+ROM_START( ncombath ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "009-pg1.p1", 0x000000, 0x080000, CRC(8e9f0add) SHA1(d0b908a86a58f2537eea73a431038f1cd74a5a2f) ) /* TC534200 */
 
@@ -800,6 +801,7 @@ ROM_END
  . NGM-010
  NEO-MVS PROG-EP / NEO-MVS CHA-32
  . NGH-010
+ NEO-AEG PROG-B / NEO-AEG CHA-32
 ****************************************/
 
 ROM_START( cyberlip )
@@ -910,6 +912,7 @@ ROM_END
  NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
  . NGH-016
  NEO-AEG PROG42G / NEO-AEG CHA42G
+ NEO-AEG PROG42G-1 / NEO-AEG CHA42G-1
 ****************************************/
 
 ROM_START( kotm ) /* MVS VERSION */
@@ -962,6 +965,7 @@ ROM_END
  NEO-MVS PROG42G / NEO-MVS CHA42G
  . NGH-017
  NEO-AEG PROG42G / NEO-AEG CHA42G
+ NEO-AEG  PRO42G-1 / NEO-AEG CHA42G-1
 ****************************************/
 
 ROM_START( sengoku ) /* MVS AND AES VERSION */
@@ -1233,6 +1237,8 @@ ROM_END
  ID-0023
  . NGM-023
  NEO-MVS PROG42G / NEO-MVS CHA42G
+ NEO-MVS PROGTOP / NEO-MVS CHA-256 
+ Boards used for the Korean release
  . NGH-023
  NEO-AEG PROG42G-1 / NEO-AEG CHA42G-1
 ****************************************/
@@ -1368,7 +1374,7 @@ ROM_END
 
 /****************************************
  ID-0028
- Dunk Star (prototype) Sammy
+ Dunk Star (prototype) 1991 Sammy
 ****************************************/
 
 /****************************************
@@ -1618,6 +1624,7 @@ ROM_END
  ID-0036
  . MOM-002
  NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
+ NEO-MVS PROG42G-COM / NEO-MVS CHA42G-1
  . MOH-002
  NEO-AEG PROG42G / NEO-AEG CHA42G
 ****************************************/
@@ -1775,6 +1782,7 @@ ROM_END
  . NGM-040
  NEO-MVS PROG 4096 / NEO-MVS CHA 42G-2
  . NGH-040
+ NEO-AEG PROG16 / NEO-AEG CHA42G-1
 ****************************************/
 
 ROM_START( sengoku2 )
@@ -1805,6 +1813,7 @@ ROM_END
  . NGM-041
  NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
  . NGH-041
+ NEO-AEG PROG42G-1 / NEO-AEG CHA42G-1
 ****************************************/
 
 ROM_START( bstars2 )
@@ -1862,6 +1871,7 @@ ROM_END
  ID-0043
  . NGM-043
  NEO-MVS PROG 4096 / NEO-MVS CHA 42G-2
+ NEO-MVS PROG-G2 / NEO-MVS CHA 42G-2
  . NGH-043
  NEO-AEG PROG16 / NEO-AEG CHA42G-1
 ****************************************/
@@ -1896,6 +1906,7 @@ ROM_END
  ID-0044
  . NGM-044
  NEO-MVS PROG16 / NEO-MVS CHA42G-1
+ NEO-MVS PROG4096 / NEO-MVS CHA42G-1
  . NGH-044
  NEO-AEG PROG16 / NEO-AEG CHA42G-1
 ****************************************/
@@ -1903,7 +1914,8 @@ ROM_END
 ROM_START( aof ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "044-p1.p1", 0x000000, 0x080000, CRC(ca9f7a6d) SHA1(4d28ef86696f7e832510a66d3e8eb6c93b5b91a1) ) /* TC534200 */
-
+	/* also found sets with ep1 or p1 on eprom. */
+	
 	NEO_SFIX_128K( "044-s1.s1", CRC(89903f39) SHA1(a04a0c244a5d5c7a595fcf649107969635a6a8b6) ) /* TC531000 */
 
 	NEO_BIOS_AUDIO_128K( "044-m1.m1", CRC(0987e4bb) SHA1(8fae4b7fac09d46d4727928e609ed9d3711dbded) ) /* TC531001 */
@@ -1937,7 +1949,8 @@ ROM_START( samsho ) /* MVS VERSION */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "045-p1.p1",   0x000000, 0x100000, CRC(dfe51bf0) SHA1(2243af3770a516ae698b69bcd9daf53632d9128d) ) /* TC538200 */
 	ROM_LOAD16_WORD_SWAP( "045-pg2.sp2", 0x100000, 0x100000, CRC(46745b94) SHA1(d9e959fd1f88c9402915c1d0dcdb4a9e3d49cdcb) ) /* TC538200 */
-
+	/* also found set with ep1 / ep2 on eprom and sp2 on maskrom; same rom data as samshoh is used. */
+	
 	NEO_SFIX_128K( "045-s1.s1", CRC(9142a4d3) SHA1(54088e99fcfd75fd0f94852890a56350066a05a3) ) /* TC531000 */
 
 	NEO_BIOS_AUDIO_128K( "045-m1.m1", CRC(95170640) SHA1(125c502db0693e8d11cef619b090081c14a9a300) ) /* TC531001 */
@@ -2051,6 +2064,7 @@ ROM_END
  NEO-MVS PROG-G2 (SNK-9201) / NEO-MVS CHA42G-1
  . NGH-047
  NEO-AEG PROG-G2 (PRO-CT0) / NEO-AEG CHA42G-2B
+ NEO-AEG PROG-G2 (PRO-CT0) / NEO-AEG CHA42G-2
 ****************************************/
 
 ROM_START( fatfury2 ) /* MVS AND AES VERSION */
@@ -2137,6 +2151,7 @@ ROM_END
  . ALM-004
  NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
  . ALH-004
+ NEO-AEG PROG42G-1 / NEO-AEG CHA42G-1
 ****************************************/
 
 ROM_START( ncommand )
@@ -2164,6 +2179,7 @@ ROM_END
  ID-0051
  . AIM-051
  NEO-MVS PROG-G2 / NEO-MVS CHA42G-1
+ NEO-MVS PROG 4096 / NEO-MVS CHA 42G-2
  . AIH-051
 ****************************************/
 
@@ -2194,6 +2210,7 @@ ROM_END
  . NGM-052
  NEO-MVS PROG-G2 (SNK-9201) / NEO-MVS CHA 42G-2
  . NGH-052
+ NEO-AEG PROG-G2 (SNK-9201) / NEO-AEG CHA42G-2
 ****************************************/
 
 ROM_START( ssideki )
@@ -2222,6 +2239,7 @@ ROM_END
  NEO-MVS PROG16 / NEO-MVS CHA42G-1
  . ALH-005
  NEO-AEG PROG16 / NEO-AEG CHA42G-1
+ NEO-AEG PROG-G2 / NEO-AEG CHA42G-2C
 ****************************************/
 
 ROM_START( wh1 ) /* MVS VERSION */
@@ -2253,7 +2271,7 @@ ROM_START( wh1h ) /* AES VERSION */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "053-p1.p1", 0x000000, 0x080000, CRC(95b574cb) SHA1(b7b7af6a04c3d902e7f8852897741ecaf0b1062c) ) /* TC534200 */
 	ROM_LOAD16_WORD_SWAP( "053-p2.p2", 0x080000, 0x080000, CRC(f198ed45) SHA1(24ccc091e97f63796562bb5b30df51f39bd504ef) ) /* TC534200 */
-
+		
 	NEO_SFIX_128K( "053-s1.s1", CRC(8c2c2d6b) SHA1(87fa79611c6f8886dcc8766814829c669c65b40f) ) /* TC531000 */
 
 	NEO_BIOS_AUDIO_128K( "053-m1.m1", CRC(1bd9d04b) SHA1(65cd7b002123ed1a3111e3d942608d0082799ff3) ) /* TC531001 */
@@ -2307,6 +2325,7 @@ ROM_END
  ID-0055
  . NGM-055
  NEO-MVS PROGTOP / NEO-MVS CHA256
+ NEO-MVS PROGTOP / NEO-MVS CHA256B
  . NGH-055
  NEO-AEG PROGRK / NEO-AEG CHA256
 ****************************************/
@@ -2437,7 +2456,8 @@ ROM_END
 /****************************************
  ID-0058
  . NGM-058
- NEO-MVS PROGGSC / NEO-MVS CHA 42G-3B
+ NEO-MVS PROGGSC / NEO-MVS CHA42G-3B
+ NEO-MVS PROGGSC / NEO-MVS CHA 42G-3
  . NGH-058
  NEO-AEG PROGGS / NEO-AEG CHA42G-4
 ****************************************/
@@ -2499,6 +2519,7 @@ ROM_END
  ID-0059
  . NGM-059
  NEO-MVS PROGTOP / NEO-MVS CHA256
+ NEO-MVS PROG 4096 B / NEO-MVS CHA 42G-3
  . NGH-059
 ****************************************/
 
@@ -2584,6 +2605,8 @@ ROM_END
  ID-0061
  . NGM-061
  NEO-MVS PROGGSC / NEO-MVS CHA256
+ NEO-MVS PROGTOP / NEO-MVS CHA256
+ NEO-MVS PROG 4096 B / NEO-MVS CHA256
  . NGH-061
  NEO-AEG PROGRKB / NEO-AEG CHA256[B]
 ****************************************/
@@ -2591,7 +2614,8 @@ ROM_END
 ROM_START( ssideki2 ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "061-p1.p1", 0x000000, 0x100000, CRC(5969e0dc) SHA1(78abea880c125ec5a85bef6404478512a34b5513) ) /* mask rom TC538200 */
-
+	/* also found MVS sets with ep1 / ep2 on eprom; correct chip label unknown. */
+	
 	NEO_SFIX_128K( "061-s1.s1", CRC(226d1b68) SHA1(de010f6fda3ddadb181fe37daa6105f22e78b970) ) /* mask rom TC531000 */
 
 	NEO_BIOS_AUDIO_128K( "061-m1.m1", CRC(156f6951) SHA1(49686f615f109a02b4f23931f1c84fee13872ffd) ) /* mask rom TC531001 */
@@ -2654,7 +2678,8 @@ ROM_START( samsho2 ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "063-p1.p1", 0x100000, 0x100000, CRC(22368892) SHA1(0997f8284aa0f57a333be8a0fdea777d0d01afd6) ) /* TC5316200 */
 	ROM_CONTINUE( 0x000000, 0x100000 )
-
+	/* also found MVS sets with ep1 / ep2 on eprom and p1 / sp2 on maskrom; correct chip label unknown */
+	
 	NEO_SFIX_128K( "063-s1.s1", CRC(64a5cd66) SHA1(12cdfb27bf9ccd5a8df6ddd4628ef7cf2c6d4964) ) /* TC531000 */
 
 	NEO_BIOS_AUDIO_128K( "063-m1.m1", CRC(56675098) SHA1(90429fc40d056d480d0e2bbefbc691d9fa260fc4) ) /* TC531001 */
@@ -2716,6 +2741,7 @@ ROM_END
  NEO-MVS PROGGSC / NEO-MVS CHA256
  . ADH-007
  NEO-AEG PROGRK / NEO-AEG CHA256
+ NEO-AEG PROGRKB / NEO-AEG CHA256[B]
 ****************************************/
 
 ROM_START( wh2j ) /* MVS AND AES VERSION */
@@ -2734,6 +2760,7 @@ ROM_START( wh2j ) /* MVS AND AES VERSION */
 	NO_DELTAT_REGION
 
 	ROM_REGION( 0x1000000, "sprites", 0 )
+	/* Different layout with 4xC (32 mbit) also exists; chip labels are 064-C13, 064-C24, 064-C57 and 064-c68. */
 	ROM_LOAD16_BYTE( "064-c1.c1", 0x000000, 0x200000, CRC(2ec87cea) SHA1(e713ec7839a7665edee6ee3f82a6e530b3b4bd7c) ) /* Plane 0,1 */ /* TC5316200 */
 	ROM_LOAD16_BYTE( "064-c2.c2", 0x000001, 0x200000, CRC(526b81ab) SHA1(b5f0a2f04489539ed6b9d0810b12787356c64b23) ) /* Plane 2,3 */ /* TC5316200 */
 	ROM_LOAD16_BYTE( "064-c3.c3", 0x400000, 0x200000, CRC(436d1b31) SHA1(059776d77b91377ed0bcfc278802d659c917fc0f) ) /* Plane 0,1 */ /* TC5316200 */
@@ -2749,6 +2776,7 @@ ROM_END
  . DEM-002
  NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
  . DEH-002
+ NEO-AEG PROG42G-1 / NEO-AEG CHA42G-1
 ****************************************/
 
 ROM_START( wjammers )
@@ -2807,6 +2835,7 @@ ROM_END
  ID-0067
  . ??M-067
  NEO-MVS PROG16 / NEO-MVS CHA256B
+ NEO-MVS PROG16 / NEO-MVS CHA256
 ****************************************/
 
 ROM_START( gururin ) /* MVS ONLY RELEASE */
@@ -2925,7 +2954,8 @@ ROM_END
 /****************************************
  ID-0071
  Bang Bang Busters (prototype) 1994 Visco
- Released in 2010 for MVS and AES (Releaser claims that it is officially licensed by VISCO)
+ Prepared for release in 2000/2001, but apparently Zupapa was favored
+ The 2000 version was released in 2010 for MVS and AES (Releaser claims that it is officially licensed by VISCO)
 
  Reported UNIVERSE BIOS CRC32:
   ROM     EC861CAF
@@ -2934,6 +2964,23 @@ ROM_END
   BANK 2  NOT USED
   BANK 3  NOT USED
  ****************************************/
+
+ ROM_START( b2b )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "071.p1", 0x000000, 0x080000, CRC(7687197d) SHA1(4bb9cb7819807f7a7e1f85f1c4faac4a2f8761e8) )
+
+	NEO_SFIX_128K( "071.s1", CRC(44e5f154) SHA1(b3f80051789e60e5d8c5df0408f1aba51616e92d) )
+
+	NEO_BIOS_AUDIO_128K( "071.m1", CRC(6da739ad) SHA1(cbf5f55c54b4ee00943e2a411eeee4e465ce9c34) )
+
+	ROM_REGION( 0x100000, "ymsnd", 0 )
+	ROM_LOAD( "071.v1", 0x000000, 0x100000, CRC(50feffb0) SHA1(00127dae0130889995bfa7560bc4b0662f74fba5) )
+
+	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "071.c1", 0x000000, 0x200000, CRC(23d84a7a) SHA1(9034658ad40e2c45558abc3db312aa2764102fc4) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "071.c2", 0x000001, 0x200000, CRC(ce7b6248) SHA1(ad1cd5adae5c151e183ff88b68afe10f7009f48e) ) /* Plane 2,3 */
+ROM_END
+
 
 /****************************************
  ID-0072
@@ -3005,6 +3052,7 @@ ROM_END
  . NGM-075
  NEO-MVS PROGGSC / NEO-MVS CHA256
  . NGH-075
+ NEO-AEG PROGRK / NEO-AEG CHA256
 ****************************************/
 
 ROM_START( sonicwi2 )
@@ -3059,7 +3107,8 @@ ROM_END
 
 /****************************************
  ID-0077
- The Warlocks of the Fates (prototype) 1995 Astec
+ The Warlocks of the Fates / Shinryu Senki (prototype) 1995 SNK/Astec21
+ a video of intro and full gameplay was on youtube in 2014.
 ****************************************/
 
 /****************************************
@@ -3130,6 +3179,8 @@ ROM_END
  ID-0080
  . SAM-080
  NEO-MVS PROGGSC / NEO-MVS CHA256
+ NEO-MVS PROGTOP / NEO-MVS CHA256
+ Boards used for the Korean release
  . SAH-080
  NEO-AEG PROGTOP2 / NEO-AEG CHA256 B
 ****************************************/
@@ -3185,7 +3236,10 @@ ROM_END
  . NGM-081
  NEO-MVS PROGTOP / NEO-MVS CHA42G-3B
  NEO-MVS PROGTOP / NEO-MVS CHA256
+ NEO-MVS PROG 4096 B / NEO-MVS CHA 42G-3
+ NEO-MVS PROGBK1 / NEO-MVS CHA256B
  . NGH-081
+ NEO-AEG PROGTOP2 / NEO-AEG CHA256 B
 ****************************************/
 
 ROM_START( ssideki3 )
@@ -3219,6 +3273,8 @@ ROM_END
  NEO-MVS PROGTOP / NEO-MVS CHA256
  NEO-MVS PROGTOP / NEO-MVS CHA 42G-3
  NEO-MVS PROGBK1 / NEO-MVS CHA256
+ NEO-MVS PROGTOP / NEO-MVS CHA256B
+ NEO-MVS PROG 4096 B / NEO-MVS CHA 42G-3
  . NGH-082
 ****************************************/
 
@@ -3417,6 +3473,7 @@ ROM_END
  ID-0087
  . NGM-087
  NEO-MVS PROGSS3 / NEO-MVS CHA256
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
  . NGH-087
  NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
 ****************************************/
@@ -3508,6 +3565,7 @@ ROM_END
  . NGM-088
  NEO-MVS PROGBK1 / NEO-MVS CHA42-3B
  . NGH-088
+ NEO-AEG PROGRKB / NEO-AEG CHA256[B]
 ****************************************/
 
 ROM_START( stakwin )
@@ -3536,6 +3594,7 @@ ROM_END
  . NGM-089
  NEO-MVS PROGBK1 / NEO-MVS CHA256
  . NGH-089
+ NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
 ****************************************/
 
 ROM_START( pulstar )
@@ -3568,6 +3627,9 @@ ROM_END
  ID-0090
  . ADM-009
  NEO-MVS PROGTOP / NEO-MVS CHA256
+ NEO-MVS PROGGSC / NEO-MVS CHA256
+ NEO-MVS PROGGSC / NEO-MVS CHA256B
+ NEO-MVS PROGBK1 / NEO-MVS CHA256B
  . ADH-009
 ****************************************/
 
@@ -3602,13 +3664,14 @@ ROM_END
 
 /****************************************
  ID-0091
- unknown
+ ADK World / ADK Special 1995 ADK (CD only)
 ****************************************/
 
 /****************************************
  ID-0092
  . NGM-092
  NEO-MVS PROGBK1 / NEO-MVS CHA256
+ NEO-MVS PROGTOP / NEO-MVS CHA256
  . NGH-092
 ****************************************/
 
@@ -3830,6 +3893,7 @@ ROM_END
  . NGM-097
  NEO-MVS PROGBK1 / NEO-MVS CHA256
  . NGH-097
+ NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
 ****************************************/
 
 ROM_START( sonicwi3 )
@@ -3886,6 +3950,7 @@ ROM_END
  ID-0200
  . NGM-200
  NEO-MVS PROGBK1 / NEO-MVS CHA256B
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
  . NGH-200
 ****************************************/
 
@@ -3915,6 +3980,7 @@ ROM_END
  ID-0201
  . NGM-201
  NEO-MVS PROGBK1 / NEO-MVS CHA256
+ NEO-MVS PROGBK1 / NEO-MVS CHA256B
  . NGH-201
 ****************************************/
 
@@ -3991,7 +4057,7 @@ ROM_END
 
 /****************************************
  ID-0204
- QP (prototype)
+ QP (prototype) 1997 Success
 ****************************************/
 
 /****************************************
@@ -4031,6 +4097,7 @@ ROM_END
  ID-0207
  . ??M-207
  NEO-MVS PROGBK1 / NEO-MVS CHA42G-3B
+ NEO-MVS PROG 4096 / NEO-MVS CHA42G-3B
 ****************************************/
 
 ROM_START( neomrdo ) /* MVS ONLY RELEASE */
@@ -4175,14 +4242,17 @@ ROM_END
  ID-0214
  . NGM-214
  NEO-MVS PROGBK1 / NEO-MVS CHA256
+ NEO-MVS PROGSS3 / NEO-MVS CHA256
  . NGH-214
+ NEO-AEG PROGBK1Y / NEO-GEO AEG CHA256RY
 ****************************************/
 
 ROM_START( kof96 ) /* MVS VERSION */
 	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "214-p1.p1",  0x000000, 0x100000, CRC(52755d74) SHA1(4232d627f1d2e6ea9fc8cf01571d77d4d5b8a1bb) ) /* TC538200 */
 	ROM_LOAD16_WORD_SWAP( "214-p2.sp2", 0x100000, 0x200000, CRC(002ccb73) SHA1(3ae8df682c75027ca82db25491021eeba00a267e) ) /* TC5316200 */
-
+	/* also found sets with ep1 / ep2 / ep3 / ep4 on eprom and 214-P5 on TC5316200; correct chip labels for eproms is unknown */
+	
 	NEO_SFIX_128K( "214-s1.s1", CRC(1254cbdb) SHA1(fce5cf42588298711a3633e9c9c1d4dcb723ac76) ) /* TC531000 */
 
 	NEO_BIOS_AUDIO_128K( "214-m1.m1", CRC(dabc427c) SHA1(b76722ed142ee7addceb4757424870dbd003e8b3) ) /* TC531001 */
@@ -4205,7 +4275,7 @@ ROM_START( kof96 ) /* MVS VERSION */
 	ROM_LOAD16_BYTE( "214-c8.c8", 0x1800001, 0x400000, CRC(fa1461ad) SHA1(6c71a7f08e4044214223a6bf80984582ab5e0328) ) /* Plane 2,3 */ /* TC5332205 */
 ROM_END
 
-ROM_START( kof96h )
+ROM_START( kof96h ) /* AES VERSION */
 	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "214-pg1.p1", 0x000000, 0x100000, CRC(bd3757c9) SHA1(35392a044117e46c088ff0fdd07d69a3faa4f96e) )
 	ROM_LOAD16_WORD_SWAP( "214-p2.sp2", 0x100000, 0x200000, CRC(002ccb73) SHA1(3ae8df682c75027ca82db25491021eeba00a267e) ) /* TC5316200 */
@@ -4237,6 +4307,7 @@ ROM_END
  . NGM-215
  NEO-MVS PROGBK1 / NEO-MVS CHA256
  . NGH-215
+ NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
 ****************************************/
 
 ROM_START( ssideki4 )
@@ -4268,6 +4339,7 @@ ROM_END
  . ??M-216
  NEO-MVS PROGTOP / NEO-MVS CHA256
  . ??H-216
+ NEO-AEG PROGTOP2Y / NEO-AEG CHA256BY
 ****************************************/
 
 ROM_START( kizuna )
@@ -4346,6 +4418,7 @@ ROM_END
  . ADM-012
  NEO-MVS PROGBK1 / NEO-MVS CHA256
  . ADH-012
+ NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
 ****************************************/
 
 ROM_START( ninjamas )
@@ -4485,6 +4558,7 @@ ROM_END
  ID-0221
  . NGM-221
  NEO-MVS PROGBK1 / NEO-MVS CHA256B
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
  . NGH-221
 ****************************************/
 
@@ -4573,6 +4647,7 @@ ROM_END
  . NGM-223
  NEO-MVS PROGBK1 / NEO-MVS CHA256B
  . NGH-223
+ NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
 ****************************************/
 
 ROM_START( rbffspec )
@@ -4605,7 +4680,7 @@ ROM_END
 ROM_START( rbffspeck ) /* KOREAN VERSION */
 	ROM_REGION( 0x500000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "223-p1k.p1", 0x000000, 0x100000, CRC(b78c8391) SHA1(936b356ac135331b10a37bc10882ec2e4f6b400b) )
-	/* Chip label is correct. They used Cart ID 0124 as 0123 was allready used by quizdaisk */
+	/* Chip label is correct. They used Cart ID 0124 as 0123 was already used by quizdaisk */
 	ROM_LOAD16_WORD_SWAP( "223-p2.sp2", 0x100000, 0x400000, CRC(addd8f08) SHA1(abaf5b86c8ec915c07ef2d83fce9ad03acaa4817) ) /* TC5332205 */
 
 	NEO_SFIX_128K( "223-s1.s1", CRC(7ecd6e8c) SHA1(465455afc4d83cbb118142be4671b2539ffafd79) ) /* TC531000 */
@@ -4635,6 +4710,7 @@ ROM_END
  . ADM-013
  NEO-MVS PROGBK1 / NEO-MVS CHA256B
  . ADH-013
+ NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
 ****************************************/
 
 ROM_START( twinspri )
@@ -4700,6 +4776,7 @@ ROM_END
  . NGM-227
  NEO-MVS PROGBK1 / NEO-MVS CHA256
  . NGH-227
+ NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
 ****************************************/
 
 ROM_START( stakwin2 )
@@ -4761,6 +4838,7 @@ ROM_END
  . NGM-2300
  NEO-MVS PROGBK1 / NEO-MVS CHA256B
  . NGH-2300
+ NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
 ****************************************/
 
 ROM_START( breakers )
@@ -4899,6 +4977,7 @@ ROM_END
  . NGM-2330
  NEO-MVS PROGBK1 / NEO-MVS CHA256
  . NGH-2330
+ NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
 ****************************************/
 
 ROM_START( magdrop3 )
@@ -4934,7 +5013,9 @@ ROM_START( lastblad ) /* MVS VERSION */
 	ROM_REGION( 0x500000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "234-p1.p1",  0x000000, 0x100000, CRC(e123a5a3) SHA1(a3ddabc00feeb54272b145246612ad4632b0e413) ) /* TC538200 */
 	ROM_LOAD16_WORD_SWAP( "234-p2.sp2", 0x100000, 0x400000, CRC(0fdc289e) SHA1(1ff31c0b0f4f9ddbedaf4bcf927faaae81892ec7) ) /* TC5332205 */
-
+	/* also found sets with p1 / sp2 / ep1 / ep2 / m1 on eprom with sticker */ 
+	/* chip label is 0234-P1, 0234-SP2, 0234-EP1, 0234-EP2 and 0234-M1 */
+	
 	NEO_SFIX_128K( "234-s1.s1", CRC(95561412) SHA1(995de272f572fd08d909d3d0af4251b9957b3640) ) /* TC531000 */
 
 	NEO_BIOS_AUDIO_128K( "234-m1.m1", CRC(087628ea) SHA1(48dcf739bb16699af4ab8ed632b7dcb25e470e06) ) /* TC531001 */
@@ -5151,6 +5232,7 @@ ROM_END
  . NGM-2390
  NEO-MVS PROGBK1 / NEO-MVS CHA512Y
  . NGH-2390
+ NEO-AEG PROGBK1Y / NEO-AEG CHA512Y
 ****************************************/
 
 ROM_START( blazstar )
@@ -5269,6 +5351,7 @@ ROM_END
  ID-0241
  . NGM-2410
  NEO-MVS PROGBK1 / NEO-MVS CHA512Y
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
  . NGH-2410
  NEO-AEG PROGBK1Y / NEO-AEG CHA512Y
 ****************************************/
@@ -5289,6 +5372,7 @@ ROM_START( mslug2 ) /* MVS AND AES VERSION */
 	NO_DELTAT_REGION
 
 	ROM_REGION( 0x2000000, "sprites", 0 )
+	/* Different layout with 8xC (16 mbit) also exists; naming sheme 241-Cx */
 	ROM_LOAD16_BYTE( "241-c1.c1", 0x0000000, 0x800000, CRC(394b5e0d) SHA1(4549926f5054ee6aa7689cf920be0327e3908a50) ) /* Plane 0,1 */ /* TC5364205 */
 	ROM_LOAD16_BYTE( "241-c2.c2", 0x0000001, 0x800000, CRC(e5806221) SHA1(1e5475cfab129c77acc610f09369ca42ba5aafa5) ) /* Plane 2,3 */ /* TC5364205 */
 	ROM_LOAD16_BYTE( "241-c3.c3", 0x1000000, 0x800000, CRC(9f6bfa6f) SHA1(a4319b48004e723f81a980887678e3e296049a53) ) /* Plane 0,1 */ /* TC5364205 */
@@ -5298,8 +5382,8 @@ ROM_END
 /****************************************
  ID-0242
  . NGM-2420
- NEO-MVS PROGSF1 (protected board) / NEO-MVS CHA512Y
- NEO-MVS PROGSF1E (protected board) / NEO-MVS CHA512Y
+ NEO-MVS PROGSF1 (1998.6.17) (protected board) / NEO-MVS CHA512Y
+ NEO-MVS PROGSF1E (1998.6.18) (protected board) / NEO-MVS CHA512Y
  NEO-MVS PROGBK1 / NEO-MVS CHA512Y
  . NGH-2420
  NEO-AEG PROGBK1Y / NEO-AEG CHA512Y
@@ -5422,7 +5506,7 @@ ROM_START( kof98ka ) /* encrypted code + protection, only z80 rom is different t
 	ROM_LOAD16_BYTE( "242-c8.c8", 0x3000001, 0x800000, CRC(c823e045) SHA1(886fbf64bcb58bc4eabb1fc9262f6ac9901a0f28) ) /* Plane 2,3 */ /* TC5364205 */
 ROM_END
 
-ROM_START( kof98h ) /* AES VERSION */
+ROM_START( kof98h ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x500000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "242-pn1.p1", 0x000000, 0x100000, CRC(61ac868a) SHA1(26577264aa72d6af272952a876fcd3775f53e3fa) ) /* TC538200 */
 	ROM_LOAD16_WORD_SWAP( "242-p2.sp2", 0x100000, 0x400000, CRC(980aba4c) SHA1(5e735929ec6c3ca5b2efae3c7de47bcbb8ade2c5) ) /* TC5332205 */
@@ -5689,11 +5773,11 @@ ROM_END
  ID-0251
  . NGM-2510
  SMA protected version found on:
- NEO-MVS PROGLBA (NEO-SMA) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
+ NEO-MVS PROGLBA (NEO-SMA) (1999.4.12) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
  Non SMA protected version found on:
  NEO-MVS PROGBK1 / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
  . NGH-2510
- NEO-AEG PROGLBA / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7042)
+ NEO-AEG PROGLBA (1999.7.6) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7042)
 ****************************************/
 
 ROM_START( kof99 ) /* Original Version - Encrypted Code & GFX */ /* MVS VERSION */
@@ -5908,9 +5992,9 @@ ROM_END
 /****************************************
  ID-0253
  . NGM-2530
- NEO-MVS PROGLBA (NEO-SMA) (LBA-SUB) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
+ NEO-MVS PROGLBA (1999.4.12) (NEO-SMA)(LBA-SUB) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
  . NGH-2530
- NEO-AEG PROGLBA (NEO-SMA) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7042)
+ NEO-AEG PROGLBA (1999.7.6) (NEO-SMA) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7042)
 ****************************************/
 
 ROM_START( garou ) /* Original Version - Encrypted GFX */ /* MVS VERSION - later revision */
@@ -6096,10 +6180,11 @@ ROM_END
  ID-0256
  . NGM-2560
  SMA protected version found on:
- NEO-MVS PROGLBA (NEO-SMA)(LBA-SUB) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
+ NEO-MVS PROGLBA (1999.4.12) (NEO-SMA)(LBA-SUB) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
  Non SMA protected version found on:
  NEO-MVS PROGBK1 / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
  . NGH-2560
+ NEO-AEG PROGLBA (1999.7.6) (NEO-SMA)(LBA-SUB) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7042)
 ****************************************/
 
 ROM_START( mslug3 ) /* Original Version - Encrypted Code & GFX */ /* revision 2000.4.1 */ /* MVS VERSION */
@@ -6108,7 +6193,7 @@ ROM_START( mslug3 ) /* Original Version - Encrypted Code & GFX */ /* revision 20
 	/* The SMA for this release has a green colour marking; the older revision has a white colour marking */
 	ROM_LOAD16_WORD_SWAP( "256-pg1.p1", 0x100000, 0x400000, CRC(b07edfd5) SHA1(dcbd9e500bfae98d754e55cdbbbbf9401013f8ee) ) /* TC5332202 */
 	ROM_LOAD16_WORD_SWAP( "256-pg2.p2", 0x500000, 0x400000, CRC(6097c26b) SHA1(248ec29d21216f29dc6f5f3f0e1ad1601b3501b6) ) /* TC5332202 */
-
+		
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
@@ -6143,7 +6228,9 @@ ROM_START( mslug3h ) /* Original Version - Encrypted GFX */ /* revision 2000.3.1
 	ROM_REGION( 0x500000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "256-ph1.p1",  0x000000, 0x100000, CRC(9c42ca85) SHA1(7a8f77a89867b889295ae9b9dfd4ba28f02d234d) )
 	ROM_LOAD16_WORD_SWAP( "256-ph2.sp2", 0x100000, 0x400000, CRC(1f3d8ce8) SHA1(08b05a8abfb86ec09a5e758d6273acf1489961f9) )
-
+	/* also found AES set with p1 / p2 on maskrom on NEO-AEG PROGLBA (NEO-SMA); chip labels is 256-PG1 and 256-PG2 */
+	/* The SMA for this release has a pink color marking */
+	
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
@@ -6178,7 +6265,7 @@ ROM_END
  ID-0257
  . NGM-2570
  SMA protected version found on:
- NEO-MVS PROGLBA (NEO-SMA)(LBA-SUB) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
+ NEO-MVS PROGLBA (1999.4.12) (NEO-SMA)(LBA-SUB) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
  Non SMA protected version found on:
  NEO-MVS PROGBK1 / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
  . NGH-2570
@@ -6330,6 +6417,7 @@ ROM_END
  . NGM-2610
  NEO-MVS PROGBK1 / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
  . NGH-2610
+ NEO-AEG PROGBK1F / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7042)
 ****************************************/
 
 ROM_START( sengoku3 ) /* Original Version - Encrypted GFX */
@@ -6449,7 +6537,7 @@ ROM_END
  . NGM-2630
  NEO-MVS PROGBK2 (NEO-PCM2 SNK)/ NEO-MVS CHAFIO (NEO-CMC 7050)
  . NGH-2630
- NEO-AEG PROGBK2 (NEO-PCM2 SNK) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
+ NEO-AEG PROGBK2 (2002.4.1) (NEO-PCM2 SNK) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
 ****************************************/
 
 ROM_START( mslug4 ) /* Original Version - Encrypted GFX */ /* MVS VERSION */
@@ -6524,9 +6612,9 @@ ROM_END
 /****************************************
  ID-0264
  . NGM-264?
- NEO-MVS PROGBK2 (NEO-PCM2 SNK) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
+ NEO-MVS PROGBK2 (2000.3.21) (NEO-PCM2 SNK) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
  . NGH-2641
- NEO-AEG PROGBK2 (NEO-PCM2 SNK) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
+ NEO-AEG PROGBK2 (2002.4.1) (NEO-PCM2 SNK) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
   - Distribution by BrezzaSoft
 ****************************************/
 
@@ -6567,7 +6655,7 @@ ROM_END
 /****************************************
  ID-0265
  . NGM-2650
- NEO-MVS PROGBK2 (NEO-PCM2 PLAYMORE) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
+ NEO-MVS PROGBK2 (2000.3.21) (NEO-PCM2 PLAYMORE) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
  . NGH-2650
  NEO-AEG PROGBK2 (NEO-PCM2 PLAYMORE) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
 ****************************************/
@@ -6610,9 +6698,9 @@ ROM_END
 /****************************************
  ID-0266
  . NGM-2660
- NEO-MVS PROGBK2 (NEO-PCM2 PLAYMORE) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
+ NEO-MVS PROGBK2 (2000.3.21) (NEO-PCM2 PLAYMORE) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
  . NGH-2660
- NEO-AEG PROGBK2 (NEO-PCM2 PLAYMORE) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
+ NEO-AEG PROGBK2 (2002.4.1) (NEO-PCM2 PLAYMORE) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
 ****************************************/
 
 ROM_START( matrim ) /* Encrypted Set */ /* MVS AND AES VERSION */
@@ -6659,7 +6747,8 @@ ROM_END
 ROM_START( pnyaa ) /* Encrypted Set */ /* MVS ONLY RELEASE */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "267-p1.p1", 0x000000, 0x100000, CRC(112fe2c0) SHA1(01420e051f0bdbd4f68ce306a3738161b96f8ba8) ) /* mask rom TC538200 */
-
+	/* also found set with p1 and m1 on eprom with sticker; chip labels is PN 2.02 and M1 */
+	
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
@@ -6686,8 +6775,9 @@ ROM_END
 /****************************************
  ID-0268
  . NGM-2680
- NEO-MVS PROGBK3S (NEO-PCM2 PLAYMORE) (NEO-PVC) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
+ NEO-MVS PROGBK3S (2003.10.1) (NEO-PCM2 PLAYMORE) (NEO-PVC) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
  . NGH-2680
+ NEO-AEG PROGBK3S (2003.10.6) (NEO-PCM2 PLAYMORE) (NEO-PVC) / NEO-AEG CHAFIO (2003.7.24) (NEO-CMC 7050)
 ****************************************/
 
 ROM_START( mslug5 ) /* Encrypted Set */ /* MVS VERSION */
@@ -6729,7 +6819,8 @@ ROM_START( mslug5h ) /* Encrypted Set */ /* AES release of the game but is also 
 	ROM_REGION( 0x800000, "maincpu", 0 )
 	ROM_LOAD32_WORD_SWAP( "268-p1c.p1", 0x000000, 0x400000, CRC(3636690a) SHA1(e0da714b4bdc6efffe1250ded02ebddb3ab6d7b3) )
 	ROM_LOAD32_WORD_SWAP( "268-p2c.p2", 0x000002, 0x400000, CRC(8dfc47a2) SHA1(27d618cfbd0107a4d2a836797e967b39d2eb4851) )
-
+	/* also found AES set with p1 / p2 on maskrom; chip labels is 268-P1CR2 and 268-P2CR2 */
+	
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
@@ -6804,9 +6895,9 @@ ROM_END
 /****************************************
  ID-0270
  . NGM-2700
- NEO-MVS PROGBK2R (NEO-PCM2 PLAYMORE) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
+ NEO-MVS PROGBK2R (2003.8.26) (NEO-PCM2 PLAYMORE) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
  . NGH-2700
- NEO-AEG PROGBK2S (NEO-PCM2 PLAYMORE) / NEO-AEG CHAFIO (2003.7.24) (NEO-CMC 7050)
+ NEO-AEG PROGBK2S (2003.10.16) (NEO-PCM2 PLAYMORE) / NEO-AEG CHAFIO (2003.7.24) (NEO-CMC 7050)
 ****************************************/
 
 ROM_START( samsho5 ) /* Encrypted Set */ /* MVS VERSION */
@@ -6882,9 +6973,9 @@ ROM_END
 /****************************************
  ID-0271
  . NGM-2710
- NEO-MVS PROGBK3S (NEO-PCM2 PLAYMORE) (NEO-PVC) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
+ NEO-MVS PROGBK3S (2003.10.1) (NEO-PCM2 PLAYMORE) (NEO-PVC) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
  . NGH-2710
- NEO-AEG PROGBK3S (NEO-PCM2 PLAYMORE) (NEO-PVC) / NEO-AEG CHAFIO (2003.7.24) (NEO-CMC 7050)
+ NEO-AEG PROGBK3S (2003.10.6) (NEO-PCM2 PLAYMORE) (NEO-PVC) / NEO-AEG CHAFIO (2003.7.24) (NEO-CMC 7050)
 ****************************************/
 
 ROM_START( kof2003 ) /* Encrypted Code + Sound + GFX Roms */ /* MVS VERSION */
@@ -6963,7 +7054,7 @@ ROM_END
 /****************************************
  ID-0272
  . NGM-2720
- NEO-MVS PROGBK2S (NEO-PCM2 PLAYMORE) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
+ NEO-MVS PROGBK2S (2003.10.18) (NEO-PCM2 PLAYMORE) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
  . NGH-2720
 ****************************************/
 
@@ -7097,7 +7188,7 @@ ROM_END
 /****************************************
  B-J-02
  . ???-????
- MVS PROGV (2000.11.17) / NEO-MVS CHAFIO (1999.6.14)
+ MVS PROGV (2000.11.17) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
 ****************************************/
 
 ROM_START( jockeygp ) /* MVS ONLY RELEASE */
@@ -9780,6 +9871,7 @@ GAME( 1998, flipshot,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neoge
 GAME( 1999, ctomaday,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Visco", "Captain Tomaday", GAME_SUPPORTS_SAVE )
 GAME( 1999, ganryu,     neogeo,   neogeo_noslot,   neogeo, neogeo_noslot_state,   ganryu,   ROT0, "Visco", "Ganryu / Musashi Ganryuki" , GAME_SUPPORTS_SAVE ) /* Encrypted GFX */
 GAME( 2000, bangbead,   neogeo,   neogeo_noslot,   neogeo, neogeo_noslot_state,   bangbead, ROT0, "Visco", "Bang Bead", GAME_SUPPORTS_SAVE )
+GAME( 2000, b2b,        neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "Visco", "Bang Bang Busters (2010 NCI release)" , GAME_SUPPORTS_SAVE )
 
 /* Mega Enterprise */
 GAME( 2002, mslug4,     neogeo,   neogeo_noslot,   neogeo, neogeo_noslot_state,   mslug4,   ROT0, "Mega / Playmore", "Metal Slug 4 (NGM-2630)", GAME_SUPPORTS_SAVE )
@@ -9813,7 +9905,11 @@ GAME( 2004, sbp,        neogeo,   neogeo_noslot,   neogeo, neogeo_noslot_state, 
 // Fast Striker (c)2010 - MVS/AES
 // Fast Striker 1.5 (c)2010 - MVS/AES
 // GunLord (c)2012 - MVS/AES
+// Neo XYX (c)2013 - MVS/AES
+// Razion (c)2014 - MVS/AES?
 
 /* N.C.I - LE CORTEX */
-// Bang Bang Busters (c)2010 - MVS?/AES
-// Treasure of the Caribbean (c)2011 - MVS?/AES
+// Treasure of the Caribbean (c)2011 - AES only (no credits system if ran on an MVS, Freeplay)
+
+/* NEOBITZ */
+// Knight's Chance (c)2014 - MVS/AES
