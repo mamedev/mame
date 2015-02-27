@@ -20,7 +20,7 @@ Might be some priority glitches
 #include "includes/tbowl.h"
 
 
-WRITE8_MEMBER(tbowl_state::tbowl_coin_counter_w)
+WRITE8_MEMBER(tbowl_state::coincounter_w)
 {
 	coin_counter_w(machine(), 0, data & 1);
 }
@@ -31,43 +31,21 @@ note: check this, its borrowed from tecmo.c / wc90.c at the moment and could wel
 
 ***/
 
-WRITE8_MEMBER(tbowl_state::tbowlb_bankswitch_w)
+WRITE8_MEMBER(tbowl_state::boardb_bankswitch_w)
 {
-	int bankaddress;
-	UINT8 *RAM = memregion("maincpu")->base();
-
-
-	bankaddress = 0x10000 + ((data & 0xf8) << 8);
-	membank("bank1")->set_base(&RAM[bankaddress]);
+	membank("mainbank")->set_entry(data >> 3);
 }
 
-WRITE8_MEMBER(tbowl_state::tbowlc_bankswitch_w)
+WRITE8_MEMBER(tbowl_state::boardc_bankswitch_w)
 {
-	int bankaddress;
-	UINT8 *RAM = memregion("sub")->base();
-
-
-	bankaddress = 0x10000 + ((data & 0xf8) << 8);
-
-
-	membank("bank2")->set_base(&RAM[bankaddress]);
+	membank("subbank")->set_entry(data >> 3);
 }
 
 /*** Shared Ram Handlers
 
 ***/
 
-READ8_MEMBER(tbowl_state::shared_r)
-{
-	return m_shared_ram[offset];
-}
-
-WRITE8_MEMBER(tbowl_state::shared_w)
-{
-	m_shared_ram[offset] = data;
-}
-
-WRITE8_MEMBER(tbowl_state::tbowl_sound_command_w)
+WRITE8_MEMBER(tbowl_state::sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -88,18 +66,18 @@ WRITE8_MEMBER(tbowl_state::tbowl_sound_command_w)
 static ADDRESS_MAP_START( 6206B_map, AS_PROGRAM, 8, tbowl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(tbowl_bg2videoram_w) AM_SHARE("bg2videoram")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(tbowl_bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(tbowl_txvideoram_w) AM_SHARE("txvideoram")
+	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(bg2videoram_w) AM_SHARE("bg2videoram")
+	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
 //  AM_RANGE(0xf000, 0xf000) AM_WRITE(unknown_write) * written during start-up, not again */
-	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(shared_r, shared_w) AM_SHARE("shared_ram") /* check */
-	AM_RANGE(0xfc00, 0xfc00) AM_READ_PORT("P1") AM_WRITE(tbowlb_bankswitch_w)
+	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("mainbank")
+	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("shared_ram") /* check */
+	AM_RANGE(0xfc00, 0xfc00) AM_READ_PORT("P1") AM_WRITE(boardb_bankswitch_w)
 	AM_RANGE(0xfc01, 0xfc01) AM_READ_PORT("P2")
 //  AM_RANGE(0xfc01, 0xfc01) AM_WRITE(unknown_write) /* written during start-up, not again */
 	AM_RANGE(0xfc02, 0xfc02) AM_READ_PORT("P3")
 //  AM_RANGE(0xfc02, 0xfc02) AM_WRITE(unknown_write) /* written during start-up, not again */
-	AM_RANGE(0xfc03, 0xfc03) AM_READ_PORT("P4") AM_WRITE(tbowl_coin_counter_w)
+	AM_RANGE(0xfc03, 0xfc03) AM_READ_PORT("P4") AM_WRITE(coincounter_w)
 //  AM_RANGE(0xfc05, 0xfc05) AM_WRITE(unknown_write) /* no idea */
 //  AM_RANGE(0xfc06, 0xfc06) AM_READ(dummy_r)        /* Read During NMI */
 	AM_RANGE(0xfc07, 0xfc07) AM_READ_PORT("SYSTEM")
@@ -108,19 +86,19 @@ static ADDRESS_MAP_START( 6206B_map, AS_PROGRAM, 8, tbowl_state )
 	AM_RANGE(0xfc09, 0xfc09) AM_READ_PORT("DSW2")
 	AM_RANGE(0xfc0a, 0xfc0a) AM_READ_PORT("DSW3")
 //  AM_RANGE(0xfc0a, 0xfc0a) AM_WRITE(unknown_write) /* hardly used .. */
-	AM_RANGE(0xfc0d, 0xfc0d) AM_WRITE(tbowl_sound_command_w) /* not sure, used quite a bit */
-	AM_RANGE(0xfc10, 0xfc10) AM_WRITE(tbowl_bg2xscroll_lo)
-	AM_RANGE(0xfc11, 0xfc11) AM_WRITE(tbowl_bg2xscroll_hi)
-	AM_RANGE(0xfc12, 0xfc12) AM_WRITE(tbowl_bg2yscroll_lo)
-	AM_RANGE(0xfc13, 0xfc13) AM_WRITE(tbowl_bg2yscroll_hi)
-	AM_RANGE(0xfc14, 0xfc14) AM_WRITE(tbowl_bgxscroll_lo)
-	AM_RANGE(0xfc15, 0xfc15) AM_WRITE(tbowl_bgxscroll_hi)
-	AM_RANGE(0xfc16, 0xfc16) AM_WRITE(tbowl_bgyscroll_lo)
-	AM_RANGE(0xfc17, 0xfc17) AM_WRITE(tbowl_bgyscroll_hi)
+	AM_RANGE(0xfc0d, 0xfc0d) AM_WRITE(sound_command_w) /* not sure, used quite a bit */
+	AM_RANGE(0xfc10, 0xfc10) AM_WRITE(bg2xscroll_lo)
+	AM_RANGE(0xfc11, 0xfc11) AM_WRITE(bg2xscroll_hi)
+	AM_RANGE(0xfc12, 0xfc12) AM_WRITE(bg2yscroll_lo)
+	AM_RANGE(0xfc13, 0xfc13) AM_WRITE(bg2yscroll_hi)
+	AM_RANGE(0xfc14, 0xfc14) AM_WRITE(bgxscroll_lo)
+	AM_RANGE(0xfc15, 0xfc15) AM_WRITE(bgxscroll_hi)
+	AM_RANGE(0xfc16, 0xfc16) AM_WRITE(bgyscroll_lo)
+	AM_RANGE(0xfc17, 0xfc17) AM_WRITE(bgyscroll_hi)
 ADDRESS_MAP_END
 
 /* Board C */
-WRITE8_MEMBER(tbowl_state::tbowl_trigger_nmi)
+WRITE8_MEMBER(tbowl_state::trigger_nmi)
 {
 	/* trigger NMI on 6206B's Cpu? (guess but seems to work..) */
 	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -132,36 +110,36 @@ static ADDRESS_MAP_START( 6206C_map, AS_PROGRAM, 8, tbowl_state )
 	AM_RANGE(0xc000, 0xd7ff) AM_WRITEONLY
 	AM_RANGE(0xd800, 0xdfff) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0xe000, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // 2x palettes, one for each monitor?
-	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank2")
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(shared_r, shared_w)
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(tbowlc_bankswitch_w)
+	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("subbank")
+	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("shared_ram")
+	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(boardc_bankswitch_w)
 	AM_RANGE(0xfc01, 0xfc01) AM_WRITENOP /* ? */
-	AM_RANGE(0xfc02, 0xfc02) AM_WRITE(tbowl_trigger_nmi) /* ? */
+	AM_RANGE(0xfc02, 0xfc02) AM_WRITE(trigger_nmi) /* ? */
 	AM_RANGE(0xfc03, 0xfc03) AM_WRITENOP /* ? */
 	AM_RANGE(0xfc06, 0xfc06) AM_WRITENOP /* ? */
 ADDRESS_MAP_END
 
 /* Board A */
 
-WRITE8_MEMBER(tbowl_state::tbowl_adpcm_start_w)
+WRITE8_MEMBER(tbowl_state::adpcm_start_w)
 {
 	msm5205_device *adpcm = (offset & 1) ? m_msm2 : m_msm1;
 	m_adpcm_pos[offset & 1] = data << 8;
 	adpcm->reset_w(0);
 }
 
-WRITE8_MEMBER(tbowl_state::tbowl_adpcm_end_w)
+WRITE8_MEMBER(tbowl_state::adpcm_end_w)
 {
 	m_adpcm_end[offset & 1] = (data + 1) << 8;
 }
 
-WRITE8_MEMBER(tbowl_state::tbowl_adpcm_vol_w)
+WRITE8_MEMBER(tbowl_state::adpcm_vol_w)
 {
 	msm5205_device *adpcm = (offset & 1) ? m_msm2 : m_msm1;
 	adpcm->set_volume((data & 0x7f) * 100 / 0x7f);
 }
 
-void tbowl_state::tbowl_adpcm_int( msm5205_device *device, int num )
+void tbowl_state::adpcm_int( msm5205_device *device, int num )
 {
 	if (m_adpcm_pos[num] >= m_adpcm_end[num] ||
 				m_adpcm_pos[num] >= memregion("adpcm")->bytes()/2)
@@ -180,14 +158,14 @@ void tbowl_state::tbowl_adpcm_int( msm5205_device *device, int num )
 	}
 }
 
-WRITE_LINE_MEMBER(tbowl_state::tbowl_adpcm_int_1)
+WRITE_LINE_MEMBER(tbowl_state::adpcm_int_1)
 {
-	tbowl_adpcm_int(m_msm1, 0);
+	adpcm_int(m_msm1, 0);
 }
 
-WRITE_LINE_MEMBER(tbowl_state::tbowl_adpcm_int_2)
+WRITE_LINE_MEMBER(tbowl_state::adpcm_int_2)
 {
-	tbowl_adpcm_int(m_msm2, 1);
+	adpcm_int(m_msm2, 1);
 }
 
 static ADDRESS_MAP_START( 6206A_map, AS_PROGRAM, 8, tbowl_state )
@@ -195,9 +173,9 @@ static ADDRESS_MAP_START( 6206A_map, AS_PROGRAM, 8, tbowl_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("ym1", ym3812_device, write)
 	AM_RANGE(0xd800, 0xd801) AM_DEVWRITE("ym2", ym3812_device, write)
-	AM_RANGE(0xe000, 0xe001) AM_WRITE(tbowl_adpcm_end_w)
-	AM_RANGE(0xe002, 0xe003) AM_WRITE(tbowl_adpcm_start_w)
-	AM_RANGE(0xe004, 0xe005) AM_WRITE(tbowl_adpcm_vol_w)
+	AM_RANGE(0xe000, 0xe001) AM_WRITE(adpcm_end_w)
+	AM_RANGE(0xe002, 0xe003) AM_WRITE(adpcm_start_w)
+	AM_RANGE(0xe004, 0xe005) AM_WRITE(adpcm_vol_w)
 	AM_RANGE(0xe006, 0xe006) AM_WRITENOP
 	AM_RANGE(0xe007, 0xe007) AM_WRITENOP    /* NMI acknowledge */
 	AM_RANGE(0xe010, 0xe010) AM_READ(soundlatch_byte_r)
@@ -436,6 +414,17 @@ The game is displayed on 2 monitors
 
 ***/
 
+void tbowl_state::machine_start()
+{
+	membank("mainbank")->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x800);
+	membank("subbank")->configure_entries(0, 32, memregion("sub")->base() + 0x10000, 0x800);
+	
+	save_item(NAME(m_adpcm_pos));
+	save_item(NAME(m_adpcm_end));
+	save_item(NAME(m_adpcm_data));
+
+}
+
 void tbowl_state::machine_reset()
 {
 	m_adpcm_pos[0] = m_adpcm_pos[1] = 0;
@@ -475,7 +464,7 @@ static MACHINE_CONFIG_START( tbowl, tbowl_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tbowl_state, screen_update_tbowl_left)
+	MCFG_SCREEN_UPDATE_DRIVER(tbowl_state, screen_update_left)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
@@ -483,7 +472,7 @@ static MACHINE_CONFIG_START( tbowl, tbowl_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tbowl_state, screen_update_tbowl_right)
+	MCFG_SCREEN_UPDATE_DRIVER(tbowl_state, screen_update_right)
 	MCFG_SCREEN_PALETTE("palette")
 
 
@@ -499,12 +488,12 @@ static MACHINE_CONFIG_START( tbowl, tbowl_state )
 
 	/* something for the samples? */
 	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(tbowl_state, tbowl_adpcm_int_1))    /* interrupt function */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(tbowl_state, adpcm_int_1))    /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(tbowl_state, tbowl_adpcm_int_2))    /* interrupt function */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(tbowl_state, adpcm_int_2))    /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -713,6 +702,6 @@ ROM_START( tbowlj )
 	ROM_LOAD( "6206a.2",    0x10000, 0x10000, CRC(1e9e5936) SHA1(60370d1de28b1c5ffeff7843702aaddb19ff1f58) )
 ROM_END
 
-GAME( 1987, tbowl,    0,        tbowl,    tbowl, driver_device,    0, ROT0,  "Tecmo", "Tecmo Bowl (World)", 0 )
-GAME( 1987, tbowlp,   tbowl,    tbowl,    tbowl, driver_device,    0, ROT0,  "Tecmo", "Tecmo Bowl (World, prototype?)", 0 ) // or early version, handwritten labels
-GAME( 1987, tbowlj,   tbowl,    tbowl,    tbowlj, driver_device,   0, ROT0,  "Tecmo", "Tecmo Bowl (Japan)", 0 )
+GAME( 1987, tbowl,    0,        tbowl,    tbowl, driver_device,    0, ROT0,  "Tecmo", "Tecmo Bowl (World)", GAME_SUPPORTS_SAVE )
+GAME( 1987, tbowlp,   tbowl,    tbowl,    tbowl, driver_device,    0, ROT0,  "Tecmo", "Tecmo Bowl (World, prototype?)", GAME_SUPPORTS_SAVE ) // or early version, handwritten labels
+GAME( 1987, tbowlj,   tbowl,    tbowl,    tbowlj, driver_device,   0, ROT0,  "Tecmo", "Tecmo Bowl (Japan)", GAME_SUPPORTS_SAVE )

@@ -694,8 +694,7 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 			for(int i = 0; i < m_IR5_character_per_row; i++)
 			{
-				if((address & 0x3fff) == ((m_cursor_h << 8) | m_cursor_l))
-					m_cursor_on = true;
+				bool cursor_on = ((address & 0x3fff) == ((m_cursor_h << 8) | m_cursor_l));
 
 				if (!m_display_cb.isnull())
 					m_display_cb(m_bitmap,
@@ -704,7 +703,7 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 									tilerow,
 									space().read_byte(address),
 									address,
-									(charrow >= m_IR6_cursor_first_scanline) && m_cursor_on,
+									(charrow >= m_IR6_cursor_first_scanline) && (charrow <= m_IR6_cursor_last_scanline) && cursor_on,
 									dw != 0,
 									m_gfx_enabled != 0,
 									charrow == m_IR7_cursor_underline_position,
@@ -714,9 +713,6 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				if(address > ((m_IR9_display_buffer_last_address << 10) | 0x3ff))
 					address = (m_IR9_display_buffer_first_address_MSB << 8) | m_IR8_display_buffer_first_address_LSB;
 			}
-
-			if(charrow == m_IR6_cursor_last_scanline)
-				m_cursor_on = false;
 
 			if(m_gfx_enabled || (charrow == (m_IR0_scanline_per_char_row - 1)))
 				m_address = address;

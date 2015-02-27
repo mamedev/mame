@@ -120,23 +120,8 @@ static HANDLE window_thread_ready_event;
 //  PROTOTYPES
 //============================================================
 
-static void winwindow_video_window_destroy(win_window_info *window);
 
-static unsigned __stdcall thread_entry(void *param);
-static int complete_create(win_window_info *window);
 static void create_window_class(void);
-static void set_starting_view(int index, win_window_info *window, const char *view);
-
-static void constrain_to_aspect_ratio(win_window_info *window, RECT *rect, int adjustment);
-static void get_min_bounds(win_window_info *window, RECT *bounds, int constrain);
-static void get_max_bounds(win_window_info *window, RECT *bounds, int constrain);
-static void update_minmax_state(win_window_info *window);
-static void minimize_window(win_window_info *window);
-static void maximize_window(win_window_info *window);
-
-static void adjust_window_position_after_major_change(win_window_info *window);
-static void set_fullscreen(win_window_info *window, int fullscreen);
-
 
 // temporary hacks
 #if LOG_THREADS
@@ -213,7 +198,7 @@ bool windows_osd_interface::window_init()
 			fatalerror("Failed to create window thread ready event\n");
 
 		// create a thread to run the windows from
-		temp = _beginthreadex(NULL, 0, thread_entry, NULL, 0, (unsigned *)&window_threadid);
+		temp = _beginthreadex(NULL, 0, win_window_info::thread_entry, NULL, 0, (unsigned *)&window_threadid);
 		window_thread = (HANDLE)temp;
 		if (window_thread == NULL)
 			fatalerror("Failed to create window thread\n");
@@ -272,7 +257,9 @@ void windows_osd_interface::window_exit()
 	{
 		win_window_info *temp = win_window_list;
 		win_window_list = temp->m_next;
-		winwindow_video_window_destroy(temp);
+		temp->destroy();
+		global_free(temp);
+
 	}
 
 	// kill the drawers
@@ -659,7 +646,7 @@ void winwindow_update_cursor_state(running_machine &machine)
 //  (main thread)
 //============================================================
 
-void winwindow_video_window_create(running_machine &machine, int index, win_monitor_info *monitor, const osd_window_config *config)
+void win_window_info::create(running_machine &machine, int index, win_monitor_info *monitor, const osd_window_config *config)
 {
 	win_window_info *window, *win;
 
@@ -690,7 +677,9 @@ void winwindow_video_window_create(running_machine &machine, int index, win_moni
 
 	// set the specific view
 	windows_options &options = downcast<windows_options &>(machine.options());
-	set_starting_view(index, window, options.view(index));
+
+	const char *defview = options.view();
+	window->set_starting_view(index, defview, options.view(index));
 
 	// remember the current values in case they change
 	window->m_targetview = window->m_target->view();
@@ -720,7 +709,7 @@ void winwindow_video_window_create(running_machine &machine, int index, win_moni
 		}
 	}
 	else
-		window->m_init_state = complete_create(window) ? -1 : 1;
+		window->m_init_state = window->complete_create() ? -1 : 1;
 
 	// handle error conditions
 	if (window->m_init_state == -1)
@@ -734,7 +723,7 @@ void winwindow_video_window_create(running_machine &machine, int index, win_moni
 //  (main thread)
 //============================================================
 
-static void winwindow_video_window_destroy(win_window_info *window)
+void win_window_info::destroy()
 {
 	win_window_info **prevptr;
 
@@ -742,24 +731,23 @@ static void winwindow_video_window_destroy(win_window_info *window)
 
 	// remove us from the list
 	for (prevptr = &win_window_list; *prevptr != NULL; prevptr = &(*prevptr)->m_next)
-		if (*prevptr == window)
+		if (*prevptr == this)
 		{
-			*prevptr = window->m_next;
+			*prevptr = this->m_next;
 			break;
 		}
 
 	// destroy the window
-	if (window->m_hwnd != NULL)
-		SendMessage(window->m_hwnd, WM_USER_SELF_TERMINATE, 0, 0);
+	if (m_hwnd != NULL)
+		SendMessage(m_hwnd, WM_USER_SELF_TERMINATE, 0, 0);
 
 	// free the render target
-	window->machine().render().target_free(window->m_target);
+	machine().render().target_free(m_target);
 
+	// FIXME: move to destructor
 	// free the lock
-	osd_lock_free(window->m_render_lock);
+	osd_lock_free(m_render_lock);
 
-	// free the window itself
-	global_free(window);
 }
 
 
@@ -845,7 +833,7 @@ void win_window_info::update()
 //  (window thread)
 //============================================================
 
-win_monitor_info *win_window_info::winwindow_video_window_monitor(const RECT *proposed)
+win_monitor_info *win_window_info::winwindow_video_window_monitor(const osd_rect *proposed)
 {
 	win_monitor_info *monitor;
 
@@ -853,7 +841,14 @@ win_monitor_info *win_window_info::winwindow_video_window_monitor(const RECT *pr
 	if (!m_fullscreen)
 	{
 		if (proposed != NULL)
-			monitor = winvideo_monitor_from_handle(MonitorFromRect(proposed, MONITOR_DEFAULTTONEAREST));
+		{
+			RECT p;
+			p.top = proposed->top();
+			p.left = proposed->left();
+			p.bottom = proposed->bottom();
+			p.right = proposed->right();
+			monitor = winvideo_monitor_from_handle(MonitorFromRect(&p, MONITOR_DEFAULTTONEAREST));
+		}
 		else
 			monitor = winvideo_monitor_from_handle(MonitorFromWindow(m_hwnd, MONITOR_DEFAULTTONEAREST));
 	}
@@ -905,9 +900,8 @@ static void create_window_class(void)
 //  (main thread)
 //============================================================
 
-static void set_starting_view(int index, win_window_info *window, const char *view)
+void win_window_info::set_starting_view(int index, const char *defview, const char *view)
 {
-	const char *defview = downcast<windows_options &>(window->machine().options()).view();
 	int viewindex;
 
 	assert(GetCurrentThreadId() == main_threadid);
@@ -917,12 +911,11 @@ static void set_starting_view(int index, win_window_info *window, const char *vi
 		view = defview;
 
 	// query the video system to help us pick a view
-	viewindex = window->m_target->configured_view(view, index, video_config.numscreens);
+	viewindex = target()->configured_view(view, index, video_config.numscreens);
 
 	// set the view
-	window->m_target->set_view(viewindex);
+	target()->set_view(viewindex);
 }
-
 
 
 //============================================================
@@ -1037,12 +1030,12 @@ int winwindow_ui_is_paused(running_machine &machine)
 //  (window thread)
 //============================================================
 
-INLINE int wnd_extra_width(win_window_info *window)
+int win_window_info::wnd_extra_width()
 {
 	RECT temprect = { 100, 100, 200, 200 };
-	if (window->m_fullscreen)
+	if (m_fullscreen)
 		return 0;
-	AdjustWindowRectEx(&temprect, WINDOW_STYLE, window->win_has_menu(), WINDOW_STYLE_EX);
+	AdjustWindowRectEx(&temprect, WINDOW_STYLE, win_has_menu(), WINDOW_STYLE_EX);
 	return rect_width(&temprect) - 100;
 }
 
@@ -1053,12 +1046,12 @@ INLINE int wnd_extra_width(win_window_info *window)
 //  (window thread)
 //============================================================
 
-INLINE int wnd_extra_height(win_window_info *window)
+int win_window_info::wnd_extra_height()
 {
 	RECT temprect = { 100, 100, 200, 200 };
-	if (window->m_fullscreen)
+	if (m_fullscreen)
 		return 0;
-	AdjustWindowRectEx(&temprect, WINDOW_STYLE, window->win_has_menu(), WINDOW_STYLE_EX);
+	AdjustWindowRectEx(&temprect, WINDOW_STYLE, win_has_menu(), WINDOW_STYLE_EX);
 	return rect_height(&temprect) - 100;
 }
 
@@ -1069,7 +1062,7 @@ INLINE int wnd_extra_height(win_window_info *window)
 //  (window thread)
 //============================================================
 
-static unsigned __stdcall thread_entry(void *param)
+unsigned __stdcall win_window_info::thread_entry(void *param)
 {
 	MSG message;
 
@@ -1141,7 +1134,7 @@ static unsigned __stdcall thread_entry(void *param)
 				case WM_USER_FINISH_CREATE_WINDOW:
 				{
 					win_window_info *window = (win_window_info *)message.lParam;
-					window->m_init_state = complete_create(window) ? -1 : 1;
+					window->m_init_state = window->complete_create() ? -1 : 1;
 					dispatch = FALSE;
 					break;
 				}
@@ -1165,9 +1158,9 @@ static unsigned __stdcall thread_entry(void *param)
 //  (window thread)
 //============================================================
 
-static int complete_create(win_window_info *window)
+int win_window_info::complete_create()
 {
-	RECT monitorbounds, client;
+	RECT client;
 	int tempwidth, tempheight;
 	HMENU menu = NULL;
 	HDC dc;
@@ -1175,70 +1168,70 @@ static int complete_create(win_window_info *window)
 	assert(GetCurrentThreadId() == window_threadid);
 
 	// get the monitor bounds
-	monitorbounds = window->m_monitor->position_size();
+	osd_rect monitorbounds = m_monitor->position_size();
 
 	// create the window menu if needed
-	if (downcast<windows_options &>(window->machine().options()).menu())
+	if (downcast<windows_options &>(machine().options()).menu())
 	{
-		if (win_create_menu(window->machine(), &menu))
+		if (win_create_menu(machine(), &menu))
 			return 1;
 	}
 
 	// create the window, but don't show it yet
-	window->m_hwnd = win_create_window_ex_utf8(
-						window->m_fullscreen ? FULLSCREEN_STYLE_EX : WINDOW_STYLE_EX,
+	m_hwnd = win_create_window_ex_utf8(
+						m_fullscreen ? FULLSCREEN_STYLE_EX : WINDOW_STYLE_EX,
 						"MAME",
-						window->m_title,
-						window->m_fullscreen ? FULLSCREEN_STYLE : WINDOW_STYLE,
-						monitorbounds.left + 20, monitorbounds.top + 20,
-						monitorbounds.left + 100, monitorbounds.top + 100,
+						m_title,
+						m_fullscreen ? FULLSCREEN_STYLE : WINDOW_STYLE,
+						monitorbounds.left() + 20, monitorbounds.top() + 20,
+						monitorbounds.left() + 100, monitorbounds.top() + 100,
 						NULL,//(win_window_list != NULL) ? win_window_list->m_hwnd : NULL,
 						menu,
 						GetModuleHandle(NULL),
 						NULL);
-	if (window->m_hwnd == NULL)
+	if (m_hwnd == NULL)
 		return 1;
 
 	// set window #0 as the focus window for all windows, required for D3D & multimonitor
-	window->m_focus_hwnd = win_window_list->m_hwnd;
+	m_focus_hwnd = win_window_list->m_hwnd;
 
 	// set a pointer back to us
-	SetWindowLongPtr(window->m_hwnd, GWLP_USERDATA, (LONG_PTR)window);
+	SetWindowLongPtr(m_hwnd, GWLP_USERDATA, (LONG_PTR)this);
 
 	// skip the positioning stuff for -video none */
 	if (video_config.mode == VIDEO_MODE_NONE)
 		return 0;
 
 	// adjust the window position to the initial width/height
-	tempwidth = (window->m_win_config.width != 0) ? window->m_win_config.width : 640;
-	tempheight = (window->m_win_config.height != 0) ? window->m_win_config.height : 480;
-	SetWindowPos(window->m_hwnd, NULL, monitorbounds.left + 20, monitorbounds.top + 20,
-			monitorbounds.left + tempwidth + wnd_extra_width(window),
-			monitorbounds.top + tempheight + wnd_extra_height(window),
+	tempwidth = (m_win_config.width != 0) ? m_win_config.width : 640;
+	tempheight = (m_win_config.height != 0) ? m_win_config.height : 480;
+	SetWindowPos(m_hwnd, NULL, monitorbounds.left() + 20, monitorbounds.top() + 20,
+			monitorbounds.left() + tempwidth + wnd_extra_width(),
+			monitorbounds.top() + tempheight + wnd_extra_height(),
 			SWP_NOZORDER);
 
 	// maximum or minimize as appropriate
-	if (window->m_startmaximized)
-		maximize_window(window);
+	if (m_startmaximized)
+		maximize_window();
 	else
-		minimize_window(window);
-	adjust_window_position_after_major_change(window);
+		minimize_window();
+	adjust_window_position_after_major_change();
 
 	// show the window
-	if (!window->m_fullscreen || window->m_fullscreen_safe)
+	if (!m_fullscreen || m_fullscreen_safe)
 	{
 		// finish off by trying to initialize DirectX; if we fail, ignore it
-		window->m_renderer = draw.create(window);
-		if (window->m_renderer->create())
+		m_renderer = draw.create(this);
+		if (m_renderer->create())
 			return 1;
-		ShowWindow(window->m_hwnd, SW_SHOW);
+		ShowWindow(m_hwnd, SW_SHOW);
 	}
 
 	// clear the window
-	dc = GetDC(window->m_hwnd);
-	GetClientRect(window->m_hwnd, &client);
+	dc = GetDC(m_hwnd);
+	GetClientRect(m_hwnd, &client);
 	FillRect(dc, &client, (HBRUSH)GetStockObject(BLACK_BRUSH));
-	ReleaseDC(window->m_hwnd, dc);
+	ReleaseDC(m_hwnd, dc);
 	return 0;
 }
 
@@ -1258,7 +1251,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 	if (window != NULL)
 	{
 		assert(GetCurrentThreadId() == window_threadid);
-		update_minmax_state(window);
+		window->update_minmax_state();
 	}
 
 	// handle a few messages
@@ -1360,7 +1353,13 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 		{
 			RECT *rect = (RECT *)lparam;
 			if (video_config.keepaspect && !(GetAsyncKeyState(VK_CONTROL) & 0x8000))
-				constrain_to_aspect_ratio(window, rect, wparam);
+			{
+				osd_rect r = window->constrain_to_aspect_ratio(RECT_to_osd_rect(*rect), wparam);
+				rect->top = r.top();
+				rect->left = r.left();
+				rect->bottom = r.bottom();
+				rect->right = r.right();
+			}
 			InvalidateRect(wnd, NULL, FALSE);
 			break;
 		}
@@ -1380,11 +1379,11 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 			// handle maximize
 			if (cmd == SC_MAXIMIZE)
 			{
-				update_minmax_state(window);
+				window->update_minmax_state();
 				if (window->m_ismaximized)
-					minimize_window(window);
+					window->minimize_window();
 				else
-					maximize_window(window);
+					window->maximize_window();
 				break;
 			}
 			return DefWindowProc(wnd, message, wparam, lparam);
@@ -1435,17 +1434,17 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 
 		// fullscreen set
 		case WM_USER_SET_FULLSCREEN:
-			set_fullscreen(window, wparam);
+			window->set_fullscreen(wparam);
 			break;
 
 		// minimum size set
 		case WM_USER_SET_MINSIZE:
-			minimize_window(window);
+			window->minimize_window();
 			break;
 
 		// maximum size set
 		case WM_USER_SET_MAXSIZE:
-			maximize_window(window);
+			window->maximize_window();
 			break;
 
 		// set focus: if we're not the primary window, switch back
@@ -1514,17 +1513,17 @@ void win_window_info::draw_video_contents(HDC dc, int update)
 //  (window thread)
 //============================================================
 
-static void constrain_to_aspect_ratio(win_window_info *window, RECT *rect, int adjustment)
+osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int adjustment)
 {
-	win_monitor_info *monitor = window->winwindow_video_window_monitor(rect);
-	INT32 extrawidth = wnd_extra_width(window);
-	INT32 extraheight = wnd_extra_height(window);
+	INT32 extrawidth = wnd_extra_width();
+	INT32 extraheight = wnd_extra_height();
 	INT32 propwidth, propheight;
 	INT32 minwidth, minheight;
 	INT32 maxwidth, maxheight;
 	INT32 viswidth, visheight;
 	INT32 adjwidth, adjheight;
 	float pixel_aspect;
+	win_monitor_info *monitor = winwindow_video_window_monitor(&rect);
 
 	assert(GetCurrentThreadId() == window_threadid);
 
@@ -1532,8 +1531,8 @@ static void constrain_to_aspect_ratio(win_window_info *window, RECT *rect, int a
 	pixel_aspect = monitor->aspect();
 
 	// determine the proposed width/height
-	propwidth = rect_width(rect) - extrawidth;
-	propheight = rect_height(rect) - extraheight;
+	propwidth = rect.width() - extrawidth;
+	propheight = rect.height() - extraheight;
 
 	// based on which edge we are adjusting, take either the width, height, or both as gospel
 	// and scale to fit using that as our parameter
@@ -1541,21 +1540,21 @@ static void constrain_to_aspect_ratio(win_window_info *window, RECT *rect, int a
 	{
 		case WMSZ_BOTTOM:
 		case WMSZ_TOP:
-			window->m_target->compute_visible_area(10000, propheight, pixel_aspect, window->m_target->orientation(), propwidth, propheight);
+			m_target->compute_visible_area(10000, propheight, pixel_aspect, m_target->orientation(), propwidth, propheight);
 			break;
 
 		case WMSZ_LEFT:
 		case WMSZ_RIGHT:
-			window->m_target->compute_visible_area(propwidth, 10000, pixel_aspect, window->m_target->orientation(), propwidth, propheight);
+			m_target->compute_visible_area(propwidth, 10000, pixel_aspect, m_target->orientation(), propwidth, propheight);
 			break;
 
 		default:
-			window->m_target->compute_visible_area(propwidth, propheight, pixel_aspect, window->m_target->orientation(), propwidth, propheight);
+			m_target->compute_visible_area(propwidth, propheight, pixel_aspect, m_target->orientation(), propwidth, propheight);
 			break;
 	}
 
 	// get the minimum width/height for the current layout
-	window->m_target->compute_minimum_size(minwidth, minheight);
+	m_target->compute_minimum_size(minwidth, minheight);
 
 	// clamp against the absolute minimum
 	propwidth = MAX(propwidth, MIN_WINDOW_DIM);
@@ -1566,21 +1565,21 @@ static void constrain_to_aspect_ratio(win_window_info *window, RECT *rect, int a
 	propheight = MAX(propheight, minheight);
 
 	// clamp against the maximum (fit on one screen for full screen mode)
-	if (window->m_fullscreen)
+	if (m_fullscreen)
 	{
-		maxwidth = rect_width(&monitor->position_size()) - extrawidth;
-		maxheight = rect_height(&monitor->position_size()) - extraheight;
+		maxwidth = monitor->position_size().width() - extrawidth;
+		maxheight = monitor->position_size().height() - extraheight;
 	}
 	else
 	{
-		maxwidth = rect_width(&monitor->usuable_position_size()) - extrawidth;
-		maxheight = rect_height(&monitor->usuable_position_size()) - extraheight;
+		maxwidth = monitor->usuable_position_size().width() - extrawidth;
+		maxheight = monitor->usuable_position_size().height() - extraheight;
 
 		// further clamp to the maximum width/height in the window
-		if (window->m_win_config.width != 0)
-			maxwidth = MIN(maxwidth, window->m_win_config.width + extrawidth);
-		if (window->m_win_config.height != 0)
-			maxheight = MIN(maxheight, window->m_win_config.height + extraheight);
+		if (m_win_config.width != 0)
+			maxwidth = MIN(maxwidth, m_win_config.width + extrawidth);
+		if (m_win_config.height != 0)
+			maxheight = MIN(maxheight, m_win_config.height + extraheight);
 	}
 
 	// clamp to the maximum
@@ -1588,39 +1587,38 @@ static void constrain_to_aspect_ratio(win_window_info *window, RECT *rect, int a
 	propheight = MIN(propheight, maxheight);
 
 	// compute the visible area based on the proposed rectangle
-	window->m_target->compute_visible_area(propwidth, propheight, pixel_aspect, window->m_target->orientation(), viswidth, visheight);
+	m_target->compute_visible_area(propwidth, propheight, pixel_aspect, m_target->orientation(), viswidth, visheight);
 
 	// compute the adjustments we need to make
-	adjwidth = (viswidth + extrawidth) - rect_width(rect);
-	adjheight = (visheight + extraheight) - rect_height(rect);
+	adjwidth = (viswidth + extrawidth) - rect.width();
+	adjheight = (visheight + extraheight) - rect.height();
 
 	// based on which corner we're adjusting, constrain in different ways
+	osd_rect ret(rect);
+
 	switch (adjustment)
 	{
 		case WMSZ_BOTTOM:
 		case WMSZ_BOTTOMRIGHT:
 		case WMSZ_RIGHT:
-			rect->right += adjwidth;
-			rect->bottom += adjheight;
+			ret = rect.resize(rect.width() + adjwidth, rect.height() + adjheight);
 			break;
 
 		case WMSZ_BOTTOMLEFT:
-			rect->left -= adjwidth;
-			rect->bottom += adjheight;
+			ret = rect.move_by(-adjwidth, 0).resize(rect.width(), rect.height() + adjheight);
 			break;
 
 		case WMSZ_LEFT:
 		case WMSZ_TOPLEFT:
 		case WMSZ_TOP:
-			rect->left -= adjwidth;
-			rect->top -= adjheight;
+			ret = rect.move_by(-adjwidth, -adjheight);
 			break;
 
 		case WMSZ_TOPRIGHT:
-			rect->right += adjwidth;
-			rect->top -= adjheight;
+			ret = rect.move_by(0, -adjheight).resize(rect.width() + adjwidth, rect.height());
 			break;
 	}
+	return ret;
 }
 
 
@@ -1630,14 +1628,14 @@ static void constrain_to_aspect_ratio(win_window_info *window, RECT *rect, int a
 //  (window thread)
 //============================================================
 
-static void get_min_bounds(win_window_info *window, RECT *bounds, int constrain)
+osd_dim win_window_info::get_min_bounds(int constrain)
 {
 	INT32 minwidth, minheight;
 
 	assert(GetCurrentThreadId() == window_threadid);
 
 	// get the minimum target size
-	window->m_target->compute_minimum_size(minwidth, minheight);
+	m_target->compute_minimum_size(minwidth, minheight);
 
 	// expand to our minimum dimensions
 	if (minwidth < MIN_WINDOW_DIM)
@@ -1646,45 +1644,34 @@ static void get_min_bounds(win_window_info *window, RECT *bounds, int constrain)
 		minheight = MIN_WINDOW_DIM;
 
 	// account for extra window stuff
-	minwidth += wnd_extra_width(window);
-	minheight += wnd_extra_height(window);
+	minwidth += wnd_extra_width();
+	minheight += wnd_extra_height();
 
 	// if we want it constrained, figure out which one is larger
 	if (constrain)
 	{
-		RECT test1, test2;
-
 		// first constrain with no height limit
-		test1.top = test1.left = 0;
-		test1.right = minwidth;
-		test1.bottom = 10000;
-		constrain_to_aspect_ratio(window, &test1, WMSZ_BOTTOMRIGHT);
+		osd_rect test1(0,0,minwidth,10000);
+		test1 = constrain_to_aspect_ratio(test1, WMSZ_BOTTOMRIGHT);
 
 		// then constrain with no width limit
-		test2.top = test2.left = 0;
-		test2.right = 10000;
-		test2.bottom = minheight;
-		constrain_to_aspect_ratio(window, &test2, WMSZ_BOTTOMRIGHT);
+		osd_rect test2(0,0,10000,minheight);
+		test2 = constrain_to_aspect_ratio(test2, WMSZ_BOTTOMRIGHT);
 
 		// pick the larger
-		if (rect_width(&test1) > rect_width(&test2))
+		if (test1.width() > test2.width())
 		{
-			minwidth = rect_width(&test1);
-			minheight = rect_height(&test1);
+			minwidth = test1.width();
+			minheight = test1.height();
 		}
 		else
 		{
-			minwidth = rect_width(&test2);
-			minheight = rect_height(&test2);
+			minwidth = test2.width();
+			minheight = test2.height();
 		}
 	}
 
-	// get the window rect
-	GetWindowRect(window->m_hwnd, bounds);
-
-	// now adjust
-	bounds->right = bounds->left + minwidth;
-	bounds->bottom = bounds->top + minheight;
+	return osd_dim(minwidth, minheight);
 }
 
 
@@ -1694,45 +1681,40 @@ static void get_min_bounds(win_window_info *window, RECT *bounds, int constrain)
 //  (window thread)
 //============================================================
 
-static void get_max_bounds(win_window_info *window, RECT *bounds, int constrain)
+osd_dim win_window_info::get_max_bounds(int constrain)
 {
-	RECT maximum;
-
 	assert(GetCurrentThreadId() == window_threadid);
 
 	// compute the maximum client area
-	window->m_monitor->refresh();
-	maximum = window->m_monitor->usuable_position_size();
+	m_monitor->refresh();
+	osd_rect maximum = m_monitor->usuable_position_size();
 
 	// clamp to the window's max
-	if (window->m_win_config.width != 0)
+	int tempw = maximum.width();
+	int temph = maximum.height();
+	if (m_win_config.width != 0)
 	{
-		int temp = window->m_win_config.width + wnd_extra_width(window);
-		if (temp < rect_width(&maximum))
-			maximum.right = maximum.left + temp;
+		int temp = m_win_config.width + wnd_extra_width();
+		if (temp < maximum.width())
+			tempw = temp;
 	}
-	if (window->m_win_config.height != 0)
+	if (m_win_config.height != 0)
 	{
-		int temp = window->m_win_config.height + wnd_extra_height(window);
-		if (temp < rect_height(&maximum))
-			maximum.bottom = maximum.top + temp;
+		int temp = m_win_config.height + wnd_extra_height();
+		if (temp < maximum.height())
+			temph = temp;
 	}
+
+	maximum = maximum.resize(tempw, temph);
 
 	// constrain to fit
 	if (constrain)
-		constrain_to_aspect_ratio(window, &maximum, WMSZ_BOTTOMRIGHT);
+		maximum = constrain_to_aspect_ratio(maximum, WMSZ_BOTTOMRIGHT);
 	else
 	{
-		maximum.right -= wnd_extra_width(window);
-		maximum.bottom -= wnd_extra_height(window);
+		maximum = maximum.resize(maximum.width() - wnd_extra_width(), maximum.height() - wnd_extra_height());
 	}
-
-	// center within the work area
-	RECT work = window->m_monitor->usuable_position_size();
-	bounds->left = work.left + (rect_width(&work) - rect_width(&maximum)) / 2;
-	bounds->top = work.top + (rect_height(&work) - rect_height(&maximum)) / 2;
-	bounds->right = bounds->left + rect_width(&maximum);
-	bounds->bottom = bounds->top + rect_height(&maximum);
+	return maximum.dim();
 }
 
 
@@ -1742,29 +1724,29 @@ static void get_max_bounds(win_window_info *window, RECT *bounds, int constrain)
 //  (window thread)
 //============================================================
 
-static void update_minmax_state(win_window_info *window)
+void win_window_info::update_minmax_state()
 {
 	assert(GetCurrentThreadId() == window_threadid);
 
-	if (!window->m_fullscreen)
+	if (!m_fullscreen)
 	{
-		RECT bounds, minbounds, maxbounds;
+		RECT bounds;
 
 		// compare the maximum bounds versus the current bounds
-		get_min_bounds(window, &minbounds, video_config.keepaspect);
-		get_max_bounds(window, &maxbounds, video_config.keepaspect);
-		GetWindowRect(window->m_hwnd, &bounds);
+		osd_dim minbounds = get_min_bounds(video_config.keepaspect);
+		osd_dim maxbounds = get_max_bounds(video_config.keepaspect);
+		GetWindowRect(m_hwnd, &bounds);
 
 		// if either the width or height matches, we were maximized
-		window->m_isminimized = (rect_width(&bounds) == rect_width(&minbounds) ||
-								rect_height(&bounds) == rect_height(&minbounds));
-		window->m_ismaximized = (rect_width(&bounds) == rect_width(&maxbounds) ||
-								rect_height(&bounds) == rect_height(&maxbounds));
+		m_isminimized = (rect_width(&bounds) == minbounds.width()) ||
+								(rect_height(&bounds) == minbounds.height());
+		m_ismaximized = (rect_width(&bounds) == maxbounds.width()) ||
+								(rect_height(&bounds) == maxbounds.height());
 	}
 	else
 	{
-		window->m_isminimized = FALSE;
-		window->m_ismaximized = TRUE;
+		m_isminimized = FALSE;
+		m_ismaximized = TRUE;
 	}
 }
 
@@ -1775,14 +1757,20 @@ static void update_minmax_state(win_window_info *window)
 //  (window thread)
 //============================================================
 
-static void minimize_window(win_window_info *window)
+void win_window_info::minimize_window()
 {
-	RECT newsize;
-
 	assert(GetCurrentThreadId() == window_threadid);
 
-	get_min_bounds(window, &newsize, video_config.keepaspect);
-	SetWindowPos(window->m_hwnd, NULL, newsize.left, newsize.top, rect_width(&newsize), rect_height(&newsize), SWP_NOZORDER);
+	osd_dim newsize = get_min_bounds(video_config.keepaspect);
+
+	// get the window rect
+	RECT bounds;
+	GetWindowRect(m_hwnd, &bounds);
+
+	osd_rect newrect(bounds.left, bounds.top, newsize );
+
+
+	SetWindowPos(m_hwnd, NULL, newrect.left(), newrect.top(), newrect.width(), newrect.height(), SWP_NOZORDER);
 }
 
 
@@ -1792,14 +1780,19 @@ static void minimize_window(win_window_info *window)
 //  (window thread)
 //============================================================
 
-static void maximize_window(win_window_info *window)
+void win_window_info::maximize_window()
 {
-	RECT newsize;
-
 	assert(GetCurrentThreadId() == window_threadid);
 
-	get_max_bounds(window, &newsize, video_config.keepaspect);
-	SetWindowPos(window->m_hwnd, NULL, newsize.left, newsize.top, rect_width(&newsize), rect_height(&newsize), SWP_NOZORDER);
+	osd_dim newsize = get_max_bounds(video_config.keepaspect);
+
+	// center within the work area
+	osd_rect work = m_monitor->usuable_position_size();
+	osd_rect newrect = osd_rect(work.left() + (work.width() - newsize.width()) / 2,
+			work.top() + (work.height() - newsize.height()) / 2,
+			newsize);
+
+	SetWindowPos(m_hwnd, NULL, newrect.left(), newrect.top(), newrect.width(), newrect.height(), SWP_NOZORDER);
 }
 
 
@@ -1809,43 +1802,43 @@ static void maximize_window(win_window_info *window)
 //  (window thread)
 //============================================================
 
-static void adjust_window_position_after_major_change(win_window_info *window)
+void win_window_info::adjust_window_position_after_major_change()
 {
-	RECT oldrect, newrect;
+	RECT oldrect;
 
 	assert(GetCurrentThreadId() == window_threadid);
 
 	// get the current size
-	GetWindowRect(window->m_hwnd, &oldrect);
+	GetWindowRect(m_hwnd, &oldrect);
+	osd_rect newrect = RECT_to_osd_rect(oldrect);
 
 	// adjust the window size so the client area is what we want
-	if (!window->m_fullscreen)
+	if (!m_fullscreen)
 	{
 		// constrain the existing size to the aspect ratio
-		newrect = oldrect;
 		if (video_config.keepaspect)
-			constrain_to_aspect_ratio(window, &newrect, WMSZ_BOTTOMRIGHT);
+			newrect = constrain_to_aspect_ratio(newrect, WMSZ_BOTTOMRIGHT);
 	}
 
 	// in full screen, make sure it covers the primary display
 	else
 	{
-		win_monitor_info *monitor = window->winwindow_video_window_monitor(NULL);
+		win_monitor_info *monitor = winwindow_video_window_monitor(NULL);
 		newrect = monitor->position_size();
 	}
 
 	// adjust the position if different
-	if (oldrect.left != newrect.left || oldrect.top != newrect.top ||
-		oldrect.right != newrect.right || oldrect.bottom != newrect.bottom)
-		SetWindowPos(window->m_hwnd, window->m_fullscreen ? HWND_TOPMOST : HWND_TOP,
-				newrect.left, newrect.top,
-				rect_width(&newrect), rect_height(&newrect), 0);
+	if (oldrect.left != newrect.left() || oldrect.top != newrect.top() ||
+		oldrect.right != newrect.right() || oldrect.bottom != newrect.bottom())
+		SetWindowPos(m_hwnd, m_fullscreen ? HWND_TOPMOST : HWND_TOP,
+				newrect.left(), newrect.top(),
+				newrect.width(), newrect.height(), 0);
 
 	// take note of physical window size (used for lightgun coordinate calculation)
-	if (window == win_window_list)
+	if (this == win_window_list)
 	{
-		win_physical_width = rect_width(&newrect);
-		win_physical_height = rect_height(&newrect);
+		win_physical_width = newrect.width();
+		win_physical_height = newrect.height();
 		logerror("Physical width %d, height %d\n",win_physical_width,win_physical_height);
 	}
 }
@@ -1856,48 +1849,48 @@ static void adjust_window_position_after_major_change(win_window_info *window)
 //  (window thread)
 //============================================================
 
-static void set_fullscreen(win_window_info *window, int fullscreen)
+void win_window_info::set_fullscreen(int fullscreen)
 {
 	assert(GetCurrentThreadId() == window_threadid);
 
 	// if we're in the right state, punt
-	if (window->m_fullscreen == fullscreen)
+	if (m_fullscreen == fullscreen)
 		return;
-	window->m_fullscreen = fullscreen;
+	m_fullscreen = fullscreen;
 
 	// kill off the drawers
-	window->m_renderer->destroy();
-	global_free(window->m_renderer);
-	window->m_renderer = NULL;
+	m_renderer->destroy();
+	global_free(m_renderer);
+	m_renderer = NULL;
 
 	// hide ourself
-	ShowWindow(window->m_hwnd, SW_HIDE);
+	ShowWindow(m_hwnd, SW_HIDE);
 
 	// configure the window if non-fullscreen
 	if (!fullscreen)
 	{
 		// adjust the style
-		SetWindowLong(window->m_hwnd, GWL_STYLE, WINDOW_STYLE);
-		SetWindowLong(window->m_hwnd, GWL_EXSTYLE, WINDOW_STYLE_EX);
-		SetWindowPos(window->m_hwnd, 0, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+		SetWindowLong(m_hwnd, GWL_STYLE, WINDOW_STYLE);
+		SetWindowLong(m_hwnd, GWL_EXSTYLE, WINDOW_STYLE_EX);
+		SetWindowPos(m_hwnd, 0, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 
 		// force to the bottom, then back on top
-		SetWindowPos(window->m_hwnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-		SetWindowPos(window->m_hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+		SetWindowPos(m_hwnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+		SetWindowPos(m_hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
 		// if we have previous non-fullscreen bounds, use those
-		if (window->m_non_fullscreen_bounds.right != window->m_non_fullscreen_bounds.left)
+		if (m_non_fullscreen_bounds.right != m_non_fullscreen_bounds.left)
 		{
-			SetWindowPos(window->m_hwnd, HWND_TOP, window->m_non_fullscreen_bounds.left, window->m_non_fullscreen_bounds.top,
-						rect_width(&window->m_non_fullscreen_bounds), rect_height(&window->m_non_fullscreen_bounds),
+			SetWindowPos(m_hwnd, HWND_TOP, m_non_fullscreen_bounds.left, m_non_fullscreen_bounds.top,
+						rect_width(&m_non_fullscreen_bounds), rect_height(&m_non_fullscreen_bounds),
 						SWP_NOZORDER);
 		}
 
 		// otherwise, set a small size and maximize from there
 		else
 		{
-			SetWindowPos(window->m_hwnd, HWND_TOP, 0, 0, MIN_WINDOW_DIM, MIN_WINDOW_DIM, SWP_NOZORDER);
-			maximize_window(window);
+			SetWindowPos(m_hwnd, HWND_TOP, 0, 0, MIN_WINDOW_DIM, MIN_WINDOW_DIM, SWP_NOZORDER);
+			maximize_window();
 		}
 	}
 
@@ -1905,32 +1898,32 @@ static void set_fullscreen(win_window_info *window, int fullscreen)
 	else
 	{
 		// save the bounds
-		GetWindowRect(window->m_hwnd, &window->m_non_fullscreen_bounds);
+		GetWindowRect(m_hwnd, &m_non_fullscreen_bounds);
 
 		// adjust the style
-		SetWindowLong(window->m_hwnd, GWL_STYLE, FULLSCREEN_STYLE);
-		SetWindowLong(window->m_hwnd, GWL_EXSTYLE, FULLSCREEN_STYLE_EX);
-		SetWindowPos(window->m_hwnd, 0, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+		SetWindowLong(m_hwnd, GWL_STYLE, FULLSCREEN_STYLE);
+		SetWindowLong(m_hwnd, GWL_EXSTYLE, FULLSCREEN_STYLE_EX);
+		SetWindowPos(m_hwnd, 0, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 
 		// set topmost
-		SetWindowPos(window->m_hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+		SetWindowPos(m_hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	}
 
 	// adjust the window to compensate for the change
-	adjust_window_position_after_major_change(window);
+	adjust_window_position_after_major_change();
 
 	// show ourself
-	if (!window->m_fullscreen || window->m_fullscreen_safe)
+	if (!m_fullscreen || m_fullscreen_safe)
 	{
 		if (video_config.mode != VIDEO_MODE_NONE)
-			ShowWindow(window->m_hwnd, SW_SHOW);
-		window->m_renderer = draw.create(window);
-		if (window->m_renderer->create())
+			ShowWindow(m_hwnd, SW_SHOW);
+		m_renderer = draw.create(this);
+		if (m_renderer->create())
 			exit(1);
 	}
 
 	// ensure we're still adjusted correctly
-	adjust_window_position_after_major_change(window);
+	adjust_window_position_after_major_change();
 }
 
 #if (USE_QTDEBUG)

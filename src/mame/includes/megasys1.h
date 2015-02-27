@@ -102,6 +102,7 @@ public:
 	DECLARE_WRITE16_MEMBER(megasys1_scrollram_1_w);
 	DECLARE_WRITE16_MEMBER(megasys1_scrollram_2_w);
 	DECLARE_WRITE16_MEMBER(megasys1_vregs_A_w);
+	DECLARE_WRITE16_MEMBER(megasys1_vregs_monkelf_w);
 	DECLARE_READ16_MEMBER(megasys1_vregs_C_r);
 	DECLARE_WRITE16_MEMBER(megasys1_vregs_C_w);
 	DECLARE_WRITE16_MEMBER(megasys1_vregs_D_w);
@@ -145,6 +146,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1B_scanline);
 	inline void scrollram_w(offs_t offset, UINT16 data, UINT16 mem_mask, int which);
 	void create_tilemaps();
+	void megasys1_priority_create();
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void rodlandj_gfx_unmangle(const char *region);
 	void jitsupro_gfx_unmangle(const char *region);

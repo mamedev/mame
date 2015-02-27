@@ -113,6 +113,8 @@ void vulgus_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(vulgus_state::get_bg_tile_info),this),TILEMAP_SCAN_COLS,16,16,32,32);
 
 	m_fg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 47);
+	
+	save_item(NAME(m_palette_bank));
 }
 
 
@@ -122,20 +124,20 @@ void vulgus_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(vulgus_state::vulgus_fgvideoram_w)
+WRITE8_MEMBER(vulgus_state::fgvideoram_w)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(vulgus_state::vulgus_bgvideoram_w)
+WRITE8_MEMBER(vulgus_state::bgvideoram_w)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-WRITE8_MEMBER(vulgus_state::vulgus_c804_w)
+WRITE8_MEMBER(vulgus_state::c804_w)
 {
 	/* bits 0 and 1 are coin counters */
 	coin_counter_w(machine(), 0, data & 0x01);
@@ -146,7 +148,7 @@ WRITE8_MEMBER(vulgus_state::vulgus_c804_w)
 }
 
 
-WRITE8_MEMBER(vulgus_state::vulgus_palette_bank_w)
+WRITE8_MEMBER(vulgus_state::palette_bank_w)
 {
 	if (m_palette_bank != (data & 3))
 	{
@@ -194,7 +196,7 @@ void vulgus_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	}
 }
 
-UINT32 vulgus_state::screen_update_vulgus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 vulgus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, m_scroll_low[1] + 256 * m_scroll_high[1]);
 	m_bg_tilemap->set_scrolly(0, m_scroll_low[0] + 256 * m_scroll_high[0]);

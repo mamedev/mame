@@ -30,6 +30,7 @@ void jal_blend_init(running_machine &machine, int enable)
 	{
 		jal_blend_table = auto_alloc_array_clear(machine, UINT8, 0xc00);
 		machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(jal_blend_reset), &machine));
+		machine.save().save_pointer(NAME(jal_blend_table), 0xc00);
 	}
 	else
 	{

@@ -146,7 +146,7 @@ public:
 	: osd_renderer(w, FLAG_NONE), m_blittimer(0), m_sdl_renderer(NULL),
 		m_last_hofs(0), m_last_vofs(0),
 		m_width(0), m_height(0),
-		m_blitwidth(0), m_blitheight(0),
+		m_blit_dim(0,0),
 		m_last_blit_time(0), m_last_blit_pixels(0)
 	{}
 
@@ -156,14 +156,13 @@ public:
 	/* virtual */ void destroy();
 	/* virtual */ render_primitive_list *get_primitives()
 	{
-		int nw = 0; int nh = 0;
-		window().blit_surface_size(nw, nh);
-		if (nw != m_blitwidth || nh != m_blitheight)
+		osd_dim nd = window().blit_surface_size();
+		if (nd != m_blit_dim)
 		{
-			m_blitwidth = nw; m_blitheight = nh;
+			m_blit_dim = nd;
 			notify_changed();
 		}
-		window().target()->set_bounds(m_blitwidth, m_blitheight, window().aspect());
+		window().target()->set_bounds(m_blit_dim.width(), m_blit_dim.height(), window().aspect());
 		return &window().target()->get_primitives();
 	}
 
@@ -193,8 +192,7 @@ private:
 	int             m_width;
 	int             m_height;
 
-	int             m_blitwidth;
-	int             m_blitheight;
+	osd_dim         m_blit_dim;
 
 	// Stats
 	INT64           m_last_blit_time;
@@ -649,9 +647,9 @@ int sdl_info13::xy_to_render_target(int x, int y, int *xt, int *yt)
 {
 	*xt = x - m_last_hofs;
 	*yt = y - m_last_vofs;
-	if (*xt<0 || *xt >= m_blitwidth)
+	if (*xt<0 || *xt >= m_blit_dim.width())
 		return 0;
-	if (*yt<0 || *yt >= m_blitheight)
+	if (*yt<0 || *yt >= m_blit_dim.height())
 		return 0;
 	return 1;
 }
@@ -688,14 +686,13 @@ int sdl_info13::draw(int update)
 		return 0;
 	}
 
-	int width = 0; int height = 0;
-	window().get_size(width,height);
+	osd_dim wdim = window().get_size();
 
-	if (has_flags(FI_CHANGED) || (width != m_width) || (height != m_height))
+	if (has_flags(FI_CHANGED) || (wdim.width() != m_width) || (wdim.height() != m_height))
 	{
 		destroy_all_textures();
-		m_width = width;
-		m_height = height;
+		m_width = wdim.width();
+		m_height = wdim.height();
 		SDL_RenderSetViewport(m_sdl_renderer, NULL);
 		m_blittimer = 3;
 		clear_flags(FI_CHANGED);
@@ -720,16 +717,16 @@ int sdl_info13::draw(int update)
 	{
 		int ch, cw;
 
-		ch = height;
-		cw = width;
+		ch = wdim.height();
+		cw = wdim.width();
 
 		if (video_config.centerv)
 		{
-			vofs = (ch - m_blitheight) / 2.0f;
+			vofs = (ch - m_blit_dim.height()) / 2.0f;
 		}
 		if (video_config.centerh)
 		{
-			hofs = (cw - m_blitwidth) / 2.0f;
+			hofs = (cw - m_blit_dim.width()) / 2.0f;
 		}
 	}
 

@@ -59,6 +59,58 @@ struct sdl_mode
 	int                 height;
 };
 
+class osd_dim
+{
+public:
+	osd_dim(const int &w, const int &h)
+	: m_w(w), m_h(h)
+	{
+	}
+	int width() const { return m_w; }
+	int height() const { return m_h; }
+
+	bool operator!=(const osd_dim &other) { return (m_w != other.width()) || (m_h != other.height()); }
+	bool operator==(const osd_dim &other) { return (m_w == other.width()) && (m_h == other.height()); }
+private:
+	int m_w;
+	int m_h;
+};
+
+class osd_rect
+{
+public:
+	osd_rect(const int x, const int y, const int &w, const int &h)
+	: m_x(x), m_y(y), m_d(w,h)
+	{
+	}
+	osd_rect(const int x, const int y, const osd_dim &d)
+	: m_x(x), m_y(y), m_d(d)
+	{
+	}
+	int top() const { return m_y; }
+	int left() const { return m_x; }
+	int width() const { return m_d.width(); }
+	int height() const { return m_d.height(); }
+
+	osd_dim dim() const { return m_d; }
+
+	int bottom() const { return m_y + m_d.height(); }
+	int right() const { return m_x + m_d.width(); }
+
+	osd_rect move_by(int dx, int dy) const { return osd_rect(m_x + dx, m_y + dy, m_d); }
+	osd_rect resize(int w, int h) const { return osd_rect(m_x, m_y, w, h); }
+
+private:
+	int m_x;
+	int m_y;
+	osd_dim m_d;
+};
+
+inline osd_rect SDL_Rect_to_osd_rect(const SDL_Rect &r)
+{
+	return osd_rect(r.x, r.y, r.w, r.h);
+}
+
 // FIXME: This is sort of ugly ... and should be a real interface only
 class sdl_monitor_info
 {
@@ -75,13 +127,14 @@ public:
 	}
 
 	const UINT64 handle() { return m_handle; }
-	const SDL_Rect &position_size() { refresh(); return m_dimensions; }
+	const osd_rect position_size() { refresh(); return SDL_Rect_to_osd_rect(m_dimensions); }
+	const osd_rect usuable_position_size() { refresh(); return SDL_Rect_to_osd_rect(m_dimensions); }
 
 	const char *devicename() { refresh(); return m_name[0] ? m_name : "UNKNOWN"; }
 
 	float aspect();
 
-	void set_aspect(const float aspect) { m_aspect = aspect; }
+	void set_aspect(const float a) { m_aspect = a; }
 
 	// STATIC
 	static void init();

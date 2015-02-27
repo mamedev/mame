@@ -487,7 +487,7 @@ public:
 	sdl_info_ogl(osd_window *window)
 	: osd_renderer(window, FLAG_NEEDS_OPENGL), m_blittimer(0),
 		m_width(0), m_height(0),
-		m_blitwidth(0), m_blitheight(0),
+		m_blit_dim(0, 0),
 		m_gl_context(NULL),
 		m_initialized(0),
 		m_last_blendmode(0),
@@ -519,18 +519,17 @@ public:
 	/* virtual */ void destroy();
 	/* virtual */ render_primitive_list *get_primitives()
 	{
-		int nw = 0; int nh = 0;
 #ifdef OSD_WINDOWS
-		window().get_size(nw, nh);
+		osd_dim nd = window().get_size();
 #else
-		window().blit_surface_size(nw, nh);
+		osd_dim nd = window().blit_surface_size();
 #endif
-		if (nw != m_blitwidth || nh != m_blitheight)
+		if (nd != m_blit_dim)
 		{
-			m_blitwidth = nw; m_blitheight = nh;
+			m_blit_dim = nd;
 			notify_changed();
 		}
-		window().target()->set_bounds(m_blitwidth, m_blitheight, window().aspect());
+		window().target()->set_bounds(m_blit_dim.width(), m_blit_dim.height(), window().aspect());
 		return &window().target()->get_primitives();
 	}
 
@@ -562,8 +561,7 @@ private:
 	INT32           m_blittimer;
 	int             m_width;
 	int             m_height;
-	int             m_blitwidth;
-	int             m_blitheight;
+	osd_dim         m_blit_dim;
 
 	osd_gl_context	*m_gl_context;
 
@@ -1070,9 +1068,9 @@ int sdl_info_ogl::xy_to_render_target(int x, int y, int *xt, int *yt)
 {
 	*xt = x - m_last_hofs;
 	*yt = y - m_last_vofs;
-	if (*xt<0 || *xt >= m_blitwidth)
+	if (*xt<0 || *xt >= m_blit_dim.width())
 		return 0;
-	if (*yt<0 || *yt >= m_blitheight)
+	if (*yt<0 || *yt >= m_blit_dim.height())
 		return 0;
 	return 1;
 }
@@ -1479,7 +1477,6 @@ int sdl_info_ogl::draw(const int update)
 	texture_info *texture=NULL;
 	float vofs, hofs;
 	int  pendingPrimitive=GL_NO_PRIMITIVE, curPrimitive=GL_NO_PRIMITIVE;
-	int width = 0; int height = 0;
 
 #ifdef TOBEMIGRATED
 	if (video_config.novideo)
@@ -1488,13 +1485,13 @@ int sdl_info_ogl::draw(const int update)
 	}
 #endif
 
-	window().get_size(width, height);
+	osd_dim wdim = window().get_size();
 
-	if (has_flags(FI_CHANGED) || (width != m_width) || (height != m_height))
+	if (has_flags(FI_CHANGED) || (wdim.width() != m_width) || (wdim.height() != m_height))
 	{
 		destroy_all_textures();
-		m_width = width;
-		m_height = height;
+		m_width = wdim.width();
+		m_height = wdim.height();
 		m_blittimer = 3;
 		m_init_context = 1;
 		clear_flags(FI_CHANGED);
@@ -1613,11 +1610,11 @@ int sdl_info_ogl::draw(const int update)
 
 		if (video_config.centerv)
 		{
-			vofs = (ch - m_blitheight) / 2.0f;
+			vofs = (ch - m_blit_dim.height()) / 2.0f;
 		}
 		if (video_config.centerh)
 		{
-			hofs = (cw - m_blitwidth) / 2.0f;
+			hofs = (cw - m_blit_dim.width()) / 2.0f;
 		}
 	}
 #else
@@ -2186,8 +2183,8 @@ int sdl_info_ogl::texture_shader_create(const render_texinfo *texsource, texture
 {
 	int uniform_location;
 	int i;
-	int surf_w_pow2  = get_valid_pow2_value (m_blitwidth, texture->texpow2);
-	int surf_h_pow2  = get_valid_pow2_value (m_blitheight, texture->texpow2);
+	int surf_w_pow2  = get_valid_pow2_value (m_blit_dim.width(), texture->texpow2);
+	int surf_h_pow2  = get_valid_pow2_value (m_blit_dim.height(), texture->texpow2);
 
 	assert ( texture->type==TEXTURE_TYPE_SHADER );
 
@@ -2234,7 +2231,7 @@ int sdl_info_ogl::texture_shader_create(const render_texinfo *texsource, texture
 		pfn_glUniform2fvARB(uniform_location, 1, &(color_texture_pow2_sz[0]));
 		GL_CHECK_ERROR_NORMAL();
 
-		GLfloat screen_texture_sz[2] = { (GLfloat) m_blitwidth, (GLfloat) m_blitheight };
+		GLfloat screen_texture_sz[2] = { (GLfloat) m_blit_dim.width(), (GLfloat) m_blit_dim.height() };
 		uniform_location = pfn_glGetUniformLocationARB(m_glsl_program[i], "screen_texture_sz");
 		pfn_glUniform2fvARB(uniform_location, 1, &(screen_texture_sz[0]));
 		GL_CHECK_ERROR_NORMAL();

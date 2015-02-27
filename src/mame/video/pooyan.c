@@ -124,21 +124,21 @@ void pooyan_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(pooyan_state::pooyan_videoram_w)
+WRITE8_MEMBER(pooyan_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(pooyan_state::pooyan_colorram_w)
+WRITE8_MEMBER(pooyan_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(pooyan_state::pooyan_flipscreen_w)
+WRITE8_MEMBER(pooyan_state::flipscreen_w)
 {
 	flip_screen_set(~data & 0x01);
 }
@@ -153,19 +153,15 @@ WRITE8_MEMBER(pooyan_state::pooyan_flipscreen_w)
 
 void pooyan_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
-	UINT8 *spriteram_2 = m_spriteram2;
-	int offs;
-
-	for (offs = 0x10; offs < 0x40; offs += 2)
+	for (int offs = 0x10; offs < 0x40; offs += 2)
 	{
-		int sx = spriteram[offs];
-		int sy = 240 - spriteram_2[offs + 1];
+		int sx = m_spriteram[offs];
+		int sy = 240 - m_spriteram2[offs + 1];
 
-		int code = spriteram[offs + 1];
-		int color = spriteram_2[offs] & 0x0f;
-		int flipx = ~spriteram_2[offs] & 0x40;
-		int flipy = spriteram_2[offs] & 0x80;
+		int code = m_spriteram[offs + 1];
+		int color = m_spriteram2[offs] & 0x0f;
+		int flipx = ~m_spriteram2[offs] & 0x40;
+		int flipy = m_spriteram2[offs] & 0x80;
 
 
 			m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
@@ -185,7 +181,7 @@ void pooyan_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
  *
  *************************************/
 
-UINT32 pooyan_state::screen_update_pooyan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 pooyan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);

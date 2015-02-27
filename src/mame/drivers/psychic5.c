@@ -69,7 +69,7 @@ execution of two different restart (RST) instructions.
 RST 10,the main IRQ,is to be triggered each time the screen is refreshed.
 RST 08 must be triggered in order to make the game work properly
 (e.g. demo game),I guess sound has something to do with this IRQ,but I
-don't know whether it is sinchronized with video beam neither I know whether
+don't know whether it is synchronized with video beam neither I know whether
 it can be disabled.
 
 Sound CPU runs in IM1.
@@ -237,7 +237,7 @@ background intensity.
 Background intensity is encoded in the same way of colors,and
 affects the intensity of each color component (BGR).
 The least significant nibble of c5ff is unknown,it assumes value
-0xf occasionaly when the other nibbles are changed.The only
+0xf occasionally when the other nibbles are changed.The only
 value which is not 0 neither 0xf is 2 and it is assumed by this nibble
 during the ride on the witches' broom.
 
@@ -265,7 +265,7 @@ Background virtual screen is 1024 pixels tall and 512 pixel wide.
 Two consecutive bytes identify one tile.
 
         O7 O6 O5 O4 O3 O2 O1 O0         gfx Offset
-        O9 O8 FX FY C3 C2 C1 C0         Attibute
+        O9 O8 FX FY C3 C2 C1 C0         Attribute
 
         O= GFX offset (1024 tiles)
         F= Flip X and Y
@@ -315,6 +315,20 @@ The first sprite data is located at f20b,then f21b and so on.
 #include "includes/psychic5.h"
 
 
+MACHINE_START_MEMBER(psychic5_state, psychic5)
+{
+	membank("mainbank")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
+	
+	save_item(NAME(m_bank_latch));
+}
+
+MACHINE_START_MEMBER(psychic5_state, bombsa)
+{
+	membank("mainbank")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
+	
+	save_item(NAME(m_bank_latch));
+}
+
 void psychic5_state::machine_reset()
 {
 	m_bank_latch = 0xff;
@@ -327,7 +341,7 @@ void psychic5_state::machine_reset()
 
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(psychic5_state::psychic5_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(psychic5_state::scanline)
 {
 	int scanline = param;
 
@@ -346,34 +360,26 @@ TIMER_DEVICE_CALLBACK_MEMBER(psychic5_state::psychic5_scanline)
 
 ***************************************************************************/
 
-READ8_MEMBER(psychic5_state::psychic5_bankselect_r)
+READ8_MEMBER(psychic5_state::bankselect_r)
 {
 	return m_bank_latch;
 }
 
 WRITE8_MEMBER(psychic5_state::psychic5_bankselect_w)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-	int bankaddress;
-
 	if (m_bank_latch != data)
 	{
 		m_bank_latch = data;
-		bankaddress = 0x10000 + ((data & 3) * 0x4000);
-		membank("bank1")->set_base(&RAM[bankaddress]);   /* Select 4 banks of 16k */
+		membank("mainbank")->set_entry(data & 3);   /* Select 4 banks of 16k */
 	}
 }
 
 WRITE8_MEMBER(psychic5_state::bombsa_bankselect_w)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-	int bankaddress;
-
 	if (m_bank_latch != data)
 	{
 		m_bank_latch = data;
-		bankaddress = 0x10000 + ((data & 7) * 0x4000);
-		membank("bank1")->set_base(&RAM[bankaddress]);   /* Select 8 banks of 16k */
+		membank("mainbank")->set_entry(data & 7);   /* Select 8 banks of 16k */
 	}
 }
 
@@ -407,13 +413,13 @@ WRITE8_MEMBER(psychic5_state::bombsa_flipscreen_w)
 
 static ADDRESS_MAP_START( psychic5_main_map, AS_PROGRAM, 8, psychic5_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")
 	AM_RANGE(0xc000, 0xdfff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xf001, 0xf001) AM_READNOP AM_WRITE(psychic5_coin_counter_w)
-	AM_RANGE(0xf002, 0xf002) AM_READWRITE(psychic5_bankselect_r, psychic5_bankselect_w)
-	AM_RANGE(0xf003, 0xf003) AM_READWRITE(psychic5_vram_page_select_r, psychic5_vram_page_select_w)
+	AM_RANGE(0xf002, 0xf002) AM_READWRITE(bankselect_r, psychic5_bankselect_w)
+	AM_RANGE(0xf003, 0xf003) AM_READWRITE(vram_page_select_r, vram_page_select_w)
 	AM_RANGE(0xf004, 0xf004) AM_NOP // ???
 	AM_RANGE(0xf005, 0xf005) AM_READNOP AM_WRITE(psychic5_title_screen_w)
 	AM_RANGE(0xf006, 0xf1ff) AM_NOP
@@ -458,14 +464,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bombsa_main_map, AS_PROGRAM, 8, psychic5_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 
 	/* ports look like the other games */
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(soundlatch_byte_w) // confirmed
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(bombsa_flipscreen_w)
-	AM_RANGE(0xd002, 0xd002) AM_READWRITE(psychic5_bankselect_r, bombsa_bankselect_w)
-	AM_RANGE(0xd003, 0xd003) AM_READWRITE(psychic5_vram_page_select_r, psychic5_vram_page_select_w)
+	AM_RANGE(0xd002, 0xd002) AM_READWRITE(bankselect_r, bombsa_bankselect_w)
+	AM_RANGE(0xd003, 0xd003) AM_READWRITE(vram_page_select_r, vram_page_select_w)
 	AM_RANGE(0xd005, 0xd005) AM_WRITE(bombsa_unknown_w) // ?
 
 	AM_RANGE(0xd000, 0xd1ff) AM_RAM
@@ -682,18 +688,12 @@ static GFXDECODE_START( bombsa )
 GFXDECODE_END
 
 
-
-WRITE_LINE_MEMBER(psychic5_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 static MACHINE_CONFIG_START( psychic5, psychic5_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)
 	MCFG_CPU_PROGRAM_MAP(psychic5_main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", psychic5_state, psychic5_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", psychic5_state, scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(psychic5_vrambank_map)
@@ -707,6 +707,8 @@ static MACHINE_CONFIG_START( psychic5, psychic5_state )
 	MCFG_CPU_IO_MAP(psychic5_soundport_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))      /* Allow time for 2nd cpu to interleave */
+	
+	MCFG_MACHINE_START_OVERRIDE(psychic5_state,psychic5)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -727,7 +729,7 @@ static MACHINE_CONFIG_START( psychic5, psychic5_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(psychic5_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -745,7 +747,7 @@ static MACHINE_CONFIG_START( bombsa, psychic5_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2 ) /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(bombsa_main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", psychic5_state, psychic5_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", psychic5_state, scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bombsa_vrambank_map)
@@ -759,6 +761,8 @@ static MACHINE_CONFIG_START( bombsa, psychic5_state )
 	MCFG_CPU_IO_MAP(bombsa_soundport_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	
+	MCFG_MACHINE_START_OVERRIDE(psychic5_state,bombsa)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -778,7 +782,7 @@ static MACHINE_CONFIG_START( bombsa, psychic5_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(psychic5_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.30)
 	MCFG_SOUND_ROUTE(2, "mono", 0.30)
@@ -944,6 +948,6 @@ ROM_START( bombsa )
 ROM_END
 
 
-GAME( 1987, psychic5,  0,        psychic5, psychic5, driver_device, 0, ROT270, "Jaleco / NMK", "Psychic 5 (World)", 0 ) // "Oversea's version V2.00 CHANGED BY TAMIO NAKASATO" text present in ROM, various modifications (English names, more complete attract demo etc.)
-GAME( 1987, psychic5j, psychic5, psychic5, psychic5, driver_device, 0, ROT270, "Jaleco / NMK", "Psychic 5 (Japan)", 0 )
-GAME( 1988, bombsa,    0,        bombsa,   bombsa,   driver_device, 0, ROT270, "Jaleco", "Bombs Away", GAME_NOT_WORKING )
+GAME( 1987, psychic5,  0,        psychic5, psychic5, driver_device, 0, ROT270, "Jaleco / NMK", "Psychic 5 (World)", GAME_SUPPORTS_SAVE ) // "Oversea's version V2.00 CHANGED BY TAMIO NAKASATO" text present in ROM, various modifications (English names, more complete attract demo etc.)
+GAME( 1987, psychic5j, psychic5, psychic5, psychic5, driver_device, 0, ROT270, "Jaleco / NMK", "Psychic 5 (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, bombsa,    0,        bombsa,   bombsa,   driver_device, 0, ROT270, "Jaleco", "Bombs Away", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

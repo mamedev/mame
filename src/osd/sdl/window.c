@@ -58,7 +58,7 @@
 // minimum window dimension
 #define MIN_WINDOW_DIM                  200
 
-#ifndef SDLMAME_WIN32
+//#ifndef SDLMAME_WIN32
 #define WMSZ_TOP        (0)
 #define WMSZ_BOTTOM     (1)
 #define WMSZ_BOTTOMLEFT     (2)
@@ -67,7 +67,7 @@
 #define WMSZ_TOPLEFT        (5)
 #define WMSZ_TOPRIGHT       (6)
 #define WMSZ_RIGHT      (7)
-#endif
+//#endif
 
 //============================================================
 //  GLOBAL VARIABLES
@@ -382,16 +382,15 @@ INLINE int better_mode(int width0, int height0, int width1, int height1, float d
 	return (fabs(desired_aspect - aspect0) < fabs(desired_aspect - aspect1)) ? 0 : 1;
 }
 
-void sdl_window_info::blit_surface_size(int &blitwidth, int &blitheight)
+osd_dim sdl_window_info::blit_surface_size()
 {
-	int window_width, window_height;
-	get_size(window_width, window_height);
+	osd_dim window_dim = get_size();
 
-	INT32 newwidth, newheight;
+	int newwidth, newheight;
 	int xscale = 1, yscale = 1;
 	float desired_aspect = 1.0f;
-	INT32 target_width = window_width;
-	INT32 target_height = window_height;
+	INT32 target_width = window_dim.width();
+	INT32 target_height = window_dim.height();
 
 	// start with the minimum size
 	m_target->compute_minimum_size(newwidth, newheight);
@@ -415,17 +414,17 @@ void sdl_window_info::blit_surface_size(int &blitwidth, int &blitheight)
 		if (video_config.keepaspect)
 		{
 			// if we could stretch more in the X direction, and that makes a better fit, bump the xscale
-			while (newwidth * (xscale + 1) <= window_width &&
+			while (newwidth * (xscale + 1) <= window_dim.width() &&
 				better_mode(newwidth * xscale, newheight * yscale, newwidth * (xscale + 1), newheight * yscale, desired_aspect))
 				xscale++;
 
 			// if we could stretch more in the Y direction, and that makes a better fit, bump the yscale
-			while (newheight * (yscale + 1) <= window_height &&
+			while (newheight * (yscale + 1) <= window_dim.height() &&
 				better_mode(newwidth * xscale, newheight * yscale, newwidth * xscale, newheight * (yscale + 1), desired_aspect))
 				yscale++;
 
 			// now that we've maxed out, see if backing off the maximally stretched one makes a better fit
-			if (window_width - newwidth * xscale < window_height - newheight * yscale)
+			if (window_dim.width() - newwidth * xscale < window_dim.height() - newheight * yscale)
 			{
 				while (better_mode(newwidth * xscale, newheight * yscale, newwidth * (xscale - 1), newheight * yscale, desired_aspect) && (xscale >= 0))
 					xscale--;
@@ -454,15 +453,9 @@ void sdl_window_info::blit_surface_size(int &blitwidth, int &blitheight)
 	//FIXME: really necessary to distinguish for yuv_modes ?
 	if (m_target->zoom_to_screen()
 		&& (video_config.scale_mode == VIDEO_SCALE_MODE_NONE ))
-		newwidth = window_width;
+		newwidth = window_dim.width();
 
-#if 0
-	// Fixme: notify_changed really necessary ?
-	if ((blitwidth != newwidth) || (blitheight != newheight))
-		notify_changed();
-#endif
-	blitwidth = newwidth;
-	blitheight = newheight;
+	return osd_dim(newwidth, newheight);
 }
 
 
@@ -498,10 +491,9 @@ void sdl_window_info::resize(INT32 width, INT32 height)
 {
 	ASSERT_MAIN_THREAD();
 
-	int cw=0; int ch=0;
-	get_size(cw, ch);
+	osd_dim cd = get_size();
 
-	if (width != cw || height != ch)
+	if (width != cd.width() || height != cd.height())
 		execute_async_wait(&sdlwindow_resize_wt, worker_param(this, width, height));
 }
 
@@ -555,7 +547,7 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_toggle_full_screen_wt )
 	// If we are going fullscreen (leaving windowed) remember our windowed size
 	if (!window->fullscreen())
 	{
-		window->get_size(window->m_windowed_width, window->m_windowed_height);
+		window->m_windowed_dim = window->get_size();
 	}
 
 	window->renderer().destroy();
@@ -742,7 +734,7 @@ int sdl_window_info::window_init()
 	m_target = m_machine.render().target_alloc();
 
 	// set the specific view
-	set_starting_view(m_machine, m_index, options.view(), options.view(m_index));
+	set_starting_view(m_index, options.view(), options.view(m_index));
 
 	// make the window title
 	if (video_config.numscreens == 1)
@@ -853,7 +845,7 @@ void sdl_window_info::destroy()
 //============================================================
 
 #if SDLMAME_SDL2
-void sdl_window_info::pick_best_mode(int *fswidth, int *fsheight)
+osd_dim sdl_window_info::pick_best_mode()
 {
 	int minimum_width, minimum_height, target_width, target_height;
 	int i;
@@ -912,15 +904,15 @@ void sdl_window_info::pick_best_mode(int *fswidth, int *fsheight)
 			if (size_score > best_score)
 			{
 				best_score = size_score;
-				*fswidth = mode.w;
-				*fsheight = mode.h;
+				return osd_dim(mode.w, mode.h);
 			}
 
 		}
 	}
+	return osd_dim(0,0); // please compiler
 }
 #else
-void sdl_window_info::pick_best_mode(int *fswidth, int *fsheight)
+osd_dim sdl_window_info::pick_best_mode()
 {
 	int minimum_width, minimum_height, target_width, target_height;
 	int i;
@@ -958,8 +950,7 @@ void sdl_window_info::pick_best_mode(int *fswidth, int *fsheight)
 	}
 	else if (modes == (SDL_Rect **)-1)  // all modes are possible
 	{
-		*fswidth = m_win_config.width;
-		*fsheight = m_win_config.height;
+		return osd_dim(m_win_config.width, m_win_config.height);
 	}
 	else
 	{
@@ -986,12 +977,12 @@ void sdl_window_info::pick_best_mode(int *fswidth, int *fsheight)
 			if (size_score > best_score)
 			{
 				best_score = size_score;
-				*fswidth = modes[i]->w;
-				*fsheight = modes[i]->h;
+				return osd_dim(modes[i]->w, modes[i]->h);
 			}
 
 		}
 	}
+	return osd_dim(0,0);
 }
 #endif
 
@@ -1017,10 +1008,9 @@ void sdl_window_info::update()
 
 		// see if the games video mode has changed
 		m_target->compute_minimum_size(tempwidth, tempheight);
-		if (tempwidth != m_minwidth || tempheight != m_minheight)
+		if (osd_dim(tempwidth, tempheight) != m_minimum_dim)
 		{
-			m_minwidth = tempwidth;
-			m_minheight = tempheight;
+			m_minimum_dim = osd_dim(tempwidth, tempheight);
 
 			if (!this->m_fullscreen)
 			{
@@ -1029,8 +1019,8 @@ void sdl_window_info::update()
 			}
 			else if (video_config.switchres)
 			{
-				this->pick_best_mode(&tempwidth, &tempheight);
-				resize(tempwidth, tempheight);
+				osd_dim tmp = this->pick_best_mode();
+				resize(tmp.width(), tmp.height());
 			}
 		}
 
@@ -1058,7 +1048,7 @@ void sdl_window_info::update()
 //  (main thread)
 //============================================================
 
-void sdl_window_info::set_starting_view(running_machine &machine, int index, const char *defview, const char *view)
+void sdl_window_info::set_starting_view(int index, const char *defview, const char *view)
 {
 	int viewindex;
 
@@ -1086,7 +1076,7 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 	worker_param *      wp = (worker_param *) param;
 	sdl_window_info *   window = wp->window();
 
-	int tempwidth, tempheight;
+	osd_dim temp(0,0);
 	static int result[2] = {0,1};
 
 	ASSERT_WINDOW_THREAD();
@@ -1095,36 +1085,35 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 	if (window->fullscreen())
 	{
 		// default to the current mode exactly
-		tempwidth = window->monitor()->position_size().w;
-		tempheight = window->monitor()->position_size().h;
+		temp = window->monitor()->position_size().dim();
 
 		// if we're allowed to switch resolutions, override with something better
 		if (video_config.switchres)
-			window->pick_best_mode(&tempwidth, &tempheight);
+			temp = window->pick_best_mode();
 	}
-	else if (window->m_windowed_width)
+	else if (window->m_windowed_dim.width() > 0)
 	{
 		// if we have a remembered size force the new window size to it
-		tempwidth = window->m_windowed_width;
-		tempheight = window->m_windowed_height;
+		temp = window->m_windowed_dim;
 	}
 	else
 	{
 		if (window->m_startmaximized)
 		{
-			tempwidth = tempheight = 0;
-			window->get_max_bounds(&tempwidth, &tempheight, video_config.keepaspect );
+			temp = window->get_max_bounds(video_config.keepaspect );
 		}
 		else
 		{
+#if 0
+			// Couriersud: This code never has worked with the last version of get_min_bounds
 			/* Create the window directly with the correct aspect
 			   instead of letting sdlwindow_blit_surface_size() resize it
 			   this stops the window from "flashing" from the wrong aspect
 			   size to the right one at startup. */
 			tempwidth = (window->m_win_config.width != 0) ? window->m_win_config.width : 640;
 			tempheight = (window->m_win_config.height != 0) ? window->m_win_config.height : 480;
-
-			window->get_min_bounds(&tempwidth, &tempheight, video_config.keepaspect );
+#endif
+			temp = window->get_min_bounds(video_config.keepaspect );
 		}
 	}
 
@@ -1166,8 +1155,8 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 #endif
 	// create the SDL window
 	window->m_sdl_window = SDL_CreateWindow(window->m_title,
-			window->monitor()->position_size().x, window->monitor()->position_size().y,
-			tempwidth, tempheight, window->m_extra_flags);
+			window->monitor()->position_size().left(), window->monitor()->position_size().top(),
+			temp.width(), temp.height(), window->m_extra_flags);
 	//window().sdl_window() = SDL_CreateWindow(window().m_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 	//      width, height, m_extra_flags);
 
@@ -1186,8 +1175,8 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 		//SDL_GetCurrentDisplayMode(window().monitor()->handle, &mode);
 		SDL_GetWindowDisplayMode(window->sdl_window(), &mode);
 		window->m_original_mode = mode;
-		mode.w = tempwidth;
-		mode.h = tempheight;
+		mode.w = temp.width();
+		mode.h = temp.height();
 		if (window->m_win_config.refresh)
 			mode.refresh_rate = window->m_win_config.refresh;
 
@@ -1241,7 +1230,7 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 	if (!window->m_sdlsurf)
 		printf("completely failed\n");
 #endif
-	window->m_sdlsurf = SDL_SetVideoMode(tempwidth, tempheight,
+	window->m_sdlsurf = SDL_SetVideoMode(temp.width(), temp.height(),
 							0, SDL_SWSURFACE  | SDL_ANYFORMAT | window->m_extra_flags);
 
 	if (!window->m_sdlsurf)
@@ -1377,28 +1366,40 @@ OSDWORK_CALLBACK( sdl_window_info::draw_video_contents_wt )
 	return NULL;
 }
 
+int sdl_window_info::wnd_extra_width()
+{
+	return m_fullscreen ? 0 : WINDOW_DECORATION_WIDTH;
+}
+
+int sdl_window_info::wnd_extra_height()
+{
+	return m_fullscreen ? 0 : WINDOW_DECORATION_HEIGHT;
+}
+
 
 //============================================================
 //  constrain_to_aspect_ratio
 //  (window thread)
 //============================================================
 
-void sdl_window_info::constrain_to_aspect_ratio(int *window_width, int *window_height, int adjustment)
+osd_rect sdl_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int adjustment)
 {
-	INT32 extrawidth = 0;
-	INT32 extraheight = 0;
+	INT32 extrawidth = wnd_extra_width();
+	INT32 extraheight = wnd_extra_height();
 	INT32 propwidth, propheight;
 	INT32 minwidth, minheight;
 	INT32 maxwidth, maxheight;
 	INT32 viswidth, visheight;
+	INT32 adjwidth, adjheight;
 	float pixel_aspect;
+	sdl_monitor_info *monitor = m_monitor;
 
 	// get the pixel aspect ratio for the target monitor
-	pixel_aspect = m_monitor->aspect();
+	pixel_aspect = monitor->aspect();
 
 	// determine the proposed width/height
-	propwidth = *window_width - extrawidth;
-	propheight = *window_height - extraheight;
+	propwidth = rect.width() - extrawidth;
+	propheight = rect.height() - extraheight;
 
 	// based on which edge we are adjusting, take either the width, height, or both as gospel
 	// and scale to fit using that as our parameter
@@ -1431,19 +1432,21 @@ void sdl_window_info::constrain_to_aspect_ratio(int *window_width, int *window_h
 	propheight = MAX(propheight, minheight);
 
 	// clamp against the maximum (fit on one screen for full screen mode)
-	maxwidth = m_monitor->position_size().w - extrawidth;
-	maxheight = m_monitor->position_size().h - extraheight;
-	if (this->m_fullscreen)
+	if (m_fullscreen)
 	{
-		// nothing
+		maxwidth = monitor->position_size().width() - extrawidth;
+		maxheight = monitor->position_size().height() - extraheight;
 	}
 	else
 	{
+		maxwidth = monitor->usuable_position_size().width() - extrawidth;
+		maxheight = monitor->usuable_position_size().height() - extraheight;
+
 		// further clamp to the maximum width/height in the window
-		if (this->m_win_config.width != 0)
-			maxwidth = MIN(maxwidth, this->m_win_config.width + extrawidth);
-		if (this->m_win_config.height != 0)
-			maxheight = MIN(maxheight, this->m_win_config.height + extraheight);
+		if (m_win_config.width != 0)
+			maxwidth = MIN(maxwidth, m_win_config.width + extrawidth);
+		if (m_win_config.height != 0)
+			maxheight = MIN(maxheight, m_win_config.height + extraheight);
 	}
 
 	// clamp to the maximum
@@ -1453,9 +1456,38 @@ void sdl_window_info::constrain_to_aspect_ratio(int *window_width, int *window_h
 	// compute the visible area based on the proposed rectangle
 	m_target->compute_visible_area(propwidth, propheight, pixel_aspect, m_target->orientation(), viswidth, visheight);
 
-	*window_width = viswidth;
-	*window_height = visheight;
+	// compute the adjustments we need to make
+	adjwidth = (viswidth + extrawidth) - rect.width();
+	adjheight = (visheight + extraheight) - rect.height();
+
+	// based on which corner we're adjusting, constrain in different ways
+	osd_rect ret(rect);
+
+	switch (adjustment)
+	{
+		case WMSZ_BOTTOM:
+		case WMSZ_BOTTOMRIGHT:
+		case WMSZ_RIGHT:
+			ret = rect.resize(rect.width() + adjwidth, rect.height() + adjheight);
+			break;
+
+		case WMSZ_BOTTOMLEFT:
+			ret = rect.move_by(-adjwidth, 0).resize(rect.width(), rect.height() + adjheight);
+			break;
+
+		case WMSZ_LEFT:
+		case WMSZ_TOPLEFT:
+		case WMSZ_TOP:
+			ret = rect.move_by(-adjwidth, -adjheight);
+			break;
+
+		case WMSZ_TOPRIGHT:
+			ret = rect.move_by(0, -adjheight).resize(rect.width() + adjwidth, rect.height());
+			break;
 }
+	return ret;
+}
+
 
 
 //============================================================
@@ -1463,12 +1495,12 @@ void sdl_window_info::constrain_to_aspect_ratio(int *window_width, int *window_h
 //  (window thread)
 //============================================================
 
-void sdl_window_info::get_min_bounds(int *window_width, int *window_height, int constrain)
+osd_dim sdl_window_info::get_min_bounds(int constrain)
 {
 	INT32 minwidth, minheight;
 
 	// get the minimum target size
-	this->m_target->compute_minimum_size(minwidth, minheight);
+	m_target->compute_minimum_size(minwidth, minheight);
 
 	// expand to our minimum dimensions
 	if (minwidth < MIN_WINDOW_DIM)
@@ -1476,36 +1508,37 @@ void sdl_window_info::get_min_bounds(int *window_width, int *window_height, int 
 	if (minheight < MIN_WINDOW_DIM)
 		minheight = MIN_WINDOW_DIM;
 
+	// account for extra window stuff
+	minwidth += wnd_extra_width();
+	minheight += wnd_extra_height();
+
 	// if we want it constrained, figure out which one is larger
 	if (constrain)
 	{
-		int test1w, test1h;
-		int test2w, test2h;
-
 		// first constrain with no height limit
-		test1w = minwidth; test1h = 10000;
-		this->constrain_to_aspect_ratio(&test1w, &test1h, WMSZ_BOTTOMRIGHT);
+		osd_rect test1(0,0,minwidth,10000);
+		test1 = constrain_to_aspect_ratio(test1, WMSZ_BOTTOMRIGHT);
 
 		// then constrain with no width limit
-		test2w = 10000; test2h = minheight;
-		this->constrain_to_aspect_ratio(&test2w, &test2h, WMSZ_BOTTOMRIGHT);
+		osd_rect test2(0,0,10000,minheight);
+		test2 = constrain_to_aspect_ratio(test2, WMSZ_BOTTOMRIGHT);
 
 		// pick the larger
-		if ( test1w > test2w )
+		if (test1.width() > test2.width())
 		{
-			minwidth = test1w;
-			minheight = test1h;
+			minwidth = test1.width();
+			minheight = test1.height();
 		}
 		else
 		{
-			minwidth = test2w;
-			minheight = test2h;
+			minwidth = test2.width();
+			minheight = test2.height();
 		}
 	}
 
-	*window_width = minwidth;
-	*window_height = minheight;
+	return osd_dim(minwidth, minheight);
 }
+
 
 
 //============================================================
@@ -1513,36 +1546,36 @@ void sdl_window_info::get_min_bounds(int *window_width, int *window_height, int 
 //  (window thread)
 //============================================================
 
-void sdl_window_info::get_max_bounds(int *window_width, int *window_height, int constrain)
+osd_dim sdl_window_info::get_max_bounds(int constrain)
 {
-	INT32 maxwidth, maxheight;
-
 	// compute the maximum client area
-	maxwidth = m_monitor->position_size().w;
-	maxheight = m_monitor->position_size().h;
+
+	osd_rect maximum = m_monitor->position_size();
 
 	// clamp to the window's max
-	if (this->m_win_config.width != 0)
+	int tempw = maximum.width();
+	int temph = maximum.height();
+	if (m_win_config.width != 0)
 	{
-		int temp = this->m_win_config.width + WINDOW_DECORATION_WIDTH;
-		if (temp < maxwidth)
-			maxwidth = temp;
+		int temp = m_win_config.width + wnd_extra_width();
+		if (temp < maximum.width())
+			tempw = temp;
 	}
-	if (this->m_win_config.height != 0)
+	if (m_win_config.height != 0)
 	{
-		int temp = this->m_win_config.height + WINDOW_DECORATION_HEIGHT;
-		if (temp < maxheight)
-			maxheight = temp;
+		int temp = m_win_config.height + wnd_extra_height();
+		if (temp < maximum.height())
+			temph = temp;
 	}
+
+	maximum = maximum.resize(tempw, temph);
 
 	// constrain to fit
 	if (constrain)
-		this->constrain_to_aspect_ratio(&maxwidth, &maxheight, WMSZ_BOTTOMRIGHT);
-	//else
+		maximum = constrain_to_aspect_ratio(maximum, WMSZ_BOTTOMRIGHT);
+	else
 	{
-		maxwidth -= WINDOW_DECORATION_WIDTH;
-		maxheight -= WINDOW_DECORATION_HEIGHT;
-		*window_width = maxwidth;
-		*window_height = maxheight;
+		maximum = maximum.resize(maximum.width() - wnd_extra_width(), maximum.height() - wnd_extra_height());
 	}
+	return maximum.dim();
 }

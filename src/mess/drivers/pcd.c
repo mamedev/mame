@@ -250,6 +250,8 @@ WRITE16_MEMBER( pcd_state::dskctl_w )
 
 	if((m_dskctl & 1) && floppy0)
 		m_fdc->set_floppy(floppy0);
+	if((m_dskctl & 2) && floppy1)
+		m_fdc->set_floppy(floppy1);
 
 	if(floppy0)
 	{
@@ -292,6 +294,8 @@ SCN2674_DRAW_CHARACTER_MEMBER(pcd_state::display_pixels)
 	else
 	{
 		UINT8 data = m_charram[(m_vram[address] & 0xff) * 16 + linecount];
+		if(cursor && blink)
+			data = 0xff;
 		for(int i = 0; i < 8; i++)
 			bitmap.pix32(y, x + i) = m_palette->pen((data & (1 << (7 - i))) ? 1 : 0);
 	}
@@ -397,7 +401,7 @@ WRITE_LINE_MEMBER(pcd_state::write_scsi_req)
 //**************************************************************************
 
 static ADDRESS_MAP_START( pcd_map, AS_PROGRAM, 16, pcd_state )
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM // fixed 256k for now
+	AM_RANGE(0x00000, 0x7ffff) AM_RAM // fixed 512k for now
 	AM_RANGE(0xf0000, 0xf7fff) AM_READONLY AM_WRITE(vram_w) AM_SHARE("vram")
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 	AM_RANGE(0x00000, 0xfffff) AM_READWRITE8(nmi_io_r, nmi_io_w, 0xffff)
@@ -448,6 +452,9 @@ static MACHINE_CONFIG_START( pcd, pcd_state )
 	MCFG_CPU_IO_MAP(pcd_io)
 	MCFG_80186_TMROUT1_HANDLER(WRITELINE(pcd_state, i186_timer1_w))
 	MCFG_80186_IRQ_SLAVE_ACK(READ8(pcd_state, irq_callback))
+
+	MCFG_CPU_ADD("graphics", I8741, XTAL_16MHz/2)
+	MCFG_DEVICE_DISABLE()
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer0_tick", pcd_state, timer0_tick, attotime::from_hz(XTAL_16MHz / 24)) // adjusted to pass post
 

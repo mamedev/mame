@@ -64,10 +64,8 @@ public:
 	//m_hw_scale_height(0),
 	m_last_hofs(0),
 	m_last_vofs(0),
-	m_blitwidth(0),
-	m_blitheight(0),
-	m_last_width(0),
-	m_last_height(0)
+	m_blit_dim(0, 0),
+	m_last_dim(0, 0)
 	{ }
 
 	/* virtual */ int create();
@@ -76,14 +74,13 @@ public:
 	/* virtual */ void destroy();
 	/* virtual */ render_primitive_list *get_primitives()
 	{
-		int nw = 0; int nh = 0;
-		window().blit_surface_size(nw, nh);
-		if (nw != m_blitwidth || nh != m_blitheight)
+		osd_dim nd = window().blit_surface_size();
+		if (nd != m_blit_dim)
 		{
-			m_blitwidth = nw; m_blitheight = nh;
+			m_blit_dim = nd;
 			notify_changed();
 		}
-		window().target()->set_bounds(m_blitwidth, m_blitheight, window().aspect());
+		window().target()->set_bounds(m_blit_dim.width(), m_blit_dim.height(), window().aspect());
 		return &window().target()->get_primitives();
 	}
 
@@ -91,7 +88,7 @@ private:
 	void destroy_all_textures();
 	void yuv_init();
 #if (SDLMAME_SDL2)
-	void setup_texture(int tempwidth, int tempheight);
+	void setup_texture(const osd_dim &size);
 #endif
 	void yuv_lookup_set(unsigned int pen, unsigned char red,
 				unsigned char green, unsigned char blue);
@@ -118,10 +115,8 @@ private:
 
 	int                 m_last_hofs;
 	int                 m_last_vofs;
-	int                 m_blitwidth;
-	int                 m_blitheight;
-	int                 m_last_width;
-	int                 m_last_height;
+	osd_dim             m_blit_dim;
+	osd_dim             m_last_dim;
 };
 
 struct sdl_scale_mode
@@ -269,7 +264,7 @@ static void drawsdl_exit(void)
 //============================================================
 
 #if (SDLMAME_SDL2)
-void sdl_info::setup_texture(int tempwidth, int tempheight)
+void sdl_info::setup_texture(const osd_dim &size)
 {
 	const sdl_scale_mode *sdl_sm = &scale_modes[video_config.scale_mode];
 	SDL_DisplayMode mode;
@@ -288,7 +283,7 @@ void sdl_info::setup_texture(int tempwidth, int tempheight)
 
 	if (sdl_sm->is_scale)
 	{
-		int m_hw_scale_width =0;
+		int m_hw_scale_width = 0;
 		int m_hw_scale_height = 0;
 
 		window().target()->compute_minimum_size(m_hw_scale_width, m_hw_scale_height);
@@ -312,7 +307,7 @@ void sdl_info::setup_texture(int tempwidth, int tempheight)
 	else
 	{
 		m_texture_id = SDL_CreateTexture(m_sdl_renderer,fmt, SDL_TEXTUREACCESS_STREAMING,
-				tempwidth, tempheight);
+				size.width(), size.height());
 	}
 }
 #endif
@@ -523,9 +518,9 @@ int sdl_info::xy_to_render_target(int x, int y, int *xt, int *yt)
 {
 	*xt = x - m_last_hofs;
 	*yt = y - m_last_vofs;
-	if (*xt<0 || *xt >= m_blitwidth)
+	if (*xt<0 || *xt >= m_blit_dim.width())
 		return 0;
-	if (*yt<0 || *yt >= m_blitheight)
+	if (*yt<0 || *yt >= m_blit_dim.height())
 		return 0;
 	return 1;
 }
@@ -559,7 +554,6 @@ int sdl_info::draw(int update)
 	UINT8 *surfptr;
 	INT32 pitch;
 	Uint32 rmask, gmask, bmask;
-	int width = 0; int height = 0;
 #if (SDLMAME_SDL2)
 	Uint32 amask;
 #endif
@@ -571,19 +565,18 @@ int sdl_info::draw(int update)
 		return 0;
 	}
 
-	window().get_size(width, height);
-	if (has_flags(FI_CHANGED) || (width != m_last_width) || (height != m_last_height))
+	osd_dim wdim = window().get_size();
+	if (has_flags(FI_CHANGED) || (wdim != m_last_dim))
 	{
 		destroy_all_textures();
 		clear_flags(FI_CHANGED);
 		m_blittimer = 3;
-		m_last_width = width;
-		m_last_height = height;
+		m_last_dim = wdim;
 #if (SDLMAME_SDL2)
 		SDL_RenderSetViewport(m_sdl_renderer, NULL);
 		if (m_texture_id != NULL)
 			SDL_DestroyTexture(m_texture_id);
-		setup_texture(m_blitwidth, m_blitheight);
+		setup_texture(m_blit_dim);
 		m_blittimer = 3;
 #else
 		const sdl_scale_mode *sdl_sm = &scale_modes[video_config.scale_mode];
@@ -619,7 +612,7 @@ int sdl_info::draw(int update)
 	// Clear if necessary
 	if (m_blittimer > 0)
 	{
-		memset(window().sdl_surface()->pixels, 0, height * window().sdl_surface()->pitch);
+		memset(window().sdl_surface()->pixels, 0, wdim.height() * window().sdl_surface()->pitch);
 		m_blittimer--;
 	}
 
@@ -666,11 +659,11 @@ int sdl_info::draw(int update)
 #endif
 	// get ready to center the image
 	vofs = hofs = 0;
-	blitwidth = m_blitwidth;
-	blitheight = m_blitheight;
+	blitwidth = m_blit_dim.width();
+	blitheight = m_blit_dim.height();
 
-	ch = height;
-	cw = width;
+	ch = wdim.height();
+	cw = wdim.width();
 
 	// do not crash if the window's smaller than the blit area
 	if (blitheight > ch)
@@ -679,7 +672,7 @@ int sdl_info::draw(int update)
 	}
 	else if (video_config.centerv)
 	{
-		vofs = (ch - m_blitheight) / 2;
+		vofs = (ch - m_blit_dim.height()) / 2;
 	}
 
 	if (blitwidth > cw)
@@ -688,7 +681,7 @@ int sdl_info::draw(int update)
 	}
 	else if (video_config.centerh)
 	{
-		hofs = (cw - m_blitwidth) / 2;
+		hofs = (cw - m_blit_dim.width()) / 2;
 	}
 
 	m_last_hofs = hofs;

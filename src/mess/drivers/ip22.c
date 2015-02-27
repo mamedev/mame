@@ -706,7 +706,7 @@ READ32_MEMBER(ip22_state::rtc_r)
 			//verboselog((machine, 3, "RTC RAM MSB Read: %02x \n", RTC_RAMMSB );
 			return RTC_RAMMSB;
 		case 0x0053:
-			return m_RTC.nRAM[ ( RTC_RAMMSB << 8 ) | RTC_RAMLSB ];
+			return m_RTC.nRAM[ (( RTC_RAMMSB << 8 ) | RTC_RAMLSB) & 0x7ff ];
 		case 0x005e:
 			return RTC_WRITECNT;
 		default:
@@ -725,7 +725,7 @@ WRITE32_MEMBER(ip22_state::rtc_w)
 {
 	RTC_WRITECNT++;
 
-//  osd_printf_info("RTC_W: offset %x => %x (PC=%x)\n", data, offset, activecpu_get_pc());
+//  osd_printf_info("RTC_W: offset %x => %x (PC=%x)\n", data, offset, space.device().safe_pc());
 
 	if( offset <= 0x0d )
 	{
@@ -850,8 +850,7 @@ WRITE32_MEMBER(ip22_state::rtc_w)
 			RTC_RAMMSB = data;
 			break;
 		case 0x0053:
-			assert(((RTC_RAMMSB << 8) | RTC_RAMLSB) >= 0 && ((RTC_RAMMSB << 8) | RTC_RAMLSB) < 0x800);
-			m_RTC.nRAM[ ( RTC_RAMMSB << 8 ) | RTC_RAMLSB ] = data;
+			m_RTC.nRAM[ (( RTC_RAMMSB << 8 ) | RTC_RAMLSB) & 0x7ff ] = data;
 			break;
 		default:
 			//verboselog((machine, 3, "Unknown RTC Ext. Reg. Write: %02x: %02x\n", offset, data );

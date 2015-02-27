@@ -83,7 +83,7 @@ bool windows_osd_interface::video_init()
 	// create the windows
 	windows_options &options = downcast<windows_options &>(machine().options());
 	for (index = 0; index < video_config.numscreens; index++)
-		winwindow_video_window_create(machine(), index, pick_monitor(options, index), &windows[index]);
+		win_window_info::create(machine(), index, pick_monitor(options, index), &windows[index]);
 	if (video_config.mode != VIDEO_MODE_NONE)
 		SetForegroundWindow(win_window_list->m_hwnd);
 

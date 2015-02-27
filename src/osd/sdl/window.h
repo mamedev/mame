@@ -44,7 +44,8 @@ public:
 		m_resize_height(0),
 		m_last_resize(0),
 #endif
-			m_minwidth(0), m_minheight(0),
+		m_minimum_dim(0,0),
+		m_windowed_dim(0,0),
 		m_rendered_event(0), m_target(0),
 #if (SDLMAME_SDL2)
 		m_sdl_window(NULL),
@@ -61,8 +62,7 @@ public:
 		m_fullscreen = !video_config.windowed;
 		m_prescale = video_config.prescale;
 
-		m_windowed_width = config->width;
-		m_windowed_height = config->height;
+		m_windowed_dim = osd_dim(config->width, config->height);
 	}
 
 	~sdl_window_info()
@@ -80,12 +80,14 @@ public:
 
 	void notify_changed();
 
-	void get_size(int &w, int &h)
+	osd_dim get_size()
 	{
 #if (SDLMAME_SDL2)
+		int w=0; int h=0;
 		SDL_GetWindowSize(m_sdl_window, &w, &h);
+		return osd_dim(w,h);
 #else
-		w = m_sdlsurf->w; h = m_sdlsurf->h;
+		return osd_dim(m_sdlsurf->w, m_sdlsurf->h);
 #endif
 	}
 
@@ -102,7 +104,7 @@ public:
 	SDL_Surface *sdl_surface() { return m_sdlsurf; }
 #endif
 
-	void blit_surface_size(int &blitwidth, int &blitheight);
+	osd_dim blit_surface_size();
 	int prescale() const { return m_prescale; }
 
 	// Pointer to next window
@@ -120,10 +122,9 @@ private:
 	char                m_title[256];
 	int                 m_startmaximized;
 
-	// diverse flags
-	int                 m_minwidth, m_minheight;
-	int                 m_windowed_width;
-	int                 m_windowed_height;
+	// dimensions
+	osd_dim             m_minimum_dim;
+	osd_dim             m_windowed_dim;
 
 	// rendering info
 	osd_event *         m_rendered_event;
@@ -150,12 +151,14 @@ private:
 protected:
 	osd_renderer &renderer() { return *m_renderer; }
 private:
-	void constrain_to_aspect_ratio(int *window_width, int *window_height, int adjustment);
+	int wnd_extra_width();
+	int wnd_extra_height();
+	void set_starting_view(int index, const char *defview, const char *view);
+	osd_rect constrain_to_aspect_ratio(const osd_rect &rect, int adjustment);
+	osd_dim get_min_bounds(int constrain);
+	osd_dim get_max_bounds(int constrain);
 	void update_cursor_state();
-	void pick_best_mode(int *fswidth, int *fsheight);
-	void set_starting_view(running_machine &machine, int index, const char *defview, const char *view);
-	void get_min_bounds(int *window_width, int *window_height, int constrain);
-	void get_max_bounds(int *window_width, int *window_height, int constrain);
+	osd_dim pick_best_mode();
 	void set_fullscreen(int afullscreen) { m_fullscreen = afullscreen; }
 
 	// Pointer to machine

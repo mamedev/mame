@@ -105,7 +105,6 @@ private:
 	UINT8 m_dbl1;
 	int m_linecounter;
 	UINT16 m_address;
-	bool m_cursor_on;
 
 	UINT8 m_irq_state;
 

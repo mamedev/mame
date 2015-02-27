@@ -96,25 +96,17 @@ Noted added by ClawGrip 28-Mar-2008:
 #define MSM5205_CLOCK XTAL_384kHz
 
 
-WRITE8_MEMBER(wc90b_state::wc90b_bankswitch_w)
+WRITE8_MEMBER(wc90b_state::bankswitch_w)
 {
-	int bankaddress;
-	UINT8 *ROM = memregion("maincpu")->base();
-
-	bankaddress = 0x10000 + ((data & 0xf8) << 8);
-	membank("bank1")->set_base(&ROM[bankaddress]);
+	membank("mainbank")->set_entry(data >> 3);
 }
 
-WRITE8_MEMBER(wc90b_state::wc90b_bankswitch1_w)
+WRITE8_MEMBER(wc90b_state::bankswitch1_w)
 {
-	int bankaddress;
-	UINT8 *ROM = memregion("sub")->base();
-
-	bankaddress = 0x10000 + ((data & 0xf8) << 8);
-	membank("bank2")->set_base(&ROM[bankaddress]);
+	membank("subbank")->set_entry(data >> 3);
 }
 
-WRITE8_MEMBER(wc90b_state::wc90b_sound_command_w)
+WRITE8_MEMBER(wc90b_state::sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
@@ -122,13 +114,7 @@ WRITE8_MEMBER(wc90b_state::wc90b_sound_command_w)
 
 WRITE8_MEMBER(wc90b_state::adpcm_control_w)
 {
-	int bankaddress;
-	UINT8 *ROM = memregion("audiocpu")->base();
-
-	/* the code writes either 2 or 3 in the bottom two bits */
-	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
-	membank("bank3")->set_base(&ROM[bankaddress]);
-
+	membank("audiobank")->set_entry(data & 0x01);
 	m_msm->reset_w(data & 0x08);
 }
 
@@ -141,13 +127,13 @@ WRITE8_MEMBER(wc90b_state::adpcm_data_w)
 static ADDRESS_MAP_START( wc90b_map1, AS_PROGRAM, 8, wc90b_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM /* Main RAM */
-	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(wc90b_fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(wc90b_bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(wc90b_txvideoram_w) AM_SHARE("txvideoram")
-	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
+	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
+	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("mainbank")
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(wc90b_bankswitch_w)
-	AM_RANGE(0xfd00, 0xfd00) AM_WRITE(wc90b_sound_command_w)
+	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(bankswitch_w)
+	AM_RANGE(0xfd00, 0xfd00) AM_WRITE(sound_command_w)
 	AM_RANGE(0xfd04, 0xfd04) AM_WRITEONLY AM_SHARE("scroll1y")
 	AM_RANGE(0xfd06, 0xfd06) AM_WRITEONLY AM_SHARE("scroll1x")
 	AM_RANGE(0xfd08, 0xfd08) AM_WRITEONLY AM_SHARE("scroll2y")
@@ -166,14 +152,14 @@ static ADDRESS_MAP_START( wc90b_map2, AS_PROGRAM, 8, wc90b_state )
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xe800, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank2")
+	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("subbank")
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(wc90b_bankswitch1_w)
+	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(bankswitch1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, wc90b_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("audiobank")
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(adpcm_control_w)
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(adpcm_data_w)
 	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
@@ -322,13 +308,6 @@ GFXDECODE_END
 
 
 
-/* handler called by the 2203 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(wc90b_state::irqhandler)
-{
-	/* NMI writes to MSM ports *only*! -AS */
-	//m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 WRITE_LINE_MEMBER(wc90b_state::adpcm_int)
 {
 	m_toggle ^= 1;
@@ -339,6 +318,16 @@ WRITE_LINE_MEMBER(wc90b_state::adpcm_int)
 	}
 	else
 		m_msm->data_w((m_msm5205next & 0x0f) >> 0);
+}
+
+void wc90b_state::machine_start()
+{
+	membank("mainbank")->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x800);
+	membank("subbank")->configure_entries(0, 32, memregion("sub")->base() + 0x10000, 0x800);
+	membank("audiobank")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x8000, 0x4000);
+	
+	save_item(NAME(m_msm5205next));
+	save_item(NAME(m_toggle));
 }
 
 
@@ -363,7 +352,7 @@ static MACHINE_CONFIG_START( wc90b, wc90b_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(wc90b_state, screen_update_wc90b)
+	MCFG_SCREEN_UPDATE_DRIVER(wc90b_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wc90b)
@@ -375,7 +364,6 @@ static MACHINE_CONFIG_START( wc90b, wc90b_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, YM2203_CLOCK)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(wc90b_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_SOUND_ADD("msm", MSM5205, MSM5205_CLOCK)
@@ -393,9 +381,8 @@ ROM_START( wc90b1 )
 	ROM_LOAD( "a04.bin",      0x00000, 0x10000, CRC(3d535e2f) SHA1(f1e1878b5a8316e770c74a1e1f29a7a81a4e5dfe) )  /* c000-ffff is not used */
 	ROM_LOAD( "a05.bin",      0x10000, 0x10000, CRC(9e421c4b) SHA1(e23a1f1d5d1e960696f45df653869712eb889839) )  /* banked at f000-f7ff */
 
-	ROM_REGION( 0x18000, "audiocpu", 0 )
-	ROM_LOAD( "a01.bin",      0x00000, 0x8000, CRC(3d317622) SHA1(ae4e8c5247bc215a2769786cb8639bce2f80db22) )
-	ROM_CONTINUE(             0x10000, 0x8000 ) /* banked at 8000-bfff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "a01.bin",      0x00000, 0x10000, CRC(3d317622) SHA1(ae4e8c5247bc215a2769786cb8639bce2f80db22) )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )
 	ROM_LOAD( "a06.bin",      0x000000, 0x04000, CRC(3b5387b7) SHA1(b839b4eafe8bf6f9e841e19fee1bdb64a66f3448) )
@@ -436,9 +423,8 @@ ROM_START( wc90b2 )
 	ROM_LOAD( "a04.bin",      0x00000, 0x10000, CRC(3d535e2f) SHA1(f1e1878b5a8316e770c74a1e1f29a7a81a4e5dfe) )  /* c000-ffff is not used */
 	ROM_LOAD( "a05.bin",      0x10000, 0x10000, CRC(9e421c4b) SHA1(e23a1f1d5d1e960696f45df653869712eb889839) )  /* banked at f000-f7ff */
 
-	ROM_REGION( 0x18000, "audiocpu", 0 )
-	ROM_LOAD( "a01.bin",      0x00000, 0x8000, CRC(3d317622) SHA1(ae4e8c5247bc215a2769786cb8639bce2f80db22) )
-	ROM_CONTINUE(             0x10000, 0x8000 ) /* banked at 8000-bfff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "a01.bin",      0x00000, 0x10000, CRC(3d317622) SHA1(ae4e8c5247bc215a2769786cb8639bce2f80db22) )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )
 	ROM_LOAD( "a06",       0x000000, 0x04000, CRC(0c054481) SHA1(eebab099a4db5fbf13522ecd67bfa741e16e40d4) )
@@ -490,9 +476,8 @@ ROM_START( wc90ba )
 	ROM_LOAD( "a04.bin",              0x00000, 0x10000, CRC(3d535e2f) SHA1(f1e1878b5a8316e770c74a1e1f29a7a81a4e5dfe) )  /* c000-ffff is not used */
 	ROM_LOAD( "el_ic98_27c512_05.bin",0x10000, 0x10000, CRC(c70d8c13) SHA1(365718725ea7d0355c68ba703b7f9624cb1134bc) )
 
-	ROM_REGION( 0x18000, "audiocpu", 0 )
-	ROM_LOAD( "a01.bin",      0x00000, 0x8000, CRC(3d317622) SHA1(ae4e8c5247bc215a2769786cb8639bce2f80db22) )
-	ROM_CONTINUE(             0x10000, 0x8000 ) /* banked at 8000-bfff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "a01.bin",      0x00000, 0x10000, CRC(3d317622) SHA1(ae4e8c5247bc215a2769786cb8639bce2f80db22) )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )
 	ROM_LOAD( "a06.bin",      0x000000, 0x04000, CRC(3b5387b7) SHA1(b839b4eafe8bf6f9e841e19fee1bdb64a66f3448) )
@@ -525,6 +510,6 @@ ROM_START( wc90ba )
 ROM_END
 
 
-GAME( 1989, wc90b1, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
-GAME( 1989, wc90b2, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Worldcup '90", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
-GAME( 1989, wc90ba, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Euro League (Italian hack of Temco World Cup '90 - alt version)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
+GAME( 1989, wc90b1, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1989, wc90b2, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Worldcup '90", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1989, wc90ba, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Euro League (Italian hack of Temco World Cup '90 - alt version)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
