@@ -14,12 +14,17 @@
 #include "sound/speaker.h"
 
 #include "amaztron.lh"
+#include "bankshot.lh"
+#include "cnsector.lh"
 #include "ebball.lh"
 #include "elecdet.lh"
 #include "comp4.lh"
 #include "mathmagi.lh"
+#include "merlin.lh"
 #include "simon.lh"
+#include "splitsec.lh"
 #include "starwbc.lh"
+#include "stopthie.lh"
 #include "tandy12.lh"
 #include "tc4.lh"
 
@@ -95,6 +100,28 @@ public:
 	DECLARE_READ8_MEMBER(simon_read_k);
 	DECLARE_WRITE16_MEMBER(simon_write_r);
 	DECLARE_WRITE16_MEMBER(simon_write_o);
+
+	DECLARE_READ8_MEMBER(cnsector_read_k);
+	DECLARE_WRITE16_MEMBER(cnsector_write_r);
+	DECLARE_WRITE16_MEMBER(cnsector_write_o);
+
+	DECLARE_READ8_MEMBER(merlin_read_k);
+	DECLARE_WRITE16_MEMBER(merlin_write_r);
+	DECLARE_WRITE16_MEMBER(merlin_write_o);
+
+	DECLARE_READ8_MEMBER(stopthief_read_k);
+	DECLARE_WRITE16_MEMBER(stopthief_write_r);
+	DECLARE_WRITE16_MEMBER(stopthief_write_o);
+
+	void bankshot_display();
+	DECLARE_READ8_MEMBER(bankshot_read_k);
+	DECLARE_WRITE16_MEMBER(bankshot_write_r);
+	DECLARE_WRITE16_MEMBER(bankshot_write_o);
+
+	void splitsec_display();
+	DECLARE_READ8_MEMBER(splitsec_read_k);
+	DECLARE_WRITE16_MEMBER(splitsec_write_r);
+	DECLARE_WRITE16_MEMBER(splitsec_write_o);
 
 	void tandy12_display();
 	DECLARE_READ8_MEMBER(tandy12_read_k);
@@ -452,7 +479,7 @@ void hh_tms1k_state::amaztron_display()
 		m_display_state[y] = (m_r >> (y + 8) & 1) ? m_o : 0;
 	}
 	
-	// R6,R7: lamps -> lamp20, lamp21
+	// R6,R7: lamps (-> lamp20,21)
 	m_display_state[2] = m_r >> 6 & 3;
 	
 	display_update();
@@ -1170,6 +1197,541 @@ MACHINE_CONFIG_END
 
 
 
+/***************************************************************************
+
+  Parker Brothers Code Name: Sector, by Bob Doyle
+  * MP0905BNL ZA0379 (die labeled 0970F-05B)
+
+  This is a tabletop submarine pursuit game. A grid board and small toy
+  boats are used to remember your locations (a Paint app should be ok too).
+  Refer to the official manual for more information, it is not a simple game.
+
+
+  TODO:
+  - MCU clock is unknown
+
+***************************************************************************/
+
+READ8_MEMBER(hh_tms1k_state::cnsector_read_k)
+{
+	return read_inputs(5);
+}
+
+WRITE16_MEMBER(hh_tms1k_state::cnsector_write_r)
+{
+	m_display_maxy = 7;
+	m_display_maxx = 8;
+
+	// R0-R5: select digit (right-to-left)
+	for (int y = 0; y < 6; y++)
+	{
+		m_7seg_mask[y] = 0xff;
+		m_display_state[y] = (data >> y & 1) ? m_o : 0;
+	}
+
+	// R6-R9: direction leds (-> lamp60-63)
+	m_display_state[6] = data >> 6 & 0xf;
+	
+	display_update();
+}
+
+WRITE16_MEMBER(hh_tms1k_state::cnsector_write_o)
+{
+	// O0-O4: input mux
+	m_inp_mux = data & 0x1f;
+	
+	// O0-O7: digit segments
+	m_o = data;
+}
+
+
+
+static INPUT_PORTS_START( cnsector )
+	PORT_START("IN.0") // O0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Next Ship")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Left")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Range")
+
+	PORT_START("IN.1") // O1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Aim")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Right")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // O2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Fire")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("Evasive Sub") // expert button
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Recall")
+
+	PORT_START("IN.3") // O3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("Sub Finder") // expert button
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Slower")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // O4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Teach Mode")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("Faster")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Move Ship")
+INPUT_PORTS_END
+
+
+static MACHINE_CONFIG_START( cnsector, hh_tms1k_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // approximation - unknown freq
+	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, cnsector_read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, cnsector_write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, cnsector_write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_cnsector)
+
+	/* no video! */
+
+	/* no sound! */
+MACHINE_CONFIG_END
+
+
+
+
+/***************************************************************************
+
+  Parker Bros Merlin handheld computer game, by Bob Doyle
+  * TMS1100NLL MP3404A-N2
+
+  To start a game, press NEW GAME, followed by a number:
+  1: Tic-Tac-Toe
+  2: Music Machine
+  3: Echo
+  4: Blackjack 13
+  5: Magic Square
+  6: Mindbender
+
+  Refer to the official manual for more information on the games.
+
+
+  Other handhelds assumed to be on similar hardware:
+  - Dr. Smith - by Tomy, released in Japan (basically a white version of Merlin,
+    let's assume for now that the ROM contents is identical)
+  - Master Merlin
+
+***************************************************************************/
+
+READ8_MEMBER(hh_tms1k_state::merlin_read_k)
+{
+	return read_inputs(4);
+}
+
+WRITE16_MEMBER(hh_tms1k_state::merlin_write_r)
+{
+	/* leds:
+
+	     R0
+	R1   R2   R3
+	R4   R5   R6
+	R7   R8   R9
+	     R10
+	*/
+	m_display_maxx = 11;
+	m_display_state[0] = data;
+	display_update();
+}
+
+WRITE16_MEMBER(hh_tms1k_state::merlin_write_o)
+{
+	// O4-O6: speaker out (paralleled for increased current driving capability)
+	static const int count[8] = { 0, 1, 1, 2, 1, 2, 2, 3 };
+	m_speaker->level_w(count[data >> 4 & 7]);
+
+	// O0-O3: input mux
+	// O7: N/C
+	m_inp_mux = data & 0xf;
+}
+
+
+
+static INPUT_PORTS_START( merlin )
+	PORT_START("IN.0") // O0
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME("Button 0")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Button 1")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("Button 3")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Button 2")
+
+	PORT_START("IN.1") // O1
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Button 4")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Button 5")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Button 7")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Button 6")
+
+	PORT_START("IN.2") // O2
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Button 8")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Button 9")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Same Game")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Button 10")
+
+	PORT_START("IN.3") // O3
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Comp Turn")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Hit Me")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("New Game")
+INPUT_PORTS_END
+
+
+static const INT16 merlin_speaker_levels[] = { 0, 10922, 21845, 32767 };
+
+
+static MACHINE_CONFIG_START( merlin, hh_tms1k_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1100, 350000) // RC osc. R=33K, C=100pf -> ~350kHz
+	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, merlin_read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, merlin_write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, merlin_write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_merlin)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SPEAKER_LEVELS(4, merlin_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+/***************************************************************************
+
+  Parker Brothers Stop Thief, by Bob Doyle
+  * TMS0980NLL MP6101B (die labeled 0980B-01A)
+
+  Stop Thief is actually a board game, the electronic device emulated here
+  (called Electronic Crime Scanner) is an accessory. To start a game, press
+  the ON button. Otherwise, it is in test-mode where you can hear all sounds.
+
+
+  TODO:
+  - MCU clock is unknown
+  - stopthiep: unable to start a game (may be intentional?)
+
+***************************************************************************/
+
+READ8_MEMBER(hh_tms1k_state::stopthief_read_k)
+{
+	// note: the Vss row is always on
+	return m_inp_matrix[2]->read() | read_inputs(2);
+}
+
+WRITE16_MEMBER(hh_tms1k_state::stopthief_write_r)
+{
+	m_display_maxy = 3;
+	m_display_maxx = 7;
+
+	// R0-R2: select digit
+	UINT8 o = BITSWAP8(m_o,3,5,2,1,4,0,6,7);
+	for (int y = 0; y < m_display_maxy; y++)
+	{
+		m_7seg_mask[y] = 0x7f;
+		m_display_state[y] = (data >> y & 1) ? o : 0;
+	}
+
+	display_update();
+
+	// R3-R8: speaker on
+	m_speaker->level_w((data & 0x1f8 && m_o & 8) ? 1 : 0);
+}
+
+WRITE16_MEMBER(hh_tms1k_state::stopthief_write_o)
+{
+	// O0,O6: input mux
+	m_inp_mux = (data & 1) | (data >> 5 & 2);
+	
+	// O3: speaker out
+	// O0-O2,O4-O7: led segments A-G
+	m_o = data;
+}
+
+
+/* physical button layout and labels is like this:
+
+    [1] [2] [OFF]
+    [3] [4] [ON]
+    [5] [6] [T, TIP]
+    [7] [8] [A, ARREST]
+    [9] [0] [C, CLUE]
+*/
+
+static INPUT_PORTS_START( stopthief )
+	PORT_START("IN.0") // O0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+
+	PORT_START("IN.1") // O6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+
+	// note: even though power buttons are on the matrix, they are not CPU-controlled
+	PORT_START("IN.2") // Vss!
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, tms0980_power_button, (void *)true)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Tip")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Arrest")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Clue")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, tms0980_power_button, (void *)false)
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( stopthief, hh_tms1k_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS0980, 425000) // approximation - unknown freq
+	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, stopthief_read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, stopthief_write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, stopthief_write_o))
+	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(hh_tms1k_state, tms0980_auto_power_off))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_stopthie)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+/***************************************************************************
+
+  Parker Brothers Bank Shot (known as Cue Ball in the UK), by Garry Kitchen
+  * TMS1400NLL MP7313-N2 (die labeled MP7313)
+
+  Bank Shot is an electronic pool game. To select a game, repeatedly press
+  the [SELECT] button, then press [CUE UP] to start. Refer to the official
+  manual for more information. The game selections are:
+  1: Straight Pool (1 player)
+  2: Straight Pool (2 players)
+  3: Poison Pool
+  4: Trick Shots
+
+
+  TODO:
+  - bankshot: the cue ball led is strobed more often than other leds,
+    making it look brighter. We need more accurate led decay simulation
+    for this to work.
+  - MCU clock is unknown
+
+***************************************************************************/
+
+void hh_tms1k_state::bankshot_display()
+{
+	m_display_maxy = 11;
+	m_display_maxx = 7;
+	
+	// update current state
+	for (int y = 0; y < m_display_maxy; y++)
+		m_display_state[y] = (m_r >> y & 1) ? m_o : 0;
+	
+	display_update();
+}
+
+READ8_MEMBER(hh_tms1k_state::bankshot_read_k)
+{
+	return read_inputs(2);
+}
+
+
+WRITE16_MEMBER(hh_tms1k_state::bankshot_write_r)
+{
+	// R0: speaker out
+	m_speaker->level_w(data & 1);
+
+	// R2,R3: input mux
+	m_inp_mux = data >> 2 & 3;
+
+	// R2-R10: led rows
+	m_r = data & ~3;
+	bankshot_display();
+}
+
+WRITE16_MEMBER(hh_tms1k_state::bankshot_write_o)
+{
+	// O0-O6: led columns
+	// O7: N/C
+	m_o = data;
+	bankshot_display();
+}
+
+
+
+
+/* physical button layout and labels is like this:
+  (note: remember that you can rotate the display in MESS)
+
+    [SELECT  [BALL UP] [BALL OVER]
+     SCORE]
+
+    ------  led display  ------
+
+    [ANGLE]  [AIM]     [CUE UP
+                        SHOOT]
+*/
+
+static INPUT_PORTS_START( bankshot )
+	PORT_START("IN.0") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Angle")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Aim")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Cue Up / Shoot")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Select / Score")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Ball Up")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Ball Over")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+static MACHINE_CONFIG_START( bankshot, hh_tms1k_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1400, 475000) // approximation - RC osc. R=24K, C=100pf, but unknown RC curve
+	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, bankshot_read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, bankshot_write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, bankshot_write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_bankshot)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+/***************************************************************************
+
+  Parker Brothers Split Second
+  * TMS1400NLL MP7314-N2 (die labeled MP7314)
+
+  This is an electronic handheld reflex gaming device, it's straightforward
+  to use. The included mini-games are:
+  1, 2, 3: Mad Maze*
+  4, 5: Space Attack*
+  6: Auto Cross
+  7: Stomp
+  8: Speedball
+
+  *: higher number indicates higher difficulty
+
+***************************************************************************/
+
+
+/* display layout, where number xy is lamp R(x),O(y)
+
+       00    02    04
+    10 01 12 03 14 05 16
+       11    13    15
+    20 21 22 23 24 25 26
+       31    33    35
+    30 41 32 43 34 45 36
+       51    53    55
+    40 61 42 63 44 65 46
+       71    73    75
+    50 60 52 62 54 64 56
+       70    72    74
+*/
+
+void hh_tms1k_state::splitsec_display()
+{
+	m_display_maxy = 8;
+	m_display_maxx = 7;
+	
+	// update current state
+	for (int y = 0; y < m_display_maxy; y++)
+		m_display_state[y] = (m_r >> y & 1) ? m_o : 0;
+	
+	display_update();
+}
+
+READ8_MEMBER(hh_tms1k_state::splitsec_read_k)
+{
+	return read_inputs(2);
+}
+
+WRITE16_MEMBER(hh_tms1k_state::splitsec_write_r)
+{
+	// R8: speaker out
+	m_speaker->level_w(data >> 8 & 1);
+
+	// R9,R10: input mux
+	m_inp_mux = data >> 9 & 3;
+
+	// R0-R7: led rows
+	m_r = data;
+	display_update();
+}
+
+WRITE16_MEMBER(hh_tms1k_state::splitsec_write_o)
+{
+	// O0-O6: led columns
+	// O7: N/C
+	m_o = data;
+	splitsec_display();
+}
+
+static INPUT_PORTS_START( splitsec )
+	PORT_START("IN.0") // R9
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY // 4 separate directional buttons, hence 16way
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R10
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Select")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Start")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( splitsec, hh_tms1k_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1400, 475000) // approximation - RC osc. R=24K, C=100pf, but unknown RC curve
+	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, splitsec_read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, splitsec_write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, splitsec_write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_splitsec)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
 
 
 
@@ -1528,6 +2090,82 @@ ROM_START( simon )
 	ROM_LOAD( "tms1000_simon_opla.pla", 0, 365, CRC(2943c71b) SHA1(bd5bb55c57e7ba27e49c645937ec1d4e67506601) )
 ROM_END
 
+ROM_START( cnsector )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0905bnl_za0379", 0x0000, 0x0400, CRC(201036e9) SHA1(b37fef86bb2bceaf0ac8bb3745b4702d17366914) )
+
+	ROM_REGION( 782, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0970_default_ipla.pla", 0, 782, CRC(e038fc44) SHA1(dfc280f6d0a5828d1bb14fcd59ac29caf2c2d981) )
+	ROM_REGION( 860, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0970_cnsector_mpla.pla", 0, 860, CRC(059f5bb4) SHA1(2653766f9fd74d41d44013bb6f54c0973a6080c9) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0970_cnsector_opla.pla", 0, 352, CRC(7c0bdcd6) SHA1(dade774097e8095dca5deac7b2367d0c701aca51) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0970_cnsector_spla.pla", 0, 157, CRC(56c37a4f) SHA1(18ecc20d2666e89673739056483aed5a261ae927) )
+ROM_END
+
+
+ROM_START( merlin )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "mp3404", 0x0000, 0x800, CRC(7515a75d) SHA1(76ca3605d3fde1df62f79b9bb1f534c2a2ae0229) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_merlin_mpla.pla", 0, 867, CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_merlin_opla.pla", 0, 365, CRC(3921b074) SHA1(12bd58e4d6676eb8c7059ef53598279e4f1a32ea) )
+ROM_END
+
+
+ROM_START( stopthie )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "tms0980nll_mp6101b", 0x0000, 0x1000, CRC(8bde5bb4) SHA1(8c318fcce67acc24c7ae361f575f28ec6f94665a) )
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 1982, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0980_default_mpla.pla", 0, 1982, CRC(3709014f) SHA1(d28ee59ded7f3b9dc3f0594a32a98391b6e9c961) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_stopthie_opla.pla", 0, 352, CRC(50337a48) SHA1(4a9ea62ed797a9ac5190eec3bb6ebebb7814628c) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_stopthie_spla.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
+ROM_END
+
+ROM_START( stopthiep )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD16_WORD( "us4341385", 0x0000, 0x1000, CRC(07aec38a) SHA1(0a3d0956495c0d6d9ea771feae6c14a473a800dc) ) // from patent US4341385, data should be correct (it included checksums)
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 1982, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0980_default_mpla.pla", 0, 1982, CRC(3709014f) SHA1(d28ee59ded7f3b9dc3f0594a32a98391b6e9c961) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0980_stopthie_opla.pla", 0, 352, CRC(50337a48) SHA1(4a9ea62ed797a9ac5190eec3bb6ebebb7814628c) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0980_stopthie_spla.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
+ROM_END
+
+ROM_START( bankshot )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "tms1400nll_mp7313", 0x0000, 0x1000, CRC(7a5016a9) SHA1(a8730dc8a282ffaa3d89e675f371d43eb39f39b4) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_default_mpla.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1400_bankshot_opla.pla", 0, 557, CRC(7539283b) SHA1(f791fa98259fc10c393ff1961d4c93040f1a2932) )
+ROM_END
+
+
+ROM_START( splitsec )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "tms1400nll_mp7314", 0x0000, 0x1000, CRC(e94b2098) SHA1(f0fc1f56a829252185592a2508740354c50bedf8) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_default_mpla.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1400_splitsec_opla.pla", 0, 557, CRC(7539283b) SHA1(f791fa98259fc10c393ff1961d4c93040f1a2932) )
+ROM_END
+
+
 ROM_START( tandy12 )
 	ROM_REGION( 0x800, "maincpu", 0 )
 	ROM_LOAD( "cd7282sl", 0x0000, 0x800, CRC(a10013dd) SHA1(42ebd3de3449f371b99937f9df39c240d15ac686) )
@@ -1569,6 +2207,14 @@ CONS( 1979, starwbcp, starwbc, 0, starwbc, starwbc, driver_device, 0, "Kenner", 
 
 CONS( 1977, comp4, 0, 0, comp4, comp4, driver_device, 0, "Milton Bradley", "Comp IV", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 CONS( 1978, simon, 0, 0, simon, simon, driver_device, 0, "Milton Bradley", "Simon (Rev. A)", GAME_SUPPORTS_SAVE )
+
+
+CONS( 1977, cnsector, 0, 0, cnsector, cnsector, driver_device, 0, "Parker Brothers", "Code Name: Sector", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+CONS( 1978, merlin, 0, 0, merlin, merlin, driver_device, 0, "Parker Brothers", "Merlin", GAME_SUPPORTS_SAVE )
+CONS( 1979, stopthie,  0,        0, stopthief, stopthief, driver_device, 0, "Parker Brothers", "Stop Thief (Electronic Crime Scanner)", GAME_SUPPORTS_SAVE )
+CONS( 1979, stopthiep, stopthie, 0, stopthief, stopthief, driver_device, 0, "Parker Brothers", "Stop Thief (Electronic Crime Scanner) (prototype)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1980, bankshot, 0, 0, bankshot, bankshot, driver_device, 0, "Parker Brothers", "Bank Shot - Electronic Pool", GAME_SUPPORTS_SAVE )
+CONS( 1980, splitsec, 0, 0, splitsec, splitsec, driver_device, 0, "Parker Brothers", "Split Second", GAME_SUPPORTS_SAVE )
 
 CONS( 1981, tandy12, 0, 0, tandy12, tandy12, driver_device, 0, "Tandy Radio Shack", "Tandy-12: Computerized Arcade", GAME_SUPPORTS_SAVE )
 

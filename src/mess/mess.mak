@@ -1487,10 +1487,6 @@ $(MESSOBJ)/palm.a:              \
 	$(MESS_DRIVERS)/palmz22.o   \
 
 $(MESSOBJ)/parker.a:            \
-	$(MESS_DRIVERS)/cnsector.o  \
-	$(MESS_DRIVERS)/merlin.o    \
-	$(MESS_DRIVERS)/splitsec.o  \
-	$(MESS_DRIVERS)/stopthie.o  \
 	$(MESS_DRIVERS)/wildfire.o  \
 
 $(MESSOBJ)/pitronic.a:          \
@@ -2106,7 +2102,6 @@ $(MAME_DRIVERS)/cdi.o:      $(MAME_LAYOUT)/cdi.lh
 $(MESS_DRIVERS)/chessmst.o: $(MESS_LAYOUT)/chessmst.lh
 $(MESS_DRIVERS)/chesstrv.o: $(MESS_LAYOUT)/chesstrv.lh \
 							$(MESS_LAYOUT)/borisdpl.lh
-$(MESS_DRIVERS)/cnsector.o: $(MESS_LAYOUT)/cnsector.lh
 $(MESS_DRIVERS)/comp4.o:    $(MESS_LAYOUT)/comp4.lh
 $(MESS_DRIVERS)/cp1.o:      $(MESS_LAYOUT)/cp1.lh
 $(MESS_DRIVERS)/cvicny.o:   $(MESS_LAYOUT)/cvicny.lh
@@ -2131,12 +2126,17 @@ $(MESS_DRIVERS)/gamecom.o:  $(MESS_LAYOUT)/gamecom.lh
 $(MESS_DRIVERS)/glasgow.o:  $(MESS_LAYOUT)/glasgow.lh
 $(MESS_DRIVERS)/h8.o:       $(MESS_LAYOUT)/h8.lh
 $(MESS_DRIVERS)/hh_tms1k.o: $(MESS_LAYOUT)/amaztron.lh \
+                            $(MESS_LAYOUT)/bankshot.lh \
+                            $(MESS_LAYOUT)/cnsector.lh \
                             $(MESS_LAYOUT)/comp4.lh \
                             $(MESS_LAYOUT)/ebball.lh \
                             $(MESS_LAYOUT)/elecdet.lh \
                             $(MESS_LAYOUT)/mathmagi.lh \
+                            $(MESS_LAYOUT)/merlin.lh \
                             $(MESS_LAYOUT)/simon.lh \
+                            $(MESS_LAYOUT)/splitsec.lh \
                             $(MESS_LAYOUT)/starwbc.lh \
+                            $(MESS_LAYOUT)/stopthie.lh \
                             $(MESS_LAYOUT)/tandy12.lh \
                             $(MESS_LAYOUT)/tc4.lh
 $(MESS_DRIVERS)/ie15.o:     $(MESS_LAYOUT)/ie15.lh
@@ -2151,7 +2151,6 @@ $(MESS_DRIVERS)/mac.o:      $(MESS_LAYOUT)/mac.lh
 $(MESS_MACHINE)/megacd.o:   $(MESS_LAYOUT)/megacd.lh
 $(MESS_DRIVERS)/mekd2.o:    $(MESS_LAYOUT)/mekd2.lh
 $(MESS_DRIVERS)/mephisto.o: $(MESS_LAYOUT)/mephisto.lh
-$(MESS_DRIVERS)/merlin.o:   $(MESS_LAYOUT)/merlin.lh
 $(MESS_DRIVERS)/minicom.o:  $(MESS_LAYOUT)/minicom.lh
 $(MESS_DRIVERS)/mirage.o:   $(MESS_LAYOUT)/mirage.lh
 $(MESS_DRIVERS)/mk1.o:      $(MESS_LAYOUT)/mk1.lh
@@ -2187,9 +2186,6 @@ $(MESS_DRIVERS)/simon.o:    $(MESS_LAYOUT)/simon.lh
 $(MESS_DRIVERS)/sitcom.o:   $(MESS_LAYOUT)/sitcom.lh
 $(MESS_DRIVERS)/slc1.o:     $(MESS_LAYOUT)/slc1.lh
 $(MESS_DRIVERS)/sms.o:      $(MESS_LAYOUT)/sms1.lh
-$(MESS_DRIVERS)/splitsec.o: $(MESS_LAYOUT)/bankshot.lh \
-							$(MESS_LAYOUT)/splitsec.lh
-$(MESS_DRIVERS)/stopthie.o: $(MESS_LAYOUT)/stopthie.lh
 $(MESS_DRIVERS)/super80.o:  $(MESS_LAYOUT)/super80.lh
 $(MESS_DRIVERS)/supercon.o: $(MESS_LAYOUT)/supercon.lh
 $(MESS_DRIVERS)/svision.o:  $(MESS_LAYOUT)/svision.lh
