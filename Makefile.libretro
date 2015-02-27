@@ -122,7 +122,7 @@ BASELIBS +=  -lpthread
 	CC = g++
 	AR = @ar
 	LD = g++ 
-	CCOMFLAGS += $(PLATCFLAGS) -ffast-math  
+	CCOMFLAGS += $(PLATCFLAGS)
 	LIBS += -lstdc++ -lpthread -ldl
 	ifeq ($(firstword $(filter x86_64,$(UNAME))),x86_64)
 		PTR64 = 1
@@ -163,7 +163,7 @@ else ifeq ($(platform), android)
 	NATIVELDFLAGS = -Wl,--warn-common -lstdc++
 	NATIVECC = g++
 	NATIVECFLAGS = -std=gnu99 
-	CCOMFLAGS += $(PLATCFLAGS) -ffast-math  
+	CCOMFLAGS += $(PLATCFLAGS)
 	LIBS += -lstdc++ 
 	#-lpthread
 
@@ -220,7 +220,7 @@ else ifeq ($(platform), ios)
 	CFLAGS += -DIOS
 	LDFLAGSEMULATOR +=  -stdlib=libc++
 	PLATCFLAGS += -DSDLMAME_NO64BITIO -DIOS -DUSE_ARM_HACK -DHAVE_POSIX_MEMALIGN
-	CCOMFLAGS += $(PLATCFLAGS) -ffast-math  
+	CCOMFLAGS += $(PLATCFLAGS)
 
 # QNX
 else ifeq ($(platform), qnx)
@@ -322,7 +322,7 @@ else ifneq (,$(findstring armv,$(platform)))
 	CC = g++
 	AR = @ar
 	LD = g++
-	CCOMFLAGS += $(PLATCFLAGS) -ffast-math
+	CCOMFLAGS += $(PLATCFLAGS)
 
 	ifneq (,$(findstring cortexa8,$(platform)))
 		PLATCFLAGS += -marm -mcpu=cortex-a8
