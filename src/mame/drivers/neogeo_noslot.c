@@ -9809,7 +9809,7 @@ GAME( 1996, mslug,      neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neoge
 
 /* NMK */
 GAME( 1994, zedblade,   neogeo,   neogeo_noslot,   neogeo, neogeo_state,   neogeo,   ROT0, "NMK", "Zed Blade / Operation Ragnarok", GAME_SUPPORTS_SAVE )
-b
+
 /* Psikyo */
 GAME( 1999, s1945p,     neogeo,   neogeo_noslot,   neogeo, neogeo_noslot_state,   s1945p,   ROT0, "Psikyo", "Strikers 1945 Plus" , GAME_SUPPORTS_SAVE )   /* Encrypted GFX */
 
