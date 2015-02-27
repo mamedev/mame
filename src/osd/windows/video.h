@@ -45,6 +45,8 @@ public:
 	int width() const { return m_w; }
 	int height() const { return m_h; }
 
+	bool operator!=(const osd_dim &other) { return (m_w != other.width()) || (m_h != other.height()); }
+	bool operator==(const osd_dim &other) { return (m_w == other.width()) && (m_h == other.height()); }
 private:
 	int m_w;
 	int m_h;

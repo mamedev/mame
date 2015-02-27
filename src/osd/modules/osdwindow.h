@@ -54,7 +54,7 @@ public:
 	virtual osd_dim get_size() = 0;
 
 #ifdef OSD_SDL
-	virtual void blit_surface_size(int &blitwidth, int &blitheight) = 0;
+	virtual osd_dim blit_surface_size() = 0;
 	virtual sdl_monitor_info *monitor() const = 0;
 #if (SDLMAME_SDL2)
 	virtual SDL_Window *sdl_window() = 0;

@@ -44,7 +44,7 @@ public:
 		m_resize_height(0),
 		m_last_resize(0),
 #endif
-		m_minwidth(0), m_minheight(0),
+		m_minimum_dim(0,0),
 		m_windowed_dim(0,0),
 		m_rendered_event(0), m_target(0),
 #if (SDLMAME_SDL2)
@@ -104,7 +104,7 @@ public:
 	SDL_Surface *sdl_surface() { return m_sdlsurf; }
 #endif
 
-	void blit_surface_size(int &blitwidth, int &blitheight);
+	osd_dim blit_surface_size();
 	int prescale() const { return m_prescale; }
 
 	// Pointer to next window
@@ -122,8 +122,8 @@ private:
 	char                m_title[256];
 	int                 m_startmaximized;
 
-	// diverse flags
-	int                 m_minwidth, m_minheight;
+	// dimensions
+	osd_dim             m_minimum_dim;
 	osd_dim             m_windowed_dim;
 
 	// rendering info
@@ -153,7 +153,7 @@ protected:
 private:
 	int wnd_extra_width();
 	int wnd_extra_height();
-	void set_starting_view(running_machine &machine, int index, const char *defview, const char *view);
+	void set_starting_view(int index, const char *defview, const char *view);
 	osd_rect constrain_to_aspect_ratio(const osd_rect &rect, int adjustment);
 	osd_dim get_min_bounds(int constrain);
 	osd_dim get_max_bounds(int constrain);

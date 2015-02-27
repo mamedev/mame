@@ -677,7 +677,9 @@ void win_window_info::create(running_machine &machine, int index, win_monitor_in
 
 	// set the specific view
 	windows_options &options = downcast<windows_options &>(machine.options());
-	window->set_starting_view(index, options.view(index));
+
+	const char *defview = options.view();
+	window->set_starting_view(index, defview, options.view(index));
 
 	// remember the current values in case they change
 	window->m_targetview = window->m_target->view();
@@ -898,9 +900,8 @@ static void create_window_class(void)
 //  (main thread)
 //============================================================
 
-void win_window_info::set_starting_view(int index, const char *view)
+void win_window_info::set_starting_view(int index, const char *defview, const char *view)
 {
-	const char *defview = downcast<windows_options &>(machine().options()).view();
 	int viewindex;
 
 	assert(GetCurrentThreadId() == main_threadid);
@@ -910,12 +911,11 @@ void win_window_info::set_starting_view(int index, const char *view)
 		view = defview;
 
 	// query the video system to help us pick a view
-	viewindex = m_target->configured_view(view, index, video_config.numscreens);
+	viewindex = target()->configured_view(view, index, video_config.numscreens);
 
 	// set the view
-	m_target->set_view(viewindex);
+	target()->set_view(viewindex);
 }
-
 
 
 //============================================================
@@ -1515,7 +1515,6 @@ void win_window_info::draw_video_contents(HDC dc, int update)
 
 osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int adjustment)
 {
-	win_monitor_info *monitor = winwindow_video_window_monitor(&rect);
 	INT32 extrawidth = wnd_extra_width();
 	INT32 extraheight = wnd_extra_height();
 	INT32 propwidth, propheight;
@@ -1524,6 +1523,7 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	INT32 viswidth, visheight;
 	INT32 adjwidth, adjheight;
 	float pixel_aspect;
+	win_monitor_info *monitor = winwindow_video_window_monitor(&rect);
 
 	assert(GetCurrentThreadId() == window_threadid);
 

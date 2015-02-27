@@ -69,6 +69,8 @@ public:
 	int width() const { return m_w; }
 	int height() const { return m_h; }
 
+	bool operator!=(const osd_dim &other) { return (m_w != other.width()) || (m_h != other.height()); }
+	bool operator==(const osd_dim &other) { return (m_w == other.width()) && (m_h == other.height()); }
 private:
 	int m_w;
 	int m_h;
@@ -126,12 +128,13 @@ public:
 
 	const UINT64 handle() { return m_handle; }
 	const osd_rect position_size() { refresh(); return SDL_Rect_to_osd_rect(m_dimensions); }
+	const osd_rect usuable_position_size() { refresh(); return SDL_Rect_to_osd_rect(m_dimensions); }
 
 	const char *devicename() { refresh(); return m_name[0] ? m_name : "UNKNOWN"; }
 
 	float aspect();
 
-	void set_aspect(const float aspect) { m_aspect = aspect; }
+	void set_aspect(const float a) { m_aspect = a; }
 
 	// STATIC
 	static void init();

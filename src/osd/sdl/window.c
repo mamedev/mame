@@ -382,7 +382,7 @@ INLINE int better_mode(int width0, int height0, int width1, int height1, float d
 	return (fabs(desired_aspect - aspect0) < fabs(desired_aspect - aspect1)) ? 0 : 1;
 }
 
-void sdl_window_info::blit_surface_size(int &blitwidth, int &blitheight)
+osd_dim sdl_window_info::blit_surface_size()
 {
 	osd_dim window_dim = get_size();
 
@@ -455,8 +455,7 @@ void sdl_window_info::blit_surface_size(int &blitwidth, int &blitheight)
 		&& (video_config.scale_mode == VIDEO_SCALE_MODE_NONE ))
 		newwidth = window_dim.width();
 
-	blitwidth = newwidth;
-	blitheight = newheight;
+	return osd_dim(newwidth, newheight);
 }
 
 
@@ -735,7 +734,7 @@ int sdl_window_info::window_init()
 	m_target = m_machine.render().target_alloc();
 
 	// set the specific view
-	set_starting_view(m_machine, m_index, options.view(), options.view(m_index));
+	set_starting_view(m_index, options.view(), options.view(m_index));
 
 	// make the window title
 	if (video_config.numscreens == 1)
@@ -1009,10 +1008,9 @@ void sdl_window_info::update()
 
 		// see if the games video mode has changed
 		m_target->compute_minimum_size(tempwidth, tempheight);
-		if (tempwidth != m_minwidth || tempheight != m_minheight)
+		if (osd_dim(tempwidth, tempheight) != m_minimum_dim)
 		{
-			m_minwidth = tempwidth;
-			m_minheight = tempheight;
+			m_minimum_dim = osd_dim(tempwidth, tempheight);
 
 			if (!this->m_fullscreen)
 			{
@@ -1050,7 +1048,7 @@ void sdl_window_info::update()
 //  (main thread)
 //============================================================
 
-void sdl_window_info::set_starting_view(running_machine &machine, int index, const char *defview, const char *view)
+void sdl_window_info::set_starting_view(int index, const char *defview, const char *view)
 {
 	int viewindex;
 
@@ -1394,9 +1392,10 @@ osd_rect sdl_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	INT32 viswidth, visheight;
 	INT32 adjwidth, adjheight;
 	float pixel_aspect;
+	sdl_monitor_info *monitor = m_monitor;
 
 	// get the pixel aspect ratio for the target monitor
-	pixel_aspect = m_monitor->aspect();
+	pixel_aspect = monitor->aspect();
 
 	// determine the proposed width/height
 	propwidth = rect.width() - extrawidth;
@@ -1435,13 +1434,13 @@ osd_rect sdl_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	// clamp against the maximum (fit on one screen for full screen mode)
 	if (m_fullscreen)
 	{
-		maxwidth = m_monitor->position_size().width() - extrawidth;
-		maxheight = m_monitor->position_size().height() - extraheight;
+		maxwidth = monitor->position_size().width() - extrawidth;
+		maxheight = monitor->position_size().height() - extraheight;
 	}
 	else
 	{
-		maxwidth = m_monitor->position_size().width() - extrawidth;
-		maxheight = m_monitor->position_size().height() - extraheight;
+		maxwidth = monitor->usuable_position_size().width() - extrawidth;
+		maxheight = monitor->usuable_position_size().height() - extraheight;
 
 		// further clamp to the maximum width/height in the window
 		if (m_win_config.width != 0)

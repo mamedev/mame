@@ -53,12 +53,11 @@ public:
 		return GetMenu(m_hwnd) ? true : false;
 	}
 
-	/* virtual */ void get_size(int &w, int &h)
+	/* virtual */ osd_dim get_size()
 	{
 		RECT client;
 		GetClientRect(m_hwnd, &client);
-		w = client.right - client.left;
-		h = client.bottom - client.top;
+		return osd_dim(client.right - client.left, client.bottom - client.top);
 	}
 
 	win_monitor_info *monitor() const { return m_monitor; }
@@ -110,7 +109,7 @@ public:
 private:
 	void draw_video_contents(HDC dc, int update);
 	int complete_create();
-	void set_starting_view(int index, const char *view);
+	void set_starting_view(int index, const char *defview, const char *view);
 	int wnd_extra_width();
 	int wnd_extra_height();
 	osd_rect constrain_to_aspect_ratio(const osd_rect &rect, int adjustment);
