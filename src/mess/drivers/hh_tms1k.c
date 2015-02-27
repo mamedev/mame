@@ -42,15 +42,25 @@ public:
 		m_display_maxx(0)
 	{ }
 
+	// devices
 	required_device<cpu_device> m_maincpu;
 	optional_ioport_array<7> m_inp_matrix; // max 7
 	optional_device<speaker_sound_device> m_speaker;
 	
+	// misc common
 	UINT16 m_r;
 	UINT16 m_o;
 	UINT16 m_inp_mux;
 	bool m_power_on;
 
+	UINT8 read_inputs(int columns);
+	DECLARE_INPUT_CHANGED_MEMBER(tms0980_power_button);
+	DECLARE_WRITE_LINE_MEMBER(tms0980_auto_power_off);
+
+	virtual void machine_start();
+	virtual void machine_reset();
+
+	// display common
 	int m_display_wait;
 	int m_display_maxy;
 	int m_display_maxx;
@@ -61,13 +71,8 @@ public:
 	UINT16 m_7seg_mask[0x20];
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
-	bool index_is_7segled(int index);
 	void display_update();
 	
-	UINT8 read_inputs(int columns);
-	DECLARE_INPUT_CHANGED_MEMBER(tms0980_power_button);
-	DECLARE_WRITE_LINE_MEMBER(tms0980_auto_power_off);
-
 	// game-specific handlers
 	void mathmagi_display();
 	DECLARE_READ8_MEMBER(mathmagi_read_k);
@@ -131,9 +136,6 @@ public:
 	DECLARE_READ8_MEMBER(unk3403_read_k);
 	DECLARE_WRITE16_MEMBER(unk3403_write_r);
 	DECLARE_WRITE16_MEMBER(unk3403_write_o);
-
-	virtual void machine_start();
-	virtual void machine_reset();
 };
 
 
@@ -144,7 +146,7 @@ void hh_tms1k_state::machine_start()
 	memset(m_display_cache, 0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
 	memset(m_7seg_mask, 0, sizeof(m_7seg_mask));
-
+	
 	m_o = 0;
 	m_r = 0;
 	m_inp_mux = 0;
