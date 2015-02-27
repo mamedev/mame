@@ -1435,6 +1435,7 @@ $(MESSOBJ)/nec.a:               \
 	$(MESS_DRIVERS)/pc100.o     \
 	$(MESS_DRIVERS)/pc9801.o $(MESS_MACHINE)/pc9801_26.o $(MESS_MACHINE)/pc9801_86.o $(MESS_MACHINE)/pc9801_118.o $(MESS_MACHINE)/pc9801_cbus.o $(MESS_MACHINE)/pc9801_kbd.o \
 	$(MESS_DRIVERS)/tk80bs.o    \
+	$(MESS_DRIVERS)/hh_ucom4.o  \
 
 $(MESSOBJ)/netronic.a:          \
 	$(MESS_DRIVERS)/elf.o       \
@@ -2139,6 +2140,7 @@ $(MESS_DRIVERS)/hh_tms1k.o: $(MESS_LAYOUT)/amaztron.lh \
                             $(MESS_LAYOUT)/stopthie.lh \
                             $(MESS_LAYOUT)/tandy12.lh \
                             $(MESS_LAYOUT)/tc4.lh
+$(MESS_DRIVERS)/hh_ucom4.o: $(MESS_LAYOUT)/tmpacman.lh
 $(MESS_DRIVERS)/ie15.o:     $(MESS_LAYOUT)/ie15.lh
 $(MESS_DRIVERS)/instruct.o: $(MESS_LAYOUT)/instruct.lh
 $(MESS_DRIVERS)/k1003.o:    $(MESS_LAYOUT)/k1003.lh
