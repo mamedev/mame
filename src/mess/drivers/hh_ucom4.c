@@ -4,7 +4,6 @@
 
   NEC uCOM4 MCU handhelds
 
-  NOTE!: MESS external artwork is required for most of the games
 
 
   serial  device  etc
@@ -26,7 +25,7 @@
 #include "cpu/ucom4/ucom4.h"
 #include "sound/speaker.h"
 
-// test-layouts for vfd games
+// test-layouts - use external artwork
 #include "alnchase.lh"
 #include "edracula.lh"
 #include "tmpacman.lh"
@@ -48,7 +47,7 @@ public:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	optional_ioport_array<4> m_inp_matrix; // max 4
+	optional_ioport_array<3> m_inp_matrix; // max 3
 	optional_device<speaker_sound_device> m_speaker;
 	
 	// misc common
@@ -57,7 +56,6 @@ public:
 	UINT8 read_inputs(int columns);
 
 	virtual void machine_start();
-	virtual void machine_reset();
 
 	// display common
 	int m_display_wait;
@@ -123,9 +121,6 @@ void hh_ucom4_state::machine_start()
 }
 
 
-void hh_ucom4_state::machine_reset()
-{
-}
 
 /***************************************************************************
 
@@ -133,20 +128,7 @@ void hh_ucom4_state::machine_reset()
 
 ***************************************************************************/
 
-// LED segments
-#if 0
-enum
-{
-	lA = 0x01,
-	lB = 0x02,
-	lC = 0x04,
-	lD = 0x08,
-	lE = 0x10,
-	lF = 0x20,
-	lG = 0x40,
-	lDP = 0x80
-};
-#endif
+
 
 // The device strobes the outputs very fast, it is unnoticeable to the user.
 // To prevent flickering here, we need to simulate a decay.
@@ -242,6 +224,7 @@ UINT8 hh_ucom4_state::read_inputs(int columns)
   - USA: Dracula, red case
   - Other: Dracula, yellow case, published by Hales
 
+  NOTE!: MESS external artwork is recommended
 
 
 ***************************************************************************/
@@ -330,6 +313,7 @@ MACHINE_CONFIG_END
   side, player 2 or CPU on the left. Each player has six possible positions
   where to hit the ball. A backdrop behind the VFD shows a tennis court.
 
+  NOTE!: MESS external artwork is recommended
 
 ***************************************************************************/
 
@@ -420,7 +404,6 @@ INPUT_CHANGED_MEMBER(hh_ucom4_state::tmtennis_difficulty_switch)
 
 MACHINE_RESET_MEMBER(hh_ucom4_state, tmtennis)
 {
-	machine_reset(); // common
 	tmtennis_set_clock();
 }
 
@@ -466,6 +449,8 @@ MACHINE_CONFIG_END
   - UK: Puckman (Tomy), and also as Munchman, published by Grandstand
   - Australia: Pac Man-1, published by Futuretronics
 
+  NOTE!: MESS external artwork is recommended
+
 ***************************************************************************/
 
 static INPUT_PORTS_START( tmpacman )
@@ -502,6 +487,8 @@ MACHINE_CONFIG_END
 
   This is a space-themed tabletop VFD electronic game. To start, simply
   press [UP]. Hold a joystick direction to move around.
+
+  NOTE!: MESS external artwork is recommended
 
 ***************************************************************************/
 
