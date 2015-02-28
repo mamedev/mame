@@ -100,7 +100,6 @@ void tms34061_device::device_start()
 	save_pointer(NAME(m_vram), m_vramsize);
 	save_pointer(NAME(m_latchram), m_vramsize);
 	save_item(NAME(m_latchdata));
-	save_pointer(NAME(m_shiftreg), m_vramsize);
 }
 
 //-------------------------------------------------

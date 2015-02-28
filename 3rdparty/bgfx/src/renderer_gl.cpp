@@ -232,7 +232,7 @@ namespace bgfx
 		{ GL_DEPTH_COMPONENT32F,                       GL_DEPTH_COMPONENT,                          GL_FLOAT,                        false }, // D16F
 		{ GL_DEPTH_COMPONENT32F,                       GL_DEPTH_COMPONENT,                          GL_FLOAT,                        false }, // D24F
 		{ GL_DEPTH_COMPONENT32F,                       GL_DEPTH_COMPONENT,                          GL_FLOAT,                        false }, // D32F
-		{ GL_STENCIL_INDEX8,                           GL_DEPTH_STENCIL,                            GL_UNSIGNED_BYTE,                false }, // D0S8
+		{ GL_STENCIL_INDEX8,                           GL_STENCIL_INDEX,                            GL_UNSIGNED_BYTE,                false }, // D0S8
 	};
 	BX_STATIC_ASSERT(TextureFormat::Count == BX_COUNTOF(s_textureFormat) );
 
@@ -430,6 +430,7 @@ namespace bgfx
 			OES_texture_npot,
 			OES_texture_half_float,
 			OES_texture_half_float_linear,
+			OES_texture_stencil8,
 			OES_vertex_array_object,
 			OES_vertex_half_float,
 			OES_vertex_type_10_10_10_2,
@@ -590,6 +591,7 @@ namespace bgfx
 		{ "OES_texture_npot",                      false,                             true  },
 		{ "OES_texture_half_float",                false,                             true  },
 		{ "OES_texture_half_float_linear",         false,                             true  },
+		{ "OES_texture_stencil8",                  false,                             true  },
 		{ "OES_vertex_array_object",               false,                             !BX_PLATFORM_IOS },
 		{ "OES_vertex_half_float",                 false,                             true  },
 		{ "OES_vertex_type_10_10_10_2",            false,                             true  },
@@ -1165,7 +1167,8 @@ namespace bgfx
 				}
 			}
 
-			if (!isTextureFormatValid(TextureFormat::R8) )
+			if (BX_ENABLED(BX_PLATFORM_EMSCRIPTEN)
+			||  !isTextureFormatValid(TextureFormat::R8) )
 			{
 				// GL core has to use GL_R8 Issue#208, GLES2 has to use GL_LUMINANCE issue#226
 				s_textureFormat[TextureFormat::R8].m_internalFmt = GL_LUMINANCE;
@@ -1385,7 +1388,7 @@ namespace bgfx
 			}
 
 			// Init reserved part of view name.
-			for (uint8_t ii = 0; ii < BGFX_CONFIG_MAX_VIEWS; ++ii)
+			for (uint32_t ii = 0; ii < BGFX_CONFIG_MAX_VIEWS; ++ii)
 			{
 				bx::snprintf(s_viewName[ii], BGFX_CONFIG_MAX_VIEW_NAME_RESERVED+1, "%3d  ", ii);
 			}
@@ -2554,6 +2557,10 @@ namespace bgfx
 			GLSL_TYPE(GL_IMAGE_2D);
 			GLSL_TYPE(GL_IMAGE_3D);
 			GLSL_TYPE(GL_IMAGE_CUBE);
+			GLSL_TYPE(GL_UNSIGNED_INT_IMAGE_1D);
+			GLSL_TYPE(GL_UNSIGNED_INT_IMAGE_2D);
+			GLSL_TYPE(GL_UNSIGNED_INT_IMAGE_3D);
+			GLSL_TYPE(GL_UNSIGNED_INT_IMAGE_CUBE);
 		}
 
 #undef GLSL_TYPE
@@ -2636,6 +2643,10 @@ namespace bgfx
 		case GL_IMAGE_2D:
 		case GL_IMAGE_3D:
 		case GL_IMAGE_CUBE:
+		case GL_UNSIGNED_INT_IMAGE_1D:
+		case GL_UNSIGNED_INT_IMAGE_2D:
+		case GL_UNSIGNED_INT_IMAGE_3D:
+		case GL_UNSIGNED_INT_IMAGE_CUBE:
 			return UniformType::Uniform1iv;
 		};
 
@@ -2833,6 +2844,10 @@ namespace bgfx
 			case GL_IMAGE_2D:
 			case GL_IMAGE_3D:
 			case GL_IMAGE_CUBE:
+			case GL_UNSIGNED_INT_IMAGE_1D:
+			case GL_UNSIGNED_INT_IMAGE_2D:
+			case GL_UNSIGNED_INT_IMAGE_3D:
+			case GL_UNSIGNED_INT_IMAGE_CUBE:
 				BX_TRACE("Sampler #%d at location %d.", m_numSamplers, loc);
 				m_sampler[m_numSamplers] = loc;
 				m_numSamplers++;
@@ -4279,7 +4294,7 @@ namespace bgfx
 			int32_t numItems = _render->m_num;
 			for (int32_t item = 0, restartItem = numItems; item < numItems || restartItem < numItems;)
 			{
-				const bool isCompute   = key.decode(_render->m_sortKeys[item]);
+				const bool isCompute   = key.decode(_render->m_sortKeys[item], _render->m_viewRemap);
 				const bool viewChanged = 0
 					|| key.m_view != view
 					|| item == numItems

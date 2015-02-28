@@ -17,9 +17,9 @@ solution "bx"
 
 	language "C++"
 
-BX_DIR = (path.getabsolute("..") .. "/")
-local BX_BUILD_DIR = (BX_DIR .. ".build/")
-local BX_THIRD_PARTY_DIR = (BX_DIR .. "3rdparty/")
+BX_DIR = path.getabsolute("..")
+local BX_BUILD_DIR = path.join(BX_DIR, ".build")
+local BX_THIRD_PARTY_DIR = path.join(BX_DIR, "3rdparty")
 
 defines {
 	"BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS=1"
@@ -39,15 +39,15 @@ project "bx.test"
 	uuid "8a653da8-23d6-11e3-acb4-887628d43830"
 	kind "ConsoleApp"
 
-	debugdir (BX_DIR .. "tests")
+	debugdir (path.join(BX_DIR, "tests"))
 
 	removeflags {
 		"NoExceptions",
 	}
 
 	includedirs {
-		BX_DIR .. "include",
-		BX_THIRD_PARTY_DIR .. "UnitTest++/src/",
+		path.join(BX_DIR, "include"),
+		path.join(BX_THIRD_PARTY_DIR, "UnitTest++/src"),
 	}
 
 	links {
@@ -55,8 +55,8 @@ project "bx.test"
 	}
 
 	files {
-		BX_DIR .. "tests/**.cpp",
-		BX_DIR .. "tests/**.H",
+		path.join(BX_DIR, "tests/**.cpp"),
+		path.join(BX_DIR, "tests/**.H"),
 	}
 
 	configuration { "vs*" }
