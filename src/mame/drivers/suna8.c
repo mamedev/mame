@@ -18,7 +18,7 @@ Year + Game         Game     PCB         Epoxy CPU  Samples  Notes
 89  Spark Man       KRB-16   60136-081   T568009    Yes      Encryption + Protection
 90  Star Fighter    KRB-17   60484-0082  T568009    Yes      Encryption + Protection
 91  Hard Head 2     ?        ?           T568009    -        Encryption + Protection
-92  Brick Zone      ?        ?           Yes        -        Encryption + Protection
+92  Brick Zone      KRB-19   70523-0084  Yes        -        Encryption + Protection
 --------------------------------------------------------------------------------------
 
 Notes:
@@ -146,6 +146,7 @@ DRIVER_INIT_MEMBER(suna8_state, brickzn_common)
 DRIVER_INIT_MEMBER(suna8_state,brickzn)
 {
 	DRIVER_INIT_CALL(brickzn_common);
+
 	// !!!!!! PATCHES !!!!!!
 	// To do: ROM banking should be disabled here
 	m_decrypt[0x11cc] = 0x00; // LD ($C040),A -> NOP
@@ -2537,7 +2538,7 @@ Large epoxy(?) module near the cpu's.
 
 ROM_START( brickzn )
 	ROM_REGION( 0x50000 + 0x40000, "maincpu", 0 )       /* Main Z80 Code */
-	ROM_LOAD( "P9.M7", 0x00000, 0x08000, CRC(bd7a3c01) SHA1(05fb2836f1c8d8818847ccb76e7b477f13a9929b) )
+	ROM_LOAD( "P9.M7", 0x00000, 0x08000, CRC(bd7a3c01) SHA1(05fb2836f1c8d8818847ccb76e7b477f13a9929b) )  // V6.0 1992,3,16
 	ROM_LOAD( "P8.K7", 0x10000, 0x20000, CRC(ec3e266d) SHA1(4441a5ae88e51353f6d1eb22c00becb0a7ecea6e) )
 	ROM_LOAD( "P7.I7", 0x30000, 0x20000, CRC(4dd88631) SHA1(0dbcaf3420dad82c3ed94d231948fe69b044b786) )
 
@@ -2880,7 +2881,7 @@ GAME( 1990, starfigh,  0,        starfigh, starfigh, suna8_state, starfigh,  ROT
 
 GAME( 1991, hardhea2,  0,        hardhea2, hardhea2, suna8_state, hardhea2,  ROT0,  "SunA",                       "Hard Head 2 (v2.0)",          0 )
 
-GAME( 1992, brickzn,   0,        brickzn,  brickzn,  suna8_state, brickzn,   ROT90, "SunA",                       "Brick Zone (v6.0, Joystick)", 0 ) // 'V 60'
-GAME( 1992, brickznv5, brickzn,  brickzn,  brickzn,  suna8_state, brickznv5, ROT90, "SunA",                       "Brick Zone (v5.0, Joystick)",  0 )
+GAME( 1992, brickzn,   0,        brickzn,  brickzn,  suna8_state, brickzn,   ROT90, "SunA",                       "Brick Zone (v6.0, Joystick)", 0 )
+GAME( 1992, brickznv5, brickzn,  brickzn,  brickzn,  suna8_state, brickznv5, ROT90, "SunA",                       "Brick Zone (v5.0, Joystick)", 0 )
 GAME( 1992, brickznv4, brickzn,  brickzn,  brickzn,  suna8_state, brickznv4, ROT90, "SunA",                       "Brick Zone (v4.0, Spinner)",  0 )
 GAME( 1992, brickzn11, brickzn,  brickzn,  brickzn,  suna8_state, brickzn11, ROT90, "SunA",                       "Brick Zone (v1.1)",  GAME_NOT_WORKING )
