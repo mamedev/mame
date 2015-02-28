@@ -824,7 +824,7 @@ endif
 	$(RM) depend_mess.mak
 	$(RM) depend_ume.mak
 	@echo Deleting build targets...
-ifeq ($(PARTIAL),1)
+ifneq ($(PARTIAL),1)
 	# TODO: We should do this smarter at some point
 	$(RM) *_libretro.so *_libretro.dylib *_libretro.dll
 endif
