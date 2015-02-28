@@ -124,6 +124,8 @@ public:
 	DECLARE_READ8_MEMBER(suna8_banked_spriteram_r);
 	DECLARE_WRITE8_MEMBER(suna8_spriteram_w);
 	DECLARE_WRITE8_MEMBER(suna8_banked_spriteram_w);
+	DECLARE_DRIVER_INIT(brickzn_common);
+	DECLARE_DRIVER_INIT(brickznv5);
 	DECLARE_DRIVER_INIT(brickznv4);
 	DECLARE_DRIVER_INIT(starfigh);
 	DECLARE_DRIVER_INIT(hardhea2);
