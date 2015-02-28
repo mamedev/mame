@@ -87,7 +87,7 @@ class texture_info
 {
 	friend class simple_list<texture_info>;
 public:
-	texture_info(SDL_Renderer *renderer, const render_texinfo &texsource, const quad_setup_data &setup, const UINT32 flags);
+	texture_info(sdl_info13 *renderer, const render_texinfo &texsource, const quad_setup_data &setup, const UINT32 flags);
 	~texture_info();
 
 	void set_data(const render_texinfo &texsource, const UINT32 flags);
@@ -118,7 +118,7 @@ public:
 
 private:
 	Uint32              m_sdl_access;
-	SDL_Renderer *      m_sdl_renderer;
+	sdl_info13 *      	m_renderer;
 	render_texinfo      m_texinfo;            // copy of the texture info
 	HashT               m_hash;               // hash value for the texture (must be >= pointer size)
 	UINT32              m_flags;              // rendering flags
@@ -143,12 +143,18 @@ class sdl_info13 : public osd_renderer
 {
 public:
 	sdl_info13(osd_window *w)
-	: osd_renderer(w, FLAG_NONE), m_blittimer(0), m_sdl_renderer(NULL),
+	: osd_renderer(w, FLAG_NONE), m_sdl_renderer(NULL), m_blittimer(0),
 		m_last_hofs(0), m_last_vofs(0),
 		m_width(0), m_height(0),
 		m_blit_dim(0,0),
 		m_last_blit_time(0), m_last_blit_pixels(0)
-	{}
+	{
+		for (int i=0; i < 30; i++)
+		{
+			fmt_support[i].format = 0;
+			fmt_support[i].status = 0;
+		}
+	}
 
 	/* virtual */ int create();
 	/* virtual */ int draw(const int update);
@@ -165,6 +171,9 @@ public:
 		window().target()->set_bounds(m_blit_dim.width(), m_blit_dim.height(), window().aspect());
 		return &window().target()->get_primitives();
 	}
+	int RendererSupportsFormat(Uint32 format, Uint32 access, const char *sformat);
+
+	SDL_Renderer *  m_sdl_renderer;
 
 private:
 	void render_quad(texture_info *texture, const render_primitive *prim, const int x, const int y);
@@ -183,7 +192,6 @@ private:
 	SDL_Surface         *m_sdlsurf;
 #endif
 
-	SDL_Renderer *  m_sdl_renderer;
 	simple_list<texture_info>  m_texlist;                // list of active textures
 
 	float           m_last_hofs;
@@ -193,6 +201,12 @@ private:
 	int             m_height;
 
 	osd_dim         m_blit_dim;
+
+	struct
+	{
+		Uint32  format;
+		int     status;
+	} fmt_support[30];
 
 	// Stats
 	INT64           m_last_blit_time;
@@ -317,13 +331,6 @@ static copy_info_t blit_info_default[] =
 
 static copy_info_t *blit_info[SDL_TEXFORMAT_LAST+1];
 
-static struct
-{
-	Uint32  format;
-	int     status;
-} fmt_support[30] = { { 0, 0 } };
-
-
 //============================================================
 //  INLINES
 //============================================================
@@ -400,7 +407,7 @@ void texture_info::render_quad(const render_primitive *prim, const int x, const 
 
 	SDL_SetTextureBlendMode(m_texture_id, m_sdl_blendmode);
 	set_coloralphamode(m_texture_id, &prim->color);
-	SDL_RenderCopy(m_sdl_renderer,  m_texture_id, NULL, &target_rect);
+	SDL_RenderCopy(m_renderer->m_sdl_renderer,  m_texture_id, NULL, &target_rect);
 }
 
 void sdl_info13::render_quad(texture_info *texture, const render_primitive *prim, const int x, const int y)
@@ -440,7 +447,7 @@ void sdl_info13::render_quad(texture_info *texture, const render_primitive *prim
 	}
 }
 
-static int RendererSupportsFormat(SDL_Renderer *renderer, Uint32 format, Uint32 access, const char *sformat)
+int sdl_info13::RendererSupportsFormat(Uint32 format, Uint32 access, const char *sformat)
 {
 	int i;
 	SDL_Texture *texid;
@@ -454,7 +461,7 @@ static int RendererSupportsFormat(SDL_Renderer *renderer, Uint32 format, Uint32 
 	/* not tested yet */
 	fmt_support[i].format = format;
 	fmt_support[i + 1].format = 0;
-	texid = SDL_CreateTexture(renderer, format, access, 16, 16);
+	texid = SDL_CreateTexture(m_sdl_renderer, format, access, 16, 16);
 	if (texid)
 	{
 		fmt_support[i].status = 1;
@@ -545,6 +552,7 @@ static void drawsdl2_exit(void)
 	int i;
 	copy_info_t *bi, *freeme;
 	for (i = 0; i <= SDL_TEXFORMAT_LAST; i++)
+	{
 		for (bi = blit_info[i]; bi != NULL; )
 		{
 			if (bi->pixel_count)
@@ -555,6 +563,8 @@ static void drawsdl2_exit(void)
 			bi = bi->next;
 			global_free(freeme);
 		}
+		blit_info[i] = NULL;
+	}
 }
 
 //============================================================
@@ -796,7 +806,7 @@ copy_info_t *texture_info::compute_size_type()
 		if ((m_is_rotated == bi->blitter->m_is_rot)
 				&& (m_sdl_blendmode == bi->bm_mask))
 		{
-			if (RendererSupportsFormat(m_sdl_renderer, bi->dst_fmt, m_sdl_access, bi->dstname))
+			if (m_renderer->RendererSupportsFormat(bi->dst_fmt, m_sdl_access, bi->dstname))
 			{
 				int perf = bi->perf;
 				if (perf == 0)
@@ -816,7 +826,7 @@ copy_info_t *texture_info::compute_size_type()
 	{
 		if ((m_is_rotated == bi->blitter->m_is_rot)
 			&& (m_sdl_blendmode == bi->bm_mask))
-			if (RendererSupportsFormat(m_sdl_renderer, bi->dst_fmt, m_sdl_access, bi->dstname))
+			if (m_renderer->RendererSupportsFormat(bi->dst_fmt, m_sdl_access, bi->dstname))
 				return bi;
 	}
 	//FIXME: crash implement a -do nothing handler */
@@ -851,10 +861,10 @@ bool texture_info::matches(const render_primitive &prim, const quad_setup_data &
 //  texture_create
 //============================================================
 
-texture_info::texture_info(SDL_Renderer *renderer, const render_texinfo &texsource, const quad_setup_data &setup, UINT32 flags)
+texture_info::texture_info(sdl_info13 *renderer, const render_texinfo &texsource, const quad_setup_data &setup, UINT32 flags)
 {
 	// fill in the core data
-	m_sdl_renderer = renderer;
+	m_renderer = renderer;
 	m_hash = texture_compute_hash(texsource, flags);
 	m_flags = flags;
 	m_texinfo = texsource;
@@ -903,7 +913,7 @@ texture_info::texture_info(SDL_Renderer *renderer, const render_texinfo &texsour
 
 	m_copyinfo = compute_size_type();
 
-	m_texture_id = SDL_CreateTexture(m_sdl_renderer, m_copyinfo->dst_fmt, m_sdl_access,
+	m_texture_id = SDL_CreateTexture(m_renderer->m_sdl_renderer, m_copyinfo->dst_fmt, m_sdl_access,
 			m_setup.rotwidth, m_setup.rotheight);
 
 	if (!m_texture_id)
@@ -1076,7 +1086,7 @@ texture_info * sdl_info13::texture_update(const render_primitive &prim)
 	// if we didn't find one, create a new texture
 	if (texture == NULL && prim.texture.base != NULL)
 	{
-		texture = global_alloc(texture_info(m_sdl_renderer, prim.texture, setup, prim.flags));
+		texture = global_alloc(texture_info(this, prim.texture, setup, prim.flags));
 		/* add us to the texture list */
 		m_texlist.prepend(*texture);
 
