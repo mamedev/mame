@@ -897,7 +897,7 @@ texture_info::texture_info(sdl_info13 *renderer, const render_texinfo &texsource
 	}
 
 	if (setup.rotwidth != m_texinfo.width || setup.rotheight != m_texinfo.height
-			|| setup.dudx < 0 || setup.dvdy < 0)
+			|| setup.dudx < 0 || setup.dvdy < 0 || (PRIMFLAG_GET_TEXORIENT(flags) != 0))
 		m_is_rotated = true;
 	else
 		m_is_rotated = false;
