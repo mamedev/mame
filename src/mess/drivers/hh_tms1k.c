@@ -11,9 +11,9 @@
 
   serial   device   etc.
 --------------------------------------------------------------------
- @MP0904A  TMS0970  1977, Milton Bradley Comp IV
+ @CP0904A  TMS0970  1977, Milton Bradley Comp IV
  @MP0905B  TMS0970  1977, Parker Brothers Codename Sector
- @MP0914   TMS1000  1979, Entex Baseball
+ @MP0914   TMS1000  1978, Entex Baseball 1
  @MP1030   TMS1100  1980, APF Mathemagician
  @MP3226   TMS1000  1978, Milton Bradley Simon
  @MP3403   TMS1100  1978, unknown
@@ -371,8 +371,8 @@ INPUT_CHANGED_MEMBER(hh_tms1k_state::tms0980_power_button)
 
 void hh_tms1k_state::mathmagi_display()
 {
-	m_display_maxy = 11;
 	m_display_maxx = 8;
+	m_display_maxy = 11;
 
 	// R0-R7: 7seg leds
 	for (int y = 0; y < 8; y++)
@@ -535,8 +535,8 @@ MACHINE_CONFIG_END
 
 void hh_tms1k_state::amaztron_display()
 {
-	m_display_maxy = 3;
 	m_display_maxx = 8;
+	m_display_maxy = 3;
 
 	// R8,R9: select digit
 	for (int y = 0; y < 2; y++)
@@ -1347,8 +1347,8 @@ READ8_MEMBER(hh_tms1k_state::cnsector_read_k)
 
 WRITE16_MEMBER(hh_tms1k_state::cnsector_write_r)
 {
-	m_display_maxy = 7;
 	m_display_maxx = 8;
+	m_display_maxy = 7;
 
 	// R0-R5: select digit (right-to-left)
 	for (int y = 0; y < 6; y++)
@@ -1555,8 +1555,8 @@ READ8_MEMBER(hh_tms1k_state::stopthief_read_k)
 
 WRITE16_MEMBER(hh_tms1k_state::stopthief_write_r)
 {
-	m_display_maxy = 3;
 	m_display_maxx = 7;
+	m_display_maxy = 3;
 
 	// R0-R2: select digit
 	UINT8 o = BITSWAP8(m_o,3,5,2,1,4,0,6,7) & 0x7f;
@@ -2294,7 +2294,7 @@ CONS( 1980, mathmagi, 0, 0, mathmagi, mathmagi, driver_device, 0, "APF Electroni
 CONS( 1979, amaztron, 0, 0, amaztron, amaztron, driver_device, 0, "Coleco", "Amaze-A-Tron", GAME_SUPPORTS_SAVE )
 CONS( 1981, tc4, 0, 0, tc4, tc4, driver_device, 0, "Coleco", "Total Control 4", GAME_SUPPORTS_SAVE )
 
-CONS( 1979, ebball, 0, 0, ebball, ebball, driver_device, 0, "Entex", "Baseball (Entex)", GAME_SUPPORTS_SAVE )
+CONS( 1978, ebball, 0, 0, ebball, ebball, driver_device, 0, "Entex", "Electronic Baseball (Entex)", GAME_SUPPORTS_SAVE )
 
 CONS( 1979, elecdet, 0, 0, elecdet, elecdet, driver_device, 0, "Ideal", "Electronic Detective", GAME_SUPPORTS_SAVE )
 
