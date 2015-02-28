@@ -27,14 +27,10 @@
 #define WINOPTION_PROFILE               "profile"
 
 // video options
-#define WINOPTION_PRESCALE              "prescale"
 #define WINOPTION_MENU                  "menu"
 
 // DirectDraw-specific options
 #define WINOPTION_HWSTRETCH             "hwstretch"
-
-// Direct3D-specific options
-#define WINOPTION_FILTER                "filter"
 
 // core post-processing options
 #define WINOPTION_HLSL_ENABLE               "hlsl_enable"
@@ -132,14 +128,10 @@ public:
 	int profile() const { return int_value(WINOPTION_PROFILE); }
 
 	// video options
-	int prescale() const { return int_value(WINOPTION_PRESCALE); }
 	bool menu() const { return bool_value(WINOPTION_MENU); }
 
 	// DirectDraw-specific options
 	bool hwstretch() const { return bool_value(WINOPTION_HWSTRETCH); }
-
-	// Direct3D-specific options
-	bool filter() const { return bool_value(WINOPTION_FILTER); }
 
 	// core post-processing options
 	const char *screen_post_fx_dir() const { return value(WINOPTION_HLSLPATH); }

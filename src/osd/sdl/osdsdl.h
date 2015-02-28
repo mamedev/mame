@@ -43,10 +43,8 @@
 #define SDLOPTION_INIPATH               "inipath"
 #define SDLOPTION_SDLVIDEOFPS           "sdlvideofps"
 #define SDLOPTION_USEALLHEADS           "useallheads"
-#define SDLOPTION_FILTER                "filter"
 #define SDLOPTION_CENTERH               "centerh"
 #define SDLOPTION_CENTERV               "centerv"
-#define SDLOPTION_PRESCALE              "prescale"
 
 #define SDLOPTION_SCALEMODE             "scalemode"
 
@@ -63,15 +61,6 @@
 #if (USE_XINPUT)
 #define SDLOPTION_LIGHTGUNINDEX         "lightgun_index"
 #endif
-
-#define SDLOPTION_SHADER_MAME           "glsl_shader_mame"
-#define SDLOPTION_SHADER_SCREEN         "glsl_shader_screen"
-#define SDLOPTION_GLSL_FILTER           "gl_glsl_filter"
-#define SDLOPTION_GL_GLSL               "gl_glsl"
-#define SDLOPTION_GL_PBO                "gl_pbo"
-#define SDLOPTION_GL_VBO                "gl_vbo"
-#define SDLOPTION_GL_NOTEXTURERECT      "gl_notexturerect"
-#define SDLOPTION_GL_FORCEPOW2TEXTURE   "gl_forcepow2texture"
 
 #define SDLOPTION_AUDIODRIVER           "audiodriver"
 #define SDLOPTION_VIDEODRIVER           "videodriver"
@@ -124,18 +113,6 @@ public:
 	bool centerh() const { return bool_value(SDLOPTION_CENTERH); }
 	bool centerv() const { return bool_value(SDLOPTION_CENTERV); }
 	const char *scale_mode() const { return value(SDLOPTION_SCALEMODE); }
-
-	// OpenGL specific options
-	bool filter() const { return bool_value(SDLOPTION_FILTER); }
-	int prescale() const { return int_value(SDLOPTION_PRESCALE); }
-	bool gl_force_pow2_texture() const { return bool_value(SDLOPTION_GL_FORCEPOW2TEXTURE); }
-	bool gl_no_texture_rect() const { return bool_value(SDLOPTION_GL_NOTEXTURERECT); }
-	bool gl_vbo() const { return bool_value(SDLOPTION_GL_VBO); }
-	bool gl_pbo() const { return bool_value(SDLOPTION_GL_PBO); }
-	bool gl_glsl() const { return bool_value(SDLOPTION_GL_GLSL); }
-	bool glsl_filter() const { return bool_value(SDLOPTION_GLSL_FILTER); }
-	const char *shader_mame(int index) const { astring temp; return value(temp.format("%s%d", SDLOPTION_SHADER_MAME, index)); }
-	const char *shader_screen(int index) const { astring temp; return value(temp.format("%s%d", SDLOPTION_SHADER_SCREEN, index)); }
 
 	// full screen options
 #ifdef SDLMAME_X11
