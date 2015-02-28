@@ -9,7 +9,7 @@
   to create the illusion of a moving ball, and even the flippers are leds.
   A drawing of a pinball table is added as overlay.
 
-  NOTE!: MESS external artwork is required to be able to play
+  NOTE!: MESS external artwork is recommended
 
 
   TODO:
@@ -25,7 +25,7 @@
 #include "cpu/amis2000/amis2000.h"
 #include "sound/speaker.h"
 
-#include "wildfire.lh" // this is a test layout, external artwork is necessary
+#include "wildfire.lh" // this is a test layout, use external artwork
 
 // master clock is a single stage RC oscillator: R=?K, C=?pf,
 // S2000 default frequency is 850kHz

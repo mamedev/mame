@@ -19,7 +19,7 @@
 			<bounds left="0" right="64" top="0" bottom="64" />
 		</bezel>
 
-	<!-- 8*18 matrix -->
+	<!-- 18*8 matrix -->
 
 		<bezel name="lamp700" element="led"><bounds x="0" y="0" width="1" height="1" /></bezel>
 		<bezel name="lamp701" element="led"><bounds x="0" y="2" width="1" height="1" /></bezel>

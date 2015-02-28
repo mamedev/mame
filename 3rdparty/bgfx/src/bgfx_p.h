@@ -679,8 +679,10 @@ namespace bgfx
 	};
 
 #define SORT_KEY_RENDER_DRAW (UINT64_C(1)<<0x2b)
+#define SORT_KEY_VIEW_SHIFT  UINT8_C(0x37)
+#define SORT_KEY_VIEW_MASK   ( (uint64_t(BGFX_CONFIG_MAX_VIEWS-1) )<<SORT_KEY_VIEW_SHIFT)
 
-	BX_STATIC_ASSERT(BGFX_CONFIG_MAX_VIEWS   <= 32);
+	BX_STATIC_ASSERT(BGFX_CONFIG_MAX_VIEWS <= 256);
 	BX_STATIC_ASSERT( (BGFX_CONFIG_MAX_PROGRAMS & (BGFX_CONFIG_MAX_PROGRAMS-1) ) == 0); // must be power of 2
 
 	struct SortKey
@@ -689,7 +691,7 @@ namespace bgfx
 		{
 			// |               3               2               1               0|
 			// |fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210|
-			// |    vvvvvsssssssssssdttpppppppppdddddddddddddddddddddddddddddddd|
+			// | vvvvvvvvsssssssssssdttpppppppppdddddddddddddddddddddddddddddddd|
 			// |        ^          ^^ ^        ^                               ^|
 			// |        |          || |        |                               ||
 			// |   view-+      seq-+| +-trans  +-program                 depth-+|
@@ -699,7 +701,7 @@ namespace bgfx
 			const uint64_t program = uint64_t(m_program)<<0x20;
 			const uint64_t trans   = uint64_t(m_trans  )<<0x29;
 			const uint64_t seq     = uint64_t(m_seq    )<<0x2c;
-			const uint64_t view    = uint64_t(m_view   )<<0x37;
+			const uint64_t view    = uint64_t(m_view   )<<SORT_KEY_VIEW_SHIFT;
 			const uint64_t key     = depth|program|trans|SORT_KEY_RENDER_DRAW|seq|view;
 			return key;
 		}
@@ -708,7 +710,7 @@ namespace bgfx
 		{
 			// |               3               2               1               0|
 			// |fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210|
-			// |    vvvvvsssssssssssdppppppppp                                  |
+			// | vvvvvvvvsssssssssssdppppppppp                                  |
 			// |        ^          ^^        ^                                  |
 			// |        |          ||        |                                  |
 			// |   view-+      seq-+|        +-program                          |
@@ -716,7 +718,7 @@ namespace bgfx
 
 			const uint64_t program = uint64_t(m_program)<<0x22;
 			const uint64_t seq     = uint64_t(m_seq    )<<0x2c;
-			const uint64_t view    = uint64_t(m_view   )<<0x37;
+			const uint64_t view    = uint64_t(m_view   )<<SORT_KEY_VIEW_SHIFT;
 			const uint64_t key     = program|seq|view;
 			return key;
 		}
@@ -725,7 +727,7 @@ namespace bgfx
 		bool decode(uint64_t _key)
 		{
 			m_seq     = (_key>>0x2c)& 0x7ff;
-			m_view    = (_key>>0x37)&(BGFX_CONFIG_MAX_VIEWS-1);
+			m_view    = uint8_t( (_key&SORT_KEY_VIEW_MASK)>>SORT_KEY_VIEW_SHIFT);
 			if (_key & SORT_KEY_RENDER_DRAW)
 			{
 				m_depth   =  _key       & 0xffffffff;
@@ -736,6 +738,21 @@ namespace bgfx
 
 			m_program = (_key>>0x22)&(BGFX_CONFIG_MAX_PROGRAMS-1);
 			return true; // compute
+		}
+
+		bool decode(uint64_t _key, uint8_t _viewRemap[BGFX_CONFIG_MAX_VIEWS])
+		{
+			bool compute = decode(_key);
+			m_view = _viewRemap[m_view];
+			return compute;
+		}
+
+		static uint64_t remapView(uint64_t _key, uint8_t _viewRemap[BGFX_CONFIG_MAX_VIEWS])
+		{
+			const uint8_t  oldView  = uint8_t( (_key & SORT_KEY_VIEW_MASK) >> SORT_KEY_VIEW_SHIFT);
+			const uint64_t view     = uint64_t(_viewRemap[oldView])        << SORT_KEY_VIEW_SHIFT;
+			const uint64_t key      = (_key & ~SORT_KEY_VIEW_MASK) | view;
+			return key;
 		}
 
 		void reset()
@@ -1353,7 +1370,6 @@ namespace bgfx
 
 		void setVertexBuffer(VertexBufferHandle _handle, uint32_t _startVertex, uint32_t _numVertices)
 		{
-			BX_CHECK(_handle.idx < BGFX_CONFIG_MAX_VERTEX_BUFFERS, "Invalid vertex buffer handle. %d (< %d)", _handle.idx, BGFX_CONFIG_MAX_VERTEX_BUFFERS);
 			m_draw.m_startVertex  = _startVertex;
 			m_draw.m_numVertices  = _numVertices;
 			m_draw.m_vertexBuffer = _handle;
@@ -1394,7 +1410,6 @@ namespace bgfx
 
 		void setProgram(ProgramHandle _handle)
 		{
-			BX_CHECK(isValid(_handle), "Can't set program with invalid handle.");
 			m_key.m_program = _handle.idx;
 		}
 
@@ -1432,7 +1447,7 @@ namespace bgfx
 			bind.m_un.m_compute.m_mip    = 0;
 		}
 
-		void setImage(uint8_t _stage, UniformHandle _sampler, TextureHandle _handle, uint8_t _mip, TextureFormat::Enum _format, Access::Enum _access)
+		void setImage(uint8_t _stage, UniformHandle _sampler, TextureHandle _handle, uint8_t _mip, Access::Enum _access, TextureFormat::Enum _format)
 		{
 			Binding& bind = m_compute.m_bind[_stage];
 			bind.m_idx    = _handle.idx;
@@ -1564,6 +1579,7 @@ namespace bgfx
 
 		SortKey m_key;
 
+		uint8_t m_viewRemap[BGFX_CONFIG_MAX_VIEWS];
 		FrameBufferHandle m_fb[BGFX_CONFIG_MAX_VIEWS];
 		Clear m_clear[BGFX_CONFIG_MAX_VIEWS];
 		float m_clearColor[BGFX_CONFIG_MAX_CLEAR_COLOR_PALETTE][4];
@@ -1720,6 +1736,20 @@ namespace bgfx
 			m_free.push_back(Free(_ptr, _size) );
 		}
 
+		uint64_t remove()
+		{
+			BX_CHECK(0 == m_used.size(), "");
+
+			if (0 < m_free.size() )
+			{
+				Free free = m_free.front();
+				m_free.pop_front();
+				return free.m_ptr;
+			}
+
+			return 0;
+		}
+
 		uint64_t alloc(uint32_t _size)
 		{
 			for (FreeList::iterator it = m_free.begin(), itEnd = m_free.end(); it != itEnd; ++it)
@@ -1758,7 +1788,7 @@ namespace bgfx
 			}
 		}
 
-		void compact()
+		bool compact()
 		{
 			m_free.sort();
 
@@ -1775,6 +1805,8 @@ namespace bgfx
 					++next;
 				}
 			}
+
+			return 0 == m_used.size();
 		}
 
 	private:
@@ -2147,7 +2179,14 @@ namespace bgfx
 			else
 			{
 				m_dynIndexBufferAllocator.free(uint64_t(dib.m_handle.idx)<<32 | dib.m_offset);
-				m_dynIndexBufferAllocator.compact();
+				if (m_dynIndexBufferAllocator.compact() )
+				{
+					for (uint64_t ptr = m_dynIndexBufferAllocator.remove(); 0 != ptr; ptr = m_dynIndexBufferAllocator.remove() )
+					{
+						IndexBufferHandle handle = { uint16_t(ptr>>32) };
+						destroyIndexBuffer(handle);
+					}
+				}
 			}
 
 			m_dynamicIndexBufferHandle.free(_handle.idx);
@@ -2292,7 +2331,14 @@ namespace bgfx
 			else
 			{
 				m_dynVertexBufferAllocator.free(uint64_t(dvb.m_handle.idx)<<32 | dvb.m_offset);
-				m_dynVertexBufferAllocator.compact();
+				if (m_dynVertexBufferAllocator.compact() )
+				{
+					for (uint64_t ptr = m_dynVertexBufferAllocator.remove(); 0 != ptr; ptr = m_dynVertexBufferAllocator.remove() )
+					{
+						VertexBufferHandle handle = { uint16_t(ptr>>32) };
+						destroyVertexBuffer(handle);
+					}
+				}
 			}
 
 			m_dynamicVertexBufferHandle.free(_handle.idx);
@@ -2672,31 +2718,34 @@ namespace bgfx
 
 		BGFX_API_FUNC(TextureHandle createTexture(const Memory* _mem, uint32_t _flags, uint8_t _skip, TextureInfo* _info) )
 		{
-			if (NULL != _info)
+			TextureInfo ti;
+			if (NULL == _info)
 			{
-				ImageContainer imageContainer;
-				if (imageParse(imageContainer, _mem->data, _mem->size) )
-				{
-					calcTextureSize(*_info
-						, (uint16_t)imageContainer.m_width
-						, (uint16_t)imageContainer.m_height
-						, (uint16_t)imageContainer.m_depth
-						, imageContainer.m_cubeMap
-						, imageContainer.m_numMips
-						, TextureFormat::Enum(imageContainer.m_format)
-						);
-				}
-				else
-				{
-					_info->format = TextureFormat::Unknown;
-					_info->storageSize = 0;
-					_info->width   = 0;
-					_info->height  = 0;
-					_info->depth   = 0;
-					_info->numMips = 0;
-					_info->bitsPerPixel = 0;
-					_info->cubeMap = false;
-				}
+				_info = &ti;
+			}
+
+			ImageContainer imageContainer;
+			if (imageParse(imageContainer, _mem->data, _mem->size) )
+			{
+				calcTextureSize(*_info
+					, (uint16_t)imageContainer.m_width
+					, (uint16_t)imageContainer.m_height
+					, (uint16_t)imageContainer.m_depth
+					, imageContainer.m_cubeMap
+					, imageContainer.m_numMips
+					, TextureFormat::Enum(imageContainer.m_format)
+					);
+			}
+			else
+			{
+				_info->format = TextureFormat::Unknown;
+				_info->storageSize = 0;
+				_info->width   = 0;
+				_info->height  = 0;
+				_info->depth   = 0;
+				_info->numMips = 0;
+				_info->bitsPerPixel = 0;
+				_info->cubeMap = false;
 			}
 
 			TextureHandle handle = { m_textureHandle.alloc() };
@@ -2705,6 +2754,7 @@ namespace bgfx
 			{
 				TextureRef& ref = m_textureRef[handle.idx];
 				ref.m_refCount = 1;
+				ref.m_format   = uint8_t(_info->format);
 
 				CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::CreateTexture);
 				cmdbuf.write(handle);
@@ -3038,6 +3088,23 @@ namespace bgfx
 			}
 		}
 
+		BGFX_API_FUNC(void setViewRemap(uint8_t _id, uint8_t _num, const void* _remap) )
+		{
+			const uint32_t num = bx::uint32_min( (BGFX_CONFIG_MAX_VIEWS - _id) + _num, BGFX_CONFIG_MAX_VIEWS) - _id;
+			if (NULL == _remap)
+			{
+				for (uint32_t ii = 0; ii < num; ++ii)
+				{
+					uint8_t id = uint8_t(ii+_id);
+					m_viewRemap[id] = id;
+				}
+			}
+			else
+			{
+				memcpy(&m_viewRemap[_id], _remap, num);
+			}
+		}
+
 		BGFX_API_FUNC(void setMarker(const char* _marker) )
 		{
 			m_submit->setMarker(_marker);
@@ -3190,12 +3257,13 @@ namespace bgfx
 			m_submit->setBuffer(_stage, dvb.m_handle, _access);
 		}
 
-		BGFX_API_FUNC(void setImage(uint8_t _stage, UniformHandle _sampler, TextureHandle _handle, uint8_t _mip, TextureFormat::Enum _format, Access::Enum _access) )
+		BGFX_API_FUNC(void setImage(uint8_t _stage, UniformHandle _sampler, TextureHandle _handle, uint8_t _mip, Access::Enum _access, TextureFormat::Enum _format) )
 		{
-			m_submit->setImage(_stage, _sampler, _handle, _mip, _format, _access);
+			_format = TextureFormat::Count == _format ? TextureFormat::Enum(m_textureRef[_handle.idx].m_format) : _format;
+			m_submit->setImage(_stage, _sampler, _handle, _mip, _access, _format);
 		}
 
-		BGFX_API_FUNC(void setImage(uint8_t _stage, UniformHandle _sampler, FrameBufferHandle _handle, uint8_t _attachment, TextureFormat::Enum _format, Access::Enum _access) )
+		BGFX_API_FUNC(void setImage(uint8_t _stage, UniformHandle _sampler, FrameBufferHandle _handle, uint8_t _attachment, Access::Enum _access, TextureFormat::Enum _format) )
 		{
 			BX_CHECK(_attachment < g_caps.maxFBAttachments, "Frame buffer attachment index %d is invalid.", _attachment);
 			TextureHandle textureHandle = BGFX_INVALID_HANDLE;
@@ -3207,7 +3275,7 @@ namespace bgfx
 				BX_CHECK(isValid(textureHandle), "Frame buffer texture %d is invalid.", _attachment);
 			}
 
-			setImage(_stage, _sampler, textureHandle, 0, _format, _access);
+			setImage(_stage, _sampler, textureHandle, 0, _access, _format);
 		}
 
 		BGFX_API_FUNC(uint32_t dispatch(uint8_t _id, ProgramHandle _handle, uint16_t _numX, uint16_t _numY, uint16_t _numZ, uint8_t _flags) )
@@ -3337,6 +3405,7 @@ namespace bgfx
 		struct TextureRef
 		{
 			int16_t m_refCount;
+			uint8_t m_format;
 		};
 
 		struct FrameBufferRef
@@ -3358,6 +3427,7 @@ namespace bgfx
 		FrameBufferRef m_frameBufferRef[BGFX_CONFIG_MAX_FRAME_BUFFERS];
 		VertexDeclRef m_declRef;
 
+		uint8_t m_viewRemap[BGFX_CONFIG_MAX_VIEWS];
 		FrameBufferHandle m_fb[BGFX_CONFIG_MAX_VIEWS];
 		Clear m_clear[BGFX_CONFIG_MAX_VIEWS];
 

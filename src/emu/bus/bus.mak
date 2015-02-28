@@ -931,6 +931,7 @@ BUSOBJS += $(BUSOBJ)/a2bus/corvfdc01.o
 BUSOBJS += $(BUSOBJ)/a2bus/corvfdc02.o
 BUSOBJS += $(BUSOBJ)/a2bus/ramcard16k.o
 BUSOBJS += $(BUSOBJ)/a2bus/ramcard128k.o
+BUSOBJS += $(BUSOBJ)/a2bus/ezcgi.o
 endif
 
 #-------------------------------------------------

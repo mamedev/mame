@@ -60,9 +60,7 @@ void tms34061_device::device_start()
 
 	/* allocate memory for VRAM */
 	m_vram = auto_alloc_array_clear(machine(), UINT8, m_vramsize + 256 * 2);
-	/* not really a save state, just there for debugging purposes */
-	save_pointer(NAME(m_vram), m_vramsize);
-
+	
 	/* allocate memory for latch RAM */
 	m_latchram = auto_alloc_array_clear(machine(), UINT8, m_vramsize + 256 * 2);
 
@@ -95,6 +93,13 @@ void tms34061_device::device_start()
 
 	/* start vertical interrupt timer */
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tms34061_device::interrupt), this));
+	
+	save_item(NAME(m_regs));
+	save_item(NAME(m_xmask));
+	save_item(NAME(m_yshift));
+	save_pointer(NAME(m_vram), m_vramsize);
+	save_pointer(NAME(m_latchram), m_vramsize);
+	save_item(NAME(m_latchdata));
 }
 
 //-------------------------------------------------
