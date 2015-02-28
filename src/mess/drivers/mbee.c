@@ -88,6 +88,17 @@
     3. At the Basic prompt, type in EDASM press enter. At the memory size
        prompt press enter. Now, make sure the keyboard works properly.
 
+    How to use the config switch for PIO B7:
+    - Teleterm: Must use RTC. Anything else makes teleterm go crazy.
+    - 256TC, 128, 128p: Doesn't seem to matter, leave at the default.
+    - Standard: Has no effect, best left at "Tied High"
+    - Other rom-based models: "VS" to make the Telcom clock work, or "Tied high".
+    - 56k: not sure yet, leave as "Tied high" until more is known.
+
+    How to use programs that need functions keys on models that use the old
+    keyboard (for example, to run Simply Write on a 128k model).
+    Press Ctrl+Shift+number, eg for F1 press hold down Ctrl Shift, press 1.
+
 ***************************************************************************
 
     TODO/not working:
@@ -108,13 +119,10 @@
       crashes due to a bug in z80pio emulation.
 
     - 256tc: Keyboard ROM U60 needs to be dumped.
-    - 128k: GOLD PAL needs to be dumped for the bankswitching.
-    - 64k: RED PAL needs to be dumped for the bankswitching.
+    - 128k, 64k: PALs need to be dumped for the bankswitching.
 
-    - Teleterm: keyboard has multiple severe problems. Also, the schematic shows
-                it using the old-style keyboard, however this must be wrong since
-                the computer has function keys, which are only available on the
-                new keyboard.
+    - Teleterm: keyboard has problems. The schematic shows it using the old-style keyboard,
+                however it actually uses the new keyboard with interrupts.
 
     - Mouse: a few programs support the use of a serial mouse which interfaced
              directly to the Z80PIO. However there's little info to be found.
@@ -135,61 +143,45 @@
 
 static ADDRESS_MAP_START(mbee_mem, AS_PROGRAM, 8, mbee_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
-	AM_RANGE(0x1000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_WRITENOP    // Needed because quickload to here will crash MESS
+	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x8000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(mbee_low_r, mbee_low_w)
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(mbee_high_r, mbee_high_w)
+	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(video_low_r, video_low_w)
+	AM_RANGE(0xf800, 0xffff) AM_READWRITE(video_high_r, video_high_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbeeic_mem, AS_PROGRAM, 8, mbee_state)
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
-	AM_RANGE(0x1000, 0x7fff) AM_RAM
+	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("pak")
 	AM_RANGE(0xe000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(mbee_low_r, mbee_low_w)
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(mbeeic_high_r, mbeeic_high_w)
+	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(video_low_r, video_low_w)
+	AM_RANGE(0xf800, 0xffff) AM_READWRITE(video_high_r, video_high_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbeepc_mem, AS_PROGRAM, 8, mbee_state)
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
-	AM_RANGE(0x1000, 0x7fff) AM_RAM
+	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("pak")
 	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("telcom")
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(mbee_low_r, mbee_low_w)
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(mbeeic_high_r, mbeeic_high_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(mbeepc85_mem, AS_PROGRAM, 8, mbee_state)
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
-	AM_RANGE(0x1000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("pak")
-	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("telcom")
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(mbee_low_r, mbee_low_w)
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(mbeeic_high_r, mbeeic_high_w)
+	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(video_low_r, video_low_w)
+	AM_RANGE(0xf800, 0xffff) AM_READWRITE(video_high_r, video_high_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbeeppc_mem, AS_PROGRAM, 8, mbee_state)
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
-	AM_RANGE(0x1000, 0x7fff) AM_RAM
+	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("basic")
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("pak")
 	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("telcom")
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(mbeeppc_low_r, mbeeppc_low_w)
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(mbeeppc_high_r, mbeeppc_high_w)
+	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(video_low_r, video_low_w)
+	AM_RANGE(0xf800, 0xffff) AM_READWRITE(video_high_r, video_high_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbee56_mem, AS_PROGRAM, 8, mbee_state)
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
-	AM_RANGE(0x1000, 0xdfff) AM_RAM
+	AM_RANGE(0x0000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(mbee_low_r, mbee_low_w)
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(mbeeic_high_r, mbeeic_high_w)
+	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(video_low_r, video_low_w)
+	AM_RANGE(0xf800, 0xffff) AM_READWRITE(video_high_r, video_high_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbee256_mem, AS_PROGRAM, 8, mbee_state)
@@ -212,21 +204,20 @@ static ADDRESS_MAP_START(mbee256_mem, AS_PROGRAM, 8, mbee_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbeett_mem, AS_PROGRAM, 8, mbee_state)
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
-	AM_RANGE(0x1000, 0x7fff) AM_RAM
+	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("pak")
 	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("telcom")
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(mbeeppc_low_r, mbeeppc_low_w)
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(mbeeppc_high_r, mbeeppc_high_w)
+	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(video_low_r, video_low_w)
+	AM_RANGE(0xf800, 0xffff) AM_READWRITE(video_high_r, video_high_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbee_io, AS_IO, 8, mbee_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x10) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0x10) AM_READWRITE(mbee_0b_r, mbee_0b_w)
+	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0x10) AM_WRITE(port0b_w)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
 	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
 ADDRESS_MAP_END
@@ -235,10 +226,10 @@ static ADDRESS_MAP_START(mbeeic_io, AS_IO, 8, mbee_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x10) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0x10) AM_READWRITE(mbeeic_08_r, mbeeic_08_w)
-	AM_RANGE(0x09, 0x09) AM_MIRROR(0x10) AM_NOP /* Listed as "Colour Wait Off" or "USART 2651" but doesn't appear in the schematics */
-	AM_RANGE(0x0a, 0x0a) AM_MIRROR(0x10) AM_READWRITE(mbeeic_0a_r, mbeeic_0a_w)
-	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0x10) AM_READWRITE(mbee_0b_r, mbee_0b_w)
+	AM_RANGE(0x08, 0x08) AM_MIRROR(0x10) AM_READWRITE(port08_r, port08_w)
+	AM_RANGE(0x09, 0x09) AM_WRITENOP /* Listed as "Colour Wait Off" or "USART 2651" but doesn't appear in the schematics */
+	AM_RANGE(0x0a, 0x0a) AM_MIRROR(0x10) AM_WRITE(port0a_w)
+	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0x10) AM_WRITE(port0b_w)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
 	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
 ADDRESS_MAP_END
@@ -246,45 +237,56 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(mbeepc_io, AS_IO, 8, mbee_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0xff10) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x0008, 0x0008) AM_MIRROR(0xff10) AM_READWRITE(mbeeic_08_r, mbeeic_08_w)
-	AM_RANGE(0x000a, 0x000a) AM_MIRROR(0xfe10) AM_READWRITE(mbeepc_telcom_low_r, mbeeic_0a_w)
-	AM_RANGE(0x000b, 0x000b) AM_MIRROR(0xff10) AM_READWRITE(mbee_0b_r, mbee_0b_w)
+	AM_RANGE(0x0008, 0x0008) AM_MIRROR(0xff10) AM_READWRITE(port08_r, port08_w)
+	AM_RANGE(0x0009, 0x0009) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0x000b, 0x000b) AM_MIRROR(0xff10) AM_WRITE(port0b_w)
 	AM_RANGE(0x000c, 0x000c) AM_MIRROR(0xff10) AM_READWRITE(m6545_status_r, m6545_index_w)
 	AM_RANGE(0x000d, 0x000d) AM_MIRROR(0xff10) AM_READWRITE(m6545_data_r, m6545_data_w)
-	AM_RANGE(0x010a, 0x010a) AM_MIRROR(0xfe10) AM_READWRITE(mbeepc_telcom_high_r, mbeeic_0a_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(mbeepc85_io, AS_IO, 8, mbee_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0xff10) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x0008, 0x0008) AM_MIRROR(0xff10) AM_READWRITE(mbeeic_08_r, mbeeic_08_w)
-	AM_RANGE(0x000a, 0x000a) AM_MIRROR(0xfe10) AM_READWRITE(mbeepc_telcom_low_r, mbeeic_0a_w)
-	AM_RANGE(0x000b, 0x000b) AM_MIRROR(0xff10) AM_READWRITE(mbee_0b_r, mbee_0b_w)
-	AM_RANGE(0x000c, 0x000c) AM_MIRROR(0xff10) AM_READWRITE(m6545_status_r, m6545_index_w)
-	AM_RANGE(0x000d, 0x000d) AM_MIRROR(0xff10) AM_READWRITE(m6545_data_r, m6545_data_w)
-	AM_RANGE(0x010a, 0x010a) AM_MIRROR(0xfe10) AM_READWRITE(mbeepc_telcom_high_r, mbeeic_0a_w)
+	AM_RANGE(0x000a, 0x000a) AM_MIRROR(0xfe10) AM_READWRITE(telcom_low_r, port0a_w)
+	AM_RANGE(0x010a, 0x010a) AM_MIRROR(0xfe10) AM_READWRITE(telcom_high_r, port0a_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbeeppc_io, AS_IO, 8, mbee_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0xff10) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x0008, 0x0008) AM_MIRROR(0xff10) AM_READWRITE(mbeeic_08_r, mbeeic_08_w)
-	AM_RANGE(0x000a, 0x000a) AM_MIRROR(0xfe10) AM_READWRITE(mbeepc_telcom_low_r, mbeeic_0a_w)
-	AM_RANGE(0x000b, 0x000b) AM_MIRROR(0xff10) AM_READWRITE(mbee_0b_r, mbee_0b_w)
+	AM_RANGE(0x0008, 0x0008) AM_MIRROR(0xff10) AM_READWRITE(port08_r, port08_w)
+	AM_RANGE(0x0009, 0x0009) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0x000b, 0x000b) AM_MIRROR(0xff10) AM_WRITE(port0b_w)
 	AM_RANGE(0x000c, 0x000c) AM_MIRROR(0xff00) AM_READWRITE(m6545_status_r, m6545_index_w)
 	AM_RANGE(0x000d, 0x000d) AM_MIRROR(0xff10) AM_READWRITE(m6545_data_r, m6545_data_w)
-	AM_RANGE(0x001c, 0x001c) AM_MIRROR(0xff00) AM_READWRITE(mbeeppc_1c_r, mbeeppc_1c_w)
-	AM_RANGE(0x010a, 0x010a) AM_MIRROR(0xfe10) AM_READWRITE(mbeepc_telcom_high_r, mbeeic_0a_w)
+	AM_RANGE(0x001c, 0x001c) AM_MIRROR(0xff00) AM_READWRITE(port1c_r, port1c_w)
+	AM_RANGE(0x000a, 0x000a) AM_MIRROR(0xfe10) AM_READWRITE(telcom_low_r, port0a_w)
+	AM_RANGE(0x010a, 0x010a) AM_MIRROR(0xfe10) AM_READWRITE(telcom_high_r, port0a_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(mbeett_io, AS_IO, 8, mbee_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0xff00) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
+	AM_RANGE(0x0004, 0x0004) AM_MIRROR(0xff00) AM_WRITE(port04_w)
+	AM_RANGE(0x0006, 0x0006) AM_MIRROR(0xff00) AM_WRITE(port06_w)
+	AM_RANGE(0x0007, 0x0007) AM_MIRROR(0xff00) AM_READ(port07_r)
+	AM_RANGE(0x0008, 0x0008) AM_MIRROR(0xff00) AM_READWRITE(port08_r, port08_w)
+	AM_RANGE(0x000b, 0x000b) AM_MIRROR(0xff00) AM_WRITE(port0b_w)
+	AM_RANGE(0x000c, 0x000c) AM_MIRROR(0xff00) AM_READWRITE(m6545_status_r, m6545_index_w)
+	AM_RANGE(0x000d, 0x000d) AM_MIRROR(0xff00) AM_READWRITE(m6545_data_r, m6545_data_w)
+	AM_RANGE(0x0018, 0x001b) AM_MIRROR(0xff00) AM_READ(port18_r)
+	AM_RANGE(0x001c, 0x001f) AM_MIRROR(0xff00) AM_READWRITE(port1c_r, port1c_w)
+	AM_RANGE(0x0009, 0x0009) AM_MIRROR(0xfe00) AM_READ(speed_low_r)
+	AM_RANGE(0x0109, 0x0109) AM_MIRROR(0xfe00) AM_READ(speed_high_r)
+	AM_RANGE(0x000a, 0x000a) AM_MIRROR(0xfe00) AM_READWRITE(telcom_low_r, port0a_w)
+	AM_RANGE(0x010a, 0x010a) AM_MIRROR(0xfe00) AM_READWRITE(telcom_high_r, port0a_w)
+	AM_RANGE(0x0068, 0x006f) AM_MIRROR(0xff00) AM_DEVREADWRITE("scc", scc8530_t, reg_r, reg_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbee56_io, AS_IO, 8, mbee_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x10) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0x10) AM_READWRITE(mbeeic_08_r, mbeeic_08_w)
-	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0x10) AM_READWRITE(mbee_0b_r, mbee_0b_w)
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
-	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
+	AM_RANGE(0x08, 0x08) AM_READWRITE(port08_r, port08_w)
+	AM_RANGE(0x09, 0x09) AM_WRITENOP
+	AM_RANGE(0x0b, 0x0b) AM_WRITE(port0b_w)
+	AM_RANGE(0x0c, 0x0c) AM_READWRITE(m6545_status_r, m6545_index_w)
+	AM_RANGE(0x0d, 0x0d) AM_READWRITE(m6545_data_r, m6545_data_w)
 	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("fdc", wd2793_t, read, write)
 	AM_RANGE(0x48, 0x4f) AM_READWRITE(fdc_status_r, fdc_motor_w)
 ADDRESS_MAP_END
@@ -293,14 +295,15 @@ static ADDRESS_MAP_START(mbee128_io, AS_IO, 8, mbee_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x04, 0x04) AM_WRITE(mbee_04_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(mbee_06_w)
-	AM_RANGE(0x07, 0x07) AM_READ(mbee_07_r)
-	AM_RANGE(0x08, 0x08) AM_READWRITE(mbeeic_08_r, mbeeic_08_w)
-	AM_RANGE(0x0b, 0x0b) AM_READWRITE(mbee_0b_r, mbee_0b_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(port04_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(port06_w)
+	AM_RANGE(0x07, 0x07) AM_READ(port07_r)
+	AM_RANGE(0x08, 0x08) AM_READWRITE(port08_r, port08_w)
+	AM_RANGE(0x09, 0x09) AM_WRITENOP
+	AM_RANGE(0x0b, 0x0b) AM_WRITE(port0b_w)
 	AM_RANGE(0x0c, 0x0c) AM_READWRITE(m6545_status_r, m6545_index_w)
 	AM_RANGE(0x0d, 0x0d) AM_READWRITE(m6545_data_r, m6545_data_w)
-	AM_RANGE(0x1c, 0x1f) AM_READWRITE(mbeeppc_1c_r, mbee256_1c_w)
+	AM_RANGE(0x1c, 0x1f) AM_READWRITE(port1c_r, port1c_w)
 	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("fdc", wd2793_t, read, write)
 	AM_RANGE(0x48, 0x4f) AM_READWRITE(fdc_status_r, fdc_motor_w)
 	AM_RANGE(0x50, 0x57) AM_WRITE(mbee128_50_w)
@@ -309,41 +312,25 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(mbee256_io, AS_IO, 8, mbee_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0xff00) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x0004, 0x0004) AM_MIRROR(0xff00) AM_WRITE(mbee_04_w)
-	AM_RANGE(0x0006, 0x0006) AM_MIRROR(0xff00) AM_WRITE(mbee_06_w)
-	AM_RANGE(0x0007, 0x0007) AM_MIRROR(0xff00) AM_READ(mbee_07_r)
-	AM_RANGE(0x0008, 0x0008) AM_MIRROR(0xff00) AM_READWRITE(mbeeic_08_r, mbeeic_08_w)
-	AM_RANGE(0x0009, 0x0009) AM_MIRROR(0xfd00) AM_READ(mbee256_speed_low_r)
-	AM_RANGE(0x0209, 0x0209) AM_MIRROR(0xfd00) AM_READ(mbee256_speed_high_r)
-	AM_RANGE(0x000b, 0x000b) AM_MIRROR(0xff00) AM_READWRITE(mbee_0b_r, mbee_0b_w)
+	AM_RANGE(0x0004, 0x0004) AM_MIRROR(0xff00) AM_WRITE(port04_w)
+	AM_RANGE(0x0006, 0x0006) AM_MIRROR(0xff00) AM_WRITE(port06_w)
+	AM_RANGE(0x0007, 0x0007) AM_MIRROR(0xff00) AM_READ(port07_r)
+	AM_RANGE(0x0008, 0x0008) AM_MIRROR(0xff00) AM_READWRITE(port08_r, port08_w)
+	AM_RANGE(0x0009, 0x0009) AM_MIRROR(0xfd00) AM_READ(speed_low_r)
+	AM_RANGE(0x0209, 0x0209) AM_MIRROR(0xfd00) AM_READ(speed_high_r)
+	AM_RANGE(0x0009, 0x0009) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0x000b, 0x000b) AM_MIRROR(0xff00) AM_WRITE(port0b_w)
 	AM_RANGE(0x000c, 0x000c) AM_MIRROR(0xff00) AM_READWRITE(m6545_status_r, m6545_index_w)
 	AM_RANGE(0x000d, 0x000d) AM_MIRROR(0xff00) AM_READWRITE(m6545_data_r, m6545_data_w)
 	// AM_RANGE(0x0010, 0x0013) AM_MIRROR(0xff00) Optional SN76489AN audio chip
-	AM_RANGE(0x0018, 0x001b) AM_MIRROR(0xff00) AM_READ(mbee256_18_r)
-	AM_RANGE(0x001c, 0x001f) AM_MIRROR(0xff00) AM_READWRITE(mbeeppc_1c_r, mbee256_1c_w)
+	AM_RANGE(0x0018, 0x001b) AM_MIRROR(0xff00) AM_READ(port18_r)
+	AM_RANGE(0x001c, 0x001f) AM_MIRROR(0xff00) AM_READWRITE(port1c_r, port1c_w)
 	AM_RANGE(0x0044, 0x0047) AM_MIRROR(0xff00) AM_DEVREADWRITE("fdc", wd2793_t, read, write)
 	AM_RANGE(0x0048, 0x004f) AM_MIRROR(0xff00) AM_READWRITE(fdc_status_r, fdc_motor_w)
 	AM_RANGE(0x0050, 0x0057) AM_MIRROR(0xff00) AM_WRITE(mbee256_50_w)
 	// AM_RANGE(0x0058, 0x005f) AM_MIRROR(0xff00) External options: floppy drive, hard drive and keyboard
 	// AM_RANGE(0x0060, 0x0067) AM_MIRROR(0xff00) Reserved for file server selection (unused)
 	// AM_RANGE(0x0068, 0x006f) AM_MIRROR(0xff00) Reserved for 8530 SCC (unused)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(mbeett_io, AS_IO, 8, mbee_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0xff00) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x0004, 0x0004) AM_MIRROR(0xff00) AM_WRITE(mbee_04_w)
-	AM_RANGE(0x0006, 0x0006) AM_MIRROR(0xff00) AM_WRITE(mbee_06_w)
-	AM_RANGE(0x0007, 0x0007) AM_MIRROR(0xff00) AM_READ(mbee_07_r)
-	AM_RANGE(0x0008, 0x0008) AM_MIRROR(0xff00) AM_READWRITE(mbeeic_08_r, mbeeic_08_w)
-	AM_RANGE(0x000b, 0x000b) AM_MIRROR(0xff00) AM_READWRITE(mbee_0b_r, mbee_0b_w)
-	AM_RANGE(0x000c, 0x000c) AM_MIRROR(0xff00) AM_READWRITE(m6545_status_r, m6545_index_w)
-	AM_RANGE(0x000d, 0x000d) AM_MIRROR(0xff00) AM_READWRITE(m6545_data_r, m6545_data_w)
-	AM_RANGE(0x0018, 0x001b) AM_MIRROR(0xff00) AM_READ(mbee256_18_r)
-	AM_RANGE(0x001c, 0x001f) AM_MIRROR(0xff00) AM_READWRITE(mbeeppc_1c_r,mbee256_1c_w)
-	AM_RANGE(0x000a, 0x000a) AM_MIRROR(0xfe10) AM_READWRITE(mbeepc_telcom_low_r, mbeeic_0a_w)
-	AM_RANGE(0x010a, 0x010a) AM_MIRROR(0xfe10) AM_READWRITE(mbeepc_telcom_high_r, mbeeic_0a_w)
-	// AM_RANGE(0x0068, 0x006f) AM_MIRROR(0xff00) 8530 SCC
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mbee )
@@ -419,7 +406,7 @@ static INPUT_PORTS_START( mbee )
 
 	PORT_START("X.7") /* IN7 KEY ROW 7 [380] */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("(Up)") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("(Down)") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("(Left)") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -444,8 +431,8 @@ static INPUT_PORTS_START( mbee )
 	PORT_CONFNAME( 0xc0, 0x80, "PIO B7")
 	PORT_CONFSETTING(    0x00, "VS") // sync pulse to enable telcom clock
 	PORT_CONFSETTING(    0x40, "RTC") // optional board usually not fitted
-	PORT_CONFSETTING(    0x80, "Not used") // default resistor to vcc
-	PORT_CONFSETTING(    0xc0, "Centronics") // busy line
+	PORT_CONFSETTING(    0x80, "Tied high") // default resistor to vcc
+	PORT_CONFSETTING(    0xc0, "Reserved for net")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mbee256 )
@@ -576,11 +563,11 @@ static INPUT_PORTS_START( mbee256 )
 	PORT_CONFSETTING(    0x00, DEF_STR(No))
 	PORT_CONFSETTING(    0x01, DEF_STR(Yes))
 	// Wire links on motherboard
-	PORT_CONFNAME( 0xc0, 0x80, "PIO B7") // default - do nothing
+	PORT_CONFNAME( 0xc0, 0x40, "PIO B7")
 	PORT_CONFSETTING(    0x00, "VS") // sync pulse to enable telcom clock
-	PORT_CONFSETTING(    0x40, "RTC") // optional board usually not fitted
-	PORT_CONFSETTING(    0x80, "Not used") // default resistor to vcc
-	PORT_CONFSETTING(    0xc0, "Centronics") // busy line
+	PORT_CONFSETTING(    0x40, "RTC") // RTC IRQ must be used on teleterm
+	PORT_CONFSETTING(    0x80, "Tied high") // default resistor to vcc
+	PORT_CONFSETTING(    0xc0, "Reserved for net")
 INPUT_PORTS_END
 
 static const z80_daisy_config mbee_daisy_chain[] =
@@ -744,13 +731,7 @@ static MACHINE_CONFIG_DERIVED( mbeepc, mbeeic )
 	MCFG_CPU_IO_MAP(mbeepc_io)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mbeepc85, mbeeic )
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(mbeepc85_mem)
-	MCFG_CPU_IO_MAP(mbeepc85_io)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( mbeepc85b, mbeepc85 )
+static MACHINE_CONFIG_DERIVED( mbeepc85b, mbeepc )
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(mbee_state, mbeepc85b)
 MACHINE_CONFIG_END
@@ -764,6 +745,8 @@ static MACHINE_CONFIG_DERIVED( mbeeppc, mbeeic )
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(mbee_state, premium)
+	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE(mbee_state, rtc_irq_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbee56, mbeeic )
@@ -784,6 +767,7 @@ static MACHINE_CONFIG_DERIVED( mbee128, mbee56 )
 	MCFG_CPU_IO_MAP(mbee128_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee128)
 	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE(mbee_state, rtc_irq_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbee128p, mbeeppc )
@@ -791,7 +775,6 @@ static MACHINE_CONFIG_DERIVED( mbee128p, mbeeppc )
 	MCFG_CPU_PROGRAM_MAP(mbee256_mem)
 	MCFG_CPU_IO_MAP(mbee128_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee128)
-	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
 	MCFG_WD2793x_ADD("fdc", XTAL_4MHz / 4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(mbee_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(mbee_state, fdc_drq_w))
@@ -816,7 +799,9 @@ static MACHINE_CONFIG_DERIVED( mbeett, mbeeppc )
 	MCFG_CPU_PROGRAM_MAP(mbeett_mem)
 	MCFG_CPU_IO_MAP(mbeett_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbeett)
-	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
+	MCFG_DEVICE_REMOVE("quickload")
+	MCFG_DEVICE_REMOVE("quickload2")
+	MCFG_DEVICE_ADD("scc", SCC8530, 4000000) // clock unknown
 MACHINE_CONFIG_END
 
 /* Unused roms:
@@ -1152,9 +1137,9 @@ ROM_END
 COMP( 1982, mbee,     0,        0,      mbee,     mbee,     mbee_state,  mbee,       "Applied Technology",  "Microbee 16 Standard" , 0 )
 COMP( 1982, mbeeic,   mbee,     0,      mbeeic,   mbee,     mbee_state,  mbeeic,     "Applied Technology",  "Microbee 32 IC" , 0 )
 COMP( 1982, mbeepc,   mbee,     0,      mbeepc,   mbee,     mbee_state,  mbeepc,     "Applied Technology",  "Microbee Personal Communicator" , 0 )
-COMP( 1985, mbeepc85, mbee,     0,      mbeepc85, mbee,     mbee_state,  mbeepc85,   "Applied Technology",  "Microbee PC85" , 0 )
+COMP( 1985, mbeepc85, mbee,     0,      mbeepc,   mbee,     mbee_state,  mbeepc85,   "Applied Technology",  "Microbee PC85" , 0 )
 COMP( 1985, mbeepc85b,mbee,     0,      mbeepc85b,mbee,     mbee_state,  mbeepc85,   "Applied Technology",  "Microbee PC85 (New version)" , 0 )
-COMP( 1985, mbeepc85s,mbee,     0,      mbeepc85, mbee,     mbee_state,  mbeepc85,   "Applied Technology",  "Microbee PC85 (Swedish)" , 0 )
+COMP( 1985, mbeepc85s,mbee,     0,      mbeepc,   mbee,     mbee_state,  mbeepc85,   "Applied Technology",  "Microbee PC85 (Swedish)" , 0 )
 COMP( 1986, mbeeppc,  mbee,     0,      mbeeppc,  mbee,     mbee_state,  mbeeppc,    "Applied Technology",  "Microbee Premium PC85" , 0 )
 COMP( 1986, mbeett,   mbee,     0,      mbeett,   mbee256,  mbee_state,  mbeett,     "Applied Technology",  "Microbee Teleterm" , GAME_NOT_WORKING )
 COMP( 1986, mbee56,   mbee,     0,      mbee56,   mbee,     mbee_state,  mbee56,     "Applied Technology",  "Microbee 56k" , GAME_NOT_WORKING )

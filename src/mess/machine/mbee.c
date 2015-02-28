@@ -20,12 +20,6 @@ void mbee_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	case TIMER_MBEE_NEWKB:
 		timer_newkb(ptr, param);
 		break;
-	case TIMER_MBEE_RTC_IRQ:
-		timer_rtc_irq(ptr, param);
-		break;
-	case TIMER_MBEE_BOOT:
-		timer_boot(ptr, param);
-		break;
 	default:
 		assert_always(FALSE, "Unknown id in mbee_state::device_timer");
 	}
@@ -46,17 +40,16 @@ WRITE_LINE_MEMBER( mbee_state::pio_ardy )
 WRITE8_MEMBER( mbee_state::pio_port_b_w )
 {
 /*  PIO port B - d5..d2 not emulated
-    d7 network interrupt (microbee network for classrooms)
+    d7 interrupt from network or rtc or vsync or not used (see config switch)
     d6 speaker
     d5 rs232 output (1=mark)
     d4 rs232 input (0=mark)
     d3 rs232 CTS (0=clear to send)
     d2 rs232 clock or DTR
-    d1 cass out and (on 256tc) keyboard irq
+    d1 cass out and (on new keyboard) keyboard irq
     d0 cass in */
 
-	m_cassette->output((data & 0x02) ? -1.0 : +1.0);
-
+	m_cassette->output(BIT(data, 1) ? -1.0 : +1.0);
 	m_speaker->level_w(BIT(data, 6));
 };
 
@@ -64,36 +57,24 @@ READ8_MEMBER( mbee_state::pio_port_b_r )
 {
 	UINT8 data = 0;
 
-	if (m_cassette->input() > 0.03) data |= 1;
+	if (m_cassette->input() > 0.03)
+		data |= 1;
 
 	data |= 8; // CTS held high via resistor. If low, the disk-based models think a mouse is plugged in.
 
-	if (m_is_mbeett)
+	switch (m_io_config->read() & 0xc0)
 	{
-		if (m_b2)
-			data |= 0x82;
-		else
+		case 0x00:
+			data |= (UINT8)m_b7_vs << 7;
+			break;
+		case 0x40:
+			data |= (UINT8)m_b7_rtc << 7;
+			break;
+		case 0x80:
 			data |= 0x80;
+			break;
 	}
-	else
-	{
-		switch (m_io_config->read() & 0xc0)
-		{
-			case 0x00:
-				data |= (UINT8)m_b7_vs << 7;
-				break;
-			case 0x40:
-				data |= (UINT8)m_b7_rtc << 7;
-				break;
-			case 0x80:
-				data |= 0x80;
-				break;
-			case 0xc0:
-				data |= 0x80; // centronics busy line - FIXME
-				break;
-		}
-		data |= (UINT8)m_b2 << 1; // key pressed on new keyboard
-	}
+	data |= (UINT8)m_b2 << 1; // key pressed on new keyboard
 
 	return data;
 }
@@ -194,15 +175,15 @@ TIMER_CALLBACK_MEMBER( mbee_state::timer_newkb )
 
 	// if anything queued, cause an interrupt
 	if (m_mbee256_q_pos)
-	{
 		m_b2 = 1; // set irq
-		//breaks keyboard m_pio->port_b_write(pio_port_b_r(generic_space(),0,0xff));
-	}
 
-	timer_set(attotime::from_hz(25), TIMER_MBEE_NEWKB);
+	if (m_b2)
+		m_pio->port_b_write(pio_port_b_r(generic_space(),0,0xff));
+
+	timer_set(attotime::from_hz(10), TIMER_MBEE_NEWKB);
 }
 
-READ8_MEMBER( mbee_state::mbee256_18_r )
+READ8_MEMBER( mbee_state::port18_r )
 {
 	UINT8 i, data = m_mbee256_q[0]; // get oldest key
 
@@ -223,13 +204,13 @@ READ8_MEMBER( mbee_state::mbee256_18_r )
 
 ************************************************************/
 
-READ8_MEMBER( mbee_state::mbee256_speed_low_r )
+READ8_MEMBER( mbee_state::speed_low_r )
 {
 	m_maincpu->set_unscaled_clock(3375000);
 	return 0xff;
 }
 
-READ8_MEMBER( mbee_state::mbee256_speed_high_r )
+READ8_MEMBER( mbee_state::speed_high_r )
 {
 	m_maincpu->set_unscaled_clock(6750000);
 	return 0xff;
@@ -243,34 +224,28 @@ READ8_MEMBER( mbee_state::mbee256_speed_high_r )
 
 ************************************************************/
 
-WRITE8_MEMBER( mbee_state::mbee_04_w )  // address
+WRITE8_MEMBER( mbee_state::port04_w )  // address
 {
 	m_rtc->write(space, 0, data);
 }
 
-WRITE8_MEMBER( mbee_state::mbee_06_w )  // write
+WRITE8_MEMBER( mbee_state::port06_w )  // write
 {
 	m_rtc->write(space, 1, data);
 }
 
-READ8_MEMBER( mbee_state::mbee_07_r )   // read
+READ8_MEMBER( mbee_state::port07_r )   // read
 {
 	return m_rtc->read(space, 1);
 }
 
-// This doesn't seem to do anything; the time works without it.
-TIMER_CALLBACK_MEMBER( mbee_state::timer_rtc_irq )
+// See it work: Run mbeett, choose RTC in the config switches, run the F3 test, press Esc.
+WRITE_LINE_MEMBER( mbee_state::rtc_irq_w )
 {
-	if (!m_rtc)
-		return;
-
-	UINT8 data = m_rtc->read(m_maincpu->space(AS_IO), 12);
-	m_b7_rtc = (data) ? 1 : 0;
+	m_b7_rtc = (state) ? 0 : 1; // inverted by IC15 (pins 8,9,10)
 
 	if ((m_io_config->read() & 0xc0) == 0x40) // RTC selected in config menu
 		m_pio->port_b_write(pio_port_b_r(generic_space(),0,0xff));
-
-	timer_set(attotime::from_hz(10), TIMER_MBEE_RTC_IRQ);
 }
 
 
@@ -327,16 +302,8 @@ void mbee_state::setup_banks(UINT8 data, bool first_time, UINT8 b_mask)
 				if (!BIT(b_byte, 4))
 				{
 					// select video
-					if (m_is_premium)
-					{
-						mem.install_read_handler (b_vid, b_vid + 0x7ff, read8_delegate(FUNC(mbee_state::mbeeppc_low_r), this));
-						mem.install_read_handler (b_vid + 0x800, b_vid + 0xfff, read8_delegate(FUNC(mbee_state::mbeeppc_high_r), this));
-					}
-					else
-					{
-						mem.install_read_handler (b_vid, b_vid + 0x7ff, read8_delegate(FUNC(mbee_state::mbee_low_r), this));
-						mem.install_read_handler (b_vid + 0x800, b_vid + 0xfff, read8_delegate(FUNC(mbee_state::mbeeic_high_r), this));
-					}
+					mem.install_read_handler (b_vid, b_vid + 0x7ff, read8_delegate(FUNC(mbee_state::video_low_r), this));
+					mem.install_read_handler (b_vid + 0x800, b_vid + 0xfff, read8_delegate(FUNC(mbee_state::video_high_r), this));
 				}
 				else
 				{
@@ -367,16 +334,8 @@ void mbee_state::setup_banks(UINT8 data, bool first_time, UINT8 b_mask)
 				if (!BIT(b_byte, 4))
 				{
 					// select video
-					if (m_is_premium)
-					{
-						mem.install_write_handler (b_vid, b_vid + 0x7ff, write8_delegate(FUNC(mbee_state::mbeeppc_low_w), this));
-						mem.install_write_handler (b_vid + 0x800, b_vid + 0xfff, write8_delegate(FUNC(mbee_state::mbeeppc_high_w), this));
-					}
-					else
-					{
-						mem.install_write_handler (b_vid, b_vid + 0x7ff, write8_delegate(FUNC(mbee_state::mbee_low_w), this));
-						mem.install_write_handler (b_vid + 0x800, b_vid + 0xfff, write8_delegate(FUNC(mbee_state::mbeeic_high_w), this));
-					}
+					mem.install_write_handler (b_vid, b_vid + 0x7ff, write8_delegate(FUNC(mbee_state::video_low_w), this));
+					mem.install_write_handler (b_vid + 0x800, b_vid + 0xfff, write8_delegate(FUNC(mbee_state::video_high_w), this));
 				}
 				else
 				{
@@ -433,28 +392,29 @@ WRITE8_MEMBER( mbee_state::mbee128_50_w )
 
 ************************************************************/
 
-READ8_MEMBER( mbee_state::mbeeic_0a_r )
-{
-	return m_0a;
-}
-
-WRITE8_MEMBER( mbee_state::mbeeic_0a_w )
+WRITE8_MEMBER( mbee_state::port0a_w )
 {
 	m_0a = data;
-	m_pak->set_entry(data & 15);
+
+	if (m_pak)
+		m_pak->set_entry(data & 15);
 }
 
-READ8_MEMBER( mbee_state::mbeepc_telcom_low_r )
+READ8_MEMBER( mbee_state::telcom_low_r )
 {
 /* Read of port 0A - set Telcom rom to first half */
-	m_telcom->set_entry(0);
+	if (m_telcom)
+		m_telcom->set_entry(0);
+
 	return m_0a;
 }
 
-READ8_MEMBER( mbee_state::mbeepc_telcom_high_r )
+READ8_MEMBER( mbee_state::telcom_high_r )
 {
 /* Read of port 10A - set Telcom rom to 2nd half */
-	m_telcom->set_entry(1);
+	if (m_telcom)
+		m_telcom->set_entry(1);
+
 	return m_0a;
 }
 
@@ -471,60 +431,57 @@ READ8_MEMBER( mbee_state::mbeepc_telcom_high_r )
 */
 
 
-/* after the first 4 bytes have been read from ROM, switch the ram back in */
-TIMER_CALLBACK_MEMBER( mbee_state::timer_boot )
-{
-	m_boot->set_entry(0);
-}
-
-void mbee_state::machine_reset_common_disk()
+void mbee_state::machine_reset_common()
 {
 	m_fdc_rq = 0;
+	m_08 = 0;
+	m_0a = 0;
+	m_0b = 0;
+	m_1c = 0;
+
+	if (m_basic)
+		m_basic->set_entry(0);
+
+	if (m_telcom)
+		m_telcom->set_entry(0);
 }
 
 MACHINE_RESET_MEMBER( mbee_state, mbee )
 {
-	m_boot->set_entry(1);
-	timer_set(attotime::from_usec(4), TIMER_MBEE_BOOT);
+	machine_reset_common();
+	m_maincpu->set_pc(0x8000);
 }
 
 MACHINE_RESET_MEMBER( mbee_state, mbee56 )
 {
-	machine_reset_common_disk();
-	m_boot->set_entry(1);
-	timer_set(attotime::from_usec(4), TIMER_MBEE_BOOT);
+	machine_reset_common();
+	m_maincpu->set_pc(0xE000);
 }
 
 MACHINE_RESET_MEMBER( mbee_state, mbee128 )
 {
-	machine_reset_common_disk();
+	machine_reset_common();
 	setup_banks(0, 1, 3); // set banks to default
 	m_maincpu->set_pc(0x8000);
 }
 
 MACHINE_RESET_MEMBER( mbee_state, mbee256 )
 {
-	UINT8 i;
-	for (i = 0; i < 15; i++) m_mbee256_was_pressed[i] = 0;
 	m_mbee256_q_pos = 0;
-	machine_reset_common_disk();
+	machine_reset_common();
 	setup_banks(0, 1, 7); // set banks to default
 	m_maincpu->set_pc(0x8000);
 }
 
 MACHINE_RESET_MEMBER( mbee_state, mbeett )
 {
-	UINT8 i;
-	for (i = 0; i < 15; i++) m_mbee256_was_pressed[i] = 0;
 	m_mbee256_q_pos = 0;
-	m_boot->set_entry(1);
-	timer_set(attotime::from_usec(4), TIMER_MBEE_BOOT);
+	machine_reset_common();
+	m_maincpu->set_pc(0x8000);
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbee )
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-	m_boot->configure_entries(0, 2, &RAM[0x0000], 0x8000);
 	m_size = 0x4000;
 	m_has_oldkb = 1;
 	m_is_mbeett = 0;
@@ -532,13 +489,10 @@ DRIVER_INIT_MEMBER( mbee_state, mbee )
 
 DRIVER_INIT_MEMBER( mbee_state, mbeeic )
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-	m_boot->configure_entries(0, 2, &RAM[0x0000], 0x8000);
-
-	RAM = memregion("pakrom")->base();
+	UINT8 *RAM = memregion("pakrom")->base();
 	m_pak->configure_entries(0, 16, &RAM[0x0000], 0x2000);
-
 	m_pak->set_entry(0);
+
 	m_size = 0x8000;
 	m_has_oldkb = 1;
 	m_is_mbeett = 0;
@@ -546,17 +500,13 @@ DRIVER_INIT_MEMBER( mbee_state, mbeeic )
 
 DRIVER_INIT_MEMBER( mbee_state, mbeepc )
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-	m_boot->configure_entries(0, 2, &RAM[0x0000], 0x8000);
-
-	RAM = memregion("telcomrom")->base();
+	UINT8 *RAM = memregion("telcomrom")->base();
 	m_telcom->configure_entries(0, 2, &RAM[0x0000], 0x1000);
 
 	RAM = memregion("pakrom")->base();
 	m_pak->configure_entries(0, 16, &RAM[0x0000], 0x2000);
-
 	m_pak->set_entry(0);
-	m_telcom->set_entry(0);
+
 	m_size = 0x8000;
 	m_has_oldkb = 1;
 	m_is_mbeett = 0;
@@ -564,17 +514,13 @@ DRIVER_INIT_MEMBER( mbee_state, mbeepc )
 
 DRIVER_INIT_MEMBER( mbee_state, mbeepc85 )
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-	m_boot->configure_entries(0, 2, &RAM[0x0000], 0x8000);
-
-	RAM = memregion("telcomrom")->base();
+	UINT8 *RAM = memregion("telcomrom")->base();
 	m_telcom->configure_entries(0, 2, &RAM[0x0000], 0x1000);
 
 	RAM = memregion("pakrom")->base();
 	m_pak->configure_entries(0, 16, &RAM[0x0000], 0x2000);
-
 	m_pak->set_entry(5);
-	m_telcom->set_entry(0);
+
 	m_size = 0x8000;
 	m_has_oldkb = 1;
 	m_is_mbeett = 0;
@@ -582,22 +528,16 @@ DRIVER_INIT_MEMBER( mbee_state, mbeepc85 )
 
 DRIVER_INIT_MEMBER( mbee_state, mbeeppc )
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-	m_boot->configure_entry(0, &RAM[0x0000]);
-
-	RAM = memregion("basicrom")->base();
+	UINT8 *RAM = memregion("basicrom")->base();
 	m_basic->configure_entries(0, 2, &RAM[0x0000], 0x2000);
-	m_boot->configure_entry(1, &RAM[0x0000]);
 
 	RAM = memregion("telcomrom")->base();
 	m_telcom->configure_entries(0, 2, &RAM[0x0000], 0x1000);
 
 	RAM = memregion("pakrom")->base();
 	m_pak->configure_entries(0, 16, &RAM[0x0000], 0x2000);
-
 	m_pak->set_entry(5);
-	m_telcom->set_entry(0);
-	m_basic->set_entry(0);
+
 	m_size = 0x8000;
 	m_has_oldkb = 1;
 	m_is_mbeett = 0;
@@ -605,8 +545,6 @@ DRIVER_INIT_MEMBER( mbee_state, mbeeppc )
 
 DRIVER_INIT_MEMBER( mbee_state, mbee56 )
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-	m_boot->configure_entries(0, 2, &RAM[0x0000], 0xe000);
 	m_size = 0xe000;
 	m_has_oldkb = 1;
 	m_is_mbeett = 0;
@@ -628,8 +566,6 @@ DRIVER_INIT_MEMBER( mbee_state, mbee128 )
 		membank(banktag)->configure_entries(0, 32, &RAM[0x0000], 0x1000); // RAM banks
 		membank(banktag)->configure_entries(64, 1, &ROM[0x4000], 0x1000); // dummy rom
 	}
-
-	timer_set(attotime::from_hz(1), TIMER_MBEE_RTC_IRQ);   /* timer for rtc */
 
 	m_size = 0x8000;
 	m_has_oldkb = 1;
@@ -653,8 +589,7 @@ DRIVER_INIT_MEMBER( mbee_state, mbee256 )
 		membank(banktag)->configure_entries(64, 1, &ROM[0x4000], 0x1000); // dummy rom
 	}
 
-	timer_set(attotime::from_hz(1), TIMER_MBEE_RTC_IRQ);   /* timer for rtc */
-	timer_set(attotime::from_hz(25), TIMER_MBEE_NEWKB);   /* timer for kbd */
+	timer_set(attotime::from_hz(1), TIMER_MBEE_NEWKB);   /* kick-start timer for kbd */
 
 	m_size = 0x8000;
 	m_has_oldkb = 0;
@@ -663,20 +598,14 @@ DRIVER_INIT_MEMBER( mbee_state, mbee256 )
 
 DRIVER_INIT_MEMBER( mbee_state, mbeett )
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-	m_boot->configure_entries(0, 2, &RAM[0x0000], 0x8000);
-
-	RAM = memregion("telcomrom")->base();
+	UINT8 *RAM = memregion("telcomrom")->base();
 	m_telcom->configure_entries(0, 2, &RAM[0x0000], 0x1000);
 
 	RAM = memregion("pakrom")->base();
 	m_pak->configure_entries(0, 16, &RAM[0x0000], 0x2000);
-
 	m_pak->set_entry(5);
-	m_telcom->set_entry(0);
 
-	timer_set(attotime::from_hz(1), TIMER_MBEE_RTC_IRQ);   /* timer for rtc */
-	timer_set(attotime::from_hz(25), TIMER_MBEE_NEWKB);   /* timer for kbd */
+	timer_set(attotime::from_hz(1), TIMER_MBEE_NEWKB);   /* kick-start timer for kbd */
 
 	m_size = 0x8000;
 	m_has_oldkb = 0;

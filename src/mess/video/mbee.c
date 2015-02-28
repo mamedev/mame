@@ -69,124 +69,79 @@ void mbee_state::sy6545_cursor_configure()
 ************************************************************/
 
 
-READ8_MEMBER( mbee_state::mbee_low_r )
+READ8_MEMBER( mbee_state::video_low_r )
 {
-	if (m_0b & 1)
-		return m_p_gfxram[offset];
-	else
-		return m_p_videoram[offset];
-}
-
-WRITE8_MEMBER( mbee_state::mbee_low_w )
-{
-	m_p_videoram[offset] = data;
-}
-
-READ8_MEMBER( mbee_state::mbee_high_r )
-{
-	return m_p_gfxram[0x800 | offset];
-}
-
-WRITE8_MEMBER( mbee_state::mbee_high_w )
-{
-	m_p_gfxram[0x800 | offset] = data;
-}
-
-READ8_MEMBER( mbee_state::mbee_0b_r )
-{
-	return m_0b;
-}
-
-WRITE8_MEMBER( mbee_state::mbee_0b_w )
-{
-	m_0b = data;
-}
-
-READ8_MEMBER( mbee_state::mbeeic_08_r )
-{
-	return m_08;
-}
-
-WRITE8_MEMBER( mbee_state::mbeeic_08_w )
-{
-	m_08 = data;
-}
-
-READ8_MEMBER( mbee_state::mbeeic_high_r )
-{
-	if (m_08 & 0x40)
-		return m_p_colorram[offset];
-	else
-		return m_p_gfxram[0x800 | offset];
-}
-
-WRITE8_MEMBER( mbee_state::mbeeic_high_w )
-{
-	if ((m_08 & 0x40) && (~m_0b & 1))
-		m_p_colorram[offset] = data;
-	else
-		m_p_gfxram[0x0800 | offset] = data;
-}
-
-READ8_MEMBER( mbee_state::mbeeppc_1c_r )
-{
-	return m_1c;
-}
-
-WRITE8_MEMBER( mbee_state::mbeeppc_1c_w )
-{
-/*  d7 extended graphics (1=allow attributes and pcg banks)
-    d5 bankswitch basic rom
-    d4 select attribute ram
-    d3..d0 select m_videoram bank */
-
-	m_1c = data;
-	membank("basic")->set_entry(BIT(data, 5));
-}
-
-WRITE8_MEMBER( mbee_state::mbee256_1c_w )
-{
-/*  d7 extended graphics (1=allow attributes and pcg banks)
-    d5 bankswitch basic rom
-    d4 select attribute ram
-    d3..d0 select m_videoram bank */
-
-	m_1c = data;
-}
-
-READ8_MEMBER( mbee_state::mbeeppc_low_r )
-{
-	if ((m_1c & 0x1f) == 0x10)
+	if (m_is_premium && ((m_1c & 0x9f) == 0x90))
 		return m_p_attribram[offset];
 	else
-	if (m_0b & 1)
+	if BIT(m_0b, 0)
 		return m_p_gfxram[offset];
 	else
 		return m_p_videoram[offset];
 }
 
-WRITE8_MEMBER( mbee_state::mbeeppc_low_w )
+WRITE8_MEMBER( mbee_state::video_low_w )
 {
-	if (m_1c & 16)
-		m_p_attribram[offset] = data;
+	if BIT(m_1c, 4)
+	{
+		// non-premium attribute writes are discarded
+		if (m_is_premium && BIT(m_1c, 7))
+			m_p_attribram[offset] = data;
+	}
 	else
 		m_p_videoram[offset] = data;
 }
 
-READ8_MEMBER( mbee_state::mbeeppc_high_r )
+READ8_MEMBER( mbee_state::video_high_r )
 {
-	if (m_08 & 0x40)
+	if BIT(m_08, 6)
 		return m_p_colorram[offset];
 	else
 		return m_p_gfxram[(((m_1c & 15) + 1) << 11) | offset];
 }
 
-WRITE8_MEMBER ( mbee_state::mbeeppc_high_w )
+WRITE8_MEMBER( mbee_state::video_high_w )
 {
-	if ((m_08 & 0x40) && (~m_0b & 1))
+	if (BIT(m_08, 6) && (~m_0b & 1))
 		m_p_colorram[offset] = data;
 	else
 		m_p_gfxram[(((m_1c & 15) + 1) << 11) | offset] = data;
+}
+
+WRITE8_MEMBER( mbee_state::port0b_w )
+{
+	m_0b = data & 1;
+}
+
+READ8_MEMBER( mbee_state::port08_r )
+{
+	return m_08;
+}
+
+WRITE8_MEMBER( mbee_state::port08_w )
+{
+	m_08 = data;
+}
+
+READ8_MEMBER( mbee_state::port1c_r )
+{
+	return m_1c;
+}
+
+WRITE8_MEMBER( mbee_state::port1c_w )
+{
+/*  d7 extended graphics (1=allow attributes and pcg banks)
+    d5 bankswitch basic rom
+    d4 select attribute ram
+    d3..d0 select m_videoram bank */
+
+	if (m_is_premium && BIT(data, 7))
+		m_1c = data;
+	else
+		m_1c = data & 0x30;
+
+	if (m_basic)
+		m_basic->set_entry(BIT(data, 5));
 }
 
 
@@ -197,49 +152,49 @@ WRITE8_MEMBER ( mbee_state::mbeeppc_high_w )
 ************************************************************/
 
 
-void mbee_state::keyboard_matrix_r(int offs)
+void mbee_state::oldkb_matrix_r(UINT16 offs)
 {
-	UINT8 port = (offs >> 7) & 7;
-	UINT8 bit = (offs >> 4) & 7;
-	UINT8 data = m_io_oldkb[port]->read();
-	bool keydown  = ( data >> bit ) & 1;
-
-	// This adds premium-style cursor keys to the old keyboard
-	// They are used by the pc85 & ppc menu, and the 128k shell.
-	if (!keydown)
+	if (m_has_oldkb)
 	{
-		UINT8 extra = m_io_extra->read();
+		UINT8 port = (offs >> 7) & 7;
+		UINT8 bit = (offs >> 4) & 7;
+		UINT8 data = m_io_oldkb[port]->read();
+		bool keydown  = ( data >> bit ) & 1;
 
-		if (extra && port == 7 && bit == 1) keydown = 1;   /* Control */
+		// This adds premium-style cursor keys to the old keyboard
+		// They are used by the pc85 & ppc menu, and the 128k shell.
+		if (!keydown)
+		{
+			UINT8 extra = m_io_extra->read();
 
-		if (BIT(extra, 0) && ( port == 0 && bit == 5 )) keydown = 1; // cursor up = ^E
-		else
-		if (BIT(extra, 1) && ( port == 3 && bit == 0 )) keydown = 1; // cursor down = ^X
-		else
-		if (BIT(extra, 2) && ( port == 2 && bit == 3 )) keydown = 1; // cursor left = ^S
-		else
-		if (BIT(extra, 3) && ( port == 0 && bit == 4 )) keydown = 1; // cursor right = ^D
-#if 0
-		// this key doesn't appear on any keyboard afaik. It is a Wordbee function.
-		else
-		if (BIT(extra, 4) && ( port == 2 && bit == 6 )) keydown = 1;  // insert = ^V
-#endif
-	}
+			if (extra && port == 7 && bit == 1) keydown = 1;   /* Control */
 
-	if( keydown )
-	{
-		m_sy6545_reg[17] = offs;
-		m_sy6545_reg[16] = (offs >> 8) & 0x3f;
-		m_sy6545_status |= 0x40; //lpen_strobe
+			if (BIT(extra, 0) && ( port == 0 && bit == 5 )) keydown = 1; // cursor up = ^E
+			else
+			if (BIT(extra, 1) && ( port == 3 && bit == 0 )) keydown = 1; // cursor down = ^X
+			else
+			if (BIT(extra, 2) && ( port == 2 && bit == 3 )) keydown = 1; // cursor left = ^S
+			else
+			if (BIT(extra, 3) && ( port == 0 && bit == 4 )) keydown = 1; // cursor right = ^D
+			else
+			if (BIT(extra, 4) && ( port == 2 && bit == 6 )) keydown = 1; // insert = ^V
+		}
+
+		if( keydown )
+		{
+			m_sy6545_reg[17] = offs;
+			m_sy6545_reg[16] = (offs >> 8) & 0x3f;
+			m_sy6545_status |= 0x40; //lpen_strobe
+		}
 	}
 }
 
 
-void mbee_state::mbee_video_kbd_scan( int param )
+void mbee_state::oldkb_scan( UINT16 param )
 {
-	if (m_0b) return; // can't remember why this is here
+	if (m_0b) return; // IC5 (pins 11,12,13)
 	if (param & 15) return; // only scan once per row instead of 16 times
-	keyboard_matrix_r(param);
+	oldkb_matrix_r(param);
 }
 
 
@@ -277,7 +232,7 @@ READ8_MEMBER( mbee_state::m6545_data_r )
 		// This firstly pushes the contents of the transparent registers onto the MA lines,
 		// then increments the address, then sets update strobe on.
 		addr = (m_sy6545_reg[18] << 8) | m_sy6545_reg[19];
-		keyboard_matrix_r(addr);
+		oldkb_matrix_r(addr);
 		m_sy6545_reg[19]++;
 		if (!m_sy6545_reg[19]) m_sy6545_reg[18]++;
 		m_sy6545_status |= 0x80; // update_strobe
@@ -296,7 +251,7 @@ WRITE8_MEMBER ( mbee_state::m6545_index_w )
 WRITE8_MEMBER ( mbee_state::m6545_data_w )
 {
 	static const UINT8 sy6545_mask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0,0x3f,0xff};
-	int addr = 0;
+	UINT16 addr = 0;
 
 	switch( m_sy6545_ind )
 	{
@@ -309,7 +264,7 @@ WRITE8_MEMBER ( mbee_state::m6545_data_w )
 		// This firstly pushes the contents of the transparent registers onto the MA lines,
 		// then increments the address, then sets update strobe on.
 		addr = (m_sy6545_reg[18] << 8) | m_sy6545_reg[19];
-		keyboard_matrix_r(addr);
+		oldkb_matrix_r(addr);
 		m_sy6545_reg[19]++;
 		if (!m_sy6545_reg[19]) m_sy6545_reg[18]++;
 		m_sy6545_status |= 0x80; // update_strobe
@@ -382,7 +337,7 @@ MC6845_UPDATE_ROW( mbee_state::mono_update_row )
 		mem = (ma + x) & 0x7ff;
 		chr = m_p_videoram[mem];
 
-		mbee_video_kbd_scan(x+ma);
+		oldkb_scan(x+ma);
 
 		/* process cursor */
 		if (x == cursor_x)
@@ -419,27 +374,23 @@ MC6845_UPDATE_ROW( mbee_state::colour_update_row )
 		chr = m_p_videoram[mem];
 		col = m_p_colorram[mem];                     // read a byte of colour
 
-		if (m_is_premium)
+		if BIT(m_1c, 7) // premium graphics enabled?
 		{
-			if (m_1c & 0x80)                     // are extended features enabled?
-			{
-				attr = m_p_attribram[mem];
+			attr = m_p_attribram[mem];
 
-				if (chr & 0x80)
-					chr += ((attr & 15) << 7);          // bump chr to its particular pcg definition
+			if BIT(chr, 7)
+				chr += ((attr & 15) << 7);          // bump chr to its particular pcg definition
 
-				if (attr & 0x40)
-					inv ^= 0xff;                    // inverse attribute
+			if BIT(attr, 6)
+				inv ^= 0xff;                    // inverse attribute
 
-				if ((attr & 0x80) && (m_framecnt & 0x10))            // flashing attribute
-					chr = 0x20;
-			}
+			if (BIT(attr, 7) & BIT(m_framecnt, 4))            // flashing attribute
+				chr = 0x20;
 		}
 		else
 			col |= colourm;
 
-		if (m_has_oldkb)
-			mbee_video_kbd_scan(x+ma);
+		oldkb_scan(x+ma);
 
 		/* process cursor */
 		if (x == cursor_x)
