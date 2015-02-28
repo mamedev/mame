@@ -6,8 +6,8 @@
 
 
 
-  serial  device  etc
-------------------------------------------
+  serial  device  etc.
+-----------------------------------------------
  @048     uPD552  1980, Tomy Tennis
  *085     uPD650  1980, Roland TR-808
   102     uPD553  1981, Bandai Block Out
@@ -186,8 +186,9 @@ void hh_ucom4_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety
 	m_display_maxy = maxy;
 
 	// update current state
+	UINT32 mask = (1 << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
-		m_display_state[y] = (sety >> y & 1) ? setx : 0;
+		m_display_state[y] = (sety >> y & 1) ? (setx & mask) : 0;
 	
 	display_update();
 }
@@ -434,6 +435,8 @@ static MACHINE_CONFIG_START( tmtennis, hh_ucom4_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
+
+
 
 /***************************************************************************
 
