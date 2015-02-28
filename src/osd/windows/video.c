@@ -32,7 +32,7 @@
 //  GLOBAL VARIABLES
 //============================================================
 
-win_video_config video_config;
+osd_video_config video_config;
 
 
 
@@ -170,7 +170,7 @@ float win_monitor_info::aspect()
 //  winvideo_monitor_from_handle
 //============================================================
 
-win_monitor_info *winvideo_monitor_from_handle(HMONITOR hmonitor)
+win_monitor_info *win_monitor_info::monitor_from_handle(HMONITOR hmonitor)
 {
 	win_monitor_info *monitor;
 

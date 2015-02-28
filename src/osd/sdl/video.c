@@ -61,7 +61,7 @@
 //  GLOBAL VARIABLES
 //============================================================
 
-sdl_video_config video_config;
+osd_video_config video_config;
 
 sdl_monitor_info *sdl_monitor_info::primary_monitor = NULL;
 sdl_monitor_info *sdl_monitor_info::list = NULL;

@@ -847,10 +847,10 @@ win_monitor_info *win_window_info::winwindow_video_window_monitor(const osd_rect
 			p.left = proposed->left();
 			p.bottom = proposed->bottom();
 			p.right = proposed->right();
-			monitor = winvideo_monitor_from_handle(MonitorFromRect(&p, MONITOR_DEFAULTTONEAREST));
+			monitor = win_monitor_info::monitor_from_handle(MonitorFromRect(&p, MONITOR_DEFAULTTONEAREST));
 		}
 		else
-			monitor = winvideo_monitor_from_handle(MonitorFromWindow(m_hwnd, MONITOR_DEFAULTTONEAREST));
+			monitor = win_monitor_info::monitor_from_handle(MonitorFromWindow(m_hwnd, MONITOR_DEFAULTTONEAREST));
 	}
 
 	// in full screen, just use the configured monitor

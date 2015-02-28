@@ -53,12 +53,6 @@ enum {
 //  TYPE DEFINITIONS
 //============================================================
 
-struct sdl_mode
-{
-	int                 width;
-	int                 height;
-};
-
 class osd_dim
 {
 public:
@@ -160,18 +154,13 @@ private:
 	float               m_aspect;                 // computed/configured aspect ratio of the physical device
 };
 
-struct sdl_video_config
+struct osd_video_config
 {
-	// performance options
-	int                 novideo;                // don't draw, for pure CPU benchmarking
-
 	// global configuration
 	int                 windowed;               // start windowed?
 	int                 prescale;                   // prescale factor
 	int                 keepaspect;                 // keep aspect ratio
 	int                 numscreens;             // number of screens
-	int                 centerh;
-	int                 centerv;
 
 	// hardware options
 	int                 mode;           // output mode
@@ -179,13 +168,16 @@ struct sdl_video_config
 	int                 syncrefresh;    // sync only to refresh rate
 	int                 switchres;      // switch resolutions
 
-	int                 fullstretch;
+	int                 fullstretch;	// FXIME: implement in windows!
 
-	// vector options
-	float               beamwidth;      // beam width
+	// ddraw options
+	int                 hwstretch;                  // stretch using the hardware
+
+	// d3d, accel, opengl
+	int                 filter;                     // enable filtering
+	//int                 filter;         // enable filtering, disabled if glsl_filter>0
 
 	// OpenGL options
-	int                 filter;         // enable filtering, disabled if glsl_filter>0
 	int                 glsl;
 	int                 glsl_filter;        // glsl filtering, >0 disables filter
 	char *              glsl_shader_mamebm[GLSL_SHADER_MAX]; // custom glsl shader set, mame bitmap
@@ -196,6 +188,20 @@ struct sdl_video_config
 	int                 vbo;
 	int                 allowtexturerect;   // allow GL_ARB_texture_rectangle, default: no
 	int                 forcepow2texture;   // force power of two textures, default: no
+
+	// dd, d3d
+	int                 triplebuf;                  // triple buffer
+
+	//============================================================
+	// SDL - options
+	//============================================================
+	int                 novideo;                // don't draw, for pure CPU benchmarking
+
+	int                 centerh;
+	int                 centerv;
+
+	// vector options
+	float               beamwidth;      // beam width
 
 	// perftest
 	int                 perftest;       // print out real video fps
@@ -211,6 +217,6 @@ struct sdl_video_config
 //  GLOBAL VARIABLES
 //============================================================
 
-extern sdl_video_config video_config;
+extern osd_video_config video_config;
 
 #endif
