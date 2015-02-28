@@ -809,22 +809,25 @@ maketree: $(sort $(OBJDIRS))
 
 clean: $(OSDCLEAN)
 ifeq ($(PARTIAL),1)	
-		@echo Deleting object tree $(OBJ)...
-		$(RM) -r obj/osd/*
+	@echo Deleting object tree $(OBJ)...
+	$(RM) -r obj/osd/*
 else	
-		@echo Deleting object tree $(OBJ)...
-		$(RM) -r obj/*
+	@echo Deleting object tree $(OBJ)...
+	$(RM) -r obj/*
 endif
-		@echo Deleting $(EMULATOR)...
-		$(RM) $(EMULATOR)
-		@echo Deleting $(TOOLS)...
-		$(RM) $(TOOLS)
-		@echo Deleting dependencies...
-		$(RM) depend_mame.mak
-		$(RM) depend_mess.mak
-		$(RM) depend_ume.mak
-		@echo Deleting build targets...
-		$(RM) *_libretro.so
+	@echo Deleting $(EMULATOR)...
+	$(RM) $(EMULATOR)
+	@echo Deleting $(TOOLS)...
+	$(RM) $(TOOLS)
+	@echo Deleting dependencies...
+	$(RM) depend_mame.mak
+	$(RM) depend_mess.mak
+	$(RM) depend_ume.mak
+	@echo Deleting build targets...
+ifeq ($(PARTIAL),1)
+	# TODO: We should do this smarter at some point
+	$(RM) *_libretro.so *_libretro.dylib *_libretro.dll
+endif
 
 checkautodetect:
 	@echo TARGETOS=$(TARGETOS)
