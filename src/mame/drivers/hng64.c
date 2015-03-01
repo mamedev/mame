@@ -1173,6 +1173,13 @@ WRITE32_MEMBER(hng64_state::hng64_sprite_clear_odd_w)
 <ElSemi> 0xBF800000-0xBF808000 S-RAM
 <ElSemi> 0x60000000-0x60001000 Comm dualport ram
 */
+
+WRITE32_MEMBER(hng64_state::hng64_vregs_w)
+{
+//	printf("hng64_vregs_w %02x, %08x %08x\n", offset * 4, data, mem_mask);
+	COMBINE_DATA(&m_videoregs[offset]);
+}
+
 static ADDRESS_MAP_START( hng_map, AS_PROGRAM, 32, hng64_state )
 
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_SHARE("mainram")
@@ -1196,7 +1203,7 @@ static ADDRESS_MAP_START( hng_map, AS_PROGRAM, 32, hng64_state )
 	AM_RANGE(0x2000e400, 0x2000efff) AM_WRITE(hng64_sprite_clear_odd_w)
 	AM_RANGE(0x20010000, 0x20010013) AM_RAM AM_SHARE("spriteregs")
 	AM_RANGE(0x20100000, 0x2017ffff) AM_RAM_WRITE(hng64_videoram_w) AM_SHARE("videoram")    // Tilemap
-	AM_RANGE(0x20190000, 0x20190037) AM_RAM AM_SHARE("videoregs")
+	AM_RANGE(0x20190000, 0x20190037) AM_RAM_WRITE(hng64_vregs_w) AM_SHARE("videoregs")
 	AM_RANGE(0x20200000, 0x20203fff) AM_RAM_WRITE(hng64_pal_w) AM_SHARE("paletteram")
 	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_SHARE("tcram")   // Transition Control
 	AM_RANGE(0x20300000, 0x203001ff) AM_RAM_WRITE(dl_w) AM_SHARE("dl")  // 3d Display List
@@ -1902,6 +1909,13 @@ void hng64_state::machine_start()
 
 	m_comm_rom = memregion("user2")->base();
 	m_comm_ram = auto_alloc_array(machine(),UINT8,0x10000);
+
+
+	for (int i = 0; i < 0x38 / 4; i++)
+	{
+		m_videoregs[i] = 0xdeadbeef;
+	}
+		
 }
 
 

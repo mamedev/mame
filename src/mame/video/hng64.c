@@ -9,58 +9,16 @@
 
 static void hng64_mark_all_tiles_dirty( hng64_state *state, int tilemap )
 {
-	if (tilemap == 0)
-	{
-		state->m_tilemap0_8x8->mark_all_dirty();
-		state->m_tilemap0_16x16->mark_all_dirty();
-		state->m_tilemap0_16x16_alt->mark_all_dirty();
-	}
-	else if (tilemap == 1)
-	{
-		state->m_tilemap1_8x8->mark_all_dirty();
-		state->m_tilemap1_16x16->mark_all_dirty();
-		state->m_tilemap1_16x16_alt->mark_all_dirty();
-	}
-	else if (tilemap == 2)
-	{
-		state->m_tilemap2_8x8->mark_all_dirty();
-		state->m_tilemap2_16x16->mark_all_dirty();
-		state->m_tilemap2_16x16_alt->mark_all_dirty();
-	}
-	else if (tilemap == 3)
-	{
-		state->m_tilemap3_8x8->mark_all_dirty();
-		state->m_tilemap3_16x16->mark_all_dirty();
-		state->m_tilemap3_16x16_alt->mark_all_dirty();
-	}
+	state->m_tilemap[tilemap].m_tilemap_8x8->mark_all_dirty();
+	state->m_tilemap[tilemap].m_tilemap_16x16->mark_all_dirty();
+	state->m_tilemap[tilemap].m_tilemap_16x16_alt->mark_all_dirty();
 }
 
 static void hng64_mark_tile_dirty( hng64_state *state, int tilemap, int tile_index )
 {
-	if (tilemap == 0)
-	{
-		state->m_tilemap0_8x8->mark_tile_dirty(tile_index);
-		state->m_tilemap0_16x16->mark_tile_dirty(tile_index);
-		state->m_tilemap0_16x16_alt->mark_tile_dirty(tile_index);
-	}
-	else if (tilemap == 1)
-	{
-		state->m_tilemap1_8x8->mark_tile_dirty(tile_index);
-		state->m_tilemap1_16x16->mark_tile_dirty(tile_index);
-		state->m_tilemap1_16x16_alt->mark_tile_dirty(tile_index);
-	}
-	else if (tilemap == 2)
-	{
-		state->m_tilemap2_8x8->mark_tile_dirty(tile_index);
-		state->m_tilemap2_16x16->mark_tile_dirty(tile_index);
-		state->m_tilemap2_16x16_alt->mark_tile_dirty(tile_index);
-	}
-	else if (tilemap == 3)
-	{
-		state->m_tilemap3_8x8->mark_tile_dirty(tile_index);
-		state->m_tilemap3_16x16->mark_tile_dirty(tile_index);
-		state->m_tilemap3_16x16_alt->mark_tile_dirty(tile_index);
-	}
+	state->m_tilemap[tilemap].m_tilemap_8x8->mark_tile_dirty(tile_index);
+	state->m_tilemap[tilemap].m_tilemap_16x16->mark_tile_dirty(tile_index);
+	state->m_tilemap[tilemap].m_tilemap_16x16_alt->mark_tile_dirty(tile_index);
 }
 
 
@@ -913,70 +871,37 @@ static void hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const
 	{
 		scrollbase = (hng64_videoregs[0x04]&0x3fff0000)>>16;
 		tileregs   = (hng64_videoregs[0x02]&0xffff0000)>>16;
-
-		if (global_dimensions==0)
-		{
-			if (tileregs&0x0200)    tilemap = state->m_tilemap0_16x16;
-			else tilemap = state->m_tilemap0_8x8;
-		}
-		else
-		{
-			if (tileregs&0x0200)    tilemap = state->m_tilemap0_16x16_alt;
-			else tilemap = state->m_tilemap0_8x8; // _alt
-		}
 	}
 	else if (tm==1)
 	{
 		scrollbase = (hng64_videoregs[0x04]&0x00003fff)>>0;
 		tileregs   = (hng64_videoregs[0x02]&0x0000ffff)>>0;
-
-		if (global_dimensions==0)
-		{
-			if (tileregs&0x0200)    tilemap = state->m_tilemap1_16x16;
-			else tilemap = state->m_tilemap1_8x8;
-		}
-		else
-		{
-			if (tileregs&0x0200)    tilemap = state->m_tilemap1_16x16_alt;
-			else tilemap = state->m_tilemap1_8x8; // _alt
-		}
 	}
 	else if (tm==2)
 	{
 		scrollbase = (hng64_videoregs[0x05]&0x3fff0000)>>16;
 		tileregs   = (hng64_videoregs[0x03]&0xffff0000)>>16;
-
-		if (global_dimensions==0)
-		{
-			if (tileregs&0x0200)    tilemap = state->m_tilemap2_16x16;
-			else tilemap = state->m_tilemap2_8x8;
-		}
-		else
-		{
-			if (tileregs&0x0200)    tilemap = state->m_tilemap2_16x16_alt;
-			else tilemap = state->m_tilemap2_8x8; // _alt
-		}
 	}
 	else if (tm==3)
 	{
 		scrollbase = (hng64_videoregs[0x05]&0x00003fff)>>0;
 		tileregs   = (hng64_videoregs[0x03]&0x0000ffff)>>0;
+	}
 
-		if (global_dimensions==0)
-		{
-			if (tileregs&0x0200)    tilemap = state->m_tilemap3_16x16;
-			else tilemap = state->m_tilemap3_8x8;
-		}
-		else
-		{
-			if (tileregs&0x0200)    tilemap = state->m_tilemap3_16x16_alt;
-			else tilemap = state->m_tilemap3_8x8; // _alt
-		}
+	if (global_dimensions==0)
+	{
+		if (tileregs&0x0200)    tilemap = state->m_tilemap[tm].m_tilemap_16x16;
+		else tilemap = state->m_tilemap[tm].m_tilemap_8x8;
+	}
+	else
+	{
+		if (tileregs&0x0200)    tilemap = state->m_tilemap[tm].m_tilemap_16x16_alt;
+		else tilemap = state->m_tilemap[tm].m_tilemap_8x8; // _alt
 	}
 
 	// xrally's pink tilemaps make me think this is a tilemap enable bit.
 	// fatfurwa makes me think otherwise.
-	//if (!(tileregs & 0x0040)) return;
+//	if (!(tileregs & 0x0040)) return;
 
 	// set the transmask so our manual copy is correct
 	if (tileregs & 0x0400)
@@ -1311,14 +1236,14 @@ static void hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const
     // 0940 - samurai shodown 64
     // 0880 - buriki
 
-    // mmmm dbr? ??e? ????
+    // mmmm dbrz zzzz zzzz
     // m = mosaic related?
     //  -- they seem to enable mosaic at the same time as rowscroll in several cases (floor in buriki / ff)
     //     and also on the rotating logo in buriki.. does it cause some kind of aliasing side-effect, or.. ?
     // r = tile size (seems correct)
     // b = 4bpp/8bpp (seems correct) (beast busters, samsh64, sasm64 2, xrally switch it for some screens)
     // d = line (floor) mode - buriki, fatafurwa, some backgrounds in ss64_2
-    // e = enable according to sams64_2 debug mode, buriki and xrally.. but NOT fatal fury :-(
+    // z = z depth? tilemaps might also be affected by min / max clip values somewhere? (debug layer on buriki has priority 0x020, which would be highest)
 
 
  */
@@ -1334,8 +1259,7 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 	UINT32 *hng64_tcram = m_tcram;
 	UINT32 animmask;
 	UINT32 animbits;
-	UINT16 tileflags0, tileflags1;
-	UINT16 tileflags2, tileflags3;
+	UINT16 tileflags[4];
 
 #if 0
 	// press in sams64_2 attract mode for a nice debug screen from the game
@@ -1356,10 +1280,10 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 
 	animmask = hng64_videoregs[0x0b];
 	animbits = hng64_videoregs[0x0c];
-	tileflags0 = hng64_videoregs[0x02]>>16;
-	tileflags1 = hng64_videoregs[0x02]&0xffff;
-	tileflags2 = hng64_videoregs[0x03]>>16;
-	tileflags3 = hng64_videoregs[0x03]&0xffff;
+	tileflags[0] = hng64_videoregs[0x02]>>16;
+	tileflags[1] = hng64_videoregs[0x02]&0xffff;
+	tileflags[2] = hng64_videoregs[0x03]>>16;
+	tileflags[3] = hng64_videoregs[0x03]&0xffff;
 
 	/* if the auto-animation mask or bits have changed search for tiles using them and mark as dirty */
 	if ((m_old_animmask != animmask) || (m_old_animbits != animbits))
@@ -1389,35 +1313,15 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 		m_old_animbits = animbits;
 	}
 
-	if ((m_old_tileflags0&IMPORTANT_DIRTY_TILEFLAG_MASK)!=(tileflags0&IMPORTANT_DIRTY_TILEFLAG_MASK))
+	for (int i = 0; i < 4; i++)
 	{
-		hng64_mark_all_tiles_dirty(this, 0);
-		m_old_tileflags0 = tileflags0;
+		if ((m_old_tileflags[i]&IMPORTANT_DIRTY_TILEFLAG_MASK)!=(tileflags[i]&IMPORTANT_DIRTY_TILEFLAG_MASK))
+		{
+			hng64_mark_all_tiles_dirty(this, i);
+			m_old_tileflags[i] = tileflags[i];
+		}
 	}
 
-	if ((m_old_tileflags1&IMPORTANT_DIRTY_TILEFLAG_MASK)!=(tileflags1&IMPORTANT_DIRTY_TILEFLAG_MASK))
-	{
-		hng64_mark_all_tiles_dirty(this, 1);
-		m_old_tileflags1 = tileflags1;
-	}
-
-	if ((m_old_tileflags2&IMPORTANT_DIRTY_TILEFLAG_MASK)!=(tileflags2&IMPORTANT_DIRTY_TILEFLAG_MASK))
-	{
-		hng64_mark_all_tiles_dirty(this, 2);
-		m_old_tileflags2 = tileflags2;
-	}
-
-	if ((m_old_tileflags3&IMPORTANT_DIRTY_TILEFLAG_MASK)!=(tileflags3&IMPORTANT_DIRTY_TILEFLAG_MASK))
-	{
-		hng64_mark_all_tiles_dirty(this, 3);
-		m_old_tileflags3 = tileflags3;
-	}
-
-	// mark all frames as dirty if for some reason we don't trust the above code
-	//hng64_mark_all_tiles_dirty(this, 0);
-	//hng64_mark_all_tiles_dirty(this, 1);
-	//hng64_mark_all_tiles_dirty(this, 2);
-	//hng64_mark_all_tiles_dirty(this, 3);
 
 	hng64_drawtilemap(screen,bitmap,cliprect, 3);
 	hng64_drawtilemap(screen,bitmap,cliprect, 2);
@@ -1455,14 +1359,14 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 	if (0)
 		popmessage("%08x %08x %08x %08x %08x", m_spriteregs[0], m_spriteregs[1], m_spriteregs[2], m_spriteregs[3], m_spriteregs[4]);
 
-	if (0)
-	popmessage("%08x %08x TR(%04x %04x %04x %04x) SB(%04x %04x %04x %04x) %08x %08x %08x %08x %08x AA(%08x %08x) %08x %08x",
+	if (1)
+	popmessage("%08x %08x TR(%04x %04x %04x %04x) SB(%04x %04x %04x %04x) %08x %08x %08x %08x %08x AA(%08x %08x) %08x",
 		hng64_videoregs[0x00],
 		hng64_videoregs[0x01],
-	(hng64_videoregs[0x02]>>16)&0xf9ff, // ----  bits we're sure about are masked out
-	(hng64_videoregs[0x02]>>0)&0xf9ff,  //  ss64_2 debug mode indicates that 0x0040 is enable!
-	(hng64_videoregs[0x03]>>16)&0xf9ff, //   buriki agrees (debug data on text layer) xrally agress (pink layer)
-	(hng64_videoregs[0x03]>>0)&0xf9ff,  //   fatal fury doesn't (all backgrounds have it set) joy
+	(hng64_videoregs[0x02]>>16)&0x01ff, // ----  bits we're sure about are masked out
+	(hng64_videoregs[0x02]>>0)&0x01ff,  //  ss64_2 debug mode indicates that 0x0040 is enable!
+	(hng64_videoregs[0x03]>>16)&0x01ff, //   buriki agrees (debug data on text layer) xrally agress (pink layer)
+	(hng64_videoregs[0x03]>>0)&0x01ff,  //   fatal fury doesn't (all backgrounds have it set) joy
 	(hng64_videoregs[0x04]>>16)&0xffff,
 	(hng64_videoregs[0x04]>>0)&0xffff,
 	(hng64_videoregs[0x05]>>16)&0xffff,
@@ -1474,8 +1378,7 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 		hng64_videoregs[0x0a],
 		hng64_videoregs[0x0b],
 		hng64_videoregs[0x0c],
-		hng64_videoregs[0x0d],
-		hng64_videoregs[0x0e]);
+		hng64_videoregs[0x0d]);
 
 	if (0)
 	popmessage("3D: %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x",
@@ -1547,42 +1450,33 @@ void hng64_state::video_start()
 
 	m_old_animmask = -1;
 	m_old_animbits = -1;
-	m_old_tileflags0 = -1;
-	m_old_tileflags1 = -1;
-	m_old_tileflags2 = -1;
-	m_old_tileflags3 = -1;
+	m_old_tileflags[0] = -1;
+	m_old_tileflags[1] = -1;
+	m_old_tileflags[2] = -1;
+	m_old_tileflags[3] = -1;
 
-	m_tilemap0_8x8       = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile0_8x8_info),this),   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
-	m_tilemap0_16x16     = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile0_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
-	m_tilemap0_16x16_alt = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile0_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
+	m_tilemap[0].m_tilemap_8x8       = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile0_8x8_info),this),   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
+	m_tilemap[0].m_tilemap_16x16     = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile0_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
+	m_tilemap[0].m_tilemap_16x16_alt = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile0_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
 
-	m_tilemap1_8x8       = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile1_8x8_info),this),   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
-	m_tilemap1_16x16     = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile1_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
-	m_tilemap1_16x16_alt = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile1_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
+	m_tilemap[1].m_tilemap_8x8       = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile1_8x8_info),this),   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
+	m_tilemap[1].m_tilemap_16x16     = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile1_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
+	m_tilemap[1].m_tilemap_16x16_alt = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile1_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
 
-	m_tilemap2_8x8       = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile2_8x8_info),this),   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
-	m_tilemap2_16x16     = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile2_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
-	m_tilemap2_16x16_alt = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile2_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
+	m_tilemap[2].m_tilemap_8x8       = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile2_8x8_info),this),   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
+	m_tilemap[2].m_tilemap_16x16     = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile2_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
+	m_tilemap[2].m_tilemap_16x16_alt = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile2_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
 
-	m_tilemap3_8x8       = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile3_8x8_info),this),   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
-	m_tilemap3_16x16     = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile3_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
-	m_tilemap3_16x16_alt = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile3_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
+	m_tilemap[3].m_tilemap_8x8       = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile3_8x8_info),this),   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
+	m_tilemap[3].m_tilemap_16x16     = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile3_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
+	m_tilemap[3].m_tilemap_16x16_alt = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile3_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
 
-	m_tilemap0_8x8->set_transparent_pen(0);
-	m_tilemap0_16x16->set_transparent_pen(0);
-	m_tilemap0_16x16_alt->set_transparent_pen(0);
-
-	m_tilemap1_8x8->set_transparent_pen(0);
-	m_tilemap1_16x16->set_transparent_pen(0);
-	m_tilemap1_16x16_alt->set_transparent_pen(0);
-
-	m_tilemap2_8x8->set_transparent_pen(0);
-	m_tilemap2_16x16->set_transparent_pen(0);
-	m_tilemap2_16x16_alt->set_transparent_pen(0);
-
-	m_tilemap3_8x8->set_transparent_pen(0);
-	m_tilemap3_16x16->set_transparent_pen(0);
-	m_tilemap3_16x16_alt->set_transparent_pen(0);
+	for (int i = 0; i < 4; i++)
+	{
+		m_tilemap[i].m_tilemap_8x8->set_transparent_pen(0);
+		m_tilemap[i].m_tilemap_16x16->set_transparent_pen(0);
+		m_tilemap[i].m_tilemap_16x16_alt->set_transparent_pen(0);
+	}
 
 	// Debug switch, turn on / off additive blending on a per-tilemap basis
 	m_additive_tilemap_debug = 0;

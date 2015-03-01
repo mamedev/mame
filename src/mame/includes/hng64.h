@@ -97,20 +97,13 @@ public:
 
 	UINT8 m_screen_dis;
 
-	tilemap_t *m_tilemap0_8x8;
-	tilemap_t *m_tilemap1_8x8;
-	tilemap_t *m_tilemap2_8x8;
-	tilemap_t *m_tilemap3_8x8;
+	struct hng64_tilemap {
+		tilemap_t *m_tilemap_8x8;
+		tilemap_t *m_tilemap_16x16;
+		tilemap_t *m_tilemap_16x16_alt;
+	};
 
-	tilemap_t *m_tilemap0_16x16;
-	tilemap_t *m_tilemap1_16x16;
-	tilemap_t *m_tilemap2_16x16;
-	tilemap_t *m_tilemap3_16x16;
-
-	tilemap_t *m_tilemap0_16x16_alt;
-	tilemap_t *m_tilemap1_16x16_alt;
-	tilemap_t *m_tilemap2_16x16_alt;
-	tilemap_t *m_tilemap3_16x16_alt;
+	hng64_tilemap m_tilemap[4];
 
 	UINT8 m_additive_tilemap_debug;
 
@@ -121,10 +114,7 @@ public:
 
 	UINT32 m_old_animmask;
 	UINT32 m_old_animbits;
-	UINT16 m_old_tileflags0;
-	UINT16 m_old_tileflags1;
-	UINT16 m_old_tileflags2;
-	UINT16 m_old_tileflags3;
+	UINT16 m_old_tileflags[4];
 
 	UINT32 m_dls[2][0x81];
 
@@ -166,6 +156,7 @@ public:
 	DECLARE_READ32_MEMBER(unk_vreg_r);
 	DECLARE_WRITE32_MEMBER(hng64_soundram_w);
 	DECLARE_READ32_MEMBER(hng64_soundram_r);
+	DECLARE_WRITE32_MEMBER(hng64_vregs_w);
 
 	// not actually used, but left in code so you can turn it and see the (possibly undesired?) behavior, see notes in memory map
 	DECLARE_WRITE32_MEMBER(hng64_soundram2_w);
