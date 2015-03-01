@@ -11,9 +11,9 @@
 
   serial   device   etc.
 --------------------------------------------------------------------
- @MP0904A  TMS0970  1977, Milton Bradley Comp IV
+ @CP0904A  TMS0970  1977, Milton Bradley Comp IV
  @MP0905B  TMS0970  1977, Parker Brothers Codename Sector
- @MP0914   TMS1000  1979, Entex Baseball
+ @MP0914   TMS1000  1978, Entex Baseball 1
  @MP1030   TMS1100  1980, APF Mathemagician
  @MP3226   TMS1000  1978, Milton Bradley Simon
  @MP3403   TMS1100  1978, unknown
@@ -56,6 +56,7 @@
 #include "amaztron.lh"
 #include "bankshot.lh"
 #include "cnsector.lh"
+#include "ebball.lh"
 #include "elecdet.lh"
 #include "comp4.lh"
 #include "mathmagi.lh"
@@ -66,9 +67,6 @@
 #include "stopthie.lh"
 #include "tandy12.lh" // clickable
 #include "tc4.lh"
-
-// test-layouts - use external artwork
-#include "ebball.lh"
 
 
 class hh_tms1k_state : public driver_device
@@ -298,8 +296,9 @@ void hh_tms1k_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety
 	m_display_maxy = maxy;
 
 	// update current state
+	UINT32 mask = (1 << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
-		m_display_state[y] = (sety >> y & 1) ? setx : 0;
+		m_display_state[y] = (sety >> y & 1) ? (setx & mask) : 0;
 	
 	display_update();
 }
@@ -372,14 +371,14 @@ INPUT_CHANGED_MEMBER(hh_tms1k_state::tms0980_power_button)
 
 void hh_tms1k_state::mathmagi_display()
 {
-	m_display_maxy = 11;
 	m_display_maxx = 8;
+	m_display_maxy = 11;
 
 	// R0-R7: 7seg leds
 	for (int y = 0; y < 8; y++)
 	{
 		m_7seg_mask[y] = 0x7f;
-		m_display_state[y] = (m_r >> y & 1) ? ((m_o >> 1 & 0x7f) | (m_o << 7 & 0x80)) : 0;
+		m_display_state[y] = (m_r >> y & 1) ? (m_o >> 1) : 0;
 	}
 
 	// R8: custom math symbols digit
@@ -536,8 +535,8 @@ MACHINE_CONFIG_END
 
 void hh_tms1k_state::amaztron_display()
 {
-	m_display_maxy = 3;
 	m_display_maxx = 8;
+	m_display_maxy = 3;
 
 	// R8,R9: select digit
 	for (int y = 0; y < 2; y++)
@@ -802,10 +801,19 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Entex Baseball
+  Entex Electronic Baseball (1)
   * TMS1000NLP MP0914 (die labeled MP0914A)
+  
+  This is a handheld LED baseball game. One player controls the batter, the CPU
+  or other player controls the pitcher. Pitcher throw buttons are on a 'joypad'
+  obtained from a compartment in the back. Player scores are supposed to be
+  written down manually, the game doesn't save scores or innings (this annoyance
+  was resolved in the sequel). For more information, refer to the official manual.
+  
+  The overlay graphic is known to have 2 versions: one where the field players
+  are denoted by words ("left", "center", "short", etc), and an alternate one
+  with little guys drawn next to the LEDs.
 
-  NOTE!: MESS external artwork is recommended
 
   lamp translation table: led LDzz from game PCB = MESS lampyx:
 
@@ -827,7 +835,7 @@ void hh_tms1k_state::ebball_display()
 	// R8 is a 7seg
 	m_7seg_mask[8] = 0x7f;
 	
-	display_matrix(7, 9, m_o, m_r);
+	display_matrix(7, 9, ~m_o, m_r);
 }
 
 READ8_MEMBER(hh_tms1k_state::ebball_read_k)
@@ -859,36 +867,38 @@ WRITE16_MEMBER(hh_tms1k_state::ebball_write_o)
 
 static INPUT_PORTS_START( ebball )
 	PORT_START("IN.0") // R1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Change Up")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Change Sides")
+	PORT_CONFNAME( 0x04, 0x04, "Pitcher" )
+	PORT_CONFSETTING(    0x04, "Auto" )
+	PORT_CONFSETTING(    0x00, "Manual" )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // R2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Fast Ball")
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.2") // R3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 Knuckler")
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.3") // R4
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Curve")
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.4") // R5
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON7 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Slider")
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.5") // Vss!
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON8 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Batter")
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( ebball, hh_tms1k_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 350000) // RC osc. R=43K, C=47pf -> ~350kHz
+	MCFG_CPU_ADD("maincpu", TMS1000, 375000) // RC osc. R=43K, C=47pf -> ~375kHz
 	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, ebball_read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, ebball_write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, ebball_write_o))
@@ -1337,8 +1347,8 @@ READ8_MEMBER(hh_tms1k_state::cnsector_read_k)
 
 WRITE16_MEMBER(hh_tms1k_state::cnsector_write_r)
 {
-	m_display_maxy = 7;
 	m_display_maxx = 8;
+	m_display_maxy = 7;
 
 	// R0-R5: select digit (right-to-left)
 	for (int y = 0; y < 6; y++)
@@ -1545,11 +1555,11 @@ READ8_MEMBER(hh_tms1k_state::stopthief_read_k)
 
 WRITE16_MEMBER(hh_tms1k_state::stopthief_write_r)
 {
-	m_display_maxy = 3;
 	m_display_maxx = 7;
+	m_display_maxy = 3;
 
 	// R0-R2: select digit
-	UINT8 o = BITSWAP8(m_o,3,5,2,1,4,0,6,7);
+	UINT8 o = BITSWAP8(m_o,3,5,2,1,4,0,6,7) & 0x7f;
 	for (int y = 0; y < m_display_maxy; y++)
 	{
 		m_7seg_mask[y] = 0x7f;
@@ -2284,7 +2294,7 @@ CONS( 1980, mathmagi, 0, 0, mathmagi, mathmagi, driver_device, 0, "APF Electroni
 CONS( 1979, amaztron, 0, 0, amaztron, amaztron, driver_device, 0, "Coleco", "Amaze-A-Tron", GAME_SUPPORTS_SAVE )
 CONS( 1981, tc4, 0, 0, tc4, tc4, driver_device, 0, "Coleco", "Total Control 4", GAME_SUPPORTS_SAVE )
 
-CONS( 1979, ebball, 0, 0, ebball, ebball, driver_device, 0, "Entex", "Baseball (Entex)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1978, ebball, 0, 0, ebball, ebball, driver_device, 0, "Entex", "Electronic Baseball (Entex)", GAME_SUPPORTS_SAVE )
 
 CONS( 1979, elecdet, 0, 0, elecdet, elecdet, driver_device, 0, "Ideal", "Electronic Detective", GAME_SUPPORTS_SAVE )
 
