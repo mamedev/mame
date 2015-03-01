@@ -865,7 +865,8 @@ osd_dim sdl_window_info::pick_best_mode()
 		minimum_height -= 4;
 	}
 
-	num = SDL_GetNumDisplayModes(m_monitor->handle());
+	// FIXME: this should be provided by monitor !
+	num = SDL_GetNumDisplayModes(*((UINT64 *)m_monitor->handle()));
 
 	if (num == 0)
 	{
@@ -877,7 +878,7 @@ osd_dim sdl_window_info::pick_best_mode()
 		for (i = 0; i < num; ++i)
 		{
 			SDL_DisplayMode mode;
-			SDL_GetDisplayMode(m_monitor->handle(), i, &mode);
+			SDL_GetDisplayMode(*((UINT64 *)m_monitor->handle()), i, &mode);
 
 			// compute initial score based on difference between target and current
 			size_score = 1.0f / (1.0f + fabsf((INT32)mode.w - target_width) + fabsf((INT32)mode.h - target_height));
@@ -1392,7 +1393,7 @@ osd_rect sdl_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	INT32 viswidth, visheight;
 	INT32 adjwidth, adjheight;
 	float pixel_aspect;
-	sdl_monitor_info *monitor = m_monitor;
+	osd_monitor_info *monitor = m_monitor;
 
 	// get the pixel aspect ratio for the target monitor
 	pixel_aspect = monitor->aspect();

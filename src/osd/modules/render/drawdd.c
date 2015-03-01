@@ -94,7 +94,7 @@ private:
 
 	// video modes
 	int config_adapter_mode();
-	void get_adapter_for_monitor(win_monitor_info *monitor);
+	void get_adapter_for_monitor(osd_monitor_info *monitor);
 	void pick_best_mode();
 
 	// various
@@ -130,7 +130,7 @@ private:
 /* monitor_enum_info holds information during a monitor enumeration */
 struct monitor_enum_info
 {
-	win_monitor_info *      monitor;                    // pointer to monitor we want
+	osd_monitor_info *      monitor;                    // pointer to monitor we want
 	GUID                    guid;                       // GUID of the one we found
 	GUID *                  guid_ptr;                   // pointer to our GUID
 	int                     foundit;                    // TRUE if we found what we wanted
@@ -263,11 +263,17 @@ int renderer_dd::create()
 {
 	// configure the adapter for the mode we want
 	if (config_adapter_mode())
+	{
+		osd_printf_error("Unable to configure adapter.\n");
 		goto error;
+	}
 
 	// create the ddraw object
 	if (ddraw_create())
+	{
+		osd_printf_error("Unable to create ddraw object.\n");
 		goto error;
+	}
 
 	return 0;
 
@@ -855,7 +861,7 @@ void renderer_dd::compute_blit_surface_size()
 		// compute the appropriate visible area if we're trying to keepaspect
 		if (video_config.keepaspect)
 		{
-			win_monitor_info *monitor = window().winwindow_video_window_monitor(NULL);
+			osd_monitor_info *monitor = window().winwindow_video_window_monitor(NULL);
 			window().target()->compute_visible_area(target_width, target_height, monitor->aspect(), window().target()->orientation(), target_width, target_height);
 			desired_aspect = (float)target_width / (float)target_height;
 		}
@@ -945,7 +951,7 @@ void renderer_dd::calc_fullscreen_margins(DWORD desc_width, DWORD desc_height, R
 void renderer_dd::blit_to_primary(int srcwidth, int srcheight)
 {
 	IDirectDrawSurface7 *target = (back != NULL) ? back : primary;
-	win_monitor_info *monitor = window().winwindow_video_window_monitor(NULL);
+	osd_monitor_info *monitor = window().winwindow_video_window_monitor(NULL);
 	DDBLTFX blitfx = { sizeof(DDBLTFX) };
 	RECT clear, outer, dest, source;
 	INT32 dstwidth, dstheight;
@@ -1161,7 +1167,7 @@ static BOOL WINAPI monitor_enum_callback(GUID FAR *guid, LPSTR description, LPST
 	monitor_enum_info *einfo = (monitor_enum_info *)context;
 
 	// do we match the desired monitor?
-	if (hmonitor == einfo->monitor->handle() || (hmonitor == NULL && einfo->monitor->is_primary()))
+	if (hmonitor == *((HMONITOR *)einfo->monitor->oshandle()) || (hmonitor == NULL && einfo->monitor->is_primary()))
 	{
 		einfo->guid_ptr = (guid != NULL) ? &einfo->guid : NULL;
 		if (guid != NULL)
@@ -1177,7 +1183,7 @@ static BOOL WINAPI monitor_enum_callback(GUID FAR *guid, LPSTR description, LPST
 //  get_adapter_for_monitor
 //============================================================
 
-void renderer_dd::get_adapter_for_monitor(win_monitor_info *monitor)
+void renderer_dd::get_adapter_for_monitor(osd_monitor_info *monitor)
 {
 	monitor_enum_info einfo;
 	HRESULT result;

@@ -1266,7 +1266,7 @@ int renderer::get_adapter_for_monitor()
 		HMONITOR curmonitor = (*d3dintf->d3d.get_adapter_monitor)(d3dintf, adapternum);
 
 		// if we match the proposed monitor, this is it
-		if (curmonitor == window().monitor()->handle())
+		if (curmonitor == *((HMONITOR *)window().monitor()->oshandle()))
 		{
 			return adapternum;
 		}
