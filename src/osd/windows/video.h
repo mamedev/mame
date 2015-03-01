@@ -10,7 +10,6 @@
 #define __WIN_VIDEO__
 
 #include "render.h"
-//#include "modules/osdwindow.h"
 
 //============================================================
 //  CONSTANTS

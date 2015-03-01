@@ -402,12 +402,16 @@ void texture_info::render_quad(const render_primitive *prim, const int x, const 
 
 	target_rect.x = x;
 	target_rect.y = y;
-	target_rect.w = round_nearest(prim->bounds.x1 - prim->bounds.x0);
-	target_rect.h = round_nearest(prim->bounds.y1 - prim->bounds.y0);
+	target_rect.w = round_nearest(prim->bounds.x1) - round_nearest(prim->bounds.x0);
+	target_rect.h = round_nearest(prim->bounds.y1) - round_nearest(prim->bounds.y0);
 
 	SDL_SetTextureBlendMode(m_texture_id, m_sdl_blendmode);
 	set_coloralphamode(m_texture_id, &prim->color);
+	//printf("%d %d %d %d\n", target_rect.x, target_rect.y, target_rect.w, target_rect.h);
+	// Arghhh .. Just another bug. SDL_RenderCopy has severe issues with scaling ...
 	SDL_RenderCopy(m_renderer->m_sdl_renderer,  m_texture_id, NULL, &target_rect);
+	//SDL_RenderCopyEx(m_renderer->m_sdl_renderer,  m_texture_id, NULL, &target_rect, 0, NULL, SDL_FLIP_NONE);
+	//SDL_RenderCopyEx(m_renderer->m_sdl_renderer,  m_texture_id, NULL, NULL, 0, NULL, SDL_FLIP_NONE);
 }
 
 void sdl_info13::render_quad(texture_info *texture, const render_primitive *prim, const int x, const int y)
@@ -854,6 +858,8 @@ bool texture_info::matches(const render_primitive &prim, const quad_setup_data &
 			m_setup.dvdx == setup.dvdx &&
 			m_setup.dudy == setup.dudy &&
 			m_setup.dvdy == setup.dvdy &&
+			m_setup.startu == setup.startu &&
+			m_setup.startv == setup.startv &&
 			((flags() ^ prim.flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0;
 }
 
@@ -986,6 +992,11 @@ void texture_info::set_data(const render_texinfo &texsource, const UINT32 flags)
 //  compute rotation setup
 //============================================================
 
+inline float signf(const float a)
+{
+	return (0.0f < a) - (a < 0.0f);
+}
+
 void quad_setup_data::compute(const render_primitive &prim, const int prescale)
 {
 	const render_quad_texuv *texcoords = &prim.texcoords;
@@ -1000,10 +1011,18 @@ void quad_setup_data::compute(const render_primitive &prim, const int prescale)
 	else
 		fscale = 1.0f;
 
-	fdudx = (texcoords->tr.u - texcoords->tl.u) / fscale; // a a11
-	fdvdx = (texcoords->tr.v - texcoords->tl.v) / fscale; // c a21
-	fdudy = (texcoords->bl.u - texcoords->tl.u) / fscale; // b a12
-	fdvdy = (texcoords->bl.v - texcoords->tl.v) / fscale; // d a22
+	fdudx = (texcoords->tr.u - texcoords->tl.u); // a a11
+	fdvdx = (texcoords->tr.v - texcoords->tl.v); // c a21
+	fdudy = (texcoords->bl.u - texcoords->tl.u); // b a12
+	fdvdy = (texcoords->bl.v - texcoords->tl.v); // d a22
+
+	width = fabs(( fdudx * (float) (texwidth) + fdvdx * (float) (texheight)) ) * fscale;
+	height = fabs((fdudy * (float) (texwidth) + fdvdy * (float) (texheight)) ) * fscale;
+
+	fdudx = signf(fdudx) / fscale;
+	fdvdy = signf(fdvdy) / fscale;
+	fdvdx = signf(fdvdx) / fscale;
+	fdudy = signf(fdudy) / fscale;
 
 #if 0
 	printf("tl.u %f tl.v %f\n", texcoords->tl.u, texcoords->tl.v);
@@ -1022,11 +1041,10 @@ void quad_setup_data::compute(const render_primitive &prim, const int prescale)
 
 	/* clamp to integers */
 
-	width = fabs((fdudx * (float) (texwidth) + fdvdx * (float) (texheight)) * fscale * fscale);
-	height = fabs((fdudy * (float)(texwidth) + fdvdy * (float) (texheight)) * fscale * fscale);
+	rotwidth = round_nearest(width);
+	rotheight = round_nearest(height);
 
-	rotwidth = width;
-	rotheight = height;
+	//printf("%d %d rot %d %d\n", texwidth, texheight, rotwidth, rotheight);
 
 	startu += (dudx + dudy) / 2;
 	startv += (dvdx + dvdy) / 2;

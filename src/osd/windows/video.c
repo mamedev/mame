@@ -362,6 +362,7 @@ void windows_osd_interface::extract_video_config()
 	// global options: extract the data
 	video_config.windowed      = options().window();
 	video_config.prescale      = options().prescale();
+	video_config.filter        = options().filter();
 	video_config.keepaspect    = options().keep_aspect();
 	video_config.numscreens    = options().numscreens();
 
@@ -411,11 +412,11 @@ void windows_osd_interface::extract_video_config()
 	// ddraw options: extract the data
 	video_config.hwstretch     = options().hwstretch();
 
-	// d3d options: extract the data
-	video_config.filter        = options().filter();
-	if (video_config.prescale == 0)
+	if (video_config.prescale < 1 || video_config.prescale > 3)
+	{
+		osd_printf_warning("Invalid prescale option, reverting to '1'\n");
 		video_config.prescale = 1;
-
+	}
 	#if (USE_OPENGL)
 		// default to working video please
 		video_config.forcepow2texture = options().gl_force_pow2_texture();

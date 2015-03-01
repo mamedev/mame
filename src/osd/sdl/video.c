@@ -587,6 +587,7 @@ void sdl_osd_interface::extract_video_config()
 	// global options: extract the data
 	video_config.windowed      = options().window();
 	video_config.prescale      = options().prescale();
+	video_config.filter        = options().filter();
 	video_config.keepaspect    = options().keep_aspect();
 	video_config.numscreens    = options().numscreens();
 	video_config.fullstretch   = options().uneven_stretch();
@@ -649,10 +650,6 @@ void sdl_osd_interface::extract_video_config()
 		osd_printf_warning("-syncrefresh specified without -waitsync. Reverting to -nosyncrefresh\n");
 		video_config.syncrefresh = 0;
 	}
-
-	#if (USE_OPENGL || SDLMAME_SDL2)
-	video_config.filter        = options().filter();
-	#endif
 
 	if (video_config.prescale < 1 || video_config.prescale > 3)
 	{
