@@ -1587,7 +1587,7 @@ ROM_START( pangb )
 	ROM_LOAD( "pang_03.bin",  0x10000, 0x20000, CRC(0c8477ae) SHA1(a31a8c00407dfc3017d56e29fac6114b73248030) )   /* Decrypted data */
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
-	ROM_LOAD( "bb9.bin",      0x000000, 0x20000, CRC(3a5883f5) SHA1(a8a33071e10f5992e80afdb782c334829f9ae27f) ) /* chars */
+	ROM_LOAD( "pang_9.bin",      0x000000, 0x20000, CRC(3a5883f5) SHA1(a8a33071e10f5992e80afdb782c334829f9ae27f) ) /* chars */
 	ROM_LOAD( "bb3.bin",      0x020000, 0x20000, CRC(79a8ed08) SHA1(c1e43889e29b80c7fe2c09b11eecde24450a1ff5) )
 	/* 40000-7ffff empty */
 	ROM_LOAD( "bb11.bin",     0x080000, 0x20000, CRC(166a16ae) SHA1(7f907c78b7ac8c99e3d79761a6ae689c77e3a1f5) )
@@ -1610,7 +1610,7 @@ ROM_START( pangb2 )
 	ROM_CONTINUE(0x10000, 0x20000 )   /* Decrypted data */
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
-	ROM_LOAD( "bb9.bin",      0x000000, 0x20000, CRC(3a5883f5) SHA1(a8a33071e10f5992e80afdb782c334829f9ae27f) ) /* chars */
+	ROM_LOAD( "pang_9.bin",      0x000000, 0x20000, CRC(3a5883f5) SHA1(a8a33071e10f5992e80afdb782c334829f9ae27f) ) /* chars */
 	ROM_LOAD( "bb3.bin",      0x020000, 0x20000, CRC(79a8ed08) SHA1(c1e43889e29b80c7fe2c09b11eecde24450a1ff5) )
 	/* 40000-7ffff empty */
 	ROM_LOAD( "bb11.bin",     0x080000, 0x20000, CRC(166a16ae) SHA1(7f907c78b7ac8c99e3d79761a6ae689c77e3a1f5) )
