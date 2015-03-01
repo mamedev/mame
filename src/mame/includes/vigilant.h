@@ -38,7 +38,8 @@ public:
 	DECLARE_WRITE8_MEMBER(vigilant_horiz_scroll_w);
 	DECLARE_WRITE8_MEMBER(vigilant_rear_horiz_scroll_w);
 	DECLARE_WRITE8_MEMBER(vigilant_rear_color_w);
-	virtual void video_start();
+    virtual void machine_start();
+    virtual void video_start();
 	virtual void video_reset();
 	UINT32 screen_update_vigilant(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_kikcubic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

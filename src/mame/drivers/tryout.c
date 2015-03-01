@@ -43,13 +43,14 @@ WRITE8_MEMBER(tryout_state::tryout_sound_irq_ack_w)
 //  m_audiocpu->set_input_line(0, CLEAR_LINE);
 }
 
+void tryout_state::machine_start()
+{
+    membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x2000);
+}
+
 WRITE8_MEMBER(tryout_state::tryout_bankswitch_w)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-	int bankaddress;
-
-	bankaddress = 0x10000 + (data & 0x01) * 0x2000;
-	membank("bank1")->set_base(&RAM[bankaddress]);
+    membank("bank1")->set_entry(data & 0x01);
 }
 
 static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, tryout_state )

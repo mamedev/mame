@@ -63,7 +63,7 @@ public:
 	DECLARE_READ8_MEMBER(k052109_051960_r);
 	DECLARE_WRITE8_MEMBER(k052109_051960_w);
 	DECLARE_WRITE8_MEMBER(scontra_snd_bankswitch_w);
-	virtual void video_start();
+    virtual void video_start();
 	DECLARE_MACHINE_START(scontra);
 	DECLARE_MACHINE_RESET(scontra);
 	DECLARE_MACHINE_START(thunderx);
