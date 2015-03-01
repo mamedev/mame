@@ -867,7 +867,7 @@ WRITE32_MEMBER(hng64_state::dl_w)
 		}
 
 		// Send it off to the 3d subsystem.
-		hng64_command3d(machine(), packet3d);
+		hng64_command3d( packet3d);
 	}
 #endif
 }
@@ -892,6 +892,8 @@ WRITE32_MEMBER(hng64_state::dl_upload_w)
 {
 	// this handles 3d to fb upload
 	UINT16 packet3d[16];
+//	printf("dl_upload_w %08x %08x\n", data, mem_mask);
+
 
 	for(int packetStart=0;packetStart<0x200/4;packetStart+=8)
 	{
@@ -906,7 +908,7 @@ WRITE32_MEMBER(hng64_state::dl_upload_w)
 		}
 
 		// Send it off to the 3d subsystem.
-		hng64_command3d(machine(), packet3d);
+		hng64_command3d( packet3d);
 	}
 
 	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(0x200*8), timer_expired_delegate(FUNC(hng64_state::hng64_3dfifo_processed),this));
@@ -915,6 +917,8 @@ WRITE32_MEMBER(hng64_state::dl_upload_w)
 /* Note: Samurai Shodown games never calls bit 1, so it can't be framebuffer clear. It also calls bit 3 at start-up, meaning unknown */
 WRITE32_MEMBER(hng64_state::dl_control_w) // This handles framebuffers
 {
+//	printf("dl_control_w %08x %08x\n", data, mem_mask);
+
 	//if(data & 2) // swap buffers
 	//{
 	//  clear3d();
@@ -1737,7 +1741,7 @@ static GFXDECODE_START( hng64 )
 	GFXDECODE_ENTRY( "textures", 0, hng64_texlayout,     0x0, 0x10 )  /* textures */
 GFXDECODE_END
 
-static void hng64_reorder(running_machine &machine, UINT8* gfxregion, size_t gfxregionsize)
+static void hng64_reorder( UINT8* gfxregion, size_t gfxregionsize)
 {
 	// by default 2 4bpp tiles are stored in each 8bpp tile, this makes decoding in MAME harder than it needs to be
 	// reorder them
@@ -1757,14 +1761,14 @@ static void hng64_reorder(running_machine &machine, UINT8* gfxregion, size_t gfx
 
 DRIVER_INIT_MEMBER(hng64_state,hng64_reorder_gfx)
 {
-	hng64_reorder(machine(), memregion("scrtile")->base(), memregion("scrtile")->bytes());
+	hng64_reorder(memregion("scrtile")->base(), memregion("scrtile")->bytes());
 }
 
 #define HACK_REGION
 #ifdef HACK_REGION
-static void hng64_patch_bios_region(running_machine& machine, int region)
+void hng64_state::hng64_patch_bios_region(int region)
 {
-	UINT8 *rom = machine.root_device().memregion("user1")->base();
+	UINT8 *rom = memregion("user1")->base();
 
 	if ((rom[0x4000]==0xff) && (rom[0x4001] == 0xff))
 	{
@@ -1781,11 +1785,11 @@ DRIVER_INIT_MEMBER(hng64_state,hng64)
 	// region hacking, english error messages are more useful to us, but no english bios is dumped...
 #ifdef HACK_REGION
 // versions according to fatal fury test mode
-//  hng64_patch_bios_region(machine(), 0); // 'Others Ver' (invalid?)
-	hng64_patch_bios_region(machine(), 1); // Japan
-//  hng64_patch_bios_region(machine(), 2); // USA
-//  hng64_patch_bios_region(machine(), 3); // Korea
-//  hng64_patch_bios_region(machine(), 4); // 'Others'
+//  hng64_patch_bios_region( 0); // 'Others Ver' (invalid?)
+	hng64_patch_bios_region( 1); // Japan
+//  hng64_patch_bios_region( 2); // USA
+//  hng64_patch_bios_region( 3); // Korea
+//  hng64_patch_bios_region( 4); // 'Others'
 #endif
 
 	/* 1 meg of virtual address space for the com cpu */
