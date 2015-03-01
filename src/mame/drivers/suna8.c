@@ -2881,7 +2881,8 @@ GAME( 1990, starfigh,  0,        starfigh, starfigh, suna8_state, starfigh,  ROT
 
 GAME( 1991, hardhea2,  0,        hardhea2, hardhea2, suna8_state, hardhea2,  ROT0,  "SunA",                       "Hard Head 2 (v2.0)",          0 )
 
-GAME( 1992, brickzn,   0,        brickzn,  brickzn,  suna8_state, brickzn,   ROT90, "SunA",                       "Brick Zone (v6.0, Joystick)", 0 )
-GAME( 1992, brickznv5, brickzn,  brickzn,  brickzn,  suna8_state, brickznv5, ROT90, "SunA",                       "Brick Zone (v5.0, Joystick)", 0 )
-GAME( 1992, brickznv4, brickzn,  brickzn,  brickzn,  suna8_state, brickznv4, ROT90, "SunA",                       "Brick Zone (v4.0, Spinner)",  0 )
+// is meant to sound like this https://www.youtube.com/watch?v=yfU1C7A3iZI (recorded from v6.0, Joystick version)
+GAME( 1992, brickzn,   0,        brickzn,  brickzn,  suna8_state, brickzn,   ROT90, "SunA",                       "Brick Zone (v6.0, Joystick)", GAME_IMPERFECT_SOUND )
+GAME( 1992, brickznv5, brickzn,  brickzn,  brickzn,  suna8_state, brickznv5, ROT90, "SunA",                       "Brick Zone (v5.0, Joystick)", GAME_IMPERFECT_SOUND )
+GAME( 1992, brickznv4, brickzn,  brickzn,  brickzn,  suna8_state, brickznv4, ROT90, "SunA",                       "Brick Zone (v4.0, Spinner)",  GAME_IMPERFECT_SOUND )
 GAME( 1992, brickzn11, brickzn,  brickzn,  brickzn,  suna8_state, brickzn11, ROT90, "SunA",                       "Brick Zone (v1.1)",  GAME_NOT_WORKING )
