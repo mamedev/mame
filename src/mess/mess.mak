@@ -726,6 +726,7 @@ DRVLIBS += \
 	$(MESSOBJ)/funtech.a \
 	$(MESSOBJ)/galaxy.a \
 	$(MESSOBJ)/gamepark.a \
+	$(MESSOBJ)/gi.a \
 	$(MESSOBJ)/grundy.a \
 	$(MESSOBJ)/hartung.a \
 	$(MESSOBJ)/heathkit.a \
@@ -1044,8 +1045,8 @@ $(MESSOBJ)/att.a:               \
 $(MESSOBJ)/bally.a:             \
 	$(MESS_DRIVERS)/astrocde.o  \
 
-$(MESSOBJ)/banctec.a:            \
-	$(MESS_DRIVERS)/banctec.o    \
+$(MESSOBJ)/banctec.a:           \
+	$(MESS_DRIVERS)/banctec.o   \
 
 $(MESSOBJ)/bandai.a:            \
 	$(MESS_DRIVERS)/sv8000.o    \
@@ -1259,6 +1260,9 @@ $(MESSOBJ)/galaxy.a:            \
 $(MESSOBJ)/gamepark.a:          \
 	$(MESS_DRIVERS)/gp2x.o      \
 	$(MESS_DRIVERS)/gp32.o      \
+
+$(MESSOBJ)/gi.a:                \
+	$(MESS_DRIVERS)/hh_pic16.o  \
 
 $(MESSOBJ)/grundy.a:            \
 	$(MESS_DRIVERS)/newbrain.o $(MESS_VIDEO)/newbrain.o \
@@ -1644,10 +1648,10 @@ $(MESSOBJ)/sinclair.a:          \
 
 $(MESSOBJ)/siemens.a:           \
 	$(MESS_DRIVERS)/pcd.o       \
-	$(MESS_MACHINE)/pcd_kbd.o       \
+	$(MESS_MACHINE)/pcd_kbd.o   \
 
-$(MESSOBJ)/slicer.a:           \
-	$(MESS_DRIVERS)/slicer.o   \
+$(MESSOBJ)/slicer.a:            \
+	$(MESS_DRIVERS)/slicer.o    \
 
 $(MESSOBJ)/snk.a:               \
 	$(MESS_DRIVERS)/ng_aes.o    \
@@ -1932,7 +1936,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/fc100.o     \
 	$(MESS_DRIVERS)/fk1.o       \
 	$(MESS_DRIVERS)/ft68m.o     \
-	$(MESS_DRIVERS)/gamate.o    $(MESS_AUDIO)/gamate.o    \
+	$(MESS_DRIVERS)/gamate.o $(MESS_AUDIO)/gamate.o \
 	$(MESS_DRIVERS)/gameking.o  \
 	$(MESS_DRIVERS)/gimix.o     \
 	$(MESS_DRIVERS)/grfd2301.o  \
@@ -1969,7 +1973,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/mx2178.o    \
 	$(MESS_DRIVERS)/mycom.o     \
 	$(MESS_DRIVERS)/myvision.o  \
-	$(MESS_DRIVERS)/ngen.o  $(MESS_MACHINE)/ngen_kb.o \
+	$(MESS_DRIVERS)/ngen.o $(MESS_MACHINE)/ngen_kb.o \
 	$(MESS_DRIVERS)/octopus.o   \
 	$(MESS_DRIVERS)/onyx.o      \
 	$(MESS_DRIVERS)/okean240.o  \
@@ -2119,6 +2123,7 @@ $(MESS_DRIVERS)/fidelz80.o: $(MESS_LAYOUT)/fidelz80.lh \
 $(MESS_DRIVERS)/gamecom.o:  $(MESS_LAYOUT)/gamecom.lh
 $(MESS_DRIVERS)/glasgow.o:  $(MESS_LAYOUT)/glasgow.lh
 $(MESS_DRIVERS)/h8.o:       $(MESS_LAYOUT)/h8.lh
+$(MESS_DRIVERS)/hh_pic16.o: $(MESS_LAYOUT)/maniac.lh
 $(MESS_DRIVERS)/hh_tms1k.o: $(MESS_LAYOUT)/amaztron.lh \
                             $(MESS_LAYOUT)/bankshot.lh \
                             $(MESS_LAYOUT)/cnsector.lh \
